@@ -2,124 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 086DE36F0B1
-	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 22:03:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F366E36F0BE
+	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 22:03:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234155AbhD2TsN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Apr 2021 15:48:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35122 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234113AbhD2TsL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 29 Apr 2021 15:48:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619725643;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+M4to1dcOs700isxx4oGCjHBz32mVchtGZDofF69pWA=;
-        b=GCaohZ0xibePeliaUTQfHi46ufhAlbmYkz87Ln3FhwAtMPy9natGkRhHmHBNwjGRxIaByy
-        71KdGSYVMDzu6NO9Af9kKmqu5XqFEocZsrqCGA/qDZwa0FOoRzAuIowSVdYn9GJmUKaJo6
-        IL3XWW8fvtF3XtbcAprHsjjR4Eyv4bg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-79-KamNEiW9NsGsTkhGWHaQ0w-1; Thu, 29 Apr 2021 15:47:02 -0400
-X-MC-Unique: KamNEiW9NsGsTkhGWHaQ0w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S236969AbhD2UBy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Apr 2021 16:01:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55640 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237301AbhD2UAK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Apr 2021 16:00:10 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E7048189C6;
-        Thu, 29 Apr 2021 19:47:00 +0000 (UTC)
-Received: from redhat.com (ovpn-113-225.phx2.redhat.com [10.3.113.225])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C2AFF69513;
-        Thu, 29 Apr 2021 19:46:59 +0000 (UTC)
-Date:   Thu, 29 Apr 2021 13:46:59 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Shanker R Donthineni <sdonthineni@nvidia.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        "Catalin Marinas" <catalin.marinas@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>, Vikram Sethi <vsethi@nvidia.com>,
-        Jason Sequeira <jsequeira@nvidia.com>
-Subject: Re: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR
- region in VMA
-Message-ID: <20210429134659.321a5c3c@redhat.com>
-In-Reply-To: <470360a7-0242-9ae5-816f-13608f957bf6@nvidia.com>
-References: <20210429162906.32742-1-sdonthineni@nvidia.com>
-        <20210429162906.32742-2-sdonthineni@nvidia.com>
-        <20210429122840.4f98f78e@redhat.com>
-        <470360a7-0242-9ae5-816f-13608f957bf6@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+        by mail.kernel.org (Postfix) with ESMTPSA id 72C3D613C1;
+        Thu, 29 Apr 2021 19:59:22 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lcCoi-00A5Du-4j; Thu, 29 Apr 2021 20:59:20 +0100
+Date:   Thu, 29 Apr 2021 20:59:14 +0100
+Message-ID: <87fsz8vp4d.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        pbonzini@redhat.com, drjones@redhat.com, alexandru.elisei@arm.com,
+        eric.auger@redhat.com
+Subject: Re: [PATCH 1/3] KVM: selftests: Add exception handling support for aarch64
+In-Reply-To: <YIryP84dAc0XHJk2@google.com>
+References: <20210423040351.1132218-1-ricarkol@google.com>
+        <20210423040351.1132218-2-ricarkol@google.com>
+        <87sg3hnzrj.wl-maz@kernel.org>
+        <YIryP84dAc0XHJk2@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: ricarkol@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, drjones@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 29 Apr 2021 14:14:50 -0500
-Shanker R Donthineni <sdonthineni@nvidia.com> wrote:
-
-> Thanks Alex for quick reply.
->=20
-> On 4/29/21 1:28 PM, Alex Williamson wrote:
-> > If this were a valid thing to do, it should be done for all
-> > architectures, not just ARM64.  However, a prefetchable range only
-> > necessarily allows merged writes, which seems like a subset of the
-> > semantics implied by a WC attribute, therefore this doesn't seem
-> > universally valid.
+AOn Thu, 29 Apr 2021 18:51:59 +0100,
+Ricardo Koller <ricarkol@google.com> wrote:
+> 
+> On Fri, Apr 23, 2021 at 09:58:24AM +0100, Marc Zyngier wrote:
+> > Hi Ricardo,
+> > 
+> > Thanks for starting this.
+> > 
+> > On Fri, 23 Apr 2021 05:03:49 +0100,
+> > Ricardo Koller <ricarkol@google.com> wrote:
+> > > +.pushsection ".entry.text", "ax"
+> > > +.balign 0x800
+> > > +.global vectors
+> > > +vectors:
+> > > +.popsection
+> > > +
+> > > +/*
+> > > + * Build an exception handler for vector and append a jump to it into
+> > > + * vectors (while making sure that it's 0x80 aligned).
+> > > + */
+> > > +.macro HANDLER, el, label, vector
+> > > +handler\()\vector:
+> > > +	save_registers \el
+> > > +	mov	x0, sp
+> > > +	mov	x1, \vector
+> > > +	bl	route_exception
+> > > +	restore_registers \el
+> > > +
+> > > +.pushsection ".entry.text", "ax"
+> > > +.balign 0x80
+> > > +	b	handler\()\vector
+> > > +.popsection
+> > > +.endm
+> > 
+> > That's an interesting construct, wildly different from what we are
+> > using elsewhere in the kernel, but hey, I like change ;-). It'd be
+> > good to add a comment to spell out that anything that emits into
+> > .entry.text between the declaration of 'vectors' and the end of this
+> > file will break everything.
+> > 
+> > > +
+> > > +.global ex_handler_code
+> > > +ex_handler_code:
+> > > +	HANDLER	1, sync, 0			// Synchronous EL1t
+> > > +	HANDLER	1, irq, 1			// IRQ EL1t
+> > > +	HANDLER	1, fiq, 2			// FIQ EL1t
+> > > +	HANDLER	1, error, 3			// Error EL1t
+> > 
+> > Can any of these actually happen? As far as I can see, the whole
+> > selftest environment seems to be designed around EL1h.
 > >
-> > I'm also a bit confused by your problem statement that indicates that
-> > without WC you're seeing unaligned accesses, does this suggest that
-> > your driver is actually relying on WC semantics to perform merging to
-> > achieve alignment?  That seems rather like a driver bug, I'd expect UC
-> > vs WC is largely a difference in performance, not a means to enforce
-> > proper driver access patterns.  Per the PCI spec, the bridge itself can
-> > merge writes to prefetchable areas, presumably regardless of this
-> > processor attribute, perhaps that's the feature your driver is relying
-> > on that might be missing here.  Thanks, =20
-> The driver uses WC semantics, It's mapping PCI prefetchable BARS
-> using ioremap_wc().=C2=A0 We don't see any issue for x86 architecture,
-> driver works fine in the host and guest kernel. The same driver works
-> on ARM64 kernel but crashes inside VM. GPU driver uses the
-> architecture agnostic function ioremap_wc() like other drivers. This
-> limitation applies to all the drivers if they use WC memory and
-> follow ARM64 NORMAL-NC access rules.
+> 
+> They can happen. KVM defaults to use EL1h:
 
-x86 KVM works for other reasons, KVM will trust the vCPU attributes for
-the memory range rather than relying only on the host mapping.
+That's not a KVM decision. That's an architectural requirement. Reset
+is an exception, exception use the handler mode.
 
-> On ARM64, ioremap_wc() is mapped to non-cacheable memory-type, no
-> side effects on reads and unaligned accesses are allowed as per
-> ARM-ARM architecture. The driver behavior is different in host vs
-> guest on ARM64.=C2=A0
+> 
+> 	#define VCPU_RESET_PSTATE_EL1   (PSR_MODE_EL1h | PSR_A_BIT | PSR_I_BIT | \
+> 
+> but then a guest can set the SPSel to 0:
+> 
+> 	asm volatile("msr spsel, #0");
+> 
+> and this happens:
+> 
+> 	  Unexpected exception guest (vector:0x0, ec:0x25)
+> 
+> I think it should still be a valid situation: some test might want to
+> try it.
 
-Per the PCI spec, prefetchable memory only necessarily allows the bridge
-to merge writes.  I believe this is only a subset of what WC mappings
-allow, therefore I expect this is incompatible with drivers that do not
-use WC mappings.
-=20
-> ARM CPU generating alignment faults before transaction reaches the
-> PCI-RC/switch/end-point-device.
+Sure, but that's not what this test (in patch #2) is doing, is it?
+If, as I believe, this is an unexpected situation, why not handle it
+separately? I'm not advocating one way or another, but it'd be good to
+understand the actual scope of the exception handling in this
+infrastructure.
 
-If an alignment fault is fixed by configuring a WC mapping, doesn't
-that suggest that the driver performed an unaligned access itself and
-is relying on write combining by the processor to correct that error?
-That's wrong.  Fix the driver or please offer another explanation of
-how the WC mapping resolves this.  I suspect you could enable tracing
-in QEMU, disable MMIO mmaps on the vfio-pci device and find the invalid
-access.
+If you plan to allow tests to run in the EL1t environment, where do
+you decide to switch back to EL1t after taking the exception in EL1h?
+Are the tests supposed to implement both stack layouts?
 
-> We've two concerns here:
-> =C2=A0=C2=A0 - Performance impacts for pass-through devices.
-> =C2=A0=C2=A0 - The definition of ioremap_wc() function doesn't match the =
-host
-> kernel on ARM64
+Overall, I'm worried that nobody is going to use this layout *unless*
+it becomes mandated.
 
-Performance I can understand, but I think you're also using it to mask
-a driver bug which should be resolved first.  Thanks,
+Thanks,
 
-Alex
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
