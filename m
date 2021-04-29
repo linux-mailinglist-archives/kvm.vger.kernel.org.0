@@ -2,62 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9888136E436
-	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 06:28:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7E5836E51E
+	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 08:51:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236839AbhD2EXs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Apr 2021 00:23:48 -0400
-Received: from mga01.intel.com ([192.55.52.88]:60569 "EHLO mga01.intel.com"
+        id S231343AbhD2GwL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Apr 2021 02:52:11 -0400
+Received: from verein.lst.de ([213.95.11.211]:51957 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236230AbhD2EXr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Apr 2021 00:23:47 -0400
-IronPort-SDR: 2ri/VPHsvYU4K5Ad8I+t5APa4qaPRtlIeJLuy9B4T/Bjqm/4qkUNORLfVQmjpYXiw/08PC+f0g
- 45RbrPhjOqmA==
-X-IronPort-AV: E=McAfee;i="6200,9189,9968"; a="217643620"
-X-IronPort-AV: E=Sophos;i="5.82,258,1613462400"; 
-   d="scan'208";a="217643620"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2021 21:22:53 -0700
-IronPort-SDR: +46sYziGc1P2unbdLWaf+MGFGQ/RtbJflfMG9BETMwPbjQSQ4cUCxb+G1kmzVJyNMe1QmW3rmm
- N2wl/hJydfHQ==
-X-IronPort-AV: E=Sophos;i="5.82,258,1613462400"; 
-   d="scan'208";a="393732622"
-Received: from savora-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.209.50.252])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2021 21:22:52 -0700
-From:   Kai Huang <kai.huang@intel.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, Kai Huang <kai.huang@intel.com>
-Subject: [PATCH] KVM: VMX: Fix a typo in comment around handle_vmx_instruction()
-Date:   Thu, 29 Apr 2021 16:22:37 +1200
-Message-Id: <20210429042237.51280-1-kai.huang@intel.com>
-X-Mailer: git-send-email 2.30.2
+        id S238802AbhD2GwI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Apr 2021 02:52:08 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 9D4F867357; Thu, 29 Apr 2021 08:51:13 +0200 (CEST)
+Date:   Thu, 29 Apr 2021 08:51:13 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Tarun Gupta <targupta@nvidia.com>
+Subject: Re: [PATCH v2 02/13] vfio/mdev: Allow the mdev_parent_ops to
+ specify the device driver to bind
+Message-ID: <20210429065113.GB2882@lst.de>
+References: <0-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com> <2-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com> <20210428060300.GA4092@lst.de> <CAPcyv4g=MFtZMVZPn8AtTX6NyweF25nuFNVBu7pg_QSP+EGE+g@mail.gmail.com> <20210428124153.GA28566@lst.de> <20210428140005.GS1370958@nvidia.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210428140005.GS1370958@nvidia.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It is nested_vmx_hardware_setup() which overwrites VMX instruction VM
-exits handlers, but not nested_vmx_setup().  Fix the typo in comment.
+On Wed, Apr 28, 2021 at 11:00:05AM -0300, Jason Gunthorpe wrote:
+> I thought about doing it like that, it is generally a good idea,
+> however, if I add new API surface to the driver core I really want to
+> get rid of device_bind_driver(), or at least most of its users.
+> 
+> I'm pretty sure Greg will ask for it too.
 
-Signed-off-by: Kai Huang <kai.huang@intel.com>
----
- arch/x86/kvm/vmx/vmx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 10b610fc7bbc..f8661bc113ed 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5618,7 +5618,7 @@ static int handle_preemption_timer(struct kvm_vcpu *vcpu)
- 
- /*
-  * When nested=0, all VMX instruction VM Exits filter here.  The handlers
-- * are overwritten by nested_vmx_setup() when nested=1.
-+ * are overwritten by nested_vmx_hardware_setup() when nested=1.
-  */
- static int handle_vmx_instruction(struct kvm_vcpu *vcpu)
- {
--- 
-2.30.2
-
+Well, let's ask them.  I though I had Cced him on my original mail,
+but must have missed that.
