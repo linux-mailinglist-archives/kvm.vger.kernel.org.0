@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BA17B36EE4D
-	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 18:41:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E1B4536EE4E
+	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 18:42:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240824AbhD2Qmc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Apr 2021 12:42:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43947 "EHLO
+        id S240839AbhD2Qme (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Apr 2021 12:42:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35288 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233099AbhD2Qmb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 29 Apr 2021 12:42:31 -0400
+        by vger.kernel.org with ESMTP id S233099AbhD2Qmd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 29 Apr 2021 12:42:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619714504;
+        s=mimecast20190719; t=1619714506;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TslnRqE0mRcJII5nyI9E9Ex8fm7/Lw2IOiNlNoFrCTk=;
-        b=Lwdp8/YeN7TEAKSxUHWeCigBtBJypF4nheMDgZjhhxSFZYJEcHVOWqA6QsjPvMmtA9FSC5
-        yEfdOCdO0tC7b2Uz+OEobO8/tzzb0ToZArsGf7EMxNjRK7PP0SoP6CrcknBFpEujooX1WC
-        iAkXTrfsFQRWdkjn8Xa/i6noyxGokao=
+        bh=YsWBDQcBjYg5w88YF1WhzwzOokFQvL14Q/QvvOyRBQQ=;
+        b=HZR3uZLkMbtY/zmatFLYnmapWCwA9ucY1f+Ln3bF7y6426r20GtYoMblJ94I1+HVsHXtC6
+        l3bywG6Hs7CU53IFjoVsOrOyR/yKYu7KGh6nUD0eKR5r4TAueULfofHs8GjfddWzaltz6B
+        KSZkBR/0Xc27MVc+gtvcqp+WJySOQ+o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-GXp_yXj1PUKliDdLCGsXTg-1; Thu, 29 Apr 2021 12:41:41 -0400
-X-MC-Unique: GXp_yXj1PUKliDdLCGsXTg-1
+ us-mta-411-OBv2WfIzMt-aVwCxD5XuBA-1; Thu, 29 Apr 2021 12:41:44 -0400
+X-MC-Unique: OBv2WfIzMt-aVwCxD5XuBA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5ED30107ACFB;
-        Thu, 29 Apr 2021 16:41:40 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A0961B18BC5;
+        Thu, 29 Apr 2021 16:41:42 +0000 (UTC)
 Received: from gator.redhat.com (unknown [10.40.192.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D99DD5D6DC;
-        Thu, 29 Apr 2021 16:41:38 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B14065D768;
+        Thu, 29 Apr 2021 16:41:40 +0000 (UTC)
 From:   Andrew Jones <drjones@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     alexandru.elisei@arm.com, nikos.nikoleris@arm.com,
         andre.przywara@arm.com, eric.auger@redhat.com
-Subject: [PATCH kvm-unit-tests v3 1/8] arm/arm64: Reorganize cstart assembler
-Date:   Thu, 29 Apr 2021 18:41:23 +0200
-Message-Id: <20210429164130.405198-2-drjones@redhat.com>
+Subject: [PATCH kvm-unit-tests v3 2/8] arm/arm64: Move setup_vm into setup
+Date:   Thu, 29 Apr 2021 18:41:24 +0200
+Message-Id: <20210429164130.405198-3-drjones@redhat.com>
 In-Reply-To: <20210429164130.405198-1-drjones@redhat.com>
 References: <20210429164130.405198-1-drjones@redhat.com>
 MIME-Version: 1.0
@@ -49,146 +49,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move secondary_entry helper functions out of .init and into .text,
-since secondary_entry isn't run at at "init" time. Actually, anything
-that is used after init time should be in .text, as we may not include
-.init in some build configurations.
+Consolidate our setup calls to reduce the amount we need to do from
+init::start. Also remove a couple of pointless comments from setup().
 
-Reviewed-by Nikos Nikoleris <nikos.nikoleris@arm.com>
+Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- arm/cstart.S   | 66 +++++++++++++++++++++++++++++---------------------
- arm/cstart64.S | 18 ++++++++------
- 2 files changed, 49 insertions(+), 35 deletions(-)
+ arm/cstart.S    | 6 ------
+ arm/cstart64.S  | 5 -----
+ lib/arm/setup.c | 7 +++++--
+ 3 files changed, 5 insertions(+), 13 deletions(-)
 
 diff --git a/arm/cstart.S b/arm/cstart.S
-index d88a98362940..b2c0ba061cd5 100644
+index b2c0ba061cd5..bf3c78157e6a 100644
 --- a/arm/cstart.S
 +++ b/arm/cstart.S
-@@ -96,32 +96,7 @@ start:
- 	bl	exit
- 	b	halt
+@@ -81,12 +81,7 @@ start:
+ 	/* complete setup */
+ 	pop	{r0-r1}
+ 	bl	setup
+-	bl	get_mmu_off
+-	cmp	r0, #0
+-	bne	1f
+-	bl	setup_vm
  
--
--.macro set_mode_stack mode, stack
--	add	\stack, #S_FRAME_SIZE
--	msr	cpsr_c, #(\mode | PSR_I_BIT | PSR_F_BIT)
--	isb
--	mov	sp, \stack
--.endm
--
--exceptions_init:
--	mrc	p15, 0, r2, c1, c0, 0	@ read SCTLR
--	bic	r2, #CR_V		@ SCTLR.V := 0
--	mcr	p15, 0, r2, c1, c0, 0	@ write SCTLR
--	ldr	r2, =vector_table
--	mcr	p15, 0, r2, c12, c0, 0	@ write VBAR
--
--	mrs	r2, cpsr
--
--	/* first frame reserved for svc mode */
--	set_mode_stack	UND_MODE, r0
--	set_mode_stack	ABT_MODE, r0
--	set_mode_stack	IRQ_MODE, r0
--	set_mode_stack	FIQ_MODE, r0
--
--	msr	cpsr_cxsf, r2		@ back to svc mode
--	isb
--	mov	pc, lr
-+.text
- 
- enable_vfp:
- 	/* Enable full access to CP10 and CP11: */
-@@ -133,8 +108,6 @@ enable_vfp:
+-1:
+ 	/* run the test */
+ 	ldr	r0, =__argc
+ 	ldr	r0, [r0]
+@@ -108,7 +103,6 @@ enable_vfp:
  	vmsr	fpexc, r0
  	mov	pc, lr
  
--.text
--
- .global get_mmu_off
+-.global get_mmu_off
  get_mmu_off:
  	ldr	r0, =auxinfo
-@@ -235,6 +208,43 @@ asm_mmu_disable:
- 
- 	mov     pc, lr
- 
-+/*
-+ * Vectors
-+ */
-+
-+.macro set_mode_stack mode, stack
-+	add	\stack, #S_FRAME_SIZE
-+	msr	cpsr_c, #(\mode | PSR_I_BIT | PSR_F_BIT)
-+	isb
-+	mov	sp, \stack
-+.endm
-+
-+/*
-+ * exceptions_init
-+ *
-+ * Input r0 is the stack top, which is the exception stacks base
-+ */
-+exceptions_init:
-+	mrc	p15, 0, r2, c1, c0, 0	@ read SCTLR
-+	bic	r2, #CR_V		@ SCTLR.V := 0
-+	mcr	p15, 0, r2, c1, c0, 0	@ write SCTLR
-+	ldr	r2, =vector_table
-+	mcr	p15, 0, r2, c12, c0, 0	@ write VBAR
-+
-+	mrs	r2, cpsr
-+
-+	/*
-+	 * The first frame is reserved for svc mode
-+	 */
-+	set_mode_stack	UND_MODE, r0
-+	set_mode_stack	ABT_MODE, r0
-+	set_mode_stack	IRQ_MODE, r0
-+	set_mode_stack	FIQ_MODE, r0
-+
-+	msr	cpsr_cxsf, r2		@ back to svc mode
-+	isb
-+	mov	pc, lr
-+
- /*
-  * Vector stubs
-  * Simplified version of the Linux kernel implementation
+ 	ldr	r0, [r0, #4]
 diff --git a/arm/cstart64.S b/arm/cstart64.S
-index 0a85338bcdae..7963e1fea979 100644
+index 7963e1fea979..27251fe8b5cd 100644
 --- a/arm/cstart64.S
 +++ b/arm/cstart64.S
-@@ -109,13 +109,6 @@ start:
- 	bl	exit
- 	b	halt
+@@ -93,11 +93,7 @@ start:
  
--exceptions_init:
--	adrp	x4, vector_table
--	add	x4, x4, :lo12:vector_table
--	msr	vbar_el1, x4
--	isb
--	ret
--
+ 	/* complete setup */
+ 	bl	setup				// x0 is the addr of the dtb
+-	bl	get_mmu_off
+-	cbnz	x0, 1f
+-	bl	setup_vm
+ 
+-1:
+ 	/* run the test */
+ 	adrp	x0, __argc
+ 	ldr	w0, [x0, :lo12:__argc]
+@@ -111,7 +107,6 @@ start:
+ 
  .text
  
- .globl get_mmu_off
-@@ -251,6 +244,17 @@ asm_mmu_disable:
+-.globl get_mmu_off
+ get_mmu_off:
+ 	adrp	x0, auxinfo
+ 	ldr	x0, [x0, :lo12:auxinfo + 8]
+diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+index 751ba980000a..9c16f6004e9f 100644
+--- a/lib/arm/setup.c
++++ b/lib/arm/setup.c
+@@ -16,6 +16,8 @@
+ #include <alloc.h>
+ #include <alloc_phys.h>
+ #include <alloc_page.h>
++#include <vmalloc.h>
++#include <auxinfo.h>
+ #include <argv.h>
+ #include <asm/thread_info.h>
+ #include <asm/setup.h>
+@@ -233,7 +235,6 @@ void setup(const void *fdt)
+ 		freemem += initrd_size;
+ 	}
  
- /*
-  * Vectors
-+ */
+-	/* call init functions */
+ 	mem_init(PAGE_ALIGN((unsigned long)freemem));
+ 	cpu_init();
+ 
+@@ -243,7 +244,6 @@ void setup(const void *fdt)
+ 	/* mem_init must be called before io_init */
+ 	io_init();
+ 
+-	/* finish setup */
+ 	timer_save_state();
+ 
+ 	ret = dt_get_bootargs(&bootargs);
+@@ -256,4 +256,7 @@ void setup(const void *fdt)
+ 		memcpy(env, initrd, initrd_size);
+ 		setup_env(env, initrd_size);
+ 	}
 +
-+exceptions_init:
-+	adrp	x4, vector_table
-+	add	x4, x4, :lo12:vector_table
-+	msr	vbar_el1, x4
-+	isb
-+	ret
-+
-+/*
-+ * Vector stubs
-  * Adapted from arch/arm64/kernel/entry.S
-  */
- .macro vector_stub, name, vec
++	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
++		setup_vm();
+ }
 -- 
 2.30.2
 
