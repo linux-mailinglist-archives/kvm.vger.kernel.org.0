@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E1B4536EE4E
-	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 18:42:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CEC236EE4F
+	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 18:42:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240839AbhD2Qme (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S240828AbhD2Qme (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Thu, 29 Apr 2021 12:42:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35288 "EHLO
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31635 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233099AbhD2Qmd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 29 Apr 2021 12:42:33 -0400
+        by vger.kernel.org with ESMTP id S240836AbhD2Qme (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 29 Apr 2021 12:42:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619714506;
+        s=mimecast20190719; t=1619714507;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YsWBDQcBjYg5w88YF1WhzwzOokFQvL14Q/QvvOyRBQQ=;
-        b=HZR3uZLkMbtY/zmatFLYnmapWCwA9ucY1f+Ln3bF7y6426r20GtYoMblJ94I1+HVsHXtC6
-        l3bywG6Hs7CU53IFjoVsOrOyR/yKYu7KGh6nUD0eKR5r4TAueULfofHs8GjfddWzaltz6B
-        KSZkBR/0Xc27MVc+gtvcqp+WJySOQ+o=
+        bh=ieB651UsZKHZvC9D2BHwczeE14PHQ4gT6iRkFLBLOnU=;
+        b=EFPWLW05bb0dmYbGXUdxuEX9lkh6fXsH87sEzahQAvN2WCuZvVMOfOSkF5uwKafgYaCtN4
+        EleYrtCnaPHB2VWTu5f6xfSTHN87UAsWE6ZW9nd24/OptWKwr/gzgyn81KWVucEE4Vh25C
+        CF7IouwAEE6YpP9O0Hn0i/SekC/2vLQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-OBv2WfIzMt-aVwCxD5XuBA-1; Thu, 29 Apr 2021 12:41:44 -0400
-X-MC-Unique: OBv2WfIzMt-aVwCxD5XuBA-1
+ us-mta-572-4GiY9sFpMueNp2NM7EuMpA-1; Thu, 29 Apr 2021 12:41:44 -0400
+X-MC-Unique: 4GiY9sFpMueNp2NM7EuMpA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A0961B18BC5;
-        Thu, 29 Apr 2021 16:41:42 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBD05107ACFA;
+        Thu, 29 Apr 2021 16:41:43 +0000 (UTC)
 Received: from gator.redhat.com (unknown [10.40.192.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B14065D768;
-        Thu, 29 Apr 2021 16:41:40 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C9DA5D768;
+        Thu, 29 Apr 2021 16:41:42 +0000 (UTC)
 From:   Andrew Jones <drjones@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     alexandru.elisei@arm.com, nikos.nikoleris@arm.com,
         andre.przywara@arm.com, eric.auger@redhat.com
-Subject: [PATCH kvm-unit-tests v3 2/8] arm/arm64: Move setup_vm into setup
-Date:   Thu, 29 Apr 2021 18:41:24 +0200
-Message-Id: <20210429164130.405198-3-drjones@redhat.com>
+Subject: [PATCH kvm-unit-tests v3 3/8] pci-testdev: ioremap regions
+Date:   Thu, 29 Apr 2021 18:41:25 +0200
+Message-Id: <20210429164130.405198-4-drjones@redhat.com>
 In-Reply-To: <20210429164130.405198-1-drjones@redhat.com>
 References: <20210429164130.405198-1-drjones@redhat.com>
 MIME-Version: 1.0
@@ -49,104 +49,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Consolidate our setup calls to reduce the amount we need to do from
-init::start. Also remove a couple of pointless comments from setup().
+Don't assume the physical addresses used with PCI have already been
+identity mapped.
 
 Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- arm/cstart.S    | 6 ------
- arm/cstart64.S  | 5 -----
- lib/arm/setup.c | 7 +++++--
- 3 files changed, 5 insertions(+), 13 deletions(-)
+ lib/pci-host-generic.c | 5 ++---
+ lib/pci-host-generic.h | 4 ++--
+ lib/pci-testdev.c      | 4 ++++
+ 3 files changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/arm/cstart.S b/arm/cstart.S
-index b2c0ba061cd5..bf3c78157e6a 100644
---- a/arm/cstart.S
-+++ b/arm/cstart.S
-@@ -81,12 +81,7 @@ start:
- 	/* complete setup */
- 	pop	{r0-r1}
- 	bl	setup
--	bl	get_mmu_off
--	cmp	r0, #0
--	bne	1f
--	bl	setup_vm
+diff --git a/lib/pci-host-generic.c b/lib/pci-host-generic.c
+index 818150dc0a66..c5e3db9b96f4 100644
+--- a/lib/pci-host-generic.c
++++ b/lib/pci-host-generic.c
+@@ -122,7 +122,7 @@ static struct pci_host_bridge *pci_dt_probe(void)
+ 		      sizeof(host->addr_space[0]) * nr_addr_spaces);
+ 	assert(host != NULL);
  
--1:
- 	/* run the test */
- 	ldr	r0, =__argc
- 	ldr	r0, [r0]
-@@ -108,7 +103,6 @@ enable_vfp:
- 	vmsr	fpexc, r0
- 	mov	pc, lr
+-	host->start		= base.addr;
++	host->start		= ioremap(base.addr, base.size);
+ 	host->size		= base.size;
+ 	host->bus		= bus;
+ 	host->bus_max		= bus_max;
+@@ -279,8 +279,7 @@ phys_addr_t pci_host_bridge_get_paddr(u64 pci_addr)
  
--.global get_mmu_off
- get_mmu_off:
- 	ldr	r0, =auxinfo
- 	ldr	r0, [r0, #4]
-diff --git a/arm/cstart64.S b/arm/cstart64.S
-index 7963e1fea979..27251fe8b5cd 100644
---- a/arm/cstart64.S
-+++ b/arm/cstart64.S
-@@ -93,11 +93,7 @@ start:
- 
- 	/* complete setup */
- 	bl	setup				// x0 is the addr of the dtb
--	bl	get_mmu_off
--	cbnz	x0, 1f
--	bl	setup_vm
- 
--1:
- 	/* run the test */
- 	adrp	x0, __argc
- 	ldr	w0, [x0, :lo12:__argc]
-@@ -111,7 +107,6 @@ start:
- 
- .text
- 
--.globl get_mmu_off
- get_mmu_off:
- 	adrp	x0, auxinfo
- 	ldr	x0, [x0, :lo12:auxinfo + 8]
-diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index 751ba980000a..9c16f6004e9f 100644
---- a/lib/arm/setup.c
-+++ b/lib/arm/setup.c
-@@ -16,6 +16,8 @@
- #include <alloc.h>
- #include <alloc_phys.h>
- #include <alloc_page.h>
-+#include <vmalloc.h>
-+#include <auxinfo.h>
- #include <argv.h>
- #include <asm/thread_info.h>
- #include <asm/setup.h>
-@@ -233,7 +235,6 @@ void setup(const void *fdt)
- 		freemem += initrd_size;
- 	}
- 
--	/* call init functions */
- 	mem_init(PAGE_ALIGN((unsigned long)freemem));
- 	cpu_init();
- 
-@@ -243,7 +244,6 @@ void setup(const void *fdt)
- 	/* mem_init must be called before io_init */
- 	io_init();
- 
--	/* finish setup */
- 	timer_save_state();
- 
- 	ret = dt_get_bootargs(&bootargs);
-@@ -256,4 +256,7 @@ void setup(const void *fdt)
- 		memcpy(env, initrd, initrd_size);
- 		setup_env(env, initrd_size);
- 	}
-+
-+	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
-+		setup_vm();
+ static void __iomem *pci_get_dev_conf(struct pci_host_bridge *host, int devfn)
+ {
+-	return (void __iomem *)(unsigned long)
+-		host->start + (devfn << PCI_ECAM_DEVFN_SHIFT);
++	return host->start + (devfn << PCI_ECAM_DEVFN_SHIFT);
  }
+ 
+ u8 pci_config_readb(pcidevaddr_t dev, u8 off)
+diff --git a/lib/pci-host-generic.h b/lib/pci-host-generic.h
+index fd30e7c74ed8..0ffe6380ec8f 100644
+--- a/lib/pci-host-generic.h
++++ b/lib/pci-host-generic.h
+@@ -18,8 +18,8 @@ struct pci_addr_space {
+ };
+ 
+ struct pci_host_bridge {
+-	phys_addr_t		start;
+-	phys_addr_t		size;
++	void __iomem		*start;
++	size_t			size;
+ 	int			bus;
+ 	int			bus_max;
+ 	int			nr_addr_spaces;
+diff --git a/lib/pci-testdev.c b/lib/pci-testdev.c
+index 039bb44781c1..4f2e5663b2d6 100644
+--- a/lib/pci-testdev.c
++++ b/lib/pci-testdev.c
+@@ -185,7 +185,11 @@ int pci_testdev(void)
+ 	mem = ioremap(addr, PAGE_SIZE);
+ 
+ 	addr = pci_bar_get_addr(&pci_dev, 1);
++#if defined(__i386__) || defined(__x86_64__)
+ 	io = (void *)(unsigned long)addr;
++#else
++	io = ioremap(addr, PAGE_SIZE);
++#endif
+ 
+ 	nr_tests += pci_testdev_all(mem, &pci_testdev_mem_ops);
+ 	nr_tests += pci_testdev_all(io, &pci_testdev_io_ops);
 -- 
 2.30.2
 
