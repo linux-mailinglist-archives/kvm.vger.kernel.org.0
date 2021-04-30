@@ -2,77 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89BEA36F6C5
-	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 09:58:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AFA436F77B
+	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 11:03:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230407AbhD3H6q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Apr 2021 03:58:46 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:17830 "EHLO
-        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229532AbhD3H6p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Apr 2021 03:58:45 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4FWl662qVnzBtGb;
-        Fri, 30 Apr 2021 15:55:26 +0800 (CST)
-Received: from [127.0.0.1] (10.69.38.196) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.498.0; Fri, 30 Apr 2021
- 15:57:47 +0800
-From:   Yicong Yang <yangyicong@hisilicon.com>
-Subject: [Question] Indefinitely block in the host when remove the PF driver
-To:     Alex Williamson <alex.williamson@redhat.com>, <cohuck@redhat.com>,
-        <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-CC:     "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        Yicong Yang <yangyicong@hisilicon.com>
-Message-ID: <c9466e2c-385d-8298-d03c-80dcfc359f52@hisilicon.com>
-Date:   Fri, 30 Apr 2021 15:57:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.1
+        id S231181AbhD3JEP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Apr 2021 05:04:15 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:59716 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229598AbhD3JEP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Apr 2021 05:04:15 -0400
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1619773405;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=bQLJe2vWc77QZO90MG/WZK52RC28OAEA93KFg1edhos=;
+        b=RKCg+BApqYuVq7uEf/l3PnLOt+vVeI1FI9YvgjIu3V32QCQUNu3+G7gB+vWO4I4u3vzVQM
+        98oDDxwoGtW0q9YcZZ/r08BmGaTdkoanliK0uDB5GXn1fAlrDJ3duh65/K51XMMSceOJIR
+        hir50rUQGaNTkXEoVCpGPgO+X3OD4+nT7t3XF/krEH3OJPL19ezSRkq1ZK1RfLRTdWUjtq
+        lHmq5wiICOgQ2PzK1r497nihQlNZHwCp9WGru7ZZbuWN/x/jP9k1yob0uh9VOCgvH2jXEK
+        TA5tfQaOIcFOOwj2A+assSH/qQkphcApwVV5wSy3NtiMs9dhaVbcoGSKONaB2Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1619773405;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=bQLJe2vWc77QZO90MG/WZK52RC28OAEA93KFg1edhos=;
+        b=tQCKyw1A0DB2zxwte4lI4q+fVS+chFnBaPqnDZh6nwoaxiWHbZfWeyUyAnHEsA66/whM5F
+        nOKhLIr6vo/vtPDw==
+To:     Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org
+Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH 4/4] KVM/VMX: Fold handle_interrupt_nmi_irqoff() into its solo caller
+In-Reply-To: <20210426230949.3561-5-jiangshanlai@gmail.com>
+References: <20210426230949.3561-1-jiangshanlai@gmail.com> <20210426230949.3561-5-jiangshanlai@gmail.com>
+Date:   Fri, 30 Apr 2021 11:03:25 +0200
+Message-ID: <87y2d0du02.ffs@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.38.196]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When I try to remove the PF driver in the host, the process will be blocked
-if the related VF of the device is added in the Qemu as an iEP.
+Lai,
 
-here's what I got in the host:
+On Tue, Apr 27 2021 at 07:09, Lai Jiangshan wrote:
+>  	u32 intr_info = vmx_get_intr_info(&vmx->vcpu);
+> @@ -6427,12 +6417,19 @@ static void handle_exception_nmi_irqoff(struct vcpu_vmx *vmx)
+>  static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
+>  {
+>  	u32 intr_info = vmx_get_intr_info(vcpu);
+> +	unsigned int vector;
+> +	gate_desc *desc;
+>  
+>  	if (WARN_ONCE(!is_external_intr(intr_info),
+>  	    "KVM: unexpected VM-Exit interrupt info: 0x%x", intr_info))
+>  		return;
+>  
+> -	handle_interrupt_nmi_irqoff(vcpu, intr_info);
+> +	vector = intr_info & INTR_INFO_VECTOR_MASK;
+> +	desc = (gate_desc *)host_idt_base + vector;
+> +
+> +	kvm_before_interrupt(vcpu);
+> +	vmx_do_interrupt_nmi_irqoff(gate_offset(desc));
+> +	kvm_after_interrupt(vcpu);
 
-[root@localhost 0000:75:00.0]# rmmod hisi_zip
-[99760.571352] vfio-pci 0000:75:00.1: Relaying device request to user (#0)
-[99862.992099] vfio-pci 0000:75:00.1: Relaying device request to user (#10)
-[...]
+So the previous patch does:
 
-and in the Qemu:
++               kvm_before_interrupt(&vmx->vcpu);
++               vmx_do_interrupt_nmi_irqoff((unsigned long)asm_noist_exc_nmi);
++               kvm_after_interrupt(&vmx->vcpu);
 
-estuary:/$ lspci -tv
--[0000:00]-+-00.0  Device 1b36:0008
-           +-01.0  Device 1af4:1000
-           +-02.0  Device 1af4:1009
-           \-03.0  Device 19e5:a251 <----- the related VF device
-estuary:/$ qemu-system-aarch64: warning: vfio 0000:75:00.1: Bus 'pcie.0' does not support hotplugging
-qemu-system-aarch64: warning: vfio 0000:75:00.1: Bus 'pcie.0' does not support hotplugging
-qemu-system-aarch64: warning: vfio 0000:75:00.1: Bus 'pcie.0' does not support hotplugging
-qemu-system-aarch64: warning: vfio 0000:75:00.1: Bus 'pcie.0' does not support hotplugging
-[...]
-
-The rmmod process will be blocked until I kill the Qemu process. That's the only way if I
-want to end the rmmod.
-
-So my question is: is such block reasonable? If the VF devcie is occupied or doesn't
-support hotplug in the Qemu, shouldn't we fail the rmmod and return something like -EBUSY
-rather than make the host blocked indefinitely?
-
-Add the VF under a pcie root port will avoid this. Is it encouraged to always
-add the VF under a pcie root port rather than directly add it as an iEP?
+What is this idt gate descriptor dance for in this code?
 
 Thanks,
-Yicong
 
-
-
+        tglx
