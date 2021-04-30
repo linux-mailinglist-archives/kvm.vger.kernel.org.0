@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E55E636FAB3
-	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 14:42:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BC6436FAB5
+	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 14:42:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232784AbhD3Mm5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Apr 2021 08:42:57 -0400
-Received: from mail-dm6nam12on2072.outbound.protection.outlook.com ([40.107.243.72]:56448
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        id S233102AbhD3MnR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Apr 2021 08:43:17 -0400
+Received: from mail-co1nam11on2082.outbound.protection.outlook.com ([40.107.220.82]:56928
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232718AbhD3Mln (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Apr 2021 08:41:43 -0400
+        id S233014AbhD3Mlx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Apr 2021 08:41:53 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PBP2Xz0lfeU8vihzE9w8vx9MlTc3SjcKxWkHzPVmUldn1HyQ7+8e5ZbWYNjU4EzydUSlgEE1v1MCIzLzA9VTs/VmRCh2jVk8LSS0fDBvuGXM/pU9bxadfbMR9WPHKsw6wX40xmiV4Vj9oFgEqUHXcaGsqT9P7xu1f/mR3Vg4wlaF2quEr988zP9EytLlzWQrZVQMGimSVaShzoPYN4MjgmGAstAkDSnwCMmP2WZe8nWwydsdV0Gkv4kG2Bw40EatjGZpLQYtSvO/D89jFeyNQUxlmMNc0N2tr4t9t88Cvw55BGsnBjZRJTE3OwPn4BdQeArqoFadJEfDgUu0gDvRYA==
+ b=GB1yxsPOkPxiWi9PRaXuIbViV1VqNj8FdRt7nPu1uM5BH9gk/AM0BBCteROv/rBNcoCB/tqUq/CvgxXuPEWKWiikbaHqwpz/pekcVx+PjZJZzMWU8NKSk52hclPQ6EbMr41EhGywBp9qJmgmWrOgrGHpxw7QuPTiZCZZNm7kiegoH9hO07J+7xwMHoyGJjelAOB9fXkpsK49rJ3ZpAeqdbzvONUUmMOi0fhBeWlM7nAgh0cMuZCW/daAx9IKPxi5iu1ZpuDy1DCCOZjWD960IO0E4/e14TjI24tfff2gLf0EKpcLS0gyLY4FFhJkkipPN7Ec0li81RefTRa7biuINw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XDrXWRS0Mr8SyYFVTPmqsB4jVYSoEmKEM7Yrm8+awDs=;
- b=KF8ezqmAIpLe12Zz5hBMl/8db17GViHXeW4XeJGp6Bl+RFJ5tcr++5KcFQrM5YacIGkIrWUTRs+UCsemJKRmOtESOlscNYOvGc9tIaQVWRESUeBXNZuT8P0XrRAAQGhl2F7L4Una1Z/SqPAdPdm7NE8rI1FpOGxFKIoWJ5n/V0rvqRoyQilLch1fZKhb/R6hHZ9TQsmr4oWw9NbkIcZjyT4b7s8Ak5rvDdtQg/8wC5zPKF8eTh1HybBMs4X7Dvq1dLTjb0GiKqJqrnsI1TGsWj/VxuRlFQCgolQwgFx3+cnzQ1pqQBwE4qRegFKWT+9yIAkNDmK61XOKijn/5x0yTA==
+ bh=5ZJ3je2wPxh/fQFSMVgcp3662puay8fC0jHWjiSZ3ZM=;
+ b=FtNqg0rr5631RDoOUutWYOOiE4DOP78IWUycQEEiJtjywN+C+rBTGioP9cnmHhdvIPL2lgubPsxPVSf8vSwkkEWBSzdMf1S6Zd054sdKKpDlyaYhAxPVVpPN4UpubiVHi3hVZDkTO64ITv+8UXjBTgSJ8aqyxTfgtC+FtKCCm/oTsoPV1NgAolxS2c2/Z+qgYuaVRdGJJRHCBGc6z+7H5aUsyTo+XGoBX1LXcQa+97Y6VdjzsuPDq1u4c9epv0bshVBaANz5Pnl38B47WHS9wvSS6RaC1sn1Z6RiW2XUvzImc5W+neBF6IF7tjX3XfPSJGc2EDB0/3VPBeTCpTLAPA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XDrXWRS0Mr8SyYFVTPmqsB4jVYSoEmKEM7Yrm8+awDs=;
- b=OslvHGV/doLJ9dVr/wHWdp8HWRbRyxfbXToz4ihqKnnPDOGoIIPzutCT7aoHkrFUBWdkPM3pGb0omg7G2T6/IArtsCNnt7wyEeQjXkvfe+K2zkdwTYWQkGvE/IkEr9PL/kL0IaKsEWIm9oQade96Qzqk7n6I6xOVuZM3Km8htPQ=
+ bh=5ZJ3je2wPxh/fQFSMVgcp3662puay8fC0jHWjiSZ3ZM=;
+ b=a9a8VLdpQOMHTMt4h1cS+yrtmxkzhtb8g7cGSjniu+BI8t9nU5D62cbEUiYnHVPhTthJSrnYB24dqcSgkHvutm1EOmaJk90Uu1FFoGcVC5/VOPoKuo5k/knf6X3mBr34i3OK0RXb3adiWlBw+cNvPWbq3G7I0qL9d9VOA0KDEzI=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
  by SN6PR12MB2688.namprd12.prod.outlook.com (2603:10b6:805:6f::29) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4087.35; Fri, 30 Apr
- 2021 12:39:47 +0000
+ 2021 12:39:48 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4065.027; Fri, 30 Apr 2021
@@ -44,9 +44,9 @@ Cc:     tglx@linutronix.de, bp@alien8.de, jroedel@suse.de,
         dave.hansen@intel.com, rientjes@google.com, seanjc@google.com,
         peterz@infradead.org, hpa@zytor.com, tony.luck@intel.com,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH Part2 RFC v2 32/37] KVM: SVM: Add support to handle MSR based Page State Change VMGEXIT
-Date:   Fri, 30 Apr 2021 07:38:17 -0500
-Message-Id: <20210430123822.13825-33-brijesh.singh@amd.com>
+Subject: [PATCH Part2 RFC v2 33/37] KVM: SVM: Add support to handle Page State Change VMGEXIT
+Date:   Fri, 30 Apr 2021 07:38:18 -0500
+Message-Id: <20210430123822.13825-34-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210430123822.13825-1-brijesh.singh@amd.com>
 References: <20210430123822.13825-1-brijesh.singh@amd.com>
@@ -59,199 +59,127 @@ MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN4PR0501CA0089.namprd05.prod.outlook.com (2603:10b6:803:22::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4108.8 via Frontend Transport; Fri, 30 Apr 2021 12:39:17 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c5b0028f-5c4a-4b3b-20cc-08d90bd4f844
+X-MS-Office365-Filtering-Correlation-Id: f63ccc21-a4a1-4406-e556-08d90bd4f8ac
 X-MS-TrafficTypeDiagnostic: SN6PR12MB2688:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR12MB268819F3D73BE3730743D32DE55E9@SN6PR12MB2688.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Microsoft-Antispam-PRVS: <SN6PR12MB26880E7F8C1E84D74F16543FE55E9@SN6PR12MB2688.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: o+MHFiUq0LnWmSBZCzH50O5zdjD5rZdBFqdWXUAP3NMLaU0FpKXDlaiXVQf4Frdsjo2ojFMTEqkeCxolpOehdNS2H4RlIK88sX0rqsZFlzJ25eLZYDDTRiCLaRa+T59YvtH6aMp2Kf9r6mLNfpyInO8j0K3snXYE0CXtUQ5MCtQ2fUvyjWyrxVgjk0b0hoOfo8YExwxrXN7EMfYxNEzxh8fnNjoqOt9oEi7ydaRdqEd5PKPJCUu8pjeMnvJA9n+zmcdh6Mbj9M7j2Z71bfKt8du8wj9Y0S02A3sHf4t4b8NIW5d4muZktkAPm97+mxBvLB8M7IPMf++bkVS56x03eOr/Fk8HZROqcERj7PhXEGTl6HRkswwLFzeZ2oayA/Ldtjn3uUs+hOMKkq49ZWNXHx7uZnx5rP1cJdcxzI5GHCPWCpTJX0oeAQFaJIgHjN8i/DOa/VLV7JpTLAKzZWG/vWrP/gd09lnQHIsrwBjik4DqIyZTIUVCCd8kfm/iSShXuMbSyuqRWvenBJ4O4TRk15SmBZSGgL47e/QMgCEMazOFEHet4DJPZf+bOMUs+7Cq6dV8fvUwO53Pv/aAF8eapjzLYq04PBTzANaQMx1IODp8iCF0uUPBR8nlXLv6COOyjpG7OOV/J8jSQHO8Qv4orQ==
+X-Microsoft-Antispam-Message-Info: x8tn9OFGzOt05bCYFXDOHWzz0YuFmAcX3T0K/l7b7MZEZbFNLz22K7L64ug2NjSNN15KQUbjD5lY7pLL3srKZpxaPvlt6dXtAp6MuhJ/5oKP0Bl3UfSQRyhq3mq4H1YNkSXjjkmW/a06VfUz6BheL10J6YyiwnDdCW5RajdldCiDK8ZY6Ii6LzjikDFDy4D45tMBwcFxJOPP7CGFoxWbvFfTZM2oSgTl/GFA95Gdj6oPsnrCKWHx9xg9FQ+RMYjdMMfZ2/AsEeu3wIqj79L//6QbvQLkrfHjhLFo166b73KwyM8IVEM4/kxKnl2tJ11KFt1gPV0xHxuQrC97hWzdJVYtYy2Y6+Bhf14BkjsmV2f5I3AscyD69DPVGxn277Z4UHLe0FbSdC6XgXVW3lomSKIGfyZNEwlvhg3AQWdo8Qbn4PdCxemsDbuHdf5YXvmWet/R9/rqpajHLVoa6iW6Xn2ni+PcFpPIvTwCxgWHreAko7dA1aFF+4HYhKOMaWXt4ygnbE14c8/yJ1MJR5OBAKM2mIM9UOawLAykQmSpugH1LcVGCKmOFDpqeHWh17w/Lcu0Q5Tk27eo6DLFPlNTbmk3c38LxYPTrZU/KBJ/XG1QxIPgaqC67u+GDW3KV8SQF+BX4nal+tX41VZqRdH19A==
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(376002)(366004)(136003)(396003)(346002)(26005)(8936002)(86362001)(478600001)(52116002)(8676002)(1076003)(66946007)(66556008)(2906002)(7696005)(83380400001)(36756003)(66476007)(44832011)(5660300002)(956004)(38350700002)(38100700002)(7416002)(2616005)(16526019)(186003)(316002)(6486002)(4326008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?latTE4Oqbsbfrh/fBpa6RMZGNObp1X97ur8LBEC7bqNqouVE7aVbAGUjd/h0?=
- =?us-ascii?Q?MGH5IbNnX0rponG83BzkYRI04GqBOqfXhPZaCCL01hx2cbA0onm5AYCxd1tD?=
- =?us-ascii?Q?xK8rExBSrbhDT0pxyHijhfGF7xW/rQPdmLYmnHfJ6h7wlxNB4ONiH2xWCxNO?=
- =?us-ascii?Q?rJ1OPSVrp2sODavXHI49suTpXAHObvaH8wyorO2b7w1mn2LHII2j/q8Qd/NJ?=
- =?us-ascii?Q?cdfXoYAeLOEdel2NXStosxLL4GJOIPuQRy82A5WQWvMVBf8b1fiyAUd3MmWJ?=
- =?us-ascii?Q?CQVDwgH3ekjYlzyzLSja7BjbsxTdCNeZXBrzP0zWaigfGItzZV5VGkw5jCWF?=
- =?us-ascii?Q?eMGh82En+oO+8n2rUQZeiAnoyVjGkdE5wb29gG0XviYSxpy9TBZjgi58fdZt?=
- =?us-ascii?Q?LmuArY7gVcuNCyUHiG7d0xMxCGwqIdol3QNQZ4Mst8oXENjJrp5qMwWy5zLP?=
- =?us-ascii?Q?D+/waIVhIGp5fPnPc4EnqvtYLKEE3L3o/I3LlgUFuFp1fJ4eUD54Fe1ngFmX?=
- =?us-ascii?Q?crnMZHT5Ze1bxPX09cCI9XUL1FXGVG5m3Y6siDftlGOHMGXoVzZTkv6W2bSD?=
- =?us-ascii?Q?n8g+y9T77H2+C0W0xVLHJOH7S7pgCE+CMZ0U2TNVbJfnn7tusOboD8Ot9oVZ?=
- =?us-ascii?Q?z+slVM3W0DET4xwW5yKwJBuujrirKjT18wBxg5opGz2bamE/OoKtn6vspMb2?=
- =?us-ascii?Q?9BHAj+uXtGacjjodXXsAsov1CEsCg+S0MRriJvGBZldmp8SGNAIkIBw0w7nd?=
- =?us-ascii?Q?96RiaxaNAoCbHifxbncrsBDDfBWkmfJoA3+QJriPH/s7EVMZH4rBOTRkSnIP?=
- =?us-ascii?Q?hXzHwphZvUvKdIvDDntrbNWHAK6+i1U8rQHUUqxS6NMGKsRXXy5sQXBR4xJV?=
- =?us-ascii?Q?kZVPpkcYvbkxy0NuuGWpy1b5Eb2Svh71G2p/y6d3WYhR9AQm3E816U9t7sjg?=
- =?us-ascii?Q?9NmyArSvr6PyHCmgnBsfC4WZ5NvK2zHD9PCsrfgbePtK36B4+K50CXgIJ1yK?=
- =?us-ascii?Q?LjdfCQph37Bv4dEdw+jRUz3enaFwU6M4AflwsF0BG2e7Je5PRfQ9uxPxEbHV?=
- =?us-ascii?Q?rk1jwG6EzhF6nQo17hVaATGuDhC37ePndZLIuLbiBIoczwZhJz4wvcqajZEW?=
- =?us-ascii?Q?CedKzgq6Ts7BrGHTaeDVUeV0+XtVzSWm2u88Kssiy/N4N8SsjA7BiF8ObdfL?=
- =?us-ascii?Q?zx6uWi5WLeuUvDL5yPnAVgAu2tqkWTrMR5eVaUgx6Adt/2ftdx9kFii2LU9R?=
- =?us-ascii?Q?H12HKjBe3h66qGi5sC0Db13weMb7D3hBOz4z3FDiFrxFE7J5O2n1jlnO9kc/?=
- =?us-ascii?Q?Gd4g4Rw+AJ7yBpNJ6iQzejz3?=
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?Q1xwHglMZ6aPN/K3uTcWuaezBwk+pLXLgNwzrLGMjWZxkYJox3N9wF6C4o6c?=
+ =?us-ascii?Q?yYgw9KVY3TTgMGSYG25VSQfpH5wYUn9mepxhfDIOBOuxJflkk/ecIEy3D0kr?=
+ =?us-ascii?Q?np2qMLdRZwf7hJ1fiCyI4DUk3KSaF/2yURPq27HaJZ6YWo5qdn+aFoa1T79y?=
+ =?us-ascii?Q?2naSlgpH3YZxixBdK0u7A3zIuaPxUWUqvdXsOQve6nNFQI0fNwVd2T3qW/D/?=
+ =?us-ascii?Q?vvjGrihzZsXo+LMmTOtOfK3nn2h/1n83IUX9Cy+93UzKY9VyfHv8vm76ugeC?=
+ =?us-ascii?Q?xykweH0npXDBf/6m8E4/sECv0zxPROCH2dP0twWEH1djM/+1ET7XNtU1TY81?=
+ =?us-ascii?Q?7reG83YJcyPmW0v/PBm4QU0a6uHt9pV4Lc9M91tM22sF3ajkE7y6t8/IgtDQ?=
+ =?us-ascii?Q?3ne6fjWy/1clwWygMPDcEUYJ7CFgSRje3yFQvHOkGnwJSclOQ4GCxkucPJCE?=
+ =?us-ascii?Q?SnCSSHEr/Hp3nkfBm1dIvhBeoXxrkmtoYbk63tHKJ/JGtGH8u8diexXJ88Ct?=
+ =?us-ascii?Q?WwXQ91UnmfRMYsQNJOoGyZ4wiNIvjOIP0y9i1VpzPBWdcnWrNNblfIeeiePX?=
+ =?us-ascii?Q?Rfs5mSGcZHx5rNI7CcQJgfUAKtdcIBa/EHLBVPmzq0+9GI07l356iBXbuViF?=
+ =?us-ascii?Q?jKqsG8BMW8AjY7HozxthyDH7yTtRl9xABj4D7eLU8ROOkl1SXCcUTsdUQ7VN?=
+ =?us-ascii?Q?dl7F1RnFxZlxPrk2o1huh/XuyavVScYs4qrnJ3S9KWH3I7niVHn6B3EllPY5?=
+ =?us-ascii?Q?qJbn6tuJoK+OQyrrZsj2qkTP+CH+K5UKasfhC5i3996yuSBMbMfXAcQCNlv5?=
+ =?us-ascii?Q?9nO3b5T+feRYSfQhnbZrUNh3LlCqL27/FqFUYHo77yLcX0Akmhg71eQSpOzm?=
+ =?us-ascii?Q?mGr1OJJjJvBBwRCp/BGByPC5H4zNVgkcFofS5a+weVMl3K5BwGf8OXxPYfjR?=
+ =?us-ascii?Q?s0Um/eO2o7jqbEYnBBgMt/+In6SWi3rLcU+ClNQmU3wFntjWVaZ6hqB3qwPU?=
+ =?us-ascii?Q?5Du0sSH5dwwciSopllLBZCbla52TEYG6cepjMP+rQNaB2HVaYQ9ejiVsyP0J?=
+ =?us-ascii?Q?TsRn4NO9N28WmjuxI+MGUP1T2hhIRMKtcXQ1ar1FUg1zzoN/uvRZzJ2Iws9l?=
+ =?us-ascii?Q?nSgFhaNXxNufK0JBZiyjKiOxce/r4fKIhh+KShksygWQaKcFuTZQozsyQyIT?=
+ =?us-ascii?Q?mpH8iEZ3dCVXdGRTlScT8ooOeo8SSgV0yKh52GEpcV1F63bnRpXzC8NyCzMu?=
+ =?us-ascii?Q?VLlVDHO2HmeNHMKVbCH0IhmefdLos39Ll/OJkKMV96oxQoeCaYxBL/6y3teo?=
+ =?us-ascii?Q?p77znflt5+qDkMY4H9yL1fEo?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c5b0028f-5c4a-4b3b-20cc-08d90bd4f844
+X-MS-Exchange-CrossTenant-Network-Message-Id: f63ccc21-a4a1-4406-e556-08d90bd4f8ac
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2021 12:39:17.7441
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2021 12:39:18.5117
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: h04ze2wofgefGNcqH+h5O9FXP6ofB1Ej1JMlkn6QUHNjgbP0vqQ6LVORe2X8ujETHpviMs2BML+l2OI6HaUYZw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: b5TAikzR2LXg8kxeiyJ2tWm+09iD808UKYnTJEvs+RPjiQFxcyzMJSY+qKUtEmUCwQ/+9/5INPZh9kJUbxyOug==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2688
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 SEV-SNP VMs can ask the hypervisor to change the page state in the RMP
-table to be private or shared using the Page State Change MSR protocol
-as defined in the GHCB specification.
-
-Before changing the page state in the RMP entry, we lookup the page in
-the TDP to make sure that there is a valid mapping for it. If the mapping
-exist then try to find a workable page level between the TDP and RMP for
-the page. If the page is not mapped in the TDP, then create a fault such
-that it gets mapped before we change the page state in the RMP entry.
+table to be private or shared using the Page State Change NAE event
+as defined in the GHCB specification section 4.1.6.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/kvm/svm/sev.c | 137 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 137 insertions(+)
+ arch/x86/kvm/svm/sev.c | 58 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 1cba9d770860..cc2628d8ef1b 100644
+index cc2628d8ef1b..bd71ece35597 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -28,6 +28,7 @@
- #include "svm_ops.h"
- #include "cpuid.h"
- #include "trace.h"
-+#include "mmu.h"
- 
- #define __ex(x) __kvm_handle_fault_on_reboot(x)
- 
-@@ -2825,6 +2826,127 @@ static void set_ghcb_msr(struct vcpu_svm *svm, u64 value)
- 	svm->vmcb->control.ghcb_gpa = value;
+@@ -2641,6 +2641,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+ 	case SVM_VMGEXIT_AP_JUMP_TABLE:
+ 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+ 	case SVM_VMGEXIT_HYPERVISOR_FEATURES:
++	case SVM_VMGEXIT_SNP_PAGE_STATE_CHANGE:
+ 		break;
+ 	default:
+ 		goto vmgexit_err;
+@@ -2927,6 +2928,7 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, int op, gpa_t g
+ 		case SNP_PAGE_STATE_PRIVATE:
+ 			rc = snp_make_page_private(vcpu, gpa, pfn, level);
+ 			break;
++		/* TODO: Add USMASH and PSMASH support */
+ 		default:
+ 			rc = -EINVAL;
+ 			break;
+@@ -2947,6 +2949,53 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, int op, gpa_t g
+ 	return rc;
  }
  
-+static int snp_rmptable_psmash(struct kvm_vcpu *vcpu, kvm_pfn_t pfn)
++static unsigned long snp_handle_page_state_change(struct vcpu_svm *svm, struct ghcb *ghcb)
 +{
-+	pfn = pfn & ~(KVM_PAGES_PER_HPAGE(PG_LEVEL_2M) - 1);
++	struct snp_page_state_entry *entry;
++	struct kvm_vcpu *vcpu = &svm->vcpu;
++	struct snp_page_state_change *info;
++	unsigned long rc;
++	int level, op;
++	gpa_t gpa;
 +
-+	return psmash(pfn_to_page(pfn));
-+}
++	if (!sev_snp_guest(vcpu->kvm))
++		return -ENXIO;
 +
-+static int snp_make_page_shared(struct kvm_vcpu *vcpu, gpa_t gpa, kvm_pfn_t pfn, int level)
-+{
-+	struct rmpupdate val;
-+	int rc, rmp_level;
-+	struct rmpentry *e;
-+
-+	e = snp_lookup_page_in_rmptable(pfn_to_page(pfn), &rmp_level);
-+	if (!e)
++	if (!setup_vmgexit_scratch(svm, true, sizeof(ghcb->save.sw_scratch))) {
++		pr_err("vmgexit: scratch area is not setup.\n");
 +		return -EINVAL;
-+
-+	if (!rmpentry_assigned(e))
-+		return 0;
-+
-+	/* Log if the entry is validated */
-+	if (rmpentry_validated(e))
-+		pr_debug_ratelimited("Remove RMP entry for a validated gpa 0x%llx\n", gpa);
-+
-+	/*
-+	 * Is the page part of an existing 2M RMP entry ? Split the 2MB into multiple
-+	 * of 4K-page before making the memory shared.
-+	 */
-+	if ((level == PG_LEVEL_4K) && (rmp_level == PG_LEVEL_2M)) {
-+		rc = snp_rmptable_psmash(vcpu, pfn);
-+		if (rc)
-+			return rc;
 +	}
 +
-+	memset(&val, 0, sizeof(val));
-+	val.pagesize = X86_TO_RMP_PG_LEVEL(level);
-+	return rmpupdate(pfn_to_page(pfn), &val);
-+}
++	info = (struct snp_page_state_change *)svm->ghcb_sa;
++	entry = &info->entry[info->header.cur_entry];
 +
-+static int snp_make_page_private(struct kvm_vcpu *vcpu, gpa_t gpa, kvm_pfn_t pfn, int level)
-+{
-+	struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
-+	struct rmpupdate val;
-+	struct rmpentry *e;
-+	int rmp_level;
++	if ((info->header.cur_entry >= VMGEXIT_PSC_MAX_ENTRY) ||
++	    (info->header.end_entry >= VMGEXIT_PSC_MAX_ENTRY) ||
++	    (info->header.cur_entry > info->header.end_entry))
++		return VMGEXIT_PSC_INVALID_HEADER;
 +
-+	e = snp_lookup_page_in_rmptable(pfn_to_page(pfn), &rmp_level);
-+	if (!e)
-+		return -EINVAL;
++	while (info->header.cur_entry <= info->header.end_entry) {
++		entry = &info->entry[info->header.cur_entry];
++		gpa = gfn_to_gpa(entry->gfn);
++		level = RMP_TO_X86_PG_LEVEL(entry->pagesize);
++		op = entry->operation;
 +
-+	/* Log if the entry is validated */
-+	if (rmpentry_validated(e))
-+		pr_err_ratelimited("Asked to make a pre-validated gpa %llx private\n", gpa);
-+
-+	memset(&val, 0, sizeof(val));
-+	val.gpa = gpa;
-+	val.asid = sev->asid;
-+	val.pagesize = X86_TO_RMP_PG_LEVEL(level);
-+	val.assigned = true;
-+
-+	return rmpupdate(pfn_to_page(pfn), &val);
-+}
-+
-+static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, int op, gpa_t gpa, int level)
-+{
-+	struct kvm *kvm = vcpu->kvm;
-+	int rc, tdp_level;
-+	kvm_pfn_t pfn;
-+	gpa_t gpa_end;
-+
-+	gpa_end = gpa + page_level_size(level);
-+
-+	while (gpa < gpa_end) {
-+		/*
-+		 * Get the pfn and level for the gpa from the nested page table.
-+		 *
-+		 * If the TDP walk failed, then its safe to say that we don't have a valid
-+		 * mapping for the gpa in the nested page table. Create a fault to map the
-+		 * page is nested page table.
-+		 */
-+		if (!kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &tdp_level)) {
-+			pfn = kvm_mmu_map_tdp_page(vcpu, gpa, PFERR_USER_MASK, level);
-+			if (is_error_noslot_pfn(pfn))
-+				goto out;
-+
-+			if (!kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &tdp_level))
-+				goto out;
-+		}
-+
-+		/* Adjust the level so that we don't go higher than the backing page level */
-+		level = min_t(size_t, level, tdp_level);
-+
-+		write_lock(&kvm->mmu_lock);
-+
-+		switch (op) {
-+		case SNP_PAGE_STATE_SHARED:
-+			rc = snp_make_page_shared(vcpu, gpa, pfn, level);
-+			break;
-+		case SNP_PAGE_STATE_PRIVATE:
-+			rc = snp_make_page_private(vcpu, gpa, pfn, level);
-+			break;
-+		default:
-+			rc = -EINVAL;
-+			break;
-+		}
-+
-+		write_unlock(&kvm->mmu_lock);
-+
-+		if (rc) {
-+			pr_err_ratelimited("Error op %d gpa %llx pfn %llx level %d rc %d\n",
-+					   op, gpa, pfn, level, rc);
++		if (!IS_ALIGNED(gpa, page_level_size(level))) {
++			rc = VMGEXIT_PSC_INVALID_ENTRY;
 +			goto out;
 +		}
 +
-+		gpa = gpa + page_level_size(level);
++		rc = __snp_handle_page_state_change(vcpu, op, gpa, level);
++		if (rc)
++			goto out;
++
++		info->header.cur_entry++;
 +	}
 +
 +out:
@@ -261,28 +189,22 @@ index 1cba9d770860..cc2628d8ef1b 100644
  static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
  {
  	struct vmcb_control_area *control = &svm->vmcb->control;
-@@ -2923,6 +3045,21 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- 				  GHCB_MSR_INFO_POS);
+@@ -3187,6 +3236,15 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 		ret = 1;
  		break;
  	}
-+	case GHCB_MSR_PSC_REQ: {
-+		gfn_t gfn;
-+		int ret;
-+		u8 op;
++	case SVM_VMGEXIT_SNP_PAGE_STATE_CHANGE: {
++		unsigned long rc;
 +
-+		gfn = get_ghcb_msr_bits(svm, GHCB_MSR_PSC_GFN_MASK, GHCB_MSR_PSC_GFN_POS);
-+		op = get_ghcb_msr_bits(svm, GHCB_MSR_PSC_OP_MASK, GHCB_MSR_PSC_OP_POS);
++		ret = 1;
 +
-+		ret = __snp_handle_page_state_change(vcpu, op, gfn_to_gpa(gfn), PG_LEVEL_4K);
-+
-+		set_ghcb_msr_bits(svm, ret, GHCB_MSR_PSC_ERROR_MASK, GHCB_MSR_PSC_ERROR_POS);
-+		set_ghcb_msr_bits(svm, 0, GHCB_MSR_PSC_RSVD_MASK, GHCB_MSR_PSC_RSVD_POS);
-+		set_ghcb_msr_bits(svm, GHCB_MSR_PSC_RESP, GHCB_MSR_INFO_MASK, GHCB_MSR_INFO_POS);
++		rc = snp_handle_page_state_change(svm, ghcb);
++		ghcb_set_sw_exit_info_2(ghcb, rc);
 +		break;
 +	}
- 	case GHCB_MSR_TERM_REQ: {
- 		u64 reason_set, reason_code;
- 
+ 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+ 		vcpu_unimpl(vcpu,
+ 			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
 -- 
 2.17.1
 
