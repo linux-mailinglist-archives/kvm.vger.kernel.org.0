@@ -2,101 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7075A36FC72
-	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 16:30:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8655C36FC8D
+	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 16:38:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232838AbhD3Oag (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Apr 2021 10:30:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28437 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229707AbhD3Oae (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 30 Apr 2021 10:30:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619792985;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FPEELsSGx4cLbmxHKF7dTq3mC1Xpq1F0QvtZc08MVK4=;
-        b=eU8pU6YWtyzMvQAJmcdsD0F9MT9F9kK/xE4oQbrGs8xo/Q3WNsTrDVxQL/xInzXzPyDECB
-        gOVRt2LSD2/eoU1H8ZpqyY+vzcaDwErtDwj8GRAjftBIO8+zyKTyATouftUEe7RuvuP/p3
-        qUY1vHeqNpcOvasAgAzNDYhWaiMt+d8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-390-y0KmsgpjO0yM5DYo73n47Q-1; Fri, 30 Apr 2021 10:29:43 -0400
-X-MC-Unique: y0KmsgpjO0yM5DYo73n47Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 146AC107ACCD;
-        Fri, 30 Apr 2021 14:29:42 +0000 (UTC)
-Received: from redhat.com (ovpn-113-225.phx2.redhat.com [10.3.113.225])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 86B66100763C;
-        Fri, 30 Apr 2021 14:29:41 +0000 (UTC)
-Date:   Fri, 30 Apr 2021 08:29:40 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yicong Yang <yangyicong@hisilicon.com>
-Cc:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Linuxarm <linuxarm@huawei.com>
-Subject: Re: [Question] Indefinitely block in the host when remove the PF
- driver
-Message-ID: <20210430082940.4b0e0397@redhat.com>
-In-Reply-To: <c9466e2c-385d-8298-d03c-80dcfc359f52@hisilicon.com>
-References: <c9466e2c-385d-8298-d03c-80dcfc359f52@hisilicon.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+        id S230379AbhD3Oin (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Apr 2021 10:38:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49140 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230297AbhD3Oim (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Apr 2021 10:38:42 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC7D9C06174A
+        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 07:37:54 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id m10-20020a170902f20ab02900ed7e32ff42so3716260plc.19
+        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 07:37:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=v5lYu1w+irOCEZJQl/ANzvss1KKbzTlcUMWMr3wEwIU=;
+        b=hLsvwn8xKe2dyxS2t6qKV/Q5tQNoF5Y92f3eXV85RZYbprYcxDuoixMIirnaU19+Pi
+         yxN6SbDbHnyJGrriQBg0ozX//CtWauQqON9Xk0LZj8V7/TaFOCV7Kcl+ElSf3XFdDZPw
+         Q5qF9Qc2H/Z3m1Sn+HRsAI4N3H66VEHQdWsfbAHg6hryDlRXeM2CJy3ceo0qi2I5H1vs
+         e12eLUE7BpEX4C/ZYeXheUA8N6/qzt+lQxFhtbMnU+jVUfMvcXQSEpw/rBvSnQo1YB4R
+         KnBAYHDU2XDG98RlzRvz3FGcfA+nEvp35M7scYViD9BZGyTUTdd7de6BShISlmr7V4yJ
+         R2cA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=v5lYu1w+irOCEZJQl/ANzvss1KKbzTlcUMWMr3wEwIU=;
+        b=O/ixPkF8BNu5TOn8A6lK1/u/8zv2PkIv+cXC+rx4wwAADZbHUzaIkrPU4/jqDbMB5T
+         d6hT+kESAfK+z1gGFlWWPmx7CmoPnpcfg1svDZN1Chj+7LPFuuFmHKsXNsgi39JepoJj
+         nDSM8uAvrWFYZYnbqZ832yxBvvELWLrgkBT4KDdfhacTj6dj4LJTUsHEPumOLy+6RPay
+         kZgAuFTH/Zkc1JlB3uX6+X7+f/UC4gA6aKqUsa85jP52UALmsRnWCwBKhIeN+SeiiAdy
+         LbQ1+KeCBPgdpHrSzhBscAATwK+B7XHmcEhGdrLVgFtc6NUs1lmyuOUJUh7glfdWuwXY
+         xjOg==
+X-Gm-Message-State: AOAM533Dh9nFjcmdrjemofBqTcNSS+XW/qGMXMIss1xafMHOX9CelBXJ
+        jiHEEh+qNpd6nZ/tGt5SdH6af/kyXlZNjZDn
+X-Google-Smtp-Source: ABdhPJzVyxCwumdlhXSDRDRuTJTfZ+CAdxm11+hy0w667BUJnxcocTjfduwCPFou+asw+4qL+IEq9wDv0xHGVjBg
+X-Received: from aaronlewis1.sea.corp.google.com ([2620:15c:100:202:250e:2425:2e40:acc])
+ (user=aaronlewis job=sendgmr) by 2002:a17:902:ec84:b029:ea:b28d:e53e with
+ SMTP id x4-20020a170902ec84b02900eab28de53emr5327690plg.77.1619793474194;
+ Fri, 30 Apr 2021 07:37:54 -0700 (PDT)
+Date:   Fri, 30 Apr 2021 07:37:49 -0700
+Message-Id: <20210430143751.1693253-1-aaronlewis@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.1.527.g47e6f16901-goog
+Subject: [PATCH v5 0/2] fallback for emulation errors
+From:   Aaron Lewis <aaronlewis@google.com>
+To:     david.edmondson@oracle.com, seanjc@google.com, jmattson@google.com
+Cc:     kvm@vger.kernel.org, Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 30 Apr 2021 15:57:47 +0800
-Yicong Yang <yangyicong@hisilicon.com> wrote:
+This patchset allows userspace to be a fallback for handling emulation errors.
 
-> When I try to remove the PF driver in the host, the process will be blocked
-> if the related VF of the device is added in the Qemu as an iEP.
-> 
-> here's what I got in the host:
-> 
-> [root@localhost 0000:75:00.0]# rmmod hisi_zip
-> [99760.571352] vfio-pci 0000:75:00.1: Relaying device request to user (#0)
-> [99862.992099] vfio-pci 0000:75:00.1: Relaying device request to user (#10)
-> [...]
-> 
-> and in the Qemu:
-> 
-> estuary:/$ lspci -tv
-> -[0000:00]-+-00.0  Device 1b36:0008
->            +-01.0  Device 1af4:1000
->            +-02.0  Device 1af4:1009
->            \-03.0  Device 19e5:a251 <----- the related VF device
-> estuary:/$ qemu-system-aarch64: warning: vfio 0000:75:00.1: Bus 'pcie.0' does not support hotplugging
-> qemu-system-aarch64: warning: vfio 0000:75:00.1: Bus 'pcie.0' does not support hotplugging
-> qemu-system-aarch64: warning: vfio 0000:75:00.1: Bus 'pcie.0' does not support hotplugging
-> qemu-system-aarch64: warning: vfio 0000:75:00.1: Bus 'pcie.0' does not support hotplugging
-> [...]
-> 
-> The rmmod process will be blocked until I kill the Qemu process. That's the only way if I
-> want to end the rmmod.
-> 
-> So my question is: is such block reasonable? If the VF devcie is occupied or doesn't
-> support hotplug in the Qemu, shouldn't we fail the rmmod and return something like -EBUSY
-> rather than make the host blocked indefinitely?
+v1 -> v2:
 
-Where would we return -EBUSY?  pci_driver.remove() returns void.
-Without blocking, I think our only option would be to kill the user
-process.
- 
-> Add the VF under a pcie root port will avoid this. Is it encouraged to always
-> add the VF under a pcie root port rather than directly add it as an iEP?
+ - Added additional documentation for KVM_CAP_EXIT_ON_EMULATION_FAILURE.
+ - In prepare_emulation_failure_exit():
+   - Created a local variable for vcpu->run.
+   - Cleared the flags, emulation_failure.flags.
+   - Or'd the instruction bytes flag on to emulation_failure.flags.
+ - Updated the comment for KVM_INTERNAL_ERROR_EMULATION flags on how they are
+   to be used.
+ - Updated the comment for struct emulation_failure.
 
-Releasing a device via the vfio request interrupt is always a
-cooperative process currently, the VM needs to be configured such that
-the device is capable of being unplugged and the guest needs to respond
-to the ejection request.  Thanks,
+v2 -> v3:
 
-Alex
+ - Update documentation for KVM_CAP_EXIT_ON_EMULATION_FAILURE.
+ - Fix spacing in prepare_emulation_failure_exit().
+
+v3 -> v4:
+
+ - In prepare_emulation_failure_exit():
+   - Clear instruction bytes to 0x90.
+   - Copy over insn_size bytes rather than sizeof(ctxt->fetch.data).
+ - set_page_table_entry() takes a pte rather than mask.
+ - In _vm_get_page_table_entry():
+   - Removed check for page aligned addresses only.
+   - Added canonical check.
+   - Added a check to make sure no reserved bits are set along the walk except
+     for the final pte (the pte cannot have the reserved bits checked otherwise
+     the test would fail).
+   - Added check to ensure superpage bits are clear.
+ - Added check in test for 'allow_smaller_maxphyaddr' module parameter.
+ - If the is_flds() check fails, only look at the first byte.
+ - Don't use labels to increment the RIP.  Decode the instruction well enough to
+   ensure it is only 2-bytes.
+
+v4 -> v5:
+
+ - Switch 'insn_size' to u32.
+ - Add documentation for how the flags are used.
+ - Remove 'max_insn_size' and use 'sizeof(run->emulation_failure.insn_bytes)' instead.
+ - Fix typos.
+ - Fix canonical check.
+ - Add reserved check for bit-7 of PML4E.
+ - Add reserved check for bit-63 of all page table levels if EFER.NXE = 0.
+ - Remove opcode check (it might be a prefix).
+ - Remove labels.
+ - Remove detritus (rogue cpuid entry in the test).
+
+Aaron Lewis (2):
+  kvm: x86: Allow userspace to handle emulation errors
+  selftests: kvm: Allows userspace to handle emulation errors.
+
+ Documentation/virt/kvm/api.rst                |  21 ++
+ arch/x86/include/asm/kvm_host.h               |   6 +
+ arch/x86/kvm/x86.c                            |  37 ++-
+ include/uapi/linux/kvm.h                      |  23 ++
+ tools/include/uapi/linux/kvm.h                |  23 ++
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/x86_64/processor.h  |   4 +
+ .../selftests/kvm/lib/x86_64/processor.c      |  94 ++++++++
+ .../kvm/x86_64/emulator_error_test.c          | 219 ++++++++++++++++++
+ 10 files changed, 425 insertions(+), 4 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/emulator_error_test.c
+
+-- 
+2.31.1.527.g47e6f16901-goog
 
