@@ -2,209 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 417AB36F530
-	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 06:53:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C5ED36F635
+	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 09:14:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230134AbhD3Eym (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Apr 2021 00:54:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33210 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbhD3Eym (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Apr 2021 00:54:42 -0400
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9EF5C06174A
-        for <kvm@vger.kernel.org>; Thu, 29 Apr 2021 21:53:54 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id 82-20020a1c01550000b0290142562ff7c9so920679wmb.3
-        for <kvm@vger.kernel.org>; Thu, 29 Apr 2021 21:53:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UGRVbFEa+O4nql4wL8JLwDHK88SuI1CttvKEIpPLdho=;
-        b=tAZOlBWC/dpe7X4h3LVF4JPHUHPKhmGC5Jgq5flDvzlS3SEXGQc+S+M+lae8i5pcJC
-         6NAUgtRCZwc3HQzDsVVo0m/tz+J3cZIZvocq8XlIVFfQt7aiiRAbNdWH3Ae6FpqwCtJu
-         ILuQFcAgM/H2XmlV+JYAKfSMQtdgfdg62aDqg5pgLb8PcLaNUa6rmbG0wmUH3Re22mtf
-         ywos2ak6Rr+c39ESQDCiWiffWvFwMVReNNkvrqMWszfAHiLk/YHsBuIEdiLC5Q/D2MCK
-         PFcaX04lZdC+ZfZUmxdj5jGWROUUyT/cEtvmtnG1DGJ//x2Ja31TqsJVBM/7bGrG7v2e
-         JZKA==
+        id S229876AbhD3HPS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Apr 2021 03:15:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47481 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229590AbhD3HPR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 30 Apr 2021 03:15:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619766869;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=88zcHBIvkFYTLwFj8R82kvHFKJmjmnE4dPY/zw0a/o0=;
+        b=ZfntUJi3eOl/hZGp0aJhKmJk8j81A1TDHhmoH8eQ3aaq8ZdJrCP79lwA+5hWvUx6JAt8H2
+        NBxUS8ueBHS1DJ92DZAUBxhyCkANCGOkXQAl2F+s8zysnJQZLycvHWF8oZ0Fj9wn89GP++
+        ltbbN76mrM1IQ/FN8AY7QzaTmpld6bM=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-301-H3Wlo_ppOwC7rNd6X2DiHQ-1; Fri, 30 Apr 2021 03:14:27 -0400
+X-MC-Unique: H3Wlo_ppOwC7rNd6X2DiHQ-1
+Received: by mail-ej1-f70.google.com with SMTP id zo1-20020a170906ff41b02903973107d7b5so1598362ejb.21
+        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 00:14:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UGRVbFEa+O4nql4wL8JLwDHK88SuI1CttvKEIpPLdho=;
-        b=IELlV8OmwW2uOBr6EM7RqK6NCp0QZzUCFWjqtiVXjtzCSysDW7NN+jC4wtRGAAtUIo
-         EnM8XBOvrWz/y810gpToP0IW3Ow20+kWrCLumtLGbEPW7dGyaHKcV94GUdvvxjANuujH
-         keV64BX/WCR2KfUmeaBi/ciUzp8up8u158nqC/Lpn75d+iEeNXzFafh/Fwr+UGn6Tnea
-         GALQ8EJKTVRGhGGq+0J9ruSmcSn+noGN3h+j5QpCYw6CCnBFyuVn4DmEW2uzlIqupqOu
-         5MW4dftx9/l7fQVhapvrOeyt0/8lHrE/StL3nh/H0wrY3ShzMbrSoTwcGJ2LpjeFNU82
-         isfg==
-X-Gm-Message-State: AOAM532fBfykN4mbJx6wwyeuLH1eZWqxX1+QCKF3JX4who6cdmvKa5Or
-        MWZrS5fMACUIHVf6UYW8LxZ8uSSYMnz3T8TxIJNOVg==
-X-Google-Smtp-Source: ABdhPJz6ciYc399ey9eit4UZvScEpLv5uRf/WYCuteudvmF//NfaJHTVN7DyPq6zhLx3l7ORcT1VPGnVqp22VhrZSEo=
-X-Received: by 2002:a7b:c348:: with SMTP id l8mr14781328wmj.152.1619758433260;
- Thu, 29 Apr 2021 21:53:53 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=88zcHBIvkFYTLwFj8R82kvHFKJmjmnE4dPY/zw0a/o0=;
+        b=aZsckfvq2L2oMt4JcWQb9L78oqbGUdp411ZJqvuiniVKzaTeLC5UJOqQc9tT2vZiIp
+         1lpjcrnS6iqGOCgD1WAtNNDmAu/RB59Js1n936r9czzLLjxVQ0BR9te1Hoi2L9d5Ajsd
+         +/dHnOgWGel5HwfkDc+7EcHFP9ukeCPkFwdSPIqXQ/CAMBQKjXHLhwWYsYMcuW8FC1+U
+         /TiIGFJejNQ4+jgzDoDsOKK6WztEL5w4Pxw94DiNZrp20W2+1/T1S/bDZjxCOcuwCB/q
+         zLzJsea3dA7ofSU51WrBfjYGUaZfWchtoaEfPD3JIX/Q2jdxup8rs1yq9v5rNdJw+AQ9
+         aS6Q==
+X-Gm-Message-State: AOAM5312t+YFOXug/0+2BgWA5OQpa3b7I+parYhh9X+MhxVfoTFC6QLa
+        zmyE1CZ6fuuLdNCmfexVstWPDGtKqZQP2DHFtr6+3tRFy4b7EjOMvUqMvkizMxVxRWJxp6DKUNI
+        s/Ii1YESfyjF4
+X-Received: by 2002:a50:fe03:: with SMTP id f3mr3981342edt.92.1619766865757;
+        Fri, 30 Apr 2021 00:14:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxkX5+0d05v5IY9ScipRTZGdRgvaqONdXqS9ZQ2Ai/Zcc7UxMAXTt3J9TbGGUsBNxv8PqJXNw==
+X-Received: by 2002:a50:fe03:: with SMTP id f3mr3981317edt.92.1619766865577;
+        Fri, 30 Apr 2021 00:14:25 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id d18sm1402990eja.71.2021.04.30.00.14.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 30 Apr 2021 00:14:24 -0700 (PDT)
+Subject: Re: [PATCH 0/4] x86: Don't invoke asm_exc_nmi() on the kernel stack
+To:     Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org
+Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Sean Christopherson <seanjc@google.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Uros Bizjak <ubizjak@gmail.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+References: <20210426230949.3561-1-jiangshanlai@gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <228d8b10-84cb-4dd2-8810-3c94bc3ae07b@redhat.com>
+Date:   Fri, 30 Apr 2021 09:14:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-References: <20210412065246.1853-1-jiangyifei@huawei.com> <20210412065246.1853-8-jiangyifei@huawei.com>
-In-Reply-To: <20210412065246.1853-8-jiangyifei@huawei.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Fri, 30 Apr 2021 10:23:41 +0530
-Message-ID: <CAAhSdy34aVwGEW-_Z=FkOkrAGrTsaS-11Ck6gJg77wwUSXe=zw@mail.gmail.com>
-Subject: Re: [PATCH RFC v5 07/12] hw/riscv: PLIC update external interrupt by
- KVM when kvm enabled
-To:     Yifei Jiang <jiangyifei@huawei.com>
-Cc:     QEMU Developers <qemu-devel@nongnu.org>,
-        "open list:RISC-V" <qemu-riscv@nongnu.org>,
-        kvm-riscv@lists.infradead.org, KVM General <kvm@vger.kernel.org>,
-        libvir-list@redhat.com, Anup Patel <anup.patel@wdc.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Sagar Karandikar <sagark@eecs.berkeley.edu>,
-        Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-        Bin Meng <bin.meng@windriver.com>, fanliang@huawei.com,
-        "Wubin (H)" <wu.wubin@huawei.com>,
-        Zhanghailiang <zhang.zhanghailiang@huawei.com>,
-        yinyipeng <yinyipeng1@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210426230949.3561-1-jiangshanlai@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 12, 2021 at 12:24 PM Yifei Jiang <jiangyifei@huawei.com> wrote:
->
-> Only support supervisor external interrupt currently.
->
-> Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-> Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
-> ---
->  hw/intc/sifive_plic.c    | 29 ++++++++++++++++++++---------
->  target/riscv/kvm-stub.c  |  5 +++++
->  target/riscv/kvm.c       | 20 ++++++++++++++++++++
->  target/riscv/kvm_riscv.h |  1 +
->  4 files changed, 46 insertions(+), 9 deletions(-)
->
-> diff --git a/hw/intc/sifive_plic.c b/hw/intc/sifive_plic.c
-> index 97a1a27a9a..2746eb7a05 100644
-> --- a/hw/intc/sifive_plic.c
-> +++ b/hw/intc/sifive_plic.c
-> @@ -31,6 +31,8 @@
->  #include "target/riscv/cpu.h"
->  #include "sysemu/sysemu.h"
->  #include "migration/vmstate.h"
-> +#include "sysemu/kvm.h"
-> +#include "kvm_riscv.h"
->
->  #define RISCV_DEBUG_PLIC 0
->
-> @@ -147,15 +149,24 @@ static void sifive_plic_update(SiFivePLICState *plic)
->              continue;
->          }
->          int level = sifive_plic_irqs_pending(plic, addrid);
-> -        switch (mode) {
-> -        case PLICMode_M:
-> -            riscv_cpu_update_mip(RISCV_CPU(cpu), MIP_MEIP, BOOL_TO_MASK(level));
-> -            break;
-> -        case PLICMode_S:
-> -            riscv_cpu_update_mip(RISCV_CPU(cpu), MIP_SEIP, BOOL_TO_MASK(level));
-> -            break;
-> -        default:
-> -            break;
-> +        if (kvm_enabled()) {
-> +            if (mode == PLICMode_M) {
-> +                continue;
-> +            }
-> +            kvm_riscv_set_irq(RISCV_CPU(cpu), IRQ_S_EXT, level);
-> +        } else {
-> +            switch (mode) {
-> +            case PLICMode_M:
-> +                riscv_cpu_update_mip(RISCV_CPU(cpu),
-> +                                     MIP_MEIP, BOOL_TO_MASK(level));
-> +                break;
-> +            case PLICMode_S:
-> +                riscv_cpu_update_mip(RISCV_CPU(cpu),
-> +                                     MIP_SEIP, BOOL_TO_MASK(level));
-> +                break;
-> +            default:
-> +                break;
-> +            }
+On 27/04/21 01:09, Lai Jiangshan wrote:
+> From: Lai Jiangshan <laijs@linux.alibaba.com>
+> 
+> In VMX, the NMI handler needs to be invoked after NMI VM-Exit.
+> 
+> Before the commit 1a5488ef0dcf6 ("KVM: VMX: Invoke NMI handler via
+> indirect call instead of INTn"), the work is done by INTn ("int $2").
+> 
+> But INTn microcode is relatively expensive, so the commit reworked
+> NMI VM-Exit handling to invoke the kernel handler by function call.
+> And INTn doesn't set the NMI blocked flag required by the linux kernel
+> NMI entry.  So moving away from INTn are very reasonable.
+> 
+> Yet some details were missed.  After the said commit applied, the NMI
+> entry pointer is fetched from the IDT table and called from the kernel
+> stack.  But the NMI entry pointer installed on the IDT table is
+> asm_exc_nmi() which expects to be invoked on the IST stack by the ISA.
+> And it relies on the "NMI executing" variable on the IST stack to work
+> correctly.  When it is unexpectedly called from the kernel stack, the
+> RSP-located "NMI executing" variable is also on the kernel stack and
+> is "uninitialized" and can cause the NMI entry to run in the wrong way.
+> 
+> During fixing the problem for KVM, I found that there might be the same
+> problem for early booting stage where the IST is not set up. asm_exc_nmi()
+> is not allowed to be used in this stage for the same reason about
+> the RSP-located "NMI executing" variable.
+> 
+> For both cases, we should use asm_noist_exc_nmi() which is introduced
+> in the patch 1 via renaming from an existing asm_xenpv_exc_nmi() and
+> which is safe on the kernel stack.
+> 
+> https://lore.kernel.org/lkml/20200915191505.10355-3-sean.j.christopherson@intel.com/
 
-I am not comfortable with this patch.
+For the KVM part,
 
-This way we will endup calling kvm_riscv_set_irq() from various
-places in hw/intc and hw/riscv.
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-I suggest to extend riscv_cpu_update_mip() such that when kvm is
-enabled riscv_cpu_update_mip() will:
-1) Consider only MIP_SEIP bit in "mask" parameter and all other
-    bits in "mask" parameter will be ignored probably with warning
-2) When the MIP_SEIP bit is set in "mask" call kvm_riscv_set_irq()
-to change the IRQ state in the KVM module.
+Thanks,
 
-Regards,
-Anup
+Paolo
 
->          }
->      }
->
-> diff --git a/target/riscv/kvm-stub.c b/target/riscv/kvm-stub.c
-> index 39b96fe3f4..4e8fc31a21 100644
-> --- a/target/riscv/kvm-stub.c
-> +++ b/target/riscv/kvm-stub.c
-> @@ -23,3 +23,8 @@ void kvm_riscv_reset_vcpu(RISCVCPU *cpu)
->  {
->      abort();
->  }
-> +
-> +void kvm_riscv_set_irq(RISCVCPU *cpu, int irq, int level)
-> +{
-> +    abort();
-> +}
-> diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
-> index 79c931acb4..da63535812 100644
-> --- a/target/riscv/kvm.c
-> +++ b/target/riscv/kvm.c
-> @@ -453,6 +453,26 @@ void kvm_riscv_reset_vcpu(RISCVCPU *cpu)
->      env->gpr[11] = cpu->env.fdt_addr;          /* a1 */
->  }
->
-> +void kvm_riscv_set_irq(RISCVCPU *cpu, int irq, int level)
-> +{
-> +    int ret;
-> +    unsigned virq = level ? KVM_INTERRUPT_SET : KVM_INTERRUPT_UNSET;
-> +
-> +    if (irq != IRQ_S_EXT) {
-> +        return;
-> +    }
-> +
-> +    if (!kvm_enabled()) {
-> +        return;
-> +    }
-> +
-> +    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_INTERRUPT, &virq);
-> +    if (ret < 0) {
-> +        perror("Set irq failed");
-> +        abort();
-> +    }
-> +}
-> +
->  bool kvm_arch_cpu_check_are_resettable(void)
->  {
->      return true;
-> diff --git a/target/riscv/kvm_riscv.h b/target/riscv/kvm_riscv.h
-> index f38c82bf59..ed281bdce0 100644
-> --- a/target/riscv/kvm_riscv.h
-> +++ b/target/riscv/kvm_riscv.h
-> @@ -20,5 +20,6 @@
->  #define QEMU_KVM_RISCV_H
->
->  void kvm_riscv_reset_vcpu(RISCVCPU *cpu);
-> +void kvm_riscv_set_irq(RISCVCPU *cpu, int irq, int level);
->
->  #endif
-> --
-> 2.19.1
->
->
-> --
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Steven Rostedt <rostedt@goodmis.org>
+> Cc: Andi Kleen <ak@linux.intel.com>
+> Cc: Andy Lutomirski <luto@kernel.org>
+> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Cc: Wanpeng Li <wanpengli@tencent.com>
+> Cc: Jim Mattson <jmattson@google.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: kvm@vger.kernel.org
+> Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+> Cc: Uros Bizjak <ubizjak@gmail.com>
+> Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+> 
+> Lai Jiangshan (4):
+>    x86/xen/entry: Rename xenpv_exc_nmi to noist_exc_nmi
+>    x86/entry: Use asm_noist_exc_nmi() for NMI in early booting stage
+>    KVM/VMX: Invoke NMI non-IST entry instead of IST entry
+>    KVM/VMX: fold handle_interrupt_nmi_irqoff() into its solo caller
+> 
+>   arch/x86/include/asm/idtentry.h |  4 +---
+>   arch/x86/kernel/idt.c           |  8 +++++++-
+>   arch/x86/kernel/nmi.c           | 12 ++++++++++++
+>   arch/x86/kvm/vmx/vmx.c          | 27 ++++++++++++++-------------
+>   arch/x86/xen/enlighten_pv.c     |  9 +++------
+>   arch/x86/xen/xen-asm.S          |  2 +-
+>   6 files changed, 38 insertions(+), 24 deletions(-)
+> 
+
