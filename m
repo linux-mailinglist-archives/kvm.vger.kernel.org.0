@@ -2,147 +2,325 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 57CFB36FA72
-	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 14:38:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CDE9A36FABD
+	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 14:43:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232289AbhD3MjA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Apr 2021 08:39:00 -0400
-Received: from mail-bn8nam08on2056.outbound.protection.outlook.com ([40.107.100.56]:46240
-        "EHLO NAM04-BN8-obe.outbound.protection.outlook.com"
+        id S232817AbhD3Mn5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Apr 2021 08:43:57 -0400
+Received: from mail-bn8nam12on2074.outbound.protection.outlook.com ([40.107.237.74]:41101
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232276AbhD3Mi6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Apr 2021 08:38:58 -0400
+        id S232441AbhD3Mmg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Apr 2021 08:42:36 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h74nqhLooHmsdqU+GkpQbSRjiBTzZokrQAD7UDIzk/Sr+Cx0wpj6PhmkTJYD2BmFNlp0EY7VBQ3nhmhXFIPHUerviXknWt+oBeH1hQ/nVpwCgt5mEg+Ej4W/qRh7DA36Bu+0y4OFVHNm9LkB9E5upSP8OirXm1CH2gjnzwsrGMWxfb327VCYWmqCSBvuoAgTgjGMU0NVr0DyTRfHzlwY1KrYi8JM7KjoYz0qYE+HchUDEBBhOpf4tH2gfxjvuqYKcMC9IcMdSWepTpJApncseOm1RPLPmt4L/Mzc9nrt4pJVtu3gUydEfPU6Il4HO9u0iHTJ4sNKGPNMaoNVZsHcRg==
+ b=EGJpVBWVfT58f8fMg1p5gnZVuoeqAVoBTkLrkl39MP0ExIoIIqsaiVhN7p5r/9uExlkTrXJvvZptcjkLM2gSen3Z2PsM5ae0G8mPM3VoROimtalZQ16E3CesylH6DA39bM8OKiuwA66s9seNi71EM5A+Osi3YieVvYGXt5rfL+h1hbIAse4IC5Npb6a18Kapxme31eCdGE4tXfrQgl+699RQ9Z0kELBngK54WKUm1MXNSzyA4mjcB48UtI2QPi8al1CRa/UfybHkTqXLdkcNRKVYXDbWeIfaGTkWCPyo0FU+90xOShq/jqW3eB55WMFN9vZaFr73mJ0S9MS47xg00Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=52GXFOl/ii9pTZEjUJQyiOxXKZOlDXL/7lqIX/JA58c=;
- b=QbuHtUZU1sY2R6X8eBdwIRlr/xMZupVwOvg+YHpcfgqkmuxm9Fkr7K1oFlq60ckV4TSSz8OcxoMfESwB57OVt+eQRyTSgEv62gMwdBE7ON7V8CuxnHDrBaK5mLynul2hC37mpBdlIe4FL3nH+g9yf96FafU66Qu9Hngv45BSow90OcZbV+ZvcDvxopurbNxbgip6lNvBwg22Ka0YO3EQT3M8nNY73KYZMyXKEaOetgFyl0jFrtpTIOWh83dNtEtDzajFVWe3oUgcpUuoTp6qip0LO133RFTryAc/icCCEUvqJUodHVrFsFG+OOmfLY/iqI/WDPcVXFWrpCYZiLGO9g==
+ bh=fiJEiN0MDAnMJXmc07sfCitsrSw8RPaedeW1YFszWOE=;
+ b=QEGPVC1EAKJMK3C+0meeNb/Uy6voxrec6vbhgIPfmoI4Smp89T8D1raK4AQ8/KMmzZBtApeb2oFfD9yHIHvfvaVDHWSlprsU8dn24iVogP1J+CPbjqbE4kuXiupKQfS+8VXo20ZUVEsrCmuUqQSQzb0Rs9bl2l+JDsI7EZ844I3BJV2ONPCop5YIhTUegQruDrtJwVbtPnOd5wneI4RxJ5fc5MBeL62+msT6ndgQ91cwS23DMW/iD2nCX5OYSK6qQdl1uBFCeE1O5ntQdR5yxJzo2vjSZm7wwaa4VbMLjD00ZEucCsrcO/RMQPkOq7GNVMZVw/3rHEenP7duVtazGw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=52GXFOl/ii9pTZEjUJQyiOxXKZOlDXL/7lqIX/JA58c=;
- b=NSe1siURRa22mfT+Pe7oDeIwz/SMUG7WXFQnTmW1O5VuFqQpGSJmFsv5mPasIeW977vms9sh3VR8I3S3zHIeShzd5OiT9A8p7c+DDsIpnBD3I3swdI3wmk4GZ4Bh2NDIMno4PBVT+VhbuhDiXLtu+6XvaSiVmzsGmTbfog/+ClSsvH8u7QhP5Q2tj/5qH39RZwFYPg1horWlme31ZxrwrSonpKaxyi7MrLSBAeXxk5Htn19pWgKaypXviAKX8n0qszlTwfTcKfVJONOgKxej1l8TyJUqsNGcqsJ8F1NPWwb4WuMzJO22ZQCFRltqc4ql4JFkJL+kZRFclBztxY6Vxg==
-Authentication-Results: arm.com; dkim=none (message not signed)
- header.d=none;arm.com; dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM6PR12MB3020.namprd12.prod.outlook.com (2603:10b6:5:11f::15) with
+ bh=fiJEiN0MDAnMJXmc07sfCitsrSw8RPaedeW1YFszWOE=;
+ b=qTDGBrUDaJp2Zy1SRTdo20MXypM/Tn09zdxibMJVhpBooc16+H+6fEBeA8FvBEWjlwPhxv7jHOQIK/dprwOUK5qhtngUs5W28wbGUjQsNyeXoWUilxsNn5ARLfm+2T7rpn2SrBDDsPdovcRkmxQcY5jVmU687F6ZVJOTIosW8BA=
+Authentication-Results: kernel.org; dkim=none (message not signed)
+ header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SN6PR12MB2832.namprd12.prod.outlook.com (2603:10b6:805:eb::30) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.23; Fri, 30 Apr
- 2021 12:38:08 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.4065.027; Fri, 30 Apr 2021
- 12:38:08 +0000
-Date:   Fri, 30 Apr 2021 09:38:07 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
-Cc:     Shanker Donthineni <sdonthineni@nvidia.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Vikram Sethi <vsethi@nvidia.com>,
-        Jason Sequeira <jsequeira@nvidia.com>, benh@kernel.crashing.org
-Subject: Re: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR
- region in VMA
-Message-ID: <20210430123807.GB1370958@nvidia.com>
-References: <20210429162906.32742-1-sdonthineni@nvidia.com>
- <20210429162906.32742-2-sdonthineni@nvidia.com>
- <20210430095417.GA13686@lpieralisi>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210430095417.GA13686@lpieralisi>
-X-Originating-IP: [206.223.160.26]
-X-ClientProxiedBy: CH0PR04CA0046.namprd04.prod.outlook.com
- (2603:10b6:610:77::21) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.24; Fri, 30 Apr
+ 2021 12:39:10 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4065.027; Fri, 30 Apr 2021
+ 12:39:10 +0000
+From:   Brijesh Singh <brijesh.singh@amd.com>
+To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     tglx@linutronix.de, bp@alien8.de, jroedel@suse.de,
+        thomas.lendacky@amd.com, pbonzini@redhat.com, mingo@redhat.com,
+        dave.hansen@intel.com, rientjes@google.com, seanjc@google.com,
+        peterz@infradead.org, hpa@zytor.com, tony.luck@intel.com,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH Part2 RFC v2 23/37] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_UPDATE command
+Date:   Fri, 30 Apr 2021 07:38:08 -0500
+Message-Id: <20210430123822.13825-24-brijesh.singh@amd.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20210430123822.13825-1-brijesh.singh@amd.com>
+References: <20210430123822.13825-1-brijesh.singh@amd.com>
+Content-Type: text/plain
+X-Originating-IP: [165.204.77.1]
+X-ClientProxiedBy: SN4PR0501CA0089.namprd05.prod.outlook.com
+ (2603:10b6:803:22::27) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (206.223.160.26) by CH0PR04CA0046.namprd04.prod.outlook.com (2603:10b6:610:77::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4087.25 via Frontend Transport; Fri, 30 Apr 2021 12:38:08 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lcSPH-00Eh4x-6G; Fri, 30 Apr 2021 09:38:07 -0300
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN4PR0501CA0089.namprd05.prod.outlook.com (2603:10b6:803:22::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4108.8 via Frontend Transport; Fri, 30 Apr 2021 12:39:10 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 99de3d75-374a-41c8-7903-08d90bd4cf08
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3020:
+X-MS-Office365-Filtering-Correlation-Id: 07ad746d-3541-46e8-0de0-08d90bd4f40b
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2832:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB3020801D48350A201A410761C25E9@DM6PR12MB3020.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-Microsoft-Antispam-PRVS: <SN6PR12MB28321FF261B5C17FFCBE6C99E55E9@SN6PR12MB2832.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3173;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MPtfkKbafPdGzfAmzajJd1HazVDS0Cny9mhTshoUo3FnYpxcVMnC2whTR0036PaDG/kJ1ikW9gYQFYlGsKsIcXFKjswP3T3In08UhRg2qCK2xiyEDG3xu+LFizT3JFpcOD5OuBx3XcxrZ9LGUkvCgK+k+tbSIj9UzFTjroZQkYrE0uNKtbXNo2MfnxRgkdWb4Xvk2RdqIvmzefdk91jUk12ROwbJxKSQNOefERBzNBmavGLHNgG7/Hn01QskYeCs4FZiTADWh+4NjLfnhJLwNldMWBzfmzgh8BzPD/pj1e1/IKjmZdTWrDW53KvL9rbIeUrf1+J6CLL9dbq/f/sglDpCbPYDDghArMQ8AG57khoLlDhLZLhCP70DGJ5CuT2gXk/BIMZscgnhJWD/tnko4CFqFPkUVRBaEB7bSrPoJlTvr8vyDfAWdP+/g0ZuTSWRXSrjPkpvbwcjgBjq/QYsCcv/6SSh/6kh7/RnXDB+Om0XDkmTueOEZIxZypdoptJepnSqsxYwNs8VbNcK3PYFfDuSai6NbnIaZao55KCZXWwkEhGCgChIuQw59tUsfi8EDsz2WvMBAHzSVWZQuh0NDyeMQqTfvhiHKUPtHWsuLbl63bE+vl6K97f/yqmaWnO8qDUzQA05XniF2zvGSZ22esC0nVydUAs8Xtra1UPfdvrptXoOHDzoepCdGvMb9qD+ITrnhTB4kY4FaaC98k5e3CWToMSQ2WPDp4Al7Ys7100=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(396003)(376002)(136003)(366004)(39860400002)(316002)(33656002)(2906002)(66946007)(186003)(36756003)(54906003)(9786002)(66476007)(8676002)(9746002)(4326008)(5660300002)(66556008)(7416002)(6916009)(426003)(2616005)(83380400001)(1076003)(478600001)(8936002)(38100700002)(966005)(26005)(86362001)(3714002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?sogDj5vxgMqNqCpWL7hATIas/EmaE2fIUUjktGD+i8qgOdxww2H2ANG/JQhm?=
- =?us-ascii?Q?gDc7+INkcRt5T6o55XKeMlJv/LslqOb1xvHsaw1TzeglrmL6OTIr6/dFL7VE?=
- =?us-ascii?Q?Jenl6bc/znJqqdkC+zZac57SXatM+BXNZ4vbWTlG8L/EKUnRMeImpGUWkK6+?=
- =?us-ascii?Q?8nHQ5ZHd0CqcbqdjSIExAJ7VkWBup0E6E4LWW6CjqB4RpTJHEga4e0huwsGb?=
- =?us-ascii?Q?eSFI8KFxlxFf6gvm7KZTXHNwQr8fZfrcD7LNvrxpINW7/GFrMWj12EQXQLmd?=
- =?us-ascii?Q?vdeH4PYFod/y43uxHBSMetCnxMJxiLtZt6UtMO7rBFuT5aCYJJ3abOexyurN?=
- =?us-ascii?Q?bkisDFzotfT/gEELJn7wcRcAYzAOCrclQ2z24zbujsB3whW3bjBXIXXCvwgx?=
- =?us-ascii?Q?2mHjxD7ORGLvPSeZF28vIuqIwYoolSZpHDM1NTkKesI2JBG0xaLwJtV3r0eo?=
- =?us-ascii?Q?eQ4s4V695tmKuGrFGhGGsUv4+Uf9YtRs8vE3Iahg/dJZ6AXZaGOIzMkbUVfs?=
- =?us-ascii?Q?RqY1dntHxPr0yoDG9IFRDcUgjmpoiFRKxaiuEZhJgMck5wEo7ARapJRRstQr?=
- =?us-ascii?Q?+FRpkqYqzyGrq/apwToShZVYO7O/hztMozNDRAWfdhlXrX2K6Lx15Z4NujYn?=
- =?us-ascii?Q?rpKtpTop2leVuNiGQdILFuKQE2TXLFw8VJhfNVIdSWUdHwQWBwF/rsoYlsi+?=
- =?us-ascii?Q?i3+GAZsLtp56to4ZV6iUxn3wtie718SbdzcUzZnmrfDYTyvVYvO/zwWqCzXU?=
- =?us-ascii?Q?5sdSmmHDnc6SZLAYiMVaTMOyTV1qCcYtoG+P1vjp82gKx4PbzkFSJoNonaoy?=
- =?us-ascii?Q?3hUG48ALDo7jKGEC48lwkNpI89PO6P5fGNp5y3dFH25Qam1WFWB/tDn+ahor?=
- =?us-ascii?Q?fYqqc33HRhVSiueQmB8HU8M23r6ts9BVcwI49HBu2vJw8h7Fa1OhIoDPphGd?=
- =?us-ascii?Q?5haIdDpSYWIiU/Mx1db6Fr3vHus0c++QpZSNW12r2QIfLuUMZ7rSCJUZ06z4?=
- =?us-ascii?Q?jHx9OZaBUFsE5lZoeK8X+jESoEDYMdDKPU+VVjaAX7mIi+OTPoivlRFvnsPe?=
- =?us-ascii?Q?l/d9gAaA6RBiZ4vK+dH7trlId0Nwz4BtEfggekkaWwAdNjPWWViVO1YLG56A?=
- =?us-ascii?Q?jSJItbZKxYlIk/sUIknd8vcuv04KIvDkRlWw+d3O07fzz28GmLyaXpCNJpu6?=
- =?us-ascii?Q?LTtZJ5oEqrb0REEOxmZ0JSIu9hToQRnS6QraqRPM78Sh4YGm23h2GRvKKZSP?=
- =?us-ascii?Q?39uNEGc73uaWZPPbXZsZfkgJV0zST5FgpiomDIPRxp7uKsS9FuIxN5yVFWpG?=
- =?us-ascii?Q?v6NRiTQbnJ3kdLO3xFbR3GSA?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 99de3d75-374a-41c8-7903-08d90bd4cf08
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
+X-Microsoft-Antispam-Message-Info: NMJhy+M/0mB3Zu2IA1K9YnhNlFnA74kOyb6s5Iz5vCh8CoVTeb2r56SSyOwAcmGizZsCDRJDi/Mjudwaev8gnXo/cTJWEzNjzsFnr37mS2IrB5CP9Qd62uXBIsnLD3xWjSb4Aw1xFMDchFFfSKl77cLtJfgpg9UPbODppP+RNAAq4toEsj5uSbXUcOVF7eGG4Md4Hy6zeKk+fJJBbBqkSH6iBPDu/QzubHCOzGPiuF23ONG1ViNWNwmQLzCKswufPjhBtd/Yyf2kTjgendndxhNldQ2zNJQnkLM7Od4goxluVYVt7i9C6kJdr763hmlUOR0eitZaZmBXkdbKe4vR8bFqDeYaLYmjTK6ZMOYeWI5tNE2OJUfPsBuylyb+Oa4RhkvmmVKZ897vtIRAmpDtkM/Ypu/ruoaq7ePLQ+k8Tg/3+e5nv49SfIia7xP6h1NV1EBs+3GONXZclunkR75k7bJ7T32cNEw/vpfX59oNaJlv1gxFShTXuEq6ylMU0c68wUgEzjmKx6sjJWJCGtFx7Jxit4qLaH1aDNgEaW2JlknhdqP+Ypdl2vIP+hnkgL9+k/UG8penZZMNFd89PNJ1u7c9hGJOMa82DMCPKa/fL9jfBh3w7kHdv4Nb34kR/brdhaX1Iiolqjq3GHhwb6wk+A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(39860400002)(396003)(136003)(376002)(346002)(66556008)(956004)(7696005)(66476007)(2906002)(7416002)(66946007)(1076003)(52116002)(38100700002)(186003)(16526019)(4326008)(2616005)(6486002)(5660300002)(44832011)(8676002)(26005)(316002)(8936002)(36756003)(478600001)(83380400001)(86362001)(38350700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?by1PALNaVqnCItOfCpjVMfI/AeJ8Su60ypM07VIp09uTea7WtQo6VcmbCDWM?=
+ =?us-ascii?Q?MnreQkOiTsoOlLAYPgaZgDbEXlPNmoAOeUyHHUFHReJs9T9CoBvjTr5EAE6Z?=
+ =?us-ascii?Q?TQCZac/5ojGcjrG7QrV3uSZpq2U3j6mw4FF1p24re6I+xcLn/GgrNeIgWBoN?=
+ =?us-ascii?Q?KcDNzc5gJSwea97hXHXulaAZU1Y9JEPRm7wlKP/iCWpbdi++c3DqO5pysuNZ?=
+ =?us-ascii?Q?bwkh3O1TdcikuTEMpN3Cn2+b6tWMElHXRVYyOJLcVeUtCkID20XGR/5Ip/Pq?=
+ =?us-ascii?Q?x48ZBGwFqwGu9VRsqO03vfE1Bg17a04nL2ABSq+dcThAK3tYiD863ihkry8T?=
+ =?us-ascii?Q?5DrGDD2tPz+1WXX6+smotw3gm1EdaqRF+YJWnCuhmiwZp9rL0SLejAy7G5+I?=
+ =?us-ascii?Q?F0bRTDWg6I05Q/fnkS41VjPOQvciNHv/VvEF3r6xDjVMMpakCY0TCkugcDNE?=
+ =?us-ascii?Q?OyjL9iWWptuqUaaCTQJOZFobbcA+P5wRxiRae4FhWfIfbTMsNxB+xnNYzOKg?=
+ =?us-ascii?Q?p6yChbucpaRFzFqJHZTvAke0hqSWDmS5k1W/huCw3X4l8uq3JigmqCzm2ECK?=
+ =?us-ascii?Q?Z4PjqytoPw7hAAnqmHlzSOIk9BFU9sERqffZgN0GhBBVzkuPWBZ/qTsbFIQd?=
+ =?us-ascii?Q?hYZaSCz9KH/emrF1Oc/2Q9cRO5f5sV9EUMJ8ibAESSxlsytVgFF6aIqnva5C?=
+ =?us-ascii?Q?Q1TqBXct8ML3rHMumqdjWuN6HCq5dV6txH/jG540gn8Sf6XYZ8oLBSI4Y2Vp?=
+ =?us-ascii?Q?1Y3Q+E4t0CZP4RsAdX4LZDF2KjidEAHJjdCLLB/LJuVDc6dGnXiYkWLLQdkl?=
+ =?us-ascii?Q?9hUAqZNleKDbTdCcOc+liIc+oCk+kJ/YJbztZLaMH/RQPkpbVfPZTxePDHl7?=
+ =?us-ascii?Q?N2rX+9pjwLUszSYs1nvCqTOg8DCkPbd84W/fxN/twP/eZv18N+ZYfJ2yXTrE?=
+ =?us-ascii?Q?alIEVkUHEYfamoThqcp6WZLjl3FeSMKZC2aI2Y5ZDM9G/YFCh7lKmkNBcN9X?=
+ =?us-ascii?Q?3rZpKg7EZM5mmKiIVa9KMlNeZ3hUqaD8nYWNvUl+9EGNOVM47NmIbnDg8NoI?=
+ =?us-ascii?Q?BsLqIUhalvxJasmOTy2e6G7livpN898AXCHwjGLv7rnNFEcRFiqTGlLdEzcC?=
+ =?us-ascii?Q?DFCg+TL82jnExOxgpB+LeD9+orTMjPft6/lZ7sCdOlG5G0VzXidVmpUdJoPd?=
+ =?us-ascii?Q?K1Nvwfc9VLwl/x3+6j/XvDClqNPS2vRDqkLNvRT9QM54n68JMdbJwJZAplS0?=
+ =?us-ascii?Q?foC0B8W1R1Hf2LwNrWzfzThYZudyuRWzFXYu2ieHdIY3UrNUAef1OnyjuhAL?=
+ =?us-ascii?Q?6zZwgw34yitm2mJHH0MzWJ8R?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 07ad746d-3541-46e8-0de0-08d90bd4f40b
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2021 12:38:08.7075
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2021 12:39:10.6582
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bFKw6aJfa9HR7LIuydB10DnDhefaeEWTunW1Jl8Elr0S/xE9+UBZYz0Ra/RK5rwP
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3020
+X-MS-Exchange-CrossTenant-UserPrincipalName: F6vFigq9ANOxPRjRSmk0heaxQdiTlxS2eDG2GT1yiXbNqlsSuUXwnYYR4nAmc09nBNq+IeXghNNAlxfkARrxPQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2832
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 30, 2021 at 10:54:17AM +0100, Lorenzo Pieralisi wrote:
-> [+Jason, Ben]
-> 
-> On Thu, Apr 29, 2021 at 11:29:05AM -0500, Shanker Donthineni wrote:
-> > For pass-through device assignment, the ARM64 KVM hypervisor retrieves
-> > the memory region properties physical address, size, and whether a
-> > region backed with struct page or not from VMA. The prefetchable
-> > attribute of a BAR region isn't visible to KVM to make an optimal
-> > decision for stage2 attributes.
-> > 
-> > This patch updates vma->vm_page_prot and maps with write-combine
-> > attribute if the associated BAR is prefetchable. For ARM64
-> > pgprot_writecombine() is mapped to memory-type MT_NORMAL_NC which
-> > has no side effects on reads and multiple writes can be combined.
-> > 
-> > Signed-off-by: Shanker Donthineni <sdonthineni@nvidia.com>
-> >  drivers/vfio/pci/vfio_pci.c | 6 +++++-
-> >  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> A bit of background information that may be useful:
-> 
-> https://lore.kernel.org/linux-pci/2b539df4c9ec703458e46da2fc879ee3b310b31c.camel@kernel.crashing.org
+The KVM_SEV_SNP_LAUNCH_UPDATE command can be used to insert data into the
+guest's memory. The data is encrypted with the cryptographic context
+created with the KVM_SEV_SNP_LAUNCH_START.
 
-This can't happen automatically.
+In addition to the inserting data, it can insert a two special pages
+into the guests memory: the secrets page and the CPUID page.
 
-writecombining or not is a uABI visible change. Userspace needs to
-explicitly request and know that the mmap it gets back is
-writecombining.
+For more information see the SEV-SNP specification.
 
-Jason
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+---
+ arch/x86/kvm/svm/sev.c   | 139 +++++++++++++++++++++++++++++++++++++++
+ include/uapi/linux/kvm.h |  18 +++++
+ 2 files changed, 157 insertions(+)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 90d70038b607..d97f37df1f3b 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -17,6 +17,7 @@
+ #include <linux/misc_cgroup.h>
+ #include <linux/processor.h>
+ #include <linux/trace_events.h>
++#include <linux/sev.h>
+ #include <asm/fpu/internal.h>
+ 
+ #include <asm/trapnr.h>
+@@ -1607,6 +1608,141 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	return rc;
+ }
+ 
++static struct kvm_memory_slot *hva_to_memslot(struct kvm *kvm, unsigned long hva)
++{
++	struct kvm_memslots *slots = kvm_memslots(kvm);
++	struct kvm_memory_slot *memslot;
++
++	kvm_for_each_memslot(memslot, slots) {
++		if (hva >= memslot->userspace_addr &&
++		    hva < memslot->userspace_addr + (memslot->npages << PAGE_SHIFT))
++			return memslot;
++	}
++
++	return NULL;
++}
++
++static bool hva_to_gpa(struct kvm *kvm, unsigned long hva, gpa_t *gpa)
++{
++	struct kvm_memory_slot *memslot;
++	gpa_t gpa_offset;
++
++	memslot = hva_to_memslot(kvm, hva);
++	if (!memslot)
++		return false;
++
++	gpa_offset = hva - memslot->userspace_addr;
++	*gpa = ((memslot->base_gfn << PAGE_SHIFT) + gpa_offset);
++
++	return true;
++}
++
++static int snp_page_reclaim(struct page *page, int rmppage_size)
++{
++	struct sev_data_snp_page_reclaim data = {};
++	struct rmpupdate e = {};
++	int rc, err;
++
++	data.paddr = __sme_page_pa(page) | rmppage_size;
++	rc = snp_guest_page_reclaim(&data, &err);
++	if (rc)
++		return rc;
++
++	return rmpupdate(page, &e);
++}
++
++static int snp_launch_update(struct kvm *kvm, struct kvm_sev_cmd *argp)
++{
++	unsigned long npages, vaddr, vaddr_end, i, next_vaddr;
++	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
++	struct sev_data_snp_launch_update data = {};
++	struct kvm_sev_snp_launch_update params;
++	int *error = &argp->error;
++	struct kvm_vcpu *vcpu;
++	struct page **inpages;
++	struct rmpupdate e;
++	int ret;
++
++	if (!sev_snp_guest(kvm))
++		return -ENOTTY;
++
++	if (!sev->snp_context)
++		return -EINVAL;
++
++	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
++		return -EFAULT;
++
++	data.gctx_paddr = __psp_pa(sev->snp_context);
++
++	/* Lock the user memory. */
++	inpages = sev_pin_memory(kvm, params.uaddr, params.len, &npages, 1);
++	if (!inpages)
++		return -ENOMEM;
++
++	vcpu = kvm_get_vcpu(kvm, 0);
++	vaddr = params.uaddr;
++	vaddr_end = vaddr + params.len;
++
++	for (i = 0; vaddr < vaddr_end; vaddr = next_vaddr, i++) {
++		unsigned long psize, pmask;
++		int level = PG_LEVEL_4K;
++		gpa_t gpa;
++
++		if (!hva_to_gpa(kvm, vaddr, &gpa)) {
++			ret = -EINVAL;
++			goto e_unpin;
++		}
++
++		psize = page_level_size(level);
++		pmask = page_level_mask(level);
++		gpa = gpa & pmask;
++
++		/* Transition the page state to pre-guest */
++		memset(&e, 0, sizeof(e));
++		e.assigned = 1;
++		e.gpa = gpa;
++		e.asid = sev_get_asid(kvm);
++		e.immutable = true;
++		e.pagesize = X86_TO_RMP_PG_LEVEL(level);
++		ret = rmpupdate(inpages[i], &e);
++		if (ret) {
++			ret = -EFAULT;
++			goto e_unpin;
++		}
++
++		data.address = __sme_page_pa(inpages[i]);
++		data.page_size = e.pagesize;
++		data.page_type = params.page_type;
++		ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_LAUNCH_UPDATE, &data, error);
++		if (ret) {
++			snp_page_reclaim(inpages[i], e.pagesize);
++			goto e_unpin;
++		}
++
++		next_vaddr = (vaddr & pmask) + psize;
++	}
++
++e_unpin:
++	/* Content of memory is updated, mark pages dirty */
++	memset(&e, 0, sizeof(e));
++	for (i = 0; i < npages; i++) {
++		set_page_dirty_lock(inpages[i]);
++		mark_page_accessed(inpages[i]);
++
++		/*
++		 * If its an error, then update RMP entry to change page ownership
++		 * to the hypervisor.
++		 */
++		if (ret)
++			rmpupdate(inpages[i], &e);
++	}
++
++	/* Unlock the user pages */
++	sev_unpin_memory(kvm, inpages, npages);
++
++	return ret;
++}
++
+ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+ {
+ 	struct kvm_sev_cmd sev_cmd;
+@@ -1699,6 +1835,9 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+ 	case KVM_SEV_SNP_LAUNCH_START:
+ 		r = snp_launch_start(kvm, &sev_cmd);
+ 		break;
++	case KVM_SEV_SNP_LAUNCH_UPDATE:
++		r = snp_launch_update(kvm, &sev_cmd);
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		goto out;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 00427707d053..dfc4975820d6 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1681,6 +1681,7 @@ enum sev_cmd_id {
+ 	/* SNP specific commands */
+ 	KVM_SEV_SNP_INIT,
+ 	KVM_SEV_SNP_LAUNCH_START,
++	KVM_SEV_SNP_LAUNCH_UPDATE,
+ 
+ 	KVM_SEV_NR_MAX,
+ };
+@@ -1786,6 +1787,23 @@ struct kvm_sev_snp_launch_start {
+ 	__u8 gosvw[16];
+ };
+ 
++#define KVM_SEV_SNP_PAGE_TYPE_NORMAL		0x1
++#define KVM_SEV_SNP_PAGE_TYPE_VMSA		0x2
++#define KVM_SEV_SNP_PAGE_TYPE_ZERO		0x3
++#define KVM_SEV_SNP_PAGE_TYPE_UNMEASURED	0x4
++#define KVM_SEV_SNP_PAGE_TYPE_SECRETS		0x5
++#define KVM_SEV_SNP_PAGE_TYPE_CPUID		0x6
++
++struct kvm_sev_snp_launch_update {
++	__u64 uaddr;
++	__u32 len;
++	__u8 imi_page;
++	__u8 page_type;
++	__u8 vmpl3_perms;
++	__u8 vmpl2_perms;
++	__u8 vmpl1_perms;
++};
++
+ #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+ #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+ #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
+-- 
+2.17.1
+
