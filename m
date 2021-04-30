@@ -2,53 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B75EE370405
-	for <lists+kvm@lfdr.de>; Sat,  1 May 2021 01:24:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FE79370406
+	for <lists+kvm@lfdr.de>; Sat,  1 May 2021 01:24:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232855AbhD3XZC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Apr 2021 19:25:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52298 "EHLO
+        id S232876AbhD3XZE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Apr 2021 19:25:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230508AbhD3XZB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Apr 2021 19:25:01 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF49BC06174A
-        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 16:24:11 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id u5-20020a17090a3fc5b029014e545d9a6eso2427493pjm.2
-        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 16:24:11 -0700 (PDT)
+        with ESMTP id S232860AbhD3XZC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Apr 2021 19:25:02 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E465AC06138B
+        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 16:24:12 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id m36-20020a634c640000b02901fbb60ec3a6so25428980pgl.15
+        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 16:24:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=E9dhF2zRcjBoJyUagXIfZYrtnBYAcfcBi4++x+LfSDA=;
-        b=eK+y/OfDIUCfpXL+6G9kEV5E1+nBdAlojXSCo0Mp5ScQGuZNoHJeAGJ4Egi6+RKL9Z
-         zrmB1RpeE5bjubElxSbmIx52AhCcA5mvZMUz4IgwpZ29/DFmJ/YBfPh2A8hcZzfJXz6f
-         Jstp0DbCQ/ZTzdSUOo6t9IXl1MoylEMA+PsEQozOB/STsbzC2+WdPRqrT2mv34O6rt/W
-         SJwpLhRhMlapWReiTXgtI5qQ4PJuDsfZKHC6zgAXsHhTTBiDYqaqzTEexOVHb4vr7RhQ
-         dvuiA2rWiTz7zsaXh7XsJwMiaOQxQj3aUnDQ0tVvYybkEIkP73dOpremRPmtcxlH3KA5
-         xZfw==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=ZyjdoDvj+0d1MrdvPreqK5eup22FMf+XNotdYUvQgRI=;
+        b=mVFEcJIz8TqMr35h+/Q4+Dav2KYnjMb7ka5/Gc219hGHhFNsWibr/XuA/YPgX+YHCA
+         NeqV+TgK7Yo40Do4rWs0FSy/f7DQXYjOid3a1piWerc8fAYFMONv/Xny8SzTye5CFkdu
+         8UO6h2hEwmqxxb/nMC1eCrRL0GCG7JLy8rL2TxB6lsJcFj+nEOnkJ7oqynUSoat7ZCAj
+         axu0v6pjMoecsg8X9qkeuwsozgIWn4HN2ajHRbMCEll5feWXxuNRWaVkgdp/OnOWR817
+         nwjerzB/XdDGaABVwh7/aFrycJgqzKOIITDywOnNcXrzrlOM/7SnoNQIubrddxI85XBo
+         HOmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=E9dhF2zRcjBoJyUagXIfZYrtnBYAcfcBi4++x+LfSDA=;
-        b=q1Qmu9lnaEiDYmi75LWd+PpQpD3NO5vgYGVQlUGZVRjd430/CTl/k+n5HhwK8IDb8F
-         vVCg1ywkmX/pMHtZXUX7PpbKszc7LdyGcaC4FrXLvZjK/y4n67VkshrhneKkIKxi3pX3
-         jc3DgcksUlahnxqCNHwhF7gC7h2Sapdg/e1RZ/t4uuFSbuh9i6pWc5g+meMTu11OtcVT
-         tx14VNGx9mLtTspKnGtZJn7wN3zLwRpH4B9UDr1HNXI5vCoQzhYikmXiDMNMx82BgOyh
-         556/hfy0PDrFV2DZ7okuL8DA/kqGK9KhdkYZIN7z4LzaT8OD4c2EguZJYQpZ3OJoXVGo
-         JRTQ==
-X-Gm-Message-State: AOAM530kti7F65QVehYawBJXxKXPF6okMLZpZlkhNAK1h6u8r4k8to0s
-        jtOHVKckx/+Bbq1Ku33X4F+LZ8NV6XOx9Jd9pti0J7x6iH81nB9V5HAqUlQkfDoHdVZg0iQclg1
-        Xu2egdztIIgugR+xPNsIvdx+53WWpLAUfdlXv+l5rkFbV/jCS2/LmIWtTgoshM8A=
-X-Google-Smtp-Source: ABdhPJx8Zj51M8c+P8fjodtaWXMvKND3bUmTo0cpsuI7daS6L06aMBpeM4573QKUNZ9T/hCuJU9qEZzNtfCIXA==
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=ZyjdoDvj+0d1MrdvPreqK5eup22FMf+XNotdYUvQgRI=;
+        b=UoM0YqBbSbXk4eMRDo68ZqZ75zZrpzE8wyqfDBCx0tctLZxOtgi7S1UBkjdzDgCKUt
+         FSDTz6YCpeHoOesjiugvo8XayrrJOns/b9tiAhpbM4gXGZsVvJWDtV6fIBE39TAMdebL
+         J2ApHQpS3HRLaKdAOZ/EN4ugsiXsqjf8Kcg6FTDl4b/aF6MiluJujbMxiv43olp4Bujn
+         MApkUtfyrKDQjk3p2ikSnIN0zGW1pYYvZznq4Riylj5s+XC+Ge6so0pKEo4OzD1VIg9p
+         XJjJDxNvoOM/j+43O+l3F37Y9zyeAeSM23KqSRTbByKVVX/zni1ke3Je+dZsbs6qoQow
+         44Kw==
+X-Gm-Message-State: AOAM531isKg3ESeNH543nk6tkYJWy3re926PFRNAFr2ewPUPCjEtX9EV
+        SKZH1Ct02/c8xiK/H9EAT5JDXCeHwAa4GfgAqU3+3qME8lqlA3ReksFzUcuv/UUD4nFtnnpNBve
+        uUMm/cGdlIp7NxDyXsiNr9kc90b6qzD5Iadb1xXN9V+DJu3aC4/D+1P/k7eJLwU0=
+X-Google-Smtp-Source: ABdhPJw/WgOmany3vFjVOVJu6fs2Y1+1Pd0XL579JpPqAIrVqPNcaxkdQAkHOnqSS0bi/PanAPM14cJfMb63Xw==
 X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:902:dacf:b029:ee:ac0e:d0fe with SMTP
- id q15-20020a170902dacfb02900eeac0ed0femr2916269plx.30.1619825050505; Fri, 30
- Apr 2021 16:24:10 -0700 (PDT)
-Date:   Fri, 30 Apr 2021 16:24:02 -0700
-Message-Id: <20210430232408.2707420-1-ricarkol@google.com>
+ (user=ricarkol job=sendgmr) by 2002:a05:6a00:853:b029:27b:7bf6:f322 with SMTP
+ id q19-20020a056a000853b029027b7bf6f322mr7086773pfk.7.1619825052185; Fri, 30
+ Apr 2021 16:24:12 -0700 (PDT)
+Date:   Fri, 30 Apr 2021 16:24:03 -0700
+In-Reply-To: <20210430232408.2707420-1-ricarkol@google.com>
+Message-Id: <20210430232408.2707420-2-ricarkol@google.com>
 Mime-Version: 1.0
+References: <20210430232408.2707420-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.31.1.527.g47e6f16901-goog
-Subject: [PATCH v2 0/5] KVM: selftests: arm64 exception handling and debug test
+Subject: [PATCH v2 1/5] KVM: selftests: Rename vm_handle_exception
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     pbonzini@redhat.com, maz@kernel.org, drjones@redhat.com,
@@ -59,65 +63,103 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Rename the vm_handle_exception function to a name that indicates more
+clearly that it installs something: vm_install_vector_handler.
 
-These patches add a debug exception test in aarch64 KVM selftests while
-also adding basic exception handling support.
+Suggested-by: Marc Zyngier <maz@kernel.org>
+Suggested-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+---
+ tools/testing/selftests/kvm/include/x86_64/processor.h    | 2 +-
+ tools/testing/selftests/kvm/lib/x86_64/processor.c        | 4 ++--
+ tools/testing/selftests/kvm/x86_64/kvm_pv_test.c          | 2 +-
+ .../selftests/kvm/x86_64/userspace_msr_exit_test.c        | 8 ++++----
+ tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c       | 2 +-
+ 5 files changed, 9 insertions(+), 9 deletions(-)
 
-The structure of the exception handling is based on its x86 counterpart.
-Tests use the same calls to initialize exception handling and both
-architectures allow tests to override the handler for a particular
-vector, or (vector, ec) for synchronous exceptions in the arm64 case.
-
-The debug test is similar to x86_64/debug_regs, except that the x86 one
-controls the debugging from outside the VM. This proposed arm64 test
-controls and handles debug exceptions from the inside.
-
-Thanks,
-Ricardo
-
-v1 -> v2:
-
-Addressed comments from Andrew and Marc (thank you very much):
-- rename vm_handle_exception in all tests.
-- introduce UCALL_UNHANDLED in x86 first.
-- move GUEST_ASSERT_EQ to common utils header.
-- handle sync and other exceptions separately: use two tables (like
-  kvm-unit-tests).
-- add two separate functions for installing sync versus other exceptions
-- changes in handlers.S: use the same layout as user_pt_regs, treat the
-  EL1t vectors as invalid, refactor the vector table creation to not use
-  manual numbering, add comments, remove LR from the stored registers.
-- changes in debug-exceptions.c: remove unused headers, use the common
-  GUEST_ASSERT_EQ, use vcpu_run instead of _vcpu_run.
-- changes in processor.h: write_sysreg with support for xzr, replace EL1
-  with current in macro names, define ESR_EC_MASK as ESR_EC_NUM-1.
-
-Ricardo Koller (5):
-  KVM: selftests: Rename vm_handle_exception
-  KVM: selftests: Introduce UCALL_UNHANDLED for unhandled vector
-    reporting
-  KVM: selftests: Move GUEST_ASSERT_EQ to utils header
-  KVM: selftests: Add exception handling support for aarch64
-  KVM: selftests: Add aarch64/debug-exceptions test
-
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   3 +-
- .../selftests/kvm/aarch64/debug-exceptions.c  | 244 ++++++++++++++++++
- .../selftests/kvm/include/aarch64/processor.h |  90 ++++++-
- .../testing/selftests/kvm/include/kvm_util.h  |  10 +
- .../selftests/kvm/include/x86_64/processor.h  |   4 +-
- .../selftests/kvm/lib/aarch64/handlers.S      | 130 ++++++++++
- .../selftests/kvm/lib/aarch64/processor.c     | 124 +++++++++
- .../selftests/kvm/lib/x86_64/processor.c      |  19 +-
- .../selftests/kvm/x86_64/kvm_pv_test.c        |   2 +-
- .../selftests/kvm/x86_64/tsc_msrs_test.c      |   9 -
- .../kvm/x86_64/userspace_msr_exit_test.c      |   8 +-
- .../selftests/kvm/x86_64/xapic_ipi_test.c     |   2 +-
- 13 files changed, 611 insertions(+), 35 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/aarch64/debug-exceptions.c
- create mode 100644 tools/testing/selftests/kvm/lib/aarch64/handlers.S
-
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index 0b30b4e15c38..12889d3e8948 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -391,7 +391,7 @@ struct ex_regs {
+ 
+ void vm_init_descriptor_tables(struct kvm_vm *vm);
+ void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid);
+-void vm_handle_exception(struct kvm_vm *vm, int vector,
++void vm_install_vector_handler(struct kvm_vm *vm, int vector,
+ 			void (*handler)(struct ex_regs *));
+ 
+ /*
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index a8906e60a108..e156061263a6 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -1250,8 +1250,8 @@ void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid)
+ 	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
+ }
+ 
+-void vm_handle_exception(struct kvm_vm *vm, int vector,
+-			 void (*handler)(struct ex_regs *))
++void vm_install_vector_handler(struct kvm_vm *vm, int vector,
++			       void (*handler)(struct ex_regs *))
+ {
+ 	vm_vaddr_t *handlers = (vm_vaddr_t *)addr_gva2hva(vm, vm->handlers);
+ 
+diff --git a/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c b/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c
+index 732b244d6956..5ae5f748723a 100644
+--- a/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c
++++ b/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c
+@@ -227,7 +227,7 @@ int main(void)
+ 
+ 	vm_init_descriptor_tables(vm);
+ 	vcpu_init_descriptor_tables(vm, VCPU_ID);
+-	vm_handle_exception(vm, GP_VECTOR, guest_gp_handler);
++	vm_install_vector_handler(vm, GP_VECTOR, guest_gp_handler);
+ 
+ 	enter_guest(vm);
+ 	kvm_vm_free(vm);
+diff --git a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+index 72c0d0797522..20c373e2d329 100644
+--- a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
++++ b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+@@ -574,7 +574,7 @@ static void test_msr_filter_allow(void) {
+ 	vm_init_descriptor_tables(vm);
+ 	vcpu_init_descriptor_tables(vm, VCPU_ID);
+ 
+-	vm_handle_exception(vm, GP_VECTOR, guest_gp_handler);
++	vm_install_vector_handler(vm, GP_VECTOR, guest_gp_handler);
+ 
+ 	/* Process guest code userspace exits. */
+ 	run_guest_then_process_rdmsr(vm, MSR_IA32_XSS);
+@@ -588,12 +588,12 @@ static void test_msr_filter_allow(void) {
+ 	run_guest_then_process_wrmsr(vm, MSR_NON_EXISTENT);
+ 	run_guest_then_process_rdmsr(vm, MSR_NON_EXISTENT);
+ 
+-	vm_handle_exception(vm, UD_VECTOR, guest_ud_handler);
++	vm_install_vector_handler(vm, UD_VECTOR, guest_ud_handler);
+ 	run_guest(vm);
+-	vm_handle_exception(vm, UD_VECTOR, NULL);
++	vm_install_vector_handler(vm, UD_VECTOR, NULL);
+ 
+ 	if (process_ucall(vm) != UCALL_DONE) {
+-		vm_handle_exception(vm, GP_VECTOR, guest_fep_gp_handler);
++		vm_install_vector_handler(vm, GP_VECTOR, guest_fep_gp_handler);
+ 
+ 		/* Process emulated rdmsr and wrmsr instructions. */
+ 		run_guest_then_process_rdmsr(vm, MSR_IA32_XSS);
+diff --git a/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c b/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
+index 2f964cdc273c..ded70ff465d5 100644
+--- a/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
++++ b/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
+@@ -462,7 +462,7 @@ int main(int argc, char *argv[])
+ 
+ 	vm_init_descriptor_tables(vm);
+ 	vcpu_init_descriptor_tables(vm, HALTER_VCPU_ID);
+-	vm_handle_exception(vm, IPI_VECTOR, guest_ipi_handler);
++	vm_install_vector_handler(vm, IPI_VECTOR, guest_ipi_handler);
+ 
+ 	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA, 0);
+ 
 -- 
 2.31.1.527.g47e6f16901-goog
 
