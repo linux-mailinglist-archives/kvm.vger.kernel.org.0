@@ -2,85 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8133A36FFC4
-	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 19:39:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E3CD36FFD7
+	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 19:43:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230486AbhD3Rkf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Apr 2021 13:40:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33156 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230356AbhD3Rke (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Apr 2021 13:40:34 -0400
-Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21E3AC06174A
-        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 10:39:46 -0700 (PDT)
-Received: by mail-ot1-x32f.google.com with SMTP id x54-20020a05683040b6b02902a527443e2fso14011207ott.1
-        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 10:39:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/QCg3tcFZuKNZPrHgr+MVsV/ZvagGHBU+E0/6yNtjTk=;
-        b=S21mRyNFdIavYRi0+iNlOuM65+BLRfj0CCvvp5XAkGtoWtBnywaRXgrL/V7B6XsYSy
-         eyhiFsgnVSOnf7IVPqeMr1+NjJFwlo4zuqrcTFDj25tvCJr9Yz7vY0iov0q/5FZy3nFN
-         +ERnF6q1US2rvrVPHiTI4nON6kGwd0xGClFsemwNQBNV3CPqgS3+BmxxyWvLxafENMfI
-         5dT+wO62rRLL+lm7vgJFMeZdzy16y3S9F+oDrgmhacX/BuZ1Vg1neO4GqKdNP7Qe1q9r
-         jt50Hu4Xd+SjjzJwHOAj8F9uXQkhQZIWcJxfOd66WbEPR16X0aJeA/mO1yxbcgmWl1Al
-         vIyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/QCg3tcFZuKNZPrHgr+MVsV/ZvagGHBU+E0/6yNtjTk=;
-        b=Km5pc5YK4zgdBTMlUgmBB/6i0hrIL+deM+NrEvQhkauV4aweyZRe2XMCNy0HJJZCz6
-         T6xcCiRUnCcRXQ7dQ6PCCqSjodmjWxUtowh9BWXx2rDd5dZvh/7KQgaRhFXCupnFpqpP
-         k82xvUGL1k1EDCtj0S2xyFbCxiePHLhR7CC/aBOL3o2RKZxuGXeD+PtseX+xWEdfDzb7
-         wsnLpEZEKt6UmMUoKu2gtIlsjm4o2Ej2uImj5mj24TVXG/PCE5JVeXT4SpwJop1CygZ2
-         HPBZID2G5Nb1zMvfVsmr5Wt5C68J+Yo2U5CWA6ALUw0q2VAC2f+4ea8L6Ys8Ud4Ri9+2
-         pP9Q==
-X-Gm-Message-State: AOAM531/nizJtV2OgzQuc1mweOwD6WZmpDtUTEZhR3HmgRUjFyTx5q6p
-        frSAPCjyg0OP8yPT3XenKiLUe9izbs7cGjtec7cCJA==
-X-Google-Smtp-Source: ABdhPJxVui1hT2Hcy1eveUoAxuJ7AVz+2nWWBcVsk4luZe3GSZZp4iXbGXaOTr1cLOXa7xCKCO5NN50powcHKV3ijv4=
-X-Received: by 2002:a9d:1b4d:: with SMTP id l71mr4576968otl.241.1619804384661;
- Fri, 30 Apr 2021 10:39:44 -0700 (PDT)
+        id S230356AbhD3Rof (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Apr 2021 13:44:35 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46976 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229750AbhD3Roe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 30 Apr 2021 13:44:34 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13UHab5h073209;
+        Fri, 30 Apr 2021 13:43:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=mUVH6xyknU1SpzhgboC1wVZ7fZkvVN0ZyD4IPb0ZU+o=;
+ b=AINzomltP5OU2aaC8iPkP1JL7I7DOmpKAhO2D6pAuKcYghwewd9wvRifeYsHKPoUIxt3
+ zI55Q7djQ2/T8nxwqMNPpfYZd/wZhERTDn8Wsk1AOsllUEktRAoGWkJ8nc3pHT/BVh6Z
+ jq3U0Us0HbVTQCuzy5cvWxNZFjHfShFE4fqw+PlDD1y0aQtG9cfz09DeAQc03EFW1ULR
+ H+C53rX88abM2Iv+Ll8/C2SxCp6vlblimiic7WdVHzgT4ExN38g6iA+FSl29Bf9JNSVt
+ A6NFdDRnTXpEu4jkcK10a9bcIOhmYetkLRfUO4046HnWfczeIfEiZKZPxL/aglRWZ4q0 kw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 388perr3wj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 30 Apr 2021 13:43:45 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13UHda9V082314;
+        Fri, 30 Apr 2021 13:43:45 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 388perr3w1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 30 Apr 2021 13:43:45 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13UHhhdL023320;
+        Fri, 30 Apr 2021 17:43:43 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 384ay8kbdb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 30 Apr 2021 17:43:43 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13UHhfGr33489248
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 30 Apr 2021 17:43:41 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 61DBE52050;
+        Fri, 30 Apr 2021 17:43:41 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.4.217])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 0AD685204F;
+        Fri, 30 Apr 2021 17:43:41 +0000 (GMT)
+Subject: Re: [PATCH] kvm: exit halt polling on need_resched() as well
+To:     Venkatesh Srinivas <venkateshs@chromium.org>, kvm@vger.kernel.org,
+        jmattson@google.com, pbonzini@redhat.com, dmatlack@google.com
+Cc:     Benjamin Segall <bsegall@google.com>
+References: <20210429162233.116849-1-venkateshs@chromium.org>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <ea54b776-c15a-e718-d7c9-ae8df7f24de3@de.ibm.com>
+Date:   Fri, 30 Apr 2021 19:43:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.1
 MIME-Version: 1.0
-References: <20210430143751.1693253-1-aaronlewis@google.com> <20210430143751.1693253-3-aaronlewis@google.com>
-In-Reply-To: <20210430143751.1693253-3-aaronlewis@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 30 Apr 2021 10:39:30 -0700
-Message-ID: <CALMp9eQZEiZ1_nOmyMA2G1Q5vB_vhm09fmB1Bc9VK8tJUUB4kA@mail.gmail.com>
-Subject: Re: [PATCH v5 2/2] selftests: kvm: Allows userspace to handle
- emulation errors.
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     David Edmondson <david.edmondson@oracle.com>,
-        Sean Christopherson <seanjc@google.com>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210429162233.116849-1-venkateshs@chromium.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 3GWA--_yM7QU3M5PFfHuUo5frUE0fmEx
+X-Proofpoint-GUID: rZBdaTSLni0CYv79uXB_EGC_D3XHv5CE
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-30_10:2021-04-30,2021-04-30 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
+ mlxscore=0 adultscore=0 clxscore=1011 mlxlogscore=999 spamscore=0
+ impostorscore=0 lowpriorityscore=0 bulkscore=0 priorityscore=1501
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104300116
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 30, 2021 at 7:38 AM Aaron Lewis <aaronlewis@google.com> wrote:
->
-> This test exercises the feature KVM_CAP_EXIT_ON_EMULATION_FAILURE.  When
-> enabled, errors in the in-kernel instruction emulator are forwarded to
-> userspace with the instruction bytes stored in the exit struct for
-> KVM_EXIT_INTERNAL_ERROR.  So, when the guest attempts to emulate an
-> 'flds' instruction, which isn't able to be emulated in KVM, instead
-> of failing, KVM sends the instruction to userspace to handle.
->
-> For this test to work properly the module parameter
-> 'allow_smaller_maxphyaddr' has to be set.
->
-> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> Change-Id: I23af1c0d4a3a3484dc15ddd928f3693a48c33e47
+
+
+On 29.04.21 18:22, Venkatesh Srinivas wrote:
+> From: Benjamin Segall <bsegall@google.com>
+> 
+> single_task_running() is usually more general than need_resched()
+> but CFS_BANDWIDTH throttling will use resched_task() when there
+> is just one task to get the task to block. This was causing
+> long-need_resched warnings and was likely allowing VMs to
+> overrun their quota when halt polling.
+> 
+> Signed-off-by: Ben Segall <bsegall@google.com>
+> Signed-off-by: Venkatesh Srinivas <venkateshs@chromium.org>
+
+would that qualify for stable?
+
 > ---
-...
-> +                       TEST_ASSERT(is_flds(insn_bytes, insn_size),
-> +                                   "Unexpected instruction.  Expected 'flds' (0xd9 /0)");
-
-Aren't we looking for 0xd9 /5?
-
-With that minor fix.
-
-Reviewed-by: Jim Mattson <jmattson@google.com>
+>   virt/kvm/kvm_main.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 2799c6660cce..b9f12da6af0e 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2973,7 +2973,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>   				goto out;
+>   			}
+>   			poll_end = cur = ktime_get();
+> -		} while (single_task_running() && ktime_before(cur, stop));
+> +		} while (single_task_running() && !need_resched() &&
+> +			 ktime_before(cur, stop));
+>   	}
+> 
+>   	prepare_to_rcuwait(&vcpu->wait);
+> 
