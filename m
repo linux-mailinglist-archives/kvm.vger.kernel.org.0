@@ -2,454 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE35F36FC90
-	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 16:38:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CBFF036FD19
+	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 17:05:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233023AbhD3Oit (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Apr 2021 10:38:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49164 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230297AbhD3Ois (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Apr 2021 10:38:48 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7414AC06138B
-        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 07:38:00 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id j91-20020a17090a1464b0290155d0a238deso1932477pja.1
-        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 07:38:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=Wv9OA04TAyeI3neAe+/+3mKFQ8hCA2L7TG303iBIYZs=;
-        b=T6lidl0EtMxqhLRsCVwri1s4az4InKiYA558Q5vReoAf8FV0jR7qalY59mHRFD8ISU
-         hEpSGBll1mq5PAyDXwEjV9cvNnvH467PhHR70gnFqxlQyKIG83AQCoXgZeDBMIAQaHOB
-         8ocE2FPcoTs9N46l5r9DOWP4PREVVcqAC/0unaby+o+QNAd34wfOE4U9QVVPWs7LAjPh
-         tjakwOd43m4vqz7H66aFqASdAfB8XkrTmlYL7sqYKLNOR2/ev+JrXUJJ+UydUvYH72xk
-         sL5ypfdtidjPsRiSAdnZ6wM0gIpYkzXJY1PZH9RmK8R7dMbN8VR7b115rpcYH6GDOYHG
-         uGQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=Wv9OA04TAyeI3neAe+/+3mKFQ8hCA2L7TG303iBIYZs=;
-        b=EFROJM5nY4VhIKD1BbR74cKQ5eBVUapNalWHy3uhgRypXqXTRggjTjti7meZ2kZcwR
-         Tahh18BrNid522dbSBoGCyZXE/PfEzQMw4xj3zCPhKdItTOnF1xQvj9hQQWZx+lMykdY
-         D+LTzLBkd35tXuR7uDQ9U0Dse0+Yfmfs6IX4AA0dZyjxC62aerBgSPETcZxQKwVxNBkC
-         B7bzc5NVYyzwjPJEAi9l19mxYvdgVzkUfbqplVGfRVxYWBQnB9E4KMF/NzKVP4kNvCZ4
-         J+F2UcUq1sLKXDsV4kKL6VpQ5JVkwghaD2RUw815V/fksPeFfmO2bDLLXn78Gq+Utcic
-         Xswg==
-X-Gm-Message-State: AOAM530mPx/snx6axvg3ooxj+ZWmx9B55Q8DtBwifkZX6F47m7ckW203
-        l3rsOmMVeV1oJoJURstCDQ+HQzf8ATuMocxC
-X-Google-Smtp-Source: ABdhPJwhg77uTZEQPd5rytLNqQLnMzmP8G4KKY4+5hT6rGyU+CD4dzztSqjhGs6JGJWmp87V7VHfPuaVZEkRTVqA
-X-Received: from aaronlewis1.sea.corp.google.com ([2620:15c:100:202:250e:2425:2e40:acc])
- (user=aaronlewis job=sendgmr) by 2002:a17:902:4d:b029:ec:94df:c9aa with SMTP
- id 71-20020a170902004db02900ec94dfc9aamr5765553pla.7.1619793479990; Fri, 30
- Apr 2021 07:37:59 -0700 (PDT)
-Date:   Fri, 30 Apr 2021 07:37:51 -0700
-In-Reply-To: <20210430143751.1693253-1-aaronlewis@google.com>
-Message-Id: <20210430143751.1693253-3-aaronlewis@google.com>
-Mime-Version: 1.0
-References: <20210430143751.1693253-1-aaronlewis@google.com>
-X-Mailer: git-send-email 2.31.1.527.g47e6f16901-goog
-Subject: [PATCH v5 2/2] selftests: kvm: Allows userspace to handle emulation errors.
-From:   Aaron Lewis <aaronlewis@google.com>
-To:     david.edmondson@oracle.com, seanjc@google.com, jmattson@google.com
-Cc:     kvm@vger.kernel.org, Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S231485AbhD3O7s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Apr 2021 10:59:48 -0400
+Received: from mail-eopbgr770073.outbound.protection.outlook.com ([40.107.77.73]:4499
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231389AbhD3O7O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Apr 2021 10:59:14 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iPDdFZgHiqRSuyGZ0ffYJdtCckByV2S00zJ/Cn6e5QbQ7kp7iqOhctyN7VRQStJj8BrHeGdDUcgDHQJsytxQi7I2+Rh5kXvig46PNSJZnUChSr37ml5gG+VAc4ihqXqI60csQpWrWr88OBD72mDx1QCgRr458tCHX3fjCFrNUaarT9br7dQAgiQl3coss/WRzkF9HTeQheDlKbjAtfoar9YRvw01hNT47FBGkqE6Cj1xUTbhBo/drlz8JPYJYx5f/Dcam4geNL5trYXP97GzsPh3RK62EBTRKugOjM5oaVcyl0C2ClU8yugBs0nxyzVhmnSvoEN652eNDdV2niqAfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=c1R+l2CcKmd6vOAMVfDzaF/KTbDH7EQDEkqRh2CopLk=;
+ b=f6FgepBsH0xR+XzrUSqaAggXC7ArnrzI5eoe+8NkTBpqG6lxCCCkaDEcbaT6xsso4T9/2Cnqf7wWeko9q5DaD3S3A0u9pOT1yuB+P/SDs1l8GlcRCAUFAgICKSfpcjSBRuPHLWZwOyMlAwY4XjI0yRsGezU1H6IoRAhUQx+Oy4Uj9mmfYDwnt3Pe2JUXAY1KUMfVduyp2IDKAcct3/F2Hfuj547EfDzNm5f+Wkgowf40vfvjzG6n0ZFo0cvI1Ybl5qoUVwoznEvUXdr7hOLDup0G06e/syvf2PZUcO1dYBPMQ7EvkpereX/swXsPQh1TO9pUnjABk5k6akDge3XwWA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=c1R+l2CcKmd6vOAMVfDzaF/KTbDH7EQDEkqRh2CopLk=;
+ b=LVqWKycIU3dKA5fzO0gVWuyom3bnixu/V5Lio01ZiHmI7/WhKFTMPc77Oi5kTYa5RENNKjpzoB246n7So6KqeaTDHMm5d7ML6RWdpkbPxBQMbvLaVOzSZL3ZBSPz46rs+4bqjkmfjEVuY1ETyb1oZwpd21eCgT9yD+TGE5s2r3TR2Qwt5KZyr8wBldnAJMVLaI7obR27btTdVBLTRUGAM93/9q0kyrIUy6DIrTkPTEXEcPcxIQJ4PuQHvhFi9hCW/6HFn9p7mOn04N6ZFSeXLC58HqrVisyNYqw0C4AmiqjKk2OnslAfqf09SgIB6QaAGjqe8XD8sAE5J0cWakZidw==
+Received: from BN8PR15CA0051.namprd15.prod.outlook.com (2603:10b6:408:80::28)
+ by BL1PR12MB5080.namprd12.prod.outlook.com (2603:10b6:208:30a::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4087.25; Fri, 30 Apr
+ 2021 14:58:25 +0000
+Received: from BN8NAM11FT035.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:80:cafe::88) by BN8PR15CA0051.outlook.office365.com
+ (2603:10b6:408:80::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4087.27 via Frontend
+ Transport; Fri, 30 Apr 2021 14:58:25 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; kernel.org; dkim=none (message not signed)
+ header.d=none;kernel.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ BN8NAM11FT035.mail.protection.outlook.com (10.13.177.116) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4087.27 via Frontend Transport; Fri, 30 Apr 2021 14:58:24 +0000
+Received: from [10.20.22.163] (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 30 Apr
+ 2021 14:58:23 +0000
+Subject: Re: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR
+ region in VMA
+To:     Marc Zyngier <maz@kernel.org>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        "Christoffer Dall" <christoffer.dall@arm.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, Vikram Sethi <vsethi@nvidia.com>,
+        Jason Sequeira <jsequeira@nvidia.com>
+References: <20210429162906.32742-1-sdonthineni@nvidia.com>
+ <20210429162906.32742-2-sdonthineni@nvidia.com>
+ <20210429122840.4f98f78e@redhat.com>
+ <470360a7-0242-9ae5-816f-13608f957bf6@nvidia.com>
+ <20210429134659.321a5c3c@redhat.com>
+ <e3d7fda8-5263-211c-3686-f699765ab715@nvidia.com>
+ <87czucngdc.wl-maz@kernel.org>
+From:   Shanker R Donthineni <sdonthineni@nvidia.com>
+Message-ID: <1edb2c4e-23f0-5730-245b-fc6d289951e1@nvidia.com>
+Date:   Fri, 30 Apr 2021 09:58:14 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <87czucngdc.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 12373b4a-c977-42be-468a-08d90be867cb
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5080:
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5080461DE98CB94BD7004EF5C75E9@BL1PR12MB5080.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: vCDDbXwrInF+MnLksUxtX3x7Kfczd2RBg1eytWnKm1evtms4LtVRXvJVUWwDFyCCxUx22faiEz3+OTq5FYzommeVc8o/d7ZmwcQiHUmBqu429kHrcHmB7I85RHTEkV72zMphop2bCaVSP0+pXVBOrugMjQ13MJq9c9mpQA2qnSL0405RMpooYAq+4bTIpLSLFjh5P/mtQaGsSMTLJHStQebTa9vmrXcRP7XQIZ3OlQHZ4RM53i6wHcsXMgbBKYcul0G5z0+GrcYkcRle83yVIv3sYSf8JG3VzlM5XT7FtFE1pwOg9rL726GAHHBcRC6iG9POY0VSDd7U5iTXRi9dlU4YIDEJFy6ZTUUXFLJROW487kr+pl8Q2Z9T2gtx5mZdEsNHxPlDJpB4y7DkxMGOYtX6QD6IRuSrCwu6TAIAP5EuOB84GNsTuZq/wm5MCyTbFU1xnLUz9Wv9avvqLERo2KxBaFq0JZDCmJfR2viehW/ZhT4qMgPeP8N7D1lj5ZNv0si/TG35bFi1r3FDLtn8+Vn6j23m8dbEVm0gbW4bNCjryEWrzq1OapuhuuNQBSYOx4Myn07GYKhQm2I1zGCGtcrWiM/dmEQoXWHN4OGqRiaTsoQ5YStvCnD1a6U49ZHauH6jWoA2KnYCKMO4NRxGb+lkaiJ58euY7kqJUm1CIJtoKPG5PD6+51JL79YsS2fe
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(376002)(346002)(396003)(136003)(39850400004)(46966006)(36840700001)(4326008)(36860700001)(2906002)(6666004)(426003)(47076005)(36756003)(2616005)(336012)(16526019)(5660300002)(82310400003)(107886003)(478600001)(6916009)(26005)(31686004)(186003)(70586007)(54906003)(70206006)(316002)(83380400001)(8936002)(356005)(31696002)(8676002)(53546011)(7636003)(86362001)(82740400003)(36906005)(16576012)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2021 14:58:24.9470
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 12373b4a-c977-42be-468a-08d90be867cb
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT035.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5080
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This test exercises the feature KVM_CAP_EXIT_ON_EMULATION_FAILURE.  When
-enabled, errors in the in-kernel instruction emulator are forwarded to
-userspace with the instruction bytes stored in the exit struct for
-KVM_EXIT_INTERNAL_ERROR.  So, when the guest attempts to emulate an
-'flds' instruction, which isn't able to be emulated in KVM, instead
-of failing, KVM sends the instruction to userspace to handle.
+Hi Marc,
 
-For this test to work properly the module parameter
-'allow_smaller_maxphyaddr' has to be set.
+On 4/30/21 6:47 AM, Marc Zyngier wrote:
+>
+>>>> We've two concerns here:
+>>>>    - Performance impacts for pass-through devices.
+>>>>    - The definition of ioremap_wc() function doesn't match the host
+>>>> kernel on ARM64
+>>> Performance I can understand, but I think you're also using it to mask
+>>> a driver bug which should be resolved first.  Thank
+>> We’ve already instrumented the driver code and found the code path
+>> for the unaligned accesses. We’ll fix this issue if it’s not
+>> following WC semantics.
+>>
+>> Fixing the performance concern will be under KVM stage-2 page-table
+>> control. We're looking for a guidance/solution for updating stage-2
+>> PTE based on PCI-BAR attribute.
+> Before we start discussing the *how*, I'd like to clearly understand
+> what *arm64* memory attributes you are relying on. We already have
+> established that the unaligned access was a bug, which was the biggest
+> argument in favour of NORMAL_NC. What are the other requirements?
+Sorry, my earlier response was not complete...
 
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-Change-Id: I23af1c0d4a3a3484dc15ddd928f3693a48c33e47
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/include/x86_64/processor.h  |   4 +
- .../selftests/kvm/lib/x86_64/processor.c      |  94 ++++++++
- .../kvm/x86_64/emulator_error_test.c          | 219 ++++++++++++++++++
- 5 files changed, 319 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/emulator_error_test.c
+ARMv8 architecture has two features Gathering and Reorder transactions, very
+important from a performance point of view. Small inline packets for NIC cards
+and accesses to GPU's frame buffer are CPU-bound operations. We want to take
+advantages of GRE features to achieve higher performance.
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 7bd7e776c266..ec9e20a2f752 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -7,6 +7,7 @@
- /x86_64/cr4_cpuid_sync_test
- /x86_64/debug_regs
- /x86_64/evmcs_test
-+/x86_64/emulator_error_test
- /x86_64/get_cpuid_test
- /x86_64/get_msr_index_features
- /x86_64/kvm_pv_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 67eebb53235f..5ff705d92d02 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -41,6 +41,7 @@ LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_ha
- TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
- TEST_GEN_PROGS_x86_64 += x86_64/get_msr_index_features
- TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
-+TEST_GEN_PROGS_x86_64 += x86_64/emulator_error_test
- TEST_GEN_PROGS_x86_64 += x86_64/get_cpuid_test
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_clock
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 0b30b4e15c38..8fdd21710aae 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -394,6 +394,10 @@ void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid);
- void vm_handle_exception(struct kvm_vm *vm, int vector,
- 			void (*handler)(struct ex_regs *));
- 
-+uint64_t vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid, uint64_t vaddr);
-+void vm_set_page_table_entry(struct kvm_vm *vm, int vcpuid, uint64_t vaddr,
-+			     uint64_t pte);
-+
- /*
-  * set_cpuid() - overwrites a matching cpuid entry with the provided value.
-  *		 matches based on ent->function && ent->index. returns true
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index a8906e60a108..78f5109e30da 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -292,6 +292,100 @@ void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
- 	pte[index[0]].present = 1;
- }
- 
-+static struct pageTableEntry *_vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid,
-+						       uint64_t vaddr)
-+{
-+	uint16_t index[4];
-+	struct pageMapL4Entry *pml4e;
-+	struct pageDirectoryPointerEntry *pdpe;
-+	struct pageDirectoryEntry *pde;
-+	struct pageTableEntry *pte;
-+	struct kvm_cpuid_entry2 *entry;
-+	struct kvm_sregs sregs;
-+	int max_phy_addr;
-+	/* Set the bottom 52 bits. */
-+	uint64_t rsvd_mask = 0x000fffffffffffff;
-+
-+	entry = kvm_get_supported_cpuid_index(0x80000008, 0);
-+	max_phy_addr = entry->eax & 0x000000ff;
-+	/* Clear the bottom bits of the reserved mask. */
-+	rsvd_mask = (rsvd_mask >> max_phy_addr) << max_phy_addr;
-+
-+	/*
-+	 * SDM vol 3, fig 4-11 "Formats of CR3 and Paging-Structure Entries
-+	 * with 4-Level Paging and 5-Level Paging".
-+	 * If IA32_EFER.NXE = 0 and the P flag of a paging-structure entry is 1,
-+	 * the XD flag (bit 63) is reserved.
-+	 */
-+	vcpu_sregs_get(vm, vcpuid, &sregs);
-+	if ((sregs.efer & EFER_NX) == 0) {
-+		rsvd_mask |= (1ull << 63);
-+	}
-+
-+	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K, "Attempt to use "
-+		"unknown or unsupported guest mode, mode: 0x%x", vm->mode);
-+	TEST_ASSERT(sparsebit_is_set(vm->vpages_valid,
-+		(vaddr >> vm->page_shift)),
-+		"Invalid virtual address, vaddr: 0x%lx",
-+		vaddr);
-+	/*
-+	 * Based on the mode check above there are 48 bits in the vaddr, so
-+	 * shift 16 to sign extend the last bit (bit-47),
-+	 */
-+	TEST_ASSERT(vaddr == (((int64_t)vaddr << 16) >> 16),
-+		"Canonical check failed.  The virtual address is invalid.");
-+
-+	index[0] = (vaddr >> 12) & 0x1ffu;
-+	index[1] = (vaddr >> 21) & 0x1ffu;
-+	index[2] = (vaddr >> 30) & 0x1ffu;
-+	index[3] = (vaddr >> 39) & 0x1ffu;
-+
-+	pml4e = addr_gpa2hva(vm, vm->pgd);
-+	TEST_ASSERT(pml4e[index[3]].present,
-+		"Expected pml4e to be present for gva: 0x%08lx", vaddr);
-+	TEST_ASSERT((*(uint64_t*)(&pml4e[index[3]]) &
-+		(rsvd_mask | (1ull << 7))) == 0,
-+		"Unexpected reserved bits set.");
-+
-+	pdpe = addr_gpa2hva(vm, pml4e[index[3]].address * vm->page_size);
-+	TEST_ASSERT(pdpe[index[2]].present,
-+		"Expected pdpe to be present for gva: 0x%08lx", vaddr);
-+	TEST_ASSERT(pdpe[index[2]].page_size == 0,
-+		"Expected pdpe to map a pde not a 1-GByte page.");
-+	TEST_ASSERT((*(uint64_t*)(&pdpe[index[2]]) & rsvd_mask) == 0,
-+		"Unexpected reserved bits set.");
-+
-+	pde = addr_gpa2hva(vm, pdpe[index[2]].address * vm->page_size);
-+	TEST_ASSERT(pde[index[1]].present,
-+		"Expected pde to be present for gva: 0x%08lx", vaddr);
-+	TEST_ASSERT(pde[index[1]].page_size == 0,
-+		"Expected pde to map a pte not a 2-MByte page.");
-+	TEST_ASSERT((*(uint64_t*)(&pde[index[1]]) & rsvd_mask) == 0,
-+		"Unexpected reserved bits set.");
-+
-+	pte = addr_gpa2hva(vm, pde[index[1]].address * vm->page_size);
-+	TEST_ASSERT(pte[index[0]].present,
-+		"Expected pte to be present for gva: 0x%08lx", vaddr);
-+
-+	return &pte[index[0]];
-+}
-+
-+uint64_t vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid, uint64_t vaddr)
-+{
-+	struct pageTableEntry *pte = _vm_get_page_table_entry(vm, vcpuid, vaddr);
-+
-+	return *(uint64_t *)pte;
-+}
-+
-+void vm_set_page_table_entry(struct kvm_vm *vm, int vcpuid, uint64_t vaddr,
-+			     uint64_t pte)
-+{
-+	struct pageTableEntry *new_pte = _vm_get_page_table_entry(vm, vcpuid,
-+								  vaddr);
-+
-+	*(uint64_t *)new_pte = pte;
-+}
-+
- void virt_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
- {
- 	struct pageMapL4Entry *pml4e, *pml4e_start;
-diff --git a/tools/testing/selftests/kvm/x86_64/emulator_error_test.c b/tools/testing/selftests/kvm/x86_64/emulator_error_test.c
-new file mode 100644
-index 000000000000..054b39e49413
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/emulator_error_test.c
-@@ -0,0 +1,219 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2020, Google LLC.
-+ *
-+ * Tests for KVM_CAP_EXIT_ON_EMULATION_FAILURE capability.
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "vmx.h"
-+
-+#define VCPU_ID	   1
-+#define PAGE_SIZE  4096
-+#define MAXPHYADDR 36
-+
-+#define MEM_REGION_GVA	0x0000123456789000
-+#define MEM_REGION_GPA	0x0000000700000000
-+#define MEM_REGION_SLOT	10
-+#define MEM_REGION_SIZE PAGE_SIZE
-+
-+static void guest_code(void)
-+{
-+	__asm__ __volatile__("flds (%[addr])"
-+			     :: [addr]"r"(MEM_REGION_GVA));
-+
-+	GUEST_DONE();
-+}
-+
-+static void run_guest(struct kvm_vm *vm)
-+{
-+	int rc;
-+
-+	rc = _vcpu_run(vm, VCPU_ID);
-+	TEST_ASSERT(rc == 0, "vcpu_run failed: %d\n", rc);
-+}
-+
-+/*
-+ * Accessors to get R/M, REG, and Mod bits described in the SDM vol 2,
-+ * figure 2-2 "Table Interpretation of ModR/M Byte (C8H)".
-+ */
-+#define GET_RM(insn_byte) (insn_byte & 0x7)
-+#define GET_REG(insn_byte) ((insn_byte & 0x38) >> 3)
-+#define GET_MOD(insn_byte) ((insn_byte & 0xc) >> 6)
-+
-+/* Ensure we are dealing with a simple 2-byte flds instruction. */
-+static bool is_flds(uint8_t *insn_bytes, uint8_t insn_size)
-+{
-+	return insn_size >= 2 &&
-+	       insn_bytes[0] == 0xd9 &&
-+	       GET_REG(insn_bytes[1]) == 0x0 &&
-+	       GET_MOD(insn_bytes[1]) == 0x0 &&
-+	       /* Ensure there is no SIB byte. */
-+	       GET_RM(insn_bytes[1]) != 0x4 &&
-+	       /* Ensure there is no displacement byte. */
-+	       GET_RM(insn_bytes[1]) != 0x5;
-+}
-+
-+static void process_exit_on_emulation_error(struct kvm_vm *vm)
-+{
-+	struct kvm_run *run = vcpu_state(vm, VCPU_ID);
-+	struct kvm_regs regs;
-+	uint8_t *insn_bytes;
-+	uint8_t insn_size;
-+	uint64_t flags;
-+
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_INTERNAL_ERROR,
-+		    "Unexpected exit reason: %u (%s)",
-+		    run->exit_reason,
-+		    exit_reason_str(run->exit_reason));
-+
-+	TEST_ASSERT(run->emulation_failure.suberror == KVM_INTERNAL_ERROR_EMULATION,
-+		    "Unexpected suberror: %u",
-+		    run->emulation_failure.suberror);
-+
-+	if (run->emulation_failure.ndata >= 1) {
-+		flags = run->emulation_failure.flags;
-+		if ((flags & KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES) &&
-+		    run->emulation_failure.ndata >= 3) {
-+			insn_size = run->emulation_failure.insn_size;
-+			insn_bytes = run->emulation_failure.insn_bytes;
-+
-+			TEST_ASSERT(insn_size <= 15 && insn_size > 0,
-+				    "Unexpected instruction size: %u",
-+				    insn_size);
-+
-+			TEST_ASSERT(is_flds(insn_bytes, insn_size),
-+				    "Unexpected instruction.  Expected 'flds' (0xd9 /0)");
-+
-+			/*
-+			 * If is_flds() succeeded then the instruction bytes
-+			 * contained an flds instruction that is 2-bytes in
-+			 * length (ie: no prefix, no SIB, no displacement).
-+			 */
-+			vcpu_regs_get(vm, VCPU_ID, &regs);
-+			regs.rip += 2;
-+			vcpu_regs_set(vm, VCPU_ID, &regs);
-+		}
-+	}
-+}
-+
-+static void do_guest_assert(struct kvm_vm *vm, struct ucall *uc)
-+{
-+	TEST_FAIL("%s at %s:%ld", (const char *)uc->args[0], __FILE__,
-+		  uc->args[1]);
-+}
-+
-+static void check_for_guest_assert(struct kvm_vm *vm)
-+{
-+	struct kvm_run *run = vcpu_state(vm, VCPU_ID);
-+	struct ucall uc;
-+
-+	if (run->exit_reason == KVM_EXIT_IO &&
-+	    get_ucall(vm, VCPU_ID, &uc) == UCALL_ABORT) {
-+		do_guest_assert(vm, &uc);
-+	}
-+}
-+
-+static void process_ucall_done(struct kvm_vm *vm)
-+{
-+	struct kvm_run *run = vcpu_state(vm, VCPU_ID);
-+	struct ucall uc;
-+
-+	check_for_guest_assert(vm);
-+
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+		    "Unexpected exit reason: %u (%s)",
-+		    run->exit_reason,
-+		    exit_reason_str(run->exit_reason));
-+
-+	TEST_ASSERT(get_ucall(vm, VCPU_ID, &uc) == UCALL_DONE,
-+		    "Unexpected ucall command: %lu, expected UCALL_DONE (%d)",
-+		    uc.cmd, UCALL_DONE);
-+}
-+
-+static uint64_t process_ucall(struct kvm_vm *vm)
-+{
-+	struct kvm_run *run = vcpu_state(vm, VCPU_ID);
-+	struct ucall uc;
-+
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+		    "Unexpected exit reason: %u (%s)",
-+		    run->exit_reason,
-+		    exit_reason_str(run->exit_reason));
-+
-+	switch (get_ucall(vm, VCPU_ID, &uc)) {
-+	case UCALL_SYNC:
-+		break;
-+	case UCALL_ABORT:
-+		do_guest_assert(vm, &uc);
-+		break;
-+	case UCALL_DONE:
-+		process_ucall_done(vm);
-+		break;
-+	default:
-+		TEST_ASSERT(false, "Unexpected ucall");
-+	}
-+
-+	return uc.cmd;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_enable_cap emul_failure_cap = {
-+		.cap = KVM_CAP_EXIT_ON_EMULATION_FAILURE,
-+		.args[0] = 1,
-+	};
-+	struct kvm_cpuid_entry2 *entry;
-+	struct kvm_cpuid2 *cpuid;
-+	struct kvm_vm *vm;
-+	uint64_t gpa, pte;
-+	uint64_t *hva;
-+	int rc;
-+
-+	/* Tell stdout not to buffer its content */
-+	setbuf(stdout, NULL);
-+
-+	vm = vm_create_default(VCPU_ID, 0, guest_code);
-+
-+	if (!kvm_check_cap(KVM_CAP_SMALLER_MAXPHYADDR)) {
-+		printf("module parameter 'allow_smaller_maxphyaddr' is not set.  Skipping test.\n");
-+		return 0;
-+	}
-+
-+	cpuid = kvm_get_supported_cpuid();
-+
-+	entry = kvm_get_supported_cpuid_index(0x80000008, 0);
-+	entry->eax = (entry->eax & 0xffffff00) | MAXPHYADDR;
-+	set_cpuid(cpuid, entry);
-+
-+	vcpu_set_cpuid(vm, VCPU_ID, cpuid);
-+
-+	rc = kvm_check_cap(KVM_CAP_EXIT_ON_EMULATION_FAILURE);
-+	TEST_ASSERT(rc, "KVM_CAP_EXIT_ON_EMULATION_FAILURE is unavailable");
-+	vm_enable_cap(vm, &emul_failure_cap);
-+
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+				    MEM_REGION_GPA, MEM_REGION_SLOT,
-+				    MEM_REGION_SIZE / PAGE_SIZE, 0);
-+	gpa = vm_phy_pages_alloc(vm, MEM_REGION_SIZE / PAGE_SIZE,
-+				 MEM_REGION_GPA, MEM_REGION_SLOT);
-+	TEST_ASSERT(gpa == MEM_REGION_GPA, "Failed vm_phy_pages_alloc\n");
-+	virt_map(vm, MEM_REGION_GVA, MEM_REGION_GPA, 1, 0);
-+	hva = addr_gpa2hva(vm, MEM_REGION_GPA);
-+	memset(hva, 0, PAGE_SIZE);
-+	pte = vm_get_page_table_entry(vm, VCPU_ID, MEM_REGION_GVA);
-+	vm_set_page_table_entry(vm, VCPU_ID, MEM_REGION_GVA, pte | (1ull << 36));
-+
-+	run_guest(vm);
-+	process_exit_on_emulation_error(vm);
-+	run_guest(vm);
-+
-+	TEST_ASSERT(process_ucall(vm) == UCALL_DONE, "Expected UCALL_DONE");
-+
-+	kvm_vm_free(vm);
-+
-+	return 0;
-+}
--- 
-2.31.1.527.g47e6f16901-goog
+Both these features are disabled for prefetchable BARs in VM because memory-type
+MT_DEVICE_nGnRE enforced in stage-2.
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
 
