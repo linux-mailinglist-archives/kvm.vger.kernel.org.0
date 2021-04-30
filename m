@@ -2,229 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A423370259
-	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 22:45:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B75EE370405
+	for <lists+kvm@lfdr.de>; Sat,  1 May 2021 01:24:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235913AbhD3UqF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Apr 2021 16:46:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45868 "EHLO
+        id S232855AbhD3XZC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Apr 2021 19:25:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231325AbhD3UqE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Apr 2021 16:46:04 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CC6FC06138B
-        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 13:45:16 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id p17so9169052pjz.3
-        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 13:45:16 -0700 (PDT)
+        with ESMTP id S230508AbhD3XZB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Apr 2021 19:25:01 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF49BC06174A
+        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 16:24:11 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id u5-20020a17090a3fc5b029014e545d9a6eso2427493pjm.2
+        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 16:24:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=XV1S7QX7pqISwKM1jB1GYc13VlD7bLx7ViM4ltZNWvc=;
-        b=kC7w1khTWN2G6MhIIRpBpH5C+waiMNYFwiSwBeCh3wxC25KAB+f8yT9YhWesbnJfs4
-         zMWJhDMZIYbi2lK09czlbTIiFHH1bBA/Za0YMgIVwnYV/NRmKubuM7y9YZIYe+LoIPaN
-         1fSifRORlDvCpL6MQQ9wNYvPLouiXkf7BDlAdnuCXR7/RHqB0D8KFHnppO3+Pvkt1Rav
-         3h7H7ghykzjdaDgp5Bt4WbJX5T320llMrzlGRW0N6paUrM9UX80KsAWbAN3DI4qRv7KI
-         mzh7sgPJGGy3qEtXi9GT2lZNuR3qN6ZhzrPtzGWJZm4pBpI6Axve4JYeZSzNSkogkbJM
-         zbcw==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=E9dhF2zRcjBoJyUagXIfZYrtnBYAcfcBi4++x+LfSDA=;
+        b=eK+y/OfDIUCfpXL+6G9kEV5E1+nBdAlojXSCo0Mp5ScQGuZNoHJeAGJ4Egi6+RKL9Z
+         zrmB1RpeE5bjubElxSbmIx52AhCcA5mvZMUz4IgwpZ29/DFmJ/YBfPh2A8hcZzfJXz6f
+         Jstp0DbCQ/ZTzdSUOo6t9IXl1MoylEMA+PsEQozOB/STsbzC2+WdPRqrT2mv34O6rt/W
+         SJwpLhRhMlapWReiTXgtI5qQ4PJuDsfZKHC6zgAXsHhTTBiDYqaqzTEexOVHb4vr7RhQ
+         dvuiA2rWiTz7zsaXh7XsJwMiaOQxQj3aUnDQ0tVvYybkEIkP73dOpremRPmtcxlH3KA5
+         xZfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=XV1S7QX7pqISwKM1jB1GYc13VlD7bLx7ViM4ltZNWvc=;
-        b=uZpvwfPMwnJ0sUHt0nZeU2+EiT52eNCffGMSrpIH3KuOsoKSvTEDGfxDETWxCkjrAP
-         aQtBbhdLErf6rFeAkWplLct7IHvr5adQE+XpDMUt64zf+iV9+tA8kBw3dnrqRbtimUV6
-         Np75/x4lJDSH89XJ+SLG+/J2IcKVxfuinEGKispEWlZBxfnn/Q2PZlO88JAWqhx7cjYG
-         3rC2mJd88reQJU+qC6uw+tXO0f3VaINLCjV6pUF5nacDOaAep4QIKChJnwW7dCYbuvCf
-         Sa253IcdfBWp4OudSw/y9rrsO03ukla2Zen9Ve0VfJEWnV3jQJtmDH5b9NL74FgCl0JM
-         AVzw==
-X-Gm-Message-State: AOAM5318MKwnPrEMJZTxGQ/u7n7wkglsAP3BRrDZ1afnD1pRZPJNDKCV
-        NFroDmd84KptasjBt+avG29fLQ==
-X-Google-Smtp-Source: ABdhPJwKn4YKXVr0RI440tpiiDhbuArtF+So3buArcfhCZhkihl8gczHEyvSsmApSw3Ba6k57GnaCw==
-X-Received: by 2002:a17:90a:dd45:: with SMTP id u5mr17554026pjv.15.1619815515285;
-        Fri, 30 Apr 2021 13:45:15 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id w124sm2962195pfb.73.2021.04.30.13.45.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Apr 2021 13:45:14 -0700 (PDT)
-Date:   Fri, 30 Apr 2021 20:45:11 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jon Kohler <jon@nutanix.com>
-Cc:     Bijan Mottahedeh <bijan.mottahedeh@nutanix.com>,
-        Raphael Norwitz <raphael.norwitz@nutanix.com>,
-        Junaid Shahid <junaids@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] kvm: x86: move srcu lock out of kvm_vcpu_check_block
-Message-ID: <YIxsV6VgSDEdngKA@google.com>
-References: <20210428173820.13051-1-jon@nutanix.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210428173820.13051-1-jon@nutanix.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=E9dhF2zRcjBoJyUagXIfZYrtnBYAcfcBi4++x+LfSDA=;
+        b=q1Qmu9lnaEiDYmi75LWd+PpQpD3NO5vgYGVQlUGZVRjd430/CTl/k+n5HhwK8IDb8F
+         vVCg1ywkmX/pMHtZXUX7PpbKszc7LdyGcaC4FrXLvZjK/y4n67VkshrhneKkIKxi3pX3
+         jc3DgcksUlahnxqCNHwhF7gC7h2Sapdg/e1RZ/t4uuFSbuh9i6pWc5g+meMTu11OtcVT
+         tx14VNGx9mLtTspKnGtZJn7wN3zLwRpH4B9UDr1HNXI5vCoQzhYikmXiDMNMx82BgOyh
+         556/hfy0PDrFV2DZ7okuL8DA/kqGK9KhdkYZIN7z4LzaT8OD4c2EguZJYQpZ3OJoXVGo
+         JRTQ==
+X-Gm-Message-State: AOAM530kti7F65QVehYawBJXxKXPF6okMLZpZlkhNAK1h6u8r4k8to0s
+        jtOHVKckx/+Bbq1Ku33X4F+LZ8NV6XOx9Jd9pti0J7x6iH81nB9V5HAqUlQkfDoHdVZg0iQclg1
+        Xu2egdztIIgugR+xPNsIvdx+53WWpLAUfdlXv+l5rkFbV/jCS2/LmIWtTgoshM8A=
+X-Google-Smtp-Source: ABdhPJx8Zj51M8c+P8fjodtaWXMvKND3bUmTo0cpsuI7daS6L06aMBpeM4573QKUNZ9T/hCuJU9qEZzNtfCIXA==
+X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:62fe])
+ (user=ricarkol job=sendgmr) by 2002:a17:902:dacf:b029:ee:ac0e:d0fe with SMTP
+ id q15-20020a170902dacfb02900eeac0ed0femr2916269plx.30.1619825050505; Fri, 30
+ Apr 2021 16:24:10 -0700 (PDT)
+Date:   Fri, 30 Apr 2021 16:24:02 -0700
+Message-Id: <20210430232408.2707420-1-ricarkol@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.1.527.g47e6f16901-goog
+Subject: [PATCH v2 0/5] KVM: selftests: arm64 exception handling and debug test
+From:   Ricardo Koller <ricarkol@google.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     pbonzini@redhat.com, maz@kernel.org, drjones@redhat.com,
+        alexandru.elisei@arm.com, eric.auger@redhat.com,
+        Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 28, 2021, Jon Kohler wrote:
-> To improve performance, this moves kvm->srcu lock logic from
-> kvm_vcpu_check_block to kvm_vcpu_running and wraps directly around
-> check_events. Also adds a hint for callers to tell
-> kvm_vcpu_running whether or not to acquire srcu, which is useful in
-> situations where the lock may already be held. With this in place, we
-> see roughly 5% improvement in an internal benchmark [3] and no more
-> impact from this lock on non-nested workloads.
+Hi,
 
-...
+These patches add a debug exception test in aarch64 KVM selftests while
+also adding basic exception handling support.
 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index efc7a82ab140..354f690cc982 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9273,10 +9273,24 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
->  	return 1;
->  }
-> 
-> -static inline bool kvm_vcpu_running(struct kvm_vcpu *vcpu)
-> +static inline bool kvm_vcpu_running(struct kvm_vcpu *vcpu, bool acquire_srcu)
->  {
-> -	if (is_guest_mode(vcpu))
-> -		kvm_x86_ops.nested_ops->check_events(vcpu);
-> +	if (is_guest_mode(vcpu)) {
-> +		if (acquire_srcu) {
-> +			/*
-> +			 * We need to lock because check_events could call
-> +			 * nested_vmx_vmexit() which might need to resolve a
-> +			 * valid memslot. We will have this lock only when
-> +			 * called from vcpu_run but not when called from
-> +			 * kvm_vcpu_check_block > kvm_arch_vcpu_runnable.
-> +			 */
-> +			int idx = srcu_read_lock(&vcpu->kvm->srcu);
-> +			kvm_x86_ops.nested_ops->check_events(vcpu);
-> +			srcu_read_unlock(&vcpu->kvm->srcu, idx);
-> +		} else {
-> +			kvm_x86_ops.nested_ops->check_events(vcpu);
-> +		}
-> +	}
+The structure of the exception handling is based on its x86 counterpart.
+Tests use the same calls to initialize exception handling and both
+architectures allow tests to override the handler for a particular
+vector, or (vector, ec) for synchronous exceptions in the arm64 case.
 
-Obviously not your fault, but I absolutely detest calling check_events() from
-kvm_vcpu_running.  I would much prefer to make baby steps toward cleaning up the
-existing mess instead of piling more weirdness on top.
+The debug test is similar to x86_64/debug_regs, except that the x86 one
+controls the debugging from outside the VM. This proposed arm64 test
+controls and handles debug exceptions from the inside.
 
-Ideally, APICv support would be fixed to not require a deep probe into nested
-events just to see if a vCPU can run.  But, that's probably more than we want to
-bite off at this time.
+Thanks,
+Ricardo
 
-What if we add another nested_ops API to check if the vCPU has an event, but not
-actually process the event?  I think that would allow eliminating the SRCU lock,
-and would get rid of the most egregious behavior of triggering a nested VM-Exit
-in a seemingly innocuous helper.
+v1 -> v2:
 
-If this works, we could even explore moving the call to nested_ops->has_events()
-out of kvm_vcpu_running() and into kvm_vcpu_has_events(); I can't tell if the
-side effects in vcpu_block() would get messed up with that change :-/
+Addressed comments from Andrew and Marc (thank you very much):
+- rename vm_handle_exception in all tests.
+- introduce UCALL_UNHANDLED in x86 first.
+- move GUEST_ASSERT_EQ to common utils header.
+- handle sync and other exceptions separately: use two tables (like
+  kvm-unit-tests).
+- add two separate functions for installing sync versus other exceptions
+- changes in handlers.S: use the same layout as user_pt_regs, treat the
+  EL1t vectors as invalid, refactor the vector table creation to not use
+  manual numbering, add comments, remove LR from the stored registers.
+- changes in debug-exceptions.c: remove unused headers, use the common
+  GUEST_ASSERT_EQ, use vcpu_run instead of _vcpu_run.
+- changes in processor.h: write_sysreg with support for xzr, replace EL1
+  with current in macro names, define ESR_EC_MASK as ESR_EC_NUM-1.
 
-Incomplete patch...
+Ricardo Koller (5):
+  KVM: selftests: Rename vm_handle_exception
+  KVM: selftests: Introduce UCALL_UNHANDLED for unhandled vector
+    reporting
+  KVM: selftests: Move GUEST_ASSERT_EQ to utils header
+  KVM: selftests: Add exception handling support for aarch64
+  KVM: selftests: Add aarch64/debug-exceptions test
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 00339d624c92..15f514891326 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3771,15 +3771,17 @@ static bool nested_vmx_preemption_timer_pending(struct kvm_vcpu *vcpu)
-               to_vmx(vcpu)->nested.preemption_timer_expired;
- }
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +-
+ .../selftests/kvm/aarch64/debug-exceptions.c  | 244 ++++++++++++++++++
+ .../selftests/kvm/include/aarch64/processor.h |  90 ++++++-
+ .../testing/selftests/kvm/include/kvm_util.h  |  10 +
+ .../selftests/kvm/include/x86_64/processor.h  |   4 +-
+ .../selftests/kvm/lib/aarch64/handlers.S      | 130 ++++++++++
+ .../selftests/kvm/lib/aarch64/processor.c     | 124 +++++++++
+ .../selftests/kvm/lib/x86_64/processor.c      |  19 +-
+ .../selftests/kvm/x86_64/kvm_pv_test.c        |   2 +-
+ .../selftests/kvm/x86_64/tsc_msrs_test.c      |   9 -
+ .../kvm/x86_64/userspace_msr_exit_test.c      |   8 +-
+ .../selftests/kvm/x86_64/xapic_ipi_test.c     |   2 +-
+ 13 files changed, 611 insertions(+), 35 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/handlers.S
 
--static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
-+static int __vmx_check_nested_events(struct kvm_vcpu *vcpu, bool only_check)
- {
-        struct vcpu_vmx *vmx = to_vmx(vcpu);
-        unsigned long exit_qual;
--       bool block_nested_events =
--           vmx->nested.nested_run_pending || kvm_event_needs_reinjection(vcpu);
-        bool mtf_pending = vmx->nested.mtf_pending;
-        struct kvm_lapic *apic = vcpu->arch.apic;
+-- 
+2.31.1.527.g47e6f16901-goog
 
-+       bool block_nested_events = only_check ||
-+                                  vmx->nested.nested_run_pending ||
-+                                  kvm_event_needs_reinjection(vcpu);
-+
-        /*
-         * Clear the MTF state. If a higher priority VM-exit is delivered first,
-         * this state is discarded.
-@@ -3837,7 +3839,7 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
-        }
-
-        if (vcpu->arch.exception.pending) {
--               if (vmx->nested.nested_run_pending)
-+               if (vmx->nested.nested_run_pending || only_check)
-                        return -EBUSY;
-                if (!nested_vmx_check_exception(vcpu, &exit_qual))
-                        goto no_vmexit;
-@@ -3886,10 +3888,23 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
-        }
-
- no_vmexit:
--       vmx_complete_nested_posted_interrupt(vcpu);
-+       if (!check_only)
-+               vmx_complete_nested_posted_interrupt(vcpu);
-+       else if (vmx->nested.pi_desc && vmx->nested.pi_pending)
-+               return -EBUSY;
-        return 0;
- }
-
-+static bool vmx_has_nested_event(struct kvm_vcpu *vcpu)
-+{
-+       return !!__vmx_check_nested_events(vcpu, true);
-+}
-+
-+static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
-+{
-+       return __vmx_check_nested_events(vcpu, false);
-+}
-+
- static u32 vmx_get_preemption_timer_value(struct kvm_vcpu *vcpu)
- {
-        ktime_t remaining =
-@@ -6627,6 +6642,7 @@ __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *))
- }
-
- struct kvm_x86_nested_ops vmx_nested_ops = {
-+       .has_event = vmx_has_nested_event,
-        .check_events = vmx_check_nested_events,
-        .hv_timer_pending = nested_vmx_preemption_timer_pending,
-        .triple_fault = nested_vmx_triple_fault,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a829f1ab60c3..5df01012cb1f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9310,6 +9310,10 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
-                        update_cr8_intercept(vcpu);
-                        kvm_lapic_sync_to_vapic(vcpu);
-                }
-+       } else if (is_guest_mode(vcpu)) {
-+               r = kvm_check_nested_events(vcpu);
-+               if (r < 0)
-+                       req_immediate_exit = true;
-        }
-
-        r = kvm_mmu_reload(vcpu);
-@@ -9516,8 +9520,10 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
-
- static inline bool kvm_vcpu_running(struct kvm_vcpu *vcpu)
- {
--       if (is_guest_mode(vcpu))
--               kvm_check_nested_events(vcpu);
-+       if (is_guest_mode(vcpu) &&
-+           (kvm_test_request(KVM_REQ_TRIPLE_FAULT, vcpu) ||
-+            kvm_x86_ops.nested_ops->has_event(vcpu)))
-+               return true;
-
-        return (vcpu->arch.mp_state == KVM_MP_STATE_RUNNABLE &&
-                !vcpu->arch.apf.halted);
