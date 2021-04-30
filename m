@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FE79370406
+	by mail.lfdr.de (Postfix) with ESMTP id A8CB8370408
 	for <lists+kvm@lfdr.de>; Sat,  1 May 2021 01:24:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232876AbhD3XZE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S232880AbhD3XZE (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Fri, 30 Apr 2021 19:25:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52300 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232860AbhD3XZC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Apr 2021 19:25:02 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E465AC06138B
-        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 16:24:12 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id m36-20020a634c640000b02901fbb60ec3a6so25428980pgl.15
-        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 16:24:12 -0700 (PDT)
+        with ESMTP id S232861AbhD3XZD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Apr 2021 19:25:03 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1C18C06174A
+        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 16:24:14 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id r2-20020a25ac420000b02904f5a9b7d37fso834807ybd.22
+        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 16:24:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=ZyjdoDvj+0d1MrdvPreqK5eup22FMf+XNotdYUvQgRI=;
-        b=mVFEcJIz8TqMr35h+/Q4+Dav2KYnjMb7ka5/Gc219hGHhFNsWibr/XuA/YPgX+YHCA
-         NeqV+TgK7Yo40Do4rWs0FSy/f7DQXYjOid3a1piWerc8fAYFMONv/Xny8SzTye5CFkdu
-         8UO6h2hEwmqxxb/nMC1eCrRL0GCG7JLy8rL2TxB6lsJcFj+nEOnkJ7oqynUSoat7ZCAj
-         axu0v6pjMoecsg8X9qkeuwsozgIWn4HN2ajHRbMCEll5feWXxuNRWaVkgdp/OnOWR817
-         nwjerzB/XdDGaABVwh7/aFrycJgqzKOIITDywOnNcXrzrlOM/7SnoNQIubrddxI85XBo
-         HOmQ==
+        bh=DrtIzoZNc79OT7R03r+6Yhv7XXgWtVPXBdQ8gE5Za50=;
+        b=hrA93mrfNvMtPI4VgsoEAfSKtto6rMPg+XTcD8MyoMUgLaj5o9tLH3AwvT5hgfwWoZ
+         etFwv7KD1vg1aRcGGpw5PRSmKq0tE7WHqERR0XauYivNrLYKmOMuupUwQSfEtWMh08r7
+         cihPWH3QFt9w3b/V5DeidqkD26w13mLIzcyk41Ym+dhZEgIB0D9x5VVCS+lVeGLOkMhD
+         gaP8C7S9g51MowvglkvRjiDYjSssCj4VTPEz6dLV2SIIkDSRr6L80gCz1m98goVOv9hq
+         bem2O7Q/hq4UwAFPSw7yjYDMgsjtpCd+KOA/kjvaSRPKIuZorYXLQ7D3DugljqjU1d5q
+         96Dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=ZyjdoDvj+0d1MrdvPreqK5eup22FMf+XNotdYUvQgRI=;
-        b=UoM0YqBbSbXk4eMRDo68ZqZ75zZrpzE8wyqfDBCx0tctLZxOtgi7S1UBkjdzDgCKUt
-         FSDTz6YCpeHoOesjiugvo8XayrrJOns/b9tiAhpbM4gXGZsVvJWDtV6fIBE39TAMdebL
-         J2ApHQpS3HRLaKdAOZ/EN4ugsiXsqjf8Kcg6FTDl4b/aF6MiluJujbMxiv43olp4Bujn
-         MApkUtfyrKDQjk3p2ikSnIN0zGW1pYYvZznq4Riylj5s+XC+Ge6so0pKEo4OzD1VIg9p
-         XJjJDxNvoOM/j+43O+l3F37Y9zyeAeSM23KqSRTbByKVVX/zni1ke3Je+dZsbs6qoQow
-         44Kw==
-X-Gm-Message-State: AOAM531isKg3ESeNH543nk6tkYJWy3re926PFRNAFr2ewPUPCjEtX9EV
-        SKZH1Ct02/c8xiK/H9EAT5JDXCeHwAa4GfgAqU3+3qME8lqlA3ReksFzUcuv/UUD4nFtnnpNBve
-        uUMm/cGdlIp7NxDyXsiNr9kc90b6qzD5Iadb1xXN9V+DJu3aC4/D+1P/k7eJLwU0=
-X-Google-Smtp-Source: ABdhPJw/WgOmany3vFjVOVJu6fs2Y1+1Pd0XL579JpPqAIrVqPNcaxkdQAkHOnqSS0bi/PanAPM14cJfMb63Xw==
+        bh=DrtIzoZNc79OT7R03r+6Yhv7XXgWtVPXBdQ8gE5Za50=;
+        b=hfVIvBM0+IIVU2qRLsGO2vYNJwb+njfxJUPVdMo5vL1Cmus1bDX5VehNnXbu5W9U2i
+         CRvbUJHgMwKBCJktjB85lZQOQCuSfidqnoroW9qrL3skHxXGlXt70dZGkuIvnCNO1Atg
+         YlXJfemUQPL2q95X4ZL27D2OCOI3Bq88YvMTjIcPs/gbqVB8g9mWlmn/nTLVd74pthpD
+         jGcrnczvXvkj/cH39MCOfCBqhslUW/ZfR9Y4ZGo4k33aakdJKz6kusXecETFBtQF+8qj
+         CjuSQ3fy9Ghu0NxTe+LDzYtgxTfwzjXv7n+aKjOin5BcvjJ6JYunvsjSIzTftKgya+YL
+         DE7A==
+X-Gm-Message-State: AOAM531wXLdAfXgJ+s8Yql8ZKTGZ+smX5wof8i5ZN474P6jDLbjWO+1z
+        nzRgvPQjvEWCMBpnJd7uyuWtRzBnEK/hVK1ZOKMU97UnGGL1wPEuevdcloUNuGTBG/A0wH1369X
+        Rje0bwF7vV7HJbmiOLjSyszMbCpo33PnXKvBUql3YU2BZJkhJ1A30oO3hMwvHPiM=
+X-Google-Smtp-Source: ABdhPJxCH47qwg6o/sPFrCh0eBsljgWhHVIlR+rd2tL+C+5G+0C/awiKqu15PVkzt+chVmExB8oH4/OW2Cw2GQ==
 X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a05:6a00:853:b029:27b:7bf6:f322 with SMTP
- id q19-20020a056a000853b029027b7bf6f322mr7086773pfk.7.1619825052185; Fri, 30
- Apr 2021 16:24:12 -0700 (PDT)
-Date:   Fri, 30 Apr 2021 16:24:03 -0700
+ (user=ricarkol job=sendgmr) by 2002:a25:6d82:: with SMTP id
+ i124mr10969252ybc.78.1619825053901; Fri, 30 Apr 2021 16:24:13 -0700 (PDT)
+Date:   Fri, 30 Apr 2021 16:24:04 -0700
 In-Reply-To: <20210430232408.2707420-1-ricarkol@google.com>
-Message-Id: <20210430232408.2707420-2-ricarkol@google.com>
+Message-Id: <20210430232408.2707420-3-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20210430232408.2707420-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.31.1.527.g47e6f16901-goog
-Subject: [PATCH v2 1/5] KVM: selftests: Rename vm_handle_exception
+Subject: [PATCH v2 2/5] KVM: selftests: Introduce UCALL_UNHANDLED for
+ unhandled vector reporting
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     pbonzini@redhat.com, maz@kernel.org, drjones@redhat.com,
@@ -63,102 +63,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rename the vm_handle_exception function to a name that indicates more
-clearly that it installs something: vm_install_vector_handler.
+x86, the only arch implementing exception handling, reports unhandled
+vectors using port IO at a specific port number. This replicates what
+ucall already does.
 
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Suggested-by: Andrew Jones <drjones@redhat.com>
+Introduce a new ucall type, UCALL_UNHANDLED, for guests to report
+unhandled exceptions. Then replace the x86 unhandled vector exception
+reporting to use it instead of port IO.  This new ucall type will be
+used in the next commits by arm64 to report unhandled vectors as well.
+
+Tested: Forcing a page fault in the ./x86_64/xapic_ipi_test
+	halter_guest_code() shows this:
+
+	$ ./x86_64/xapic_ipi_test
+	...
+	  Unexpected vectored event in guest (vector:0xe)
+
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- tools/testing/selftests/kvm/include/x86_64/processor.h    | 2 +-
- tools/testing/selftests/kvm/lib/x86_64/processor.c        | 4 ++--
- tools/testing/selftests/kvm/x86_64/kvm_pv_test.c          | 2 +-
- .../selftests/kvm/x86_64/userspace_msr_exit_test.c        | 8 ++++----
- tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c       | 2 +-
- 5 files changed, 9 insertions(+), 9 deletions(-)
+ tools/testing/selftests/kvm/include/kvm_util.h    |  1 +
+ .../selftests/kvm/include/x86_64/processor.h      |  2 --
+ .../testing/selftests/kvm/lib/x86_64/processor.c  | 15 ++++++---------
+ 3 files changed, 7 insertions(+), 11 deletions(-)
 
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index bea4644d645d..7880929ea548 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -347,6 +347,7 @@ enum {
+ 	UCALL_SYNC,
+ 	UCALL_ABORT,
+ 	UCALL_DONE,
++	UCALL_UNHANDLED,
+ };
+ 
+ #define UCALL_MAX_ARGS 6
 diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 0b30b4e15c38..12889d3e8948 100644
+index 12889d3e8948..ff4da2f95b13 100644
 --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
 +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -391,7 +391,7 @@ struct ex_regs {
+@@ -53,8 +53,6 @@
+ #define CPUID_PKU		(1ul << 3)
+ #define CPUID_LA57		(1ul << 16)
  
- void vm_init_descriptor_tables(struct kvm_vm *vm);
- void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid);
--void vm_handle_exception(struct kvm_vm *vm, int vector,
-+void vm_install_vector_handler(struct kvm_vm *vm, int vector,
- 			void (*handler)(struct ex_regs *));
- 
- /*
+-#define UNEXPECTED_VECTOR_PORT 0xfff0u
+-
+ /* General Registers in 64-Bit Mode */
+ struct gpr64_regs {
+ 	u64 rax;
 diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index a8906e60a108..e156061263a6 100644
+index e156061263a6..96e2bd9d66eb 100644
 --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
 +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -1250,8 +1250,8 @@ void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid)
- 	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
+@@ -1207,7 +1207,7 @@ static void set_idt_entry(struct kvm_vm *vm, int vector, unsigned long addr,
+ 
+ void kvm_exit_unexpected_vector(uint32_t value)
+ {
+-	outl(UNEXPECTED_VECTOR_PORT, value);
++	ucall(UCALL_UNHANDLED, 1, value);
  }
  
--void vm_handle_exception(struct kvm_vm *vm, int vector,
--			 void (*handler)(struct ex_regs *))
-+void vm_install_vector_handler(struct kvm_vm *vm, int vector,
-+			       void (*handler)(struct ex_regs *))
+ void route_exception(struct ex_regs *regs)
+@@ -1260,16 +1260,13 @@ void vm_install_vector_handler(struct kvm_vm *vm, int vector,
+ 
+ void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid)
  {
- 	vm_vaddr_t *handlers = (vm_vaddr_t *)addr_gva2hva(vm, vm->handlers);
+-	if (vcpu_state(vm, vcpuid)->exit_reason == KVM_EXIT_IO
+-		&& vcpu_state(vm, vcpuid)->io.port == UNEXPECTED_VECTOR_PORT
+-		&& vcpu_state(vm, vcpuid)->io.size == 4) {
+-		/* Grab pointer to io data */
+-		uint32_t *data = (void *)vcpu_state(vm, vcpuid)
+-			+ vcpu_state(vm, vcpuid)->io.data_offset;
++	struct ucall uc;
  
-diff --git a/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c b/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c
-index 732b244d6956..5ae5f748723a 100644
---- a/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c
-@@ -227,7 +227,7 @@ int main(void)
- 
- 	vm_init_descriptor_tables(vm);
- 	vcpu_init_descriptor_tables(vm, VCPU_ID);
--	vm_handle_exception(vm, GP_VECTOR, guest_gp_handler);
-+	vm_install_vector_handler(vm, GP_VECTOR, guest_gp_handler);
- 
- 	enter_guest(vm);
- 	kvm_vm_free(vm);
-diff --git a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
-index 72c0d0797522..20c373e2d329 100644
---- a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
-@@ -574,7 +574,7 @@ static void test_msr_filter_allow(void) {
- 	vm_init_descriptor_tables(vm);
- 	vcpu_init_descriptor_tables(vm, VCPU_ID);
- 
--	vm_handle_exception(vm, GP_VECTOR, guest_gp_handler);
-+	vm_install_vector_handler(vm, GP_VECTOR, guest_gp_handler);
- 
- 	/* Process guest code userspace exits. */
- 	run_guest_then_process_rdmsr(vm, MSR_IA32_XSS);
-@@ -588,12 +588,12 @@ static void test_msr_filter_allow(void) {
- 	run_guest_then_process_wrmsr(vm, MSR_NON_EXISTENT);
- 	run_guest_then_process_rdmsr(vm, MSR_NON_EXISTENT);
- 
--	vm_handle_exception(vm, UD_VECTOR, guest_ud_handler);
-+	vm_install_vector_handler(vm, UD_VECTOR, guest_ud_handler);
- 	run_guest(vm);
--	vm_handle_exception(vm, UD_VECTOR, NULL);
-+	vm_install_vector_handler(vm, UD_VECTOR, NULL);
- 
- 	if (process_ucall(vm) != UCALL_DONE) {
--		vm_handle_exception(vm, GP_VECTOR, guest_fep_gp_handler);
-+		vm_install_vector_handler(vm, GP_VECTOR, guest_fep_gp_handler);
- 
- 		/* Process emulated rdmsr and wrmsr instructions. */
- 		run_guest_then_process_rdmsr(vm, MSR_IA32_XSS);
-diff --git a/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c b/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
-index 2f964cdc273c..ded70ff465d5 100644
---- a/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
-@@ -462,7 +462,7 @@ int main(int argc, char *argv[])
- 
- 	vm_init_descriptor_tables(vm);
- 	vcpu_init_descriptor_tables(vm, HALTER_VCPU_ID);
--	vm_handle_exception(vm, IPI_VECTOR, guest_ipi_handler);
-+	vm_install_vector_handler(vm, IPI_VECTOR, guest_ipi_handler);
- 
- 	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA, 0);
++	if (get_ucall(vm, vcpuid, &uc) == UCALL_UNHANDLED) {
++		uint64_t vector = uc.args[0];
+ 		TEST_ASSERT(false,
+-			    "Unexpected vectored event in guest (vector:0x%x)",
+-			    *data);
++			    "Unexpected vectored event in guest (vector:0x%lx)",
++			    vector);
+ 	}
+ }
  
 -- 
 2.31.1.527.g47e6f16901-goog
