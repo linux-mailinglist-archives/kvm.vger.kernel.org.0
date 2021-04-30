@@ -2,116 +2,253 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E3CD36FFD7
-	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 19:43:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0ECD370116
+	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 21:18:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230356AbhD3Rof (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Apr 2021 13:44:35 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46976 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229750AbhD3Roe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 30 Apr 2021 13:44:34 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13UHab5h073209;
-        Fri, 30 Apr 2021 13:43:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=mUVH6xyknU1SpzhgboC1wVZ7fZkvVN0ZyD4IPb0ZU+o=;
- b=AINzomltP5OU2aaC8iPkP1JL7I7DOmpKAhO2D6pAuKcYghwewd9wvRifeYsHKPoUIxt3
- zI55Q7djQ2/T8nxwqMNPpfYZd/wZhERTDn8Wsk1AOsllUEktRAoGWkJ8nc3pHT/BVh6Z
- jq3U0Us0HbVTQCuzy5cvWxNZFjHfShFE4fqw+PlDD1y0aQtG9cfz09DeAQc03EFW1ULR
- H+C53rX88abM2Iv+Ll8/C2SxCp6vlblimiic7WdVHzgT4ExN38g6iA+FSl29Bf9JNSVt
- A6NFdDRnTXpEu4jkcK10a9bcIOhmYetkLRfUO4046HnWfczeIfEiZKZPxL/aglRWZ4q0 kw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 388perr3wj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Apr 2021 13:43:45 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13UHda9V082314;
-        Fri, 30 Apr 2021 13:43:45 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 388perr3w1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Apr 2021 13:43:45 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13UHhhdL023320;
-        Fri, 30 Apr 2021 17:43:43 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 384ay8kbdb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Apr 2021 17:43:43 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13UHhfGr33489248
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 30 Apr 2021 17:43:41 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 61DBE52050;
-        Fri, 30 Apr 2021 17:43:41 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.171.4.217])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 0AD685204F;
-        Fri, 30 Apr 2021 17:43:41 +0000 (GMT)
-Subject: Re: [PATCH] kvm: exit halt polling on need_resched() as well
-To:     Venkatesh Srinivas <venkateshs@chromium.org>, kvm@vger.kernel.org,
-        jmattson@google.com, pbonzini@redhat.com, dmatlack@google.com
-Cc:     Benjamin Segall <bsegall@google.com>
-References: <20210429162233.116849-1-venkateshs@chromium.org>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <ea54b776-c15a-e718-d7c9-ae8df7f24de3@de.ibm.com>
-Date:   Fri, 30 Apr 2021 19:43:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.1
+        id S231280AbhD3TTR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Apr 2021 15:19:17 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:38421 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229534AbhD3TTK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Apr 2021 15:19:10 -0400
+Received: by mail-io1-f71.google.com with SMTP id v1-20020a5d94810000b02903e0f4d732b4so39408424ioj.5
+        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 12:18:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=W21MpQbg2r+zNE3j8+vGWPwY3QTKyRcwFXVYnsEsdfk=;
+        b=WdCtxzvSl/Xj6yhrDYnzNTefwiHyyjofcjnnlIhyFkZrQjDIEwMWsxVXQHCVLvA7qy
+         9PWYjCSRs3oH3mCaO4OMqv4y8XYv9pxXlTq90BUXBInnXZ5LuABvlCLJqQx51TyUeoOJ
+         RnB3JIGCqeMvAAXC0gYbAPCuCSKuZXs8PmGnZ7reIhOBtwfhGe8ddqtBtPv7hlfmV5Yu
+         +ziP05SJxAL5SwktnU1JxrZxNNE9SepgsVOO12B2oSjIRIeidLrWhQlrYw77TgQg4FeC
+         +8FrQNzlO0jTugcxjKbAWjOKf+nuqmmIMZdr/85Rltl9cJ7H7DCJPHJS/wVf5tf6eKjP
+         KGjw==
+X-Gm-Message-State: AOAM532JYx5Y/QHzA9j/7E2cX526wb33wX1EA/bWi7VSFSBQ1Xf9Bhcr
+        tlC+Svz+TDaNDZgdQ7p7y0JY0igqreNtYFF2OGr8kQaJbhGi
+X-Google-Smtp-Source: ABdhPJwZS0tfegh2Qqjc0QKn+UUcf4HfJCvapdjl8XTuTXzuiIOy0BxLLiudFD2SpuxKFLCBNFeorHCXet+FSN9BdOrQwf79BoUu
 MIME-Version: 1.0
-In-Reply-To: <20210429162233.116849-1-venkateshs@chromium.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 3GWA--_yM7QU3M5PFfHuUo5frUE0fmEx
-X-Proofpoint-GUID: rZBdaTSLni0CYv79uXB_EGC_D3XHv5CE
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-30_10:2021-04-30,2021-04-30 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
- mlxscore=0 adultscore=0 clxscore=1011 mlxlogscore=999 spamscore=0
- impostorscore=0 lowpriorityscore=0 bulkscore=0 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104300116
+X-Received: by 2002:a05:6e02:1526:: with SMTP id i6mr5273750ilu.270.1619810301365;
+ Fri, 30 Apr 2021 12:18:21 -0700 (PDT)
+Date:   Fri, 30 Apr 2021 12:18:21 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009dd35c05c135792d@google.com>
+Subject: [syzbot] possible deadlock in sctp_addr_wq_timeout_handler
+From:   syzbot <syzbot+959223586843e69a2674@syzkaller.appspotmail.com>
+To:     akpm@linux-foundation.org, bp@alien8.de, davem@davemloft.net,
+        hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kuba@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-sctp@vger.kernel.org, marcelo.leitner@gmail.com,
+        mark.rutland@arm.com, masahiroy@kernel.org, mingo@redhat.com,
+        netdev@vger.kernel.org, nhorman@tuxdriver.com, pbonzini@redhat.com,
+        peterz@infradead.org, rafael.j.wysocki@intel.com,
+        rostedt@goodmis.org, seanjc@google.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vkuznets@redhat.com, vyasevich@gmail.com, wanpengli@tencent.com,
+        will@kernel.org, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    2a1d7946 Merge tag 'for-linus' of git://git.kernel.org/pub..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=159af1c1d00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9404cfa686df2c05
+dashboard link: https://syzkaller.appspot.com/bug?extid=959223586843e69a2674
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11613d71d00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12be674dd00000
+
+The issue was bisected to:
+
+commit 997acaf6b4b59c6a9c259740312a69ea549cc684
+Author: Mark Rutland <mark.rutland@arm.com>
+Date:   Mon Jan 11 15:37:07 2021 +0000
+
+    lockdep: report broken irq restoration
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17c36a5dd00000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=14236a5dd00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=10236a5dd00000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+959223586843e69a2674@syzkaller.appspotmail.com
+Fixes: 997acaf6b4b5 ("lockdep: report broken irq restoration")
+
+======================================================
+WARNING: possible circular locking dependency detected
+5.12.0-rc8-syzkaller #0 Not tainted
+------------------------------------------------------
+syz-executor044/8536 is trying to acquire lock:
+ffff8880183933a0 (slock-AF_INET6){+.-.}-{2:2}, at: spin_lock include/linux/spinlock.h:354 [inline]
+ffff8880183933a0 (slock-AF_INET6){+.-.}-{2:2}, at: sctp_addr_wq_timeout_handler+0x1a1/0x550 net/sctp/protocol.c:666
+
+but task is already holding lock:
+ffffffff8d659620 (&net->sctp.addr_wq_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:359 [inline]
+ffffffff8d659620 (&net->sctp.addr_wq_lock){+.-.}-{2:2}, at: sctp_addr_wq_timeout_handler+0x38/0x550 net/sctp/protocol.c:626
+
+which lock already depends on the new lock.
 
 
-On 29.04.21 18:22, Venkatesh Srinivas wrote:
-> From: Benjamin Segall <bsegall@google.com>
-> 
-> single_task_running() is usually more general than need_resched()
-> but CFS_BANDWIDTH throttling will use resched_task() when there
-> is just one task to get the task to block. This was causing
-> long-need_resched warnings and was likely allowing VMs to
-> overrun their quota when halt polling.
-> 
-> Signed-off-by: Ben Segall <bsegall@google.com>
-> Signed-off-by: Venkatesh Srinivas <venkateshs@chromium.org>
+the existing dependency chain (in reverse order) is:
 
-would that qualify for stable?
+-> #1 (&net->sctp.addr_wq_lock){+.-.}-{2:2}:
+       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:135 [inline]
+       _raw_spin_lock_bh+0x2f/0x40 kernel/locking/spinlock.c:175
+       spin_lock_bh include/linux/spinlock.h:359 [inline]
+       sctp_destroy_sock+0x204/0x440 net/sctp/socket.c:5028
+       sctp_v6_destroy_sock+0x11/0x20 net/sctp/socket.c:9528
+       sk_common_release+0x64/0x390 net/core/sock.c:3264
+       sctp_close+0x4da/0x940 net/sctp/socket.c:1531
+       inet_release+0x12e/0x280 net/ipv4/af_inet.c:431
+       inet6_release+0x4c/0x70 net/ipv6/af_inet6.c:478
+       __sock_release+0xcd/0x280 net/socket.c:599
+       sock_close+0x18/0x20 net/socket.c:1258
+       __fput+0x288/0x920 fs/file_table.c:280
+       task_work_run+0xdd/0x1a0 kernel/task_work.c:140
+       exit_task_work include/linux/task_work.h:30 [inline]
+       do_exit+0xbfc/0x2a60 kernel/exit.c:825
+       do_group_exit+0x125/0x310 kernel/exit.c:922
+       __do_sys_exit_group kernel/exit.c:933 [inline]
+       __se_sys_exit_group kernel/exit.c:931 [inline]
+       __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:931
+       do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+       entry_SYSCALL_64_after_hwframe+0x44/0xae
 
-> ---
->   virt/kvm/kvm_main.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 2799c6660cce..b9f12da6af0e 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2973,7 +2973,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
->   				goto out;
->   			}
->   			poll_end = cur = ktime_get();
-> -		} while (single_task_running() && ktime_before(cur, stop));
-> +		} while (single_task_running() && !need_resched() &&
-> +			 ktime_before(cur, stop));
->   	}
-> 
->   	prepare_to_rcuwait(&vcpu->wait);
-> 
+-> #0 (slock-AF_INET6){+.-.}-{2:2}:
+       check_prev_add kernel/locking/lockdep.c:2937 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3060 [inline]
+       validate_chain kernel/locking/lockdep.c:3675 [inline]
+       __lock_acquire+0x2b14/0x54c0 kernel/locking/lockdep.c:4901
+       lock_acquire kernel/locking/lockdep.c:5511 [inline]
+       lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5476
+       __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
+       _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
+       spin_lock include/linux/spinlock.h:354 [inline]
+       sctp_addr_wq_timeout_handler+0x1a1/0x550 net/sctp/protocol.c:666
+       call_timer_fn+0x1a5/0x6b0 kernel/time/timer.c:1431
+       expire_timers kernel/time/timer.c:1476 [inline]
+       __run_timers.part.0+0x67c/0xa50 kernel/time/timer.c:1745
+       __run_timers kernel/time/timer.c:1726 [inline]
+       run_timer_softirq+0xb3/0x1d0 kernel/time/timer.c:1758
+       __do_softirq+0x29b/0x9f6 kernel/softirq.c:345
+       invoke_softirq kernel/softirq.c:221 [inline]
+       __irq_exit_rcu kernel/softirq.c:422 [inline]
+       irq_exit_rcu+0x134/0x200 kernel/softirq.c:434
+       sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1100
+       asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:632
+       __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:161 [inline]
+       _raw_spin_unlock_irqrestore+0x38/0x70 kernel/locking/spinlock.c:191
+       __debug_check_no_obj_freed lib/debugobjects.c:997 [inline]
+       debug_check_no_obj_freed+0x20c/0x420 lib/debugobjects.c:1018
+       slab_free_hook mm/slub.c:1554 [inline]
+       slab_free_freelist_hook+0x147/0x210 mm/slub.c:1600
+       slab_free mm/slub.c:3161 [inline]
+       kmem_cache_free+0x8a/0x740 mm/slub.c:3177
+       free_fs_struct fs/fs_struct.c:92 [inline]
+       exit_fs+0x123/0x170 fs/fs_struct.c:108
+       do_exit+0xbca/0x2a60 kernel/exit.c:821
+       do_group_exit+0x125/0x310 kernel/exit.c:922
+       __do_sys_exit_group kernel/exit.c:933 [inline]
+       __se_sys_exit_group kernel/exit.c:931 [inline]
+       __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:931
+       do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+       entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+other info that might help us debug this:
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&net->sctp.addr_wq_lock);
+                               lock(slock-AF_INET6);
+                               lock(&net->sctp.addr_wq_lock);
+  lock(slock-AF_INET6);
+
+ *** DEADLOCK ***
+
+2 locks held by syz-executor044/8536:
+ #0: ffffc90000007d78 ((&net->sctp.addr_wq_timer)){+.-.}-{0:0}, at: lockdep_copy_map include/linux/lockdep.h:35 [inline]
+ #0: ffffc90000007d78 ((&net->sctp.addr_wq_timer)){+.-.}-{0:0}, at: call_timer_fn+0xd5/0x6b0 kernel/time/timer.c:1421
+ #1: ffffffff8d659620 (&net->sctp.addr_wq_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:359 [inline]
+ #1: ffffffff8d659620 (&net->sctp.addr_wq_lock){+.-.}-{2:2}, at: sctp_addr_wq_timeout_handler+0x38/0x550 net/sctp/protocol.c:626
+
+stack backtrace:
+CPU: 0 PID: 8536 Comm: syz-executor044 Not tainted 5.12.0-rc8-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:79 [inline]
+ dump_stack+0x141/0x1d7 lib/dump_stack.c:120
+ check_noncircular+0x25f/0x2e0 kernel/locking/lockdep.c:2128
+ check_prev_add kernel/locking/lockdep.c:2937 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3060 [inline]
+ validate_chain kernel/locking/lockdep.c:3675 [inline]
+ __lock_acquire+0x2b14/0x54c0 kernel/locking/lockdep.c:4901
+ lock_acquire kernel/locking/lockdep.c:5511 [inline]
+ lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5476
+ __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
+ _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
+ spin_lock include/linux/spinlock.h:354 [inline]
+ sctp_addr_wq_timeout_handler+0x1a1/0x550 net/sctp/protocol.c:666
+ call_timer_fn+0x1a5/0x6b0 kernel/time/timer.c:1431
+ expire_timers kernel/time/timer.c:1476 [inline]
+ __run_timers.part.0+0x67c/0xa50 kernel/time/timer.c:1745
+ __run_timers kernel/time/timer.c:1726 [inline]
+ run_timer_softirq+0xb3/0x1d0 kernel/time/timer.c:1758
+ __do_softirq+0x29b/0x9f6 kernel/softirq.c:345
+ invoke_softirq kernel/softirq.c:221 [inline]
+ __irq_exit_rcu kernel/softirq.c:422 [inline]
+ irq_exit_rcu+0x134/0x200 kernel/softirq.c:434
+ sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1100
+ </IRQ>
+ asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:632
+RIP: 0010:__raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:161 [inline]
+RIP: 0010:_raw_spin_unlock_irqrestore+0x38/0x70 kernel/locking/spinlock.c:191
+Code: 74 24 10 e8 4a f9 53 f8 48 89 ef e8 82 af 54 f8 81 e3 00 02 00 00 75 25 9c 58 f6 c4 02 75 2d 48 85 db 74 01 fb bf 01 00 00 00 <e8> 63 7d 48 f8 65 8b 05 0c 48 fc 76 85 c0 74 0a 5b 5d c3 e8 d0 3c
+RSP: 0018:ffffc9000173fc50 EFLAGS: 00000206
+RAX: 0000000000000002 RBX: 0000000000000200 RCX: 1ffffffff1b89e11
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000001
+RBP: ffffffff9006cf00 R08: 0000000000000001 R09: 0000000000000001
+R10: ffffffff8179e4c8 R11: 000000000000003f R12: 1ffffffff200d9df
+R13: 0000000000000000 R14: dead000000000100 R15: dffffc0000000000
+ __debug_check_no_obj_freed lib/debugobjects.c:997 [inline]
+ debug_check_no_obj_freed+0x20c/0x420 lib/debugobjects.c:1018
+ slab_free_hook mm/slub.c:1554 [inline]
+ slab_free_freelist_hook+0x147/0x210 mm/slub.c:1600
+ slab_free mm/slub.c:3161 [inline]
+ kmem_cache_free+0x8a/0x740 mm/slub.c:3177
+ free_fs_struct fs/fs_struct.c:92 [inline]
+ exit_fs+0x123/0x170 fs/fs_struct.c:108
+ do_exit+0xbca/0x2a60 kernel/exit.c:821
+ do_group_exit+0x125/0x310 kernel/exit.c:922
+ __do_sys_exit_group kernel/exit.c:933 [inline]
+ __se_sys_exit_group kernel/exit.c:931 [inline]
+ __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:931
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x43ea79
+Code: Unable to access opcode bytes at RIP 0x43ea4f.
+RSP: 002b:00007ffdbc348058 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
+RAX: ffffffffffffffda RBX: 00000000004b0330 RCX: 000000000043ea79
+RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000000
+RBP: 0000000000000000 R08: ffffffffffffffc0 R09: 0000000000000001
+R10: 0000000000000001 R11: 0000000000000246 R12: 00000000004b0330
+R13: 0000000000000001 R14: 0000000000000000 R15: 0000000000000001
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
