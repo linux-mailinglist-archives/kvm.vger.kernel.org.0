@@ -2,253 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B0ECD370116
-	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 21:18:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A30E13701DA
+	for <lists+kvm@lfdr.de>; Fri, 30 Apr 2021 22:11:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231280AbhD3TTR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Apr 2021 15:19:17 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:38421 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229534AbhD3TTK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Apr 2021 15:19:10 -0400
-Received: by mail-io1-f71.google.com with SMTP id v1-20020a5d94810000b02903e0f4d732b4so39408424ioj.5
-        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 12:18:21 -0700 (PDT)
+        id S235536AbhD3ULx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Apr 2021 16:11:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38318 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235420AbhD3ULr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Apr 2021 16:11:47 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E4F7C06138C
+        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 13:10:58 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id p12so50142404pgj.10
+        for <kvm@vger.kernel.org>; Fri, 30 Apr 2021 13:10:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=y5hqDeZNhe8SoddKxv/ncGGJkjFlgN/Vvr4BayVVCMY=;
+        b=KuHqqWrjKa2m55Q/rYXy8NdBn6FOdROzDmCHjWsY9JynRSJG0cewtOzEeU0vh4SZfL
+         8MgNSxiia93hm5iqJxTYx2oNGp3J6RWfv+/uo9ghdK/gJz7saJ2p5VjEMiLdOYNr0rdD
+         eGtgn36hh46T0c23mmszl4+hJ+mqknyV3t/KIvT4dWRXs8lc1+L9vqDIBIER0VvjHKZU
+         LIcUVNXB4qqAlk+Rxh6US0RqrRnDFdBA2uVDoCBWwVTyGfC61FAyb13mtVILtNSjW/xb
+         FXUBbwfiAGviWnMqFzBEOAxTdtkTDITPeKT4hh5ZwzhlTRo4vqvpa+OiyeLsntQTutge
+         qsgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=W21MpQbg2r+zNE3j8+vGWPwY3QTKyRcwFXVYnsEsdfk=;
-        b=WdCtxzvSl/Xj6yhrDYnzNTefwiHyyjofcjnnlIhyFkZrQjDIEwMWsxVXQHCVLvA7qy
-         9PWYjCSRs3oH3mCaO4OMqv4y8XYv9pxXlTq90BUXBInnXZ5LuABvlCLJqQx51TyUeoOJ
-         RnB3JIGCqeMvAAXC0gYbAPCuCSKuZXs8PmGnZ7reIhOBtwfhGe8ddqtBtPv7hlfmV5Yu
-         +ziP05SJxAL5SwktnU1JxrZxNNE9SepgsVOO12B2oSjIRIeidLrWhQlrYw77TgQg4FeC
-         +8FrQNzlO0jTugcxjKbAWjOKf+nuqmmIMZdr/85Rltl9cJ7H7DCJPHJS/wVf5tf6eKjP
-         KGjw==
-X-Gm-Message-State: AOAM532JYx5Y/QHzA9j/7E2cX526wb33wX1EA/bWi7VSFSBQ1Xf9Bhcr
-        tlC+Svz+TDaNDZgdQ7p7y0JY0igqreNtYFF2OGr8kQaJbhGi
-X-Google-Smtp-Source: ABdhPJwZS0tfegh2Qqjc0QKn+UUcf4HfJCvapdjl8XTuTXzuiIOy0BxLLiudFD2SpuxKFLCBNFeorHCXet+FSN9BdOrQwf79BoUu
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=y5hqDeZNhe8SoddKxv/ncGGJkjFlgN/Vvr4BayVVCMY=;
+        b=jUia/qmP3j5M3Eocs0QQ3GmN20Rxu2pFp/uFinWXj8f8GMEoqbBatQJoS0/q3rQpX3
+         /5LrdT0MMfVxsIyUr8pqDaWJXVo6mV3SoSShXdkdbzPxbWwyqGqBTNq7Mr8ByPm1rhr5
+         XrOhLVQYP3nq8tdJAvoGrR7uIxI42Q07uuzT6TFY54MbBpuEbjaO/36shjX/kBNd7GpI
+         k77rza0bJsGcsdYvyYkmYDEAJlsXsWHKUimhEdZuDF9NISwU8NU9HO6/XqlPGQlO8Pb1
+         dmIWMLXMj7RBoXskLxUnI4AdNw9PuFrWjYqdPt5WRc/oLOrFNJTMRQJBnW9NDIVZ7HzN
+         i6ng==
+X-Gm-Message-State: AOAM533hF2dPH4MhkuHktXOWgJvI2NRDQ/fGNyaAMrL2q1NYqLnVMKSJ
+        8uAJBn8/m0y6SGqSmSELYaSV0Q==
+X-Google-Smtp-Source: ABdhPJzyZYSMg+LE19UpoeZAg2GN8Z10SjNNoosOh5NIqYLoSK/OgyJzEGbzTpfeT1dBNJOxHG6ZiQ==
+X-Received: by 2002:a63:2143:: with SMTP id s3mr6326413pgm.429.1619813457493;
+        Fri, 30 Apr 2021 13:10:57 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id i9sm2922341pji.41.2021.04.30.13.10.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Apr 2021 13:10:56 -0700 (PDT)
+Date:   Fri, 30 Apr 2021 20:10:53 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        srutherford@google.com, joro@8bytes.org, brijesh.singh@amd.com,
+        thomas.lendacky@amd.com, ashish.kalra@amd.com,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@suse.de>,
+        x86@kernel.org
+Subject: Re: [PATCH v3 2/2] KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS
+ hypercall
+Message-ID: <YIxkTZsblAzUzsf7@google.com>
+References: <20210429104707.203055-1-pbonzini@redhat.com>
+ <20210429104707.203055-3-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1526:: with SMTP id i6mr5273750ilu.270.1619810301365;
- Fri, 30 Apr 2021 12:18:21 -0700 (PDT)
-Date:   Fri, 30 Apr 2021 12:18:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000009dd35c05c135792d@google.com>
-Subject: [syzbot] possible deadlock in sctp_addr_wq_timeout_handler
-From:   syzbot <syzbot+959223586843e69a2674@syzkaller.appspotmail.com>
-To:     akpm@linux-foundation.org, bp@alien8.de, davem@davemloft.net,
-        hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
-        kuba@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-sctp@vger.kernel.org, marcelo.leitner@gmail.com,
-        mark.rutland@arm.com, masahiroy@kernel.org, mingo@redhat.com,
-        netdev@vger.kernel.org, nhorman@tuxdriver.com, pbonzini@redhat.com,
-        peterz@infradead.org, rafael.j.wysocki@intel.com,
-        rostedt@goodmis.org, seanjc@google.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
-        vkuznets@redhat.com, vyasevich@gmail.com, wanpengli@tencent.com,
-        will@kernel.org, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210429104707.203055-3-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On Thu, Apr 29, 2021, Paolo Bonzini wrote:
+> diff --git a/Documentation/virt/kvm/msr.rst b/Documentation/virt/kvm/msr.rst
+> index 57fc4090031a..cf1b0b2099b0 100644
+> --- a/Documentation/virt/kvm/msr.rst
+> +++ b/Documentation/virt/kvm/msr.rst
+> @@ -383,5 +383,10 @@ MSR_KVM_MIGRATION_CONTROL:
+>  data:
+>          This MSR is available if KVM_FEATURE_MIGRATION_CONTROL is present in
+>          CPUID.  Bit 0 represents whether live migration of the guest is allowed.
+> +
+>          When a guest is started, bit 0 will be 1 if the guest has encrypted
+> -        memory and 0 if the guest does not have encrypted memory.
+> +        memory and 0 if the guest does not have encrypted memory.  If the
+> +        guest is communicating page encryption status to the host using the
+> +        ``KVM_HC_PAGE_ENC_STATUS`` hypercall, it can set bit 0 in this MSR to
+> +        allow live migration of the guest.  The MSR is read-only if
+> +        ``KVM_FEATURE_HC_PAGE_STATUS`` is not advertised to the guest.
 
-syzbot found the following issue on:
+I still don't get the desire to tie MSR_KVM_MIGRATION_CONTROL to PAGE_ENC_STATUS
+in any way shape or form.  I can understand making it read-only or dropping
+writes if it's not intercepted by userspace, but making it read-only for
+non-encrypted guests makes it useful only for encrypted guests, which defeats
+the purpose of genericizing the MSR.
 
-HEAD commit:    2a1d7946 Merge tag 'for-linus' of git://git.kernel.org/pub..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=159af1c1d00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9404cfa686df2c05
-dashboard link: https://syzkaller.appspot.com/bug?extid=959223586843e69a2674
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11613d71d00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12be674dd00000
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e9c40be9235c..0c2524bbaa84 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3279,6 +3279,12 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		if (!guest_pv_has(vcpu, KVM_FEATURE_MIGRATION_CONTROL))
+>  			return 1;
+>  
+> +		/*
+> +		 * This implementation is only good if userspace has *not*
+> +		 * enabled KVM_FEATURE_HC_PAGE_ENC_STATUS.  If userspace
+> +		 * enables KVM_FEATURE_HC_PAGE_ENC_STATUS it must set up an
+> +		 * MSR filter in order to accept writes that change bit 0.
+> +		 */
+>  		if (data != !static_call(kvm_x86_has_encrypted_memory)(vcpu->kvm))
+>  			return 1;
 
-The issue was bisected to:
+This behavior doesn't match the documentation.
 
-commit 997acaf6b4b59c6a9c259740312a69ea549cc684
-Author: Mark Rutland <mark.rutland@arm.com>
-Date:   Mon Jan 11 15:37:07 2021 +0000
+  a. The MSR is not read-only for legacy guests since they can write '0'.
+  b. The MSR is not read-only if KVM_FEATURE_HC_PAGE_STATUS isn't advertised,
+     a guest with encrypted memory can write '1' regardless of whether userspace
+     has enabled KVM_FEATURE_HC_PAGE_STATUS.
+  c. The MSR is never fully writable, e.g. a guest with encrypted memory can set
+     bit 0, but not clear it.  This doesn't seem intentional?
 
-    lockdep: report broken irq restoration
+Why not simply drop writes?  E.g.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17c36a5dd00000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=14236a5dd00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=10236a5dd00000
+		if (data & ~KVM_MIGRATION_READY)
+			return 1;
+		break;
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+959223586843e69a2674@syzkaller.appspotmail.com
-Fixes: 997acaf6b4b5 ("lockdep: report broken irq restoration")
+And then do "msr->data = 0;" in the read path.  That's just as effective as
+making the MSR read-only to force userspace to intercept the MSR if it wants to
+do anything useful with the information, and it's easy to document.
 
-======================================================
-WARNING: possible circular locking dependency detected
-5.12.0-rc8-syzkaller #0 Not tainted
-------------------------------------------------------
-syz-executor044/8536 is trying to acquire lock:
-ffff8880183933a0 (slock-AF_INET6){+.-.}-{2:2}, at: spin_lock include/linux/spinlock.h:354 [inline]
-ffff8880183933a0 (slock-AF_INET6){+.-.}-{2:2}, at: sctp_addr_wq_timeout_handler+0x1a1/0x550 net/sctp/protocol.c:666
-
-but task is already holding lock:
-ffffffff8d659620 (&net->sctp.addr_wq_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:359 [inline]
-ffffffff8d659620 (&net->sctp.addr_wq_lock){+.-.}-{2:2}, at: sctp_addr_wq_timeout_handler+0x38/0x550 net/sctp/protocol.c:626
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #1 (&net->sctp.addr_wq_lock){+.-.}-{2:2}:
-       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:135 [inline]
-       _raw_spin_lock_bh+0x2f/0x40 kernel/locking/spinlock.c:175
-       spin_lock_bh include/linux/spinlock.h:359 [inline]
-       sctp_destroy_sock+0x204/0x440 net/sctp/socket.c:5028
-       sctp_v6_destroy_sock+0x11/0x20 net/sctp/socket.c:9528
-       sk_common_release+0x64/0x390 net/core/sock.c:3264
-       sctp_close+0x4da/0x940 net/sctp/socket.c:1531
-       inet_release+0x12e/0x280 net/ipv4/af_inet.c:431
-       inet6_release+0x4c/0x70 net/ipv6/af_inet6.c:478
-       __sock_release+0xcd/0x280 net/socket.c:599
-       sock_close+0x18/0x20 net/socket.c:1258
-       __fput+0x288/0x920 fs/file_table.c:280
-       task_work_run+0xdd/0x1a0 kernel/task_work.c:140
-       exit_task_work include/linux/task_work.h:30 [inline]
-       do_exit+0xbfc/0x2a60 kernel/exit.c:825
-       do_group_exit+0x125/0x310 kernel/exit.c:922
-       __do_sys_exit_group kernel/exit.c:933 [inline]
-       __se_sys_exit_group kernel/exit.c:931 [inline]
-       __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:931
-       do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #0 (slock-AF_INET6){+.-.}-{2:2}:
-       check_prev_add kernel/locking/lockdep.c:2937 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3060 [inline]
-       validate_chain kernel/locking/lockdep.c:3675 [inline]
-       __lock_acquire+0x2b14/0x54c0 kernel/locking/lockdep.c:4901
-       lock_acquire kernel/locking/lockdep.c:5511 [inline]
-       lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5476
-       __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
-       _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
-       spin_lock include/linux/spinlock.h:354 [inline]
-       sctp_addr_wq_timeout_handler+0x1a1/0x550 net/sctp/protocol.c:666
-       call_timer_fn+0x1a5/0x6b0 kernel/time/timer.c:1431
-       expire_timers kernel/time/timer.c:1476 [inline]
-       __run_timers.part.0+0x67c/0xa50 kernel/time/timer.c:1745
-       __run_timers kernel/time/timer.c:1726 [inline]
-       run_timer_softirq+0xb3/0x1d0 kernel/time/timer.c:1758
-       __do_softirq+0x29b/0x9f6 kernel/softirq.c:345
-       invoke_softirq kernel/softirq.c:221 [inline]
-       __irq_exit_rcu kernel/softirq.c:422 [inline]
-       irq_exit_rcu+0x134/0x200 kernel/softirq.c:434
-       sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1100
-       asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:632
-       __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:161 [inline]
-       _raw_spin_unlock_irqrestore+0x38/0x70 kernel/locking/spinlock.c:191
-       __debug_check_no_obj_freed lib/debugobjects.c:997 [inline]
-       debug_check_no_obj_freed+0x20c/0x420 lib/debugobjects.c:1018
-       slab_free_hook mm/slub.c:1554 [inline]
-       slab_free_freelist_hook+0x147/0x210 mm/slub.c:1600
-       slab_free mm/slub.c:3161 [inline]
-       kmem_cache_free+0x8a/0x740 mm/slub.c:3177
-       free_fs_struct fs/fs_struct.c:92 [inline]
-       exit_fs+0x123/0x170 fs/fs_struct.c:108
-       do_exit+0xbca/0x2a60 kernel/exit.c:821
-       do_group_exit+0x125/0x310 kernel/exit.c:922
-       __do_sys_exit_group kernel/exit.c:933 [inline]
-       __se_sys_exit_group kernel/exit.c:931 [inline]
-       __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:931
-       do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-other info that might help us debug this:
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&net->sctp.addr_wq_lock);
-                               lock(slock-AF_INET6);
-                               lock(&net->sctp.addr_wq_lock);
-  lock(slock-AF_INET6);
-
- *** DEADLOCK ***
-
-2 locks held by syz-executor044/8536:
- #0: ffffc90000007d78 ((&net->sctp.addr_wq_timer)){+.-.}-{0:0}, at: lockdep_copy_map include/linux/lockdep.h:35 [inline]
- #0: ffffc90000007d78 ((&net->sctp.addr_wq_timer)){+.-.}-{0:0}, at: call_timer_fn+0xd5/0x6b0 kernel/time/timer.c:1421
- #1: ffffffff8d659620 (&net->sctp.addr_wq_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:359 [inline]
- #1: ffffffff8d659620 (&net->sctp.addr_wq_lock){+.-.}-{2:2}, at: sctp_addr_wq_timeout_handler+0x38/0x550 net/sctp/protocol.c:626
-
-stack backtrace:
-CPU: 0 PID: 8536 Comm: syz-executor044 Not tainted 5.12.0-rc8-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:79 [inline]
- dump_stack+0x141/0x1d7 lib/dump_stack.c:120
- check_noncircular+0x25f/0x2e0 kernel/locking/lockdep.c:2128
- check_prev_add kernel/locking/lockdep.c:2937 [inline]
- check_prevs_add kernel/locking/lockdep.c:3060 [inline]
- validate_chain kernel/locking/lockdep.c:3675 [inline]
- __lock_acquire+0x2b14/0x54c0 kernel/locking/lockdep.c:4901
- lock_acquire kernel/locking/lockdep.c:5511 [inline]
- lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5476
- __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
- _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
- spin_lock include/linux/spinlock.h:354 [inline]
- sctp_addr_wq_timeout_handler+0x1a1/0x550 net/sctp/protocol.c:666
- call_timer_fn+0x1a5/0x6b0 kernel/time/timer.c:1431
- expire_timers kernel/time/timer.c:1476 [inline]
- __run_timers.part.0+0x67c/0xa50 kernel/time/timer.c:1745
- __run_timers kernel/time/timer.c:1726 [inline]
- run_timer_softirq+0xb3/0x1d0 kernel/time/timer.c:1758
- __do_softirq+0x29b/0x9f6 kernel/softirq.c:345
- invoke_softirq kernel/softirq.c:221 [inline]
- __irq_exit_rcu kernel/softirq.c:422 [inline]
- irq_exit_rcu+0x134/0x200 kernel/softirq.c:434
- sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1100
- </IRQ>
- asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:632
-RIP: 0010:__raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:161 [inline]
-RIP: 0010:_raw_spin_unlock_irqrestore+0x38/0x70 kernel/locking/spinlock.c:191
-Code: 74 24 10 e8 4a f9 53 f8 48 89 ef e8 82 af 54 f8 81 e3 00 02 00 00 75 25 9c 58 f6 c4 02 75 2d 48 85 db 74 01 fb bf 01 00 00 00 <e8> 63 7d 48 f8 65 8b 05 0c 48 fc 76 85 c0 74 0a 5b 5d c3 e8 d0 3c
-RSP: 0018:ffffc9000173fc50 EFLAGS: 00000206
-RAX: 0000000000000002 RBX: 0000000000000200 RCX: 1ffffffff1b89e11
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000001
-RBP: ffffffff9006cf00 R08: 0000000000000001 R09: 0000000000000001
-R10: ffffffff8179e4c8 R11: 000000000000003f R12: 1ffffffff200d9df
-R13: 0000000000000000 R14: dead000000000100 R15: dffffc0000000000
- __debug_check_no_obj_freed lib/debugobjects.c:997 [inline]
- debug_check_no_obj_freed+0x20c/0x420 lib/debugobjects.c:1018
- slab_free_hook mm/slub.c:1554 [inline]
- slab_free_freelist_hook+0x147/0x210 mm/slub.c:1600
- slab_free mm/slub.c:3161 [inline]
- kmem_cache_free+0x8a/0x740 mm/slub.c:3177
- free_fs_struct fs/fs_struct.c:92 [inline]
- exit_fs+0x123/0x170 fs/fs_struct.c:108
- do_exit+0xbca/0x2a60 kernel/exit.c:821
- do_group_exit+0x125/0x310 kernel/exit.c:922
- __do_sys_exit_group kernel/exit.c:933 [inline]
- __se_sys_exit_group kernel/exit.c:931 [inline]
- __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:931
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x43ea79
-Code: Unable to access opcode bytes at RIP 0x43ea4f.
-RSP: 002b:00007ffdbc348058 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 00000000004b0330 RCX: 000000000043ea79
-RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000000
-RBP: 0000000000000000 R08: ffffffffffffffc0 R09: 0000000000000001
-R10: 0000000000000001 R11: 0000000000000246 R12: 00000000004b0330
-R13: 0000000000000001 R14: 0000000000000000 R15: 0000000000000001
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+>  		break;
