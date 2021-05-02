@@ -2,355 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A43B6370913
-	for <lists+kvm@lfdr.de>; Sat,  1 May 2021 23:26:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D82CD370AE8
+	for <lists+kvm@lfdr.de>; Sun,  2 May 2021 11:33:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232045AbhEAV1o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 1 May 2021 17:27:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53984 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231739AbhEAV1o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 1 May 2021 17:27:44 -0400
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EE08C06174A;
-        Sat,  1 May 2021 14:26:53 -0700 (PDT)
-Received: by mail-wr1-x42b.google.com with SMTP id x5so1599396wrv.13;
-        Sat, 01 May 2021 14:26:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=H+/XQHOBovY563RuYzioRfzF40F4WZOQRA1OIG79TGE=;
-        b=Wwr078b4CpvDiBltKip8l5jY6ekeWuW4WesKPoy/+bl5c+RpHarJh90BLI8llSF69q
-         rrbEcK25s0o8WP9VjHINOluEt6WsKaFSVDx8ev0AyRcP5PndIWljxXfPk6NV1jl8fTNC
-         Ze9MQxsSFtAS9ZgA2X+NldVEvt/+/00BWaEbV9INNewjlZomlDcFH9HtkKJby2AbkmnB
-         spVSpQe5M8A9g1/QEp6rSruR2tMocLdUUUlrIyiLoFixFUUbjVZUqRS15smrvWxW1+fB
-         L36KMZBzplygGM9cwhC4WhkYCMAv6QtHzQCo2IRudTSItO6O2/8FThDBQvzkn0ryvE10
-         QYBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=H+/XQHOBovY563RuYzioRfzF40F4WZOQRA1OIG79TGE=;
-        b=Sk5KjGe88KthL7TEtiNJUjP0vKrCGzKDFcuVVjjwKUPcenytK0g2SJ4SyoVpPMKHVN
-         uDbiYDA6GvZQHeNByya5z0sXSHPTKEbMF2OSpSl0qbOkpdzDtRUXFUpweG46l3SWHgEx
-         oADCojI3+/ZLq3rOvOoPZTpK8srV7BfP+EqChUSCF8064AW8JB7TitNE0EFS2aRYqVNq
-         hMdrdaYGZRFpnrYmr1uTbUVFMmvw52SAj+DU/3B3b1m7E5GTQ3U/4GnjwjbXnbKXh1N9
-         XaR24N6V5j579+qSOD67MxgJKn6tPdY3Oa2upNCRsbR4TMm3Wk1oaDtMuYhrLCaiKlox
-         BgZg==
-X-Gm-Message-State: AOAM530wFFai3y/y1aUQc3VGq2efq/SDce4vrFs9YyrSFh1o1Kjf46XG
-        LgSUAswF3t/eWw1qsUaej7p4AIJnftKhQLNWBso=
-X-Google-Smtp-Source: ABdhPJwPpka31A9Aba3jD8olwtimqQ7Q9rOAxs++uzIlkNsKJ4z8DyvVOVkYTIPJgql9iuglMGwqbANapo8b+mbzX1o=
-X-Received: by 2002:a05:6000:1786:: with SMTP id e6mr15769568wrg.243.1619904411666;
- Sat, 01 May 2021 14:26:51 -0700 (PDT)
+        id S229987AbhEBJeQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 2 May 2021 05:34:16 -0400
+Received: from mail-co1nam11on2061.outbound.protection.outlook.com ([40.107.220.61]:5536
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229754AbhEBJeO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 2 May 2021 05:34:14 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KWhCjmFX6ktkUax4rjgQRyCmprKcfpXJp6OO8FlxvRKD9JsXCQ0EniRi4h3FQYHF6BmXurFDBBS1d19YbJ6T9azoOm/d6RtUznoDUiujABGTAN6zP8xN2Xab/GpujNj6gyg0kGTyplhpaLo+6krBPuTzoTYwKj4CPCNI8GY4IpxCVH++nQreU30rlm368I5z/3hncnbrsyt8ozvMaOOh+bS2SuDNFMQzl97kmTpsmJkqP/99ve2neEf/a81efqI4qy3o3ZCeL2uLBwQEiG2KDDARUzfa/CuPx/Ht/43JnB5HuL5s2+JUPKhQ8sDFPa4NWbOhhaddd4SW2wuRG2poMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IXQDFJlF1fT/fEiinB/RTnlvv/90dNnWHm8fuCe3x7Y=;
+ b=lpz7vq3sW36pTHgSfZoofxeREXVFGZ57/rsO4Ev7KD10WoAjTF1t/o1dVJeT/F789/HXd+rZVqfThgxgFqm3Dlm+Ih+irNMXC2Q+4YWcA9Adb6j2jqoMBNhWBSMNEglIdHDha3L/FHYA8DA+LsaoRdU+amc+tovlqeYib+L8JwFXO5BnTY7BywVjtwOU7q8r2UyRM/wXOzzgkKq+5VnuBv84GCgzWKMde/8K9ytwH9MmVl0LPmjmuOOKQUMLngW/pCW1UEhSu24O9ePIW1Io8xR6TDl+53mCOKSe5SbaSRHmlKFjx+LMEE27GG3vIo56ZmIPm8OGGzypqyDv88MsRQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.35) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IXQDFJlF1fT/fEiinB/RTnlvv/90dNnWHm8fuCe3x7Y=;
+ b=pSX7qPj0KhPfduKzGWkpjlQCBC6fVa9yeDLneIw2h2PY7QjolqimRg9d6pwH7MtnekgVG20BgmYXGdRPmLSBzM0ZfrliBtgd1HBOkfl2Q/gO+jB8Te8fvugVksGh+kBniLeMFxOAY25sAVf2jy62Ezwnv0BPhDoCLVnNp7aPHDeMMu34xUlE6Sk0rmFlq0vcoDfM0D7XBpy10+Gt2/dhI5K2e4KltBNjkl7rRKdhO8p7OLRozAL2RTyprPqmv8JBRIW7Y1S2INOa147mYz17w3/zpiLERApY1kgFQv+N6pmCq/ojy0G99D8TOD+FeSf7mtWxnQWbNlXewvCsE+hBxA==
+Received: from DM6PR02CA0091.namprd02.prod.outlook.com (2603:10b6:5:1f4::32)
+ by MN2PR12MB3616.namprd12.prod.outlook.com (2603:10b6:208:cc::25) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.25; Sun, 2 May
+ 2021 09:33:22 +0000
+Received: from DM6NAM11FT034.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:1f4:cafe::30) by DM6PR02CA0091.outlook.office365.com
+ (2603:10b6:5:1f4::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4087.27 via Frontend
+ Transport; Sun, 2 May 2021 09:33:22 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.35)
+ smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.35 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.35; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.35) by
+ DM6NAM11FT034.mail.protection.outlook.com (10.13.173.47) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4087.32 via Frontend Transport; Sun, 2 May 2021 09:33:22 +0000
+Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Sun, 2 May
+ 2021 09:33:21 +0000
+Received: from r-arch-stor02.mtr.labs.mlnx (172.20.145.6) by mail.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Sun, 2 May 2021 02:33:19 -0700
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+To:     <mst@redhat.com>, <kvm@vger.kernel.org>, <jasowang@redhat.com>,
+        <virtualization@lists.linux-foundation.org>
+CC:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Subject: [PATCH 1/1] virtio-net: don't allocate control_buf if not supported
+Date:   Sun, 2 May 2021 12:33:19 +0300
+Message-ID: <20210502093319.61313-1-mgurtovoy@nvidia.com>
+X-Mailer: git-send-email 2.18.1
 MIME-Version: 1.0
-References: <0000000000009dd35c05c135792d@google.com>
-In-Reply-To: <0000000000009dd35c05c135792d@google.com>
-From:   Xin Long <lucien.xin@gmail.com>
-Date:   Sat, 1 May 2021 17:26:40 -0400
-Message-ID: <CADvbK_fpqtbaNT24V0AKyRxVob7NiaYrf+oCZO=6FRCHjPBoUQ@mail.gmail.com>
-Subject: Re: [syzbot] possible deadlock in sctp_addr_wq_timeout_handler
-To:     syzbot <syzbot+959223586843e69a2674@syzkaller.appspotmail.com>
-Cc:     akpm@linux-foundation.org, bp@alien8.de,
-        davem <davem@davemloft.net>, hpa@zytor.com, jmattson@google.com,
-        joro@8bytes.org, Jakub Kicinski <kuba@kernel.org>,
-        kvm@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        "linux-sctp @ vger . kernel . org" <linux-sctp@vger.kernel.org>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-        mark.rutland@arm.com, masahiroy@kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        network dev <netdev@vger.kernel.org>,
-        Neil Horman <nhorman@tuxdriver.com>, pbonzini@redhat.com,
-        Peter Zijlstra <peterz@infradead.org>,
-        rafael.j.wysocki@intel.com, rostedt@goodmis.org, seanjc@google.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
-        vkuznets@redhat.com, vyasevich@gmail.com, wanpengli@tencent.com,
-        will@kernel.org, x86@kernel.org,
-        Or Cohen <orcohen@paloaltonetworks.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 4db3f2a0-06a2-40fc-7050-08d90d4d53f9
+X-MS-TrafficTypeDiagnostic: MN2PR12MB3616:
+X-Microsoft-Antispam-PRVS: <MN2PR12MB36166845161D6AF1F4BA703EDE5C9@MN2PR12MB3616.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:854;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: TH1gG75zG5QSD6Jose7MzqQPJkjqK+2uiaJTZUtD4Eu1Qwnv/iZ0PEx6OTTa2tYrdFFJ5Le8gnAp0LodaHKQ0uGsVsNtT90fC0VtB0/trFuhN2R8QVTkjk04XobfWKT3I6NypJKAjm0RCU9R+/x++BQQR8w57Tm1d/ImMgVZie4sK8npLmIX8TzsRSGr33T2LGBirkwcU+QrWK3WOprfmHavSWEBhLbmNx5CEdEzOf/m64u8M96UZYMoa4fbPXKtbHQETYVlQFoAH4UdE7Ixtk/rp4UiNMjZY7GkHi9JD3fWkjZO0iSDLsTtVqZ+mDjf2Ykm91MjNF5Qs8UC2eSUVZTl0s3hYW+sgNju6k5bYUaAAhPddN0X6FS3Ux5m/1Sd6+HrjUJ6vE4xhl9cSemkxZ/6krJJnvjmlrH8EPMVbxEORM7QAyWbrsM7fc71CIX7SH5UDCD5AXGJ3brRRC/9nefiOFscO5/010S2j0rBqPp0dBkOvAbSYyu9IOwWKybtmnozTJ64oSWoPvEgxeZybk64j14adXupzGxZXWtc1ymzbco83zkiB4m+hF5GBpZpIWA73GOzLXq+ZV1Wu9UVlLLutimr7R4z+xd1vr8TEqv06Zu8fE+ug2Jg8K3wm7jghl46Oy1mQjtBzEXWYu4JjARxkXiE2Kqo1yLEs5uVVk4=
+X-Forefront-Antispam-Report: CIP:216.228.112.35;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid04.nvidia.com;CAT:NONE;SFS:(4636009)(396003)(346002)(39860400002)(376002)(136003)(46966006)(36840700001)(70586007)(4744005)(2906002)(186003)(83380400001)(82740400003)(8936002)(336012)(316002)(356005)(36756003)(36906005)(70206006)(26005)(110136005)(36860700001)(86362001)(107886003)(1076003)(8676002)(478600001)(426003)(2616005)(4326008)(7636003)(82310400003)(5660300002)(47076005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 May 2021 09:33:22.1035
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4db3f2a0-06a2-40fc-7050-08d90d4d53f9
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.35];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT034.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3616
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 30, 2021 at 3:19 PM syzbot
-<syzbot+959223586843e69a2674@syzkaller.appspotmail.com> wrote:
->
-> Hello,
->
-> syzbot found the following issue on:
->
-> HEAD commit:    2a1d7946 Merge tag 'for-linus' of git://git.kernel.org/pub..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=159af1c1d00000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=9404cfa686df2c05
-> dashboard link: https://syzkaller.appspot.com/bug?extid=959223586843e69a2674
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11613d71d00000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12be674dd00000
->
-> The issue was bisected to:
->
-> commit 997acaf6b4b59c6a9c259740312a69ea549cc684
-> Author: Mark Rutland <mark.rutland@arm.com>
-> Date:   Mon Jan 11 15:37:07 2021 +0000
->
->     lockdep: report broken irq restoration
->
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17c36a5dd00000
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=14236a5dd00000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=10236a5dd00000
->
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+959223586843e69a2674@syzkaller.appspotmail.com
-> Fixes: 997acaf6b4b5 ("lockdep: report broken irq restoration")
->
-> ======================================================
-> WARNING: possible circular locking dependency detected
-> 5.12.0-rc8-syzkaller #0 Not tainted
-> ------------------------------------------------------
-> syz-executor044/8536 is trying to acquire lock:
-> ffff8880183933a0 (slock-AF_INET6){+.-.}-{2:2}, at: spin_lock include/linux/spinlock.h:354 [inline]
-> ffff8880183933a0 (slock-AF_INET6){+.-.}-{2:2}, at: sctp_addr_wq_timeout_handler+0x1a1/0x550 net/sctp/protocol.c:666
->
-> but task is already holding lock:
-> ffffffff8d659620 (&net->sctp.addr_wq_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:359 [inline]
-> ffffffff8d659620 (&net->sctp.addr_wq_lock){+.-.}-{2:2}, at: sctp_addr_wq_timeout_handler+0x38/0x550 net/sctp/protocol.c:626
->
-> which lock already depends on the new lock.
->
->
-> the existing dependency chain (in reverse order) is:
->
-> -> #1 (&net->sctp.addr_wq_lock){+.-.}-{2:2}:
->        __raw_spin_lock_bh include/linux/spinlock_api_smp.h:135 [inline]
->        _raw_spin_lock_bh+0x2f/0x40 kernel/locking/spinlock.c:175
->        spin_lock_bh include/linux/spinlock.h:359 [inline]
->        sctp_destroy_sock+0x204/0x440 net/sctp/socket.c:5028
->        sctp_v6_destroy_sock+0x11/0x20 net/sctp/socket.c:9528
->        sk_common_release+0x64/0x390 net/core/sock.c:3264
->        sctp_close+0x4da/0x940 net/sctp/socket.c:1531
->        inet_release+0x12e/0x280 net/ipv4/af_inet.c:431
->        inet6_release+0x4c/0x70 net/ipv6/af_inet6.c:478
->        __sock_release+0xcd/0x280 net/socket.c:599
->        sock_close+0x18/0x20 net/socket.c:1258
->        __fput+0x288/0x920 fs/file_table.c:280
->        task_work_run+0xdd/0x1a0 kernel/task_work.c:140
->        exit_task_work include/linux/task_work.h:30 [inline]
->        do_exit+0xbfc/0x2a60 kernel/exit.c:825
->        do_group_exit+0x125/0x310 kernel/exit.c:922
->        __do_sys_exit_group kernel/exit.c:933 [inline]
->        __se_sys_exit_group kernel/exit.c:931 [inline]
->        __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:931
->        do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->        entry_SYSCALL_64_after_hwframe+0x44/0xae
->
-> -> #0 (slock-AF_INET6){+.-.}-{2:2}:
->        check_prev_add kernel/locking/lockdep.c:2937 [inline]
->        check_prevs_add kernel/locking/lockdep.c:3060 [inline]
->        validate_chain kernel/locking/lockdep.c:3675 [inline]
->        __lock_acquire+0x2b14/0x54c0 kernel/locking/lockdep.c:4901
->        lock_acquire kernel/locking/lockdep.c:5511 [inline]
->        lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5476
->        __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
->        _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
->        spin_lock include/linux/spinlock.h:354 [inline]
->        sctp_addr_wq_timeout_handler+0x1a1/0x550 net/sctp/protocol.c:666
->        call_timer_fn+0x1a5/0x6b0 kernel/time/timer.c:1431
->        expire_timers kernel/time/timer.c:1476 [inline]
->        __run_timers.part.0+0x67c/0xa50 kernel/time/timer.c:1745
->        __run_timers kernel/time/timer.c:1726 [inline]
->        run_timer_softirq+0xb3/0x1d0 kernel/time/timer.c:1758
->        __do_softirq+0x29b/0x9f6 kernel/softirq.c:345
->        invoke_softirq kernel/softirq.c:221 [inline]
->        __irq_exit_rcu kernel/softirq.c:422 [inline]
->        irq_exit_rcu+0x134/0x200 kernel/softirq.c:434
->        sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1100
->        asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:632
->        __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:161 [inline]
->        _raw_spin_unlock_irqrestore+0x38/0x70 kernel/locking/spinlock.c:191
->        __debug_check_no_obj_freed lib/debugobjects.c:997 [inline]
->        debug_check_no_obj_freed+0x20c/0x420 lib/debugobjects.c:1018
->        slab_free_hook mm/slub.c:1554 [inline]
->        slab_free_freelist_hook+0x147/0x210 mm/slub.c:1600
->        slab_free mm/slub.c:3161 [inline]
->        kmem_cache_free+0x8a/0x740 mm/slub.c:3177
->        free_fs_struct fs/fs_struct.c:92 [inline]
->        exit_fs+0x123/0x170 fs/fs_struct.c:108
->        do_exit+0xbca/0x2a60 kernel/exit.c:821
->        do_group_exit+0x125/0x310 kernel/exit.c:922
->        __do_sys_exit_group kernel/exit.c:933 [inline]
->        __se_sys_exit_group kernel/exit.c:931 [inline]
->        __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:931
->        do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->        entry_SYSCALL_64_after_hwframe+0x44/0xae
->
-> other info that might help us debug this:
->
->  Possible unsafe locking scenario:
->
->        CPU0                    CPU1
->        ----                    ----
->   lock(&net->sctp.addr_wq_lock);
->                                lock(slock-AF_INET6);
->                                lock(&net->sctp.addr_wq_lock);
->   lock(slock-AF_INET6);
-Unfortunately, Commit b166a20b0738 ("net/sctp: fix race condition in
-sctp_destroy_sock")
-introduced this, and had to be reverted. I'm thinking to fix it by
-delaying the auto_asconf
-until doing bind, which makes more sense, as auto_asconf requires an
-ANY addr bind:
+Not all virtio_net devices support the ctrl queue feature. Thus, there
+is no need to allocate unused resources.
 
-diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-index a710917c5ac7..4ae428f2f2c5 100644
---- a/net/sctp/socket.c
-+++ b/net/sctp/socket.c
-@@ -357,6 +357,18 @@ static struct sctp_af *sctp_sockaddr_af(struct
-sctp_sock *opt,
-  return af;
- }
+Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+---
+ drivers/net/virtio_net.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-+static void sctp_auto_asconf_init(struct sctp_sock *sp)
-+{
-+ struct net *net = sock_net(&sp->inet.sk);
-+
-+ if (net->sctp.default_auto_asconf) {
-+ spin_lock(&net->sctp.addr_wq_lock);
-+ list_add_tail(&sp->auto_asconf_list, &net->sctp.auto_asconf_splist);
-+ spin_unlock(&net->sctp.addr_wq_lock);
-+ sp->do_auto_asconf = 1;
-+ }
-+}
-+
- /* Bind a local address either to an endpoint or to an association.  */
- static int sctp_do_bind(struct sock *sk, union sctp_addr *addr, int len)
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 7fda2ae4c40f..9b6a4a875c55 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -2870,9 +2870,13 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
  {
-@@ -418,8 +430,10 @@ static int sctp_do_bind(struct sock *sk, union
-sctp_addr *addr, int len)
-  return -EADDRINUSE;
-
-  /* Refresh ephemeral port.  */
-- if (!bp->port)
-+ if (!bp->port) {
-  bp->port = inet_sk(sk)->inet_num;
-+ sctp_auto_asconf_init(sp);
-+ }
-
-  /* Add the address to the bind address list.
-  * Use GFP_ATOMIC since BHs will be disabled.
-@@ -4993,19 +5007,6 @@ static int sctp_init_sock(struct sock *sk)
-  sk_sockets_allocated_inc(sk);
-  sock_prot_inuse_add(net, sk->sk_prot, 1);
-
-- /* Nothing can fail after this block, otherwise
-- * sctp_destroy_sock() will be called without addr_wq_lock held
-- */
-- if (net->sctp.default_auto_asconf) {
-- spin_lock(&sock_net(sk)->sctp.addr_wq_lock);
-- list_add_tail(&sp->auto_asconf_list,
--     &net->sctp.auto_asconf_splist);
-- sp->do_auto_asconf = 1;
-- spin_unlock(&sock_net(sk)->sctp.addr_wq_lock);
-- } else {
-- sp->do_auto_asconf = 0;
-- }
--
-  local_bh_enable();
-
-  return 0;
-@@ -9401,6 +9402,8 @@ static int sctp_sock_migrate(struct sock *oldsk,
-struct sock *newsk,
-  return err;
-  }
-
-+ sctp_auto_asconf_init(newsp);
-+
-  /* Move any messages in the old socket's receive queue that are for the
-  * peeled off association to the new socket's receive queue.
-  */
---
+ 	int i;
+ 
+-	vi->ctrl = kzalloc(sizeof(*vi->ctrl), GFP_KERNEL);
+-	if (!vi->ctrl)
+-		goto err_ctrl;
++	if (vi->has_cvq) {
++		vi->ctrl = kzalloc(sizeof(*vi->ctrl), GFP_KERNEL);
++		if (!vi->ctrl)
++			goto err_ctrl;
++	} else {
++		vi->ctrl = NULL;
++	}
+ 	vi->sq = kcalloc(vi->max_queue_pairs, sizeof(*vi->sq), GFP_KERNEL);
+ 	if (!vi->sq)
+ 		goto err_sq;
+-- 
 2.18.1
 
-Thanks.
->
->  *** DEADLOCK ***
->
-> 2 locks held by syz-executor044/8536:
->  #0: ffffc90000007d78 ((&net->sctp.addr_wq_timer)){+.-.}-{0:0}, at: lockdep_copy_map include/linux/lockdep.h:35 [inline]
->  #0: ffffc90000007d78 ((&net->sctp.addr_wq_timer)){+.-.}-{0:0}, at: call_timer_fn+0xd5/0x6b0 kernel/time/timer.c:1421
->  #1: ffffffff8d659620 (&net->sctp.addr_wq_lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:359 [inline]
->  #1: ffffffff8d659620 (&net->sctp.addr_wq_lock){+.-.}-{2:2}, at: sctp_addr_wq_timeout_handler+0x38/0x550 net/sctp/protocol.c:626
->
-> stack backtrace:
-> CPU: 0 PID: 8536 Comm: syz-executor044 Not tainted 5.12.0-rc8-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-> Call Trace:
->  <IRQ>
->  __dump_stack lib/dump_stack.c:79 [inline]
->  dump_stack+0x141/0x1d7 lib/dump_stack.c:120
->  check_noncircular+0x25f/0x2e0 kernel/locking/lockdep.c:2128
->  check_prev_add kernel/locking/lockdep.c:2937 [inline]
->  check_prevs_add kernel/locking/lockdep.c:3060 [inline]
->  validate_chain kernel/locking/lockdep.c:3675 [inline]
->  __lock_acquire+0x2b14/0x54c0 kernel/locking/lockdep.c:4901
->  lock_acquire kernel/locking/lockdep.c:5511 [inline]
->  lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5476
->  __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
->  _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
->  spin_lock include/linux/spinlock.h:354 [inline]
->  sctp_addr_wq_timeout_handler+0x1a1/0x550 net/sctp/protocol.c:666
->  call_timer_fn+0x1a5/0x6b0 kernel/time/timer.c:1431
->  expire_timers kernel/time/timer.c:1476 [inline]
->  __run_timers.part.0+0x67c/0xa50 kernel/time/timer.c:1745
->  __run_timers kernel/time/timer.c:1726 [inline]
->  run_timer_softirq+0xb3/0x1d0 kernel/time/timer.c:1758
->  __do_softirq+0x29b/0x9f6 kernel/softirq.c:345
->  invoke_softirq kernel/softirq.c:221 [inline]
->  __irq_exit_rcu kernel/softirq.c:422 [inline]
->  irq_exit_rcu+0x134/0x200 kernel/softirq.c:434
->  sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1100
->  </IRQ>
->  asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:632
-> RIP: 0010:__raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:161 [inline]
-> RIP: 0010:_raw_spin_unlock_irqrestore+0x38/0x70 kernel/locking/spinlock.c:191
-> Code: 74 24 10 e8 4a f9 53 f8 48 89 ef e8 82 af 54 f8 81 e3 00 02 00 00 75 25 9c 58 f6 c4 02 75 2d 48 85 db 74 01 fb bf 01 00 00 00 <e8> 63 7d 48 f8 65 8b 05 0c 48 fc 76 85 c0 74 0a 5b 5d c3 e8 d0 3c
-> RSP: 0018:ffffc9000173fc50 EFLAGS: 00000206
-> RAX: 0000000000000002 RBX: 0000000000000200 RCX: 1ffffffff1b89e11
-> RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000001
-> RBP: ffffffff9006cf00 R08: 0000000000000001 R09: 0000000000000001
-> R10: ffffffff8179e4c8 R11: 000000000000003f R12: 1ffffffff200d9df
-> R13: 0000000000000000 R14: dead000000000100 R15: dffffc0000000000
->  __debug_check_no_obj_freed lib/debugobjects.c:997 [inline]
->  debug_check_no_obj_freed+0x20c/0x420 lib/debugobjects.c:1018
->  slab_free_hook mm/slub.c:1554 [inline]
->  slab_free_freelist_hook+0x147/0x210 mm/slub.c:1600
->  slab_free mm/slub.c:3161 [inline]
->  kmem_cache_free+0x8a/0x740 mm/slub.c:3177
->  free_fs_struct fs/fs_struct.c:92 [inline]
->  exit_fs+0x123/0x170 fs/fs_struct.c:108
->  do_exit+0xbca/0x2a60 kernel/exit.c:821
->  do_group_exit+0x125/0x310 kernel/exit.c:922
->  __do_sys_exit_group kernel/exit.c:933 [inline]
->  __se_sys_exit_group kernel/exit.c:931 [inline]
->  __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:931
->  do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->  entry_SYSCALL_64_after_hwframe+0x44/0xae
-> RIP: 0033:0x43ea79
-> Code: Unable to access opcode bytes at RIP 0x43ea4f.
-> RSP: 002b:00007ffdbc348058 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-> RAX: ffffffffffffffda RBX: 00000000004b0330 RCX: 000000000043ea79
-> RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000000
-> RBP: 0000000000000000 R08: ffffffffffffffc0 R09: 0000000000000001
-> R10: 0000000000000001 R11: 0000000000000246 R12: 00000000004b0330
-> R13: 0000000000000001 R14: 0000000000000000 R15: 0000000000000001
->
->
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
->
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-> syzbot can test patches for this issue, for details see:
-> https://goo.gl/tpsmEJ#testing-patches
