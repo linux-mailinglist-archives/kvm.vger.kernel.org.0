@@ -2,95 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AE1D371770
-	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 17:03:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BBF49371784
+	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 17:07:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230225AbhECPEv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 May 2021 11:04:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42636 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230205AbhECPEt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 May 2021 11:04:49 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 60A0561364
-        for <kvm@vger.kernel.org>; Mon,  3 May 2021 15:03:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620054235;
-        bh=ln+8BofV7Gh4bD8EraABi30+kOtgmTS6KtlBAWP07u8=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=p/pcCk1Owl9SAKIf4zZn16m79oUf5KJA8G6Tm/q0sT7O0rGMXwetz1Q8eQEI/CBfQ
-         DOHo2vsd6EMNYMK/jba+J2xzuHo5DrOIkkoBFp+DY2TUUvFRJcysALBk5b6hw/xvb0
-         7GXm/9gB737FdWTk7h6mP6l84J3Za7xx8ukbniXhVWGhdMJsGIlAv8Z+Lf4S0DORdQ
-         cGtN9osHnMAK6lHsSzZ+qkRr7YEYtkned3Cj5xIazsMB+dMnvqeaTzrU5Mv7EkJx27
-         9XgkVxiaxpvzSmwfIzdsBqdMfZKO0w+KZ4UQOMe0rSaWPJbGIwiK2gT2zrdLyrO4gX
-         jGITTz2nTmFZw==
-Received: by mail-ed1-f42.google.com with SMTP id e7so6621896edu.10
-        for <kvm@vger.kernel.org>; Mon, 03 May 2021 08:03:55 -0700 (PDT)
-X-Gm-Message-State: AOAM531YdkYjx9a9bO/wl5TcuajgGkgR5Z5jA5E40SkRfrjkkVmtBlXJ
-        5kn8iywRZxrPQrGawLc+gDAoNtfJXlA5/rN+akEFIQ==
-X-Google-Smtp-Source: ABdhPJx3QTOhuJGr019PmYgMDrSRVccEeRhDKz9yDKKZ/VSDJuBePqFTTIy/Xno/zToUViVjF4VIL/WxQ0HBM99xFro=
-X-Received: by 2002:a05:6402:17b0:: with SMTP id j16mr20168200edy.97.1620054233726;
- Mon, 03 May 2021 08:03:53 -0700 (PDT)
+        id S230256AbhECPIa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 May 2021 11:08:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58040 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230123AbhECPI3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 May 2021 11:08:29 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F39E1C06174A;
+        Mon,  3 May 2021 08:07:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=kMx7dObqmiMRLKvCPPx5dZSO2/TSonq0GivO88n9Dnw=; b=RTzFX22TzavsuLNPyHWsd2y00w
+        cF7Q/aaqJCVid9CI0gOoHuVkJsFTBbZj+lTPkVmRBQuzkNZYpJG9sXa/4C5amfoRCfYEaoMelXezF
+        C0YeOyS2NPjqv9FtF+HlWKZgFNAC6y4cUT4Dth+3fQbFuNHOkJu3qze9TWiODLDmQVdOmH+q7Fnwe
+        4VInMB/ACCoVu9GXHTNkiuuMBbcoDG8s/XN1fO8sY15E1lODTIA3YXke6rzgpeM5r3GSOHg4dLvuK
+        Me1nm5M0fRzPZ9A2SFF0T9D0zvnBPeANCBMBIQX4m+RiZFxcbxM7QZpJnXNrmLIlNuqCtNrLMG0LX
+        k3rHcIew==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1ldaAH-00EBCq-9l; Mon, 03 May 2021 15:07:21 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id DFF893001D0;
+        Mon,  3 May 2021 17:07:15 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 61FAF2C1AAE0C; Mon,  3 May 2021 17:07:15 +0200 (CEST)
+Date:   Mon, 3 May 2021 17:07:15 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        tglx@linutronix.de, bp@alien8.de, jroedel@suse.de,
+        thomas.lendacky@amd.com, pbonzini@redhat.com, mingo@redhat.com,
+        dave.hansen@intel.com, rientjes@google.com, seanjc@google.com,
+        hpa@zytor.com, tony.luck@intel.com
+Subject: Re: [PATCH Part2 RFC v2 08/37] x86/sev: Split the physmap when
+ adding the page in RMP table
+Message-ID: <YJARo9vpAgb6VmLI@hirez.programming.kicks-ass.net>
+References: <20210430123822.13825-1-brijesh.singh@amd.com>
+ <20210430123822.13825-9-brijesh.singh@amd.com>
 MIME-Version: 1.0
-References: <20210430123822.13825-1-brijesh.singh@amd.com> <20210430123822.13825-11-brijesh.singh@amd.com>
- <c3950468-af35-a46d-2d50-238245ed37b3@intel.com>
-In-Reply-To: <c3950468-af35-a46d-2d50-238245ed37b3@intel.com>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Mon, 3 May 2021 08:03:42 -0700
-X-Gmail-Original-Message-ID: <CALCETrVEyBaG41gS4ntu6ikJqeiWs2gMuqfo_Yk0cdgpHyN9Dg@mail.gmail.com>
-Message-ID: <CALCETrVEyBaG41gS4ntu6ikJqeiWs2gMuqfo_Yk0cdgpHyN9Dg@mail.gmail.com>
-Subject: Re: [PATCH Part2 RFC v2 10/37] x86/fault: Add support to handle the
- RMP fault for kernel address
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, X86 ML <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210430123822.13825-9-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 3, 2021 at 7:44 AM Dave Hansen <dave.hansen@intel.com> wrote:
->
-> On 4/30/21 5:37 AM, Brijesh Singh wrote:
-> > When SEV-SNP is enabled globally, a write from the host goes through the
-> > RMP check. When the host writes to pages, hardware checks the following
-> > conditions at the end of page walk:
-> >
-> > 1. Assigned bit in the RMP table is zero (i.e page is shared).
-> > 2. If the page table entry that gives the sPA indicates that the target
-> >    page size is a large page, then all RMP entries for the 4KB
-> >    constituting pages of the target must have the assigned bit 0.
-> > 3. Immutable bit in the RMP table is not zero.
-> >
-> > The hardware will raise page fault if one of the above conditions is not
-> > met. A host should not encounter the RMP fault in normal execution, but
-> > a malicious guest could trick the hypervisor into it. e.g., a guest does
-> > not make the GHCB page shared, on #VMGEXIT, the hypervisor will attempt
-> > to write to GHCB page.
->
-> Is that the only case which is left?  If so, why don't you simply split
-> the direct map for GHCB pages before giving them to the guest?  Or, map
-> them with vmap() so that the mapping is always 4k?
+On Fri, Apr 30, 2021 at 07:37:53AM -0500, Brijesh Singh wrote:
 
-If I read Brijesh's message right, this isn't about 4k.  It's about
-the guest violating host expectations about the page type.
+> This poses a challenge in the Linux memory model. The Linux kernel
+> creates a direct mapping of all the physical memory -- referred to as
+> the physmap. The physmap may contain a valid mapping of guest owned pages.
+> During the page table walk, the host access may get into the situation where
+> one of the pages within the large page is owned by the guest (i.e assigned
+> bit is set in RMP). A write to a non-guest within the large page will
+> raise an RMP violation. To workaround it, call set_memory_4k() to split
+> the physmap before adding the page in the RMP table. This ensures that the
+> pages added in the RMP table are used as 4K in the physmap.
 
-I need to go and do a full read of all the relevant specs, but I think
-there's an analogous situation in TDX: if the host touches guest
-private memory, the TDX hardware will get extremely angry (more so
-than AMD hardware).  And, if I have understood this patch correctly,
-it's fudging around the underlying bug by intentionally screwing up
-the RMP contents to avoid a page fault.  Assuming I've understood
-everything correctly (a big if!), then I think this is backwards.  The
-host kernel should not ever access guest memory without a plan in
-place to handle failure.  We need real accessors, along the lines of
-copy_from_guest() and copy_to_guest().
+What's an RMP violation and why are they a problem?
+
+> The spliting of the physmap is a temporary solution until the kernel page
+> fault handler is improved to split the kernel address on demand.
+
+How is that an improvement? Fracturing the physmap sucks whichever way
+around.
+
+> One of the
+> disadvtange of splitting is that eventually, it will end up breaking down
+> the entire physmap unless its coalesce back to a large page. I am open to
+> the suggestation on various approaches we could take to address this problem.
+
+Have the hardware fracture the TLB entry internally?
