@@ -2,102 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55E9B3720AF
-	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 21:43:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 477D1372111
+	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 22:02:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229673AbhECToi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 May 2021 15:44:38 -0400
-Received: from mga01.intel.com ([192.55.52.88]:11738 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229499AbhECToh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 May 2021 15:44:37 -0400
-IronPort-SDR: IVbvvE8LOTM4azFXVm7c/FI2zGgSbO8sBdla+gXyPX9jcjPYtYNDZ9maApjjs87RNyC6omNWQR
- yoJ/l0IbFlfA==
-X-IronPort-AV: E=McAfee;i="6200,9189,9973"; a="218618670"
-X-IronPort-AV: E=Sophos;i="5.82,270,1613462400"; 
-   d="scan'208";a="218618670"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2021 12:43:44 -0700
-IronPort-SDR: uHSfBKMV2BOEbYd9Zz5o1JegxdT8KmkHUrFmHxHoKXFLErsGm7We4F5m3Q8anLmf85D5S/AMjI
- ZZj7T5e9KqBw==
-X-IronPort-AV: E=Sophos;i="5.82,270,1613462400"; 
-   d="scan'208";a="432904163"
-Received: from tbroiles-mobl.amr.corp.intel.com (HELO [10.209.47.222]) ([10.209.47.222])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2021 12:43:43 -0700
-Subject: Re: [PATCH Part2 RFC v2 10/37] x86/fault: Add support to handle the
- RMP fault for kernel address
-To:     Brijesh Singh <brijesh.singh@amd.com>,
-        Andy Lutomirski <luto@amacapital.net>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        tglx@linutronix.de, bp@alien8.de, jroedel@suse.de,
-        Thomas.Lendacky@amd.com, pbonzini@redhat.com, mingo@redhat.com,
-        rientjes@google.com, seanjc@google.com, peterz@infradead.org,
-        hpa@zytor.com, tony.luck@intel.com
-References: <9e3e4331-2933-7ae6-31d9-5fb73fce4353@amd.com>
- <40C2457E-C2A3-4DF7-BD16-829D927CC17C@amacapital.net>
- <1c98a55a-d4d5-866e-dcad-81caa09a495d@amd.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <b723e0dd-7af1-37b3-6553-e9ef4802dac8@intel.com>
-Date:   Mon, 3 May 2021 12:43:41 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S229610AbhECUDl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 May 2021 16:03:41 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:49378 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229497AbhECUDl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 May 2021 16:03:41 -0400
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1620072166;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XgZpXyzMSt2ZuSYziPI65CE3gq9cUvnBGAFcSg9BFNk=;
+        b=0i59kTSGkQNolbf+b00nTId26MVXzcV5mMXdgH+7pm5p9eZTQxLdS5ke1KZ1fcn0Sted+p
+        SVhLjMIy8xe2gdBAI9KELdGngxDTAGEEOdKNHagihHIfQdW1VIFyVDPVUErdnrZBshowNe
+        iRX8KFp3zcwl9eMIaNfj56CED/9F8Nb2eFDuVNB+rMgdfphdSZFuyj2Xm8uxdUKnf6r2Bo
+        bwxK++/NdjUiTXupD3kWuFL8Y9F1Lx5MmWAGGsVDscaaNyPdanXtH7W+kJzQnEQUkUq7EM
+        WhKmzVfOoZg3xWiIO8SPCU0KJGBtW8V8U5vQ2KyoTdhEbJI743slY1chrXC2Wg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1620072166;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XgZpXyzMSt2ZuSYziPI65CE3gq9cUvnBGAFcSg9BFNk=;
+        b=RQOjtFI0ZhFjpV5vlGvNQ+NvXBfAy77dvWKiYp6tyVG5UhVtN0a221OcYkCYj7rFCuiK2W
+        0ma3zEvtPU+pV8Dg==
+To:     Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org
+Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Uros Bizjak <ubizjak@gmail.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH 3/4] KVM/VMX: Invoke NMI non-IST entry instead of IST entry
+In-Reply-To: <20210426230949.3561-4-jiangshanlai@gmail.com>
+References: <20210426230949.3561-1-jiangshanlai@gmail.com> <20210426230949.3561-4-jiangshanlai@gmail.com>
+Date:   Mon, 03 May 2021 22:02:46 +0200
+Message-ID: <87eeenk2l5.ffs@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <1c98a55a-d4d5-866e-dcad-81caa09a495d@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/3/21 12:41 PM, Brijesh Singh wrote:
-> Sure, I will look into all the drivers which do a walk plus kmap to make
-> sure that they fail instead of going into the fault path. Should I drop
-> this patch or keep it just in the case we miss something?
+On Tue, Apr 27 2021 at 07:09, Lai Jiangshan wrote:
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index bcbf0d2139e9..96e59d912637 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -36,6 +36,7 @@
+>  #include <asm/debugreg.h>
+>  #include <asm/desc.h>
+>  #include <asm/fpu/internal.h>
+> +#include <asm/idtentry.h>
+>  #include <asm/io.h>
+>  #include <asm/irq_remapping.h>
+>  #include <asm/kexec.h>
+> @@ -6416,8 +6417,11 @@ static void handle_exception_nmi_irqoff(struct vcpu_vmx *vmx)
+>  	else if (is_machine_check(intr_info))
+>  		kvm_machine_check();
+>  	/* We need to handle NMIs before interrupts are enabled */
+> -	else if (is_nmi(intr_info))
+> -		handle_interrupt_nmi_irqoff(&vmx->vcpu, intr_info);
+> +	else if (is_nmi(intr_info)) {
 
-I think you should drop it, and just ensure that the existing page fault
-oops code can produce a coherent, descriptive error message about what
-went wrong.
+Lacks curly braces for all of the above conditions according to coding style.
+
+> +		kvm_before_interrupt(&vmx->vcpu);
+> +		vmx_do_interrupt_nmi_irqoff((unsigned long)asm_noist_exc_nmi);
+> +		kvm_after_interrupt(&vmx->vcpu);
+> +	}
+
+but this and the next patch are not really needed. The below avoids the
+extra kvm_before/after() dance in both places. Hmm?
+
+Thanks,
+
+        tglx
+---
+--- a/arch/x86/kernel/nmi.c
++++ b/arch/x86/kernel/nmi.c
+@@ -526,6 +526,10 @@ DEFINE_IDTENTRY_RAW(exc_nmi)
+ 
+ DEFINE_IDTENTRY_RAW_ALIAS(exc_nmi, exc_nmi_noist);
+ 
++#if IS_MODULE(CONFIG_KVM_INTEL)
++EXPORT_SYMBOL_GPL(asm_exc_nmi_noist);
++#endif
++
+ void stop_nmi(void)
+ {
+ 	ignore_nmis++;
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -36,6 +36,7 @@
+ #include <asm/debugreg.h>
+ #include <asm/desc.h>
+ #include <asm/fpu/internal.h>
++#include <asm/idtentry.h>
+ #include <asm/io.h>
+ #include <asm/irq_remapping.h>
+ #include <asm/kexec.h>
+@@ -6395,18 +6396,17 @@ static void vmx_apicv_post_state_restore
+ 
+ void vmx_do_interrupt_nmi_irqoff(unsigned long entry);
+ 
+-static void handle_interrupt_nmi_irqoff(struct kvm_vcpu *vcpu, u32 intr_info)
++static void handle_interrupt_nmi_irqoff(struct kvm_vcpu *vcpu,
++					unsigned long entry)
+ {
+-	unsigned int vector = intr_info & INTR_INFO_VECTOR_MASK;
+-	gate_desc *desc = (gate_desc *)host_idt_base + vector;
+-
+ 	kvm_before_interrupt(vcpu);
+-	vmx_do_interrupt_nmi_irqoff(gate_offset(desc));
++	vmx_do_interrupt_nmi_irqoff(entry);
+ 	kvm_after_interrupt(vcpu);
+ }
+ 
+ static void handle_exception_nmi_irqoff(struct vcpu_vmx *vmx)
+ {
++	const unsigned long nmi_entry = (unsigned long)asm_exc_nmi_noist;
+ 	u32 intr_info = vmx_get_intr_info(&vmx->vcpu);
+ 
+ 	/* if exit due to PF check for async PF */
+@@ -6417,18 +6417,20 @@ static void handle_exception_nmi_irqoff(
+ 		kvm_machine_check();
+ 	/* We need to handle NMIs before interrupts are enabled */
+ 	else if (is_nmi(intr_info))
+-		handle_interrupt_nmi_irqoff(&vmx->vcpu, intr_info);
++		handle_interrupt_nmi_irqoff(&vmx->vcpu, nmi_entry);
+ }
+ 
+ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
+ {
+ 	u32 intr_info = vmx_get_intr_info(vcpu);
++	unsigned int vector = intr_info & INTR_INFO_VECTOR_MASK;
++	gate_desc *desc = (gate_desc *)host_idt_base + vector;
+ 
+ 	if (WARN_ONCE(!is_external_intr(intr_info),
+ 	    "KVM: unexpected VM-Exit interrupt info: 0x%x", intr_info))
+ 		return;
+ 
+-	handle_interrupt_nmi_irqoff(vcpu, intr_info);
++	handle_interrupt_nmi_irqoff(vcpu, gate_offset(desc));
+ }
+ 
+ static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
