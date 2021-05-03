@@ -2,114 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95DB1371664
-	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 16:05:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67B5C371688
+	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 16:24:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234037AbhECOG0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 May 2021 10:06:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23475 "EHLO
+        id S229637AbhECOZ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 May 2021 10:25:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57119 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233712AbhECOGU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 3 May 2021 10:06:20 -0400
+        by vger.kernel.org with ESMTP id S229616AbhECOZY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 3 May 2021 10:25:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620050726;
+        s=mimecast20190719; t=1620051871;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=GNPR9aetB5O6vbBVkjBt4WTSfiMRhHXQRTN0FbjXPg4=;
-        b=D0cirnOK2AyvFzjM2BtbNQ7U+v7ClTz/b1uzu9bzTZzrizL5hcfek40Dj+GEbZzH0Af0d0
-        Gu73masjpZovOcFeTr0FbWgPfNnEsFsh31wYwz2DYH8OfdWNlXIogXztX+Tt8TfPETye3b
-        ybptc4YKtIpXHoBCD4GptK5gWNZungw=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-80-UfLIO13mO2O_qbrqJL-ykg-1; Mon, 03 May 2021 10:05:23 -0400
-X-MC-Unique: UfLIO13mO2O_qbrqJL-ykg-1
-Received: by mail-ej1-f71.google.com with SMTP id h9-20020a1709063c09b0290393e97fec0fso2070675ejg.13
-        for <kvm@vger.kernel.org>; Mon, 03 May 2021 07:05:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GNPR9aetB5O6vbBVkjBt4WTSfiMRhHXQRTN0FbjXPg4=;
-        b=hnhMvMOYn0lmIdRZoOeLFtPy4HM1ReHxxwJcjxFlTc2Ih9msrum/W/K2zud6jh9XPz
-         jnoEdXyhgyafIidpVd+Qt8NmHcYh+BgHdXfqyhVWsmV3aEEpnzojAb40FRK0/fPloQeF
-         1gYU2a8/E4gVoQB8FxgcvtNcLAM/BSx+wwFJfwm5dKwqqat6SOyP8UAMNZ4t+kKMqqBv
-         QTrMfmcr4Wy2s8MbvpKFVseGLLMBfYYtROEjfVy0jGSsJ2xj/gPjcdHG/agS5MSL6tA+
-         x/X/bGlJ4P8p4eRZ+eGKmeFiHfJvLiVtNJgkDozHkGcDQpdNy8nUEue340PG5LUzqese
-         +k1Q==
-X-Gm-Message-State: AOAM532U0/AF7X9z+NK98AZLhJnARytZKrKHPljTCtXJPZhPiIQJn+ox
-        23rsgvKhMdcf9dQ+C73xmdLBMyyz3eHIrvutQhQ7ssI7ycSMpH0e4nUdQodvuHrwyWmAFBsKZ2k
-        5goovx32AHtLz
-X-Received: by 2002:a17:906:4d8d:: with SMTP id s13mr16729101eju.37.1620050722849;
-        Mon, 03 May 2021 07:05:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw4au918keNwU9ajYzFOowIyCo1Jppz2HVvxcn98scQ414jHG95DpQAGuWs5CJ8pUcPcdDWZw==
-X-Received: by 2002:a17:906:4d8d:: with SMTP id s13mr16729075eju.37.1620050722699;
-        Mon, 03 May 2021 07:05:22 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id t14sm10993993ejc.121.2021.05.03.07.05.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 May 2021 07:05:22 -0700 (PDT)
-Subject: Re: [PATCH][next] KVM: x86: Fix potential fput on a null
- source_kvm_file
-To:     Colin King <colin.king@canonical.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        bh=98YMn44MI3AF28P/LGOwR7TI74pmmlNtJhmCw9kvmpc=;
+        b=Au8K1PRhXkc7gjDAAvkEpLoblT5iC8sDFRuM9kb/BjnXZTelV4RRzN/5Fed4e53OsXPbG6
+        7QmKZC3AgUHVkQhpzNmvSp3OZmYLMyPE3mbgxRTmnbaPYyj7YnLUVrIV/LFo75M29J7Ijk
+        HasT5JSLgjbr0UklkvVRFoWSCPDmOBY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-503-ymysQEVmPJaQCMMW76RL2g-1; Mon, 03 May 2021 10:24:27 -0400
+X-MC-Unique: ymysQEVmPJaQCMMW76RL2g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95225107ACFC;
+        Mon,  3 May 2021 14:24:25 +0000 (UTC)
+Received: from starship (unknown [10.40.193.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8B46661156;
+        Mon,  3 May 2021 14:24:21 +0000 (UTC)
+Message-ID: <21c774b2c1a4f5f90f615ac55b3eac22043854f2.camel@redhat.com>
+Subject: Re: [PATCH 4/5] KVM: nSVM: force L1's GIF to 1 when setting the
+ nested state
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Nathan Tempelman <natet@google.com>, kvm@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210430170303.131924-1-colin.king@canonical.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9d28cde2-7aff-64bb-26f4-9909344676e5@redhat.com>
-Date:   Mon, 3 May 2021 16:05:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Cathy Avery <cavery@redhat.com>
+Date:   Mon, 03 May 2021 17:24:20 +0300
+In-Reply-To: <7d2fe4a1-9603-8bea-e7f1-fb3c24198941@redhat.com>
+References: <20210503125446.1353307-1-mlevitsk@redhat.com>
+         <20210503125446.1353307-5-mlevitsk@redhat.com>
+         <7d2fe4a1-9603-8bea-e7f1-fb3c24198941@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <20210430170303.131924-1-colin.king@canonical.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/04/21 19:03, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
+On Mon, 2021-05-03 at 16:00 +0200, Paolo Bonzini wrote:
+> On 03/05/21 14:54, Maxim Levitsky wrote:
+> > While after a reset the GIF value is already 1,
+> > it doesn't have to have this value if the nested state
+> > is loaded later.
+> > 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >   arch/x86/kvm/svm/nested.c | 3 +++
+> >   1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > index 32400cba608d..12a12ae940fa 100644
+> > --- a/arch/x86/kvm/svm/nested.c
+> > +++ b/arch/x86/kvm/svm/nested.c
+> > @@ -1314,6 +1314,9 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+> >   	else
+> >   		svm->nested.vmcb02.ptr->save = svm->vmcb01.ptr->save;
+> >   
+> > +	/* Force L1's GIF to true */
+> > +	svm_set_gif(svm, true);
+> > +
+> >   	svm->nested.nested_run_pending =
+> >   		!!(kvm_state->flags & KVM_STATE_NESTED_RUN_PENDING);
+> >   
+> > 
 > 
-> The fget can potentially return null, so the fput on the error return
-> path can cause a null pointer dereference. Fix this by checking for
-> a null source_kvm_file before doing a fput.
+> Hmm, not sure about this one.  It is possible in principle to do CLGI in 
+> L2 with the intercept disabled.
+
+I need to think about this a bit more. 
+In theory we have L0 GIF, the L1 GIF and the L2 GIF.
+L0 GIF is always KVM's, so no problem.
+L1 GIF can be toggled with L1 executing clgi/stgi, and it will be either stored in 
+vmcb.int_ctl (vmcb01 or vmcb02) or in hflags depending if vGIF is enabled.
+(the L1 owned bits are copied in nested_vmcb02_prepare_control)
+
+For L2 we never advertise virtual gif and we don't let it set V_GIF_ENABLE_MASK
+in int_ctl, so it either intercepts clgi/stgi and does its own businesses with it
+or it doesn't intercept it in which case L2 indeed just modifies L1 GIF.
+
+
 > 
-> Addresses-Coverity: ("Dereference null return")
-> Fixes: 54526d1fd593 ("KVM: x86: Support KVM VMs sharing SEV context")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> ---
->   arch/x86/kvm/svm/sev.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+> You need to use
 > 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 1356ee095cd5..8b11c711a0e4 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -1764,7 +1764,8 @@ int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd)
->   e_source_unlock:
->   	mutex_unlock(&source_kvm->lock);
->   e_source_put:
-> -	fput(source_kvm_file);
-> +	if (source_kvm_file)
-> +		fput(source_kvm_file);
->   	return ret;
->   }
->   
+> svm_set_gif(svm, !!(kvm_state->flags & KVM_STATE_NESTED_GIF_SET));
+
+
+Assuming that the above is correct, then indeed, this should be done,
+so I'll send a patch for this.
+Thanks a lot!!
+
+Best regards,
+	Maxim Levitsky
+
+
+
+> 
+> instead.
+> 
+> Paolo
 > 
 
-Queued, thanks.
-
-Paolo
 
