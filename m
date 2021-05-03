@@ -2,125 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 93C0A3713DD
-	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 12:54:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D064A3713ED
+	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 13:02:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233212AbhECKzq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 May 2021 06:55:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25451 "EHLO
+        id S233062AbhECLD1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 May 2021 07:03:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44640 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233247AbhECKzq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 3 May 2021 06:55:46 -0400
+        by vger.kernel.org with ESMTP id S229811AbhECLD0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 3 May 2021 07:03:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620039292;
+        s=mimecast20190719; t=1620039753;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Y3t+kPfLjNDbkhI03RIcjqpeyYZyaL5l/wCZp6xDiZo=;
-        b=NNdNqMIZGn8tvhyFGp6OS0sbuP6DVtiVeOPNpemL+aySSTZd230mFhIMu/AkwV4QfUsNzL
-        f7M4KseD89kUthGRT2GkhMs209MxdORJYqYnCWDI5s9JOKlAYWYbIfdM4O8bNcQe8n8qYj
-        TYOXi09k1e/CKAJkTA0GyddvVJ0nlQA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490-74LuuizoOG2gCKOmN6aoUw-1; Mon, 03 May 2021 06:54:49 -0400
-X-MC-Unique: 74LuuizoOG2gCKOmN6aoUw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B450061245;
-        Mon,  3 May 2021 10:54:46 +0000 (UTC)
-Received: from gondolin.fritz.box (ovpn-113-109.ams2.redhat.com [10.36.113.109])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 265461064146;
-        Mon,  3 May 2021 10:54:42 +0000 (UTC)
-Date:   Mon, 3 May 2021 12:54:40 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Eric Farman <farman@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Christoph Hellwig <hch@lst.de>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-Subject: s390 common I/O layer locking (was: [PATCH v2 07/13] vfio/ccw:
- Convert to use vfio_register_group_dev())
-Message-ID: <20210503125440.0acd7c1f.cohuck@redhat.com>
-In-Reply-To: <20210430171908.GD1370958@nvidia.com>
-References: <0-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com>
-        <7-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com>
-        <20210428190949.4360afb7.cohuck@redhat.com>
-        <20210428172008.GV1370958@nvidia.com>
-        <20210429135855.443b7a1b.cohuck@redhat.com>
-        <20210429181347.GA3414759@nvidia.com>
-        <20210430143140.378904bf.cohuck@redhat.com>
-        <20210430171908.GD1370958@nvidia.com>
-Organization: Red Hat GmbH
+        bh=/EWTxxOMyJ8o5vQqPG2GzHZg6NeXROGBPlWyiCjpcdE=;
+        b=R6N9wgYzQSDcmBKSjgF3z4fE8gCGMC6CtwVwNVoW2OZTMVRwHhOyH2qx4Q9Dsq3L7FNdwm
+        zDkk60gFvzdo6TlqwrQqZynfnbjmWMrN1/cM7Ls8OVP7bJPi3fRW08yWVM0Wo9ZVUESf+x
+        7wqeUGKeBLH+EVy4vwb1w4Aq+md6HSc=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-497-n13-wgSlPherQCuHILKc7Q-1; Mon, 03 May 2021 07:02:31 -0400
+X-MC-Unique: n13-wgSlPherQCuHILKc7Q-1
+Received: by mail-ed1-f70.google.com with SMTP id r19-20020a05640251d3b02903888eb31cafso3442413edd.13
+        for <kvm@vger.kernel.org>; Mon, 03 May 2021 04:02:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/EWTxxOMyJ8o5vQqPG2GzHZg6NeXROGBPlWyiCjpcdE=;
+        b=met0cW/U6BOQ6WXhoAf2nJDY2WWdrrHaekLo5+2/gcoCFpx6RFAURf8FYG6LiWFDPP
+         qSfoFv/D3de79IFKM/jV9OMAQEMSWt4qvaMIrP23bzZfab81dYCpp3nFjxY+nwJRKZ2h
+         n4BdrG7kRGsKaBPhU3JjatmYOjxwVgY1qVnIlMvVh8OLcip5mCPHBxUWaLD7AadmnDZP
+         NC0pP/5ao9md11XWk2awGMALcd2IB+KZJEbg6r320yjF9F5mgjFdXip0h9Usnv1zAi5j
+         LaYWjRFWevFOE1Mue26zzt3yH8sIXnxX5snQ2QE8hdlASsHxVMfSIRzlucBetCJwhwKa
+         JhfQ==
+X-Gm-Message-State: AOAM5300cnSjMu6LWeyvGIe4F64o+1oSz/Bu+UQG8tEuxLNcnTIJ47K2
+        bHhLOyRN7AodNCMuGcgrzGXaoqrVI24EEsySAqdCQF8IsejIDIektvzGjFtwOOVo5hDgpPEPvgT
+        tseAOjoAC3TDY
+X-Received: by 2002:a05:6402:105a:: with SMTP id e26mr19293110edu.164.1620039750344;
+        Mon, 03 May 2021 04:02:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJylvnp9X0+uVBO9kOzAkvwMm/5iedsAamzZstZykQGU7cKIbzwdsosMtEaYT37CgFxd2xM9kQ==
+X-Received: by 2002:a05:6402:105a:: with SMTP id e26mr19293100edu.164.1620039750229;
+        Mon, 03 May 2021 04:02:30 -0700 (PDT)
+Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+        by smtp.gmail.com with ESMTPSA id re14sm11068149ejb.20.2021.05.03.04.02.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 May 2021 04:02:29 -0700 (PDT)
+Date:   Mon, 3 May 2021 13:02:28 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        pbonzini@redhat.com, maz@kernel.org, alexandru.elisei@arm.com,
+        eric.auger@redhat.com
+Subject: Re: [PATCH v2 1/5] KVM: selftests: Rename vm_handle_exception
+Message-ID: <20210503110228.646nvqd3ickuolbu@gator.home>
+References: <20210430232408.2707420-1-ricarkol@google.com>
+ <20210430232408.2707420-2-ricarkol@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210430232408.2707420-2-ricarkol@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 30 Apr 2021 14:19:08 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> On Fri, Apr 30, 2021 at 02:31:40PM +0200, Cornelia Huck wrote:
-> > On Thu, 29 Apr 2021 15:13:47 -0300
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> > > All the checks for !private need some kind of locking. The driver core
-> > > model is that the 'struct device_driver' callbacks are all called
-> > > under the device_lock (this prevents the driver unbinding during the
-> > > callback). I didn't check if ccs does this or not..  
-> > 
-> > probe/remove/shutdown are basically a forward of the callbacks at the
-> > bus level.  
+On Fri, Apr 30, 2021 at 04:24:03PM -0700, Ricardo Koller wrote:
+> Rename the vm_handle_exception function to a name that indicates more
+> clearly that it installs something: vm_install_vector_handler.
 > 
-> These are all covered by device_lock
-> 
-> > The css bus should make sure that we serialize
-> > irq/sch_event/chp_event with probe/remove.  
-> 
-> Hum it doesn't look OK, like here:
-> 
-> css_process_crw()
->   css_evaluate_subchannel()
->    sch = bus_find_device()
->       -- So we have a refcount on the struct device
->    css_evaluate_known_subchannel() {
-> 	if (sch->driver) {
-> 		if (sch->driver->sch_event)
-> 			ret = sch->driver->sch_event(sch, slow);
->    }
-> 
-> But the above call and touches to sch->driver (which is really just
-> sch->dev.driver) are unlocked and racy.
-> 
-> I would hold the device_lock() over all touches to sch->driver outside
-> of a driver core callback.
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Suggested-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  tools/testing/selftests/kvm/include/x86_64/processor.h    | 2 +-
+>  tools/testing/selftests/kvm/lib/x86_64/processor.c        | 4 ++--
+>  tools/testing/selftests/kvm/x86_64/kvm_pv_test.c          | 2 +-
+>  .../selftests/kvm/x86_64/userspace_msr_exit_test.c        | 8 ++++----
+>  tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c       | 2 +-
+>  5 files changed, 9 insertions(+), 9 deletions(-)
+>
 
-I think this issue did not come up much before, as most drivers on the
-css bus tend to stay put during the lifetime of the device; but yes, it
-seems we're missing some locking.
-
-For the css bus, we need locking for the event callbacks; for irq, this
-may interact with the subchannel lock and likely needs some care.
-
-I also looked at the other busses in the common I/O layer: scm looks
-good at a glance, ccwgroup and ccw have locking for online/offline; the
-other callbacks for the ccw drivers probably need to take the device
-lock as well.
-
-Common I/O layer maintainers, does that look right?
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
