@@ -2,93 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A7E58371E99
-	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 19:30:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53A30371EA4
+	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 19:30:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231649AbhECRa4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 May 2021 13:30:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33864 "EHLO
+        id S231877AbhECRbM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 May 2021 13:31:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231285AbhECRaz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 May 2021 13:30:55 -0400
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C2BAC06174A
-        for <kvm@vger.kernel.org>; Mon,  3 May 2021 10:30:00 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id i24so7205630edy.8
-        for <kvm@vger.kernel.org>; Mon, 03 May 2021 10:30:00 -0700 (PDT)
+        with ESMTP id S231869AbhECRbJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 May 2021 13:31:09 -0400
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10FA0C06174A
+        for <kvm@vger.kernel.org>; Mon,  3 May 2021 10:30:16 -0700 (PDT)
+Received: by mail-oi1-x22e.google.com with SMTP id i81so6114338oif.6
+        for <kvm@vger.kernel.org>; Mon, 03 May 2021 10:30:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+        d=chromium.org; s=google;
+        h=mime-version:in-reply-to:references:from:date:message-id:subject:to
          :cc;
-        bh=Wo+3D2WH6zYwTkILvVy6D/EkEPxtoZBBnnAY6b6btd4=;
-        b=sEGX8JuBNskey+iHEkDuFkLzMsN8mdfs5ym8ZOw6mVx23SZFxzP3RgCAcoRiBr6TPy
-         fytvGyD6UGsc3MctHTcM152ui5Bm8crn9r5W1WPZA+mWKXi2pt3TH1xJOtOXZpKRPsk8
-         63mjaA8bNYBoXVrih6tCRGT6ZLXuoBLHgB2PZjgHBFjiP5aMjp7oG2rGmfZdxKEu/k3B
-         RQHQcS2N7zee+JD0YdlADTQjfgcjupfRhR+wEiuRErmoe5zeNtc4+mPp5Clp33uOGwTU
-         yNM8pcC8oRd1fZ26aiOk6u77uiwiU8PW2dbjKqSGTVMVHWxjWYsPyNIiG8x9tn+CeQFI
-         byHQ==
+        bh=Ww87/u28SrRs0AQb4VrCAG+F/OsSAQIfgx2ufgEvzqY=;
+        b=PaA3j1/67BuxpHs5cHtkSBua8jHfnIBQMQVjhlvU2kAmkpSmE5j4goJW2Seb5ggfC4
+         d0a0P9ucBr1lQHazoec0gul5+AcXcg8XIzQFMrtVJdinRbmTvwhKcRGfExe2fDDzhPaW
+         uFHaPoDhrvRXpXx8tjxa3LDcLZ86Du6oZWf1o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+        h=x-gm-message-state:mime-version:in-reply-to:references:from:date
          :message-id:subject:to:cc;
-        bh=Wo+3D2WH6zYwTkILvVy6D/EkEPxtoZBBnnAY6b6btd4=;
-        b=cIj1VWuLURzfSe0VWAe6k5DrXUTn7OTiTdsxjIdRoTH7RWbW56Bg5XAAKrE7YE7Hb3
-         njxvl8bGDwczodVtCXxsrSIcF+pDzvmd3M8McVi9cgMPuSutAlw4MobP3L4Xew6B4Gei
-         RocMU1Fqb+RJTZlQUs/m3BqxMDwHTKiPBDq1qMq9n6SPlyqE4dqWPQhvP1szZq+HGHVG
-         34GRPv7u/WDQZRn6AbrmnREwYVs45qSGOzj6sFNL7Mq/Z0yNmQ2Q1+S0I6MoGbnat6Cm
-         WQnjLg3I0RtuU/d+dztOEhUOK1iCbfry5+wRbU5b005Iu404cQEKVfZdp+BJP7qxDb6H
-         F8+Q==
-X-Gm-Message-State: AOAM530khjauHby6muq34OGvumoBPJVYSwDAlTShGKK3uJuZOZ8qi5L1
-        8cPZ9ZkTnkuaX/2/DU3X7HsjhST69AgG5TzHvSbqYA==
-X-Google-Smtp-Source: ABdhPJyU5c1skKCSJwjpn4CF3EhnwaMRKedy59htKPIKzkTK643efQAWfH8HBBvmzxuv782rYPKfCxu7ar+C4333clY=
-X-Received: by 2002:a50:eb47:: with SMTP id z7mr19538118edp.68.1620062998464;
- Mon, 03 May 2021 10:29:58 -0700 (PDT)
+        bh=Ww87/u28SrRs0AQb4VrCAG+F/OsSAQIfgx2ufgEvzqY=;
+        b=FPWiS0xccf0WtW/xjvIZnnOrJKsumduzI2HTlJUpAQEt5ucBf/zpJYpkwA6fHeXbhh
+         o4TJOGXLyMuB2iBajis25a1EBj8Dwg8OPn54IVjMGn3bEzXdqsSpBth7x8ahnTiE7HEj
+         cFL1C/d6IkipgHJ1mEVy//VgoxMI9GA+HEUL3kMa80jxcLbkokcfSkIsk8z0Q0NS/Ls1
+         PD1njJ13YNJNo7poVm7uG7/+md85hTZaagn9bn0Cw2BlAGOcKwb0vdUO6LC8ykY7Cz3J
+         OZQsmFW6Amw0fhPW7k3BxJJifgMqSmMlg/9/r7YK52VHy+GN8oRuL/G2GsI0jFNgN/SB
+         HrAg==
+X-Gm-Message-State: AOAM532p39WBuDk3YeL0Q+SnPzdDcdgTIR0MDqmgT7lN9ectiMMFXhMW
+        RU1h87EjRPcFcZ0ilIecaP/rX8YPEY3C6gOTYiLUvg==
+X-Google-Smtp-Source: ABdhPJwNJ6NhUIpWVP8Ew1bTdKLBqrSK3V9oiD1uFsOIkcV4l4YiX9BNnR4CDl3qtDtLMexXC63mmJsQ0V1nxxAh1ik=
+X-Received: by 2002:a54:4716:: with SMTP id k22mr14633067oik.55.1620063015513;
+ Mon, 03 May 2021 10:30:15 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210429211833.3361994-1-bgardon@google.com> <20210429211833.3361994-8-bgardon@google.com>
- <ad4ccd85-a5c0-b80f-f268-14ed0f82a3ad@redhat.com>
-In-Reply-To: <ad4ccd85-a5c0-b80f-f268-14ed0f82a3ad@redhat.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 3 May 2021 10:29:47 -0700
-Message-ID: <CANgfPd-mhu3YD_D2ne7QRiuAavKuge_CQuLwNSSKkLw0qeVoDA@mail.gmail.com>
-Subject: Re: [PATCH v2 7/7] KVM: x86/mmu: Lazily allocate memslot rmaps
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Received: by 2002:a9d:a05:0:0:0:0:0 with HTTP; Mon, 3 May 2021 10:30:15 -0700 (PDT)
+In-Reply-To: <20210502093319.61313-1-mgurtovoy@nvidia.com>
+References: <20210502093319.61313-1-mgurtovoy@nvidia.com>
+From:   Venkatesh Srinivas <venkateshs@chromium.org>
+Date:   Mon, 3 May 2021 10:30:15 -0700
+Message-ID: <CAA0tLEoT2P05cb8N+PXx7PLUgzvWqDtZ9eaMVhYtM5KXKF6E=A@mail.gmail.com>
+Subject: Re: [PATCH 1/1] virtio-net: don't allocate control_buf if not supported
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     mst@redhat.com, kvm@vger.kernel.org, jasowang@redhat.com,
+        virtualization@lists.linux-foundation.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 3, 2021 at 6:42 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On 5/2/21, Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
+> Not all virtio_net devices support the ctrl queue feature. Thus, there
+> is no need to allocate unused resources.
 >
-> On 29/04/21 23:18, Ben Gardon wrote:
-> > +int alloc_memslots_rmaps(struct kvm *kvm, struct kvm_memslots *slots)
->
-> This can be static, can't it?
+> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
 
-Ah, yes. Absolutely.
+Reviewed-by: Venkatesh Srinivas <venkateshs@chromium.org>
 
+> ---
+>  drivers/net/virtio_net.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
 >
-> Paolo
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 7fda2ae4c40f..9b6a4a875c55 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -2870,9 +2870,13 @@ static int virtnet_alloc_queues(struct virtnet_info
+> *vi)
+>  {
+>  	int i;
 >
-> > +{
-> > +     struct kvm_memory_slot *slot;
-> > +     int r = 0;
-> > +
-> > +     kvm_for_each_memslot(slot, slots) {
-> > +             r = alloc_memslot_rmap(kvm, slot, slot->npages);
-> > +             if (r)
-> > +                     break;
-> > +     }
-> > +     return r;
-> > +}
-> > +
+> -	vi->ctrl = kzalloc(sizeof(*vi->ctrl), GFP_KERNEL);
+> -	if (!vi->ctrl)
+> -		goto err_ctrl;
+> +	if (vi->has_cvq) {
+> +		vi->ctrl = kzalloc(sizeof(*vi->ctrl), GFP_KERNEL);
+> +		if (!vi->ctrl)
+> +			goto err_ctrl;
+> +	} else {
+> +		vi->ctrl = NULL;
+> +	}
+>  	vi->sq = kcalloc(vi->max_queue_pairs, sizeof(*vi->sq), GFP_KERNEL);
+>  	if (!vi->sq)
+>  		goto err_sq;
+> --
+> 2.18.1
+>
 >
