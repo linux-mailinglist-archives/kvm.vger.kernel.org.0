@@ -2,145 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DA1D6372210
-	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 22:53:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BF1E372258
+	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 23:17:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229667AbhECUyJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 May 2021 16:54:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51566 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229601AbhECUyH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 May 2021 16:54:07 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31EF5C061573
-        for <kvm@vger.kernel.org>; Mon,  3 May 2021 13:53:14 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id z34so809906pgl.13
-        for <kvm@vger.kernel.org>; Mon, 03 May 2021 13:53:14 -0700 (PDT)
+        id S229693AbhECVSg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 May 2021 17:18:36 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:33927 "EHLO
+        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229499AbhECVSg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 May 2021 17:18:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=HG2iNPS4vD6GrbqrBfY2VORMzd+kD2GBhkRPz7mriA8=;
-        b=n2ftQwm8noxgljSPL4wW5Y3SCTg7vd3R4Vy7KhuNmyKgm3rffGmKYAZHVOqlUp/Ary
-         STPerdv+arJoa+ql79CrWotvXvy2wY/r7yQdYW7+b+WAFHe621SSDOFwnXBPx0HIO6bU
-         D5/8di/nCu32y9NFL/tasW5xRLrMDw5tLP81BEwLjInJ2sD+BAKP17UeOpg0pih1j8gU
-         ybsslREp0Fqrxstt2SIxjvo2nXSD26MW2fFH3XWNqmmAJhjrXUi4QVICj8l3sOdi3UIb
-         waJPUX2VhYTdTxppxyToFNeo4cXrfxoAYvgNCDK3ItobxIl62P/fGelG2hGY8fWdYsFM
-         x2kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=HG2iNPS4vD6GrbqrBfY2VORMzd+kD2GBhkRPz7mriA8=;
-        b=IdU8KzyB2Km9kwZsMdzz+GWk7zkDMbtUINIrM2h08/ztQlqeuKseVnxPU37j/e2gLk
-         x7rI5bG7qUQYwyvu0LjlaQugWrPo1PsD0Pl0dY2TW+omKNa3rI5c79IzorGyEzdbFgqX
-         V3Xkxo5ChDzz7uUTlUZB/yQlLtx1lHsAM13YNE19pBxbtgyJQQUs5U+W0Kd/N3EsvM0V
-         MY7STySKF/eaLTwKH3jMGtSeIt1vb0kfDGmoWf+pVCL+Qu2dTzO4F61lva+7ALCOm3t4
-         eaLLAA7zVto5oBDKoHvhRvd5krf1jlFnMpHV5dQYRK8lzmqJkBe1uoBcDJfFeqByT/El
-         M75A==
-X-Gm-Message-State: AOAM532TZcXqP7L80n6snpsSrUxg+EGkUIk4mRn6uyMl6QTwvuI3VWqh
-        wPNYwQbwzxIIDoMkAqLGJGnpnK/kSRLiMA==
-X-Google-Smtp-Source: ABdhPJyAEygoMk7Ly1OgLpfsjKRWjlj1zjMSVtHgt83+UZ1qGH/TogN/idt2I2LqqUGNhSNwwo7AuQ==
-X-Received: by 2002:a05:6a00:c8:b029:260:f25a:f2ef with SMTP id e8-20020a056a0000c8b0290260f25af2efmr20322820pfj.78.1620075193504;
-        Mon, 03 May 2021 13:53:13 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id g8sm9749944pfo.85.2021.05.03.13.53.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 May 2021 13:53:12 -0700 (PDT)
-Date:   Mon, 3 May 2021 20:53:09 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Siddharth Chandrasekaran <sidcha@amazon.de>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1620076663; x=1651612663;
+  h=date:from:to:cc:message-id:references:mime-version:
+   in-reply-to:subject;
+  bh=04TqWL9x3kySh2dDc818s2E7ADPYmdphIO/5JHsPMSc=;
+  b=rH+QVhBhwaJS+0U5EPixs8azYWre4dvVBrbNTeKgDbbbyyHKUrDza3vx
+   Zmk2hehkk94dkLHt0QLneMQS3vJ4f4QPVJSuD+6oazt92nc+L+SvogcXR
+   4B0lxhPRa9V1iy13uiAkGLYeGeDlzw49PbG9R9KlWgrq6oK1SdifRWuTe
+   Q=;
+X-IronPort-AV: E=Sophos;i="5.82,271,1613433600"; 
+   d="scan'208";a="105449271"
+Subject: Re: [PATCH] KVM: x86: Hoist input checks in kvm_add_msr_filter()
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2b-8cc5d68b.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-4101.iad4.amazon.com with ESMTP; 03 May 2021 21:17:35 +0000
+Received: from EX13D28EUC003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-2b-8cc5d68b.us-west-2.amazon.com (Postfix) with ESMTPS id 02C54A059E;
+        Mon,  3 May 2021 21:17:32 +0000 (UTC)
+Received: from uc8bbc9586ea454.ant.amazon.com (10.43.162.28) by
+ EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 3 May 2021 21:17:27 +0000
+Date:   Mon, 3 May 2021 23:17:23 +0200
+From:   Siddharth Chandrasekaran <sidcha@amazon.de>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: Hoist input checks in kvm_add_msr_filter()
-Message-ID: <YJBitcip8/WIsaB9@google.com>
+        <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Message-ID: <20210503211722.GA8688@uc8bbc9586ea454.ant.amazon.com>
 References: <20210503122111.13775-1-sidcha@amazon.de>
+ <YJBitcip8/WIsaB9@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20210503122111.13775-1-sidcha@amazon.de>
+In-Reply-To: <YJBitcip8/WIsaB9@google.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Originating-IP: [10.43.162.28]
+X-ClientProxiedBy: EX13D18UWA003.ant.amazon.com (10.43.160.238) To
+ EX13D28EUC003.ant.amazon.com (10.43.164.43)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 03, 2021, Siddharth Chandrasekaran wrote:
-> In ioctl KVM_X86_SET_MSR_FILTER, input from user space is validated
-> after a memdup_user(). For invalid inputs we'd memdup and then call
-> kfree unnecessarily. Hoist input validation to avoid kfree altogether.
+On Mon, May 03, 2021 at 08:53:09PM +0000, Sean Christopherson wrote:
+> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
 > 
-> Signed-off-by: Siddharth Chandrasekaran <sidcha@amazon.de>
-> ---
->  arch/x86/kvm/x86.c | 21 ++++++---------------
->  1 file changed, 6 insertions(+), 15 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index ee0dc58ac3a5..15c20b31cc91 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5393,11 +5393,16 @@ static int kvm_add_msr_filter(struct kvm_x86_msr_filter *msr_filter,
->  	struct msr_bitmap_range range;
->  	unsigned long *bitmap = NULL;
->  	size_t bitmap_size;
-> -	int r;
->  
->  	if (!user_range->nmsrs)
->  		return 0;
->  
-> +	if (user_range->flags & ~(KVM_MSR_FILTER_READ | KVM_MSR_FILTER_WRITE))
-> +		return -EINVAL;
-> +
-> +	if (!user_range->flags)
-> +		return -EINVAL;
-> +
->  	bitmap_size = BITS_TO_LONGS(user_range->nmsrs) * sizeof(long);
->  	if (!bitmap_size || bitmap_size > KVM_MSR_FILTER_MAX_BITMAP_SIZE)
->  		return -EINVAL;
-> @@ -5413,24 +5418,10 @@ static int kvm_add_msr_filter(struct kvm_x86_msr_filter *msr_filter,
->  		.bitmap = bitmap,
->  	};
->  
-> -	if (range.flags & ~(KVM_MSR_FILTER_READ | KVM_MSR_FILTER_WRITE)) {
-> -		r = -EINVAL;
-> -		goto err;
-> -	}
-> -
-> -	if (!range.flags) {
-> -		r = -EINVAL;
-> -		goto err;
-> -	}
-> -
-> -	/* Everything ok, add this range identifier. */
->  	msr_filter->ranges[msr_filter->count] = range;
+> 
+> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
+> 
+> On Mon, May 03, 2021, Siddharth Chandrasekaran wrote:
+> > In ioctl KVM_X86_SET_MSR_FILTER, input from user space is validated
+> > after a memdup_user(). For invalid inputs we'd memdup and then call
+> > kfree unnecessarily. Hoist input validation to avoid kfree altogether.
+> >
+> > Signed-off-by: Siddharth Chandrasekaran <sidcha@amazon.de>
+> > ---
+> >  arch/x86/kvm/x86.c | 21 ++++++---------------
+> >  1 file changed, 6 insertions(+), 15 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index ee0dc58ac3a5..15c20b31cc91 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -5393,11 +5393,16 @@ static int kvm_add_msr_filter(struct kvm_x86_msr_filter *msr_filter,
+> >       struct msr_bitmap_range range;
+> >       unsigned long *bitmap = NULL;
+> >       size_t bitmap_size;
+> > -     int r;
+> >
+> >       if (!user_range->nmsrs)
+> >               return 0;
+> >
+> > +     if (user_range->flags & ~(KVM_MSR_FILTER_READ | KVM_MSR_FILTER_WRITE))
+> > +             return -EINVAL;
+> > +
+> > +     if (!user_range->flags)
+> > +             return -EINVAL;
+> > +
+> >       bitmap_size = BITS_TO_LONGS(user_range->nmsrs) * sizeof(long);
+> >       if (!bitmap_size || bitmap_size > KVM_MSR_FILTER_MAX_BITMAP_SIZE)
+> >               return -EINVAL;
+> > @@ -5413,24 +5418,10 @@ static int kvm_add_msr_filter(struct kvm_x86_msr_filter *msr_filter,
+> >               .bitmap = bitmap,
+> >       };
+> >
+> > -     if (range.flags & ~(KVM_MSR_FILTER_READ | KVM_MSR_FILTER_WRITE)) {
+> > -             r = -EINVAL;
+> > -             goto err;
+> > -     }
+> > -
+> > -     if (!range.flags) {
+> > -             r = -EINVAL;
+> > -             goto err;
+> > -     }
+> > -
+> > -     /* Everything ok, add this range identifier. */
+> >       msr_filter->ranges[msr_filter->count] = range;
+> 
+> Might be worth elminating the intermediate "range", too.  Doesn't affect output,
+> but it would make it a little more obvious that the new range is mostly coming
+> straight from userspace input.  E.g.
+> 
+>         msr_filter->ranges[msr_filter->count] = (struct msr_bitmap_range) {
+>                 .flags = user_range->flags,
+>                 .base = user_range->base,
+>                 .nmsrs = user_range->nmsrs,
+>                 .bitmap = bitmap,
+>         };
+> 
+> Either way:
+> 
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
 
-Might be worth elminating the intermediate "range", too.  Doesn't affect output,
-but it would make it a little more obvious that the new range is mostly coming
-straight from userspace input.  E.g.
+Thanks for the review. Changed as suggested.
 
-	msr_filter->ranges[msr_filter->count] = (struct msr_bitmap_range) {
-		.flags = user_range->flags,
-		.base = user_range->base,
-		.nmsrs = user_range->nmsrs,
-		.bitmap = bitmap,
-	};
+~ Sid.
 
-Either way:
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
 
->  	msr_filter->count++;
->  
->  	return 0;
-> -err:
-> -	kfree(bitmap);
-> -	return r;
->  }
->  
->  static int kvm_vm_ioctl_set_msr_filter(struct kvm *kvm, void __user *argp)
-> -- 
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
+
