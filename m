@@ -2,115 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 30F7D371718
-	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 16:52:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 785D3371727
+	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 16:54:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229650AbhECOxm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 May 2021 10:53:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32884 "EHLO
+        id S229942AbhECOz1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 May 2021 10:55:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58757 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229595AbhECOxm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 3 May 2021 10:53:42 -0400
+        by vger.kernel.org with ESMTP id S229903AbhECOzZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 3 May 2021 10:55:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620053568;
+        s=mimecast20190719; t=1620053671;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rkdgV17Gm02P7t7dZkmC73s5tJJWZNXKdgqQub3pjBY=;
-        b=Z9R+A1YFoONAQqsmN5uOSFwMX2BpeGKs/PRrSOuI0rA7pDyUaE37PlnXwAwLfOVVOS1H/6
-        IsXsOIWwRkruqfzctMOGdB1raRExw2om83f4jZpQY75oOP7cwx0wLSXP+6YLqTEChpdv5Y
-        1KVcQUybDZzeuIKV2V+HQfhU7zHF+Fk=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-nj-RWGftO1GSx2uTngzwUg-1; Mon, 03 May 2021 10:52:47 -0400
-X-MC-Unique: nj-RWGftO1GSx2uTngzwUg-1
-Received: by mail-ej1-f71.google.com with SMTP id w2-20020a1709062f82b0290378745f26d5so2136867eji.6
-        for <kvm@vger.kernel.org>; Mon, 03 May 2021 07:52:47 -0700 (PDT)
+        bh=3b540+x5tTROkhNIivHz2jfrf6p5DdmXEjkUmZeSpJM=;
+        b=A5Ptyk7vR/V2/ULPbO2gsdYtkQR9m7/9bs84JP3eCO6aB8enjn0FusPEUskvJzg9X7cQWa
+        XXbenGT2rs9cG15GFO5RKqB2hdOyodpilfitwuLAawtLaih4gp/n2x/e7YjdQ2MzyYfnJY
+        2dduNU8ihCEs7hXf1K/034g71hRTxiU=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-336-zTE4NdSPMYm13HNmpQJmSQ-1; Mon, 03 May 2021 10:54:30 -0400
+X-MC-Unique: zTE4NdSPMYm13HNmpQJmSQ-1
+Received: by mail-ed1-f72.google.com with SMTP id f8-20020a0564020688b029038840895df2so4683065edy.17
+        for <kvm@vger.kernel.org>; Mon, 03 May 2021 07:54:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=rkdgV17Gm02P7t7dZkmC73s5tJJWZNXKdgqQub3pjBY=;
-        b=ShkgwNpI4zrmbHD1Z5olqHDAACoVfhpfKnoCY1bzSS67Wl2E0zK7mRx6gvDdJF/EHc
-         Z/aqGvQNly2KM4CDoZTrHxCcVz05pdHKhcbdpdsUD1EIIfQW227VVVwK50dka4liFEqS
-         GeY7mJqYUdKVPhsq01SLIUSr6VDchNI3QFNPZIJ9Knt+ALx8yKKTrR1oZIOtx+Z37Zng
-         7349GelEDWZHYTh7RPafswfP62gsWJdC11/csfUovIij+MhnxFwLbEBkviOeTyCdDQIh
-         hgfhErW58ckFKiFwZZpV1BJ1awVpi2ZkU082JKOiYb2DOjR3N4Rh81WII+hjD9BHcvLP
-         mjPg==
-X-Gm-Message-State: AOAM5304apogR7sQ+QMWHas6H+w+QOh3I5SwhAqLvoAIXbR/QrlU2/O9
-        w7w5I+u+YGL1151rTeqOPTBzVHujSOpuGtIjwaa59rZmvTJBiNqgq4EA6fOoGsgUgDbRNudf2bK
-        GDrgCrHO8LL96
-X-Received: by 2002:a17:906:6717:: with SMTP id a23mr2683768ejp.502.1620053566165;
-        Mon, 03 May 2021 07:52:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyMnE2sNfuuwJIyaATAlZeh5FXkX8/38mwdTCXyAo7/QwZgnvkrmG3xAH0wA2P0O2Bp4tbR1w==
-X-Received: by 2002:a17:906:6717:: with SMTP id a23mr2683754ejp.502.1620053566011;
-        Mon, 03 May 2021 07:52:46 -0700 (PDT)
+        bh=3b540+x5tTROkhNIivHz2jfrf6p5DdmXEjkUmZeSpJM=;
+        b=tPcH6BzIakevfhxfKealMQK9ngCwprtoBgnydLz0/G6YTcO9XlREagVQ0Ifw9JMcQa
+         nIbsnXyAfGrElL1vMJMEUmJk+7JUMgih2ATThESBh9Dp5ANpwQvzmYqXQesIq5cbvP5Z
+         BLkAdtoW5xVsGnjHkiEN/PfCaq1tTxz4g8vDKgd6Mbwgoa53SxybcEVdXxkF2uBECJw7
+         zxq+7/Y+hTWZ5/fciTUsRJ0MUdjhyxCuku3rBzKZnXZUQPwiL+lYSeVKklQBWenoUC8o
+         PJDvdMkbI3F4M8Zd32yJy+Tqleqpfq9nFcA+8suA/EAENFWG57BOsnYltPv+Ix1RI0Db
+         fSBA==
+X-Gm-Message-State: AOAM5317x751zZb93dq9CJF/wXFxCW8m58+Pn8XeRLq3qB4hurMnXQhn
+        y2ew6fRvKPU0EY7JVzqsoRzHZ3AXy9AN0mv/+7yaSwWEcJMojCXlJhwFyPxqwZ8nYg9KpgtCwmq
+        9qv6vuD8N4NFn
+X-Received: by 2002:a17:906:3884:: with SMTP id q4mr3800244ejd.492.1620053669155;
+        Mon, 03 May 2021 07:54:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxoR23CFOSjH9ccO37wfLz2PUmLdvsRxh6LTPVmadaUWrtpbDf7jx//gWJ/S64YXlz2inuaaw==
+X-Received: by 2002:a17:906:3884:: with SMTP id q4mr3800225ejd.492.1620053668986;
+        Mon, 03 May 2021 07:54:28 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id e4sm11109708ejh.98.2021.05.03.07.52.44
+        by smtp.gmail.com with ESMTPSA id go38sm11070888ejc.40.2021.05.03.07.54.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 May 2021 07:52:45 -0700 (PDT)
-Subject: Re: [PATCH] kvm: exit halt polling on need_resched() as well
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Venkatesh Srinivas <venkateshs@chromium.org>,
-        kvm@vger.kernel.org, jmattson@google.com, dmatlack@google.com
-Cc:     Benjamin Segall <bsegall@google.com>
-References: <20210429162233.116849-1-venkateshs@chromium.org>
- <ea54b776-c15a-e718-d7c9-ae8df7f24de3@de.ibm.com>
+        Mon, 03 May 2021 07:54:28 -0700 (PDT)
+Subject: Re: [PATCH v4] KVM: x86: Fix KVM_GET_CPUID2 ioctl to return cpuid
+ entries count
+To:     Sean Christopherson <seanjc@google.com>,
+        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+Cc:     linux-kernel@vger.kernel.org, Denis Lunev <den@openvz.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Alexander Graf <graf@amazon.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        Like Xu <like.xu@linux.intel.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20210428172729.3551-1-valeriy.vdovin@virtuozzo.com>
+ <YIoFFl72VSeuhCRt@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2d4ebb6d-02d8-193c-c7e9-64ec233add6e@redhat.com>
-Date:   Mon, 3 May 2021 16:52:44 +0200
+Message-ID: <0d68dbc3-8462-7763-fbad-f3b895fcf6e6@redhat.com>
+Date:   Mon, 3 May 2021 16:54:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <ea54b776-c15a-e718-d7c9-ae8df7f24de3@de.ibm.com>
+In-Reply-To: <YIoFFl72VSeuhCRt@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/04/21 19:43, Christian Borntraeger wrote:
+On 29/04/21 03:00, Sean Christopherson wrote:
+> On Wed, Apr 28, 2021, Valeriy Vdovin wrote:
+>> It's very explicit by the code that it was designed to receive some
+>> small number of entries to return E2BIG along with the corrected number.
 > 
-> 
-> On 29.04.21 18:22, Venkatesh Srinivas wrote:
->> From: Benjamin Segall <bsegall@google.com>
->>
->> single_task_running() is usually more general than need_resched()
->> but CFS_BANDWIDTH throttling will use resched_task() when there
->> is just one task to get the task to block. This was causing
->> long-need_resched warnings and was likely allowing VMs to
->> overrun their quota when halt polling.
->>
->> Signed-off-by: Ben Segall <bsegall@google.com>
->> Signed-off-by: Venkatesh Srinivas <venkateshs@chromium.org>
-> 
-> would that qualify for stable?
+> LOL, saying KVM_GET_CPUID2 was "designed" is definitely giving the KVM
+> forefathers the benefit of the doubt.
 
-Good idea indeed, I added the Cc.
+I was going to make a different joke, i.e. that KVM_GET_CPUID2 was 
+indeed designed the way Valeriy described, but that design was forgotten 
+soon after.
+
+Really, this ioctl has been such a trainwreck that I think the only good 
+solution here is to drop it.
 
 Paolo
 
->> ---
->>   virt/kvm/kvm_main.c | 3 ++-
->>   1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->> index 2799c6660cce..b9f12da6af0e 100644
->> --- a/virt/kvm/kvm_main.c
->> +++ b/virt/kvm/kvm_main.c
->> @@ -2973,7 +2973,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
->>                   goto out;
->>               }
->>               poll_end = cur = ktime_get();
->> -        } while (single_task_running() && ktime_before(cur, stop));
->> +        } while (single_task_running() && !need_resched() &&
->> +             ktime_before(cur, stop));
->>       }
->>
->>       prepare_to_rcuwait(&vcpu->wait);
->>
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index efc7a82ab140..3f941b1f4e78 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -4773,14 +4773,17 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>>   		r = -EFAULT;
+>>   		if (copy_from_user(&cpuid, cpuid_arg, sizeof(cpuid)))
+>>   			goto out;
+>> +
+>>   		r = kvm_vcpu_ioctl_get_cpuid2(vcpu, &cpuid,
+>>   					      cpuid_arg->entries);
+>> -		if (r)
+>> +
+>> +		if (r && r != -E2BIG)
+>>   			goto out;
+>> -		r = -EFAULT;
+>> -		if (copy_to_user(cpuid_arg, &cpuid, sizeof(cpuid)))
+>> +
+>> +		if (copy_to_user(cpuid_arg, &cpuid, sizeof(cpuid))) {
+>> +			r = -EFAULT;
+>>   			goto out;
+> 
+> As I pointed out[*], copying the number of entries but not the entries themselves
+> is wrong.  All of my feedback on v1 still stands.
+> 
+> [*] https://lkml.kernel.org/r/YIl4M/GgaYvwNuXv@google.com
+> 
+>> -		r = 0;
+>> +		}
+>>   		break;
+>>   	}
+>>   	case KVM_GET_MSRS: {
 > 
 
