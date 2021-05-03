@@ -2,116 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D967737156D
-	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 14:52:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9312337157A
+	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 14:54:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233815AbhECMxO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 May 2021 08:53:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46971 "EHLO
+        id S233875AbhECMzu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 May 2021 08:55:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52276 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233786AbhECMxN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 3 May 2021 08:53:13 -0400
+        by vger.kernel.org with ESMTP id S230246AbhECMzt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 3 May 2021 08:55:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620046339;
+        s=mimecast20190719; t=1620046495;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=00y6pk1lqtm3CQ8P5eKfBOeFzeVGfefBmB3Ru5wJeWQ=;
-        b=FyC9S1gTcj/piFDf+MXSrbK2RiGOHZsayxhp74AuO3Iz0i9b1FnW5ylBe5mSE1ry2auK5d
-        DYb4Mo2MYXNpeTmv6Q3uWCcKI/aCIVjaxW47XaxzWV338FgB6H1HiRNi0hlCmfxgYj9HhB
-        TPR2NKdKhRoEABj3of56IN8OFcF/m0k=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-391-57rQzjDGMzqWKRtx5uOU1Q-1; Mon, 03 May 2021 08:52:17 -0400
-X-MC-Unique: 57rQzjDGMzqWKRtx5uOU1Q-1
-Received: by mail-wr1-f71.google.com with SMTP id 93-20020adf80e60000b0290106fab45006so3861970wrl.20
-        for <kvm@vger.kernel.org>; Mon, 03 May 2021 05:52:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:organization
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=00y6pk1lqtm3CQ8P5eKfBOeFzeVGfefBmB3Ru5wJeWQ=;
-        b=JmiTRW27lHljSs+06JNuoIrDWei0Rw//lk2yZYrS7op6y79YfMcHGe95SgJrmrm4hO
-         D4PhIFRF5+FgBVBmOlGC5keiEl+G2rrD1BhBJS9d8zWK+HofyJUM+erDNp1IdF02iPNX
-         49A1m/YBkbgE4r0dgeAXwGp6tz9HHbFkyDLLZE2ZiwIw6DctL8CoT4i6gLTVzEeBITbi
-         4YNTGO6OPszYci299vumBNtVY8oFl+gGpgHnq5brBxt1MW7v2GUyC+XLCGdYK9rPvYfm
-         NUlJYD5OSy+E3UBcvwFEwU6lugtO2R/i9ZwFM6RSljH9/ABfNmW7knPCPRg0XmucTT/c
-         QFlg==
-X-Gm-Message-State: AOAM533XV5dwhNj+2KBl79JTXct602+F9yjYmt7awBcIQ1w4U8Yh4IaL
-        Ecoy6T1pjDXBvl5db9JkGO+QcMxK6mGFOKtM+2QxAqwteNyOF/ExnF2wNKZEpsWKWwtHs25wp0a
-        uPHyl47wIXHSf
-X-Received: by 2002:a05:6000:12ca:: with SMTP id l10mr25043633wrx.145.1620046336596;
-        Mon, 03 May 2021 05:52:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzBpUyPshJ4bbxqVI40aIk/ceTeMiB4otIs9gTRTA1WEiCDKVv8vl0cAJ12rix0ePOiKck2lg==
-X-Received: by 2002:a05:6000:12ca:: with SMTP id l10mr25043610wrx.145.1620046336368;
-        Mon, 03 May 2021 05:52:16 -0700 (PDT)
-Received: from [192.168.3.132] (p5b0c649f.dip0.t-ipconnect.de. [91.12.100.159])
-        by smtp.gmail.com with ESMTPSA id s1sm9772241wmj.8.2021.05.03.05.52.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 May 2021 05:52:16 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH] s390x: Fix vector stfle checks
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     thuth@redhat.com, imbrenda@linux.ibm.com, cohuck@redhat.com
-References: <20210503124713.68975-1-frankja@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Message-ID: <973d0083-6831-2822-a16f-7cb924a395b5@redhat.com>
-Date:   Mon, 3 May 2021 14:52:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+         content-transfer-encoding:content-transfer-encoding;
+        bh=1Rw8PEoNDUSMjSr1Op+FeFRDfcIRdOVFZ6tTPEgh5kA=;
+        b=c/luLvoSRJ9tfceNU2Ic0lt8rUvCqVXB1+0zuAF8qD/s73xjY+scaBUvG+CEh7goqYclDb
+        IRgQSEsHjaNPI4Ri3kbXUq03t5NsBOs+hSryO/UxuYhOllq7kOK0eueJq151gYa8tQo3Af
+        aVvFVuq+3aCwfdirYqElslUyGttZyXo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-465-nzEQ7-B_NrCWNWi_DZLH4A-1; Mon, 03 May 2021 08:54:54 -0400
+X-MC-Unique: nzEQ7-B_NrCWNWi_DZLH4A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5802E1922962;
+        Mon,  3 May 2021 12:54:52 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.40.193.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2A79E610DF;
+        Mon,  3 May 2021 12:54:47 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND
+        64-BIT)), Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+        Sean Christopherson <seanjc@google.com>,
+        Cathy Avery <cavery@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH 0/5] KVM: nSVM: few fixes for the nested migration
+Date:   Mon,  3 May 2021 15:54:41 +0300
+Message-Id: <20210503125446.1353307-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20210503124713.68975-1-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03.05.21 14:47, Janosch Frank wrote:
-> 134 is for bcd
-> 135 is for the vector enhancements
-> 
-> Not the other way around...
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Suggested-by: David Hildenbrand <david@redhat.com>
-> ---
->   s390x/vector.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/s390x/vector.c b/s390x/vector.c
-> index d1b6a571..b052de55 100644
-> --- a/s390x/vector.c
-> +++ b/s390x/vector.c
-> @@ -53,7 +53,7 @@ static void test_add(void)
->   /* z14 vector extension test */
->   static void test_ext1_nand(void)
->   {
-> -	bool has_vext = test_facility(134);
-> +	bool has_vext = test_facility(135);
->   	static struct prm {
->   		__uint128_t a,b,c;
->   	} prm __attribute__((aligned(16)));
-> @@ -79,7 +79,7 @@ static void test_ext1_nand(void)
->   /* z14 bcd extension test */
->   static void test_bcd_add(void)
->   {
-> -	bool has_bcd = test_facility(135);
-> +	bool has_bcd = test_facility(134);
->   	static struct prm {
->   		__uint128_t a,b,c;
->   	} prm __attribute__((aligned(16)));
-> 
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
-thanks!
-
--- 
-Thanks,
-
-David / dhildenb
+Those are few fixes for issues I uncovered by doing variants of a=0D
+synthetic migration test I just created:=0D
+=0D
+I modified the qemu, such that on each vm pause/resume cycle,=0D
+just prior to resuming a vCPU, qemu reads its KVM state,=0D
+then (optionaly) resets this state by uploading a=0D
+dummy reset state to KVM, and then it uploads back to KVM,=0D
+the state that this vCPU had before.=0D
+=0D
+I'll try to make this test upstreamable soon, pending few details=0D
+I need to figure out.=0D
+=0D
+Last patch in this series is for false positive warning=0D
+that I have seen lately when setting the nested state,=0D
+in nested_svm_vmexit, where it expects the vmcb01 to have=0D
+VMRUN vmexit, which is not true after nested migration,=0D
+as it is not fully initialized.=0D
+If you prefer the warning can be removed instead.=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (5):=0D
+  KVM: nSVM: fix a typo in svm_leave_nested=0D
+  KVM: nSVM: fix few bugs in the vmcb02 caching logic=0D
+  KVM: nSVM: leave the guest mode prior to loading a nested state=0D
+  KVM: nSVM: force L1's GIF to 1 when setting the nested state=0D
+  KVM: nSVM: set a dummy exit reason in L1 vmcb when loading the nested=0D
+    state=0D
+=0D
+ arch/x86/include/asm/kvm_host.h |  1 +=0D
+ arch/x86/kvm/svm/nested.c       | 29 ++++++++++++++++++++++++++---=0D
+ arch/x86/kvm/svm/svm.c          |  4 ++--=0D
+ 3 files changed, 29 insertions(+), 5 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
