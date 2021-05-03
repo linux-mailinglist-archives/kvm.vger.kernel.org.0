@@ -2,191 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 441D3371606
-	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 15:35:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04A6237161A
+	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 15:42:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234297AbhECNgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 May 2021 09:36:23 -0400
-Received: from sibelius.xs4all.nl ([83.163.83.176]:53160 "EHLO
-        sibelius.xs4all.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231166AbhECNgW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 May 2021 09:36:22 -0400
-Received: from localhost (bloch.sibelius.xs4all.nl [local])
-        by bloch.sibelius.xs4all.nl (OpenSMTPD) with ESMTPA id 06eed435;
-        Mon, 3 May 2021 15:35:25 +0200 (CEST)
-Date:   Mon, 3 May 2021 15:35:25 +0200 (CEST)
-From:   Mark Kettenis <mark.kettenis@xs4all.nl>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     vsethi@nvidia.com, sdonthineni@nvidia.com,
-        alex.williamson@redhat.com, will@kernel.org,
-        catalin.marinas@arm.com, christoffer.dall@arm.com,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        jsequeira@nvidia.com
-In-Reply-To: <87bl9sunnw.wl-maz@kernel.org> (message from Marc Zyngier on Mon,
-        03 May 2021 11:17:23 +0100)
-Subject: Re: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR
- region in VMA
-References: <20210429162906.32742-1-sdonthineni@nvidia.com>
- <20210429162906.32742-2-sdonthineni@nvidia.com>
- <20210429122840.4f98f78e@redhat.com>
- <470360a7-0242-9ae5-816f-13608f957bf6@nvidia.com>
- <20210429134659.321a5c3c@redhat.com>
- <e3d7fda8-5263-211c-3686-f699765ab715@nvidia.com>
- <87czucngdc.wl-maz@kernel.org>
- <1edb2c4e-23f0-5730-245b-fc6d289951e1@nvidia.com>
- <878s4zokll.wl-maz@kernel.org>
- <BL0PR12MB2532CC436EBF626966B15994BD5E9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <87eeeqvm1d.wl-maz@kernel.org>
- <BL0PR12MB25329EF5DFA7BBAA732064A7BD5C9@BL0PR12MB2532.namprd12.prod.outlook.com> <87bl9sunnw.wl-maz@kernel.org>
-Message-ID: <c1bd514a531988c9@bloch.sibelius.xs4all.nl>
+        id S234371AbhECNnX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 May 2021 09:43:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60284 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234374AbhECNnV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 3 May 2021 09:43:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620049348;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IOqsilqvn+aRNNXngzMn1OYzuH7ToC3yrg+kEaYj+1g=;
+        b=DfSyFZzkjK6crwUZDl72B4zuy/n9jpuppsOeFpwDJuLFZEwwunNfnOVRAipva6ld2iTuP7
+        CfLxHZh6IxCft/aaiR+3ymbcZsdo/sZPSUlHtj8XzvYGq4QZvz4UMQNG8WP9MIlQCzhOdn
+        q72TcE4+S6g2t3x3aXlwvMNpN2++4iM=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-506-9jv1Q2NwOKSC4WpTI8jSVA-1; Mon, 03 May 2021 09:42:24 -0400
+X-MC-Unique: 9jv1Q2NwOKSC4WpTI8jSVA-1
+Received: by mail-ed1-f72.google.com with SMTP id bm3-20020a0564020b03b0290387c8b79486so4523913edb.20
+        for <kvm@vger.kernel.org>; Mon, 03 May 2021 06:42:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=IOqsilqvn+aRNNXngzMn1OYzuH7ToC3yrg+kEaYj+1g=;
+        b=SvsjzxET5L/IDdh6mOQOxPCcdi26hbk2gJOfbbX5mJS6hOtBwecBlhIM36gDO8X866
+         klQaa7I3YLwNTj90cAiVF71OCUnP2+w+TdVgVXGs3I6WfECAbjTh12dsmYr8g9Os2yRw
+         Il1iD7ax80zPkqerHa+XjavHUJ1LbX7YEem9YBtzPmcuZvX6dnnGgA9Ri8DeykSE3kmf
+         AkrfKvVd5/GbSO0CjNH+KLCs6m3R28dZNzSDcNpOjTMz1EwMAw8TenEZwGaYeD7+tnMx
+         FQlV+dOdDpaTxkDJrW2HxUqian6i3+/toPZAgdlMjJDQY1hMdqJNWcQBF6BrL5uy8IKx
+         VdSQ==
+X-Gm-Message-State: AOAM530/w/N116jRHM3zy1rc6al/ODswrABfgbQQPoSshBu2skQXJfeq
+        YekSFRyJr0eLyNMPcHkhPpZ/fJtIgJBVBym5RGQ6qzBtdcDl5e+UGxSFlzZ5dhHjD0UeWkJjOYL
+        5ScTplb+EdouY
+X-Received: by 2002:a50:82e2:: with SMTP id 89mr19872358edg.0.1620049343334;
+        Mon, 03 May 2021 06:42:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzk3YnveQIawNQR3cb7zFFkOhqqtODvwbejBqHjpAgxGkRH2eHVwNnMVOHCGoASejb2epmncQ==
+X-Received: by 2002:a50:82e2:: with SMTP id 89mr19872346edg.0.1620049343181;
+        Mon, 03 May 2021 06:42:23 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id c25sm12614554edt.43.2021.05.03.06.42.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 May 2021 06:42:22 -0700 (PDT)
+To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+References: <20210429211833.3361994-1-bgardon@google.com>
+ <20210429211833.3361994-2-bgardon@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 1/7] KVM: x86/mmu: Track if shadow MMU active
+Message-ID: <e9090079-2255-5a70-f909-89f6f65c12ed@redhat.com>
+Date:   Mon, 3 May 2021 15:42:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
+MIME-Version: 1.0
+In-Reply-To: <20210429211833.3361994-2-bgardon@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Date: Mon, 03 May 2021 11:17:23 +0100
-> From: Marc Zyngier <maz@kernel.org>
-> 
-> Hi Vikram,
-> 
-> On Sun, 02 May 2021 18:56:31 +0100,
-> Vikram Sethi <vsethi@nvidia.com> wrote:
-> > 
-> > Hi Marc, 
-> > 
-> > > From: Marc Zyngier <maz@kernel.org>
-> > > Hi Vikram,
-> > > 
-> >  
-> > > The problem I see is that we have VM and userspace being written in terms
-> > > of Write-Combine, which is:
-> > > 
-> > > - loosely defined even on x86
-> > > 
-> > > - subject to interpretations in the way it maps to PCI
-> > > 
-> > > - has no direct equivalent in the ARMv8 collection of memory
-> > >   attributes (and Normal_NC comes with speculation capabilities which
-> > >   strikes me as extremely undesirable on arbitrary devices)
-> > 
-> > If speculation with Normal NC to prefetchable BARs in devices was a
-> > problem, those devices would already be broken in baremetal with
-> > ioremap_wc on arm64, and we would need quirks there to not do Normal
-> > NC for them but Device GRE, and if such a quirk was needed on
-> > baremetal, it could be picked up by vfio/KVM as well. But we haven't
-> > seen any broken devices doing wc on baremetal on ARM64, have we?
+On 29/04/21 23:18, Ben Gardon wrote:
+> +void activate_shadow_mmu(struct kvm *kvm)
+> +{
+> +	kvm->arch.shadow_mmu_active = true;
+> +}
+> +
 
-I think the SC2A11 SoC used in the Socionext developerbox counts as
-"broken":
+I think there's no lock protecting both the write and the read side.
+Therefore this should be an smp_store_release, and all checks in
+patch 2 should be an smp_load_acquire.
 
-https://www.96boards.org/documentation/enterprise/developerbox/support/known-issues.html
+Also, the assignments to slot->arch.rmap in patch 4 (alloc_memslot_rmap)
+should be an rcu_assign_pointer, while __gfn_to_rmap must be changed like so:
 
-I'm not sure my understanding of the issue is 100% correct, but I
-believe the firmware workaround described there uses the stage 2
-translation tables to map "Normal NC" onto "Device nGRE" or something
-even more restricted.  Now this hardware may be classified as simply
-broken.  However...
++	struct kvm_rmap_head *head;
+...
+-	return &slot->arch.rmap[level - PG_LEVEL_4K][idx];
++	head = srcu_dereference(slot->arch.rmap[level - PG_LEVEL_4K], &kvm->srcu,
++				 lockdep_is_held(&kvm->slots_arch_lock));
++       return &head[idx];
 
-On hardware based on the NXP LX2160A SoC we're seeing some weird
-behaviour when using "Normal NC" mappings with an AMD GPU that
-disappear by using "Device nGnRnE" mappings on OpenBSD.  No such issue
-was observed with hardware based on an Ampere eMAG SoC.  I don't fully
-understand this issue yet, and it may very well be a bug in OpenBSD
-code, but it does show there are potential pitfalls with using "Normal
-NC" for mapping prefetchable BARs of PCIe devices.
+Paolo
 
-> The lack of evidence does not equate to a proof, and your devices not
-> misbehaving doesn't mean it is the right thing, specially when we have
-> such a wide range of CPU and interconnect implementation. Which is why
-> I really want an answer at the architecture level. Not a "it works for
-> me" type of answer.
-> 
-> Furthermore, as I replied to Shanker in a separate email, what
-> Linux/arm64 does is pretty much irrelevant. KVM/arm64 implements the
-> ARMv8 architecture, and it is at that level that we need to solve the
-> problem.
-> 
-> If, by enumerating the properties of Prefetchable, you can show that
-> they are a strict superset of Normal_NC, I'm on board. I haven't seen
-> such an enumeration so far.
-> 
-> > I know we have tested NICs write combining on arm64 in baremetal, as
-> > well as GPU and NVMe CMB without issues.
-> > 
-> > Further, I don't see why speculation to non cacheble would be an
-> > issue if prefetch without side effects is allowed by the device,
-> > which is what a prefetchable BAR is.
-> > If it is an issue for a device I would consider that a bug already needing a quirk in
-> > Baremetal/host kernel already. 
-> > From PCI spec " A prefetchable address range may have write side effects, 
-> > but it may not have read side effects."
-> 
-> Right, so we have made a small step in the direction of mapping
-> "prefetchable" onto "Normal_NC", thanks for that. What about all the
-> other properties (unaligned accesses, ordering, gathering)?
-
-On x86 WC:
-
-1. Is not cached (but stores are buffered).
-
-2. Allows unaligned access just like normal memory.
-
-3. Allows speculative reads.
-
-4. Has weaker ordering than normal memory; [lsm]fence instructions are
-   needed to guarantee a particular ordering of writes with respect to
-   other writes and reads.
-
-5. Stores are buffered.  This buffer isn't snooped so it has to be
-   flushed before changes are globally visible.  The [sm]fence
-   instructions flush the store buffer.
-
-6. The store buffer may combine multiple writes into a single write.
-
-Now whether the fact the unaligned access is allowed is really part of
-the semantics of WC mappings is debatable as x86 always allows
-unaligned access, even for areas mapped with ioremap().
-
-However, this is where userland comes in.  The userland graphics stack
-does assume that graphics memory mapped throug a prefetchable PCIe BAR
-allows unaligned access if the architecture allows unaligned access
-for cacheable memory.  On arm64 this means that such memory needs to
-be "Normal NC".  And since kernel drivers tend to map such memory
-using ioremap_wc() that pretty much implies ioremap_wc() shoul use
-"Normal NC" as well isn't it?
-
-> > > How do we translate this into something consistent? I'd like to
-> > > see an actual description of what we *really* expect from WC on
-> > > prefetchable PCI regions, turn that into a documented definition
-> > > agreed across architectures, and then we can look at
-> > > implementing it with one memory type or another on arm64.
-> > > 
-> > > Because once we expose that memory type at S2 for KVM guests, it
-> > > becomes ABI and there is no turning back. So I want to get it
-> > > right once and for all.
-> > > 
-> > I agree that we need a precise definition for the Linux ioremap_wc
-> > API wrt what drivers (kernel and userspace) can expect and whether
-> > memset/memcpy is expected to work or not and whether aligned
-> > accesses are a requirement.
-> > To the extent ABI is set, I would think that the ABI is also already
-> > set in the host kernel for arm64 WC = Normal NC, so why should that
-> > not also be the ABI for same driver in VMs.
-> 
-> KVM is an implementation of the ARM architecture, and doesn't really
-> care about what WC is. If we come to the conclusion that Normal_NC is
-> the natural match for Prefetchable attributes, than we're good and we
-> can have Normal_NC being set by userspace, or even VFIO. But I don't
-> want to set it only because "it works when bare-metal Linux uses it".
-> Remember KVM doesn't only run Linux as guests.
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> 
