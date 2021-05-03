@@ -2,73 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D76AC371FCA
-	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 20:37:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A671637201D
+	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 21:05:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229549AbhECSid (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 May 2021 14:38:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49558 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229594AbhECSid (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 May 2021 14:38:33 -0400
-Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26C42C06174A
-        for <kvm@vger.kernel.org>; Mon,  3 May 2021 11:37:40 -0700 (PDT)
-Received: by mail-oi1-x22b.google.com with SMTP id e25so6337413oii.2
-        for <kvm@vger.kernel.org>; Mon, 03 May 2021 11:37:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ycjp9YKakzYJfMsw68/OJmOAmJ2d7LEiKPPYJZM/rhQ=;
-        b=ngo0XmaWH5gTZxwbdEUVi8ZstccnjudOjkpneq3evNOJjp+jxg1I9zTk8ZehM/RrrK
-         EapVgxlcDwuiQTt7N5U2ErUj/l+pfH9VKEwkZ0YunRBgUHZju+/MpnoYaBZyK9ryjYTJ
-         FNEAm3jQ3oITai4X8mJfI+caeZRLxgDen5HE2KYUUh5EsU530ipb8Hxcrgd9TaxRFqIw
-         b6/M76u8bjAZvmldevIDhSSM2TK/lx6lJgTlZdznOnx9P+plb+KdzkLyDKuOmyske4iA
-         3RhoNFg+xP5c4kqETaxiNKCB1t9ZTDeR+gKs1SL8+W2pcRD7oHu+gfiTlG4dk07DiUdC
-         G9Bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ycjp9YKakzYJfMsw68/OJmOAmJ2d7LEiKPPYJZM/rhQ=;
-        b=ikCLGkhXuYNKsag8q1uY9zaCPHFwuIECghGl8bFzaRhrzFzR60Nof0Ea9lpsZ47PX5
-         bbgecqkhclJuVzH5WF+wxAUZLhDuYtivemvArAy1BkmiqyiC8vsXdNGkJMbgMX5fljQg
-         NTswrEN0/gGjDxAhiduvYlIBCo6fZh6O191pho3TlYTxAsZB9QtNGxiq6d/hPgMxwtNd
-         1megFIjR9m/7FzSCqCaPPQHboQAslyod1DicyxIwPEQoMEL3MnGKJz2jQb/zDVhV5IGw
-         rvTOvTk6Hz8UhgOPPQp3NtUAWVT4HZMqKq3zW1be95DHRnGGkFSMwnin1TLBXJPxh4eq
-         eDBg==
-X-Gm-Message-State: AOAM5329xZZQdL9Xot4mOvKoVaFdjNWdfzx6QAC54n263SXUv6hRtJcd
-        eRavc5+rBQGed8bnCt4UHvNXIKxXeU+rMskAFi3wgw==
-X-Google-Smtp-Source: ABdhPJyvGARaa5/iBTRXxOzi1F2QBL9c4NbR422WtoBAs2wDqjdJ7B52sjIRwxQ/gDIso+WgslIEI/xGyZ7fT3Eb2v4=
-X-Received: by 2002:a05:6808:b2f:: with SMTP id t15mr21641896oij.6.1620067059263;
- Mon, 03 May 2021 11:37:39 -0700 (PDT)
-MIME-Version: 1.0
-References: <X9LJE6ElVfKECnno@google.com> <20201211012317.3722214-1-morbo@google.com>
-In-Reply-To: <20201211012317.3722214-1-morbo@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 3 May 2021 11:37:28 -0700
-Message-ID: <CALMp9eSvMtaXndor9=h40utaefQs9BPKknV7nbWFQi0phr_TvA@mail.gmail.com>
-Subject: Re: [PATCH v2] selftests: kvm: remove reassignment of non-absolute variables
-To:     Bill Wendling <morbo@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>, kvm list <kvm@vger.kernel.org>,
+        id S229596AbhECTGZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 May 2021 15:06:25 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:48974 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229497AbhECTGY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 May 2021 15:06:24 -0400
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1620068730;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FLkve6HXLfgxpJAWW6er1tQK1qnNOtpub3goAX+TdbM=;
+        b=r7T+1fS30pNUclSzvMNOId4Jc7ooI632oXoL+wBdH+efvKIyRgBV0QZHYfOBmZnYGuNGcV
+        5U7ghgY6ShUSSX3nHIErQsr2UuP7dkwCXL55R4aXlU7ioqtUFsRpa89B63egHbiXRwP0IL
+        sMdxQGpp5Xvp+a3O7/M81oE1aTtxmt520+GQS889a8UQhpEFALt5qWyM1/WlcTnEakkjc3
+        3BfrS9syoDXogzgl0bBuzQPR8vlDeoWuIrzFrROO3rwKpGRz4JYIc10uCvO3a64e73KTt7
+        EkAPlic1cFpwT5pV+b2xkced1EVqatU/4DpvaQlRBQbdRS03ncx6MAizauB9sw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1620068730;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FLkve6HXLfgxpJAWW6er1tQK1qnNOtpub3goAX+TdbM=;
+        b=uD1KjZuTN8voYLmc+tVb3tu8d2nRizEfGUX5ZzhqdF060ShxUwNwzIyqHVUSEuiKrn0AO5
+        2P8oP1s8gcjL/IAw==
+To:     Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org
+Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Shuah Khan <shuah@kernel.org>, Jian Cai <caij2003@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+        Steven Rostedt <rostedt@goodmis.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Uros Bizjak <ubizjak@gmail.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Alexandre Chartre <alexandre.chartre@oracle.com>,
+        Joerg Roedel <jroedel@suse.de>, Jian Cai <caij2003@gmail.com>,
+        xen-devel@lists.xenproject.org
+Subject: Re: [PATCH 1/4] x86/xen/entry: Rename xenpv_exc_nmi to noist_exc_nmi
+In-Reply-To: <20210426230949.3561-2-jiangshanlai@gmail.com>
+References: <20210426230949.3561-1-jiangshanlai@gmail.com> <20210426230949.3561-2-jiangshanlai@gmail.com>
+Date:   Mon, 03 May 2021 21:05:29 +0200
+Message-ID: <87r1ind4ee.ffs@nanos.tec.linutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 10, 2020 at 7:58 PM Bill Wendling <morbo@google.com> wrote:
+On Tue, Apr 27 2021 at 07:09, Lai Jiangshan wrote:
+> From: Lai Jiangshan <laijs@linux.alibaba.com>
 >
-> Clang's integrated assembler does not allow symbols with non-absolute
-> values to be reassigned. Modify the interrupt entry loop macro to be
-> compatible with IAS by using a label and an offset.
->
-> Cc: Jian Cai <caij2003@gmail.com>
-> Signed-off-by: Bill Wendling <morbo@google.com>
-> References: https://lore.kernel.org/lkml/20200714233024.1789985-1-caij2003@gmail.com/
-Reviewed-by: Jim Mattson <jmattson@google.com>
+> There is no any functionality change intended.  Just rename it and
+> move it to arch/x86/kernel/nmi.c so that we can resue it later in
+> next patch for early NMI and kvm.
+
+'Reuse it later' is not really a proper explanation why this change it
+necessary.
+
+Also this can be simplified by using aliasing which keeps the name
+spaces intact.
+
+Thanks,
+
+        tglx
+---       
+
+--- a/arch/x86/include/asm/idtentry.h
++++ b/arch/x86/include/asm/idtentry.h
+@@ -135,6 +135,9 @@ static __always_inline void __##func(str
+ #define DEFINE_IDTENTRY_RAW(func)					\
+ __visible noinstr void func(struct pt_regs *regs)
+ 
++#define DEFINE_IDTENTRY_RAW_ALIAS(alias, func)				\
++__visible noinstr void func(struct pt_regs *regs) __alias(alias)
++
+ /**
+  * DECLARE_IDTENTRY_RAW_ERRORCODE - Declare functions for raw IDT entry points
+  *				    Error code pushed by hardware
+--- a/arch/x86/kernel/nmi.c
++++ b/arch/x86/kernel/nmi.c
+@@ -524,6 +524,8 @@ DEFINE_IDTENTRY_RAW(exc_nmi)
+ 		mds_user_clear_cpu_buffers();
+ }
+ 
++DEFINE_IDTENTRY_RAW_ALIAS(exc_nmi, xenpv_exc_nmi);
++
+ void stop_nmi(void)
+ {
+ 	ignore_nmis++;
+--- a/arch/x86/xen/enlighten_pv.c
++++ b/arch/x86/xen/enlighten_pv.c
+@@ -565,12 +565,6 @@ static void xen_write_ldt_entry(struct d
+ 
+ void noist_exc_debug(struct pt_regs *regs);
+ 
+-DEFINE_IDTENTRY_RAW(xenpv_exc_nmi)
+-{
+-	/* On Xen PV, NMI doesn't use IST.  The C part is the same as native. */
+-	exc_nmi(regs);
+-}
+-
+ DEFINE_IDTENTRY_RAW_ERRORCODE(xenpv_exc_double_fault)
+ {
+ 	/* On Xen PV, DF doesn't use IST.  The C part is the same as native. */
