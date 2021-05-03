@@ -2,220 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 534103715F6
-	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 15:29:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 441D3371606
+	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 15:35:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234277AbhECNaN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 May 2021 09:30:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21556 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233773AbhECNaM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 3 May 2021 09:30:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620048559;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=e5ncV0IuRV2X8acsw7XWidCK/BBCiCt6KbPi7m/CD8g=;
-        b=iQrD531wA7j91RBb9LZjgWcqgjZQJvTBbZdJD6QTpgi0kzkPYuT0QOvUZSx0A4f/hecTEf
-        FDNONHnHm52Ui++UuegmTS/+5IFGAwEWW0siWLYvwPCZB8S4LJOOvsaHg6en6WsWvh5lWp
-        FWCLILNEzS/qsZajNXf5w1t2kvZSaHA=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-472-OUa119NEMbWKSpSR8x8IOw-1; Mon, 03 May 2021 09:29:17 -0400
-X-MC-Unique: OUa119NEMbWKSpSR8x8IOw-1
-Received: by mail-ed1-f71.google.com with SMTP id s20-20020a0564025214b029038752a2d8f3so4531176edd.2
-        for <kvm@vger.kernel.org>; Mon, 03 May 2021 06:29:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=e5ncV0IuRV2X8acsw7XWidCK/BBCiCt6KbPi7m/CD8g=;
-        b=EmkZo9BWfx+bXZgKYy9AOtZH2POd87bOG0BcIcIO4Wp1kSikBpMhTmpTsAytQRLXa3
-         w9mAyeMhuhh6k3+tRnE2GqWveuKqr7F3x1ghvDC/9SrrfHjnmAdTT3VmnTbDLIu5/s1P
-         LejG9mXA9crFBtYAR8E3+z5VmV5lg8Ir+WL8OLF44+LrVeq6DhXPcPaOxS3fA4wUkqkw
-         WV8aJmAp0C3/yf3TnCrhb0yuuVpDm/UCh+rrKQEWYtlMVHZYEO7jhNmhhAIpLjj2G05/
-         IHMTiQYgl0Bsqcth0shJUhbSJmFln8Nn1l53eRfTt6Aey9Be8NhUCs/ybjdhTbqLG7gR
-         3Tqw==
-X-Gm-Message-State: AOAM532ZCsQ4Y+6cxTjeOEmbOn/Ymx1QzWHldjuWphYD2vxVUzABiJ56
-        9zuKkmPFMlCiqZKjFKUsZKcPn3AtrHKZ0m5qpPu6fGOTTTbU2PS1hQ7y1IJSA42cHuxjwTmWNgv
-        5YJv3mZMq1C8R
-X-Received: by 2002:a17:906:57c3:: with SMTP id u3mr6342362ejr.162.1620048556668;
-        Mon, 03 May 2021 06:29:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy/Aww29E8ytLtFzAfOWI+1a+yBoHJ2PMthWXM8sX0DLGamizPpdIKkDlRNVbitW0rwV0r7nA==
-X-Received: by 2002:a17:906:57c3:: with SMTP id u3mr6342344ejr.162.1620048556461;
-        Mon, 03 May 2021 06:29:16 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id r16sm4130883edq.87.2021.05.03.06.29.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 May 2021 06:29:15 -0700 (PDT)
-To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-References: <20210429211833.3361994-1-bgardon@google.com>
- <20210429211833.3361994-7-bgardon@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 6/7] KVM: mmu: Add slots_arch_lock for memslot arch
- fields
-Message-ID: <1e9c77a9-adec-0a2d-5483-70cb2332d529@redhat.com>
-Date:   Mon, 3 May 2021 15:29:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
-MIME-Version: 1.0
-In-Reply-To: <20210429211833.3361994-7-bgardon@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        id S234297AbhECNgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 May 2021 09:36:23 -0400
+Received: from sibelius.xs4all.nl ([83.163.83.176]:53160 "EHLO
+        sibelius.xs4all.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231166AbhECNgW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 May 2021 09:36:22 -0400
+Received: from localhost (bloch.sibelius.xs4all.nl [local])
+        by bloch.sibelius.xs4all.nl (OpenSMTPD) with ESMTPA id 06eed435;
+        Mon, 3 May 2021 15:35:25 +0200 (CEST)
+Date:   Mon, 3 May 2021 15:35:25 +0200 (CEST)
+From:   Mark Kettenis <mark.kettenis@xs4all.nl>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     vsethi@nvidia.com, sdonthineni@nvidia.com,
+        alex.williamson@redhat.com, will@kernel.org,
+        catalin.marinas@arm.com, christoffer.dall@arm.com,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        jsequeira@nvidia.com
+In-Reply-To: <87bl9sunnw.wl-maz@kernel.org> (message from Marc Zyngier on Mon,
+        03 May 2021 11:17:23 +0100)
+Subject: Re: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR
+ region in VMA
+References: <20210429162906.32742-1-sdonthineni@nvidia.com>
+ <20210429162906.32742-2-sdonthineni@nvidia.com>
+ <20210429122840.4f98f78e@redhat.com>
+ <470360a7-0242-9ae5-816f-13608f957bf6@nvidia.com>
+ <20210429134659.321a5c3c@redhat.com>
+ <e3d7fda8-5263-211c-3686-f699765ab715@nvidia.com>
+ <87czucngdc.wl-maz@kernel.org>
+ <1edb2c4e-23f0-5730-245b-fc6d289951e1@nvidia.com>
+ <878s4zokll.wl-maz@kernel.org>
+ <BL0PR12MB2532CC436EBF626966B15994BD5E9@BL0PR12MB2532.namprd12.prod.outlook.com>
+ <87eeeqvm1d.wl-maz@kernel.org>
+ <BL0PR12MB25329EF5DFA7BBAA732064A7BD5C9@BL0PR12MB2532.namprd12.prod.outlook.com> <87bl9sunnw.wl-maz@kernel.org>
+Message-ID: <c1bd514a531988c9@bloch.sibelius.xs4all.nl>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/04/21 23:18, Ben Gardon wrote:
-> Add a new lock to protect the arch-specific fields of memslots if they
-> need to be modified in a kvm->srcu read critical section. A future
-> commit will use this lock to lazily allocate memslot rmaps for x86.
-
-Here there should be a blurb about the possible races that can happen 
-and why we decided for the slots_arch_lock.
-
-> Signed-off-by: Ben Gardon <bgardon@google.com>
-> ---
->   include/linux/kvm_host.h |  9 +++++++++
->   virt/kvm/kvm_main.c      | 31 ++++++++++++++++++++++++++-----
->   2 files changed, 35 insertions(+), 5 deletions(-)
+> Date: Mon, 03 May 2021 11:17:23 +0100
+> From: Marc Zyngier <maz@kernel.org>
 > 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 8895b95b6a22..2d5e797fbb08 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -472,6 +472,15 @@ struct kvm {
->   #endif /* KVM_HAVE_MMU_RWLOCK */
->   
->   	struct mutex slots_lock;
-> +
-> +	/*
-> +	 * Protects the arch-specific fields of struct kvm_memory_slots in
-> +	 * use by the VM. To be used under the slots_lock (above) or in a
-> +	 * kvm->srcu read cirtical section where acquiring the slots_lock
-> +	 * would lead to deadlock with the synchronize_srcu in
-> +	 * install_new_memslots.
-> +	 */
-
-I think usage under slots_lock need not be mentioned here.  More like this:
-
-	/*
-	 * Protects the arch-specific fields of struct kvm_memory_slots
-	 * in use by the VM.  Usually these are initialized by
-	 * kvm_arch_prepare_memory_region and then protected by
-	 * kvm->srcu; however, if they need to be initialized outside
-	 * kvm_arch_prepare_memory_region, slots_arch_lock can
-	 * be used instead as it is also held when calling
-	 * kvm_arch_prepare_memory_region itself.  Note that using
-	 * slots_lock would lead to deadlock with install_new_memslots,
-	 * because it is held during synchronize_srcu:
-	 *
-	 *	idx = srcu_read_lock(&kvm->srcu);
-	 *	mutex_lock(&kvm->slots_lock);
-	 *				mutex_lock(&kvm->slots_lock);
-	 *				synchronize_srcu(&kvm->srcu);
-	 */
-
-(Though a better place for this is in 
-Documentation/virtual/kvm/locking.rst).
-
-Paolo
-
-> +	struct mutex slots_arch_lock;
->   	struct mm_struct *mm; /* userspace tied to this vm */
->   	struct kvm_memslots __rcu *memslots[KVM_ADDRESS_SPACE_NUM];
->   	struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index c8010f55e368..97b03fa2d0c8 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -908,6 +908,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
->   	mutex_init(&kvm->lock);
->   	mutex_init(&kvm->irq_lock);
->   	mutex_init(&kvm->slots_lock);
-> +	mutex_init(&kvm->slots_arch_lock);
->   	INIT_LIST_HEAD(&kvm->devices);
->   
->   	BUILD_BUG_ON(KVM_MEM_SLOTS_NUM > SHRT_MAX);
-> @@ -1280,6 +1281,10 @@ static struct kvm_memslots *install_new_memslots(struct kvm *kvm,
->   	slots->generation = gen | KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS;
->   
->   	rcu_assign_pointer(kvm->memslots[as_id], slots);
-> +
-> +	/* Acquired in kvm_set_memslot. */
-> +	mutex_unlock(&kvm->slots_arch_lock);
-> +
->   	synchronize_srcu_expedited(&kvm->srcu);
->   
->   	/*
-> @@ -1351,6 +1356,9 @@ static int kvm_set_memslot(struct kvm *kvm,
->   	struct kvm_memslots *slots;
->   	int r;
->   
-> +	/* Released in install_new_memslots. */
-> +	mutex_lock(&kvm->slots_arch_lock);
-> +
->   	slots = kvm_dup_memslots(__kvm_memslots(kvm, as_id), change);
->   	if (!slots)
->   		return -ENOMEM;
-> @@ -1364,10 +1372,9 @@ static int kvm_set_memslot(struct kvm *kvm,
->   		slot->flags |= KVM_MEMSLOT_INVALID;
->   
->   		/*
-> -		 * We can re-use the old memslots, the only difference from the
-> -		 * newly installed memslots is the invalid flag, which will get
-> -		 * dropped by update_memslots anyway.  We'll also revert to the
-> -		 * old memslots if preparing the new memory region fails.
-> +		 * We can re-use the memory from the old memslots.
-> +		 * It will be overwritten with a copy of the new memslots
-> +		 * after reacquiring the slots_arch_lock below.
->   		 */
->   		slots = install_new_memslots(kvm, as_id, slots);
->   
-> @@ -1379,6 +1386,17 @@ static int kvm_set_memslot(struct kvm *kvm,
->   		 *	- kvm_is_visible_gfn (mmu_check_root)
->   		 */
->   		kvm_arch_flush_shadow_memslot(kvm, slot);
-> +
-> +		/* Released in install_new_memslots. */
-> +		mutex_lock(&kvm->slots_arch_lock);
-> +
-> +		/*
-> +		 * The arch-specific fields of the memslots could have changed
-> +		 * between releasing the slots_arch_lock in
-> +		 * install_new_memslots and here, so get a fresh copy of the
-> +		 * slots.
-> +		 */
-> +		kvm_copy_memslots(__kvm_memslots(kvm, as_id), slots);
->   	}
->   
->   	r = kvm_arch_prepare_memory_region(kvm, new, mem, change);
-> @@ -1394,8 +1412,11 @@ static int kvm_set_memslot(struct kvm *kvm,
->   	return 0;
->   
->   out_slots:
-> -	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
-> +	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
-> +		slot = id_to_memslot(slots, old->id);
-> +		slot->flags &= ~KVM_MEMSLOT_INVALID;
->   		slots = install_new_memslots(kvm, as_id, slots);
-> +	}
->   	kvfree(slots);
->   	return r;
->   }
+> Hi Vikram,
 > 
+> On Sun, 02 May 2021 18:56:31 +0100,
+> Vikram Sethi <vsethi@nvidia.com> wrote:
+> > 
+> > Hi Marc, 
+> > 
+> > > From: Marc Zyngier <maz@kernel.org>
+> > > Hi Vikram,
+> > > 
+> >  
+> > > The problem I see is that we have VM and userspace being written in terms
+> > > of Write-Combine, which is:
+> > > 
+> > > - loosely defined even on x86
+> > > 
+> > > - subject to interpretations in the way it maps to PCI
+> > > 
+> > > - has no direct equivalent in the ARMv8 collection of memory
+> > >   attributes (and Normal_NC comes with speculation capabilities which
+> > >   strikes me as extremely undesirable on arbitrary devices)
+> > 
+> > If speculation with Normal NC to prefetchable BARs in devices was a
+> > problem, those devices would already be broken in baremetal with
+> > ioremap_wc on arm64, and we would need quirks there to not do Normal
+> > NC for them but Device GRE, and if such a quirk was needed on
+> > baremetal, it could be picked up by vfio/KVM as well. But we haven't
+> > seen any broken devices doing wc on baremetal on ARM64, have we?
 
+I think the SC2A11 SoC used in the Socionext developerbox counts as
+"broken":
+
+https://www.96boards.org/documentation/enterprise/developerbox/support/known-issues.html
+
+I'm not sure my understanding of the issue is 100% correct, but I
+believe the firmware workaround described there uses the stage 2
+translation tables to map "Normal NC" onto "Device nGRE" or something
+even more restricted.  Now this hardware may be classified as simply
+broken.  However...
+
+On hardware based on the NXP LX2160A SoC we're seeing some weird
+behaviour when using "Normal NC" mappings with an AMD GPU that
+disappear by using "Device nGnRnE" mappings on OpenBSD.  No such issue
+was observed with hardware based on an Ampere eMAG SoC.  I don't fully
+understand this issue yet, and it may very well be a bug in OpenBSD
+code, but it does show there are potential pitfalls with using "Normal
+NC" for mapping prefetchable BARs of PCIe devices.
+
+> The lack of evidence does not equate to a proof, and your devices not
+> misbehaving doesn't mean it is the right thing, specially when we have
+> such a wide range of CPU and interconnect implementation. Which is why
+> I really want an answer at the architecture level. Not a "it works for
+> me" type of answer.
+> 
+> Furthermore, as I replied to Shanker in a separate email, what
+> Linux/arm64 does is pretty much irrelevant. KVM/arm64 implements the
+> ARMv8 architecture, and it is at that level that we need to solve the
+> problem.
+> 
+> If, by enumerating the properties of Prefetchable, you can show that
+> they are a strict superset of Normal_NC, I'm on board. I haven't seen
+> such an enumeration so far.
+> 
+> > I know we have tested NICs write combining on arm64 in baremetal, as
+> > well as GPU and NVMe CMB without issues.
+> > 
+> > Further, I don't see why speculation to non cacheble would be an
+> > issue if prefetch without side effects is allowed by the device,
+> > which is what a prefetchable BAR is.
+> > If it is an issue for a device I would consider that a bug already needing a quirk in
+> > Baremetal/host kernel already. 
+> > From PCI spec " A prefetchable address range may have write side effects, 
+> > but it may not have read side effects."
+> 
+> Right, so we have made a small step in the direction of mapping
+> "prefetchable" onto "Normal_NC", thanks for that. What about all the
+> other properties (unaligned accesses, ordering, gathering)?
+
+On x86 WC:
+
+1. Is not cached (but stores are buffered).
+
+2. Allows unaligned access just like normal memory.
+
+3. Allows speculative reads.
+
+4. Has weaker ordering than normal memory; [lsm]fence instructions are
+   needed to guarantee a particular ordering of writes with respect to
+   other writes and reads.
+
+5. Stores are buffered.  This buffer isn't snooped so it has to be
+   flushed before changes are globally visible.  The [sm]fence
+   instructions flush the store buffer.
+
+6. The store buffer may combine multiple writes into a single write.
+
+Now whether the fact the unaligned access is allowed is really part of
+the semantics of WC mappings is debatable as x86 always allows
+unaligned access, even for areas mapped with ioremap().
+
+However, this is where userland comes in.  The userland graphics stack
+does assume that graphics memory mapped throug a prefetchable PCIe BAR
+allows unaligned access if the architecture allows unaligned access
+for cacheable memory.  On arm64 this means that such memory needs to
+be "Normal NC".  And since kernel drivers tend to map such memory
+using ioremap_wc() that pretty much implies ioremap_wc() shoul use
+"Normal NC" as well isn't it?
+
+> > > How do we translate this into something consistent? I'd like to
+> > > see an actual description of what we *really* expect from WC on
+> > > prefetchable PCI regions, turn that into a documented definition
+> > > agreed across architectures, and then we can look at
+> > > implementing it with one memory type or another on arm64.
+> > > 
+> > > Because once we expose that memory type at S2 for KVM guests, it
+> > > becomes ABI and there is no turning back. So I want to get it
+> > > right once and for all.
+> > > 
+> > I agree that we need a precise definition for the Linux ioremap_wc
+> > API wrt what drivers (kernel and userspace) can expect and whether
+> > memset/memcpy is expected to work or not and whether aligned
+> > accesses are a requirement.
+> > To the extent ABI is set, I would think that the ABI is also already
+> > set in the host kernel for arm64 WC = Normal NC, so why should that
+> > not also be the ABI for same driver in VMs.
+> 
+> KVM is an implementation of the ARM architecture, and doesn't really
+> care about what WC is. If we come to the conclusion that Normal_NC is
+> the natural match for Prefetchable attributes, than we're good and we
+> can have Normal_NC being set by userspace, or even VFIO. But I don't
+> want to set it only because "it works when bare-metal Linux uses it".
+> Remember KVM doesn't only run Linux as guests.
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> 
