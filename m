@@ -2,162 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 73053371297
-	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 10:47:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E18F37138A
+	for <lists+kvm@lfdr.de>; Mon,  3 May 2021 12:17:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232996AbhECIs2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 May 2021 04:48:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58017 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231531AbhECIs1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 3 May 2021 04:48:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620031654;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oNh3VIIaagnprujVXdPtNBa4jPKLHbvzqtglqUzkcjA=;
-        b=e8RC2eL+gnIHgBWKOfx+Hl9RYkeKrrYo7MUxRfcsI1bb2zm01SWe7udILlPhPmH+L6IE1h
-        TCg0jyyWlhPi24bWNYZIweJXrCFs4a9ofidjuvD9PJc0aYFwrZSqY6fDGQd1905vSDLIYG
-        LS2GmVgq0j6RcEMYA96HrKjQYpkBKzQ=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-332-pmg7Lj2KPci3_1edG2VB4Q-1; Mon, 03 May 2021 04:47:32 -0400
-X-MC-Unique: pmg7Lj2KPci3_1edG2VB4Q-1
-Received: by mail-wr1-f71.google.com with SMTP id l2-20020adf9f020000b029010d6bb7f1cbso3515119wrf.7
-        for <kvm@vger.kernel.org>; Mon, 03 May 2021 01:47:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=oNh3VIIaagnprujVXdPtNBa4jPKLHbvzqtglqUzkcjA=;
-        b=ftA7qYuxRTF10rrzlLP/q5B3PGoAQI/y4rP5yVQ+ad2I1YTiQpeuU1UO7iOK1rBh4m
-         X/CPMJbwKByIddKg80yOGOExYmSNWvg6hgnNzMoAcgUVOL8yTgCzWpd0HXLbrnB2F55v
-         dgRDOWUa5QXciOv4lcbWMEUKfuO/benrfspAk2XVpvvQp742AfteMEAZGRh5nOjjepqd
-         ZWOqUOW8jhdrvExjFPpOv3LxqVVT1J3R0wSf9WEPTXLjKt3TT3WXjSwpT7y0kMHNJWaO
-         9k/R2gglGA0OrdnfIIByYufHJaYfWS+WZwEFcPSEKfoXNFhRiteIiv131KDlgEiJVUg1
-         KqMQ==
-X-Gm-Message-State: AOAM532LREc8yauj79TsJusaFhDYhbROIzE24jhVTVxrKAXq8273VLL4
-        r8+ShGiWaIdwZN5ewZhavx5KH2B2JSUiNUQ28n3khKOPcv2ww1pT6yWYIu3pvHXtH90p2EsFf2I
-        7bbRPpxw+1oT6
-X-Received: by 2002:adf:f00a:: with SMTP id j10mr23036894wro.231.1620031651547;
-        Mon, 03 May 2021 01:47:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxvQn7ZILmdzPLig2hPkrpiOMpynXsLhaYHpmRxuCUep9NSoCwjLciJspeYLkl3+SmLIr8RrA==
-X-Received: by 2002:adf:f00a:: with SMTP id j10mr23036877wro.231.1620031651405;
-        Mon, 03 May 2021 01:47:31 -0700 (PDT)
-Received: from redhat.com ([2a10:800a:cdef:0:114d:2085:61e4:7b41])
-        by smtp.gmail.com with ESMTPSA id i20sm20091020wmq.29.2021.05.03.01.47.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 May 2021 01:47:30 -0700 (PDT)
-Date:   Mon, 3 May 2021 04:47:28 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Zhu Lingshan <lingshan.zhu@intel.com>
-Cc:     jasowang@redhat.com, lulu@redhat.com, sgarzare@redhat.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V4 2/3] vDPA/ifcvf: enable Intel C5000X-PL virtio-block
- for vDPA
-Message-ID: <20210503043801-mutt-send-email-mst@kernel.org>
-References: <20210419063326.3748-1-lingshan.zhu@intel.com>
- <20210419063326.3748-3-lingshan.zhu@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210419063326.3748-3-lingshan.zhu@intel.com>
+        id S233315AbhECKSV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 May 2021 06:18:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46984 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233025AbhECKSU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 May 2021 06:18:20 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2C3DB610E6;
+        Mon,  3 May 2021 10:17:27 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1ldVdk-00AX3n-VA; Mon, 03 May 2021 11:17:25 +0100
+Date:   Mon, 03 May 2021 11:17:23 +0100
+Message-ID: <87bl9sunnw.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Vikram Sethi <vsethi@nvidia.com>
+Cc:     Shanker Donthineni <sdonthineni@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jason Sequeira <jsequeira@nvidia.com>
+Subject: Re: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR region in VMA
+In-Reply-To: <BL0PR12MB25329EF5DFA7BBAA732064A7BD5C9@BL0PR12MB2532.namprd12.prod.outlook.com>
+References: <20210429162906.32742-1-sdonthineni@nvidia.com>
+        <20210429162906.32742-2-sdonthineni@nvidia.com>
+        <20210429122840.4f98f78e@redhat.com>
+        <470360a7-0242-9ae5-816f-13608f957bf6@nvidia.com>
+        <20210429134659.321a5c3c@redhat.com>
+        <e3d7fda8-5263-211c-3686-f699765ab715@nvidia.com>
+        <87czucngdc.wl-maz@kernel.org>
+        <1edb2c4e-23f0-5730-245b-fc6d289951e1@nvidia.com>
+        <878s4zokll.wl-maz@kernel.org>
+        <BL0PR12MB2532CC436EBF626966B15994BD5E9@BL0PR12MB2532.namprd12.prod.outlook.com>
+        <87eeeqvm1d.wl-maz@kernel.org>
+        <BL0PR12MB25329EF5DFA7BBAA732064A7BD5C9@BL0PR12MB2532.namprd12.prod.outlook.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: vsethi@nvidia.com, sdonthineni@nvidia.com, alex.williamson@redhat.com, will@kernel.org, catalin.marinas@arm.com, christoffer.dall@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, jsequeira@nvidia.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 19, 2021 at 02:33:25PM +0800, Zhu Lingshan wrote:
-> This commit enabled Intel FPGA SmartNIC C5000X-PL virtio-block
-> for vDPA.
+Hi Vikram,
+
+On Sun, 02 May 2021 18:56:31 +0100,
+Vikram Sethi <vsethi@nvidia.com> wrote:
 > 
-> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> Acked-by: Jason Wang <jasowang@redhat.com>
-> ---
->  drivers/vdpa/ifcvf/ifcvf_base.h |  8 +++++++-
->  drivers/vdpa/ifcvf/ifcvf_main.c | 19 ++++++++++++++++++-
->  2 files changed, 25 insertions(+), 2 deletions(-)
+> Hi Marc, 
 > 
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
-> index 1c04cd256fa7..0111bfdeb342 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
-> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
-> @@ -15,6 +15,7 @@
->  #include <linux/pci_regs.h>
->  #include <linux/vdpa.h>
->  #include <uapi/linux/virtio_net.h>
-> +#include <uapi/linux/virtio_blk.h>
->  #include <uapi/linux/virtio_config.h>
->  #include <uapi/linux/virtio_pci.h>
+> > From: Marc Zyngier <maz@kernel.org>
+> > Hi Vikram,
+> > 
 >  
-> @@ -28,7 +29,12 @@
->  #define C5000X_PL_SUBSYS_VENDOR_ID	0x8086
->  #define C5000X_PL_SUBSYS_DEVICE_ID	0x0001
->  
-> -#define IFCVF_SUPPORTED_FEATURES \
-> +#define C5000X_PL_BLK_VENDOR_ID		0x1AF4
+> > The problem I see is that we have VM and userspace being written in terms
+> > of Write-Combine, which is:
+> > 
+> > - loosely defined even on x86
+> > 
+> > - subject to interpretations in the way it maps to PCI
+> > 
+> > - has no direct equivalent in the ARMv8 collection of memory
+> >   attributes (and Normal_NC comes with speculation capabilities which
+> >   strikes me as extremely undesirable on arbitrary devices)
+> 
+> If speculation with Normal NC to prefetchable BARs in devices was a
+> problem, those devices would already be broken in baremetal with
+> ioremap_wc on arm64, and we would need quirks there to not do Normal
+> NC for them but Device GRE, and if such a quirk was needed on
+> baremetal, it could be picked up by vfio/KVM as well. But we haven't
+> seen any broken devices doing wc on baremetal on ARM64, have we?
 
+The lack of evidence does not equate to a proof, and your devices not
+misbehaving doesn't mean it is the right thing, specially when we have
+such a wide range of CPU and interconnect implementation. Which is why
+I really want an answer at the architecture level. Not a "it works for
+me" type of answer.
 
-Come on this is just PCI_VENDOR_ID_REDHAT_QUMRANET right?
+Furthermore, as I replied to Shanker in a separate email, what
+Linux/arm64 does is pretty much irrelevant. KVM/arm64 implements the
+ARMv8 architecture, and it is at that level that we need to solve the
+problem.
 
+If, by enumerating the properties of Prefetchable, you can show that
+they are a strict superset of Normal_NC, I'm on board. I haven't seen
+such an enumeration so far.
 
+> I know we have tested NICs write combining on arm64 in baremetal, as
+> well as GPU and NVMe CMB without issues.
+> 
+> Further, I don't see why speculation to non cacheble would be an
+> issue if prefetch without side effects is allowed by the device,
+> which is what a prefetchable BAR is.
+> If it is an issue for a device I would consider that a bug already needing a quirk in
+> Baremetal/host kernel already. 
+> From PCI spec " A prefetchable address range may have write side effects, 
+> but it may not have read side effects."
 
-> +#define C5000X_PL_BLK_DEVICE_ID		0x1001
+Right, so we have made a small step in the direction of mapping
+"prefetchable" onto "Normal_NC", thanks for that. What about all the
+other properties (unaligned accesses, ordering, gathering)?
 
-0x1001 is a transitional blk device from virtio spec too right? Let's add these to virtio_ids.h?
+> > How do we translate this into something consistent? I'd like to see an actual
+> > description of what we *really* expect from WC on prefetchable PCI regions,
+> > turn that into a documented definition agreed across architectures, and then
+> > we can look at implementing it with one memory type or another on arm64.
+> > 
+> > Because once we expose that memory type at S2 for KVM guests, it
+> > becomes ABI and there is no turning back. So I want to get it right once and
+> > for all.
+> > 
+> I agree that we need a precise definition for the Linux ioremap_wc
+> API wrt what drivers (kernel and userspace) can expect and whether
+> memset/memcpy is expected to work or not and whether aligned
+> accesses are a requirement.
+> To the extent ABI is set, I would think that the ABI is also already
+> set in the host kernel for arm64 WC = Normal NC, so why should that
+> not also be the ABI for same driver in VMs.
 
-> +#define C5000X_PL_BLK_SUBSYS_VENDOR_ID	0x8086
-> +#define C5000X_PL_BLK_SUBSYS_DEVICE_ID	0x0002
+KVM is an implementation of the ARM architecture, and doesn't really
+care about what WC is. If we come to the conclusion that Normal_NC is
+the natural match for Prefetchable attributes, than we're good and we
+can have Normal_NC being set by userspace, or even VFIO. But I don't
+want to set it only because "it works when bare-metal Linux uses it".
+Remember KVM doesn't only run Linux as guests.
 
-VIRTIO_ID_BLOCK?
+	M.
 
-> +
-> +#define IFCVF_NET_SUPPORTED_FEATURES \
->  		((1ULL << VIRTIO_NET_F_MAC)			| \
->  		 (1ULL << VIRTIO_F_ANY_LAYOUT)			| \
->  		 (1ULL << VIRTIO_F_VERSION_1)			| \
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-> index 66927ec81fa5..9a4a6df91f08 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
-> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-> @@ -168,10 +168,23 @@ static struct ifcvf_hw *vdpa_to_vf(struct vdpa_device *vdpa_dev)
->  
->  static u64 ifcvf_vdpa_get_features(struct vdpa_device *vdpa_dev)
->  {
-> +	struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
->  	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
-> +	struct pci_dev *pdev = adapter->pdev;
-> +
->  	u64 features;
->  
-> -	features = ifcvf_get_features(vf) & IFCVF_SUPPORTED_FEATURES;
-> +	switch (vf->dev_type) {
-> +	case VIRTIO_ID_NET:
-> +		features = ifcvf_get_features(vf) & IFCVF_NET_SUPPORTED_FEATURES;
-> +		break;
-> +	case VIRTIO_ID_BLOCK:
-> +		features = ifcvf_get_features(vf);
-> +		break;
-> +	default:
-> +		features = 0;
-> +		IFCVF_ERR(pdev, "VIRTIO ID %u not supported\n", vf->dev_type);
-> +	}
->  
->  	return features;
->  }
-> @@ -514,6 +527,10 @@ static struct pci_device_id ifcvf_pci_ids[] = {
->  			 C5000X_PL_DEVICE_ID,
->  			 C5000X_PL_SUBSYS_VENDOR_ID,
->  			 C5000X_PL_SUBSYS_DEVICE_ID) },
-> +	{ PCI_DEVICE_SUB(C5000X_PL_BLK_VENDOR_ID,
-> +			 C5000X_PL_BLK_DEVICE_ID,
-> +			 C5000X_PL_BLK_SUBSYS_VENDOR_ID,
-> +			 C5000X_PL_BLK_SUBSYS_DEVICE_ID) },
->  
->  	{ 0 },
->  };
-> -- 
-> 2.27.0
-
+-- 
+Without deviation from the norm, progress is not possible.
