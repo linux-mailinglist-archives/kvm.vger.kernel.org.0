@@ -2,55 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C760A372F03
-	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 19:37:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 186C1372F36
+	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 19:50:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231796AbhEDRii (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 May 2021 13:38:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44168 "EHLO
+        id S232126AbhEDRvS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 May 2021 13:51:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231734AbhEDRih (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 May 2021 13:38:37 -0400
-Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8CB5C06174A
-        for <kvm@vger.kernel.org>; Tue,  4 May 2021 10:37:41 -0700 (PDT)
-Received: by mail-oi1-x22b.google.com with SMTP id l6so9560046oii.1
-        for <kvm@vger.kernel.org>; Tue, 04 May 2021 10:37:41 -0700 (PDT)
+        with ESMTP id S231908AbhEDRvS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 May 2021 13:51:18 -0400
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09F6EC06174A
+        for <kvm@vger.kernel.org>; Tue,  4 May 2021 10:50:22 -0700 (PDT)
+Received: by mail-oi1-x229.google.com with SMTP id l6so9598901oii.1
+        for <kvm@vger.kernel.org>; Tue, 04 May 2021 10:50:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=uQJdUXEx8maMY/qSJE4caWuHD5W+mMvJWFUW8MPsCdU=;
-        b=Z2XmxRIGEs+aA4d/74oGwD1FDn7Q/Ilim4Q3Irnx6sHCVz04n1GuGScOZxS9lR4fCj
-         RtJM0jmmdBmsSzCLagcOsZoI8m1ZRmA9MwQDDml9y0Qex4//GXkmWj0so2jXOtt2a2Ab
-         HvrVVvhWBloMqucQDbYcoW/CCULw4c8CnxT8XqvqIBXTOos8tWFxvEurwpPqEBJG/UuJ
-         Wynls0Y4wQizGcvvBGQTBM+r/scTdza0iJxOclAIQtisUI3IV+8nk/0S+NIZO28bAb00
-         Ae/bMhto+kK2yEyj3j57ymNqa2h2KAhNGwkRwMVfWCMDoYIKWgiSms5nvpNuCy/Ks9Dz
-         TOiQ==
+        bh=DCkRHCN61kfizqWJXP1PWNpclqjzIE2ZjByqn8qit3M=;
+        b=TJ5hcE62aB70t3wRgov2kIHjvIshRaIKwKhsS6AKdPP57RDYO/z30LoU/rF67pU0XU
+         IX8UJLBud9zuRfHTIlVO/nC7FH2uePijzicdHzldgmLPR59XrR5NnW8i/dr6td/UiKEe
+         +2l5dD8yXCQ14uQwkasfUugjgt3fHHCqDtcmA4+c0Nx9+AsX+DWmpKYLE7ndkYCluTGP
+         Ff/X1Cz7eEwgxJONcOl06k3gXPXPGY3nmZXgc4RpwISc5vPk4pewq0R4oddwgpc43Kxu
+         igyvApR6auWvoSXDFL3RbIDTX4Q1sGlY/YD01BsPMY3+n+ohgtbTvxm91vcssZbXIWUP
+         Fi5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=uQJdUXEx8maMY/qSJE4caWuHD5W+mMvJWFUW8MPsCdU=;
-        b=VP39KKhyloVqT8tcScPLyOfNJ/bAP4F1rpYhpz3aEo6xZdwz1Z1/MVff4FFbijZCA9
-         2OBD1fmFiq6juc7X5ZFRsT6CnagtJPe591/Og7frIV5gTqTYJLM4PqsQOiPzWxxsqgGY
-         qJ34k8XvfUuMEFpg4DU0n71OvOHoVeMwvkcy1+6bXJGT1mtPb9sP1r/IJPHOHSdI4JRj
-         NIFZPY9j+Sg4Omsvv3ovDo36mDCRLfDNW8CEI42DIF4VdPzz/DAh7NqYUCQdX3ixv84v
-         08bE8CJwh+gM9D2t3OUG5GGZo5n/M4AbBU1Q7nVUwaxgilUBQWFMcTnxVWqeblzaApu6
-         yyAA==
-X-Gm-Message-State: AOAM532/vWDwrT/16Vk+6XLnKZcA/2gTOEsJHWI5l7iP17m7P8UGjSGv
-        uJgtUZXsWk5mhNNdgAbNmfxQQ3QhfWhD3ZyyzAZiKg==
-X-Google-Smtp-Source: ABdhPJy62AFpAROaQIN9dPxNDLR0eJkP8Ot0H7OpqD9T1/6g9TuNu6fUPjm89rupzH+YCfd6pdjXwHMaiozxIwZzuTM=
-X-Received: by 2002:a05:6808:b2f:: with SMTP id t15mr3814416oij.6.1620149860953;
- Tue, 04 May 2021 10:37:40 -0700 (PDT)
+        bh=DCkRHCN61kfizqWJXP1PWNpclqjzIE2ZjByqn8qit3M=;
+        b=GZq9arXkBn1IJfdFTB0eiKmRspIIx/pk1K2Man3RsbcSagQ+0Q49ujYT0FteKgAXe7
+         UiEcr/PeL4GLGV16EpniUu7/IbA5NuH7dAbSt1ftk4JDnMXQnn0wRT2B8pqkVt3/VYDq
+         xHY9XuEwUtVSGxPs/gZwFR7FGFCcOQo1tN0T82SzqavekJNW8MdQZspWY12zDM8IHtFJ
+         QQtHKNdU+N2f5l3QWKpGZdAN6PfXbwYHkwDaWqh/NGm7uPiYdjoIvaXk66lxAsjbrpT1
+         XxuwKl2YdHPOgJjxiwgmT/pXZLjHQEbxOurvKc6wDjSCQo8Xv9xticaJ4xilLA4T8XU3
+         bGtA==
+X-Gm-Message-State: AOAM532npLGZhTbJ5gmMOxXYtiLyGKwUH8jEGXwZxRPMLPYYHf9XBog5
+        IpVfz7Yj7XfkTTLjPOxvKg4/szzbRtKR49G8fVAnPw==
+X-Google-Smtp-Source: ABdhPJzF70u/lwIhgpkw/qWojuBy7ba9HmvvzYL4q9yPwPYvQ7BSZD6+KuS92/zihXTjnwbz8wZQPTVc2liKABG/L08=
+X-Received: by 2002:aca:3cd6:: with SMTP id j205mr18533711oia.28.1620150621183;
+ Tue, 04 May 2021 10:50:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210504171734.1434054-1-seanjc@google.com> <20210504171734.1434054-2-seanjc@google.com>
-In-Reply-To: <20210504171734.1434054-2-seanjc@google.com>
+References: <20210504171734.1434054-1-seanjc@google.com> <20210504171734.1434054-3-seanjc@google.com>
+In-Reply-To: <20210504171734.1434054-3-seanjc@google.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 4 May 2021 10:37:29 -0700
-Message-ID: <CALMp9eToSSQ=8Dy4Vt5-GYEB4YB9c6-LTp8c60C97LOY9ufdjg@mail.gmail.com>
-Subject: Re: [PATCH 01/15] KVM: VMX: Do not adverise RDPID if ENABLE_RDTSCP
- control is unsupported
+Date:   Tue, 4 May 2021 10:50:10 -0700
+Message-ID: <CALMp9eTqoiiwDdXZQ=MYpaEp-g1z=1SeAqqk6TNU9MFeRJayWQ@mail.gmail.com>
+Subject: Re: [PATCH 02/15] KVM: x86: Emulate RDPID only if RDTSCP is supported
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -66,14 +65,16 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, May 4, 2021 at 10:17 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> Clear KVM's RDPID capability if the ENABLE_RDTSCP secondary exec control is
-> unsupported.  Despite being enumerated in a separate CPUID flag, RDPID is
-> bundled under the same VMCS control as RDTSCP and will #UD in VMX non-root
-> if ENABLE_RDTSCP is not enabled.
+> Do not advertise emulation support for RDPID if RDTSCP is unsupported.
+> RDPID emulation subtly relies on MSR_TSC_AUX to exist in hardware, as
+> both vmx_get_msr() and svm_get_msr() will return an error if the MSR is
+> unsupported, i.e. ctxt->ops->get_msr() will fail and the emulator will
+> inject a #UD.
 >
-> Fixes: 41cd02c6f7f6 ("kvm: x86: Expose RDPID in KVM_GET_SUPPORTED_CPUID")
+> Note, RDPID emulation also relies on RDTSCP being enabled in the guest,
+> but this is a KVM bug and will eventually be fixed.
+>
+> Fixes: fb6d4d340e05 ("KVM: x86: emulate RDPID")
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-But KVM will happily emulate RDPID if the instruction causes a #UD
-VM-exit, won't it? See commit fb6d4d340e05 (KVM: x86: emulate RDPID).
+Reviewed by: Jim Mattson <jmattson@google.com>
