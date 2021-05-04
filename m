@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A6ADB372FA0
-	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 20:17:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17389373117
+	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 21:55:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232223AbhEDSSI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 May 2021 14:18:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53116 "EHLO
+        id S232671AbhEDT4T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 May 2021 15:56:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232171AbhEDSSH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 May 2021 14:18:07 -0400
+        with ESMTP id S232667AbhEDT4S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 May 2021 15:56:18 -0400
 Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E198C061574
-        for <kvm@vger.kernel.org>; Tue,  4 May 2021 11:17:11 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id e15so8679909pfv.10
-        for <kvm@vger.kernel.org>; Tue, 04 May 2021 11:17:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A7D7C06174A
+        for <kvm@vger.kernel.org>; Tue,  4 May 2021 12:55:22 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id v191so72317pfc.8
+        for <kvm@vger.kernel.org>; Tue, 04 May 2021 12:55:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=14b7XgnhSuRkX7Ox309zfy7AdpkEzaYxX119We4gjnY=;
-        b=pLnD59w1zG5K84HrnD/SSxkOwRZPxyLv242DpXFHJly55QqhlDdJ1PMllReMOfJEmL
-         cba5bErynjsfVQV6HO8F1MhNdxTkmmo8nMu2NgBzyeL1zC8ZWZIBfAd+62Qwfb2M/c5k
-         bE/4Bcg8gRCNChwxM4cEKidlL2aDXh2DLgsPnvm9W6O2yQddakyBBnJDBdVz659B10YJ
-         Y0tux2aKSJbJci8XBo9GE4+v2tw45KC46kodx/ZaH6SqTbpYk9gSBLU/T577ODC0Hddq
-         ThpeqdJELRHjEVO4sDs3PLOTkilWJmdoxF09ZTutJoHlgV+As8IGt6e5MGZB54R9Ml3P
-         bTXw==
+        bh=V9MXCUfkwjmTe3RnQ5lcnKM97SAruzdIHvAHJ/7SbBM=;
+        b=gDxUZXMjj4gmp5w7OneOA+ybUb5VLB6rrAPPS0IlGoniTArDiPJtz+fjyJG5pgsAMk
+         KVjvhbAGD2sm8co6/oxomB+WqEb34rpQzg9VqgC7Pxglu9zYWstkxG+O4KcWxYMINqEE
+         Z+RuLPQiCNVqp5L26RB3hDzYZcckTcsvVLcM9ivk8Quwc1EvIaHqbPP51FfNUayEGBtl
+         0o0RFgUZ0GWIP+D0EunIYE6tDOi/TzlAW8yQ3iu5z5Ff2RWfpZBNmalCU/lKEAlnVOFu
+         zZzrNLFp0Ybndoegu82z6OGV4CV3nuSkGn55WMkjI2P16/OfYTpz8d+NxnQro74LTSW7
+         Wq5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=14b7XgnhSuRkX7Ox309zfy7AdpkEzaYxX119We4gjnY=;
-        b=hfbw9AJP5yDT822HjZHGlxPnyx89fHV8LVB+QZzcETnchYIfcKEEp4M4CcqwwzGesM
-         LKTvgfcodITJHrp72Qsnem58ae6BZ49yoZ5x9u1lcnkiCP48NBlxGV3rlZqZ3uvd3xm+
-         PfWauyRQiEPo9osn12yCG0jSYiC9gYJBQ6v/bvidNtOVKMyAtj9v22oMxtyTr4FhgYb7
-         1YXmLXjranT+ybGA5X6YeulY9qA/VVgY3WlK12eASu36fHevGHtYVcLn5PxiVx59m6x4
-         LyKUKDSvEzWPmdS7bvyMfWHdISGLqkVfwowC02PfcPKvhRocdhPCcwxpRCtpqC/+jn2j
-         F3AQ==
-X-Gm-Message-State: AOAM533NthdzZhOfviyd20nGBEhYmgvmo1lcNP4R8mHVuUga6g4UwBW/
-        nICvzV2oRyvobJqLbp+8o0rw1Q==
-X-Google-Smtp-Source: ABdhPJxfvDZm5IlG3fikLP6ejiZTWjCh5Zo2BWDsG6bH3EAtMHHvBGctDXw3Rng1YEbtrLvZBr6NOw==
-X-Received: by 2002:a17:90a:55c5:: with SMTP id o5mr6051105pjm.169.1620152230643;
-        Tue, 04 May 2021 11:17:10 -0700 (PDT)
+        bh=V9MXCUfkwjmTe3RnQ5lcnKM97SAruzdIHvAHJ/7SbBM=;
+        b=BDJ33x5ixZawJE/RrgPnN6kBSOBqlau/kBfX8o0AhH7FDmvEWIjqgtdc5CPnJwVDrm
+         ax/stcMN3cb4b6VL18LUI20D+Y/A0clo5RpPy4YB9Lr05BKE8Leb6kwj1F7lZh9D01sQ
+         MEWKnSyGGksfk8g0ESWtadShEvPNMiPKguhAvUi64+Jiv54fa14kmSYCG6u+6f0ae89Z
+         kaTtliurFlURGshNPW43UT/0VGz81mfmhHDLQTDszmKgJGljkEdvF/+LOAQPnGJ0Y9cE
+         LJuiVAg1s3RvDC1rXQNCCatqZg/PcxdyjPLHCWioT0zgQVrr+703q4FAO6HcXE33xwQC
+         5TtQ==
+X-Gm-Message-State: AOAM533ReglHFpHKA5zkxjbAC9jmPNm0w/mnUfyRxOFwxWt2wnDWO6bA
+        RmXfnyrHVAetIkVrWhtvsnM8ew==
+X-Google-Smtp-Source: ABdhPJxa4R2eqYOmzom07zcVSSH/UwYdjTwtJKrJZ4ws+px9kF2HWI7h/Tqs4dOTngLsuXaKVJoJNA==
+X-Received: by 2002:a63:796:: with SMTP id 144mr24646749pgh.246.1620158121499;
+        Tue, 04 May 2021 12:55:21 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id k14sm15051948pjg.0.2021.05.04.11.17.09
+        by smtp.gmail.com with ESMTPSA id j10sm13484582pfn.207.2021.05.04.12.55.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 May 2021 11:17:09 -0700 (PDT)
-Date:   Tue, 4 May 2021 18:17:06 +0000
+        Tue, 04 May 2021 12:55:20 -0700 (PDT)
+Date:   Tue, 4 May 2021 19:55:16 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Ben Gardon <bgardon@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
         Junaid Shahid <junaids@google.com>,
         Jim Mattson <jmattson@google.com>,
@@ -59,52 +59,84 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <kernellwp@gmail.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Subject: Re: [PATCH v2 0/7] Lazily allocate memslot rmaps
-Message-ID: <YJGPotr2X9fHAQqq@google.com>
+Subject: Re: [PATCH v2 1/7] KVM: x86/mmu: Track if shadow MMU active
+Message-ID: <YJGmpOzaFy9E0f5T@google.com>
 References: <20210429211833.3361994-1-bgardon@google.com>
- <a3279647-fb30-4033-2a9d-75d473bd8f8e@redhat.com>
- <CANgfPd-fD33hJkQP_MVb2a4CadKQbkpwwtP9r5rMrC_Mripeqg@mail.gmail.com>
- <4d27e9d6-42db-3aa1-053a-552e1643f46d@redhat.com>
- <CANgfPd_EvGg2N19HJs0nEq_rbaDJQQ9cUWS9wEsJ5wajNW_s7Q@mail.gmail.com>
+ <20210429211833.3361994-2-bgardon@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANgfPd_EvGg2N19HJs0nEq_rbaDJQQ9cUWS9wEsJ5wajNW_s7Q@mail.gmail.com>
+In-Reply-To: <20210429211833.3361994-2-bgardon@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 04, 2021, Ben Gardon wrote:
-> On Tue, May 4, 2021 at 12:21 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >
-> > On 03/05/21 19:31, Ben Gardon wrote:
-> > > On Mon, May 3, 2021 at 6:45 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > >>
-> > >> On 29/04/21 23:18, Ben Gardon wrote:
-> > >>> This series enables KVM to save memory when using the TDP MMU by waiting
-> > >>> to allocate memslot rmaps until they are needed. To do this, KVM tracks
-> > >>> whether or not a shadow root has been allocated. In order to get away
-> > >>> with not allocating the rmaps, KVM must also be sure to skip operations
-> > >>> which iterate over the rmaps. If the TDP MMU is in use and we have not
-> > >>> allocated a shadow root, these operations would essentially be op-ops
-> > >>> anyway. Skipping the rmap operations has a secondary benefit of avoiding
-> > >>> acquiring the MMU lock in write mode in many cases, substantially
-> > >>> reducing MMU lock contention.
-> > >>>
-> > >>> This series was tested on an Intel Skylake machine. With the TDP MMU off
-> > >>> and on, this introduced no new failures on kvm-unit-tests or KVM selftests.
-> > >>
-> > >> Thanks, I only reported some technicalities in the ordering of loads
-> > >> (which matter since the loads happen with SRCU protection only).  Apart
-> > >> from this, this looks fine!
-> > >
-> > > Awesome to hear, thank you for the reviews. Should I send a v3
-> > > addressing those comments, or did you already make those changes when
-> > > applying to your tree?
-> >
-> > No, I didn't (I wanted some oversight, and this is 5.14 stuff anyway).
+On Thu, Apr 29, 2021, Ben Gardon wrote:
+> Add a field to each VM to track if the shadow / legacy MMU is actually
+> in use. If the shadow MMU is not in use, then that knowledge opens the
+> door to other optimizations which will be added in future patches.
 > 
-> Ah, okay I'll send out a v3 soon, discussion on the other patches settles.
+> Signed-off-by: Ben Gardon <bgardon@google.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  2 ++
+>  arch/x86/kvm/mmu/mmu.c          | 10 +++++++++-
+>  arch/x86/kvm/mmu/mmu_internal.h |  2 ++
+>  arch/x86/kvm/mmu/tdp_mmu.c      |  6 ++++--
+>  arch/x86/kvm/mmu/tdp_mmu.h      |  4 ++--
+>  5 files changed, 19 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index ad22d4839bcc..3900dcf2439e 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1122,6 +1122,8 @@ struct kvm_arch {
+>  	 */
+>  	spinlock_t tdp_mmu_pages_lock;
+>  #endif /* CONFIG_X86_64 */
+> +
+> +	bool shadow_mmu_active;
 
-I'll look through v2 this afternoon, now that I've mostly dug myself out of
-RDPID hell.
+I'm not a fan of the name, "shadow mmu" in KVM almost always means shadow paging
+of some form, whereas this covers both shadow paging and legacy TDP support.
+
+But, I think we we can avoid bikeshedding by simply eliminating this flag.  More
+in later patches.
+
+>  };
+>  
+>  struct kvm_vm_stat {
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 930ac8a7e7c9..3975272321d0 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3110,6 +3110,11 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  	return ret;
+>  }
+>  
+> +void activate_shadow_mmu(struct kvm *kvm)
+> +{
+> +	kvm->arch.shadow_mmu_active = true;
+> +}
+> +
+>  static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
+>  			       struct list_head *invalid_list)
+>  {
+> @@ -3280,6 +3285,8 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+>  		}
+>  	}
+>  
+> +	activate_shadow_mmu(vcpu->kvm);
+> +
+>  	write_lock(&vcpu->kvm->mmu_lock);
+>  	r = make_mmu_pages_available(vcpu);
+>  	if (r < 0)
+> @@ -5467,7 +5474,8 @@ void kvm_mmu_init_vm(struct kvm *kvm)
+>  {
+>  	struct kvm_page_track_notifier_node *node = &kvm->arch.mmu_sp_tracker;
+>  
+> -	kvm_mmu_init_tdp_mmu(kvm);
+> +	if (!kvm_mmu_init_tdp_mmu(kvm))
+> +		activate_shadow_mmu(kvm);
+
+Doesn't come into play yet, but I would strongly prefer to open code setting the
+necessary flag instead of relying on the helper to never fail.
