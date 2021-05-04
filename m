@@ -2,246 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 28E1F372C62
-	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 16:48:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3097E372CC5
+	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 17:10:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231429AbhEDOtf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 May 2021 10:49:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60325 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231309AbhEDOta (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 May 2021 10:49:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620139715;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZdnkN5ICt/SkFxgX40PMOCB89b2MDJYUx+B8oGK9YpA=;
-        b=Fev/87721/Y7LBNvmSM48uYP+FLl5ECW+OeGLfj2AwFlX8c3EckQdtnY2cywVO2NyrLBT/
-        TT7RQTdU/xJgKsGIA13ouFl9hA/6HM2SttHkc8i1e+yVK1uLbVTDtvMPVDX8aqmud7o5h0
-        3on9LVJ1wOdjGqyRDn6fvEkgYRS4EMY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-3SwFKME1PLq8QCJvJvMJpw-1; Tue, 04 May 2021 10:48:33 -0400
-X-MC-Unique: 3SwFKME1PLq8QCJvJvMJpw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3BBE810CEF00;
-        Tue,  4 May 2021 14:47:43 +0000 (UTC)
-Received: from [10.36.113.191] (ovpn-113-191.ams2.redhat.com [10.36.113.191])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 747E95B4A4;
-        Tue,  4 May 2021 14:47:38 +0000 (UTC)
-Subject: Re: [PATCH 15/56] KVM: arm64: Add build rules for separate VHE/nVHE
- object files
-To:     Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Alexander Graf <graf@amazon.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andrew Scull <ascull@google.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        David Brazdil <dbrazdil@google.com>,
-        Gavin Shan <gshan@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Peng Hao <richard.peng@oppo.com>,
-        Quentin Perret <qperret@google.com>,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kernel-team@android.com
-References: <20200805175700.62775-1-maz@kernel.org>
- <20200805175700.62775-16-maz@kernel.org>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <2ff3a1cb-a310-7963-4171-bd1e7d08e39b@redhat.com>
-Date:   Tue, 4 May 2021 16:47:36 +0200
+        id S230254AbhEDPLv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 May 2021 11:11:51 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13034 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230246AbhEDPLv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 May 2021 11:11:51 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 144F2r9R133118;
+        Tue, 4 May 2021 11:10:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=FV62r63UU0u17Cog/FRiEeJ1q2bcxJbuCanzevxgAIM=;
+ b=e28HgJtGcUKLvIPlc8K+Cj9PShetHeRGOIrCbD9aDtuFKzcypJbJ6H8QYhOj7reR1Dya
+ 0WeyjbCDg5czPdLlC/KosioIhoeSn4MFDs/6eIi7JwRus5NxHtDO5LY/0YBr+3uiIWKj
+ rIiZg0xsXpBM6VV0m4jzL5lPtvlY+BBcvw7sn0r1X2hprphqR742hI8NTSMYf0yfOXG/
+ fvN9GYdpXLZ1pt8eQnSLbsmz5fUvcKsMAX23kjVtHIuxq/pC7P4bb//oYKADFXqqE6tp
+ AElOkGm+2HYNNCg94CYdec4o8oJTXlqu/cFm++WXD7QhBbko8Eg7dcYS0gdepe8iLF9O Ug== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38b7hwjgab-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 May 2021 11:10:49 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 144F4JZf143293;
+        Tue, 4 May 2021 11:10:48 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38b7hwjg9d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 May 2021 11:10:48 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 144ErID2013873;
+        Tue, 4 May 2021 15:10:46 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma05fra.de.ibm.com with ESMTP id 388xm8gq3k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 May 2021 15:10:46 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 144FAhqU27263374
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 4 May 2021 15:10:43 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5F1B14204C;
+        Tue,  4 May 2021 15:10:43 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B32A142041;
+        Tue,  4 May 2021 15:10:42 +0000 (GMT)
+Received: from oc6887364776.ibm.com (unknown [9.145.169.74])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  4 May 2021 15:10:42 +0000 (GMT)
+Subject: Re: s390 common I/O layer locking
+To:     Cornelia Huck <cohuck@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Eric Farman <farman@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Tarun Gupta <targupta@nvidia.com>
+References: <0-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com>
+ <7-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com>
+ <20210428190949.4360afb7.cohuck@redhat.com>
+ <20210428172008.GV1370958@nvidia.com>
+ <20210429135855.443b7a1b.cohuck@redhat.com>
+ <20210429181347.GA3414759@nvidia.com>
+ <20210430143140.378904bf.cohuck@redhat.com>
+ <20210430171908.GD1370958@nvidia.com>
+ <20210503125440.0acd7c1f.cohuck@redhat.com>
+From:   Vineeth Vijayan <vneethv@linux.ibm.com>
+Message-ID: <292442e8-3b1a-56c4-b974-05e8b358ba64@linux.ibm.com>
+Date:   Tue, 4 May 2021 17:10:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+ Thunderbird/78.9.1
 MIME-Version: 1.0
-In-Reply-To: <20200805175700.62775-16-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20210503125440.0acd7c1f.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: A68hUm527tQ2hObdklKVI-O3N_tbMUq4
+X-Proofpoint-ORIG-GUID: PgF53yaSizNLAJlz8l6mrwyGMSvzC5KN
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-04_08:2021-05-04,2021-05-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ mlxlogscore=557 adultscore=0 clxscore=1011 impostorscore=0 malwarescore=0
+ spamscore=0 priorityscore=1501 lowpriorityscore=0 suspectscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2105040111
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi David, Marc,
 
-On 8/5/20 7:56 PM, Marc Zyngier wrote:
-> From: David Brazdil <dbrazdil@google.com>
-> 
-> Add new folders arch/arm64/kvm/hyp/{vhe,nvhe} and Makefiles for building code
-> that runs in EL2 under VHE/nVHE KVM, repsectivelly. Add an include folder for
-> hyp-specific header files which will include code common to VHE/nVHE.
-> 
-> Build nVHE code with -D__KVM_NVHE_HYPERVISOR__, VHE code with
-> -D__KVM_VHE_HYPERVISOR__.
-> 
-> Under nVHE compile each source file into a `.hyp.tmp.o` object first, then
-> prefix all its symbols with "__kvm_nvhe_" using `objcopy` and produce
-> a `.hyp.o`. Suffixes were chosen so that it would be possible for VHE and nVHE
-> to share some source files, but compiled with different CFLAGS.
-> 
-> The nVHE ELF symbol prefix is added to kallsyms.c as ignored. EL2-only symbols
-> will never appear in EL1 stack traces.
-> 
-> Due to symbol prefixing, add a section in image-vars.h for aliases of symbols
-> that are defined in nVHE EL2 and accessed by kernel in EL1 or vice versa.
-> 
-> Signed-off-by: David Brazdil <dbrazdil@google.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Link: https://lore.kernel.org/r/20200625131420.71444-4-dbrazdil@google.com
-> ---
->  arch/arm64/kernel/image-vars.h   | 14 +++++++++++++
->  arch/arm64/kvm/hyp/Makefile      | 10 +++++++---
->  arch/arm64/kvm/hyp/nvhe/Makefile | 34 ++++++++++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/vhe/Makefile  | 17 ++++++++++++++++
->  scripts/kallsyms.c               |  1 +
->  5 files changed, 73 insertions(+), 3 deletions(-)
->  create mode 100644 arch/arm64/kvm/hyp/nvhe/Makefile
->  create mode 100644 arch/arm64/kvm/hyp/vhe/Makefile
-> 
-> diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-> index be0a63ffed23..3dc27da47712 100644
-> --- a/arch/arm64/kernel/image-vars.h
-> +++ b/arch/arm64/kernel/image-vars.h
-> @@ -51,4 +51,18 @@ __efistub__ctype		= _ctype;
->  
->  #endif
->  
-> +#ifdef CONFIG_KVM
-> +
-> +/*
-> + * KVM nVHE code has its own symbol namespace prefixed with __kvm_nvhe_, to
-> + * separate it from the kernel proper. The following symbols are legally
-> + * accessed by it, therefore provide aliases to make them linkable.
-> + * Do not include symbols which may not be safely accessed under hypervisor
-> + * memory mappings.
-> + */
-> +
-> +#define KVM_NVHE_ALIAS(sym) __kvm_nvhe_##sym = sym;
-> +
-> +#endif /* CONFIG_KVM */
-> +
->  #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
-> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-> index 5d8357ddc234..9c5dfe6ff80b 100644
-> --- a/arch/arm64/kvm/hyp/Makefile
-> +++ b/arch/arm64/kvm/hyp/Makefile
-> @@ -3,10 +3,14 @@
->  # Makefile for Kernel-based Virtual Machine module, HYP part
->  #
->  
-> -ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING \
-> -		$(DISABLE_STACKLEAK_PLUGIN)
-> +incdir := $(srctree)/$(src)/include
-> +subdir-asflags-y := -I$(incdir)
-> +subdir-ccflags-y := -I$(incdir)				\
-> +		    -fno-stack-protector		\
-> +		    -DDISABLE_BRANCH_PROFILING		\
-> +		    $(DISABLE_STACKLEAK_PLUGIN)
->  
-> -obj-$(CONFIG_KVM) += hyp.o
-> +obj-$(CONFIG_KVM) += hyp.o nvhe/
->  obj-$(CONFIG_KVM_INDIRECT_VECTORS) += smccc_wa.o
->  
->  hyp-y := vgic-v3-sr.o timer-sr.o aarch32.o vgic-v2-cpuif-proxy.o sysreg-sr.o \
-> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-> new file mode 100644
-> index 000000000000..955f4188e00f
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> @@ -0,0 +1,34 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +#
-> +# Makefile for Kernel-based Virtual Machine module, HYP/nVHE part
-> +#
-> +
-> +asflags-y := -D__KVM_NVHE_HYPERVISOR__
-> +ccflags-y := -D__KVM_NVHE_HYPERVISOR__
-> +
-> +obj-y :=
-> +
-> +obj-y := $(patsubst %.o,%.hyp.o,$(obj-y))
-> +extra-y := $(patsubst %.hyp.o,%.hyp.tmp.o,$(obj-y))
-> +
-> +$(obj)/%.hyp.tmp.o: $(src)/%.c FORCE
-> +	$(call if_changed_rule,cc_o_c)
-> +$(obj)/%.hyp.tmp.o: $(src)/%.S FORCE
-> +	$(call if_changed_rule,as_o_S)
-> +$(obj)/%.hyp.o: $(obj)/%.hyp.tmp.o FORCE
-> +	$(call if_changed,hypcopy)
-> +
-> +quiet_cmd_hypcopy = HYPCOPY $@
-> +      cmd_hypcopy = $(OBJCOPY) --prefix-symbols=__kvm_nvhe_ $< $@
-> +
-> +# KVM nVHE code is run at a different exception code with a different map, so
-> +# compiler instrumentation that inserts callbacks or checks into the code may
-> +# cause crashes. Just disable it.
-> +GCOV_PROFILE	:= n
-> +KASAN_SANITIZE	:= n
-> +UBSAN_SANITIZE	:= n
-> +KCOV_INSTRUMENT	:= n
-> +
-> +# Skip objtool checking for this directory because nVHE code is compiled with
-> +# non-standard build rules.
-> +OBJECT_FILES_NON_STANDARD := y
-> diff --git a/arch/arm64/kvm/hyp/vhe/Makefile b/arch/arm64/kvm/hyp/vhe/Makefile
-> new file mode 100644
-> index 000000000000..e04375546081
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/vhe/Makefile
-> @@ -0,0 +1,17 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +#
-> +# Makefile for Kernel-based Virtual Machine module, HYP/nVHE part
-> +#
-> +
-> +asflags-y := -D__KVM_VHE_HYPERVISOR__
-> +ccflags-y := -D__KVM_VHE_HYPERVISOR__
-> +
-> +obj-y :=
-> +
-> +# KVM code is run at a different exception code with a different map, so
-> +# compiler instrumentation that inserts callbacks or checks into the code may
-> +# cause crashes. Just disable it.
-> +GCOV_PROFILE	:= n
-> +KASAN_SANITIZE	:= n
-> +UBSAN_SANITIZE	:= n
-> +KCOV_INSTRUMENT	:= n
-> diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-> index 6dc3078649fa..0096cd965332 100644
-> --- a/scripts/kallsyms.c
-> +++ b/scripts/kallsyms.c
-> @@ -109,6 +109,7 @@ static bool is_ignored_symbol(const char *name, char type)
->  		".LASANPC",		/* s390 kasan local symbols */
->  		"__crc_",		/* modversions */
->  		"__efistub_",		/* arm64 EFI stub namespace */
-> +		"__kvm_nvhe_",		/* arm64 non-VHE KVM namespace */
-The addition of this line seems to have introduced errors on the
-'vmlinux symtab matches kallsyms' perf test (perf test -v 1) which fails
-on aarch64 for all __kvm_nvhe_ prefixed symbols, like
-
-ERR : <addr> : __kvm_nvhe___invalid not on kallsyms
-ERR : <addr> : __kvm_nvhe___do_hyp_init not on kallsyms
-ERR : <addr> : __kvm_nvhe___kvm_handle_stub_hvc not on kallsyms
-ERR : <addr> : __kvm_nvhe_reset not on kallsyms
-../..
-
-I understand we willingly hided those symbols from /proc/kallsyms. Do
-you confirm the right fix is to upgrade the perf test suite accordingly?
-
-Thanks
-
-Eric
-
-
->  		NULL
->  	};
->  
-> 
-
+On 5/3/21 12:54 PM, Cornelia Huck wrote:
+> On Fri, 30 Apr 2021 14:19:08 -0300
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>
+>> On Fri, Apr 30, 2021 at 02:31:40PM +0200, Cornelia Huck wrote:
+>>> On Thu, 29 Apr 2021 15:13:47 -0300
+>>> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>>>> All the checks for !private need some kind of locking. The driver core
+>>>> model is that the 'struct device_driver' callbacks are all called
+>>>> under the device_lock (this prevents the driver unbinding during the
+>>>> callback). I didn't check if ccs does this or not..
+>>> probe/remove/shutdown are basically a forward of the callbacks at the
+>>> bus level.
+>> These are all covered by device_lock
+>>
+>>> The css bus should make sure that we serialize
+>>> irq/sch_event/chp_event with probe/remove.
+>> Hum it doesn't look OK, like here:
+>>
+>> css_process_crw()
+>>    css_evaluate_subchannel()
+>>     sch = bus_find_device()
+>>        -- So we have a refcount on the struct device
+>>     css_evaluate_known_subchannel() {
+>> 	if (sch->driver) {
+>> 		if (sch->driver->sch_event)
+>> 			ret = sch->driver->sch_event(sch, slow);
+>>     }
+>>
+>> But the above call and touches to sch->driver (which is really just
+>> sch->dev.driver) are unlocked and racy.
+>>
+>> I would hold the device_lock() over all touches to sch->driver outside
+>> of a driver core callback.
+> I think this issue did not come up much before, as most drivers on the
+> css bus tend to stay put during the lifetime of the device; but yes, it
+> seems we're missing some locking.
+>
+> For the css bus, we need locking for the event callbacks; for irq, this
+> may interact with the subchannel lock and likely needs some care.
+>
+> I also looked at the other busses in the common I/O layer: scm looks
+> good at a glance, ccwgroup and ccw have locking for online/offline; the
+> other callbacks for the ccw drivers probably need to take the device
+> lock as well.
+>
+> Common I/O layer maintainers, does that look right?
+>
+I just had a quick glance on the CIO layer drivers. And at first look, 
+you are right.
+It looks likewe need modifications in the event callbacks (referring css 
+here)
+Let me go thoughthis thoroughly and update.
+Thank you.
