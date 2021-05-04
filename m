@@ -2,224 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AC7E9372E37
-	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 18:46:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B05A2372E49
+	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 18:53:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231734AbhEDQrE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 May 2021 12:47:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60694 "EHLO
+        id S231739AbhEDQxy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 May 2021 12:53:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231680AbhEDQrE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 May 2021 12:47:04 -0400
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C250C061574
-        for <kvm@vger.kernel.org>; Tue,  4 May 2021 09:46:09 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id w3so14218685ejc.4
-        for <kvm@vger.kernel.org>; Tue, 04 May 2021 09:46:08 -0700 (PDT)
+        with ESMTP id S230477AbhEDQxx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 May 2021 12:53:53 -0400
+Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18B28C061574
+        for <kvm@vger.kernel.org>; Tue,  4 May 2021 09:52:58 -0700 (PDT)
+Received: by mail-ot1-x335.google.com with SMTP id g15-20020a9d128f0000b02902a7d7a7bb6eso2091371otg.9
+        for <kvm@vger.kernel.org>; Tue, 04 May 2021 09:52:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=KHf2ZMKdg9jN9lddyLRTxgJZXNS2YqOTao5Opa455GQ=;
-        b=T9ZYSMJszQasjZu5BQFTl0qdpvgJVjvC+LTlMQVCshD1xppdz/PpD07b0kCvqqxvlP
-         Ie/qrss3B+O4GCBfQB3V4ezewt3yk3iF6Q+yJrS8GQ46bv+t4s7IuClHBJPX46518mH9
-         z+48EQtVfOn5nkJJIen7Jvzoy7hnwnZQ5pqHU2DZMLuk4EXBi/HnMs9XQvydz4Ys+3xB
-         mB1FuU91ZGZmEC88zdU783XdS7qrPaY1qYrvaYkAGDq/tuscFb8niDuJWeEeD+WT1SXJ
-         IdGnuIRe5tCdhOHNxAV3fdT1jdtbN0khRrWotFq/D23V3ne5TfUtyxt+qiYdsUWxE+ux
-         hqmA==
+        bh=vdkFREewlZcIDmDynEQ1WiTK28L5oQeFHQvdWFt20H8=;
+        b=sxCdv3gUS81WcMO5HZwVF/YY/aTx9nyBxnp72jMDhHxZyPo8dExNRLRe1h6NxXBlMF
+         owEnVU/qRjK/grqsNFswIwo4RYalfY8Q9BT68HxVIq40oX3IyJTxisXf+RWQnlh6ksBl
+         8SdZm2T5mo3K/W5I/O0LXTqtqkeiiNn2CxxT9Vt+ceX3uOQxiO7wonFbVriU//TlbdQQ
+         dMKjYUY4W6MxXbGp5N2i0WA0yxZSBT3oJGmalOomTLWDKimjaT0vvCzdn/5nhsegpqSO
+         PptP4XzsvIuul9jIuRXwBty0YwD1ttzYoy2OOyJjqlFRletHTLL2OLQhqHzi4cLGdbo6
+         1cTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=KHf2ZMKdg9jN9lddyLRTxgJZXNS2YqOTao5Opa455GQ=;
-        b=EH9jb/UL3lF3N0ou6OmmQzLJ/N+XSjJd+W2XeQ3t3Q1EAAKEKiQjHzkzDlCfX3v+Jp
-         HPNMEDp7hfq6YrCnAcCAFFHlUgUgZ5XB+h2yMLKI8kb908DmQQL7WejLMmbPS5IlxSLq
-         QjL13C8kZOTvn5HJ0Ls/BAII5Ia5d/AnvJ/UBb4HCygZVw/GqzzExK9DKTuYDaG1at7K
-         zcjZS1C8X06Thf8qKmTHsrYshQH/e+aYpOK0WHyl5jFrikYmQgSa8dDoaFqLyeJFYL0T
-         x9Z9cSTT9OzHTlZxaJVbHio4Ix2RoNTi6LQrCO31qP71SyFIzX7g3NLFFOqt/gDbXPcR
-         olFg==
-X-Gm-Message-State: AOAM5327W15nnI0XZaAqsEfNRG6QsvM31WwdJL1lrckSxRFvVAxapUgQ
-        8XULqY1cDSp07aQr9hBpeoB/HRN4jtXKrxnD7GNvfw==
-X-Google-Smtp-Source: ABdhPJyXcx3zNFGneIwhm6L81T/V7HcN2SL2UNAv9pPjNRt9r+THFblmhv9pKa/4PqV1Oen8SPJ/4iPeWF6iFIur5V8=
-X-Received: by 2002:a17:907:1c15:: with SMTP id nc21mr4692622ejc.49.1620146767482;
- Tue, 04 May 2021 09:46:07 -0700 (PDT)
+        bh=vdkFREewlZcIDmDynEQ1WiTK28L5oQeFHQvdWFt20H8=;
+        b=QcT4hcl+nfwRrr6Cs0xIOs9cKNOwIyDx9AQ6aQDYQcjpf4BDfXl+3tFWrUKdAz8yib
+         azStC8yD2/gF0flMz8ZSJxr0mkUXMuk9NnlpY9JmMqd9Wo2O6WFTZnwApn2weS2OFoSu
+         sZHweoE7aL4l3bIJdUKIIhh/ljq9HfwbzTsqdpR7Z9CQ8opsRQhuVxgtHN4HueGZanEo
+         EZv2YyIIE61ZGUHPLTAjJH/jfZ32ZIpFGY4qqQLZ93ZBlv+QPxpUti/ILFA+GS6Gcpo5
+         I031Llsf+gkq+/JigOBMtPBuA107xHlm7mPWgkJ1Y4E07zQZeXVdd+kbC0MYmxVumyQg
+         JRCg==
+X-Gm-Message-State: AOAM532FKHFWZnbH3n9iXFhejkptj2vZJwurOgZlWHvdKvIhRd+F1X1b
+        7/uzmlPS8yYIZVPSPyXlTaMimehnml2mzkRcEtyhGg==
+X-Google-Smtp-Source: ABdhPJz4q/uVbItWDyl6QflQ4NHfG7as4jx8YVi70hHEkvZXmHwdIZxapwMixmihPdmvH/JJv8aCMvaA7Abj9xLlRHE=
+X-Received: by 2002:a05:6830:16c8:: with SMTP id l8mr20047502otr.56.1620147177249;
+ Tue, 04 May 2021 09:52:57 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210430160138.100252-1-kai.huang@intel.com> <CANgfPd_gWYaKbdD-fkLNwCSaVQhgcQaSKOEoG0a2B90GhB03zg@mail.gmail.com>
- <e5814ecab90a3df04ea862dd31927a8f9275af77.camel@intel.com>
-In-Reply-To: <e5814ecab90a3df04ea862dd31927a8f9275af77.camel@intel.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Tue, 4 May 2021 09:45:55 -0700
-Message-ID: <CANgfPd-3a1a4se--+M6fCnfXP0kbbxqpKrv18JVA3UFcxrZ_3g@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Fix some return value error in kvm_tdp_mmu_map()
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+References: <20210428172729.3551-1-valeriy.vdovin@virtuozzo.com>
+ <YIoFFl72VSeuhCRt@google.com> <0d68dbc3-8462-7763-fbad-f3b895fcf6e6@redhat.com>
+ <be7eedf7-03a2-f998-079d-b18101b8b187@openvz.org> <63e54361-0018-ad3b-fb2b-e5dba6a0f221@redhat.com>
+ <048b3f3a-379d-cff3-20b6-fc74dd12a98f@openvz.org> <514b5373-c07b-ad34-5fba-f8850faf6d68@redhat.com>
+ <b4434730-9cd1-1d41-d012-f7beff7e351b@amazon.com>
+In-Reply-To: <b4434730-9cd1-1d41-d012-f7beff7e351b@amazon.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 4 May 2021 09:52:46 -0700
+Message-ID: <CALMp9eSzNBv-EQoGryyx_eFGmYyUBQwYkB5ndmwuE1SP0Wu6_A@mail.gmail.com>
+Subject: Re: [PATCH v4] KVM: x86: Fix KVM_GET_CPUID2 ioctl to return cpuid
+ entries count
+To:     Alexander Graf <graf@amazon.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Denis V. Lunev" <den@openvz.org>,
         Sean Christopherson <seanjc@google.com>,
+        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        Like Xu <like.xu@linux.intel.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 3, 2021 at 4:32 PM Kai Huang <kai.huang@intel.com> wrote:
+On Tue, May 4, 2021 at 2:26 AM Alexander Graf <graf@amazon.com> wrote:
 >
-> On Mon, 2021-05-03 at 10:07 -0700, Ben Gardon wrote:
-> > On Fri, Apr 30, 2021 at 9:03 AM Kai Huang <kai.huang@intel.com> wrote:
-> > >
-> > > There are couple of issues in current tdp_mmu_map_handle_target_level()
-> > > regarding to return value which reflects page fault handler's behavior
-> > > -- whether it truely fixed page fault, or fault was suprious, or fault
-> > > requires emulation, etc:
-> > >
-> > > 1) Currently tdp_mmu_map_handle_target_level() return 0, which is
-> > >    RET_PF_RETRY, when page fault is actually fixed.  This makes
-> > >    kvm_tdp_mmu_map() also return RET_PF_RETRY in this case, instead of
-> > >    RET_PF_FIXED.
+>
+>
+> On 04.05.21 10:21, Paolo Bonzini wrote:
 > >
-> > Ooof that was an oversight. Thank you for catching that.
->
-> Thanks for reviewing.
->
+> > On 04/05/21 10:15, Denis V. Lunev wrote:
+> >> As far as I understand only some testing within kernel now.
+> >> Though we have plans to expose it for QAPI as the series
+> >> in QEMU
+> >>    [PATCH 1/2] qapi: fix error handling for x-vz-query-cpu-model-cpuid
+> >>    [PATCH 2/2] qapi: blacklisted x-vz-query-cpu-model-cpuid in tests
+> >> is not coming in a good way.
+> >> The idea was to avoid manual code rework in QEMU and
+> >> expose collected model at least for debug.
 > >
-> > >
-> > > 2) When page fault is spurious, tdp_mmu_map_handle_target_level()
-> > >    currently doesn't return immediately.  This is not correct, since it
-> > >    may, for instance, lead to double emulation for a single instruction.
-> >
-> > Could you please add an example of what would be required for this to
-> > happen? What effect would it have?
-> > I don't doubt you're correct on this point, just having a hard time
-> > pinpointing where the issue is.
+> > KVM_GET_CPUID2 as a VM ioctl cannot expose the whole truth about CPUID
+> > either, since it doesn't handle the TSX_CTRL_CPUID_CLEAR bit.  Given
+> > that QEMU doesn't need KVM_GET_CPUID2; it only needs to save whatever it
+> > passed to KVM_SET_CPUID2.
 >
-> Hmm.. After reading your reply, I think I wasn't thinking correctly about the emulation
-> part :)
->
-> I was thinking the case that two threads simultaneously write to video ram (which is write
-> protected and requires emulation) which has been swapped out, in which case one thread
-> will succeed with setting up the mapping, and the other will get atomic exchange failure.
-> Since both threads are trying to setup the same mapping, I thought in this case for the
-> second thread (that gets atomic exchange failure) should just give up. But reading code
-> again, and with your reply, I think the right behavior is, actually both threads need to
-> do the emulation, because this is the correct behavior.'
->
-> That being said, I still believe that for spurious fault, we should return immediately
-> (otherwise it is not spurious fault). But I now also believe the spurious fault check in
-> existing code happens too early -- it has to be after write protection emulation check.
-> And I just checked the mmu_set_spte() code, if I read correctly, it exactly puts spurious
-> fault check after write protection emulation check.
->
-> Does this make sense?
+> What if we instead deflect CPUID into user space so it can emulate it in
+> whatever way it likes? Is the performance difference going to be
+> relevant? Are people still using cpuid as barrier these days?
 
-Yeah, that makes sense. Having to move the emulation check after the
-cmpxchg always felt a little weird to me Though I still think it makes
-sense since the cmpxchg can fail.
+What else would they use (in ring 3 code)? Sure, serialize is coming
+in Sapphire Rapids, but it will be 20+ years before kvm drops support
+for CPUs without serialize.
 
 >
-> If this looks good to you, I guess it would be better to split this patch into smaller
-> patches (for instance, one patch to handle case 1), and one to handle spurious fault
-> change)?
-
-That sounds good to me. That would definitely make it easier to review.
-
+> Alex
 >
-> >
-> > >
-> > > 3) One case of spurious fault is missing: when iter->old_spte is not
-> > >    REMOVED_SPTE, but still tdp_mmu_set_spte_atomic() fails on atomic
-> > >    exchange. This case means the page fault has already been handled by
-> > >    another thread, and RET_PF_SPURIOUS should be returned. Currently
-> > >    this case is not distinguished with iter->old_spte == REMOVED_SPTE
-> > >    case, and RET_PF_RETRY is returned.
-> >
-> > See comment on this point in the code below.
-> >
-> > >
-> > > Fix 1) by initializing ret to RET_PF_FIXED at beginning. Fix 2) & 3) by
-> > > explicitly adding is_removed_spte() check at beginning, and return
-> > > RET_PF_RETRY when it is true.  For other two cases (old spte equals to
-> > > new spte, and tdp_mmu_set_spte_atomic() fails), return RET_PF_SPURIOUS
-> > > immediately.
-> > >
-> > > Fixes: bb18842e2111 ("kvm: x86/mmu: Add TDP MMU PF handler")
-> > > Signed-off-by: Kai Huang <kai.huang@intel.com>
-> > > ---
-> > >  arch/x86/kvm/mmu/tdp_mmu.c | 12 +++++++-----
-> > >  1 file changed, 7 insertions(+), 5 deletions(-)
-> > >
-> > > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > > index 84ee1a76a79d..a4dc7c9a4ebb 100644
-> > > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > > @@ -905,9 +905,12 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu, int write,
-> > >                                           kvm_pfn_t pfn, bool prefault)
-> > >  {
-> > >         u64 new_spte;
-> > > -       int ret = 0;
-> > > +       int ret = RET_PF_FIXED;
-> > >         int make_spte_ret = 0;
-> > >
-> > > +       if (is_removed_spte(iter->old_spte))
-> > > +               return RET_PF_RETRY;
-> > > +
-> > >         if (unlikely(is_noslot_pfn(pfn)))
-> > >                 new_spte = make_mmio_spte(vcpu, iter->gfn, ACC_ALL);
-> > >         else
-> > > @@ -916,10 +919,9 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu, int write,
-> > >                                          map_writable, !shadow_accessed_mask,
-> > >                                          &new_spte);
-> > >
-> > > -       if (new_spte == iter->old_spte)
-> > > -               ret = RET_PF_SPURIOUS;
-> > > -       else if (!tdp_mmu_set_spte_atomic(vcpu->kvm, iter, new_spte))
-> > > -               return RET_PF_RETRY;
-> > > +       if (new_spte == iter->old_spte ||
-> > > +                       !tdp_mmu_set_spte_atomic(vcpu->kvm, iter, new_spte))
-> > > +               return RET_PF_SPURIOUS;
-> >
-> >
-> > I'm not sure this is quite right. In mmu_set_spte, I see the following comment:
-> >
-> > /*
-> > * The fault is fully spurious if and only if the new SPTE and old SPTE
-> > * are identical, and emulation is not required.
-> > */
-> >
-> > Based on that comment, I think the existing code is correct. Further,
-> > if the cmpxchg fails, we have no guarantee that the value that was
-> > inserted instead resolved the page fault. For example, if two threads
-> > try to fault in a large page, but one access is a write and the other
-> > an instruction fetch, the thread with the write might lose the race to
-> > install its leaf SPTE to the instruction fetch thread installing a
-> > non-leaf SPTE for NX hugepages. In that case the fault might not be
-> > spurious and a retry could be needed.
 >
-> Right. Thanks for educating me :)
 >
-> >
-> > We could do what the fast PF handler does and check
-> > is_access_allowed(error_code, spte) with whatever value we lost the
-> > cmpxchg to, but I don't know if that's worth doing or not. There's not
-> > really much control flow difference between the two return values, as
-> > far as I can tell.
-> >
-> > It looks like we might also be incorrectly incrementing pf_fixed on a
-> > spurious PF.
+> Amazon Development Center Germany GmbH
+> Krausenstr. 38
+> 10117 Berlin
+> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+> Sitz: Berlin
+> Ust-ID: DE 289 237 879
 >
-> Yes I also think for spurious fault we should return immediately.
->
-> >
-> > It might be more interesting and accurate to introduce a separate
-> > return value for cmpxchg failures, just to see how often vCPUs
-> > actually collide like that.
->
-> It might be too complicated I guess, and probably won't worth doing that (and given my
-> double emulation is wrong).
-
-Maybe something as simple as a stat would actually be a better way to
-track that. No hurry to add such a stat though.
-
->
-> >
 >
