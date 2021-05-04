@@ -2,123 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B05A2372E49
-	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 18:53:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60ED0372E82
+	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 19:10:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231739AbhEDQxy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 May 2021 12:53:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33972 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230477AbhEDQxx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 May 2021 12:53:53 -0400
-Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18B28C061574
-        for <kvm@vger.kernel.org>; Tue,  4 May 2021 09:52:58 -0700 (PDT)
-Received: by mail-ot1-x335.google.com with SMTP id g15-20020a9d128f0000b02902a7d7a7bb6eso2091371otg.9
-        for <kvm@vger.kernel.org>; Tue, 04 May 2021 09:52:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=vdkFREewlZcIDmDynEQ1WiTK28L5oQeFHQvdWFt20H8=;
-        b=sxCdv3gUS81WcMO5HZwVF/YY/aTx9nyBxnp72jMDhHxZyPo8dExNRLRe1h6NxXBlMF
-         owEnVU/qRjK/grqsNFswIwo4RYalfY8Q9BT68HxVIq40oX3IyJTxisXf+RWQnlh6ksBl
-         8SdZm2T5mo3K/W5I/O0LXTqtqkeiiNn2CxxT9Vt+ceX3uOQxiO7wonFbVriU//TlbdQQ
-         dMKjYUY4W6MxXbGp5N2i0WA0yxZSBT3oJGmalOomTLWDKimjaT0vvCzdn/5nhsegpqSO
-         PptP4XzsvIuul9jIuRXwBty0YwD1ttzYoy2OOyJjqlFRletHTLL2OLQhqHzi4cLGdbo6
-         1cTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=vdkFREewlZcIDmDynEQ1WiTK28L5oQeFHQvdWFt20H8=;
-        b=QcT4hcl+nfwRrr6Cs0xIOs9cKNOwIyDx9AQ6aQDYQcjpf4BDfXl+3tFWrUKdAz8yib
-         azStC8yD2/gF0flMz8ZSJxr0mkUXMuk9NnlpY9JmMqd9Wo2O6WFTZnwApn2weS2OFoSu
-         sZHweoE7aL4l3bIJdUKIIhh/ljq9HfwbzTsqdpR7Z9CQ8opsRQhuVxgtHN4HueGZanEo
-         EZv2YyIIE61ZGUHPLTAjJH/jfZ32ZIpFGY4qqQLZ93ZBlv+QPxpUti/ILFA+GS6Gcpo5
-         I031Llsf+gkq+/JigOBMtPBuA107xHlm7mPWgkJ1Y4E07zQZeXVdd+kbC0MYmxVumyQg
-         JRCg==
-X-Gm-Message-State: AOAM532FKHFWZnbH3n9iXFhejkptj2vZJwurOgZlWHvdKvIhRd+F1X1b
-        7/uzmlPS8yYIZVPSPyXlTaMimehnml2mzkRcEtyhGg==
-X-Google-Smtp-Source: ABdhPJz4q/uVbItWDyl6QflQ4NHfG7as4jx8YVi70hHEkvZXmHwdIZxapwMixmihPdmvH/JJv8aCMvaA7Abj9xLlRHE=
-X-Received: by 2002:a05:6830:16c8:: with SMTP id l8mr20047502otr.56.1620147177249;
- Tue, 04 May 2021 09:52:57 -0700 (PDT)
+        id S231589AbhEDRLb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 May 2021 13:11:31 -0400
+Received: from 5.mo52.mail-out.ovh.net ([188.165.45.220]:53904 "EHLO
+        5.mo52.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231485AbhEDRLa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 May 2021 13:11:30 -0400
+X-Greylist: delayed 16200 seconds by postgrey-1.27 at vger.kernel.org; Tue, 04 May 2021 13:11:30 EDT
+Received: from mxplan5.mail.ovh.net (unknown [10.108.4.240])
+        by mo52.mail-out.ovh.net (Postfix) with ESMTPS id CD06B275188;
+        Tue,  4 May 2021 14:22:40 +0200 (CEST)
+Received: from kaod.org (37.59.142.101) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Tue, 4 May 2021
+ 14:22:38 +0200
+Authentication-Results: garm.ovh; auth=pass (GARM-101G0043eda4e7a-de7c-4853-8406-edae349cf2a7,
+                    233BADB9E061AA125F593C9F78707CF28220F307) smtp.auth=groug@kaod.org
+X-OVh-ClientIp: 78.197.208.248
+Date:   Tue, 4 May 2021 14:22:36 +0200
+From:   Greg Kurz <groug@kaod.org>
+To:     Christoph Hellwig <hch@lst.de>
+CC:     Michael Ellerman <mpe@ellerman.id.au>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>, <kvm@vger.kernel.org>,
+        David Airlie <airlied@linux.ie>,
+        <linux-kernel@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+        "Paul Mackerras" <paulus@samba.org>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+        <linux-api@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
+        <qemu-devel@nongnu.org>, <qemu-ppc@nongnu.org>
+Subject: Re: remove the nvlink2 pci_vfio subdriver v2
+Message-ID: <20210504142236.76994047@bahia.lan>
+In-Reply-To: <20210326061311.1497642-1-hch@lst.de>
+References: <20210326061311.1497642-1-hch@lst.de>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20210428172729.3551-1-valeriy.vdovin@virtuozzo.com>
- <YIoFFl72VSeuhCRt@google.com> <0d68dbc3-8462-7763-fbad-f3b895fcf6e6@redhat.com>
- <be7eedf7-03a2-f998-079d-b18101b8b187@openvz.org> <63e54361-0018-ad3b-fb2b-e5dba6a0f221@redhat.com>
- <048b3f3a-379d-cff3-20b6-fc74dd12a98f@openvz.org> <514b5373-c07b-ad34-5fba-f8850faf6d68@redhat.com>
- <b4434730-9cd1-1d41-d012-f7beff7e351b@amazon.com>
-In-Reply-To: <b4434730-9cd1-1d41-d012-f7beff7e351b@amazon.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 4 May 2021 09:52:46 -0700
-Message-ID: <CALMp9eSzNBv-EQoGryyx_eFGmYyUBQwYkB5ndmwuE1SP0Wu6_A@mail.gmail.com>
-Subject: Re: [PATCH v4] KVM: x86: Fix KVM_GET_CPUID2 ioctl to return cpuid
- entries count
-To:     Alexander Graf <graf@amazon.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Denis V. Lunev" <den@openvz.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Oliver Upton <oupton@google.com>,
-        Like Xu <like.xu@linux.intel.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.101]
+X-ClientProxiedBy: DAG5EX1.mxp5.local (172.16.2.41) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: 316f1bea-914e-41ab-a4e8-46202395b6d3
+X-Ovh-Tracer-Id: 4363706565853223297
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduledrvdefiedgheefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeeftdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeetgffffffggfekgeffteekhffhueelffdvhedvgfdthfeiudetvddulefgveevteenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdhpphgtsehnohhnghhnuhdrohhrgh
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 4, 2021 at 2:26 AM Alexander Graf <graf@amazon.com> wrote:
->
->
->
-> On 04.05.21 10:21, Paolo Bonzini wrote:
-> >
-> > On 04/05/21 10:15, Denis V. Lunev wrote:
-> >> As far as I understand only some testing within kernel now.
-> >> Though we have plans to expose it for QAPI as the series
-> >> in QEMU
-> >>    [PATCH 1/2] qapi: fix error handling for x-vz-query-cpu-model-cpuid
-> >>    [PATCH 2/2] qapi: blacklisted x-vz-query-cpu-model-cpuid in tests
-> >> is not coming in a good way.
-> >> The idea was to avoid manual code rework in QEMU and
-> >> expose collected model at least for debug.
-> >
-> > KVM_GET_CPUID2 as a VM ioctl cannot expose the whole truth about CPUID
-> > either, since it doesn't handle the TSX_CTRL_CPUID_CLEAR bit.  Given
-> > that QEMU doesn't need KVM_GET_CPUID2; it only needs to save whatever it
-> > passed to KVM_SET_CPUID2.
->
-> What if we instead deflect CPUID into user space so it can emulate it in
-> whatever way it likes? Is the performance difference going to be
-> relevant? Are people still using cpuid as barrier these days?
+On Fri, 26 Mar 2021 07:13:09 +0100
+Christoph Hellwig <hch@lst.de> wrote:
 
-What else would they use (in ring 3 code)? Sure, serialize is coming
-in Sapphire Rapids, but it will be 20+ years before kvm drops support
-for CPUs without serialize.
+> Hi all,
+> 
+> the nvlink2 vfio subdriver is a weird beast.  It supports a hardware
+> feature without any open source component - what would normally be
+> the normal open source userspace that we require for kernel drivers,
+> although in this particular case user space could of course be a
+> kernel driver in a VM.  It also happens to be a complete mess that
+> does not properly bind to PCI IDs, is hacked into the vfio_pci driver
+> and also pulles in over 1000 lines of code always build into powerpc
+> kernels that have Power NV support enabled.  Because of all these
+> issues and the lack of breaking userspace when it is removed I think
+> the best idea is to simply kill.
+> 
+> Changes since v1:
+>  - document the removed subtypes as reserved
+>  - add the ACK from Greg
+> 
+> Diffstat:
+>  arch/powerpc/platforms/powernv/npu-dma.c     |  705 ---------------------------
+>  b/arch/powerpc/include/asm/opal.h            |    3 
+>  b/arch/powerpc/include/asm/pci-bridge.h      |    1 
+>  b/arch/powerpc/include/asm/pci.h             |    7 
+>  b/arch/powerpc/platforms/powernv/Makefile    |    2 
+>  b/arch/powerpc/platforms/powernv/opal-call.c |    2 
+>  b/arch/powerpc/platforms/powernv/pci-ioda.c  |  185 -------
+>  b/arch/powerpc/platforms/powernv/pci.c       |   11 
+>  b/arch/powerpc/platforms/powernv/pci.h       |   17 
+>  b/arch/powerpc/platforms/pseries/pci.c       |   23 
+>  b/drivers/vfio/pci/Kconfig                   |    6 
+>  b/drivers/vfio/pci/Makefile                  |    1 
+>  b/drivers/vfio/pci/vfio_pci.c                |   18 
+>  b/drivers/vfio/pci/vfio_pci_private.h        |   14 
+>  b/include/uapi/linux/vfio.h                  |   38 -
 
->
-> Alex
->
->
->
-> Amazon Development Center Germany GmbH
-> Krausenstr. 38
-> 10117 Berlin
-> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-> Sitz: Berlin
-> Ust-ID: DE 289 237 879
->
->
+
+Hi Christoph,
+
+FYI, these uapi changes break build of QEMU.
+
+I guess QEMU people should take some action before this percolates
+to the QEMU source tree.
+
+Cc'ing relevant QEMU lists to bring the discussion there.
+
+Cheers,
+
+--
+Greg
+
+>  drivers/vfio/pci/vfio_pci_nvlink2.c          |  490 ------------------
+>  16 files changed, 12 insertions(+), 1511 deletions(-)
+
