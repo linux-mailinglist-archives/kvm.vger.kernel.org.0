@@ -2,73 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4488D37273E
-	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 10:30:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A1BB3727C8
+	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 11:05:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230089AbhEDIbG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 May 2021 04:31:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36178 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229920AbhEDIbF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 May 2021 04:31:05 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1CEF2613BA;
-        Tue,  4 May 2021 08:30:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620117011;
-        bh=SA0MPq08S4sIbEu0S/YkhVbAPJQkRS5WeyPcEthMjx8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=MFnRDdSddwFqD0o+BFnn3MH3YKem6HT//4u8RH8EXkPAcQT9SkeWZNklQFzo7wOQB
-         HXvNwJWmMvA1IcwoMACcnxUpimVDq6op2UIEj0NHPacUaNQpBw4mLOKutdV8VHhdzQ
-         tbi/EeK3qbxUA7dPh3UIZZ41LtqvbZG/8B4D6uoz253eQgtYCUPk0Er3JjRnbL04eL
-         H4oTHVChbT7vJKYa+ihaC6dHWLnbIyTxgnUu3h/aBLrSSszNynVwXEeUB1DT7sLR5w
-         jPgVoOqjKc10n+KxOyuvx83dQRxSLi4+E7XR72yx+Z7H4KUyYX+ZtQgT5vCjlgR+J7
-         RPZjLwKCg+RsA==
-Date:   Tue, 4 May 2021 09:30:05 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Vikram Sethi <vsethi@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Mark Kettenis <mark.kettenis@xs4all.nl>,
-        Marc Zyngier <maz@kernel.org>,
-        Shanker Donthineni <sdonthineni@nvidia.com>,
-        "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-        "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jason Sequeira <jsequeira@nvidia.com>
-Subject: Re: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR
- region in VMA
-Message-ID: <20210504083005.GA12290@willie-the-truck>
-References: <1edb2c4e-23f0-5730-245b-fc6d289951e1@nvidia.com>
- <878s4zokll.wl-maz@kernel.org>
- <BL0PR12MB2532CC436EBF626966B15994BD5E9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <87eeeqvm1d.wl-maz@kernel.org>
- <BL0PR12MB25329EF5DFA7BBAA732064A7BD5C9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <87bl9sunnw.wl-maz@kernel.org>
- <c1bd514a531988c9@bloch.sibelius.xs4all.nl>
- <BL0PR12MB253296086906C4A850EC68E6BD5B9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <20210503084432.75e0126d@x1.home.shazbot.org>
- <BL0PR12MB2532BEAE226E7D68A8A2F97EBD5B9@BL0PR12MB2532.namprd12.prod.outlook.com>
+        id S230115AbhEDJGP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 May 2021 05:06:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42922 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230102AbhEDJGP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 May 2021 05:06:15 -0400
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9298FC061574
+        for <kvm@vger.kernel.org>; Tue,  4 May 2021 02:05:20 -0700 (PDT)
+Received: by mail-io1-xd31.google.com with SMTP id v123so6445066ioe.10
+        for <kvm@vger.kernel.org>; Tue, 04 May 2021 02:05:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=XbsIVpSzOqKCxf1/BEytXw5/aJTW1x58VGkF7dnUL34=;
+        b=DVWU+Dsi8RKxW0nOLNSUUPIpmLx909iDNX+6P78T3nnEn/BrPxyOA/ZKimt2FxXDe0
+         pDBHzh53J4o7GkZxdaEm+OzzNRcwX2LFICD36eNa9nY6LX1nQNcCjQuwv8sq+cN+ovuW
+         Bn+uxyDk8YUCTNuBztjnuTuXpMNGLw5vU+wn/7Jpm1mNyVoGubosHvnUqpf3+JweZWfH
+         y2cmZqqIaUOHQTm2jXE5WS+VkLuLexQkMo5AFu97Ua+RW153KLfn4stTLDCIF5N45PSK
+         acgnZJO5Ht7Yv7lGlK9/6v66VzfyIh8vtPRx06eymH8fMe+P3rsb1/+dsvkuni71gVWP
+         l4cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=XbsIVpSzOqKCxf1/BEytXw5/aJTW1x58VGkF7dnUL34=;
+        b=EMpo1NEX+hduMLTWlJxfjCjGVGPmFdU0JR0OFKHab7qx7T/I+35w0yVI1h+fQDE2Ja
+         N/r+qkR39NmE17NyXxvqA2FdihA8UNWP50WXIpdCYo7BBDm+Bcd+P3xjjmRVJZE03JS4
+         RzWPPTEluyCM/Fs9mqKJwuJ6wSJOZRZPmOfhzMBngiqNo9x4ShB2Bp0anrQVdUaUnN94
+         i8eqcciDn54UPoexQSNL0aAsJ0Ym459t6EIu23q9v4lGyRwbyYAADE3cHzVODJ4jX2iV
+         3OOvVfRycRZolvMaVeL30QiWrvLGEKn+out5fBGa2x444qdWDX5f3d54I9H6ZJY3UJjU
+         gS5Q==
+X-Gm-Message-State: AOAM533DBahwYgFcV8g4nWRrF6B9H4zxDIbf3d/h2Vinb/9vvzLNVB2Z
+        BlZM/aXvsS+2imDHD/PQohThLyiIadiojBu1/i7gkvjyd/RQfQ==
+X-Google-Smtp-Source: ABdhPJzZIrxVdXV1y+Ga2yUVf6D/4eMeE/k/ecvvmyY3YiSfSMFQvUrpGtKJS5mFhPe6fg3gnHB8qm1NqxSylqgMPq4=
+X-Received: by 2002:a05:6638:a2c:: with SMTP id 12mr22329922jao.99.1620119120085;
+ Tue, 04 May 2021 02:05:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BL0PR12MB2532BEAE226E7D68A8A2F97EBD5B9@BL0PR12MB2532.namprd12.prod.outlook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20210502093319.61313-1-mgurtovoy@nvidia.com>
+In-Reply-To: <20210502093319.61313-1-mgurtovoy@nvidia.com>
+From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Date:   Tue, 4 May 2021 11:05:08 +0200
+Message-ID: <CAM9Jb+iOBxu0o5THFNNTJx4qQ8ZXHpD020T5ZwfZYnsHy+8Hjg@mail.gmail.com>
+Subject: Re: [PATCH 1/1] virtio-net: don't allocate control_buf if not supported
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     "Michael S . Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>,
+        virtualization@lists.linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 03, 2021 at 10:03:59PM +0000, Vikram Sethi wrote:
-> Will/Catalin, perhaps you could explain your thought process on why you chose
-> Normal NC for ioremap_wc on the armv8 linux port instead of Device GRE or other
-> Device Gxx. 
+> Not all virtio_net devices support the ctrl queue feature. Thus, there
+> is no need to allocate unused resources.
+>
+> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> ---
+>  drivers/net/virtio_net.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 7fda2ae4c40f..9b6a4a875c55 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -2870,9 +2870,13 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
+>  {
+>         int i;
+>
+> -       vi->ctrl = kzalloc(sizeof(*vi->ctrl), GFP_KERNEL);
+> -       if (!vi->ctrl)
+> -               goto err_ctrl;
+> +       if (vi->has_cvq) {
+> +               vi->ctrl = kzalloc(sizeof(*vi->ctrl), GFP_KERNEL);
+> +               if (!vi->ctrl)
+> +                       goto err_ctrl;
+> +       } else {
+> +               vi->ctrl = NULL;
+> +       }
+>         vi->sq = kcalloc(vi->max_queue_pairs, sizeof(*vi->sq), GFP_KERNEL);
+>         if (!vi->sq)
+>                 goto err_sq;
 
-I think a combination of: compatibility with 32-bit Arm, the need to
-support unaligned accesses and the potential for higher performance.
-
-Furthermore, ioremap() already gives you a Device memory type, and we're
-tight on MAIR space.
-
-Will
+Reviewed-by: Pankaj Gupta <pankaj.gupta@ionos.com>
