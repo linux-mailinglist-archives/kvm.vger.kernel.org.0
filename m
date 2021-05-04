@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D1CEA372EA4
-	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 19:18:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79922372EA6
+	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 19:18:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232113AbhEDRSr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 May 2021 13:18:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39580 "EHLO
+        id S232136AbhEDRSu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 May 2021 13:18:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232064AbhEDRSp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 May 2021 13:18:45 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DBB2C06174A
-        for <kvm@vger.kernel.org>; Tue,  4 May 2021 10:17:50 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id v12-20020a25848c0000b02904f30b36aebfso12767676ybk.1
-        for <kvm@vger.kernel.org>; Tue, 04 May 2021 10:17:50 -0700 (PDT)
+        with ESMTP id S230463AbhEDRSs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 May 2021 13:18:48 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 696A8C06174A
+        for <kvm@vger.kernel.org>; Tue,  4 May 2021 10:17:52 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id m68-20020a6326470000b029020f37ad2901so5674695pgm.7
+        for <kvm@vger.kernel.org>; Tue, 04 May 2021 10:17:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=j0hBscA0403vKyQ6SIWuUyRenydWaHr9yEWTv+u3OUs=;
-        b=ViGRM4AJOU518/+fjRX9OlnzW/83aCiR1KgihpFq073sjX7H1DBYYHGZqylYb5Y7Q2
-         Uy/gi/efm0nM4Dc+A9bK5CQp8VswRZeS/3eOIoB/umJuYp/pxlaKPQ0qUPtfPdg4BPyu
-         VR/9ZeJTs0uJ2ZYBElFK2p5be4z5mcspDhD+eai1dmzNGh9xlgZzEP6q0lCUmX4jfrGN
-         CbOUQlh9p82oQfrxYXtz7dtIOi4BMLqhiECO5oENxRneRyHKxSCkyZeGHq0AGq3YXHKB
-         9rybb4wVz7MsGHzg+JHNFfgmol3G3HWFHN7OE/ioX13Q5FuXARrTtE6NxnlmRGOlEVvb
-         qycw==
+        bh=x9ju8Y95QmZw6Siui/FK/R18zMsSmb8w0Q5nDcsgnqg=;
+        b=v/A3HzwLp+vZV56pMiyGse3+Y7Ns38lqueNgFzl39BqNJ8/nNkwrQwLE7jj0HL6n3b
+         bTksTsCS/rwy4KFIpqe8pt2TgSLjkyG/8jr8S2+csy2GFj3kf+Vk+b2KJ26ri0osQnAE
+         7zOM779YwH3NA+nudqbsxSiBW7gUOdYB7+pZA91l7wUgytk0IAsvHC0yI4FxxC1QaTRT
+         EjKP0xq8zK8bmp7mNLxzwGD66AvagO8ZGcuyxa2AVrDT1g0uouUrsyQULAtR4oy9IMWQ
+         hvXGsaW34984PFebHKAzJblE8fgtliDC98prZJTZwDWp655aymPS2gaOd3APbn2NyhSc
+         m39w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=j0hBscA0403vKyQ6SIWuUyRenydWaHr9yEWTv+u3OUs=;
-        b=bLX1M/NpDSero0m1xIillBqTcmZoQwV9EA4s44CCH/Ly119mjbe2QQFou414u6k5Pw
-         +1r6f1Z6OnBgqQy04f/5M8wIsWtZPF1oCBVUwc/V9RxDup0Mu18HJcB+N4AuVJ9zz0AP
-         lakehwCmWOQWJmsatYoY0XMi21swTlNySR43g/Qq2PS9wJhsAY3YKeWP1Tyq5FuQENEV
-         aDz8/ibh3HBUnh1jgoIu0Sb2UhQDLdhv5BIO/FzARvAzQOiyuH7LeSsJXBue2AYM0vud
-         65shlwFJYY8FWTH66z83/ftfTAFABWXpOAjzJxz9mlpf/UbcXZBMn8q4hViBeFO3J5Kt
-         0/tw==
-X-Gm-Message-State: AOAM5315d7rsENiwYUSA3TVw6eoobyngSviRwKb7XvXeZb0dkTQkeTSb
-        kygi2W9yO26pcNSVqqoKed6txmN4Mm8=
-X-Google-Smtp-Source: ABdhPJwry1A6z/xjHiq7OfswGhOeDlb9iJLLC5CJCuD7yr/gYHfb7E3S+/lNHAndjUQOSs8wYttrWfkEfes=
+        bh=x9ju8Y95QmZw6Siui/FK/R18zMsSmb8w0Q5nDcsgnqg=;
+        b=oXO6DKgpQ7xYNtdlbUH8BkzZEIXnC1bdt8Zf1JeWgo8HIvuRjukA2WTi/S13zR0VMQ
+         eN+1Wd6wwEpdcdpCiQqo6ViMSOi50PTE+f2c9XOu40bVsygYe9a6fbjaCJck2X0rAJUj
+         YXqKypnb8Y/ajK175xw76p3D2RKI55gpmh2SFles/Zr4DsF5vCjycF3L3WN9tOWvo+2N
+         97lrmWPo7WwLmztLRkv5XDzEQCj/JDevfhNAWJpsEn6URbjDMHgvCd0IbR8XGiYeqiV7
+         YvE7jfFFBbyfrmxZ7HJA6saIsdairB9LfELw3rkxFxAuON0gW545mbpvUzOghV2G2Mzp
+         YS1A==
+X-Gm-Message-State: AOAM530oSGqOoweihCPaT+6QbJsmzWuoBuJuIVw6qq9zvyssq3pt1PhG
+        U1R9QX7ILNjGEYWoq/1/eZ5mYEqdmr8=
+X-Google-Smtp-Source: ABdhPJyMfi4QaGrLYdrW6ssUNtQ+SG89NJapbP1MqWBMxR/nCoes9dndo5SZcIvi2xFF+IwubJiTNFdt5nk=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:df57:48cb:ea33:a156])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1349:: with SMTP id
- g9mr18387086ybu.30.1620148669369; Tue, 04 May 2021 10:17:49 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:f690:: with SMTP id
+ cl16mr29862523pjb.207.1620148671954; Tue, 04 May 2021 10:17:51 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue,  4 May 2021 10:17:22 -0700
+Date:   Tue,  4 May 2021 10:17:23 -0700
 In-Reply-To: <20210504171734.1434054-1-seanjc@google.com>
-Message-Id: <20210504171734.1434054-4-seanjc@google.com>
+Message-Id: <20210504171734.1434054-5-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210504171734.1434054-1-seanjc@google.com>
 X-Mailer: git-send-email 2.31.1.527.g47e6f16901-goog
-Subject: [PATCH 03/15] KVM: SVM: Inject #UD on RDTSCP when it should be
- disabled in the guest
+Subject: [PATCH 04/15] KVM: x86: Move RDPID emulation intercept to its own enum
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -67,82 +66,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Intercept RDTSCP to inject #UD if RDTSC is disabled in the guest.
+Add a dedicated intercept enum for RDPID instead of piggybacking RDTSCP.
+Unlike VMX's ENABLE_RDTSCP, RDPID is not bound to SVM's RDTSCP intercept.
 
-Note, SVM does not support intercepting RDPID.  Unlike VMX's
-ENABLE_RDTSCP control, RDTSCP interception does not apply to RDPID.  This
-is a benign virtualization hole as the host kernel (incorrectly) sets
-MSR_TSC_AUX if RDTSCP is supported, and KVM loads the guest's MSR_TSC_AUX
-into hardware if RDTSCP is supported in the host, i.e. KVM will not leak
-the host's MSR_TSC_AUX to the guest.
-
-But, when the kernel bug is fixed, KVM will start leaking the host's
-MSR_TSC_AUX if RDPID is supported in hardware, but RDTSCP isn't available
-for whatever reason.  This leak will be remedied in a future commit.
-
-Fixes: 46896c73c1a4 ("KVM: svm: add support for RDTSCP")
+Fixes: fb6d4d340e05 ("KVM: x86: emulate RDPID")
 Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+ arch/x86/kvm/emulate.c     | 2 +-
+ arch/x86/kvm/kvm_emulate.h | 1 +
+ arch/x86/kvm/vmx/vmx.c     | 3 ++-
+ 3 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index a7271f31df47..8f2b184270c0 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1100,7 +1100,9 @@ static u64 svm_write_l1_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
- 	return svm->vmcb->control.tsc_offset;
- }
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index abd9a4db11a8..8fc71e70857d 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -4502,7 +4502,7 @@ static const struct opcode group8[] = {
+  * from the register case of group9.
+  */
+ static const struct gprefix pfx_0f_c7_7 = {
+-	N, N, N, II(DstMem | ModRM | Op3264 | EmulateOnUD, em_rdpid, rdtscp),
++	N, N, N, II(DstMem | ModRM | Op3264 | EmulateOnUD, em_rdpid, rdpid),
+ };
  
--static void svm_check_invpcid(struct vcpu_svm *svm)
-+/* Evaluate instruction intercepts that depend on guest CPUID features. */
-+static void svm_recalc_instruction_intercepts(struct kvm_vcpu *vcpu,
-+					      struct vcpu_svm *svm)
- {
+ 
+diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+index 0d359115429a..f016838faedd 100644
+--- a/arch/x86/kvm/kvm_emulate.h
++++ b/arch/x86/kvm/kvm_emulate.h
+@@ -468,6 +468,7 @@ enum x86_intercept {
+ 	x86_intercept_clgi,
+ 	x86_intercept_skinit,
+ 	x86_intercept_rdtscp,
++	x86_intercept_rdpid,
+ 	x86_intercept_icebp,
+ 	x86_intercept_wbinvd,
+ 	x86_intercept_monitor,
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 82404ee2520e..99591e523b47 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7437,8 +7437,9 @@ static int vmx_check_intercept(struct kvm_vcpu *vcpu,
  	/*
- 	 * Intercept INVPCID if shadow paging is enabled to sync/free shadow
-@@ -1113,6 +1115,13 @@ static void svm_check_invpcid(struct vcpu_svm *svm)
- 		else
- 			svm_clr_intercept(svm, INTERCEPT_INVPCID);
- 	}
-+
-+	if (kvm_cpu_cap_has(X86_FEATURE_RDTSCP)) {
-+		if (guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
-+			svm_clr_intercept(svm, INTERCEPT_RDTSCP);
-+		else
-+			svm_set_intercept(svm, INTERCEPT_RDTSCP);
-+	}
- }
- 
- static void init_vmcb(struct kvm_vcpu *vcpu)
-@@ -1248,7 +1257,7 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
- 		svm_clr_intercept(svm, INTERCEPT_PAUSE);
- 	}
- 
--	svm_check_invpcid(svm);
-+	svm_recalc_instruction_intercepts(vcpu, svm);
- 
- 	/*
- 	 * If the host supports V_SPEC_CTRL then disable the interception
-@@ -3084,6 +3093,7 @@ static int (*const svm_exit_handlers[])(struct kvm_vcpu *vcpu) = {
- 	[SVM_EXIT_STGI]				= stgi_interception,
- 	[SVM_EXIT_CLGI]				= clgi_interception,
- 	[SVM_EXIT_SKINIT]			= skinit_interception,
-+	[SVM_EXIT_RDTSCP]			= kvm_handle_invalid_op,
- 	[SVM_EXIT_WBINVD]                       = kvm_emulate_wbinvd,
- 	[SVM_EXIT_MONITOR]			= kvm_emulate_monitor,
- 	[SVM_EXIT_MWAIT]			= kvm_emulate_mwait,
-@@ -4007,8 +4017,7 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	svm->nrips_enabled = kvm_cpu_cap_has(X86_FEATURE_NRIPS) &&
- 			     guest_cpuid_has(vcpu, X86_FEATURE_NRIPS);
- 
--	/* Check again if INVPCID interception if required */
--	svm_check_invpcid(svm);
-+	svm_recalc_instruction_intercepts(vcpu, svm);
- 
- 	/* For sev guests, the memory encryption bit is not reserved in CR3.  */
- 	if (sev_guest(vcpu->kvm)) {
+ 	 * RDPID causes #UD if disabled through secondary execution controls.
+ 	 * Because it is marked as EmulateOnUD, we need to intercept it here.
++	 * Note, RDPID is hidden behind ENABLE_RDTSCP.
+ 	 */
+-	case x86_intercept_rdtscp:
++	case x86_intercept_rdpid:
+ 		if (!nested_cpu_has2(vmcs12, SECONDARY_EXEC_ENABLE_RDTSCP)) {
+ 			exception->vector = UD_VECTOR;
+ 			exception->error_code_valid = false;
 -- 
 2.31.1.527.g47e6f16901-goog
 
