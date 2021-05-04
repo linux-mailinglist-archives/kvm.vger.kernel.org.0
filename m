@@ -2,91 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A1BB3727C8
-	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 11:05:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DAFF3372812
+	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 11:27:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230115AbhEDJGP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 May 2021 05:06:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42922 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230102AbhEDJGP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 May 2021 05:06:15 -0400
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9298FC061574
-        for <kvm@vger.kernel.org>; Tue,  4 May 2021 02:05:20 -0700 (PDT)
-Received: by mail-io1-xd31.google.com with SMTP id v123so6445066ioe.10
-        for <kvm@vger.kernel.org>; Tue, 04 May 2021 02:05:20 -0700 (PDT)
+        id S230085AbhEDJ2B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 May 2021 05:28:01 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:38055 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229903AbhEDJ1v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 May 2021 05:27:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XbsIVpSzOqKCxf1/BEytXw5/aJTW1x58VGkF7dnUL34=;
-        b=DVWU+Dsi8RKxW0nOLNSUUPIpmLx909iDNX+6P78T3nnEn/BrPxyOA/ZKimt2FxXDe0
-         pDBHzh53J4o7GkZxdaEm+OzzNRcwX2LFICD36eNa9nY6LX1nQNcCjQuwv8sq+cN+ovuW
-         Bn+uxyDk8YUCTNuBztjnuTuXpMNGLw5vU+wn/7Jpm1mNyVoGubosHvnUqpf3+JweZWfH
-         y2cmZqqIaUOHQTm2jXE5WS+VkLuLexQkMo5AFu97Ua+RW153KLfn4stTLDCIF5N45PSK
-         acgnZJO5Ht7Yv7lGlK9/6v66VzfyIh8vtPRx06eymH8fMe+P3rsb1/+dsvkuni71gVWP
-         l4cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XbsIVpSzOqKCxf1/BEytXw5/aJTW1x58VGkF7dnUL34=;
-        b=EMpo1NEX+hduMLTWlJxfjCjGVGPmFdU0JR0OFKHab7qx7T/I+35w0yVI1h+fQDE2Ja
-         N/r+qkR39NmE17NyXxvqA2FdihA8UNWP50WXIpdCYo7BBDm+Bcd+P3xjjmRVJZE03JS4
-         RzWPPTEluyCM/Fs9mqKJwuJ6wSJOZRZPmOfhzMBngiqNo9x4ShB2Bp0anrQVdUaUnN94
-         i8eqcciDn54UPoexQSNL0aAsJ0Ym459t6EIu23q9v4lGyRwbyYAADE3cHzVODJ4jX2iV
-         3OOvVfRycRZolvMaVeL30QiWrvLGEKn+out5fBGa2x444qdWDX5f3d54I9H6ZJY3UJjU
-         gS5Q==
-X-Gm-Message-State: AOAM533DBahwYgFcV8g4nWRrF6B9H4zxDIbf3d/h2Vinb/9vvzLNVB2Z
-        BlZM/aXvsS+2imDHD/PQohThLyiIadiojBu1/i7gkvjyd/RQfQ==
-X-Google-Smtp-Source: ABdhPJzZIrxVdXV1y+Ga2yUVf6D/4eMeE/k/ecvvmyY3YiSfSMFQvUrpGtKJS5mFhPe6fg3gnHB8qm1NqxSylqgMPq4=
-X-Received: by 2002:a05:6638:a2c:: with SMTP id 12mr22329922jao.99.1620119120085;
- Tue, 04 May 2021 02:05:20 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1620120417; x=1651656417;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=VQ/a1Lg4gGku2HtYE9KiPPHcFeBRAiUZ7AcJxQWzW+Q=;
+  b=JO32lqMePlVa4DhCvqXnr4OhifXuULHGBi/rB7jNO4ZC0IPer68pi06t
+   3VyazDc6pwYQkoIhjT3emNIdEDWS1ENC5TErj3qeC3wuKq0BPUqBb4Kg3
+   CKf+ftRDNdNuxZXv7I396I/JrvSJnrDKxln+mGNbzmY1ZiFZrSPdxjh2C
+   M=;
+X-IronPort-AV: E=Sophos;i="5.82,272,1613433600"; 
+   d="scan'208";a="132879461"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-1a-821c648d.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP; 04 May 2021 09:26:34 +0000
+Received: from EX13MTAUWC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-1a-821c648d.us-east-1.amazon.com (Postfix) with ESMTPS id 0A329A04E5;
+        Tue,  4 May 2021 09:26:26 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 4 May 2021 09:26:26 +0000
+Received: from [10.85.99.170] (10.43.162.28) by EX13D20UWC001.ant.amazon.com
+ (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 4 May
+ 2021 09:26:21 +0000
+Message-ID: <b4434730-9cd1-1d41-d012-f7beff7e351b@amazon.com>
+Date:   Tue, 4 May 2021 11:26:20 +0200
 MIME-Version: 1.0
-References: <20210502093319.61313-1-mgurtovoy@nvidia.com>
-In-Reply-To: <20210502093319.61313-1-mgurtovoy@nvidia.com>
-From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Date:   Tue, 4 May 2021 11:05:08 +0200
-Message-ID: <CAM9Jb+iOBxu0o5THFNNTJx4qQ8ZXHpD020T5ZwfZYnsHy+8Hjg@mail.gmail.com>
-Subject: Re: [PATCH 1/1] virtio-net: don't allocate control_buf if not supported
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     "Michael S . Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>,
-        virtualization@lists.linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:89.0)
+ Gecko/20100101 Thunderbird/89.0
+Subject: Re: [PATCH v4] KVM: x86: Fix KVM_GET_CPUID2 ioctl to return cpuid
+ entries count
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Denis V. Lunev" <den@openvz.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+CC:     <linux-kernel@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "Jim Mattson" <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "Borislav Petkov" <bp@alien8.de>, <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>,
+        Aaron Lewis <aaronlewis@google.com>,
+        "Andrew Jones" <drjones@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        Like Xu <like.xu@linux.intel.com>, <kvm@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
+References: <20210428172729.3551-1-valeriy.vdovin@virtuozzo.com>
+ <YIoFFl72VSeuhCRt@google.com>
+ <0d68dbc3-8462-7763-fbad-f3b895fcf6e6@redhat.com>
+ <be7eedf7-03a2-f998-079d-b18101b8b187@openvz.org>
+ <63e54361-0018-ad3b-fb2b-e5dba6a0f221@redhat.com>
+ <048b3f3a-379d-cff3-20b6-fc74dd12a98f@openvz.org>
+ <514b5373-c07b-ad34-5fba-f8850faf6d68@redhat.com>
+From:   Alexander Graf <graf@amazon.com>
+In-Reply-To: <514b5373-c07b-ad34-5fba-f8850faf6d68@redhat.com>
+X-Originating-IP: [10.43.162.28]
+X-ClientProxiedBy: EX13D16UWC004.ant.amazon.com (10.43.162.72) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Not all virtio_net devices support the ctrl queue feature. Thus, there
-> is no need to allocate unused resources.
->
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> ---
->  drivers/net/virtio_net.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 7fda2ae4c40f..9b6a4a875c55 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -2870,9 +2870,13 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
->  {
->         int i;
->
-> -       vi->ctrl = kzalloc(sizeof(*vi->ctrl), GFP_KERNEL);
-> -       if (!vi->ctrl)
-> -               goto err_ctrl;
-> +       if (vi->has_cvq) {
-> +               vi->ctrl = kzalloc(sizeof(*vi->ctrl), GFP_KERNEL);
-> +               if (!vi->ctrl)
-> +                       goto err_ctrl;
-> +       } else {
-> +               vi->ctrl = NULL;
-> +       }
->         vi->sq = kcalloc(vi->max_queue_pairs, sizeof(*vi->sq), GFP_KERNEL);
->         if (!vi->sq)
->                 goto err_sq;
+CgpPbiAwNC4wNS4yMSAxMDoyMSwgUGFvbG8gQm9uemluaSB3cm90ZToKPiAKPiBPbiAwNC8wNS8y
+MSAxMDoxNSwgRGVuaXMgVi4gTHVuZXYgd3JvdGU6Cj4+IEFzIGZhciBhcyBJIHVuZGVyc3RhbmQg
+b25seSBzb21lIHRlc3Rpbmcgd2l0aGluIGtlcm5lbCBub3cuCj4+IFRob3VnaCB3ZSBoYXZlIHBs
+YW5zIHRvIGV4cG9zZSBpdCBmb3IgUUFQSSBhcyB0aGUgc2VyaWVzCj4+IGluIFFFTVUKPj4gwqDC
+oCBbUEFUQ0ggMS8yXSBxYXBpOiBmaXggZXJyb3IgaGFuZGxpbmcgZm9yIHgtdnotcXVlcnktY3B1
+LW1vZGVsLWNwdWlkCj4+IMKgwqAgW1BBVENIIDIvMl0gcWFwaTogYmxhY2tsaXN0ZWQgeC12ei1x
+dWVyeS1jcHUtbW9kZWwtY3B1aWQgaW4gdGVzdHMKPj4gaXMgbm90IGNvbWluZyBpbiBhIGdvb2Qg
+d2F5Lgo+PiBUaGUgaWRlYSB3YXMgdG8gYXZvaWQgbWFudWFsIGNvZGUgcmV3b3JrIGluIFFFTVUg
+YW5kCj4+IGV4cG9zZSBjb2xsZWN0ZWQgbW9kZWwgYXQgbGVhc3QgZm9yIGRlYnVnLgo+IAo+IEtW
+TV9HRVRfQ1BVSUQyIGFzIGEgVk0gaW9jdGwgY2Fubm90IGV4cG9zZSB0aGUgd2hvbGUgdHJ1dGgg
+YWJvdXQgQ1BVSUQKPiBlaXRoZXIsIHNpbmNlIGl0IGRvZXNuJ3QgaGFuZGxlIHRoZSBUU1hfQ1RS
+TF9DUFVJRF9DTEVBUiBiaXQuwqAgR2l2ZW4KPiB0aGF0IFFFTVUgZG9lc24ndCBuZWVkIEtWTV9H
+RVRfQ1BVSUQyOyBpdCBvbmx5IG5lZWRzIHRvIHNhdmUgd2hhdGV2ZXIgaXQKPiBwYXNzZWQgdG8g
+S1ZNX1NFVF9DUFVJRDIuCgpXaGF0IGlmIHdlIGluc3RlYWQgZGVmbGVjdCBDUFVJRCBpbnRvIHVz
+ZXIgc3BhY2Ugc28gaXQgY2FuIGVtdWxhdGUgaXQgaW4gCndoYXRldmVyIHdheSBpdCBsaWtlcz8g
+SXMgdGhlIHBlcmZvcm1hbmNlIGRpZmZlcmVuY2UgZ29pbmcgdG8gYmUgCnJlbGV2YW50PyBBcmUg
+cGVvcGxlIHN0aWxsIHVzaW5nIGNwdWlkIGFzIGJhcnJpZXIgdGhlc2UgZGF5cz8KCgpBbGV4CgoK
+CkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJICktyYXVzZW5zdHIuIDM4CjEw
+MTE3IEJlcmxpbgpHZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdGlhbiBTY2hsYWVnZXIsIEpvbmF0
+aGFuIFdlaXNzCkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJsb3R0ZW5idXJnIHVudGVy
+IEhSQiAxNDkxNzMgQgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBERSAyODkgMjM3IDg3OQoKCg==
 
-Reviewed-by: Pankaj Gupta <pankaj.gupta@ionos.com>
