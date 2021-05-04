@@ -2,117 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86B77372683
-	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 09:23:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A33C3726DE
+	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 10:02:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229918AbhEDHYH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 May 2021 03:24:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57690 "EHLO
+        id S229987AbhEDIDQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 May 2021 04:03:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32045 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229897AbhEDHYG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 May 2021 03:24:06 -0400
+        by vger.kernel.org with ESMTP id S229937AbhEDIDP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 May 2021 04:03:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620112991;
+        s=mimecast20190719; t=1620115341;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vDZzFVHUz6nuJ5xJd1dslJwLGgGS3xgzc5l8z25vt0g=;
-        b=iuolmwkV5dhIJhz+qCL9x5nP+6Lbq2SaMAlv4nFzJYoXFx1Nt4JeVJhDiUSis4jldezBzL
-        fMXJ8gAIzA5NVu3RNjFemqiEF4DnDLOuw0XQbnQs9hUfuKhSLADm5shEQ1y2AeXQE39OWB
-        3kjuIud9B+/VpFH7YkPU7BeK7ZPP6Gw=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-555-j2ZR6viaOb6kdoa6w_WkxA-1; Tue, 04 May 2021 03:23:08 -0400
-X-MC-Unique: j2ZR6viaOb6kdoa6w_WkxA-1
-Received: by mail-ed1-f72.google.com with SMTP id i2-20020a0564020542b02903875c5e7a00so5957443edx.6
-        for <kvm@vger.kernel.org>; Tue, 04 May 2021 00:23:08 -0700 (PDT)
+        bh=RazSrOHQRIEZi4NpTNvRDMTS0CNW0QsK+1YnSeSLHGA=;
+        b=XzXrKsHgR8hvGLMnwwuyMXTOH0vlUSw1/uofUgvG1zNI2CCzok4T6HwSlz8UdDvlNntA1H
+        vNSIe72iEWbXVLqUoDxOVeI4fCqiSrbx7tRVFN5gji4KH3+iUPuqu4lmskrAqRlNX03gQR
+        A197BdXfuBoZyd0OuY0qQ5uzHklQ14c=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-306-zFwsupwJPnWn8-7CdGsdOg-1; Tue, 04 May 2021 04:02:16 -0400
+X-MC-Unique: zFwsupwJPnWn8-7CdGsdOg-1
+Received: by mail-ej1-f69.google.com with SMTP id bi3-20020a170906a243b02903933c4d9132so2825567ejb.11
+        for <kvm@vger.kernel.org>; Tue, 04 May 2021 01:02:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vDZzFVHUz6nuJ5xJd1dslJwLGgGS3xgzc5l8z25vt0g=;
-        b=CFY9cHYb8z1InHFIr4IkE4WbeSzkis16sV2nNVoqivPjT2lzAjpUtDuI+996kSNyCT
-         fBB6ak+2CnJ9BNiuxBLQzVD9q+HmiL7fuX1p6NP2pxSwvk/cG7Od/Mc5SGssNDYUTjFJ
-         xpwxoXUr53su7HHg4VSXja3eVrjo66qnXPESJr/su07dV/EtPnPbCQyzpC9Or2/Vyxb1
-         T2HTA/PvDCYOU4NfN3l2GsAOvRyzdKLqkrCXqXXxv+/r7G6JCu/XkDmNzjF5/thUW7DA
-         P+AkP4LlSzSFKr2XIMRJzUzIqDVcwspVZjQ4D+N1hUX4Dnm4Zl/rMBR27VNO7Vo0VLy+
-         GUtQ==
-X-Gm-Message-State: AOAM533axc+rDXus09HuZu9Nnxkem25NInudtxZ3snC6OX/6GhrVyo4n
-        wmq/q0do9czwPTOQQPnwyQsI+pOyIgILNGoElNJENVhvUhJDC0hAhhHbH7W7pzu6MaR2RhCJp0g
-        bO2Fqbg+4AnN/
-X-Received: by 2002:a17:906:1284:: with SMTP id k4mr19971121ejb.409.1620112987710;
-        Tue, 04 May 2021 00:23:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzH+i8bygB46cYQo1fTbkLpUNZoJa+LXWC2Ieg7+dXmg88oJQA7q0vx3511SV/4Uuatr98sDg==
-X-Received: by 2002:a17:906:1284:: with SMTP id k4mr19971092ejb.409.1620112987470;
-        Tue, 04 May 2021 00:23:07 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id h15sm915197ejs.72.2021.05.04.00.23.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 May 2021 00:23:06 -0700 (PDT)
-Subject: Re: [PATCH v4] KVM: x86: Fix KVM_GET_CPUID2 ioctl to return cpuid
- entries count
-To:     "Denis V. Lunev" <den@openvz.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
-Cc:     linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=RazSrOHQRIEZi4NpTNvRDMTS0CNW0QsK+1YnSeSLHGA=;
+        b=CyEHeDsk7GAqZXedsknAPASUVw7jp8XQc+gotG/12C09RxKU/KKEYmLQJ/sxCQrP3l
+         RStw2sU6LdtRXDjLpUmS4ly8vet59rgWCvfCeZDwcHH0u3hA7TN8vC6WnyA6FyIgBDVc
+         VHG2BpEFoJwdgPui4Durh2fNQva5/WNk1Bt7fNQF5/pOrQIKD3Jaeeo4DCuHe54jmmV3
+         XfoqghwxsZYkAF/1ODhoYQj2+wquO5dSMss1DrEDgp7Qquq3A3BtjGZCVoUrOrsIZ0pl
+         BVrtBgoNyAwrGnwkY3lnhOs7lnMSLMUrXCxx76eHOcD8QXYSbSkGVe/oC1AMRmlF6CgK
+         2rvQ==
+X-Gm-Message-State: AOAM5308mn1XAWIJwx6iDH2qiTX0lqkUcxX8GhWXlDtfgJTtqzNyu/rM
+        D4WHRy7fRu1YHyE04oHn/yM9mIkOTX14dYAoIAkws4mXo8xN34GZOM8BQQLeZ8Ozyh8MuBMP27E
+        mPRua/4LzmAuV
+X-Received: by 2002:a17:906:a2d1:: with SMTP id by17mr21419097ejb.426.1620115335493;
+        Tue, 04 May 2021 01:02:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJweCmFPwqcdiMBHVArj6oWwQABJweFkYeuR6CqR2SYSBGFK8M7OAXR4kpyt3tKr6KHslmCVZg==
+X-Received: by 2002:a17:906:a2d1:: with SMTP id by17mr21419082ejb.426.1620115335335;
+        Tue, 04 May 2021 01:02:15 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id x18sm983963eju.45.2021.05.04.01.02.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 May 2021 01:02:14 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Alexander Graf <graf@amazon.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Oliver Upton <oupton@google.com>,
-        Like Xu <like.xu@linux.intel.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20210428172729.3551-1-valeriy.vdovin@virtuozzo.com>
- <YIoFFl72VSeuhCRt@google.com>
- <0d68dbc3-8462-7763-fbad-f3b895fcf6e6@redhat.com>
- <be7eedf7-03a2-f998-079d-b18101b8b187@openvz.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <63e54361-0018-ad3b-fb2b-e5dba6a0f221@redhat.com>
-Date:   Tue, 4 May 2021 09:23:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/4] KVM: nVMX: Map enlightened VMCS upon restore when
+ possible
+In-Reply-To: <87de6570-750c-5ce1-17a2-36abe99813ac@redhat.com>
+References: <20210503150854.1144255-1-vkuznets@redhat.com>
+ <20210503150854.1144255-5-vkuznets@redhat.com>
+ <87de6570-750c-5ce1-17a2-36abe99813ac@redhat.com>
+Date:   Tue, 04 May 2021 10:02:14 +0200
+Message-ID: <87h7jjx6yh.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <be7eedf7-03a2-f998-079d-b18101b8b187@openvz.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/05/21 21:18, Denis V. Lunev wrote:
-> On 5/3/21 5:54 PM, Paolo Bonzini wrote:
->> On 29/04/21 03:00, Sean Christopherson wrote:
->>> On Wed, Apr 28, 2021, Valeriy Vdovin wrote:
->>>> It's very explicit by the code that it was designed to receive some
->>>> small number of entries to return E2BIG along with the corrected
->>>> number.
->>>
->>> LOL, saying KVM_GET_CPUID2 was "designed" is definitely giving the KVM
->>> forefathers the benefit of the doubt.
->>
->> I was going to make a different joke, i.e. that KVM_GET_CPUID2 was
->> indeed designed the way Valeriy described, but that design was
->> forgotten soon after.
->>
->> Really, this ioctl has been such a trainwreck that I think the only
->> good solution here is to drop it.
->>
->> Paolo
->>
-> 
-> should we discuss KVM_GET_CPUID3 which will work "normally"?
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Is anybody using KVM_GET_CPUID2 at all?
+> On 03/05/21 17:08, Vitaly Kuznetsov wrote:
+>> It now looks like a bad idea to not restore eVMCS mapping directly from
+>> vmx_set_nested_state(). The restoration path now depends on whether KVM
+>> will continue executing L2 (vmx_get_nested_state_pages()) or will have to
+>> exit to L1 (nested_vmx_vmexit()), this complicates error propagation and
+>> diverges too much from the 'native' path when 'nested.current_vmptr' is
+>> set directly from vmx_get_nested_state_pages().
+>> 
+>> The existing solution postponing eVMCS mapping also seems to be fragile.
+>> In multiple places the code checks whether 'vmx->nested.hv_evmcs' is not
+>> NULL to distinguish between eVMCS and non-eVMCS cases. All these checks
+>> are 'incomplete' as we have a weird 'eVMCS is in use but not yet mapped'
+>> state.
+>> 
+>> Also, in case vmx_get_nested_state() is called right after
+>> vmx_set_nested_state() without executing the guest first, the resulting
+>> state is going to be incorrect as 'KVM_STATE_NESTED_EVMCS' flag will be
+>> missing.
+>> 
+>> Fix all these issues by making eVMCS restoration path closer to its
+>> 'native' sibling by putting eVMCS GPA to 'struct kvm_vmx_nested_state_hdr'.
+>> To avoid ABI incompatibility, do not introduce a new flag and keep the
+>
+> I'm not sure what is the disadvantage of not having a new flag.
+>
 
-Paolo
+Adding a new flag would make us backwards-incompatible both ways:
+
+1) Migrating 'new' state to an older KVM will fail the
+
+	if (kvm_state->hdr.vmx.flags & ~KVM_STATE_VMX_PREEMPTION_TIMER_DEADLINE)
+	        return -EINVAL;
+
+check.
+
+2) Migrating 'old' state to 'new' KVM would make us support the old path
+('KVM_REQ_GET_NESTED_STATE_PAGES') so the flag will still be 'optional'.
+
+> Having two different paths with subtly different side effects however 
+> seems really worse for maintenance.  We are already discussing in 
+> another thread how to get rid of the check_nested_events side effects; 
+> that might possibly even remove the need for patch 1, so it's at least 
+> worth pursuing more than adding this second path.
+
+I have to admit I don't fully like this solution either :-( In case we
+make sure KVM_REQ_GET_NESTED_STATE_PAGES always gets handled the fix can
+be omitted indeed, however, I still dislike the divergence and the fact
+that 'if (vmx->nested.hv_evmcs)' checks scattered across the code are
+not fully valid. E.g. how do we fix immediate KVM_GET_NESTED_STATE after
+KVM_SET_NESTED_STATE without executing the vCPU problem?
+
+>
+> I have queued patch 1, but I'd rather have a kvm selftest for it.  It 
+> doesn't seem impossible to have one...
+
+Thank you, the band-aid solves a real problem. Let me try to come up
+with a selftest for it.
+
+>
+> Paolo
+>
+>> original eVMCS mapping path through KVM_REQ_GET_NESTED_STATE_PAGES in
+>> place. To distinguish between 'new' and 'old' formats consider eVMCS
+>> GPA == 0 as an unset GPA (thus forcing KVM_REQ_GET_NESTED_STATE_PAGES
+>> path). While technically possible, it seems to be an extremely unlikely
+>> case.
+>
+>
+>> Signed-off-by: Vitaly Kuznetsov<vkuznets@redhat.com>
+>
+
+-- 
+Vitaly
 
