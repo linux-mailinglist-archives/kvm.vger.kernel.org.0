@@ -2,54 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D95EE3732B4
-	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 01:24:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB43B3732C6
+	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 01:37:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231299AbhEDXZJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 May 2021 19:25:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36466 "EHLO
+        id S231458AbhEDXh5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 May 2021 19:37:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231279AbhEDXZJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 May 2021 19:25:09 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50B84C061574
-        for <kvm@vger.kernel.org>; Tue,  4 May 2021 16:24:13 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id y32so374401pga.11
-        for <kvm@vger.kernel.org>; Tue, 04 May 2021 16:24:13 -0700 (PDT)
+        with ESMTP id S231440AbhEDXhz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 May 2021 19:37:55 -0400
+Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E842C06174A
+        for <kvm@vger.kernel.org>; Tue,  4 May 2021 16:36:59 -0700 (PDT)
+Received: by mail-oi1-x233.google.com with SMTP id u16so523111oiu.7
+        for <kvm@vger.kernel.org>; Tue, 04 May 2021 16:36:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=cCjpzDhrttWsw5MJ/p42z/oli5HL0EZ4CCcwCVvuAoc=;
-        b=Jsjd0wfSASc35JMy8OFI+WGWdedhSmWjdc9/8egrIrj/OAUw1r3z0rbzxov+fJMCdB
-         8LCoDvmG6EHJ0veMHcaOO2y7esjJsxDR02u80b6HuYIjk01mdo+M80bFI99KNvDTT2o4
-         C50gnrXKnC5OkpOvBU75vnQxbhNksQ5ThdJ853VWIGHmBzge/oFgeNt568JWwqhlYhB9
-         IKt15CCP7c08U+Q0LG907KjvgkJnGsCgY0ZWrp+yrxSDIWSLEDuXul0XFnx0ULpszY58
-         JtCOAM3G2shxJVixfcKgUnxCsuGrToUGIFC8UvSHym/6qJ5Q9bO9KLESGkA/1Zf4uY5G
-         m61w==
+        bh=7ZG1nWXtzTYTaXrMK1FVDEfdYcnwUzz0W/Bp4Vm63w8=;
+        b=W0/NtpO49BkFw56cUrtxd4cEfAJIY00IrrdCRRM83zOAeUgsB5GNY/mRrQ9guQ+GCu
+         zt+IJvmorwCO7B/VnqnHGwHqgBURRJbU4N9fAgchjHtd3fM8mwQ3UelDSkOAA8+3qMf8
+         r9JZMox/04J0poAyl2fdpSvJp4JNeW+aKECRZEie7GHgopXF8ef5KvuID8N/VIJ3vacw
+         /pAZnyCOMa76HYaURuL4TrKT5xRQmbHMuP/59JFIL5CjKdSjWfNmpOhrGkgBJEeFKtJR
+         3qFalKYZueX64+3yV8ur8yG1/8AgITMp2LXEsXIZN2c/2iR9N87REuOR7ayWiX89ltLq
+         MGAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=cCjpzDhrttWsw5MJ/p42z/oli5HL0EZ4CCcwCVvuAoc=;
-        b=YXACuxch37DX8osTmfcl/4Eg/Mh8MJyprvsd5YZ6VD7K+NPXS4tExDeXhVKXnswjIc
-         4T3jVOjb+u2qbWZOTmxQist0Xqe/SAb8tP2+oZHcwVT83SG8QdgyQBuhR+uo9pZBQvrL
-         s4oYKRQyYIdwjFKqpeG/bMHkTPKaJXKeSJPL96JuDj8JNrfKzhO2vK+fgWabmPuh6wlh
-         sTBp/IASUt/G01SKAK6G/gasooVDiuVJ3eGR2p/GwaM/v6bRzJkuWYi93BDd2cbAFajV
-         7jGQ5bMgF7ZFiJC1el910TijxQxSwQwXV/Y78/9CVHtctl5ZaMKDsZ2H7rC2tcAogRd3
-         nK/Q==
-X-Gm-Message-State: AOAM531LiEVlU23CRT20kD3ZIk1Vlzb7gEcObD0FPC57Bj4n5xje245K
-        u4YtfvVcvJZ/5TbdseETd723JAqUJG2BR+3n+c1QDw==
-X-Google-Smtp-Source: ABdhPJy/jLwkYb2DIgxmx6j08hXvs0Rg7hT+i/eMkXx+ku0j6lxB7XK8qoX13mi1aZrW9aon251R0axwu5gMzqpW2tE=
-X-Received: by 2002:a63:ff25:: with SMTP id k37mr5373178pgi.360.1620170652347;
- Tue, 04 May 2021 16:24:12 -0700 (PDT)
+        bh=7ZG1nWXtzTYTaXrMK1FVDEfdYcnwUzz0W/Bp4Vm63w8=;
+        b=lFQcDGRppcIloi7ulWnn76H1mGcpIdqKaIAyv4x5Gs51/i/O2/mkj+Cik1ySB5KDig
+         LPeESx8klkR0dPgHataKXF2ADeyZ7z1cUG/td5lkWW/UFMlcXRrEL7w7lnsie0H9y2rH
+         LDxIxTYvhsDof+VvWkZWnJlYzPJDTyV+DRavkC+wRMiztbqUGGbDxmzf+vMr5nbYz6EG
+         ekTiPogvLcEAeggK9gKebSUwz9vaXN+Rfuddsi8iOf4khafM2nImbYAt/jeCR1Qv36Zk
+         fefq1i4McA3xni8fG4bRZKDn8eESpN817nHj1SKXWSyzZLu1zmnOjMs9kSGzJq34tO6d
+         KFGA==
+X-Gm-Message-State: AOAM532fUpfpZPZu65ftvf8zk+k2zbTrAwdj3ql9CJ6Pf6JdfR53hjYI
+        cdmDKN3kpr1iNbD3hUUabP+AoDSsiyFxGqfcrBNaTw==
+X-Google-Smtp-Source: ABdhPJwn/nngurgnvemnAXyxfhI7q1jjWsE5Plk4Zrimr9wx7e+kViDLlODMMe3olSMzacxI1V8LVMwEjPJKagGUspg=
+X-Received: by 2002:a05:6808:b2f:: with SMTP id t15mr4766153oij.6.1620171418015;
+ Tue, 04 May 2021 16:36:58 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210504171734.1434054-1-seanjc@google.com> <20210504171734.1434054-5-seanjc@google.com>
-In-Reply-To: <20210504171734.1434054-5-seanjc@google.com>
+References: <20210504171734.1434054-1-seanjc@google.com> <20210504171734.1434054-6-seanjc@google.com>
+In-Reply-To: <20210504171734.1434054-6-seanjc@google.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 4 May 2021 16:24:01 -0700
-Message-ID: <CALMp9eTh6JMdeAW9JAP7L6CciBQYgOPgogcQzcfKf=quY0k_2w@mail.gmail.com>
-Subject: Re: [PATCH 04/15] KVM: x86: Move RDPID emulation intercept to its own enum
+Date:   Tue, 4 May 2021 16:36:46 -0700
+Message-ID: <CALMp9eQOZyf=U=Y-4CLpB9=nBfVPjOQzcURrTAUNZyugiischw@mail.gmail.com>
+Subject: Re: [PATCH 05/15] KVM: VMX: Disable preemption when probing user
+ return MSRs
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -65,10 +66,16 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, May 4, 2021 at 10:17 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> Add a dedicated intercept enum for RDPID instead of piggybacking RDTSCP.
-> Unlike VMX's ENABLE_RDTSCP, RDPID is not bound to SVM's RDTSCP intercept.
+> Disable preemption when probing a user return MSR via RDSMR/WRMSR.  If
+> the MSR holds a different value per logical CPU, the WRMSR could corrupt
+> the host's value if KVM is preempted between the RDMSR and WRMSR, and
+> then rescheduled on a different CPU.
 >
-> Fixes: fb6d4d340e05 ("KVM: x86: emulate RDPID")
+> Opportunistically land the helper in common x86, SVM will use the helper
+> in a future commit.
+>
+> Fixes: 4be534102624 ("KVM: VMX: Initialize vmx->guest_msrs[] right after allocation")
 > Cc: stable@vger.kernel.org
+> Cc: Xiaoyao Li <xiaoyao.li@intel.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 Reviewed-by: Jim Mattson <jmattson@google.com>
