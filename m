@@ -2,104 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 350703731CD
-	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 23:16:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E1BEA373201
+	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 23:46:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232871AbhEDVRw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 May 2021 17:17:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36846 "EHLO
+        id S231700AbhEDVq4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 May 2021 17:46:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232825AbhEDVRw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 May 2021 17:17:52 -0400
-Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBC91C06174A
-        for <kvm@vger.kernel.org>; Tue,  4 May 2021 14:16:56 -0700 (PDT)
-Received: by mail-il1-x136.google.com with SMTP id j20so7563328ilo.10
-        for <kvm@vger.kernel.org>; Tue, 04 May 2021 14:16:56 -0700 (PDT)
+        with ESMTP id S230490AbhEDVqz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 May 2021 17:46:55 -0400
+Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69703C061574
+        for <kvm@vger.kernel.org>; Tue,  4 May 2021 14:45:59 -0700 (PDT)
+Received: by mail-ot1-x32e.google.com with SMTP id g7-20020a9d5f870000b02902a5831ad705so9609166oti.10
+        for <kvm@vger.kernel.org>; Tue, 04 May 2021 14:45:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=NO76g2V6YO9liWnh4UbX1vxV8zjs7Pw4ACyPlVCyUgY=;
-        b=FxUEulgNjm630aSSiUIdWNw+5aClOyUoVxmAZPKeNQbuP+r6214kJ1TXDXcZGcvzJ6
-         yVhu1OQilQw9gJ7+VE3diVVksHZN8aV4qoQ3olrWU29HfoXxFQT0QcnPAvZd6EuYOavH
-         XN4Tzf5PmgJugVixxb/fS3RJzh1F7MKD7B9b+hiizf8GGFFN1ChpYONsA+JCtSALwVeK
-         gjEjG7go/wJr46tA+lU7c74kbFQjSAaf2VJONJjm+hi8qib/bkEogLZ9LJUaiJg2CcE3
-         /miK/WGaphVKGlLNRYqbXqCCBqR5oU2r3cDoTpUP+oinSgd2FRQSy27EZwWAAloDeT2z
-         9HVA==
+        bh=4daw9Y4OB39yIbPmv1qSyV0lFSedRBWvMPVCNOlqsp8=;
+        b=YuahOkppk59MZLC7WekMPtBRH1zWw4mEeRTjyXfWHcaFAEoHYyuVEdm8/VPkYC654O
+         b1QkGuK3lh82Q6JJ4hpW+nrfmorwDx5CunnSLrtcPqR7OSJDAt3F3OePcN1EKaKkNZe+
+         Grdgil++mGs5tb4rOyJ8Lz+vIwRBN9+BykAI/JI066eDtPrv8j0uoQFBFNefCPCZIltq
+         If4Xh0JnegRP8P1123UI8CFoYdMj6+0HRiiFRB7CYVvuHFJ49EwY51SKdQFSJfnAbYHE
+         ZnC1uGHHYmT6QcHm8hmo2gAlHybbUwmAM+EkMFxj1xZZnYxhj6VJs1eYLkhSdRQJAfVn
+         Lpvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=NO76g2V6YO9liWnh4UbX1vxV8zjs7Pw4ACyPlVCyUgY=;
-        b=npTGsmBLfdL8GH48YC7qXYiyjigAgRplXoJGIP1teUOeQn+XNUCV3V8EStb8mbASy+
-         PSqTxPnJwLyGLBZZVw2ETd7SpvQi3jLo8kVn78YxXEaAfy/8H/njNxK+BrO7ms1v1/vS
-         G00YKMILlZFZdSfky/ecUWpEyBWr27eGakFflJkXjt1Kb/E6G08YxQU3aNYKUg58GqvC
-         Km9WP6+iSEd5NTnuExdfwbqdzwRDlIozwOEDcg+8RtRsjeOEa7Y0kZHj7I3FFa+4xYdh
-         y80gm52CTsLqJtHv/gnLQ6/kXa3n5sh/i10xPxQuFBtNwKgUn9kJh2U7DmLkoczNYURv
-         vkYw==
-X-Gm-Message-State: AOAM530mLjYmIP25wn4+YEARoIeRrUTBPCCqSc1/2YQX5Y8/W9KJB+h2
-        5abRFbkuovuMdVSU8w5gHkTGvTFzuTZjebkWkPumvA==
-X-Google-Smtp-Source: ABdhPJyjGp6M1Ccx/0P616YGwvLUxrAlDyzng4BCHiM33P2X481G4H2BSk3AI94JS7I+h/glGqhDeO+lcPn9qc4fr5c=
-X-Received: by 2002:a05:6e02:1a8d:: with SMTP id k13mr3708510ilv.31.1620163015905;
- Tue, 04 May 2021 14:16:55 -0700 (PDT)
+        bh=4daw9Y4OB39yIbPmv1qSyV0lFSedRBWvMPVCNOlqsp8=;
+        b=GcHBcCWBJmZv7c0UflgbU9DHFaJ7bDoIwYZCoKZcPmepghRL/ECbDObzzrUGlrdFT7
+         8PtfbCAbzeLC930iQwbxCfZ+UiIklZNsIhqo7kOEOq+adV/rlDWvAHZwBp0Js3dt8rz7
+         CHS91Qy/MWW+xtlEUceQMCg3L9K29QMoLPwifDtQd/avkQl881jMO2ecNR2evOqXNPYL
+         W+b7h+gBAbOtOMgigkoPbU1d6r4CrtEOQmKMG9wOQRrAeS62pl64YFWvoO6wyQ+pPZNG
+         0mW4+ppyke/PEcbZebuyXmIXUCMu1hcxEmiwXpZ5+e9bcD5AHmzj9s2DMONsC5fXSE3/
+         qKww==
+X-Gm-Message-State: AOAM532QMyiWJnbcCr8NTGffVa5Z8wNp86MgOoabOGF7M5blcH8UPuKf
+        10uK5RsgD4R/HBa8tPorCQ9qvDmRXV7smg/RaZLOcw==
+X-Google-Smtp-Source: ABdhPJztXVSdXEkoqT3D2wPGFa8u15RwEty3GSdnIbvfUJ4PWmDHPCq3rJvSjQ3gJl1fT/PD4gLTEsmY7DzIesU+Ptw=
+X-Received: by 2002:a05:6830:16c8:: with SMTP id l8mr21021609otr.56.1620164758579;
+ Tue, 04 May 2021 14:45:58 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210429104707.203055-1-pbonzini@redhat.com> <20210429104707.203055-3-pbonzini@redhat.com>
- <YIxkTZsblAzUzsf7@google.com> <c4bf8a05-ec0d-9723-bb64-444fe1f088b5@redhat.com>
- <YJF/3d+VBfJKqXV4@google.com> <f7300393-6527-005f-d824-eed5f7f2f8a8@redhat.com>
- <YJGvrYWLQwiRSNLt@google.com> <55db8e64-763b-9ecc-9c9a-6d840628e763@redhat.com>
-In-Reply-To: <55db8e64-763b-9ecc-9c9a-6d840628e763@redhat.com>
-From:   Steve Rutherford <srutherford@google.com>
-Date:   Tue, 4 May 2021 14:16:20 -0700
-Message-ID: <CABayD+eAJjVjoh9GAnvC9z64pL9GnpHomCqXtw_=EPDr=vz7hA@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS hypercall
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+References: <20210504171734.1434054-1-seanjc@google.com> <20210504171734.1434054-4-seanjc@google.com>
+In-Reply-To: <20210504171734.1434054-4-seanjc@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 4 May 2021 14:45:47 -0700
+Message-ID: <CALMp9eSvXRJm-KxCGKOkgPO=4wJPBi5wDFLbCCX91UtvGJ1qBg@mail.gmail.com>
+Subject: Re: [PATCH 03/15] KVM: SVM: Inject #UD on RDTSCP when it should be
+ disabled in the guest
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@suse.de>,
-        X86 ML <x86@kernel.org>
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Reiji Watanabe <reijiw@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 4, 2021 at 1:56 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Tue, May 4, 2021 at 10:17 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> On 04/05/21 22:33, Sean Christopherson wrote:
-> > On Tue, May 04, 2021, Paolo Bonzini wrote:
-> >> On 04/05/21 19:09, Sean Christopherson wrote:
-> >>> On Sat, May 01, 2021, Paolo Bonzini wrote:
-> >>>> - make it completely independent from migration, i.e. it's just a facet of
-> >>>> MSR_KVM_PAGE_ENC_STATUS saying whether the bitmap is up-to-date.  It would
-> >>>> use CPUID bit as the encryption status bitmap and have no code at all in KVM
-> >>>> (userspace needs to set up the filter and implement everything).
-> >>>
-> >>> If the bit is purely a "page encryption status is up-to-date", what about
-> >>> overloading KVM_HC_PAGE_ENC_STATUS to handle that status update as well?   That
-> >>> would eliminate my biggest complaint about having what is effectively a single
-> >>> paravirt feature split into two separate, but intertwined chunks of ABI.
-> >>
-> >> It's true that they are intertwined, but I dislike not having a way to read
-> >> the current state.
-> >
-> >  From the guest?
+> Intercept RDTSCP to inject #UD if RDTSC is disabled in the guest.
 >
-> Yes, host userspace obviously doesn't need one since it's implemented
-> through an MSR filter.  It may not be really necessary to read it, but
-> it's a bit jarring compared to how the rest of the PV APIs uses MSRs.
+> Note, SVM does not support intercepting RDPID.  Unlike VMX's
+> ENABLE_RDTSCP control, RDTSCP interception does not apply to RDPID.  This
+> is a benign virtualization hole as the host kernel (incorrectly) sets
+> MSR_TSC_AUX if RDTSCP is supported, and KVM loads the guest's MSR_TSC_AUX
+> into hardware if RDTSCP is supported in the host, i.e. KVM will not leak
+> the host's MSR_TSC_AUX to the guest.
 >
-> Also from a debugging/crashdump point of view the VMM may have an
-> established way to read an MSR from a vCPU, but it won't work if you
-> come up with a new way to set the state.
+> But, when the kernel bug is fixed, KVM will start leaking the host's
+> MSR_TSC_AUX if RDPID is supported in hardware, but RDTSCP isn't available
+> for whatever reason.  This leak will be remedied in a future commit.
+>
+> Fixes: 46896c73c1a4 ("KVM: svm: add support for RDTSCP")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+...
+> @@ -4007,8 +4017,7 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>         svm->nrips_enabled = kvm_cpu_cap_has(X86_FEATURE_NRIPS) &&
+>                              guest_cpuid_has(vcpu, X86_FEATURE_NRIPS);
+>
+> -       /* Check again if INVPCID interception if required */
+> -       svm_check_invpcid(svm);
+> +       svm_recalc_instruction_intercepts(vcpu, svm);
 
-Agreed on the preference for an MSR. I particularly appreciate that it
-reduces the kernel footprint for these changes.
-
-
-Steve
+Does the right thing happen here if the vCPU is in guest mode when
+userspace decides to toggle the CPUID.80000001H:EDX.RDTSCP bit on or
+off?
