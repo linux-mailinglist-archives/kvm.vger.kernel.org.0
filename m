@@ -2,148 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE8B0372D5B
-	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 17:53:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AD85372D8E
+	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 18:06:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231546AbhEDPy0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 May 2021 11:54:26 -0400
-Received: from mail-dm3nam07on2081.outbound.protection.outlook.com ([40.107.95.81]:33281
-        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231274AbhEDPyZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 May 2021 11:54:25 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RpSLLCCttapERRxue9VMJ2EURH3ITNrdDjQiWp1x/S+nPPX4VeIIkyVNQauj/XoXbGw1Iq8D4JHG2lHGsmbMCr9spxebLr6Ltu69+EUK+moVTY3Q7DN1GGSk7+mA8rsPvLFgHCm3XJ3ZTmMiYOuo8Whgt6jsM4kPTlKBMFyQTQ41NjGRTTs/H2xRoSveA6DKURQ0UcKeM3EljFJPrvE4Br+xhcx89AoCe+3YSUFPUtLr8j/rlU647AqE8O07Io+96q7tTGC/JhRdB2hA+ssRsDUPyxzc7mm1AhClkO62zDKkYAwqCucge1Xj7vZSk9lVMszUllaENKNjsqd6blVTPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9fk7vSHH76rCwRJ/dvveQNZmwI29ddZ/htCxCI1e734=;
- b=PueQIbwLJJ2IzsdO2a0sbaPUQEg/eORwUqtbfa7bAfKPf31NHVTihEGRvj8Xnmd57vg0RhIwpFyTU/nAAsxl1zFkgsNzg73z2LzdDmoQiXHrfVl2RM7bzvCe85uVpEhDVv48v8Ut35JeMYawg65P9DxPSIjW7ojLfuH5nZ5WGVVyOi8nLv1vu0p0vdNi3vc+0URY6gtZM1CJNlrAiaeQ9Pe0Eahn7NcCBOMtGPxh/ea5FGHjXHmQAyhCyH/23HhNN5arItM6MljKiAZCIIFXha/GJ8JVY6j8Ba3LtpQkUK/rRyLp+IVEDw+k67bQJNEg+ad84kh56Qabd/Gi7DQTtA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9fk7vSHH76rCwRJ/dvveQNZmwI29ddZ/htCxCI1e734=;
- b=uafKNoQfDhUwIC1aPK/LHrYNrr0jDr/RoagpbKTShou75zgF3v/XLHTYC+tLYhjaFtkbJ+94HdHCpd7OBKa7BuW2oHTtBxmN0Mfo1Qz7jz80qWZMMuc1BOma6wkk6OjAGPe7M93+ql7/ZC9eCwkSgyI1slO5tRwSedv/53hVNNyGUfOlDVQnIutu8kQzNRCdMiMV5/NHRsGYQuBj4r3NKGkcGMGA+91WM6pjQqo0KHRGyrACIsZUztKn2O73RsVt6TN3KUj5PMaUEMCe4AaJwjAixCYGkS79eLpjU3zZjNWbIcSC+lnqccOwJMCOHL4KVzvRtirLlp+zjQ0d8sQVvg==
-Authentication-Results: kaod.org; dkim=none (message not signed)
- header.d=none;kaod.org; dmarc=none action=none header.from=nvidia.com;
-Received: from BY5PR12MB3827.namprd12.prod.outlook.com (2603:10b6:a03:1ab::16)
- by BYAPR12MB2902.namprd12.prod.outlook.com (2603:10b6:a03:12f::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4087.41; Tue, 4 May
- 2021 15:53:29 +0000
-Received: from BY5PR12MB3827.namprd12.prod.outlook.com
- ([fe80::81ef:d824:43ae:aef5]) by BY5PR12MB3827.namprd12.prod.outlook.com
- ([fe80::81ef:d824:43ae:aef5%4]) with mapi id 15.20.4087.044; Tue, 4 May 2021
- 15:53:29 +0000
-Date:   Tue, 4 May 2021 12:53:27 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Greg Kurz <groug@kaod.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org, David Airlie <airlied@linux.ie>,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        Paul Mackerras <paulus@samba.org>, linux-api@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, qemu-devel@nongnu.org,
+        id S231668AbhEDQHq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 May 2021 12:07:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48188 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230501AbhEDQHn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 May 2021 12:07:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620144408;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GVIxTT9uSFfUO3j3YO7sGQ1PTKDOjdIH+lYA0YgyIyA=;
+        b=dycdF2qfxM8IDOjcyT5dLckHXobifrVzvi1XMcrJcXoY7l33XxFth5lB/vlpctVH8cqZ9D
+        fwtoH6Br8bf6dPnOOOOowwYpuxq2AyCETLBFJSL6Tabwguygo7XVz+60soI/L7CnceH9uG
+        QjbhscPjEyklitlvQ07trZQmahML5R4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-78-I7M62cUEMh-U8VfpQ2FvKw-1; Tue, 04 May 2021 12:06:46 -0400
+X-MC-Unique: I7M62cUEMh-U8VfpQ2FvKw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF23E107ACCA;
+        Tue,  4 May 2021 16:06:44 +0000 (UTC)
+Received: from gondolin.fritz.box (ovpn-113-126.ams2.redhat.com [10.36.113.126])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5C81219C71;
+        Tue,  4 May 2021 16:06:39 +0000 (UTC)
+Date:   Tue, 4 May 2021 18:06:36 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, groug@kaod.org, hch@lst.de,
+        gregkh@linuxfoundation.org, daniel@ffwll.ch,
+        linux-kernel@vger.kernel.org, linux-api@vger.kernel.org,
+        qemu-devel@nongnu.org, linuxppc-dev@lists.ozlabs.org,
         qemu-ppc@nongnu.org
-Subject: Re: remove the nvlink2 pci_vfio subdriver v2
-Message-ID: <20210504155327.GA94750@nvidia.com>
-References: <20210326061311.1497642-1-hch@lst.de>
- <20210504142236.76994047@bahia.lan>
- <YJFFG1tSP0dUCxcX@kroah.com>
- <20210504152034.18e41ec3@bahia.lan>
- <YJFY7NjEBtCSlJHw@phenom.ffwll.local>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YJFY7NjEBtCSlJHw@phenom.ffwll.local>
-X-Originating-IP: [47.55.113.94]
-X-ClientProxiedBy: BL1PR13CA0202.namprd13.prod.outlook.com
- (2603:10b6:208:2be::27) To BY5PR12MB3827.namprd12.prod.outlook.com
- (2603:10b6:a03:1ab::16)
+Subject: Re: [PATCH] vfio/pci: Revert nvlink removal uAPI breakage
+Message-ID: <20210504180636.6251eaf1.cohuck@redhat.com>
+In-Reply-To: <162014341432.3807030.11054087109120670135.stgit@omen>
+References: <162014341432.3807030.11054087109120670135.stgit@omen>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (47.55.113.94) by BL1PR13CA0202.namprd13.prod.outlook.com (2603:10b6:208:2be::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4108.8 via Frontend Transport; Tue, 4 May 2021 15:53:28 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1ldxMV-000QaC-2L; Tue, 04 May 2021 12:53:27 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 690aaf03-92dd-4e81-f1e5-08d90f14c294
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2902:
-X-Microsoft-Antispam-PRVS: <BYAPR12MB2902250DC07AB2848DE5A2D5C25A9@BYAPR12MB2902.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: yhtRYdliGrikzJDXHFlkvW/Ivx07rePzDou9hJVVmWT41FeSTzweZsBFukYbSBQ0DI7XBkQmXuFkVGmS043Iy4TbgEISo0ORgAQe+q3LyjYHra5noGVrynvEWy+P2SI9xOeLHvC3xjIetEtMeSc9QxMhyUVmQSoLi6Ese5BK8k26mXxyHsObSL5i2YoW7h5BuhBuffzWQzCLXPtNQT9BnhBP01gO6GWCrNxxA8P/d9JuRUlOA8lATDiyFnjBRmORj6YUEnqjL/nLMHOAI28FKxuvnIbxSZ3t1PndZ2RGrA333+O8dOfinrJGbFUNVUptgSsRI1q6HlY7Psx+s3tNbV8CuqookIyf5HDgpo4ctjaF5eSwDHE0ckMwJN51SpzEsAOmi8OSwlyUMxXGuXhZ8NO9LA0qSi5VU6YtL6aVZiROJmANoMPuu4iW0kC/EtXQXUypWxTGwF61l1LShhjtWuClzy9MU4faCHkLV+q7PxngPR99xr1Ua/gB52S86q4Gu1VVPXqEqTKQK3UY/Ey/+eMI4fY+0eezpkMoP+DiiaMOIcSWX1edkkTlf/HWDki4lf0hv5pkQRnbcC3vfqiabO+zt6FR4SySC6Ltsujewl7IMwm7+a2Ai5bFUsLyCftPj9gtDT93pD/de/Qa5PLqcw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB3827.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(346002)(366004)(376002)(396003)(136003)(186003)(5660300002)(9786002)(316002)(26005)(921005)(9746002)(8936002)(7416002)(426003)(38100700002)(86362001)(36756003)(1076003)(2616005)(83380400001)(478600001)(2906002)(66556008)(66946007)(8676002)(33656002)(110136005)(66476007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?hJIT1eMQQ1VtxmcUhDOLrmaTtzO1A46C1nUWXmxA5JeL7wZBvLLh+cG+82Ex?=
- =?us-ascii?Q?0SXZYrgRXDS33cft2NglMlsTLk7fZZ8R43ox4WIBGOksI+MMk8VZ3vjSlkN2?=
- =?us-ascii?Q?mlyqC2kruSPYRzW1sXNL7F8GzWKr/IC/UWOz7QuvUcAS0HjnYmUnoPak3/Gn?=
- =?us-ascii?Q?6GagQUhEjVAEa84R7+FCA9tAU5ls3hapu/knAJOA7p2J2KSfqcxuMX3ptlwW?=
- =?us-ascii?Q?UXB+ZSe7nFdCyosBEGPnmezypkZ0Uxwkql/fKtQM3tJC93q0OxZCQraa9liT?=
- =?us-ascii?Q?jaQpJWuC1vWjJBRVLVG6rED7sm0Tof7kBfu61XtSGX10e+sttTGdfmsHCsTx?=
- =?us-ascii?Q?qQKuzRFCia3yx3wSu7er+iYMyutz0Kc2u2NyxR0cq7STR7s6HjZ6i0++HFz1?=
- =?us-ascii?Q?Ob1WLUgrMijv6soLZfAQrhahM7608wUpC7Y9rUnDZMWFsXIcVq+i6tsoVhiK?=
- =?us-ascii?Q?WXY2BAvRZUNEgcfSJzoTC78Z7q9XyUX6r8jw3qMFeOUTEe7rdY4oXyXMzbMT?=
- =?us-ascii?Q?ndHMSoqfpQ5Q2FeR2kJiDAVtNZ0B1gsKZ7ReTKfnxU58pWkA2DVxC3WNFxhy?=
- =?us-ascii?Q?rG0yn8FOxUhbeV/1rt0+lH4GJ7vI1FUorLr/a5eLNZh61EUOlF/3qEeOgWSb?=
- =?us-ascii?Q?rRRJ2+IgEN9UjZLB9JbCvJVFEwHrf89XQV/C5lexGW4CB8k3We+pz31GtSeH?=
- =?us-ascii?Q?lg6jzVIQ7RNBx+qg2Q1v57DQNIvpZ8dwGnuJWozVn+1pOSdy3r3ry5yqyU+P?=
- =?us-ascii?Q?gFc8nuVlYfoZIQc/vDpywMjuYVHAiCDNZpgqVGZavm4x8xTJgzxDLnyhuQxk?=
- =?us-ascii?Q?6o1CunrN1UzUe1IMPsBg2sWA843q11MVSlYP6jpmW5THfw8e+seydSVgCztd?=
- =?us-ascii?Q?pGnMmrbdBLy+0uY9NHkjN0MHv6XwBoT0JsD/VYErFCL0Nu9j22An6d1u+lfb?=
- =?us-ascii?Q?Wz4zGPjt+cPTeId71LBPm5e9owVgfGhbD2inv4dB/WEVBjUJfPsZD+uE23C5?=
- =?us-ascii?Q?7+bjZkWjeuBSVwD9hMEEDc6/E/+3rV1kQyvIYdlSk9JWceZzsdYf3ceepmG1?=
- =?us-ascii?Q?ZJ/TeNnhFu0Cq31R0AK6NuHu4CLBWAYjmRTsikW963yrWCx1EUzGsFnhCM/e?=
- =?us-ascii?Q?me8mgr6LCarPw4XRUri1N7iT+gmh0oO0qp2DFYXkdoESaqPiJT+2NXbOqHY8?=
- =?us-ascii?Q?yG4ma6Gja1rgXYZF/IoQixhEYSN4PVVtB3yr2DjUX6RXJwOpKYhjkc0B5Z1F?=
- =?us-ascii?Q?lT7B0H0lDZ8TvX72EVAxF4RoikqwJ2prncPsMIXMVbyQSWFFMeBuOVgYo3Ve?=
- =?us-ascii?Q?SpKB5QZuQLu+eiPxtoLd4GCS?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 690aaf03-92dd-4e81-f1e5-08d90f14c294
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB3827.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2021 15:53:29.1007
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2Q6wZfryuVkoYYO6BQJhlFugkryk3hUvlGTHxvfhlE6/dJyvBuNIFUM8r9FS2f1K
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB2902
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 04, 2021 at 04:23:40PM +0200, Daniel Vetter wrote:
+On Tue, 04 May 2021 09:52:02 -0600
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
-> Just my 2cents from drm (where we deprecate old gunk uapi quite often):
-> Imo it's best to keep the uapi headers as-is, but exchange the
-> documentation with a big "this is removed, never use again" warning:
+> Revert the uAPI changes from the below commit with notice that these
+> regions and capabilities are no longer provided.
+> 
+> Fixes: b392a1989170 ("vfio/pci: remove vfio_pci_nvlink2")
+> Reported-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+> 
+> Greg (Kurz), please double check this resolves the issue.  Thanks!
+> 
+>  include/uapi/linux/vfio.h |   46 +++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 42 insertions(+), 4 deletions(-)
 
-We in RDMA have been doing the opposite, the uapi headers are supposed
-to reflect the current kernel. This helps make the kernel
-understandable.
+I had already hacked up a QEMU patch that moved the definitions into
+local headers, but this one is less of a hassle. (Code compiles fine
+after doing a headers update.)
 
-When userspace needs backwards compat to ABI that the current kernel
-doesn't support then userspace has distinct copies of that information
-in some compat location. It has happened a few times over the last 15
-years.
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-We keep full copies of the current kernel headers in the userspace
-source tree, when the kernel headers change in a compile incompatible
-way we fix everything while updating to the new kernel headers.
-
-> - it's good to know which uapi numbers (like parameter extensions or
->   whatever they are in this case) are defacto reserved, because there are
->   binaries (qemu in this) that have code acting on them out there.
-
-Numbers and things get marked reserved or the like
-
-> Anyway feel free to ignore since this might be different than drivers/gpu.
-
-AFAIK drives/gpu has a lot wider userspace, rdma manages this OK
-because we only have one library package that provides the user/kernel
-interface.
- 
-Jason
