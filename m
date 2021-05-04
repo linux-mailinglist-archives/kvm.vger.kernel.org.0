@@ -2,111 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 60ED0372E82
-	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 19:10:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72A43372E7B
+	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 19:08:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231589AbhEDRLb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 May 2021 13:11:31 -0400
-Received: from 5.mo52.mail-out.ovh.net ([188.165.45.220]:53904 "EHLO
-        5.mo52.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231485AbhEDRLa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 May 2021 13:11:30 -0400
-X-Greylist: delayed 16200 seconds by postgrey-1.27 at vger.kernel.org; Tue, 04 May 2021 13:11:30 EDT
-Received: from mxplan5.mail.ovh.net (unknown [10.108.4.240])
-        by mo52.mail-out.ovh.net (Postfix) with ESMTPS id CD06B275188;
-        Tue,  4 May 2021 14:22:40 +0200 (CEST)
-Received: from kaod.org (37.59.142.101) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Tue, 4 May 2021
- 14:22:38 +0200
-Authentication-Results: garm.ovh; auth=pass (GARM-101G0043eda4e7a-de7c-4853-8406-edae349cf2a7,
-                    233BADB9E061AA125F593C9F78707CF28220F307) smtp.auth=groug@kaod.org
-X-OVh-ClientIp: 78.197.208.248
-Date:   Tue, 4 May 2021 14:22:36 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     Christoph Hellwig <hch@lst.de>
-CC:     Michael Ellerman <mpe@ellerman.id.au>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>, <kvm@vger.kernel.org>,
-        David Airlie <airlied@linux.ie>,
-        <linux-kernel@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
-        "Paul Mackerras" <paulus@samba.org>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
-        <linux-api@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
-        <qemu-devel@nongnu.org>, <qemu-ppc@nongnu.org>
-Subject: Re: remove the nvlink2 pci_vfio subdriver v2
-Message-ID: <20210504142236.76994047@bahia.lan>
-In-Reply-To: <20210326061311.1497642-1-hch@lst.de>
-References: <20210326061311.1497642-1-hch@lst.de>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S231485AbhEDRI4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 May 2021 13:08:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37340 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230449AbhEDRIz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 May 2021 13:08:55 -0400
+Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBB00C061574
+        for <kvm@vger.kernel.org>; Tue,  4 May 2021 10:07:59 -0700 (PDT)
+Received: by mail-ot1-x335.google.com with SMTP id b5-20020a9d5d050000b02902a5883b0f4bso8887755oti.2
+        for <kvm@vger.kernel.org>; Tue, 04 May 2021 10:07:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=a18OKh4si98wo09kax0C+fC9YoLiwXZ0QN6CWagL1Cs=;
+        b=l0a+ZCk1mvC2qrYMpznn9uww9cuoDy8csjja3nJULF43BcRzIrFE4qzQW9vTrdg28r
+         n20IX5OQ+DWKCyqD+/7XcaJ19euRwcDdGMRWYHlYJmkzGF5qj1Uk95gqHoSdW7XXomDE
+         5BUPiRNaj6jKxTK9W44hVvVBZ3ESaghYvQ8TzqDFu1LtA/hkOqxfWNzN/VJDDDRFvkEH
+         1wg/adLf4PzdVav1C+BaoxAYKaoqCmis7D7oKJ8iDgMb21hIrbmxxUxyDxGbYuM+rYOT
+         1wiQC/Agt8jUJjk+7HZ8gjfaNA2+USxgZtGk+a3jYemMrrFN5swzL0lOZcLTLput/EaV
+         uoYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=a18OKh4si98wo09kax0C+fC9YoLiwXZ0QN6CWagL1Cs=;
+        b=jv3VBdlwDS5jaRUD4WT1X8CKKE3GYlenvpc4e5GQy1cghUsmt1Oj7AJVB7UYog9H/S
+         bJDz5kJy9sMl711Fpub2OdITQPZatpJQEO8SGZbYDt9Lf8sbQa5xX/91/cwwIlfC1z58
+         hvBv+QGperEhAc0e0U9P/E7ye9iRzeoS4ZtNHX609wux0Xu615ViKRj1FloHB93r3wHv
+         82oLNHD/C2oohrjtknvpOcsm1z9cUEI1Lbh/JdcOquWtRG3UnxXqVEV9sB/rYLUJBO89
+         1UWNx/u3Vr3saEVxcsB+95Xvt2MRqQrS64GgXCppMtkHPJjdB55VTcOY1DVHGLXuchMf
+         gJUg==
+X-Gm-Message-State: AOAM5304uaYFqCApbKqruJxT0WRL3VVcZ7alzh4uqfZz1OIRsO6XEC+V
+        olhf9TpUn9jR/yUVLf4OLM7myGCfw+6G3X22O7A3yg==
+X-Google-Smtp-Source: ABdhPJwix7Joyua4FEpha2I/asd4LydO4GNegfTBK83bnNOxLSrPda6QDFGRLt6MHScTIRxQCioFNs9DySxnGTSg3cQ=
+X-Received: by 2002:a05:6830:16c8:: with SMTP id l8mr20109273otr.56.1620148078808;
+ Tue, 04 May 2021 10:07:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.101]
-X-ClientProxiedBy: DAG5EX1.mxp5.local (172.16.2.41) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: 316f1bea-914e-41ab-a4e8-46202395b6d3
-X-Ovh-Tracer-Id: 4363706565853223297
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduledrvdefiedgheefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeeftdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeetgffffffggfekgeffteekhffhueelffdvhedvgfdthfeiudetvddulefgveevteenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdhpphgtsehnohhnghhnuhdrohhrgh
+References: <20210309045250.3333311-1-morbo@google.com>
+In-Reply-To: <20210309045250.3333311-1-morbo@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 4 May 2021 10:07:47 -0700
+Message-ID: <CALMp9eStUGcyY5bD8ETDvuepQ7VVNDnRRyJVaS=9v9gH41L=5A@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] Makefile: do not use "libgcc" for clang
+To:     Bill Wendling <morbo@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 26 Mar 2021 07:13:09 +0100
-Christoph Hellwig <hch@lst.de> wrote:
-
-> Hi all,
-> 
-> the nvlink2 vfio subdriver is a weird beast.  It supports a hardware
-> feature without any open source component - what would normally be
-> the normal open source userspace that we require for kernel drivers,
-> although in this particular case user space could of course be a
-> kernel driver in a VM.  It also happens to be a complete mess that
-> does not properly bind to PCI IDs, is hacked into the vfio_pci driver
-> and also pulles in over 1000 lines of code always build into powerpc
-> kernels that have Power NV support enabled.  Because of all these
-> issues and the lack of breaking userspace when it is removed I think
-> the best idea is to simply kill.
-> 
-> Changes since v1:
->  - document the removed subtypes as reserved
->  - add the ACK from Greg
-> 
-> Diffstat:
->  arch/powerpc/platforms/powernv/npu-dma.c     |  705 ---------------------------
->  b/arch/powerpc/include/asm/opal.h            |    3 
->  b/arch/powerpc/include/asm/pci-bridge.h      |    1 
->  b/arch/powerpc/include/asm/pci.h             |    7 
->  b/arch/powerpc/platforms/powernv/Makefile    |    2 
->  b/arch/powerpc/platforms/powernv/opal-call.c |    2 
->  b/arch/powerpc/platforms/powernv/pci-ioda.c  |  185 -------
->  b/arch/powerpc/platforms/powernv/pci.c       |   11 
->  b/arch/powerpc/platforms/powernv/pci.h       |   17 
->  b/arch/powerpc/platforms/pseries/pci.c       |   23 
->  b/drivers/vfio/pci/Kconfig                   |    6 
->  b/drivers/vfio/pci/Makefile                  |    1 
->  b/drivers/vfio/pci/vfio_pci.c                |   18 
->  b/drivers/vfio/pci/vfio_pci_private.h        |   14 
->  b/include/uapi/linux/vfio.h                  |   38 -
-
-
-Hi Christoph,
-
-FYI, these uapi changes break build of QEMU.
-
-I guess QEMU people should take some action before this percolates
-to the QEMU source tree.
-
-Cc'ing relevant QEMU lists to bring the discussion there.
-
-Cheers,
-
---
-Greg
-
->  drivers/vfio/pci/vfio_pci_nvlink2.c          |  490 ------------------
->  16 files changed, 12 insertions(+), 1511 deletions(-)
-
+On Mon, Mar 8, 2021 at 8:53 PM Bill Wendling <morbo@google.com> wrote:
+>
+> The -nostdlib flag disables the driver from adding libclang_rt.*.a
+> during linking. Adding a specific library to the command line then
+> causes the linker to report unresolved symbols, because the libraries
+> that resolve those symbols aren't automatically added. Turns out clang
+> doesn't need to specify that library.
+>
+> Signed-off-by: Bill Wendling <morbo@google.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
