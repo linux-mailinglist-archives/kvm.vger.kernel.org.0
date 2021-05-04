@@ -2,102 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35576372EEC
-	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 19:28:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C760A372F03
+	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 19:37:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231659AbhEDR3f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 May 2021 13:29:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42144 "EHLO
+        id S231796AbhEDRii (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 May 2021 13:38:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230400AbhEDR3e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 May 2021 13:29:34 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E2FDC061574
-        for <kvm@vger.kernel.org>; Tue,  4 May 2021 10:28:38 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id di13so11401809edb.2
-        for <kvm@vger.kernel.org>; Tue, 04 May 2021 10:28:38 -0700 (PDT)
+        with ESMTP id S231734AbhEDRih (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 May 2021 13:38:37 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8CB5C06174A
+        for <kvm@vger.kernel.org>; Tue,  4 May 2021 10:37:41 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id l6so9560046oii.1
+        for <kvm@vger.kernel.org>; Tue, 04 May 2021 10:37:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=nSjAAu8/uv2OHnvht3tsCA/NqO7UE0bjKWBDG7VyVvs=;
-        b=fR+qBddIZH/jxUspHZqc2eSdJx08Os3neWEKcaxQHMt+9ypWw6vZq//LjxaT/Q6VAd
-         1+u3o6EoIDeKvuQxbNTlCKOT9PT8CFxOPjUwEbCrAA9GC9Qiw7HxBW6AGlFF70RIc4Dz
-         tLi2r65CF7MVh5bcUWd2RP5tqbKiQmlaV9lFgBwEKm3ShCg3dAUNU9fUa20lmv5czMtA
-         jKzRNwpon3/Z5MC3oIwK8T+Q+UjRpzJK5raqx3e35nsa1Up+In/TiarYlMQc2AKNGtkW
-         n9aDMkbRF8jG1sr6+IyDhwwmR9E/WcNl3yUx+xSSNsJF23vvqi7R2jrWFWKx890V8Ycj
-         dWyw==
+        bh=uQJdUXEx8maMY/qSJE4caWuHD5W+mMvJWFUW8MPsCdU=;
+        b=Z2XmxRIGEs+aA4d/74oGwD1FDn7Q/Ilim4Q3Irnx6sHCVz04n1GuGScOZxS9lR4fCj
+         RtJM0jmmdBmsSzCLagcOsZoI8m1ZRmA9MwQDDml9y0Qex4//GXkmWj0so2jXOtt2a2Ab
+         HvrVVvhWBloMqucQDbYcoW/CCULw4c8CnxT8XqvqIBXTOos8tWFxvEurwpPqEBJG/UuJ
+         Wynls0Y4wQizGcvvBGQTBM+r/scTdza0iJxOclAIQtisUI3IV+8nk/0S+NIZO28bAb00
+         Ae/bMhto+kK2yEyj3j57ymNqa2h2KAhNGwkRwMVfWCMDoYIKWgiSms5nvpNuCy/Ks9Dz
+         TOiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=nSjAAu8/uv2OHnvht3tsCA/NqO7UE0bjKWBDG7VyVvs=;
-        b=UidJVwPtCgyBsmP1ZfiCXc1M4m+n3AjOb9V5Mc5NOOcgGPwYPMtuSs3I5oalGbS8kU
-         oYkNKf1IH19pZJL2VGihF7k5ns67W/7ElaRZg+87KTbCGv0rZpx4yIjD+e+HO4OMRPIN
-         s033B5LpIUGIzBiEB5+xy6Sofvv1bMSgJdtkkWxSRJjd/P8kdVdpBC7d+jVt7oZ5NiKd
-         se6gsmq0hW3WVzdWu1R0B7QnMBIbf7S0Z69OCr56WD756ERV5LfVXSd3XLg3T9MWYRUG
-         wdzfH5Ye6v9PDtrdbf6jycoXdjuQ5CmGJuPt6/4fdWzmeDq/JE98koVhbG9c+AWWKw1P
-         T84g==
-X-Gm-Message-State: AOAM530M6uDtFjLD1TwG4N2/7wZCUWeADk+6LPxu5MWvNP+D/XKIouHB
-        0ZU2l3McnKXFPf3unbW9Y5gkUcxQMNMNaJDQ3NsQsQ==
-X-Google-Smtp-Source: ABdhPJxy3F9kuj96l3542ArNSwjtRexrVmjr1qVyuHJmdi3SyQzBLcvCQ8hHf1Gq5IXKagI+jaqgkNTZfgtYHAsbpkI=
-X-Received: by 2002:a05:6402:3090:: with SMTP id de16mr27183674edb.177.1620149317162;
- Tue, 04 May 2021 10:28:37 -0700 (PDT)
+        bh=uQJdUXEx8maMY/qSJE4caWuHD5W+mMvJWFUW8MPsCdU=;
+        b=VP39KKhyloVqT8tcScPLyOfNJ/bAP4F1rpYhpz3aEo6xZdwz1Z1/MVff4FFbijZCA9
+         2OBD1fmFiq6juc7X5ZFRsT6CnagtJPe591/Og7frIV5gTqTYJLM4PqsQOiPzWxxsqgGY
+         qJ34k8XvfUuMEFpg4DU0n71OvOHoVeMwvkcy1+6bXJGT1mtPb9sP1r/IJPHOHSdI4JRj
+         NIFZPY9j+Sg4Omsvv3ovDo36mDCRLfDNW8CEI42DIF4VdPzz/DAh7NqYUCQdX3ixv84v
+         08bE8CJwh+gM9D2t3OUG5GGZo5n/M4AbBU1Q7nVUwaxgilUBQWFMcTnxVWqeblzaApu6
+         yyAA==
+X-Gm-Message-State: AOAM532/vWDwrT/16Vk+6XLnKZcA/2gTOEsJHWI5l7iP17m7P8UGjSGv
+        uJgtUZXsWk5mhNNdgAbNmfxQQ3QhfWhD3ZyyzAZiKg==
+X-Google-Smtp-Source: ABdhPJy62AFpAROaQIN9dPxNDLR0eJkP8Ot0H7OpqD9T1/6g9TuNu6fUPjm89rupzH+YCfd6pdjXwHMaiozxIwZzuTM=
+X-Received: by 2002:a05:6808:b2f:: with SMTP id t15mr3814416oij.6.1620149860953;
+ Tue, 04 May 2021 10:37:40 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210429211833.3361994-1-bgardon@google.com> <a3279647-fb30-4033-2a9d-75d473bd8f8e@redhat.com>
- <CANgfPd-fD33hJkQP_MVb2a4CadKQbkpwwtP9r5rMrC_Mripeqg@mail.gmail.com> <4d27e9d6-42db-3aa1-053a-552e1643f46d@redhat.com>
-In-Reply-To: <4d27e9d6-42db-3aa1-053a-552e1643f46d@redhat.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Tue, 4 May 2021 10:28:24 -0700
-Message-ID: <CANgfPd_EvGg2N19HJs0nEq_rbaDJQQ9cUWS9wEsJ5wajNW_s7Q@mail.gmail.com>
-Subject: Re: [PATCH v2 0/7] Lazily allocate memslot rmaps
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
+References: <20210504171734.1434054-1-seanjc@google.com> <20210504171734.1434054-2-seanjc@google.com>
+In-Reply-To: <20210504171734.1434054-2-seanjc@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 4 May 2021 10:37:29 -0700
+Message-ID: <CALMp9eToSSQ=8Dy4Vt5-GYEB4YB9c6-LTp8c60C97LOY9ufdjg@mail.gmail.com>
+Subject: Re: [PATCH 01/15] KVM: VMX: Do not adverise RDPID if ENABLE_RDTSCP
+ control is unsupported
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Reiji Watanabe <reijiw@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 4, 2021 at 12:21 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Tue, May 4, 2021 at 10:17 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> On 03/05/21 19:31, Ben Gardon wrote:
-> > On Mon, May 3, 2021 at 6:45 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >>
-> >> On 29/04/21 23:18, Ben Gardon wrote:
-> >>> This series enables KVM to save memory when using the TDP MMU by waiting
-> >>> to allocate memslot rmaps until they are needed. To do this, KVM tracks
-> >>> whether or not a shadow root has been allocated. In order to get away
-> >>> with not allocating the rmaps, KVM must also be sure to skip operations
-> >>> which iterate over the rmaps. If the TDP MMU is in use and we have not
-> >>> allocated a shadow root, these operations would essentially be op-ops
-> >>> anyway. Skipping the rmap operations has a secondary benefit of avoiding
-> >>> acquiring the MMU lock in write mode in many cases, substantially
-> >>> reducing MMU lock contention.
-> >>>
-> >>> This series was tested on an Intel Skylake machine. With the TDP MMU off
-> >>> and on, this introduced no new failures on kvm-unit-tests or KVM selftests.
-> >>
-> >> Thanks, I only reported some technicalities in the ordering of loads
-> >> (which matter since the loads happen with SRCU protection only).  Apart
-> >> from this, this looks fine!
-> >
-> > Awesome to hear, thank you for the reviews. Should I send a v3
-> > addressing those comments, or did you already make those changes when
-> > applying to your tree?
+> Clear KVM's RDPID capability if the ENABLE_RDTSCP secondary exec control is
+> unsupported.  Despite being enumerated in a separate CPUID flag, RDPID is
+> bundled under the same VMCS control as RDTSCP and will #UD in VMX non-root
+> if ENABLE_RDTSCP is not enabled.
 >
-> No, I didn't (I wanted some oversight, and this is 5.14 stuff anyway).
+> Fixes: 41cd02c6f7f6 ("kvm: x86: Expose RDPID in KVM_GET_SUPPORTED_CPUID")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Ah, okay I'll send out a v3 soon, discussion on the other patches settles.
-
->
-> Paolo
->
+But KVM will happily emulate RDPID if the instruction causes a #UD
+VM-exit, won't it? See commit fb6d4d340e05 (KVM: x86: emulate RDPID).
