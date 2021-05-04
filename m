@@ -2,61 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 974E9373155
-	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 22:23:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C59937315E
+	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 22:26:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232615AbhEDUYA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 May 2021 16:24:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51517 "EHLO
+        id S232596AbhEDU1X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 May 2021 16:27:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29803 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231380AbhEDUX7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 May 2021 16:23:59 -0400
+        by vger.kernel.org with ESMTP id S229542AbhEDU1W (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 May 2021 16:27:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620159783;
+        s=mimecast20190719; t=1620159986;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=LZKovbJ8lKtotNg9ShvdPO02WF5aXDGNpj87pCUgbWM=;
-        b=acGWK4G6g2NXiHyfiPSFyeVyynJiXbRYWOkSN74PgCUxWNbK/PeEPgUU0zpKPf/onImLL8
-        367ke7noPmRiHQjxpy9DLh7SZEHAu4a0dB9UvB/fhm+lVHcgFYIc9ZkGFtKHKd4O5DMnky
-        65RPlKx3oiurh42ZVf+0s9I7lTuHZhE=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-557-vDoheUEXMeKFJUm6S5HgsQ-1; Tue, 04 May 2021 16:23:02 -0400
-X-MC-Unique: vDoheUEXMeKFJUm6S5HgsQ-1
-Received: by mail-ed1-f69.google.com with SMTP id y17-20020a0564023591b02903886c26ada4so6976124edc.5
-        for <kvm@vger.kernel.org>; Tue, 04 May 2021 13:23:02 -0700 (PDT)
+        bh=NmaFtxsE0S5qvJK+FcOeAQOG1JYRVA5bDwB/1VM2dIk=;
+        b=QqAvEi4FNbgdlCddsw6m88UPDAxj6Wrpsxgo8CdKS2PsdAFhGMPonsRL6pzhmfQzS+4ubj
+        pkF15OpCS2HZft+N4hWlGSqWqCqwuuLI32Lczews0Yoae222RxY4GKyGEYtMHkvYmDUlb7
+        hA7zvrYaKAXMXb1t4BEE8FlQp6MG7Zg=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-226-ZogSY5DJPc2kNS68Ssw1_Q-1; Tue, 04 May 2021 16:26:24 -0400
+X-MC-Unique: ZogSY5DJPc2kNS68Ssw1_Q-1
+Received: by mail-ed1-f72.google.com with SMTP id g7-20020aa7c5870000b02903888f809d62so6056639edq.23
+        for <kvm@vger.kernel.org>; Tue, 04 May 2021 13:26:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=LZKovbJ8lKtotNg9ShvdPO02WF5aXDGNpj87pCUgbWM=;
-        b=i899Y14Qlmu1gR75Cq8842ia7KLzg7NT5QAEQVYDYF2W+3z6nrPmDGC5hRtFHQ2hfQ
-         J70nS2eZbLl4Oesrm3MO9l7NFzWSCuqqdcLFuzUF1qctyyIK/WRE6adX+BQlDVn82u9/
-         Jtbjc9w1js47VTBrHzHHs39REhPhJtPCAXXJDZGY5nL2IKyVdWdKD2S+GnJC5hCmQgNH
-         CR2iMJb2biaJCZupCO1supU1ourAmFLG0ay6DCZRSoU01GHyPBAsYvxXrg4RIVvt6JG2
-         ZJz93zXMnujzxGpDkvirZnWlE6z6SkOG9EKpG8yaFnjH1GDNCAxbxQy/5yDGoAyv7CJK
-         3+NA==
-X-Gm-Message-State: AOAM5326JzYT1Hzs7seFdcXnHPH3YHuqTWt4YgpvPQSHz1TxrGRbP5lc
-        NM7vt0hW7juXlFLoH0wVKT3LvfcsmYk5/5LLB9zUQODsY+mG7M7BQfxqzWIvgedn7ejjzn5FTRZ
-        USetG98yYpHMy
-X-Received: by 2002:a17:906:a295:: with SMTP id i21mr23568684ejz.160.1620159780863;
-        Tue, 04 May 2021 13:23:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy/ehuSnSyvhjGI2eJylw4RSt91+go0x6ZX/64OwCIMlzvvHaAvwWoFTchd058/nFJcvnoIXw==
-X-Received: by 2002:a17:906:a295:: with SMTP id i21mr23568673ejz.160.1620159780652;
-        Tue, 04 May 2021 13:23:00 -0700 (PDT)
+        bh=NmaFtxsE0S5qvJK+FcOeAQOG1JYRVA5bDwB/1VM2dIk=;
+        b=AnGxo+qSM86zoKHGZZhUh81YeUdnbZ/MLyZclji7PLgjnMUXzYlOzWfbt8bR+RucDY
+         zUM0QsKhg3AcANedBqguOnSMV96Rvm59FcgAWs1rJavauTcQrG7mJmcqsSOwJRa8YVRT
+         S6uRfcAvGCe52A9t15iDYxym1KEXw+ccjzwLPn5n1WeLIHDGQLe44qlWJ02B1ZyUXEKZ
+         8sw23nNSXrLNEbeajRQ6MHWI2R2i6WXQHb0iQ4g44E3+3r1w+5mc0FBe4f9iFUYZz998
+         X2VDObPGvGYr//rnwEUXOryki+n2TmqAaxOZsbhS9gOdxrpvCumb6TfpSjfW0nvvCdA2
+         p+Dw==
+X-Gm-Message-State: AOAM530gkWn6p5pzs9hLxs6O5lTfCAAmK+tsyvUNnvvcDT/OHlAmrWbZ
+        c2Q9/XZUYSI4S/Vmqmhhcit0XYS5TqduhtjM1oeMTavq6gdp/Fex1LCY51zQ087mZN6UpSDC9Yq
+        +f/SWT1A1R5au
+X-Received: by 2002:a17:906:fcd6:: with SMTP id qx22mr24014615ejb.529.1620159983342;
+        Tue, 04 May 2021 13:26:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxh1zbFHg9vwi2oHIGX5YBErFcyt0Oodg4Od0An9+HOszlBG2A+myYeCIIk2cSbkE0RAwV6gQ==
+X-Received: by 2002:a17:906:fcd6:: with SMTP id qx22mr24014595ejb.529.1620159983133;
+        Tue, 04 May 2021 13:26:23 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id p22sm15250338edr.4.2021.05.04.13.22.59
+        by smtp.gmail.com with ESMTPSA id ca20sm1907157ejb.84.2021.05.04.13.26.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 May 2021 13:23:00 -0700 (PDT)
-Subject: Re: [PATCH v2 7/7] KVM: x86/mmu: Lazily allocate memslot rmaps
-To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
+        Tue, 04 May 2021 13:26:22 -0700 (PDT)
+Subject: Re: [PATCH v2 1/7] KVM: x86/mmu: Track if shadow MMU active
+To:     Sean Christopherson <seanjc@google.com>,
+        Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
         Junaid Shahid <junaids@google.com>,
         Jim Mattson <jmattson@google.com>,
         Yulei Zhang <yulei.kernel@gmail.com>,
@@ -64,14 +63,14 @@ Cc:     Peter Xu <peterx@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Xiao Guangrong <xiaoguangrong.eric@gmail.com>
 References: <20210429211833.3361994-1-bgardon@google.com>
- <20210429211833.3361994-8-bgardon@google.com>
+ <20210429211833.3361994-2-bgardon@google.com> <YJGmpOzaFy9E0f5T@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1e50ae22-16a3-c43d-594a-a20d2ea3caa5@redhat.com>
-Date:   Tue, 4 May 2021 22:22:53 +0200
+Message-ID: <edfadb98-b86e-6d03-bdfc-9025fac73dee@redhat.com>
+Date:   Tue, 4 May 2021 22:26:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210429211833.3361994-8-bgardon@google.com>
+In-Reply-To: <YJGmpOzaFy9E0f5T@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,24 +78,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/04/21 23:18, Ben Gardon wrote:
-> +	/*
-> +	 * If set, the rmap should be allocated for any newly created or
-> +	 * modified memslots. If allocating rmaps lazily, this may be set
-> +	 * before the rmaps are allocated for existing memslots, but
-> +	 * shadow_mmu_active will not be set until after the rmaps are fully
-> +	 * allocated.
-> +	 */
-> +	bool alloc_memslot_rmaps;
+On 04/05/21 21:55, Sean Christopherson wrote:
+> But, I think we we can avoid bikeshedding by simply eliminating this flag.  More
+> in later patches.
 
-Let's remove the whole sentence starting with "If allocating rmaps 
-lazily".  The part about shadow_mmu_active should go there, while the 
-rest is pointless as long as we just say that this flag will be accessed 
-only under slots_arch_lock.
+Are you thinking of checking slot->arch.rmap[0] directly?  That should 
+work indeed.
 
-(Regarding shadow_mmu_active, I think I know what Sean will be 
-suggesting because I had a similar thought and decided it introduced 
-extra unnecessary complication... but maybe not, so let's see what he says).
+>> -	kvm_mmu_init_tdp_mmu(kvm);
+>> +	if (!kvm_mmu_init_tdp_mmu(kvm))
+>> +		activate_shadow_mmu(kvm);
+> Doesn't come into play yet, but I would strongly prefer to open code setting the
+> necessary flag instead of relying on the helper to never fail.
+> 
+
+You mean
+
+kvm->arch.shadow_mmu_active = !kvm_mmu_init_tdp_mmu(kvm);
+
+(which would assign to alloc_memslot_rmaps instead if shadow_mmu_active 
+is removed)?  That makes sense.
 
 Paolo
 
