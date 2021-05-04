@@ -2,107 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F3D00373214
-	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 23:53:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93A6F373216
+	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 23:54:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232935AbhEDVyq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 May 2021 17:54:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44894 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231478AbhEDVyq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 May 2021 17:54:46 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D97E9C061574
-        for <kvm@vger.kernel.org>; Tue,  4 May 2021 14:53:50 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id b21so38326plz.0
-        for <kvm@vger.kernel.org>; Tue, 04 May 2021 14:53:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=FsMJe2qKChbQLfpmmI2er2bhYru7z7dSUmbB+MQYcyA=;
-        b=PGoh0QzzOP4PWKgVUJgFGMnPDB9z/qJcSqqffhmjm4s/x5sxxsSaZAmxrbq5mKPW4L
-         JmwSJzcfYvkb2ch2/dsk3/8nY2UDwC9PdQ26CCxFkFv57DMlvSQrrD/UvcxslTN2srD0
-         qGLVKOzczAmBiJcYf0KMNxFZQJwILjDiYjEpZ2zk/PkkZD7nFWsJ5xBz46AbGBP/css+
-         T0mGQvtT0ZTewdlOK9YMnvEXz6arFOAiJR8e9xEgf6yaiDWKXp0YwZCwt/JTFGZvXzma
-         nuYBxQeGtkjs8jusd/8gTRL5dyKI+gSypuoeSuS/sqVNEY0XqPxrlJLSsq6Fp48gEn9r
-         eg0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=FsMJe2qKChbQLfpmmI2er2bhYru7z7dSUmbB+MQYcyA=;
-        b=fOYuvubISPnLS42y6V6vpf26RPp8hQh+Uh7qFGQwJnTiHtF63EzwbtozYpXgr0w7VU
-         c/wVL0D8yMkTTjk+NhenGIBTDg+kV25CujHqYZIIAOb3NXXmoDtED2U6CSMEL42ZNNlt
-         13s0EnD6KE9pPjZjZxfGNiShVEPMFI6Py1GWhrI8O+KmBzvSkSqmOUfzo9knhnTJIBsY
-         2+D71Im7Ppm56WFPJE7AsV/f22EIrTSGxk+RUqcZt6lF2nqOXsphiWBEapcsQDEILhq2
-         nuwIL9e9sa5PGlPhkhcc9CXgMkDCY5jjXMPfxLj9+RbkA62A7GTVdbnfXtAFqUEuE3PA
-         m4UA==
-X-Gm-Message-State: AOAM531aVZog2o99CzaszFtTGta9jJ0cViPpFgSbOIHi58mrfH6s4OZG
-        SAHcBsl6biTmFDCkxW8iwL1PZA==
-X-Google-Smtp-Source: ABdhPJyIfszxo0bx3Jkguq3ZGyfAq1tH8gsNHrt6Rmn0FlLPMa9UdSaaKIKxu3FAamS9VYMkfrvs8g==
-X-Received: by 2002:a17:902:9a84:b029:ec:7fd5:193e with SMTP id w4-20020a1709029a84b02900ec7fd5193emr28456943plp.62.1620165230295;
-        Tue, 04 May 2021 14:53:50 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id i126sm12898036pfc.20.2021.05.04.14.53.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 May 2021 14:53:49 -0700 (PDT)
-Date:   Tue, 4 May 2021 21:53:45 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        id S232530AbhEDVzd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 May 2021 17:55:33 -0400
+Received: from mga12.intel.com ([192.55.52.136]:30204 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232254AbhEDVzc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 May 2021 17:55:32 -0400
+IronPort-SDR: at1OSACClPRfuk7bs9KU3iZpMwASc4n//xJUyw4llzXwgWW44CTEWp/ghJyjvefzB9UK0Q905m
+ UjtTdknUStrg==
+X-IronPort-AV: E=McAfee;i="6200,9189,9974"; a="177626196"
+X-IronPort-AV: E=Sophos;i="5.82,272,1613462400"; 
+   d="scan'208";a="177626196"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2021 14:54:26 -0700
+IronPort-SDR: oBJOXwGB4iCZVeW4S3SZOPw5Ap+WheWH7blJxx3VUF1zEjfmnJtoBbXXqvrYO4YbC3q5597ini
+ ryVf/k/lB8PA==
+X-IronPort-AV: E=Sophos;i="5.82,272,1613462400"; 
+   d="scan'208";a="406291888"
+Received: from pdonde-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.230.10])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2021 14:54:24 -0700
+Message-ID: <b6d23d9fd8e526e5c7c1a968e2018d13c5433547.camel@intel.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Fix some return value error in
+ kvm_tdp_mmu_map()
+From:   Kai Huang <kai.huang@intel.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH 03/15] KVM: SVM: Inject #UD on RDTSCP when it should be
- disabled in the guest
-Message-ID: <YJHCadSIQ/cK/RAw@google.com>
-References: <20210504171734.1434054-1-seanjc@google.com>
- <20210504171734.1434054-4-seanjc@google.com>
- <CALMp9eSvXRJm-KxCGKOkgPO=4wJPBi5wDFLbCCX91UtvGJ1qBg@mail.gmail.com>
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Date:   Wed, 05 May 2021 09:54:22 +1200
+In-Reply-To: <CANgfPd-3a1a4se--+M6fCnfXP0kbbxqpKrv18JVA3UFcxrZ_3g@mail.gmail.com>
+References: <20210430160138.100252-1-kai.huang@intel.com>
+         <CANgfPd_gWYaKbdD-fkLNwCSaVQhgcQaSKOEoG0a2B90GhB03zg@mail.gmail.com>
+         <e5814ecab90a3df04ea862dd31927a8f9275af77.camel@intel.com>
+         <CANgfPd-3a1a4se--+M6fCnfXP0kbbxqpKrv18JVA3UFcxrZ_3g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.0 (3.40.0-1.fc34) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eSvXRJm-KxCGKOkgPO=4wJPBi5wDFLbCCX91UtvGJ1qBg@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 04, 2021, Jim Mattson wrote:
-> On Tue, May 4, 2021 at 10:17 AM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > Intercept RDTSCP to inject #UD if RDTSC is disabled in the guest.
-> >
-> > Note, SVM does not support intercepting RDPID.  Unlike VMX's
-> > ENABLE_RDTSCP control, RDTSCP interception does not apply to RDPID.  This
-> > is a benign virtualization hole as the host kernel (incorrectly) sets
-> > MSR_TSC_AUX if RDTSCP is supported, and KVM loads the guest's MSR_TSC_AUX
-> > into hardware if RDTSCP is supported in the host, i.e. KVM will not leak
-> > the host's MSR_TSC_AUX to the guest.
-> >
-> > But, when the kernel bug is fixed, KVM will start leaking the host's
-> > MSR_TSC_AUX if RDPID is supported in hardware, but RDTSCP isn't available
-> > for whatever reason.  This leak will be remedied in a future commit.
-> >
-> > Fixes: 46896c73c1a4 ("KVM: svm: add support for RDTSCP")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> ...
-> > @@ -4007,8 +4017,7 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> >         svm->nrips_enabled = kvm_cpu_cap_has(X86_FEATURE_NRIPS) &&
-> >                              guest_cpuid_has(vcpu, X86_FEATURE_NRIPS);
-> >
-> > -       /* Check again if INVPCID interception if required */
-> > -       svm_check_invpcid(svm);
-> > +       svm_recalc_instruction_intercepts(vcpu, svm);
+On Tue, 2021-05-04 at 09:45 -0700, Ben Gardon wrote:
+> On Mon, May 3, 2021 at 4:32 PM Kai Huang <kai.huang@intel.com> wrote:
+> > 
+> > On Mon, 2021-05-03 at 10:07 -0700, Ben Gardon wrote:
+> > > On Fri, Apr 30, 2021 at 9:03 AM Kai Huang <kai.huang@intel.com> wrote:
+> > > > 
+> > > > There are couple of issues in current tdp_mmu_map_handle_target_level()
+> > > > regarding to return value which reflects page fault handler's behavior
+> > > > -- whether it truely fixed page fault, or fault was suprious, or fault
+> > > > requires emulation, etc:
+> > > > 
+> > > > 1) Currently tdp_mmu_map_handle_target_level() return 0, which is
+> > > >    RET_PF_RETRY, when page fault is actually fixed.  This makes
+> > > >    kvm_tdp_mmu_map() also return RET_PF_RETRY in this case, instead of
+> > > >    RET_PF_FIXED.
+> > > 
+> > > Ooof that was an oversight. Thank you for catching that.
+> > 
+> > Thanks for reviewing.
+> > 
+> > > 
+> > > > 
+> > > > 2) When page fault is spurious, tdp_mmu_map_handle_target_level()
+> > > >    currently doesn't return immediately.  This is not correct, since it
+> > > >    may, for instance, lead to double emulation for a single instruction.
+> > > 
+> > > Could you please add an example of what would be required for this to
+> > > happen? What effect would it have?
+> > > I don't doubt you're correct on this point, just having a hard time
+> > > pinpointing where the issue is.
+> > 
+> > Hmm.. After reading your reply, I think I wasn't thinking correctly about the emulation
+> > part :)
+> > 
+> > I was thinking the case that two threads simultaneously write to video ram (which is write
+> > protected and requires emulation) which has been swapped out, in which case one thread
+> > will succeed with setting up the mapping, and the other will get atomic exchange failure.
+> > Since both threads are trying to setup the same mapping, I thought in this case for the
+> > second thread (that gets atomic exchange failure) should just give up. But reading code
+> > again, and with your reply, I think the right behavior is, actually both threads need to
+> > do the emulation, because this is the correct behavior.'
+> > 
+> > That being said, I still believe that for spurious fault, we should return immediately
+> > (otherwise it is not spurious fault). But I now also believe the spurious fault check in
+> > existing code happens too early -- it has to be after write protection emulation check.
+> > And I just checked the mmu_set_spte() code, if I read correctly, it exactly puts spurious
+> > fault check after write protection emulation check.
+> > 
+> > Does this make sense?
 > 
-> Does the right thing happen here if the vCPU is in guest mode when
-> userspace decides to toggle the CPUID.80000001H:EDX.RDTSCP bit on or
-> off?
+> Yeah, that makes sense. Having to move the emulation check after the
+> cmpxchg always felt a little weird to me Though I still think it makes
+> sense since the cmpxchg can fail.
 
-I hate our terminology.  By "guest mode", do you mean running the vCPU, or do
-you specifically mean running in L2?
+I guess my brain was dominated by the idea that for spurious fault we should return
+immediately :) But I guess we can also fix the pf_fixed count  issue by simply:
+
+-       if (!prefault)
++       if (!prefault && ret == RET_PF_FIXED)
+                vcpu->stat.pf_fixed++;
+
+Which way do you prefer?
+
+> 
+> > 
+> > If this looks good to you, I guess it would be better to split this patch into smaller
+> > patches (for instance, one patch to handle case 1), and one to handle spurious fault
+> > change)?
+> 
+> That sounds good to me. That would definitely make it easier to review.
+
+I'll post a new patch series I guess.
+
+Thanks!
+
+
+
