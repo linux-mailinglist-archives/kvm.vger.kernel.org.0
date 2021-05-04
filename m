@@ -2,79 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 406683726E9
-	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 10:06:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD4783726F5
+	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 10:10:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230042AbhEDIHq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 May 2021 04:07:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37210 "EHLO
+        id S230089AbhEDILo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 May 2021 04:11:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56030 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230029AbhEDIHq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 May 2021 04:07:46 -0400
+        by vger.kernel.org with ESMTP id S230043AbhEDILn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 May 2021 04:11:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620115611;
+        s=mimecast20190719; t=1620115848;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fnZe71Z03G+GeuFZEGo29g9lHgOD/bxvNQsCK+sXxoI=;
-        b=Ci9A1hGAlPge6h39xq9Pr0pAafzZGxXp1c6MyMIjej8oJGsbUyhgIY8QS9lin3+dR8Mg3m
-        Mm59BwdK12RA+ikXkuGeOFLwch0AQVOAWIHQtxJLOTbKX+wwfNTbBquMIJtrWGxjsRR6ro
-        /ujQ/ov4pSrPpemtAeTlq3fOPhVtCoY=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-202-V_i8051jNTKp2mNxT-OtAQ-1; Tue, 04 May 2021 04:06:50 -0400
-X-MC-Unique: V_i8051jNTKp2mNxT-OtAQ-1
-Received: by mail-ej1-f70.google.com with SMTP id bi3-20020a170906a243b02903933c4d9132so2831268ejb.11
-        for <kvm@vger.kernel.org>; Tue, 04 May 2021 01:06:50 -0700 (PDT)
+        bh=7qjyE39N3bF2ncX4ajvi/suOmZwRdS2DR748897diBQ=;
+        b=ZS21iLNPjETakXLPHft8/Wpthuc2BGbuaubDvdpRy+uujyl0Nkc6FruCX5GeJCSG8247nh
+        InHOLNCnyLqZE71RgnouWdJoQwXMSsfHMZlBFdAyhBruqTkRFyJfndQX4F+Ua/u3IGrquA
+        cJuQn++wrRltgOuytJW01elNzuLZDok=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-589-K4eV2F-BPdCv1rE7bqKohg-1; Tue, 04 May 2021 04:10:45 -0400
+X-MC-Unique: K4eV2F-BPdCv1rE7bqKohg-1
+Received: by mail-ej1-f72.google.com with SMTP id z13-20020a1709067e4db02903a28208c9bdso2822458ejr.0
+        for <kvm@vger.kernel.org>; Tue, 04 May 2021 01:10:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=fnZe71Z03G+GeuFZEGo29g9lHgOD/bxvNQsCK+sXxoI=;
-        b=moEOHPWAQCfsI7XgIhSj/8hZAUWEtSWiedKuack+ep6pDznBbXBUvhKgn7GvhE3Vyl
-         uTcFtq3ysOxXPpDQ7MlPY8ZktjO2PN4pN3L614Jt3LXKC/sU5viiKNebuUMYDFXHGy6g
-         uuj3h5OcEeR7uyY/SF5T+rVG723RzX0/cGEqG/t5iCTHDNwU+eLtCIEkn+7LVfJsLMC7
-         rLOSGhdtQ8sSQ5ZOhBYgpu64etiYitJ+/SUIS8mhW/FPbP18TCOCMFbv8qiwZ0/baX8I
-         lgSOcjpGPPHcqVXI6eJzmyV9lnQAsAF5PGZr+AzIyrP6PgFrgxnRRj/CKumbCi+ujSA4
-         pzDg==
-X-Gm-Message-State: AOAM532fBMovN4Zd1XoyE7FSWfeS+QIsk1X3ZOmlZn3qykpk8Dthvf/Z
-        WryaW+q0XKsVzIZfoDPV0gh1Ep3NuZRP1JcsEq7OnREiUmQsiOD1yUJKi4paPsTYlxrhfgLkC5s
-        y2Bb+9IOj926R
-X-Received: by 2002:a17:907:3e27:: with SMTP id hp39mr20899584ejc.373.1620115609285;
-        Tue, 04 May 2021 01:06:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwGcOcInD/43MTk+q2tA+hGucwFY4vTHO/DlghpF7kOgLuaL29CbKw1EO3abdvtPzJndytl5w==
-X-Received: by 2002:a17:907:3e27:: with SMTP id hp39mr20899564ejc.373.1620115609117;
-        Tue, 04 May 2021 01:06:49 -0700 (PDT)
+        bh=7qjyE39N3bF2ncX4ajvi/suOmZwRdS2DR748897diBQ=;
+        b=qKPy5JtRj078ch9EVQPKh5GXwHGBFLL4xEcjUBA3Q6Ctck/PNirnz8rakMHuxMPia0
+         ScNF8Wi9c3GyLTiwbIhK/tQ3/BztvyVUKBTkr6iKCMPOnF9z9wYHSNUCwt9QfUS/Jd/0
+         ZyCuoX0e8eAQiI+fQOJOIVd1WUpLb8S2MG1lXP/NQeiUhbpmHu1m43HOxwrHm7vQbgCe
+         tUKbc9d8uJWOrU09jvWw5Q+T0MW1weo91tP2EzTRfc9XjYjYJeqNMmeebE5VrsuLUZC7
+         wemAATTlB1/lC+1GS2Fcsw/10L7O8ysJZnTtWdaeYyYf3JrTru2Pv8Axqh5H2+8M5fKX
+         VbUw==
+X-Gm-Message-State: AOAM533IsU2nhmVazsFZb7BnW0+ovT4C9cij0ij0Af89UocH47e+DAtd
+        iIw35UBBSvb0FizZR4T6Ry+m3ml8o3qWhhWgx+gPNmk9fd8FbPcttxr6nc+PG4GryCRLkTA3dIq
+        IpquYki5/Nk85
+X-Received: by 2002:a17:907:72cc:: with SMTP id du12mr20177460ejc.436.1620115844192;
+        Tue, 04 May 2021 01:10:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyQcuwOUeVVSnFxwEpEhamj+QvCvZG06wMaGnmC6TdRZGX6Bbm18WADkqIA+ZYd6bsqEgPagQ==
+X-Received: by 2002:a17:907:72cc:: with SMTP id du12mr20177447ejc.436.1620115844009;
+        Tue, 04 May 2021 01:10:44 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id v14sm166212edx.5.2021.05.04.01.06.47
+        by smtp.gmail.com with ESMTPSA id q16sm14094053edv.61.2021.05.04.01.10.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 May 2021 01:06:48 -0700 (PDT)
-Subject: Re: [PATCH v3 2/2] KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS
- hypercall
-To:     Steve Rutherford <srutherford@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@suse.de>,
-        X86 ML <x86@kernel.org>
-References: <20210429104707.203055-1-pbonzini@redhat.com>
- <20210429104707.203055-3-pbonzini@redhat.com> <YIxkTZsblAzUzsf7@google.com>
- <c4bf8a05-ec0d-9723-bb64-444fe1f088b5@redhat.com>
- <CABayD+f41GQwCL1818S7iogNHO+MLesLJ-hCX5Bbf_0vFfDMrw@mail.gmail.com>
+        Tue, 04 May 2021 01:10:43 -0700 (PDT)
+Subject: Re: [PATCH 3/4] KVM/VMX: Invoke NMI non-IST entry instead of IST
+ entry
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org
+Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Uros Bizjak <ubizjak@gmail.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>
+References: <20210426230949.3561-1-jiangshanlai@gmail.com>
+ <20210426230949.3561-4-jiangshanlai@gmail.com>
+ <87eeenk2l5.ffs@nanos.tec.linutronix.de>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7c8f388c-1c0e-1fa8-24a5-46ffd40f8b24@redhat.com>
-Date:   Tue, 4 May 2021 10:06:47 +0200
+Message-ID: <baa499a7-2b63-2970-04a6-e2c68796adc7@redhat.com>
+Date:   Tue, 4 May 2021 10:10:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <CABayD+f41GQwCL1818S7iogNHO+MLesLJ-hCX5Bbf_0vFfDMrw@mail.gmail.com>
+In-Reply-To: <87eeenk2l5.ffs@nanos.tec.linutronix.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -82,27 +88,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/05/21 01:22, Steve Rutherford wrote:
-> As far as I know, because of MSR filtering, the only "code" that needs
-> to be in KVM for MSR handling is a #define reserving the PV feature
-> number and a #define for the MSR number.
-> 
-> Arguably, you don't even need to add the new PV bits to the supported
-> cpuid, since MSR filtering is really what determines if kernel support
-> is present.
+On 03/05/21 22:02, Thomas Gleixner wrote:
+> but this and the next patch are not really needed. The below avoids the
+> extra kvm_before/after() dance in both places. Hmm?
 
-Not only I don't need to do that, I must not. :)
-
->> At this point I very much prefer the latter, which is basically Ashish's
->> earlier patch.
->
-> The minor distinction would be that if you expose the cpuid bit to the
-> guest you plan on intercepting the MSR with filters, and would not
-> need any handler code in the kernel.
-
-Yep, and it's not a minor distinction after all (especially from the PoV 
-of the guy who actually ends up maintaining the code, i.e. me), so 
-that's what I'm going for.
+Sure, that's good as well.
 
 Paolo
+
+> Thanks,
+> 
+>          tglx
+> ---
+> --- a/arch/x86/kernel/nmi.c
+> +++ b/arch/x86/kernel/nmi.c
+> @@ -526,6 +526,10 @@ DEFINE_IDTENTRY_RAW(exc_nmi)
+>   
+>   DEFINE_IDTENTRY_RAW_ALIAS(exc_nmi, exc_nmi_noist);
+>   
+> +#if IS_MODULE(CONFIG_KVM_INTEL)
+> +EXPORT_SYMBOL_GPL(asm_exc_nmi_noist);
+> +#endif
+> +
+>   void stop_nmi(void)
+>   {
+>   	ignore_nmis++;
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -36,6 +36,7 @@
+>   #include <asm/debugreg.h>
+>   #include <asm/desc.h>
+>   #include <asm/fpu/internal.h>
+> +#include <asm/idtentry.h>
+>   #include <asm/io.h>
+>   #include <asm/irq_remapping.h>
+>   #include <asm/kexec.h>
+> @@ -6395,18 +6396,17 @@ static void vmx_apicv_post_state_restore
+>   
+>   void vmx_do_interrupt_nmi_irqoff(unsigned long entry);
+>   
+> -static void handle_interrupt_nmi_irqoff(struct kvm_vcpu *vcpu, u32 intr_info)
+> +static void handle_interrupt_nmi_irqoff(struct kvm_vcpu *vcpu,
+> +					unsigned long entry)
+>   {
+> -	unsigned int vector = intr_info & INTR_INFO_VECTOR_MASK;
+> -	gate_desc *desc = (gate_desc *)host_idt_base + vector;
+> -
+>   	kvm_before_interrupt(vcpu);
+> -	vmx_do_interrupt_nmi_irqoff(gate_offset(desc));
+> +	vmx_do_interrupt_nmi_irqoff(entry);
+>   	kvm_after_interrupt(vcpu);
+>   }
+>   
+>   static void handle_exception_nmi_irqoff(struct vcpu_vmx *vmx)
+>   {
+> +	const unsigned long nmi_entry = (unsigned long)asm_exc_nmi_noist;
+>   	u32 intr_info = vmx_get_intr_info(&vmx->vcpu);
+>   
+>   	/* if exit due to PF check for async PF */
+> @@ -6417,18 +6417,20 @@ static void handle_exception_nmi_irqoff(
+>   		kvm_machine_check();
+>   	/* We need to handle NMIs before interrupts are enabled */
+>   	else if (is_nmi(intr_info))
+> -		handle_interrupt_nmi_irqoff(&vmx->vcpu, intr_info);
+> +		handle_interrupt_nmi_irqoff(&vmx->vcpu, nmi_entry);
+>   }
+>   
+>   static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
+>   {
+>   	u32 intr_info = vmx_get_intr_info(vcpu);
+> +	unsigned int vector = intr_info & INTR_INFO_VECTOR_MASK;
+> +	gate_desc *desc = (gate_desc *)host_idt_base + vector;
+>   
+>   	if (WARN_ONCE(!is_external_intr(intr_info),
+>   	    "KVM: unexpected VM-Exit interrupt info: 0x%x", intr_info))
+>   		return;
+>   
+> -	handle_interrupt_nmi_irqoff(vcpu, intr_info);
+> +	handle_interrupt_nmi_irqoff(vcpu, gate_offset(desc));
+>   }
+>   
+>   static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
 
