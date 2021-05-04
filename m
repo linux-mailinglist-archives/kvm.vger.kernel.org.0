@@ -2,285 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 25420373140
-	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 22:13:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 737CC37314B
+	for <lists+kvm@lfdr.de>; Tue,  4 May 2021 22:18:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232615AbhEDUOJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 May 2021 16:14:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50776 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229960AbhEDUOC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 May 2021 16:14:02 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65508C061574
-        for <kvm@vger.kernel.org>; Tue,  4 May 2021 13:13:06 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id p17so5933183plf.12
-        for <kvm@vger.kernel.org>; Tue, 04 May 2021 13:13:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=hOpr5X5iLUsxQXZMfgFtFQv/OPJaI291sQPjBVYL6i4=;
-        b=qjyvmlpGQP5Uyw4BFXCTRuaCPMBPrTNd6RKSeKxciqdRz3ek0UeoVOP4X7Gns7xbOK
-         NiiEgRKp6Yi68+g0d7L+hE2maO66CrmPO6igUJSUvbSagSQvZZnbqA02K6AeiQWtTIFR
-         5OiCHldYWl0fj0bfppGp9WVJLxxuOotzbbzUt8KwikHRd5twDZMeXYBuD/4jN+b1sG7D
-         K8L008O3d/b4JV7XI5gBT9VdIqz7jfpoV7YWYDeOGTjfEb4hF3yCdjySDn+FK1SqEWEW
-         oqkVJHzWk2wr10/X/Oy9htxYknp91nC6gy066Ie+rOBCqyXM+/63fqljO1stMtf3T2jN
-         Pccw==
+        id S231464AbhEDUTt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 May 2021 16:19:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39521 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230217AbhEDUTs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 May 2021 16:19:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620159532;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QJf7ER3TDUPpx69gjjjuRZbp8LhbACyEKSP42GGHdNw=;
+        b=Huq45OuJwddEpbAzCtZKTeBWSowrF2yvBSYTJQFxKEFrM1g8+dda3S87MBePDaoxWMg3cd
+        bQBljwUoNajYHELugxL64RmJifGqYPDzPQPPoazYXwoKmBTFokjKJIFr4g0ZhiZ1vQmDxW
+        9W9Bzo17lChxowufouQ1BvuCcQkbRno=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-210-iokdBH_XOpipJ_8o8ZQKow-1; Tue, 04 May 2021 16:18:50 -0400
+X-MC-Unique: iokdBH_XOpipJ_8o8ZQKow-1
+Received: by mail-ed1-f72.google.com with SMTP id s20-20020a0564025214b029038752a2d8f3so6967071edd.2
+        for <kvm@vger.kernel.org>; Tue, 04 May 2021 13:18:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=hOpr5X5iLUsxQXZMfgFtFQv/OPJaI291sQPjBVYL6i4=;
-        b=gAKWja4IGc+S1lJn47iGuTSDLZHLcWCbY0lMGIJXmP6y3PMJAnpXWDYod1IY8VyqP9
-         HMTOGghrszKMbZDBq90Mg0pGu0Fz5zHtBWiUVuP5tmXwcjoPV3K9zzzMs6IEed6TZD6k
-         B+AaJ2Ynxs85gJaKeYsX9GXXRb1X9E8UorBlNAaAlSUcBlSxIbPn8H7HLtMChA0Q7G6r
-         //v9jhpvexNT/Yqj+aEp5L0EsVClco4F7HgZyZtGXvUQqpxUSpoQtAYl8B74amGoA0w0
-         /O/fRcGeEC9myjZJKyWnqg1hg1M/1bFhYC/zsW7/I2oXP3HxukSf3ex77T0qaYskR6wn
-         Y1EQ==
-X-Gm-Message-State: AOAM53350attgCpB5cb2InpkX2xMoPI9v1JNo/c62i84orohpls6EarM
-        A0y2/9ULYzoDUQ+P66WBxGZZSg==
-X-Google-Smtp-Source: ABdhPJzZlpmByhkmegFWPDJejjwukrIiTVDPdra8aVzO6A1dV9z/mY4C3DyvcX/IXw8Jyd5TeU80IA==
-X-Received: by 2002:a17:902:9893:b029:ee:e8a8:688c with SMTP id s19-20020a1709029893b02900eee8a8688cmr7097120plp.84.1620159185570;
-        Tue, 04 May 2021 13:13:05 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id md21sm5168152pjb.3.2021.05.04.13.13.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 May 2021 13:13:04 -0700 (PDT)
-Date:   Tue, 4 May 2021 20:13:01 +0000
-From:   Sean Christopherson <seanjc@google.com>
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=QJf7ER3TDUPpx69gjjjuRZbp8LhbACyEKSP42GGHdNw=;
+        b=fNSTlFYXAeS3ucscQalYt5eia183WFh0BTxzXpz64gVmwjhn82ZjP6Y+RSc4ByFNj5
+         SrTc3fpPoNlSbnnH1IDH8wVI3f0Jc4XV9rjV2l/In9IUZHsoVLzfnRjstzX7xTE6f2dD
+         uAyEiLs6qK25t0Y+spTj3hPhcpYS/rUV58/PoNqQYGZn0sag/aGdDmb+VwfzTr74joHo
+         1hN3Rz0MS0A950IGrknsdKXuP2gCc426OViyAuTzE/osijMwQBMsc1b1+gWCBi5BRFKq
+         Ri3E0meZTyCud7p7vbUcDajhGX4QnuPO1ZJsS9k6KG5X/R9pz6My0rUFo60HvUb4TOLl
+         9dtQ==
+X-Gm-Message-State: AOAM531g6hUj8guxke9LOHQfymEGBoihCLyURNow4bXKyNzxVNoPp/I6
+        X519pOgV3uFjWHSkjNKiiVpPm9IYffVTW9LUTiyJ5P0FKe6Cz96RyFrnwkG+C1CEUpWs0V5xlfh
+        vAp+yIgyTLXsY
+X-Received: by 2002:a17:906:e105:: with SMTP id gj5mr24371332ejb.388.1620159528938;
+        Tue, 04 May 2021 13:18:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxPW3cE3OvV+sifWvUG52jfXFijecUpZWkEi4GWpuQsW03z9NVNRFBAl8LL0HoXyCoYIPnvbw==
+X-Received: by 2002:a17:906:e105:: with SMTP id gj5mr24371314ejb.388.1620159528740;
+        Tue, 04 May 2021 13:18:48 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id o20sm14995116eds.65.2021.05.04.13.18.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 May 2021 13:18:48 -0700 (PDT)
 To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
         Junaid Shahid <junaids@google.com>,
         Jim Mattson <jmattson@google.com>,
         Yulei Zhang <yulei.kernel@gmail.com>,
         Wanpeng Li <kernellwp@gmail.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Subject: Re: [PATCH v2 7/7] KVM: x86/mmu: Lazily allocate memslot rmaps
-Message-ID: <YJGqzZ/8CS8mSx2c@google.com>
 References: <20210429211833.3361994-1-bgardon@google.com>
- <20210429211833.3361994-8-bgardon@google.com>
+ <20210429211833.3361994-2-bgardon@google.com>
+ <e9090079-2255-5a70-f909-89f6f65c12ed@redhat.com>
+ <CANgfPd9O3d9b+WYgo+ke1Jx50=ep_f-ZC1gRqUET6PDsLxW+Gw@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 1/7] KVM: x86/mmu: Track if shadow MMU active
+Message-ID: <34fe30b6-0d4b-f1e8-9abd-6cb0a0765492@redhat.com>
+Date:   Tue, 4 May 2021 22:18:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210429211833.3361994-8-bgardon@google.com>
+In-Reply-To: <CANgfPd9O3d9b+WYgo+ke1Jx50=ep_f-ZC1gRqUET6PDsLxW+Gw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 29, 2021, Ben Gardon wrote:
-> If the TDP MMU is in use, wait to allocate the rmaps until the shadow
-> MMU is actually used. (i.e. a nested VM is launched.) This saves memory
-> equal to 0.2% of guest memory in cases where the TDP MMU is used and
-> there are no nested guests involved.
+On 04/05/21 19:26, Ben Gardon wrote:
+> On Mon, May 3, 2021 at 6:42 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> On 29/04/21 23:18, Ben Gardon wrote:
+>>> +void activate_shadow_mmu(struct kvm *kvm)
+>>> +{
+>>> +     kvm->arch.shadow_mmu_active = true;
+>>> +}
+>>> +
+>>
+>> I think there's no lock protecting both the write and the read side.
+>> Therefore this should be an smp_store_release, and all checks in
+>> patch 2 should be an smp_load_acquire.
 > 
-> Signed-off-by: Ben Gardon <bgardon@google.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 11 +++++++
->  arch/x86/kvm/mmu/mmu.c          | 21 +++++++++++--
->  arch/x86/kvm/mmu/mmu_internal.h |  2 +-
->  arch/x86/kvm/x86.c              | 54 ++++++++++++++++++++++++++++++---
->  4 files changed, 80 insertions(+), 8 deletions(-)
+> That makes sense.
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 3900dcf2439e..b8633ed00a6a 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1124,6 +1124,15 @@ struct kvm_arch {
->  #endif /* CONFIG_X86_64 */
->  
->  	bool shadow_mmu_active;
-> +
-> +	/*
-> +	 * If set, the rmap should be allocated for any newly created or
-> +	 * modified memslots. If allocating rmaps lazily, this may be set
-> +	 * before the rmaps are allocated for existing memslots, but
-> +	 * shadow_mmu_active will not be set until after the rmaps are fully
-> +	 * allocated.
-> +	 */
-> +	bool alloc_memslot_rmaps;
-
-Maybe "need_rmaps" or "need_memslot_rmaps"?
-
->  };
->  
->  struct kvm_vm_stat {
-> @@ -1855,4 +1864,6 @@ static inline int kvm_cpu_get_apicid(int mps_cpu)
->  
->  int kvm_cpu_dirty_log_size(void);
->  
-> +int alloc_all_memslots_rmaps(struct kvm *kvm);
-> +
->  #endif /* _ASM_X86_KVM_HOST_H */
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index e252af46f205..b2a6585bd978 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3125,9 +3125,17 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  	return ret;
->  }
->  
-> -void activate_shadow_mmu(struct kvm *kvm)
-> +int activate_shadow_mmu(struct kvm *kvm)
->  {
-> +	int r;
-> +
-> +	r = alloc_all_memslots_rmaps(kvm);
-> +	if (r)
-> +		return r;
-> +
->  kvm->arch.shadow_mmu_active = true;
-
-If shadow_mmu_active goes away, so does this helper.
-
-> +
-> +	return 0;
->  }
->  
->  static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
-> @@ -3300,7 +3308,9 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
->  		}
->  	}
->  
-> -	activate_shadow_mmu(vcpu->kvm);
-> +	r = activate_shadow_mmu(vcpu->kvm);
-> +	if (r)
-> +		return r;
->  
->  	write_lock(&vcpu->kvm->mmu_lock);
->  	r = make_mmu_pages_available(vcpu);
-> @@ -5491,7 +5501,12 @@ void kvm_mmu_init_vm(struct kvm *kvm)
->  	struct kvm_page_track_notifier_node *node = &kvm->arch.mmu_sp_tracker;
->  
->  	if (!kvm_mmu_init_tdp_mmu(kvm))
-> -		activate_shadow_mmu(kvm);
-> +		/*
-> +		 * No memslots can have been allocated at this point.
-> +		 * activate_shadow_mmu won't actually need to allocate
-> +		 * rmaps, so it cannot fail.
-> +		 */
-> +		WARN_ON(activate_shadow_mmu(kvm));
-
-This is where I really don't like calling the full flow.  VM init is already
-special, I don't see any harm in open coding the setting of the flag.  This also
-provides a good place to document that the smp_store/load business is unnecessary
-since there can't be users.
-
->  	node->track_write = kvm_mmu_pte_write;
->  	node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
-> -static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
-> +int alloc_memslots_rmaps(struct kvm *kvm, struct kvm_memslots *slots)
-> +{
-> +	struct kvm_memory_slot *slot;
-> +	int r = 0;
-> +
-> +	kvm_for_each_memslot(slot, slots) {
-> +		r = alloc_memslot_rmap(kvm, slot, slot->npages);
-> +		if (r)
-> +			break;
-> +	}
-> +	return r;
-> +}
-
-Just open code this in the caller, it's literally one line of code and the
-indentation isn't bad.
-
-> +
-> +int alloc_all_memslots_rmaps(struct kvm *kvm)
-> +{
-> +	struct kvm_memslots *slots;
-> +	int r = 0;
-> +	int i;
-> +
-> +	mutex_lock(&kvm->slots_arch_lock);
-> +	kvm->arch.alloc_memslot_rmaps = true;
-> +
-> +	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-> +		slots = __kvm_memslots(kvm, i);
-> +		r = alloc_memslots_rmaps(kvm, slots);
-> +		if (r)
-
-It'd be easier just to destroy the rmaps on failure and then do:
-
-	if (kvm->arch.needs_memslots_rmaps)
-		return;
-
-	mutex_lock(&kvm->slots_arch_lock);
-
-	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-		kvm_for_each_memslot(slot, __kvm_memslots(kvm, i)) {
-			r = alloc_memslot_rmap(kvm, slot, slot->npages);
-				break;
-		}
-	}
-
-	if (!r)
-		smp_store_release(kvm->arch.needs_memslots_rmaps, true);
-	else
-		kvm_free_rmaps(kvm);
-	mutex_unlock(&kvm->slots_arch_lock);
-
-
-and make alloc_memslot_rmap() a pure allocator (no checks on whether it should
-actually do allocations), i.e. push the check to the memslot flow:
-
-static int kvm_alloc_memslot_metadata(struct kvm *kvm,
-				      struct kvm_memory_slot *slot,
-				      unsigned long npages)
-{
-	int i;
-	int r;
-
-	/*
-	 * Clear out the previous array pointers for the KVM_MR_MOVE case.  The
-	 * old arrays will be freed by __kvm_set_memory_region() if installing
-	 * the new memslot is successful.
-	 */
-	memset(&slot->arch, 0, sizeof(slot->arch));
-
-	if (kvm->arch.needs_memslots_rmaps) {
-		r = alloc_memslot_rmap(kvm, slot, npages);
-		if (r)
-			return r;
-	}
-
-
-With that, there's no need for the separate shadow_mmu_active flag, and you can
-do s/activate_shadow_mmu/kvm_activate_rmaps or so.
-
-
-> +			break;
-> +	}
-> +	mutex_unlock(&kvm->slots_arch_lock);
-> +	return r;
-> +}
-> +
-> +static int kvm_alloc_memslot_metadata(struct kvm *kvm,
-> +				      struct kvm_memory_slot *slot,
->  				      unsigned long npages)
->  {
->  	int i;
-> @@ -10881,7 +10927,7 @@ static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
->  	 */
->  	memset(&slot->arch, 0, sizeof(slot->arch));
->  
-> -	r = alloc_memslot_rmap(slot, npages);
-> +	r = alloc_memslot_rmap(kvm, slot, npages);
->  	if (r)
->  		return r;
->  
-> @@ -10954,7 +11000,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->  				enum kvm_mr_change change)
->  {
->  	if (change == KVM_MR_CREATE || change == KVM_MR_MOVE)
-> -		return kvm_alloc_memslot_metadata(memslot,
-> +		return kvm_alloc_memslot_metadata(kvm, memslot,
->  						  mem->memory_size >> PAGE_SHIFT);
->  	return 0;
->  }
-> -- 
-> 2.31.1.527.g47e6f16901-goog
+>>
+>> Also, the assignments to slot->arch.rmap in patch 4 (alloc_memslot_rmap)
+>> should be an rcu_assign_pointer, while __gfn_to_rmap must be changed like so:
+>>
+>> +       struct kvm_rmap_head *head;
+>> ...
+>> -       return &slot->arch.rmap[level - PG_LEVEL_4K][idx];
+>> +       head = srcu_dereference(slot->arch.rmap[level - PG_LEVEL_4K], &kvm->srcu,
+>> +                                lockdep_is_held(&kvm->slots_arch_lock));
+>> +       return &head[idx];
 > 
+> I'm not sure I fully understand why this becomes necessary after patch
+> 4. Isn't it already needed since the memslots are protected by RCU? Or
+> is there already a higher level rcu dereference?
+> 
+> __kvm_memslots already does an srcu dereference, so is there a path
+> where we aren't getting the slots from that function where this is
+> needed?
+
+There are two point of views:
+
+1) the easier one is just CONFIG_PROVE_RCU debugging: the rmaps need to 
+be accessed under RCU because the memslots can disappear as soon as 
+kvm->srcu is unlocked.
+
+2) the harder one (though at this point I'm better at figuring out these 
+ordering bugs than "traditional" mutex races) is what the happens before 
+relation[1] looks like.  Consider what happens if the rmaps are 
+allocated by *another thread* after the slots have been fetched.
+
+thread 1		thread 2		thread 3
+allocate memslots
+rcu_assign_pointer
+			slots = srcu_dereference
+						allocate rmap
+						rcu_assign_pointer
+			head = slot->arch.rmap[]
+
+Here, thread 3 is allocating the rmaps in the SRCU-protected 
+kvm_memslots; those rmaps that didn't exist at the time thread 1 did the 
+rcu_assign_pointer (which synchronizes with thread 2's srcu_dereference 
+that retrieves slots), hence they were not covered by the release 
+semantics of that rcu_assign_pointer and the "consume" semantics of the 
+corresponding srcu_dereference.  Therefore, thread 2 needs another 
+srcu_dereference when retrieving them.
+
+Paolo
+
+[1] https://lwn.net/Articles/844224/
+
+> I wouldn't say that the rmaps are protected by RCU in any way that
+> separate from the memslots.
+
