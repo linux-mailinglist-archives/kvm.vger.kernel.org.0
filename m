@@ -2,118 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4ED113746CC
-	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 19:53:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2D803746F7
+	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 19:53:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237502AbhEER2J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 May 2021 13:28:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41866 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235915AbhEERCY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 May 2021 13:02:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620234084;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7g2k8F+O24ILX6i9wlywTWqxuX2ak4LnZOnLn8IJqNY=;
-        b=I0Acs7JkAFBGnjbE8cg/Ed4v4TpGNX+hKW6gXg9rfrvLDEC5VUREMhdQjZ11yJ1YkugWBi
-        PNs0IC4b/N6wY7U30ZRX7LqayFAnVQQUiNY6rxqw9Dg3UQVnedQp1IXEzV0VwIVEeeTGVY
-        FhdC/d24D/bVmKtiwbVOhFWn6hH8/HU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-437-CCqmUhZyN6m7PTGLXZo43A-1; Wed, 05 May 2021 13:01:22 -0400
-X-MC-Unique: CCqmUhZyN6m7PTGLXZo43A-1
-Received: by mail-wr1-f71.google.com with SMTP id 65-20020adf82c70000b0290107593a42c3so953910wrc.5
-        for <kvm@vger.kernel.org>; Wed, 05 May 2021 10:01:22 -0700 (PDT)
+        id S236156AbhEERgK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 May 2021 13:36:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50470 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240655AbhEERbx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 May 2021 13:31:53 -0400
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C846BC04957F
+        for <kvm@vger.kernel.org>; Wed,  5 May 2021 10:01:35 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id r9so3986498ejj.3
+        for <kvm@vger.kernel.org>; Wed, 05 May 2021 10:01:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dHdYz151PKTWNs0iwW3G2S7ao71/OuX/lBcR18Vu17c=;
+        b=Vn5O+RKhScbNYISKD9Qxf/ZHZMGkFGOrAeHmD389mgDKKu1o1SSgJbZnABvWAy1zK8
+         RJ7uEYZnFXavtksWdsnGRNizBcTxLSogY5L+PiS9BJm0sVxgWh+Zp5zANxMhWJQWdph+
+         yU4k2PoxDqy455e3McohgsEfshFG7twShBqdJA2AQZ2lhjRk96jzehH2KgkU+d7KNj3o
+         EIoDe2gljyWesUE+MNhGl50Gm8oB5E1njXk4l9FhSE414DN7K1DjMm4e8pE1kbZfEaPe
+         J84FGlfuiw6XgLJxXPF73dmZOnjDiAlov8AHURk5VwS9Lp0J/rUHWPiU0U7zsW9RWVLB
+         GTeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=7g2k8F+O24ILX6i9wlywTWqxuX2ak4LnZOnLn8IJqNY=;
-        b=ojetDUjuou6o9lx60fC+/CQrZmtqRndNolXN6C8fy+i71/p1UYESYX7otilo1UIB4k
-         OBeWMyr7J2aFojfeBl85IOTHZFRccaSUsJxb9ulDiNkiKL9tHA4zeclv5CAMJh6PmEZ4
-         bBocrHGsXwQo6AfvllJSVeRIMyv8u1YuTEjbYRjkSBvH8YInuMY0aAF2xWvRHZL2wjlq
-         kIHe/YjZXErGM403ZebXqb0eaT42umKrutVtCMiPDjDDrREwwFUUK/YK1/RGX++QYFkI
-         e7t4yqabFnEDTiLfS7IR1oSMofI4vlnR6pDDiww/4WfNG4PnPTo2ZUJdlJ0HtY0ns1Gn
-         aiDQ==
-X-Gm-Message-State: AOAM530qDDdY6nj1DEZs7kTwJ3+HgpMmrFe0R2bqr7mxV70d1qwziwKS
-        2Gb9ziPh3up6kXRsXW34wy7A3ihmsqiWRcSF8FERDEex0lztPvfFkK1/IlK2RPEyPJulmHZiEZR
-        ch2n/u96cZ2bX
-X-Received: by 2002:a1c:1d50:: with SMTP id d77mr11295070wmd.114.1620234081690;
-        Wed, 05 May 2021 10:01:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzmgH4JwP3i9dHZjwwiWSGdQcazy8feE/fCrd6Xa/tz3JD28tBwB4MYsNyH0CmUS+lyRxh2hg==
-X-Received: by 2002:a1c:1d50:: with SMTP id d77mr11295057wmd.114.1620234081584;
-        Wed, 05 May 2021 10:01:21 -0700 (PDT)
-Received: from x1w.redhat.com (astrasbourg-653-1-188-220.w90-13.abo.wanadoo.fr. [90.13.127.220])
-        by smtp.gmail.com with ESMTPSA id q10sm15824317wre.92.2021.05.05.10.01.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 May 2021 10:01:21 -0700 (PDT)
-From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Warner Losh <imp@bsdimp.com>, Kyle Evans <kevans@freebsd.org>,
-        Greg Kurz <groug@kaod.org>,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        qemu-ppc@nongnu.org (open list:PowerPC TCG CPUs),
-        kvm@vger.kernel.org (open list:Overall KVM CPUs)
-Subject: [PATCH 5/5] target/ppc/kvm: Replace alloca() by g_malloc()
-Date:   Wed,  5 May 2021 19:00:55 +0200
-Message-Id: <20210505170055.1415360-6-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.3
-In-Reply-To: <20210505170055.1415360-1-philmd@redhat.com>
-References: <20210505170055.1415360-1-philmd@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dHdYz151PKTWNs0iwW3G2S7ao71/OuX/lBcR18Vu17c=;
+        b=jqDNpxSSjQDedKENFlEoQ8GVj4iSco3tK18FF6DphDYh7+ziy35eE+EYTLn4Fhcrib
+         djBdOpeT/jE5z/fpaKi1XNh9iIugml5onIPVRCILBLiA5FP9tWb6Sj5Q9xT4V+LMSgMK
+         FlK3Z9tu+m9ayxbtx7d8nM3uMTEqyVTxt82sNL2qDi1mf+kY/585gvfOYLxILth5WOA/
+         pY2e22cYTAvvcMg1Tif0Ss7rinj8FHKq16KNUWd3YpmH1f5+5UEZYxDOmOxAG00oYKyR
+         KDxzhxZfKJyethYfSGB/kjWYF6UMREecSnrebynknlsTVUIpB5myjQwH08OVa+W6pSJy
+         7obQ==
+X-Gm-Message-State: AOAM5339vCk/NeY+nrhyr1tRMJjTOHsvvLi+vf6PuGCeY2gtKyd4X+8o
+        28aQ78z1tCT/v65DIudqti0KV0A3VXgt0EQ5ll/9VQ==
+X-Google-Smtp-Source: ABdhPJzmV2+raeJouq5W3ix1ojmG6vTXiEz8csQID7kNdSDeY0I/l2PTI5vlWjeCNwgfd+qp66HSwaw/ysJB3ni1NdA=
+X-Received: by 2002:a17:906:4c82:: with SMTP id q2mr28789124eju.80.1620234093994;
+ Wed, 05 May 2021 10:01:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <cover.1620200410.git.kai.huang@intel.com> <817eae486273adad0a622671f628c5a99b72a375.1620200410.git.kai.huang@intel.com>
+ <CANgfPd_gWZB9NMjzsZ-v61e=p53WytCR1qm_28vRg6bdESD1fQ@mail.gmail.com>
+In-Reply-To: <CANgfPd_gWZB9NMjzsZ-v61e=p53WytCR1qm_28vRg6bdESD1fQ@mail.gmail.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 5 May 2021 10:01:22 -0700
+Message-ID: <CANgfPd-Dv-x9=t1DQrukCpRQJufEcN4ZUTw7mOe=p-zcS=hQDw@mail.gmail.com>
+Subject: Re: [PATCH 3/3] KVM: x86/mmu: Fix TDP MMU page table level
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The ALLOCA(3) man-page mentions its "use is discouraged".
+On Wed, May 5, 2021 at 9:28 AM Ben Gardon <bgardon@google.com> wrote:
+>
+> On Wed, May 5, 2021 at 2:38 AM Kai Huang <kai.huang@intel.com> wrote:
+> >
+> > TDP MMU iterator's level is identical to page table's actual level.  For
+> > instance, for the last level page table (whose entry points to one 4K
+> > page), iter->level is 1 (PG_LEVEL_4K), and in case of 5 level paging,
+> > the iter->level is mmu->shadow_root_level, which is 5.  However, struct
+> > kvm_mmu_page's level currently is not set correctly when it is allocated
+> > in kvm_tdp_mmu_map().  When iterator hits non-present SPTE and needs to
+> > allocate a new child page table, currently iter->level, which is the
+> > level of the page table where the non-present SPTE belongs to, is used.
+> > This results in struct kvm_mmu_page's level always having its parent's
+> > level (excpet root table's level, which is initialized explicitly using
+> > mmu->shadow_root_level).  This is kinda wrong, and not consistent with
+> > existing non TDP MMU code.  Fortuantely the sp->role.level is only used
+> > in handle_removed_tdp_mmu_page(), which apparently is already aware of
+> > this, and handles correctly.  However to make it consistent with non TDP
+> > MMU code (and fix the issue that both root page table and any child of
+> > it having shadow_root_level), fix this by using iter->level - 1 in
+> > kvm_tdp_mmu_map().  Also modify handle_removed_tdp_mmu_page() to handle
+> > such change.
+>
+> Ugh. Thank you for catching this. This is going to take me a bit to
+> review as I should audit the code more broadly for this problem in the
+> TDP MMU.
+> It would probably also be a good idea to add a comment on the level
+> field to say that it represents the level of the SPTEs in the
+> associated page, not the level of the SPTE that links to the
+> associated page.
+> Hopefully that will prevent similar future misunderstandings.
 
-Replace it by a g_malloc() call.
+I went through and manually audited the code. I think the only case
+that needs to be added to this is for nx recovery:
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- target/ppc/kvm.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 104a308abb5..ae62daddf7d 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2698,11 +2698,11 @@ int kvmppc_save_htab(QEMUFile *f, int fd, size_t bufsize, int64_t max_ns)
- int kvmppc_load_htab_chunk(QEMUFile *f, int fd, uint32_t index,
-                            uint16_t n_valid, uint16_t n_invalid, Error **errp)
+--- a/arch/x86/kvm/mmu/tdp_mmu.h
++++ b/arch/x86/kvm/mmu/tdp_mmu.h
+@@ -31,7 +31,7 @@ static inline bool kvm_tdp_mmu_zap_gfn_range(struct
+kvm *kvm, int as_id,
+ }
+ static inline bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
  {
--    struct kvm_get_htab_header *buf;
--    size_t chunksize = sizeof(*buf) + n_valid * HASH_PTE_SIZE_64;
-+    size_t chunksize = sizeof(struct kvm_get_htab_header)
-+                       + n_valid * HASH_PTE_SIZE_64;
-     ssize_t rc;
-+    g_autofree struct kvm_get_htab_header *buf = g_malloc(chunksize);
- 
--    buf = alloca(chunksize);
-     buf->index = index;
-     buf->n_valid = n_valid;
-     buf->n_invalid = n_invalid;
-@@ -2741,10 +2741,10 @@ void kvmppc_read_hptes(ppc_hash_pte64_t *hptes, hwaddr ptex, int n)
-     i = 0;
-     while (i < n) {
-         struct kvm_get_htab_header *hdr;
-+        char buf[sizeof(*hdr) + HPTES_PER_GROUP * HASH_PTE_SIZE_64];
-         int m = n < HPTES_PER_GROUP ? n : HPTES_PER_GROUP;
--        char buf[sizeof(*hdr) + m * HASH_PTE_SIZE_64];
- 
--        rc = read(fd, buf, sizeof(buf));
-+        rc = read(fd, buf, sizeof(*hdr) + m * HASH_PTE_SIZE_64);
-         if (rc < 0) {
-             hw_error("kvmppc_read_hptes: Unable to read HPTEs");
-         }
--- 
-2.26.3
+-       gfn_t end = sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level);
++       gfn_t end = sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level + 1);
 
+        /*
+         * Don't allow yielding, as the caller may have a flush pending.  Note,
+
+Otherwise we won't zap the full page with this change, resulting in
+ineffective or less reliable NX recovery.
+
+>
+> >
+> > Signed-off-by: Kai Huang <kai.huang@intel.com>
+> > ---
+> >  arch/x86/kvm/mmu/tdp_mmu.c | 8 ++++----
+> >  1 file changed, 4 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > index debe8c3ec844..bcfb87e1c06e 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > @@ -335,7 +335,7 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
+> >
+> >         for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
+> >                 sptep = rcu_dereference(pt) + i;
+> > -               gfn = base_gfn + (i * KVM_PAGES_PER_HPAGE(level - 1));
+> > +               gfn = base_gfn + i * KVM_PAGES_PER_HPAGE(level);
+> >
+> >                 if (shared) {
+> >                         /*
+> > @@ -377,12 +377,12 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
+> >                         WRITE_ONCE(*sptep, REMOVED_SPTE);
+> >                 }
+> >                 handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), gfn,
+> > -                                   old_child_spte, REMOVED_SPTE, level - 1,
+> > +                                   old_child_spte, REMOVED_SPTE, level,
+> >                                     shared);
+> >         }
+> >
+> >         kvm_flush_remote_tlbs_with_address(kvm, gfn,
+> > -                                          KVM_PAGES_PER_HPAGE(level));
+> > +                                          KVM_PAGES_PER_HPAGE(level + 1));
+> >
+> >         call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
+> >  }
+> > @@ -1009,7 +1009,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+> >                 }
+> >
+> >                 if (!is_shadow_present_pte(iter.old_spte)) {
+> > -                       sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level);
+> > +                       sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level - 1);
+> >                         child_pt = sp->spt;
+> >
+> >                         new_spte = make_nonleaf_spte(child_pt,
+> > --
+> > 2.31.1
+> >
