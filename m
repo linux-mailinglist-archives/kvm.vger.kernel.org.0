@@ -2,108 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EB592373D93
-	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 16:23:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D60C373DE9
+	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 16:48:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232154AbhEEOYI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 May 2021 10:24:08 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:17132 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233113AbhEEOYH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 May 2021 10:24:07 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FZzPQ2QyszqSVy;
-        Wed,  5 May 2021 22:19:54 +0800 (CST)
-Received: from [10.174.185.179] (10.174.185.179) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.498.0; Wed, 5 May 2021 22:23:02 +0800
-Subject: Re: [PATCH v2 03/11] KVM: arm64: Make kvm_skip_instr() and co private
- to HYP
-To:     Marc Zyngier <maz@kernel.org>
-CC:     <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <kernel-team@android.com>, Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Andrew Scull <ascull@google.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Quentin Perret <qperret@google.com>,
-        David Brazdil <dbrazdil@google.com>
-References: <20201102164045.264512-1-maz@kernel.org>
- <20201102164045.264512-4-maz@kernel.org>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <cef3517b-e66d-4d26-68a9-2d5fb433377c@huawei.com>
-Date:   Wed, 5 May 2021 22:23:02 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S233381AbhEEOtF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 May 2021 10:49:05 -0400
+Received: from shelob.surriel.com ([96.67.55.147]:38488 "EHLO
+        shelob.surriel.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233369AbhEEOtF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 May 2021 10:49:05 -0400
+Received: from imladris.surriel.com ([96.67.55.152])
+        by shelob.surriel.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <riel@shelob.surriel.com>)
+        id 1leIgA-00064I-FN; Wed, 05 May 2021 10:39:10 -0400
+Message-ID: <eb62d635e3e6408247923e90eb7a47271e72e1f8.camel@surriel.com>
+Subject: Re: [PATCH 2/6] sched: Rename sched_info_{queued,dequeued}
+From:   Rik van Riel <riel@surriel.com>
+To:     Peter Zijlstra <peterz@infradead.org>, tglx@linutronix.de,
+        mingo@kernel.org, juri.lelli@redhat.com,
+        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+        rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+        bristot@redhat.com, bsingharora@gmail.com, pbonzini@redhat.com,
+        maz@kernel.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        hannes@cmpxchg.org
+Date:   Wed, 05 May 2021 10:39:09 -0400
+In-Reply-To: <20210505111525.061402904@infradead.org>
+References: <20210505105940.190490250@infradead.org>
+         <20210505111525.061402904@infradead.org>
+Content-Type: multipart/signed; micalg="pgp-sha256";
+        protocol="application/pgp-signature"; boundary="=-xmFicWXjWbCqR9zb6bcb"
+User-Agent: Evolution 3.34.4 (3.34.4-1.fc31) 
 MIME-Version: 1.0
-In-Reply-To: <20201102164045.264512-4-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.185.179]
-X-CFilter-Loop: Reflected
+Sender: riel@shelob.surriel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
 
-On 2020/11/3 0:40, Marc Zyngier wrote:
-> In an effort to remove the vcpu PC manipulations from EL1 on nVHE
-> systems, move kvm_skip_instr() to be HYP-specific. EL1's intent
-> to increment PC post emulation is now signalled via a flag in the
-> vcpu structure.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+--=-xmFicWXjWbCqR9zb6bcb
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-[...]
+On Wed, 2021-05-05 at 12:59 +0200, Peter Zijlstra wrote:
+> For consistency, rename {queued,dequeued} to {enqueue,dequeue}.
+>=20
+> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 
-> @@ -133,6 +134,8 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
->  	__load_guest_stage2(vcpu->arch.hw_mmu);
->  	__activate_traps(vcpu);
->  
-> +	__adjust_pc(vcpu);
+Ohhh nice.
 
-If the INCREMENT_PC flag was set (e.g., for WFx emulation) while we're
-handling PSCI CPU_ON call targetting this VCPU, the *target_pc* (aka
-entry point address, normally provided by the primary VCPU) will be
-unexpectedly incremented here. That's pretty bad, I think.
+Reviewed-by: Rik van Riel <riel@surriel.com>
 
-This was noticed with a latest guest kernel, at least with commit
-dccc9da22ded ("arm64: Improve parking of stopped CPUs"), which put the
-stopped VCPUs in the WFx loop. The guest kernel shouted at me that
+--=20
+All Rights Reversed.
 
-	"CPU: CPUs started in inconsistent modes"
+--=-xmFicWXjWbCqR9zb6bcb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
 
-*after* rebooting. The problem is that the secondary entry point was
-corrupted by KVM as explained above. All of the secondary processors
-started from set_cpu_boot_mode_flag(), with w0=0. Oh well...
+-----BEGIN PGP SIGNATURE-----
 
-I write the below diff and guess it will help. But I have to look at all
-other places where we adjust PC directly to make a right fix. Please let
-me know what do you think.
+iQEzBAABCAAdFiEEKR73pCCtJ5Xj3yADznnekoTE3oMFAmCSrg4ACgkQznnekoTE
+3oOInggAgDct8qVUfTm3PaF4Yfb1MLm47e62yy69vk+aKoJ25rn7U3vZLxjZpTD6
+4E2ok7S3vk/B+aiuKnTEO+4PikRtsq2gCD9nQfG07LdeXOpEpDxUmZBNJ7ESKwoU
+lpb/ZV65ut/IoCRr98bHq+TTiHibJYEDrNwoSJQMNtIeyurXbSO/t25ha0nUBER9
+aZsB7y+Ulwab520ZsTw6osNOoz7O7U2WOOy+hRAI35mO6u5eVW96IgKhHK3mlUmL
+AIihADWqGLGeb864bZL2lJWLRn2Jr0bSjvZsP8E3Pto68h19nhNfhSQ06ddSiyeS
+gbHq06y1bnWI7QMKb3QRDJWfyxaiYQ==
+=iZNc
+-----END PGP SIGNATURE-----
 
+--=-xmFicWXjWbCqR9zb6bcb--
 
-Thanks,
-Zenghui
-
----->8----
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 956cdc240148..ed647eb387c3 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -265,7 +265,12 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
-  		if (vcpu->arch.reset_state.be)
-  			kvm_vcpu_set_be(vcpu);
-
-+		/*
-+		 * Don't bother with the KVM_ARM64_INCREMENT_PC flag while
-+		 * using this version of __adjust_pc().
-+		 */
-  		*vcpu_pc(vcpu) = target_pc;
-+		vcpu->arch.flags &= ~KVM_ARM64_INCREMENT_PC;
-  		vcpu_set_reg(vcpu, 0, vcpu->arch.reset_state.r0);
-
-  		vcpu->arch.reset_state.reset = false;
