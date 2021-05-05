@@ -2,153 +2,242 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D979037493E
-	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 22:20:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5412337498A
+	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 22:39:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234189AbhEEUV1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 May 2021 16:21:27 -0400
-Received: from mga01.intel.com ([192.55.52.88]:12098 "EHLO mga01.intel.com"
+        id S234968AbhEEUkD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 May 2021 16:40:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46990 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234027AbhEEUV0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 May 2021 16:21:26 -0400
-IronPort-SDR: P1fqeTO68nwXcURW9IQPYDq/yUS47WRUk1xuAEeh0YlEEv3/aTKW+jifbs5mY7PP8zy2hP6g2L
- 9UveFor+NAqw==
-X-IronPort-AV: E=McAfee;i="6200,9189,9975"; a="219166886"
-X-IronPort-AV: E=Sophos;i="5.82,276,1613462400"; 
-   d="scan'208";a="219166886"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2021 13:20:07 -0700
-IronPort-SDR: A0HIRXsRDQtl/UWQY7oVZ1I1C+3TmKW6L+/3dKIGEBk3/Y7RN84R5CvW7QRz08mC8Po2kUOT+x
- FbifZ7d2Smvg==
-X-IronPort-AV: E=Sophos;i="5.82,276,1613462400"; 
-   d="scan'208";a="464264304"
-Received: from asharm3-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.239.162])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2021 13:20:00 -0700
-Message-ID: <c7148ea6aa95ee2c53d0893b0ba966169f303789.camel@intel.com>
-Subject: Re: [PATCH 3/3] KVM: x86/mmu: Fix TDP MMU page table level
-From:   Kai Huang <kai.huang@intel.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Date:   Thu, 06 May 2021 08:19:56 +1200
-In-Reply-To: <CANgfPd-Dv-x9=t1DQrukCpRQJufEcN4ZUTw7mOe=p-zcS=hQDw@mail.gmail.com>
-References: <cover.1620200410.git.kai.huang@intel.com>
-         <817eae486273adad0a622671f628c5a99b72a375.1620200410.git.kai.huang@intel.com>
-         <CANgfPd_gWZB9NMjzsZ-v61e=p53WytCR1qm_28vRg6bdESD1fQ@mail.gmail.com>
-         <CANgfPd-Dv-x9=t1DQrukCpRQJufEcN4ZUTw7mOe=p-zcS=hQDw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.0 (3.40.0-1.fc34) 
+        id S234675AbhEEUkC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 May 2021 16:40:02 -0400
+Received: from gandalf.local.home (cpe-66-24-58-225.stny.res.rr.com [66.24.58.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 37678613E3;
+        Wed,  5 May 2021 20:39:04 +0000 (UTC)
+Date:   Wed, 5 May 2021 16:38:55 -0400
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     LKML <linux-kernel@vger.kernel.org>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Joel Fernandes <joelaf@google.com>,
+        Linux Trace Devel <linux-trace-devel@vger.kernel.org>
+Subject: [RFC][PATCH] vhost/vsock: Add vsock_list file to map cid with vhost
+ tasks
+Message-ID: <20210505163855.32dad8e7@gandalf.local.home>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2021-05-05 at 10:01 -0700, Ben Gardon wrote:
-> On Wed, May 5, 2021 at 9:28 AM Ben Gardon <bgardon@google.com> wrote:
-> > 
-> > On Wed, May 5, 2021 at 2:38 AM Kai Huang <kai.huang@intel.com> wrote:
-> > > 
-> > > TDP MMU iterator's level is identical to page table's actual level.  For
-> > > instance, for the last level page table (whose entry points to one 4K
-> > > page), iter->level is 1 (PG_LEVEL_4K), and in case of 5 level paging,
-> > > the iter->level is mmu->shadow_root_level, which is 5.  However, struct
-> > > kvm_mmu_page's level currently is not set correctly when it is allocated
-> > > in kvm_tdp_mmu_map().  When iterator hits non-present SPTE and needs to
-> > > allocate a new child page table, currently iter->level, which is the
-> > > level of the page table where the non-present SPTE belongs to, is used.
-> > > This results in struct kvm_mmu_page's level always having its parent's
-> > > level (excpet root table's level, which is initialized explicitly using
-> > > mmu->shadow_root_level).  This is kinda wrong, and not consistent with
-> > > existing non TDP MMU code.  Fortuantely the sp->role.level is only used
-> > > in handle_removed_tdp_mmu_page(), which apparently is already aware of
-> > > this, and handles correctly.  However to make it consistent with non TDP
-> > > MMU code (and fix the issue that both root page table and any child of
-> > > it having shadow_root_level), fix this by using iter->level - 1 in
-> > > kvm_tdp_mmu_map().  Also modify handle_removed_tdp_mmu_page() to handle
-> > > such change.
-> > 
-> > Ugh. Thank you for catching this. This is going to take me a bit to
-> > review as I should audit the code more broadly for this problem in the
-> > TDP MMU.
-> > It would probably also be a good idea to add a comment on the level
-> > field to say that it represents the level of the SPTEs in the
-> > associated page, not the level of the SPTE that links to the
-> > associated page.
-> > Hopefully that will prevent similar future misunderstandings.
-> 
-> I went through and manually audited the code. I think the only case
-> that needs to be added to this is for nx recovery:
-> 
-> --- a/arch/x86/kvm/mmu/tdp_mmu.h
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.h
-> @@ -31,7 +31,7 @@ static inline bool kvm_tdp_mmu_zap_gfn_range(struct
-> kvm *kvm, int as_id,
->  }
->  static inline bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
->  {
-> -       gfn_t end = sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level);
-> +       gfn_t end = sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level + 1);
-> 
->         /*
->          * Don't allow yielding, as the caller may have a flush pending.  Note,
-> 
-> Otherwise we won't zap the full page with this change, resulting in
-> ineffective or less reliable NX recovery.
+The new trace-cmd 3.0 (which is almost ready to be released) allows for
+tracing between host and guests with timestamp synchronization such that
+the events on the host and the guest can be interleaved in the proper order
+that they occur. KernelShark now has a plugin that visualizes this
+interaction.
 
-Oh correct. I missed this. I'll add this in next version. Thanks.
+The implementation requires that the guest has a vsock CID assigned, and on
+the guest a "trace-cmd agent" is running, that will listen on a port for
+the CID. The on the host a "trace-cmd record -A guest@cid:port -e events"
+can be called and the host will connect to the guest agent through the
+cid/port pair and have the agent enable tracing on behalf of the host and
+send the trace data back down to it.
 
-> 
-> > 
-> > > 
-> > > Signed-off-by: Kai Huang <kai.huang@intel.com>
-> > > ---
-> > >  arch/x86/kvm/mmu/tdp_mmu.c | 8 ++++----
-> > >  1 file changed, 4 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > > index debe8c3ec844..bcfb87e1c06e 100644
-> > > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > > @@ -335,7 +335,7 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
-> > > 
-> > >         for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
-> > >                 sptep = rcu_dereference(pt) + i;
-> > > -               gfn = base_gfn + (i * KVM_PAGES_PER_HPAGE(level - 1));
-> > > +               gfn = base_gfn + i * KVM_PAGES_PER_HPAGE(level);
-> > > 
-> > >                 if (shared) {
-> > >                         /*
-> > > @@ -377,12 +377,12 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
-> > >                         WRITE_ONCE(*sptep, REMOVED_SPTE);
-> > >                 }
-> > >                 handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), gfn,
-> > > -                                   old_child_spte, REMOVED_SPTE, level - 1,
-> > > +                                   old_child_spte, REMOVED_SPTE, level,
-> > >                                     shared);
-> > >         }
-> > > 
-> > >         kvm_flush_remote_tlbs_with_address(kvm, gfn,
-> > > -                                          KVM_PAGES_PER_HPAGE(level));
-> > > +                                          KVM_PAGES_PER_HPAGE(level + 1));
-> > > 
-> > >         call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
-> > >  }
-> > > @@ -1009,7 +1009,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
-> > >                 }
-> > > 
-> > >                 if (!is_shadow_present_pte(iter.old_spte)) {
-> > > -                       sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level);
-> > > +                       sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level - 1);
-> > >                         child_pt = sp->spt;
-> > > 
-> > >                         new_spte = make_nonleaf_spte(child_pt,
-> > > --
-> > > 2.31.1
-> > > 
+The problem is that there is no sure fire way to find the CID for a guest.
+Currently, the user must know the cid, or we have a hack that looks for the
+qemu process and parses the --guest-cid parameter from it. But this is
+prone to error and does not work on other implementation (was told that
+crosvm does not use qemu).
+
+As I can not find a way to discover CIDs assigned to guests via any kernel
+interface, I decided to create this one. Note, I'm not attached to it. If
+there's a better way to do this, I would love to have it. But since I'm not
+an expert in the networking layer nor virtio, I decided to stick to what I
+know and add a debugfs interface that simply lists all the registered CIDs
+and the worker task that they are associated with. The worker task at
+least has the PID of the task it represents.
+
+Now I can find the cid / host process in charge of the guest pair:
+
+  # cat /sys/kernel/debug/vsock_list
+  3	vhost-1954:2002
+
+  # ps aux | grep 1954
+  qemu        1954  9.9 21.3 1629092 796148 ?      Sl   16:22   0:58  /usr/bin/qemu-kvm -name guest=Fedora21,debug-threads=on -S -object secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-1-Fedora21/master-key.aes -machine pc-1.2,accel=kvm,usb=off,dump-guest-core=off -cpu qemu64 -m 1000 -overcommit mem-lock=off -smp 2,sockets=2,cores=1,threads=1 -uuid 1eefeeb0-3ac7-07c1-926e-236908313b4c -no-user-config -nodefaults -chardev socket,id=charmonitor,fd=32,server,nowait -mon chardev=charmonitor,id=monitor,mode=control -rtc base=utc -no-shutdown -boot strict=on -device piix3-usb-uhci,id=usb,bus=pci.0,addr=0x1.0x2 -device virtio-serial-pci,id=virtio-serial0,bus=pci.0,addr=0x6 -blockdev {"driver":"host_device","filename":"/dev/mapper/vg_bxtest-GuestFedora","node-name":"libvirt-1-storage","auto-read-only":true,"discard":"unmap"} -blockdev {"node-name":"libvirt-1-format","read-only":false,"driver":"raw","file":"libvirt-1-storage"} -device ide-hd,bus=ide.0,unit=0,drive=libvirt-1-
+ format,id=ide0-0-0,bootindex=1 -netdev tap,fd=34,id=hostnet0 -device rtl8139,netdev=hostnet0,id=net0,mac=52:54:00:9f:e9:d5,bus=pci.0,addr=0x3 -netdev tap,fd=35,id=hostnet1 -device virtio-net-pci,netdev=hostnet1,id=net1,mac=52:54:00:ec:dc:6e,bus=pci.0,addr=0x5 -chardev pty,id=charserial0 -device isa-serial,chardev=charserial0,id=serial0 -chardev pipe,id=charchannel0,path=/var/lib/trace-cmd/virt/Fedora21/trace-pipe-cpu0 -device virtserialport,bus=virtio-serial0.0,nr=1,chardev=charchannel0,id=channel0,name=trace-pipe-cpu0 -chardev pipe,id=charchannel1,path=/var/lib/trace-cmd/virt/Fedora21/trace-pipe-cpu1 -device virtserialport,bus=virtio-serial0.0,nr=2,chardev=charchannel1,id=channel1,name=trace-pipe-cpu1 -vnc 127.0.0.1:0 -device cirrus-vga,id=video0,bus=pci.0,addr=0x2 -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x4 -sandbox on,obsolete=deny,elevateprivileges=deny,spawn=deny,resourcecontrol=deny -device vhost-vsock-pci,id=vsock0,guest-cid=3,vhostfd=16,bus=pci.0,addr=0x7 -msg 
+ timestamp=on
+  root        2000  0.0  0.0      0     0 ?        S    16:22   0:00 [kvm-pit/1954]
+  root        2002  0.0  0.0      0     0 ?        S    16:22   0:00 [vhost-1954]
 
 
+This is just an example of what I'm looking for. Just a way to find what
+process is using what cid.
+
+Signed-off-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+---
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index 5e78fb719602..4f03b25b23c1 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -15,6 +15,7 @@
+ #include <linux/virtio_vsock.h>
+ #include <linux/vhost.h>
+ #include <linux/hashtable.h>
++#include <linux/debugfs.h>
+ 
+ #include <net/af_vsock.h>
+ #include "vhost.h"
+@@ -900,6 +901,128 @@ static struct miscdevice vhost_vsock_misc = {
+ 	.fops = &vhost_vsock_fops,
+ };
+ 
++static struct dentry *vsock_file;
++
++struct vsock_file_iter {
++	struct hlist_node	*node;
++	int			index;
++};
++
++
++static void *vsock_next(struct seq_file *m, void *v, loff_t *pos)
++{
++	struct vsock_file_iter *iter = v;
++	struct vhost_vsock *vsock;
++
++	if (pos)
++		(*pos)++;
++
++	if (iter->index >= (int)HASH_SIZE(vhost_vsock_hash))
++		return NULL;
++
++	if (iter->node)
++		iter->node = rcu_dereference_raw(hlist_next_rcu(iter->node));
++
++	for (;;) {
++		if (iter->node) {
++			vsock = hlist_entry_safe(rcu_dereference_raw(iter->node),
++						 struct vhost_vsock, hash);
++			if (vsock->guest_cid)
++				break;
++			iter->node = rcu_dereference_raw(hlist_next_rcu(iter->node));
++			continue;
++		}
++		iter->index++;
++		if (iter->index >= HASH_SIZE(vhost_vsock_hash))
++			return NULL;
++
++		iter->node = rcu_dereference_raw(hlist_first_rcu(&vhost_vsock_hash[iter->index]));
++	}
++	return iter;
++}
++
++static void *vsock_start(struct seq_file *m, loff_t *pos)
++{
++	struct vsock_file_iter *iter = m->private;
++	loff_t l = 0;
++	void *t;
++
++	rcu_read_lock();
++
++	iter->index = -1;
++	iter->node = NULL;
++	t = vsock_next(m, iter, NULL);
++
++	for (; iter->index < HASH_SIZE(vhost_vsock_hash) && l < *pos;
++	     t = vsock_next(m, iter, &l))
++		;
++
++	return t;
++}
++
++static void vsock_stop(struct seq_file *m, void *p)
++{
++	rcu_read_unlock();
++}
++
++static int vsock_show(struct seq_file *m, void *v)
++{
++	struct vsock_file_iter *iter = v;
++	struct vhost_vsock *vsock;
++	struct task_struct *worker;
++
++	if (!iter || iter->index >= HASH_SIZE(vhost_vsock_hash))
++		return 0;
++
++	vsock = hlist_entry_safe(rcu_dereference_raw(iter->node), struct vhost_vsock, hash);
++	worker = vsock->dev.worker;
++	seq_printf(m, "%d\t", vsock->guest_cid);
++
++	if (worker)
++		seq_printf(m, "%s:%d\n", worker->comm, worker->pid);
++	else
++		seq_puts(m, "(no task)\n");
++
++	return 0;
++}
++
++static const struct seq_operations vsock_file_seq_ops = {
++	.start		= vsock_start,
++	.next		= vsock_next,
++	.stop		= vsock_stop,
++	.show		= vsock_show,
++};
++
++static int vsock_file_open(struct inode *inode, struct file *file)
++{
++	struct vsock_file_iter *iter;
++	struct seq_file *m;
++	int ret;
++
++	iter = kzalloc(sizeof(*iter), GFP_KERNEL);
++	if (!iter)
++		return -ENOMEM;
++
++	ret = seq_open(file, &vsock_file_seq_ops);
++	if (ret) {
++		kfree(iter);
++		return ret;
++	}
++
++	m = file->private_data;
++	m->private = iter;
++
++	return 0;
++}
++
++static const struct file_operations vsock_file_fops = {
++	.owner		= THIS_MODULE,
++	.open		= vsock_file_open,
++	.release	= seq_release_private,
++	.read		= seq_read,
++	.llseek		= seq_lseek,
++};
++
+ static int __init vhost_vsock_init(void)
+ {
+ 	int ret;
+@@ -908,12 +1031,15 @@ static int __init vhost_vsock_init(void)
+ 				  VSOCK_TRANSPORT_F_H2G);
+ 	if (ret < 0)
+ 		return ret;
++	vsock_file = debugfs_create_file("vsock_list", 0400,
++					 NULL, NULL, &vsock_file_fops);
+ 	return misc_register(&vhost_vsock_misc);
+ };
+ 
+ static void __exit vhost_vsock_exit(void)
+ {
+ 	misc_deregister(&vhost_vsock_misc);
++	debugfs_remove(vsock_file);
+ 	vsock_core_unregister(&vhost_transport.transport);
+ };
+ 
