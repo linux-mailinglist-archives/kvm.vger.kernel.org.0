@@ -2,132 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 67529373FCF
-	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 18:29:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 982893746CD
+	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 19:53:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233998AbhEEQae (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 May 2021 12:30:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37080 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234030AbhEEQa3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 May 2021 12:30:29 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D484C061574
-        for <kvm@vger.kernel.org>; Wed,  5 May 2021 09:29:25 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id md17so1097206pjb.0
-        for <kvm@vger.kernel.org>; Wed, 05 May 2021 09:29:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=PtDxfO21/LGxTPF9vukAcaQEKePn1czqbdVKjYC9ITI=;
-        b=H1igZrphUfbsfmID/ur6C8M2xOh7l7Gt3G92KlnhVLfro5pIgDeJDgdWkeQmAPSpSg
-         UnwNLZdBD0LLhI+NbN/5ZKsjCq7Rju9cNmWtIxGnqLVWXZ7ZGhcRR1UCZFx19lc5cdFU
-         LHXmUFwDsl26NyYQq3zb7lz/LuKROWiQE10Bbyxt1aCBSRiuCcagrIZRUPabc5x5G6tF
-         Gt4QX0eaniZJKAgKPPiqdlMrkc16GRuZFTuPrXUX1C2aLUoUFMc8gbHTQdtuI4EJ7LLN
-         C0PeDVC10IJu17BfKn8AKY6uZFmnCHpItTRfjfCc7QDtJ7y6LwM6X1HMyE444BsNWzn7
-         SocQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=PtDxfO21/LGxTPF9vukAcaQEKePn1czqbdVKjYC9ITI=;
-        b=IOsvduloC41kSr0KmKp+IB2zz9VRIgJqiyjo/a76cv9Vb1uC0UCMDZL7u/7QT9/+JF
-         +QEre3lTfynjEFkJV3+f71T2hnBVhbgYORSXlmNZUYAOU0pVyHF2IMtqxY5ybpaHJ58r
-         cWD7bsc/61Q3ZUNrKzPiRt2gXs8OsRxRT8LtQQvJt/PUePN1ljP0Bsvv7pbfSvkkv9hR
-         t9lZ3XIjRgGcylXUAy/GH5VxfB1aXEqsMfa9ZkcRF73rSMdc2nuNZRnpDVzriNSb2us6
-         I7slvo2tPxRVztE/zRwBh4b0Whwzhr98nNQqP1w77Xm9UbUORyzC8rWctNvjK2am9M+D
-         dc2g==
-X-Gm-Message-State: AOAM531bbUSNG1AHZVmBgd2Me7WxafBN++hqPKNSSacCakc/wX5xR8EO
-        1sHFEn6YHcO+H4HnXQrw9xCBlvDenb93NA==
-X-Google-Smtp-Source: ABdhPJw4Nf1+IhU1datEMsFKpfCZ4mYj242oIgI/CWIZ3H8NUbIQkSDHOQGBHqSOclCruEkja7fKnw==
-X-Received: by 2002:a17:903:4091:b029:ec:fbd2:3192 with SMTP id z17-20020a1709034091b02900ecfbd23192mr31821336plc.21.1620232164837;
-        Wed, 05 May 2021 09:29:24 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id g6sm10486268pfr.213.2021.05.05.09.29.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 May 2021 09:29:24 -0700 (PDT)
-Date:   Wed, 5 May 2021 16:29:20 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, bgardon@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org
-Subject: Re: [PATCH 2/3] KVM: x86/mmu: Fix pf_fixed count in
- tdp_mmu_map_handle_target_level()
-Message-ID: <YJLH4Iyz4imfY0c2@google.com>
-References: <cover.1620200410.git.kai.huang@intel.com>
- <23b565dd3b3dfa20aea1c13bce01163f9427a237.1620200410.git.kai.huang@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <23b565dd3b3dfa20aea1c13bce01163f9427a237.1620200410.git.kai.huang@intel.com>
+        id S237641AbhEER2K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 May 2021 13:28:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60882 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238549AbhEERGI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 May 2021 13:06:08 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id E59C461402;
+        Wed,  5 May 2021 16:46:54 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1leKfk-00B35v-PD; Wed, 05 May 2021 17:46:52 +0100
+Date:   Wed, 05 May 2021 17:46:51 +0100
+Message-ID: <875yzxnn5w.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Zenghui Yu <yuzenghui@huawei.com>
+Cc:     <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <kernel-team@android.com>, Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH v2 03/11] KVM: arm64: Make kvm_skip_instr() and co private to HYP
+In-Reply-To: <cef3517b-e66d-4d26-68a9-2d5fb433377c@huawei.com>
+References: <20201102164045.264512-1-maz@kernel.org>
+        <20201102164045.264512-4-maz@kernel.org>
+        <cef3517b-e66d-4d26-68a9-2d5fb433377c@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com, will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, ascull@google.com, mark.rutland@arm.com, qperret@google.com, dbrazdil@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 05, 2021, Kai Huang wrote:
-> Currently pf_fixed is increased even when page fault requires emulation,
-> or fault is spurious.  Fix by only increasing it when return value is
-> RET_PF_FIXED.
+Hi Zenghui,
+
+On Wed, 05 May 2021 15:23:02 +0100,
+Zenghui Yu <yuzenghui@huawei.com> wrote:
 > 
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Hi Marc,
 > 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 1cad4c9f7c34..debe8c3ec844 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -942,7 +942,7 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu, int write,
->  				       rcu_dereference(iter->sptep));
->  	}
->  
-> -	if (!prefault)
-> +	if (!prefault && ret == RET_PF_FIXED)
->  		vcpu->stat.pf_fixed++;
-
-Both this patch and the existing code are wrong to check prefault, and they both
-deviate from the legacy MMU (both TDP and shadow) for RET_PF_EMULATE.
-
-For prefault==true, KVM should indeed bump pf_fixed since "prefault" really means
-"async page fault completed".  In that case, the original page fault from the
-guest was morphed into an async page fault and stat.pf_fixed was _not_ incremented
-because KVM hasn't actually fixed the fault.  The "prefault" flag is there
-purely so that KVM doesn't injected a #PF into the guest in the case where the
-guest unmapped the gpa while the async page fault was being handled.
-
-For RET_PF_EMULATE, I could go either way.  On one hand, KVM is installing a
-translation that accelerates future emulated MMIO, so it's kinda sorta fixing
-the page fault.  On the other handle, future emulated MMIO still page faults, it
-just gets handled without going through the full page fault handler.
-
-If we do decide to omit RET_PF_EMULATE, it should be a separate patch and should
-be done for all flavors of MMU.  For this patch, the correct code is:
-
-	if (ret != RET_PF_SPURIOUS)
-		vcpu->stat.pf_fixed++;
-
-which works because "ret" cannot be RET_PF_RETRY.
-
-Looking through the other code, KVM also fails to bump stat.pf_fixed in the fast
-page fault case.  So, if we decide to fix/adjust RET_PF_EMULATE, I think it would
-make sense to handle stat.pf_fixed in a common location.
-
-The legacy MMU also prefetches on RET_PF_EMULATE, which isn't technically wrong,
-but it's pretty much guaranteed to be a waste of time since prefetching only
-installs SPTEs if there is a backing memslot and PFN.
-
-Kai, if it's ok with you, I'll fold the above "ret != RET_PF_SPURIOUS" change
-into a separate mini-series to address the other issues I pointed out.  I was
-hoping I could paste patches for them inline and let you carry them, but moving
-stat.pf_fixed handling to a common location requires additional code shuffling
-because of async page faults :-/
-
-Thanks!
-
->  	return ret;
-> -- 
-> 2.31.1
+> On 2020/11/3 0:40, Marc Zyngier wrote:
+> > In an effort to remove the vcpu PC manipulations from EL1 on nVHE
+> > systems, move kvm_skip_instr() to be HYP-specific. EL1's intent
+> > to increment PC post emulation is now signalled via a flag in the
+> > vcpu structure.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > 
+> [...]
+> 
+> > @@ -133,6 +134,8 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+> >  	__load_guest_stage2(vcpu->arch.hw_mmu);
+> >  	__activate_traps(vcpu);
+> >  +	__adjust_pc(vcpu);
+> 
+> If the INCREMENT_PC flag was set (e.g., for WFx emulation) while we're
+> handling PSCI CPU_ON call targetting this VCPU, the *target_pc* (aka
+> entry point address, normally provided by the primary VCPU) will be
+> unexpectedly incremented here. That's pretty bad, I think.
+
+How can you online a CPU using PSCI if that CPU is currently spinning
+on a WFI? Or is that we have transitioned via userspace to perform the
+vcpu reset? I can imagine it happening in that case.
+
+> This was noticed with a latest guest kernel, at least with commit
+> dccc9da22ded ("arm64: Improve parking of stopped CPUs"), which put the
+> stopped VCPUs in the WFx loop. The guest kernel shouted at me that
+> 
+> 	"CPU: CPUs started in inconsistent modes"
+
+Ah, the perks of running guests with "quiet"... Well caught.
+
+> *after* rebooting. The problem is that the secondary entry point was
+> corrupted by KVM as explained above. All of the secondary processors
+> started from set_cpu_boot_mode_flag(), with w0=0. Oh well...
+> 
+> I write the below diff and guess it will help. But I have to look at all
+> other places where we adjust PC directly to make a right fix. Please let
+> me know what do you think.
+> 
+> 
+> Thanks,
+> Zenghui
+> 
+> ---->8----
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 956cdc240148..ed647eb387c3 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -265,7 +265,12 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  		if (vcpu->arch.reset_state.be)
+>  			kvm_vcpu_set_be(vcpu);
+> 
+> +		/*
+> +		 * Don't bother with the KVM_ARM64_INCREMENT_PC flag while
+> +		 * using this version of __adjust_pc().
+> +		 */
+>  		*vcpu_pc(vcpu) = target_pc;
+> +		vcpu->arch.flags &= ~KVM_ARM64_INCREMENT_PC;
+
+I think you need to make it a lot stronger: any PC-altering flag will
+do the wrong thing here. I'd go and clear all the exception bits:
+
+Thanks,
+
+	M.
+
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 956cdc240148..54913612d602 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -265,6 +265,12 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 		if (vcpu->arch.reset_state.be)
+ 			kvm_vcpu_set_be(vcpu);
+ 
++		/*
++		 * We're reseting the CPU, make sure there is no
++		 * pending exception or other PC-altering event.
++		 */
++		vcpu->arch.flags &= ~(KVM_ARM64_PENDING_EXCEPTION |
++				      KVM_ARM64_EXCEPT_MASK);
+ 		*vcpu_pc(vcpu) = target_pc;
+ 		vcpu_set_reg(vcpu, 0, vcpu->arch.reset_state.r0);
+ 
+
+-- 
+Without deviation from the norm, progress is not possible.
