@@ -2,272 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 441AA3748D6
-	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 21:46:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D97853748F1
+	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 21:55:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233192AbhEETrg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 May 2021 15:47:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52952 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232642AbhEETrf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 May 2021 15:47:35 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 885D9C061574
-        for <kvm@vger.kernel.org>; Wed,  5 May 2021 12:46:38 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id w3so4699445ejc.4
-        for <kvm@vger.kernel.org>; Wed, 05 May 2021 12:46:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9YKks1MIWR6n/3YFjtLH/pKCp7CerCnDCGt2HK7yw0w=;
-        b=kAeglYP6Ii6YuQfFNZgv3tvriwCuyxwYflp1i9Sc4vSOeqKyafSPlR/5+ze5NVA4vP
-         Zo/1F0tKsdqOuYoajAWkR28t+WeSNN/4qmnm1/nZM/jCjr6sP8ah6FCjw9jX+V6dcfIK
-         bc6bKY5VRk4Sa+ucKs2vUFLNZHPFMqjBO6KqncOWByNL71wBKOaaOLCzLFlwf5rvxnKa
-         Npl6JwbYu0aWBaAQ63mYXl5WcgHUWqxif3egbESFWdwwO2xUJA7mA3Ldr4HoeXW6F3ps
-         xXnPLEDADU2QTVLbgAyCAanDQslXPC9Zo+kH7t/4fVHr136dsIvc02t/kCTSq+WzXx97
-         itNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9YKks1MIWR6n/3YFjtLH/pKCp7CerCnDCGt2HK7yw0w=;
-        b=NvwE5fTwnrK+kAxPoTjf/n83mnJghwV9udYOvIoMAsWHtKImDj4/8eMw8nqNcW6MFn
-         eLZDF2IsqRAUvQ+NqafwkovmWOUFSArF/h4N/CB605phFA3O7NgaITlZ3gyu5ujriEUm
-         GYpVQ+jspCPi7IJ+16xVdP5/SMusHBnWGuiIbwrmQWwoHW4dXCkEfn71SITsIh2r3hmT
-         UH9gYlWg4GQ2hpC745OUddAyn3ir0n4M0m/izcne+DMGRLch9Adqc3p7TnZXkjrz13jp
-         pvS/FfsFEMeT+/T6dLACXVBk8yqmgBzWTx0AdK0x8pXI69GpeKrn9oKo5XEkd55KC1pY
-         cD6w==
-X-Gm-Message-State: AOAM532x5W2r0c0nyE3YERwPeSiI0MuFozJOJ1XsGYSSDik2+Fu586QH
-        exLCP0olaBiV8sS30Jdi4vsmrQ0mImu2+En/nAcx
-X-Google-Smtp-Source: ABdhPJw7nY50mjeODI10q+kOLlgygBWSsrS7HTcMd9YAV31Yq8kVm15ispKizTi3kwHqBgyTAdR3l2hDYjvcrg6n6Ow=
-X-Received: by 2002:a17:906:1fd1:: with SMTP id e17mr396765ejt.419.1620243996946;
- Wed, 05 May 2021 12:46:36 -0700 (PDT)
+        id S233603AbhEET4w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 May 2021 15:56:52 -0400
+Received: from mail-dm6nam12on2061.outbound.protection.outlook.com ([40.107.243.61]:64992
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230437AbhEET4v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 May 2021 15:56:51 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=K7pI1/MEo8nRYa/1AJ6LlB73p83elML1Xdb1E1KM/QNlN5KjwBS0nrFKRwGdwtq+/NFq/mQWbEi3oEyX1mUBP89kuponmWpYJofYV2mr+1AKbUNa4wXyL062mxyAPgufhwFjGISxeEuVWnN4Gutz+JOyKOiKcozhumVKMoh4EvAeIhkAIA99m5Gk4KHzQUFRGBV2kbHBemEMKt8xCYlYEA7Qg/HFI1LA+Wr75WBCHvpXVcI69j/nGFWVb6Osp+YsFp2YXfKXDTjeu4C49B4owFC98Op1lF5ymEEnddD9NQZ3FOQoxc8i5pGqkNP32r+oBuSqGZP8CJb//9zpejSWaw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jf7dMnLAhAvOoyvn3VAI5mAjKpw1QbLDxRURKvMsyJE=;
+ b=NTDdn4Drllcsk/klc2ETg/n8PRBYLaU57oXi46Rp1CFefaNCJ/kk/lR012VuO34T+KIkNQPMV2kkuKOY4jn8396/KLKJIfvhixQC8LW69QuYLoBZSPkzpPGVgcXasLWpUDfLRA1V7qhxSrSMoCCIwWtkdBAuEtSH1NvQbfPT18lvkZXxxri6ZXuIUuHjP7XNzFuGNzTHlNdfLXufvsB1DbKfDWwCQnjM4gPv05Z/UkqaTxLb9IChjj3HSQrH/ilBKSlTMuhAvrOUQj3x+P+eCJmEBH+7UZOT0CImWDzlcZ5hBNm0hZQqZ6LXhZAapgCBLSqssBy6B2v+w09BEndqtQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jf7dMnLAhAvOoyvn3VAI5mAjKpw1QbLDxRURKvMsyJE=;
+ b=LN2W5JU/BgPmGvadNtM1inEfI6hDOryeiJXmDSRV/4pQtMGgT0T+Wj4tZOEE3jw6iIMJdToI7qaiPoGoZZs69ai+WyA9Zxrd1PJrg9ZB9PQpsyd+TeOWEYg3fXmnw4rwdOJJnBg5IKchVcxTU7qXEE3oxAfseNWGgF1PA0IV8v0=
+Authentication-Results: alien8.de; dkim=none (message not signed)
+ header.d=none;alien8.de; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
+ DM5PR12MB1353.namprd12.prod.outlook.com (2603:10b6:3:76::16) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4087.40; Wed, 5 May 2021 19:55:52 +0000
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::b914:4704:ad6f:aba9]) by DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::b914:4704:ad6f:aba9%12]) with mapi id 15.20.4087.044; Wed, 5 May 2021
+ 19:55:52 +0000
+Subject: Re: SRCU dereference check warning with SEV-ES
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm list <kvm@vger.kernel.org>
+Cc:     Borislav Petkov <bp@alien8.de>
+References: <601f1278-17dd-7124-f328-b865447ca160@amd.com>
+ <c65e06ed-2bd8-cac9-a933-0117c99fc856@redhat.com>
+ <9bbc82fa-9560-185c-7780-052a3ee963b9@amd.com>
+ <a6bf7668-f217-4217-501a-f9a12a41beb3@redhat.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <1d0ddadc-6a98-2564-aa78-cf8fa2113a28@amd.com>
+Date:   Wed, 5 May 2021 14:55:50 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
+In-Reply-To: <a6bf7668-f217-4217-501a-f9a12a41beb3@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [165.204.77.1]
+X-ClientProxiedBy: SN4PR0501CA0047.namprd05.prod.outlook.com
+ (2603:10b6:803:41::24) To DM5PR12MB1355.namprd12.prod.outlook.com
+ (2603:10b6:3:6e::7)
 MIME-Version: 1.0
-References: <20210505131412.654238-1-pbonzini@redhat.com> <941e5f21-7d0b-2e67-21d1-3c425a43f489@redhat.com>
-In-Reply-To: <941e5f21-7d0b-2e67-21d1-3c425a43f489@redhat.com>
-From:   Bill Wendling <morbo@google.com>
-Date:   Wed, 5 May 2021 12:46:25 -0700
-Message-ID: <CAGG=3QX82NZqPcQEaf1zXOwqw60MTBNjD6WHVPMCLUfjKuDmdw@mail.gmail.com>
-Subject: Re: [PATCH kvm-unit-tests] libcflat: provide long division routines
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.30.118] (165.204.77.1) by SN4PR0501CA0047.namprd05.prod.outlook.com (2603:10b6:803:41::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4108.8 via Frontend Transport; Wed, 5 May 2021 19:55:52 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b7c04459-c468-4c17-3a7d-08d90fffc990
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1353:
+X-Microsoft-Antispam-PRVS: <DM5PR12MB135391907A811F55FDA5EB0BEC599@DM5PR12MB1353.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: b7ERQWKQfzWYl/IwsZw8urZTGHgZujmeXMT0NCA0kpDAEeJIY8SavCgwqBmYC2R2c2RAnKDovRMSjA16eVyi/PzzTRXTZq40gDAsIviH8WJocW35cRojp/BZ1IKpbEi4SH+IX6QQeMmYNBD0ccnFKn4vCgdlftkrhM49Olsz2oMopMXI3QviV0kkMgptVgZcs5JsbxFqAcgwVxcEaH6q70OwwqLoCnL6LAvJlGWyns8M+EV+CkzWNGCHFnxdKARqqBNgRKy2ISDq4e7e5nmnDYMUemkStekmMatb8Z+LEXjRIkU3crf+SgvQkAwLVW4xaLIePpSwHW+3tmkXfSMGo6aEKcsLgXM89oW+IeEVTZXMK4jUAUCZqRRjhWyFj8WsepnPCR4JRBGLnEmC0fJEKs6UPaYS060SfFIaWZ638gXPsfTQpb4oKmQFYXx8U8EsUch6m0+P+3bT5Futu5dx7Gsqux6SuGlA4Ppk3vvRp5SLMTlmErT617EFTFE01eHym4ffS+SKezf2KGK1sUVOijYG2A6zHbt11kBnIflJCq52Hb1bieMrURsshHv3zdAyJa98hbyiMAlMbanOd2Cl4Gx4XrVVTiK57FJ+IxhCf7cHfy/QjfAkpfv4KegBcM7YuS5krgUCGCWRPTH+f8juXeGsPqhlmPlQ1KmdGG/2oqg+FKBLZyISoOSNMITMbOnM
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(366004)(376002)(136003)(396003)(346002)(38100700002)(31686004)(2906002)(316002)(4326008)(86362001)(8676002)(53546011)(26005)(16576012)(956004)(31696002)(16526019)(66476007)(66946007)(478600001)(83380400001)(5660300002)(6486002)(66556008)(8936002)(2616005)(36756003)(110136005)(186003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?MjRjZDNXcG12RWlSanhMbEc2eTg2Nm50VGlTRWNwbmlPbXhPQlNTaVY1Y25p?=
+ =?utf-8?B?QTljUzg3SmJzSDBCUTRzSzVzNmh1bWJ0T3VaNWdzaVJNZ0dkb3NrOE5mNExV?=
+ =?utf-8?B?N2hGMlo2NnYvOEhKcnhMWTMrZlc4NDZrOWR1czM2RHJRZDM2U0NGRS9Ya2JK?=
+ =?utf-8?B?eHhpTWNXRjYrVzBwaHM4NTRjbzBGVk05dTJwMW82Nkl3YXdEYTJnRHFDdlk5?=
+ =?utf-8?B?MUJnOHZPcEVna0ZqTFNPZm1Nd2hnVGZRc3FnLy9FWVRxc0o3ZnpPdHlPbm1w?=
+ =?utf-8?B?R0dvYzFjQ3VKVDlaKzdOOUdaZ3lRZFI0dGhrQWcxV1FBYzJqL3o3Vi8xV2wv?=
+ =?utf-8?B?MzFQeENQbXIzVS9NMldVNE5jN3c4ZG55SFAzQm80UFUrWDduSTJoZGh2QzQy?=
+ =?utf-8?B?czVjSUw5akx0cmVkKzFyWUVnT0k4cUdWR0tJYVNNclpMZ0ZKV3BnUGRaZnRN?=
+ =?utf-8?B?N01kemZta3g2V0FydllPdUtVaVBzVjJxSVp6Q2VvbGUvQXkyNGhEbFgwNG8w?=
+ =?utf-8?B?WHBqdEdvYzFIU1hIZ3JSNkNVNXNZVDdJTDhGL3NPalJycXN3MzhKRHN1NGJH?=
+ =?utf-8?B?MzZiSmsya3BqTnNNWWZQbDU5N0xFWE1hUzJsMVE4VlJHQWJHb3RPYXBnYWVn?=
+ =?utf-8?B?S1BPMjNaWTZTQnViWTFqb0NDQldNdWdhMXd3a0dneGVyeXk0bXRpbjlnOFVB?=
+ =?utf-8?B?bUFkcGFaR0R3d0hLS3NLREVQUG5UdFRtQlh4TmdFTXdBWk8rRHhNeGN5LzQ5?=
+ =?utf-8?B?L2N3MVVFTU9wTGM1aTlTMm1MMWFCcEFvZ3RMYm5VMDNkSzNON0JBdEhVY3RB?=
+ =?utf-8?B?VlVxT3R3YkJmRnBkZXlCbDV1Z3lOVmE3dEpFNjh1SUFyOWh2VDdRYnB3TGY0?=
+ =?utf-8?B?OXVUdUs1UmhqTmpXY1RCNHF6d3lvN3FoaEN3cCtiV2Z2c0JjR0Vrelhlc0xa?=
+ =?utf-8?B?S1dRN2poeWt5eVBLN3MyN2QydXJIaE13SUNWRjNKMFJ1c0xKTXlrbFI2Z3lF?=
+ =?utf-8?B?NGR3LzdxRnMrRXFlVnQyOElscVYrY2thaWFZbE1PNlYxdVVKS0lGZUpGcE00?=
+ =?utf-8?B?TmFqK2NyZEZkcjY4TEFndHI3TExnTnc0am1MWXJsTmFBdFcvUGx1aW1zVE1k?=
+ =?utf-8?B?V2MwU1F0UzFrNnZBclpkeGdoKzFNRktBSlNiOVd4UXFrMy9zUTlGeWs0VjA4?=
+ =?utf-8?B?OW1iWVFQY1pmV2lLcjFpVGVEbFhBa29LbGVBQzFDUjdITmhUOWZtZFlGOFRh?=
+ =?utf-8?B?SVFQUzZldlgrT0ZCOGwrSjFkbHhzaDZsVm1rdlpVVjhWZkJUYy9vWEVXUlBG?=
+ =?utf-8?B?QkdYeWpKZjdYWTkvdld4Q241TnlWbHhWYTgzODFxTlRzcSswUjhMYXN4Y1JM?=
+ =?utf-8?B?ZFZtZ0NobXJUQVhhTXVUR0o0MnFLZnRlL2psNExCR0RQMktta203TGkxUE10?=
+ =?utf-8?B?enliQ2N5bXljWU5lbHhDZHBMNFlJYm5BUnB1SmdGa09lcDdyNVZXeStwUEY4?=
+ =?utf-8?B?cFVFNTVuZmdxc0E2QmJPeWRsa256Qks0NXhYZ3poK2V5N1p4eXVyTVI3elFy?=
+ =?utf-8?B?amlBSENFdVNnNVROK1dhUUkwcmlwWWc5RW9hSVg0blNxdEJmYThoUXJSb3dZ?=
+ =?utf-8?B?Sm5VNGd2K3Y3M21zRXJiQkVYb0ZrbFlWNGtKZHk3SUtacnk4emszcFFOcXpH?=
+ =?utf-8?B?bUZPM2tCUGpuNTBGNm1TbTN5MFpBbmIwUXBFd0J0Zm5mS0g0L1MxdFBRNURD?=
+ =?utf-8?Q?r2M17iTE+brohdidBsKYl83zhR4e2w5/w9Fbq0/?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b7c04459-c468-4c17-3a7d-08d90fffc990
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 May 2021 19:55:52.3585
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +BQUErbUfCQAagJPYEX15/JlGPOHkSyk1zCthKuaHKs6r6B3wCr3aOnQOvCHL1tWXQwhJoLtQU6/pd41UkhMSw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1353
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 5, 2021 at 6:16 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 05/05/21 15:14, Paolo Bonzini wrote:
-> > The -nostdlib flag disables the driver from adding libclang_rt.*.a
-> > during linking. Adding a specific library to the command line such as
-> > libgcc then causes the linker to report unresolved symbols, because the
-> > libraries that resolve those symbols aren't automatically added.
-> >
-> > libgcc however is only needed for long division (64-bit by 64-bit).
-> > Instead of linking the whole of it, implement the routines that are
-> > needed.
-> >
-> > Reported-by: Bill Wendling <morbo@google.com>
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->
-Thanks, Paolo!
+On 5/5/21 1:50 PM, Paolo Bonzini wrote:
+> On 05/05/21 20:39, Tom Lendacky wrote:
+>> On 5/5/21 11:16 AM, Paolo Bonzini wrote:
+>>> On 05/05/21 16:01, Tom Lendacky wrote:
+>>>> Boris noticed the below warning when running an SEV-ES guest with
+>>>> CONFIG_PROVE_LOCKING=y.
+>>>>
+>>>> The SRCU lock is released before invoking the vCPU run op where the
+>>>> SEV-ES
+>>>> support will unmap the GHCB. Is the proper thing to do here to take the
+>>>> SRCU lock around the call to kvm_vcpu_unmap() in this case? It does fix
+>>>> the issue, but I just want to be sure that I shouldn't, instead, be
+>>>> taking
+>>>> the memslot lock:
+>>>
+>>> I would rather avoid having long-lived maps, as I am working on removing
+>>> them from the Intel code.  However, it seems to me that the GHCB is almost
+>>> not used after sev_handle_vmgexit returns?
+>>
+>> Except for as you pointed out below, things like MMIO and IO. Anything
+>> that has to exit to userspace to complete will still need the GHCB mapped
+>> when coming back into the kernel if the shared buffer area of the GHCB is
+>> being used.
+>>
+>> Btw, what do you consider long lived maps?  Is having a map while context
+>> switching back to userspace considered long lived? The GHCB will
+>> (possibly) only be mapped on VMEXIT (VMGEXIT) and unmapped on the next
+>> VMRUN for the vCPU. An AP reset hold could be a while, though.
+> 
+> Anything that cannot be unmapped in the same function that maps it,
+> essentially.
+> 
+>>> 2) upon an AP reset hold exit, the above patch sets the EXITINFO2 field
+>>> before the SIPI was received.  My understanding is that the processor will
+>>> not see the value anyway until it resumes execution, and why would other
+>>> vCPUs muck with the AP's GHCB.  But I'm not sure if it's okay.
+>>
+>> As long as the vCPU might not be woken up for any reason other than a
+>> SIPI, you can get a way with this. But if it was to be woken up for some
+>> other reason (an IPI for some reason?), then you wouldn't want the
+>> non-zero value set in the GHCB in advance, because that might cause the
+>> vCPU to exit the HLT loop it is in waiting for the actual SIPI.
+> 
+> Ok.  Then the best thing to do is to pull sev_es_pre_run to the
+> prepare_guest_switch callback.
 
--bw
+A quick test of this failed (VMRUN failure), let me see what is going on
+and post back.
 
-> Oops, I didn't actually remove libgcc!
->
-> diff --git a/Makefile b/Makefile
-> index 24b7917..ddebcae 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -25,8 +25,6 @@ cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
->   #make sure env CFLAGS variable is not used
->   CFLAGS =
->
-> -libgcc := $(shell $(CC) --print-libgcc-file-name)
-> -
->   libcflat := lib/libcflat.a
->   cflatobjs := \
->         lib/argv.o \
-> diff --git a/arm/Makefile.common b/arm/Makefile.common
-> index 55478ec..38385e0 100644
-> --- a/arm/Makefile.common
-> +++ b/arm/Makefile.common
-> @@ -58,9 +58,7 @@ OBJDIRS += lib/arm
->   libeabi = lib/arm/libeabi.a
->   eabiobjs = lib/arm/eabi_compat.o
->
-> -libgcc := $(shell $(CC) $(machine) --print-libgcc-file-name)
-> -
-> -FLATLIBS = $(libcflat) $(LIBFDT_archive) $(libgcc) $(libeabi)
-> +FLATLIBS = $(libcflat) $(LIBFDT_archive) $(libeabi)
->   %.elf: LDFLAGS = -nostdlib $(arch_LDFLAGS)
->   %.elf: %.o $(FLATLIBS) $(SRCDIR)/arm/flat.lds $(cstart.o)
->         $(CC) $(CFLAGS) -c -o $(@:.elf=.aux.o) $(SRCDIR)/lib/auxinfo.c \
-> diff --git a/x86/Makefile.common b/x86/Makefile.common
-> index 55f7f28..52bb7aa 100644
-> --- a/x86/Makefile.common
-> +++ b/x86/Makefile.common
-> @@ -37,12 +37,10 @@ COMMON_CFLAGS += -O1
->   # stack.o relies on frame pointers.
->   KEEP_FRAME_POINTER := y
->
-> -libgcc := $(shell $(CC) -m$(bits) --print-libgcc-file-name)
-> -
->   # We want to keep intermediate file: %.elf and %.o
->   .PRECIOUS: %.elf %.o
->
-> -FLATLIBS = lib/libcflat.a $(libgcc)
-> +FLATLIBS = lib/libcflat.a
->   %.elf: %.o $(FLATLIBS) $(SRCDIR)/x86/flat.lds $(cstart.o)
->         $(CC) $(CFLAGS) -nostdlib -o $@ -Wl,-T,$(SRCDIR)/x86/flat.lds \
->                 $(filter %.o, $^) $(FLATLIBS)
->
->
-> > ---
-> >   arm/Makefile.arm  |   1 +
-> >   lib/ldiv32.c      | 105 ++++++++++++++++++++++++++++++++++++++++++++++
-> >   x86/Makefile.i386 |   2 +-
-> >   3 files changed, 107 insertions(+), 1 deletion(-)
-> >   create mode 100644 lib/ldiv32.c
-> >
-> > diff --git a/arm/Makefile.arm b/arm/Makefile.arm
-> > index d379a28..687a8ed 100644
-> > --- a/arm/Makefile.arm
-> > +++ b/arm/Makefile.arm
-> > @@ -23,6 +23,7 @@ cstart.o = $(TEST_DIR)/cstart.o
-> >   cflatobjs += lib/arm/spinlock.o
-> >   cflatobjs += lib/arm/processor.o
-> >   cflatobjs += lib/arm/stack.o
-> > +cflatobjs += lib/ldiv32.o
-> >
-> >   # arm specific tests
-> >   tests =
-> > diff --git a/lib/ldiv32.c b/lib/ldiv32.c
-> > new file mode 100644
-> > index 0000000..e9d434f
-> > --- /dev/null
-> > +++ b/lib/ldiv32.c
-> > @@ -0,0 +1,105 @@
-> > +#include <inttypes.h>
-> > +
-> > +extern uint64_t __udivmoddi4(uint64_t num, uint64_t den, uint64_t *p_rem);
-> > +extern int64_t __moddi3(int64_t num, int64_t den);
-> > +extern int64_t __divdi3(int64_t num, int64_t den);
-> > +extern uint64_t __udivdi3(uint64_t num, uint64_t den);
-> > +extern uint64_t __umoddi3(uint64_t num, uint64_t den);
-> > +
-> > +uint64_t __udivmoddi4(uint64_t num, uint64_t den, uint64_t *p_rem)
-> > +{
-> > +     uint64_t quot = 0;
-> > +
-> > +     /* Trigger a division by zero at run time (trick taken from iPXE).  */
-> > +     if (den == 0)
-> > +             return 1/((unsigned)den);
-> > +
-> > +     if (num >= den) {
-> > +             /* Align den to num to avoid wasting time on leftmost zero bits.  */
-> > +             int n = __builtin_clzll(den) - __builtin_clzll(num);
-> > +             den <<= n;
-> > +
-> > +             do {
-> > +                     quot <<= 1;
-> > +                     if (num >= den) {
-> > +                             num -= den;
-> > +                             quot |= 1;
-> > +                     }
-> > +                     den >>= 1;
-> > +             } while (n--);
-> > +     }
-> > +
-> > +     if (p_rem)
-> > +             *p_rem = num;
-> > +
-> > +     return quot;
-> > +}
-> > +
-> > +int64_t __moddi3(int64_t num, int64_t den)
-> > +{
-> > +     uint64_t mask = num < 0 ? -1 : 0;
-> > +
-> > +     /* Compute absolute values and do an unsigned division.  */
-> > +     num = (num + mask) ^ mask;
-> > +     if (den < 0)
-> > +             den = -den;
-> > +
-> > +     /* Copy sign of num into result.  */
-> > +     return (__umoddi3(num, den) + mask) ^ mask;
-> > +}
-> > +
-> > +int64_t __divdi3(int64_t num, int64_t den)
-> > +{
-> > +     uint64_t mask = (num ^ den) < 0 ? -1 : 0;
-> > +
-> > +     /* Compute absolute values and do an unsigned division.  */
-> > +     if (num < 0)
-> > +             num = -num;
-> > +     if (den < 0)
-> > +             den = -den;
-> > +
-> > +     /* Copy sign of num^den into result.  */
-> > +     return (__udivdi3(num, den) + mask) ^ mask;
-> > +}
-> > +
-> > +uint64_t __udivdi3(uint64_t num, uint64_t den)
-> > +{
-> > +     uint64_t rem;
-> > +     return __udivmoddi4(num, den, &rem);
-> > +}
-> > +
-> > +uint64_t __umoddi3(uint64_t num, uint64_t den)
-> > +{
-> > +     uint64_t rem;
-> > +     __udivmoddi4(num, den, &rem);
-> > +     return rem;
-> > +}
-> > +
-> > +#ifdef TEST
-> > +#include <assert.h>
-> > +#define UTEST(a, b, q, r) assert(__udivdi3(a, b) == q && __umoddi3(a, b) == r)
-> > +#define STEST(a, b, q, r) assert(__divdi3(a, b) == q && __moddi3(a, b) == r)
-> > +int main()
-> > +{
-> > +     UTEST(1, 1, 1, 0);
-> > +     UTEST(2, 2, 1, 0);
-> > +     UTEST(5, 3, 1, 2);
-> > +     UTEST(10, 3, 3, 1);
-> > +     UTEST(120, 3, 40, 0);
-> > +     UTEST(120, 1, 120, 0);
-> > +     UTEST(0x7FFFFFFFFFFFFFFFULL, 17, 0x787878787878787, 8);
-> > +     UTEST(0x7FFFFFFFFFFFFFFFULL, 0x787878787878787, 17, 8);
-> > +     UTEST(0x8000000000000001ULL, 17, 0x787878787878787, 10);
-> > +     UTEST(0x8000000000000001ULL, 0x787878787878787, 17, 10);
-> > +     UTEST(0, 5, 0, 0);
-> > +
-> > +     STEST(0x7FFFFFFFFFFFFFFFULL, 17, 0x787878787878787, 8);
-> > +     STEST(0x7FFFFFFFFFFFFFFFULL, -17, -0x787878787878787, 8);
-> > +     STEST(-0x7FFFFFFFFFFFFFFFULL, 17, -0x787878787878787, -8);
-> > +     STEST(-0x7FFFFFFFFFFFFFFFULL, -17, 0x787878787878787, -8);
-> > +     STEST(33, 5, 6, 3);
-> > +     STEST(33, -5, -6, 3);
-> > +     STEST(-33, 5, -6, -3);
-> > +     STEST(-33, -5, 6, -3);
-> > +}
-> > +#endif
-> > diff --git a/x86/Makefile.i386 b/x86/Makefile.i386
-> > index c04e5aa..960e274 100644
-> > --- a/x86/Makefile.i386
-> > +++ b/x86/Makefile.i386
-> > @@ -3,7 +3,7 @@ bits = 32
-> >   ldarch = elf32-i386
-> >   COMMON_CFLAGS += -mno-sse -mno-sse2
-> >
-> > -cflatobjs += lib/x86/setjmp32.o
-> > +cflatobjs += lib/x86/setjmp32.o lib/ldiv32.o
-> >
-> >   tests = $(TEST_DIR)/taskswitch.flat $(TEST_DIR)/taskswitch2.flat \
-> >       $(TEST_DIR)/cmpxchg8b.flat $(TEST_DIR)/la57.flat
-> >
->
+Thanks,
+Tom
+
+> 
+> Paolo
+> 
