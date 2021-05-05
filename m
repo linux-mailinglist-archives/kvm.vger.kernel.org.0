@@ -2,111 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 14C2A373EF4
-	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 17:50:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4392D373EFC
+	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 17:52:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233543AbhEEPvi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 May 2021 11:51:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47502 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229797AbhEEPvh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 May 2021 11:51:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620229840;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wITGEIqpZnfr6XwKeX5z8uHosmf/mobmC6J56/IU3Aw=;
-        b=C5H3votlCyRqu79Y2dtG0sWe7yl7ftswnhCefJYIFuH5AzbVnodoD79hRfCpuSUoBvFzwJ
-        L7ywzcWTPFMx4kt8u0yKLV/GlnHTqeDKoYz6RFq/4gyqOuyHgWoLg6MlqKBCneCQx9P7pZ
-        9kpoFdAuD7JbQc3vc/joJha2zdOV+Ow=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-09CgqwcuN1OtWgUxxG7DoA-1; Wed, 05 May 2021 11:50:38 -0400
-X-MC-Unique: 09CgqwcuN1OtWgUxxG7DoA-1
-Received: by mail-wr1-f69.google.com with SMTP id 88-20020adf95610000b029010758d8d7e2so849000wrs.19
-        for <kvm@vger.kernel.org>; Wed, 05 May 2021 08:50:38 -0700 (PDT)
+        id S233502AbhEEPxK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 May 2021 11:53:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56814 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233499AbhEEPxK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 May 2021 11:53:10 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B20ABC061574
+        for <kvm@vger.kernel.org>; Wed,  5 May 2021 08:52:13 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id b14-20020a17090a6e0eb0290155c7f6a356so1039759pjk.0
+        for <kvm@vger.kernel.org>; Wed, 05 May 2021 08:52:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=fWu6RproSO3vhb8FFKdjOsNB26PtX2CgGoLpKJMkcZw=;
+        b=dP4d1XGCVm58MZKh9tsvJLb4Si+Kcg4C0fRJSYNgI2AKkoDfsxnrTnesNUgLsPZAkn
+         1XASzlm4f+ZoY70g7IizU8IwaIVMNMYgmjgEmMDHOhR1JdUml+F78Ev5iOIfVp/rTycF
+         QTQX4a1jEg2olMfZ4M/CzhoW0fPaDCjhNbLLvfZg/gSQuHlnrxUNjUS+14Rtapq3Y7Y9
+         IvTY6B8QWNbqkTugNkDTxqiVmqIU70IIZAUzuCiAX+jp51pL8aGQ5SgulkKLB2ayCtwQ
+         kAILENZEsLLaAW80Cds2aMk4DHtH1VuLuvanm2/EfpAW8AN8uLvPAsWs2/xsCLIy0PgE
+         Lg/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=wITGEIqpZnfr6XwKeX5z8uHosmf/mobmC6J56/IU3Aw=;
-        b=jJJ/AwaAwiEaTvl7B4g95GmUQRSP7FZS+VBu+0rXqoOhc3ZnyTYxMs6IxeRWhqo3KK
-         y8p5YQEqQ2WoWZSca9uYwDhTdGXRJTLLTAnReAv7qOY8oxlxeeEHmrnfQfzNp6xzPRfn
-         hQ028jXQhuKHcWkdgo98B5ykfXZTrpcJjKQjaJukcWkqqeeQ2cGb3vrOW3ctKLXfdsbJ
-         d34jO7o/C+67PuAu6DQd2nURgcu2UUait4Ucnjomg/xbxighldJEEgs8QNd1+bvCEhDD
-         9m7AD6CWMwZhGU4wd3h/Nrp6PYNPOvRNScA0BKyP5QVCCGf05fERkSF5oz32hxnHYuJQ
-         a6Jw==
-X-Gm-Message-State: AOAM5331EkXvGuOeT+okEuW8NDGi0v+0FbSqycwtaFhm8nZCEiWqXSoa
-        SXaSroPg9yH9+f/Gu95keyctLWZcFd+TpFSjWSPCEqNOdXOAkMpCTXLpjX4pp7cdBlJMR4toX/i
-        clLfoAnbFVH9N
-X-Received: by 2002:a1c:1f95:: with SMTP id f143mr10882609wmf.77.1620229837079;
-        Wed, 05 May 2021 08:50:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw4jd7+IaqHS5ld5iDky4g39jgFwX3kqGr1QxZXDrhgU/SfwpeA2uONta8KDTD2AqxzIa+L5A==
-X-Received: by 2002:a1c:1f95:: with SMTP id f143mr10882590wmf.77.1620229836839;
-        Wed, 05 May 2021 08:50:36 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id w7sm12609912wru.51.2021.05.05.08.50.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 May 2021 08:50:36 -0700 (PDT)
-Subject: Re: [PATCH 11/15] KVM: VMX: Disable loading of TSX_CTRL MSR the more
- conventional way
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
-        Reiji Watanabe <reijiw@google.com>
-References: <20210504171734.1434054-1-seanjc@google.com>
- <20210504171734.1434054-12-seanjc@google.com>
- <08a4afca-c3cb-1999-02a6-a72440ab2214@redhat.com>
- <YJK7jzbihzFIkb59@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b33cf48c-03f2-b864-481f-1588dd7cc6aa@redhat.com>
-Date:   Wed, 5 May 2021 17:50:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=fWu6RproSO3vhb8FFKdjOsNB26PtX2CgGoLpKJMkcZw=;
+        b=jw6YTy8BFHwOw1Elvmn9nqMHLfuZVdrH2ZhAhzHTzrLFUy8IL+X/qVEZx5P+Q4VVFs
+         bYAxZG+TxSCMgibkOpag2gD1C/c1mRmHFPlgx5uluc5FmTxcrXPnf0qJZc4stOUXlEm/
+         giwV+WPJXnDuo+t3cpny2qlbrbReYHBXd8LNjIRRKdIFjYKrm7DlsuOBD4A/utJhZHP7
+         NRh4iqAkR7u2Sy2+NZ8Zi1qbisGKdE/Svj4FXSqENy5IwCCgZy/ZPTNvBKDeHdzUuQA9
+         9cLguKM+DKzutV/+nBvfQJr4oEMUyoJy1hvq0Nxybb3+6Yz3eCkaTjoMTHqMCg8PSlwH
+         du7Q==
+X-Gm-Message-State: AOAM531ZyxnSBb31xM2e2oaBmPgnGgm65nX8g08qPu1Cp2Kt0BcVMsrY
+        gaDDR1Z+HNqQ7Qe2lQzsaaLsDmrZCiLoPg==
+X-Google-Smtp-Source: ABdhPJwM38lKwE/g3ivwr6B32LLXTSqABMeye1jvL0UfKxvx1FlpoVNpsfmJhOTmB1Grke5kcamWNg==
+X-Received: by 2002:a17:90a:f2cf:: with SMTP id gt15mr12025100pjb.64.1620229932814;
+        Wed, 05 May 2021 08:52:12 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id r32sm6730235pgm.49.2021.05.05.08.52.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 May 2021 08:52:12 -0700 (PDT)
+Date:   Wed, 5 May 2021 15:52:08 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Nicholas Piggin <npiggin@gmail.com>
+Cc:     kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org,
+        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Bharata B Rao <bharata@linux.ibm.com>
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: Fix conversion to gfn-based MMU
+ notifier callbacks
+Message-ID: <YJK/KDCV5CvTNhoo@google.com>
+References: <20210505121509.1470207-1-npiggin@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <YJK7jzbihzFIkb59@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210505121509.1470207-1-npiggin@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/05/21 17:36, Sean Christopherson wrote:
-> On Wed, May 05, 2021, Paolo Bonzini wrote:
->> On 04/05/21 19:17, Sean Christopherson wrote:
->>> Tag TSX_CTRL as not needing to be loaded when RTM isn't supported in the
->>> host.  Crushing the write mask to '0' has the same effect, but requires
->>> more mental gymnastics to understand.
->>
->> This doesn't explain _why_ this is now possible.  What about:
->>
->> Now that user return MSRs is always present in the list, we don't have
+On Wed, May 05, 2021, Nicholas Piggin wrote:
+> Commit b1c5356e873c ("KVM: PPC: Convert to the gfn-based MMU notifier
+> callbacks") causes unmap_gfn_range and age_gfn callbacks to only work
+> on the first gfn in the range. It also makes the aging callbacks call
+> into both radix and hash aging functions for radix guests. Fix this.
+
+Ugh, the rest of kvm_handle_hva_range() was so similar to the x86 code that I
+glossed right over the for-loop.  My apologies :-/
+
+> Add warnings for the single-gfn calls that have been converted to range
+> callbacks, in case they ever receieve ranges greater than 1.
 > 
-> User return MSRs aren't always present in the list; this series doesn't change
-> that behavior at all.
-> 
->> the problem that the TSX_CTRL MSR needs a slot vmx->guest_uret_msrs even
->> if RTM is not supported in the host (and therefore there is nothing to
->> enable).  Thus we can simply tag TSX_CTRL as not needing to be loaded
->> instead of crushing the write mask to '0'.
-> 
-> Unless I'm missing something, it would have been possible to give TSX_CTRL a
-> slot but not load it even before this refactoring, we just missed that approach
-> when handling the TSX_CTRL without HLE/RTM case.  Several other MSRs rely on
-> this behavior, notably the SYSCALL MSRs, which are present in the list so that
-> the guest can read/write the MSRs, but are loaded into hardware iff the guest
-> has enabled SYSCALL.
+> Fixes: b1c5356e873c ("KVM: PPC: Convert to the gfn-based MMU notifier callbacks")
+> Reported-by: Bharata B Rao <bharata@linux.ibm.com>
+> Tested-by: Bharata B Rao <bharata@linux.ibm.com>
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+> The e500 change in that commit also looks suspicious, why is it okay
+> to remove kvm_flush_remote_tlbs() there? Also is the the change from
+> returning false to true intended?
 
-You're right, it used to be done with vmx->nr_active_uret_msr.
-
-Paolo
-
-> All that said, I certainly have no objection to writing a longer changelog.
-
+The common code interprets a return of "true" as "do kvm_flush_remote_tlbs()".
+There is technically a functional change, as the deferring the flush to common
+code will batch flushes if the invalidation spans multiple memslots.  But the
+mmu_lock is held the entire time, so batching is a good thing unless e500 has
+wildly different MMU semantics.
