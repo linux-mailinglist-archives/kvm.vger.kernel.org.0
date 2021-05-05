@@ -2,100 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 481003749F3
-	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 23:12:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E52A1374A23
+	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 23:28:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233831AbhEEVNh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 May 2021 17:13:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36271 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233738AbhEEVNf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 May 2021 17:13:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620249158;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gqZEVFVeZ1PP5CqVjY9bmTR5zVRvOWsxXWPKEVWrRSk=;
-        b=gY5Rx3Q7V55uJUS5JC2o2BYyF3eSr66pjB8CeBgzbPylsW4hGn1jpW3qbEzf7Mos+md85M
-        U/rouloOmcIK1oJ8UMvPdSzKc5dNk27afIczwlA6p5oExFVclpFw0W+qgIMacFfvRPrc60
-        mThiY77P2+9KyS+l762/oT5yQR7iem4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-453-9e9KUVFQMOqkQruZSyFzAw-1; Wed, 05 May 2021 17:12:36 -0400
-X-MC-Unique: 9e9KUVFQMOqkQruZSyFzAw-1
-Received: by mail-wm1-f70.google.com with SMTP id b16-20020a7bc2500000b029014587f5376dso1785829wmj.1
-        for <kvm@vger.kernel.org>; Wed, 05 May 2021 14:12:36 -0700 (PDT)
+        id S230224AbhEEV3i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 May 2021 17:29:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47394 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229893AbhEEV3g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 May 2021 17:29:36 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B3F1C061574
+        for <kvm@vger.kernel.org>; Wed,  5 May 2021 14:28:39 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id t22so2842119pgu.0
+        for <kvm@vger.kernel.org>; Wed, 05 May 2021 14:28:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ahSIRGK2fYWWMJVxtv1JPWgUm0OPTQW4ZW0oanx+tLQ=;
+        b=WNFQ/WRK83n/T1KRmVg59K5vVus49xIttRmJw/BRUayCqpdm5ldKmXXnsj3Mu9jRTn
+         bcJIxVVvYky2x8Pt4KYC1HRIXelcFq1ZgQ6bVx6ZslPmRURJr9wh/CUY8i92u11AI6E+
+         8tQQ/6A2jg1KJUZA6Sc5qVdOtntRUTGoPxYWZoe4h/MLt7UBnfpgosqLdGNTbrmSOwVJ
+         jSysacOM6MvjkBLj4AlDQvnFsExTB2R07kQmKbScySNwHNDtOHGtmv9O3n3vJil2qRls
+         1YJlNSul6k0WfkRA975vjiltIQ1MqTJFOt1MwgK/OlQQfFZRW6jNJuzWf2Ols+KeeIbp
+         g7eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=gqZEVFVeZ1PP5CqVjY9bmTR5zVRvOWsxXWPKEVWrRSk=;
-        b=uVFJbzL75ETUrW77YOvh7NBcYLq6/Xavqw0+HwTta6HtRY6FhmTHwZlwKP4VY7Z8U8
-         f9B5xCh12ijmQYmY74NO6aR3oPJdWoEB3r0WUFiJa648J+QqIzARZLol/jd9nMpD0Yba
-         /o9PiknME+65v3rtYWeplmP8YJzeQFPTKmzU4JriDlFn8YxS6vedYWjNA63obTt18rkU
-         LVpinsIKya/YrDXQIxOMiJothEXeo0on43Pi7yjWIM9n/2SgGA7ZeYPNN+hyTm686v4P
-         LJxauIImMM5ewYfGX0ukJbTv59hp8G3bvSU+33yN/7+JAuVQda3zit/rBkk3HNyb5KmQ
-         x8Mg==
-X-Gm-Message-State: AOAM532gIHN4SYHqkbd9t5o9Eq9H9j8o6etG/Tl+wesrO0QlTroJVHs1
-        lBhpC3zFGY3YuUyRuJ5T7qL1OuIRS/T2FJq9lWi2+9cS8F/RhbQ8xJwAenkkuM4HcxacTyKfJlZ
-        QfRd5RSbBeylG
-X-Received: by 2002:a5d:4351:: with SMTP id u17mr1030237wrr.47.1620249155513;
-        Wed, 05 May 2021 14:12:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxdfQQZsRtZ7nyL+DSHqlEkFdqu+Hv47j75LD54ri+lhlT8Xt5UqHtwkM5tFFazugNDQCPNDw==
-X-Received: by 2002:a5d:4351:: with SMTP id u17mr1030222wrr.47.1620249155407;
-        Wed, 05 May 2021 14:12:35 -0700 (PDT)
-Received: from x1w.redhat.com (astrasbourg-653-1-188-220.w90-13.abo.wanadoo.fr. [90.13.127.220])
-        by smtp.gmail.com with ESMTPSA id g129sm8432025wmg.27.2021.05.05.14.12.34
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ahSIRGK2fYWWMJVxtv1JPWgUm0OPTQW4ZW0oanx+tLQ=;
+        b=XFhaP4oDKwXWyBiZrcF3ojsw7D9un7LddE4dYxw035P2EMkZSrA3JDLOM1YbLvRkCn
+         YEGOQCIWsIWNZUuoaoHvgdA62I5T96D09YN6uzc87orwz6VhE5/TQ1m8xIe+AbFalIec
+         YGHqu3jN6Nn9sRQGCusY6PW/WNk8s/Ts+ptyxe3hQp/lSkXHUmgLoU2Jr+fSxhOlsz3U
+         N3RbHxkTaaBTX3WOsEQIn2qWgo3755vlNfpe0uaO2I5vip9GJR1XuqXbeLSq0NbGCZjX
+         g5d1JUMyZZRTzY/4PKKfrSmodeIDAxh4jDEuev5fh5JMQ1XrSFvOFlclIOGB0iSX0Qfv
+         RZYw==
+X-Gm-Message-State: AOAM530z6K4Xo9gPnlRxYBHGUvSnki5uCLRBW1qBRSgX3iGdbKUCh/LZ
+        TW/7v2g0fMGNc4gizhi1k71SYw==
+X-Google-Smtp-Source: ABdhPJz3AKd0wVU4oiG2Drgtg1foqJ6TnB/es1muP8FGj5g8t3BWiZ3+Fjm90YwR/yJS5o9BrcjbBw==
+X-Received: by 2002:a65:63c5:: with SMTP id n5mr853733pgv.271.1620250118488;
+        Wed, 05 May 2021 14:28:38 -0700 (PDT)
+Received: from google.com ([2620:15c:f:10:820b:3fc:8d69:7035])
+        by smtp.gmail.com with ESMTPSA id i62sm150306pfc.162.2021.05.05.14.28.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 May 2021 14:12:35 -0700 (PDT)
-From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     qemu-block@nongnu.org,
-        =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-        qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
-        =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Greg Kurz <groug@kaod.org>,
-        kvm@vger.kernel.org (open list:Overall KVM CPUs)
-Subject: [PATCH 21/23] target/ppc/kvm: Avoid dynamic stack allocation
-Date:   Wed,  5 May 2021 23:10:45 +0200
-Message-Id: <20210505211047.1496765-22-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.3
-In-Reply-To: <20210505211047.1496765-1-philmd@redhat.com>
-References: <20210505211047.1496765-1-philmd@redhat.com>
+        Wed, 05 May 2021 14:28:37 -0700 (PDT)
+Date:   Wed, 5 May 2021 14:28:31 -0700
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [PATCH] KVM: VMX: Fix a typo in comment around
+ handle_vmx_instruction()
+Message-ID: <YJMN/4LE5u7NNW9e@google.com>
+References: <20210429042237.51280-1-kai.huang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210429042237.51280-1-kai.huang@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use autofree heap allocation instead of variable-length
-array on the stack.
+On Thu, Apr 29, 2021, Kai Huang wrote:
+> It is nested_vmx_hardware_setup() which overwrites VMX instruction VM
+> exits handlers, but not nested_vmx_setup().  Fix the typo in comment.
+> 
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 10b610fc7bbc..f8661bc113ed 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5618,7 +5618,7 @@ static int handle_preemption_timer(struct kvm_vcpu *vcpu)
+>  
+>  /*
+>   * When nested=0, all VMX instruction VM Exits filter here.  The handlers
+> - * are overwritten by nested_vmx_setup() when nested=1.
+> + * are overwritten by nested_vmx_hardware_setup() when nested=1.
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- target/ppc/kvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Alternatively, to reduce the odds of the comment becoming stale again:
 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index ae62daddf7d..90d0230eb86 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2660,7 +2660,7 @@ int kvmppc_get_htab_fd(bool write, uint64_t index, Error **errp)
- int kvmppc_save_htab(QEMUFile *f, int fd, size_t bufsize, int64_t max_ns)
- {
-     int64_t starttime = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
--    uint8_t buf[bufsize];
-+    g_autofree uint8_t *buf = g_malloc(bufsize);
-     ssize_t rc;
- 
-     do {
--- 
-2.26.3
+    are overwritten during hardware setup when nested=1.
 
+>   */
+>  static int handle_vmx_instruction(struct kvm_vcpu *vcpu)
+>  {
+> -- 
+> 2.30.2
+> 
