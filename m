@@ -2,97 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 79157373EAC
-	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 17:36:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 216D8373EC6
+	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 17:44:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233621AbhEEPht (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 May 2021 11:37:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53332 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233605AbhEEPhs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 May 2021 11:37:48 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24CC3C06174A
-        for <kvm@vger.kernel.org>; Wed,  5 May 2021 08:36:52 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id y2so1300869plr.5
-        for <kvm@vger.kernel.org>; Wed, 05 May 2021 08:36:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Uh5fnNg4PWYr5e3cV22y9vYtxdN1GmrpBB3SRm60g3I=;
-        b=BAW6nWwMYE/qNeiD8Uv6sfc0s0VCmV87nng79Gp4ifLQZWxTEt+Y3n9e8mSwU41CON
-         Kw/etwdSsl/FVeP+dqEkjelHig7+u5EXG+yBC1KAZ5wK13qIEmEV87+/Byfy8tFjitse
-         +acufFHjk56KyNImGAzIj3gUWxS742gVQdMmIXnPT66Bq4k3fMvqqsxEA35GLH6xgGPT
-         STUQiwE+dTla5M2kSkcGz0wy6RDlRGrS0q4atlyuSi6gFaOKXR1LriMnKepaK5eE572G
-         Q9br1bd/QUse+1zRyqZIT3GlZ1jROgvt1I2z4Zb3RAoYjtaJWdWfOuXpoFufy7QvjIsl
-         w/iA==
+        id S233536AbhEEPpL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 May 2021 11:45:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25416 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233466AbhEEPpK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 May 2021 11:45:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620229453;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kB18wOq0wwABF209vAjteUSBdk4dEBLdqvgC2SNz17Y=;
+        b=V1/RVaZVC7yVZ+8QXueKZMvUwp/94dKmWqEUjDXMTcy1ebiECI6giTHcZehxUNuOlerzTe
+        Z3MwTMPNJIl+RpLQoFEbDpg+lOFE7Tc68v+P1DrBRylJszSeTr4w2HfaoaNva0FdG8+m+Z
+        bGEEsdGLP1QxnzdNeoPB/l2KJJ3Q4A0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-170-hWPe5lHXNsKTVieuR7uhFQ-1; Wed, 05 May 2021 11:44:10 -0400
+X-MC-Unique: hWPe5lHXNsKTVieuR7uhFQ-1
+Received: by mail-wm1-f71.google.com with SMTP id r10-20020a05600c2c4ab029014b601975e1so1567725wmg.0
+        for <kvm@vger.kernel.org>; Wed, 05 May 2021 08:44:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Uh5fnNg4PWYr5e3cV22y9vYtxdN1GmrpBB3SRm60g3I=;
-        b=mS5Bk2eivq9MYjBoDz+HSt4c4LsbNsekKTJkTyXmeyFfLZ3d2IKF+yoYmZJkhQznOe
-         SElSeTf05BvW090nYPxsLt3OjasD3J+0w/lo1ppUhN1dhfbSxbwObpn1p0eWiUky0iCx
-         ORH31LFTmpmJpNJYJmsR7wLOvS+cnkT0X1RGnjd5wSHfvx+Rg52lukCfFlSfnhmSIbsE
-         UEfoa5XVucw4vwpsJ67I10L1iF1G8jJI7WY6wa9laOMwiM2kHJIFyBQe9KQIp84rMFer
-         dbugLGnBXryQ4ZzhvT8Sr0iZCM9vVXXWe1Wac/U6WRLtcy2xDRhj0XFuX3i+u+WnfTlz
-         wgqQ==
-X-Gm-Message-State: AOAM533cSbDGT7C/kN1Web8shitGo2zXCIuycR086oe9koF6SVck2Nnn
-        VSF4dfgS+bYE6uyZTBMl8TGAEQ==
-X-Google-Smtp-Source: ABdhPJwJshXIaDcc8ih2fcYI40swoQEQ4+4URUBGAeGDf8TBQWEjne7XmzoRhTQubVJItcu/gBjy1Q==
-X-Received: by 2002:a17:90a:f491:: with SMTP id bx17mr12330618pjb.176.1620229011512;
-        Wed, 05 May 2021 08:36:51 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id c13sm1829446pjc.43.2021.05.05.08.36.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 May 2021 08:36:50 -0700 (PDT)
-Date:   Wed, 5 May 2021 15:36:47 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=kB18wOq0wwABF209vAjteUSBdk4dEBLdqvgC2SNz17Y=;
+        b=RR/ZG7vtYpGhSj71H+Z4Xjr6QSQxMlvXPn1prQzYTK7ZqtnD9cKR5UW6liN+fMXl5n
+         6w+U2x6yOA2GkEI0MbgeFkRsHHPi7iyk3LiW+rbdYqVPctzeCqXCpo8zpAub2GY7hznY
+         EbwGq0JxrhB99pO9Bta2dw/kRBlnxpnxz6ommxykjCplgVAtUVMJHioujvOWL6Lv3EsD
+         9siJaw6W/OzGsCNSoHXF3HgMuBDHLFcvcFFnkbnwyu5kN01+CLB3bsYDPJMr6hcyRqZd
+         ZFdP2DkLYsWuM9w4i3P7rBEaY8EJNY1kzkYGyHtL5POrTSYrJ4eZ2MY4Pw2od02cFr1c
+         HtzA==
+X-Gm-Message-State: AOAM531b+a+YDr3eI+Cwvi3cChz4bUBurqUBLtqlhbiIrVydfrQ76EAh
+        6FgQjWo6mRLFPut3/v+8MxCmi7PwauzWNnDYtDXEFGW7yi9c2eKbPcZXQ2RPGXy/6/KUfzhfK8H
+        SEJqRHV/AfRiV
+X-Received: by 2002:a7b:c217:: with SMTP id x23mr10447910wmi.26.1620229449401;
+        Wed, 05 May 2021 08:44:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwKkqKQ1KzwKdPY3wUmcuteH0Wwcuufh6A7pvdXG1H6KtXZqt1tXR+oSHmXTNUpeIXf5TOB8g==
+X-Received: by 2002:a7b:c217:: with SMTP id x23mr10447895wmi.26.1620229449206;
+        Wed, 05 May 2021 08:44:09 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id 61sm21723917wrm.52.2021.05.05.08.44.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 May 2021 08:44:08 -0700 (PDT)
+Subject: Re: [PATCH 0/3] KVM: selftests: evmcs_test: Check issues induced by
+ late eVMCS mapping upon restore
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
-        Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH 11/15] KVM: VMX: Disable loading of TSX_CTRL MSR the more
- conventional way
-Message-ID: <YJK7jzbihzFIkb59@google.com>
-References: <20210504171734.1434054-1-seanjc@google.com>
- <20210504171734.1434054-12-seanjc@google.com>
- <08a4afca-c3cb-1999-02a6-a72440ab2214@redhat.com>
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-kernel@vger.kernel.org
+References: <20210505151823.1341678-1-vkuznets@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f394cc20-8123-2b79-c95e-0aad784a3344@redhat.com>
+Date:   Wed, 5 May 2021 17:44:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <08a4afca-c3cb-1999-02a6-a72440ab2214@redhat.com>
+In-Reply-To: <20210505151823.1341678-1-vkuznets@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 05, 2021, Paolo Bonzini wrote:
-> On 04/05/21 19:17, Sean Christopherson wrote:
-> > Tag TSX_CTRL as not needing to be loaded when RTM isn't supported in the
-> > host.  Crushing the write mask to '0' has the same effect, but requires
-> > more mental gymnastics to understand.
+On 05/05/21 17:18, Vitaly Kuznetsov wrote:
+> A regression was introduced by commit f2c7ef3ba955
+> ("KVM: nSVM: cancel KVM_REQ_GET_NESTED_STATE_PAGES on nested vmexit"). When
+> L2->L1 exit is forced immediately after restoring nested state,
+> KVM_REQ_GET_NESTED_STATE_PAGES request is cleared and VMCS12 changes (e.g.
+> fresh RIP) are not reflected to eVMCS. The consequent nested vCPU run gets
+> broken. Add a test for the condition (PATCH2). PATCH1 is a preparatory
+> change, PATCH3 adds a test for a situation when KVM_GET_NESTED_STATE is
+> requested right after KVM_SET_NESTED_STATE, this is still broken in KVM
+> (so the patch is not to be committed).
 > 
-> This doesn't explain _why_ this is now possible.  What about:
+> Vitaly Kuznetsov (3):
+>    KVM: selftests: evmcs_test: Check that VMLAUNCH with bogus EVMPTR is
+>      causing #UD
+>    KVM: selftests: evmcs_test: Check that VMCS12 is alway properly synced
+>      to eVMCS after restore
+>    KVM: selftests: evmcs_test: Test that KVM_STATE_NESTED_EVMCS is never
+>      lost
 > 
-> Now that user return MSRs is always present in the list, we don't have
+>   .../testing/selftests/kvm/x86_64/evmcs_test.c | 150 +++++++++++++-----
+>   1 file changed, 108 insertions(+), 42 deletions(-)
+> 
 
-User return MSRs aren't always present in the list; this series doesn't change
-that behavior at all.
+Queued 1-2, thanks.
 
-> the problem that the TSX_CTRL MSR needs a slot vmx->guest_uret_msrs even
-> if RTM is not supported in the host (and therefore there is nothing to
-> enable).  Thus we can simply tag TSX_CTRL as not needing to be loaded
-> instead of crushing the write mask to '0'.
+Paolo
 
-Unless I'm missing something, it would have been possible to give TSX_CTRL a
-slot but not load it even before this refactoring, we just missed that approach
-when handling the TSX_CTRL without HLE/RTM case.  Several other MSRs rely on
-this behavior, notably the SYSCALL MSRs, which are present in the list so that
-the guest can read/write the MSRs, but are loaded into hardware iff the guest
-has enabled SYSCALL.
-
-All that said, I certainly have no objection to writing a longer changelog.
