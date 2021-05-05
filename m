@@ -2,108 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4158C3735F5
-	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 10:02:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B271837362E
+	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 10:22:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231936AbhEEIC4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 May 2021 04:02:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50850 "EHLO
+        id S231633AbhEEIXN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 May 2021 04:23:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45944 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231844AbhEEICz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 May 2021 04:02:55 -0400
+        by vger.kernel.org with ESMTP id S231430AbhEEIXM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 May 2021 04:23:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620201719;
+        s=mimecast20190719; t=1620202936;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=o5qx/tux63yhpA+wbBJMEnO707eoeKsE9vMXUK3A6WA=;
-        b=TOGOFCVNiCoBEpkUbxX0HrvCsR4bBlEV/swFG429TqgghKFyjSbdsfWKUcE8di3fmEflpp
-        iCW7X1slxWQ7VncHhMwawGSQ+F6UoEe5j8ZkZiVsPBqXqLjaPjtnQh5JyhazuvTULxXDyK
-        mXoDR4Fp5w4fMuxgZDsQBUoZqX/GEek=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-250-b35BSaGNOra7vZZKZbk3WQ-1; Wed, 05 May 2021 04:01:57 -0400
-X-MC-Unique: b35BSaGNOra7vZZKZbk3WQ-1
-Received: by mail-ej1-f70.google.com with SMTP id w23-20020a1709061857b029039ea04b02fdso158115eje.22
-        for <kvm@vger.kernel.org>; Wed, 05 May 2021 01:01:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=o5qx/tux63yhpA+wbBJMEnO707eoeKsE9vMXUK3A6WA=;
-        b=DxnFH4FMbV6Cp+oZK2spzH7MiM18MQqw8l9+KwurZUlCSHoJXsbTss+KOZnSQmHq5I
-         dONXTc43cbalkiAU1p8Cjq4BGRbPTle+XQIEMU9R2LY6aNRm/OqsKczvxhP+RJe4swYI
-         FzecPCRiUT73KYCKp350lhGB/hnq844AXH+J/0+VfWHIypelNw51C++Ol12stYevXQz1
-         iw0uoNeSwXEbs+wmPY/MnXtc3mZHQln5ySqFOqRcYSAHHYEjQLBO3o1dD68bygC08rtp
-         DulgitcdrawhJwOUVQjomtsy5NfhKxxKDzXjUlKPTDcXYrd4CSfuXvOelgfRi8iqkT9n
-         Vmjw==
-X-Gm-Message-State: AOAM532bJRVjXEQMGfszgR/gJ9cupwhkOIaZi+emmH1rqC1i4Nkyr7T1
-        jyIjtUrZl2ngrNk5rjvKmjrZtGc/8yc4XJBI9HSsvcBA9bBWHcuvkLPrg3TbOuG/67QNq9AyV5p
-        dj4LIVXEC1hIt
-X-Received: by 2002:a17:906:2511:: with SMTP id i17mr24291675ejb.198.1620201716645;
-        Wed, 05 May 2021 01:01:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyrVxfYIB3jt2bZhK7Mv1cXV5hHwNeR5Y3b/l7UvZaWKRYVvayeN0ZRhl4nPFFZLSpfIxrCcQ==
-X-Received: by 2002:a17:906:2511:: with SMTP id i17mr24291658ejb.198.1620201716443;
-        Wed, 05 May 2021 01:01:56 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id p4sm2499967ejr.81.2021.05.05.01.01.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 May 2021 01:01:55 -0700 (PDT)
-Subject: Re: [PATCH 02/15] KVM: x86: Emulate RDPID only if RDTSCP is supported
-To:     Reiji Watanabe <reijiw@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        bh=Y78uch+8ZEwmUjJmNf1iR6U8L/anRfE9pjBoQCdxF90=;
+        b=TbKqYxit9jt1FrO+6Ry0iAYsavlOoW3kb5jSgiZhi7Eo45KR/idTtbYutoDz99wvuMHeS7
+        5jFtE1eeyY109rEZdU4u1cgC7TUPjjRvENUIjXoRX0Z7AsB0TBBUnEGdcaEDHn93NgRFGl
+        sGDr+617gCURbWNaenTXwncsvYXvvMI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-557-_D13jY8bMYaqUYY1JJ6gsw-1; Wed, 05 May 2021 04:22:13 -0400
+X-MC-Unique: _D13jY8bMYaqUYY1JJ6gsw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9BDF5802804;
+        Wed,  5 May 2021 08:22:12 +0000 (UTC)
+Received: from starship (unknown [10.40.192.34])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 766A85C5DF;
+        Wed,  5 May 2021 08:22:10 +0000 (UTC)
+Message-ID: <d56429a80d9c6118370c722d5b3a90b5669e2411.camel@redhat.com>
+Subject: Re: [PATCH 1/4] KVM: nVMX: Always make an attempt to map eVMCS
+ after migration
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
-References: <20210504171734.1434054-1-seanjc@google.com>
- <20210504171734.1434054-3-seanjc@google.com>
- <CAAeT=FycnR2BonmiHSWobsLCGTuQuTS3kg9x_eYCKLRQGOvYzQ@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <92131802-68b7-3d27-3e61-9b388bfcbc7f@redhat.com>
-Date:   Wed, 5 May 2021 10:01:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+Date:   Wed, 05 May 2021 11:22:09 +0300
+In-Reply-To: <20210503150854.1144255-2-vkuznets@redhat.com>
+References: <20210503150854.1144255-1-vkuznets@redhat.com>
+         <20210503150854.1144255-2-vkuznets@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <CAAeT=FycnR2BonmiHSWobsLCGTuQuTS3kg9x_eYCKLRQGOvYzQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/05/21 05:51, Reiji Watanabe wrote:
->> --- a/arch/x86/kvm/cpuid.c
->> +++ b/arch/x86/kvm/cpuid.c
->> @@ -637,7 +637,8 @@ static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
->>          case 7:
->>                  entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
->>                  entry->eax = 0;
->> -               entry->ecx = F(RDPID);
->> +               if (kvm_cpu_cap_has(X86_FEATURE_RDTSCP))
->> +                       entry->ecx = F(RDPID);
->>                  ++array->nent;
->>          default:
->>                  break;
-> I'm wondering if entry->ecx should be set to F(RDPID) here
-> even if the CPU supports RDPID natively.
-> (i.e. kvm_cpu_cap_has(X86_FEATURE_RDPID) is true)
+On Mon, 2021-05-03 at 17:08 +0200, Vitaly Kuznetsov wrote:
+> When enlightened VMCS is in use and nested state is migrated with
+> vmx_get_nested_state()/vmx_set_nested_state() KVM can't map evmcs
+> page right away: evmcs gpa is not 'struct kvm_vmx_nested_state_hdr'
+> and we can't read it from VP assist page because userspace may decide
+> to restore HV_X64_MSR_VP_ASSIST_PAGE after restoring nested state
+> (and QEMU, for example, does exactly that). To make sure eVMCS is
+> mapped /vmx_set_nested_state() raises KVM_REQ_GET_NESTED_STATE_PAGES
+> request.
 > 
-> The document "Documentation/virt/kvm/api.rst" says:
+> Commit f2c7ef3ba955 ("KVM: nSVM: cancel KVM_REQ_GET_NESTED_STATE_PAGES
+> on nested vmexit") added KVM_REQ_GET_NESTED_STATE_PAGES clearing to
+> nested_vmx_vmexit() to make sure MSR permission bitmap is not switched
+> when an immediate exit from L2 to L1 happens right after migration (caused
+> by a pending event, for example). Unfortunately, in the exact same
+> situation we still need to have eVMCS mapped so
+> nested_sync_vmcs12_to_shadow() reflects changes in VMCS12 to eVMCS.
+> 
+> As a band-aid, restore nested_get_evmcs_page() when clearing
+> KVM_REQ_GET_NESTED_STATE_PAGES in nested_vmx_vmexit(). The 'fix' is far
+> from being ideal as we can't easily propagate possible failures and even if
+> we could, this is most likely already too late to do so. The whole
+> 'KVM_REQ_GET_NESTED_STATE_PAGES' idea for mapping eVMCS after migration
+> seems to be fragile as we diverge too much from the 'native' path when
+> vmptr loading happens on vmx_set_nested_state().
+> 
+> Fixes: f2c7ef3ba955 ("KVM: nSVM: cancel KVM_REQ_GET_NESTED_STATE_PAGES on nested vmexit")
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 > ---
-> 4.88 KVM_GET_EMULATED_CPUID
-> ---------------------------
-> <...>
-> Userspace can use the information returned by this ioctl to query
-> which features are emulated by kvm instead of being present natively.
-> ---
+>  arch/x86/kvm/vmx/nested.c | 29 +++++++++++++++++++----------
+>  1 file changed, 19 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 1e069aac7410..2febb1dd68e8 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3098,15 +3098,8 @@ static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
+>  			nested_vmx_handle_enlightened_vmptrld(vcpu, false);
+>  
+>  		if (evmptrld_status == EVMPTRLD_VMFAIL ||
+> -		    evmptrld_status == EVMPTRLD_ERROR) {
+> -			pr_debug_ratelimited("%s: enlightened vmptrld failed\n",
+> -					     __func__);
+> -			vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+> -			vcpu->run->internal.suberror =
+> -				KVM_INTERNAL_ERROR_EMULATION;
+> -			vcpu->run->internal.ndata = 0;
+> +		    evmptrld_status == EVMPTRLD_ERROR)
+>  			return false;
+> -		}
+>  	}
+>  
+>  	return true;
+> @@ -3194,8 +3187,16 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+>  
+>  static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
+>  {
+> -	if (!nested_get_evmcs_page(vcpu))
+> +	if (!nested_get_evmcs_page(vcpu)) {
+> +		pr_debug_ratelimited("%s: enlightened vmptrld failed\n",
+> +				     __func__);
+> +		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+> +		vcpu->run->internal.suberror =
+> +			KVM_INTERNAL_ERROR_EMULATION;
+> +		vcpu->run->internal.ndata = 0;
+> +
+>  		return false;
+> +	}
 
-Setting it always is consistent with the treatment of MOVBE above. 
-Either way is okay but it should be done for both bits.
+Hi!
 
-Paolo
+Any reason to move the debug prints out of nested_get_evmcs_page?
+
+
+>  
+>  	if (is_guest_mode(vcpu) && !nested_get_vmcs12_pages(vcpu))
+>  		return false;
+> @@ -4422,7 +4423,15 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+>  	/* trying to cancel vmlaunch/vmresume is a bug */
+>  	WARN_ON_ONCE(vmx->nested.nested_run_pending);
+>  
+> -	kvm_clear_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
+> +	if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
+> +		/*
+> +		 * KVM_REQ_GET_NESTED_STATE_PAGES is also used to map
+> +		 * Enlightened VMCS after migration and we still need to
+> +		 * do that when something is forcing L2->L1 exit prior to
+> +		 * the first L2 run.
+> +		 */
+> +		(void)nested_get_evmcs_page(vcpu);
+> +	}
+Yes this is a band-aid, but it has to be done I agree.
+
+>  
+>  	/* Service the TLB flush request for L2 before switching to L1. */
+>  	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
+
+
+
+
+I also tested this and it survives a bit better (used to crash instantly
+after a single migration cycle, but the guest still crashes after around ~20 iterations of my 
+regular nested migration test).
+
+Blues screen shows that stop code is HYPERVISOR ERROR and nothing else.
+
+I tested both this patch alone and all 4 patches.
+
+Without evmcs, the same VM with same host kernel and qemu survived an overnight
+test and passed about 1800 migration iterations.
+(my synthetic migration test doesn't yet work on Intel, I need to investigate why)
+
+For reference this is the VM that you gave me to test, kvm/queue kernel,
+with merged mainline in it,
+and mostly latest qemu (updated about a week ago or so)
+
+qemu: 3791642c8d60029adf9b00bcb4e34d7d8a1aea4d
+kernel: 9f242010c3b46e63bc62f08fff42cef992d3801b and
+        then merge v5.12 from mainline.
+
+Best regards,
+	Maxim Levitsky
+
+
+
 
