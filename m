@@ -2,94 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E52A1374A23
-	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 23:28:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A821374A86
+	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 23:39:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230224AbhEEV3i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 May 2021 17:29:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47394 "EHLO
+        id S234403AbhEEVk2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 May 2021 17:40:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229893AbhEEV3g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 May 2021 17:29:36 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B3F1C061574
-        for <kvm@vger.kernel.org>; Wed,  5 May 2021 14:28:39 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id t22so2842119pgu.0
-        for <kvm@vger.kernel.org>; Wed, 05 May 2021 14:28:39 -0700 (PDT)
+        with ESMTP id S234357AbhEEVkF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 May 2021 17:40:05 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA8B3C061342
+        for <kvm@vger.kernel.org>; Wed,  5 May 2021 14:39:06 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id b3so1912927plg.11
+        for <kvm@vger.kernel.org>; Wed, 05 May 2021 14:39:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=ahSIRGK2fYWWMJVxtv1JPWgUm0OPTQW4ZW0oanx+tLQ=;
-        b=WNFQ/WRK83n/T1KRmVg59K5vVus49xIttRmJw/BRUayCqpdm5ldKmXXnsj3Mu9jRTn
-         bcJIxVVvYky2x8Pt4KYC1HRIXelcFq1ZgQ6bVx6ZslPmRURJr9wh/CUY8i92u11AI6E+
-         8tQQ/6A2jg1KJUZA6Sc5qVdOtntRUTGoPxYWZoe4h/MLt7UBnfpgosqLdGNTbrmSOwVJ
-         jSysacOM6MvjkBLj4AlDQvnFsExTB2R07kQmKbScySNwHNDtOHGtmv9O3n3vJil2qRls
-         1YJlNSul6k0WfkRA975vjiltIQ1MqTJFOt1MwgK/OlQQfFZRW6jNJuzWf2Ols+KeeIbp
-         g7eQ==
+        bh=p5WbUDTCy8at+RZ096C+TWQnzaCtiquOJEsVUamTn30=;
+        b=ETnPvDSVlt25+89h0ch6LhrN35qUJuQCBbGlyz3o2IOhExXNm6UpZw/tf8+HZgcqpe
+         lhGwJGuOkMdxfElfqPtedvXKV9MyFrZZ198NxzoVbhciFoXWPthFQKCbLN98uOh5t3fo
+         veePHsvDMF79EluHjNAqVwzWgLxb4cDnIfadO6wFUw68fjewmA4LI3i8xuuBwAbyvZfK
+         MLqC0o5Bgn2P8Gqa1qPlAH5Zup+Vx72EYq6In9XYLQcRvCnnads4Zq79YgRV0DXbU8aG
+         wqM2HcNLYL1zpWi6OYTILb8u9Nx0eOH03KnyiNBS0WdJQKvcksyehGNId8EqL3t8fkBd
+         sNYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=ahSIRGK2fYWWMJVxtv1JPWgUm0OPTQW4ZW0oanx+tLQ=;
-        b=XFhaP4oDKwXWyBiZrcF3ojsw7D9un7LddE4dYxw035P2EMkZSrA3JDLOM1YbLvRkCn
-         YEGOQCIWsIWNZUuoaoHvgdA62I5T96D09YN6uzc87orwz6VhE5/TQ1m8xIe+AbFalIec
-         YGHqu3jN6Nn9sRQGCusY6PW/WNk8s/Ts+ptyxe3hQp/lSkXHUmgLoU2Jr+fSxhOlsz3U
-         N3RbHxkTaaBTX3WOsEQIn2qWgo3755vlNfpe0uaO2I5vip9GJR1XuqXbeLSq0NbGCZjX
-         g5d1JUMyZZRTzY/4PKKfrSmodeIDAxh4jDEuev5fh5JMQ1XrSFvOFlclIOGB0iSX0Qfv
-         RZYw==
-X-Gm-Message-State: AOAM530z6K4Xo9gPnlRxYBHGUvSnki5uCLRBW1qBRSgX3iGdbKUCh/LZ
-        TW/7v2g0fMGNc4gizhi1k71SYw==
-X-Google-Smtp-Source: ABdhPJz3AKd0wVU4oiG2Drgtg1foqJ6TnB/es1muP8FGj5g8t3BWiZ3+Fjm90YwR/yJS5o9BrcjbBw==
-X-Received: by 2002:a65:63c5:: with SMTP id n5mr853733pgv.271.1620250118488;
-        Wed, 05 May 2021 14:28:38 -0700 (PDT)
-Received: from google.com ([2620:15c:f:10:820b:3fc:8d69:7035])
-        by smtp.gmail.com with ESMTPSA id i62sm150306pfc.162.2021.05.05.14.28.37
+        bh=p5WbUDTCy8at+RZ096C+TWQnzaCtiquOJEsVUamTn30=;
+        b=PAGcKwFwFmbiC5P6RYIAmUFbI7jBt1anXhdBDtyPE53i0p9NjTnPGUCpAg+B/jeKw3
+         isuZcmJVvKpi5IpM+JsoJKZNF7XyHi8R717NbjWfPRTS90Shh4Q3Z99SeOGn01aqJQRO
+         wuTGoEyIF6aXjgzucS7HahE3uHzZjIALpxtMOkk/SqaqT/WqRXcPmwmtL4ndPfCgrfNq
+         cBu1drhd0K7XqbjV6BpgG07imPnwbyjLTwkDb+bDKQuPTQagCDvT3tWtCI54lm26zpjZ
+         fOn3C6STMEnCJAyV9lKrx2rsKrcGk2fYX//ETJ09ntpTpApRhnm6pbcicneXOo43YTPE
+         8pmA==
+X-Gm-Message-State: AOAM532Myi9cIxXd3WWHbi/H3LFjvy+u9XoxM9AsLJdJpAXa5idzNM2B
+        TI+CljIucQGlzRUctplxbo7h8w==
+X-Google-Smtp-Source: ABdhPJz0SxL7mrUMHW2PvMJvUwEgPsKwRyWrWN3HZY/ZPlMvYkaCBRGDspfkdlxIzeZc6dae/3Se6A==
+X-Received: by 2002:a17:90b:3905:: with SMTP id ob5mr13270238pjb.94.1620250746117;
+        Wed, 05 May 2021 14:39:06 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id q194sm174912pfc.62.2021.05.05.14.39.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 May 2021 14:28:37 -0700 (PDT)
-Date:   Wed, 5 May 2021 14:28:31 -0700
+        Wed, 05 May 2021 14:39:05 -0700 (PDT)
+Date:   Wed, 5 May 2021 21:39:01 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
-Subject: Re: [PATCH] KVM: VMX: Fix a typo in comment around
- handle_vmx_instruction()
-Message-ID: <YJMN/4LE5u7NNW9e@google.com>
-References: <20210429042237.51280-1-kai.huang@intel.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     rientjes@google.com, kvm@vger.kernel.org
+Subject: Re: [bug report] KVM: SVM: prevent DBG_DECRYPT and DBG_ENCRYPT
+ overflow
+Message-ID: <YJMQdQu4LRMd9lSi@google.com>
+References: <YIpeFsdjT5Fz5FWZ@mwanda>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210429042237.51280-1-kai.huang@intel.com>
+In-Reply-To: <YIpeFsdjT5Fz5FWZ@mwanda>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 29, 2021, Kai Huang wrote:
-> It is nested_vmx_hardware_setup() which overwrites VMX instruction VM
-> exits handlers, but not nested_vmx_setup().  Fix the typo in comment.
+On Thu, Apr 29, 2021, Dan Carpenter wrote:
+> Hello David Rientjes,
 > 
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> The patch b86bc2858b38: "KVM: SVM: prevent DBG_DECRYPT and
+> DBG_ENCRYPT overflow" from Mar 25, 2019, leads to the following
+> static checker warning:
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 10b610fc7bbc..f8661bc113ed 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -5618,7 +5618,7 @@ static int handle_preemption_timer(struct kvm_vcpu *vcpu)
->  
->  /*
->   * When nested=0, all VMX instruction VM Exits filter here.  The handlers
-> - * are overwritten by nested_vmx_setup() when nested=1.
-> + * are overwritten by nested_vmx_hardware_setup() when nested=1.
-
-Alternatively, to reduce the odds of the comment becoming stale again:
-
-    are overwritten during hardware setup when nested=1.
-
->   */
->  static int handle_vmx_instruction(struct kvm_vcpu *vcpu)
->  {
-> -- 
-> 2.30.2
+> 	arch/x86/kvm/svm/sev.c:960 sev_dbg_crypt()
+> 	error: uninitialized symbol 'ret'.
 > 
+> arch/x86/kvm/svm/sev.c
+>    879  static int sev_dbg_crypt(struct kvm *kvm, struct kvm_sev_cmd *argp, bool dec)
+>    880  {
+>    881          unsigned long vaddr, vaddr_end, next_vaddr;
+>                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 
+>    882          unsigned long dst_vaddr;
+>                 ^^^^^^^^^^^^^^^^^^^^^^^^
+> 
+> These are unsigned long
+> 
+>    883          struct page **src_p, **dst_p;
+>    884          struct kvm_sev_dbg debug;
+>    885          unsigned long n;
+>    886          unsigned int size;
+>    887          int ret;
+>    888  
+>    889          if (!sev_guest(kvm))
+>    890                  return -ENOTTY;
+>    891  
+>    892          if (copy_from_user(&debug, (void __user *)(uintptr_t)argp->data, sizeof(debug)))
+>    893                  return -EFAULT;
+>    894  
+>    895          if (!debug.len || debug.src_uaddr + debug.len < debug.src_uaddr)
+>                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> But these are u64 so this could still overflow on 32 bit.  Do we care?
+
+Not really.  sev_guest() will always be false for CONFIG_KVM_AMD_SEV=n, and
+CONFIG_KVM_AMD_SEV is dependent on CONFIG_X86_64=y.  This code is compiled for
+32-bit only because everyone has been too lazy to stub out sev.c.
