@@ -2,169 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D97853748F1
-	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 21:55:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 158FE374922
+	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 22:11:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233603AbhEET4w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 May 2021 15:56:52 -0400
-Received: from mail-dm6nam12on2061.outbound.protection.outlook.com ([40.107.243.61]:64992
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230437AbhEET4v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 May 2021 15:56:51 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K7pI1/MEo8nRYa/1AJ6LlB73p83elML1Xdb1E1KM/QNlN5KjwBS0nrFKRwGdwtq+/NFq/mQWbEi3oEyX1mUBP89kuponmWpYJofYV2mr+1AKbUNa4wXyL062mxyAPgufhwFjGISxeEuVWnN4Gutz+JOyKOiKcozhumVKMoh4EvAeIhkAIA99m5Gk4KHzQUFRGBV2kbHBemEMKt8xCYlYEA7Qg/HFI1LA+Wr75WBCHvpXVcI69j/nGFWVb6Osp+YsFp2YXfKXDTjeu4C49B4owFC98Op1lF5ymEEnddD9NQZ3FOQoxc8i5pGqkNP32r+oBuSqGZP8CJb//9zpejSWaw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jf7dMnLAhAvOoyvn3VAI5mAjKpw1QbLDxRURKvMsyJE=;
- b=NTDdn4Drllcsk/klc2ETg/n8PRBYLaU57oXi46Rp1CFefaNCJ/kk/lR012VuO34T+KIkNQPMV2kkuKOY4jn8396/KLKJIfvhixQC8LW69QuYLoBZSPkzpPGVgcXasLWpUDfLRA1V7qhxSrSMoCCIwWtkdBAuEtSH1NvQbfPT18lvkZXxxri6ZXuIUuHjP7XNzFuGNzTHlNdfLXufvsB1DbKfDWwCQnjM4gPv05Z/UkqaTxLb9IChjj3HSQrH/ilBKSlTMuhAvrOUQj3x+P+eCJmEBH+7UZOT0CImWDzlcZ5hBNm0hZQqZ6LXhZAapgCBLSqssBy6B2v+w09BEndqtQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jf7dMnLAhAvOoyvn3VAI5mAjKpw1QbLDxRURKvMsyJE=;
- b=LN2W5JU/BgPmGvadNtM1inEfI6hDOryeiJXmDSRV/4pQtMGgT0T+Wj4tZOEE3jw6iIMJdToI7qaiPoGoZZs69ai+WyA9Zxrd1PJrg9ZB9PQpsyd+TeOWEYg3fXmnw4rwdOJJnBg5IKchVcxTU7qXEE3oxAfseNWGgF1PA0IV8v0=
-Authentication-Results: alien8.de; dkim=none (message not signed)
- header.d=none;alien8.de; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM5PR12MB1353.namprd12.prod.outlook.com (2603:10b6:3:76::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4087.40; Wed, 5 May 2021 19:55:52 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::b914:4704:ad6f:aba9]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::b914:4704:ad6f:aba9%12]) with mapi id 15.20.4087.044; Wed, 5 May 2021
- 19:55:52 +0000
-Subject: Re: SRCU dereference check warning with SEV-ES
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm list <kvm@vger.kernel.org>
-Cc:     Borislav Petkov <bp@alien8.de>
-References: <601f1278-17dd-7124-f328-b865447ca160@amd.com>
- <c65e06ed-2bd8-cac9-a933-0117c99fc856@redhat.com>
- <9bbc82fa-9560-185c-7780-052a3ee963b9@amd.com>
- <a6bf7668-f217-4217-501a-f9a12a41beb3@redhat.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <1d0ddadc-6a98-2564-aa78-cf8fa2113a28@amd.com>
-Date:   Wed, 5 May 2021 14:55:50 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
-In-Reply-To: <a6bf7668-f217-4217-501a-f9a12a41beb3@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SN4PR0501CA0047.namprd05.prod.outlook.com
- (2603:10b6:803:41::24) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+        id S233891AbhEEUMj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 May 2021 16:12:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21891 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233852AbhEEUMi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 May 2021 16:12:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620245501;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=trH/NfkKL9hdKsJ9LaR25jQCqSBLEA1C4zT+z7TQZuM=;
+        b=c4vI6jhfDfjM342yyr+Z0P0gJxEilvydX/61teLkdkeZ8kyFJXTtp/NRkJD7dewnm+YZtf
+        XNXdQ1kocmkGwMKnWh1Fzl42RCrCfts0RwmDNzZhC0dyKGnd5P3WG1uvrCDcWGNrEX2nD0
+        uBXpUe3sZSwOtzQOmFMnniatLRAHXaQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-447-IU2rogHhP9Sp7VUdGu7Mfw-1; Wed, 05 May 2021 16:11:39 -0400
+X-MC-Unique: IU2rogHhP9Sp7VUdGu7Mfw-1
+Received: by mail-wm1-f71.google.com with SMTP id h128-20020a1cb7860000b0290148da43c895so715623wmf.4
+        for <kvm@vger.kernel.org>; Wed, 05 May 2021 13:11:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=trH/NfkKL9hdKsJ9LaR25jQCqSBLEA1C4zT+z7TQZuM=;
+        b=BJhnoIXwAsLWe0PP/0ikf6P53Rf7loHq0mGZg8vIqtIA/RM6j1ytbtaaD7aF/r+e2Y
+         jl2Cv9B1+0Sf0GhrP8snm9VjDgTvAmFoDujEjNsBLfhTFBUnF59ibhAqwfU01c8tGJY4
+         1nBYDMgAwVt8BzfksV6UJze55W7l0Wtmr4nrDkSpW1jpzqlIQseBfawN/trUO0FpVE9I
+         GksDmozGA56RsBO3hsaWvUuLBG33tUGD3kLEiquX5IPFHV72j7bP0cTq9bHGJ00qXn1W
+         LK/m+L4dcX6N5xUutOQ4CdjKhCoUWreA61rbugOUmyxdwAklQKBTVFMtjhGNH4ugBvEg
+         IZ+A==
+X-Gm-Message-State: AOAM531EG9skW8cOBE2gmIfBTtH6GcPOhdFwuGErYboaKYJdZZbccPl8
+        J7Z7f845TCWGXV2kHncxjlcT4f1mHyJx/yjdex2Kz8X9Im3OztoBDOoMytXjbPtYgvlJkRcI09P
+        fTqJth5sDO/pa
+X-Received: by 2002:a05:600c:190c:: with SMTP id j12mr11647203wmq.41.1620245498492;
+        Wed, 05 May 2021 13:11:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJztjSMo+WrOGeWsi0rPU8vWa/2MQe6CfpFZS59vZKcAjfy+3i8GW0D8k1kGMxQrBXfQFIf4Ug==
+X-Received: by 2002:a05:600c:190c:: with SMTP id j12mr11647184wmq.41.1620245498339;
+        Wed, 05 May 2021 13:11:38 -0700 (PDT)
+Received: from redhat.com ([2a10:800c:8fce:0:8e1b:40f0:6a74:513b])
+        by smtp.gmail.com with ESMTPSA id m6sm533139wrp.29.2021.05.05.13.11.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 May 2021 13:11:38 -0700 (PDT)
+Date:   Wed, 5 May 2021 16:11:35 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        elic@nvidia.com, jasowang@redhat.com, lingshan.zhu@intel.com,
+        liu.xiang@zlingsmart.com, lkp@intel.com, mgurtovoy@nvidia.com,
+        mst@redhat.com, parav@nvidia.com, sgarzare@redhat.com,
+        stable@vger.kernel.org, xieyongji@bytedance.com
+Subject: [GIT PULL] virtio,vhost,vdpa: features, fixes
+Message-ID: <20210505161135-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.118] (165.204.77.1) by SN4PR0501CA0047.namprd05.prod.outlook.com (2603:10b6:803:41::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4108.8 via Frontend Transport; Wed, 5 May 2021 19:55:52 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b7c04459-c468-4c17-3a7d-08d90fffc990
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1353:
-X-Microsoft-Antispam-PRVS: <DM5PR12MB135391907A811F55FDA5EB0BEC599@DM5PR12MB1353.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: b7ERQWKQfzWYl/IwsZw8urZTGHgZujmeXMT0NCA0kpDAEeJIY8SavCgwqBmYC2R2c2RAnKDovRMSjA16eVyi/PzzTRXTZq40gDAsIviH8WJocW35cRojp/BZ1IKpbEi4SH+IX6QQeMmYNBD0ccnFKn4vCgdlftkrhM49Olsz2oMopMXI3QviV0kkMgptVgZcs5JsbxFqAcgwVxcEaH6q70OwwqLoCnL6LAvJlGWyns8M+EV+CkzWNGCHFnxdKARqqBNgRKy2ISDq4e7e5nmnDYMUemkStekmMatb8Z+LEXjRIkU3crf+SgvQkAwLVW4xaLIePpSwHW+3tmkXfSMGo6aEKcsLgXM89oW+IeEVTZXMK4jUAUCZqRRjhWyFj8WsepnPCR4JRBGLnEmC0fJEKs6UPaYS060SfFIaWZ638gXPsfTQpb4oKmQFYXx8U8EsUch6m0+P+3bT5Futu5dx7Gsqux6SuGlA4Ppk3vvRp5SLMTlmErT617EFTFE01eHym4ffS+SKezf2KGK1sUVOijYG2A6zHbt11kBnIflJCq52Hb1bieMrURsshHv3zdAyJa98hbyiMAlMbanOd2Cl4Gx4XrVVTiK57FJ+IxhCf7cHfy/QjfAkpfv4KegBcM7YuS5krgUCGCWRPTH+f8juXeGsPqhlmPlQ1KmdGG/2oqg+FKBLZyISoOSNMITMbOnM
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(366004)(376002)(136003)(396003)(346002)(38100700002)(31686004)(2906002)(316002)(4326008)(86362001)(8676002)(53546011)(26005)(16576012)(956004)(31696002)(16526019)(66476007)(66946007)(478600001)(83380400001)(5660300002)(6486002)(66556008)(8936002)(2616005)(36756003)(110136005)(186003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?MjRjZDNXcG12RWlSanhMbEc2eTg2Nm50VGlTRWNwbmlPbXhPQlNTaVY1Y25p?=
- =?utf-8?B?QTljUzg3SmJzSDBCUTRzSzVzNmh1bWJ0T3VaNWdzaVJNZ0dkb3NrOE5mNExV?=
- =?utf-8?B?N2hGMlo2NnYvOEhKcnhMWTMrZlc4NDZrOWR1czM2RHJRZDM2U0NGRS9Ya2JK?=
- =?utf-8?B?eHhpTWNXRjYrVzBwaHM4NTRjbzBGVk05dTJwMW82Nkl3YXdEYTJnRHFDdlk5?=
- =?utf-8?B?MUJnOHZPcEVna0ZqTFNPZm1Nd2hnVGZRc3FnLy9FWVRxc0o3ZnpPdHlPbm1w?=
- =?utf-8?B?R0dvYzFjQ3VKVDlaKzdOOUdaZ3lRZFI0dGhrQWcxV1FBYzJqL3o3Vi8xV2wv?=
- =?utf-8?B?MzFQeENQbXIzVS9NMldVNE5jN3c4ZG55SFAzQm80UFUrWDduSTJoZGh2QzQy?=
- =?utf-8?B?czVjSUw5akx0cmVkKzFyWUVnT0k4cUdWR0tJYVNNclpMZ0ZKV3BnUGRaZnRN?=
- =?utf-8?B?N01kemZta3g2V0FydllPdUtVaVBzVjJxSVp6Q2VvbGUvQXkyNGhEbFgwNG8w?=
- =?utf-8?B?WHBqdEdvYzFIU1hIZ3JSNkNVNXNZVDdJTDhGL3NPalJycXN3MzhKRHN1NGJH?=
- =?utf-8?B?MzZiSmsya3BqTnNNWWZQbDU5N0xFWE1hUzJsMVE4VlJHQWJHb3RPYXBnYWVn?=
- =?utf-8?B?S1BPMjNaWTZTQnViWTFqb0NDQldNdWdhMXd3a0dneGVyeXk0bXRpbjlnOFVB?=
- =?utf-8?B?bUFkcGFaR0R3d0hLS3NLREVQUG5UdFRtQlh4TmdFTXdBWk8rRHhNeGN5LzQ5?=
- =?utf-8?B?L2N3MVVFTU9wTGM1aTlTMm1MMWFCcEFvZ3RMYm5VMDNkSzNON0JBdEhVY3RB?=
- =?utf-8?B?VlVxT3R3YkJmRnBkZXlCbDV1Z3lOVmE3dEpFNjh1SUFyOWh2VDdRYnB3TGY0?=
- =?utf-8?B?OXVUdUs1UmhqTmpXY1RCNHF6d3lvN3FoaEN3cCtiV2Z2c0JjR0Vrelhlc0xa?=
- =?utf-8?B?S1dRN2poeWt5eVBLN3MyN2QydXJIaE13SUNWRjNKMFJ1c0xKTXlrbFI2Z3lF?=
- =?utf-8?B?NGR3LzdxRnMrRXFlVnQyOElscVYrY2thaWFZbE1PNlYxdVVKS0lGZUpGcE00?=
- =?utf-8?B?TmFqK2NyZEZkcjY4TEFndHI3TExnTnc0am1MWXJsTmFBdFcvUGx1aW1zVE1k?=
- =?utf-8?B?V2MwU1F0UzFrNnZBclpkeGdoKzFNRktBSlNiOVd4UXFrMy9zUTlGeWs0VjA4?=
- =?utf-8?B?OW1iWVFQY1pmV2lLcjFpVGVEbFhBa29LbGVBQzFDUjdITmhUOWZtZFlGOFRh?=
- =?utf-8?B?SVFQUzZldlgrT0ZCOGwrSjFkbHhzaDZsVm1rdlpVVjhWZkJUYy9vWEVXUlBG?=
- =?utf-8?B?QkdYeWpKZjdYWTkvdld4Q241TnlWbHhWYTgzODFxTlRzcSswUjhMYXN4Y1JM?=
- =?utf-8?B?ZFZtZ0NobXJUQVhhTXVUR0o0MnFLZnRlL2psNExCR0RQMktta203TGkxUE10?=
- =?utf-8?B?enliQ2N5bXljWU5lbHhDZHBMNFlJYm5BUnB1SmdGa09lcDdyNVZXeStwUEY4?=
- =?utf-8?B?cFVFNTVuZmdxc0E2QmJPeWRsa256Qks0NXhYZ3poK2V5N1p4eXVyTVI3elFy?=
- =?utf-8?B?amlBSENFdVNnNVROK1dhUUkwcmlwWWc5RW9hSVg0blNxdEJmYThoUXJSb3dZ?=
- =?utf-8?B?Sm5VNGd2K3Y3M21zRXJiQkVYb0ZrbFlWNGtKZHk3SUtacnk4emszcFFOcXpH?=
- =?utf-8?B?bUZPM2tCUGpuNTBGNm1TbTN5MFpBbmIwUXBFd0J0Zm5mS0g0L1MxdFBRNURD?=
- =?utf-8?Q?r2M17iTE+brohdidBsKYl83zhR4e2w5/w9Fbq0/?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b7c04459-c468-4c17-3a7d-08d90fffc990
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 May 2021 19:55:52.3585
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +BQUErbUfCQAagJPYEX15/JlGPOHkSyk1zCthKuaHKs6r6B3wCr3aOnQOvCHL1tWXQwhJoLtQU6/pd41UkhMSw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1353
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mutt-Fcc: =sent
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/5/21 1:50 PM, Paolo Bonzini wrote:
-> On 05/05/21 20:39, Tom Lendacky wrote:
->> On 5/5/21 11:16 AM, Paolo Bonzini wrote:
->>> On 05/05/21 16:01, Tom Lendacky wrote:
->>>> Boris noticed the below warning when running an SEV-ES guest with
->>>> CONFIG_PROVE_LOCKING=y.
->>>>
->>>> The SRCU lock is released before invoking the vCPU run op where the
->>>> SEV-ES
->>>> support will unmap the GHCB. Is the proper thing to do here to take the
->>>> SRCU lock around the call to kvm_vcpu_unmap() in this case? It does fix
->>>> the issue, but I just want to be sure that I shouldn't, instead, be
->>>> taking
->>>> the memslot lock:
->>>
->>> I would rather avoid having long-lived maps, as I am working on removing
->>> them from the Intel code.  However, it seems to me that the GHCB is almost
->>> not used after sev_handle_vmgexit returns?
->>
->> Except for as you pointed out below, things like MMIO and IO. Anything
->> that has to exit to userspace to complete will still need the GHCB mapped
->> when coming back into the kernel if the shared buffer area of the GHCB is
->> being used.
->>
->> Btw, what do you consider long lived maps?  Is having a map while context
->> switching back to userspace considered long lived? The GHCB will
->> (possibly) only be mapped on VMEXIT (VMGEXIT) and unmapped on the next
->> VMRUN for the vCPU. An AP reset hold could be a while, though.
-> 
-> Anything that cannot be unmapped in the same function that maps it,
-> essentially.
-> 
->>> 2) upon an AP reset hold exit, the above patch sets the EXITINFO2 field
->>> before the SIPI was received.  My understanding is that the processor will
->>> not see the value anyway until it resumes execution, and why would other
->>> vCPUs muck with the AP's GHCB.  But I'm not sure if it's okay.
->>
->> As long as the vCPU might not be woken up for any reason other than a
->> SIPI, you can get a way with this. But if it was to be woken up for some
->> other reason (an IPI for some reason?), then you wouldn't want the
->> non-zero value set in the GHCB in advance, because that might cause the
->> vCPU to exit the HLT loop it is in waiting for the actual SIPI.
-> 
-> Ok.  Then the best thing to do is to pull sev_es_pre_run to the
-> prepare_guest_switch callback.
+The following changes since commit 9f4ad9e425a1d3b6a34617b8ea226d56a119a717:
 
-A quick test of this failed (VMRUN failure), let me see what is going on
-and post back.
+  Linux 5.12 (2021-04-25 13:49:08 -0700)
 
-Thanks,
-Tom
+are available in the Git repository at:
 
-> 
-> Paolo
-> 
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+
+for you to fetch changes up to d7bce85aa7b92b5de8f69b3bcedfe51d7b1aabe1:
+
+  virtio_pci_modern: correct sparse tags for notify (2021-05-04 04:19:59 -0400)
+
+----------------------------------------------------------------
+virtio,vhost,vdpa: features, fixes
+
+A bunch of new drivers including vdpa support for block
+and virtio-vdpa. Beginning of vq kick (aka doorbell) mapping support.
+Misc fixes.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Eli Cohen (1):
+      vdpa/mlx5: Enable user to add/delete vdpa device
+
+Jason Wang (9):
+      vdpa: introduce virtio pci driver
+      virtio_pci_modern: introduce helper to map vq notify area
+      virtio-pci library: switch to use vp_modern_map_vq_notify()
+      vp_vdpa: switch to use vp_modern_map_vq_notify()
+      virtio_pci_modern: hide vp_modern_get_queue_notify_off()
+      virito_pci libray: hide vp_modern_map_capability()
+      virtio-pci library: report resource address
+      vp_vdpa: report doorbell address
+      vhost-vdpa: fix vm_flags for virtqueue doorbell mapping
+
+Liu Xiang (1):
+      virtio-balloon: fix a typo in comment of virtballoon_migratepage()
+
+Max Gurtovoy (2):
+      virtio-net: don't allocate control_buf if not supported
+      vdpa: add vdpa simulator for block device
+
+Michael S. Tsirkin (2):
+      virtio_pci_modern: __force cast the notify mapping
+      virtio_pci_modern: correct sparse tags for notify
+
+Parav Pandit (2):
+      vdpa: Follow kdoc comment style
+      vdpa: Follow kdoc comment style
+
+Stefano Garzarella (12):
+      vdpa_sim: use iova module to allocate IOVA addresses
+      vringh: add 'iotlb_lock' to synchronize iotlb accesses
+      vringh: reset kiov 'consumed' field in __vringh_iov()
+      vringh: explain more about cleaning riov and wiov
+      vringh: implement vringh_kiov_advance()
+      vringh: add vringh_kiov_length() helper
+      vdpa_sim: cleanup kiovs in vdpasim_free()
+      vdpa: add get_config_size callback in vdpa_config_ops
+      vhost/vdpa: use get_config_size callback in vhost_vdpa_config_validate()
+      vdpa_sim_blk: implement ramdisk behaviour
+      vdpa_sim_blk: handle VIRTIO_BLK_T_GET_ID
+      vdpa_sim_blk: add support for vdpa management tool
+
+Xie Yongji (1):
+      vhost/vdpa: Remove the restriction that only supports virtio-net devices
+
+Zhu Lingshan (10):
+      vDPA/ifcvf: get_vendor_id returns a device specific vendor id
+      vDPA/ifcvf: enable Intel C5000X-PL virtio-net for vDPA
+      vDPA/ifcvf: rename original IFCVF dev ids to N3000 ids
+      vDPA/ifcvf: remove the version number string
+      vDPA/ifcvf: fetch device feature bits when probe
+      vDPA/ifcvf: verify mandatory feature bits for vDPA
+      vDPA/ifcvf: deduce VIRTIO device ID from pdev ids
+      vDPA/ifcvf: deduce VIRTIO device ID when probe
+      vDPA/ifcvf: enable Intel C5000X-PL virtio-block for vDPA
+      vDPA/ifcvf: get_config_size should return dev specific config size
+
+ drivers/Makefile                       |   1 +
+ drivers/net/virtio_net.c               |  10 +-
+ drivers/vdpa/Kconfig                   |  15 +
+ drivers/vdpa/Makefile                  |   1 +
+ drivers/vdpa/ifcvf/ifcvf_base.c        |  24 +-
+ drivers/vdpa/ifcvf/ifcvf_base.h        |  26 +-
+ drivers/vdpa/ifcvf/ifcvf_main.c        |  86 +++++-
+ drivers/vdpa/mlx5/net/mlx5_vnet.c      |  85 +++++-
+ drivers/vdpa/vdpa.c                    |  12 +-
+ drivers/vdpa/vdpa_sim/Makefile         |   1 +
+ drivers/vdpa/vdpa_sim/vdpa_sim.c       | 127 ++++++---
+ drivers/vdpa/vdpa_sim/vdpa_sim.h       |   2 +
+ drivers/vdpa/vdpa_sim/vdpa_sim_blk.c   | 338 +++++++++++++++++++++++
+ drivers/vdpa/virtio_pci/Makefile       |   2 +
+ drivers/vdpa/virtio_pci/vp_vdpa.c      | 484 +++++++++++++++++++++++++++++++++
+ drivers/vhost/vdpa.c                   |  16 +-
+ drivers/vhost/vringh.c                 |  69 +++--
+ drivers/virtio/virtio_balloon.c        |   2 +-
+ drivers/virtio/virtio_pci_modern.c     |  27 +-
+ drivers/virtio/virtio_pci_modern_dev.c |  67 ++++-
+ include/linux/vdpa.h                   |  42 +--
+ include/linux/virtio_pci_modern.h      |  11 +-
+ include/linux/vringh.h                 |  19 +-
+ 23 files changed, 1295 insertions(+), 172 deletions(-)
+ create mode 100644 drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
+ create mode 100644 drivers/vdpa/virtio_pci/Makefile
+ create mode 100644 drivers/vdpa/virtio_pci/vp_vdpa.c
+
