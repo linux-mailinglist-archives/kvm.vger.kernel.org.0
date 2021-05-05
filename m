@@ -2,102 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F28AC373F4A
-	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 18:12:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFEF7373F60
+	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 18:16:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233830AbhEEQNE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 May 2021 12:13:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33104 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233810AbhEEQNE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 May 2021 12:13:04 -0400
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 644BDC061574
-        for <kvm@vger.kernel.org>; Wed,  5 May 2021 09:12:07 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id bf4so2682605edb.11
-        for <kvm@vger.kernel.org>; Wed, 05 May 2021 09:12:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aV/2dStAzXa+KSKuOzr4V2KYFoBFUN1TbbN4nok1Zdg=;
-        b=r9/DPCed0Kmo4atGaRvE12IpBZYuP+Wo6gWQFrjo7ft6G4mVQaIh6Kr3sNrkBXsRiA
-         NVKZlT5Dx56mzE10yz6ZI48azqrAQU3z9g7HKBn5JdUZ2UMHNU1xWEYXpmumFaIDzQg5
-         59qo9Kl1aR0HJXsR4VTlQJFZJyrQ0+m8Xkxr0pMM6XPuEFfWUSLe1mysskCAc6YluzhA
-         QeyXEPN65Gw0qGb0dEvQCruAHXBS67zEtpWlqR4tURx5eck5lXte51RlwGl8sSD4aVTW
-         QdKlqrKGC/R9wmEr3GVNVOspMkNVhEz3Blx4YeOZQnKNJH0Kw9CVNIO+NGaKn6nViMSU
-         w3ug==
+        id S233884AbhEEQRZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 May 2021 12:17:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22481 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233798AbhEEQRZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 May 2021 12:17:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620231388;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MtoMXiwx/TZYh7+WehJVTMiOcQ29qIoOXNdluC//5Ro=;
+        b=dJ69krHSNFCPdIIaX2vBr6rxRyqaE++hZ5wMp+pwTmVFEbvXppd3yNYFjq/PPV54LEQZSi
+        mTzdYEYHIJ9+O7PT3NpFMNgkP8PIKtjLhEAJHPQJa6Qf5bK8Dh8COkcMQNLkzbTX3dHAQM
+        Zo6bSmF0E4hOSs7G7cqDSTRAicWY8sk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-118-yh3T7oc5MsajVxkilSivLA-1; Wed, 05 May 2021 12:16:25 -0400
+X-MC-Unique: yh3T7oc5MsajVxkilSivLA-1
+Received: by mail-wm1-f72.google.com with SMTP id c2-20020a1cb3020000b029013850c82dbcso1763986wmf.5
+        for <kvm@vger.kernel.org>; Wed, 05 May 2021 09:16:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aV/2dStAzXa+KSKuOzr4V2KYFoBFUN1TbbN4nok1Zdg=;
-        b=gMjAO4+UJ6Fxv4fy4iMVsf83wtUkah5q4GPfghOFxrmMvXKfDjVkJnrIP2KoxswcrP
-         Srmg6A8uuW8nVUzWod0SjdGQvfnbVv8MAzRuBNSpQkm1lYk9NgTkxFJ/UpomGjbv+snp
-         gszuWehnqeIr2ucHCxvXgsclALE8o71JlPkOD2DPDrnk4JpkQwGkqSWCJJgV9GFN52rE
-         Otf/dKbSp6nNc4y4h39i4BAzlbynlRMsSGJ0pUA0fBwRVWhDttK3giNCmBS1QMsk/PuP
-         lxQLG6nJbUxXSMQ21IcPoxDJ+B5HlwCVsJdPBgABb28TLuedmPkupzUS0E4uz1qG1WHA
-         1vxg==
-X-Gm-Message-State: AOAM531tpsGL8C5xWW+a76Ak14qQxTLmeHFME29hjwJSOh0hgPoDN6oo
-        nuCSaTJ1+cW6tnrV+8CROvehWlkIrHNrbc2dwkyo/g==
-X-Google-Smtp-Source: ABdhPJyF5JV56mLu8zQaiKqXpGPEFP0OxMrEM4vxPjke35d1/Zwi/OkeHKZI3xiEegDZQELsvRpQMDueQnvSu3OpoUM=
-X-Received: by 2002:aa7:dad1:: with SMTP id x17mr22473946eds.47.1620231125965;
- Wed, 05 May 2021 09:12:05 -0700 (PDT)
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MtoMXiwx/TZYh7+WehJVTMiOcQ29qIoOXNdluC//5Ro=;
+        b=K56vWFFS7lvBAiTRGRxhg8gnVPASDhjv/9e0RoNTQQIJhNTbK+EEtDzCLnu/cOj78F
+         dOKz7MsGxvV5juVh0Emk4Y/RcjgBzpeuDRP8XBBCtKgf1UI2lTpnEuzKcg7ElTfXdebo
+         mbzgaTqWboO6g8xE0aBUIxD48dXpEzaVEKamSfR29CQXS00aqo5uNFIx1sHTD3zKiyIr
+         SkkAh2sWA/NhhM2ARLOmYtP2k8dAjO5AoGBwSw2Nd8MDCAn0gEdslRovTm03u0FAo0sK
+         dyt0Ipg+qggT3wocT7PP6zcbnzfPV1UdCthwjbw65TradkLd4Z+3RCtSoDxVP5GwBTiE
+         D3rQ==
+X-Gm-Message-State: AOAM5337TTSarUEofZr6P/9u91h7yB4FpNqnsd+HIpExjyEZ3WRQLJGb
+        2AmTlUwYCDYFbD+za3SHJ3SqrXYFVt8GRaV3rM5Q3EdIso4P9qjl2KWLfMw7yq5hqEJDTb7YRWj
+        s3/oJz31o8MR6
+X-Received: by 2002:a5d:660c:: with SMTP id n12mr39239347wru.87.1620231383052;
+        Wed, 05 May 2021 09:16:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz5wqdw3ZPs/Tvf3D2pZcdljN/vf1kRYOQ6+ZfxftfAS0raT4MWIQol7PDugizh2DuLUpInEA==
+X-Received: by 2002:a5d:660c:: with SMTP id n12mr39239327wru.87.1620231382834;
+        Wed, 05 May 2021 09:16:22 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id s10sm3438995wru.55.2021.05.05.09.16.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 May 2021 09:16:22 -0700 (PDT)
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
+        kvm list <kvm@vger.kernel.org>
+Cc:     Borislav Petkov <bp@alien8.de>
+References: <601f1278-17dd-7124-f328-b865447ca160@amd.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: SRCU dereference check warning with SEV-ES
+Message-ID: <c65e06ed-2bd8-cac9-a933-0117c99fc856@redhat.com>
+Date:   Wed, 5 May 2021 18:16:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-References: <cover.1620200410.git.kai.huang@intel.com> <23b565dd3b3dfa20aea1c13bce01163f9427a237.1620200410.git.kai.huang@intel.com>
-In-Reply-To: <23b565dd3b3dfa20aea1c13bce01163f9427a237.1620200410.git.kai.huang@intel.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 5 May 2021 09:11:53 -0700
-Message-ID: <CANgfPd-hf-+trgTWe=pjjuWSEyVn8F4WyZ4p5kqaMiqghjseew@mail.gmail.com>
-Subject: Re: [PATCH 2/3] KVM: x86/mmu: Fix pf_fixed count in tdp_mmu_map_handle_target_level()
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <601f1278-17dd-7124-f328-b865447ca160@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 5, 2021 at 2:38 AM Kai Huang <kai.huang@intel.com> wrote:
->
-> Currently pf_fixed is increased even when page fault requires emulation,
-> or fault is spurious.  Fix by only increasing it when return value is
-> RET_PF_FIXED.
+On 05/05/21 16:01, Tom Lendacky wrote:
+> Boris noticed the below warning when running an SEV-ES guest with
+> CONFIG_PROVE_LOCKING=y.
+> 
+> The SRCU lock is released before invoking the vCPU run op where the SEV-ES
+> support will unmap the GHCB. Is the proper thing to do here to take the
+> SRCU lock around the call to kvm_vcpu_unmap() in this case? It does fix
+> the issue, but I just want to be sure that I shouldn't, instead, be taking
+> the memslot lock:
 
-Revisiting __direct_map and mmu_set_spte, there are cases in the
-legacy MMU where RET_PF_EMULATE is returned but pf_fixed is still
-incremented.
-Perhaps it would make more sense to do the increment in the success
-case of tdp_mmu_set_spte_atomic as you suggested before. Sorry I
-didn't catch that earlier.
+I would rather avoid having long-lived maps, as I am working on removing
+them from the Intel code.  However, it seems to me that the GHCB is almost
+not used after sev_handle_vmgexit returns?
 
-It would probably also be worth putting a comment on pf_fixed so that
-people in the future know what it's supposed to mean and we don't get
-into archeology, reverse engineering the meaning of the stat again.
+If so, there's no need to keep it mapped until pre_sev_es_run:
 
->
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 1cad4c9f7c34..debe8c3ec844 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -942,7 +942,7 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu, int write,
->                                        rcu_dereference(iter->sptep));
->         }
->
-> -       if (!prefault)
-> +       if (!prefault && ret == RET_PF_FIXED)
->                 vcpu->stat.pf_fixed++;
->
->         return ret;
-> --
-> 2.31.1
->
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index a9d8d6aafdb8..b2226a5e249d 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2200,9 +2200,6 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+  
+  static void pre_sev_es_run(struct vcpu_svm *svm)
+  {
+-	if (!svm->ghcb)
+-		return;
+-
+  	if (svm->ghcb_sa_free) {
+  		/*
+  		 * The scratch area lives outside the GHCB, so there is a
+@@ -2220,13 +2217,6 @@ static void pre_sev_es_run(struct vcpu_svm *svm)
+  		svm->ghcb_sa = NULL;
+  		svm->ghcb_sa_free = false;
+  	}
+-
+-	trace_kvm_vmgexit_exit(svm->vcpu.vcpu_id, svm->ghcb);
+-
+-	sev_es_sync_to_ghcb(svm);
+-
+-	kvm_vcpu_unmap(&svm->vcpu, &svm->ghcb_map, true);
+-	svm->ghcb = NULL;
+  }
+  
+  void pre_sev_run(struct vcpu_svm *svm, int cpu)
+@@ -2465,7 +2455,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+  
+  	ret = sev_es_validate_vmgexit(svm);
+  	if (ret)
+-		return ret;
++		goto out_unmap;
+  
+  	sev_es_sync_from_ghcb(svm);
+  	ghcb_set_sw_exit_info_1(ghcb, 0);
+@@ -2485,6 +2485,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+  		ret = svm_invoke_exit_handler(vcpu, SVM_EXIT_IRET);
+  		break;
+  	case SVM_VMGEXIT_AP_HLT_LOOP:
++		ghcb_set_sw_exit_info_2(svm->ghcb, 1);
+  		ret = kvm_emulate_ap_reset_hold(vcpu);
+  		break;
+  	case SVM_VMGEXIT_AP_JUMP_TABLE: {
+@@ -2531,6 +2521,11 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+  		ret = svm_invoke_exit_handler(vcpu, exit_code);
+  	}
+  
++	sev_es_sync_to_ghcb(svm);
++
++out_unmap:
++	kvm_vcpu_unmap(&svm->vcpu, &svm->ghcb_map, true);
++	svm->ghcb = NULL;
+  	return ret;
+  }
+  
+@@ -2619,21 +2620,4 @@ void sev_es_prepare_guest_switch(struct vcpu_svm *svm, unsigned int cpu)
+  
+  void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+  {
+-	struct vcpu_svm *svm = to_svm(vcpu);
+-
+-	/* First SIPI: Use the values as initially set by the VMM */
+-	if (!svm->received_first_sipi) {
+-		svm->received_first_sipi = true;
+-		return;
+-	}
+-
+-	/*
+-	 * Subsequent SIPI: Return from an AP Reset Hold VMGEXIT, where
+-	 * the guest will set the CS and RIP. Set SW_EXIT_INFO_2 to a
+-	 * non-zero value.
+-	 */
+-	if (!svm->ghcb)
+-		return;
+-
+-	ghcb_set_sw_exit_info_2(svm->ghcb, 1);
+  }
+
+However:
+
+1) I admit I got lost in the maze starting with sev_es_string_io
+
+2) upon an AP reset hold exit, the above patch sets the EXITINFO2 field
+before the SIPI was received.  My understanding is that the processor will
+not see the value anyway until it resumes execution, and why would other
+vCPUs muck with the AP's GHCB.  But I'm not sure if it's okay.
+
+Paolo
+
