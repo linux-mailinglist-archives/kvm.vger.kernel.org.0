@@ -2,104 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A821374A86
-	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 23:39:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0036374AC3
+	for <lists+kvm@lfdr.de>; Wed,  5 May 2021 23:48:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234403AbhEEVk2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 May 2021 17:40:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49850 "EHLO
+        id S230370AbhEEVtU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 May 2021 17:49:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234357AbhEEVkF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 May 2021 17:40:05 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA8B3C061342
-        for <kvm@vger.kernel.org>; Wed,  5 May 2021 14:39:06 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id b3so1912927plg.11
-        for <kvm@vger.kernel.org>; Wed, 05 May 2021 14:39:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=p5WbUDTCy8at+RZ096C+TWQnzaCtiquOJEsVUamTn30=;
-        b=ETnPvDSVlt25+89h0ch6LhrN35qUJuQCBbGlyz3o2IOhExXNm6UpZw/tf8+HZgcqpe
-         lhGwJGuOkMdxfElfqPtedvXKV9MyFrZZ198NxzoVbhciFoXWPthFQKCbLN98uOh5t3fo
-         veePHsvDMF79EluHjNAqVwzWgLxb4cDnIfadO6wFUw68fjewmA4LI3i8xuuBwAbyvZfK
-         MLqC0o5Bgn2P8Gqa1qPlAH5Zup+Vx72EYq6In9XYLQcRvCnnads4Zq79YgRV0DXbU8aG
-         wqM2HcNLYL1zpWi6OYTILb8u9Nx0eOH03KnyiNBS0WdJQKvcksyehGNId8EqL3t8fkBd
-         sNYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=p5WbUDTCy8at+RZ096C+TWQnzaCtiquOJEsVUamTn30=;
-        b=PAGcKwFwFmbiC5P6RYIAmUFbI7jBt1anXhdBDtyPE53i0p9NjTnPGUCpAg+B/jeKw3
-         isuZcmJVvKpi5IpM+JsoJKZNF7XyHi8R717NbjWfPRTS90Shh4Q3Z99SeOGn01aqJQRO
-         wuTGoEyIF6aXjgzucS7HahE3uHzZjIALpxtMOkk/SqaqT/WqRXcPmwmtL4ndPfCgrfNq
-         cBu1drhd0K7XqbjV6BpgG07imPnwbyjLTwkDb+bDKQuPTQagCDvT3tWtCI54lm26zpjZ
-         fOn3C6STMEnCJAyV9lKrx2rsKrcGk2fYX//ETJ09ntpTpApRhnm6pbcicneXOo43YTPE
-         8pmA==
-X-Gm-Message-State: AOAM532Myi9cIxXd3WWHbi/H3LFjvy+u9XoxM9AsLJdJpAXa5idzNM2B
-        TI+CljIucQGlzRUctplxbo7h8w==
-X-Google-Smtp-Source: ABdhPJz0SxL7mrUMHW2PvMJvUwEgPsKwRyWrWN3HZY/ZPlMvYkaCBRGDspfkdlxIzeZc6dae/3Se6A==
-X-Received: by 2002:a17:90b:3905:: with SMTP id ob5mr13270238pjb.94.1620250746117;
-        Wed, 05 May 2021 14:39:06 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id q194sm174912pfc.62.2021.05.05.14.39.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 May 2021 14:39:05 -0700 (PDT)
-Date:   Wed, 5 May 2021 21:39:01 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     rientjes@google.com, kvm@vger.kernel.org
-Subject: Re: [bug report] KVM: SVM: prevent DBG_DECRYPT and DBG_ENCRYPT
- overflow
-Message-ID: <YJMQdQu4LRMd9lSi@google.com>
-References: <YIpeFsdjT5Fz5FWZ@mwanda>
+        with ESMTP id S229968AbhEEVtS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 May 2021 17:49:18 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59B5BC061574;
+        Wed,  5 May 2021 14:48:21 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1620251297;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=DwnDbRYPGOB6QSqiEY7AuTKE84++kwmlDEV1tcogAv0=;
+        b=IcbSGt/aNAWDrw7qHp4Wt8BC0pn3AjDcHV/mHlqw2N2CyjBBYWo68W2MyuGT4p1O9zkz/f
+        zbXaj21XFjY1WP1sUbezCn9QsRTJLfRG97KxkwF0kfZPgHFdnxOQGgRXEi52Bbnb1N168T
+        WUNxiGfmhyuUkFmsJYh/sdTMSD+5+GfIOZ7BHfJrIQh0LbvxGTRThHscV+EseE1+AlHeJA
+        3LAv4i1pkq4MiCT0Rms7FFIzNmxpPxjplHP4NDibsWxaN4vo8Vk5mr2vQ89k1561mMj34n
+        7PRVnrNEk4c1Y/UGrlFkViwJ+Z3xFyKCqXqxXYRAMw3KCKE+vdF7X5gxLKabmg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1620251297;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=DwnDbRYPGOB6QSqiEY7AuTKE84++kwmlDEV1tcogAv0=;
+        b=DCbmaGOAWxbh7gginzBuFNGOZA2b1+9xNNptOuadeawYHzdDig1Ftb6TFP/0JRINV4+FZW
+        bkJWphTAQQeN6NAg==
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, x86@kernel.org,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: KVM: x86: Cancel pvclock_gtod_work on module removal
+Date:   Wed, 05 May 2021 23:48:17 +0200
+Message-ID: <87czu4onry.ffs@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YIpeFsdjT5Fz5FWZ@mwanda>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 29, 2021, Dan Carpenter wrote:
-> Hello David Rientjes,
-> 
-> The patch b86bc2858b38: "KVM: SVM: prevent DBG_DECRYPT and
-> DBG_ENCRYPT overflow" from Mar 25, 2019, leads to the following
-> static checker warning:
-> 
-> 	arch/x86/kvm/svm/sev.c:960 sev_dbg_crypt()
-> 	error: uninitialized symbol 'ret'.
-> 
-> arch/x86/kvm/svm/sev.c
->    879  static int sev_dbg_crypt(struct kvm *kvm, struct kvm_sev_cmd *argp, bool dec)
->    880  {
->    881          unsigned long vaddr, vaddr_end, next_vaddr;
->                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> 
->    882          unsigned long dst_vaddr;
->                 ^^^^^^^^^^^^^^^^^^^^^^^^
-> 
-> These are unsigned long
-> 
->    883          struct page **src_p, **dst_p;
->    884          struct kvm_sev_dbg debug;
->    885          unsigned long n;
->    886          unsigned int size;
->    887          int ret;
->    888  
->    889          if (!sev_guest(kvm))
->    890                  return -ENOTTY;
->    891  
->    892          if (copy_from_user(&debug, (void __user *)(uintptr_t)argp->data, sizeof(debug)))
->    893                  return -EFAULT;
->    894  
->    895          if (!debug.len || debug.src_uaddr + debug.len < debug.src_uaddr)
->                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> But these are u64 so this could still overflow on 32 bit.  Do we care?
+Nothing prevents the following:
 
-Not really.  sev_guest() will always be false for CONFIG_KVM_AMD_SEV=n, and
-CONFIG_KVM_AMD_SEV is dependent on CONFIG_X86_64=y.  This code is compiled for
-32-bit only because everyone has been too lazy to stub out sev.c.
+  pvclock_gtod_notify()
+    queue_work(system_long_wq, &pvclock_gtod_work);
+  ...
+  remove_module(kvm);
+  ...
+  work_queue_run()
+    pvclock_gtod_work()	<- UAF
+
+Ditto for any other operation on that workqueue list head which touches
+pvclock_gtod_work after module removal.
+
+Cancel the work in kvm_arch_exit() to prevent that.
+
+Fixes: 16e8d74d2da9 ("KVM: x86: notifier for clocksource changes")
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+---
+Found by inspection because of:
+  https://lkml.kernel.org/r/0000000000001d43ac05c0f5c6a0@google.com
+See also:
+  https://lkml.kernel.org/r/20210505105940.190490250@infradead.org
+
+TL;DR: Scheduling work with tk_core.seq write held is a bad idea.
+---
+ arch/x86/kvm/x86.c |    1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8168,6 +8168,7 @@ void kvm_arch_exit(void)
+ 	cpuhp_remove_state_nocalls(CPUHP_AP_X86_KVM_CLK_ONLINE);
+ #ifdef CONFIG_X86_64
+ 	pvclock_gtod_unregister_notifier(&pvclock_gtod_notifier);
++	cancel_work_sync(&pvclock_gtod_work);
+ #endif
+ 	kvm_x86_ops.hardware_enable = NULL;
+ 	kvm_mmu_module_exit();
