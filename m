@@ -2,119 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 384643759E5
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 19:58:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 148BF3759F9
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 20:10:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236522AbhEFR7h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 13:59:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38244 "EHLO
+        id S230387AbhEFSK6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 14:10:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236501AbhEFR7g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 13:59:36 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36167C06138B
-        for <kvm@vger.kernel.org>; Thu,  6 May 2021 10:58:37 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id a7-20020a5b00070000b02904ed415d9d84so6893543ybp.0
-        for <kvm@vger.kernel.org>; Thu, 06 May 2021 10:58:37 -0700 (PDT)
+        with ESMTP id S230104AbhEFSK6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 14:10:58 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4BBAC061574
+        for <kvm@vger.kernel.org>; Thu,  6 May 2021 11:09:59 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id gc22-20020a17090b3116b02901558435aec1so3938542pjb.4
+        for <kvm@vger.kernel.org>; Thu, 06 May 2021 11:09:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=Sd8WEj+PgaScYsgfeqR/hc4kupQ0VU11JVPKLdE8YCo=;
-        b=EmxT2XYM2BzbyxRgqdF5HDGKtLZiZcnPRSifrgtlrx+r/MjFEWoZwrmSGBBERXCvs4
-         E4JIMwds8T6m90XBZR5l2O3QP443a+AwrHmBWyMelZNwrHPBAl4Hmh5arXGuu6h4J1iM
-         Rm5uqjjM2FMI64lzQ6N2f/9WHBNjh93h4h4k4DibfmSfFvawbtvQyDP543alMfzc1l65
-         QF0bR1KJkLfrjd2TDw/0QZoQEf/ivFATCQI0/H4KRAxBNoVMS6hfzZYBkan+rz9iTHXu
-         ovAMVNxKFNOlQWJwAKpD9wVIqcG6DgkfK39Cr601qCjML5V5yXkXrWg8GZCB98h7feyr
-         MUdg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=l5Dlc7w4uK4iSr1bdMuCNZxN2DjDbFLny4tbxIzPuBY=;
+        b=E+W/dEwY5qRJzzQ4l3Mzn99iYZ7namyy9BScjSIpURrAtVGs86EaRBnyXGU1764fdg
+         mivqI78GlkIQRKFiFWMfSacOABd5GF6uGqHX6nH5Z4JPZUzn1EFPXrZg+dPTatciTTTZ
+         5AsiT0xbalr4SIrH6zzxEpwwv8voZKFxQ+1EycQ4VHvlbFTrP0W4jYnwjGI+G66mS+dO
+         R9punUTI4mSjQy9kD19+Ufz/tzm/zxNdCWaW9vi91fPijzgN9vglIhj3hMErKF5y1/kH
+         gNY6aRDqsZWtP4NrMWuARWVaG9Z+nA+2xf3eBy7ODZmosswhNFQqlEDZVlJkyfxD2GMz
+         P5YQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=Sd8WEj+PgaScYsgfeqR/hc4kupQ0VU11JVPKLdE8YCo=;
-        b=ITDRq9C9R/SEEnqUxsWkvVza1TrFMZeCi77ezVblg2F6fZZaaFqghQtz0MlprNUcfG
-         tf3e6vXShz9Zq+s+PJqImCEj6xlVosfQkj98AsgmZ58dm1NlcvR3x0MYFJIbSoXol2Xw
-         WvnKU9uKvbw5VbmIvb61NSg89QKuOEB2K334+YDOAMM0XN1E6vA/I/yjDMSalTO53ZHr
-         /hWBJrpuXKTZTXrzhaPQ5LnpLz9NbxPhyixj+noF+1UTw3BruSuuG/Shd+K2uwhkZBb3
-         23cxDp6N/gL0+dTSz3c1bSDLhqgQGDf8jN73WWMBjDZjg3bn7KItItJi04R/BMWMw0lG
-         uTFQ==
-X-Gm-Message-State: AOAM533t+2pKiFK13xNuO8lmd/UgQHG3cpziwn0fSneETQADNTWrSJ4S
-        fGhX9Oa44H7OVYwd3gVGLF16TdzFNq8=
-X-Google-Smtp-Source: ABdhPJxC4+0lI0Mm3aAI52n+oh65A9gZczkK2o2BhouAnB7HbvxYpIa98mtba7ZNKqYNKGNKPSZi2lSApto=
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:818d:5ca3:d49c:cfc8])
- (user=seanjc job=sendgmr) by 2002:a25:3496:: with SMTP id b144mr7152883yba.393.1620323915928;
- Thu, 06 May 2021 10:58:35 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu,  6 May 2021 10:58:26 -0700
-In-Reply-To: <20210506175826.2166383-1-seanjc@google.com>
-Message-Id: <20210506175826.2166383-3-seanjc@google.com>
-Mime-Version: 1.0
-References: <20210506175826.2166383-1-seanjc@google.com>
-X-Mailer: git-send-email 2.31.1.607.g51e8a6a459-goog
-Subject: [PATCH 2/2] KVM: SVM: Fix sev_pin_memory() error checks in SEV
- migration utilities
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=l5Dlc7w4uK4iSr1bdMuCNZxN2DjDbFLny4tbxIzPuBY=;
+        b=bLXy1tWEhJkFJkT3r7slW1B6Sepnmu0hHliNvsYxuEmMm9xkK17FfcM8noaiHXgOID
+         q3+xFR8PWfphsU5mw3Yw6g0Ytaa1UbyMDFfYksWxOd06yI/9a/YfGqZ1yPGhiomcpuL5
+         gzI9pZg9KRhB5DE6SR4CGOa+1cMb4c1NwOO2rTfq0nekcMr7Q4y7nDz0i0VJYnIku5+Z
+         EYJpwB9Pc+R6menGhRtzu+K6J71WcwHK0OE2KjwgZ1u2+85opjtdqcQF1nIzOdesOTeB
+         3IsHOY8fwTWS+RDIKwax0WlqVhfcu8CFpmSpzC9EeecOkhMVhcfHsZ8wpqTjgThhKTQ2
+         TQsQ==
+X-Gm-Message-State: AOAM532q4MC6Ss+RLnoczJtxHcorcKd2PqjvIDGLNzBt1WRHBnh3ZAMK
+        KGyNYPkilp7RQ8fLwwzNOFwdtw==
+X-Google-Smtp-Source: ABdhPJwPBwkpBMkBxL3iJJA3EPNFDRDiv0AKX8+SqHOc4r48pf+Yw/TqpQF97siXvVV37A2ZSn2/dA==
+X-Received: by 2002:a17:90a:de17:: with SMTP id m23mr6126632pjv.16.1620324598850;
+        Thu, 06 May 2021 11:09:58 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id y190sm2570658pgd.24.2021.05.06.11.09.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 May 2021 11:09:58 -0700 (PDT)
+Date:   Thu, 6 May 2021 18:09:54 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Steve Rutherford <srutherford@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Ashish Kalra <ashish.kalra@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     brijesh.singh@amd.com, kvm@vger.kernel.org
+Subject: Re: [bug report] KVM: SVM: Add KVM_SEND_UPDATE_DATA command
+Message-ID: <YJQw8jlJcPO9ImNO@google.com>
+References: <YIpeKpSB7Wqkqn9f@mwanda>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YIpeKpSB7Wqkqn9f@mwanda>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use IS_ERR() instead of checking for a NULL pointer when querying for
-sev_pin_memory() failures.  sev_pin_memory() always returns an error code
-cast to a pointer, or a valid pointer; it never returns NULL.
+On Thu, Apr 29, 2021, Dan Carpenter wrote:
+> Hello Brijesh Singh,
+> 
+> The patch d3d1af85e2c7: "KVM: SVM: Add KVM_SEND_UPDATE_DATA command"
+> from Apr 15, 2021, leads to the following static checker warning:
+> 
+> arch/x86/kvm/svm/sev.c:1268 sev_send_update_data() warn: 'guest_page' is an error pointer or valid
+> arch/x86/kvm/svm/sev.c:1316 sev_send_update_data() warn: maybe return -EFAULT instead of the bytes remaining?
+> arch/x86/kvm/svm/sev.c:1462 sev_receive_update_data() warn: 'guest_page' is an error pointer or valid
 
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-Cc: Steve Rutherford <srutherford@google.com>
-Cc: Brijesh Singh <brijesh.singh@amd.com>
-Cc: Ashish Kalra <ashish.kalra@amd.com>
-Fixes: d3d1af85e2c7 ("KVM: SVM: Add KVM_SEND_UPDATE_DATA command")
-Fixes: 15fb7de1a7f5 ("KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA command")
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/sev.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 1f99c240db6d..9b23b7ac60fa 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -1265,8 +1265,8 @@ static int sev_send_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	/* Pin guest memory */
- 	guest_page = sev_pin_memory(kvm, params.guest_uaddr & PAGE_MASK,
- 				    PAGE_SIZE, &n, 0);
--	if (!guest_page)
--		return -EFAULT;
-+	if (IS_ERR(guest_page))
-+		return PTR_ERR(guest_page);
- 
- 	/* allocate memory for header and transport buffer */
- 	ret = -ENOMEM;
-@@ -1457,11 +1457,12 @@ static int sev_receive_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	data.trans_len = params.trans_len;
- 
- 	/* Pin guest memory */
--	ret = -EFAULT;
- 	guest_page = sev_pin_memory(kvm, params.guest_uaddr & PAGE_MASK,
- 				    PAGE_SIZE, &n, 0);
--	if (!guest_page)
-+	if (IS_ERR(guest_page)) {
-+		ret = PTR_ERR(guest_page);
- 		goto e_free_trans;
-+	}
- 
- 	/* The RECEIVE_UPDATE_DATA command requires C-bit to be always set. */
- 	data.guest_address = (page_to_pfn(guest_page[0]) << PAGE_SHIFT) + offset;
--- 
-2.31.1.607.g51e8a6a459-goog
-
+Thanks for the report.  Is the static checker you're using publicly available?
+Catching these bugs via a checker is super cool!
