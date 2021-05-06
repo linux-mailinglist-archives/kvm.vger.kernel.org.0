@@ -2,80 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 37FDC375585
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 16:21:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C02037559B
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 16:26:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234693AbhEFOWq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 10:22:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45552 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234002AbhEFOWp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 10:22:45 -0400
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EDCEC061574
-        for <kvm@vger.kernel.org>; Thu,  6 May 2021 07:21:47 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id s6so6355738edu.10
-        for <kvm@vger.kernel.org>; Thu, 06 May 2021 07:21:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=t9MSfhz8wMF3tZG8WRBgyPgiyyJAnX7W/qxJ671xWoM=;
-        b=LJH5mMZ20Y3AoXxKlQcHTIOe3bl+a98UGZvriU2PurXQoR5ybz77ph2NiTazegoXLA
-         nyjkA5pok7/z3aJB+S+2O2Lpu3nT4+7HOMAP1PBnN/zrVpNrWJFGWIFZrgkqxNBIZZAr
-         mb6f4pMlcxCn4JFlmIGUsm0tsXHkC2HDUXAbutYq2TleB5X993GacMW6+hRPUtb1g+11
-         FvtE/BILoHZZ4Z1NaxYqCzj7QtzEa/n3YTzyiwVee6IOY6Lx+2CEvnnGiDG0wqAZH6Uq
-         qSW52Q5SXdF9q0450wEzc1C93p1irlfG8GjcE69D4v5iuQy+xo6XtrdI9C+u392tFvaS
-         IgKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=t9MSfhz8wMF3tZG8WRBgyPgiyyJAnX7W/qxJ671xWoM=;
-        b=mfeXYzNRKxRbdxM41Je4OPBfEFrWf6bl65ukVtDzOXGHEy6eVgj1jNLoxLYOb1JK0r
-         M70rosDQLwLaGIPlk0Lez7RmZODevR1QGshKPdAWdN6IIbyVwGtCzGBspLG94TbCV0Nx
-         a3leEXt1cti5iuzurd3uKd0j9Pqr0yrot60jNm/HqcKMPEzLjD0tQZG4xMKui7P9axPH
-         uKeY1CR2oSbcbQL07vaEg0koDJBqqQyS0y7sYyZkJY9a6QsjBuY6ByMMMv0rXcx6k23a
-         ElEACKzcc396woJwkSDUbCkYEBAXjl42P6YfgkjRr/g6yyrn+W/dgbaz2i0EOGSNbJxw
-         D3sg==
-X-Gm-Message-State: AOAM533Xhct62HYU3k4d+jhbQmBfPu4Hzl1yKQx0HMJw1tRImLMLJ3PO
-        tzLYbvtA1kzAlyX2H+Yanf2hhKB1XCK6mK6kj6NL3fBwrgBMsw==
-X-Google-Smtp-Source: ABdhPJxEQwnMoy7/2nuHnosZZdus1Q7o1rbwnC4Wcg8eh66gIgE6jve/dRr62bTKsnfjoStgWL/uN3drhQuQsko3WUo=
-X-Received: by 2002:a05:6402:1d8f:: with SMTP id dk15mr2695462edb.146.1620310905518;
- Thu, 06 May 2021 07:21:45 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210506133758.1749233-1-philmd@redhat.com> <20210506133758.1749233-5-philmd@redhat.com>
- <CANCZdfoJWEbPFvZ0605riUfnpVRAeC6Feem5_ahC7FUfO71-AA@mail.gmail.com>
-In-Reply-To: <CANCZdfoJWEbPFvZ0605riUfnpVRAeC6Feem5_ahC7FUfO71-AA@mail.gmail.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Thu, 6 May 2021 15:20:37 +0100
-Message-ID: <CAFEAcA9VL_h8DdVwWWmOxs=mNWj-DEHQu-U4L6vb_H4cGMZpPA@mail.gmail.com>
+        id S234744AbhEFO1J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 10:27:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46507 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234002AbhEFO1F (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 May 2021 10:27:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620311167;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4iuE6eCW+gTRiFvl6fzIAuVjIl3+LmZF9xYYjhbaPYk=;
+        b=BsbqGT44wZbzUDkCH3+KhXxXu+WNRUQERCcRg2SJyfn0aAoAhMIJmPACMx4ExtMCG7Py/c
+        pZO+//Q4oAptcPEIV/4u5o5MWRpDXtK1tbriMuYZjmaqUO+UXf+kC7N4NbGDy1ebx0mVyB
+        bQEpEGRtT7vkMbaiaItcWzxMfUlqGKU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-436-VUj96t0uOsKt2Yn_3ajXeQ-1; Thu, 06 May 2021 10:25:57 -0400
+X-MC-Unique: VUj96t0uOsKt2Yn_3ajXeQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4465818BA281;
+        Thu,  6 May 2021 14:25:56 +0000 (UTC)
+Received: from [10.3.113.56] (ovpn-113-56.phx2.redhat.com [10.3.113.56])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E70A95D6D7;
+        Thu,  6 May 2021 14:25:51 +0000 (UTC)
 Subject: Re: [PATCH v2 4/9] bsd-user/syscall: Replace alloca() by g_new()
-To:     Warner Losh <imp@bsdimp.com>
-Cc:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>, Kyle Evans <kevans@freebsd.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        qemu-arm <qemu-arm@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     Warner Losh <imp@bsdimp.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc:     kvm@vger.kernel.org, Kyle Evans <kevans@freebsd.org>,
+        QEMU Developers <qemu-devel@nongnu.org>, qemu-arm@nongnu.org,
+        qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20210506133758.1749233-1-philmd@redhat.com>
+ <20210506133758.1749233-5-philmd@redhat.com>
+ <CANCZdfoJWEbPFvZ0605riUfnpVRAeC6Feem5_ahC7FUfO71-AA@mail.gmail.com>
+From:   Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <39f12704-af5c-2e4f-d872-a860d9a870d7@redhat.com>
+Date:   Thu, 6 May 2021 09:25:51 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
+MIME-Version: 1.0
+In-Reply-To: <CANCZdfoJWEbPFvZ0605riUfnpVRAeC6Feem5_ahC7FUfO71-AA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 6 May 2021 at 15:17, Warner Losh <imp@bsdimp.com> wrote:
->
->
->
-> On Thu, May 6, 2021, 7:38 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
-om> wrote:
->>
+On 5/6/21 9:16 AM, Warner Losh wrote:
+> On Thu, May 6, 2021, 7:38 AM Philippe Mathieu-Daudé <philmd@redhat.com>
+> wrote:
+> 
 >> The ALLOCA(3) man-page mentions its "use is discouraged".
 >>
 >> Replace it by a g_new() call.
 >>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 >> ---
 >>  bsd-user/syscall.c | 3 +--
 >>  1 file changed, 1 insertion(+), 2 deletions(-)
@@ -84,28 +77,28 @@ om> wrote:
 >> index 4abff796c76..dbee0385ceb 100644
 >> --- a/bsd-user/syscall.c
 >> +++ b/bsd-user/syscall.c
->> @@ -355,9 +355,8 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, =
-abi_long arg1,
+>> @@ -355,9 +355,8 @@ abi_long do_freebsd_syscall(void *cpu_env, int num,
+>> abi_long arg1,
 >>      case TARGET_FREEBSD_NR_writev:
 >>          {
->>              int count =3D arg3;
+>>              int count = arg3;
 >> -            struct iovec *vec;
->> +            g_autofree struct iovec *vec =3D g_new(struct iovec, count)=
-;
->
->
-> Where is this freed?
+>> +            g_autofree struct iovec *vec = g_new(struct iovec, count);
+>>
+> 
+> Where is this freed? Also, alloca just moves a stack pointer, where malloc
+> has complex interactions. Are you sure that's a safe change here?
 
-g_autofree, so it gets freed when it goes out of scope.
-https://developer.gnome.org/glib/stable/glib-Miscellaneous-Macros.html#g-au=
-tofree
+It's freed any time the g_autofree variable goes out of scope (that's
+what the g_autofree macro is for).  Yes, the change is safe, although
+you are right that switching to malloc is going to be a bit more
+heavyweight than what alloca used.  What's more, it adds safety: if
+count was under user control, a user could pass a value that could cause
+alloca to allocate more than 4k and accidentally mess up stack guard
+pages, while malloc() uses the heap and therefore cannot cause stack bugs.
 
-> Also, alloca just moves a stack pointer, where malloc has complex interac=
-tions. Are you sure that's a safe change here?
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-alloca()ing something with size determined by the guest is
-definitely not safe :-) malloc as part of "handle this syscall"
-is pretty common, at least in linux-user.
-
-thanks
--- PMM
