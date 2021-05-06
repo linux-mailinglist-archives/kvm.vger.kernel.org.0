@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E9D2374CF0
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 03:41:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 052C4374CF1
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 03:41:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230308AbhEFBmJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 May 2021 21:42:09 -0400
+        id S230315AbhEFBmN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 May 2021 21:42:13 -0400
 Received: from mga11.intel.com ([192.55.52.93]:9158 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230294AbhEFBmJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 May 2021 21:42:09 -0400
-IronPort-SDR: KQ9RUesta1th8Eg3RzpZUSCYGy6gMKt8EdhqOjn8igoDcUL2+eNHbw5y2KTKHgQtj5AFwtb17v
- MwllW5Fk+Zfw==
-X-IronPort-AV: E=McAfee;i="6200,9189,9975"; a="195230473"
+        id S230311AbhEFBmM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 May 2021 21:42:12 -0400
+IronPort-SDR: qQG0uzGteNokUgLQGbHSA3Xb6ghRj3a40yprsypEFIRdGFucKSQvL0WIbhm85FWG8YFFFvhYef
+ /GrVpryARkaw==
+X-IronPort-AV: E=McAfee;i="6200,9189,9975"; a="195230481"
 X-IronPort-AV: E=Sophos;i="5.82,276,1613462400"; 
-   d="scan'208";a="195230473"
+   d="scan'208";a="195230481"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2021 18:41:11 -0700
-IronPort-SDR: +aGY4EzyJD9S1GtGVUkEkdSKjoINddR0rLoGI2JG83jpe49jZ+WiJo9TCVl8LJzPPIZcsk8Ea0
- QgqzRgq49FlQ==
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2021 18:41:14 -0700
+IronPort-SDR: ODijVWIWkzgja8CNKpLWpZYAZg3ObQCFIyQMQIh65kRS1XKW1o23AcwOk8oNfVSLYrsrlRx73v
+ 2viTFNtg6E2A==
 X-IronPort-AV: E=Sophos;i="5.82,276,1613462400"; 
-   d="scan'208";a="469220373"
+   d="scan'208";a="469220387"
 Received: from yy-desk-7060.sh.intel.com ([10.239.159.38])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2021 18:41:08 -0700
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2021 18:41:11 -0700
 From:   Yuan Yao <yuan.yao@linux.intel.com>
 To:     pbonzini@redhat.com
 Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com,
         ehabkost@redhat.com, mst@redhat.com, armbru@redhat.com,
         mtosatti@redhat.com, ashish.kalra@amd.com, Thomas.Lendacky@amd.com,
         brijesh.singh@amd.com, isaku.yamahata@intel.com, yuan.yao@intel.com
-Subject: [RFC][PATCH v1 04/10] Implements the common MemoryRegion::ram_debug_ops for encrypted guests
-Date:   Thu,  6 May 2021 09:40:31 +0800
-Message-Id: <20210506014037.11982-5-yuan.yao@linux.intel.com>
+Subject: [RFC][PATCH v1 05/10] Set the RAM's MemoryRegion::debug_ops for INTEL TD guests
+Date:   Thu,  6 May 2021 09:40:32 +0800
+Message-Id: <20210506014037.11982-6-yuan.yao@linux.intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210506014037.11982-1-yuan.yao@linux.intel.com>
 References: <20210506014037.11982-1-yuan.yao@linux.intel.com>
@@ -42,100 +42,68 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Yuan Yao <yuan.yao@intel.com>
 
-The new functions are added into target/i386/kvm/kvm.c as common functions
-to support encrypted guest for KVM on x86.
-
-Now we enable these only for INTEL TD guests.
+Now only set the RAM's debug_ops for INTEL TD guests, SEV can also
+rely on the common part introduced in previous patch or introduce
+new debug_ops implementation if it's necessary.
 
 Signed-off-by: Yuan Yao <yuan.yao@intel.com>
 
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 05bf4f8b8b..5050b2a82f 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -134,6 +134,9 @@ static struct kvm_msr_list *kvm_feature_msrs;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index d5a4345f44..772b19c524 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -60,6 +60,7 @@
+ #include "sysemu/xen.h"
+ #include "sysemu/reset.h"
+ #include "sysemu/runstate.h"
++#include "sysemu/tdx.h"
+ #include "kvm/kvm_i386.h"
+ #include "hw/xen/xen.h"
+ #include "hw/xen/start_info.h"
+@@ -992,6 +993,9 @@ void pc_memory_init(PCMachineState *pcms,
  
- static int vm_type;
- 
-+void kvm_encrypted_guest_set_memory_region_debug_ops(void *handle,
-+                                                     MemoryRegion *mr);
+     /* Init ACPI memory hotplug IO base address */
+     pcms->memhp_io_base = ACPI_MEMORY_HOTPLUG_BASE;
 +
- int kvm_set_vm_type(MachineState *ms, int kvm_type)
- {
-     if (kvm_type == KVM_X86_LEGACY_VM ||
-@@ -2228,6 +2231,10 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-         return ret;
-     }
++    if (tdx_debug_enabled(machine->cgs))
++        kvm_set_memory_region_debug_ops(NULL, *ram_memory);
+ }
  
-+    if (kvm_tdx_enabled())
-+        kvm_setup_memory_region_debug_ops(s,
-+                                          kvm_encrypted_guest_set_memory_region_debug_ops);
+ /*
+diff --git a/include/sysemu/tdx.h b/include/sysemu/tdx.h
+index 429bb0ff8e..bd0af77c03 100644
+--- a/include/sysemu/tdx.h
++++ b/include/sysemu/tdx.h
+@@ -16,4 +16,7 @@ void tdx_post_init_vcpu(CPUState *cpu);
+ struct TDXCapability;
+ struct TDXCapability *tdx_get_capabilities(void);
+ 
++struct ConfidentialGuestSupport;
++bool tdx_debug_enabled(ConfidentialGuestSupport *cgs);
 +
-     if (!kvm_check_extension(s, KVM_CAP_IRQ_ROUTING)) {
-         error_report("kvm: KVM_CAP_IRQ_ROUTING not supported by KVM");
-         return -ENOTSUP;
-@@ -4917,3 +4924,62 @@ bool kvm_arch_cpu_check_are_resettable(void)
+ #endif
+diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+index c4e5686260..d13d4c8487 100644
+--- a/target/i386/kvm/tdx.c
++++ b/target/i386/kvm/tdx.c
+@@ -384,3 +384,18 @@ static void tdx_guest_finalize(Object *obj)
+ static void tdx_guest_class_init(ObjectClass *oc, void *data)
  {
-     return !sev_es_enabled();
  }
 +
-+static int kvm_encrypted_guest_read_memory(uint8_t *dest,
-+                                           const uint8_t *hva_src, hwaddr gpa_src,
-+                                           uint32_t len, MemTxAttrs attrs)
++bool tdx_debug_enabled(ConfidentialGuestSupport *cgs)
 +{
-+    struct kvm_rw_memory rw;
++    TdxGuest *tdx;
 +
-+    /*
-+      TODO:
-+      Can we check SEV/TDX state to decide use
-+      gpa_dest or hva_dest here ?
++    if (!cgs)
++        return false;
 +
-+      Also how shall we handle the kvm_vm_ioctl failure case ?
-+      Some user like cpu_physical_memory_{read,write}() doesn't handle such
-+      failure, because for non-encrypted guest these functions may do memory
-+      reading/wrting with memcpy() dirctly before.
-+      May memset() the buffer to a bad pattern (all 0x0 or 0xff)
-+      for indicating this ?
-+    */
-+    rw.addr = gpa_src;
-+    rw.buf = dest;
-+    rw.len = len;
++    tdx = (TdxGuest *)object_dynamic_cast(OBJECT(cgs),
++                                          TYPE_TDX_GUEST);
++    if (!tdx)
++        return false;
 +
-+    return kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_READ_MEMORY, &rw);
-+}
-+
-+static int kvm_encrypted_guest_write_memory(uint8_t *hva_dest, hwaddr gpa_dest,
-+                                            const uint8_t *src,
-+                                            uint32_t len, MemTxAttrs attrs)
-+{
-+    struct kvm_rw_memory rw;
-+
-+    /*
-+      TODO:
-+      Can we check SEV/TDX state to decide use
-+      gpa_dest or hva_dest here ?
-+
-+      Also how shall we handle the kvm_vm_ioctl failure case ?
-+      Some user like cpu_physical_memory_{read,write}() doesn't handle such
-+      failure, because for non-encrypted guest these functions may do memory
-+      reading/wrting with memcpy() dirctly before.
-+     */
-+    rw.addr = gpa_dest;
-+    rw.buf = (void*)src;
-+    rw.len = len;
-+
-+    return kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_WRITE_MEMORY, &rw);
-+}
-+
-+static MemoryRegionRAMReadWriteOps kvm_encrypted_guest_mr_debug_ops = {
-+    .read = kvm_encrypted_guest_read_memory,
-+    .write = kvm_encrypted_guest_write_memory,
-+};
-+
-+void kvm_encrypted_guest_set_memory_region_debug_ops(void *handle,
-+                                                     MemoryRegion *mr)
-+{
-+    memory_region_set_ram_debug_ops(mr, &kvm_encrypted_guest_mr_debug_ops);
++    return tdx->debug;
 +}
 -- 
 2.20.1
