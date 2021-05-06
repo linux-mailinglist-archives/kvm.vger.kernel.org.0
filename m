@@ -2,250 +2,263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B962375D1D
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 00:16:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB453375D21
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 00:19:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230299AbhEFWRw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 18:17:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54364 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230149AbhEFWRu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 May 2021 18:17:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620339411;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VVqtcHMBiEb5CBRrlD2feZ+Jh9dkQ48ROy3h7QQSIaA=;
-        b=UiW8H7RrnHr5SAuNY13ZZkrYgb1/x/YTrFEsOZdXZ7MqQWbfgiLPMQO6jfCmTrFQFqqVR7
-        MSpuyIya29Wc5zNp3nZbXvMfkUICW4Jn5LMXzzB8P8ATLuWQxBk0lZaQFdbtcbcENf2UZH
-        lA2yI7a4nntUHtN54C5TyiZgEzOe28Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-8-bCkilFXlNEGUMolnrLCKfA-1; Thu, 06 May 2021 18:16:49 -0400
-X-MC-Unique: bCkilFXlNEGUMolnrLCKfA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC99318397A4;
-        Thu,  6 May 2021 22:16:48 +0000 (UTC)
-Received: from localhost (unknown [10.22.8.123])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6638710027A5;
-        Thu,  6 May 2021 22:16:48 +0000 (UTC)
-Date:   Thu, 6 May 2021 18:16:47 -0400
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     pbonzini@redhat.com, richard.henderson@linaro.org,
-        mtosatti@redhat.com, sean.j.christopherson@intel.com,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v7 2/6] target/i386: Enable XSS feature enumeration for
- CPUID
-Message-ID: <20210506221647.zaq4or66rqspxssb@habkost.net>
-References: <20210226022058.24562-1-weijiang.yang@intel.com>
- <20210226022058.24562-3-weijiang.yang@intel.com>
+        id S230386AbhEFWUJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 18:20:09 -0400
+Received: from mga18.intel.com ([134.134.136.126]:57804 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230149AbhEFWUI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 18:20:08 -0400
+IronPort-SDR: +Q+0ngws0Ovd65ndihcWDvzvcMwhoAngZF7yOigTzV4bu1hLsPPbkdDdnX8udE+0Ck7GXeS893
+ QmnlVJ46TqBA==
+X-IronPort-AV: E=McAfee;i="6200,9189,9976"; a="186055228"
+X-IronPort-AV: E=Sophos;i="5.82,279,1613462400"; 
+   d="scan'208";a="186055228"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2021 15:19:09 -0700
+IronPort-SDR: MjuSReAT0zksu9TbRtLbo+riDqZMvs+77DlWSL8zI6fHrRBOiU1Ckfv/6VBxEcjSuSytCnBWq4
+ 3RcgjKORtQMA==
+X-IronPort-AV: E=Sophos;i="5.82,279,1613462400"; 
+   d="scan'208";a="465083907"
+Received: from sangbara-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.209.86.237])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2021 15:19:07 -0700
+Message-ID: <613f09f72dc6f941771217eeb25f0193e021aebe.camel@intel.com>
+Subject: Re: [PATCH 3/3] KVM: x86/mmu: Fix TDP MMU page table level
+From:   Kai Huang <kai.huang@intel.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Date:   Fri, 07 May 2021 10:19:04 +1200
+In-Reply-To: <CANgfPd9FrnkSkXwd3U+AuiN9rGSHReoH145KZTP8fK==4JJybg@mail.gmail.com>
+References: <cover.1620200410.git.kai.huang@intel.com>
+         <817eae486273adad0a622671f628c5a99b72a375.1620200410.git.kai.huang@intel.com>
+         <CANgfPd_gWZB9NMjzsZ-v61e=p53WytCR1qm_28vRg6bdESD1fQ@mail.gmail.com>
+         <51f7d6bbe52ad0c42d3c09fffd340fe7d2c0e113.camel@intel.com>
+         <CANgfPd8Y6bh8-TePNDoKeCn9F_K2VnPSF5nVCyuaicCY3X1=Tg@mail.gmail.com>
+         <CANgfPd9FrnkSkXwd3U+AuiN9rGSHReoH145KZTP8fK==4JJybg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.0 (3.40.0-1.fc34) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210226022058.24562-3-weijiang.yang@intel.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 26, 2021 at 10:20:54AM +0800, Yang Weijiang wrote:
-> Currently, CPUID.(EAX=0DH,ECX=01H) doesn't enumerate features in
-> XSS properly, add the support here. XCR0 bits indicate user-mode XSAVE
-> components, and XSS bits indicate supervisor-mode XSAVE components.
+On Thu, 2021-05-06 at 09:23 -0700, Ben Gardon wrote:
+> On Thu, May 6, 2021 at 9:22 AM Ben Gardon <bgardon@google.com> wrote:
+> > 
+> > On Thu, May 6, 2021 at 1:00 AM Kai Huang <kai.huang@intel.com> wrote:
+> > > 
+> > > On Wed, 2021-05-05 at 09:28 -0700, Ben Gardon wrote:
+> > > > On Wed, May 5, 2021 at 2:38 AM Kai Huang <kai.huang@intel.com> wrote:
+> > > > > 
+> > > > > TDP MMU iterator's level is identical to page table's actual level.  For
+> > > > > instance, for the last level page table (whose entry points to one 4K
+> > > > > page), iter->level is 1 (PG_LEVEL_4K), and in case of 5 level paging,
+> > > > > the iter->level is mmu->shadow_root_level, which is 5.  However, struct
+> > > > > kvm_mmu_page's level currently is not set correctly when it is allocated
+> > > > > in kvm_tdp_mmu_map().  When iterator hits non-present SPTE and needs to
+> > > > > allocate a new child page table, currently iter->level, which is the
+> > > > > level of the page table where the non-present SPTE belongs to, is used.
+> > > > > This results in struct kvm_mmu_page's level always having its parent's
+> > > > > level (excpet root table's level, which is initialized explicitly using
+> > > > > mmu->shadow_root_level).  This is kinda wrong, and not consistent with
+> > > > > existing non TDP MMU code.  Fortuantely the sp->role.level is only used
+> > > > > in handle_removed_tdp_mmu_page(), which apparently is already aware of
+> > > > > this, and handles correctly.  However to make it consistent with non TDP
+> > > > > MMU code (and fix the issue that both root page table and any child of
+> > > > > it having shadow_root_level), fix this by using iter->level - 1 in
+> > > > > kvm_tdp_mmu_map().  Also modify handle_removed_tdp_mmu_page() to handle
+> > > > > such change.
+> > > > 
+> > > > Ugh. Thank you for catching this. This is going to take me a bit to
+> > > > review as I should audit the code more broadly for this problem in the
+> > > > TDP MMU.
+> > > > It would probably also be a good idea to add a comment on the level
+> > > > field to say that it represents the level of the SPTEs in the
+> > > > associated page, not the level of the SPTE that links to the
+> > > > associated page.
+> > > > Hopefully that will prevent similar future misunderstandings.
+> > > 
+> > > Regarding to adding  a comment, sorry I had a hard time to figure out where to add. Did
+> > > you mean level field of 'struct kvm_mmu_page_role', or 'struct tdp_iter'? If it is the
+> > > former, to me not quite useful.
+> > 
+> > I meant the level field of 'struct kvm_mmu_page_role', but if you
+> > don't think it makes sense to add one there, I don't feel strongly
+> > either way.
+> > 
+> > > 
+> > > I ended up with below. Is it OK to you?
+> > 
+> > Yeah, it looks good to me.
+> > 
+> > > 
+> > > If you still think a comment of level should be added, would you be more specific so that
+> > > I can add it?
+> > 
+> > struct {
+> > +       /*
+> > +       * The level of the SPT tracked by this SP, as opposed to the
+> > level of the
+> > +       * parent SPTE linking this SPT.
+> > +        */
+> >         unsigned level:4;
+> > 
+> > ... I guess that does sound kind of unnecessary.
+
+Thanks for explanation.  It looks a little bit unnecessary for me.  And if necessary,
+perhaps a separate patch :)
+
+> > 
+> > > 
+> > > ------------------------------------------------------------------------
+> > > 
+> > > TDP MMU iterator's level is identical to page table's actual level.  For
+> > > instance, for the last level page table (whose entry points to one 4K
+> > > page), iter->level is 1 (PG_LEVEL_4K), and in case of 5 level paging,
+> > > the iter->level is mmu->shadow_root_level, which is 5.  However, struct
+> > > kvm_mmu_page's level currently is not set correctly when it is allocated
+> > > in kvm_tdp_mmu_map().  When iterator hits non-present SPTE and needs to
+> > > allocate a new child page table, currently iter->level, which is the
+> > > level of the page table where the non-present SPTE belongs to, is used.
+> > > This results in struct kvm_mmu_page's level always having its parent's
+> > > level (excpet root table's level, which is initialized explicitly using
+> > > mmu->shadow_root_level).
+> > > 
+> > > This is kinda wrong, and not consistent with existing non TDP MMU code.
+> > > Fortuantely sp->role.level is only used in handle_removed_tdp_mmu_page()
+> > > and kvm_tdp_mmu_zap_sp(), and they are already aware of this and behave
+> > > correctly.  However to make it consistent with legacy MMU code (and fix
+> > > the issue that both root page table and its child page table have
+> > > shadow_root_level), use iter->level - 1 in kvm_tdp_mmu_map(), and change
+> > > handle_removed_tdp_mmu_page() and kvm_tdp_mmu_zap_sp() accordingly.
+> > > 
+> > > Signed-off-by: Kai Huang <kai.huang@intel.com>
 > 
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> ---
->  target/i386/cpu.c | 48 ++++++++++++++++++++++++++++++++++++++++++-----
->  target/i386/cpu.h | 12 ++++++++++++
->  2 files changed, 55 insertions(+), 5 deletions(-)
+> Ooops, I meant to add:
 > 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 89edab4240..f3923988ed 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -1058,6 +1058,24 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->          },
->          .tcg_features = TCG_XSAVE_FEATURES,
->      },
-> +    [FEAT_XSAVE_XSS_LO] = {
-> +        .type = CPUID_FEATURE_WORD,
-> +        .cpuid = {
-> +            .eax = 0xD,
-> +            .needs_ecx = true,
-> +            .ecx = 1,
-> +            .reg = R_ECX,
-> +        },
-> +    },
-> +    [FEAT_XSAVE_XSS_HI] = {
-> +        .type = CPUID_FEATURE_WORD,
-> +        .cpuid = {
-> +            .eax = 0xD,
-> +            .needs_ecx = true,
-> +            .ecx = 1,
-> +            .reg = R_EDX
-> +        },
-> +    },
->      [FEAT_6_EAX] = {
->          .type = CPUID_FEATURE_WORD,
->          .feat_names = {
-> @@ -1478,6 +1496,9 @@ static uint32_t xsave_area_size(uint64_t mask)
->      for (i = 0; i < ARRAY_SIZE(x86_ext_save_areas); i++) {
->          const ExtSaveArea *esa = &x86_ext_save_areas[i];
->          if ((mask >> i) & 1) {
-> +            if (i >= 2 && !esa->offset) {
+> Reviewed-by: Ben Gardon <bgardon@google.com>
 
-Maybe a few comments at the definition of ExtSaveArea to explain
-that offset can now be zero (and what it means when it's zero)
-would be helpful.  I took a while to understand why this is safe.
+Thank you!
 
-Would it be valid to say "ExtSaveArea.offset has a valid offset
-only if the component is in CPUID_XSTATE_XCR0_MASK"?  If so,
-can't this check be simply replaced with:
-  if ((1 << i) & CPUID_XSTATE_XCR0_MASK)
-?
-
-Or maybe this function should just contain a:
-  assert(!(mask & CPUID_XSTATE_XCR0_MASK));
-at the beginning?
-
-
-> +                continue;
-> +            }
->              ret = MAX(ret, esa->offset + esa->size);
->          }
->      }
-> @@ -1489,12 +1510,18 @@ static inline bool accel_uses_host_cpuid(void)
->      return kvm_enabled() || hvf_enabled();
->  }
->  
-> -static inline uint64_t x86_cpu_xsave_components(X86CPU *cpu)
-> +static inline uint64_t x86_cpu_xsave_xcr0_components(X86CPU *cpu)
->  {
->      return ((uint64_t)cpu->env.features[FEAT_XSAVE_XCR0_HI]) << 32 |
->             cpu->env.features[FEAT_XSAVE_XCR0_LO];
->  }
->  
-> +static inline uint64_t x86_cpu_xsave_xss_components(X86CPU *cpu)
-> +{
-> +    return ((uint64_t)cpu->env.features[FEAT_XSAVE_XSS_HI]) << 32 |
-> +           cpu->env.features[FEAT_XSAVE_XSS_LO];
-> +}
-> +
->  const char *get_register_name_32(unsigned int reg)
->  {
->      if (reg >= CPU_NB_REGS32) {
-> @@ -5716,7 +5743,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->          }
->  
->          if (count == 0) {
-> -            *ecx = xsave_area_size(x86_cpu_xsave_components(cpu));
-> +            *ecx = xsave_area_size(x86_cpu_xsave_xcr0_components(cpu));
->              *eax = env->features[FEAT_XSAVE_XCR0_LO];
->              *edx = env->features[FEAT_XSAVE_XCR0_HI];
->              /*
-> @@ -5728,11 +5755,17 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->              *ebx = kvm_enabled() ? *ecx : xsave_area_size(env->xcr0);
->          } else if (count == 1) {
->              *eax = env->features[FEAT_XSAVE];
-> +            *ecx = env->features[FEAT_XSAVE_XSS_LO];
-> +            *edx = env->features[FEAT_XSAVE_XSS_HI];
-
-What about EBX?  It is documented as "The size in bytes of the
-XSAVE area containing all states enabled by XCRO | IA32_XSS".
-
-The Intel SDM is not clear, but I assume this would be
-necessarily the size of the area in compacted format?
-
-
->          } else if (count < ARRAY_SIZE(x86_ext_save_areas)) {
-> -            if ((x86_cpu_xsave_components(cpu) >> count) & 1) {
-> -                const ExtSaveArea *esa = &x86_ext_save_areas[count];
-> +            const ExtSaveArea *esa = &x86_ext_save_areas[count];
-> +            if ((x86_cpu_xsave_xcr0_components(cpu) >> count) & 1) {
->                  *eax = esa->size;
->                  *ebx = esa->offset;
-> +            } else if ((x86_cpu_xsave_xss_components(cpu) >> count) & 1) {
-> +                *eax = esa->size;
-> +                *ebx = 0;
-> +                *ecx = 1;
->              }
->          }
->          break;
-> @@ -6059,6 +6092,9 @@ static void x86_cpu_reset(DeviceState *dev)
->      }
->      for (i = 2; i < ARRAY_SIZE(x86_ext_save_areas); i++) {
->          const ExtSaveArea *esa = &x86_ext_save_areas[i];
-> +        if (!esa->offset) {
-> +            continue;
-
-Most of the comments at the xsave_area_size() hunk would apply
-here.  I miss some clarity on what esa->offset==0 really means.
-
-Would it be valid to replace this with a check for
-  ((1 << i) & CPUID_XSTATE_XCR0_MASK)
-?
-
-> +        }
->          if (env->features[esa->feature] & esa->bits) {
->              xcr0 |= 1ull << i;
->          }
-> @@ -6295,8 +6331,10 @@ static void x86_cpu_enable_xsave_components(X86CPU *cpu)
->          }
->      }
->  
-> -    env->features[FEAT_XSAVE_XCR0_LO] = mask;
-> +    env->features[FEAT_XSAVE_XCR0_LO] = mask & CPUID_XSTATE_XCR0_MASK;
->      env->features[FEAT_XSAVE_XCR0_HI] = mask >> 32;
-> +    env->features[FEAT_XSAVE_XSS_LO] = mask & CPUID_XSTATE_XSS_MASK;
-> +    env->features[FEAT_XSAVE_XSS_HI] = mask >> 32;
->  }
->  
->  /***** Steps involved on loading and filtering CPUID data
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 52f31335c4..8aeaa8869a 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -504,6 +504,16 @@ typedef enum X86Seg {
->  #define XSTATE_Hi16_ZMM_MASK            (1ULL << XSTATE_Hi16_ZMM_BIT)
->  #define XSTATE_PKRU_MASK                (1ULL << XSTATE_PKRU_BIT)
->  
-> +/* CPUID feature bits available in XCR0 */
-> +#define CPUID_XSTATE_XCR0_MASK  (XSTATE_FP_MASK | XSTATE_SSE_MASK | \
-> +                                 XSTATE_YMM_MASK | XSTATE_BNDREGS_MASK | \
-> +                                 XSTATE_BNDCSR_MASK | XSTATE_OPMASK_MASK | \
-> +                                 XSTATE_ZMM_Hi256_MASK | \
-> +                                 XSTATE_Hi16_ZMM_MASK | XSTATE_PKRU_MASK)
-> +
-> +/* CPUID feature bits available in XSS */
-> +#define CPUID_XSTATE_XSS_MASK    0
-
-Do you expect this to be used outside target/i386/cpu.c?  If not,
-maybe it could be moved close to the x86_ext_save_areas[]
-definition, as any updates to x86_ext_save_areas will require an
-update to these macros.
-
-> +
->  /* CPUID feature words */
->  typedef enum FeatureWord {
->      FEAT_1_EDX,         /* CPUID[1].EDX */
-> @@ -541,6 +551,8 @@ typedef enum FeatureWord {
->      FEAT_VMX_EPT_VPID_CAPS,
->      FEAT_VMX_BASIC,
->      FEAT_VMX_VMFUNC,
-> +    FEAT_XSAVE_XSS_LO,     /* CPUID[EAX=0xd,ECX=1].ECX */
-> +    FEAT_XSAVE_XSS_HI,     /* CPUID[EAX=0xd,ECX=1].EDX */
->      FEATURE_WORDS,
->  } FeatureWord;
->  
-> -- 
-> 2.26.2
 > 
-> 
+> > > ---
+> > >  arch/x86/kvm/mmu/tdp_mmu.c | 8 ++++----
+> > >  arch/x86/kvm/mmu/tdp_mmu.h | 2 +-
+> > >  2 files changed, 5 insertions(+), 5 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > > index 5e28fbabcd35..45fb889f6a94 100644
+> > > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > > @@ -335,7 +335,7 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t
+> > > pt,
+> > > 
+> > >         for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
+> > >                 sptep = rcu_dereference(pt) + i;
+> > > -               gfn = base_gfn + (i * KVM_PAGES_PER_HPAGE(level - 1));
+> > > +               gfn = base_gfn + i * KVM_PAGES_PER_HPAGE(level);
+> > > 
+> > >                 if (shared) {
+> > >                         /*
+> > > @@ -377,12 +377,12 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t
+> > > pt,
+> > >                         WRITE_ONCE(*sptep, REMOVED_SPTE);
+> > >                 }
+> > >                 handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), gfn,
+> > > -                                   old_child_spte, REMOVED_SPTE, level - 1,
+> > > +                                   old_child_spte, REMOVED_SPTE, level,
+> > >                                     shared);
+> > >         }
+> > > 
+> > >         kvm_flush_remote_tlbs_with_address(kvm, gfn,
+> > > -                                          KVM_PAGES_PER_HPAGE(level));
+> > > +                                          KVM_PAGES_PER_HPAGE(level + 1));
+> > > 
+> > >         call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
+> > >  }
+> > > @@ -1013,7 +1013,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32
+> > > error_code,
+> > >                 }
+> > > 
+> > >                 if (!is_shadow_present_pte(iter.old_spte)) {
+> > > -                       sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level);
+> > > +                       sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level - 1);
+> > >                         child_pt = sp->spt;
+> > > 
+> > >                         new_spte = make_nonleaf_spte(child_pt,
+> > > diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+> > > index 5fdf63090451..7f9974c5d0b4 100644
+> > > --- a/arch/x86/kvm/mmu/tdp_mmu.h
+> > > +++ b/arch/x86/kvm/mmu/tdp_mmu.h
+> > > @@ -31,7 +31,7 @@ static inline bool kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, int as_id,
+> > >  }
+> > >  static inline bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+> > >  {
+> > > -       gfn_t end = sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level);
+> > > +       gfn_t end = sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level + 1);
+> > > 
+> > >         /*
+> > >          * Don't allow yielding, as the caller may have a flush pending.  Note,
+> > > --
+> > > 2.31.1
+> > > 
+> > > 
+> > > > 
+> > > > > 
+> > > > > Signed-off-by: Kai Huang <kai.huang@intel.com>
+> > > > > ---
+> > > > >  arch/x86/kvm/mmu/tdp_mmu.c | 8 ++++----
+> > > > >  1 file changed, 4 insertions(+), 4 deletions(-)
+> > > > > 
+> > > > > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > > > > index debe8c3ec844..bcfb87e1c06e 100644
+> > > > > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > > > > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > > > > @@ -335,7 +335,7 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
+> > > > > 
+> > > > >         for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
+> > > > >                 sptep = rcu_dereference(pt) + i;
+> > > > > -               gfn = base_gfn + (i * KVM_PAGES_PER_HPAGE(level - 1));
+> > > > > +               gfn = base_gfn + i * KVM_PAGES_PER_HPAGE(level);
+> > > > > 
+> > > > >                 if (shared) {
+> > > > >                         /*
+> > > > > @@ -377,12 +377,12 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
+> > > > >                         WRITE_ONCE(*sptep, REMOVED_SPTE);
+> > > > >                 }
+> > > > >                 handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), gfn,
+> > > > > -                                   old_child_spte, REMOVED_SPTE, level - 1,
+> > > > > +                                   old_child_spte, REMOVED_SPTE, level,
+> > > > >                                     shared);
+> > > > >         }
+> > > > > 
+> > > > >         kvm_flush_remote_tlbs_with_address(kvm, gfn,
+> > > > > -                                          KVM_PAGES_PER_HPAGE(level));
+> > > > > +                                          KVM_PAGES_PER_HPAGE(level + 1));
+> > > > > 
+> > > > >         call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
+> > > > >  }
+> > > > > @@ -1009,7 +1009,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+> > > > >                 }
+> > > > > 
+> > > > >                 if (!is_shadow_present_pte(iter.old_spte)) {
+> > > > > -                       sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level);
+> > > > > +                       sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level - 1);
+> > > > >                         child_pt = sp->spt;
+> > > > > 
+> > > > >                         new_spte = make_nonleaf_spte(child_pt,
+> > > > > --
+> > > > > 2.31.1
+> > > > > 
+> > > 
+> > > 
 
--- 
-Eduardo
 
