@@ -2,173 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DCE8C375D56
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 01:15:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30022375D63
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 01:27:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231218AbhEFXQr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 19:16:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51960 "EHLO
+        id S231932AbhEFX2d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 19:28:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230487AbhEFXQq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 19:16:46 -0400
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D537AC061761
-        for <kvm@vger.kernel.org>; Thu,  6 May 2021 16:15:46 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id l61-20020a0c84430000b02901a9a7e363edso5305761qva.16
-        for <kvm@vger.kernel.org>; Thu, 06 May 2021 16:15:46 -0700 (PDT)
+        with ESMTP id S231622AbhEFX2c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 19:28:32 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00771C061574
+        for <kvm@vger.kernel.org>; Thu,  6 May 2021 16:27:31 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id y32so5819286pga.11
+        for <kvm@vger.kernel.org>; Thu, 06 May 2021 16:27:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=S0EFe95CIa83FH/uR0CK5DeEnOSiVvW2gb1ym2pZaOs=;
-        b=YI8500gjXbsMPkTWeUd9d4qkOvRGR55b+Blh1YjsV7bTdx2Uu23DX43NCLrLm8jXNX
-         8IwQG+Bw3nBl+X9aSivNLLmVZ4aePC8vIMnLBJso7IoGPJHNUHQxR4Fo93zJ6LEqOCOV
-         KjfjSvbBKo/0uxcH+ynv1MPrfLtpVxaY1U7WrYpsym+YZ6nZJNwptq2kobYrsamRb4WH
-         WofcJtCp6Na3+C3ZVcnu8OhoLH0Cv8FYlYU0TO29X6W/mfqDiBXQzoOhHPFWxa0MmrVP
-         D0WIIU3/McDobkN5q+u7omIzNr8cfySOmNoDuo4YsM5NRbUHPxabYK6uR7lVtANCaRcF
-         y97Q==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=hNnmB2N+G/xliEHvFgXD/jk8b5W6LQ1nCJcVUsPji2I=;
+        b=cXuAAA48mu88DAuWJxtAPWw5wM0J3HL3GxZE9djShlADFL8vJ3ysETvXY6SV/jQdeQ
+         NHXdnwBUs5Zij7g0Y4e80hmMJi4XbWulwDIXgHeb5lyNB8B8Yzyo4X4KkZOz60OTnIfg
+         SQVUoOaco97WIizqiL/OwN2ey5smZPwKzpsENT/Wi7GA/4wzFT0SDo1rYJIBDlsjjySK
+         ky8BdcIpcc4BjXuYD1OS9Fckz0v81qKM6y4k1JrlD9dCCs6l4UhY8JrkQ0xHEqUDECTI
+         InG95rF0j8N87Xez49u3CR2+ZF1F28laFfCbm273k7ymbrKIkNY7SaY/CHGIITjm1UC5
+         tZFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=S0EFe95CIa83FH/uR0CK5DeEnOSiVvW2gb1ym2pZaOs=;
-        b=TvcdFKEBTNtdnJ3H0Bytc6jakFFCFUGLY/HwX2ah6MtTwNKcGN9dwuqdZ5rtOGOL/r
-         WCgjVy/X3l1qBWbaiW/TJGvz+THYt61YexjHoxZhnnLX1OJa+EjbrT2cIVr+4OSWf8Z7
-         mykKxRGQGsPkC83qRZLWhg+RBa0fxLxrVjht0LIY1A09Kf52veNNDVqk8dDVjzZsDECU
-         sPtCc/e8yKaK8RxSpVj+ZGLksTWdrWhC38qh9OceiNN55eRZHf/KtgTXYFGVnRLvaIAM
-         24sjRd8vDUpynkLQa3A/9pYqGMja/OBgY+RpMYVE0WrGGv3vsGKyn9Gs5GOGvdJWJBa/
-         ZwHw==
-X-Gm-Message-State: AOAM530hZdB/VOlV3oVSHiGLz6ph3FypoXgAHKKVTkj29biIgpUb/0dK
-        Jo6lA98ULbmpmiLaXuyYz95cGNFKsvE=
-X-Google-Smtp-Source: ABdhPJx/QMmmBfM7/niLPM9tz2+a7Ayuom0BmFJwoWUMdwo30QH3UjsA/dZPrPqzpkWJgIJB/5IQp304d9c=
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:818d:5ca3:d49c:cfc8])
- (user=seanjc job=sendgmr) by 2002:a05:6214:241:: with SMTP id
- k1mr7031611qvt.29.1620342945773; Thu, 06 May 2021 16:15:45 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu,  6 May 2021 16:15:42 -0700
-Message-Id: <20210506231542.2331138-1-seanjc@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.31.1.607.g51e8a6a459-goog
-Subject: [PATCH] KVM: SVM: Invert user pointer casting in SEV {en,de}crypt helpers
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hNnmB2N+G/xliEHvFgXD/jk8b5W6LQ1nCJcVUsPji2I=;
+        b=mM2kI7yC2nNDkKpZbxV+OBeWoJT4ZpaH7V2PU87ZCINfdBMQ8HQfP3k1+5JOwFbNYH
+         lgVpnFSbT/lJHEu1a37PWpw8hE2EhJ/zlRx57VtGAxEm8vccKkdSlgVh5th3OMXnoAgU
+         1vroSX4sjD65ETb4jFb97e4DdPJHgrh7UN3TgAHKG0I69fO51CfiEHg/6sBbAc1iYZwj
+         Hi8eg1ExFRMV2q9MGtmOv7IcLrrZ2qFhFySZkHtjwcyv1dYhL1xOXHIE2Ki2S5P/UyOb
+         HfL6ic+acomR1yLNDAVG/UzW2jqxTCB/h07R2ktB9QLS+DmMSLpxErdoIO0Qp7VTnwJD
+         LkDg==
+X-Gm-Message-State: AOAM533nEivegfk3TeXut590NQldMyzxuUw9vABKdXWzEAB0AOFIzB5M
+        EAmRwBgroGTy8k5m5Wa+/cuRUHAHLCjoYQ==
+X-Google-Smtp-Source: ABdhPJxKb2tilIJ4jh/l5dj063LYVgL9b+SY5h1DiC2kpP4lVhAVzlu3K9Pp+zl3VS3rhBMXvGQyiQ==
+X-Received: by 2002:a63:6986:: with SMTP id e128mr6751721pgc.16.1620343651335;
+        Thu, 06 May 2021 16:27:31 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id c6sm10411626pjs.11.2021.05.06.16.27.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 May 2021 16:27:30 -0700 (PDT)
+Date:   Thu, 6 May 2021 23:27:27 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ashish Kalra <ashish.kalra@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     Jim Mattson <jmattson@google.com>
+Cc:     KarimAllah Ahmed <karahmed@amazon.de>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v6 08/14] KVM/nVMX: Use kvm_vcpu_map when mapping the
+ posted interrupt descriptor table
+Message-ID: <YJR7X7nN7sFwvesj@google.com>
+References: <1548966284-28642-1-git-send-email-karahmed@amazon.de>
+ <1548966284-28642-9-git-send-email-karahmed@amazon.de>
+ <CALMp9eR-Kt5wcveYmmmOe7HfWBB4r5nF+SjMfybPRR-b9TXiTg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALMp9eR-Kt5wcveYmmmOe7HfWBB4r5nF+SjMfybPRR-b9TXiTg@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Invert the user pointer params for SEV's helpers for encrypting and
-decrypting guest memory so that they take a pointer and cast to an
-unsigned long as necessary, as opposed to doing the opposite.  Tagging a
-non-pointer as __user is confusing and weird since a cast of some form
-needs to occur to actually access the user data.  This also fixes Sparse
-warnings triggered by directly consuming the unsigned longs, which are
-"noderef" due to the __user tag.
+On Thu, May 06, 2021, Jim Mattson wrote:
+> On Thu, Jan 31, 2019 at 12:28 PM KarimAllah Ahmed <karahmed@amazon.de> wrote:
+> >
+> > Use kvm_vcpu_map when mapping the posted interrupt descriptor table since
+> > using kvm_vcpu_gpa_to_page() and kmap() will only work for guest memory
+> > that has a "struct page".
+> >
+> > One additional semantic change is that the virtual host mapping lifecycle
+> > has changed a bit. It now has the same lifetime of the pinning of the
+> > interrupt descriptor table page on the host side.
+> >
+> > Signed-off-by: KarimAllah Ahmed <karahmed@amazon.de>
+> > Reviewed-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+> > ---
+> > v4 -> v5:
+> > - unmap with dirty flag
+> >
+> > v1 -> v2:
+> > - Do not change the lifecycle of the mapping (pbonzini)
+> > ---
+> >  arch/x86/kvm/vmx/nested.c | 43 ++++++++++++-------------------------------
+> >  arch/x86/kvm/vmx/vmx.h    |  2 +-
+> >  2 files changed, 13 insertions(+), 32 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index 31b352c..53b1063 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -230,12 +230,8 @@ static void free_nested(struct kvm_vcpu *vcpu)
+> >                 vmx->nested.apic_access_page = NULL;
+> >         }
+> >         kvm_vcpu_unmap(vcpu, &vmx->nested.virtual_apic_map, true);
+> > -       if (vmx->nested.pi_desc_page) {
+> > -               kunmap(vmx->nested.pi_desc_page);
+> > -               kvm_release_page_dirty(vmx->nested.pi_desc_page);
+> > -               vmx->nested.pi_desc_page = NULL;
+> > -               vmx->nested.pi_desc = NULL;
+> > -       }
+> > +       kvm_vcpu_unmap(vcpu, &vmx->nested.pi_desc_map, true);
+> > +       vmx->nested.pi_desc = NULL;
+> >
+> >         kvm_mmu_free_roots(vcpu, &vcpu->arch.guest_mmu, KVM_MMU_ROOTS_ALL);
+> >
+> > @@ -2868,26 +2864,15 @@ static void nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+> >         }
+> >
+> >         if (nested_cpu_has_posted_intr(vmcs12)) {
+> > -               if (vmx->nested.pi_desc_page) { /* shouldn't happen */
+> > -                       kunmap(vmx->nested.pi_desc_page);
+> > -                       kvm_release_page_dirty(vmx->nested.pi_desc_page);
+> > -                       vmx->nested.pi_desc_page = NULL;
+> > -                       vmx->nested.pi_desc = NULL;
+> > -                       vmcs_write64(POSTED_INTR_DESC_ADDR, -1ull);
+> > +               map = &vmx->nested.pi_desc_map;
+> > +
+> > +               if (!kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->posted_intr_desc_addr), map)) {
+> > +                       vmx->nested.pi_desc =
+> > +                               (struct pi_desc *)(((void *)map->hva) +
+> > +                               offset_in_page(vmcs12->posted_intr_desc_addr));
+> > +                       vmcs_write64(POSTED_INTR_DESC_ADDR,
+> > +                                    pfn_to_hpa(map->pfn) + offset_in_page(vmcs12->posted_intr_desc_addr));
+> >                 }
+> 
+> Previously, if there was no backing page for the
+> vmcs12->posted_intr_desc_addr, we wrote an illegal value (-1ull) into
+> the vmcs02 POSTED_INTR_DESC_ADDR field to force VM-entry failure.
 
-Cc: Brijesh Singh <brijesh.singh@amd.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Ashish Kalra <ashish.kalra@amd.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/sev.c | 24 +++++++++++-------------
- 1 file changed, 11 insertions(+), 13 deletions(-)
+The "vmcs_write64(POSTED_INTR_DESC_ADDR, -1ull)" above is for the "impossible"
+case where the PI descriptor was already mapped.  The error handling for failure
+to map is below.  The (forced) VM-Exit unmap paths don't stuff vmcs02 either.
+In other words, I think the bug was pre-existing.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index a9d8d6aafdb8..bba4544fbaba 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -763,7 +763,7 @@ static int __sev_dbg_decrypt(struct kvm *kvm, unsigned long src_paddr,
- }
- 
- static int __sev_dbg_decrypt_user(struct kvm *kvm, unsigned long paddr,
--				  unsigned long __user dst_uaddr,
-+				  void __user *dst_uaddr,
- 				  unsigned long dst_paddr,
- 				  int size, int *err)
- {
-@@ -787,8 +787,7 @@ static int __sev_dbg_decrypt_user(struct kvm *kvm, unsigned long paddr,
- 
- 	if (tpage) {
- 		offset = paddr & 15;
--		if (copy_to_user((void __user *)(uintptr_t)dst_uaddr,
--				 page_address(tpage) + offset, size))
-+		if (copy_to_user(dst_uaddr, page_address(tpage) + offset, size))
- 			ret = -EFAULT;
- 	}
- 
-@@ -800,9 +799,9 @@ static int __sev_dbg_decrypt_user(struct kvm *kvm, unsigned long paddr,
- }
- 
- static int __sev_dbg_encrypt_user(struct kvm *kvm, unsigned long paddr,
--				  unsigned long __user vaddr,
-+				  void __user *vaddr,
- 				  unsigned long dst_paddr,
--				  unsigned long __user dst_vaddr,
-+				  void __user *dst_vaddr,
- 				  int size, int *error)
- {
- 	struct page *src_tpage = NULL;
-@@ -810,13 +809,12 @@ static int __sev_dbg_encrypt_user(struct kvm *kvm, unsigned long paddr,
- 	int ret, len = size;
- 
- 	/* If source buffer is not aligned then use an intermediate buffer */
--	if (!IS_ALIGNED(vaddr, 16)) {
-+	if (!IS_ALIGNED((unsigned long)vaddr, 16)) {
- 		src_tpage = alloc_page(GFP_KERNEL);
- 		if (!src_tpage)
- 			return -ENOMEM;
- 
--		if (copy_from_user(page_address(src_tpage),
--				(void __user *)(uintptr_t)vaddr, size)) {
-+		if (copy_from_user(page_address(src_tpage), vaddr, size)) {
- 			__free_page(src_tpage);
- 			return -EFAULT;
- 		}
-@@ -830,7 +828,7 @@ static int __sev_dbg_encrypt_user(struct kvm *kvm, unsigned long paddr,
- 	 *   - copy the source buffer in an intermediate buffer
- 	 *   - use the intermediate buffer as source buffer
- 	 */
--	if (!IS_ALIGNED(dst_vaddr, 16) || !IS_ALIGNED(size, 16)) {
-+	if (!IS_ALIGNED((unsigned long)dst_vaddr, 16) || !IS_ALIGNED(size, 16)) {
- 		int dst_offset;
- 
- 		dst_tpage = alloc_page(GFP_KERNEL);
-@@ -855,7 +853,7 @@ static int __sev_dbg_encrypt_user(struct kvm *kvm, unsigned long paddr,
- 			       page_address(src_tpage), size);
- 		else {
- 			if (copy_from_user(page_address(dst_tpage) + dst_offset,
--					   (void __user *)(uintptr_t)vaddr, size)) {
-+					   vaddr, size)) {
- 				ret = -EFAULT;
- 				goto e_free;
- 			}
-@@ -935,15 +933,15 @@ static int sev_dbg_crypt(struct kvm *kvm, struct kvm_sev_cmd *argp, bool dec)
- 		if (dec)
- 			ret = __sev_dbg_decrypt_user(kvm,
- 						     __sme_page_pa(src_p[0]) + s_off,
--						     dst_vaddr,
-+						     (void __user *)dst_vaddr,
- 						     __sme_page_pa(dst_p[0]) + d_off,
- 						     len, &argp->error);
- 		else
- 			ret = __sev_dbg_encrypt_user(kvm,
- 						     __sme_page_pa(src_p[0]) + s_off,
--						     vaddr,
-+						     (void __user *)vaddr,
- 						     __sme_page_pa(dst_p[0]) + d_off,
--						     dst_vaddr,
-+						     (void __user *)dst_vaddr,
- 						     len, &argp->error);
- 
- 		sev_unpin_memory(kvm, src_p, n);
--- 
-2.31.1.607.g51e8a6a459-goog
+> Now, AFAICT, we leave that field unmodified. For a newly constructed vmcs02,
+> doesn't that mean we're going to treat physical address 0 as the address of
+> the vmcs02 posted interrupt descriptor?
 
+PA=0 is the happy path.  Thanks to L1TF, that memory is always unused.  If
+mapping for a previous VM-Enter succeeded, vmcs02.POSTED_INTR_DESC_ADDR will
+hold whatever PA was used for the last VM-Enter.
+ 
+> > -               page = kvm_vcpu_gpa_to_page(vcpu, vmcs12->posted_intr_desc_addr);
+> > -               if (is_error_page(page))
+> > -                       return;
+
+Error path for failure to map.
+
+> > -               vmx->nested.pi_desc_page = page;
+> > -               vmx->nested.pi_desc = kmap(vmx->nested.pi_desc_page);
+> > -               vmx->nested.pi_desc =
+> > -                       (struct pi_desc *)((void *)vmx->nested.pi_desc +
+> > -                       (unsigned long)(vmcs12->posted_intr_desc_addr &
+> > -                       (PAGE_SIZE - 1)));
+> > -               vmcs_write64(POSTED_INTR_DESC_ADDR,
+> > -                       page_to_phys(vmx->nested.pi_desc_page) +
+> > -                       (unsigned long)(vmcs12->posted_intr_desc_addr &
+> > -                       (PAGE_SIZE - 1)));
+> >         }
+> >         if (nested_vmx_prepare_msr_bitmap(vcpu, vmcs12))
+> >                 vmcs_set_bits(CPU_BASED_VM_EXEC_CONTROL,
+> > @@ -3911,12 +3896,8 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
+> >                 vmx->nested.apic_access_page = NULL;
+> >         }
+> >         kvm_vcpu_unmap(vcpu, &vmx->nested.virtual_apic_map, true);
+> > -       if (vmx->nested.pi_desc_page) {
+> > -               kunmap(vmx->nested.pi_desc_page);
+> > -               kvm_release_page_dirty(vmx->nested.pi_desc_page);
+> > -               vmx->nested.pi_desc_page = NULL;
+> > -               vmx->nested.pi_desc = NULL;
+> > -       }
+> > +       kvm_vcpu_unmap(vcpu, &vmx->nested.pi_desc_map, true);
+> > +       vmx->nested.pi_desc = NULL;
+> >
+> >         /*
+> >          * We are now running in L2, mmu_notifier will force to reload the
+> > diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> > index f618f52..bd04725 100644
+> > --- a/arch/x86/kvm/vmx/vmx.h
+> > +++ b/arch/x86/kvm/vmx/vmx.h
+> > @@ -143,7 +143,7 @@ struct nested_vmx {
+> >          */
+> >         struct page *apic_access_page;
+> >         struct kvm_host_map virtual_apic_map;
+> > -       struct page *pi_desc_page;
+> > +       struct kvm_host_map pi_desc_map;
+> >
+> >         struct kvm_host_map msr_bitmap_map;
+> >
+> > --
+> > 2.7.4
+> >
