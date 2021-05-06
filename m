@@ -2,150 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3010F375093
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 10:12:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D20043750A8
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 10:22:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233657AbhEFINZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 04:13:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48627 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231372AbhEFINY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 May 2021 04:13:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620288746;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UC82bAJniKzYDd1rr6hFdgedXUqInssRFspajndQMpU=;
-        b=SK8K2O+TEh9ofT+OChMOa8gvXEKqeKOs94Zso8TwxRT8LPF92W6hNmXxbr9UoUVJY6bRMv
-        Zq9lwm6mmJrdbKrvg75l43ovexfx6ledyQgI67J5MT7hlNS3IviyzQhFWNdGe4JbvlMvsS
-        KObIJy0ZVi5FzBY8WY5eoquaVYCau3Q=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-OnlyOSJRNAmb0vOfbdGs1g-1; Thu, 06 May 2021 04:12:23 -0400
-X-MC-Unique: OnlyOSJRNAmb0vOfbdGs1g-1
-Received: by mail-wm1-f71.google.com with SMTP id n9-20020a1c40090000b02901401bf40f9dso2367642wma.0
-        for <kvm@vger.kernel.org>; Thu, 06 May 2021 01:12:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=UC82bAJniKzYDd1rr6hFdgedXUqInssRFspajndQMpU=;
-        b=kI/Ih64aUdPRhsIf7318NCIuLx6e/gojdZhcaY5u5rMEBZChpzadnqFfCW4hjr7aSE
-         QRO3Fx+VIp2HMwK9er3b9plFNkqKYVWjy/fJ1odt6EfRLDy4tjOYU08KwWqgVIeh1wS1
-         ImfuZokMf0eKgJXOCWclJ2vC0Jx4+eUnISm9xiU4GXtiU/pHQqpmB/CqS42Dt/xf8FFh
-         P+u422ODuAmkBiqcH5N+VDQK+ahDy2DrzL7wCKBPhad6isSUDv8FxrMC8gI1SGf2CBR1
-         4NYDvIscEUNvUwfaYpec7GJc1urNCz/JBzhFkF7a2WTtIaxIpYnEfHPPva1lRhTl1O+l
-         PEhg==
-X-Gm-Message-State: AOAM530wMhHcy5S+4xLuzK+bo9X93j4tz3NQGyxvrd9nvMX//n2vTnoj
-        +kvHce5MVORrmPcdB+FHRyiEOgjm/cO1ozoM67Wtrgjv7kXt60tyPh21bB98o8yaV1N0YjE8+5S
-        bXh7yDAfhDOdo
-X-Received: by 2002:a5d:5351:: with SMTP id t17mr3541254wrv.83.1620288741817;
-        Thu, 06 May 2021 01:12:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxYOEaMbdcz5IXpIt214SV5btSIHDzQM7uxpcmfvjwnZSCT2BWQX5LFXPNw221igJoGM2NA4Q==
-X-Received: by 2002:a5d:5351:: with SMTP id t17mr3541224wrv.83.1620288741611;
-        Thu, 06 May 2021 01:12:21 -0700 (PDT)
-Received: from redhat.com ([2a10:8004:640e:0:d1db:1802:5043:7b85])
-        by smtp.gmail.com with ESMTPSA id x65sm10637130wmg.36.2021.05.06.01.12.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 May 2021 01:12:20 -0700 (PDT)
-Date:   Thu, 6 May 2021 04:12:17 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, xieyongji@bytedance.com,
-        stefanha@redhat.com, file@sect.tu-berlin.de, ashish.kalra@amd.com,
-        konrad.wilk@oracle.com, kvm@vger.kernel.org, hch@infradead.org
-Subject: Re: [RFC PATCH V2 0/7] Do not read from descripto ring
-Message-ID: <20210506041057-mutt-send-email-mst@kernel.org>
-References: <20210423080942.2997-1-jasowang@redhat.com>
- <0e9d70b7-6c8a-4ff5-1fa9-3c4f04885bb8@redhat.com>
+        id S232818AbhEFIWz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 04:22:55 -0400
+Received: from mga17.intel.com ([192.55.52.151]:60650 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231929AbhEFIWy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 04:22:54 -0400
+IronPort-SDR: 1AYIDNJYwzVJ0GwmzHlRR8JU/vqAt9LNYZ78odr9tUkjmIIOSSPzkZU/bSFlHElMOTWjV6gU9P
+ dMNGLFs12VmQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,9975"; a="178648757"
+X-IronPort-AV: E=Sophos;i="5.82,277,1613462400"; 
+   d="scan'208";a="178648757"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2021 01:21:55 -0700
+IronPort-SDR: g4z8m5QE4qwcF+Fi8aDyO6fsSg088sGEKtuoi//CNTD35nw6DY7h/kNzF7+McYg/KBQADXdWgk
+ 0YHw8Say7oIA==
+X-IronPort-AV: E=Sophos;i="5.82,277,1613462400"; 
+   d="scan'208";a="430425641"
+Received: from unknown (HELO [10.238.0.151]) ([10.238.0.151])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2021 01:21:53 -0700
+Subject: Re: [PATCH v2 1/3] KVM: X86: Rename DR6_INIT to DR6_ACTIVE_LOW
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Li, Xiaoyao" <xiaoyao.li@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20210202090433.13441-1-chenyi.qiang@intel.com>
+ <20210202090433.13441-2-chenyi.qiang@intel.com>
+ <3db069ba-b4e0-1288-ec79-66ac44938682@redhat.com>
+ <6678520f-e69e-6116-88c9-e9d6cd450934@intel.com>
+ <ea9eaa84-999b-82cb-ef40-66fde361704d@redhat.com>
+ <dc22f0a2-97c5-d54d-a521-c02f802c2229@intel.com>
+ <3d7455a7-dca7-3c60-0c34-3a3ab8f7f1fb@redhat.com>
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+Message-ID: <f8d6f502-e870-b374-afc4-62fd49dd5571@intel.com>
+Date:   Thu, 6 May 2021 16:21:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0e9d70b7-6c8a-4ff5-1fa9-3c4f04885bb8@redhat.com>
+In-Reply-To: <3d7455a7-dca7-3c60-0c34-3a3ab8f7f1fb@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 06, 2021 at 11:20:30AM +0800, Jason Wang wrote:
-> 
-> 在 2021/4/23 下午4:09, Jason Wang 写道:
-> > Hi:
-> > 
-> > Sometimes, the driver doesn't trust the device. This is usually
-> > happens for the encrtpyed VM or VDUSE[1]. In both cases, technology
-> > like swiotlb is used to prevent the poking/mangling of memory from the
-> > device. But this is not sufficient since current virtio driver may
-> > trust what is stored in the descriptor table (coherent mapping) for
-> > performing the DMA operations like unmap and bounce so the device may
-> > choose to utilize the behaviour of swiotlb to perform attacks[2].
-> > 
-> > To protect from a malicous device, this series store and use the
-> > descriptor metadata in an auxiliay structure which can not be accessed
-> > via swiotlb instead of the ones in the descriptor table. This means
-> > the descriptor table is write-only from the view of the driver.
-> > 
-> > Actually, we've almost achieved that through packed virtqueue and we
-> > just need to fix a corner case of handling mapping errors. For split
-> > virtqueue we just follow what's done in the packed.
-> > 
-> > Note that we don't duplicate descriptor medata for indirect
-> > descriptors since it uses stream mapping which is read only so it's
-> > safe if the metadata of non-indirect descriptors are correct.
-> > 
-> > For split virtqueue, the change increase the footprint due the the
-> > auxiliary metadata but it's almost neglectlable in the simple test
-> > like pktgen or netpef.
-> > 
-> > Slightly tested with packed on/off, iommu on/of, swiotlb force/off in
-> > the guest.
-> > 
-> > Please review.
-> > 
-> > Changes from V1:
-> > - Always use auxiliary metadata for split virtqueue
-> > - Don't read from descripto when detaching indirect descriptor
-> 
-> 
-> Hi Michael:
-> 
-> Our QE see no regression on the perf test for 10G but some regressions
-> (5%-10%) on 40G card.
-> 
-> I think this is expected since we increase the footprint, are you OK with
-> this and we can try to optimize on top or you have other ideas?
-> 
-> Thanks
-
-Let's try for just a bit, won't make this window anyway:
-
-I have an old idea. Add a way to find out that unmap is a nop
-(or more exactly does not use the address/length).
-Then in that case even with DMA API we do not need
-the extra data. Hmm?
 
 
+On 4/2/2021 5:01 PM, Paolo Bonzini wrote:
+> On 02/04/21 10:53, Xiaoyao Li wrote:
+>>>
+>>
+>> Hi Paolo,
+>>
+>> Fenghua's bare metal support is in tip tree now.
+>> https://lore.kernel.org/lkml/20210322135325.682257-1-fenghua.yu@intel.com/
+>>
+>> Will the rest KVM patches get into 5.13 together?
 > 
-> > 
-> > [1]
-> > https://lore.kernel.org/netdev/fab615ce-5e13-a3b3-3715-a4203b4ab010@redhat.com/T/
-> > [2]
-> > https://yhbt.net/lore/all/c3629a27-3590-1d9f-211b-c0b7be152b32@redhat.com/T/#mc6b6e2343cbeffca68ca7a97e0f473aaa871c95b
-> > 
-> > Jason Wang (7):
-> >    virtio-ring: maintain next in extra state for packed virtqueue
-> >    virtio_ring: rename vring_desc_extra_packed
-> >    virtio-ring: factor out desc_extra allocation
-> >    virtio_ring: secure handling of mapping errors
-> >    virtio_ring: introduce virtqueue_desc_add_split()
-> >    virtio: use err label in __vring_new_virtqueue()
-> >    virtio-ring: store DMA metadata in desc_extra for split virtqueue
-> > 
-> >   drivers/virtio/virtio_ring.c | 201 +++++++++++++++++++++++++----------
-> >   1 file changed, 144 insertions(+), 57 deletions(-)
-> > 
+> Yes, they will.
+> 
+> Thanks for the notice!
+> 
 
+Hi Paolo,
+
+I notice the patch 1 is merged but the remaining patch 2 and 3 are not 
+included yet. The bare metal support is merged. Will the rest KVM parts 
+be in 5.13 as well?
+
+> Paolo
+> 
