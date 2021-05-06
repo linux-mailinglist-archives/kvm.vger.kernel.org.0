@@ -2,99 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 30DFA375824
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 18:04:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CE4A375846
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 18:13:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235583AbhEFQFm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 12:05:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40906 "EHLO
+        id S235844AbhEFQOI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 12:14:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235156AbhEFQFk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 12:05:40 -0400
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88082C061574
-        for <kvm@vger.kernel.org>; Thu,  6 May 2021 09:04:42 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id m12so9087037eja.2
-        for <kvm@vger.kernel.org>; Thu, 06 May 2021 09:04:42 -0700 (PDT)
+        with ESMTP id S235281AbhEFQOG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 12:14:06 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55066C061574
+        for <kvm@vger.kernel.org>; Thu,  6 May 2021 09:13:08 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id i14so5053976pgk.5
+        for <kvm@vger.kernel.org>; Thu, 06 May 2021 09:13:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=C736AuqidzDQYfgZUZZB0PARKzaD4iAVzFxsLnZvVFc=;
-        b=n1fAETreJFQdC7wXEx5ii+pfu/gGH9b/X8P5A9SX9BGHF7EutNs8G9WP/6DeQ2UEEz
-         lf3SV4glmo9fE8fMqGf/+JMh4m+fmRshQpmQh79Olzk5LYno3JkeOfytqEKfk/VclzzJ
-         of6IX46ugieYUfWu0eEiMPC/A/nIUtuPLE3+dgdoXM7BCZ5ZEewe7BI/qNpNP4P7/eqh
-         x1uCSUJPNDOvt3uq/6X68SpaE2eiJRn/D2v+9sJrdNQqvEXBFt5cxsJ77XFujzRe9E0u
-         dJSkDbtfDPNtAd+q/qcFmWTw3MJND80Z31hpZSed3D3dtCJNSiU41yxdRE0pLc5YIdKB
-         vSng==
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=pC08hOC2AN+wyK5mT1AdQmyJCQNj6SPdVWaqp3QAEAg=;
+        b=VavpFO4sdqGbiT15AYtOAtQVcxe9b0IGKDipvgr5a/C+HFLmKIhSG9gCPQ0wzAT9D8
+         pnepDUGhdDmWqe91ldWolYVkoEmCWAavFRK6F2B0ihLnLjD3Yu040DUd2Z/tMyWGyWj/
+         duIGX2uqIFX4wtqWI0Lk4z1OoymowQZUSiewkBHaLqI8Xy4te1yeWt8n823TGnYohdfS
+         bHC8EwuvYj6IVL4UcrdX+tRSFSGuW5GuqoBJ77d9RqfhvlzNAWhh8Gh79i+JrzF/q/EG
+         kFASKvpNv7pO0ffLBF9EQ27YEiJ2JDWqDjopEg9sWNbKPQigMWqON8/dW1lEL7m4YLvn
+         7/zQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=C736AuqidzDQYfgZUZZB0PARKzaD4iAVzFxsLnZvVFc=;
-        b=QsThg7pvm5+Iec5VRulg/kpgVTOIKbLCWDzYTAIwIV1edpC4SsF2ps0x1kryTx+fYk
-         D/jKHN6CwSkzmfoWIAVHVR4UXFTRkh+gDiJT7A0zOO0hQwtIjoSDsr3DYbDm3tzm5fAs
-         IdoefsgJgxzW76DgKg7ZlRIpL4m9hvjI3Ye+vrhI/gzPFiBmHWM3jZI9RbWbZ5TU0oqq
-         5WNVP+1mE9i8ZTmlGRRNHfAJVVnn4aX3WiAO1O4bZDyoW2gNYrF78V+6cCmkMHPNM7AG
-         IDX0uMGj7MmaDFyAmxVxGsVDgroakLIh8NT0B2AyJL/H7iUOnCI4k8twm1u3LOYy0Utl
-         YT8A==
-X-Gm-Message-State: AOAM530VGGfzwPdCD9Q946yPEn7dhhaStRw7fIjjKSFOEHPnapU4E81q
-        tUeMLg1fc2KJE1V46sHxZiZvMX5hcTUtggD/OVqndg==
-X-Google-Smtp-Source: ABdhPJxWQt3yjMYSuWKONmSU3rQ4pt6tgqkHulEIhHw9fFhEGRGThw0EfZS8dZ2aVL+Wv3z1hTcsyguw7VV4nt7m6PE=
-X-Received: by 2002:a17:906:b1cc:: with SMTP id bv12mr5163395ejb.407.1620317081062;
- Thu, 06 May 2021 09:04:41 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=pC08hOC2AN+wyK5mT1AdQmyJCQNj6SPdVWaqp3QAEAg=;
+        b=A32SkRujFw7BbeRoH7uPkCI1pCYNQUBx1nDLOSuZL/T7EMS7d6T2PdwZK74o3o2XiR
+         eYv8+qISGpTPKWL6ibhmlUp3jEYgtptVMDJ9WmfofvJ19bl8IlQUsxWw9Xp13BoIl9EP
+         BYjPoQ3yoE8yX/1qE3HA4M2P1EkSNhJSVw1SxwY+ynO5KxXa8mWqcCwI40FnStQV1wny
+         SmdyBrJYfa/ZWDAsD9nP5kyKnPGkj7u/nkgBZ77bm2NQDnlGJ03d7srI2mB3rWFQP0CB
+         E9kZ5C6ZLQy34BGm0w2nuxRV955K0nJ6i4RO7z6L1oe7xMMGJI4AVquHVKxgsIGnQOtt
+         RkTw==
+X-Gm-Message-State: AOAM530XqQojYwV3PDudZeLnvpOMDHox/bchHOlUmxUbLQ7CdlWHwLc0
+        oQz+kw9ZL+x5swGrCYWJwUyfkQ==
+X-Google-Smtp-Source: ABdhPJwatxlV+xfhhtH4nBHRMsVEoFU/nkaoLTy/GTPXvWvDJ8Q4h5fqvy+ymq2otmghJ543Ed+C1g==
+X-Received: by 2002:a63:1903:: with SMTP id z3mr4998123pgl.185.1620317587643;
+        Thu, 06 May 2021 09:13:07 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id g1sm2190963pgi.64.2021.05.06.09.13.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 May 2021 09:13:06 -0700 (PDT)
+Date:   Thu, 6 May 2021 16:13:03 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Venkatesh Srinivas <venkateshs@chromium.org>
+Cc:     kvm@vger.kernel.org, dmatlack@google.com, pbonzini@redhat.com
+Subject: Re: [PATCH] kvm: Cap halt polling at kvm->max_halt_poll_ns
+Message-ID: <YJQVj3GaVp9tvWog@google.com>
+References: <20210506152442.4010298-1-venkateshs@chromium.org>
 MIME-Version: 1.0
-References: <20210506133758.1749233-1-philmd@redhat.com> <20210506133758.1749233-5-philmd@redhat.com>
- <CANCZdfoJWEbPFvZ0605riUfnpVRAeC6Feem5_ahC7FUfO71-AA@mail.gmail.com>
- <39f12704-af5c-2e4f-d872-a860d9a870d7@redhat.com> <CANCZdfqW0XTa18F+JxuSnhpictWxVJUsu87c=yAwMp6YT60FMg@mail.gmail.com>
- <7a96d45e-2bdc-f699-96f7-3fbf607cb06b@redhat.com> <CANCZdfrcv9ZUcBv7z+z3JPCjy0uzzY07VLmC4dqr5r8ba_QPLw@mail.gmail.com>
- <adfc5da4-a615-24d7-0c67-f04d4eaec9a6@redhat.com>
-In-Reply-To: <adfc5da4-a615-24d7-0c67-f04d4eaec9a6@redhat.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Thu, 6 May 2021 17:03:33 +0100
-Message-ID: <CAFEAcA98KHKcGam1nukspYOQvPNXyq+hfsNbATpNvmDGoODN1A@mail.gmail.com>
-Subject: Re: [PATCH v2 4/9] bsd-user/syscall: Replace alloca() by g_new()
-To:     Eric Blake <eblake@redhat.com>
-Cc:     Warner Losh <imp@bsdimp.com>, kvm-devel <kvm@vger.kernel.org>,
-        Kyle Evans <kevans@freebsd.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        qemu-arm <qemu-arm@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210506152442.4010298-1-venkateshs@chromium.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 6 May 2021 at 16:46, Eric Blake <eblake@redhat.com> wrote:
->
-> On 5/6/21 10:30 AM, Warner Losh wrote:
->
-> >
-> > But for the real answer, I need to contact the original authors of
-> > this part of the code (they are no longer involved day-to-day in
-> > the bsd-user efforts) to see if this scenario is possible or not. If
-> > it's easy to find out that way, we can either know this is safe to
-> > do, or if effort is needed to make it safe. At present, I've seen
-> > enough and chatted enough with others to be concerned that
-> > the change would break proper emulation.
->
-> Do we have a feel for the maximum amount of memory being used by the
-> various alloca() replaced in this series?  If so, can we just
-> stack-allocate an array of bytes of the maximum size needed?
+Prefer capitalizing KVM in the shortlog, if only because I'm lazy with grep :-)
 
-In *-user the allocas are generally of the form "guest passed
-us a random number, allocate that many structs/whatevers". (In this
-specific bsd-user example it's the writev syscall and it's "however
-many struct iovecs the guest passed".) So there is no upper limit.
+On Thu, May 06, 2021, Venkatesh Srinivas wrote:
+> From: David Matlack <dmatlack@google.com>
+> 
+> When growing halt-polling, there is no check that the poll time exceeds
+> the per-VM limit. It's possible for vcpu->halt_poll_ns to grow past
+> kvm->max_halt_poll_ns and stay there until a halt which takes longer
+> than kvm->halt_poll_ns.
+> 
 
-The right thing to do here is probably to use g_try_malloc() and return
-ENOMEM or whatever on failure. The use of alloca, at least in the
-linux-user code, is purely old lazy coding based on "in practice
-real world guest binaries don't allocate very many of these so
-we can get away with shoving them on the stack".
+Fixes: acd05785e48c ("kvm: add capability for halt polling")
 
-thanks
--- PMM
+and probably Cc: stable@ too.
+
+
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> Signed-off-by: Venkatesh Srinivas <venkateshs@chromium.org>
+> ---
+>  virt/kvm/kvm_main.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 2799c6660cce..120817c5f271 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2893,8 +2893,8 @@ static void grow_halt_poll_ns(struct kvm_vcpu *vcpu)
+>  	if (val < grow_start)
+>  		val = grow_start;
+>  
+> -	if (val > halt_poll_ns)
+> -		val = halt_poll_ns;
+> +	if (val > vcpu->kvm->max_halt_poll_ns)
+> +		val = vcpu->kvm->max_halt_poll_ns;
+
+Hmm, I would argue that the introduction of the capability broke halt_poll_ns.
+The halt_poll_ns module param is writable after KVM is loaded.  Prior to the
+capability, that meant the admin could adjust the param on the fly and all vCPUs
+would honor the new value as it was changed.
+
+By snapshotting the module param at VM creation, those semantics were lost.
+That's not necessarily wrong/bad, but I don't see anything in the changelog for
+the capability that suggests killing the old behavior was intentional/desirable.
+
+>  
+>  	vcpu->halt_poll_ns = val;
+>  out:
+> -- 
+> 2.31.1.607.g51e8a6a459-goog
+> 
