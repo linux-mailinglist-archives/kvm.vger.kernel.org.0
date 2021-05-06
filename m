@@ -2,103 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A594375A43
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 20:41:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74DB8375A47
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 20:42:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236395AbhEFSmJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 14:42:09 -0400
-Received: from mx2.suse.de ([195.135.220.15]:37162 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234219AbhEFSmI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 14:42:08 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 8E651B186;
-        Thu,  6 May 2021 18:41:08 +0000 (UTC)
-Date:   Thu, 6 May 2021 20:41:05 +0200
-From:   Joerg Roedel <jroedel@suse.de>
-To:     "Eric W. Biederman" <ebiederm@xmission.com>
-Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        kexec@lists.infradead.org, stable@vger.kernel.org, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
+        id S234441AbhEFSnr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 14:43:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47970 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234241AbhEFSnp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 14:43:45 -0400
+Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05BDAC061574
+        for <kvm@vger.kernel.org>; Thu,  6 May 2021 11:42:46 -0700 (PDT)
+Received: by mail-qt1-x849.google.com with SMTP id 69-20020aed304b0000b02901c6d87aed7fso4119670qte.21
+        for <kvm@vger.kernel.org>; Thu, 06 May 2021 11:42:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=sOvqNeuGyU/ZMmaxdOA2l2pA74nfx+pU9gEcCSqkRJU=;
+        b=uoosXHvihKGjquSMLz/CYZMZ4tR+g+wYMy+PQ0C6KeO5KYBM56Yk/c//Vb8khLCpLa
+         YCHBvNfyl8fH5jv4BySXf883bxjZ+cUiwAKJ1zfGhX8PIIuFYLGMwj52jIzhvNJwbrdG
+         ctX1VXEfR5WjkdhcV0c1eKg/C6Y6xKdg5LtFepfs9Lx49Y5kn3+C6LKUY85fNB9EBNUI
+         tZejepMkiSxcVdz5z3kRvFkJ0MgkNm40VBAr7pwUVoWYY16zBkswnXhIKMmIsWItYJkX
+         YakB7IEn+bKpzh6aLKFM1KSAejHXtfO3bkROa587oG0OexgaEENARbJzHsBf91VwKuP8
+         sppg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=sOvqNeuGyU/ZMmaxdOA2l2pA74nfx+pU9gEcCSqkRJU=;
+        b=rXcG3cFM27IiiZakOlDrgCOZIbNCv4nwrNAZduXma9Iy47i6LWvMTcXiLY6AGECgDf
+         1KosnYMAg5YTfooodwctzhmcdCVvCT+AH/wZ5YFtLmt5cVmTXZFUL2i8HjBwU4pIzuNC
+         +ob5RTWOCYxogqE8FYZ8k/3UhqwXnEn3R4PLCGnlMuKSBDfiBSoehwc6flVG7gDZ4HvV
+         gP4qYbd3dutoQv7AD7Luoh9tx46fPCRsv7+Jsjc/Pj4IAESFQgiDs7cESKQgwk/iS9pq
+         XWiPzLFuFkMb3f0JQbGwzvCh7fT9PnTD0tKWJHH84CpZHem2OOFkwo9Gve8PF6tpTTXN
+         K5jg==
+X-Gm-Message-State: AOAM5318BTIDr2dfKSDt2FH8hV9D95edP+kc2bCRS3Cm3ruvCoDj0AKT
+        yAGfx/GsYNN/IFsLeFiuqtwbZOXq2gid
+X-Google-Smtp-Source: ABdhPJwtioxMRraHZDM3/mQxHN62IsmMxoyEHNLt1azp+GP7XBXuMx1lN08IjxpvyrsToOHNvTb9HUS7kNjB
+X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:9258:9474:54ca:4500])
+ (user=bgardon job=sendgmr) by 2002:a05:6214:258d:: with SMTP id
+ fq13mr6103004qvb.50.1620326565176; Thu, 06 May 2021 11:42:45 -0700 (PDT)
+Date:   Thu,  6 May 2021 11:42:33 -0700
+Message-Id: <20210506184241.618958-1-bgardon@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.1.607.g51e8a6a459-goog
+Subject: [PATCH v3 0/8] Lazily allocate memslot rmaps
+From:   Ben Gardon <bgardon@google.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH 2/2] x86/kexec/64: Forbid kexec when running as an SEV-ES
- guest
-Message-ID: <YJQ4QTtvG76WpcNf@suse.de>
-References: <20210506093122.28607-1-joro@8bytes.org>
- <20210506093122.28607-3-joro@8bytes.org>
- <m17dkb4v4k.fsf@fess.ebiederm.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <m17dkb4v4k.fsf@fess.ebiederm.org>
+        Peter Shier <pshier@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 06, 2021 at 12:42:03PM -0500, Eric W. Biederman wrote:
-> I don't understand this.
-> 
-> Fundamentally kexec is about doing things more or less inspite of
-> what the firmware is doing.
-> 
-> I don't have any idea what a SEV-ES is.  But the normal x86 boot doesn't
-> do anything special.  Is cross cpu IPI emulation buggy?
+This series enables KVM to save memory when using the TDP MMU by waiting
+to allocate memslot rmaps until they are needed. To do this, KVM tracks
+whether or not a shadow root has been allocated. In order to get away
+with not allocating the rmaps, KVM must also be sure to skip operations
+which iterate over the rmaps. If the TDP MMU is in use and we have not
+allocated a shadow root, these operations would essentially be op-ops
+anyway. Skipping the rmap operations has a secondary benefit of avoiding
+acquiring the MMU lock in write mode in many cases, substantially
+reducing MMU lock contention.
 
-Under SEV-ES the normal SIPI-based sequence to re-initialize a CPU does
-not work anymore. An SEV-ES guest is a special virtual machine where the
-hardware encrypts the guest memory and the guest register state. The
-hypervisor can't make any modifications to the guests registers at
-runtime. Therefore it also can't emulate a SIPI sequence and reset the
-vCPU.
+This series was tested on an Intel Skylake machine. With the TDP MMU off
+and on, this introduced no new failures on kvm-unit-tests or KVM selftests.
 
-The guest kernel has to reset the vCPU itself and hand it over from the
-old kernel to the kexec'ed kernel. This isn't currently implemented and
-therefore kexec needs to be disabled when running as an SEV-ES guest.
+Changelog:
+v2:
+	Incorporated feedback from Paolo and Sean
+	Replaced the memslot_assignment_lock with slots_arch_lock, which
+	has a larger critical section.
 
-Implementing this also requires an extension to the guest-hypervisor
-protocol (the GHCB Spec[1]) which is only available in version 2. So a
-guest running on a hypervisor supporting only version 1 will never
-properly support kexec.
+v3:
+	Removed shadow_mmu_active as suggested by Sean
+	Removed everything except adding a return value to
+	kvm_mmu_init_tdp_mmu from patch 1 of v2
+	Added RCU protection and better memory ordering for installing the
+	memslot rmaps as suggested by Paolo
+	Reordered most of the patches
 
-> What is the actual problem you are trying to avoid?
+Ben Gardon (8):
+  KVM: x86/mmu: Deduplicate rmap freeing
+  KVM: x86/mmu: Factor out allocating memslot rmap
+  KVM: mmu: Refactor memslot copy
+  KVM: mmu: Add slots_arch_lock for memslot arch fields
+  KVM: x86/mmu: Add a field to control memslot rmap allocation
+  KVM: x86/mmu: Skip rmap operations if rmaps not allocated
+  KVM: x86/mmu: Protect rmaps independently with SRCU
+  KVM: x86/mmu: Lazily allocate memslot rmaps
 
-Currently, if someone tries kexec in an SEV-ES guest, the kexec'ed
-kernel will only be able to bring up the boot CPU, not the others. The
-others will wake up with the old kernels CPU state in the new kernels
-memory and do undefined things, most likely triple-fault because their
-page-table is not existent anymore.
+ arch/x86/include/asm/kvm_host.h |   9 ++
+ arch/x86/kvm/mmu/mmu.c          | 195 ++++++++++++++++++++------------
+ arch/x86/kvm/mmu/tdp_mmu.c      |   6 +-
+ arch/x86/kvm/mmu/tdp_mmu.h      |   4 +-
+ arch/x86/kvm/x86.c              | 107 ++++++++++++++----
+ include/linux/kvm_host.h        |   9 ++
+ virt/kvm/kvm_main.c             |  54 +++++++--
+ 7 files changed, 275 insertions(+), 109 deletions(-)
 
-So since kexec currently does not work as expected under SEV-ES, it is
-better to hide it until everything is implemented so it can do what the
-user expects.
-
-> And yes for a temporary hack the suggestion of putting code into
-> machine_kexec_prepare seems much more reasonable so we don't have to
-> carry special case infrastructure for the forseeable future.
-
-As I said above, for protocol version 1 it will stay disabled, so it is
-not only a temporary hack.
-
-Regards,
-
-	Joerg
-
-[1] https://developer.amd.com/wp-content/resources/56421.pdf
+-- 
+2.31.1.607.g51e8a6a459-goog
 
