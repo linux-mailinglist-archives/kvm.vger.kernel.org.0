@@ -2,61 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 444D0375CEE
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 23:41:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D7102375CFE
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 23:50:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230265AbhEFVmd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 17:42:33 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43932 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230071AbhEFVmb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 17:42:31 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 465EB61077;
-        Thu,  6 May 2021 21:41:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620337291;
-        bh=FY/ocjRlemocM3ziqWePXGxR0o2RJSQymV7kU0n807M=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=rO7kh0E2QsMpEffj1Zhhv/6ohCG0QfLoUBum4DPIE9Hfv/1fhTK5EldCCNIuFEzLd
-         jVlN2qskYkt8lxY7AudBCgL6IlXfPt3VqMNOIENm0x65yx160rE/3fbN6YgUTsIdk6
-         4lnd1rh/Fc0gVsxqei3j9TEK+IhOyCzng9X9+jTHAdwdEcr3g9CxgloIgcMWU7AUIx
-         55IM1ejUIkyqZTCHGtYHoP+/syRR3C6Ki+punBb4McPBp0C+FmP/lAPrfid4i9lhFH
-         nDLqjYKCGdPU56DZPufCH8hEWFRaL2iGm7GiLE9bdsDm+1mO+fNTR36K1dugRtfbWL
-         Aq8OHrhB1YMog==
-Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 407A7609E8;
-        Thu,  6 May 2021 21:41:31 +0000 (UTC)
-Subject: Re: [GIT PULL] VFIO updates for v5.13-rc1 pt2
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20210506123111.6b6c0bf3@redhat.com>
-References: <20210506123111.6b6c0bf3@redhat.com>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20210506123111.6b6c0bf3@redhat.com>
-X-PR-Tracked-Remote: git://github.com/awilliam/linux-vfio.git tags/vfio-v5.13-rc1pt2
-X-PR-Tracked-Commit-Id: cc35518d29bc8e38902866b74874b4a3f1ad3617
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: a2de4bbddce3e98bd2444bb027dc84418a0066b1
-Message-Id: <162033729125.2467.13311999969059190277.pr-tracker-bot@kernel.org>
-Date:   Thu, 06 May 2021 21:41:31 +0000
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        id S230231AbhEFVvX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 17:51:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41891 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230048AbhEFVvX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 May 2021 17:51:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620337823;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Q9h3TdRqA3v9lLQkKiiTDr2ssav5eexul01Jy9Pakf4=;
+        b=CCfV5m1cWUgOFyEMAyPmn+ARdn+f6Z4jShdIcrM67+8WN+k7eQdjHbDg9fna1QYjhD2f1j
+        KS7+ozRIobcZRZQn7QOAyCHSRsuEeq5+RLKDS0GOIj7GM5v0wjVdzWzrRXx7uA19+Y8P6R
+        tfOBXfOxJTNu941JPV2lN/Tif3rm4Ts=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-196-eeDIo886N2awTTLzwNq-Ug-1; Thu, 06 May 2021 17:50:21 -0400
+X-MC-Unique: eeDIo886N2awTTLzwNq-Ug-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A7B7802938;
+        Thu,  6 May 2021 21:50:20 +0000 (UTC)
+Received: from redhat.com (ovpn-113-225.phx2.redhat.com [10.3.113.225])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 48D845D9CA;
+        Thu,  6 May 2021 21:50:05 +0000 (UTC)
+Date:   Thu, 6 May 2021 15:50:04 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc:     jmorris@namei.org, dhowells@redhat.com,
         linux-kernel@vger.kernel.org,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>, hi@alyssa.is,
-        dan.carpenter@oracle.com
+        linux-security-module@vger.kernel.org, kvm@vger.kernel.org,
+        mjg59@srcf.ucam.org, keescook@chromium.org, cohuck@redhat.com
+Subject: Re: [PATCH] vfio: Lock down no-IOMMU mode when kernel is locked
+ down
+Message-ID: <20210506155004.7e214d8f@redhat.com>
+In-Reply-To: <20210506091859.6961-1-maxime.coquelin@redhat.com>
+References: <20210506091859.6961-1-maxime.coquelin@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Thu, 6 May 2021 12:31:11 -0600:
+On Thu,  6 May 2021 11:18:59 +0200
+Maxime Coquelin <maxime.coquelin@redhat.com> wrote:
 
-> git://github.com/awilliam/linux-vfio.git tags/vfio-v5.13-rc1pt2
+> When no-IOMMU mode is enabled, VFIO is as unsafe as accessing
+> the PCI BARs via the device's sysfs, which is locked down when
+> the kernel is locked down.
+> 
+> Indeed, it is possible for an attacker to craft DMA requests
+> to modify kernel's code or leak secrets stored in the kernel,
+> since the device is not isolated by an IOMMU.
+> 
+> This patch introduces a new integrity lockdown reason for the
+> unsafe VFIO no-iommu mode.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/a2de4bbddce3e98bd2444bb027dc84418a0066b1
+I'm hoping security folks will chime in here as I'm not familiar with
+the standard practices for new lockdown reasons.  The vfio no-iommu
+backend is clearly an integrity risk, which is why it's already hidden
+behind a separate Kconfig option, requires RAWIO capabilities, and
+taints the kernel if it's used, but I agree that preventing it during
+lockdown seems like a good additional step.
 
-Thank you!
+Is it generally advised to create specific reasons, like done here, or
+should we aim to create a more generic reason related to unrestricted
+userspace DMA?
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+I understand we don't want to re-use PCI_ACCESS because the vfio
+no-iommu backend is device agnostic, it can be used for both PCI and
+non-PCI devices.
+
+> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+> ---
+>  drivers/vfio/vfio.c      | 13 +++++++++----
+>  include/linux/security.h |  1 +
+>  security/security.c      |  1 +
+>  3 files changed, 11 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index 5e631c359ef2..fe466d6ea5d8 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -25,6 +25,7 @@
+>  #include <linux/pci.h>
+>  #include <linux/rwsem.h>
+>  #include <linux/sched.h>
+> +#include <linux/security.h>
+>  #include <linux/slab.h>
+>  #include <linux/stat.h>
+>  #include <linux/string.h>
+> @@ -165,7 +166,8 @@ static void *vfio_noiommu_open(unsigned long arg)
+>  {
+>  	if (arg != VFIO_NOIOMMU_IOMMU)
+>  		return ERR_PTR(-EINVAL);
+> -	if (!capable(CAP_SYS_RAWIO))
+> +	if (!capable(CAP_SYS_RAWIO) ||
+> +			security_locked_down(LOCKDOWN_VFIO_NOIOMMU))
+>  		return ERR_PTR(-EPERM);
+>  
+>  	return NULL;
+> @@ -1280,7 +1282,8 @@ static int vfio_group_set_container(struct vfio_group *group, int container_fd)
+>  	if (atomic_read(&group->container_users))
+>  		return -EINVAL;
+>  
+> -	if (group->noiommu && !capable(CAP_SYS_RAWIO))
+> +	if (group->noiommu && (!capable(CAP_SYS_RAWIO) ||
+> +			security_locked_down(LOCKDOWN_VFIO_NOIOMMU)))
+>  		return -EPERM;
+>  
+>  	f = fdget(container_fd);
+> @@ -1362,7 +1365,8 @@ static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
+>  	    !group->container->iommu_driver || !vfio_group_viable(group))
+>  		return -EINVAL;
+>  
+> -	if (group->noiommu && !capable(CAP_SYS_RAWIO))
+> +	if (group->noiommu && (!capable(CAP_SYS_RAWIO) ||
+> +			security_locked_down(LOCKDOWN_VFIO_NOIOMMU)))
+>  		return -EPERM;
+>  
+>  	device = vfio_device_get_from_name(group, buf);
+> @@ -1490,7 +1494,8 @@ static int vfio_group_fops_open(struct inode *inode, struct file *filep)
+>  	if (!group)
+>  		return -ENODEV;
+>  
+> -	if (group->noiommu && !capable(CAP_SYS_RAWIO)) {
+> +	if (group->noiommu && (!capable(CAP_SYS_RAWIO) ||
+> +			security_locked_down(LOCKDOWN_VFIO_NOIOMMU))) {
+>  		vfio_group_put(group);
+>  		return -EPERM;
+>  	}
+
+In these cases where we're testing RAWIO, the idea is to raise the
+barrier of passing file descriptors to unprivileged users.  Is lockdown
+sufficiently static that we might really only need the test on open?
+The latter three cases here only make sense if the user were able to
+open a no-iommu context when lockdown is not enabled, then lockdown is
+later enabled preventing them from doing anything with that context...
+but not preventing ongoing unsafe usage that might already exist.  I
+suspect for that reason that lockdown is static and we really only need
+the test on open.  Thanks,
+
+Alex
+
+> diff --git a/include/linux/security.h b/include/linux/security.h
+> index 06f7c50ce77f..f29388180fab 100644
+> --- a/include/linux/security.h
+> +++ b/include/linux/security.h
+> @@ -120,6 +120,7 @@ enum lockdown_reason {
+>  	LOCKDOWN_MMIOTRACE,
+>  	LOCKDOWN_DEBUGFS,
+>  	LOCKDOWN_XMON_WR,
+> +	LOCKDOWN_VFIO_NOIOMMU,
+>  	LOCKDOWN_INTEGRITY_MAX,
+>  	LOCKDOWN_KCORE,
+>  	LOCKDOWN_KPROBES,
+> diff --git a/security/security.c b/security/security.c
+> index b38155b2de83..33c3ddb6dcab 100644
+> --- a/security/security.c
+> +++ b/security/security.c
+> @@ -58,6 +58,7 @@ const char *const lockdown_reasons[LOCKDOWN_CONFIDENTIALITY_MAX+1] = {
+>  	[LOCKDOWN_MMIOTRACE] = "unsafe mmio",
+>  	[LOCKDOWN_DEBUGFS] = "debugfs access",
+>  	[LOCKDOWN_XMON_WR] = "xmon write access",
+> +	[LOCKDOWN_VFIO_NOIOMMU] = "VFIO unsafe no-iommu mode",
+>  	[LOCKDOWN_INTEGRITY_MAX] = "integrity",
+>  	[LOCKDOWN_KCORE] = "/proc/kcore access",
+>  	[LOCKDOWN_KPROBES] = "use of kprobes",
+
