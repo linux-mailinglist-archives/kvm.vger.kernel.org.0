@@ -2,147 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F67D37598E
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 19:42:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66ACC3759A7
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 19:48:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236280AbhEFRnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 13:43:20 -0400
-Received: from out02.mta.xmission.com ([166.70.13.232]:47818 "EHLO
-        out02.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236042AbhEFRnS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 13:43:18 -0400
-Received: from in01.mta.xmission.com ([166.70.13.51])
-        by out02.mta.xmission.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <ebiederm@xmission.com>)
-        id 1lei0n-005md5-4q; Thu, 06 May 2021 11:42:09 -0600
-Received: from ip68-227-160-95.om.om.cox.net ([68.227.160.95] helo=fess.xmission.com)
-        by in01.mta.xmission.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.87)
-        (envelope-from <ebiederm@xmission.com>)
-        id 1lei0m-0003nZ-2F; Thu, 06 May 2021 11:42:08 -0600
-From:   ebiederm@xmission.com (Eric W. Biederman)
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, kexec@lists.infradead.org,
-        Joerg Roedel <jroedel@suse.de>, stable@vger.kernel.org,
-        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-References: <20210506093122.28607-1-joro@8bytes.org>
-        <20210506093122.28607-3-joro@8bytes.org>
-Date:   Thu, 06 May 2021 12:42:03 -0500
-In-Reply-To: <20210506093122.28607-3-joro@8bytes.org> (Joerg Roedel's message
-        of "Thu, 6 May 2021 11:31:22 +0200")
-Message-ID: <m17dkb4v4k.fsf@fess.ebiederm.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        id S236262AbhEFRtb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 13:49:31 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:10338 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236042AbhEFRt2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 13:49:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1620323310; x=1651859310;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-id:content-transfer-encoding:mime-version:subject;
+  bh=hjIFP8Th9zm4cQ0vMItVvNk0EEH3BVsWYq91C+wnqdA=;
+  b=epk8DEXnn64AkK2hORmLK8rBUKms5iJ6Ld4PaL7P226JLZYUKH8oVGf+
+   yiUO9V7JfDQc2jIIBYjc9hPwGFsQ/YU39pxsfkeQmLX5BWMwF8V4EVLqi
+   ga6FykMYjG6aDvMPLZkUo5jvJmysuaUSdOCADmASwEVXWu+QUKPcgS4YB
+   E=;
+X-IronPort-AV: E=Sophos;i="5.82,278,1613433600"; 
+   d="scan'208";a="133692844"
+Subject: Re: [PATCH 0/8] KVM: VMX: Implement nested TSC scaling
+Thread-Topic: [PATCH 0/8] KVM: VMX: Implement nested TSC scaling
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-2c-397e131e.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP; 06 May 2021 17:48:30 +0000
+Received: from EX13MTAUEE001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-2c-397e131e.us-west-2.amazon.com (Postfix) with ESMTPS id 4813EA17F1;
+        Thu,  6 May 2021 17:48:29 +0000 (UTC)
+Received: from EX13D08UEB004.ant.amazon.com (10.43.60.142) by
+ EX13MTAUEE001.ant.amazon.com (10.43.62.200) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 6 May 2021 17:48:27 +0000
+Received: from EX13D18EUA001.ant.amazon.com (10.43.165.58) by
+ EX13D08UEB004.ant.amazon.com (10.43.60.142) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 6 May 2021 17:48:27 +0000
+Received: from EX13D18EUA001.ant.amazon.com ([10.43.165.58]) by
+ EX13D18EUA001.ant.amazon.com ([10.43.165.58]) with mapi id 15.00.1497.015;
+ Thu, 6 May 2021 17:48:26 +0000
+From:   "Stamatis, Ilias" <ilstam@amazon.com>
+To:     "jmattson@google.com" <jmattson@google.com>,
+        "ilstam@mailbox.org" <ilstam@mailbox.org>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "zamsden@gmail.com" <zamsden@gmail.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>
+Thread-Index: AQHXQmOvrYg/PUZgSkCUzBXC0MvHl6rWsk8AgAAI8QA=
+Date:   Thu, 6 May 2021 17:48:26 +0000
+Message-ID: <fccb8b01aadfb7e53f8711100bc10dc1c98c5cd5.camel@amazon.com>
+References: <20210506103228.67864-1-ilstam@mailbox.org>
+         <CALMp9eSNHf=vmqeer+ZkRa3NhJoLMbEO+OZJaG9qf+2+TQ2grA@mail.gmail.com>
+In-Reply-To: <CALMp9eSNHf=vmqeer+ZkRa3NhJoLMbEO+OZJaG9qf+2+TQ2grA@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.165.65]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <835FC84252A86D44B6FCA5C3D9324107@amazon.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-X-XM-SPF: eid=1lei0m-0003nZ-2F;;;mid=<m17dkb4v4k.fsf@fess.ebiederm.org>;;;hst=in01.mta.xmission.com;;;ip=68.227.160.95;;;frm=ebiederm@xmission.com;;;spf=neutral
-X-XM-AID: U2FsdGVkX18K6SvQ88nM/nPpaU9bp8QcNl7ZXSm1Ea8=
-X-SA-Exim-Connect-IP: 68.227.160.95
-X-SA-Exim-Mail-From: ebiederm@xmission.com
-X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on sa02.xmission.com
-X-Spam-Level: **
-X-Spam-Status: No, score=2.0 required=8.0 tests=ALL_TRUSTED,BAYES_50,
-        DCC_CHECK_NEGATIVE,T_TM2_M_HEADER_IN_MSG,T_TooManySym_01,XMNoVowels,
-        XMSubLong autolearn=disabled version=3.4.2
-X-Spam-Virus: No
-X-Spam-Report: * -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.5000]
-        *  1.5 XMNoVowels Alpha-numberic number with no vowels
-        *  0.7 XMSubLong Long Subject
-        *  0.0 T_TM2_M_HEADER_IN_MSG BODY: No description available.
-        * -0.0 DCC_CHECK_NEGATIVE Not listed in DCC
-        *      [sa02 1397; Body=1 Fuz1=1 Fuz2=1]
-        *  0.0 T_TooManySym_01 4+ unique symbols in subject
-X-Spam-DCC: XMission; sa02 1397; Body=1 Fuz1=1 Fuz2=1 
-X-Spam-Combo: **;Joerg Roedel <joro@8bytes.org>
-X-Spam-Relay-Country: 
-X-Spam-Timing: total 608 ms - load_scoreonly_sql: 0.04 (0.0%),
-        signal_user_changed: 4.3 (0.7%), b_tie_ro: 2.8 (0.5%), parse: 1.46
-        (0.2%), extract_message_metadata: 11 (1.9%), get_uri_detail_list: 1.16
-        (0.2%), tests_pri_-1000: 6 (0.9%), tests_pri_-950: 1.07 (0.2%),
-        tests_pri_-900: 0.84 (0.1%), tests_pri_-90: 182 (30.0%), check_bayes:
-        168 (27.7%), b_tokenize: 7 (1.2%), b_tok_get_all: 26 (4.3%),
-        b_comp_prob: 2.5 (0.4%), b_tok_touch_all: 130 (21.3%), b_finish: 0.82
-        (0.1%), tests_pri_0: 246 (40.5%), check_dkim_signature: 0.37 (0.1%),
-        check_dkim_adsp: 2.6 (0.4%), poll_dns_idle: 140 (23.0%), tests_pri_10:
-        2.5 (0.4%), tests_pri_500: 148 (24.4%), rewrite_mail: 0.00 (0.0%)
-Subject: Re: [PATCH 2/2] x86/kexec/64: Forbid kexec when running as an SEV-ES guest
-X-Spam-Flag: No
-X-SA-Exim-Version: 4.2.1 (built Thu, 05 May 2016 13:38:54 -0600)
-X-SA-Exim-Scanned: Yes (on in01.mta.xmission.com)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Joerg Roedel <joro@8bytes.org> writes:
-
-> From: Joerg Roedel <jroedel@suse.de>
->
-> For now, kexec is not supported when running as an SEV-ES guest. Doing
-> so requires additional hypervisor support and special code to hand
-> over the CPUs to the new kernel in a safe way.
->
-> Until this is implemented, do not support kexec in SEV-ES guests.
-
-I don't understand this.
-
-Fundamentally kexec is about doing things more or less inspite of
-what the firmware is doing.
-
-I don't have any idea what a SEV-ES is.  But the normal x86 boot doesn't
-do anything special.  Is cross cpu IPI emulation buggy?
-
-If this is a move in your face hypervisor like Xen is sometimes I can
-see perhaps needing a little bit of different work during bootup.
-Perhaps handing back a cpu on system shutdown and asking for more cpus
-on system boot up.
-
-What is the actual problem you are trying to avoid?
-
-And yes for a temporary hack the suggestion of putting code into
-machine_kexec_prepare seems much more reasonable so we don't have to
-carry special case infrastructure for the forseeable future.
-
-Eric
-
-
-> Cc: stable@vger.kernel.org # v5.10+
-> Signed-off-by: Joerg Roedel <jroedel@suse.de>
-> ---
->  arch/x86/kernel/machine_kexec_64.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
->
-> diff --git a/arch/x86/kernel/machine_kexec_64.c b/arch/x86/kernel/machine_kexec_64.c
-> index c078b0d3ab0e..f902cc9cc634 100644
-> --- a/arch/x86/kernel/machine_kexec_64.c
-> +++ b/arch/x86/kernel/machine_kexec_64.c
-> @@ -620,3 +620,11 @@ void arch_kexec_pre_free_pages(void *vaddr, unsigned int pages)
->  	 */
->  	set_memory_encrypted((unsigned long)vaddr, pages);
->  }
-> +
-> +/*
-> + * Kexec is not supported in SEV-ES guests yet
-> + */
-> +bool arch_kexec_supported(void)
-> +{
-> +	return !sev_es_active();
-> +}
+T24gVGh1LCAyMDIxLTA1LTA2IGF0IDEwOjE2IC0wNzAwLCBKaW0gTWF0dHNvbiB3cm90ZToNCj4g
+T24gVGh1LCBNYXkgNiwgMjAyMSBhdCAzOjM0IEFNIDxpbHN0YW1AbWFpbGJveC5vcmc+IHdyb3Rl
+Og0KPiA+IA0KPiA+IEZyb206IElsaWFzIFN0YW1hdGlzIDxpbHN0YW1AYW1hem9uLmNvbT4NCj4g
+PiANCj4gPiBLVk0gY3VycmVudGx5IHN1cHBvcnRzIGhhcmR3YXJlLWFzc2lzdGVkIFRTQyBzY2Fs
+aW5nIGJ1dCBvbmx5IGZvciBMMQ0KPiA+IGFuZCBpdA0KPiA+IGRvZXNuJ3QgZXhwb3NlIHRoZSBm
+ZWF0dXJlIHRvIG5lc3RlZCBndWVzdHMuIFRoaXMgcGF0Y2ggc2VyaWVzIGFkZHMNCj4gPiBzdXBw
+b3J0IGZvcg0KPiA+IG5lc3RlZCBUU0Mgc2NhbGluZyBhbmQgYWxsb3dzIGJvdGggTDEgYW5kIEwy
+IHRvIGJlIHNjYWxlZCB3aXRoDQo+ID4gZGlmZmVyZW50DQo+ID4gc2NhbGluZyBmYWN0b3JzLg0K
+PiA+IA0KPiA+IFdoZW4gc2NhbGluZyBhbmQgb2Zmc2V0dGluZyBpcyBhcHBsaWVkLCB0aGUgVFND
+IGZvciB0aGUgZ3Vlc3QgaXMNCj4gPiBjYWxjdWxhdGVkIGFzOg0KPiA+IA0KPiA+IChUU0MgKiBt
+dWx0aXBsaWVyID4+IDQ4KSArIG9mZnNldA0KPiA+IA0KPiA+IFdpdGggbmVzdGVkIHNjYWxpbmcg
+dGhlIHZhbHVlcyBpbiBWTUNTMDEgYW5kIFZNQ1MxMiBuZWVkIHRvIGJlDQo+ID4gbWVyZ2VkDQo+
+ID4gdG9nZXRoZXIgYW5kIHN0b3JlZCBpbiBWTUNTMDIuDQo+ID4gDQo+ID4gVGhlIFZNQ1MwMiB2
+YWx1ZXMgYXJlIGNhbGN1bGF0ZWQgYXMgZm9sbG93czoNCj4gPiANCj4gPiBvZmZzZXRfMDIgPSAo
+KG9mZnNldF8wMSAqIG11bHRfMTIpID4+IDQ4KSArIG9mZnNldF8xMg0KPiA+IG11bHRfMDIgPSAo
+bXVsdF8wMSAqIG11bHRfMTIpID4+IDQ4DQo+ID4gDQo+ID4gVGhlIGxhc3QgcGF0Y2ggb2YgdGhl
+IHNlcmllcyBhZGRzIGEgS1ZNIHNlbGZ0ZXN0Lg0KPiANCj4gV2lsbCB5b3UgYmUgZG9pbmcgdGhl
+IHNhbWUgZm9yIFNWTT8gVGhlIGxhc3QgdGltZSBJIHRyaWVkIHRvIGFkZCBhDQo+IG5lc3RlZCB2
+aXJ0dWFsaXphdGlvbiBmZWF0dXJlIGZvciBJbnRlbCBvbmx5LCBQYW9sbyByYXBwZWQgbXkga251
+Y2tsZXMNCj4gd2l0aCBhIHJ1bGVyLg0KDQpZZXMsIEkgY2FuIHRyeSBkbyB0aGlzLCBpZiBpdCdz
+IG5vdCBtdWNoIG1vcmUgY29tcGxpY2F0ZWQsIG9uY2UgSSBnZXQNCmFjY2VzcyB0byBBTUQgaGFy
+ZHdhcmUuIA0KDQpCdXQgSSBzdXBwb3NlIHRoaXMgc2VyaWVzIGlzIHN0YW5kYWxvbmUgYW5kIGNv
+dWxkIGJlIG1lcmdlZCBzZXBhcmF0ZWx5Pw0KQnkgdGFraW5nIGEgcXVpY2sgbG9vayBpdCBzZWVt
+cyB0aGF0IFNWTSBleHBvc2VzIGZhciBsZXNzIGZlYXR1cmVzIHRvDQpuZXN0ZWQgZ3Vlc3RzIHRo
+YW4gVk1YIGRvZXMgYW55d2F5Lg0KDQpJbGlhcw0K
