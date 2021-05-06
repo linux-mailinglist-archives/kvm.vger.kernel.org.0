@@ -2,154 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A054A375323
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 13:43:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E22DD3753D3
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 14:27:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229921AbhEFLoh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 07:44:37 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:17135 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229777AbhEFLog (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 07:44:36 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FbWpr1xXDzqSfJ;
-        Thu,  6 May 2021 19:40:20 +0800 (CST)
-Received: from [10.174.185.179] (10.174.185.179) by
- DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 6 May 2021 19:43:26 +0800
-Subject: Re: [PATCH v2 03/11] KVM: arm64: Make kvm_skip_instr() and co private
- to HYP
-To:     Marc Zyngier <maz@kernel.org>
-CC:     <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <kernel-team@android.com>, Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Andrew Scull <ascull@google.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Quentin Perret <qperret@google.com>,
-        David Brazdil <dbrazdil@google.com>
-References: <20201102164045.264512-1-maz@kernel.org>
- <20201102164045.264512-4-maz@kernel.org>
- <cef3517b-e66d-4d26-68a9-2d5fb433377c@huawei.com>
- <875yzxnn5w.wl-maz@kernel.org> <87zgx8mkwd.wl-maz@kernel.org>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <db784fc8-3a52-49ff-0b75-83a1bbc81d98@huawei.com>
-Date:   Thu, 6 May 2021 19:43:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S231422AbhEFM2w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 08:28:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49155 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229921AbhEFM2v (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 May 2021 08:28:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620304072;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xgSadxMph4w8kdj7Ae9ltL+71dKAfC6hOMn4oBADA6s=;
+        b=chAWNVIcaRi7wKD4oreh6gW0EE8nnvo35AQ2gRoGEoGfL/ex6Gtrp0Vues56NJqs/3XCIY
+        LJ4umP5FuY9/WVB7VaveLWaAzOwWXSd/R9eJCfLUZhiTrDR0ZjuH+DNohvxYYAntulSzu9
+        8EmZGKdP6xQV4dtAG2IHhjjzGgJroc8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-3-5rKzy72EOz-gMj98MzJ5Pw-1; Thu, 06 May 2021 08:27:51 -0400
+X-MC-Unique: 5rKzy72EOz-gMj98MzJ5Pw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7578881840B;
+        Thu,  6 May 2021 12:27:49 +0000 (UTC)
+Received: from [10.36.113.191] (ovpn-113-191.ams2.redhat.com [10.36.113.191])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2254910023AB;
+        Thu,  6 May 2021 12:27:43 +0000 (UTC)
+Subject: Re: [PATCH v2 1/5] KVM: selftests: Rename vm_handle_exception
+To:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     pbonzini@redhat.com, maz@kernel.org, drjones@redhat.com,
+        alexandru.elisei@arm.com
+References: <20210430232408.2707420-1-ricarkol@google.com>
+ <20210430232408.2707420-2-ricarkol@google.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <0e0e8341-9c4d-13e8-f037-e84f0ee291dd@redhat.com>
+Date:   Thu, 6 May 2021 14:27:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <87zgx8mkwd.wl-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20210430232408.2707420-2-ricarkol@google.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.185.179]
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/5/6 14:33, Marc Zyngier wrote:
-> On Wed, 05 May 2021 17:46:51 +0100,
-> Marc Zyngier <maz@kernel.org> wrote:
->>
->> Hi Zenghui,
->>
->> On Wed, 05 May 2021 15:23:02 +0100,
->> Zenghui Yu <yuzenghui@huawei.com> wrote:
->>>
->>> Hi Marc,
->>>
->>> On 2020/11/3 0:40, Marc Zyngier wrote:
->>>> In an effort to remove the vcpu PC manipulations from EL1 on nVHE
->>>> systems, move kvm_skip_instr() to be HYP-specific. EL1's intent
->>>> to increment PC post emulation is now signalled via a flag in the
->>>> vcpu structure.
->>>>
->>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>>
->>> [...]
->>>
->>>> @@ -133,6 +134,8 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
->>>>  	__load_guest_stage2(vcpu->arch.hw_mmu);
->>>>  	__activate_traps(vcpu);
->>>> +	__adjust_pc(vcpu);
->>>
->>> If the INCREMENT_PC flag was set (e.g., for WFx emulation) while we're
->>> handling PSCI CPU_ON call targetting this VCPU, the *target_pc* (aka
->>> entry point address, normally provided by the primary VCPU) will be
->>> unexpectedly incremented here. That's pretty bad, I think.
->>
->> How can you online a CPU using PSCI if that CPU is currently spinning
->> on a WFI? Or is that we have transitioned via userspace to perform the
->> vcpu reset? I can imagine it happening in that case.
+Hi Ricardo,
 
-I hadn't tried to reset VCPU from userspace. That would be a much easier
-way to reproduce this problem.
-
->>> This was noticed with a latest guest kernel, at least with commit
->>> dccc9da22ded ("arm64: Improve parking of stopped CPUs"), which put the
->>> stopped VCPUs in the WFx loop. The guest kernel shouted at me that
->>>
->>> 	"CPU: CPUs started in inconsistent modes"
->>
->> Ah, the perks of running guests with "quiet"... Well caught.
->>
->>> *after* rebooting. The problem is that the secondary entry point was
->>> corrupted by KVM as explained above. All of the secondary processors
->>> started from set_cpu_boot_mode_flag(), with w0=0. Oh well...
->>>
->>> I write the below diff and guess it will help. But I have to look at all
->>> other places where we adjust PC directly to make a right fix. Please let
->>> me know what do you think.
->>>
->>>
->>> Thanks,
->>> Zenghui
->>>
->>> ---->8----
->>> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
->>> index 956cdc240148..ed647eb387c3 100644
->>> --- a/arch/arm64/kvm/reset.c
->>> +++ b/arch/arm64/kvm/reset.c
->>> @@ -265,7 +265,12 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->>>  		if (vcpu->arch.reset_state.be)
->>>  			kvm_vcpu_set_be(vcpu);
->>>
->>> +		/*
->>> +		 * Don't bother with the KVM_ARM64_INCREMENT_PC flag while
->>> +		 * using this version of __adjust_pc().
->>> +		 */
->>>  		*vcpu_pc(vcpu) = target_pc;
->>> +		vcpu->arch.flags &= ~KVM_ARM64_INCREMENT_PC;
+On 5/1/21 1:24 AM, Ricardo Koller wrote:
+> Rename the vm_handle_exception function to a name that indicates more
+> clearly that it installs something: vm_install_vector_handler.
 > 
-> Actually, this is far worse than it looks, and this only papers over
-> one particular symptom. We need to resolve all pending PC updates
-> *before* returning to userspace, or things like live migration can
-> observe an inconsistent state.
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Suggested-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Ah yeah, agreed.
+Thanks
 
-Apart from the PC manipulation, I noticed that when handling the user
-GET_VCPU_EVENTS request:
+Eric
 
-|	/*
-|	 * We never return a pending ext_dabt here because we deliver it to
-|	 * the virtual CPU directly when setting the event and it's no longer
-|	 * 'pending' at this point.
-|	 */
+> ---
+>  tools/testing/selftests/kvm/include/x86_64/processor.h    | 2 +-
+>  tools/testing/selftests/kvm/lib/x86_64/processor.c        | 4 ++--
+>  tools/testing/selftests/kvm/x86_64/kvm_pv_test.c          | 2 +-
+>  .../selftests/kvm/x86_64/userspace_msr_exit_test.c        | 8 ++++----
+>  tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c       | 2 +-
+>  5 files changed, 9 insertions(+), 9 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> index 0b30b4e15c38..12889d3e8948 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> @@ -391,7 +391,7 @@ struct ex_regs {
+>  
+>  void vm_init_descriptor_tables(struct kvm_vm *vm);
+>  void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid);
+> -void vm_handle_exception(struct kvm_vm *vm, int vector,
+> +void vm_install_vector_handler(struct kvm_vm *vm, int vector,
+>  			void (*handler)(struct ex_regs *));
+>  
+>  /*
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index a8906e60a108..e156061263a6 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -1250,8 +1250,8 @@ void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid)
+>  	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
+>  }
+>  
+> -void vm_handle_exception(struct kvm_vm *vm, int vector,
+> -			 void (*handler)(struct ex_regs *))
+> +void vm_install_vector_handler(struct kvm_vm *vm, int vector,
+> +			       void (*handler)(struct ex_regs *))
+>  {
+>  	vm_vaddr_t *handlers = (vm_vaddr_t *)addr_gva2hva(vm, vm->handlers);
+>  
+> diff --git a/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c b/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c
+> index 732b244d6956..5ae5f748723a 100644
+> --- a/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c
+> @@ -227,7 +227,7 @@ int main(void)
+>  
+>  	vm_init_descriptor_tables(vm);
+>  	vcpu_init_descriptor_tables(vm, VCPU_ID);
+> -	vm_handle_exception(vm, GP_VECTOR, guest_gp_handler);
+> +	vm_install_vector_handler(vm, GP_VECTOR, guest_gp_handler);
+>  
+>  	enter_guest(vm);
+>  	kvm_vm_free(vm);
+> diff --git a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+> index 72c0d0797522..20c373e2d329 100644
+> --- a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+> @@ -574,7 +574,7 @@ static void test_msr_filter_allow(void) {
+>  	vm_init_descriptor_tables(vm);
+>  	vcpu_init_descriptor_tables(vm, VCPU_ID);
+>  
+> -	vm_handle_exception(vm, GP_VECTOR, guest_gp_handler);
+> +	vm_install_vector_handler(vm, GP_VECTOR, guest_gp_handler);
+>  
+>  	/* Process guest code userspace exits. */
+>  	run_guest_then_process_rdmsr(vm, MSR_IA32_XSS);
+> @@ -588,12 +588,12 @@ static void test_msr_filter_allow(void) {
+>  	run_guest_then_process_wrmsr(vm, MSR_NON_EXISTENT);
+>  	run_guest_then_process_rdmsr(vm, MSR_NON_EXISTENT);
+>  
+> -	vm_handle_exception(vm, UD_VECTOR, guest_ud_handler);
+> +	vm_install_vector_handler(vm, UD_VECTOR, guest_ud_handler);
+>  	run_guest(vm);
+> -	vm_handle_exception(vm, UD_VECTOR, NULL);
+> +	vm_install_vector_handler(vm, UD_VECTOR, NULL);
+>  
+>  	if (process_ucall(vm) != UCALL_DONE) {
+> -		vm_handle_exception(vm, GP_VECTOR, guest_fep_gp_handler);
+> +		vm_install_vector_handler(vm, GP_VECTOR, guest_fep_gp_handler);
+>  
+>  		/* Process emulated rdmsr and wrmsr instructions. */
+>  		run_guest_then_process_rdmsr(vm, MSR_IA32_XSS);
+> diff --git a/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c b/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
+> index 2f964cdc273c..ded70ff465d5 100644
+> --- a/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
+> @@ -462,7 +462,7 @@ int main(int argc, char *argv[])
+>  
+>  	vm_init_descriptor_tables(vm);
+>  	vcpu_init_descriptor_tables(vm, HALTER_VCPU_ID);
+> -	vm_handle_exception(vm, IPI_VECTOR, guest_ipi_handler);
+> +	vm_install_vector_handler(vm, IPI_VECTOR, guest_ipi_handler);
+>  
+>  	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA, 0);
+>  
+> 
 
-Which isn't true anymore now that we defer the exception injection right
-before the VCPU entry. The comment needs to be updated anyway whilst it
-isn't clear to me that whether we should expose the in-kernel ext_dabt
-to userspace, given that the exception state is already reflected by the
-registers and the abort can be taken in the next VCPU entry (if we can
-appropriately fix the PC updating problem).
-
-> I'll try and cook something up.
-
-Thanks.
-
-
-Zenghui
