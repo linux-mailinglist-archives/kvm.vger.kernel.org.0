@@ -2,58 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB0863754AF
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 15:27:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F8FE3754D7
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 15:37:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233714AbhEFN2K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 09:28:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33160 "EHLO
+        id S234179AbhEFNiB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 09:38:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230381AbhEFN2I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 09:28:08 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36B0AC061574
-        for <kvm@vger.kernel.org>; Thu,  6 May 2021 06:27:10 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id s6so6131182edu.10
-        for <kvm@vger.kernel.org>; Thu, 06 May 2021 06:27:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=5lD39euqnLLWALUOK+cga3/qrcq4Set5HCzS7aBLz9o=;
-        b=NA75tt5dKKdI2X66eVrKmGUQboAhgTcJukjLu+g2K/7PjkOtAMNMetve2bwb0kaIjS
-         qc6/SpOr/IS6Kc5zwyUm0xGMoy8T0wbwdR2SOdVOIa5NTM34AeDBpO6Yg7ZHnFllA6Lm
-         WIgvknx4g/lq59aFAX/A4o+9/Jstm4F4EF5cprMGSeOM8AZRL+sikwNefXmuDS15sof9
-         691lmBZccs0qoaTKHuVCbUpKcUEDBX3DYVy/sH/rPrzytZtUssE0/RzMabd9SdFfx6Vk
-         mv4h6xpvyo7hi2Na7XQXx5PX94Orr0oMoxwW5icozWIe0sn/QLEMShPRaDElLw8EX0Be
-         tHTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=5lD39euqnLLWALUOK+cga3/qrcq4Set5HCzS7aBLz9o=;
-        b=TTszOGvvILC7zD2pLVJkf5rtCCZTkV77oqzY1sGohK1cLL+v2DpAO85AVQ+CXPM6AR
-         z+//IidlQW0J3nmeZzm7JMD8Md+07GDX85Wfhi8baK8mzntZxcSMCcziBA78vPG5x25n
-         mzlR/RpbrR26bgvZVGY8Oth5UNHICyYOFlDhEFNuFh8x/fe5B1JFtxNtFlP2k1Uu50af
-         CDjwpv3qf7GyO/KopwBruNmEZoiN7eva0idrk+t5wcYrdmCk8LD++V3MpLpVIJGAtMk/
-         CKvbixjml3uEl3FgW7zkl2Q9XU2pyLEgD7PT7L8Pk2wg+6oSX8ayc3ea12CK7LUwQEau
-         +xNw==
-X-Gm-Message-State: AOAM531D6bfINOKt7jbWsr6jiz+1hG3pq6WlRaf09nPL0wMgnfb0Brwm
-        lhvKQkTS3foHqNEBB7t+bLRIq3JfvNzmf7gnvFo=
-X-Google-Smtp-Source: ABdhPJzUE/X1AOoMIfXvXem2bMnyCLSMVxRWHYjFLwrW5yhtmp9YxR93tgBKnbRMWenMgxZMp/NWtT+nrbKFYV6hMlY=
-X-Received: by 2002:a05:6402:22c3:: with SMTP id dm3mr5336465edb.307.1620307628951;
- Thu, 06 May 2021 06:27:08 -0700 (PDT)
+        with ESMTP id S233461AbhEFNh5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 09:37:57 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30A47C061761;
+        Thu,  6 May 2021 06:36:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=cZKl1g221hvgsUM4ruH5PC7LZQBfPUMAAeP8YaPjGAU=; b=iCvBIdp7CfSO/0BJGcxbWozcPf
+        t5+tSFPC4ck12ybfCEVvVxo8U9LY1fxOS9JBCsesLSJjScpvyFriKQ5I121sTTU1wduIRAToqxDWQ
+        GUihxZ+vvPpjjBG0m720St9/4O5srJjJswCAjDCQDB2hZTwbdav9kAZIHPV6njAwGAGhzH6xRvEqz
+        Cwd2WqijKlvf7k5hA1Ys4CSZ4t3jNrVLPEMozQv6gelS2+1Bzb6NL82XwqXWmUaLKKA+giVqeDHYN
+        e9oTf6PG6n/UTia4wqFcyPO9x27cCS8wnVcM6LiKUFR8vSJDzU8TZk0je2A9cZctcj2GA0skSqibN
+        MTKubsqA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lee9l-001lUf-GN; Thu, 06 May 2021 13:35:26 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 031A93001DB;
+        Thu,  6 May 2021 15:35:07 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id D2CEC202641BA; Thu,  6 May 2021 15:35:07 +0200 (CEST)
+Date:   Thu, 6 May 2021 15:35:07 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, x86@kernel.org,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: KVM: x86: Prevent deadlock against tk_core.seq
+Message-ID: <YJPwi0FSObIjOSd7@hirez.programming.kicks-ass.net>
+References: <87h7jgm1zy.ffs@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Received: by 2002:a05:6402:1053:0:0:0:0 with HTTP; Thu, 6 May 2021 06:27:08
- -0700 (PDT)
-Reply-To: nascointt@hotmail.com
-From:   Nayef Abu Sakran <chrisdicksonchris@gmail.com>
-Date:   Thu, 6 May 2021 14:27:08 +0100
-Message-ID: <CAKhAfvi6Zfgt=SCHqZJKX5tPJQNbxJkXddVe4nwHRN984e=OVQ@mail.gmail.com>
-Subject: mail pls
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87h7jgm1zy.ffs@nanos.tec.linutronix.de>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Did you received the mail i send to you?
+On Thu, May 06, 2021 at 03:21:37PM +0200, Thomas Gleixner wrote:
+> syzbot reported a possible deadlock in pvclock_gtod_notify():
+> 
+> CPU 0  		  	   	    	    CPU 1
+> write_seqcount_begin(&tk_core.seq);
+>   pvclock_gtod_notify()			    spin_lock(&pool->lock);
+>     queue_work(..., &pvclock_gtod_work)	    ktime_get()
+>      spin_lock(&pool->lock);		      do {
+>      						seq = read_seqcount_begin(tk_core.seq)
+> 						...
+> 				              } while (read_seqcount_retry(&tk_core.seq, seq);
+> 
+> While this is unlikely to happen, it's possible.
+> 
+> Delegate queue_work() to irq_work() which postpones it until the
+> tk_core.seq write held region is left and interrupts are reenabled.
+> 
+> Fixes: 16e8d74d2da9 ("KVM: x86: notifier for clocksource changes")
+> Reported-by: syzbot+6beae4000559d41d80f8@syzkaller.appspotmail.com
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
