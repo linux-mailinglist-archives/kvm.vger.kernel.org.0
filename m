@@ -2,92 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DD323757C5
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 17:43:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B29BD3757C9
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 17:43:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235346AbhEFPoE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 11:44:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25347 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235145AbhEFPn6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 May 2021 11:43:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620315779;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4KmRXMHEZ+tVNwwgfG0qof+36HnLMbB1FdIrxdalX6M=;
-        b=BquaxmH/Z5+T/EjIDNfbS4m3MA7rb9E8fgwqHemxL3RDDlmpxSkKySQ4vyK8tSxgbX5gmi
-        Z+8tzyQMDxIl6Ntw0Nls7U+FPIy6Q/+1NreJz45Pxd6HJls9Mfy5azf2wfKiGK3v47C6Ou
-        hxda2q4SWXLBB3wh5HVnM234id5O5NA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-HqYu6-wIOUGL-HnIy_9qew-1; Thu, 06 May 2021 11:42:56 -0400
-X-MC-Unique: HqYu6-wIOUGL-HnIy_9qew-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D196D80ED9B;
-        Thu,  6 May 2021 15:42:54 +0000 (UTC)
-Received: from [10.3.113.56] (ovpn-113-56.phx2.redhat.com [10.3.113.56])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A7CAE60862;
-        Thu,  6 May 2021 15:42:50 +0000 (UTC)
-Subject: Re: [PATCH v2 4/9] bsd-user/syscall: Replace alloca() by g_new()
-To:     Warner Losh <imp@bsdimp.com>
-Cc:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>, Kyle Evans <kevans@freebsd.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        qemu-arm <qemu-arm@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20210506133758.1749233-1-philmd@redhat.com>
- <20210506133758.1749233-5-philmd@redhat.com>
- <CANCZdfoJWEbPFvZ0605riUfnpVRAeC6Feem5_ahC7FUfO71-AA@mail.gmail.com>
- <39f12704-af5c-2e4f-d872-a860d9a870d7@redhat.com>
- <CANCZdfqW0XTa18F+JxuSnhpictWxVJUsu87c=yAwMp6YT60FMg@mail.gmail.com>
- <7a96d45e-2bdc-f699-96f7-3fbf607cb06b@redhat.com>
- <CANCZdfrcv9ZUcBv7z+z3JPCjy0uzzY07VLmC4dqr5r8ba_QPLw@mail.gmail.com>
-From:   Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <adfc5da4-a615-24d7-0c67-f04d4eaec9a6@redhat.com>
-Date:   Thu, 6 May 2021 10:42:50 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S235481AbhEFPon (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 11:44:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36130 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236166AbhEFPo1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 11:44:27 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B77C1C061574
+        for <kvm@vger.kernel.org>; Thu,  6 May 2021 08:43:28 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id i190so5367655pfc.12
+        for <kvm@vger.kernel.org>; Thu, 06 May 2021 08:43:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=LcIFfAB5skjGeyCAD2QMmjpF+VNCcVetb+lsu2lskTY=;
+        b=Z2vGGhLZma2sfvQ1r1IYFoiaBh/8OD45lcuCFUx7hhUR4L0p3zrETc8AvA/i9r3vZK
+         BMwvJeQ4BZ5BK7rSNnP8T9XZf5Go+XMFA7h6OEq4uO/7W5leKfZffK8CvY4NbCvXhxS1
+         +m2no7ilCyqCmnV8YdDQnVBqeCST3QB89YIpUzF0tWlkBe3u5efC0UcjqpaG+kcM+lih
+         9HBCQvXchWCyikzB2vtYrg8qydzk0U/IVFI/aGscicVtEDbCTgKevXCfP0Mk+2xMKjvC
+         xtmveXOWb321zTVdDQbYe5Sw4r6x40mjMgj1SB81L5LiCykz4AW1tm9cSkv//4kBbbbL
+         NO3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=LcIFfAB5skjGeyCAD2QMmjpF+VNCcVetb+lsu2lskTY=;
+        b=HrRufpZlud7nRFJsVN2qNpWe1zRg+d+n1Cp5dacmDlW/NT0BvFyH/oMazIhugzoOdr
+         lCVr+xdq5KpD2gsrZX49o1pXbxkgBWoftUPmawQqDYqC3FwQGG68Sj7qapUwLPO6fnZG
+         TeywVcUXBGGk3/tUwpj5tKXGVbU2mNaSCsZXGY+3gBMRekHFab8PEDiaJHS6ISZLp7un
+         WolBA0oLJ/ssf7ZdAZBPLsdaSF6Xp7LGD8TZkpjzvigkACupC17MKqMYvUJHtYMHfmGJ
+         xZBLAe4SlZxDHVDxK63W6QWFP39+FVPX3RFAWQ+LmoGTJn7FNxvPXOsWe8fkzGS/pNYN
+         RAOw==
+X-Gm-Message-State: AOAM533NsCeXR9lbI7+5gZvhUXNaybA0ZM27ArRiGJ5BYdAfIDZW9dvk
+        z8JQFmCamjgXiIMJFO3/JEjheg==
+X-Google-Smtp-Source: ABdhPJwzg5Yk54M6Dkv5tgc2Fqqb0Cj/1kw7CHpPzP+oLwemOrk0iU1SGCVH9hc+g3ixgndN+qF/bg==
+X-Received: by 2002:a63:e712:: with SMTP id b18mr4963082pgi.2.1620315807827;
+        Thu, 06 May 2021 08:43:27 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id 187sm2501268pff.139.2021.05.06.08.43.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 May 2021 08:43:27 -0700 (PDT)
+Date:   Thu, 6 May 2021 15:43:23 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     Eric Biederman <ebiederm@xmission.com>, x86@kernel.org,
+        kexec@lists.infradead.org, Joerg Roedel <jroedel@suse.de>,
+        stable@vger.kernel.org, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH 1/2] kexec: Allow architecture code to opt-out at runtime
+Message-ID: <YJQOmxx1EMUqNpNn@google.com>
+References: <20210506093122.28607-1-joro@8bytes.org>
+ <20210506093122.28607-2-joro@8bytes.org>
 MIME-Version: 1.0
-In-Reply-To: <CANCZdfrcv9ZUcBv7z+z3JPCjy0uzzY07VLmC4dqr5r8ba_QPLw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210506093122.28607-2-joro@8bytes.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/6/21 10:30 AM, Warner Losh wrote:
-
+On Thu, May 06, 2021, Joerg Roedel wrote:
+> From: Joerg Roedel <jroedel@suse.de>
 > 
-> But for the real answer, I need to contact the original authors of
-> this part of the code (they are no longer involved day-to-day in
-> the bsd-user efforts) to see if this scenario is possible or not. If
-> it's easy to find out that way, we can either know this is safe to
-> do, or if effort is needed to make it safe. At present, I've seen
-> enough and chatted enough with others to be concerned that
-> the change would break proper emulation.
+> Allow a runtime opt-out of kexec support for architecture code in case
+> the kernel is running in an environment where kexec is not properly
+> supported yet.
+> 
+> This will be used on x86 when the kernel is running as an SEV-ES
+> guest. SEV-ES guests need special handling for kexec to hand over all
+> CPUs to the new kernel. This requires special hypervisor support and
+> handling code in the guest which is not yet implemented.
+> 
+> Cc: stable@vger.kernel.org # v5.10+
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> ---
+>  kernel/kexec.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+> 
+> diff --git a/kernel/kexec.c b/kernel/kexec.c
+> index c82c6c06f051..d03134160458 100644
+> --- a/kernel/kexec.c
+> +++ b/kernel/kexec.c
+> @@ -195,11 +195,25 @@ static int do_kexec_load(unsigned long entry, unsigned long nr_segments,
+>   * that to happen you need to do that yourself.
+>   */
+>  
+> +bool __weak arch_kexec_supported(void)
+> +{
+> +	return true;
+> +}
+> +
+>  static inline int kexec_load_check(unsigned long nr_segments,
+>  				   unsigned long flags)
+>  {
+>  	int result;
+>  
+> +	/*
+> +	 * The architecture may support kexec in general, but the kernel could
+> +	 * run in an environment where it is not (yet) possible to execute a new
+> +	 * kernel. Allow the architecture code to opt-out of kexec support when
+> +	 * it is running in such an environment.
+> +	 */
+> +	if (!arch_kexec_supported())
+> +		return -ENOSYS;
 
-Do we have a feel for the maximum amount of memory being used by the
-various alloca() replaced in this series?  If so, can we just
-stack-allocate an array of bytes of the maximum size needed?  Then we
-avoid alloca() but also avoid the dynamic memory management that
-malloc() would introduce.  Basically, it boils down to auditing why the
-alloca() is safe, and once we know that, replacing the variable-sized
-precise alloca() with its counterpart statically-sized array allocation,
-at the expense of some wasted stack space when the runtime size does not
-use the full compile-time maximum size.
+This misses kexec_file_load.  Also, is a new hook really needed?  E.g. the
+SEV-ES check be shoved into machine_kexec_prepare().  The downside is that we'd
+do a fair amount of work before detecting failure, but that doesn't seem hugely
+problematic.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+> +
+>  	/* We only trust the superuser with rebooting the system. */
+>  	if (!capable(CAP_SYS_BOOT) || kexec_load_disabled)
+>  		return -EPERM;
+> -- 
+> 2.31.1
+> 
