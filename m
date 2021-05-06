@@ -2,120 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD39C375BA8
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 21:22:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F254375BAD
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 21:25:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233944AbhEFTXf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 15:23:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57018 "EHLO
+        id S233944AbhEFT0a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 15:26:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230375AbhEFTXf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 15:23:35 -0400
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1102C061574
-        for <kvm@vger.kernel.org>; Thu,  6 May 2021 12:22:36 -0700 (PDT)
-Received: by mail-wr1-x42f.google.com with SMTP id s8so6771536wrw.10
-        for <kvm@vger.kernel.org>; Thu, 06 May 2021 12:22:36 -0700 (PDT)
+        with ESMTP id S230375AbhEFT03 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 15:26:29 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58968C061574
+        for <kvm@vger.kernel.org>; Thu,  6 May 2021 12:25:31 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id h14-20020a17090aea8eb02901553e1cc649so4012684pjz.0
+        for <kvm@vger.kernel.org>; Thu, 06 May 2021 12:25:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=references:user-agent:from:to:cc:subject:date:in-reply-to
-         :message-id:mime-version:content-transfer-encoding;
-        bh=OcGko0AZpfeOMrm5jT5N9J347dkqKIUp28FiXKFtwdk=;
-        b=fELVnzK2+xFRsnRGPh//ft7E2TmxIFR18SqhN97yrkYySqfxwRVM7nMPS1kmx9/BX/
-         d8lCU2LfQu25BYAvEswZgx22e/LoyRz6+EIYTY4eU4ShXsZS/nYDa5+gP/KWIDKszo/c
-         M0WLyrc3i91S1+Dy53iMsyCIuA2sDNPcVDcPjPC7qyxyKhKP25ltlUClufgWfb8yGrCk
-         nuYBeT2/NCmJpSWDs9bpLugSq6FqorqXdwEsuh+hTexVA3ScBlU6LaLTbyHaC3qGg09f
-         eP09zF4EfJaaw1dnt1Ubroq5jzpysEQSFMaOeh6uqcEe9kqH31NAzOmISGT8QpyI/XLS
-         P2nA==
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=uMGMOvQ5q418Ceph1tt/bJGdVBp1Eq6LdOxVTMsFDWQ=;
+        b=wDMyPfbBA4bpoOkIxuwgizFpEga+k/0hOPxQOga3eKaFW0lQbh+WFWoo6IErzI5czg
+         XvXNSZuH+lIpNZZpvTBAAOG7GrG7SvnK+xTYIBh7TdD7HJTrR+dqJBcdS+clgDXysD5b
+         MuomI4tVmF7qds27SEfkYskITuM30kZncIbRH6hL/n35CbFEYipWwVNbNerXYk4zEgUo
+         R13BP/g2hCL8GljDA9XeNI8GivSUQjxSamLjkIqMX0BMasY4NekLVOtmINuHu62QUMFs
+         Ntq6uDBMsjjk2saXIzT920uUnZjI+/4I5UhE4CFC7HO+cxSXOVqJsrobYj21q0oRMxgG
+         PixA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
-         :in-reply-to:message-id:mime-version:content-transfer-encoding;
-        bh=OcGko0AZpfeOMrm5jT5N9J347dkqKIUp28FiXKFtwdk=;
-        b=ow0LF83YXTiUzXzkpCFc7P+rV4lLMjAvYGQ4aqBF41G1oeAZazxhFNHcd1FAlUDCMF
-         Uf4lS9NzChsMNCe6LllIwPHJ5UXusUVadAFLC7D7J6EDr8U5sK9VwGd+OLF6P8STUeQw
-         K1GXq87TnXro5AytSkPRiHMi1MXACRexZnrNkmSlCdHWFVWkaUae4213dHOdHgeXh13I
-         c0J8ThoFxe1+KOPGhdeYq9NEvy5fOObnHcXAw2QwIwKYF0NDEbgTWVGOs83LPrIqZSx7
-         pAX0rsHUXGDJA1I/aLsjAtL9q7T7UrDa5VYCR/ZGIp2HZu8RvD2c4O7IGX9uoZ2jiDFF
-         KqcA==
-X-Gm-Message-State: AOAM532eyXvFnoUrbl8bm0y87i3D8BmcmEmUgAtKIdtwy7bf9TM5GxN+
-        48HSLy+bj9bH/mikWW7MSbQ0vmTHHNSkyg==
-X-Google-Smtp-Source: ABdhPJz7hohkJdA1qQSV8cIlvzUqbOP6alUWSu9tndMQ8CfhwlXE/7/aWSvUceGtoPB3tbC5F9TWzw==
-X-Received: by 2002:a5d:6648:: with SMTP id f8mr7554311wrw.396.1620328955527;
-        Thu, 06 May 2021 12:22:35 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
-        by smtp.gmail.com with ESMTPSA id t7sm5572382wrw.60.2021.05.06.12.22.34
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=uMGMOvQ5q418Ceph1tt/bJGdVBp1Eq6LdOxVTMsFDWQ=;
+        b=OpFM1ziLgx1Gia8IOI2RVhPtI+TXMG1HhRAIwbQmTS2VZ+zGgWVICMZ4CF4W1CUMTF
+         WqJPBbqony51pg406pj6mYFwiFLCWSCaGDLPQdRsDDbDpw3IqcJVXHB39IZ0ZBza6LNC
+         CWU/o7LIYonBDx+kbPKlUL4QBHFLlQKe2znoSuz2S6En3gwO2CSalTuh7ZAqi5Yspr6Y
+         s7Fr8RGj4Rlny15VoUgheYhFKOM63tDpT2KoA4pdYQo+/84QPgPqSu63z1G3uHsHsRDx
+         2zlFg7rBKEJgUcpco59MIYuEr92ScL336v8EhfbIUd4pTJ4S8G7DCod8MVnqu+V/wfAX
+         nBwQ==
+X-Gm-Message-State: AOAM5319Antu7XSleY43gh+DjeuB6tte1VC5Qzd6FxhBIhawf/qde9L5
+        saaFEpODAPxcDqi+WadY9g5h1A==
+X-Google-Smtp-Source: ABdhPJzFysD3c1+Y2C5BLc7zv4oWvoZ4Bd+ArzikrDwphaOuc2hEETZ3Uc60xPueK9IMU7ASeduXFQ==
+X-Received: by 2002:a17:90a:8e82:: with SMTP id f2mr6111250pjo.45.1620329130671;
+        Thu, 06 May 2021 12:25:30 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id v21sm2521262pgh.12.2021.05.06.12.25.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 May 2021 12:22:34 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 811051FF7E;
-        Thu,  6 May 2021 20:22:33 +0100 (BST)
-References: <20210506133758.1749233-1-philmd@redhat.com>
- <20210506133758.1749233-8-philmd@redhat.com>
-User-agent: mu4e 1.5.13; emacs 28.0.50
-From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-ppc@nongnu.org,
-        qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 7/9] gdbstub: Replace alloca() + memset(0) by g_new0()
-Date:   Thu, 06 May 2021 20:22:01 +0100
-In-reply-to: <20210506133758.1749233-8-philmd@redhat.com>
-Message-ID: <87v97vmzuu.fsf@linaro.org>
+        Thu, 06 May 2021 12:25:30 -0700 (PDT)
+Date:   Thu, 6 May 2021 19:25:26 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jacob Xu <jacobhxu@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        kvm list <kvm@vger.kernel.org>
+Subject: Re: [kvm-unit-tests PATCH v2] x86: Do not assign values to unaligned
+ pointer to 128 bits
+Message-ID: <YJRCpv9O/Q24DKmZ@google.com>
+References: <20210506184925.290359-1-jacobhxu@google.com>
+ <YJQ8NN6EzzZEiJ6a@google.com>
+ <CAJ5mJ6gYmwXEQZASk8A_Ozt6asW6ZDTnDs83nCfLNTa62x7n+g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJ5mJ6gYmwXEQZASk8A_Ozt6asW6ZDTnDs83nCfLNTa62x7n+g@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, May 06, 2021, Jacob Xu wrote:
+> > memset() takes a void *, which it casts to an char, i.e. it works on one byte at
+> a time.
+> Huh, TIL. Based on this I'd thought that I don't need a cast at all,
+> but doing so actually results in a movaps instruction.
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+Ewwww.  That's likely because emulator.c does:
 
-> The ALLOCA(3) man-page mentions its "use is discouraged".
->
-> Replace the alloca() and memset(0) calls by g_new0().
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+  #define memset __builtin_memset
 
-Please see:
+and the compiler is clever enough to know that __attribute__((vector_size(16)))
+means the variable is (supposed to be) aligned.
 
-  Subject: [ALT PATCH] gdbstub: Replace GdbCmdContext with plain g_array()
-  Date: Thu,  6 May 2021 17:07:41 +0100
-  Message-Id: <20210506160741.9841-1-alex.bennee@linaro.org>
+> I've changed the cast back to (uint8_t *).
 
-which also includes elements of 6/9 which can be kept split off.
+I assume removing the above #define and grabbing memset() from string.c fixes
+the movaps generation?  If so, that has my vote, as opposed to fudging around
+the compiler by casting to uint8_t *.
 
-> ---
->  gdbstub.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/gdbstub.c b/gdbstub.c
-> index 7cee2fb0f1f..666053bf590 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -1487,14 +1487,13 @@ static int process_string_cmd(void *user_ctx, con=
-st char *data,
->          if (cmd->schema) {
->              int schema_len =3D strlen(cmd->schema);
->              int max_num_params =3D schema_len / 2;
-> +            g_autofree GdbCmdVariant *params =3D NULL;
->=20=20
->              if (schema_len % 2) {
->                  return -2;
->              }
->=20=20
-> -            gdb_ctx.params =3D (GdbCmdVariant *)alloca(sizeof(*gdb_ctx.p=
-arams)
-> -                                                     * max_num_params);
-> -            memset(gdb_ctx.params, 0, sizeof(*gdb_ctx.params) * max_num_=
-params);
-> +            gdb_ctx.params =3D params =3D g_new0(GdbCmdVariant, max_num_=
-params);
->=20=20
->              if (cmd_parse_params(&data[strlen(cmd->cmd)], cmd->schema,
->                                   gdb_ctx.params, &gdb_ctx.num_params)) {
-
-
---=20
-Alex Benn=C3=A9e
+As evidenced by this issue, using the compiler's memset() in kvm-unit-tests seems
+inherently dangerous since the tests are often doing intentionally stupid things.
