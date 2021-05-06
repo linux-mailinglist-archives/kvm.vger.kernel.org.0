@@ -2,175 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 37552375274
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 12:35:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 390F5375275
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 12:35:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234555AbhEFKgb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 06:36:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51128 "EHLO
+        id S234406AbhEFKgw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 06:36:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234406AbhEFKgb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 06:36:31 -0400
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [IPv6:2001:67c:2050::465:101])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42154C061574
-        for <kvm@vger.kernel.org>; Thu,  6 May 2021 03:35:33 -0700 (PDT)
+        with ESMTP id S231863AbhEFKgw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 06:36:52 -0400
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [IPv6:2001:67c:2050::465:102])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4F89C061761
+        for <kvm@vger.kernel.org>; Thu,  6 May 2021 03:35:54 -0700 (PDT)
 Received: from smtp1.mailbox.org (smtp1.mailbox.org [80.241.60.240])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4FbVN34MRqzQjmP;
-        Thu,  6 May 2021 12:35:31 +0200 (CEST)
+        by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4FbVNS0pF8zQk1H;
+        Thu,  6 May 2021 12:35:52 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mailbox.org; h=
         references:in-reply-to:message-id:date:date:subject:subject:from
-        :from:received; s=mail20150812; t=1620297328; bh=9uNWF8Xr0G9/jSz
-        HcgQqOcjiTZHBCs03GQfqI3el7nI=; b=OphBRe6c6zbEuPFTv/L43bzPdz29JxA
-        YU6Myw0IXDWEzjkI1cXu2YqgCoemMWInnKOlrte9qxqtXO5tLMLarB/UAVoJN79e
-        f1Lh9PcpS4KH7Vd0hhArqsam33vD4yz0UZGT4sh1Pz2oqbUPveNx1jbY3EAf6iM6
-        amSpQLrMwqe2i/FbRXi5867az/V6Ap8n3xzJSUZyaulhTLGipp7uyEwAzML3kd7G
-        pN5d6i8kX/4Mojdqpc5sASmtk6fdnsEZ/F0PN1mwwUbx7/1tFd6BdFD0B7O5WT2m
-        UPJJJv7P6w7XrFb1DVJ+hAq3+DV3VH2E6Vgys5gUawHgBNMW3LAoByg==
+        :from:received; s=mail20150812; t=1620297349; bh=tEybp2p8gf7yZ+6
+        LkwoThST0HRw53MFcH7vdYU00HJw=; b=wzgn2nFq00MCUz95pLq5RL0DEwQy4lL
+        7IMijFPXEpESm+2MDdvveYYwZrTmQJuvxqBE3/kWivcqT2P9FVYpcbAGuWp4Rw/6
+        14DU9PLgztfelB+2y4Vijo0+nlGmOwm5v1lGt32NaCh7ftPxCNyuhiykuJD7B0J9
+        IV9pyC+0vYxhKWK7wMr/AQvkaD4opwFdROX9G/Dxlo/NSbhaplAQj2GOA56nnHIs
+        fCzzWz9Tb34bgJmWhVBxw+sMAZadHwo5DIF0Vcy4bX44uOMMbwWoXU3bnwDaYegR
+        uVGNDNAniSSY1PmX7S92lAxQnpt8rFy4kejPGRwpO5ud02bTAA2telg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-        t=1620297329;
+        t=1620297350;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=m4l+yaalVSjEbiK6O7xAueJFYpP9C6LsbkEmolHF2zc=;
-        b=uBBuXG0UcPOhsiMSOHpa1q7ZBM2y8f0Pg/rS/bl+43t/IJI2TDagvkDpKVpchvnKu589fO
-        DUpLQoktRM0hOgFkG308QgpiYVX+qHy0P26RLGMdMXECV7qhqNciBaxfrkcSwEF53l92Mv
-        tHDPhNiWmamYcVi+NpTrzWf8ndnRCJ0DbqHoSDFZ7q9xDNYTl8oC14ui0WbMwfRE8IF6a0
-        ovXG2vtK+0DG2hYu3MdML53+OcksKgwLSTTe/P3D6Xag/7BMrATKpQAMm05zUwcm0xA9Da
-        wMx0/oeR26VDer5Wz4I9cE3CWgPiGj9VGPvHvFGMTrfYYUlCEid5lKRVoMCPTg==
+        bh=gZSRfLxHhC3FdVKaHb3Mg4nXEWDZswfrHVBWzXtiPxo=;
+        b=QBmzz/smQt3uzBwJtPIBHOc/ZKuk8d8iX9kWRQZqro8vC2Ti8sLJs88tUXKbS+/9LSTRj4
+        8N/u+xnLcBSsgqa00goLmOAsOgT/G8p51vpp3Qm/I3QeaImSR8t5NFPYjSau28BlV4cxdK
+        2fvFda5NrMGyDaCGOYtXCFRafELiCjCSNwFPqO3PpNT+yDf0Rjd4/fpmcny7rx6YTDfjN9
+        cxPn0VZX/uozCg/d8qw/YOQhGHwl7sjdX412NmnzP9Ay6animJCbkPTKRWEsiHVSKXYTiU
+        DPAQjitwXsyvle2cqnm7HllcC6KoEzFRbLUlMUNPvO7OkMC1jAHYUVXzuMXMTg==
 X-Virus-Scanned: amavisd-new at heinlein-support.de
 Received: from smtp1.mailbox.org ([80.241.60.240])
-        by spamfilter03.heinlein-hosting.de (spamfilter03.heinlein-hosting.de [80.241.56.117]) (amavisd-new, port 10030)
-        with ESMTP id 9CK4h8sfBaTP; Thu,  6 May 2021 12:35:28 +0200 (CEST)
+        by spamfilter04.heinlein-hosting.de (spamfilter04.heinlein-hosting.de [80.241.56.122]) (amavisd-new, port 10030)
+        with ESMTP id 1-E47WGN_SHf; Thu,  6 May 2021 12:35:49 +0200 (CEST)
 From:   ilstam@mailbox.org
 To:     kvm@vger.kernel.org, pbonzini@redhat.com
 Cc:     ilstam@amazon.com, seanjc@google.com, vkuznets@redhat.com,
         wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
         haozhong.zhang@intel.com, zamsden@gmail.com, mtosatti@redhat.com,
         dplotnikov@virtuozzo.com, dwmw@amazon.co.uk
-Subject: [PATCH 4/8] KVM: VMX: Adjust the TSC-related VMCS fields on L2 entry and exit
-Date:   Thu,  6 May 2021 10:32:24 +0000
-Message-Id: <20210506103228.67864-5-ilstam@mailbox.org>
+Subject: [PATCH 5/8] KVM: X86: Move tracing outside write_l1_tsc_offset()
+Date:   Thu,  6 May 2021 10:32:25 +0000
+Message-Id: <20210506103228.67864-6-ilstam@mailbox.org>
 In-Reply-To: <20210506103228.67864-1-ilstam@mailbox.org>
 References: <20210506103228.67864-1-ilstam@mailbox.org>
 X-MBO-SPAM-Probability: 
 X-Rspamd-Score: -4.11 / 15.00 / 15.00
-X-Rspamd-Queue-Id: 743A81868
-X-Rspamd-UID: 32ff15
+X-Rspamd-Queue-Id: 355691868
+X-Rspamd-UID: 2bd5a9
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 From: Ilias Stamatis <ilstam@amazon.com>
 
-When L2 is entered we need to "merge" the TSC multiplier and TSC offset
-values of VMCS01 and VMCS12 and store the result into the current
-VMCS02.
+A subsequent patch fixes write_l1_tsc_offset() to account for nested TSC
+scaling. Calculating the L1 TSC for logging it with the trace call
+becomes more complex then.
 
-The 02 values are calculated using the following equations:
-  offset_02 = ((offset_01 * mult_12) >> 48) + offset_12
-  mult_02 = (mult_01 * mult_12) >> 48
+This patch moves the trace call to the caller and avoids code
+duplication as a result too.
 
 Signed-off-by: Ilias Stamatis <ilstam@amazon.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/vmx/nested.c       | 26 ++++++++++++++++++++++----
- arch/x86/kvm/x86.c              | 25 +++++++++++++++++++++++++
- 3 files changed, 48 insertions(+), 4 deletions(-)
+ arch/x86/kvm/svm/svm.c | 4 ----
+ arch/x86/kvm/vmx/vmx.c | 3 ---
+ arch/x86/kvm/x86.c     | 4 ++++
+ 3 files changed, 4 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index cdddbf0b1177..e7a1eb36f95a 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1780,6 +1780,7 @@ void kvm_define_user_return_msr(unsigned index, u32 msr);
- int kvm_set_user_return_msr(unsigned index, u64 val, u64 mask);
- 
- u64 kvm_scale_tsc(struct kvm_vcpu *vcpu, u64 tsc, bool l1);
-+u64 kvm_compute_02_tsc_offset(u64 l1_offset, u64 l2_multiplier, u64 l2_offset);
- u64 kvm_read_l1_tsc(struct kvm_vcpu *vcpu, u64 host_tsc);
- 
- unsigned long kvm_get_linear_rip(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index bced76637823..a1bf28f33837 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3353,8 +3353,22 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 9790c73f2a32..d2f9d6a9716f 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1090,10 +1090,6 @@ static u64 svm_write_l1_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
+ 		svm->vmcb01.ptr->control.tsc_offset = offset;
  	}
  
- 	enter_guest_mode(vcpu);
--	if (vmcs12->cpu_based_vm_exec_control & CPU_BASED_USE_TSC_OFFSETTING)
--		vcpu->arch.tsc_offset += vmcs12->tsc_offset;
-+
-+	if (vmcs12->cpu_based_vm_exec_control & CPU_BASED_USE_TSC_OFFSETTING) {
-+		if (vmcs12->secondary_vm_exec_control & SECONDARY_EXEC_TSC_SCALING) {
-+			vcpu->arch.tsc_offset = kvm_compute_02_tsc_offset(
-+					vcpu->arch.l1_tsc_offset,
-+					vmcs12->tsc_multiplier,
-+					vmcs12->tsc_offset);
-+
-+			vcpu->arch.tsc_scaling_ratio = mul_u64_u64_shr(
-+					vcpu->arch.tsc_scaling_ratio,
-+					vmcs12->tsc_multiplier,
-+					kvm_tsc_scaling_ratio_frac_bits);
-+		} else {
-+			vcpu->arch.tsc_offset += vmcs12->tsc_offset;
-+		}
-+	}
+-	trace_kvm_write_tsc_offset(vcpu->vcpu_id,
+-				   svm->vmcb->control.tsc_offset - g_tsc_offset,
+-				   offset);
+-
+ 	svm->vmcb->control.tsc_offset = offset + g_tsc_offset;
  
- 	if (prepare_vmcs02(vcpu, vmcs12, &entry_failure_code)) {
- 		exit_reason.basic = EXIT_REASON_INVALID_STATE;
-@@ -4454,8 +4468,12 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
- 	if (nested_cpu_has_preemption_timer(vmcs12))
- 		hrtimer_cancel(&to_vmx(vcpu)->nested.preemption_timer);
+ 	vmcb_mark_dirty(svm->vmcb, VMCB_INTERCEPTS);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index cbe0cdade38a..49241423b854 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1812,9 +1812,6 @@ static u64 vmx_write_l1_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
+ 	    (vmcs12->cpu_based_vm_exec_control & CPU_BASED_USE_TSC_OFFSETTING))
+ 		g_tsc_offset = vmcs12->tsc_offset;
  
--	if (vmcs12->cpu_based_vm_exec_control & CPU_BASED_USE_TSC_OFFSETTING)
--		vcpu->arch.tsc_offset -= vmcs12->tsc_offset;
-+	if (vmcs12->cpu_based_vm_exec_control & CPU_BASED_USE_TSC_OFFSETTING) {
-+		vcpu->arch.tsc_offset = vcpu->arch.l1_tsc_offset;
-+
-+		if (vmcs12->secondary_vm_exec_control & SECONDARY_EXEC_TSC_SCALING)
-+			vcpu->arch.tsc_scaling_ratio = vcpu->arch.l1_tsc_scaling_ratio;
-+	}
- 
- 	if (likely(!vmx->fail)) {
- 		sync_vmcs02_to_vmcs12(vcpu, vmcs12);
+-	trace_kvm_write_tsc_offset(vcpu->vcpu_id,
+-				   vcpu->arch.tsc_offset - g_tsc_offset,
+-				   offset);
+ 	vmcs_write64(TSC_OFFSET, offset + g_tsc_offset);
+ 	return offset + g_tsc_offset;
+ }
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 26a4c0f46f15..87deb119c521 100644
+index 87deb119c521..c08295bcf50e 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -2266,6 +2266,31 @@ static u64 kvm_compute_tsc_offset(struct kvm_vcpu *vcpu, u64 target_tsc)
- 	return target_tsc - tsc;
- }
+@@ -2299,6 +2299,10 @@ EXPORT_SYMBOL_GPL(kvm_read_l1_tsc);
  
-+/*
-+ * This function computes the TSC offset that is stored in VMCS02 when entering
-+ * L2 by combining the offset and multiplier values of VMCS01 and VMCS12.
-+ */
-+u64 kvm_compute_02_tsc_offset(u64 l1_offset, u64 l2_multiplier, u64 l2_offset)
-+{
-+	u64 offset;
-+
-+	/*
-+	 * The L1 offset is interpreted as a signed number by the CPU and can
-+	 * be negative. So we extract the sign before the multiplication and
-+	 * put it back afterwards if needed.
-+	 */
-+	offset = mul_u64_u64_shr(abs((s64) l1_offset),
-+				 l2_multiplier,
-+				 kvm_tsc_scaling_ratio_frac_bits);
-+
-+	if ((s64) l1_offset < 0)
-+		offset = -((s64) offset);
-+
-+	offset += l2_offset;
-+	return offset;
-+}
-+EXPORT_SYMBOL_GPL(kvm_compute_02_tsc_offset);
-+
- u64 kvm_read_l1_tsc(struct kvm_vcpu *vcpu, u64 host_tsc)
+ static void kvm_vcpu_write_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
  {
- 	return vcpu->arch.l1_tsc_offset + kvm_scale_tsc(vcpu, host_tsc, true);
++	trace_kvm_write_tsc_offset(vcpu->vcpu_id,
++				   vcpu->arch.l1_tsc_offset,
++				   offset);
++
+ 	vcpu->arch.l1_tsc_offset = offset;
+ 	vcpu->arch.tsc_offset = static_call(kvm_x86_write_l1_tsc_offset)(vcpu, offset);
+ }
 -- 
 2.17.1
 
