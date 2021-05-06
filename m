@@ -2,122 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 455F9375D7C
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 01:34:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EBFCC375DA9
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 01:44:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232696AbhEFXfX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 19:35:23 -0400
-Received: from mga18.intel.com ([134.134.136.126]:63204 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230387AbhEFXfX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 19:35:23 -0400
-IronPort-SDR: MOyIKmpnUjhO6rDlQd8ci6kntW7ut6uMBheo2SdaTfSi9tr9QWKrqpTKwn5htWw7rC4NRZZIAs
- 8dpANCkAEwmQ==
-X-IronPort-AV: E=McAfee;i="6200,9189,9976"; a="186066173"
-X-IronPort-AV: E=Sophos;i="5.82,279,1613462400"; 
-   d="scan'208";a="186066173"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2021 16:34:24 -0700
-IronPort-SDR: a29ItPBPiJF2+Rbg6oyKknw2aJc5QqOTLlwE/V0nXITIyCut5F4lBnw4BC3x6l/uRSkqngFX3P
- RkQ0/iZCV49Q==
-X-IronPort-AV: E=Sophos;i="5.82,279,1613462400"; 
-   d="scan'208";a="608004676"
-Received: from jasonbai-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.252.141.48])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2021 16:34:22 -0700
-From:   Kai Huang <kai.huang@intel.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, bgardon@google.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, Kai Huang <kai.huang@intel.com>
-Subject: [PATCH v2 3/3] KVM: x86/mmu: Fix TDP MMU page table level
-Date:   Fri,  7 May 2021 11:34:02 +1200
-Message-Id: <d689dc6f19fc92d3db64065377df2eb48c09f07b.1620343751.git.kai.huang@intel.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <cover.1620343751.git.kai.huang@intel.com>
-References: <cover.1620343751.git.kai.huang@intel.com>
+        id S233072AbhEFXpd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 19:45:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58486 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233054AbhEFXpc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 19:45:32 -0400
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14913C061574
+        for <kvm@vger.kernel.org>; Thu,  6 May 2021 16:44:32 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id gx5so10784338ejb.11
+        for <kvm@vger.kernel.org>; Thu, 06 May 2021 16:44:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qhv1j7pNpSIh0kRrRi4C7ulLHu/0y1uR6QrzcVzsKFs=;
+        b=JjBSKDp8wLUhN5/jyijaGmw6s+ZvIJR1IOGhJcNYnkQnHiNOdJCUz6Yn4whomeuDUl
+         72RRj+Oy56L3vWffDkPVTZsZL4qnp5Cw5cHMJW14TNal8Lqkbg6PIy6ajog60qKlQOqs
+         RQtFC6gzi23b1waKUPUwxHkbs5AhOw5ohyy1R0ug+yrNIT9g123QRZX+OmoG2YVDfq67
+         5E9b9lM9JbxjMwEH0meYmCS3GzSaQbbwqP60Uycnd2kx8EvvEc5Wb7oqjNmrBTqfNb6g
+         LsqwhoDsgsvzApO/j937gaFvvWNuG1HLffmusgncLejYejG9NET1U2AsOvM59othgtgz
+         n70Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qhv1j7pNpSIh0kRrRi4C7ulLHu/0y1uR6QrzcVzsKFs=;
+        b=qi6Y0qddDOYI30imhlyqjAyl64f2HZ+OmknRle1AmSkxTLEELCiFaiwMolv5A1Cpj1
+         OlTo1rKp/Ou7PfQgnsvTKeofdLdJwR5Gq2dHtWpDfomnW5PsqbRkfOyOL8c6BO3rQLck
+         olyscZbjg4Ys8Zqt4Xb1TrsNBqB4R0wkEud2zeWfW5BYnoeCGGfZ+T56T6vheONPmO+/
+         Y4UaGGJz11EEm6pCY1PjVtT/3SiB80CiyCooRjb7bwZtrGSQp/gEJRXBfS4B1R32Oroc
+         KuKHLKoD5NE9RRsH/pjrHEweQ528nseZJ+IaV5sYCxecLjvMZQpyuF1kOThjGwOTqqtv
+         uojw==
+X-Gm-Message-State: AOAM530B+Zbqox314CVge0g4TKYbWNURTtDkYTpBecPm3C8ad+ZouRxK
+        Fck7qNRGH4u26IiV5wickphJHN7G9za6PbYeiwTPjA==
+X-Google-Smtp-Source: ABdhPJwyqAnim/mOs8BRMBMgREtD47ZlL0QgWrPMb8ZNsO6Z5Kh0yGd6zaynzhj+HKKecp7MdpBAQFkrjaecabslY6w=
+X-Received: by 2002:a17:907:3e0b:: with SMTP id hp11mr6746294ejc.171.1620344670313;
+ Thu, 06 May 2021 16:44:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210506184241.618958-1-bgardon@google.com> <20210506184241.618958-6-bgardon@google.com>
+In-Reply-To: <20210506184241.618958-6-bgardon@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Thu, 6 May 2021 16:44:19 -0700
+Message-ID: <CANgfPd-eJsHRYARTa0tm4EUVQyXvdQxGQfGfj=qLi5vkLTG6pw@mail.gmail.com>
+Subject: Re: [PATCH v3 5/8] KVM: x86/mmu: Add a field to control memslot rmap allocation
+To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TDP MMU iterator's level is identical to page table's actual level.  For
-instance, for the last level page table (whose entry points to one 4K
-page), iter->level is 1 (PG_LEVEL_4K), and in case of 5 level paging,
-the iter->level is mmu->shadow_root_level, which is 5.  However, struct
-kvm_mmu_page's level currently is not set correctly when it is allocated
-in kvm_tdp_mmu_map().  When iterator hits non-present SPTE and needs to
-allocate a new child page table, currently iter->level, which is the
-level of the page table where the non-present SPTE belongs to, is used.
-This results in struct kvm_mmu_page's level always having its parent's
-level (excpet root table's level, which is initialized explicitly using
-mmu->shadow_root_level).
+On Thu, May 6, 2021 at 11:43 AM Ben Gardon <bgardon@google.com> wrote:
+>
+> Add a field to control whether new memslots should have rmaps allocated
+> for them. As of this change, it's not safe to skip allocating rmaps, so
+> the field is always set to allocate rmaps. Future changes will make it
+> safe to operate without rmaps, using the TDP MMU. Then further changes
+> will allow the rmaps to be allocated lazily when needed for nested
+> oprtation.
+>
+> No functional change expected.
+>
+> Signed-off-by: Ben Gardon <bgardon@google.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  8 ++++++++
+>  arch/x86/kvm/mmu/mmu.c          |  2 ++
+>  arch/x86/kvm/x86.c              | 18 +++++++++++++-----
+>  3 files changed, 23 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index ad22d4839bcc..00065f9bbc5e 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1122,6 +1122,12 @@ struct kvm_arch {
+>          */
+>         spinlock_t tdp_mmu_pages_lock;
+>  #endif /* CONFIG_X86_64 */
+> +
+> +       /*
+> +        * If set, rmaps have been allocated for all memslots and should be
+> +        * allocated for any newly created or modified memslots.
+> +        */
+> +       bool memslots_have_rmaps;
+>  };
+>
+>  struct kvm_vm_stat {
+> @@ -1853,4 +1859,6 @@ static inline int kvm_cpu_get_apicid(int mps_cpu)
+>
+>  int kvm_cpu_dirty_log_size(void);
+>
+> +inline bool kvm_memslots_have_rmaps(struct kvm *kvm);
 
-This is kinda wrong, and not consistent with existing non TDP MMU code.
-Fortuantely sp->role.level is only used in handle_removed_tdp_mmu_page()
-and kvm_tdp_mmu_zap_sp(), and they are already aware of this and behave
-correctly.  However to make it consistent with legacy MMU code (and fix
-the issue that both root page table and its child page table have
-shadow_root_level), use iter->level - 1 in kvm_tdp_mmu_map(), and change
-handle_removed_tdp_mmu_page() and kvm_tdp_mmu_zap_sp() accordingly.
+Woops, this shouldn't be marked inline as it creates build problems
+for the next patch with some configs.
 
-Reviewed-by: Ben Gardon <bgardon@google.com>
-Signed-off-by: Kai Huang <kai.huang@intel.com>
----
- arch/x86/kvm/mmu/tdp_mmu.c | 8 ++++----
- arch/x86/kvm/mmu/tdp_mmu.h | 2 +-
- 2 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index c389d20418e3..a1db99d10680 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -335,7 +335,7 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
- 
- 	for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
- 		sptep = rcu_dereference(pt) + i;
--		gfn = base_gfn + (i * KVM_PAGES_PER_HPAGE(level - 1));
-+		gfn = base_gfn + i * KVM_PAGES_PER_HPAGE(level);
- 
- 		if (shared) {
- 			/*
-@@ -377,12 +377,12 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
- 			WRITE_ONCE(*sptep, REMOVED_SPTE);
- 		}
- 		handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), gfn,
--				    old_child_spte, REMOVED_SPTE, level - 1,
-+				    old_child_spte, REMOVED_SPTE, level,
- 				    shared);
- 	}
- 
- 	kvm_flush_remote_tlbs_with_address(kvm, gfn,
--					   KVM_PAGES_PER_HPAGE(level));
-+					   KVM_PAGES_PER_HPAGE(level + 1));
- 
- 	call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
- }
-@@ -1013,7 +1013,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 		}
- 
- 		if (!is_shadow_present_pte(iter.old_spte)) {
--			sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level);
-+			sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level - 1);
- 			child_pt = sp->spt;
- 
- 			new_spte = make_nonleaf_spte(child_pt,
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 5fdf63090451..7f9974c5d0b4 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -31,7 +31,7 @@ static inline bool kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, int as_id,
- }
- static inline bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
- {
--	gfn_t end = sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level);
-+	gfn_t end = sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level + 1);
- 
- 	/*
- 	 * Don't allow yielding, as the caller may have a flush pending.  Note,
--- 
-2.31.1
-
+> +
+>  #endif /* _ASM_X86_KVM_HOST_H */
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 930ac8a7e7c9..8761b4925755 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5469,6 +5469,8 @@ void kvm_mmu_init_vm(struct kvm *kvm)
+>
+>         kvm_mmu_init_tdp_mmu(kvm);
+>
+> +       kvm->arch.memslots_have_rmaps = true;
+> +
+>         node->track_write = kvm_mmu_pte_write;
+>         node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
+>         kvm_page_track_register_notifier(kvm, node);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index fc32a7dbe4c4..d7a40ce342cc 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10868,7 +10868,13 @@ static int alloc_memslot_rmap(struct kvm_memory_slot *slot,
+>         return -ENOMEM;
+>  }
+>
+> -static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
+> +bool kvm_memslots_have_rmaps(struct kvm *kvm)
+> +{
+> +       return kvm->arch.memslots_have_rmaps;
+> +}
+> +
+> +static int kvm_alloc_memslot_metadata(struct kvm *kvm,
+> +                                     struct kvm_memory_slot *slot,
+>                                       unsigned long npages)
+>  {
+>         int i;
+> @@ -10881,9 +10887,11 @@ static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
+>          */
+>         memset(&slot->arch, 0, sizeof(slot->arch));
+>
+> -       r = alloc_memslot_rmap(slot, npages);
+> -       if (r)
+> -               return r;
+> +       if (kvm_memslots_have_rmaps(kvm)) {
+> +               r = alloc_memslot_rmap(slot, npages);
+> +               if (r)
+> +                       return r;
+> +       }
+>
+>         for (i = 1; i < KVM_NR_PAGE_SIZES; ++i) {
+>                 struct kvm_lpage_info *linfo;
+> @@ -10954,7 +10962,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>                                 enum kvm_mr_change change)
+>  {
+>         if (change == KVM_MR_CREATE || change == KVM_MR_MOVE)
+> -               return kvm_alloc_memslot_metadata(memslot,
+> +               return kvm_alloc_memslot_metadata(kvm, memslot,
+>                                                   mem->memory_size >> PAGE_SHIFT);
+>         return 0;
+>  }
+> --
+> 2.31.1.607.g51e8a6a459-goog
+>
