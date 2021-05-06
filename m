@@ -2,140 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B29BD3757C9
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 17:43:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 33400375813
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 18:00:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235481AbhEFPon (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 11:44:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36130 "EHLO
+        id S235434AbhEFQA7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 12:00:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236166AbhEFPo1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 11:44:27 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B77C1C061574
-        for <kvm@vger.kernel.org>; Thu,  6 May 2021 08:43:28 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id i190so5367655pfc.12
-        for <kvm@vger.kernel.org>; Thu, 06 May 2021 08:43:28 -0700 (PDT)
+        with ESMTP id S235482AbhEFQA4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 12:00:56 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B60DC06138A
+        for <kvm@vger.kernel.org>; Thu,  6 May 2021 08:59:57 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id di13so6788011edb.2
+        for <kvm@vger.kernel.org>; Thu, 06 May 2021 08:59:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=LcIFfAB5skjGeyCAD2QMmjpF+VNCcVetb+lsu2lskTY=;
-        b=Z2vGGhLZma2sfvQ1r1IYFoiaBh/8OD45lcuCFUx7hhUR4L0p3zrETc8AvA/i9r3vZK
-         BMwvJeQ4BZ5BK7rSNnP8T9XZf5Go+XMFA7h6OEq4uO/7W5leKfZffK8CvY4NbCvXhxS1
-         +m2no7ilCyqCmnV8YdDQnVBqeCST3QB89YIpUzF0tWlkBe3u5efC0UcjqpaG+kcM+lih
-         9HBCQvXchWCyikzB2vtYrg8qydzk0U/IVFI/aGscicVtEDbCTgKevXCfP0Mk+2xMKjvC
-         xtmveXOWb321zTVdDQbYe5Sw4r6x40mjMgj1SB81L5LiCykz4AW1tm9cSkv//4kBbbbL
-         NO3Q==
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=jjP2tVL8/5fMTkJrtwgNcBDcwQmnwEx/OAkZcrhoFzw=;
+        b=iYjiLvZXn8FAfX8V7OtJx1T2eMni4SkjZFTpMgVdft9/9vTih/6KIUqaLSUVKVH2lB
+         rdX96HR+vI+jPQTu0Bg8k4top/RzfLhFCp51C3D3vZwJ3Lx2gN6PMhXB7HNfXmwj2/MS
+         kI5J/U4wGxqiwnePvRvhxDFK7DGjKaKGCQPGY1RxoiMLUcXBImS5YkpyXi+nD4wRRMIG
+         Vd3pxC2/58fTEwi4VMe/tmPN/gEMKkjjO98VLjjlTuAj5j/qH8TyyuQoeRW6QPM2hpq0
+         9h2avyy3pdpoxpVeIAZiywio5CJDgbn931Rl8r2vY2aO2dFJJLuDU5a50WV5oGdB6EFF
+         G12A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=LcIFfAB5skjGeyCAD2QMmjpF+VNCcVetb+lsu2lskTY=;
-        b=HrRufpZlud7nRFJsVN2qNpWe1zRg+d+n1Cp5dacmDlW/NT0BvFyH/oMazIhugzoOdr
-         lCVr+xdq5KpD2gsrZX49o1pXbxkgBWoftUPmawQqDYqC3FwQGG68Sj7qapUwLPO6fnZG
-         TeywVcUXBGGk3/tUwpj5tKXGVbU2mNaSCsZXGY+3gBMRekHFab8PEDiaJHS6ISZLp7un
-         WolBA0oLJ/ssf7ZdAZBPLsdaSF6Xp7LGD8TZkpjzvigkACupC17MKqMYvUJHtYMHfmGJ
-         xZBLAe4SlZxDHVDxK63W6QWFP39+FVPX3RFAWQ+LmoGTJn7FNxvPXOsWe8fkzGS/pNYN
-         RAOw==
-X-Gm-Message-State: AOAM533NsCeXR9lbI7+5gZvhUXNaybA0ZM27ArRiGJ5BYdAfIDZW9dvk
-        z8JQFmCamjgXiIMJFO3/JEjheg==
-X-Google-Smtp-Source: ABdhPJwzg5Yk54M6Dkv5tgc2Fqqb0Cj/1kw7CHpPzP+oLwemOrk0iU1SGCVH9hc+g3ixgndN+qF/bg==
-X-Received: by 2002:a63:e712:: with SMTP id b18mr4963082pgi.2.1620315807827;
-        Thu, 06 May 2021 08:43:27 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id 187sm2501268pff.139.2021.05.06.08.43.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 May 2021 08:43:27 -0700 (PDT)
-Date:   Thu, 6 May 2021 15:43:23 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     Eric Biederman <ebiederm@xmission.com>, x86@kernel.org,
-        kexec@lists.infradead.org, Joerg Roedel <jroedel@suse.de>,
-        stable@vger.kernel.org, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH 1/2] kexec: Allow architecture code to opt-out at runtime
-Message-ID: <YJQOmxx1EMUqNpNn@google.com>
-References: <20210506093122.28607-1-joro@8bytes.org>
- <20210506093122.28607-2-joro@8bytes.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=jjP2tVL8/5fMTkJrtwgNcBDcwQmnwEx/OAkZcrhoFzw=;
+        b=RXOqZ2O/Reafot2OnhvUrSXXYXD0Ixiy3p5TMhM31SK+lKAaieRHXMMLMVXK+M81Fb
+         hAf9BBaHh/4lkujSmUI627uKJgGPvAbdRmnhqNGDlty+TVgGLEk1K5PIT5lF2ZLde7e3
+         0rG/4EY3xuG8Q/Tljy0OPWgHlKttG28Bj2Si4ka9XqbaezOBDiayZr9Zr6+fYoxpjy/o
+         edTU7gTyJRE3QifUiYIJ+WuHvJPTh4F8B8GFT3hYCIV3zLlBd4RzmmruP2en4qDTA8Ep
+         Pns7w+WhDms5QLd5U7dZgVwn/crIogRhW7N3dT6inirxVbyLwdD+JCLKg8DpvlPOxkRd
+         64lg==
+X-Gm-Message-State: AOAM533oTDA1qiETlZpYksxiUjuuIB+1ApE1WY12pTJj1d0IKSx9gA7S
+        jfymFshjuci5zELh5SjEyP1gI7YG79AE+PCWGVYpCI0KeJw=
+X-Google-Smtp-Source: ABdhPJy7C/ySonWlnTvVnDYUsB0oud7vURVnI7Vhk6vQ1/ROaTRg0RP3rpzkpDP4ZNY7nR3YGOvpTTaFjaMy9fc6+wM=
+X-Received: by 2002:a05:6402:12d3:: with SMTP id k19mr6095158edx.52.1620316795885;
+ Thu, 06 May 2021 08:59:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210506093122.28607-2-joro@8bytes.org>
+References: <20210506133758.1749233-1-philmd@redhat.com> <20210506133758.1749233-5-philmd@redhat.com>
+ <CANCZdfoJWEbPFvZ0605riUfnpVRAeC6Feem5_ahC7FUfO71-AA@mail.gmail.com>
+ <39f12704-af5c-2e4f-d872-a860d9a870d7@redhat.com> <CANCZdfqW0XTa18F+JxuSnhpictWxVJUsu87c=yAwMp6YT60FMg@mail.gmail.com>
+In-Reply-To: <CANCZdfqW0XTa18F+JxuSnhpictWxVJUsu87c=yAwMp6YT60FMg@mail.gmail.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Thu, 6 May 2021 16:58:47 +0100
+Message-ID: <CAFEAcA-V1DWhsFYuh-y5F2_PbO50KFoCm-XPrcMEYN1V2WHDfA@mail.gmail.com>
+Subject: Re: [PATCH v2 4/9] bsd-user/syscall: Replace alloca() by g_new()
+To:     Warner Losh <imp@bsdimp.com>
+Cc:     Eric Blake <eblake@redhat.com>, kvm-devel <kvm@vger.kernel.org>,
+        Kyle Evans <kevans@freebsd.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        qemu-arm <qemu-arm@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 06, 2021, Joerg Roedel wrote:
-> From: Joerg Roedel <jroedel@suse.de>
-> 
-> Allow a runtime opt-out of kexec support for architecture code in case
-> the kernel is running in an environment where kexec is not properly
-> supported yet.
-> 
-> This will be used on x86 when the kernel is running as an SEV-ES
-> guest. SEV-ES guests need special handling for kexec to hand over all
-> CPUs to the new kernel. This requires special hypervisor support and
-> handling code in the guest which is not yet implemented.
-> 
-> Cc: stable@vger.kernel.org # v5.10+
-> Signed-off-by: Joerg Roedel <jroedel@suse.de>
-> ---
->  kernel/kexec.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
-> 
-> diff --git a/kernel/kexec.c b/kernel/kexec.c
-> index c82c6c06f051..d03134160458 100644
-> --- a/kernel/kexec.c
-> +++ b/kernel/kexec.c
-> @@ -195,11 +195,25 @@ static int do_kexec_load(unsigned long entry, unsigned long nr_segments,
->   * that to happen you need to do that yourself.
->   */
->  
-> +bool __weak arch_kexec_supported(void)
-> +{
-> +	return true;
-> +}
-> +
->  static inline int kexec_load_check(unsigned long nr_segments,
->  				   unsigned long flags)
->  {
->  	int result;
->  
-> +	/*
-> +	 * The architecture may support kexec in general, but the kernel could
-> +	 * run in an environment where it is not (yet) possible to execute a new
-> +	 * kernel. Allow the architecture code to opt-out of kexec support when
-> +	 * it is running in such an environment.
-> +	 */
-> +	if (!arch_kexec_supported())
-> +		return -ENOSYS;
+On Thu, 6 May 2021 at 15:57, Warner Losh <imp@bsdimp.com> wrote:
+> malloc, on the other hand, involves taking out a number of mutexes
+> and similar things to obtain the memory, which may not necessarily
+> be safe in all the contexts system calls can be called from. System
+> calls are, typically, async safe and can be called from signal handlers.
+> alloca() is async safe, while malloc() is not. So changing the calls
+> from alloca to malloc makes calls to system calls in signal handlers
+> unsafe and potentially introducing buggy behavior as a result.
 
-This misses kexec_file_load.  Also, is a new hook really needed?  E.g. the
-SEV-ES check be shoved into machine_kexec_prepare().  The downside is that we'd
-do a fair amount of work before detecting failure, but that doesn't seem hugely
-problematic.
+malloc() should definitely be fine in this context. The syscall
+emulation is called after the cpu_loop() in bsd-user has called
+cpu_exec(). cpu_exec() calls into the JIT, which will malloc
+all over the place if it needs to in the course of JITting things.
 
-> +
->  	/* We only trust the superuser with rebooting the system. */
->  	if (!capable(CAP_SYS_BOOT) || kexec_load_disabled)
->  		return -EPERM;
-> -- 
-> 2.31.1
-> 
+This code should never be being called from a (host) signal handler.
+In upstream the signal handling code for bsd-user appears to
+be missing entirely. For linux-user when we take a host signal
+we merely arrange for the guest to take a guest signal, we
+don't try to execute guest code directly from the host handler.
+
+(There are some pretty hairy races in emulated signal handling:
+we did a big overhaul of the linux-user code in that area a
+while back. If your bsd-user code doesn't have the 'safe_syscall'
+stuff it probably needs it. But that's more about races between
+"guest code wants to execute a syscall" and "incoming signal"
+where we could fail to exit EINTR from an emulated syscall if
+the signal arrives in a bad window.)
+
+thanks
+-- PMM
