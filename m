@@ -2,97 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C415F37515A
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 11:16:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FA95375165
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 11:19:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234033AbhEFJRz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 05:17:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33490 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231815AbhEFJRz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 05:17:55 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83C49C061574;
-        Thu,  6 May 2021 02:16:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=hDlhIpbeqoCuO5RsCW5NsbO4jPToGyvU3+tnRRJpx4c=; b=iYuUkaMe+/U1GiNT1IvXMm1Ghs
-        ClsV1L3x+mn8IeGIMWAI6+/uU63Vae7mcNy9L7RXxx1w+Eu8p75msl4QVc7Pdf0cnY0LnCAx+3MnN
-        1zQbiQTVyYk32bsO3nfxmLzMuE6/WibB/lvXr3m5OmQWUXokK9gO0+v0JViftpRWo9lnWP9w7IzcM
-        WqQ43Nru5hOMTrd22q6xIs80jwkt241Ac0zrYfMxSrF97YLKZephHtCpfaA6kNuMIluUULlz7gaZY
-        RawR5gJ8n2qAwozVzbo0Ya/S5s4HJcblYyZx3a4gWAxAg2uIPTzWtezuDe4wFk+esyl7tElDIPm3y
-        hbqpuM+w==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lea4x-001Woe-Jg; Thu, 06 May 2021 09:14:25 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 1921E30030F;
-        Thu,  6 May 2021 11:13:52 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id C6C342018C406; Thu,  6 May 2021 11:13:52 +0200 (CEST)
-Date:   Thu, 6 May 2021 11:13:52 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Balbir Singh <bsingharora@gmail.com>
-Cc:     tglx@linutronix.de, mingo@kernel.org, juri.lelli@redhat.com,
-        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-        rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
-        bristot@redhat.com, pbonzini@redhat.com, maz@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        riel@surriel.com, hannes@cmpxchg.org
-Subject: Re: [PATCH 0/6] sched,delayacct: Some cleanups
-Message-ID: <YJOzUAg30LZWSHcI@hirez.programming.kicks-ass.net>
-References: <20210505105940.190490250@infradead.org>
- <20210505222940.GA4236@balbir-desktop>
+        id S231864AbhEFJUW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 05:20:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38181 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230113AbhEFJUT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 May 2021 05:20:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620292760;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=9T3+gtqvRPWaN1kbhzEfYcsn4RQucKuVfAaPYhpIxaE=;
+        b=fP+O2RVolWbMIF0CfCgVZxUqmmBd6cSLifyA0qSA5YOHi1c1jLGNryhRKuhH7hYJbS3ZRM
+        sR1wTflR8OlchuWiF8ilvMEIl31PpwM2LqNSp4LkTO4VzDF+/6VIYAabLnNnyVX34w4LIw
+        iNCEMd6ub0BbX8VGBUn6l1arIbTYyuI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-225-YvqA8d_6MjelWBozQMda6Q-1; Thu, 06 May 2021 05:19:17 -0400
+X-MC-Unique: YvqA8d_6MjelWBozQMda6Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69970802B78;
+        Thu,  6 May 2021 09:19:16 +0000 (UTC)
+Received: from max-t490s.redhat.com (unknown [10.36.110.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ABA2419D7C;
+        Thu,  6 May 2021 09:19:07 +0000 (UTC)
+From:   Maxime Coquelin <maxime.coquelin@redhat.com>
+To:     alex.williamson@redhat.com, jmorris@namei.org, dhowells@redhat.com,
+        linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org, kvm@vger.kernel.org
+Cc:     mjg59@srcf.ucam.org, keescook@chromium.org, cohuck@redhat.com,
+        Maxime Coquelin <maxime.coquelin@redhat.com>
+Subject: [PATCH] vfio: Lock down no-IOMMU mode when kernel is locked down
+Date:   Thu,  6 May 2021 11:18:59 +0200
+Message-Id: <20210506091859.6961-1-maxime.coquelin@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210505222940.GA4236@balbir-desktop>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 06, 2021 at 08:29:40AM +1000, Balbir Singh wrote:
-> On Wed, May 05, 2021 at 12:59:40PM +0200, Peter Zijlstra wrote:
-> > Hi,
-> > 
-> > Due to:
-> > 
-> >   https://lkml.kernel.org/r/0000000000001d43ac05c0f5c6a0@google.com
-> > 
-> > and general principle, delayacct really shouldn't be using ktime (pvclock also
-> > really shouldn't be doing what it does, but that's another story). This lead me
-> > to looking at the SCHED_INFO, SCHEDSTATS, DELAYACCT (and PSI) accounting hell.
-> > 
-> > The rest of the patches are an attempt at simplifying all that a little. All
-> > that crud is enabled by default for distros which is leading to a death by a
-> > thousand cuts.
-> > 
-> > The last patch is an attempt at default disabling DELAYACCT, because I don't
-> > think anybody actually uses that much, but what do I know, there were no ill
-> > effects on my testbox. Perhaps we should mirror
-> > /proc/sys/kernel/sched_schedstats and provide a delayacct sysctl for runtime
-> > frobbing.
-> >
-> 
-> There are tools like iotop that use delayacct to display information. 
+When no-IOMMU mode is enabled, VFIO is as unsafe as accessing
+the PCI BARs via the device's sysfs, which is locked down when
+the kernel is locked down.
 
-Right, but how many actual people use that? Does that justify saddling
-the whole sodding world with the overhead?
+Indeed, it is possible for an attacker to craft DMA requests
+to modify kernel's code or leak secrets stored in the kernel,
+since the device is not isolated by an IOMMU.
 
-> When the
-> code was checked in, we did run SPEC* back in the day 2006 to find overheads,
-> nothing significant showed. Do we have any date on the overhead your seeing?
+This patch introduces a new integrity lockdown reason for the
+unsafe VFIO no-iommu mode.
 
-I've not looked, but having it disabled saves that per-task allocation
-and that spinlock in delayacct_end() for iowait wakeups and a bunch of
-cache misses ofcourse.
+Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+---
+ drivers/vfio/vfio.c      | 13 +++++++++----
+ include/linux/security.h |  1 +
+ security/security.c      |  1 +
+ 3 files changed, 11 insertions(+), 4 deletions(-)
 
-I doubt SPEC is a benchmark that tickles those paths much if at all.
+diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+index 5e631c359ef2..fe466d6ea5d8 100644
+--- a/drivers/vfio/vfio.c
++++ b/drivers/vfio/vfio.c
+@@ -25,6 +25,7 @@
+ #include <linux/pci.h>
+ #include <linux/rwsem.h>
+ #include <linux/sched.h>
++#include <linux/security.h>
+ #include <linux/slab.h>
+ #include <linux/stat.h>
+ #include <linux/string.h>
+@@ -165,7 +166,8 @@ static void *vfio_noiommu_open(unsigned long arg)
+ {
+ 	if (arg != VFIO_NOIOMMU_IOMMU)
+ 		return ERR_PTR(-EINVAL);
+-	if (!capable(CAP_SYS_RAWIO))
++	if (!capable(CAP_SYS_RAWIO) ||
++			security_locked_down(LOCKDOWN_VFIO_NOIOMMU))
+ 		return ERR_PTR(-EPERM);
+ 
+ 	return NULL;
+@@ -1280,7 +1282,8 @@ static int vfio_group_set_container(struct vfio_group *group, int container_fd)
+ 	if (atomic_read(&group->container_users))
+ 		return -EINVAL;
+ 
+-	if (group->noiommu && !capable(CAP_SYS_RAWIO))
++	if (group->noiommu && (!capable(CAP_SYS_RAWIO) ||
++			security_locked_down(LOCKDOWN_VFIO_NOIOMMU)))
+ 		return -EPERM;
+ 
+ 	f = fdget(container_fd);
+@@ -1362,7 +1365,8 @@ static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
+ 	    !group->container->iommu_driver || !vfio_group_viable(group))
+ 		return -EINVAL;
+ 
+-	if (group->noiommu && !capable(CAP_SYS_RAWIO))
++	if (group->noiommu && (!capable(CAP_SYS_RAWIO) ||
++			security_locked_down(LOCKDOWN_VFIO_NOIOMMU)))
+ 		return -EPERM;
+ 
+ 	device = vfio_device_get_from_name(group, buf);
+@@ -1490,7 +1494,8 @@ static int vfio_group_fops_open(struct inode *inode, struct file *filep)
+ 	if (!group)
+ 		return -ENODEV;
+ 
+-	if (group->noiommu && !capable(CAP_SYS_RAWIO)) {
++	if (group->noiommu && (!capable(CAP_SYS_RAWIO) ||
++			security_locked_down(LOCKDOWN_VFIO_NOIOMMU))) {
+ 		vfio_group_put(group);
+ 		return -EPERM;
+ 	}
+diff --git a/include/linux/security.h b/include/linux/security.h
+index 06f7c50ce77f..f29388180fab 100644
+--- a/include/linux/security.h
++++ b/include/linux/security.h
+@@ -120,6 +120,7 @@ enum lockdown_reason {
+ 	LOCKDOWN_MMIOTRACE,
+ 	LOCKDOWN_DEBUGFS,
+ 	LOCKDOWN_XMON_WR,
++	LOCKDOWN_VFIO_NOIOMMU,
+ 	LOCKDOWN_INTEGRITY_MAX,
+ 	LOCKDOWN_KCORE,
+ 	LOCKDOWN_KPROBES,
+diff --git a/security/security.c b/security/security.c
+index b38155b2de83..33c3ddb6dcab 100644
+--- a/security/security.c
++++ b/security/security.c
+@@ -58,6 +58,7 @@ const char *const lockdown_reasons[LOCKDOWN_CONFIDENTIALITY_MAX+1] = {
+ 	[LOCKDOWN_MMIOTRACE] = "unsafe mmio",
+ 	[LOCKDOWN_DEBUGFS] = "debugfs access",
+ 	[LOCKDOWN_XMON_WR] = "xmon write access",
++	[LOCKDOWN_VFIO_NOIOMMU] = "VFIO unsafe no-iommu mode",
+ 	[LOCKDOWN_INTEGRITY_MAX] = "integrity",
+ 	[LOCKDOWN_KCORE] = "/proc/kcore access",
+ 	[LOCKDOWN_KPROBES] = "use of kprobes",
+-- 
+2.31.1
 
-The thing is; we can't just keep growing more and more stats, that'll
-kill us quite dead.
