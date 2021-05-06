@@ -2,82 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D20043750A8
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 10:22:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3174F3750FF
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 10:41:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232818AbhEFIWz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 04:22:55 -0400
-Received: from mga17.intel.com ([192.55.52.151]:60650 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231929AbhEFIWy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 04:22:54 -0400
-IronPort-SDR: 1AYIDNJYwzVJ0GwmzHlRR8JU/vqAt9LNYZ78odr9tUkjmIIOSSPzkZU/bSFlHElMOTWjV6gU9P
- dMNGLFs12VmQ==
-X-IronPort-AV: E=McAfee;i="6200,9189,9975"; a="178648757"
-X-IronPort-AV: E=Sophos;i="5.82,277,1613462400"; 
-   d="scan'208";a="178648757"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2021 01:21:55 -0700
-IronPort-SDR: g4z8m5QE4qwcF+Fi8aDyO6fsSg088sGEKtuoi//CNTD35nw6DY7h/kNzF7+McYg/KBQADXdWgk
- 0YHw8Say7oIA==
-X-IronPort-AV: E=Sophos;i="5.82,277,1613462400"; 
-   d="scan'208";a="430425641"
-Received: from unknown (HELO [10.238.0.151]) ([10.238.0.151])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2021 01:21:53 -0700
-Subject: Re: [PATCH v2 1/3] KVM: X86: Rename DR6_INIT to DR6_ACTIVE_LOW
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Li, Xiaoyao" <xiaoyao.li@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20210202090433.13441-1-chenyi.qiang@intel.com>
- <20210202090433.13441-2-chenyi.qiang@intel.com>
- <3db069ba-b4e0-1288-ec79-66ac44938682@redhat.com>
- <6678520f-e69e-6116-88c9-e9d6cd450934@intel.com>
- <ea9eaa84-999b-82cb-ef40-66fde361704d@redhat.com>
- <dc22f0a2-97c5-d54d-a521-c02f802c2229@intel.com>
- <3d7455a7-dca7-3c60-0c34-3a3ab8f7f1fb@redhat.com>
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-Message-ID: <f8d6f502-e870-b374-afc4-62fd49dd5571@intel.com>
-Date:   Thu, 6 May 2021 16:21:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.1
+        id S233763AbhEFIme convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 6 May 2021 04:42:34 -0400
+Received: from 2.mo51.mail-out.ovh.net ([178.33.255.19]:53600 "EHLO
+        2.mo51.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231880AbhEFImd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 04:42:33 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.138.5])
+        by mo51.mail-out.ovh.net (Postfix) with ESMTPS id 4E6FF288D1E;
+        Thu,  6 May 2021 10:41:32 +0200 (CEST)
+Received: from kaod.org (37.59.142.95) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Thu, 6 May 2021
+ 10:41:31 +0200
+Authentication-Results: garm.ovh; auth=pass (GARM-95G0013e49f871-4110-410e-8fd8-c83a2fe46aa9,
+                    A011F864E236C67B2AFE342ECDF08F9E86568858) smtp.auth=groug@kaod.org
+X-OVh-ClientIp: 78.197.208.248
+Date:   Thu, 6 May 2021 10:41:30 +0200
+From:   Greg Kurz <groug@kaod.org>
+To:     Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+CC:     <qemu-devel@nongnu.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        Warner Losh <imp@bsdimp.com>, Kyle Evans <kevans@freebsd.org>,
+        Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>,
+        "open list:PowerPC TCG CPUs" <qemu-ppc@nongnu.org>,
+        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>
+Subject: Re: [PATCH 5/5] target/ppc/kvm: Replace alloca() by g_malloc()
+Message-ID: <20210506104130.5f617359@bahia.lan>
+In-Reply-To: <20210505170055.1415360-6-philmd@redhat.com>
+References: <20210505170055.1415360-1-philmd@redhat.com>
+        <20210505170055.1415360-6-philmd@redhat.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <3d7455a7-dca7-3c60-0c34-3a3ab8f7f1fb@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Originating-IP: [37.59.142.95]
+X-ClientProxiedBy: DAG2EX2.mxp5.local (172.16.2.12) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: 81b71a7d-59c2-4d1c-8aa8-7f6a7006e2cf
+X-Ovh-Tracer-Id: 12374484402015738159
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduledrvdegtddgtdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeevlefhtddufffhieevhefhleegleelgfetffetkedugeehjeffgfehhfefueduffenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhg
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed,  5 May 2021 19:00:55 +0200
+Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
 
-
-On 4/2/2021 5:01 PM, Paolo Bonzini wrote:
-> On 02/04/21 10:53, Xiaoyao Li wrote:
->>>
->>
->> Hi Paolo,
->>
->> Fenghua's bare metal support is in tip tree now.
->> https://lore.kernel.org/lkml/20210322135325.682257-1-fenghua.yu@intel.com/
->>
->> Will the rest KVM patches get into 5.13 together?
+> The ALLOCA(3) man-page mentions its "use is discouraged".
 > 
-> Yes, they will.
+> Replace it by a g_malloc() call.
 > 
-> Thanks for the notice!
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  target/ppc/kvm.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 > 
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 104a308abb5..ae62daddf7d 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -2698,11 +2698,11 @@ int kvmppc_save_htab(QEMUFile *f, int fd, size_t bufsize, int64_t max_ns)
+>  int kvmppc_load_htab_chunk(QEMUFile *f, int fd, uint32_t index,
+>                             uint16_t n_valid, uint16_t n_invalid, Error **errp)
+>  {
+> -    struct kvm_get_htab_header *buf;
+> -    size_t chunksize = sizeof(*buf) + n_valid * HASH_PTE_SIZE_64;
+> +    size_t chunksize = sizeof(struct kvm_get_htab_header)
 
-Hi Paolo,
+It is a bit unfortunate to introduce a new dependency on the struct type.
 
-I notice the patch 1 is merged but the remaining patch 2 and 3 are not 
-included yet. The bare metal support is merged. Will the rest KVM parts 
-be in 5.13 as well?
+What about the following ?
 
-> Paolo
-> 
+-    struct kvm_get_htab_header *buf;
++    g_autofree struct kvm_get_htab_header *buf = NULL;
+     size_t chunksize = sizeof(*buf) + n_valid * HASH_PTE_SIZE_64;
+     ssize_t rc;
+ 
+-    buf = alloca(chunksize);
++    buf = g_malloc(chunksize);
+
+
+    g_autofree struct kvm_get_htab_header *buf = NULL;
+    size_t chunksize = sizeof(*buf) + n_valid * HASH_PTE_SIZE_64;
+
+> +                       + n_valid * HASH_PTE_SIZE_64;
+>      ssize_t rc;
+> +    g_autofree struct kvm_get_htab_header *buf = g_malloc(chunksize);
+>  
+> -    buf = alloca(chunksize);
+>      buf->index = index;
+>      buf->n_valid = n_valid;
+>      buf->n_invalid = n_invalid;
+> @@ -2741,10 +2741,10 @@ void kvmppc_read_hptes(ppc_hash_pte64_t *hptes, hwaddr ptex, int n)
+>      i = 0;
+>      while (i < n) {
+>          struct kvm_get_htab_header *hdr;
+> +        char buf[sizeof(*hdr) + HPTES_PER_GROUP * HASH_PTE_SIZE_64];
+>          int m = n < HPTES_PER_GROUP ? n : HPTES_PER_GROUP;
+> -        char buf[sizeof(*hdr) + m * HASH_PTE_SIZE_64];
+>  
+> -        rc = read(fd, buf, sizeof(buf));
+> +        rc = read(fd, buf, sizeof(*hdr) + m * HASH_PTE_SIZE_64);
+>          if (rc < 0) {
+>              hw_error("kvmppc_read_hptes: Unable to read HPTEs");
+>          }
+
