@@ -2,126 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A6DF4375878
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 18:30:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F504375891
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 18:40:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235908AbhEFQbn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 12:31:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46660 "EHLO
+        id S235757AbhEFQlM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 12:41:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235167AbhEFQbk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 12:31:40 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DFB5C061574
-        for <kvm@vger.kernel.org>; Thu,  6 May 2021 09:30:42 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id z13so8694342lft.1
-        for <kvm@vger.kernel.org>; Thu, 06 May 2021 09:30:41 -0700 (PDT)
+        with ESMTP id S235222AbhEFQlL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 12:41:11 -0400
+Received: from mail-oo1-xc2b.google.com (mail-oo1-xc2b.google.com [IPv6:2607:f8b0:4864:20::c2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79E5CC061574
+        for <kvm@vger.kernel.org>; Thu,  6 May 2021 09:40:13 -0700 (PDT)
+Received: by mail-oo1-xc2b.google.com with SMTP id c12-20020a4ae24c0000b02901bad05f40e4so1381273oot.4
+        for <kvm@vger.kernel.org>; Thu, 06 May 2021 09:40:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=XMKGeijkLRftBOYtsZmv6QsareZFL8VpGrNkhWmATc4=;
-        b=MMkA5P5PQrc5F3yf+Bm0NXxr1fNtjselNFeGaFqI3X+wFHMKdb3wPBBhRg/I0FiO3m
-         eD2b4NCrT/2mGP+PRaRl2z3W+oEBWXSF1zP/N6gzyGtggdVqkH9RJx34K7YntNBr527P
-         B/gKxaB6tc/aBw7xX/bf2cfyrUs855XXQxroHl+xOng7U7XC07n5RUSix3dUYJ641Gs6
-         rU80Nh201Kt/ENUh0BMMw0H518Wh963SBBYCeJM4t15DrJqS5drpf/niT3kR+/l7A+jF
-         QXII3mIlM91F0VhXEHIUioEs0YQKv0kkMwPZ1f+LbJNwzuHlX1tZmlbt/C2sp5cWKAvB
-         e3sg==
+        bh=WoWdcVhaKgBx8aRDpUOXmoHORz3RdCxP4DX2bATlIbs=;
+        b=blzRXHNVROgJET/HSvhddWHBX4YHJaKfWaDhmM7OKpQlGyIb9CKIo7Hg/3LybOrmxL
+         e9i6Sff1GJfXcvg+XoIhqQIOvv/8+LlCKN65iAYVtu2XkEmxHnuX1j/woGHVSKHJvEpl
+         VnLVG39Okto6j6O+iFzPQMY1HCapSaMfWR1/0g5QCqjpZTIRCewbX7Iz1bTzOLV5VGAm
+         XGPKbeSXWzDHoAwLnOeOTd0aehB70lCT1ShAdmnBGn4od7LKy5gl1dybixv7r3uJi2+z
+         bTN6boryNHGmYG6hOw9RtJVrTs+/0xzW+VeIzZNnl4n6FHHIovtI4Upt+dohLyxqQXEe
+         jz+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=XMKGeijkLRftBOYtsZmv6QsareZFL8VpGrNkhWmATc4=;
-        b=CoOVkoeTP7MXdQqlGz9qhrMYbFPj/ny/70q+Li2Q1Ub0tn5++JvEDBbuelENHDsXSw
-         4t1mzOy2GjlZaB55UAGYmwDsxTbGngPsUfSZiVdsfdoxrpkRYwVobCOSvpDy/fC1RBmP
-         jkN64KEGDp8jNy8i53rLLtRXSSaTLHq5MnZGOkI6I6pdx0ma/NJ5PO6yrdiuCbhFvb5k
-         CGP41xcSZN9KuME2SW7PpwldtX1kDustZK07fQ4H8Pee4iq4/D54EwcVVUQepy+iHPUv
-         AqCYwud97VLW7mowqqY5h1tk8Yhvr0QNJeO3jeicL41pikGJAAeyVUyE7/avGOUUlkWd
-         ZbEw==
-X-Gm-Message-State: AOAM531FVOTl5uuqEfDg7aWFOO3DUJfKZ9dg73x2VsnqFFHN33RfdN2S
-        FikyEJpwWsyGF9qxWS/3+qmiY/EpEBrz4br6bgI40Q==
-X-Google-Smtp-Source: ABdhPJwiGjmpais50NnUwjA5DRgGQNXs54iAdzEQnpCf4DKY4bXy07OakW0dY3mqyEDYCp43niOXxsGH5qQ3y44DS2A=
-X-Received: by 2002:a05:6512:20f:: with SMTP id a15mr3511660lfo.531.1620318640352;
- Thu, 06 May 2021 09:30:40 -0700 (PDT)
+        bh=WoWdcVhaKgBx8aRDpUOXmoHORz3RdCxP4DX2bATlIbs=;
+        b=ZCAHI/xSDTKG2EDRh5jtL1mBUFJo6d0d9daHspn3kJGlkPhboCUhKqjSp80EAMgW5G
+         qQHRWLypAxfJDdgUVEQzNN6Xi+wRm7xP8t5+2gpVK7WHOHLhXrVi9W/YVc/2tYHgbO+2
+         +oOMcsFWaa0WbWKefoSOv3XTrwTpFsfy2TYNHJ7GCFNVOsxrWD47PaX5Pzv37IMcj4EB
+         zMNKXKfwbVkoQp4WGAIfeoPkzIhcveKsVYaXe5hdjgUzsD5nWToR/cIzMgLIFu/ga3kq
+         W/0mazSlnE+L/aDXw5jFnvxrpYwb3Y9obEP/VgNsWeO/3Ayx59V5JQCFEQEww2heSdYa
+         ZtFg==
+X-Gm-Message-State: AOAM531BzZIIjKMKZIBodsNvwq21/AUvs60WsdbAKCoPBAJv1jq9Go/9
+        5I22X22yrgMI4WsUeZcDKcqiJRlyi0shzSft9OuorA==
+X-Google-Smtp-Source: ABdhPJw79HSZTWuUu/dLWQ/Am8k3vorS6YbEPro+IuQPDXMzbvl/f0Sv95goJkHQE4sf7qWKeP/t7f0D3YULMqQ2XzI=
+X-Received: by 2002:a05:6820:100a:: with SMTP id v10mr936579oor.55.1620319212570;
+ Thu, 06 May 2021 09:40:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210506152442.4010298-1-venkateshs@chromium.org> <YJQVj3GaVp9tvWog@google.com>
-In-Reply-To: <YJQVj3GaVp9tvWog@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Thu, 6 May 2021 09:30:14 -0700
-Message-ID: <CALzav=e+6mtPUHTHFLbw1Q=1kgstPbAp=2mg9mi+_fc+iWELGA@mail.gmail.com>
-Subject: Re: [PATCH] kvm: Cap halt polling at kvm->max_halt_poll_ns
+References: <20210506004847.210466-1-jacobhxu@google.com> <YJQSx9vb1lT3P79j@google.com>
+In-Reply-To: <YJQSx9vb1lT3P79j@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 6 May 2021 09:40:01 -0700
+Message-ID: <CALMp9eSWA+KKA93fdyX7o+rEPogP-QJvY+CADTnDPXmCoEg1Yw@mail.gmail.com>
+Subject: Re: [PATCH] x86: Do not assign values to unaligned pointer to 128 bits
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Venkatesh Srinivas <venkateshs@chromium.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jacob Xu <jacobhxu@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 6, 2021 at 9:13 AM Sean Christopherson <seanjc@google.com> wrote:
+On Thu, May 6, 2021 at 9:01 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> Prefer capitalizing KVM in the shortlog, if only because I'm lazy with grep :-)
+> Please use [kvm-unit-tests PATCH ...] for the subject, it took me a depressingly
+> long time to figure out which code base this applied to (though admittedly there
+> was a non-zero amount of PEBKAC going on).
 >
-> On Thu, May 06, 2021, Venkatesh Srinivas wrote:
-> > From: David Matlack <dmatlack@google.com>
+> On Wed, May 05, 2021, Jacob Xu wrote:
+> > When compiled with clang, the following statement gets converted into a
+> > movaps instructions.
+> > mem->u[0] = 5; mem->u[1] = 6; mem->u[2] = 7; mem->u[3] = 8;
 > >
-> > When growing halt-polling, there is no check that the poll time exceeds
-> > the per-VM limit. It's possible for vcpu->halt_poll_ns to grow past
-> > kvm->max_halt_poll_ns and stay there until a halt which takes longer
-> > than kvm->halt_poll_ns.
+> > Since mem is an unaligned pointer to a union of an sse, we get a GP when
+> > running.
 > >
->
-> Fixes: acd05785e48c ("kvm: add capability for halt polling")
->
-> and probably Cc: stable@ too.
->
->
-> > Signed-off-by: David Matlack <dmatlack@google.com>
-> > Signed-off-by: Venkatesh Srinivas <venkateshs@chromium.org>
+> > All we want is to make the values between mem and v different for this
+> > testcase, so let's just memset the pointer at mem, and convert to
+> > uint8_t pointer. Then the compiler will not assume the pointer is
+> > aligned to 128 bits.
+> >
+> > Fixes: e5e76263b5 ("x86: add additional test cases for sse exceptions to
+> > emulator.c")
+> >
+> > Signed-off-by: Jacob Xu <jacobhxu@google.com>
 > > ---
-> >  virt/kvm/kvm_main.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >  x86/emulator.c | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
 > >
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 2799c6660cce..120817c5f271 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -2893,8 +2893,8 @@ static void grow_halt_poll_ns(struct kvm_vcpu *vcpu)
-> >       if (val < grow_start)
-> >               val = grow_start;
+> > diff --git a/x86/emulator.c b/x86/emulator.c
+> > index 9705073..672bfda 100644
+> > --- a/x86/emulator.c
+> > +++ b/x86/emulator.c
+> > @@ -716,12 +716,12 @@ static __attribute__((target("sse2"))) void test_sse_exceptions(void *cross_mem)
 > >
-> > -     if (val > halt_poll_ns)
-> > -             val = halt_poll_ns;
-> > +     if (val > vcpu->kvm->max_halt_poll_ns)
-> > +             val = vcpu->kvm->max_halt_poll_ns;
+> >       // test unaligned access for movups, movupd and movaps
+> >       v.u[0] = 1; v.u[1] = 2; v.u[2] = 3; v.u[3] = 4;
+> > -     mem->u[0] = 5; mem->u[1] = 6; mem->u[2] = 7; mem->u[3] = 8;
+> > +     memset((uint8_t *)mem, 0, 128);
 >
-> Hmm, I would argue that the introduction of the capability broke halt_poll_ns.
-> The halt_poll_ns module param is writable after KVM is loaded.  Prior to the
-> capability, that meant the admin could adjust the param on the fly and all vCPUs
-> would honor the new value as it was changed.
->
-> By snapshotting the module param at VM creation, those semantics were lost.
-> That's not necessarily wrong/bad, but I don't see anything in the changelog for
-> the capability that suggests killing the old behavior was intentional/desirable.
+> Shouldn't this be '16', as in 16 bytes / 128 bits?  And would it makes sense to
+> use a pattern other than '0', if only for giggles?
 
-api.rst does say the capability overrides halt_poll_ns. But I could
-see value in changing the semantics to something like:
-
-- halt_poll_ns sets machine-wide maximum halt poll time.
-- kvm->max_halt_poll_ns sets VM-wide maximum halt poll time.
-- A vCPU will poll for at most min(halt_poll_ns,
-kvm->max_halt_poll_ns) (aside from an in-progress poll when either
-parameter is changed).
-
-On a related note, the capability and these subtle details should be
-documented in Documentation/virtual/kvm/halt-polling.txt.
-
-
->
-> >
-> >       vcpu->halt_poll_ns = val;
-> >  out:
-> > --
-> > 2.31.1.607.g51e8a6a459-goog
-> >
+Or possibly sizeof(*mem)?
