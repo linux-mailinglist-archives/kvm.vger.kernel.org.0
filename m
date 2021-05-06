@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 29F50375A56
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 20:43:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49D39375A58
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 20:43:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236529AbhEFSoV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 14:44:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48076 "EHLO
+        id S236561AbhEFSod (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 14:44:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236479AbhEFSoN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 14:44:13 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62A4DC06138D
-        for <kvm@vger.kernel.org>; Thu,  6 May 2021 11:43:14 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id a3-20020a2580430000b02904f7a1a09012so7020196ybn.3
-        for <kvm@vger.kernel.org>; Thu, 06 May 2021 11:43:14 -0700 (PDT)
+        with ESMTP id S236519AbhEFSoS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 14:44:18 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DD39C06138A
+        for <kvm@vger.kernel.org>; Thu,  6 May 2021 11:43:19 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id l19-20020a0ce5130000b02901b6795e3304so4873456qvm.2
+        for <kvm@vger.kernel.org>; Thu, 06 May 2021 11:43:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=zhL8FcfNScm9PkXj7Tnrl0I6RhUdnvKmvH1J8Dy7QUQ=;
-        b=DNrJDk6WIDGw5JhVnZ+VsOQCNnNUjt/avv4geA9QT5TONqnlHYiM7VuWXVzY4pul6e
-         NR8m80fQb4EYvj1Ud3mmlDd7/GfLTdsD87plp5x+cw2ja6zHuJ2i9ZEJk/EIBqGjvHsP
-         P2SAu4Dc/Zr2sCXvozOgiWVTbxUXqwZHUXylSXGRxPN6NkHWcnqOmr582WajrL/nNk3C
-         uWvh23HoiCgFoDTTpLAuRnx0YASCjWruSl5OM/MBYf6A6KoUHvzPa4tDxYWF+jZVdC3S
-         Wqfl+yilGvTkJ6VPbuepGFC+3+ePBHp6OjKItg3UMd+4auMCodyGt5dzsNbrVnWjt+/R
-         tDEA==
+        bh=iw/a8Ja/3KurYblK4L1VkCBkw/kvgNKeAvoJlP3V0N4=;
+        b=sOcR6WopGmQeOsEVbql1czxjIYXtvwnQfRsQ9Tol6fmEo1JJ8bPTkrMBEsGvyG20Fa
+         HDu8Sl1hcFB+B4vi4znrlOA9p0rvXQvFW99L6+Hqsnp6VrMpW6hZU0fE6ULYXoSTKUol
+         0uCChy4AQZvw7i3NN/VoQ7FbcioWSHO8+g7kgJ1Kg4jIbLVcSRa8j8X9/zdijZc8t2xF
+         DobXZ1IkwUfAP55V1Mcvg/mDvE26XnXcdyNo+Fo5cw403GV9LatgK2OYKM+VvsMiBgEm
+         Tt4ZMoAj2ra7Uy97dhOTMAaeP1AW8iDZXD+1AWvO8J32Zl1XJHTyJqiWClVH5WUXvyv4
+         cX5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=zhL8FcfNScm9PkXj7Tnrl0I6RhUdnvKmvH1J8Dy7QUQ=;
-        b=YRd8XbQsmJSWtYncAKwMAP8OXQPjMde5pjP+Oimdf23FyfDFDye2e3uJuH+4eqDeWd
-         qNw/mXSRpDXwORa6nR2RS/90i3m2lKNfknYg592wrJAEvUaXZURzfL7B0xpIsCLZ2qWj
-         eSr1rW1M9VEh0WIHLLgnM4vOnz+EMIVzFh49fzKFa8/kxJ3A+H9tXdcdHg583YfJmier
-         KYwiqF+5u55htdzLHYM6lRarb4CavoYruFw3P1VHJiDt76LGvxa6OoqDsXR2oUPVMFv3
-         dDnU8m+2zMMFb33MH2n5/8qnjMADe3q2PUpn44vUWYgYkT15mXItb5J4q/2m+dOaHhzo
-         1jmw==
-X-Gm-Message-State: AOAM533MmOy3YdBWOnRmz2zmW3BI8gU9DtWBWuJrhiHOh3Xe+n1GmnHn
-        85M+gfewTEM+zVO8darPVtjGOcxSNn5y
-X-Google-Smtp-Source: ABdhPJyBQ56x2JTSMyMjqsURTn9cs4CSWa93n5guW5qSo4vNHRQfv+K9LXF9g1VMqA9/rB/n0m7BTWQ7CNse
+        bh=iw/a8Ja/3KurYblK4L1VkCBkw/kvgNKeAvoJlP3V0N4=;
+        b=e/Jcfshq0ppTx5WJclm9k+oBCNxKqk3ZMA0uoBCM+wufovK5eTtMrcr6tPsE3LRSQG
+         z7NZmyEFAUkeXuUENHPooAdeSvNOQTm9afXTMh74mzzrRuBg8K5oulMjO6B9SX5/56ts
+         6Z/BRwCWa1jkz6w+32PiQXckgF7/Blp+NEcwtxDCkdU5ZFseByhwQlNhV9D4ymJCxO3I
+         yedCNx3GsKS2Ashb8PWBi0fq7fCvvo3q7V0R+nGMCfBMCphlmPi2jXQN+vZqIkJIfXVL
+         Od8a7EkPi9UuY8lBL5OA1Dj1KyBhaMTwv9hirJdqiCDP8LAPYr3ROedMx9gGIa32mIen
+         /Z1A==
+X-Gm-Message-State: AOAM530L/jrjqtmxGIthtVnqm4xF3Mbl9v5oF/K6IDkSP480XjFeC77R
+        jodFtf6tArDjfOpVqXjhZodTWgy4cnrM
+X-Google-Smtp-Source: ABdhPJzLQCaK09iohpWRePuwJmaHeqNvzJRKQOMofUmstX0MustmnJ+kXp0rKMpS9TZj3mWEx8UpdIW3VlhS
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:9258:9474:54ca:4500])
- (user=bgardon job=sendgmr) by 2002:a25:a466:: with SMTP id
- f93mr7989143ybi.264.1620326593607; Thu, 06 May 2021 11:43:13 -0700 (PDT)
-Date:   Thu,  6 May 2021 11:42:39 -0700
+ (user=bgardon job=sendgmr) by 2002:a0c:ee23:: with SMTP id
+ l3mr6174793qvs.55.1620326598310; Thu, 06 May 2021 11:43:18 -0700 (PDT)
+Date:   Thu,  6 May 2021 11:42:40 -0700
 In-Reply-To: <20210506184241.618958-1-bgardon@google.com>
-Message-Id: <20210506184241.618958-7-bgardon@google.com>
+Message-Id: <20210506184241.618958-8-bgardon@google.com>
 Mime-Version: 1.0
 References: <20210506184241.618958-1-bgardon@google.com>
 X-Mailer: git-send-email 2.31.1.607.g51e8a6a459-goog
-Subject: [PATCH v3 6/8] KVM: x86/mmu: Skip rmap operations if rmaps not allocated
+Subject: [PATCH v3 7/8] KVM: x86/mmu: Protect rmaps independently with SRCU
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -67,262 +67,186 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If only the TDP MMU is being used to manage the memory mappings for a VM,
-then many rmap operations can be skipped as they are guaranteed to be
-no-ops. This saves some time which would be spent on the rmap operation.
-It also avoids acquiring the MMU lock in write mode for many operations.
+In preparation for lazily allocating the rmaps when the TDP MMU is in
+use, protect the rmaps with SRCU. Unfortunately, this requires
+propagating a pointer to struct kvm around to several functions.
 
-This makes it safe to run the VM without rmaps allocated, when only
-using the TDP MMU and sets the stage for waiting to allocate the rmaps
-until they're needed.
-
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 128 +++++++++++++++++++++++++----------------
- 1 file changed, 77 insertions(+), 51 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 57 +++++++++++++++++++++++++-----------------
+ arch/x86/kvm/x86.c     |  6 ++---
+ 2 files changed, 37 insertions(+), 26 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 8761b4925755..730ea84bf7e7 100644
+index 730ea84bf7e7..48067c572c02 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1189,6 +1189,10 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
- 	if (is_tdp_mmu_enabled(kvm))
- 		kvm_tdp_mmu_clear_dirty_pt_masked(kvm, slot,
- 				slot->base_gfn + gfn_offset, mask, true);
-+
-+	if (!kvm_memslots_have_rmaps(kvm))
-+		return;
-+
- 	while (mask) {
- 		rmap_head = __gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
- 					  PG_LEVEL_4K, slot);
-@@ -1218,6 +1222,10 @@ static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
- 	if (is_tdp_mmu_enabled(kvm))
- 		kvm_tdp_mmu_clear_dirty_pt_masked(kvm, slot,
- 				slot->base_gfn + gfn_offset, mask, false);
-+
-+	if (!kvm_memslots_have_rmaps(kvm))
-+		return;
-+
- 	while (mask) {
- 		rmap_head = __gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
- 					  PG_LEVEL_4K, slot);
-@@ -1260,9 +1268,12 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
- 	int i;
- 	bool write_protected = false;
- 
--	for (i = PG_LEVEL_4K; i <= KVM_MAX_HUGEPAGE_LEVEL; ++i) {
--		rmap_head = __gfn_to_rmap(gfn, i, slot);
--		write_protected |= __rmap_write_protect(kvm, rmap_head, true);
-+	if (kvm_memslots_have_rmaps(kvm)) {
-+		for (i = PG_LEVEL_4K; i <= KVM_MAX_HUGEPAGE_LEVEL; ++i) {
-+			rmap_head = __gfn_to_rmap(gfn, i, slot);
-+			write_protected |= __rmap_write_protect(kvm, rmap_head,
-+								true);
-+		}
- 	}
- 
- 	if (is_tdp_mmu_enabled(kvm))
-@@ -1433,9 +1444,10 @@ static __always_inline bool kvm_handle_gfn_range(struct kvm *kvm,
- 
- bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- {
--	bool flush;
-+	bool flush = false;
- 
--	flush = kvm_handle_gfn_range(kvm, range, kvm_unmap_rmapp);
-+	if (kvm_memslots_have_rmaps(kvm))
-+		flush = kvm_handle_gfn_range(kvm, range, kvm_unmap_rmapp);
- 
- 	if (is_tdp_mmu_enabled(kvm))
- 		flush |= kvm_tdp_mmu_unmap_gfn_range(kvm, range, flush);
-@@ -1445,9 +1457,10 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- 
- bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
--	bool flush;
-+	bool flush = false;
- 
--	flush = kvm_handle_gfn_range(kvm, range, kvm_set_pte_rmapp);
-+	if (kvm_memslots_have_rmaps(kvm))
-+		flush = kvm_handle_gfn_range(kvm, range, kvm_set_pte_rmapp);
- 
- 	if (is_tdp_mmu_enabled(kvm))
- 		flush |= kvm_tdp_mmu_set_spte_gfn(kvm, range);
-@@ -1500,9 +1513,10 @@ static void rmap_recycle(struct kvm_vcpu *vcpu, u64 *spte, gfn_t gfn)
- 
- bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
--	bool young;
-+	bool young = false;
- 
--	young = kvm_handle_gfn_range(kvm, range, kvm_age_rmapp);
-+	if (kvm_memslots_have_rmaps(kvm))
-+		young = kvm_handle_gfn_range(kvm, range, kvm_age_rmapp);
- 
- 	if (is_tdp_mmu_enabled(kvm))
- 		young |= kvm_tdp_mmu_age_gfn_range(kvm, range);
-@@ -1512,9 +1526,10 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- 
- bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
--	bool young;
-+	bool young = false;
- 
--	young = kvm_handle_gfn_range(kvm, range, kvm_test_age_rmapp);
-+	if (kvm_memslots_have_rmaps(kvm))
-+		young = kvm_handle_gfn_range(kvm, range, kvm_test_age_rmapp);
- 
- 	if (is_tdp_mmu_enabled(kvm))
- 		young |= kvm_tdp_mmu_test_age_gfn(kvm, range);
-@@ -5440,7 +5455,8 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
- 	 */
- 	kvm_reload_remote_mmus(kvm);
- 
--	kvm_zap_obsolete_pages(kvm);
-+	if (kvm_memslots_have_rmaps(kvm))
-+		kvm_zap_obsolete_pages(kvm);
- 
- 	write_unlock(&kvm->mmu_lock);
- 
-@@ -5492,29 +5508,29 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
- 	int i;
- 	bool flush = false;
- 
--	write_lock(&kvm->mmu_lock);
--	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
--		slots = __kvm_memslots(kvm, i);
--		kvm_for_each_memslot(memslot, slots) {
--			gfn_t start, end;
--
--			start = max(gfn_start, memslot->base_gfn);
--			end = min(gfn_end, memslot->base_gfn + memslot->npages);
--			if (start >= end)
--				continue;
-+	if (kvm_memslots_have_rmaps(kvm)) {
-+		write_lock(&kvm->mmu_lock);
-+		for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-+			slots = __kvm_memslots(kvm, i);
-+			kvm_for_each_memslot(memslot, slots) {
-+				gfn_t start, end;
-+
-+				start = max(gfn_start, memslot->base_gfn);
-+				end = min(gfn_end, memslot->base_gfn + memslot->npages);
-+				if (start >= end)
-+					continue;
- 
--			flush = slot_handle_level_range(kvm, memslot, kvm_zap_rmapp,
--							PG_LEVEL_4K,
--							KVM_MAX_HUGEPAGE_LEVEL,
--							start, end - 1, true, flush);
-+				flush = slot_handle_level_range(kvm, memslot,
-+						kvm_zap_rmapp, PG_LEVEL_4K,
-+						KVM_MAX_HUGEPAGE_LEVEL, start,
-+						end - 1, true, flush);
-+			}
- 		}
-+		if (flush)
-+			kvm_flush_remote_tlbs_with_address(kvm, gfn_start, gfn_end);
-+		write_unlock(&kvm->mmu_lock);
- 	}
- 
--	if (flush)
--		kvm_flush_remote_tlbs_with_address(kvm, gfn_start, gfn_end);
--
--	write_unlock(&kvm->mmu_lock);
--
- 	if (is_tdp_mmu_enabled(kvm)) {
- 		flush = false;
- 
-@@ -5541,12 +5557,15 @@ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
- 				      struct kvm_memory_slot *memslot,
- 				      int start_level)
- {
--	bool flush;
-+	bool flush = false;
- 
--	write_lock(&kvm->mmu_lock);
--	flush = slot_handle_level(kvm, memslot, slot_rmap_write_protect,
--				start_level, KVM_MAX_HUGEPAGE_LEVEL, false);
--	write_unlock(&kvm->mmu_lock);
-+	if (kvm_memslots_have_rmaps(kvm)) {
-+		write_lock(&kvm->mmu_lock);
-+		flush = slot_handle_level(kvm, memslot, slot_rmap_write_protect,
-+					  start_level, KVM_MAX_HUGEPAGE_LEVEL,
-+					  false);
-+		write_unlock(&kvm->mmu_lock);
-+	}
- 
- 	if (is_tdp_mmu_enabled(kvm)) {
- 		read_lock(&kvm->mmu_lock);
-@@ -5616,16 +5635,15 @@ void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
- 	struct kvm_memory_slot *slot = (struct kvm_memory_slot *)memslot;
- 	bool flush;
- 
--	write_lock(&kvm->mmu_lock);
--	flush = slot_handle_leaf(kvm, slot, kvm_mmu_zap_collapsible_spte, true);
--
--	if (flush)
--		kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
--	write_unlock(&kvm->mmu_lock);
-+	if (kvm_memslots_have_rmaps(kvm)) {
-+		write_lock(&kvm->mmu_lock);
-+		flush = slot_handle_leaf(kvm, slot, kvm_mmu_zap_collapsible_spte, true);
-+		if (flush)
-+			kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
-+		write_unlock(&kvm->mmu_lock);
-+	}
- 
- 	if (is_tdp_mmu_enabled(kvm)) {
--		flush = false;
--
- 		read_lock(&kvm->mmu_lock);
- 		flush = kvm_tdp_mmu_zap_collapsible_sptes(kvm, slot, flush);
- 		if (flush)
-@@ -5652,11 +5670,14 @@ void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
- void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
- 				   struct kvm_memory_slot *memslot)
- {
--	bool flush;
-+	bool flush = false;
- 
--	write_lock(&kvm->mmu_lock);
--	flush = slot_handle_leaf(kvm, memslot, __rmap_clear_dirty, false);
--	write_unlock(&kvm->mmu_lock);
-+	if (kvm_memslots_have_rmaps(kvm)) {
-+		write_lock(&kvm->mmu_lock);
-+		flush = slot_handle_leaf(kvm, memslot, __rmap_clear_dirty,
-+					 false);
-+		write_unlock(&kvm->mmu_lock);
-+	}
- 
- 	if (is_tdp_mmu_enabled(kvm)) {
- 		read_lock(&kvm->mmu_lock);
-@@ -5681,6 +5702,14 @@ void kvm_mmu_zap_all(struct kvm *kvm)
- 	int ign;
- 
- 	write_lock(&kvm->mmu_lock);
-+	if (is_tdp_mmu_enabled(kvm))
-+		kvm_tdp_mmu_zap_all(kvm);
-+
-+	if (!kvm_memslots_have_rmaps(kvm)) {
-+		write_unlock(&kvm->mmu_lock);
-+		return;
-+	}
-+
- restart:
- 	list_for_each_entry_safe(sp, node, &kvm->arch.active_mmu_pages, link) {
- 		if (WARN_ON(sp->role.invalid))
-@@ -5693,9 +5722,6 @@ void kvm_mmu_zap_all(struct kvm *kvm)
- 
- 	kvm_mmu_commit_zap_page(kvm, &invalid_list);
- 
--	if (is_tdp_mmu_enabled(kvm))
--		kvm_tdp_mmu_zap_all(kvm);
--
- 	write_unlock(&kvm->mmu_lock);
+@@ -927,13 +927,18 @@ static void pte_list_remove(struct kvm_rmap_head *rmap_head, u64 *sptep)
+ 	__pte_list_remove(sptep, rmap_head);
  }
  
+-static struct kvm_rmap_head *__gfn_to_rmap(gfn_t gfn, int level,
++static struct kvm_rmap_head *__gfn_to_rmap(struct kvm *kvm, gfn_t gfn,
++					   int level,
+ 					   struct kvm_memory_slot *slot)
+ {
++	struct kvm_rmap_head *head;
+ 	unsigned long idx;
+ 
+ 	idx = gfn_to_index(gfn, slot->base_gfn, level);
+-	return &slot->arch.rmap[level - PG_LEVEL_4K][idx];
++	head = srcu_dereference_check(slot->arch.rmap[level - PG_LEVEL_4K],
++				      &kvm->srcu,
++				      lockdep_is_held(&kvm->slots_arch_lock));
++	return &head[idx];
+ }
+ 
+ static struct kvm_rmap_head *gfn_to_rmap(struct kvm *kvm, gfn_t gfn,
+@@ -944,7 +949,7 @@ static struct kvm_rmap_head *gfn_to_rmap(struct kvm *kvm, gfn_t gfn,
+ 
+ 	slots = kvm_memslots_for_spte_role(kvm, sp->role);
+ 	slot = __gfn_to_memslot(slots, gfn);
+-	return __gfn_to_rmap(gfn, sp->role.level, slot);
++	return __gfn_to_rmap(kvm, gfn, sp->role.level, slot);
+ }
+ 
+ static bool rmap_can_add(struct kvm_vcpu *vcpu)
+@@ -1194,7 +1199,8 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
+ 		return;
+ 
+ 	while (mask) {
+-		rmap_head = __gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
++		rmap_head = __gfn_to_rmap(kvm,
++					  slot->base_gfn + gfn_offset + __ffs(mask),
+ 					  PG_LEVEL_4K, slot);
+ 		__rmap_write_protect(kvm, rmap_head, false);
+ 
+@@ -1227,7 +1233,8 @@ static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+ 		return;
+ 
+ 	while (mask) {
+-		rmap_head = __gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
++		rmap_head = __gfn_to_rmap(kvm,
++					  slot->base_gfn + gfn_offset + __ffs(mask),
+ 					  PG_LEVEL_4K, slot);
+ 		__rmap_clear_dirty(kvm, rmap_head, slot);
+ 
+@@ -1270,7 +1277,7 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
+ 
+ 	if (kvm_memslots_have_rmaps(kvm)) {
+ 		for (i = PG_LEVEL_4K; i <= KVM_MAX_HUGEPAGE_LEVEL; ++i) {
+-			rmap_head = __gfn_to_rmap(gfn, i, slot);
++			rmap_head = __gfn_to_rmap(kvm, gfn, i, slot);
+ 			write_protected |= __rmap_write_protect(kvm, rmap_head,
+ 								true);
+ 		}
+@@ -1373,17 +1380,19 @@ struct slot_rmap_walk_iterator {
+ };
+ 
+ static void
+-rmap_walk_init_level(struct slot_rmap_walk_iterator *iterator, int level)
++rmap_walk_init_level(struct kvm *kvm, struct slot_rmap_walk_iterator *iterator,
++		     int level)
+ {
+ 	iterator->level = level;
+ 	iterator->gfn = iterator->start_gfn;
+-	iterator->rmap = __gfn_to_rmap(iterator->gfn, level, iterator->slot);
+-	iterator->end_rmap = __gfn_to_rmap(iterator->end_gfn, level,
++	iterator->rmap = __gfn_to_rmap(kvm, iterator->gfn, level,
++				       iterator->slot);
++	iterator->end_rmap = __gfn_to_rmap(kvm, iterator->end_gfn, level,
+ 					   iterator->slot);
+ }
+ 
+ static void
+-slot_rmap_walk_init(struct slot_rmap_walk_iterator *iterator,
++slot_rmap_walk_init(struct kvm *kvm, struct slot_rmap_walk_iterator *iterator,
+ 		    struct kvm_memory_slot *slot, int start_level,
+ 		    int end_level, gfn_t start_gfn, gfn_t end_gfn)
+ {
+@@ -1393,7 +1402,7 @@ slot_rmap_walk_init(struct slot_rmap_walk_iterator *iterator,
+ 	iterator->start_gfn = start_gfn;
+ 	iterator->end_gfn = end_gfn;
+ 
+-	rmap_walk_init_level(iterator, iterator->start_level);
++	rmap_walk_init_level(kvm, iterator, iterator->start_level);
+ }
+ 
+ static bool slot_rmap_walk_okay(struct slot_rmap_walk_iterator *iterator)
+@@ -1401,7 +1410,8 @@ static bool slot_rmap_walk_okay(struct slot_rmap_walk_iterator *iterator)
+ 	return !!iterator->rmap;
+ }
+ 
+-static void slot_rmap_walk_next(struct slot_rmap_walk_iterator *iterator)
++static void slot_rmap_walk_next(struct kvm *kvm,
++				struct slot_rmap_walk_iterator *iterator)
+ {
+ 	if (++iterator->rmap <= iterator->end_rmap) {
+ 		iterator->gfn += (1UL << KVM_HPAGE_GFN_SHIFT(iterator->level));
+@@ -1413,15 +1423,15 @@ static void slot_rmap_walk_next(struct slot_rmap_walk_iterator *iterator)
+ 		return;
+ 	}
+ 
+-	rmap_walk_init_level(iterator, iterator->level);
++	rmap_walk_init_level(kvm, iterator, iterator->level);
+ }
+ 
+-#define for_each_slot_rmap_range(_slot_, _start_level_, _end_level_,	\
+-	   _start_gfn, _end_gfn, _iter_)				\
+-	for (slot_rmap_walk_init(_iter_, _slot_, _start_level_,		\
+-				 _end_level_, _start_gfn, _end_gfn);	\
+-	     slot_rmap_walk_okay(_iter_);				\
+-	     slot_rmap_walk_next(_iter_))
++#define for_each_slot_rmap_range(_kvm_, _slot_, _start_level_, _end_level_,	\
++				 _start_gfn, _end_gfn, _iter_)			\
++	for (slot_rmap_walk_init(_kvm_, _iter_, _slot_, _start_level_,		\
++				 _end_level_, _start_gfn, _end_gfn);		\
++	     slot_rmap_walk_okay(_iter_);					\
++	     slot_rmap_walk_next(_kvm_, _iter_))
+ 
+ typedef bool (*rmap_handler_t)(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+ 			       struct kvm_memory_slot *slot, gfn_t gfn,
+@@ -1434,8 +1444,9 @@ static __always_inline bool kvm_handle_gfn_range(struct kvm *kvm,
+ 	struct slot_rmap_walk_iterator iterator;
+ 	bool ret = false;
+ 
+-	for_each_slot_rmap_range(range->slot, PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL,
+-				 range->start, range->end - 1, &iterator)
++	for_each_slot_rmap_range(kvm, range->slot, PG_LEVEL_4K,
++				 KVM_MAX_HUGEPAGE_LEVEL, range->start,
++				 range->end - 1, &iterator)
+ 		ret |= handler(kvm, iterator.rmap, range->slot, iterator.gfn,
+ 			       iterator.level, range->pte);
+ 
+@@ -5233,8 +5244,8 @@ slot_handle_level_range(struct kvm *kvm, struct kvm_memory_slot *memslot,
+ {
+ 	struct slot_rmap_walk_iterator iterator;
+ 
+-	for_each_slot_rmap_range(memslot, start_level, end_level, start_gfn,
+-			end_gfn, &iterator) {
++	for_each_slot_rmap_range(kvm, memslot, start_level, end_level,
++				 start_gfn, end_gfn, &iterator) {
+ 		if (iterator.rmap)
+ 			flush |= fn(kvm, iterator.rmap, memslot);
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index d7a40ce342cc..1098ab73a704 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10854,9 +10854,9 @@ static int alloc_memslot_rmap(struct kvm_memory_slot *slot,
+ 		lpages = gfn_to_index(slot->base_gfn + npages - 1,
+ 				      slot->base_gfn, level) + 1;
+ 
+-		slot->arch.rmap[i] =
+-			kvcalloc(lpages, sizeof(*slot->arch.rmap[i]),
+-				 GFP_KERNEL_ACCOUNT);
++		rcu_assign_pointer(slot->arch.rmap[i],
++				   kvcalloc(lpages, sizeof(*slot->arch.rmap[i]),
++					    GFP_KERNEL_ACCOUNT));
+ 		if (!slot->arch.rmap[i])
+ 			goto out_free;
+ 	}
 -- 
 2.31.1.607.g51e8a6a459-goog
 
