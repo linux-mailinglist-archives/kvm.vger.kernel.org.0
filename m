@@ -2,64 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 958493754E8
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 15:38:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67BDE3754E9
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 15:38:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234357AbhEFNjg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 09:39:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45187 "EHLO
+        id S234369AbhEFNjk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 09:39:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55674 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233954AbhEFNjf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 May 2021 09:39:35 -0400
+        by vger.kernel.org with ESMTP id S233954AbhEFNjk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 May 2021 09:39:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620308316;
+        s=mimecast20190719; t=1620308321;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=k4PLS6ZKiwbiAj4ntOkzSZGX4ZG/Ux0v+1o1vvVJrYM=;
-        b=fXK2Y/P9RYah5H5Usg5XD7ROW3+c224PC1hsDZg5WY20szqAyp53YtvBheJC5PVPF5TsU5
-        hgY7bylhkWSMTg6H6RbwlkuzzflSaZqnLEuT/RatR7SE3Y5lPRN6LqyoXJp5TfYW/qwlwA
-        gisZvPU/Vsr4RHGxWQ6Gvt0jGKpBSns=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-233-0mxKsjtMPtWmK7kH_7XrTA-1; Thu, 06 May 2021 09:38:35 -0400
-X-MC-Unique: 0mxKsjtMPtWmK7kH_7XrTA-1
-Received: by mail-wm1-f72.google.com with SMTP id g17-20020a05600c0011b029014399f816a3so1337366wmc.7
-        for <kvm@vger.kernel.org>; Thu, 06 May 2021 06:38:34 -0700 (PDT)
+        bh=NaJZZTBiusehu1Tq7zBJHOToPc0jvSFCIFWhGsqf9q0=;
+        b=fresYRepUTg/YtxMS/3eGVjkRpuHC2Xi5fEGESlljRXmD5PL2fWTexa6z2dHsysbpno9TJ
+        tkwTRHAiN4vJN9wgANKJgwRKXkgLVDloiLlGdGf+yccTbZe6atcZxHWkoBcfxYN1bgt7Gi
+        Pwe4Jhb+5LbDNGRhRbmSjgWJlSTV28w=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-551-FEZgIZ2GPxqIYUxGuRdjdg-1; Thu, 06 May 2021 09:38:40 -0400
+X-MC-Unique: FEZgIZ2GPxqIYUxGuRdjdg-1
+Received: by mail-wr1-f72.google.com with SMTP id 91-20020adf94640000b029010b019075afso2201587wrq.17
+        for <kvm@vger.kernel.org>; Thu, 06 May 2021 06:38:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=k4PLS6ZKiwbiAj4ntOkzSZGX4ZG/Ux0v+1o1vvVJrYM=;
-        b=i7fXXwD2HxZm4uG1vmc0UX61/1uOUR4nQiqi4Pu/vtNNJwAWlnL2f9ml7kqTFXdIMB
-         juDax4y5Dusd4CRNvwR2zQmORUuFCUz13gtBgvDdEPHhEPtxLTTed1lzVG48aSAHbFdj
-         5O0OzwPliiTiNjZDBc9rZfGvPnfeBuc8n4NTaOdvOl9/Kq8OTMt56oaPJFiVN9aL2QTi
-         VeIf5DpQg2dKlacopho1c10h6dIMSEj31BZ54n4nD1SWl2GZ4qhXDTgHQ88ZakST15ZI
-         9AmOKtoiBqPkz8miMS/3QhnNPdHdxz5Yv3cQnkPGbfcUNic0+igid2iBfXgvdcbBexPL
-         Dp3Q==
-X-Gm-Message-State: AOAM532+K/EyMFIWkllDv9693Yksfg9zseFK7kL52q8pRFBo77I46qhJ
-        lQ5MX9fZ40szz/IXtxAi8rjNhMuTYBPr5d66TMjhxMU4XavXUD06MdlRVrLoMn8pTdskf1YrSm4
-        lLiDIQ1grskpL
-X-Received: by 2002:a5d:4707:: with SMTP id y7mr5273917wrq.137.1620308314031;
-        Thu, 06 May 2021 06:38:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw9OkIRdMCjajJ35Xqm95nwOIWcYI/GC6OCGDnowdoEynI2VdSlNOXJBaO3mbso8BQyxIbuGA==
-X-Received: by 2002:a5d:4707:: with SMTP id y7mr5273889wrq.137.1620308313868;
-        Thu, 06 May 2021 06:38:33 -0700 (PDT)
+        bh=NaJZZTBiusehu1Tq7zBJHOToPc0jvSFCIFWhGsqf9q0=;
+        b=CnKheQNPpcdngIDsD1ZZnP6FY5frkj/QxF5qjxecLNPD3jeoXekDJBnTjP1cZ0/+Pz
+         i393J7b3h/ul9rFNfUgKvaLG6aAb5lz/yBbKB7Jxm11UJFEW0VXEX7c2CFSHckwmMrrL
+         bm8KNm5R4+qL8XcciA3wJz9YLVMqpo6bDD60xeL8GgfnSAWFpkiSwU82IQKlqdZnEU8h
+         zd/QcBUtcyyUkfBjlNcmeUzPUgxaYQrF6HS7n4S/FTLuP/Vn5Pk0IUomffceIRzY3GWa
+         NYVHW0HzCqmdXArCgz826zhzESUm/p8qOT0wGsPZaRYQIG+N7uHTaZ3w0yrug68Qo6vs
+         oPPw==
+X-Gm-Message-State: AOAM531qT/7XSEIfhxFM5k+N2m9ckb9dpWVAh5OK//FJFeD3yygJ84S+
+        6HrxqdR5+YLxnwlhUBxjPfqCMrx9GF1In2fvmAOZTm2phd75nZcNfJqqbugyTvwsmoDYUws1nGF
+        MdruQ2o3CyFHP
+X-Received: by 2002:adf:c002:: with SMTP id z2mr5292551wre.100.1620308318927;
+        Thu, 06 May 2021 06:38:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyyHdfkaTmkvWQf5Hf6Mx8u2g2OWRDThcbJG1gkPh5MWHU1eQptHFzQJqG0ffuS/NnFVO+6Rg==
+X-Received: by 2002:adf:c002:: with SMTP id z2mr5292527wre.100.1620308318789;
+        Thu, 06 May 2021 06:38:38 -0700 (PDT)
 Received: from localhost.localdomain (astrasbourg-652-1-219-60.w90-40.abo.wanadoo.fr. [90.40.114.60])
-        by smtp.gmail.com with ESMTPSA id j13sm4830339wrd.81.2021.05.06.06.38.32
+        by smtp.gmail.com with ESMTPSA id l22sm9501029wmq.28.2021.05.06.06.38.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 May 2021 06:38:33 -0700 (PDT)
+        Thu, 06 May 2021 06:38:38 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     kvm@vger.kernel.org, qemu-ppc@nongnu.org, qemu-arm@nongnu.org,
         Gerd Hoffmann <kraxel@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [PATCH v2 7/9] gdbstub: Replace alloca() + memset(0) by g_new0()
-Date:   Thu,  6 May 2021 15:37:56 +0200
-Message-Id: <20210506133758.1749233-8-philmd@redhat.com>
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>
+Subject: [PATCH v2 8/9] hw/misc/pca9552: Replace g_newa() by g_new()
+Date:   Thu,  6 May 2021 15:37:57 +0200
+Message-Id: <20210506133758.1749233-9-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.3
 In-Reply-To: <20210506133758.1749233-1-philmd@redhat.com>
 References: <20210506133758.1749233-1-philmd@redhat.com>
@@ -72,34 +75,26 @@ X-Mailing-List: kvm@vger.kernel.org
 
 The ALLOCA(3) man-page mentions its "use is discouraged".
 
-Replace the alloca() and memset(0) calls by g_new0().
+Replace the g_newa() call by g_new().
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- gdbstub.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ hw/misc/pca9552.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 7cee2fb0f1f..666053bf590 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1487,14 +1487,13 @@ static int process_string_cmd(void *user_ctx, const char *data,
-         if (cmd->schema) {
-             int schema_len = strlen(cmd->schema);
-             int max_num_params = schema_len / 2;
-+            g_autofree GdbCmdVariant *params = NULL;
+diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
+index b7686e27d7f..facf103cbfb 100644
+--- a/hw/misc/pca9552.c
++++ b/hw/misc/pca9552.c
+@@ -71,7 +71,7 @@ static void pca955x_display_pins_status(PCA955xState *s,
+         return;
+     }
+     if (trace_event_get_state_backends(TRACE_PCA955X_GPIO_STATUS)) {
+-        char *buf = g_newa(char, k->pin_count + 1);
++        g_autofree char *buf = g_new(char, k->pin_count + 1);
  
-             if (schema_len % 2) {
-                 return -2;
-             }
- 
--            gdb_ctx.params = (GdbCmdVariant *)alloca(sizeof(*gdb_ctx.params)
--                                                     * max_num_params);
--            memset(gdb_ctx.params, 0, sizeof(*gdb_ctx.params) * max_num_params);
-+            gdb_ctx.params = params = g_new0(GdbCmdVariant, max_num_params);
- 
-             if (cmd_parse_params(&data[strlen(cmd->cmd)], cmd->schema,
-                                  gdb_ctx.params, &gdb_ctx.num_params)) {
+         for (i = 0; i < k->pin_count; i++) {
+             if (extract32(pins_status, i, 1)) {
 -- 
 2.26.3
 
