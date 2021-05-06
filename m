@@ -2,180 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D7102375CFE
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 23:50:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B962375D1D
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 00:16:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230231AbhEFVvX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 17:51:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41891 "EHLO
+        id S230299AbhEFWRw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 18:17:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54364 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230048AbhEFVvX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 May 2021 17:51:23 -0400
+        by vger.kernel.org with ESMTP id S230149AbhEFWRu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 May 2021 18:17:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620337823;
+        s=mimecast20190719; t=1620339411;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Q9h3TdRqA3v9lLQkKiiTDr2ssav5eexul01Jy9Pakf4=;
-        b=CCfV5m1cWUgOFyEMAyPmn+ARdn+f6Z4jShdIcrM67+8WN+k7eQdjHbDg9fna1QYjhD2f1j
-        KS7+ozRIobcZRZQn7QOAyCHSRsuEeq5+RLKDS0GOIj7GM5v0wjVdzWzrRXx7uA19+Y8P6R
-        tfOBXfOxJTNu941JPV2lN/Tif3rm4Ts=
+        bh=VVqtcHMBiEb5CBRrlD2feZ+Jh9dkQ48ROy3h7QQSIaA=;
+        b=UiW8H7RrnHr5SAuNY13ZZkrYgb1/x/YTrFEsOZdXZ7MqQWbfgiLPMQO6jfCmTrFQFqqVR7
+        MSpuyIya29Wc5zNp3nZbXvMfkUICW4Jn5LMXzzB8P8ATLuWQxBk0lZaQFdbtcbcENf2UZH
+        lA2yI7a4nntUHtN54C5TyiZgEzOe28Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-eeDIo886N2awTTLzwNq-Ug-1; Thu, 06 May 2021 17:50:21 -0400
-X-MC-Unique: eeDIo886N2awTTLzwNq-Ug-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-8-bCkilFXlNEGUMolnrLCKfA-1; Thu, 06 May 2021 18:16:49 -0400
+X-MC-Unique: bCkilFXlNEGUMolnrLCKfA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A7B7802938;
-        Thu,  6 May 2021 21:50:20 +0000 (UTC)
-Received: from redhat.com (ovpn-113-225.phx2.redhat.com [10.3.113.225])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 48D845D9CA;
-        Thu,  6 May 2021 21:50:05 +0000 (UTC)
-Date:   Thu, 6 May 2021 15:50:04 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc:     jmorris@namei.org, dhowells@redhat.com,
-        linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org, kvm@vger.kernel.org,
-        mjg59@srcf.ucam.org, keescook@chromium.org, cohuck@redhat.com
-Subject: Re: [PATCH] vfio: Lock down no-IOMMU mode when kernel is locked
- down
-Message-ID: <20210506155004.7e214d8f@redhat.com>
-In-Reply-To: <20210506091859.6961-1-maxime.coquelin@redhat.com>
-References: <20210506091859.6961-1-maxime.coquelin@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC99318397A4;
+        Thu,  6 May 2021 22:16:48 +0000 (UTC)
+Received: from localhost (unknown [10.22.8.123])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6638710027A5;
+        Thu,  6 May 2021 22:16:48 +0000 (UTC)
+Date:   Thu, 6 May 2021 18:16:47 -0400
+From:   Eduardo Habkost <ehabkost@redhat.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     pbonzini@redhat.com, richard.henderson@linaro.org,
+        mtosatti@redhat.com, sean.j.christopherson@intel.com,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v7 2/6] target/i386: Enable XSS feature enumeration for
+ CPUID
+Message-ID: <20210506221647.zaq4or66rqspxssb@habkost.net>
+References: <20210226022058.24562-1-weijiang.yang@intel.com>
+ <20210226022058.24562-3-weijiang.yang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210226022058.24562-3-weijiang.yang@intel.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  6 May 2021 11:18:59 +0200
-Maxime Coquelin <maxime.coquelin@redhat.com> wrote:
-
-> When no-IOMMU mode is enabled, VFIO is as unsafe as accessing
-> the PCI BARs via the device's sysfs, which is locked down when
-> the kernel is locked down.
+On Fri, Feb 26, 2021 at 10:20:54AM +0800, Yang Weijiang wrote:
+> Currently, CPUID.(EAX=0DH,ECX=01H) doesn't enumerate features in
+> XSS properly, add the support here. XCR0 bits indicate user-mode XSAVE
+> components, and XSS bits indicate supervisor-mode XSAVE components.
 > 
-> Indeed, it is possible for an attacker to craft DMA requests
-> to modify kernel's code or leak secrets stored in the kernel,
-> since the device is not isolated by an IOMMU.
-> 
-> This patch introduces a new integrity lockdown reason for the
-> unsafe VFIO no-iommu mode.
-
-I'm hoping security folks will chime in here as I'm not familiar with
-the standard practices for new lockdown reasons.  The vfio no-iommu
-backend is clearly an integrity risk, which is why it's already hidden
-behind a separate Kconfig option, requires RAWIO capabilities, and
-taints the kernel if it's used, but I agree that preventing it during
-lockdown seems like a good additional step.
-
-Is it generally advised to create specific reasons, like done here, or
-should we aim to create a more generic reason related to unrestricted
-userspace DMA?
-
-I understand we don't want to re-use PCI_ACCESS because the vfio
-no-iommu backend is device agnostic, it can be used for both PCI and
-non-PCI devices.
-
-> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 > ---
->  drivers/vfio/vfio.c      | 13 +++++++++----
->  include/linux/security.h |  1 +
->  security/security.c      |  1 +
->  3 files changed, 11 insertions(+), 4 deletions(-)
+>  target/i386/cpu.c | 48 ++++++++++++++++++++++++++++++++++++++++++-----
+>  target/i386/cpu.h | 12 ++++++++++++
+>  2 files changed, 55 insertions(+), 5 deletions(-)
 > 
-> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> index 5e631c359ef2..fe466d6ea5d8 100644
-> --- a/drivers/vfio/vfio.c
-> +++ b/drivers/vfio/vfio.c
-> @@ -25,6 +25,7 @@
->  #include <linux/pci.h>
->  #include <linux/rwsem.h>
->  #include <linux/sched.h>
-> +#include <linux/security.h>
->  #include <linux/slab.h>
->  #include <linux/stat.h>
->  #include <linux/string.h>
-> @@ -165,7 +166,8 @@ static void *vfio_noiommu_open(unsigned long arg)
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 89edab4240..f3923988ed 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -1058,6 +1058,24 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>          },
+>          .tcg_features = TCG_XSAVE_FEATURES,
+>      },
+> +    [FEAT_XSAVE_XSS_LO] = {
+> +        .type = CPUID_FEATURE_WORD,
+> +        .cpuid = {
+> +            .eax = 0xD,
+> +            .needs_ecx = true,
+> +            .ecx = 1,
+> +            .reg = R_ECX,
+> +        },
+> +    },
+> +    [FEAT_XSAVE_XSS_HI] = {
+> +        .type = CPUID_FEATURE_WORD,
+> +        .cpuid = {
+> +            .eax = 0xD,
+> +            .needs_ecx = true,
+> +            .ecx = 1,
+> +            .reg = R_EDX
+> +        },
+> +    },
+>      [FEAT_6_EAX] = {
+>          .type = CPUID_FEATURE_WORD,
+>          .feat_names = {
+> @@ -1478,6 +1496,9 @@ static uint32_t xsave_area_size(uint64_t mask)
+>      for (i = 0; i < ARRAY_SIZE(x86_ext_save_areas); i++) {
+>          const ExtSaveArea *esa = &x86_ext_save_areas[i];
+>          if ((mask >> i) & 1) {
+> +            if (i >= 2 && !esa->offset) {
+
+Maybe a few comments at the definition of ExtSaveArea to explain
+that offset can now be zero (and what it means when it's zero)
+would be helpful.  I took a while to understand why this is safe.
+
+Would it be valid to say "ExtSaveArea.offset has a valid offset
+only if the component is in CPUID_XSTATE_XCR0_MASK"?  If so,
+can't this check be simply replaced with:
+  if ((1 << i) & CPUID_XSTATE_XCR0_MASK)
+?
+
+Or maybe this function should just contain a:
+  assert(!(mask & CPUID_XSTATE_XCR0_MASK));
+at the beginning?
+
+
+> +                continue;
+> +            }
+>              ret = MAX(ret, esa->offset + esa->size);
+>          }
+>      }
+> @@ -1489,12 +1510,18 @@ static inline bool accel_uses_host_cpuid(void)
+>      return kvm_enabled() || hvf_enabled();
+>  }
+>  
+> -static inline uint64_t x86_cpu_xsave_components(X86CPU *cpu)
+> +static inline uint64_t x86_cpu_xsave_xcr0_components(X86CPU *cpu)
 >  {
->  	if (arg != VFIO_NOIOMMU_IOMMU)
->  		return ERR_PTR(-EINVAL);
-> -	if (!capable(CAP_SYS_RAWIO))
-> +	if (!capable(CAP_SYS_RAWIO) ||
-> +			security_locked_down(LOCKDOWN_VFIO_NOIOMMU))
->  		return ERR_PTR(-EPERM);
+>      return ((uint64_t)cpu->env.features[FEAT_XSAVE_XCR0_HI]) << 32 |
+>             cpu->env.features[FEAT_XSAVE_XCR0_LO];
+>  }
 >  
->  	return NULL;
-> @@ -1280,7 +1282,8 @@ static int vfio_group_set_container(struct vfio_group *group, int container_fd)
->  	if (atomic_read(&group->container_users))
->  		return -EINVAL;
+> +static inline uint64_t x86_cpu_xsave_xss_components(X86CPU *cpu)
+> +{
+> +    return ((uint64_t)cpu->env.features[FEAT_XSAVE_XSS_HI]) << 32 |
+> +           cpu->env.features[FEAT_XSAVE_XSS_LO];
+> +}
+> +
+>  const char *get_register_name_32(unsigned int reg)
+>  {
+>      if (reg >= CPU_NB_REGS32) {
+> @@ -5716,7 +5743,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>          }
 >  
-> -	if (group->noiommu && !capable(CAP_SYS_RAWIO))
-> +	if (group->noiommu && (!capable(CAP_SYS_RAWIO) ||
-> +			security_locked_down(LOCKDOWN_VFIO_NOIOMMU)))
->  		return -EPERM;
->  
->  	f = fdget(container_fd);
-> @@ -1362,7 +1365,8 @@ static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
->  	    !group->container->iommu_driver || !vfio_group_viable(group))
->  		return -EINVAL;
->  
-> -	if (group->noiommu && !capable(CAP_SYS_RAWIO))
-> +	if (group->noiommu && (!capable(CAP_SYS_RAWIO) ||
-> +			security_locked_down(LOCKDOWN_VFIO_NOIOMMU)))
->  		return -EPERM;
->  
->  	device = vfio_device_get_from_name(group, buf);
-> @@ -1490,7 +1494,8 @@ static int vfio_group_fops_open(struct inode *inode, struct file *filep)
->  	if (!group)
->  		return -ENODEV;
->  
-> -	if (group->noiommu && !capable(CAP_SYS_RAWIO)) {
-> +	if (group->noiommu && (!capable(CAP_SYS_RAWIO) ||
-> +			security_locked_down(LOCKDOWN_VFIO_NOIOMMU))) {
->  		vfio_group_put(group);
->  		return -EPERM;
->  	}
+>          if (count == 0) {
+> -            *ecx = xsave_area_size(x86_cpu_xsave_components(cpu));
+> +            *ecx = xsave_area_size(x86_cpu_xsave_xcr0_components(cpu));
+>              *eax = env->features[FEAT_XSAVE_XCR0_LO];
+>              *edx = env->features[FEAT_XSAVE_XCR0_HI];
+>              /*
+> @@ -5728,11 +5755,17 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>              *ebx = kvm_enabled() ? *ecx : xsave_area_size(env->xcr0);
+>          } else if (count == 1) {
+>              *eax = env->features[FEAT_XSAVE];
+> +            *ecx = env->features[FEAT_XSAVE_XSS_LO];
+> +            *edx = env->features[FEAT_XSAVE_XSS_HI];
 
-In these cases where we're testing RAWIO, the idea is to raise the
-barrier of passing file descriptors to unprivileged users.  Is lockdown
-sufficiently static that we might really only need the test on open?
-The latter three cases here only make sense if the user were able to
-open a no-iommu context when lockdown is not enabled, then lockdown is
-later enabled preventing them from doing anything with that context...
-but not preventing ongoing unsafe usage that might already exist.  I
-suspect for that reason that lockdown is static and we really only need
-the test on open.  Thanks,
+What about EBX?  It is documented as "The size in bytes of the
+XSAVE area containing all states enabled by XCRO | IA32_XSS".
 
-Alex
+The Intel SDM is not clear, but I assume this would be
+necessarily the size of the area in compacted format?
 
-> diff --git a/include/linux/security.h b/include/linux/security.h
-> index 06f7c50ce77f..f29388180fab 100644
-> --- a/include/linux/security.h
-> +++ b/include/linux/security.h
-> @@ -120,6 +120,7 @@ enum lockdown_reason {
->  	LOCKDOWN_MMIOTRACE,
->  	LOCKDOWN_DEBUGFS,
->  	LOCKDOWN_XMON_WR,
-> +	LOCKDOWN_VFIO_NOIOMMU,
->  	LOCKDOWN_INTEGRITY_MAX,
->  	LOCKDOWN_KCORE,
->  	LOCKDOWN_KPROBES,
-> diff --git a/security/security.c b/security/security.c
-> index b38155b2de83..33c3ddb6dcab 100644
-> --- a/security/security.c
-> +++ b/security/security.c
-> @@ -58,6 +58,7 @@ const char *const lockdown_reasons[LOCKDOWN_CONFIDENTIALITY_MAX+1] = {
->  	[LOCKDOWN_MMIOTRACE] = "unsafe mmio",
->  	[LOCKDOWN_DEBUGFS] = "debugfs access",
->  	[LOCKDOWN_XMON_WR] = "xmon write access",
-> +	[LOCKDOWN_VFIO_NOIOMMU] = "VFIO unsafe no-iommu mode",
->  	[LOCKDOWN_INTEGRITY_MAX] = "integrity",
->  	[LOCKDOWN_KCORE] = "/proc/kcore access",
->  	[LOCKDOWN_KPROBES] = "use of kprobes",
+
+>          } else if (count < ARRAY_SIZE(x86_ext_save_areas)) {
+> -            if ((x86_cpu_xsave_components(cpu) >> count) & 1) {
+> -                const ExtSaveArea *esa = &x86_ext_save_areas[count];
+> +            const ExtSaveArea *esa = &x86_ext_save_areas[count];
+> +            if ((x86_cpu_xsave_xcr0_components(cpu) >> count) & 1) {
+>                  *eax = esa->size;
+>                  *ebx = esa->offset;
+> +            } else if ((x86_cpu_xsave_xss_components(cpu) >> count) & 1) {
+> +                *eax = esa->size;
+> +                *ebx = 0;
+> +                *ecx = 1;
+>              }
+>          }
+>          break;
+> @@ -6059,6 +6092,9 @@ static void x86_cpu_reset(DeviceState *dev)
+>      }
+>      for (i = 2; i < ARRAY_SIZE(x86_ext_save_areas); i++) {
+>          const ExtSaveArea *esa = &x86_ext_save_areas[i];
+> +        if (!esa->offset) {
+> +            continue;
+
+Most of the comments at the xsave_area_size() hunk would apply
+here.  I miss some clarity on what esa->offset==0 really means.
+
+Would it be valid to replace this with a check for
+  ((1 << i) & CPUID_XSTATE_XCR0_MASK)
+?
+
+> +        }
+>          if (env->features[esa->feature] & esa->bits) {
+>              xcr0 |= 1ull << i;
+>          }
+> @@ -6295,8 +6331,10 @@ static void x86_cpu_enable_xsave_components(X86CPU *cpu)
+>          }
+>      }
+>  
+> -    env->features[FEAT_XSAVE_XCR0_LO] = mask;
+> +    env->features[FEAT_XSAVE_XCR0_LO] = mask & CPUID_XSTATE_XCR0_MASK;
+>      env->features[FEAT_XSAVE_XCR0_HI] = mask >> 32;
+> +    env->features[FEAT_XSAVE_XSS_LO] = mask & CPUID_XSTATE_XSS_MASK;
+> +    env->features[FEAT_XSAVE_XSS_HI] = mask >> 32;
+>  }
+>  
+>  /***** Steps involved on loading and filtering CPUID data
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 52f31335c4..8aeaa8869a 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -504,6 +504,16 @@ typedef enum X86Seg {
+>  #define XSTATE_Hi16_ZMM_MASK            (1ULL << XSTATE_Hi16_ZMM_BIT)
+>  #define XSTATE_PKRU_MASK                (1ULL << XSTATE_PKRU_BIT)
+>  
+> +/* CPUID feature bits available in XCR0 */
+> +#define CPUID_XSTATE_XCR0_MASK  (XSTATE_FP_MASK | XSTATE_SSE_MASK | \
+> +                                 XSTATE_YMM_MASK | XSTATE_BNDREGS_MASK | \
+> +                                 XSTATE_BNDCSR_MASK | XSTATE_OPMASK_MASK | \
+> +                                 XSTATE_ZMM_Hi256_MASK | \
+> +                                 XSTATE_Hi16_ZMM_MASK | XSTATE_PKRU_MASK)
+> +
+> +/* CPUID feature bits available in XSS */
+> +#define CPUID_XSTATE_XSS_MASK    0
+
+Do you expect this to be used outside target/i386/cpu.c?  If not,
+maybe it could be moved close to the x86_ext_save_areas[]
+definition, as any updates to x86_ext_save_areas will require an
+update to these macros.
+
+> +
+>  /* CPUID feature words */
+>  typedef enum FeatureWord {
+>      FEAT_1_EDX,         /* CPUID[1].EDX */
+> @@ -541,6 +551,8 @@ typedef enum FeatureWord {
+>      FEAT_VMX_EPT_VPID_CAPS,
+>      FEAT_VMX_BASIC,
+>      FEAT_VMX_VMFUNC,
+> +    FEAT_XSAVE_XSS_LO,     /* CPUID[EAX=0xd,ECX=1].ECX */
+> +    FEAT_XSAVE_XSS_HI,     /* CPUID[EAX=0xd,ECX=1].EDX */
+>      FEATURE_WORDS,
+>  } FeatureWord;
+>  
+> -- 
+> 2.26.2
+> 
+> 
+
+-- 
+Eduardo
 
