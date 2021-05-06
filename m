@@ -2,51 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 74DB8375A47
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 20:42:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6640375A48
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 20:42:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234441AbhEFSnr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 14:43:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47970 "EHLO
+        id S234757AbhEFSnv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 14:43:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234241AbhEFSnp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 14:43:45 -0400
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05BDAC061574
-        for <kvm@vger.kernel.org>; Thu,  6 May 2021 11:42:46 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id 69-20020aed304b0000b02901c6d87aed7fso4119670qte.21
-        for <kvm@vger.kernel.org>; Thu, 06 May 2021 11:42:45 -0700 (PDT)
+        with ESMTP id S234470AbhEFSnu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 14:43:50 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D496C061574
+        for <kvm@vger.kernel.org>; Thu,  6 May 2021 11:42:51 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id s10-20020a05620a030ab02902e061a1661fso4143496qkm.12
+        for <kvm@vger.kernel.org>; Thu, 06 May 2021 11:42:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=sOvqNeuGyU/ZMmaxdOA2l2pA74nfx+pU9gEcCSqkRJU=;
-        b=uoosXHvihKGjquSMLz/CYZMZ4tR+g+wYMy+PQ0C6KeO5KYBM56Yk/c//Vb8khLCpLa
-         YCHBvNfyl8fH5jv4BySXf883bxjZ+cUiwAKJ1zfGhX8PIIuFYLGMwj52jIzhvNJwbrdG
-         ctX1VXEfR5WjkdhcV0c1eKg/C6Y6xKdg5LtFepfs9Lx49Y5kn3+C6LKUY85fNB9EBNUI
-         tZejepMkiSxcVdz5z3kRvFkJ0MgkNm40VBAr7pwUVoWYY16zBkswnXhIKMmIsWItYJkX
-         YakB7IEn+bKpzh6aLKFM1KSAejHXtfO3bkROa587oG0OexgaEENARbJzHsBf91VwKuP8
-         sppg==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=Ma9cEaNYQpiK24KAk14C2pwYKbfgwwx99tQd6V1vKOE=;
+        b=LYvO9qL1KxuwwY8zXKo8FEJSIkPJvM+7iXkMC0Ql2RmJ+Aw8djkGrqQ0nooXX6LCqN
+         vMoOU9dJbIHD2f/Nulg/MfRdxBbl17p77oGdeUwkND0cORvXlBjaOFjLgCQRhzCDu+SZ
+         57ndJ1qJcK22He2ba7+ttqL5NibboxrFqI1uEZBymduSL0WTc06py/ny14uFb6D2DIoX
+         79gV/oWqiT52iuQhyOCI+RgJa8arP8yybkAdYC8woKQd5WlhpTuqrgCzZOKXa5248qY/
+         22QKi4SBvhMs156Q7+cOLCExdqJMbUFMRqU1ahGdAAm5R95VxNuYQ69xcgFea9U+L6CW
+         uJHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=sOvqNeuGyU/ZMmaxdOA2l2pA74nfx+pU9gEcCSqkRJU=;
-        b=rXcG3cFM27IiiZakOlDrgCOZIbNCv4nwrNAZduXma9Iy47i6LWvMTcXiLY6AGECgDf
-         1KosnYMAg5YTfooodwctzhmcdCVvCT+AH/wZ5YFtLmt5cVmTXZFUL2i8HjBwU4pIzuNC
-         +ob5RTWOCYxogqE8FYZ8k/3UhqwXnEn3R4PLCGnlMuKSBDfiBSoehwc6flVG7gDZ4HvV
-         gP4qYbd3dutoQv7AD7Luoh9tx46fPCRsv7+Jsjc/Pj4IAESFQgiDs7cESKQgwk/iS9pq
-         XWiPzLFuFkMb3f0JQbGwzvCh7fT9PnTD0tKWJHH84CpZHem2OOFkwo9Gve8PF6tpTTXN
-         K5jg==
-X-Gm-Message-State: AOAM5318BTIDr2dfKSDt2FH8hV9D95edP+kc2bCRS3Cm3ruvCoDj0AKT
-        yAGfx/GsYNN/IFsLeFiuqtwbZOXq2gid
-X-Google-Smtp-Source: ABdhPJwtioxMRraHZDM3/mQxHN62IsmMxoyEHNLt1azp+GP7XBXuMx1lN08IjxpvyrsToOHNvTb9HUS7kNjB
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=Ma9cEaNYQpiK24KAk14C2pwYKbfgwwx99tQd6V1vKOE=;
+        b=gX9MwzjbUgVe8o22KSJm5KbA3RV35lE2Kk4oIylsO8ZY84M2paMJ8udpdTaaXAfVeU
+         frdoRC5sf6qUhtWFi79LXYLVWJQQWl4Z4WwHG1DMzJwVfOhj7EtG/cDzvXZUQMS+XCld
+         aRRjQ7sU0+W0nVV9IgNmglp1z8hUB5v/1Sttvel/Y42d6Oqqy0PtTIPjUdVQf8athag/
+         QnE0TSrr2Vp/prDM3GkX+qYR+aJW064mo+8bYV5tLM8JAxZ6pNsUWI66EYOnAUBAI31L
+         MboTikuvylWWFFvpSd9wY5AmDsR+SEBefDtxeGHbq/yq2MXMo5ztvbc+7lVzuVzwAkVq
+         CAMQ==
+X-Gm-Message-State: AOAM533xA8OUv0cNqHbYeEcVQYG1RYihlYmXBUtE9rc1AIUeUDcx0Wze
+        erOeRhWmQa3bug2QxjmNjKs/fSLrQt27
+X-Google-Smtp-Source: ABdhPJyNENTXrdjoSVNfItEX8J3Wb9EZHsSLEqNWcC9gEkVhLgIiJnnSfDKBbjTgQAWFiU+dEWlxTpcpyu/k
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:9258:9474:54ca:4500])
- (user=bgardon job=sendgmr) by 2002:a05:6214:258d:: with SMTP id
- fq13mr6103004qvb.50.1620326565176; Thu, 06 May 2021 11:42:45 -0700 (PDT)
-Date:   Thu,  6 May 2021 11:42:33 -0700
-Message-Id: <20210506184241.618958-1-bgardon@google.com>
+ (user=bgardon job=sendgmr) by 2002:a0c:b28c:: with SMTP id
+ r12mr3231963qve.32.1620326570257; Thu, 06 May 2021 11:42:50 -0700 (PDT)
+Date:   Thu,  6 May 2021 11:42:34 -0700
+In-Reply-To: <20210506184241.618958-1-bgardon@google.com>
+Message-Id: <20210506184241.618958-2-bgardon@google.com>
 Mime-Version: 1.0
+References: <20210506184241.618958-1-bgardon@google.com>
 X-Mailer: git-send-email 2.31.1.607.g51e8a6a459-goog
-Subject: [PATCH v3 0/8] Lazily allocate memslot rmaps
+Subject: [PATCH v3 1/8] KVM: x86/mmu: Deduplicate rmap freeing
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -63,52 +67,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series enables KVM to save memory when using the TDP MMU by waiting
-to allocate memslot rmaps until they are needed. To do this, KVM tracks
-whether or not a shadow root has been allocated. In order to get away
-with not allocating the rmaps, KVM must also be sure to skip operations
-which iterate over the rmaps. If the TDP MMU is in use and we have not
-allocated a shadow root, these operations would essentially be op-ops
-anyway. Skipping the rmap operations has a secondary benefit of avoiding
-acquiring the MMU lock in write mode in many cases, substantially
-reducing MMU lock contention.
+Small code deduplication. No functional change expected.
 
-This series was tested on an Intel Skylake machine. With the TDP MMU off
-and on, this introduced no new failures on kvm-unit-tests or KVM selftests.
+Signed-off-by: Ben Gardon <bgardon@google.com>
+---
+ arch/x86/kvm/x86.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
 
-Changelog:
-v2:
-	Incorporated feedback from Paolo and Sean
-	Replaced the memslot_assignment_lock with slots_arch_lock, which
-	has a larger critical section.
-
-v3:
-	Removed shadow_mmu_active as suggested by Sean
-	Removed everything except adding a return value to
-	kvm_mmu_init_tdp_mmu from patch 1 of v2
-	Added RCU protection and better memory ordering for installing the
-	memslot rmaps as suggested by Paolo
-	Reordered most of the patches
-
-Ben Gardon (8):
-  KVM: x86/mmu: Deduplicate rmap freeing
-  KVM: x86/mmu: Factor out allocating memslot rmap
-  KVM: mmu: Refactor memslot copy
-  KVM: mmu: Add slots_arch_lock for memslot arch fields
-  KVM: x86/mmu: Add a field to control memslot rmap allocation
-  KVM: x86/mmu: Skip rmap operations if rmaps not allocated
-  KVM: x86/mmu: Protect rmaps independently with SRCU
-  KVM: x86/mmu: Lazily allocate memslot rmaps
-
- arch/x86/include/asm/kvm_host.h |   9 ++
- arch/x86/kvm/mmu/mmu.c          | 195 ++++++++++++++++++++------------
- arch/x86/kvm/mmu/tdp_mmu.c      |   6 +-
- arch/x86/kvm/mmu/tdp_mmu.h      |   4 +-
- arch/x86/kvm/x86.c              | 107 ++++++++++++++----
- include/linux/kvm_host.h        |   9 ++
- virt/kvm/kvm_main.c             |  54 +++++++--
- 7 files changed, 275 insertions(+), 109 deletions(-)
-
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index cf3b67679cf0..5bcf07465c47 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10818,17 +10818,23 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 	kvm_hv_destroy_vm(kvm);
+ }
+ 
+-void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
++static void free_memslot_rmap(struct kvm_memory_slot *slot)
+ {
+ 	int i;
+ 
+ 	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
+ 		kvfree(slot->arch.rmap[i]);
+ 		slot->arch.rmap[i] = NULL;
++	}
++}
+ 
+-		if (i == 0)
+-			continue;
++void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
++{
++	int i;
++
++	free_memslot_rmap(slot);
+ 
++	for (i = 1; i < KVM_NR_PAGE_SIZES; ++i) {
+ 		kvfree(slot->arch.lpage_info[i - 1]);
+ 		slot->arch.lpage_info[i - 1] = NULL;
+ 	}
+@@ -10894,12 +10900,9 @@ static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
+ 	return 0;
+ 
+ out_free:
+-	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
+-		kvfree(slot->arch.rmap[i]);
+-		slot->arch.rmap[i] = NULL;
+-		if (i == 0)
+-			continue;
++	free_memslot_rmap(slot);
+ 
++	for (i = 1; i < KVM_NR_PAGE_SIZES; ++i) {
+ 		kvfree(slot->arch.lpage_info[i - 1]);
+ 		slot->arch.lpage_info[i - 1] = NULL;
+ 	}
 -- 
 2.31.1.607.g51e8a6a459-goog
 
