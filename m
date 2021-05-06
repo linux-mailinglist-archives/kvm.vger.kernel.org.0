@@ -2,116 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D634F37531C
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 13:35:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A054A375323
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 13:43:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234845AbhEFLgI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 07:36:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36295 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234842AbhEFLgH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 May 2021 07:36:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620300908;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IcruxJx/IBHZiLRdPQHrzdMkqW/EMFC2L1rirQLSBsk=;
-        b=Ut4uEZAEqcbTThhpyPGGcPrfnOq86r8qEjH9C1A6+OD/M5lGzhsrD2IZh2qF4OZBZuQfyG
-        A6JzBHTglGjdeTnk1A9Zvqbc80LNbQLAg1MY5KoKcP5/ojMsufmD9lMCyTk6hnHG8jwUDg
-        dlBSVAQxgmCEs96aMQuZbLEFma1o0/A=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-lOt6Y5dNPfiyMiz26Y4Hvw-1; Thu, 06 May 2021 07:35:04 -0400
-X-MC-Unique: lOt6Y5dNPfiyMiz26Y4Hvw-1
-Received: by mail-ej1-f72.google.com with SMTP id f8-20020a1709068248b02903a8adf1f5c2so498351ejx.19
-        for <kvm@vger.kernel.org>; Thu, 06 May 2021 04:35:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=IcruxJx/IBHZiLRdPQHrzdMkqW/EMFC2L1rirQLSBsk=;
-        b=RCG/rXxQSeA/11wyMLR8xmaSrCFC82WNaBB14VBKuElbX4KpbfkcaQ7rlKVJXA2X2/
-         nGkz18vmjxmhvxSwmuv/AUl7koGO9sUwwIobQqWeORxlj6WdOgF+CCUT/IM34yPIXMis
-         72mMwB9cK6OvD4jMRMaY9HCctn3/XrmGS25w0hbYA4uVa567+7x9OGVrJtBYavsxiPxE
-         WfyInyJhN3H5S/iXY/t5MJkLYPlOVj6l+qrP+V6BArIKEkfjBXAVXswbFJIucJE/I9Gu
-         rnkzaqZX1jObVz3HHOzPqYejJ74SlKXbwjUCZVldt2/jjZ3siam8SDBqhPyYmZY72iNz
-         rR+g==
-X-Gm-Message-State: AOAM531kzOJOWTF5zS0Uxih1mK7tNRspcOc4X2Lm5QqeKPODEh31ss0N
-        4y+2JieCRp3qjDxS2feMQy4akoGl3MosEILf8JIKU9n+YsYi3eqIVGGrULaKprpaHDU3rxqWMQ4
-        0SFzAxARkbLjW
-X-Received: by 2002:a17:906:dffb:: with SMTP id lc27mr2495218ejc.469.1620300903653;
-        Thu, 06 May 2021 04:35:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw7T6NEYxSs2IVjtnQnWAs8zbhJN+Tmbs/3knWOOHRukp3KsTdby0Kkpz24YEjFioxJPIqIBg==
-X-Received: by 2002:a17:906:dffb:: with SMTP id lc27mr2495192ejc.469.1620300903297;
-        Thu, 06 May 2021 04:35:03 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id i6sm1447225eds.83.2021.05.06.04.35.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 May 2021 04:35:02 -0700 (PDT)
-Subject: Re: KVM: x86: Cancel pvclock_gtod_work on module removal
-To:     Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>, x86@kernel.org,
-        LKML <linux-kernel@vger.kernel.org>
-References: <87czu4onry.ffs@nanos.tec.linutronix.de>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2a18634f-b100-334e-f7b5-01c84302e27e@redhat.com>
-Date:   Thu, 6 May 2021 13:35:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        id S229921AbhEFLoh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 07:44:37 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:17135 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229777AbhEFLog (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 07:44:36 -0400
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FbWpr1xXDzqSfJ;
+        Thu,  6 May 2021 19:40:20 +0800 (CST)
+Received: from [10.174.185.179] (10.174.185.179) by
+ DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
+ 14.3.498.0; Thu, 6 May 2021 19:43:26 +0800
+Subject: Re: [PATCH v2 03/11] KVM: arm64: Make kvm_skip_instr() and co private
+ to HYP
+To:     Marc Zyngier <maz@kernel.org>
+CC:     <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <kernel-team@android.com>, Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        David Brazdil <dbrazdil@google.com>
+References: <20201102164045.264512-1-maz@kernel.org>
+ <20201102164045.264512-4-maz@kernel.org>
+ <cef3517b-e66d-4d26-68a9-2d5fb433377c@huawei.com>
+ <875yzxnn5w.wl-maz@kernel.org> <87zgx8mkwd.wl-maz@kernel.org>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <db784fc8-3a52-49ff-0b75-83a1bbc81d98@huawei.com>
+Date:   Thu, 6 May 2021 19:43:26 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <87czu4onry.ffs@nanos.tec.linutronix.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <87zgx8mkwd.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.185.179]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/05/21 23:48, Thomas Gleixner wrote:
-> Nothing prevents the following:
-> 
->    pvclock_gtod_notify()
->      queue_work(system_long_wq, &pvclock_gtod_work);
->    ...
->    remove_module(kvm);
->    ...
->    work_queue_run()
->      pvclock_gtod_work()	<- UAF
-> 
-> Ditto for any other operation on that workqueue list head which touches
-> pvclock_gtod_work after module removal.
-> 
-> Cancel the work in kvm_arch_exit() to prevent that.
-> 
-> Fixes: 16e8d74d2da9 ("KVM: x86: notifier for clocksource changes")
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-> ---
-> Found by inspection because of:
->    https://lkml.kernel.org/r/0000000000001d43ac05c0f5c6a0@google.com
-> See also:
->    https://lkml.kernel.org/r/20210505105940.190490250@infradead.org
-> 
-> TL;DR: Scheduling work with tk_core.seq write held is a bad idea.
-> ---
->   arch/x86/kvm/x86.c |    1 +
->   1 file changed, 1 insertion(+)
-> 
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8168,6 +8168,7 @@ void kvm_arch_exit(void)
->   	cpuhp_remove_state_nocalls(CPUHP_AP_X86_KVM_CLK_ONLINE);
->   #ifdef CONFIG_X86_64
->   	pvclock_gtod_unregister_notifier(&pvclock_gtod_notifier);
-> +	cancel_work_sync(&pvclock_gtod_work);
->   #endif
->   	kvm_x86_ops.hardware_enable = NULL;
->   	kvm_mmu_module_exit();
-> 
+On 2021/5/6 14:33, Marc Zyngier wrote:
+> On Wed, 05 May 2021 17:46:51 +0100,
+> Marc Zyngier <maz@kernel.org> wrote:
+>>
+>> Hi Zenghui,
+>>
+>> On Wed, 05 May 2021 15:23:02 +0100,
+>> Zenghui Yu <yuzenghui@huawei.com> wrote:
+>>>
+>>> Hi Marc,
+>>>
+>>> On 2020/11/3 0:40, Marc Zyngier wrote:
+>>>> In an effort to remove the vcpu PC manipulations from EL1 on nVHE
+>>>> systems, move kvm_skip_instr() to be HYP-specific. EL1's intent
+>>>> to increment PC post emulation is now signalled via a flag in the
+>>>> vcpu structure.
+>>>>
+>>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>>
+>>> [...]
+>>>
+>>>> @@ -133,6 +134,8 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>>>>  	__load_guest_stage2(vcpu->arch.hw_mmu);
+>>>>  	__activate_traps(vcpu);
+>>>> +	__adjust_pc(vcpu);
+>>>
+>>> If the INCREMENT_PC flag was set (e.g., for WFx emulation) while we're
+>>> handling PSCI CPU_ON call targetting this VCPU, the *target_pc* (aka
+>>> entry point address, normally provided by the primary VCPU) will be
+>>> unexpectedly incremented here. That's pretty bad, I think.
+>>
+>> How can you online a CPU using PSCI if that CPU is currently spinning
+>> on a WFI? Or is that we have transitioned via userspace to perform the
+>> vcpu reset? I can imagine it happening in that case.
 
-Queued, thanks (with added Cc to stable).
+I hadn't tried to reset VCPU from userspace. That would be a much easier
+way to reproduce this problem.
 
-Paolo
+>>> This was noticed with a latest guest kernel, at least with commit
+>>> dccc9da22ded ("arm64: Improve parking of stopped CPUs"), which put the
+>>> stopped VCPUs in the WFx loop. The guest kernel shouted at me that
+>>>
+>>> 	"CPU: CPUs started in inconsistent modes"
+>>
+>> Ah, the perks of running guests with "quiet"... Well caught.
+>>
+>>> *after* rebooting. The problem is that the secondary entry point was
+>>> corrupted by KVM as explained above. All of the secondary processors
+>>> started from set_cpu_boot_mode_flag(), with w0=0. Oh well...
+>>>
+>>> I write the below diff and guess it will help. But I have to look at all
+>>> other places where we adjust PC directly to make a right fix. Please let
+>>> me know what do you think.
+>>>
+>>>
+>>> Thanks,
+>>> Zenghui
+>>>
+>>> ---->8----
+>>> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+>>> index 956cdc240148..ed647eb387c3 100644
+>>> --- a/arch/arm64/kvm/reset.c
+>>> +++ b/arch/arm64/kvm/reset.c
+>>> @@ -265,7 +265,12 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>>>  		if (vcpu->arch.reset_state.be)
+>>>  			kvm_vcpu_set_be(vcpu);
+>>>
+>>> +		/*
+>>> +		 * Don't bother with the KVM_ARM64_INCREMENT_PC flag while
+>>> +		 * using this version of __adjust_pc().
+>>> +		 */
+>>>  		*vcpu_pc(vcpu) = target_pc;
+>>> +		vcpu->arch.flags &= ~KVM_ARM64_INCREMENT_PC;
+> 
+> Actually, this is far worse than it looks, and this only papers over
+> one particular symptom. We need to resolve all pending PC updates
+> *before* returning to userspace, or things like live migration can
+> observe an inconsistent state.
 
+Ah yeah, agreed.
+
+Apart from the PC manipulation, I noticed that when handling the user
+GET_VCPU_EVENTS request:
+
+|	/*
+|	 * We never return a pending ext_dabt here because we deliver it to
+|	 * the virtual CPU directly when setting the event and it's no longer
+|	 * 'pending' at this point.
+|	 */
+
+Which isn't true anymore now that we defer the exception injection right
+before the VCPU entry. The comment needs to be updated anyway whilst it
+isn't clear to me that whether we should expose the in-kernel ext_dabt
+to userspace, given that the exception state is already reflected by the
+registers and the abort can be taken in the next VCPU entry (if we can
+appropriately fix the PC updating problem).
+
+> I'll try and cook something up.
+
+Thanks.
+
+
+Zenghui
