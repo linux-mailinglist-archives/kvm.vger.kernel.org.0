@@ -2,101 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05E9337555E
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 16:04:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99E91375561
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 16:05:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234638AbhEFOFA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 10:05:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:26438 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234489AbhEFOFA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 May 2021 10:05:00 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 146E3nGS046689
-        for <kvm@vger.kernel.org>; Thu, 6 May 2021 10:04:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=iFQCnsQsFzVQxEI2giGcwds7XDiCZ61hdo8CyZAPTM8=;
- b=j5CSYeIOyp1GNAQc/DFDNy8yF+ffG+SGYax1yEw4+9abxg2FsWCxnENpJpmOGyCeDo8E
- DA2U7oGILxqnIgs5lYbFYWZv3qYhcuzAkoRX/dLXvr+SfmA9M2wGmBFv1DCiJH0v8Wjq
- 6w9Je38dyDUEJWhAsGxjv83tJ0woi69j4s5IIf/BLKkaEuzx34zqJRbEOhvB2vhnWdB7
- HNEeKnzWvw2BzbC+/+YbTQAUyn4SNMNxSx/ploHxv9K6nsnnkR7wknPEIdKbLzVem8aP
- QSL95lK5K8xRnDaNMswQRdn5OCDLywnV1gDreN+asPHYHP48rdYGXuO4m1ypMhsyFhC6 FQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38ch7k9jtv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 06 May 2021 10:04:01 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 146E41fG051382
-        for <kvm@vger.kernel.org>; Thu, 6 May 2021 10:04:01 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38ch7k9js5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 06 May 2021 10:04:01 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 146E2cke002345;
-        Thu, 6 May 2021 14:03:57 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 38bee590bm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 06 May 2021 14:03:57 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 146E3TMg17236332
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 6 May 2021 14:03:29 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E89BFA4068;
-        Thu,  6 May 2021 14:03:54 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B664AA4060;
-        Thu,  6 May 2021 14:03:54 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  6 May 2021 14:03:54 +0000 (GMT)
-From:   Stefan Raspl <raspl@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, pbonzini@redhat.com
-Subject: [PATCH] tools/kvm_stat: Fix documentation typo
-Date:   Thu,  6 May 2021 16:03:52 +0200
-Message-Id: <20210506140352.4178789-1-raspl@linux.ibm.com>
-X-Mailer: git-send-email 2.25.1
+        id S234584AbhEFOGw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 10:06:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42032 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234356AbhEFOGu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 10:06:50 -0400
+Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C856DC061574
+        for <kvm@vger.kernel.org>; Thu,  6 May 2021 07:05:49 -0700 (PDT)
+Received: by mail-qv1-xf2f.google.com with SMTP id i8so3101063qvv.0
+        for <kvm@vger.kernel.org>; Thu, 06 May 2021 07:05:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=hbjbiDDox/c2hA+feNWa8syDuZOLvvjQadHx48Aoaro=;
+        b=LbhnY5ym9APVeexTLuJGr7MMKGjN9hmqX26uD1UJYcMkAkX8z/tiZhK/ikt2rvhzHS
+         9kEGmwuk18n4q52jU6YNu0X4xEKX5txN/russqjjG/pLr/DNQHP+bd9jXnjBOKkDwxfw
+         nW6pNFM1rHJwQ7MEyYnp3PGBjTOEoM084gYIHzYoYF3NF2GKgPxZG36GlFRNw2lNHEEf
+         vbXQMEK2FKKzEtBE/bM3cpjM3guUGn5pJDvrJODg086lIeWMKmtXbfo04kI9i63Rn2bt
+         BJRfd6Vd2CEWVhmtLh9Ns2MT31KNfgtMGje83IIQAEhYOmNizIO4tFCX/DDhlrzHTLHH
+         nGDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hbjbiDDox/c2hA+feNWa8syDuZOLvvjQadHx48Aoaro=;
+        b=BxhPRMV1Dg0IE36WPkMddBu7HiJ6qmyyNAN/uhliNTVWUJaUkTITfH9UMg9xxPcLDg
+         ahKLyyMXFFLvz/Jn7zWB9+yFkbOI1E7fszUl2vdCOI7VenaggRlzo8KofikXE3AMqH6h
+         t++jwZuDRrkDGlrh7NX5XMSt2GtwIo0aiNjoTKVc+7yhy1XVbt2jH6ASSl5354K7dAnJ
+         u1BYCw2cpbbsn03ZCwC42TV7/QCYxjCPQGwLeWdT6kVrwI50oZ+mtY/qzD2C6bnzW2pS
+         88BqVwMUEPYRv9YubdoVClZa7F/w2NGajFX1krfkIgV36AV2g11TSBGgYECYR9d8fkTV
+         D/6w==
+X-Gm-Message-State: AOAM532BwtqtZvr1jQbjqRjWGqsmB8ERJETowb6eJEDb0dVC68fscppc
+        T43ikBMOUG4xzckAclqSgiechw==
+X-Google-Smtp-Source: ABdhPJytRVmf5ibcwq9QlnppqKcfHA6xaf6/9LV6NnirB+BDs4Bxqg1Q24VuArzOivzw+if6socsjg==
+X-Received: by 2002:a0c:9e0f:: with SMTP id p15mr4701467qve.33.1620309949095;
+        Thu, 06 May 2021 07:05:49 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::1:4c4b])
+        by smtp.gmail.com with ESMTPSA id o135sm1862762qke.124.2021.05.06.07.05.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 May 2021 07:05:48 -0700 (PDT)
+Date:   Thu, 6 May 2021 10:05:47 -0400
+From:   Johannes Weiner <hannes@cmpxchg.org>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     tglx@linutronix.de, mingo@kernel.org, juri.lelli@redhat.com,
+        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+        rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+        bristot@redhat.com, bsingharora@gmail.com, pbonzini@redhat.com,
+        maz@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        riel@surriel.com
+Subject: Re: [PATCH 5/6] delayacct: Add static_branch in scheduler hooks
+Message-ID: <YJP3uwSWeMUtSYcp@cmpxchg.org>
+References: <20210505105940.190490250@infradead.org>
+ <20210505111525.248028369@infradead.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: OTbtJEauIgG96cxNZZSZTUcB7kCY1iFr
-X-Proofpoint-ORIG-GUID: yjYdPedxrzmiJP4xR2x-AfwIGYJXmq87
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-05-06_10:2021-05-06,2021-05-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- clxscore=1011 mlxlogscore=932 priorityscore=1501 spamscore=0 bulkscore=0
- mlxscore=0 adultscore=0 lowpriorityscore=0 suspectscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
- definitions=main-2105060103
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210505111525.248028369@infradead.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Makes the dash in front of option '-z' disappear in the generated
-man-page.
+On Wed, May 05, 2021 at 12:59:45PM +0200, Peter Zijlstra wrote:
+> Cheaper when delayacct is disabled.
+> 
+> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 
-Signed-off-by: Stefan Raspl <raspl@linux.ibm.com>
----
- tools/kvm/kvm_stat/kvm_stat.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/kvm/kvm_stat/kvm_stat.txt b/tools/kvm/kvm_stat/kvm_stat.txt
-index feaf46451e83..3a9f2037bd23 100644
---- a/tools/kvm/kvm_stat/kvm_stat.txt
-+++ b/tools/kvm/kvm_stat/kvm_stat.txt
-@@ -111,7 +111,7 @@ OPTIONS
- --tracepoints::
-         retrieve statistics from tracepoints
- 
--*z*::
-+-z::
- --skip-zero-records::
-         omit records with all zeros in logging mode
- 
--- 
-2.25.1
-
+Acked-by: Johannes Weiner <hannes@cmpxchg.org>
