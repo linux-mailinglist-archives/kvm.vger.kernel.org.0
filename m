@@ -2,114 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC2A937522C
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 12:20:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A79EB375269
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 12:34:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234161AbhEFKUy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 06:20:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41317 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231976AbhEFKUx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 May 2021 06:20:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620296394;
+        id S234473AbhEFKfI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 06:35:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50742 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234443AbhEFKfF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 06:35:05 -0400
+Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [IPv6:2001:67c:2050::465:202])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28B03C061574
+        for <kvm@vger.kernel.org>; Thu,  6 May 2021 03:34:06 -0700 (PDT)
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [80.241.60.240])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4FbVLP0fJWzQjx9;
+        Thu,  6 May 2021 12:34:05 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mailbox.org; h=
+        message-id:date:date:subject:subject:from:from:received; s=
+        mail20150812; t=1620297241; bh=KSg8OBHMy9XZ/qF/svh0kP1dL0DArtxtX
+        /X5djEOQHM=; b=v0xLBlmIkQ6DrFDUlg/9XfFoEIfnue1iaHkDM+2Uc+tryeP7+
+        If7BuutlA2fGkkhsSZ7EMHwU8YdoTUyAkHuy1wAMcwZfpy+hwDflih5gzdEqoTyC
+        NLFJJXZFBTRUyHqsjbI/ulr7ceCaOM/DSJrp26u8e6S0YeBWja4VfvIKj/dbF1sb
+        qhoxi7Y63OSiAJxCcRraO/S6NUl0Xy4CT/uZ6i04zT3IDU8p06YAQA0Qgr6TLuoU
+        w8g6nvHN1o7XwMxRPeEhQsIL4NCb3Z8/XS2aMzgWiZgIYXfrPQS7oIaHgsULmyLE
+        mkP0h4K5nVoVpWa82tk2EEXMXD7RDlIH0sOKw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+        t=1620297243;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/4AlmcxHNK6jvbhK2/zhBDdPr/gsgwHyIrd/Q6pHQ5E=;
-        b=XDsPx4L64PsS8cOSdIKokxGUSJ5XsLS9vXRTIegCTXQjoFATlYUweEtZwWp/ZFUxkD+t+k
-        Tx1MK1j+oBVMrHJMeY8pi3M8cAZM48nKyaLSdjGH/SWZS6ne+V5dAtyu4NMsCgrdWK9dy7
-        Sohw525GL3NwHecqpmto/imjpXcpaNw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-375-3jjM71QFOmyCO-K-Ti6MlA-1; Thu, 06 May 2021 06:19:52 -0400
-X-MC-Unique: 3jjM71QFOmyCO-K-Ti6MlA-1
-Received: by mail-wr1-f72.google.com with SMTP id r12-20020adfc10c0000b029010d83323601so1974960wre.22
-        for <kvm@vger.kernel.org>; Thu, 06 May 2021 03:19:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/4AlmcxHNK6jvbhK2/zhBDdPr/gsgwHyIrd/Q6pHQ5E=;
-        b=qV3VKDbrqyg2i5VZFf+TJ6uBLdxgH9ybCetv9aZ/aYGWHkh6ZDLw28Li+HmfuOyZFd
-         yqBNdl++ZHxdH7rsgXiNBxkzE5UKDMIaCt6QkAhrPrl+SR47RjoPU/aOjPcXgs4+w++8
-         Fye0s2FLHPq3AMq+01hIpe9j+OjCsZkwn2SCq8+Cky92cscjR6JzlzKI9Y7+Fmu4dHNc
-         AVjW+zqx/Pi3oJAJUnh1sduUCNq1Ps4kbpZSMRHoTRZhE7wHiY1qQfe5FjEFDjvrTYge
-         2iTFZBx61hyWQfivLzWNSB0MJt79f43MSsLiTq7mk6+wCjYcuNUpoLkBQa/ZsrBFV4A/
-         ARBA==
-X-Gm-Message-State: AOAM530sLXPVwzCMhTG9qmlr6tCH9a6+KPYwzE42hRHucSUWABfwPZ/Y
-        ZoBxjNfMp+8hemeoBtWNOuXf+Yrwgej3nNtw+kpIbIRjgsdHLuhK4ce1TBgJ5JzyMNMQbOfWN0x
-        yhu5ZUeTjcjM4
-X-Received: by 2002:a7b:c8ca:: with SMTP id f10mr3240036wml.118.1620296391795;
-        Thu, 06 May 2021 03:19:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz2RzhaNbA2WpOR6chOGiG4O6PtUzpc3NV+HioaR04QGKhmGmhPqls4+o0IVxWuBoWJ0ynqfg==
-X-Received: by 2002:a7b:c8ca:: with SMTP id f10mr3240015wml.118.1620296391552;
-        Thu, 06 May 2021 03:19:51 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id d9sm3463587wrp.47.2021.05.06.03.19.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 May 2021 03:19:50 -0700 (PDT)
-Subject: Re: [PATCH v2 1/3] KVM: X86: Rename DR6_INIT to DR6_ACTIVE_LOW
-To:     Chenyi Qiang <chenyi.qiang@intel.com>,
-        "Li, Xiaoyao" <xiaoyao.li@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20210202090433.13441-1-chenyi.qiang@intel.com>
- <20210202090433.13441-2-chenyi.qiang@intel.com>
- <3db069ba-b4e0-1288-ec79-66ac44938682@redhat.com>
- <6678520f-e69e-6116-88c9-e9d6cd450934@intel.com>
- <ea9eaa84-999b-82cb-ef40-66fde361704d@redhat.com>
- <dc22f0a2-97c5-d54d-a521-c02f802c2229@intel.com>
- <3d7455a7-dca7-3c60-0c34-3a3ab8f7f1fb@redhat.com>
- <f8d6f502-e870-b374-afc4-62fd49dd5571@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f64eb246-e3a8-a22d-cf34-10f10b55d8b4@redhat.com>
-Date:   Thu, 6 May 2021 12:19:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
-MIME-Version: 1.0
-In-Reply-To: <f8d6f502-e870-b374-afc4-62fd49dd5571@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+         to:to:cc:cc; bh=o6UNy7s4Ky0OKTddd5MLvC/FJxKgZKt+z0XAH8iUwpY=;
+        b=UpzbriPoVQtkUrkwo4ZtH+gJH9tpCek7NF4ZzAk+cnWUTls7ctC46ugmBL+i2MEk8KU5Tm
+        rNrcbBAsLif1D5rBm83KwYEA1WlEvLMNCL9KJAdV7lpMiLUGjEI+2XT95lmbxxXD9Uq67E
+        8TUEyIVie5i5l/UMV+XUsfhagNiHqbJaziG7HEm0Uph1ieFH8lNkEIShmJgye8LjT9+z+Z
+        RIuf27uN5fLWz23BI4LH/pG1m33O0joD/x7vGqLuc9GjeD+mysRk0IQ/UEjuyaM1zoqsHJ
+        02tPpE48c7XwMRYPkue88A4TAhPChGgiSl9ymRtlYSyZ/nU2to231vPzG+Ik4A==
+X-Virus-Scanned: amavisd-new at heinlein-support.de
+Received: from smtp1.mailbox.org ([80.241.60.240])
+        by spamfilter02.heinlein-hosting.de (spamfilter02.heinlein-hosting.de [80.241.56.116]) (amavisd-new, port 10030)
+        with ESMTP id FYd6A0ERsLu4; Thu,  6 May 2021 12:34:01 +0200 (CEST)
+From:   ilstam@mailbox.org
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Cc:     ilstam@amazon.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        haozhong.zhang@intel.com, zamsden@gmail.com, mtosatti@redhat.com,
+        dplotnikov@virtuozzo.com, dwmw@amazon.co.uk
+Subject: [PATCH 0/8] KVM: VMX: Implement nested TSC scaling
+Date:   Thu,  6 May 2021 10:32:20 +0000
+Message-Id: <20210506103228.67864-1-ilstam@mailbox.org>
+X-MBO-SPAM-Probability: 
+X-Rspamd-Score: -4.11 / 15.00 / 15.00
+X-Rspamd-Queue-Id: A98F71404
+X-Rspamd-UID: 10da07
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/05/21 10:21, Chenyi Qiang wrote:
-> 
-> 
-> On 4/2/2021 5:01 PM, Paolo Bonzini wrote:
->> On 02/04/21 10:53, Xiaoyao Li wrote:
->>>>
->>>
->>> Hi Paolo,
->>>
->>> Fenghua's bare metal support is in tip tree now.
->>> https://lore.kernel.org/lkml/20210322135325.682257-1-fenghua.yu@intel.com/ 
->>>
->>>
->>> Will the rest KVM patches get into 5.13 together?
->>
->> Yes, they will.
->>
->> Thanks for the notice!
->>
-> 
-> Hi Paolo,
-> 
-> I notice the patch 1 is merged but the remaining patch 2 and 3 are not 
-> included yet. The bare metal support is merged. Will the rest KVM parts 
-> be in 5.13 as well?
+From: Ilias Stamatis <ilstam@amazon.com>
 
-Yes.
+KVM currently supports hardware-assisted TSC scaling but only for L1 and it
+doesn't expose the feature to nested guests. This patch series adds support for
+nested TSC scaling and allows both L1 and L2 to be scaled with different
+scaling factors.
 
-Paolo
+When scaling and offsetting is applied, the TSC for the guest is calculated as:
+
+(TSC * multiplier >> 48) + offset
+
+With nested scaling the values in VMCS01 and VMCS12 need to be merged
+together and stored in VMCS02.
+
+The VMCS02 values are calculated as follows:
+
+offset_02 = ((offset_01 * mult_12) >> 48) + offset_12
+mult_02 = (mult_01 * mult_12) >> 48
+
+The last patch of the series adds a KVM selftest.
+
+Ilias Stamatis (8):
+  KVM: VMX: Add a TSC multiplier field in VMCS12
+  KVM: X86: Store L1's TSC scaling ratio in 'struct kvm_vcpu_arch'
+  KVM: X86: Pass an additional 'L1' argument to kvm_scale_tsc()
+  KVM: VMX: Adjust the TSC-related VMCS fields on L2 entry and exit
+  KVM: X86: Move tracing outside write_l1_tsc_offset()
+  KVM: VMX: Make vmx_write_l1_tsc_offset() work with nested TSC scaling
+  KVM: VMX: Expose TSC scaling to L2
+  KVM: selftests: x86: Add vmx_nested_tsc_scaling_test
+
+ arch/x86/include/asm/kvm_host.h               |   8 +-
+ arch/x86/kvm/svm/svm.c                        |   4 -
+ arch/x86/kvm/vmx/nested.c                     |  32 ++-
+ arch/x86/kvm/vmx/vmcs12.c                     |   1 +
+ arch/x86/kvm/vmx/vmcs12.h                     |   4 +-
+ arch/x86/kvm/vmx/vmx.c                        |  31 ++-
+ arch/x86/kvm/x86.c                            |  54 ++++-
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../kvm/x86_64/vmx_nested_tsc_scaling_test.c  | 209 ++++++++++++++++++
+ 10 files changed, 312 insertions(+), 33 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_nested_tsc_scaling_test.c
+
+-- 
+2.17.1
 
