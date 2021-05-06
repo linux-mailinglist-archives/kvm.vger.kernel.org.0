@@ -2,125 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ED353375A97
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 20:58:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FFE0375B0F
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 21:00:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233217AbhEFS7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 14:59:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51494 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232085AbhEFS67 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 14:58:59 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B92E9C061574
-        for <kvm@vger.kernel.org>; Thu,  6 May 2021 11:58:00 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id gj14so3838054pjb.5
-        for <kvm@vger.kernel.org>; Thu, 06 May 2021 11:58:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=P9I9rDg26Q2V97zgGas1g52p1U3fzjO7Ue2DgK7mij4=;
-        b=B7+UeLfzmEquIe+5GZzD10zk/Ek1giutP7I9S5kdP0eFIq9xuWwoQ5ezw36/e65hch
-         ASqezKcwZWHQTMg/kzqgbJoScEtYE68mT/2/Q33tPO+tTu9FXoMFkKL3sHmjtQ1fCUGQ
-         qivVRiZdc/21r31h9T0unDNXuv2EMGYmf0TmpYNJP1o7ZNY44OaK8jJTunEKYxLXSOo2
-         ripVGDgsRRcGbFnbgviBtpLQVSkF2c0giFt88sl6b+oL042mQpFhbJX5wX3edFBFm1pV
-         ahN0Bh9/cr0hHdtVLCLJqOpckMGt7sJEXLeartWEG74AwYY/W6y0mMA2zx4nMxoXkwsQ
-         bQ3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=P9I9rDg26Q2V97zgGas1g52p1U3fzjO7Ue2DgK7mij4=;
-        b=tNps+E9hoU3U8ae1HOAzKqmnG0DdkmJUXmmvbnffpgrDfNkg74wfuehy+cL7G2fiak
-         0tnwEB/qkIx+BcsXrC67uCZhUX8f/QfyAd71HKC8zZVgNl6JhfRpieB0Qa2DvtcRb52I
-         XvyH2zal8hPqn2dnnIHJepeHo3T53j7Zc/hE1DMGw9SqihLaBHLL254Ib5FZlm8chVDL
-         0eozinZGe3KSGZDpHEHt7wlyD0atMIk0ybnBCpfAgbd8UAWZ4ohK4fkJ7+vrFO7aPCDs
-         6+9WlebcqrOSpyUOMl1aW9HcWRIUwNN9Hxt7hlQm7huiBd+eiV+vnprJ+IzDe8QdSsr9
-         ck9A==
-X-Gm-Message-State: AOAM533R4J7WY76z/qQXZ35P+bzOYAr1VFY29xyHilig7qqNlA/KP/Ct
-        Ep//y6udjEh4bigjAhhVFME1TA==
-X-Google-Smtp-Source: ABdhPJyUKL7tKf0IthEIdezYUHRdFlj7VjhPCLAOxRvISEm+qwEI8LRTcmwM2w38cfBVEtxt70NSzQ==
-X-Received: by 2002:a17:90a:cf8a:: with SMTP id i10mr6210801pju.188.1620327479986;
-        Thu, 06 May 2021 11:57:59 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id w74sm2809572pfc.173.2021.05.06.11.57.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 May 2021 11:57:59 -0700 (PDT)
-Date:   Thu, 6 May 2021 18:57:56 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jacob Xu <jacobhxu@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2] x86: Do not assign values to unaligned
- pointer to 128 bits
-Message-ID: <YJQ8NN6EzzZEiJ6a@google.com>
-References: <20210506184925.290359-1-jacobhxu@google.com>
+        id S234076AbhEFTA6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 15:00:58 -0400
+Received: from out01.mta.xmission.com ([166.70.13.231]:53778 "EHLO
+        out01.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233314AbhEFTA4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 15:00:56 -0400
+Received: from in02.mta.xmission.com ([166.70.13.52])
+        by out01.mta.xmission.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.93)
+        (envelope-from <ebiederm@xmission.com>)
+        id 1lejDx-006IlB-FL; Thu, 06 May 2021 12:59:49 -0600
+Received: from ip68-227-160-95.om.om.cox.net ([68.227.160.95] helo=fess.xmission.com)
+        by in02.mta.xmission.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.93)
+        (envelope-from <ebiederm@xmission.com>)
+        id 1lejDv-007wor-20; Thu, 06 May 2021 12:59:48 -0600
+From:   ebiederm@xmission.com (Eric W. Biederman)
+To:     Joerg Roedel <jroedel@suse.de>
+Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        kexec@lists.infradead.org, stable@vger.kernel.org, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+References: <20210506093122.28607-1-joro@8bytes.org>
+        <20210506093122.28607-3-joro@8bytes.org>
+        <m17dkb4v4k.fsf@fess.ebiederm.org> <YJQ4QTtvG76WpcNf@suse.de>
+Date:   Thu, 06 May 2021 13:59:42 -0500
+In-Reply-To: <YJQ4QTtvG76WpcNf@suse.de> (Joerg Roedel's message of "Thu, 6 May
+        2021 20:41:05 +0200")
+Message-ID: <m1o8dn1ye9.fsf@fess.ebiederm.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210506184925.290359-1-jacobhxu@google.com>
+Content-Type: text/plain
+X-XM-SPF: eid=1lejDv-007wor-20;;;mid=<m1o8dn1ye9.fsf@fess.ebiederm.org>;;;hst=in02.mta.xmission.com;;;ip=68.227.160.95;;;frm=ebiederm@xmission.com;;;spf=neutral
+X-XM-AID: U2FsdGVkX1+QSetsVGHHRPIqFsnfIS69iprRKQZBDtk=
+X-SA-Exim-Connect-IP: 68.227.160.95
+X-SA-Exim-Mail-From: ebiederm@xmission.com
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on sa06.xmission.com
+X-Spam-Level: *
+X-Spam-Status: No, score=1.2 required=8.0 tests=ALL_TRUSTED,BAYES_40,
+        DCC_CHECK_NEGATIVE,T_TM2_M_HEADER_IN_MSG,T_TooManySym_01,XMNoVowels,
+        XMSubLong autolearn=disabled version=3.4.2
+X-Spam-Report: * -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
+        * -0.0 BAYES_40 BODY: Bayes spam probability is 20 to 40%
+        *      [score: 0.3011]
+        *  1.5 XMNoVowels Alpha-numberic number with no vowels
+        *  0.7 XMSubLong Long Subject
+        *  0.0 T_TM2_M_HEADER_IN_MSG BODY: No description available.
+        * -0.0 DCC_CHECK_NEGATIVE Not listed in DCC
+        *      [sa06 1397; Body=1 Fuz1=1 Fuz2=1]
+        *  0.0 T_TooManySym_01 4+ unique symbols in subject
+X-Spam-DCC: XMission; sa06 1397; Body=1 Fuz1=1 Fuz2=1 
+X-Spam-Combo: *;Joerg Roedel <jroedel@suse.de>
+X-Spam-Relay-Country: 
+X-Spam-Timing: total 1515 ms - load_scoreonly_sql: 0.07 (0.0%),
+        signal_user_changed: 11 (0.7%), b_tie_ro: 10 (0.6%), parse: 0.96
+        (0.1%), extract_message_metadata: 13 (0.9%), get_uri_detail_list: 1.98
+        (0.1%), tests_pri_-1000: 6 (0.4%), tests_pri_-950: 1.32 (0.1%),
+        tests_pri_-900: 1.14 (0.1%), tests_pri_-90: 132 (8.7%), check_bayes:
+        122 (8.1%), b_tokenize: 10 (0.7%), b_tok_get_all: 10 (0.7%),
+        b_comp_prob: 3.3 (0.2%), b_tok_touch_all: 95 (6.2%), b_finish: 0.98
+        (0.1%), tests_pri_0: 1335 (88.1%), check_dkim_signature: 0.59 (0.0%),
+        check_dkim_adsp: 2.4 (0.2%), poll_dns_idle: 0.57 (0.0%), tests_pri_10:
+        3.1 (0.2%), tests_pri_500: 8 (0.6%), rewrite_mail: 0.00 (0.0%)
+Subject: Re: [PATCH 2/2] x86/kexec/64: Forbid kexec when running as an SEV-ES guest
+X-SA-Exim-Version: 4.2.1 (built Sat, 08 Feb 2020 21:53:50 +0000)
+X-SA-Exim-Scanned: Yes (on in02.mta.xmission.com)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 06, 2021, Jacob Xu wrote:
-> When compiled with clang, the following statement gets converted into a
-> movaps instructions.
-> mem->u[0] = 5; mem->u[1] = 6; mem->u[2] = 7; mem->u[3] = 8;
-> 
-> Since mem is an unaligned pointer to a union of an sse, we get a GP when
-> running.
-> 
-> All we want is to make the values between mem and v different for this
-> testcase, so let's just memset the pointer at mem, and convert to
-> uint32_t pointer. Then the compiler will not assume the pointer is
-> aligned to 128 bits.
-> 
-> Fixes: e5e76263b5 ("x86: add additional test cases for sse exceptions to
-> emulator.c")
-> 
-> Signed-off-by: Jacob Xu <jacobhxu@google.com>
-> ---
->  x86/emulator.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/x86/emulator.c b/x86/emulator.c
-> index 9705073..a2c7e5b 100644
-> --- a/x86/emulator.c
-> +++ b/x86/emulator.c
-> @@ -716,12 +716,12 @@ static __attribute__((target("sse2"))) void test_sse_exceptions(void *cross_mem)
->  
->  	// test unaligned access for movups, movupd and movaps
->  	v.u[0] = 1; v.u[1] = 2; v.u[2] = 3; v.u[3] = 4;
-> -	mem->u[0] = 5; mem->u[1] = 6; mem->u[2] = 7; mem->u[3] = 8;
-> +	memset((uint32_t *)mem, 0xdecafbad, sizeof(mem));
+Joerg Roedel <jroedel@suse.de> writes:
 
-memset() takes a void *, which it casts to an char, i.e. it works on one byte at
-a time.  Casting to a uint32_t won't make it write the full "0xdecafbad", it will
-just repease 0xad over and over.
+> On Thu, May 06, 2021 at 12:42:03PM -0500, Eric W. Biederman wrote:
+>> I don't understand this.
+>> 
+>> Fundamentally kexec is about doing things more or less inspite of
+>> what the firmware is doing.
+>> 
+>> I don't have any idea what a SEV-ES is.  But the normal x86 boot doesn't
+>> do anything special.  Is cross cpu IPI emulation buggy?
+>
+> Under SEV-ES the normal SIPI-based sequence to re-initialize a CPU does
+> not work anymore. An SEV-ES guest is a special virtual machine where the
+> hardware encrypts the guest memory and the guest register state. The
+> hypervisor can't make any modifications to the guests registers at
+> runtime. Therefore it also can't emulate a SIPI sequence and reset the
+> vCPU.
+>
+> The guest kernel has to reset the vCPU itself and hand it over from the
+> old kernel to the kexec'ed kernel. This isn't currently implemented and
+> therefore kexec needs to be disabled when running as an SEV-ES guest.
+>
+> Implementing this also requires an extension to the guest-hypervisor
+> protocol (the GHCB Spec[1]) which is only available in version 2. So a
+> guest running on a hypervisor supporting only version 1 will never
+> properly support kexec.
 
-The size needs to be sizeof(*mem), i.e. the size of the object that mem points to,
-not the size of the pointer's storage.
+Why does it need that?
 
->  	asm("movups %1, %0" : "=m"(*mem) : "x"(v.sse));
->  	report(sseeq(&v, mem), "movups unaligned");
->  
->  	v.u[0] = 1; v.u[1] = 2; v.u[2] = 3; v.u[3] = 4;
-> -	mem->u[0] = 5; mem->u[1] = 6; mem->u[2] = 7; mem->u[3] = 8;
-> +	memset((uint32_t *)mem, 0xdecafbad, sizeof(mem));
->  	asm("movupd %1, %0" : "=m"(*mem) : "x"(v.sse));
->  	report(sseeq(&v, mem), "movupd unaligned");
->  	exceptions = 0;
-> @@ -734,7 +734,7 @@ static __attribute__((target("sse2"))) void test_sse_exceptions(void *cross_mem)
->  	// setup memory for cross page access
->  	mem = (sse_union *)(&bytes[4096-8]);
->  	v.u[0] = 1; v.u[1] = 2; v.u[2] = 3; v.u[3] = 4;
-> -	mem->u[0] = 5; mem->u[1] = 6; mem->u[2] = 7; mem->u[3] = 8;
-> +	memset((uint32_t *)mem, 0xdecafbad, sizeof(mem));
->  
->  	asm("movups %1, %0" : "=m"(*mem) : "x"(v.sse));
->  	report(sseeq(&v, mem), "movups unaligned crosspage");
-> -- 
-> 2.31.1.607.g51e8a6a459-goog
-> 
+Would it not make sense to instead teach kexec how to pass a cpu from
+one kernel to another.  We could use that everywhere.
+
+Even the kexec-on-panic case should work as even in that case we have
+to touch the cpus as they go down.
+
+The hardware simply worked well enough that it hasn't mattered enough
+for us to do something like that, but given that we need to do something
+anyway.  It seems like it would make most sense do something that
+will work everywhere, and does not introduce unnecessary dependencies
+on hypervisors.
+
+>> What is the actual problem you are trying to avoid?
+>
+> Currently, if someone tries kexec in an SEV-ES guest, the kexec'ed
+> kernel will only be able to bring up the boot CPU, not the others. The
+> others will wake up with the old kernels CPU state in the new kernels
+> memory and do undefined things, most likely triple-fault because their
+> page-table is not existent anymore.
+>
+> So since kexec currently does not work as expected under SEV-ES, it is
+> better to hide it until everything is implemented so it can do what the
+> user expects.
+
+I can understand temporarily disabling the functionality.
+
+>> And yes for a temporary hack the suggestion of putting code into
+>> machine_kexec_prepare seems much more reasonable so we don't have to
+>> carry special case infrastructure for the forseeable future.
+>
+> As I said above, for protocol version 1 it will stay disabled, so it is
+> not only a temporary hack.
+
+Why does bringing up a cpu need hypervisor support?
+
+I understand why we can't do what we do currently, but that doesn't seem
+to preclude doing something without hypervisor support.
+
+Eric
