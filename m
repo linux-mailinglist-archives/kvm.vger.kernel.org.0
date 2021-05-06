@@ -2,92 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CBA603755A4
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 16:28:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C398E3755AA
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 16:29:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234806AbhEFO3z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 10:29:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20106 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234665AbhEFO3z (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 May 2021 10:29:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620311336;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Mdbs+8zL0ZsR6n4jgVA72c4nLXnosqzKKX4khM1dLjo=;
-        b=SVcguRnDSSS8Eyx7CIo9b4hlFvW5MZR7ki0pFMW86+1uSAuXGYhSQqPj40c+K3pr1ymW4e
-        7pwL2EkUsBB5fPRLj3Q92dzoZAyjip0efyon46GA9A9ZWXxzysOW4aq/w5d3n3JmXyGT+6
-        gYtAIM4v/0nW50xWgUiXx/P3663FDYc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-91-UrRYZ5BMPNC0cG3q7qBqBg-1; Thu, 06 May 2021 10:28:55 -0400
-X-MC-Unique: UrRYZ5BMPNC0cG3q7qBqBg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S234397AbhEFOaj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 10:30:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57970 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234792AbhEFOai (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 10:30:38 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9BEB2801107;
-        Thu,  6 May 2021 14:28:53 +0000 (UTC)
-Received: from [10.3.113.56] (ovpn-113-56.phx2.redhat.com [10.3.113.56])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 724BA19D61;
-        Thu,  6 May 2021 14:28:49 +0000 (UTC)
-Subject: Re: [PATCH v2 0/9] misc: Replace alloca() by g_malloc()
-To:     Warner Losh <imp@bsdimp.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Cc:     kvm@vger.kernel.org, QEMU Developers <qemu-devel@nongnu.org>,
-        qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20210506133758.1749233-1-philmd@redhat.com>
- <CANCZdfqiHxQoG+g3bq_KL01yWCHUbF5qxJWN=sD37h7UJFMZ7g@mail.gmail.com>
-From:   Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <476d8b44-cba3-4bf2-d93c-d35736d316c6@redhat.com>
-Date:   Thu, 6 May 2021 09:28:48 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
-MIME-Version: 1.0
-In-Reply-To: <CANCZdfqiHxQoG+g3bq_KL01yWCHUbF5qxJWN=sD37h7UJFMZ7g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+        by mail.kernel.org (Postfix) with ESMTPSA id 604F860E09;
+        Thu,  6 May 2021 14:29:40 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1lef0U-00BG3a-62; Thu, 06 May 2021 15:29:38 +0100
+Date:   Thu, 06 May 2021 15:29:37 +0100
+Message-ID: <87o8doq6jy.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Zenghui Yu <yuzenghui@huawei.com>
+Cc:     <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <kernel-team@android.com>, Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH v2 03/11] KVM: arm64: Make kvm_skip_instr() and co private to HYP
+In-Reply-To: <db784fc8-3a52-49ff-0b75-83a1bbc81d98@huawei.com>
+References: <20201102164045.264512-1-maz@kernel.org>
+        <20201102164045.264512-4-maz@kernel.org>
+        <cef3517b-e66d-4d26-68a9-2d5fb433377c@huawei.com>
+        <875yzxnn5w.wl-maz@kernel.org>
+        <87zgx8mkwd.wl-maz@kernel.org>
+        <db784fc8-3a52-49ff-0b75-83a1bbc81d98@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com, will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, ascull@google.com, mark.rutland@arm.com, qperret@google.com, dbrazdil@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/6/21 9:22 AM, Warner Losh wrote:
-> On Thu, May 6, 2021 at 7:39 AM Philippe Mathieu-Daudé <philmd@redhat.com>
-> wrote:
+On Thu, 06 May 2021 12:43:26 +0100,
+Zenghui Yu <yuzenghui@huawei.com> wrote:
 > 
->> The ALLOCA(3) man-page mentions its "use is discouraged".
->> Replace few calls by equivalent GLib malloc().
->>
+> On 2021/5/6 14:33, Marc Zyngier wrote:
+> > On Wed, 05 May 2021 17:46:51 +0100,
+> > Marc Zyngier <maz@kernel.org> wrote:
+> >> 
+> >> Hi Zenghui,
+> >> 
+> >> On Wed, 05 May 2021 15:23:02 +0100,
+> >> Zenghui Yu <yuzenghui@huawei.com> wrote:
+> >>> 
+> >>> Hi Marc,
+> >>> 
+> >>> On 2020/11/3 0:40, Marc Zyngier wrote:
+> >>>> In an effort to remove the vcpu PC manipulations from EL1 on nVHE
+> >>>> systems, move kvm_skip_instr() to be HYP-specific. EL1's intent
+> >>>> to increment PC post emulation is now signalled via a flag in the
+> >>>> vcpu structure.
+> >>>> 
+> >>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> >>> 
+> >>> [...]
+> >>> 
+> >>>> @@ -133,6 +134,8 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+> >>>>  	__load_guest_stage2(vcpu->arch.hw_mmu);
+> >>>>  	__activate_traps(vcpu);
+> >>>> +	__adjust_pc(vcpu);
+> >>> 
+> >>> If the INCREMENT_PC flag was set (e.g., for WFx emulation) while we're
+> >>> handling PSCI CPU_ON call targetting this VCPU, the *target_pc* (aka
+> >>> entry point address, normally provided by the primary VCPU) will be
+> >>> unexpectedly incremented here. That's pretty bad, I think.
+> >> 
+> >> How can you online a CPU using PSCI if that CPU is currently spinning
+> >> on a WFI? Or is that we have transitioned via userspace to perform the
+> >> vcpu reset? I can imagine it happening in that case.
 > 
-> Except g_alloc and g_malloc are not at all the same, and you can't drop in
-> replace one with the other.
-> 
-> g_alloc allocates stack space on the calling frame that's automatically
-> freed when the function returns.
-> g_malloc allocates space from the heap, and calls to it must be matched
-> with calls to g_free().
-> 
-> These patches don't do the latter, as far as I can tell, and so introduce
-> memory leaks unless there's something I've missed.
+> I hadn't tried to reset VCPU from userspace. That would be a much easier
+> way to reproduce this problem.
 
-You missed the g_autofree, whose job is to call g_free() on all points
-in the control flow where the malloc()d memory goes out of scope
-(equivalent in expressive power to alloca()d memory going out of scope).
- Although the code is arguably a bit slower (as heap manipulations are
-not as cheap as stack manipulations), in the long run that speed penalty
-is worth the safety factor (since stack manipulations under user control
-are inherently unsafe).
+Then I don't understand how you end-up there. If the vcpu was in WFI,
+it wasn't off and PSCI_CPU_ON doesn't have any effect.
+
+> > Actually, this is far worse than it looks, and this only papers over
+> > one particular symptom. We need to resolve all pending PC updates
+> > *before* returning to userspace, or things like live migration can
+> > observe an inconsistent state.
+> 
+> Ah yeah, agreed.
+> 
+> Apart from the PC manipulation, I noticed that when handling the user
+> GET_VCPU_EVENTS request:
+> 
+> |	/*
+> |	 * We never return a pending ext_dabt here because we deliver it to
+> |	 * the virtual CPU directly when setting the event and it's no longer
+> |	 * 'pending' at this point.
+> |	 */
+> 
+> Which isn't true anymore now that we defer the exception injection right
+> before the VCPU entry.
+
+I believe the comment will be valid again once I fix the core issue,
+which is that we shouldn't return to userspace with pending PC
+adjustments. As long as KVM_GET_VCPU_EVENTS isn't issued on a running
+vcpu (which looks pointless to me), this should be just fine.
+
+Thanks,
+
+	M.
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+Without deviation from the norm, progress is not possible.
