@@ -2,27 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4EF4C375186
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 11:32:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA4F1375189
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 11:32:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234002AbhEFJc4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S234117AbhEFJc5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 05:32:57 -0400
+Received: from 8bytes.org ([81.169.241.247]:37654 "EHLO theia.8bytes.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229698AbhEFJc4 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 6 May 2021 05:32:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36818 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233028AbhEFJcz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 05:32:55 -0400
-Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3288EC061574;
-        Thu,  6 May 2021 02:31:58 -0700 (PDT)
 Received: from cap.home.8bytes.org (p5b0069de.dip0.t-ipconnect.de [91.0.105.222])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id EB37B247;
-        Thu,  6 May 2021 11:31:55 +0200 (CEST)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 73639379;
+        Thu,  6 May 2021 11:31:56 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     Eric Biederman <ebiederm@xmission.com>, x86@kernel.org
 Cc:     kexec@lists.infradead.org, Joerg Roedel <jroedel@suse.de>,
-        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        stable@vger.kernel.org, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Jiri Slaby <jslaby@suse.cz>,
@@ -41,10 +39,12 @@ Cc:     kexec@lists.infradead.org, Joerg Roedel <jroedel@suse.de>,
         Joerg Roedel <joro@8bytes.org>, linux-coco@lists.linux.dev,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH 0/2] x86: Disable kexec for SEV-ES guests
-Date:   Thu,  6 May 2021 11:31:20 +0200
-Message-Id: <20210506093122.28607-1-joro@8bytes.org>
+Subject: [PATCH 1/2] kexec: Allow architecture code to opt-out at runtime
+Date:   Thu,  6 May 2021 11:31:21 +0200
+Message-Id: <20210506093122.28607-2-joro@8bytes.org>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20210506093122.28607-1-joro@8bytes.org>
+References: <20210506093122.28607-1-joro@8bytes.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -53,31 +53,51 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Hi,
+Allow a runtime opt-out of kexec support for architecture code in case
+the kernel is running in an environment where kexec is not properly
+supported yet.
 
-two small patches to disable kexec on x86 when running as an SEV-ES
-guest. Trying to kexec a new kernel would fail anyway because there is
-no mechanism yet to hand over the APs from the old to the new kernel.
-Supporting this needs changes in the Hypervisor and the guest kernel
-as well.
+This will be used on x86 when the kernel is running as an SEV-ES
+guest. SEV-ES guests need special handling for kexec to hand over all
+CPUs to the new kernel. This requires special hypervisor support and
+handling code in the guest which is not yet implemented.
 
-This code is currently being work on, but disable kexec in SEV-ES
-guests until it is ready.
+Cc: stable@vger.kernel.org # v5.10+
+Signed-off-by: Joerg Roedel <jroedel@suse.de>
+---
+ kernel/kexec.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-Please review.
-
-Regards,
-
-	Joerg
-
-Joerg Roedel (2):
-  kexec: Allow architecture code to opt-out at runtime
-  x86/kexec/64: Forbid kexec when running as an SEV-ES guest
-
- arch/x86/kernel/machine_kexec_64.c |  8 ++++++++
- kernel/kexec.c                     | 14 ++++++++++++++
- 2 files changed, 22 insertions(+)
-
+diff --git a/kernel/kexec.c b/kernel/kexec.c
+index c82c6c06f051..d03134160458 100644
+--- a/kernel/kexec.c
++++ b/kernel/kexec.c
+@@ -195,11 +195,25 @@ static int do_kexec_load(unsigned long entry, unsigned long nr_segments,
+  * that to happen you need to do that yourself.
+  */
+ 
++bool __weak arch_kexec_supported(void)
++{
++	return true;
++}
++
+ static inline int kexec_load_check(unsigned long nr_segments,
+ 				   unsigned long flags)
+ {
+ 	int result;
+ 
++	/*
++	 * The architecture may support kexec in general, but the kernel could
++	 * run in an environment where it is not (yet) possible to execute a new
++	 * kernel. Allow the architecture code to opt-out of kexec support when
++	 * it is running in such an environment.
++	 */
++	if (!arch_kexec_supported())
++		return -ENOSYS;
++
+ 	/* We only trust the superuser with rebooting the system. */
+ 	if (!capable(CAP_SYS_BOOT) || kexec_load_disabled)
+ 		return -EPERM;
 -- 
 2.31.1
 
