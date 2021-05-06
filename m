@@ -2,144 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1163037598B
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 19:41:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F67D37598E
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 19:42:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236255AbhEFRmi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 13:42:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34338 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236042AbhEFRmh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 13:42:37 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70F6AC061574
-        for <kvm@vger.kernel.org>; Thu,  6 May 2021 10:41:39 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id t4so3787379plc.6
-        for <kvm@vger.kernel.org>; Thu, 06 May 2021 10:41:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=RIDKgGDjuruMb0Qu9mNHZG+3Nlcbv33doObWMSwteyg=;
-        b=ARbW+0WnA7CWV0dJEOBE6FKE7vEpqb1abKg8E3KJA63Rhh5SZgbjDTfvvwT0zG83qt
-         q4sigwB5tJYh7f9joRBQDHBHBdXkA5TYBBnc5WWhzUU5Cvvu8rQ1BbpBenNa/6gdnRHb
-         1s3eVhuF7O57vT0FDOzM2c4W0Qrbm3/lZhdDBLfaQYV1uNmfftiQZHuDy/WZAbTVjAJ0
-         MNJyTU892cNx6So2PV30WX219s7OCEv16TByKOumWNh6iZy2D+vgLjIYQf4H5oi/5Yja
-         Yn0XsCEcaycnSHssFK92/iQK7cWjSo6kSe7uUuOupipQXVf0xxwTUO61LiWfK1g5kCaL
-         i70g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=RIDKgGDjuruMb0Qu9mNHZG+3Nlcbv33doObWMSwteyg=;
-        b=YEfT5UNTPPrxPMIHAnqNJ/B+qTK9GFw3nUcUrxyQTcPMt10rR6ULHvrXTo+iaesO7U
-         pzE3FogyfwO7PkOm8zAkTVnuvZN6PaBLnWfjAV76GYMnaCBnEEK2hAaH2FUkIO1G2l1y
-         z5vMngKvF7YDSBW5+l0NfbeaDW/iy7pkrDGJgt/DhzHsL4eY6oFo90WLWXUT3wwEaEBD
-         vWlbgPzIuhf1hVNWjFGK0w8Q555om9QOxFqKHJ8oyvxDCl28ugYHHojhxGcRTxtHBWZq
-         p/mcKbeialtjpc9Fqt4Lz1ZzGvuyZ3x6P6g0ikP7dFbzS2XqgmxGq4NLM8m6J240HpIl
-         szZg==
-X-Gm-Message-State: AOAM531wEVxn7S3x1RFPRbcrcBqvmsYFD9TOR6C2BnY3vCLidz9sWJPP
-        lJra4Iv7PsIzCGbEapbssWGzsA==
-X-Google-Smtp-Source: ABdhPJzppdt/ru4ADkfO0j+ANVyvTPI6WGZjj+HEMWsVKOoYwEVvgdSgasSuwsaWdyFLkfvHYBMc8Q==
-X-Received: by 2002:a17:902:8682:b029:ef:d2:4311 with SMTP id g2-20020a1709028682b02900ef00d24311mr2123508plo.4.1620322898657;
-        Thu, 06 May 2021 10:41:38 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id t19sm2398643pgv.75.2021.05.06.10.41.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 May 2021 10:41:38 -0700 (PDT)
-Date:   Thu, 6 May 2021 17:41:34 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Venkatesh Srinivas <venkateshs@chromium.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] kvm: Cap halt polling at kvm->max_halt_poll_ns
-Message-ID: <YJQqTuduLxwTDOSa@google.com>
-References: <20210506152442.4010298-1-venkateshs@chromium.org>
- <YJQVj3GaVp9tvWog@google.com>
- <CALzav=e+6mtPUHTHFLbw1Q=1kgstPbAp=2mg9mi+_fc+iWELGA@mail.gmail.com>
+        id S236280AbhEFRnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 13:43:20 -0400
+Received: from out02.mta.xmission.com ([166.70.13.232]:47818 "EHLO
+        out02.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236042AbhEFRnS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 May 2021 13:43:18 -0400
+Received: from in01.mta.xmission.com ([166.70.13.51])
+        by out02.mta.xmission.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <ebiederm@xmission.com>)
+        id 1lei0n-005md5-4q; Thu, 06 May 2021 11:42:09 -0600
+Received: from ip68-227-160-95.om.om.cox.net ([68.227.160.95] helo=fess.xmission.com)
+        by in01.mta.xmission.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.87)
+        (envelope-from <ebiederm@xmission.com>)
+        id 1lei0m-0003nZ-2F; Thu, 06 May 2021 11:42:08 -0600
+From:   ebiederm@xmission.com (Eric W. Biederman)
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, kexec@lists.infradead.org,
+        Joerg Roedel <jroedel@suse.de>, stable@vger.kernel.org,
+        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+References: <20210506093122.28607-1-joro@8bytes.org>
+        <20210506093122.28607-3-joro@8bytes.org>
+Date:   Thu, 06 May 2021 12:42:03 -0500
+In-Reply-To: <20210506093122.28607-3-joro@8bytes.org> (Joerg Roedel's message
+        of "Thu, 6 May 2021 11:31:22 +0200")
+Message-ID: <m17dkb4v4k.fsf@fess.ebiederm.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALzav=e+6mtPUHTHFLbw1Q=1kgstPbAp=2mg9mi+_fc+iWELGA@mail.gmail.com>
+Content-Type: text/plain
+X-XM-SPF: eid=1lei0m-0003nZ-2F;;;mid=<m17dkb4v4k.fsf@fess.ebiederm.org>;;;hst=in01.mta.xmission.com;;;ip=68.227.160.95;;;frm=ebiederm@xmission.com;;;spf=neutral
+X-XM-AID: U2FsdGVkX18K6SvQ88nM/nPpaU9bp8QcNl7ZXSm1Ea8=
+X-SA-Exim-Connect-IP: 68.227.160.95
+X-SA-Exim-Mail-From: ebiederm@xmission.com
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on sa02.xmission.com
+X-Spam-Level: **
+X-Spam-Status: No, score=2.0 required=8.0 tests=ALL_TRUSTED,BAYES_50,
+        DCC_CHECK_NEGATIVE,T_TM2_M_HEADER_IN_MSG,T_TooManySym_01,XMNoVowels,
+        XMSubLong autolearn=disabled version=3.4.2
+X-Spam-Virus: No
+X-Spam-Report: * -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
+        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.5000]
+        *  1.5 XMNoVowels Alpha-numberic number with no vowels
+        *  0.7 XMSubLong Long Subject
+        *  0.0 T_TM2_M_HEADER_IN_MSG BODY: No description available.
+        * -0.0 DCC_CHECK_NEGATIVE Not listed in DCC
+        *      [sa02 1397; Body=1 Fuz1=1 Fuz2=1]
+        *  0.0 T_TooManySym_01 4+ unique symbols in subject
+X-Spam-DCC: XMission; sa02 1397; Body=1 Fuz1=1 Fuz2=1 
+X-Spam-Combo: **;Joerg Roedel <joro@8bytes.org>
+X-Spam-Relay-Country: 
+X-Spam-Timing: total 608 ms - load_scoreonly_sql: 0.04 (0.0%),
+        signal_user_changed: 4.3 (0.7%), b_tie_ro: 2.8 (0.5%), parse: 1.46
+        (0.2%), extract_message_metadata: 11 (1.9%), get_uri_detail_list: 1.16
+        (0.2%), tests_pri_-1000: 6 (0.9%), tests_pri_-950: 1.07 (0.2%),
+        tests_pri_-900: 0.84 (0.1%), tests_pri_-90: 182 (30.0%), check_bayes:
+        168 (27.7%), b_tokenize: 7 (1.2%), b_tok_get_all: 26 (4.3%),
+        b_comp_prob: 2.5 (0.4%), b_tok_touch_all: 130 (21.3%), b_finish: 0.82
+        (0.1%), tests_pri_0: 246 (40.5%), check_dkim_signature: 0.37 (0.1%),
+        check_dkim_adsp: 2.6 (0.4%), poll_dns_idle: 140 (23.0%), tests_pri_10:
+        2.5 (0.4%), tests_pri_500: 148 (24.4%), rewrite_mail: 0.00 (0.0%)
+Subject: Re: [PATCH 2/2] x86/kexec/64: Forbid kexec when running as an SEV-ES guest
+X-Spam-Flag: No
+X-SA-Exim-Version: 4.2.1 (built Thu, 05 May 2016 13:38:54 -0600)
+X-SA-Exim-Scanned: Yes (on in01.mta.xmission.com)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 06, 2021, David Matlack wrote:
-> On Thu, May 6, 2021 at 9:13 AM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > Prefer capitalizing KVM in the shortlog, if only because I'm lazy with grep :-)
-> >
-> > On Thu, May 06, 2021, Venkatesh Srinivas wrote:
-> > > From: David Matlack <dmatlack@google.com>
-> > >
-> > > When growing halt-polling, there is no check that the poll time exceeds
-> > > the per-VM limit. It's possible for vcpu->halt_poll_ns to grow past
-> > > kvm->max_halt_poll_ns and stay there until a halt which takes longer
-> > > than kvm->halt_poll_ns.
-> > >
-> >
-> > Fixes: acd05785e48c ("kvm: add capability for halt polling")
-> >
-> > and probably Cc: stable@ too.
-> >
-> >
-> > > Signed-off-by: David Matlack <dmatlack@google.com>
-> > > Signed-off-by: Venkatesh Srinivas <venkateshs@chromium.org>
-> > > ---
-> > >  virt/kvm/kvm_main.c | 4 ++--
-> > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > index 2799c6660cce..120817c5f271 100644
-> > > --- a/virt/kvm/kvm_main.c
-> > > +++ b/virt/kvm/kvm_main.c
-> > > @@ -2893,8 +2893,8 @@ static void grow_halt_poll_ns(struct kvm_vcpu *vcpu)
-> > >       if (val < grow_start)
-> > >               val = grow_start;
-> > >
-> > > -     if (val > halt_poll_ns)
-> > > -             val = halt_poll_ns;
-> > > +     if (val > vcpu->kvm->max_halt_poll_ns)
-> > > +             val = vcpu->kvm->max_halt_poll_ns;
-> >
-> > Hmm, I would argue that the introduction of the capability broke halt_poll_ns.
-> > The halt_poll_ns module param is writable after KVM is loaded.  Prior to the
-> > capability, that meant the admin could adjust the param on the fly and all vCPUs
-> > would honor the new value as it was changed.
-> >
-> > By snapshotting the module param at VM creation, those semantics were lost.
-> > That's not necessarily wrong/bad, but I don't see anything in the changelog for
-> > the capability that suggests killing the old behavior was intentional/desirable.
-> 
-> api.rst does say the capability overrides halt_poll_ns.
+Joerg Roedel <joro@8bytes.org> writes:
 
-Ya, I'm more concerned about old userspace that isn't aware of the capability,
-e.g. an old userspace that relies on tuning halt_poll_ns while a VM is running
-would break when upgrading to a version of KVM that supports the capability.
+> From: Joerg Roedel <jroedel@suse.de>
+>
+> For now, kexec is not supported when running as an SEV-ES guest. Doing
+> so requires additional hypervisor support and special code to hand
+> over the CPUs to the new kernel in a safe way.
+>
+> Until this is implemented, do not support kexec in SEV-ES guests.
 
-> see value in changing the semantics to something like:
-> 
-> - halt_poll_ns sets machine-wide maximum halt poll time.
-> - kvm->max_halt_poll_ns sets VM-wide maximum halt poll time.
-> - A vCPU will poll for at most min(halt_poll_ns,
-> kvm->max_halt_poll_ns) (aside from an in-progress poll when either
-> parameter is changed).
+I don't understand this.
 
-Agreed.  That would also provide a good opportunity to clean up the benign
-races in kvm_vcpu_block(); since both the module param and the per-VM variable
-can be modified at will, they really should only be read once per instance of
-kvm_vcpu_block().
+Fundamentally kexec is about doing things more or less inspite of
+what the firmware is doing.
 
-> On a related note, the capability and these subtle details should be
-> documented in Documentation/virtual/kvm/halt-polling.txt.
-> 
-> 
-> >
-> > >
-> > >       vcpu->halt_poll_ns = val;
-> > >  out:
-> > > --
-> > > 2.31.1.607.g51e8a6a459-goog
-> > >
+I don't have any idea what a SEV-ES is.  But the normal x86 boot doesn't
+do anything special.  Is cross cpu IPI emulation buggy?
+
+If this is a move in your face hypervisor like Xen is sometimes I can
+see perhaps needing a little bit of different work during bootup.
+Perhaps handing back a cpu on system shutdown and asking for more cpus
+on system boot up.
+
+What is the actual problem you are trying to avoid?
+
+And yes for a temporary hack the suggestion of putting code into
+machine_kexec_prepare seems much more reasonable so we don't have to
+carry special case infrastructure for the forseeable future.
+
+Eric
+
+
+> Cc: stable@vger.kernel.org # v5.10+
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> ---
+>  arch/x86/kernel/machine_kexec_64.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/arch/x86/kernel/machine_kexec_64.c b/arch/x86/kernel/machine_kexec_64.c
+> index c078b0d3ab0e..f902cc9cc634 100644
+> --- a/arch/x86/kernel/machine_kexec_64.c
+> +++ b/arch/x86/kernel/machine_kexec_64.c
+> @@ -620,3 +620,11 @@ void arch_kexec_pre_free_pages(void *vaddr, unsigned int pages)
+>  	 */
+>  	set_memory_encrypted((unsigned long)vaddr, pages);
+>  }
+> +
+> +/*
+> + * Kexec is not supported in SEV-ES guests yet
+> + */
+> +bool arch_kexec_supported(void)
+> +{
+> +	return !sev_es_active();
+> +}
