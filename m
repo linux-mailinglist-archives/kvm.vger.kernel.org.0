@@ -2,71 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 157DD375310
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 13:33:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D634F37531C
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 13:35:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234787AbhEFLeB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 07:34:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28542 "EHLO
+        id S234845AbhEFLgI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 07:36:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36295 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234671AbhEFLeA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 May 2021 07:34:00 -0400
+        by vger.kernel.org with ESMTP id S234842AbhEFLgH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 May 2021 07:36:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620300782;
+        s=mimecast20190719; t=1620300908;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=y9zFz2Pd4PacI7N8DSgBt6hQeKhJ/ACPsQ095WgVG8o=;
-        b=eSM/+VVJso29+fnHNqwvKBOoDhLPir+R+p//OF6MJ/LyE537eYP+6d5y1z6PL6GZFSnkQ4
-        4IsgxIdbWN0kQRj85EyPaHO0+zT4xv3H9ePm319aYdigNh4w1KjqFPZwG0m68TwT8k8f4F
-        aBcmOivb5nu0YFL81mpLnIx8+DQGXv0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-251-xx-Zhl5ONQ2IUvA2s28IMw-1; Thu, 06 May 2021 07:33:00 -0400
-X-MC-Unique: xx-Zhl5ONQ2IUvA2s28IMw-1
-Received: by mail-wr1-f70.google.com with SMTP id s7-20020adfc5470000b0290106eef17cbdso2060964wrf.11
-        for <kvm@vger.kernel.org>; Thu, 06 May 2021 04:33:00 -0700 (PDT)
+        bh=IcruxJx/IBHZiLRdPQHrzdMkqW/EMFC2L1rirQLSBsk=;
+        b=Ut4uEZAEqcbTThhpyPGGcPrfnOq86r8qEjH9C1A6+OD/M5lGzhsrD2IZh2qF4OZBZuQfyG
+        A6JzBHTglGjdeTnk1A9Zvqbc80LNbQLAg1MY5KoKcP5/ojMsufmD9lMCyTk6hnHG8jwUDg
+        dlBSVAQxgmCEs96aMQuZbLEFma1o0/A=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-405-lOt6Y5dNPfiyMiz26Y4Hvw-1; Thu, 06 May 2021 07:35:04 -0400
+X-MC-Unique: lOt6Y5dNPfiyMiz26Y4Hvw-1
+Received: by mail-ej1-f72.google.com with SMTP id f8-20020a1709068248b02903a8adf1f5c2so498351ejx.19
+        for <kvm@vger.kernel.org>; Thu, 06 May 2021 04:35:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=y9zFz2Pd4PacI7N8DSgBt6hQeKhJ/ACPsQ095WgVG8o=;
-        b=pjQU516fiQXwuuoOc6t8ipPx0802vOwi7EvpVyWA6VBHwJ2iVsfhmiklSxqG+PxnuT
-         vw3QCblMU6hZHGSQJVwiPiXzgwK4wyxHeeQdjrDljGNEGPHuQi796UqP20HGEK4DpcWx
-         ZQS6E23JeM96YMXdRreIfMuvZWwdSzOSY/1JbQNfDpwgq2WAoyaYJac3wekb79TyvEsL
-         eQT8OkWs4oNaxfWMmHRVFNFbs5Vm5CeoKdkqjDUrQnu97FkdCReNlADGt279mFK8xU7T
-         vkmLi6xRpKavK/2NjxRlnkjRqnBjgqFeAbfW9oltYE9GB3Q7TzuMfezT67Ya0BLPs6f8
-         WK/Q==
-X-Gm-Message-State: AOAM531sCo2YnMjjfFjdiK3BlOQcww71oANDcQxhnLFD2xMw5vumzjAu
-        c2wZ9ZEF40EVlLANcs3HmH86CnxEXpDTmz+XVaV1WVkstvSJw/KMeqP9B3dJ7YfmWgoS9AWP5Np
-        Ukjc2eXZTopU8
-X-Received: by 2002:a5d:524f:: with SMTP id k15mr4508683wrc.412.1620300779783;
-        Thu, 06 May 2021 04:32:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJySAOzbq/0B3BkEsbZNYxWmL9Nqds2KX53q5A4ACTHZgU10fORGtqi8P6SOylffIAaYx3rO9g==
-X-Received: by 2002:a5d:524f:: with SMTP id k15mr4508667wrc.412.1620300779591;
-        Thu, 06 May 2021 04:32:59 -0700 (PDT)
+        bh=IcruxJx/IBHZiLRdPQHrzdMkqW/EMFC2L1rirQLSBsk=;
+        b=RCG/rXxQSeA/11wyMLR8xmaSrCFC82WNaBB14VBKuElbX4KpbfkcaQ7rlKVJXA2X2/
+         nGkz18vmjxmhvxSwmuv/AUl7koGO9sUwwIobQqWeORxlj6WdOgF+CCUT/IM34yPIXMis
+         72mMwB9cK6OvD4jMRMaY9HCctn3/XrmGS25w0hbYA4uVa567+7x9OGVrJtBYavsxiPxE
+         WfyInyJhN3H5S/iXY/t5MJkLYPlOVj6l+qrP+V6BArIKEkfjBXAVXswbFJIucJE/I9Gu
+         rnkzaqZX1jObVz3HHOzPqYejJ74SlKXbwjUCZVldt2/jjZ3siam8SDBqhPyYmZY72iNz
+         rR+g==
+X-Gm-Message-State: AOAM531kzOJOWTF5zS0Uxih1mK7tNRspcOc4X2Lm5QqeKPODEh31ss0N
+        4y+2JieCRp3qjDxS2feMQy4akoGl3MosEILf8JIKU9n+YsYi3eqIVGGrULaKprpaHDU3rxqWMQ4
+        0SFzAxARkbLjW
+X-Received: by 2002:a17:906:dffb:: with SMTP id lc27mr2495218ejc.469.1620300903653;
+        Thu, 06 May 2021 04:35:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw7T6NEYxSs2IVjtnQnWAs8zbhJN+Tmbs/3knWOOHRukp3KsTdby0Kkpz24YEjFioxJPIqIBg==
+X-Received: by 2002:a17:906:dffb:: with SMTP id lc27mr2495192ejc.469.1620300903297;
+        Thu, 06 May 2021 04:35:03 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id s6sm9720965wms.0.2021.05.06.04.32.58
+        by smtp.gmail.com with ESMTPSA id i6sm1447225eds.83.2021.05.06.04.35.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 May 2021 04:32:59 -0700 (PDT)
-Subject: Re: [PATCH 4/8] KVM: VMX: Adjust the TSC-related VMCS fields on L2
- entry and exit
-To:     ilstam@mailbox.org, kvm@vger.kernel.org
-Cc:     ilstam@amazon.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        haozhong.zhang@intel.com, zamsden@gmail.com, mtosatti@redhat.com,
-        dplotnikov@virtuozzo.com, dwmw@amazon.co.uk
-References: <20210506103228.67864-1-ilstam@mailbox.org>
- <20210506103228.67864-5-ilstam@mailbox.org>
+        Thu, 06 May 2021 04:35:02 -0700 (PDT)
+Subject: Re: KVM: x86: Cancel pvclock_gtod_work on module removal
+To:     Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>, x86@kernel.org,
+        LKML <linux-kernel@vger.kernel.org>
+References: <87czu4onry.ffs@nanos.tec.linutronix.de>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <50f86951-1cea-b7aa-7236-f28edd5eca8d@redhat.com>
-Date:   Thu, 6 May 2021 13:32:57 +0200
+Message-ID: <2a18634f-b100-334e-f7b5-01c84302e27e@redhat.com>
+Date:   Thu, 6 May 2021 13:35:01 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210506103228.67864-5-ilstam@mailbox.org>
+In-Reply-To: <87czu4onry.ffs@nanos.tec.linutronix.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,37 +70,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/05/21 12:32, ilstam@mailbox.org wrote:
-> +	if (vmcs12->cpu_based_vm_exec_control & CPU_BASED_USE_TSC_OFFSETTING) {
-> +		if (vmcs12->secondary_vm_exec_control & SECONDARY_EXEC_TSC_SCALING) {
-> +			vcpu->arch.tsc_offset = kvm_compute_02_tsc_offset(
-> +					vcpu->arch.l1_tsc_offset,
-> +					vmcs12->tsc_multiplier,
-> +					vmcs12->tsc_offset);
-> +
-> +			vcpu->arch.tsc_scaling_ratio = mul_u64_u64_shr(
-> +					vcpu->arch.tsc_scaling_ratio,
-> +					vmcs12->tsc_multiplier,
-> +					kvm_tsc_scaling_ratio_frac_bits);
-> +		} else {
-> +			vcpu->arch.tsc_offset += vmcs12->tsc_offset;
-> +		}
+On 05/05/21 23:48, Thomas Gleixner wrote:
+> Nothing prevents the following:
+> 
+>    pvclock_gtod_notify()
+>      queue_work(system_long_wq, &pvclock_gtod_work);
+>    ...
+>    remove_module(kvm);
+>    ...
+>    work_queue_run()
+>      pvclock_gtod_work()	<- UAF
+> 
+> Ditto for any other operation on that workqueue list head which touches
+> pvclock_gtod_work after module removal.
+> 
+> Cancel the work in kvm_arch_exit() to prevent that.
+> 
+> Fixes: 16e8d74d2da9 ("KVM: x86: notifier for clocksource changes")
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> ---
+> Found by inspection because of:
+>    https://lkml.kernel.org/r/0000000000001d43ac05c0f5c6a0@google.com
+> See also:
+>    https://lkml.kernel.org/r/20210505105940.190490250@infradead.org
+> 
+> TL;DR: Scheduling work with tk_core.seq write held is a bad idea.
+> ---
+>   arch/x86/kvm/x86.c |    1 +
+>   1 file changed, 1 insertion(+)
+> 
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8168,6 +8168,7 @@ void kvm_arch_exit(void)
+>   	cpuhp_remove_state_nocalls(CPUHP_AP_X86_KVM_CLK_ONLINE);
+>   #ifdef CONFIG_X86_64
+>   	pvclock_gtod_unregister_notifier(&pvclock_gtod_notifier);
+> +	cancel_work_sync(&pvclock_gtod_work);
+>   #endif
+>   	kvm_x86_ops.hardware_enable = NULL;
+>   	kvm_mmu_module_exit();
+> 
 
-The computation of vcpu->arch.tsc_offset is (not coincidentially) the
-same that appears in patch 6
-
-+	    (vmcs12->cpu_based_vm_exec_control & CPU_BASED_USE_TSC_OFFSETTING)) {
-+		if (vmcs12->secondary_vm_exec_control & SECONDARY_EXEC_TSC_SCALING) {
-+			cur_offset = kvm_compute_02_tsc_offset(
-+					l1_offset,
-+					vmcs12->tsc_multiplier,
-+					vmcs12->tsc_offset);
-+		} else {
-+			cur_offset = l1_offset + vmcs12->tsc_offset;
-
-So I think you should just pass vmcs12 and the L1 offset to
-kvm_compute_02_tsc_offset, and let it handle both cases (and possibly
-even set vcpu->arch.tsc_scaling_ratio in the same function).
+Queued, thanks (with added Cc to stable).
 
 Paolo
 
