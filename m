@@ -2,77 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B233374D1E
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 03:56:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7CC3374D5E
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 04:18:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229974AbhEFB5m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 May 2021 21:57:42 -0400
-Received: from mga03.intel.com ([134.134.136.65]:26000 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229488AbhEFB5k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 May 2021 21:57:40 -0400
-IronPort-SDR: LZ7KxEEbXMnVScdvIq3ZDpgqX9tfG6q4yGGzmVzEJX+qqACkRfSC+7ws8Jxj+jkiOHjT91lDQR
- gDEBHLeMkM4w==
-X-IronPort-AV: E=McAfee;i="6200,9189,9975"; a="198403961"
-X-IronPort-AV: E=Sophos;i="5.82,276,1613462400"; 
-   d="scan'208";a="198403961"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2021 18:56:43 -0700
-IronPort-SDR: DaUOOV52LW22FFn5MVlFXDJn8/Hza/txWljjB2WJ92MRbMjKib4zgsMMw1xYsDVONbyw1Qlng5
- do0F/h/lqP/Q==
-X-IronPort-AV: E=Sophos;i="5.82,276,1613462400"; 
-   d="scan'208";a="619333107"
-Received: from jhagel-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.164.152])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2021 18:56:40 -0700
-Message-ID: <c96a3fc259726a52bbc18ccc5bb1b06d58216dee.camel@intel.com>
-Subject: Re: [PATCH 1/3] KVM: x86/mmu: Fix return value in
- tdp_mmu_map_handle_target_level()
-From:   Kai Huang <kai.huang@intel.com>
-To:     Ben Gardon <bgardon@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Date:   Thu, 06 May 2021 13:56:38 +1200
-In-Reply-To: <CANgfPd_s1jrAaRRPtC=VUbeL=GfqWPncPx3RVG=+mK3fCiuiKQ@mail.gmail.com>
-References: <cover.1620200410.git.kai.huang@intel.com>
-         <00875eb37d6b5cc9d19bb19e31db3130ac1d8730.1620200410.git.kai.huang@intel.com>
-         <YJLBARcEiD+Sn4UV@google.com>
-         <CANgfPd_s1jrAaRRPtC=VUbeL=GfqWPncPx3RVG=+mK3fCiuiKQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.0 (3.40.0-1.fc34) 
+        id S231334AbhEFCTP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 May 2021 22:19:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54746 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231321AbhEFCTP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 May 2021 22:19:15 -0400
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09BB4C061574
+        for <kvm@vger.kernel.org>; Wed,  5 May 2021 19:18:18 -0700 (PDT)
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4FbHLJ0L7mz9sW4; Thu,  6 May 2021 12:18:16 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1620267496;
+        bh=WYlB70z+eVZIq1j3dLlNhnhyis7gJO8sepMb+y0/sTQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=VCGtcRBGWJeV11yW5ubhxiYhOD6KpXQMvdcPs3tSJqg4LGbCl9FyKk8Xk8OLtCaPO
+         dyCO+yoVFqC//REDbVEapPLR0wlHsy5JD5dGTVQ+71xC0AC+DBSidzABjkCBakSq07
+         LfR1AWYQbuw6vAETyYht19C0yZKqK5JX8DPddVe4=
+Date:   Thu, 6 May 2021 12:16:29 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org, qemu-block@nongnu.org,
+        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+        qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+        =?iso-8859-1?Q?Marc-Andr=E9?= Lureau 
+        <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Greg Kurz <groug@kaod.org>,
+        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>
+Subject: Re: [PATCH 21/23] target/ppc/kvm: Avoid dynamic stack allocation
+Message-ID: <YJNRfZOmH9NKB7EP@yekko>
+References: <20210505211047.1496765-1-philmd@redhat.com>
+ <20210505211047.1496765-22-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="4nfXEX1oz+WC3sSD"
+Content-Disposition: inline
+In-Reply-To: <20210505211047.1496765-22-philmd@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2021-05-05 at 09:04 -0700, Ben Gardon wrote:
-> On Wed, May 5, 2021 at 9:00 AM Sean Christopherson <seanjc@google.com> wrote:
-> > 
-> > On Wed, May 05, 2021, Kai Huang wrote:
-> > > Currently tdp_mmu_map_handle_target_level() returns 0, which is
-> > > RET_PF_RETRY, when page fault is actually fixed.  This makes
-> > > kvm_tdp_mmu_map() also return RET_PF_RETRY in this case, instead of
-> > > RET_PF_FIXED.  Fix by initializing ret to RET_PF_FIXED.
-> > 
-> > Probably worth adding a blurb to call out that the bad return value is benign
-> > since kvm_mmu_page_fault() resumes the guest on RET_PF_RETRY or RET_PF_FIXED.
-> > And for good measure, a Fixes without stable@.
-> > 
-> >   Fixes: bb18842e2111 ("kvm: x86/mmu: Add TDP MMU PF handler")
-> > 
-> > Reviewed-by: Sean Christopherson <seanjc@google.com>
-> 
-> Haha I was just about to add the same two comments. Besides those,
-> this patch looks good to me as well.
-> 
-> Reviewed-by: Ben Gardon <bgardon@google.com>
-> 
-> 
 
-Thanks Sean and Ben. I'll add Sean's suggestion to commit message, and add a Fixes:...
+--4nfXEX1oz+WC3sSD
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, May 05, 2021 at 11:10:45PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> Use autofree heap allocation instead of variable-length
+> array on the stack.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  target/ppc/kvm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index ae62daddf7d..90d0230eb86 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -2660,7 +2660,7 @@ int kvmppc_get_htab_fd(bool write, uint64_t index, =
+Error **errp)
+>  int kvmppc_save_htab(QEMUFile *f, int fd, size_t bufsize, int64_t max_ns)
+>  {
+>      int64_t starttime =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+> -    uint8_t buf[bufsize];
+> +    g_autofree uint8_t *buf =3D g_malloc(bufsize);
+>      ssize_t rc;
+> =20
+>      do {
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--4nfXEX1oz+WC3sSD
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmCTUX0ACgkQbDjKyiDZ
+s5J1Xg//fP1CCuNm/HXYPKD8uyQHwvtdILvGbw+HFXKQczWuXk0sjY8FFMtKSRzI
+wJeYsZ2GmWAolWYLsVqquprjj4ciC2jjRW17ktQTI1BfvjossxiolQUpDFvRgW8m
+ZLGcL9FzEKEJsN3izzKLlYtfmNt/VrPxl5+Oplp/TCyZmoGHyXDthBjss7+ShBss
+Bb1y8XkpFyne5dL1pounzAMIhw1o7WPGDzWBhVxTpZeFUqlkRcUCl8cahxgFMcjf
+YeJzjwS6on8wj32r3eoUQu8SPJDehkRI76HC/np5P6oWn15/F4Cq4hE3kQvidM1/
+luCwRFY04TPHVL7BNDcnV1zyCjtJ/TvlqNbWIHIYhdpahi1uBkM2Qq91bdB1Ehg1
+mJczNaXIJbqqT6/BIsbX4MXOCdSCxNCwdRHJupaqzZJGGM+GjmGkXeZmuhJHajh8
+s2uAy02ZSqHn+ZBA+Q2lw18gEixs5//IjfEsJ+XE8Ju88ax/UMWr9TpfWcG1IGFu
+yAw7CufbuLdF2yvqCvbfeCHbpaNQ0udUpIb8ZO2URtCvFY59s7q+RAg7hsBliYVH
+L+iRuKLctjsxPut99eGq8dWaKLr31JmcnULc6t0Dicak5CVQIXye/vP0a9xIyqxT
+mR2jrBRpg+rDTdKWGX03s3XO5u9a18DnmikjtMlpqmLPPHlQq9U=
+=JU2c
+-----END PGP SIGNATURE-----
+
+--4nfXEX1oz+WC3sSD--
