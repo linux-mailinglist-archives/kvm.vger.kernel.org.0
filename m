@@ -2,350 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4034F374C91
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 03:03:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C0DB374CEC
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 03:40:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229905AbhEFBER (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 May 2021 21:04:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53222 "EHLO mail.kernel.org"
+        id S230144AbhEFBlo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 May 2021 21:41:44 -0400
+Received: from mga17.intel.com ([192.55.52.151]:23042 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229465AbhEFBEQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 May 2021 21:04:16 -0400
-Received: from oasis.local.home (cpe-66-24-58-225.stny.res.rr.com [66.24.58.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7911A610EA;
-        Thu,  6 May 2021 01:03:18 +0000 (UTC)
-Date:   Wed, 5 May 2021 21:03:16 -0400
-From:   Steven Rostedt <rostedt@goodmis.org>
-To:     LKML <linux-kernel@vger.kernel.org>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        Joel Fernandes <joelaf@google.com>,
-        Linux Trace Devel <linux-trace-devel@vger.kernel.org>
-Subject: Re: [RFC][PATCH] vhost/vsock: Add vsock_list file to map cid with
- vhost tasks
-Message-ID: <20210505210316.11e1bbcd@oasis.local.home>
-In-Reply-To: <20210505163855.32dad8e7@gandalf.local.home>
-References: <20210505163855.32dad8e7@gandalf.local.home>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="MP_/7JbDmOvvGcBoZTDb=tjglhB"
+        id S229465AbhEFBln (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 May 2021 21:41:43 -0400
+IronPort-SDR: xb+9QEEzCv4VccF6ESe+8/bOZfaLMxfjv7XTHLdn7Bpdd+5577oe7WWdOfM8pWtyN8QdZqeO7r
+ xN8CD/m67R4w==
+X-IronPort-AV: E=McAfee;i="6200,9189,9975"; a="178579116"
+X-IronPort-AV: E=Sophos;i="5.82,276,1613462400"; 
+   d="scan'208";a="178579116"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2021 18:40:46 -0700
+IronPort-SDR: zQ7EbdqEJwrBw+4OMqt9VyMttbWhq7tYPmxvfMikKcLBu9QuvwYJtGo5L8CSQLzE7xehyIKi0b
+ /X6YY9A5P1nQ==
+X-IronPort-AV: E=Sophos;i="5.82,276,1613462400"; 
+   d="scan'208";a="469220276"
+Received: from yy-desk-7060.sh.intel.com ([10.239.159.38])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2021 18:40:42 -0700
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     pbonzini@redhat.com
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com,
+        ehabkost@redhat.com, mst@redhat.com, armbru@redhat.com,
+        mtosatti@redhat.com, ashish.kalra@amd.com, Thomas.Lendacky@amd.com,
+        brijesh.singh@amd.com, isaku.yamahata@intel.com, yuan.yao@intel.com
+Subject: [RFC][PATCH v1 00/10] Enable encrypted guest memory access in QEMU
+Date:   Thu,  6 May 2021 09:40:27 +0800
+Message-Id: <20210506014037.11982-1-yuan.yao@linux.intel.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---MP_/7JbDmOvvGcBoZTDb=tjglhB
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+From: Yuan Yao <yuan.yao@intel.com>
 
-For kicks, I wrote this program that uses libtracefs to search all CIDS
-(1-255), and find the kvm guests that are attached to them.
+This RFC series introduces the basic framework and a common
+implementation on x86 to handle encrypted guest memory
+reading/writing, to support QEMU's built-in guest debugging
+features, like the monitor command xp and gdbstub.
 
-It traces the sched_wakeup and kvm_exit, looking for:
+The encrypted guest which its memory and/or register context
+is encrypted by vendor specific technology(AMD SEV/INTEL TDX),
+is able to resist the attack from malicious VMM or other
+privileged components in host side, however, this ability also
+breaks down the QEMU's built-in guest debugging features,
+because it prohibits the direct guest memory accessing
+(memcpy() with HVA) from QEMU which is the base of these
+debugging features.
 
- this_task -> wakeup -> wakeup -> kvm_exit
+The framework part based on the previous patche set from
+AMD[1] and some discussion result in community[2]. The main
+idea is, introduce some new debug interfaces to handle the
+encrypted guest physical memory accessing, also introduce
+new interfaces in MemoryRegion to handle the actual accessing
+there with KVM, don't bother the exist memory access logic or
+callbacks as far as possible. 
 
-when doing a connect to a cid.
+[1] https://lore.kernel.org/qemu-devel/
+    cover.1605316268.git.ashish.kalra@amd.com/
+[2] https://lore.kernel.org/qemu-devel/
+    20200922201124.GA6606@ashkalra_ubuntu_server/
 
-When it finds the pid that did a kvm_exit, it knows that's the PID that
-is woken by the vhost worker task. It's a little slow, and I would
-really like a better way to do this, but it's at least an option that
-is available now.
+ - The difference part in this patch series:
+   - We introduce another new vm level ioctl focus on the encrypted
+     guest memory accessing:
 
--- Steve
+     KVM_MEMORY_ENCRYPT_{READ,WRITE}_MEMORY
 
---MP_/7JbDmOvvGcBoZTDb=tjglhB
-Content-Type: text/x-c++src
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment; filename=vsock-list.c
+     struct kvm_rw_memory rw;
+     rw.addr = gpa_OR_hva;
+     rw.buf = (__u64)src;
+     rw.len = len;
+     kvm_vm_ioctl(kvm_state,
+                  KVM_MEMORY_ENCRYPT_{READ,WRITE}_MEMORY,
+                  &rw);
 
-#define _GNU_SOURCE
-#include <asm/types.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <linux/vm_sockets.h>
+     This new ioctl has more neutral and general name for its
+     purpose, the debugging support of AMD SEV and INTEL TDX
+     can be covered by a unify QEMU implementation on x86 with this
+     ioctl. Although only INTEL TD guest is supported in this series,
+     AMD SEV could be also supported with implementation of this
+     ioctl in KVM, plus small modifications in QEMU to enable the
+     unify part.
 
-#include <tracefs.h>
+   - The MemoryRegion interface introduced by AMD before now has
+     addtional GPA parameter(only HVA before).
+     This is for INTEL TDX which uses GPA to do guest memory
+     accessing. This change won't impact AMD SEV which is using
+     HVA to access the guest memory.
 
-#define MAX_CID		256
+ - New APIs in QEMU:
+   - Physical memory accessing:
+     - cpu_physical_memory_rw_debug().
+     - cpu_physical_memory_read_debug().
+     - cpu_physical_memory_write_debug().
+     - x86_ldl_phys_debug().
+     - x86_ldq_phys_debug().
+   - Access from address_space:
+     - address_space_read_debug().
+     - address_space_write_rom_debug().
+   - Virtual memory accessing and page table walking:
+     - cpu_memory_rw_debug().
+     - x86_cpu_get_phys_page_attrs_encrypted_debug().
 
-static int this_pid;
+ - New intrfaces in QEMU:
+   - MemoryDebugOps *physical_memory_debug_op
+     - For normal guest:
+       Just call the old exist memory RW functions.
+     - For encrypted guest:
+       Forward the request to MemoryRegion->ram_debug_ops
 
-static int open_vsock(unsigned int cid, unsigned int port)
-{
-	struct sockaddr_vm addr = {
-		.svm_family = AF_VSOCK,
-		.svm_cid = cid,
-		.svm_port = port,
-	};
-	int sd;
+   - MemoryRegionRAMReadWriteOps MemoryRegion::*ram_debug_ops
+     - For normal guest:
+       NULL and nobody use it.
+     - For encrypted guest:
+       Forward the request to common/vendor specific implementation.
 
-	sd = socket(AF_VSOCK, SOCK_STREAM, 0);
-	if (sd < 0)
-		return -1;
+ - The relationship diagram of the APIs and interfaces:
 
-	if (connect(sd, (struct sockaddr *)&addr, sizeof(addr)))
-		return -1;
+                 +---------------------------------------------+
+                 |x86_cpu_get_phys_page_attrs_encrypted_debug()|
+                 +----------------------------------+----------+
+                                                    |
+          +---------------------------------+       |
+          |cpu_physical_memory_rw_debug()   |       |
+          |cpu_physical_memory_read_debug() |       |
+          |cpu_physical_memory_write_debug()|       |
+          +----------------------+----------+       |
+                                 |                  |
+   +---------------------+       |        +---------v----------+
+   |cpu_memory_rw_debug()|       |        |x86_ldl_phys_debug()|
+   +-------------------+-+       |        |x86_ldq_phys_debug()|
+                       |         |        +-------+------------+
+                       |         |                |
+                       |         |                |
+  +--------------------v---------v----------------v------------+
+  |         MemoryDebugOps *physical_memory_debug_op           |
+  +----------------------+--------------------------+----------+
+                         |                          |
+                         |Encrypted guest           |Normal guest
+                         |                          |
+    +--------------------v-----------------------+  |
+    |address_space_encrypted_memory_read_debug() |  |
+    |address_space_encrypted_rom_write_debug()   |  |
+    +--------------------+-----------------------+  |
+                         |                          | 
+                         |          +---------------v----------+
+                         |          |address_space_read()      |
+                         |          |address_space_write_rom() |
+                         |          +--------------------------+
+                         |
+        +----------------v----------------+
+        | address_space_read_debug()      |
+        | address_space_write_rom_debug() |
+        +----------------+----------------+
+                         |
+                         |
+                         |
+        +----------------v----------------+
+        |  MemoryRegionRAMReadWriteOps    |
+        |  MemoryRegion::*ram_debug_ops   |
+        +--------+--------------+---------+
+                 |              |
+                 |              |Normal guest
+                 |              |
+  Encrypted guest|          +---v-------------------+
+                 |          | NULL(nobody using it) |
+                 |          +-----------------------+
+                 |
+       +---------v----------------------------+
+       |  kvm_encrypted_guest_read_memory()   |
+       |  kvm_encrypted_guest_write_memory()  |
+       +--------------------------------------+
 
-	return sd;
-}
+Ashish Kalra (2):
+  Introduce new MemoryDebugOps which hook into guest virtual and
+    physical memory debug interfaces such as cpu_memory_rw_debug, to
+    allow vendor specific assist/hooks for debugging and delegating
+    accessing the guest memory. This is required for example in case of
+    AMD SEV platform where the guest memory is encrypted and a SEV
+    specific debug assist/hook will be required to access the guest
+    memory.
+  Add new address_space_read and address_space_write debug helper
+    interfaces which can be invoked by vendor specific guest memory
+    debug assist/hooks to do guest RAM memory accesses using the added
+    MemoryRegion callbacks.
 
-struct pids {
-	struct pids		*next;
-	int			pid;
-};
+Brijesh Singh (2):
+  Extend the MemTxAttrs to include a 'debug' flag. The flag can be used
+    as general indicator that operation was triggered by the debugger.
+  Currently, guest memory access for debugging purposes is performed
+    using memcpy(). Extend the 'struct MemoryRegion' to include new
+    callbacks that can be used to override the use of memcpy() with
+    something else.
 
-struct trace_info {
-	struct tracefs_instance		*instance;
-	struct tep_handle		*tep;
-	struct tep_event		*wake_up;
-	struct tep_event		*kvm_exit;
-	struct tep_format_field		*common_pid;
-	struct tep_format_field		*wake_pid;
-	struct pids			*pids;
-	int				cid;
-	int				pid;
-};
+Yuan Yao (6):
+  Introduce new interface KVMState::set_mr_debug_ops and its wrapper
+  Implements the common MemoryRegion::ram_debug_ops for encrypted guests
+  Set the RAM's MemoryRegion::debug_ops for INTEL TD guests
+  Introduce debug version of physical memory read/write API
+  Change the monitor and other commands and gdbstub to use the debug API
+  Introduce new CPUClass::get_phys_page_attrs_debug implementation for
+    encrypted guests
 
-static void tear_down_trace(struct trace_info *info)
-{
-	tracefs_instance_file_write(info->instance, "events/enable", "0");
-	tracefs_instance_destroy(info->instance);
-	tracefs_instance_free(info->instance);
-	tep_free(info->tep);
-}
+ accel/kvm/kvm-all.c       |  17 +++++
+ accel/stubs/kvm-stub.c    |  11 +++
+ dump/dump.c               |   2 +-
+ gdbstub.c                 |   4 +-
+ hw/i386/pc.c              |   4 +
+ include/exec/cpu-common.h |  14 ++++
+ include/exec/memattrs.h   |   4 +
+ include/exec/memory.h     |  54 +++++++++++++
+ include/sysemu/kvm.h      |   5 ++
+ include/sysemu/tdx.h      |   3 +
+ monitor/misc.c            |  12 ++-
+ softmmu/cpus.c            |   2 +-
+ softmmu/physmem.c         | 154 +++++++++++++++++++++++++++++++++++++-
+ target/i386/cpu.h         |   4 +
+ target/i386/helper.c      |  64 +++++++++++++---
+ target/i386/kvm/kvm.c     |  68 +++++++++++++++++
+ target/i386/kvm/tdx.c     |  21 ++++++
+ target/i386/monitor.c     |  52 ++++++-------
+ 18 files changed, 447 insertions(+), 48 deletions(-)
 
-static int setup_trace(struct trace_info *info)
-{
-	const char *systems[] = { "sched", "kvm", NULL};
-	char *name;
-	int ret;
+-- 
+2.20.1
 
-	info->pids = NULL;
-
-	ret = asprintf(&name, "vsock_find-%d\n", getpid());
-	if (ret < 0)
-		return ret;
-
-	info->instance = tracefs_instance_create(name);
-	free(name);
-	if (!info->instance)
-		return -1;
-
-	tracefs_trace_off(info->instance);
-	info->tep = tracefs_local_events_system(NULL, systems);
-	if (!info->tep)
-		goto fail;
-
-	info->wake_up = tep_find_event_by_name(info->tep, "sched", "sched_waking");
-	if (!info->wake_up) {
-		fprintf(stderr, "Failed to find sched_waking\n");
-		goto fail;
-	}
-
-	info->kvm_exit = tep_find_event_by_name(info->tep, "kvm", "kvm_exit");
-	if (!info->kvm_exit) {
-		fprintf(stderr, "Failed to find kvm_exit\n");
-		goto fail;
-	}
-
-	info->wake_pid = tep_find_any_field(info->wake_up, "pid");
-	if (!info->wake_pid) {
-		fprintf(stderr, "Failed to find wake up pid\n");
-		goto fail;
-	}
-
-	info->common_pid = tep_find_common_field(info->wake_up,
-						 "common_pid");
-	if (!info->common_pid) {
-		fprintf(stderr, "Failed to find common pid\n");
-		goto fail;
-	}
-
-	ret = tracefs_instance_file_write(info->instance, "events/sched/sched_waking/enable", "1");
-	if (ret < 0) {
-		fprintf(stderr, "Failed to enable sched_waking\n");
-		goto fail;
-	}
-
-	ret = tracefs_instance_file_write(info->instance, "events/kvm/kvm_exit/enable", "1");
-	if (ret < 0) {
-		fprintf(stderr, "Failed to enable kvm_exit\n");
-		goto fail;
-	}
-
-	return 0;
-fail:
-	tear_down_trace(info);
-	return -1;
-}
-
-
-static void free_pids(struct pids *pids)
-{
-	struct pids *next;
-
-	while (pids) {
-		next = pids;
-		pids = pids->next;
-		free(next);
-	}
-}
-
-static void add_pid(struct pids **pids, int pid)
-{
-	struct pids *new_pid;
-
-	new_pid = malloc(sizeof(*new_pid));
-	if (!new_pid)
-		return;
-
-	new_pid->pid = pid;
-	new_pid->next = *pids;
-	*pids = new_pid;
-}
-
-static bool match_pid(struct pids *pids, int pid)
-{
-	while (pids) {
-		if (pids->pid == pid)
-			return true;
-		pids = pids->next;
-	}
-	return false;
-}
-
-static int callback(struct tep_event *event, struct tep_record *record,
-		    int cpu, void *data)
-{
-	struct trace_info *info = data;
-	struct tep_handle *tep = info->tep;
-	unsigned long long val;
-	int type;
-	int pid;
-	int ret;
-
-	ret = tep_read_number_field(info->common_pid, record->data, &val);
-	if (ret < 0)
-		return 0;
-
-	pid = val;
-
-	if (!match_pid(info->pids, pid))
-		return 0;
-
-	type = tep_data_type(tep, record);
-	if (type == info->kvm_exit->id) {
-		info->pid = pid;
-		return -1;
-	}
-
-	if (type != info->wake_up->id)
-		return 0;
-
-	ret = tep_read_number_field(info->wake_pid, record->data, &val);
-	if (ret < 0)
-		return 0;
-
-	add_pid(&info->pids, (int)val);
-	return 0;
-}
-
-static void print_cid_pid(int cid, int pid)
-{
-	FILE *fp;
-	char *path;
-	char *buf = NULL;
-	char *save;
-	size_t l = 0;
-	int tgid = -1;
-
-	if (asprintf(&path, "/proc/%d/status", pid) < 0)
-		return;
-
-	fp = fopen(path, "r");
-	free(path);
-	if (!fp)
-		return;
-
-	while (getline(&buf, &l, fp) > 0) {
-		char *tok;
-
-		if (strncmp(buf, "Tgid:", 5) != 0)
-			continue;
-		tok = strtok_r(buf, ":", &save);
-		if (!tok)
-			continue;
-		tok = strtok_r(NULL, ":", &save);
-		if (!tok)
-			continue;
-		while (isspace(*tok))
-			tok++;
-		tgid = strtol(tok, NULL, 0);
-		break;
-	}
-	free(buf);
-
-	if (tgid >= 0)
-		printf("%d\t%d\n", cid, tgid);
-}
-
-static void find_cid(struct trace_info *info, int cid)
-{
-	int fd;
-
-	add_pid(&info->pids, this_pid);
-
-	tracefs_instance_file_clear(info->instance, "trace");
-	tracefs_trace_on(info->instance);
-	fd = open_vsock(cid, -1);
-	tracefs_trace_off(info->instance);
-	if (fd >= 0)
-		close(fd);
-	info->cid = cid;
-	info->pid = -1;
-	tracefs_iterate_raw_events(info->tep, info->instance,
-				   NULL, 0, callback, info);
-	if (info->pid >= 0)
-		print_cid_pid(cid, info->pid);
-	tracefs_trace_off(info->instance);
-	free_pids(info->pids);
-	info->pids = NULL;
-}
-
-static int find_cids(void)
-{
-	struct trace_info info ;
-	int cid;
-
-	if (setup_trace(&info) < 0)
-		return -1;
-
-	for (cid = 0; cid < MAX_CID; cid++)
-		find_cid(&info, cid);
-
-	tear_down_trace(&info);
-	return 0;
-}
-
-int main(int argc, char *argv[])
-{
-	this_pid = getpid();
-	find_cids();
-	exit(0);
-}
-
---MP_/7JbDmOvvGcBoZTDb=tjglhB--
