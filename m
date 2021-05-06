@@ -2,222 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C54B9375083
-	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 10:00:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3010F375093
+	for <lists+kvm@lfdr.de>; Thu,  6 May 2021 10:12:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233670AbhEFIB3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 04:01:29 -0400
-Received: from mga04.intel.com ([192.55.52.120]:61471 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233676AbhEFIB2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 04:01:28 -0400
-IronPort-SDR: IH36+L2ahIWELbrQN0BEdcl19tYA1Rhq4mzWKFryjQf+iKKyi4rCXNjYcpO15N5NJasBwLHJm2
- RaEfv8QMgINg==
-X-IronPort-AV: E=McAfee;i="6200,9189,9975"; a="196382457"
-X-IronPort-AV: E=Sophos;i="5.82,277,1613462400"; 
-   d="scan'208";a="196382457"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2021 01:00:30 -0700
-IronPort-SDR: o4dkVKGbYyaN2OFhZbHMMNJbU83ejckFuEcC73mJIYEFBh5kOXcOPLXZEryTWym4XeVoSDnot3
- THFKAgT+a/NQ==
-X-IronPort-AV: E=Sophos;i="5.82,277,1613462400"; 
-   d="scan'208";a="406906183"
-Received: from jhagel-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.164.152])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2021 01:00:28 -0700
-Message-ID: <51f7d6bbe52ad0c42d3c09fffd340fe7d2c0e113.camel@intel.com>
-Subject: Re: [PATCH 3/3] KVM: x86/mmu: Fix TDP MMU page table level
-From:   Kai Huang <kai.huang@intel.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Date:   Thu, 06 May 2021 20:00:26 +1200
-In-Reply-To: <CANgfPd_gWZB9NMjzsZ-v61e=p53WytCR1qm_28vRg6bdESD1fQ@mail.gmail.com>
-References: <cover.1620200410.git.kai.huang@intel.com>
-         <817eae486273adad0a622671f628c5a99b72a375.1620200410.git.kai.huang@intel.com>
-         <CANgfPd_gWZB9NMjzsZ-v61e=p53WytCR1qm_28vRg6bdESD1fQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.0 (3.40.0-1.fc34) 
+        id S233657AbhEFINZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 May 2021 04:13:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48627 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231372AbhEFINY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 May 2021 04:13:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620288746;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UC82bAJniKzYDd1rr6hFdgedXUqInssRFspajndQMpU=;
+        b=SK8K2O+TEh9ofT+OChMOa8gvXEKqeKOs94Zso8TwxRT8LPF92W6hNmXxbr9UoUVJY6bRMv
+        Zq9lwm6mmJrdbKrvg75l43ovexfx6ledyQgI67J5MT7hlNS3IviyzQhFWNdGe4JbvlMvsS
+        KObIJy0ZVi5FzBY8WY5eoquaVYCau3Q=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-217-OnlyOSJRNAmb0vOfbdGs1g-1; Thu, 06 May 2021 04:12:23 -0400
+X-MC-Unique: OnlyOSJRNAmb0vOfbdGs1g-1
+Received: by mail-wm1-f71.google.com with SMTP id n9-20020a1c40090000b02901401bf40f9dso2367642wma.0
+        for <kvm@vger.kernel.org>; Thu, 06 May 2021 01:12:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=UC82bAJniKzYDd1rr6hFdgedXUqInssRFspajndQMpU=;
+        b=kI/Ih64aUdPRhsIf7318NCIuLx6e/gojdZhcaY5u5rMEBZChpzadnqFfCW4hjr7aSE
+         QRO3Fx+VIp2HMwK9er3b9plFNkqKYVWjy/fJ1odt6EfRLDy4tjOYU08KwWqgVIeh1wS1
+         ImfuZokMf0eKgJXOCWclJ2vC0Jx4+eUnISm9xiU4GXtiU/pHQqpmB/CqS42Dt/xf8FFh
+         P+u422ODuAmkBiqcH5N+VDQK+ahDy2DrzL7wCKBPhad6isSUDv8FxrMC8gI1SGf2CBR1
+         4NYDvIscEUNvUwfaYpec7GJc1urNCz/JBzhFkF7a2WTtIaxIpYnEfHPPva1lRhTl1O+l
+         PEhg==
+X-Gm-Message-State: AOAM530wMhHcy5S+4xLuzK+bo9X93j4tz3NQGyxvrd9nvMX//n2vTnoj
+        +kvHce5MVORrmPcdB+FHRyiEOgjm/cO1ozoM67Wtrgjv7kXt60tyPh21bB98o8yaV1N0YjE8+5S
+        bXh7yDAfhDOdo
+X-Received: by 2002:a5d:5351:: with SMTP id t17mr3541254wrv.83.1620288741817;
+        Thu, 06 May 2021 01:12:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxYOEaMbdcz5IXpIt214SV5btSIHDzQM7uxpcmfvjwnZSCT2BWQX5LFXPNw221igJoGM2NA4Q==
+X-Received: by 2002:a5d:5351:: with SMTP id t17mr3541224wrv.83.1620288741611;
+        Thu, 06 May 2021 01:12:21 -0700 (PDT)
+Received: from redhat.com ([2a10:8004:640e:0:d1db:1802:5043:7b85])
+        by smtp.gmail.com with ESMTPSA id x65sm10637130wmg.36.2021.05.06.01.12.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 May 2021 01:12:20 -0700 (PDT)
+Date:   Thu, 6 May 2021 04:12:17 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, xieyongji@bytedance.com,
+        stefanha@redhat.com, file@sect.tu-berlin.de, ashish.kalra@amd.com,
+        konrad.wilk@oracle.com, kvm@vger.kernel.org, hch@infradead.org
+Subject: Re: [RFC PATCH V2 0/7] Do not read from descripto ring
+Message-ID: <20210506041057-mutt-send-email-mst@kernel.org>
+References: <20210423080942.2997-1-jasowang@redhat.com>
+ <0e9d70b7-6c8a-4ff5-1fa9-3c4f04885bb8@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <0e9d70b7-6c8a-4ff5-1fa9-3c4f04885bb8@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2021-05-05 at 09:28 -0700, Ben Gardon wrote:
-> On Wed, May 5, 2021 at 2:38 AM Kai Huang <kai.huang@intel.com> wrote:
-> > 
-> > TDP MMU iterator's level is identical to page table's actual level.  For
-> > instance, for the last level page table (whose entry points to one 4K
-> > page), iter->level is 1 (PG_LEVEL_4K), and in case of 5 level paging,
-> > the iter->level is mmu->shadow_root_level, which is 5.  However, struct
-> > kvm_mmu_page's level currently is not set correctly when it is allocated
-> > in kvm_tdp_mmu_map().  When iterator hits non-present SPTE and needs to
-> > allocate a new child page table, currently iter->level, which is the
-> > level of the page table where the non-present SPTE belongs to, is used.
-> > This results in struct kvm_mmu_page's level always having its parent's
-> > level (excpet root table's level, which is initialized explicitly using
-> > mmu->shadow_root_level).  This is kinda wrong, and not consistent with
-> > existing non TDP MMU code.  Fortuantely the sp->role.level is only used
-> > in handle_removed_tdp_mmu_page(), which apparently is already aware of
-> > this, and handles correctly.  However to make it consistent with non TDP
-> > MMU code (and fix the issue that both root page table and any child of
-> > it having shadow_root_level), fix this by using iter->level - 1 in
-> > kvm_tdp_mmu_map().  Also modify handle_removed_tdp_mmu_page() to handle
-> > such change.
+On Thu, May 06, 2021 at 11:20:30AM +0800, Jason Wang wrote:
 > 
-> Ugh. Thank you for catching this. This is going to take me a bit to
-> review as I should audit the code more broadly for this problem in the
-> TDP MMU.
-> It would probably also be a good idea to add a comment on the level
-> field to say that it represents the level of the SPTEs in the
-> associated page, not the level of the SPTE that links to the
-> associated page.
-> Hopefully that will prevent similar future misunderstandings.
+> 在 2021/4/23 下午4:09, Jason Wang 写道:
+> > Hi:
+> > 
+> > Sometimes, the driver doesn't trust the device. This is usually
+> > happens for the encrtpyed VM or VDUSE[1]. In both cases, technology
+> > like swiotlb is used to prevent the poking/mangling of memory from the
+> > device. But this is not sufficient since current virtio driver may
+> > trust what is stored in the descriptor table (coherent mapping) for
+> > performing the DMA operations like unmap and bounce so the device may
+> > choose to utilize the behaviour of swiotlb to perform attacks[2].
+> > 
+> > To protect from a malicous device, this series store and use the
+> > descriptor metadata in an auxiliay structure which can not be accessed
+> > via swiotlb instead of the ones in the descriptor table. This means
+> > the descriptor table is write-only from the view of the driver.
+> > 
+> > Actually, we've almost achieved that through packed virtqueue and we
+> > just need to fix a corner case of handling mapping errors. For split
+> > virtqueue we just follow what's done in the packed.
+> > 
+> > Note that we don't duplicate descriptor medata for indirect
+> > descriptors since it uses stream mapping which is read only so it's
+> > safe if the metadata of non-indirect descriptors are correct.
+> > 
+> > For split virtqueue, the change increase the footprint due the the
+> > auxiliary metadata but it's almost neglectlable in the simple test
+> > like pktgen or netpef.
+> > 
+> > Slightly tested with packed on/off, iommu on/of, swiotlb force/off in
+> > the guest.
+> > 
+> > Please review.
+> > 
+> > Changes from V1:
+> > - Always use auxiliary metadata for split virtqueue
+> > - Don't read from descripto when detaching indirect descriptor
+> 
+> 
+> Hi Michael:
+> 
+> Our QE see no regression on the perf test for 10G but some regressions
+> (5%-10%) on 40G card.
+> 
+> I think this is expected since we increase the footprint, are you OK with
+> this and we can try to optimize on top or you have other ideas?
+> 
+> Thanks
 
-Regarding to adding  a comment, sorry I had a hard time to figure out where to add. Did
-you mean level field of 'struct kvm_mmu_page_role', or 'struct tdp_iter'? If it is the
-former, to me not quite useful. 
+Let's try for just a bit, won't make this window anyway:
 
-I ended up with below. Is it OK to you?
+I have an old idea. Add a way to find out that unmap is a nop
+(or more exactly does not use the address/length).
+Then in that case even with DMA API we do not need
+the extra data. Hmm?
 
-If you still think a comment of level should be added, would you be more specific so that
-I can add it?
 
-------------------------------------------------------------------------
-
-TDP MMU iterator's level is identical to page table's actual level.  For
-instance, for the last level page table (whose entry points to one 4K
-page), iter->level is 1 (PG_LEVEL_4K), and in case of 5 level paging,
-the iter->level is mmu->shadow_root_level, which is 5.  However, struct
-kvm_mmu_page's level currently is not set correctly when it is allocated
-in kvm_tdp_mmu_map().  When iterator hits non-present SPTE and needs to
-allocate a new child page table, currently iter->level, which is the
-level of the page table where the non-present SPTE belongs to, is used.
-This results in struct kvm_mmu_page's level always having its parent's
-level (excpet root table's level, which is initialized explicitly using
-mmu->shadow_root_level).
-
-This is kinda wrong, and not consistent with existing non TDP MMU code.
-Fortuantely sp->role.level is only used in handle_removed_tdp_mmu_page()
-and kvm_tdp_mmu_zap_sp(), and they are already aware of this and behave
-correctly.  However to make it consistent with legacy MMU code (and fix
-the issue that both root page table and its child page table have
-shadow_root_level), use iter->level - 1 in kvm_tdp_mmu_map(), and change
-handle_removed_tdp_mmu_page() and kvm_tdp_mmu_zap_sp() accordingly.
-
-Signed-off-by: Kai Huang <kai.huang@intel.com>
----
- arch/x86/kvm/mmu/tdp_mmu.c | 8 ++++----
- arch/x86/kvm/mmu/tdp_mmu.h | 2 +-
- 2 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 5e28fbabcd35..45fb889f6a94 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -335,7 +335,7 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t
-pt,
-
-        for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
-                sptep = rcu_dereference(pt) + i;
--               gfn = base_gfn + (i * KVM_PAGES_PER_HPAGE(level - 1));
-+               gfn = base_gfn + i * KVM_PAGES_PER_HPAGE(level);
-
-                if (shared) {
-                        /*
-@@ -377,12 +377,12 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t
-pt,
-                        WRITE_ONCE(*sptep, REMOVED_SPTE);
-                }
-                handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), gfn,
--                                   old_child_spte, REMOVED_SPTE, level - 1,
-+                                   old_child_spte, REMOVED_SPTE, level,
-                                    shared);
-        }
-
-        kvm_flush_remote_tlbs_with_address(kvm, gfn,
--                                          KVM_PAGES_PER_HPAGE(level));
-+                                          KVM_PAGES_PER_HPAGE(level + 1));
-
-        call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
- }
-@@ -1013,7 +1013,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32
-error_code,
-                }
-
-                if (!is_shadow_present_pte(iter.old_spte)) {
--                       sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level);
-+                       sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level - 1);
-                        child_pt = sp->spt;
-
-                        new_spte = make_nonleaf_spte(child_pt,
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 5fdf63090451..7f9974c5d0b4 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -31,7 +31,7 @@ static inline bool kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, int as_id,
- }
- static inline bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
- {
--       gfn_t end = sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level);
-+       gfn_t end = sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level + 1);
-
-        /*
-         * Don't allow yielding, as the caller may have a flush pending.  Note,
--- 
-2.31.1
-
- 
 > 
 > > 
-> > Signed-off-by: Kai Huang <kai.huang@intel.com>
-> > ---
-> >  arch/x86/kvm/mmu/tdp_mmu.c | 8 ++++----
-> >  1 file changed, 4 insertions(+), 4 deletions(-)
+> > [1]
+> > https://lore.kernel.org/netdev/fab615ce-5e13-a3b3-3715-a4203b4ab010@redhat.com/T/
+> > [2]
+> > https://yhbt.net/lore/all/c3629a27-3590-1d9f-211b-c0b7be152b32@redhat.com/T/#mc6b6e2343cbeffca68ca7a97e0f473aaa871c95b
 > > 
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > index debe8c3ec844..bcfb87e1c06e 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > @@ -335,7 +335,7 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
+> > Jason Wang (7):
+> >    virtio-ring: maintain next in extra state for packed virtqueue
+> >    virtio_ring: rename vring_desc_extra_packed
+> >    virtio-ring: factor out desc_extra allocation
+> >    virtio_ring: secure handling of mapping errors
+> >    virtio_ring: introduce virtqueue_desc_add_split()
+> >    virtio: use err label in __vring_new_virtqueue()
+> >    virtio-ring: store DMA metadata in desc_extra for split virtqueue
 > > 
-> >         for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
-> >                 sptep = rcu_dereference(pt) + i;
-> > -               gfn = base_gfn + (i * KVM_PAGES_PER_HPAGE(level - 1));
-> > +               gfn = base_gfn + i * KVM_PAGES_PER_HPAGE(level);
+> >   drivers/virtio/virtio_ring.c | 201 +++++++++++++++++++++++++----------
+> >   1 file changed, 144 insertions(+), 57 deletions(-)
 > > 
-> >                 if (shared) {
-> >                         /*
-> > @@ -377,12 +377,12 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
-> >                         WRITE_ONCE(*sptep, REMOVED_SPTE);
-> >                 }
-> >                 handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), gfn,
-> > -                                   old_child_spte, REMOVED_SPTE, level - 1,
-> > +                                   old_child_spte, REMOVED_SPTE, level,
-> >                                     shared);
-> >         }
-> > 
-> >         kvm_flush_remote_tlbs_with_address(kvm, gfn,
-> > -                                          KVM_PAGES_PER_HPAGE(level));
-> > +                                          KVM_PAGES_PER_HPAGE(level + 1));
-> > 
-> >         call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
-> >  }
-> > @@ -1009,7 +1009,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
-> >                 }
-> > 
-> >                 if (!is_shadow_present_pte(iter.old_spte)) {
-> > -                       sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level);
-> > +                       sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level - 1);
-> >                         child_pt = sp->spt;
-> > 
-> >                         new_spte = make_nonleaf_spte(child_pt,
-> > --
-> > 2.31.1
-> > 
-
 
