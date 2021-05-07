@@ -2,200 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D32CA37671F
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 16:40:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 546C237672E
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 16:44:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237676AbhEGOlk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 May 2021 10:41:40 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54714 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233545AbhEGOlj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 May 2021 10:41:39 -0400
-Received: from gandalf.local.home (cpe-66-24-58-225.stny.res.rr.com [66.24.58.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 622A361157;
-        Fri,  7 May 2021 14:40:38 +0000 (UTC)
-Date:   Fri, 7 May 2021 10:40:36 -0400
-From:   Steven Rostedt <rostedt@goodmis.org>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        Joel Fernandes <joelaf@google.com>,
-        Linux Trace Devel <linux-trace-devel@vger.kernel.org>
-Subject: Re: [RFC][PATCH] vhost/vsock: Add vsock_list file to map cid with
- vhost tasks
-Message-ID: <20210507104036.711b0b10@gandalf.local.home>
-In-Reply-To: <20210507141120.ot6xztl4h5zyav2c@steredhat>
-References: <20210505163855.32dad8e7@gandalf.local.home>
-        <20210507141120.ot6xztl4h5zyav2c@steredhat>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+        id S237692AbhEGOpd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 May 2021 10:45:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53977 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234601AbhEGOpd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 May 2021 10:45:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620398673;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=C+MYJWIsLohbCHlMSEIGcZQyDaEDuU9Kl0ow5213YNc=;
+        b=T9bqPQ1iOCtOKzHERhU/iTCRz0QU+fJrVF7VtsJtQ1CCf+nD5fiCd3UL4Tf5Pug+hnXn0A
+        iS6taGJK/KAqmDWOLanVYHlyKIuW8EShZq3IPNpUd9MsmnZ1qhfip1w63fLcuGeZLzqRD3
+        urf2/VDDc9L3+6oZq7q/Vf4Cs3vKot0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-302-r851SfVcOGyO7fkQu3389g-1; Fri, 07 May 2021 10:44:31 -0400
+X-MC-Unique: r851SfVcOGyO7fkQu3389g-1
+Received: by mail-wr1-f69.google.com with SMTP id 65-20020adf82c70000b0290107593a42c3so3701426wrc.5
+        for <kvm@vger.kernel.org>; Fri, 07 May 2021 07:44:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=C+MYJWIsLohbCHlMSEIGcZQyDaEDuU9Kl0ow5213YNc=;
+        b=R4U2iQ07ssxn8xm2HOpcowGBxbc3YE+hzR3/7iIgPAGbMWKBXSzyY8fQWqfl0qLro7
+         JRgBKbCssBvJl//giwX8CcvSekj2MSBxxtRZ2UN5pmPT5XpcZSoZML4C76jOjo+j1T3s
+         tR81lIKvA77fwo3/rP+risfZbFMefuztjIoRNMZgkiUEnPQCzz0D3+pQUQEBG4uJ4Vz4
+         ClSEd4xz+nRkKdNhPj2BublaR9WvPRXjLXWAbn4ahZBLO54q5d+s8FBYpfdu0lT3dbMt
+         2IGNHs7vnfPPeRrol/gmSMKcfCmcdOnmnC9qEIfnNW329JVWuD5TVA68t5Z6ErhrtFnC
+         qejA==
+X-Gm-Message-State: AOAM5334ELiildZYAUKIPjKGROmsPD3zE8D5gF5lmfhYqkPkDSuTAwpQ
+        ttFq+cQBPwnkvZF++y+ZjzIwkuLlUQyqJCxLCjc/ohR6odNKbw3HOEbZhvyobyZChVMV3D1hOXa
+        66xFlpJUct8hg
+X-Received: by 2002:adf:f80f:: with SMTP id s15mr12876030wrp.341.1620398670260;
+        Fri, 07 May 2021 07:44:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyV3LXdgDeT9W3nPy2PYFEyT0xnL/c2fIbnfgtcygElbhUWgwrD2nI+U4GtCxZ9QE5ZsaU17g==
+X-Received: by 2002:adf:f80f:: with SMTP id s15mr12876009wrp.341.1620398670157;
+        Fri, 07 May 2021 07:44:30 -0700 (PDT)
+Received: from localhost.localdomain (astrasbourg-652-1-219-60.w90-40.abo.wanadoo.fr. [90.40.114.60])
+        by smtp.gmail.com with ESMTPSA id r13sm8833726wrn.2.2021.05.07.07.44.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 May 2021 07:44:29 -0700 (PDT)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Laurent Vivier <laurent@vivier.eu>,
+        Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org,
+        Peter Maydell <peter.maydell@linaro.org>,
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        Gerd Hoffmann <kraxel@redhat.com>, qemu-arm@nongnu.org,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        Greg Kurz <groug@kaod.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm@vger.kernel.org (open list:Overall KVM CPUs)
+Subject: [PATCH v3 15/17] target/ppc/kvm: Replace alloca() by g_malloc()
+Date:   Fri,  7 May 2021 16:43:13 +0200
+Message-Id: <20210507144315.1994337-16-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.3
+In-Reply-To: <20210507144315.1994337-1-philmd@redhat.com>
+References: <20210507144315.1994337-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 7 May 2021 16:11:20 +0200
-Stefano Garzarella <sgarzare@redhat.com> wrote:
+The ALLOCA(3) man-page mentions its "use is discouraged".
 
-> Hi Steven,
-> 
-> On Wed, May 05, 2021 at 04:38:55PM -0400, Steven Rostedt wrote:
-> >The new trace-cmd 3.0 (which is almost ready to be released) allows for
-> >tracing between host and guests with timestamp synchronization such that
-> >the events on the host and the guest can be interleaved in the proper order
-> >that they occur. KernelShark now has a plugin that visualizes this
-> >interaction.
-> >
-> >The implementation requires that the guest has a vsock CID assigned, and on
-> >the guest a "trace-cmd agent" is running, that will listen on a port for
-> >the CID. The on the host a "trace-cmd record -A guest@cid:port -e events"
-> >can be called and the host will connect to the guest agent through the
-> >cid/port pair and have the agent enable tracing on behalf of the host and
-> >send the trace data back down to it.
-> >
-> >The problem is that there is no sure fire way to find the CID for a guest.
-> >Currently, the user must know the cid, or we have a hack that looks for the
-> >qemu process and parses the --guest-cid parameter from it. But this is
-> >prone to error and does not work on other implementation (was told that
-> >crosvm does not use qemu).  
-> 
-> For debug I think could be useful to link the vhost-vsock kthread to the 
-> CID, but for the user point of view, maybe is better to query the VM 
-> management layer, for example if you're using libvirt, you can easily do:
-> 
-> $ virsh dumpxml fedora34 | grep cid
->      <cid auto='yes' address='3'/>
+Use autofree heap allocation instead, replacing it by a g_malloc call.
 
-We looked into going this route, but then that means trace-cmd host/guest
-tracing needs a way to handle every layer, as some people use libvirt
-(myself included), some people use straight qemu, some people us Xen, and
-some people use crosvm. We need to support all of them. Which is why I'm
-looking at doing this from the lowest common denominator, and since vsock
-is a requirement from trace-cmd to do this tracing, getting the thread
-that's related to the vsock is that lowest denominator.
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ target/ppc/kvm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> 
-> >
-> >As I can not find a way to discover CIDs assigned to guests via any kernel
-> >interface, I decided to create this one. Note, I'm not attached to it. If
-> >there's a better way to do this, I would love to have it. But since I'm not
-> >an expert in the networking layer nor virtio, I decided to stick to what I
-> >know and add a debugfs interface that simply lists all the registered 
-> >CIDs
-> >and the worker task that they are associated with. The worker task at
-> >least has the PID of the task it represents.  
-> 
-> I honestly don't know if it's the best interface, like I said maybe for 
-> debugging it's fine, but if we want to expose it to the user in some 
-> way, we could support devlink/netlink to provide information about the 
-> vsock devices currently in use.
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 104a308abb5..23c4ea377e8 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2698,11 +2698,11 @@ int kvmppc_save_htab(QEMUFile *f, int fd, size_t bufsize, int64_t max_ns)
+ int kvmppc_load_htab_chunk(QEMUFile *f, int fd, uint32_t index,
+                            uint16_t n_valid, uint16_t n_invalid, Error **errp)
+ {
+-    struct kvm_get_htab_header *buf;
++    g_autofree struct kvm_get_htab_header *buf = NULL;
+     size_t chunksize = sizeof(*buf) + n_valid * HASH_PTE_SIZE_64;
+     ssize_t rc;
+ 
+-    buf = alloca(chunksize);
++    buf = g_malloc(chunksize);
+     buf->index = index;
+     buf->n_valid = n_valid;
+     buf->n_invalid = n_invalid;
+-- 
+2.26.3
 
-Ideally, a devlink/netlink is the right approach. I just had no idea on how
-to implement that ;-)  So I went with what I know, which is debugfs files!
-
-
-
-> >Signed-off-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
-> >---
-> >diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> >index 5e78fb719602..4f03b25b23c1 100644
-> >--- a/drivers/vhost/vsock.c
-> >+++ b/drivers/vhost/vsock.c
-> >@@ -15,6 +15,7 @@
-> > #include <linux/virtio_vsock.h>
-> > #include <linux/vhost.h>
-> > #include <linux/hashtable.h>
-> >+#include <linux/debugfs.h>
-> >
-> > #include <net/af_vsock.h>
-> > #include "vhost.h"
-> >@@ -900,6 +901,128 @@ static struct miscdevice vhost_vsock_misc = {
-> > 	.fops = &vhost_vsock_fops,
-> > };
-> >
-> >+static struct dentry *vsock_file;
-> >+
-> >+struct vsock_file_iter {
-> >+	struct hlist_node	*node;
-> >+	int			index;
-> >+};
-> >+
-> >+
-> >+static void *vsock_next(struct seq_file *m, void *v, loff_t *pos)
-> >+{
-> >+	struct vsock_file_iter *iter = v;
-> >+	struct vhost_vsock *vsock;
-> >+
-> >+	if (pos)
-> >+		(*pos)++;
-> >+
-> >+	if (iter->index >= (int)HASH_SIZE(vhost_vsock_hash))
-> >+		return NULL;
-> >+
-> >+	if (iter->node)
-> >+		iter->node = rcu_dereference_raw(hlist_next_rcu(iter->node));
-> >+
-> >+	for (;;) {
-> >+		if (iter->node) {
-> >+			vsock = hlist_entry_safe(rcu_dereference_raw(iter->node),
-> >+						 struct vhost_vsock, hash);
-> >+			if (vsock->guest_cid)
-> >+				break;
-> >+			iter->node = rcu_dereference_raw(hlist_next_rcu(iter->node));
-> >+			continue;
-> >+		}
-> >+		iter->index++;
-> >+		if (iter->index >= HASH_SIZE(vhost_vsock_hash))
-> >+			return NULL;
-> >+
-> >+		iter->node = rcu_dereference_raw(hlist_first_rcu(&vhost_vsock_hash[iter->index]));
-> >+	}
-> >+	return iter;
-> >+}
-> >+
-> >+static void *vsock_start(struct seq_file *m, loff_t *pos)
-> >+{
-> >+	struct vsock_file_iter *iter = m->private;
-> >+	loff_t l = 0;
-> >+	void *t;
-> >+
-> >+	rcu_read_lock();  
-> 
-> Instead of keeping this rcu lock between vsock_start() and vsock_stop(), 
-> maybe it's better to make a dump here of the bindings (pid/cid), save it 
-> in an array, and iterate it in vsock_next().
-
-The start/stop of a seq_file() is made for taking locks. I do this with all
-my code in ftrace. Yeah, there's a while loop between the two, but that's
-just to fill the buffer. It's not that long and it never goes to userspace
-between the two. You can even use this for spin locks (but I wouldn't
-recommend doing it for raw ones).
-
-> 
-> >+
-> >+	iter->index = -1;
-> >+	iter->node = NULL;
-> >+	t = vsock_next(m, iter, NULL);
-> >+
-> >+	for (; iter->index < HASH_SIZE(vhost_vsock_hash) && l < *pos;
-> >+	     t = vsock_next(m, iter, &l))
-> >+		;  
-> 
-> A while() maybe was more readable...
-
-Again, I just cut and pasted from my other code.
-
-If you have a good idea on how to implement this with netlink (something
-that ss or netstat can dislpay), I think that's the best way to go.
-
-Thanks for looking at this!
-
--- Steve
