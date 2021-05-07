@@ -2,108 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C417376707
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 16:27:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E221337670D
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 16:32:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237648AbhEGO2V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 May 2021 10:28:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56278 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235979AbhEGO2U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 May 2021 10:28:20 -0400
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC5F3C061574
-        for <kvm@vger.kernel.org>; Fri,  7 May 2021 07:27:20 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id l7so10475809edb.1
-        for <kvm@vger.kernel.org>; Fri, 07 May 2021 07:27:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=U/6/Fs98j7xjLe1Hn7iMyAo3MtABQ4n40Y84F+3ysxY=;
-        b=pvgTaJkZF2AaG05a0BQ6ZgH02yfB8+ljSzKIgQE3X0vZt5qcyFVP2EgFM0a5iCPxUT
-         XS5v2rlOHO1IwwiQafXwiiQlhClML593nCSWwI0nGWiUxQ0/3hMy+vN+S+n8HHykT9md
-         mS1jXOCk5Qg+pOItwx0C3uhkOEJBWbHKXvufCwmYZq88JGzd1RQmtwqgXY5ydnuarqU+
-         izH5INass7F6e0vcM4NfPYAHiIPQHmnoWkAnUJhnu/zgBzKaw1Kp8k83fVyXiQqOaJn8
-         iCrf8iFW7tMy67XT80JtHptMi6xUFmVLx3VFjawZ1lDa31ezIdqlYXcfsaPD9R0EcySG
-         WiDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=U/6/Fs98j7xjLe1Hn7iMyAo3MtABQ4n40Y84F+3ysxY=;
-        b=YPJaz18bd3kAFvsLaii1inGEHydknwhoA36itlY2mTDHptRJiULMBTZ3DgZwGQIIwU
-         oOBK4XltXEpwlCzXhDl1sWwSYlPQQJCTI4GbWr6Ynjl2gUCEU9W0cLvRwoaoBjRjcwsW
-         dtslhBh5ZZSX7ck10sGKduEdsuxbzP9MCgJ5olXQhvamXBCwDLcZoP25DsIJzBn+DWGg
-         /ou2XKNCemaItO6t9Fx9/PglVDNQhWef2tKrO4mwSMhUoqxfmvAGGqxpS9pS7eUbub1Z
-         emQEiGZo5+UrAUGEPPUZOz4FoK4VZ5QqSF7AH2PXJl+k2a/3fH2V6ON+/eqJO4qyFZHd
-         lZ8w==
-X-Gm-Message-State: AOAM531oE+4Ej1vZxs7SYNelkCoCa9TZxUO9LSLsLrZ2EoN/oriahnTO
-        ky3zWuxtddxwgiOl+sL3iuivX2ATsKLvtXxcoOWXKw==
-X-Google-Smtp-Source: ABdhPJww9F/q8phUmIjiYHVsNktXIQgeQWrgOzOa+qi7aJciKKPJTWD+cH2g4gRNKeumkDy3/NesR3/vBs0J+Z3wgd4=
-X-Received: by 2002:aa7:d4d9:: with SMTP id t25mr3835005edr.377.1620397638763;
- Fri, 07 May 2021 07:27:18 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210430143751.1693253-1-aaronlewis@google.com>
- <20210430143751.1693253-2-aaronlewis@google.com> <cuneeel4avw.fsf@oracle.com>
-In-Reply-To: <cuneeel4avw.fsf@oracle.com>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Fri, 7 May 2021 07:27:07 -0700
-Message-ID: <CAAAPnDFVR9xXEF_3_rEDhNhbe7r7QCEEiJ399Zv6h+ZUX=EfWA@mail.gmail.com>
-Subject: Re: [PATCH v5 1/2] kvm: x86: Allow userspace to handle emulation errors
-To:     David Edmondson <david.edmondson@oracle.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S237648AbhEGOc7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 May 2021 10:32:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51632 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235979AbhEGOc7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 May 2021 10:32:59 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 271726101A;
+        Fri,  7 May 2021 14:31:59 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1lf1WG-00BTpD-Pj; Fri, 07 May 2021 15:31:57 +0100
+Date:   Fri, 07 May 2021 15:31:56 +0100
+Message-ID: <877dkapqcj.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        pbonzini@redhat.com, drjones@redhat.com, alexandru.elisei@arm.com,
+        eric.auger@redhat.com
+Subject: Re: [PATCH v2 4/5] KVM: selftests: Add exception handling support for aarch64
+In-Reply-To: <YJBLFVoRmsehRJ1N@google.com>
+References: <20210430232408.2707420-1-ricarkol@google.com>
+        <20210430232408.2707420-5-ricarkol@google.com>
+        <87a6pcumyg.wl-maz@kernel.org>
+        <YJBLFVoRmsehRJ1N@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: ricarkol@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, drjones@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > +7.24 KVM_CAP_EXIT_ON_EMULATION_FAILURE
-> > +--------------------------------------
-> > +
-> > +:Architectures: x86
-> > +:Parameters: args[0] whether the feature should be enabled or not
-> > +
-> > +When this capability is enabled the in-kernel instruction emulator packs
-> > +the exit struct of KVM_INTERNAL_ERROR with the instruction length and
-> > +instruction bytes when an error occurs while emulating an instruction.  This
-> > +will also happen when the emulation type is set to EMULTYPE_SKIP, but with this
-> > +capability enabled this becomes the default behavior regarless of how the
->
-> s/regarless/regardless/
->
-> > +emulation type is set unless it is a VMware #GP; in that case a #GP is injected
-> > +and KVM does not exit to userspace.
-> > +
-> > +When this capability is enabled use the emulation_failure struct instead of the
-> > +internal struct for the exit struct.  They have the same layout, but the
-> > +emulation_failure struct matches the content better.  It also explicitly defines
-> > +the 'flags' field which is used to describe the fields in the struct that are
-> > +valid (ie: if KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES is set in the
-> > +'flags' field then 'insn_size' and 'insn_bytes' has valid data in them.)
->
-> Starting both paragraphs with "With this capability enabled..." would
-> probably cause me to stop reading if I didn't enable the capability, but
-> as the first paragraph goes on to say, EMULTYPE_SKIP will also cause the
-> instruction to be provided.
->
+On Mon, 03 May 2021 20:12:21 +0100,
+Ricardo Koller <ricarkol@google.com> wrote:
+> 
+> On Mon, May 03, 2021 at 11:32:39AM +0100, Marc Zyngier wrote:
+> > On Sat, 01 May 2021 00:24:06 +0100,
+> > Ricardo Koller <ricarkol@google.com> wrote:
 
-What about this instead?
+[...]
 
-When this capability is enabled, an emulation failure will result in an exit
-to userspace with KVM_INTERNAL_ERROR (except when the emulator was invoked
-to handle a VMware backdoor instruction). Furthermore, KVM will now provide up
-to 15 instruction bytes for any exit to userspace resulting from an emulation
-failure.  When these exits to userspace occur use the emulation_failure struct
-instead of the internal struct.  They both have the same layout, but the
-emulation_failure struct matches the content better.  It also explicitly
-defines the 'flags' field which is used to describe the fields in the struct
-that are valid (ie: if KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES is
-set in the 'flags' field then both 'insn_size' and 'insn_bytes' have valid data
-in them.)
+> > > +	.if \vector >= 8
+> > > +	mrs	x1, sp_el0
+> > 
+> > I'm still a bit perplexed by this. SP_EL0 is never changed, since you
+> > always run in handler mode. Therefore, saving/restoring it is only
+> > overhead. If an exception handler wants to introspect it, it is
+> > already available in the relevant system register.
+> > 
+> > Or did you have something else in mind for it?
+> > 
+> 
+> Not really. The reason for saving sp_el0 in there was just for
+> consistency, so that handlers for both el0 and el1 exceptions could
+> get the sp at regs->sp.
 
-I left out the part about EMULTYPE_SKIP because that behavior is not
-affected by setting KVM_CAP_EXIT_ON_EMULATION_FAILURE, so I thought it
-wasn't needed in the documentation here.
+We already have sp_el0 consistency by virtue of having it stored in in
+a sysreg.
+
+> Restoring sp_el0 might be too much. So, what do you think of this
+> v3: we keep the saving of sp_el0 into regs->sp (to keep things the
+> same between el0 and el1) and delete the restoring of sp_el0?
+
+To me, the whole purpose of saving some some context is to allow the
+exception handling code to run C code and introspect the interrupted
+state. But saving things that are not affected by the context change
+seems a bit pointless.
+
+One thing I'd like to see though is to save sp_el1 as it was at the
+point of the exception (because that is meaningful to get the
+exception context -- think of an unaligned EL1 stack for example),
+which means correcting the value that gets saved.
+
+So I would suggest to *only* save sp_el1, to always save it
+(irrespective of the exception coming from EL0 or EL1), and to save a
+retro-corrected value so that the handler can directly know where the
+previous stack pointer was.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
