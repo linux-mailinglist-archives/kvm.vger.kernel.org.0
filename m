@@ -2,99 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D233376147
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 09:39:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2EBC37614F
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 09:40:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234484AbhEGHkB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 May 2021 03:40:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57151 "EHLO
+        id S235546AbhEGHl2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 May 2021 03:41:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35733 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235440AbhEGHjg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 May 2021 03:39:36 -0400
+        by vger.kernel.org with ESMTP id S231179AbhEGHl1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 May 2021 03:41:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620373117;
+        s=mimecast20190719; t=1620373227;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=kBTtRECuFmb5m6BraCZy4PnJHFx6r0vEiT/8u2tqtfA=;
-        b=SOYM0f/PIHFsGBhy/bL8/mmUDaFPz6itaZ2p5msGjChiW0e9o9pGDNleT7hx0MShANLoHb
-        +rZYXO2inKRDAYYGn4XfuPjDuxI5rqsMJTtXfAsVE5KRM+2ZHXvxfX0D2VVkGF4xZ9NaWl
-        4p4QHeCSZXSg2V2Q/+d2R5c2ypWfp80=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-454-Aajd0ZW_OL6urhF4K17Qqw-1; Fri, 07 May 2021 03:38:35 -0400
-X-MC-Unique: Aajd0ZW_OL6urhF4K17Qqw-1
-Received: by mail-ed1-f70.google.com with SMTP id d18-20020aa7d6920000b0290388b4c7ee24so4030808edr.12
-        for <kvm@vger.kernel.org>; Fri, 07 May 2021 00:38:35 -0700 (PDT)
+        bh=cytpn5HUqqHMQi7fHCbchsnpUSL44ZuNU5lozqiis8I=;
+        b=Vj7VxN4KJSZLyja15lpWInfSGG3t2c5YptbWcP/AfwgzhrhmlM+ATPBnR730OWHtHKQnHY
+        J0WNSHSCv6z/5JnAfyvYSpVDASJKKK3GhbBsdLjPvwGKtKh2IHk56/JBYfprDPquZhBCda
+        NXobOMEmlfQgX6gYENnKO8kvTUVhq5A=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-384--oWfnzjPPx28lJP73_gG7A-1; Fri, 07 May 2021 03:40:25 -0400
+X-MC-Unique: -oWfnzjPPx28lJP73_gG7A-1
+Received: by mail-wm1-f71.google.com with SMTP id s66-20020a1ca9450000b0290149fce15f03so3602973wme.9
+        for <kvm@vger.kernel.org>; Fri, 07 May 2021 00:40:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=kBTtRECuFmb5m6BraCZy4PnJHFx6r0vEiT/8u2tqtfA=;
-        b=t+WszWN5QULxwVfqWLL/f3bCh/I0cYIhqscImVMY07W4ILMSKrDuZQw6pGcTYSph9p
-         4xkmLyYBVbIs6f2M82ZDq2p1GqFAF9dNxTCIKGLiBNCcVR31XjPMrFnzB/Ne3d2RdCtR
-         fo5RacffkrfPxvopOl0RmCy+pUe2oBUdMGbkKfHyHWFmPEhoZgUWG1t4L8sXGNyhebgl
-         946hij2m5YLIZ+FoNdUzkeLyJ9rYDKM7VvbK2ULT4GL9JGDJKk7r2wdHEsIhC7e7a8P/
-         Vhl6QVkuAytE/K82fb2ap+yGE+psZ3zZTr2Rdi6CpsNJ7k6+ChlQfsPnFbjzBhXKciAM
-         08iQ==
-X-Gm-Message-State: AOAM532gmOsjv64TCiB1Bzzx4CAgSYNrWIVdqfK+zogBdFfs4FV4wySE
-        2c/wzPc4cvgvsI3tv2z5Gv64KSCfs6FzwlcUSmgYeTz4HSpxQPyi0bUpOtvIqQrv4ofR5hYLZ9S
-        3fpTOHsvzThcE
-X-Received: by 2002:a50:f113:: with SMTP id w19mr9452783edl.46.1620373114227;
-        Fri, 07 May 2021 00:38:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxZ/7NeEWb2qccaD0eVmBCiON3TssIhzQVJAFOZqHaDOCDkzBZRc3Wwakszx3Ihk+lqfismtw==
-X-Received: by 2002:a50:f113:: with SMTP id w19mr9452775edl.46.1620373114038;
-        Fri, 07 May 2021 00:38:34 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id p14sm3448567eds.28.2021.05.07.00.38.32
+        h=x-gm-message-state:subject:to:cc:references:from:organization
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=cytpn5HUqqHMQi7fHCbchsnpUSL44ZuNU5lozqiis8I=;
+        b=r0a5/9QpgJJnbfsK3WiLd3VOqIChuVWWKYl07KgcSAA42KA0e3tzJMFZDoijdubWyM
+         vyd14AdWNS6nvpLtKIpprFmo876MLHFr6e8Hf+8pyPoSC4zUt7c/28GjjdGHNjfkPlwY
+         ReWd+NI/nNpHrwzO0nCUsL9YOdwqjClXH2FhWgz8D528O4d772pC9aWHWJIfXPJXD3wW
+         b03dKLAB0GzEV0DCGHimY7jmKMveO5AJqw1CyTZE+g6S9GiPH5FNK4EEEpfsBQvNmKnP
+         6Y1klLudW19Zo7zwZSRgIi9cD18vA8rINpbr59iwbhFWowa6Ei2J6WrQOainAouIntNY
+         Vd0w==
+X-Gm-Message-State: AOAM531jVPDr+Z8dETv8oA/TuB3NnsnsUEkmti3vMVQNSf5MmgY5nkCz
+        GvOyGFOTjR3+URgAX7g7etbnUmi3c/3qjW1+P8LxibPpy/U2IPQX2s6VvO9WlIsDft/Hz2LilSI
+        hre52VHOgATrB
+X-Received: by 2002:a5d:4532:: with SMTP id j18mr10234873wra.223.1620373224754;
+        Fri, 07 May 2021 00:40:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyzKBTGBiLC4DaItIJ6x7hljljQiDIHXoHip9FQtBMJTCeRTrmEtRTYf6EtYcNjww90epWJyg==
+X-Received: by 2002:a5d:4532:: with SMTP id j18mr10234842wra.223.1620373224509;
+        Fri, 07 May 2021 00:40:24 -0700 (PDT)
+Received: from [192.168.3.132] (p5b0c63c0.dip0.t-ipconnect.de. [91.12.99.192])
+        by smtp.gmail.com with ESMTPSA id x8sm7313019wru.70.2021.05.07.00.40.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 May 2021 00:38:33 -0700 (PDT)
-Subject: Re: [PATCH 21/24] KVM: x86/mmu: Tweak auditing WARN for A/D bits to
- !PRESENT (was MMIO)
-To:     Matteo Croce <mcroce@linux.microsoft.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
-References: <20210225204749.1512652-1-seanjc@google.com>
- <20210225204749.1512652-22-seanjc@google.com>
- <20210507010518.26aa74f0@linux.microsoft.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3c33b99f-7a8c-a897-9c3e-d5e71d1e2e25@redhat.com>
-Date:   Fri, 7 May 2021 09:38:31 +0200
+        Fri, 07 May 2021 00:40:24 -0700 (PDT)
+Subject: Re: [PATCH v3 0/8] Lazily allocate memslot rmaps
+To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>
+References: <20210506184241.618958-1-bgardon@google.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Message-ID: <05848766-b13c-2a58-81da-0f1e839a6cd0@redhat.com>
+Date:   Fri, 7 May 2021 09:40:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210507010518.26aa74f0@linux.microsoft.com>
+In-Reply-To: <20210506184241.618958-1-bgardon@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/05/21 01:05, Matteo Croce wrote:
-> On Thu, 25 Feb 2021 12:47:46 -0800
-> Sean Christopherson <seanjc@google.com> wrote:
+On 06.05.21 20:42, Ben Gardon wrote:
+> This series enables KVM to save memory when using the TDP MMU by waiting
+> to allocate memslot rmaps until they are needed. To do this, KVM tracks
+> whether or not a shadow root has been allocated. In order to get away
+> with not allocating the rmaps, KVM must also be sure to skip operations
+> which iterate over the rmaps. If the TDP MMU is in use and we have not
+> allocated a shadow root, these operations would essentially be op-ops
+> anyway. Skipping the rmap operations has a secondary benefit of avoiding
+> acquiring the MMU lock in write mode in many cases, substantially
+> reducing MMU lock contention.
 > 
->> Tweak the MMU_WARN that guards against weirdness when querying A/D
->> status to fire on a !MMU_PRESENT SPTE, as opposed to a MMIO SPTE.
->> Attempting to query A/D status on any kind of !MMU_PRESENT SPTE, MMIO
->> or otherwise, indicates a KVM bug.  Case in point, several now-fixed
->> bugs were identified by enabling this new WARN.
->>
->> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> This series was tested on an Intel Skylake machine. With the TDP MMU off
+> and on, this introduced no new failures on kvm-unit-tests or KVM selftests.
 > 
-> You made the 1.000.000th commit, congrats!
-> 
-> $ git log --oneline --reverse |sed '1000000!d'
-> 8f366ae6d8c5 KVM: x86/mmu: Tweak auditing WARN for A/D bits to !PRESENT (was MMIO)
 
-🦀🦀🦀
+Happy to see this change pop up, I remember discussing this with Paolo 
+recently.
 
-Paolo
+Another step to reduce the rmap overhead could be looking into using a 
+dynamic datastructure to manage the rmap, instead of allocating a 
+fixed-sized array. That could also significantly reduce memory overhead 
+in some setups and give us more flexibility, for example, for resizing 
+or splitting slots atomically.
+
+-- 
+Thanks,
+
+David / dhildenb
 
