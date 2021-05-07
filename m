@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B72E93763F1
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 12:36:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16B903763F7
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 12:37:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236940AbhEGKh5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 May 2021 06:37:57 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:18009 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236915AbhEGKh4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 May 2021 06:37:56 -0400
+        id S236965AbhEGKiI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 May 2021 06:38:08 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:18352 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236949AbhEGKiC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 May 2021 06:38:02 -0400
 Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Fc6HP36dszQkLN;
-        Fri,  7 May 2021 18:33:37 +0800 (CST)
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Fc6JH4R8yzCr6t;
+        Fri,  7 May 2021 18:34:23 +0800 (CST)
 Received: from DESKTOP-5IS4806.china.huawei.com (10.174.187.224) by
  DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 7 May 2021 18:36:49 +0800
+ 14.3.498.0; Fri, 7 May 2021 18:36:50 +0800
 From:   Keqian Zhu <zhukeqian1@huawei.com>
 To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
         Alex Williamson <alex.williamson@redhat.com>,
@@ -31,10 +31,12 @@ CC:     Jonathan Cameron <Jonathan.Cameron@huawei.com>,
         Lu Baolu <baolu.lu@linux.intel.com>,
         <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>,
         <yuzenghui@huawei.com>, <lushenming@huawei.com>
-Subject: [RFC PATCH v2 0/3] vfio/iommu_type1: Implement dirty log tracking based on IOMMU HWDBM
-Date:   Fri, 7 May 2021 18:36:05 +0800
-Message-ID: <20210507103608.39440-1-zhukeqian1@huawei.com>
+Subject: [RFC PATCH v2 1/3] vfio/iommu_type1: Add HWDBM status maintenance
+Date:   Fri, 7 May 2021 18:36:06 +0800
+Message-ID: <20210507103608.39440-2-zhukeqian1@huawei.com>
 X-Mailer: git-send-email 2.8.4.windows.1
+In-Reply-To: <20210507103608.39440-1-zhukeqian1@huawei.com>
+References: <20210507103608.39440-1-zhukeqian1@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.174.187.224]
@@ -43,69 +45,95 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex and everyone,
+From: Kunkun Jiang <jiangkunkun@huawei.com>
 
-This patch series implement vfio dma dirty log tracking based on IOMMU HWDBM (hardware
-dirty bit management, such as SMMU with HTTU or intel IOMMU with SLADE).
+We are going to optimize dirty log tracking based on iommu dirty
+log tracking, but the dirty log from iommu is useful only when
+all iommu backed domains support it.
 
-This patch series is split from the series[1] that containes both IOMMU part and
-VFIO part. Please refer the new IOMMU part v4[2] to review or test.
+This maintains a counter in vfio_iommu, which is used for dirty
+bitmap population in next patch.
 
-Changelog:
+This also maintains a boolean flag in vfio_domain, which is used
+in the policy of switch dirty log in next patch.
 
-v2:
- - Use separate ioctl to get dirty log without clear it automatically. (Alex)
- - Implement based on new iommu dirty tracking framework.
- - Track hwdbm status at domain level.
- - Bugfix: When get_no_clear, we should recover dirty bitmap too.
- - Bugfix: When switch from full dirty policy to iommu hwdbm policy, we should populate full dirty.
+Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
+Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+---
+ drivers/vfio/vfio_iommu_type1.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-Intention:
-
-As we know, vfio live migration is an important and valuable feature, but there
-are still many hurdles to solve, including migration of interrupt, device state,
-DMA dirty log tracking, and etc.
-
-For now, the only dirty log tracking interface is pinning. It has some drawbacks:
-1. Only smart vendor drivers are aware of this.
-2. It's coarse-grained, the pinned-scope is generally bigger than what the device actually access.
-3. It can't track dirty continuously and precisely, vfio populates all pinned-scope as dirty.
-   So it doesn't work well with iteratively dirty log handling.
-
-About this series:
-
-Implement a new dirty log tracking method for vfio based on iommu hwdbm. A new
-ioctl operation named VFIO_DIRTY_LOG_MANUAL_CLEAR is added, which can eliminate
-some redundant dirty handling of userspace.   
-   
-Optimizations Todo:
-
-1. We recognized that each smmu_domain (a vfio_container may has several smmu_domain) has its
-   own stage1 mapping, and we must scan all these mapping to sync dirty state. We plan to refactor
-   smmu_domain to support more than one smmu in one smmu_domain, then these smmus can share a same
-   stage1 mapping.
-2. We also recognized that scan TTD is a hotspot of performance. Recently, I have implement a
-   SW/HW conbined dirty log tracking at MMU side[3], which can effectively solve this problem.
-   This idea can be applied to smmu side too.
-
-Thanks,
-Keqian
-
-[1] https://lore.kernel.org/linux-iommu/20210310090614.26668-1-zhukeqian1@huawei.com/
-[2] https://lore.kernel.org/linux-iommu/20210507102211.8836-1-zhukeqian1@huawei.com/ 
-[3] https://lore.kernel.org/linux-arm-kernel/20210126124444.27136-1-zhukeqian1@huawei.com/
-
-
-Kunkun Jiang (3):
-  vfio/iommu_type1: Add HWDBM status maintenance
-  vfio/iommu_type1: Optimize dirty bitmap population based on iommu
-    HWDBM
-  vfio/iommu_type1: Add support for manual dirty log clear
-
- drivers/vfio/vfio_iommu_type1.c | 315 ++++++++++++++++++++++++++++++--
- include/uapi/linux/vfio.h       |  36 +++-
- 2 files changed, 337 insertions(+), 14 deletions(-)
-
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index a0747c35a778..146aaf95589c 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -73,6 +73,7 @@ struct vfio_iommu {
+ 	unsigned int		vaddr_invalid_count;
+ 	uint64_t		pgsize_bitmap;
+ 	uint64_t		num_non_pinned_groups;
++	uint64_t		num_non_hwdbm_domains;
+ 	wait_queue_head_t	vaddr_wait;
+ 	bool			v2;
+ 	bool			nesting;
+@@ -86,6 +87,7 @@ struct vfio_domain {
+ 	struct list_head	group_list;
+ 	int			prot;		/* IOMMU_CACHE */
+ 	bool			fgsp;		/* Fine-grained super pages */
++	bool			iommu_hwdbm;	/* Hardware dirty management */
+ };
+ 
+ struct vfio_dma {
+@@ -2238,6 +2240,26 @@ static void vfio_iommu_iova_insert_copy(struct vfio_iommu *iommu,
+ 	list_splice_tail(iova_copy, iova);
+ }
+ 
++/*
++ * Called after a new group is added to the iommu_domain, or an old group is
++ * removed from the iommu_domain. Update the HWDBM status of vfio_domain and
++ * vfio_iommu.
++ */
++static void vfio_iommu_update_hwdbm(struct vfio_iommu *iommu,
++				    struct vfio_domain *domain,
++				    bool attach)
++{
++	bool old_hwdbm = domain->iommu_hwdbm;
++	bool new_hwdbm = iommu_support_dirty_log(domain->domain);
++
++	if (old_hwdbm && !new_hwdbm && attach) {
++		iommu->num_non_hwdbm_domains++;
++	} else if (!old_hwdbm && new_hwdbm && !attach) {
++		iommu->num_non_hwdbm_domains--;
++	}
++	domain->iommu_hwdbm = new_hwdbm;
++}
++
+ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 					 struct iommu_group *iommu_group)
+ {
+@@ -2391,6 +2413,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 			vfio_iommu_detach_group(domain, group);
+ 			if (!vfio_iommu_attach_group(d, group)) {
+ 				list_add(&group->next, &d->group_list);
++				vfio_iommu_update_hwdbm(iommu, d, true);
+ 				iommu_domain_free(domain->domain);
+ 				kfree(domain);
+ 				goto done;
+@@ -2417,6 +2440,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 
+ 	list_add(&domain->next, &iommu->domain_list);
+ 	vfio_update_pgsize_bitmap(iommu);
++	vfio_iommu_update_hwdbm(iommu, domain, true);
+ done:
+ 	/* Delete the old one and insert new iova list */
+ 	vfio_iommu_iova_insert_copy(iommu, &iova_copy);
+@@ -2599,6 +2623,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+ 			continue;
+ 
+ 		vfio_iommu_detach_group(domain, group);
++		vfio_iommu_update_hwdbm(iommu, domain, false);
+ 		update_dirty_scope = !group->pinned_page_dirty_scope;
+ 		list_del(&group->next);
+ 		kfree(group);
 -- 
 2.19.1
 
