@@ -2,201 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D27E37601E
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 08:11:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D233376147
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 09:39:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230128AbhEGGML (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 May 2021 02:12:11 -0400
-Received: from mga11.intel.com ([192.55.52.93]:64772 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229886AbhEGGMK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 May 2021 02:12:10 -0400
-IronPort-SDR: terrjIr2lC+HiXutCMTSbC311w1VgDI/YHhnVDcT1Sguir3eMpHZak6aOokBaf32eoFFU4pbQm
- lUd70RJox00g==
-X-IronPort-AV: E=McAfee;i="6200,9189,9976"; a="195543308"
-X-IronPort-AV: E=Sophos;i="5.82,279,1613462400"; 
-   d="scan'208";a="195543308"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2021 23:11:10 -0700
-IronPort-SDR: h0ymBZXlH173lkj3+6XhGCRSrZdugIvz9HTKZQsVP6dYdnleDfbJm2AhXv7DDb03tcsK4L2qci
- 1w/Qh6Seg8Mg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.82,279,1613462400"; 
-   d="scan'208";a="434767472"
-Received: from michael-optiplex-9020.sh.intel.com (HELO localhost) ([10.239.159.172])
-  by orsmga008.jf.intel.com with ESMTP; 06 May 2021 23:11:08 -0700
-Date:   Fri, 7 May 2021 14:25:11 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Eduardo Habkost <ehabkost@redhat.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
-        richard.henderson@linaro.org, mtosatti@redhat.com,
-        sean.j.christopherson@intel.com, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v7 2/6] target/i386: Enable XSS feature enumeration for
- CPUID
-Message-ID: <20210507062511.GA5990@michael-OptiPlex-9020>
-References: <20210226022058.24562-1-weijiang.yang@intel.com>
- <20210226022058.24562-3-weijiang.yang@intel.com>
- <20210506221647.zaq4or66rqspxssb@habkost.net>
+        id S234484AbhEGHkB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 May 2021 03:40:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57151 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235440AbhEGHjg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 May 2021 03:39:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620373117;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kBTtRECuFmb5m6BraCZy4PnJHFx6r0vEiT/8u2tqtfA=;
+        b=SOYM0f/PIHFsGBhy/bL8/mmUDaFPz6itaZ2p5msGjChiW0e9o9pGDNleT7hx0MShANLoHb
+        +rZYXO2inKRDAYYGn4XfuPjDuxI5rqsMJTtXfAsVE5KRM+2ZHXvxfX0D2VVkGF4xZ9NaWl
+        4p4QHeCSZXSg2V2Q/+d2R5c2ypWfp80=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-454-Aajd0ZW_OL6urhF4K17Qqw-1; Fri, 07 May 2021 03:38:35 -0400
+X-MC-Unique: Aajd0ZW_OL6urhF4K17Qqw-1
+Received: by mail-ed1-f70.google.com with SMTP id d18-20020aa7d6920000b0290388b4c7ee24so4030808edr.12
+        for <kvm@vger.kernel.org>; Fri, 07 May 2021 00:38:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=kBTtRECuFmb5m6BraCZy4PnJHFx6r0vEiT/8u2tqtfA=;
+        b=t+WszWN5QULxwVfqWLL/f3bCh/I0cYIhqscImVMY07W4ILMSKrDuZQw6pGcTYSph9p
+         4xkmLyYBVbIs6f2M82ZDq2p1GqFAF9dNxTCIKGLiBNCcVR31XjPMrFnzB/Ne3d2RdCtR
+         fo5RacffkrfPxvopOl0RmCy+pUe2oBUdMGbkKfHyHWFmPEhoZgUWG1t4L8sXGNyhebgl
+         946hij2m5YLIZ+FoNdUzkeLyJ9rYDKM7VvbK2ULT4GL9JGDJKk7r2wdHEsIhC7e7a8P/
+         Vhl6QVkuAytE/K82fb2ap+yGE+psZ3zZTr2Rdi6CpsNJ7k6+ChlQfsPnFbjzBhXKciAM
+         08iQ==
+X-Gm-Message-State: AOAM532gmOsjv64TCiB1Bzzx4CAgSYNrWIVdqfK+zogBdFfs4FV4wySE
+        2c/wzPc4cvgvsI3tv2z5Gv64KSCfs6FzwlcUSmgYeTz4HSpxQPyi0bUpOtvIqQrv4ofR5hYLZ9S
+        3fpTOHsvzThcE
+X-Received: by 2002:a50:f113:: with SMTP id w19mr9452783edl.46.1620373114227;
+        Fri, 07 May 2021 00:38:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxZ/7NeEWb2qccaD0eVmBCiON3TssIhzQVJAFOZqHaDOCDkzBZRc3Wwakszx3Ihk+lqfismtw==
+X-Received: by 2002:a50:f113:: with SMTP id w19mr9452775edl.46.1620373114038;
+        Fri, 07 May 2021 00:38:34 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id p14sm3448567eds.28.2021.05.07.00.38.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 May 2021 00:38:33 -0700 (PDT)
+Subject: Re: [PATCH 21/24] KVM: x86/mmu: Tweak auditing WARN for A/D bits to
+ !PRESENT (was MMIO)
+To:     Matteo Croce <mcroce@linux.microsoft.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
+References: <20210225204749.1512652-1-seanjc@google.com>
+ <20210225204749.1512652-22-seanjc@google.com>
+ <20210507010518.26aa74f0@linux.microsoft.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3c33b99f-7a8c-a897-9c3e-d5e71d1e2e25@redhat.com>
+Date:   Fri, 7 May 2021 09:38:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210506221647.zaq4or66rqspxssb@habkost.net>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20210507010518.26aa74f0@linux.microsoft.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 06, 2021 at 06:16:47PM -0400, Eduardo Habkost wrote:
-> On Fri, Feb 26, 2021 at 10:20:54AM +0800, Yang Weijiang wrote:
-> > Currently, CPUID.(EAX=0DH,ECX=01H) doesn't enumerate features in
-> > XSS properly, add the support here. XCR0 bits indicate user-mode XSAVE
-> > components, and XSS bits indicate supervisor-mode XSAVE components.
-> > 
-> > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> > ---
-> >  target/i386/cpu.c | 48 ++++++++++++++++++++++++++++++++++++++++++-----
-> >  target/i386/cpu.h | 12 ++++++++++++
-> >  2 files changed, 55 insertions(+), 5 deletions(-)
-> >
- 
-[...]
+On 07/05/21 01:05, Matteo Croce wrote:
+> On Thu, 25 Feb 2021 12:47:46 -0800
+> Sean Christopherson <seanjc@google.com> wrote:
+> 
+>> Tweak the MMU_WARN that guards against weirdness when querying A/D
+>> status to fire on a !MMU_PRESENT SPTE, as opposed to a MMIO SPTE.
+>> Attempting to query A/D status on any kind of !MMU_PRESENT SPTE, MMIO
+>> or otherwise, indicates a KVM bug.  Case in point, several now-fixed
+>> bugs were identified by enabling this new WARN.
+>>
+>> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> 
+> You made the 1.000.000th commit, congrats!
+> 
+> $ git log --oneline --reverse |sed '1000000!d'
+> 8f366ae6d8c5 KVM: x86/mmu: Tweak auditing WARN for A/D bits to !PRESENT (was MMIO)
 
-> > @@ -1478,6 +1496,9 @@ static uint32_t xsave_area_size(uint64_t mask)
-> >      for (i = 0; i < ARRAY_SIZE(x86_ext_save_areas); i++) {
-> >          const ExtSaveArea *esa = &x86_ext_save_areas[i];
-> >          if ((mask >> i) & 1) {
-> > +            if (i >= 2 && !esa->offset) {
-> 
-> Maybe a few comments at the definition of ExtSaveArea to explain
-> that offset can now be zero (and what it means when it's zero)
-> would be helpful.  I took a while to understand why this is safe.
->
-Thanks Eduardo!
+🦀🦀🦀
 
-Sure, I'll add some comments in next version.
- 
-> Would it be valid to say "ExtSaveArea.offset has a valid offset
-> only if the component is in CPUID_XSTATE_XCR0_MASK"?  If so,
-> can't this check be simply replaced with:
->   if ((1 << i) & CPUID_XSTATE_XCR0_MASK)
-> ?
-> 
-> Or maybe this function should just contain a:
->   assert(!(mask & CPUID_XSTATE_XCR0_MASK));
-> at the beginning?
-> 
+Paolo
 
-Maybe I need to modifiy the function a bit to accommodate compacted format
-size calculation for CPUID(0xD,1).EBX.
-> 
-> > +                continue;
-> > +            }
-> >              ret = MAX(ret, esa->offset + esa->size);
-> >          }
-> >      }
-> > @@ -1489,12 +1510,18 @@ static inline bool accel_uses_host_cpuid(void)
-> >      return kvm_enabled() || hvf_enabled();
-> >  }
-
-[...]
-
-> >  
-> > @@ -5716,7 +5743,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-> >          }
-> >  
-> >          if (count == 0) {
-> > -            *ecx = xsave_area_size(x86_cpu_xsave_components(cpu));
-> > +            *ecx = xsave_area_size(x86_cpu_xsave_xcr0_components(cpu));
-> >              *eax = env->features[FEAT_XSAVE_XCR0_LO];
-> >              *edx = env->features[FEAT_XSAVE_XCR0_HI];
-> >              /*
-> > @@ -5728,11 +5755,17 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-> >              *ebx = kvm_enabled() ? *ecx : xsave_area_size(env->xcr0);
-> >          } else if (count == 1) {
-> >              *eax = env->features[FEAT_XSAVE];
-> > +            *ecx = env->features[FEAT_XSAVE_XSS_LO];
-> > +            *edx = env->features[FEAT_XSAVE_XSS_HI];
-> 
-> What about EBX?  It is documented as "The size in bytes of the
-> XSAVE area containing all states enabled by XCRO | IA32_XSS".
-> 
-> The Intel SDM is not clear, but I assume this would be
-> necessarily the size of the area in compacted format?
-
-Yes, I'll add ebx assignment.
-> 
-> 
-> >          } else if (count < ARRAY_SIZE(x86_ext_save_areas)) {
-> > -            if ((x86_cpu_xsave_components(cpu) >> count) & 1) {
-> > -                const ExtSaveArea *esa = &x86_ext_save_areas[count];
-> > +            const ExtSaveArea *esa = &x86_ext_save_areas[count];
-> > +            if ((x86_cpu_xsave_xcr0_components(cpu) >> count) & 1) {
-> >                  *eax = esa->size;
-> >                  *ebx = esa->offset;
-> > +            } else if ((x86_cpu_xsave_xss_components(cpu) >> count) & 1) {
-> > +                *eax = esa->size;
-> > +                *ebx = 0;
-> > +                *ecx = 1;
-> >              }
-> >          }
-> >          break;
-> > @@ -6059,6 +6092,9 @@ static void x86_cpu_reset(DeviceState *dev)
-> >      }
-> >      for (i = 2; i < ARRAY_SIZE(x86_ext_save_areas); i++) {
-> >          const ExtSaveArea *esa = &x86_ext_save_areas[i];
-> > +        if (!esa->offset) {
-> > +            continue;
-> 
-> Most of the comments at the xsave_area_size() hunk would apply
-> here.  I miss some clarity on what esa->offset==0 really means.
-> 
-> Would it be valid to replace this with a check for
->   ((1 << i) & CPUID_XSTATE_XCR0_MASK)
-> ?
-
-Sure, I'll use this check to make things clearer, thanks for the comments!
-
-> 
-> > +        }
-> >          if (env->features[esa->feature] & esa->bits) {
-> >              xcr0 |= 1ull << i;
-> >          }
-
-[...]
-  
-> > +/* CPUID feature bits available in XCR0 */
-> > +#define CPUID_XSTATE_XCR0_MASK  (XSTATE_FP_MASK | XSTATE_SSE_MASK | \
-> > +                                 XSTATE_YMM_MASK | XSTATE_BNDREGS_MASK | \
-> > +                                 XSTATE_BNDCSR_MASK | XSTATE_OPMASK_MASK | \
-> > +                                 XSTATE_ZMM_Hi256_MASK | \
-> > +                                 XSTATE_Hi16_ZMM_MASK | XSTATE_PKRU_MASK)
-> > +
-> > +/* CPUID feature bits available in XSS */
-> > +#define CPUID_XSTATE_XSS_MASK    0
-> 
-> Do you expect this to be used outside target/i386/cpu.c?  If not,
-> maybe it could be moved close to the x86_ext_save_areas[]
-> definition, as any updates to x86_ext_save_areas will require an
-> update to these macros.
-> 
-> > +
-> >  /* CPUID feature words */
-> >  typedef enum FeatureWord {
-> >      FEAT_1_EDX,         /* CPUID[1].EDX */
-> > @@ -541,6 +551,8 @@ typedef enum FeatureWord {
-> >      FEAT_VMX_EPT_VPID_CAPS,
-> >      FEAT_VMX_BASIC,
-> >      FEAT_VMX_VMFUNC,
-> > +    FEAT_XSAVE_XSS_LO,     /* CPUID[EAX=0xd,ECX=1].ECX */
-> > +    FEAT_XSAVE_XSS_HI,     /* CPUID[EAX=0xd,ECX=1].EDX */
-> >      FEATURE_WORDS,
-> >  } FeatureWord;
-> >  
-> > -- 
-> > 2.26.2
-> > 
-> > 
-> 
-> -- 
-> Eduardo
