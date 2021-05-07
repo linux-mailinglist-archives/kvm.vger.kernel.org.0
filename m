@@ -2,105 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9510037626A
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 10:52:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 761EE376298
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 11:03:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235454AbhEGIxa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 May 2021 04:53:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46879 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231906AbhEGIxa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 May 2021 04:53:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620377550;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kk51ztpoBo8Zvuxk9OuoeLtIDzxLHuq4PIJWw7SMpro=;
-        b=jTfoq8LRernkd2qYblxMt2LcGtwaW86j9hwLynnjDeFMq7JnypuGAPloLI0sWf35I1WcXx
-        zHSsTv5aF0yhfJcFfhfmrtPyPeYOnz1cMg5F3L0LTBV2vV+0+NpaP+zDyKNehL56qj6auP
-        JTkZQldLApQI+it9bzo7gjfCqkTj2Hg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-561-J9ECXxWwNHCfoS3eJsp0Pg-1; Fri, 07 May 2021 04:52:27 -0400
-X-MC-Unique: J9ECXxWwNHCfoS3eJsp0Pg-1
-Received: by mail-wr1-f71.google.com with SMTP id 4-20020adf91840000b029010d9c088599so3302255wri.10
-        for <kvm@vger.kernel.org>; Fri, 07 May 2021 01:52:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=kk51ztpoBo8Zvuxk9OuoeLtIDzxLHuq4PIJWw7SMpro=;
-        b=UBq/oYXMg0yr2YT6IpUpee+J2uHYxKF7YDh+8+1uWZho9gfxzEE1ZHcMzUPGs1BgfU
-         28Cb4IidMKOXBGG6OZWh0bICVhnNV8nk7SzSojhHfwOiqVMpuDg/lXm02aFltIzH4cV1
-         JiJnJJM2I9AKUb9GK5lwzKR+ISQFdzjJUTfLs7dtSW3jgUPPo+Y8ill1M9luSwE7Zrr3
-         VcjTAaqZcqJzI2nBhbuSXTxH1LJBEwPY6NfWj4OCSlUQMndm/Zd4NRdg+vJvr0HC7Tzo
-         +ySYbaaOJ6nIx+Cm1It94zolo2tBKuv0lz7CiYMzeZJ9Ivx/ISs10wOC1r8Q9WwFVJSl
-         rCpg==
-X-Gm-Message-State: AOAM5314OpPfqeMHXjdzlB5Lah+CKPsvkgl0PnfiLJMAsEkfTAj0zkAw
-        tfQlT625M73zQCHvMRkgdCl9bjJBrWmqEJ9ycaJZQ0OHGzh9ssmBsU8gCmo6dVRPHmbe1KMKImN
-        9x9G+myENKKUd
-X-Received: by 2002:adf:cd06:: with SMTP id w6mr10724171wrm.93.1620377546892;
-        Fri, 07 May 2021 01:52:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz8NUi0XxZzefIeXt1PapQXTeV91tOCHaHhl9MTITyV5W/oYaino3SMQ2F5ksLu1/6OeQqhvA==
-X-Received: by 2002:adf:cd06:: with SMTP id w6mr10724160wrm.93.1620377546768;
-        Fri, 07 May 2021 01:52:26 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id i3sm8908664wrb.46.2021.05.07.01.52.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 May 2021 01:52:26 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        kernel test robot <lkp@intel.com>
-Cc:     kbuild-all@lists.01.org, clang-built-linux@googlegroups.com,
-        kvm@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
-        Farrah Chen <farrah.chen@intel.com>,
-        Danmei Wei <danmei.wei@intel.com>
-Subject: Re: [kvm:queue 11/44] arch/x86/kernel/kvm.c:672:2: error: implicit
- declaration of function 'kvm_guest_cpu_offline'
-In-Reply-To: <e671b62d-0324-2835-2726-6b28a0202b7a@redhat.com>
-References: <202105070840.f1TZQ4rC-lkp@intel.com>
- <e671b62d-0324-2835-2726-6b28a0202b7a@redhat.com>
-Date:   Fri, 07 May 2021 10:52:25 +0200
-Message-ID: <87v97vvsc6.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        id S236576AbhEGJEv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 May 2021 05:04:51 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60546 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230108AbhEGJEu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 May 2021 05:04:50 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 757386144A;
+        Fri,  7 May 2021 09:03:51 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1lewOj-00BQgL-9i; Fri, 07 May 2021 10:03:49 +0100
+Date:   Fri, 07 May 2021 10:03:48 +0100
+Message-ID: <87k0oaq5jf.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Shaokun Zhang <zhangshaokun@hisilicon.com>
+Cc:     <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <linux-pci@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Nianyao Tang <tangnianyao@huawei.com>,
+        Bjorn Helgaas <bhelgaas@google.com>
+Subject: Re: Question on guest enable msi fail when using GICv4/4.1
+In-Reply-To: <3a2c66d6-6ca0-8478-d24b-61e8e3241b20@hisilicon.com>
+References: <3a2c66d6-6ca0-8478-d24b-61e8e3241b20@hisilicon.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: zhangshaokun@hisilicon.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-pci@vger.kernel.org, alex.williamson@redhat.com, cohuck@redhat.com, tangnianyao@huawei.com, bhelgaas@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On Fri, 07 May 2021 06:57:04 +0100,
+Shaokun Zhang <zhangshaokun@hisilicon.com> wrote:
+> 
+> [This letter comes from Nianyao Tang]
+> 
+> Hi,
+> 
+> Using GICv4/4.1 and msi capability, guest vf driver requires 3
+> vectors and enable msi, will lead to guest stuck.
 
-> On 07/05/21 02:13, kernel test robot wrote:
->> tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
->> head:   c6d517aecd40b25ea05c593962b2c4b085092343
->> commit: 9140e381e0f2f8cb1c628c29730ece2a52cb4cbc [11/44] x86/kvm: Teardown PV features on boot CPU as well
->> config: x86_64-randconfig-a001-20210506 (attached as .config)
->> compiler: clang version 13.0.0 (https://github.com/llvm/llvm-project 8f5a2a5836cc8e4c1def2bdeb022e7b496623439)
->> reproduce (this is a W=1 build):
->>          wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->>          chmod +x ~/bin/make.cross
->>          # install x86_64 cross compiling tool for clang build
->>          # apt-get install binutils-x86-64-linux-gnu
->>          # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=9140e381e0f2f8cb1c628c29730ece2a52cb4cbc
->>          git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
->>          git fetch --no-tags kvm queue
->>          git checkout 9140e381e0f2f8cb1c628c29730ece2a52cb4cbc
->>          # save the attached .config to linux build tree
->>          COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 ARCH=x86_64
->> 
->> If you fix the issue, kindly add following tag as appropriate
->> Reported-by: kernel test robot <lkp@intel.com>
->
-> kvm_guest_cpu_offline must be placed outside #ifdef CONFIG_SMP.  
+Stuck how?
 
-... and kvm_guest_cpu_online() too.
+> Qemu gets number of interrupts from Multiple Message Capable field
+> set by guest. This field is aligned to a power of 2(if a function
+> requires 3 vectors, it initializes it to 2).
 
-> I fixed  it up.
->
+So I guess this is a MultiMSI device with 4 vectors, right?
 
-Thanks!
+> However, guest driver just sends 3 mapi-cmd to vits and 3 ite
+> entries is recorded in host.  Vfio initializes msi interrupts using
+> the number of interrupts 4 provide by qemu.  When it comes to the
+> 4th msi without ite in vits, in irq_bypass_register_producer,
+> producer and consumer will __connect fail, due to find_ite fail, and
+> do not resume guest.
+
+Let me rephrase this to check that I understand it:
+- The device has 4 vectors
+- The guest only create mappings for 3 of them
+- VFIO calls kvm_vgic_v4_set_forwarding() for each vector
+- KVM doesn't have a mapping for the 4th vector and returns an error
+- VFIO disable this 4th vector
+
+Is that correct? If yes, I don't understand why that impacts the guest
+at all. From what I can see, vfio_msi_set_vector_signal() just prints
+a message on the console and carries on.
+
+> Do we support this case, Guest function using msi interrupts number
+> not aligned to a power of 2?  Or qemu should provide correct msi
+> interrupts number?
+
+QEMU cannot know how many vectors are in use, and the guest is free to
+issue mappings for the exact number of vectors it wants to service.
+
+Please describe what breaks the guest here.
+
+Thanks,
+
+	M.
 
 -- 
-Vitaly
-
+Without deviation from the norm, progress is not possible.
