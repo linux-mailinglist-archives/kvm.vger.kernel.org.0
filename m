@@ -2,112 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 53E5B375EF4
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 05:00:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BA04375F98
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 07:02:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230413AbhEGDBn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 May 2021 23:01:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45078 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229942AbhEGDBm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 May 2021 23:01:42 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6230C061574
-        for <kvm@vger.kernel.org>; Thu,  6 May 2021 20:00:43 -0700 (PDT)
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4FbwDm2j3Tz9sXS; Fri,  7 May 2021 13:00:40 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1620356440;
-        bh=V3Col8QuO+oqxyxGF4EMsfKrF/pUgQZGNFIpssOh0AI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=edza2LeyxxkxmGtfpPhcz3XklUpdUgN1Aqkrr6AcESVHjA5NDMONhLDq8vdFR0mA9
-         Ev2aVcmxor+FyG9jCJ03f7dIGIn4hb2rHFiwsWWm+ATaBNAgAA30gKGrnmOTaCbya4
-         p4Coak2+knhaXxjx8cMB2Ef29JD/zmObxV8j8DFo=
-Date:   Fri, 7 May 2021 11:05:35 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-ppc@nongnu.org,
-        qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-        Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v2 9/9] target/ppc/kvm: Replace alloca() by g_malloc()
-Message-ID: <YJSSX1eUIecBpwwX@yekko>
-References: <20210506133758.1749233-1-philmd@redhat.com>
- <20210506133758.1749233-10-philmd@redhat.com>
+        id S232900AbhEGFDJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 May 2021 01:03:09 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:60668 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232410AbhEGFDI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 May 2021 01:03:08 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14751qTh056194;
+        Fri, 7 May 2021 05:02:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=/HKU6Ng+BrRVqtSTYd0Pmq7ALei3Vd56o5oCrPq6vSY=;
+ b=gwajVnp/tl7ltxJ8wX3WLiWH7/GXBI+eO5OidA02CfCRFHCfet/nMRU8UnjW3umRHAuN
+ LWlu0p4kXmMau28wlidr1DymwyGD+KwViTmCmsHO2iV0L+JwzKeo8goCowrgF+jUP5Lk
+ Qh4NQGcx9zrH28bh0bLcGN7hr+7eLCWhDcBOvR0PlA+B6vG9Csp2DJxxc7NPhO4or9XZ
+ f7YS+bFpc75DFg63X/1LqSK7GNRSfLJkz0J2Mc88SLjxwBixPAOuouISKgtqX8VRsL8C
+ gjkTAAGNrkKAO7TjxkRY/UAE1+68g+XWgH24fcXaa2cTpjR95GcaWZyADYw5nLWWj6Lp 0g== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 38ctd88b50-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 07 May 2021 05:02:06 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 1474xWJP088558;
+        Fri, 7 May 2021 05:02:05 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by aserp3030.oracle.com with ESMTP id 38csre1c08-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 07 May 2021 05:02:05 +0000
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 147524nk108125;
+        Fri, 7 May 2021 05:02:04 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 38csre1by1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 07 May 2021 05:02:04 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 1475209M029971;
+        Fri, 7 May 2021 05:02:00 GMT
+Received: from kadam (/102.36.221.92)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 06 May 2021 22:01:59 -0700
+Date:   Fri, 7 May 2021 08:01:53 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     brijesh.singh@amd.com, kvm@vger.kernel.org
+Subject: Re: [bug report] KVM: SVM: Add KVM_SEND_UPDATE_DATA command
+Message-ID: <20210507050153.GC1922@kadam>
+References: <YIpeKpSB7Wqkqn9f@mwanda>
+ <YJQw8jlJcPO9ImNO@google.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="g1x6QJlBgI8sUhxy"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210506133758.1749233-10-philmd@redhat.com>
+In-Reply-To: <YJQw8jlJcPO9ImNO@google.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-GUID: Lgjie_AlCOtezkuq_T6ZF3fjgBlHGgvh
+X-Proofpoint-ORIG-GUID: Lgjie_AlCOtezkuq_T6ZF3fjgBlHGgvh
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9976 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0 adultscore=0
+ clxscore=1011 spamscore=0 mlxlogscore=999 priorityscore=1501
+ lowpriorityscore=0 phishscore=0 suspectscore=0 impostorscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
+ definitions=main-2105070035
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, May 06, 2021 at 06:09:54PM +0000, Sean Christopherson wrote:
+> On Thu, Apr 29, 2021, Dan Carpenter wrote:
+> > Hello Brijesh Singh,
+> > 
+> > The patch d3d1af85e2c7: "KVM: SVM: Add KVM_SEND_UPDATE_DATA command"
+> > from Apr 15, 2021, leads to the following static checker warning:
+> > 
+> > arch/x86/kvm/svm/sev.c:1268 sev_send_update_data() warn: 'guest_page' is an error pointer or valid
+> > arch/x86/kvm/svm/sev.c:1316 sev_send_update_data() warn: maybe return -EFAULT instead of the bytes remaining?
+> > arch/x86/kvm/svm/sev.c:1462 sev_receive_update_data() warn: 'guest_page' is an error pointer or valid
+> 
+> Thanks for the report.  Is the static checker you're using publicly available?
+> Catching these bugs via a checker is super cool!
 
---g1x6QJlBgI8sUhxy
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This is a Smatch check, but I'm glad you asked about this because it
+turns out I never committed the "is an error pointer or valid" check.
+I'll do that now and push it later today.
 
-On Thu, May 06, 2021 at 03:37:58PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> The ALLOCA(3) man-page mentions its "use is discouraged".
->=20
-> Replace it by a g_malloc() call.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> ---
->  target/ppc/kvm.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->=20
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 104a308abb5..63c458e2211 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2698,11 +2698,10 @@ int kvmppc_save_htab(QEMUFile *f, int fd, size_t =
-bufsize, int64_t max_ns)
->  int kvmppc_load_htab_chunk(QEMUFile *f, int fd, uint32_t index,
->                             uint16_t n_valid, uint16_t n_invalid, Error *=
-*errp)
->  {
-> -    struct kvm_get_htab_header *buf;
->      size_t chunksize =3D sizeof(*buf) + n_valid * HASH_PTE_SIZE_64;
-> +    g_autofree struct kvm_get_htab_header *buf =3D g_malloc(chunksize);
-
-Um.. that doesn't look like it would compile, since you use
-sizeof(*buf) before declaring buf.
-
->      ssize_t rc;
-> =20
-> -    buf =3D alloca(chunksize);
->      buf->index =3D index;
->      buf->n_valid =3D n_valid;
->      buf->n_invalid =3D n_invalid;
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---g1x6QJlBgI8sUhxy
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmCUkl0ACgkQbDjKyiDZ
-s5JeShAAtE6r+nLzXGSDEwW1F4BeqX9QVewuCmaxNGgnLxraxLHuO0ME9IMsp0jM
-xJg2sv+KFC9axYu1o2RZeGeH8+wGBusgofIRlxmL28+jIgYyFeD/VQZM5Fh2C/Qz
-apTpHA6Pjn6Ed6d8qk+6cTCAYj4cEZkq+4PvI7Rf492WLPDJxKMa28DeUdJ4Oe/K
-SsYZIgJMRXrgk8ckPEJ7faYweaBtVxlvIK8yt/dKJuv+u33oHMoFwwqfPJP2i5ed
-LKCl5bN/wEMGkaD5iP39AgPbLf5ICl2W3wB42+jbsewTBwCzr//+Oudl1Qt7Okns
-08kk6GFbK/9jLrSUDUAN8JUblIzPGu0QF+QEsWGaCvgnL+EXHUDBNjv9BtEpupPt
-KauPOUXwA6XA6gEnU3N3S5kP9QlN1sWs9Df0wH0flbJo62cGFAg1A1ZxgCmyayfZ
-H3c7bPsQvTm1lB6YEHAirHe2FB5G9blsNAZU4dtMsxxdm2uOK87rEwuwFzW3XfZY
-aNcENy3aYUbKVLSOWoeRLLlvtVXHAT8afhN1RYtaby+mA8w/fI22IW1F55scEz1B
-AZSDqkJ0ZDmNM3KUY+n6YRJeYvTTQJNIgAO5Lud5533d9hZFxD3HVD7oogXykAaL
-XYG+MJamQEwkV5wZr9VXyy543zqIwRatQdJk7RAxeHPsqt8lYsY=
-=JBda
------END PGP SIGNATURE-----
-
---g1x6QJlBgI8sUhxy--
+regards,
+dan carpenter
