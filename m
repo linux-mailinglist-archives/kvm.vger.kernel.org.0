@@ -2,577 +2,253 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F069A3766D0
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 16:08:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC7803766E1
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 16:11:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237484AbhEGOJa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 May 2021 10:09:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44752 "EHLO
+        id S237521AbhEGOMa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 May 2021 10:12:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41044 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234381AbhEGOJ1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 May 2021 10:09:27 -0400
+        by vger.kernel.org with ESMTP id S232831AbhEGOM0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 May 2021 10:12:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620396506;
+        s=mimecast20190719; t=1620396686;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=mxoOyIpY8OwDu/Vz+6kjS73PiqqUb0L56eRSjGlANpU=;
-        b=RpjtcsTnolhFRjJ/VzhZ1hmlq1rdAHHLfO5xL7CEOVjhHyFzjyJmgGZlx8TmTKSI6ZiSqR
-        5Lu5HIbOYGvDRIdWKGYycWpKB3Th1nPp1nc0EZKBZGClbtV4h2MrPoUZ7vXa4hUeMrZ82Q
-        xw0OAeJGLAz/GKFyB+c7mPdUgeznIBw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-KfzXBDc1OnC0CAEB5yVk9A-1; Fri, 07 May 2021 10:08:12 -0400
-X-MC-Unique: KfzXBDc1OnC0CAEB5yVk9A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC5F21005E7A;
-        Fri,  7 May 2021 14:08:11 +0000 (UTC)
-Received: from [10.36.113.168] (ovpn-113-168.ams2.redhat.com [10.36.113.168])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 91BD1646D6;
-        Fri,  7 May 2021 14:08:09 +0000 (UTC)
-Subject: Re: [PATCH v2 4/5] KVM: selftests: Add exception handling support for
- aarch64
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com,
-        drjones@redhat.com, alexandru.elisei@arm.com
-References: <20210430232408.2707420-1-ricarkol@google.com>
- <20210430232408.2707420-5-ricarkol@google.com> <87a6pcumyg.wl-maz@kernel.org>
- <YJBLFVoRmsehRJ1N@google.com>
- <20915a2f-d07c-2e61-3cce-ff385e98e796@redhat.com>
- <YJRADhU4CcTE7bdm@google.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <8a99d57b-0513-557c-79e0-98084799812f@redhat.com>
-Date:   Fri, 7 May 2021 16:08:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        bh=3xemaWuClFSKLtaEonBaCJQAvDoWvpQU/PJ5oe6FUAg=;
+        b=T51nSFmtzdrKwEN5KUV2hqyNwyOLnwEprC20lZdEMd0LyjQ0i6vsrrSzvz9M7c4jd1rePf
+        l+fcSBvA/7fZtE6RN3D9nyfi32e8YzSwiFwNf/bwo7WpQO8wyuno1hLwKH/b0MjGMB1FTP
+        GqAGQ64PQ4BmfBatZzJK+vQrXaCckL8=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-541-nHhzfD6DPGG4whKGXomxjw-1; Fri, 07 May 2021 10:11:24 -0400
+X-MC-Unique: nHhzfD6DPGG4whKGXomxjw-1
+Received: by mail-ed1-f72.google.com with SMTP id r19-20020a05640251d3b02903888eb31cafso4518535edd.13
+        for <kvm@vger.kernel.org>; Fri, 07 May 2021 07:11:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=3xemaWuClFSKLtaEonBaCJQAvDoWvpQU/PJ5oe6FUAg=;
+        b=W59/zeslDn4z2a7AXd7EdIv6Lz/WqV6pjoGl68PmAsfUzyzkuj7WM+ZP3FujOHM0i+
+         Z7bLCY4ssQ84rJy8RGx5G5n2hUPrWSE25k46JtLy/2SgI9QOm8+v+JfH3kCD+AtoUqZN
+         XrQ0U8h/EWU6Tb/jq65q7QGTfRgE3q8m0aEd+YOxIiZGqgfEOrgpfddJLHfZPAWwtNRQ
+         X3QluEpQh5apIo5jBKJoL4fJTbY3keNvq7Np0wY8PjA9d4AO6GEdtdHsJ7IMQnqTW4Op
+         /GrSfyrCYbdeX6R2h94ehFOFT4BulDBfIVwFSGFVDOaipv0uR3QWyKcSQFx2fAxe0MjL
+         BMIA==
+X-Gm-Message-State: AOAM530zT4l6oIUMPIdxkJyUgDqJ1a23zor/kFDdY24ANrZY1w50e1dH
+        qR6kEfc9dYBczwOxd7X87zMtazi3172pSYaqUOx2e5y06FLcJo990v7oWE8Ddu2vfdW7bAKArUr
+        1fXvsushIXeSW
+X-Received: by 2002:a17:906:b0cd:: with SMTP id bk13mr10393825ejb.184.1620396683537;
+        Fri, 07 May 2021 07:11:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyXr8UvxvxaXMzinyfRTZbCVHa8v6FhIvaqZukbWNaaGPDQqQTGT/mEtRf9SwSMNBw9IPtE+Q==
+X-Received: by 2002:a17:906:b0cd:: with SMTP id bk13mr10393792ejb.184.1620396683250;
+        Fri, 07 May 2021 07:11:23 -0700 (PDT)
+Received: from steredhat (host-79-18-148-79.retail.telecomitalia.it. [79.18.148.79])
+        by smtp.gmail.com with ESMTPSA id k5sm4910773edk.46.2021.05.07.07.11.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 May 2021 07:11:22 -0700 (PDT)
+Date:   Fri, 7 May 2021 16:11:20 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Joel Fernandes <joelaf@google.com>,
+        Linux Trace Devel <linux-trace-devel@vger.kernel.org>
+Subject: Re: [RFC][PATCH] vhost/vsock: Add vsock_list file to map cid with
+ vhost tasks
+Message-ID: <20210507141120.ot6xztl4h5zyav2c@steredhat>
+References: <20210505163855.32dad8e7@gandalf.local.home>
 MIME-Version: 1.0
-In-Reply-To: <YJRADhU4CcTE7bdm@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20210505163855.32dad8e7@gandalf.local.home>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ricardo,
+Hi Steven,
 
-On 5/6/21 9:14 PM, Ricardo Koller wrote:
-> On Thu, May 06, 2021 at 02:30:17PM +0200, Auger Eric wrote:
->> Hi Ricardo,
->>
-> 
-> Hi Eric,
-> 
-> Thank you very much for the test.
-> 
->> On 5/3/21 9:12 PM, Ricardo Koller wrote:
->>> On Mon, May 03, 2021 at 11:32:39AM +0100, Marc Zyngier wrote:
->>>> On Sat, 01 May 2021 00:24:06 +0100,
->>>> Ricardo Koller <ricarkol@google.com> wrote:
->>>>>
->>>>> Add the infrastructure needed to enable exception handling in aarch64
->>>>> selftests. The exception handling defaults to an unhandled-exception
->>>>> handler which aborts the test, just like x86. These handlers can be
->>>>> overridden by calling vm_install_vector_handler(vector) or
->>>>> vm_install_exception_handler(vector, ec). The unhandled exception
->>>>> reporting from the guest is done using the ucall type introduced in a
->>>>> previous commit, UCALL_UNHANDLED.
->>>>>
->>>>> The exception handling code is heavily inspired on kvm-unit-tests.
->>
->> running the test on 5.12 I get
->>
->> ==== Test Assertion Failure ====
->>   aarch64/debug-exceptions.c:232: false
->>   pid=6477 tid=6477 errno=4 - Interrupted system call
->>      1	0x000000000040147b: main at debug-exceptions.c:230
->>      2	0x000003ff8aa60de3: ?? ??:0
->>      3	0x0000000000401517: _start at :?
->>   Failed guest assert: hw_bp_addr == PC(hw_bp) at
->> aarch64/debug-exceptions.c:105
->> 	values: 0, 0x401794
->>
->>
->> I guess it is not an expected result. Any known bug waiting on the list?
->>
-> 
-> Not expected. That should work, or at least abort early because there is
-> no HW breakpoints support.
-> 
-> I'm trying to reproduce the failure; can you help me with some
-> questions, please?
-sure, please find the answers below.
-> 
-> - does your setup have support for hardware breakpoints? Can you try a
->   'dmesg | grep break'? I'm looking for something like 'hw-breakpoint:
->   found ...'. If there is no such line it's very likely that the check
->   for "debug_ver >= 6" is not enough and the test should check for
->   "num_breakpoints > 0".
-[   25.640418] hw-breakpoint: found 6 breakpoint and 4 watchpoint registers.
-> - does it fail consistently (every single attempt)?
-yes it does.
+On Wed, May 05, 2021 at 04:38:55PM -0400, Steven Rostedt wrote:
+>The new trace-cmd 3.0 (which is almost ready to be released) allows for
+>tracing between host and guests with timestamp synchronization such that
+>the events on the host and the guest can be interleaved in the proper order
+>that they occur. KernelShark now has a plugin that visualizes this
+>interaction.
+>
+>The implementation requires that the guest has a vsock CID assigned, and on
+>the guest a "trace-cmd agent" is running, that will listen on a port for
+>the CID. The on the host a "trace-cmd record -A guest@cid:port -e events"
+>can be called and the host will connect to the guest agent through the
+>cid/port pair and have the agent enable tracing on behalf of the host and
+>send the trace data back down to it.
+>
+>The problem is that there is no sure fire way to find the CID for a guest.
+>Currently, the user must know the cid, or we have a hack that looks for the
+>qemu process and parses the --guest-cid parameter from it. But this is
+>prone to error and does not work on other implementation (was told that
+>crosvm does not use qemu).
 
-I will try to find some time to investigate too
+For debug I think could be useful to link the vhost-vsock kthread to the=20
+CID, but for the user point of view, maybe is better to query the VM=20
+management layer, for example if you're using libvirt, you can easily do:
 
-Thanks
+$ virsh dumpxml fedora34 | grep cid
+     <cid auto=3D'yes' address=3D'3'/>
 
-Eric
-> 
-> Thanks!
-> Ricardo
-> 
->>
->> Thanks
->>
->> Eric
-> 
-> 
->>>>>
->>>>> Signed-off-by: Ricardo Koller <ricarkol@google.com>
->>>>> ---
->>>>>  tools/testing/selftests/kvm/Makefile          |   2 +-
->>>>>  .../selftests/kvm/include/aarch64/processor.h |  78 +++++++++++
->>>>>  .../selftests/kvm/lib/aarch64/handlers.S      | 130 ++++++++++++++++++
->>>>>  .../selftests/kvm/lib/aarch64/processor.c     | 124 +++++++++++++++++
->>>>>  4 files changed, 333 insertions(+), 1 deletion(-)
->>>>>  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/handlers.S
->>>>>
->>>>> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
->>>>> index 4e548d7ab0ab..618c5903f478 100644
->>>>> --- a/tools/testing/selftests/kvm/Makefile
->>>>> +++ b/tools/testing/selftests/kvm/Makefile
->>>>> @@ -35,7 +35,7 @@ endif
->>>>>  
->>>>>  LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
->>>>>  LIBKVM_x86_64 = lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
->>>>> -LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c
->>>>> +LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S
->>>>>  LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
->>>>>  
->>>>>  TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
->>>>> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
->>>>> index b7fa0c8551db..40aae31b4afc 100644
->>>>> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
->>>>> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
->>>>> @@ -8,6 +8,7 @@
->>>>>  #define SELFTEST_KVM_PROCESSOR_H
->>>>>  
->>>>>  #include "kvm_util.h"
->>>>> +#include <linux/stringify.h>
->>>>>  
->>>>>  
->>>>>  #define ARM64_CORE_REG(x) (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
->>>>> @@ -18,6 +19,7 @@
->>>>>  #define MAIR_EL1	3, 0, 10, 2, 0
->>>>>  #define TTBR0_EL1	3, 0,  2, 0, 0
->>>>>  #define SCTLR_EL1	3, 0,  1, 0, 0
->>>>> +#define VBAR_EL1	3, 0, 12, 0, 0
->>>>>  
->>>>>  /*
->>>>>   * Default MAIR
->>>>> @@ -56,4 +58,80 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, int vcpuid, struct kvm_vcpu_init *ini
->>>>>  void aarch64_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid,
->>>>>  			      struct kvm_vcpu_init *init, void *guest_code);
->>>>>  
->>>>> +struct ex_regs {
->>>>> +	u64 regs[31];
->>>>> +	u64 sp;
->>>>> +	u64 pc;
->>>>> +	u64 pstate;
->>>>> +};
->>>>> +
->>>>> +#define VECTOR_NUM	16
->>>>> +
->>>>> +enum {
->>>>> +	VECTOR_SYNC_CURRENT_SP0,
->>>>> +	VECTOR_IRQ_CURRENT_SP0,
->>>>> +	VECTOR_FIQ_CURRENT_SP0,
->>>>> +	VECTOR_ERROR_CURRENT_SP0,
->>>>> +
->>>>> +	VECTOR_SYNC_CURRENT,
->>>>> +	VECTOR_IRQ_CURRENT,
->>>>> +	VECTOR_FIQ_CURRENT,
->>>>> +	VECTOR_ERROR_CURRENT,
->>>>> +
->>>>> +	VECTOR_SYNC_LOWER_64,
->>>>> +	VECTOR_IRQ_LOWER_64,
->>>>> +	VECTOR_FIQ_LOWER_64,
->>>>> +	VECTOR_ERROR_LOWER_64,
->>>>> +
->>>>> +	VECTOR_SYNC_LOWER_32,
->>>>> +	VECTOR_IRQ_LOWER_32,
->>>>> +	VECTOR_FIQ_LOWER_32,
->>>>> +	VECTOR_ERROR_LOWER_32,
->>>>> +};
->>>>> +
->>>>> +#define VECTOR_IS_SYNC(v) ((v) == VECTOR_SYNC_CURRENT_SP0 || \
->>>>> +			   (v) == VECTOR_SYNC_CURRENT     || \
->>>>> +			   (v) == VECTOR_SYNC_LOWER_64    || \
->>>>> +			   (v) == VECTOR_SYNC_LOWER_32)
->>>>> +
->>>>> +/* Some common EC (Exception classes) */
->>>>> +#define ESR_EC_ILLEGAL_INS	0x0e
->>>>> +#define ESR_EC_SVC64		0x15
->>>>> +#define ESR_EC_IABORT_CURRENT	0x21
->>>>> +#define ESR_EC_DABORT_CURRENT	0x25
->>>>> +#define ESR_EC_SERROR		0x2f
->>>>> +#define ESR_EC_HW_BP_CURRENT	0x31
->>>>> +#define ESR_EC_SSTEP_CURRENT	0x33
->>>>> +#define ESR_EC_WP_CURRENT	0x35
->>>>> +#define ESR_EC_BRK_INS		0x3C
->>>>> +
->>>>> +#define ESR_EC_NUM		64
->>>>> +
->>>>> +#define ESR_EC_SHIFT		26
->>>>> +#define ESR_EC_MASK		(ESR_EC_NUM - 1)
->>>>> +
->>>>> +void vm_init_descriptor_tables(struct kvm_vm *vm);
->>>>> +void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid);
->>>>> +
->>>>> +typedef void(*handler_fn)(struct ex_regs *);
->>>>> +void vm_install_exception_handler(struct kvm_vm *vm,
->>>>> +		int vector, int ec, handler_fn handler);
->>>>> +void vm_install_vector_handler(struct kvm_vm *vm,
->>>>> +		int vector, handler_fn handler);
->>>>> +
->>>>> +#define SPSR_D          (1 << 9)
->>>>> +#define SPSR_SS         (1 << 21)
->>>>> +
->>>>> +#define write_sysreg(reg, val)						  \
->>>>> +({									  \
->>>>> +	u64 __val = (u64)(val);						  \
->>>>> +	asm volatile("msr " __stringify(reg) ", %x0" : : "rZ" (__val));	  \
->>>>> +})
->>>>> +
->>>>> +#define read_sysreg(reg)						  \
->>>>> +({	u64 val;							  \
->>>>> +	asm volatile("mrs %0, "__stringify(reg) : "=r"(val) : : "memory");\
->>>>> +	val;								  \
->>>>> +})
->>>>> +
->>>>>  #endif /* SELFTEST_KVM_PROCESSOR_H */
->>>>> diff --git a/tools/testing/selftests/kvm/lib/aarch64/handlers.S b/tools/testing/selftests/kvm/lib/aarch64/handlers.S
->>>>> new file mode 100644
->>>>> index 000000000000..8a560021892b
->>>>> --- /dev/null
->>>>> +++ b/tools/testing/selftests/kvm/lib/aarch64/handlers.S
->>>>> @@ -0,0 +1,130 @@
->>>>> +/* SPDX-License-Identifier: GPL-2.0 */
->>>>> +.macro save_registers, vector
->>>>> +	add	sp, sp, #-16 * 17
->>>>> +
->>>>> +	stp	x0, x1, [sp, #16 * 0]
->>>>> +	stp	x2, x3, [sp, #16 * 1]
->>>>> +	stp	x4, x5, [sp, #16 * 2]
->>>>> +	stp	x6, x7, [sp, #16 * 3]
->>>>> +	stp	x8, x9, [sp, #16 * 4]
->>>>> +	stp	x10, x11, [sp, #16 * 5]
->>>>> +	stp	x12, x13, [sp, #16 * 6]
->>>>> +	stp	x14, x15, [sp, #16 * 7]
->>>>> +	stp	x16, x17, [sp, #16 * 8]
->>>>> +	stp	x18, x19, [sp, #16 * 9]
->>>>> +	stp	x20, x21, [sp, #16 * 10]
->>>>> +	stp	x22, x23, [sp, #16 * 11]
->>>>> +	stp	x24, x25, [sp, #16 * 12]
->>>>> +	stp	x26, x27, [sp, #16 * 13]
->>>>> +	stp	x28, x29, [sp, #16 * 14]
->>>>> +
->>>>> +	.if \vector >= 8
->>>>> +	mrs	x1, sp_el0
->>>>
->>>> I'm still a bit perplexed by this. SP_EL0 is never changed, since you
->>>> always run in handler mode. Therefore, saving/restoring it is only
->>>> overhead. If an exception handler wants to introspect it, it is
->>>> already available in the relevant system register.
->>>>
->>>> Or did you have something else in mind for it?
->>>>
->>>
->>> Not really. The reason for saving sp_el0 in there was just for
->>> consistency, so that handlers for both el0 and el1 exceptions could get
->>> the sp at regs->sp.
->>>
->>> Restoring sp_el0 might be too much. So, what do you think of this v3: we
->>> keep the saving of sp_el0 into regs->sp (to keep things the same between
->>> el0 and el1) and delete the restoring of sp_el0?
->>>
->>> Thanks,
->>> Ricardo
->>>
->>>>> +	.else
->>>>> +	/*
->>>>> +	 * This stores sp_el1 into ex_regs.sp so exception handlers can
->>>>> +	 * "look" at it. It will _not_ be used to restore the sp_el1 on
->>>>> +	 * return from the exception so handlers can not update it.
->>>>> +	 */
->>>>> +	mov	x1, sp
->>>>> +	.endif
->>>>> +	stp	x30, x1, [sp, #16 * 15] /* x30, SP */
->>>>> +
->>>>> +	mrs	x1, elr_el1
->>>>> +	mrs	x2, spsr_el1
->>>>> +	stp	x1, x2, [sp, #16 * 16] /* PC, PSTATE */
->>>>> +.endm
->>>>> +
->>>>> +.macro restore_registers, vector
->>>>> +	ldp	x1, x2, [sp, #16 * 16] /* PC, PSTATE */
->>>>> +	msr	elr_el1, x1
->>>>> +	msr	spsr_el1, x2
->>>>> +
->>>>> +	ldp	x30, x1, [sp, #16 * 15] /* x30, SP */
->>>>> +	.if \vector >= 8
->>>>> +	msr	sp_el0, x1
->>>>> +	.endif
->>>>> +
->>>>> +	ldp	x28, x29, [sp, #16 * 14]
->>>>> +	ldp	x26, x27, [sp, #16 * 13]
->>>>> +	ldp	x24, x25, [sp, #16 * 12]
->>>>> +	ldp	x22, x23, [sp, #16 * 11]
->>>>> +	ldp	x20, x21, [sp, #16 * 10]
->>>>> +	ldp	x18, x19, [sp, #16 * 9]
->>>>> +	ldp	x16, x17, [sp, #16 * 8]
->>>>> +	ldp	x14, x15, [sp, #16 * 7]
->>>>> +	ldp	x12, x13, [sp, #16 * 6]
->>>>> +	ldp	x10, x11, [sp, #16 * 5]
->>>>> +	ldp	x8, x9, [sp, #16 * 4]
->>>>> +	ldp	x6, x7, [sp, #16 * 3]
->>>>> +	ldp	x4, x5, [sp, #16 * 2]
->>>>> +	ldp	x2, x3, [sp, #16 * 1]
->>>>> +	ldp	x0, x1, [sp, #16 * 0]
->>>>> +
->>>>> +	add	sp, sp, #16 * 17
->>>>> +
->>>>> +	eret
->>>>> +.endm
->>>>> +
->>>>> +.pushsection ".entry.text", "ax"
->>>>> +.balign 0x800
->>>>> +.global vectors
->>>>> +vectors:
->>>>> +.popsection
->>>>> +
->>>>> +.set	vector, 0
->>>>> +
->>>>> +/*
->>>>> + * Build an exception handler for vector and append a jump to it into
->>>>> + * vectors (while making sure that it's 0x80 aligned).
->>>>> + */
->>>>> +.macro HANDLER, label
->>>>> +handler_\()\label:
->>>>> +	save_registers vector
->>>>> +	mov	x0, sp
->>>>> +	mov	x1, #vector
->>>>> +	bl	route_exception
->>>>> +	restore_registers vector
->>>>> +
->>>>> +.pushsection ".entry.text", "ax"
->>>>> +.balign 0x80
->>>>> +	b	handler_\()\label
->>>>> +.popsection
->>>>> +
->>>>> +.set	vector, vector + 1
->>>>> +.endm
->>>>> +
->>>>> +.macro HANDLER_INVALID
->>>>> +.pushsection ".entry.text", "ax"
->>>>> +.balign 0x80
->>>>> +/* This will abort so no need to save and restore registers. */
->>>>> +	mov	x0, #vector
->>>>> +	b	kvm_exit_unexpected_vector
->>>>> +.popsection
->>>>> +
->>>>> +.set	vector, vector + 1
->>>>> +.endm
->>>>> +
->>>>> +/*
->>>>> + * Caution: be sure to not add anything between the declaration of vectors
->>>>> + * above and these macro calls that will build the vectors table below it.
->>>>> + */
->>>>> +	HANDLER_INVALID                         // Synchronous EL1t
->>>>> +	HANDLER_INVALID                         // IRQ EL1t
->>>>> +	HANDLER_INVALID                         // FIQ EL1t
->>>>> +	HANDLER_INVALID                         // Error EL1t
->>>>> +
->>>>> +	HANDLER	el1h_sync                       // Synchronous EL1h
->>>>> +	HANDLER	el1h_irq                        // IRQ EL1h
->>>>> +	HANDLER el1h_fiq                        // FIQ EL1h
->>>>> +	HANDLER	el1h_error                      // Error EL1h
->>>>> +
->>>>> +	HANDLER	el0_sync_64                     // Synchronous 64-bit EL0
->>>>> +	HANDLER	el0_irq_64                      // IRQ 64-bit EL0
->>>>> +	HANDLER	el0_fiq_64                      // FIQ 64-bit EL0
->>>>> +	HANDLER	el0_error_64                    // Error 64-bit EL0
->>>>> +
->>>>> +	HANDLER	el0_sync_32                     // Synchronous 32-bit EL0
->>>>> +	HANDLER	el0_irq_32                      // IRQ 32-bit EL0
->>>>> +	HANDLER	el0_fiq_32                      // FIQ 32-bit EL0
->>>>> +	HANDLER	el0_error_32                    // Error 32-bit EL0
->>>>> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
->>>>> index cee92d477dc0..25be71ec88be 100644
->>>>> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
->>>>> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
->>>>> @@ -6,6 +6,7 @@
->>>>>   */
->>>>>  
->>>>>  #include <linux/compiler.h>
->>>>> +#include <assert.h>
->>>>>  
->>>>>  #include "kvm_util.h"
->>>>>  #include "../kvm_util_internal.h"
->>>>> @@ -14,6 +15,8 @@
->>>>>  #define KVM_GUEST_PAGE_TABLE_MIN_PADDR		0x180000
->>>>>  #define DEFAULT_ARM64_GUEST_STACK_VADDR_MIN	0xac0000
->>>>>  
->>>>> +vm_vaddr_t exception_handlers;
->>>>> +
->>>>>  static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
->>>>>  {
->>>>>  	return (v + vm->page_size) & ~(vm->page_size - 1);
->>>>> @@ -334,6 +337,127 @@ void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
->>>>>  	va_end(ap);
->>>>>  }
->>>>>  
->>>>> +void kvm_exit_unexpected_vector(int vector)
->>>>> +{
->>>>> +	ucall(UCALL_UNHANDLED, 3, vector, 0, false /* !valid_ec */);
->>>>> +}
->>>>> +
->>>>> +void kvm_exit_unexpected_exception(int vector, uint64_t ec)
->>>>> +{
->>>>> +	ucall(UCALL_UNHANDLED, 3, vector, ec, true /* valid_ec */);
->>>>> +}
->>>>> +
->>>>>  void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid)
->>>>>  {
->>>>> +	struct ucall uc;
->>>>> +
->>>>> +	if (get_ucall(vm, vcpuid, &uc) != UCALL_UNHANDLED)
->>>>> +		return;
->>>>> +
->>>>> +	if (uc.args[2]) /* valid_ec */ {
->>>>> +		assert(VECTOR_IS_SYNC(uc.args[0]));
->>>>> +		TEST_ASSERT(false,
->>>>> +			"Unexpected exception (vector:0x%lx, ec:0x%lx)",
->>>>> +			uc.args[0], uc.args[1]);
->>>>> +	} else {
->>>>> +		assert(!VECTOR_IS_SYNC(uc.args[0]));
->>>>> +		TEST_ASSERT(false,
->>>>> +			"Unexpected exception (vector:0x%lx)",
->>>>> +			uc.args[0]);
->>>>> +	}
->>>>> +}
->>>>> +
->>>>> +/*
->>>>> + * This exception handling code was heavily inspired on kvm-unit-tests. There
->>>>> + * is a set of default vector handlers stored in vector_handlers. These default
->>>>> + * vector handlers call user-installed handlers stored in exception_handlers.
->>>>> + * Synchronous handlers are indexed by (vector, ec), and irq handlers by
->>>>> + * (vector, ec=0).
->>>>> + */
->>>>> +
->>>>> +typedef void(*vector_fn)(struct ex_regs *, int vector);
->>>>> +
->>>>> +struct handlers {
->>>>> +	vector_fn vector_handlers[VECTOR_NUM];
->>>>> +	handler_fn exception_handlers[VECTOR_NUM][ESR_EC_NUM];
->>>>> +};
->>>>> +
->>>>> +void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid)
->>>>> +{
->>>>> +	extern char vectors;
->>>>> +
->>>>> +	set_reg(vm, vcpuid, ARM64_SYS_REG(VBAR_EL1), (uint64_t)&vectors);
->>>>> +}
->>>>> +
->>>>> +void default_sync_handler(struct ex_regs *regs, int vector)
->>>>> +{
->>>>> +	struct handlers *handlers = (struct handlers *)exception_handlers;
->>>>> +	uint64_t esr = read_sysreg(esr_el1);
->>>>> +	uint64_t ec = (esr >> ESR_EC_SHIFT) & ESR_EC_MASK;
->>>>> +
->>>>> +	GUEST_ASSERT(VECTOR_IS_SYNC(vector));
->>>>> +
->>>>> +	if (handlers && handlers->exception_handlers[vector][ec])
->>>>> +		handlers->exception_handlers[vector][ec](regs);
->>>>> +	else
->>>>> +		kvm_exit_unexpected_exception(vector, ec);
->>>>> +}
->>>>> +
->>>>> +void default_irq_handler(struct ex_regs *regs, int vector)
->>>>> +{
->>>>> +	struct handlers *handlers = (struct handlers *)exception_handlers;
->>>>> +
->>>>> +	GUEST_ASSERT(!VECTOR_IS_SYNC(vector));
->>>>> +
->>>>> +	if (handlers && handlers->exception_handlers[vector][0])
->>>>> +		handlers->exception_handlers[vector][0](regs);
->>>>> +	else
->>>>> +		kvm_exit_unexpected_vector(vector);
->>>>> +}
->>>>> +
->>>>> +void route_exception(struct ex_regs *regs, int vector)
->>>>> +{
->>>>> +	struct handlers *handlers = (struct handlers *)exception_handlers;
->>>>> +
->>>>> +	if (handlers && handlers->vector_handlers[vector])
->>>>> +		handlers->vector_handlers[vector](regs, vector);
->>>>> +	else
->>>>> +		kvm_exit_unexpected_vector(vector);
->>>>> +}
->>>>> +
->>>>> +void vm_init_descriptor_tables(struct kvm_vm *vm)
->>>>> +{
->>>>> +	struct handlers *handlers;
->>>>> +
->>>>> +	vm->handlers = vm_vaddr_alloc(vm, sizeof(struct handlers),
->>>>> +			vm->page_size, 0, 0);
->>>>> +
->>>>> +	handlers = (struct handlers *)addr_gva2hva(vm, vm->handlers);
->>>>> +	handlers->vector_handlers[VECTOR_SYNC_CURRENT] = default_sync_handler;
->>>>> +	handlers->vector_handlers[VECTOR_IRQ_CURRENT] = default_irq_handler;
->>>>> +	handlers->vector_handlers[VECTOR_SYNC_LOWER_64] = default_sync_handler;
->>>>> +	handlers->vector_handlers[VECTOR_IRQ_LOWER_64] = default_irq_handler;
->>>>
->>>> How about FIQ, Error? Although they are unlikely, they are valid
->>>> exceptions.
->>>>
->>>>> +
->>>>> +	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
->>>>> +}
->>>>> +
->>>>> +void vm_install_exception_handler(struct kvm_vm *vm, int vector, int ec,
->>>>> +			 void (*handler)(struct ex_regs *))
->>>>> +{
->>>>> +	struct handlers *handlers = (struct handlers *)addr_gva2hva(vm, vm->handlers);
->>>>> +
->>>>> +	assert(VECTOR_IS_SYNC(vector));
->>>>> +	assert(vector < VECTOR_NUM);
->>>>> +	assert(ec < ESR_EC_NUM);
->>>>> +	handlers->exception_handlers[vector][ec] = handler;
->>>>> +}
->>>>> +
->>>>> +void vm_install_vector_handler(struct kvm_vm *vm, int vector,
->>>>> +			 void (*handler)(struct ex_regs *))
->>>>> +{
->>>>> +	struct handlers *handlers = (struct handlers *)addr_gva2hva(vm, vm->handlers);
->>>>> +
->>>>> +	assert(!VECTOR_IS_SYNC(vector));
->>>>> +	assert(vector < VECTOR_NUM);
->>>>> +	handlers->exception_handlers[vector][0] = handler;
->>>>>  }
->>>>
->>>> Thanks,
->>>>
->>>> 	M.
->>>>
->>>> -- 
->>>> Without deviation from the norm, progress is not possible.
->>>
->>
-> 
+>
+>As I can not find a way to discover CIDs assigned to guests via any kernel
+>interface, I decided to create this one. Note, I'm not attached to it. If
+>there's a better way to do this, I would love to have it. But since I'm not
+>an expert in the networking layer nor virtio, I decided to stick to what I
+>know and add a debugfs interface that simply lists all the registered=20
+>CIDs
+>and the worker task that they are associated with. The worker task at
+>least has the PID of the task it represents.
+
+I honestly don't know if it's the best interface, like I said maybe for=20
+debugging it's fine, but if we want to expose it to the user in some=20
+way, we could support devlink/netlink to provide information about the=20
+vsock devices currently in use.
+
+>
+>Now I can find the cid / host process in charge of the guest pair:
+>
+>  # cat /sys/kernel/debug/vsock_list
+>  3	vhost-1954:2002
+>
+>  # ps aux | grep 1954
+>  qemu        1954  9.9 21.3 1629092 796148 ?      Sl   16:22   0:58  /usr=
+/bin/qemu-kvm -name guest=3DFedora21,debug-threads=3Don -S -object secret,i=
+d=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-1-Fedora21/=
+master-key.aes -machine pc-1.2,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff =
+-cpu qemu64 -m 1000 -overcommit mem-lock=3Doff -smp 2,sockets=3D2,cores=3D1=
+,threads=3D1 -uuid 1eefeeb0-3ac7-07c1-926e-236908313b4c -no-user-config -no=
+defaults -chardev socket,id=3Dcharmonitor,fd=3D32,server,nowait -mon charde=
+v=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -no-shutdown -b=
+oot strict=3Don -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 =
+-device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x6 -block=
+dev {"driver":"host_device","filename":"/dev/mapper/vg_bxtest-GuestFedora",=
+"node-name":"libvirt-1-storage","auto-read-only":true,"discard":"unmap"} -b=
+lockdev {"node-name":"libvirt-1-format","read-only":false,"driver":"raw","f=
+ile":"libvirt-1-storage"} -device ide-hd,bus=3Dide.0,unit=3D0,drive=3Dlibvi=
+rt-1-
+> format,id=3Dide0-0-0,bootindex=3D1 -netdev tap,fd=3D34,id=3Dhostnet0 -dev=
+ice rtl8139,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:9f:e9:d5,bus=3Dpci.0=
+,addr=3D0x3 -netdev tap,fd=3D35,id=3Dhostnet1 -device virtio-net-pci,netdev=
+=3Dhostnet1,id=3Dnet1,mac=3D52:54:00:ec:dc:6e,bus=3Dpci.0,addr=3D0x5 -chard=
+ev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3Dseria=
+l0 -chardev pipe,id=3Dcharchannel0,path=3D/var/lib/trace-cmd/virt/Fedora21/=
+trace-pipe-cpu0 -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,charde=
+v=3Dcharchannel0,id=3Dchannel0,name=3Dtrace-pipe-cpu0 -chardev pipe,id=3Dch=
+archannel1,path=3D/var/lib/trace-cmd/virt/Fedora21/trace-pipe-cpu1 -device =
+virtserialport,bus=3Dvirtio-serial0.0,nr=3D2,chardev=3Dcharchannel1,id=3Dch=
+annel1,name=3Dtrace-pipe-cpu1 -vnc 127.0.0.1:0 -device cirrus-vga,id=3Dvide=
+o0,bus=3Dpci.0,addr=3D0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpc=
+i.0,addr=3D0x4 -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=
+=3Ddeny,resourcecontrol=3Ddeny -device vhost-vsock-pci,id=3Dvsock0,guest-ci=
+d=3D3,vhostfd=3D16,bus=3Dpci.0,addr=3D0x7 -msg
+> timestamp=3Don
+>  root        2000  0.0  0.0      0     0 ?        S    16:22   0:00 [kvm-=
+pit/1954]
+>  root        2002  0.0  0.0      0     0 ?        S    16:22   0:00 [vhos=
+t-1954]
+>
+>
+>This is just an example of what I'm looking for. Just a way to find what
+>process is using what cid.
+>
+>Signed-off-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+>---
+>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>index 5e78fb719602..4f03b25b23c1 100644
+>--- a/drivers/vhost/vsock.c
+>+++ b/drivers/vhost/vsock.c
+>@@ -15,6 +15,7 @@
+> #include <linux/virtio_vsock.h>
+> #include <linux/vhost.h>
+> #include <linux/hashtable.h>
+>+#include <linux/debugfs.h>
+>
+> #include <net/af_vsock.h>
+> #include "vhost.h"
+>@@ -900,6 +901,128 @@ static struct miscdevice vhost_vsock_misc =3D {
+> 	.fops =3D &vhost_vsock_fops,
+> };
+>
+>+static struct dentry *vsock_file;
+>+
+>+struct vsock_file_iter {
+>+	struct hlist_node	*node;
+>+	int			index;
+>+};
+>+
+>+
+>+static void *vsock_next(struct seq_file *m, void *v, loff_t *pos)
+>+{
+>+	struct vsock_file_iter *iter =3D v;
+>+	struct vhost_vsock *vsock;
+>+
+>+	if (pos)
+>+		(*pos)++;
+>+
+>+	if (iter->index >=3D (int)HASH_SIZE(vhost_vsock_hash))
+>+		return NULL;
+>+
+>+	if (iter->node)
+>+		iter->node =3D rcu_dereference_raw(hlist_next_rcu(iter->node));
+>+
+>+	for (;;) {
+>+		if (iter->node) {
+>+			vsock =3D hlist_entry_safe(rcu_dereference_raw(iter->node),
+>+						 struct vhost_vsock, hash);
+>+			if (vsock->guest_cid)
+>+				break;
+>+			iter->node =3D rcu_dereference_raw(hlist_next_rcu(iter->node));
+>+			continue;
+>+		}
+>+		iter->index++;
+>+		if (iter->index >=3D HASH_SIZE(vhost_vsock_hash))
+>+			return NULL;
+>+
+>+		iter->node =3D rcu_dereference_raw(hlist_first_rcu(&vhost_vsock_hash[it=
+er->index]));
+>+	}
+>+	return iter;
+>+}
+>+
+>+static void *vsock_start(struct seq_file *m, loff_t *pos)
+>+{
+>+	struct vsock_file_iter *iter =3D m->private;
+>+	loff_t l =3D 0;
+>+	void *t;
+>+
+>+	rcu_read_lock();
+
+Instead of keeping this rcu lock between vsock_start() and vsock_stop(),=20
+maybe it's better to make a dump here of the bindings (pid/cid), save it=20
+in an array, and iterate it in vsock_next().
+
+>+
+>+	iter->index =3D -1;
+>+	iter->node =3D NULL;
+>+	t =3D vsock_next(m, iter, NULL);
+>+
+>+	for (; iter->index < HASH_SIZE(vhost_vsock_hash) && l < *pos;
+>+	     t =3D vsock_next(m, iter, &l))
+>+		;
+
+A while() maybe was more readable...
+
+Thanks,
+Stefano
 
