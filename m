@@ -2,218 +2,268 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88F3F376AFF
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 22:04:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 388C8376B17
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 22:14:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230094AbhEGUFo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 May 2021 16:05:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59184 "EHLO
+        id S230127AbhEGUPu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 May 2021 16:15:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50056 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230103AbhEGUFm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 May 2021 16:05:42 -0400
+        by vger.kernel.org with ESMTP id S229905AbhEGUPs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 May 2021 16:15:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620417882;
+        s=mimecast20190719; t=1620418488;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Vsn0n/n41qSgktCXK2TGNsKBldvh+9wi0dK3Oc3lJD4=;
-        b=gAL8idvTNDo0Sr/vxmAoEfHARsefm+uc95V1Ar7ZGGoPtADqLNoZ1Fiy9wAe60fIFPIsYF
-        MRa0AXPTbokEhZDWISSOxz4V5iIZDu7coITr/09qwGnof6NFo/MxcoKQuozqwS+KW/Xx2S
-        7kFh8tH+9lX5NHVShzIVTyuCTQ8YoAo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-209-YgeIyFXLN2uu8DfI2U5DgQ-1; Fri, 07 May 2021 16:04:40 -0400
-X-MC-Unique: YgeIyFXLN2uu8DfI2U5DgQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E8BD1006C80;
-        Fri,  7 May 2021 20:04:39 +0000 (UTC)
-Received: from gator.home (unknown [10.40.192.135])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1EEB81A26A;
-        Fri,  7 May 2021 20:04:36 +0000 (UTC)
+        bh=TnHESXa93QYCM8UH+VCHFhVjEIMfUQrgYtHFTFsHEvo=;
+        b=TyMqaJBgPFHvZV4TM981+yRJlNHIcTngyuoUp/xM5plzkgAahWAwckvGEIGq9riMweHNyM
+        thV9xmsBlKJ6l2IM1VxwZLPQn0TqVxGr0kR0rvy6ViAMPjZLvVLE2ql6afsiT6YedzLt5S
+        NYQNuI+NJo3PHyS4Mzj3uQaW7ur53fI=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-8-AHEFTwThP92dJzG-vAwfKA-1; Fri, 07 May 2021 16:14:46 -0400
+X-MC-Unique: AHEFTwThP92dJzG-vAwfKA-1
+Received: by mail-ed1-f69.google.com with SMTP id y19-20020a0564022713b029038a9f36060dso5019272edd.4
+        for <kvm@vger.kernel.org>; Fri, 07 May 2021 13:14:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=TnHESXa93QYCM8UH+VCHFhVjEIMfUQrgYtHFTFsHEvo=;
+        b=RWGr8WKmb2iIZeDke9qZKwqdqaFI6sWSkWGtChqoGpsX3ZajgbjLVX2VyrT4vk0z+n
+         eM65Qw0PuKKQWFeewevKvQvXvRFPE41EeFy6olKC3hvpcGPI1XcHVcJcFuBpZqknINqp
+         88pFzb9GVyuWachTlixtHyDeJKy2ySMnDpqMrG8GlVD9l+5dE8KOyKu1iA3cdMfqKLDj
+         AuDYiAYqpLRXChZDYvbdI5EGG+lAnHvxkx8/lX6iRgykrucbwjqLieW53RgT9z9bN1AD
+         PmKlUFluMGPLXnBJTHtdygXOUmCkefk7o1Y29uZBWVGBP+19A7yQ82/n25DdkAe4sNqP
+         cQOg==
+X-Gm-Message-State: AOAM530XeQJnNDeK4PuiyG5I/+x5oCXuW9ovjAv++ia1w98wNSjfS77I
+        szeBrqKrIxy6yYjfj+lt2TD+R67ynesXaEBz9xXhCEu7dTls3WQMmO923W1+38mo1MnZvZ+pg3s
+        Xob6/SEn/oON6
+X-Received: by 2002:a05:6402:2d6:: with SMTP id b22mr13644434edx.274.1620418485596;
+        Fri, 07 May 2021 13:14:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwd5KZIwYKeFk7YYMqZhKIaiBTKb6DcFk7gfUDyJtCHsVrAH3r1gHjxpLOkBznW3F4hf6bQqA==
+X-Received: by 2002:a05:6402:2d6:: with SMTP id b22mr13644409edx.274.1620418485395;
+        Fri, 07 May 2021 13:14:45 -0700 (PDT)
+Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+        by smtp.gmail.com with ESMTPSA id b8sm4003865ejc.29.2021.05.07.13.14.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 May 2021 13:14:44 -0700 (PDT)
+Date:   Fri, 7 May 2021 22:14:43 +0200
 From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     maz@kernel.org, ricarkol@google.com, eric.auger@redhat.com,
-        alexandru.elisei@arm.com, pbonzini@redhat.com
-Subject: [PATCH 6/6] KVM: arm64: selftests: get-reg-list: Split base and pmu registers
-Date:   Fri,  7 May 2021 22:04:16 +0200
-Message-Id: <20210507200416.198055-7-drjones@redhat.com>
-In-Reply-To: <20210507200416.198055-1-drjones@redhat.com>
-References: <20210507200416.198055-1-drjones@redhat.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Aaron Lewis <aaronlewis@google.com>
+Subject: Re: [PATCH] KVM: selftests: Print a message if /dev/kvm is missing
+Message-ID: <20210507201443.nvtmntp3tgeapwnw@gator.home>
+References: <20210507190559.425518-1-dmatlack@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210507190559.425518-1-dmatlack@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since KVM commit 11663111cd49 ("KVM: arm64: Hide PMU registers from
-userspace when not available") the get-reg-list* tests have been
-failing with
+On Fri, May 07, 2021 at 07:05:59PM +0000, David Matlack wrote:
+> If a KVM selftest is run on a machine without /dev/kvm, it will exit
+> silently. Make it easy to tell what's happening by printing an error
+> message.
+> 
+> Opportunistically consolidate all codepaths that open /dev/kvm into a
+> single function so they all print the same message.
+> 
+> This slightly changes the semantics of vm_is_unrestricted_guest() by
+> changing a TEST_ASSERT() to exit(KSFT_SKIP). However
+> vm_is_unrestricted_guest() is only called in one place
+> (x86_64/mmio_warning_test.c) and that is to determine if the test should
+> be skipped or not.
+> 
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+>  .../testing/selftests/kvm/include/kvm_util.h  |  1 +
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 35 +++++++++++--------
+>  .../selftests/kvm/lib/x86_64/processor.c      | 16 +++------
+>  .../kvm/x86_64/get_msr_index_features.c       |  8 ++---
+>  4 files changed, 28 insertions(+), 32 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index a8f022794ce3..84982eb02b29 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -77,6 +77,7 @@ struct vm_guest_mode_params {
+>  };
+>  extern const struct vm_guest_mode_params vm_guest_mode_params[];
+>  
+> +int open_kvm_dev_path_or_exit(void);
+>  int kvm_check_cap(long cap);
+>  int vm_enable_cap(struct kvm_vm *vm, struct kvm_enable_cap *cap);
+>  int vcpu_enable_cap(struct kvm_vm *vm, uint32_t vcpu_id,
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index fc83f6c5902d..bb7dc65d7fb5 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -31,6 +31,23 @@ static void *align(void *x, size_t size)
+>  	return (void *) (((size_t) x + mask) & ~mask);
+>  }
+>  
+> +/* Open KVM_DEV_PATH if available, otherwise exit the entire program.
+> + *
+> + * Return:
+> + *   The opened file descriptor of /dev/kvm.
+> + */
+> +int open_kvm_dev_path_or_exit(void) {
+> +  int fd;
+> +
+> +  fd = open(KVM_DEV_PATH, O_RDONLY);
+> +  if (fd < 0) {
+> +    print_skip("%s not available", KVM_DEV_PATH);
+> +    exit(KSFT_SKIP);
+> +  }
+> +
+> +  return fd;
+> +}
 
-  ...
-  ... There are 74 missing registers.
-  The following lines are missing registers:
-  ...
+Style issues in the function above '{' and 2 spaces vs. 1 tab.
 
-where the 74 missing registers are all PMU registers. This isn't a
-bug in KVM that the selftest found, even though it's true that a
-KVM userspace that wasn't setting the KVM_ARM_VCPU_PMU_V3 VCPU
-flag, but still expecting the PMU registers to be in the reg-list,
-would suddenly no longer have their expectations met. In that case,
-the expectations were wrong, though, so that KVM userspace needs to
-be fixed, and so does this selftest. The fix for this selftest is to
-pull the PMU registers out of the base register sublist into their
-own sublist and then create new, pmu-enabled vcpu configs which we
-can be tested.
+> +
+>  /*
+>   * Capability
+>   *
+> @@ -52,10 +69,7 @@ int kvm_check_cap(long cap)
+>  	int ret;
+>  	int kvm_fd;
+>  
+> -	kvm_fd = open(KVM_DEV_PATH, O_RDONLY);
+> -	if (kvm_fd < 0)
+> -		exit(KSFT_SKIP);
+> -
+> +	kvm_fd = open_kvm_dev_path_or_exit();
+>  	ret = ioctl(kvm_fd, KVM_CHECK_EXTENSION, cap);
+>  	TEST_ASSERT(ret != -1, "KVM_CHECK_EXTENSION IOCTL failed,\n"
+>  		"  rc: %i errno: %i", ret, errno);
+> @@ -128,9 +142,7 @@ void vm_enable_dirty_ring(struct kvm_vm *vm, uint32_t ring_size)
+>  
+>  static void vm_open(struct kvm_vm *vm, int perm)
+>  {
+> -	vm->kvm_fd = open(KVM_DEV_PATH, perm);
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- .../selftests/kvm/aarch64/get-reg-list.c      | 50 ++++++++++++++++---
- 1 file changed, 42 insertions(+), 8 deletions(-)
+I don't think we should change this one, otherwise the user provided
+perms are ignored.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index 2f7caa0b9e57..9bc6e125bae7 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -37,12 +37,16 @@
- 
- enum {
- 	VREGS,
-+	VREGS_PMU,
- 	SVE,
-+	SVE_PMU,
- };
- 
- static char * const vcpu_config_names[] = {
- 	[VREGS] = "vregs",
-+	[VREGS_PMU] = "vregs+pmu",
- 	[SVE] = "sve",
-+	[SVE_PMU] = "sve+pmu",
- 	NULL
- };
- 
-@@ -59,6 +63,7 @@ struct reg_sublist {
- struct vcpu_config {
- 	const char *name;
- 	bool sve;
-+	bool pmu;
- 	struct reg_sublist sublists[];
- };
- 
-@@ -339,6 +344,8 @@ static void prepare_vcpu_init(struct vcpu_config *c, struct kvm_vcpu_init *init)
- {
- 	if (c->sve)
- 		init->features[0] |= 1 << KVM_ARM_VCPU_SVE;
-+	if (c->pmu)
-+		init->features[0] |= 1 << KVM_ARM_VCPU_PMU_V3;
- }
- 
- static void finalize_vcpu(struct kvm_vm *vm, uint32_t vcpuid, struct vcpu_config *c)
-@@ -357,6 +364,10 @@ static void check_supported(struct vcpu_config *c)
- 		fprintf(stderr, "%s: SVE not available, skipping tests\n", c->name);
- 		exit(KSFT_SKIP);
- 	}
-+	if (c->pmu && !kvm_check_cap(KVM_CAP_ARM_PMU_V3)) {
-+		fprintf(stderr, "%s: PMU not available, skipping tests\n", c->name);
-+		exit(KSFT_SKIP);
-+	}
- }
- 
- static bool fixup_core_regs;
-@@ -614,7 +625,7 @@ int main(int ac, char **av)
-  * The current blessed list was primed with the output of kernel version
-  * v4.15 with --core-reg-fixup and then later updated with new registers.
-  *
-- * The blessed list is up to date with kernel version v5.10-rc5
-+ * The blessed list is up to date with kernel version v5.11-rc6
-  */
- static __u64 base_regs[] = {
- 	KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(regs.regs[0]),
-@@ -806,8 +817,6 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 0, 5, 2, 0),	/* ESR_EL1 */
- 	ARM64_SYS_REG(3, 0, 6, 0, 0),	/* FAR_EL1 */
- 	ARM64_SYS_REG(3, 0, 7, 4, 0),	/* PAR_EL1 */
--	ARM64_SYS_REG(3, 0, 9, 14, 1),	/* PMINTENSET_EL1 */
--	ARM64_SYS_REG(3, 0, 9, 14, 2),	/* PMINTENCLR_EL1 */
- 	ARM64_SYS_REG(3, 0, 10, 2, 0),	/* MAIR_EL1 */
- 	ARM64_SYS_REG(3, 0, 10, 3, 0),	/* AMAIR_EL1 */
- 	ARM64_SYS_REG(3, 0, 12, 0, 0),	/* VBAR_EL1 */
-@@ -816,6 +825,16 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 0, 13, 0, 4),	/* TPIDR_EL1 */
- 	ARM64_SYS_REG(3, 0, 14, 1, 0),	/* CNTKCTL_EL1 */
- 	ARM64_SYS_REG(3, 2, 0, 0, 0),	/* CSSELR_EL1 */
-+	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
-+	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
-+	ARM64_SYS_REG(3, 4, 3, 0, 0),	/* DACR32_EL2 */
-+	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
-+	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
-+};
-+
-+static __u64 pmu_regs[] = {
-+	ARM64_SYS_REG(3, 0, 9, 14, 1),	/* PMINTENSET_EL1 */
-+	ARM64_SYS_REG(3, 0, 9, 14, 2),	/* PMINTENCLR_EL1 */
- 	ARM64_SYS_REG(3, 3, 9, 12, 0),	/* PMCR_EL0 */
- 	ARM64_SYS_REG(3, 3, 9, 12, 1),	/* PMCNTENSET_EL0 */
- 	ARM64_SYS_REG(3, 3, 9, 12, 2),	/* PMCNTENCLR_EL0 */
-@@ -825,8 +844,6 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 3, 9, 13, 0),	/* PMCCNTR_EL0 */
- 	ARM64_SYS_REG(3, 3, 9, 14, 0),	/* PMUSERENR_EL0 */
- 	ARM64_SYS_REG(3, 3, 9, 14, 3),	/* PMOVSSET_EL0 */
--	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
--	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
- 	ARM64_SYS_REG(3, 3, 14, 8, 0),
- 	ARM64_SYS_REG(3, 3, 14, 8, 1),
- 	ARM64_SYS_REG(3, 3, 14, 8, 2),
-@@ -890,9 +907,6 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 3, 14, 15, 5),
- 	ARM64_SYS_REG(3, 3, 14, 15, 6),
- 	ARM64_SYS_REG(3, 3, 14, 15, 7),	/* PMCCFILTR_EL0 */
--	ARM64_SYS_REG(3, 4, 3, 0, 0),	/* DACR32_EL2 */
--	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
--	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
- };
- 
- static __u64 vregs[] = {
-@@ -996,6 +1010,15 @@ static struct vcpu_config vregs_config = {
- 	{0},
- 	},
- };
-+static struct vcpu_config vregs_pmu_config = {
-+	vcpu_config_names[VREGS_PMU], .pmu = true,
-+	.sublists = {
-+	{ base_regs,	ARRAY_SIZE(base_regs), },
-+	{ vregs,	ARRAY_SIZE(vregs), },
-+	{ pmu_regs,	ARRAY_SIZE(pmu_regs), },
-+	{0},
-+	},
-+};
- static struct vcpu_config sve_config = {
- 	vcpu_config_names[SVE], .sve = true,
- 	.sublists = {
-@@ -1004,9 +1027,20 @@ static struct vcpu_config sve_config = {
- 	{0},
- 	},
- };
-+static struct vcpu_config sve_pmu_config = {
-+	vcpu_config_names[SVE_PMU], .sve = true, .pmu = true,
-+	.sublists = {
-+	{ base_regs,	ARRAY_SIZE(base_regs), },
-+	{ sve_regs,	ARRAY_SIZE(sve_regs),	sve_rejects_set,	ARRAY_SIZE(sve_rejects_set), },
-+	{ pmu_regs,	ARRAY_SIZE(pmu_regs), },
-+	{0},
-+	},
-+};
- 
- static struct vcpu_config *vcpu_configs[] = {
- 	&vregs_config,
-+	&vregs_pmu_config,
- 	&sve_config,
-+	&sve_pmu_config,
- 	NULL
- };
--- 
-2.30.2
+> -	if (vm->kvm_fd < 0)
+> -		exit(KSFT_SKIP);
+> +	vm->kvm_fd = open_kvm_dev_path_or_exit();
+>  
+>  	if (!kvm_check_cap(KVM_CAP_IMMEDIATE_EXIT)) {
+>  		print_skip("immediate_exit not available");
+> @@ -925,9 +937,7 @@ static int vcpu_mmap_sz(void)
+>  {
+>  	int dev_fd, ret;
+>  
+> -	dev_fd = open(KVM_DEV_PATH, O_RDONLY);
+> -	if (dev_fd < 0)
+> -		exit(KSFT_SKIP);
+> +        dev_fd = open_kvm_dev_path_or_exit();
+
+spaces vs. tab here
+
+>  
+>  	ret = ioctl(dev_fd, KVM_GET_VCPU_MMAP_SIZE, NULL);
+>  	TEST_ASSERT(ret >= sizeof(struct kvm_run),
+> @@ -2015,10 +2025,7 @@ bool vm_is_unrestricted_guest(struct kvm_vm *vm)
+>  
+>  	if (vm == NULL) {
+>  		/* Ensure that the KVM vendor-specific module is loaded. */
+> -		f = fopen(KVM_DEV_PATH, "r");
+> -		TEST_ASSERT(f != NULL, "Error in opening KVM dev file: %d",
+> -			    errno);
+> -		fclose(f);
+> +                close(open_kvm_dev_path_or_exit());
+
+spaces
+
+>  	}
+>  
+>  	f = fopen("/sys/module/kvm_intel/parameters/unrestricted_guest", "r");
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index a8906e60a108..efe235044421 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -657,9 +657,7 @@ struct kvm_cpuid2 *kvm_get_supported_cpuid(void)
+>  		return cpuid;
+>  
+>  	cpuid = allocate_kvm_cpuid2();
+> -	kvm_fd = open(KVM_DEV_PATH, O_RDONLY);
+> -	if (kvm_fd < 0)
+> -		exit(KSFT_SKIP);
+> +	kvm_fd = open_kvm_dev_path_or_exit();
+>  
+>  	ret = ioctl(kvm_fd, KVM_GET_SUPPORTED_CPUID, cpuid);
+>  	TEST_ASSERT(ret == 0, "KVM_GET_SUPPORTED_CPUID failed %d %d\n",
+> @@ -691,9 +689,7 @@ uint64_t kvm_get_feature_msr(uint64_t msr_index)
+>  
+>  	buffer.header.nmsrs = 1;
+>  	buffer.entry.index = msr_index;
+> -	kvm_fd = open(KVM_DEV_PATH, O_RDONLY);
+> -	if (kvm_fd < 0)
+> -		exit(KSFT_SKIP);
+> +	kvm_fd = open_kvm_dev_path_or_exit();
+>  
+>  	r = ioctl(kvm_fd, KVM_GET_MSRS, &buffer.header);
+>  	TEST_ASSERT(r == 1, "KVM_GET_MSRS IOCTL failed,\n"
+> @@ -986,9 +982,7 @@ struct kvm_msr_list *kvm_get_msr_index_list(void)
+>  	struct kvm_msr_list *list;
+>  	int nmsrs, r, kvm_fd;
+>  
+> -	kvm_fd = open(KVM_DEV_PATH, O_RDONLY);
+> -	if (kvm_fd < 0)
+> -		exit(KSFT_SKIP);
+> +	kvm_fd = open_kvm_dev_path_or_exit();
+>  
+>  	nmsrs = kvm_get_num_msrs_fd(kvm_fd);
+>  	list = malloc(sizeof(*list) + nmsrs * sizeof(list->indices[0]));
+> @@ -1312,9 +1306,7 @@ struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(void)
+>  		return cpuid;
+>  
+>  	cpuid = allocate_kvm_cpuid2();
+> -	kvm_fd = open(KVM_DEV_PATH, O_RDONLY);
+> -	if (kvm_fd < 0)
+> -		exit(KSFT_SKIP);
+> +	kvm_fd = open_kvm_dev_path_or_exit();
+>  
+>  	ret = ioctl(kvm_fd, KVM_GET_SUPPORTED_HV_CPUID, cpuid);
+>  	TEST_ASSERT(ret == 0, "KVM_GET_SUPPORTED_HV_CPUID failed %d %d\n",
+> diff --git a/tools/testing/selftests/kvm/x86_64/get_msr_index_features.c b/tools/testing/selftests/kvm/x86_64/get_msr_index_features.c
+> index cb953df4d7d0..8aed0db1331d 100644
+> --- a/tools/testing/selftests/kvm/x86_64/get_msr_index_features.c
+> +++ b/tools/testing/selftests/kvm/x86_64/get_msr_index_features.c
+> @@ -37,9 +37,7 @@ static void test_get_msr_index(void)
+>  	int old_res, res, kvm_fd, r;
+>  	struct kvm_msr_list *list;
+>  
+> -	kvm_fd = open(KVM_DEV_PATH, O_RDONLY);
+> -	if (kvm_fd < 0)
+> -		exit(KSFT_SKIP);
+> +	kvm_fd = open_kvm_dev_path_or_exit();
+>  
+>  	old_res = kvm_num_index_msrs(kvm_fd, 0);
+>  	TEST_ASSERT(old_res != 0, "Expecting nmsrs to be > 0");
+> @@ -101,9 +99,7 @@ static void test_get_msr_feature(void)
+>  	int res, old_res, i, kvm_fd;
+>  	struct kvm_msr_list *feature_list;
+>  
+> -	kvm_fd = open(KVM_DEV_PATH, O_RDONLY);
+> -	if (kvm_fd < 0)
+> -		exit(KSFT_SKIP);
+> +	kvm_fd = open_kvm_dev_path_or_exit();
+>  
+>  	old_res = kvm_num_feature_msrs(kvm_fd, 0);
+>  	TEST_ASSERT(old_res != 0, "Expecting nmsrs to be > 0");
+> -- 
+> 2.31.1.607.g51e8a6a459-goog
+> 
+
+Thanks,
+drew
 
