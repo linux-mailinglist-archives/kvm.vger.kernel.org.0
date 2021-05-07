@@ -2,239 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DF9183764E7
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 14:12:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26E5737652E
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 14:31:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236093AbhEGMNO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 May 2021 08:13:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35837 "EHLO
+        id S236861AbhEGMcp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 May 2021 08:32:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38654 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236061AbhEGMNO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 May 2021 08:13:14 -0400
+        by vger.kernel.org with ESMTP id S236687AbhEGMco (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 May 2021 08:32:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620389534;
+        s=mimecast20190719; t=1620390704;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=7o2rfVJZNyHJwK9ln3g7JbDOs7uu+V/EsDrZzUW8Nqs=;
-        b=JbdDJUp3JxKQU7Izks44p9nbvFUEI5xKP4AnxPbfhVUo7rRGZOJ/2Z2H2I75chDLFVvRAL
-        FJzpZweQ9bd8hcjkmIYddRPNR4tcEDCb13YBFFhnvoVPlysIkkLfH8PxXKF5v6ofBU1uyJ
-        x8/pP3080dhNj7e79okvXHow6pGK34Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-460-RJMs6oQgM9ybZJpKMQtXjA-1; Fri, 07 May 2021 08:12:12 -0400
-X-MC-Unique: RJMs6oQgM9ybZJpKMQtXjA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0D4F1936B6A;
-        Fri,  7 May 2021 12:12:11 +0000 (UTC)
-Received: from fuller.cnet (ovpn-112-4.gru2.redhat.com [10.97.112.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E9AC10074E0;
-        Fri,  7 May 2021 12:12:04 +0000 (UTC)
-Received: by fuller.cnet (Postfix, from userid 1000)
-        id 84D2B41887F4; Fri,  7 May 2021 09:11:52 -0300 (-03)
-Date:   Fri, 7 May 2021 09:11:52 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Pei Zhang <pezhang@redhat.com>
-Subject: Re: [patch 2/2 V2] KVM: VMX: update vcpu posted-interrupt descriptor
- when assigning device
-Message-ID: <20210507121152.GA367281@fuller.cnet>
-References: <20210506185732.609010123@redhat.com>
- <20210506190419.481236922@redhat.com>
- <20210506192125.GA350334@fuller.cnet>
- <YJRhMrxTrSDClwbQ@google.com>
+        bh=8ZWnxuhYP/znADIXvr0zXi06seVsXloJf8ocVnr0GQY=;
+        b=CVapc7onWuETDJ3V8XStNgeb8o1gY8rwdScLIXFzbOKcoB0W7sj+uV883+aSnHg0n2clRY
+        M+pXQiouT8ZTWF/kgsB9TS2hMmRA3MeY3jTrx/gFW9Wnh6XEgpuYrzA0zacjz7PsN6QKbw
+        OYn/Ur8wfBvqPPRNvY7KelKig6hLF/A=
+Received: from mail-yb1-f200.google.com (mail-yb1-f200.google.com
+ [209.85.219.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-304-H3jZZecQNJKDzQoUaMHvcg-1; Fri, 07 May 2021 08:31:43 -0400
+X-MC-Unique: H3jZZecQNJKDzQoUaMHvcg-1
+Received: by mail-yb1-f200.google.com with SMTP id o186-20020a2528c30000b02904f824478356so9798978ybo.4
+        for <kvm@vger.kernel.org>; Fri, 07 May 2021 05:31:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8ZWnxuhYP/znADIXvr0zXi06seVsXloJf8ocVnr0GQY=;
+        b=iCvVIdoEhSn4Jk1JbPK0MnbtyNNC8I+U/ShOOpPiwZmM3QLA+LKBi9QWcVeITiyBBU
+         iY582uJxCpa/rRHkDat8KU92suqeGJi5q6sSEsa+ItmOUrBoX1n4uCNwedPdgYh3jnQW
+         5igrvVTFw26uC6995YQhn9MTRWzlx+30BRXxpklE0KLV9NaxljhVO+hPxoVm7BvfhQa4
+         nQUPvFbovMiAp3M0IvuYpiQPI3mvX/atimymEm55bUofr7tOuQCwsv8fcAe6Ld/uJ34e
+         Aih3TV6cx54QsQmv+wA4Riu+kdVZPvX5AaFEhswJsbQZFg1xmHCdyCFdgs+PKbhxMlma
+         dYVw==
+X-Gm-Message-State: AOAM533CrJhrK32NyXl4GTMlE1Bwq7qsq26rvDFqDB4pIo1OY2py58J+
+        gn+B4V3pPbGAT7m/eln5cNkll1vDEEnJsi6hG8gpopQrU7edL669zOhHsLQfduWqvUM6gxWDANs
+        QIn43ksTJCEHBH4sTnrZMpqN/wQqM
+X-Received: by 2002:a25:6886:: with SMTP id d128mr13040341ybc.227.1620390702161;
+        Fri, 07 May 2021 05:31:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwgn4lRmwCmgddYwQNaNYZ2/6Vqav0rPUA4Ui4HFMkUNwr3mrG/13QWjAo8m5vsDj7kbtEXN6LAeyuL1i2iASc=
+X-Received: by 2002:a25:6886:: with SMTP id d128mr13040312ybc.227.1620390701899;
+ Fri, 07 May 2021 05:31:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YJRhMrxTrSDClwbQ@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+References: <20210506091859.6961-1-maxime.coquelin@redhat.com>
+ <20210506155004.7e214d8f@redhat.com> <CAFqZXNswPM4nEoRwKjLY=zpnqXLF8SRAWWkhj1EL3CoODYB-=w@mail.gmail.com>
+ <ee4b4bdb-79c1-b91c-2181-2e849cc77ef3@redhat.com>
+In-Reply-To: <ee4b4bdb-79c1-b91c-2181-2e849cc77ef3@redhat.com>
+From:   Ondrej Mosnacek <omosnace@redhat.com>
+Date:   Fri, 7 May 2021 14:31:28 +0200
+Message-ID: <CAFqZXNsDGS-MOqkg1xc47D2RwSmOiekY4Thz84ZM=rJUJCXTBA@mail.gmail.com>
+Subject: Re: [PATCH] vfio: Lock down no-IOMMU mode when kernel is locked down
+To:     Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        James Morris <jmorris@namei.org>,
+        David Howells <dhowells@redhat.com>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Linux Security Module list 
+        <linux-security-module@vger.kernel.org>, kvm@vger.kernel.org,
+        mjg59@srcf.ucam.org, Kees Cook <keescook@chromium.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Paul Moore <paul@paul-moore.com>,
+        Stephen Smalley <stephen.smalley.work@gmail.com>,
+        SElinux list <selinux@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
+(Adding the SELinux list, Paul, and Stephen to Cc)
 
-On Thu, May 06, 2021 at 09:35:46PM +0000, Sean Christopherson wrote:
-> On Thu, May 06, 2021, Marcelo Tosatti wrote:
-> > Index: kvm/arch/x86/kvm/vmx/posted_intr.c
-> > ===================================================================
-> > --- kvm.orig/arch/x86/kvm/vmx/posted_intr.c
-> > +++ kvm/arch/x86/kvm/vmx/posted_intr.c
-> > @@ -114,7 +114,7 @@ static void __pi_post_block(struct kvm_v
-> >  	} while (cmpxchg64(&pi_desc->control, old.control,
-> >  			   new.control) != old.control);
-> >  
-> > -	if (!WARN_ON_ONCE(vcpu->pre_pcpu == -1)) {
-> > +	if (vcpu->pre_pcpu != -1) {
-> >  		spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
-> >  		list_del(&vcpu->blocked_vcpu_list);
-> >  		spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
-> > @@ -135,20 +135,13 @@ static void __pi_post_block(struct kvm_v
-> >   *   this case, return 1, otherwise, return 0.
-> >   *
-> >   */
-> > -int pi_pre_block(struct kvm_vcpu *vcpu)
-> > +static int __pi_pre_block(struct kvm_vcpu *vcpu)
-> >  {
-> >  	unsigned int dest;
-> >  	struct pi_desc old, new;
-> >  	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
-> >  
-> > -	if (!kvm_arch_has_assigned_device(vcpu->kvm) ||
-> > -		!irq_remapping_cap(IRQ_POSTING_CAP)  ||
-> > -		!kvm_vcpu_apicv_active(vcpu))
-> > -		return 0;
-> > -
-> > -	WARN_ON(irqs_disabled());
-> > -	local_irq_disable();
-> > -	if (!WARN_ON_ONCE(vcpu->pre_pcpu != -1)) {
-> > +	if (vcpu->pre_pcpu == -1) {
-> >  		vcpu->pre_pcpu = vcpu->cpu;
-> >  		spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
-> >  		list_add_tail(&vcpu->blocked_vcpu_list,
-> > @@ -188,12 +181,33 @@ int pi_pre_block(struct kvm_vcpu *vcpu)
-> >  	if (pi_test_on(pi_desc) == 1)
-> >  		__pi_post_block(vcpu);
-> >  
-> > +	return (vcpu->pre_pcpu == -1);
-> 
-> Nothing checks the return of __pi_pre_block(), this can be dropped and the
-> helper can be a void return.
+On Fri, May 7, 2021 at 11:11 AM Maxime Coquelin
+<maxime.coquelin@redhat.com> wrote:
+> On 5/7/21 10:37 AM, Ondrej Mosnacek wrote:
+> > On Thu, May 6, 2021 at 11:50 PM Alex Williamson
+> > <alex.williamson@redhat.com> wrote:
+> >> On Thu,  6 May 2021 11:18:59 +0200
+> >> Maxime Coquelin <maxime.coquelin@redhat.com> wrote:
+> >>
+> >>> When no-IOMMU mode is enabled, VFIO is as unsafe as accessing
+> >>> the PCI BARs via the device's sysfs, which is locked down when
+> >>> the kernel is locked down.
+> >>>
+> >>> Indeed, it is possible for an attacker to craft DMA requests
+> >>> to modify kernel's code or leak secrets stored in the kernel,
+> >>> since the device is not isolated by an IOMMU.
+> >>>
+> >>> This patch introduces a new integrity lockdown reason for the
+> >>> unsafe VFIO no-iommu mode.
+> >>
+> >> I'm hoping security folks will chime in here as I'm not familiar with
+> >> the standard practices for new lockdown reasons.  The vfio no-iommu
+> >> backend is clearly an integrity risk, which is why it's already hidden
+> >> behind a separate Kconfig option, requires RAWIO capabilities, and
+> >> taints the kernel if it's used, but I agree that preventing it during
+> >> lockdown seems like a good additional step.
+> >>
+> >> Is it generally advised to create specific reasons, like done here, or
+> >> should we aim to create a more generic reason related to unrestricted
+> >> userspace DMA?
+>
+> I am fine with a more generic reason. I'm also not sure what is the best
+> thing to do in term of granularity.
+>
+> >> I understand we don't want to re-use PCI_ACCESS because the vfio
+> >> no-iommu backend is device agnostic, it can be used for both PCI and
+> >> non-PCI devices.
+>
+> Right, that's why I created a new reason.
+>
+> >>> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+> >>> ---
+> >>>  drivers/vfio/vfio.c      | 13 +++++++++----
+> >>>  include/linux/security.h |  1 +
+> >>>  security/security.c      |  1 +
+> >>>  3 files changed, 11 insertions(+), 4 deletions(-)
+> >>>
+> >>> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> >>> index 5e631c359ef2..fe466d6ea5d8 100644
+> >>> --- a/drivers/vfio/vfio.c
+> >>> +++ b/drivers/vfio/vfio.c
+> >>> @@ -25,6 +25,7 @@
+> >>>  #include <linux/pci.h>
+> >>>  #include <linux/rwsem.h>
+> >>>  #include <linux/sched.h>
+> >>> +#include <linux/security.h>
+> >>>  #include <linux/slab.h>
+> >>>  #include <linux/stat.h>
+> >>>  #include <linux/string.h>
+> >>> @@ -165,7 +166,8 @@ static void *vfio_noiommu_open(unsigned long arg)
+> >>>  {
+> >>>       if (arg != VFIO_NOIOMMU_IOMMU)
+> >>>               return ERR_PTR(-EINVAL);
+> >>> -     if (!capable(CAP_SYS_RAWIO))
+> >>> +     if (!capable(CAP_SYS_RAWIO) ||
+> >>> +                     security_locked_down(LOCKDOWN_VFIO_NOIOMMU))
+> >>>               return ERR_PTR(-EPERM);
+> >>>
+> >>>       return NULL;
+> >>> @@ -1280,7 +1282,8 @@ static int vfio_group_set_container(struct vfio_group *group, int container_fd)
+> >>>       if (atomic_read(&group->container_users))
+> >>>               return -EINVAL;
+> >>>
+> >>> -     if (group->noiommu && !capable(CAP_SYS_RAWIO))
+> >>> +     if (group->noiommu && (!capable(CAP_SYS_RAWIO) ||
+> >>> +                     security_locked_down(LOCKDOWN_VFIO_NOIOMMU)))
+> >>>               return -EPERM;
+> >>>
+> >>>       f = fdget(container_fd);
+> >>> @@ -1362,7 +1365,8 @@ static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
+> >>>           !group->container->iommu_driver || !vfio_group_viable(group))
+> >>>               return -EINVAL;
+> >>>
+> >>> -     if (group->noiommu && !capable(CAP_SYS_RAWIO))
+> >>> +     if (group->noiommu && (!capable(CAP_SYS_RAWIO) ||
+> >>> +                     security_locked_down(LOCKDOWN_VFIO_NOIOMMU)))
+> >>>               return -EPERM;
+> >>>
+> >>>       device = vfio_device_get_from_name(group, buf);
+> >>> @@ -1490,7 +1494,8 @@ static int vfio_group_fops_open(struct inode *inode, struct file *filep)
+> >>>       if (!group)
+> >>>               return -ENODEV;
+> >>>
+> >>> -     if (group->noiommu && !capable(CAP_SYS_RAWIO)) {
+> >>> +     if (group->noiommu && (!capable(CAP_SYS_RAWIO) ||
+> >>> +                     security_locked_down(LOCKDOWN_VFIO_NOIOMMU))) {
+> >>>               vfio_group_put(group);
+> >>>               return -EPERM;
+> >>>       }
+> >>
+> >> In these cases where we're testing RAWIO, the idea is to raise the
+> >> barrier of passing file descriptors to unprivileged users.  Is lockdown
+> >> sufficiently static that we might really only need the test on open?
+> >> The latter three cases here only make sense if the user were able to
+> >> open a no-iommu context when lockdown is not enabled, then lockdown is
+> >> later enabled preventing them from doing anything with that context...
+> >> but not preventing ongoing unsafe usage that might already exist.  I
+> >> suspect for that reason that lockdown is static and we really only need
+> >> the test on open.  Thanks,
+> >
+> > Note that SELinux now also implements the locked_down hook and that
+> > implementation is not static like the Lockdown LSM's. It checks
+> > whether the current task's SELinux domain has either integrity or
+> > confidentiality permission granted by the policy, so for SELinux it
+> > makes sense to have the lockdown hook called in these other places as
+> > well.
+> >
+>
+> Thanks Ondrej for the insights, is there any plan for selinux to support
+> finer granularity than integrity and confidentiality? I'm not sure it
+> makes sense, but it might help to understand if we should choose between
+> a "VFIO no-iommu mode" reason and a more generic userspace DMA one.
 
-Done.
+Looking at the ML discussion under the original patch posting [1],
+having a finer granularity was preferred, but there was a concern that
+the list of reasons would change too much, making the kernel <->
+policy interface too unstable. Looking at the git log, the list of
+lockdown reasons hasn't changed much since the original SELinux
+implementation was added (there was just one addition, not counting
+this patch), so it looks like switching SELinux to finer granularity
+would be viable now.
 
-> > +}
-> > +
-> > +int pi_pre_block(struct kvm_vcpu *vcpu)
-> > +{
-> > +	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> > +
-> > +	vmx->in_blocked_section = true;
-> > +
-> > +	if (!kvm_arch_has_assigned_device(vcpu->kvm) ||
-> > +		!irq_remapping_cap(IRQ_POSTING_CAP)  ||
-> > +		!kvm_vcpu_apicv_active(vcpu))
-> 
-> Opportunistically fix the indentation?
+I'm not sure whether the less or more generic variant would be better
+here... Perhaps Stephen or Paul will have an opinion.
 
-Done.
+[1] https://lore.kernel.org/selinux/365ca063-6efd-8051-8d4b-5c8aef0d2e12@tycho.nsa.gov/T/
 
-> > +		return 0;
-> > +
-> > +	WARN_ON(irqs_disabled());
-> > +	local_irq_disable();
-> > +	__pi_pre_block(vcpu);
-> >  	local_irq_enable();
-> > +
-> >  	return (vcpu->pre_pcpu == -1);
-> >  }
-> >  
-> >  void pi_post_block(struct kvm_vcpu *vcpu)
-> >  {
-> > +	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> > +
-> > +	vmx->in_blocked_section = false;
-> >  	if (vcpu->pre_pcpu == -1)
-> >  		return;
-> >  
-> > @@ -236,6 +250,52 @@ bool pi_has_pending_interrupt(struct kvm
-> >  		(pi_test_sn(pi_desc) && !pi_is_pir_empty(pi_desc));
-> >  }
-> >  
-> > +static void pi_update_wakeup_vector(void *data)
-> > +{
-> > +	struct vcpu_vmx *vmx;
-> > +	struct kvm_vcpu *vcpu = data;
-> > +
-> > +	vmx = to_vmx(vcpu);
-> > +
-> > +	/* race with pi_post_block ? */
-> > +	if (vcpu->pre_pcpu != -1)
-> 
-> This seems wrong.  The funky code in __pi_pre_block() regarding pre_cpu muddies
-> the waters, but I don't think it's safe to call __pi_pre_block() from a pCPU
-> other than the pCPU that is associated with the vCPU.
-
-From Intel's manual:
-
-"29.6 POSTED-INTERRUPT PROCESSING
-
-...
-
-Use of the posted-interrupt descriptor differs from that of other
-data structures that are referenced by pointers in a VMCS. There is a
-general requirement that software ensure that each such data structure
-is modified only when no logical processor with a current VMCS that
-references it is in VMX non-root operation. That requirement does not
-apply to the posted-interrupt descriptor. There is a requirement,
-however, that such modifications be done using locked read-modify-write
-instructions."
-
-> If the vCPU is migrated after vmx_pi_start_assignment() grabs vcpu->cpu but
-> before the IPI arrives (to run pi_update_wakeup_vector()), then it's possible
-> that a different pCPU could be running __pi_pre_block() concurrently with this
-> code.  If that happens, both pcPUs could see "vcpu->pre_cpu == -1" and corrupt
-> the list due to a double list_add_tail.
-
-Good point.
-
-> The existing code is unnecessarily confusing, but unless I'm missing something,
-> it's guaranteed to call pi_pre_block() from the pCPU that is associated with the
-> pCPU, i.e. arguably it could/should use this_cpu_ptr(). 
-
-Well problem is it might not exit kvm_vcpu_block(). However that can be
-fixed.
-
-
->  Because the existing
-> code grabs vcpu->cpu with IRQs disabled and is called only from KVM_RUN,
-> vcpu->cpu is guaranteed to match the current pCPU since vcpu->cpu will be set to
-> the current pCPU when the vCPU is scheduled in.
-> 
-> Assuming my analysis is correct (definitely not guaranteed), I'm struggling to
-> come up with an elegant solution.  But, do we need an elegant solution?  E.g.
-> can the start_assignment() hook simply kick all vCPUs with APICv active?
-> 
-> > +		return;
-> > +
-> > +	if (!vmx->in_blocked_section)
-> > +		return;
-> > +
-> > +	__pi_pre_block(vcpu);
-> > +}
-> > +
-> > +void vmx_pi_start_assignment(struct kvm *kvm, int device_count)
-> > +{
-> > +	struct kvm_vcpu *vcpu;
-> > +	int i;
-> > +
-> > +	if (!irq_remapping_cap(IRQ_POSTING_CAP))
-> > +		return;
-> > +
-> > +	/* only care about first device assignment */
-> > +	if (device_count != 1)
-> > +		return;
-> > +
-> > +	/* Update wakeup vector and add vcpu to blocked_vcpu_list */
-> > +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> > +		struct vcpu_vmx *vmx = to_vmx(vcpu);
-> > +		int pcpu;
-> > +
-> > +		if (!kvm_vcpu_apicv_active(vcpu))
-> > +			continue;
-> > +
-> > +		preempt_disable();
-> 
-> Any reason not to do "cpu = get_cpu()"?  Might make sense to do that outside of
-> the for-loop, too.
-
-kvm_vcpu_kick seems cleaner, just need to add another arch
-hook to allow kvm_vcpu_block() to return.
-
-Thanks for the review! Will resend after testing.
+--
+Ondrej Mosnacek
+Software Engineer, Linux Security - SELinux kernel
+Red Hat, Inc.
 
