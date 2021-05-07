@@ -2,58 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E115A376910
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 18:52:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A30A6376925
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 18:58:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237071AbhEGQxU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 May 2021 12:53:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49406 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233797AbhEGQxS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 May 2021 12:53:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620406337;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=h+S8doMBTdYelFV+sS7BmEZ8OEDR2ZNO9i+PaJSM0AA=;
-        b=CneR1B49BjclH6XNs1j487ddELgcvC6svCreXqoi8ijzV18nrCb0q7gAtiY8SVUEi3rUpQ
-        3zUMfYwZPpiynSgfOUFEbeHXpSdmMUxIiYPctlperjPT1G6vYhBQ9YsrMJIWX6qcx57mdF
-        Ecmzujcv85OKpp7KxRP5su9BlWC6vUI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-PTY1eAWuOOSoDscDlKTH9g-1; Fri, 07 May 2021 12:52:16 -0400
-X-MC-Unique: PTY1eAWuOOSoDscDlKTH9g-1
-Received: by mail-wr1-f69.google.com with SMTP id t18-20020adfdc120000b02900ffe4432d8bso3848573wri.6
-        for <kvm@vger.kernel.org>; Fri, 07 May 2021 09:52:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=h+S8doMBTdYelFV+sS7BmEZ8OEDR2ZNO9i+PaJSM0AA=;
-        b=YCcAQ+KF2h0MZ1ZKdJHNZPC4sCbV+qcxo/eSUOhTpeYNbVqkc4CtSocKaDoW+93UPZ
-         YWurnvTWLZrXM7u3ZnCnNJa/Tf2OkbFNcmQ0B7W0vqX4h1oy1JRc6bmZ434wFmafzWXj
-         qzxRgKvcOZEydhV+2MWmtJrgYR9etFfDJzXTEHGCmBHVDvbcPn+vbY57ZzExPn/D1Voi
-         bXFgOJWQgwjgA/zIMfwur35ufpBmovu0xBk01lhJmGvLbzC+nxRihvaKLMqada0w2/KM
-         Uejxy/5yCQJzZPGhC31L2w9IMHy+V73tXEMD5pyYcXtCXYtiFA/br9/jThZB/o1CPfH7
-         /18w==
-X-Gm-Message-State: AOAM531iUzHzfAkZH+2m0MnjzdJmTYuKM6VypR7n3MvZB+DomlBh9btA
-        3cv2oQ5M0LmljxruF+qXjxvmu37QOTk2OgRLmOlJCLocDqdfi6BiwnBLCZV+Ou7MFqrk4Yx04l2
-        ZfzXm1MEVW2pNdgZ621ehtjeu9n0WWEwIOA9BjQOZeu8OSsnqmhOJSCL31qW4KzEX
-X-Received: by 2002:adf:f2ce:: with SMTP id d14mr8283561wrp.384.1620406334784;
-        Fri, 07 May 2021 09:52:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxuHIzab3som8mEifHdG6z6H0HXWrTHx5n8FsQjFIT8yASS8a8NGyLOblNiq/WP2hLJEnnaxQ==
-X-Received: by 2002:adf:f2ce:: with SMTP id d14mr8283517wrp.384.1620406334515;
-        Fri, 07 May 2021 09:52:14 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id f3sm8460641wrp.7.2021.05.07.09.52.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 May 2021 09:52:13 -0700 (PDT)
+        id S237117AbhEGQ7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 May 2021 12:59:41 -0400
+Received: from mga12.intel.com ([192.55.52.136]:55083 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236002AbhEGQ7k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 May 2021 12:59:40 -0400
+IronPort-SDR: n2lbfxXYpqBylyttp97PIqKZ74LzJ7uMEem5lA4bK899nKRfM4FFa4oLwhbqdLNzusbkZOJ1VM
+ XjSSPsY8b21A==
+X-IronPort-AV: E=McAfee;i="6200,9189,9977"; a="178332823"
+X-IronPort-AV: E=Sophos;i="5.82,281,1613462400"; 
+   d="scan'208";a="178332823"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2021 09:58:40 -0700
+IronPort-SDR: YgqrEfFZRrHLPBBBcck8G5GdEs4aOzKt/p8qHr+MwtXXqLuF4Yjvh3wlkbDqCrkSBHCBjuxBwE
+ jjRidWlEdXxg==
+X-IronPort-AV: E=Sophos;i="5.82,281,1613462400"; 
+   d="scan'208";a="431446391"
+Received: from msandrid-mobl.amr.corp.intel.com (HELO [10.212.134.124]) ([10.212.134.124])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2021 09:58:39 -0700
 Subject: Re: [PATCH] KVM: x86: add hint to skip hidden rdpkru under
  kvm_load_host_xsave_state
-To:     Jon Kohler <jon@nutanix.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, Jon Kohler <jon@nutanix.com>
 Cc:     Babu Moger <babu.moger@amd.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -63,7 +36,6 @@ Cc:     Babu Moger <babu.moger@amd.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Dave Hansen <dave.hansen@intel.com>,
         Fenghua Yu <fenghua.yu@intel.com>,
         Yu-cheng Yu <yu-cheng.yu@intel.com>,
         Tony Luck <tony.luck@intel.com>,
@@ -81,79 +53,76 @@ Cc:     Babu Moger <babu.moger@amd.com>,
         Arvind Sankar <nivedita@alum.mit.edu>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 References: <20210507164456.1033-1-jon@nutanix.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <16af038e-5b30-2509-4e3b-3b3ed9d4b81e@redhat.com>
-Date:   Fri, 7 May 2021 18:52:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+ <16af038e-5b30-2509-4e3b-3b3ed9d4b81e@redhat.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
+ oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
+ 2UnKuZuSBu7lgOE193+7Uks3416N2hTkyKUSNkduyoZ9F5twiBhxPJwPtn/wnch6n5RsoXsb
+ ygOEDxLEsSk/7eyFycjE+btUtAWZtx+HseyaGfqkZK0Z9bT1lsaHecmB203xShwCPT49Blxz
+ VOab8668QpaEOdLGhtvrVYVK7x4skyT3nGWcgDCl5/Vp3TWA4K+IofwvXzX2ON/Mj7aQwf5W
+ iC+3nWC7q0uxKwwsddJ0Nu+dpA/UORQWa1NiAftEoSpk5+nUUi0WE+5DRm0H+TXKBWMGNCFn
+ c6+EKg5zQaa8KqymHcOrSXNPmzJuXvDQ8uj2J8XuzCZfK4uy1+YdIr0yyEMI7mdh4KX50LO1
+ pmowEqDh7dLShTOif/7UtQYrzYq9cPnjU2ZW4qd5Qz2joSGTG9eCXLz5PRe5SqHxv6ljk8mb
+ ApNuY7bOXO/A7T2j5RwXIlcmssqIjBcxsRRoIbpCwWWGjkYjzYCjgsNFL6rt4OL11OUF37wL
+ QcTl7fbCGv53KfKPdYD5hcbguLKi/aCccJK18ZwNjFhqr4MliQARAQABzShEYXZpZCBDaHJp
+ c3RvcGhlciBIYW5zZW4gPGRhdmVAc3I3MS5uZXQ+wsF7BBMBAgAlAhsDBgsJCAcDAgYVCAIJ
+ CgsEFgIDAQIeAQIXgAUCTo3k0QIZAQAKCRBoNZUwcMmSsMO2D/421Xg8pimb9mPzM5N7khT0
+ 2MCnaGssU1T59YPE25kYdx2HntwdO0JA27Wn9xx5zYijOe6B21ufrvsyv42auCO85+oFJWfE
+ K2R/IpLle09GDx5tcEmMAHX6KSxpHmGuJmUPibHVbfep2aCh9lKaDqQR07gXXWK5/yU1Dx0r
+ VVFRaHTasp9fZ9AmY4K9/BSA3VkQ8v3OrxNty3OdsrmTTzO91YszpdbjjEFZK53zXy6tUD2d
+ e1i0kBBS6NLAAsqEtneplz88T/v7MpLmpY30N9gQU3QyRC50jJ7LU9RazMjUQY1WohVsR56d
+ ORqFxS8ChhyJs7BI34vQusYHDTp6PnZHUppb9WIzjeWlC7Jc8lSBDlEWodmqQQgp5+6AfhTD
+ kDv1a+W5+ncq+Uo63WHRiCPuyt4di4/0zo28RVcjtzlGBZtmz2EIC3vUfmoZbO/Gn6EKbYAn
+ rzz3iU/JWV8DwQ+sZSGu0HmvYMt6t5SmqWQo/hyHtA7uF5Wxtu1lCgolSQw4t49ZuOyOnQi5
+ f8R3nE7lpVCSF1TT+h8kMvFPv3VG7KunyjHr3sEptYxQs4VRxqeirSuyBv1TyxT+LdTm6j4a
+ mulOWf+YtFRAgIYyyN5YOepDEBv4LUM8Tz98lZiNMlFyRMNrsLV6Pv6SxhrMxbT6TNVS5D+6
+ UorTLotDZKp5+M7BTQRUY85qARAAsgMW71BIXRgxjYNCYQ3Xs8k3TfAvQRbHccky50h99TUY
+ sqdULbsb3KhmY29raw1bgmyM0a4DGS1YKN7qazCDsdQlxIJp9t2YYdBKXVRzPCCsfWe1dK/q
+ 66UVhRPP8EGZ4CmFYuPTxqGY+dGRInxCeap/xzbKdvmPm01Iw3YFjAE4PQ4hTMr/H76KoDbD
+ cq62U50oKC83ca/PRRh2QqEqACvIH4BR7jueAZSPEDnzwxvVgzyeuhwqHY05QRK/wsKuhq7s
+ UuYtmN92Fasbxbw2tbVLZfoidklikvZAmotg0dwcFTjSRGEg0Gr3p/xBzJWNavFZZ95Rj7Et
+ db0lCt0HDSY5q4GMR+SrFbH+jzUY/ZqfGdZCBqo0cdPPp58krVgtIGR+ja2Mkva6ah94/oQN
+ lnCOw3udS+Eb/aRcM6detZr7XOngvxsWolBrhwTQFT9D2NH6ryAuvKd6yyAFt3/e7r+HHtkU
+ kOy27D7IpjngqP+b4EumELI/NxPgIqT69PQmo9IZaI/oRaKorYnDaZrMXViqDrFdD37XELwQ
+ gmLoSm2VfbOYY7fap/AhPOgOYOSqg3/Nxcapv71yoBzRRxOc4FxmZ65mn+q3rEM27yRztBW9
+ AnCKIc66T2i92HqXCw6AgoBJRjBkI3QnEkPgohQkZdAb8o9WGVKpfmZKbYBo4pEAEQEAAcLB
+ XwQYAQIACQUCVGPOagIbDAAKCRBoNZUwcMmSsJeCEACCh7P/aaOLKWQxcnw47p4phIVR6pVL
+ e4IEdR7Jf7ZL00s3vKSNT+nRqdl1ugJx9Ymsp8kXKMk9GSfmZpuMQB9c6io1qZc6nW/3TtvK
+ pNGz7KPPtaDzvKA4S5tfrWPnDr7n15AU5vsIZvgMjU42gkbemkjJwP0B1RkifIK60yQqAAlT
+ YZ14P0dIPdIPIlfEPiAWcg5BtLQU4Wg3cNQdpWrCJ1E3m/RIlXy/2Y3YOVVohfSy+4kvvYU3
+ lXUdPb04UPw4VWwjcVZPg7cgR7Izion61bGHqVqURgSALt2yvHl7cr68NYoFkzbNsGsye9ft
+ M9ozM23JSgMkRylPSXTeh5JIK9pz2+etco3AfLCKtaRVysjvpysukmWMTrx8QnI5Nn5MOlJj
+ 1Ov4/50JY9pXzgIDVSrgy6LYSMc4vKZ3QfCY7ipLRORyalFDF3j5AGCMRENJjHPD6O7bl3Xo
+ 4DzMID+8eucbXxKiNEbs21IqBZbbKdY1GkcEGTE7AnkA3Y6YB7I/j9mQ3hCgm5muJuhM/2Fr
+ OPsw5tV/LmQ5GXH0JQ/TZXWygyRFyyI2FqNTx4WHqUn3yFj8rwTAU1tluRUYyeLy0ayUlKBH
+ ybj0N71vWO936MqP6haFERzuPAIpxj2ezwu0xb1GjTk4ynna6h5GjnKgdfOWoRtoWndMZxbA
+ z5cecg==
+Message-ID: <709442d7-68e8-32a8-05b4-8a16748d9f11@intel.com>
+Date:   Fri, 7 May 2021 09:58:38 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210507164456.1033-1-jon@nutanix.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <16af038e-5b30-2509-4e3b-3b3ed9d4b81e@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Nice one.  The patch can be made simpler though (I think).
-
-On 07/05/21 18:44, Jon Kohler wrote:
-  @@ -122,7 +124,7 @@ static inline u32 rdpkru(void)
->   	return 0;
->   }
+On 5/7/21 9:52 AM, Paolo Bonzini wrote:
+> This can be optimized as well, can't it?  This means that the only case
+> that needs the rdpkru is in switch_fpu_finish, and __write_pkru can be
+> removed completely:
 > 
-> -static inline void __write_pkru(u32 pkru)
-> +static inline void __write_pkru(u32 pkru, bool skip_comparison)
->   {
->   }
->   #endif
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index cebdaa1e3cf5..cd95adbd140c 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -912,10 +912,10 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu)
->   	}
+> - do the rdpkru+wrpkru in switch_fpu_finish
 > 
->   	if (static_cpu_has(X86_FEATURE_PKU) &&
-> -	    (kvm_read_cr4_bits(vcpu, X86_CR4_PKE) ||
-> -	     (vcpu->arch.xcr0 & XFEATURE_MASK_PKRU)) &&
-> -	    vcpu->arch.pkru != vcpu->arch.host_pkru)
-> -		__write_pkru(vcpu->arch.pkru);
-> +	    vcpu->arch.pkru != vcpu->arch.host_pkru &&
-> +	    ((vcpu->arch.xcr0 & XFEATURE_MASK_PKRU) ||
-> +	     kvm_read_cr4_bits(vcpu, X86_CR4_PKE)))
-> +		__write_pkru(vcpu->arch.pkru, false);
+> - just use wrpkru in KVM
 
-This can be optimized as well, can't it?  This means that the only case 
-that needs the rdpkru is in switch_fpu_finish, and __write_pkru can be 
-removed completely:
+I was going to suggest exactly the same thing.  It doesn't require the
+compiler to be smart, and wrpkru() is available in the same header as
+__write_pkru().
 
-- do the rdpkru+wrpkru in switch_fpu_finish
-
-- just use wrpkru in KVM
-
-Paolo
-
-
->   }
->   EXPORT_SYMBOL_GPL(kvm_load_guest_xsave_state);
-> 
-> @@ -925,11 +925,11 @@ void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
->   		return;
-> 
->   	if (static_cpu_has(X86_FEATURE_PKU) &&
-> -	    (kvm_read_cr4_bits(vcpu, X86_CR4_PKE) ||
-> -	     (vcpu->arch.xcr0 & XFEATURE_MASK_PKRU))) {
-> +	    ((vcpu->arch.xcr0 & XFEATURE_MASK_PKRU) ||
-> +	     kvm_read_cr4_bits(vcpu, X86_CR4_PKE))) {
->   		vcpu->arch.pkru = rdpkru();
->   		if (vcpu->arch.pkru != vcpu->arch.host_pkru)
-> -			__write_pkru(vcpu->arch.host_pkru);
-> +			__write_pkru(vcpu->arch.host_pkru, true);
->   	}
-> 
->   	if (kvm_read_cr4_bits(vcpu, X86_CR4_OSXSAVE)) {
-> --
-> 2.30.1 (Apple Git-130)
-> 
-
+I also detest the mysterious true/false arguments to functions where you
+have no clue what they're doing at the call site without comments.
