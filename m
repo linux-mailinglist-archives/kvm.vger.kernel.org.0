@@ -2,180 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C17F4376235
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 10:37:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4440F376246
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 10:42:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236356AbhEGIiV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 May 2021 04:38:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36497 "EHLO
+        id S235011AbhEGInY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 May 2021 04:43:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29047 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233735AbhEGIiU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 May 2021 04:38:20 -0400
+        by vger.kernel.org with ESMTP id S233340AbhEGInX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 May 2021 04:43:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620376640;
+        s=mimecast20190719; t=1620376944;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=G4FGrNimJhV01IK3zZ0JL4RVVApImUVGYjkgoM4AFN0=;
-        b=Y2HNdQlbgbxH2vQVugjm+WOuSYybEMSzpeo/904eTqrgVMcPHi6MKJ6MwzsUoXJxJXNBwR
-        bo9eBc+7cq1ytvn0HB9Me+X3v1D5XHBjgctcsFrkHunNgQxj5/ETYrXPNoY/tJwvmrwoSk
-        GdT1C5JplCQUBN16zN+JEM4+1weVP2Q=
-Received: from mail-yb1-f200.google.com (mail-yb1-f200.google.com
- [209.85.219.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-70-xIAYxamwOMyu0meP85BhHw-1; Fri, 07 May 2021 04:37:19 -0400
-X-MC-Unique: xIAYxamwOMyu0meP85BhHw-1
-Received: by mail-yb1-f200.google.com with SMTP id j63-20020a25d2420000b02904d9818b80e8so9148104ybg.14
-        for <kvm@vger.kernel.org>; Fri, 07 May 2021 01:37:19 -0700 (PDT)
+        bh=xfCXoiSRUf8EHAREMqARq69JqzDyk9XVPqTBvkTg9rI=;
+        b=gVXu3HtBW746PzK5QEAJ6LcGT94mF1scIFBKDJN3KUOnvf57yzYyECOOakQqDMQS9UfhOa
+        mJBCAfO7sSEdeHssy8zXg9RJH3Pa97uf3yjq4u/JgYg8ihSmX7phxHGpoR+Qjqr1YZQPpp
+        YdLhXM0C7Sff084CZi/2KheHANc58vw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-124-mG9DIUbCNEWUSoJE15qIJg-1; Fri, 07 May 2021 04:42:22 -0400
+X-MC-Unique: mG9DIUbCNEWUSoJE15qIJg-1
+Received: by mail-wm1-f71.google.com with SMTP id n9-20020a1c40090000b02901401bf40f9dso3670303wma.0
+        for <kvm@vger.kernel.org>; Fri, 07 May 2021 01:42:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=G4FGrNimJhV01IK3zZ0JL4RVVApImUVGYjkgoM4AFN0=;
-        b=uIs+HnPhdjIPJp7dXofpGYX+VqhZU1TweeYyJjEf6Z+iWX3rF+uPMps2akf7RESgiQ
-         8TGFNu7Q/9YmpeQQDISPWLMIRgL/0nYtACevHhQLm0lLDp0bUzcJ6cuKBGez6y8KYQYF
-         vHNJXO7T9WVPGjpuSPEqEkuAwDnbm0rVmR0kNzx6VS+MNuXTt1HZsKJkWPQRfrdmbEuv
-         KOozmhOdlJKYPUONpWacTFOHuKcnRFpK5IpWicVOTFHNIbGWdQxfaaCbcwD7dYDlLsgG
-         6zD1AW4WAHhaQEKmUFeIAgOwf+ISbDdcYBDuFNRGr3KjQUi8guK8VkJ3OvorFEtZapdj
-         qBJw==
-X-Gm-Message-State: AOAM532+qMXi8qOXV5AstIq95wT5/toqWaM280cy8QfSFqLqesO9TQEe
-        9lLZawr3TWEIeUzoTYAcz9HNScxY1gNKaI2+IAy4F+Go6jrgE9ebNDs0X/0zNqQC0qNnfK6pnIX
-        wIGv6TTKMwb3rG5YRleU5UoreKr3a
-X-Received: by 2002:a25:cccd:: with SMTP id l196mr12372288ybf.26.1620376638468;
-        Fri, 07 May 2021 01:37:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxewIyOv51q5Ji9x8dEqFP2aSx4Up03TrbmnULK/VTdw16ioRy22PBDlbvyRSw6NJNCizaj7Ckva55HsAkki/w=
-X-Received: by 2002:a25:cccd:: with SMTP id l196mr12372264ybf.26.1620376638189;
- Fri, 07 May 2021 01:37:18 -0700 (PDT)
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=xfCXoiSRUf8EHAREMqARq69JqzDyk9XVPqTBvkTg9rI=;
+        b=kb7/pJQSdn0ShhPIEgR8szXD0r2ZX+P+KPvIz8pRqSSVIKe2R8Fi26MvdSDJbN/2KD
+         4sg+mW5uya99JCt5YMU8Jo7FKoP893Dg1QbvAL3xcSb1qjXdNkU/qWsqVoeosUz275Lz
+         EA18IkywtnLaS11ej/OHgNQrtgj45msJpaoud86wd8bT4ybXZ30af7NpT//dQvTijw36
+         gmN2sRaTRPth3tvLAv0ogVesE9ArZlSvKPsc8liC0TYkiogt1xgPBq5kDJpNVWE4Ek+r
+         R6zD7iZSWVD/fJD+hVZdOOiRtxJxh9YTK2w2wNbh+H9fworybRDsqstk/wljzqmnuveW
+         XQYA==
+X-Gm-Message-State: AOAM531FDOtWBFOTzE0VzTdtOj1h2NC6wAm3/iAcVimb8QbJde2epgma
+        3J6XnXhAr5R56FhLPerHdyW3hmxnVkjDjJO0Tg3YRevG8Y9OchInhwm22QTbPlcFS4rOX1GOPH5
+        Zl0UtyuukD17h
+X-Received: by 2002:a5d:400f:: with SMTP id n15mr6846898wrp.274.1620376941330;
+        Fri, 07 May 2021 01:42:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwoFMyEIZk1TCndnag6cii3qK499Zt0/XLGrLq/Nt25lWx4sb8T0QrY1Xct3knS7xGtliLwCw==
+X-Received: by 2002:a5d:400f:: with SMTP id n15mr6846875wrp.274.1620376941115;
+        Fri, 07 May 2021 01:42:21 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id n10sm7744773wrw.37.2021.05.07.01.42.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 May 2021 01:42:20 -0700 (PDT)
+To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>
+References: <20210506184241.618958-1-bgardon@google.com>
+ <20210506184241.618958-8-bgardon@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 7/8] KVM: x86/mmu: Protect rmaps independently with
+ SRCU
+Message-ID: <e2e73709-f247-1a60-4835-f3fad37ab736@redhat.com>
+Date:   Fri, 7 May 2021 10:42:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-References: <20210506091859.6961-1-maxime.coquelin@redhat.com> <20210506155004.7e214d8f@redhat.com>
-In-Reply-To: <20210506155004.7e214d8f@redhat.com>
-From:   Ondrej Mosnacek <omosnace@redhat.com>
-Date:   Fri, 7 May 2021 10:37:04 +0200
-Message-ID: <CAFqZXNswPM4nEoRwKjLY=zpnqXLF8SRAWWkhj1EL3CoODYB-=w@mail.gmail.com>
-Subject: Re: [PATCH] vfio: Lock down no-IOMMU mode when kernel is locked down
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Maxime Coquelin <maxime.coquelin@redhat.com>,
-        James Morris <jmorris@namei.org>,
-        David Howells <dhowells@redhat.com>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        Linux Security Module list 
-        <linux-security-module@vger.kernel.org>, kvm@vger.kernel.org,
-        mjg59@srcf.ucam.org, Kees Cook <keescook@chromium.org>,
-        Cornelia Huck <cohuck@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210506184241.618958-8-bgardon@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 6, 2021 at 11:50 PM Alex Williamson
-<alex.williamson@redhat.com> wrote:
-> On Thu,  6 May 2021 11:18:59 +0200
-> Maxime Coquelin <maxime.coquelin@redhat.com> wrote:
->
-> > When no-IOMMU mode is enabled, VFIO is as unsafe as accessing
-> > the PCI BARs via the device's sysfs, which is locked down when
-> > the kernel is locked down.
-> >
-> > Indeed, it is possible for an attacker to craft DMA requests
-> > to modify kernel's code or leak secrets stored in the kernel,
-> > since the device is not isolated by an IOMMU.
-> >
-> > This patch introduces a new integrity lockdown reason for the
-> > unsafe VFIO no-iommu mode.
->
-> I'm hoping security folks will chime in here as I'm not familiar with
-> the standard practices for new lockdown reasons.  The vfio no-iommu
-> backend is clearly an integrity risk, which is why it's already hidden
-> behind a separate Kconfig option, requires RAWIO capabilities, and
-> taints the kernel if it's used, but I agree that preventing it during
-> lockdown seems like a good additional step.
->
-> Is it generally advised to create specific reasons, like done here, or
-> should we aim to create a more generic reason related to unrestricted
-> userspace DMA?
->
-> I understand we don't want to re-use PCI_ACCESS because the vfio
-> no-iommu backend is device agnostic, it can be used for both PCI and
-> non-PCI devices.
->
-> > Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
-> > ---
-> >  drivers/vfio/vfio.c      | 13 +++++++++----
-> >  include/linux/security.h |  1 +
-> >  security/security.c      |  1 +
-> >  3 files changed, 11 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> > index 5e631c359ef2..fe466d6ea5d8 100644
-> > --- a/drivers/vfio/vfio.c
-> > +++ b/drivers/vfio/vfio.c
-> > @@ -25,6 +25,7 @@
-> >  #include <linux/pci.h>
-> >  #include <linux/rwsem.h>
-> >  #include <linux/sched.h>
-> > +#include <linux/security.h>
-> >  #include <linux/slab.h>
-> >  #include <linux/stat.h>
-> >  #include <linux/string.h>
-> > @@ -165,7 +166,8 @@ static void *vfio_noiommu_open(unsigned long arg)
-> >  {
-> >       if (arg != VFIO_NOIOMMU_IOMMU)
-> >               return ERR_PTR(-EINVAL);
-> > -     if (!capable(CAP_SYS_RAWIO))
-> > +     if (!capable(CAP_SYS_RAWIO) ||
-> > +                     security_locked_down(LOCKDOWN_VFIO_NOIOMMU))
-> >               return ERR_PTR(-EPERM);
-> >
-> >       return NULL;
-> > @@ -1280,7 +1282,8 @@ static int vfio_group_set_container(struct vfio_group *group, int container_fd)
-> >       if (atomic_read(&group->container_users))
-> >               return -EINVAL;
-> >
-> > -     if (group->noiommu && !capable(CAP_SYS_RAWIO))
-> > +     if (group->noiommu && (!capable(CAP_SYS_RAWIO) ||
-> > +                     security_locked_down(LOCKDOWN_VFIO_NOIOMMU)))
-> >               return -EPERM;
-> >
-> >       f = fdget(container_fd);
-> > @@ -1362,7 +1365,8 @@ static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
-> >           !group->container->iommu_driver || !vfio_group_viable(group))
-> >               return -EINVAL;
-> >
-> > -     if (group->noiommu && !capable(CAP_SYS_RAWIO))
-> > +     if (group->noiommu && (!capable(CAP_SYS_RAWIO) ||
-> > +                     security_locked_down(LOCKDOWN_VFIO_NOIOMMU)))
-> >               return -EPERM;
-> >
-> >       device = vfio_device_get_from_name(group, buf);
-> > @@ -1490,7 +1494,8 @@ static int vfio_group_fops_open(struct inode *inode, struct file *filep)
-> >       if (!group)
-> >               return -ENODEV;
-> >
-> > -     if (group->noiommu && !capable(CAP_SYS_RAWIO)) {
-> > +     if (group->noiommu && (!capable(CAP_SYS_RAWIO) ||
-> > +                     security_locked_down(LOCKDOWN_VFIO_NOIOMMU))) {
-> >               vfio_group_put(group);
-> >               return -EPERM;
-> >       }
->
-> In these cases where we're testing RAWIO, the idea is to raise the
-> barrier of passing file descriptors to unprivileged users.  Is lockdown
-> sufficiently static that we might really only need the test on open?
-> The latter three cases here only make sense if the user were able to
-> open a no-iommu context when lockdown is not enabled, then lockdown is
-> later enabled preventing them from doing anything with that context...
-> but not preventing ongoing unsafe usage that might already exist.  I
-> suspect for that reason that lockdown is static and we really only need
-> the test on open.  Thanks,
+On 06/05/21 20:42, Ben Gardon wrote:
+> In preparation for lazily allocating the rmaps when the TDP MMU is in
+> use, protect the rmaps with SRCU. Unfortunately, this requires
+> propagating a pointer to struct kvm around to several functions.
 
-Note that SELinux now also implements the locked_down hook and that
-implementation is not static like the Lockdown LSM's. It checks
-whether the current task's SELinux domain has either integrity or
-confidentiality permission granted by the policy, so for SELinux it
-makes sense to have the lockdown hook called in these other places as
-well.
+Thinking more about it, this is not needed because all reads of the rmap 
+array are guarded by the load-acquire of kvm->arch.memslots_have_rmaps. 
+  That is, the pattern is always
 
--- 
-Ondrej Mosnacek
-Software Engineer, Linux Security - SELinux kernel
-Red Hat, Inc.
+	if (!load-acquire(memslot_have_rmaps))
+		return;
+	... = __gfn_to_rmap(...)
+
+				slots->arch.rmap[x] = ...
+				store-release(memslot_have_rmaps, true)
+
+where the load-acquire/store-release have the same role that 
+srcu_dereference/rcu_assign_pointer had before this patch.
+
+We also know that any read that misses the check has the potential for a 
+NULL pointer dereference, so it *has* to be like that.
+
+That said, srcu_dereference has zero cost unless debugging options are 
+enabled, and it *is* true that the rmap can disappear if kvm->srcu is 
+not held, so I lean towards keeping this change and just changing the 
+commit message like this:
+
+---------
+Currently, rmaps are always allocated and published together with a new 
+memslot, so the srcu_dereference for the memslots array already ensures 
+that the memory pointed to by slots->arch.rmap is zero at the time 
+slots->arch.rmap.  However, they still need to be accessed in an SRCU 
+read-side critical section, as the whole memslot can be deleted outside 
+SRCU.
+--------
+
+Thanks,
+
+Paolo
+
+> 
+> Suggested-by: Paolo Bonzini<pbonzini@redhat.com>
+> Signed-off-by: Ben Gardon<bgardon@google.com>
+> ---
+>   arch/x86/kvm/mmu/mmu.c | 57 +++++++++++++++++++++++++-----------------
+>   arch/x86/kvm/x86.c     |  6 ++---
+>   2 files changed, 37 insertions(+), 26 deletions(-)
 
