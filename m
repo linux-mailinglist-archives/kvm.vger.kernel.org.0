@@ -2,107 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D0794376974
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 19:22:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AF8D376979
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 19:23:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233756AbhEGRXk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 May 2021 13:23:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38664 "EHLO
+        id S234167AbhEGRYa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 May 2021 13:24:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233036AbhEGRXj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 May 2021 13:23:39 -0400
-Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 348AAC061574
-        for <kvm@vger.kernel.org>; Fri,  7 May 2021 10:22:38 -0700 (PDT)
-Received: by mail-ot1-x330.google.com with SMTP id u19-20020a0568302493b02902d61b0d29adso7743159ots.10
-        for <kvm@vger.kernel.org>; Fri, 07 May 2021 10:22:38 -0700 (PDT)
+        with ESMTP id S229612AbhEGRY3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 May 2021 13:24:29 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA11AC061574
+        for <kvm@vger.kernel.org>; Fri,  7 May 2021 10:23:29 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id t2-20020a17090ae502b029015b0fbfbc50so5600367pjy.3
+        for <kvm@vger.kernel.org>; Fri, 07 May 2021 10:23:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gQ3ipQxbX73bGU2SXA3y2Bzh59V5vke4f329EGQixvg=;
-        b=KH8GL3iNV6Z/uD3TMYgD+CrCfLVaUDeAs0zqsk9jCpnDJJCpW0QyHmMSjWWmSLhvJ1
-         FDtdqZsKLe2uoN2TDpAYLCOrimwhcklk1sSa42lMZ/jWzznAXKuD2WvTNhdBcUnJy88h
-         Q+lub5DzGRR83dIb2AC9agASP4rw1QyRLhGkA=
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=qKsbxM0NOn3sUuVqM7zk4fAmHoCca2YmurbXxzp/4eM=;
+        b=jvdh07sSAyCSV3l9hZOaKSp6ZVLqf3mV3BIpas+TejSLOXeKYg8wHWzW7wzbujdncD
+         LXQeFI9dK8eKu8wc77f1qxFhjIEOWEPCvxWaehIJBS9pMltpiYzQh7xrr7p0ihNkenLC
+         /V+e/levDhqiYjlBcfrjjrqhSTYnZDYldpffJuo4zC1zQHJiXMaBi8wZnkLmpQudJmej
+         t/hiaeyh39iK64OvUwwybGFj+uF7m4S14DwO/Asbe+2J+qbLm3zXJT4rc0r8SrHC1iVB
+         YYsxF69GtEz252us0RgdcBihRmR1I0KlNdXUwl6aMTVXzsNIBEuW8U7B9fIsUIZV+6rz
+         3ZiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gQ3ipQxbX73bGU2SXA3y2Bzh59V5vke4f329EGQixvg=;
-        b=d7o7Q3VFiL0NCmaiC0/m61SMISVVJKUEsnfH3E+/JQWyqGJ5pItMN1HODm7aEkPvBw
-         /KV7uBxK+2BSck/pT6Z7oVjEWn+nvETixPAMiTAttxpptp2TcvOwoy5NJ7Xu6UrtdU3u
-         z9wyDgjV4U7tyRr0kUFJ53qv5rn87rB+xwrnKo/Z5NxB1+Pl5LHmkJpasmdgkgtOXeWt
-         iq3RDF38YlT/MBl8aD6m/Oq1mNh9zx6HuBnqY/xRGO1SIxmKR2ElpW7nMq8wU71RGdII
-         /pK7KXLHQvlKijbZrKGzllU0xU7ABPlCGq8Oi5khp8dPJVj20RtiohbJkqQ6HC7Pv6M6
-         GwEA==
-X-Gm-Message-State: AOAM530+TTOus5ZTFz7zf0FbQS1RNrhHF7Ijrl9VzG+j6BZTG0sQd62N
-        mEjVJdBw2tmrQUTkmkR/6QywZaY053KS87VZwGwTog==
-X-Google-Smtp-Source: ABdhPJxDU02k2Jf2AhhsznQct+cAPyxL7BbEYKFvu6VMh4FAxQjvUIGiWjfmwnilcwXbYXtl5qcWmP5bc5q29/lz1jM=
-X-Received: by 2002:a9d:764f:: with SMTP id o15mr9279052otl.164.1620408157620;
- Fri, 07 May 2021 10:22:37 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=qKsbxM0NOn3sUuVqM7zk4fAmHoCca2YmurbXxzp/4eM=;
+        b=MgDZhldjqNLxC7Fsje/621veDvJHCAn+pnE9m1l44YDDedQxxQKT2V9qd2bf0P3bOZ
+         jCQ+FcBtC+Sqp+G6DhoRJPc6jKqUi6oWQuO9AnwoUpvH3SeGmSMCW9r/M7LnZEGCcrNm
+         U01jqrSyK0ZDK+VcyxDA1PoIKaeB9iLwAId5+065U5+O7AM8i/FEayazbekBsnI9bVP5
+         AlII8gL2vanxe9Zjf8XgZyZxxndIJNtIFYSEefs5RHYJzcImaBOD+xpQERCScF4GEzdJ
+         hIgYv8orIIVoIrteKRfPtZVLUlDc0mR2MZluzf9BDMBUqyOjE7ob+EuKiNJKUMprGdtV
+         jQdQ==
+X-Gm-Message-State: AOAM532Egcb9uXo4Qm7FvTF2Ct5YkiiEdx+UaVxrDk5344WF64/6dogf
+        JOZyBqXgRCj/bw+p76CN/EBIQB8AJUY1Pg==
+X-Google-Smtp-Source: ABdhPJw4dRxO9+t9G0390L10GS3912LucjMNHKEVK4C21J/5mCQJJ1Us2jv1nsoE+eyGc6LflB/kpA==
+X-Received: by 2002:a17:90a:fe01:: with SMTP id ck1mr22271149pjb.146.1620408209287;
+        Fri, 07 May 2021 10:23:29 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id d8sm4826137pfl.156.2021.05.07.10.23.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 May 2021 10:23:28 -0700 (PDT)
+Date:   Fri, 7 May 2021 17:23:25 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, bgardon@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org
+Subject: Re: [PATCH v2 2/3] KVM: x86/mmu: Fix pf_fixed count in
+ tdp_mmu_map_handle_target_level()
+Message-ID: <YJV3jTPCj6NoPZVY@google.com>
+References: <cover.1620343751.git.kai.huang@intel.com>
+ <76406bd7aad0cec458e832639c7a2de963e70990.1620343751.git.kai.huang@intel.com>
 MIME-Version: 1.0
-References: <20210507150636.94389-1-jon@nutanix.com>
-In-Reply-To: <20210507150636.94389-1-jon@nutanix.com>
-From:   Venkatesh Srinivas <venkateshs@chromium.org>
-Date:   Fri, 7 May 2021 10:22:25 -0700
-Message-ID: <CAA0tLEoyy_ogDc11r_1T907Rp5CwgM64hFwRt5SX40THp2+C3A@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: use X86_FEATURE_RSB_CTXSW for RSB stuffing in vmexit
-To:     Jon Kohler <jon@nutanix.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <76406bd7aad0cec458e832639c7a2de963e70990.1620343751.git.kai.huang@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 7, 2021 at 8:08 AM Jon Kohler <jon@nutanix.com> wrote:
->
-> cpufeatures.h defines X86_FEATURE_RSB_CTXSW as "Fill RSB on context
-> switches" which seems more accurate than using X86_FEATURE_RETPOLINE
-> in the vmxexit path for RSB stuffing.
->
-> X86_FEATURE_RSB_CTXSW is used for FILL_RETURN_BUFFER in
-> arch/x86/entry/entry_{32|64}.S. This change makes KVM vmx and svm
-> follow that same pattern. This pairs up nicely with the language in
-> bugs.c, where this cpu_cap is enabled, which indicates that RSB
-> stuffing should be unconditional with spectrev2 enabled.
->         /*
->          * If spectre v2 protection has been enabled, unconditionally fill
->          * RSB during a context switch; this protects against two independent
->          * issues:
->          *
->          *      - RSB underflow (and switch to BTB) on Skylake+
->          *      - SpectreRSB variant of spectre v2 on X86_BUG_SPECTRE_V2 CPUs
->          */
->         setup_force_cpu_cap(X86_FEATURE_RSB_CTXSW);
->
-> Furthermore, on X86_FEATURE_IBRS_ENHANCED CPUs && SPECTRE_V2_CMD_AUTO,
-> we're bypassing setting X86_FEATURE_RETPOLINE, where as far as I could
-> find, we should still be doing RSB stuffing no matter what when
-> CONFIG_RETPOLINE is enabled and spectrev2 is set to auto.
+On Fri, May 07, 2021, Kai Huang wrote:
+> Currently pf_fixed is not increased when prefault is true.  This is not
+> correct, since prefault here really means "async page fault completed".
+> In that case, the original page fault from the guest was morphed into as
+> async page fault and pf_fixed was not increased.  So when prefault
+> indicates async page fault is completed, pf_fixed should be increased.
+> 
+> Additionally, currently pf_fixed is also increased even when page fault
+> is spurious, while legacy MMU increases pf_fixed when page fault returns
+> RET_PF_EMULATE or RET_PF_FIXED.
+> 
+> To fix above two issues, change to increase pf_fixed when return value
+> is not RET_PF_SPURIOUS (RET_PF_RETRY has already been ruled out by
+> reaching here).
+> 
+> More information:
+> https://lore.kernel.org/kvm/cover.1620200410.git.kai.huang@intel.com/T/#mbb5f8083e58a2cd262231512b9211cbe70fc3bd5
+> 
+> Fixes: bb18842e2111 ("kvm: x86/mmu: Add TDP MMU PF handler")
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> ---
 
-If I'm reading https://software.intel.com/security-software-guidance/deep-dives/deep-dive-indirect-branch-restricted-speculation
-correctly, I don't think an RSB fill sequence is required on VMExit on
-processors w/ Enhanced IBRS. Specifically:
-"""
-On processors with enhanced IBRS, an RSB overwrite sequence may not
-suffice to prevent the predicted target of a near return from using an
-RSB entry created in a less privileged predictor mode.  Software can
-prevent this by enabling SMEP (for transitions from user mode to
-supervisor mode) and by having IA32_SPEC_CTRL.IBRS set during VM exits
-"""
-On Enhanced IBRS processors, it looks like SPEC_CTRL.IBRS is set
-across all #VMExits via x86_virt_spec_ctrl in kvm.
-
-So is this patch needed?
-
-Thanks,
--- vs;
+Reviewed-by: Sean Christopherson <seanjc@google.com>
