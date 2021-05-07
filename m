@@ -2,168 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CE0F0376439
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 13:04:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 571C2376474
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 13:28:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234581AbhEGLFu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 May 2021 07:05:50 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:18789 "EHLO
-        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234014AbhEGLFq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 May 2021 07:05:46 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Fc6wJ68SJzCr09;
-        Fri,  7 May 2021 19:02:08 +0800 (CST)
-Received: from DESKTOP-5IS4806.china.huawei.com (10.174.187.224) by
- DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 7 May 2021 19:04:39 +0800
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-To:     <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <maz@kernel.org>
-CC:     <wanghaibin.wang@huawei.com>
-Subject: [PATCH v5 2/2] kvm/arm64: Try stage2 block mapping for host device MMIO
-Date:   Fri, 7 May 2021 19:03:22 +0800
-Message-ID: <20210507110322.23348-3-zhukeqian1@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
-In-Reply-To: <20210507110322.23348-1-zhukeqian1@huawei.com>
-References: <20210507110322.23348-1-zhukeqian1@huawei.com>
+        id S233900AbhEGL3c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 May 2021 07:29:32 -0400
+Received: from mx2.suse.de ([195.135.220.15]:43976 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233369AbhEGL3b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 May 2021 07:29:31 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 287B9B14A;
+        Fri,  7 May 2021 11:28:30 +0000 (UTC)
+Subject: Re: [PATCH Part2 RFC v2 08/37] x86/sev: Split the physmap when adding
+ the page in RMP table
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Cc:     X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>
+References: <20210430123822.13825-1-brijesh.singh@amd.com>
+ <20210430123822.13825-9-brijesh.singh@amd.com>
+ <CALCETrXsUW3S_9ZUPXT5HEv_ki2VxEUQMe-uzerG1xnbcgYNtw@mail.gmail.com>
+ <c1e9573e-9be4-ee85-9363-73b9c60db315@intel.com>
+From:   Vlastimil Babka <vbabka@suse.cz>
+Message-ID: <5c07ff2c-efb4-5f7b-0ad6-d52d985e5c46@suse.cz>
+Date:   Fri, 7 May 2021 13:28:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.187.224]
-X-CFilter-Loop: Reflected
+In-Reply-To: <c1e9573e-9be4-ee85-9363-73b9c60db315@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The MMIO region of a device maybe huge (GB level), try to use
-block mapping in stage2 to speedup both map and unmap.
+On 5/3/21 5:41 PM, Dave Hansen wrote:
+> On 5/3/21 8:15 AM, Andy Lutomirski wrote:
+>> How much performance do we get back if we add a requirement that only
+>> 2M pages (hugetlbfs, etc) may be used for private guest memory?
+> 
+> Are you generally asking about the performance overhead of using 4k
+> pages instead of 2M for the direct map?  We looked at that recently and
+> pulled together some data:
 
-Compared to normal memory mapping, we should consider two more
-points when try block mapping for MMIO region:
+IIUC using 2M for private guest memory wouldn't be itself sufficient, as the
+guest would also have to share pages with host with 2MB granularity, and that
+might be too restrictive?
 
-1. For normal memory mapping, the PA(host physical address) and
-HVA have same alignment within PUD_SIZE or PMD_SIZE when we use
-the HVA to request hugepage, so we don't need to consider PA
-alignment when verifing block mapping. But for device memory
-mapping, the PA and HVA may have different alignment.
-
-2. For normal memory mapping, we are sure hugepage size properly
-fit into vma, so we don't check whether the mapping size exceeds
-the boundary of vma. But for device memory mapping, we should pay
-attention to this.
-
-This adds get_vma_page_shift() to get page shift for both normal
-memory and device MMIO region, and check these two points when
-selecting block mapping size for MMIO region.
-
-Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
----
- arch/arm64/kvm/mmu.c | 61 ++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 51 insertions(+), 10 deletions(-)
-
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 16efd47439a6..2a3d3b760550 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -822,6 +822,35 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
- 	return PAGE_SIZE;
- }
- 
-+static int get_vma_page_shift(struct vm_area_struct *vma, unsigned long hva)
-+{
-+	unsigned long pa;
-+
-+	if (is_vm_hugetlb_page(vma) && !(vma->vm_flags & VM_PFNMAP))
-+		return huge_page_shift(hstate_vma(vma));
-+
-+	if (!(vma->vm_flags & VM_PFNMAP))
-+		return PAGE_SHIFT;
-+
-+	VM_BUG_ON(is_vm_hugetlb_page(vma));
-+
-+	pa = (vma->vm_pgoff << PAGE_SHIFT) + (hva - vma->vm_start);
-+
-+#ifndef __PAGETABLE_PMD_FOLDED
-+	if ((hva & (PUD_SIZE - 1)) == (pa & (PUD_SIZE - 1)) &&
-+	    ALIGN_DOWN(hva, PUD_SIZE) >= vma->vm_start &&
-+	    ALIGN(hva, PUD_SIZE) <= vma->vm_end)
-+		return PUD_SHIFT;
-+#endif
-+
-+	if ((hva & (PMD_SIZE - 1)) == (pa & (PMD_SIZE - 1)) &&
-+	    ALIGN_DOWN(hva, PMD_SIZE) >= vma->vm_start &&
-+	    ALIGN(hva, PMD_SIZE) <= vma->vm_end)
-+		return PMD_SHIFT;
-+
-+	return PAGE_SHIFT;
-+}
-+
- static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			  struct kvm_memory_slot *memslot, unsigned long hva,
- 			  unsigned long fault_status)
-@@ -853,7 +882,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		return -EFAULT;
- 	}
- 
--	/* Let's check if we will get back a huge page backed by hugetlbfs */
-+	/*
-+	 * Let's check if we will get back a huge page backed by hugetlbfs, or
-+	 * get block mapping for device MMIO region.
-+	 */
- 	mmap_read_lock(current->mm);
- 	vma = find_vma_intersection(current->mm, hva, hva + 1);
- 	if (unlikely(!vma)) {
-@@ -862,15 +894,15 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		return -EFAULT;
- 	}
- 
--	if (is_vm_hugetlb_page(vma))
--		vma_shift = huge_page_shift(hstate_vma(vma));
--	else
--		vma_shift = PAGE_SHIFT;
--
--	if (logging_active ||
--	    (vma->vm_flags & VM_PFNMAP)) {
-+	/*
-+	 * logging_active is guaranteed to never be true for VM_PFNMAP
-+	 * memslots.
-+	 */
-+	if (logging_active) {
- 		force_pte = true;
- 		vma_shift = PAGE_SHIFT;
-+	} else {
-+		vma_shift = get_vma_page_shift(vma, hva);
- 	}
- 
- 	switch (vma_shift) {
-@@ -943,8 +975,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		return -EFAULT;
- 
- 	if (kvm_is_device_pfn(pfn)) {
-+		/*
-+		 * If the page was identified as device early by looking at
-+		 * the VMA flags, vma_pagesize is already representing the
-+		 * largest quantity we can map.  If instead it was mapped
-+		 * via gfn_to_pfn_prot(), vma_pagesize is set to PAGE_SIZE
-+		 * and must not be upgraded.
-+		 *
-+		 * In both cases, we don't let transparent_hugepage_adjust()
-+		 * change things at the last minute.
-+		 */
- 		device = true;
--		force_pte = true;
- 	} else if (logging_active && !write_fault) {
- 		/*
- 		 * Only actually map the page as writable if this was a write
-@@ -965,7 +1006,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * If we are not forced to use page mapping, check if we are
- 	 * backed by a THP and thus use block mapping if possible.
- 	 */
--	if (vma_pagesize == PAGE_SIZE && !force_pte)
-+	if (vma_pagesize == PAGE_SIZE && !(force_pte || device))
- 		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
- 							   &pfn, &fault_ipa);
- 	if (writable)
--- 
-2.19.1
+>> https://lore.kernel.org/lkml/213b4567-46ce-f116-9cdf-bbd0c884eb3c@linux.intel.com/
+> 
 
