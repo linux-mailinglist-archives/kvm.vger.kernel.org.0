@@ -2,139 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B5A85376972
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 19:22:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0794376974
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 19:22:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233115AbhEGRXP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 May 2021 13:23:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38564 "EHLO
+        id S233756AbhEGRXk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 May 2021 13:23:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232234AbhEGRXN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 May 2021 13:23:13 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C764C061574
-        for <kvm@vger.kernel.org>; Fri,  7 May 2021 10:22:12 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id i14so7627680pgk.5
-        for <kvm@vger.kernel.org>; Fri, 07 May 2021 10:22:12 -0700 (PDT)
+        with ESMTP id S233036AbhEGRXj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 May 2021 13:23:39 -0400
+Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 348AAC061574
+        for <kvm@vger.kernel.org>; Fri,  7 May 2021 10:22:38 -0700 (PDT)
+Received: by mail-ot1-x330.google.com with SMTP id u19-20020a0568302493b02902d61b0d29adso7743159ots.10
+        for <kvm@vger.kernel.org>; Fri, 07 May 2021 10:22:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=kaWNJOZNHQM17GdENePY8QBaToZgJGQqlauYDVc5v3M=;
-        b=g4na67SI3DU41cZ7ScTQtXqlRqH211zEraccRSDgDDwNgtInz+HmQByazYcejNlRr/
-         Gf0kUnOzULnveI8gdNfFEdeXbCWo4EPnAjIZDIerX5HaLfZW7Egfq01NLVdUn8+x8dGh
-         FTkGj+smF50744mbvtq76UudGGreGUqp0Gk1ZaXvW3uEgIwDJ2JmIPI5QOu6YbgsUEef
-         ZX7y0DMrV6zUjMiHyonN75GdQvMlddjhEyqW4HfZEjHDjJQW+bKo5GWgD4XCzulb0SAX
-         afKtM/91aVbF8pPAeLSRpOsgN7+IwNzSsLgl65vGFhNmKL/v0IfM4rLoG8pbjNB1u/Wr
-         xbZA==
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=gQ3ipQxbX73bGU2SXA3y2Bzh59V5vke4f329EGQixvg=;
+        b=KH8GL3iNV6Z/uD3TMYgD+CrCfLVaUDeAs0zqsk9jCpnDJJCpW0QyHmMSjWWmSLhvJ1
+         FDtdqZsKLe2uoN2TDpAYLCOrimwhcklk1sSa42lMZ/jWzznAXKuD2WvTNhdBcUnJy88h
+         Q+lub5DzGRR83dIb2AC9agASP4rw1QyRLhGkA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=kaWNJOZNHQM17GdENePY8QBaToZgJGQqlauYDVc5v3M=;
-        b=RmPzl3JZfiyoyCMabtxdpZso1SJyY4cqWtl0x99zvmpl6rQCv+foEwdPEvMv9caux9
-         Rbe4et4xVhR1SIIfgsqVkh14H8vtQr6mbbP2OeSC3kw3Usa9bW/+fkSBEKSP152URJas
-         NuHa7p+Jlvldq2kvJS+sd6jjuGhaCO0xUKQNywreVkLQPJz5LEHs80TzsGC/sy0dMmwU
-         U8/YK9SJa2IhFxh+FTlEoEjIXbEjsqDVxzFnf4mqOHuzoP0CUgRGw1QjhutaQCTxVNlw
-         IUKDCXqqj8KFXNN1Phe/v1QbAaNwT3SkMKqLZS/qZ8HYUOo1pphwopDlxhOwj2DfI/BK
-         dDDQ==
-X-Gm-Message-State: AOAM532Uqke+OMgcGl8tKI3X1dqRELoSnU5+mbuwAhdaDwkPe2Qhxo3Y
-        dTwNTJ3LOGxusALt+o3veNblRCiqNEfKvw==
-X-Google-Smtp-Source: ABdhPJzpnBiQSsQs8KvPugdihlSYjycu70EHmHY203mpg57K2QJ9jk4ingLCEsO3hudvrKa6Qy45/A==
-X-Received: by 2002:a62:2904:0:b029:25c:13f2:47d4 with SMTP id p4-20020a6229040000b029025c13f247d4mr11365705pfp.4.1620408131821;
-        Fri, 07 May 2021 10:22:11 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id x22sm3788187pfp.138.2021.05.07.10.22.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 May 2021 10:22:11 -0700 (PDT)
-Date:   Fri, 7 May 2021 17:22:07 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Pei Zhang <pezhang@redhat.com>
-Subject: Re: [patch 4/4] KVM: VMX: update vcpu posted-interrupt descriptor
- when assigning device
-Message-ID: <YJV3P4mFA7pITziM@google.com>
-References: <20210507130609.269153197@redhat.com>
- <20210507130923.528132061@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=gQ3ipQxbX73bGU2SXA3y2Bzh59V5vke4f329EGQixvg=;
+        b=d7o7Q3VFiL0NCmaiC0/m61SMISVVJKUEsnfH3E+/JQWyqGJ5pItMN1HODm7aEkPvBw
+         /KV7uBxK+2BSck/pT6Z7oVjEWn+nvETixPAMiTAttxpptp2TcvOwoy5NJ7Xu6UrtdU3u
+         z9wyDgjV4U7tyRr0kUFJ53qv5rn87rB+xwrnKo/Z5NxB1+Pl5LHmkJpasmdgkgtOXeWt
+         iq3RDF38YlT/MBl8aD6m/Oq1mNh9zx6HuBnqY/xRGO1SIxmKR2ElpW7nMq8wU71RGdII
+         /pK7KXLHQvlKijbZrKGzllU0xU7ABPlCGq8Oi5khp8dPJVj20RtiohbJkqQ6HC7Pv6M6
+         GwEA==
+X-Gm-Message-State: AOAM530+TTOus5ZTFz7zf0FbQS1RNrhHF7Ijrl9VzG+j6BZTG0sQd62N
+        mEjVJdBw2tmrQUTkmkR/6QywZaY053KS87VZwGwTog==
+X-Google-Smtp-Source: ABdhPJxDU02k2Jf2AhhsznQct+cAPyxL7BbEYKFvu6VMh4FAxQjvUIGiWjfmwnilcwXbYXtl5qcWmP5bc5q29/lz1jM=
+X-Received: by 2002:a9d:764f:: with SMTP id o15mr9279052otl.164.1620408157620;
+ Fri, 07 May 2021 10:22:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210507130923.528132061@redhat.com>
+References: <20210507150636.94389-1-jon@nutanix.com>
+In-Reply-To: <20210507150636.94389-1-jon@nutanix.com>
+From:   Venkatesh Srinivas <venkateshs@chromium.org>
+Date:   Fri, 7 May 2021 10:22:25 -0700
+Message-ID: <CAA0tLEoyy_ogDc11r_1T907Rp5CwgM64hFwRt5SX40THp2+C3A@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: use X86_FEATURE_RSB_CTXSW for RSB stuffing in vmexit
+To:     Jon Kohler <jon@nutanix.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 07, 2021, Marcelo Tosatti wrote:
-> Index: kvm/arch/x86/kvm/vmx/posted_intr.c
-> ===================================================================
-> --- kvm.orig/arch/x86/kvm/vmx/posted_intr.c
-> +++ kvm/arch/x86/kvm/vmx/posted_intr.c
-> @@ -203,6 +203,25 @@ void pi_post_block(struct kvm_vcpu *vcpu
->  	local_irq_enable();
->  }
->  
-> +int vmx_vcpu_check_block(struct kvm_vcpu *vcpu)
-> +{
-> +	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
-> +
-> +	if (!irq_remapping_cap(IRQ_POSTING_CAP))
-> +		return 0;
-> +
-> +	if (!kvm_vcpu_apicv_active(vcpu))
-> +		return 0;
-> +
-> +	if (!kvm_arch_has_assigned_device(vcpu->kvm))
-> +		return 0;
-> +
-> +	if (pi_desc->nv == POSTED_INTR_WAKEUP_VECTOR)
-> +		return 0;
-> +
-> +	return 1;
+On Fri, May 7, 2021 at 8:08 AM Jon Kohler <jon@nutanix.com> wrote:
+>
+> cpufeatures.h defines X86_FEATURE_RSB_CTXSW as "Fill RSB on context
+> switches" which seems more accurate than using X86_FEATURE_RETPOLINE
+> in the vmxexit path for RSB stuffing.
+>
+> X86_FEATURE_RSB_CTXSW is used for FILL_RETURN_BUFFER in
+> arch/x86/entry/entry_{32|64}.S. This change makes KVM vmx and svm
+> follow that same pattern. This pairs up nicely with the language in
+> bugs.c, where this cpu_cap is enabled, which indicates that RSB
+> stuffing should be unconditional with spectrev2 enabled.
+>         /*
+>          * If spectre v2 protection has been enabled, unconditionally fill
+>          * RSB during a context switch; this protects against two independent
+>          * issues:
+>          *
+>          *      - RSB underflow (and switch to BTB) on Skylake+
+>          *      - SpectreRSB variant of spectre v2 on X86_BUG_SPECTRE_V2 CPUs
+>          */
+>         setup_force_cpu_cap(X86_FEATURE_RSB_CTXSW);
+>
+> Furthermore, on X86_FEATURE_IBRS_ENHANCED CPUs && SPECTRE_V2_CMD_AUTO,
+> we're bypassing setting X86_FEATURE_RETPOLINE, where as far as I could
+> find, we should still be doing RSB stuffing no matter what when
+> CONFIG_RETPOLINE is enabled and spectrev2 is set to auto.
 
-IIUC, the logic is to bail out of the block loop if the VM has an assigned
-device, but the blocking vCPU didn't reconfigure the PI.NV to the wakeup vector,
-i.e. the assigned device came along after the initial check in vcpu_block().
-That makes sense, but you can add a comment somewhere in/above this function?
+If I'm reading https://software.intel.com/security-software-guidance/deep-dives/deep-dive-indirect-branch-restricted-speculation
+correctly, I don't think an RSB fill sequence is required on VMExit on
+processors w/ Enhanced IBRS. Specifically:
+"""
+On processors with enhanced IBRS, an RSB overwrite sequence may not
+suffice to prevent the predicted target of a near return from using an
+RSB entry created in a less privileged predictor mode.  Software can
+prevent this by enabling SMEP (for transitions from user mode to
+supervisor mode) and by having IA32_SPEC_CTRL.IBRS set during VM exits
+"""
+On Enhanced IBRS processors, it looks like SPEC_CTRL.IBRS is set
+across all #VMExits via x86_virt_spec_ctrl in kvm.
 
-> +}
-> +
->  /*
->   * Handler for POSTED_INTERRUPT_WAKEUP_VECTOR.
->   */
-> @@ -236,6 +255,26 @@ bool pi_has_pending_interrupt(struct kvm
->  		(pi_test_sn(pi_desc) && !pi_is_pir_empty(pi_desc));
->  }
->  
-> +void vmx_pi_start_assignment(struct kvm *kvm, int device_count)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +	int i;
-> +
-> +	if (!irq_remapping_cap(IRQ_POSTING_CAP))
-> +		return;
-> +
-> +	/* only care about first device assignment */
-> +	if (device_count != 1)
-> +		return;
-> +
-> +	/* Update wakeup vector and add vcpu to blocked_vcpu_list */
+So is this patch needed?
 
-Can you expand this comment, too?  Specifically, I think what you're saying is
-that the wakeup will cause the vCPU to bail out of kvm_vcpu_block() and go back
-through vcpu_block() and thus pi_pre_block().
-
-> +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> +		if (!kvm_vcpu_apicv_active(vcpu))
-> +			continue;
-> +
-> +		kvm_vcpu_kick(vcpu);
-
-Actually, can't we avoid the full kick and instead just do kvm_vcpu_wake_up()?
-If the vCPU is in guest mode, i.e. kvm_arch_vcpu_should_kick() returns true,
-then by definition it can't be blocking.  And if it about to block, it's
-guaranteed to see the assigned device.
-
-> +	}
-> +}
+Thanks,
+-- vs;
