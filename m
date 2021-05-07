@@ -2,143 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A533376155
-	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 09:42:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BDC6C37615A
+	for <lists+kvm@lfdr.de>; Fri,  7 May 2021 09:44:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235592AbhEGHnv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 May 2021 03:43:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30019 "EHLO
+        id S235565AbhEGHpr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 May 2021 03:45:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26200 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233978AbhEGHnv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 May 2021 03:43:51 -0400
+        by vger.kernel.org with ESMTP id S231165AbhEGHpq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 May 2021 03:45:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620373371;
+        s=mimecast20190719; t=1620373486;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vsa8eoRAU/op3poaE3LMiG1JCafOvgbDI+OB1GR9vsw=;
-        b=SpNUf/P3VvlfEwkxirfYSL1UM4kdac8Jr9n/i9oezfvKJpsrHjKXCX7ebUwyHjyu57wYN4
-        7TpyscWE02tyFpGdvOtltrOI86UOIgET9hxoKttqeE4vS94iYl36lgTQwyoYpjXj6EA+Ma
-        Sxg7bSzmsg6tk14tHbyg5+keu4Tr+/Y=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-468-X_V5dXdROUGdwayGupIeWg-1; Fri, 07 May 2021 03:42:49 -0400
-X-MC-Unique: X_V5dXdROUGdwayGupIeWg-1
-Received: by mail-ed1-f69.google.com with SMTP id i19-20020a05640242d3b0290388cea34ed3so3994980edc.15
-        for <kvm@vger.kernel.org>; Fri, 07 May 2021 00:42:49 -0700 (PDT)
+        bh=2AzHD+mIX/ZO5hVREmfYA68VAf490QyrXZtGAVC/kOM=;
+        b=YKejhakt5IDRuJ5pP3ubY+6zssGTW+/3dcpLu4cNgnR/IycYkqVG7EJSBj9TOHn4S1Av6X
+        sRFWa/YWDDsbDv6DWyNAEKRA1Z7klkd1ryrn5PwjeZnO64T5IBp7ATXHBBUgh5RsYf69VT
+        kcC/5il+gzn9u0aTW5h1Fy5ugOOVj3w=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-254-kv0MdnPTPZ6IljH3tYphvw-1; Fri, 07 May 2021 03:44:44 -0400
+X-MC-Unique: kv0MdnPTPZ6IljH3tYphvw-1
+Received: by mail-ej1-f71.google.com with SMTP id w2-20020a1709062f82b0290378745f26d5so2652703eji.6
+        for <kvm@vger.kernel.org>; Fri, 07 May 2021 00:44:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:organization
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=vsa8eoRAU/op3poaE3LMiG1JCafOvgbDI+OB1GR9vsw=;
-        b=ekGwyefF40LbveuJ78GzVjScSjE15WVUpvM2AnOrWVbwfD+wUb9/ru8Q+P1BLFQxxH
-         knry2AArJRufGOMWQ9imNwfZABng+Ba2PHqIewRCWv66wnoQnDglXsyqDHOVGKU/Z/nd
-         AO/E8suMBY7RDXSb9nEoaJRjvCWIJedypW6dSJgSIk0aartYoMq8lnonG6/lBwe6N+3R
-         KyLHHHMO4HsnIAIs4TxpijZD3Bp3fKRjCnVTM8FtVqH8FBtY7r6oWPjB3ldTclsrMDjx
-         qiXhUS/kztpHMVZ8mXeilsvgjMHcyaTzEgfJ5+2zr2ziPJUU+yi2Qnfz6kkrfjK3gYtl
-         LhyQ==
-X-Gm-Message-State: AOAM532iRWhZvYyWzq5Rz/HKgmE6CLe1PLhJ8XOYh9w3IkRizxDwJZiT
-        LlpchanZWCS3oM0OLX1vknC211/R3Ci0csYroH+RvNP7P52NihDc2TPrv/RlOM2Fg8XbR0nC2WW
-        PpaxE75oD70Bk
-X-Received: by 2002:aa7:ccc4:: with SMTP id y4mr9565497edt.171.1620373368582;
-        Fri, 07 May 2021 00:42:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy4lQAaBrROI5moPobb0YQwseMCoxa7a0OaL+tWl07rMAc+ZBwZGj8pu8eJHfR3ilJxTw0IZQ==
-X-Received: by 2002:aa7:ccc4:: with SMTP id y4mr9565484edt.171.1620373368429;
-        Fri, 07 May 2021 00:42:48 -0700 (PDT)
-Received: from [192.168.3.132] (p5b0c63c0.dip0.t-ipconnect.de. [91.12.99.192])
-        by smtp.gmail.com with ESMTPSA id r16sm3555325edq.87.2021.05.07.00.42.47
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2AzHD+mIX/ZO5hVREmfYA68VAf490QyrXZtGAVC/kOM=;
+        b=iT6CiBNe2kpEgyd5akaB6Icw9mXldUu8I+HxtDbvJjN9wrWq3Apcy8ZiUAgt8fVYZj
+         aufwi3NZ0ReMkkthoiSYwLqGSFKiI28SL++MmTcFbXN7Rp7qJ41hohJ7QJQAMS2l9S/u
+         KWiiOAyRthoz+hz6+565hihyHUBepSrXeooE4Ibd2knyWpP56fLgz2qFgW+sXwM+oR+B
+         46v4MiKCVBIOfDnJNNpTQdr6SEonHcq8I1GLjWuK7WHU5KNa2HXfon9Gr5ZwRI+aHc+z
+         ETUSD0Ktg6ihPoFvccXLVfWt/bLQFyxnh2OtE0goTBi9pWqwzQNZuqsTXypH8wKUhKma
+         ECBQ==
+X-Gm-Message-State: AOAM5322HTO7XhDLWiaHtT8MuiV0SZKtv2aXMixbKPbvsiaz+A5hoxUg
+        dU+Qgtts7vfZExb632h+yid8gi23MgWZM/c5FnX07baIltMuEbNvpaGPyKZR2v9ez2lSA6KH+Xu
+        UNv3c6PQP41hG
+X-Received: by 2002:a17:906:270a:: with SMTP id z10mr8366865ejc.204.1620373482885;
+        Fri, 07 May 2021 00:44:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzrHYChoRh6PU4Ww0EjZj5mIN8mZ9JJJDr1JHotMaiY/gnOK9+ycDQry9whFHdEmo/KzVd50Q==
+X-Received: by 2002:a17:906:270a:: with SMTP id z10mr8366856ejc.204.1620373482717;
+        Fri, 07 May 2021 00:44:42 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id r17sm3596059edt.33.2021.05.07.00.44.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 May 2021 00:42:48 -0700 (PDT)
-Subject: Re: [PATCH v3 1/8] KVM: x86/mmu: Deduplicate rmap freeing
-To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>
-References: <20210506184241.618958-1-bgardon@google.com>
- <20210506184241.618958-2-bgardon@google.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Message-ID: <97d6a7da-2777-293a-4dab-668fe16dc2e9@redhat.com>
-Date:   Fri, 7 May 2021 09:42:47 +0200
+        Fri, 07 May 2021 00:44:42 -0700 (PDT)
+Subject: Re: [kvm:queue 11/44] arch/x86/kernel/kvm.c:672:2: error: implicit
+ declaration of function 'kvm_guest_cpu_offline'
+To:     kernel test robot <lkp@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kbuild-all@lists.01.org, clang-built-linux@googlegroups.com,
+        kvm@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
+        Farrah Chen <farrah.chen@intel.com>,
+        Danmei Wei <danmei.wei@intel.com>
+References: <202105070840.f1TZQ4rC-lkp@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e671b62d-0324-2835-2726-6b28a0202b7a@redhat.com>
+Date:   Fri, 7 May 2021 09:44:40 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210506184241.618958-2-bgardon@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <202105070840.f1TZQ4rC-lkp@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06.05.21 20:42, Ben Gardon wrote:
-> Small code deduplication. No functional change expected.
+On 07/05/21 02:13, kernel test robot wrote:
+> tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+> head:   c6d517aecd40b25ea05c593962b2c4b085092343
+> commit: 9140e381e0f2f8cb1c628c29730ece2a52cb4cbc [11/44] x86/kvm: Teardown PV features on boot CPU as well
+> config: x86_64-randconfig-a001-20210506 (attached as .config)
+> compiler: clang version 13.0.0 (https://github.com/llvm/llvm-project 8f5a2a5836cc8e4c1def2bdeb022e7b496623439)
+> reproduce (this is a W=1 build):
+>          wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>          chmod +x ~/bin/make.cross
+>          # install x86_64 cross compiling tool for clang build
+>          # apt-get install binutils-x86-64-linux-gnu
+>          # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=9140e381e0f2f8cb1c628c29730ece2a52cb4cbc
+>          git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
+>          git fetch --no-tags kvm queue
+>          git checkout 9140e381e0f2f8cb1c628c29730ece2a52cb4cbc
+>          # save the attached .config to linux build tree
+>          COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 ARCH=x86_64
 > 
-> Signed-off-by: Ben Gardon <bgardon@google.com>
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
+
+kvm_guest_cpu_offline must be placed outside #ifdef CONFIG_SMP.  I fixed 
+it up.
+
+Paolo
+
+> 
+> All errors (new ones prefixed by >>):
+> 
+>>> arch/x86/kernel/kvm.c:672:2: error: implicit declaration of function 'kvm_guest_cpu_offline' [-Werror,-Wimplicit-function-declaration]
+>             kvm_guest_cpu_offline();
+>             ^
+>     arch/x86/kernel/kvm.c:672:2: note: did you mean 'kvm_guest_cpu_init'?
+>     arch/x86/kernel/kvm.c:332:13: note: 'kvm_guest_cpu_init' declared here
+>     static void kvm_guest_cpu_init(void)
+>                 ^
+>>> arch/x86/kernel/kvm.c:679:2: error: implicit declaration of function 'kvm_cpu_online' [-Werror,-Wimplicit-function-declaration]
+>             kvm_cpu_online(raw_smp_processor_id());
+>             ^
+>     2 errors generated.
+> 
+> 
+> vim +/kvm_guest_cpu_offline +672 arch/x86/kernel/kvm.c
+> 
+>     669	
+>     670	static int kvm_suspend(void)
+>     671	{
+>   > 672		kvm_guest_cpu_offline();
+>     673	
+>     674		return 0;
+>     675	}
+>     676	
+>     677	static void kvm_resume(void)
+>     678	{
+>   > 679		kvm_cpu_online(raw_smp_processor_id());
+>     680	}
+>     681	
+> 
 > ---
->   arch/x86/kvm/x86.c | 19 +++++++++++--------
->   1 file changed, 11 insertions(+), 8 deletions(-)
+> 0-DAY CI Kernel Test Service, Intel Corporation
+> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index cf3b67679cf0..5bcf07465c47 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10818,17 +10818,23 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
->   	kvm_hv_destroy_vm(kvm);
->   }
->   
-> -void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
-> +static void free_memslot_rmap(struct kvm_memory_slot *slot)
->   {
->   	int i;
->   
->   	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
->   		kvfree(slot->arch.rmap[i]);
->   		slot->arch.rmap[i] = NULL;
-> +	}
-> +}
->   
-> -		if (i == 0)
-> -			continue;
-> +void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
-> +{
-> +	int i;
-> +
-> +	free_memslot_rmap(slot);
->   
-> +	for (i = 1; i < KVM_NR_PAGE_SIZES; ++i) {
->   		kvfree(slot->arch.lpage_info[i - 1]);
->   		slot->arch.lpage_info[i - 1] = NULL;
->   	}
-> @@ -10894,12 +10900,9 @@ static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
->   	return 0;
->   
->   out_free:
-> -	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
-> -		kvfree(slot->arch.rmap[i]);
-> -		slot->arch.rmap[i] = NULL;
-> -		if (i == 0)
-> -			continue;
-> +	free_memslot_rmap(slot);
->   
-> +	for (i = 1; i < KVM_NR_PAGE_SIZES; ++i) {
->   		kvfree(slot->arch.lpage_info[i - 1]);
->   		slot->arch.lpage_info[i - 1] = NULL;
->   	}
-> 
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
--- 
-Thanks,
-
-David / dhildenb
 
