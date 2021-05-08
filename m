@@ -2,183 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DEBD376E39
-	for <lists+kvm@lfdr.de>; Sat,  8 May 2021 03:52:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD5A0376F21
+	for <lists+kvm@lfdr.de>; Sat,  8 May 2021 05:32:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230316AbhEHBxB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 May 2021 21:53:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58438 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230257AbhEHBxB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 May 2021 21:53:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620438720;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qaU4UN52bL9DeZ0ND4jhfpiSI9Et+mZ9RMw7As/kczA=;
-        b=PW2JLNDgJJa2ljaDClKSNKl/s2ETwxxGgpQYy0F0aBT3hGQCmCYfrqRc1i3JTbTxhwr6BJ
-        /EpieYQLHVJL6UYbb7T7Ft1/Yf1ZH/S5LlZdvhNMDqnpNgkqZeOlIwN9JSkhn8MnSqQ9fl
-        dJfVM+VlNelCiARaVpCRjhun3IsfHEQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-560-EHqKB97XOb2zg-q63RXjLQ-1; Fri, 07 May 2021 21:51:58 -0400
-X-MC-Unique: EHqKB97XOb2zg-q63RXjLQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20C30107ACC7;
-        Sat,  8 May 2021 01:51:57 +0000 (UTC)
-Received: from wangxiaodeMacBook-Air.local (ovpn-12-251.pek2.redhat.com [10.72.12.251])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 913785D740;
-        Sat,  8 May 2021 01:51:41 +0000 (UTC)
-Subject: Re: Question on guest enable msi fail when using GICv4/4.1
-To:     Marc Zyngier <maz@kernel.org>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        Shaokun Zhang <zhangshaokun@hisilicon.com>
-Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, linux-pci@vger.kernel.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Nianyao Tang <tangnianyao@huawei.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-References: <3a2c66d6-6ca0-8478-d24b-61e8e3241b20@hisilicon.com>
- <87k0oaq5jf.wl-maz@kernel.org>
- <cf870bcf-1173-a70b-2b55-4209abcbcbc3@hisilicon.com>
- <878s4qq00u.wl-maz@kernel.org> <874kfepht4.wl-maz@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <373c70d3-eda3-8e84-d138-2f90d4e55217@redhat.com>
-Date:   Sat, 8 May 2021 09:51:39 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.0
+        id S229853AbhEHDdL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 May 2021 23:33:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58956 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229806AbhEHDdL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 May 2021 23:33:11 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A4C2C061574
+        for <kvm@vger.kernel.org>; Fri,  7 May 2021 20:32:10 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id z6-20020a17090a1706b0290155e8a752d8so6515093pjd.4
+        for <kvm@vger.kernel.org>; Fri, 07 May 2021 20:32:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9JYYAmwYunC3A/UB35SuTsQeKsWMhFLNBAsmanEYycc=;
+        b=h2daclxA/ZVdOCctymOzhMZaQP/AtcACEj64ahtKuimTmR6UQfOS5kIAwWDY9EB4lS
+         TNlW/WlekKGjD6B6cGGsanQtHODdVi9uXNpeAJbVjb5g/9edzLIPqGPTJ+6qter83elK
+         KFYAiETqXkVxpWJ2cVkGJOTyeHxXIjUgp1fo29IeY9/KSvZSRv9Xj8dV+VhyA1AVUCF8
+         OmX28vXl93cFcLiNSC8lnCapr6XMgGeWHmBs8a9TSEjiFN54yawffUmPGQG0nFMjtl64
+         qkA+f7r2Z/BRuOqXl6+jox+/q7DZwx4PCl1zKbBi2YCpdC1Onwli9S9cDn1X6AWIkgnT
+         OQ6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9JYYAmwYunC3A/UB35SuTsQeKsWMhFLNBAsmanEYycc=;
+        b=Bkifnmd8XxyScPDN/qbqhqpH+uMOwPa44/FMptgmRHvwMMGj0hAQSGKhcl5ZBHee8g
+         WLgjdjSMALIXAJ11DMcP1iGnf1tDd5Kc0stph/lw3YHILuiydu5+Fn4eEs0dZUyX0ZKH
+         3Uj2Ceh8QiIiHTjLMD/UDFUcXnGvgLBLuaYYfLnHtM2JRi7fm3R8BgsSEvB8pS/7dl5E
+         lFxKxvrjvkc0maTLZOBWvhkqdKv4/VDOl6Lcvom5nKffb2x3x0yiMHDYEDC+ndbinNHq
+         CdUiFNYvRl+OSLrBVJ2GgOiQ2tlmqpXBA6r02iclR213//8Hi9/DzkCkyJTHGBBk8XW0
+         VM/g==
+X-Gm-Message-State: AOAM533RTqyiYHsQE5Uz3cbD2pGKLqqa2dlAOQCjotjA5t4Js/+YWQum
+        cdgpoKsVvEVxalVOTSiJmboX92PQbSp2FBDLPTcJ3A==
+X-Google-Smtp-Source: ABdhPJzip2jqsEDqlFdRd8w3o8BQZ7NP/TwAeaT3iaJZVotos8f6QBllfS4nCWODNnOXuEdE87xAo9sxcxAKokmX/8c=
+X-Received: by 2002:a17:90a:fa8f:: with SMTP id cu15mr14393879pjb.216.1620444729736;
+ Fri, 07 May 2021 20:32:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <874kfepht4.wl-maz@kernel.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+References: <20210504171734.1434054-1-seanjc@google.com> <20210504171734.1434054-10-seanjc@google.com>
+In-Reply-To: <20210504171734.1434054-10-seanjc@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Fri, 7 May 2021 20:31:53 -0700
+Message-ID: <CAAeT=FyKjHykGNcQc=toqvhCR281SWc6UqNihsjyU+vuo3z5Yg@mail.gmail.com>
+Subject: Re: [PATCH 09/15] KVM: VMX: Use flag to indicate "active" uret MSRs
+ instead of sorting list
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-ÔÚ 2021/5/8 ÉÏÎç1:36, Marc Zyngier Ð´µÀ:
-> On Fri, 07 May 2021 12:02:57 +0100,
-> Marc Zyngier <maz@kernel.org> wrote:
->> On Fri, 07 May 2021 10:58:23 +0100,
->> Shaokun Zhang <zhangshaokun@hisilicon.com> wrote:
->>> Hi Marc,
->>>
->>> Thanks for your quick reply.
->>>
->>> On 2021/5/7 17:03, Marc Zyngier wrote:
->>>> On Fri, 07 May 2021 06:57:04 +0100,
->>>> Shaokun Zhang <zhangshaokun@hisilicon.com> wrote:
->>>>> [This letter comes from Nianyao Tang]
->>>>>
->>>>> Hi,
->>>>>
->>>>> Using GICv4/4.1 and msi capability, guest vf driver requires 3
->>>>> vectors and enable msi, will lead to guest stuck.
->>>> Stuck how?
->>> Guest serial does not response anymore and guest network shutdown.
->>>
->>>>> Qemu gets number of interrupts from Multiple Message Capable field
->>>>> set by guest. This field is aligned to a power of 2(if a function
->>>>> requires 3 vectors, it initializes it to 2).
->>>> So I guess this is a MultiMSI device with 4 vectors, right?
->>>>
->>> Yes, it can support maximum of 32 msi interrupts, and vf driver only use 3 msi.
->>>
->>>>> However, guest driver just sends 3 mapi-cmd to vits and 3 ite
->>>>> entries is recorded in host.  Vfio initializes msi interrupts using
->>>>> the number of interrupts 4 provide by qemu.  When it comes to the
->>>>> 4th msi without ite in vits, in irq_bypass_register_producer,
->>>>> producer and consumer will __connect fail, due to find_ite fail, and
->>>>> do not resume guest.
->>>> Let me rephrase this to check that I understand it:
->>>> - The device has 4 vectors
->>>> - The guest only create mappings for 3 of them
->>>> - VFIO calls kvm_vgic_v4_set_forwarding() for each vector
->>>> - KVM doesn't have a mapping for the 4th vector and returns an error
->>>> - VFIO disable this 4th vector
->>>>
->>>> Is that correct? If yes, I don't understand why that impacts the guest
->>>> at all. From what I can see, vfio_msi_set_vector_signal() just prints
->>>> a message on the console and carries on.
->>>>
->>> function calls:
->>> --> vfio_msi_set_vector_signal
->>>     --> irq_bypass_register_producer
->>>        -->__connect
->>>
->>> in __connect, add_producer finally calls kvm_vgic_v4_set_forwarding
->>> and fails to get the 4th mapping. When add_producer fail, it does
->>> not call cons->start, calls kvm_arch_irq_bypass_start and then
->>> kvm_arm_resume_guest.
->> [+Eric, who wrote the irq_bypass infrastructure.]
->>
->> Ah, so the guest is actually paused, not in a livelock situation
->> (which is how I interpreted "stuck").
->>
->> I think we should handle this case gracefully, as there should be no
->> expectation that the guest will be using this interrupt. Given that
->> VFIO seems to be pretty unfazed when a producer fails, I'm temped to
->> do the same thing and restart the guest.
->>
->> Also, __disconnect doesn't care about errors, so why should __connect
->> have this odd behaviour?
->>
->> Can you please try this? It is completely untested (and I think the
->> del_consumer call is odd, which is why I've also dropped it).
->>
->> Eric, what do you think?
-> Adding Zhu, Jason, MST to the party. It all seems to be caused by this
-> commit:
+> -static void vmx_setup_uret_msr(struct vcpu_vmx *vmx, unsigned int msr)
+> +static void vmx_setup_uret_msr(struct vcpu_vmx *vmx, unsigned int msr,
+> +                              bool load_into_hardware)
+>  {
+> -       struct vmx_uret_msr tmp;
+> -       int from, to;
+> +       struct vmx_uret_msr *uret_msr;
 >
-> commit a979a6aa009f3c99689432e0cdb5402a4463fb88
-> Author: Zhu Lingshan <lingshan.zhu@intel.com>
-> Date:   Fri Jul 31 14:55:33 2020 +0800
+> -       from = __vmx_find_uret_msr(vmx, msr);
+> -       if (from < 0)
+> +       uret_msr = vmx_find_uret_msr(vmx, msr);
+> +       if (!uret_msr)
+>                 return;
+> -       to = vmx->nr_active_uret_msrs++;
 >
->      irqbypass: do not start cons/prod when failed connect
->      
->      If failed to connect, there is no need to start consumer nor
->      producer.
->      
->      Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->      Suggested-by: Jason Wang <jasowang@redhat.com>
->      Link: https://lore.kernel.org/r/20200731065533.4144-7-lingshan.zhu@intel.com
->      Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> -       tmp = vmx->guest_uret_msrs[to];
+> -       vmx->guest_uret_msrs[to] = vmx->guest_uret_msrs[from];
+> -       vmx->guest_uret_msrs[from] = tmp;
+> +       uret_msr->load_into_hardware = load_into_hardware;
+>  }
 >
+>  /*
+> @@ -1785,30 +1781,36 @@ static void vmx_setup_uret_msr(struct vcpu_vmx *vmx, unsigned int msr)
+>   */
+>  static void setup_msrs(struct vcpu_vmx *vmx)
+>  {
+> -       vmx->guest_uret_msrs_loaded = false;
+> -       vmx->nr_active_uret_msrs = 0;
+>  #ifdef CONFIG_X86_64
+> +       bool load_syscall_msrs;
+> +
+>         /*
+>          * The SYSCALL MSRs are only needed on long mode guests, and only
+>          * when EFER.SCE is set.
+>          */
+> -       if (is_long_mode(&vmx->vcpu) && (vmx->vcpu.arch.efer & EFER_SCE)) {
+> -               vmx_setup_uret_msr(vmx, MSR_STAR);
+> -               vmx_setup_uret_msr(vmx, MSR_LSTAR);
+> -               vmx_setup_uret_msr(vmx, MSR_SYSCALL_MASK);
+> -       }
+> +       load_syscall_msrs = is_long_mode(&vmx->vcpu) &&
+> +                           (vmx->vcpu.arch.efer & EFER_SCE);
+> +
+> +       vmx_setup_uret_msr(vmx, MSR_STAR, load_syscall_msrs);
+> +       vmx_setup_uret_msr(vmx, MSR_LSTAR, load_syscall_msrs);
+> +       vmx_setup_uret_msr(vmx, MSR_SYSCALL_MASK, load_syscall_msrs);
+>  #endif
+> -       if (update_transition_efer(vmx))
+> -               vmx_setup_uret_msr(vmx, MSR_EFER);
+> +       vmx_setup_uret_msr(vmx, MSR_EFER, update_transition_efer(vmx));
 >
-> Zhu, I'd really like to understand why you think it is OK not to
-> restart consumer and producers when a connection has failed to be
-> established between the two?
+> -       if (guest_cpuid_has(&vmx->vcpu, X86_FEATURE_RDTSCP)  ||
+> -           guest_cpuid_has(&vmx->vcpu, X86_FEATURE_RDPID))
+> -               vmx_setup_uret_msr(vmx, MSR_TSC_AUX);
+> +       vmx_setup_uret_msr(vmx, MSR_TSC_AUX,
+> +                          guest_cpuid_has(&vmx->vcpu, X86_FEATURE_RDTSCP) ||
+> +                          guest_cpuid_has(&vmx->vcpu, X86_FEATURE_RDPID));
+
+Shouldn't vmx_setup_uret_msr(,MSR_TSC_AUX,) be called to update
+the new flag load_into_hardware for MSR_TSC_AUX when CPUID
+(X86_FEATURE_RDTSCP/X86_FEATURE_RDPID) of the vCPU is updated ?
 
 
-My bad, I didn't check ARM code but it's not easy to infer that the 
-cons->start/stop is not a per consumer specific operation but a global 
-one like VM halting/resuming.
-
-
->
-> In the case of KVM/arm64, this results in the guest being forever
-> suspended and never resumed. That's obviously not an acceptable
-> regression, as there is a number of benign reasons for a connect to
-> fail.
-
-
-Let's revert this commit.
-
-Thanks
-
-
->
-> Thanks,
->
-> 	M.
->
-
+Thanks,
+Reiji
