@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D1473770EE
-	for <lists+kvm@lfdr.de>; Sat,  8 May 2021 11:32:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E11FF3770ED
+	for <lists+kvm@lfdr.de>; Sat,  8 May 2021 11:32:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230411AbhEHJdQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 8 May 2021 05:33:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51922 "EHLO
+        id S230393AbhEHJdO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 8 May 2021 05:33:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230360AbhEHJdN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 8 May 2021 05:33:13 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08A34C061574;
-        Sat,  8 May 2021 02:32:08 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id v13so6455662ple.9;
-        Sat, 08 May 2021 02:32:08 -0700 (PDT)
+        with ESMTP id S229583AbhEHJdM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 8 May 2021 05:33:12 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98132C061756;
+        Sat,  8 May 2021 02:32:10 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id b21so6498435plz.0;
+        Sat, 08 May 2021 02:32:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=VCwCRDPBnnn7qNUo5vSlKxWUsTUAH/2lmhRqXohoBWQ=;
-        b=U1kzLI99KF6933JgzvSZO63mcvGR5o2wyX8353sk/s67IUbcMyJ7kkQnJ0bMgnhueP
-         4GoYk7no/XGcFOo3PmizqCkxIkr4LJ9ZcxkywTOTDVayUiSWNi96AAIBpbFZTeiLzH8n
-         P0TTGPIdjAyKWzl6oIhA5WeoRfLhuCAod3KgVhHu7wNDtJSjYbap9HkYWkEodUL26mvr
-         e/yaU0xypoTGxd/bFo7JAO6lJOqUEk1xcqi43sDvkgdBqRovCuNgXlyS93zxPCmOThrs
-         zD+idL9m3v3/XvlOIamH12UEW6Gh2Pwz7T0RDueBwMe01OlDSO/YHL3bv9Kv5h1cqEej
-         nfHQ==
+        bh=1CGHW9g1U7mxu/mVGb43UumaGiz2ve3vaE4gPvsroXY=;
+        b=pbDNw1Fx99ba7QrZGEIm3/SSQPA+bqJOrtp8ZLb9V73V8MxilDw19X7PFvb6cmZHlr
+         tWsyk85UfQdF1vdn/Gzb1CZITBpP0i/KxS2W/2wEL9L+l2I1kUagiHakVRr2SaxxnbEm
+         QTu2kzhqPT6bab/UqOaOoLw4vMasOeqqHD7kX4VfKoZ1iM0xlIEsyO+L+Xsz4+0TiEKg
+         8YQhDFEbjSbSfWzYzsCfUkybNrPTk5djolvDN2iWu1z+nll5XaU+/17OvAjhbfTA62+v
+         Hl5LOzFPTW0bvHLcqWx+SMDAVN1rasBs3Q5jSaJp/lbeclLW4QFCxLzvrFuKu+r3O7sM
+         SI6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=VCwCRDPBnnn7qNUo5vSlKxWUsTUAH/2lmhRqXohoBWQ=;
-        b=O/grl6bFVPP+DczOM9uIh1ZTDEI2VA56sjcVDtYnUewVf15NViSBpS9F+T+SfKvBag
-         ZCPftTpFeVUD2H/h80BU2KhZr1TpKY0Fh8y0FBHEaQL7liwgoAsLrE0YjZ/iOv01/xQm
-         RzU9A1ZLWabPPDybKHSVs+wwkjV/NA+5JjWisI1XSpL0zsdWA+buEY7fqby9BbSZYOXR
-         E4K2vrfuJb+DlBgAmlpL23xlsg0+ABE3dPwVFWgGTuEKXlqkoFl2/FVc2+n1wOnnJKIG
-         HGgE4Joj/wb+nhNFR23mOVIC1qLcGCx8wUVaOZKwKAGIvbxYTqtZfgl4J4/j9Vu04lwm
-         9Ugw==
-X-Gm-Message-State: AOAM530hFuy2sJ/aP9oHjqe4XYMXiLeMr5jR9vOEs0Pz2NBRnLBREoaJ
-        jeRDwadpVB7QwZciHms+jyO38rnqfQQ=
-X-Google-Smtp-Source: ABdhPJxxb1/hNde2lEJzxBj+zIr/lFBB813z09ATk4UL3888M0n3XvTRwOV0m/VLp1syeMHd4xmVWw==
-X-Received: by 2002:a17:902:9a01:b029:ef:11d:4b77 with SMTP id v1-20020a1709029a01b02900ef011d4b77mr10680897plp.51.1620466327228;
-        Sat, 08 May 2021 02:32:07 -0700 (PDT)
+        bh=1CGHW9g1U7mxu/mVGb43UumaGiz2ve3vaE4gPvsroXY=;
+        b=nx8kNBusuWfeiTqbEqLZ+J4E9UnFXKc95WDiOdop1r5NQhRmAwawxGDi6RuoUmmWd3
+         LUzV5w8/5lwEnBQsV0CK+mbtdjIUxx0sVfU5t3LpHTPG/LQbKCLv7/ENjHZNNAEW9GTj
+         uK8818l/yQvKPxH4daMW6yJmJkO7/ZQRxObEB0W1FreSkkEQgBZMKHoIW3grDvp6DbWa
+         oLKOdn4Txe9o0IMhT9prveN44ZrpOXDwFQfT9k7k5NlGm1ntfVFfDotbe6iPMWpOL1L3
+         Xg4LL1u9K6YPGVMjnKjKvsQzPtVHLpwGlX+oWhXg+gdpiLNIt6GhuBDEYCk6pSPZjFke
+         /JDA==
+X-Gm-Message-State: AOAM530ndE7Xt/iTv/EeSdX5MI29FInSofknkn+YerdDL3Gaci5NJaAp
+        9qfSo+GxSV704inmSFxBtgO0wRR3Vq0=
+X-Google-Smtp-Source: ABdhPJy//+f7HmIzch4pMQ1TT6uDnh5IuVL+45PNnmpu/8oWSEAXNCv0ga9U3CCfGHrHzyAqD2BfwA==
+X-Received: by 2002:a17:902:bc88:b029:ee:7ef1:e770 with SMTP id bb8-20020a170902bc88b02900ee7ef1e770mr14621444plb.19.1620466329986;
+        Sat, 08 May 2021 02:32:09 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id f3sm40437765pjo.3.2021.05.08.02.32.04
+        by smtp.googlemail.com with ESMTPSA id f3sm40437765pjo.3.2021.05.08.02.32.07
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 08 May 2021 02:32:06 -0700 (PDT)
+        Sat, 08 May 2021 02:32:09 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
@@ -54,10 +54,10 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH 2/3] KVM: X86: Bail out of direct yield in case of undercomitted scenarios
-Date:   Sat,  8 May 2021 17:31:49 +0800
-Message-Id: <1620466310-8428-2-git-send-email-wanpengli@tencent.com>
+        Joerg Roedel <joro@8bytes.org>, stable@vger.kernel.org
+Subject: [PATCH 3/3] KVM: X86: Fix vCPU preempted state from guest point of view
+Date:   Sat,  8 May 2021 17:31:50 +0800
+Message-Id: <1620466310-8428-3-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1620466310-8428-1-git-send-email-wanpengli@tencent.com>
 References: <1620466310-8428-1-git-send-email-wanpengli@tencent.com>
@@ -67,31 +67,36 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-In case of undercomitted scenarios, vCPU can get scheduling easily, 
-kvm_vcpu_yield_to adds extra overhead, we can observe a lot of race 
-between vcpu->ready is true and yield fails due to p->state is 
-TASK_RUNNING. Let's bail out is such scenarios by checking the length 
-of current cpu runqueue.
+Commit 66570e966dd9 (kvm: x86: only provide PV features if enabled in guest's 
+CPUID) avoids to access pv tlb shootdown host side logic when this pv feature 
+is not exposed to guest, however, kvm_steal_time.preempted not only leveraged 
+by pv tlb shootdown logic but also mitigate the lock holder preemption issue. 
+From guest point of view, vCPU is always preempted since we lose the reset of
+kvm_steal_time.preempted before vmentry if pv tlb shootdown feature is not 
+exposed. This patch fixes it by clearing kvm_steal_time.preempted before 
+vmentry.
 
+Fixes: 66570e966dd9 (kvm: x86: only provide PV features if enabled in guest's CPUID)
+Cc: stable@vger.kernel.org
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- arch/x86/kvm/x86.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/x86/kvm/x86.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5bd550e..c0244a6 100644
+index c0244a6..c38e990 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -8358,6 +8358,9 @@ static void kvm_sched_yield(struct kvm_vcpu *vcpu, unsigned long dest_id)
- 	struct kvm_vcpu *target = NULL;
- 	struct kvm_apic_map *map;
+@@ -3105,7 +3105,8 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+ 				       st->preempted & KVM_VCPU_FLUSH_TLB);
+ 		if (xchg(&st->preempted, 0) & KVM_VCPU_FLUSH_TLB)
+ 			kvm_vcpu_flush_tlb_guest(vcpu);
+-	}
++	} else
++		st->preempted = 0;
  
-+	if (single_task_running())
-+		goto no_yield;
-+
- 	vcpu->stat.directed_yield_attempted++;
+ 	vcpu->arch.st.preempted = 0;
  
- 	rcu_read_lock();
 -- 
 2.7.4
 
