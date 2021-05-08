@@ -2,249 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AFE82376DA7
-	for <lists+kvm@lfdr.de>; Sat,  8 May 2021 02:29:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DEBD376E39
+	for <lists+kvm@lfdr.de>; Sat,  8 May 2021 03:52:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230079AbhEHA3h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 May 2021 20:29:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47476 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229880AbhEHA3g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 May 2021 20:29:36 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12AB1C061574
-        for <kvm@vger.kernel.org>; Fri,  7 May 2021 17:28:36 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id w33-20020a6349210000b029020ed5af91a4so6359114pga.14
-        for <kvm@vger.kernel.org>; Fri, 07 May 2021 17:28:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=SphSvC26ZGxlBkm3BeBKNoj34ApiaYqthl3dh1p5JaA=;
-        b=dwdozba0Kg9U9NaGXkRlf8+ZmY43QVsYlEd56RN0AIt9O2vMLU+P3s8uN4ZpKsY9Pu
-         uN0FN9xGRXdou1j9Zo3xt/9Werr3j3DumVKd46f01vVRXofLMw7Uxk65HxKrUmCMDXzD
-         VCzsoOjIT4pc3XHrw/147XtCmb6j7miL9im6CU2jUMbpyr6lxyMhV/xJLt6nqvcAsVBy
-         R3UJHuDfTK/xKeu8hUtNvUWYEol84IdINKnY6wU6NsrOhxmVxN60lu13gZvWyUSXzUnM
-         +umuD8BhUoBgnwj4aRgI4+7mUJL5NLJMtwbKlXBU/pG41oK9E6aEI7Zw1LsoPi65ygPB
-         xQ7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=SphSvC26ZGxlBkm3BeBKNoj34ApiaYqthl3dh1p5JaA=;
-        b=s5Nuomacg6eJzYrABx0EcZAOlieg/bcO8UPo5pTR/JDQ1wYw5Z31alCMpixcNbmkNo
-         o437HBosVX1HAmV9Wf6O9pbb7TWYddayU4u7H41V5vWXKOg4UamaDESolZqiaDH7kkyw
-         rI0Ipd5lgMZsDNrTdtQnXXKNq5NB+sVX4COsK3iXh2TFQZNqTxBQQAVOwP7VC6LGxWaM
-         u7r8urVD2ppGR9PrKXaL+UNUtW3v5LlDJux3CXwDKt9CyfvIzTdi0WYyaTeALADUCYM9
-         /jDAgA1e7+3nsEM+XTzo1fYIhMn6bz3xSdu398ttJpw2Z8NIIv7ESR9c7jwxgu4Ab4aF
-         ohSQ==
-X-Gm-Message-State: AOAM531Qf1yx/nIfnVkjLrfAlCucdpYE1PXZTqAiXL/w9AKlXT1cjp20
-        Pp4Szq+MBeyHbjrdZFNtclfe9MlTh8r1gk2bMCA9leAf/+Vo6BZVM27qmIBXHeFxx70Rq+r4Nzl
-        nBIRqbCeMbnTUov0Lk1eykkraMiVGThLZSgLdjpVygj+mTYMdlkCN4T5WlAOeXGM=
-X-Google-Smtp-Source: ABdhPJxFiRAmqpeiaRlsjVw4wHe7AzBIJxMZn2UglcIKWAkWX9bsq06z4g2PNqxFAn/Ucifil5gPLKIe9g9GcA==
-X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a62:25c4:0:b029:276:a40:5729 with SMTP id
- l187-20020a6225c40000b02902760a405729mr13092313pfl.80.1620433715222; Fri, 07
- May 2021 17:28:35 -0700 (PDT)
-Date:   Sat,  8 May 2021 00:28:32 +0000
-Message-Id: <20210508002832.759818-1-dmatlack@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.31.1.607.g51e8a6a459-goog
-Subject: [PATCH v2] KVM: selftests: Print a message if /dev/kvm is missing
-From:   David Matlack <dmatlack@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S230316AbhEHBxB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 May 2021 21:53:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58438 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230257AbhEHBxB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 May 2021 21:53:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620438720;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qaU4UN52bL9DeZ0ND4jhfpiSI9Et+mZ9RMw7As/kczA=;
+        b=PW2JLNDgJJa2ljaDClKSNKl/s2ETwxxGgpQYy0F0aBT3hGQCmCYfrqRc1i3JTbTxhwr6BJ
+        /EpieYQLHVJL6UYbb7T7Ft1/Yf1ZH/S5LlZdvhNMDqnpNgkqZeOlIwN9JSkhn8MnSqQ9fl
+        dJfVM+VlNelCiARaVpCRjhun3IsfHEQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-560-EHqKB97XOb2zg-q63RXjLQ-1; Fri, 07 May 2021 21:51:58 -0400
+X-MC-Unique: EHqKB97XOb2zg-q63RXjLQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20C30107ACC7;
+        Sat,  8 May 2021 01:51:57 +0000 (UTC)
+Received: from wangxiaodeMacBook-Air.local (ovpn-12-251.pek2.redhat.com [10.72.12.251])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 913785D740;
+        Sat,  8 May 2021 01:51:41 +0000 (UTC)
+Subject: Re: Question on guest enable msi fail when using GICv4/4.1
+To:     Marc Zyngier <maz@kernel.org>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        Shaokun Zhang <zhangshaokun@hisilicon.com>
+Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, linux-pci@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Nianyao Tang <tangnianyao@huawei.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+References: <3a2c66d6-6ca0-8478-d24b-61e8e3241b20@hisilicon.com>
+ <87k0oaq5jf.wl-maz@kernel.org>
+ <cf870bcf-1173-a70b-2b55-4209abcbcbc3@hisilicon.com>
+ <878s4qq00u.wl-maz@kernel.org> <874kfepht4.wl-maz@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <373c70d3-eda3-8e84-d138-2f90d4e55217@redhat.com>
+Date:   Sat, 8 May 2021 09:51:39 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.10.0
+MIME-Version: 1.0
+In-Reply-To: <874kfepht4.wl-maz@kernel.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If a KVM selftest is run on a machine without /dev/kvm, it will exit
-silently. Make it easy to tell what's happening by printing an error
-message.
 
-Opportunistically consolidate all codepaths that open /dev/kvm into a
-single function so they all print the same message.
+ÔÚ 2021/5/8 ÉÏÎç1:36, Marc Zyngier Ð´µÀ:
+> On Fri, 07 May 2021 12:02:57 +0100,
+> Marc Zyngier <maz@kernel.org> wrote:
+>> On Fri, 07 May 2021 10:58:23 +0100,
+>> Shaokun Zhang <zhangshaokun@hisilicon.com> wrote:
+>>> Hi Marc,
+>>>
+>>> Thanks for your quick reply.
+>>>
+>>> On 2021/5/7 17:03, Marc Zyngier wrote:
+>>>> On Fri, 07 May 2021 06:57:04 +0100,
+>>>> Shaokun Zhang <zhangshaokun@hisilicon.com> wrote:
+>>>>> [This letter comes from Nianyao Tang]
+>>>>>
+>>>>> Hi,
+>>>>>
+>>>>> Using GICv4/4.1 and msi capability, guest vf driver requires 3
+>>>>> vectors and enable msi, will lead to guest stuck.
+>>>> Stuck how?
+>>> Guest serial does not response anymore and guest network shutdown.
+>>>
+>>>>> Qemu gets number of interrupts from Multiple Message Capable field
+>>>>> set by guest. This field is aligned to a power of 2(if a function
+>>>>> requires 3 vectors, it initializes it to 2).
+>>>> So I guess this is a MultiMSI device with 4 vectors, right?
+>>>>
+>>> Yes, it can support maximum of 32 msi interrupts, and vf driver only use 3 msi.
+>>>
+>>>>> However, guest driver just sends 3 mapi-cmd to vits and 3 ite
+>>>>> entries is recorded in host.  Vfio initializes msi interrupts using
+>>>>> the number of interrupts 4 provide by qemu.  When it comes to the
+>>>>> 4th msi without ite in vits, in irq_bypass_register_producer,
+>>>>> producer and consumer will __connect fail, due to find_ite fail, and
+>>>>> do not resume guest.
+>>>> Let me rephrase this to check that I understand it:
+>>>> - The device has 4 vectors
+>>>> - The guest only create mappings for 3 of them
+>>>> - VFIO calls kvm_vgic_v4_set_forwarding() for each vector
+>>>> - KVM doesn't have a mapping for the 4th vector and returns an error
+>>>> - VFIO disable this 4th vector
+>>>>
+>>>> Is that correct? If yes, I don't understand why that impacts the guest
+>>>> at all. From what I can see, vfio_msi_set_vector_signal() just prints
+>>>> a message on the console and carries on.
+>>>>
+>>> function calls:
+>>> --> vfio_msi_set_vector_signal
+>>>     --> irq_bypass_register_producer
+>>>        -->__connect
+>>>
+>>> in __connect, add_producer finally calls kvm_vgic_v4_set_forwarding
+>>> and fails to get the 4th mapping. When add_producer fail, it does
+>>> not call cons->start, calls kvm_arch_irq_bypass_start and then
+>>> kvm_arm_resume_guest.
+>> [+Eric, who wrote the irq_bypass infrastructure.]
+>>
+>> Ah, so the guest is actually paused, not in a livelock situation
+>> (which is how I interpreted "stuck").
+>>
+>> I think we should handle this case gracefully, as there should be no
+>> expectation that the guest will be using this interrupt. Given that
+>> VFIO seems to be pretty unfazed when a producer fails, I'm temped to
+>> do the same thing and restart the guest.
+>>
+>> Also, __disconnect doesn't care about errors, so why should __connect
+>> have this odd behaviour?
+>>
+>> Can you please try this? It is completely untested (and I think the
+>> del_consumer call is odd, which is why I've also dropped it).
+>>
+>> Eric, what do you think?
+> Adding Zhu, Jason, MST to the party. It all seems to be caused by this
+> commit:
+>
+> commit a979a6aa009f3c99689432e0cdb5402a4463fb88
+> Author: Zhu Lingshan <lingshan.zhu@intel.com>
+> Date:   Fri Jul 31 14:55:33 2020 +0800
+>
+>      irqbypass: do not start cons/prod when failed connect
+>      
+>      If failed to connect, there is no need to start consumer nor
+>      producer.
+>      
+>      Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>      Suggested-by: Jason Wang <jasowang@redhat.com>
+>      Link: https://lore.kernel.org/r/20200731065533.4144-7-lingshan.zhu@intel.com
+>      Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
+>
+> Zhu, I'd really like to understand why you think it is OK not to
+> restart consumer and producers when a connection has failed to be
+> established between the two?
 
-This slightly changes the semantics of vm_is_unrestricted_guest() by
-changing a TEST_ASSERT() to exit(KSFT_SKIP). However
-vm_is_unrestricted_guest() is only called in one place
-(x86_64/mmio_warning_test.c) and that is to determine if the test should
-be skipped or not.
 
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- .../testing/selftests/kvm/include/kvm_util.h  |  1 +
- tools/testing/selftests/kvm/lib/kvm_util.c    | 39 ++++++++++++-------
- .../selftests/kvm/lib/x86_64/processor.c      | 16 ++------
- .../kvm/x86_64/get_msr_index_features.c       |  8 +---
- 4 files changed, 32 insertions(+), 32 deletions(-)
+My bad, I didn't check ARM code but it's not easy to infer that the 
+cons->start/stop is not a per consumer specific operation but a global 
+one like VM halting/resuming.
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index a8f022794ce3..401393a8c2b7 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -77,6 +77,7 @@ struct vm_guest_mode_params {
- };
- extern const struct vm_guest_mode_params vm_guest_mode_params[];
- 
-+int open_kvm_dev_path_or_exit(int flags);
- int kvm_check_cap(long cap);
- int vm_enable_cap(struct kvm_vm *vm, struct kvm_enable_cap *cap);
- int vcpu_enable_cap(struct kvm_vm *vm, uint32_t vcpu_id,
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index fc83f6c5902d..10d488f83e3a 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -31,6 +31,27 @@ static void *align(void *x, size_t size)
- 	return (void *) (((size_t) x + mask) & ~mask);
- }
- 
-+/* Open KVM_DEV_PATH if available, otherwise exit the entire program.
-+ *
-+ * Input Args:
-+ *   flags - The flags to pass when opening KVM_DEV_PATH.
-+ *
-+ * Return:
-+ *   The opened file descriptor of /dev/kvm.
-+ */
-+int open_kvm_dev_path_or_exit(int flags)
-+{
-+	int fd;
-+
-+	fd = open(KVM_DEV_PATH, flags);
-+	if (fd < 0) {
-+		print_skip("%s not available", KVM_DEV_PATH);
-+		exit(KSFT_SKIP);
-+	}
-+
-+	return fd;
-+}
-+
- /*
-  * Capability
-  *
-@@ -52,10 +73,7 @@ int kvm_check_cap(long cap)
- 	int ret;
- 	int kvm_fd;
- 
--	kvm_fd = open(KVM_DEV_PATH, O_RDONLY);
--	if (kvm_fd < 0)
--		exit(KSFT_SKIP);
--
-+	kvm_fd = open_kvm_dev_path_or_exit(O_RDONLY);
- 	ret = ioctl(kvm_fd, KVM_CHECK_EXTENSION, cap);
- 	TEST_ASSERT(ret != -1, "KVM_CHECK_EXTENSION IOCTL failed,\n"
- 		"  rc: %i errno: %i", ret, errno);
-@@ -128,9 +146,7 @@ void vm_enable_dirty_ring(struct kvm_vm *vm, uint32_t ring_size)
- 
- static void vm_open(struct kvm_vm *vm, int perm)
- {
--	vm->kvm_fd = open(KVM_DEV_PATH, perm);
--	if (vm->kvm_fd < 0)
--		exit(KSFT_SKIP);
-+	vm->kvm_fd = open_kvm_dev_path_or_exit(perm);
- 
- 	if (!kvm_check_cap(KVM_CAP_IMMEDIATE_EXIT)) {
- 		print_skip("immediate_exit not available");
-@@ -925,9 +941,7 @@ static int vcpu_mmap_sz(void)
- {
- 	int dev_fd, ret;
- 
--	dev_fd = open(KVM_DEV_PATH, O_RDONLY);
--	if (dev_fd < 0)
--		exit(KSFT_SKIP);
-+	dev_fd = open_kvm_dev_path_or_exit(O_RDONLY);
- 
- 	ret = ioctl(dev_fd, KVM_GET_VCPU_MMAP_SIZE, NULL);
- 	TEST_ASSERT(ret >= sizeof(struct kvm_run),
-@@ -2015,10 +2029,7 @@ bool vm_is_unrestricted_guest(struct kvm_vm *vm)
- 
- 	if (vm == NULL) {
- 		/* Ensure that the KVM vendor-specific module is loaded. */
--		f = fopen(KVM_DEV_PATH, "r");
--		TEST_ASSERT(f != NULL, "Error in opening KVM dev file: %d",
--			    errno);
--		fclose(f);
-+		close(open_kvm_dev_path_or_exit(O_RDONLY));
- 	}
- 
- 	f = fopen("/sys/module/kvm_intel/parameters/unrestricted_guest", "r");
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index a8906e60a108..1ce0a37d8a89 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -657,9 +657,7 @@ struct kvm_cpuid2 *kvm_get_supported_cpuid(void)
- 		return cpuid;
- 
- 	cpuid = allocate_kvm_cpuid2();
--	kvm_fd = open(KVM_DEV_PATH, O_RDONLY);
--	if (kvm_fd < 0)
--		exit(KSFT_SKIP);
-+	kvm_fd = open_kvm_dev_path_or_exit(O_RDONLY);
- 
- 	ret = ioctl(kvm_fd, KVM_GET_SUPPORTED_CPUID, cpuid);
- 	TEST_ASSERT(ret == 0, "KVM_GET_SUPPORTED_CPUID failed %d %d\n",
-@@ -691,9 +689,7 @@ uint64_t kvm_get_feature_msr(uint64_t msr_index)
- 
- 	buffer.header.nmsrs = 1;
- 	buffer.entry.index = msr_index;
--	kvm_fd = open(KVM_DEV_PATH, O_RDONLY);
--	if (kvm_fd < 0)
--		exit(KSFT_SKIP);
-+	kvm_fd = open_kvm_dev_path_or_exit(O_RDONLY);
- 
- 	r = ioctl(kvm_fd, KVM_GET_MSRS, &buffer.header);
- 	TEST_ASSERT(r == 1, "KVM_GET_MSRS IOCTL failed,\n"
-@@ -986,9 +982,7 @@ struct kvm_msr_list *kvm_get_msr_index_list(void)
- 	struct kvm_msr_list *list;
- 	int nmsrs, r, kvm_fd;
- 
--	kvm_fd = open(KVM_DEV_PATH, O_RDONLY);
--	if (kvm_fd < 0)
--		exit(KSFT_SKIP);
-+	kvm_fd = open_kvm_dev_path_or_exit(O_RDONLY);
- 
- 	nmsrs = kvm_get_num_msrs_fd(kvm_fd);
- 	list = malloc(sizeof(*list) + nmsrs * sizeof(list->indices[0]));
-@@ -1312,9 +1306,7 @@ struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(void)
- 		return cpuid;
- 
- 	cpuid = allocate_kvm_cpuid2();
--	kvm_fd = open(KVM_DEV_PATH, O_RDONLY);
--	if (kvm_fd < 0)
--		exit(KSFT_SKIP);
-+	kvm_fd = open_kvm_dev_path_or_exit(O_RDONLY);
- 
- 	ret = ioctl(kvm_fd, KVM_GET_SUPPORTED_HV_CPUID, cpuid);
- 	TEST_ASSERT(ret == 0, "KVM_GET_SUPPORTED_HV_CPUID failed %d %d\n",
-diff --git a/tools/testing/selftests/kvm/x86_64/get_msr_index_features.c b/tools/testing/selftests/kvm/x86_64/get_msr_index_features.c
-index cb953df4d7d0..91373935bff6 100644
---- a/tools/testing/selftests/kvm/x86_64/get_msr_index_features.c
-+++ b/tools/testing/selftests/kvm/x86_64/get_msr_index_features.c
-@@ -37,9 +37,7 @@ static void test_get_msr_index(void)
- 	int old_res, res, kvm_fd, r;
- 	struct kvm_msr_list *list;
- 
--	kvm_fd = open(KVM_DEV_PATH, O_RDONLY);
--	if (kvm_fd < 0)
--		exit(KSFT_SKIP);
-+	kvm_fd = open_kvm_dev_path_or_exit(O_RDONLY);
- 
- 	old_res = kvm_num_index_msrs(kvm_fd, 0);
- 	TEST_ASSERT(old_res != 0, "Expecting nmsrs to be > 0");
-@@ -101,9 +99,7 @@ static void test_get_msr_feature(void)
- 	int res, old_res, i, kvm_fd;
- 	struct kvm_msr_list *feature_list;
- 
--	kvm_fd = open(KVM_DEV_PATH, O_RDONLY);
--	if (kvm_fd < 0)
--		exit(KSFT_SKIP);
-+	kvm_fd = open_kvm_dev_path_or_exit(O_RDONLY);
- 
- 	old_res = kvm_num_feature_msrs(kvm_fd, 0);
- 	TEST_ASSERT(old_res != 0, "Expecting nmsrs to be > 0");
--- 
-2.31.1.607.g51e8a6a459-goog
+
+>
+> In the case of KVM/arm64, this results in the guest being forever
+> suspended and never resumed. That's obviously not an acceptable
+> regression, as there is a number of benign reasons for a connect to
+> fail.
+
+
+Let's revert this commit.
+
+Thanks
+
+
+>
+> Thanks,
+>
+> 	M.
+>
 
