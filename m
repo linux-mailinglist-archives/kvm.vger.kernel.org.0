@@ -2,111 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4416C376FB1
-	for <lists+kvm@lfdr.de>; Sat,  8 May 2021 07:08:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA0F9377035
+	for <lists+kvm@lfdr.de>; Sat,  8 May 2021 08:57:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230429AbhEHFJx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 8 May 2021 01:09:53 -0400
-Received: from mga05.intel.com ([192.55.52.43]:44649 "EHLO mga05.intel.com"
+        id S230085AbhEHG6S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 8 May 2021 02:58:18 -0400
+Received: from mga05.intel.com ([192.55.52.43]:31055 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229841AbhEHFJw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 8 May 2021 01:09:52 -0400
-IronPort-SDR: PV/luzZuE82VIC9b1M9LifUL7iKLG6C5D846ri5UNlEBF/+7VtdzUPdCRZBejh38UV83ns7JAu
- jZpiswjunfYg==
-X-IronPort-AV: E=McAfee;i="6200,9189,9977"; a="284333992"
+        id S229701AbhEHG6S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 8 May 2021 02:58:18 -0400
+IronPort-SDR: e3374fKmBfJI6clEZh3NVKXf8tyVdEjRr85TPLza+mc8J7i9XTgbGekIygZndhiAaNWFOfVjGg
+ vG2cem+tBaYA==
+X-IronPort-AV: E=McAfee;i="6200,9189,9977"; a="284342962"
 X-IronPort-AV: E=Sophos;i="5.82,282,1613462400"; 
-   d="asc'?scan'208";a="284333992"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2021 22:08:52 -0700
-IronPort-SDR: Dv3dGDws6GEtevLyQTECKkR1AuLUReLH1KTJFez646MGA6b4ixaiVRy+90+G3n+Xr5SvbCm8K9
- suwx2W96fVUQ==
-X-ExtLoop1: 1
+   d="scan'208";a="284342962"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2021 23:57:17 -0700
+IronPort-SDR: zS4QOPadBzcAxJpEIR004ULpAonv9OaBt4d9Hfs0piQ51u0zXRSpAbLsa0LmW5WvY0rMNl+A/g
+ R8ub7TQ6FLPQ==
 X-IronPort-AV: E=Sophos;i="5.82,282,1613462400"; 
-   d="asc'?scan'208";a="460405312"
-Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.160.147])
-  by FMSMGA003.fm.intel.com with ESMTP; 07 May 2021 22:08:50 -0700
-Date:   Sat, 8 May 2021 12:50:04 +0800
-From:   Zhenyu Wang <zhenyuw@linux.intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     tkffaul@outlook.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vfio/pci: Sanity check IGD OpRegion Size
-Message-ID: <20210508045004.GH4589@zhen-hp.sh.intel.com>
-Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
-References: <162041357421.21800.16214130780777455390.stgit@omen>
+   d="scan'208";a="470153866"
+Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.254.209.3]) ([10.254.209.3])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2021 23:57:02 -0700
+Subject: Re: Question on guest enable msi fail when using GICv4/4.1
+To:     Jason Wang <jasowang@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Shaokun Zhang <zhangshaokun@hisilicon.com>
+Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, linux-pci@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Nianyao Tang <tangnianyao@huawei.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+References: <3a2c66d6-6ca0-8478-d24b-61e8e3241b20@hisilicon.com>
+ <87k0oaq5jf.wl-maz@kernel.org>
+ <cf870bcf-1173-a70b-2b55-4209abcbcbc3@hisilicon.com>
+ <878s4qq00u.wl-maz@kernel.org> <874kfepht4.wl-maz@kernel.org>
+ <373c70d3-eda3-8e84-d138-2f90d4e55217@redhat.com>
+From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
+Message-ID: <4695fd66-7832-5070-627a-74dd254f7456@intel.com>
+Date:   Sat, 8 May 2021 14:56:58 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="KFztAG8eRSV9hGtP"
-Content-Disposition: inline
-In-Reply-To: <162041357421.21800.16214130780777455390.stgit@omen>
+In-Reply-To: <373c70d3-eda3-8e84-d138-2f90d4e55217@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---KFztAG8eRSV9hGtP
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On 2021.05.07 12:53:17 -0600, Alex Williamson wrote:
-> The size field of the IGD OpRegion table is supposed to indicate table
-> size in KB, but we've seen at least one report of a BIOS that appears
-> to incorrectly report size in bytes.  The default size is 8 (*1024 =3D
-> 8KB), but an incorrect implementation may report 8192 (*1024 =3D 8MB)
-> and can cause a variety of mapping errors.
->=20
-> It's believed that 8MB would be an implausible, if not absurd, actual
-> size, so we can probably be pretty safe in assuming this is a BIOS bug
-> where the intended size is likely 8KB.
->=20
-> Reported-by: Travis Faulhaber <tkffaul@outlook.com>
-> Tested-by: Travis Faulhaber <tkffaul@outlook.com>
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
->  drivers/vfio/pci/vfio_pci_igd.c |   11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/vfio_pci_=
-igd.c
-> index 228df565e9bc..c89a4797cd18 100644
-> --- a/drivers/vfio/pci/vfio_pci_igd.c
-> +++ b/drivers/vfio/pci/vfio_pci_igd.c
-> @@ -86,7 +86,16 @@ static int vfio_pci_igd_opregion_init(struct vfio_pci_=
-device *vdev)
->  		return -EINVAL;
->  	}
-> =20
-> -	size *=3D 1024; /* In KB */
-> +	/*
-> +	 * The OpRegion size field is specified as size in KB, but there have b=
-een
-> +	 * user reports where this field appears to report size in bytes.  If we
-> +	 * read 8192, assume this is the case.
-> +	 */
-> +	if (size =3D=3D OPREGION_SIZE)
-> +		pci_warn(vdev->pdev,
-> +			 "BIOS Bug, IGD OpRegion reports invalid size, assuming default 8KB\n=
-");
-> +	else
-> +		size *=3D 1024; /* In KB */
-> =20
->  	/*
->  	 * Support opregion v2.1+
->=20
+On 5/8/2021 9:51 AM, Jason Wang wrote:
+>
+> 在 2021/5/8 上午1:36, Marc Zyngier 写道:
+>> On Fri, 07 May 2021 12:02:57 +0100,
+>> Marc Zyngier <maz@kernel.org> wrote:
+>>> On Fri, 07 May 2021 10:58:23 +0100,
+>>> Shaokun Zhang <zhangshaokun@hisilicon.com> wrote:
+>>>> Hi Marc,
+>>>>
+>>>> Thanks for your quick reply.
+>>>>
+>>>> On 2021/5/7 17:03, Marc Zyngier wrote:
+>>>>> On Fri, 07 May 2021 06:57:04 +0100,
+>>>>> Shaokun Zhang <zhangshaokun@hisilicon.com> wrote:
+>>>>>> [This letter comes from Nianyao Tang]
+>>>>>>
+>>>>>> Hi,
+>>>>>>
+>>>>>> Using GICv4/4.1 and msi capability, guest vf driver requires 3
+>>>>>> vectors and enable msi, will lead to guest stuck.
+>>>>> Stuck how?
+>>>> Guest serial does not response anymore and guest network shutdown.
+>>>>
+>>>>>> Qemu gets number of interrupts from Multiple Message Capable field
+>>>>>> set by guest. This field is aligned to a power of 2(if a function
+>>>>>> requires 3 vectors, it initializes it to 2).
+>>>>> So I guess this is a MultiMSI device with 4 vectors, right?
+>>>>>
+>>>> Yes, it can support maximum of 32 msi interrupts, and vf driver 
+>>>> only use 3 msi.
+>>>>
+>>>>>> However, guest driver just sends 3 mapi-cmd to vits and 3 ite
+>>>>>> entries is recorded in host.  Vfio initializes msi interrupts using
+>>>>>> the number of interrupts 4 provide by qemu.  When it comes to the
+>>>>>> 4th msi without ite in vits, in irq_bypass_register_producer,
+>>>>>> producer and consumer will __connect fail, due to find_ite fail, and
+>>>>>> do not resume guest.
+>>>>> Let me rephrase this to check that I understand it:
+>>>>> - The device has 4 vectors
+>>>>> - The guest only create mappings for 3 of them
+>>>>> - VFIO calls kvm_vgic_v4_set_forwarding() for each vector
+>>>>> - KVM doesn't have a mapping for the 4th vector and returns an error
+>>>>> - VFIO disable this 4th vector
+>>>>>
+>>>>> Is that correct? If yes, I don't understand why that impacts the 
+>>>>> guest
+>>>>> at all. From what I can see, vfio_msi_set_vector_signal() just prints
+>>>>> a message on the console and carries on.
+>>>>>
+>>>> function calls:
+>>>> --> vfio_msi_set_vector_signal
+>>>>     --> irq_bypass_register_producer
+>>>>        -->__connect
+>>>>
+>>>> in __connect, add_producer finally calls kvm_vgic_v4_set_forwarding
+>>>> and fails to get the 4th mapping. When add_producer fail, it does
+>>>> not call cons->start, calls kvm_arch_irq_bypass_start and then
+>>>> kvm_arm_resume_guest.
+>>> [+Eric, who wrote the irq_bypass infrastructure.]
+>>>
+>>> Ah, so the guest is actually paused, not in a livelock situation
+>>> (which is how I interpreted "stuck").
+>>>
+>>> I think we should handle this case gracefully, as there should be no
+>>> expectation that the guest will be using this interrupt. Given that
+>>> VFIO seems to be pretty unfazed when a producer fails, I'm temped to
+>>> do the same thing and restart the guest.
+>>>
+>>> Also, __disconnect doesn't care about errors, so why should __connect
+>>> have this odd behaviour?
+>>>
+>>> Can you please try this? It is completely untested (and I think the
+>>> del_consumer call is odd, which is why I've also dropped it).
+>>>
+>>> Eric, what do you think?
+>> Adding Zhu, Jason, MST to the party. It all seems to be caused by this
+>> commit:
+>>
+>> commit a979a6aa009f3c99689432e0cdb5402a4463fb88
+>> Author: Zhu Lingshan <lingshan.zhu@intel.com>
+>> Date:   Fri Jul 31 14:55:33 2020 +0800
+>>
+>>      irqbypass: do not start cons/prod when failed connect
+>>           If failed to connect, there is no need to start consumer nor
+>>      producer.
+>>           Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>      Suggested-by: Jason Wang <jasowang@redhat.com>
+>>      Link: 
+>> https://lore.kernel.org/r/20200731065533.4144-7-lingshan.zhu@intel.com
+>>      Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>
+>>
+>> Zhu, I'd really like to understand why you think it is OK not to
+>> restart consumer and producers when a connection has failed to be
+>> established between the two?
+>
+>
+> My bad, I didn't check ARM code but it's not easy to infer that the 
+> cons->start/stop is not a per consumer specific operation but a global 
+> one like VM halting/resuming.
+Hi Marc,
 
-Reviewed-by: Zhenyu Wang <zhenyuw@linux.intel.com>
+I will send out a patch to revert this commit as Jason suggested.
 
-thanks
+Thanks
+>
+>
+>>
+>> In the case of KVM/arm64, this results in the guest being forever
+>> suspended and never resumed. That's obviously not an acceptable
+>> regression, as there is a number of benign reasons for a connect to
+>> fail.
+>
+>
+> Let's revert this commit.
+>
+> Thanks
+>
+>
+>>
+>> Thanks,
+>>
+>>     M.
+>>
+>
 
---KFztAG8eRSV9hGtP
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCYJYYcwAKCRCxBBozTXgY
-J9gLAJ9WZQAELAZanHt41Fm37Zpywbd/5wCgnfwh7QDlG6+zsX/eLRycHAm9RmY=
-=mQOk
------END PGP SIGNATURE-----
-
---KFztAG8eRSV9hGtP--
