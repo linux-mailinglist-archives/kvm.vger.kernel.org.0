@@ -2,137 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15FEE379069
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 16:16:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22B683790F0
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 16:37:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233696AbhEJORL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 10:17:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35264 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236647AbhEJOND (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 10:13:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620655916;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=af5r9u3qqZ9G/EkGOxZhfoFUt25ySsbb0dW7quZCUNk=;
-        b=MACKYQ582AGjNO7gNRZ1vDl4G7+57kkB8zDHFpUggtAezcI1AC8gE1W3ld3nHy8JbG0czU
-        aknQjWvzd+jKHg33vuNpCcI/CK1RXXYz7n4VA18loH6bBHDlmTVcWCEZQGwzeAFp+tmyRc
-        U0x+rRniEjXdECKEubLdNK+7+c6il7g=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-518-L_hInLbpPtGi1jvx_E6gKw-1; Mon, 10 May 2021 10:11:54 -0400
-X-MC-Unique: L_hInLbpPtGi1jvx_E6gKw-1
-Received: by mail-wm1-f70.google.com with SMTP id g67-20020a1cb6460000b029014297bda128so2064475wmf.1
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 07:11:54 -0700 (PDT)
+        id S239215AbhEJOiO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 10:38:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36786 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232412AbhEJOgO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 10:36:14 -0400
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 747A5C06125F;
+        Mon, 10 May 2021 06:59:02 -0700 (PDT)
+Received: by mail-wm1-x32f.google.com with SMTP id p14-20020a05600c358eb029015c01f207d7so3223283wmq.5;
+        Mon, 10 May 2021 06:59:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=oOiV5WgMi7Wi96u1A0j7aVHx72rSJUWKb9L7JASEw6U=;
+        b=eI3N1Fpg9OGfxDYeN9CkM6JnUmUHl5WgQKsZJBAEe06N6eQIW+N/2eMqTIlrsyK/qM
+         Xa35uzmXt4bi7Z5ExQmBDGcCmQr1UD910O1m2RozktwaOIV8OjhOXtuMqdS2t5KIlfV2
+         /xSjuQtpNfwsgUMZT4YbuSWeEoVUpnkLWdYWx57GHC/JMnIbfeomB6X1EwhI6GqtNjJz
+         5mS+m2iGgDDSAr7pACiBgtShvHO5CxZyag+ZmeEb/XAmakP22Iz1mAVAu5X4yPcneMls
+         MNKS6aX+UYGYTiDpkPzh+zNyC5KsbwVbzbmTl9DNNLPJNUbSwFzwjXpWYoyfaT3bHk/5
+         tcow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=af5r9u3qqZ9G/EkGOxZhfoFUt25ySsbb0dW7quZCUNk=;
-        b=QRXxSbObQQ9BK/cQ3WBV39xFpm51GrITNAj/0eMiT6ayDSQW2DH6DfbbVw+OcACuXo
-         TejUKsWs4HZc1hETRH9IgkLUV/WDLG12opPR+N5wysSKPx3Rf2E509Y1VEj1ZEFPvBR3
-         TmUjYo3aEyLk4paDK6QFCcvfahgJi7gNd4PUuvVrwewu65ujt7Y/+Jl1FpJdLPzFFEwW
-         WQImqYPm+U2EXkYhr/0cMfwE047T2bUyFlxyfKPJPgvAxBQ0rXCXTi8yEU5zEkXhYHLE
-         MwkIbNxEudWxaVHNetwJgbVRvxO76wZ/jsC3NpNROpZZDLg/DooMhYe/12qyEhBYESiF
-         wBjw==
-X-Gm-Message-State: AOAM531/0JjVQ5+wDH44ugc9u072JK5q3KO6C+1KYoTN1qkffrmuoq0w
-        eMcFiBqSb8wXuUTY5dFKgG0tjrLDzii77CwJXbtF1d7Z1oyPY3vjRzrpq/Ox82L3sLgw1KPuz+Y
-        zSNSpdZE7WlyI
-X-Received: by 2002:a05:600c:4f48:: with SMTP id m8mr29832354wmq.169.1620655913357;
-        Mon, 10 May 2021 07:11:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxyIVLNk31dZvAQl7t4iAvD7xEAaktItzWZGK1tv1d3hqXxusFE5ZnDBKEklD2/Rdcs4H11hw==
-X-Received: by 2002:a05:600c:4f48:: with SMTP id m8mr29832324wmq.169.1620655913120;
-        Mon, 10 May 2021 07:11:53 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id f22sm19346400wmj.42.2021.05.10.07.11.51
+        bh=oOiV5WgMi7Wi96u1A0j7aVHx72rSJUWKb9L7JASEw6U=;
+        b=RE/Wygko9Mp3kdIWtWRpJqqPmeF+t4NsDu7B9pkIQBtIN3y8dEX3plIe+hsz5pCias
+         cGEiXuSTxRSat2OG08sE4uAzNtk9mFihLdDtbeLCF3S0YFVfapUgED+Iy6C5TNNe23+A
+         NjmtMikvBXBSffFOTvkhQpSTSltJuPkPqu8SBy/anL15FsMNCKo7rLpWrCr0vLV+yYVM
+         amHozn+Pj5algJtq82JQLBOWD3Vj43ZdWpFRkm2PeVwkN2LB65tv/tPV13xCUOMon2PD
+         q++0EbiRVw12g0cvWZIPGRzVhcUi2HYRJSRU3Te+GXiBLB4vY2mu7/tZHvMQVd2CkBwc
+         d5rA==
+X-Gm-Message-State: AOAM531B6vgcrgA/OugSAwakzk8lsc8kEb0Ilqb5rMR1ik1a2Og85K3p
+        JhRd8ualkONJCPOOZh1BDd4=
+X-Google-Smtp-Source: ABdhPJxuRWxshXLY3D3BIGKPZC8k+BUcpGElfoLV7AagS8fiv45gCBBhTdzQWkysFh21R1ZatES2dQ==
+X-Received: by 2002:a1c:e38a:: with SMTP id a132mr26226331wmh.135.1620655141215;
+        Mon, 10 May 2021 06:59:01 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159425-cmbg20-2-0-cust403.5-4.cable.virginm.net. [86.7.189.148])
+        by smtp.gmail.com with ESMTPSA id d127sm25703586wmd.14.2021.05.10.06.58.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 May 2021 07:11:52 -0700 (PDT)
-Subject: Re: [PATCH 4/8] KVM: VMX: Adjust the TSC-related VMCS fields on L2
- entry and exit
-To:     "Stamatis, Ilias" <ilstam@amazon.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "ilstam@mailbox.org" <ilstam@mailbox.org>
-Cc:     "jmattson@google.com" <jmattson@google.com>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "haozhong.zhang@intel.com" <haozhong.zhang@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "zamsden@gmail.com" <zamsden@gmail.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "dplotnikov@virtuozzo.com" <dplotnikov@virtuozzo.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>
-References: <20210506103228.67864-1-ilstam@mailbox.org>
- <20210506103228.67864-5-ilstam@mailbox.org>
- <50f86951-1cea-b7aa-7236-f28edd5eca8d@redhat.com>
- <8ebf2b17f339bf21b69bba41575e62f98ec87105.camel@amazon.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9506c826-face-e816-d88a-3797872f26d2@redhat.com>
-Date:   Mon, 10 May 2021 16:11:50 +0200
+        Mon, 10 May 2021 06:59:00 -0700 (PDT)
+Subject: Re: [PATCH 00/53] Get rid of UTF-8 chars that can be mapped as ASCII
+To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc:     David Woodhouse <dwmw2@infradead.org>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        alsa-devel@alsa-project.org, coresight@lists.linaro.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
+        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-fpga@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-sgx@vger.kernel.org, linux-usb@vger.kernel.org,
+        mjpeg-users@lists.sourceforge.net, netdev@vger.kernel.org,
+        rcu@vger.kernel.org, x86@kernel.org
+References: <cover.1620641727.git.mchehab+huawei@kernel.org>
+ <2ae366fdff4bd5910a2270823e8da70521c859af.camel@infradead.org>
+ <20210510135518.305cc03d@coco.lan>
+ <df6b4567-030c-a480-c5a6-fe579830e8c0@gmail.com>
+ <20210510153807.4405695e@coco.lan>
+From:   Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <b3366f65-35e1-8f1a-d8d8-ebd444c9499d@gmail.com>
+Date:   Mon, 10 May 2021 14:58:59 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-In-Reply-To: <8ebf2b17f339bf21b69bba41575e62f98ec87105.camel@amazon.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20210510153807.4405695e@coco.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/05/21 19:35, Stamatis, Ilias wrote:
-> On Thu, 2021-05-06 at 13:32 +0200, Paolo Bonzini wrote:
->> On 06/05/21 12:32, ilstam@mailbox.org wrote:
->>> +     if (vmcs12->cpu_based_vm_exec_control &
->>> CPU_BASED_USE_TSC_OFFSETTING) {
->>> +             if (vmcs12->secondary_vm_exec_control &
->>> SECONDARY_EXEC_TSC_SCALING) {
->>> +                     vcpu->arch.tsc_offset =
->>> kvm_compute_02_tsc_offset(
->>> +                                     vcpu->arch.l1_tsc_offset,
->>> +                                     vmcs12->tsc_multiplier,
->>> +                                     vmcs12->tsc_offset);
->>> +
->>> +                     vcpu->arch.tsc_scaling_ratio =
->>> mul_u64_u64_shr(
->>> +                                     vcpu->arch.tsc_scaling_ratio,
->>> +                                     vmcs12->tsc_multiplier,
->>> +                                     kvm_tsc_scaling_ratio_frac_bit
->>> s);
->>> +             } else {
->>> +                     vcpu->arch.tsc_offset += vmcs12->tsc_offset;
->>> +             }
->>
->> The computation of vcpu->arch.tsc_offset is (not coincidentially) the
->> same that appears in patch 6
->>
->> +           (vmcs12->cpu_based_vm_exec_control &
->> CPU_BASED_USE_TSC_OFFSETTING)) {
->> +               if (vmcs12->secondary_vm_exec_control &
->> SECONDARY_EXEC_TSC_SCALING) {
->> +                       cur_offset = kvm_compute_02_tsc_offset(
->> +                                       l1_offset,
->> +                                       vmcs12->tsc_multiplier,
->> +                                       vmcs12->tsc_offset);
->> +               } else {
->> +                       cur_offset = l1_offset + vmcs12->tsc_offset;
->>
->> So I think you should just pass vmcs12 and the L1 offset to
->> kvm_compute_02_tsc_offset, and let it handle both cases (and possibly
->> even set vcpu->arch.tsc_scaling_ratio in the same function).
+On 10/05/2021 14:38, Mauro Carvalho Chehab wrote:
+> Em Mon, 10 May 2021 14:16:16 +0100
+> Edward Cree <ecree.xilinx@gmail.com> escreveu:
+>> But what kinds of things with × or — in are going to be grept for?
 > 
-> That was my thinking initially too. However, kvm_compute_02_tsc_offset
-> is defined in x86.c which is vmx-agnostic and hence 'struct vmcs12' is
-> not defined there.
+> Actually, on almost all places, those aren't used inside math formulae, but
+> instead, they describe video some resolutions:
+Ehh, those are also proper uses of ×.  It's still a multiplication,
+ after all.
 
-Good point.  Yeah, it's trading one comde duplication for another. 
-Right now there's already code duplication in write_l1_tsc_offset, so it 
-makes some sense to limit duplication _within_ the file and lose in 
-duplicated code across vmx/svm, but either is okay.
+> it is a way more likely that, if someone wants to grep, they would be 
+> doing something like this, in order to get video resolutions:
+Why would someone be grepping for "all video resolutions mentioned in
+ the documentation"?  That seems contrived to me.
 
-Paolo
-
+-ed
