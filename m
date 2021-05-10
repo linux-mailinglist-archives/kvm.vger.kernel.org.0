@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 898E63795F6
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 19:31:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B40C3795CB
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 19:28:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233098AbhEJRcV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 13:32:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56486 "EHLO mail.kernel.org"
+        id S233144AbhEJR36 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 13:29:58 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53870 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233112AbhEJRaS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 13:30:18 -0400
+        id S232984AbhEJR3S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 13:29:18 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7BBA46147F;
-        Mon, 10 May 2021 17:29:13 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id A44D16157F;
+        Mon, 10 May 2021 17:28:13 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1lg9Gs-000Uqg-59; Mon, 10 May 2021 18:00:42 +0100
+        id 1lg9Gs-000Uqg-MQ; Mon, 10 May 2021 18:00:42 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -32,9 +32,9 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: [PATCH v4 65/66] KVM: arm64: nv: Fast-track 'InHost' exception returns
-Date:   Mon, 10 May 2021 17:59:19 +0100
-Message-Id: <20210510165920.1913477-66-maz@kernel.org>
+Subject: [PATCH v4 66/66] KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
+Date:   Mon, 10 May 2021 17:59:20 +0100
+Message-Id: <20210510165920.1913477-67-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210510165920.1913477-1-maz@kernel.org>
 References: <20210510165920.1913477-1-maz@kernel.org>
@@ -48,148 +48,148 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A significant part of the ARMv8.3-NV extension is to trap ERET
-instructions so that the hypervisor gets a chance to switch
-from a vEL2 L1 guest to an EL1 L2 guest.
+Due to the way ARMv8.4-NV suppresses traps when accessing EL2
+system registers, we can't track when the guest changes its
+HCR_EL2.TGE setting. This means we always trap EL1 TLBIs,
+even if they don't affect any guest.
 
-But this also has the unfortunate consequence of trapping ERET
-in unsuspecting circumstances, such as staying at vEL2 (interrupt
-handling while being in the guest hypervisor), or returning to host
-userspace in the case of a VHE guest.
+This obviously has a huge impact on performance, as we handle
+TLBI traps as a normal exit, and a normal VHE host issues
+thousands of TLBIs when booting (and quite a few when running
+userspace).
 
-Although we already make some effort to handle these ERET quicker
-by not doing the put/load dance, it is still way too far down the
-line for it to be efficient enough.
-
-For these cases, it would ideal to ERET directly, no question asked.
-Of course, we can't do that. But the next best thing is to do it as
-early as possible, in fixup_guest_exit(), much as we would handle
-FPSIMD exceptions.
+A cheap way to reduce the overhead is to handle the limited
+case of {E2H,TGE}=={1,1} as a guest fixup, as we already have
+the right mmu configuration in place. Just execute the decoded
+instruction right away and return to the guest.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/emulate-nested.c | 26 ++--------------
- arch/arm64/kvm/hyp/vhe/switch.c | 53 ++++++++++++++++++++++++++++++++-
- 2 files changed, 54 insertions(+), 25 deletions(-)
+ arch/arm64/kvm/hyp/vhe/switch.c | 36 +++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/vhe/tlb.c    |  6 ++++--
+ arch/arm64/kvm/sys_regs.c       | 25 ++++++++---------------
+ 3 files changed, 48 insertions(+), 19 deletions(-)
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index df4661515183..43197ff4a806 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -52,8 +52,7 @@ bool forward_nv_traps(struct kvm_vcpu *vcpu)
- 
- void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- {
--	u64 spsr, elr, mode;
--	bool direct_eret;
-+	u64 spsr, elr;
- 
- 	/*
- 	 * Forward this trap to the virtual EL2 if the virtual
-@@ -62,31 +61,10 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- 	if (forward_nv_traps(vcpu))
- 		return;
- 
--	/*
--	 * Going through the whole put/load motions is a waste of time
--	 * if this is a VHE guest hypervisor returning to its own
--	 * userspace, or the hypervisor performing a local exception
--	 * return. No need to save/restore registers, no need to
--	 * switch S2 MMU. Just do the canonical ERET.
--	 */
--	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
--	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
--
--	direct_eret  = (mode == PSR_MODE_EL0t &&
--			vcpu_el2_e2h_is_set(vcpu) &&
--			vcpu_el2_tge_is_set(vcpu));
--	direct_eret |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
--
--	if (direct_eret) {
--		*vcpu_pc(vcpu) = vcpu_read_sys_reg(vcpu, ELR_EL2);
--		*vcpu_cpsr(vcpu) = spsr;
--		trace_kvm_nested_eret(vcpu, *vcpu_pc(vcpu), spsr);
--		return;
--	}
--
- 	preempt_disable();
- 	kvm_arch_vcpu_put(vcpu);
- 
-+	spsr = __vcpu_sys_reg(vcpu, SPSR_EL2);
- 	elr = __vcpu_sys_reg(vcpu, ELR_EL2);
- 
- 	trace_kvm_nested_eret(vcpu, elr, spsr);
 diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index bd4ae1296de4..b3e7d996b54d 100644
+index b3e7d996b54d..67f8b7d89db6 100644
 --- a/arch/arm64/kvm/hyp/vhe/switch.c
 +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -166,6 +166,56 @@ void deactivate_traps_vhe_put(void)
+@@ -166,6 +166,39 @@ void deactivate_traps_vhe_put(void)
  	__deactivate_traps_common();
  }
  
-+static bool __hyp_handle_eret(struct kvm_vcpu *vcpu)
++static bool __hyp_handle_tlbi_el1(struct kvm_vcpu *vcpu)
 +{
-+	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
-+	u64 spsr, mode;
++	u32 instr;
++	u64 val;
 +
 +	/*
-+	 * Going through the whole put/load motions is a waste of time
-+	 * if this is a VHE guest hypervisor returning to its own
-+	 * userspace, or the hypervisor performing a local exception
-+	 * return. No need to save/restore registers, no need to
-+	 * switch S2 MMU. Just do the canonical ERET. Unless the trap
-+	 * has to be forwarded further down the line, of course...
++	 * Ideally, we would never trap on EL1 TLB invalidations when the
++	 * guest's HCR_EL2.{E2H,TGE} == {1,1}. But "thanks" to ARMv8.4, we
++	 * don't trap writes to HCR_EL2, meaning that we can't track
++	 * changes to the virtual TGE bit. So we leave HCR_EL2.TTLB set on
++	 * the host. Oopsie...
++	 *
++	 * In order to speed-up EL1 TLBIs from the vEL2 guest when TGE is
++	 * set, try and handle these invalidation as quickly as possible,
++	 * without fully exiting (unless this needs forwarding).
 +	 */
-+	if (kvm_vcpu_trap_get_class(vcpu) != ESR_ELx_EC_ERET)
++	if (kvm_vcpu_trap_get_class(vcpu) != ESR_ELx_EC_SYS64 ||
++	    !vcpu_mode_el2(vcpu) ||
++	    (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE))
 +		return false;
 +
-+	/*
-+	 * Let the trap forwarding be handled by the normal exception
-+	 * handling code.
-+	 */
-+	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
++	instr = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
++	if (sys_reg_Op0(instr) != TLBI_Op0 ||
++	    sys_reg_Op1(instr) != TLBI_Op1_EL1)
 +		return false;
 +
-+	spsr = read_sysreg_el1(SYS_SPSR);
-+	spsr = __fixup_spsr_el2_read(ctxt, spsr);
-+	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
-+
-+	switch (mode) {
-+	case PSR_MODE_EL0t:
-+		if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
-+			return false;
-+		break;
-+	case PSR_MODE_EL2t:
-+		mode = PSR_MODE_EL1t;
-+		break;
-+	case PSR_MODE_EL2h:
-+		mode = PSR_MODE_EL1h;
-+		break;
-+	default:
-+		return false;
-+	}
-+
-+	spsr = (spsr & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
-+
-+	write_sysreg_el2(spsr, SYS_SPSR);
-+	write_sysreg_el2(read_sysreg_el1(SYS_ELR), SYS_ELR);
++	val = vcpu_get_reg(vcpu, kvm_vcpu_sys_get_rt(vcpu));
++	__kvm_tlb_el1_instr(NULL, val, instr);
++	__kvm_skip_instr(vcpu);
 +
 +	return true;
 +}
 +
- static bool fixup_guest_exit_vhe(struct kvm_vcpu *vcpu, u64 *exit_code,
- 				 bool hyp_ctxt)
+ static bool __hyp_handle_eret(struct kvm_vcpu *vcpu)
  {
-@@ -207,7 +257,8 @@ static bool fixup_guest_exit_vhe(struct kvm_vcpu *vcpu, u64 *exit_code,
- 	fixup_guest_exit_prologue(vcpu, exit_code);
- 
+ 	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
+@@ -259,6 +292,9 @@ static bool fixup_guest_exit_vhe(struct kvm_vcpu *vcpu, u64 *exit_code,
  	if (*exit_code == ARM_EXCEPTION_TRAP) {
--		/* more to come here */
-+		if (__hyp_handle_eret(vcpu))
+ 		if (__hyp_handle_eret(vcpu))
+ 			return true;
++
++		if (__hyp_handle_tlbi_el1(vcpu))
 +			return true;
  	}
  
  	return fixup_guest_exit(vcpu, exit_code);
+diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
+index 001ac9f2f1b5..583255aa35ec 100644
+--- a/arch/arm64/kvm/hyp/vhe/tlb.c
++++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+@@ -201,7 +201,8 @@ void __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding)
+ 	dsb(ishst);
+ 
+ 	/* Switch to requested VMID */
+-	__tlb_switch_to_guest(mmu, &cxt);
++	if (mmu)
++		__tlb_switch_to_guest(mmu, &cxt);
+ 
+ 	/*
+ 	 * Execute the same instruction as the guest hypervisor did,
+@@ -240,5 +241,6 @@ void __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding)
+ 	dsb(ish);
+ 	isb();
+ 
+-	__tlb_switch_to_host(&cxt);
++	if (mmu)
++		__tlb_switch_to_host(&cxt);
+ }
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 084230f6b993..6d0776737b76 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2721,6 +2721,8 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 			    const struct sys_reg_desc *r)
+ {
+ 	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
++	u64 virtual_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
++	struct kvm_s2_mmu *mmu;
+ 
+ 	/*
+ 	 * If we're here, this is because we've trapped on a EL1 TLBI
+@@ -2739,24 +2741,13 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 
+ 	mutex_lock(&vcpu->kvm->lock);
+ 
+-	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE)) {
+-		u64 virtual_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
+-		struct kvm_s2_mmu *mmu;
+-
+-		mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, HCR_VM);
+-		if (mmu)
+-			__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
++	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, HCR_VM);
++	if (mmu)
++		__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
+ 
+-		mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, 0);
+-		if (mmu)
+-			__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
+-	} else {
+-		/*
+-		 * ARMv8.4-NV allows the guest to change TGE behind
+-		 * our back, so we always trap EL1 TLBIs from vEL2...
+-		 */
+-		__kvm_tlb_el1_instr(&vcpu->kvm->arch.mmu, p->regval, sys_encoding);
+-	}
++	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, 0);
++	if (mmu)
++		__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
+ 
+ 	mutex_unlock(&vcpu->kvm->lock);
+ 
 -- 
 2.29.2
 
