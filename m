@@ -2,101 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E9B34377C47
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 08:32:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 368A7377C76
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 08:41:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229998AbhEJGdq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 02:33:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56246 "EHLO
+        id S230023AbhEJGl7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 02:41:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36440 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229863AbhEJGdp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 02:33:45 -0400
+        by vger.kernel.org with ESMTP id S229608AbhEJGl6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 02:41:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620628361;
+        s=mimecast20190719; t=1620628854;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=1xp5CXeApoBRGIrJIKufW+mRSz5wk+uC5rFnWxgQ3fE=;
-        b=h3l6U7Yz6GRfRdK5lODJ4+j6t2onsR7fvloKnbJ15jEIJ2CTEFkA43APj0lZOI7h7SJ7gO
-        raJM8ydqGQEtDQxaXcEE7sZbHQqig5gsmQIHtNV+adPPFXpkF3tO8K+H6NiA1n65VRYAuL
-        ACKGjXMbdRRo6Nn0B37nF3nLfnuco04=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-wbsZF2DqMUW2UQvLbqobkA-1; Mon, 10 May 2021 02:32:39 -0400
-X-MC-Unique: wbsZF2DqMUW2UQvLbqobkA-1
-Received: by mail-ej1-f69.google.com with SMTP id z15-20020a170906074fb029038ca4d43d48so4349896ejb.17
-        for <kvm@vger.kernel.org>; Sun, 09 May 2021 23:32:39 -0700 (PDT)
+        bh=AhkvvC0oMUJmsEQCW6Q1nd0/KwtGO4qGTTgVWNfA7vM=;
+        b=Igt4ggngxHsZbauKxw5vh7cAinzcxm62D2vZwqr0uoIV54LBWzrgjWXnP9rv6NudvYw7rA
+        rfLi1+waPi4eMP3iUPXcjbgW+cBKYBHFTW+98aJpMNRSkaZ/zcYFJOPBoZCRIyKDjHP1w3
+        u0fPJw0W9wbR/3vHxAbhIWULqT2o2Yo=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-39-zApqHrbcOoaGdNKUTcyOLg-1; Mon, 10 May 2021 02:40:52 -0400
+X-MC-Unique: zApqHrbcOoaGdNKUTcyOLg-1
+Received: by mail-ed1-f71.google.com with SMTP id i17-20020a50fc110000b0290387c230e257so8533462edr.0
+        for <kvm@vger.kernel.org>; Sun, 09 May 2021 23:40:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=1xp5CXeApoBRGIrJIKufW+mRSz5wk+uC5rFnWxgQ3fE=;
-        b=eyTb032Ku1eHfiB+/dY5+5vtLS19QJmoTzY//e/zJmy0Fo5vRDDEXHrt6an5Bnd0Pd
-         gJdz0ygdqegyUgOBQ427/f4WAVcimcQLWQQJTAlQBByqCT8deOYUnZsCT24oB6trw775
-         rIVi1S50JGWn290x3r2jch3SP0cTM1Pgrg4Yn3GXMaW4TOxFUEi+XfHecVGS8ZtFQFUE
-         liltXGW32eyliR3vhr7qtNi3Lqj3J+hP1ficpcmxVRSYh1i2O2PSXH9M5o6ge0mivemq
-         Vy1l2cQUrC2WU/ZKwyLNh3/TpEe+SHnFUmg29KtJIXUsPU+h/UvCm3xQwQvq7BXM3P71
-         EXbw==
-X-Gm-Message-State: AOAM532KLW2LOUnIDm3Pze0SXlUduxILoX8ngGiqo0fCIren0IeEUrL8
-        YmHTf/JgPlozoap5N1v/I1kN2jISAbpMygLsDQ4Kkc/pIiFVDDPjpFAiioIzbU7GHqc0WPpIZfn
-        EIXOWpWHMIBss
-X-Received: by 2002:a17:906:5a83:: with SMTP id l3mr24066569ejq.50.1620628358538;
-        Sun, 09 May 2021 23:32:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJypEhn8R0VJeNzMsaV7jR0XKiODWQvEf+ed6g2SLE5v0Oabap0gb0tBkuQ74d/zsgTSP6hqag==
-X-Received: by 2002:a17:906:5a83:: with SMTP id l3mr24066558ejq.50.1620628358430;
-        Sun, 09 May 2021 23:32:38 -0700 (PDT)
+        bh=AhkvvC0oMUJmsEQCW6Q1nd0/KwtGO4qGTTgVWNfA7vM=;
+        b=GhxPpYYYFxw0m12q9FE34dnvLd4r/CzXs3e89sBHxbMpGJbur2AyJOxKzYa1zFuYyD
+         qadvYksrZeCO0SaMwzjw0Sw3v9B6xjCHBeFgDdUGg1XSynKugNLNrGKGI1q6OJsCkmSV
+         2hhC2s0i2wxkKny4UEJDRpBbES2HHHRAoiEHEZdRus+zIXkeZr4YcXSsFuV3z8nKRalm
+         ROGjatiwiJoJN7HBdxRt7IELZroIAqyIJTfqdeIHlki7mk5Pf7foDLgy7gu81WPLTkvd
+         Jizm1+6tNbcaw7eaKSf2TsU9OhKnOk8nppQCrIZDyWH9QVbBD5/vVpwSAlG7BCs7LpBm
+         8sbQ==
+X-Gm-Message-State: AOAM5301Q/sEjLVgq348H4hXOlhENsa9txQKD2QmOF+9SrwXw8Z1aLSm
+        p8UnLDUyP2E0tggLqAZXDb0Ux21BZ8y88SOUFLGIXuLLDetT2Kea4S9SAhfrTO0LFlIeYzi3juV
+        0mNCrQEOYzVIypfwFRcfgBe+IrAvJmq9B+WQs+CkCRskKOiRPrGs/VcMXVW/Bo68=
+X-Received: by 2002:a05:6402:3585:: with SMTP id y5mr27515700edc.233.1620628851360;
+        Sun, 09 May 2021 23:40:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy79W7vGg+HWZl+58lL8SGrEdJrYPWGAcRD5CxRhKSms3qnClb4ZaME1e4VxVzhNQ90K2UDtw==
+X-Received: by 2002:a05:6402:3585:: with SMTP id y5mr27515677edc.233.1620628851164;
+        Sun, 09 May 2021 23:40:51 -0700 (PDT)
 Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id z7sm10494841edi.39.2021.05.09.23.32.37
+        by smtp.gmail.com with ESMTPSA id g11sm2970883edt.85.2021.05.09.23.40.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 May 2021 23:32:38 -0700 (PDT)
-Date:   Mon, 10 May 2021 08:32:36 +0200
+        Sun, 09 May 2021 23:40:50 -0700 (PDT)
+Date:   Mon, 10 May 2021 08:40:48 +0200
 From:   Andrew Jones <drjones@redhat.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Aaron Lewis <aaronlewis@google.com>
-Subject: Re: [PATCH] KVM: selftests: Print a message if /dev/kvm is missing
-Message-ID: <20210510063236.5ekmlulazelvl2s6@gator>
-References: <20210507190559.425518-1-dmatlack@google.com>
- <20210507201443.nvtmntp3tgeapwnw@gator.home>
- <CALzav=dk_Z=hQE1Bjpfg8B3su7h2Jvk6RZoEFqBn+qqxmwzHMQ@mail.gmail.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     maz@kernel.org, ricarkol@google.com, eric.auger@redhat.com,
+        alexandru.elisei@arm.com, pbonzini@redhat.com
+Subject: Re: [PATCH 4/6] KVM: arm64: selftests: get-reg-list: Provide config
+ selection option
+Message-ID: <20210510064048.m7ezciiratbesqjj@gator>
+References: <20210507200416.198055-1-drjones@redhat.com>
+ <20210507200416.198055-5-drjones@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALzav=dk_Z=hQE1Bjpfg8B3su7h2Jvk6RZoEFqBn+qqxmwzHMQ@mail.gmail.com>
+In-Reply-To: <20210507200416.198055-5-drjones@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 07, 2021 at 01:51:45PM -0700, David Matlack wrote:
-> > >  static void vm_open(struct kvm_vm *vm, int perm)
-> > >  {
-> > > -     vm->kvm_fd = open(KVM_DEV_PATH, perm);
-> >
-> > I don't think we should change this one, otherwise the user provided
-> > perms are ignored.
+On Fri, May 07, 2021 at 10:04:14PM +0200, Andrew Jones wrote:
+> Add a new command line option that allows the user to select a specific
+> configuration, e.g. --config:sve will give the sve config. Also provide
+> help text and the --help/-h options.
 > 
-> Good catch. I don't see any reason to exclude this case, but we do need
-> to pass `perm` down to open_kvm_dev_path_or_exit().
->
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  .../selftests/kvm/aarch64/get-reg-list.c      | 76 +++++++++++++++++--
+>  1 file changed, 70 insertions(+), 6 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> index 68d3be86d490..f5e122b6b257 100644
+> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> @@ -38,6 +38,17 @@
+>  #define reg_list_sve() (false)
+>  #endif
+>  
+> +enum {
+> +	VREGS,
+> +	SVE,
+> +};
+> +
+> +static char * const vcpu_config_names[] = {
+> +	[VREGS] = "vregs",
+> +	[SVE] = "sve",
+> +	NULL
+> +};
+> +
+>  static struct kvm_reg_list *reg_list;
+>  static __u64 *blessed_reg, blessed_n;
+>  
+> @@ -502,34 +513,87 @@ static void run_test(struct vcpu_config *c)
+>  	kvm_vm_free(vm);
+>  }
+>  
+> +static void help(void)
+> +{
+> +	char * const *n;
+> +
+> +	printf(
+> +	"\n"
+> +	"usage: get-reg-list [--config:<selection>[,<selection>...]] [--list] [--list-filtered] [--core-reg-fixup]\n\n"
+> +	" --config:<selection>[,<selection>...] Used to select a specific vcpu configuration for the test/listing\n"
 
-I've reviewed v2 and gave it an r-b, since I don't have overly strong
-opinion about this, but I actually liked that open_kvm_dev_path_or_exit()
-didn't take any arguments. To handle this case I would have either left
-it open coded, like it was, or created something like
+I just realized I left this <selection>[,<selection>...] help text and
+some other kruft, like the vcpu_config_names[] array, from a different
+design I scrapped. That design, which used getsubopt(), was more
+complicated than it was worth.
 
-int _open_kvm_dev_path_or_exit(int flags)
-{
-   int fd = open(KVM_DEV_PATH, flags);
-   if (fd < 0)
-     ...exit skip...
-   return fd;
-}
-
-int open_kvm_dev_path_or_exit(void)
-{
-  return _open_kvm_dev_path_or_exit(O_RDONLY);
-}
+I'll send a v2 to get this cleaned up, but I'll wait a day or so first
+for more comments.
 
 Thanks,
 drew
