@@ -2,117 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6215637923A
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 17:15:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DE00379268
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 17:19:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241632AbhEJPQ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 11:16:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45230 "EHLO
+        id S233990AbhEJPUO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 11:20:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240361AbhEJPOf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 11:14:35 -0400
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B71FCC056756;
-        Mon, 10 May 2021 07:33:50 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id t18so16891382wry.1;
-        Mon, 10 May 2021 07:33:50 -0700 (PDT)
+        with ESMTP id S234543AbhEJPSu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 11:18:50 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E63C3C061574
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 07:48:38 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id u7-20020a259b470000b02904dca50820c2so19966404ybo.11
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 07:48:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=iXsxoOt9fS3DXvxCyyFOaJfbPkU6WlTqA1MG4BgEpJA=;
-        b=jIc4OS4UG1e9Htue39hs2SdJXCmPLn+MTostxG/pw06sXYt4cF0beJY8cOPd4XkNvN
-         wMkWqq4rS4nqVWqmlHYwknDCThc4F5oj3a10x6AGXMwZ0Kkxjgx6mU53ky5S6gct5IOF
-         gb8YE/CdqFeQhJSfkuXg75IoXDsEW/QKbfnCDm8DSyF/6zHxA2in236S9Jv233h02Cag
-         nY/zUkluYzDhxrfM75C6Qnf/beBRBG9DBN2uslTW/jB8AmOrnU4strwuRTlIYCmTiED9
-         Adakd2gy/AYmhY6PfiGery2Nb+BVYLJb2xN6RqR96XQSpLkoAkrrTIc1zJH3tzspThUx
-         eDlQ==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=Eoa6ihgecNBdFQExHytcx2mx1a+eIjFgjkpb1S01aME=;
+        b=SXRFfdTupE+ft3atKQ7rOk+izjlVlxelHEkRgHbANZ2q8q6XU9nwXZZ6NgYEwgmnly
+         73W/fN8nSNTbL3oxe/BlDmkDFMwy2vsfqX0+N2XwnSPT8LlDuxkGEu9GCb+wBH2fNH59
+         WRIRz4cAaizuXe+BUMtfpv8ZjE848jz3vUQkuEZtS6Ni0HwQ5J98pYQcMCCW76eiWtN+
+         Xk+HNnqqHZGk3XELA4bFUOev57e2IQ1SZ7/iP/eKVOVUC/h+1sKLbck7HOi7nVx4qoY7
+         mMWr16bSRSmxSPyD1KjXA+CSikaHr16oaq+o+/AgpHcB4Dv9raCxIq41DFd5VFrsc731
+         PkvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=iXsxoOt9fS3DXvxCyyFOaJfbPkU6WlTqA1MG4BgEpJA=;
-        b=mtcfeMsx7dMqYNepetHcvVEp2glMa9yIlLyEQ8rzKenwJZWsHQ0xYa4FlfmN2J8LUY
-         bPfOWxNXZyLuUbv6mxcQzDooN2CybZw4KKRpvAa/DrNtG9dFdBPkqfMLVMWB9yeSeuhw
-         KifzQf56nF3lwZi75f/YZ9fJAMLNWYeuMRIm/mSQXcM0o6HLRxrVNe3PcWPOde4Ouehf
-         HQo08nNDf9XEIEtKPrSCYDyPT+1asNxWQJ15AiWCwdz6YBacVGiCzslr6WMf0PAAJhWe
-         NOEZZaMTk+c6yb5EuDFdDdRkIJXz5xQH1O3KiVzaCllG860vf8paCuiuRV8XjsFmGVtg
-         sxhw==
-X-Gm-Message-State: AOAM532ZdhgvQU2/PzbBMlyPonGNmCSVV+wEv5FYNx421ebedZz5AXty
-        8pgEwWSVt3X7TC9UFQeGUWQ=
-X-Google-Smtp-Source: ABdhPJze1q8t3iuv5DjzOv0RveTjqSpEwnprh+IG3St78u9eWCZrU93KSEZYLbobgkyZLBZ/m0bYBQ==
-X-Received: by 2002:adf:e98c:: with SMTP id h12mr30469476wrm.314.1620657229579;
-        Mon, 10 May 2021 07:33:49 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159425-cmbg20-2-0-cust403.5-4.cable.virginm.net. [86.7.189.148])
-        by smtp.gmail.com with ESMTPSA id h9sm20117820wmb.35.2021.05.10.07.33.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 May 2021 07:33:48 -0700 (PDT)
-Subject: Re: [PATCH 00/53] Get rid of UTF-8 chars that can be mapped as ASCII
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        alsa-devel@alsa-project.org, coresight@lists.linaro.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
-        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-fpga@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-sgx@vger.kernel.org, linux-usb@vger.kernel.org,
-        mjpeg-users@lists.sourceforge.net, netdev@vger.kernel.org,
-        rcu@vger.kernel.org, x86@kernel.org
-References: <cover.1620641727.git.mchehab+huawei@kernel.org>
- <2ae366fdff4bd5910a2270823e8da70521c859af.camel@infradead.org>
- <20210510135518.305cc03d@coco.lan>
- <df6b4567-030c-a480-c5a6-fe579830e8c0@gmail.com>
- <YJk8LMFViV7Z3Uu7@casper.infradead.org>
-From:   Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <ed65025c-1087-9672-7451-6d28e7ab8f92@gmail.com>
-Date:   Mon, 10 May 2021 15:33:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
-MIME-Version: 1.0
-In-Reply-To: <YJk8LMFViV7Z3Uu7@casper.infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=Eoa6ihgecNBdFQExHytcx2mx1a+eIjFgjkpb1S01aME=;
+        b=NRQbCSz1E89uFirIXWTQWP6x/akzcS2Lqx2q70vMjrbC47yKw4wpguWUd1/y/LWhfQ
+         kq436WzPvsRng37sOX9MPBHvr6gJIRKfMiSuz17nb26zoHjtwxs+juGUjFtbpK0FJo5k
+         i6lCei04Kd+8iF3IREulGffhfwpfjQczkKTfFHx7zu1nl6L12d17dRV2ISUl/HQEYAdw
+         0Qk6ANOYs+3xZCfejlg1FBZOFKeQb/IzZtoQYSligl8d4fShHWPwJzeqNGEI197Yr6IZ
+         j0z0R2ftahqBUAJblYUJ8rtxj2R0rTFGnO8akDdk3GdK84JSjAbswuFIA3/ZN2xkiuDn
+         AtEA==
+X-Gm-Message-State: AOAM533JNfkCHxbvti/Z/+7QA1628tF7jiGn0JrOhCgKopMFPVvuzmHW
+        ePx65hJ/l2yCKwKCHwEv2Eu3hSGKD3mVXvJX
+X-Google-Smtp-Source: ABdhPJzvAS2X3pPt3UXGTnxNFMFyZSRhqMZ+qdIpkAXN5cZCT3vYvPEgKkiBoH+UPTMWHci5USPdHfioo8bChEtI
+X-Received: from aaronlewis1.sea.corp.google.com ([2620:15c:100:202:3396:9513:fac0:8ec7])
+ (user=aaronlewis job=sendgmr) by 2002:a25:4ac4:: with SMTP id
+ x187mr29286178yba.478.1620658117824; Mon, 10 May 2021 07:48:37 -0700 (PDT)
+Date:   Mon, 10 May 2021 07:48:32 -0700
+Message-Id: <20210510144834.658457-1-aaronlewis@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.1.607.g51e8a6a459-goog
+Subject: [PATCH v6 0/2] fallback for emulation errors
+From:   Aaron Lewis <aaronlewis@google.com>
+To:     david.edmondson@oracle.com, seanjc@google.com, jmattson@google.com
+Cc:     kvm@vger.kernel.org, Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/05/2021 14:59, Matthew Wilcox wrote:
-> Most of these
-> UTF-8 characters come from latex conversions and really aren't
-> necessary (and are being used incorrectly).
-I fully agree with fixing those.
-The cover-letter, however, gave the impression that that was not the
- main purpose of this series; just, perhaps, a happy side-effect.
+This patchset allows userspace to be a fallback for handling emulation errors.
 
-> You seem quite knowedgeable about the various differences.  Perhaps
-> you'd be willing to write a document for Documentation/doc-guide/
-> that provides guidance for when to use which kinds of horizontal
-> line?I have Opinions about the proper usage of punctuation, but I also know
- that other people have differing opinions.  For instance, I place
- spaces around an em dash, which is nonstandard according to most
- style guides.  Really this is an individual enough thing that I'm not
- sure we could have a "kernel style guide" that would be more useful
- than general-purpose guidance like the page you linked.
-Moreover, such a guide could make non-native speakers needlessly self-
- conscious about their writing and discourage them from contributing
- documentation at all.  I'm not advocating here for trying to push
- kernel developers towards an eats-shoots-and-leaves level of
- linguistic pedantry; rather, I merely think that existing correct
- usages should be left intact (and therefore, excising incorrect usage
- should only be attempted by someone with both the expertise and time
- to check each case).
+v1 -> v2:
 
-But if you really want such a doc I wouldn't mind contributing to it.
+ - Added additional documentation for KVM_CAP_EXIT_ON_EMULATION_FAILURE.
+ - In prepare_emulation_failure_exit():
+   - Created a local variable for vcpu->run.
+   - Cleared the flags, emulation_failure.flags.
+   - Or'd the instruction bytes flag on to emulation_failure.flags.
+ - Updated the comment for KVM_INTERNAL_ERROR_EMULATION flags on how they are
+   to be used.
+ - Updated the comment for struct emulation_failure.
 
--ed
+v2 -> v3:
+
+ - Update documentation for KVM_CAP_EXIT_ON_EMULATION_FAILURE.
+ - Fix spacing in prepare_emulation_failure_exit().
+
+v3 -> v4:
+
+ - In prepare_emulation_failure_exit():
+   - Clear instruction bytes to 0x90.
+   - Copy over insn_size bytes rather than sizeof(ctxt->fetch.data).
+ - set_page_table_entry() takes a pte rather than mask.
+ - In _vm_get_page_table_entry():
+   - Removed check for page aligned addresses only.
+   - Added canonical check.
+   - Added a check to make sure no reserved bits are set along the walk except
+     for the final pte (the pte cannot have the reserved bits checked otherwise
+     the test would fail).
+   - Added check to ensure superpage bits are clear.
+ - Added check in test for 'allow_smaller_maxphyaddr' module parameter.
+ - If the is_flds() check fails, only look at the first byte.
+ - Don't use labels to increment the RIP.  Decode the instruction well enough to
+   ensure it is only 2-bytes.
+
+v4 -> v5:
+
+ - Switch 'insn_size' to u32.
+ - Add documentation for how the flags are used.
+ - Remove 'max_insn_size' and use 'sizeof(run->emulation_failure.insn_bytes)' instead.
+ - Fix typos.
+ - Fix canonical check.
+ - Add reserved check for bit-7 of PML4E.
+ - Add reserved check for bit-63 of all page table levels if EFER.NXE = 0.
+ - Remove opcode check (it might be a prefix).
+ - Remove labels.
+ - Remove detritus (rogue cpuid entry in the test).
+
+v5 -> v6
+
+ - Fix documentation.
+
+Aaron Lewis (2):
+  kvm: x86: Allow userspace to handle emulation errors
+  selftests: kvm: Allows userspace to handle emulation errors.
+
+ Documentation/virt/kvm/api.rst                |  19 ++
+ arch/x86/include/asm/kvm_host.h               |   6 +
+ arch/x86/kvm/x86.c                            |  37 ++-
+ include/uapi/linux/kvm.h                      |  23 ++
+ tools/include/uapi/linux/kvm.h                |  23 ++
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/x86_64/processor.h  |   4 +
+ .../selftests/kvm/lib/x86_64/processor.c      |  94 ++++++++
+ .../kvm/x86_64/emulator_error_test.c          | 219 ++++++++++++++++++
+ 10 files changed, 423 insertions(+), 4 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/emulator_error_test.c
+
+-- 
+2.31.1.607.g51e8a6a459-goog
+
