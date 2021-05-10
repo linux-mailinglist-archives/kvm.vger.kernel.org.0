@@ -2,122 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56D953791F5
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 17:05:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F3D1379214
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 17:06:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241309AbhEJPGs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 11:06:48 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43191 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232772AbhEJPDQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 11:03:16 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14AEaE0v148725;
-        Mon, 10 May 2021 11:02:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=qmWTO6Jpcomzj7wYTwIK2pecoL7VSoFFO1RSCnOZ0J8=;
- b=slW+KlkyDAzDiZXi4fSODKZOHjLGXgRB1enLVkZlpEXHZHH91H2Gk6c2thtBCrw4Isq8
- rKW8asMIyrgFMfAkr6ROAMiPXouAjVjBl/O2xRu7bhUJBGynOc5j4Td2jEhBXjsVgBui
- lEri/KG+m9oQ0NmZ3x5Zruyz5fYFWiLI0x1ck+ALOhAnB98WfccpHo8mWPEBrliVwyo8
- xjrCYG9/GIenQXmxZ378G2LiSYid4qowLCVkh8EPIEntjBKwAnZ4eg1Owe/jnvLV1FQ5
- rZDWr5LxqdbjxkduHcE/xt625bZ2qxrmCz0bHPJae1ZDocEOxb/ih+dgdgMEoRHtZSS2 Nw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38f3dbf2hx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 May 2021 11:02:08 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14AEaVdd151054;
-        Mon, 10 May 2021 11:02:08 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38f3dbf2gb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 May 2021 11:02:08 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14AErOBv009509;
-        Mon, 10 May 2021 15:02:04 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03fra.de.ibm.com with ESMTP id 38dj988jgs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 May 2021 15:02:03 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14AF1xUg33620304
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 10 May 2021 15:01:59 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 64577AE053;
-        Mon, 10 May 2021 15:01:59 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A27AFAE051;
-        Mon, 10 May 2021 15:01:58 +0000 (GMT)
-Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 10 May 2021 15:01:58 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
-        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        thuth@redhat.com
-Subject: [kvm-unit-tests PATCH 4/4] s390x: cpumodel: FMT2 SCLP implies test
-Date:   Mon, 10 May 2021 15:00:15 +0000
-Message-Id: <20210510150015.11119-5-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210510150015.11119-1-frankja@linux.ibm.com>
-References: <20210510150015.11119-1-frankja@linux.ibm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: X5LFWpYHUIDedv5t-2FnRQTpmJPFJDII
-X-Proofpoint-ORIG-GUID: lj9rlZBJ77BCqqK6f3PjhDrCkp1R4_TN
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-05-10_09:2021-05-10,2021-05-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
- suspectscore=0 bulkscore=0 priorityscore=1501 lowpriorityscore=0
- malwarescore=0 mlxlogscore=999 phishscore=0 impostorscore=0 clxscore=1015
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2105100105
+        id S235186AbhEJPHU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 11:07:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54722 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239602AbhEJPGB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 11:06:01 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6DF146147F;
+        Mon, 10 May 2021 15:04:56 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1lg7So-000TBy-B7; Mon, 10 May 2021 16:04:54 +0100
+Date:   Mon, 10 May 2021 16:04:53 +0100
+Message-ID: <87v97qociy.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com, stable@vger.kernel.org
+Subject: Re: [PATCH 2/2] KVM: arm64: Commit pending PC adjustemnts before returning to userspace
+In-Reply-To: <7a0f43c8-cc36-810e-0b8e-ffe66672ca82@arm.com>
+References: <20210510094915.1909484-1-maz@kernel.org>
+        <20210510094915.1909484-3-maz@kernel.org>
+        <7a0f43c8-cc36-810e-0b8e-ffe66672ca82@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, yuzenghui@huawei.com, james.morse@arm.com, suzuki.poulose@arm.com, kernel-team@android.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The sie facilities require sief2 to also be enabled, so lets check if
-that's the case.
+On Mon, 10 May 2021 15:55:28 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 5/10/21 10:49 AM, Marc Zyngier wrote:
+> > KVM currently updates PC (and the corresponding exception state)
+> > using a two phase approach: first by setting a set of flags,
+> > then by converting these flags into a state update when the vcpu
+> > is about to enter the guest.
+> >
+> > However, this creates a disconnect with userspace if the vcpu thread
+> > returns there with any exception/PC flag set. In this case, the exposed
+> 
+> The code seems to handle only the KVM_ARM64_PENDING_EXCEPTION
+> flag. Is the "PC flag" a reference to the KVM_ARM64_INCREMENT_PC
+> flag?
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- s390x/cpumodel.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+No, it does handle both exception and PC increment, unless I have
+completely bodged something (entirely possible).
 
-diff --git a/s390x/cpumodel.c b/s390x/cpumodel.c
-index 619c3dc7..67bb6543 100644
---- a/s390x/cpumodel.c
-+++ b/s390x/cpumodel.c
-@@ -56,12 +56,24 @@ static void test_sclp_features_fmt4(void)
- 	report_prefix_pop();
- }
- 
-+static void test_sclp_features_fmt2(void)
-+{
-+	if (sclp_facilities.has_sief2)
-+		return;
-+
-+	report_prefix_push("!sief2 implies");
-+	test_sclp_missing_sief2_implications();
-+	report_prefix_pop();
-+}
-+
- static void test_sclp_features(void)
- {
- 	report_prefix_push("sclp");
- 
- 	if (uv_os_is_guest())
- 		test_sclp_features_fmt4();
-+	else
-+		test_sclp_features_fmt2();
- 
- 	report_prefix_pop();
- }
+> 
+> > context is wrong, as userpsace doesn't have access to these flags
+> 
+> s/userpsace/userspace
+> 
+> > (they aren't architectural). It also means that these flags are
+> > preserved across a reset, which isn't expected.
+> >
+> > To solve this problem, force an explicit synchronisation of the
+> > exception state on vcpu exit to userspace. As an optimisation
+> > for nVHE systems, only perform this when there is something pending.
+> >
+> > Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Cc: stable@vger.kernel.org # 5.11
+> > ---
+> >  arch/arm64/include/asm/kvm_asm.h   |  1 +
+> >  arch/arm64/kvm/arm.c               | 10 ++++++++++
+> >  arch/arm64/kvm/hyp/exception.c     |  4 ++--
+> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  8 ++++++++
+> >  4 files changed, 21 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> > index d5b11037401d..5e9b33cbac51 100644
+> > --- a/arch/arm64/include/asm/kvm_asm.h
+> > +++ b/arch/arm64/include/asm/kvm_asm.h
+> > @@ -63,6 +63,7 @@
+> >  #define __KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector		18
+> >  #define __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize		19
+> >  #define __KVM_HOST_SMCCC_FUNC___pkvm_mark_hyp			20
+> > +#define __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc			21
+> >  
+> >  #ifndef __ASSEMBLY__
+> >  
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 1cb39c0803a4..d62a7041ebd1 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -897,6 +897,16 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> >  
+> >  	kvm_sigset_deactivate(vcpu);
+> >  
+> > +	/*
+> > +	 * In the unlikely event that we are returning to userspace
+> > +	 * with pending exceptions or PC adjustment, commit these
+> 
+> I'm going to assume "PC adjustment" means the KVM_ARM64_INCREMENT_PC
+> flag. Please correct me if that's not true, but if that's the case,
+> then the flag isn't handled below.
+> 
+> > +	 * adjustments in order to give userspace a consistent view of
+> > +	 * the vcpu state.
+> > +	 */
+> > +	if (unlikely(vcpu->arch.flags & (KVM_ARM64_PENDING_EXCEPTION |
+> > +					 KVM_ARM64_EXCEPT_MASK)))
+> 
+> The condition seems to suggest that it is valid to set
+> KVM_ARM64_EXCEPT_{AA32,AA64}_* without setting
+> KVM_ARM64_PENDING_EXCEPTION, which looks rather odd to me.
+> Is that a valid use of the KVM_ARM64_EXCEPT_MASK bits? If it's not
+> (the existing code always sets the exception type with the
+> KVM_ARM64_PENDING_EXCEPTION), that I was thinking that checking only
+> the KVM_ARM64_PENDING_EXCEPTION flag would make the intention
+> clearer.
+
+No, you are missing this (subtle) comment in kvm_host.h:
+
+<quote>
+/*
+ * Overlaps with KVM_ARM64_EXCEPT_MASK on purpose so that it can't be
+ * set together with an exception...
+ */
+#define KVM_ARM64_INCREMENT_PC		(1 << 9) /* Increment PC */
+</quote>
+
+So (KVM_ARM64_PENDING_EXCEPTION | KVM_ARM64_EXCEPT_MASK) checks for
+*both* an exception and a PC increment.
+
+Thanks,
+
+	M.
+
 -- 
-2.30.2
-
+Without deviation from the norm, progress is not possible.
