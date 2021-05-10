@@ -2,152 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF12B3798A5
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 22:56:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C00953798B3
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 23:02:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232913AbhEJU6B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 16:58:01 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62402 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232816AbhEJU57 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 16:57:59 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14AKX0lV009515;
-        Mon, 10 May 2021 16:56:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=FlTlbt+jZfzefr6O1neniFwOcbMu+ZI4wyFsWrsce/c=;
- b=NxwIVGWTSJI4WW0mIYFKCXL2Nsp5YgZybs+v4U+E76UT6svTESJpUnL2BDyNBN/XXQIR
- AKFvDBnxDCb+7VJUaenqGVYmDAUqvGMQ1dpwGV1Yj2BRTH/utPprogbBqHA9gi/vQLqe
- 4WkxeVOGZQ4ZD4QaGWgtfEhS2xJP4vkmGUx1fsJywnxmRq6BmtUYtrgjpOhXfS01kLhI
- rp2/gQxkRLZl0O5pwwXKLWPCEOZzoLzw3Kp7M0q+4ikMERch3QAonuoQv9h1Aex07TsX
- mOV5UVz63Qbqi/PQvGXhAk3FZ9LazMfQm505puR1iX0dd297uZCALw6hdrFFBwUMVVqP xg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38fbpc12dj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 May 2021 16:56:54 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14AKXg9s014950;
-        Mon, 10 May 2021 16:56:53 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38fbpc12cm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 May 2021 16:56:53 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14AKtDhf030615;
-        Mon, 10 May 2021 20:56:51 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 38dj9899dp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 May 2021 20:56:51 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14AKumdn33948112
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 10 May 2021 20:56:48 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A39304C052;
-        Mon, 10 May 2021 20:56:48 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8FB5E4C04A;
-        Mon, 10 May 2021 20:56:48 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon, 10 May 2021 20:56:48 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id 31718E047D; Mon, 10 May 2021 22:56:48 +0200 (CEST)
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Cc:     Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
-Subject: [RFC PATCH v5 3/3] vfio-ccw: Serialize FSM IDLE state with I/O completion
-Date:   Mon, 10 May 2021 22:56:46 +0200
-Message-Id: <20210510205646.1845844-4-farman@linux.ibm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210510205646.1845844-1-farman@linux.ibm.com>
-References: <20210510205646.1845844-1-farman@linux.ibm.com>
+        id S231555AbhEJVD3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 17:03:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39454 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231162AbhEJVD2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 17:03:28 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1375CC061574
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 14:02:21 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id v191so14474306pfc.8
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 14:02:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=45NUfNFNptvMg6JTtEiEAtq0rD4KjNhuaSZ4UKjowxM=;
+        b=XkvV82WvRXO64kiRraW9QAeJzi177K0R8eeVI7F2FbVP6xOjEftm6FuZihuX5YG95Z
+         ZgMEyUzwxTRZwOQvSjyOlcCf1UlE5D7xozB2ARQkJI9+jntLzGwOJX7K4miq9RoKn1Y7
+         BTyoT5falJYMo6Ysa9Wd6iXJ3owIbxE+TA1uK3OezcB/k44c0WsWRTkhB6bXoDzUj8eG
+         rOZ4COMsI/uwXrbu9Iij3n/mTN7/0UbKUExiNOk142Gw1vZwVb4FNfxJJNS+LI+nKHZU
+         HFMQ7sZvrI39V2Dc09jmdiQjI2LQSyioa3ouKt+zk13il41cQvPmtzzONhhvDo9uKyPv
+         SIGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=45NUfNFNptvMg6JTtEiEAtq0rD4KjNhuaSZ4UKjowxM=;
+        b=Z72Z0/mt9FPi+Oak7YNStF3jpxW/95gXl8OBWW+wC+KJAvVDKEPB9yz4Lnu4KxcL7G
+         T6440lkw5fFWJydN3RYpb5+6a9e6wQAw6iQPTjebvf9Rtd42aUnfIe6HHyMbR+I+Uboq
+         IE9ii5hkaYD92kXrAOjmUQQbIt4ixBODpfl/vmIc7mfPGmgU9u1ozHMgAQ58sFTX70iL
+         9iGOnr4v2TbxdExU/XRBXjYzK4ShYT0ib3LEkYtyUJcDnUGLpHHEOTegPTAPwqi7Uk4P
+         X1gaopj1xzHSUwXApsy8eDYhAhFDYWY+vgEjb+YgagIQ6SsJ7om8rZWvQdQe1T5lnH76
+         lzYQ==
+X-Gm-Message-State: AOAM53321nYjaQwTU9NSX3aftDUy0E2ZAaMq+u6ZAGlxHUFA8Gmj3wQD
+        ooVWkhmkMtX6gzx21Q5FJaa/5A==
+X-Google-Smtp-Source: ABdhPJzZTuM44zAfoBZUi9Bj2lDne3SvasMsj8yS5dnz/amFPTp89Usk8uPjTYlehmVU6DVhcqDOHg==
+X-Received: by 2002:aa7:90d5:0:b029:28e:df57:47ff with SMTP id k21-20020aa790d50000b029028edf5747ffmr27631557pfk.74.1620680540337;
+        Mon, 10 May 2021 14:02:20 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id e20sm324207pjt.8.2021.05.10.14.02.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 May 2021 14:02:19 -0700 (PDT)
+Date:   Mon, 10 May 2021 21:02:15 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Peter Gonda <pgonda@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Allow userspace to update tracked sregs
+ for protected guests
+Message-ID: <YJmfV1sO8miqvQLM@google.com>
+References: <20210507165947.2502412-1-seanjc@google.com>
+ <20210507165947.2502412-3-seanjc@google.com>
+ <5f084672-5c0d-a6f3-6dcf-38dd76e0bde0@amd.com>
+ <YJla8vpwqCxqgS8C@google.com>
+ <12fe8f83-49b4-1a22-7903-84e45f16c372@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: luTX-tt7hrJwCYmfD_NOs03zzhHoN8N5
-X-Proofpoint-ORIG-GUID: IvufkpWU_rM5DZ4FOUY0DNBBlc3u7FHl
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-05-10_12:2021-05-10,2021-05-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- impostorscore=0 mlxscore=0 suspectscore=0 spamscore=0 mlxlogscore=851
- priorityscore=1501 lowpriorityscore=0 malwarescore=0 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2105100140
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <12fe8f83-49b4-1a22-7903-84e45f16c372@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Today, the stacked call to vfio_ccw_sch_io_todo() does three things:
+On Mon, May 10, 2021, Tom Lendacky wrote:
+> On 5/10/21 11:10 AM, Sean Christopherson wrote:
+> > On Fri, May 07, 2021, Tom Lendacky wrote:
+> >> On 5/7/21 11:59 AM, Sean Christopherson wrote:
+> >>> Allow userspace to set CR0, CR4, CR8, and EFER via KVM_SET_SREGS for
+> >>> protected guests, e.g. for SEV-ES guests with an encrypted VMSA.  KVM
+> >>> tracks the aforementioned registers by trapping guest writes, and also
+> >>> exposes the values to userspace via KVM_GET_SREGS.  Skipping the regs
+> >>> in KVM_SET_SREGS prevents userspace from updating KVM's CPU model to
+> >>> match the known hardware state.
+> >>
+> >> This is very similar to the original patch I had proposed that you were
+> >> against :)
+> > 
+> > I hope/think my position was that it should be unnecessary for KVM to need to
+> > know the guest's CR0/4/0 and EFER values, i.e. even the trapping is unnecessary.
+> > I was going to say I had a change of heart, as EFER.LMA in particular could
+> > still be required to identify 64-bit mode, but that's wrong; EFER.LMA only gets
+> > us long mode, the full is_64_bit_mode() needs access to cs.L, which AFAICT isn't
+> > provided by #VMGEXIT or trapping.
+> 
+> Right, that one is missing. If you take a VMGEXIT that uses the GHCB, then
+> I think you can assume we're in 64-bit mode.
 
-  1) Update a solicited IRB with CP information, and release the CP
-     if the interrupt was the end of a START operation.
-  2) Copy the IRB data into the io_region, under the protection of
-     the io_mutex
-  3) Reset the vfio-ccw FSM state to IDLE to acknowledge that
-     vfio-ccw can accept more work.
+But that's not technically guaranteed.  The GHCB even seems to imply that there
+are scenarios where it's legal/expected to do VMGEXIT with a valid GHCB outside
+of 64-bit mode:
 
-The trouble is that step 3 is (A) invoked for both solicited and
-unsolicited interrupts, and (B) sitting after the mutex for step 2.
-This second piece becomes a problem if it processes an interrupt
-for a CLEAR SUBCHANNEL while another thread initiates a START,
-thus allowing the CP and FSM states to get out of sync. That is:
+  However, instead of issuing a HLT instruction, the AP will issue a VMGEXIT
+  with SW_EXITCODE of 0x8000_0004 ((this implies that the GHCB was updated prior
+  to leaving 64-bit long mode).
 
-    CPU 1                           CPU 2
-    fsm_do_clear()
-    fsm_irq()
-                                    fsm_io_request()
-    vfio_ccw_sch_io_todo()
-                                    fsm_io_helper()
+In practice, assuming the guest is in 64-bit mode will likely work, especially
+since the MSR-based protocol is extremely limited, but ideally there should be
+stronger language in the GHCB to define the exact VMM assumptions/behaviors.
 
-Since the FSM state and CP should be kept in sync, let's make a
-note when the CP is released, and rely on that as an indication
-that the FSM should also be reset at the end of this routine and
-open up the device for more work.
+On the flip side, that assumption and the limited exposure through the MSR
+protocol means trapping CR0, CR4, and EFER is pointless.  I don't see how KVM
+can do anything useful with that information outside of VMGEXITs.  Page tables
+are encrypted and GPRs are stale; what else could KVM possibly do with
+identifying protected mode, paging, and/or 64-bit?
 
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
----
- drivers/s390/cio/vfio_ccw_drv.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+> > Unless I'm missing something, that means that VMGEXIT(VMMCALL) is broken since
+> > KVM will incorrectly crush (or preserve) bits 63:32 of GPRs.  I'm guessing no
+> > one has reported a bug because either (a) no one has tested a hypercall that
+> > requires bits 63:32 in a GPR or (b) the guest just happens to be in 64-bit mode
+> > when KVM_SEV_LAUNCH_UPDATE_VMSA is invoked and so the segment registers are
+> > frozen to make it appear as if the guest is perpetually in 64-bit mode.
+> 
+> I don't think it's (b) since the LAUNCH_UPDATE_VMSA is done against reset-
+> state vCPUs.
+> 
+> > 
+> > I see that sev_es_validate_vmgexit() checks ghcb_cpl_is_valid(), but isn't that
+> > either pointless or indicative of a much, much bigger problem?  If VMGEXIT is
+> 
+> It is needed for the VMMCALL exit.
+> 
+> > restricted to CPL0, then the check is pointless.  If VMGEXIT isn't restricted to
+> > CPL0, then KVM has a big gaping hole that allows a malicious/broken guest
+> > userspace to crash the VM simply by executing VMGEXIT.  Since valid_bitmap is
+> > cleared during VMGEXIT handling, I don't think guest userspace can attack/corrupt
+> > the guest kernel by doing a replay attack, but it does all but guarantee a
+> > VMGEXIT at CPL>0 will be fatal since the required valid bits won't be set.
+> 
+> Right, so I think some cleanup is needed there, both for the guest and the
+> hypervisor:
+> 
+> - For the guest, we could just clear the valid bitmask before leaving the
+>   #VC handler/releasing the GHCB. Userspace can't update the GHCB, so any
+>   VMGEXIT from userspace would just look like a no-op with the below
+>   change to KVM.
 
-diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-index 8c625b530035..ef39182edab5 100644
---- a/drivers/s390/cio/vfio_ccw_drv.c
-+++ b/drivers/s390/cio/vfio_ccw_drv.c
-@@ -85,7 +85,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
- {
- 	struct vfio_ccw_private *private;
- 	struct irb *irb;
--	bool is_final;
-+	bool is_final, is_finished = false;
- 
- 	private = container_of(work, struct vfio_ccw_private, io_work);
- 	irb = &private->irb;
-@@ -94,14 +94,16 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
- 		     (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
- 	if (scsw_is_solicited(&irb->scsw)) {
- 		cp_update_scsw(&private->cp, &irb->scsw);
--		if (is_final && private->state == VFIO_CCW_STATE_CP_PENDING)
-+		if (is_final && private->state == VFIO_CCW_STATE_CP_PENDING) {
- 			cp_free(&private->cp);
-+			is_finished = true;
-+		}
- 	}
- 	mutex_lock(&private->io_mutex);
- 	memcpy(private->io_region->irb_area, irb, sizeof(*irb));
- 	mutex_unlock(&private->io_mutex);
- 
--	if (private->mdev && is_final)
-+	if (private->mdev && is_finished)
- 		private->state = VFIO_CCW_STATE_IDLE;
- 
- 	if (private->io_trigger)
--- 
-2.25.1
+Ah, right, the exit_code and exit infos need to be valid.
 
+> - For KVM, instead of returning -EINVAL from sev_es_validate_vmgexit(), we
+>   return the #GP action through the GHCB and continue running the guest.
+
+Agreed, KVM should never kill the guest in response to a bad VMGEXIT.  That
+should always be a guest decision.
+
+> > Sadly, the APM doesn't describe the VMGEXIT behavior, nor does any of the SEV-ES
+> > documentation I have.  I assume VMGEXIT is recognized at CPL>0 since it morphs
+> > to VMMCALL when SEV-ES isn't active.
+> 
+> Correct.
+> 
+> > 
+> > I.e. either the ghcb_cpl_is_valid() check should be nuked, or more likely KVM
+> 
+> The ghcb_cpl_is_valid() is still needed to see whether the VMMCALL was
+> from userspace or not (a VMMCALL will generate a #VC).
+
+Blech.  I get that the GHCB spec says CPL must be provided/checked for VMMCALL,
+but IMO that makes no sense whatsover.
+
+If the guest restricts the GHCB to CPL0, then the CPL field is pointless because
+the VMGEXIT will only ever come from CPL0.  Yes, technically the guest kernel
+can proxy a VMMCALL from userspace to the host, but the guest kernel _must_ be
+the one to enforce any desired CPL checks because the VMM is untrusted, at least
+once you get to SNP.
+
+If the guest exposes the GHCB to any CPL, then the CPL check is worthless because
+guest userspace can simply lie about the CPL.  And exposing the GCHB to userspace
+completely undermines guest privilege separation since hardware doesn't provide
+the real CPL, i.e. the VMM, even it were trusted, can't determine the origin of
+the VMGEXIT.
