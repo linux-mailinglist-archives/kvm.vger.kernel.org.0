@@ -2,171 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A40EB37974C
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 20:57:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 726BE379772
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 21:10:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232995AbhEJS6z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 14:58:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39864 "EHLO
+        id S233089AbhEJTK5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 15:10:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232952AbhEJS6w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 14:58:52 -0400
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0546C06138A
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 11:57:46 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id q186so2464314ljq.8
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 11:57:46 -0700 (PDT)
+        with ESMTP id S232714AbhEJTK4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 15:10:56 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D184AC06175F
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 12:09:49 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id k15so1238791pgb.10
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 12:09:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=aKEUOJuhx+R5Q4bhRWHxVLgdxk0QGSuqQVlbf8MB+7c=;
-        b=JDBZzQIPoejn3/d+QtGZzD28RdIw8C64WhVvR1t8Mm8NPesB5GQbV+6X8MAPg8d2iz
-         7mjSfAUxoe5GoA1u5eFD81uYYLAp2URnyUCGrbNDYHVp38j8bGebnRhp+yuSIhca96TB
-         Idw999gL4TQKkak+v8eW//N13DSw/7q+BBPaOMR33bGqZCv8T374sU+F3cL1EEa60D/a
-         NLbUr3Kya2ani4/px1deJxMu9aWX7EaHN+n0Wv5F28jq3z25xhcOIgfkMVM1CulHeisB
-         6W1yTMA8cSJ+3dwvBwd7q8xAXNwv+Nbrjofd7n08PFX4O78UvKYNZsu4A6MXr68Q2VUW
-         k9Cg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=mgdZMcvNYkjsPLV9hPmFw01fQwD6bWf6+x+1xi3tISM=;
+        b=IfKnIJ2VyxRci+J3kp/Ql6Eo/hXM5QZS9Ez8aaAfuPw2VqWGOlPvLChA+WTXTku1WF
+         to8/CPTQ/4FjOZGWfJGVg+pFCncRzBM1G/+CkT9P6wkD+rH8Qwg/F9l7bSZ9Q+JKV9FU
+         3Zl4YsKDWBHNtWKIRLAf3PRd2zJs+Swv1lsyZPjFoR5RHQdrM7H/4IHScEI9Ty/PqCNG
+         iVBA7HczDKmpe+LJN3OkoUoT0t9tF8dpziH/R3CDyiF46F1qQCqSczMju563Wbup8Fgd
+         W0J1NzCp38TK50mWTieOhtjgR9qLaACLQcMOvAfHIle9rpvgX25nr7ZafJ3/wApV4Q0W
+         nNAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=aKEUOJuhx+R5Q4bhRWHxVLgdxk0QGSuqQVlbf8MB+7c=;
-        b=rmDyTvudt24eywUQ95zSDS6iOpqnMRnsJlBRlBScIjphnTbcrjItu5WNE+jWwRJGqS
-         WXNCsJ3uLusTpSDxNIjXBm2/KXY/y00Ko54Bq09AUZuoqOYVPEine2aLTzODwJoZV+sN
-         jW5pbpXIaHkFaMx793v5VSzd7+t81Hu1MFQXKV0uMeqBvJyI14jG33H1lRRwfXyKasYd
-         IbxZA/xGNRKJM4+MO7ZvRl0eD3YCzKgTtiMteiIwBFchdjRNgOvyil8w5S8R0qNWyrLb
-         UMqjlt6jh8pTy5meBHE4QidwuxCdwxxOhnbzMJoczo6lmTpMVppg8Y51iGI5T83Y0Tuu
-         DCZw==
-X-Gm-Message-State: AOAM5311UIrhhPN28tplKjvVOlkT7td0mjk+p5urqiXB8JAC/Lnjd2SI
-        YsM1HwcCfi151BuTXWXDO3GSY6XH+9CWjtqFA2vHJShojmKIoQ==
-X-Google-Smtp-Source: ABdhPJwlSFI8JRzL4BW3Gmg9WHqzIaE0tnEyTDmQy+u1k5R9ZHhhfpXgcqsFOBszyUlQhiyVUC1Rjjrmtnj+bLyjTHs=
-X-Received: by 2002:a2e:591:: with SMTP id 139mr14109105ljf.207.1620673065009;
- Mon, 10 May 2021 11:57:45 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=mgdZMcvNYkjsPLV9hPmFw01fQwD6bWf6+x+1xi3tISM=;
+        b=Jx7fn7WXJm+QSrtixPmYK9NGpNZxEFDD7D3u+48N8FU3KBMi2ljgxLQPECpMTRc0HX
+         Wmasr8Rq5ZG2cyqL3i9MTGeaLFRC+BfD+flHB2PWc/Osq/wMlK+pCTPJ6vxr06lRl/fJ
+         WY3XjJvbGxpYNw3ca1bcTa+zRxwmOR4mSCOI2HLUFCghSIost3yKggW5Bwtki0gPzBL1
+         hIjo7GyBFvxBQgf/JQfP4jz5hb+JDx2GacLIMI3CzIHU3Vwz4oMeSLjXU1n8Ud8cBzad
+         Tcylvyl2sWFlQ1z+QqiHKBRHTQsFGhsKItl8xOpImcKLkrtBzB3+YttD4j1K3lgrtAf4
+         HCUQ==
+X-Gm-Message-State: AOAM532fBWv/nsDcxAJLVY5AWUHLHo5hwsiUK9fjnWj6hGB/bw5Ib6Gz
+        Yni4OEgP3qyTccZg5wF+mujKLg==
+X-Google-Smtp-Source: ABdhPJw12h8+tFsY3t4ukeyKuMFQPy8tkkLsjsvVjJVLAzv6rMc55IvUbCU6a4WkCrbyUljO9MEpyA==
+X-Received: by 2002:a62:e203:0:b029:28e:8267:e02e with SMTP id a3-20020a62e2030000b029028e8267e02emr26746639pfi.75.1620673789134;
+        Mon, 10 May 2021 12:09:49 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id z25sm12528938pgu.89.2021.05.10.12.09.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 May 2021 12:09:48 -0700 (PDT)
+Date:   Mon, 10 May 2021 19:09:44 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [GIT PULL] KVM updates for Linux 5.13-rc2
+Message-ID: <YJmE+NpAt4GTw/ZK@google.com>
+References: <20210510181441.351452-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20210429203740.1935629-1-jingzhangos@google.com>
-In-Reply-To: <20210429203740.1935629-1-jingzhangos@google.com>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Mon, 10 May 2021 13:57:33 -0500
-Message-ID: <CAAdAUtgW0vYmr5rqiMJKbZSjgEtLQqxfHd8H0fxrTbE0o4zmWw@mail.gmail.com>
-Subject: Re: [PATCH v4 0/4] KVM statistics data fd-based binary interface
-To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        LinuxS390 <linux-s390@vger.kernel.org>,
-        Linuxkselftest <linux-kselftest@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210510181441.351452-1-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On Mon, May 10, 2021, Paolo Bonzini wrote:
+> Linus,
+> 
+> The following changes since commit 9ccce092fc64d19504fa54de4fd659e279cc92e7:
+> 
+>   Merge tag 'for-linus-5.13-ofs-1' of git://git.kernel.org/pub/scm/linux/kernel/git/hubcap/linux (2021-05-02 14:13:46 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+> 
+> for you to fetch changes up to ce7ea0cfdc2e9ff31d12da31c3226deddb9644f5:
+> 
+>   KVM: SVM: Move GHCB unmapping to fix RCU warning (2021-05-07 06:06:23 -0400)
+> 
+> Thomas Gleixner and Michael Ellerman had some KVM changes in their
+> late merge window pull requests, but there are no conflicts.
+> 
+> ----------------------------------------------------------------
+> Sean Christopherson (17):
+>       KVM: VMX: Do not advertise RDPID if ENABLE_RDTSCP control is unsupported
+>       KVM: x86: Emulate RDPID only if RDTSCP is supported
+>       KVM: SVM: Inject #UD on RDTSCP when it should be disabled in the guest
+>       KVM: x86: Move RDPID emulation intercept to its own enum
+>       KVM: VMX: Disable preemption when probing user return MSRs
+>       KVM: SVM: Probe and load MSR_TSC_AUX regardless of RDTSCP support in host
+>       KVM: x86: Add support for RDPID without RDTSCP
+>       KVM: VMX: Configure list of user return MSRs at module init
 
-On Thu, Apr 29, 2021 at 3:37 PM Jing Zhang <jingzhangos@google.com> wrote:
->
-> This patchset provides a file descriptor for every VM and VCPU to read
-> KVM statistics data in binary format.
-> It is meant to provide a lightweight, flexible, scalable and efficient
-> lock-free solution for user space telemetry applications to pull the
-> statistics data periodically for large scale systems. The pulling
-> frequency could be as high as a few times per second.
-> In this patchset, every statistics data are treated to have some
-> attributes as below:
->   * architecture dependent or common
->   * VM statistics data or VCPU statistics data
->   * type: cumulative, instantaneous,
->   * unit: none for simple counter, nanosecond, microsecond,
->     millisecond, second, Byte, KiByte, MiByte, GiByte. Clock Cycles
-> Since no lock/synchronization is used, the consistency between all
-> the statistics data is not guaranteed. That means not all statistics
-> data are read out at the exact same time, since the statistics date
-> are still being updated by KVM subsystems while they are read out.
->
-> ---
->
-> * v3 -> v4
->   - Rebase to kvm/queue, commit 9f242010c3b4 ("KVM: avoid "deadlock"
->     between install_new_memslots and MMU notifier")
->   - Use C-stype comments in the whole patch
->   - Fix wrong count for x86 VCPU stats descriptors
->   - Fix KVM stats data size counting and validity check in selftest
->
-> * v2 -> v3
->   - Rebase to kvm/queue, commit edf408f5257b ("KVM: avoid "deadlock"
->     between install_new_memslots and MMU notifier")
->   - Resolve some nitpicks about format
->
-> * v1 -> v2
->   - Use ARRAY_SIZE to count the number of stats descriptors
->   - Fix missing `size` field initialization in macro STATS_DESC
->
-> [1] https://lore.kernel.org/kvm/20210402224359.2297157-1-jingzhangos@google.com
-> [2] https://lore.kernel.org/kvm/20210415151741.1607806-1-jingzhangos@google.com
-> [3] https://lore.kernel.org/kvm/20210423181727.596466-1-jingzhangos@google.com
->
-> ---
->
-> Jing Zhang (4):
->   KVM: stats: Separate common stats from architecture specific ones
->   KVM: stats: Add fd-based API to read binary stats data
->   KVM: stats: Add documentation for statistics data binary interface
->   KVM: selftests: Add selftest for KVM statistics data binary interface
->
->  Documentation/virt/kvm/api.rst                | 171 ++++++++
->  arch/arm64/include/asm/kvm_host.h             |   9 +-
->  arch/arm64/kvm/guest.c                        |  42 +-
->  arch/mips/include/asm/kvm_host.h              |   9 +-
->  arch/mips/kvm/mips.c                          |  67 ++-
->  arch/powerpc/include/asm/kvm_host.h           |   9 +-
->  arch/powerpc/kvm/book3s.c                     |  68 +++-
->  arch/powerpc/kvm/book3s_hv.c                  |  12 +-
->  arch/powerpc/kvm/book3s_pr.c                  |   2 +-
->  arch/powerpc/kvm/book3s_pr_papr.c             |   2 +-
->  arch/powerpc/kvm/booke.c                      |  63 ++-
->  arch/s390/include/asm/kvm_host.h              |   9 +-
->  arch/s390/kvm/kvm-s390.c                      | 133 +++++-
->  arch/x86/include/asm/kvm_host.h               |   9 +-
->  arch/x86/kvm/x86.c                            |  71 +++-
->  include/linux/kvm_host.h                      | 132 +++++-
->  include/linux/kvm_types.h                     |  12 +
->  include/uapi/linux/kvm.h                      |  50 +++
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   3 +
->  .../testing/selftests/kvm/include/kvm_util.h  |   3 +
->  .../selftests/kvm/kvm_bin_form_stats.c        | 380 ++++++++++++++++++
->  tools/testing/selftests/kvm/lib/kvm_util.c    |  11 +
->  virt/kvm/kvm_main.c                           | 237 ++++++++++-
->  24 files changed, 1415 insertions(+), 90 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/kvm_bin_form_stats.c
->
->
-> base-commit: 9f242010c3b46e63bc62f08fff42cef992d3801b
-> --
-> 2.31.1.527.g47e6f16901-goog
->
+I'm guessing I'm too late as usual and the hashes are set in stone, but just in
+case I'm not...
 
-Do I need to send another version for this?
+This patch (commit b6194b94a2ca, "KVM: VMX: Configure...) has a bug that Maxim
+found during code review.  The bug is eliminated by the very next patch (commit
+e7f5ab87841c), but it will break bisection if bisection involves running a KVM
+guest.  At a glance, even syzkaller will be affected :-(
 
-Thanks,
-Jing
+>       KVM: VMX: Use flag to indicate "active" uret MSRs instead of sorting list
+>       KVM: VMX: Use common x86's uret MSR list as the one true list
+>       KVM: VMX: Disable loading of TSX_CTRL MSR the more conventional way
+>       KVM: x86: Export the number of uret MSRs to vendor modules
+>       KVM: x86: Move uret MSR slot management to common x86
+>       KVM: x86: Tie Intel and AMD behavior for MSR_TSC_AUX to guest CPU model
+>       KVM: x86: Hide RDTSCP and RDPID if MSR_TSC_AUX probing failed
+>       KVM: x86: Prevent KVM SVM from loading on kernels with 5-level paging
+>       KVM: SVM: Invert user pointer casting in SEV {en,de}crypt helpers
