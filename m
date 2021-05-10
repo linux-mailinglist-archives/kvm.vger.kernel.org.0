@@ -2,115 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A6227377DC9
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 10:15:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7541377DC1
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 10:14:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230254AbhEJIQy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 04:16:54 -0400
-Received: from mga18.intel.com ([134.134.136.126]:57585 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230238AbhEJIQv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 04:16:51 -0400
-IronPort-SDR: tyr7/+J11/kcEkr+9Psm9bAX2kBqhcnIBy2fCHDnZ1rO39Wz59jO2yfUVm/O2SyyhqAXoWl0HT
- 0UW7XBc5KIhg==
-X-IronPort-AV: E=McAfee;i="6200,9189,9979"; a="186587929"
-X-IronPort-AV: E=Sophos;i="5.82,287,1613462400"; 
-   d="scan'208";a="186587929"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2021 01:15:47 -0700
-IronPort-SDR: DXO8kTfUesPnHkzUDVaiwI5pu8nDY0ieuvPZd4UKW4SWbAMrPm8stG9XRjYye+89DZyo/G3B/m
- 1f/aZl84ys+Q==
-X-IronPort-AV: E=Sophos;i="5.82,287,1613462400"; 
-   d="scan'208";a="436040641"
-Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.193.73])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2021 01:15:45 -0700
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     jasowang@redhat.com, mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH 2/2] vDPA/ifcvf: reuse pre-defined macros for device ids and vendor ids
-Date:   Mon, 10 May 2021 16:10:15 +0800
-Message-Id: <20210510081015.4212-3-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210510081015.4212-1-lingshan.zhu@intel.com>
-References: <20210510081015.4212-1-lingshan.zhu@intel.com>
+        id S230156AbhEJIPw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 04:15:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28922 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230045AbhEJIPv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 04:15:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620634486;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YzIlE0g/4U7xWXnQ0lyKGcEjcSAJhWnyeWZnCZ0Wzz4=;
+        b=aTNRUloBh+2R5EW9MsyrmD9SOaEYdgmehPaS/5ZaOp+vTNZLevfDv1i4voDVYY0Hz0KRud
+        Gm4EUAtfEpqcj7op3Ns2syDe4VInJMQPsD7K4BdiW9HZC70y0UDRLzddcPs7jnTJ3VnrEQ
+        4LIAR03BTaAMeLhJtsJ97OlmTm1GHrk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-163-_0aJNn2oOaSeZL52oNUMWQ-1; Mon, 10 May 2021 04:14:45 -0400
+X-MC-Unique: _0aJNn2oOaSeZL52oNUMWQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CD031008060;
+        Mon, 10 May 2021 08:14:43 +0000 (UTC)
+Received: from starship (unknown [10.40.194.86])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 75C8560E3A;
+        Mon, 10 May 2021 08:14:40 +0000 (UTC)
+Message-ID: <01c04a2335c913437b98e3ea874357689b097990.camel@redhat.com>
+Subject: Re: [PATCH 04/15] KVM: x86: Move RDPID emulation intercept to its
+ own enum
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
+        Reiji Watanabe <reijiw@google.com>
+Date:   Mon, 10 May 2021 11:14:39 +0300
+In-Reply-To: <20210504171734.1434054-5-seanjc@google.com>
+References: <20210504171734.1434054-1-seanjc@google.com>
+         <20210504171734.1434054-5-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit would reuse pre-defined macros for ifcvf device ids
-and vendor ids
+On Tue, 2021-05-04 at 10:17 -0700, Sean Christopherson wrote:
+> Add a dedicated intercept enum for RDPID instead of piggybacking RDTSCP.
+> Unlike VMX's ENABLE_RDTSCP, RDPID is not bound to SVM's RDTSCP intercept.
+> 
+> Fixes: fb6d4d340e05 ("KVM: x86: emulate RDPID")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/emulate.c     | 2 +-
+>  arch/x86/kvm/kvm_emulate.h | 1 +
+>  arch/x86/kvm/vmx/vmx.c     | 3 ++-
+>  3 files changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index abd9a4db11a8..8fc71e70857d 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -4502,7 +4502,7 @@ static const struct opcode group8[] = {
+>   * from the register case of group9.
+>   */
+>  static const struct gprefix pfx_0f_c7_7 = {
+> -	N, N, N, II(DstMem | ModRM | Op3264 | EmulateOnUD, em_rdpid, rdtscp),
+> +	N, N, N, II(DstMem | ModRM | Op3264 | EmulateOnUD, em_rdpid, rdpid),
+>  };
+>  
+>  
+> diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+> index 0d359115429a..f016838faedd 100644
+> --- a/arch/x86/kvm/kvm_emulate.h
+> +++ b/arch/x86/kvm/kvm_emulate.h
+> @@ -468,6 +468,7 @@ enum x86_intercept {
+>  	x86_intercept_clgi,
+>  	x86_intercept_skinit,
+>  	x86_intercept_rdtscp,
+> +	x86_intercept_rdpid,
+>  	x86_intercept_icebp,
+>  	x86_intercept_wbinvd,
+>  	x86_intercept_monitor,
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 82404ee2520e..99591e523b47 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7437,8 +7437,9 @@ static int vmx_check_intercept(struct kvm_vcpu *vcpu,
+>  	/*
+>  	 * RDPID causes #UD if disabled through secondary execution controls.
+>  	 * Because it is marked as EmulateOnUD, we need to intercept it here.
+> +	 * Note, RDPID is hidden behind ENABLE_RDTSCP.
+>  	 */
+> -	case x86_intercept_rdtscp:
+> +	case x86_intercept_rdpid:
+Shoudn't this path still handle the x86_intercept_rdtscp as I described below,
+or should we remove it from the SVM side as well?
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
----
- drivers/vdpa/ifcvf/ifcvf_base.h | 12 ------------
- drivers/vdpa/ifcvf/ifcvf_main.c | 23 +++++++++++++----------
- 2 files changed, 13 insertions(+), 22 deletions(-)
+>  		if (!nested_cpu_has2(vmcs12, SECONDARY_EXEC_ENABLE_RDTSCP)) {
+>  			exception->vector = UD_VECTOR;
+>  			exception->error_code_valid = false;
 
-diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
-index 0111bfdeb342..ded1b1b5fb13 100644
---- a/drivers/vdpa/ifcvf/ifcvf_base.h
-+++ b/drivers/vdpa/ifcvf/ifcvf_base.h
-@@ -19,21 +19,9 @@
- #include <uapi/linux/virtio_config.h>
- #include <uapi/linux/virtio_pci.h>
- 
--#define N3000_VENDOR_ID		0x1AF4
- #define N3000_DEVICE_ID		0x1041
--#define N3000_SUBSYS_VENDOR_ID	0x8086
- #define N3000_SUBSYS_DEVICE_ID	0x001A
- 
--#define C5000X_PL_VENDOR_ID		0x1AF4
--#define C5000X_PL_DEVICE_ID		0x1000
--#define C5000X_PL_SUBSYS_VENDOR_ID	0x8086
--#define C5000X_PL_SUBSYS_DEVICE_ID	0x0001
--
--#define C5000X_PL_BLK_VENDOR_ID		0x1AF4
--#define C5000X_PL_BLK_DEVICE_ID		0x1001
--#define C5000X_PL_BLK_SUBSYS_VENDOR_ID	0x8086
--#define C5000X_PL_BLK_SUBSYS_DEVICE_ID	0x0002
--
- #define IFCVF_NET_SUPPORTED_FEATURES \
- 		((1ULL << VIRTIO_NET_F_MAC)			| \
- 		 (1ULL << VIRTIO_F_ANY_LAYOUT)			| \
-diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-index ab0ab5cf0f6e..bc1d59f316d1 100644
---- a/drivers/vdpa/ifcvf/ifcvf_main.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-@@ -536,18 +536,21 @@ static void ifcvf_remove(struct pci_dev *pdev)
- }
- 
- static struct pci_device_id ifcvf_pci_ids[] = {
--	{ PCI_DEVICE_SUB(N3000_VENDOR_ID,
-+	/* N3000 network device */
-+	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_REDHAT_QUMRANET,
- 			 N3000_DEVICE_ID,
--			 N3000_SUBSYS_VENDOR_ID,
-+			 PCI_VENDOR_ID_INTEL,
- 			 N3000_SUBSYS_DEVICE_ID) },
--	{ PCI_DEVICE_SUB(C5000X_PL_VENDOR_ID,
--			 C5000X_PL_DEVICE_ID,
--			 C5000X_PL_SUBSYS_VENDOR_ID,
--			 C5000X_PL_SUBSYS_DEVICE_ID) },
--	{ PCI_DEVICE_SUB(C5000X_PL_BLK_VENDOR_ID,
--			 C5000X_PL_BLK_DEVICE_ID,
--			 C5000X_PL_BLK_SUBSYS_VENDOR_ID,
--			 C5000X_PL_BLK_SUBSYS_DEVICE_ID) },
-+	/* C5000X-PL network device */
-+	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_REDHAT_QUMRANET,
-+			 VIRTIO_TRANS_ID_NET,
-+			 PCI_VENDOR_ID_INTEL,
-+			 VIRTIO_ID_NET) },
-+	/* C5000X-PL block device */
-+	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_REDHAT_QUMRANET,
-+			 VIRTIO_TRANS_ID_BLOCK,
-+			 PCI_VENDOR_ID_INTEL,
-+			 VIRTIO_ID_BLOCK) },
- 
- 	{ 0 },
- };
--- 
-2.27.0
+I have a maybe unrelated question that caught my eye:
+I see this:
+
+	DIP(SrcNone, rdtscp, check_rdtsc),
+
+As far as I can see this means that if a nested guest executes
+the rdtscp, and L1 intercepts it, then we will emulate the rdtscp by doing a nested
+VM exit, but if we emulate a rdtscp for L1, we will fail since there is no .execute callback.
+
+Is this intentional? As I understand it, at least in theory the emulator can be called
+on any instruction due to things like lack of unrestricted guest, and/or emulating an
+instruction on page fault (although the later is usually done by re-executing the instruction).
+
+I know that the x86 emulator is far from being complete for such cases but I 
+do wonder why rdtspc has different behavior in regard to nested and not nested case.
+
+So this patch (since it removes the x86_intercept_rdtscp handling from the VMX),
+should break the rdtscp emulation for the nested guest on VMX, although it is probably
+not used anyway and should be removed.
+
+Best regards,
+	Maxim Levitsky
+
 
