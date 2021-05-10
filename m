@@ -2,181 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DFB0C377DFA
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 10:20:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EDC0377E07
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 10:22:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230181AbhEJIV6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 04:21:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45292 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230146AbhEJIV5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 04:21:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620634853;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KycsCZsBmF5GXF6UVjxsWkCrzDBEjgApKN4NXuzKWms=;
-        b=S9oYPP/Qo3iTUTLmfJfeImY2WRZdRZeVLmDQ/SrMK0nsZL+P+5R3WT1AoU6+56beBAIeEu
-        R27I3UuOU82dETk9ZWZDMBACXzF13u803pa1C30rYWnzPdC251mw8qCtd4fiwEvlKmua5R
-        G09oJpmJkw47KYui20d/t3I/wQPcik0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-59-988bIh9jOjqeb8rX5UHe2A-1; Mon, 10 May 2021 04:20:51 -0400
-X-MC-Unique: 988bIh9jOjqeb8rX5UHe2A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3005B1008060;
-        Mon, 10 May 2021 08:20:50 +0000 (UTC)
-Received: from starship (unknown [10.40.194.86])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2D3725D74B;
-        Mon, 10 May 2021 08:20:46 +0000 (UTC)
-Message-ID: <3699a28f75fbb541ab14e90d5856c4b3a583497e.camel@redhat.com>
-Subject: Re: [PATCH 07/15] KVM: x86: Add support for RDPID without RDTSCP
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        id S230203AbhEJIXP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 04:23:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37774 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230118AbhEJIXO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 04:23:14 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A012BC061573;
+        Mon, 10 May 2021 01:22:10 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id t193so216643pgb.4;
+        Mon, 10 May 2021 01:22:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=dhMvoxMJAO0uO8IA2H0TKE6ifTGSTb7TdUN9wUYY1wY=;
+        b=rF+VTgtqNWExfkHPyubomVntp5D64QNIvFRhbWNDq6JUqR6drFXxO2hUq73WoOb4A+
+         SXOJgOFxNcvt44dK+celf8J3digKOAsuPwycGLvcaaHB/tHudcZcGzYjb+ce+eNCEm5Y
+         w1w7mnQROzs825bb6dI+/Ueisd7QaGmUSyyHHzsOrxhPaFiyt2PlTlOrvpueeDTt24Pz
+         waUwUJhvvCcbpGEmlvPq6YugzUH0ga9pv4L/PLrps/YtrJPioHxChF4RezJHTP89GA54
+         XVo5oXSsoj8GaAu8br8RIuD/SSQuPkATQhlrx3Ga5B2ACa6PpiZiE5By+lDUoVaUWz1K
+         BkqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=dhMvoxMJAO0uO8IA2H0TKE6ifTGSTb7TdUN9wUYY1wY=;
+        b=jqnXwF3gIcCmTusClvtZ4CmQItUK73p7FS9NTQ9S/tR3WqsJma1s5ZU3I+2sfmH1Rf
+         DiG99sU+YBUuIpRH0CDh5Fe19N8Jf5Unao4v5CeSkG0kkp8p8SQlDhAKhWIsUKLUVBIi
+         6pXnuOCKp/WZeNhPigiDetAh9giY5yUt8oT7h0fyZGDPBx5McXx9g/NSz66YKhhLhQlQ
+         MGF+kf7q7mYuXJXH75TTghw2tPQSWYPR72lMMqnx+2GgqxyGF75+KW8pyy+exaR8f+RU
+         TNzkT8mTBsDAMzxLuSR/udvKjOvrP6LGh0R/YhOby/nxTfx4ptA7czExYQainqZXl1U/
+         2/UQ==
+X-Gm-Message-State: AOAM532bU/sMZu1SbSgMAEaoHJrNUqaj3/aG+UI1TsKMHryihT+00noM
+        fsEgMcqRTYXHqjU6YIYpzj93fr19DV0=
+X-Google-Smtp-Source: ABdhPJzIP+6jHymcpdNkCuuBGSX0Azj04jxYye7z94O7cf+ud4WEkbUhx8ymwUTMtSHpOCMpQk7ZVg==
+X-Received: by 2002:a63:8f17:: with SMTP id n23mr24343609pgd.82.1620634929917;
+        Mon, 10 May 2021 01:22:09 -0700 (PDT)
+Received: from localhost.localdomain ([103.7.29.6])
+        by smtp.googlemail.com with ESMTPSA id n8sm10477853pgm.7.2021.05.10.01.22.07
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 10 May 2021 01:22:09 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
-        Reiji Watanabe <reijiw@google.com>
-Date:   Mon, 10 May 2021 11:20:45 +0300
-In-Reply-To: <20210504171734.1434054-8-seanjc@google.com>
-References: <20210504171734.1434054-1-seanjc@google.com>
-         <20210504171734.1434054-8-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH] KVM: x86: hyper-v: Task srcu lock when accessing kvm_memslots()
+Date:   Mon, 10 May 2021 16:21:59 +0800
+Message-Id: <1620634919-4563-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-05-04 at 10:17 -0700, Sean Christopherson wrote:
-> Allow userspace to enable RDPID for a guest without also enabling RDTSCP.
-> Aside from checking for RDPID support in the obvious flows, VMX also needs
-> to set ENABLE_RDTSCP=1 when RDPID is exposed.
-> 
-> For the record, there is no known scenario where enabling RDPID without
-> RDTSCP is desirable.  But, both AMD and Intel architectures allow for the
-> condition, i.e. this is purely to make KVM more architecturally accurate.
-> 
-> Fixes: 41cd02c6f7f6 ("kvm: x86: Expose RDPID in KVM_GET_SUPPORTED_CPUID")
-> Cc: stable@vger.kernel.org
-> Reported-by: Reiji Watanabe <reijiw@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/svm/svm.c |  6 ++++--
->  arch/x86/kvm/vmx/vmx.c | 27 +++++++++++++++++++++++----
->  arch/x86/kvm/x86.c     |  3 ++-
->  3 files changed, 29 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index b3153d40cc4d..231b9650d864 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -2669,7 +2669,8 @@ static int svm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		if (tsc_aux_uret_slot < 0)
->  			return 1;
->  		if (!msr_info->host_initiated &&
-> -		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
-> +		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP) &&
-> +		    !guest_cpuid_has(vcpu, X86_FEATURE_RDPID))
->  			return 1;
->  		msr_info->data = svm->tsc_aux;
->  		break;
-> @@ -2891,7 +2892,8 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
->  			return 1;
->  
->  		if (!msr->host_initiated &&
-> -		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
-> +		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP) &&
-> +		    !guest_cpuid_has(vcpu, X86_FEATURE_RDPID))
->  			return 1;
->  
->  		/*
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 990ee339a05f..42e4bbaa299a 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1788,7 +1788,8 @@ static void setup_msrs(struct vcpu_vmx *vmx)
->  	if (update_transition_efer(vmx))
->  		vmx_setup_uret_msr(vmx, MSR_EFER);
->  
-> -	if (guest_cpuid_has(&vmx->vcpu, X86_FEATURE_RDTSCP))
-> +	if (guest_cpuid_has(&vmx->vcpu, X86_FEATURE_RDTSCP)  ||
-> +	    guest_cpuid_has(&vmx->vcpu, X86_FEATURE_RDPID))
->  		vmx_setup_uret_msr(vmx, MSR_TSC_AUX);
->  
->  	vmx_setup_uret_msr(vmx, MSR_IA32_TSX_CTRL);
-> @@ -1994,7 +1995,8 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		break;
->  	case MSR_TSC_AUX:
->  		if (!msr_info->host_initiated &&
-> -		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
-> +		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP) &&
-> +		    !guest_cpuid_has(vcpu, X86_FEATURE_RDPID))
->  			return 1;
->  		goto find_uret_msr;
->  	case MSR_IA32_DEBUGCTLMSR:
-> @@ -2314,7 +2316,8 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		break;
->  	case MSR_TSC_AUX:
->  		if (!msr_info->host_initiated &&
-> -		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
-> +		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP) &&
-> +		    !guest_cpuid_has(vcpu, X86_FEATURE_RDPID))
->  			return 1;
->  		/* Check reserved bit, higher 32 bits should be zero */
->  		if ((data >> 32) != 0)
-> @@ -4368,7 +4371,23 @@ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
->  						  xsaves_enabled, false);
->  	}
->  
-> -	vmx_adjust_sec_exec_feature(vmx, &exec_control, rdtscp, RDTSCP);
-> +	/*
-> +	 * RDPID is also gated by ENABLE_RDTSCP, turn on the control if either
-> +	 * feature is exposed to the guest.  This creates a virtualization hole
-> +	 * if both are supported in hardware but only one is exposed to the
-> +	 * guest, but letting the guest execute RDTSCP or RDPID when either one
-> +	 * is advertised is preferable to emulating the advertised instruction
-> +	 * in KVM on #UD, and obviously better than incorrectly injecting #UD.
-> +	 */
-> +	if (cpu_has_vmx_rdtscp()) {
-> +		bool rdpid_or_rdtscp_enabled =
-> +			guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP) ||
-> +			guest_cpuid_has(vcpu, X86_FEATURE_RDPID);
-> +
-> +		vmx_adjust_secondary_exec_control(vmx, &exec_control,
-> +						  SECONDARY_EXEC_ENABLE_RDTSCP,
-> +						  rdpid_or_rdtscp_enabled, false);
-> +	}
->  	vmx_adjust_sec_exec_feature(vmx, &exec_control, invpcid, INVPCID);
->  
->  	vmx_adjust_sec_exec_exiting(vmx, &exec_control, rdrand, RDRAND);
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index e304447be42d..b4516d303413 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5978,7 +5978,8 @@ static void kvm_init_msr_list(void)
->  				continue;
->  			break;
->  		case MSR_TSC_AUX:
-> -			if (!kvm_cpu_cap_has(X86_FEATURE_RDTSCP))
-> +			if (!kvm_cpu_cap_has(X86_FEATURE_RDTSCP) &&
-> +			    !kvm_cpu_cap_has(X86_FEATURE_RDPID))
->  				continue;
->  			break;
->  		case MSR_IA32_UMWAIT_CONTROL:
+From: Wanpeng Li <wanpengli@tencent.com>
 
-Reviewed-by : Maxim Levitsky <mlevitsk@redhat.com>
+ WARNING: suspicious RCU usage
+ 5.13.0-rc1 #4 Not tainted
+ -----------------------------
+ ./include/linux/kvm_host.h:710 suspicious rcu_dereference_check() usage!
+ 
+other info that might help us debug this:
 
-Best regards,
-	Maxim Levitsky
+rcu_scheduler_active = 2, debug_locks = 1
+ 1 lock held by hyperv_clock/8318:
+  #0: ffffb6b8cb05a7d8 (&hv->hv_lock){+.+.}-{3:3}, at: kvm_hv_invalidate_tsc_page+0x3e/0xa0 [kvm]
+ 
+stack backtrace:
+CPU: 3 PID: 8318 Comm: hyperv_clock Not tainted 5.13.0-rc1 #4
+Call Trace:
+ dump_stack+0x87/0xb7
+ lockdep_rcu_suspicious+0xce/0xf0
+ kvm_write_guest_page+0x1c1/0x1d0 [kvm]
+ kvm_write_guest+0x50/0x90 [kvm]
+ kvm_hv_invalidate_tsc_page+0x79/0xa0 [kvm]
+ kvm_gen_update_masterclock+0x1d/0x110 [kvm]
+ kvm_arch_vm_ioctl+0x2a7/0xc50 [kvm]
+ kvm_vm_ioctl+0x123/0x11d0 [kvm]
+ __x64_sys_ioctl+0x3ed/0x9d0
+ do_syscall_64+0x3d/0x80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
 
+kvm_memslots() will be called by kvm_write_guest(), so we should take the srcu lock.
+
+Fixes: e880c6ea5 (KVM: x86: hyper-v: Prevent using not-yet-updated TSC page by secondary CPUs)
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ arch/x86/kvm/hyperv.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index f98370a3..f00830e 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -1172,6 +1172,7 @@ void kvm_hv_invalidate_tsc_page(struct kvm *kvm)
+ {
+ 	struct kvm_hv *hv = to_kvm_hv(kvm);
+ 	u64 gfn;
++	int idx;
+ 
+ 	if (hv->hv_tsc_page_status == HV_TSC_PAGE_BROKEN ||
+ 	    hv->hv_tsc_page_status == HV_TSC_PAGE_UNSET ||
+@@ -1190,9 +1191,16 @@ void kvm_hv_invalidate_tsc_page(struct kvm *kvm)
+ 	gfn = hv->hv_tsc_page >> HV_X64_MSR_TSC_REFERENCE_ADDRESS_SHIFT;
+ 
+ 	hv->tsc_ref.tsc_sequence = 0;
++
++	/*
++	 * Take the srcu lock as memslots will be accessed to check the gfn
++	 * cache generation against the memslots generation.
++	 */
++	idx = srcu_read_lock(&kvm->srcu);
+ 	if (kvm_write_guest(kvm, gfn_to_gpa(gfn),
+ 			    &hv->tsc_ref, sizeof(hv->tsc_ref.tsc_sequence)))
+ 		hv->hv_tsc_page_status = HV_TSC_PAGE_BROKEN;
++	srcu_read_unlock(&kvm->srcu, idx);
+ 
+ out_unlock:
+ 	mutex_unlock(&hv->hv_lock);
+-- 
+2.7.4
 
