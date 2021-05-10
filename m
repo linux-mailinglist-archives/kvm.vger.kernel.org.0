@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 12BF1379471
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 18:45:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2C1E379475
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 18:45:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231932AbhEJQqF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 12:46:05 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:12420 "EHLO
+        id S232304AbhEJQqN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 12:46:13 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43510 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231904AbhEJQpy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 12:45:54 -0400
+        by vger.kernel.org with ESMTP id S232091AbhEJQpz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 12:45:55 -0400
 Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14AGXiI7192459;
-        Mon, 10 May 2021 12:44:47 -0400
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14AGXiIi192398;
+        Mon, 10 May 2021 12:44:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=YzPlVfYTQczK3eanC33KDqYjm/wzv93jGkPN8LJXV98=;
- b=Bzydo6XKQARIdeI3P3hm4l5geoSef123hqx57oLaFAkfKHxpnTcIpiwD5zddDnHcFvNd
- QqLEqmpq1g1qY0/ZsbqcZxBF9qNMALkegvWB1vfRpJ9TKB3mK7UAsknGRSUlYmmhHIh5
- ddbQzLNbdg7sLT6tUQ02J1jAnv3tr26hQqNgvuCMuJ/RQ6mOBMQGpRbCMU1/wqPLcuIb
- jI5uB6ZfjFubIQC+MSZocm1iQpTKRqfzhSNYw+ywWkTY2zfzCYSdNkINGrxv/hM767+Z
- /NwkMYrRDHbHHuacK5BXue4lvlOk86uwIcUEv6gasAjRkTEHSJyxClbZherqfpIe8HMV eA== 
+ bh=340KIGt2R1DmbQMVVNaA17sNQes/7TDk0BTtBZkxRBI=;
+ b=Yj77eMzrSlfcmjhYlxO+v07+4c4JduQDZrkMwtuWEzzv6lALmSxrk9P16cF2HgWkVvBm
+ 2ItS36wwSFB5a8gymfqRsHQSAsWUP0v19z8St6ETzaphMHa0G7V+TGkf8zDBvHCYiUzM
+ c0d8jcmDUofrggkWLCVIHbWi7yt1X6JxmdKO2Jhg+TNanNzqG7icR8EdPANFGqRHKHRX
+ fltZWvj1V6nsAFXTT/gXitcCVItoq4v2aQLXZzElgopWYSdtwUkD5SjwUcfZPaN2oojF
+ W8q/l4SbtqvCutxe47c3BNH0f23BhHTHGAftBMyFsf8y8OrUAM1OqQ4UKXeyT0T8cJ+7 Pg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 38f7r2hkxt-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 38f7r2hky6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 May 2021 12:44:46 -0400
+        Mon, 10 May 2021 12:44:48 -0400
 Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14AGXjud192481;
-        Mon, 10 May 2021 12:44:46 -0400
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 38f7r2hkxc-1
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14AGZC67008697;
+        Mon, 10 May 2021 12:44:47 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 38f7r2hkxw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 May 2021 12:44:46 -0400
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14AGgMpw026801;
-        Mon, 10 May 2021 16:44:45 GMT
+        Mon, 10 May 2021 12:44:47 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14AGgpnN003007;
+        Mon, 10 May 2021 16:44:46 GMT
 Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma05wdc.us.ibm.com with ESMTP id 38dj98yp6h-1
+        by ppma01dal.us.ibm.com with ESMTP id 38dj99bj79-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 May 2021 16:44:45 +0000
+        Mon, 10 May 2021 16:44:46 +0000
 Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14AGiibx28049744
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14AGii2928508510
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Mon, 10 May 2021 16:44:44 GMT
 Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E3D61AE05F;
-        Mon, 10 May 2021 16:44:43 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id B67C5AE05F;
+        Mon, 10 May 2021 16:44:44 +0000 (GMT)
 Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DDEA6AE067;
-        Mon, 10 May 2021 16:44:42 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id F1BACAE063;
+        Mon, 10 May 2021 16:44:43 +0000 (GMT)
 Received: from cpe-172-100-179-72.stny.res.rr.com.com (unknown [9.85.140.234])
         by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon, 10 May 2021 16:44:42 +0000 (GMT)
+        Mon, 10 May 2021 16:44:43 +0000 (GMT)
 From:   Tony Krowiak <akrowiak@linux.ibm.com>
 To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
@@ -62,17 +62,17 @@ Cc:     jjherne@linux.ibm.com, freude@linux.ibm.com,
         pasic@linux.ibm.com, alex.williamson@redhat.com,
         kwankhede@nvidia.com, fiuczy@linux.ibm.com,
         Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: [PATCH v16 10/14] s390/zcrypt: driver callback to indicate resource in use
-Date:   Mon, 10 May 2021 12:44:19 -0400
-Message-Id: <20210510164423.346858-11-akrowiak@linux.ibm.com>
+Subject: [PATCH v16 11/14] s390/vfio-ap: implement in-use callback for vfio_ap driver
+Date:   Mon, 10 May 2021 12:44:20 -0400
+Message-Id: <20210510164423.346858-12-akrowiak@linux.ibm.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210510164423.346858-1-akrowiak@linux.ibm.com>
 References: <20210510164423.346858-1-akrowiak@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: AQeETZniIvOvauNoAdowQSBj5L-AVP5Z
-X-Proofpoint-ORIG-GUID: r27zCeMsn1hd255gAeQ_7HXI1gu6tF21
+X-Proofpoint-GUID: VAcK4kbJG3mYDcEsrkzXZOq9pMzJpjyU
+X-Proofpoint-ORIG-GUID: SIXWOEwF5AxQ4EZ0WLrvZJEVtO3eHwAa
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
  definitions=2021-05-10_09:2021-05-10,2021-05-10 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
@@ -84,264 +84,158 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduces a new driver callback to prevent a root user from unbinding
-an AP queue from its device driver if the queue is in use. The callback
-will be invoked whenever a change to the AP bus's sysfs apmask or aqmask
-attributes would result in one or more AP queues being removed from its
-driver. If the callback responds in the affirmative for any driver
-queried, the change to the apmask or aqmask will be rejected with a device
-busy error.
+Let's implement the callback to indicate when an APQN
+is in use by the vfio_ap device driver. The callback is
+invoked whenever a change to the apmask or aqmask would
+result in one or more queue devices being removed from the driver. The
+vfio_ap device driver will indicate a resource is in use
+if the APQN of any of the queue devices to be removed are assigned to
+any of the matrix mdevs under the driver's control.
 
-For this patch, only non-default drivers will be queried. Currently,
-there is only one non-default driver, the vfio_ap device driver. The
-vfio_ap device driver facilitates pass-through of an AP queue to a
-guest. The idea here is that a guest may be administered by a different
-sysadmin than the host and we don't want AP resources to unexpectedly
-disappear from a guest's AP configuration (i.e., adapters and domains
-assigned to the matrix mdev). This will enforce the proper procedure for
-removing AP resources intended for guest usage which is to
-first unassign them from the matrix mdev, then unbind them from the
-vfio_ap device driver.
+There is potential for a deadlock condition between the matrix_dev->lock
+used to lock the matrix device during assignment of adapters and domains
+and the ap_perms_mutex locked by the AP bus when changes are made to the
+sysfs apmask/aqmask attributes.
+
+Consider following scenario (courtesy of Halil Pasic):
+1) apmask_store() takes ap_perms_mutex
+2) assign_adapter_store() takes matrix_dev->lock
+3) apmask_store() calls vfio_ap_mdev_resource_in_use() which tries
+   to take matrix_dev->lock
+4) assign_adapter_store() calls ap_apqn_in_matrix_owned_by_def_drv
+   which tries to take ap_perms_mutex
+
+BANG!
+
+To resolve this issue, instead of using the mutex_lock(&matrix_dev->lock)
+function to lock the matrix device during assignment of an adapter or
+domain to a matrix_mdev as well as during the in_use callback, the
+mutex_trylock(&matrix_dev->lock) function will be used. If the lock is not
+obtained, then the assignment and in_use functions will terminate with
+-EAGAIN.
 
 Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
 ---
- drivers/s390/crypto/ap_bus.c | 160 ++++++++++++++++++++++++++++++++---
- drivers/s390/crypto/ap_bus.h |   4 +
- 2 files changed, 154 insertions(+), 10 deletions(-)
+ drivers/s390/crypto/vfio_ap_drv.c     |  1 +
+ drivers/s390/crypto/vfio_ap_ops.c     | 38 ++++++++++++++++++++++-----
+ drivers/s390/crypto/vfio_ap_private.h |  2 ++
+ 3 files changed, 34 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/s390/crypto/ap_bus.c b/drivers/s390/crypto/ap_bus.c
-index 2758d05a802d..b7653cec81ac 100644
---- a/drivers/s390/crypto/ap_bus.c
-+++ b/drivers/s390/crypto/ap_bus.c
-@@ -36,6 +36,7 @@
- #include <linux/mod_devicetable.h>
- #include <linux/debugfs.h>
- #include <linux/ctype.h>
-+#include <linux/module.h>
+diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
+index 73bd073fd5d3..8934471b7944 100644
+--- a/drivers/s390/crypto/vfio_ap_drv.c
++++ b/drivers/s390/crypto/vfio_ap_drv.c
+@@ -147,6 +147,7 @@ static int __init vfio_ap_init(void)
+ 	memset(&vfio_ap_drv, 0, sizeof(vfio_ap_drv));
+ 	vfio_ap_drv.probe = vfio_ap_mdev_probe_queue;
+ 	vfio_ap_drv.remove = vfio_ap_mdev_remove_queue;
++	vfio_ap_drv.in_use = vfio_ap_mdev_resource_in_use;
+ 	vfio_ap_drv.ids = ap_queue_ids;
  
- #include "ap_bus.h"
- #include "ap_debug.h"
-@@ -1006,6 +1007,23 @@ static int modify_bitmap(const char *str, unsigned long *bitmap, int bits)
- 	return 0;
+ 	ret = ap_driver_register(&vfio_ap_drv, THIS_MODULE, VFIO_AP_DRV_NAME);
+diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+index 48e3db2f1c28..3d6c6c2b3b4f 100644
+--- a/drivers/s390/crypto/vfio_ap_ops.c
++++ b/drivers/s390/crypto/vfio_ap_ops.c
+@@ -684,10 +684,14 @@ static void vfio_ap_mdev_link_adapter(struct ap_matrix_mdev *matrix_mdev,
+  *	   driver; or, if no APQIs have yet been assigned, the APID is not
+  *	   contained in an APQN bound to the vfio_ap device driver.
+  *
+- *	4. -EBUSY
++ *	4. -EADDRINUSE
+  *	   An APQN derived from the cross product of the APID being assigned
+  *	   and the APQIs previously assigned is being used by another mediated
+- *	   matrix device or the mdev lock could not be acquired.
++ *	   matrix device.
++ *
++ *	5. -EAGAIN
++ *	   The mdev lock could not be acquired which is required in order to
++ *	   change the AP configuration for the mdev
+  */
+ static ssize_t assign_adapter_store(struct device *dev,
+ 				    struct device_attribute *attr,
+@@ -698,7 +702,8 @@ static ssize_t assign_adapter_store(struct device *dev,
+ 	struct mdev_device *mdev = mdev_from_dev(dev);
+ 	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+ 
+-	mutex_lock(&matrix_dev->lock);
++	if (!mutex_trylock(&matrix_dev->lock))
++		return -EAGAIN;
+ 
+ 	/*
+ 	 * If the KVM pointer is in flux or the guest is running, disallow
+@@ -921,10 +926,14 @@ static void vfio_ap_mdev_link_domain(struct ap_matrix_mdev *matrix_mdev,
+  *	   driver; or, if no APIDs have yet been assigned, the APQI is not
+  *	   contained in an APQN bound to the vfio_ap device driver.
+  *
+- *	4. -BUSY
++ *	4. -EADDRINUSE
+  *	   An APQN derived from the cross product of the APQI being assigned
+  *	   and the APIDs previously assigned is being used by another mediated
+- *	   matrix device or the mdev lock could not be acquired.
++ *	   matrix device.
++ *
++ *	5. -EAGAIN
++ *	   The mdev lock could not be acquired which is required in order to
++ *	   change the AP configuration for the mdev
+  */
+ static ssize_t assign_domain_store(struct device *dev,
+ 				   struct device_attribute *attr,
+@@ -936,7 +945,8 @@ static ssize_t assign_domain_store(struct device *dev,
+ 	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+ 	unsigned long max_apqi = matrix_mdev->matrix.aqm_max;
+ 
+-	mutex_lock(&matrix_dev->lock);
++	if (!mutex_trylock(&matrix_dev->lock))
++		return -EAGAIN;
+ 
+ 	/*
+ 	 * If the KVM pointer is in flux or the guest is running, disallow
+@@ -1113,6 +1123,7 @@ static void vfio_ap_mdev_hot_plug_cdom(struct ap_matrix_mdev *matrix_mdev,
+  * returns one of the following errors:
+  *	-EINVAL if the ID is not a number
+  *	-ENODEV if the ID exceeds the maximum value configured for the system
++ *	-EAGAIN if the mdev lock could not be acquired
+  */
+ static ssize_t assign_control_domain_store(struct device *dev,
+ 					   struct device_attribute *attr,
+@@ -1123,7 +1134,8 @@ static ssize_t assign_control_domain_store(struct device *dev,
+ 	struct mdev_device *mdev = mdev_from_dev(dev);
+ 	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+ 
+-	mutex_lock(&matrix_dev->lock);
++	if (!mutex_trylock(&matrix_dev->lock))
++		return -EAGAIN;
+ 
+ 	/*
+ 	 * If the KVM pointer is in flux or the guest is running, disallow
+@@ -1740,3 +1752,15 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
+ 	kfree(q);
+ 	mutex_unlock(&matrix_dev->lock);
  }
- 
-+static int ap_parse_bitmap_str(const char *str, unsigned long *bitmap, int bits,
-+			       unsigned long *newmap)
++
++int vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long *aqm)
 +{
-+	unsigned long size;
-+	int rc;
++	int ret;
 +
-+	size = BITS_TO_LONGS(bits) * sizeof(unsigned long);
-+	if (*str == '+' || *str == '-') {
-+		memcpy(newmap, bitmap, size);
-+		rc = modify_bitmap(str, newmap, bits);
-+	} else {
-+		memset(newmap, 0, size);
-+		rc = hex2bitmap(str, newmap, bits);
-+	}
-+	return rc;
++	if (!mutex_trylock(&matrix_dev->lock))
++		return -EBUSY;
++	ret = vfio_ap_mdev_verify_no_sharing(apm, aqm);
++	mutex_unlock(&matrix_dev->lock);
++
++	return ret;
 +}
-+
- int ap_parse_mask_str(const char *str,
- 		      unsigned long *bitmap, int bits,
- 		      struct mutex *lock)
-@@ -1025,14 +1043,7 @@ int ap_parse_mask_str(const char *str,
- 		kfree(newmap);
- 		return -ERESTARTSYS;
- 	}
--
--	if (*str == '+' || *str == '-') {
--		memcpy(newmap, bitmap, size);
--		rc = modify_bitmap(str, newmap, bits);
--	} else {
--		memset(newmap, 0, size);
--		rc = hex2bitmap(str, newmap, bits);
--	}
-+	rc = ap_parse_bitmap_str(str, bitmap, bits, newmap);
- 	if (rc == 0)
- 		memcpy(bitmap, newmap, size);
- 	mutex_unlock(lock);
-@@ -1224,12 +1235,76 @@ static ssize_t apmask_show(struct bus_type *bus, char *buf)
- 	return rc;
- }
+diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
+index 1b95486fccf0..43c422896f31 100644
+--- a/drivers/s390/crypto/vfio_ap_private.h
++++ b/drivers/s390/crypto/vfio_ap_private.h
+@@ -110,4 +110,6 @@ void vfio_ap_mdev_unregister(void);
+ int vfio_ap_mdev_probe_queue(struct ap_device *queue);
+ void vfio_ap_mdev_remove_queue(struct ap_device *queue);
  
-+static int __verify_card_reservations(struct device_driver *drv, void *data)
-+{
-+	int rc = 0;
-+	struct ap_driver *ap_drv = to_ap_drv(drv);
-+	unsigned long *newapm = (unsigned long *)data;
++int vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long *aqm);
 +
-+	/*
-+	 * No need to verify whether the driver is using the queues if it is the
-+	 * default driver.
-+	 */
-+	if (ap_drv->flags & AP_DRIVER_FLAG_DEFAULT)
-+		return 0;
-+
-+	/*
-+	 * increase the driver's module refcounter to be sure it is not
-+	 * going away when we invoke the callback function.
-+	 */
-+	if (!try_module_get(drv->owner))
-+		return 0;
-+
-+	if (ap_drv->in_use) {
-+		rc = ap_drv->in_use(newapm, ap_perms.aqm);
-+		if (rc)
-+			rc = -EBUSY;
-+	}
-+
-+	/* release the driver's module */
-+	module_put(drv->owner);
-+
-+	return rc;
-+}
-+
-+static int apmask_commit(unsigned long *newapm)
-+{
-+	int rc;
-+	unsigned long reserved[BITS_TO_LONGS(AP_DEVICES)];
-+
-+	/*
-+	 * Check if any bits in the apmask have been set which will
-+	 * result in queues being removed from non-default drivers
-+	 */
-+	if (bitmap_andnot(reserved, newapm, ap_perms.apm, AP_DEVICES)) {
-+		rc = bus_for_each_drv(&ap_bus_type, NULL, reserved,
-+				      __verify_card_reservations);
-+		if (rc)
-+			return rc;
-+	}
-+
-+	memcpy(ap_perms.apm, newapm, APMASKSIZE);
-+
-+	return 0;
-+}
-+
- static ssize_t apmask_store(struct bus_type *bus, const char *buf,
- 			    size_t count)
- {
- 	int rc;
-+	DECLARE_BITMAP(newapm, AP_DEVICES);
-+
-+	if (mutex_lock_interruptible(&ap_perms_mutex))
-+		return -ERESTARTSYS;
- 
--	rc = ap_parse_mask_str(buf, ap_perms.apm, AP_DEVICES, &ap_perms_mutex);
-+	rc = ap_parse_bitmap_str(buf, ap_perms.apm, AP_DEVICES, newapm);
-+	if (rc)
-+		goto done;
-+
-+	rc = apmask_commit(newapm);
-+
-+done:
-+	mutex_unlock(&ap_perms_mutex);
- 	if (rc)
- 		return rc;
- 
-@@ -1255,12 +1330,77 @@ static ssize_t aqmask_show(struct bus_type *bus, char *buf)
- 	return rc;
- }
- 
-+static int __verify_queue_reservations(struct device_driver *drv, void *data)
-+{
-+	int rc = 0;
-+	struct ap_driver *ap_drv = to_ap_drv(drv);
-+	unsigned long *newaqm = (unsigned long *)data;
-+
-+	/*
-+	 * If the reserved bits do not identify queues reserved for use by the
-+	 * non-default driver, there is no need to verify the driver is using
-+	 * the queues.
-+	 */
-+	if (ap_drv->flags & AP_DRIVER_FLAG_DEFAULT)
-+		return 0;
-+
-+	/*
-+	 * increase the driver's module refcounter to be sure it is not
-+	 * going away when we invoke the callback function.
-+	 */
-+	if (!try_module_get(drv->owner))
-+		return 0;
-+
-+	if (ap_drv->in_use) {
-+		rc = ap_drv->in_use(ap_perms.apm, newaqm);
-+		if (rc)
-+			return -EBUSY;
-+	}
-+
-+	/* release the driver's module */
-+	module_put(drv->owner);
-+
-+	return rc;
-+}
-+
-+static int aqmask_commit(unsigned long *newaqm)
-+{
-+	int rc;
-+	unsigned long reserved[BITS_TO_LONGS(AP_DOMAINS)];
-+
-+	/*
-+	 * Check if any bits in the aqmask have been set which will
-+	 * result in queues being removed from non-default drivers
-+	 */
-+	if (bitmap_andnot(reserved, newaqm, ap_perms.aqm, AP_DOMAINS)) {
-+		rc = bus_for_each_drv(&ap_bus_type, NULL, reserved,
-+				      __verify_queue_reservations);
-+		if (rc)
-+			return rc;
-+	}
-+
-+	memcpy(ap_perms.aqm, newaqm, AQMASKSIZE);
-+
-+	return 0;
-+}
-+
- static ssize_t aqmask_store(struct bus_type *bus, const char *buf,
- 			    size_t count)
- {
- 	int rc;
-+	DECLARE_BITMAP(newaqm, AP_DOMAINS);
-+
-+	if (mutex_lock_interruptible(&ap_perms_mutex))
-+		return -ERESTARTSYS;
-+
-+	rc = ap_parse_bitmap_str(buf, ap_perms.aqm, AP_DOMAINS, newaqm);
-+	if (rc)
-+		goto done;
-+
-+	rc = aqmask_commit(newaqm);
- 
--	rc = ap_parse_mask_str(buf, ap_perms.aqm, AP_DOMAINS, &ap_perms_mutex);
-+done:
-+	mutex_unlock(&ap_perms_mutex);
- 	if (rc)
- 		return rc;
- 
-diff --git a/drivers/s390/crypto/ap_bus.h b/drivers/s390/crypto/ap_bus.h
-index 472efd3a755c..95c9da072f81 100644
---- a/drivers/s390/crypto/ap_bus.h
-+++ b/drivers/s390/crypto/ap_bus.h
-@@ -145,6 +145,7 @@ struct ap_driver {
- 
- 	int (*probe)(struct ap_device *);
- 	void (*remove)(struct ap_device *);
-+	int (*in_use)(unsigned long *apm, unsigned long *aqm);
- };
- 
- #define to_ap_drv(x) container_of((x), struct ap_driver, driver)
-@@ -293,6 +294,9 @@ void ap_queue_init_state(struct ap_queue *aq);
- struct ap_card *ap_card_create(int id, int queue_depth, int raw_device_type,
- 			       int comp_device_type, unsigned int functions);
- 
-+#define APMASKSIZE (BITS_TO_LONGS(AP_DEVICES) * sizeof(unsigned long))
-+#define AQMASKSIZE (BITS_TO_LONGS(AP_DOMAINS) * sizeof(unsigned long))
-+
- struct ap_perms {
- 	unsigned long ioctlm[BITS_TO_LONGS(AP_IOCTLS)];
- 	unsigned long apm[BITS_TO_LONGS(AP_DEVICES)];
+ #endif /* _VFIO_AP_PRIVATE_H_ */
 -- 
 2.30.2
 
