@@ -2,89 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DFD0937799F
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 03:11:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF9D23779A6
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 03:12:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230121AbhEJBLZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 9 May 2021 21:11:25 -0400
-Received: from mga01.intel.com ([192.55.52.88]:48552 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229941AbhEJBLU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 9 May 2021 21:11:20 -0400
-IronPort-SDR: 0RTbbDN2Ewlak3U54tFPsihd2eQs/sFxGZXJnsEwKhu5j33WkwB7UbMRq1WNyMdSrVk3gQNzzg
- brgziDFySVYg==
-X-IronPort-AV: E=McAfee;i="6200,9189,9979"; a="220024067"
-X-IronPort-AV: E=Sophos;i="5.82,286,1613462400"; 
-   d="scan'208";a="220024067"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2021 18:10:17 -0700
-IronPort-SDR: rTsmeD20ARgDXEz0Kl1zLM25fvP+Bhd6ba7hrWM/JOfQtfDVxpQW2ZmUz9WMnpMJP9b2w8wFIq
- nZsivOM2nWXg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.82,286,1613462400"; 
-   d="scan'208";a="460994377"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.38])
-  by FMSMGA003.fm.intel.com with ESMTP; 09 May 2021 18:10:15 -0700
-Date:   Mon, 10 May 2021 09:10:14 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     tkffaul@outlook.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vfio/pci: Sanity check IGD OpRegion Size
-Message-ID: <20210510011014.q6xfcmqopbqgepbq@yy-desk-7060>
-References: <162041357421.21800.16214130780777455390.stgit@omen>
+        id S230143AbhEJBNb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 9 May 2021 21:13:31 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:2606 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230096AbhEJBNb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 9 May 2021 21:13:31 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Fdjdz0tPBzlcpf;
+        Mon, 10 May 2021 09:10:15 +0800 (CST)
+Received: from [10.67.77.175] (10.67.77.175) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.498.0; Mon, 10 May 2021
+ 09:12:22 +0800
+Subject: Re: [PATCH] Revert "irqbypass: do not start cons/prod when failed
+ connect"
+To:     Marc Zyngier <maz@kernel.org>,
+        Zhu Lingshan <lingshan.zhu@intel.com>
+CC:     <jasowang@redhat.com>, <mst@redhat.com>,
+        <alex.williamson@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <cohuck@redhat.com>,
+        <stable@vger.kernel.org>
+References: <20210508071152.722425-1-lingshan.zhu@intel.com>
+ <8735uxvajh.wl-maz@kernel.org>
+From:   Shaokun Zhang <zhangshaokun@hisilicon.com>
+Message-ID: <cfb68374-a7bf-1eb4-86cf-77c57f7fe9e5@hisilicon.com>
+Date:   Mon, 10 May 2021 09:12:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <162041357421.21800.16214130780777455390.stgit@omen>
-User-Agent: NeoMutt/20171215
+In-Reply-To: <8735uxvajh.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.77.175]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 07, 2021 at 12:53:17PM -0600, Alex Williamson wrote:
-> The size field of the IGD OpRegion table is supposed to indicate table
-> size in KB, but we've seen at least one report of a BIOS that appears
-> to incorrectly report size in bytes.  The default size is 8 (*1024 =
-> 8KB), but an incorrect implementation may report 8192 (*1024 = 8MB)
-> and can cause a variety of mapping errors.
-> 
-> It's believed that 8MB would be an implausible, if not absurd, actual
-> size, so we can probably be pretty safe in assuming this is a BIOS bug
-> where the intended size is likely 8KB.
-> 
-> Reported-by: Travis Faulhaber <tkffaul@outlook.com>
-> Tested-by: Travis Faulhaber <tkffaul@outlook.com>
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
->  drivers/vfio/pci/vfio_pci_igd.c |   11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/vfio_pci_igd.c
-> index 228df565e9bc..c89a4797cd18 100644
-> --- a/drivers/vfio/pci/vfio_pci_igd.c
-> +++ b/drivers/vfio/pci/vfio_pci_igd.c
-> @@ -86,7 +86,16 @@ static int vfio_pci_igd_opregion_init(struct vfio_pci_device *vdev)
->  		return -EINVAL;
->  	}
->  
-> -	size *= 1024; /* In KB */
-> +	/*
-> +	 * The OpRegion size field is specified as size in KB, but there have been
-> +	 * user reports where this field appears to report size in bytes.  If we
-> +	 * read 8192, assume this is the case.
-> +	 */
-> +	if (size == OPREGION_SIZE)
+Hi Marc,
 
-Is "size >= OPREGION_SIZE" or "size >= smaller but still implausible value
-(like 4096)" better for covering more bad BIOS implementation cases ?
-
-> +		pci_warn(vdev->pdev,
-> +			 "BIOS Bug, IGD OpRegion reports invalid size, assuming default 8KB\n");
-> +	else
-> +		size *= 1024; /* In KB */
->  
->  	/*
->  	 * Support opregion v2.1+
+On 2021/5/8 17:29, Marc Zyngier wrote:
+> On Sat, 08 May 2021 08:11:52 +0100,
+> Zhu Lingshan <lingshan.zhu@intel.com> wrote:
+>>
+>> This reverts commit a979a6aa009f3c99689432e0cdb5402a4463fb88.
+>>
+>> The reverted commit may cause VM freeze on arm64 platform.
+>> Because on arm64 platform, stop a consumer will suspend the VM,
+>> the VM will freeze without a start consumer
 > 
+> It also unconditionally calls del_consumer on the producer, which
+> isn't exactly expected.
+> 
+>>
+>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> 
+> Reported-by: Shaokun Zhang <zhangshaokun@hisilicon.com>
+
+Thanks for the tag, it works with this patch, So:
+Tested-by: Shaokun Zhang <zhangshaokun@hisilicon.com>
+
+I shall invite you to have a drink for the quick debug.
+Anyway, thank you again.
+
+Shaokun
+
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Acked-by: Marc Zyngier <maz@kernel.org>
+> Fixes: a979a6aa009f ("irqbypass: do not start cons/prod when failed connect")
+> Link: https://lore.kernel.org/r/3a2c66d6-6ca0-8478-d24b-61e8e3241b20@hisilicon.com
+> Cc: stable@vger.kernel.org
+> 
+> Thanks,
+> 
+> 	M.
 > 
