@@ -2,168 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 18D433791A7
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 16:56:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6215637923A
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 17:15:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231830AbhEJO5J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 10:57:09 -0400
-Received: from foss.arm.com ([217.140.110.172]:60280 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234589AbhEJOzt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 10:55:49 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F00ED1688;
-        Mon, 10 May 2021 07:54:43 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B8D483F719;
-        Mon, 10 May 2021 07:54:42 -0700 (PDT)
-Subject: Re: [PATCH 2/2] KVM: arm64: Commit pending PC adjustemnts before
- returning to userspace
-To:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc:     Zenghui Yu <yuzenghui@huawei.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com, stable@vger.kernel.org
-References: <20210510094915.1909484-1-maz@kernel.org>
- <20210510094915.1909484-3-maz@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <7a0f43c8-cc36-810e-0b8e-ffe66672ca82@arm.com>
-Date:   Mon, 10 May 2021 15:55:28 +0100
+        id S241632AbhEJPQ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 11:16:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45230 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240361AbhEJPOf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 11:14:35 -0400
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B71FCC056756;
+        Mon, 10 May 2021 07:33:50 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id t18so16891382wry.1;
+        Mon, 10 May 2021 07:33:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=iXsxoOt9fS3DXvxCyyFOaJfbPkU6WlTqA1MG4BgEpJA=;
+        b=jIc4OS4UG1e9Htue39hs2SdJXCmPLn+MTostxG/pw06sXYt4cF0beJY8cOPd4XkNvN
+         wMkWqq4rS4nqVWqmlHYwknDCThc4F5oj3a10x6AGXMwZ0Kkxjgx6mU53ky5S6gct5IOF
+         gb8YE/CdqFeQhJSfkuXg75IoXDsEW/QKbfnCDm8DSyF/6zHxA2in236S9Jv233h02Cag
+         nY/zUkluYzDhxrfM75C6Qnf/beBRBG9DBN2uslTW/jB8AmOrnU4strwuRTlIYCmTiED9
+         Adakd2gy/AYmhY6PfiGery2Nb+BVYLJb2xN6RqR96XQSpLkoAkrrTIc1zJH3tzspThUx
+         eDlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=iXsxoOt9fS3DXvxCyyFOaJfbPkU6WlTqA1MG4BgEpJA=;
+        b=mtcfeMsx7dMqYNepetHcvVEp2glMa9yIlLyEQ8rzKenwJZWsHQ0xYa4FlfmN2J8LUY
+         bPfOWxNXZyLuUbv6mxcQzDooN2CybZw4KKRpvAa/DrNtG9dFdBPkqfMLVMWB9yeSeuhw
+         KifzQf56nF3lwZi75f/YZ9fJAMLNWYeuMRIm/mSQXcM0o6HLRxrVNe3PcWPOde4Ouehf
+         HQo08nNDf9XEIEtKPrSCYDyPT+1asNxWQJ15AiWCwdz6YBacVGiCzslr6WMf0PAAJhWe
+         NOEZZaMTk+c6yb5EuDFdDdRkIJXz5xQH1O3KiVzaCllG860vf8paCuiuRV8XjsFmGVtg
+         sxhw==
+X-Gm-Message-State: AOAM532ZdhgvQU2/PzbBMlyPonGNmCSVV+wEv5FYNx421ebedZz5AXty
+        8pgEwWSVt3X7TC9UFQeGUWQ=
+X-Google-Smtp-Source: ABdhPJze1q8t3iuv5DjzOv0RveTjqSpEwnprh+IG3St78u9eWCZrU93KSEZYLbobgkyZLBZ/m0bYBQ==
+X-Received: by 2002:adf:e98c:: with SMTP id h12mr30469476wrm.314.1620657229579;
+        Mon, 10 May 2021 07:33:49 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159425-cmbg20-2-0-cust403.5-4.cable.virginm.net. [86.7.189.148])
+        by smtp.gmail.com with ESMTPSA id h9sm20117820wmb.35.2021.05.10.07.33.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 May 2021 07:33:48 -0700 (PDT)
+Subject: Re: [PATCH 00/53] Get rid of UTF-8 chars that can be mapped as ASCII
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        alsa-devel@alsa-project.org, coresight@lists.linaro.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
+        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-fpga@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-sgx@vger.kernel.org, linux-usb@vger.kernel.org,
+        mjpeg-users@lists.sourceforge.net, netdev@vger.kernel.org,
+        rcu@vger.kernel.org, x86@kernel.org
+References: <cover.1620641727.git.mchehab+huawei@kernel.org>
+ <2ae366fdff4bd5910a2270823e8da70521c859af.camel@infradead.org>
+ <20210510135518.305cc03d@coco.lan>
+ <df6b4567-030c-a480-c5a6-fe579830e8c0@gmail.com>
+ <YJk8LMFViV7Z3Uu7@casper.infradead.org>
+From:   Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <ed65025c-1087-9672-7451-6d28e7ab8f92@gmail.com>
+Date:   Mon, 10 May 2021 15:33:47 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-In-Reply-To: <20210510094915.1909484-3-maz@kernel.org>
+In-Reply-To: <YJk8LMFViV7Z3Uu7@casper.infradead.org>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On 10/05/2021 14:59, Matthew Wilcox wrote:
+> Most of these
+> UTF-8 characters come from latex conversions and really aren't
+> necessary (and are being used incorrectly).
+I fully agree with fixing those.
+The cover-letter, however, gave the impression that that was not the
+ main purpose of this series; just, perhaps, a happy side-effect.
 
-On 5/10/21 10:49 AM, Marc Zyngier wrote:
-> KVM currently updates PC (and the corresponding exception state)
-> using a two phase approach: first by setting a set of flags,
-> then by converting these flags into a state update when the vcpu
-> is about to enter the guest.
->
-> However, this creates a disconnect with userspace if the vcpu thread
-> returns there with any exception/PC flag set. In this case, the exposed
+> You seem quite knowedgeable about the various differences.  Perhaps
+> you'd be willing to write a document for Documentation/doc-guide/
+> that provides guidance for when to use which kinds of horizontal
+> line?I have Opinions about the proper usage of punctuation, but I also know
+ that other people have differing opinions.  For instance, I place
+ spaces around an em dash, which is nonstandard according to most
+ style guides.  Really this is an individual enough thing that I'm not
+ sure we could have a "kernel style guide" that would be more useful
+ than general-purpose guidance like the page you linked.
+Moreover, such a guide could make non-native speakers needlessly self-
+ conscious about their writing and discourage them from contributing
+ documentation at all.  I'm not advocating here for trying to push
+ kernel developers towards an eats-shoots-and-leaves level of
+ linguistic pedantry; rather, I merely think that existing correct
+ usages should be left intact (and therefore, excising incorrect usage
+ should only be attempted by someone with both the expertise and time
+ to check each case).
 
-The code seems to handle only the KVM_ARM64_PENDING_EXCEPTION flag. Is the "PC
-flag" a reference to the KVM_ARM64_INCREMENT_PC flag?
+But if you really want such a doc I wouldn't mind contributing to it.
 
-> context is wrong, as userpsace doesn't have access to these flags
-
-s/userpsace/userspace
-
-> (they aren't architectural). It also means that these flags are
-> preserved across a reset, which isn't expected.
->
-> To solve this problem, force an explicit synchronisation of the
-> exception state on vcpu exit to userspace. As an optimisation
-> for nVHE systems, only perform this when there is something pending.
->
-> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Cc: stable@vger.kernel.org # 5.11
-> ---
->  arch/arm64/include/asm/kvm_asm.h   |  1 +
->  arch/arm64/kvm/arm.c               | 10 ++++++++++
->  arch/arm64/kvm/hyp/exception.c     |  4 ++--
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  8 ++++++++
->  4 files changed, 21 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index d5b11037401d..5e9b33cbac51 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -63,6 +63,7 @@
->  #define __KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector		18
->  #define __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize		19
->  #define __KVM_HOST_SMCCC_FUNC___pkvm_mark_hyp			20
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc			21
->  
->  #ifndef __ASSEMBLY__
->  
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 1cb39c0803a4..d62a7041ebd1 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -897,6 +897,16 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  
->  	kvm_sigset_deactivate(vcpu);
->  
-> +	/*
-> +	 * In the unlikely event that we are returning to userspace
-> +	 * with pending exceptions or PC adjustment, commit these
-
-I'm going to assume "PC adjustment" means the KVM_ARM64_INCREMENT_PC flag. Please
-correct me if that's not true, but if that's the case, then the flag isn't handled
-below.
-
-> +	 * adjustments in order to give userspace a consistent view of
-> +	 * the vcpu state.
-> +	 */
-> +	if (unlikely(vcpu->arch.flags & (KVM_ARM64_PENDING_EXCEPTION |
-> +					 KVM_ARM64_EXCEPT_MASK)))
-
-The condition seems to suggest that it is valid to set
-KVM_ARM64_EXCEPT_{AA32,AA64}_* without setting KVM_ARM64_PENDING_EXCEPTION, which
-looks rather odd to me. Is that a valid use of the KVM_ARM64_EXCEPT_MASK bits? If
-it's not (the existing code always sets the exception type with the
-KVM_ARM64_PENDING_EXCEPTION), that I was thinking that checking only the
-KVM_ARM64_PENDING_EXCEPTION flag would make the intention clearer.
-
-Thanks,
-
-Alex
-
-> +		kvm_call_hyp(__kvm_adjust_pc, vcpu);
-> +
->  	vcpu_put(vcpu);
->  	return ret;
->  }
-> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-> index 0812a496725f..11541b94b328 100644
-> --- a/arch/arm64/kvm/hyp/exception.c
-> +++ b/arch/arm64/kvm/hyp/exception.c
-> @@ -331,8 +331,8 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
->  }
->  
->  /*
-> - * Adjust the guest PC on entry, depending on flags provided by EL1
-> - * for the purpose of emulation (MMIO, sysreg) or exception injection.
-> + * Adjust the guest PC (and potentially exception state) depending on
-> + * flags provided by the emulation code.
->   */
->  void __kvm_adjust_pc(struct kvm_vcpu *vcpu)
->  {
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index f36420a80474..1632f001f4ed 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -28,6 +28,13 @@ static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
->  	cpu_reg(host_ctxt, 1) =  __kvm_vcpu_run(kern_hyp_va(vcpu));
->  }
->  
-> +static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
-> +
-> +	__kvm_adjust_pc(kern_hyp_va(vcpu));
-> +}
-> +
->  static void handle___kvm_flush_vm_context(struct kvm_cpu_context *host_ctxt)
->  {
->  	__kvm_flush_vm_context();
-> @@ -170,6 +177,7 @@ typedef void (*hcall_t)(struct kvm_cpu_context *);
->  
->  static const hcall_t host_hcall[] = {
->  	HANDLE_FUNC(__kvm_vcpu_run),
-> +	HANDLE_FUNC(__kvm_adjust_pc),
->  	HANDLE_FUNC(__kvm_flush_vm_context),
->  	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
->  	HANDLE_FUNC(__kvm_tlb_flush_vmid),
+-ed
