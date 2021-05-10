@@ -2,181 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C00953798B3
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 23:02:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF83A37990A
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 23:18:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231555AbhEJVD3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 17:03:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39454 "EHLO
+        id S232719AbhEJVTO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 17:19:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231162AbhEJVD2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 17:03:28 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1375CC061574
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 14:02:21 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id v191so14474306pfc.8
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 14:02:21 -0700 (PDT)
+        with ESMTP id S231617AbhEJVTD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 17:19:03 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A921C06175F
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 14:17:58 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id b21so7426771pft.10
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 14:17:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=45NUfNFNptvMg6JTtEiEAtq0rD4KjNhuaSZ4UKjowxM=;
-        b=XkvV82WvRXO64kiRraW9QAeJzi177K0R8eeVI7F2FbVP6xOjEftm6FuZihuX5YG95Z
-         ZgMEyUzwxTRZwOQvSjyOlcCf1UlE5D7xozB2ARQkJI9+jntLzGwOJX7K4miq9RoKn1Y7
-         BTyoT5falJYMo6Ysa9Wd6iXJ3owIbxE+TA1uK3OezcB/k44c0WsWRTkhB6bXoDzUj8eG
-         rOZ4COMsI/uwXrbu9Iij3n/mTN7/0UbKUExiNOk142Gw1vZwVb4FNfxJJNS+LI+nKHZU
-         HFMQ7sZvrI39V2Dc09jmdiQjI2LQSyioa3ouKt+zk13il41cQvPmtzzONhhvDo9uKyPv
-         SIGA==
+        bh=0n88KguwK4u1Tl40XFeYJoKeAxPDsastf87y73L4zpU=;
+        b=bA4rMWnN7wm4v/a7EQ9UE5EfJewP1uei2YncP5LVPTIMrZHcbxqJTZncdbPvGuag7M
+         SOn9d1m9ir1oUtIaL396Jk2zcmZlgzzq22MqPdrxU23iqWuBUx5SpGG+rh6VhtJlEe9x
+         SK0i13IrBunc1t1JqsrmeTCpt4zZ+QcJ2UVDvDleEU2hQnTrVLtNvG2cpk1HELkBlPqn
+         ZAHNnrOsx2PtVO7s4UtUPGMTvf+DtBtSLqnXAuSvCewRDTFvlvfWjlPkvVL1nfNqpZFs
+         oF3RER3pvNMy08u0Mx+VljVqvnzwL9W7E1OfL4AJPSjdYkWS8STTkmIDTAkgzye8tPHt
+         3FTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=45NUfNFNptvMg6JTtEiEAtq0rD4KjNhuaSZ4UKjowxM=;
-        b=Z72Z0/mt9FPi+Oak7YNStF3jpxW/95gXl8OBWW+wC+KJAvVDKEPB9yz4Lnu4KxcL7G
-         T6440lkw5fFWJydN3RYpb5+6a9e6wQAw6iQPTjebvf9Rtd42aUnfIe6HHyMbR+I+Uboq
-         IE9ii5hkaYD92kXrAOjmUQQbIt4ixBODpfl/vmIc7mfPGmgU9u1ozHMgAQ58sFTX70iL
-         9iGOnr4v2TbxdExU/XRBXjYzK4ShYT0ib3LEkYtyUJcDnUGLpHHEOTegPTAPwqi7Uk4P
-         X1gaopj1xzHSUwXApsy8eDYhAhFDYWY+vgEjb+YgagIQ6SsJ7om8rZWvQdQe1T5lnH76
-         lzYQ==
-X-Gm-Message-State: AOAM53321nYjaQwTU9NSX3aftDUy0E2ZAaMq+u6ZAGlxHUFA8Gmj3wQD
-        ooVWkhmkMtX6gzx21Q5FJaa/5A==
-X-Google-Smtp-Source: ABdhPJzZTuM44zAfoBZUi9Bj2lDne3SvasMsj8yS5dnz/amFPTp89Usk8uPjTYlehmVU6DVhcqDOHg==
-X-Received: by 2002:aa7:90d5:0:b029:28e:df57:47ff with SMTP id k21-20020aa790d50000b029028edf5747ffmr27631557pfk.74.1620680540337;
-        Mon, 10 May 2021 14:02:20 -0700 (PDT)
+        bh=0n88KguwK4u1Tl40XFeYJoKeAxPDsastf87y73L4zpU=;
+        b=J88eAnXNaIrf/Q3L0Egmj9J0E1lvIbLJhkQ7NDSHLl4644AdkPWJyet4hIsaxZvWJ8
+         OBIRUJuSzcEGOmqKGkJIkmg+yYS/kcaNihesx3zgE9NP5tGVekj0Z/F2FALVCmBxmReM
+         sBU7O/i2ORHkNBfquW6JEuq5zAlq/yd1yrG7hkjauXpknTMAb0UZRY4qoewbIEfNiv00
+         j7GEtMOvV/x3vHuCPiflLkHcofkVyu+0D7vNk1YiGwJda16zY8UnTf+/8Wne1SA0lWm3
+         c8WCGJzXydkyo81m8R/MSvDE9XrvkEmLh4MrkNKQUcgkRuUyi/Rk0WVWWmhgdHgyrg/s
+         m+tA==
+X-Gm-Message-State: AOAM533u8k2W9Jmnlx2bTe4xO/CrBTfYmphc08l0Fl7Ej5hrcJ4gcCnq
+        EEVx2xVCVfCWJLCBGjRwdtbu3YFwL4c7rw==
+X-Google-Smtp-Source: ABdhPJy9w+X4oY2R3aIS+LuC4kgu8dLv7P/58an6EiZEdbMJtO8s28rzY3t1vB20O8L4vKb6gxiKIw==
+X-Received: by 2002:a63:9d48:: with SMTP id i69mr27113197pgd.297.1620681477999;
+        Mon, 10 May 2021 14:17:57 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id e20sm324207pjt.8.2021.05.10.14.02.19
+        by smtp.gmail.com with ESMTPSA id n30sm11679056pfv.52.2021.05.10.14.17.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 May 2021 14:02:19 -0700 (PDT)
-Date:   Mon, 10 May 2021 21:02:15 +0000
+        Mon, 10 May 2021 14:17:57 -0700 (PDT)
+Date:   Mon, 10 May 2021 21:17:53 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Peter Gonda <pgonda@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH 2/2] KVM: x86: Allow userspace to update tracked sregs
- for protected guests
-Message-ID: <YJmfV1sO8miqvQLM@google.com>
-References: <20210507165947.2502412-1-seanjc@google.com>
- <20210507165947.2502412-3-seanjc@google.com>
- <5f084672-5c0d-a6f3-6dcf-38dd76e0bde0@amd.com>
- <YJla8vpwqCxqgS8C@google.com>
- <12fe8f83-49b4-1a22-7903-84e45f16c372@amd.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     Peter Gonda <pgonda@google.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, jroedel@suse.de,
+        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        David Rientjes <rientjes@google.com>, peterz@infradead.org,
+        "H. Peter Anvin" <hpa@zytor.com>, tony.luck@intel.com
+Subject: Re: [PATCH Part2 RFC v2 36/37] KVM: SVM: Provide support for
+ SNP_GUEST_REQUEST NAE event
+Message-ID: <YJmjAaogWeFgCEmb@google.com>
+References: <20210430123822.13825-1-brijesh.singh@amd.com>
+ <20210430123822.13825-37-brijesh.singh@amd.com>
+ <CAMkAt6ottZkx02-ykazkG-5Tu5URv-xwOjWOZ=XMAXv98_HOYA@mail.gmail.com>
+ <f357d874-a369-93b6-ffa1-75c643596c81@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <12fe8f83-49b4-1a22-7903-84e45f16c372@amd.com>
+In-Reply-To: <f357d874-a369-93b6-ffa1-75c643596c81@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 10, 2021, Tom Lendacky wrote:
-> On 5/10/21 11:10 AM, Sean Christopherson wrote:
-> > On Fri, May 07, 2021, Tom Lendacky wrote:
-> >> On 5/7/21 11:59 AM, Sean Christopherson wrote:
-> >>> Allow userspace to set CR0, CR4, CR8, and EFER via KVM_SET_SREGS for
-> >>> protected guests, e.g. for SEV-ES guests with an encrypted VMSA.  KVM
-> >>> tracks the aforementioned registers by trapping guest writes, and also
-> >>> exposes the values to userspace via KVM_GET_SREGS.  Skipping the regs
-> >>> in KVM_SET_SREGS prevents userspace from updating KVM's CPU model to
-> >>> match the known hardware state.
-> >>
-> >> This is very similar to the original patch I had proposed that you were
-> >> against :)
-> > 
-> > I hope/think my position was that it should be unnecessary for KVM to need to
-> > know the guest's CR0/4/0 and EFER values, i.e. even the trapping is unnecessary.
-> > I was going to say I had a change of heart, as EFER.LMA in particular could
-> > still be required to identify 64-bit mode, but that's wrong; EFER.LMA only gets
-> > us long mode, the full is_64_bit_mode() needs access to cs.L, which AFAICT isn't
-> > provided by #VMGEXIT or trapping.
+On Mon, May 10, 2021, Brijesh Singh wrote:
 > 
-> Right, that one is missing. If you take a VMGEXIT that uses the GHCB, then
-> I think you can assume we're in 64-bit mode.
-
-But that's not technically guaranteed.  The GHCB even seems to imply that there
-are scenarios where it's legal/expected to do VMGEXIT with a valid GHCB outside
-of 64-bit mode:
-
-  However, instead of issuing a HLT instruction, the AP will issue a VMGEXIT
-  with SW_EXITCODE of 0x8000_0004 ((this implies that the GHCB was updated prior
-  to leaving 64-bit long mode).
-
-In practice, assuming the guest is in 64-bit mode will likely work, especially
-since the MSR-based protocol is extremely limited, but ideally there should be
-stronger language in the GHCB to define the exact VMM assumptions/behaviors.
-
-On the flip side, that assumption and the limited exposure through the MSR
-protocol means trapping CR0, CR4, and EFER is pointless.  I don't see how KVM
-can do anything useful with that information outside of VMGEXITs.  Page tables
-are encrypted and GPRs are stale; what else could KVM possibly do with
-identifying protected mode, paging, and/or 64-bit?
-
-> > Unless I'm missing something, that means that VMGEXIT(VMMCALL) is broken since
-> > KVM will incorrectly crush (or preserve) bits 63:32 of GPRs.  I'm guessing no
-> > one has reported a bug because either (a) no one has tested a hypercall that
-> > requires bits 63:32 in a GPR or (b) the guest just happens to be in 64-bit mode
-> > when KVM_SEV_LAUNCH_UPDATE_VMSA is invoked and so the segment registers are
-> > frozen to make it appear as if the guest is perpetually in 64-bit mode.
+> On 5/10/21 1:57 PM, Peter Gonda wrote:
+> >> +e_fail:
+> >> +       ghcb_set_sw_exit_info_2(ghcb, rc);
+> >> +       return;
+> >> +
+> >> +e_term:
+> >> +       ghcb_set_sw_exit_info_1(ghcb, 1);
+> >> +       ghcb_set_sw_exit_info_2(ghcb,
+> >> +                               X86_TRAP_GP |
+> >> +                               SVM_EVTINJ_TYPE_EXEPT |
+> >> +                               SVM_EVTINJ_VALID);
+> >> +}
+> > I am probably missing something in the spec but I don't see any
+> > references to #GP in the '4.1.7 SNP Guest Request' section. Why is
+> > this different from e_fail?
 > 
-> I don't think it's (b) since the LAUNCH_UPDATE_VMSA is done against reset-
-> state vCPUs.
-> 
-> > 
-> > I see that sev_es_validate_vmgexit() checks ghcb_cpl_is_valid(), but isn't that
-> > either pointless or indicative of a much, much bigger problem?  If VMGEXIT is
-> 
-> It is needed for the VMMCALL exit.
-> 
-> > restricted to CPL0, then the check is pointless.  If VMGEXIT isn't restricted to
-> > CPL0, then KVM has a big gaping hole that allows a malicious/broken guest
-> > userspace to crash the VM simply by executing VMGEXIT.  Since valid_bitmap is
-> > cleared during VMGEXIT handling, I don't think guest userspace can attack/corrupt
-> > the guest kernel by doing a replay attack, but it does all but guarantee a
-> > VMGEXIT at CPL>0 will be fatal since the required valid bits won't be set.
-> 
-> Right, so I think some cleanup is needed there, both for the guest and the
-> hypervisor:
-> 
-> - For the guest, we could just clear the valid bitmask before leaving the
->   #VC handler/releasing the GHCB. Userspace can't update the GHCB, so any
->   VMGEXIT from userspace would just look like a no-op with the below
->   change to KVM.
+> The spec does not say to inject the #GP, I chose this because guest is
+> not adhering to the spec and there was a not a good error code in the
+> GHCB spec to communicate this condition. Per the spec, both the request
+> and response page must be a valid GPA. If we detect that guest is not
+> following the spec then its a guest BUG. IIRC, other places in the KVM
+> does something similar when guest is trying invalid operation.
 
-Ah, right, the exit_code and exit infos need to be valid.
+The GHCB spec should be updated to define an error code, even if it's a blanket
+statement for all VMGEXITs that fail to adhere to the spec.  Arbitrarily choosing
+an error code and/or exception number makes the information useless to the guest
+because the guest can't take specific action for those failures.  E.g. if there
+is a return code specifically for GHCB spec violation, then the guest can panic,
+WARN, etc... knowing that it done messed up.
 
-> - For KVM, instead of returning -EINVAL from sev_es_validate_vmgexit(), we
->   return the #GP action through the GHCB and continue running the guest.
-
-Agreed, KVM should never kill the guest in response to a bad VMGEXIT.  That
-should always be a guest decision.
-
-> > Sadly, the APM doesn't describe the VMGEXIT behavior, nor does any of the SEV-ES
-> > documentation I have.  I assume VMGEXIT is recognized at CPL>0 since it morphs
-> > to VMMCALL when SEV-ES isn't active.
-> 
-> Correct.
-> 
-> > 
-> > I.e. either the ghcb_cpl_is_valid() check should be nuked, or more likely KVM
-> 
-> The ghcb_cpl_is_valid() is still needed to see whether the VMMCALL was
-> from userspace or not (a VMMCALL will generate a #VC).
-
-Blech.  I get that the GHCB spec says CPL must be provided/checked for VMMCALL,
-but IMO that makes no sense whatsover.
-
-If the guest restricts the GHCB to CPL0, then the CPL field is pointless because
-the VMGEXIT will only ever come from CPL0.  Yes, technically the guest kernel
-can proxy a VMMCALL from userspace to the host, but the guest kernel _must_ be
-the one to enforce any desired CPL checks because the VMM is untrusted, at least
-once you get to SNP.
-
-If the guest exposes the GHCB to any CPL, then the CPL check is worthless because
-guest userspace can simply lie about the CPL.  And exposing the GCHB to userspace
-completely undermines guest privilege separation since hardware doesn't provide
-the real CPL, i.e. the VMM, even it were trusted, can't determine the origin of
-the VMGEXIT.
+"Injecting" an exception is particularly bad, because if the guest kernel takes
+that request literally and emulates a #GP, then we can end up in a situation
+where someone files a bug report because VMGEXIT is hitting a #GP and confusion
+ensues.
