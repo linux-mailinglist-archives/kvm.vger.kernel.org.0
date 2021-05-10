@@ -2,106 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6327C37956E
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 19:24:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9559C379688
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 19:54:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232065AbhEJRZD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 13:25:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46736 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232835AbhEJRYx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 13:24:53 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27DDDC06175F
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 10:23:47 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id q186so2126703ljq.8
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 10:23:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qjZ3geuBOqlKdDEgFutiZBTMkGdRIMIVW70XxRX+Dxw=;
-        b=vJJFx+iXeURlAYbc9tWZCuLYqTtOMYMWSEW+fw1kxssIkflP5jlF5rqd6r3iaBnnXr
-         ftMvtPSTN+cGcK/e7yDsOLKNTQyE5AeQd45wV9VkuiicpwGeuQwjKdnhpgohRIqb6J7v
-         myLW+3zs+JNponDbp/r5s9eB9RkzUtUJL/SRFL2dV1FqItCpGWEjlbh6QHpbLIoBu4Ar
-         lTer2XJ88n7g8b6/cX2p8b/VMJTqfKnqN2UZBM+JzX+aNeaaRErtRldWTqLsupPiKsXT
-         0qO/xZ/8QEcWu0Db3v5TvM9cEz+hdt+Vtv2EgmHN4B85DRCz8gGYWFzljqCkHPX+OxKG
-         FFgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qjZ3geuBOqlKdDEgFutiZBTMkGdRIMIVW70XxRX+Dxw=;
-        b=KPCmTdXmkfvcVsVZjQV+yffvgDENzmICUTYaESWz33Ax2tYV2aA8OmrvVbcRhwO2AY
-         A7MPMoK0V7gmSmGShcuO2XrroMlksQNjPYI68Uowo/p1p1TEKWCQj+uWwt32EFx2/sXP
-         D2SiDwjHkVvLmVqKF/62TZqBNgWVF7q5n19yMxl600vsZ9LEXt6npvuD/1e40HPUSjkm
-         In8ZogOfVrP6McSWFRh9810mLMT34sQ/86/UdxzKV1xD7dieV1UteJKnNh8EOUWFUDMb
-         GQQ3mpzn9BzAtt+7d85jP6rCGdnepoGYbZdHJNpRnnXuOR/qPJ7UoN1XK0rfTLi4l6oC
-         YkaQ==
-X-Gm-Message-State: AOAM532cqfOGXgJKGTEkGR4msdcRUtKd3JNH6NNjMqdYDvxYj+nJZUET
-        4X+fTOTEeV+YCm9svWK8LEXJAeOnf9qcvgmk+z39rA==
-X-Google-Smtp-Source: ABdhPJyV8r4T6sAXK3f7SoBsKNghh9O8FC8xpC786adlgtglNdeGiERREDMjb1CU5uQtmGXbNHfn7RuMyQWIDk6p1l8=
-X-Received: by 2002:a2e:9a54:: with SMTP id k20mr21613855ljj.448.1620667425476;
- Mon, 10 May 2021 10:23:45 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210507190559.425518-1-dmatlack@google.com> <20210507201443.nvtmntp3tgeapwnw@gator.home>
- <CALzav=dk_Z=hQE1Bjpfg8B3su7h2Jvk6RZoEFqBn+qqxmwzHMQ@mail.gmail.com> <20210510063236.5ekmlulazelvl2s6@gator>
-In-Reply-To: <20210510063236.5ekmlulazelvl2s6@gator>
-From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 10 May 2021 10:23:19 -0700
-Message-ID: <CALzav=fptvvuY==LQ7pzA3y4aoEz4N+2TpiVvjTueZNyj8uwgw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: selftests: Print a message if /dev/kvm is missing
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S233296AbhEJRzu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 13:55:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60050 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233238AbhEJRzg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 13:55:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620669271;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=zGAx3lT0Af5JXR+dtPqi2eB2KHwQq7HfmXkTkY8h0d0=;
+        b=A5AdZePpjo5EivEbH9G64vWbtr1ym3yoskRL0+sutSJqFTaQzi3kGbtBKAL0SqN+ZoQizS
+        rEGSMx+svURh04F9PJfNLo7fmn1lKe9SUEWF87KB5ZE8pOVTZT2zHWwfnACxjbW0+ZHu0k
+        /I8Si02VICiF4ZYClX8gpmk4r8omgpA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-199-8Gj3r4FEMOONqDok0TUXKg-1; Mon, 10 May 2021 13:54:29 -0400
+X-MC-Unique: 8Gj3r4FEMOONqDok0TUXKg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82AEA8014D8;
+        Mon, 10 May 2021 17:54:28 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-8.gru2.redhat.com [10.97.112.8])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2C6305C1BB;
+        Mon, 10 May 2021 17:54:20 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id 73DAE406E9D9; Mon, 10 May 2021 14:54:15 -0300 (-03)
+Message-ID: <20210510172646.930550753@redhat.com>
+User-Agent: quilt/0.66
+Date:   Mon, 10 May 2021 14:26:46 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Xu <peterx@redhat.com>
+Subject: [patch 0/4] VMX: configure posted interrupt descriptor when assigning device (v3)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, May 9, 2021 at 11:32 PM Andrew Jones <drjones@redhat.com> wrote:
->
-> On Fri, May 07, 2021 at 01:51:45PM -0700, David Matlack wrote:
-> > > >  static void vm_open(struct kvm_vm *vm, int perm)
-> > > >  {
-> > > > -     vm->kvm_fd = open(KVM_DEV_PATH, perm);
-> > >
-> > > I don't think we should change this one, otherwise the user provided
-> > > perms are ignored.
-> >
-> > Good catch. I don't see any reason to exclude this case, but we do need
-> > to pass `perm` down to open_kvm_dev_path_or_exit().
-> >
->
-> I've reviewed v2 and gave it an r-b, since I don't have overly strong
-> opinion about this, but I actually liked that open_kvm_dev_path_or_exit()
-> didn't take any arguments. To handle this case I would have either left
-> it open coded, like it was, or created something like
->
-> int _open_kvm_dev_path_or_exit(int flags)
-> {
->    int fd = open(KVM_DEV_PATH, flags);
->    if (fd < 0)
->      ...exit skip...
->    return fd;
-> }
->
-> int open_kvm_dev_path_or_exit(void)
-> {
->   return _open_kvm_dev_path_or_exit(O_RDONLY);
-> }
+Configuration of the posted interrupt descriptor is incorrect when devices
+are hotplugged to the guest (and vcpus are halted).
 
-I agree so long as hiding O_RDONLY does not decrease code readability.
-I could not find any place in KVM where the R/W permissions on
-/dev/kvm played a role, so I'm inclined to agree it's better to hide
-the permissions.
+See patch 4 for details.
 
-I'll send another version with this change along with the comment fix.
+---
 
-Thanks.
+v3: improved comments (Sean)
+    use kvm_vcpu_wake_up (Sean)
+    drop device_count from start_assignment function (Peter Xu)
 
->
-> Thanks,
-> drew
->
+v2: rather than using a potentially racy IPI (vs vcpu->cpu switches),
+    kick the vcpus when assigning a device and let the blocked per-CPU
+    list manipulation happen locally at ->pre_block and ->post_block
+    (Sean Christopherson).
+
+
