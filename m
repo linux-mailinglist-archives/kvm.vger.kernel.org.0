@@ -2,181 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 49DAA378DCA
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 15:47:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 368BB378DCD
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 15:47:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241829AbhEJMxp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 08:53:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44172 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S243600AbhEJL4e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 07:56:34 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 383C061260;
-        Mon, 10 May 2021 11:55:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620647729;
-        bh=dyIPtb49LgFnCoKazyq+bQhPSj3PCobNssG21KHdoK4=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=S4cpkndG9UuTYGkhKfO3hJLbYIHDWve5Su3QQFRXInDkMRoAu9bVjsNPKBQQExFiA
-         MH/LvEqboPFe5Mg323DsrqgW7WJPZfjJ5OWh3KcGd7Kzb/Ed/OuhsjfzebDsCLf+jo
-         Z2y3h21hX1f0r0znndE/gsvI3+7MfvcFNE3R9vJ3F6eSaoK3rYc9HAxpysQKCzq2nw
-         XliTZNXkMCNQpYy6ormSrp00pDOW21OImF+xXBpjWC/JIXAZfq/wrXo3rh38peS5/g
-         BQeri8Wl+fs0ihvm/Fcaw0vxpMvqk7Fkm7kctYIMuGKithMKv3Kd8J2NMAGsk2M1IJ
-         Z8/9XzwZufeKA==
-Date:   Mon, 10 May 2021 13:55:18 +0200
-From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        alsa-devel@alsa-project.org, coresight@lists.linaro.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
-        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-fpga@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-sgx@vger.kernel.org, linux-usb@vger.kernel.org,
-        mjpeg-users@lists.sourceforge.net, netdev@vger.kernel.org,
-        rcu@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH 00/53] Get rid of UTF-8 chars that can be mapped as
- ASCII
-Message-ID: <20210510135518.305cc03d@coco.lan>
-In-Reply-To: <2ae366fdff4bd5910a2270823e8da70521c859af.camel@infradead.org>
-References: <cover.1620641727.git.mchehab+huawei@kernel.org>
-        <2ae366fdff4bd5910a2270823e8da70521c859af.camel@infradead.org>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S1344849AbhEJMx7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 08:53:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60720 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245646AbhEJMNe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 08:13:34 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7788DC0611CC;
+        Mon, 10 May 2021 05:05:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=hgWKawcsmXyf/l2+3vEwOhYJ9xgud2VHY8Z8IPJF1w8=; b=k42pJsX2WLlKvruyN8PNJivDyZ
+        ffOn188g03X9FmI6TkpJONi0Qz2pdy2kB9vYEHDDxtQlChs7w92Pfb+Uz8BonqjueTs1HqWZeErpj
+        pOBBZ20ra5bGCrmwqIh930icE2Ri940t6qJfHWg26uauAi2UOREq+fJhILXRNRjPMGf12iWaJ1lJC
+        Hh4R/UOxTDRblhm89WOSYb6K3cEZUi1WID/rUepmD6pbzAd5FH1R0+iMqeEEp8A4X3sw6XxuhPIJk
+        J4mnk9jkHDWOBZ4YTPN7zcl1IIkSqdBwuefml5auPMtlR0ULkuKyy4Q1q88WTvmba+shetUGvHvIe
+        l3qCOUbA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lg4ez-00EBfk-H3; Mon, 10 May 2021 12:05:18 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 9B9A63002C4;
+        Mon, 10 May 2021 14:05:13 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 8077C20275859; Mon, 10 May 2021 14:05:13 +0200 (CEST)
+Date:   Mon, 10 May 2021 14:05:13 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     tglx@linutronix.de, mingo@kernel.org, juri.lelli@redhat.com,
+        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+        rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+        bristot@redhat.com, bsingharora@gmail.com, pbonzini@redhat.com,
+        maz@kernel.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        riel@surriel.com, hannes@cmpxchg.org
+Subject: [PATCH 7/6] delayacct: Add sysctl to enable at runtime
+Message-ID: <YJkhebGJAywaZowX@hirez.programming.kicks-ass.net>
+References: <20210505105940.190490250@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210505105940.190490250@infradead.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi David,
 
-Em Mon, 10 May 2021 11:54:02 +0100
-David Woodhouse <dwmw2@infradead.org> escreveu:
+Just like sched_schedstats, allow runtime enabling (and disabling) of
+delayacct. This is useful if one forgot to add the delayacct boot time
+option.
 
-> On Mon, 2021-05-10 at 12:26 +0200, Mauro Carvalho Chehab wrote:
-> > There are several UTF-8 characters at the Kernel's documentation.
-> >=20
-> > Several of them were due to the process of converting files from
-> > DocBook, LaTeX, HTML and Markdown. They were probably introduced
-> > by the conversion tools used on that time.
-> >=20
-> > Other UTF-8 characters were added along the time, but they're easily
-> > replaceable by ASCII chars.
-> >=20
-> > As Linux developers are all around the globe, and not everybody has UTF=
--8
-> > as their default charset, better to use UTF-8 only on cases where it is=
- really
-> > needed. =20
->=20
-> No, that is absolutely the wrong approach.
->=20
-> If someone has a local setup which makes bogus assumptions about text
-> encodings, that is their own mistake.
->=20
-> We don't do them any favours by trying to *hide* it in the common case
-> so that they don't notice it for longer.
->=20
-> There really isn't much excuse for such brokenness, this far into the
-> 21st century.
->=20
-> Even *before* UTF-8 came along in the final decade of the last
-> millennium, it was important to know which character set a given piece
-> of text was encoded in.
->=20
-> In fact it was even *more* important back then, we couldn't just assume
-> UTF-8 everywhere like we can in modern times.
->=20
-> Git can already do things like CRLF conversion on checking files out to
-> match local conventions; if you want to teach it to do character set
-> conversions too then I suppose that might be useful to a few developers
-> who've fallen through a time warp and still need it. But nobody's ever
-> bothered before because it just isn't necessary these days.
->=20
-> Please *don't* attempt to address this anachronistic and esoteric
-> "requirement" by dragging the kernel source back in time by three
-> decades.
-
-No. The idea is not to go back three decades ago.=20
-
-The goal is just to avoid use UTF-8 where it is not needed. See, the vast
-majority of UTF-8 chars are kept:
-
-	- Non-ASCII Latin and Greek chars;
-	- Box drawings;
-	- arrows;
-	- most symbols.
-
-There, it makes perfect sense to keep using UTF-8.
-
-We should keep using UTF-8 on Kernel. This is something that it shouldn't
-be changed.
-
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
+ Documentation/accounting/delay-accounting.rst |    6 ++--
+ kernel/delayacct.c                            |   36 ++++++++++++++++++++++++--
+ kernel/sysctl.c                               |   12 ++++++++
+ 3 files changed, 50 insertions(+), 4 deletions(-)
 
-This patch series is doing conversion only when using ASCII makes
-more sense than using UTF-8.=20
-
-See, a number of converted documents ended with weird characters
-like ZERO WIDTH NO-BREAK SPACE (U+FEFF) character. This specific
-character doesn't do any good.
-
-Others use NO-BREAK SPACE (U+A0) instead of 0x20. Harmless, until
-someone tries to use grep[1].
-
-[1] try to run:
-
-    $ git grep "CPU 0 has been" Documentation/RCU/
-
-    it will return nothing with current upstream.
-
-    But it will work fine after the series is applied:
-
-    $ git grep "CPU 0 has been" Documentation/RCU/
-      Documentation/RCU/Design/Data-Structures/Data-Structures.rst:| #. CPU=
- 0 has been in dyntick-idle mode for quite some time. When it   |
-      Documentation/RCU/Design/Data-Structures/Data-Structures.rst:|    not=
-ices that CPU 0 has been in dyntick idle mode, which qualifies  |
-
-The main point on this series is to replace just the occurrences
-where ASCII represents the symbol equally well, e. g. it is limited
-for those chars:
-
-	- U+2010 ('=E2=80=90'): HYPHEN
-	- U+00ad ('=C2=AD'): SOFT HYPHEN
-	- U+2013 ('=E2=80=93'): EN DASH
-	- U+2014 ('=E2=80=94'): EM DASH
-
-	- U+2018 ('=E2=80=98'): LEFT SINGLE QUOTATION MARK
-	- U+2019 ('=E2=80=99'): RIGHT SINGLE QUOTATION MARK
-	- U+00b4 ('=C2=B4'): ACUTE ACCENT
-
-	- U+201c ('=E2=80=9C'): LEFT DOUBLE QUOTATION MARK
-	- U+201d ('=E2=80=9D'): RIGHT DOUBLE QUOTATION MARK
-
-	- U+00d7 ('=C3=97'): MULTIPLICATION SIGN
-	- U+2212 ('=E2=88=92'): MINUS SIGN
-
-	- U+2217 ('=E2=88=97'): ASTERISK OPERATOR
-	  (this one used as a pointer reference like "*foo" on C code
-	   example inside a document converted from LaTeX)
-
-	- U+00bb ('=C2=BB'): RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
-	  (this one also used wrongly on an ABI file, meaning '>')
-
-	- U+00a0 ('=C2=A0'): NO-BREAK SPACE
-	- U+feff ('=EF=BB=BF'): ZERO WIDTH NO-BREAK SPACE
-
-Using the above symbols will just trick tools like grep for no good
-reason.
-
-Thanks,
-Mauro
+--- a/Documentation/accounting/delay-accounting.rst
++++ b/Documentation/accounting/delay-accounting.rst
+@@ -74,8 +74,10 @@ Delay accounting is disabled by default
+ 
+    delayacct
+ 
+-to the kernel boot options. The rest of the instructions
+-below assume this has been done.
++to the kernel boot options. The rest of the instructions below assume this has
++been done. Alternatively, use sysctl kernel.sched_delayacct to switch the state
++at runtime. Note however that only tasks started after enabling it will have
++delayacct information.
+ 
+ After the system has booted up, use a utility
+ similar to  getdelays.c to access the delays
+--- a/kernel/delayacct.c
++++ b/kernel/delayacct.c
+@@ -18,6 +18,17 @@ DEFINE_STATIC_KEY_FALSE(delayacct_key);
+ int delayacct_on __read_mostly;	/* Delay accounting turned on/off */
+ struct kmem_cache *delayacct_cache;
+ 
++static void set_delayacct(bool enabled)
++{
++	if (enabled) {
++		static_branch_enable(&delayacct_key);
++		delayacct_on = 1;
++	} else {
++		delayacct_on = 0;
++		static_branch_disable(&delayacct_key);
++	}
++}
++
+ static int __init delayacct_setup_enable(char *str)
+ {
+ 	delayacct_on = 1;
+@@ -29,9 +40,30 @@ void delayacct_init(void)
+ {
+ 	delayacct_cache = KMEM_CACHE(task_delay_info, SLAB_PANIC|SLAB_ACCOUNT);
+ 	delayacct_tsk_init(&init_task);
+-	if (delayacct_on)
+-		static_branch_enable(&delayacct_key);
++	set_delayacct(delayacct_on);
++}
++
++#ifdef CONFIG_PROC_SYSCTL
++int sysctl_delayacct(struct ctl_table *table, int write, void *buffer,
++		     size_t *lenp, loff_t *ppos)
++{
++	int state = delayacct_on;
++	struct ctl_table t;
++	int err;
++
++	if (write && !capable(CAP_SYS_ADMIN))
++		return -EPERM;
++
++	t = *table;
++	t.data = &state;
++	err = proc_dointvec_minmax(&t, write, buffer, lenp, ppos);
++	if (err < 0)
++		return err;
++	if (write)
++		set_delayacct(state);
++	return err;
+ }
++#endif
+ 
+ void __delayacct_tsk_init(struct task_struct *tsk)
+ {
+--- a/kernel/sysctl.c
++++ b/kernel/sysctl.c
+@@ -71,6 +71,7 @@
+ #include <linux/coredump.h>
+ #include <linux/latencytop.h>
+ #include <linux/pid.h>
++#include <linux/delayacct.h>
+ 
+ #include "../lib/kstrtox.h"
+ 
+@@ -1727,6 +1728,17 @@ static struct ctl_table kern_table[] = {
+ 		.extra2		= SYSCTL_ONE,
+ 	},
+ #endif /* CONFIG_SCHEDSTATS */
++#ifdef CONFIG_TASK_DELAY_ACCT
++	{
++		.procname	= "sched_delayacct",
++		.data		= NULL,
++		.maxlen		= sizeof(unsigned int),
++		.mode		= 0644,
++		.proc_handler	= sysctl_delayacct,
++		.extra1		= SYSCTL_ZERO,
++		.extra2		= SYSCTL_ONE,
++	},
++#endif /* CONFIG_TASK_DELAY_ACCT */
+ #ifdef CONFIG_NUMA_BALANCING
+ 	{
+ 		.procname	= "numa_balancing",
