@@ -2,210 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EC66379678
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 19:51:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F2A537967F
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 19:53:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231786AbhEJRwr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 13:52:47 -0400
-Received: from mail-co1nam11on2088.outbound.protection.outlook.com ([40.107.220.88]:58720
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230479AbhEJRwr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 13:52:47 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fARYUrgZTBfCe84+KmEZwqyNbID/wh9bVtRY/fw5dG8bSHFpnh9JuVjxBxhk9loUqcW0im6Pe5u0qfyf74FKj8pqc0RaC+Gl1pX/FLQGfza0xnFTGCC+EGGomUgvurLE/MzFz+Kyjo6lja2QDtyBQoYgwwRT5qLa7nCKiyftbgd2ey9aPp+SlW5HNdCA+AA9iZHC2Bzy8gG4sfXzchwB5vlDBeBsUuY+y5AakBYKSN/x9fHcMMh5vvXDbbdyBlU938+Lw1U0TqJImC8ITI0BG8du+JrjkZ9wtmdO2XrXN8j4DLCrza/AzVMcvPLfRU7UMReFWXNVv3VvF+l4oYfZSQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z3tEajDeiYXlURvNrvCDn0c4mRqgqZit8AzNlxFFxrs=;
- b=mZMcNWd8hJPnD6PCp/cbFpTgg7HqzAojAAhXT5E62PUgx3oNEPeCcacjKwnjV/3YMVQdIVC9jJ0HCYsLguCdX0MWmasgAnAoTGcrYX+h5he64Vk+i3YYreioxkrec9YK8xCggjA1xFj7AdtrsMMwul7ewMEvKAh+NkwKRUUOeUEhUqwnbRhYTlCHVTyEP8JYIwXrebcZxF5zHKYIQg0TM1Uua/i0LKPUFA+/kxgdAHgQG7B5HBWEMBrbS9xRtLhBvwGGMSJfh9nJhVtwSDmJ3DrRuG7SusmyQNB2sCRtGkBkHBnVZyYm6fRygK6Q/1eGnnHktyKuyJQeQtOMHYy99Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z3tEajDeiYXlURvNrvCDn0c4mRqgqZit8AzNlxFFxrs=;
- b=vD8nNWPKxeRVizAha9nQm96vSS0Y5UmfdO5gdztk3ne6Fcha/G9uVm1lKG4EyZIWkgiL97BBcPV0/Kl8UstrkcogjR74h9km4ZKR7Dq5IM8GVSOPq4cbFr2W2vwThhesFNoFo78bd0Sm5WruQqC2CoG2Gb5WZz9wwXaBLxljF2M=
-Authentication-Results: intel.com; dkim=none (message not signed)
- header.d=none;intel.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4382.namprd12.prod.outlook.com (2603:10b6:806:9a::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4108.26; Mon, 10 May
- 2021 17:51:40 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4108.031; Mon, 10 May 2021
- 17:51:40 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, jroedel@suse.de,
-        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>, peterz@infradead.org,
-        "H. Peter Anvin" <hpa@zytor.com>, tony.luck@intel.com
-Subject: Re: [PATCH Part2 RFC v2 32/37] KVM: SVM: Add support to handle MSR
- based Page State Change VMGEXIT
-To:     Peter Gonda <pgonda@google.com>
-References: <20210430123822.13825-1-brijesh.singh@amd.com>
- <20210430123822.13825-33-brijesh.singh@amd.com>
- <CAMkAt6oYhRmqsKzDev3V5yMMePAR7ZzpEDRLadKhhCrb9Fq2=g@mail.gmail.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <84f52e0e-b034-ebcf-e787-7ef9e3baae2f@amd.com>
-Date:   Mon, 10 May 2021 12:51:36 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.0
-In-Reply-To: <CAMkAt6oYhRmqsKzDev3V5yMMePAR7ZzpEDRLadKhhCrb9Fq2=g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Originating-IP: [70.112.153.56]
-X-ClientProxiedBy: SN4PR0501CA0054.namprd05.prod.outlook.com
- (2603:10b6:803:41::31) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        id S233108AbhEJRyt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 13:54:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44623 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231512AbhEJRyr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 13:54:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620669222;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZRMKkN3puVHnbiCCjdkC/0aI/Ng/WMP6VZjBrfm3u3I=;
+        b=cOCihoxcPQzvGKQJ3FuT5Eir1fNpEVpYOjbwj2J5Rr5dZVP6CLttvtPGgHPJWtbVTqKMzD
+        7Rg1nj1O5gFr+sHsMQ4RjJTtRg051x6eO7jfaasZvnXJGs2J8oJju/inxl7CGSOPwFdUAW
+        +a0HwvzYUnzpCy6gGZ93mhLvYnrMVM4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-110-xGEn8BMDP_eVTZEvrCbdHA-1; Mon, 10 May 2021 13:53:41 -0400
+X-MC-Unique: xGEn8BMDP_eVTZEvrCbdHA-1
+Received: by mail-wm1-f69.google.com with SMTP id o18-20020a1ca5120000b02901333a56d46eso7259801wme.8
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 10:53:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ZRMKkN3puVHnbiCCjdkC/0aI/Ng/WMP6VZjBrfm3u3I=;
+        b=Llt/b4hTGebMBfsrjw2Zygekplm8mtjs/+9DmTYdJ8TXfVg7Jc/w7ZqBsjNT/exurn
+         H5Q0iJ3qBl6OosnCeN24GgIDxf0MBese5RGiEQNrT7SXH6UFImeihGDnyNm697WEGB8N
+         SwaJu5sd79xkiTMVY6rhyFVrkaPRmew7TPIOZj1Kcriyz9cyh9aZpp2zvg69hdO5cOkz
+         IzDDBYwQfUEULBePYmxKJp6NkFVnSlknLzzvMCFq8ECZr47P8e4fsi7ZV6Dxlu7EhjO0
+         OWzD3tS90gI0prY20SVqcbrSFmc001UI1hbTVFIGMnDU0OkuvctE4z79ltb9qlaepX26
+         5cVQ==
+X-Gm-Message-State: AOAM5319QahWzahgLBKu85VbJJ5/d3rBKHBI34nUL+iOrTAgdl7aqzZS
+        pMGZdK78KlpKeLaQpqcl30fZcKUpKVq4mZcJdXdnfIvoSuQW0oycgHTTz7/qHz71csJXnnBaIg9
+        H8nVEEtk02qZ7
+X-Received: by 2002:a05:600c:41d4:: with SMTP id t20mr397218wmh.46.1620669219692;
+        Mon, 10 May 2021 10:53:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxACCYv6x9QhD3YmeCA/WIWl5sAyibLtwamGjdiFCeIqnub2B2iMTBAkL7kge9o6yM046pzgw==
+X-Received: by 2002:a05:600c:41d4:: with SMTP id t20mr397186wmh.46.1620669219388;
+        Mon, 10 May 2021 10:53:39 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id n123sm285028wme.24.2021.05.10.10.53.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 May 2021 10:53:38 -0700 (PDT)
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Peter Xu <peterx@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>
+References: <20210506184241.618958-1-bgardon@google.com>
+ <20210506184241.618958-8-bgardon@google.com>
+ <e2e73709-f247-1a60-4835-f3fad37ab736@redhat.com>
+ <YJlxQe1AXljq5yhQ@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 7/8] KVM: x86/mmu: Protect rmaps independently with
+ SRCU
+Message-ID: <a13b6960-3628-2899-5fbf-0765f97aa9eb@redhat.com>
+Date:   Mon, 10 May 2021 19:53:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SN4PR0501CA0054.namprd05.prod.outlook.com (2603:10b6:803:41::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4129.12 via Frontend Transport; Mon, 10 May 2021 17:51:38 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: aee8979b-47dc-452b-f532-08d913dc4369
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4382:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB438281B9FAAB912E81B8C0C7E5549@SA0PR12MB4382.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: RDm/MmKJtDvZijccRv8fl595LJwMsszdjIQ5QuYA66DrCJkhyny2RYpOTfbXYasV5OamTnPSPRt/G5AZCmKdqT8p4GwqMK9uR7FAkbsfdqBUFWDW68DWy9BbubQlRRVcemotGuPs6Ura/jSsBqd8R0NxOqVjksCzEOjLYpAjtfsfIlqyUz9uVSSj13ljoUONzPTG7C5VtjRdPj+lRVjM8m/gY4nkc58CElg6aoCdibekkcnurEv7sKV1hP1wraTc65MhvZfK7KNqobog5nZ6VqehnvTpgq3ZGfI5wxKTQqKMLfldaAxgonzefF/2ubepSaSYkWNvZ6odQnX2mWz00ffLk4x0ToQlneMOx2r+PL+xIRBRK0+gTcMig1W9kqBF8mOjrKEaUev6TJVUZI4U0KIoNpZHKrwzbkSAhslhY/TB6JmahHHEa99fzc2tb/0QGK3yxNcfjcYvz22BK63LeAXXVxeHD7kNXTLeD7Jw3bHCGcF3cRmjxmWQH4Nj42DM5NXVBu75pRSyXEnn3T/lHmdz7DyibDX2HkhnGx5VyvB9AGpbt0QjOoYt+/oe1Ut0i4uZ+GRyY33bRhbGySshXSTl7YoCtFMr0utlTuJVXk84DSSzwH/X/3E0NYcahJCgllauKlqb71P96sLpZlzsd2fGWkT6+O5yd8GyIcMbD400vwHfYpRR3m6Dr4/vbqTFxihwJ/9htRNmhGhZRfuIXf43wdM6itVNXmjaBf1VBIU=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(366004)(39860400002)(136003)(396003)(6512007)(31696002)(54906003)(16526019)(2906002)(83380400001)(478600001)(44832011)(38350700002)(5660300002)(38100700002)(86362001)(66476007)(36756003)(7416002)(4326008)(66556008)(8676002)(31686004)(52116002)(8936002)(956004)(2616005)(26005)(66946007)(186003)(316002)(6916009)(53546011)(6486002)(6506007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?YTdKVkFmN1Ayb1I3bkhaVitVNzZObHpTUjlsSEpCSU9uT2VWOGNzSVZGSktE?=
- =?utf-8?B?bEMySE45a0llNUJFV04wTmxCY1ZKVEVvbVVURHZFY1VaM2Z3Z2lKMVM5Mlln?=
- =?utf-8?B?SzZ3SEo5OW1GV3RRVkUrbFVKUHRyZ0lUTUx6R1J2SWIyc0k5L2FOWTY1bGJW?=
- =?utf-8?B?VkJrcFdSUTI5ZjhRRWFVQ0lBdDMrWUl4cVFkYThLWGRHajF6RzBpQWRuUHoy?=
- =?utf-8?B?c2F6RXNSdzFlWXZDNHpqM2kxdEh2UEFNOFdDaEk1QjcxVGxWMW1YakpPeHVH?=
- =?utf-8?B?ZndQQ2E0b2E1emZZVmR6WTNyR0lybjBXb2N4ZWlqYUxLbVZVUWNTbEhaamlB?=
- =?utf-8?B?UnM0ZHR2MW45dG9jNXRPWXIvRnNPNXR0YWtoYnBsNHp2clp1Ynk1cDlsZG1s?=
- =?utf-8?B?cElLWEJpbUZZeUhJamZEZEV6UXliUlk5REg3VFJ4RUsrSHB6R0I5T3hmMnow?=
- =?utf-8?B?RVJ6dnNMRVJnbnJucThPeElUb3Jhd1RmYm44MVdoRmtJRWFhOFVBQ0Q2bkFo?=
- =?utf-8?B?VXh4ZVJsd3h1Um55MTcvU2hHcUFQa3NqQ0Q3NUlxaXpEVjRhK2NxVTE2WUw0?=
- =?utf-8?B?MXhWczBucUtQYzFPT3NDeDQ0K2R2QnFJUHFJenQxcW9vT0tuamh1NW9IV1Bw?=
- =?utf-8?B?Sll4ZC9hQTFUOUtGRmh0R2xHSkEwdUR6QXJwQTI3Z3ZhMnREUThGano4Wmxv?=
- =?utf-8?B?OHozN2NYRFRCcHZDKzhTWVZlNzNXejRUemh5Ni9XL2h4UDd6WCs0b0lnL0FT?=
- =?utf-8?B?TkxtQ01uN1Z1c1BoSEFscjF2Z2F4bElKU2JRSnJCRFhhclZOT2hVQ20xdEg1?=
- =?utf-8?B?M3QzK0lueXBSd0tJcWw3TEJsMmFkbjkvcy8vWlRBYTdoQ3lpQ1RPUTRnNjZw?=
- =?utf-8?B?RXRuejY3bitqb2tpeEw4VHNDcDN3dU9yMDhEVzllR25pZ25ZRXl2U0NZNTlN?=
- =?utf-8?B?UHFJdld3Wk10dzB2bW0rQ256b3VFdno5ck9IQXZPRmxNbXBVemN0eVlGeGh1?=
- =?utf-8?B?RG1hNktENW9ram43YzR2eC92U3l1NFZPRWFPN1Z1RzJscXRMMDMyVkszQVpV?=
- =?utf-8?B?Q0FQb3VYYnNMWTU0OGhhZ2RRVnkySlV2cHhmVnkyMktUTUVLWmYwSXAyeHhS?=
- =?utf-8?B?eEtNaDc5K3ZYdWUwcW5NUjRSbDBiT0ZJNm1SeXBxbXhsK3ZZYzlkaTB2cTVZ?=
- =?utf-8?B?Z1kxOURwSzJBOXZUTkNDbjB3dWNoN1FSa0hIVTJOR0RmRC9lbkdnVUVxak5z?=
- =?utf-8?B?SHVoR3NnWFozTlFPYncvNzJ4b0tpNmQzVFNURVg4ZmtyaVpiUlR4ODVCWkNG?=
- =?utf-8?B?bjkvaDZPeUxnYjRIZmMrNDYrdVpYMWNqUWdZT3FmMWkvSForUXdTZnJ4TitB?=
- =?utf-8?B?Y0VGQzJtMHlzY1lrclVIRlk1UVBPK2VISlN4ZWMweFNNSExxSVJSdU1lbUNm?=
- =?utf-8?B?SndTcjByemFEZjAxdjlzNDNvYS9QQ25hdW9LQWFjZ0VFZmtZamR5aDh6RnAz?=
- =?utf-8?B?TzIrbTU4aFVPUWZkcldkWGFIUFM4cUk2YlM5NHh2TXU5S3lLSERLTEFBdkEz?=
- =?utf-8?B?Ty9qRUVPYm00b3ZJOFk5U0kzZFBHUDdJUjJiN3dLdStPNHE1d1dtUnpFVlI3?=
- =?utf-8?B?bjUvN1ZMYnE2M0RtdnZYWVUyN0RicU9rbjBwdnFMK0E5eWpuWXZ2NUxDanBh?=
- =?utf-8?B?Uk41MDQzMnVwN1VkcGl5dTBTcmRBWVlWellQbmlwaGZycXdHOTBESUVKMTBC?=
- =?utf-8?Q?u6bG9gpA3zE5y3gZHGpYJ5BRauZYALbAFo0w2+r?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aee8979b-47dc-452b-f532-08d913dc4369
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2021 17:51:39.7874
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: y07U+nLAJWRvMFmtACt1icphFLv6uQFgG0wOBD86VYp4xiKL5/SBC51DaF0wSGdxKGqfMD7M5gisLgD+w7Qm6Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4382
+In-Reply-To: <YJlxQe1AXljq5yhQ@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Peter,
+On 10/05/21 19:45, Sean Christopherson wrote:
+>>
+>> ---------
+>> Currently, rmaps are always allocated and published together with a new
+>> memslot, so the srcu_dereference for the memslots array already ensures that
+>> the memory pointed to by slots->arch.rmap is zero at the time
+>> slots->arch.rmap.  However, they still need to be accessed in an SRCU
+>> read-side critical section, as the whole memslot can be deleted outside
+>> SRCU.
+>> --------
+> I disagree, sprinkling random and unnecessary __rcu/SRCU annotations does more
+> harm than good.  Adding the unnecessary tag could be quite misleading as it
+> would imply the rmap pointers can_change_  independent of the memslots.
+> 
+> Similary, adding rcu_assign_pointer() in alloc_memslot_rmap() implies that its
+> safe to access the rmap after its pointer is assigned, and that's simply not
+> true since an rmap array can be freed if rmap allocation for a different memslot
+> fails.  Accessing the rmap is safe if and only if all rmaps are allocated, i.e.
+> if arch.memslots_have_rmaps is true, as you pointed out.
 
-On 5/10/21 12:30 PM, Peter Gonda wrote:
->> +static int snp_make_page_shared(struct kvm_vcpu *vcpu, gpa_t gpa, kvm_pfn_t pfn, int level)
->> +{
->> +       struct rmpupdate val;
->> +       int rc, rmp_level;
->> +       struct rmpentry *e;
->> +
->> +       e = snp_lookup_page_in_rmptable(pfn_to_page(pfn), &rmp_level);
->> +       if (!e)
->> +               return -EINVAL;
->> +
->> +       if (!rmpentry_assigned(e))
->> +               return 0;
->> +
->> +       /* Log if the entry is validated */
->> +       if (rmpentry_validated(e))
->> +               pr_debug_ratelimited("Remove RMP entry for a validated gpa 0x%llx\n", gpa);
->> +
->> +       /*
->> +        * Is the page part of an existing 2M RMP entry ? Split the 2MB into multiple
->> +        * of 4K-page before making the memory shared.
->> +        */
->> +       if ((level == PG_LEVEL_4K) && (rmp_level == PG_LEVEL_2M)) {
->> +               rc = snp_rmptable_psmash(vcpu, pfn);
->> +               if (rc)
->> +                       return rc;
->> +       }
->> +
->> +       memset(&val, 0, sizeof(val));
->> +       val.pagesize = X86_TO_RMP_PG_LEVEL(level);
-> This is slightly different from Rev 2.00 of the GHCB spec. This
-> defaults to 2MB page sizes, when the spec says the only valid settings
-> for level are 0 -> 4k pages or 1 -> 2MB pages. Should this enforce the
-> same strictness as the spec?
+This about freeing is a very good point.
 
+> Furthermore, to actually gain any protection from SRCU, there would have to be
+> an synchronize_srcu() call after assigning the pointers, and that _does_  have an
+> associated.
 
-The caller of the snp_make_page_shared() must pass the x86 page level.
-We should reach here after all the guest provide value have passed
-through checks.
+... but this is incorrect (I was almost going to point out the below in 
+my reply to Ben, then decided I was pointing out the obvious; lesson 
+learned).
 
-The call sequence in this case should be:
+synchronize_srcu() is only needed after *deleting* something, which in 
+this case is done as part of deleting the memslots---it's perfectly fine 
+to batch multiple synchronize_*() calls given how expensive some of them 
+are.
 
-snp_handle_vmgexit_msr_protocol()
+(BTW an associated what?)
 
- __snp_handle_page_state_change(vcpu, gfn_to_gpa(gfn), PG_LEVEL_4K)
+So they still count as RCU-protected in my opinion, just because reading 
+them outside SRCU is a big no and ought to warn (it's unlikely that it 
+happens with rmaps, but then we just had 2-3 bugs like this being 
+reported in a short time for memslots so never say never).  However, 
+rcu_assign_pointer is not needed because the visibility of the rmaps is 
+further protected by the have-rmaps flag (to be accessed with 
+load-acquire/store-release) and not just by the pointer being there and 
+non-NULL.
 
-  snp_make_page_shared(..., level)
+Paolo
 
-Am I missing something  ?
+> Not to mention that to truly respect the __rcu annotation, deleting
+> the rmaps would also have to be done "independently" with the correct
+> rcu_assign_pointer() and synchronize_srcu() logic.
+> 
 
->> +       return rmpupdate(pfn_to_page(pfn), &val);
->> +}
->> +
->> +static int snp_make_page_private(struct kvm_vcpu *vcpu, gpa_t gpa, kvm_pfn_t pfn, int level)
->> +{
->> +       struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
->> +       struct rmpupdate val;
->> +       struct rmpentry *e;
->> +       int rmp_level;
->> +
->> +       e = snp_lookup_page_in_rmptable(pfn_to_page(pfn), &rmp_level);
->> +       if (!e)
->> +               return -EINVAL;
->> +
->> +       /* Log if the entry is validated */
->> +       if (rmpentry_validated(e))
->> +               pr_err_ratelimited("Asked to make a pre-validated gpa %llx private\n", gpa);
->> +
->> +       memset(&val, 0, sizeof(val));
->> +       val.gpa = gpa;
->> +       val.asid = sev->asid;
->> +       val.pagesize = X86_TO_RMP_PG_LEVEL(level);
-> Same comment as above.
-
-See my above response.
-
-
->
->> +       val.assigned = true;
->> +
->> +       return rmpupdate(pfn_to_page(pfn), &val);
->> +}
