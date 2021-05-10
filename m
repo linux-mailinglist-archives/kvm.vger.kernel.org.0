@@ -2,93 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CA30379329
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 17:55:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5077C37932E
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 17:55:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231394AbhEJP4D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 11:56:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54610 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230503AbhEJP4D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 11:56:03 -0400
-Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6BF0C061574
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 08:54:56 -0700 (PDT)
-Received: by mail-qv1-xf2a.google.com with SMTP id z1so8586779qvo.4
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 08:54:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=dKnE93StZsqCunlDWqAom0kQB6W55N5BaGWqotQGVUE=;
-        b=nuCBcs9/S1aTLECuWcN5h85qoqBaLLtCmy8zbuhR+zPZIMDw77L3oRAU7xMeuDuh42
-         1aY3lX4gkaR/KbePkX7G1aB4Tpotsrq6rAP9gAhtcsTRhc0Gr01HHPgz83z/GnxJGBsg
-         Bgm+850D+Iu3fWcIhJnyleMndHaJU8eu5R+J7ww9ibnhcQrnYmdXCBCA/riNKAbRtSll
-         l1yAaUuiGbs9mNbvE3XsoU7M2UC1x/oM1anr+WkEwv0XXzudrTewGREVjZScvyVEfQdQ
-         cELamVl6RymHsUL1VXH8Yvje4DNltTqqC+G2U/5otju6aAnXdj/94+nc1C46u8eQdS8I
-         heCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dKnE93StZsqCunlDWqAom0kQB6W55N5BaGWqotQGVUE=;
-        b=rdYig8fvxSfAnobjyiZYNIgDi3ZkFiwEoGZb4mZTXikjPqhrXEzbHHCFoeUL0lgrnf
-         etOlgbzLSjwK+JPCiUAixtaKOFq2b2IitiBPwl7aDT4YMx1HJsJfJyXRMorxAsbZ6c6/
-         v74Lht2+6tFv7K28ImjiwpO7YPjsVfCHHaGCDVfhQCixkHYkkjoVB9GyweXpEf54RYNL
-         W/FugOYgoiEWDiQ4QVqwbvnMSC458QSQUZ+mHDBLXUgisEDFvy8lA3RJgdmM8h5oCuxy
-         BtNY7u9m7a1AZCOflouARKMHW+AzsVqhIoFiq97EFSyPR7wLwZ4KRgPHS67ytmoqLh5u
-         aHbA==
-X-Gm-Message-State: AOAM533cRP4weGKismPw6fnZckiGlMcKfSjtMuoARUyI6CcS30lY7lfE
-        4fMA+siptN0DM5uyR9E/ahwRmA==
-X-Google-Smtp-Source: ABdhPJxmEWE6l8G4ddQYCJA3Ydglf+qOUGmIWRC1Z06kUQgptb6+ijWYRVzLErmdhwjQdbwCc1sh8A==
-X-Received: by 2002:a0c:bd8c:: with SMTP id n12mr2852029qvg.29.1620662095910;
-        Mon, 10 May 2021 08:54:55 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-47-55-113-94.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.113.94])
-        by smtp.gmail.com with ESMTPSA id g185sm11814969qkf.62.2021.05.10.08.54.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 May 2021 08:54:55 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1lg8FC-004bOW-Vr; Mon, 10 May 2021 12:54:55 -0300
-Date:   Mon, 10 May 2021 12:54:54 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Will Deacon <will@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-arm-kernel@lists.infradead.org,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 3/6] vfio: remove the unused mdev iommu hook
-Message-ID: <20210510155454.GA1096940@ziepe.ca>
-References: <20210510065405.2334771-1-hch@lst.de>
- <20210510065405.2334771-4-hch@lst.de>
+        id S231600AbhEJP44 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 10 May 2021 11:56:56 -0400
+Received: from us-smtp-delivery-44.mimecast.com ([207.211.30.44]:25060 "EHLO
+        us-smtp-delivery-44.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230492AbhEJP4y (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 11:56:54 -0400
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-399-Dv24lgUpNayROI3ptof5aQ-1; Mon, 10 May 2021 11:55:44 -0400
+X-MC-Unique: Dv24lgUpNayROI3ptof5aQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 537B3100A61E;
+        Mon, 10 May 2021 15:55:43 +0000 (UTC)
+Received: from bahia.redhat.com (ovpn-112-152.ams2.redhat.com [10.36.112.152])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D638819C44;
+        Mon, 10 May 2021 15:55:40 +0000 (UTC)
+From:   Greg Kurz <groug@kaod.org>
+To:     qemu-devel@nongnu.org
+Cc:     Vivek Goyal <vgoyal@redhat.com>, virtio-fs@redhat.com,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>, Greg Kurz <groug@kaod.org>
+Subject: [for-6.1 v3 0/3] virtiofsd: Add support for FUSE_SYNCFS request
+Date:   Mon, 10 May 2021 17:55:36 +0200
+Message-Id: <20210510155539.998747-1-groug@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210510065405.2334771-4-hch@lst.de>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: kaod.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 10, 2021 at 08:54:02AM +0200, Christoph Hellwig wrote:
-> The iommu_device field in struct mdev_device has never been used
-> since it was added more than 2 years ago.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 132 ++++++--------------------------
->  include/linux/mdev.h            |  20 -----
->  2 files changed, 25 insertions(+), 127 deletions(-)
+FUSE_SYNCFS allows the client to flush the host page cache.
+This isn't available in upstream linux yet, but the following
+tree can be used to test:
 
-I asked Intel folks to deal with this a month ago:
+https://gitlab.com/gkurz/linux/-/tree/virtio-fs-sync
 
-https://lore.kernel.org/kvm/20210406200030.GA425310@nvidia.com/
+v3: - track submounts and do per-submount syncfs() (Vivek)
+    - based on new version of FUSE_SYNCFS (still not upstream)
+      https://listman.redhat.com/archives/virtio-fs/2021-May/msg00025.html
 
-So lets just remove it, it is clearly a bad idea
+v2: - based on new version of FUSE_SYNCFS
+      https://listman.redhat.com/archives/virtio-fs/2021-April/msg00166.html
+    - propagate syncfs() errors to client (Vivek)
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Greg Kurz (3):
+  Update linux headers to 5.13-rc1 + FUSE_SYNCFS
+  virtiofsd: Track mounts
+  virtiofsd: Add support for FUSE_SYNCFS request
 
-Jason
+ .../infiniband/hw/vmw_pvrdma/pvrdma_verbs.h   |  35 -
+ include/standard-headers/drm/drm_fourcc.h     |  23 +-
+ include/standard-headers/linux/ethtool.h      | 109 ++-
+ include/standard-headers/linux/fuse.h         |  27 +-
+ include/standard-headers/linux/input.h        |   2 +-
+ include/standard-headers/linux/virtio_ids.h   |   2 +
+ .../standard-headers/rdma/vmw_pvrdma-abi.h    |   7 +
+ linux-headers/asm-generic/unistd.h            |  13 +-
+ linux-headers/asm-mips/unistd_n32.h           | 752 +++++++--------
+ linux-headers/asm-mips/unistd_n64.h           | 704 +++++++-------
+ linux-headers/asm-mips/unistd_o32.h           | 844 ++++++++---------
+ linux-headers/asm-powerpc/kvm.h               |   2 +
+ linux-headers/asm-powerpc/unistd_32.h         | 857 +++++++++---------
+ linux-headers/asm-powerpc/unistd_64.h         | 801 ++++++++--------
+ linux-headers/asm-s390/unistd_32.h            |   5 +
+ linux-headers/asm-s390/unistd_64.h            |   5 +
+ linux-headers/asm-x86/kvm.h                   |   1 +
+ linux-headers/asm-x86/unistd_32.h             |   5 +
+ linux-headers/asm-x86/unistd_64.h             |   5 +
+ linux-headers/asm-x86/unistd_x32.h            |   5 +
+ linux-headers/linux/kvm.h                     | 134 +++
+ linux-headers/linux/userfaultfd.h             |  36 +-
+ linux-headers/linux/vfio.h                    |  35 +
+ tools/virtiofsd/fuse_lowlevel.c               |  11 +
+ tools/virtiofsd/fuse_lowlevel.h               |  12 +
+ tools/virtiofsd/passthrough_ll.c              |  80 +-
+ tools/virtiofsd/passthrough_seccomp.c         |   1 +
+ 27 files changed, 2465 insertions(+), 2048 deletions(-)
+
+-- 
+2.26.3
+
+
