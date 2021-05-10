@@ -2,153 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 97573377E43
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 10:33:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E4771377E68
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 10:42:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230138AbhEJIeF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 04:34:05 -0400
-Received: from mga05.intel.com ([192.55.52.43]:42326 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230215AbhEJIeD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 04:34:03 -0400
-IronPort-SDR: 7ijODCU5M6GnOcM9l/OGgmtYoS0LHGYz39FUWEUS/j9ifonRg6mxl+rFPItaIfKfTu0PFDkm7D
- tA+CRdRsdMXg==
-X-IronPort-AV: E=McAfee;i="6200,9189,9979"; a="284626354"
-X-IronPort-AV: E=Sophos;i="5.82,287,1613462400"; 
-   d="scan'208";a="284626354"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2021 01:32:59 -0700
-IronPort-SDR: EI6UBs0GHV3icPsMda52IPH37BYgVnWhaaGj5zqVCose/og3/4GEBs4LFn3kLp+v2Feg7yeNcq
- l7DNyidfXprg==
-X-IronPort-AV: E=Sophos;i="5.82,287,1613462400"; 
-   d="scan'208";a="470722622"
-Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.254.212.136]) ([10.254.212.136])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2021 01:32:56 -0700
-Subject: Re: [PATCH] Revert "irqbypass: do not start cons/prod when failed
- connect"
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-To:     Jason Wang <jasowang@redhat.com>, mst@redhat.com, maz@kernel.org,
-        alex.williamson@redhat.com
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, cohuck@redhat.com,
-        stable@vger.kernel.org
-References: <20210508071152.722425-1-lingshan.zhu@intel.com>
- <b309c02d-9570-6400-9a0c-63030aed7ff7@redhat.com>
- <a659fc6f-2c7a-23d2-9c34-0044d5a31861@intel.com>
- <e5d63867-7a4a-963f-9fbd-741ccd3ec360@redhat.com>
- <b822cde1-7970-dac0-26cc-da1daa0b622f@intel.com>
-Message-ID: <feee2889-6e91-46f3-123f-826a9c4ef43c@intel.com>
-Date:   Mon, 10 May 2021 16:32:54 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        id S230146AbhEJInq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 04:43:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42438 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230029AbhEJInq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 04:43:46 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00F15C061573;
+        Mon, 10 May 2021 01:42:42 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id gj14so9349660pjb.5;
+        Mon, 10 May 2021 01:42:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=scJ3NrXTuahw2yzhmVWfK55O/lDzcVrCShB7rGVBtm8=;
+        b=PS27FdqMFAg4Onslbjd5Aa5ZmxzmzbIGz1ym+AC/D31HVIdNGujgRDR5GyLhJfgRgj
+         jDNZ0f1YPgKVBnFVHGkEm8hCk7GIcP2S6kUrvA6p5XVxt7yWFaH3WEhZALhtXuzVw1mA
+         8mmxF2BeAOOH9LtvKpG0bMED8dhGdzHxG4Lyr+oxjeVEDgpYlnBW7c1TeF7uMr5pX5v+
+         k5JMDhqCX/AJU/A+PNmFr0zD4noYtLB5+oweW+wvcEnZaYQBM0TBUp4h7IySWZKHEh6d
+         NxolZmEVKH+pjxxEoz6iaTM7Gwu2K8z6ELo3yf6fbDvfXi/L7y3mdO278xzDLfxK/9Yu
+         dnVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=scJ3NrXTuahw2yzhmVWfK55O/lDzcVrCShB7rGVBtm8=;
+        b=h10It0Jx0l/hXaeH8W1K/u+BsyGstDdkaXG/iLKcwO3iLRHJ0Fc0aiAr1YJKMhTG9t
+         MjZQqtEvqBQM/qDGnQ6gAF5VT/SHq8wo4hymfMem3zjC2JVPOkvT7RTeCSLRMkSZM4Rg
+         5uVmxbYVCVBDU879OPVaFonu8H3256FZDFqTE8BLtf3RM8IbQsRbX0azVX4OsfblqFXP
+         YWkkFcdpnIql4Han+viYr4L/vP9lAgSVPXSOhRLvLiBFwLC/KpdpN5feagXgV/npz5WX
+         EObi8CtoTD+oRXiiFX6EXGacTJRkw7TTn3qliJfLwKmu5lHOkdr8ve/JRYbUZSC+LK3u
+         JjEQ==
+X-Gm-Message-State: AOAM531p5SjO4cpi8Q9MOnRy8+NHbCjNTkJPkitVaW/avs6dGG8v43Ag
+        Z+3Jj4zDuANWilm2OblGpmo=
+X-Google-Smtp-Source: ABdhPJyMQKlO5I8qVaoBnwoIE+yxgQz2GSn7SF+EIHLp1k/jtff5dNN0fmjDj6iAzEKDTKyRIVn2sA==
+X-Received: by 2002:a17:90b:11cf:: with SMTP id gv15mr26761960pjb.178.1620636161472;
+        Mon, 10 May 2021 01:42:41 -0700 (PDT)
+Received: from localhost ([203.87.99.126])
+        by smtp.gmail.com with ESMTPSA id h9sm10786984pfv.14.2021.05.10.01.42.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 May 2021 01:42:40 -0700 (PDT)
+Date:   Mon, 10 May 2021 18:42:36 +1000
+From:   Balbir Singh <bsingharora@gmail.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     tglx@linutronix.de, mingo@kernel.org, juri.lelli@redhat.com,
+        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+        rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+        bristot@redhat.com, pbonzini@redhat.com, maz@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        riel@surriel.com, hannes@cmpxchg.org
+Subject: Re: [PATCH 5/6] delayacct: Add static_branch in scheduler hooks
+Message-ID: <20210510084236.GE4236@balbir-desktop>
+References: <20210505105940.190490250@infradead.org>
+ <20210505111525.248028369@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <b822cde1-7970-dac0-26cc-da1daa0b622f@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210505111525.248028369@infradead.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, May 05, 2021 at 12:59:45PM +0200, Peter Zijlstra wrote:
+> Cheaper when delayacct is disabled.
+> 
+> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> ---
 
-
-On 5/10/2021 3:09 PM, Zhu, Lingshan wrote:
->
->
-> On 5/10/2021 12:34 PM, Jason Wang wrote:
->>
->> 在 2021/5/10 上午11:00, Zhu, Lingshan 写道:
->>>
->>>
->>> On 5/10/2021 10:43 AM, Jason Wang wrote:
->>>>
->>>> 在 2021/5/8 下午3:11, Zhu Lingshan 写道:
->>>>> This reverts commit a979a6aa009f3c99689432e0cdb5402a4463fb88.
->>>>>
->>>>> The reverted commit may cause VM freeze on arm64 platform.
->>>>> Because on arm64 platform, stop a consumer will suspend the VM,
->>>>> the VM will freeze without a start consumer
->>>>>
->>>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->>>>
->>>>
->>>> Acked-by: Jason Wang <jasowang@redhat.com>
->>>>
->>>> Please resubmit with the formal process of stable 
->>>> (stable-kernel-rules.rst).
->>> sure, I will re-submit it to stable kernel once it is merged into 
->>> Linus tree.
->>>
->>> Thanks
->>
->>
->> I think it's better to resubmit (option 1), see how 
->> stable-kernel-rules.rst said:
->>
->> ""
->>
->> :ref:`option_1` is **strongly** preferred, is the easiest and most 
->> common.
->> :ref:`option_2` and :ref:`option_3` are more useful if the patch 
->> isn't deemed
->> worthy at the time it is applied to a public git tree (for instance, 
->> because
->> it deserves more regression testing first).
->>
->> """
->>
->> Thanks
-> OK, works for me, I will add cc stable, and resubmit it soon
->
-> Thanks!
-I just seeMarc has already added "Cc: stable@vger.kernel.org", and he 
-would take the patch in his tree,
-so I think no need to resend.
-
-Thanks,
-Zhu Lingshan
->>
->>
->>>>
->>>> Thanks
->>>>
->>>>
->>>>> ---
->>>>>   virt/lib/irqbypass.c | 16 ++++++----------
->>>>>   1 file changed, 6 insertions(+), 10 deletions(-)
->>>>>
->>>>> diff --git a/virt/lib/irqbypass.c b/virt/lib/irqbypass.c
->>>>> index c9bb3957f58a..28fda42e471b 100644
->>>>> --- a/virt/lib/irqbypass.c
->>>>> +++ b/virt/lib/irqbypass.c
->>>>> @@ -40,21 +40,17 @@ static int __connect(struct 
->>>>> irq_bypass_producer *prod,
->>>>>       if (prod->add_consumer)
->>>>>           ret = prod->add_consumer(prod, cons);
->>>>>   -    if (ret)
->>>>> -        goto err_add_consumer;
->>>>> -
->>>>> -    ret = cons->add_producer(cons, prod);
->>>>> -    if (ret)
->>>>> -        goto err_add_producer;
->>>>> +    if (!ret) {
->>>>> +        ret = cons->add_producer(cons, prod);
->>>>> +        if (ret && prod->del_consumer)
->>>>> +            prod->del_consumer(prod, cons);
->>>>> +    }
->>>>>         if (cons->start)
->>>>>           cons->start(cons);
->>>>>       if (prod->start)
->>>>>           prod->start(prod);
->>>>> -err_add_producer:
->>>>> -    if (prod->del_consumer)
->>>>> -        prod->del_consumer(prod, cons);
->>>>> -err_add_consumer:
->>>>> +
->>>>>       return ret;
->>>>>   }
->>>>
->>>
->>
->
-
+Acked-by: Balbir Singh <bsingharora@gmail.com> 
