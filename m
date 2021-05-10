@@ -2,140 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C7541377DC1
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 10:14:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92119377DCB
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 10:16:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230156AbhEJIPw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 04:15:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28922 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230045AbhEJIPv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 04:15:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620634486;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YzIlE0g/4U7xWXnQ0lyKGcEjcSAJhWnyeWZnCZ0Wzz4=;
-        b=aTNRUloBh+2R5EW9MsyrmD9SOaEYdgmehPaS/5ZaOp+vTNZLevfDv1i4voDVYY0Hz0KRud
-        Gm4EUAtfEpqcj7op3Ns2syDe4VInJMQPsD7K4BdiW9HZC70y0UDRLzddcPs7jnTJ3VnrEQ
-        4LIAR03BTaAMeLhJtsJ97OlmTm1GHrk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-163-_0aJNn2oOaSeZL52oNUMWQ-1; Mon, 10 May 2021 04:14:45 -0400
-X-MC-Unique: _0aJNn2oOaSeZL52oNUMWQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CD031008060;
-        Mon, 10 May 2021 08:14:43 +0000 (UTC)
-Received: from starship (unknown [10.40.194.86])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 75C8560E3A;
-        Mon, 10 May 2021 08:14:40 +0000 (UTC)
-Message-ID: <01c04a2335c913437b98e3ea874357689b097990.camel@redhat.com>
-Subject: Re: [PATCH 04/15] KVM: x86: Move RDPID emulation intercept to its
- own enum
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        id S230146AbhEJIRU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 04:17:20 -0400
+Received: from mga12.intel.com ([192.55.52.136]:42716 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230059AbhEJIRU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 04:17:20 -0400
+IronPort-SDR: kTwoUV49CSQtICKqzAbwTsEW2M19tUkGb4igNiYrqFqcj05Rr00Kv4Fa3jbsgNgJHwyiFyqetM
+ mjCsPXIRrmQQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,9979"; a="178727651"
+X-IronPort-AV: E=Sophos;i="5.82,287,1613462400"; 
+   d="scan'208";a="178727651"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2021 01:16:15 -0700
+IronPort-SDR: AdPc4YmQaJF/PrgQns47ijYSAa+cNsQPEOSpQFr1r9goPyObksljui00Ajk2RGFoc90nxbmQJl
+ uNZ9IZbIkiXg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.82,287,1613462400"; 
+   d="scan'208";a="408250810"
+Received: from clx-ap-likexu.sh.intel.com ([10.239.48.108])
+  by orsmga002.jf.intel.com with ESMTP; 10 May 2021 01:16:13 -0700
+From:   Like Xu <like.xu@linux.intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
-        Reiji Watanabe <reijiw@google.com>
-Date:   Mon, 10 May 2021 11:14:39 +0300
-In-Reply-To: <20210504171734.1434054-5-seanjc@google.com>
-References: <20210504171734.1434054-1-seanjc@google.com>
-         <20210504171734.1434054-5-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        Joerg Roedel <joro@8bytes.org>, weijiang.yang@intel.com,
+        wei.w.wang@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [RESEND PATCH v4 00/10] KVM: x86/pmu: Guest Architectural LBR Enabling
+Date:   Mon, 10 May 2021 16:15:24 +0800
+Message-Id: <20210510081535.94184-1-like.xu@linux.intel.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-05-04 at 10:17 -0700, Sean Christopherson wrote:
-> Add a dedicated intercept enum for RDPID instead of piggybacking RDTSCP.
-> Unlike VMX's ENABLE_RDTSCP, RDPID is not bound to SVM's RDTSCP intercept.
-> 
-> Fixes: fb6d4d340e05 ("KVM: x86: emulate RDPID")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/emulate.c     | 2 +-
->  arch/x86/kvm/kvm_emulate.h | 1 +
->  arch/x86/kvm/vmx/vmx.c     | 3 ++-
->  3 files changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index abd9a4db11a8..8fc71e70857d 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -4502,7 +4502,7 @@ static const struct opcode group8[] = {
->   * from the register case of group9.
->   */
->  static const struct gprefix pfx_0f_c7_7 = {
-> -	N, N, N, II(DstMem | ModRM | Op3264 | EmulateOnUD, em_rdpid, rdtscp),
-> +	N, N, N, II(DstMem | ModRM | Op3264 | EmulateOnUD, em_rdpid, rdpid),
->  };
->  
->  
-> diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-> index 0d359115429a..f016838faedd 100644
-> --- a/arch/x86/kvm/kvm_emulate.h
-> +++ b/arch/x86/kvm/kvm_emulate.h
-> @@ -468,6 +468,7 @@ enum x86_intercept {
->  	x86_intercept_clgi,
->  	x86_intercept_skinit,
->  	x86_intercept_rdtscp,
-> +	x86_intercept_rdpid,
->  	x86_intercept_icebp,
->  	x86_intercept_wbinvd,
->  	x86_intercept_monitor,
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 82404ee2520e..99591e523b47 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7437,8 +7437,9 @@ static int vmx_check_intercept(struct kvm_vcpu *vcpu,
->  	/*
->  	 * RDPID causes #UD if disabled through secondary execution controls.
->  	 * Because it is marked as EmulateOnUD, we need to intercept it here.
-> +	 * Note, RDPID is hidden behind ENABLE_RDTSCP.
->  	 */
-> -	case x86_intercept_rdtscp:
-> +	case x86_intercept_rdpid:
-Shoudn't this path still handle the x86_intercept_rdtscp as I described below,
-or should we remove it from the SVM side as well?
+Hi geniuses,
 
->  		if (!nested_cpu_has2(vmcs12, SECONDARY_EXEC_ENABLE_RDTSCP)) {
->  			exception->vector = UD_VECTOR;
->  			exception->error_code_valid = false;
+A new kernel cycle has begun, and this version looks promising. 
 
-I have a maybe unrelated question that caught my eye:
-I see this:
+From the end user's point of view, the usage of Arch LBR is the same as
+the legacy LBR we have merged in the mainline, but it is much faster.
 
-	DIP(SrcNone, rdtscp, check_rdtsc),
+The Architectural Last Branch Records (LBRs) is published 
+in the 319433-040 release of Intel Architecture Instruction
+Set Extensions and Future Features Programming Reference[0].
 
-As far as I can see this means that if a nested guest executes
-the rdtscp, and L1 intercepts it, then we will emulate the rdtscp by doing a nested
-VM exit, but if we emulate a rdtscp for L1, we will fail since there is no .execute callback.
+The main advantages for the Arch LBR users are [1]:
+- Faster context switching due to XSAVES support and faster reset of
+  LBR MSRs via the new DEPTH MSR
+- Faster LBR read for a non-PEBS event due to XSAVES support, which
+  lowers the overhead of the NMI handler.
+- Linux kernel can support the LBR features without knowing the model
+  number of the current CPU.
 
-Is this intentional? As I understand it, at least in theory the emulator can be called
-on any instruction due to things like lack of unrestricted guest, and/or emulating an
-instruction on page fault (although the later is usually done by re-executing the instruction).
+Please check more details in each commit and feel free to comment.
 
-I know that the x86 emulator is far from being complete for such cases but I 
-do wonder why rdtspc has different behavior in regard to nested and not nested case.
+[0] https://software.intel.com/content/www/us/en/develop/download/
+intel-architecture-instruction-set-extensions-and-future-features-programming-reference.html
+[1] https://lore.kernel.org/lkml/1593780569-62993-1-git-send-email-kan.liang@linux.intel.com/
 
-So this patch (since it removes the x86_intercept_rdtscp handling from the VMX),
-should break the rdtscp emulation for the nested guest on VMX, although it is probably
-not used anyway and should be removed.
+---
+v13->v13 RESEND Changelog:
+- Rebase to kvm/queue tree tag: kvm-5.13-2;
+- Includes two XSS dependency patches from kvm/intel tree;
 
-Best regards,
-	Maxim Levitsky
+v3->v4 Changelog:
+- Add one more host patch to reuse ARCH_LBR_CTL_MASK;
+- Add reserve_lbr_buffers() instead of using GFP_ATOMIC;
+- Fia a bug in the arch_lbr_depth_is_valid();
+- Add LBR_CTL_EN to unify DEBUGCTLMSR_LBR and ARCH_LBR_CTL_LBREN;
+- Add vmx->host_lbrctlmsr to save/restore host values;
+- Add KVM_SUPPORTED_XSS to refactoring supported_xss;
+- Clear Arch_LBR ans its XSS bit if it's not supported;
+- Add negative testing to the related kvm-unit-tests;
+- Refine code and commit messages;
 
+Previous:
+v4: https://lore.kernel.org/kvm/20210314155225.206661-1-like.xu@linux.intel.com/
+v3: https://lore.kernel.org/kvm/20210303135756.1546253-1-like.xu@linux.intel.com/
+
+Like Xu (8):
+  perf/x86/intel: Fix the comment about guest LBR support on KVM
+  perf/x86/lbr: Simplify the exposure check for the LBR_INFO registers
+  KVM: vmx/pmu: Add MSR_ARCH_LBR_DEPTH emulation for Arch LBR
+  KVM: vmx/pmu: Add MSR_ARCH_LBR_CTL emulation for Arch LBR
+  KVM: vmx/pmu: Add Arch LBR emulation and its VMCS field
+  KVM: x86: Expose Architectural LBR CPUID leaf
+  KVM: x86: Refine the matching and clearing logic for supported_xss
+  KVM: x86: Add XSAVE Support for Architectural LBRs
+
+Sean Christopherson (1):
+  KVM: x86: Report XSS as an MSR to be saved if there are supported
+    features
+
+Yang Weijiang (1):
+  KVM: x86: Refresh CPUID on writes to MSR_IA32_XSS
+
+ arch/x86/events/intel/core.c     |   3 +-
+ arch/x86/events/intel/lbr.c      |   6 +-
+ arch/x86/include/asm/kvm_host.h  |   1 +
+ arch/x86/include/asm/msr-index.h |   1 +
+ arch/x86/include/asm/vmx.h       |   4 ++
+ arch/x86/kvm/cpuid.c             |  46 ++++++++++++--
+ arch/x86/kvm/vmx/capabilities.h  |  25 +++++---
+ arch/x86/kvm/vmx/pmu_intel.c     | 103 ++++++++++++++++++++++++++++---
+ arch/x86/kvm/vmx/vmx.c           |  50 +++++++++++++--
+ arch/x86/kvm/vmx/vmx.h           |   4 ++
+ arch/x86/kvm/x86.c               |  19 +++++-
+ 11 files changed, 226 insertions(+), 36 deletions(-)
+
+-- 
+2.31.1
 
