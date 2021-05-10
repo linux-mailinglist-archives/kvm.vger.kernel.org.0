@@ -2,100 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 78F4B37948D
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 18:50:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 047833794AE
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 18:56:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231621AbhEJQvj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 12:51:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39238 "EHLO
+        id S231529AbhEJQ5n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 12:57:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230165AbhEJQve (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 12:51:34 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59EE3C061574
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 09:50:28 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id p4so14060189pfo.3
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 09:50:28 -0700 (PDT)
+        with ESMTP id S230289AbhEJQ5h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 12:57:37 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27AFAC06175F
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 09:56:32 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id b14-20020a17090a6e0eb0290155c7f6a356so8591362pjk.0
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 09:56:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=olHLGZ48niXGut0XbbxLsqr0rbv3H8VjFmjxIqL68wU=;
-        b=brCt+CBq+MmsYtOo49UoEAd8XbftfZYRocY+H8ceTF3EwDGCN2CeI1WQ9eIy3UfxdW
-         XyVfkCJcNVJVKj12/M02BdtLR4a1OqoaYg8VFD4AUV8H4YpQQue8q/ib29WgJYgMKbSy
-         Je7H5aynTFvuPadhnyzh/dg06wu2Bajchu46UjJxxFmAOm0XGtPbiJCyciWF431x9siw
-         j1h9BOIk0ZL2QVW1AfgwxN+E4r5eKw7YZ/KFrj3WPAN50AHbGDp/4x9gWuBICi2ScZFJ
-         vJIkAKMXRM5CIdzwa1RoLiQNETmENm8QV3oi7d8GD2BYUzLK8Cao3VcKXD+FGmyoBZsy
-         fpGA==
+        bh=Ie5AYmqK63xzjFssLcNkkP7A6mi6riGq/9HKzXNVk6A=;
+        b=SepcazzDfwcqb7zkKwhVhYcOakZPshV+SlDOgSATAzQaPDFRyfm0SCzNeTyVwrxU+N
+         buq8UGFWATYjEHXZoW4ieGWKBhxiD2ERcd/i5FZ+6W6C48Js1KQo7Sg2THdAXARR8GPk
+         Q0yf9N6Wmso6uB0rrEOEyZ6Z8SlfmXnVpYo9uISLbfL2QLt52sgsLnjaS5Of9P1/35zI
+         vJTWUV6/c2tdjwNa6tVQbVikPDB5Vzuqnz4dw4HIOq5kxaOhzh4qBqV2Hceruzjvq0Tb
+         DOXY/0FN0UxeWWZBJElv0U+O7O41D1n98sgg+hGppVwb61UN/YTaV8h2yrQCY7XZrjGl
+         czsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=olHLGZ48niXGut0XbbxLsqr0rbv3H8VjFmjxIqL68wU=;
-        b=c4PNFEuE7SgWTn8CQs0pmo9r5cl74U/yecxlOnJiVyRDt5h8GApfESaemXvoggQeUP
-         U02EBcEoLlx3Slp4T5HWj7RoIgefRxnovR10yeN6hs0dWIcPCyLBESnXg8WTFUSlc3Y0
-         pGAcfMLdIc527YKTMMn1O3wxsmBefHo2vOqgKlIDCyBgkEy9m7iHP37WRvpSW33niAuk
-         JB1H9scQZbpbsjMVt9cthk9/RyhOEuH2xv2MDkvkWuV6je561kmV4rTJOn7C3tL4vhw2
-         bDgvAUfalPTcp5kFKaBEddER9CxFFrS25c/d/qS8jsHS8QmhVG5mGm3b5iqB3DmhuaFH
-         qPiA==
-X-Gm-Message-State: AOAM5303+c67p51C4MJG4bqAvUmbADb5YenY8SJ/Be7vNowa1aK0HoaR
-        twmUmOWcOfB2niibEl0dV2xrYw==
-X-Google-Smtp-Source: ABdhPJw234xk7Bm+twfROI+POMcEoLhFF5jcgYbuwBXgF1NjudkN/ojQY/hp0T/liBO1/h47of8KLg==
-X-Received: by 2002:a63:5602:: with SMTP id k2mr25493231pgb.127.1620665427664;
-        Mon, 10 May 2021 09:50:27 -0700 (PDT)
+        bh=Ie5AYmqK63xzjFssLcNkkP7A6mi6riGq/9HKzXNVk6A=;
+        b=pO/LRHBpPeMIwnJsmpGalAjkSB0F8mCkLS3lTRTDP/tP3AnPq9x/5G0c5HvCpr4Dfa
+         snD+eHsXQN8Gc7H6Ld7gRPAFCRDgDZe5S3QV66ByMog3t2RZMAoGwdhfCMC7xhEZ9kQf
+         hoj2uUe8TdAsAmPLf4LVm3gB8b21zK65BZi8nYPcAKP3rZNXXskNlU6sUnnY+qubZDmD
+         ucCIU5otYHRxFE823m3Va0GAhsDtaP52B4nvJ+FDvwIT2ZLbl+ongN4slObksPzlJDxE
+         wMsEMBYhSzlfU9QMSL8KhkvAK10qSjXzydJ57lR6uGv9gEyzPj8nol4f+3fk0oPOg906
+         Z9HA==
+X-Gm-Message-State: AOAM533x1R09tWOso+0Mu2XuHx6xRwc0yTlm2LzqDGhKHBBVjWaCN5XL
+        0gf+qNeAEW0c1SVnLqxNmjG9kQ==
+X-Google-Smtp-Source: ABdhPJysmU+4T6LyJRwuT+O5zxMdfqgXZAfHCgL3iAoHnEl4RCd+O61QSobdgHOsiO9AZQ/QJ9q/yw==
+X-Received: by 2002:a17:90b:370a:: with SMTP id mg10mr28773364pjb.219.1620665791522;
+        Mon, 10 May 2021 09:56:31 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id k69sm11859203pgc.45.2021.05.10.09.50.26
+        by smtp.gmail.com with ESMTPSA id d18sm11877725pgo.66.2021.05.10.09.56.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 May 2021 09:50:26 -0700 (PDT)
-Date:   Mon, 10 May 2021 16:50:23 +0000
+        Mon, 10 May 2021 09:56:31 -0700 (PDT)
+Date:   Mon, 10 May 2021 16:56:27 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+Cc:     Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
         Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH 14/15] KVM: x86: Tie Intel and AMD behavior for
- MSR_TSC_AUX to guest CPU model
-Message-ID: <YJlkT0kJ241gYgVw@google.com>
+Subject: Re: [PATCH 03/15] KVM: SVM: Inject #UD on RDTSCP when it should be
+ disabled in the guest
+Message-ID: <YJlluzMze2IfUM6S@google.com>
 References: <20210504171734.1434054-1-seanjc@google.com>
- <20210504171734.1434054-15-seanjc@google.com>
- <7e75b44c0477a7fb87f83962e4ea2ed7337c37e5.camel@redhat.com>
+ <20210504171734.1434054-4-seanjc@google.com>
+ <CALMp9eSvXRJm-KxCGKOkgPO=4wJPBi5wDFLbCCX91UtvGJ1qBg@mail.gmail.com>
+ <YJHCadSIQ/cK/RAw@google.com>
+ <1b50b090-2d6d-e13d-9532-e7195ebffe14@redhat.com>
+ <CALMp9eSSiPVWDf43Zed3+ukUc+NwMP8z7feoxX0eMmimvrznzA@mail.gmail.com>
+ <4a4b9fea4937da7b0b42e6f3179566d73bf022e2.camel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7e75b44c0477a7fb87f83962e4ea2ed7337c37e5.camel@redhat.com>
+In-Reply-To: <4a4b9fea4937da7b0b42e6f3179566d73bf022e2.camel@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, May 10, 2021, Maxim Levitsky wrote:
-> On Tue, 2021-05-04 at 10:17 -0700, Sean Christopherson wrote:
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index de921935e8de..6c7c6a303cc5 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -2663,12 +2663,6 @@ static int svm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> >  			msr_info->data |= (u64)svm->sysenter_esp_hi << 32;
-> >  		break;
-> >  	case MSR_TSC_AUX:
-> > -		if (tsc_aux_uret_slot < 0)
-> > -			return 1;
-> > -		if (!msr_info->host_initiated &&
-> Not related to this patch, but I do wonder why do we need
-> to always allow writing this msr if done by the host,
-> since if neither RDTSPC nor RDPID are supported, the guest
-> won't be able to read this msr at all.
+> On Tue, 2021-05-04 at 14:58 -0700, Jim Mattson wrote:
+> > On Tue, May 4, 2021 at 2:57 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > > On 04/05/21 23:53, Sean Christopherson wrote:
+> > > > > Does the right thing happen here if the vCPU is in guest mode when
+> > > > > userspace decides to toggle the CPUID.80000001H:EDX.RDTSCP bit on or
+> > > > > off?
+> > > > I hate our terminology.  By "guest mode", do you mean running the vCPU, or do
+> > > > you specifically mean running in L2?
+> > > > 
+> > > 
+> > > Guest mode should mean L2.
+> > > 
+> > > (I wonder if we should have a capability that says "KVM_SET_CPUID2 can
+> > > only be called prior to KVM_RUN").
+> > 
+> > It would certainly make it easier to reason about potential security issues.
+> > 
+> I vote too for this.
 
-It's an ordering thing and not specific to MSR_TSC_AUX.  Exempting host userspace
-from guest CPUID checks allows userspace to set MSR state, e.g. during migration,
-before setting the guest CPUID model.
+Alternatively, what about adding KVM_VCPU_RESET to let userspace explicitly
+pull RESET#, and defining that ioctl() to freeze the vCPU model?  I.e. after
+userspace resets the vCPU, KVM_SET_CPUID (and any other relevant ioctls() is
+disallowed.
 
-> > -		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP) &&
-> > -		    !guest_cpuid_has(vcpu, X86_FEATURE_RDPID))
-> > -			return 1;
-> >  		msr_info->data = svm->tsc_aux;
-> >  		break;
-> >  	/*
+Lack of proper RESET emulation is annoying, e.g. userspace has to manually stuff
+EDX after vCPU creation to get the right value at RESET.  A dedicated ioctl()
+would kill two birds with one stone, without having to add yet another "2"
+ioctl().
