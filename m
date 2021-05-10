@@ -2,58 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C4A73793C3
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 18:29:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E3833793EE
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 18:34:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231383AbhEJQad (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 12:30:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34330 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230300AbhEJQaa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 12:30:30 -0400
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3D6DC06175F
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 09:29:25 -0700 (PDT)
-Received: by mail-il1-x12d.google.com with SMTP id z1so6722098ils.0
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 09:29:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=BkfDg/7imdX1kS2mno+cgyMshYAEJnF0DUnywtzmZC8=;
-        b=Rg5r5I5Swy6LR6oGgCyRRNQ8y01tbtyWS/ZLufuZK3tbzxJ5wWzlX2/SwDmdH/ccVi
-         cVw5pHQVsCbYHSzxZeYs5uwqUqsRigm4/cOYPKBqY3h79/HBz3EWLs8VfZzEn+ThByUG
-         2P/3HC8SuxBXiLHgYddPZBxwX9EddzBn+qSV/pgFqHETLruZBLbPsTy5kQBoHz/6CzcV
-         cJ7YJuAYXBgkzPLIG3tJtErmtxYZgPjhRtPmpZYiuPqstGAFVoNvFF691USD7hx8lOAG
-         GHkJd5UtmKqKHvUjsd2aQbUQAA2/pYnW4I95ex+21j0gzA59fpwYUqoK/qR5FXoxxVSm
-         rRhw==
+        id S231721AbhEJQfD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 12:35:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41767 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231374AbhEJQeu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 12:34:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620664423;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qdODaN2OuNSEexqz+L9Iw9HnmwvY9206zRfzY1Y1re8=;
+        b=AI9BgH5wyf3tsACpy3zqeramlkUIHZt/0Zxw2BPQ7WFNwDonEWsk3nAVhadh33UzCyDLa7
+        VJj1ApOruUw5vEwbKJrTfPLuFWYFbAv3fr0vWysu7utE4ixzwFSvDdk/+PcBlbD//oDO6n
+        nCJIzGCilCEkORRo/BsUWxzc9godpmU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-EzsrWthDNNeypU6ztMBzNg-1; Mon, 10 May 2021 12:33:41 -0400
+X-MC-Unique: EzsrWthDNNeypU6ztMBzNg-1
+Received: by mail-wr1-f71.google.com with SMTP id a12-20020a5d6cac0000b0290109c3c8d66fso7711128wra.15
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 09:33:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=BkfDg/7imdX1kS2mno+cgyMshYAEJnF0DUnywtzmZC8=;
-        b=jrYneULKhpGLHB1I4yEHymss7vqy3iHMs0/tGnUb0MO4YvWnWMw586Q82yEgTVgqsV
-         drXQyaZ+wx0veczx8t2wGKNvfpXPenccu9IWgINXlcKqJBi7ed8BQQEc9FBHe+2q3E85
-         N8SW2nxy65NABV4UfP5adGhZK03R2ke7Hj2xZGS+sDzcQwXMY6VHhs6yTUxacUe2QT5X
-         Yy75eNWpPbvy7MnLPhyUk5rGLClKAHt455Z4AdqZmrabPJI12CI5tE3wC0fQBtx1dyLx
-         i1ARdRq10F9h0kZ3tBVdq+i621C60tX4yJn2c2lZbVoFbVroOMi1dQnKroUV4uOGc0lY
-         6hfw==
-X-Gm-Message-State: AOAM531Qtif2CXEIeMuk6kleRNzIpr6gTCRXN6ssnSe4eXStMgEoJmHK
-        MNPXaNnf4r6GgOII2najcNHLmnYvKZ5jtNfTFJ89QQ==
-X-Google-Smtp-Source: ABdhPJwiyFQV/afbXqOHGcblLT+JVG4Ot3xt71Vs8QQ375y0uMrhlKjEDTu+WwL6DR5Axajl25WCuoagaF2xqeMIeAk=
-X-Received: by 2002:a05:6e02:96d:: with SMTP id q13mr9155411ilt.285.1620664165138;
- Mon, 10 May 2021 09:29:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210506184241.618958-1-bgardon@google.com> <20210506184241.618958-3-bgardon@google.com>
- <97d085a0-185d-2546-f32e-ea1c55579ba0@redhat.com>
-In-Reply-To: <97d085a0-185d-2546-f32e-ea1c55579ba0@redhat.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 10 May 2021 09:29:14 -0700
-Message-ID: <CANgfPd9GMZgfHxkgGxERrqLwP2aHYMK_yxyrDjCfjao3fvf7oQ@mail.gmail.com>
-Subject: Re: [PATCH v3 2/8] KVM: x86/mmu: Factor out allocating memslot rmap
-To:     David Hildenbrand <david@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=qdODaN2OuNSEexqz+L9Iw9HnmwvY9206zRfzY1Y1re8=;
+        b=UrjUOZDPFNEWQq6DJq6OF83tn+IVWtIpuhBVtnjL9QXOvHS5shnu9LVKZeBJ+oxI7C
+         RB+BNzwh6OGzEv689/XvYvZZzsGtn9WLS+enTwWWe7+H7rPh0nIUVx+bxQbwLQ2Q96tq
+         fzIHZT24kzP5jphwq4fw7tJp/BeRn10EfZba5SJVgCOeSC62nCe6gX3bdH2419nqoEb3
+         KLGOfIz3+wLy3hIvyUjzhqwZM73o44xmHzuSp76MIYKDPQyb8TccagMXN7zgtueGQCDg
+         EHmByRymzhetN3tlWBeXR8K7J6WmBbwuM/ih0cqrm5uWaOEAVZtDAnjo6O8n854/EdSy
+         bdUg==
+X-Gm-Message-State: AOAM533yNIxW4a79BtNq7dxfrC/8+RreDSCJeZ7GOrwygiRoY5gTm3mF
+        2Ov9l57mhjkSDpKMy7zhAG8qUu3gg/yADZq/exRLvZ0F6/tDMyrmKAn/wNnzv2G/9Xkbb1bwGzj
+        NQGFYUFf81Bg9
+X-Received: by 2002:a5d:4acd:: with SMTP id y13mr31236158wrs.185.1620664420466;
+        Mon, 10 May 2021 09:33:40 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzEuMcVvwepkIW8kBENdv7Ek4C4HWRYfJRgWlPpdHVtYoJM2zVP457NBhPvPMR/41vsF70XQA==
+X-Received: by 2002:a5d:4acd:: with SMTP id y13mr31236133wrs.185.1620664420237;
+        Mon, 10 May 2021 09:33:40 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id c15sm2310454wml.38.2021.05.10.09.33.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 May 2021 09:33:39 -0700 (PDT)
+Subject: Re: [PATCH v3 5/8] KVM: x86/mmu: Add a field to control memslot rmap
+ allocation
+To:     Ben Gardon <bgardon@google.com>
 Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
         Peter Xu <peterx@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Peter Shier <pshier@google.com>,
@@ -62,109 +63,35 @@ Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
         Kai Huang <kai.huang@intel.com>,
         Keqian Zhu <zhukeqian1@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20210506184241.618958-1-bgardon@google.com>
+ <20210506184241.618958-6-bgardon@google.com>
+ <CANgfPd-eJsHRYARTa0tm4EUVQyXvdQxGQfGfj=qLi5vkLTG6pw@mail.gmail.com>
+ <a12eaa7e-f422-d8f4-e024-492aa038a398@redhat.com>
+ <CANgfPd8BNtsSwujZnk9GAfP8Xmjy7B3yHdTOnh45wbmNU_yOQw@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <03e66630-b967-b91c-b74e-6944bdcaf2d7@redhat.com>
+Date:   Mon, 10 May 2021 18:33:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
+MIME-Version: 1.0
+In-Reply-To: <CANgfPd8BNtsSwujZnk9GAfP8Xmjy7B3yHdTOnh45wbmNU_yOQw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 7, 2021 at 12:47 AM David Hildenbrand <david@redhat.com> wrote:
->
-> On 06.05.21 20:42, Ben Gardon wrote:
-> > Small refactor to facilitate allocating rmaps for all memslots at once.
-> >
-> > No functional change expected.
-> >
-> > Signed-off-by: Ben Gardon <bgardon@google.com>
-> > ---
-> >   arch/x86/kvm/x86.c | 41 ++++++++++++++++++++++++++++++++---------
-> >   1 file changed, 32 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 5bcf07465c47..fc32a7dbe4c4 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -10842,10 +10842,37 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
-> >       kvm_page_track_free_memslot(slot);
-> >   }
-> >
-> > +static int alloc_memslot_rmap(struct kvm_memory_slot *slot,
-> > +                           unsigned long npages)
->
-> I'd have called the functions memslot_rmap_alloc() and memslot_rmap_free()
->
->
-> > +{
-> > +     int i;
-> > +
-> > +     for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
-> > +             int lpages;
-> > +             int level = i + 1;
-> > +
-> > +             lpages = gfn_to_index(slot->base_gfn + npages - 1,
-> > +                                   slot->base_gfn, level) + 1;
-> > +
-> > +             slot->arch.rmap[i] =
-> > +                     kvcalloc(lpages, sizeof(*slot->arch.rmap[i]),
-> > +                              GFP_KERNEL_ACCOUNT);
-> > +             if (!slot->arch.rmap[i])
-> > +                     goto out_free;
->
-> you can just avoid the goto here and do the free_memslot_rmap() right away.
+On 10/05/21 18:14, Ben Gardon wrote:
+>> Possibly stupid (or at least lazy) question: why can't it be a "normal"
+>> static inline function?
+> That was my initial approach (hence the leftover inline) but I got
+> some warnings about a forward declaration of struct kvm because
+> arch/x86/include/asm/kvm_host.h doesn't include virt/kvm/kvm_host.h.
+> Maybe there's a way to fix that, but I didn't want to mess with it.
+> 
 
-Oh good catch. I'll incorporate your suggestions in v4.
+Let's just use the field directly.
 
->
-> > +     }
-> > +
-> > +     return 0;
-> > +
-> > +out_free:
-> > +     free_memslot_rmap(slot);
-> > +     return -ENOMEM;
-> > +}
-> > +
-> >   static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
-> >                                     unsigned long npages)
-> >   {
-> >       int i;
-> > +     int r;
-> >
-> >       /*
-> >        * Clear out the previous array pointers for the KVM_MR_MOVE case.  The
-> > @@ -10854,7 +10881,11 @@ static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
-> >        */
-> >       memset(&slot->arch, 0, sizeof(slot->arch));
-> >
-> > -     for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
-> > +     r = alloc_memslot_rmap(slot, npages);
-> > +     if (r)
-> > +             return r;
-> > +
-> > +     for (i = 1; i < KVM_NR_PAGE_SIZES; ++i) {
-> >               struct kvm_lpage_info *linfo;
-> >               unsigned long ugfn;
-> >               int lpages;
-> > @@ -10863,14 +10894,6 @@ static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
-> >               lpages = gfn_to_index(slot->base_gfn + npages - 1,
-> >                                     slot->base_gfn, level) + 1;
-> >
-> > -             slot->arch.rmap[i] =
-> > -                     kvcalloc(lpages, sizeof(*slot->arch.rmap[i]),
-> > -                              GFP_KERNEL_ACCOUNT);
-> > -             if (!slot->arch.rmap[i])
-> > -                     goto out_free;
-> > -             if (i == 0)
-> > -                     continue;
-> > -
-> >               linfo = kvcalloc(lpages, sizeof(*linfo), GFP_KERNEL_ACCOUNT);
-> >               if (!linfo)
-> >                       goto out_free;
-> >
->
-> apart from that LGTM
->
-> --
-> Thanks,
->
-> David / dhildenb
->
+Paolo
+
