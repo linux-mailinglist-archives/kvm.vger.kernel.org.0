@@ -2,113 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A82A3790D9
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 16:32:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E23B7379136
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 16:46:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236391AbhEJOdB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 10:33:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20598 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230152AbhEJOav (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 10:30:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620656985;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PVhwAQco9R41v3dWo8fAy6CH45dQj+RWz+P+aZRwNAE=;
-        b=dUzbL/mhDIGPFBVg4BM2UOwVElUybYUjbwQ9EAEni99wynQ75RepM891TdCHL1w5ThBIcB
-        BeHspRxFjbFhsKCwhD6zNybIHtPB2d+85hIjuYHMxANXocggRyjkgL766Z2YQvZz7OciWn
-        TPV8bb9Okax6DPFIxXkkQoeEj7kM09I=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-603-tsKbTQM8Mk6ml_QSrtDY9w-1; Mon, 10 May 2021 10:29:44 -0400
-X-MC-Unique: tsKbTQM8Mk6ml_QSrtDY9w-1
-Received: by mail-wm1-f71.google.com with SMTP id w21-20020a7bc1150000b029014a850581efso3566157wmi.6
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 07:29:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=PVhwAQco9R41v3dWo8fAy6CH45dQj+RWz+P+aZRwNAE=;
-        b=DO58bl/coUaIAfdttCRYm/ou1V1Pzsc/EQOJnRmZGj5XVIr3TZ5sYlzfOUzJmpputj
-         s+7tUhJd0d16bRoFylvnmco0xYaNOe+Z2+7crYmqhZ2CTDjLYD/klCDUEFvFfN4yBtTS
-         egwCxB8NFBAFGrOWNHWUXY8JLZjco0o738Qi0/OBmx3wMnR7Sgz2gJ5SL5dSOivT/SSv
-         4mbY5/y0QDN+6q7Y0fq035Xzart1xmwGNnXHfDM8yAECA15evmjHCiya6edoGKIX+wom
-         lrPoNJaoEgJ1CYp/KzlTBbu5wHJSdbFHJ6PG9nhoCrtY/MxykzeNNGrnG0r6rmcHeyyD
-         QA6w==
-X-Gm-Message-State: AOAM530IfnSBkfWdChPEf08tfFT1PSrflEfjkk13aXCYP/wjTRC7ufrX
-        HooxM86mf+yd1i1++6ORw8dhRZvrJaW23rgXzJO6d32XowURFzOx40oGRj8ALBoHJFdDaIyYlni
-        YOMT2xEuWrQFA
-X-Received: by 2002:adf:f3c1:: with SMTP id g1mr31915395wrp.242.1620656982882;
-        Mon, 10 May 2021 07:29:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz7qp62uiPj2YNFPbBBrBkzA+qnxLBcXElgNK1+YlCIqKhpmM2uMbsoAdz/OsjHjBtWRhUt6Q==
-X-Received: by 2002:adf:f3c1:: with SMTP id g1mr31915376wrp.242.1620656982739;
-        Mon, 10 May 2021 07:29:42 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id s18sm23509169wro.95.2021.05.10.07.29.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 May 2021 07:29:42 -0700 (PDT)
-To:     Jim Mattson <jmattson@google.com>, ilstam@mailbox.org
-Cc:     kvm list <kvm@vger.kernel.org>, ilstam@amazon.com,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Haozhong Zhang <haozhong.zhang@intel.com>, zamsden@gmail.com,
-        mtosatti@redhat.com, Denis Plotnikov <dplotnikov@virtuozzo.com>,
-        David Woodhouse <dwmw@amazon.co.uk>
+        id S239721AbhEJOrU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 10:47:20 -0400
+Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:42427 "EHLO
+        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238512AbhEJOpu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 10:45:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1620657887; x=1652193887;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-id:content-transfer-encoding:mime-version:subject;
+  bh=PAOdaCdiz6gOVFrpIte26pUTY2A3KFWfBGskpOSvbmc=;
+  b=cVpYfW+HZvgYSkse4TfLZcZt53j8UZODn2tkGGHzWqlc6DcSmvu8kh9R
+   ycWxLOfVKsWF0RVLCevNUl6xJM0WFLxf5+qa/KkMit92sRPCQBfVPygeD
+   olI9OA5Anjkr+1UoherZWWO6JHlUFrYGL8nmmpCsrjG4my94S5MOx12pF
+   s=;
+X-IronPort-AV: E=Sophos;i="5.82,287,1613433600"; 
+   d="scan'208";a="108342826"
+Subject: Re: [PATCH 4/8] KVM: VMX: Adjust the TSC-related VMCS fields on L2 entry and
+ exit
+Thread-Topic: [PATCH 4/8] KVM: VMX: Adjust the TSC-related VMCS fields on L2 entry and exit
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1e-42f764a0.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP; 10 May 2021 14:44:38 +0000
+Received: from EX13MTAUEB002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+        by email-inbound-relay-1e-42f764a0.us-east-1.amazon.com (Postfix) with ESMTPS id 17C26C13B0;
+        Mon, 10 May 2021 14:44:33 +0000 (UTC)
+Received: from EX13D08UEB002.ant.amazon.com (10.43.60.107) by
+ EX13MTAUEB002.ant.amazon.com (10.43.60.12) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 10 May 2021 14:44:29 +0000
+Received: from EX13D18EUA001.ant.amazon.com (10.43.165.58) by
+ EX13D08UEB002.ant.amazon.com (10.43.60.107) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 10 May 2021 14:44:29 +0000
+Received: from EX13D18EUA001.ant.amazon.com ([10.43.165.58]) by
+ EX13D18EUA001.ant.amazon.com ([10.43.165.58]) with mapi id 15.00.1497.015;
+ Mon, 10 May 2021 14:44:28 +0000
+From:   "Stamatis, Ilias" <ilstam@amazon.com>
+To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "ilstam@mailbox.org" <ilstam@mailbox.org>
+CC:     "jmattson@google.com" <jmattson@google.com>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "haozhong.zhang@intel.com" <haozhong.zhang@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "zamsden@gmail.com" <zamsden@gmail.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "dplotnikov@virtuozzo.com" <dplotnikov@virtuozzo.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>
+Thread-Index: AQHXQmOfxameJSAMYEqrMNVyHN/WrarcwvkAgAAOM4A=
+Date:   Mon, 10 May 2021 14:44:28 +0000
+Message-ID: <3a636a78f08d7ba725a77ff659c7df7e5bb5dfc7.camel@amazon.com>
 References: <20210506103228.67864-1-ilstam@mailbox.org>
- <CALMp9eSNHf=vmqeer+ZkRa3NhJoLMbEO+OZJaG9qf+2+TQ2grA@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 0/8] KVM: VMX: Implement nested TSC scaling
-Message-ID: <bdfb8be8-7584-c60b-635e-3595fe481a60@redhat.com>
-Date:   Mon, 10 May 2021 16:29:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
-MIME-Version: 1.0
-In-Reply-To: <CALMp9eSNHf=vmqeer+ZkRa3NhJoLMbEO+OZJaG9qf+2+TQ2grA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+         <20210506103228.67864-5-ilstam@mailbox.org>
+         <4bb959a084e7acc4043f683888b9660f1a4a3fd7.camel@redhat.com>
+In-Reply-To: <4bb959a084e7acc4043f683888b9660f1a4a3fd7.camel@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.165.104]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <61076699EF44F64F9B4CA2B4DEC7DFC8@amazon.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/05/21 19:16, Jim Mattson wrote:
-> On Thu, May 6, 2021 at 3:34 AM <ilstam@mailbox.org> wrote:
->>
->> From: Ilias Stamatis <ilstam@amazon.com>
->>
->> KVM currently supports hardware-assisted TSC scaling but only for L1 and it
->> doesn't expose the feature to nested guests. This patch series adds support for
->> nested TSC scaling and allows both L1 and L2 to be scaled with different
->> scaling factors.
->>
->> When scaling and offsetting is applied, the TSC for the guest is calculated as:
->>
->> (TSC * multiplier >> 48) + offset
->>
->> With nested scaling the values in VMCS01 and VMCS12 need to be merged
->> together and stored in VMCS02.
->>
->> The VMCS02 values are calculated as follows:
->>
->> offset_02 = ((offset_01 * mult_12) >> 48) + offset_12
->> mult_02 = (mult_01 * mult_12) >> 48
->>
->> The last patch of the series adds a KVM selftest.
-> 
-> Will you be doing the same for SVM? The last time I tried to add a
-> nested virtualization feature for Intel only, Paolo rapped my knuckles
-> with a ruler.
-
-For bugfixes definitely, for features it is definitely nice.
-
-And these days we even have similar-enough code between nVMX and nSVM 
-code, that in many cases there's really no good excuse not to do it.
-
-Paolo
-
+T24gTW9uLCAyMDIxLTA1LTEwIGF0IDE2OjUzICswMzAwLCBNYXhpbSBMZXZpdHNreSB3cm90ZToN
+Cj4gT24gVGh1LCAyMDIxLTA1LTA2IGF0IDEwOjMyICswMDAwLCBpbHN0YW1AbWFpbGJveC5vcmcg
+d3JvdGU6DQo+ID4gRnJvbTogSWxpYXMgU3RhbWF0aXMgPGlsc3RhbUBhbWF6b24uY29tPg0KPiA+
+IA0KPiA+IFdoZW4gTDIgaXMgZW50ZXJlZCB3ZSBuZWVkIHRvICJtZXJnZSIgdGhlIFRTQyBtdWx0
+aXBsaWVyIGFuZCBUU0MNCj4gPiBvZmZzZXQNCj4gPiB2YWx1ZXMgb2YgVk1DUzAxIGFuZCBWTUNT
+MTIgYW5kIHN0b3JlIHRoZSByZXN1bHQgaW50byB0aGUgY3VycmVudA0KPiA+IFZNQ1MwMi4NCj4g
+PiANCj4gPiBUaGUgMDIgdmFsdWVzIGFyZSBjYWxjdWxhdGVkIHVzaW5nIHRoZSBmb2xsb3dpbmcg
+ZXF1YXRpb25zOg0KPiA+ICAgb2Zmc2V0XzAyID0gKChvZmZzZXRfMDEgKiBtdWx0XzEyKSA+PiA0
+OCkgKyBvZmZzZXRfMTINCj4gPiAgIG11bHRfMDIgPSAobXVsdF8wMSAqIG11bHRfMTIpID4+IDQ4
+DQo+IA0KPiBJIHdvdWxkIG1lbnRpb24gdGhhdCA0OCBpcyBrdm1fdHNjX3NjYWxpbmdfcmF0aW9f
+ZnJhY19iaXRzIGluc3RlYWQuDQo+IEFsc28gbWF5YmUgYWRkIHRoZSBjb21tb24gY29kZSBpbiBh
+IHNlcGFyYXRlIHBhdGNoPw0KDQpSaWdodCwgd2lsbCBkby4NCg0KPiANCj4gPiANCj4gPiBTaWdu
+ZWQtb2ZmLWJ5OiBJbGlhcyBTdGFtYXRpcyA8aWxzdGFtQGFtYXpvbi5jb20+DQo+ID4gLS0tDQo+
+ID4gIGFyY2gveDg2L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggfCAgMSArDQo+ID4gIGFyY2gveDg2
+L2t2bS92bXgvbmVzdGVkLmMgICAgICAgfCAyNiArKysrKysrKysrKysrKysrKysrKysrLS0tLQ0K
+PiA+ICBhcmNoL3g4Ni9rdm0veDg2LmMgICAgICAgICAgICAgIHwgMjUgKysrKysrKysrKysrKysr
+KysrKysrKysrKw0KPiA+ICAzIGZpbGVzIGNoYW5nZWQsIDQ4IGluc2VydGlvbnMoKyksIDQgZGVs
+ZXRpb25zKC0pDQo+ID4gDQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2luY2x1ZGUvYXNtL2t2
+bV9ob3N0LmgNCj4gPiBiL2FyY2gveDg2L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgNCj4gPiBpbmRl
+eCBjZGRkYmYwYjExNzcuLmU3YTFlYjM2Zjk1YSAxMDA2NDQNCj4gPiAtLS0gYS9hcmNoL3g4Ni9p
+bmNsdWRlL2FzbS9rdm1faG9zdC5oDQo+ID4gKysrIGIvYXJjaC94ODYvaW5jbHVkZS9hc20va3Zt
+X2hvc3QuaA0KPiA+IEBAIC0xNzgwLDYgKzE3ODAsNyBAQCB2b2lkIGt2bV9kZWZpbmVfdXNlcl9y
+ZXR1cm5fbXNyKHVuc2lnbmVkDQo+ID4gaW5kZXgsIHUzMiBtc3IpOw0KPiA+ICBpbnQga3ZtX3Nl
+dF91c2VyX3JldHVybl9tc3IodW5zaWduZWQgaW5kZXgsIHU2NCB2YWwsIHU2NCBtYXNrKTsNCj4g
+PiANCj4gPiAgdTY0IGt2bV9zY2FsZV90c2Moc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1NjQgdHNj
+LCBib29sIGwxKTsNCj4gPiArdTY0IGt2bV9jb21wdXRlXzAyX3RzY19vZmZzZXQodTY0IGwxX29m
+ZnNldCwgdTY0IGwyX211bHRpcGxpZXIsIHU2NA0KPiA+IGwyX29mZnNldCk7DQo+ID4gIHU2NCBr
+dm1fcmVhZF9sMV90c2Moc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1NjQgaG9zdF90c2MpOw0KPiA+
+IA0KPiA+ICB1bnNpZ25lZCBsb25nIGt2bV9nZXRfbGluZWFyX3JpcChzdHJ1Y3Qga3ZtX3ZjcHUg
+KnZjcHUpOw0KPiA+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0vdm14L25lc3RlZC5jIGIvYXJj
+aC94ODYva3ZtL3ZteC9uZXN0ZWQuYw0KPiA+IGluZGV4IGJjZWQ3NjYzNzgyMy4uYTFiZjI4ZjMz
+ODM3IDEwMDY0NA0KPiA+IC0tLSBhL2FyY2gveDg2L2t2bS92bXgvbmVzdGVkLmMNCj4gPiArKysg
+Yi9hcmNoL3g4Ni9rdm0vdm14L25lc3RlZC5jDQo+ID4gQEAgLTMzNTMsOCArMzM1MywyMiBAQCBl
+bnVtIG52bXhfdm1lbnRyeV9zdGF0dXMNCj4gPiBuZXN0ZWRfdm14X2VudGVyX25vbl9yb290X21v
+ZGUoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LA0KPiA+ICAgICAgIH0NCj4gPiANCj4gPiAgICAgICBl
+bnRlcl9ndWVzdF9tb2RlKHZjcHUpOw0KPiA+IC0gICAgIGlmICh2bWNzMTItPmNwdV9iYXNlZF92
+bV9leGVjX2NvbnRyb2wgJg0KPiA+IENQVV9CQVNFRF9VU0VfVFNDX09GRlNFVFRJTkcpDQo+ID4g
+LSAgICAgICAgICAgICB2Y3B1LT5hcmNoLnRzY19vZmZzZXQgKz0gdm1jczEyLT50c2Nfb2Zmc2V0
+Ow0KPiA+ICsNCj4gPiArICAgICBpZiAodm1jczEyLT5jcHVfYmFzZWRfdm1fZXhlY19jb250cm9s
+ICYNCj4gPiBDUFVfQkFTRURfVVNFX1RTQ19PRkZTRVRUSU5HKSB7DQo+ID4gKyAgICAgICAgICAg
+ICBpZiAodm1jczEyLT5zZWNvbmRhcnlfdm1fZXhlY19jb250cm9sICYNCj4gPiBTRUNPTkRBUllf
+RVhFQ19UU0NfU0NBTElORykgew0KPiA+ICsgICAgICAgICAgICAgICAgICAgICB2Y3B1LT5hcmNo
+LnRzY19vZmZzZXQgPQ0KPiA+IGt2bV9jb21wdXRlXzAyX3RzY19vZmZzZXQoDQo+ID4gKyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2Y3B1LT5hcmNoLmwxX3RzY19vZmZzZXQs
+DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2bWNzMTItPnRzY19t
+dWx0aXBsaWVyLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdm1j
+czEyLT50c2Nfb2Zmc2V0KTsNCj4gPiArDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgIHZjcHUt
+PmFyY2gudHNjX3NjYWxpbmdfcmF0aW8gPQ0KPiA+IG11bF91NjRfdTY0X3NocigNCj4gPiArICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHZjcHUtPmFyY2gudHNjX3NjYWxpbmdf
+cmF0aW8sDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2bWNzMTIt
+PnRzY19tdWx0aXBsaWVyLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAga3ZtX3RzY19zY2FsaW5nX3JhdGlvX2ZyYWNfYml0DQo+ID4gcyk7DQo+ID4gKyAgICAgICAg
+ICAgICB9IGVsc2Ugew0KPiA+ICsgICAgICAgICAgICAgICAgICAgICB2Y3B1LT5hcmNoLnRzY19v
+ZmZzZXQgKz0gdm1jczEyLT50c2Nfb2Zmc2V0Ow0KPiA+ICsgICAgICAgICAgICAgfQ0KPiA+ICsg
+ICAgIH0NCj4gPiANCj4gPiAgICAgICBpZiAocHJlcGFyZV92bWNzMDIodmNwdSwgdm1jczEyLCAm
+ZW50cnlfZmFpbHVyZV9jb2RlKSkgew0KPiA+ICAgICAgICAgICAgICAgZXhpdF9yZWFzb24uYmFz
+aWMgPSBFWElUX1JFQVNPTl9JTlZBTElEX1NUQVRFOw0KPiA+IEBAIC00NDU0LDggKzQ0NjgsMTIg
+QEAgdm9pZCBuZXN0ZWRfdm14X3ZtZXhpdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsDQo+ID4gdTMy
+IHZtX2V4aXRfcmVhc29uLA0KPiA+ICAgICAgIGlmIChuZXN0ZWRfY3B1X2hhc19wcmVlbXB0aW9u
+X3RpbWVyKHZtY3MxMikpDQo+ID4gICAgICAgICAgICAgICBocnRpbWVyX2NhbmNlbCgmdG9fdm14
+KHZjcHUpLQ0KPiA+ID5uZXN0ZWQucHJlZW1wdGlvbl90aW1lcik7DQo+ID4gDQo+ID4gLSAgICAg
+aWYgKHZtY3MxMi0+Y3B1X2Jhc2VkX3ZtX2V4ZWNfY29udHJvbCAmDQo+ID4gQ1BVX0JBU0VEX1VT
+RV9UU0NfT0ZGU0VUVElORykNCj4gPiAtICAgICAgICAgICAgIHZjcHUtPmFyY2gudHNjX29mZnNl
+dCAtPSB2bWNzMTItPnRzY19vZmZzZXQ7DQo+ID4gKyAgICAgaWYgKHZtY3MxMi0+Y3B1X2Jhc2Vk
+X3ZtX2V4ZWNfY29udHJvbCAmDQo+ID4gQ1BVX0JBU0VEX1VTRV9UU0NfT0ZGU0VUVElORykgew0K
+PiA+ICsgICAgICAgICAgICAgdmNwdS0+YXJjaC50c2Nfb2Zmc2V0ID0gdmNwdS0+YXJjaC5sMV90
+c2Nfb2Zmc2V0Ow0KPiA+ICsNCj4gPiArICAgICAgICAgICAgIGlmICh2bWNzMTItPnNlY29uZGFy
+eV92bV9leGVjX2NvbnRyb2wgJg0KPiA+IFNFQ09OREFSWV9FWEVDX1RTQ19TQ0FMSU5HKQ0KPiA+
+ICsgICAgICAgICAgICAgICAgICAgICB2Y3B1LT5hcmNoLnRzY19zY2FsaW5nX3JhdGlvID0gdmNw
+dS0NCj4gPiA+YXJjaC5sMV90c2Nfc2NhbGluZ19yYXRpbzsNCj4gPiArICAgICB9DQo+ID4gDQo+
+ID4gICAgICAgaWYgKGxpa2VseSghdm14LT5mYWlsKSkgew0KPiA+ICAgICAgICAgICAgICAgc3lu
+Y192bWNzMDJfdG9fdm1jczEyKHZjcHUsIHZtY3MxMik7DQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gv
+eDg2L2t2bS94ODYuYyBiL2FyY2gveDg2L2t2bS94ODYuYw0KPiA+IGluZGV4IDI2YTRjMGY0NmYx
+NS4uODdkZWIxMTljNTIxIDEwMDY0NA0KPiA+IC0tLSBhL2FyY2gveDg2L2t2bS94ODYuYw0KPiA+
+ICsrKyBiL2FyY2gveDg2L2t2bS94ODYuYw0KPiA+IEBAIC0yMjY2LDYgKzIyNjYsMzEgQEAgc3Rh
+dGljIHU2NCBrdm1fY29tcHV0ZV90c2Nfb2Zmc2V0KHN0cnVjdA0KPiA+IGt2bV92Y3B1ICp2Y3B1
+LCB1NjQgdGFyZ2V0X3RzYykNCj4gPiAgICAgICByZXR1cm4gdGFyZ2V0X3RzYyAtIHRzYzsNCj4g
+PiAgfQ0KPiA+IA0KPiA+ICsvKg0KPiA+ICsgKiBUaGlzIGZ1bmN0aW9uIGNvbXB1dGVzIHRoZSBU
+U0Mgb2Zmc2V0IHRoYXQgaXMgc3RvcmVkIGluIFZNQ1MwMg0KPiA+IHdoZW4gZW50ZXJpbmcNCj4g
+PiArICogTDIgYnkgY29tYmluaW5nIHRoZSBvZmZzZXQgYW5kIG11bHRpcGxpZXIgdmFsdWVzIG9m
+IFZNQ1MwMSBhbmQNCj4gPiBWTUNTMTIuDQo+ID4gKyAqLw0KPiA+ICt1NjQga3ZtX2NvbXB1dGVf
+MDJfdHNjX29mZnNldCh1NjQgbDFfb2Zmc2V0LCB1NjQgbDJfbXVsdGlwbGllciwgdTY0DQo+ID4g
+bDJfb2Zmc2V0KQ0KPiA+ICt7DQo+ID4gKyAgICAgdTY0IG9mZnNldDsNCj4gPiArDQo+ID4gKyAg
+ICAgLyoNCj4gPiArICAgICAgKiBUaGUgTDEgb2Zmc2V0IGlzIGludGVycHJldGVkIGFzIGEgc2ln
+bmVkIG51bWJlciBieSB0aGUgQ1BVDQo+ID4gYW5kIGNhbg0KPiA+ICsgICAgICAqIGJlIG5lZ2F0
+aXZlLiBTbyB3ZSBleHRyYWN0IHRoZSBzaWduIGJlZm9yZSB0aGUNCj4gPiBtdWx0aXBsaWNhdGlv
+biBhbmQNCj4gPiArICAgICAgKiBwdXQgaXQgYmFjayBhZnRlcndhcmRzIGlmIG5lZWRlZC4NCj4g
+DQo+IElmIEkgdW5kZXJzdGFuZCBjb3JyZWN0bHkgdGhlIHJlYXNvbiBmb3Igc2lnbiBleHRyYWN0
+aW9uIGlzIHRoYXQgd2UNCj4gZG9uJ3QNCj4gaGF2ZSBtdWxfczY0X3U2NF9zaHIuIE1heWJlIHdl
+IHNob3VsZCBhZGQgaXQ/DQo+IA0KDQpJbml0aWFsbHkgSSBhZGRlZCBhIG11bF9zNjRfczY0X3No
+ciBhbmQgdXNlZCB0aGF0Lg0KDQpZb3UgY2FuIHRha2UgYSBsb29rDQpoZXJlOg0KDQpodHRwczov
+L2dpdGh1Yi5jb20vaWxzdGFtL2xpbnV4L2NvbW1pdC83YmMwYjc1YmI3YjhkOWJjZWNmNDFlMmUx
+ZTE5MzY4ODBkM2I5M2QxDQoNCg0KSSBhZGRlZCBtdWxfczY0X3M2NF9zaHIgaW5zdGVhZCBvZiBt
+dWxfczY0X3U2NF9zaHIgdGhpbmtpbmcgdGhhdCBhKQ0KcGVyaGFwcyBpdCB3b3VsZCBiZSBtb3Jl
+IHVzZWZ1bCBhcyBhIGdlbmVyYWwtcHVycG9zZSBmdW5jdGlvbiBhbmQgYikNCmV2ZW4gdGhvdWdo
+IHRoZSBtdWx0aXBsaWVyIGlzIHVuc2lnbmVkIGluIHJlYWxpdHkgaXQncyBjYXBlZCBzbyBpdA0K
+c2hvdWxkIGJlIHNhZmUgdG8gY2FzdCBpdCB0byBzaWduZWQuDQoNCkJ1dCB0aGVuIEkgcmVhbGl6
+ZWQgdGhhdA0KbXVsX3U2NF91NjRfc2hyIHRoYXQgd2UgYWxyZWFkeSBoYXZlIGlzIGVub3VnaCBh
+bmQgSSBjYW4ganVzdCBzaW1wbHkgcmUtDQp1c2UgdGhhdC4NCg0KSG93IHdvdWxkIGEgbXVsX3M2
+NF91NjRfc2hyIGJlIGltcGxlbWVudGVkPw0KDQpJIHRoaW5rIGluIHRoZSBlbmQNCndlIG5lZWQg
+dG8gZGVjaWRlIGlmIHdlIHdhbnQgdG8gZG8gc2lnbmVkIG9yIHVuc2lnbmVkIG11bHRpcGxpY2F0
+aW9uLg0KQW5kIGRlcGVuZGluZyBvbiB0aGlzIHdlIG5lZWQgdG8gZG8gYSBzaWduZWQgb3IgdW5z
+aWduZWQgcmlnaHQgc2hpZnQNCmFjY29yZGluZ2x5Lg0KDQpTbyBpZiB3ZSBkaWQgaGF2ZSBhIG11
+bF9zNjRfdTY0X3NociB3b3VsZG4ndCBpdCBuZWVkIHRvIGNhc3QNCmVpdGhlciBvZiB0aGUgYXJn
+dW1lbnRzIGFuZCB0aGVuIHVzZSBtdWxfdTY0X3U2NCAob3IgbXVsX3M2NF9zNjQpIGJlaW5nDQpq
+dXN0IGEgd3JhcHBlciBlc3NlbnRpYWxseT8gSSBkb24ndCB0aGluayB0aGF0IHdlIGNhbiBndWFy
+YW50ZWUgdGhhdA0KY2FzdGluZyBlaXRoZXIgb2YgdGhlIGFyZ3VtZW50cyBpcyBhbHdheXMgc2Fm
+ZSBpZiB3ZSB3YW50IHRvIGFkdmVydGlzZQ0KdGhpcyBhcyBhIGdlbmVyYWwgcHVycG9zZSBmdW5j
+dGlvbi4NCg0KVGhhbmtzIGZvciB0aGUgcmV2aWV3cyENCg0KSWxpYXMNCg0KPiBUaGUgcGF0dGVy
+biBvZiAoQSAqIEIpID4+IHNoaWZ0IGFwcGVhcnMgbWFueSB0aW1lcyBpbiBUU0Mgc2NhbGluZy4N
+Cj4gDQo+IFNvIGluc3RlYWQgb2YgdGhpcyBmdW5jdGlvbiBtYXliZSBqdXN0IHVzZSBzb21ldGhp
+bmcgbGlrZSB0aGF0Pw0KPiANCj4gbWVyZ2VkX29mZnNldCA9IGwyX29mZnNldCArIG11bF9zNjRf
+dTY0X3NociAoKHM2NCkgbDFfb2Zmc2V0LA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBsMl9tdWx0aXBsaWVyLA0KPiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBrdm1fdHNjX3NjYWxpbmdfcmF0aW9fZnJhDQo+IGNfYml0
+cykNCj4gDQo+IE9yIGFub3RoZXIgaWRlYToNCj4gDQo+IEhvdyBhYm91dA0KPiANCj4gdTY0IF9f
+a3ZtX3NjYWxlX3RzY192YWx1ZSh1NjQgdmFsdWUsIHU2NCBtdWx0aXBsaWVyKSB7DQo+ICAgICAg
+ICAgcmV0dXJuIG11bF91NjRfdTY0X3Nocih2YWx1ZSwNCj4gICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIG11bHRpcGxpZXIsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBr
+dm1fdHNjX3NjYWxpbmdfcmF0aW9fZnJhY19iaXRzKTsNCj4gfQ0KPiANCj4gDQo+IGFuZA0KPiAN
+Cj4gczY0IF9fa3ZtX3NjYWxlX3RzY19vZmZzZXQodTY0IHZhbHVlLCB1NjQgbXVsdGlwbGllcikN
+Cj4gew0KPiAgICAgICAgIHJldHVybiBtdWxfczY0X3U2NF9zaHIoKHM2NCl2YWx1ZSwNCj4gICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIG11bHRpcGxpZXIsDQo+ICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBrdm1fdHNjX3NjYWxpbmdfcmF0aW9fZnJhY19iaXRzKTsNCj4gfQ0K
+PiANCj4gQW5kIHRoZW4gdXNlIHRoZW0gaW4gdGhlIGNvZGUuDQo+IA0KPiBPdmVyYWxsIHRob3Vn
+aCB0aGUgY29kZSAqbG9va3MqIGNvcnJlY3QgdG8gbWUNCj4gYnV0IEkgbWlnaHQgaGF2ZSBtaXNz
+ZWQgc29tZXRoaW5nLg0KPiANCj4gQmVzdCByZWdhcmRzLA0KPiAgICAgICAgIE1heGltIExldml0
+c2t5DQo+IA0KPiANCj4gPiArICAgICAgKi8NCj4gPiArICAgICBvZmZzZXQgPSBtdWxfdTY0X3U2
+NF9zaHIoYWJzKChzNjQpIGwxX29mZnNldCksDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIGwyX211bHRpcGxpZXIsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IGt2bV90c2Nfc2NhbGluZ19yYXRpb19mcmFjX2JpdHMpOw0KPiA+ICsNCj4gPiArICAgICBpZiAo
+KHM2NCkgbDFfb2Zmc2V0IDwgMCkNCj4gPiArICAgICAgICAgICAgIG9mZnNldCA9IC0oKHM2NCkg
+b2Zmc2V0KTsNCj4gPiArDQo+ID4gKyAgICAgb2Zmc2V0ICs9IGwyX29mZnNldDsNCj4gPiArICAg
+ICByZXR1cm4gb2Zmc2V0Ow0KPiA+ICt9DQo+ID4gK0VYUE9SVF9TWU1CT0xfR1BMKGt2bV9jb21w
+dXRlXzAyX3RzY19vZmZzZXQpOw0KPiA+ICsNCj4gPiAgdTY0IGt2bV9yZWFkX2wxX3RzYyhzdHJ1
+Y3Qga3ZtX3ZjcHUgKnZjcHUsIHU2NCBob3N0X3RzYykNCj4gPiAgew0KPiA+ICAgICAgIHJldHVy
+biB2Y3B1LT5hcmNoLmwxX3RzY19vZmZzZXQgKyBrdm1fc2NhbGVfdHNjKHZjcHUsDQo+ID4gaG9z
+dF90c2MsIHRydWUpOw0KPiANCj4gDQo=
