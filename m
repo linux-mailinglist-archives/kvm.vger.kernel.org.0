@@ -2,124 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 368A7377C76
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 08:41:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 740EC377C8A
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 08:54:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230023AbhEJGl7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 02:41:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36440 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229608AbhEJGl6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 02:41:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620628854;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AhkvvC0oMUJmsEQCW6Q1nd0/KwtGO4qGTTgVWNfA7vM=;
-        b=Igt4ggngxHsZbauKxw5vh7cAinzcxm62D2vZwqr0uoIV54LBWzrgjWXnP9rv6NudvYw7rA
-        rfLi1+waPi4eMP3iUPXcjbgW+cBKYBHFTW+98aJpMNRSkaZ/zcYFJOPBoZCRIyKDjHP1w3
-        u0fPJw0W9wbR/3vHxAbhIWULqT2o2Yo=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-39-zApqHrbcOoaGdNKUTcyOLg-1; Mon, 10 May 2021 02:40:52 -0400
-X-MC-Unique: zApqHrbcOoaGdNKUTcyOLg-1
-Received: by mail-ed1-f71.google.com with SMTP id i17-20020a50fc110000b0290387c230e257so8533462edr.0
-        for <kvm@vger.kernel.org>; Sun, 09 May 2021 23:40:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=AhkvvC0oMUJmsEQCW6Q1nd0/KwtGO4qGTTgVWNfA7vM=;
-        b=GhxPpYYYFxw0m12q9FE34dnvLd4r/CzXs3e89sBHxbMpGJbur2AyJOxKzYa1zFuYyD
-         qadvYksrZeCO0SaMwzjw0Sw3v9B6xjCHBeFgDdUGg1XSynKugNLNrGKGI1q6OJsCkmSV
-         2hhC2s0i2wxkKny4UEJDRpBbES2HHHRAoiEHEZdRus+zIXkeZr4YcXSsFuV3z8nKRalm
-         ROGjatiwiJoJN7HBdxRt7IELZroIAqyIJTfqdeIHlki7mk5Pf7foDLgy7gu81WPLTkvd
-         Jizm1+6tNbcaw7eaKSf2TsU9OhKnOk8nppQCrIZDyWH9QVbBD5/vVpwSAlG7BCs7LpBm
-         8sbQ==
-X-Gm-Message-State: AOAM5301Q/sEjLVgq348H4hXOlhENsa9txQKD2QmOF+9SrwXw8Z1aLSm
-        p8UnLDUyP2E0tggLqAZXDb0Ux21BZ8y88SOUFLGIXuLLDetT2Kea4S9SAhfrTO0LFlIeYzi3juV
-        0mNCrQEOYzVIypfwFRcfgBe+IrAvJmq9B+WQs+CkCRskKOiRPrGs/VcMXVW/Bo68=
-X-Received: by 2002:a05:6402:3585:: with SMTP id y5mr27515700edc.233.1620628851360;
-        Sun, 09 May 2021 23:40:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy79W7vGg+HWZl+58lL8SGrEdJrYPWGAcRD5CxRhKSms3qnClb4ZaME1e4VxVzhNQ90K2UDtw==
-X-Received: by 2002:a05:6402:3585:: with SMTP id y5mr27515677edc.233.1620628851164;
-        Sun, 09 May 2021 23:40:51 -0700 (PDT)
-Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id g11sm2970883edt.85.2021.05.09.23.40.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 May 2021 23:40:50 -0700 (PDT)
-Date:   Mon, 10 May 2021 08:40:48 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     maz@kernel.org, ricarkol@google.com, eric.auger@redhat.com,
-        alexandru.elisei@arm.com, pbonzini@redhat.com
-Subject: Re: [PATCH 4/6] KVM: arm64: selftests: get-reg-list: Provide config
- selection option
-Message-ID: <20210510064048.m7ezciiratbesqjj@gator>
-References: <20210507200416.198055-1-drjones@redhat.com>
- <20210507200416.198055-5-drjones@redhat.com>
+        id S230111AbhEJGzf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 02:55:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46334 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229863AbhEJGzf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 02:55:35 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AD49C061573
+        for <kvm@vger.kernel.org>; Sun,  9 May 2021 23:54:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=Sq4XHMDmRvg4zOADmLFRCjprd6ygyX6pUUVYUuxn5Bo=; b=WSSiM+vF8qQ8nLXBxMp64jItAj
+        C4spCPQr0Ol97iquceEOYE84KKmfSwI7TO7+9KBRnkPx8x48qRY9wU6GnbakAhMCKPkW3rG1ks0kR
+        0dcvxasARFw8YnlHQqgRsZxqc/J9rjA9ya6dJ3Uhv6KfcRwrB/iqBfbMkdmJH4Y1Oc1OBeDQNCbaP
+        qgEN76GRschT9ZriyDzP8TdF++5DeTN/jGQElvp6Gin3KRRcYpINUKqJlEQlRh6YI7lEi3iD67hGc
+        RgUvOowwKGpj/hh+hRbvDCdOgyvmQedtlXWjsJ/1367C2qXx68cJOPe1ilfdAocYoeOp67APqnmw5
+        SwgmcCtA==;
+Received: from [2001:4bb8:198:fbc8:e179:16d2:93d1:8e1] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lfznr-008Lnz-JD; Mon, 10 May 2021 06:54:08 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     David Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Will Deacon <will@kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        linux-arm-kernel@lists.infradead.org,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org
+Subject: more iommu dead code removal
+Date:   Mon, 10 May 2021 08:53:59 +0200
+Message-Id: <20210510065405.2334771-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210507200416.198055-5-drjones@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 07, 2021 at 10:04:14PM +0200, Andrew Jones wrote:
-> Add a new command line option that allows the user to select a specific
-> configuration, e.g. --config:sve will give the sve config. Also provide
-> help text and the --help/-h options.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  .../selftests/kvm/aarch64/get-reg-list.c      | 76 +++++++++++++++++--
->  1 file changed, 70 insertions(+), 6 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> index 68d3be86d490..f5e122b6b257 100644
-> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> @@ -38,6 +38,17 @@
->  #define reg_list_sve() (false)
->  #endif
->  
-> +enum {
-> +	VREGS,
-> +	SVE,
-> +};
-> +
-> +static char * const vcpu_config_names[] = {
-> +	[VREGS] = "vregs",
-> +	[SVE] = "sve",
-> +	NULL
-> +};
-> +
->  static struct kvm_reg_list *reg_list;
->  static __u64 *blessed_reg, blessed_n;
->  
-> @@ -502,34 +513,87 @@ static void run_test(struct vcpu_config *c)
->  	kvm_vm_free(vm);
->  }
->  
-> +static void help(void)
-> +{
-> +	char * const *n;
-> +
-> +	printf(
-> +	"\n"
-> +	"usage: get-reg-list [--config:<selection>[,<selection>...]] [--list] [--list-filtered] [--core-reg-fixup]\n\n"
-> +	" --config:<selection>[,<selection>...] Used to select a specific vcpu configuration for the test/listing\n"
+Hi all,
 
-I just realized I left this <selection>[,<selection>...] help text and
-some other kruft, like the vcpu_config_names[] array, from a different
-design I scrapped. That design, which used getsubopt(), was more
-complicated than it was worth.
+this is another series to remove dead code from the IOMMU subsystem,
+this time mostly about the hacky code to pass an iommu device in
+struct mdev_device and huge piles of support code.  All of this was
+merged two years ago and (fortunately) never got used.
 
-I'll send a v2 to get this cleaned up, but I'll wait a day or so first
-for more comments.
+Note that the mdev.h changes might have minor contextual conflicts
+with the pending work from Jason, but it is trivial to resolve.
 
-Thanks,
-drew
-
+Diffstat:
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |    2 
+ drivers/iommu/intel/iommu.c                 |  362 ----------------------------
+ drivers/iommu/intel/svm.c                   |    6 
+ drivers/iommu/iommu.c                       |   57 ----
+ drivers/vfio/vfio_iommu_type1.c             |  132 +---------
+ include/linux/intel-iommu.h                 |   11 
+ include/linux/iommu.h                       |   41 ---
+ include/linux/mdev.h                        |   20 -
+ 8 files changed, 31 insertions(+), 600 deletions(-)
