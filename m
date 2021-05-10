@@ -2,216 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E23B7379136
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 16:46:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A6733791A4
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 16:56:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239721AbhEJOrU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 10:47:20 -0400
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:42427 "EHLO
-        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238512AbhEJOpu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 10:45:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1620657887; x=1652193887;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-id:content-transfer-encoding:mime-version:subject;
-  bh=PAOdaCdiz6gOVFrpIte26pUTY2A3KFWfBGskpOSvbmc=;
-  b=cVpYfW+HZvgYSkse4TfLZcZt53j8UZODn2tkGGHzWqlc6DcSmvu8kh9R
-   ycWxLOfVKsWF0RVLCevNUl6xJM0WFLxf5+qa/KkMit92sRPCQBfVPygeD
-   olI9OA5Anjkr+1UoherZWWO6JHlUFrYGL8nmmpCsrjG4my94S5MOx12pF
-   s=;
-X-IronPort-AV: E=Sophos;i="5.82,287,1613433600"; 
-   d="scan'208";a="108342826"
-Subject: Re: [PATCH 4/8] KVM: VMX: Adjust the TSC-related VMCS fields on L2 entry and
- exit
-Thread-Topic: [PATCH 4/8] KVM: VMX: Adjust the TSC-related VMCS fields on L2 entry and exit
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1e-42f764a0.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP; 10 May 2021 14:44:38 +0000
-Received: from EX13MTAUEB002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-1e-42f764a0.us-east-1.amazon.com (Postfix) with ESMTPS id 17C26C13B0;
-        Mon, 10 May 2021 14:44:33 +0000 (UTC)
-Received: from EX13D08UEB002.ant.amazon.com (10.43.60.107) by
- EX13MTAUEB002.ant.amazon.com (10.43.60.12) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 10 May 2021 14:44:29 +0000
-Received: from EX13D18EUA001.ant.amazon.com (10.43.165.58) by
- EX13D08UEB002.ant.amazon.com (10.43.60.107) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 10 May 2021 14:44:29 +0000
-Received: from EX13D18EUA001.ant.amazon.com ([10.43.165.58]) by
- EX13D18EUA001.ant.amazon.com ([10.43.165.58]) with mapi id 15.00.1497.015;
- Mon, 10 May 2021 14:44:28 +0000
-From:   "Stamatis, Ilias" <ilstam@amazon.com>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "ilstam@mailbox.org" <ilstam@mailbox.org>
-CC:     "jmattson@google.com" <jmattson@google.com>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "haozhong.zhang@intel.com" <haozhong.zhang@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "zamsden@gmail.com" <zamsden@gmail.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "dplotnikov@virtuozzo.com" <dplotnikov@virtuozzo.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>
-Thread-Index: AQHXQmOfxameJSAMYEqrMNVyHN/WrarcwvkAgAAOM4A=
-Date:   Mon, 10 May 2021 14:44:28 +0000
-Message-ID: <3a636a78f08d7ba725a77ff659c7df7e5bb5dfc7.camel@amazon.com>
-References: <20210506103228.67864-1-ilstam@mailbox.org>
-         <20210506103228.67864-5-ilstam@mailbox.org>
-         <4bb959a084e7acc4043f683888b9660f1a4a3fd7.camel@redhat.com>
-In-Reply-To: <4bb959a084e7acc4043f683888b9660f1a4a3fd7.camel@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.165.104]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <61076699EF44F64F9B4CA2B4DEC7DFC8@amazon.com>
-Content-Transfer-Encoding: base64
+        id S233188AbhEJO5D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 10:57:03 -0400
+Received: from foss.arm.com ([217.140.110.172]:60256 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234485AbhEJOzs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 10:55:48 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7908A15BE;
+        Mon, 10 May 2021 07:54:36 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 422713F719;
+        Mon, 10 May 2021 07:54:35 -0700 (PDT)
+Subject: Re: [PATCH 1/2] KVM: arm64: Move __adjust_pc out of line
+To:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc:     Zenghui Yu <yuzenghui@huawei.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com, stable@vger.kernel.org
+References: <20210510094915.1909484-1-maz@kernel.org>
+ <20210510094915.1909484-2-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <01c646f1-e342-b9fc-39b3-e8649862b4ac@arm.com>
+Date:   Mon, 10 May 2021 15:55:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
+In-Reply-To: <20210510094915.1909484-2-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gTW9uLCAyMDIxLTA1LTEwIGF0IDE2OjUzICswMzAwLCBNYXhpbSBMZXZpdHNreSB3cm90ZToN
-Cj4gT24gVGh1LCAyMDIxLTA1LTA2IGF0IDEwOjMyICswMDAwLCBpbHN0YW1AbWFpbGJveC5vcmcg
-d3JvdGU6DQo+ID4gRnJvbTogSWxpYXMgU3RhbWF0aXMgPGlsc3RhbUBhbWF6b24uY29tPg0KPiA+
-IA0KPiA+IFdoZW4gTDIgaXMgZW50ZXJlZCB3ZSBuZWVkIHRvICJtZXJnZSIgdGhlIFRTQyBtdWx0
-aXBsaWVyIGFuZCBUU0MNCj4gPiBvZmZzZXQNCj4gPiB2YWx1ZXMgb2YgVk1DUzAxIGFuZCBWTUNT
-MTIgYW5kIHN0b3JlIHRoZSByZXN1bHQgaW50byB0aGUgY3VycmVudA0KPiA+IFZNQ1MwMi4NCj4g
-PiANCj4gPiBUaGUgMDIgdmFsdWVzIGFyZSBjYWxjdWxhdGVkIHVzaW5nIHRoZSBmb2xsb3dpbmcg
-ZXF1YXRpb25zOg0KPiA+ICAgb2Zmc2V0XzAyID0gKChvZmZzZXRfMDEgKiBtdWx0XzEyKSA+PiA0
-OCkgKyBvZmZzZXRfMTINCj4gPiAgIG11bHRfMDIgPSAobXVsdF8wMSAqIG11bHRfMTIpID4+IDQ4
-DQo+IA0KPiBJIHdvdWxkIG1lbnRpb24gdGhhdCA0OCBpcyBrdm1fdHNjX3NjYWxpbmdfcmF0aW9f
-ZnJhY19iaXRzIGluc3RlYWQuDQo+IEFsc28gbWF5YmUgYWRkIHRoZSBjb21tb24gY29kZSBpbiBh
-IHNlcGFyYXRlIHBhdGNoPw0KDQpSaWdodCwgd2lsbCBkby4NCg0KPiANCj4gPiANCj4gPiBTaWdu
-ZWQtb2ZmLWJ5OiBJbGlhcyBTdGFtYXRpcyA8aWxzdGFtQGFtYXpvbi5jb20+DQo+ID4gLS0tDQo+
-ID4gIGFyY2gveDg2L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggfCAgMSArDQo+ID4gIGFyY2gveDg2
-L2t2bS92bXgvbmVzdGVkLmMgICAgICAgfCAyNiArKysrKysrKysrKysrKysrKysrKysrLS0tLQ0K
-PiA+ICBhcmNoL3g4Ni9rdm0veDg2LmMgICAgICAgICAgICAgIHwgMjUgKysrKysrKysrKysrKysr
-KysrKysrKysrKw0KPiA+ICAzIGZpbGVzIGNoYW5nZWQsIDQ4IGluc2VydGlvbnMoKyksIDQgZGVs
-ZXRpb25zKC0pDQo+ID4gDQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2luY2x1ZGUvYXNtL2t2
-bV9ob3N0LmgNCj4gPiBiL2FyY2gveDg2L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgNCj4gPiBpbmRl
-eCBjZGRkYmYwYjExNzcuLmU3YTFlYjM2Zjk1YSAxMDA2NDQNCj4gPiAtLS0gYS9hcmNoL3g4Ni9p
-bmNsdWRlL2FzbS9rdm1faG9zdC5oDQo+ID4gKysrIGIvYXJjaC94ODYvaW5jbHVkZS9hc20va3Zt
-X2hvc3QuaA0KPiA+IEBAIC0xNzgwLDYgKzE3ODAsNyBAQCB2b2lkIGt2bV9kZWZpbmVfdXNlcl9y
-ZXR1cm5fbXNyKHVuc2lnbmVkDQo+ID4gaW5kZXgsIHUzMiBtc3IpOw0KPiA+ICBpbnQga3ZtX3Nl
-dF91c2VyX3JldHVybl9tc3IodW5zaWduZWQgaW5kZXgsIHU2NCB2YWwsIHU2NCBtYXNrKTsNCj4g
-PiANCj4gPiAgdTY0IGt2bV9zY2FsZV90c2Moc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1NjQgdHNj
-LCBib29sIGwxKTsNCj4gPiArdTY0IGt2bV9jb21wdXRlXzAyX3RzY19vZmZzZXQodTY0IGwxX29m
-ZnNldCwgdTY0IGwyX211bHRpcGxpZXIsIHU2NA0KPiA+IGwyX29mZnNldCk7DQo+ID4gIHU2NCBr
-dm1fcmVhZF9sMV90c2Moc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1NjQgaG9zdF90c2MpOw0KPiA+
-IA0KPiA+ICB1bnNpZ25lZCBsb25nIGt2bV9nZXRfbGluZWFyX3JpcChzdHJ1Y3Qga3ZtX3ZjcHUg
-KnZjcHUpOw0KPiA+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0vdm14L25lc3RlZC5jIGIvYXJj
-aC94ODYva3ZtL3ZteC9uZXN0ZWQuYw0KPiA+IGluZGV4IGJjZWQ3NjYzNzgyMy4uYTFiZjI4ZjMz
-ODM3IDEwMDY0NA0KPiA+IC0tLSBhL2FyY2gveDg2L2t2bS92bXgvbmVzdGVkLmMNCj4gPiArKysg
-Yi9hcmNoL3g4Ni9rdm0vdm14L25lc3RlZC5jDQo+ID4gQEAgLTMzNTMsOCArMzM1MywyMiBAQCBl
-bnVtIG52bXhfdm1lbnRyeV9zdGF0dXMNCj4gPiBuZXN0ZWRfdm14X2VudGVyX25vbl9yb290X21v
-ZGUoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LA0KPiA+ICAgICAgIH0NCj4gPiANCj4gPiAgICAgICBl
-bnRlcl9ndWVzdF9tb2RlKHZjcHUpOw0KPiA+IC0gICAgIGlmICh2bWNzMTItPmNwdV9iYXNlZF92
-bV9leGVjX2NvbnRyb2wgJg0KPiA+IENQVV9CQVNFRF9VU0VfVFNDX09GRlNFVFRJTkcpDQo+ID4g
-LSAgICAgICAgICAgICB2Y3B1LT5hcmNoLnRzY19vZmZzZXQgKz0gdm1jczEyLT50c2Nfb2Zmc2V0
-Ow0KPiA+ICsNCj4gPiArICAgICBpZiAodm1jczEyLT5jcHVfYmFzZWRfdm1fZXhlY19jb250cm9s
-ICYNCj4gPiBDUFVfQkFTRURfVVNFX1RTQ19PRkZTRVRUSU5HKSB7DQo+ID4gKyAgICAgICAgICAg
-ICBpZiAodm1jczEyLT5zZWNvbmRhcnlfdm1fZXhlY19jb250cm9sICYNCj4gPiBTRUNPTkRBUllf
-RVhFQ19UU0NfU0NBTElORykgew0KPiA+ICsgICAgICAgICAgICAgICAgICAgICB2Y3B1LT5hcmNo
-LnRzY19vZmZzZXQgPQ0KPiA+IGt2bV9jb21wdXRlXzAyX3RzY19vZmZzZXQoDQo+ID4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2Y3B1LT5hcmNoLmwxX3RzY19vZmZzZXQs
-DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2bWNzMTItPnRzY19t
-dWx0aXBsaWVyLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdm1j
-czEyLT50c2Nfb2Zmc2V0KTsNCj4gPiArDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgIHZjcHUt
-PmFyY2gudHNjX3NjYWxpbmdfcmF0aW8gPQ0KPiA+IG11bF91NjRfdTY0X3NocigNCj4gPiArICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHZjcHUtPmFyY2gudHNjX3NjYWxpbmdf
-cmF0aW8sDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2bWNzMTIt
-PnRzY19tdWx0aXBsaWVyLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAga3ZtX3RzY19zY2FsaW5nX3JhdGlvX2ZyYWNfYml0DQo+ID4gcyk7DQo+ID4gKyAgICAgICAg
-ICAgICB9IGVsc2Ugew0KPiA+ICsgICAgICAgICAgICAgICAgICAgICB2Y3B1LT5hcmNoLnRzY19v
-ZmZzZXQgKz0gdm1jczEyLT50c2Nfb2Zmc2V0Ow0KPiA+ICsgICAgICAgICAgICAgfQ0KPiA+ICsg
-ICAgIH0NCj4gPiANCj4gPiAgICAgICBpZiAocHJlcGFyZV92bWNzMDIodmNwdSwgdm1jczEyLCAm
-ZW50cnlfZmFpbHVyZV9jb2RlKSkgew0KPiA+ICAgICAgICAgICAgICAgZXhpdF9yZWFzb24uYmFz
-aWMgPSBFWElUX1JFQVNPTl9JTlZBTElEX1NUQVRFOw0KPiA+IEBAIC00NDU0LDggKzQ0NjgsMTIg
-QEAgdm9pZCBuZXN0ZWRfdm14X3ZtZXhpdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsDQo+ID4gdTMy
-IHZtX2V4aXRfcmVhc29uLA0KPiA+ICAgICAgIGlmIChuZXN0ZWRfY3B1X2hhc19wcmVlbXB0aW9u
-X3RpbWVyKHZtY3MxMikpDQo+ID4gICAgICAgICAgICAgICBocnRpbWVyX2NhbmNlbCgmdG9fdm14
-KHZjcHUpLQ0KPiA+ID5uZXN0ZWQucHJlZW1wdGlvbl90aW1lcik7DQo+ID4gDQo+ID4gLSAgICAg
-aWYgKHZtY3MxMi0+Y3B1X2Jhc2VkX3ZtX2V4ZWNfY29udHJvbCAmDQo+ID4gQ1BVX0JBU0VEX1VT
-RV9UU0NfT0ZGU0VUVElORykNCj4gPiAtICAgICAgICAgICAgIHZjcHUtPmFyY2gudHNjX29mZnNl
-dCAtPSB2bWNzMTItPnRzY19vZmZzZXQ7DQo+ID4gKyAgICAgaWYgKHZtY3MxMi0+Y3B1X2Jhc2Vk
-X3ZtX2V4ZWNfY29udHJvbCAmDQo+ID4gQ1BVX0JBU0VEX1VTRV9UU0NfT0ZGU0VUVElORykgew0K
-PiA+ICsgICAgICAgICAgICAgdmNwdS0+YXJjaC50c2Nfb2Zmc2V0ID0gdmNwdS0+YXJjaC5sMV90
-c2Nfb2Zmc2V0Ow0KPiA+ICsNCj4gPiArICAgICAgICAgICAgIGlmICh2bWNzMTItPnNlY29uZGFy
-eV92bV9leGVjX2NvbnRyb2wgJg0KPiA+IFNFQ09OREFSWV9FWEVDX1RTQ19TQ0FMSU5HKQ0KPiA+
-ICsgICAgICAgICAgICAgICAgICAgICB2Y3B1LT5hcmNoLnRzY19zY2FsaW5nX3JhdGlvID0gdmNw
-dS0NCj4gPiA+YXJjaC5sMV90c2Nfc2NhbGluZ19yYXRpbzsNCj4gPiArICAgICB9DQo+ID4gDQo+
-ID4gICAgICAgaWYgKGxpa2VseSghdm14LT5mYWlsKSkgew0KPiA+ICAgICAgICAgICAgICAgc3lu
-Y192bWNzMDJfdG9fdm1jczEyKHZjcHUsIHZtY3MxMik7DQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gv
-eDg2L2t2bS94ODYuYyBiL2FyY2gveDg2L2t2bS94ODYuYw0KPiA+IGluZGV4IDI2YTRjMGY0NmYx
-NS4uODdkZWIxMTljNTIxIDEwMDY0NA0KPiA+IC0tLSBhL2FyY2gveDg2L2t2bS94ODYuYw0KPiA+
-ICsrKyBiL2FyY2gveDg2L2t2bS94ODYuYw0KPiA+IEBAIC0yMjY2LDYgKzIyNjYsMzEgQEAgc3Rh
-dGljIHU2NCBrdm1fY29tcHV0ZV90c2Nfb2Zmc2V0KHN0cnVjdA0KPiA+IGt2bV92Y3B1ICp2Y3B1
-LCB1NjQgdGFyZ2V0X3RzYykNCj4gPiAgICAgICByZXR1cm4gdGFyZ2V0X3RzYyAtIHRzYzsNCj4g
-PiAgfQ0KPiA+IA0KPiA+ICsvKg0KPiA+ICsgKiBUaGlzIGZ1bmN0aW9uIGNvbXB1dGVzIHRoZSBU
-U0Mgb2Zmc2V0IHRoYXQgaXMgc3RvcmVkIGluIFZNQ1MwMg0KPiA+IHdoZW4gZW50ZXJpbmcNCj4g
-PiArICogTDIgYnkgY29tYmluaW5nIHRoZSBvZmZzZXQgYW5kIG11bHRpcGxpZXIgdmFsdWVzIG9m
-IFZNQ1MwMSBhbmQNCj4gPiBWTUNTMTIuDQo+ID4gKyAqLw0KPiA+ICt1NjQga3ZtX2NvbXB1dGVf
-MDJfdHNjX29mZnNldCh1NjQgbDFfb2Zmc2V0LCB1NjQgbDJfbXVsdGlwbGllciwgdTY0DQo+ID4g
-bDJfb2Zmc2V0KQ0KPiA+ICt7DQo+ID4gKyAgICAgdTY0IG9mZnNldDsNCj4gPiArDQo+ID4gKyAg
-ICAgLyoNCj4gPiArICAgICAgKiBUaGUgTDEgb2Zmc2V0IGlzIGludGVycHJldGVkIGFzIGEgc2ln
-bmVkIG51bWJlciBieSB0aGUgQ1BVDQo+ID4gYW5kIGNhbg0KPiA+ICsgICAgICAqIGJlIG5lZ2F0
-aXZlLiBTbyB3ZSBleHRyYWN0IHRoZSBzaWduIGJlZm9yZSB0aGUNCj4gPiBtdWx0aXBsaWNhdGlv
-biBhbmQNCj4gPiArICAgICAgKiBwdXQgaXQgYmFjayBhZnRlcndhcmRzIGlmIG5lZWRlZC4NCj4g
-DQo+IElmIEkgdW5kZXJzdGFuZCBjb3JyZWN0bHkgdGhlIHJlYXNvbiBmb3Igc2lnbiBleHRyYWN0
-aW9uIGlzIHRoYXQgd2UNCj4gZG9uJ3QNCj4gaGF2ZSBtdWxfczY0X3U2NF9zaHIuIE1heWJlIHdl
-IHNob3VsZCBhZGQgaXQ/DQo+IA0KDQpJbml0aWFsbHkgSSBhZGRlZCBhIG11bF9zNjRfczY0X3No
-ciBhbmQgdXNlZCB0aGF0Lg0KDQpZb3UgY2FuIHRha2UgYSBsb29rDQpoZXJlOg0KDQpodHRwczov
-L2dpdGh1Yi5jb20vaWxzdGFtL2xpbnV4L2NvbW1pdC83YmMwYjc1YmI3YjhkOWJjZWNmNDFlMmUx
-ZTE5MzY4ODBkM2I5M2QxDQoNCg0KSSBhZGRlZCBtdWxfczY0X3M2NF9zaHIgaW5zdGVhZCBvZiBt
-dWxfczY0X3U2NF9zaHIgdGhpbmtpbmcgdGhhdCBhKQ0KcGVyaGFwcyBpdCB3b3VsZCBiZSBtb3Jl
-IHVzZWZ1bCBhcyBhIGdlbmVyYWwtcHVycG9zZSBmdW5jdGlvbiBhbmQgYikNCmV2ZW4gdGhvdWdo
-IHRoZSBtdWx0aXBsaWVyIGlzIHVuc2lnbmVkIGluIHJlYWxpdHkgaXQncyBjYXBlZCBzbyBpdA0K
-c2hvdWxkIGJlIHNhZmUgdG8gY2FzdCBpdCB0byBzaWduZWQuDQoNCkJ1dCB0aGVuIEkgcmVhbGl6
-ZWQgdGhhdA0KbXVsX3U2NF91NjRfc2hyIHRoYXQgd2UgYWxyZWFkeSBoYXZlIGlzIGVub3VnaCBh
-bmQgSSBjYW4ganVzdCBzaW1wbHkgcmUtDQp1c2UgdGhhdC4NCg0KSG93IHdvdWxkIGEgbXVsX3M2
-NF91NjRfc2hyIGJlIGltcGxlbWVudGVkPw0KDQpJIHRoaW5rIGluIHRoZSBlbmQNCndlIG5lZWQg
-dG8gZGVjaWRlIGlmIHdlIHdhbnQgdG8gZG8gc2lnbmVkIG9yIHVuc2lnbmVkIG11bHRpcGxpY2F0
-aW9uLg0KQW5kIGRlcGVuZGluZyBvbiB0aGlzIHdlIG5lZWQgdG8gZG8gYSBzaWduZWQgb3IgdW5z
-aWduZWQgcmlnaHQgc2hpZnQNCmFjY29yZGluZ2x5Lg0KDQpTbyBpZiB3ZSBkaWQgaGF2ZSBhIG11
-bF9zNjRfdTY0X3NociB3b3VsZG4ndCBpdCBuZWVkIHRvIGNhc3QNCmVpdGhlciBvZiB0aGUgYXJn
-dW1lbnRzIGFuZCB0aGVuIHVzZSBtdWxfdTY0X3U2NCAob3IgbXVsX3M2NF9zNjQpIGJlaW5nDQpq
-dXN0IGEgd3JhcHBlciBlc3NlbnRpYWxseT8gSSBkb24ndCB0aGluayB0aGF0IHdlIGNhbiBndWFy
-YW50ZWUgdGhhdA0KY2FzdGluZyBlaXRoZXIgb2YgdGhlIGFyZ3VtZW50cyBpcyBhbHdheXMgc2Fm
-ZSBpZiB3ZSB3YW50IHRvIGFkdmVydGlzZQ0KdGhpcyBhcyBhIGdlbmVyYWwgcHVycG9zZSBmdW5j
-dGlvbi4NCg0KVGhhbmtzIGZvciB0aGUgcmV2aWV3cyENCg0KSWxpYXMNCg0KPiBUaGUgcGF0dGVy
-biBvZiAoQSAqIEIpID4+IHNoaWZ0IGFwcGVhcnMgbWFueSB0aW1lcyBpbiBUU0Mgc2NhbGluZy4N
-Cj4gDQo+IFNvIGluc3RlYWQgb2YgdGhpcyBmdW5jdGlvbiBtYXliZSBqdXN0IHVzZSBzb21ldGhp
-bmcgbGlrZSB0aGF0Pw0KPiANCj4gbWVyZ2VkX29mZnNldCA9IGwyX29mZnNldCArIG11bF9zNjRf
-dTY0X3NociAoKHM2NCkgbDFfb2Zmc2V0LA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBsMl9tdWx0aXBsaWVyLA0KPiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBrdm1fdHNjX3NjYWxpbmdfcmF0aW9fZnJhDQo+IGNfYml0
-cykNCj4gDQo+IE9yIGFub3RoZXIgaWRlYToNCj4gDQo+IEhvdyBhYm91dA0KPiANCj4gdTY0IF9f
-a3ZtX3NjYWxlX3RzY192YWx1ZSh1NjQgdmFsdWUsIHU2NCBtdWx0aXBsaWVyKSB7DQo+ICAgICAg
-ICAgcmV0dXJuIG11bF91NjRfdTY0X3Nocih2YWx1ZSwNCj4gICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIG11bHRpcGxpZXIsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBr
-dm1fdHNjX3NjYWxpbmdfcmF0aW9fZnJhY19iaXRzKTsNCj4gfQ0KPiANCj4gDQo+IGFuZA0KPiAN
-Cj4gczY0IF9fa3ZtX3NjYWxlX3RzY19vZmZzZXQodTY0IHZhbHVlLCB1NjQgbXVsdGlwbGllcikN
-Cj4gew0KPiAgICAgICAgIHJldHVybiBtdWxfczY0X3U2NF9zaHIoKHM2NCl2YWx1ZSwNCj4gICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIG11bHRpcGxpZXIsDQo+ICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBrdm1fdHNjX3NjYWxpbmdfcmF0aW9fZnJhY19iaXRzKTsNCj4gfQ0K
-PiANCj4gQW5kIHRoZW4gdXNlIHRoZW0gaW4gdGhlIGNvZGUuDQo+IA0KPiBPdmVyYWxsIHRob3Vn
-aCB0aGUgY29kZSAqbG9va3MqIGNvcnJlY3QgdG8gbWUNCj4gYnV0IEkgbWlnaHQgaGF2ZSBtaXNz
-ZWQgc29tZXRoaW5nLg0KPiANCj4gQmVzdCByZWdhcmRzLA0KPiAgICAgICAgIE1heGltIExldml0
-c2t5DQo+IA0KPiANCj4gPiArICAgICAgKi8NCj4gPiArICAgICBvZmZzZXQgPSBtdWxfdTY0X3U2
-NF9zaHIoYWJzKChzNjQpIGwxX29mZnNldCksDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIGwyX211bHRpcGxpZXIsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IGt2bV90c2Nfc2NhbGluZ19yYXRpb19mcmFjX2JpdHMpOw0KPiA+ICsNCj4gPiArICAgICBpZiAo
-KHM2NCkgbDFfb2Zmc2V0IDwgMCkNCj4gPiArICAgICAgICAgICAgIG9mZnNldCA9IC0oKHM2NCkg
-b2Zmc2V0KTsNCj4gPiArDQo+ID4gKyAgICAgb2Zmc2V0ICs9IGwyX29mZnNldDsNCj4gPiArICAg
-ICByZXR1cm4gb2Zmc2V0Ow0KPiA+ICt9DQo+ID4gK0VYUE9SVF9TWU1CT0xfR1BMKGt2bV9jb21w
-dXRlXzAyX3RzY19vZmZzZXQpOw0KPiA+ICsNCj4gPiAgdTY0IGt2bV9yZWFkX2wxX3RzYyhzdHJ1
-Y3Qga3ZtX3ZjcHUgKnZjcHUsIHU2NCBob3N0X3RzYykNCj4gPiAgew0KPiA+ICAgICAgIHJldHVy
-biB2Y3B1LT5hcmNoLmwxX3RzY19vZmZzZXQgKyBrdm1fc2NhbGVfdHNjKHZjcHUsDQo+ID4gaG9z
-dF90c2MsIHRydWUpOw0KPiANCj4gDQo=
+Hi Marc,
+
+On 5/10/21 10:49 AM, Marc Zyngier wrote:
+> In order to make it easy to call __adjust_pc() from the EL1 code
+> (in the case of nVHE), rename it to __kvm_adjust_pc() and move
+> it out of line.
+>
+> No expected functional change.
+
+It does look to me like they're functionally identical. Minor comments below.
+
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org # 5.11
+> ---
+>  arch/arm64/include/asm/kvm_asm.h           |  2 ++
+>  arch/arm64/kvm/hyp/exception.c             | 18 +++++++++++++++++-
+>  arch/arm64/kvm/hyp/include/hyp/adjust_pc.h | 18 ------------------
+>  arch/arm64/kvm/hyp/nvhe/switch.c           |  2 +-
+>  arch/arm64/kvm/hyp/vhe/switch.c            |  2 +-
+>  5 files changed, 21 insertions(+), 21 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index cf8df032b9c3..d5b11037401d 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -201,6 +201,8 @@ extern void __kvm_timer_set_cntvoff(u64 cntvoff);
+>  
+>  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+>  
+> +extern void __kvm_adjust_pc(struct kvm_vcpu *vcpu);
+
+It looks pretty strange to have the file
+arch/arm64/kvm/hyp/include/hyp/adjust_pc.h, but the function __kvm_adjust_pc() in
+another header. I guess this was done because arch/arm64/kvm/arm.c will use the
+function in the next patch. I was thinking that maybe renaming
+adjust_pc.h->skip_instr.h would make more sense, what do you think? I can send a
+patch on top of this series with the rename if you prefer.
+
+> +
+>  extern u64 __vgic_v3_get_gic_config(void);
+>  extern u64 __vgic_v3_read_vmcr(void);
+>  extern void __vgic_v3_write_vmcr(u32 vmcr);
+> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+> index 73629094f903..0812a496725f 100644
+> --- a/arch/arm64/kvm/hyp/exception.c
+> +++ b/arch/arm64/kvm/hyp/exception.c
+> @@ -296,7 +296,7 @@ static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+>  	*vcpu_pc(vcpu) = vect_offset;
+>  }
+>  
+> -void kvm_inject_exception(struct kvm_vcpu *vcpu)
+> +static void kvm_inject_exception(struct kvm_vcpu *vcpu)
+>  {
+>  	if (vcpu_el1_is_32bit(vcpu)) {
+>  		switch (vcpu->arch.flags & KVM_ARM64_EXCEPT_MASK) {
+> @@ -329,3 +329,19 @@ void kvm_inject_exception(struct kvm_vcpu *vcpu)
+>  		}
+>  	}
+>  }
+> +
+> +/*
+> + * Adjust the guest PC on entry, depending on flags provided by EL1
+
+This is also called by the VHE code running at EL2, but the comment is reworded in
+the next patch, so it doesn't really matter, and keeping the diff a straight move
+makes it easier to read.
+
+> + * for the purpose of emulation (MMIO, sysreg) or exception injection.
+> + */
+> +void __kvm_adjust_pc(struct kvm_vcpu *vcpu)
+> +{
+> +	if (vcpu->arch.flags & KVM_ARM64_PENDING_EXCEPTION) {
+> +		kvm_inject_exception(vcpu);
+> +		vcpu->arch.flags &= ~(KVM_ARM64_PENDING_EXCEPTION |
+> +				      KVM_ARM64_EXCEPT_MASK);
+> +	} else 	if (vcpu->arch.flags & KVM_ARM64_INCREMENT_PC) {
+> +		kvm_skip_instr(vcpu);
+> +		vcpu->arch.flags &= ~KVM_ARM64_INCREMENT_PC;
+> +	}
+> +}
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
+> index 61716359035d..4fdfeabefeb4 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
+> @@ -13,8 +13,6 @@
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/kvm_host.h>
+>  
+> -void kvm_inject_exception(struct kvm_vcpu *vcpu);
+> -
+>  static inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
+>  {
+>  	if (vcpu_mode_is_32bit(vcpu)) {
+> @@ -43,22 +41,6 @@ static inline void __kvm_skip_instr(struct kvm_vcpu *vcpu)
+>  	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
+>  }
+>  
+> -/*
+> - * Adjust the guest PC on entry, depending on flags provided by EL1
+> - * for the purpose of emulation (MMIO, sysreg) or exception injection.
+> - */
+> -static inline void __adjust_pc(struct kvm_vcpu *vcpu)
+> -{
+> -	if (vcpu->arch.flags & KVM_ARM64_PENDING_EXCEPTION) {
+> -		kvm_inject_exception(vcpu);
+> -		vcpu->arch.flags &= ~(KVM_ARM64_PENDING_EXCEPTION |
+> -				      KVM_ARM64_EXCEPT_MASK);
+> -	} else 	if (vcpu->arch.flags & KVM_ARM64_INCREMENT_PC) {
+> -		kvm_skip_instr(vcpu);
+> -		vcpu->arch.flags &= ~KVM_ARM64_INCREMENT_PC;
+> -	}
+> -}
+> -
+>  /*
+>   * Skip an instruction while host sysregs are live.
+>   * Assumes host is always 64-bit.
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index e9f6ea704d07..b8ac123c3419 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -201,7 +201,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	 */
+>  	__debug_save_host_buffers_nvhe(vcpu);
+>  
+> -	__adjust_pc(vcpu);
+> +	__kvm_adjust_pc(vcpu);
+>  
+>  	/*
+>  	 * We must restore the 32-bit state before the sysregs, thanks
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index 7b8f7db5c1ed..3eafed0431f5 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -132,7 +132,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>  	__load_guest_stage2(vcpu->arch.hw_mmu);
+>  	__activate_traps(vcpu);
+>  
+> -	__adjust_pc(vcpu);
+> +	__kvm_adjust_pc(vcpu);
+
+With the function now moved to kvm_asm.h, the header include adjust_pc.h is not
+needed. Same for the nvhe version of switch.c.
+
+Thanks,
+
+Alex
+
+>  
+>  	sysreg_restore_guest_state_vhe(guest_ctxt);
+>  	__debug_switch_to_guest(vcpu);
