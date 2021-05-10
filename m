@@ -2,93 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 91802379105
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 16:39:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A82A3790D9
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 16:32:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233075AbhEJOkW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 10:40:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37048 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235503AbhEJOhY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 10:37:24 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D84CC08E8A9;
-        Mon, 10 May 2021 07:00:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=i6vAxLOytNOYwyM1NYfARO0i+7jkuFK7y9pYt7pXuwE=; b=djb3CWn/LU378IzapvABLkn8Gd
-        Mp82QkScestEUeQW2L+zqtEN7XvYp31eFRebvjBEITr//+6YOo6+SYheq9BxF7YMTeqbS+RN1ORYU
-        WcTwnub1JAhAEwo1EbdH4ZtDbzKRVhVt7KKBx8eH43WzT6ZsZkO7OQPiITlB671P2UStmst5kwHpO
-        oLDGkct+Pf7s4vCchonkHPjgJ2dHAgGdY9eEvhnNfgt0nMzg4EJ/N8O7mpCEUjiq1yDlLopkoOUQy
-        tCb7mahOMAZ84vugzBeIjfIYkNlViOtJdTlUAmJVQy5eePLrQct4R8yXLPW7Hy+DjovMg5jAZGdoa
-        yuW/o03A==;
-Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lg6RA-006DIB-7H; Mon, 10 May 2021 13:59:19 +0000
-Date:   Mon, 10 May 2021 14:59:08 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Edward Cree <ecree.xilinx@gmail.com>
-Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        alsa-devel@alsa-project.org, coresight@lists.linaro.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
-        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-fpga@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-sgx@vger.kernel.org, linux-usb@vger.kernel.org,
-        mjpeg-users@lists.sourceforge.net, netdev@vger.kernel.org,
-        rcu@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH 00/53] Get rid of UTF-8 chars that can be mapped as ASCII
-Message-ID: <YJk8LMFViV7Z3Uu7@casper.infradead.org>
-References: <cover.1620641727.git.mchehab+huawei@kernel.org>
- <2ae366fdff4bd5910a2270823e8da70521c859af.camel@infradead.org>
- <20210510135518.305cc03d@coco.lan>
- <df6b4567-030c-a480-c5a6-fe579830e8c0@gmail.com>
+        id S236391AbhEJOdB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 10:33:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20598 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230152AbhEJOav (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 10:30:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620656985;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PVhwAQco9R41v3dWo8fAy6CH45dQj+RWz+P+aZRwNAE=;
+        b=dUzbL/mhDIGPFBVg4BM2UOwVElUybYUjbwQ9EAEni99wynQ75RepM891TdCHL1w5ThBIcB
+        BeHspRxFjbFhsKCwhD6zNybIHtPB2d+85hIjuYHMxANXocggRyjkgL766Z2YQvZz7OciWn
+        TPV8bb9Okax6DPFIxXkkQoeEj7kM09I=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-603-tsKbTQM8Mk6ml_QSrtDY9w-1; Mon, 10 May 2021 10:29:44 -0400
+X-MC-Unique: tsKbTQM8Mk6ml_QSrtDY9w-1
+Received: by mail-wm1-f71.google.com with SMTP id w21-20020a7bc1150000b029014a850581efso3566157wmi.6
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 07:29:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PVhwAQco9R41v3dWo8fAy6CH45dQj+RWz+P+aZRwNAE=;
+        b=DO58bl/coUaIAfdttCRYm/ou1V1Pzsc/EQOJnRmZGj5XVIr3TZ5sYlzfOUzJmpputj
+         s+7tUhJd0d16bRoFylvnmco0xYaNOe+Z2+7crYmqhZ2CTDjLYD/klCDUEFvFfN4yBtTS
+         egwCxB8NFBAFGrOWNHWUXY8JLZjco0o738Qi0/OBmx3wMnR7Sgz2gJ5SL5dSOivT/SSv
+         4mbY5/y0QDN+6q7Y0fq035Xzart1xmwGNnXHfDM8yAECA15evmjHCiya6edoGKIX+wom
+         lrPoNJaoEgJ1CYp/KzlTBbu5wHJSdbFHJ6PG9nhoCrtY/MxykzeNNGrnG0r6rmcHeyyD
+         QA6w==
+X-Gm-Message-State: AOAM530IfnSBkfWdChPEf08tfFT1PSrflEfjkk13aXCYP/wjTRC7ufrX
+        HooxM86mf+yd1i1++6ORw8dhRZvrJaW23rgXzJO6d32XowURFzOx40oGRj8ALBoHJFdDaIyYlni
+        YOMT2xEuWrQFA
+X-Received: by 2002:adf:f3c1:: with SMTP id g1mr31915395wrp.242.1620656982882;
+        Mon, 10 May 2021 07:29:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz7qp62uiPj2YNFPbBBrBkzA+qnxLBcXElgNK1+YlCIqKhpmM2uMbsoAdz/OsjHjBtWRhUt6Q==
+X-Received: by 2002:adf:f3c1:: with SMTP id g1mr31915376wrp.242.1620656982739;
+        Mon, 10 May 2021 07:29:42 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id s18sm23509169wro.95.2021.05.10.07.29.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 May 2021 07:29:42 -0700 (PDT)
+To:     Jim Mattson <jmattson@google.com>, ilstam@mailbox.org
+Cc:     kvm list <kvm@vger.kernel.org>, ilstam@amazon.com,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Haozhong Zhang <haozhong.zhang@intel.com>, zamsden@gmail.com,
+        mtosatti@redhat.com, Denis Plotnikov <dplotnikov@virtuozzo.com>,
+        David Woodhouse <dwmw@amazon.co.uk>
+References: <20210506103228.67864-1-ilstam@mailbox.org>
+ <CALMp9eSNHf=vmqeer+ZkRa3NhJoLMbEO+OZJaG9qf+2+TQ2grA@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 0/8] KVM: VMX: Implement nested TSC scaling
+Message-ID: <bdfb8be8-7584-c60b-635e-3595fe481a60@redhat.com>
+Date:   Mon, 10 May 2021 16:29:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <CALMp9eSNHf=vmqeer+ZkRa3NhJoLMbEO+OZJaG9qf+2+TQ2grA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <df6b4567-030c-a480-c5a6-fe579830e8c0@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 10, 2021 at 02:16:16PM +0100, Edward Cree wrote:
-> On 10/05/2021 12:55, Mauro Carvalho Chehab wrote:
-> > The main point on this series is to replace just the occurrences
-> > where ASCII represents the symbol equally well
+On 06/05/21 19:16, Jim Mattson wrote:
+> On Thu, May 6, 2021 at 3:34 AM <ilstam@mailbox.org> wrote:
+>>
+>> From: Ilias Stamatis <ilstam@amazon.com>
+>>
+>> KVM currently supports hardware-assisted TSC scaling but only for L1 and it
+>> doesn't expose the feature to nested guests. This patch series adds support for
+>> nested TSC scaling and allows both L1 and L2 to be scaled with different
+>> scaling factors.
+>>
+>> When scaling and offsetting is applied, the TSC for the guest is calculated as:
+>>
+>> (TSC * multiplier >> 48) + offset
+>>
+>> With nested scaling the values in VMCS01 and VMCS12 need to be merged
+>> together and stored in VMCS02.
+>>
+>> The VMCS02 values are calculated as follows:
+>>
+>> offset_02 = ((offset_01 * mult_12) >> 48) + offset_12
+>> mult_02 = (mult_01 * mult_12) >> 48
+>>
+>> The last patch of the series adds a KVM selftest.
 > 
-> > 	- U+2014 ('—'): EM DASH
-> Em dash is not the same thing as hyphen-minus, and the latter does not
->  serve 'equally well'.  People use em dashes because — even in
->  monospace fonts — they make text easier to read and comprehend, when
->  used correctly.
-> I accept that some of the other distinctions — like en dashes — are
->  needlessly pedantic (though I don't doubt there is someone out there
->  who will gladly defend them with the same fervour with which I argue
->  for the em dash) and I wouldn't take the trouble to use them myself;
->  but I think there is a reasonable assumption that when someone goes
->  to the effort of using a Unicode punctuation mark that is semantic
->  (rather than merely typographical), they probably had a reason for
->  doing so.
+> Will you be doing the same for SVM? The last time I tried to add a
+> nested virtualization feature for Intel only, Paolo rapped my knuckles
+> with a ruler.
 
-I think you're overestimating the amount of care and typographical
-knowledge that your average kernel developer has.  Most of these
-UTF-8 characters come from latex conversions and really aren't
-necessary (and are being used incorrectly).
+For bugfixes definitely, for features it is definitely nice.
 
-You seem quite knowedgeable about the various differences.  Perhaps
-you'd be willing to write a document for Documentation/doc-guide/
-that provides guidance for when to use which kinds of horizontal
-line?  https://www.punctuationmatters.com/hyphen-dash-n-dash-and-m-dash/
-talks about it in the context of publications, but I think we need
-something more suited to our needs for kernel documentation.
+And these days we even have similar-enough code between nVMX and nSVM 
+code, that in many cases there's really no good excuse not to do it.
+
+Paolo
+
