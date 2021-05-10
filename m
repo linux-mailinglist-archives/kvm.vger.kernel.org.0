@@ -2,94 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 919DD378DCB
+	by mail.lfdr.de (Postfix) with ESMTP id 49DAA378DCA
 	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 15:47:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241866AbhEJMxv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 08:53:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57500 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244390AbhEJL7B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 07:59:01 -0400
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B22CBC08C5F3
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 04:54:15 -0700 (PDT)
-Received: by mail-qk1-x736.google.com with SMTP id q136so14931981qka.7
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 04:54:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=4+X4WteNsgQ19+v1jrZ7Ekzjl0pM0a2tSBb6kLiTT48=;
-        b=PWyo1gl6oTeAtHGCeTBEPCa3Yr0PE4k7LvQFXAjuZ8kYFrMR4YWhiKpWpL9UTBvZ7m
-         qk8KFyM10DuEJNIBnRKAozmeWOLsaRT5BF34OdpSj6Zv4Gqt85+FGlDU+TUek9WwkkfR
-         jZ7v8VD7HnnFbwgxTvyBeOotqiXojc6x8i1KKOK4cVeQIekGTw1TCNcAMW/CMpvd+6RP
-         tm9qSDCStEi3cagBGLSl7+rtLDZzX8+eMCzoO28n1Ii8zBPZJRPmgHsTk8uv3JTt6aUv
-         wyhvmP1oQ5xcemAq48IGapmsXw3yUdDwPENB6AdF3PlELk7SIAKnvWNK5LHjesLGFh1U
-         9+Jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=4+X4WteNsgQ19+v1jrZ7Ekzjl0pM0a2tSBb6kLiTT48=;
-        b=P7ECMV3426VZo69DZIwo/Y7R8Gz4KmDl9/V7mbACRjww62y9HT/RkbjdrmMDH0RtNl
-         ZCUID9rXSbu2aR/RvVH0EvzNC0A7bdRtENFdUoag0Unn/3K1JxyEw65KIX43nbq9M802
-         yjBzfKANcqkxMw+ZC+xaP7uWz5lqILJJBUWWsETt7B240gianvjpI4W26UsLtaL6l79J
-         8tybz+Qvv2gsDoq3OuSbZedtIu4+LwmHuIYP/vn2XeLRa/YRClLLm53IlK9KVSqwUIbd
-         R8mjnkepdg88veeJqbaRah12Itkr0/t2HCuElOO52i8u0T6M/bi5YUjudAVasTEZ+LHn
-         xJ4A==
-X-Gm-Message-State: AOAM531DW6rAA62dLkwQpEe0BkcI16UxE9PP0FPLJnRao13IiHY6UYnh
-        KLR/cADbAJua9Zzyszx2Vbv11Q==
-X-Google-Smtp-Source: ABdhPJzBhRA/mYegQ6Y3SCHv8vvyMaFup+8Bx9cPBeG9nbr9M1kzHbHa1+EnzLI/fQPr8l4kD42yUg==
-X-Received: by 2002:a37:468c:: with SMTP id t134mr12536249qka.357.1620647654876;
-        Mon, 10 May 2021 04:54:14 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-47-55-113-94.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.113.94])
-        by smtp.gmail.com with ESMTPSA id 189sm11286888qkd.51.2021.05.10.04.54.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 May 2021 04:54:14 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1lg4UH-004Bs3-DG; Mon, 10 May 2021 08:54:13 -0300
-Date:   Mon, 10 May 2021 08:54:13 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Will Deacon <will@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        linux-arm-kernel@lists.infradead.org,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org
-Subject: Re: more iommu dead code removal
-Message-ID: <20210510115413.GE2047089@ziepe.ca>
-References: <20210510065405.2334771-1-hch@lst.de>
+        id S241829AbhEJMxp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 08:53:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44172 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S243600AbhEJL4e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 07:56:34 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 383C061260;
+        Mon, 10 May 2021 11:55:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1620647729;
+        bh=dyIPtb49LgFnCoKazyq+bQhPSj3PCobNssG21KHdoK4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=S4cpkndG9UuTYGkhKfO3hJLbYIHDWve5Su3QQFRXInDkMRoAu9bVjsNPKBQQExFiA
+         MH/LvEqboPFe5Mg323DsrqgW7WJPZfjJ5OWh3KcGd7Kzb/Ed/OuhsjfzebDsCLf+jo
+         Z2y3h21hX1f0r0znndE/gsvI3+7MfvcFNE3R9vJ3F6eSaoK3rYc9HAxpysQKCzq2nw
+         XliTZNXkMCNQpYy6ormSrp00pDOW21OImF+xXBpjWC/JIXAZfq/wrXo3rh38peS5/g
+         BQeri8Wl+fs0ihvm/Fcaw0vxpMvqk7Fkm7kctYIMuGKithMKv3Kd8J2NMAGsk2M1IJ
+         Z8/9XzwZufeKA==
+Date:   Mon, 10 May 2021 13:55:18 +0200
+From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        alsa-devel@alsa-project.org, coresight@lists.linaro.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
+        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-fpga@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-sgx@vger.kernel.org, linux-usb@vger.kernel.org,
+        mjpeg-users@lists.sourceforge.net, netdev@vger.kernel.org,
+        rcu@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH 00/53] Get rid of UTF-8 chars that can be mapped as
+ ASCII
+Message-ID: <20210510135518.305cc03d@coco.lan>
+In-Reply-To: <2ae366fdff4bd5910a2270823e8da70521c859af.camel@infradead.org>
+References: <cover.1620641727.git.mchehab+huawei@kernel.org>
+        <2ae366fdff4bd5910a2270823e8da70521c859af.camel@infradead.org>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210510065405.2334771-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 10, 2021 at 08:53:59AM +0200, Christoph Hellwig wrote:
-> Hi all,
-> 
-> this is another series to remove dead code from the IOMMU subsystem,
-> this time mostly about the hacky code to pass an iommu device in
-> struct mdev_device and huge piles of support code.  All of this was
-> merged two years ago and (fortunately) never got used.
+Hi David,
 
-Yes, I looked at this too. Intel has been merging dead code for a
-while now. Ostensibly to prepare to get PASID support in.. But the
-whole PASID thing looks to be redesigned from what was originally
-imagined.
+Em Mon, 10 May 2021 11:54:02 +0100
+David Woodhouse <dwmw2@infradead.org> escreveu:
 
-At least from VFIO I think the PASID support should not use this hacky
-stuff, /dev/ioasid should provide a clean solution
+> On Mon, 2021-05-10 at 12:26 +0200, Mauro Carvalho Chehab wrote:
+> > There are several UTF-8 characters at the Kernel's documentation.
+> >=20
+> > Several of them were due to the process of converting files from
+> > DocBook, LaTeX, HTML and Markdown. They were probably introduced
+> > by the conversion tools used on that time.
+> >=20
+> > Other UTF-8 characters were added along the time, but they're easily
+> > replaceable by ASCII chars.
+> >=20
+> > As Linux developers are all around the globe, and not everybody has UTF=
+-8
+> > as their default charset, better to use UTF-8 only on cases where it is=
+ really
+> > needed. =20
+>=20
+> No, that is absolutely the wrong approach.
+>=20
+> If someone has a local setup which makes bogus assumptions about text
+> encodings, that is their own mistake.
+>=20
+> We don't do them any favours by trying to *hide* it in the common case
+> so that they don't notice it for longer.
+>=20
+> There really isn't much excuse for such brokenness, this far into the
+> 21st century.
+>=20
+> Even *before* UTF-8 came along in the final decade of the last
+> millennium, it was important to know which character set a given piece
+> of text was encoded in.
+>=20
+> In fact it was even *more* important back then, we couldn't just assume
+> UTF-8 everywhere like we can in modern times.
+>=20
+> Git can already do things like CRLF conversion on checking files out to
+> match local conventions; if you want to teach it to do character set
+> conversions too then I suppose that might be useful to a few developers
+> who've fallen through a time warp and still need it. But nobody's ever
+> bothered before because it just isn't necessary these days.
+>=20
+> Please *don't* attempt to address this anachronistic and esoteric
+> "requirement" by dragging the kernel source back in time by three
+> decades.
 
-Jason
+No. The idea is not to go back three decades ago.=20
+
+The goal is just to avoid use UTF-8 where it is not needed. See, the vast
+majority of UTF-8 chars are kept:
+
+	- Non-ASCII Latin and Greek chars;
+	- Box drawings;
+	- arrows;
+	- most symbols.
+
+There, it makes perfect sense to keep using UTF-8.
+
+We should keep using UTF-8 on Kernel. This is something that it shouldn't
+be changed.
+
+---
+
+This patch series is doing conversion only when using ASCII makes
+more sense than using UTF-8.=20
+
+See, a number of converted documents ended with weird characters
+like ZERO WIDTH NO-BREAK SPACE (U+FEFF) character. This specific
+character doesn't do any good.
+
+Others use NO-BREAK SPACE (U+A0) instead of 0x20. Harmless, until
+someone tries to use grep[1].
+
+[1] try to run:
+
+    $ git grep "CPU 0 has been" Documentation/RCU/
+
+    it will return nothing with current upstream.
+
+    But it will work fine after the series is applied:
+
+    $ git grep "CPU 0 has been" Documentation/RCU/
+      Documentation/RCU/Design/Data-Structures/Data-Structures.rst:| #. CPU=
+ 0 has been in dyntick-idle mode for quite some time. When it   |
+      Documentation/RCU/Design/Data-Structures/Data-Structures.rst:|    not=
+ices that CPU 0 has been in dyntick idle mode, which qualifies  |
+
+The main point on this series is to replace just the occurrences
+where ASCII represents the symbol equally well, e. g. it is limited
+for those chars:
+
+	- U+2010 ('=E2=80=90'): HYPHEN
+	- U+00ad ('=C2=AD'): SOFT HYPHEN
+	- U+2013 ('=E2=80=93'): EN DASH
+	- U+2014 ('=E2=80=94'): EM DASH
+
+	- U+2018 ('=E2=80=98'): LEFT SINGLE QUOTATION MARK
+	- U+2019 ('=E2=80=99'): RIGHT SINGLE QUOTATION MARK
+	- U+00b4 ('=C2=B4'): ACUTE ACCENT
+
+	- U+201c ('=E2=80=9C'): LEFT DOUBLE QUOTATION MARK
+	- U+201d ('=E2=80=9D'): RIGHT DOUBLE QUOTATION MARK
+
+	- U+00d7 ('=C3=97'): MULTIPLICATION SIGN
+	- U+2212 ('=E2=88=92'): MINUS SIGN
+
+	- U+2217 ('=E2=88=97'): ASTERISK OPERATOR
+	  (this one used as a pointer reference like "*foo" on C code
+	   example inside a document converted from LaTeX)
+
+	- U+00bb ('=C2=BB'): RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
+	  (this one also used wrongly on an ABI file, meaning '>')
+
+	- U+00a0 ('=C2=A0'): NO-BREAK SPACE
+	- U+feff ('=EF=BB=BF'): ZERO WIDTH NO-BREAK SPACE
+
+Using the above symbols will just trick tools like grep for no good
+reason.
+
+Thanks,
+Mauro
