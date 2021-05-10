@@ -2,87 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 12812379681
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 19:54:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 954A4379689
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 19:55:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233199AbhEJRzH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 13:55:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22639 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231512AbhEJRzH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 13:55:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620669241;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q8zrkY6i3GGCRRRcvyXkvs2AXr+SVRkrm6eJ5LBI7P0=;
-        b=Bs//1v0dNI03pw1cRiWGj9IPTNnQ7Y2ODTRikJRmQTq31Kq930RtA97kvMvVEhry0gdIQ4
-        7lswbJwVf2TVRJzhK+67IgWr3ocxPeA28tbBENdCP4NqxFt3DjllursilNKdpkp1nLGX88
-        biSaGHkPtrP2yfpy8jz+dqMexIrSekM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-4hNSdJaNM2614DnodBB8Gw-1; Mon, 10 May 2021 13:54:00 -0400
-X-MC-Unique: 4hNSdJaNM2614DnodBB8Gw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F33B6107ACC7;
-        Mon, 10 May 2021 17:53:58 +0000 (UTC)
-Received: from fuller.cnet (ovpn-112-8.gru2.redhat.com [10.97.112.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D799361094;
-        Mon, 10 May 2021 17:53:51 +0000 (UTC)
-Received: by fuller.cnet (Postfix, from userid 1000)
-        id 197D1406E9D9; Mon, 10 May 2021 14:53:46 -0300 (-03)
-Date:   Mon, 10 May 2021 14:53:46 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [patch 1/4] KVM: x86: add start_assignment hook to kvm_x86_ops
-Message-ID: <20210510175346.GA48272@fuller.cnet>
-References: <20210507130609.269153197@redhat.com>
- <20210507130923.438255076@redhat.com>
- <YJWR8G+2RSESOQyS@t490s>
+        id S233094AbhEJR4s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 13:56:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54120 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232091AbhEJR4q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 13:56:46 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2DE9C06175F
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 10:55:40 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id b15so3343584plh.10
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 10:55:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1ENyXchrEwZFqrIacbznFvbJBEbNl/lZ9i1nxAnl+9g=;
+        b=UYnI3HCSiBU6cvrm7dQI9tdEKSpp7CV9MxA5EuqiU1bGvJozPE8d1aTvUMwq39OvOd
+         6hCzlmIZ4HAEv63tDmVIVKWs9W/onufqIfZR0FJAiNKvjvqbAGyfuN9WDmRCYeKCbSO5
+         eJyWoEjCXEYhAF6SLKA5MebZNUldv1yONyhuZjb36IRxEIqV5b5WDCOkbL8OQ7vb4pRh
+         IowdP6NS5bWsZGrw8dyywqqSnSDrD01UxPFtiSFzC7LaB1fWvGvTe61QibO+dQemlWPB
+         jWxT35Zkc40rObpO+UVyCdQmjq+8lF8jqrR13Mp0g7PBbaExIEj5E/xbQS+K2pBE5lU4
+         SNRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1ENyXchrEwZFqrIacbznFvbJBEbNl/lZ9i1nxAnl+9g=;
+        b=purNldR9wqX+jv+96WML6iFxeg1JISI2oPhSNQY3Rlomm0xtZwfrUeLc8M49jugWRG
+         Ut8gLIWYrayLY5F1/rHL+fEaO85nvScXY7+e/Ei9y/PQhOWFaAtf21g+/9P7sTHxTDfp
+         wElsLSJAB6xSWPmiNKYDIueEanh/B5SYxA20OOo3TPCvRVyBrUfcLtKxl3mg5FfOMcZj
+         6snBQZGnuGJJRyWI7a86P/IuEiKIBqe6SLa6iq6pZciUsaUC38Gp0B6z+P/ozrX/wOey
+         QEOTGld3om2WapiTJ3X9FVIjz45m6808+fkn1kp2oqiSx37nQfPWOWDnlkAV8VTkmtqM
+         nyug==
+X-Gm-Message-State: AOAM531ucCjS6eQtUgWqgO3t1hsjLVPBQIFcobS+BZZvCcVO3zdWdSZw
+        fx8F21SgCBgBgKksVtA8Re9dyZAQ14Wl4CmhfaODug==
+X-Google-Smtp-Source: ABdhPJzYS0mfwifF6JB5ZMhzPe6Yj6fIZ8OsHaCnRLd+QrUH0DbuWH4cUGjgbuEIW9GLWUClBxbn5gr61i4+/DsRBU0=
+X-Received: by 2002:a17:902:f203:b029:ee:af8f:8e4b with SMTP id
+ m3-20020a170902f203b02900eeaf8f8e4bmr25110542plc.23.1620669340375; Mon, 10
+ May 2021 10:55:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YJWR8G+2RSESOQyS@t490s>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+References: <20210504171734.1434054-1-seanjc@google.com> <20210504171734.1434054-10-seanjc@google.com>
+ <CAAeT=FyKjHykGNcQc=toqvhCR281SWc6UqNihsjyU+vuo3z5Yg@mail.gmail.com> <YJlixiTcwFkrnxIL@google.com>
+In-Reply-To: <YJlixiTcwFkrnxIL@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Mon, 10 May 2021 10:55:24 -0700
+Message-ID: <CAAeT=FxTfF2-FsKn93u3ba1Rdg8ehz6XUG9G=bBT7fx_OtXgdw@mail.gmail.com>
+Subject: Re: [PATCH 09/15] KVM: VMX: Use flag to indicate "active" uret MSRs
+ instead of sorting list
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 07, 2021 at 03:16:00PM -0400, Peter Xu wrote:
-> On Fri, May 07, 2021 at 10:06:10AM -0300, Marcelo Tosatti wrote:
-> > Add a start_assignment hook to kvm_x86_ops, which is called when 
-> > kvm_arch_start_assignment is done.
-> > 
-> > The hook is required to update the wakeup vector of a sleeping vCPU
-> > when a device is assigned to the guest.
-> > 
-> > Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
-> > 
-> > Index: kvm/arch/x86/include/asm/kvm_host.h
-> > ===================================================================
-> > --- kvm.orig/arch/x86/include/asm/kvm_host.h
-> > +++ kvm/arch/x86/include/asm/kvm_host.h
-> > @@ -1322,6 +1322,7 @@ struct kvm_x86_ops {
-> >  
-> >  	int (*update_pi_irte)(struct kvm *kvm, unsigned int host_irq,
-> >  			      uint32_t guest_irq, bool set);
-> > +	void (*start_assignment)(struct kvm *kvm, int device_count);
-> 
-> I'm thinking what the hook could do with the device_count besides comparing it
-> against 1...
-> 
-> If we can't think of any, perhaps we can directly make it an enablement hook
-> instead (so we avoid calling the hook at all when count>1)?
-> 
->    /* Called when the first assignment registers (count from 0 to 1) */
->    void (*enable_assignment)(struct kvm *kvm);
+> > Shouldn't vmx_setup_uret_msr(,MSR_TSC_AUX,) be called to update
+> > the new flag load_into_hardware for MSR_TSC_AUX when CPUID
+> > (X86_FEATURE_RDTSCP/X86_FEATURE_RDPID) of the vCPU is updated ?
+>
+> Yes.  I have a patch in the massive vCPU RESET/INIT series to do exactly that.
+> I honestly can't remember if there was a dependency that "required" the fix to
+> be buried in the middle of that series.  I suspect not; I'm guessing I just
+> didn't think it was worth backporting to stable kernels and so didn't prioritize
+> hoisting the patch out of that mess.
+>
+> https://lkml.kernel.org/r/20210424004645.3950558-34-seanjc@google.com
 
-Sure, sounds good, just kept the original name...
+I see. I hadn't checked the patch.
+Thank you for your answer !
 
+Regards,
+Reiji
