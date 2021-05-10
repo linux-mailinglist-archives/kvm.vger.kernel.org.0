@@ -2,92 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D4F7379434
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 18:38:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 244E2379454
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 18:44:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231875AbhEJQj0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 12:39:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36400 "EHLO
+        id S231800AbhEJQpI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 12:45:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231528AbhEJQjH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 12:39:07 -0400
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 268E6C061574
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 09:38:02 -0700 (PDT)
-Received: by mail-io1-xd35.google.com with SMTP id z24so15392197ioj.7
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 09:38:02 -0700 (PDT)
+        with ESMTP id S231727AbhEJQpC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 12:45:02 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F00E5C06175F
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 09:43:54 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id k5so513868pjj.1
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 09:43:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gZ7cDY5D7ED7oV3zufRsM/2xrQZyC5C3tmx4hUtNL90=;
-        b=RjMaIpp5YIRqTnldyLdlV3fxRBx2tRhXYAgDzcbGJOa7RFPgiR4+I34uS2mWSTyhF3
-         NRZg3TGeLwGW3bJZeucXGxLobGWJpKprli+RnTvfD1GxIij0PUNB0S8EP6dIvL9pwXZ3
-         u1P4cBawO5UY/BdlfLpeECy0p7chC49SZcXfrwP4iIjJZpkPpRsDtAgSVmiPaP+b6Z7c
-         eiBk6guFB+u2avFI9OkGHmy3daxI28f2LZTxJs4y1y3O4QBVGD7b5Xrd8usCfPoo4du5
-         RCIAGcZRg9FKvkGv0q6Jz1DNC8KWcLTMHFaDQItWQ0yRwt3caqgR9SlRBBmJxo9YWEt2
-         pjGg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=QULoJ0SNPB24UWoCTsLENCPq0GiItK6XvhhTWI3rQSE=;
+        b=NGMRB8wqHqQxCcnVxtb+STRwI01jqDIsfmwmXAG4F8fO6jwGnhS3CV/77i9qG7uCE/
+         SDJ26pVfhdr4tZjzv9dl8mS1UsyHN8Wo2OJFHaviPYXBST+OnBu3XkaG++Zo6BncMnH2
+         4GEvBy/6dlGnQbwGRxNgynsQgSzyNJmTD+HAC8xNzR+OvgTZf3AuMySdKPJnE/mOKumb
+         dm0AQFslgcgdgltgIowfi15piIccrGkqLgFrixkY3w2syx9rAHG9drCt4faByN5o8CGd
+         3eGPzIUj4THZ5g6dyVQXXyZuvvSH/PErazoVh1Yhs4t2DyICZwij6t4hFBA6RrLg2p7O
+         nZBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gZ7cDY5D7ED7oV3zufRsM/2xrQZyC5C3tmx4hUtNL90=;
-        b=hmv3Xen3QcQbdkjvVGetK0KV9jw039WHwpCt3KHpZ79vORzQ84kT2vJELQYzGhkwki
-         jM6CXdM6DepawN8kK2RoMlebxHA3wmdO0WRah6F5GQQfwyEtAJW7Fw8G02dHRhr7nJsU
-         Ro820coI+9Pi17zV2iOXHkNKI8GaHBXRRM0YvcJp77jczui2py4+1iRAF1llC4XNfBNw
-         B65iiNgVSBHgf7ebEXKYHnO0V6D4xmOaPtQguWBX9PzotdnLHritsf7e7pd9ZUVWybhT
-         KuH3Q7Vx9M9GK4aCjV/hQsEjIMYyyMLjuFNuyY/p7cqU/385/vGzMvk9behBt1gTVRFN
-         Yngg==
-X-Gm-Message-State: AOAM533thfI7sLmWXTb4/dCGnLDodU1eoaGJtjAcB5kH3ZV3hS+dDkZp
-        NTbZ1Zewk0Njgg6/Gd2GAJSxWkE4IjaxKSBg21FmOMANFPQ=
-X-Google-Smtp-Source: ABdhPJwvuScosFSOqHr0oFwxJKgaY1y/wslBGIeJJgGCiIWeFcVXzmPzZMqnqfIoJZgGxEiFv2vdMk5DFf4xhzpaMvU=
-X-Received: by 2002:a6b:b2c8:: with SMTP id b191mr2257093iof.19.1620664681447;
- Mon, 10 May 2021 09:38:01 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=QULoJ0SNPB24UWoCTsLENCPq0GiItK6XvhhTWI3rQSE=;
+        b=TU3snqqqao77lGeEuvFw6nk+Frj1kC3nIoe96baLajh45y8EbkPjBuIkr6oH8RJ1B0
+         TA2f3WGVB2ruRckdajxNmM9StycIuhUmpNlfbuzU67lr4NJtvQ9BJ010q+rmIXQfoSn6
+         dTdLPc/v8yw0KYqrt8q5g/M6jGVq+Q8cY0uIFcAO7jm86xWFQHeqjtdOoo4SbKM7Eho9
+         FkM/AkIhilI6LSQ0I620Nh+2QWp/8sMbKsCgHmgfHuRxFGGtg0VlaJTEzBbMsA9xdQTV
+         fW2s/LBo88SDgPhzR9uG/2FFpou9FPK5RAm3E3OKTL/BUYB6o4/3STBcjaF5YCrWW1Gc
+         En/w==
+X-Gm-Message-State: AOAM532cJQV5eQHRvQtOlsPSA0wSlJmJv4AJnQCLYGnAz2FxPX2luCj0
+        niDGjkWS4ldzO+3rILRtSRik6TrvoTjZMw==
+X-Google-Smtp-Source: ABdhPJz7dR2r+pOIFi4B5085WH86k5cw6pZDQMSisn1SEYN1rA1HPgKbr53WG11MVV6txMyG4R6SOQ==
+X-Received: by 2002:a17:90b:3689:: with SMTP id mj9mr28683768pjb.154.1620665034345;
+        Mon, 10 May 2021 09:43:54 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id i20sm11290982pjz.48.2021.05.10.09.43.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 May 2021 09:43:53 -0700 (PDT)
+Date:   Mon, 10 May 2021 16:43:50 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: Re: [PATCH 09/15] KVM: VMX: Use flag to indicate "active" uret MSRs
+ instead of sorting list
+Message-ID: <YJlixiTcwFkrnxIL@google.com>
+References: <20210504171734.1434054-1-seanjc@google.com>
+ <20210504171734.1434054-10-seanjc@google.com>
+ <CAAeT=FyKjHykGNcQc=toqvhCR281SWc6UqNihsjyU+vuo3z5Yg@mail.gmail.com>
 MIME-Version: 1.0
-References: <20210506184241.618958-1-bgardon@google.com> <20210506184241.618958-6-bgardon@google.com>
- <CANgfPd-eJsHRYARTa0tm4EUVQyXvdQxGQfGfj=qLi5vkLTG6pw@mail.gmail.com>
- <a12eaa7e-f422-d8f4-e024-492aa038a398@redhat.com> <CANgfPd8BNtsSwujZnk9GAfP8Xmjy7B3yHdTOnh45wbmNU_yOQw@mail.gmail.com>
- <03e66630-b967-b91c-b74e-6944bdcaf2d7@redhat.com>
-In-Reply-To: <03e66630-b967-b91c-b74e-6944bdcaf2d7@redhat.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 10 May 2021 09:37:51 -0700
-Message-ID: <CANgfPd_uM+jXD=2m-EK-Vsz4UtB0hd-EFAA-m-y74fZf18rOpQ@mail.gmail.com>
-Subject: Re: [PATCH v3 5/8] KVM: x86/mmu: Add a field to control memslot rmap allocation
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAAeT=FyKjHykGNcQc=toqvhCR281SWc6UqNihsjyU+vuo3z5Yg@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 10, 2021 at 9:33 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 10/05/21 18:14, Ben Gardon wrote:
-> >> Possibly stupid (or at least lazy) question: why can't it be a "normal"
-> >> static inline function?
-> > That was my initial approach (hence the leftover inline) but I got
-> > some warnings about a forward declaration of struct kvm because
-> > arch/x86/include/asm/kvm_host.h doesn't include virt/kvm/kvm_host.h.
-> > Maybe there's a way to fix that, but I didn't want to mess with it.
+On Fri, May 07, 2021, Reiji Watanabe wrote:
+> > -static void vmx_setup_uret_msr(struct vcpu_vmx *vmx, unsigned int msr)
+> > +static void vmx_setup_uret_msr(struct vcpu_vmx *vmx, unsigned int msr,
+> > +                              bool load_into_hardware)
+> >  {
+> > -       struct vmx_uret_msr tmp;
+> > -       int from, to;
+> > +       struct vmx_uret_msr *uret_msr;
 > >
->
-> Let's just use the field directly.
+> > -       from = __vmx_find_uret_msr(vmx, msr);
+> > -       if (from < 0)
+> > +       uret_msr = vmx_find_uret_msr(vmx, msr);
+> > +       if (!uret_msr)
+> >                 return;
+> > -       to = vmx->nr_active_uret_msrs++;
+> >
+> > -       tmp = vmx->guest_uret_msrs[to];
+> > -       vmx->guest_uret_msrs[to] = vmx->guest_uret_msrs[from];
+> > -       vmx->guest_uret_msrs[from] = tmp;
+> > +       uret_msr->load_into_hardware = load_into_hardware;
+> >  }
+> >
+> >  /*
+> > @@ -1785,30 +1781,36 @@ static void vmx_setup_uret_msr(struct vcpu_vmx *vmx, unsigned int msr)
+> >   */
+> >  static void setup_msrs(struct vcpu_vmx *vmx)
+> >  {
+> > -       vmx->guest_uret_msrs_loaded = false;
+> > -       vmx->nr_active_uret_msrs = 0;
+> >  #ifdef CONFIG_X86_64
+> > +       bool load_syscall_msrs;
+> > +
+> >         /*
+> >          * The SYSCALL MSRs are only needed on long mode guests, and only
+> >          * when EFER.SCE is set.
+> >          */
+> > -       if (is_long_mode(&vmx->vcpu) && (vmx->vcpu.arch.efer & EFER_SCE)) {
+> > -               vmx_setup_uret_msr(vmx, MSR_STAR);
+> > -               vmx_setup_uret_msr(vmx, MSR_LSTAR);
+> > -               vmx_setup_uret_msr(vmx, MSR_SYSCALL_MASK);
+> > -       }
+> > +       load_syscall_msrs = is_long_mode(&vmx->vcpu) &&
+> > +                           (vmx->vcpu.arch.efer & EFER_SCE);
+> > +
+> > +       vmx_setup_uret_msr(vmx, MSR_STAR, load_syscall_msrs);
+> > +       vmx_setup_uret_msr(vmx, MSR_LSTAR, load_syscall_msrs);
+> > +       vmx_setup_uret_msr(vmx, MSR_SYSCALL_MASK, load_syscall_msrs);
+> >  #endif
+> > -       if (update_transition_efer(vmx))
+> > -               vmx_setup_uret_msr(vmx, MSR_EFER);
+> > +       vmx_setup_uret_msr(vmx, MSR_EFER, update_transition_efer(vmx));
+> >
+> > -       if (guest_cpuid_has(&vmx->vcpu, X86_FEATURE_RDTSCP)  ||
+> > -           guest_cpuid_has(&vmx->vcpu, X86_FEATURE_RDPID))
+> > -               vmx_setup_uret_msr(vmx, MSR_TSC_AUX);
+> > +       vmx_setup_uret_msr(vmx, MSR_TSC_AUX,
+> > +                          guest_cpuid_has(&vmx->vcpu, X86_FEATURE_RDTSCP) ||
+> > +                          guest_cpuid_has(&vmx->vcpu, X86_FEATURE_RDPID));
+> 
+> Shouldn't vmx_setup_uret_msr(,MSR_TSC_AUX,) be called to update
+> the new flag load_into_hardware for MSR_TSC_AUX when CPUID
+> (X86_FEATURE_RDTSCP/X86_FEATURE_RDPID) of the vCPU is updated ?
 
-That works for me too. I moved to the wrapper because adding the
-smp_load_acquire and a comment explaining why we were doing that
-looked bloated and I thought it would be easier to document in one
-place, but it's not that much bloat, and having the subtleties
-documented directly in the function is probably clearer for readers
-anyway.
+Yes.  I have a patch in the massive vCPU RESET/INIT series to do exactly that.
+I honestly can't remember if there was a dependency that "required" the fix to
+be buried in the middle of that series.  I suspect not; I'm guessing I just
+didn't think it was worth backporting to stable kernels and so didn't prioritize
+hoisting the patch out of that mess.
 
->
-> Paolo
->
+https://lkml.kernel.org/r/20210424004645.3950558-34-seanjc@google.com
