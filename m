@@ -2,83 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF9D23779A6
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 03:12:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C0B83779D0
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 03:34:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230143AbhEJBNb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 9 May 2021 21:13:31 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:2606 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230096AbhEJBNb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 9 May 2021 21:13:31 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Fdjdz0tPBzlcpf;
-        Mon, 10 May 2021 09:10:15 +0800 (CST)
-Received: from [10.67.77.175] (10.67.77.175) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.498.0; Mon, 10 May 2021
- 09:12:22 +0800
-Subject: Re: [PATCH] Revert "irqbypass: do not start cons/prod when failed
- connect"
-To:     Marc Zyngier <maz@kernel.org>,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-CC:     <jasowang@redhat.com>, <mst@redhat.com>,
-        <alex.williamson@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <cohuck@redhat.com>,
-        <stable@vger.kernel.org>
-References: <20210508071152.722425-1-lingshan.zhu@intel.com>
- <8735uxvajh.wl-maz@kernel.org>
-From:   Shaokun Zhang <zhangshaokun@hisilicon.com>
-Message-ID: <cfb68374-a7bf-1eb4-86cf-77c57f7fe9e5@hisilicon.com>
-Date:   Mon, 10 May 2021 09:12:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        id S230119AbhEJBfS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 9 May 2021 21:35:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56979 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230114AbhEJBfR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 9 May 2021 21:35:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620610453;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=G6F/Zc94YePQW7AcfQRcHnmyKkKZaaJbaatLrem/2Q0=;
+        b=ZdK+P1QulnKbhuYtOZWkJSuESXR9zawK8b2g2hWWJEKwbfzkFU/JmBhoOPJOhBMD3wyBLO
+        J67k/a/ifWw87r/beuOh9mdkowbl5l+N9ECdupWTLHBF/p7dsDfp0mNOlmEXGtB1XdKvG4
+        G2ukL3UQt1h0rNQBWnMkymsSKpIDvh8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-554-ixLWuBhbNBWuRm1ScIgBgA-1; Sun, 09 May 2021 21:34:09 -0400
+X-MC-Unique: ixLWuBhbNBWuRm1ScIgBgA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE192107ACCA;
+        Mon, 10 May 2021 01:34:08 +0000 (UTC)
+Received: from x1.home.shazbot.org (ovpn-113-225.phx2.redhat.com [10.3.113.225])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3C3CD610D0;
+        Mon, 10 May 2021 01:34:08 +0000 (UTC)
+Date:   Sun, 9 May 2021 19:34:08 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yuan Yao <yuan.yao@linux.intel.com>
+Cc:     tkffaul@outlook.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vfio/pci: Sanity check IGD OpRegion Size
+Message-ID: <20210509193408.22ae2b2a@x1.home.shazbot.org>
+In-Reply-To: <20210510011014.q6xfcmqopbqgepbq@yy-desk-7060>
+References: <162041357421.21800.16214130780777455390.stgit@omen>
+        <20210510011014.q6xfcmqopbqgepbq@yy-desk-7060>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <8735uxvajh.wl-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.77.175]
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Mon, 10 May 2021 09:10:14 +0800
+Yuan Yao <yuan.yao@linux.intel.com> wrote:
 
-On 2021/5/8 17:29, Marc Zyngier wrote:
-> On Sat, 08 May 2021 08:11:52 +0100,
-> Zhu Lingshan <lingshan.zhu@intel.com> wrote:
->>
->> This reverts commit a979a6aa009f3c99689432e0cdb5402a4463fb88.
->>
->> The reverted commit may cause VM freeze on arm64 platform.
->> Because on arm64 platform, stop a consumer will suspend the VM,
->> the VM will freeze without a start consumer
+> On Fri, May 07, 2021 at 12:53:17PM -0600, Alex Williamson wrote:
+> > The size field of the IGD OpRegion table is supposed to indicate table
+> > size in KB, but we've seen at least one report of a BIOS that appears
+> > to incorrectly report size in bytes.  The default size is 8 (*1024 =
+> > 8KB), but an incorrect implementation may report 8192 (*1024 = 8MB)
+> > and can cause a variety of mapping errors.
+> > 
+> > It's believed that 8MB would be an implausible, if not absurd, actual
+> > size, so we can probably be pretty safe in assuming this is a BIOS bug
+> > where the intended size is likely 8KB.
+> > 
+> > Reported-by: Travis Faulhaber <tkffaul@outlook.com>
+> > Tested-by: Travis Faulhaber <tkffaul@outlook.com>
+> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > ---
+> >  drivers/vfio/pci/vfio_pci_igd.c |   11 ++++++++++-
+> >  1 file changed, 10 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/vfio_pci_igd.c
+> > index 228df565e9bc..c89a4797cd18 100644
+> > --- a/drivers/vfio/pci/vfio_pci_igd.c
+> > +++ b/drivers/vfio/pci/vfio_pci_igd.c
+> > @@ -86,7 +86,16 @@ static int vfio_pci_igd_opregion_init(struct vfio_pci_device *vdev)
+> >  		return -EINVAL;
+> >  	}
+> >  
+> > -	size *= 1024; /* In KB */
+> > +	/*
+> > +	 * The OpRegion size field is specified as size in KB, but there have been
+> > +	 * user reports where this field appears to report size in bytes.  If we
+> > +	 * read 8192, assume this is the case.
+> > +	 */
+> > +	if (size == OPREGION_SIZE)  
 > 
-> It also unconditionally calls del_consumer on the producer, which
-> isn't exactly expected.
-> 
->>
->> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-> 
-> Reported-by: Shaokun Zhang <zhangshaokun@hisilicon.com>
+> Is "size >= OPREGION_SIZE" or "size >= smaller but still implausible value
+> (like 4096)" better for covering more bad BIOS implementation cases ?
 
-Thanks for the tag, it works with this patch, So:
-Tested-by: Shaokun Zhang <zhangshaokun@hisilicon.com>
+We haven't seen such cases and it seems like a BIOS implementation
+competent enough to use something other than the default size, probably
+might get the units correct for this field.  Our footing for assuming
+this specific implementation error gets shakier if we try to apply it
+beyond the default size, imo.  Thanks,
 
-I shall invite you to have a drink for the quick debug.
-Anyway, thank you again.
+Alex
 
-Shaokun
-
-> Suggested-by: Marc Zyngier <maz@kernel.org>
-> Acked-by: Marc Zyngier <maz@kernel.org>
-> Fixes: a979a6aa009f ("irqbypass: do not start cons/prod when failed connect")
-> Link: https://lore.kernel.org/r/3a2c66d6-6ca0-8478-d24b-61e8e3241b20@hisilicon.com
-> Cc: stable@vger.kernel.org
-> 
-> Thanks,
-> 
-> 	M.
-> 
