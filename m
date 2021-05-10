@@ -2,134 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F2A537967F
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 19:53:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12812379681
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 19:54:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233108AbhEJRyt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 13:54:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44623 "EHLO
+        id S233199AbhEJRzH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 13:55:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22639 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231512AbhEJRyr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 13:54:47 -0400
+        by vger.kernel.org with ESMTP id S231512AbhEJRzH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 13:55:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620669222;
+        s=mimecast20190719; t=1620669241;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ZRMKkN3puVHnbiCCjdkC/0aI/Ng/WMP6VZjBrfm3u3I=;
-        b=cOCihoxcPQzvGKQJ3FuT5Eir1fNpEVpYOjbwj2J5Rr5dZVP6CLttvtPGgHPJWtbVTqKMzD
-        7Rg1nj1O5gFr+sHsMQ4RjJTtRg051x6eO7jfaasZvnXJGs2J8oJju/inxl7CGSOPwFdUAW
-        +a0HwvzYUnzpCy6gGZ93mhLvYnrMVM4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-110-xGEn8BMDP_eVTZEvrCbdHA-1; Mon, 10 May 2021 13:53:41 -0400
-X-MC-Unique: xGEn8BMDP_eVTZEvrCbdHA-1
-Received: by mail-wm1-f69.google.com with SMTP id o18-20020a1ca5120000b02901333a56d46eso7259801wme.8
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 10:53:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ZRMKkN3puVHnbiCCjdkC/0aI/Ng/WMP6VZjBrfm3u3I=;
-        b=Llt/b4hTGebMBfsrjw2Zygekplm8mtjs/+9DmTYdJ8TXfVg7Jc/w7ZqBsjNT/exurn
-         H5Q0iJ3qBl6OosnCeN24GgIDxf0MBese5RGiEQNrT7SXH6UFImeihGDnyNm697WEGB8N
-         SwaJu5sd79xkiTMVY6rhyFVrkaPRmew7TPIOZj1Kcriyz9cyh9aZpp2zvg69hdO5cOkz
-         IzDDBYwQfUEULBePYmxKJp6NkFVnSlknLzzvMCFq8ECZr47P8e4fsi7ZV6Dxlu7EhjO0
-         OWzD3tS90gI0prY20SVqcbrSFmc001UI1hbTVFIGMnDU0OkuvctE4z79ltb9qlaepX26
-         5cVQ==
-X-Gm-Message-State: AOAM5319QahWzahgLBKu85VbJJ5/d3rBKHBI34nUL+iOrTAgdl7aqzZS
-        pMGZdK78KlpKeLaQpqcl30fZcKUpKVq4mZcJdXdnfIvoSuQW0oycgHTTz7/qHz71csJXnnBaIg9
-        H8nVEEtk02qZ7
-X-Received: by 2002:a05:600c:41d4:: with SMTP id t20mr397218wmh.46.1620669219692;
-        Mon, 10 May 2021 10:53:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxACCYv6x9QhD3YmeCA/WIWl5sAyibLtwamGjdiFCeIqnub2B2iMTBAkL7kge9o6yM046pzgw==
-X-Received: by 2002:a05:600c:41d4:: with SMTP id t20mr397186wmh.46.1620669219388;
-        Mon, 10 May 2021 10:53:39 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id n123sm285028wme.24.2021.05.10.10.53.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 May 2021 10:53:38 -0700 (PDT)
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Peter Xu <peterx@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>
-References: <20210506184241.618958-1-bgardon@google.com>
- <20210506184241.618958-8-bgardon@google.com>
- <e2e73709-f247-1a60-4835-f3fad37ab736@redhat.com>
- <YJlxQe1AXljq5yhQ@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 7/8] KVM: x86/mmu: Protect rmaps independently with
- SRCU
-Message-ID: <a13b6960-3628-2899-5fbf-0765f97aa9eb@redhat.com>
-Date:   Mon, 10 May 2021 19:53:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        bh=Q8zrkY6i3GGCRRRcvyXkvs2AXr+SVRkrm6eJ5LBI7P0=;
+        b=Bs//1v0dNI03pw1cRiWGj9IPTNnQ7Y2ODTRikJRmQTq31Kq930RtA97kvMvVEhry0gdIQ4
+        7lswbJwVf2TVRJzhK+67IgWr3ocxPeA28tbBENdCP4NqxFt3DjllursilNKdpkp1nLGX88
+        biSaGHkPtrP2yfpy8jz+dqMexIrSekM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-107-4hNSdJaNM2614DnodBB8Gw-1; Mon, 10 May 2021 13:54:00 -0400
+X-MC-Unique: 4hNSdJaNM2614DnodBB8Gw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F33B6107ACC7;
+        Mon, 10 May 2021 17:53:58 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-8.gru2.redhat.com [10.97.112.8])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D799361094;
+        Mon, 10 May 2021 17:53:51 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id 197D1406E9D9; Mon, 10 May 2021 14:53:46 -0300 (-03)
+Date:   Mon, 10 May 2021 14:53:46 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [patch 1/4] KVM: x86: add start_assignment hook to kvm_x86_ops
+Message-ID: <20210510175346.GA48272@fuller.cnet>
+References: <20210507130609.269153197@redhat.com>
+ <20210507130923.438255076@redhat.com>
+ <YJWR8G+2RSESOQyS@t490s>
 MIME-Version: 1.0
-In-Reply-To: <YJlxQe1AXljq5yhQ@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YJWR8G+2RSESOQyS@t490s>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/05/21 19:45, Sean Christopherson wrote:
->>
->> ---------
->> Currently, rmaps are always allocated and published together with a new
->> memslot, so the srcu_dereference for the memslots array already ensures that
->> the memory pointed to by slots->arch.rmap is zero at the time
->> slots->arch.rmap.  However, they still need to be accessed in an SRCU
->> read-side critical section, as the whole memslot can be deleted outside
->> SRCU.
->> --------
-> I disagree, sprinkling random and unnecessary __rcu/SRCU annotations does more
-> harm than good.  Adding the unnecessary tag could be quite misleading as it
-> would imply the rmap pointers can_change_  independent of the memslots.
+On Fri, May 07, 2021 at 03:16:00PM -0400, Peter Xu wrote:
+> On Fri, May 07, 2021 at 10:06:10AM -0300, Marcelo Tosatti wrote:
+> > Add a start_assignment hook to kvm_x86_ops, which is called when 
+> > kvm_arch_start_assignment is done.
+> > 
+> > The hook is required to update the wakeup vector of a sleeping vCPU
+> > when a device is assigned to the guest.
+> > 
+> > Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+> > 
+> > Index: kvm/arch/x86/include/asm/kvm_host.h
+> > ===================================================================
+> > --- kvm.orig/arch/x86/include/asm/kvm_host.h
+> > +++ kvm/arch/x86/include/asm/kvm_host.h
+> > @@ -1322,6 +1322,7 @@ struct kvm_x86_ops {
+> >  
+> >  	int (*update_pi_irte)(struct kvm *kvm, unsigned int host_irq,
+> >  			      uint32_t guest_irq, bool set);
+> > +	void (*start_assignment)(struct kvm *kvm, int device_count);
 > 
-> Similary, adding rcu_assign_pointer() in alloc_memslot_rmap() implies that its
-> safe to access the rmap after its pointer is assigned, and that's simply not
-> true since an rmap array can be freed if rmap allocation for a different memslot
-> fails.  Accessing the rmap is safe if and only if all rmaps are allocated, i.e.
-> if arch.memslots_have_rmaps is true, as you pointed out.
-
-This about freeing is a very good point.
-
-> Furthermore, to actually gain any protection from SRCU, there would have to be
-> an synchronize_srcu() call after assigning the pointers, and that _does_  have an
-> associated.
-
-... but this is incorrect (I was almost going to point out the below in 
-my reply to Ben, then decided I was pointing out the obvious; lesson 
-learned).
-
-synchronize_srcu() is only needed after *deleting* something, which in 
-this case is done as part of deleting the memslots---it's perfectly fine 
-to batch multiple synchronize_*() calls given how expensive some of them 
-are.
-
-(BTW an associated what?)
-
-So they still count as RCU-protected in my opinion, just because reading 
-them outside SRCU is a big no and ought to warn (it's unlikely that it 
-happens with rmaps, but then we just had 2-3 bugs like this being 
-reported in a short time for memslots so never say never).  However, 
-rcu_assign_pointer is not needed because the visibility of the rmaps is 
-further protected by the have-rmaps flag (to be accessed with 
-load-acquire/store-release) and not just by the pointer being there and 
-non-NULL.
-
-Paolo
-
-> Not to mention that to truly respect the __rcu annotation, deleting
-> the rmaps would also have to be done "independently" with the correct
-> rcu_assign_pointer() and synchronize_srcu() logic.
+> I'm thinking what the hook could do with the device_count besides comparing it
+> against 1...
 > 
+> If we can't think of any, perhaps we can directly make it an enablement hook
+> instead (so we avoid calling the hook at all when count>1)?
+> 
+>    /* Called when the first assignment registers (count from 0 to 1) */
+>    void (*enable_assignment)(struct kvm *kvm);
+
+Sure, sounds good, just kept the original name...
 
