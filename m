@@ -2,244 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AC7A3377D8B
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 09:59:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E19A377D90
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 10:00:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230093AbhEJIAM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 04:00:12 -0400
-Received: from mx2.suse.de ([195.135.220.15]:49690 "EHLO mx2.suse.de"
+        id S230138AbhEJIBH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 04:01:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60968 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229852AbhEJIAL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 04:00:11 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1620633546; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TuZVZ/TZC+amwC+uSPzlrvCbYklxbsfl2Zo4uow0QtM=;
-        b=MZBcmLBBHrZ1wfDmTie51ynVN+p9kalGIgPfxsMqHhSJmp4MYuDWgAgnR9/CHGq5YbBeOc
-        XT7/1TA7xKwDsQpPQbTmP4jQzLcNh7/CMpnUY3deZWvw6rUNHWt74ljco5yKZ8copvcdd1
-        aVCuEaZGmHXdJS5RbaR37aXxP5YEVY0=
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id DF29DAE57;
-        Mon, 10 May 2021 07:59:05 +0000 (UTC)
-Subject: Re: [PATCH 1/4] x86/xen/entry: Rename xenpv_exc_nmi to noist_exc_nmi
-To:     Lai Jiangshan <jiangshanlai@gmail.com>,
-        linux-kernel@vger.kernel.org
-Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Uros Bizjak <ubizjak@gmail.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Alexandre Chartre <alexandre.chartre@oracle.com>,
-        Joerg Roedel <jroedel@suse.de>, Jian Cai <caij2003@gmail.com>,
-        xen-devel@lists.xenproject.org
-References: <20210426230949.3561-1-jiangshanlai@gmail.com>
- <20210426230949.3561-2-jiangshanlai@gmail.com>
-From:   Juergen Gross <jgross@suse.com>
-Message-ID: <76c9d530-6a55-927b-9727-7875bc8101bb@suse.com>
-Date:   Mon, 10 May 2021 09:59:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
-MIME-Version: 1.0
-In-Reply-To: <20210426230949.3561-2-jiangshanlai@gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="mQbbA6hZIMq2ZCFvc5HSGnGiqncPrGTud"
+        id S229852AbhEJIBG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 04:01:06 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3C916613B6;
+        Mon, 10 May 2021 08:00:02 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1lg0pc-000Jsp-4R; Mon, 10 May 2021 09:00:00 +0100
+Date:   Mon, 10 May 2021 08:59:59 +0100
+Message-ID: <87zgx3nhmo.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Zenghui Yu <yuzenghui@huawei.com>
+Cc:     <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <kernel-team@android.com>, Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH v2 03/11] KVM: arm64: Make kvm_skip_instr() and co private to HYP
+In-Reply-To: <78e0bc84-4b38-9d93-39a1-473ed8c7265b@huawei.com>
+References: <20201102164045.264512-1-maz@kernel.org>
+        <20201102164045.264512-4-maz@kernel.org>
+        <cef3517b-e66d-4d26-68a9-2d5fb433377c@huawei.com>
+        <875yzxnn5w.wl-maz@kernel.org>
+        <87zgx8mkwd.wl-maz@kernel.org>
+        <db784fc8-3a52-49ff-0b75-83a1bbc81d98@huawei.com>
+        <87o8doq6jy.wl-maz@kernel.org>
+        <78e0bc84-4b38-9d93-39a1-473ed8c7265b@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com, will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, ascull@google.com, mark.rutland@arm.com, qperret@google.com, dbrazdil@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mQbbA6hZIMq2ZCFvc5HSGnGiqncPrGTud
-Content-Type: multipart/mixed; boundary="IGLvBXepGr91Ct8EfRs0yAnZoEVaWAbXG";
- protected-headers="v1"
-From: Juergen Gross <jgross@suse.com>
-To: Lai Jiangshan <jiangshanlai@gmail.com>, linux-kernel@vger.kernel.org
-Cc: Lai Jiangshan <laijs@linux.alibaba.com>,
- Thomas Gleixner <tglx@linutronix.de>, Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Steven Rostedt
- <rostedt@goodmis.org>, Andi Kleen <ak@linux.intel.com>,
- Andy Lutomirski <luto@kernel.org>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- Wanpeng Li <wanpengli@tencent.com>, Jim Mattson <jmattson@google.com>,
- Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
- Josh Poimboeuf <jpoimboe@redhat.com>, Uros Bizjak <ubizjak@gmail.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Peter Zijlstra <peterz@infradead.org>,
- Alexandre Chartre <alexandre.chartre@oracle.com>,
- Joerg Roedel <jroedel@suse.de>, Jian Cai <caij2003@gmail.com>,
- xen-devel@lists.xenproject.org
-Message-ID: <76c9d530-6a55-927b-9727-7875bc8101bb@suse.com>
-Subject: Re: [PATCH 1/4] x86/xen/entry: Rename xenpv_exc_nmi to noist_exc_nmi
-References: <20210426230949.3561-1-jiangshanlai@gmail.com>
- <20210426230949.3561-2-jiangshanlai@gmail.com>
-In-Reply-To: <20210426230949.3561-2-jiangshanlai@gmail.com>
+On Sun, 09 May 2021 14:07:45 +0100,
+Zenghui Yu <yuzenghui@huawei.com> wrote:
+> 
+> On 2021/5/6 22:29, Marc Zyngier wrote:
+> > On Thu, 06 May 2021 12:43:26 +0100,
+> > Zenghui Yu <yuzenghui@huawei.com> wrote:
+> >> 
+> >> On 2021/5/6 14:33, Marc Zyngier wrote:
+> >>> On Wed, 05 May 2021 17:46:51 +0100,
+> >>> Marc Zyngier <maz@kernel.org> wrote:
+> >>>> 
+> >>>> Hi Zenghui,
+> >>>> 
+> >>>> On Wed, 05 May 2021 15:23:02 +0100,
+> >>>> Zenghui Yu <yuzenghui@huawei.com> wrote:
+> >>>>> 
+> >>>>> Hi Marc,
+> >>>>> 
+> >>>>> On 2020/11/3 0:40, Marc Zyngier wrote:
+> >>>>>> In an effort to remove the vcpu PC manipulations from EL1 on nVHE
+> >>>>>> systems, move kvm_skip_instr() to be HYP-specific. EL1's intent
+> >>>>>> to increment PC post emulation is now signalled via a flag in the
+> >>>>>> vcpu structure.
+> >>>>>> 
+> >>>>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> >>>>> 
+> >>>>> [...]
+> >>>>> 
+> >>>>>> @@ -133,6 +134,8 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+> >>>>>>  	__load_guest_stage2(vcpu->arch.hw_mmu);
+> >>>>>>  	__activate_traps(vcpu);
+> >>>>>> +	__adjust_pc(vcpu);
+> >>>>> 
+> >>>>> If the INCREMENT_PC flag was set (e.g., for WFx emulation) while we're
+> >>>>> handling PSCI CPU_ON call targetting this VCPU, the *target_pc* (aka
+> >>>>> entry point address, normally provided by the primary VCPU) will be
+> >>>>> unexpectedly incremented here. That's pretty bad, I think.
+> >>>> 
+> >>>> How can you online a CPU using PSCI if that CPU is currently spinning
+> >>>> on a WFI? Or is that we have transitioned via userspace to perform the
+> >>>> vcpu reset? I can imagine it happening in that case.
+> >> 
+> >> I hadn't tried to reset VCPU from userspace. That would be a much easier
+> >> way to reproduce this problem.
+> > 
+> > Then I don't understand how you end-up there. If the vcpu was in WFI,
+> > it wasn't off and PSCI_CPU_ON doesn't have any effect.
+> 
+> I'm sorry for the misleading words.
+> 
+> The reported problem (secondary vcpu entry point corruption) was noticed
+> after a guest reboot. On rebooting, all vcpus will go back to userspace,
+> either because of a vcpu PSCI_SYSTEM_RESET call (with a
+> KVM_SYSTEM_EVENT_RESET system event in result), or because of a pending
+> signal targetting the vcpu thread. Userspace (I used QEMU) will then
+> perform the vcpu reset using the KVM_ARM_VCPU_INIT ioctl, of course!
 
---IGLvBXepGr91Ct8EfRs0yAnZoEVaWAbXG
-Content-Type: multipart/mixed;
- boundary="------------B3541311547641A2A2D99FD5"
-Content-Language: en-US
+OK, that's exactly the scenario I had in mind, and we are in violent
+agreement! :-)
 
-This is a multi-part message in MIME format.
---------------B3541311547641A2A2D99FD5
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+> WFI is the last instruction executed by the secondary vcpu before
+> rebooting. Emulating it results in a PC-altering flag.
+> 
+> What I was going to say is that maybe we can reproduce this problem with
+> a much simpler userspace program (not QEMU, no reboot) -- perform vcpu
+> reset while the vcpu is concurrently executing WFI, and see if the
+> result PC is set to 0 (per the KVM_ARM_VCPU_INIT doc). Maybe we can
+> achieve it with a kvm selftest case but "I hadn't tried", which turned
+> out to be misleading.
 
-On 27.04.21 01:09, Lai Jiangshan wrote:
-> From: Lai Jiangshan <laijs@linux.alibaba.com>
->=20
-> There is no any functionality change intended.  Just rename it and
-> move it to arch/x86/kernel/nmi.c so that we can resue it later in
-> next patch for early NMI and kvm.
->=20
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: Steven Rostedt <rostedt@goodmis.org>
-> Cc: Andi Kleen <ak@linux.intel.com>
-> Cc: Andy Lutomirski <luto@kernel.org>
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Cc: Wanpeng Li <wanpengli@tencent.com>
-> Cc: Jim Mattson <jmattson@google.com>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: kvm@vger.kernel.org
-> Cc: Josh Poimboeuf <jpoimboe@redhat.com>
-> Cc: Uros Bizjak <ubizjak@gmail.com>
-> Cc: Maxim Levitsky <mlevitsk@redhat.com>
-> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+No worries. At least I know we have the same understanding of the
+problem and we can look at the solution.
 
-Acked-by: Juergen Gross <jgross@suse.com>
+> I'll have a look at your branch.
 
+Thanks,
 
-Juergen
+	M.
 
---------------B3541311547641A2A2D99FD5
-Content-Type: application/pgp-keys;
- name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: attachment;
- filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
-cWx
-w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
-f8Z
-d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
-9bf
-IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
-G7/
-377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
-3Jv
-c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
-QIe
-AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
-hpw
-dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
-MbD
-1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
-oPH
-Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
-5QL
-+qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
-2Vu
-IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
-QoL
-BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
-Wf0
-teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
-/nu
-AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
-ITT
-d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
-XBK
-7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
-80h
-SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
-AcD
-AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
-FOX
-gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
-jnD
-kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
-N51
-N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
-otu
-fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
-tqS
-EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
-hsD
-BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
-g3O
-ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
-dM7
-wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
-D+j
-LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
-V2x
-AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
-Eaw
-QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
-nHI
-s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
-wgn
-BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
-bVF
-LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
-pEd
-IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
-QAB
-wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
-Tbe
-8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
-vJz
-Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
-VGi
-wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
-svi
-uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
-zXs
-ZDn8R38=3D
-=3D2wuH
------END PGP PUBLIC KEY BLOCK-----
-
---------------B3541311547641A2A2D99FD5--
-
---IGLvBXepGr91Ct8EfRs0yAnZoEVaWAbXG--
-
---mQbbA6hZIMq2ZCFvc5HSGnGiqncPrGTud
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmCY58cFAwAAAAAACgkQsN6d1ii/Ey9t
-LwgAhGh3kiEytpFwdlrXX4nrGqwyp+dgw7V8JtwPEAbGMsJoY/p8Ii1SYqsirhnhbqZBhTJthDoK
-X9fhFPxUejj1QZf+/1V0D9xMUGRyqCGE/m8eVj4BZiJLf0Rf6zVe1u7dVSnhiZpwRTOC4xCgIVVy
-xsc+Xshq4VfG4L+4kfPuPcDOLhbNUCXFijLYIDUpfBInsFNS5iInJ9IjiNJSb2iIdb3ggIWtOdqI
-D3ua2HDxita+PD39wzrKeBzLOqM9KRgkB6X4eUvKDSw1nx8+g7S0sUgdEoZmUlYTupLDvH9fL+fl
-zliVI0HYzTAhhxS6J1uTP91IMat6HFhV4i79cxHIfQ==
-=RO4B
------END PGP SIGNATURE-----
-
---mQbbA6hZIMq2ZCFvc5HSGnGiqncPrGTud--
+-- 
+Without deviation from the norm, progress is not possible.
