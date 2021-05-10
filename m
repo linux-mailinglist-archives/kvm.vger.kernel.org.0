@@ -2,148 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2ADFB379743
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 20:57:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A40EB37974C
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 20:57:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232462AbhEJS6t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 14:58:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39828 "EHLO
+        id S232995AbhEJS6z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 14:58:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230300AbhEJS6r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 14:58:47 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CB4CC06175F
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 11:57:41 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id x2so24912231lff.10
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 11:57:41 -0700 (PDT)
+        with ESMTP id S232952AbhEJS6w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 14:58:52 -0400
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0546C06138A
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 11:57:46 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id q186so2464314ljq.8
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 11:57:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=rHjqwVQjzMEV5GK54WowYNEUzQ+k4CK9chJTV5Okn7c=;
-        b=QMjJbO1L2Cxu9EqcoA2Dh2LjzMSrVFxlZPKXiltJd/6sQmrMeQxmH95UG0NicAqPUj
-         WNZPpwMln6fAm4nod1Kpt1aNKY1MaRsPbYZoWlDMc9bQZsgZ7sJQh2ap2gK+rrTHhq3M
-         rXmH3pAazUZliBie1fO20stm2CEZvezyK7PRArTr6i0RZFqSBe7z1CKS1zvYK1Rwqlsi
-         jMbodNLYT7iIEDAxxKpv1Kut+KZtAe/W5wCfazhEJqRD15FENd3QWbMh8iwrNdcW94F5
-         qMz3DlZ5VbtODD74KEe0KpnwbXRKnPiM94zZ29/OIZjvuzA6ftBfv/rbBMVz2Btxvpqp
-         5iTQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=aKEUOJuhx+R5Q4bhRWHxVLgdxk0QGSuqQVlbf8MB+7c=;
+        b=JDBZzQIPoejn3/d+QtGZzD28RdIw8C64WhVvR1t8Mm8NPesB5GQbV+6X8MAPg8d2iz
+         7mjSfAUxoe5GoA1u5eFD81uYYLAp2URnyUCGrbNDYHVp38j8bGebnRhp+yuSIhca96TB
+         Idw999gL4TQKkak+v8eW//N13DSw/7q+BBPaOMR33bGqZCv8T374sU+F3cL1EEa60D/a
+         NLbUr3Kya2ani4/px1deJxMu9aWX7EaHN+n0Wv5F28jq3z25xhcOIgfkMVM1CulHeisB
+         6W1yTMA8cSJ+3dwvBwd7q8xAXNwv+Nbrjofd7n08PFX4O78UvKYNZsu4A6MXr68Q2VUW
+         k9Cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=rHjqwVQjzMEV5GK54WowYNEUzQ+k4CK9chJTV5Okn7c=;
-        b=XpVn4lF6K8oBXEYTOK8A56rD70CpROJBttwI3BgYo4y7q+8u+rsq9c2GqWjXkr3ufj
-         21f6wEtmwoeU9qFoy3oUiDn+ac28KmLCP8aYW7X9wt6SaQutzRIlvqfRDztAkeN4gVKi
-         o05zuqlh+ft58pMjfX1ZMOQYX5kT9wT0Y8MXayUvCzX3IwPpmVT96dvYeHFTcms3rDSw
-         zhCqQrAtTP9Xd9YbkP9Btfn5vLYclSnpy8iB9UynpPUUWKsKensNlfeyvJvoOJpNCbh8
-         4R9LKxEsbnYUmUBeTi1nyuSfIKCrWsKqliO2OXASKysAr084aJeIAL2rnSU64L131Opq
-         rRRg==
-X-Gm-Message-State: AOAM531dvk9NrVUd0o8ol5e7PuIXg+ikIdckFm+4XnmyJ4yoBfIM/erz
-        xq/Rcp2Reqd8KgTwDi3shl+fpkz4uqj0Gbq207wDw6Ir/MVtX5aD
-X-Google-Smtp-Source: ABdhPJyUTojXkR3OkkvxmoH6PFq+uUMBCtGrr8/i1SBWhTm9x+5pM4LoolwpcagABSdUASsTaqvLwYA+WiLFk52KFmI=
-X-Received: by 2002:ac2:532d:: with SMTP id f13mr17394936lfh.81.1620673059631;
- Mon, 10 May 2021 11:57:39 -0700 (PDT)
+         :message-id:subject:to;
+        bh=aKEUOJuhx+R5Q4bhRWHxVLgdxk0QGSuqQVlbf8MB+7c=;
+        b=rmDyTvudt24eywUQ95zSDS6iOpqnMRnsJlBRlBScIjphnTbcrjItu5WNE+jWwRJGqS
+         WXNCsJ3uLusTpSDxNIjXBm2/KXY/y00Ko54Bq09AUZuoqOYVPEine2aLTzODwJoZV+sN
+         jW5pbpXIaHkFaMx793v5VSzd7+t81Hu1MFQXKV0uMeqBvJyI14jG33H1lRRwfXyKasYd
+         IbxZA/xGNRKJM4+MO7ZvRl0eD3YCzKgTtiMteiIwBFchdjRNgOvyil8w5S8R0qNWyrLb
+         UMqjlt6jh8pTy5meBHE4QidwuxCdwxxOhnbzMJoczo6lmTpMVppg8Y51iGI5T83Y0Tuu
+         DCZw==
+X-Gm-Message-State: AOAM5311UIrhhPN28tplKjvVOlkT7td0mjk+p5urqiXB8JAC/Lnjd2SI
+        YsM1HwcCfi151BuTXWXDO3GSY6XH+9CWjtqFA2vHJShojmKIoQ==
+X-Google-Smtp-Source: ABdhPJwlSFI8JRzL4BW3Gmg9WHqzIaE0tnEyTDmQy+u1k5R9ZHhhfpXgcqsFOBszyUlQhiyVUC1Rjjrmtnj+bLyjTHs=
+X-Received: by 2002:a2e:591:: with SMTP id 139mr14109105ljf.207.1620673065009;
+ Mon, 10 May 2021 11:57:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210430123822.13825-1-brijesh.singh@amd.com> <20210430123822.13825-37-brijesh.singh@amd.com>
-In-Reply-To: <20210430123822.13825-37-brijesh.singh@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Mon, 10 May 2021 12:57:27 -0600
-Message-ID: <CAMkAt6ottZkx02-ykazkG-5Tu5URv-xwOjWOZ=XMAXv98_HOYA@mail.gmail.com>
-Subject: Re: [PATCH Part2 RFC v2 36/37] KVM: SVM: Provide support for
- SNP_GUEST_REQUEST NAE event
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
-        kvm list <kvm@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, jroedel@suse.de,
-        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
+References: <20210429203740.1935629-1-jingzhangos@google.com>
+In-Reply-To: <20210429203740.1935629-1-jingzhangos@google.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Mon, 10 May 2021 13:57:33 -0500
+Message-ID: <CAAdAUtgW0vYmr5rqiMJKbZSjgEtLQqxfHd8H0fxrTbE0o4zmWw@mail.gmail.com>
+Subject: Re: [PATCH v4 0/4] KVM statistics data fd-based binary interface
+To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
         David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>, peterz@infradead.org,
-        "H. Peter Anvin" <hpa@zytor.com>, tony.luck@intel.com
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->
-> +static void snp_handle_guest_request(struct vcpu_svm *svm, struct ghcb *ghcb,
-> +                                   gpa_t req_gpa, gpa_t resp_gpa)
-> +{
-> +       struct sev_data_snp_guest_request data = {};
-> +       struct kvm_vcpu *vcpu = &svm->vcpu;
-> +       struct kvm *kvm = vcpu->kvm;
-> +       kvm_pfn_t req_pfn, resp_pfn;
-> +       struct kvm_sev_info *sev;
-> +       int rc, err = 0;
-> +
-> +       if (!sev_snp_guest(vcpu->kvm)) {
-> +               rc = -ENODEV;
-> +               goto e_fail;
-> +       }
-> +
-> +       sev = &to_kvm_svm(kvm)->sev_info;
-> +
-> +       if (!__ratelimit(&sev->snp_guest_msg_rs)) {
-> +               pr_info_ratelimited("svm: too many guest message requests\n");
-> +               rc = -EAGAIN;
-> +               goto e_fail;
-> +       }
-> +
-> +       if (!IS_ALIGNED(req_gpa, PAGE_SIZE) || !IS_ALIGNED(resp_gpa, PAGE_SIZE)) {
-> +               pr_err("svm: guest request (%#llx) or response (%#llx) is not page aligned\n",
-> +                       req_gpa, resp_gpa);
-> +               goto e_term;
-> +       }
-> +
-> +       req_pfn = gfn_to_pfn(kvm, gpa_to_gfn(req_gpa));
-> +       if (is_error_noslot_pfn(req_pfn)) {
-> +               pr_err("svm: guest request invalid gpa=%#llx\n", req_gpa);
-> +               goto e_term;
-> +       }
-> +
-> +       resp_pfn = gfn_to_pfn(kvm, gpa_to_gfn(resp_gpa));
-> +       if (is_error_noslot_pfn(resp_pfn)) {
-> +               pr_err("svm: guest response invalid gpa=%#llx\n", resp_gpa);
-> +               goto e_term;
-> +       }
-> +
-> +       data.gctx_paddr = __psp_pa(sev->snp_context);
-> +       data.req_paddr = __sme_set(req_pfn << PAGE_SHIFT);
-> +       data.res_paddr = __psp_pa(sev->snp_resp_page);
-> +
-> +       mutex_lock(&kvm->lock);
-> +
-> +       rc = sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &data, &err);
-> +       if (rc) {
-> +               mutex_unlock(&kvm->lock);
-> +
-> +               /* If we have a firmware error code then use it. */
-> +               if (err)
-> +                       rc = err;
-> +
-> +               goto e_fail;
-> +       }
-> +
-> +       /* Copy the response after the firmware returns success. */
-> +       rc = kvm_write_guest(kvm, resp_gpa, sev->snp_resp_page, PAGE_SIZE);
-> +
-> +       mutex_unlock(&kvm->lock);
-> +
-> +e_fail:
-> +       ghcb_set_sw_exit_info_2(ghcb, rc);
-> +       return;
-> +
-> +e_term:
-> +       ghcb_set_sw_exit_info_1(ghcb, 1);
-> +       ghcb_set_sw_exit_info_2(ghcb,
-> +                               X86_TRAP_GP |
-> +                               SVM_EVTINJ_TYPE_EXEPT |
-> +                               SVM_EVTINJ_VALID);
-> +}
+Hi Paolo,
 
-I am probably missing something in the spec but I don't see any
-references to #GP in the '4.1.7 SNP Guest Request' section. Why is
-this different from e_fail?
+On Thu, Apr 29, 2021 at 3:37 PM Jing Zhang <jingzhangos@google.com> wrote:
+>
+> This patchset provides a file descriptor for every VM and VCPU to read
+> KVM statistics data in binary format.
+> It is meant to provide a lightweight, flexible, scalable and efficient
+> lock-free solution for user space telemetry applications to pull the
+> statistics data periodically for large scale systems. The pulling
+> frequency could be as high as a few times per second.
+> In this patchset, every statistics data are treated to have some
+> attributes as below:
+>   * architecture dependent or common
+>   * VM statistics data or VCPU statistics data
+>   * type: cumulative, instantaneous,
+>   * unit: none for simple counter, nanosecond, microsecond,
+>     millisecond, second, Byte, KiByte, MiByte, GiByte. Clock Cycles
+> Since no lock/synchronization is used, the consistency between all
+> the statistics data is not guaranteed. That means not all statistics
+> data are read out at the exact same time, since the statistics date
+> are still being updated by KVM subsystems while they are read out.
+>
+> ---
+>
+> * v3 -> v4
+>   - Rebase to kvm/queue, commit 9f242010c3b4 ("KVM: avoid "deadlock"
+>     between install_new_memslots and MMU notifier")
+>   - Use C-stype comments in the whole patch
+>   - Fix wrong count for x86 VCPU stats descriptors
+>   - Fix KVM stats data size counting and validity check in selftest
+>
+> * v2 -> v3
+>   - Rebase to kvm/queue, commit edf408f5257b ("KVM: avoid "deadlock"
+>     between install_new_memslots and MMU notifier")
+>   - Resolve some nitpicks about format
+>
+> * v1 -> v2
+>   - Use ARRAY_SIZE to count the number of stats descriptors
+>   - Fix missing `size` field initialization in macro STATS_DESC
+>
+> [1] https://lore.kernel.org/kvm/20210402224359.2297157-1-jingzhangos@google.com
+> [2] https://lore.kernel.org/kvm/20210415151741.1607806-1-jingzhangos@google.com
+> [3] https://lore.kernel.org/kvm/20210423181727.596466-1-jingzhangos@google.com
+>
+> ---
+>
+> Jing Zhang (4):
+>   KVM: stats: Separate common stats from architecture specific ones
+>   KVM: stats: Add fd-based API to read binary stats data
+>   KVM: stats: Add documentation for statistics data binary interface
+>   KVM: selftests: Add selftest for KVM statistics data binary interface
+>
+>  Documentation/virt/kvm/api.rst                | 171 ++++++++
+>  arch/arm64/include/asm/kvm_host.h             |   9 +-
+>  arch/arm64/kvm/guest.c                        |  42 +-
+>  arch/mips/include/asm/kvm_host.h              |   9 +-
+>  arch/mips/kvm/mips.c                          |  67 ++-
+>  arch/powerpc/include/asm/kvm_host.h           |   9 +-
+>  arch/powerpc/kvm/book3s.c                     |  68 +++-
+>  arch/powerpc/kvm/book3s_hv.c                  |  12 +-
+>  arch/powerpc/kvm/book3s_pr.c                  |   2 +-
+>  arch/powerpc/kvm/book3s_pr_papr.c             |   2 +-
+>  arch/powerpc/kvm/booke.c                      |  63 ++-
+>  arch/s390/include/asm/kvm_host.h              |   9 +-
+>  arch/s390/kvm/kvm-s390.c                      | 133 +++++-
+>  arch/x86/include/asm/kvm_host.h               |   9 +-
+>  arch/x86/kvm/x86.c                            |  71 +++-
+>  include/linux/kvm_host.h                      | 132 +++++-
+>  include/linux/kvm_types.h                     |  12 +
+>  include/uapi/linux/kvm.h                      |  50 +++
+>  tools/testing/selftests/kvm/.gitignore        |   1 +
+>  tools/testing/selftests/kvm/Makefile          |   3 +
+>  .../testing/selftests/kvm/include/kvm_util.h  |   3 +
+>  .../selftests/kvm/kvm_bin_form_stats.c        | 380 ++++++++++++++++++
+>  tools/testing/selftests/kvm/lib/kvm_util.c    |  11 +
+>  virt/kvm/kvm_main.c                           | 237 ++++++++++-
+>  24 files changed, 1415 insertions(+), 90 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/kvm_bin_form_stats.c
+>
+>
+> base-commit: 9f242010c3b46e63bc62f08fff42cef992d3801b
+> --
+> 2.31.1.527.g47e6f16901-goog
+>
+
+Do I need to send another version for this?
+
+Thanks,
+Jing
