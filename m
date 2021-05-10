@@ -2,107 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 33621377E35
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 10:29:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 87513377E39
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 10:30:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230301AbhEJIa6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 04:30:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34505 "EHLO
+        id S230285AbhEJIbH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 04:31:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41594 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230216AbhEJIa5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 04:30:57 -0400
+        by vger.kernel.org with ESMTP id S230326AbhEJIbE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 May 2021 04:31:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620635393;
+        s=mimecast20190719; t=1620635400;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7EQ4vZLkNzKipHnk+EIka5PGObJDdPPscSMPWhaXeCg=;
-        b=PNZs8FA8MiMTWqqCMm1FMxL2l9rp+kIB4aGeutx1sd/tNcO/FoEiQFqEXMVITi7gmbljaP
-        sW1OuxfLZb280r4Hs50jb5bwmhdAzX9i9Oqq8GUjpHxDMHdA8iPDl5JP/wr09Abft0Lbng
-        Ss7YBoz2GACVN8HrzipiAdDTQP3eaKk=
+        bh=FKDGvNTOu+l98CEFBGE2CwvsTNx4tKn3+gggtayZ+GA=;
+        b=L4C/+k5JhxmWP5ymwugeF2UORnwfhPXZVkNl4+TfmZXd/bBH2JnFfdFXUjDaJRCcWzkT2a
+        dDnRa7MTjNz+gOuLrwy0KbEWShNnNaM8rkUgo7K79Ft7nQE/GWyUfb05QF2aj14xzCemAB
+        t5gylCEdQleB1NT6t2w000zw3GyYrSk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-456-GzwQDWOwNwG8cZrE_7tCcA-1; Mon, 10 May 2021 04:29:51 -0400
-X-MC-Unique: GzwQDWOwNwG8cZrE_7tCcA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-386-B4pWwqHOMA6Zr9UN-8mAgQ-1; Mon, 10 May 2021 04:29:56 -0400
+X-MC-Unique: B4pWwqHOMA6Zr9UN-8mAgQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 705BD818400;
-        Mon, 10 May 2021 08:29:50 +0000 (UTC)
-Received: from starship (unknown [10.40.194.86])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 507A310246F1;
-        Mon, 10 May 2021 08:29:47 +0000 (UTC)
-Message-ID: <4616405e483e3de185129a478a0ee576827bb6cf.camel@redhat.com>
-Subject: Re: [PATCH 15/15] KVM: x86: Hide RDTSCP and RDPID if MSR_TSC_AUX
- probing failed
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
-        Reiji Watanabe <reijiw@google.com>
-Date:   Mon, 10 May 2021 11:29:45 +0300
-In-Reply-To: <20210504171734.1434054-16-seanjc@google.com>
-References: <20210504171734.1434054-1-seanjc@google.com>
-         <20210504171734.1434054-16-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0968E1008063;
+        Mon, 10 May 2021 08:29:55 +0000 (UTC)
+Received: from [10.36.113.168] (ovpn-113-168.ams2.redhat.com [10.36.113.168])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C7BB519C44;
+        Mon, 10 May 2021 08:29:48 +0000 (UTC)
+Subject: Re: Question on guest enable msi fail when using GICv4/4.1
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Shaokun Zhang <zhangshaokun@hisilicon.com>,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, linux-pci@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Nianyao Tang <tangnianyao@huawei.com>,
+        Bjorn Helgaas <bhelgaas@google.com>
+References: <3a2c66d6-6ca0-8478-d24b-61e8e3241b20@hisilicon.com>
+ <87k0oaq5jf.wl-maz@kernel.org>
+ <cf870bcf-1173-a70b-2b55-4209abcbcbc3@hisilicon.com>
+ <878s4qq00u.wl-maz@kernel.org>
+ <d6481eee-4318-1a56-a5a4-daf467070d22@redhat.com>
+ <871rafowp2.wl-maz@kernel.org>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <69cd5989-f4cb-469c-f6a0-3362540e0271@redhat.com>
+Date:   Mon, 10 May 2021 10:29:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
+In-Reply-To: <871rafowp2.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-05-04 at 10:17 -0700, Sean Christopherson wrote:
-> If probing MSR_TSC_AUX failed, hide RDTSCP and RDPID, and WARN if either
-> feature was reported as supported.  In theory, such a scenario should
-> never happen as both Intel and AMD state that MSR_TSC_AUX is available if
-> RDTSCP or RDPID is supported.  But, KVM injects #GP on MSR_TSC_AUX
-> accesses if probing failed, faults on WRMSR(MSR_TSC_AUX) may be fatal to
-> the guest (because they happen during early CPU bringup), and KVM itself
-> has effectively misreported RDPID support in the past.
-> 
-> Note, this also has the happy side effect of omitting MSR_TSC_AUX from
-> the list of MSRs that are exposed to userspace if probing the MSR fails.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/cpuid.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index c96f79c9fff2..bf0f74ce4974 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -567,6 +567,21 @@ void kvm_set_cpu_caps(void)
->  		F(ACE2) | F(ACE2_EN) | F(PHE) | F(PHE_EN) |
->  		F(PMM) | F(PMM_EN)
->  	);
-> +
-> +	/*
-> +	 * Hide RDTSCP and RDPID if either feature is reported as supported but
-> +	 * probing MSR_TSC_AUX failed.  This is purely a sanity check and
-> +	 * should never happen, but the guest will likely crash if RDTSCP or
-> +	 * RDPID is misreported, and KVM has botched MSR_TSC_AUX emulation in
-> +	 * the past, e.g. the sanity check may fire if this instance of KVM is
-> +	 * running as L1 on top of an older, broken KVM.
-> +	 */
-> +	if (WARN_ON((kvm_cpu_cap_has(X86_FEATURE_RDTSCP) ||
-> +		     kvm_cpu_cap_has(X86_FEATURE_RDPID)) &&
-> +		     !kvm_is_supported_user_return_msr(MSR_TSC_AUX))) {
-> +		kvm_cpu_cap_clear(X86_FEATURE_RDTSCP);
-> +		kvm_cpu_cap_clear(X86_FEATURE_RDPID);
-> +	}
->  }
->  EXPORT_SYMBOL_GPL(kvm_set_cpu_caps);
->  
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Hi Marc,
 
-Best regards,
-	Maxim Levitsky
+On 5/10/21 9:49 AM, Marc Zyngier wrote:
+> Hi Eric,
+> 
+> On Sun, 09 May 2021 18:00:04 +0100,
+> Auger Eric <eric.auger@redhat.com> wrote:
+>>
+>> Hi,
+>> On 5/7/21 1:02 PM, Marc Zyngier wrote:
+>>> On Fri, 07 May 2021 10:58:23 +0100,
+>>> Shaokun Zhang <zhangshaokun@hisilicon.com> wrote:
+>>>>
+>>>> Hi Marc,
+>>>>
+>>>> Thanks for your quick reply.
+>>>>
+>>>> On 2021/5/7 17:03, Marc Zyngier wrote:
+>>>>> On Fri, 07 May 2021 06:57:04 +0100,
+>>>>> Shaokun Zhang <zhangshaokun@hisilicon.com> wrote:
+>>>>>>
+>>>>>> [This letter comes from Nianyao Tang]
+>>>>>>
+>>>>>> Hi,
+>>>>>>
+>>>>>> Using GICv4/4.1 and msi capability, guest vf driver requires 3
+>>>>>> vectors and enable msi, will lead to guest stuck.
+>>>>>
+>>>>> Stuck how?
+>>>>
+>>>> Guest serial does not response anymore and guest network shutdown.
+>>>>
+>>>>>
+>>>>>> Qemu gets number of interrupts from Multiple Message Capable field
+>>>>>> set by guest. This field is aligned to a power of 2(if a function
+>>>>>> requires 3 vectors, it initializes it to 2).
+>>>>>
+>>>>> So I guess this is a MultiMSI device with 4 vectors, right?
+>>>>>
+>>>>
+>>>> Yes, it can support maximum of 32 msi interrupts, and vf driver only use 3 msi.
+>>>>
+>>>>>> However, guest driver just sends 3 mapi-cmd to vits and 3 ite
+>>>>>> entries is recorded in host.  Vfio initializes msi interrupts using
+>>>>>> the number of interrupts 4 provide by qemu.  When it comes to the
+>>>>>> 4th msi without ite in vits, in irq_bypass_register_producer,
+>>>>>> producer and consumer will __connect fail, due to find_ite fail, and
+>>>>>> do not resume guest.
+>>>>>
+>>>>> Let me rephrase this to check that I understand it:
+>>>>> - The device has 4 vectors
+>>>>> - The guest only create mappings for 3 of them
+>>>>> - VFIO calls kvm_vgic_v4_set_forwarding() for each vector
+>>>>> - KVM doesn't have a mapping for the 4th vector and returns an error
+>>>>> - VFIO disable this 4th vector
+>>>>>
+>>>>> Is that correct? If yes, I don't understand why that impacts the guest
+>>>>> at all. From what I can see, vfio_msi_set_vector_signal() just prints
+>>>>> a message on the console and carries on.
+>>>>>
+>>>>
+>>>> function calls:
+>>>> --> vfio_msi_set_vector_signal
+>>>>    --> irq_bypass_register_producer
+>>>>       -->__connect
+>>>>
+>>>> in __connect, add_producer finally calls kvm_vgic_v4_set_forwarding
+>>>> and fails to get the 4th mapping. When add_producer fail, it does
+>>>> not call cons->start, calls kvm_arch_irq_bypass_start and then
+>>>> kvm_arm_resume_guest.
+>>>
+>>> [+Eric, who wrote the irq_bypass infrastructure.]
+>>>
+>>> Ah, so the guest is actually paused, not in a livelock situation
+>>> (which is how I interpreted "stuck").
+>>>
+>>> I think we should handle this case gracefully, as there should be no
+>>> expectation that the guest will be using this interrupt. Given that
+>>> VFIO seems to be pretty unfazed when a producer fails, I'm temped to
+>>> do the same thing and restart the guest.
+>>>
+>>> Also, __disconnect doesn't care about errors, so why should __connect
+>>> have this odd behaviour?
+>>
+>> _disconnect() does not care as we should always succeed tearing off
+>> things. del_* ops are void functions. On the opposite we can fail
+>> setting up the bypass.
+>>
+>> Effectively
+>> a979a6aa009f ("irqbypass: do not start cons/prod when failed connect")
+>> needs to be reverted.
+>>
+>> I agree the kerneldoc comments in linux/irqbypass.h may be improved to
+>> better explain the role of stop/start cbs and warn about their potential
+>> global impact.
+> 
+> Yup. It also begs the question of why we have producer callbacks, as
+> nobody seems to use them.
+
+At the time this was designed, I was working on VFIO platform IRQ
+forwarding using direct EOI and they were used (and useful)
+
++	irq->producer.stop = vfio_platform_irq_bypass_stop;
++	irq->producer.start = vfio_platform_irq_bypass_start;
+
+[PATCH v4 02/13] VFIO: platform: registration of a dummy IRQ bypass producer
+[PATCH v4 07/13] VFIO: platform: add irq bypass producer management
+https://lists.cs.columbia.edu/pipermail/kvmarm/2015-November/017323.html
+
+basically the IRQ was disabled and re-enabled. This series has never
+been upstreamed but that's where it originates from.
+
+
+
+> 
+>> wrt the case above, "in __connect, add_producer finally calls
+>> kvm_vgic_v4_set_forwarding and fails to get the 4th mapping", shouldn't
+>> we succeed in that case?
+> 
+> From a KVM perspective, we can't return a success because there is no
+> guest LPI that matches the input signal.
+right, sorry I had in mind the set_forwarding was partially successful
+for 3 of 4 LPIs but it is a unitary operation.
+> 
+> And such failure seems to be expected by the VFIO code, which just
+> prints a message on the console and set the producer token to NULL. So
+> returning an error from the KVM code is useful, at least to an extent.
+
+OK. So with the revert, the use case resume working, right?
+
+Thanks
+
+Eric
+> 
+> Thanks,
+> 
+> 	M.
+> 
 
