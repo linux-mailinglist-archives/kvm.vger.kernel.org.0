@@ -2,110 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EAB1377A42
-	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 05:00:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59EBB377A6A
+	for <lists+kvm@lfdr.de>; Mon, 10 May 2021 05:14:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230215AbhEJDB4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 9 May 2021 23:01:56 -0400
-Received: from mga05.intel.com ([192.55.52.43]:21244 "EHLO mga05.intel.com"
+        id S230245AbhEJDPd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 9 May 2021 23:15:33 -0400
+Received: from mga07.intel.com ([134.134.136.100]:43874 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229670AbhEJDB4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 9 May 2021 23:01:56 -0400
-IronPort-SDR: 6qd5Kxqh9nrymG/viMa26NW014kv8W0uhu9kGerF8fhXvP+feoRvsBJcZO1UgVKhSKWCPBH2KE
- mWqf6P+KYYtA==
-X-IronPort-AV: E=McAfee;i="6200,9189,9979"; a="284581979"
+        id S230129AbhEJDPd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 9 May 2021 23:15:33 -0400
+IronPort-SDR: 8QbKD3xmsXv2il6mkgKDKbLWunUbN+Rg7dfJCT7yEYjgmmRsdJMNVkajCTiS8YsYlvvstKmT3V
+ 3krScytyKeYQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,9979"; a="263032956"
 X-IronPort-AV: E=Sophos;i="5.82,286,1613462400"; 
-   d="scan'208";a="284581979"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2021 20:00:52 -0700
-IronPort-SDR: uhZUQngbuGEQq0E1Bk7Pmkzto28JvYBFdcwQNt85aUpzZFrDhbnyklFDUPSNkQ4wyJETH7Xnd5
- t9ejrt3/uhrg==
+   d="scan'208";a="263032956"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2021 20:14:28 -0700
+IronPort-SDR: WCxSB8qlULFEg27R7YRx1U/xAVu5Dtt9mv946s7i7zI5uP4EzZ3iN9OfCfcrwc5sbVddZeaqlm
+ 9NAWJThKybvg==
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.82,286,1613462400"; 
-   d="scan'208";a="435941124"
-Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.254.212.136]) ([10.254.212.136])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2021 20:00:49 -0700
-Subject: Re: [PATCH] Revert "irqbypass: do not start cons/prod when failed
- connect"
-To:     Jason Wang <jasowang@redhat.com>, mst@redhat.com, maz@kernel.org,
-        alex.williamson@redhat.com
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, cohuck@redhat.com,
-        stable@vger.kernel.org
-References: <20210508071152.722425-1-lingshan.zhu@intel.com>
- <b309c02d-9570-6400-9a0c-63030aed7ff7@redhat.com>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-Message-ID: <a659fc6f-2c7a-23d2-9c34-0044d5a31861@intel.com>
-Date:   Mon, 10 May 2021 11:00:46 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+   d="scan'208";a="621047218"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.38])
+  by fmsmga006.fm.intel.com with ESMTP; 09 May 2021 20:14:27 -0700
+Date:   Mon, 10 May 2021 11:14:26 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     tkffaul@outlook.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vfio/pci: Sanity check IGD OpRegion Size
+Message-ID: <20210510031426.gs2jcnswn2h4atow@yy-desk-7060>
+References: <162041357421.21800.16214130780777455390.stgit@omen>
+ <20210510011014.q6xfcmqopbqgepbq@yy-desk-7060>
+ <20210509193408.22ae2b2a@x1.home.shazbot.org>
 MIME-Version: 1.0
-In-Reply-To: <b309c02d-9570-6400-9a0c-63030aed7ff7@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210509193408.22ae2b2a@x1.home.shazbot.org>
+User-Agent: NeoMutt/20171215
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, May 09, 2021 at 07:34:08PM -0600, Alex Williamson wrote:
+> On Mon, 10 May 2021 09:10:14 +0800
+> Yuan Yao <yuan.yao@linux.intel.com> wrote:
+> 
+> > On Fri, May 07, 2021 at 12:53:17PM -0600, Alex Williamson wrote:
+> > > The size field of the IGD OpRegion table is supposed to indicate table
+> > > size in KB, but we've seen at least one report of a BIOS that appears
+> > > to incorrectly report size in bytes.  The default size is 8 (*1024 =
+> > > 8KB), but an incorrect implementation may report 8192 (*1024 = 8MB)
+> > > and can cause a variety of mapping errors.
+> > > 
+> > > It's believed that 8MB would be an implausible, if not absurd, actual
+> > > size, so we can probably be pretty safe in assuming this is a BIOS bug
+> > > where the intended size is likely 8KB.
+> > > 
+> > > Reported-by: Travis Faulhaber <tkffaul@outlook.com>
+> > > Tested-by: Travis Faulhaber <tkffaul@outlook.com>
+> > > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > > ---
+> > >  drivers/vfio/pci/vfio_pci_igd.c |   11 ++++++++++-
+> > >  1 file changed, 10 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/vfio_pci_igd.c
+> > > index 228df565e9bc..c89a4797cd18 100644
+> > > --- a/drivers/vfio/pci/vfio_pci_igd.c
+> > > +++ b/drivers/vfio/pci/vfio_pci_igd.c
+> > > @@ -86,7 +86,16 @@ static int vfio_pci_igd_opregion_init(struct vfio_pci_device *vdev)
+> > >  		return -EINVAL;
+> > >  	}
+> > >  
+> > > -	size *= 1024; /* In KB */
+> > > +	/*
+> > > +	 * The OpRegion size field is specified as size in KB, but there have been
+> > > +	 * user reports where this field appears to report size in bytes.  If we
+> > > +	 * read 8192, assume this is the case.
+> > > +	 */
+> > > +	if (size == OPREGION_SIZE)  
+> > 
+> > Is "size >= OPREGION_SIZE" or "size >= smaller but still implausible value
+> > (like 4096)" better for covering more bad BIOS implementation cases ?
+> 
+> We haven't seen such cases and it seems like a BIOS implementation
+> competent enough to use something other than the default size, probably
+> might get the units correct for this field.  Our footing for assuming
+> this specific implementation error gets shakier if we try to apply it
+> beyond the default size, imo.  Thanks,
 
+OK, make sense to me, thanks.
 
-On 5/10/2021 10:43 AM, Jason Wang wrote:
->
-> 在 2021/5/8 下午3:11, Zhu Lingshan 写道:
->> This reverts commit a979a6aa009f3c99689432e0cdb5402a4463fb88.
->>
->> The reverted commit may cause VM freeze on arm64 platform.
->> Because on arm64 platform, stop a consumer will suspend the VM,
->> the VM will freeze without a start consumer
->>
->> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->
->
-> Acked-by: Jason Wang <jasowang@redhat.com>
->
-> Please resubmit with the formal process of stable 
-> (stable-kernel-rules.rst).
-sure, I will re-submit it to stable kernel once it is merged into Linus 
-tree.
-
-Thanks
->
-> Thanks
->
->
->> ---
->>   virt/lib/irqbypass.c | 16 ++++++----------
->>   1 file changed, 6 insertions(+), 10 deletions(-)
->>
->> diff --git a/virt/lib/irqbypass.c b/virt/lib/irqbypass.c
->> index c9bb3957f58a..28fda42e471b 100644
->> --- a/virt/lib/irqbypass.c
->> +++ b/virt/lib/irqbypass.c
->> @@ -40,21 +40,17 @@ static int __connect(struct irq_bypass_producer 
->> *prod,
->>       if (prod->add_consumer)
->>           ret = prod->add_consumer(prod, cons);
->>   -    if (ret)
->> -        goto err_add_consumer;
->> -
->> -    ret = cons->add_producer(cons, prod);
->> -    if (ret)
->> -        goto err_add_producer;
->> +    if (!ret) {
->> +        ret = cons->add_producer(cons, prod);
->> +        if (ret && prod->del_consumer)
->> +            prod->del_consumer(prod, cons);
->> +    }
->>         if (cons->start)
->>           cons->start(cons);
->>       if (prod->start)
->>           prod->start(prod);
->> -err_add_producer:
->> -    if (prod->del_consumer)
->> -        prod->del_consumer(prod, cons);
->> -err_add_consumer:
->> +
->>       return ret;
->>   }
->
-
+> 
+> Alex
+> 
