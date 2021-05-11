@@ -2,192 +2,251 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 29DFE37A42D
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 12:01:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 07B0337A44E
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 12:08:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231440AbhEKKCy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 May 2021 06:02:54 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:52568 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231201AbhEKKCt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 May 2021 06:02:49 -0400
-Received: from zn.tnic (p200300ec2f0ec70079cd82bef3234244.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:c700:79cd:82be:f323:4244])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S231304AbhEKKIT convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 11 May 2021 06:08:19 -0400
+Received: from us-smtp-delivery-44.mimecast.com ([207.211.30.44]:60580 "EHLO
+        us-smtp-delivery-44.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231220AbhEKKIT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 May 2021 06:08:19 -0400
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-59-2FsjIJRtO-mChO6UtihqnQ-1; Tue, 11 May 2021 06:07:10 -0400
+X-MC-Unique: 2FsjIJRtO-mChO6UtihqnQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 37EF31EC0315;
-        Tue, 11 May 2021 12:01:42 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1620727302;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=uNnvu0wsyy+IBcG9GpyAl66RgNtNpSo1YIkRCPmHqvY=;
-        b=eTNhcKZp1C9WOyP/ArvXMKri9FqjsrzCxNR4J9d7j9OixYlSfIIOzm05Yqsag8RLCPACfU
-        30V11GMKA3IHUKeZRWPxzLvHYwD3NSDgi4rzGS+Ngp9nQC5o9hfZ9la0Zv8RVlOkX5yl4N
-        YiMmD5YWrrD2vFOn4z4M3gQvohP2CF4=
-Date:   Tue, 11 May 2021 12:01:37 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        tglx@linutronix.de, jroedel@suse.de, thomas.lendacky@amd.com,
-        pbonzini@redhat.com, mingo@redhat.com, dave.hansen@intel.com,
-        rientjes@google.com, seanjc@google.com, peterz@infradead.org,
-        hpa@zytor.com, tony.luck@intel.com
-Subject: Re: [PATCH Part1 RFC v2 03/20] x86/sev: Add support for hypervisor
- feature VMGEXIT
-Message-ID: <YJpWAY+ayATSn6nN@zn.tnic>
-References: <20210430121616.2295-1-brijesh.singh@amd.com>
- <20210430121616.2295-4-brijesh.singh@amd.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AFE80801B15;
+        Tue, 11 May 2021 10:07:09 +0000 (UTC)
+Received: from bahia.lan (ovpn-112-143.ams2.redhat.com [10.36.112.143])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CC9BD7013B;
+        Tue, 11 May 2021 10:06:56 +0000 (UTC)
+Date:   Tue, 11 May 2021 12:06:55 +0200
+From:   Greg Kurz <groug@kaod.org>
+To:     Vivek Goyal <vgoyal@redhat.com>
+Cc:     qemu-devel@nongnu.org, virtio-fs@redhat.com,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>
+Subject: Re: [for-6.1 v3 2/3] virtiofsd: Track mounts
+Message-ID: <20210511120655.379c99fb@bahia.lan>
+In-Reply-To: <20210510191839.GB193692@horse>
+References: <20210510155539.998747-1-groug@kaod.org>
+        <20210510155539.998747-3-groug@kaod.org>
+        <20210510191839.GB193692@horse>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210430121616.2295-4-brijesh.singh@amd.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: kaod.org
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 30, 2021 at 07:15:59AM -0500, Brijesh Singh wrote:
-> Version 2 of GHCB specification introduced advertisement of a features
-> that are supported by the hypervisor. Define the GHCB MSR protocol and NAE
-> for the hypervisor feature request and query the feature during the GHCB
-> protocol negotitation. See the GHCB specification for more details.
+On Mon, 10 May 2021 15:18:39 -0400
+Vivek Goyal <vgoyal@redhat.com> wrote:
+
+> On Mon, May 10, 2021 at 05:55:38PM +0200, Greg Kurz wrote:
+> > The upcoming implementation of ->sync_fs() needs to know about all
+> > submounts in order to call syncfs() on all of them.
+> > 
+> > Track every inode that comes up with a new mount id in a GHashTable.
+> > If the mount id isn't available, e.g. no statx() on the host, fallback
+> > on the device id for the key. This is done during lookup because we
+> > only care for the submounts that the client knows about. The inode
+> > is removed from the hash table when ultimately unreferenced. This
+> > can happen on a per-mount basis when the client posts a FUSE_FORGET
+> > request or for all submounts at once with FUSE_DESTROY.
+> > 
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  tools/virtiofsd/passthrough_ll.c | 42 +++++++++++++++++++++++++++++---
+> >  1 file changed, 39 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+> > index 1553d2ef454f..dc940a1d048b 100644
+> > --- a/tools/virtiofsd/passthrough_ll.c
+> > +++ b/tools/virtiofsd/passthrough_ll.c
+> > @@ -117,6 +117,7 @@ struct lo_inode {
+> >      GHashTable *posix_locks; /* protected by lo_inode->plock_mutex */
+> >  
+> >      mode_t filetype;
+> > +    bool is_mnt;
+> >  };
+> >  
+> >  struct lo_cred {
+> > @@ -163,6 +164,7 @@ struct lo_data {
+> >      bool use_statx;
+> >      struct lo_inode root;
+> >      GHashTable *inodes; /* protected by lo->mutex */
+> > +    GHashTable *mnt_inodes; /* protected by lo->mutex */
+> >      struct lo_map ino_map; /* protected by lo->mutex */
+> >      struct lo_map dirp_map; /* protected by lo->mutex */
+> >      struct lo_map fd_map; /* protected by lo->mutex */
+> > @@ -968,6 +970,31 @@ static int do_statx(struct lo_data *lo, int dirfd, const char *pathname,
+> >      return 0;
+> >  }
+> >  
+> > +static uint64_t mnt_inode_key(struct lo_inode *inode)
+> > +{
+> > +    /* Prefer mnt_id, fallback on dev */
+> > +    return inode->key.mnt_id ? inode->key.mnt_id : inode->key.dev;
+> > +}
+> > +
+> > +static void add_mnt_inode(struct lo_data *lo, struct lo_inode *inode)
+> > +{
+> > +    uint64_t mnt_key = mnt_inode_key(inode);
+> > +
+> > +    if (!g_hash_table_contains(lo->mnt_inodes, &mnt_key)) {
+> > +        inode->is_mnt = true;
+> > +        g_hash_table_insert(lo->mnt_inodes, &mnt_key, inode);
+> > +    }
+> > +}
+> > +
+> > +static void remove_mnt_inode(struct lo_data *lo, struct lo_inode *inode)
+> > +{
+> > +    uint64_t mnt_key = mnt_inode_key(inode);
+> > +
+> > +    if (inode->is_mnt) {
+> > +        g_hash_table_remove(lo->mnt_inodes, &mnt_key);
+> > +    }
 > 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/include/asm/sev-common.h | 17 +++++++++++++++++
->  arch/x86/include/uapi/asm/svm.h   |  2 ++
->  arch/x86/kernel/sev-shared.c      | 24 ++++++++++++++++++++++++
->  3 files changed, 43 insertions(+)
+> What if same filesystem is mounted at two different mount points. Say at
+> foo/ and bar/. Now when we lookup foo, we will add that inode to 
+
+e.g.
+
+mount --bind /var/tmp ${virtiofs_path}/foo
+mount --bind /var/tmp ${virtiofs_path}/bar
+
+?
+
+> hash table. But when we lookup bar, we will not add it. Now say foo
+> is unmounted, and inode is going away, then we will remove super block
+> of fs from hash table (while it is still mounted at bar/ ?). Do I
+> understand it right?
+
+If the host provides mount ids in statx(), each of these has a different
+mnt_id and is thus considered as a distinct super block.
+
+On a host with an older kernel, the fallback on dev_t would cause them
+to be considered the same indeed. But in this case, foo and bar are
+already confounded in the inode list, i.e. we can't have one removed
+and the other one still around AFAICT.
+
+If virtiofsd still has an inode for foo, it cannot be unmounted in the
+host. The client needs to forget the inode first, in which case it
+seems we don't care anymore for foo's super block.
+
 > 
-> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-> index 9f1b66090a4c..8142e247d8da 100644
-> --- a/arch/x86/include/asm/sev-common.h
-> +++ b/arch/x86/include/asm/sev-common.h
-> @@ -51,6 +51,22 @@
->  #define GHCB_MSR_AP_RESET_HOLD_RESULT_POS	12
->  #define GHCB_MSR_AP_RESET_HOLD_RESULT_MASK	0xfffffffffffff
->  
-> +/* GHCB Hypervisor Feature Request */
-> +#define GHCB_MSR_HV_FEATURES_REQ	0x080
-> +#define GHCB_MSR_HV_FEATURES_RESP	0x081
-> +#define GHCB_MSR_HV_FEATURES_POS	12
-> +#define GHCB_MSR_HV_FEATURES_MASK	0xfffffffffffffUL
-> +#define GHCB_MSR_HV_FEATURES_RESP_VAL(v)	\
-> +	(((v) >> GHCB_MSR_HV_FEATURES_POS) & GHCB_MSR_HV_FEATURES_MASK)
-> +
-> +#define GHCB_HV_FEATURES_SNP		BIT_ULL(0)
-> +#define GHCB_HV_FEATURES_SNP_AP_CREATION			\
-> +		(BIT_ULL(1) | GHCB_HV_FEATURES_SNP)
-> +#define GHCB_HV_FEATURES_SNP_RESTRICTED_INJECTION		\
-> +		(BIT_ULL(2) | GHCB_HV_FEATURES_SNP_AP_CREATION)
-> +#define GHCB_HV_FEATURES_SNP_RESTRICTED_INJECTION_TIMER		\
-> +		(BIT_ULL(3) | GHCB_HV_FEATURES_SNP_RESTRICTED_INJECTION)
+> If yes, we probably will need another refcounted object to keep track
+> of all the instances of the same fs?
+> 
 
-Please add those in the patches which use them - not in bulk here.
+I wanted to do that at first but it seemed unnecessary in the end,
+because I couldn't come up with a scenario where we could evict
+a super block while some inode under it is still referenced by the
+client.
 
-And GHCB_HV_FEATURES_SNP_RESTRICTED_INJECTION_TIMER is a mouthfull and
-looks like BIOS code to me. But this is still the kernel, remember? :-)
+Anyway, I need to respin the patch because I misused the glib
+hash table API, i.e. use g_int64_*() functions on unallocated
+keys while I should use g_direct_*() to do this optimization.
+This has the effect of never removing super blocks and ending
+with stale inode pointers in the hash. This is what caused
+the EBADF error with syncfs() you reported on irc.
 
-So let's do
+> Thanks
+> Vivek
+> 
 
-GHCB_MSR_HV_FT_*
+Cheers,
 
-GHCB_SNP_AP_CREATION
-GHCB_SNP_RESTRICTED_INJ
-GHCB_SNP_RESTRICTED_INJ_TMR
+--
+Greg
 
-and so on so that we can all keep our sanity when reading that code.
+> 
+> > +}
+> > +
+> 
+> >  /*
+> >   * Increments nlookup on the inode on success. unref_inode_lolocked() must be
+> >   * called eventually to decrement nlookup again. If inodep is non-NULL, the
+> > @@ -1054,10 +1081,14 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t parent, const char *name,
+> >          pthread_mutex_lock(&lo->mutex);
+> >          inode->fuse_ino = lo_add_inode_mapping(req, inode);
+> >          g_hash_table_insert(lo->inodes, &inode->key, inode);
+> > +        add_mnt_inode(lo, inode);
+> >          pthread_mutex_unlock(&lo->mutex);
+> >      }
+> >      e->ino = inode->fuse_ino;
+> >  
+> > +    fuse_log(FUSE_LOG_DEBUG, "  %lli/%s -> %lli%s\n", (unsigned long long)parent,
+> > +             name, (unsigned long long)e->ino, inode->is_mnt ? " (mount)" : "");
+> > +
+> >      /* Transfer ownership of inode pointer to caller or drop it */
+> >      if (inodep) {
+> >          *inodep = inode;
+> > @@ -1067,9 +1098,6 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t parent, const char *name,
+> >  
+> >      lo_inode_put(lo, &dir);
+> >  
+> > -    fuse_log(FUSE_LOG_DEBUG, "  %lli/%s -> %lli\n", (unsigned long long)parent,
+> > -             name, (unsigned long long)e->ino);
+> > -
+> >      return 0;
+> >  
+> >  out_err:
+> > @@ -1479,6 +1507,7 @@ static void unref_inode(struct lo_data *lo, struct lo_inode *inode, uint64_t n)
+> >              g_hash_table_destroy(inode->posix_locks);
+> >              pthread_mutex_destroy(&inode->plock_mutex);
+> >          }
+> > +        remove_mnt_inode(lo, inode);
+> >          /* Drop our refcount from lo_do_lookup() */
+> >          lo_inode_put(lo, &inode);
+> >      }
+> > @@ -3129,6 +3158,7 @@ static void lo_destroy(void *userdata)
+> >      struct lo_data *lo = (struct lo_data *)userdata;
+> >  
+> >      pthread_mutex_lock(&lo->mutex);
+> > +    g_hash_table_remove_all(lo->mnt_inodes);
+> >      while (true) {
+> >          GHashTableIter iter;
+> >          gpointer key, value;
+> > @@ -3659,6 +3689,7 @@ static void setup_root(struct lo_data *lo, struct lo_inode *root)
+> >          root->posix_locks = g_hash_table_new_full(
+> >              g_direct_hash, g_direct_equal, NULL, posix_locks_value_destroy);
+> >      }
+> > +    add_mnt_inode(lo, root);
+> >  }
+> >  
+> >  static guint lo_key_hash(gconstpointer key)
+> > @@ -3678,6 +3709,10 @@ static gboolean lo_key_equal(gconstpointer a, gconstpointer b)
+> >  
+> >  static void fuse_lo_data_cleanup(struct lo_data *lo)
+> >  {
+> > +    if (lo->mnt_inodes) {
+> > +        g_hash_table_destroy(lo->mnt_inodes);
+> > +    }
+> > +
+> >      if (lo->inodes) {
+> >          g_hash_table_destroy(lo->inodes);
+> >      }
+> > @@ -3739,6 +3774,7 @@ int main(int argc, char *argv[])
+> >      lo.root.fd = -1;
+> >      lo.root.fuse_ino = FUSE_ROOT_ID;
+> >      lo.cache = CACHE_AUTO;
+> > +    lo.mnt_inodes = g_hash_table_new(g_int64_hash, g_int64_equal);
+> >  
+> >      /*
+> >       * Set up the ino map like this:
+> > -- 
+> > 2.26.3
+> > 
+> 
 
-> +
->  #define GHCB_MSR_TERM_REQ		0x100
->  #define GHCB_MSR_TERM_REASON_SET_POS	12
->  #define GHCB_MSR_TERM_REASON_SET_MASK	0xf
-> @@ -62,6 +78,7 @@
->  
->  #define GHCB_SEV_ES_REASON_GENERAL_REQUEST	0
->  #define GHCB_SEV_ES_REASON_PROTOCOL_UNSUPPORTED	1
-> +#define GHCB_SEV_ES_REASON_SNP_UNSUPPORTED	2
-
-I remember asking for those to get shortened too
-
-GHCB_SEV_ES_GEN_REQ
-GHCB_SEV_ES_PROT_UNSUPPORTED
-GHCB_SEV_ES_SNP_UNSUPPORTED
-
-Perhaps in a prepatch?
-
->  #define GHCB_RESP_CODE(v)		((v) & GHCB_MSR_INFO_MASK)
->  
-> diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
-> index 554f75fe013c..7fbc311e2de1 100644
-> --- a/arch/x86/include/uapi/asm/svm.h
-> +++ b/arch/x86/include/uapi/asm/svm.h
-> @@ -108,6 +108,7 @@
->  #define SVM_VMGEXIT_AP_JUMP_TABLE		0x80000005
->  #define SVM_VMGEXIT_SET_AP_JUMP_TABLE		0
->  #define SVM_VMGEXIT_GET_AP_JUMP_TABLE		1
-> +#define SVM_VMGEXIT_HYPERVISOR_FEATURES		0x8000fffd
-
-SVM_VMGEXIT_HV_FT
-
-you get the idea.
-
->  #define SVM_VMGEXIT_UNSUPPORTED_EVENT		0x8000ffff
->  
->  #define SVM_EXIT_ERR           -1
-> @@ -215,6 +216,7 @@
->  	{ SVM_VMGEXIT_NMI_COMPLETE,	"vmgexit_nmi_complete" }, \
->  	{ SVM_VMGEXIT_AP_HLT_LOOP,	"vmgexit_ap_hlt_loop" }, \
->  	{ SVM_VMGEXIT_AP_JUMP_TABLE,	"vmgexit_ap_jump_table" }, \
-> +	{ SVM_VMGEXIT_HYPERVISOR_FEATURES,	"vmgexit_hypervisor_feature" }, \
->  	{ SVM_EXIT_ERR,         "invalid_guest_state" }
->  
->  
-> diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
-> index 48a47540b85f..874f911837db 100644
-> --- a/arch/x86/kernel/sev-shared.c
-> +++ b/arch/x86/kernel/sev-shared.c
-> @@ -20,6 +20,7 @@
->   * out when the .bss section is later cleared.
->   */
->  static u16 ghcb_version __section(".data") = 0;
-> +static u64 hv_features __section(".data") = 0;
-
-ERROR: do not initialise statics to 0
-#181: FILE: arch/x86/kernel/sev-shared.c:23:
-+static u64 hv_features __section(".data") = 0;
-
->  static bool __init sev_es_check_cpu_features(void)
->  {
-> @@ -49,6 +50,26 @@ static void __noreturn sev_es_terminate(unsigned int reason)
->  		asm volatile("hlt\n" : : : "memory");
->  }
->  
-> +static bool ghcb_get_hv_features(void)
-
-Used only once here - no need for the ghcb_ prefix.
-
-> +{
-> +	u64 val;
-> +
-> +	/* The hypervisor features are available from version 2 onward. */
-> +	if (ghcb_version < 2)
-> +		return true;
-
-		return false;
-no?
-
-Also, this should be done differently:
-
-	if (ghcb_version >= 2)
-		get_hv_features();
-
-at the call site.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
