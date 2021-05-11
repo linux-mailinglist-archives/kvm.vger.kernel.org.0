@@ -2,131 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E1DD37A9C2
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 16:42:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AFC5037A9AD
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 16:39:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231935AbhEKOng (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 May 2021 10:43:36 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33904 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231681AbhEKOnd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 May 2021 10:43:33 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14BEZLXk181942;
-        Tue, 11 May 2021 10:42:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=fJv9vggYsg3sydHxRnceIagbtZal6zDnl97tU05/eak=;
- b=H/QXNKN+U3iObFicEEy8dJ9kg7TF+7I/kJOHdHYX7ws/BncjoYic1zeTDLZUO/kBRz/P
- /o0GvWtptw+3tijKhwgJqcaQS2OZSeTTGxkw6X0BnM+tvdDxJwhdCIwSAm/4h1z7Afj4
- xQVXTYeSmJlv0L9gP3xoQFWzTNY/GpKG8LWL2iCOkP10ygs+ARHKHRE43AReqo4PraRz
- WcGa/2G1lkcX7SDLa3+bruYLPeKJZs1OqrRPkaEePGfFSNcxlrJTUrcC5vqhXIbApMhb
- sxkoMN6LAdu6U/vwy1c4oqlcEOiKS/o8hzX4+nzoo2cxogFv1izJHX8vVs8DhoNE+GEh Sg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38ftarbqq5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 May 2021 10:42:26 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14BEZlsm184021;
-        Tue, 11 May 2021 10:42:26 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38ftarbqp2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 May 2021 10:42:26 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14BEdDUM024747;
-        Tue, 11 May 2021 14:42:23 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma01fra.de.ibm.com with ESMTP id 38dj988xd2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 May 2021 14:42:23 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14BEgLwZ30998950
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 May 2021 14:42:21 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E360111C050;
-        Tue, 11 May 2021 14:42:20 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5A63D11C04A;
-        Tue, 11 May 2021 14:42:20 +0000 (GMT)
-Received: from ibm-vm (unknown [9.145.13.244])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 11 May 2021 14:42:20 +0000 (GMT)
-Date:   Tue, 11 May 2021 16:36:59 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, david@redhat.com, cohuck@redhat.com,
-        linux-s390@vger.kernel.org, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH 4/4] s390x: cpumodel: FMT2 SCLP implies
- test
-Message-ID: <20210511163659.16329e3b@ibm-vm>
-In-Reply-To: <20210510150015.11119-5-frankja@linux.ibm.com>
-References: <20210510150015.11119-1-frankja@linux.ibm.com>
-        <20210510150015.11119-5-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S231917AbhEKOkZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 May 2021 10:40:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36921 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231781AbhEKOkX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 May 2021 10:40:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620743957;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=BldeCvM9QHm9N8qu+17EJDBJ78BgeNyJtTowBlKxfAg=;
+        b=hC0bNDslCP/ljB7Mosf6nU/DxHJWTj4WD24kY+pAN0twoDbA8vCSprFkaL2pqcAemPdH8e
+        lqtLa3vSfT9tTMttYeWBaRcy+QWgJfGSpDZuPIRa3NtL+QZjahSWbqXeAWR3+A0k1Zo9HG
+        tGfN4vmRjyYgjJUAQshUb38VaoNmOZo=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-309-jbuQocCgM7uPNKtAb9uyoQ-1; Tue, 11 May 2021 10:39:13 -0400
+X-MC-Unique: jbuQocCgM7uPNKtAb9uyoQ-1
+Received: by mail-qv1-f72.google.com with SMTP id l61-20020a0c84430000b02901a9a7e363edso15618946qva.16
+        for <kvm@vger.kernel.org>; Tue, 11 May 2021 07:39:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=BldeCvM9QHm9N8qu+17EJDBJ78BgeNyJtTowBlKxfAg=;
+        b=KrmV/1dPOmadPLfACAdHGCWvURwxvfM6KfxND7CJdkFKh1Bl4AmbSccnG8Gl+3VacC
+         YAUMGlaiZ3Rp7x9SZ6lqPV4DiW4V1ZgKuJ7fnpL1AlEgXxIP6Xmc4wt69fMQDt5NR7Jl
+         TuDbgZXy7JymgOzlkQW4qdsTEuS0UOg8lye/nCQk2ARWpKNo9wm2vQOFi+zp0NWDEoN7
+         crYMVS8pMl8CKzBnw8ms6ZQ1Fz4bFH9bSDklBGJsCTPnHEOiRmYfV2guxQTlEg21/XOE
+         Z4Fc1jEbBenYKlrXKoe8ONP8n6yeqoOaRHJ7af+4ffHzUlYNwHkEECN7Uv8Wne3pCPRk
+         zrIQ==
+X-Gm-Message-State: AOAM533yuxpKkx/oe8SEkUSdvNxycww6yH8HYFkwwpH65rS0MQvYjBRC
+        zVonOxercgOXLcORqGesldH/Y5DodjmbuxTAhA4BMtnCVfI0aGJySoxz8A5Me0gkj+O4+R1S9II
+        TehAP3LziQWJr
+X-Received: by 2002:a37:658a:: with SMTP id z132mr17467815qkb.86.1620743952949;
+        Tue, 11 May 2021 07:39:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxwma92fggIfHJJaV1/FXJQoHnBmTmrmte7vpnL4skInn3tziNs7PO/jme78HyhgRRutTZNwQ==
+X-Received: by 2002:a37:658a:: with SMTP id z132mr17467791qkb.86.1620743952741;
+        Tue, 11 May 2021 07:39:12 -0700 (PDT)
+Received: from t490s (bras-base-toroon474qw-grc-72-184-145-4-219.dsl.bell.ca. [184.145.4.219])
+        by smtp.gmail.com with ESMTPSA id m124sm14170793qkc.70.2021.05.11.07.39.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 May 2021 07:39:12 -0700 (PDT)
+Date:   Tue, 11 May 2021 10:39:11 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Pei Zhang <pezhang@redhat.com>
+Subject: Re: [patch 4/4] KVM: VMX: update vcpu posted-interrupt descriptor
+ when assigning device
+Message-ID: <YJqXD5gQCfzO4rT5@t490s>
+References: <20210507130609.269153197@redhat.com>
+ <20210507130923.528132061@redhat.com>
+ <YJV3P4mFA7pITziM@google.com>
+ <YJWVAcIsvCaD7U0C@t490s>
+ <20210507220831.GA449495@fuller.cnet>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: wlsIgwPlPvaCSvpaLFtW2jJIVsmVof3w
-X-Proofpoint-ORIG-GUID: yYwQNuK4xM-fe9m0-dbE5iWkz5r4YoMh
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-05-11_02:2021-05-11,2021-05-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
- impostorscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0 malwarescore=0
- suspectscore=0 spamscore=0 mlxscore=0 priorityscore=1501 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2105110110
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210507220831.GA449495@fuller.cnet>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 10 May 2021 15:00:15 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> The sie facilities require sief2 to also be enabled, so lets check if
-> that's the case.
+On Fri, May 07, 2021 at 07:08:31PM -0300, Marcelo Tosatti wrote:
+> > Wondering whether we should add a pi_test_on() check in kvm_vcpu_has_events()
+> > somehow, so that even without customized ->vcpu_check_block we should be able
+> > to break the block loop (as kvm_arch_vcpu_runnable will return true properly)?
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
-I agree with David, you can fold this in the previous patch
-
-> ---
->  s390x/cpumodel.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+> static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
+> {
+>         int ret = -EINTR;
+>         int idx = srcu_read_lock(&vcpu->kvm->srcu);
 > 
-> diff --git a/s390x/cpumodel.c b/s390x/cpumodel.c
-> index 619c3dc7..67bb6543 100644
-> --- a/s390x/cpumodel.c
-> +++ b/s390x/cpumodel.c
-> @@ -56,12 +56,24 @@ static void test_sclp_features_fmt4(void)
->  	report_prefix_pop();
->  }
->  
-> +static void test_sclp_features_fmt2(void)
-> +{
-> +	if (sclp_facilities.has_sief2)
-> +		return;
-> +
-> +	report_prefix_push("!sief2 implies");
-> +	test_sclp_missing_sief2_implications();
-> +	report_prefix_pop();
-> +}
-> +
->  static void test_sclp_features(void)
->  {
->  	report_prefix_push("sclp");
->  
->  	if (uv_os_is_guest())
->  		test_sclp_features_fmt4();
-> +	else
-> +		test_sclp_features_fmt2();
->  
->  	report_prefix_pop();
->  }
+>         if (kvm_arch_vcpu_runnable(vcpu)) {
+>                 kvm_make_request(KVM_REQ_UNHALT, vcpu); <---
+>                 goto out;
+>         }
+> 
+> Don't want to unhalt the vcpu.
+
+Could you elaborate?  It's not obvious to me why we can't do that if
+pi_test_on() returns true..  we have pending post interrupts anyways, so
+shouldn't we stop halting?  Thanks!
+
+-- 
+Peter Xu
 
