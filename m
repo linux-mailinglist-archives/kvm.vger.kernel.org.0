@@ -2,173 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AFB1837A5A1
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 13:20:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86C3137A5C6
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 13:30:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231639AbhEKLVz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 May 2021 07:21:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34449 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231560AbhEKLVk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 May 2021 07:21:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620732034;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jgezwu+Ka/2x1z5dm2QC7G75OxkPVMK5k1J0nHkF7Ds=;
-        b=PNPpOuqkAmZUdhPZsWbxH7VwBM6pgK3ET4nhLX1XJk28m+5y4SS1vy/CZHMB0vOZ4YEy6/
-        W3D3332bHIj5aKHcpHBZUDwv9ckmbagfsCah6f4GnvkCZRtsI7ABeLSXhdE6I0b6TpmctN
-        V5E4gFmBZF+V5rte/PNLhLrjX0SZcE4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-UVUDOauwOq-nIxbW-5YncQ-1; Tue, 11 May 2021 07:20:31 -0400
-X-MC-Unique: UVUDOauwOq-nIxbW-5YncQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 393831922038;
-        Tue, 11 May 2021 11:20:29 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.193.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 286D463C40;
-        Tue, 11 May 2021 11:20:26 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH 7/7] KVM: selftests: evmcs_test: Test that KVM_STATE_NESTED_EVMCS is never lost
-Date:   Tue, 11 May 2021 13:19:56 +0200
-Message-Id: <20210511111956.1555830-8-vkuznets@redhat.com>
-In-Reply-To: <20210511111956.1555830-1-vkuznets@redhat.com>
-References: <20210511111956.1555830-1-vkuznets@redhat.com>
+        id S231502AbhEKLbU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 May 2021 07:31:20 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2776 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231393AbhEKLbT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 May 2021 07:31:19 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FfbGx73YHzmgJV;
+        Tue, 11 May 2021 19:26:49 +0800 (CST)
+Received: from [10.174.184.135] (10.174.184.135) by
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.498.0; Tue, 11 May 2021 19:30:02 +0800
+Subject: Re: [RFC PATCH v3 0/8] Add IOPF support for VFIO passthrough
+From:   Shenming Lu <lushenming@huawei.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     Cornelia Huck <cohuck@redhat.com>, Will Deacon <will@kernel.org>,
+        "Robin Murphy" <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Jean-Philippe Brucker" <jean-philippe@linaro.org>,
+        Eric Auger <eric.auger@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <iommu@lists.linux-foundation.org>, <linux-api@vger.kernel.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>, <yi.l.liu@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        "Barry Song" <song.bao.hua@hisilicon.com>,
+        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
+References: <20210409034420.1799-1-lushenming@huawei.com>
+ <cb9584fd-c7f5-8cac-8c63-219ded2ef9db@huawei.com>
+Message-ID: <b7fbb6a3-8777-d46a-af6c-5b3243e8b00c@huawei.com>
+Date:   Tue, 11 May 2021 19:30:01 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <cb9584fd-c7f5-8cac-8c63-219ded2ef9db@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.184.135]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Do KVM_GET_NESTED_STATE/KVM_SET_NESTED_STATE for a freshly restored VM
-(before the first KVM_RUN) to check that KVM_STATE_NESTED_EVMCS is not
-lost.
+Hi Alex,
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- .../testing/selftests/kvm/x86_64/evmcs_test.c | 64 +++++++++++--------
- 1 file changed, 38 insertions(+), 26 deletions(-)
+Hope for some suggestions or comments from you since there seems to be many unsure
+points in this series. :-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/evmcs_test.c b/tools/testing/selftests/kvm/x86_64/evmcs_test.c
-index 63096cea26c6..fcef347a681a 100644
---- a/tools/testing/selftests/kvm/x86_64/evmcs_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/evmcs_test.c
-@@ -121,14 +121,38 @@ void inject_nmi(struct kvm_vm *vm)
- 	vcpu_events_set(vm, VCPU_ID, &events);
- }
- 
-+static void save_restore_vm(struct kvm_vm *vm)
-+{
-+	struct kvm_regs regs1, regs2;
-+	struct kvm_x86_state *state;
-+
-+	state = vcpu_save_state(vm, VCPU_ID);
-+	memset(&regs1, 0, sizeof(regs1));
-+	vcpu_regs_get(vm, VCPU_ID, &regs1);
-+
-+	kvm_vm_release(vm);
-+
-+	/* Restore state in a new VM.  */
-+	kvm_vm_restart(vm, O_RDWR);
-+	vm_vcpu_add(vm, VCPU_ID);
-+	vcpu_set_hv_cpuid(vm, VCPU_ID);
-+	vcpu_enable_evmcs(vm, VCPU_ID);
-+	vcpu_load_state(vm, VCPU_ID, state);
-+	free(state);
-+
-+	memset(&regs2, 0, sizeof(regs2));
-+	vcpu_regs_get(vm, VCPU_ID, &regs2);
-+	TEST_ASSERT(!memcmp(&regs1, &regs2, sizeof(regs2)),
-+		    "Unexpected register values after vcpu_load_state; rdi: %lx rsi: %lx",
-+		    (ulong) regs2.rdi, (ulong) regs2.rsi);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	vm_vaddr_t vmx_pages_gva = 0;
- 
--	struct kvm_regs regs1, regs2;
- 	struct kvm_vm *vm;
- 	struct kvm_run *run;
--	struct kvm_x86_state *state;
- 	struct ucall uc;
- 	int stage;
- 
-@@ -145,10 +169,6 @@ int main(int argc, char *argv[])
- 	vcpu_set_hv_cpuid(vm, VCPU_ID);
- 	vcpu_enable_evmcs(vm, VCPU_ID);
- 
--	run = vcpu_state(vm, VCPU_ID);
--
--	vcpu_regs_get(vm, VCPU_ID, &regs1);
--
- 	vcpu_alloc_vmx(vm, &vmx_pages_gva);
- 	vcpu_args_set(vm, VCPU_ID, 1, vmx_pages_gva);
- 
-@@ -160,6 +180,7 @@ int main(int argc, char *argv[])
- 	pr_info("Running L1 which uses EVMCS to run L2\n");
- 
- 	for (stage = 1;; stage++) {
-+		run = vcpu_state(vm, VCPU_ID);
- 		_vcpu_run(vm, VCPU_ID);
- 		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
- 			    "Stage %d: unexpected exit reason: %u (%s),\n",
-@@ -184,32 +205,23 @@ int main(int argc, char *argv[])
- 			    uc.args[1] == stage, "Stage %d: Unexpected register values vmexit, got %lx",
- 			    stage, (ulong)uc.args[1]);
- 
--		state = vcpu_save_state(vm, VCPU_ID);
--		memset(&regs1, 0, sizeof(regs1));
--		vcpu_regs_get(vm, VCPU_ID, &regs1);
--
--		kvm_vm_release(vm);
--
--		/* Restore state in a new VM.  */
--		kvm_vm_restart(vm, O_RDWR);
--		vm_vcpu_add(vm, VCPU_ID);
--		vcpu_set_hv_cpuid(vm, VCPU_ID);
--		vcpu_enable_evmcs(vm, VCPU_ID);
--		vcpu_load_state(vm, VCPU_ID, state);
--		run = vcpu_state(vm, VCPU_ID);
--		free(state);
--
--		memset(&regs2, 0, sizeof(regs2));
--		vcpu_regs_get(vm, VCPU_ID, &regs2);
--		TEST_ASSERT(!memcmp(&regs1, &regs2, sizeof(regs2)),
--			    "Unexpected register values after vcpu_load_state; rdi: %lx rsi: %lx",
--			    (ulong) regs2.rdi, (ulong) regs2.rsi);
-+		save_restore_vm(vm);
- 
- 		/* Force immediate L2->L1 exit before resuming */
- 		if (stage == 8) {
- 			pr_info("Injecting NMI into L1 before L2 had a chance to run after restore\n");
- 			inject_nmi(vm);
- 		}
-+
-+		/*
-+		 * Do KVM_GET_NESTED_STATE/KVM_SET_NESTED_STATE for a freshly
-+		 * restored VM (before the first KVM_RUN) to check that
-+		 * KVM_STATE_NESTED_EVMCS is not lost.
-+		 */
-+		if (stage == 9) {
-+			pr_info("Trying extra KVM_GET_NESTED_STATE/KVM_SET_NESTED_STATE cycle\n");
-+			save_restore_vm(vm);
-+		}
- 	}
- 
- done:
--- 
-2.30.2
+Thanks,
+Shenming
 
+
+On 2021/4/26 9:41, Shenming Lu wrote:
+> On 2021/4/9 11:44, Shenming Lu wrote:
+>> Hi,
+>>
+>> Requesting for your comments and suggestions. :-)
+> 
+> Kind ping...
+> 
+>>
+>> The static pinning and mapping problem in VFIO and possible solutions
+>> have been discussed a lot [1, 2]. One of the solutions is to add I/O
+>> Page Fault support for VFIO devices. Different from those relatively
+>> complicated software approaches such as presenting a vIOMMU that provides
+>> the DMA buffer information (might include para-virtualized optimizations),
+>> IOPF mainly depends on the hardware faulting capability, such as the PCIe
+>> PRI extension or Arm SMMU stall model. What's more, the IOPF support in
+>> the IOMMU driver has already been implemented in SVA [3]. So we add IOPF
+>> support for VFIO passthrough based on the IOPF part of SVA in this series.
+>>
+>> We have measured its performance with UADK [4] (passthrough an accelerator
+>> to a VM(1U16G)) on Hisilicon Kunpeng920 board (and compared with host SVA):
+>>
+>> Run hisi_sec_test...
+>>  - with varying sending times and message lengths
+>>  - with/without IOPF enabled (speed slowdown)
+>>
+>> when msg_len = 1MB (and PREMAP_LEN (in Patch 4) = 1):
+>>             slowdown (num of faults)
+>>  times      VFIO IOPF      host SVA
+>>  1          63.4% (518)    82.8% (512)
+>>  100        22.9% (1058)   47.9% (1024)
+>>  1000       2.6% (1071)    8.5% (1024)
+>>
+>> when msg_len = 10MB (and PREMAP_LEN = 512):
+>>             slowdown (num of faults)
+>>  times      VFIO IOPF
+>>  1          32.6% (13)
+>>  100        3.5% (26)
+>>  1000       1.6% (26)
+>>
+>> History:
+>>
+>> v2 -> v3
+>>  - Nit fixes.
+>>  - No reason to disable reporting the unrecoverable faults. (baolu)
+>>  - Maintain a global IOPF enabled group list.
+>>  - Split the pre-mapping optimization to be a separate patch.
+>>  - Add selective faulting support (use vfio_pin_pages to indicate the
+>>    non-faultable scope and add a new struct vfio_range to record it,
+>>    untested). (Kevin)
+>>
+>> v1 -> v2
+>>  - Numerous improvements following the suggestions. Thanks a lot to all
+>>    of you.
+>>
+>> Note that PRI is not supported at the moment since there is no hardware.
+>>
+>> Links:
+>> [1] Lesokhin I, et al. Page Fault Support for Network Controllers. In ASPLOS,
+>>     2016.
+>> [2] Tian K, et al. coIOMMU: A Virtual IOMMU with Cooperative DMA Buffer Tracking
+>>     for Efficient Memory Management in Direct I/O. In USENIX ATC, 2020.
+>> [3] https://patchwork.kernel.org/project/linux-arm-kernel/cover/20210401154718.307519-1-jean-philippe@linaro.org/
+>> [4] https://github.com/Linaro/uadk
+>>
+>> Thanks,
+>> Shenming
+>>
+>>
+>> Shenming Lu (8):
+>>   iommu: Evolve the device fault reporting framework
+>>   vfio/type1: Add a page fault handler
+>>   vfio/type1: Add an MMU notifier to avoid pinning
+>>   vfio/type1: Pre-map more pages than requested in the IOPF handling
+>>   vfio/type1: VFIO_IOMMU_ENABLE_IOPF
+>>   vfio/type1: No need to statically pin and map if IOPF enabled
+>>   vfio/type1: Add selective DMA faulting support
+>>   vfio: Add nested IOPF support
+>>
+>>  .../iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c   |    3 +-
+>>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   |   18 +-
+>>  drivers/iommu/iommu.c                         |   56 +-
+>>  drivers/vfio/vfio.c                           |   85 +-
+>>  drivers/vfio/vfio_iommu_type1.c               | 1000 ++++++++++++++++-
+>>  include/linux/iommu.h                         |   19 +-
+>>  include/linux/vfio.h                          |   13 +
+>>  include/uapi/linux/iommu.h                    |    4 +
+>>  include/uapi/linux/vfio.h                     |    6 +
+>>  9 files changed, 1181 insertions(+), 23 deletions(-)
+>>
