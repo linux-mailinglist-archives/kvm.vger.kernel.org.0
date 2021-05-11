@@ -2,79 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17DA137B097
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 23:13:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4294237B0C2
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 23:27:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229984AbhEKVOT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 May 2021 17:14:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56028 "EHLO
+        id S229916AbhEKV2V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 May 2021 17:28:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229784AbhEKVOT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 May 2021 17:14:19 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90840C061574
-        for <kvm@vger.kernel.org>; Tue, 11 May 2021 14:13:12 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id gc22-20020a17090b3116b02901558435aec1so2108372pjb.4
-        for <kvm@vger.kernel.org>; Tue, 11 May 2021 14:13:12 -0700 (PDT)
+        with ESMTP id S229637AbhEKV2U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 May 2021 17:28:20 -0400
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99CB7C061574
+        for <kvm@vger.kernel.org>; Tue, 11 May 2021 14:27:13 -0700 (PDT)
+Received: by mail-oi1-x22f.google.com with SMTP id l6so20403751oii.1
+        for <kvm@vger.kernel.org>; Tue, 11 May 2021 14:27:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=udQopo09yiN7BZym6iPBJj0HRqYBWUyaKZOwZTHYUDc=;
-        b=QJctDFxBQkbiWCVjnD3yaN3HqYZ3ZwawGEkBFpKdJjyDut5/gOpJoi2lEBoi8qlULw
-         HfCostyZDeec6fRZ70/0nUQV8mwOJ7rFXRj12AQI/HOH36woylcL7ASmk5r7yGlQobFa
-         r2UFzH50p3N9KVboF96rvz7ZbcyZ/mmTLGJDvu8+qhwsWnWhLpyu5A0BNyQoVMw2LTlc
-         +I7HEEBTdt5RkqpS+7ituaTCrh1eae1/RJjweuuTPJcEid24Lb2ovyejIElujIIqT4y0
-         H52HZDaacuJP6IickdlwW4F9CYxp1kUnVU5A9vdyf+3F3W6uG7VSWpm1mMKxKuKkeK/j
-         rPCg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=raiVLCfAf9/vKVvJ2xvj7dS2xaKxdBfJtG6OeEt6BAQ=;
+        b=BuqhpT5l4aweACDZWAf2oKzGbgVpt5hOHCVDjYMe2t0VcTjq62XMrxi6QKwzKkbh0Y
+         BacM/dqOeyTmpKydRpQvQW9aFltkc5UKr/LQHyipuqog8lZ1tBKn8p93bg6/WcZGXjGh
+         SyWHxWmu8V5TfMvPAyrGYrm13u8RPNnD/MaFYQ4ClKqvTeNVnj2Bnhy2MSMR1IIzzU2b
+         3Ws1eNa6EbSBJPQ055r50ReoFpB6nbiO3c1wwnwrTQk1HFJo+BCEMv4JWLkb4CMfS7XI
+         KA1UoopzGZQfwICXaHrroJpMRJTyN5haqQdwTeBUniRcc26DJB1v/TobkB6njIQOGFFi
+         xw+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=udQopo09yiN7BZym6iPBJj0HRqYBWUyaKZOwZTHYUDc=;
-        b=OTQePlMcMkxFGlCUOnEwsTiIK0J5qEaGvRQgHhSJ+V0iMp7glNJKtQQZR7a7uMaudf
-         rDIeamesny9HTcGvZmhK0pyK4a82ky+D3DqWNmRRDxoHOQHPSOUUzmxY9x7eSz6f/yMs
-         Gx6gWaFdru4gJ273jkhsYaBu0VMAzpdpT61T/SqiXQLVRCXtyVIdoBWV4XQ1xjxr5fo7
-         UuTvNmEDIcL5LMIOrac6JQOKLqw5+tjW2l4SKw/gxmY23i5g2G22SO2J6ymIaVWzFE15
-         YQtIuFPYItAePWY63XoX3KxXVtmk97bx6dtYhciuesP9Ti64fuJjOHgCRsL48N0nAme3
-         eFow==
-X-Gm-Message-State: AOAM532R/1SCpwgJ6EuagdEYoZuKe7UhzdOxxCPOri1OVu4ZBF3tFXBj
-        ys+mZg0WsRgslSWmF2nIE9VJTw==
-X-Google-Smtp-Source: ABdhPJxEXv59fde7v4QVBK4b1vS7G8DygMQIUY4cgxYS1Rcwyw24n5ZflTts6O4EGpKEguXAEwPmwg==
-X-Received: by 2002:a17:902:c214:b029:ee:de19:9ae4 with SMTP id 20-20020a170902c214b02900eede199ae4mr30899581pll.57.1620767590370;
-        Tue, 11 May 2021 14:13:10 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id w74sm14327277pfc.173.2021.05.11.14.13.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 May 2021 14:13:09 -0700 (PDT)
-Date:   Tue, 11 May 2021 21:13:05 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jacob Xu <jacobhxu@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH 2/2] x86: remove use of compiler's memset
- from emulator.c
-Message-ID: <YJrzYVJXs8gNBPmF@google.com>
-References: <20210511015016.815461-1-jacobhxu@google.com>
- <20210511015016.815461-2-jacobhxu@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=raiVLCfAf9/vKVvJ2xvj7dS2xaKxdBfJtG6OeEt6BAQ=;
+        b=sHCMADK91l+76Nw6KIkyfTBASKEiYnXnSSSt5AlMtopod4Gyfzo/mG0745sL3FPn+C
+         xcqCFE5lFqo8a/OcX7KwCCjVy2YwjHmdCvEtrXtVgi0q8gyNF6RuFJ/USKZpBqnP/0V1
+         1L5uytYeH45FjBwDDTIXVdy9l/lPv+k2xJ/ffgw0JRIok9AWc+dsuttyyFplSlF9Ekye
+         goeG2MNCq/ewjSCiSpIGNuToouN1UmDXwI5NTiFOvDwxOY/fKz3q2aCZtaPvFdDh8AhI
+         EuC/DoR6BZF1A/ROW5T4T6hRK32u3erYVHPieUG+YM0lxUgfhqjSqj/iqZxS3wTCTXfW
+         qb2Q==
+X-Gm-Message-State: AOAM531tk04jci94QiC8AAwbc911ZknfMALooBAStIzLeTJP22P0+hlX
+        nvKDGyfpWuXAut06Csxa6lq4p7gyxh5v6UjdKZs4+Q==
+X-Google-Smtp-Source: ABdhPJyzXaF1u80lP4DgHIw8/uR4ku0znI0wQFSkXveZodKfKY25fkNxFTdAONMzv/xzrlydDKgFP2vfU3qn9xKaCKs=
+X-Received: by 2002:aca:5358:: with SMTP id h85mr5180044oib.6.1620768432575;
+ Tue, 11 May 2021 14:27:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210511015016.815461-2-jacobhxu@google.com>
+References: <20200529074347.124619-1-like.xu@linux.intel.com> <20200529074347.124619-4-like.xu@linux.intel.com>
+In-Reply-To: <20200529074347.124619-4-like.xu@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 11 May 2021 14:27:01 -0700
+Message-ID: <CALMp9eQNZsk-odGHNkLkkakk+Y01qqY5Mzm3x8n0A3YizfUJ7Q@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: pmu: Test full-width counter writes support
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 10, 2021, Jacob Xu wrote:
-> Per Sean in discussion of the previous patch, "using the compiler's
-> memset() in kvm-unit-tests seems inherently dangerous since the tests
-> are often doing intentionally stupid things."
-> 
-> The string.h memset is already imported through libcflat.h, so let's use
-> that instead.
-> 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Jacob Xu <jacobhxu@google.com>
+On Fri, May 29, 2020 at 12:44 AM Like Xu <like.xu@linux.intel.com> wrote:
+>
+> When the full-width writes capability is set, use the alternative MSR
+> range to write larger sign counter values (up to GP counter width).
+>
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
 > ---
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+> +       /*
+> +        * MSR_IA32_PMCn supports writing values =C3=A2=E2=82=AC=E2=80=B9=
+=C3=A2=E2=82=AC=E2=80=B9up to GP counter width,
+> +        * and only the lowest bits of GP counter width are valid.
+> +        */
+
+Could you rewrite this comment in ASCII, please? I would do it, but
+I'm not sure what the correct translation is.
