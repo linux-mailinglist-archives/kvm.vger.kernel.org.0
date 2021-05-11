@@ -2,221 +2,368 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D832537B160
-	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 00:10:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E942537B2D0
+	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 01:54:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230009AbhEKWLN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 May 2021 18:11:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40648 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229637AbhEKWLN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 May 2021 18:11:13 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A238C061574
-        for <kvm@vger.kernel.org>; Tue, 11 May 2021 15:10:05 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id m10-20020a170902f20ab02900ed7e32ff42so8183977plc.19
-        for <kvm@vger.kernel.org>; Tue, 11 May 2021 15:10:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc
-         :content-transfer-encoding;
-        bh=13xt/09p3n54kTsPIZnNmQLqQsy13uIdS7rJhB8C15Q=;
-        b=pi9W/sfCZjmPScfx6I0ku6MpZrlLYMFTiAzsXMHhcv/fR/XEf+qt+YLy6+4XvpCMFA
-         ru9JFmL2W2Q5Y8Et9inbzTKU1FKjyr7nadWr0wBWDpckQkNzHTaXaA5YNMLyGidbhxDY
-         pSRDPe10193rG7lb8AkVaIShKbrJYDNR/F3cNnY93ltVsWPyhH4dVEBSJbN79nNKuqju
-         5HU5KVAZrrbSKyPkUkR6Jzt0N7iHMb1A4zTziEHyjZRzNIA9HeuwdiJ2HTWQMC1aIljf
-         mA4cZDjLjK2r33spzAe1UfAGVFGeZSJvOfKG3IINeW+RG159Xs99TcVu5aMc2JOxxKn4
-         0k7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc
-         :content-transfer-encoding;
-        bh=13xt/09p3n54kTsPIZnNmQLqQsy13uIdS7rJhB8C15Q=;
-        b=XBmKFn8n3ggN1zpgf/3gdHfYAyVj1i/cXlaNy32988kv3yfYuyc++Yrhhavozp9K/A
-         y9Q2Rs2NNdGdBpQGB1VCD9xMhvuIdxCgsOCKCeFMwY5acxNXACDacAs+cdsQ1eJ8+gQ2
-         gs5Q+gdHp3KfMHzkd3144a4vQ7+lUanu2gI+nUpO5Vx4gtIBVq8ZqWwxoSZYnaKZUhJw
-         JyGVotm6vjtfZUAFgvRdxfpk29I3AfztwraKUUEjicaSaqv9v9s1Mr7JvYR7guThA5kM
-         MOA38H3IhCvfC1dhZVP7Ysh7CuSZDnSQdZuzrKSOP+NLOeSxprs8RLCkCzCqYywgXtEQ
-         orEA==
-X-Gm-Message-State: AOAM531q9gvPJvZ65KSewAGsIy6rxhYBdlHTzTQITqdIWghVB1H8AQXD
-        ot7U/3WFtiCMnYRSGxXyL2sbFNLoeICAqA==
-X-Google-Smtp-Source: ABdhPJyBsk58YHK/PF5rVmpWXRhXJI7AiVbtXSxPdhecd7QZZS3o5VrxYcaziJeOl2266byaHKmvEohkY8u55g==
-X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1a0d])
- (user=jmattson job=sendgmr) by 2002:aa7:96ea:0:b029:28c:e131:f0f with SMTP id
- i10-20020aa796ea0000b029028ce1310f0fmr32910200pfq.11.1620771004724; Tue, 11
- May 2021 15:10:04 -0700 (PDT)
-Date:   Tue, 11 May 2021 15:09:49 -0700
-Message-Id: <20210511220949.1019978-1-jmattson@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.31.1.607.g51e8a6a459-goog
-Subject: [kvm-unit-tests PATCH] x86: Convert vmx_tests.c comments to ASCII
-From:   Jim Mattson <jmattson@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        id S230012AbhEKXz5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 May 2021 19:55:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54305 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229637AbhEKXz5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 May 2021 19:55:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620777289;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qJ9npD1rbA7F89PpG04Ums16Ro3sxWMBXXN6oqoNyHI=;
+        b=EV/7Zp6CZjmZoFTLlVcqpdhwrBpPgq6tEurBtlOCxDp+2AdmMHNmY21OTN8fW17tBRVc8z
+        S4hjlCPJXupKt4KrHP4IxFh7gI5RO+Y51idrYgxPnpkHt+5TqyJkgv/oH7K5VW8lsGbSLr
+        1luKNfApKtbJDLRFGglX3mkF6/pnDdw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-336-ZW-UZz5iPLqE28U-J3Dryw-1; Tue, 11 May 2021 19:54:48 -0400
+X-MC-Unique: ZW-UZz5iPLqE28U-J3Dryw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 239EB6D241;
+        Tue, 11 May 2021 23:54:47 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 53EE55D6A8;
+        Tue, 11 May 2021 23:54:36 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id 8303443F79CA; Tue, 11 May 2021 20:51:24 -0300 (-03)
+Date:   Tue, 11 May 2021 20:51:24 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Pei Zhang <pezhang@redhat.com>
+Subject: Re: [patch 4/4] KVM: VMX: update vcpu posted-interrupt descriptor
+ when assigning device
+Message-ID: <20210511235124.GA187296@fuller.cnet>
+References: <20210507130609.269153197@redhat.com>
+ <20210507130923.528132061@redhat.com>
+ <YJV3P4mFA7pITziM@google.com>
+ <YJWVAcIsvCaD7U0C@t490s>
+ <20210507220831.GA449495@fuller.cnet>
+ <YJqXD5gQCfzO4rT5@t490s>
+ <20210511145157.GC124427@fuller.cnet>
+ <YJqurM+LiyAY+MPO@t490s>
+ <20210511171810.GA162107@fuller.cnet>
+ <YJr4ravpCjz2M4bp@t490s>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YJr4ravpCjz2M4bp@t490s>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some strange characters snuck into this file. Convert them to ASCII
-for better readability.
+On Tue, May 11, 2021 at 05:35:41PM -0400, Peter Xu wrote:
+> On Tue, May 11, 2021 at 02:18:10PM -0300, Marcelo Tosatti wrote:
+> > On Tue, May 11, 2021 at 12:19:56PM -0400, Peter Xu wrote:
+> > > On Tue, May 11, 2021 at 11:51:57AM -0300, Marcelo Tosatti wrote:
+> > > > On Tue, May 11, 2021 at 10:39:11AM -0400, Peter Xu wrote:
+> > > > > On Fri, May 07, 2021 at 07:08:31PM -0300, Marcelo Tosatti wrote:
+> > > > > > > Wondering whether we should add a pi_test_on() check in kvm_vcpu_has_events()
+> > > > > > > somehow, so that even without customized ->vcpu_check_block we should be able
+> > > > > > > to break the block loop (as kvm_arch_vcpu_runnable will return true properly)?
+> > > > > > 
+> > > > > > static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
+> > > > > > {
+> > > > > >         int ret = -EINTR;
+> > > > > >         int idx = srcu_read_lock(&vcpu->kvm->srcu);
+> > > > > > 
+> > > > > >         if (kvm_arch_vcpu_runnable(vcpu)) {
+> > > > > >                 kvm_make_request(KVM_REQ_UNHALT, vcpu); <---
+> > > > > >                 goto out;
+> > > > > >         }
+> > > > > > 
+> > > > > > Don't want to unhalt the vcpu.
+> > > > > 
+> > > > > Could you elaborate?  It's not obvious to me why we can't do that if
+> > > > > pi_test_on() returns true..  we have pending post interrupts anyways, so
+> > > > > shouldn't we stop halting?  Thanks!
+> > > > 
+> > > > pi_test_on() only returns true when an interrupt is signalled by the
+> > > > device. But the sequence of events is:
+> > > > 
+> > > > 
+> > > > 1. pCPU idles without notification vector configured to wakeup vector.
+> > > > 
+> > > > 2. PCI device is hotplugged, assigned device count increases from 0 to 1.
+> > > > 
+> > > > <arbitrary amount of time>
+> > > > 
+> > > > 3. device generates interrupt, sets ON bit to true in the posted
+> > > > interrupt descriptor.
+> > > > 
+> > > > We want to exit kvm_vcpu_block after 2, but before 3 (where ON bit
+> > > > is not set).
+> > > 
+> > > Ah yes.. thanks.
+> > > 
+> > > Besides the current approach, I'm thinking maybe it'll be cleaner/less LOC to
+> > > define a KVM_REQ_UNBLOCK to replace the pre_block hook (in x86's kvm_host.h):
+> > > 
+> > > #define KVM_REQ_UNBLOCK			KVM_ARCH_REQ(31)
+> > > 
+> > > We can set it in vmx_pi_start_assignment(), then check+clear it in
+> > > kvm_vcpu_has_events() (or make it a bool in kvm_vcpu struct?).
+> > 
+> > Can't check it in kvm_vcpu_has_events() because that will set
+> > KVM_REQ_UNHALT (which we don't want).
+> 
+> I thought it was okay to break the guest HLT? 
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- x86/vmx_tests.c | 44 ++++++++++++++++++++++----------------------
- 1 file changed, 22 insertions(+), 22 deletions(-)
+Intel:
 
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index 2eb5962..179a55b 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -4049,13 +4049,13 @@ static void test_pi_desc_addr(u64 addr, bool ctrl)
- }
-=20
- /*
-- * If the =C3=A2=E2=82=AC=C5=93process posted interrupts=C3=A2=E2=82=AC VM=
--execution control is 1, the
-+ * If the "process posted interrupts" VM-execution control is 1, the
-  * following must be true:
-  *
-- *	- The =C3=A2=E2=82=AC=C5=93virtual-interrupt delivery=C3=A2=E2=82=AC VM=
--execution control is 1.
-- *	- The =C3=A2=E2=82=AC=C5=93acknowledge interrupt on exit=C3=A2=E2=82=AC=
- VM-exit control is 1.
-+ *	- The "virtual-interrupt delivery" VM-execution control is 1.
-+ *	- The "acknowledge interrupt on exit" VM-exit control is 1.
-  *	- The posted-interrupt notification vector has a value in the
-- *	- range 0=C3=A2=E2=82=AC=E2=80=9C255 (bits 15:8 are all 0).
-+ *	- range 0 - 255 (bits 15:8 are all 0).
-  *	- Bits 5:0 of the posted-interrupt descriptor address are all 0.
-  *	- The posted-interrupt descriptor address does not set any bits
-  *	  beyond the processor's physical-address width.
-@@ -4179,7 +4179,7 @@ static void test_apic_ctls(void)
- }
-=20
- /*
-- * If the =C3=A2=E2=82=AC=C5=93enable VPID=C3=A2=E2=82=AC VM-execution con=
-trol is 1, the value of the
-+ * If the "enable VPID" VM-execution control is 1, the value of the
-  * of the VPID VM-execution control field must not be 0000H.
-  * [Intel SDM]
-  */
-@@ -4263,7 +4263,7 @@ static void test_invalid_event_injection(void)
- 	vmcs_write(ENT_INTR_ERROR, 0x00000000);
- 	vmcs_write(ENT_INST_LEN, 0x00000001);
-=20
--	/* The field=E2=80=99s interruption type is not set to a reserved value. =
-*/
-+	/* The field's interruption type is not set to a reserved value. */
- 	ent_intr_info =3D ent_intr_info_base | INTR_TYPE_RESERVED | DE_VECTOR;
- 	report_prefix_pushf("%s, VM-entry intr info=3D0x%x",
- 			    "RESERVED interruption type invalid [-]",
-@@ -4480,7 +4480,7 @@ skip_unrestricted_guest:
- 	/*
- 	 * If the interruption type is software interrupt, software exception,
- 	 * or privileged software exception, the VM-entry instruction-length
--	 * field is in the range 0=E2=80=9315.
-+	 * field is in the range 0 - 15.
- 	 */
-=20
- 	for (cnt =3D 0; cnt < 3; cnt++) {
-@@ -4686,8 +4686,8 @@ out:
-  *  VM-execution control must be 0.
-  *  [Intel SDM]
-  *
-- *  If the =E2=80=9Cvirtual NMIs=E2=80=9D VM-execution control is 0, the =
-=E2=80=9CNMI-window
-- *  exiting=E2=80=9D VM-execution control must be 0.
-+ *  If the "virtual NMIs" VM-execution control is 0, the "NMI-window
-+ *  exiting" VM-execution control must be 0.
-  *  [Intel SDM]
-  */
- static void test_nmi_ctrls(void)
-@@ -5448,14 +5448,14 @@ static void test_vm_execution_ctls(void)
-   * the VM-entry MSR-load count field is non-zero:
-   *
-   *    - The lower 4 bits of the VM-entry MSR-load address must be 0.
--  *      The address should not set any bits beyond the processor=C3=A2=E2=
-=82=AC=E2=84=A2s
-+  *      The address should not set any bits beyond the processor's
-   *      physical-address width.
-   *
-   *    - The address of the last byte in the VM-entry MSR-load area
--  *      should not set any bits beyond the processor=C3=A2=E2=82=AC=E2=84=
-=A2s physical-address
-+  *      should not set any bits beyond the processor's physical-address
-   *      width. The address of this last byte is VM-entry MSR-load address
-   *      + (MSR count * 16) - 1. (The arithmetic used for the computation
--  *      uses more bits than the processor=C3=A2=E2=82=AC=E2=84=A2s physic=
-al-address width.)
-+  *      uses more bits than the processor's physical-address width.)
-   *
-   *
-   *  [Intel SDM]
-@@ -5574,14 +5574,14 @@ static void test_vm_entry_ctls(void)
-  * the VM-exit MSR-store count field is non-zero:
-  *
-  *    - The lower 4 bits of the VM-exit MSR-store address must be 0.
-- *      The address should not set any bits beyond the processor=E2=80=99s
-+ *      The address should not set any bits beyond the processor's
-  *      physical-address width.
-  *
-  *    - The address of the last byte in the VM-exit MSR-store area
-- *      should not set any bits beyond the processor=E2=80=99s physical-ad=
-dress
-+ *      should not set any bits beyond the processor's physical-address
-  *      width. The address of this last byte is VM-exit MSR-store address
-  *      + (MSR count * 16) - 1. (The arithmetic used for the computation
-- *      uses more bits than the processor=E2=80=99s physical-address width=
-.)
-+ *      uses more bits than the processor's physical-address width.)
-  *
-  * If IA32_VMX_BASIC[48] is read as 1, neither address should set any bits
-  * in the range 63:32.
-@@ -7172,7 +7172,7 @@ static void test_ctl_reg(const char *cr_name, u64 cr,=
- u64 fixed0, u64 fixed1)
-  *    operation.
-  * 3. On processors that support Intel 64 architecture, the CR3 field must
-  *    be such that bits 63:52 and bits in the range 51:32 beyond the
-- *    processor=C3=A2=E2=82=AC=E2=84=A2s physical-address width must be 0.
-+ *    processor's physical-address width must be 0.
-  *
-  *  [Intel SDM]
-  */
-@@ -7940,11 +7940,11 @@ static void test_load_guest_pat(void)
- #define MSR_IA32_BNDCFGS_RSVD_MASK	0x00000ffc
-=20
- /*
-- * If the =C3=A2=E2=82=AC=C5=93load IA32_BNDCFGS=C3=A2=E2=82=AC VM-entry c=
-ontrol is 1, the following
-+ * If the "load IA32_BNDCFGS" VM-entry control is 1, the following
-  * checks are performed on the field for the IA32_BNDCFGS MSR:
-  *
-- *   =C3=A2=E2=82=AC=E2=80=9D  Bits reserved in the IA32_BNDCFGS MSR must =
-be 0.
-- *   =C3=A2=E2=82=AC=E2=80=9D  The linear address in bits 63:12 must be ca=
-nonical.
-+ *   - Bits reserved in the IA32_BNDCFGS MSR must be 0.
-+ *   - The linear address in bits 63:12 must be canonical.
-  *
-  *  [Intel SDM]
-  */
-@@ -8000,9 +8000,9 @@ do {									\
- /*
-  * The following checks are done on the Selector field of the Guest Segmen=
-t
-  * Registers:
-- *    =E2=80=94 TR. The TI flag (bit 2) must be 0.
-- *    =E2=80=94 LDTR. If LDTR is usable, the TI flag (bit 2) must be 0.
-- *    =E2=80=94 SS. If the guest will not be virtual-8086 and the "unrestr=
-icted
-+ *    - TR. The TI flag (bit 2) must be 0.
-+ *    - LDTR. If LDTR is usable, the TI flag (bit 2) must be 0.
-+ *    - SS. If the guest will not be virtual-8086 and the "unrestricted
-  *	guest" VM-execution control is 0, the RPL (bits 1:0) must equal
-  *	the RPL of the selector field for CS.
-  *
---=20
-2.31.1.607.g51e8a6a459-goog
+"HLT-HALT
+
+Description
+
+Stops instruction execution and places the processor in a HALT state. An enabled interrupt (including NMI and
+SMI), a debug exception, the BINIT# signal, the INIT# signal, or the RESET# signal will resume execution. If an
+interrupt (including NMI) is used to resume execution after a HLT instruction, the saved instruction pointer
+(CS:EIP) points to the instruction following the HLT instruction."
+
+AMD:
+
+"6.5 Processor Halt
+The processor halt instruction (HLT) halts instruction execution, leaving the processor in the halt state.
+No registers or machine state are modified as a result of executing the HLT instruction. The processor
+remains in the halt state until one of the following occurs:
+• A non-maskable interrupt (NMI).
+• An enabled, maskable interrupt (INTR).
+• Processor reset (RESET).
+• Processor initialization (INIT).
+• System-management interrupt (SMI)."
+
+The KVM_REQ_UNBLOCK patch will resume execution even any such event
+occuring. So the behaviour would be different from baremetal.
+
+> As IMHO the guest code should
+> always be able to re-run the HLT when interrupted?  As IIUC HLT can easily be
+> interrupted by e.g., SMIs, according to SDM Vol.2.  
+
+CPU will by default return to HLT'ed state, not continue to the
+instruction following HLT, on SMI:
+
+34.10 AUTO HALT RESTART
+If the processor is in a HALT state (due to the prior execution of a HLT instruction) when it receives an SMI, the
+processor records the fact in the auto HALT restart flag in the saved processor state (see Figure 34-3). (This flag is
+located at offset 7F02H and bit 0 in the state save area of the SMRAM.)
+If the processor sets the auto HALT restart flag upon entering SMM (indicating that the SMI occurred when the
+processor was in the HALT state), the SMI handler has two options:
+* It can leave the auto HALT restart flag set, which instructs the RSM instruction to return program control to the
+HLT instruction. This option in effect causes the processor to re-enter the HALT state after handling the SMI.
+(This is the default operation.)
+* It can clear the auto HALT restart flag, which instructs the RSM instruction to return program control to the
+instruction following the HLT instruction.
+
+> Not to mention vfio hotplug
+> should be rare, and we'll only trigger this once for the 1st device.
+> 
+> > 
+> > I think KVM_REQ_UNBLOCK will add more lines of code.
+> 
+> It's very possible I overlooked something above... but if breaking HLT
+> unregularly is okay, I attached one patch that is based on your v3 series, just
+> dropped the vcpu_check_block() but use KVM_REQ_UNBLOCK (no compile test even,
+> just to satisfy my own curiosity on how many loc we can save.. :), it gives me:
+> 
+>  7 files changed, 5 insertions(+), 41 deletions(-)
+> 
+> But again, I could have missed something...
+> 
+> Thanks,
+> 
+> > 
+> > > The thing is current vmx_vcpu_check_block() is mostly a sanity check and
+> > > copy-paste of the pi checks on a few items, so maybe cleaner to use
+> > > KVM_REQ_UNBLOCK, as it might be reused in the future for re-evaluating of
+> > > pre-block for similar purpose?
+> > > 
+> > > No strong opinion, though.
+> > 
+> > Hum... IMHO v3 is quite clean already (although i don't object to your
+> > suggestion).
+> > 
+> > Paolo, what do you think?
+> > 
+> > 
+> > 
+> 
+> -- 
+> Peter Xu
+
+> >From 1131248f3c8f1f2715dd49d439c9fab25b4db9b8 Mon Sep 17 00:00:00 2001
+> From: Peter Xu <peterx@redhat.com>
+> Date: Tue, 11 May 2021 17:33:21 -0400
+> Subject: [PATCH] replace vcpu_check_block() hook with KVM_REQ_UNBLOCK
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  arch/x86/include/asm/kvm-x86-ops.h |  1 -
+>  arch/x86/include/asm/kvm_host.h    | 12 +-----------
+>  arch/x86/kvm/svm/svm.c             |  1 -
+>  arch/x86/kvm/vmx/posted_intr.c     | 27 +--------------------------
+>  arch/x86/kvm/vmx/posted_intr.h     |  1 -
+>  arch/x86/kvm/vmx/vmx.c             |  1 -
+>  arch/x86/kvm/x86.c                 |  3 +++
+>  7 files changed, 5 insertions(+), 41 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index fc99fb779fd21..e7bef91cee04a 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -98,7 +98,6 @@ KVM_X86_OP_NULL(pre_block)
+>  KVM_X86_OP_NULL(post_block)
+>  KVM_X86_OP_NULL(vcpu_blocking)
+>  KVM_X86_OP_NULL(vcpu_unblocking)
+> -KVM_X86_OP_NULL(vcpu_check_block)
+>  KVM_X86_OP_NULL(update_pi_irte)
+>  KVM_X86_OP_NULL(start_assignment)
+>  KVM_X86_OP_NULL(apicv_post_state_restore)
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 5bf7bd0e59582..74ab042e9b146 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -91,6 +91,7 @@
+>  #define KVM_REQ_MSR_FILTER_CHANGED	KVM_ARCH_REQ(29)
+>  #define KVM_REQ_UPDATE_CPU_DIRTY_LOGGING \
+>  	KVM_ARCH_REQ_FLAGS(30, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> +#define KVM_REQ_UNBLOCK			KVM_ARCH_REQ(31)
+>  
+>  #define CR0_RESERVED_BITS                                               \
+>  	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
+> @@ -1350,8 +1351,6 @@ struct kvm_x86_ops {
+>  	void (*vcpu_blocking)(struct kvm_vcpu *vcpu);
+>  	void (*vcpu_unblocking)(struct kvm_vcpu *vcpu);
+>  
+> -	int (*vcpu_check_block)(struct kvm_vcpu *vcpu);
+> -
+>  	int (*update_pi_irte)(struct kvm *kvm, unsigned int host_irq,
+>  			      uint32_t guest_irq, bool set);
+>  	void (*start_assignment)(struct kvm *kvm);
+> @@ -1835,15 +1834,6 @@ static inline bool kvm_irq_is_postable(struct kvm_lapic_irq *irq)
+>  		irq->delivery_mode == APIC_DM_LOWEST);
+>  }
+>  
+> -#define __KVM_HAVE_ARCH_VCPU_CHECK_BLOCK
+> -static inline int kvm_arch_vcpu_check_block(struct kvm_vcpu *vcpu)
+> -{
+> -	if (kvm_x86_ops.vcpu_check_block)
+> -		return static_call(kvm_x86_vcpu_check_block)(vcpu);
+> -
+> -	return 0;
+> -}
+> -
+>  static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+>  {
+>  	static_call_cond(kvm_x86_vcpu_blocking)(vcpu);
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index cda5ccb4d9d1b..8b03795cfcd11 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4459,7 +4459,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  	.vcpu_put = svm_vcpu_put,
+>  	.vcpu_blocking = svm_vcpu_blocking,
+>  	.vcpu_unblocking = svm_vcpu_unblocking,
+> -	.vcpu_check_block = NULL,
+>  
+>  	.update_exception_bitmap = svm_update_exception_bitmap,
+>  	.get_msr_feature = svm_get_msr_feature,
+> diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+> index 2d0d009965530..0b74d598ebcbd 100644
+> --- a/arch/x86/kvm/vmx/posted_intr.c
+> +++ b/arch/x86/kvm/vmx/posted_intr.c
+> @@ -203,32 +203,6 @@ void pi_post_block(struct kvm_vcpu *vcpu)
+>  	local_irq_enable();
+>  }
+>  
+> -/*
+> - * Bail out of the block loop if the VM has an assigned
+> - * device, but the blocking vCPU didn't reconfigure the
+> - * PI.NV to the wakeup vector, i.e. the assigned device
+> - * came along after the initial check in vcpu_block().
+> - */
+> -
+> -int vmx_vcpu_check_block(struct kvm_vcpu *vcpu)
+> -{
+> -	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
+> -
+> -	if (!irq_remapping_cap(IRQ_POSTING_CAP))
+> -		return 0;
+> -
+> -	if (!kvm_vcpu_apicv_active(vcpu))
+> -		return 0;
+> -
+> -	if (!kvm_arch_has_assigned_device(vcpu->kvm))
+> -		return 0;
+> -
+> -	if (pi_desc->nv == POSTED_INTR_WAKEUP_VECTOR)
+> -		return 0;
+> -
+> -	return 1;
+> -}
+> -
+>  /*
+>   * Handler for POSTED_INTERRUPT_WAKEUP_VECTOR.
+>   */
+> @@ -278,6 +252,7 @@ void vmx_pi_start_assignment(struct kvm *kvm)
+>  		if (!kvm_vcpu_apicv_active(vcpu))
+>  			continue;
+>  
+> +		kvm_make_request(KVM_REQ_UNBLOCK, vcpu);
+>  		kvm_vcpu_wake_up(vcpu);
+>  	}
+>  }
+> diff --git a/arch/x86/kvm/vmx/posted_intr.h b/arch/x86/kvm/vmx/posted_intr.h
+> index 2aa082fd1c7ab..7f7b2326caf53 100644
+> --- a/arch/x86/kvm/vmx/posted_intr.h
+> +++ b/arch/x86/kvm/vmx/posted_intr.h
+> @@ -96,6 +96,5 @@ bool pi_has_pending_interrupt(struct kvm_vcpu *vcpu);
+>  int pi_update_irte(struct kvm *kvm, unsigned int host_irq, uint32_t guest_irq,
+>  		   bool set);
+>  void vmx_pi_start_assignment(struct kvm *kvm);
+> -int vmx_vcpu_check_block(struct kvm_vcpu *vcpu);
+>  
+>  #endif /* __KVM_X86_VMX_POSTED_INTR_H */
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index ab68fed8b7e43..639ec3eba9b80 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7716,7 +7716,6 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+>  
+>  	.pre_block = vmx_pre_block,
+>  	.post_block = vmx_post_block,
+> -	.vcpu_check_block = vmx_vcpu_check_block,
+>  
+>  	.pmu_ops = &intel_pmu_ops,
+>  	.nested_ops = &vmx_nested_ops,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e6fee59b5dab6..739e1bd59e8a9 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -11177,6 +11177,9 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
+>  	     static_call(kvm_x86_smi_allowed)(vcpu, false)))
+>  		return true;
+>  
+> +	if (kvm_check_request(KVM_REQ_UNBLOCK, vcpu))
+> +		return true;
+> +
+>  	if (kvm_arch_interrupt_allowed(vcpu) &&
+>  	    (kvm_cpu_has_interrupt(vcpu) ||
+>  	    kvm_guest_apic_has_interrupt(vcpu)))
+> -- 
+> 2.31.1
+> 
 
