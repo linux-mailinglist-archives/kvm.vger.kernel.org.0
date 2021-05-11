@@ -2,122 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B8CDB37A373
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 11:23:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D8ED37A387
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 11:25:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231265AbhEKJYS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 May 2021 05:24:18 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:45216 "EHLO mail.skyhub.de"
+        id S231357AbhEKJ02 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 May 2021 05:26:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42700 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230126AbhEKJYR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 May 2021 05:24:17 -0400
-Received: from zn.tnic (p200300ec2f0ec70079cd82bef3234244.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:c700:79cd:82be:f323:4244])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 03AA81EC04DE;
-        Tue, 11 May 2021 11:23:09 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1620724990;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=2BFJfXAt4RasctGcG7XZvImeLDWYB+zm7FzMoySZHus=;
-        b=Ww1QaJQl377xw7ZOtlWjvHoC8Dgd0+Snh9DpsXI7OhvodVQZktNpt0QVAVcZe4k8CVAsUN
-        +AWstQUXWdbXbrueFkK0CdCKMm6efG7Z9dXFXWTEuFMbVw4q2/HPEldWGfXjt4CzpeLj2V
-        8ZMzByLEDYSDLwEKEFC5UX9VI5APT7s=
-Date:   Tue, 11 May 2021 11:23:05 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        tglx@linutronix.de, jroedel@suse.de, thomas.lendacky@amd.com,
-        pbonzini@redhat.com, mingo@redhat.com, dave.hansen@intel.com,
-        rientjes@google.com, seanjc@google.com, peterz@infradead.org,
-        hpa@zytor.com, tony.luck@intel.com
-Subject: Re: [PATCH Part1 RFC v2 02/20] x86/sev: Save the negotiated GHCB
- version
-Message-ID: <YJpM+VZaEr68hTwZ@zn.tnic>
-References: <20210430121616.2295-1-brijesh.singh@amd.com>
- <20210430121616.2295-3-brijesh.singh@amd.com>
+        id S230427AbhEKJ00 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 May 2021 05:26:26 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id BAA5561469;
+        Tue, 11 May 2021 09:25:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1620725119;
+        bh=SxEDkhQ4NDmmQJU/qD2f8WKt2ZN30zjdTiLd/JmT63A=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=qYIzsO6/tiOl8TGJ6a2eiShRAv5ZaMzH0UMz1Okj8KRt9xtY+LR/anIcVUrTbZiX4
+         89BZ53+EXyXMYuHsL+U06kiuxNXt/5HwXMQCdDP/VjD4quHGFE+7gbD3gJVXax5DaY
+         uPQ39ZXYcixN6FyJ12+nOvdmqwpol10wPiVFzbtkGhu9sXEQXyPXQcHwYGaPn1WAFe
+         4EHVQRoUTs78Ah0GJIhGex565u4aOD5+o97KCk6BlvJCrZe2QVlJEyby3BUR9BJh2D
+         ihJkCCdqkHc4Kaa3576AZpMqo1MX3GKHjJMVLdhoGH+hccpOnzojw8qINBpykxkRxP
+         IMzqRB+GVylEA==
+Date:   Tue, 11 May 2021 11:25:08 +0200
+From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        alsa-devel@alsa-project.org, coresight@lists.linaro.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
+        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-fpga@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-sgx@vger.kernel.org, linux-usb@vger.kernel.org,
+        mjpeg-users@lists.sourceforge.net, netdev@vger.kernel.org,
+        rcu@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH 00/53] Get rid of UTF-8 chars that can be mapped as
+ ASCII
+Message-ID: <20210511112508.4547bca8@coco.lan>
+In-Reply-To: <de6d1fa5b7934f4afd61370d9c58502bef588466.camel@infradead.org>
+References: <cover.1620641727.git.mchehab+huawei@kernel.org>
+        <2ae366fdff4bd5910a2270823e8da70521c859af.camel@infradead.org>
+        <20210510135518.305cc03d@coco.lan>
+        <de6d1fa5b7934f4afd61370d9c58502bef588466.camel@infradead.org>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210430121616.2295-3-brijesh.singh@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 30, 2021 at 07:15:58AM -0500, Brijesh Singh wrote:
-> The SEV-ES guest calls the sev_es_negotiate_protocol() to negotiate the
-> GHCB protocol version before establishing the GHCB. Cache the negotiated
-> GHCB version so that it can be used later.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/include/asm/sev.h   |  2 +-
->  arch/x86/kernel/sev-shared.c | 15 ++++++++++++---
->  2 files changed, 13 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-> index fa5cd05d3b5b..7ec91b1359df 100644
-> --- a/arch/x86/include/asm/sev.h
-> +++ b/arch/x86/include/asm/sev.h
-> @@ -12,7 +12,7 @@
->  #include <asm/insn.h>
->  #include <asm/sev-common.h>
->  
-> -#define GHCB_PROTO_OUR		0x0001UL
-> +#define GHCB_PROTOCOL_MIN	1ULL
->  #define GHCB_PROTOCOL_MAX	1ULL
->  #define GHCB_DEFAULT_USAGE	0ULL
->  
-> diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
-> index 6ec8b3bfd76e..48a47540b85f 100644
-> --- a/arch/x86/kernel/sev-shared.c
-> +++ b/arch/x86/kernel/sev-shared.c
-> @@ -14,6 +14,13 @@
->  #define has_cpuflag(f)	boot_cpu_has(f)
->  #endif
->  
-> +/*
-> + * Since feature negotitation related variables are set early in the boot
-> + * process they must reside in the .data section so as not to be zeroed
-> + * out when the .bss section is later cleared.
+Em Mon, 10 May 2021 14:49:44 +0100
+David Woodhouse <dwmw2@infradead.org> escreveu:
 
-  *
-  * GHCB protocol version negotiated with the hypervisor.
-  */
+> On Mon, 2021-05-10 at 13:55 +0200, Mauro Carvalho Chehab wrote:
+> > This patch series is doing conversion only when using ASCII makes
+> > more sense than using UTF-8.=20
+> >=20
+> > See, a number of converted documents ended with weird characters
+> > like ZERO WIDTH NO-BREAK SPACE (U+FEFF) character. This specific
+> > character doesn't do any good.
+> >=20
+> > Others use NO-BREAK SPACE (U+A0) instead of 0x20. Harmless, until
+> > someone tries to use grep[1]. =20
+>=20
+> Replacing those makes sense. But replacing emdashes =E2=80=94 which are a
+> distinct character that has no direct replacement in ASCII and which
+> people do *deliberately* use instead of hyphen-minus =E2=80=94 does not.
+>=20
+> Perhaps stick to those two, and any cases where an emdash or endash has
+> been used where U+002D HYPHEN-MINUS *should* have been used.
 
-> +static u16 ghcb_version __section(".data") = 0;
+Ok. I'll rework the series excluding EM/EN DASH chars from it.
+I'll then apply manually the changes for EM/EN DASH chars=20
+(probably on a separate series) where it seems to fit. That should
+make easier to discuss such replacements.
 
-Did you not see this when running checkpatch.pl on your patch?
+> And please fix your cover letter which made no reference to 'grep', and
+> only presented a completely bogus argument for the change instead.
 
-ERROR: do not initialise statics to 0
-#141: FILE: arch/x86/kernel/sev-shared.c:22:
-+static u16 ghcb_version __section(".data") = 0;
+OK!
 
->  static bool __init sev_es_check_cpu_features(void)
->  {
->  	if (!has_cpuflag(X86_FEATURE_RDRAND)) {
-> @@ -54,10 +61,12 @@ static bool sev_es_negotiate_protocol(void)
->  	if (GHCB_MSR_INFO(val) != GHCB_MSR_SEV_INFO_RESP)
->  		return false;
->  
-> -	if (GHCB_MSR_PROTO_MAX(val) < GHCB_PROTO_OUR ||
-> -	    GHCB_MSR_PROTO_MIN(val) > GHCB_PROTO_OUR)
-> +	if (GHCB_MSR_PROTO_MAX(val) < GHCB_PROTOCOL_MIN ||
-> +	    GHCB_MSR_PROTO_MIN(val) > GHCB_PROTOCOL_MAX)
->  		return false;
->  
-> +	ghcb_version = min_t(size_t, GHCB_MSR_PROTO_MAX(val), GHCB_PROTOCOL_MAX);
-
-How is that even supposed to work? GHCB_PROTOCOL_MAX is 1 so
-ghcb_version will be always 1 when you do min_t() on values one of which
-is 1.
-
-Maybe I'm missing something...
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Regards,
+Mauro
