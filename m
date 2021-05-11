@@ -2,129 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4009537AD3A
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 19:41:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F23A837AD3B
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 19:41:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231793AbhEKRmZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 May 2021 13:42:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36122 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231645AbhEKRmU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 May 2021 13:42:20 -0400
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8066C061574
-        for <kvm@vger.kernel.org>; Tue, 11 May 2021 10:41:10 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id g14so23891373edy.6
-        for <kvm@vger.kernel.org>; Tue, 11 May 2021 10:41:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=pc/L6ED7H2RwZMgS4Vq0ULfZJt+L6YaroAbjkFRFCkM=;
-        b=U8qWcXXyPWqKrOvUNouADqOJ4zKDm/LkesdC6hSrMVUslzi6hyeKiL1FR3grirLe65
-         x4WFnBPt4FiGWjGuoVLL+W8LU17/ns4WjCWy4fGv7pyl+N1AdvnW8UtlTCZ0ca5b87DV
-         fzhgTUBdZI141YjqfAyZtJZFmHQ0/+uwQo68XymtgUAKFN7iBS67jarxHPVOf7awlC42
-         ovD3MM+ZrE85GWfvLazBNPFGiOX7qGS/J48CNqkYia/IxAKsAMNOzz/S2cIL+YQuMqPa
-         rf55O4198Q+o/qe6VhGHtVQYEgyhyDlQW6+G0aj6W4haGP/ouHZMIcxBLKRz0KUmiExb
-         VXMA==
+        id S231728AbhEKRmd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 May 2021 13:42:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37090 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231439AbhEKRmd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 May 2021 13:42:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620754886;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nl1zPJY8hVLVCv7ebg49anwE3iyxunve5gouX/dXQhM=;
+        b=X1h6d3tg/bodM8EyItcUjahrQnrk/WJE1n+2Aj4AtSsI5zOIyeGZRDOKwKrEEQBAD4l0cT
+        rfgGF4J42XJ3dUM+p4Vbkby1xeE1I6mysmqPvZdcZxFi8dTFZORXca4EY31gBwQ66p+POg
+        540r7dLoVREg+B1bg/jWTf/Vmw6RKi4=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-143-azkuughnODSl8CfSWmazlQ-1; Tue, 11 May 2021 13:41:23 -0400
+X-MC-Unique: azkuughnODSl8CfSWmazlQ-1
+Received: by mail-ed1-f71.google.com with SMTP id d8-20020a0564020008b0290387d38e3ce0so11350811edu.1
+        for <kvm@vger.kernel.org>; Tue, 11 May 2021 10:41:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=pc/L6ED7H2RwZMgS4Vq0ULfZJt+L6YaroAbjkFRFCkM=;
-        b=GkY1UI1qjoY/7iJS5W3fZZyR2aRfFLUspdFZFYENUkjTiSbGvvs/CFWiek5lCsnh5r
-         6hjYHOewaSBvOgmUxDa7Y97Ez5w8b4k+SQyZGCyohOzwNPQy+3Nq5h6+FKLh0t8QhPr2
-         1lT3SGzIlUuncWSJwvC9TjVDzeqtcRIY23myjYC5SuY372lNBgWvEt0BgfzmkHN1Mswn
-         k94IRvDdFkgsY+IRBqzvh2uSnqwAYgtGhnkPmUAqrQC7PleQfXi1v9/OI88uwsy0mbu0
-         /uSq20/d55Ov2AgmGpaNe9e0EKsswshIHlxo5wYGzhXWI1RV3T3XR2COJirWTstbzPml
-         /chg==
-X-Gm-Message-State: AOAM533hv+Z08tvkivWGrixd0Nvpad+2Lr988xyHkGKsOA+eVIcqyQft
-        x+f0DDPKfcaBLFedVGfFLvIjub+oVu4=
-X-Google-Smtp-Source: ABdhPJxTsOCwcOqmkJUmlqKUC7+s0dEFqtklNzfXJYZCTQkGKs2Vt1Svz4KdhgivbfZIJb/3v1G8gA==
-X-Received: by 2002:aa7:c789:: with SMTP id n9mr38495966eds.352.1620754868887;
-        Tue, 11 May 2021 10:41:08 -0700 (PDT)
-Received: from avogadro.redhat.com ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id v23sm15239073eda.8.2021.05.11.10.41.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 May 2021 10:41:08 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+        h=x-gm-message-state:to:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nl1zPJY8hVLVCv7ebg49anwE3iyxunve5gouX/dXQhM=;
+        b=tc6BgF/y1dnHhShMM92rr6Y66sFHSpVfdkMs0eu/vHoHOLX23qCV79EYRS3sVSZYgH
+         ZdmOt1K+9PJQU2RQaPkjpdDkKTs9FqPoCqaWz+i9rtg92Jwhhmk7CL2gmuEtRtlSbNSh
+         q+BEPvsYZc3uk8hUWkWkv06wL0TULOB+q6kci9UbUy3PD7FwWKTWoAK2nt+vHIoiLtOi
+         YVHqsF/XkbOXdH+86FeGPmcOysTxup5g+E/hkujpmZDgIRslnlkQJyfGjh4UXqHdYxqu
+         fy2IXIVrHV1cC9YppWqA9ErU6cNIsGfjM8hT4dA91QGQQ1gpPcdz5onU484haidQwt2T
+         thHg==
+X-Gm-Message-State: AOAM531geFEBCAgKOMBrTJ5KITddYIdOk68RprFvAVRVCdvrYQ8U4iCj
+        +jVw0QYUFwceA5K+QOekq2kK36PlVyz76Qpt31uEGUgqAZWCqpGTuvCWwUbvjq/kEs1LVcm9AT3
+        SWdlEEd6FSFEx
+X-Received: by 2002:a17:906:33d8:: with SMTP id w24mr32367959eja.28.1620754882600;
+        Tue, 11 May 2021 10:41:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz0LBBwBsEgNINK0RaplwIyoZX/ZACJ5Ix5sGIo4CtkV7Z+pIqTURIBWUmLAz0Z/hgsY1rAKA==
+X-Received: by 2002:a17:906:33d8:: with SMTP id w24mr32367945eja.28.1620754882395;
+        Tue, 11 May 2021 10:41:22 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id p25sm791740eja.35.2021.05.11.10.41.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 May 2021 10:41:21 -0700 (PDT)
+To:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        kvm-devel <kvm@vger.kernel.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+References: <348f023d-f313-3d98-dc18-b53b6879fe45@arm.com>
+ <604b1638-452f-e8e3-b674-014d634e2767@redhat.com>
+ <05b5ce5d-4cd8-1fe3-1d2e-d34d4cf31384@arm.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH kvm-unit-tests 2/2] arm: add eabi version of 64-bit division functions
-Date:   Tue, 11 May 2021 19:41:06 +0200
-Message-Id: <20210511174106.703235-3-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210511174106.703235-1-pbonzini@redhat.com>
-References: <20210511174106.703235-1-pbonzini@redhat.com>
+Subject: Re: [kvm-unit-tests BUG] lib/ldiv32.c breaks arm compilation
+Message-ID: <b737d530-35e5-33af-0ea9-de6f507516aa@redhat.com>
+Date:   Tue, 11 May 2021 19:41:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
+In-Reply-To: <05b5ce5d-4cd8-1fe3-1d2e-d34d4cf31384@arm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-eabi prescribes different entry points for 64-bit division on
-32-bit platforms.  Implement a wrapper for the GCC-style __divmoddi4
-and __udivmoddi4 functions.
+On 11/05/21 19:03, Alexandru Elisei wrote:
+> I think it's because I'm using the*arm-none-eabi*  toolchain for compilation
+> instead of arm-linux-gnu, that's the toolchain for cross compiling arm code that
+> is present in the official Arch Linux repositories. Is that unsupported? I don't
+> remember any mention of it not being supported, but it's entirely possible that I
+> just forgot.
 
-Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arm/Makefile.arm  |  1 +
- lib/arm/ldivmod.S | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 33 insertions(+)
- create mode 100644 lib/arm/ldivmod.S
+No, it's just that there was no difference until now.  If you can add it 
+to CI we can make sure it doesn't break.
 
-diff --git a/arm/Makefile.arm b/arm/Makefile.arm
-index 687a8ed..3a4cc6b 100644
---- a/arm/Makefile.arm
-+++ b/arm/Makefile.arm
-@@ -24,6 +24,7 @@ cflatobjs += lib/arm/spinlock.o
- cflatobjs += lib/arm/processor.o
- cflatobjs += lib/arm/stack.o
- cflatobjs += lib/ldiv32.o
-+cflatobjs += lib/arm/ldivmod.o
- 
- # arm specific tests
- tests =
-diff --git a/lib/arm/ldivmod.S b/lib/arm/ldivmod.S
-new file mode 100644
-index 0000000..de11ac9
---- /dev/null
-+++ b/lib/arm/ldivmod.S
-@@ -0,0 +1,32 @@
-+// EABI ldivmod and uldivmod implementation based on libcompiler-rt
-+//
-+// This file is dual licensed under the MIT and the University of Illinois Open
-+// Source Licenses.
-+
-+	.syntax unified
-+	.align 2
-+	.globl __aeabi_uldivmod
-+	.type __aeabi_uldivmod, %function
-+__aeabi_uldivmod:
-+	push	{r11, lr}
-+	sub	sp, sp, #16
-+	add	r12, sp, #8
-+	str	r12, [sp]                // third argument to __udivmoddi4
-+	bl	__udivmoddi4
-+	ldr	r2, [sp, #8]             // remainder returned in r2-r3
-+	ldr	r3, [sp, #12]
-+	add	sp, sp, #16
-+	pop	{r11, pc}
-+
-+	.globl __aeabi_ldivmod
-+	.type __aeabi_ldivmod, %function
-+__aeabi_ldivmod:
-+	push	{r11, lr}
-+	sub	sp, sp, #16
-+	add	r12, sp, #8
-+	str	r12, [sp]                // third argument to __divmoddi4
-+	bl	__divmoddi4
-+	ldr	r2, [sp, #8]             // remainder returned in r2-r3
-+	ldr	r3, [sp, #12]
-+	add	sp, sp, #16
-+	pop	{r11, pc}
--- 
-2.31.1
+> With rem initialized to 0 I get this:
+> 
+> rm-none-eabi-ld -nostdlib -Ttext=40010000 -o arm/selftest.elf -T
+> /home/alex/data/repos/kvm-unit-tests/arm/flat.lds \
+>      arm/selftest.o arm/cstart.o lib/libcflat.a lib/libfdt/libfdt.a
+> lib/arm/libeabi.a arm/selftest.aux.o
+> arm-none-eabi-ld: lib/libcflat.a(printf.o): in function `print_int':
+> /home/alex/data/repos/kvm-unit-tests/lib/printf.c:72: undefined reference to
+> `__aeabi_ldivmod'
+> arm-none-eabi-ld: /home/alex/data/repos/kvm-unit-tests/lib/printf.c:73: undefined
+> reference to `__aeabi_ldivmod'
+> arm-none-eabi-ld: lib/libcflat.a(printf.o): in function `print_unsigned':
+> /home/alex/data/repos/kvm-unit-tests/lib/printf.c:102: undefined reference to
+> `__aeabi_uldivmod'
+> arm-none-eabi-ld: lib/libcflat.a(alloc_page.o): in function `_page_alloc_init_area':
+> /home/alex/data/repos/kvm-unit-tests/lib/alloc_page.c:482: undefined reference to
+> `__aeabi_uldivmod'
+> make: *** [/home/alex/data/repos/kvm-unit-tests/arm/Makefile.common:65:
+> arm/selftest.elf] Error 1
+
+So for this we need to include the uldivmod and ldivmod functions 
+similar to those in 
+https://android.googlesource.com/toolchain/compiler-rt/+/release_32/lib/arm.
+
+The uninitialized warning is because of the division by zero case.  I've 
+sent a couple patches to fix everything, please review!
+
+Paolo
 
