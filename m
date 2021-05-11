@@ -2,167 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 036BF37A02D
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 08:57:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 691EE37A116
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 09:44:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230350AbhEKG6H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 May 2021 02:58:07 -0400
-Received: from mga05.intel.com ([192.55.52.43]:34936 "EHLO mga05.intel.com"
+        id S229973AbhEKHp7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 May 2021 03:45:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37748 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229931AbhEKG6G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 May 2021 02:58:06 -0400
-IronPort-SDR: aCcjjqzoWxWNOjqJ6/+b1LycLkPI0MX9X34ucYooF7nPw9SUgoeCkLVpR0pds+n1DqkT0aw5ED
- lbzEUlkWLxyQ==
-X-IronPort-AV: E=McAfee;i="6200,9189,9980"; a="284858751"
-X-IronPort-AV: E=Sophos;i="5.82,290,1613462400"; 
-   d="scan'208";a="284858751"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2021 23:56:58 -0700
-IronPort-SDR: lTiGtF4iiKlRU9B4tNsIxfnwP9/wWixp0OEe0XI9nF45kfoQX5O7UYY48OUurHC2Odg60+HZiW
- /wNbRYg/nytg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.82,290,1613462400"; 
-   d="scan'208";a="621699609"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.128]) ([10.239.159.128])
-  by fmsmga006.fm.intel.com with ESMTP; 10 May 2021 23:56:50 -0700
-Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>, ashok.raj@intel.com,
-        sanjay.k.kumar@intel.com, jacob.jun.pan@intel.com,
-        kevin.tian@intel.com,
-        Jean-Philippe Brucker <jean-philippe.brucker@arm.com>,
-        yi.l.liu@intel.com, yi.y.sun@intel.com, peterx@redhat.com,
-        tiwei.bie@intel.com, xin.zeng@intel.com,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>
-Subject: Re: [PATCH v8 7/9] vfio/mdev: Add iommu related member in mdev_device
-To:     Jason Gunthorpe <jgg@nvidia.com>, Christoph Hellwig <hch@lst.de>
-References: <20190325013036.18400-1-baolu.lu@linux.intel.com>
- <20190325013036.18400-8-baolu.lu@linux.intel.com>
- <20210406200030.GA425310@nvidia.com>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <2d6d3c70-0c6f-2430-3982-2705bfe9f5a6@linux.intel.com>
-Date:   Tue, 11 May 2021 14:56:05 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
-MIME-Version: 1.0
-In-Reply-To: <20210406200030.GA425310@nvidia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S229917AbhEKHp6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 May 2021 03:45:58 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id A4E4861026;
+        Tue, 11 May 2021 07:44:52 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1lgN4U-000cdO-F7; Tue, 11 May 2021 08:44:50 +0100
+Date:   Tue, 11 May 2021 08:44:49 +0100
+Message-ID: <87o8dhogsu.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com, stable@vger.kernel.org
+Subject: Re: [PATCH 2/2] KVM: arm64: Commit pending PC adjustemnts before returning to userspace
+In-Reply-To: <65b5cad7-13d8-13a9-9502-7c21e0b72761@arm.com>
+References: <20210510094915.1909484-1-maz@kernel.org>
+        <20210510094915.1909484-3-maz@kernel.org>
+        <7a0f43c8-cc36-810e-0b8e-ffe66672ca82@arm.com>
+        <87v97qociy.wl-maz@kernel.org>
+        <65b5cad7-13d8-13a9-9502-7c21e0b72761@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, yuzenghui@huawei.com, james.morse@arm.com, suzuki.poulose@arm.com, kernel-team@android.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jason,
+On Mon, 10 May 2021 16:14:37 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 5/10/21 4:04 PM, Marc Zyngier wrote:
+> > On Mon, 10 May 2021 15:55:28 +0100,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> >> Hi Marc,
+> >>
+> >> On 5/10/21 10:49 AM, Marc Zyngier wrote:
+> >>> KVM currently updates PC (and the corresponding exception state)
+> >>> using a two phase approach: first by setting a set of flags,
+> >>> then by converting these flags into a state update when the vcpu
+> >>> is about to enter the guest.
+> >>>
+> >>> However, this creates a disconnect with userspace if the vcpu thread
+> >>> returns there with any exception/PC flag set. In this case, the exposed
+> >> The code seems to handle only the KVM_ARM64_PENDING_EXCEPTION
+> >> flag. Is the "PC flag" a reference to the KVM_ARM64_INCREMENT_PC
+> >> flag?
+> > No, it does handle both exception and PC increment, unless I have
+> > completely bodged something (entirely possible).
+> 
+> The message is correct, my bad.
+> 
+> >
+> >>> context is wrong, as userpsace doesn't have access to these flags
+> >> s/userpsace/userspace
+> >>
+> >>> (they aren't architectural). It also means that these flags are
+> >>> preserved across a reset, which isn't expected.
+> >>>
+> >>> To solve this problem, force an explicit synchronisation of the
+> >>> exception state on vcpu exit to userspace. As an optimisation
+> >>> for nVHE systems, only perform this when there is something pending.
+> >>>
+> >>> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+> >>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> >>> Cc: stable@vger.kernel.org # 5.11
+> >>> ---
+> >>>  arch/arm64/include/asm/kvm_asm.h   |  1 +
+> >>>  arch/arm64/kvm/arm.c               | 10 ++++++++++
+> >>>  arch/arm64/kvm/hyp/exception.c     |  4 ++--
+> >>>  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  8 ++++++++
+> >>>  4 files changed, 21 insertions(+), 2 deletions(-)
+> >>>
+> >>> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> >>> index d5b11037401d..5e9b33cbac51 100644
+> >>> --- a/arch/arm64/include/asm/kvm_asm.h
+> >>> +++ b/arch/arm64/include/asm/kvm_asm.h
+> >>> @@ -63,6 +63,7 @@
+> >>>  #define __KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector		18
+> >>>  #define __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize		19
+> >>>  #define __KVM_HOST_SMCCC_FUNC___pkvm_mark_hyp			20
+> >>> +#define __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc			21
+> >>>  
+> >>>  #ifndef __ASSEMBLY__
+> >>>  
+> >>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> >>> index 1cb39c0803a4..d62a7041ebd1 100644
+> >>> --- a/arch/arm64/kvm/arm.c
+> >>> +++ b/arch/arm64/kvm/arm.c
+> >>> @@ -897,6 +897,16 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> >>>  
+> >>>  	kvm_sigset_deactivate(vcpu);
+> >>>  
+> >>> +	/*
+> >>> +	 * In the unlikely event that we are returning to userspace
+> >>> +	 * with pending exceptions or PC adjustment, commit these
+> >> I'm going to assume "PC adjustment" means the KVM_ARM64_INCREMENT_PC
+> >> flag. Please correct me if that's not true, but if that's the case,
+> >> then the flag isn't handled below.
+> >>
+> >>> +	 * adjustments in order to give userspace a consistent view of
+> >>> +	 * the vcpu state.
+> >>> +	 */
+> >>> +	if (unlikely(vcpu->arch.flags & (KVM_ARM64_PENDING_EXCEPTION |
+> >>> +					 KVM_ARM64_EXCEPT_MASK)))
+> >> The condition seems to suggest that it is valid to set
+> >> KVM_ARM64_EXCEPT_{AA32,AA64}_* without setting
+> >> KVM_ARM64_PENDING_EXCEPTION, which looks rather odd to me.
+> >> Is that a valid use of the KVM_ARM64_EXCEPT_MASK bits? If it's not
+> >> (the existing code always sets the exception type with the
+> >> KVM_ARM64_PENDING_EXCEPTION), that I was thinking that checking only
+> >> the KVM_ARM64_PENDING_EXCEPTION flag would make the intention
+> >> clearer.
+> > No, you are missing this (subtle) comment in kvm_host.h:
+> >
+> > <quote>
+> > /*
+> >  * Overlaps with KVM_ARM64_EXCEPT_MASK on purpose so that it can't be
+> >  * set together with an exception...
+> >  */
+> > #define KVM_ARM64_INCREMENT_PC		(1 << 9) /* Increment PC */
+> > </quote>
+> >
+> > So (KVM_ARM64_PENDING_EXCEPTION | KVM_ARM64_EXCEPT_MASK) checks for
+> > *both* an exception and a PC increment.
+> 
+> Then how about explicitly checking for the
+> KVM_ARM64_PENDING_EXCEPTION and KVM_ARM64_INCREMENT_PC flags, like
+> it's done in __kvm_adjust_pc? That would certainly make the code
+> easier to understand, as it's not immediately obvious that the
+> EXCEPT mask includes the INCREMENT_PC flag.
 
-On 4/7/21 4:00 AM, Jason Gunthorpe wrote:
-> On Mon, Mar 25, 2019 at 09:30:34AM +0800, Lu Baolu wrote:
->> A parent device might create different types of mediated
->> devices. For example, a mediated device could be created
->> by the parent device with full isolation and protection
->> provided by the IOMMU. One usage case could be found on
->> Intel platforms where a mediated device is an assignable
->> subset of a PCI, the DMA requests on behalf of it are all
->> tagged with a PASID. Since IOMMU supports PASID-granular
->> translations (scalable mode in VT-d 3.0), this mediated
->> device could be individually protected and isolated by an
->> IOMMU.
->>
->> This patch adds a new member in the struct mdev_device to
->> indicate that the mediated device represented by mdev could
->> be isolated and protected by attaching a domain to a device
->> represented by mdev->iommu_device. It also adds a helper to
->> add or set the iommu device.
->>
->> * mdev_device->iommu_device
->>    - This, if set, indicates that the mediated device could
->>      be fully isolated and protected by IOMMU via attaching
->>      an iommu domain to this device. If empty, it indicates
->>      using vendor defined isolation, hence bypass IOMMU.
->>
->> * mdev_set/get_iommu_device(dev, iommu_device)
->>    - Set or get the iommu device which represents this mdev
->>      in IOMMU's device scope. Drivers don't need to set the
->>      iommu device if it uses vendor defined isolation.
->>
->> Cc: Ashok Raj <ashok.raj@intel.com>
->> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
->> Cc: Kevin Tian <kevin.tian@intel.com>
->> Cc: Liu Yi L <yi.l.liu@intel.com>
->> Suggested-by: Kevin Tian <kevin.tian@intel.com>
->> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
->> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
->> Reviewed-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
->> ---
->>   drivers/vfio/mdev/mdev_core.c    | 18 ++++++++++++++++++
->>   drivers/vfio/mdev/mdev_private.h |  1 +
->>   include/linux/mdev.h             | 14 ++++++++++++++
->>   3 files changed, 33 insertions(+)
->>
->> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
->> index b96fedc77ee5..1b6435529166 100644
->> +++ b/drivers/vfio/mdev/mdev_core.c
->> @@ -390,6 +390,24 @@ int mdev_device_remove(struct device *dev, bool force_remove)
->>   	return 0;
->>   }
->>   
->> +int mdev_set_iommu_device(struct device *dev, struct device *iommu_device)
->> +{
->> +	struct mdev_device *mdev = to_mdev_device(dev);
->> +
->> +	mdev->iommu_device = iommu_device;
->> +
->> +	return 0;
->> +}
->> +EXPORT_SYMBOL(mdev_set_iommu_device);
-> 
-> I was looking at these functions when touching the mdev stuff and I
-> have some concerns.
-> 
-> 1) Please don't merge dead code. It is a year later and there is still
->     no in-tree user for any of this. This is not our process. Even
->     worse it was exported so it looks like this dead code is supporting
->     out of tree modules.
-> 
-> 2) Why is this like this? Every struct device already has a connection
->     to the iommu layer and every mdev has a struct device all its own.
-> 
->     Why did we need to add special 'if (mdev)' stuff all over the
->     place? This smells like the same abuse Thomas
->     and I pointed out for the interrupt domains.
-> 
->     After my next series the mdev drivers will have direct access to
->     the vfio_device. So an alternative to using the struct device, or
->     adding 'if mdev' is to add an API to the vfio_device world to
->     inject what iommu configuration is needed from that direction
->     instead of trying to discover it from a struct device.
+Fair enough. I'll fix that in v2.
 
-Just want to make sure that I understand you correctly.
+Another thing I wondered about: we now rely on __kvm_adjust_pc() to be
+preemption safe. That's always the case in nVHE (we're at EL2), but
+VHE can be preempted at any point. The code we call is preemption
+safe, but it takes some effort to be convinced of it.
 
-We should use the existing IOMMU in-kernel APIs to connect mdev with the
-iommu subsystem, so that the upper lays don't need to use something
-like (if dev_is_mdev) to handle mdev differently. Do I get you
-correctly?
+Do you have a good suggestion on how to express this requirement?  I
+could throw a preempt_disable()/enable() at the call for the sake of
+being in the same context between VHE and nVHE, but that's not
+strictly necessary for now.
 
-> 
-> 3) The vfio_bus_is_mdev() and related symbol_get() nonsense in
->     drivers/vfio/vfio_iommu_type1.c has to go, for the same reasons
->     it was not acceptable to do this for the interrupt side either.
+Thanks,
 
-Yes. Agreed. I will look into it.
+	M.
 
-> 
-> 4) It seems pretty clear to me this will be heavily impacted by the
->     /dev/ioasid discussion. Please consider removing the dead code now.
-> 
-> Basically, please fix this before trying to get idxd mdev merged as
-> the first user.
-> 
-> Jason
-> 
-
-Best regards,
-baolu
+-- 
+Without deviation from the norm, progress is not possible.
