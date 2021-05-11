@@ -2,111 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C85E379B1E
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 02:18:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11D2C379C43
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 03:48:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230005AbhEKATR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 20:19:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55148 "EHLO
+        id S230291AbhEKBtJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 21:49:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229628AbhEKATQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 20:19:16 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14480C061574
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 17:18:11 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id gc22-20020a17090b3116b02901558435aec1so328996pjb.4
-        for <kvm@vger.kernel.org>; Mon, 10 May 2021 17:18:11 -0700 (PDT)
+        with ESMTP id S230429AbhEKBtI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 21:49:08 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE725C061574
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 18:48:02 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id x20so26249071lfu.6
+        for <kvm@vger.kernel.org>; Mon, 10 May 2021 18:48:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ikfVvr5cpOXAclsRrng8wpNS2FGQXkIocuD0PuY3Rzg=;
-        b=QQm08qjhO9hEu4hEn7czTFqAA8u6AFQcfQWATVLm5/JxkfZSD3dz6zwhb4eGOQqT/+
-         qvsVePq/3y4E0e4mwGzIk71xFqOZMgETPbfJf7WDYwBl5ah+Rh0snT+c3JOeILg6E4u2
-         ZrQE+v6i0HwKMKMokPfflQglaJAMeIkxbv8EFh8bfSvAflX2LOJpOm9Jgs6XhLbpBuur
-         5GAu0J/8AdmYIsiOeaj5qqzaQVrB+ZNCRAgrzHeGAThJq52OFsM4Hs/o5N2ZkFRZXJ1/
-         0lil+6Z2KZO+4bCSwx8tbHTw7hTijjggRZuwUjrMT++cazHzFBnSHHsdMooAuQB/jkr+
-         uAJw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=TDBP3t8xxw7FgcC7Mn32xXjVLL/Iv7un1Ml6otcfL1Q=;
+        b=o59sfAUNDxiMTA1SI3piUPgR0fGkH11jRbky8By0hyLvSsisRH56Nsgaxazi4Ab3Ck
+         Kz6rjekiyIqQN2AT+DlKKiq6LASCZOUztCzZyaKefB1YBgh/K8G1rCLoHMBu+CUgeK6e
+         C0UbX/T8kxPKnp+0rOB8y8xtFkzfzHdvatWwyctPRgq4HZ7XVywqafAsP+poIxRgRNky
+         TVX2aAVTKAbO5pEJIqhiJbhhq/8YiZxGaYJCrHkB9x180SSzvZAWZ/M8gO9tCqtYUM6t
+         zFpS975IuBHAI4plD2K7YKs9XqFsV6GnHnETaH4pkTD1C37P+KmXFI6EY6bufet+VyP1
+         hM0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ikfVvr5cpOXAclsRrng8wpNS2FGQXkIocuD0PuY3Rzg=;
-        b=egir0gJyzUU4mpE8nVby+taU9hSWX2/qji2Oshd9QlD4/LKutc8KjAm/vvA8piflQW
-         50hFx4Zg6FF4ttdJyY87zRH7pGdZYQJWD7cHSgnQz6fBk1qN8+dRaKuZmPRBSgjTpesD
-         shtq46wOoqdMzp9pFIA1FxbCED+KnMZXiIKP34yadWjViu9Ii6YEz8pd6S0PdXfbvYdU
-         uUi9p0PKd4UHRZQ/1c7CYw67TtZCwhqFd0cA74HGrbKq9ANTQsEyuiSdIO4s6qUdIurC
-         bma0BLwVodiIqPU4rsMd4kfUYDIuRvgLatQ6nEhqk4aoWpuyGMQY8SoiQi5Qg1bAtHwn
-         swog==
-X-Gm-Message-State: AOAM53055E5ra+apigXTQbwao4/Ik4wOZPc4Dbj4YvSrN0ApjodcXdj0
-        YAXxhLe/BPzpq9mPrH8NtWuWQg==
-X-Google-Smtp-Source: ABdhPJxplAR7tJENAHjFyyue0ZJQV0NzZ9jIhZ0stkVaVOs+UT1MefDKqZCQHmTfe7qLhH+HTUQSUQ==
-X-Received: by 2002:a17:90a:71c6:: with SMTP id m6mr2004510pjs.174.1620692290358;
-        Mon, 10 May 2021 17:18:10 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id i8sm4912597pgt.58.2021.05.10.17.18.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 May 2021 17:18:09 -0700 (PDT)
-Date:   Tue, 11 May 2021 00:18:06 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, stable@vger.kernel.org
-Subject: Re: [PATCH 3/3] KVM: X86: Fix vCPU preempted state from guest point
- of view
-Message-ID: <YJnNPpalqYwERwEL@google.com>
-References: <1620466310-8428-1-git-send-email-wanpengli@tencent.com>
- <1620466310-8428-3-git-send-email-wanpengli@tencent.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=TDBP3t8xxw7FgcC7Mn32xXjVLL/Iv7un1Ml6otcfL1Q=;
+        b=H/OTAWhhl8n4GNMNriNIwOp8b3uiSmfSzTN8rohmeG3RS/5Ef135ZIo3Z9hIZpyH8a
+         jvwd7w02mfZjZ9OAZXW2q5hKKa/SJmJtFWZezLHae0jhGpK3M7hgV3IWYTdgLZql4Puo
+         xRR1CtXfGpNb23F6lUSfSHqklsj1tV0ooIYiJawfMSmXYXYhRKaN2qLzhVoXpGfDvyx8
+         uzcSSAnQRpOwWDgvJn8kPHOq7WpGMUCiKg1JGaJ0QhWBHnMLWlhZFqP6kixvxcEwMa9U
+         YZaUdIWmAQWlV9a9XV/LqHgxjB3dyiOujQVoQiLZ4hBZEm3ux4L6qq4RDhc/UpnGB6UJ
+         HFyw==
+X-Gm-Message-State: AOAM533CjMMZ1Sx7updxrwPrOAjxHGE9deGWsoeb2SFuufNUzqoIeniS
+        LOJDA5NpmNOmviMDgqbT7elJYxPrPh2zrerqG3srfA==
+X-Google-Smtp-Source: ABdhPJziTZFHPGAaKcWARoXLkt0sVY54G61qQPiK3+b7cwda45qjpiU9luCCzbh0X+3ZEY9Dz/tfkv428e44BMYb1Os=
+X-Received: by 2002:a05:6512:54c:: with SMTP id h12mr18563622lfl.357.1620697681115;
+ Mon, 10 May 2021 18:48:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1620466310-8428-3-git-send-email-wanpengli@tencent.com>
+References: <20210506184925.290359-1-jacobhxu@google.com> <YJQ8NN6EzzZEiJ6a@google.com>
+ <CAJ5mJ6gYmwXEQZASk8A_Ozt6asW6ZDTnDs83nCfLNTa62x7n+g@mail.gmail.com> <CALMp9eQoscqr9p5ayzYkKXHNMcQthntJr_BJ+egEdriEQUqSTw@mail.gmail.com>
+In-Reply-To: <CALMp9eQoscqr9p5ayzYkKXHNMcQthntJr_BJ+egEdriEQUqSTw@mail.gmail.com>
+From:   Jacob Xu <jacobhxu@google.com>
+Date:   Mon, 10 May 2021 18:47:49 -0700
+Message-ID: <CAJ5mJ6h4413=3go6kRkB0VcCdz2o6sgq_p91ZbcqWv-FZBd4hw@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v2] x86: Do not assign values to unaligned
+ pointer to 128 bits
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 08, 2021, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
-> 
-> Commit 66570e966dd9 (kvm: x86: only provide PV features if enabled in guest's 
-> CPUID) avoids to access pv tlb shootdown host side logic when this pv feature 
-> is not exposed to guest, however, kvm_steal_time.preempted not only leveraged 
-> by pv tlb shootdown logic but also mitigate the lock holder preemption issue. 
-> From guest point of view, vCPU is always preempted since we lose the reset of
-> kvm_steal_time.preempted before vmentry if pv tlb shootdown feature is not 
-> exposed. This patch fixes it by clearing kvm_steal_time.preempted before 
-> vmentry.
-> 
-> Fixes: 66570e966dd9 (kvm: x86: only provide PV features if enabled in guest's CPUID)
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kvm/x86.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index c0244a6..c38e990 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3105,7 +3105,8 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
->  				       st->preempted & KVM_VCPU_FLUSH_TLB);
->  		if (xchg(&st->preempted, 0) & KVM_VCPU_FLUSH_TLB)
->  			kvm_vcpu_flush_tlb_guest(vcpu);
-> -	}
-> +	} else
-> +		st->preempted = 0;
+> The compiler does not
+> have to discard what it can infer about the alignment just because you
+> cast 'mem' to a type with weaker alignment constraints.
+>
+> Why does 'mem' need to have type 'sse_union *'? Why can't it just be
+> declared as 'uint8_t *'?
 
-Curly braces needed since the if-statment needs 'em.  Other than that,
+Huh, I see. I'll just delete sse_union then and use uint32_t instead.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+> Ewwww.  That's likely because emulator.c does:
+>  #define memset __builtin_memset
+> As evidenced by this issue, using the compiler's memset() in kvm-unit-tests seems
+> inherently dangerous since the tests are often doing intentionally stupid things.
 
->  
->  	vcpu->arch.st.preempted = 0;
->  
-> -- 
-> 2.7.4
-> 
+I'll make a separate patch to remove this from emulator.c
+
+
+
+On Thu, May 6, 2021 at 1:11 PM Jim Mattson <jmattson@google.com> wrote:
+>
+> On Thu, May 6, 2021 at 12:14 PM Jacob Xu <jacobhxu@google.com> wrote:
+> >
+> > > memset() takes a void *, which it casts to an char, i.e. it works on one byte at
+> > a time.
+> > Huh, TIL. Based on this I'd thought that I don't need a cast at all,
+> > but doing so actually results in a movaps instruction.
+> > I've changed the cast back to (uint8_t *).
+>
+> I'm pretty sure you're just getting lucky. If 'mem' is not 16-byte
+> aligned, the behavior of the code is undefined. The compiler does not
+> have to discard what it can infer about the alignment just because you
+> cast 'mem' to a type with weaker alignment constraints.
+>
+> Why does 'mem' need to have type 'sse_union *'? Why can't it just be
+> declared as 'uint8_t *'? Just add a "memory" clobbers to the inline
+> asm statements that use 'mem' as an SSE operand.
+>
+> Of course, passing it as an argument to sseeq() also implies 16-byte
+> alignment. Perhaps sseeq should take uint32_t pointers as arguments
+> rather than sse_union pointers. I'm not convinced that the sse_union
+> buys us anything other than trouble.
