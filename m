@@ -2,375 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 418EA37ACEB
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 19:16:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DFBA037AD1F
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 19:29:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232055AbhEKRRz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 May 2021 13:17:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58734 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232013AbhEKRRo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 May 2021 13:17:44 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69FB0C061349
-        for <kvm@vger.kernel.org>; Tue, 11 May 2021 10:16:33 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id w4-20020aa79a040000b029028ed6d50d44so13181471pfj.20
-        for <kvm@vger.kernel.org>; Tue, 11 May 2021 10:16:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=TWWCfHtJ7dAMyS3acFddqhtxUhh+dvvTZddd2oq7ipY=;
-        b=rTTAfkmvOv9y8Zg2CokZ0tnQalra/fAWBvyAQdf/UZFxn0yVOMbclF8uWJ/Cg0Ik6h
-         ImOQMK2+QNShN4XVSugfliJc6NrKQKVyJNXuqDh0IH4fF3uCIEn7PjioROVkH1KHACCM
-         c1a1CE+VWrkPYaJa8azgxz9+TBraum7kC7A1UCZbEAl23RlufXWObewGq7Z7wH8LniIT
-         UD2Vy3wmQPCuKAG3yutVNUiOAJ0/zwZvXEoGfI/qzYgq3SCo41wEoyA4g3GgR4wGFFh9
-         x4YCjPPZhKUwObl1qfgdv9NxG3YdpmUWOwU47ajWYk2EvVNxUvv1PHT8JEdcgh93gzQZ
-         LFtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=TWWCfHtJ7dAMyS3acFddqhtxUhh+dvvTZddd2oq7ipY=;
-        b=mnlt/8T94yaWZPMfga0v+O9suW1KA5p6eS9nEJdTFUYrGfNTHH64RZwD5yZosquNc1
-         30nN/PZNXY/6AD4aNYTNV6ZY/dlRt4ZhlEfdIICD3xjJFlA+GVihkXK7HbTfNrDEDD5F
-         wINBA4/XBSktNQYTfmaK6jaa4o5dm+dwM3oh4l+bfWVxmK3aabjq7mr5KGu3tL3GXVzV
-         U1rCdwxMjCD4+ks7ma22vKhxEgPEf4EHd6QH7IF4ofItMSf4pzgpjMTxO36spuFuLMdZ
-         q1EPSS+qNYJqDbjEdFzbxXtjDYmZ/Cy8bs8n9TEN1AAHP4YIh5qJ5h/z8VzfiUXZe2OG
-         JcRQ==
-X-Gm-Message-State: AOAM532LDNl18KkZy8vuRS7zW6MDdyVABqN7fEVL8A30qNdYgtwYJbk3
-        F8ei0tGgeLYGueM2izf6yEnpU3X9BpNw
-X-Google-Smtp-Source: ABdhPJxY6f2bkMBlWqTSNAB/QIrzqzDMTxJbmKRiRmgG/RLWZooxFyOTmEfAdP8wzCOOG+XgwjFtrBpn/CAr
-X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:e050:3342:9ea6:6859])
- (user=bgardon job=sendgmr) by 2002:a62:8744:0:b029:2cb:6fd1:b809 with SMTP id
- i65-20020a6287440000b02902cb6fd1b809mr2635500pfe.80.1620753393021; Tue, 11
- May 2021 10:16:33 -0700 (PDT)
-Date:   Tue, 11 May 2021 10:16:10 -0700
-In-Reply-To: <20210511171610.170160-1-bgardon@google.com>
-Message-Id: <20210511171610.170160-8-bgardon@google.com>
-Mime-Version: 1.0
-References: <20210511171610.170160-1-bgardon@google.com>
-X-Mailer: git-send-email 2.31.1.607.g51e8a6a459-goog
-Subject: [PATCH v4 7/7] KVM: x86/mmu: Lazily allocate memslot rmaps
-From:   Ben Gardon <bgardon@google.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        David Hildenbrand <david@redhat.com>,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S231868AbhEKRaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 May 2021 13:30:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53096 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231439AbhEKRaZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 May 2021 13:30:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620754158;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=R8Jfx2u6beGznuNa8djJTksGxj/j6Y+RV0TOPVHrWLI=;
+        b=LJlkkZ6qRqPKYpvVsd6u58xo8BGvKRZfl6Z3nnBPBNpythSaMstwi4TUX8tY745XBa2s42
+        cYwtFifwpLrzj9xzmWyt/CI2GGvLUHQsS8XOEGO/kgSA7n9sUxup7Wy+d67kFPg1TBT7y5
+        Ic0qbxwDB0quvx+rm4ZqVvwWDnjvXwo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-501-1ctvELjLMVqVEruB-jeKpg-1; Tue, 11 May 2021 13:29:15 -0400
+X-MC-Unique: 1ctvELjLMVqVEruB-jeKpg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9EE82107ACC7;
+        Tue, 11 May 2021 17:29:14 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-7.gru2.redhat.com [10.97.112.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3FCDC39A73;
+        Tue, 11 May 2021 17:29:06 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id 2EA18418AE2E; Tue, 11 May 2021 14:18:10 -0300 (-03)
+Date:   Tue, 11 May 2021 14:18:10 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Pei Zhang <pezhang@redhat.com>
+Subject: Re: [patch 4/4] KVM: VMX: update vcpu posted-interrupt descriptor
+ when assigning device
+Message-ID: <20210511171810.GA162107@fuller.cnet>
+References: <20210507130609.269153197@redhat.com>
+ <20210507130923.528132061@redhat.com>
+ <YJV3P4mFA7pITziM@google.com>
+ <YJWVAcIsvCaD7U0C@t490s>
+ <20210507220831.GA449495@fuller.cnet>
+ <YJqXD5gQCfzO4rT5@t490s>
+ <20210511145157.GC124427@fuller.cnet>
+ <YJqurM+LiyAY+MPO@t490s>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YJqurM+LiyAY+MPO@t490s>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If the TDP MMU is in use, wait to allocate the rmaps until the shadow
-MMU is actually used. (i.e. a nested VM is launched.) This saves memory
-equal to 0.2% of guest memory in cases where the TDP MMU is used and
-there are no nested guests involved.
+On Tue, May 11, 2021 at 12:19:56PM -0400, Peter Xu wrote:
+> On Tue, May 11, 2021 at 11:51:57AM -0300, Marcelo Tosatti wrote:
+> > On Tue, May 11, 2021 at 10:39:11AM -0400, Peter Xu wrote:
+> > > On Fri, May 07, 2021 at 07:08:31PM -0300, Marcelo Tosatti wrote:
+> > > > > Wondering whether we should add a pi_test_on() check in kvm_vcpu_has_events()
+> > > > > somehow, so that even without customized ->vcpu_check_block we should be able
+> > > > > to break the block loop (as kvm_arch_vcpu_runnable will return true properly)?
+> > > > 
+> > > > static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
+> > > > {
+> > > >         int ret = -EINTR;
+> > > >         int idx = srcu_read_lock(&vcpu->kvm->srcu);
+> > > > 
+> > > >         if (kvm_arch_vcpu_runnable(vcpu)) {
+> > > >                 kvm_make_request(KVM_REQ_UNHALT, vcpu); <---
+> > > >                 goto out;
+> > > >         }
+> > > > 
+> > > > Don't want to unhalt the vcpu.
+> > > 
+> > > Could you elaborate?  It's not obvious to me why we can't do that if
+> > > pi_test_on() returns true..  we have pending post interrupts anyways, so
+> > > shouldn't we stop halting?  Thanks!
+> > 
+> > pi_test_on() only returns true when an interrupt is signalled by the
+> > device. But the sequence of events is:
+> > 
+> > 
+> > 1. pCPU idles without notification vector configured to wakeup vector.
+> > 
+> > 2. PCI device is hotplugged, assigned device count increases from 0 to 1.
+> > 
+> > <arbitrary amount of time>
+> > 
+> > 3. device generates interrupt, sets ON bit to true in the posted
+> > interrupt descriptor.
+> > 
+> > We want to exit kvm_vcpu_block after 2, but before 3 (where ON bit
+> > is not set).
+> 
+> Ah yes.. thanks.
+> 
+> Besides the current approach, I'm thinking maybe it'll be cleaner/less LOC to
+> define a KVM_REQ_UNBLOCK to replace the pre_block hook (in x86's kvm_host.h):
+> 
+> #define KVM_REQ_UNBLOCK			KVM_ARCH_REQ(31)
+> 
+> We can set it in vmx_pi_start_assignment(), then check+clear it in
+> kvm_vcpu_has_events() (or make it a bool in kvm_vcpu struct?).
 
-Signed-off-by: Ben Gardon <bgardon@google.com>
----
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/mmu/mmu.c          | 53 +++++++++++++++++++++++----------
- arch/x86/kvm/mmu/tdp_mmu.c      |  6 ++--
- arch/x86/kvm/mmu/tdp_mmu.h      |  4 +--
- arch/x86/kvm/x86.c              | 45 +++++++++++++++++++++++++++-
- 5 files changed, 89 insertions(+), 21 deletions(-)
+Can't check it in kvm_vcpu_has_events() because that will set
+KVM_REQ_UNHALT (which we don't want).
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index fc75ed49bfee..7b65f82ade1c 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1868,4 +1868,6 @@ static inline int kvm_cpu_get_apicid(int mps_cpu)
- 
- int kvm_cpu_dirty_log_size(void);
- 
-+int alloc_all_memslots_rmaps(struct kvm *kvm);
-+
- #endif /* _ASM_X86_KVM_HOST_H */
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index b0bdb924d519..183afccd2944 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1190,7 +1190,8 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
- 		kvm_tdp_mmu_clear_dirty_pt_masked(kvm, slot,
- 				slot->base_gfn + gfn_offset, mask, true);
- 
--	if (!kvm->arch.memslots_have_rmaps)
-+	/* Read memslots_have_rmaps before the rmaps themselves */
-+	if (!smp_load_acquire(&kvm->arch.memslots_have_rmaps))
- 		return;
- 
- 	while (mask) {
-@@ -1223,7 +1224,8 @@ static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
- 		kvm_tdp_mmu_clear_dirty_pt_masked(kvm, slot,
- 				slot->base_gfn + gfn_offset, mask, false);
- 
--	if (!kvm->arch.memslots_have_rmaps)
-+	/* Read memslots_have_rmaps before the rmaps themselves */
-+	if (!smp_load_acquire(&kvm->arch.memslots_have_rmaps))
- 		return;
- 
- 	while (mask) {
-@@ -1268,7 +1270,8 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
- 	int i;
- 	bool write_protected = false;
- 
--	if (kvm->arch.memslots_have_rmaps) {
-+	/* Read memslots_have_rmaps before the rmaps themselves */
-+	if (smp_load_acquire(&kvm->arch.memslots_have_rmaps)) {
- 		for (i = PG_LEVEL_4K; i <= KVM_MAX_HUGEPAGE_LEVEL; ++i) {
- 			rmap_head = __gfn_to_rmap(gfn, i, slot);
- 			write_protected |= __rmap_write_protect(kvm, rmap_head,
-@@ -1446,7 +1449,8 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- {
- 	bool flush = false;
- 
--	if (kvm->arch.memslots_have_rmaps)
-+	/* Read memslots_have_rmaps before the rmaps themselves */
-+	if (smp_load_acquire(&kvm->arch.memslots_have_rmaps))
- 		flush = kvm_handle_gfn_range(kvm, range, kvm_unmap_rmapp);
- 
- 	if (is_tdp_mmu_enabled(kvm))
-@@ -1459,7 +1463,8 @@ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
- 	bool flush = false;
- 
--	if (kvm->arch.memslots_have_rmaps)
-+	/* Read memslots_have_rmaps before the rmaps themselves */
-+	if (smp_load_acquire(&kvm->arch.memslots_have_rmaps))
- 		flush = kvm_handle_gfn_range(kvm, range, kvm_set_pte_rmapp);
- 
- 	if (is_tdp_mmu_enabled(kvm))
-@@ -1515,7 +1520,8 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
- 	bool young = false;
- 
--	if (kvm->arch.memslots_have_rmaps)
-+	/* Read memslots_have_rmaps before the rmaps themselves */
-+	if (smp_load_acquire(&kvm->arch.memslots_have_rmaps))
- 		young = kvm_handle_gfn_range(kvm, range, kvm_age_rmapp);
- 
- 	if (is_tdp_mmu_enabled(kvm))
-@@ -1528,7 +1534,8 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
- 	bool young = false;
- 
--	if (kvm->arch.memslots_have_rmaps)
-+	/* Read memslots_have_rmaps before the rmaps themselves */
-+	if (smp_load_acquire(&kvm->arch.memslots_have_rmaps))
- 		young = kvm_handle_gfn_range(kvm, range, kvm_test_age_rmapp);
- 
- 	if (is_tdp_mmu_enabled(kvm))
-@@ -3295,6 +3302,10 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
- 		}
- 	}
- 
-+	r = alloc_all_memslots_rmaps(vcpu->kvm);
-+	if (r)
-+		return r;
-+
- 	write_lock(&vcpu->kvm->mmu_lock);
- 	r = make_mmu_pages_available(vcpu);
- 	if (r < 0)
-@@ -5455,7 +5466,8 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
- 	 */
- 	kvm_reload_remote_mmus(kvm);
- 
--	if (kvm->arch.memslots_have_rmaps)
-+	/* Read memslots_have_rmaps before the rmaps themselves */
-+	if (smp_load_acquire(&kvm->arch.memslots_have_rmaps))
- 		kvm_zap_obsolete_pages(kvm);
- 
- 	write_unlock(&kvm->mmu_lock);
-@@ -5483,9 +5495,13 @@ void kvm_mmu_init_vm(struct kvm *kvm)
- {
- 	struct kvm_page_track_notifier_node *node = &kvm->arch.mmu_sp_tracker;
- 
--	kvm_mmu_init_tdp_mmu(kvm);
--
--	kvm->arch.memslots_have_rmaps = true;
-+	if (!kvm_mmu_init_tdp_mmu(kvm))
-+		/*
-+		 * No smp_load/store wrappers needed here as we are in
-+		 * VM init and there cannot be any memslots / other threads
-+		 * accessing this struct kvm yet.
-+		 */
-+		kvm->arch.memslots_have_rmaps = true;
- 
- 	node->track_write = kvm_mmu_pte_write;
- 	node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
-@@ -5508,7 +5524,8 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
- 	int i;
- 	bool flush = false;
- 
--	if (kvm->arch.memslots_have_rmaps) {
-+	/* Read memslots_have_rmaps before the rmaps themselves */
-+	if (smp_load_acquire(&kvm->arch.memslots_have_rmaps)) {
- 		write_lock(&kvm->mmu_lock);
- 		for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
- 			slots = __kvm_memslots(kvm, i);
-@@ -5559,7 +5576,8 @@ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
- {
- 	bool flush = false;
- 
--	if (kvm->arch.memslots_have_rmaps) {
-+	/* Read memslots_have_rmaps before the rmaps themselves */
-+	if (smp_load_acquire(&kvm->arch.memslots_have_rmaps)) {
- 		write_lock(&kvm->mmu_lock);
- 		flush = slot_handle_level(kvm, memslot, slot_rmap_write_protect,
- 					  start_level, KVM_MAX_HUGEPAGE_LEVEL,
-@@ -5635,7 +5653,8 @@ void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
- 	struct kvm_memory_slot *slot = (struct kvm_memory_slot *)memslot;
- 	bool flush;
- 
--	if (kvm->arch.memslots_have_rmaps) {
-+	/* Read memslots_have_rmaps before the rmaps themselves */
-+	if (smp_load_acquire(&kvm->arch.memslots_have_rmaps)) {
- 		write_lock(&kvm->mmu_lock);
- 		flush = slot_handle_leaf(kvm, slot, kvm_mmu_zap_collapsible_spte, true);
- 		if (flush)
-@@ -5672,7 +5691,8 @@ void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
- {
- 	bool flush = false;
- 
--	if (kvm->arch.memslots_have_rmaps) {
-+	/* Read memslots_have_rmaps before the rmaps themselves */
-+	if (smp_load_acquire(&kvm->arch.memslots_have_rmaps)) {
- 		write_lock(&kvm->mmu_lock);
- 		flush = slot_handle_leaf(kvm, memslot, __rmap_clear_dirty,
- 					 false);
-@@ -5705,7 +5725,8 @@ void kvm_mmu_zap_all(struct kvm *kvm)
- 	if (is_tdp_mmu_enabled(kvm))
- 		kvm_tdp_mmu_zap_all(kvm);
- 
--	if (!kvm->arch.memslots_have_rmaps) {
-+	/* Read memslots_have_rmaps before the rmaps themselves */
-+	if (!smp_load_acquire(&kvm->arch.memslots_have_rmaps)) {
- 		write_unlock(&kvm->mmu_lock);
- 		return;
- 	}
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 95eeb5ac6a8a..ea00c9502ba1 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -14,10 +14,10 @@ static bool __read_mostly tdp_mmu_enabled = false;
- module_param_named(tdp_mmu, tdp_mmu_enabled, bool, 0644);
- 
- /* Initializes the TDP MMU for the VM, if enabled. */
--void kvm_mmu_init_tdp_mmu(struct kvm *kvm)
-+bool kvm_mmu_init_tdp_mmu(struct kvm *kvm)
- {
- 	if (!tdp_enabled || !READ_ONCE(tdp_mmu_enabled))
--		return;
-+		return false;
- 
- 	/* This should not be changed for the lifetime of the VM. */
- 	kvm->arch.tdp_mmu_enabled = true;
-@@ -25,6 +25,8 @@ void kvm_mmu_init_tdp_mmu(struct kvm *kvm)
- 	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_roots);
- 	spin_lock_init(&kvm->arch.tdp_mmu_pages_lock);
- 	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_pages);
-+
-+	return true;
- }
- 
- static __always_inline void kvm_lockdep_assert_mmu_lock_held(struct kvm *kvm,
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 5fdf63090451..b046ab5137a1 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -80,12 +80,12 @@ int kvm_tdp_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
- 			 int *root_level);
- 
- #ifdef CONFIG_X86_64
--void kvm_mmu_init_tdp_mmu(struct kvm *kvm);
-+bool kvm_mmu_init_tdp_mmu(struct kvm *kvm);
- void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm);
- static inline bool is_tdp_mmu_enabled(struct kvm *kvm) { return kvm->arch.tdp_mmu_enabled; }
- static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp) { return sp->tdp_mmu_page; }
- #else
--static inline void kvm_mmu_init_tdp_mmu(struct kvm *kvm) {}
-+static inline bool kvm_mmu_init_tdp_mmu(struct kvm *kvm) { return false; }
- static inline void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm) {}
- static inline bool is_tdp_mmu_enabled(struct kvm *kvm) { return false; }
- static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp) { return false; }
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 03b6bcff2a53..fdc1b2759771 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10920,6 +10920,8 @@ static int memslot_rmap_alloc(struct kvm_memory_slot *slot,
- 		int lpages;
- 		int level = i + 1;
- 
-+		WARN_ON(slot->arch.rmap[i]);
-+
- 		lpages = gfn_to_index(slot->base_gfn + npages - 1,
- 				      slot->base_gfn, level) + 1;
- 
-@@ -10935,6 +10937,46 @@ static int memslot_rmap_alloc(struct kvm_memory_slot *slot,
- 	return 0;
- }
- 
-+int alloc_all_memslots_rmaps(struct kvm *kvm)
-+{
-+	struct kvm_memslots *slots;
-+	struct kvm_memory_slot *slot;
-+	int r = 0;
-+	int i;
-+
-+	/*
-+	 * Check memslots_have_rmaps early before acquiring the
-+	 * slots_arch_lock below.
-+	 */
-+	if (smp_load_acquire(&kvm->arch.memslots_have_rmaps))
-+		return 0;
-+
-+	mutex_lock(&kvm->slots_arch_lock);
-+
-+	/*
-+	 * Read memslots_have_rmaps again, under the slots arch lock,
-+	 * before allocating the rmaps
-+	 */
-+	if (smp_load_acquire(&kvm->arch.memslots_have_rmaps))
-+		return 0;
-+
-+	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-+		slots = __kvm_memslots(kvm, i);
-+		kvm_for_each_memslot(slot, slots) {
-+			r = memslot_rmap_alloc(slot, slot->npages);
-+			if (r) {
-+				mutex_unlock(&kvm->slots_arch_lock);
-+				return r;
-+			}
-+		}
-+	}
-+
-+	/* Write rmap pointers before memslots_have_rmaps */
-+	smp_store_release(&kvm->arch.memslots_have_rmaps, true);
-+	mutex_unlock(&kvm->slots_arch_lock);
-+	return 0;
-+}
-+
- static int kvm_alloc_memslot_metadata(struct kvm *kvm,
- 				      struct kvm_memory_slot *slot,
- 				      unsigned long npages)
-@@ -10949,7 +10991,8 @@ static int kvm_alloc_memslot_metadata(struct kvm *kvm,
- 	 */
- 	memset(&slot->arch, 0, sizeof(slot->arch));
- 
--	if (kvm->arch.memslots_have_rmaps) {
-+	/* Read memslots_have_rmaps before allocating the rmaps */
-+	if (smp_load_acquire(&kvm->arch.memslots_have_rmaps)) {
- 		r = memslot_rmap_alloc(slot, npages);
- 		if (r)
- 			return r;
--- 
-2.31.1.607.g51e8a6a459-goog
+I think KVM_REQ_UNBLOCK will add more lines of code.
+
+> The thing is current vmx_vcpu_check_block() is mostly a sanity check and
+> copy-paste of the pi checks on a few items, so maybe cleaner to use
+> KVM_REQ_UNBLOCK, as it might be reused in the future for re-evaluating of
+> pre-block for similar purpose?
+> 
+> No strong opinion, though.
+
+Hum... IMHO v3 is quite clean already (although i don't object to your
+suggestion).
+
+Paolo, what do you think?
+
+
 
