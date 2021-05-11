@@ -2,108 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 873A237AFF4
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 22:10:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 441C037AFF7
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 22:10:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229954AbhEKULR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 May 2021 16:11:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42028 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbhEKULQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 May 2021 16:11:16 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8429C061574
-        for <kvm@vger.kernel.org>; Tue, 11 May 2021 13:10:09 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id h7so11385680plt.1
-        for <kvm@vger.kernel.org>; Tue, 11 May 2021 13:10:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=9hsJp/8M+c794Pqj/BGqU0TDUiLA1/EXUU62NU+MuI8=;
-        b=QWxVvsHJmxi2i0/v0yvXGA/rYmebcRITSfU78PEVWzxzZQj5NH4W2zx4Ow2aldvIOZ
-         RF+Pp01gjiTBsL4GN8iYTGXpT6Tk8/q5bZuVXfvEMLhACIa26lseUWufR0uXgI5csmYZ
-         qPaYTvBEgra7SDs/9ygersTwFvS7PngkczxI2jgG8p5lKZFWvqGWB5EBUmZ7KdIZywut
-         7YKlRIiPop3urGUH1d28rki8FOxWFo1xJl/93w/+LUlRj7ZnFAX/x6i1e8t8bFnPZg9V
-         sinN/l4I+RBvPQvUwtxvn/l4MRno77sXlDk/dibPowkeifpBrMli9ad0UZzE7+2l8L5s
-         PjTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=9hsJp/8M+c794Pqj/BGqU0TDUiLA1/EXUU62NU+MuI8=;
-        b=Tfb+cgoV2YEcYBZ3NT0q4eMC/NaT5SkGSwMVtpEtpW11z6XhyY7pbj9B3WV6/w4DPd
-         MWX2q515uCeUjBUWfSfvysBreGbDijOrxxUrXcu45uEMxWg6SFkEecQHzvP4rDE8EgqY
-         mi0cR/VVd+Lzz7VmPs84j7WDT5tNZ0UbNl8pDKlixZKhDCDXkEOyM4Mj0ZA4evpskQWj
-         snHkSxPIQRTVxcCCkMwjmXxTNjY8QFuNdjqcD16O3ObNi3dEp8xpAjpZ3//kc65sJTJq
-         LX7N0i8u9+wlcK6m7FAGSnCRj5f/ZV4Pfgfa41X92sDoCNL0E8j/a2WRuFDH7avoopts
-         dqTw==
-X-Gm-Message-State: AOAM532vL4//2XHrhBwAjkMYNWZZpzj1UTkGPkr46rK3OfoLHz9MTSAX
-        zG8wr3FjG9cnpZistxuZKtVPGg==
-X-Google-Smtp-Source: ABdhPJwy09jfy7yLVMouNyu5hwQFqzdeaXW6xbEDwmbX67gFS2cIgwJGT3bwVeejCDmtI2vaIRbYFA==
-X-Received: by 2002:a17:902:70c5:b029:ec:9a57:9cc8 with SMTP id l5-20020a17090270c5b02900ec9a579cc8mr31856628plt.73.1620763809212;
-        Tue, 11 May 2021 13:10:09 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id s14sm1396567pjp.16.2021.05.11.13.10.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 May 2021 13:10:08 -0700 (PDT)
-Date:   Tue, 11 May 2021 20:10:05 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
-        Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH 08/15] KVM: VMX: Configure list of user return MSRs at
- module init
-Message-ID: <YJrkndzXzUOXsZYJ@google.com>
-References: <20210504171734.1434054-1-seanjc@google.com>
- <20210504171734.1434054-9-seanjc@google.com>
- <db161b4dd7286870db5adb9324e4941f0dc3f098.camel@redhat.com>
- <YJlNsvKoFIKI2V/V@google.com>
- <9cf65a1d7b96c69077779d7a11777004d0bce6c9.camel@redhat.com>
+        id S229900AbhEKULj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 May 2021 16:11:39 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33210 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229637AbhEKULj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 May 2021 16:11:39 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14BK3bKU178858;
+        Tue, 11 May 2021 16:10:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=0V8Sr4zzzw9tSrU7wswLcSDl95SzFcodFkU3Wnt624I=;
+ b=KEnoeVOZL247h9bQLPXb/zO22SEZpxJzMFo0hnXaKJYSerBx2odKMoxtJiZI8CSNSiXC
+ sWDO/0NGGhH/pLt/OxdHb3zIo++j9N9lZfTGr4en8kY6tyziYuh5bg/bHePJyR9OoVz4
+ Kq2B1WRN/HdqicbSDy6WFlheL7nEpdOe2wcoaCvI8A/PFtfUuA/6uQOXQeqbk6+YsVBx
+ DXDy1S6a+R6hi9rHOIUppufK/PmI7FPIgC4gcP5hJZyXlGLhNNm51/TDbuLLtA4noWQu
+ yyF3k5hTnkZrNsedeVXGxwz6j6yvKjph+udwM2NE79PQ5muxwTMks9S83RbKqcUE7S3A ow== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38g0k0r7ab-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 May 2021 16:10:31 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14BK4adX181090;
+        Tue, 11 May 2021 16:10:31 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38g0k0r79y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 May 2021 16:10:31 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14BK7EPG025067;
+        Tue, 11 May 2021 20:10:30 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma02wdc.us.ibm.com with ESMTP id 38dj99ger4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 May 2021 20:10:30 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14BKANWW22479350
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 11 May 2021 20:10:23 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4BC12136055;
+        Tue, 11 May 2021 20:10:23 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 94361136053;
+        Tue, 11 May 2021 20:10:22 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.211.43.140])
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue, 11 May 2021 20:10:22 +0000 (GMT)
+Subject: Re: [PATCH v6 1/3] vfio-ccw: Check initialized flag in cp_init()
+To:     Eric Farman <farman@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Cc:     Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20210511195631.3995081-1-farman@linux.ibm.com>
+ <20210511195631.3995081-2-farman@linux.ibm.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+Message-ID: <927149fb-ec36-ccfa-84ac-0b10ac472f84@linux.ibm.com>
+Date:   Tue, 11 May 2021 16:10:21 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9cf65a1d7b96c69077779d7a11777004d0bce6c9.camel@redhat.com>
+In-Reply-To: <20210511195631.3995081-2-farman@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: jPnOkXzgOsifylGROr8_jKzlqwCX0Hem
+X-Proofpoint-ORIG-GUID: w3slQTrCiJMoQCBW1eAS5vhyNr-1QJJv
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-11_04:2021-05-11,2021-05-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ priorityscore=1501 suspectscore=0 impostorscore=0 bulkscore=0 adultscore=0
+ mlxlogscore=999 spamscore=0 clxscore=1011 mlxscore=0 lowpriorityscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2105110134
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 11, 2021, Maxim Levitsky wrote:
-> On Mon, 2021-05-10 at 15:13 +0000, Sean Christopherson wrote:
-> > On Mon, May 10, 2021, Maxim Levitsky wrote:
-> > > On Tue, 2021-05-04 at 10:17 -0700, Sean Christopherson wrote:
-> > > > @@ -6929,18 +6942,10 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
-> > > >  			goto free_vpid;
-> > > >  	}
-> > > >  
-> > > > -	BUILD_BUG_ON(ARRAY_SIZE(vmx_uret_msrs_list) != MAX_NR_USER_RETURN_MSRS);
-> > > > +	for (i = 0; i < vmx_nr_uret_msrs; ++i) {
-> > > > +		vmx->guest_uret_msrs[i].data = 0;
-> > > >  
-> > > > -	for (i = 0; i < ARRAY_SIZE(vmx_uret_msrs_list); ++i) {
-> > > > -		u32 index = vmx_uret_msrs_list[i];
-> > > > -		int j = vmx->nr_uret_msrs;
-> > > > -
-> > > > -		if (kvm_probe_user_return_msr(index))
-> > > > -			continue;
-> > > > -
-> > > > -		vmx->guest_uret_msrs[j].slot = i;
-> > > I don't see anything initalizing the .slot after this patch.
-> > > Now this code is removed later which masks this bug, 
-> > > but for the bisect sake, I think that this patch 
-> > > should still be fixed.
-> > 
-> > Egad, indeed it's broken.  I'll retest the whole series to verify the other
-> > patches will bisect cleanly.
-> > 
-> > Nice catch!
-> > 
-> Thanks!
+On 5/11/21 3:56 PM, Eric Farman wrote:
+> We have a really nice flag in the channel_program struct that
+> indicates if it had been initialized by cp_init(), and use it
+> as a guard in the other cp accessor routines, but not for a
+> duplicate call into cp_init(). The possibility of this occurring
+> is low, because that flow is protected by the private->io_mutex
+> and FSM CP_PROCESSING state. But then why bother checking it
+> in (for example) cp_prefetch() then?
+> 
+> Let's just be consistent and check for that in cp_init() too.
+> 
+> Fixes: 71189f263f8a3 ("vfio-ccw: make it safe to access channel programs")
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-Unfortunately this made it's way to Linus before I could fix my goof.  Fingers
-crossed no one is unfortunate enough to land on this while bisecting...
+Acked-by: Matthew Rosato <mjrosato@linux.ibm.com>
+
+> ---
+>   drivers/s390/cio/vfio_ccw_cp.c | 4 ++++
+>   1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+> index b9febc581b1f..8d1b2771c1aa 100644
+> --- a/drivers/s390/cio/vfio_ccw_cp.c
+> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> @@ -638,6 +638,10 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
+>   	static DEFINE_RATELIMIT_STATE(ratelimit_state, 5 * HZ, 1);
+>   	int ret;
+>   
+> +	/* this is an error in the caller */
+> +	if (cp->initialized)
+> +		return -EBUSY;
+> +
+>   	/*
+>   	 * We only support prefetching the channel program. We assume all channel
+>   	 * programs executed by supported guests likewise support prefetching.
+> 
+
