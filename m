@@ -2,141 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 222A637AEF1
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 20:58:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DC0637AF15
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 21:08:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231991AbhEKS7Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 May 2021 14:59:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53842 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232190AbhEKS7I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 May 2021 14:59:08 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EC61C061574
-        for <kvm@vger.kernel.org>; Tue, 11 May 2021 11:58:00 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id t2-20020a17090ae502b029015b0fbfbc50so58225pjy.3
-        for <kvm@vger.kernel.org>; Tue, 11 May 2021 11:58:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=oLyk2sgqTL5Vn/TKBovsUc1DwhBNmb78942+z6JgkFk=;
-        b=VY6g8j2sEMXzCcSYW74rKGa5U9UpB5xe1yY6CRFpyuD+pNCkDDeO/JH1RtSF5Y95nj
-         RdJmSVGXGoMyYryeRQbkzfdhDP4t5I+3HP1mS/q7QAOlf/c/BRPjh7W0W/xupnLY1dDm
-         PNCG4m8kYULgCDgLwXOVeL3u3G16aj/oYDP18LOVCWPKVOPzC9usudGj47t3Gq7HWSAb
-         Kq6TyFmTIMe8IaMVps9eNuO1Fm4P3qaA2fGyXN8R7KQHVuPwy5m7YKRL6/t6Kr5GOkre
-         W7NXOvr7qgk4wOqGu8fOHfjDVlaJd1MsbKI5PEUHix5HRh7m3ZTpydWrxiQcD+R3sVuY
-         A1bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=oLyk2sgqTL5Vn/TKBovsUc1DwhBNmb78942+z6JgkFk=;
-        b=MuB0bGLjZr94RskP1XuR3O4q+3daRZO8Xi8izNVJOtJfW+iAoBK1wt4+aSRbhFy7ab
-         FgO/YNudI25C8kP/3XbdpRpNQrz32HK7G4zcLiQ+luaplo8JV2cjJLrqWi9GZspJJG1q
-         hrpeoJFbABtaD4CCnMDfekylU+8WT0oSqrQY6E1kFzppxU5QhxtQX/IIQSPA3hiqct2S
-         VudLQyK9a6YJDoyprT9hzXhG7/IQ9a+VSawY/AKMVJx0219Ta7d3PGSWNd2KJpiTfOsS
-         rOoM/7qWHtS/JTlYWj5QpGtlhXyn62CxDI7QRcqpW+4n2U22Yk9J/RYSkKMweiOiERtu
-         0tqA==
-X-Gm-Message-State: AOAM533zQ7cYSrzCHuOlQ+WYJ/O7tyaUPvvMy24AzPnAImOqIANSK9Kx
-        FBzHnH37asJLa7TpGwZW0tDExg==
-X-Google-Smtp-Source: ABdhPJxOmU8XVtfPkJEbrBQRMNcmKDLmTjhnp407EL2ZJE/UpgkfYOAaR51m44vi5Yh8cmWDEsb79Q==
-X-Received: by 2002:a17:902:e986:b029:ee:d430:6bf9 with SMTP id f6-20020a170902e986b02900eed4306bf9mr31780254plb.0.1620759479901;
-        Tue, 11 May 2021 11:57:59 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id 130sm13473105pfy.75.2021.05.11.11.57.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 May 2021 11:57:59 -0700 (PDT)
-Date:   Tue, 11 May 2021 18:57:55 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        id S232054AbhEKTJ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 May 2021 15:09:57 -0400
+Received: from mga06.intel.com ([134.134.136.31]:45331 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231439AbhEKTJ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 May 2021 15:09:56 -0400
+IronPort-SDR: Uz+1lUOUdYkyS4oHMuGKvvSdmqQDboWoFaEPJ6qJP18ai/LwWfovuPkLrc9PTGmv24wKA9EYrO
+ 2QEmnL3aaCkg==
+X-IronPort-AV: E=McAfee;i="6200,9189,9981"; a="260786694"
+X-IronPort-AV: E=Sophos;i="5.82,291,1613462400"; 
+   d="scan'208";a="260786694"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2021 12:08:49 -0700
+IronPort-SDR: 8iUDy6woVLRRSUmm2m9QX6lwv8lbkfFM2lm89lro0rrVwrJw+ZpTH6a51eyAD5KUEM6xpQTGKE
+ Op4c74/ATmRA==
+X-IronPort-AV: E=Sophos;i="5.82,291,1613462400"; 
+   d="scan'208";a="537146980"
+Received: from unknown (HELO [10.251.0.45]) ([10.251.0.45])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2021 12:08:44 -0700
+Subject: Re: [PATCH v3] KVM: x86: use wrpkru directly in
+ kvm_load_{guest|host}_xsave_state
+To:     Jon Kohler <jon@nutanix.com>
+Cc:     Babu Moger <babu.moger@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v4 7/7] KVM: x86/mmu: Lazily allocate memslot rmaps
-Message-ID: <YJrTs6LlHFWSdGc7@google.com>
-References: <20210511171610.170160-1-bgardon@google.com>
- <20210511171610.170160-8-bgardon@google.com>
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Yu-cheng Yu <yu-cheng.yu@intel.com>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Uros Bizjak <ubizjak@gmail.com>,
+        Petteri Aimonen <jpa@git.mail.kapsi.fi>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Fan Yang <Fan_Yang@sjtu.edu.cn>,
+        Juergen Gross <jgross@suse.com>,
+        Benjamin Thiel <b.thiel@posteo.de>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20210511170508.40034-1-jon@nutanix.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
+ oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
+ 2UnKuZuSBu7lgOE193+7Uks3416N2hTkyKUSNkduyoZ9F5twiBhxPJwPtn/wnch6n5RsoXsb
+ ygOEDxLEsSk/7eyFycjE+btUtAWZtx+HseyaGfqkZK0Z9bT1lsaHecmB203xShwCPT49Blxz
+ VOab8668QpaEOdLGhtvrVYVK7x4skyT3nGWcgDCl5/Vp3TWA4K+IofwvXzX2ON/Mj7aQwf5W
+ iC+3nWC7q0uxKwwsddJ0Nu+dpA/UORQWa1NiAftEoSpk5+nUUi0WE+5DRm0H+TXKBWMGNCFn
+ c6+EKg5zQaa8KqymHcOrSXNPmzJuXvDQ8uj2J8XuzCZfK4uy1+YdIr0yyEMI7mdh4KX50LO1
+ pmowEqDh7dLShTOif/7UtQYrzYq9cPnjU2ZW4qd5Qz2joSGTG9eCXLz5PRe5SqHxv6ljk8mb
+ ApNuY7bOXO/A7T2j5RwXIlcmssqIjBcxsRRoIbpCwWWGjkYjzYCjgsNFL6rt4OL11OUF37wL
+ QcTl7fbCGv53KfKPdYD5hcbguLKi/aCccJK18ZwNjFhqr4MliQARAQABzShEYXZpZCBDaHJp
+ c3RvcGhlciBIYW5zZW4gPGRhdmVAc3I3MS5uZXQ+wsF7BBMBAgAlAhsDBgsJCAcDAgYVCAIJ
+ CgsEFgIDAQIeAQIXgAUCTo3k0QIZAQAKCRBoNZUwcMmSsMO2D/421Xg8pimb9mPzM5N7khT0
+ 2MCnaGssU1T59YPE25kYdx2HntwdO0JA27Wn9xx5zYijOe6B21ufrvsyv42auCO85+oFJWfE
+ K2R/IpLle09GDx5tcEmMAHX6KSxpHmGuJmUPibHVbfep2aCh9lKaDqQR07gXXWK5/yU1Dx0r
+ VVFRaHTasp9fZ9AmY4K9/BSA3VkQ8v3OrxNty3OdsrmTTzO91YszpdbjjEFZK53zXy6tUD2d
+ e1i0kBBS6NLAAsqEtneplz88T/v7MpLmpY30N9gQU3QyRC50jJ7LU9RazMjUQY1WohVsR56d
+ ORqFxS8ChhyJs7BI34vQusYHDTp6PnZHUppb9WIzjeWlC7Jc8lSBDlEWodmqQQgp5+6AfhTD
+ kDv1a+W5+ncq+Uo63WHRiCPuyt4di4/0zo28RVcjtzlGBZtmz2EIC3vUfmoZbO/Gn6EKbYAn
+ rzz3iU/JWV8DwQ+sZSGu0HmvYMt6t5SmqWQo/hyHtA7uF5Wxtu1lCgolSQw4t49ZuOyOnQi5
+ f8R3nE7lpVCSF1TT+h8kMvFPv3VG7KunyjHr3sEptYxQs4VRxqeirSuyBv1TyxT+LdTm6j4a
+ mulOWf+YtFRAgIYyyN5YOepDEBv4LUM8Tz98lZiNMlFyRMNrsLV6Pv6SxhrMxbT6TNVS5D+6
+ UorTLotDZKp5+M7BTQRUY85qARAAsgMW71BIXRgxjYNCYQ3Xs8k3TfAvQRbHccky50h99TUY
+ sqdULbsb3KhmY29raw1bgmyM0a4DGS1YKN7qazCDsdQlxIJp9t2YYdBKXVRzPCCsfWe1dK/q
+ 66UVhRPP8EGZ4CmFYuPTxqGY+dGRInxCeap/xzbKdvmPm01Iw3YFjAE4PQ4hTMr/H76KoDbD
+ cq62U50oKC83ca/PRRh2QqEqACvIH4BR7jueAZSPEDnzwxvVgzyeuhwqHY05QRK/wsKuhq7s
+ UuYtmN92Fasbxbw2tbVLZfoidklikvZAmotg0dwcFTjSRGEg0Gr3p/xBzJWNavFZZ95Rj7Et
+ db0lCt0HDSY5q4GMR+SrFbH+jzUY/ZqfGdZCBqo0cdPPp58krVgtIGR+ja2Mkva6ah94/oQN
+ lnCOw3udS+Eb/aRcM6detZr7XOngvxsWolBrhwTQFT9D2NH6ryAuvKd6yyAFt3/e7r+HHtkU
+ kOy27D7IpjngqP+b4EumELI/NxPgIqT69PQmo9IZaI/oRaKorYnDaZrMXViqDrFdD37XELwQ
+ gmLoSm2VfbOYY7fap/AhPOgOYOSqg3/Nxcapv71yoBzRRxOc4FxmZ65mn+q3rEM27yRztBW9
+ AnCKIc66T2i92HqXCw6AgoBJRjBkI3QnEkPgohQkZdAb8o9WGVKpfmZKbYBo4pEAEQEAAcLB
+ XwQYAQIACQUCVGPOagIbDAAKCRBoNZUwcMmSsJeCEACCh7P/aaOLKWQxcnw47p4phIVR6pVL
+ e4IEdR7Jf7ZL00s3vKSNT+nRqdl1ugJx9Ymsp8kXKMk9GSfmZpuMQB9c6io1qZc6nW/3TtvK
+ pNGz7KPPtaDzvKA4S5tfrWPnDr7n15AU5vsIZvgMjU42gkbemkjJwP0B1RkifIK60yQqAAlT
+ YZ14P0dIPdIPIlfEPiAWcg5BtLQU4Wg3cNQdpWrCJ1E3m/RIlXy/2Y3YOVVohfSy+4kvvYU3
+ lXUdPb04UPw4VWwjcVZPg7cgR7Izion61bGHqVqURgSALt2yvHl7cr68NYoFkzbNsGsye9ft
+ M9ozM23JSgMkRylPSXTeh5JIK9pz2+etco3AfLCKtaRVysjvpysukmWMTrx8QnI5Nn5MOlJj
+ 1Ov4/50JY9pXzgIDVSrgy6LYSMc4vKZ3QfCY7ipLRORyalFDF3j5AGCMRENJjHPD6O7bl3Xo
+ 4DzMID+8eucbXxKiNEbs21IqBZbbKdY1GkcEGTE7AnkA3Y6YB7I/j9mQ3hCgm5muJuhM/2Fr
+ OPsw5tV/LmQ5GXH0JQ/TZXWygyRFyyI2FqNTx4WHqUn3yFj8rwTAU1tluRUYyeLy0ayUlKBH
+ ybj0N71vWO936MqP6haFERzuPAIpxj2ezwu0xb1GjTk4ynna6h5GjnKgdfOWoRtoWndMZxbA
+ z5cecg==
+Message-ID: <7820b622-fcb2-ea59-c0b0-a3c52ac8e3e8@intel.com>
+Date:   Tue, 11 May 2021 12:08:44 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210511171610.170160-8-bgardon@google.com>
+In-Reply-To: <20210511170508.40034-1-jon@nutanix.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 11, 2021, Ben Gardon wrote:
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> @@ -10935,6 +10937,46 @@ static int memslot_rmap_alloc(struct kvm_memory_slot *slot,
->  	return 0;
->  }
->  
-> +int alloc_all_memslots_rmaps(struct kvm *kvm)
-> +{
-> +	struct kvm_memslots *slots;
-> +	struct kvm_memory_slot *slot;
-> +	int r = 0;
+On 5/11/21 10:05 AM, Jon Kohler wrote:
+> To improve performance, use wrpkru directly in KVM code and simplify
+> the uses of __write_pkru such that it can be removed completely.
 
-No need to initialize r.  And then it makes sense to put i and r on the same
-line.
+I don't love the repeated:
 
-> +	int i;
-> +
-> +	/*
-> +	 * Check memslots_have_rmaps early before acquiring the
-> +	 * slots_arch_lock below.
-> +	 */
-> +	if (smp_load_acquire(&kvm->arch.memslots_have_rmaps))
-> +		return 0;
-> +
-> +	mutex_lock(&kvm->slots_arch_lock);
-> +
-> +	/*
-> +	 * Read memslots_have_rmaps again, under the slots arch lock,
-> +	 * before allocating the rmaps
-> +	 */
-> +	if (smp_load_acquire(&kvm->arch.memslots_have_rmaps))
-> +		return 0;
++	if (pkru_val != rdpkru())
++		wrpkru(pkru_val);
 
-This fails to drop slots_arch_lock.
+But, all of the w*pkru() variants were getting confusing, even to me. :)
 
-> +
-> +	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-> +		slots = __kvm_memslots(kvm, i);
-> +		kvm_for_each_memslot(slot, slots) {
-> +			r = memslot_rmap_alloc(slot, slot->npages);
-> +			if (r) {
-> +				mutex_unlock(&kvm->slots_arch_lock);
-> +				return r;
-> +			}
-> +		}
-> +	}
-> +
-> +	/* Write rmap pointers before memslots_have_rmaps */
-> +	smp_store_release(&kvm->arch.memslots_have_rmaps, true);
-> +	mutex_unlock(&kvm->slots_arch_lock);
-> +	return 0;
-> +}
-> +
->  static int kvm_alloc_memslot_metadata(struct kvm *kvm,
->  				      struct kvm_memory_slot *slot,
->  				      unsigned long npages)
-> @@ -10949,7 +10991,8 @@ static int kvm_alloc_memslot_metadata(struct kvm *kvm,
->  	 */
->  	memset(&slot->arch, 0, sizeof(slot->arch));
->  
-> -	if (kvm->arch.memslots_have_rmaps) {
-> +	/* Read memslots_have_rmaps before allocating the rmaps */
-> +	if (smp_load_acquire(&kvm->arch.memslots_have_rmaps)) {
->  		r = memslot_rmap_alloc(slot, npages);
->  		if (r)
->  			return r;
-> -- 
-> 2.31.1.607.g51e8a6a459-goog
-> 
+Being explicit about the "wkpkru suppression" in a limited number of
+places looks fine.
+
+Acked-by: Dave Hansen <dave.hansen@intel.com>
