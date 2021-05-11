@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 43CE9379D11
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 04:43:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 084F7379D13
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 04:44:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230342AbhEKCo4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 May 2021 22:44:56 -0400
-Received: from mga11.intel.com ([192.55.52.93]:42043 "EHLO mga11.intel.com"
+        id S230369AbhEKCpC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 May 2021 22:45:02 -0400
+Received: from mga14.intel.com ([192.55.52.115]:39581 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230349AbhEKCos (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 May 2021 22:44:48 -0400
-IronPort-SDR: 3BNo/bEntLs4hgQfSFpHiEInEM2q/UtoXIibtNi7fiT9C+Yrskjg5vxWXxOFSfeUu4vdPhs3bm
- P9re20szB8gg==
-X-IronPort-AV: E=McAfee;i="6200,9189,9980"; a="196246452"
+        id S230360AbhEKCoy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 May 2021 22:44:54 -0400
+IronPort-SDR: KHZM87gkq5rO1VvN0PDZeNmSHCnaVSK2CeTY1TBJHBUG6BU+WqCBolEJuEpJ/ryT/Wtq8FI0v6
+ wn7yk4SB0BiQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,9980"; a="199015632"
 X-IronPort-AV: E=Sophos;i="5.82,290,1613462400"; 
-   d="scan'208";a="196246452"
+   d="scan'208";a="199015632"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2021 19:43:41 -0700
-IronPort-SDR: fUqBrpl83XvSk/VkXe9e99ngAvg4xPlwe01KGRzp7Qr89IXnk60TRUHUCo8RghJszmn13zEUH7
- wlqDYYkbDfhA==
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2021 19:43:48 -0700
+IronPort-SDR: ZF4aXKIKalxcAeWfmLIEGFgyL2m9Zuxzs7YqxrAkTsj+w8joXHmQlPzgVDi7qoDEcnBUGDtze3
+ 4Ud/8GII6BmA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.82,290,1613462400"; 
-   d="scan'208";a="468591908"
+   d="scan'208";a="468591977"
 Received: from clx-ap-likexu.sh.intel.com ([10.239.48.108])
-  by fmsmga002.fm.intel.com with ESMTP; 10 May 2021 19:43:36 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 10 May 2021 19:43:41 -0700
 From:   Like Xu <like.xu@linux.intel.com>
 To:     Peter Zijlstra <peterz@infradead.org>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -38,9 +38,9 @@ Cc:     Borislav Petkov <bp@alien8.de>,
         wei.w.wang@intel.com, eranian@google.com, liuxiangdong5@huawei.com,
         linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
         Like Xu <like.xu@linux.intel.com>
-Subject: [PATCH v6 10/16] KVM: x86: Set PEBS_UNAVAIL in IA32_MISC_ENABLE when PEBS is enabled
-Date:   Tue, 11 May 2021 10:42:08 +0800
-Message-Id: <20210511024214.280733-11-like.xu@linux.intel.com>
+Subject: [PATCH v6 11/16] KVM: x86/pmu: Adjust precise_ip to emulate Ice Lake guest PDIR counter
+Date:   Tue, 11 May 2021 10:42:09 +0800
+Message-Id: <20210511024214.280733-12-like.xu@linux.intel.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210511024214.280733-1-like.xu@linux.intel.com>
 References: <20210511024214.280733-1-like.xu@linux.intel.com>
@@ -50,54 +50,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The bit 12 represents "Processor Event Based Sampling Unavailable (RO)" :
-	1 = PEBS is not supported.
-	0 = PEBS is supported.
+The PEBS-PDIR facility on Ice Lake server is supported on IA31_FIXED0 only.
+If the guest configures counter 32 and PEBS is enabled, the PEBS-PDIR
+facility is supposed to be used, in which case KVM adjusts attr.precise_ip
+to 3 and request host perf to assign the exactly requested counter or fail.
 
-A write to this PEBS_UNAVL available bit will bring #GP(0) when guest PEBS
-is enabled. Some PEBS drivers in guest may care about this bit.
+The cpu model check is also required since some platforms may place the
+PEBS-PDIR facility in another counter index.
 
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 ---
- arch/x86/kvm/vmx/pmu_intel.c | 2 ++
- arch/x86/kvm/x86.c           | 4 ++++
- 2 files changed, 6 insertions(+)
+ arch/x86/kvm/pmu.c | 2 ++
+ arch/x86/kvm/pmu.h | 7 +++++++
+ 2 files changed, 9 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 58f32a55cc2e..296246bf253d 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -588,6 +588,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 		bitmap_set(pmu->all_valid_pmc_idx, INTEL_PMC_IDX_FIXED_VLBR, 1);
- 
- 	if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_FORMAT) {
-+		vcpu->arch.ia32_misc_enable_msr &= ~MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
- 		if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_BASELINE) {
- 			pmu->pebs_enable_mask = ~pmu->global_ctrl;
- 			pmu->reserved_bits &= ~ICL_EVENTSEL_ADAPTIVE;
-@@ -601,6 +602,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 				~((1ull << pmu->nr_arch_gp_counters) - 1);
- 		}
- 	} else {
-+		vcpu->arch.ia32_misc_enable_msr |= MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
- 		vcpu->arch.perf_capabilities &= ~PERF_CAP_PEBS_MASK;
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 0f86c1142f17..d3f746877d1b 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -149,6 +149,8 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+ 		 * in the PEBS record is calibrated on the guest side.
+ 		 */
+ 		attr.precise_ip = 1;
++		if (x86_match_cpu(vmx_icl_pebs_cpu) && pmc->idx == 32)
++			attr.precise_ip = 3;
  	}
- }
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index abe3ea69078c..c1ab5bcf75cc 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3212,6 +3212,10 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		break;
- 	case MSR_IA32_MISC_ENABLE:
- 		data &= ~MSR_IA32_MISC_ENABLE_EMON;
-+		if (!msr_info->host_initiated &&
-+		    (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_FORMAT) &&
-+		    (data & MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL))
-+			return 1;
- 		if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT) &&
- 		    ((vcpu->arch.ia32_misc_enable_msr ^ data) & MSR_IA32_MISC_ENABLE_MWAIT)) {
- 			if (!guest_cpuid_has(vcpu, X86_FEATURE_XMM3))
+ 
+ 	event = perf_event_create_kernel_counter(&attr, -1, current,
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 67e753edfa22..1af86ae1d3f2 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -4,6 +4,8 @@
+ 
+ #include <linux/nospec.h>
+ 
++#include <asm/cpu_device_id.h>
++
+ #define vcpu_to_pmu(vcpu) (&(vcpu)->arch.pmu)
+ #define pmu_to_vcpu(pmu)  (container_of((pmu), struct kvm_vcpu, arch.pmu))
+ #define pmc_to_pmu(pmc)   (&(pmc)->vcpu->arch.pmu)
+@@ -16,6 +18,11 @@
+ #define VMWARE_BACKDOOR_PMC_APPARENT_TIME	0x10002
+ 
+ #define MAX_FIXED_COUNTERS	3
++static const struct x86_cpu_id vmx_icl_pebs_cpu[] = {
++	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_D, NULL),
++	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_X, NULL),
++	{}
++};
+ 
+ struct kvm_event_hw_type_mapping {
+ 	u8 eventsel;
 -- 
 2.31.1
 
