@@ -2,137 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 200CC37AAF9
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 17:42:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCEE037AB11
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 17:46:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231824AbhEKPnp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 May 2021 11:43:45 -0400
-Received: from foss.arm.com ([217.140.110.172]:50072 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231609AbhEKPno (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 May 2021 11:43:44 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B5AF8D6E;
-        Tue, 11 May 2021 08:42:37 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F31D13F718;
-        Tue, 11 May 2021 08:42:36 -0700 (PDT)
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [kvm-unit-tests BUG] lib/ldiv32.c breaks arm compilation
-Message-ID: <348f023d-f313-3d98-dc18-b53b6879fe45@arm.com>
-Date:   Tue, 11 May 2021 16:43:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S231852AbhEKPsC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 May 2021 11:48:02 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:26500 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231764AbhEKPsB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 May 2021 11:48:01 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14BFWnx8065318;
+        Tue, 11 May 2021 11:46:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=uXO05UFzDX2kOyKxIHxz7GAoCbbFq4yyVqiOFNRnihM=;
+ b=gd3GqF4TdsfnmTb65T1UwLkssp6XKPBcW++zSpHPKdOBib8DTweJj8bKssmpCN5Q9yLh
+ 2pBfOiCzG9ZNeS3dxE1UggUA0jcQIP8YAeUz5NaNPbh6O7LFkE9BHyZMvncOsnIKGKOp
+ gnebyoJNw2N711c46an76JH6e724r4v/aw+2hpyLOrh2fkupTvG1jIT9n+8Kg93rkE9h
+ 4oQt5YSfGbqnpueXS+DTgG24/xhFAlxtXncFFpsRolGFtnscr/QO+DVMRxMi6bj6ntpG
+ Nhhh1WuelHIb6/4baJfGq7TABY5PJ9yW/u/xrEvPHEpkLkarXtXQ9vrEcwllbZqZK2K4 Ww== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38fsr5y5kg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 May 2021 11:46:54 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14BFWnVw065306;
+        Tue, 11 May 2021 11:46:53 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38fsr5y5hw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 May 2021 11:46:53 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14BFh5YV009068;
+        Tue, 11 May 2021 15:46:51 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma02fra.de.ibm.com with ESMTP id 38dj988xw4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 May 2021 15:46:50 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14BFkLxj34734346
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 11 May 2021 15:46:21 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 653C14C040;
+        Tue, 11 May 2021 15:46:48 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BE6B14C044;
+        Tue, 11 May 2021 15:46:47 +0000 (GMT)
+Received: from ibm-vm (unknown [9.145.13.244])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 11 May 2021 15:46:47 +0000 (GMT)
+Date:   Tue, 11 May 2021 17:46:45 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        cohuck@redhat.com, linux-s390@vger.kernel.org, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH 2/4] lib: s390x: sclp: Extend feature
+ probing
+Message-ID: <20210511174645.550c741d@ibm-vm>
+In-Reply-To: <2f0284e1-b1e0-39d6-1fe0-3be808be1849@redhat.com>
+References: <20210510150015.11119-1-frankja@linux.ibm.com>
+        <20210510150015.11119-3-frankja@linux.ibm.com>
+        <b0db681f-bfe3-5cf3-53f8-651bba04a5c5@redhat.com>
+        <20210511164137.0bba2493@ibm-vm>
+        <2f0284e1-b1e0-39d6-1fe0-3be808be1849@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 2TAF1BV_n3EykHt4V4g_nZSnNELbbFc8
+X-Proofpoint-ORIG-GUID: cfIqKpPfDtsfkyoparEfkTRV3s-LG0Rj
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-11_02:2021-05-11,2021-05-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
+ mlxlogscore=999 malwarescore=0 suspectscore=0 impostorscore=0 bulkscore=0
+ adultscore=0 lowpriorityscore=0 clxscore=1015 spamscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
+ definitions=main-2105110112
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On Tue, 11 May 2021 17:38:04 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-Commit 0b2d3dafc0d3 ("libcflat: provide long division routines"), which added the
-lib/ldiv32.c file, breaks compilation for the arm architecture; arm64 seems to be
-working just fine.
+> On 11.05.21 16:41, Claudio Imbrenda wrote:
+> > On Tue, 11 May 2021 13:43:36 +0200
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> On 10.05.21 17:00, Janosch Frank wrote:  
+> >>> Lets grab more of the feature bits from SCLP read info so we can
+> >>> use them in the cpumodel tests.
+> >>>
+> >>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> >>> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> >>> ---
+> >>>    lib/s390x/sclp.c | 20 ++++++++++++++++++++
+> >>>    lib/s390x/sclp.h | 38 +++++++++++++++++++++++++++++++++++---
+> >>>    2 files changed, 55 insertions(+), 3 deletions(-)
+> >>>
+> >>> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
+> >>> index f11c2035..f25cfdb2 100644
+> >>> --- a/lib/s390x/sclp.c
+> >>> +++ b/lib/s390x/sclp.c
+> >>> @@ -129,6 +129,13 @@ CPUEntry *sclp_get_cpu_entries(void)
+> >>>    	return (CPUEntry *)(_read_info +
+> >>> read_info->offset_cpu); }
+> >>>    
+> >>> +static bool sclp_feat_check(int byte, int mask)
+> >>> +{
+> >>> +	uint8_t *rib = (uint8_t *)read_info;
+> >>> +
+> >>> +	return !!(rib[byte] & mask);
+> >>> +}  
+> >>
+> >> Instead of a mask, I'd just check for bit (offset) numbers within
+> >> the byte.
+> >>
+> >> static bool sclp_feat_check(int byte, int bit)
+> >> {
+> >> 	uint8_t *rib = (uint8_t *)read_info;
+> >>
+> >> 	return !!(rib[byte] & (0x80 >> bit));
+> >> }  
+> > 
+> > using a mask might be useful to check multiple facilities at the
+> > same time, but in that case the check should be  
+> 
+> IMHO checking with a mask here multiple facilities will be very error 
+> prone either way ... and we only have a single byte to check for.
 
-On Arch Linux:
+as I said, I do not have a strong opinion either way :)
 
-$ ./configure --arch=arm --cross-prefix=arm-none-eabi-
-$ make clean && make
-rm -f lib/arm/asm-offsets.h lib/arm/asm-offsets.s \
-      lib/generated/asm-offsets.h
-rm -f arm/*.{o,flat,elf} lib/arm/libeabi.a lib/arm/eabi_compat.o \
-      arm/.*.d lib/arm/.*.d
-  CLEAN (libfdt)
-rm -f lib/libfdt/*.o lib/libfdt/.*.d
-rm -f lib/libfdt/libfdt.so.1
-rm -f lib/libfdt/libfdt.a
-rm -f lib/.*.d lib/libcflat.a lib/argv.o lib/printf.o lib/string.o lib/abort.o
-lib/report.o lib/stack.o lib/arm/spinlock.o lib/arm/processor.o lib/arm/stack.o
-lib/ldiv32.o lib/util.o lib/getchar.o lib/alloc_phys.o lib/alloc_page.o
-lib/vmalloc.o lib/alloc.o lib/devicetree.o lib/pci.o lib/pci-host-generic.o
-lib/pci-testdev.o lib/virtio.o lib/virtio-mmio.o lib/chr-testdev.o lib/arm/io.o
-lib/arm/setup.o lib/arm/mmu.o lib/arm/bitops.o lib/arm/psci.o lib/arm/smp.o
-lib/arm/delay.o lib/arm/gic.o lib/arm/gic-v2.o lib/arm/gic-v3.o
-[..]
-arm-none-eabi-gcc -marm -mfpu=vfp -mcpu=cortex-a15 -mno-unaligned-access
--std=gnu99 -ffreestanding -O2 -I /home/alex/data/repos/kvm-unit-tests/lib -I
-/home/alex/data/repos/kvm-unit-tests/lib/libfdt -I lib -g -MMD -MF lib/.ldiv32.d
--fno-strict-aliasing -fno-common -Wall -Wwrite-strings -Wempty-body
--Wuninitialized -Wignored-qualifiers -Werror  -fno-omit-frame-pointer 
--fno-stack-protector    -Wno-frame-address -D__U32_LONG_FMT__  -fno-pic  -no-pie 
--Wclobbered  -Wunused-but-set-parameter  -Wmissing-parameter-type 
--Wold-style-declaration -Woverride-init -Wmissing-prototypes -Wstrict-prototypes  
--c -o lib/ldiv32.o lib/ldiv32.c
-lib/ldiv32.c: In function '__moddi3':
-lib/ldiv32.c:73:11: error: 'rem' may be used uninitialized in this function
-[-Werror=maybe-uninitialized]
-   73 |  uint64_t rem;
-      |           ^~~
-lib/ldiv32.c: In function '__umoddi3':
-lib/ldiv32.c:75:9: error: 'rem' may be used uninitialized in this function
-[-Werror=maybe-uninitialized]
-   75 |  return rem;
-      |         ^~~
-cc1: all warnings being treated as errors
-make: *** [<builtin>: lib/ldiv32.o] Error 1
-$ arm-none-eabi-gcc --version
-arm-none-eabi-gcc (Arch Repository) 10.3.0
-Copyright (C) 2020 Free Software Foundation, Inc.
-This is free software; see the source for copying conditions.  There is NO
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-On Fedora 33:
-
-$ ./configure --arch=arm --cross-prefix=arm-linux-gnu-
-$ make clean && make
-rm -f lib/arm/asm-offsets.h lib/arm/asm-offsets.s \
-      lib/generated/asm-offsets.h
-rm -f arm/*.{o,flat,elf} lib/arm/libeabi.a lib/arm/eabi_compat.o \
-      arm/.*.d lib/arm/.*.d
-  CLEAN (libfdt)
-rm -f lib/libfdt/*.o lib/libfdt/.*.d
-rm -f lib/libfdt/libfdt.so.1
-rm -f lib/libfdt/libfdt.a
-rm -f lib/.*.d lib/libcflat.a lib/argv.o lib/printf.o lib/string.o lib/abort.o
-lib/report.o lib/stack.o lib/arm/spinlock.o lib/arm/processor.o lib/arm/stack.o
-lib/ldiv32.o lib/util.o lib/getchar.o lib/alloc_phys.o lib/alloc_page.o
-lib/vmalloc.o lib/alloc.o lib/devicetree.o lib/pci.o lib/pci-host-generic.o
-lib/pci-testdev.o lib/virtio.o lib/virtio-mmio.o lib/chr-testdev.o lib/arm/io.o
-lib/arm/setup.o lib/arm/mmu.o lib/arm/bitops.o lib/arm/psci.o lib/arm/smp.o
-lib/arm/delay.o lib/arm/gic.o lib/arm/gic-v2.o lib/arm/gic-v3.o
-[..]
-arm-linux-gnu-gcc -marm -mfpu=vfp -mcpu=cortex-a15 -mno-unaligned-access
--std=gnu99 -ffreestanding -O2 -I /home/alex/data/repos/kvm-unit-tests/lib -I
-/home/alex/data/repos/kvm-unit-tests/lib/libfdt -I lib -g -MMD -MF lib/.ldiv32.d
--fno-strict-aliasing -fno-common -Wall -Wwrite-strings -Wempty-body
--Wuninitialized -Wignored-qualifiers -Werror  -fno-omit-frame-pointer 
--fno-stack-protector    -Wno-frame-address   -fno-pic  -no-pie  -Wclobbered 
--Wunused-but-set-parameter  -Wmissing-parameter-type  -Wold-style-declaration
--Woverride-init -Wmissing-prototypes -Wstrict-prototypes   -c -o lib/ldiv32.o
-lib/ldiv32.c
-lib/ldiv32.c:1:10: fatal error: inttypes.h: No such file or directory
-    1 | #include <inttypes.h>
-      |          ^~~~~~~~~~~~
-compilation terminated.
-make: *** [<builtin>: lib/ldiv32.o] Error 1
-$ arm-linux-gnu-gcc --version
-arm-linux-gnu-gcc (GCC) 10.2.1 20200826 (Red Hat Cross 10.2.1-3)
-Copyright (C) 2020 Free Software Foundation, Inc.
-This is free software; see the source for copying conditions.  There is NO
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-Reverting the commit makes arm build again. I am not familiar with toolchains, and
-unfortunately I can't propose a fix.
-
-Thanks,
-
-Alex
 
