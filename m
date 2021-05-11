@@ -2,204 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 33ED637AE7C
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 20:29:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89D4437AE87
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 20:34:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231777AbhEKSaV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 May 2021 14:30:21 -0400
-Received: from mail-dm6nam10on2083.outbound.protection.outlook.com ([40.107.93.83]:47521
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        id S232053AbhEKSgA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 May 2021 14:36:00 -0400
+Received: from mail-mw2nam12on2080.outbound.protection.outlook.com ([40.107.244.80]:45793
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231329AbhEKSaU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 May 2021 14:30:20 -0400
+        id S231956AbhEKSf7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 May 2021 14:35:59 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mVf9mUBzc2onnPzsYaw52eHAOsolEmhsmTPej4e3Hr/1mjtMXeCBb/e+ChSbMSff5+kXPFYGUXlEG7YRzi89LxNVEabvgtja8rKNhBZLpTrn7V+IDF28wvXsm+54wivePeLjYrLtPOXEiDpYcgjFCcDaH95jia+rRtckxU2F2/o/vzsT+I8i45TYkAIM0a+vywqr2PyRQcZmQ+uSz0Vut77Kdtw8yhQ+bebsKHUjHzCXE+5d5C5L/LXpI0FFthRMSDcP6695QcYYqK2hdyzWHErqkbJu03OvH/jSozlQWXc4iHLMuHXEcgbSIcHzQVs1/EXLHNlEhRcqLtz1hYwqYA==
+ b=GUDmjpha5x0X/LUm7fBpjqcvrauYBZmarqKy8GSw7FWWyee6OyRFEaYNJS4pAJUUxG+Ijoe5tSnV3XjtuKDomEmk0+DaU/QTqRRt1+2elYbIb5SQgqP2eelN4IPaVbqHQ8t0+1udRPVOUFM0gRus2fTJSHoIKgZPu9uTowc8rTSotvTFr4PQ95puWUHtg8/FjSgzgrqbQ9uiLsfouKXOiWlVR4lrLwPifYE9Hd/mj7VY9pMf/iW0fVuAVwEBsWuppSqCaG8IbAicRLm7CRqcViEfwJsRLBgN0FEQBRhYc+QFt4hb5xgJzt305Tfu8HrzPdzVF2euHu7+pyXxDCFgUw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p4bqp8QF99fty+LTgozKn9SocY984CaQPtTO3GgT5Mk=;
- b=oc5BBVhIE7WsVqn6p6n1Z3U0llrW+icuf5rpOSFKdS6gic2IuGjIMGKD6poWCZUlK37hwrLPcg/E3w3UKxuIr4Y/j83GBPmpptVwuypdhJWIn511VySb0wTxbBgp1rPkPmUFwbPjJNctoZMmJvRiE0HGEvF3OYN1bbkqw3ozKoIc9GgfTJRrMBvJWtHoPImOgdi4VhFChMvI/AuwBKz/IBfVSMkHzlJtRniNIVKLMeNTyAOXp0GOSqgrNqNoh3b1Wo9NIfZkuIS8BhdgEMwkxSQeKYgIs6XkplUdfARfDD5oU+zvaK+3QqCN5FJzg87429KydPRav4uhTOhK1PAWYg==
+ bh=rzyJkmuEPuXbHr47JkJZe09ERFsolCCVdGAei7/KWxg=;
+ b=SRLkHV9tIy/cdj0+GfMFtlzcPEeZ+PnkXLh9L73g5jc+VsAx0K93MS0lnvDub+YMOcAq6Rb1WDPdHlWL/sScTLXHC4TnIyp/jkfkm+E09HCf0hQaOhDNM6hZlq13vfd8Tv0M13J/Rtq3kO43XAVLnIv7FmA/f74Kap2htGgfFsZt9nrBherDEgvM0JhEE9lFRueb93CiHmiX/pAduz+K/6xQNkfPo4QyqbOQwxTIKLjMGu2epok55oh4B4Nvree+PYiZQX6/+AqG9VA/5SXY1rPmSv4J4gvXUsXE14rnCSnLYpguCboSGR0cpzy2m6gXTRm4c3f01YDDiYOsA3AjIg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p4bqp8QF99fty+LTgozKn9SocY984CaQPtTO3GgT5Mk=;
- b=zEMwuSkpYp+JPYCcRSUaVrfaZlBbD/rxrzi/wy6GaPqad8t7FC/J/2sCX/p5Rni+LVohvTZs7WTaYcrqSYiroYC5B6oLvaKJwgkjU/chWPbSYPFu7m2HYWPn5pcftWiB+TCOT+5evEOjWnnB1bWVuUQVrv540M26I5A8ZqUpILM=
+ bh=rzyJkmuEPuXbHr47JkJZe09ERFsolCCVdGAei7/KWxg=;
+ b=gbnDtpCZTEbDtD0sRB6RRD/DJ05Mhv6ASbdcoZihpULFrXxMVyu4NaPFgn/Y09FfrNqLL/p2NEUxmA53AEoYD0ZgZlEZvk+DHf+5YXHUGXkNRH9QBUa7qJcEcf+z2xOaMAQzubXZ6u2WjEZs7RVvthfrwEeTcJnE/f8ZHqYDv8Q=
 Authentication-Results: intel.com; dkim=none (message not signed)
  header.d=none;intel.com; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4429.namprd12.prod.outlook.com (2603:10b6:806:73::20) with
+ by SN1PR12MB2512.namprd12.prod.outlook.com (2603:10b6:802:31::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4129.25; Tue, 11 May
- 2021 18:29:03 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4108.24; Tue, 11 May
+ 2021 18:34:51 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4129.025; Tue, 11 May 2021
- 18:29:03 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        tglx@linutronix.de, jroedel@suse.de, thomas.lendacky@amd.com,
-        pbonzini@redhat.com, mingo@redhat.com, dave.hansen@intel.com,
-        rientjes@google.com, seanjc@google.com, peterz@infradead.org,
-        hpa@zytor.com, tony.luck@intel.com
-Subject: Re: [PATCH Part1 RFC v2 02/20] x86/sev: Save the negotiated GHCB
- version
-To:     Borislav Petkov <bp@alien8.de>
-References: <20210430121616.2295-1-brijesh.singh@amd.com>
- <20210430121616.2295-3-brijesh.singh@amd.com> <YJpM+VZaEr68hTwZ@zn.tnic>
+ 18:34:51 +0000
+Cc:     brijesh.singh@amd.com, Peter Gonda <pgonda@google.com>,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        kvm list <kvm@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, jroedel@suse.de,
+        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        David Rientjes <rientjes@google.com>, peterz@infradead.org,
+        "H. Peter Anvin" <hpa@zytor.com>, tony.luck@intel.com
+Subject: Re: [PATCH Part2 RFC v2 36/37] KVM: SVM: Provide support for
+ SNP_GUEST_REQUEST NAE event
+To:     Sean Christopherson <seanjc@google.com>
+References: <20210430123822.13825-1-brijesh.singh@amd.com>
+ <20210430123822.13825-37-brijesh.singh@amd.com>
+ <CAMkAt6ottZkx02-ykazkG-5Tu5URv-xwOjWOZ=XMAXv98_HOYA@mail.gmail.com>
+ <f357d874-a369-93b6-ffa1-75c643596c81@amd.com> <YJmjAaogWeFgCEmb@google.com>
 From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <36add6ab-0115-d290-facd-2709e3c93fb9@amd.com>
-Date:   Tue, 11 May 2021 13:29:00 -0500
+Message-ID: <07ce14c1-d9b2-2a88-9297-cae4e8dbea1f@amd.com>
+Date:   Tue, 11 May 2021 13:34:48 -0500
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
  Gecko/20100101 Thunderbird/78.10.0
-In-Reply-To: <YJpM+VZaEr68hTwZ@zn.tnic>
+In-Reply-To: <YJmjAaogWeFgCEmb@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
 X-Originating-IP: [70.112.153.56]
-X-ClientProxiedBy: SN4PR0501CA0099.namprd05.prod.outlook.com
- (2603:10b6:803:42::16) To SN6PR12MB2718.namprd12.prod.outlook.com
+X-ClientProxiedBy: SN6PR16CA0066.namprd16.prod.outlook.com
+ (2603:10b6:805:ca::43) To SN6PR12MB2718.namprd12.prod.outlook.com
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SN4PR0501CA0099.namprd05.prod.outlook.com (2603:10b6:803:42::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4129.12 via Frontend Transport; Tue, 11 May 2021 18:29:02 +0000
+Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SN6PR16CA0066.namprd16.prod.outlook.com (2603:10b6:805:ca::43) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4108.25 via Frontend Transport; Tue, 11 May 2021 18:34:50 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8afea1ff-637a-40c6-9298-08d914aaa700
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4429:
+X-MS-Office365-Filtering-Correlation-Id: 770ac873-dafe-4d55-cde4-08d914ab7686
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2512:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB44292F077CB2262236D00C7CE5539@SA0PR12MB4429.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Microsoft-Antispam-PRVS: <SN1PR12MB2512DA1187C702DE45C27F53E5539@SN1PR12MB2512.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zN0kF67vEu9ZxH1L65Z0LAOSXqOdhIcOBt/82A0zwJlJIJNgIxq5B51Sz0k+BhJGL8ofAbL49dGgQbhHujOuu7eIhuPo7ZBnhptD3N1P08pOxdrq/WQEi2ZWgfLSz5p164TaWlUMfVLvE6FclMR2LCUvY74JuI4bvrYNyCeo6Mr9OsxWQILpdb4pcDhlYXO9IcsQT1fa1tbFL0TVLI+v95qAnN8mCndZYqr2HCrRTUgB1B/LRxpcjV2UU/QQT0JI2FK2I1301Bh5ooNLwC8H7W6bsHH/JZDI9oMmtwmyOqMo18RPqroq2c/mMUcq63MamUmS2Y/NXYPYGxYQIaPfbRjfgv/4EnLYGUtAG1iRfIFBm9Euznz09rk0/Rijj/k0Vlh9KlIVdO7ZJTLoXZtt8pk4JqXqABQdotRPvISrlwY6TDvpw9bzNe2s1dF8Ablivp+6l9wDy59mtFGpHcjZoJKpvr7+QHd70eMiDkFRduw5EKJssiYBRvsXJ0meTJxlILk/MV4AQNaZxFh0dXIjEmrKEfKRGZ3c2MMXTmzOMSdt7v3H6bEtOsbgzEH9/r26Bkc0pODXx8AyQBi5woE9ToOBkvBYkyTFzZChEzQIpTPJENDUgVvueRGxqAs7RF3IlXFty8tqQq40me5eInG0n7C20gTVIi811aCPc3PHg1q0o3hPvDuawoE80CBkAJ0XxFZMTr037Z8D2x+wcwLTCbr3hiE1wfOPQgqh12s+9cQ=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(366004)(346002)(396003)(39860400002)(376002)(8676002)(16526019)(186003)(8936002)(6506007)(53546011)(6486002)(36756003)(31696002)(478600001)(52116002)(66476007)(38100700002)(44832011)(6512007)(66556008)(6916009)(26005)(5660300002)(956004)(4326008)(38350700002)(31686004)(7416002)(2616005)(86362001)(2906002)(83380400001)(316002)(66946007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?TU1lbmRlcUVFeThVSGxQTXllS0hCOWJGbGtjSGdlVkdud2JvRXdsenB0dTM2?=
- =?utf-8?B?SjkvMEhhRHQwUklYclJnYTdwVXZLbXN2SU03d2lzc01jVE5zczRzdDhwYUVV?=
- =?utf-8?B?cFRad1p1OTlSVUxWVUtXa05SR0o1bEpqUmJ6bE14SlR5SHYxQ0FDWEtTVWFF?=
- =?utf-8?B?RVRFbXVSTzFmZjhHSDE2Q1ZwM0JVM2hVWm9vdmxTUkNHdEtCQ1g4Mkk2dk1t?=
- =?utf-8?B?MHdBUlEyTEdEdjM2c1NQdmNhUnJWN1NOWmhmU1FlQ0xPUml5MUJTeTdYQkMx?=
- =?utf-8?B?QVBKNDFUdzNLTDNLUWRaVGtSblRFRDFzYVFlaFQ3cUdyOW10c0Q4OFhJbGlV?=
- =?utf-8?B?VnE0S2IrYm1HNE9MTXJEZDlvQndESW91YVlEaHpTaVVoNGY2b0NmU000Mito?=
- =?utf-8?B?ZU5La2NPM2creERad3JSMXdXVnN1eTN4OXFIK25OMXdNUnJSSmRTTUE4NzZz?=
- =?utf-8?B?THFWZ2pobjhNL01IOTBHYjIrWGUzbDBmQzhXajI2V2x4LzBCcU5YRURWTFRZ?=
- =?utf-8?B?YkRnTWFpeEsxaG9Yd0xhVEVFYXVvTEZsaWdIWXAyWThBcmxlVExXVmJiQS9K?=
- =?utf-8?B?a29XekZPb2xMUk4rTGFDeXZDTmNvTUlkZzNxOGlqbkFVWG5LNkpJR00yVG9X?=
- =?utf-8?B?c2x6OFJwSm03VStQOXZNbUhhVzhaNjdPMWRadGt4aU9lWUdJcWUxZGtKMHdh?=
- =?utf-8?B?UW0yZlhMMVRrWGdTb1pkR2JnSUhNdXNZSFdhS0ZVaXEzc3Q4UGVNMHIzaVhJ?=
- =?utf-8?B?bFR4Y0JDc0UwNEpXeUpaQmtLYk5sZTYxWmFUR1d5aVJOTUNqenI5dEhQank3?=
- =?utf-8?B?ejdZV1JXa25GS0t1RHN4WUh5d2FMMUNlb0V1M2x6L0ZEQTZUcDBleHV0dDR6?=
- =?utf-8?B?NkN0N0lTOWVNQmR1b1pCVjdUcnJrc0ZaNXZxeWlKdTJRSWxRUWtJZldJY3Fp?=
- =?utf-8?B?eXE3U0g2RFJBaWRrZ3IwM1ltM0JkNTlwR2htRkhsSDgwdDhkRXNqb2pkZ3ZV?=
- =?utf-8?B?c0tGU0JpbWJyUTZUUjF0R3E2RnEzZlIzVjVTbVdLWjJzODBoSDlSdmx1RnNZ?=
- =?utf-8?B?TkZ4UUpPUmRtOERHT0M4N2RnYzZCekJ4WFhFb0ZocE1LWGtaQmFHSTNlQnlS?=
- =?utf-8?B?ejRXZC9GdStVSFZIbTh4L2RvSmNLTzUzU0FOdnFPeEU2N1Z3MVdaUThEdkRR?=
- =?utf-8?B?TGR5S084OG82RW54dXdheW84R3QxZ05LWFY0QkV3dHhqQ3EwYXBrNmNUTTZX?=
- =?utf-8?B?QXhXTVBkNTI1T1hvOEJsYmxscjlhcHJYWWdIamNnRi9tWGdYei9EOWFjWk83?=
- =?utf-8?B?UTN4R0ZnQ3pua2NCZnpIdURqY1QwL29JWjZjdDhQWnlndDcxRytsSmtMRHZO?=
- =?utf-8?B?dnJkVm5RM0JMcHV6blFkNTJ1dE5wOE5zV1lvV2RNMkFwdjNmNE4yUnB6WXdu?=
- =?utf-8?B?UkV5WGlxclRvSGdzRlNzMzNvRkNxUTUzVVR5aVZ3L0JaZDlwaGNvcXg3NjBx?=
- =?utf-8?B?RHJsdkhqdXFaT1pjQW93aUpIZWNMY1A2akNBL05OeEZPS1RpZmRsUUI0Z2pQ?=
- =?utf-8?B?djhnbTRuTlZsK0UwenE2a3daMC9OQkxDMi94K1hvWUJONEMxMllaaDg1eEVY?=
- =?utf-8?B?Zk9URThScXBFTlVPN0luYmIvNWMxejF2eVRSS0xlRFVJSkJvMTNtL0ZOb2Rt?=
- =?utf-8?B?TDkrSnBWYWNiWExlSTlRWWliRDRzL1R2NDMvMUdhczVkdmNUZ0YreW40L0hQ?=
- =?utf-8?Q?7qlXFhVFxpLQUmoSaMZKiVwMfk/JgJ7RzkY+qu8?=
+X-Microsoft-Antispam-Message-Info: UgZHGSWMT5tt2iXCnCEyktH3FAu41LDRSK9tU+XeZQNrqKq3PaApSksbpQtcS+LowlM2HBa8rlHZTGYDJ7TeUEStyOWMxsbdLjTTLRR9Sdb39PQvzkIizb5nEeA3KIo6HBqbp8EWdlXKNgmDyMGlJzSEQFjaLdTViV4T5WTB/O/btOBBNkARJv/40pPhszMWQ6t+BGZTuUG8R+8hfwWtYmGPVF5d8No7CuCLcXDZVzDPTPuJRh7QRshb60I+RYUhqmQ3/LR51ZXi2V03EYpTmjx5ltB/qi5oQKEREkVkZsV3viu/kIxAUmHVK24881ro6sBh8dXs/h9o0o+CPAvWH1J41Nj5R8y3zqLa0u1zgnHoJTpF/vreBGyzd+qH5WTsBWZSSX8Sq9VehkBU27q5NDsjygp3mnr7RfetuBa17SJM1IdvinZfrDbCepb6yXzsbrM2f1j5TZ2zdsFNsKKJVn2sLqGBA6g07zrx9Jz2yvC+/+6ZGLHoLLpHjVkGaB5lOwCs4sHAoxK+/wq7HwRbvXyWddRUNUhGSQlxDBWWLm+2Hn5bn2wZyojHQUJ0zIZYHjXhZ/+DIBxF22xU0LqTVS0U5QN+K0xLTCMJlztjD+hBBUnPF6F+X6vvs4hyJCiQAH4MWx56uY8UIJ/VeUG6urx1Kl+nefFoEV6zvjI7GicEMUXYPCqWIja8pS0pkeSG4KbBaWMVEOw5SAQIkxUQmvNDiK2HPXmuVrVOL+v2rm4=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(39860400002)(396003)(136003)(366004)(376002)(66476007)(186003)(5660300002)(83380400001)(16526019)(6506007)(36756003)(956004)(6486002)(66556008)(31686004)(44832011)(86362001)(6512007)(31696002)(54906003)(7416002)(6916009)(316002)(52116002)(8936002)(2906002)(53546011)(4326008)(38100700002)(26005)(8676002)(2616005)(66946007)(38350700002)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?TldISFVjamk4K3dTQmdHUWtHWWFXV1Z2aFlMQ1AwTUczNTNxS0VST3R3WG5w?=
+ =?utf-8?B?RVJBZ21zSXEybDh2anhtUlFQeVFxZW9yalA2WTd3RGhVSkZtM1Uyd09CWkl1?=
+ =?utf-8?B?TTBuNkZIYkx5b2hmVFpvUUxqbWZYQ1RmZHJoQUZGNlR0NzhuNEpoZDN3MVpX?=
+ =?utf-8?B?SDJUUG8zZkxiMzgrNWVqaTJheE5ybmpSZ1VxNEJQMVppTU5SQ1RnSHY1Uk8v?=
+ =?utf-8?B?RDQvYTRmdTdXb0JXM0hVTmcybGNYNXVWZ0hRRlo1aEx6ZzB3NWFnZU9sNGxX?=
+ =?utf-8?B?cUFaR3hpc2I0V2Z2S05mN1hKTGFGVlhENzl3WlZTTjZMcjJaR09jcStrZkhR?=
+ =?utf-8?B?SFZKQStIaUF4dGtwTDB4TDRtQU5xWTd6cy9UUGFZU1BxaFNvTVBHRGh4T1Yy?=
+ =?utf-8?B?MHdua0JGUGtjeHpKUDVEU3g3MitIcWphYmx3eFFPR3B2dkV6N0ZqYUk5Q2Vs?=
+ =?utf-8?B?bWtzcDVlWitqcWtOcytHbXBVS1VDM2kyblkydnpHWG4zWmlLRVh5Nk8rT29z?=
+ =?utf-8?B?bHJsMWhxMXpZdDBXbVphM0tyeldUd21vREN0a2hyNXkyMHovclJPZ2xMbmpE?=
+ =?utf-8?B?Z2NCd0ZlS1NJbXNmNk1mOU9vc01DNy9RSUc2bTI2K2dGUUZHRHkwQ3VVcDQ2?=
+ =?utf-8?B?M3lXTlZOWkpBQXd1UWUxYy9tazNKU2tOS3pGNWFJUzJzNWdUci9tQVY5L0pk?=
+ =?utf-8?B?WktVYlV3S1ZVdjV1SUZtZHJQd2F4Y0VHRFRLQlJXODJoc1kwTHdWcUZsd3BP?=
+ =?utf-8?B?WGwzRkhmVTVDcTloWmF3YkdFSVNKcG1lMVF3ZjU1MmhPZGw1RVlic21CdFZ1?=
+ =?utf-8?B?aDhwVVl1d3hVclZhdlF2Y0Q2Qk1zMHBYazdyVmRtV2l6dFlnNU1jT1VZdGtK?=
+ =?utf-8?B?VERReHpnUUFhN0hhNnZPQ2hNTjdTeHNsdnc4WHVTRmJPb25YRDMwOHlIbHl0?=
+ =?utf-8?B?QUdoOTNmeHdYUTNxUEpTNU5xN3FEOSs0bUhJdEpHYTBDeTJIbWlTakN1QVIz?=
+ =?utf-8?B?TkVtenk4SjgzOHdDMk1MTjRhdUZNVUo4S3BFaXdNeWNXZ2VsdzNnTDRaZHlk?=
+ =?utf-8?B?Y3RrNW8xQlFBWGkrZ0F5NWowb3E0YlhwNjRlVDBBU2pwNlNZUVh3a2FGUEF5?=
+ =?utf-8?B?VkJ6VlJ3L3lUNHR1akpINVhxRXd4VTI0a2lONCtBUTc5RzkwdVRKSXFuajc3?=
+ =?utf-8?B?Sk5NT01vV3lMTGpxekhVSG53b093YkgvMEFVS2hINzJacTBBWE5IL3dSM0w5?=
+ =?utf-8?B?Z0VpVHlROC9kNG1NTi9xRTY4TGIycmFoR0xESWUxanE0WGtLaEdSQUFNbGNl?=
+ =?utf-8?B?a2o3TU5NbFpYalByQXlvd1hWWHpWc2hJOG1CSCtGaEwyVUxEMWhXUFd4dnNK?=
+ =?utf-8?B?NUNMMXMwbW1wRUdXd0pGWjJLK0E1a0ZlSDl4cUQvdG83RlhEN1dnb1A1VlZi?=
+ =?utf-8?B?MSsrK3BNTjB6TnN2L0FGTFZ0dFFMS0loOWplbFhXTk1ZYXZ1bHBwOTZVYU90?=
+ =?utf-8?B?a3FkY0J1c2VSQW1vamhqd0luKzkwT2ZGMFgzU0xsM21aeFJ0MUw5NUlyOWxY?=
+ =?utf-8?B?VXdnaGExcm9NK2JFUUFCTUtJRDQ3R2V2S3ltWXNRaVVFSzcxcnVZOFVySTkv?=
+ =?utf-8?B?VnlKS1YwUjc3RkpNVnJpNk0xYkp4ZS9lck5taHVDY3o2NlBUS3owcUtmamdh?=
+ =?utf-8?B?eS9zNk92S2xtZFNXdjRVNFc3RzZyNm51ZWRIZnl4djV1bXlxMHM0UGUxUnk2?=
+ =?utf-8?Q?PCnGvlTtGspnLlCWKMv+9KuvhR8uLfHZxXDkKwK?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8afea1ff-637a-40c6-9298-08d914aaa700
+X-MS-Exchange-CrossTenant-Network-Message-Id: 770ac873-dafe-4d55-cde4-08d914ab7686
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2021 18:29:03.0822
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2021 18:34:51.1784
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vmU4kMIePtjluHjgFDzx9qOUTJzUFqGmAUn+7keYSGpMNdh3A3AZmZvbIQOhlYnxclvc9Hj7wcE2iCWYm5FTCA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4429
+X-MS-Exchange-CrossTenant-UserPrincipalName: mwaMS4C7jsj+iZwDr38VsmViuBnM4xWA6HbgbLG+jUArCZgC3UWXZssPmt2cQiqSBvuIidOTakRF3XI9koPGmA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2512
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 5/11/21 4:23 AM, Borislav Petkov wrote:
-> On Fri, Apr 30, 2021 at 07:15:58AM -0500, Brijesh Singh wrote:
->> The SEV-ES guest calls the sev_es_negotiate_protocol() to negotiate the
->> GHCB protocol version before establishing the GHCB. Cache the negotiated
->> GHCB version so that it can be used later.
->>
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->> ---
->>  arch/x86/include/asm/sev.h   |  2 +-
->>  arch/x86/kernel/sev-shared.c | 15 ++++++++++++---
->>  2 files changed, 13 insertions(+), 4 deletions(-)
->>
->> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
->> index fa5cd05d3b5b..7ec91b1359df 100644
->> --- a/arch/x86/include/asm/sev.h
->> +++ b/arch/x86/include/asm/sev.h
->> @@ -12,7 +12,7 @@
->>  #include <asm/insn.h>
->>  #include <asm/sev-common.h>
->>  
->> -#define GHCB_PROTO_OUR		0x0001UL
->> +#define GHCB_PROTOCOL_MIN	1ULL
->>  #define GHCB_PROTOCOL_MAX	1ULL
->>  #define GHCB_DEFAULT_USAGE	0ULL
->>  
->> diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
->> index 6ec8b3bfd76e..48a47540b85f 100644
->> --- a/arch/x86/kernel/sev-shared.c
->> +++ b/arch/x86/kernel/sev-shared.c
->> @@ -14,6 +14,13 @@
->>  #define has_cpuflag(f)	boot_cpu_has(f)
->>  #endif
->>  
->> +/*
->> + * Since feature negotitation related variables are set early in the boot
->> + * process they must reside in the .data section so as not to be zeroed
->> + * out when the .bss section is later cleared.
->   *
->   * GHCB protocol version negotiated with the hypervisor.
->   */
->
->> +static u16 ghcb_version __section(".data") = 0;
-> Did you not see this when running checkpatch.pl on your patch?
->
-> ERROR: do not initialise statics to 0
-> #141: FILE: arch/x86/kernel/sev-shared.c:22:
-> +static u16 ghcb_version __section(".data") = 0;
->
-I ignored it, because I thought I still need to initialize the value to
-zero because it does not go into .bss section which gets initialized to
-zero by kernel on boot.
+On 5/10/21 4:17 PM, Sean Christopherson wrote:
+> On Mon, May 10, 2021, Brijesh Singh wrote:
+>> On 5/10/21 1:57 PM, Peter Gonda wrote:
+>>>> +e_fail:
+>>>> +       ghcb_set_sw_exit_info_2(ghcb, rc);
+>>>> +       return;
+>>>> +
+>>>> +e_term:
+>>>> +       ghcb_set_sw_exit_info_1(ghcb, 1);
+>>>> +       ghcb_set_sw_exit_info_2(ghcb,
+>>>> +                               X86_TRAP_GP |
+>>>> +                               SVM_EVTINJ_TYPE_EXEPT |
+>>>> +                               SVM_EVTINJ_VALID);
+>>>> +}
+>>> I am probably missing something in the spec but I don't see any
+>>> references to #GP in the '4.1.7 SNP Guest Request' section. Why is
+>>> this different from e_fail?
+>> The spec does not say to inject the #GP, I chose this because guest is
+>> not adhering to the spec and there was a not a good error code in the
+>> GHCB spec to communicate this condition. Per the spec, both the request
+>> and response page must be a valid GPA. If we detect that guest is not
+>> following the spec then its a guest BUG. IIRC, other places in the KVM
+>> does something similar when guest is trying invalid operation.
+> The GHCB spec should be updated to define an error code, even if it's a blanket
+> statement for all VMGEXITs that fail to adhere to the spec.  Arbitrarily choosing
+> an error code and/or exception number makes the information useless to the guest
+> because the guest can't take specific action for those failures.  E.g. if there
+> is a return code specifically for GHCB spec violation, then the guest can panic,
+> WARN, etc... knowing that it done messed up.
 
-I guess I was wrong, maybe compiler or kernel build ensures that
-ghcb_version variable to be init'ed to zero because its marked static ?
+The GHCB is finalized and released so I don't think it will be covered
+in v2. But I will go ahead and file the report so that it is considered
+in the next updates. Having said that, I do see that for other commands
+(e.g, HV door bell page) the spec spell out that if guest provides an
+invalid GPA then inject a #GP. I guess we need to move that statement
+and apply to all the commands. Until then I am fine with not injecting
+#GP to not divert from the spec.
 
 
->>  static bool __init sev_es_check_cpu_features(void)
->>  {
->>  	if (!has_cpuflag(X86_FEATURE_RDRAND)) {
->> @@ -54,10 +61,12 @@ static bool sev_es_negotiate_protocol(void)
->>  	if (GHCB_MSR_INFO(val) != GHCB_MSR_SEV_INFO_RESP)
->>  		return false;
->>  
->> -	if (GHCB_MSR_PROTO_MAX(val) < GHCB_PROTO_OUR ||
->> -	    GHCB_MSR_PROTO_MIN(val) > GHCB_PROTO_OUR)
->> +	if (GHCB_MSR_PROTO_MAX(val) < GHCB_PROTOCOL_MIN ||
->> +	    GHCB_MSR_PROTO_MIN(val) > GHCB_PROTOCOL_MAX)
->>  		return false;
->>  
->> +	ghcb_version = min_t(size_t, GHCB_MSR_PROTO_MAX(val), GHCB_PROTOCOL_MAX);
-> How is that even supposed to work? GHCB_PROTOCOL_MAX is 1 so
-> ghcb_version will be always 1 when you do min_t() on values one of which
-> is 1.
->
-> Maybe I'm missing something...
-
-In patch #4, you will see that I increase the GHCB max protocol version
-to 2, and then min_t() will choose the lower value. I didn't combine
-version bump and caching into same patch because I felt I will be asked
-to break them into two logical patches.
-
-
->
+> "Injecting" an exception is particularly bad, because if the guest kernel takes
+> that request literally and emulates a #GP, then we can end up in a situation
+> where someone files a bug report because VMGEXIT is hitting a #GP and confusion
+> ensues.
