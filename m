@@ -2,180 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EFF3337A2C9
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 11:00:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE25337A300
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 11:08:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230517AbhEKJBV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 May 2021 05:01:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57216 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230439AbhEKJBU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 May 2021 05:01:20 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E709E611F1;
-        Tue, 11 May 2021 09:00:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620723613;
-        bh=ETvFtPpZWz6DN3iWb3G2WAPhojmYo6ps7EuchaChQ+E=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=PLGy/1LSbmraLJz9I+ZFpgkDxkCfvpVNiHxpQ06jZIl8i8GhyxDYM7Gy1/DkHiCt5
-         klo7h/HCiZCdE58jLyhFWvaAVP5oc9x+G/BoSRcOX7C3Tl/sTRBZmSPn8j1vcyPJNt
-         mRJS0yxqm/yCxF+CPVj6SxA/ae6jVWIEkJrXhN8oiyzJkjvRZFRVAZch9kSHP1iP93
-         oW7IG29Utyoqz+QwiX4h4Rg5Qegv470eEj7pH0f2MN9paDsUyx4y03dGzSMfb4uf2a
-         FDLqKCDGwM78HAqr/sdfeYExPB7ah8JOeYwd9qD22mRbJt8d7NaYnvORLTCVIJ25K4
-         6sDaroZmf8XGQ==
-Date:   Tue, 11 May 2021 11:00:02 +0200
-From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To:     Edward Cree <ecree.xilinx@gmail.com>
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        alsa-devel@alsa-project.org, coresight@lists.linaro.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
-        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-fpga@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-sgx@vger.kernel.org, linux-usb@vger.kernel.org,
-        mjpeg-users@lists.sourceforge.net, netdev@vger.kernel.org,
-        rcu@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH 00/53] Get rid of UTF-8 chars that can be mapped as
- ASCII
-Message-ID: <20210511110002.2f187f01@coco.lan>
-In-Reply-To: <ed65025c-1087-9672-7451-6d28e7ab8f92@gmail.com>
-References: <cover.1620641727.git.mchehab+huawei@kernel.org>
-        <2ae366fdff4bd5910a2270823e8da70521c859af.camel@infradead.org>
-        <20210510135518.305cc03d@coco.lan>
-        <df6b4567-030c-a480-c5a6-fe579830e8c0@gmail.com>
-        <YJk8LMFViV7Z3Uu7@casper.infradead.org>
-        <ed65025c-1087-9672-7451-6d28e7ab8f92@gmail.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S231253AbhEKJJT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 May 2021 05:09:19 -0400
+Received: from mail-vs1-f52.google.com ([209.85.217.52]:45980 "EHLO
+        mail-vs1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231189AbhEKJJS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 May 2021 05:09:18 -0400
+Received: by mail-vs1-f52.google.com with SMTP id x188so4253750vsx.12;
+        Tue, 11 May 2021 02:08:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=VWZENhS44KnEbYhJ55uNu4C5dSY972Eyg88PLcY/zho=;
+        b=ZYteCF6VMnbzLPAL9iAFHg4dIeYly3O1jQ5AW5JJ2oPvkDf9qaHUYPPSTqgNsxT5sH
+         z3T+D/pKNKeSsu6YOS9dBxElcxnKDvYdOPgcyDCb/u+Rjyfpj745mOZI32j9IjihwyUr
+         18QVNg5hgXGFGwhICErwrs1obuxQToEcdsLOybILakDy3FOXo5qg9Unde5N9jpGNBfOg
+         ksriRNSbrosR5iE6bMuQAlm+SInUEV4H0lm9pFhk+oCD0yP23p/y3/6M5kGXwnXTYgNz
+         2yQHWt/hx0eOG6fgVYxpn8Wuy1dv/f+HlL2gT5ilUwr//ZgxrlhnrNooAhGHlRhAGFyS
+         YgiQ==
+X-Gm-Message-State: AOAM532nrO/G0LpWV4ZfZEqMlg+EpjJ40uVfT8BX5GGt+EPxoDpKK11r
+        EdBs9u0cwCTCCcNf2gDYQKoQKiMkGjRtKiOxI+M=
+X-Google-Smtp-Source: ABdhPJweTlTBbaLMWAGki0KxVFdQqpl/ZcfogWI1Lhfowsw6ZamthDcv+jjw6/wD3nCQ2Fi0vyUoOcx9OTMR/abE99c=
+X-Received: by 2002:a67:3113:: with SMTP id x19mr17992653vsx.40.1620724090696;
+ Tue, 11 May 2021 02:08:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <20210330145430.996981-1-maz@kernel.org> <20210330145430.996981-8-maz@kernel.org>
+In-Reply-To: <20210330145430.996981-8-maz@kernel.org>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Tue, 11 May 2021 11:07:59 +0200
+Message-ID: <CAMuHMdWd5261ti-zKsroFLvWs0abaWa7G4DKefgPwFb3rEjnNw@mail.gmail.com>
+Subject: Re: [PATCH v19 7/7] ptp: arm/arm64: Enable ptp_kvm for arm/arm64
+To:     Marc Zyngier <maz@kernel.org>, jianyong.wu@arm.com
+Cc:     netdev <netdev@vger.kernel.org>, Yangbo Lu <yangbo.lu@nxp.com>,
+        John Stultz <john.stultz@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Paolo Bonzini <pbonzini@redhat.com>, seanjc@google.com,
+        Richard Cochran <richardcochran@gmail.com>,
+        Mark Rutland <Mark.Rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Andre Przywara <Andre.Przywara@arm.com>,
+        Steven Price <steven.price@arm.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        kvmarm@lists.cs.columbia.edu, KVM list <kvm@vger.kernel.org>,
+        Steve Capper <Steve.Capper@arm.com>, justin.he@arm.com,
+        Android Kernel Team <kernel-team@android.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Em Mon, 10 May 2021 15:33:47 +0100
-Edward Cree <ecree.xilinx@gmail.com> escreveu:
+Hi Marc, Jianyong,
 
-> On 10/05/2021 14:59, Matthew Wilcox wrote:
-> > Most of these
-> > UTF-8 characters come from latex conversions and really aren't
-> > necessary (and are being used incorrectly). =20
-> I fully agree with fixing those.
-> The cover-letter, however, gave the impression that that was not the
->  main purpose of this series; just, perhaps, a happy side-effect.
+On Tue, Mar 30, 2021 at 4:56 PM Marc Zyngier <maz@kernel.org> wrote:
+> From: Jianyong Wu <jianyong.wu@arm.com>
+>
+> Currently, there is no mechanism to keep time sync between guest and host
+> in arm/arm64 virtualization environment. Time in guest will drift compared
+> with host after boot up as they may both use third party time sources
+> to correct their time respectively. The time deviation will be in order
+> of milliseconds. But in some scenarios,like in cloud environment, we ask
+> for higher time precision.
+>
+> kvm ptp clock, which chooses the host clock source as a reference
+> clock to sync time between guest and host, has been adopted by x86
+> which takes the time sync order from milliseconds to nanoseconds.
+>
+> This patch enables kvm ptp clock for arm/arm64 and improves clock sync precision
+> significantly.
 
-Sorry for the mess. The main reason why I wrote this series is because
-there are lots of UTF-8 left-over chars from the ReST conversion.
-See:
-  - https://lore.kernel.org/linux-doc/20210507100435.3095f924@coco.lan/
+> --- a/drivers/ptp/Kconfig
+> +++ b/drivers/ptp/Kconfig
+> @@ -108,7 +108,7 @@ config PTP_1588_CLOCK_PCH
+>  config PTP_1588_CLOCK_KVM
+>         tristate "KVM virtual PTP clock"
+>         depends on PTP_1588_CLOCK
+> -       depends on KVM_GUEST && X86
+> +       depends on (KVM_GUEST && X86) || (HAVE_ARM_SMCCC_DISCOVERY && ARM_ARCH_TIMER)
 
-A large set of the UTF-8 letf-over chars were due to my conversion work,
-so I feel personally responsible to fix those ;-)
+Why does this not depend on KVM_GUEST on ARM?
+I.e. shouldn't the dependency be:
 
-Yet, this series has two positive side effects:
+    KVM_GUEST && (X86 || (HAVE_ARM_SMCCC_DISCOVERY && ARM_ARCH_TIMER))
 
- - it helps people needing to touch the documents using non-utf8 locales[1];
- - it makes easier to grep for a text;
+?
 
-[1] There are still some widely used distros nowadays (LTS ones?) that
-    don't set UTF-8 as default. Last time I installed a Debian machine
-    I had to explicitly set UTF-8 charset after install as the default
-    were using ASCII encoding (can't remember if it was Debian 10 or an
-    older version).
+>         default y
+>         help
+>           This driver adds support for using kvm infrastructure as a PTP
 
-Unintentionally, I ended by giving emphasis to the non-utf8 instead of
-giving emphasis to the conversion left-overs.
+Gr{oetje,eeting}s,
 
-FYI, this patch series originated from a discussion at linux-doc,
-reporting that Sphinx breaks when LANG is not set to utf-8[2]. That's
-why I probably ended giving the wrong emphasis at the cover letter.
+                        Geert
 
-[2] See https://lore.kernel.org/linux-doc/20210506103913.GE6564@kitsune.sus=
-e.cz/
-    for the original report. I strongly suspect that the VM set by Michal=20
-    to build the docs was using a distro that doesn't set UTF-8 as default.
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-    PS.:=20
-      I intend to prepare afterwards a separate fix to avoid Sphinx
-      logger to crash during Kernel doc builds when the locale charset
-      is not UTF-8, but I'm not too fluent in python. So, I need some
-      time to check if are there a way to just avoid python log crashes
-      without touching Sphinx code and without needing to trick it to=20
-      think that the machine's locale is UTF-8.
-
-See: while there was just a single document originally stored at the
-Kernel tree as a LaTeX document during the time we did the conversion
-(cdrom-standard.tex), there are several other documents stored as=20
-text that seemed to be generated by some tool like LaTeX, whose the
-original version were not preserved.=20
-
-Also, there were other documents using different markdown dialects=20
-that were converted via pandoc (and/or other similar tools). That's=20
-not to mention the ones that were converted from DocBook. Such
-tools tend to use some logic to use "neat" versions of some ASCII
-characters, like what this tool does:
-
-	https://daringfireball.net/projects/smartypants/
-
-(Sphinx itself seemed to use this tool on its early versions)
-
-All tool-converted documents can carry UTF-8 on unexpected places. See,
-on this series, a large amount of patches deal with U+A0 (NO-BREAK SPACE)
-chars. I can't see why someone writing a plain text document (or a ReST
-one) would type a NO-BREAK SPACE instead of a normal white space.
-
-The same applies, up to some sort, to curly commas: usually people just=20
-write ASCII "commas" on their documents, and use some tool like LaTeX
-or a text editor like libreoffice in order to convert them into
- =E2=80=9Cutf-8 curly commas=E2=80=9D[3].
-
-[3] Sphinx will do such things at the produced output, doing something=20
-    similar to what smartypants does, nowadays using this:
-
-	https://docutils.sourceforge.io/docs/user/smartquotes.html
-
-    E. g.:
-      - Straight quotes (" and ') turned into "curly" quote characters;
-      - dashes (-- and ---) turned into en- and em-dash entities;
-      - three consecutive dots (... or . . .) turned into an ellipsis char.
-
-> > You seem quite knowedgeable about the various differences.  Perhaps
-> > you'd be willing to write a document for Documentation/doc-guide/
-> > that provides guidance for when to use which kinds of horizontal
-> > line?
-> I have Opinions about the proper usage of punctuation, but I also know =20
->  that other people have differing opinions.  For instance, I place
->  spaces around an em dash, which is nonstandard according to most
->  style guides.  Really this is an individual enough thing that I'm not
->  sure we could have a "kernel style guide" that would be more useful
->  than general-purpose guidance like the page you linked.
-
-> Moreover, such a guide could make non-native speakers needlessly self-
->  conscious about their writing and discourage them from contributing
->  documentation at all.
-
-I don't think so. In a matter of fact, as a non-native speaker, I guess
-this can actually help people willing to write documents.
-
->  I'm not advocating here for trying to push
->  kernel developers towards an eats-shoots-and-leaves level of
->  linguistic pedantry; rather, I merely think that existing correct
->  usages should be left intact (and therefore, excising incorrect usage
->  should only be attempted by someone with both the expertise and time
->  to check each case).
->=20
-> But if you really want such a doc I wouldn't mind contributing to it.
-
-IMO, a document like that can be helpful. I can help reviewing it.
-
-Thanks,
-Mauro
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
