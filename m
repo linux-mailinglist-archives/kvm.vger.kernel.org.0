@@ -2,126 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 97D1037A1A9
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 10:23:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5033237A252
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 10:38:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230332AbhEKIYV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 May 2021 04:24:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50312 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230157AbhEKIYU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 May 2021 04:24:20 -0400
-Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B67B1C061574
-        for <kvm@vger.kernel.org>; Tue, 11 May 2021 01:23:14 -0700 (PDT)
-Received: by mail-oi1-x235.google.com with SMTP id w16so10150235oiv.3
-        for <kvm@vger.kernel.org>; Tue, 11 May 2021 01:23:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=045C15kVflz7mRdOnafmMq48e1iREZTBgktY8+UlBLQ=;
-        b=usBH1qyQQe6ZPzFOrrb23X7llSmuVyi8/ugogrn0DiiqOcFmN5N23A+vwiQzhraS8I
-         hDBFZmOD7bPeKqMqZo8QrZdYiEYJr1dbhBe6sko2QRH/zx40XZY3GPkkwPl9UxjZFfn4
-         0KdaSoHhakKATnZ5BycuKM7nP2yysbq/lXMJKS17VMx+LyOE4cGhILRdTMmMrIFtAVYt
-         yLBpIZWcHgRzF08cwsvWrAiAKGtuftRwOnihWAWz5XF1DSmZR9uz8gd1yhW/ry9sz9L8
-         Fmf4BSKwOUGW2fBXegpREPe1+1QFb/nQomxM6kms+RmBvRLY5QXpBdgbdcBRgL89xVHx
-         oBLg==
+        id S230126AbhEKIkD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 May 2021 04:40:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53094 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229995AbhEKIkB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 May 2021 04:40:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620722335;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=oAopTEbdD9SUh6PQTXI2MykT2T2jIRp0VGhtGVWodjg=;
+        b=I9C6OlbcmXOMZOkN0/jLrZOqQ1B+Rf890chd7w6VaAKWOoI0nKTlHCPThla8IthEZMj6iz
+        zNYnKvTpfrSjh6/22ZHLmF2RiHJhn1BfxxjIrSXRuczEcDjQRfPbToETKhFVxpsZZeKhGK
+        Qo33zxiA30ezsYMg6ffxUj9vYPfG2pk=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-370-ZqyjPjiJNe2uKwGpOH9Org-1; Tue, 11 May 2021 04:38:53 -0400
+X-MC-Unique: ZqyjPjiJNe2uKwGpOH9Org-1
+Received: by mail-ej1-f72.google.com with SMTP id c11-20020a170906170bb02903bbefa04cd1so1943319eje.8
+        for <kvm@vger.kernel.org>; Tue, 11 May 2021 01:38:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=045C15kVflz7mRdOnafmMq48e1iREZTBgktY8+UlBLQ=;
-        b=ZnyCaZRbibNNX2XIzbfJQg0JXmO6PJvbEv+SwyVzi7O+NWDsdqLh/zlEqOy5gq0SpB
-         F6HnULK+0brui5FbFxbZbBjs4stzxWk9lW62myZK/2FOPbDZSBy1sO+fRZj27fRdSeLv
-         e3o7oaXTchVvHN37AJH0PvWt6ICkI5c9v+ASg3AZiF2lcx59qFnXF6hwOPOz6B3HN27K
-         wAG9wjccqJjFsTucni0J9GIV+OigD27jD0y1pbCxg/H2gRYy0iRT+VOxXuJ4irymDk5R
-         jLtjQQ19WFCEwTl1Ne2u7DqMaLL7pRmT5TxSh6U3qsmqYYA7jmYo2zeIXo97CRNfYLSP
-         Wwnw==
-X-Gm-Message-State: AOAM530eVLiMAoJJIUoraCy39+NbzvA5ZTSORwy1/lRNtel4vhVFILN3
-        i5F3EOBfntV6p8CKyksyBYiIsGazXMRx9+ng5TNWjApCssqFtA==
-X-Google-Smtp-Source: ABdhPJzIB4t03lWKbmxy3jCJsw9fAeIDQrCq1mc5kl0akqAeREBctE/IihK/+/BJ2lGPo6x8xW+oBaVTt8h+WzRQsHw=
-X-Received: by 2002:aca:f5c7:: with SMTP id t190mr2559324oih.67.1620721393989;
- Tue, 11 May 2021 01:23:13 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210510094915.1909484-1-maz@kernel.org> <20210510094915.1909484-3-maz@kernel.org>
- <CA+EHjTzcfmt4mxh05a_P+nheQ_A2FuXhpgvKXuV5__pZP0SxkA@mail.gmail.com> <871radvg9n.wl-maz@kernel.org>
-In-Reply-To: <871radvg9n.wl-maz@kernel.org>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Tue, 11 May 2021 09:22:37 +0100
-Message-ID: <CA+EHjTzoWYhgVjURzi9V8nGQO5DOimgGKv7gQcfrRgd-Gf2j2Q@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: Commit pending PC adjustemnts before
- returning to userspace
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org,
-        "open list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        "moderated list:ARM64 PORT (AARCH64 ARCHITECTURE)" 
-        <linux-arm-kernel@lists.infradead.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=oAopTEbdD9SUh6PQTXI2MykT2T2jIRp0VGhtGVWodjg=;
+        b=J4sFY9sEvqx6OSDCAaYmLo6jRuQofBIOa1UrSy1RwGk8Z2Qe+X0pVN48CSfU9POUCY
+         wGJIZcpfXIks9qk9IWcsY9wAUFNmFNAjtNKobcm6Xi5vlnkWB4DUQvNiAEojWCoqhlQy
+         evUSjfDVDtlix+EnzRMeDwE2a73o9N4Ysdt3uDdGt9BdUa/T3TSFljlMsuNTZrqRjYQ/
+         0K2hn5aQYK7LQ0/oqcA8MKWsED44w84puqRDngZQAsk/nXww9EcOn29M84nLGiDP6FeN
+         RINi5lTUI+atD3r9+YhPhfAgXT3f5oy7NZqFHfx/ujJHI5bTnS3fr81p47gBNAVBnfTH
+         WjMA==
+X-Gm-Message-State: AOAM530h9AlgUK51FuKKDRwRM9lFV5ciQ4sg9SgB8ACrrs4jR/TfTrhm
+        K0jogfoydHog5Qq9mqF3X+5nZmqwb9YOWscWn1/gVhCCfo0cbAMgUyHQ8emnMxDF1Jc0kl1ny5u
+        9iZIeRw60Wnup
+X-Received: by 2002:a17:906:9718:: with SMTP id k24mr1941008ejx.23.1620722332728;
+        Tue, 11 May 2021 01:38:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyT75fua4+WgIi/rgmXTzVvo4K8REfXZdDbFxcG2kK4Dqn2ZsdkeL1pgt+qT2yOLrXO7W/tLA==
+X-Received: by 2002:a17:906:9718:: with SMTP id k24mr1940987ejx.23.1620722332520;
+        Tue, 11 May 2021 01:38:52 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id b21sm11083756ejg.80.2021.05.11.01.38.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 May 2021 01:38:51 -0700 (PDT)
+Subject: Re: [PATCH v4 0/4] KVM statistics data fd-based binary interface
+To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
         James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+References: <20210429203740.1935629-1-jingzhangos@google.com>
+ <CAAdAUtgW0vYmr5rqiMJKbZSjgEtLQqxfHd8H0fxrTbE0o4zmWw@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cdf0a42f-c52b-bf79-5237-5f3b31077db7@redhat.com>
+Date:   Tue, 11 May 2021 10:38:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
+MIME-Version: 1.0
+In-Reply-To: <CAAdAUtgW0vYmr5rqiMJKbZSjgEtLQqxfHd8H0fxrTbE0o4zmWw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On 10/05/21 20:57, Jing Zhang wrote:
+> Hi Paolo,
+> 
+> On Thu, Apr 29, 2021 at 3:37 PM Jing Zhang <jingzhangos@google.com> wrote:
+>>
+>> This patchset provides a file descriptor for every VM and VCPU to read
+>> KVM statistics data in binary format.
+>> It is meant to provide a lightweight, flexible, scalable and efficient
+>> lock-free solution for user space telemetry applications to pull the
+>> statistics data periodically for large scale systems. The pulling
+>> frequency could be as high as a few times per second.
+>> In this patchset, every statistics data are treated to have some
+>> attributes as below:
+>>    * architecture dependent or common
+>>    * VM statistics data or VCPU statistics data
+>>    * type: cumulative, instantaneous,
+>>    * unit: none for simple counter, nanosecond, microsecond,
+>>      millisecond, second, Byte, KiByte, MiByte, GiByte. Clock Cycles
+>> Since no lock/synchronization is used, the consistency between all
+>> the statistics data is not guaranteed. That means not all statistics
+>> data are read out at the exact same time, since the statistics date
+>> are still being updated by KVM subsystems while they are read out.
+>>
+>> ---
+>>
+>> * v3 -> v4
+>>    - Rebase to kvm/queue, commit 9f242010c3b4 ("KVM: avoid "deadlock"
+>>      between install_new_memslots and MMU notifier")
+>>    - Use C-stype comments in the whole patch
+>>    - Fix wrong count for x86 VCPU stats descriptors
+>>    - Fix KVM stats data size counting and validity check in selftest
+>>
+>> * v2 -> v3
+>>    - Rebase to kvm/queue, commit edf408f5257b ("KVM: avoid "deadlock"
+>>      between install_new_memslots and MMU notifier")
+>>    - Resolve some nitpicks about format
+>>
+>> * v1 -> v2
+>>    - Use ARRAY_SIZE to count the number of stats descriptors
+>>    - Fix missing `size` field initialization in macro STATS_DESC
+>>
+>> [1] https://lore.kernel.org/kvm/20210402224359.2297157-1-jingzhangos@google.com
+>> [2] https://lore.kernel.org/kvm/20210415151741.1607806-1-jingzhangos@google.com
+>> [3] https://lore.kernel.org/kvm/20210423181727.596466-1-jingzhangos@google.com
+>>
+>> ---
+>>
+>> Jing Zhang (4):
+>>    KVM: stats: Separate common stats from architecture specific ones
+>>    KVM: stats: Add fd-based API to read binary stats data
+>>    KVM: stats: Add documentation for statistics data binary interface
+>>    KVM: selftests: Add selftest for KVM statistics data binary interface
+>>
+>>   Documentation/virt/kvm/api.rst                | 171 ++++++++
+>>   arch/arm64/include/asm/kvm_host.h             |   9 +-
+>>   arch/arm64/kvm/guest.c                        |  42 +-
+>>   arch/mips/include/asm/kvm_host.h              |   9 +-
+>>   arch/mips/kvm/mips.c                          |  67 ++-
+>>   arch/powerpc/include/asm/kvm_host.h           |   9 +-
+>>   arch/powerpc/kvm/book3s.c                     |  68 +++-
+>>   arch/powerpc/kvm/book3s_hv.c                  |  12 +-
+>>   arch/powerpc/kvm/book3s_pr.c                  |   2 +-
+>>   arch/powerpc/kvm/book3s_pr_papr.c             |   2 +-
+>>   arch/powerpc/kvm/booke.c                      |  63 ++-
+>>   arch/s390/include/asm/kvm_host.h              |   9 +-
+>>   arch/s390/kvm/kvm-s390.c                      | 133 +++++-
+>>   arch/x86/include/asm/kvm_host.h               |   9 +-
+>>   arch/x86/kvm/x86.c                            |  71 +++-
+>>   include/linux/kvm_host.h                      | 132 +++++-
+>>   include/linux/kvm_types.h                     |  12 +
+>>   include/uapi/linux/kvm.h                      |  50 +++
+>>   tools/testing/selftests/kvm/.gitignore        |   1 +
+>>   tools/testing/selftests/kvm/Makefile          |   3 +
+>>   .../testing/selftests/kvm/include/kvm_util.h  |   3 +
+>>   .../selftests/kvm/kvm_bin_form_stats.c        | 380 ++++++++++++++++++
+>>   tools/testing/selftests/kvm/lib/kvm_util.c    |  11 +
+>>   virt/kvm/kvm_main.c                           | 237 ++++++++++-
+>>   24 files changed, 1415 insertions(+), 90 deletions(-)
+>>   create mode 100644 tools/testing/selftests/kvm/kvm_bin_form_stats.c
+>>
+>>
+>> base-commit: 9f242010c3b46e63bc62f08fff42cef992d3801b
+>> --
+>> 2.31.1.527.g47e6f16901-goog
+>>
+> 
+> Do I need to send another version for this?
 
+No, the merge window has just finished and I wanted to flush the dozens 
+of bugfix patches that I had.  I'll get to it shortly.
 
-On Tue, May 11, 2021 at 9:14 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> Hi Fuad,
->
-> On Tue, 11 May 2021 09:03:40 +0100,
-> Fuad Tabba <tabba@google.com> wrote:
-> >
-> > Hi Marc,
-> >
-> > > KVM: arm64: Commit pending PC adjustemnts before returning to userspace
-> >
-> > s/adjustments/adjustments
->
-> Looks like Gmail refuses to let you mimic my spelling mistakes! :D
->
-> >
-> > On Mon, May 10, 2021 at 10:49 AM Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > > KVM currently updates PC (and the corresponding exception state)
-> > > using a two phase approach: first by setting a set of flags,
-> > > then by converting these flags into a state update when the vcpu
-> > > is about to enter the guest.
-> > >
-> > > However, this creates a disconnect with userspace if the vcpu thread
-> > > returns there with any exception/PC flag set. In this case, the exposed
-> > > context is wrong, as userpsace doesn't have access to these flags
-> > > (they aren't architectural). It also means that these flags are
-> > > preserved across a reset, which isn't expected.
-> > >
-> > > To solve this problem, force an explicit synchronisation of the
-> > > exception state on vcpu exit to userspace. As an optimisation
-> > > for nVHE systems, only perform this when there is something pending.
-> >
-> > I've tested this with a few nvhe and vhe tests that exercise both
-> > __kvm_adjust_pc call paths (__kvm_vcpu_run and
-> > kvm_arch_vcpu_ioctl_run), and the tests ran as expected.  I'll do the
-> > same for v2 when you send it out.
->
-> Ah, that's interesting. Do you have tests that actually fail when
-> hitting this bug? Given that this is pretty subtle, it'd be good to
-> have a way to make sure it doesn't crop up again.
+Paolo
 
-Nothing that fails, just code that generates exceptions or emulates
-instructions at various points. That said, I think it should be
-straightforward to write a selftest for this. I'll give it a go.
-
-/fuad
-
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
