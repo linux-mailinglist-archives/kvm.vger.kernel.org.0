@@ -2,211 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A65C37A454
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 12:09:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A66DE37A499
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 12:29:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231255AbhEKKKt convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 11 May 2021 06:10:49 -0400
-Received: from us-smtp-delivery-44.mimecast.com ([207.211.30.44]:26707 "EHLO
-        us-smtp-delivery-44.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231177AbhEKKKt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 May 2021 06:10:49 -0400
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-561-lrD21_EpNbGUvjV5ZkV2Xg-1; Tue, 11 May 2021 06:09:39 -0400
-X-MC-Unique: lrD21_EpNbGUvjV5ZkV2Xg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 272861883520;
-        Tue, 11 May 2021 10:09:38 +0000 (UTC)
-Received: from bahia.lan (ovpn-112-143.ams2.redhat.com [10.36.112.143])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 031C25D9D5;
-        Tue, 11 May 2021 10:09:25 +0000 (UTC)
-Date:   Tue, 11 May 2021 12:09:24 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     Vivek Goyal <vgoyal@redhat.com>
-Cc:     qemu-devel@nongnu.org, virtio-fs@redhat.com,
-        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Miklos Szeredi <miklos@szeredi.hu>
-Subject: Re: [for-6.1 v3 3/3] virtiofsd: Add support for FUSE_SYNCFS request
-Message-ID: <20210511120924.1cf2ee60@bahia.lan>
-In-Reply-To: <20210510191502.GA193692@horse>
-References: <20210510155539.998747-1-groug@kaod.org>
-        <20210510155539.998747-4-groug@kaod.org>
-        <20210510191502.GA193692@horse>
+        id S231312AbhEKKaJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 May 2021 06:30:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50704 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229935AbhEKKaI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 May 2021 06:30:08 -0400
+Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83F82C061574;
+        Tue, 11 May 2021 03:29:02 -0700 (PDT)
+Received: by mail-ot1-x331.google.com with SMTP id q7-20020a9d57870000b02902a5c2bd8c17so17081940oth.5;
+        Tue, 11 May 2021 03:29:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zQB0PqP12TFHAd0NTVcth9DgppuMURJYYCn1jtkYIJ8=;
+        b=NHjn3pGyGWaimt9x9gYKbRfEtgKJWgkBh17mD8PILXdnCpWzdRkqoZDl+ncj/G8tzr
+         HA4NbjE9UJuDWBFL+gf5KrCP/3ZlWJjZD5+ElfgS1l6ElA5p5AWl7hsSXDibAXUXaJCB
+         cV4LHTvY/gAlIZXkYtNoIi/PxCx70vnfKgEgGgEblmz0lmpWZHh/Xal0Vy3kYivOeHzh
+         cXXzrz0cd8YxnXEbcklLpiiygCHz1+fnNJg9aOuT2D8iTWWDDriYmSdsWMCx6TcyuBze
+         0+eiXgcw+QQGA3TrcWKvYGV/mDIierY8A8diPYoSf2Tgknssn5v/Y47GCyw5UXsaKwDJ
+         9YqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zQB0PqP12TFHAd0NTVcth9DgppuMURJYYCn1jtkYIJ8=;
+        b=Z6sVBeLA2DMC8w3iDuG10vr8DCdo1EV1cvg8A2r2RX8oSAgC2tpjErYmXlCfZiiuXr
+         vhBmLGX185R8HBjD+6AKQEcRwcLCdMkH0TAHI1ZXeSAN86ngJmG6H56lmXE226BxeBcD
+         FwmuZU+nrEVE6Phf1JmV1FdEXYhBSkS/FGzX8rUDB9G+AO1r3NGgMoLQkoQLLdEpK9sv
+         4TqoXQxtcBcfZqkEAUUYIOhr2stILYpg+Bta5W6V057ber613PQysUNXxil3QMHkGJ0s
+         U0qkrnGfNTiIdarh+yRnKnVoOHxezpf7VkPcd7N85VAP9Ap1oCKLqagFYsN1ORLTPMId
+         ydPQ==
+X-Gm-Message-State: AOAM532kpDPxbDiA7dJjTa+y743RK+Td49VETe/Y+JjnijdLYNMVDaLe
+        vsDCdiX4eBXUdSqBEiUrSofx3Mf2LHUTe0B1xgU=
+X-Google-Smtp-Source: ABdhPJwDiPFrAqSihqHv5/98X7pipyq2E0feML6An2J40zbxI50aiU+jKseH8mNVFGtmOPyR2IPZ9Mna0dKw4gSommY=
+X-Received: by 2002:a9d:7a88:: with SMTP id l8mr17468192otn.185.1620728942017;
+ Tue, 11 May 2021 03:29:02 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: kaod.org
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: 8BIT
+References: <1620466310-8428-1-git-send-email-wanpengli@tencent.com>
+ <1620466310-8428-3-git-send-email-wanpengli@tencent.com> <YJnNPpalqYwERwEL@google.com>
+In-Reply-To: <YJnNPpalqYwERwEL@google.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 11 May 2021 18:28:51 +0800
+Message-ID: <CANRm+Cy55bgvETx2gdVEFnaciEvi=1p-uUWojZdsn2_2X1AWUQ@mail.gmail.com>
+Subject: Re: [PATCH 3/3] KVM: X86: Fix vCPU preempted state from guest point
+ of view
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "# v3 . 10+" <stable@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 10 May 2021 15:15:02 -0400
-Vivek Goyal <vgoyal@redhat.com> wrote:
-
-> On Mon, May 10, 2021 at 05:55:39PM +0200, Greg Kurz wrote:
-> > Honor the expected behavior of syncfs() to synchronously flush all data
-> > and metadata on linux systems. Simply loop on all known submounts and
-> > call syncfs() on them.
-> > 
-> > Note that syncfs() might suffer from a time penalty if the submounts
-> > are being hammered by some unrelated workload on the host. The only
-> > solution to avoid that is to avoid shared submounts.
-> > 
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
+On Tue, 11 May 2021 at 08:18, Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Sat, May 08, 2021, Wanpeng Li wrote:
+> > From: Wanpeng Li <wanpengli@tencent.com>
+> >
+> > Commit 66570e966dd9 (kvm: x86: only provide PV features if enabled in guest's
+> > CPUID) avoids to access pv tlb shootdown host side logic when this pv feature
+> > is not exposed to guest, however, kvm_steal_time.preempted not only leveraged
+> > by pv tlb shootdown logic but also mitigate the lock holder preemption issue.
+> > From guest point of view, vCPU is always preempted since we lose the reset of
+> > kvm_steal_time.preempted before vmentry if pv tlb shootdown feature is not
+> > exposed. This patch fixes it by clearing kvm_steal_time.preempted before
+> > vmentry.
+> >
+> > Fixes: 66570e966dd9 (kvm: x86: only provide PV features if enabled in guest's CPUID)
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 > > ---
-> >  tools/virtiofsd/fuse_lowlevel.c       | 11 ++++++++
-> >  tools/virtiofsd/fuse_lowlevel.h       | 12 +++++++++
-> >  tools/virtiofsd/passthrough_ll.c      | 38 +++++++++++++++++++++++++++
-> >  tools/virtiofsd/passthrough_seccomp.c |  1 +
-> >  4 files changed, 62 insertions(+)
-> > 
-> > diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowlevel.c
-> > index 58e32fc96369..3be95ec903c9 100644
-> > --- a/tools/virtiofsd/fuse_lowlevel.c
-> > +++ b/tools/virtiofsd/fuse_lowlevel.c
-> > @@ -1870,6 +1870,16 @@ static void do_lseek(fuse_req_t req, fuse_ino_t nodeid,
-> >      }
-> >  }
-> >  
-> > +static void do_syncfs(fuse_req_t req, fuse_ino_t nodeid,
-> > +                      struct fuse_mbuf_iter *iter)
-> > +{
-> > +    if (req->se->op.syncfs) {
-> > +        req->se->op.syncfs(req);
-> > +    } else {
-> > +        fuse_reply_err(req, ENOSYS);
-> > +    }
-> > +}
-> > +
-> >  static void do_init(fuse_req_t req, fuse_ino_t nodeid,
-> >                      struct fuse_mbuf_iter *iter)
-> >  {
-> > @@ -2267,6 +2277,7 @@ static struct {
-> >      [FUSE_RENAME2] = { do_rename2, "RENAME2" },
-> >      [FUSE_COPY_FILE_RANGE] = { do_copy_file_range, "COPY_FILE_RANGE" },
-> >      [FUSE_LSEEK] = { do_lseek, "LSEEK" },
-> > +    [FUSE_SYNCFS] = { do_syncfs, "SYNCFS" },
-> >  };
-> >  
-> >  #define FUSE_MAXOP (sizeof(fuse_ll_ops) / sizeof(fuse_ll_ops[0]))
-> > diff --git a/tools/virtiofsd/fuse_lowlevel.h b/tools/virtiofsd/fuse_lowlevel.h
-> > index 3bf786b03485..890c520b195a 100644
-> > --- a/tools/virtiofsd/fuse_lowlevel.h
-> > +++ b/tools/virtiofsd/fuse_lowlevel.h
-> > @@ -1225,6 +1225,18 @@ struct fuse_lowlevel_ops {
-> >       */
-> >      void (*lseek)(fuse_req_t req, fuse_ino_t ino, off_t off, int whence,
-> >                    struct fuse_file_info *fi);
-> > +
-> > +    /**
-> > +     * Synchronize file system content
-> > +     *
-> > +     * If this request is answered with an error code of ENOSYS,
-> > +     * this is treated as success and future calls to syncfs() will
-> > +     * succeed automatically without being sent to the filesystem
-> > +     * process.
-> > +     *
-> > +     * @param req request handle
-> > +     */
-> > +    void (*syncfs)(fuse_req_t req);
-> >  };
-> >  
-> >  /**
-> > diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-> > index dc940a1d048b..289900c6d274 100644
-> > --- a/tools/virtiofsd/passthrough_ll.c
-> > +++ b/tools/virtiofsd/passthrough_ll.c
-> > @@ -3153,6 +3153,43 @@ static void lo_lseek(fuse_req_t req, fuse_ino_t ino, off_t off, int whence,
-> >      }
-> >  }
-> >  
-> > +static void lo_syncfs(fuse_req_t req)
-> > +{
-> > +    struct lo_data *lo = lo_data(req);
-> > +    GHashTableIter iter;
-> > +    gpointer key, value;
-> > +    int err = 0;
-> > +
-> > +    pthread_mutex_lock(&lo->mutex);
-> > +
-> > +    g_hash_table_iter_init(&iter, lo->mnt_inodes);
-> > +    while (g_hash_table_iter_next(&iter, &key, &value)) {
-> > +        struct lo_inode *inode = value;
-> > +        int fd;
-> > +
-> > +        fuse_log(FUSE_LOG_DEBUG, "lo_syncfs(ino=%" PRIu64 ")\n",
-> > +                 inode->fuse_ino);
-> > +
-> > +        fd = lo_inode_open(lo, inode, O_RDONLY);
-> > +        if (fd < 0) {
-> > +            err = -fd;
-> > +            break;
-> > +        }
-> > +
-> > +        if (syncfs(fd) < 0) {
-> 
-> I don't have a good feeling about calling syncfs() with lo->mutex held.
-> This seems to be that global mutex which is held at so many places
-> and will serialize everything else. I think we agreed that syncfs()
-> can take 10s of seconds if fs is busy. And that means we will stall
-> other filesystem operations too.
-> 
-> So will be good if we can call syncfs() outside the lock. May be prepare
-> a list of inodes which are there, take a reference and drop the lock.
-> call syncfs and then drop the reference on inode.
-> 
+> >  arch/x86/kvm/x86.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index c0244a6..c38e990 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -3105,7 +3105,8 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+> >                                      st->preempted & KVM_VCPU_FLUSH_TLB);
+> >               if (xchg(&st->preempted, 0) & KVM_VCPU_FLUSH_TLB)
+> >                       kvm_vcpu_flush_tlb_guest(vcpu);
+> > -     }
+> > +     } else
+> > +             st->preempted = 0;
+>
+> Curly braces needed since the if-statment needs 'em.  Other than that,
 
-You're right. I'll do that.
+Will send out a new version after 1-2 get reviewed. :)
 
-> Vivek
-> 
-> > +            err = errno;
-> > +            close(fd);
-> > +            break;
-> > +        }
-> > +
-> > +        close(fd);
-> > +    }
-> > +
-> > +    pthread_mutex_unlock(&lo->mutex);
-> > +
-> > +    fuse_reply_err(req, err);
-> > +}
-> > +
-> >  static void lo_destroy(void *userdata)
-> >  {
-> >      struct lo_data *lo = (struct lo_data *)userdata;
-> > @@ -3214,6 +3251,7 @@ static struct fuse_lowlevel_ops lo_oper = {
-> >      .copy_file_range = lo_copy_file_range,
-> >  #endif
-> >      .lseek = lo_lseek,
-> > +    .syncfs = lo_syncfs,
-> >      .destroy = lo_destroy,
-> >  };
-> >  
-> > diff --git a/tools/virtiofsd/passthrough_seccomp.c b/tools/virtiofsd/passthrough_seccomp.c
-> > index 62441cfcdb95..343188447901 100644
-> > --- a/tools/virtiofsd/passthrough_seccomp.c
-> > +++ b/tools/virtiofsd/passthrough_seccomp.c
-> > @@ -107,6 +107,7 @@ static const int syscall_allowlist[] = {
-> >      SCMP_SYS(set_robust_list),
-> >      SCMP_SYS(setxattr),
-> >      SCMP_SYS(symlinkat),
-> > +    SCMP_SYS(syncfs),
-> >      SCMP_SYS(time), /* Rarely needed, except on static builds */
-> >      SCMP_SYS(tgkill),
-> >      SCMP_SYS(unlinkat),
-> > -- 
-> > 2.26.3
-> > 
-> 
-
+>
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
+>
+> >
+> >       vcpu->arch.st.preempted = 0;
+> >
+> > --
+> > 2.7.4
+> >
