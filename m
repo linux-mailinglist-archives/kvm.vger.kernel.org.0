@@ -2,117 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EFFE37AC13
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 18:36:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AB0937AC17
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 18:37:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231728AbhEKQhl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 May 2021 12:37:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59660 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230435AbhEKQhl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 May 2021 12:37:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620750994;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aa8ISZD+9VCaLFGh8Nx9yVUDD7ZejYAK3rK1NXQssoI=;
-        b=KJgG9sjmBpB6ZtLa88Tye4D1/rPOMT5JGlKrECFRpq75tF0Cz+r7ZS13hLzBwDQk4BxNIp
-        Orahjbe5589gWF7g78QcLvRNc61KCgPm6Vmf4ZdoqMyKJ1eow2YurHt+ovT2FYYVdvm754
-        GIb45/Yo0MwdE1KoWYCHXuITos6SJwM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-560-CX8DcdlfOQ6mrqGo36PzDA-1; Tue, 11 May 2021 12:36:30 -0400
-X-MC-Unique: CX8DcdlfOQ6mrqGo36PzDA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DCB1801817;
-        Tue, 11 May 2021 16:36:29 +0000 (UTC)
-Received: from gondolin.fritz.box (ovpn-113-172.ams2.redhat.com [10.36.113.172])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2C63F100164C;
-        Tue, 11 May 2021 16:36:25 +0000 (UTC)
-Date:   Tue, 11 May 2021 18:36:22 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH 2/4] lib: s390x: sclp: Extend feature
- probing
-Message-ID: <20210511183622.1251155d.cohuck@redhat.com>
-In-Reply-To: <20210511174645.550c741d@ibm-vm>
-References: <20210510150015.11119-1-frankja@linux.ibm.com>
-        <20210510150015.11119-3-frankja@linux.ibm.com>
-        <b0db681f-bfe3-5cf3-53f8-651bba04a5c5@redhat.com>
-        <20210511164137.0bba2493@ibm-vm>
-        <2f0284e1-b1e0-39d6-1fe0-3be808be1849@redhat.com>
-        <20210511174645.550c741d@ibm-vm>
-Organization: Red Hat GmbH
+        id S231392AbhEKQiY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 May 2021 12:38:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49826 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231220AbhEKQiX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 May 2021 12:38:23 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAB27C06174A
+        for <kvm@vger.kernel.org>; Tue, 11 May 2021 09:37:16 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id i190so16423671pfc.12
+        for <kvm@vger.kernel.org>; Tue, 11 May 2021 09:37:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=3bG2YjHFxw2IUcvWWfrYi6Mn8YwbVedGoWY/g26m+0M=;
+        b=OM2kuCVzGBNZXt25qURATdM5R+e8BKXX2FSii4MeTP64ksBnqzdwtZxZZub8LgzhXa
+         N6yoEfBNNEg4YSvLoYQZerPBHD3LImYN0s5qXSg1BhtXkSNH2Ah1ZGi6u5amDqeoigHM
+         aIHEodLagPxqE+6Vy5Uwnlzp1Mnq+4EJjhVRjxK7HH5lYjPxaNL3W8PVZZUqsGhZ3J/v
+         h97cCGwu5fPbep2a2KJO1WHcKoY6f1ADEQcYeHuSYl7CoUJGwR3dfmffNVh5lbmOJaxO
+         maNxrYdESRWDJaoQhwvBULekqvqUwV4gL6qF4uf5b9bne1go7ozn7wuPnJw6zSz7EZGH
+         5LCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=3bG2YjHFxw2IUcvWWfrYi6Mn8YwbVedGoWY/g26m+0M=;
+        b=fHRpbf95gmoeXw3nnwaBvzc/64IfkdkA9f7JoJSPxXNtQS4IhatG3w8vxgTsSManKY
+         CfDAtEeZ1XBZRQrctq0ZYqRuPqW7P2mAQrRk/pdyezMIg5fZQvzpkJNm6K3HRTm+Bkx+
+         dL/l6Ihw39TEaWCrOMdOZiyLyaRor+TZR9lh/69kdbfE+mK9VgC3B4c4fCCR8P9cvaMY
+         d5lUQXwB7meQos4DvI4qgPBV11wHRZHx0s/L3qgu03SEHDe9rCfT3xRg/gvHVsO17LDo
+         JleAtOz2rNCOvLGFdj+Nj52QTvdFDDSEZuQQ8NRdMixRapp4GedVff8HErahYfokFFgF
+         lKng==
+X-Gm-Message-State: AOAM533nTsjcHZoiK/cGqzV4tc7vZEk5HAksOX7CqAQHbNM2d90ewyNQ
+        RAwXrOgQi5tbwJaybNL9CwN9CA==
+X-Google-Smtp-Source: ABdhPJwbonQdlDKxDyuS4GYe9D4jlnb7qNRNzXU/ISmqKwx9QJ0asZNITRb8jXZo8SKoqH1pfhwDnA==
+X-Received: by 2002:a63:575a:: with SMTP id h26mr32432818pgm.35.1620751036132;
+        Tue, 11 May 2021 09:37:16 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id t1sm14049000pjo.33.2021.05.11.09.37.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 May 2021 09:37:15 -0700 (PDT)
+Date:   Tue, 11 May 2021 16:37:11 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH 3/7] KVM: nVMX: Ignore 'hv_clean_fields' data when eVMCS
+ data is copied in vmx_get_nested_state()
+Message-ID: <YJqytyu7+Q7+bqeG@google.com>
+References: <20210511111956.1555830-1-vkuznets@redhat.com>
+ <20210511111956.1555830-4-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210511111956.1555830-4-vkuznets@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 11 May 2021 17:46:45 +0200
-Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
+On Tue, May 11, 2021, Vitaly Kuznetsov wrote:
+> 'Clean fields' data from enlightened VMCS is only valid upon vmentry: L1
+> hypervisor is not obliged to keep it up-to-date while it is mangling L2's
+> state, KVM_GET_NESTED_STATE request may come at a wrong moment when actual
+> eVMCS changes are unsynchronized with 'hv_clean_fields'. As upon migration
+> VMCS12 is used as a source of ultimate truce, we must make sure we pick all
+> the changes to eVMCS and thus 'clean fields' data must be ignored.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 43 +++++++++++++++++++++++----------------
+>  1 file changed, 25 insertions(+), 18 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index ea2869d8b823..7970a16ee6b1 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -1607,16 +1607,23 @@ static void copy_vmcs12_to_shadow(struct vcpu_vmx *vmx)
+>  	vmcs_load(vmx->loaded_vmcs->vmcs);
+>  }
+>  
+> -static int copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx)
+> +static int copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, bool from_vmentry)
+>  {
+>  	struct vmcs12 *vmcs12 = vmx->nested.cached_vmcs12;
+>  	struct hv_enlightened_vmcs *evmcs = vmx->nested.hv_evmcs;
+> +	u32 hv_clean_fields;
+>  
+>  	/* HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE */
+>  	vmcs12->tpr_threshold = evmcs->tpr_threshold;
+>  	vmcs12->guest_rip = evmcs->guest_rip;
+>  
+> -	if (unlikely(!(evmcs->hv_clean_fields &
+> +	/* Clean fields data can only be trusted upon vmentry */
+> +	if (likely(from_vmentry))
+> +		hv_clean_fields = evmcs->hv_clean_fields;
+> +	else
+> +		hv_clean_fields = 0;
 
-> On Tue, 11 May 2021 17:38:04 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
-> > On 11.05.21 16:41, Claudio Imbrenda wrote:  
-> > > On Tue, 11 May 2021 13:43:36 +0200
-> > > David Hildenbrand <david@redhat.com> wrote:
-> > >     
-> > >> On 10.05.21 17:00, Janosch Frank wrote:    
-> > >>> Lets grab more of the feature bits from SCLP read info so we can
-> > >>> use them in the cpumodel tests.
-> > >>>
-> > >>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> > >>> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > >>> ---
-> > >>>    lib/s390x/sclp.c | 20 ++++++++++++++++++++
-> > >>>    lib/s390x/sclp.h | 38 +++++++++++++++++++++++++++++++++++---
-> > >>>    2 files changed, 55 insertions(+), 3 deletions(-)
-> > >>>
-> > >>> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
-> > >>> index f11c2035..f25cfdb2 100644
-> > >>> --- a/lib/s390x/sclp.c
-> > >>> +++ b/lib/s390x/sclp.c
-> > >>> @@ -129,6 +129,13 @@ CPUEntry *sclp_get_cpu_entries(void)
-> > >>>    	return (CPUEntry *)(_read_info +
-> > >>> read_info->offset_cpu); }
-> > >>>    
-> > >>> +static bool sclp_feat_check(int byte, int mask)
-> > >>> +{
-> > >>> +	uint8_t *rib = (uint8_t *)read_info;
-> > >>> +
-> > >>> +	return !!(rib[byte] & mask);
-> > >>> +}    
-> > >>
-> > >> Instead of a mask, I'd just check for bit (offset) numbers within
-> > >> the byte.
-> > >>
-> > >> static bool sclp_feat_check(int byte, int bit)
-> > >> {
-> > >> 	uint8_t *rib = (uint8_t *)read_info;
-> > >>
-> > >> 	return !!(rib[byte] & (0x80 >> bit));
-> > >> }    
-> > > 
-> > > using a mask might be useful to check multiple facilities at the
-> > > same time, but in that case the check should be    
-> > 
-> > IMHO checking with a mask here multiple facilities will be very error 
-> > prone either way ... and we only have a single byte to check for.  
-> 
-> as I said, I do not have a strong opinion either way :)
-> 
-> 
+...
 
-If you need a tie breaker, I'd vote for bit over mask :)
+> @@ -3503,7 +3510,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+>  		return nested_vmx_failInvalid(vcpu);
+>  
+>  	if (vmx->nested.hv_evmcs) {
+> -		copy_enlightened_to_vmcs12(vmx);
+> +		copy_enlightened_to_vmcs12(vmx, true);
 
+Rather than pass a bool, what about having the caller explicitly specify the
+clean fields?  Then the migration path can have a comment about needing to
+assume all fields are dirty, and the normal path would be self-documenting.
+E.g. with evmcs captured in a local var:
+
+	if (evmcs) {
+		copy_enlightened_to_vmcs12(vmx, evmcs->hv_clean_fields);
+	} else if (...) {
+	}
+
+>  		/* Enlightened VMCS doesn't have launch state */
+>  		vmcs12->launch_state = !launch;
+>  	} else if (enable_shadow_vmcs) {
+> @@ -6136,7 +6143,7 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
+>  		copy_vmcs02_to_vmcs12_rare(vcpu, get_vmcs12(vcpu));
+>  		if (!vmx->nested.need_vmcs12_to_shadow_sync) {
+>  			if (vmx->nested.hv_evmcs)
+> -				copy_enlightened_to_vmcs12(vmx);
+> +				copy_enlightened_to_vmcs12(vmx, false);
+>  			else if (enable_shadow_vmcs)
+>  				copy_shadow_to_vmcs12(vmx);
+>  		}
+> -- 
+> 2.30.2
+> 
