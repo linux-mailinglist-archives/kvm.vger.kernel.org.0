@@ -2,135 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 810AF37AA6C
-	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 17:16:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5ADD237AAD1
+	for <lists+kvm@lfdr.de>; Tue, 11 May 2021 17:38:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231723AbhEKPRl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 May 2021 11:17:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25612 "EHLO
+        id S231864AbhEKPjR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 May 2021 11:39:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52812 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231461AbhEKPRk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 May 2021 11:17:40 -0400
+        by vger.kernel.org with ESMTP id S231782AbhEKPjQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 May 2021 11:39:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620746193;
+        s=mimecast20190719; t=1620747490;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ofC0rBi4DPPTj74xp81sP5GGpV+ugu6+KkhMIEvk3x4=;
-        b=dFs6ZPpRnfIBZsTpy4iKK9L2sCJ6LaUqIz1/D6SXHeMh0+V/rBF25OJs2jdNDYdG/4kjUi
-        +bv/P7HdrVUVWEA4VpbKdK4/ygaZxAAxcyZaSRXag4LS8AtCZSWCOgj0TKaRGMo9jvGNrg
-        XclPVRF3xxD32wz6D40WqOncPHQq2oo=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-62-9CfAL_hqP5iGDNVdAGPIRQ-1; Tue, 11 May 2021 11:16:29 -0400
-X-MC-Unique: 9CfAL_hqP5iGDNVdAGPIRQ-1
-Received: by mail-qk1-f199.google.com with SMTP id s4-20020a3790040000b02902fa7aa987e8so1609954qkd.14
-        for <kvm@vger.kernel.org>; Tue, 11 May 2021 08:16:29 -0700 (PDT)
+        bh=lA3YA8wLy3fJ4pK+UdDswwsR291TTeUp7+xqxJEhVYY=;
+        b=JvK/votoefNpejtfrKXyIzJqbRD3zvmdizP8de6WbuwD4JmVqX2DlY57sg9nOi5pybh260
+        jhPx/P/2Uh3kGqSFy3AWAy2DZnlkETui9gDtsop1neIL/VkVM3b0juRqLWzIoZH3RMnIdX
+        DAPq5R8h8iQP6SMU4yny6SuTo5Ctklo=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-443-YYlkW-XqNlaL-EEJdGG9tw-1; Tue, 11 May 2021 11:38:08 -0400
+X-MC-Unique: YYlkW-XqNlaL-EEJdGG9tw-1
+Received: by mail-ej1-f72.google.com with SMTP id z15-20020a170906074fb029038ca4d43d48so6135246ejb.17
+        for <kvm@vger.kernel.org>; Tue, 11 May 2021 08:38:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ofC0rBi4DPPTj74xp81sP5GGpV+ugu6+KkhMIEvk3x4=;
-        b=s5orpwoTDZKIFI61tlaYWXt9n9FbUr5D4zC51vH3V/QMxgnEmXq5bxXx80u6Sr2QF+
-         /Vaz2Rf1oFCb46KqKfCBKwx4jAnp13p5ocfwrUgDXLp8R2rqZg+r4Ez9cRmjoLafxFtH
-         OLCeVFAWIJpLDuu959z4m+tt4jiLtBvUIjSySS/R5tiZUiVwBUU1BuSaHQuqRgZ5DUPy
-         90eA4K0DPH4dOeGAj8dLgwaIDqX/F2j5RqL/E/CO8vnf660nM04p+6igmWs854cdUsTw
-         Y5ksEZS6rnuAx1d0d8nFtcdTUFgdcs8JORpohiwrQdqNKSMYCjIsk0ddzD0/UBDBVRIA
-         V73g==
-X-Gm-Message-State: AOAM530xkYQYYiHrf8DYUpad8UfIqfrowvcYe0B2ytEBVoGBHE7WmSD/
-        MdeA0GCZY+gIf3UKgVXFU3UBMW5Ao7Wlx3Qg1u4eu0MX79sr98NwIX863h3UnXhPAxVlCT/3c0o
-        Enwtqh18/hAQn
-X-Received: by 2002:a0c:c447:: with SMTP id t7mr30058993qvi.60.1620746189187;
-        Tue, 11 May 2021 08:16:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw4aJlekwQNcRyqocU4BWwi3mAVhpr5Mu7ViTGISYvK4QWRRRcGQUhLMl9d/MYz4rhlALi3FQ==
-X-Received: by 2002:a0c:c447:: with SMTP id t7mr30058966qvi.60.1620746188974;
-        Tue, 11 May 2021 08:16:28 -0700 (PDT)
-Received: from horse (pool-173-76-174-238.bstnma.fios.verizon.net. [173.76.174.238])
-        by smtp.gmail.com with ESMTPSA id b7sm12579971qte.80.2021.05.11.08.16.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 May 2021 08:16:28 -0700 (PDT)
-Date:   Tue, 11 May 2021 11:16:26 -0400
-From:   Vivek Goyal <vgoyal@redhat.com>
-To:     Miklos Szeredi <mszeredi@redhat.com>
-Cc:     Greg Kurz <groug@kaod.org>,
-        QEMU Developers <qemu-devel@nongnu.org>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        virtio-fs-list <virtio-fs@redhat.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [Virtio-fs] [for-6.1 v3 3/3] virtiofsd: Add support for
- FUSE_SYNCFS request
-Message-ID: <20210511151626.GC238488@horse>
-References: <20210510155539.998747-1-groug@kaod.org>
- <20210510155539.998747-4-groug@kaod.org>
- <CAOssrKfbzCnpHma-=tTRvwUecy_9RtJADzMb_uQ1yzzJStz1PA@mail.gmail.com>
- <20210511125409.GA234533@horse>
- <20210511144923.GA238488@horse>
- <CAOssrKeSBnDTa3SF0y49ZuoFMJPr1iq6KqzPCkXYmNsRxXP7vQ@mail.gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:organization
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=lA3YA8wLy3fJ4pK+UdDswwsR291TTeUp7+xqxJEhVYY=;
+        b=WIhYIr6qlcUIosdO7ULF773J8ESf4+wq3aeqL/DiSCoqLjAz9u8LW0udrL0UMrOBOE
+         7iWLRgzg1ux4GRCGKB8iUGmqawDMhjsVhCkIb8sDCD70qt/i3T4Ko8QWvnz+1oI+d+Lv
+         4t7eGr6fgGZsUPJ3riABE5CGqyDLQiNZduDMAair9o0YKkRzTsWpXzvsqxBzUv/ecNuM
+         cKKbPb+iAFuiVj31xyJHsaKWzBagZpjpznlOgQNw3byf+Vurara8ObYsOQWhaSCyiQ/+
+         /J17fE5FSvKnb51aZsWz/bQLvaffVWKwJiR/1hYQ57wBbWpB3u8m7JzR8LSO6e4LBt2E
+         LDXA==
+X-Gm-Message-State: AOAM533lHMz1PUxbnlXLMiwAcdT6Ejf/DYHYrb9koFd+5t0LvoqvNpW9
+        iI7gIXhyHIFVxKCOwJJEDtsu6IhliLvdriQRlMoBUPLgRdY030fCfPprV6yxogG5B2QPyVXel6O
+        y9e1yijB658d/
+X-Received: by 2002:a17:907:f81:: with SMTP id kb1mr32986021ejc.476.1620747485809;
+        Tue, 11 May 2021 08:38:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz+4xR4cq7DP1xS9MpVHR7xeg5rXqtoQ4ZWLRP0+lX+o33jqwD6v8lig6L4cWx0D+FfjDusqw==
+X-Received: by 2002:a17:907:f81:: with SMTP id kb1mr32985989ejc.476.1620747485534;
+        Tue, 11 May 2021 08:38:05 -0700 (PDT)
+Received: from [192.168.3.132] (p5b0c6329.dip0.t-ipconnect.de. [91.12.99.41])
+        by smtp.gmail.com with ESMTPSA id p2sm11700066ejo.108.2021.05.11.08.38.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 May 2021 08:38:05 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 2/4] lib: s390x: sclp: Extend feature
+ probing
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        cohuck@redhat.com, linux-s390@vger.kernel.org, thuth@redhat.com
+References: <20210510150015.11119-1-frankja@linux.ibm.com>
+ <20210510150015.11119-3-frankja@linux.ibm.com>
+ <b0db681f-bfe3-5cf3-53f8-651bba04a5c5@redhat.com>
+ <20210511164137.0bba2493@ibm-vm>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Message-ID: <2f0284e1-b1e0-39d6-1fe0-3be808be1849@redhat.com>
+Date:   Tue, 11 May 2021 17:38:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOssrKeSBnDTa3SF0y49ZuoFMJPr1iq6KqzPCkXYmNsRxXP7vQ@mail.gmail.com>
+In-Reply-To: <20210511164137.0bba2493@ibm-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 11, 2021 at 05:08:42PM +0200, Miklos Szeredi wrote:
-> On Tue, May 11, 2021 at 4:49 PM Vivek Goyal <vgoyal@redhat.com> wrote:
-> >
-> > On Tue, May 11, 2021 at 08:54:09AM -0400, Vivek Goyal wrote:
-> > > On Tue, May 11, 2021 at 02:31:14PM +0200, Miklos Szeredi wrote:
-> > > > On Mon, May 10, 2021 at 5:55 PM Greg Kurz <groug@kaod.org> wrote:
-> > > > >
-> > > > > Honor the expected behavior of syncfs() to synchronously flush all data
-> > > > > and metadata on linux systems. Simply loop on all known submounts and
-> > > > > call syncfs() on them.
-> > > >
-> > > > Why not pass the submount's root to the server, so it can do just one
-> > > > targeted syncfs?
-> > > >
-> > > > E.g. somehting like this in fuse_sync_fs():
-> > > >
-> > > > args.nodeid = get_node_id(sb->s_root->d_inode);
-> > >
-> > > Hi Miklos,
-> > >
-> > > I think current proposal was due to lack of full understanding on my part.
-> > > I was assuming we have one super block in client and that's not the case
-> > > looks like. For every submount, we will have another superblock known
-> > > to vfs, IIUC. That means when sync() happens, we will receive ->syncfs()
-> > > for each of those super blocks. And that means file server does not
-> > > have to keep track of submounts explicitly and it will either receive
-> > > a single targeted SYNCFS (for the case of syncfs(fd)) or receive
-> > > multile SYNCFS calls (one for each submount when sync() is called).
-> >
-> > Tried sync() with submounts enabled and we are seeing a SYNCFS call
-> > only for top level super block and not for submounts.
-> >
-> > Greg noticed that it probably is due to the fact that iterate_super()
-> > skips super blocks which don't have SB_BORN flag set.
-> >
-> > Only vfs_get_tree() seems to set SB_BORN and for our submounts we
-> > are not calling vfs_get_tree(), hence SB_BORN is not set. NFS seems
-> > to call vfs_get_tree() and hence SB_BORN must be set for submounts.
-> >
-> > Maybe we need to modify virtio_fs_get_tree() so that it can deal with
-> > mount as well as submounts and then fuse_dentry_automount() should
-> > probably call vfs_get_tree() and that should set SB_BORN and hopefully
-> > sync() will work with it. Greg is planning to give it a try.
-> >
-> > Does it sound reasonable.
+On 11.05.21 16:41, Claudio Imbrenda wrote:
+> On Tue, 11 May 2021 13:43:36 +0200
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> Just setting SB_BORN sounds much simpler.  What's the disadvantage?
+>> On 10.05.21 17:00, Janosch Frank wrote:
+>>> Lets grab more of the feature bits from SCLP read info so we can use
+>>> them in the cpumodel tests.
+>>>
+>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>>> ---
+>>>    lib/s390x/sclp.c | 20 ++++++++++++++++++++
+>>>    lib/s390x/sclp.h | 38 +++++++++++++++++++++++++++++++++++---
+>>>    2 files changed, 55 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
+>>> index f11c2035..f25cfdb2 100644
+>>> --- a/lib/s390x/sclp.c
+>>> +++ b/lib/s390x/sclp.c
+>>> @@ -129,6 +129,13 @@ CPUEntry *sclp_get_cpu_entries(void)
+>>>    	return (CPUEntry *)(_read_info + read_info->offset_cpu);
+>>>    }
+>>>    
+>>> +static bool sclp_feat_check(int byte, int mask)
+>>> +{
+>>> +	uint8_t *rib = (uint8_t *)read_info;
+>>> +
+>>> +	return !!(rib[byte] & mask);
+>>> +}
+>>
+>> Instead of a mask, I'd just check for bit (offset) numbers within the
+>> byte.
+>>
+>> static bool sclp_feat_check(int byte, int bit)
+>> {
+>> 	uint8_t *rib = (uint8_t *)read_info;
+>>
+>> 	return !!(rib[byte] & (0x80 >> bit));
+>> }
+> 
+> using a mask might be useful to check multiple facilities at the same
+> time, but in that case the check should be
 
-I was little hesitant to set it directly because no other filesystem
-seems to be doing it. Hence I assumed that VFS expects filesystems to
-not set SB_BORN.
+IMHO checking with a mask here multiple facilities will be very error 
+prone either way ... and we only have a single byte to check for.
 
-But I do agree that setting SB_BORN in automount code is much simpler
-solution.
 
-Thanks
-Vivek
+-- 
+Thanks,
+
+David / dhildenb
 
