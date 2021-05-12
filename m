@@ -2,173 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2424337EFEF
+	by mail.lfdr.de (Postfix) with ESMTP id B570E37EFF1
 	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 01:43:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234161AbhELXhk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 19:37:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37158 "EHLO
+        id S234272AbhELXhr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 19:37:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377069AbhELXKN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 19:10:13 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5E98C06175F
-        for <kvm@vger.kernel.org>; Wed, 12 May 2021 16:08:47 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id k19so19931992pfu.5
-        for <kvm@vger.kernel.org>; Wed, 12 May 2021 16:08:47 -0700 (PDT)
+        with ESMTP id S1377593AbhELXUN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 May 2021 19:20:13 -0400
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47423C061357
+        for <kvm@vger.kernel.org>; Wed, 12 May 2021 16:17:12 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id p12so31715192ljg.1
+        for <kvm@vger.kernel.org>; Wed, 12 May 2021 16:17:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=Wb492hLROD3rznrPy6wf7KJkHzULIirqNRRIhlDd1kk=;
-        b=Wp04QAxK78mttLcAyJONeic541wFKI87ox2A0TllkYbwUq3DRVQ2h8CaP5mWFhE7Eh
-         XgJ5I3eiobAgct8DsIBapJ7K5VA4nBu/MlGApscGVtz2ks7XES8IqS72W6IHkSa/X7FB
-         CbQbFHxOWiA1yuQ6rMIohTwo+3QXEXp2/JDMc0rbPeg+DlV4ZPpZ5EwGFvm3K1OY1xRP
-         uvLLAbhG7GMhycc3g/idyewYyd22b/58+z4PVoUS5r8WBFdWAPoFYywxzeOKIT2jV36Z
-         oI0YAVl3TpO+XkVakcP2LQq1Awfx98GUPY+6A+JWQ/yOMFyK4sZJtCiDyE5V6ylds1rz
-         1d7g==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=JQiB9sLTWHFoFy/ehq3hN41VSXihaIbpt0N1jzuH/T0=;
+        b=JJ8L4UmwPRLSAvUK0Jk3HoTz8jlwZU469A6CXfMaO8vN2VpbVHnHSgXJHPin4O6iB/
+         UqEvalRAabU4gspJHdxn7OyGKm0NQPjEP6+QvWNYHwK4FWBUwEir5B33r/f+MpgADhIs
+         HJuiwv7iaqWkTVeny3xl362Afqd0hMi03wiA2QVLI9cfPcUC0v+tbbziccm8k+KZdqq/
+         +XXY9AUt3S1q2ZU7gXjl6nj9fW2xGlZOhZ2MFnwL6akjlSdrkxLX+3S4IdArOm7uTglX
+         IJMIStDYDSnRS2t0zvD/dxhSubfNiDHqfC2qWGAKDt4bOYFuKthdt8Qa2LAisnylYuzr
+         BhUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=Wb492hLROD3rznrPy6wf7KJkHzULIirqNRRIhlDd1kk=;
-        b=ndEn7nbm/OXb3t7/QdLTu2ToZdmbh25uiX0LTl8NI+j33EGn+eLjHeHEoYR9XWUV7h
-         Kf5m574SVpolC9MlddncS0vTqMyIdlYvRIZWdQ7pKCq6/wCcoItnQXYmnWe8mbVhG2UT
-         805oR/rYEVhmMfW+o5FeIpxpEkYqqx2uiKhTmhHEVLsKstJ5kr9HdekpYd/HtL4bK7xa
-         BxS0KWW2llKflJh7Dhc7G9GlW9rA8TN7P2Cw72Kqn9VE/MQHrP1xmMnkQvPyNTcolr6S
-         DcXMiA5p//3NFeVr+xWuFSWgBjN6zI2kPSYrKOjgMQZl1elI9KpY5MAy+6FecPudPlQ2
-         p8aA==
-X-Gm-Message-State: AOAM530n7zwEKPOMRhGagh8CuVh/5VQkKgw7Di0iCuGk5fgqQKP5euAN
-        I6TzuTq68sXuijhkMxeHaIgFOw==
-X-Google-Smtp-Source: ABdhPJyXJaa8FXXCaZ/ZKjzEibYMgOb8b0ELox5A9RF2nt4VMaDXntZEjjVnN2/8DY0lu4XYGqdpHQ==
-X-Received: by 2002:a17:90a:fb97:: with SMTP id cp23mr1035851pjb.169.1620860927121;
-        Wed, 12 May 2021 16:08:47 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id b6sm728181pfb.27.2021.05.12.16.08.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 May 2021 16:08:46 -0700 (PDT)
-Date:   Wed, 12 May 2021 23:08:42 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Liran Alon <liran.alon@oracle.com>,
-        Jim Mattson <jmattson@google.com>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Kevin Mcgaire <kevinmcgaire@google.com>,
-        Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH] kvm: x86: Don't dirty guest memory on every vcpu_put()
-Message-ID: <YJxf+ho/iu8Gpw6+@google.com>
-References: <20200116001635.174948-1-jmattson@google.com>
- <FE5AE42B-107F-4D7E-B728-E33780743434@oracle.com>
- <CANgfPd8wFZx977enc+kbbTP1DfMdxkbi5uzhAgpRZhU0yXOzKg@mail.gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=JQiB9sLTWHFoFy/ehq3hN41VSXihaIbpt0N1jzuH/T0=;
+        b=dmjJtw5/xz70EwrszAMWeTiLJq/6gsSk0d7j7pBu0d08MHVxMhUaRYE+qLEsGTn02w
+         N6Ho2fodh3xC6XJs6qcaYHQYJ7ge96b9O3YI3U7rJSlTqPinpWvb737cge4BJGWVfN5w
+         Y5AiXqxRg90iwNSgXWwxcbUGRXwOX7CFTblnwHQZbwW2tXKR/FPiVa94Ov3TwMLa+5+p
+         qu7uZglNalyvMG4rO7tifMtg8/V9N6Fu15PhLSdHtz5rz+xZIox9AXId3aC+4lotzMWJ
+         SGJIVkXNfEYwKIbvdce+2yb0SqHoNX/ijN+rLrYXZ+b8qxH1H2kZsOKtCGawqCjfhiXE
+         OscA==
+X-Gm-Message-State: AOAM531uwvCoC6le/iMwLLFcac2nwms8M4G63+G2YDDxlnXvpMZNkaJL
+        8C6g6rh8/AsTub0Rklax2mENoNXscbhh82Vwd0w2xQ==
+X-Google-Smtp-Source: ABdhPJz4nT2NqJcZFz2UrKAvtEwW9ZMtr8A1+fD5q6gQPHshVzbD+pDD8IetiOzNniyNhQfeyg7UuJws3Xt2YIDPXyc=
+X-Received: by 2002:a2e:81d0:: with SMTP id s16mr32885298ljg.74.1620861430582;
+ Wed, 12 May 2021 16:17:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANgfPd8wFZx977enc+kbbTP1DfMdxkbi5uzhAgpRZhU0yXOzKg@mail.gmail.com>
+References: <20210511202120.1371800-1-dmatlack@google.com> <20210512064052.jgmyknopi3xcmwrl@gator>
+In-Reply-To: <20210512064052.jgmyknopi3xcmwrl@gator>
+From:   David Matlack <dmatlack@google.com>
+Date:   Wed, 12 May 2021 16:16:43 -0700
+Message-ID: <CALzav=eGJxpWu0xO4G-Z4dAkxc_bOthyKfAZi0LF+=8XRduW7A@mail.gmail.com>
+Subject: Re: [PATCH v4] KVM: selftests: Print a message if /dev/kvm is missing
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 12, 2021, Ben Gardon wrote:
-> On Wed, Jan 15, 2020 at 4:32 PM Liran Alon <liran.alon@oracle.com> wrote:
+On Tue, May 11, 2021 at 11:41 PM Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Tue, May 11, 2021 at 08:21:20PM +0000, David Matlack wrote:
+> > If a KVM selftest is run on a machine without /dev/kvm, it will exit
+> > silently. Make it easy to tell what's happening by printing an error
+> > message.
 > >
+> > Opportunistically consolidate all codepaths that open /dev/kvm into a
+> > single function so they all print the same message.
 > >
+> > This slightly changes the semantics of vm_is_unrestricted_guest() by
+> > changing a TEST_ASSERT() to exit(KSFT_SKIP). However
+> > vm_is_unrestricted_guest() is only called in one place
+> > (x86_64/mmio_warning_test.c) and that is to determine if the test should
+> > be skipped or not.
 > >
-> > > On 16 Jan 2020, at 2:16, Jim Mattson <jmattson@google.com> wrote:
-> > >
-> > > Beginning with commit 0b9f6c4615c99 ("x86/kvm: Support the vCPU
-> > > preemption check"), the KVM_VCPU_PREEMPTED flag is set in the guest
-> > > copy of the kvm_steal_time struct on every call to vcpu_put(). As a
-> > > result, guest memory is dirtied on every call to vcpu_put(), even when
-> > > the VM is quiescent.
-> > >
-> > > To avoid dirtying guest memory unnecessarily, don't bother setting the
-> > > flag in the guest copy of the struct if it is already set in the
-> > > kernel copy of the struct.
+> > Signed-off-by: David Matlack <dmatlack@google.com>
+> > ---
+> >  .../testing/selftests/kvm/include/kvm_util.h  |  1 +
+> >  tools/testing/selftests/kvm/lib/kvm_util.c    | 45 +++++++++++++------
+> >  .../selftests/kvm/lib/x86_64/processor.c      | 16 ++-----
+> >  .../kvm/x86_64/get_msr_index_features.c       |  8 +---
+> >  4 files changed, 38 insertions(+), 32 deletions(-)
 > >
-> > I suggest adding this comment to code as-well.
-> 
-> Ping. I don't know if a v2 of this change with the comment in code is
-> needed for acceptance, but I don't want this to fall through the
-> cracks and get lost.
+>
+> Hi David,
+>
+> You could have grabbed my r-b from v3, but anyway here it is again
 
-A version of this was committed a while ago.  The CVE number makes me think it
-went stealthily...
+Gotcha, I will keep that in mind in the future. Thanks for your
+patience and reviews on this patch!
 
-commit 8c6de56a42e0c657955e12b882a81ef07d1d073e
-Author: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Date:   Wed Oct 30 19:01:31 2019 +0000
-
-    x86/kvm: Be careful not to clear KVM_VCPU_FLUSH_TLB bit
-
-    kvm_steal_time_set_preempted() may accidentally clear KVM_VCPU_FLUSH_TLB
-    bit if it is called more than once while VCPU is preempted.
-
-    This is part of CVE-2019-3016.
-
-    (This bug was also independently discovered by Jim Mattson
-    <jmattson@google.com>)
-
-    Signed-off-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-    Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
-    Cc: stable@vger.kernel.org
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index cf917139de6b..8c9369151e9f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3504,6 +3504,9 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
-        if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
-                return;
-
-+       if (vcpu->arch.st.steal.preempted)
-+               return;
-+
-        vcpu->arch.st.steal.preempted = KVM_VCPU_PREEMPTED;
-
-        kvm_write_guest_offset_cached(vcpu->kvm, &vcpu->arch.st.stime,
-
-
-> > > If a different vCPU thread clears the guest copy of the flag, it will
-> > > no longer get reset on the next call to vcpu_put, but it's not clear
-> > > that resetting the flag in this case was intentional to begin with.
-> >
-> > I agree… I find it hard to believe that guest vCPU is allowed to clear the flag
-> > and expect host to set it again on the next vcpu_put() call. Doesn’t really make sense.
-> >
-> > >
-> > > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > > Tested-by: Kevin Mcgaire <kevinmcgaire@google.com>
-> > > Reviewed-by: Ben Gardon <bgardon@google.com>
-> > > Reviewed-by: Oliver Upton <oupton@google.com>
-> >
-> > Good catch.
-> > Reviewed-by: Liran Alon <liran.alon@oracle.com>
-> >
-> > -Liran
-> >
-> > >
-> > > ---
-> > > arch/x86/kvm/x86.c | 3 +++
-> > > 1 file changed, 3 insertions(+)
-> > >
-> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > index cf917139de6b..3dc17b173f88 100644
-> > > --- a/arch/x86/kvm/x86.c
-> > > +++ b/arch/x86/kvm/x86.c
-> > > @@ -3504,6 +3504,9 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
-> > >       if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
-> > >               return;
-> > >
-> > > +     if (vcpu->arch.st.steal.preempted & KVM_VCPU_PREEMPTED)
-> > > +             return;
-> > > +
-> > >       vcpu->arch.st.steal.preempted = KVM_VCPU_PREEMPTED;
-> > >
-> > >       kvm_write_guest_offset_cached(vcpu->kvm, &vcpu->arch.st.stime,
-> > > --
-> > > 2.25.0.rc1.283.g88dfdc4193-goog
-> > >
-> >
+>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+>
+> Thanks,
+> drew
+>
