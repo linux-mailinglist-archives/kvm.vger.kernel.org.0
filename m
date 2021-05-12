@@ -2,71 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E0C8437B891
-	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 10:51:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 731E937B89F
+	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 10:52:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230403AbhELIvw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 04:51:52 -0400
-Received: from 8bytes.org ([81.169.241.247]:38848 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230137AbhELIvv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 04:51:51 -0400
-Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id D8842F3; Wed, 12 May 2021 10:50:42 +0200 (CEST)
-Date:   Wed, 12 May 2021 10:50:41 +0200
-From:   'Joerg Roedel' <joro@8bytes.org>
-To:     Juergen Gross <jgross@suse.com>
-Cc:     David Laight <David.Laight@aculab.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        Hyunwook Baek <baekhw@google.com>,
-        Joerg Roedel <jroedel@suse.de>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        "hpa@zytor.com" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>
-Subject: Re: [PATCH 3/6] x86/sev-es: Use __put_user()/__get_user
-Message-ID: <YJuW4TtRJKZ+OIhj@8bytes.org>
-References: <20210512075445.18935-1-joro@8bytes.org>
- <20210512075445.18935-4-joro@8bytes.org>
- <0496626f018d4d27a8034a4822170222@AcuMS.aculab.com>
- <fcb2c501-70ca-1a54-4a75-8ab05c21ee30@suse.com>
+        id S230506AbhELIxY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 04:53:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33647 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230295AbhELIxY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 12 May 2021 04:53:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620809536;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0wtuPVOomswhN3nKbizxfMzPJgWJmm0zGlVQ5c3NWyA=;
+        b=N/yTTDZowlCD71r3u/DlRHsRSAYU6uK1AL4PUFRivlbSwXSnxePRVLcBY+WLmjlc9imMvz
+        py1WG5WCoHNWQIVVztQ3NAImVVIS84mFOLMTARti8OiVQveTwl3uxCV/IoCAT8TMz9LC0Y
+        HNHwkBYSvnq4kvwRozTJA23ArOQ/p8I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-596-68KwoGpgOO-EJxJemm-tJg-1; Wed, 12 May 2021 04:52:14 -0400
+X-MC-Unique: 68KwoGpgOO-EJxJemm-tJg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8ABEC107ACCA;
+        Wed, 12 May 2021 08:52:13 +0000 (UTC)
+Received: from [10.36.112.87] (ovpn-112-87.ams2.redhat.com [10.36.112.87])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D7ECAE159;
+        Wed, 12 May 2021 08:52:10 +0000 (UTC)
+Subject: Re: [PATCH v2 4/5] KVM: selftests: Add exception handling support for
+ aarch64
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com,
+        drjones@redhat.com, alexandru.elisei@arm.com
+References: <20210430232408.2707420-1-ricarkol@google.com>
+ <20210430232408.2707420-5-ricarkol@google.com> <87a6pcumyg.wl-maz@kernel.org>
+ <YJBLFVoRmsehRJ1N@google.com>
+ <20915a2f-d07c-2e61-3cce-ff385e98e796@redhat.com>
+ <YJRADhU4CcTE7bdm@google.com>
+ <8a99d57b-0513-557c-79e0-98084799812f@redhat.com>
+ <YJuDYZbqe8V47YCJ@google.com>
+ <4e83daa3-3166-eeed-840c-39be71b1124d@redhat.com>
+ <348b978aad60db6af7ba9c9ce51bbd87@kernel.org>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <628dca08-4108-8be1-9bea-8c388f28401e@redhat.com>
+Date:   Wed, 12 May 2021 10:52:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fcb2c501-70ca-1a54-4a75-8ab05c21ee30@suse.com>
+In-Reply-To: <348b978aad60db6af7ba9c9ce51bbd87@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 12, 2021 at 10:16:12AM +0200, Juergen Gross wrote:
-> You want something like xen_safe_[read|write]_ulong().
+Hi,
 
-From a first glance I can't see it, what is the difference between the
-xen_safe_*_ulong() functions and __get_user()/__put_user()? The only
-difference I can see is that __get/__put_user() support different access
-sizes, but neither of those disables page-faults by itself, for example.
+On 5/12/21 10:33 AM, Marc Zyngier wrote:
+> On 2021-05-12 09:19, Auger Eric wrote:
+>> Hi Ricardo,
+>>
+>> On 5/12/21 9:27 AM, Ricardo Koller wrote:
+>>> On Fri, May 07, 2021 at 04:08:07PM +0200, Auger Eric wrote:
+>>>> Hi Ricardo,
+>>>>
+>>>> On 5/6/21 9:14 PM, Ricardo Koller wrote:
+>>>>> On Thu, May 06, 2021 at 02:30:17PM +0200, Auger Eric wrote:
+>>>>>> Hi Ricardo,
+>>>>>>
+>>>>>
+>>>>> Hi Eric,
+>>>>>
+>>>>> Thank you very much for the test.
+>>>>>
+>>>>>> On 5/3/21 9:12 PM, Ricardo Koller wrote:
+>>>>>>> On Mon, May 03, 2021 at 11:32:39AM +0100, Marc Zyngier wrote:
+>>>>>>>> On Sat, 01 May 2021 00:24:06 +0100,
+>>>>>>>> Ricardo Koller <ricarkol@google.com> wrote:
+>>>>>>>>>
+>>>>>>>>> Add the infrastructure needed to enable exception handling in
+>>>>>>>>> aarch64
+>>>>>>>>> selftests. The exception handling defaults to an
+>>>>>>>>> unhandled-exception
+>>>>>>>>> handler which aborts the test, just like x86. These handlers
+>>>>>>>>> can be
+>>>>>>>>> overridden by calling vm_install_vector_handler(vector) or
+>>>>>>>>> vm_install_exception_handler(vector, ec). The unhandled exception
+>>>>>>>>> reporting from the guest is done using the ucall type
+>>>>>>>>> introduced in a
+>>>>>>>>> previous commit, UCALL_UNHANDLED.
+>>>>>>>>>
+>>>>>>>>> The exception handling code is heavily inspired on kvm-unit-tests.
+>>>>>>
+>>>>>> running the test on 5.12 I get
+>>>>>>
+>>>
+>>> Hi Eric,
+>>>
+>>> I'm able to reproduce the failure you are seeing on 5.6, specifically
+>>> with kernels older than this commit:
+>>>
+>>>   4942dc6638b0 KVM: arm64: Write arch.mdcr_el2 changes since last
+>>> vcpu_load on VHE
+>>>
+>>> but not yet on v5.12. Could you share the commit of the kernel you are
+>>> testing, please?
+>>
+>> my host is a 5.12 kernel (8404c9fbc84b)
+> 
+> Time to compare notes then. What HW are you using? Running VHE or not?
+VHE yes. Cavium Sabre system.
 
-Couldn't these xen-specific functions not also be replaces by
-__get_user()/__put_user()?
+Thanks
 
-Regards,
-
-	Joerg
+Eric
+> 
+> Thanks,
+> 
+>         M.
 
