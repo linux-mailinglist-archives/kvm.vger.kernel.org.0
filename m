@@ -2,128 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C40CE37BB55
-	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 12:54:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C3AB37BB74
+	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 13:10:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230316AbhELKz5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 06:55:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42008 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230246AbhELKzy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 06:55:54 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA38DC061761
-        for <kvm@vger.kernel.org>; Wed, 12 May 2021 03:54:44 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id c22so26502615edn.7
-        for <kvm@vger.kernel.org>; Wed, 12 May 2021 03:54:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=NPXzGpmso8Te8IRLGmmznTWDVnaW8I7l+0F2ZmGTikk=;
-        b=WBwhP4kSQeL/Rzy5eduUceKcWKhU7XRl9kE6Hsqnt7EkH3iNZy2hFCTGDpUjAsZZ/7
-         VcEoKdDQuztgQNI0Fl9E34PwAzunDLxEcqemp6V2TNC1cf7v0d+M5VBt3hwqJgRvG1vH
-         SAqckcUAGLG4W46IYiWG6fvaKoJ44/SR/dAtFYSM3d52ZT93om1YAZmuQR2kye74wByk
-         WHm8CBcfJpCLT/8swpPIaUrtmssl++SDIwmb09UBNcYn/5GRMHwY38Ucxk29bOI340Cr
-         pnxjM5AeY2epGNHTXfj8Tl+ZYCMadgtC5RE+ZTYzi0FP6xKlseXKwdm8NzkT2CjofX/Y
-         eENg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:subject:date:message-id
-         :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=NPXzGpmso8Te8IRLGmmznTWDVnaW8I7l+0F2ZmGTikk=;
-        b=uBCpNtqlNpFhzkDhnQ48ggHr8yeGtNqSedWcrwl6iha7/A5ebeNUVYdBwDlhjejgDL
-         psvoeTjdEdRgsKlo0vwtnv1w3nVJV6VmUI8X3tqdJLdtdKZxTWTdHmKwOXBSvBQuJQKd
-         fJx4Qzyq9XysS5vLwCoZiMbzoFGKFd7XW03nSZx8okOp+DSwGmdkecPTuCedAxm8oqtY
-         GsgA3kC4cX6SrkOqZSeeDH3WLsx6hhuJMioo0i5hk5Yks0ct0+TKDYdGEzDrGSe8ofLw
-         6iH3EGFnuyiC8QqYbCCr26019kHQSgItiOVDAyKd6vUnEkx8B9R2YA03iYQcY/IbOOB1
-         kOEA==
-X-Gm-Message-State: AOAM532zr4Fv99ccnoSnaq0YHa0vVP+f9WHP3DQi2AqfnyUCWWv8hqtV
-        Zje2OFjNZJj62xPwVHS1/Ef0c3WiC4E=
-X-Google-Smtp-Source: ABdhPJxx1vATkhTNvJOlK9tTb/FsDaxl+CQ55MaKjd7u6oOtMjk488IFc6dxRkqtfm3+mQovFFKVzQ==
-X-Received: by 2002:aa7:c30c:: with SMTP id l12mr42319992edq.217.1620816883622;
-        Wed, 12 May 2021 03:54:43 -0700 (PDT)
-Received: from avogadro.lan ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id b19sm16829624edd.66.2021.05.12.03.54.43
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 May 2021 03:54:43 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Subject: [PATCH v2 kvm-unit-tests 2/2] arm: add eabi version of 64-bit division functions
-Date:   Wed, 12 May 2021 12:54:40 +0200
-Message-Id: <20210512105440.748153-3-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210512105440.748153-1-pbonzini@redhat.com>
-References: <20210512105440.748153-1-pbonzini@redhat.com>
+        id S230137AbhELLLx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 07:11:53 -0400
+Received: from mx2.suse.de ([195.135.220.15]:51046 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230035AbhELLLw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 May 2021 07:11:52 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id D58ABB028;
+        Wed, 12 May 2021 11:10:43 +0000 (UTC)
+Date:   Wed, 12 May 2021 12:10:40 +0100
+From:   Mel Gorman <mgorman@suse.de>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     tglx@linutronix.de, mingo@kernel.org, juri.lelli@redhat.com,
+        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+        rostedt@goodmis.org, bsegall@google.com, bristot@redhat.com,
+        bsingharora@gmail.com, pbonzini@redhat.com, maz@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        riel@surriel.com, hannes@cmpxchg.org
+Subject: Re: [PATCH 3/6] sched: Simplify sched_info_on()
+Message-ID: <20210512111040.GC3672@suse.de>
+References: <20210505105940.190490250@infradead.org>
+ <20210505111525.121458839@infradead.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=iso-8859-15
+Content-Disposition: inline
+In-Reply-To: <20210505111525.121458839@infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-eabi prescribes different entry points for 64-bit division on
-32-bit platforms.  Implement a wrapper for the GCC-style __divmoddi4
-and __udivmoddi4 functions.
+On Wed, May 05, 2021 at 12:59:43PM +0200, Peter Zijlstra wrote:
+> The situation around sched_info is somewhat complicated, it is used by
+> sched_stats and delayacct and, indirectly, kvm.
+> 
+> If SCHEDSTATS=Y (but disabled by default) sched_info_on() is
+> unconditionally true -- this is the case for all distro kernel configs
+> I checked.
+> 
+> If for some reason SCHEDSTATS=N, but TASK_DELAY_ACCT=Y, then
+> sched_info_on() can return false when delayacct is disabled,
+> presumably because there would be no other users left; except kvm is.
+> 
+> Instead of complicating matters further by accurately accounting
+> sched_stat and kvm state, simply unconditionally enable when
+> SCHED_INFO=Y, matching the common distro case.
+> 
+> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> @@ -163,13 +158,12 @@ static inline void sched_info_reset_dequ
+>   */
+>  static inline void sched_info_dequeue(struct rq *rq, struct task_struct *t)
+>  {
+> -	unsigned long long now = rq_clock(rq), delta = 0;
+> +	unsigned long long delta = 0;
+>  
+> -	if (sched_info_on()) {
+> -		if (t->sched_info.last_queued)
+> -			delta = now - t->sched_info.last_queued;
+> +	if (t->sched_info.last_queued) {
+> +		delta = rq_clock(rq) - t->sched_info.last_queued;
+> +		t->sched_info.last_queued = 0;
+>  	}
+> -	sched_info_reset_dequeued(t);
+>  	t->sched_info.run_delay += delta;
+>  
+>  	rq_sched_info_dequeue(rq, delta);
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arm/Makefile.arm  |  1 +
- lib/arm/ldivmod.S | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 33 insertions(+)
- create mode 100644 lib/arm/ldivmod.S
+As delta is !0 iff t->sched_info.last_queued, why not this?
 
-diff --git a/arm/Makefile.arm b/arm/Makefile.arm
-index 687a8ed..3a4cc6b 100644
---- a/arm/Makefile.arm
-+++ b/arm/Makefile.arm
-@@ -24,6 +24,7 @@ cflatobjs += lib/arm/spinlock.o
- cflatobjs += lib/arm/processor.o
- cflatobjs += lib/arm/stack.o
- cflatobjs += lib/ldiv32.o
-+cflatobjs += lib/arm/ldivmod.o
+diff --git a/kernel/sched/stats.h b/kernel/sched/stats.h
+index 33ffd41935ba..37e33c0eeb7c 100644
+--- a/kernel/sched/stats.h
++++ b/kernel/sched/stats.h
+@@ -158,15 +158,14 @@ static inline void psi_sched_switch(struct task_struct *prev,
+  */
+ static inline void sched_info_dequeue(struct rq *rq, struct task_struct *t)
+ {
+-	unsigned long long delta = 0;
+-
+ 	if (t->sched_info.last_queued) {
++		unsigned long long delta;
++
+ 		delta = rq_clock(rq) - t->sched_info.last_queued;
+ 		t->sched_info.last_queued = 0;
++		t->sched_info.run_delay += delta;
++		rq_sched_info_dequeue(rq, delta);
+ 	}
+-	t->sched_info.run_delay += delta;
+-
+-	rq_sched_info_dequeue(rq, delta);
+ }
  
- # arm specific tests
- tests =
-diff --git a/lib/arm/ldivmod.S b/lib/arm/ldivmod.S
-new file mode 100644
-index 0000000..de11ac9
---- /dev/null
-+++ b/lib/arm/ldivmod.S
-@@ -0,0 +1,32 @@
-+// EABI ldivmod and uldivmod implementation based on libcompiler-rt
-+//
-+// This file is dual licensed under the MIT and the University of Illinois Open
-+// Source Licenses.
-+
-+	.syntax unified
-+	.align 2
-+	.globl __aeabi_uldivmod
-+	.type __aeabi_uldivmod, %function
-+__aeabi_uldivmod:
-+	push	{r11, lr}
-+	sub	sp, sp, #16
-+	add	r12, sp, #8
-+	str	r12, [sp]                // third argument to __udivmoddi4
-+	bl	__udivmoddi4
-+	ldr	r2, [sp, #8]             // remainder returned in r2-r3
-+	ldr	r3, [sp, #12]
-+	add	sp, sp, #16
-+	pop	{r11, pc}
-+
-+	.globl __aeabi_ldivmod
-+	.type __aeabi_ldivmod, %function
-+__aeabi_ldivmod:
-+	push	{r11, lr}
-+	sub	sp, sp, #16
-+	add	r12, sp, #8
-+	str	r12, [sp]                // third argument to __divmoddi4
-+	bl	__divmoddi4
-+	ldr	r2, [sp, #8]             // remainder returned in r2-r3
-+	ldr	r3, [sp, #12]
-+	add	sp, sp, #16
-+	pop	{r11, pc}
--- 
-2.31.1
+ /*
 
+> @@ -184,9 +178,10 @@ static void sched_info_arrive(struct rq
+>  {
+>  	unsigned long long now = rq_clock(rq), delta = 0;
+>  
+> -	if (t->sched_info.last_queued)
+> +	if (t->sched_info.last_queued) {
+>  		delta = now - t->sched_info.last_queued;
+> -	sched_info_reset_dequeued(t);
+> +		t->sched_info.last_queued = 0;
+> +	}
+>  	t->sched_info.run_delay += delta;
+>  	t->sched_info.last_arrival = now;
+>  	t->sched_info.pcount++;
+
+Similarly
+
+@@ -176,17 +175,18 @@ static inline void sched_info_dequeue(struct rq *rq, struct task_struct *t)
+  */
+ static void sched_info_arrive(struct rq *rq, struct task_struct *t)
+ {
+-	unsigned long long now = rq_clock(rq), delta = 0;
++	unsigned long long now = rq_clock(rq);
+ 
+ 	if (t->sched_info.last_queued) {
++		unsigned long long delta;
++
+ 		delta = now - t->sched_info.last_queued;
+ 		t->sched_info.last_queued = 0;
++		t->sched_info.run_delay += delta;
++		rq_sched_info_arrive(rq, delta);
+ 	}
+-	t->sched_info.run_delay += delta;
+ 	t->sched_info.last_arrival = now;
+ 	t->sched_info.pcount++;
+-
+-	rq_sched_info_arrive(rq, delta);
+ }
+ 
+ /*
+
+-- 
+Mel Gorman
+SUSE Labs
