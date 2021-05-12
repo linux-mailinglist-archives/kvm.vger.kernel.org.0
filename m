@@ -2,110 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0264837CBE4
-	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 19:02:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71ED537CBEA
+	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 19:02:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236751AbhELQiv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 12:38:51 -0400
+        id S238644AbhELQiy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 12:38:54 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238544AbhELQaZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 12:30:25 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 116DFC08EACA
-        for <kvm@vger.kernel.org>; Wed, 12 May 2021 09:03:09 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id t21so12755619plo.2
-        for <kvm@vger.kernel.org>; Wed, 12 May 2021 09:03:09 -0700 (PDT)
+        with ESMTP id S242047AbhELQbn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 May 2021 12:31:43 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B668C061364
+        for <kvm@vger.kernel.org>; Wed, 12 May 2021 09:06:42 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id q15so14282065pgg.12
+        for <kvm@vger.kernel.org>; Wed, 12 May 2021 09:06:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=aVmYs+apRTUqz4G5EyhD9SbyJQ4D0L1K0aWCoYWQfJ4=;
-        b=s5qzg3DgtagxZgqEuCvBBT9OJVOYAC90VkRdOaYWhLb/+zDfsksL1iYK1XGsNDvdKS
-         t6BB+PVuYZW91u4G+0W2cD57E41ffaMQlDL+kkRggWgcTQDISSVFfRAOFir9rLHowdR6
-         aI2zTQB2pncjxwwjlgPG4omBnQRJ4NMd9slrMqnVnlmdry/svKybNOtRvq9f8e6dy2m3
-         axJIU4o1dZvAxanU/HnpK6skIvd1XRLHcU+cRlaHLhCIIzAzrggk5I7QtDmksB6RQ2r2
-         2nBp/Cywyl9r1xuiS7q4aGDQKvhVTQfVp7KKRiJAqBeDtreSkdI4WzC8cRmWVrdFuXPn
-         mWcg==
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=dgHbOLOeSj5WKbYYrBAPLjp+f/dwtBzWBZ4797F6XUY=;
+        b=e0Y+6aQ4yaGK7mLERwh7bRnbUGpEsba/vWgxviu4hiqJ2TDknS0YbLE/PCHvBHKLdp
+         r7rXRSv4M5zcTlW3mVyZHXRvuF8v9zhy76xYEGfbeNlCjMXQ7kMxFz7OsOahEo+azl/u
+         DXDUdie3Vre2iSrbE8UIxNHonczaH1OfjmNvZ6u9h4z9/I7PUgQ6cg/5Y0PuCHO9Qq24
+         6h+dkMBG9aJ+JlrmMDRWglC1RCfXZmpUuzcxOT9IqunqkiEJcaD7gr5ExafEkb4c6taK
+         YGKSlxUPquyGLHjlSDd+yGfPUEEgITzLRCtLOwET6Wjdb4lc+mq2rfcHhh6XpbbJre3U
+         7I+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=aVmYs+apRTUqz4G5EyhD9SbyJQ4D0L1K0aWCoYWQfJ4=;
-        b=kWkyR7eHLgR5BwrUoRw6/6tUbXzCs280YaMDj+IendYM/PF1qYTSBgpF8Lw29RK5tD
-         cC9v5hD868mj0uuePz66uXx0Z9vNVxHAbUv+MIzasBqsAsrIaCHl6TPWaTHzrnlgrG1d
-         eBvIu0hR6fwgntcsdh5uQcRvtgE2wO/M85KjKzofKyVG8FOoOxXVZRSQCO3Gs7wn2U4h
-         Wk9gQW+1ZdBDbhR8BCxAcGxIIDuXQkIqtQnMFdxw8kih5GZj+SNtSCMfcVZ3GZAztyrH
-         hr7vIiZ72TYYkwRvfb09EqpgBLDjz1yPpPZZOLPn2+/nTKrDWLy7v5qQ+VFVs3vSjbmN
-         ZjkQ==
-X-Gm-Message-State: AOAM531UPKvqasJvcCjM4JwZ3FiNigBEyUvRIRRp9K210XB0EqZml87Q
-        0n4AaYRfyJWCVE1BlLrAu6hedA==
-X-Google-Smtp-Source: ABdhPJy7Ar45AwH9wnKOlmuIMHWU46FfLre/sapwc88FmtcyWz+BGSUr9GP3erEG+vu+s1aHbuf/6w==
-X-Received: by 2002:a17:902:e84c:b029:ee:d129:3b1c with SMTP id t12-20020a170902e84cb02900eed1293b1cmr35466669plg.73.1620835385927;
-        Wed, 12 May 2021 09:03:05 -0700 (PDT)
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=dgHbOLOeSj5WKbYYrBAPLjp+f/dwtBzWBZ4797F6XUY=;
+        b=CQpaYJjii/WI1VoDXg9xXVEeImfbCyfIzEXfTTYypB6PgkLQWo5D6eK40I4G/hiFpp
+         aGv+dU62T6veqwS6NsFt9NkgGgpT+o0d5As7drqRKQ8/gB9Qoe2AgnJwDjHEjhr+c4JZ
+         80yj0BhkiBSVwlw4qnvIQOzEcBNVAih71208SivPM6BLLrDxVevvwq8nSboAjtb1GAX5
+         QUcPHCsJ/AsHpPrY1wK58X3zdipGeVXQGtgCudVcT+ASFvfAsRxx0tpu26mImT7AgsGv
+         eeCR4rKwfQahhtPYubiVEafr6rhLCdAoB6sCPnJo7CGMAc7N+HBzekYmFVVo0JthSZfL
+         uaAw==
+X-Gm-Message-State: AOAM533doIY3OJERyYbMgLYOypilOJtBxO4EtTkqRBKVhG+3EctQ4qqY
+        TVwa5TdZrahVJxEBSIr16l013NswbUsL5Q==
+X-Google-Smtp-Source: ABdhPJwCnyutMSxtRMlZCImn/MhoJ/z1aUOeS5rTLjqqupr6g4dPYtzV1nLinn5hNQDtN8Brl2rMBA==
+X-Received: by 2002:a62:3003:0:b029:28e:74d9:1e16 with SMTP id w3-20020a6230030000b029028e74d91e16mr37368927pfw.21.1620835601750;
+        Wed, 12 May 2021 09:06:41 -0700 (PDT)
 Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id j7sm223478pfd.129.2021.05.12.09.03.05
+        by smtp.gmail.com with ESMTPSA id b13sm240823pfl.140.2021.05.12.09.06.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 May 2021 09:03:05 -0700 (PDT)
-Date:   Wed, 12 May 2021 09:03:01 -0700
+        Wed, 12 May 2021 09:06:41 -0700 (PDT)
+Date:   Wed, 12 May 2021 09:06:37 -0700
 From:   Ricardo Koller <ricarkol@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Zenghui Yu <yuzenghui@huawei.com>,
-        Auger Eric <eric.auger@redhat.com>, kvm@vger.kernel.org,
+To:     Auger Eric <eric.auger@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com,
         drjones@redhat.com, alexandru.elisei@arm.com
 Subject: Re: [PATCH v2 4/5] KVM: selftests: Add exception handling support
  for aarch64
-Message-ID: <YJv8NUtKilXPDYpY@google.com>
-References: <20210430232408.2707420-1-ricarkol@google.com>
- <20210430232408.2707420-5-ricarkol@google.com>
+Message-ID: <YJv9DYIvqRW24P5C@google.com>
+References: <20210430232408.2707420-5-ricarkol@google.com>
  <87a6pcumyg.wl-maz@kernel.org>
  <YJBLFVoRmsehRJ1N@google.com>
  <20915a2f-d07c-2e61-3cce-ff385e98e796@redhat.com>
- <4f7f81f9-8da0-b4ef-49e2-7d87b5c23b15@huawei.com>
- <a5ad32abf4ff6f80764ee31f16a5e3fc@kernel.org>
+ <YJRADhU4CcTE7bdm@google.com>
+ <8a99d57b-0513-557c-79e0-98084799812f@redhat.com>
+ <YJuDYZbqe8V47YCJ@google.com>
+ <4e83daa3-3166-eeed-840c-39be71b1124d@redhat.com>
+ <348b978aad60db6af7ba9c9ce51bbd87@kernel.org>
+ <628dca08-4108-8be1-9bea-8c388f28401e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <a5ad32abf4ff6f80764ee31f16a5e3fc@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <628dca08-4108-8be1-9bea-8c388f28401e@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 12, 2021 at 02:43:28PM +0100, Marc Zyngier wrote:
-> On 2021-05-12 13:59, Zenghui Yu wrote:
-> > Hi Eric,
-> > 
-> > On 2021/5/6 20:30, Auger Eric wrote:
-> > > running the test on 5.12 I get
-> > > 
-> > > ==== Test Assertion Failure ====
-> > >   aarch64/debug-exceptions.c:232: false
-> > >   pid=6477 tid=6477 errno=4 - Interrupted system call
-> > >      1	0x000000000040147b: main at debug-exceptions.c:230
-> > >      2	0x000003ff8aa60de3: ?? ??:0
-> > >      3	0x0000000000401517: _start at :?
-> > >   Failed guest assert: hw_bp_addr == PC(hw_bp) at
-> > > aarch64/debug-exceptions.c:105
-> > > 	values: 0, 0x401794
-> > 
-> > FYI I can also reproduce it on my VHE box. And Drew's suggestion [*]
-> > seemed to work for me. Is the ISB a requirement of architecture?
+On Wed, May 12, 2021 at 10:52:09AM +0200, Auger Eric wrote:
+> Hi,
 > 
-> Very much so. Given that there is no context synchronisation (such as
-> ERET or an interrupt) in this code, the CPU is perfectly allowed to
-> delay the system register effect as long as it can.
+> On 5/12/21 10:33 AM, Marc Zyngier wrote:
+> > On 2021-05-12 09:19, Auger Eric wrote:
+> >> Hi Ricardo,
+> >>
+> >> On 5/12/21 9:27 AM, Ricardo Koller wrote:
+> >>> On Fri, May 07, 2021 at 04:08:07PM +0200, Auger Eric wrote:
+> >>>> Hi Ricardo,
+> >>>>
+> >>>> On 5/6/21 9:14 PM, Ricardo Koller wrote:
+> >>>>> On Thu, May 06, 2021 at 02:30:17PM +0200, Auger Eric wrote:
+> >>>>>> Hi Ricardo,
+> >>>>>>
+> >>>>>
+> >>>>> Hi Eric,
+> >>>>>
+> >>>>> Thank you very much for the test.
+> >>>>>
+> >>>>>> On 5/3/21 9:12 PM, Ricardo Koller wrote:
+> >>>>>>> On Mon, May 03, 2021 at 11:32:39AM +0100, Marc Zyngier wrote:
+> >>>>>>>> On Sat, 01 May 2021 00:24:06 +0100,
+> >>>>>>>> Ricardo Koller <ricarkol@google.com> wrote:
+> >>>>>>>>>
+> >>>>>>>>> Add the infrastructure needed to enable exception handling in
+> >>>>>>>>> aarch64
+> >>>>>>>>> selftests. The exception handling defaults to an
+> >>>>>>>>> unhandled-exception
+> >>>>>>>>> handler which aborts the test, just like x86. These handlers
+> >>>>>>>>> can be
+> >>>>>>>>> overridden by calling vm_install_vector_handler(vector) or
+> >>>>>>>>> vm_install_exception_handler(vector, ec). The unhandled exception
+> >>>>>>>>> reporting from the guest is done using the ucall type
+> >>>>>>>>> introduced in a
+> >>>>>>>>> previous commit, UCALL_UNHANDLED.
+> >>>>>>>>>
+> >>>>>>>>> The exception handling code is heavily inspired on kvm-unit-tests.
+> >>>>>>
+> >>>>>> running the test on 5.12 I get
+> >>>>>>
+> >>>
+> >>> Hi Eric,
+> >>>
+> >>> I'm able to reproduce the failure you are seeing on 5.6, specifically
+> >>> with kernels older than this commit:
+> >>>
+> >>>   4942dc6638b0 KVM: arm64: Write arch.mdcr_el2 changes since last
+> >>> vcpu_load on VHE
+> >>>
+> >>> but not yet on v5.12. Could you share the commit of the kernel you are
+> >>> testing, please?
+> >>
+> >> my host is a 5.12 kernel (8404c9fbc84b)
+> > 
+> > Time to compare notes then. What HW are you using? Running VHE or not?
+> VHE yes. Cavium Sabre system.
 > 
->         M.
-> -- 
-> Jazz is not dead. It just smells funny...
 
-Thank you very much Eric, Zenghui, Marc, and Andrew (for the ISB
-suggestion)!
+On my side. VHE (v5.12) on both QEMU (5.2.0 cpu=max) and Ampere Altra.
 
-As per Zenghui test, will send a V3 that includes the missing ISBs.
-Hopefully that will fix the issue for Eric as well. It's very
-interesting that the CPU seems to _always_ reorder those instructions.
-
-Thanks!
-Ricardo
+> Thanks
+> 
+> Eric
+> > 
+> > Thanks,
+> > 
+> >         M.
+> 
