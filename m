@@ -2,68 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C411037C031
-	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 16:31:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A33737C073
+	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 16:42:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230471AbhELOcR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 10:32:17 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:52190 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230347AbhELOcQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 10:32:16 -0400
-Received: from zn.tnic (p200300ec2f0bb800c6bc209d75c80142.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:b800:c6bc:209d:75c8:142])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 432F41EC046E;
-        Wed, 12 May 2021 16:31:06 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1620829866;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=sH1fnhjM7cZz9QEE54H+quyulj+UQHZBIMnPp2FOud4=;
-        b=E2oxhHIBzBfQCFRLuWw+j2m5/FrUVFuIFUmoP+gsmfRlYvNrNW/0g6C6VFAH4XNSklkrYF
-        hXqwk6zOf7GuIRaIm4QgAUpKd+FAYpKBBbKO4WnLfHt+wgtvb6CTRrHjjdR04K870kIcqB
-        UnEJB+Pxm25SuSkKGC+gLRfzqoC+hcM=
-Date:   Wed, 12 May 2021 16:31:03 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        tglx@linutronix.de, jroedel@suse.de, thomas.lendacky@amd.com,
-        pbonzini@redhat.com, mingo@redhat.com, dave.hansen@intel.com,
-        rientjes@google.com, seanjc@google.com, peterz@infradead.org,
-        hpa@zytor.com, tony.luck@intel.com
-Subject: Re: [PATCH Part1 RFC v2 02/20] x86/sev: Save the negotiated GHCB
- version
-Message-ID: <YJvmp3ELvej0ydnL@zn.tnic>
-References: <20210430121616.2295-1-brijesh.singh@amd.com>
- <20210430121616.2295-3-brijesh.singh@amd.com>
- <YJpM+VZaEr68hTwZ@zn.tnic>
- <36add6ab-0115-d290-facd-2709e3c93fb9@amd.com>
- <YJrP1vTXmtzXYapq@zn.tnic>
- <0f7abbc3-5ad4-712c-e669-d41fd83b9ed3@amd.com>
+        id S231218AbhELOnK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 10:43:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36904 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230202AbhELOnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 May 2021 10:43:09 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D38BAC061574
+        for <kvm@vger.kernel.org>; Wed, 12 May 2021 07:42:01 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id t4so12635753plc.6
+        for <kvm@vger.kernel.org>; Wed, 12 May 2021 07:42:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=wxKnnXHLSQ34iKMEdRBK5f1OVmjNy6I5PUfRGXqvHB8=;
+        b=lgF1HeKxk78Sh5QaJh95BabfBOw9mQdN47Dv/DglN2CsiJ5IZah3CZe0NGHlcvvUwD
+         T315M+jOeTswJWnbg7FKc2JtTuuLPA1WzNzw3INIE9oGhfwoIM2bc/9Iypvee2YmXFB6
+         v3VBetJftdb2T4minGSdscKkZZHBYNSypYnxixXA1onKtY5vYo8WRF9YNGNetkEve+9D
+         iuZ+k6w3fa3IMCzRfaCB5NYeYDkrsI9hLC+/dFRRoxz6RDWXUgAyXf4rODsmsOrHr1/I
+         OSItkRJg3dRb/b9xfHOQfFL3NN8NPfCKMldNXi2kS/9WMk0VzKmOAJO1fjL4Ns9pkZkp
+         +CWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=wxKnnXHLSQ34iKMEdRBK5f1OVmjNy6I5PUfRGXqvHB8=;
+        b=LD4KQW5LMDpS+NU3oCtMDsy19HUUiXyEt1F6rbmA8aC00vrAkQYwpYkNmvYqCrQ0hn
+         cjDHFndpU4knowT3NdPUBhxiaqQ3cldrFwqddTCY4NdlbFu8/uT0+bA2e4XVkN+wUPFr
+         C8n88CUwHXLEE8CjokjDLFGEgicpXzHzy8JapNNXL1m8PNg1nsiMlM2vWZb6m3xV+vOr
+         iE/HgMzKKz6Q+/o5mXdjteg1F75WEC3kpsICZvodxwHo3VK5Olla/bVn3n5nntib23ql
+         JpeAAuwZaXkJk0dYD1hYgyrVf5mRJ9ZrLVy09KAaUHg1f9psk7yu+PUgj0KSXSvx1YI4
+         ngXA==
+X-Gm-Message-State: AOAM532PitpsAMx/X2jdKklGc8jgUiujPlyxHKsp06+1zM67B+i/qqX5
+        aC+MzS3j5RmKkRxKYPoVQ+xXOwGP6rzcGw==
+X-Google-Smtp-Source: ABdhPJyX02G/Ehe0+iGqUwrV9fQJoo2Z31ZTHpkNU11jEKoGtvNI1dKljZg7sCMCQuoicrJc3uxChQ==
+X-Received: by 2002:a17:902:e5cb:b029:ed:64d5:afee with SMTP id u11-20020a170902e5cbb02900ed64d5afeemr35282305plf.41.1620830521252;
+        Wed, 12 May 2021 07:42:01 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id j4sm1111598pjm.10.2021.05.12.07.42.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 May 2021 07:42:00 -0700 (PDT)
+Date:   Wed, 12 May 2021 14:41:56 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>,
+        Pei Zhang <pezhang@redhat.com>
+Subject: Re: [patch 4/4] KVM: VMX: update vcpu posted-interrupt descriptor
+ when assigning device
+Message-ID: <YJvpNHAILLTghW1L@google.com>
+References: <YJV3P4mFA7pITziM@google.com>
+ <YJWVAcIsvCaD7U0C@t490s>
+ <20210507220831.GA449495@fuller.cnet>
+ <YJqXD5gQCfzO4rT5@t490s>
+ <20210511145157.GC124427@fuller.cnet>
+ <YJqurM+LiyAY+MPO@t490s>
+ <20210511171810.GA162107@fuller.cnet>
+ <YJr4ravpCjz2M4bp@t490s>
+ <20210511235124.GA187296@fuller.cnet>
+ <20210512000259.GA192145@fuller.cnet>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0f7abbc3-5ad4-712c-e669-d41fd83b9ed3@amd.com>
+In-Reply-To: <20210512000259.GA192145@fuller.cnet>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 12, 2021 at 09:03:41AM -0500, Brijesh Singh wrote:
-> Version 2 of the spec adds bunch of NAEs, and several of them are
-> optional except the hyervisor features NAE. IMO, a guest should bump the
-> GHCB version only after it has implemented all the required NAEs from
-> the version 2. It may help during the git bisect of the guest kernel --
-> mainly when the hypervisor supports the higher version.
+On Tue, May 11, 2021, Marcelo Tosatti wrote:
+> > The KVM_REQ_UNBLOCK patch will resume execution even any such event
+> 
+> 						  even without any such event
+> 
+> > occuring. So the behaviour would be different from baremetal.
 
-Aha, so AFAICT, the version bump should happen in patch 3 which adds
-that HV features NAE - not in a separate one after that. The logic
-being, with the patch which adds the functionality needed, you mark the
-guest as supporting v2.
+I agree with Marcelo, we don't want to spuriously unhalt the vCPU.  It's legal,
+albeit risky, to do something like
 
--- 
-Regards/Gruss,
-    Boris.
+	hlt
+	/* #UD to triple fault if this CPU is awakened. */
+	ud2
 
-https://people.kernel.org/tglx/notes-about-netiquette
+when offlining a CPU, in which case the spurious wake event will crash the guest.
