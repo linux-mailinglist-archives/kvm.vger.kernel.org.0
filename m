@@ -2,114 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4871637B80D
-	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 10:33:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A33E37B82A
+	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 10:37:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230393AbhELIeO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 04:34:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47202 "EHLO mail.kernel.org"
+        id S230372AbhELIit (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 04:38:49 -0400
+Received: from 8bytes.org ([81.169.241.247]:38784 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230373AbhELIeN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 04:34:13 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A5A1D611CE;
-        Wed, 12 May 2021 08:33:05 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1lgkIh-000qqq-B4; Wed, 12 May 2021 09:33:03 +0100
+        id S230096AbhELIiq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 May 2021 04:38:46 -0400
+Received: by theia.8bytes.org (Postfix, from userid 1000)
+        id E8C872A5; Wed, 12 May 2021 10:37:37 +0200 (CEST)
+Date:   Wed, 12 May 2021 10:37:34 +0200
+From:   'Joerg Roedel' <joro@8bytes.org>
+To:     David Laight <David.Laight@aculab.com>
+Cc:     "x86@kernel.org" <x86@kernel.org>,
+        Hyunwook Baek <baekhw@google.com>,
+        Joerg Roedel <jroedel@suse.de>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        "hpa@zytor.com" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>
+Subject: Re: [PATCH 3/6] x86/sev-es: Use __put_user()/__get_user
+Message-ID: <YJuTzhSp2XAJIYlv@8bytes.org>
+References: <20210512075445.18935-1-joro@8bytes.org>
+ <20210512075445.18935-4-joro@8bytes.org>
+ <0496626f018d4d27a8034a4822170222@AcuMS.aculab.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 12 May 2021 09:33:03 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Auger Eric <eric.auger@redhat.com>
-Cc:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com,
-        drjones@redhat.com, alexandru.elisei@arm.com
-Subject: Re: [PATCH v2 4/5] KVM: selftests: Add exception handling support for
- aarch64
-In-Reply-To: <4e83daa3-3166-eeed-840c-39be71b1124d@redhat.com>
-References: <20210430232408.2707420-1-ricarkol@google.com>
- <20210430232408.2707420-5-ricarkol@google.com>
- <87a6pcumyg.wl-maz@kernel.org> <YJBLFVoRmsehRJ1N@google.com>
- <20915a2f-d07c-2e61-3cce-ff385e98e796@redhat.com>
- <YJRADhU4CcTE7bdm@google.com>
- <8a99d57b-0513-557c-79e0-98084799812f@redhat.com>
- <YJuDYZbqe8V47YCJ@google.com>
- <4e83daa3-3166-eeed-840c-39be71b1124d@redhat.com>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <348b978aad60db6af7ba9c9ce51bbd87@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, ricarkol@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, drjones@redhat.com, alexandru.elisei@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0496626f018d4d27a8034a4822170222@AcuMS.aculab.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021-05-12 09:19, Auger Eric wrote:
-> Hi Ricardo,
-> 
-> On 5/12/21 9:27 AM, Ricardo Koller wrote:
->> On Fri, May 07, 2021 at 04:08:07PM +0200, Auger Eric wrote:
->>> Hi Ricardo,
->>> 
->>> On 5/6/21 9:14 PM, Ricardo Koller wrote:
->>>> On Thu, May 06, 2021 at 02:30:17PM +0200, Auger Eric wrote:
->>>>> Hi Ricardo,
->>>>> 
->>>> 
->>>> Hi Eric,
->>>> 
->>>> Thank you very much for the test.
->>>> 
->>>>> On 5/3/21 9:12 PM, Ricardo Koller wrote:
->>>>>> On Mon, May 03, 2021 at 11:32:39AM +0100, Marc Zyngier wrote:
->>>>>>> On Sat, 01 May 2021 00:24:06 +0100,
->>>>>>> Ricardo Koller <ricarkol@google.com> wrote:
->>>>>>>> 
->>>>>>>> Add the infrastructure needed to enable exception handling in 
->>>>>>>> aarch64
->>>>>>>> selftests. The exception handling defaults to an 
->>>>>>>> unhandled-exception
->>>>>>>> handler which aborts the test, just like x86. These handlers can 
->>>>>>>> be
->>>>>>>> overridden by calling vm_install_vector_handler(vector) or
->>>>>>>> vm_install_exception_handler(vector, ec). The unhandled 
->>>>>>>> exception
->>>>>>>> reporting from the guest is done using the ucall type introduced 
->>>>>>>> in a
->>>>>>>> previous commit, UCALL_UNHANDLED.
->>>>>>>> 
->>>>>>>> The exception handling code is heavily inspired on 
->>>>>>>> kvm-unit-tests.
->>>>> 
->>>>> running the test on 5.12 I get
->>>>> 
->> 
->> Hi Eric,
->> 
->> I'm able to reproduce the failure you are seeing on 5.6, specifically
->> with kernels older than this commit:
->> 
->>   4942dc6638b0 KVM: arm64: Write arch.mdcr_el2 changes since last 
->> vcpu_load on VHE
->> 
->> but not yet on v5.12. Could you share the commit of the kernel you are
->> testing, please?
-> 
-> my host is a 5.12 kernel (8404c9fbc84b)
+On Wed, May 12, 2021 at 08:04:33AM +0000, David Laight wrote:
+> That can't be right at all.
+> __put/get_user() are only valid on user addresses and will try to
+> fault in a missing page - so can sleep.
 
-Time to compare notes then. What HW are you using? Running VHE or not?
+Yes, in general these functions can sleep, but not in this context. They
+are called in atomic context and the page-fault handler will notice that
+and goes down the __bad_area_nosemaphore() path and only do the fixup.
 
-Thanks,
+I also thought about adding page_fault_disable()/page_fault_enable()
+calls, but being in atomic context is enough according to the
+faulthandler_disabled() implementation.
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+This is exactly what is needed here. All I want to know is whether a
+fault happened or not, the page-fault handler must not try to fix the
+fault in any way. If a fault happens it is later fixed up in
+vc_forward_exception().
+
+> At best this is abused the calls.
+
+Yes, but that is only due to the naming of these functions. In this case
+they do exactly what is needed.
+
+Regards,
+
+	Joerg
