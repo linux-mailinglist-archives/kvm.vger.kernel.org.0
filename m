@@ -2,52 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 983D037EF5B
-	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 01:11:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2148A37EF4D
+	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 01:11:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239984AbhELXBX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 19:01:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46970 "EHLO
+        id S1347008AbhELXEV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 19:04:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1388284AbhELVtQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 17:49:16 -0400
+        with ESMTP id S1388372AbhELVtR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 May 2021 17:49:17 -0400
 Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54849C06124B
-        for <kvm@vger.kernel.org>; Wed, 12 May 2021 14:45:06 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id g17-20020a056a0023d1b029028f419cb9a2so15621094pfc.4
-        for <kvm@vger.kernel.org>; Wed, 12 May 2021 14:45:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F4F5C061251
+        for <kvm@vger.kernel.org>; Wed, 12 May 2021 14:45:08 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id s5-20020aa78d450000b02902ace63a7e93so10290902pfe.8
+        for <kvm@vger.kernel.org>; Wed, 12 May 2021 14:45:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=5jUpkIWfMaq5Jmoaunq8eRpC3Xi5xzv1ZG/MFZDMBzk=;
-        b=WGvG1+DLOaYsWwslzcFaBddiYRxp0XLqVYB2uArPgDzBleiI+uU3cDpZD1xK69YsJ1
-         VY7xsOG//Dm7VOkj9PySP6eJvXdk66vQgdIaBXmFdzqhqDRnRDJ4ZteE1Q5Jkioj0Eyy
-         Z4+DzQ36g5xqcpcc6bJb4Dwzj6ERvA9KCFrl6ETG1oxasRhdbscS7A3TMKEjJQxObA7L
-         k0esfRk4vbESKv1UUlqYB8b4fRIuJFTme0t/PZ27GsZJZU4umFYYr53CGFaI9ZhkaS07
-         CwZpz4xwZD3+xTAgBF7COPrLiUOF/gBc2jcwD3zczjVHVubH6LLTCDntZF3i6NRIe95G
-         zGug==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=dsZRmacMS6KM7zL6VioeEOgTKaLma8ZGBhS/giKTJdU=;
+        b=eg8ku46+dEOGYq0sMq9kRhyoEZR8wLo/LkK/PHISXJba6ZWp90a+oTa2Zmf44FUdCu
+         QYumBp6pQdiXTHsMt//WJ/sbXj1mH40QMd5YXHvAYBe7BnrTHHcfSWDUywhyGXQwc5HD
+         bgeIY0By9ibXUyB2DtLL3Qyjm1rS4rdAKFAlGksh9ckZlPjC2SaQJsVLmOcPFCBhkWWk
+         dDG/8nPE5IvMhDyjHYrczCg1Iah/pfa3gm0jhh//4ICrRThO9tvqL5Medbimjohfom5Y
+         GcimKBjoFIUPfD2m1ZjdI9zQRYJ1p4s4l+DG357O4J96st68HVlhnKvf7rKOOMNo1fgp
+         SZeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=5jUpkIWfMaq5Jmoaunq8eRpC3Xi5xzv1ZG/MFZDMBzk=;
-        b=iC7UFL2FHXiBZ0iwZ97K8fGcz19gZMny2d3xom3xLOV+d6jZtqr43SAJ4666dQM9ZV
-         G8LCg1VsC4ySq0lsmOjdFK7/ziHFY/F1TPaPSyQayEg3QiTXuJCaUSPf25rOHOpxkSnB
-         PPfDfsLczEr/18AoDOgriYpqvF2jUL/4u9SqKYWxXzFGn1t7p+Q1rb/HoTpLGdIlYu7o
-         b4SKV+5XvoTkVnqZp1I4xDyKpAbPoFIAbFe2F2cA9qezOg5qhs7XElmPJYrpYb6NE9at
-         xufOMqnUW3Ws4CIZ4Ka6vN9r6RtAY8L9yP3lBAmHyTu2jJjxtRvCPZ+vbOkZwU9n2Pmu
-         YQcA==
-X-Gm-Message-State: AOAM531N8JF2jHtq60VLAFz8jhdhny09Cg9nO3fk05u9PIVCDEDknBub
-        JDqqflZaYlA7/1RjgJeeaMgwq7pVmKa4RGWR1axS
-X-Google-Smtp-Source: ABdhPJznlwzFf+8b63G8BSVyi6fcbSnTpML8PUgB8sdorKJKvZseAtm8CUY4Wm7UAnSfjya00Qx++cbvuCwwU2jBGzQo
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=dsZRmacMS6KM7zL6VioeEOgTKaLma8ZGBhS/giKTJdU=;
+        b=G1P+DL7xnbyqTM4lNR4wUP6wYH4jvaHD/xeGCjppZ8i2SXFan7pRikDU4kytIwXMxL
+         6AvydzGKnSJWPiIieEHHu8oY6Ph2TUyNJoiUA+gpCwMRZ6SwT1b5PfrhSKWph69wmA8B
+         oLtcI+KhrFm25tc79IbYr3p+6CN0YX325+bG+dXuiA98s2PCU3fzg+kUSCz/7DoNpOii
+         zXBsuso/I+br24svcl//V/LEPwqk55BKawOVbeBvTd8wcYiFzSQMS4Oj53xWQIaFilR+
+         oDRhF2H5jfQnVz2cCM1UTywMCj6OHwzm8uhk9WAY6GO++B8XsnJ0cxIkSCTS38n3zYC6
+         r/ng==
+X-Gm-Message-State: AOAM531MGzgR6FvT0LgEcCazeN72jXwkFsJQIAdAWGdrQ9dyfR0Gb4fS
+        X0gQ3lo/vUd41Tg1WzBv/aY0SIayOyCc+dc4L7R3
+X-Google-Smtp-Source: ABdhPJyswNHOW1PP+QOxNH6b+qDviBQKkHwncNUAmYrXswvR5b7LxW2U/DVYPrwXHf+eUMvpaaOnuyZ8ix1pI+iqGJxl
 X-Received: from ajr0.svl.corp.google.com ([2620:15c:2cd:203:29e5:10fc:1128:b0c0])
- (user=axelrasmussen job=sendgmr) by 2002:a17:902:7488:b029:ef:838a:3071 with
- SMTP id h8-20020a1709027488b02900ef838a3071mr4687161pll.61.1620855905759;
- Wed, 12 May 2021 14:45:05 -0700 (PDT)
-Date:   Wed, 12 May 2021 14:44:57 -0700
-Message-Id: <20210512214502.2047008-1-axelrasmussen@google.com>
+ (user=axelrasmussen job=sendgmr) by 2002:a17:902:b406:b029:ec:fbf2:4114 with
+ SMTP id x6-20020a170902b406b02900ecfbf24114mr37698704plr.32.1620855907823;
+ Wed, 12 May 2021 14:45:07 -0700 (PDT)
+Date:   Wed, 12 May 2021 14:44:58 -0700
+In-Reply-To: <20210512214502.2047008-1-axelrasmussen@google.com>
+Message-Id: <20210512214502.2047008-2-axelrasmussen@google.com>
 Mime-Version: 1.0
+References: <20210512214502.2047008-1-axelrasmussen@google.com>
 X-Mailer: git-send-email 2.31.1.607.g51e8a6a459-goog
-Subject: [PATCH 0/5] KVM: selftests: exercise userfaultfd minor faults
+Subject: [PATCH 1/5] KVM: selftests: allow different backing memory types for
+ demand paging
 From:   Axel Rasmussen <axelrasmussen@google.com>
 To:     Aaron Lewis <aaronlewis@google.com>,
         Alexander Graf <graf@amazon.com>,
@@ -70,61 +75,129 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Base
-====
+Add an argument which lets us specify a different backing memory type
+for the test. The default is just to use anonymous, matching existing
+behavior (if the argument is omitted).
 
-These patches are based upon Andrew Morton's v5.13-rc1-mmots-2021-05-10-22-15
-tag. This is because this series depends on:
+This is in preparation for testing UFFD minor faults. For that, we need
+to use a new backing memory type which is setup with MAP_SHARED.
 
-- UFFD minor fault support for hugetlbfs (in v5.13-rc1) [1]
-- UFFD minor fault support for shmem (in Andrew's tree) [2]
+This notably requires one other change. Perhaps counter-intuitively,
+perf_test_args.host_page_size is the host's *native* page size, not the
+size of the pages the host is using to back the guest. This means, if we
+try to run the test with e.g. VM_MEM_SRC_ANONYMOUS_HUGETLB, we'll try to
+do demand paging with 4k pages instead of 2M hugepages.
 
-[1] https://lore.kernel.org/linux-fsdevel/20210301222728.176417-1-axelrasmussen@google.com/
-[2] https://lore.kernel.org/patchwork/cover/1420967/
+So, convert everything to use a new demand_paging_size, computed based
+on the backing memory type.
 
-Overview
-========
+Signed-off-by: Axel Rasmussen <axelrasmussen@google.com>
+---
+ .../selftests/kvm/demand_paging_test.c        | 24 +++++++++++++------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
-Minor fault handling is a new userfaultfd feature whose goal is generally to
-improve performance. In particular, it is intended for use with demand paging.
-There are more details in the cover letters for this new feature (linked above),
-but at a high level the idea is that we think of these three phases of live
-migration of a VM:
-
-1. Precopy, where we copy "some" pages from the source to the target, while the
-   VM is still running on the source machine.
-2. Blackout, where execution stops on the source, and begins on the target.
-3. Postcopy, where the VM is running on the target, some pages are already up
-   to date, and others are not (because they weren't copied, or were modified
-   after being copied).
-
-During postcopy, the first time the guest touches memory, we intercept a minor
-fault. Userspace checks whether or not the page is already up to date. If
-needed, we copy the final version of the page from the soure machine. This
-could be done with RDMA for example, to do it truly in place / with no copying.
-At this point, all that's left is to setup PTEs for the guest: so we issue
-UFFDIO_CONTINUE. No copying or page allocation needed.
-
-Because of this use case, it's useful to exercise this as part of the demand
-paging test. It lets us ensure the use case works correctly end-to-end, and also
-gives us an in-tree way to profile the end-to-end flow for future performance
-improvements.
-
-Axel Rasmussen (5):
-  KVM: selftests: allow different backing memory types for demand paging
-  KVM: selftests: add shmem backing source type
-  KVM: selftests: create alias mappings when using shared memory
-  KVM: selftests: allow using UFFD minor faults for demand paging
-  KVM: selftests: add shared hugetlbfs backing source type
-
- .../selftests/kvm/demand_paging_test.c        | 146 +++++++++++++-----
- .../testing/selftests/kvm/include/kvm_util.h  |   1 +
- .../testing/selftests/kvm/include/test_util.h |  11 ++
- tools/testing/selftests/kvm/lib/kvm_util.c    |  79 +++++++++-
- .../selftests/kvm/lib/kvm_util_internal.h     |   2 +
- tools/testing/selftests/kvm/lib/test_util.c   |  46 ++++--
- 6 files changed, 222 insertions(+), 63 deletions(-)
-
---
+diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+index 5f7a229c3af1..10c7ba76a9c6 100644
+--- a/tools/testing/selftests/kvm/demand_paging_test.c
++++ b/tools/testing/selftests/kvm/demand_paging_test.c
+@@ -38,6 +38,7 @@
+ 
+ static int nr_vcpus = 1;
+ static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
++static size_t demand_paging_size;
+ static char *guest_data_prototype;
+ 
+ static void *vcpu_worker(void *data)
+@@ -83,7 +84,7 @@ static int handle_uffd_page_request(int uffd, uint64_t addr)
+ 
+ 	copy.src = (uint64_t)guest_data_prototype;
+ 	copy.dst = addr;
+-	copy.len = perf_test_args.host_page_size;
++	copy.len = demand_paging_size;
+ 	copy.mode = 0;
+ 
+ 	clock_gettime(CLOCK_MONOTONIC, &start);
+@@ -100,7 +101,7 @@ static int handle_uffd_page_request(int uffd, uint64_t addr)
+ 	PER_PAGE_DEBUG("UFFDIO_COPY %d \t%ld ns\n", tid,
+ 		       timespec_to_ns(ts_diff));
+ 	PER_PAGE_DEBUG("Paged in %ld bytes at 0x%lx from thread %d\n",
+-		       perf_test_args.host_page_size, addr, tid);
++		       demand_paging_size, addr, tid);
+ 
+ 	return 0;
+ }
+@@ -250,6 +251,7 @@ static int setup_demand_paging(struct kvm_vm *vm,
+ struct test_params {
+ 	bool use_uffd;
+ 	useconds_t uffd_delay;
++	enum vm_mem_backing_src_type src_type;
+ 	bool partition_vcpu_memory_access;
+ };
+ 
+@@ -267,14 +269,16 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	int r;
+ 
+ 	vm = perf_test_create_vm(mode, nr_vcpus, guest_percpu_mem_size,
+-				 VM_MEM_SRC_ANONYMOUS);
++				 p->src_type);
+ 
+ 	perf_test_args.wr_fract = 1;
+ 
+-	guest_data_prototype = malloc(perf_test_args.host_page_size);
++	demand_paging_size = get_backing_src_pagesz(p->src_type);
++
++	guest_data_prototype = malloc(demand_paging_size);
+ 	TEST_ASSERT(guest_data_prototype,
+ 		    "Failed to allocate buffer for guest data pattern");
+-	memset(guest_data_prototype, 0xAB, perf_test_args.host_page_size);
++	memset(guest_data_prototype, 0xAB, demand_paging_size);
+ 
+ 	vcpu_threads = malloc(nr_vcpus * sizeof(*vcpu_threads));
+ 	TEST_ASSERT(vcpu_threads, "Memory allocation failed");
+@@ -388,7 +392,7 @@ static void help(char *name)
+ {
+ 	puts("");
+ 	printf("usage: %s [-h] [-m mode] [-u] [-d uffd_delay_usec]\n"
+-	       "          [-b memory] [-v vcpus] [-o]\n", name);
++	       "          [-b memory] [-t type] [-v vcpus] [-o]\n", name);
+ 	guest_modes_help();
+ 	printf(" -u: use User Fault FD to handle vCPU page\n"
+ 	       "     faults.\n");
+@@ -398,6 +402,8 @@ static void help(char *name)
+ 	printf(" -b: specify the size of the memory region which should be\n"
+ 	       "     demand paged by each vCPU. e.g. 10M or 3G.\n"
+ 	       "     Default: 1G\n");
++	printf(" -t: The type of backing memory to use. Default: anonymous\n");
++	backing_src_help();
+ 	printf(" -v: specify the number of vCPUs to run.\n");
+ 	printf(" -o: Overlap guest memory accesses instead of partitioning\n"
+ 	       "     them into a separate region of memory for each vCPU.\n");
+@@ -409,13 +415,14 @@ int main(int argc, char *argv[])
+ {
+ 	int max_vcpus = kvm_check_cap(KVM_CAP_MAX_VCPUS);
+ 	struct test_params p = {
++		.src_type = VM_MEM_SRC_ANONYMOUS,
+ 		.partition_vcpu_memory_access = true,
+ 	};
+ 	int opt;
+ 
+ 	guest_modes_append_default();
+ 
+-	while ((opt = getopt(argc, argv, "hm:ud:b:v:o")) != -1) {
++	while ((opt = getopt(argc, argv, "hm:ud:b:t:v:o")) != -1) {
+ 		switch (opt) {
+ 		case 'm':
+ 			guest_modes_cmdline(optarg);
+@@ -430,6 +437,9 @@ int main(int argc, char *argv[])
+ 		case 'b':
+ 			guest_percpu_mem_size = parse_size(optarg);
+ 			break;
++		case 't':
++			p.src_type = parse_backing_src_type(optarg);
++			break;
+ 		case 'v':
+ 			nr_vcpus = atoi(optarg);
+ 			TEST_ASSERT(nr_vcpus > 0 && nr_vcpus <= max_vcpus,
+-- 
 2.31.1.607.g51e8a6a459-goog
 
