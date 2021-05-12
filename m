@@ -2,89 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CBF6037CBDB
-	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 19:02:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4628737D0CF
+	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 19:43:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237672AbhELQiX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 12:38:23 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:43374 "EHLO mail.skyhub.de"
+        id S234695AbhELRmz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 13:42:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46734 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238323AbhELQYp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 12:24:45 -0400
-Received: from zn.tnic (p200300ec2f0bb80077d55d62652951c8.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:b800:77d5:5d62:6529:51c8])
+        id S244795AbhELQvL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 May 2021 12:51:11 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7E2BA1EC0473;
-        Wed, 12 May 2021 18:23:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1620836614;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/0X58j7/TAcR/6ydoMQr78dKigX0U3Iwk3UeXo3z7hE=;
-        b=m3FkKJtCFmkZ0gJVjd9JdKC3IotegfXp85I2WiSv2lbm3mvKMFuExkVUUTDXwQC5Gn31Gp
-        8ogIClxXx7noylqZmMsBEO6JGz9wGoYegx1hNCSAcYrGI/H44XdpuvQfWZkkMHGDENIx+f
-        sJKF3O2PjMFOzMfJhr6Xi2c2iH0jTIg=
-Date:   Wed, 12 May 2021 18:23:27 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ashish Kalra <Ashish.Kalra@amd.com>, pbonzini@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        joro@8bytes.org, thomas.lendacky@amd.com, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        srutherford@google.com, venu.busireddy@oracle.com,
-        brijesh.singh@amd.com
-Subject: Re: [PATCH v2 2/4] mm: x86: Invoke hypercall when page encryption
- status is changed
-Message-ID: <YJwA/+0+LYtRzahr@zn.tnic>
-References: <cover.1619193043.git.ashish.kalra@amd.com>
- <ff68a73e0cdaf89e56add5c8b6e110df881fede1.1619193043.git.ashish.kalra@amd.com>
- <YJvU+RAvetAPT2XY@zn.tnic>
- <YJv5bjd0xThIahaa@google.com>
+        by mail.kernel.org (Postfix) with ESMTPSA id 2191461C8B;
+        Wed, 12 May 2021 16:18:45 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1lgrZK-000xgy-Pp; Wed, 12 May 2021 17:18:43 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YJv5bjd0xThIahaa@google.com>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 12 May 2021 17:18:42 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     Zenghui Yu <yuzenghui@huawei.com>,
+        Auger Eric <eric.auger@redhat.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com,
+        drjones@redhat.com, alexandru.elisei@arm.com
+Subject: Re: [PATCH v2 4/5] KVM: selftests: Add exception handling support for
+ aarch64
+In-Reply-To: <YJv8NUtKilXPDYpY@google.com>
+References: <20210430232408.2707420-1-ricarkol@google.com>
+ <20210430232408.2707420-5-ricarkol@google.com>
+ <87a6pcumyg.wl-maz@kernel.org> <YJBLFVoRmsehRJ1N@google.com>
+ <20915a2f-d07c-2e61-3cce-ff385e98e796@redhat.com>
+ <4f7f81f9-8da0-b4ef-49e2-7d87b5c23b15@huawei.com>
+ <a5ad32abf4ff6f80764ee31f16a5e3fc@kernel.org> <YJv8NUtKilXPDYpY@google.com>
+User-Agent: Roundcube Webmail/1.4.11
+Message-ID: <ad3fd18571983a08952f523ad5091360@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: ricarkol@google.com, yuzenghui@huawei.com, eric.auger@redhat.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, drjones@redhat.com, alexandru.elisei@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 12, 2021 at 03:51:10PM +0000, Sean Christopherson wrote:
->   TL;DR: I think the KVM hypercall should be something like this, so that it can
->   be used for SNP and TDX, and possibly for other purposes, e.g. for paravirt
->   performance enhancements or something.
-
-Ok, good, I was only making sure this is on people's radar but it
-actually is more than that. I'll let Tom and Jörg comment on the meat
-of the thing - as always, thanks for the detailed explanation.
-
-From my !virt guy POV, I like the aspect of sharing stuff as much as
-possible and it all makes sense to me but what the hell do I know...
-
->     8. KVM_HC_MAP_GPA_RANGE
->     -----------------------
->     :Architecture: x86
->     :Status: active
->     :Purpose: Request KVM to map a GPA range with the specified attributes.
+On 2021-05-12 17:03, Ricardo Koller wrote:
+> On Wed, May 12, 2021 at 02:43:28PM +0100, Marc Zyngier wrote:
+>> On 2021-05-12 13:59, Zenghui Yu wrote:
+>> > Hi Eric,
+>> >
+>> > On 2021/5/6 20:30, Auger Eric wrote:
+>> > > running the test on 5.12 I get
+>> > >
+>> > > ==== Test Assertion Failure ====
+>> > >   aarch64/debug-exceptions.c:232: false
+>> > >   pid=6477 tid=6477 errno=4 - Interrupted system call
+>> > >      1	0x000000000040147b: main at debug-exceptions.c:230
+>> > >      2	0x000003ff8aa60de3: ?? ??:0
+>> > >      3	0x0000000000401517: _start at :?
+>> > >   Failed guest assert: hw_bp_addr == PC(hw_bp) at
+>> > > aarch64/debug-exceptions.c:105
+>> > > 	values: 0, 0x401794
+>> >
+>> > FYI I can also reproduce it on my VHE box. And Drew's suggestion [*]
+>> > seemed to work for me. Is the ISB a requirement of architecture?
+>> 
+>> Very much so. Given that there is no context synchronisation (such as
+>> ERET or an interrupt) in this code, the CPU is perfectly allowed to
+>> delay the system register effect as long as it can.
+>> 
+>>         M.
+>> --
+>> Jazz is not dead. It just smells funny...
 > 
->     a0: the guest physical address of the start page
->     a1: the number of (4kb) pages (must be contiguous in GPA space)
->     a2: attributes
+> Thank you very much Eric, Zenghui, Marc, and Andrew (for the ISB
+> suggestion)!
 > 
->   where 'attributes' could be something like:
-> 
->     bits  3:0 - preferred page size encoding 0 = 4kb, 1 = 2mb, 2 = 1gb, etc...
->     bit     4 - plaintext = 0, encrypted = 1
->     bits 63:5 - reserved (must be zero)
+> As per Zenghui test, will send a V3 that includes the missing ISBs.
+> Hopefully that will fix the issue for Eric as well. It's very
+> interesting that the CPU seems to _always_ reorder those instructions.
 
-Yah, nice and simple. I like.
+I suspect that because hitting the debug registers can be a costly
+operation (it mobilises a lot of resources in the CPU), there is
+a strong incentive to let it slide until there is an actual mandate
+to commit the resource.
 
-Thx.
+It also means that SW can issue a bunch of these without too much
+overhead, and only pay the cost *once*.
 
+Your N1 CPU seems to be less aggressive on this. Implement choice,
+I'd say (it probably is more aggressive than TX2 on other things).
+Also, QEMU will almost always hide these problems, due to the nature
+of TCG.
+
+Thanks,
+
+          M.
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Jazz is not dead. It just smells funny...
