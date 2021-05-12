@@ -2,151 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B32A537EBD6
-	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 00:23:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1F4B37EBD8
+	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 00:23:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244790AbhELTiK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 15:38:10 -0400
-Received: from mga12.intel.com ([192.55.52.136]:41676 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1343682AbhELSf2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 14:35:28 -0400
-IronPort-SDR: trpsocEuMcjP3Kkrv5DM8m9vkGI7gy19XWgPEFQv5xbbC6M8op3T39gviWnoed3MBG7TK0UqQe
- Oxqh81yUw8BQ==
-X-IronPort-AV: E=McAfee;i="6200,9189,9982"; a="179372618"
-X-IronPort-AV: E=Sophos;i="5.82,295,1613462400"; 
-   d="scan'208";a="179372618"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2021 11:33:23 -0700
-IronPort-SDR: lAROKlT1CyajAg6vKFcMX4eJjvsT/BLqRLmwevKOczuyyYzoeVh98jEI7OZgr5h68Cw/D1f/Ze
- 5YpK9Nd3gkmg==
-X-IronPort-AV: E=Sophos;i="5.82,295,1613462400"; 
-   d="scan'208";a="622791145"
-Received: from purnend1-mobl1.amr.corp.intel.com (HELO [10.209.123.133]) ([10.209.123.133])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2021 11:33:22 -0700
-Subject: Re: [PATCH v3] KVM: x86: use wrpkru directly in
- kvm_load_{guest|host}_xsave_state
-To:     Peter Zijlstra <peterz@infradead.org>, Jon Kohler <jon@nutanix.com>
-Cc:     Babu Moger <babu.moger@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Yu-cheng Yu <yu-cheng.yu@intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Uros Bizjak <ubizjak@gmail.com>,
-        Petteri Aimonen <jpa@git.mail.kapsi.fi>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Fan Yang <Fan_Yang@sjtu.edu.cn>,
-        Juergen Gross <jgross@suse.com>,
-        Benjamin Thiel <b.thiel@posteo.de>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20210511170508.40034-1-jon@nutanix.com>
- <YJuGms6UnRVpP7U/@hirez.programming.kicks-ass.net>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <25d39a79-d8d8-9798-a930-ccdace304bac@intel.com>
-Date:   Wed, 12 May 2021 11:33:21 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S245046AbhELTiW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 15:38:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38808 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1377960AbhELTJx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 May 2021 15:09:53 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DAF4C06175F
+        for <kvm@vger.kernel.org>; Wed, 12 May 2021 12:07:42 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id j26so24684958edf.9
+        for <kvm@vger.kernel.org>; Wed, 12 May 2021 12:07:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SH8WV3s8un415Ugt5bhWScNzXUjXmpS/VLWqCkYtC84=;
+        b=Dhgt0CAcjAsKMVv0mgkDWSTmhfoJ1JDO9EQBu8VnZeMrMvAZtfZGzR6a7jifh4Saxc
+         Hq/Xmw7mGwxzB/UdOhGBvqqbYs9Ku0VF4d8poPddBeHD4saUIDkRsicjfhuLbQ/lzYG+
+         OnFNHshMw1seLVEiNHoYRgsHkOlWy6d4nADCs7dMcObboHYZwS6S2cwKVwvpaNP5k32e
+         PiWbWUBuZ/PrmdQTsztDQaKdaPv1fHPFzzVHRszvRXgBiEOVrPyCk6KKJrcwdBgNBNXg
+         P6/AWoix5reXhIm88saw+1bSM3QP4lerCcHC3aref6LHoHzZCqKwTb4HFXZpzZV6lmmI
+         qvAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SH8WV3s8un415Ugt5bhWScNzXUjXmpS/VLWqCkYtC84=;
+        b=UeDfJuYnORwvXCuLEVIPgYzRbDyD6OPhMOAQiLgkyNbzIfXnpoNV2PO4I2NSDnrBXU
+         xqDNOTiun9o8gaFIQL328/xO9r3vU5fmliU4fkcFiWv3+zOl6IZXAQebvkAElcYoCMS6
+         kFaV4t+3f2cS+fwzslFtNHtswBexzxqfDAlEBU8jlDECR8dcMb65swO97kWfO0oRXW4n
+         yGZr6wGPdeW0OX9iNY/prdvTWqg301qY7Hdq3lza6MmQNb+Xk6W6CedFIu1FLJFZGGwk
+         q8MB+vjF71quvTcfk2zX2m23k5Hj3S6tdiOn2wGWjcCxKoQhqJ7/QJuhgzHktRgBwElr
+         U2Dw==
+X-Gm-Message-State: AOAM533UIS6yZgfJCd2OVBIdtts/YPpIvMINE11n3F4VLlXx00S+q6Wa
+        iN27RAuePqq6Xg9fYXzBKcp+OA7kytBPRWgCtKlKFg==
+X-Google-Smtp-Source: ABdhPJzLKa0MC/AL0uqBcdjyZOKjoEtB5gcNatauceydwMC3Gu0or2hrL97FTl1aaixMEif7/6cUK+WurUukp7lpecE=
+X-Received: by 2002:a05:6402:2714:: with SMTP id y20mr44871255edd.348.1620846460743;
+ Wed, 12 May 2021 12:07:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <YJuGms6UnRVpP7U/@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20210210175423.1873-1-mike.ximing.chen@intel.com>
+ <YEiLI8fGoa9DoCnF@kroah.com> <CAPcyv4gCMjoDCc2azLEc8QC5mVhdKeLibic9gj4Lm=Xwpft9ZA@mail.gmail.com>
+ <BYAPR11MB30950965A223EDE5414EAE08D96F9@BYAPR11MB3095.namprd11.prod.outlook.com>
+ <CAPcyv4htddEBB9ePPSheH+rO+=VJULeHzx0gc384if7qXTUHHg@mail.gmail.com>
+ <BYAPR11MB309515F449B8660043A559E5D96C9@BYAPR11MB3095.namprd11.prod.outlook.com>
+ <YFBz1BICsjDsSJwv@kroah.com>
+In-Reply-To: <YFBz1BICsjDsSJwv@kroah.com>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Wed, 12 May 2021 12:07:31 -0700
+Message-ID: <CAPcyv4g89PjKqPuPp2ag0vB9Vq8igTqh0gdP0h+7ySTVPagQ9w@mail.gmail.com>
+Subject: Re: [PATCH v10 00/20] dlb: introduce DLB device driver
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     "Chen, Mike Ximing" <mike.ximing.chen@intel.com>,
+        Netdev <netdev@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+        KVM list <kvm@vger.kernel.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/12/21 12:41 AM, Peter Zijlstra wrote:
-> On Tue, May 11, 2021 at 01:05:02PM -0400, Jon Kohler wrote:
->> diff --git a/arch/x86/include/asm/fpu/internal.h b/arch/x86/include/asm/fpu/internal.h
->> index 8d33ad80704f..5bc4df3a4c27 100644
->> --- a/arch/x86/include/asm/fpu/internal.h
->> +++ b/arch/x86/include/asm/fpu/internal.h
->> @@ -583,7 +583,13 @@ static inline void switch_fpu_finish(struct fpu *new_fpu)
->>  		if (pk)
->>  			pkru_val = pk->pkru;
->>  	}
->> -	__write_pkru(pkru_val);
->> +
->> +	/*
->> +	 * WRPKRU is relatively expensive compared to RDPKRU.
->> +	 * Avoid WRPKRU when it would not change the value.
->> +	 */
->> +	if (pkru_val != rdpkru())
->> +		wrpkru(pkru_val);
-> Just wondering; why aren't we having that in a per-cpu variable? The
-> usual per-cpu MSR shadow approach avoids issuing any 'special' ops
-> entirely.
+[ add kvm@vger.kernel.org for VFIO discussion ]
 
-It could be a per-cpu variable.  When I wrote this originally I figured
-that a rdpkru would be cheaper than a load from memory (even per-cpu
-memory).
 
-But, now that I think about it, assuming that 'prku_val' is in %rdi, doing:
+On Tue, Mar 16, 2021 at 2:01 AM Greg KH <gregkh@linuxfoundation.org> wrote:
+[..]
+> > Ioctl interface
+> > Kernel driver provides ioctl interface for user applications to setup and configure dlb domains, ports, queues, scheduling types, credits,
+> > sequence numbers, and links between ports and queues.  Applications also use the interface to start, stop and inquire the dlb operations.
+>
+> What applications use any of this?  What userspace implementation today
+> interacts with this?  Where is that code located?
+>
+> Too many TLAs here, I have even less of an understanding of what this
+> driver is supposed to be doing, and what this hardware is now than
+> before.
+>
+> And here I thought I understood hardware devices, and if I am confused,
+> I pity anyone else looking at this code...
+>
+> You all need to get some real documentation together to explain
+> everything here in terms that anyone can understand.  Without that, this
+> code is going nowhere.
 
-	cmp	%gs:0x1234, %rdi
+Hi Greg,
 
-might end up being cheaper than clobbering a *pair* of GPRs with rdpkru:
+So, for the last few weeks Mike and company have patiently waded
+through my questions and now I think we are at a point to work through
+the upstream driver architecture options and tradeoffs. You were not
+alone in struggling to understand what this device does because it is
+unlike any other accelerator Linux has ever considered. It shards /
+load balances a data stream for processing by CPU threads. This is
+typically a network appliance function / protocol, but could also be
+any other generic thread pool like the kernel's padata. It saves the
+CPU cycles spent load balancing work items and marshaling them through
+a thread pool pipeline. For example, in DPDK applications, DLB2 frees
+up entire cores that would otherwise be consumed with scheduling and
+work distribution. A separate proof-of-concept, using DLB2 to
+accelerate the kernel's "padata" thread pool for a crypto workload,
+demonstrated ~150% higher throughput with hardware employed to manage
+work distribution and result ordering. Yes, you need a sufficiently
+high touch / high throughput protocol before the software load
+balancing overhead coordinating CPU threads starts to dominate the
+performance, but there are some specific workloads willing to switch
+to this regime.
 
-	xor    %ecx,%ecx
-	rdpkru
-	cmp	%rax, %rdi
+The primary consumer to date has been as a backend for the event
+handling in the userspace networking stack, DPDK. DLB2 has an existing
+polled-mode-userspace driver for that use case. So I said, "great,
+just add more features to that userspace driver and you're done". In
+fact there was DLB1 hardware that also had a polled-mode-userspace
+driver. So, the next question is "what's changed in DLB2 where a
+userspace driver is no longer suitable?". The new use case for DLB2 is
+new hardware support for a host driver to carve up device resources
+into smaller sets (vfio-mdevs) that can be assigned to guests (Intel
+calls this new hardware capability SIOV: Scalable IO Virtualization).
 
-I'm too lazy to go figure out what would be faster in practice, though.
- Does anyone care?
+Hardware resource management is difficult to handle in userspace
+especially when bare-metal hardware events need to coordinate with
+guest-VM device instances. This includes a mailbox interface for the
+guest VM to negotiate resources with the host driver. Another more
+practical roadblock for a "DLB2 in userspace" proposal is the fact
+that it implements what are in-effect software-defined-interrupts to
+go beyond the scalability limits of PCI MSI-x (Intel calls this
+Interrupt Message Store: IMS). So even if hardware resource management
+was awkwardly plumbed into a userspace daemon there would still need
+to be kernel enabling for device-specific extensions to
+drivers/vfio/pci/vfio_pci_intrs.c for it to understand the IMS
+interrupts of DLB2 in addition to PCI MSI-x.
+
+While that still might be solvable in userspace if you squint at it, I
+don't think Linux end users are served by pushing all of hardware
+resource management to userspace. VFIO is mostly built to pass entire
+PCI devices to guests, or in coordination with a kernel driver to
+describe a subset of the hardware to a virtual-device (vfio-mdev)
+interface. The rub here is that to date kernel drivers using VFIO to
+provision mdevs have some existing responsibilities to the core kernel
+like a network driver or DMA offload driver. The DLB2 driver offers no
+such service to the kernel for its primary role of accelerating a
+userspace data-plane. I am assuming here that  the padata
+proof-of-concept is interesting, but not a compelling reason to ship a
+driver compared to giving end users competent kernel-driven
+hardware-resource assignment for deploying DLB2 virtual instances into
+guest VMs.
+
+My "just continue in userspace" suggestion has no answer for the IMS
+interrupt and reliable hardware resource management support
+requirements. If you're with me so far we can go deeper into the
+details, but in answer to your previous questions most of the TLAs
+were from the land of "SIOV" where the VFIO community should be
+brought in to review. The driver is mostly a configuration plane where
+the fast path data-plane is entirely in userspace. That configuration
+plane needs to manage hardware events and resourcing on behalf of
+guest VMs running on a partitioned subset of the device. There are
+worthwhile questions about whether some of the uapi can be refactored
+to common modules like uacce, but I think we need to get to a first
+order understanding on what DLB2 is and why the kernel has a role
+before diving into the uapi discussion.
+
+Any clearer?
+
+So, in summary drivers/misc/ appears to be the first stop in the
+review since a host driver needs to be established to start the VFIO
+enabling campaign. With my community hat on, I think requiring
+standalone host drivers is healthier for Linux than broaching the
+subject of VFIO-only drivers. Even if, as in this case, the initial
+host driver is mostly implementing a capability that could be achieved
+with a userspace driver.
