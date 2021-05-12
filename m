@@ -2,72 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DA0AF37BF2F
-	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 16:03:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F36537BFA7
+	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 16:16:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230448AbhELOEn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 10:04:43 -0400
-Received: from foss.arm.com ([217.140.110.172]:39870 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230211AbhELOEk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 10:04:40 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1EC726D;
-        Wed, 12 May 2021 07:03:31 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 66DB83F718;
-        Wed, 12 May 2021 07:03:30 -0700 (PDT)
-Subject: Re: [PATCH v2 kvm-unit-tests 0/2] fix long division routines for ARM
- eabi
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-References: <20210512105440.748153-1-pbonzini@redhat.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <6ae326a1-361c-0cbe-66f7-b02efd78cdb3@arm.com>
-Date:   Wed, 12 May 2021 15:04:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S231558AbhELORD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 10:17:03 -0400
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:41050 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S231630AbhELOQh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 May 2021 10:16:37 -0400
+Received: from cwcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 14CEEiap031112
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 12 May 2021 10:14:45 -0400
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id 448C815C39C2; Wed, 12 May 2021 10:14:44 -0400 (EDT)
+Date:   Wed, 12 May 2021 10:14:44 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Mali DP Maintainers <malidp@foss.arm.com>,
+        alsa-devel@alsa-project.org, coresight@lists.linaro.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
+        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-hwmon@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-sgx@vger.kernel.org, linux-usb@vger.kernel.org,
+        mjpeg-users@lists.sourceforge.net, netdev@vger.kernel.org,
+        rcu@vger.kernel.org
+Subject: Re: [PATCH v2 00/40] Use ASCII subset instead of UTF-8 alternate
+ symbols
+Message-ID: <YJvi1L2ss5Tfi+My@mit.edu>
+References: <cover.1620823573.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20210512105440.748153-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1620823573.git.mchehab+huawei@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On Wed, May 12, 2021 at 02:50:04PM +0200, Mauro Carvalho Chehab wrote:
+> v2:
+> - removed EM/EN DASH conversion from this patchset;
 
-On 5/12/21 11:54 AM, Paolo Bonzini wrote:
+Are you still thinking about doing the
 
-> As reported by Alexandru, ARM follows a different convention than
-> x86 so it needs __aeabi_ldivmod and __aeabi_uldivmod.  Because
-> it does not use __divdi3 and __moddi3, it also needs __divmoddi4
-> to build the eabi function upon.
->
-> Paolo
->
-> v1->v2: fix __divmoddi4, make sure -DTEST covers it
->
-> Paolo Bonzini (2):
->   libcflat: clean up and complete long division routines
->   arm: add eabi version of 64-bit division functions
->
->  arm/Makefile.arm  |  1 +
->  lib/arm/ldivmod.S | 32 ++++++++++++++++++++++++++++++++
->  lib/ldiv32.c      | 40 ++++++++++++++++++++++++----------------
->  3 files changed, 57 insertions(+), 16 deletions(-)
->  create mode 100644 lib/arm/ldivmod.S
->
-I ran the arm (compiled with arm-none-eabi-gcc and arm-linux-gnu-gcc) and arm64
-tests under QEMU TCG, and everything worked as expected.
+EN DASH --> "--"
+EM DASH --> "---"
 
-I ran the arm (compiled with both toolchains) and arm64 tests under qemu and
-kvmtool on a Rockpro64 dev board, again I didn't encounter any issues. So for the
-entire series:
+conversion?  That's not going to change what the documentation will
+look like in the HTML and PDF output forms, and I think it would make
+life easier for people are reading and editing the Documentation/*
+files in text form.
 
-Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-
-Alex
-
+				- Ted
