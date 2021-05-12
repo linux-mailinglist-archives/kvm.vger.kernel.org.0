@@ -2,174 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3360E37EF58
-	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 01:11:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D78C837EF59
+	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 01:11:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348582AbhELXFc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 19:05:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46972 "EHLO
+        id S1348640AbhELXFk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 19:05:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1390039AbhELVtV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 17:49:21 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48281C061201
-        for <kvm@vger.kernel.org>; Wed, 12 May 2021 14:45:16 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id j12-20020ac8550c0000b02901dae492d1f2so10617856qtq.0
-        for <kvm@vger.kernel.org>; Wed, 12 May 2021 14:45:16 -0700 (PDT)
+        with ESMTP id S1444048AbhELWxY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 May 2021 18:53:24 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B82C7C06134B
+        for <kvm@vger.kernel.org>; Wed, 12 May 2021 15:47:37 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id q2so19820587pfh.13
+        for <kvm@vger.kernel.org>; Wed, 12 May 2021 15:47:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=L2NNDNh+hgASTvjB+YiQroB4OhnVKpDdWzCu7PeehzQ=;
-        b=f/jWqQ9KrReYTTcLlSByNRew6FCsKM1EvpOY6NccUCKPvBGo/JQ4Zxqp+Y9qdFB990
-         +ppzycm59zMkwaQn5JB3+WQrWFuHIUB51D/IExtH3kHfqQy7KV4xRmUfSvB5zMyym+5G
-         TLlMSt8evZA5NNZagdBNH9Qf04w+rO/dsWryvqWKU6DKDptYEPlTI0XBk7J8ppG5Jxho
-         p9ur6H3WcWjXmfJo0OsUqOPujxxTfEZBCyrkWgpZeGut4UQVgKVfweicGfBXTBbSaKFD
-         9LxR/mFKzVoks3DH8wdXU7A3Pj/Uk55aP9AZ387d1ryZA3jEYsk07gR7lV4mV2jNWFvL
-         5RoQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=NLbq5sm7qnQbZPjjI4rxXzEPDhmzU/W/bodPkyrwn+E=;
+        b=URaYuXkZ5rZBHA1Y5Ux79MmKkQh1IVB6Oq/luIE6LQ3q+3xGq0QuaPdPCCDuY715Hy
+         Ts0KsNtsvjVvkhIUEVL5KCkAmcSBH5KKJ1xTWkmAcS/QFW1Apk39gEvll91aYzhIF/og
+         N0knHGJZi1nXcVABBVjvBaIqnPLPAJrxOjYiRy0Ce8ntTvQYlDyTDAIVzrNrNu9zNGwC
+         i6gROgjncs7u4GWNYS1QZmyZ2z590IqTUVRqoCGuxqYENVr5Usb//wlRkaajenna5+nv
+         NkUsgTwCXVRB0AyF8ucrvilpWpUlMwDOnRS79P8u6/D8+u7nUAJ6UI48GcZnvhXqsrsn
+         L9cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=L2NNDNh+hgASTvjB+YiQroB4OhnVKpDdWzCu7PeehzQ=;
-        b=lJjLtT8Zj4gKmB2PbIrVTAy96DeZxrxZuYIedsFQAK+BcxgiZscv7Dtr+/cSheUC8w
-         BkCjX6L9yjK4Cu+L3sy5t+IpWh6Kpqv1/xSAHFA8jheEbJSg/3gUBhlvARw1Xa0rp7UX
-         9Jhz5WP7scj0He8QdASMecYy/8UNpl9eXeA99vZx/ZJ8fhnfNYXdOO3gQ72RLAPRrvX8
-         rZLMR97vvFqnzWRJ4Lskri5MsmE922o9kKgEERoaIH2sbBv/7q4xThLGbkYHFib8GCEi
-         L7KWyjGVPswadRDwVUwgdDuj9fqBxK/hTc6AQFgv130+nSwPgo+pXslpM7CQj1T6kQ0J
-         s1SA==
-X-Gm-Message-State: AOAM530GO91Ckv0vALazKfLu5RIEqr0L6KuV6REqWxjamXWptdWxkFSe
-        /B7/BjInHIaQAI80hImSexwQkn/f7+ppEEaSmP5T
-X-Google-Smtp-Source: ABdhPJwmZd1tQ0tXLXGE1m4mOZ8nKprfTo961VKDRhbFhsEOZfmfNUk6cuiyjbyK+g36JmjmfxxYDg5OhcHVQXYya+QJ
-X-Received: from ajr0.svl.corp.google.com ([2620:15c:2cd:203:29e5:10fc:1128:b0c0])
- (user=axelrasmussen job=sendgmr) by 2002:a0c:aa44:: with SMTP id
- e4mr37564404qvb.41.1620855915420; Wed, 12 May 2021 14:45:15 -0700 (PDT)
-Date:   Wed, 12 May 2021 14:45:02 -0700
-In-Reply-To: <20210512214502.2047008-1-axelrasmussen@google.com>
-Message-Id: <20210512214502.2047008-6-axelrasmussen@google.com>
-Mime-Version: 1.0
-References: <20210512214502.2047008-1-axelrasmussen@google.com>
-X-Mailer: git-send-email 2.31.1.607.g51e8a6a459-goog
-Subject: [PATCH 5/5] KVM: selftests: add shared hugetlbfs backing source type
-From:   Axel Rasmussen <axelrasmussen@google.com>
-To:     Aaron Lewis <aaronlewis@google.com>,
-        Alexander Graf <graf@amazon.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Ben Gardon <bgardon@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jacob Xu <jacobhxu@google.com>,
-        Makarand Sonare <makarandsonare@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Yanan Wang <wangyanan55@huawei.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Axel Rasmussen <axelrasmussen@google.com>
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=NLbq5sm7qnQbZPjjI4rxXzEPDhmzU/W/bodPkyrwn+E=;
+        b=W9aIuc4O5tpFQZzer1Q7/zn5dFpiAs+8qaQUmajQQfCQMgXxMbJWlSJWx2yNnRveeJ
+         vtBGuKUlvIRDDw3z5BC+28MZ5me80+vo653oAEGUyHntcwyqSZLTKF0Gzsx4i6IRSohx
+         yXuyn93RhAhMfenvfbjcxzHx3IJ0rvkkxBgV/ydZ7AP23wUdw14msJemFbLU0lwsj5NN
+         7YIm0weoGzLKRe0D4Cmg+NLVAntHJedM/bfmjjrfVS0Dbjx/zD8e45CmxurX2NOvmq1y
+         tnE4yYfZp2UTE5tbtPWlnBXsYoqTHWRFyuigahdufU/NyitFcOkWFjQ62CYy+Aaq8es8
+         61Ow==
+X-Gm-Message-State: AOAM531ejy3aSRVbVfKVYj3yYHp0z8hWO7pL7evgEg7kcnyWr8gML0rt
+        CigoXc6OEc7pDq5WM8apkUAY8J0qD4JmZQs5/ck=
+X-Google-Smtp-Source: ABdhPJweWWLfDdcLfeun6OGjVuiae1DKA4rx0RX6UkxTvol/KVjKE4lLGgRTHN4Nhaty36cKRyt+1PfUX2/WBWvKGxw=
+X-Received: by 2002:a62:3246:0:b029:224:6c6f:b3f2 with SMTP id
+ y67-20020a6232460000b02902246c6fb3f2mr37399914pfy.68.1620859657376; Wed, 12
+ May 2021 15:47:37 -0700 (PDT)
+MIME-Version: 1.0
+Received: by 2002:a05:6a10:eb83:0:0:0:0 with HTTP; Wed, 12 May 2021 15:47:37
+ -0700 (PDT)
+Reply-To: fionahill578@outlook.com
+From:   Fiona Hill <angelacoulibaly5@gmail.com>
+Date:   Wed, 12 May 2021 22:47:37 +0000
+Message-ID: <CAHipQu4fPE2jdFXB=U+Bizz45JS_DJz+LYV5fBLJzXUTH-NYXQ@mail.gmail.com>
+Subject: 
+To:     undisclosed-recipients:;
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This lets us run the demand paging test on top of a shared
-hugetlbfs-backed area. The "shared" is key, as this allows us to
-exercise userfaultfd minor faults on hugetlbfs.
-
-Signed-off-by: Axel Rasmussen <axelrasmussen@google.com>
----
- tools/testing/selftests/kvm/demand_paging_test.c |  6 ++++--
- tools/testing/selftests/kvm/include/test_util.h  | 10 ++++++++++
- tools/testing/selftests/kvm/lib/kvm_util.c       |  9 +++++++--
- tools/testing/selftests/kvm/lib/test_util.c      |  6 ++++++
- 4 files changed, 27 insertions(+), 4 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-index ff29aaea3120..32942c9e0376 100644
---- a/tools/testing/selftests/kvm/demand_paging_test.c
-+++ b/tools/testing/selftests/kvm/demand_paging_test.c
-@@ -502,8 +502,10 @@ int main(int argc, char *argv[])
- 		}
- 	}
- 
--	TEST_ASSERT(p.uffd_mode != UFFDIO_REGISTER_MODE_MINOR || p.src_type == VM_MEM_SRC_SHMEM,
--		    "userfaultfd MINOR mode requires shared memory; pick a different -t");
-+	if (p.uffd_mode == UFFDIO_REGISTER_MODE_MINOR &&
-+	    !backing_src_is_shared(p.src_type)) {
-+		TEST_FAIL("userfaultfd MINOR mode requires shared memory; pick a different -t");
-+	}
- 
- 	for_each_guest_mode(run_test, &p);
- 
-diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-index 7377f00469ef..852d6d2cc285 100644
---- a/tools/testing/selftests/kvm/include/test_util.h
-+++ b/tools/testing/selftests/kvm/include/test_util.h
-@@ -85,9 +85,19 @@ enum vm_mem_backing_src_type {
- 	VM_MEM_SRC_ANONYMOUS_HUGETLB_2GB,
- 	VM_MEM_SRC_ANONYMOUS_HUGETLB_16GB,
- 	VM_MEM_SRC_SHMEM,
-+	VM_MEM_SRC_SHARED_HUGETLB,
- 	NUM_SRC_TYPES,
- };
- 
-+/*
-+ * Whether or not the given source type is shared memory (as opposed to
-+ * anonymous).
-+ */
-+static inline bool backing_src_is_shared(enum vm_mem_backing_src_type t)
-+{
-+	return t == VM_MEM_SRC_SHMEM || t == VM_MEM_SRC_SHARED_HUGETLB;
-+}
-+
- struct vm_mem_backing_src_alias {
- 	const char *name;
- 	uint32_t flag;
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 838d58633f7e..fed02153c919 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -756,8 +756,13 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
- 		region->mmap_size += alignment;
- 
- 	region->fd = -1;
--	if (src_type == VM_MEM_SRC_SHMEM) {
--		region->fd = memfd_create("kvm_selftest", MFD_CLOEXEC);
-+	if (backing_src_is_shared(src_type)) {
-+		int memfd_flags = MFD_CLOEXEC;
-+
-+		if (src_type == VM_MEM_SRC_SHARED_HUGETLB)
-+			memfd_flags |= MFD_HUGETLB;
-+
-+		region->fd = memfd_create("kvm_selftest", memfd_flags);
- 		TEST_ASSERT(region->fd != -1,
- 			    "memfd_create failed, errno: %i", errno);
- 
-diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
-index c7a265da5090..65fb8b43782c 100644
---- a/tools/testing/selftests/kvm/lib/test_util.c
-+++ b/tools/testing/selftests/kvm/lib/test_util.c
-@@ -240,6 +240,11 @@ const struct vm_mem_backing_src_alias *vm_mem_backing_src_alias(uint32_t i)
- 			.name = "shmem",
- 			.flag = MAP_SHARED,
- 		},
-+		[VM_MEM_SRC_SHARED_HUGETLB] = {
-+			.name = "shared_hugetlb",
-+			/* No MAP_HUGETLB, we use MFD_HUGETLB instead. */
-+			.flag = MAP_SHARED,
-+		},
- 	};
- 	_Static_assert(ARRAY_SIZE(aliases) == NUM_SRC_TYPES,
- 		       "Missing new backing src types?");
-@@ -262,6 +267,7 @@ size_t get_backing_src_pagesz(uint32_t i)
- 	case VM_MEM_SRC_ANONYMOUS_THP:
- 		return get_trans_hugepagesz();
- 	case VM_MEM_SRC_ANONYMOUS_HUGETLB:
-+	case VM_MEM_SRC_SHARED_HUGETLB:
- 		return get_def_hugetlb_pagesz();
- 	default:
- 		return MAP_HUGE_PAGE_SIZE(flag);
 -- 
-2.31.1.607.g51e8a6a459-goog
-
+Hello did you see my message?
