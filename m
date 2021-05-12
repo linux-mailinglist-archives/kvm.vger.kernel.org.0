@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8072F37D0E1
-	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 19:47:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A189F37D0DF
+	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 19:47:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235456AbhELRnT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 13:43:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46838 "EHLO
+        id S237062AbhELRnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 13:43:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242724AbhELRfC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 13:35:02 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E7DBC06134D
-        for <kvm@vger.kernel.org>; Wed, 12 May 2021 10:31:08 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id gq14-20020a17090b104eb029015be008ab0fso171434pjb.1
-        for <kvm@vger.kernel.org>; Wed, 12 May 2021 10:31:08 -0700 (PDT)
+        with ESMTP id S1348911AbhELRjm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 May 2021 13:39:42 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BA5DC061574
+        for <kvm@vger.kernel.org>; Wed, 12 May 2021 10:38:34 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id a5so12020656pfa.11
+        for <kvm@vger.kernel.org>; Wed, 12 May 2021 10:38:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=jQ1izlrVGOhPAXdn9/aplXdHdgbZMkL/hHrij75+k+Q=;
-        b=a4DNmUDUNPSavKGBm5teXTf27JxGyXaVA19FtMli56IbhkY9lFuV+rJqzokIoTEuwj
-         F49XgNCm3V3M5/9KmyOKYrZZYrD8M0sxKPi5CWvV+66QLiQRD1dTK6hnpF6oOnX3KdYl
-         KuYf/BxHq4xPZ5ZcOpdXGVy7p+OIZAgc99rCcjvCYvgDQxe5GvZg2Mt/NNQY/q+08vQ0
-         Hl+rCDHoUA2rv75AAhQoZLZWwV1kC9ZJJDMDoQ/lYVk1QpsvMjeAuI4uQV90enBsC69c
-         FUK56tmkLe8UkPGpZbmL7IVKUmI0tUBnEDrhm26gFC5GF7vWR9q72Rtv/k6SpUDPgwUW
-         EuZQ==
+        bh=ygukMSZ6mguXZGZCEiXIOEJ1Ou3kN4uMuhJTb1ptDIQ=;
+        b=aXvwhA4SMeZkjzvQvbiETGvNAb2DW9SKROVUAae6HB3DVvXq17O96jqoZbLxV9WKy4
+         6pxWvKKC9OC18rcxw5IF8aal6YBlmThgbKX5w18PudVXAWgCcMhfEn5QQgzdeqe2JNVO
+         lDDbYBrELxRRY+pM82COQUTEbS52U4d2TK/IIWHJP3+Q+EcRTBiF5L7TGFcRapr4PunV
+         cw91rrN/yQBF9KZmHUWj7OeWzVio3XpBzFn6gR4JIWEWZYDFaVUzCJDUXqX5R5TKlQPR
+         b+bCPrxxd1/ixHoqp72R2BOqR54trN2dX3sUaMjyNtbpMiNWGODg24Cy8qXWN3hmWaT1
+         JcnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=jQ1izlrVGOhPAXdn9/aplXdHdgbZMkL/hHrij75+k+Q=;
-        b=GZcZ8b0OyHS3BHGzkU/f/eWEnqmpSRFljHNKQ+9j1EieR6EtSFebAP6N3DQFwWQBmN
-         Jpo6ztLS/9e4qTeukRsoS4l7XgwuZRTqYlKxHQRd2iPNnU4MY3OMBLObIxtYO1gL3ddW
-         wY0eKP0LTimP0Wxhya/g0HiaJs/kPx7Z+Xteo325IZTw9vSBKsf4BWoldH7tf3IV/Ntk
-         uFS37BOpjc2uwQqS7pE7FkiNKUDKsdgay2FUOQ7X4naqnw5Vxtf9lSo5dLjHWL13vZi5
-         CYxN5pdAb887TMf48aJoEFaZgYHs81yM1Zwp43VBAcv5/C7mSUsohtdmcsMRSrOg0bNl
-         f0qw==
-X-Gm-Message-State: AOAM5315V5Kl43YiTM+Ua4WE22m319vw5QjYzszNIgyshUt1AG7NPfEJ
-        vq/+2vn3wQHE0nYAkv3jCk2rNA==
-X-Google-Smtp-Source: ABdhPJz/4rNTvkI1wMpdg6OUFlsFjzwopUXYcEfBvzxbgvGH5sNB0scPThabFLbqW1Veig+/7/0g+A==
-X-Received: by 2002:a17:90a:5207:: with SMTP id v7mr11942175pjh.87.1620840667721;
-        Wed, 12 May 2021 10:31:07 -0700 (PDT)
+        bh=ygukMSZ6mguXZGZCEiXIOEJ1Ou3kN4uMuhJTb1ptDIQ=;
+        b=J7BcFvoWGsrcHWRrni6jm2KEmQGiCu+I5u9kSiYgeQLt4najmq9O1HeIqJDewZzywZ
+         aZ7DMETFJcyW1pkojvgOBSuPaX5qTCyz+HOUG+6wrtX8urI9AykvmROKibQHONLHc5nB
+         JU2dZ0FpyQRI5IlOIKYvx7nGyQ1Zt5B0RsftSMjahtVStOoy3iMcPh/zN8V2kYVdZaU5
+         OnbiKXox4e30l2qUeRCCpCsaUDngYGgipldBLQE/cnEgNabW0hmlbE2a/g7eGRtEy/yY
+         WkuwM3kJTzU5HHQGH6Qts7P+QO5H5JPwI4oGGsJPfPTWUdi+IopFx/BzpfxF0YFTF2VO
+         dDFg==
+X-Gm-Message-State: AOAM533xX9UcNiKW2pMQOnDX/RDhDPz97PCGqYED3NRGEKnmk5UFu2Jz
+        a5rAbX633TAJbJ9x7gbCihygNA==
+X-Google-Smtp-Source: ABdhPJz7ZGBw/PUTscy3NA7kLlxFOShh6OFXdGf+R8J7hxnn+s1GWr4QOvbmGe5JQFSmOdIskkO9FQ==
+X-Received: by 2002:aa7:85d0:0:b029:28e:80ff:cbf4 with SMTP id z16-20020aa785d00000b029028e80ffcbf4mr36669418pfn.59.1620841113580;
+        Wed, 12 May 2021 10:38:33 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id t15sm369192pgh.33.2021.05.12.10.31.06
+        by smtp.gmail.com with ESMTPSA id b6sm318783pjk.13.2021.05.12.10.38.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 May 2021 10:31:07 -0700 (PDT)
-Date:   Wed, 12 May 2021 17:31:03 +0000
+        Wed, 12 May 2021 10:38:32 -0700 (PDT)
+Date:   Wed, 12 May 2021 17:38:29 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Joerg Roedel <joro@8bytes.org>
 Cc:     x86@kernel.org, Hyunwook Baek <baekhw@google.com>,
@@ -69,15 +69,15 @@ Cc:     x86@kernel.org, Hyunwook Baek <baekhw@google.com>,
         Arvind Sankar <nivedita@alum.mit.edu>,
         linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH 2/6] x86/sev-es: Forward page-faults which happen during
- emulation
-Message-ID: <YJwQ1xsiDtv3LkBe@google.com>
+Subject: Re: [PATCH 4/6] Revert "x86/sev-es: Handle string port IO to kernel
+ memory properly"
+Message-ID: <YJwSlVnHb0SZTSrG@google.com>
 References: <20210512075445.18935-1-joro@8bytes.org>
- <20210512075445.18935-3-joro@8bytes.org>
+ <20210512075445.18935-5-joro@8bytes.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210512075445.18935-3-joro@8bytes.org>
+In-Reply-To: <20210512075445.18935-5-joro@8bytes.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
@@ -85,52 +85,64 @@ X-Mailing-List: kvm@vger.kernel.org
 On Wed, May 12, 2021, Joerg Roedel wrote:
 > From: Joerg Roedel <jroedel@suse.de>
 > 
-> When emulating guest instructions for MMIO or IOIO accesses the #VC
-> handler might get a page-fault and will not be able to complete. Forward
-> the page-fault in this case to the correct handler instead of killing
-> the machine.
+> This reverts commit 7024f60d655272bd2ca1d3a4c9e0a63319b1eea1.
 > 
-> Fixes: 0786138c78e7 ("x86/sev-es: Add a Runtime #VC Exception Handler")
-> Cc: stable@vger.kernel.org # v5.10+
+> The commit reverted here introduces a short-cut into the #VC handlers
+> memory access code which only works reliably in task context. But the
+> kernels #VC handler can be invoked from any context, making the
+> access_ok() call trigger a warning with CONFIG_DEBUG_ATOMIC_SLEEP
+> enabled.
+> 
+> Also the memcpy() used in the reverted patch is wrong, as it has no
+> page-fault handling. Access to kernel memory can also fault due to
+> kernel bugs, and those should not be reported as faults from the #VC
+> handler but as bugs of their real call-site, which is correctly later
+> done from vc_forward_exception().
+
+The changelog should call out that a previous patch fixed the original bug by
+switching to unchecked versions of get/put.  Without that, this reads like we're
+reverting to even worse behavior.
+
+Alternatively, and probably even better, fold this revert into the switch to
+the unchecked version (sounds like those will use kernel-specific flavors?).
+
+> Fixes: 7024f60d6552 ("x86/sev-es: Handle string port IO to kernel memory properly")
+> Cc: stable@vger.kernel.org # v5.11
 > Signed-off-by: Joerg Roedel <jroedel@suse.de>
 > ---
->  arch/x86/kernel/sev.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  arch/x86/kernel/sev.c | 12 ------------
+>  1 file changed, 12 deletions(-)
 > 
 > diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index c49270c7669e..6530a844eb61 100644
+> index 110b39345b40..f4f319004713 100644
 > --- a/arch/x86/kernel/sev.c
 > +++ b/arch/x86/kernel/sev.c
-> @@ -1265,6 +1265,10 @@ static __always_inline void vc_forward_exception(struct es_em_ctxt *ctxt)
->  	case X86_TRAP_UD:
->  		exc_invalid_op(ctxt->regs);
->  		break;
-> +	case X86_TRAP_PF:
-> +		write_cr2(ctxt->fi.cr2);
-> +		exc_page_fault(ctxt->regs, error_code);
-> +		break;
-
-This got me looking at the flows that "inject" #PF, and I'm pretty sure there
-are bugs in __vc_decode_user_insn() + insn_get_effective_ip().
-
-Problem #1: __vc_decode_user_insn() assumes a #PF if insn_fetch_from_user_inatomic()
-fails, but the majority of failure cases in insn_get_seg_base() are #GPs, not #PF.
-
-	res = insn_fetch_from_user_inatomic(ctxt->regs, buffer);
-	if (!res) {
-		ctxt->fi.vector     = X86_TRAP_PF;
-		ctxt->fi.error_code = X86_PF_INSTR | X86_PF_USER;
-		ctxt->fi.cr2        = ctxt->regs->ip;
-		return ES_EXCEPTION;
-	}
-
-Problem #2: Using '0' as an error code means a legitimate effective IP of '0'
-will be misinterpreted as a failure.  Practically speaking, I highly doubt anyone
-will ever actually run code at address 0, but it's technically possible.  The
-most robust approach would be to pass a pointer to @ip and return an actual error
-code.  Using a non-canonical magic value might also work, but that could run afoul
-of future shenanigans like LAM.
-
-	ip = insn_get_effective_ip(regs);
-	if (!ip)
-		return 0;
+> @@ -333,12 +333,6 @@ static enum es_result vc_write_mem(struct es_em_ctxt *ctxt,
+>  	u16 d2;
+>  	u8  d1;
+>  
+> -	/* If instruction ran in kernel mode and the I/O buffer is in kernel space */
+> -	if (!user_mode(ctxt->regs) && !access_ok(target, size)) {
+> -		memcpy(dst, buf, size);
+> -		return ES_OK;
+> -	}
+> -
+>  	switch (size) {
+>  	case 1:
+>  		memcpy(&d1, buf, 1);
+> @@ -388,12 +382,6 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
+>  	u16 d2;
+>  	u8  d1;
+>  
+> -	/* If instruction ran in kernel mode and the I/O buffer is in kernel space */
+> -	if (!user_mode(ctxt->regs) && !access_ok(s, size)) {
+> -		memcpy(buf, src, size);
+> -		return ES_OK;
+> -	}
+> -
+>  	switch (size) {
+>  	case 1:
+>  		if (__get_user(d1, s))
+> -- 
+> 2.31.1
+> 
