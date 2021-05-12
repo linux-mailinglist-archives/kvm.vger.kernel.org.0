@@ -2,96 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE13C37BE01
-	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 15:19:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37F8B37BE67
+	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 15:43:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231343AbhELNVA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 09:21:00 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:38248 "EHLO mail.skyhub.de"
+        id S230211AbhELNoj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 09:44:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49232 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231233AbhELNU7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 09:20:59 -0400
-Received: from zn.tnic (p200300ec2f0bb8006edd94bc9370939d.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:b800:6edd:94bc:9370:939d])
+        id S230037AbhELNoi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 May 2021 09:44:38 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4C6A11EC0390;
-        Wed, 12 May 2021 15:19:50 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1620825590;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=oNPg3vxOc+Ox+fohCHc47ZdZvfnk6G6W8tH14loE6Sk=;
-        b=EXX3oJI2tQjSdwnPllc9um9bPhyDf7PQfncbtmfHKP6Hrxdm55NHa0eq4ZTpq0cCGdkXP6
-        c8mOCsVIbwB/YbmD9raGg/HlLIsfs6Wi1w8WtpfFG2+oQFpVT+E+eU+6lco8IOP94Dy/Ho
-        uCHzu9WmRWphRwHgamwuBfED5dzVMgg=
-Date:   Wed, 12 May 2021 15:19:51 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        hpa@zytor.com, joro@8bytes.org, thomas.lendacky@amd.com,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        srutherford@google.com, seanjc@google.com,
-        venu.busireddy@oracle.com, brijesh.singh@amd.com,
-        linux-efi@vger.kernel.org
-Subject: Re: [PATCH v2 3/4] EFI: Introduce the new AMD Memory Encryption GUID.
-Message-ID: <YJvV9yKclJWLppWU@zn.tnic>
-References: <cover.1619193043.git.ashish.kalra@amd.com>
- <f9d22080293f24bd92684915fcee71a4974593a3.1619193043.git.ashish.kalra@amd.com>
+        by mail.kernel.org (Postfix) with ESMTPSA id 96582613D3;
+        Wed, 12 May 2021 13:43:30 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1lgp96-000uPv-82; Wed, 12 May 2021 14:43:28 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f9d22080293f24bd92684915fcee71a4974593a3.1619193043.git.ashish.kalra@amd.com>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 12 May 2021 14:43:28 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Zenghui Yu <yuzenghui@huawei.com>
+Cc:     Auger Eric <eric.auger@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com,
+        drjones@redhat.com, alexandru.elisei@arm.com
+Subject: Re: [PATCH v2 4/5] KVM: selftests: Add exception handling support for
+ aarch64
+In-Reply-To: <4f7f81f9-8da0-b4ef-49e2-7d87b5c23b15@huawei.com>
+References: <20210430232408.2707420-1-ricarkol@google.com>
+ <20210430232408.2707420-5-ricarkol@google.com>
+ <87a6pcumyg.wl-maz@kernel.org> <YJBLFVoRmsehRJ1N@google.com>
+ <20915a2f-d07c-2e61-3cce-ff385e98e796@redhat.com>
+ <4f7f81f9-8da0-b4ef-49e2-7d87b5c23b15@huawei.com>
+User-Agent: Roundcube Webmail/1.4.11
+Message-ID: <a5ad32abf4ff6f80764ee31f16a5e3fc@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, eric.auger@redhat.com, ricarkol@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, drjones@redhat.com, alexandru.elisei@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 23, 2021 at 03:59:01PM +0000, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
+On 2021-05-12 13:59, Zenghui Yu wrote:
+> Hi Eric,
 > 
-> Introduce a new AMD Memory Encryption GUID which is currently
-> used for defining a new UEFI environment variable which indicates
-> UEFI/OVMF support for the SEV live migration feature. This variable
-> is setup when UEFI/OVMF detects host/hypervisor support for SEV
-> live migration and later this variable is read by the kernel using
-> EFI runtime services to verify if OVMF supports the live migration
-> feature.
+> On 2021/5/6 20:30, Auger Eric wrote:
+>> running the test on 5.12 I get
+>> 
+>> ==== Test Assertion Failure ====
+>>   aarch64/debug-exceptions.c:232: false
+>>   pid=6477 tid=6477 errno=4 - Interrupted system call
+>>      1	0x000000000040147b: main at debug-exceptions.c:230
+>>      2	0x000003ff8aa60de3: ?? ??:0
+>>      3	0x0000000000401517: _start at :?
+>>   Failed guest assert: hw_bp_addr == PC(hw_bp) at
+>> aarch64/debug-exceptions.c:105
+>> 	values: 0, 0x401794
 > 
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
->  include/linux/efi.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/include/linux/efi.h b/include/linux/efi.h
-> index 8710f5710c1d..e95c144d1d02 100644
-> --- a/include/linux/efi.h
-> +++ b/include/linux/efi.h
-> @@ -360,6 +360,7 @@ void efi_native_runtime_setup(void);
->  
->  /* OEM GUIDs */
->  #define DELLEMC_EFI_RCI2_TABLE_GUID		EFI_GUID(0x2d9f28a2, 0xa886, 0x456a,  0x97, 0xa8, 0xf1, 0x1e, 0xf2, 0x4f, 0xf4, 0x55)
-> +#define MEM_ENCRYPT_GUID			EFI_GUID(0x0cf29b71, 0x9e51, 0x433a,  0xa3, 0xb7, 0x81, 0xf3, 0xab, 0x16, 0xb8, 0x75)
->  
->  typedef struct {
->  	efi_guid_t guid;
-> -- 
+> FYI I can also reproduce it on my VHE box. And Drew's suggestion [*]
+> seemed to work for me. Is the ISB a requirement of architecture?
 
-When you apply this patch locally, you do:
+Very much so. Given that there is no context synchronisation (such as
+ERET or an interrupt) in this code, the CPU is perfectly allowed to
+delay the system register effect as long as it can.
 
-$ git log -p -1 | ./scripts/get_maintainer.pl
-Ard Biesheuvel <ardb@kernel.org> (maintainer:EXTENSIBLE FIRMWARE INTERFACE (EFI))
-linux-efi@vger.kernel.org (open list:EXTENSIBLE FIRMWARE INTERFACE (EFI))
-linux-kernel@vger.kernel.org (open list)
-
-and this tells you that you need to CC EFI folks too.
-
-I've CCed linux-efi now - please make sure you use that script to CC the
-relevant parties on patches, in the future.
-
-Thx.
-
+         M.
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Jazz is not dead. It just smells funny...
