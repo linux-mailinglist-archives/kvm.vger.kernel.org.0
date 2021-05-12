@@ -2,66 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F36537BFA7
-	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 16:16:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C411037C031
+	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 16:31:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231558AbhELORD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 10:17:03 -0400
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:41050 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S231630AbhELOQh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 10:16:37 -0400
-Received: from cwcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 14CEEiap031112
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 May 2021 10:14:45 -0400
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 448C815C39C2; Wed, 12 May 2021 10:14:44 -0400 (EDT)
-Date:   Wed, 12 May 2021 10:14:44 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Mali DP Maintainers <malidp@foss.arm.com>,
-        alsa-devel@alsa-project.org, coresight@lists.linaro.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
-        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-hwmon@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-sgx@vger.kernel.org, linux-usb@vger.kernel.org,
-        mjpeg-users@lists.sourceforge.net, netdev@vger.kernel.org,
-        rcu@vger.kernel.org
-Subject: Re: [PATCH v2 00/40] Use ASCII subset instead of UTF-8 alternate
- symbols
-Message-ID: <YJvi1L2ss5Tfi+My@mit.edu>
-References: <cover.1620823573.git.mchehab+huawei@kernel.org>
+        id S230471AbhELOcR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 10:32:17 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:52190 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230347AbhELOcQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 May 2021 10:32:16 -0400
+Received: from zn.tnic (p200300ec2f0bb800c6bc209d75c80142.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:b800:c6bc:209d:75c8:142])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 432F41EC046E;
+        Wed, 12 May 2021 16:31:06 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1620829866;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=sH1fnhjM7cZz9QEE54H+quyulj+UQHZBIMnPp2FOud4=;
+        b=E2oxhHIBzBfQCFRLuWw+j2m5/FrUVFuIFUmoP+gsmfRlYvNrNW/0g6C6VFAH4XNSklkrYF
+        hXqwk6zOf7GuIRaIm4QgAUpKd+FAYpKBBbKO4WnLfHt+wgtvb6CTRrHjjdR04K870kIcqB
+        UnEJB+Pxm25SuSkKGC+gLRfzqoC+hcM=
+Date:   Wed, 12 May 2021 16:31:03 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        tglx@linutronix.de, jroedel@suse.de, thomas.lendacky@amd.com,
+        pbonzini@redhat.com, mingo@redhat.com, dave.hansen@intel.com,
+        rientjes@google.com, seanjc@google.com, peterz@infradead.org,
+        hpa@zytor.com, tony.luck@intel.com
+Subject: Re: [PATCH Part1 RFC v2 02/20] x86/sev: Save the negotiated GHCB
+ version
+Message-ID: <YJvmp3ELvej0ydnL@zn.tnic>
+References: <20210430121616.2295-1-brijesh.singh@amd.com>
+ <20210430121616.2295-3-brijesh.singh@amd.com>
+ <YJpM+VZaEr68hTwZ@zn.tnic>
+ <36add6ab-0115-d290-facd-2709e3c93fb9@amd.com>
+ <YJrP1vTXmtzXYapq@zn.tnic>
+ <0f7abbc3-5ad4-712c-e669-d41fd83b9ed3@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <cover.1620823573.git.mchehab+huawei@kernel.org>
+In-Reply-To: <0f7abbc3-5ad4-712c-e669-d41fd83b9ed3@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 12, 2021 at 02:50:04PM +0200, Mauro Carvalho Chehab wrote:
-> v2:
-> - removed EM/EN DASH conversion from this patchset;
+On Wed, May 12, 2021 at 09:03:41AM -0500, Brijesh Singh wrote:
+> Version 2 of the spec adds bunch of NAEs, and several of them are
+> optional except the hyervisor features NAE. IMO, a guest should bump the
+> GHCB version only after it has implemented all the required NAEs from
+> the version 2. It may help during the git bisect of the guest kernel --
+> mainly when the hypervisor supports the higher version.
 
-Are you still thinking about doing the
+Aha, so AFAICT, the version bump should happen in patch 3 which adds
+that HV features NAE - not in a separate one after that. The logic
+being, with the patch which adds the functionality needed, you mark the
+guest as supporting v2.
 
-EN DASH --> "--"
-EM DASH --> "---"
+-- 
+Regards/Gruss,
+    Boris.
 
-conversion?  That's not going to change what the documentation will
-look like in the HTML and PDF output forms, and I think it would make
-life easier for people are reading and editing the Documentation/*
-files in text form.
-
-				- Ted
+https://people.kernel.org/tglx/notes-about-netiquette
