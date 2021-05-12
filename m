@@ -2,105 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DEC6C37C53B
-	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 17:39:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98DEE37C7EC
+	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 18:38:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233709AbhELPi6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 11:38:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58667 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235917AbhELPgK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 12 May 2021 11:36:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620833701;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PdIwuA6SZONtKFJj9ICYU33rWjC+MvCYEPPUbLma7+o=;
-        b=XnsKJi+3H++e7sGRBYcMqumvJlRW4BsCNBNiP4YKud+HDSZamUKhkr1PEfKZC4Gn03RiBy
-        2iGTIDNkcIMOWqVb59/cKLAkyahlWOgI/MhEV0mDUuDxCLTNRjsw5HVT1VJD6v9Cej68iC
-        LnpLIDSc7TlGhHM3Vq82Jw0/5FBDvpo=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-450-bpgRdOPsOk-qGUrul3UVsw-1; Wed, 12 May 2021 11:34:59 -0400
-X-MC-Unique: bpgRdOPsOk-qGUrul3UVsw-1
-Received: by mail-qv1-f69.google.com with SMTP id d21-20020a0caa150000b02901e2ed83f922so11951980qvb.4
-        for <kvm@vger.kernel.org>; Wed, 12 May 2021 08:34:59 -0700 (PDT)
+        id S236993AbhELQDT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 12:03:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49854 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231764AbhELPlH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 May 2021 11:41:07 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12E52C034624
+        for <kvm@vger.kernel.org>; Wed, 12 May 2021 08:19:03 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id g24so13689398pji.4
+        for <kvm@vger.kernel.org>; Wed, 12 May 2021 08:19:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=wQuM+8vl8RXXi53GN0Bxev1KdO1+AOXUsVXjVxgXMEU=;
+        b=Gk8wYyrGJM70yGgKGKycvu8PnplDnEkH+5OEJt1C22vqGyiKdmOFlPZPA4wckvHBET
+         axKUrRx6NchuLk8scPXGEtyWZbrMUjktcZzI6IZPZASxILpdMBJY9viFlOVfgQP+1ofj
+         8ivalJAblF5A9U1KeFVPm+l1DehzV8utNI6wKbpOuN7sn4EZN8l3nmYK2Ha5b48ec5bb
+         PkHE+RTHRPw+V6q8eeejDJZEcjybkgbXPBTAM2+IDQN41aZzgX59kh/WAZuc3y+C8UdB
+         J2rzs7xhcqLwFjt6Y8n8OyNF+VMCIidkgeRuEkVzMx5kEVTsP34xSAFxgk40tFKJQiJ0
+         dlug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=PdIwuA6SZONtKFJj9ICYU33rWjC+MvCYEPPUbLma7+o=;
-        b=QfF2HrAZzltoWKmENunalFVG4KeEWFr6zG1gik0VPUFhQbGwW1+3qt01yDc5EOlhZK
-         2gaE+wK7H8x9M5kGufjdTrEctuAdP8MuDsu3W9Yq3XaI3Ql3873uBwgnzbAydxSDj2c/
-         7oF9S9UzsQ8886Pjw4/qKsFQV2B72iodjV8TL5qPcPMFIcBVes1s7E2/EeTKXcaSTOyQ
-         vCmy8pflGiJBegD16B3rFlBZycpuP51ul5jQP+B+Zon9q1PCjk8QqT/phfeL4CP9o7ai
-         Vx/A8lLyUCjC9NVBFr1YwMsEPorZ+V8bf1P8H6KPu7r5+iTy1KqKgyXGiKk0bHrAIEBK
-         BaqA==
-X-Gm-Message-State: AOAM532ZsiGd4xGJdBdaN4X5spOvhCbdEl1iBp4ZnPUCBGKVjAndqyCd
-        NpBJpP1Jdu816/4YZeK1q6rdOIstH5DW9rZuZQ/vTD+RH8SJujwpGkJzTHIOqtaXThMR2g1g1lS
-        9Flk0xvadXWZq
-X-Received: by 2002:a37:30c:: with SMTP id 12mr34063133qkd.355.1620833698761;
-        Wed, 12 May 2021 08:34:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxnRjVkfgLuSSi357o8L5EX+FX6JBBxp03jfLuLDnD+g0QmLvzcBmW+HNIRS1njQTVa0h8CgA==
-X-Received: by 2002:a37:30c:: with SMTP id 12mr34063118qkd.355.1620833698570;
-        Wed, 12 May 2021 08:34:58 -0700 (PDT)
-Received: from t490s (bras-base-toroon474qw-grc-72-184-145-4-219.dsl.bell.ca. [184.145.4.219])
-        by smtp.gmail.com with ESMTPSA id t187sm273302qkc.56.2021.05.12.08.34.57
+        bh=wQuM+8vl8RXXi53GN0Bxev1KdO1+AOXUsVXjVxgXMEU=;
+        b=c8/X5YoV9oT9StkBh/Ihu65v+5l7sr4iffK60V0WaBWQ52ArYq2d+xln5XldrMx/2U
+         vxVbgut+ZbndUKvvvp3rNeE2WRZmObcyl/6KxTOAdVymYKNzunIjGQBdVCgjBDCVishr
+         iKZ6owUpd1vvWqPMKOSlzNBPsRcIoPkdx+xjML4MyopkHHlE+n02SMb5MUdly8k8CA/L
+         Sc6mMx0iAlFJSrl6X6Lk4VDIWmeFhLxAjlt1+v6pigCbAzIyNnfpx9XbtyDgvfd8I83z
+         zqnrzJp5WlXtBwwEoGZ/aV49DrVzi8SNga7Zx9O+tGgDIeBvLIm3hnVKKqVUD1qpZRgC
+         HYzw==
+X-Gm-Message-State: AOAM532gAoJVqW6jAtDkfYZsj1zowT+W3mSIWjh4apxpD4riY47ZgU8I
+        DfX5kAC0yyv8AlIAXnj2FqWyNQ==
+X-Google-Smtp-Source: ABdhPJxh8LL59gW6hhs773DJVJAXhM8iujV6qd8DtWRXyM/hNNcnsGmWDL4gazXHGRThy8NlUzuz3Q==
+X-Received: by 2002:a17:90a:4503:: with SMTP id u3mr41532313pjg.214.1620832742442;
+        Wed, 12 May 2021 08:19:02 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id m3sm174335pfh.174.2021.05.12.08.19.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 May 2021 08:34:58 -0700 (PDT)
-Date:   Wed, 12 May 2021 11:34:57 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Pei Zhang <pezhang@redhat.com>
-Subject: Re: [patch 4/4] KVM: VMX: update vcpu posted-interrupt descriptor
- when assigning device
-Message-ID: <YJv1ofNKDpRF+vtu@t490s>
-References: <YJWVAcIsvCaD7U0C@t490s>
- <20210507220831.GA449495@fuller.cnet>
- <YJqXD5gQCfzO4rT5@t490s>
- <20210511145157.GC124427@fuller.cnet>
- <YJqurM+LiyAY+MPO@t490s>
- <20210511171810.GA162107@fuller.cnet>
- <YJr4ravpCjz2M4bp@t490s>
- <20210511235124.GA187296@fuller.cnet>
- <20210512000259.GA192145@fuller.cnet>
- <YJvpNHAILLTghW1L@google.com>
+        Wed, 12 May 2021 08:19:01 -0700 (PDT)
+Date:   Wed, 12 May 2021 15:18:58 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Xu, Like" <like.xu@intel.com>
+Cc:     Venkatesh Srinivas <venkateshs@chromium.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, weijiang.yang@intel.com,
+        Kan Liang <kan.liang@linux.intel.com>, ak@linux.intel.com,
+        wei.w.wang@intel.com, eranian@google.com, liuxiangdong5@huawei.com,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        Yao Yuan <yuan.yao@intel.com>,
+        Like Xu <like.xu@linux.intel.com>
+Subject: Re: [PATCH v6 04/16] KVM: x86/pmu: Set MSR_IA32_MISC_ENABLE_EMON bit
+ when vPMU is enabled
+Message-ID: <YJvx4tr2iXo4bQ/d@google.com>
+References: <20210511024214.280733-1-like.xu@linux.intel.com>
+ <20210511024214.280733-5-like.xu@linux.intel.com>
+ <CAA0tLErUFPnZ=SL82bLe8Ddf5rFu2Pdv5xE0aq4A91mzn9=ABA@mail.gmail.com>
+ <ead61a83-1534-a8a6-13ee-646898a6d1a9@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YJvpNHAILLTghW1L@google.com>
+In-Reply-To: <ead61a83-1534-a8a6-13ee-646898a6d1a9@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 12, 2021 at 02:41:56PM +0000, Sean Christopherson wrote:
-> On Tue, May 11, 2021, Marcelo Tosatti wrote:
-> > > The KVM_REQ_UNBLOCK patch will resume execution even any such event
-> > 
-> > 						  even without any such event
-> > 
-> > > occuring. So the behaviour would be different from baremetal.
+On Wed, May 12, 2021, Xu, Like wrote:
+> Hi Venkatesh Srinivas,
 > 
-> I agree with Marcelo, we don't want to spuriously unhalt the vCPU.  It's legal,
-> albeit risky, to do something like
+> On 2021/5/12 9:58, Venkatesh Srinivas wrote:
+> > On 5/10/21, Like Xu <like.xu@linux.intel.com> wrote:
+> > > On Intel platforms, the software can use the IA32_MISC_ENABLE[7] bit to
+> > > detect whether the processor supports performance monitoring facility.
+> > > 
+> > > It depends on the PMU is enabled for the guest, and a software write
+> > > operation to this available bit will be ignored.
+> > Is the behavior that writes to IA32_MISC_ENABLE[7] are ignored (rather than #GP)
+> > documented someplace?
 > 
-> 	hlt
-> 	/* #UD to triple fault if this CPU is awakened. */
-> 	ud2
-> 
-> when offlining a CPU, in which case the spurious wake event will crash the guest.
+> The bit[7] behavior of the real hardware on the native host is quite
+> suspicious.
 
-We can avoid that by moving the check+clear of KVM_REQ_UNBLOCK from
-kvm_vcpu_has_events() into kvm_vcpu_check_block() as replied in the other
-thread.  But I also agree Marcelo's series should work already to fix the bug,
-hence no strong opinion on this.
+Ugh.  Can you file an SDM bug to get the wording and accessibility updated?  The
+current phrasing is a mess:
 
-Thanks,
+  Performance Monitoring Available (R)
+  1 = Performance monitoring enabled.
+  0 = Performance monitoring disabled.
 
--- 
-Peter Xu
+The (R) is ambiguous because most other entries that are read-only use (RO), and
+the "enabled vs. disabled" implies the bit is writable and really does control
+the PMU.  But on my Haswell system, it's read-only.  Assuming the bit is supposed
+to be a read-only "PMU supported bit", the SDM should be:
 
+  Performance Monitoring Available (RO)
+  1 = Performance monitoring supported.
+  0 = Performance monitoring not supported.
+
+And please update the changelog to explain the "why" of whatever the behavior
+ends up being.  The "what" is obvious from the code.
+
+> To keep the semantics consistent and simple, we propose ignoring write
+> operation in the virtualized world, since whether or not to expose PMU is
+> configured by the hypervisor user space and not by the guest side.
+
+Making up our own architectural behavior because it's convient is not a good
+idea.
+
+> > > diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> > > index 9efc1a6b8693..d9dbebe03cae 100644
+> > > --- a/arch/x86/kvm/vmx/pmu_intel.c
+> > > +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> > > @@ -488,6 +488,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+> > >   	if (!pmu->version)
+> > >   		return;
+> > > 
+> > > +	vcpu->arch.ia32_misc_enable_msr |= MSR_IA32_MISC_ENABLE_EMON;
+
+Hmm, normally I would say overwriting the guest's value is a bad idea, but if
+the bit really is a read-only "PMU supported" bit, then this is the correct
+behavior, albeit weird if userspace does a late CPUID update (though that's
+weird no matter what).
+
+> > >   	perf_get_x86_pmu_capability(&x86_pmu);
+> > > 
+> > >   	pmu->nr_arch_gp_counters = min_t(int, eax.split.num_counters,
+> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > index 5bd550eaf683..abe3ea69078c 100644
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -3211,6 +3211,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct
+> > > msr_data *msr_info)
+> > >   		}
+> > >   		break;
+> > >   	case MSR_IA32_MISC_ENABLE:
+> > > +		data &= ~MSR_IA32_MISC_ENABLE_EMON;
+
+However, this is not.  If it's a read-only bit, then toggling the bit should
+cause a #GP.
+
+> > >   		if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT)
+> > > &&
+> > >   		    ((vcpu->arch.ia32_misc_enable_msr ^ data) &
+> > > MSR_IA32_MISC_ENABLE_MWAIT)) {
+> > >   			if (!guest_cpuid_has(vcpu, X86_FEATURE_XMM3))
+> > > --
