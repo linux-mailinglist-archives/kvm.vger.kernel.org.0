@@ -2,81 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 011D237B850
-	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 10:46:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0C8437B891
+	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 10:51:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231160AbhELIrM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 04:47:12 -0400
-Received: from mga17.intel.com ([192.55.52.151]:10038 "EHLO mga17.intel.com"
+        id S230403AbhELIvw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 04:51:52 -0400
+Received: from 8bytes.org ([81.169.241.247]:38848 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230498AbhELIq5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 04:46:57 -0400
-IronPort-SDR: SJfQ0DHc2GxqxaCGnpqoSYHE9pYkS/u3t5PBMEh5+Ep5weZot+zbDI1254xpM5RlqY8BCsXJsu
- lo8CxCEz0HZg==
-X-IronPort-AV: E=McAfee;i="6200,9189,9981"; a="179918887"
-X-IronPort-AV: E=Sophos;i="5.82,293,1613462400"; 
-   d="scan'208";a="179918887"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2021 01:45:49 -0700
-IronPort-SDR: H6o6VzF/Tuz6GSKhXx19UWOhNqXTidR80XhT9ufzH8IdO2tDOsbvOqxs6/FZJJWYokFcMhNt9e
- 9lVbj4V+hx5Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.82,293,1613462400"; 
-   d="scan'208";a="392636420"
-Received: from clx-ap-likexu.sh.intel.com ([10.239.48.108])
-  by orsmga006.jf.intel.com with ESMTP; 12 May 2021 01:45:45 -0700
-From:   Like Xu <like.xu@linux.intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, peterz@infradead.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, weijiang.yang@intel.com,
-        eranian@google.com, wei.w.wang@intel.com, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
-        Like Xu <like.xu@linux.intel.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Andi Kleen <andi.kleen@intel.com>
-Subject: [PATCH v3 5/5] KVM: x86/pmu: Expose PEBS-via-PT in the KVM supported capabilities
-Date:   Wed, 12 May 2021 16:44:46 +0800
-Message-Id: <20210512084446.342526-6-like.xu@linux.intel.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210512084446.342526-1-like.xu@linux.intel.com>
-References: <20210512084446.342526-1-like.xu@linux.intel.com>
+        id S230137AbhELIvv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 May 2021 04:51:51 -0400
+Received: by theia.8bytes.org (Postfix, from userid 1000)
+        id D8842F3; Wed, 12 May 2021 10:50:42 +0200 (CEST)
+Date:   Wed, 12 May 2021 10:50:41 +0200
+From:   'Joerg Roedel' <joro@8bytes.org>
+To:     Juergen Gross <jgross@suse.com>
+Cc:     David Laight <David.Laight@aculab.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        Hyunwook Baek <baekhw@google.com>,
+        Joerg Roedel <jroedel@suse.de>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        "hpa@zytor.com" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>
+Subject: Re: [PATCH 3/6] x86/sev-es: Use __put_user()/__get_user
+Message-ID: <YJuW4TtRJKZ+OIhj@8bytes.org>
+References: <20210512075445.18935-1-joro@8bytes.org>
+ <20210512075445.18935-4-joro@8bytes.org>
+ <0496626f018d4d27a8034a4822170222@AcuMS.aculab.com>
+ <fcb2c501-70ca-1a54-4a75-8ab05c21ee30@suse.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fcb2c501-70ca-1a54-4a75-8ab05c21ee30@suse.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The hypervisor userspace can dis/enable it via the MSR-based feature
-"MSR_IA32_PERF_CAPABILITIES [bit 16]". If guest also has basic PT support,
-it can output the PEBS records to the PT buffer.
+On Wed, May 12, 2021 at 10:16:12AM +0200, Juergen Gross wrote:
+> You want something like xen_safe_[read|write]_ulong().
 
-Cc: Alexander Shishkin <alexander.shishkin@linux.intel.com>
-Cc: Andi Kleen <andi.kleen@intel.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
----
- arch/x86/kvm/vmx/capabilities.h | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+From a first glance I can't see it, what is the difference between the
+xen_safe_*_ulong() functions and __get_user()/__put_user()? The only
+difference I can see is that __get/__put_user() support different access
+sizes, but neither of those disables page-faults by itself, for example.
 
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index fd8c9822db9e..e04b50174dd5 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -398,8 +398,11 @@ static inline u64 vmx_get_perf_capabilities(void)
- 
- 	perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
- 
--	if (vmx_pebs_supported())
-+	if (vmx_pebs_supported()) {
- 		perf_cap |= host_perf_cap & PERF_CAP_PEBS_MASK;
-+		if (vmx_pt_mode_is_host_guest())
-+			perf_cap |= host_perf_cap & PERF_CAP_PEBS_OUTPUT_PT;
-+	}
- 
- 	return perf_cap;
- }
--- 
-2.31.1
+Couldn't these xen-specific functions not also be replaces by
+__get_user()/__put_user()?
+
+Regards,
+
+	Joerg
 
