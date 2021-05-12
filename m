@@ -2,147 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A189F37D0DF
-	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 19:47:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7CB237EBC1
+	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 00:23:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237062AbhELRnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 13:43:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47868 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348911AbhELRjm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 13:39:42 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BA5DC061574
-        for <kvm@vger.kernel.org>; Wed, 12 May 2021 10:38:34 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id a5so12020656pfa.11
-        for <kvm@vger.kernel.org>; Wed, 12 May 2021 10:38:34 -0700 (PDT)
+        id S237536AbhELTgS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 15:36:18 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:44360 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241389AbhELR5i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 May 2021 13:57:38 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14CHocZc164414;
+        Wed, 12 May 2021 17:56:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2020-01-29;
+ bh=Q5jBGEc4gMxm1oDtwvq/JhPZ9S3nsnDPb93L9wL8JPY=;
+ b=gzfvuxX9j4m31vo+9tBj9Y66WHhEdOOl9GUdxpCQnWv9hM2qNfS60ejC8H70+SzH3TQ6
+ X6mbg1QW3qaFlj3A+DUGDcixsR5KoscAUd0gykQbpXxYrPCZCeyLAXnH71otz6RHjX6u
+ 06lX+5GQzIldUS0P3WY9idhtyeSTn8DatPyqnobmEDz8ZXG2/EYWg6CvswMoazUDVBJG
+ FYVCTN+jBQoYNpa1Ire1ir70md3akB+obwyGa2mOs4QFAB6+xHcysZxmCE8EAgIzFdVe
+ EYD9OsOH8FPt5CHXe80OEaRa5HRw/RPGOpvxms7Dwb2jpxZYAx3b6vqL8KnRKxmJUEJx 9g== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 38e285j4jc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 12 May 2021 17:56:19 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14CHtemH064573;
+        Wed, 12 May 2021 17:56:19 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2168.outbound.protection.outlook.com [104.47.59.168])
+        by userp3030.oracle.com with ESMTP id 38dfs02c1s-2
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 12 May 2021 17:56:18 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SoJjKMK/jKrACn/vsIMSdwJgjTr9rf3/QgMKACJkm3PEiyRJa4mZ02Unsg1wFSoTwznT5t6P6o4cBwimtTpN5ecGxOSOwakoFk7e2shd3qadUdCvN19T9xgTdj+rsh/oRXV+EC7goKPSMeorILR/I3fXQQzZcaVF0sxPoNRt7j5oBFePieg1ynsBzxDhoL/wZucC5v6b4VxRCFwoPL6S00tCP2BADVT5PzQ3N9nMDCry0RiE9mLPIUtVBf6aTRxyKPmzeGHDmVj8WKHRjGeKqZEUIztn30Efy6bRTzjBQGmrybdopiAXqU6njMXL9RJBOEf/3qQpI7MIQ+VahG9wgg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Q5jBGEc4gMxm1oDtwvq/JhPZ9S3nsnDPb93L9wL8JPY=;
+ b=BbVEQZTn1yWJsVUVtJ9krVQesZ0046dySGP78jJRhuVG8Z1/d4dF/c/DG9r4yNYccWGajc5y4UVcw/7dir/01NecbcWlAMFFSc1YxT1cB0mXuMMGrs8Sea9lQzGVntwZtCjGhsTamms4AxaKTU/DJ854tAjFqHk8mZYcLWBmjZk32Thkjo7deBEFD6mM3tuGOxkVTEnpfQqHOmAA7n4tKky1QLGIsKVbauYrxNCql8mN5Eps762umt3H5PJIxCE5n01WGtyGugNcfs2Bvjs8dccqVFE0MAmS011OixE9gHnoi3FJF110tBbUGWHsSLfBoOzXIaYSWem6Lt7f9KWWeA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ygukMSZ6mguXZGZCEiXIOEJ1Ou3kN4uMuhJTb1ptDIQ=;
-        b=aXvwhA4SMeZkjzvQvbiETGvNAb2DW9SKROVUAae6HB3DVvXq17O96jqoZbLxV9WKy4
-         6pxWvKKC9OC18rcxw5IF8aal6YBlmThgbKX5w18PudVXAWgCcMhfEn5QQgzdeqe2JNVO
-         lDDbYBrELxRRY+pM82COQUTEbS52U4d2TK/IIWHJP3+Q+EcRTBiF5L7TGFcRapr4PunV
-         cw91rrN/yQBF9KZmHUWj7OeWzVio3XpBzFn6gR4JIWEWZYDFaVUzCJDUXqX5R5TKlQPR
-         b+bCPrxxd1/ixHoqp72R2BOqR54trN2dX3sUaMjyNtbpMiNWGODg24Cy8qXWN3hmWaT1
-         JcnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ygukMSZ6mguXZGZCEiXIOEJ1Ou3kN4uMuhJTb1ptDIQ=;
-        b=J7BcFvoWGsrcHWRrni6jm2KEmQGiCu+I5u9kSiYgeQLt4najmq9O1HeIqJDewZzywZ
-         aZ7DMETFJcyW1pkojvgOBSuPaX5qTCyz+HOUG+6wrtX8urI9AykvmROKibQHONLHc5nB
-         JU2dZ0FpyQRI5IlOIKYvx7nGyQ1Zt5B0RsftSMjahtVStOoy3iMcPh/zN8V2kYVdZaU5
-         OnbiKXox4e30l2qUeRCCpCsaUDngYGgipldBLQE/cnEgNabW0hmlbE2a/g7eGRtEy/yY
-         WkuwM3kJTzU5HHQGH6Qts7P+QO5H5JPwI4oGGsJPfPTWUdi+IopFx/BzpfxF0YFTF2VO
-         dDFg==
-X-Gm-Message-State: AOAM533xX9UcNiKW2pMQOnDX/RDhDPz97PCGqYED3NRGEKnmk5UFu2Jz
-        a5rAbX633TAJbJ9x7gbCihygNA==
-X-Google-Smtp-Source: ABdhPJz7ZGBw/PUTscy3NA7kLlxFOShh6OFXdGf+R8J7hxnn+s1GWr4QOvbmGe5JQFSmOdIskkO9FQ==
-X-Received: by 2002:aa7:85d0:0:b029:28e:80ff:cbf4 with SMTP id z16-20020aa785d00000b029028e80ffcbf4mr36669418pfn.59.1620841113580;
-        Wed, 12 May 2021 10:38:33 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id b6sm318783pjk.13.2021.05.12.10.38.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 May 2021 10:38:32 -0700 (PDT)
-Date:   Wed, 12 May 2021 17:38:29 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, Hyunwook Baek <baekhw@google.com>,
-        Joerg Roedel <jroedel@suse.de>, stable@vger.kernel.org,
-        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH 4/6] Revert "x86/sev-es: Handle string port IO to kernel
- memory properly"
-Message-ID: <YJwSlVnHb0SZTSrG@google.com>
-References: <20210512075445.18935-1-joro@8bytes.org>
- <20210512075445.18935-5-joro@8bytes.org>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Q5jBGEc4gMxm1oDtwvq/JhPZ9S3nsnDPb93L9wL8JPY=;
+ b=vAkIxsv5Rs5vQ5lRtMTmEWAsVEGf6I1UXNJGDY2GI2VD75hGcPCpl9pI/6WAcp6xYXjvB+c4IGlTZHolPVwXvh9cZ2vHJeSohY5HcmSFSMR9UmYKq9jetClATyuwRLcJj5SorqyqbEhAKynD4Wy+/Pt+ja91cBcThDQ44sAsCaM=
+Authentication-Results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=oracle.com;
+Received: from SN6PR10MB3021.namprd10.prod.outlook.com (2603:10b6:805:cc::19)
+ by SA2PR10MB4522.namprd10.prod.outlook.com (2603:10b6:806:11b::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4129.26; Wed, 12 May
+ 2021 17:56:16 +0000
+Received: from SN6PR10MB3021.namprd10.prod.outlook.com
+ ([fe80::5911:9489:e05c:2d44]) by SN6PR10MB3021.namprd10.prod.outlook.com
+ ([fe80::5911:9489:e05c:2d44%5]) with mapi id 15.20.4108.031; Wed, 12 May 2021
+ 17:56:16 +0000
+Subject: Re: [PATCH 2/3] KVM: nVMX: Add a new VCPU statistic to show if VCPU
+ is running nested guest
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <20210512014759.55556-1-krish.sadhukhan@oracle.com>
+ <20210512014759.55556-3-krish.sadhukhan@oracle.com>
+ <CALMp9eTCgEG=kkQTn+g=DqniLq+RRmzp7jeK_iexoq++qiraxQ@mail.gmail.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <c5c4a9d2-73b5-69eb-58ee-c52df4c2ff18@oracle.com>
+Date:   Wed, 12 May 2021 10:56:14 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
+In-Reply-To: <CALMp9eTCgEG=kkQTn+g=DqniLq+RRmzp7jeK_iexoq++qiraxQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [73.15.199.204]
+X-ClientProxiedBy: BYAPR05CA0003.namprd05.prod.outlook.com
+ (2603:10b6:a03:c0::16) To SN6PR10MB3021.namprd10.prod.outlook.com
+ (2603:10b6:805:cc::19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210512075445.18935-5-joro@8bytes.org>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost.localdomain (73.15.199.204) by BYAPR05CA0003.namprd05.prod.outlook.com (2603:10b6:a03:c0::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4150.11 via Frontend Transport; Wed, 12 May 2021 17:56:16 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 7b458d61-a36b-4262-09b5-08d9156f3d5d
+X-MS-TrafficTypeDiagnostic: SA2PR10MB4522:
+X-Microsoft-Antispam-PRVS: <SA2PR10MB4522BAB3487E47C9C108D42681529@SA2PR10MB4522.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: oIqDc0OfwX0eisIRNXyBD4sSzwNPP22duBiaNR+TR2QV0vUQT6cJDKLN3OnJgLbEsaP4dWKgV59MvXvsGAJvBpI3yd46KH3eZRHqhEXh4sKf7KoUoq82lxg3OnNpcFN5rAjbLO4BDCE4ltQbmd/nlA1qJyM2yUYWsoM0Bjt6HyZDx5nV1p90rm0daizBBAVIy0zzBezRGLPKzx3TBdytnsUz/hWymVSkF9ScKOi/6flVEGhxXJ9BzLpSRAd/yyW5Tdu3RHVh4K/TkBJYWK81jnfa0BVXsYyUeXl8doKOH32dw2x0fZDnE+uRqvxxTaoMQkYgOc3NauDhQbzc92IDoXNoMNEinvDcHpy8gsoiLldFDhzXj0vYCbOmJcr0lN8oUOTVqtHUT6CtT/8hPCLpZd58acKbAs/az5CpsZ7DzS7N8DWuFzIUrTqne2cAQjeb1iGU4WfhMezGkOHSZP1yJq0iU0Xb3ikl0dEDgzfvplQ9MMKzvSTZAAxiJUDql7uFfdR5ZuM3UcQc0E9prQAAssRzpXf8X0GpvmmvRUySaq35WpjQwMXxUoQ8bjOaC1zfuXQekpsTAKklIpLIAeOv+L5fEdANE0uj6Zz6Z6yuX+n6vdEa6Y03OcNHcMFktetaXykxov2mWlrKE+jjEiivSzvh50pwk/3sTCzO71WS546bRWvaFakq+O5t0+seZoNi
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR10MB3021.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(366004)(136003)(39860400002)(396003)(346002)(6506007)(16526019)(44832011)(26005)(478600001)(66476007)(2616005)(956004)(38100700002)(4326008)(6512007)(6486002)(66556008)(6916009)(8936002)(316002)(54906003)(2906002)(66946007)(53546011)(31686004)(31696002)(86362001)(36756003)(5660300002)(186003)(8676002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?VlFQUGh3Ly9vZVZhdkNDMi9mdXI4Ni9FaHJhOVBpVEZBc0dpNEdZaUhnL2JS?=
+ =?utf-8?B?RjNtZ29iQWkxbjFyTWF6VnJCK09ERXRxQzVjeURZOWhOcmNNTXJKVHB6Rkho?=
+ =?utf-8?B?czdHODgvVDJZd285Y0JZUjUvRmU0MjBqUm81VTYvRWlLRjN2WmJsRTJBZDlX?=
+ =?utf-8?B?V0w5KzhTSGJvVEFFaWRoZUJUQVZJRm8xSkJ4QW9QR05FOHNyVDUxblZsaEJL?=
+ =?utf-8?B?R01BOXFZaDQ4VXYxdkhpZ2ZmVC9MNmlpZGM1UGJOZXhpeEkzUGpYRlFaemdT?=
+ =?utf-8?B?dmtPZzJUMHlXdlV5Vkl3REVNbE4yMTJlYnpuVmZwTWZnQjc4RkZCd21CNE5J?=
+ =?utf-8?B?OERUYmhMd3ZQZHA2eDNpVytRVFFMbmIxbmdBaUMwU2tUUU11MnZ3MWdEam84?=
+ =?utf-8?B?UURGNjFZMW13SDhhclJRTTArckZ0MGN5aCszV2NIZFU2ZGQwWlcrV3NBNDRN?=
+ =?utf-8?B?Q2piN1dqWm1BYkpYUlM2N2RHZzhDRTJKb2I4b0N3ZzJHczlCeGpxVVFJWnJC?=
+ =?utf-8?B?TWtaWUJxV2UyUVNLOXNHT3dDV0xZV0huOUZGMHJYQUgvTThmdmoreWE5Sndk?=
+ =?utf-8?B?MlFJMisyZDdUNklKZkc1ZTExNkpzSHd6WEZyd0U0bGVEUTRTTmlZeFFJUysr?=
+ =?utf-8?B?WHF2WjQwekJ4TEx2Vk5QSnBsQ3g5b3RMMGtYYnIzeFVzRGg1UXFuaGlxUEhw?=
+ =?utf-8?B?eVZoR0pJNWc1SUpid0p0SG55cUZuRW93ZFk0UzAzY2lOcUFja3l5YjZEQ1gz?=
+ =?utf-8?B?Ylh5dWw3Nk1XdDBRelVadTBWUk9tdCtDTDFFc3lWa3AzMitTcVRYN0U4YTZp?=
+ =?utf-8?B?ZFVkNy9RcEFFbE9peUpuYkJHai8rVHNFUXArWm91eUNIMzAzZ3JocDdEUHJ5?=
+ =?utf-8?B?dEV1ZWxOQ01wUVlIamJJSW1PMXRNM3FUU2t0WnpSNVpxeGUrMkYvbWY4NWJ2?=
+ =?utf-8?B?dlF5TG0wbFJFeVZYWVFZSnJWK1NhLzZRZFJ3VkYwMzF0ZkY4M0VLS3ZEbUdY?=
+ =?utf-8?B?bnRZRG5NZmZaVXlpNEp5a2FBTTh3cTVKdW96T293Nm1PcVVmS3BjR2hzUnFw?=
+ =?utf-8?B?TDRaQ1hlLzBteVNIYzBKWm4zd0daT3h6WGR4SWdvMmhtL0ZiSzJ4cjdHOURV?=
+ =?utf-8?B?VVJCOENneXVEdkdscmlqL2lSakQ3ZEhKelBsaVBBVmUxdlhiSHRISE54V0RI?=
+ =?utf-8?B?T1p2S3VUR2JDT0FObFl5d21TSzdlMGNvcGNiNjVtY0VrcDJ4OXFIaUJZZU5a?=
+ =?utf-8?B?cXhqalR3Tll2UStkUW5hVis2byt3K25oRFNqcm91YWNEUW1RRE82cTBmSW96?=
+ =?utf-8?B?UENaOVVnUkkyQWM5VUpGa0JIdTFSVVVRMUoyRitLamthYmJ0UFdpc1J5NTRm?=
+ =?utf-8?B?NVZVUVE0QjFPWTVZbXBML3ZnT1ZrZzczUEt1bk9OZ09EY0Urb0x0UElsSldq?=
+ =?utf-8?B?NUd4RTczbWtIS2FWWTVYRlBWdFc2RzBXbGxSdS9OSEhOUXRBeDBFWHVVNHow?=
+ =?utf-8?B?aWdRRzJONktKNEhUS2NNcjFCdmExRmFlOEZMMkd1eWdFblg0K2szYnV4T0g0?=
+ =?utf-8?B?SHdLN0trUzdTV0pOMnZyZmV6dlFBV3IrbFU4ZmJDMU0rZEtLWDBaWXh2b2hs?=
+ =?utf-8?B?Q1ZqWVVWU2lQT0lXMEw3aE50QjJ6QXhDVndlNjN6M1BObWh0N2Q5dHNqNDk5?=
+ =?utf-8?B?SEd6RWYwRUxMK0txdGN1OUJ4Y1hYbXQwVTVoeXB4RHZXc2wyRm9LVkFNRFZo?=
+ =?utf-8?Q?ANkHyP5H7xx9vFFKjw/A69jPhjUmF+x6QDJuD2S?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b458d61-a36b-4262-09b5-08d9156f3d5d
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR10MB3021.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2021 17:56:16.6335
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IEvdW8StyxAEWKTTEUQ2yNBAWNNK5DRzTQlNr4KJuPLWeLb8xXSr9sKLSoA3fVsR00tGP0Jt72PLkRl6PwkfSDxIIwdd2b28rpl1xfTHGCk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR10MB4522
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9982 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
+ adultscore=0 bulkscore=0 mlxscore=0 suspectscore=0 malwarescore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2105120117
+X-Proofpoint-GUID: 8UyReHqqjqkXftduwHPkp3yvo5qZhZS0
+X-Proofpoint-ORIG-GUID: 8UyReHqqjqkXftduwHPkp3yvo5qZhZS0
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9982 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxlogscore=999
+ mlxscore=0 bulkscore=0 lowpriorityscore=0 priorityscore=1501 spamscore=0
+ clxscore=1015 impostorscore=0 phishscore=0 malwarescore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
+ definitions=main-2105120116
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 12, 2021, Joerg Roedel wrote:
-> From: Joerg Roedel <jroedel@suse.de>
-> 
-> This reverts commit 7024f60d655272bd2ca1d3a4c9e0a63319b1eea1.
-> 
-> The commit reverted here introduces a short-cut into the #VC handlers
-> memory access code which only works reliably in task context. But the
-> kernels #VC handler can be invoked from any context, making the
-> access_ok() call trigger a warning with CONFIG_DEBUG_ATOMIC_SLEEP
-> enabled.
-> 
-> Also the memcpy() used in the reverted patch is wrong, as it has no
-> page-fault handling. Access to kernel memory can also fault due to
-> kernel bugs, and those should not be reported as faults from the #VC
-> handler but as bugs of their real call-site, which is correctly later
-> done from vc_forward_exception().
 
-The changelog should call out that a previous patch fixed the original bug by
-switching to unchecked versions of get/put.  Without that, this reads like we're
-reverting to even worse behavior.
+On 5/12/21 9:01 AM, Jim Mattson wrote:
+> On Tue, May 11, 2021 at 7:37 PM Krish Sadhukhan
+> <krish.sadhukhan@oracle.com> wrote:
+>> Add the following per-VCPU statistic to KVM debugfs to show if a given
+>> VCPU is running a nested guest:
+>>
+>>          nested_guest_running
+>>
+>> Also add this as a per-VM statistic to KVM debugfs to show the total number
+>> of VCPUs running a nested guest in a given VM.
+>>
+>> Signed-off-by: Krish Sadhukhan <Krish.Sadhukhan@oracle.com>
+> This is fine, but I don't really see its usefulness. OTOH, one
 
-Alternatively, and probably even better, fold this revert into the switch to
-the unchecked version (sounds like those will use kernel-specific flavors?).
+Two potential uses:
 
-> Fixes: 7024f60d6552 ("x86/sev-es: Handle string port IO to kernel memory properly")
-> Cc: stable@vger.kernel.org # v5.11
-> Signed-off-by: Joerg Roedel <jroedel@suse.de>
-> ---
->  arch/x86/kernel/sev.c | 12 ------------
->  1 file changed, 12 deletions(-)
-> 
-> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index 110b39345b40..f4f319004713 100644
-> --- a/arch/x86/kernel/sev.c
-> +++ b/arch/x86/kernel/sev.c
-> @@ -333,12 +333,6 @@ static enum es_result vc_write_mem(struct es_em_ctxt *ctxt,
->  	u16 d2;
->  	u8  d1;
->  
-> -	/* If instruction ran in kernel mode and the I/O buffer is in kernel space */
-> -	if (!user_mode(ctxt->regs) && !access_ok(target, size)) {
-> -		memcpy(dst, buf, size);
-> -		return ES_OK;
-> -	}
-> -
->  	switch (size) {
->  	case 1:
->  		memcpy(&d1, buf, 1);
-> @@ -388,12 +382,6 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
->  	u16 d2;
->  	u8  d1;
->  
-> -	/* If instruction ran in kernel mode and the I/O buffer is in kernel space */
-> -	if (!user_mode(ctxt->regs) && !access_ok(s, size)) {
-> -		memcpy(buf, src, size);
-> -		return ES_OK;
-> -	}
-> -
->  	switch (size) {
->  	case 1:
->  		if (__get_user(d1, s))
-> -- 
-> 2.31.1
-> 
+     1. If Live Migration of L2 guests is broken/buggy, this can be used 
+to determine a safer time to trigger Live Migration of L1 guests.
+
+     2. This can be used to create a time-graph of the load of L1 and L2 
+in a given VM as well across the host.
+
+> statistic I would really like to see is how many vCPUs have *ever* run
+> a nested guest.
+
+'nested_runs' statistic provides this data, though only till VCPUs are 
+alive. We can convert 'nested_runs' to be persistent beyond VCPU 
+destruction.
+
+But I am curious about the usage you are thinking of with this.
+
