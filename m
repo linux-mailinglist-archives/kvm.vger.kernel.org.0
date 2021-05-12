@@ -2,28 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6696E37B72C
-	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 09:55:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C97F37B731
+	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 09:55:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230352AbhELH4X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 03:56:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57772 "EHLO
+        id S230377AbhELH41 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 03:56:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230284AbhELH4U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230292AbhELH4U (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 12 May 2021 03:56:20 -0400
 Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A32CC06174A;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C69FEC061760;
         Wed, 12 May 2021 00:55:12 -0700 (PDT)
 Received: from cap.home.8bytes.org (p549ad305.dip0.t-ipconnect.de [84.154.211.5])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id A32B141D;
-        Wed, 12 May 2021 09:55:09 +0200 (CEST)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 3F7BE434;
+        Wed, 12 May 2021 09:55:10 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org, Hyunwook Baek <baekhw@google.com>
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
-        stable@vger.kernel.org, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
+        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Jiri Slaby <jslaby@suse.cz>,
@@ -41,9 +40,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Arvind Sankar <nivedita@alum.mit.edu>,
         linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: [PATCH 4/6] Revert "x86/sev-es: Handle string port IO to kernel memory properly"
-Date:   Wed, 12 May 2021 09:54:43 +0200
-Message-Id: <20210512075445.18935-5-joro@8bytes.org>
+Subject: [PATCH 5/6] x86/sev-es: Fix error message in runtime #VC handler
+Date:   Wed, 12 May 2021 09:54:44 +0200
+Message-Id: <20210512075445.18935-6-joro@8bytes.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210512075445.18935-1-joro@8bytes.org>
 References: <20210512075445.18935-1-joro@8bytes.org>
@@ -55,57 +54,27 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-This reverts commit 7024f60d655272bd2ca1d3a4c9e0a63319b1eea1.
+The runtime #VC handler is not "early" anymore. Fix the copy&paste error
+and remove that word from the error message.
 
-The commit reverted here introduces a short-cut into the #VC handlers
-memory access code which only works reliably in task context. But the
-kernels #VC handler can be invoked from any context, making the
-access_ok() call trigger a warning with CONFIG_DEBUG_ATOMIC_SLEEP
-enabled.
-
-Also the memcpy() used in the reverted patch is wrong, as it has no
-page-fault handling. Access to kernel memory can also fault due to
-kernel bugs, and those should not be reported as faults from the #VC
-handler but as bugs of their real call-site, which is correctly later
-done from vc_forward_exception().
-
-Fixes: 7024f60d6552 ("x86/sev-es: Handle string port IO to kernel memory properly")
-Cc: stable@vger.kernel.org # v5.11
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/kernel/sev.c | 12 ------------
- 1 file changed, 12 deletions(-)
+ arch/x86/kernel/sev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-index 110b39345b40..f4f319004713 100644
+index f4f319004713..77155c4f07f5 100644
 --- a/arch/x86/kernel/sev.c
 +++ b/arch/x86/kernel/sev.c
-@@ -333,12 +333,6 @@ static enum es_result vc_write_mem(struct es_em_ctxt *ctxt,
- 	u16 d2;
- 	u8  d1;
- 
--	/* If instruction ran in kernel mode and the I/O buffer is in kernel space */
--	if (!user_mode(ctxt->regs) && !access_ok(target, size)) {
--		memcpy(dst, buf, size);
--		return ES_OK;
--	}
--
- 	switch (size) {
- 	case 1:
- 		memcpy(&d1, buf, 1);
-@@ -388,12 +382,6 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
- 	u16 d2;
- 	u8  d1;
- 
--	/* If instruction ran in kernel mode and the I/O buffer is in kernel space */
--	if (!user_mode(ctxt->regs) && !access_ok(s, size)) {
--		memcpy(buf, src, size);
--		return ES_OK;
--	}
--
- 	switch (size) {
- 	case 1:
- 		if (__get_user(d1, s))
+@@ -1326,7 +1326,7 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
+ 		vc_finish_insn(&ctxt);
+ 		break;
+ 	case ES_UNSUPPORTED:
+-		pr_err_ratelimited("Unsupported exit-code 0x%02lx in early #VC exception (IP: 0x%lx)\n",
++		pr_err_ratelimited("Unsupported exit-code 0x%02lx in #VC exception (IP: 0x%lx)\n",
+ 				   error_code, regs->ip);
+ 		goto fail;
+ 	case ES_VMM_ERROR:
 -- 
 2.31.1
 
