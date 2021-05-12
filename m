@@ -2,188 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B00037BBB2
-	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 13:21:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F87B37BC28
+	for <lists+kvm@lfdr.de>; Wed, 12 May 2021 13:59:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230182AbhELLWo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 07:22:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48014 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230037AbhELLWo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 07:22:44 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12C13C061574;
-        Wed, 12 May 2021 04:21:35 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id w3so34443151ejc.4;
-        Wed, 12 May 2021 04:21:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=MHzreHuweH97osIdaXwbfq/+CLsH9zkDVNipBCZFdw8=;
-        b=NN/KgV2Yh68bcHPu0DFZE2mIb6JkHVqGKhAM1BUUN9OSI2tKsPy7+/pKdP/8RFjjsO
-         NI8z+Y3I4XH1zMeAGEE0xhb+TxvqljEC1q1KY7PYUQ1LguKqtiw+o2AJ7Z4uDNwzHqF4
-         SXvKIvfGFOjok6OAzc91MG/r4bSq35o07qdcq3ZXr99+GsoCJBqk7oFQ0iVIGVj5ko+m
-         G7EIbWkftBHrAGk9rmr9zfdvOTA3TZPUlb7eFwjuI0+HllDUP/tqyK/VH7ygrg/eaPeO
-         D1280JzzEJeNi3TPoVsHjXPrybb4p9vHccTqfgp7hJh9lb+tDH5ZpWag7eO1xY2kCG6t
-         eZxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=MHzreHuweH97osIdaXwbfq/+CLsH9zkDVNipBCZFdw8=;
-        b=jtxFhybpST1BNuNg3f997SYyqrmBvM21cZvRi6ic/lp4iAYZ0H7p+kB8xulVMEVHzI
-         9gCRxeEukughCoo6hIoqNeVr5CvFQLz32HemJfa7ntE4T/XV6Fq5nO/YclJ7WKfXgOml
-         je8ZJJ7LgMdQvtLCsGvn/5VmRFiRMl69g8AdKCU9Ak399dco8E3FUngKlgR5zjBFQkA0
-         HtYcL9XrJm/erp34x1VcWa3EPZV/IDCLnQok0WKwI2S1xaTb79giF6zakl6rx4faf08t
-         lpw7Wn8OUZRbWu+1UcyNLfq2u9Rcst1E0WXAKQCYGn2JoOrLxubqtG5DQ7KapYI2+OKN
-         HJ/Q==
-X-Gm-Message-State: AOAM530CfWlJyq0XDIziuv89WOdkGmIZeA7DHnd0LZppP4EtmmRRzYRX
-        qXTagAZ57boGDC9vX7pq0SdYsCYC/uuXYQ==
-X-Google-Smtp-Source: ABdhPJwGNuBiiVAKjqaj/eiwSGpnSYkfNx81epAAbGKk5DYCb8fuTybvOZb+uEo84xR+OYNQLp8ddg==
-X-Received: by 2002:a17:907:11db:: with SMTP id va27mr36365589ejb.174.1620818493453;
-        Wed, 12 May 2021 04:21:33 -0700 (PDT)
-Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
-        by smtp.gmail.com with ESMTPSA id w6sm11763192edc.25.2021.05.12.04.21.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 May 2021 04:21:33 -0700 (PDT)
-From:   Uros Bizjak <ubizjak@gmail.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Uros Bizjak <ubizjak@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH] KVM: SVM/VMX: Use %rax instead of %__ASM_AX within CONFIG_X86_64
-Date:   Wed, 12 May 2021 13:21:15 +0200
-Message-Id: <20210512112115.70048-1-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.31.1
+        id S230228AbhELMA2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 08:00:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44284 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230178AbhELMA1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 12 May 2021 08:00:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620820759;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wPzYqFqAJkTs7cOFqUIQhzc+Cz5mbywAGDvmfIHlGHI=;
+        b=JFhhXAmUuk++zK/VKuw4clOwRr61sUNje6G5NWxJWmMhBqSEzbWviQWe7oSbPTdgeUyiaO
+        Br1t5ujrTQ6gyz8oRqIXMyC1kiSvCJJGL1/S+roWhyKuVDNXz1UDC5Ypltu/DOgcSooKVs
+        RWzuQQzpsf8s06qHfxHKNPlbuQ8zcI8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-341-ymXRmXDlOzGk9qoWUzgPwQ-1; Wed, 12 May 2021 07:59:17 -0400
+X-MC-Unique: ymXRmXDlOzGk9qoWUzgPwQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2774107ACCA;
+        Wed, 12 May 2021 11:59:16 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-5.gru2.redhat.com [10.97.112.5])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A1DE42C240;
+        Wed, 12 May 2021 11:59:09 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id BDD5740B1FA0; Wed, 12 May 2021 08:10:10 -0300 (-03)
+Date:   Wed, 12 May 2021 08:10:10 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Pei Zhang <pezhang@redhat.com>
+Subject: Re: [patch 4/4] KVM: VMX: update vcpu posted-interrupt descriptor
+ when assigning device
+Message-ID: <20210512111010.GA232673@fuller.cnet>
+References: <YJWVAcIsvCaD7U0C@t490s>
+ <20210507220831.GA449495@fuller.cnet>
+ <YJqXD5gQCfzO4rT5@t490s>
+ <20210511145157.GC124427@fuller.cnet>
+ <YJqurM+LiyAY+MPO@t490s>
+ <20210511171810.GA162107@fuller.cnet>
+ <YJr4ravpCjz2M4bp@t490s>
+ <20210511235124.GA187296@fuller.cnet>
+ <20210512000259.GA192145@fuller.cnet>
+ <YJsjeEl80KzAXNFE@t490s>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <YJsjeEl80KzAXNFE@t490s>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There is no need to use %__ASM_AX within CONFIG_X86_64. The macro
-will always expand to %rax.
+On Tue, May 11, 2021 at 08:38:16PM -0400, Peter Xu wrote:
+> On Tue, May 11, 2021 at 09:02:59PM -0300, Marcelo Tosatti wrote:
+> > On Tue, May 11, 2021 at 08:51:24PM -0300, Marcelo Tosatti wrote:
+> > > On Tue, May 11, 2021 at 05:35:41PM -0400, Peter Xu wrote:
+> > > > On Tue, May 11, 2021 at 02:18:10PM -0300, Marcelo Tosatti wrote:
+> > > > > On Tue, May 11, 2021 at 12:19:56PM -0400, Peter Xu wrote:
+> > > > > > On Tue, May 11, 2021 at 11:51:57AM -0300, Marcelo Tosatti wrote:
+> > > > > > > On Tue, May 11, 2021 at 10:39:11AM -0400, Peter Xu wrote:
+> > > > > > > > On Fri, May 07, 2021 at 07:08:31PM -0300, Marcelo Tosatti wrote:
+> > > > > > > > > > Wondering whether we should add a pi_test_on() check in kvm_vcpu_has_events()
+> > > > > > > > > > somehow, so that even without customized ->vcpu_check_block we should be able
+> > > > > > > > > > to break the block loop (as kvm_arch_vcpu_runnable will return true properly)?
+> > > > > > > > > 
+> > > > > > > > > static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
+> > > > > > > > > {
+> > > > > > > > >         int ret = -EINTR;
+> > > > > > > > >         int idx = srcu_read_lock(&vcpu->kvm->srcu);
+> > > > > > > > > 
+> > > > > > > > >         if (kvm_arch_vcpu_runnable(vcpu)) {
+> > > > > > > > >                 kvm_make_request(KVM_REQ_UNHALT, vcpu); <---
+> > > > > > > > >                 goto out;
+> > > > > > > > >         }
+> > > > > > > > > 
+> > > > > > > > > Don't want to unhalt the vcpu.
+> > > > > > > > 
+> > > > > > > > Could you elaborate?  It's not obvious to me why we can't do that if
+> > > > > > > > pi_test_on() returns true..  we have pending post interrupts anyways, so
+> > > > > > > > shouldn't we stop halting?  Thanks!
+> > > > > > > 
+> > > > > > > pi_test_on() only returns true when an interrupt is signalled by the
+> > > > > > > device. But the sequence of events is:
+> > > > > > > 
+> > > > > > > 
+> > > > > > > 1. pCPU idles without notification vector configured to wakeup vector.
+> > > > > > > 
+> > > > > > > 2. PCI device is hotplugged, assigned device count increases from 0 to 1.
+> > > > > > > 
+> > > > > > > <arbitrary amount of time>
+> > > > > > > 
+> > > > > > > 3. device generates interrupt, sets ON bit to true in the posted
+> > > > > > > interrupt descriptor.
+> > > > > > > 
+> > > > > > > We want to exit kvm_vcpu_block after 2, but before 3 (where ON bit
+> > > > > > > is not set).
+> > > > > > 
+> > > > > > Ah yes.. thanks.
+> > > > > > 
+> > > > > > Besides the current approach, I'm thinking maybe it'll be cleaner/less LOC to
+> > > > > > define a KVM_REQ_UNBLOCK to replace the pre_block hook (in x86's kvm_host.h):
+> > > > > > 
+> > > > > > #define KVM_REQ_UNBLOCK			KVM_ARCH_REQ(31)
+> > > > > > 
+> > > > > > We can set it in vmx_pi_start_assignment(), then check+clear it in
+> > > > > > kvm_vcpu_has_events() (or make it a bool in kvm_vcpu struct?).
+> > > > > 
+> > > > > Can't check it in kvm_vcpu_has_events() because that will set
+> > > > > KVM_REQ_UNHALT (which we don't want).
+> > > > 
+> > > > I thought it was okay to break the guest HLT? 
+> > > 
+> > > Intel:
+> > > 
+> > > "HLT-HALT
+> > > 
+> > > Description
+> > > 
+> > > Stops instruction execution and places the processor in a HALT state. An enabled interrupt (including NMI and
+> > > SMI), a debug exception, the BINIT# signal, the INIT# signal, or the RESET# signal will resume execution. If an
+> > > interrupt (including NMI) is used to resume execution after a HLT instruction, the saved instruction pointer
+> > > (CS:EIP) points to the instruction following the HLT instruction."
+> > > 
+> > > AMD:
+> > > 
+> > > "6.5 Processor Halt
+> > > The processor halt instruction (HLT) halts instruction execution, leaving the processor in the halt state.
+> > > No registers or machine state are modified as a result of executing the HLT instruction. The processor
+> > > remains in the halt state until one of the following occurs:
+> > > • A non-maskable interrupt (NMI).
+> > > • An enabled, maskable interrupt (INTR).
+> > > • Processor reset (RESET).
+> > > • Processor initialization (INIT).
+> > > • System-management interrupt (SMI)."
+> > > 
+> > > The KVM_REQ_UNBLOCK patch will resume execution even any such event
+> > 
+> > 						  even without any such event
+> > 
+> > > occuring. So the behaviour would be different from baremetal.
+> > 
+> 
+> What if we move that kvm_check_request() into kvm_vcpu_check_block()?
+> 
+> ---8<---
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 739e1bd59e8a9..e6fee59b5dab6 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -11177,9 +11177,6 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
+>              static_call(kvm_x86_smi_allowed)(vcpu, false)))
+>                 return true;
+>  
+> -       if (kvm_check_request(KVM_REQ_UNBLOCK, vcpu))
+> -               return true;
+> -
+>         if (kvm_arch_interrupt_allowed(vcpu) &&
+>             (kvm_cpu_has_interrupt(vcpu) ||
+>             kvm_guest_apic_has_interrupt(vcpu)))
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index f68035355c08a..fc5f6bffff7fc 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2925,6 +2925,10 @@ static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
+>                 kvm_make_request(KVM_REQ_UNHALT, vcpu);
+>                 goto out;
+>         }
+> +#ifdef CONFIG_X86
+> +       if (kvm_check_request(KVM_REQ_UNBLOCK, vcpu))
+> +               return true;
+> +#endif
+>         if (kvm_cpu_has_pending_timer(vcpu))
+>                 goto out;
+>         if (signal_pending(current))
+> ---8<---
+> 
+> (The CONFIG_X86 is ugly indeed.. but just to show what I meant, e.g. it can be
+>  a boolean too I think)
+> 
+> Would this work?
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
----
- arch/x86/kvm/svm/vmenter.S | 44 +++++++++++++++++++-------------------
- arch/x86/kvm/vmx/vmenter.S | 32 +++++++++++++--------------
- 2 files changed, 38 insertions(+), 38 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
-index 4fa17df123cd..844b558bb021 100644
---- a/arch/x86/kvm/svm/vmenter.S
-+++ b/arch/x86/kvm/svm/vmenter.S
-@@ -64,14 +64,14 @@ SYM_FUNC_START(__svm_vcpu_run)
- 	mov VCPU_RSI(%_ASM_AX), %_ASM_SI
- 	mov VCPU_RDI(%_ASM_AX), %_ASM_DI
- #ifdef CONFIG_X86_64
--	mov VCPU_R8 (%_ASM_AX),  %r8
--	mov VCPU_R9 (%_ASM_AX),  %r9
--	mov VCPU_R10(%_ASM_AX), %r10
--	mov VCPU_R11(%_ASM_AX), %r11
--	mov VCPU_R12(%_ASM_AX), %r12
--	mov VCPU_R13(%_ASM_AX), %r13
--	mov VCPU_R14(%_ASM_AX), %r14
--	mov VCPU_R15(%_ASM_AX), %r15
-+	mov VCPU_R8 (%rax),  %r8
-+	mov VCPU_R9 (%rax),  %r9
-+	mov VCPU_R10(%rax), %r10
-+	mov VCPU_R11(%rax), %r11
-+	mov VCPU_R12(%rax), %r12
-+	mov VCPU_R13(%rax), %r13
-+	mov VCPU_R14(%rax), %r14
-+	mov VCPU_R15(%rax), %r15
- #endif
- 
- 	/* "POP" @vmcb to RAX. */
-@@ -93,21 +93,21 @@ SYM_FUNC_START(__svm_vcpu_run)
- 	pop %_ASM_AX
- 
- 	/* Save all guest registers.  */
--	mov %_ASM_CX,   VCPU_RCX(%_ASM_AX)
--	mov %_ASM_DX,   VCPU_RDX(%_ASM_AX)
--	mov %_ASM_BX,   VCPU_RBX(%_ASM_AX)
--	mov %_ASM_BP,   VCPU_RBP(%_ASM_AX)
--	mov %_ASM_SI,   VCPU_RSI(%_ASM_AX)
--	mov %_ASM_DI,   VCPU_RDI(%_ASM_AX)
-+	mov %_ASM_CX, VCPU_RCX(%_ASM_AX)
-+	mov %_ASM_DX, VCPU_RDX(%_ASM_AX)
-+	mov %_ASM_BX, VCPU_RBX(%_ASM_AX)
-+	mov %_ASM_BP, VCPU_RBP(%_ASM_AX)
-+	mov %_ASM_SI, VCPU_RSI(%_ASM_AX)
-+	mov %_ASM_DI, VCPU_RDI(%_ASM_AX)
- #ifdef CONFIG_X86_64
--	mov %r8,  VCPU_R8 (%_ASM_AX)
--	mov %r9,  VCPU_R9 (%_ASM_AX)
--	mov %r10, VCPU_R10(%_ASM_AX)
--	mov %r11, VCPU_R11(%_ASM_AX)
--	mov %r12, VCPU_R12(%_ASM_AX)
--	mov %r13, VCPU_R13(%_ASM_AX)
--	mov %r14, VCPU_R14(%_ASM_AX)
--	mov %r15, VCPU_R15(%_ASM_AX)
-+	mov %r8,  VCPU_R8 (%rax)
-+	mov %r9,  VCPU_R9 (%rax)
-+	mov %r10, VCPU_R10(%rax)
-+	mov %r11, VCPU_R11(%rax)
-+	mov %r12, VCPU_R12(%rax)
-+	mov %r13, VCPU_R13(%rax)
-+	mov %r14, VCPU_R14(%rax)
-+	mov %r15, VCPU_R15(%rax)
- #endif
- 
- 	/*
-diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-index 3a6461694fc2..9273709e4800 100644
---- a/arch/x86/kvm/vmx/vmenter.S
-+++ b/arch/x86/kvm/vmx/vmenter.S
-@@ -142,14 +142,14 @@ SYM_FUNC_START(__vmx_vcpu_run)
- 	mov VCPU_RSI(%_ASM_AX), %_ASM_SI
- 	mov VCPU_RDI(%_ASM_AX), %_ASM_DI
- #ifdef CONFIG_X86_64
--	mov VCPU_R8 (%_ASM_AX),  %r8
--	mov VCPU_R9 (%_ASM_AX),  %r9
--	mov VCPU_R10(%_ASM_AX), %r10
--	mov VCPU_R11(%_ASM_AX), %r11
--	mov VCPU_R12(%_ASM_AX), %r12
--	mov VCPU_R13(%_ASM_AX), %r13
--	mov VCPU_R14(%_ASM_AX), %r14
--	mov VCPU_R15(%_ASM_AX), %r15
-+	mov VCPU_R8 (%rax),  %r8
-+	mov VCPU_R9 (%rax),  %r9
-+	mov VCPU_R10(%rax), %r10
-+	mov VCPU_R11(%rax), %r11
-+	mov VCPU_R12(%rax), %r12
-+	mov VCPU_R13(%rax), %r13
-+	mov VCPU_R14(%rax), %r14
-+	mov VCPU_R15(%rax), %r15
- #endif
- 	/* Load guest RAX.  This kills the @regs pointer! */
- 	mov VCPU_RAX(%_ASM_AX), %_ASM_AX
-@@ -175,14 +175,14 @@ SYM_FUNC_START(__vmx_vcpu_run)
- 	mov %_ASM_SI, VCPU_RSI(%_ASM_AX)
- 	mov %_ASM_DI, VCPU_RDI(%_ASM_AX)
- #ifdef CONFIG_X86_64
--	mov %r8,  VCPU_R8 (%_ASM_AX)
--	mov %r9,  VCPU_R9 (%_ASM_AX)
--	mov %r10, VCPU_R10(%_ASM_AX)
--	mov %r11, VCPU_R11(%_ASM_AX)
--	mov %r12, VCPU_R12(%_ASM_AX)
--	mov %r13, VCPU_R13(%_ASM_AX)
--	mov %r14, VCPU_R14(%_ASM_AX)
--	mov %r15, VCPU_R15(%_ASM_AX)
-+	mov %r8,  VCPU_R8 (%rax)
-+	mov %r9,  VCPU_R9 (%rax)
-+	mov %r10, VCPU_R10(%rax)
-+	mov %r11, VCPU_R11(%rax)
-+	mov %r12, VCPU_R12(%rax)
-+	mov %r13, VCPU_R13(%rax)
-+	mov %r14, VCPU_R14(%rax)
-+	mov %r15, VCPU_R15(%rax)
- #endif
- 
- 	/* Clear RAX to indicate VM-Exit (as opposed to VM-Fail). */
--- 
-2.31.1
+That would work: but vcpu->requests are nicely checked (and processed) 
+at vcpu_enter_guest, before guest entry. The proposed request does not 
+follow that pattern.
 
