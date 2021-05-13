@@ -2,402 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 326FE37F077
-	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 02:37:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFD0637F0C4
+	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 03:05:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231233AbhEMAif (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 20:38:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56088 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346660AbhEMAgk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 20:36:40 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6B34C061375
-        for <kvm@vger.kernel.org>; Wed, 12 May 2021 17:28:13 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id k9-20020a63d1090000b029021091ebb84cso14852555pgg.3
-        for <kvm@vger.kernel.org>; Wed, 12 May 2021 17:28:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=W+z6ph43WEoqzK/h0XR5xPv+BQTmvSnsoISA0GsP8mc=;
-        b=KSRHUT0CZchN8QDX+Qmq4o6cKbn5IRF7Mqms8ZRwiWGv/lsLoGylG0Ar42dLWCrfb/
-         3JflgbqhixbfCSBVY4NQnE9fDc6bhi72GysQzbUvKWJ31WmAbjWLHPG7xGUtMvCt4HSG
-         7nT2M12ug8i4/dzTvnlojJeqWvVYw822llHB213vSxS3IXLbREzQzBxRghazwNed/PVu
-         GmduMsJRIXQQlK7UE9PgxuRAPANS+hD5Z9z2FKwqCOm6OMkgCQQnWaj4CAjBA2Sur3pV
-         +r1p1RJJeso5r+u35Ew0UJEaiWJV817boBKFaBigld6an3iZGQQ7qzUksyOhfsDiaUKi
-         9GSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=W+z6ph43WEoqzK/h0XR5xPv+BQTmvSnsoISA0GsP8mc=;
-        b=qk7TCrGUNqfxG/9TDVtG4+8bq9XZGhY4axQFoX2pqLFyaevdO8jIZGvNI5qX8ZjGHF
-         ZbXDfAc1PvnWLlqNe17/dbW1vh+cif7ExWq0iMbcJRR9EUQJlwve/rz4GKf1DBv0gfEY
-         aI8NmwIMyv0FDFi6f8l6ycZHnKLPlft0RLoc4TthF9Z6QabH0mS4oL1ObAFWA2Jh/LAd
-         kOrUPQfxCGbNgEcq0xLEHdHcj7lNOoph1+sikq0I94Q79tjdBLuJtFxgLhWT++chUI88
-         ZHiuszZ1VwgXn2iqi5OGJw99wSuz256SHaG0SgT1p4H05AquU4dNHZT7AQD559l3HE2C
-         OzAQ==
-X-Gm-Message-State: AOAM5312xwJpRlrTEYzOera4fDJ87vuxq3sfYbnUojjJw81qoxt5zLIK
-        h4aRwUqbMCcqkYyPpeeqRN73IKhwSDkQFtJvAAkzr4vXmEjk96Nnyvx4AveZ9Arq1TsBEjjDARB
-        gnQPp61ltZudTH/S3bBv2sZLW8p1JgJkm/xslGAjDxMago5z92Zg3aMEUnu/5tzU=
-X-Google-Smtp-Source: ABdhPJw09k+v45DCOrkklD3IrTc/H+4DaLy55rV+eRCbsm8LTN+FOp02MZluXl2JNqbZrRyQ+g5GCx43xaJJJw==
-X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:90a:7f83:: with SMTP id
- m3mr15750pjl.0.1620865692836; Wed, 12 May 2021 17:28:12 -0700 (PDT)
-Date:   Wed, 12 May 2021 17:28:02 -0700
-In-Reply-To: <20210513002802.3671838-1-ricarkol@google.com>
-Message-Id: <20210513002802.3671838-6-ricarkol@google.com>
-Mime-Version: 1.0
-References: <20210513002802.3671838-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.31.1.607.g51e8a6a459-goog
-Subject: [PATCH v3 5/5] KVM: selftests: Add aarch64/debug-exceptions test
-From:   Ricardo Koller <ricarkol@google.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     pbonzini@redhat.com, maz@kernel.org, drjones@redhat.com,
-        alexandru.elisei@arm.com, eric.auger@redhat.com,
-        Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S231822AbhEMBHE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 21:07:04 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21882 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231185AbhEMBHB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 12 May 2021 21:07:01 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14D150C7087267;
+        Wed, 12 May 2021 21:05:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=LBtSkqQLQFso9TmdaoND0DnKEsuHjYlHgN/IrGvt/NY=;
+ b=bHB8KlxJlTBq9kM3fZ29Cj8ouyPW54/1gii7I7RhIR9N+nwyCEqPcGjwaBrwTz9V+8rV
+ HCR1uwQkgt7rCYxZA6878CJXdVewV+0bJ9e+LqNvYnGuqDC8n4/rWWp56SwOFZ2y8aRE
+ QXtCRaGDKdvfTlER80ytESPUtSKxki7ro04ES5GCTqcEbxrSv+a+4O3QnHae4xcMQGku
+ B7nFIe72gnW3vnPEC6HDb0vB/WihjH9eZebYWBGBDV3CyeVBhpm/AVsY1zHLvcjVt28l
+ /Cq5co/4ay9j+S0K1Ahpw2wKZmQY+Jh5PDPsCOj7eWhaslnD0bNkC+erdUBa+ft6FMPr mA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38grxmhkpr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 12 May 2021 21:05:51 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14D15pwk094199;
+        Wed, 12 May 2021 21:05:51 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38grxmhknt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 12 May 2021 21:05:51 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14D12FlS032528;
+        Thu, 13 May 2021 01:05:49 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04fra.de.ibm.com with ESMTP id 38ef37h559-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 May 2021 01:05:49 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14D15kNM14024986
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 13 May 2021 01:05:46 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 055E842045;
+        Thu, 13 May 2021 01:05:46 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 80DB94203F;
+        Thu, 13 May 2021 01:05:45 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.63.111])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Thu, 13 May 2021 01:05:45 +0000 (GMT)
+Date:   Thu, 13 May 2021 03:05:43 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v6 0/3] vfio-ccw: Fix interrupt handling for HALT/CLEAR
+Message-ID: <20210513030543.67601a8c.pasic@linux.ibm.com>
+In-Reply-To: <20210511195631.3995081-1-farman@linux.ibm.com>
+References: <20210511195631.3995081-1-farman@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: D-gxEDFciGC1-ajuw9Jlr1KCSQHQA1t8
+X-Proofpoint-ORIG-GUID: ZTUDcHIp6Hdmj_hzrBzfUIGr84wIQV2k
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-12_13:2021-05-12,2021-05-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
+ adultscore=0 impostorscore=0 phishscore=0 malwarescore=0 mlxscore=0
+ suspectscore=0 priorityscore=1501 lowpriorityscore=0 mlxlogscore=999
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2105130004
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Covers fundamental tests for debug exceptions. The guest installs and
-handle its debug exceptions itself, without KVM_SET_GUEST_DEBUG.
+On Tue, 11 May 2021 21:56:28 +0200
+Eric Farman <farman@linux.ibm.com> wrote:
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/aarch64/debug-exceptions.c  | 250 ++++++++++++++++++
- .../selftests/kvm/include/aarch64/processor.h |  22 +-
- 4 files changed, 268 insertions(+), 6 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> Hi Conny, Matt, Halil,
+>=20
+> Here's one (last?) update to my proposal for handling the collision
+> between interrupts for START SUBCHANNEL and HALT/CLEAR SUBCHANNEL.
+>=20
+> Only change here is to include Conny's suggestions on patch 3.
+>=20
+> Thanks,
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index e65d5572aefc..f09ed908422b 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -1,4 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0-only
-+/aarch64/debug-exceptions
- /aarch64/get-reg-list
- /aarch64/get-reg-list-sve
- /aarch64/vgic_init
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 618c5903f478..2f92442c0cc9 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -73,6 +73,7 @@ TEST_GEN_PROGS_x86_64 += memslot_modification_stress_test
- TEST_GEN_PROGS_x86_64 += set_memory_region_test
- TEST_GEN_PROGS_x86_64 += steal_time
- 
-+TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list-sve
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
-diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-new file mode 100644
-index 000000000000..51c42ac24dca
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-@@ -0,0 +1,250 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <test_util.h>
-+#include <kvm_util.h>
-+#include <processor.h>
-+
-+#define VCPU_ID 0
-+
-+#define MDSCR_KDE	(1 << 13)
-+#define MDSCR_MDE	(1 << 15)
-+#define MDSCR_SS	(1 << 0)
-+
-+#define DBGBCR_LEN8	(0xff << 5)
-+#define DBGBCR_EXEC	(0x0 << 3)
-+#define DBGBCR_EL1	(0x1 << 1)
-+#define DBGBCR_E	(0x1 << 0)
-+
-+#define DBGWCR_LEN8	(0xff << 5)
-+#define DBGWCR_RD	(0x1 << 3)
-+#define DBGWCR_WR	(0x2 << 3)
-+#define DBGWCR_EL1	(0x1 << 1)
-+#define DBGWCR_E	(0x1 << 0)
-+
-+#define SPSR_D		(1 << 9)
-+#define SPSR_SS		(1 << 21)
-+
-+extern unsigned char sw_bp, hw_bp, bp_svc, bp_brk, hw_wp, ss_start;
-+static volatile uint64_t sw_bp_addr, hw_bp_addr;
-+static volatile uint64_t wp_addr, wp_data_addr;
-+static volatile uint64_t svc_addr;
-+static volatile uint64_t ss_addr[4], ss_idx;
-+#define  PC(v)  ((uint64_t)&(v))
-+
-+static void reset_debug_state(void)
-+{
-+	asm volatile("msr daifset, #8");
-+
-+	write_sysreg(osdlr_el1, 0);
-+	write_sysreg(oslar_el1, 0);
-+	isb();
-+
-+	write_sysreg(mdscr_el1, 0);
-+	/* This test only uses the first bp and wp slot. */
-+	write_sysreg(dbgbvr0_el1, 0);
-+	write_sysreg(dbgbcr0_el1, 0);
-+	write_sysreg(dbgwcr0_el1, 0);
-+	write_sysreg(dbgwvr0_el1, 0);
-+	isb();
-+}
-+
-+static void install_wp(uint64_t addr)
-+{
-+	uint32_t wcr;
-+	uint32_t mdscr;
-+
-+	wcr = DBGWCR_LEN8 | DBGWCR_RD | DBGWCR_WR | DBGWCR_EL1 | DBGWCR_E;
-+	write_sysreg(dbgwcr0_el1, wcr);
-+	write_sysreg(dbgwvr0_el1, addr);
-+	isb();
-+
-+	asm volatile("msr daifclr, #8");
-+
-+	mdscr = read_sysreg(mdscr_el1) | MDSCR_KDE | MDSCR_MDE;
-+	write_sysreg(mdscr_el1, mdscr);
-+	isb();
-+}
-+
-+static void install_hw_bp(uint64_t addr)
-+{
-+	uint32_t bcr;
-+	uint32_t mdscr;
-+
-+	bcr = DBGBCR_LEN8 | DBGBCR_EXEC | DBGBCR_EL1 | DBGBCR_E;
-+	write_sysreg(dbgbcr0_el1, bcr);
-+	write_sysreg(dbgbvr0_el1, addr);
-+	isb();
-+
-+	asm volatile("msr daifclr, #8");
-+
-+	mdscr = read_sysreg(mdscr_el1) | MDSCR_KDE | MDSCR_MDE;
-+	write_sysreg(mdscr_el1, mdscr);
-+	isb();
-+}
-+
-+static void install_ss(void)
-+{
-+	uint32_t mdscr;
-+
-+	asm volatile("msr daifclr, #8");
-+
-+	mdscr = read_sysreg(mdscr_el1) | MDSCR_KDE | MDSCR_SS;
-+	write_sysreg(mdscr_el1, mdscr);
-+	isb();
-+}
-+
-+static volatile char write_data;
-+
-+static void guest_code(void)
-+{
-+	GUEST_SYNC(0);
-+
-+	/* Software-breakpoint */
-+	asm volatile("sw_bp: brk #0");
-+	GUEST_ASSERT_EQ(sw_bp_addr, PC(sw_bp));
-+
-+	GUEST_SYNC(1);
-+
-+	/* Hardware-breakpoint */
-+	reset_debug_state();
-+	install_hw_bp(PC(hw_bp));
-+	asm volatile("hw_bp: nop");
-+	GUEST_ASSERT_EQ(hw_bp_addr, PC(hw_bp));
-+
-+	GUEST_SYNC(2);
-+
-+	/* Hardware-breakpoint + svc */
-+	reset_debug_state();
-+	install_hw_bp(PC(bp_svc));
-+	asm volatile("bp_svc: svc #0");
-+	GUEST_ASSERT_EQ(hw_bp_addr, PC(bp_svc));
-+	GUEST_ASSERT_EQ(svc_addr, PC(bp_svc) + 4);
-+
-+	GUEST_SYNC(3);
-+
-+	/* Hardware-breakpoint + software-breakpoint */
-+	reset_debug_state();
-+	install_hw_bp(PC(bp_brk));
-+	asm volatile("bp_brk: brk #0");
-+	GUEST_ASSERT_EQ(sw_bp_addr, PC(bp_brk));
-+	GUEST_ASSERT_EQ(hw_bp_addr, PC(bp_brk));
-+
-+	GUEST_SYNC(4);
-+
-+	/* Watchpoint */
-+	reset_debug_state();
-+	install_wp(PC(write_data));
-+	write_data = 'x';
-+	GUEST_ASSERT_EQ(write_data, 'x');
-+	GUEST_ASSERT_EQ(wp_data_addr, PC(write_data));
-+
-+	GUEST_SYNC(5);
-+
-+	/* Single-step */
-+	reset_debug_state();
-+	install_ss();
-+	ss_idx = 0;
-+	asm volatile("ss_start:\n"
-+		     "mrs x0, esr_el1\n"
-+		     "add x0, x0, #1\n"
-+		     "msr daifset, #8\n"
-+		     : : : "x0");
-+	GUEST_ASSERT_EQ(ss_addr[0], PC(ss_start));
-+	GUEST_ASSERT_EQ(ss_addr[1], PC(ss_start) + 4);
-+	GUEST_ASSERT_EQ(ss_addr[2], PC(ss_start) + 8);
-+
-+	GUEST_DONE();
-+}
-+
-+static void guest_sw_bp_handler(struct ex_regs *regs)
-+{
-+	sw_bp_addr = regs->pc;
-+	regs->pc += 4;
-+}
-+
-+static void guest_hw_bp_handler(struct ex_regs *regs)
-+{
-+	hw_bp_addr = regs->pc;
-+	regs->pstate |= SPSR_D;
-+}
-+
-+static void guest_wp_handler(struct ex_regs *regs)
-+{
-+	wp_data_addr = read_sysreg(far_el1);
-+	wp_addr = regs->pc;
-+	regs->pstate |= SPSR_D;
-+}
-+
-+static void guest_ss_handler(struct ex_regs *regs)
-+{
-+	GUEST_ASSERT_1(ss_idx < 4, ss_idx);
-+	ss_addr[ss_idx++] = regs->pc;
-+	regs->pstate |= SPSR_SS;
-+}
-+
-+static void guest_svc_handler(struct ex_regs *regs)
-+{
-+	svc_addr = regs->pc;
-+}
-+
-+static int debug_version(struct kvm_vm *vm)
-+{
-+	uint64_t id_aa64dfr0;
-+
-+	get_reg(vm, VCPU_ID, ARM64_SYS_REG(ID_AA64DFR0_EL1), &id_aa64dfr0);
-+	return id_aa64dfr0 & 0xf;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+	int stage;
-+
-+	vm = vm_create_default(VCPU_ID, 0, guest_code);
-+	ucall_init(vm, NULL);
-+
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vm, VCPU_ID);
-+
-+	if (debug_version(vm) < 6) {
-+		print_skip("Armv8 debug architecture not supported.");
-+		kvm_vm_free(vm);
-+		exit(KSFT_SKIP);
-+	}
-+
-+	vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_BRK_INS, guest_sw_bp_handler);
-+	vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_HW_BP_CURRENT, guest_hw_bp_handler);
-+	vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_WP_CURRENT, guest_wp_handler);
-+	vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_SSTEP_CURRENT, guest_ss_handler);
-+	vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_SVC64, guest_svc_handler);
-+
-+	for (stage = 0; stage < 7; stage++) {
-+		vcpu_run(vm, VCPU_ID);
-+
-+		switch (get_ucall(vm, VCPU_ID, &uc)) {
-+		case UCALL_SYNC:
-+			TEST_ASSERT(uc.args[1] == stage,
-+				"Stage %d: Unexpected sync ucall, got %lx",
-+				stage, (ulong)uc.args[1]);
-+			break;
-+		case UCALL_ABORT:
-+			TEST_FAIL("%s at %s:%ld\n\tvalues: %#lx, %#lx",
-+				(const char *)uc.args[0],
-+				__FILE__, uc.args[1], uc.args[2], uc.args[3]);
-+			break;
-+		case UCALL_DONE:
-+			goto done;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	}
-+
-+done:
-+	kvm_vm_free(vm);
-+	return 0;
-+}
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index bc81cd62254f..1a3abe1037b0 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -14,12 +14,14 @@
- #define ARM64_CORE_REG(x) (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
- 			   KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
- 
--#define CPACR_EL1	3, 0,  1, 0, 2
--#define TCR_EL1		3, 0,  2, 0, 2
--#define MAIR_EL1	3, 0, 10, 2, 0
--#define TTBR0_EL1	3, 0,  2, 0, 0
--#define SCTLR_EL1	3, 0,  1, 0, 0
--#define VBAR_EL1	3, 0, 12, 0, 0
-+#define CPACR_EL1               3, 0,  1, 0, 2
-+#define TCR_EL1                 3, 0,  2, 0, 2
-+#define MAIR_EL1                3, 0, 10, 2, 0
-+#define TTBR0_EL1               3, 0,  2, 0, 0
-+#define SCTLR_EL1               3, 0,  1, 0, 0
-+#define VBAR_EL1                3, 0, 12, 0, 0
-+
-+#define ID_AA64DFR0_EL1         3, 0,  0, 5, 0
- 
- /*
-  * Default MAIR
-@@ -98,6 +100,12 @@ enum {
- #define ESR_EC_SHIFT		26
- #define ESR_EC_MASK		(ESR_EC_NUM - 1)
- 
-+#define ESR_EC_SVC64		0x15
-+#define ESR_EC_HW_BP_CURRENT	0x31
-+#define ESR_EC_SSTEP_CURRENT	0x33
-+#define ESR_EC_WP_CURRENT	0x35
-+#define ESR_EC_BRK_INS		0x3c
-+
- void vm_init_descriptor_tables(struct kvm_vm *vm);
- void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid);
- 
-@@ -119,4 +127,6 @@ void vm_install_vector_handler(struct kvm_vm *vm,
- 	val;								  \
- })
- 
-+#define isb()	asm volatile("isb" : : : "memory")
-+
- #endif /* SELFTEST_KVM_PROCESSOR_H */
--- 
-2.31.1.607.g51e8a6a459-goog
+I believe these changes are beneficial, although I don't understand
+everything about them. In that sense I'm happy with the these getting
+merged.
 
+Let me also spend some words answering the unasked question, what I'm
+not understanding about these.
+
+Not understanding how the problem stated in the cover letter of v4 is
+actually resolved is certainly the most important one. Let me cite
+the relevant part of it (your cover letter already contains a link to
+the full version).
+
+"""
+
+	CPU 1			CPU 2
+ 1	CLEAR SUBCHANNEL
+ 2	fsm_irq()
+ 3				START SUBCHANNEL
+ 4	vfio_ccw_sch_io_todo()
+ 5				fsm_irq()
+ 6				vfio_ccw_sch_io_todo()
+
+=46rom the channel subsystem's point of view the CLEAR SUBCHANNEL (step 1)
+is complete once step 2 is called, as the Interrupt Response Block (IRB)
+has been presented and the TEST SUBCHANNEL was driven by the cio layer.
+Thus, the START SUBCHANNEL (step 3) is submitted [1] and gets a cc=3D0 to
+indicate the I/O was accepted. However, step 2 stacks the bulk of the
+actual work onto a workqueue for when the subchannel lock is NOT held,
+and is unqueued at step 4. That code misidentifies the data in the IRB
+as being associated with the newly active I/O, and may release memory
+that is actively in use by the channel subsystem and/or device. Eww.
+"""
+
+The last sentence clearly states "may release memory that is actively
+used by ... the device", and I understood it refers to the invocation
+of cp_free() from vfio_ccw_sch_io_todo(). Patch 3 of this series does
+not change the conditions under which cp_free() is called.
+
+Looking at the cited diagram, since patch 3 changes things in
+vfio_ccw_sch_io_todo() it probably ain't affecting steps 1-3 and
+I understood the description so that bad free happens in step 4.
+
+My guess is that your change from patch 3 somehow via the fsm prevents
+the SSCH on CPU 2 (using the diagram) from being executed  if it actually
+happens to be after vfio_ccw_sch_io_todo(). And patch 1 is supposed to
+prevent the SSCH on CPU2 from being executed in the depicted case because
+if there is a cp to free, then we would bail out form if we see it
+while processing the new IO request.
+
+In any case, I don't want to hold this up any further.
+
+Regards,
+Halil
