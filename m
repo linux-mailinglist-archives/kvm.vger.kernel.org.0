@@ -2,184 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CFEEB37FB4F
-	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 18:14:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 753DA37FB76
+	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 18:28:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235058AbhEMQP7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 May 2021 12:15:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38810 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232251AbhEMQPz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 May 2021 12:15:55 -0400
-Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 959F8C061574
-        for <kvm@vger.kernel.org>; Thu, 13 May 2021 09:14:44 -0700 (PDT)
-Received: by mail-io1-xd2b.google.com with SMTP id z24so25460762ioj.7
-        for <kvm@vger.kernel.org>; Thu, 13 May 2021 09:14:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=3sw5ViZFIYoD7cHO9bW/jhWGGuW60Jk0+ksnUZs3ziQ=;
-        b=RyrgDBFVhCxVBXjrt4gEmtS4OMHJTrHa0aEJaIiDqh5FlAT3i7mGMDmvLnnAlpuQGC
-         GkzfxMKViXuRfuuVZEFYlMYiIA/RBWIhAEsaBdWT4uHfsgUNow6Ums/nLwfE3NrlwLW5
-         00yZWGcGaFiMTkRc8cgDVmsGCa6Uo50h9lwcn5KgZ49n3ySDsPAYMTshWkm0Sl66AUIC
-         ph/SfV7vts6+CRbSnzQORjbmUMK1heE/X1NaJOvRXSl54N1Vs02KUk14hwywT1T6QO9w
-         T/4rd/AGGx1wMaV8uV2PmQ27MiEaQpBjPhwhhRqhjjlUCYF6jq/FzBAXG8hgb3HfoM2k
-         SsAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=3sw5ViZFIYoD7cHO9bW/jhWGGuW60Jk0+ksnUZs3ziQ=;
-        b=eZhMkwekWeuUj8dY+JTveSeKF9OTIiZ3PpU3VD8uhell3roPNJCRxL4K0MYuvCH/hN
-         9z0p/y45H+c4zBP2w8fUUJAB0lByy2PwrdTgKCgqXqj57fdtSnGH2HRnTDpCFfPh5lvR
-         dQwTS65eaI3zpuwDNcNlE5Wma/QQjILK2aYhXBhnxRfONT8uSbcZ1zdN/QtvUDRRcYO3
-         W1jqbgt6J5VlA3kNGMx656SY1mXkGQy1Xv2tz8oPhe6Gb8eeKWVcigPBVTHx5ff76TIt
-         ZHrVhniRexE9mvsyy8KHTc/dDGc+hMLTqVPQurc3D55ZWyyB7aqC3dQcS97Fmg4tXevL
-         FLTA==
-X-Gm-Message-State: AOAM530xxq6OsTDSXK0S4fPZrrUKIHurl9M9fJoOre03/U6uA8zji7yb
-        JJEmPNtCOh0tk4UTNUfJy3/VFiBfPS9bAFMRzmHdLg==
-X-Google-Smtp-Source: ABdhPJwmk0MJbY58+fX+kX1uAG4+dUfRpA09sey2QuAtPfeK7xdMzbcK7M9sKPJjL58oOOQH8MU+pUpyE0PhiEOOVK0=
-X-Received: by 2002:a6b:7c0b:: with SMTP id m11mr31471281iok.9.1620922483864;
- Thu, 13 May 2021 09:14:43 -0700 (PDT)
+        id S235178AbhEMQ3J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 May 2021 12:29:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55794 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235171AbhEMQ3H (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 May 2021 12:29:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620923277;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=tuYp5/3obltv5r7eq8xKVUNYQlDv3pda6zIjqU9HN2U=;
+        b=H+PL5U//NXLpnpo9Egg8S9xSfIzAVgJ+HVIRnXWXE0VXzXF0qlW3KaMXTcBsoYtgI1xon1
+        Mr/v6TqaGzJ+QabkDr6U2ZZSnEaalQWyED0R+tKcznKOxTWo/3Nl5kUalZESuZy9MKDHta
+        efGI2Q7ft6PtKfQL0ICJlDR3VIDWwCw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-487-YOsAi3fFNcaukYidOwfrtQ-1; Thu, 13 May 2021 12:27:53 -0400
+X-MC-Unique: YOsAi3fFNcaukYidOwfrtQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A08701922035;
+        Thu, 13 May 2021 16:27:51 +0000 (UTC)
+Received: from localhost (ovpn-113-21.ams2.redhat.com [10.36.113.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1324C17264;
+        Thu, 13 May 2021 16:27:46 +0000 (UTC)
+Date:   Thu, 13 May 2021 17:27:46 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, xieyongji@bytedance.com,
+        file@sect.tu-berlin.de, ashish.kalra@amd.com,
+        konrad.wilk@oracle.com, kvm@vger.kernel.org, hch@infradead.org
+Subject: Re: [RFC PATCH V2 0/7] Do not read from descripto ring
+Message-ID: <YJ1TgoFSwOkQrC+1@stefanha-x1.localdomain>
+References: <20210423080942.2997-1-jasowang@redhat.com>
 MIME-Version: 1.0
-References: <20200116001635.174948-1-jmattson@google.com> <FE5AE42B-107F-4D7E-B728-E33780743434@oracle.com>
- <CANgfPd8wFZx977enc+kbbTP1DfMdxkbi5uzhAgpRZhU0yXOzKg@mail.gmail.com> <YJxf+ho/iu8Gpw6+@google.com>
-In-Reply-To: <YJxf+ho/iu8Gpw6+@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Thu, 13 May 2021 09:14:32 -0700
-Message-ID: <CANgfPd8cujDpRBdD_XBC9h6Q8ijioXHuBUGZ-mBBGBAGHRBt6A@mail.gmail.com>
-Subject: Re: [PATCH] kvm: x86: Don't dirty guest memory on every vcpu_put()
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Liran Alon <liran.alon@oracle.com>,
-        Jim Mattson <jmattson@google.com>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Kevin Mcgaire <kevinmcgaire@google.com>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="kSjLBUWR7rqI1Fnp"
+Content-Disposition: inline
+In-Reply-To: <20210423080942.2997-1-jasowang@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 12, 2021 at 4:08 PM Sean Christopherson <seanjc@google.com> wro=
-te:
->
-> On Wed, May 12, 2021, Ben Gardon wrote:
-> > On Wed, Jan 15, 2020 at 4:32 PM Liran Alon <liran.alon@oracle.com> wrot=
-e:
-> > >
-> > >
-> > >
-> > > > On 16 Jan 2020, at 2:16, Jim Mattson <jmattson@google.com> wrote:
-> > > >
-> > > > Beginning with commit 0b9f6c4615c99 ("x86/kvm: Support the vCPU
-> > > > preemption check"), the KVM_VCPU_PREEMPTED flag is set in the guest
-> > > > copy of the kvm_steal_time struct on every call to vcpu_put(). As a
-> > > > result, guest memory is dirtied on every call to vcpu_put(), even w=
-hen
-> > > > the VM is quiescent.
-> > > >
-> > > > To avoid dirtying guest memory unnecessarily, don't bother setting =
-the
-> > > > flag in the guest copy of the struct if it is already set in the
-> > > > kernel copy of the struct.
-> > >
-> > > I suggest adding this comment to code as-well.
-> >
-> > Ping. I don't know if a v2 of this change with the comment in code is
-> > needed for acceptance, but I don't want this to fall through the
-> > cracks and get lost.
->
-> A version of this was committed a while ago.  The CVE number makes me thi=
-nk it
-> went stealthily...
 
-That's great to know. Thanks for digging that up Sean.
+--kSjLBUWR7rqI1Fnp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
->
-> commit 8c6de56a42e0c657955e12b882a81ef07d1d073e
-> Author: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-> Date:   Wed Oct 30 19:01:31 2019 +0000
->
->     x86/kvm: Be careful not to clear KVM_VCPU_FLUSH_TLB bit
->
->     kvm_steal_time_set_preempted() may accidentally clear KVM_VCPU_FLUSH_=
-TLB
->     bit if it is called more than once while VCPU is preempted.
->
->     This is part of CVE-2019-3016.
->
->     (This bug was also independently discovered by Jim Mattson
->     <jmattson@google.com>)
->
->     Signed-off-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
->     Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
->     Cc: stable@vger.kernel.org
->     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index cf917139de6b..8c9369151e9f 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3504,6 +3504,9 @@ static void kvm_steal_time_set_preempted(struct kvm=
-_vcpu *vcpu)
->         if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
->                 return;
->
-> +       if (vcpu->arch.st.steal.preempted)
-> +               return;
-> +
->         vcpu->arch.st.steal.preempted =3D KVM_VCPU_PREEMPTED;
->
->         kvm_write_guest_offset_cached(vcpu->kvm, &vcpu->arch.st.stime,
->
->
-> > > > If a different vCPU thread clears the guest copy of the flag, it wi=
-ll
-> > > > no longer get reset on the next call to vcpu_put, but it's not clea=
-r
-> > > > that resetting the flag in this case was intentional to begin with.
-> > >
-> > > I agree=E2=80=A6 I find it hard to believe that guest vCPU is allowed=
- to clear the flag
-> > > and expect host to set it again on the next vcpu_put() call. Doesn=E2=
-=80=99t really make sense.
-> > >
-> > > >
-> > > > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > > > Tested-by: Kevin Mcgaire <kevinmcgaire@google.com>
-> > > > Reviewed-by: Ben Gardon <bgardon@google.com>
-> > > > Reviewed-by: Oliver Upton <oupton@google.com>
-> > >
-> > > Good catch.
-> > > Reviewed-by: Liran Alon <liran.alon@oracle.com>
-> > >
-> > > -Liran
-> > >
-> > > >
-> > > > ---
-> > > > arch/x86/kvm/x86.c | 3 +++
-> > > > 1 file changed, 3 insertions(+)
-> > > >
-> > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > > index cf917139de6b..3dc17b173f88 100644
-> > > > --- a/arch/x86/kvm/x86.c
-> > > > +++ b/arch/x86/kvm/x86.c
-> > > > @@ -3504,6 +3504,9 @@ static void kvm_steal_time_set_preempted(stru=
-ct kvm_vcpu *vcpu)
-> > > >       if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
-> > > >               return;
-> > > >
-> > > > +     if (vcpu->arch.st.steal.preempted & KVM_VCPU_PREEMPTED)
-> > > > +             return;
-> > > > +
-> > > >       vcpu->arch.st.steal.preempted =3D KVM_VCPU_PREEMPTED;
-> > > >
-> > > >       kvm_write_guest_offset_cached(vcpu->kvm, &vcpu->arch.st.stime=
-,
-> > > > --
-> > > > 2.25.0.rc1.283.g88dfdc4193-goog
-> > > >
-> > >
+On Fri, Apr 23, 2021 at 04:09:35PM +0800, Jason Wang wrote:
+> Sometimes, the driver doesn't trust the device. This is usually
+> happens for the encrtpyed VM or VDUSE[1].
+
+Thanks for doing this.
+
+Can you describe the overall memory safety model that virtio drivers
+must follow? For example:
+
+- Driver-to-device buffers must be on dedicated pages to avoid
+  information leaks.
+
+- Driver-to-device buffers must be on dedicated pages to avoid memory
+  corruption.
+
+When I say "pages" I guess it's the IOMMU page size that matters?
+
+What is the memory access granularity of VDUSE?
+
+I'm asking these questions because there is driver code that exposes
+kernel memory to the device and I'm not sure it's safe. For example:
+
+  static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr,
+                  struct scatterlist *data_sg, bool have_data)
+  {
+          struct scatterlist hdr, status, *sgs[3];
+          unsigned int num_out = 0, num_in = 0;
+
+          sg_init_one(&hdr, &vbr->out_hdr, sizeof(vbr->out_hdr));
+	                    ^^^^^^^^^^^^^
+          sgs[num_out++] = &hdr;
+
+          if (have_data) {
+                  if (vbr->out_hdr.type & cpu_to_virtio32(vq->vdev, VIRTIO_BLK_T_OUT))
+                          sgs[num_out++] = data_sg;
+                  else
+                          sgs[num_out + num_in++] = data_sg;
+          }
+
+          sg_init_one(&status, &vbr->status, sizeof(vbr->status));
+                               ^^^^^^^^^^^^
+          sgs[num_out + num_in++] = &status;
+
+          return virtqueue_add_sgs(vq, sgs, num_out, num_in, vbr, GFP_ATOMIC);
+  }
+
+I guess the drivers don't need to be modified as long as swiotlb is used
+to bounce the buffers through "insecure" memory so that the memory
+surrounding the buffers is not exposed?
+
+Stefan
+
+--kSjLBUWR7rqI1Fnp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmCdU4EACgkQnKSrs4Gr
+c8jIXQf/bDxDNATkynJc8tGJ7x7Bp5ZiiG3XuUvb5LEsvtzjs+2kmYIZyhESbHN6
+pasUhocXLHhIiBmRf5XAHiSbQI+cdOgjgf/Owykd4xM5esusvzNOQy8I8oUCrbX/
+yxPI+spnxLyM3U7f7He68vjS86KPn/5pvwbXiRNfFF9KPjk6qE7w+daSgZLOh/NP
+BafdMFIW1E7csCnTPZjqEr2gw8WqHAAwD6vd2dkytBkoGfL1UHT4OwUpP1Ig5Vmb
+ytJDZ/tx+mG2JVfBfzXAj0n1FOXosho5Md9BcUPMNw1yqwwzJrmzfg22wdJacPzQ
+D+K0W3qs/r3YDv++4i/cJa96khB/ng==
+=T94O
+-----END PGP SIGNATURE-----
+
+--kSjLBUWR7rqI1Fnp--
+
