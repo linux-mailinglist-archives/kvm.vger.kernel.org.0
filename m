@@ -2,285 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 94DAF37FB13
-	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 17:52:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BF4E37FB19
+	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 17:57:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232398AbhEMPyG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 May 2021 11:54:06 -0400
-Received: from foss.arm.com ([217.140.110.172]:38016 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232251AbhEMPyG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 May 2021 11:54:06 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E61191476;
-        Thu, 13 May 2021 08:52:54 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2F72C3F718;
-        Thu, 13 May 2021 08:52:54 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests v4] arm/arm64: psci: Don't assume method is
- hvc
-To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
-Cc:     nikos.nikoleris@arm.com, andre.przywara@arm.com,
-        eric.auger@redhat.com
-References: <20210429164130.405198-9-drjones@redhat.com>
- <20210513101819.274917-1-drjones@redhat.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <f169b445-c0d4-e0ae-d859-994228821ceb@arm.com>
-Date:   Thu, 13 May 2021 16:53:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S233319AbhEMP64 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 May 2021 11:58:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52208 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232391AbhEMP6y (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 May 2021 11:58:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620921464;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qeKoWoUkoim0C+m+NAlidhIk6zANjrHLdTbgpfFV2r0=;
+        b=P5w2KKygvZCGBOuHUDQ+xxmUfltckFI7oJeg4pCp6CCCyjP6Ai/YBfZV6f9AwX/D3Luztz
+        VqLT0bKC9rIQtSnMoJ2dUN+f/x2Bq6HJMCCLCYIKwrwRkpRxADmBzYMjHsKHYPATULOJ3v
+        EgLqyJ1JLbiQyvY+Bmte7iYUr0q/A5Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-304-caC32aOAMVOEG8trzQFMvg-1; Thu, 13 May 2021 11:57:41 -0400
+X-MC-Unique: caC32aOAMVOEG8trzQFMvg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF741800D55;
+        Thu, 13 May 2021 15:57:39 +0000 (UTC)
+Received: from localhost (ovpn-113-21.ams2.redhat.com [10.36.113.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DC46E687C6;
+        Thu, 13 May 2021 15:57:35 +0000 (UTC)
+Date:   Thu, 13 May 2021 16:57:34 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Joel Fernandes <joelaf@google.com>,
+        Linux Trace Devel <linux-trace-devel@vger.kernel.org>
+Subject: Re: [RFC][PATCH] vhost/vsock: Add vsock_list file to map cid with
+ vhost tasks
+Message-ID: <YJ1Mbie1YGKRR6b8@stefanha-x1.localdomain>
+References: <20210505163855.32dad8e7@gandalf.local.home>
 MIME-Version: 1.0
-In-Reply-To: <20210513101819.274917-1-drjones@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="3QuthSgeiknbVY48"
+Content-Disposition: inline
+In-Reply-To: <20210505163855.32dad8e7@gandalf.local.home>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Drew,
 
-On 5/13/21 11:18 AM, Andrew Jones wrote:
-> The method can be smc in addition to hvc, and it will be when running
-> on bare metal. Additionally, we move the invocations to assembly so
-> we don't have to rely on compiler assumptions. We also fix the
-> prototype of psci_invoke. function_id should be an unsigned int, not
-> an unsigned long.
+--3QuthSgeiknbVY48
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Looks good to me:
+On Wed, May 05, 2021 at 04:38:55PM -0400, Steven Rostedt wrote:
+> The new trace-cmd 3.0 (which is almost ready to be released) allows for
+> tracing between host and guests with timestamp synchronization such that
+> the events on the host and the guest can be interleaved in the proper ord=
+er
+> that they occur. KernelShark now has a plugin that visualizes this
+> interaction.
+>=20
+> The implementation requires that the guest has a vsock CID assigned, and =
+on
+> the guest a "trace-cmd agent" is running, that will listen on a port for
+> the CID. The on the host a "trace-cmd record -A guest@cid:port -e events"
+> can be called and the host will connect to the guest agent through the
+> cid/port pair and have the agent enable tracing on behalf of the host and
+> send the trace data back down to it.
+>=20
+> The problem is that there is no sure fire way to find the CID for a guest.
+> Currently, the user must know the cid, or we have a hack that looks for t=
+he
+> qemu process and parses the --guest-cid parameter from it. But this is
+> prone to error and does not work on other implementation (was told that
+> crosvm does not use qemu).
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+The crosvm command-line syntax is: crosvm run --cid <CID>
 
-Thanks,
+> As I can not find a way to discover CIDs assigned to guests via any kernel
+> interface, I decided to create this one. Note, I'm not attached to it. If
+> there's a better way to do this, I would love to have it. But since I'm n=
+ot
+> an expert in the networking layer nor virtio, I decided to stick to what I
+> know and add a debugfs interface that simply lists all the registered CIDs
+> and the worker task that they are associated with. The worker task at
+> least has the PID of the task it represents.
+>=20
+> Now I can find the cid / host process in charge of the guest pair:
+>=20
+>   # cat /sys/kernel/debug/vsock_list
+>   3	vhost-1954:2002
+>=20
+>   # ps aux | grep 1954
+>   qemu        1954  9.9 21.3 1629092 796148 ?      Sl   16:22   0:58  /us=
+r/bin/qemu-kvm -name guest=3DFedora21,debug-threads=3Don -S -object secret,=
+id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-1-Fedora21=
+/master-key.aes -machine pc-1.2,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff=
+ -cpu qemu64 -m 1000 -overcommit mem-lock=3Doff -smp 2,sockets=3D2,cores=3D=
+1,threads=3D1 -uuid 1eefeeb0-3ac7-07c1-926e-236908313b4c -no-user-config -n=
+odefaults -chardev socket,id=3Dcharmonitor,fd=3D32,server,nowait -mon chard=
+ev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -no-shutdown -=
+boot strict=3Don -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2=
+ -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x6 -bloc=
+kdev {"driver":"host_device","filename":"/dev/mapper/vg_bxtest-GuestFedora"=
+,"node-name":"libvirt-1-storage","auto-read-only":true,"discard":"unmap"} -=
+blockdev {"node-name":"libvirt-1-format","read-only":false,"driver":"raw","=
+file":"libvirt-1-storage"} -device ide-hd,bus=3Dide.0,unit=3D0,drive=3Dlibv=
+irt-1-
+>  format,id=3Dide0-0-0,bootindex=3D1 -netdev tap,fd=3D34,id=3Dhostnet0 -de=
+vice rtl8139,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:9f:e9:d5,bus=3Dpci.=
+0,addr=3D0x3 -netdev tap,fd=3D35,id=3Dhostnet1 -device virtio-net-pci,netde=
+v=3Dhostnet1,id=3Dnet1,mac=3D52:54:00:ec:dc:6e,bus=3Dpci.0,addr=3D0x5 -char=
+dev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3Dseri=
+al0 -chardev pipe,id=3Dcharchannel0,path=3D/var/lib/trace-cmd/virt/Fedora21=
+/trace-pipe-cpu0 -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chard=
+ev=3Dcharchannel0,id=3Dchannel0,name=3Dtrace-pipe-cpu0 -chardev pipe,id=3Dc=
+harchannel1,path=3D/var/lib/trace-cmd/virt/Fedora21/trace-pipe-cpu1 -device=
+ virtserialport,bus=3Dvirtio-serial0.0,nr=3D2,chardev=3Dcharchannel1,id=3Dc=
+hannel1,name=3Dtrace-pipe-cpu1 -vnc 127.0.0.1:0 -device cirrus-vga,id=3Dvid=
+eo0,bus=3Dpci.0,addr=3D0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dp=
+ci.0,addr=3D0x4 -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=
+=3Ddeny,resourcecontrol=3Ddeny -device vhost-vsock-pci,id=3Dvsock0,guest-ci=
+d=3D3,vhostfd=3D16,bus=3Dpci.0,addr=3D0x7 -msg=20
+>  timestamp=3Don
+>   root        2000  0.0  0.0      0     0 ?        S    16:22   0:00 [kvm=
+-pit/1954]
+>   root        2002  0.0  0.0      0     0 ?        S    16:22   0:00 [vho=
+st-1954]
 
-Alex
+This approach relies on process hierarchy of the VMM (QEMU).
+Multi-process QEMU is in development and will allow VIRTIO devices to
+run as separate processes from the main QEMU. It then becomes harder to
+correlate a VIRTIO device process with its QEMU process.
 
->
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  arm/cstart.S       | 22 ++++++++++++++++++++++
->  arm/cstart64.S     | 22 ++++++++++++++++++++++
->  arm/selftest.c     | 34 +++++++---------------------------
->  lib/arm/asm/psci.h | 10 ++++++++--
->  lib/arm/psci.c     | 35 +++++++++++++++++++++++++++--------
->  lib/arm/setup.c    |  2 ++
->  6 files changed, 88 insertions(+), 37 deletions(-)
->
-> diff --git a/arm/cstart.S b/arm/cstart.S
-> index 446966de350d..2401d92cdadc 100644
-> --- a/arm/cstart.S
-> +++ b/arm/cstart.S
-> @@ -95,6 +95,28 @@ start:
->  
->  .text
->  
-> +/*
-> + * psci_invoke_hvc / psci_invoke_smc
-> + *
-> + * Inputs:
-> + *   r0 -- function_id
-> + *   r1 -- arg0
-> + *   r2 -- arg1
-> + *   r3 -- arg2
-> + *
-> + * Outputs:
-> + *   r0 -- return code
-> + */
-> +.globl psci_invoke_hvc
-> +psci_invoke_hvc:
-> +	hvc	#0
-> +	mov	pc, lr
-> +
-> +.globl psci_invoke_smc
-> +psci_invoke_smc:
-> +	smc	#0
-> +	mov	pc, lr
-> +
->  enable_vfp:
->  	/* Enable full access to CP10 and CP11: */
->  	mov	r0, #(3 << 22 | 3 << 20)
-> diff --git a/arm/cstart64.S b/arm/cstart64.S
-> index 42ba3a3ca249..e4ab7d06251e 100644
-> --- a/arm/cstart64.S
-> +++ b/arm/cstart64.S
-> @@ -109,6 +109,28 @@ start:
->  
->  .text
->  
-> +/*
-> + * psci_invoke_hvc / psci_invoke_smc
-> + *
-> + * Inputs:
-> + *   w0 -- function_id
-> + *   x1 -- arg0
-> + *   x2 -- arg1
-> + *   x3 -- arg2
-> + *
-> + * Outputs:
-> + *   x0 -- return code
-> + */
-> +.globl psci_invoke_hvc
-> +psci_invoke_hvc:
-> +	hvc	#0
-> +	ret
-> +
-> +.globl psci_invoke_smc
-> +psci_invoke_smc:
-> +	smc	#0
-> +	ret
-> +
->  get_mmu_off:
->  	adrp	x0, auxinfo
->  	ldr	x0, [x0, :lo12:auxinfo + 8]
-> diff --git a/arm/selftest.c b/arm/selftest.c
-> index 4495b161cdd5..9f459ed3d571 100644
-> --- a/arm/selftest.c
-> +++ b/arm/selftest.c
-> @@ -400,33 +400,13 @@ static void check_vectors(void *arg __unused)
->  	exit(report_summary());
->  }
->  
-> -static bool psci_check(void)
-> +static void psci_print(void)
->  {
-> -	const struct fdt_property *method;
-> -	int node, len, ver;
-> -
-> -	node = fdt_node_offset_by_compatible(dt_fdt(), -1, "arm,psci-0.2");
-> -	if (node < 0) {
-> -		printf("PSCI v0.2 compatibility required\n");
-> -		return false;
-> -	}
-> -
-> -	method = fdt_get_property(dt_fdt(), node, "method", &len);
-> -	if (method == NULL) {
-> -		printf("bad psci device tree node\n");
-> -		return false;
-> -	}
-> -
-> -	if (len < 4 || strcmp(method->data, "hvc") != 0) {
-> -		printf("psci method must be hvc\n");
-> -		return false;
-> -	}
-> -
-> -	ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-> -	printf("PSCI version %d.%d\n", PSCI_VERSION_MAJOR(ver),
-> -				       PSCI_VERSION_MINOR(ver));
-> -
-> -	return true;
-> +	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-> +	report_info("PSCI version: %d.%d", PSCI_VERSION_MAJOR(ver),
-> +					  PSCI_VERSION_MINOR(ver));
-> +	report_info("PSCI method: %s", psci_invoke == psci_invoke_hvc ?
-> +				       "hvc" : "smc");
->  }
->  
->  static void cpu_report(void *data __unused)
-> @@ -465,7 +445,7 @@ int main(int argc, char **argv)
->  
->  	} else if (strcmp(argv[1], "smp") == 0) {
->  
-> -		report(psci_check(), "PSCI version");
-> +		psci_print();
->  		on_cpus(cpu_report, NULL);
->  		while (!cpumask_full(&ready))
->  			cpu_relax();
-> diff --git a/lib/arm/asm/psci.h b/lib/arm/asm/psci.h
-> index 7b956bf5987d..cf03449ba665 100644
-> --- a/lib/arm/asm/psci.h
-> +++ b/lib/arm/asm/psci.h
-> @@ -3,8 +3,14 @@
->  #include <libcflat.h>
->  #include <linux/psci.h>
->  
-> -extern int psci_invoke(unsigned long function_id, unsigned long arg0,
-> -		       unsigned long arg1, unsigned long arg2);
-> +typedef int (*psci_invoke_fn)(unsigned int function_id, unsigned long arg0,
-> +			      unsigned long arg1, unsigned long arg2);
-> +extern psci_invoke_fn psci_invoke;
-> +extern int psci_invoke_hvc(unsigned int function_id, unsigned long arg0,
-> +			   unsigned long arg1, unsigned long arg2);
-> +extern int psci_invoke_smc(unsigned int function_id, unsigned long arg0,
-> +			   unsigned long arg1, unsigned long arg2);
-> +extern void psci_set_conduit(void);
->  extern int psci_cpu_on(unsigned long cpuid, unsigned long entry_point);
->  extern void psci_system_reset(void);
->  extern int cpu_psci_cpu_boot(unsigned int cpu);
-> diff --git a/lib/arm/psci.c b/lib/arm/psci.c
-> index 936c83948b6a..9c031a122e9b 100644
-> --- a/lib/arm/psci.c
-> +++ b/lib/arm/psci.c
-> @@ -6,22 +6,21 @@
->   *
->   * This work is licensed under the terms of the GNU LGPL, version 2.
->   */
-> +#include <devicetree.h>
->  #include <asm/psci.h>
->  #include <asm/setup.h>
->  #include <asm/page.h>
->  #include <asm/smp.h>
->  
-> -__attribute__((noinline))
-> -int psci_invoke(unsigned long function_id, unsigned long arg0,
-> -		unsigned long arg1, unsigned long arg2)
-> +static int psci_invoke_none(unsigned int function_id, unsigned long arg0,
-> +			    unsigned long arg1, unsigned long arg2)
->  {
-> -	asm volatile(
-> -		"hvc #0"
-> -	: "+r" (function_id)
-> -	: "r" (arg0), "r" (arg1), "r" (arg2));
-> -	return function_id;
-> +	printf("No PSCI method configured! Can't invoke...\n");
-> +	return PSCI_RET_NOT_PRESENT;
->  }
->  
-> +psci_invoke_fn psci_invoke = psci_invoke_none;
-> +
->  int psci_cpu_on(unsigned long cpuid, unsigned long entry_point)
->  {
->  #ifdef __arm__
-> @@ -56,3 +55,23 @@ void psci_system_off(void)
->  	int err = psci_invoke(PSCI_0_2_FN_SYSTEM_OFF, 0, 0, 0);
->  	printf("CPU%d unable to do system off (error = %d)\n", smp_processor_id(), err);
->  }
-> +
-> +void psci_set_conduit(void)
-> +{
-> +	const void *fdt = dt_fdt();
-> +	const struct fdt_property *method;
-> +	int node, len;
-> +
-> +	node = fdt_node_offset_by_compatible(fdt, -1, "arm,psci-0.2");
-> +	assert_msg(node >= 0, "PSCI v0.2 compatibility required");
-> +
-> +	method = fdt_get_property(fdt, node, "method", &len);
-> +	assert(method != NULL && len == 4);
-> +
-> +	if (strcmp(method->data, "hvc") == 0)
-> +		psci_invoke = psci_invoke_hvc;
-> +	else if (strcmp(method->data, "smc") == 0)
-> +		psci_invoke = psci_invoke_smc;
-> +	else
-> +		assert_msg(false, "Unknown PSCI conduit: %s", method->data);
-> +}
-> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> index 86f054304baf..bcdf0d78c2e2 100644
-> --- a/lib/arm/setup.c
-> +++ b/lib/arm/setup.c
-> @@ -25,6 +25,7 @@
->  #include <asm/processor.h>
->  #include <asm/smp.h>
->  #include <asm/timer.h>
-> +#include <asm/psci.h>
->  
->  #include "io.h"
->  
-> @@ -266,6 +267,7 @@ void setup(const void *fdt, phys_addr_t freemem_start)
->  	mem_regions_add_assumed();
->  	mem_init(PAGE_ALIGN((unsigned long)freemem));
->  
-> +	psci_set_conduit();
->  	cpu_init();
->  
->  	/* cpu_init must be called before thread_info_init */
+So I think in the end this approach ends up being as fragile as parsing
+command-lines. The kernel doesn't really have the concept of a "VM" that
+the vhost_vsock is associated with :). Maybe just parse QEMU and crosvm
+command-lines?
+
+Stefan
+
+--3QuthSgeiknbVY48
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmCdTG4ACgkQnKSrs4Gr
+c8isgQf9GZcfCvYI4vKMA5m60y9wvx9s4lmq1TRA/KNm9vRPMrQrqGeZqG3gxewE
+BvFw1Xx9Ax6mtLfQ7pHQY7SD/GkXMQh3UwDW9jPvX/qKnoNWVgp0DbXpcq4r3pQu
+zA3IxTW3Vv2dNBkAK5vhW6PKVOraKVPgzxxbzZ8s8BfBCV4LDO2ILIE+871f3uCo
+V6csKErHYgVfWIh4cD1OkXMyODd+A32AyUKLwb3sI0HwmJrt3E10A8XUfFIyF5GJ
+P9AgwvcEVGPh4xwZ6mInfHj0pqIqKBhGcSvWPiGn4H32yLPidBioT+C+3mb859w3
+7M7crEdkWw7O0xJ6B+yNjxOwwqallA==
+=SzSi
+-----END PGP SIGNATURE-----
+
+--3QuthSgeiknbVY48--
+
