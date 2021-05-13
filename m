@@ -2,203 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 51CF638006B
-	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 00:34:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 253103800A1
+	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 01:01:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233764AbhEMWfk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 May 2021 18:35:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38196 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233879AbhEMWf0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 May 2021 18:35:26 -0400
-Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3785CC06138B
-        for <kvm@vger.kernel.org>; Thu, 13 May 2021 15:34:09 -0700 (PDT)
-Received: by mail-il1-x12b.google.com with SMTP id s9so7046628ilp.9
-        for <kvm@vger.kernel.org>; Thu, 13 May 2021 15:34:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=c8bhFuOKPloIYByahwHFPWgdmRy0Ur+KOze97z1EzA0=;
-        b=iQT7fUSjjkfA0Y/arLSkMA8VtoCxAmrQNAbRo05lrk8GrcQ4uFWjZgG8YdpwKq0ET8
-         wpthMbxKqa4X10x2vA+MQoydIYL1lkvxj1WzZ97mamD1dhde8dR9QQSpwqPWuLwGjY4R
-         fZM8lMwSNcNG3RIqhnOKM7gElhOgslMaKQ9cO0QcXgatiOiK6txOfI02+ziSFMT6rhP5
-         qqhhbxr8PoJ9dcX+mvpQsZvOxRqzuvPJX/KU7RUFAZD/l8VV2QNHOGFe3Zi1eXZH/NRv
-         F90HXjtqSQYfBHcS46F+HBJlugCcRcewa9hjd3I0RZoKj5P+TXZGSmIfZ8MEkquFUu4x
-         ypmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=c8bhFuOKPloIYByahwHFPWgdmRy0Ur+KOze97z1EzA0=;
-        b=o3Zzijvavo6L7dBoZTw2bXf+TFsG0XaU26AZJOkVK/NTXa1/lnHAG+NXV6EwNWw4w2
-         sCDlRigR/UU66KbvLLTGgQwaZ8WZb97cYYIjAr8jrGVH6lrWdG1zFWWSan7lb27TjPzt
-         kxwug2RtzEgC6InIcAAnmUttz1+Dva1lVrelatd2OSj+DI2oJTIgktULM8Gox1vmpWU3
-         WaXA/2Sbzbx3Xqwy9JpEUVOm+M1XX2ko+svZ4AhpjBvthLInJQECtRLFWkh97c3mcm/K
-         f6GRQsF4I8gA+LpW3s0UeHdj+Qx2oz0krqEblYTjXVjLPTyXfVUor3BxNe7McxRnOnN5
-         ygWA==
-X-Gm-Message-State: AOAM532O9SMsaiOZPKrn/Uv+hzdw2/d6GlE2UoaFPxu92/s+O56uAe3j
-        PFmjGl6TbNTOSRtb/T9hg8/3qeMRG/3LI4oMx705pw==
-X-Google-Smtp-Source: ABdhPJwavDpIShEpPQaY3KOf9GpUa8lYR73uNHBcU0Gl+rAsejweOnelYA5pihcsuee289UCspem5+8RWG0EU1BR3k4=
-X-Received: by 2002:a05:6e02:1a49:: with SMTP id u9mr40315598ilv.306.1620945248421;
- Thu, 13 May 2021 15:34:08 -0700 (PDT)
+        id S231389AbhEMXCb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 May 2021 19:02:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49082 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231278AbhEMXC2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 May 2021 19:02:28 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 1742261363;
+        Thu, 13 May 2021 23:01:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1620946878;
+        bh=uN3yahKzBwkB+gvkdxWGKQOVS3XTusPU7ZhMIZnGDxg=;
+        h=Date:From:To:Cc:Subject:From;
+        b=VhIteCOOz2hyzdB7KWnX31mJ/jwWRmgYODHNwr12yHXS7kFIq2eqOChX8N240WNJ9
+         315412YAXRjUnOd+u6iJY3ZOFOe3sDRi3Er3CwHVDs/IjSay7rMU5RbWGhCI6RvioC
+         k4bo1L2jS79wlkwd3hYKOohsE0B0BDhoj3HiRw75dAmJi0PjsNPMZVjti1crtUhETB
+         MpJmv/8bbH7uMBVnvJC7wcso+wyu2meCdShKfHI0AIHMyGZQXDFcs1Mm7UOcGyWwV9
+         MRfscd9E8SyuOMwV1hCCwaWb4vviuJQNcP725m3tod75sLU3QSJRABZoYZmWGK8g1N
+         kuAKYNp6vkOww==
+Date:   Thu, 13 May 2021 18:01:55 -0500
+From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        linux-hardening@vger.kernel.org
+Subject: [PATCH][next] vfio/iommu_type1: Use struct_size() for kzalloc()
+Message-ID: <20210513230155.GA217517@embeddedor>
 MIME-Version: 1.0
-References: <20210512214502.2047008-1-axelrasmussen@google.com> <20210512214502.2047008-4-axelrasmussen@google.com>
-In-Reply-To: <20210512214502.2047008-4-axelrasmussen@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Thu, 13 May 2021 15:33:57 -0700
-Message-ID: <CANgfPd915=4=dYmxh=qn6Cu75S4uHL753h_x3JHG-mFyO0dggg@mail.gmail.com>
-Subject: Re: [PATCH 3/5] KVM: selftests: create alias mappings when using
- shared memory
-To:     Axel Rasmussen <axelrasmussen@google.com>
-Cc:     Aaron Lewis <aaronlewis@google.com>,
-        Alexander Graf <graf@amazon.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jacob Xu <jacobhxu@google.com>,
-        Makarand Sonare <makarandsonare@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Yanan Wang <wangyanan55@huawei.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 12, 2021 at 2:45 PM Axel Rasmussen <axelrasmussen@google.com> wrote:
->
-> When a memory region is added with a src_type specifying that it should
-> use some kind of shared memory, also create an alias mapping to the same
-> underlying physical pages.
->
-> And, add an API so tests can get access to these alias addresses.
-> Basically, for a guest physical address, let us look up the analogous
-> host *alias* address.
->
-> In a future commit, we'll modify the demand paging test to take
-> advantage of this to exercise UFFD minor faults. The idea is, we
-> pre-fault the underlying pages *via the alias*. When the *guest*
-> faults, it gets a "minor" fault (PTEs don't exist yet, but a page is
-> already in the page cache). Then, the userfaultfd theads can handle the
-> fault: they could potentially modify the underlying memory *via the
-> alias* if they wanted to, and then they install the PTEs and let the
-> guest carry on via a UFFDIO_CONTINUE ioctl.
->
-> Signed-off-by: Axel Rasmussen <axelrasmussen@google.com>
+Make use of the struct_size() helper instead of an open-coded version,
+in order to avoid any potential type mistakes or integer overflows
+that, in the worst scenario, could lead to heap overflows.
 
-Reviewed-by: Ben Gardon <bgardon@google.com>
+This code was detected with the help of Coccinelle and, audited and
+fixed manually.
 
-> ---
->  .../testing/selftests/kvm/include/kvm_util.h  |  1 +
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 50 +++++++++++++++++++
->  .../selftests/kvm/lib/kvm_util_internal.h     |  2 +
->  3 files changed, 53 insertions(+)
->
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index a8f022794ce3..0624f25a6803 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -146,6 +146,7 @@ void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
->  void *addr_gpa2hva(struct kvm_vm *vm, vm_paddr_t gpa);
->  void *addr_gva2hva(struct kvm_vm *vm, vm_vaddr_t gva);
->  vm_paddr_t addr_hva2gpa(struct kvm_vm *vm, void *hva);
-> +void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t gpa);
->
->  /*
->   * Address Guest Virtual to Guest Physical
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 6fbe124e0e16..838d58633f7e 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -809,6 +809,19 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
->
->         /* Add to linked-list of memory regions. */
->         list_add(&region->list, &vm->userspace_mem_regions);
-> +
-> +       /* If shared memory, create an alias. */
-> +       if (region->fd >= 0) {
-> +               region->mmap_alias = mmap(NULL, region->mmap_size,
-> +                                         PROT_READ | PROT_WRITE,
-> +                                         vm_mem_backing_src_alias(src_type)->flag,
-> +                                         region->fd, 0);
-> +               TEST_ASSERT(region->mmap_alias != MAP_FAILED,
-> +                           "mmap of alias failed, errno: %i", errno);
-> +
-> +               /* Align host alias address */
-> +               region->host_alias = align(region->mmap_alias, alignment);
-> +       }
->  }
->
->  /*
-> @@ -1237,6 +1250,43 @@ vm_paddr_t addr_hva2gpa(struct kvm_vm *vm, void *hva)
->         return -1;
->  }
->
-> +/*
-> + * Address VM physical to Host Virtual *alias*.
-> + *
-> + * Input Args:
-> + *   vm - Virtual Machine
-> + *   gpa - VM physical address
-> + *
-> + * Output Args: None
-> + *
-> + * Return:
-> + *   Equivalent address within the host virtual *alias* area, or NULL
-> + *   (without failing the test) if the guest memory is not shared (so
-> + *   no alias exists).
-> + *
-> + * When vm_create() and related functions are called with a shared memory
-> + * src_type, we also create a writable, shared alias mapping of the
-> + * underlying guest memory. This allows the host to manipulate guest memory,
-> + * e.g. to implement demand paging.
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+---
+ drivers/vfio/vfio_iommu_type1.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I would amend this to: "This allows the host to manipulate guest
-memory without mapping that memory in the guest's address space," or
-something to that effect.
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index a0747c35a778..a3e925a41b0d 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -2795,7 +2795,7 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
+ 		return 0;
+ 	}
+ 
+-	size = sizeof(*cap_iovas) + (iovas * sizeof(*cap_iovas->iova_ranges));
++	size = struct_size(cap_iovas, iova_ranges, iovas);
+ 
+ 	cap_iovas = kzalloc(size, GFP_KERNEL);
+ 	if (!cap_iovas)
+-- 
+2.27.0
 
-> + */
-> +void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t gpa)
-> +{
-> +       struct userspace_mem_region *region;
-> +
-> +       list_for_each_entry(region, &vm->userspace_mem_regions, list) {
-> +               if (!region->host_alias)
-> +                       continue;
-> +
-> +               if ((gpa >= region->region.guest_phys_addr)
-> +                       && (gpa <= (region->region.guest_phys_addr
-> +                               + region->region.memory_size - 1)))
-> +                       return (void *) ((uintptr_t) region->host_alias
-> +                               + (gpa - region->region.guest_phys_addr));
-> +       }
-> +
-> +       return NULL;
-> +}
-> +
->  /*
->   * VM Create IRQ Chip
->   *
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util_internal.h b/tools/testing/selftests/kvm/lib/kvm_util_internal.h
-> index 91ce1b5d480b..a25af33d4a9c 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util_internal.h
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util_internal.h
-> @@ -16,7 +16,9 @@ struct userspace_mem_region {
->         int fd;
->         off_t offset;
->         void *host_mem;
-> +       void *host_alias;
->         void *mmap_start;
-> +       void *mmap_alias;
->         size_t mmap_size;
->         struct list_head list;
->  };
-> --
-> 2.31.1.607.g51e8a6a459-goog
->
