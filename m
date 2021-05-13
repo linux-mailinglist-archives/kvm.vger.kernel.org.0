@@ -2,273 +2,237 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4469537F917
-	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 15:47:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F8A737F925
+	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 15:50:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234200AbhEMNs5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 May 2021 09:48:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29021 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234167AbhEMNsn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 May 2021 09:48:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620913651;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=A0dkUXbD61yHxsoYQsJu5ao3/IUZG53e3Y4MDccE/hg=;
-        b=FWRxFSaedViD/ajbBTxLXkPfske6b8/yHlhfLZD3VHnF4cYp/Pa+lfFOK4zl+Ww2bk5zNP
-        duvMAI8kjbgricSsz32mgt8jjJRHNOuH+125MxCAiIu3XmcIXuKaQEYGGrIb9SjC5kE6zN
-        x2KNaXslECH4YiEBTmja+SOVeoTfQcw=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-588-6HSzPP3OM7iqWSYiOMxKsQ-1; Thu, 13 May 2021 09:47:27 -0400
-X-MC-Unique: 6HSzPP3OM7iqWSYiOMxKsQ-1
-Received: by mail-ej1-f69.google.com with SMTP id v10-20020a170906292ab02903d18e1be8f8so1031377ejd.13
-        for <kvm@vger.kernel.org>; Thu, 13 May 2021 06:47:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=A0dkUXbD61yHxsoYQsJu5ao3/IUZG53e3Y4MDccE/hg=;
-        b=XW3sk4N+TFg+DdzpibQtNyhxWl7C7ZAO+qKm9nJpz5Na6Wj6QppVkZkKlU/dXuBlv6
-         1xiVbaVIDddan0IjxU2fvLDvqZYw3ca50tGUzAjZDefXcOq2YBsFshFuIGLl/ymXfmxh
-         I0XOG4V5hNr4+qZmI0TX2XQY6S3+rSaESVXWkd1WRlb6Cuu8MTnCikqTksFHc+/tw3yf
-         MgADIih5/ZpTnlFCFfLReoieWGt9KxNMMxFQ8OcsMBtYDaVyPFNpxXlUL1XVPbUsWOLA
-         JiCRBIYHxgee5/FwuvReWv9hAxvrnM6swK/2p9x+cEnNKSKVu/KGsHb0PIjEQZOJ7p2U
-         8YmA==
-X-Gm-Message-State: AOAM531TGt9Po1ynFb29NImHO8hUcBxzI88LM3yeZ3c27k8lWLDJIaGS
-        qBu1rNZaMeQe74/nZ/n6h8/o02cNxCszTrqGhJIzAC76HaSJW3cgr3bPwcm4rZ3LGYV/5xAtlEx
-        OgFM175RsA01y
-X-Received: by 2002:a05:6402:1a:: with SMTP id d26mr50917862edu.99.1620913646401;
-        Thu, 13 May 2021 06:47:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxguXOshUlXIdgN5o0x789QBKRhPy8p6rcPd+Tw/RguN6tZBLRGwCFOYqpyXK4ryGcq9iJdZw==
-X-Received: by 2002:a05:6402:1a:: with SMTP id d26mr50917841edu.99.1620913646200;
-        Thu, 13 May 2021 06:47:26 -0700 (PDT)
-Received: from steredhat (host-79-18-148-79.retail.telecomitalia.it. [79.18.148.79])
-        by smtp.gmail.com with ESMTPSA id x18sm1882118eju.45.2021.05.13.06.47.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 May 2021 06:47:25 -0700 (PDT)
-Date:   Thu, 13 May 2021 15:47:22 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Norbert Slusarek <nslusarek@gmx.net>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v9 17/19] vsock_test: add SOCK_SEQPACKET tests
-Message-ID: <20210513134722.i2mn54fsi5pyq4vq@steredhat>
-References: <20210508163027.3430238-1-arseny.krasnov@kaspersky.com>
- <20210508163704.3432731-1-arseny.krasnov@kaspersky.com>
+        id S234229AbhEMNvW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 May 2021 09:51:22 -0400
+Received: from mail-bn7nam10on2086.outbound.protection.outlook.com ([40.107.92.86]:43393
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S234226AbhEMNvN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 May 2021 09:51:13 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=N6RcXmRrWny8Bo+gHJbA79JEFrMv4uPyBlRgGtpBIIPHZV4HCnR8sTfX8TfWnenXyWDORQPyfBaZgB8mnB8NGbM15D1inyB+YXEtZ1sPDvxfM6xmFmnUkXvM3MdPjQ5ByYnWbRTBvx+25IPAgnmF8WIi45j6PFWzvnThICwm7+7cvWlJN/jJgJJXqjeRikypKB+2QliOhv+uZRguisjKRKogowvl3dUZPZhrlVWdwaLNqhx93i4mVJzJwXHEuHGb2a6OX8/D1fiyGDKNDf0Hfkhsbxld+mijN74omiKMS7B04pSMm9EyZ3j9eozQ1UcMdf9eDLGPsqfIGCs/FYdADw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OzOpj4IasZDKUVkC0E2ZzxC3Oaivl8dsE1eHBzxiulw=;
+ b=h6SCWeWkg/u178WH/vRQJPnW1/6WGi4bS4lIArHalWrHrRwqflHK2wARr7lRq+WQzh5b8a6GleyaVMCnAmk9mbUFDI2MYSAK4VI7iNJznvOIq8b9Gv6k64pp0xgVD4jSX6i99M0r8r2f2VzibUUxFiwO0Ox/3VIU6652FmojJaGc1GVKQNoBErl+Iu24FVbjSi994ZGBwYeIeTfjqVEbl6Zbd+Iosrf6zNnqYsYks7ugDSbFJIeT/fox6vxwopbjAoU9uTil1jYFGd0Q/LJLzSx5xDBrNSuQLncEev7dI/NJzRCNFhXT2qxVF8CTXtKmmPRalVh+AcL9vgiwOiYbig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OzOpj4IasZDKUVkC0E2ZzxC3Oaivl8dsE1eHBzxiulw=;
+ b=tdVxilW9FoXUICKVADBCGNi2Uh/zyrg4vHQGalcpZOkONghVt4k2HW0ZhlcyhGFDWkg2tco9WTcCrp+mutPt5JRaMUB+crgvL198YR5l7LbVJfliLPFxMATVpJSlrdWBrcQXlUCUurHW3oKHwfAJGQY5H2qK6omEXL7fbgxZrYw=
+Authentication-Results: amd.com; dkim=none (message not signed)
+ header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
+ DM6PR12MB2988.namprd12.prod.outlook.com (2603:10b6:5:3d::23) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4129.25; Thu, 13 May 2021 13:50:02 +0000
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::b914:4704:ad6f:aba9]) by DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::b914:4704:ad6f:aba9%12]) with mapi id 15.20.4129.025; Thu, 13 May
+ 2021 13:50:02 +0000
+Subject: Re: [PATCH v2 2/4] mm: x86: Invoke hypercall when page encryption
+ status is changed
+To:     Sean Christopherson <seanjc@google.com>,
+        Borislav Petkov <bp@alien8.de>
+Cc:     Ashish Kalra <Ashish.Kalra@amd.com>, pbonzini@redhat.com,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        joro@8bytes.org, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, srutherford@google.com,
+        venu.busireddy@oracle.com, brijesh.singh@amd.com
+References: <cover.1619193043.git.ashish.kalra@amd.com>
+ <ff68a73e0cdaf89e56add5c8b6e110df881fede1.1619193043.git.ashish.kalra@amd.com>
+ <YJvU+RAvetAPT2XY@zn.tnic> <YJv5bjd0xThIahaa@google.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <21b36f2e-bbcb-7df3-1509-9f77634eba99@amd.com>
+Date:   Thu, 13 May 2021 08:49:59 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
+In-Reply-To: <YJv5bjd0xThIahaa@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [67.79.209.213]
+X-ClientProxiedBy: SA0PR11CA0075.namprd11.prod.outlook.com
+ (2603:10b6:806:d2::20) To DM5PR12MB1355.namprd12.prod.outlook.com
+ (2603:10b6:3:6e::7)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210508163704.3432731-1-arseny.krasnov@kaspersky.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from office-linux.texastahm.com (67.79.209.213) by SA0PR11CA0075.namprd11.prod.outlook.com (2603:10b6:806:d2::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4108.25 via Frontend Transport; Thu, 13 May 2021 13:50:01 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 389b2032-afe8-4374-8773-08d916160198
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2988:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB2988D8C41ECEFCBCCE1DBCEEEC519@DM6PR12MB2988.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6CGFpWe0D7mCCOM+1cgrdqQNnFjOiwyz9J/bh2Ca+QRUiElP2664BUVtuV6BAW0jQzp0lwYR8FZ0nD7zNUWpeAVsofwCtOprhDgfyhNVxFnuCr/zf70Ml9lfgw+xxi6q6Nb3bzDBb0LM4QgGeeYiApSVgCs7SN/RSzli8wkvyr8dlXM6yVCepuFc+gWtAVEINwZrIyxvKah+XKVBtJZhw9yH66TT1Sg8TW73NGpi/c47uV9hGgDcCj67E1ngflU+u9vzSwdN6KkMVLFgDDmxCyxz/TzZR/OANPezGbg7Vg4i4KOqM8TiisdpO2wKCrFQljbuYTh2aoUf1T+0nPzjXwSK+QP9Hf9q9j5JTE1RiH0tY18RLrxisn2hxrzIUU1b0G+EI2DKqOWeBBwtFLazWL77YyE0+gzyfcpqGjoAh/ufozqQmxCvNyK1xiRaWqy2uOLVwuh/ZyMjhVQ3P4PlLwb17XBwUbkmZ+yLexoW2GMR9E5kkkYtKBhln0uTx9bJhSv6Ipja+/U1arrHs+e/ke65oYaz7LABcPwZO/2nR6mt4DItsioMa90QTc+Fn3t8SKbRd/HwlqEdyddQGYv+S4ONt82sVBziIhoyvg35Q7Au2539dXZDHArQ44ZZrRdmWOuo9y44OtyAF6LfhC+UsALOFynGTyrhJh0o5Oyp21l5mIHAISN6/xhRNrowXLDx
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(83380400001)(956004)(6506007)(186003)(5660300002)(2616005)(8936002)(16526019)(7416002)(66946007)(36756003)(6486002)(31696002)(6512007)(66476007)(4326008)(66556008)(86362001)(8676002)(31686004)(26005)(498600001)(110136005)(38100700002)(2906002)(53546011)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?dEZadG9GWnVrbVBDWFhFZlhPWStwNHBGNVZQZUVNaGczRmgrK0tFMGdSbGZW?=
+ =?utf-8?B?WlBUQlY0TTJZajY1aWFOL3FUb2NDMmNLWFBzTjMzK3V2Skl6N3psWVJpQ21D?=
+ =?utf-8?B?dElYTjJMNys2QmFyWW9oZTVYMTc1WDBkL292aGtRZGFoT25SOW5aOUFFMmhE?=
+ =?utf-8?B?WERnbWE3Qy9XSGhYU1psRkM3TjAzSU5VUlNBdExLb0dqSmZOcGV2eUU4YVBs?=
+ =?utf-8?B?M3NOU2dHLzAvUW45K3lmOW5VcTdVZzg4aUJFVUtIY3NsTWNUNkVPbnhBVjAz?=
+ =?utf-8?B?ODNJVFJlb2pFZVRnWWs0OGpyVkJEbjk4SmZQVHczNWZIUUVFSVZmNk1jNHo5?=
+ =?utf-8?B?ckI5NFY2cjdYeEFybmRnTnJMRXB1L3BLK3c5OFNIOVBqTWVJRGVOK29lckpE?=
+ =?utf-8?B?TXpZVjR4Mmt5R1I1N21qMEV2MXFpNERBbU1MTDc3bHVVbUFLbC9jTEZVVG1r?=
+ =?utf-8?B?c1V4OHZHZTRjbXdFaE9wbDNwTXhQSnByakZzclhTRFdUUjc4UzRBSWk4YmZt?=
+ =?utf-8?B?b1ByWTVEZkt2QVZOSlRJMmQ1SUZ5MkVSQzBVOXVkbUtZVkhEdG8vNXlPZDJm?=
+ =?utf-8?B?VHRyN2grb1AwZWZkVUVEQW16T1F1RkRoSTlKbFY3Z2xJcFNkejhWdEpOQVhk?=
+ =?utf-8?B?MHREZ0Y0cmh3ZFVjME5ZRnA2Rm9OeURpQmJEb1NmQWhSWXlicUVHazBhckMw?=
+ =?utf-8?B?WHpXM0JFb3o4QXR1ZWl4WllwdlFTd3JqQlpqM1NZbkFhd09QY09CVU1kenZv?=
+ =?utf-8?B?SDZiUkFpNzZScE80cGZOQ1k4NEJZdkNWL3pQeTRDYU9zLzc2MkVtb0pJQnBJ?=
+ =?utf-8?B?ZStaL214L1lSMFJQTU9Db253emFFK3BRVnJ6S002M2IzTE1hVUFBRC9wY3Nz?=
+ =?utf-8?B?SlZOME9RMHMxSldlUHRJUmFvcnFCWUFwbEFybE0xeEZINXJzT0E5RUlPZ0lG?=
+ =?utf-8?B?dWdtNW9wVVBCbUJNQlR2TmZKVU1mWjArYVMwVnd3Nng2aEN3aEdjM1QwK0JI?=
+ =?utf-8?B?SHdScnZ3bzBvQjlSNkoyYlh1Sk9BQldEYkNKaW5ieCtyYk1EL1cwZGNUYUhv?=
+ =?utf-8?B?NWVxc1J0K2NQWEtxOTNLeHZEcnU4V0s0T1pHYnlUQkpwdzRSS2txazdxczlJ?=
+ =?utf-8?B?elBLRzFXZE5XQVpBTzVFNGdmRnh3Q0c2aVJZald5QWVXVU80V1VEbjJTakg3?=
+ =?utf-8?B?TjBmU0JuSDFmc0dnWUxNL3E0Q3NFNGZrVE5sSktUKzNFS1hrZDJlT1hMVjFq?=
+ =?utf-8?B?RWY1WFluczM5UmtZa3NHN095ZHY1K3FEMmpMYWJ0cXFNWUFKRFNVZkpscm00?=
+ =?utf-8?B?WVNhK3A5SW0vemkwRHBpVVpaakoxRkhjL2tiS3VyOWE0bzl0alBZa1VDeEE1?=
+ =?utf-8?B?UjRqZnlvVXRNVW9GNGx3NTNyR1hqQkZjdi9KVW1uUEZYbmlVcFRqWDY3Tk92?=
+ =?utf-8?B?aDZ2WnJOdmdjNVBPaGtaVlJOUVJNSThoZUMrNUlCVHZneGRwK1MwNHhXUW5H?=
+ =?utf-8?B?Si8rWCtEVzY5QlV4Vk9VRXVYUUtobjQxSzVKbnRIeG56TUtvTW11Uk85ZkFZ?=
+ =?utf-8?B?T1R2ZzBzdVlualRUb2lKZnRxRDFKcGJST0NWSzZFRkZybFEyQzRHdXhWbGo1?=
+ =?utf-8?B?YktZL3pkZENVZ3A1VEhQSWhaVGptZXRUc2NtdVc5Q05UMkpGRlI5NlU1WDlj?=
+ =?utf-8?B?cUdQa0ZtYmYyTm43SmczMDZFRTMxbTJRK2drWmdsNWc5WFdFNzBFWUJEZ3JE?=
+ =?utf-8?Q?TG5fZiomX2sfbiyu5IPGyFJauGnd/Jfcz0R/Pj1?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 389b2032-afe8-4374-8773-08d916160198
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2021 13:50:02.3479
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 13/SPPtXDIuRKULGURz767wguXixFusweh96wGd/fLaMibkvMSKyKfyrDKZ4Ze0+ywkA0NE3pWmIyTSBUDDC3w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2988
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 08, 2021 at 07:37:00PM +0300, Arseny Krasnov wrote:
->This adds two tests of SOCK_SEQPACKET socket: both transfer data and
->then test MSG_EOR and MSG_TRUNC flags. Cases for connect(), bind(),
-            ^
-We removed the MSG_EOR tests, right?
+On 5/12/21 10:51 AM, Sean Christopherson wrote:
+> On Wed, May 12, 2021, Borislav Petkov wrote:
+>> On Fri, Apr 23, 2021 at 03:58:43PM +0000, Ashish Kalra wrote:
+>>> +static inline void notify_page_enc_status_changed(unsigned long pfn,
+>>> +						  int npages, bool enc)
+>>> +{
+>>> +	PVOP_VCALL3(mmu.notify_page_enc_status_changed, pfn, npages, enc);
+>>> +}
+>>
+>> Now the question is whether something like that is needed for TDX, and,
+>> if so, could it be shared by both.
+> 
+> Yes, TDX needs this same hook, but "can't" reuse the hypercall verbatime.  Ditto
+> for SEV-SNP.  I wanted to squish everything into a single common hypercall, but
+> that didn't pan out.
+> 
+> The problem is that both TDX and SNP define their own versions of this so that
+> any guest kernel that complies with the TDX|SNP specification will run cleanly
+> on a hypervisor that also complies with the spec.  This KVM-specific hook doesn't
+> meet those requires because non-Linux guest support will be sketchy at best, and
+> non-KVM hypervisor support will be non-existent.
+> 
+> The best we can do, short of refusing to support TDX or SNP, is to make this
+> KVM-specific hypercall compatible with TDX and SNP so that the bulk of the
+> control logic is identical.  The mechanics of actually invoking the hypercall
+> will differ, but if done right, everything else should be reusable without
+> modification.
+> 
+> I had an in-depth analysis of this, but it was all off-list.  Pasted below. 
+> 
+>   TDX uses GPRs to communicate with the host, so it can tunnel "legacy" hypercalls
+>   from time zero.  SNP could technically do the same (with a revised GHCB spec),
+>   but it'd be butt ugly.  And of course trying to go that route for either TDX or
+>   SNP would run into the problem of having to coordinate the ABI for the "legacy"
+>   hypercall across all guests and hosts.  So yeah, trying to remove any of the
+>   three (KVM vs. SNP vs. TDX) interfaces is sadly just wishful thinking.
+> 
+>   That being said, I do think we can reuse the KVM specific hypercall for TDX and
+>   SNP.  Both will still need a {TDX,SNP}-specific GCH{I,B} protocol so that cross-
+>   vendor compatibility is guaranteed, but that shouldn't preclude a guest that is
+>   KVM enlightened from switching to the KVM specific hypercall once it can do so.
+>   More thoughts later on.
+> 
+>   > I guess a common structure could be used along the lines of what is in the
+>   > GHCB spec today, but that seems like overkill for SEV/SEV-ES, which will
+>   > only ever really do a single page range at a time (through
+>   > set_memory_encrypted() and set_memory_decrypted()). The reason for the
+>   > expanded form for SEV-SNP is that the OS can (proactively) adjust multiple
+>   > page ranges in advance. Will TDX need to do something similar?
+> 
+>   Yes, TDX needs the exact same thing.  All three (SEV, SNP, and TDX) have more or
+>   less the exact same hook in the guest (Linux, obviously) kernel.
+> 
+>   > If so, the only real common piece in KVM is a function to track what pages
+>   > are shared vs private, which would only require a simple interface.
+> 
+>   It's not just KVM, it's also the relevant code in the guest kernel(s) and other
+>   hypervisors.  And the MMU side of KVM will likely be able to share code, e.g. to
+>   act on the page size hint.
+> 
+>   > So for SEV/SEV-ES, a simpler hypercall interface to specify a single page
+>   > range is really all that is needed, but it must be common across
+>   > hypervisors. I think that was one Sean's points originally, we don't want
+>   > one hypercall for KVM, one for Hyper-V, one for VMware, one for Xen, etc.
+> 
+>   For the KVM defined interface (required for SEV/SEV-ES), I think it makes sense
+>   to make it a superset of the SNP and TDX protocols so that it _can_ be used in
+>   lieu of the SNP/TDX specific protocol.  I don't know for sure whether or not
+>   that will actually yield better code and/or performance, but it costs us almost
+>   nothing and at least gives us the option of further optimizing the Linux+KVM
+>   combination.
 
->etc. are not tested, because it is same as for stream socket.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> tools/testing/vsock/util.c       | 32 +++++++++++++---
-> tools/testing/vsock/util.h       |  3 ++
-> tools/testing/vsock/vsock_test.c | 63 ++++++++++++++++++++++++++++++++
-> 3 files changed, 93 insertions(+), 5 deletions(-)
->
->diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
->index 93cbd6f603f9..2acbb7703c6a 100644
->--- a/tools/testing/vsock/util.c
->+++ b/tools/testing/vsock/util.c
->@@ -84,7 +84,7 @@ void vsock_wait_remote_close(int fd)
-> }
->
-> /* Connect to <cid, port> and return the file descriptor. */
->-int vsock_stream_connect(unsigned int cid, unsigned int port)
->+static int vsock_connect(unsigned int cid, unsigned int port, int type)
-> {
-> 	union {
-> 		struct sockaddr sa;
->@@ -101,7 +101,7 @@ int vsock_stream_connect(unsigned int cid, unsigned int port)
->
-> 	control_expectln("LISTENING");
->
->-	fd = socket(AF_VSOCK, SOCK_STREAM, 0);
->+	fd = socket(AF_VSOCK, type, 0);
->
-> 	timeout_begin(TIMEOUT);
-> 	do {
->@@ -120,11 +120,21 @@ int vsock_stream_connect(unsigned int cid, unsigned int port)
-> 	return fd;
-> }
->
->+int vsock_stream_connect(unsigned int cid, unsigned int port)
->+{
->+	return vsock_connect(cid, port, SOCK_STREAM);
->+}
->+
->+int vsock_seqpacket_connect(unsigned int cid, unsigned int port)
->+{
->+	return vsock_connect(cid, port, SOCK_SEQPACKET);
->+}
->+
-> /* Listen on <cid, port> and return the first incoming connection.  The remote
->  * address is stored to clientaddrp.  clientaddrp may be NULL.
->  */
->-int vsock_stream_accept(unsigned int cid, unsigned int port,
->-			struct sockaddr_vm *clientaddrp)
->+static int vsock_accept(unsigned int cid, unsigned int port,
->+			struct sockaddr_vm *clientaddrp, int type)
-> {
-> 	union {
-> 		struct sockaddr sa;
->@@ -145,7 +155,7 @@ int vsock_stream_accept(unsigned int cid, unsigned int port,
-> 	int client_fd;
-> 	int old_errno;
->
->-	fd = socket(AF_VSOCK, SOCK_STREAM, 0);
->+	fd = socket(AF_VSOCK, type, 0);
->
-> 	if (bind(fd, &addr.sa, sizeof(addr.svm)) < 0) {
-> 		perror("bind");
->@@ -189,6 +199,18 @@ int vsock_stream_accept(unsigned int cid, unsigned int port,
-> 	return client_fd;
-> }
->
->+int vsock_stream_accept(unsigned int cid, unsigned int port,
->+			struct sockaddr_vm *clientaddrp)
->+{
->+	return vsock_accept(cid, port, clientaddrp, SOCK_STREAM);
->+}
->+
->+int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
->+			   struct sockaddr_vm *clientaddrp)
->+{
->+	return vsock_accept(cid, port, clientaddrp, SOCK_SEQPACKET);
->+}
->+
-> /* Transmit one byte and check the return value.
->  *
->  * expected_ret:
->diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
->index e53dd09d26d9..a3375ad2fb7f 100644
->--- a/tools/testing/vsock/util.h
->+++ b/tools/testing/vsock/util.h
->@@ -36,8 +36,11 @@ struct test_case {
-> void init_signals(void);
-> unsigned int parse_cid(const char *str);
-> int vsock_stream_connect(unsigned int cid, unsigned int port);
->+int vsock_seqpacket_connect(unsigned int cid, unsigned int port);
-> int vsock_stream_accept(unsigned int cid, unsigned int port,
-> 			struct sockaddr_vm *clientaddrp);
->+int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
->+			   struct sockaddr_vm *clientaddrp);
-> void vsock_wait_remote_close(int fd);
-> void send_byte(int fd, int expected_ret, int flags);
-> void recv_byte(int fd, int expected_ret, int flags);
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index 5a4fb80fa832..ffec985fd36f 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -14,6 +14,8 @@
-> #include <errno.h>
-> #include <unistd.h>
-> #include <linux/kernel.h>
->+#include <sys/types.h>
->+#include <sys/socket.h>
->
-> #include "timeout.h"
-> #include "control.h"
->@@ -279,6 +281,62 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
-> 	close(fd);
-> }
->
->+#define MESSAGE_TRUNC_SZ 32
->+static void test_seqpacket_msg_trunc_client(const struct test_opts *opts)
->+{
->+	int fd;
->+	char buf[MESSAGE_TRUNC_SZ];
->+
->+	fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
->+	if (fd < 0) {
->+		perror("connect");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	if (send(fd, buf, sizeof(buf), 0) != sizeof(buf)) {
->+		perror("send failed");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	control_writeln("SENDDONE");
->+	close(fd);
->+}
->+
->+static void test_seqpacket_msg_trunc_server(const struct test_opts *opts)
->+{
->+	int fd;
->+	char buf[MESSAGE_TRUNC_SZ / 2];
->+	struct msghdr msg = {0};
->+	struct iovec iov = {0};
->+
->+	fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
->+	if (fd < 0) {
->+		perror("accept");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	control_expectln("SENDDONE");
->+	iov.iov_base = buf;
->+	iov.iov_len = sizeof(buf);
->+	msg.msg_iov = &iov;
->+	msg.msg_iovlen = 1;
->+
->+	ssize_t ret = recvmsg(fd, &msg, MSG_TRUNC);
->+
->+	if (ret != MESSAGE_TRUNC_SZ) {
->+		printf("%zi\n", ret);
->+		perror("MSG_TRUNC doesn't work");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	if (!(msg.msg_flags & MSG_TRUNC)) {
->+		fprintf(stderr, "MSG_TRUNC expected\n");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	close(fd);
->+}
->+
-> static struct test_case test_cases[] = {
-> 	{
-> 		.name = "SOCK_STREAM connection reset",
->@@ -309,6 +367,11 @@ static struct test_case test_cases[] = {
-> 		.run_client = test_stream_msg_peek_client,
-> 		.run_server = test_stream_msg_peek_server,
-> 	},
->+	{
->+		.name = "SOCK_SEQPACKET send data MSG_TRUNC",
->+		.run_client = test_seqpacket_msg_trunc_client,
->+		.run_server = test_seqpacket_msg_trunc_server,
->+	},
-> 	{},
-> };
->
->-- 
->2.25.1
->
+Right, for SEV-SNP, as long as we know that the KVM interface is
+available, it could be used. But we would have to fall back to the GHCB
+specification if it could not be determined.
 
+> 
+>   It probably shouldn't be a strict superset, as in practice I don't think SNP
+>   approach of having individual entries when batching multiple pages will yield
+>   the best performance.  E.g. the vast majority (maybe all?) of conversions for a
+>   Linux guest will be physically contiguous and will have the same preferred page
+>   size, at which point there will be less overhead if the guest specifies a
+>   massive range as opposed to having to santize and fill a large buffer.
+
+Originally, the plan was to use ranges, but based on feedback during the
+GHCB spec review it was updated to its current definition.
+
+A concern from other hypervisor vendors was to be able to return back to
+the guest in the middle of the hypercall, e.g. to deliver an interrupt or
+such, and then allow the guest to resume the hypercall where it left off.
+Not sure if you would want to build that into this hypercall, since
+depending on the range, the operation could take a while.
+
+Thanks,
+Tom
+
+> 
+>   TL;DR: I think the KVM hypercall should be something like this, so that it can
+>   be used for SNP and TDX, and possibly for other purposes, e.g. for paravirt
+>   performance enhancements or something.
+> 
+>     8. KVM_HC_MAP_GPA_RANGE
+>     -----------------------
+>     :Architecture: x86
+>     :Status: active
+>     :Purpose: Request KVM to map a GPA range with the specified attributes.
+> 
+>     a0: the guest physical address of the start page
+>     a1: the number of (4kb) pages (must be contiguous in GPA space)
+>     a2: attributes
+> 
+>   where 'attributes' could be something like:
+> 
+>     bits  3:0 - preferred page size encoding 0 = 4kb, 1 = 2mb, 2 = 1gb, etc...
+>     bit     4 - plaintext = 0, encrypted = 1
+>     bits 63:5 - reserved (must be zero)
+> 
