@@ -2,38 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 145F037FAFC
-	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 17:47:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 94DAF37FB13
+	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 17:52:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231146AbhEMPsw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 May 2021 11:48:52 -0400
-Received: from foss.arm.com ([217.140.110.172]:37942 "EHLO foss.arm.com"
+        id S232398AbhEMPyG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 May 2021 11:54:06 -0400
+Received: from foss.arm.com ([217.140.110.172]:38016 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230493AbhEMPsv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 May 2021 11:48:51 -0400
+        id S232251AbhEMPyG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 May 2021 11:54:06 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C4D971476;
-        Thu, 13 May 2021 08:47:34 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E61191476;
+        Thu, 13 May 2021 08:52:54 -0700 (PDT)
 Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 081EA3F718;
-        Thu, 13 May 2021 08:47:33 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests v3 4/8] arm/arm64: mmu: Stop mapping an
- assumed IO region
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2F72C3F718;
+        Thu, 13 May 2021 08:52:54 -0700 (PDT)
+Subject: Re: [PATCH kvm-unit-tests v4] arm/arm64: psci: Don't assume method is
+ hvc
 To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
 Cc:     nikos.nikoleris@arm.com, andre.przywara@arm.com,
         eric.auger@redhat.com
-References: <20210429164130.405198-1-drjones@redhat.com>
- <20210429164130.405198-5-drjones@redhat.com>
- <94288c5b-8894-5f8b-2477-6e45e087c4b5@arm.com>
-Message-ID: <0ca20ae5-d797-1c9f-9414-1d162d86f1b5@arm.com>
-Date:   Thu, 13 May 2021 16:48:16 +0100
+References: <20210429164130.405198-9-drjones@redhat.com>
+ <20210513101819.274917-1-drjones@redhat.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <f169b445-c0d4-e0ae-d859-994228821ceb@arm.com>
+Date:   Thu, 13 May 2021 16:53:40 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <94288c5b-8894-5f8b-2477-6e45e087c4b5@arm.com>
+In-Reply-To: <20210513101819.274917-1-drjones@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -41,292 +40,247 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Drew,
 
-On 5/10/21 4:45 PM, Alexandru Elisei wrote:
-> Hi Drew,
->
-> On 4/29/21 5:41 PM, Andrew Jones wrote:
->> By providing a proper ioremap function, we can just rely on devices
->> calling it for each region they need (as they already do) instead of
->> mapping a big assumed I/O range. We don't require the MMU to be
->> enabled at the time of the ioremap. In that case, we add the mapping
->> to the identity map anyway. This allows us to call setup_vm after
->> io_init. Why don't we just call setup_vm before io_init, I hear you
->> ask? Well, that's because tests like sieve want to start with the MMU
->> off, later call setup_vm, and all the while have working I/O. Some
->> unit tests are just really demanding...
->>
->> While at it, ensure we map the I/O regions with XN (execute never),
->> as suggested by Alexandru Elisei.
-> I got to thinking why this wasn't an issue before. Under KVM, device memory is not
-> usually mapped at stage 2, so any speculated reads wouldn't have reached memory at
-> all. The only way I imagine that happening if the user was running kvm-unit-tests
-> with a passthrough PCI device, which I don't think happens too often.
->
-> But we cannot rely on devices not being mapped at stage 2 when running under EFI
-> (we're mapping them ourselves with ioremap), so I believe this is a good fix.
->
-> Had another look at the patch, looks good to me:
+On 5/13/21 11:18 AM, Andrew Jones wrote:
+> The method can be smc in addition to hvc, and it will be when running
+> on bare metal. Additionally, we move the invocations to assembly so
+> we don't have to rely on compiler assumptions. We also fix the
+> prototype of psci_invoke. function_id should be an unsigned int, not
+> an unsigned long.
 
-While testing the series I discovered that this patch introduces a bug when
-running under kvmtool.
+Looks good to me:
 
-Here's the splat:
-
-$ ./configure --vmm=kvmtool --earlycon=uart,mmio,0x1000000 --page-size=4K && make
-clean && make -j6 && ./vm run -c2 -m128 -f arm/micro-bench.flat
-[..]
-  # lkvm run --firmware arm/micro-bench.flat -m 128 -c 2 --name guest-6986
-  Info: Placing fdt at 0x80200000 - 0x80210000
-chr_testdev_init: chr-testdev: can't find a virtio-console
-Timer Frequency 24000000 Hz (Output in microseconds)
-
-name                                    total ns                         avg
-ns            
---------------------------------------------------------------------------------------------
-hvc                                 168674516.0                        
-2573.0             
-Load address: 80000000
-PC: 80000128 PC offset: 128
-Unhandled exception ec=0x25 (DABT_EL1)
-Vector: 4 (el1h_sync)
-ESR_EL1:         96000006, ec=0x25 (DABT_EL1)
-FAR_EL1: 000000000a000008 (valid)
-Exception frame registers:
-pc : [<0000000080000128>] lr : [<000000008000cac8>] pstate: 800003c5
-sp : 000000008003ff90
-x29: 0000000000000000 x28: 0000000000000000
-x27: 00000011ada4d0c2 x26: 0000000000000000
-x25: 0000000080015978 x24: 0000000080015a90
-x23: 0000048c27394fff x22: 20c49ba5e353f7cf
-x21: 28f5c28f5c28f5c3 x20: 0000000080016af0
-x19: 000000e8d4a51000 x18: 0000000080040000
-x17: 0000000000000000 x16: 0000000080008210
-x15: 000000008003fe5c x14: 0000000000000260
-x13: 00000000000002a4 x12: 0000000080040000
-x11: 0000000000000001 x10: 0000000000000060
-x9 : 0000000000000000 x8 : 0000000000000039
-x7 : 0000000000000040 x6 : 0000000080013983
-x5 : 000000008003f74e x4 : 000000008003f69c
-x3 : 0000000000000000 x2 : 0000000000000000
-x1 : 0000000000000000 x0 : 000000000a000008
-
-The issue is caused by the mmio_read_user_exec() function from arm/micro-bench.c.
-kvmtool doesn't have a chr-testdev device, and because probing fails, the address
-0x0a000008 isn't ioremap'ed. The 0-1G memory region is not automatically mapped
-anymore, and the access triggers a data abort at stage 1.
-
-I fixed the splat with this change:
-
-diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-index 95c418c10eb4..ad9e44d71d8d 100644
---- a/arm/micro-bench.c
-+++ b/arm/micro-bench.c
-@@ -281,7 +281,7 @@ static void mmio_read_user_exec(void)
-         * updated in the future if any relevant changes in QEMU
-         * test-dev are made.
-         */
--       void *userspace_emulated_addr = (void*)0x0a000008;
-+       void *userspace_emulated_addr = (void*)ioremap(0x0a000008, 8);
- 
-        readl(userspace_emulated_addr);
- }
-
-kvmtool ignores the MMIO exit reason if no device owns the IPA, that's why it also
-works on kvmtool.
-
-The micro-bench test with the diff passes under qemu and kvmtool, tested with 4K,
-16K and 64K pages on an odroid-c4.
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
 Thanks,
 
 Alex
 
 >
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  arm/cstart.S       | 22 ++++++++++++++++++++++
+>  arm/cstart64.S     | 22 ++++++++++++++++++++++
+>  arm/selftest.c     | 34 +++++++---------------------------
+>  lib/arm/asm/psci.h | 10 ++++++++--
+>  lib/arm/psci.c     | 35 +++++++++++++++++++++++++++--------
+>  lib/arm/setup.c    |  2 ++
+>  6 files changed, 88 insertions(+), 37 deletions(-)
 >
-> Thanks,
->
-> Alex
->
->> Signed-off-by: Andrew Jones <drjones@redhat.com>
->> ---
->>  lib/arm/asm/io.h            |  6 ++++++
->>  lib/arm/asm/mmu.h           |  3 +++
->>  lib/arm/asm/page.h          |  2 ++
->>  lib/arm/asm/pgtable-hwdef.h |  1 +
->>  lib/arm/mmu.c               | 37 +++++++++++++++++++++++++++----------
->>  lib/arm64/asm/io.h          |  6 ++++++
->>  lib/arm64/asm/mmu.h         |  1 +
->>  lib/arm64/asm/page.h        |  2 ++
->>  8 files changed, 48 insertions(+), 10 deletions(-)
->>
->> diff --git a/lib/arm/asm/io.h b/lib/arm/asm/io.h
->> index ba3b0b2412ad..e4caa6ff5d1e 100644
->> --- a/lib/arm/asm/io.h
->> +++ b/lib/arm/asm/io.h
->> @@ -77,6 +77,12 @@ static inline void __raw_writel(u32 val, volatile void __iomem *addr)
->>  		     : "r" (val));
->>  }
->>  
->> +#define ioremap ioremap
->> +static inline void __iomem *ioremap(phys_addr_t phys_addr, size_t size)
->> +{
->> +	return __ioremap(phys_addr, size);
->> +}
->> +
->>  #define virt_to_phys virt_to_phys
->>  static inline phys_addr_t virt_to_phys(const volatile void *x)
->>  {
->> diff --git a/lib/arm/asm/mmu.h b/lib/arm/asm/mmu.h
->> index 122874b8aebe..94e70f0a84bf 100644
->> --- a/lib/arm/asm/mmu.h
->> +++ b/lib/arm/asm/mmu.h
->> @@ -8,10 +8,13 @@
->>  #include <asm/barrier.h>
->>  
->>  #define PTE_USER		L_PTE_USER
->> +#define PTE_UXN			L_PTE_XN
->> +#define PTE_PXN			L_PTE_PXN
->>  #define PTE_RDONLY		PTE_AP2
->>  #define PTE_SHARED		L_PTE_SHARED
->>  #define PTE_AF			PTE_EXT_AF
->>  #define PTE_WBWA		L_PTE_MT_WRITEALLOC
->> +#define PTE_UNCACHED		L_PTE_MT_UNCACHED
->>  
->>  /* See B3.18.7 TLB maintenance operations */
->>  
->> diff --git a/lib/arm/asm/page.h b/lib/arm/asm/page.h
->> index 1fb5cd26ac66..8eb4a883808e 100644
->> --- a/lib/arm/asm/page.h
->> +++ b/lib/arm/asm/page.h
->> @@ -47,5 +47,7 @@ typedef struct { pteval_t pgprot; } pgprot_t;
->>  extern phys_addr_t __virt_to_phys(unsigned long addr);
->>  extern unsigned long __phys_to_virt(phys_addr_t addr);
->>  
->> +extern void *__ioremap(phys_addr_t phys_addr, size_t size);
->> +
->>  #endif /* !__ASSEMBLY__ */
->>  #endif /* _ASMARM_PAGE_H_ */
->> diff --git a/lib/arm/asm/pgtable-hwdef.h b/lib/arm/asm/pgtable-hwdef.h
->> index fe1d8540ea3f..90fd306c7cc0 100644
->> --- a/lib/arm/asm/pgtable-hwdef.h
->> +++ b/lib/arm/asm/pgtable-hwdef.h
->> @@ -34,6 +34,7 @@
->>  #define L_PTE_USER		(_AT(pteval_t, 1) << 6)		/* AP[1] */
->>  #define L_PTE_SHARED		(_AT(pteval_t, 3) << 8)		/* SH[1:0], inner shareable */
->>  #define L_PTE_YOUNG		(_AT(pteval_t, 1) << 10)	/* AF */
->> +#define L_PTE_PXN		(_AT(pteval_t, 1) << 53)	/* PXN */
->>  #define L_PTE_XN		(_AT(pteval_t, 1) << 54)	/* XN */
->>  
->>  /*
->> diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
->> index 15eef007f256..791b1f88f946 100644
->> --- a/lib/arm/mmu.c
->> +++ b/lib/arm/mmu.c
->> @@ -11,6 +11,7 @@
->>  #include <asm/mmu.h>
->>  #include <asm/setup.h>
->>  #include <asm/page.h>
->> +#include <asm/io.h>
->>  
->>  #include "alloc_page.h"
->>  #include "vmalloc.h"
->> @@ -157,9 +158,8 @@ void mmu_set_range_sect(pgd_t *pgtable, uintptr_t virt_offset,
->>  void *setup_mmu(phys_addr_t phys_end)
->>  {
->>  	uintptr_t code_end = (uintptr_t)&etext;
->> -	struct mem_region *r;
->>  
->> -	/* 0G-1G = I/O, 1G-3G = identity, 3G-4G = vmalloc */
->> +	/* 3G-4G region is reserved for vmalloc, cap phys_end at 3G */
->>  	if (phys_end > (3ul << 30))
->>  		phys_end = 3ul << 30;
->>  
->> @@ -170,14 +170,8 @@ void *setup_mmu(phys_addr_t phys_end)
->>  			"Unsupported translation granule %ld\n", PAGE_SIZE);
->>  #endif
->>  
->> -	mmu_idmap = alloc_page();
->> -
->> -	for (r = mem_regions; r->end; ++r) {
->> -		if (!(r->flags & MR_F_IO))
->> -			continue;
->> -		mmu_set_range_sect(mmu_idmap, r->start, r->start, r->end,
->> -				   __pgprot(PMD_SECT_UNCACHED | PMD_SECT_USER));
->> -	}
->> +	if (!mmu_idmap)
->> +		mmu_idmap = alloc_page();
->>  
->>  	/* armv8 requires code shared between EL1 and EL0 to be read-only */
->>  	mmu_set_range_ptes(mmu_idmap, PHYS_OFFSET,
->> @@ -192,6 +186,29 @@ void *setup_mmu(phys_addr_t phys_end)
->>  	return mmu_idmap;
->>  }
->>  
->> +void __iomem *__ioremap(phys_addr_t phys_addr, size_t size)
->> +{
->> +	phys_addr_t paddr_aligned = phys_addr & PAGE_MASK;
->> +	phys_addr_t paddr_end = PAGE_ALIGN(phys_addr + size);
->> +	pgprot_t prot = __pgprot(PTE_UNCACHED | PTE_USER | PTE_UXN | PTE_PXN);
->> +	pgd_t *pgtable;
->> +
->> +	assert(sizeof(long) == 8 || !(phys_addr >> 32));
->> +
->> +	if (mmu_enabled()) {
->> +		pgtable = current_thread_info()->pgtable;
->> +	} else {
->> +		if (!mmu_idmap)
->> +			mmu_idmap = alloc_page();
->> +		pgtable = mmu_idmap;
->> +	}
->> +
->> +	mmu_set_range_ptes(pgtable, paddr_aligned, paddr_aligned,
->> +			   paddr_end, prot);
->> +
->> +	return (void __iomem *)(unsigned long)phys_addr;
->> +}
->> +
->>  phys_addr_t __virt_to_phys(unsigned long addr)
->>  {
->>  	if (mmu_enabled()) {
->> diff --git a/lib/arm64/asm/io.h b/lib/arm64/asm/io.h
->> index e0a03b250d5b..be19f471c0fa 100644
->> --- a/lib/arm64/asm/io.h
->> +++ b/lib/arm64/asm/io.h
->> @@ -71,6 +71,12 @@ static inline u64 __raw_readq(const volatile void __iomem *addr)
->>  	return val;
->>  }
->>  
->> +#define ioremap ioremap
->> +static inline void __iomem *ioremap(phys_addr_t phys_addr, size_t size)
->> +{
->> +	return __ioremap(phys_addr, size);
->> +}
->> +
->>  #define virt_to_phys virt_to_phys
->>  static inline phys_addr_t virt_to_phys(const volatile void *x)
->>  {
->> diff --git a/lib/arm64/asm/mmu.h b/lib/arm64/asm/mmu.h
->> index 72d75eafc882..72371b2d9fe3 100644
->> --- a/lib/arm64/asm/mmu.h
->> +++ b/lib/arm64/asm/mmu.h
->> @@ -8,6 +8,7 @@
->>  #include <asm/barrier.h>
->>  
->>  #define PMD_SECT_UNCACHED	PMD_ATTRINDX(MT_DEVICE_nGnRE)
->> +#define PTE_UNCACHED		PTE_ATTRINDX(MT_DEVICE_nGnRE)
->>  #define PTE_WBWA		PTE_ATTRINDX(MT_NORMAL)
->>  
->>  static inline void flush_tlb_all(void)
->> diff --git a/lib/arm64/asm/page.h b/lib/arm64/asm/page.h
->> index ae4484b22114..d0fac6ea563d 100644
->> --- a/lib/arm64/asm/page.h
->> +++ b/lib/arm64/asm/page.h
->> @@ -72,5 +72,7 @@ typedef struct { pteval_t pgprot; } pgprot_t;
->>  extern phys_addr_t __virt_to_phys(unsigned long addr);
->>  extern unsigned long __phys_to_virt(phys_addr_t addr);
->>  
->> +extern void *__ioremap(phys_addr_t phys_addr, size_t size);
->> +
->>  #endif /* !__ASSEMBLY__ */
->>  #endif /* _ASMARM64_PAGE_H_ */
+> diff --git a/arm/cstart.S b/arm/cstart.S
+> index 446966de350d..2401d92cdadc 100644
+> --- a/arm/cstart.S
+> +++ b/arm/cstart.S
+> @@ -95,6 +95,28 @@ start:
+>  
+>  .text
+>  
+> +/*
+> + * psci_invoke_hvc / psci_invoke_smc
+> + *
+> + * Inputs:
+> + *   r0 -- function_id
+> + *   r1 -- arg0
+> + *   r2 -- arg1
+> + *   r3 -- arg2
+> + *
+> + * Outputs:
+> + *   r0 -- return code
+> + */
+> +.globl psci_invoke_hvc
+> +psci_invoke_hvc:
+> +	hvc	#0
+> +	mov	pc, lr
+> +
+> +.globl psci_invoke_smc
+> +psci_invoke_smc:
+> +	smc	#0
+> +	mov	pc, lr
+> +
+>  enable_vfp:
+>  	/* Enable full access to CP10 and CP11: */
+>  	mov	r0, #(3 << 22 | 3 << 20)
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index 42ba3a3ca249..e4ab7d06251e 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -109,6 +109,28 @@ start:
+>  
+>  .text
+>  
+> +/*
+> + * psci_invoke_hvc / psci_invoke_smc
+> + *
+> + * Inputs:
+> + *   w0 -- function_id
+> + *   x1 -- arg0
+> + *   x2 -- arg1
+> + *   x3 -- arg2
+> + *
+> + * Outputs:
+> + *   x0 -- return code
+> + */
+> +.globl psci_invoke_hvc
+> +psci_invoke_hvc:
+> +	hvc	#0
+> +	ret
+> +
+> +.globl psci_invoke_smc
+> +psci_invoke_smc:
+> +	smc	#0
+> +	ret
+> +
+>  get_mmu_off:
+>  	adrp	x0, auxinfo
+>  	ldr	x0, [x0, :lo12:auxinfo + 8]
+> diff --git a/arm/selftest.c b/arm/selftest.c
+> index 4495b161cdd5..9f459ed3d571 100644
+> --- a/arm/selftest.c
+> +++ b/arm/selftest.c
+> @@ -400,33 +400,13 @@ static void check_vectors(void *arg __unused)
+>  	exit(report_summary());
+>  }
+>  
+> -static bool psci_check(void)
+> +static void psci_print(void)
+>  {
+> -	const struct fdt_property *method;
+> -	int node, len, ver;
+> -
+> -	node = fdt_node_offset_by_compatible(dt_fdt(), -1, "arm,psci-0.2");
+> -	if (node < 0) {
+> -		printf("PSCI v0.2 compatibility required\n");
+> -		return false;
+> -	}
+> -
+> -	method = fdt_get_property(dt_fdt(), node, "method", &len);
+> -	if (method == NULL) {
+> -		printf("bad psci device tree node\n");
+> -		return false;
+> -	}
+> -
+> -	if (len < 4 || strcmp(method->data, "hvc") != 0) {
+> -		printf("psci method must be hvc\n");
+> -		return false;
+> -	}
+> -
+> -	ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
+> -	printf("PSCI version %d.%d\n", PSCI_VERSION_MAJOR(ver),
+> -				       PSCI_VERSION_MINOR(ver));
+> -
+> -	return true;
+> +	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
+> +	report_info("PSCI version: %d.%d", PSCI_VERSION_MAJOR(ver),
+> +					  PSCI_VERSION_MINOR(ver));
+> +	report_info("PSCI method: %s", psci_invoke == psci_invoke_hvc ?
+> +				       "hvc" : "smc");
+>  }
+>  
+>  static void cpu_report(void *data __unused)
+> @@ -465,7 +445,7 @@ int main(int argc, char **argv)
+>  
+>  	} else if (strcmp(argv[1], "smp") == 0) {
+>  
+> -		report(psci_check(), "PSCI version");
+> +		psci_print();
+>  		on_cpus(cpu_report, NULL);
+>  		while (!cpumask_full(&ready))
+>  			cpu_relax();
+> diff --git a/lib/arm/asm/psci.h b/lib/arm/asm/psci.h
+> index 7b956bf5987d..cf03449ba665 100644
+> --- a/lib/arm/asm/psci.h
+> +++ b/lib/arm/asm/psci.h
+> @@ -3,8 +3,14 @@
+>  #include <libcflat.h>
+>  #include <linux/psci.h>
+>  
+> -extern int psci_invoke(unsigned long function_id, unsigned long arg0,
+> -		       unsigned long arg1, unsigned long arg2);
+> +typedef int (*psci_invoke_fn)(unsigned int function_id, unsigned long arg0,
+> +			      unsigned long arg1, unsigned long arg2);
+> +extern psci_invoke_fn psci_invoke;
+> +extern int psci_invoke_hvc(unsigned int function_id, unsigned long arg0,
+> +			   unsigned long arg1, unsigned long arg2);
+> +extern int psci_invoke_smc(unsigned int function_id, unsigned long arg0,
+> +			   unsigned long arg1, unsigned long arg2);
+> +extern void psci_set_conduit(void);
+>  extern int psci_cpu_on(unsigned long cpuid, unsigned long entry_point);
+>  extern void psci_system_reset(void);
+>  extern int cpu_psci_cpu_boot(unsigned int cpu);
+> diff --git a/lib/arm/psci.c b/lib/arm/psci.c
+> index 936c83948b6a..9c031a122e9b 100644
+> --- a/lib/arm/psci.c
+> +++ b/lib/arm/psci.c
+> @@ -6,22 +6,21 @@
+>   *
+>   * This work is licensed under the terms of the GNU LGPL, version 2.
+>   */
+> +#include <devicetree.h>
+>  #include <asm/psci.h>
+>  #include <asm/setup.h>
+>  #include <asm/page.h>
+>  #include <asm/smp.h>
+>  
+> -__attribute__((noinline))
+> -int psci_invoke(unsigned long function_id, unsigned long arg0,
+> -		unsigned long arg1, unsigned long arg2)
+> +static int psci_invoke_none(unsigned int function_id, unsigned long arg0,
+> +			    unsigned long arg1, unsigned long arg2)
+>  {
+> -	asm volatile(
+> -		"hvc #0"
+> -	: "+r" (function_id)
+> -	: "r" (arg0), "r" (arg1), "r" (arg2));
+> -	return function_id;
+> +	printf("No PSCI method configured! Can't invoke...\n");
+> +	return PSCI_RET_NOT_PRESENT;
+>  }
+>  
+> +psci_invoke_fn psci_invoke = psci_invoke_none;
+> +
+>  int psci_cpu_on(unsigned long cpuid, unsigned long entry_point)
+>  {
+>  #ifdef __arm__
+> @@ -56,3 +55,23 @@ void psci_system_off(void)
+>  	int err = psci_invoke(PSCI_0_2_FN_SYSTEM_OFF, 0, 0, 0);
+>  	printf("CPU%d unable to do system off (error = %d)\n", smp_processor_id(), err);
+>  }
+> +
+> +void psci_set_conduit(void)
+> +{
+> +	const void *fdt = dt_fdt();
+> +	const struct fdt_property *method;
+> +	int node, len;
+> +
+> +	node = fdt_node_offset_by_compatible(fdt, -1, "arm,psci-0.2");
+> +	assert_msg(node >= 0, "PSCI v0.2 compatibility required");
+> +
+> +	method = fdt_get_property(fdt, node, "method", &len);
+> +	assert(method != NULL && len == 4);
+> +
+> +	if (strcmp(method->data, "hvc") == 0)
+> +		psci_invoke = psci_invoke_hvc;
+> +	else if (strcmp(method->data, "smc") == 0)
+> +		psci_invoke = psci_invoke_smc;
+> +	else
+> +		assert_msg(false, "Unknown PSCI conduit: %s", method->data);
+> +}
+> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+> index 86f054304baf..bcdf0d78c2e2 100644
+> --- a/lib/arm/setup.c
+> +++ b/lib/arm/setup.c
+> @@ -25,6 +25,7 @@
+>  #include <asm/processor.h>
+>  #include <asm/smp.h>
+>  #include <asm/timer.h>
+> +#include <asm/psci.h>
+>  
+>  #include "io.h"
+>  
+> @@ -266,6 +267,7 @@ void setup(const void *fdt, phys_addr_t freemem_start)
+>  	mem_regions_add_assumed();
+>  	mem_init(PAGE_ALIGN((unsigned long)freemem));
+>  
+> +	psci_set_conduit();
+>  	cpu_init();
+>  
+>  	/* cpu_init must be called before thread_info_init */
