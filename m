@@ -2,257 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8029537FCA7
-	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 19:43:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C27537FD4B
+	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 20:33:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230440AbhEMRo3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 May 2021 13:44:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36128 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229964AbhEMRo3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 May 2021 13:44:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620927799;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ltOaFuqAsBE6NBj9u6B6AH3ZN/ZpntcTswD/sYg6FgQ=;
-        b=hHRxumQEGcmQLAH0a6dLIhUNL/Edvb2sz4dEHIPCE5mopsg2VZrYf/TwZmENnv3X+b6ft1
-        AtS/00xOQeDn0kIQjdD4jao9I3H6P4WJYvTQxjPfEmHvWeIGxP+dRlQxPzxG4p8nZev3m7
-        z0ywUJzM2DqTuCuh9kRmPXfx7ySwmos=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-114-MVow6pXMOaS3PZiKVGAGcA-1; Thu, 13 May 2021 13:43:17 -0400
-X-MC-Unique: MVow6pXMOaS3PZiKVGAGcA-1
-Received: by mail-ed1-f72.google.com with SMTP id g17-20020aa7dd910000b029038843570b67so15030527edv.9
-        for <kvm@vger.kernel.org>; Thu, 13 May 2021 10:43:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=ltOaFuqAsBE6NBj9u6B6AH3ZN/ZpntcTswD/sYg6FgQ=;
-        b=Gkb1oI6C0hTs03lnSiV1kdd0OhS9T8Q+zgD/kxr2mjqqorQTT09my3h+gbGBab+mFC
-         /bul6aBUSPlbR2vHGbA6kd774+61TjTYTZGEAOst8TUO0ssKwth9zySP5ZQBp2XTsDEj
-         xCHPf43E9lPEFv4EFQ4byHMNHeSED0uXZIqMXWvnjUyCjt9plSzKfp25SWGdsdbm9Wz5
-         9AxGeyHcDk7A784xosaGd/Ig/fLhMFzNX0ZYy6VNINoGvotjPRqYqBXWatGyvBEMufrI
-         87LR3Wz00qXK8muH380Cyj+6XcV6FxI6Z4yew88jyIjnWpEqTz1YyotovhuA8STqO2kK
-         4AkQ==
-X-Gm-Message-State: AOAM531RnHt+tvwRDAr2dEsBRps3RjjGehoGJp10Nf0XEfP7MaeBcbJ4
-        asltfbGjyoYu0zwAijwuBvaHGySIecwvOgkqa8YChB9T/73tKVe+oIZSCC365CWgURTTTGZc8Hg
-        2qMalXqe2Cycc
-X-Received: by 2002:aa7:db94:: with SMTP id u20mr30065487edt.381.1620927796066;
-        Thu, 13 May 2021 10:43:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwc9PBrmMqh4/QafVN5RTIgXX3dcesbr744ll+N/OnZNtxul/8iYyHtM3Ve7YV8EeTmh0UoeA==
-X-Received: by 2002:aa7:db94:: with SMTP id u20mr30065475edt.381.1620927795849;
-        Thu, 13 May 2021 10:43:15 -0700 (PDT)
-Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id yr15sm355106ejb.16.2021.05.13.10.43.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 May 2021 10:43:15 -0700 (PDT)
-Date:   Thu, 13 May 2021 19:43:13 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, nikos.nikoleris@arm.com,
-        andre.przywara@arm.com, eric.auger@redhat.com
-Subject: Re: [PATCH kvm-unit-tests v3 4/8] arm/arm64: mmu: Stop mapping an
- assumed IO region
-Message-ID: <20210513174313.j7ff6j5jhzvocnuh@gator>
-References: <20210429164130.405198-1-drjones@redhat.com>
- <20210429164130.405198-5-drjones@redhat.com>
- <94288c5b-8894-5f8b-2477-6e45e087c4b5@arm.com>
- <0ca20ae5-d797-1c9f-9414-1d162d86f1b5@arm.com>
- <20210513171844.n3h3c7l5srhuriyy@gator>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210513171844.n3h3c7l5srhuriyy@gator>
+        id S230332AbhEMSee (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 May 2021 14:34:34 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4852 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230125AbhEMSee (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 May 2021 14:34:34 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14DIXMg2077401;
+        Thu, 13 May 2021 14:33:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=RlzVUst0B2TXfJg48V/QH3bAxOQakqti0qe45OWkjdQ=;
+ b=XBo1+mBe0ousiOSzFA4xU5qNhB56l61moQp0AoIRXV6ECtxTqXcWxh+swZkjCEktykgx
+ mlsjW/bifC7+4DErm07yMT/3GSmQTgB7YDS/X8cGMVOgYIml9y2TGUP9DO5lEGclLwTl
+ 1fZIaViEGhrO/WOLKjLSqaVrYGUTFmC0LK/oatYYLuqoJ+R5XYZLi90teH0jp/pVZitl
+ o8Sd7vsxiVrVxcDUsQBbsgOZIl852rQKYC3pVjh4m3lSRZt6VmdeAKlSR6VwVbnx4bjW
+ yl+Gx0b3UioSeQVVjN4dxwJn1rggYDcJMEG/UKf2vpX9LDmUwTa2fcY4UZgL/dT2FaX6 Bg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38h8wbgwe7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 May 2021 14:33:23 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14DIXNmH077548;
+        Thu, 13 May 2021 14:33:23 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38h8wbgwdu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 May 2021 14:33:23 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14DIDFLP013152;
+        Thu, 13 May 2021 18:33:22 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma03dal.us.ibm.com with ESMTP id 38dj9a0jeg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 May 2021 18:33:22 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14DIXLqf35324202
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 13 May 2021 18:33:21 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9895728059;
+        Thu, 13 May 2021 18:33:21 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E7A6028060;
+        Thu, 13 May 2021 18:33:20 +0000 (GMT)
+Received: from farman-thinkpad-t470p (unknown [9.160.49.189])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Thu, 13 May 2021 18:33:20 +0000 (GMT)
+Message-ID: <8224aa872f243610583aab327c7e0b813ddaf0dd.camel@linux.ibm.com>
+Subject: Re: [PATCH v6 0/3] vfio-ccw: Fix interrupt handling for HALT/CLEAR
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Date:   Thu, 13 May 2021 14:33:20 -0400
+In-Reply-To: <20210513030543.67601a8c.pasic@linux.ibm.com>
+References: <20210511195631.3995081-1-farman@linux.ibm.com>
+         <20210513030543.67601a8c.pasic@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-14.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Vh7pZw2v3cGEsOLwlRwAHA7Y3yLbAvg-
+X-Proofpoint-ORIG-GUID: N9CKE4j6qfuG9i-ysitPxyxtZow_9eMT
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-13_12:2021-05-12,2021-05-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ lowpriorityscore=0 bulkscore=0 priorityscore=1501 malwarescore=0
+ phishscore=0 clxscore=1015 mlxscore=0 suspectscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2105130129
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 13, 2021 at 07:18:44PM +0200, Andrew Jones wrote:
-> On Thu, May 13, 2021 at 04:48:16PM +0100, Alexandru Elisei wrote:
-> > Hi Drew,
-> > 
-> > On 5/10/21 4:45 PM, Alexandru Elisei wrote:
-> > > Hi Drew,
-> > >
-> > > On 4/29/21 5:41 PM, Andrew Jones wrote:
-> > >> By providing a proper ioremap function, we can just rely on devices
-> > >> calling it for each region they need (as they already do) instead of
-> > >> mapping a big assumed I/O range. We don't require the MMU to be
-> > >> enabled at the time of the ioremap. In that case, we add the mapping
-> > >> to the identity map anyway. This allows us to call setup_vm after
-> > >> io_init. Why don't we just call setup_vm before io_init, I hear you
-> > >> ask? Well, that's because tests like sieve want to start with the MMU
-> > >> off, later call setup_vm, and all the while have working I/O. Some
-> > >> unit tests are just really demanding...
-> > >>
-> > >> While at it, ensure we map the I/O regions with XN (execute never),
-> > >> as suggested by Alexandru Elisei.
-> > > I got to thinking why this wasn't an issue before. Under KVM, device memory is not
-> > > usually mapped at stage 2, so any speculated reads wouldn't have reached memory at
-> > > all. The only way I imagine that happening if the user was running kvm-unit-tests
-> > > with a passthrough PCI device, which I don't think happens too often.
-> > >
-> > > But we cannot rely on devices not being mapped at stage 2 when running under EFI
-> > > (we're mapping them ourselves with ioremap), so I believe this is a good fix.
-> > >
-> > > Had another look at the patch, looks good to me:
-> > 
-> > While testing the series I discovered that this patch introduces a bug when
-> > running under kvmtool.
-> > 
-> > Here's the splat:
-> > 
-> > $ ./configure --vmm=kvmtool --earlycon=uart,mmio,0x1000000 --page-size=4K && make
-> > clean && make -j6 && ./vm run -c2 -m128 -f arm/micro-bench.flat
-> > [..]
-> >   # lkvm run --firmware arm/micro-bench.flat -m 128 -c 2 --name guest-6986
-> >   Info: Placing fdt at 0x80200000 - 0x80210000
-> > chr_testdev_init: chr-testdev: can't find a virtio-console
-> > Timer Frequency 24000000 Hz (Output in microseconds)
-> > 
-> > name                                    total ns                         avg
-> > ns            
-> > --------------------------------------------------------------------------------------------
-> > hvc                                 168674516.0                        
-> > 2573.0             
-> > Load address: 80000000
-> > PC: 80000128 PC offset: 128
-> > Unhandled exception ec=0x25 (DABT_EL1)
-> > Vector: 4 (el1h_sync)
-> > ESR_EL1:         96000006, ec=0x25 (DABT_EL1)
-> > FAR_EL1: 000000000a000008 (valid)
-> > Exception frame registers:
-> > pc : [<0000000080000128>] lr : [<000000008000cac8>] pstate: 800003c5
-> > sp : 000000008003ff90
-> > x29: 0000000000000000 x28: 0000000000000000
-> > x27: 00000011ada4d0c2 x26: 0000000000000000
-> > x25: 0000000080015978 x24: 0000000080015a90
-> > x23: 0000048c27394fff x22: 20c49ba5e353f7cf
-> > x21: 28f5c28f5c28f5c3 x20: 0000000080016af0
-> > x19: 000000e8d4a51000 x18: 0000000080040000
-> > x17: 0000000000000000 x16: 0000000080008210
-> > x15: 000000008003fe5c x14: 0000000000000260
-> > x13: 00000000000002a4 x12: 0000000080040000
-> > x11: 0000000000000001 x10: 0000000000000060
-> > x9 : 0000000000000000 x8 : 0000000000000039
-> > x7 : 0000000000000040 x6 : 0000000080013983
-> > x5 : 000000008003f74e x4 : 000000008003f69c
-> > x3 : 0000000000000000 x2 : 0000000000000000
-> > x1 : 0000000000000000 x0 : 000000000a000008
-> > 
-> > The issue is caused by the mmio_read_user_exec() function from arm/micro-bench.c.
-> > kvmtool doesn't have a chr-testdev device, and because probing fails, the address
-> > 0x0a000008 isn't ioremap'ed. The 0-1G memory region is not automatically mapped
-> > anymore, and the access triggers a data abort at stage 1.
-> > 
-> > I fixed the splat with this change:
-> > 
-> > diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-> > index 95c418c10eb4..ad9e44d71d8d 100644
-> > --- a/arm/micro-bench.c
-> > +++ b/arm/micro-bench.c
-> > @@ -281,7 +281,7 @@ static void mmio_read_user_exec(void)
-> >          * updated in the future if any relevant changes in QEMU
-> >          * test-dev are made.
-> >          */
-> > -       void *userspace_emulated_addr = (void*)0x0a000008;
-> > +       void *userspace_emulated_addr = (void*)ioremap(0x0a000008, 8);
-> >  
-> >         readl(userspace_emulated_addr);
-> >  }
-> > 
-> > kvmtool ignores the MMIO exit reason if no device owns the IPA, that's why it also
-> > works on kvmtool.
-> > 
-> > The micro-bench test with the diff passes under qemu and kvmtool, tested with 4K,
-> > 16K and 64K pages on an odroid-c4.
-> >
+On Thu, 2021-05-13 at 03:05 +0200, Halil Pasic wrote:
+> On Tue, 11 May 2021 21:56:28 +0200
+> Eric Farman <farman@linux.ibm.com> wrote:
 > 
-> Thanks Alex,
+> > Hi Conny, Matt, Halil,
+> > 
+> > Here's one (last?) update to my proposal for handling the collision
+> > between interrupts for START SUBCHANNEL and HALT/CLEAR SUBCHANNEL.
+> > 
+> > Only change here is to include Conny's suggestions on patch 3.
+> > 
+> > Thanks,
 > 
-> I think a better fix is this untested one below, though. If you can test
-> it out and confirm it also resolves the issue, then I'll add this patch
-> to the series.
+> I believe these changes are beneficial, although I don't understand
+> everything about them. In that sense I'm happy with the these getting
+> merged.
 > 
-> Thanks,
-> drew
+> Let me also spend some words answering the unasked question, what I'm
+> not understanding about these.
 > 
-> 
-> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-> index 95c418c10eb4..deafd5695c33 100644
-> --- a/arm/micro-bench.c
-> +++ b/arm/micro-bench.c
-> @@ -273,16 +273,22 @@ static void hvc_exec(void)
->         asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0");
->  }
->  
-> -static void mmio_read_user_exec(void)
-> +/*
-> + * FIXME: Read device-id in virtio mmio here in order to
-> + * force an exit to userspace. This address needs to be
-> + * updated in the future if any relevant changes in QEMU
-> + * test-dev are made.
-> + */
-> +static void *userspace_emulated_addr;
-> +
-> +static bool mmio_read_user_prep(void)
->  {
-> -       /*
-> -        * FIXME: Read device-id in virtio mmio here in order to
-> -        * force an exit to userspace. This address needs to be
-> -        * updated in the future if any relevant changes in QEMU
-> -        * test-dev are made.
-> -        */
-> -       void *userspace_emulated_addr = (void*)0x0a000008;
-> +       userspace_emulated_addr = (void*)ioremap(0x0a000008, 8);
-> +       return true;
-> +}
->  
-> +static void mmio_read_user_exec(void)
-> +{
->         readl(userspace_emulated_addr);
->  }
->  
-> @@ -309,14 +315,14 @@ struct exit_test {
->  };
->  
->  static struct exit_test tests[] = {
-> -       {"hvc",                 NULL,           hvc_exec,               NULL,           65536,          true},
-> -       {"mmio_read_user",      NULL,           mmio_read_user_exec,    NULL,           65536,          true},
-> -       {"mmio_read_vgic",      NULL,           mmio_read_vgic_exec,    NULL,           65536,          true},
-> -       {"eoi",                 NULL,           eoi_exec,               NULL,           65536,          true},
-> -       {"ipi",                 ipi_prep,       ipi_exec,               NULL,           65536,          true},
-> -       {"ipi_hw",              ipi_hw_prep,    ipi_exec,               NULL,           65536,          true},
-> -       {"lpi",                 lpi_prep,       lpi_exec,               NULL,           65536,          true},
-> -       {"timer_10ms",          timer_prep,     timer_exec,             timer_post,     256,            true},
-> +       {"hvc",                 NULL,                   hvc_exec,               NULL,           65536,          true},
-> +       {"mmio_read_user",      mmio_read_user_prep,    mmio_read_user_exec,    NULL,           65536,          true},
-> +       {"mmio_read_vgic",      NULL,                   mmio_read_vgic_exec,    NULL,           65536,          true},
-> +       {"eoi",                 NULL,                   eoi_exec,               NULL,           65536,          true},
-> +       {"ipi",                 ipi_prep,               ipi_exec,               NULL,           65536,          true},
-> +       {"ipi_hw",              ipi_hw_prep,            ipi_exec,               NULL,           65536,          true},
-> +       {"lpi",                 lpi_prep,               lpi_exec,               NULL,           65536,          true},
-> +       {"timer_10ms",          timer_prep,             timer_exec,             timer_post,     256,            true},
->  };
->  
->  struct ns_time {
->
+> Not understanding how the problem stated in the cover letter of v4 is
+> actually resolved is certainly the most important one. 
 
-I still haven't tested it (beyond compiling), but I've tweaked this a bit.
-You can see it here
+Per our phone call last week, one of Conny's suggestions from that
+particular version was related to vfio_ccw_sch_io_todo() and was giving
+me some difficulties. We all agreed that I should send what I had, and
+leave the other corner case(s) to be addressed later along with the
+broader serialization topic throughout the driver. That is still my
+intention, but I suspect that's where you are going here...
 
-https://gitlab.com/rhdrjones/kvm-unit-tests/-/commit/71938030d160e021db3388037d0d407df17e8e5e
+(I realize I said "last?" at the top here. Poor decision on my part.)
 
-The whole v4 of this series is here
+> Let me cite
+> the relevant part of it (your cover letter already contains a link to
+> the full version).
+> 
+> """
+> 
+> 	CPU 1			CPU 2
+>  1	CLEAR SUBCHANNEL
+>  2	fsm_irq()
+>  3				START SUBCHANNEL
+>  4	vfio_ccw_sch_io_todo()
+>  5				fsm_irq()
+>  6				vfio_ccw_sch_io_todo()
+> 
+> From the channel subsystem's point of view the CLEAR SUBCHANNEL (step
+> 1)
+> is complete once step 2 is called, as the Interrupt Response Block
+> (IRB)
+> has been presented and the TEST SUBCHANNEL was driven by the cio
+> layer.
+> Thus, the START SUBCHANNEL (step 3) is submitted [1] and gets a cc=0
+> to
+> indicate the I/O was accepted. However, step 2 stacks the bulk of the
+> actual work onto a workqueue for when the subchannel lock is NOT
+> held,
+> and is unqueued at step 4. That code misidentifies the data in the
+> IRB
+> as being associated with the newly active I/O, and may release memory
+> that is actively in use by the channel subsystem and/or device. Eww.
+> """
+> 
+> The last sentence clearly states "may release memory that is actively
+> used by ... the device", and I understood it refers to the invocation
+> of cp_free() from vfio_ccw_sch_io_todo(). Patch 3 of this series does
+> not change the conditions under which cp_free() is called.
 
-https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/efiprep
+Correct.
+
+> 
+> Looking at the cited diagram, since patch 3 changes things in
+> vfio_ccw_sch_io_todo() it probably ain't affecting steps 1-3 and
+> I understood the description so that bad free happens in step 4.
+
+You are correct that patch 3 touches vfio_ccw_sch_io_todo(), but it is
+not addressing the possibility of a bad free described in the old cover
+letter. The commit message for patch 3 describes pretty clearly the
+scenario in question.
+
+> 
+> My guess is that your change from patch 3 somehow via the fsm
+> prevents
+> the SSCH on CPU 2 (using the diagram) from being executed  if it
+> actually
+> happens to be after vfio_ccw_sch_io_todo(). 
+
+That's an incorrect guess. The code in vfio_ccw_sch_io_todo() today
+says "If another CPU is building an I/O (FSM is CP_PROCESSING), or
+there is no CPU building an I/O (FSM is IDLE), then skip the cp_free()
+call." The change in patch 3 says that in that situation, it should
+also not adjust the FSM state because the interrupt being handled on
+CPU1 was unrelated (maybe it was for a HALT/CLEAR, maybe it was an
+unsolicited interrupt). The SSCH on CPU2 will still go on as expected.
+
+> And patch 1 is supposed to
+> prevent the SSCH on CPU2 from being executed in the depicted case
+> because
+> if there is a cp to free, then we would bail out form if we see it
+> while processing the new IO request.
+
+Not really. It's the FSM's job to prevent a second SSCH, and route to
+fsm_io_retry() or fsm_io_busy() as appropriate. But the scenario
+described by patch 3 in this series would leave the cp initialized,
+while also resetting the FSM back to IDLE. As such, the FSM was free to
+allow another SSCH in, which would then re-initialize the cp and orphan
+the existing (active) cp resources.
+
+With the application of patch 3, that concern isn't present, so the
+change in patch 1 is really a NOP. But it allows for consistency in how
+the cp_*() functions are working, and a safety valve should this
+situation show up another way. (We'll get trace data that says
+cp_init() bailed out, rather than going on as if nothing were wrong.)
+
+> 
+> In any case, I don't want to hold this up any further.
+> 
+
+Thanks for that. You are correct that there's still a potential issue
+here, in the handoff between fsm_irq() and vfio_ccw_sch_io_todo(), and
+another fsm_io_request() that would arrive between those points. But
+it's not anything that we haven't already discussed, and will hopefully
+begin discussing in the next couple of weeks.
 
 Thanks,
-drew
+Eric
+
+> Regards,
+> Halil
 
