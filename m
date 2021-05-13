@@ -2,120 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6943637F0EC
-	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 03:30:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DCBF037F10C
+	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 03:58:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230048AbhEMBbt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 21:31:49 -0400
-Received: from smtp.bonedaddy.net ([45.33.94.42]:33298 "EHLO
-        smtp.bonedaddy.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229630AbhEMBbs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 21:31:48 -0400
-Received: from [192.168.1.209] (n49-190-168-235.per1.wa.optusnet.com.au [49.190.168.235])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pabs3@bonedaddy.net)
-        by smtp.bonedaddy.net (Postfix) with ESMTPSA id 75DC5180043;
-        Wed, 12 May 2021 21:31:12 -0400 (EDT)
-Authentication-Results: smtp.bonedaddy.net; dmarc=fail (p=none dis=none) header.from=bonedaddy.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bonedaddy.net;
-        s=mail; t=1620869477;
-        bh=jo6L1Lp7McpbL1Z7cGpI5dwqXVJEwyplDJ1NRFFYviA=;
-        h=Subject:From:To:Cc:In-Reply-To:References:Date;
-        b=LsxNjlV/IZszm2EOz/GRJeP3ns1jeQTNoK7R7ldZYkPbaCcdEo2Nu7e5020j5wg7X
-         p5RIQ9ADSISR+e7omHY35IiO9+kHvax3WU017wr9B+NqFrm4EIH6A0iwboZ61jjcLg
-         qtEXHowM7FuhoBhkFPfhDmdgcLjWguG6fIQM7ibnY9t0QU5bdZs8HSxrQUw0cxLm2B
-         NW80sl+JDrlVGW4PeqGbRHYKQekA6PrRZWmZD1whM2WiTpYRuiae84hyjaRJudrdB1
-         JRDeWuu2q/ekbOLQAJ+cEepU+ry0X54vONw60GPCi4BaSON2lZC7tGjtEyCSWTWVWC
-         Qgx8wBTWGFa3A==
-Message-ID: <ffbfcb73bfb7abb44cbe01db892bb492d80900c1.camel@bonedaddy.net>
-Subject: Re: [PATCH 0/6] sched,delayacct: Some cleanups
-From:   Paul Wise <pabs3@bonedaddy.net>
-To:     Mel Gorman <mgorman@suse.de>
-Cc:     Balbir Singh <bsingharora@gmail.com>,
-        Peter Zijlstra <peterz@infradead.org>, tglx@linutronix.de,
-        mingo@kernel.org, juri.lelli@redhat.com,
-        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-        rostedt@goodmis.org, bsegall@google.com, bristot@redhat.com,
-        pbonzini@redhat.com, maz@kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, riel@surriel.com, hannes@cmpxchg.org
-In-Reply-To: <20210512130058.GJ3672@suse.de>
-References: <20210505105940.190490250@infradead.org>
-         <20210505222940.GA4236@balbir-desktop>
-         <YJOzUAg30LZWSHcI@hirez.programming.kicks-ass.net>
-         <20210507123810.GB4236@balbir-desktop> <20210512113419.GF3672@suse.de>
-         <9524e77d054f380e4711eaf68344ebba2d1271be.camel@bonedaddy.net>
-         <20210512130058.GJ3672@suse.de>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-        protocol="application/pgp-signature"; boundary="=-oxFvlExZTgu9NltSQ5vc"
-Date:   Thu, 13 May 2021 09:29:38 +0800
-MIME-Version: 1.0
-User-Agent: Evolution 3.40.1-1 
+        id S229854AbhEMB7a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 21:59:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46474 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229801AbhEMB71 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 May 2021 21:59:27 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86107C061574;
+        Wed, 12 May 2021 18:58:17 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id c13so6829360pfv.4;
+        Wed, 12 May 2021 18:58:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=s6yds0eAnM4G0Wdu571RvhPi3TKjI+npGap0XFILkfE=;
+        b=klaPh4iM4ryJKcK4ak5Gfiffhss4QGvganMQRvxA3qZPdfc3DZscvNZalHS2iYY7l7
+         eh7k3GoMAAuKHe4bKB7A2eIgoI5YkAhZbeevFgMnQzAniRwfzgmKbrXup6XMFcuJXzuH
+         OTlFUIcDR5se3vDF+RbYMJYyBuY5lpPA70fczLto5JJvhn+VQnWUDFXrYzSWT9dJ2oC+
+         bYVn24RIOEWg2b48Qn3ScdJAyLMfMnOOUtnHVJqAmMP/lqcWIHUXK1eQJNwma3vxR9FZ
+         cSwcvzxAwEXITjApPsOQginDTlbi1fzYtvh0sB9yAoez58SOwXoF5cuRkZ6ZGJQIblYE
+         Qxbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=s6yds0eAnM4G0Wdu571RvhPi3TKjI+npGap0XFILkfE=;
+        b=dpfba45GmFGAh0uE1qSEakZRVq9vIFCvbZz3v4rq8I/ZyRQ/xRblrR5pdf6hHgwdh3
+         5blhSSVvu1drDNzHFIpPl4XvUzA7uctGho9Ow6Mxzwr/cgZhnF/y/ffqqWGpCszga/XN
+         /wHU5x2LuuDVyeiD4AdL12xfIDoXKYlFZtmmwz4bpvWYVZnW/+Rxe/F/Q4grxOwfDOUf
+         80CAJHgBWrYP10Q8uy9JE9GqwA6kcAUKe8VS+u2OEM/TzoJOX0yxBvYnrF6rQ/jYYnld
+         /1iWyop8ffVGau9hQIOBPk84fHEZgQ6aZd+Q5sfuT3x6M7c3GElQKRS6f3bvSAwePVT4
+         5m1A==
+X-Gm-Message-State: AOAM533Brl+1339A0uPd18e5vaL0d4PJGtRUCwxjA61qyDSuvK+zHWIr
+        bvwhQh9/FAj6clDw5ohADCpvWNfiJoo=
+X-Google-Smtp-Source: ABdhPJwlNz0fWh1ClQWl8HOGpto3Gg0232jmHcD6gUChaiSQ/a7krLx/KvJDva1shE16JBeioyGFvQ==
+X-Received: by 2002:a17:90a:fd95:: with SMTP id cx21mr1777447pjb.137.1620871096858;
+        Wed, 12 May 2021 18:58:16 -0700 (PDT)
+Received: from localhost.localdomain ([103.7.29.6])
+        by smtp.googlemail.com with ESMTPSA id b7sm799560pjq.36.2021.05.12.18.58.12
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 12 May 2021 18:58:15 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Ben Segall <bsegall@google.com>,
+        Venkatesh Srinivas <venkateshs@chromium.org>,
+        David Matlack <dmatlack@google.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Subject: [PATCH v2 1/4] KVM: PPC: Book3S HV: exit halt polling on need_resched() as well
+Date:   Thu, 13 May 2021 09:58:04 +0800
+Message-Id: <1620871084-4639-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Wanpeng Li <wanpengli@tencent.com>
 
---=-oxFvlExZTgu9NltSQ5vc
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Inspired by commit 262de4102c7bb8 (kvm: exit halt polling on need_resched()
+as well), CFS_BANDWIDTH throttling will use resched_task() when there is just
+one task to get the task to block. It was likely allowing VMs to overrun their
+quota when halt polling. Due to PPC implements an arch specific halt polling
+logic, we should add the need_resched() checking there as well.
 
-On Wed, 2021-05-12 at 14:00 +0100, Mel Gorman wrote:
+Cc: Ben Segall <bsegall@google.com>
+Cc: Venkatesh Srinivas <venkateshs@chromium.org>
+Cc: Jim Mattson <jmattson@google.com> 
+Cc: David Matlack <dmatlack@google.com>
+Cc: Paul Mackerras <paulus@ozlabs.org>
+Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+v1 -> v2:
+ * update patch description
 
-> If you send me the same patch, I can do submit a request to the devel
-> package for openSUSE. I don't have commit access but I would be surprised
-> if the package maintainer didn't accept the request. Obviously, I'll
-> build+boot a kernel that includes the final version of this series in
-> case of any naming changes or other oddities.
+ arch/powerpc/kvm/book3s_hv.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-At this point I'm not clear exactly what needs to be done and whether
-or not the details have been nailed down enough that it is time to
-commit the change to the iotop-py and iotop-c git repositories.
-
-I recommend upgrading the openSUSE iotop package to the latest git
-commit rather than just applying the latest patch on top.
-
-Alternatively, once the patch is applied I can probably overstep my
-permissions and add a tag to the iotop-py git repository, in case folks
-are happy to pull from the git repository instead of the website.
-
-> Good thinking. I'll open a bug on github when I've tested your iotop
-> patch so that the bug report is more coherent.
-
-OK, sounds good.
-
-PS: does Linux have a facility for userspace processes to convert
-syscall names to numbers for the currently running Linux kernel? I
-noticed that iotop-py just hard-codes the syscall numbers for
-ioprio_set and ioprio_get on common arches, missing newer arches.
-
---=20
-bye,
-pabs
-
-https://bonedaddy.net/pabs3/
-
---=-oxFvlExZTgu9NltSQ5vc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEYQsotVz8/kXqG1Y7MRa6Xp/6aaMFAmCcgP4ACgkQMRa6Xp/6
-aaPPXxAAkN9epwOw3XK0bdtOoltH0wOnGHPnNcyh8LeRjNyaNcIuz/m+g2s9M3dH
-s5SXKsNNJPj/UKQd+IA7zDE32qOwq+Vn2IspWjhJ7pLrcXIu8MNAcWoHyrJ3/Duo
-025aTp+XoNqEL0PUJ+plsnC+3sTYFBiMxobkXgOUiJD6qxTypTEAxFyw4byUhsZl
-2y4VPKFSWQy+oZwpWvmHiZ6W8h71iZzGrBDrhBpWEqvkx1Xeu4z317xZHYqAWSvR
-CGUVMGC5uYcZqnUFl0PNJ94fnKVcu1JL06gdPBsTLUfeK+n0aVVB+8ZUSrli5Wc1
-tcCGPG8XOdOFmDiPZX5xy1F7tdJl1uBTDYzB4r3+LcYJphrmOy13XTUmcgAtrqJk
-HF7FJLalkmJ4VHO6wWZtCzQVYTz36vXCZEtJJLd/3blScwP61kWyaNKc5jhvAN7J
-Cj2xAPg1kkD1SAR2QoCW2kQK8h9luA/oeYycRcm2Lk08R9krXVtwX5tzgQYwjn57
-QFiZJoicyFvEAEh/lZWdc+2HEXuYAfYp0BFqhxEn/PTImlEbm7jV7DzUAAR+5fRm
-eKm380DSQ1ZORqWwb92olgIiKfobLubUX/5b5iczSAu4ENgaHXjQ1Lrgp5WFR9nY
-h4VBFZiVXrjWOOlFJ0s7M1fhEKKYI41sc6e196mv38TG9NrZbwA=
-=t0Gt
------END PGP SIGNATURE-----
-
---=-oxFvlExZTgu9NltSQ5vc--
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 28a80d2..6199397 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -3936,7 +3936,8 @@ static void kvmppc_vcore_blocked(struct kvmppc_vcore *vc)
+ 				break;
+ 			}
+ 			cur = ktime_get();
+-		} while (single_task_running() && ktime_before(cur, stop));
++		} while (single_task_running() && !need_resched() &&
++			 ktime_before(cur, stop));
+ 
+ 		spin_lock(&vc->lock);
+ 		vc->vcore_state = VCORE_INACTIVE;
+-- 
+2.7.4
 
