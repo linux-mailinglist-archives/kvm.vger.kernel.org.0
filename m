@@ -2,135 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C01F37F113
-	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 04:00:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C03D737F16F
+	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 04:50:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230130AbhEMCBP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 May 2021 22:01:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46866 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230048AbhEMCBM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 May 2021 22:01:12 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3FD7C061574;
-        Wed, 12 May 2021 19:00:02 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id l70so5146412pga.1;
-        Wed, 12 May 2021 19:00:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=v/Eg2aLgMEl3C9DBh5TiPixhOAqZrBo8ju/YFJi/mRs=;
-        b=H0Vf/PzvX1Az7P3qelVGuIU3tInxn8PVF40BcYsq29zt+CjKyrEcg8OJGUm7V7Vw6z
-         8xLwCXBwBcfozuhpSdADU4XabIQxvQ0WL5ULDTgQrtmv24EfQk8CIFRyMQ8XFrec++ng
-         NU1EefB1Vg3LaDJ6AMhhqaYSWYB+ujA+1KiDdFgZWvD9FQirxc5J3cScWqA9eJDr6cfY
-         tKPuxK0fgiQzze8lQRkj01lDBuv1Fd/lmfJiLwLTX3CHqphuhql0kR4mB/wH4CJJ8dDG
-         bnuUjk40oFgvnzqtUYlTwdvEnks0ZWKMn2knaehUGKeXzeJ1pJBzkmxy8ol8js6uRwW2
-         v3Hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=v/Eg2aLgMEl3C9DBh5TiPixhOAqZrBo8ju/YFJi/mRs=;
-        b=AeC3/M+HSJda7iksqqEOyndFTTlxNmGF3vv3fjy+AFyoCcMXTbOpV5lju3Eb/0HcI6
-         Bk1yinnss1AzA0Z7d6bIb3zOX5yuv1pAGCkiP7kupp/KyZ7b9qDbPqdt58CmN97JMyUI
-         hycKyFfc+8pOFkt1a+uaLpUQm8ItHQqIbSTLDWEeaaT/r+aecsNOzFLS8PDxcl3q2SLP
-         IHFbUgxG/FtqiQ28P8BIStRWUuJ+F19FfI6heFpdd/zbh9WzvSNMLFjRYIPELbXfPSzS
-         UFdrqYrTtjWdc5oSdy8aoHPQSiHR0zWrlYMdu1gEAhb6W3vApt+Ge/Ic7oP19Ql6o0Jb
-         7Q4w==
-X-Gm-Message-State: AOAM530m1W8HfTMmPqrEJPCLRfpzp1plagUwOkYa54ZnKx2hn1IPIWsW
-        EtPQNm5rgdd4QSBwQXuMYSdn/jdsULA=
-X-Google-Smtp-Source: ABdhPJzibtVAUmXcXbhH3CJXurXNW/vy8qrWyWeimKensF9A9n0fD8mjbfb7Kpy+62MsfQ4hHemqVg==
-X-Received: by 2002:a17:90a:510d:: with SMTP id t13mr1782767pjh.1.1620871202379;
-        Wed, 12 May 2021 19:00:02 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id w123sm812742pfw.151.2021.05.12.19.00.00
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 12 May 2021 19:00:02 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        id S230364AbhEMCwE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 May 2021 22:52:04 -0400
+Received: from mga11.intel.com ([192.55.52.93]:15460 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229745AbhEMCwC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 May 2021 22:52:02 -0400
+IronPort-SDR: 6uSWLJ+A8r+KgKYftq3Ju/PH8PmJv7vBUYl8ODO/lBpUbdOtIOHAuoHLdZ1Dp6dILxDym4uuSD
+ 86RPaStwx0Zw==
+X-IronPort-AV: E=McAfee;i="6200,9189,9982"; a="196761692"
+X-IronPort-AV: E=Sophos;i="5.82,296,1613462400"; 
+   d="scan'208";a="196761692"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2021 19:50:50 -0700
+IronPort-SDR: 6rmxe/j+8FY1jJu5OoDnevBHx6jzZIeJxnDX74H92iE5f9tYHRRrAmOnvBnI4HGk3IYilCgBEo
+ R0Sdxsp62FqQ==
+X-IronPort-AV: E=Sophos;i="5.82,296,1613462400"; 
+   d="scan'208";a="623066848"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2021 19:50:44 -0700
+Subject: Re: [PATCH v6 04/16] KVM: x86/pmu: Set MSR_IA32_MISC_ENABLE_EMON bit
+ when vPMU is enabled
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Venkatesh Srinivas <venkateshs@chromium.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH v2 4/4] KVM: x86: hyper-v: Task srcu lock when accessing kvm_memslots()
-Date:   Thu, 13 May 2021 09:59:49 +0800
-Message-Id: <1620871189-4763-3-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1620871189-4763-1-git-send-email-wanpengli@tencent.com>
-References: <1620871189-4763-1-git-send-email-wanpengli@tencent.com>
+        Joerg Roedel <joro@8bytes.org>, weijiang.yang@intel.com,
+        Kan Liang <kan.liang@linux.intel.com>, ak@linux.intel.com,
+        wei.w.wang@intel.com, eranian@google.com, liuxiangdong5@huawei.com,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        Yao Yuan <yuan.yao@intel.com>,
+        Like Xu <like.xu@linux.intel.com>
+References: <20210511024214.280733-1-like.xu@linux.intel.com>
+ <20210511024214.280733-5-like.xu@linux.intel.com>
+ <CAA0tLErUFPnZ=SL82bLe8Ddf5rFu2Pdv5xE0aq4A91mzn9=ABA@mail.gmail.com>
+ <ead61a83-1534-a8a6-13ee-646898a6d1a9@intel.com>
+ <YJvx4tr2iXo4bQ/d@google.com>
+From:   "Xu, Like" <like.xu@intel.com>
+Message-ID: <5ef2215b-1c43-fc8a-42ef-46c22e093f40@intel.com>
+Date:   Thu, 13 May 2021 10:50:42 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
+MIME-Version: 1.0
+In-Reply-To: <YJvx4tr2iXo4bQ/d@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On 2021/5/12 23:18, Sean Christopherson wrote:
+> On Wed, May 12, 2021, Xu, Like wrote:
+>> Hi Venkatesh Srinivas,
+>>
+>> On 2021/5/12 9:58, Venkatesh Srinivas wrote:
+>>> On 5/10/21, Like Xu <like.xu@linux.intel.com> wrote:
+>>>> On Intel platforms, the software can use the IA32_MISC_ENABLE[7] bit to
+>>>> detect whether the processor supports performance monitoring facility.
+>>>>
+>>>> It depends on the PMU is enabled for the guest, and a software write
+>>>> operation to this available bit will be ignored.
+>>> Is the behavior that writes to IA32_MISC_ENABLE[7] are ignored (rather than #GP)
+>>> documented someplace?
+>> The bit[7] behavior of the real hardware on the native host is quite
+>> suspicious.
+> Ugh.  Can you file an SDM bug to get the wording and accessibility updated?  The
+> current phrasing is a mess:
+>
+>    Performance Monitoring Available (R)
+>    1 = Performance monitoring enabled.
+>    0 = Performance monitoring disabled.
+>
+> The (R) is ambiguous because most other entries that are read-only use (RO), and
+> the "enabled vs. disabled" implies the bit is writable and really does control
+> the PMU.  But on my Haswell system, it's read-only.
 
-   WARNING: suspicious RCU usage
-   5.13.0-rc1 #4 Not tainted
-   -----------------------------
-   ./include/linux/kvm_host.h:710 suspicious rcu_dereference_check() usage!
-  
-  other info that might help us debug this:
-  
-  rcu_scheduler_active = 2, debug_locks = 1
-   1 lock held by hyperv_clock/8318:
-    #0: ffffb6b8cb05a7d8 (&hv->hv_lock){+.+.}-{3:3}, at: kvm_hv_invalidate_tsc_page+0x3e/0xa0 [kvm]
-  
-  stack backtrace:
-  CPU: 3 PID: 8318 Comm: hyperv_clock Not tainted 5.13.0-rc1 #4
-  Call Trace:
-   dump_stack+0x87/0xb7
-   lockdep_rcu_suspicious+0xce/0xf0
-   kvm_write_guest_page+0x1c1/0x1d0 [kvm]
-   kvm_write_guest+0x50/0x90 [kvm]
-   kvm_hv_invalidate_tsc_page+0x79/0xa0 [kvm]
-   kvm_gen_update_masterclock+0x1d/0x110 [kvm]
-   kvm_arch_vm_ioctl+0x2a7/0xc50 [kvm]
-   kvm_vm_ioctl+0x123/0x11d0 [kvm]
-   __x64_sys_ioctl+0x3ed/0x9d0
-   do_syscall_64+0x3d/0x80
-   entry_SYSCALL_64_after_hwframe+0x44/0xae
+On your Haswell system, does it cause #GP or just silent if you change this 
+bit ?
 
-kvm_memslots() will be called by kvm_write_guest(), so we should take the srcu lock.
+> Assuming the bit is supposed
+> to be a read-only "PMU supported bit", the SDM should be:
+>
+>    Performance Monitoring Available (RO)
+>    1 = Performance monitoring supported.
+>    0 = Performance monitoring not supported.
+>
+> And please update the changelog to explain the "why" of whatever the behavior
+> ends up being.  The "what" is obvious from the code.
 
-Fixes: e880c6ea5 (KVM: x86: hyper-v: Prevent using not-yet-updated TSC page by secondary CPUs)
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/hyperv.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Thanks for your "why" comment.
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index f98370a3..f00830e 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1172,6 +1172,7 @@ void kvm_hv_invalidate_tsc_page(struct kvm *kvm)
- {
- 	struct kvm_hv *hv = to_kvm_hv(kvm);
- 	u64 gfn;
-+	int idx;
- 
- 	if (hv->hv_tsc_page_status == HV_TSC_PAGE_BROKEN ||
- 	    hv->hv_tsc_page_status == HV_TSC_PAGE_UNSET ||
-@@ -1190,9 +1191,16 @@ void kvm_hv_invalidate_tsc_page(struct kvm *kvm)
- 	gfn = hv->hv_tsc_page >> HV_X64_MSR_TSC_REFERENCE_ADDRESS_SHIFT;
- 
- 	hv->tsc_ref.tsc_sequence = 0;
-+
-+	/*
-+	 * Take the srcu lock as memslots will be accessed to check the gfn
-+	 * cache generation against the memslots generation.
-+	 */
-+	idx = srcu_read_lock(&kvm->srcu);
- 	if (kvm_write_guest(kvm, gfn_to_gpa(gfn),
- 			    &hv->tsc_ref, sizeof(hv->tsc_ref.tsc_sequence)))
- 		hv->hv_tsc_page_status = HV_TSC_PAGE_BROKEN;
-+	srcu_read_unlock(&kvm->srcu, idx);
- 
- out_unlock:
- 	mutex_unlock(&hv->hv_lock);
--- 
-2.7.4
+>
+>> To keep the semantics consistent and simple, we propose ignoring write
+>> operation in the virtualized world, since whether or not to expose PMU is
+>> configured by the hypervisor user space and not by the guest side.
+> Making up our own architectural behavior because it's convient is not a good
+> idea.
+
+Sometime we do change it.
+
+For example, the scope of some msrs may be "core level share"
+but we likely keep it as a "thread level" variable in the KVM out of 
+convenience.
+
+>
+>>>> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+>>>> index 9efc1a6b8693..d9dbebe03cae 100644
+>>>> --- a/arch/x86/kvm/vmx/pmu_intel.c
+>>>> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+>>>> @@ -488,6 +488,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>>>>    	if (!pmu->version)
+>>>>    		return;
+>>>>
+>>>> +	vcpu->arch.ia32_misc_enable_msr |= MSR_IA32_MISC_ENABLE_EMON;
+> Hmm, normally I would say overwriting the guest's value is a bad idea, but if
+> the bit really is a read-only "PMU supported" bit, then this is the correct
+> behavior, albeit weird if userspace does a late CPUID update (though that's
+> weird no matter what).
+>
+>>>>    	perf_get_x86_pmu_capability(&x86_pmu);
+>>>>
+>>>>    	pmu->nr_arch_gp_counters = min_t(int, eax.split.num_counters,
+>>>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>>>> index 5bd550eaf683..abe3ea69078c 100644
+>>>> --- a/arch/x86/kvm/x86.c
+>>>> +++ b/arch/x86/kvm/x86.c
+>>>> @@ -3211,6 +3211,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct
+>>>> msr_data *msr_info)
+>>>>    		}
+>>>>    		break;
+>>>>    	case MSR_IA32_MISC_ENABLE:
+>>>> +		data &= ~MSR_IA32_MISC_ENABLE_EMON;
+> However, this is not.  If it's a read-only bit, then toggling the bit should
+> cause a #GP.
+
+The proposal here is trying to make it as an
+unchangeable bit and don't make it #GP if guest changes it.
+
+It may different from the host behavior but
+it doesn't cause potential issue if some guest code
+changes it during the use of performance monitoring.
+
+Does this make sense to you or do you want to
+keep it strictly the same as the host side?
+
+>
+>>>>    		if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT)
+>>>> &&
+>>>>    		    ((vcpu->arch.ia32_misc_enable_msr ^ data) &
+>>>> MSR_IA32_MISC_ENABLE_MWAIT)) {
+>>>>    			if (!guest_cpuid_has(vcpu, X86_FEATURE_XMM3))
+>>>> --
 
