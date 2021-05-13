@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DDE537FB97
-	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 18:35:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D750537FB9F
+	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 18:36:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232830AbhEMQg5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 May 2021 12:36:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34673 "EHLO
+        id S234449AbhEMQhI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 May 2021 12:37:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58980 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231426AbhEMQgz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 May 2021 12:36:55 -0400
+        by vger.kernel.org with ESMTP id S231426AbhEMQhC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 May 2021 12:37:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620923745;
+        s=mimecast20190719; t=1620923752;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5HrVbwO+VE4oyzQrEPviFjY8sp2t1UYH70BSy60jRL4=;
-        b=PaOwxaLowTYIeEz9QimR5255Ukg2fCX3dehILBSE4vbGKvOkxtG9bJ5C3K4t4LdJ2yg6PO
-        nP2DQFj86vqWxTcJOHB97kWr0qk2/3I6UoGFb+I9V3U5IxGeFV0QQ4xa3rgMi1xWA4McoZ
-        0jDnAnFzHEu93/PHTw1k4yxoA982uJ0=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-394-CcTnYQZINa-v31E4j5Sa1A-1; Thu, 13 May 2021 12:35:42 -0400
-X-MC-Unique: CcTnYQZINa-v31E4j5Sa1A-1
-Received: by mail-ej1-f72.google.com with SMTP id x20-20020a1709061354b02903cff4894505so1986001ejb.14
-        for <kvm@vger.kernel.org>; Thu, 13 May 2021 09:35:42 -0700 (PDT)
+        bh=kZ77CPDQCWHApSin0O86NHXUuwmt8f5sZg8WC9FiUak=;
+        b=S6kUTWZ5V0czPJiMiB0iXiuikqL2yLZQ6cABCWsjN+xapaDqoCJYb36pEElYzSbegleGPp
+        rIBxmz1kOrJWywKco/9GkIkLJDYp3za87Wgurkpnm7p4F+k4nnaa3RMhJ65ZvZroNZl90/
+        Ky0bjvppKnmBB+sB+y/ww13lRmrBDTI=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-324-0PcrqlD2MUi7akjtyo7v6Q-1; Thu, 13 May 2021 12:35:48 -0400
+X-MC-Unique: 0PcrqlD2MUi7akjtyo7v6Q-1
+Received: by mail-ed1-f72.google.com with SMTP id s20-20020a0564025214b029038752a2d8f3so14917733edd.2
+        for <kvm@vger.kernel.org>; Thu, 13 May 2021 09:35:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=5HrVbwO+VE4oyzQrEPviFjY8sp2t1UYH70BSy60jRL4=;
-        b=NP4pd/lcPf//QQ9nwSHYg1n4C6unAMsLg1wm9RcXrpaVb7PfUSvKQAD/52De8d4bm8
-         zuzK8zi0mi/VzHZlqIaUU4Qi3BwoNswT39zXkaanJkzJmw1B9N7tpXpfwYyHFaLyLHEn
-         KKASbVJ7Dtiw6J8zZ3AHJeVaW8aQpzn/0F2/yZ4qUCMnd/0+NS+bvBTTuxkBnHDsVu5v
-         4WB93/bVOoA7qakKrqubtK7GR0OZ55Mm3MbSou8XaKdqWSX6QeljeOeaAazLh/F7p5TZ
-         bgpEr7x4RzbKbQlzYA2SDoMUmjPqy+bhgIgDhQrrq+w3oahPFIP/L0seDW2WCIfmYcuR
-         iAQw==
-X-Gm-Message-State: AOAM531MVdA60Y6of3i/PZtmg3Tyk/OsI/01jksBmUF5K2UlpV6e6Ang
-        kx5sO0HlLOwfaE0BL2p4cG9a75PpgwYLujVcvBhVk8hrNCcdEhYj2v8a7QxGLuyjlSo51R5eVmU
-        bn96eO3HvKVwz
-X-Received: by 2002:a17:907:ea6:: with SMTP id ho38mr10193323ejc.357.1620923741768;
-        Thu, 13 May 2021 09:35:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwXb/9QsvsqLto0pGHud1wiAIE7ubr/qD3vpjWKQAlsYp0w3XIiyfbDS7jp+PbvT8HJkC8imA==
-X-Received: by 2002:a17:907:ea6:: with SMTP id ho38mr10193312ejc.357.1620923741563;
-        Thu, 13 May 2021 09:35:41 -0700 (PDT)
+        bh=kZ77CPDQCWHApSin0O86NHXUuwmt8f5sZg8WC9FiUak=;
+        b=YRJtLr1rVsnrU7ehV4DkSMjLl8BhpnaTnTFwLz9tEfVKb5DoLVY2ozamoXUz4wc5bb
+         uddmeeUHTBemUdkHjnYLxONXxW8OAwoPjF0M3UlW3AFJMa4qHditD95PpGAkQwoYtOMr
+         atTGjMrdTZjheYEZ4w+Shcx1QmQN3fooYyUBWuIGAZX/iA5RY4D87Wl3pq2hXd3cA/NT
+         42beUSOlWHL1j5SHM8Kk0Wol/Kk8hjtxbnwaUNmISOZfcrd2cF7GT2qhcMGPUMqvYsJu
+         5+Z7uu/oA+ITOzGpDJFyIR3ZkmQtK/tizr5UyZ32N7fYYhYL/B4ozFFqEOez/Y27j1wp
+         sAdg==
+X-Gm-Message-State: AOAM530H0NI2LlAACNKdxaf1Rm13CcJ2Xdy3r8eu0ZW6Cj9nbIrwqs4j
+        xe9WaTyqScz717RndTRutaZF39AMeXOnwFsHId/GnL4wgqm2ApcxfCR+VWYz7M+dh6dbZvv5p70
+        6q8RvCSI4pfCb
+X-Received: by 2002:a17:906:46d1:: with SMTP id k17mr693710ejs.77.1620923747338;
+        Thu, 13 May 2021 09:35:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxS6Pt791axtI35PQLbrHu9L0hFxJm7VU4Ud3O66odghaW1DrdgeNPkrDDn/UEQrWtvK2AwDg==
+X-Received: by 2002:a17:906:46d1:: with SMTP id k17mr693694ejs.77.1620923747140;
+        Thu, 13 May 2021 09:35:47 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id t9sm2791788edf.70.2021.05.13.09.35.40
+        by smtp.gmail.com with ESMTPSA id bn5sm2078704ejb.97.2021.05.13.09.35.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 May 2021 09:35:40 -0700 (PDT)
+        Thu, 13 May 2021 09:35:46 -0700 (PDT)
 Subject: Re: [PATCH] kvm: x86: Don't dirty guest memory on every vcpu_put()
 To:     Ben Gardon <bgardon@google.com>,
         Sean Christopherson <seanjc@google.com>
@@ -64,8 +64,8 @@ References: <20200116001635.174948-1-jmattson@google.com>
  <YJxf+ho/iu8Gpw6+@google.com>
  <CANgfPd8cujDpRBdD_XBC9h6Q8ijioXHuBUGZ-mBBGBAGHRBt6A@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <788f634a-f0d8-75ab-1b40-ae65ee738879@redhat.com>
-Date:   Thu, 13 May 2021 18:35:39 +0200
+Message-ID: <6bef99fe-b4ac-63fe-b9c2-d20b9ad7c5a9@redhat.com>
+Date:   Thu, 13 May 2021 18:35:45 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.1
 MIME-Version: 1.0
@@ -84,7 +84,7 @@ On 13/05/21 18:14, Ben Gardon wrote:
 > 
 
 I usually try to send CVE/embargoed patches after the fact to the list, 
-using with an [FYI PATCH] prefix.
+using an [FYI PATCH] prefix.
 
 Paolo
 
