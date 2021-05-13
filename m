@@ -2,345 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A51BA37F36B
-	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 09:09:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 70CFD37F397
+	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 09:35:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230307AbhEMHKR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 May 2021 03:10:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36795 "EHLO
+        id S230521AbhEMHgx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 May 2021 03:36:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44563 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230446AbhEMHKP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 May 2021 03:10:15 -0400
+        by vger.kernel.org with ESMTP id S230443AbhEMHgu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 May 2021 03:36:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620889742;
+        s=mimecast20190719; t=1620891340;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=9usj50MtvJNZrPn7VPWPHTVgDdE2NT6kjUBfP8NNeYI=;
-        b=KO4MXa5kgyes3bPQ7mdTfaUU8pENn583CgmhyounwXqteG+6t8TFcLc685khBYQFeRg+vz
-        k4UsI6aa0qfjoc15k8Rtsoji9nyosQslTYwCfaOYkRP6XEQqKddITxaf8DA/5GbI6VGXH2
-        awlvxMxiZXmzdvHDT88xxy0VmDRuwUo=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-562-_dyjjJ_aNPuAd-69LugzUQ-1; Thu, 13 May 2021 03:09:01 -0400
-X-MC-Unique: _dyjjJ_aNPuAd-69LugzUQ-1
-Received: by mail-ej1-f72.google.com with SMTP id z6-20020a17090665c6b02903700252d1ccso8019702ejn.10
-        for <kvm@vger.kernel.org>; Thu, 13 May 2021 00:09:00 -0700 (PDT)
+        bh=zTEQQXsAJQxZUo5zOYVOBC+x54vGh0Ue0rC0kRz9wp8=;
+        b=GvSFwA75ZZAscu9I2FhpmKHWO7Pfd89FeMGYOBB44QeNYuynOIOfa678ylPJ1iwgJaz7N7
+        PBz+5apFDXmo2fqdpHQw5GMghCUCBkKsSYs55uJoKh1hVWqE7Gn1jCmxv/G0Hh1qKnwvcE
+        tke0lcaujWEFhQcUgn4juyJKl6pmi6E=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-222-73URZ9gNNdGK1nu74GoObA-1; Thu, 13 May 2021 03:35:38 -0400
+X-MC-Unique: 73URZ9gNNdGK1nu74GoObA-1
+Received: by mail-ed1-f70.google.com with SMTP id d8-20020a0564020008b0290387d38e3ce0so14200834edu.1
+        for <kvm@vger.kernel.org>; Thu, 13 May 2021 00:35:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=9usj50MtvJNZrPn7VPWPHTVgDdE2NT6kjUBfP8NNeYI=;
-        b=ZNy4kI1aS7btQYFREwFWi7byRXHPEGuxYHwyo/FWLp3/Oks0AnF23zJRdwsbhmQvtT
-         FdTxzNA/8KrCvLz6P3AEd2UK2AAE9I6LV+uCdX8Y5eFAWlj+dz1mHeCeA/0uiyljh4/G
-         izZmDWmkwgBtV23hx+NjIev2FL5ndpLHHkMtdHywD0XsW+hXxhgQYZTFW2CKGDJ5X2RH
-         IgOqBGoRLcl6KHNlfZfgN6UsbvW3UOHzr4pxFh3yBI/ZHC35hUe2iOWOxJH6W2kGccDM
-         eWmZ4zVC4UCI0KPHyi9uXGgx0s/GpdZbbMEDmSE1e7hpFB6sIS4krzf7FgQQftf3TTbY
-         XBvQ==
-X-Gm-Message-State: AOAM530k5JX+0ZwYyarGRSZGxCK2lmlj0m+NIT8JOly/4JBZmnyl9I0c
-        efJHQI+Hc7yLePZrEtCyzRyxnTP4sRYPgN9ClbHLeku9M6ddMEIyCVvWy7Xzty29O2gxl6Ti0Ro
-        5JBW3lR3Rt3hI
-X-Received: by 2002:a17:906:fa81:: with SMTP id lt1mr10750752ejb.465.1620889739849;
-        Thu, 13 May 2021 00:08:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyx5VvIYnhAblRSN0554BDcFFSCB7D9Hn8SRhAhxDBW0qBHK0QgWPhX435WrhxM8fOs5RDTvw==
-X-Received: by 2002:a17:906:fa81:: with SMTP id lt1mr10750730ejb.465.1620889739639;
-        Thu, 13 May 2021 00:08:59 -0700 (PDT)
+        bh=zTEQQXsAJQxZUo5zOYVOBC+x54vGh0Ue0rC0kRz9wp8=;
+        b=OrNtT5IXQYYTYbdCU8l6K+ptf99r99mzW9wrKDJkrEWgfqgLeogYjuOeYbeo4FXN9M
+         aUU3rWzXYyku5VWlZrZUuL7wvTdwEEH4+9oY2uiY1j1pPLkS2EjsnwAVKVvjLinsxVsg
+         TglFUXRpsXVz/9Pl/JhQ+ZAsKkfl1kPOZzJfsUP9oFcHFP8KmDW/S7xcOhpg6ldrcLsb
+         9XHkcdmHWeuFVnTxQQPQtHp7kvI41J9X2w0SQj/HNnBSlpBnzr9K7r4XD4gpEOo08Rad
+         Ol91JkJuCLcaaaUQvPoGXl0lnDwikpAhEpGhc6gdLPIO7+H7q2b63IlIR5IRxAMpmU3J
+         bOKg==
+X-Gm-Message-State: AOAM530jPS/i9PcggYHsKN03BlLy/v+/VRlbVmviXYSMHv7mV3GBz100
+        apSKt0NodGFUFRDfrO//DbEQi7reIT/uxeG6bn7Rpiw6wyKEGDJBfF3VJVJZiBCp0+XdsKg94pW
+        kKKZT0TNxsIXH
+X-Received: by 2002:a05:6402:1547:: with SMTP id p7mr48873025edx.319.1620891337765;
+        Thu, 13 May 2021 00:35:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy4fQrV1jLbyyYnaAc4rghuBIVhv9b9kqKDT7Ao5odjIT9s+5ushZxRP+CITFR79rGJjFXT+w==
+X-Received: by 2002:a05:6402:1547:: with SMTP id p7mr48873016edx.319.1620891337666;
+        Thu, 13 May 2021 00:35:37 -0700 (PDT)
 Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id ga12sm1302177ejc.13.2021.05.13.00.08.58
+        by smtp.gmail.com with ESMTPSA id da25sm1869559edb.38.2021.05.13.00.35.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 May 2021 00:08:59 -0700 (PDT)
-Date:   Thu, 13 May 2021 09:08:57 +0200
+        Thu, 13 May 2021 00:35:37 -0700 (PDT)
+Date:   Thu, 13 May 2021 09:35:30 +0200
 From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, nikos.nikoleris@arm.com,
-        andre.przywara@arm.com, eric.auger@redhat.com
-Subject: Re: [PATCH kvm-unit-tests v3 8/8] arm/arm64: psci: Don't assume
- method is hvc
-Message-ID: <20210513070857.z22utxgp3vooar7u@gator>
-References: <20210429164130.405198-1-drjones@redhat.com>
- <20210429164130.405198-9-drjones@redhat.com>
- <3dd4b8f6-612d-e0c0-f5b5-d8a380213a1d@arm.com>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        pbonzini@redhat.com, maz@kernel.org, alexandru.elisei@arm.com,
+        eric.auger@redhat.com
+Subject: Re: [PATCH v3 3/5] KVM: selftests: Move GUEST_ASSERT_EQ to utils
+ header
+Message-ID: <20210513073530.ajehgqt55o4faxul@gator>
+References: <20210513002802.3671838-1-ricarkol@google.com>
+ <20210513002802.3671838-4-ricarkol@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3dd4b8f6-612d-e0c0-f5b5-d8a380213a1d@arm.com>
+In-Reply-To: <20210513002802.3671838-4-ricarkol@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 12, 2021 at 05:14:24PM +0100, Alexandru Elisei wrote:
-> Hi Drew,
+On Wed, May 12, 2021 at 05:28:00PM -0700, Ricardo Koller wrote:
+> Move GUEST_ASSERT_EQ to a common header, kvm_util.h, for other
+> architectures and tests to use. Also modify __GUEST_ASSERT so it can be
+> reused to implement GUEST_ASSERT_EQ.
 > 
-> On 4/29/21 5:41 PM, Andrew Jones wrote:
-> > The method can be smc in addition to hvc, and it will be when running
-> > on bare metal. Additionally, we move the invocations to assembly so
-> > we don't have to rely on compiler assumptions. We also fix the
-> > prototype of psci_invoke. It should return long, not int, and
-> > function_id should be an unsigned int, not an unsigned long.
-> 
-> Sorry to harp on this again, but to be honest, it's still not clear to me why the
-> psci_invoke_{hvc,smc} functions return a long int.
-> 
-> If we only expect the PSCI functions to return error codes, then the PSCI spec
-> says these are 32-bit signed integers. If we want to support PSCI functions
-> returning other values, like PSCI_STAT_{RESIDENCY,COUNT}, then the invoke
-> functions should return an unsigned value.
-> 
-> The only case we're supporting is the error return for the SMC calling convention
-> (which says that error codes are 32/64bit signed integers).
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  .../testing/selftests/kvm/include/kvm_util.h  | 22 ++++++++++---------
+>  .../selftests/kvm/x86_64/tsc_msrs_test.c      |  9 --------
+>  2 files changed, 12 insertions(+), 19 deletions(-)
+>
 
-psci_invoke_{hvc,smc} should implement the SMC calling convention, since
-they're just wrapping the smc/hvc call. PSCI calls that build on that,
-e.g. psci_cpu_on, can define their own return type and then translate
-the signed long returned by SMC into, e.g. 32-bit signed integers. Indeed
-that's what psci_cpu_on does.
-
-I would write something like that in the commit message or rename
-psci_invoke to smc_invoke.
-
-Thanks,
-drew
-
-> Since the commit
-> specifically mentions this change, I think some explanation why this width was
-> chosen would be appropriate. Unless it's painfully obvious and I'm just not seeing
-> it, which is a possibility.
-> 
-> Other than that, the patch looks good. I'll some tests to make sure everything is
-> in order.
-> 
-> Thanks,
-> 
-> Alex
-> 
-> >
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> >  arm/cstart.S       | 22 ++++++++++++++++++++++
-> >  arm/cstart64.S     | 22 ++++++++++++++++++++++
-> >  arm/selftest.c     | 34 +++++++---------------------------
-> >  lib/arm/asm/psci.h | 10 ++++++++--
-> >  lib/arm/psci.c     | 35 +++++++++++++++++++++++++++--------
-> >  lib/arm/setup.c    |  2 ++
-> >  6 files changed, 88 insertions(+), 37 deletions(-)
-> >
-> > diff --git a/arm/cstart.S b/arm/cstart.S
-> > index 446966de350d..2401d92cdadc 100644
-> > --- a/arm/cstart.S
-> > +++ b/arm/cstart.S
-> > @@ -95,6 +95,28 @@ start:
-> >  
-> >  .text
-> >  
-> > +/*
-> > + * psci_invoke_hvc / psci_invoke_smc
-> > + *
-> > + * Inputs:
-> > + *   r0 -- function_id
-> > + *   r1 -- arg0
-> > + *   r2 -- arg1
-> > + *   r3 -- arg2
-> > + *
-> > + * Outputs:
-> > + *   r0 -- return code
-> > + */
-> > +.globl psci_invoke_hvc
-> > +psci_invoke_hvc:
-> > +	hvc	#0
-> > +	mov	pc, lr
-> > +
-> > +.globl psci_invoke_smc
-> > +psci_invoke_smc:
-> > +	smc	#0
-> > +	mov	pc, lr
-> > +
-> >  enable_vfp:
-> >  	/* Enable full access to CP10 and CP11: */
-> >  	mov	r0, #(3 << 22 | 3 << 20)
-> > diff --git a/arm/cstart64.S b/arm/cstart64.S
-> > index 42ba3a3ca249..e4ab7d06251e 100644
-> > --- a/arm/cstart64.S
-> > +++ b/arm/cstart64.S
-> > @@ -109,6 +109,28 @@ start:
-> >  
-> >  .text
-> >  
-> > +/*
-> > + * psci_invoke_hvc / psci_invoke_smc
-> > + *
-> > + * Inputs:
-> > + *   w0 -- function_id
-> > + *   x1 -- arg0
-> > + *   x2 -- arg1
-> > + *   x3 -- arg2
-> > + *
-> > + * Outputs:
-> > + *   x0 -- return code
-> > + */
-> > +.globl psci_invoke_hvc
-> > +psci_invoke_hvc:
-> > +	hvc	#0
-> > +	ret
-> > +
-> > +.globl psci_invoke_smc
-> > +psci_invoke_smc:
-> > +	smc	#0
-> > +	ret
-> > +
-> >  get_mmu_off:
-> >  	adrp	x0, auxinfo
-> >  	ldr	x0, [x0, :lo12:auxinfo + 8]
-> > diff --git a/arm/selftest.c b/arm/selftest.c
-> > index 4495b161cdd5..9f459ed3d571 100644
-> > --- a/arm/selftest.c
-> > +++ b/arm/selftest.c
-> > @@ -400,33 +400,13 @@ static void check_vectors(void *arg __unused)
-> >  	exit(report_summary());
-> >  }
-> >  
-> > -static bool psci_check(void)
-> > +static void psci_print(void)
-> >  {
-> > -	const struct fdt_property *method;
-> > -	int node, len, ver;
-> > -
-> > -	node = fdt_node_offset_by_compatible(dt_fdt(), -1, "arm,psci-0.2");
-> > -	if (node < 0) {
-> > -		printf("PSCI v0.2 compatibility required\n");
-> > -		return false;
-> > -	}
-> > -
-> > -	method = fdt_get_property(dt_fdt(), node, "method", &len);
-> > -	if (method == NULL) {
-> > -		printf("bad psci device tree node\n");
-> > -		return false;
-> > -	}
-> > -
-> > -	if (len < 4 || strcmp(method->data, "hvc") != 0) {
-> > -		printf("psci method must be hvc\n");
-> > -		return false;
-> > -	}
-> > -
-> > -	ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-> > -	printf("PSCI version %d.%d\n", PSCI_VERSION_MAJOR(ver),
-> > -				       PSCI_VERSION_MINOR(ver));
-> > -
-> > -	return true;
-> > +	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-> > +	report_info("PSCI version: %d.%d", PSCI_VERSION_MAJOR(ver),
-> > +					  PSCI_VERSION_MINOR(ver));
-> > +	report_info("PSCI method: %s", psci_invoke == psci_invoke_hvc ?
-> > +				       "hvc" : "smc");
-> >  }
-> >  
-> >  static void cpu_report(void *data __unused)
-> > @@ -465,7 +445,7 @@ int main(int argc, char **argv)
-> >  
-> >  	} else if (strcmp(argv[1], "smp") == 0) {
-> >  
-> > -		report(psci_check(), "PSCI version");
-> > +		psci_print();
-> >  		on_cpus(cpu_report, NULL);
-> >  		while (!cpumask_full(&ready))
-> >  			cpu_relax();
-> > diff --git a/lib/arm/asm/psci.h b/lib/arm/asm/psci.h
-> > index 7b956bf5987d..f87fca0422cc 100644
-> > --- a/lib/arm/asm/psci.h
-> > +++ b/lib/arm/asm/psci.h
-> > @@ -3,8 +3,14 @@
-> >  #include <libcflat.h>
-> >  #include <linux/psci.h>
-> >  
-> > -extern int psci_invoke(unsigned long function_id, unsigned long arg0,
-> > -		       unsigned long arg1, unsigned long arg2);
-> > +typedef long (*psci_invoke_fn)(unsigned int function_id, unsigned long arg0,
-> > +			       unsigned long arg1, unsigned long arg2);
-> > +extern psci_invoke_fn psci_invoke;
-> > +extern long psci_invoke_hvc(unsigned int function_id, unsigned long arg0,
-> > +			    unsigned long arg1, unsigned long arg2);
-> > +extern long psci_invoke_smc(unsigned int function_id, unsigned long arg0,
-> > +			    unsigned long arg1, unsigned long arg2);
-> > +extern void psci_set_conduit(void);
-> >  extern int psci_cpu_on(unsigned long cpuid, unsigned long entry_point);
-> >  extern void psci_system_reset(void);
-> >  extern int cpu_psci_cpu_boot(unsigned int cpu);
-> > diff --git a/lib/arm/psci.c b/lib/arm/psci.c
-> > index 936c83948b6a..3053b3041c28 100644
-> > --- a/lib/arm/psci.c
-> > +++ b/lib/arm/psci.c
-> > @@ -6,22 +6,21 @@
-> >   *
-> >   * This work is licensed under the terms of the GNU LGPL, version 2.
-> >   */
-> > +#include <devicetree.h>
-> >  #include <asm/psci.h>
-> >  #include <asm/setup.h>
-> >  #include <asm/page.h>
-> >  #include <asm/smp.h>
-> >  
-> > -__attribute__((noinline))
-> > -int psci_invoke(unsigned long function_id, unsigned long arg0,
-> > -		unsigned long arg1, unsigned long arg2)
-> > +static long psci_invoke_none(unsigned int function_id, unsigned long arg0,
-> > +			     unsigned long arg1, unsigned long arg2)
-> >  {
-> > -	asm volatile(
-> > -		"hvc #0"
-> > -	: "+r" (function_id)
-> > -	: "r" (arg0), "r" (arg1), "r" (arg2));
-> > -	return function_id;
-> > +	printf("No PSCI method configured! Can't invoke...\n");
-> > +	return PSCI_RET_NOT_PRESENT;
-> >  }
-> >  
-> > +psci_invoke_fn psci_invoke = psci_invoke_none;
-> > +
-> >  int psci_cpu_on(unsigned long cpuid, unsigned long entry_point)
-> >  {
-> >  #ifdef __arm__
-> > @@ -56,3 +55,23 @@ void psci_system_off(void)
-> >  	int err = psci_invoke(PSCI_0_2_FN_SYSTEM_OFF, 0, 0, 0);
-> >  	printf("CPU%d unable to do system off (error = %d)\n", smp_processor_id(), err);
-> >  }
-> > +
-> > +void psci_set_conduit(void)
-> > +{
-> > +	const void *fdt = dt_fdt();
-> > +	const struct fdt_property *method;
-> > +	int node, len;
-> > +
-> > +	node = fdt_node_offset_by_compatible(fdt, -1, "arm,psci-0.2");
-> > +	assert_msg(node >= 0, "PSCI v0.2 compatibility required");
-> > +
-> > +	method = fdt_get_property(fdt, node, "method", &len);
-> > +	assert(method != NULL && len == 4);
-> > +
-> > +	if (strcmp(method->data, "hvc") == 0)
-> > +		psci_invoke = psci_invoke_hvc;
-> > +	else if (strcmp(method->data, "smc") == 0)
-> > +		psci_invoke = psci_invoke_smc;
-> > +	else
-> > +		assert_msg(false, "Unknown PSCI conduit: %s", method->data);
-> > +}
-> > diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> > index 86f054304baf..bcdf0d78c2e2 100644
-> > --- a/lib/arm/setup.c
-> > +++ b/lib/arm/setup.c
-> > @@ -25,6 +25,7 @@
-> >  #include <asm/processor.h>
-> >  #include <asm/smp.h>
-> >  #include <asm/timer.h>
-> > +#include <asm/psci.h>
-> >  
-> >  #include "io.h"
-> >  
-> > @@ -266,6 +267,7 @@ void setup(const void *fdt, phys_addr_t freemem_start)
-> >  	mem_regions_add_assumed();
-> >  	mem_init(PAGE_ALIGN((unsigned long)freemem));
-> >  
-> > +	psci_set_conduit();
-> >  	cpu_init();
-> >  
-> >  	/* cpu_init must be called before thread_info_init */
-> 
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
