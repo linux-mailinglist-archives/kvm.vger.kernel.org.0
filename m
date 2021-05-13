@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 227A937F7A2
-	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 14:14:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DCB637F7B0
+	for <lists+kvm@lfdr.de>; Thu, 13 May 2021 14:19:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233070AbhEMMP0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 May 2021 08:15:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34445 "EHLO
+        id S232344AbhEMMUY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 May 2021 08:20:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37721 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233367AbhEMMPP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 May 2021 08:15:15 -0400
+        by vger.kernel.org with ESMTP id S233872AbhEMMTy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 May 2021 08:19:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620908046;
+        s=mimecast20190719; t=1620908324;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=SQD/pcH6/EwepQ7zwHhPK/O6wsXARP4FrHE+OPXdfJc=;
-        b=dCWnbp8YcmX7203KW84kgS3WJvJiPiTcQlO4yoYjFtd2Jdgeyghhx6/M28tgG7Ltx3o0ST
-        pObs4N5squKHiEVIhETG6czaKXVIjqaJg7Ag4oGcxLWfgeIptbjL+T8KTMJ+5gkCR/4DFx
-        xWfj7yRHXApHjPJUtu6t9QKJMeYER3U=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-ptzffjoJNQ-1GkF--HjWVg-1; Thu, 13 May 2021 08:14:04 -0400
-X-MC-Unique: ptzffjoJNQ-1GkF--HjWVg-1
-Received: by mail-ed1-f71.google.com with SMTP id r19-20020a05640251d3b02903888eb31cafso14533371edd.13
-        for <kvm@vger.kernel.org>; Thu, 13 May 2021 05:14:04 -0700 (PDT)
+        bh=IK5KASvNIAH9Eni0vYhJFRLrKtUI3CSzvduC524we5U=;
+        b=I3JEWRhXBQLw0oPOYro1sRYjefeoRZX/lC8S8Yp0Fo9qwQ8TTBNBF+ZB/R54NzTaqjRouk
+        j2/gPwIVxAPB0Ic61oJ2VhZLIdPtWxxpwoiKWAO4aWrIJswem0ISAioSujv15MniA2pFs7
+        LtINpW+qmFboULYaBJynPmpvrQCfzgY=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-348-jSxX-0LWOb-XYfWX0c4Frw-1; Thu, 13 May 2021 08:18:42 -0400
+X-MC-Unique: jSxX-0LWOb-XYfWX0c4Frw-1
+Received: by mail-ed1-f72.google.com with SMTP id k10-20020a50cb8a0000b0290387e0173bf7so14649094edi.8
+        for <kvm@vger.kernel.org>; Thu, 13 May 2021 05:18:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=SQD/pcH6/EwepQ7zwHhPK/O6wsXARP4FrHE+OPXdfJc=;
-        b=dcJ8asFf7c5a08KyJri4rtM3mav6QAJ5/xYXEXJ3ltVlCPSIMaTuosyFzQWZTdvWTn
-         n8odVgBxGwVTwlwIiHJ/pt0nP4/qtuGjibU/+cqJ8s9q9jY32WmCSQ3L7q+ow2pzokLE
-         MuvFXSgM0tuwiwcRN3BeO9fYDsqcPldIKnZciK49NneX4o9xWHoz3/q8Xy+qsM+2zq8p
-         8lwJD/Cw3fchFGbqfmRu1mlpaa0zwsohMmCWwOxF7KDslkyBqHycJ4Zr7YI0av8jD0NY
-         fRG0lqh1az+Xy0EmWZPBuEyiRF5E9aeEw2VR1noWsMiY51uQeswPAqTPce2JloItkmkZ
-         iBHA==
-X-Gm-Message-State: AOAM531FhH/yc90PmZlVEuyfqXPIucWVLjY+B0Fj3QscY0NchnyrAhSE
-        Bc4bcceFFUlduEUp/hru+39YPJgVTmjX1TBHiizrdtwoXdAgRSqesQaVvNdHbF7AfCXaa8PB07I
-        SL1CwYDcGQWFE
-X-Received: by 2002:a05:6402:6cd:: with SMTP id n13mr51384884edy.330.1620908043091;
-        Thu, 13 May 2021 05:14:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyiXiCGmnyqZKpqgMhRFcjk2WSuaiuU6ojG6BUl5WGN+JeIJysyCkHdp91nTXn7XKitQGIpkA==
-X-Received: by 2002:a05:6402:6cd:: with SMTP id n13mr51384863edy.330.1620908042947;
-        Thu, 13 May 2021 05:14:02 -0700 (PDT)
+        bh=IK5KASvNIAH9Eni0vYhJFRLrKtUI3CSzvduC524we5U=;
+        b=kUfuKB1NBAvgmgfbRgPunjU4+1tT/NMiCvyIoQ9XXYFcyge2BfUXL2jDX6lQ2XG1uZ
+         xuZSQVwO85jalbBtmDKiI+wJgNamSEBJh40zZzs7mpJmU/hMIFpbDsb8F4cWF0EfIg2r
+         XIhTTDpukWw9MbrS7mqeAY5kgSNd4nkqDXWlRKG1HZQK7Dxql/hrLgpo6T43BMd8lLDG
+         Ynshxgs39Sc/wFoowZz39kVmDJQRHjwK0cIZHtCCjm5I2C4Z5surVA4lYfc1adlY2wWl
+         A35wdPkQ8+WuE/WNYDCOTK43z6w2lrg3ltevXJzifptrmIHqHr9v6arY79NE0yK780bQ
+         PYJw==
+X-Gm-Message-State: AOAM533cSPWz57C8JgyqdPhj7TT4sGOjHO8NB+QXeI4q6gauImRYw0el
+        D1Ris9ksXVs2u5uytRmqcU8wJxSHsvkE4dGE1tV/p57b3UWecPQ2BZQZDTtCjBi+46UGZoyThYN
+        OkmhCqT05703C
+X-Received: by 2002:a17:906:604a:: with SMTP id p10mr4996074ejj.148.1620908320991;
+        Thu, 13 May 2021 05:18:40 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz1Vg66JpJOxLpGs+6NIjUxFfgVCqpT78vMAZP1rCCIR2bhxg+eIcIxHZ+9opyz96knLH1DNA==
+X-Received: by 2002:a17:906:604a:: with SMTP id p10mr4996058ejj.148.1620908320779;
+        Thu, 13 May 2021 05:18:40 -0700 (PDT)
 Received: from steredhat (host-79-18-148-79.retail.telecomitalia.it. [79.18.148.79])
-        by smtp.gmail.com with ESMTPSA id bn5sm1728763ejb.97.2021.05.13.05.14.01
+        by smtp.gmail.com with ESMTPSA id t14sm1697687ejc.121.2021.05.13.05.18.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 May 2021 05:14:02 -0700 (PDT)
-Date:   Thu, 13 May 2021 14:14:00 +0200
+        Thu, 13 May 2021 05:18:40 -0700 (PDT)
+Date:   Thu, 13 May 2021 14:18:38 +0200
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
 Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
@@ -59,84 +59,81 @@ Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Jorgen Hansen <jhansen@vmware.com>,
         Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
         Colin Ian King <colin.king@canonical.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v9 12/19] virtio/vsock: add SEQPACKET receive logic
-Message-ID: <20210513121400.7u7kectkxwame76b@steredhat>
+        Norbert Slusarek <nslusarek@gmx.net>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v9 11/19] virtio/vsock: dequeue callback for
+ SOCK_SEQPACKET
+Message-ID: <20210513121838.ndpgj56gwcww3pfc@steredhat>
 References: <20210508163027.3430238-1-arseny.krasnov@kaspersky.com>
- <20210508163544.3432132-1-arseny.krasnov@kaspersky.com>
+ <20210508163523.3431999-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20210508163544.3432132-1-arseny.krasnov@kaspersky.com>
+In-Reply-To: <20210508163523.3431999-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 08, 2021 at 07:35:40PM +0300, Arseny Krasnov wrote:
->This modifies current receive logic for SEQPACKET support:
->1) Inserts 'RW' packet to socket's rx queue, but without merging with
->   buffer of last packet in queue.
-
-This is not true anymore, right?
-
->2) Performs check for packet and socket types on receive(if mismatch,
->   then reset connection).
+On Sat, May 08, 2021 at 07:35:20PM +0300, Arseny Krasnov wrote:
+>This adds transport callback and it's logic for SEQPACKET dequeue.
+>Callback fetches RW packets from rx queue of socket until whole record
+>is copied(if user's buffer is full, user is not woken up). This is done
+>to not stall sender, because if we wake up user and it leaves syscall,
+>nobody will send credit update for rest of record, and sender will wait
+>for next enter of read syscall at receiver's side. So if user buffer is
+>full, we just send credit update and drop data.
 >
 >Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
-Also this patch is changed :-)
-
 >---
-> net/vmw_vsock/virtio_transport_common.c | 28 +++++++++++++++++++++++--
-> 1 file changed, 26 insertions(+), 2 deletions(-)
+> v8 -> v9:
+> 1) Check for RW packet type is removed from loop(all packet now
+>    considered RW).
+> 2) Locking in loop is fixed.
+> 3) cpu_to_le32()/le32_to_cpu() now used.
+> 4) MSG_TRUNC handling removed from transport.
+>
+> include/linux/virtio_vsock.h            |  5 ++
+> net/vmw_vsock/virtio_transport_common.c | 64 +++++++++++++++++++++++++
+> 2 files changed, 69 insertions(+)
+>
+>diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>index dc636b727179..02acf6e9ae04 100644
+>--- a/include/linux/virtio_vsock.h
+>+++ b/include/linux/virtio_vsock.h
+>@@ -80,6 +80,11 @@ virtio_transport_dgram_dequeue(struct vsock_sock *vsk,
+> 			       struct msghdr *msg,
+> 			       size_t len, int flags);
+>
+>+ssize_t
+>+virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
+>+				   struct msghdr *msg,
+>+				   int flags,
+>+				   bool *msg_ready);
+> s64 virtio_transport_stream_has_data(struct vsock_sock *vsk);
+> s64 virtio_transport_stream_has_space(struct vsock_sock *vsk);
 >
 >diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index f649a21dd23b..7fea0a2192f7 100644
+>index ad0d34d41444..f649a21dd23b 100644
 >--- a/net/vmw_vsock/virtio_transport_common.c
 >+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -165,6 +165,14 @@ void virtio_transport_deliver_tap_pkt(struct virtio_vsock_pkt *pkt)
+>@@ -393,6 +393,58 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+> 	return err;
 > }
-> EXPORT_SYMBOL_GPL(virtio_transport_deliver_tap_pkt);
 >
->+static u16 virtio_transport_get_type(struct sock *sk)
+>+static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
+>+						 struct msghdr *msg,
+>+						 int flags,
+>+						 bool *msg_ready)
 >+{
->+	if (sk->sk_type == SOCK_STREAM)
->+		return VIRTIO_VSOCK_TYPE_STREAM;
->+	else
->+		return VIRTIO_VSOCK_TYPE_SEQPACKET;
->+}
->+
-> /* This function can only be used on connecting/connected sockets,
->  * since a socket assigned to a transport is required.
->  *
->@@ -980,11 +988,15 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
-> 		/* If there is space in the last packet queued, we copy the
-> 		 * new packet in its buffer.
-> 		 */
->-		if (pkt->len <= last_pkt->buf_len - last_pkt->len) {
->+		if ((pkt->len <= last_pkt->buf_len - last_pkt->len) &&
->+		    !(le32_to_cpu(last_pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOR)) {
+>+	struct virtio_vsock_sock *vvs = vsk->trans;
+>+	struct virtio_vsock_pkt *pkt;
+>+	int err = 0;
+>+	size_t user_buf_len = msg->msg_iter.count;
 
-Maybe we should update the comment above.
+Forgot to mention that also here is better to use `msg_data_left(msg)`
 
-> 			memcpy(last_pkt->buf + last_pkt->len, pkt->buf,
-> 			       pkt->len);
-> 			last_pkt->len += pkt->len;
-> 			free_pkt = true;
->+
->+			if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOR)
->+				last_pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
-
-What about doing the following in any case?
-
-			last_pkt->hdr.flags |= pkt->hdr.flags;
-
-> 			goto out;
-> 		}
-> 	}
+Thanks,
+Stefano
 
