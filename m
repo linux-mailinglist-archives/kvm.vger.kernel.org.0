@@ -2,159 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D7F2380B22
-	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 16:09:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 102E2380B9D
+	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 16:18:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234196AbhENOKp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 May 2021 10:10:45 -0400
-Received: from foss.arm.com ([217.140.110.172]:50348 "EHLO foss.arm.com"
+        id S233465AbhENOTu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 May 2021 10:19:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37092 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234178AbhENOK2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 May 2021 10:10:28 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E13C51763;
-        Fri, 14 May 2021 07:07:48 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 92C273F718;
-        Fri, 14 May 2021 07:07:47 -0700 (PDT)
-Subject: Re: [PATCH v2 2/2] KVM: arm64: Commit pending PC adjustemnts before
- returning to userspace
-To:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc:     Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <tabba@google.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com, stable@vger.kernel.org
-References: <20210514104042.1929168-1-maz@kernel.org>
- <20210514104042.1929168-3-maz@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <c28efbe5-a269-fbf4-2a7e-b905386457bd@arm.com>
-Date:   Fri, 14 May 2021 15:08:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S230097AbhENOTu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 May 2021 10:19:50 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 9C73C61408;
+        Fri, 14 May 2021 14:18:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1621001918;
+        bh=c7dfcDSUedN/VQoQv/XM8fRZG2HhOOW57vq4i3XI37w=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=OQ+w8jq41p/pK8QPzt383K43rnWDvG9IebEZzoZj7WKu0EgpEM3a4OB9pZnDV5/lC
+         MxVWpkmQpp2inFtKTGn6bM1fAR+gA+04aBXFsHrR34k+VM9wQUFTEenWCHNxw8mV5S
+         Rr3kzMIGVT+KJ8CgQJfj5jt0KJvZQg0gfBfD7ImGjDrz6TXEWqjpD0nn1NC8t6bBSV
+         Y2m7PBzQCXheFvsYF9jZqx3chr66nJXcElBiHfvACPcxjY0VNJoiSeft4M6sPjRp9i
+         /15Ta8qfh6z3LjSIBpnNeZl0hFKEsFjvWWGKfF/qxDT0jcgdTLCyifuXI2D1S1QhIL
+         whK9i7cORQs2g==
+Date:   Fri, 14 May 2021 16:18:25 +0200
+From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To:     Edward Cree <ecree.xilinx@gmail.com>
+Cc:     David Woodhouse <dwmw2@infradead.org>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Mali DP Maintainers <malidp@foss.arm.com>,
+        alsa-devel@alsa-project.org, coresight@lists.linaro.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
+        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-hwmon@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-sgx@vger.kernel.org, linux-usb@vger.kernel.org,
+        mjpeg-users@lists.sourceforge.net, netdev@vger.kernel.org,
+        rcu@vger.kernel.org
+Subject: Re: [PATCH v2 00/40] Use ASCII subset instead of UTF-8 alternate
+ symbols
+Message-ID: <20210514161825.4e4c0d3e@coco.lan>
+In-Reply-To: <8b8bc929-2f07-049d-f24c-cb1f1d85bbaa@gmail.com>
+References: <cover.1620823573.git.mchehab+huawei@kernel.org>
+        <d2fed242fbe200706b8d23a53512f0311d900297.camel@infradead.org>
+        <20210514102118.1b71bec3@coco.lan>
+        <61c286b7afd6c4acf71418feee4eecca2e6c80c8.camel@infradead.org>
+        <8b8bc929-2f07-049d-f24c-cb1f1d85bbaa@gmail.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20210514104042.1929168-3-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Em Fri, 14 May 2021 12:08:36 +0100
+Edward Cree <ecree.xilinx@gmail.com> escreveu:
 
-On 5/14/21 11:40 AM, Marc Zyngier wrote:
-> KVM currently updates PC (and the corresponding exception state)
-> using a two phase approach: first by setting a set of flags,
-> then by converting these flags into a state update when the vcpu
-> is about to enter the guest.
->
-> However, this creates a disconnect with userspace if the vcpu thread
-> returns there with any exception/PC flag set. In this case, the exposed
-> context is wrong, as userpsace doesn't have access to these flags
+> For anyone who doesn't know about it: X has this wonderful thing called
+>  the Compose key[1].  For instance, type =E2=8E=84--- to get =E2=80=94, o=
+r =E2=8E=84<" for =E2=80=9C.
+> Much more mnemonic than Unicode codepoints; and you can extend it with
+>  user-defined sequences in your ~/.XCompose file.
 
-Nitpick: s/userpsace/userspace
+Good tip. I haven't use composite for years, as US-intl with dead keys is
+enough for 99.999% of my needs.=20
 
-> (they aren't architectural). It also means that these flags are
-> preserved across a reset, which isn't expected.
->
-> To solve this problem, force an explicit synchronisation of the
-> exception state on vcpu exit to userspace. As an optimisation
-> for nVHE systems, only perform this when there is something pending.
->
-> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Cc: stable@vger.kernel.org # 5.11
-> ---
->  arch/arm64/include/asm/kvm_asm.h   |  1 +
->  arch/arm64/kvm/arm.c               | 10 ++++++++++
->  arch/arm64/kvm/hyp/exception.c     |  4 ++--
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  8 ++++++++
->  4 files changed, 21 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index d5b11037401d..5e9b33cbac51 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -63,6 +63,7 @@
->  #define __KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector		18
->  #define __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize		19
->  #define __KVM_HOST_SMCCC_FUNC___pkvm_mark_hyp			20
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc			21
->  
->  #ifndef __ASSEMBLY__
->  
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 1cb39c0803a4..c4fe2b71f429 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -897,6 +897,16 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  
->  	kvm_sigset_deactivate(vcpu);
->  
-> +	/*
-> +	 * In the unlikely event that we are returning to userspace
-> +	 * with pending exceptions or PC adjustment, commit these
-> +	 * adjustments in order to give userspace a consistent view of
-> +	 * the vcpu state.
-> +	 */
-> +	if (unlikely(vcpu->arch.flags & (KVM_ARM64_PENDING_EXCEPTION |
-> +					 KVM_ARM64_INCREMENT_PC)))
-> +		kvm_call_hyp(__kvm_adjust_pc, vcpu);
-> +
->  	vcpu_put(vcpu);
->  	return ret;
->  }
-> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-> index 0812a496725f..11541b94b328 100644
-> --- a/arch/arm64/kvm/hyp/exception.c
-> +++ b/arch/arm64/kvm/hyp/exception.c
-> @@ -331,8 +331,8 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
->  }
->  
->  /*
-> - * Adjust the guest PC on entry, depending on flags provided by EL1
-> - * for the purpose of emulation (MMIO, sysreg) or exception injection.
-> + * Adjust the guest PC (and potentially exception state) depending on
-> + * flags provided by the emulation code.
->   */
->  void __kvm_adjust_pc(struct kvm_vcpu *vcpu)
->  {
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index f36420a80474..1632f001f4ed 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -28,6 +28,13 @@ static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
->  	cpu_reg(host_ctxt, 1) =  __kvm_vcpu_run(kern_hyp_va(vcpu));
->  }
->  
-> +static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
-> +
-> +	__kvm_adjust_pc(kern_hyp_va(vcpu));
-> +}
-> +
->  static void handle___kvm_flush_vm_context(struct kvm_cpu_context *host_ctxt)
->  {
->  	__kvm_flush_vm_context();
-> @@ -170,6 +177,7 @@ typedef void (*hcall_t)(struct kvm_cpu_context *);
->  
->  static const hcall_t host_hcall[] = {
->  	HANDLE_FUNC(__kvm_vcpu_run),
-> +	HANDLE_FUNC(__kvm_adjust_pc),
->  	HANDLE_FUNC(__kvm_flush_vm_context),
->  	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
->  	HANDLE_FUNC(__kvm_tlb_flush_vmid),
+Btw, at least on Fedora with Mate, Composite is disabled by default. It has
+to be enabled first using the same tool that allows changing the Keyboard
+layout[1].
 
-I'm guessing that the comment mentioned in the cover letter should be in this
-patch, right? Or is the changelog from the cover letter stale?
+Yet, typing an EN DASH for example, would be "<composite>--.", with is 4
+keystrokes instead of just two ('--'). It means twice the effort ;-)
 
-Regardless, I trust your judgement regarding the comment and the patch looks correct:
+[1] KDE, GNome, Mate, ... have different ways to enable it and to=20
+    select what key would be considered <composite>:
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+	https://dry.sailingissues.com/us-international-keyboard-layout.html
+	https://help.ubuntu.com/community/ComposeKey
 
 Thanks,
-
-Alex
-
+Mauro
