@@ -2,138 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 75B06380A79
-	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 15:39:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69F0A380ADE
+	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 15:58:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233981AbhENNk4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 May 2021 09:40:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41230 "EHLO
+        id S232507AbhENN7z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 May 2021 09:59:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229906AbhENNkz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 May 2021 09:40:55 -0400
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7912C061574
-        for <kvm@vger.kernel.org>; Fri, 14 May 2021 06:39:42 -0700 (PDT)
-Received: by mail-qt1-x82f.google.com with SMTP id h21so18431180qtu.5
-        for <kvm@vger.kernel.org>; Fri, 14 May 2021 06:39:42 -0700 (PDT)
+        with ESMTP id S232456AbhENN7y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 May 2021 09:59:54 -0400
+Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48DB7C06174A
+        for <kvm@vger.kernel.org>; Fri, 14 May 2021 06:58:43 -0700 (PDT)
+Received: by mail-il1-x132.google.com with SMTP id e14so25825754ils.12
+        for <kvm@vger.kernel.org>; Fri, 14 May 2021 06:58:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=fw8jRpLJUUiDLFl+R/OeLe/+vcSlILAW8JDLv7Pnlgw=;
-        b=ZA9iIphKPPHvcLSkBu2C/QMxUDhXyUp7Ql0A7zhq+gl8tX2VVw4d6MWbL3YGt3zMia
-         eovdKfEgpKv/Kc6JgMp9UCw9S8MZR5nPFduJNr7x/z0XbVlGgNLXVftzfUVKBu0b6ABm
-         RinPPw/eYvAo5xq2FjGO1ry+PBwldBVbyqtEvWJumFPyH6ThWymQ9gXFH0NAf+gQaVpn
-         M9srCHz/FBZ/gl8Q7AQ70j9xSGfCbxZD9KMqMhWJ8ejqfvSLeS76TlpPfl+r5p2DMKcd
-         O1K+SZm8GDVksZO0NYGjA4OCifqgsBaX7QsLUNiJf774sdooSmqhK4/lbsOJfcz7ocEi
-         FQ+w==
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=bfYFyDNOaHNznWD3QdjOTFC8+ozDhd6BMb68HdfprOU=;
+        b=c01F5hKE8Z6Bx4tcWxeDqSwTHAQXEuTzA80kuP5Y/4gWobUYbKnf5x5a93aCLtQt+7
+         /T4/ZcijHUQ5pkR6PldpwKw+JI6Wt4AAZTEsno0EtwfWn+Dl5vO/fCwWQvoiYrmKDXm1
+         8JHA5ipjZoX8GXyEiaK011JEGH291V6SxSpiqWFZOc8TQLsacNXWfjBVTK86yx+znbq/
+         iuYuY2/1bkI2uResvm8SG90jQPrWRWDeyKphHoX/dFo69ehgrmgAXPLd0W7LLHECpkDo
+         w58oYYU5YoSVmTEL5KEmHEhzQseJVKY5XZkkNSZq9VIvqb9F9DvJbrBjY/d86yxRvplT
+         0XhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=fw8jRpLJUUiDLFl+R/OeLe/+vcSlILAW8JDLv7Pnlgw=;
-        b=odPUPpNwAFiMHbsABenq8e90TNGMK/eEaskO9UzeeoFOZNYOHGZk9Auf7QAUNHlGuQ
-         WNBS3QPskBwLiV2emSSBXcOgppQXx6SfEgschtr3fingmrk7YICsCLDuDRQVZmAdXhCX
-         W+FeVonvQIYHP+O78hm5KE18QsMgHjXwck0A/3NZmTEk64en96dHGe6T/4lvGKRdvp8V
-         lGt2VjJltxSozcG38XGNDFd2Y+CDzpMVALkqIAYYtQ8VKtjoWBcYWcrMh0cnewKTAQ8h
-         kjcmI4Iy+bCFXg4Mq3L2sRJoRChy7WSgcMNwahMWBIXxiyD//8swG3FzlS8ahhEkv1lY
-         cXBg==
-X-Gm-Message-State: AOAM5325RFK5BVAXfi3UK+eXemM0jAHDe/1rNFyPu6br1ZXjF/SSdK7f
-        msw4fvtj4qdzy4Ci1tr68jYbYw==
-X-Google-Smtp-Source: ABdhPJyHkmiobTC20DDQbl/CkwGCuAAsPOfAEooNlfis4Grfk/a3JX140lwF9zGRuivL/kulThANeQ==
-X-Received: by 2002:a05:622a:5c9:: with SMTP id d9mr14474203qtb.177.1620999582009;
-        Fri, 14 May 2021 06:39:42 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-47-55-113-94.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.113.94])
-        by smtp.gmail.com with ESMTPSA id 11sm4839279qkk.31.2021.05.14.06.39.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 May 2021 06:39:41 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1lhY2V-007RfW-Pl; Fri, 14 May 2021 10:39:39 -0300
-Date:   Fri, 14 May 2021 10:39:39 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Will Deacon <will@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH 3/6] vfio: remove the unused mdev iommu hook
-Message-ID: <20210514133939.GL1096940@ziepe.ca>
-References: <20210510065405.2334771-1-hch@lst.de>
- <20210510065405.2334771-4-hch@lst.de>
- <20210510155454.GA1096940@ziepe.ca>
- <MWHPR11MB1886E02BF7DE371E9665AA328C519@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210513120058.GG1096940@ziepe.ca>
- <MWHPR11MB18863613CEBE3CDEEB86F4FC8C509@MWHPR11MB1886.namprd11.prod.outlook.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=bfYFyDNOaHNznWD3QdjOTFC8+ozDhd6BMb68HdfprOU=;
+        b=kXa5DitGQ5VPXT2X2UTI4mOerBRjucd9EnXY8TTy9Cj3zdwmNMsEtyaPxATbJt1k9s
+         uNGHoocWV8vcCfTjBQuBnMAaxzwt1z3RlpNg8kDbmFNDWuCWLrLITqbv+6FCTXiRfssw
+         evj7FxqjODYnb9A4KT/s6sngf7juyGzB5eREqCFhEPn8m38aIyUOIVNYOD6zf4qMiYfP
+         9wq2wW8SRLoKWdTWULyOxUMk1UZ3Bt/5cCnkeL3+CwGyfKNeRUbg7FO1mjtcaW4/FC5h
+         YKTBfhEQTLLcyz+ba8JWQN+fAhmf1MobOO5l2AL35ex4fEmNKMJ4iAfpEF84pPrJnjQU
+         08Zg==
+X-Gm-Message-State: AOAM532UqN8ImvgNyBTf8bRGwW9CQgwAPZULwsLaQEAQCIUbDUK5pUYm
+        JgG0nDX/UgG4XlVCUdVTVfl41IuEve72JLAyjrn7
+X-Google-Smtp-Source: ABdhPJxalKKFR43HiA8yCE0dJ8wr0xiO9hBKUHab9MyXauJN2iIVjG1vmjJpu9op6ncTeNps+BNJ6gnsJ8KcevdkWRw=
+X-Received: by 2002:a92:c884:: with SMTP id w4mr40269472ilo.186.1621000722714;
+ Fri, 14 May 2021 06:58:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <MWHPR11MB18863613CEBE3CDEEB86F4FC8C509@MWHPR11MB1886.namprd11.prod.outlook.com>
+References: <20210423080942.2997-1-jasowang@redhat.com> <YJ1TgoFSwOkQrC+1@stefanha-x1.localdomain>
+ <CACGkMEv0uWd+X87cYoG-GGjTXBvRztp2CY3RKyq9jFbSYK1n0Q@mail.gmail.com>
+ <YJ5cKe0egklXDpng@stefanha-x1.localdomain> <CACycT3u+hQbDJtf5gxS1NVVpiTffMz1skuhTExy5d_oRjYKoxg@mail.gmail.com>
+ <20210514073452-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20210514073452-mutt-send-email-mst@kernel.org>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Fri, 14 May 2021 21:58:32 +0800
+Message-ID: <CACycT3ttN=t3LQGSVUbt9mbsgUsKOrZuRRziMkZJSiQkBP77iw@mail.gmail.com>
+Subject: Re: Re: Re: [RFC PATCH V2 0/7] Do not read from descripto ring
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        file@sect.tu-berlin.de, ashish.kalra@amd.com,
+        konrad.wilk@oracle.com, kvm <kvm@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 14, 2021 at 01:17:23PM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@ziepe.ca>
-> > Sent: Thursday, May 13, 2021 8:01 PM
-> > 
-> > On Thu, May 13, 2021 at 03:28:52AM +0000, Tian, Kevin wrote:
-> > 
-> > > Are you specially concerned about this iommu_device hack which
-> > > directly connects mdev_device to iommu layer or the entire removed
-> > > logic including the aux domain concept? For the former we are now
-> > > following up the referred thread to find a clean way. But for the latter
-> > > we feel it's still necessary regardless of how iommu interface is redesigned
-> > > to support device connection from the upper level driver. The reason is
-> > > that with mdev or subdevice one physical device could be attached to
-> > > multiple domains now. there could be a primary domain with DOMAIN_
-> > > DMA type for DMA_API use by parent driver itself, and multiple auxiliary
-> > > domains with DOMAIN_UNMANAGED types for subdevices assigned to
-> > > different VMs.
-> > 
-> > Why do we need more domains than just the physical domain for the
-> > parent? How does auxdomain appear in /dev/ioasid?
-> > 
-> 
-> Another simple reason. Say you have 4 mdevs each from a different 
-> parent are attached to an ioasid. If only using physical domain of the 
-> parent + PASID it means there are 4 domains (thus 4 page tables) under 
-> this IOASID thus every dma map operation must be replicated in all
-> 4 domains which is really unnecessary. Having the domain created
-> with ioasid and allow a device attaching to multiple domains is much
-> cleaner for the upper-layer drivers to work with iommu interface.
+On Fri, May 14, 2021 at 7:36 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Fri, May 14, 2021 at 07:27:22PM +0800, Yongji Xie wrote:
+> > On Fri, May 14, 2021 at 7:17 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> > >
+> > > On Fri, May 14, 2021 at 03:29:20PM +0800, Jason Wang wrote:
+> > > > On Fri, May 14, 2021 at 12:27 AM Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> > > > >
+> > > > > On Fri, Apr 23, 2021 at 04:09:35PM +0800, Jason Wang wrote:
+> > > > > > Sometimes, the driver doesn't trust the device. This is usually
+> > > > > > happens for the encrtpyed VM or VDUSE[1].
+> > > > >
+> > > > > Thanks for doing this.
+> > > > >
+> > > > > Can you describe the overall memory safety model that virtio drivers
+> > > > > must follow?
+> > > >
+> > > > My understanding is that, basically the driver should not trust the
+> > > > device (since the driver doesn't know what kind of device that it
+> > > > tries to drive)
+> > > >
+> > > > 1) For any read only metadata (required at the spec level) which is
+> > > > mapped as coherent, driver should not depend on the metadata that is
+> > > > stored in a place that could be wrote by the device. This is what this
+> > > > series tries to achieve.
+> > > > 2) For other metadata that is produced by the device, need to make
+> > > > sure there's no malicious device triggered behavior, this is somehow
+> > > > similar to what vhost did. No DOS, loop, kernel bug and other stuffs.
+> > > > 3) swiotb is a must to enforce memory access isolation. (VDUSE or encrypted VM)
+> > > >
+> > > > > For example:
+> > > > >
+> > > > > - Driver-to-device buffers must be on dedicated pages to avoid
+> > > > >   information leaks.
+> > > >
+> > > > It looks to me if swiotlb is used, we don't need this since the
+> > > > bouncing is not done at byte not page.
+> > > >
+> > > > But if swiotlb is not used, we need to enforce this.
+> > > >
+> > > > >
+> > > > > - Driver-to-device buffers must be on dedicated pages to avoid memory
+> > > > >   corruption.
+> > > >
+> > > > Similar to the above.
+> > > >
+> > > > >
+> > > > > When I say "pages" I guess it's the IOMMU page size that matters?
+> > > > >
+> > > >
+> > > > And the IOTLB page size.
+> > > >
+> > > > > What is the memory access granularity of VDUSE?
+> > > >
+> > > > It has an swiotlb, but the access and bouncing is done per byte.
+> > > >
+> > > > >
+> > > > > I'm asking these questions because there is driver code that exposes
+> > > > > kernel memory to the device and I'm not sure it's safe. For example:
+> > > > >
+> > > > >   static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr,
+> > > > >                   struct scatterlist *data_sg, bool have_data)
+> > > > >   {
+> > > > >           struct scatterlist hdr, status, *sgs[3];
+> > > > >           unsigned int num_out = 0, num_in = 0;
+> > > > >
+> > > > >           sg_init_one(&hdr, &vbr->out_hdr, sizeof(vbr->out_hdr));
+> > > > >                             ^^^^^^^^^^^^^
+> > > > >           sgs[num_out++] = &hdr;
+> > > > >
+> > > > >           if (have_data) {
+> > > > >                   if (vbr->out_hdr.type & cpu_to_virtio32(vq->vdev, VIRTIO_BLK_T_OUT))
+> > > > >                           sgs[num_out++] = data_sg;
+> > > > >                   else
+> > > > >                           sgs[num_out + num_in++] = data_sg;
+> > > > >           }
+> > > > >
+> > > > >           sg_init_one(&status, &vbr->status, sizeof(vbr->status));
+> > > > >                                ^^^^^^^^^^^^
+> > > > >           sgs[num_out + num_in++] = &status;
+> > > > >
+> > > > >           return virtqueue_add_sgs(vq, sgs, num_out, num_in, vbr, GFP_ATOMIC);
+> > > > >   }
+> > > > >
+> > > > > I guess the drivers don't need to be modified as long as swiotlb is used
+> > > > > to bounce the buffers through "insecure" memory so that the memory
+> > > > > surrounding the buffers is not exposed?
+> > > >
+> > > > Yes, swiotlb won't bounce the whole page. So I think it's safe.
+> > >
+> > > Thanks Jason and Yongji Xie for clarifying. Seems like swiotlb or a
+> > > similar mechanism can handle byte-granularity isolation so the drivers
+> > > not need to worry about information leaks or memory corruption outside
+> > > the mapped byte range.
+> > >
+> > > We still need to audit virtio guest drivers to ensure they don't trust
+> > > data that can be modified by the device. I will look at virtio-blk and
+> > > virtio-fs next week.
+> > >
+> >
+> > Oh, that's great. Thank you!
+> >
+> > I also did some audit work these days and will send a new version for
+> > reviewing next Monday.
+> >
+> > Thanks,
+> > Yongji
+>
+> Doing it in a way that won't hurt performance for simple
+> configs that trust the device is a challenge though.
+> Pls take a look at the discussion with Christoph for some ideas
+> on how to do this.
+>
 
-Eh? That sounds messed up.
+I see. Thanks for the reminder.
 
-The IOASID is the page table. If you have one IOASID and you attach it
-to 4 IOMMU routings (be it pasid, rid, whatever) then there should
-only ever by one page table.
-
-The iommu driver should just point the iommu HW at the shared page
-table for each of the 4 routes and be done with it. At worst it has to
-replicate invalidates, but that is very HW dependent.
-
-Domain is just a half-completed-ioasid concept. It is today not
-flexible enough to be a true IOASID, but it still does hold the io
-page table.
-
-Basically your data structure is an IOASID. It holds a single HW
-specific page table. The IOASID has a list of RID and (RID,PASID) that
-are authorized to use it. The IOMMU HW is programed to match the
-RID/(RID,PASID) list and search the single page table. When the page
-table is changed the IOMMU is told to dump caches, however that works.
-
-When a device driver wants to use an IOASID it tells the iommu to
-setup the route, either RID or (RID,PASID). Setting the route causes
-the IOMMU driver to update the HW.
-
-The struct device has enough context to provide the RID and the IOMMU
-driver connection when operating on the IOASID.
-
-Jason
+Thanks,
+Yongji
