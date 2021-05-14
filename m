@@ -2,106 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2C8E3812DF
-	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 23:33:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E47C73813C6
+	for <lists+kvm@lfdr.de>; Sat, 15 May 2021 00:30:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232810AbhENVeX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 May 2021 17:34:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34596 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230309AbhENVeW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 May 2021 17:34:22 -0400
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9032EC06174A
-        for <kvm@vger.kernel.org>; Fri, 14 May 2021 14:33:10 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id x19so360211lfa.2
-        for <kvm@vger.kernel.org>; Fri, 14 May 2021 14:33:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=DgAKwIM9zch8xYFNPJtzcIGRCfmQye33dMFzHuDOjA8=;
-        b=Ma9YTpFKv2FKqspm+/+nOYKxqwaYNdETxuDqxtZyA7ZnVB17mpdfo0ZQZ1QAMyP7bQ
-         2NoTwneXD9c+6ebVHoiqc6oePXLumrECPiQv+8vOzySGekm4yv4qyr/1A5OQgNBWIdOc
-         GC91s86KWPnv8OcKzcAtpmA6LtDhi2dV4QHzddOOZPk3XWb4BwhtopFJddjuMGi0t41q
-         Jt0ib/JJrlJ/eTK/VFDyP2XjLu/w++ESDctvgTGDtx+T4x5lrWiNYYxvwr1aWxUfB5gb
-         DYjv0/UJb4ygI1UCeFfyaQGMxfketFlRyTTSsDTQ0S3dPSWKpNzYhoYbxy3ooFhgS+3n
-         2mNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DgAKwIM9zch8xYFNPJtzcIGRCfmQye33dMFzHuDOjA8=;
-        b=MlrOcARiK93R+Ak+PpzTwEvOY2nuH1V4ANSe9ISeaYenQMM5M1CDlskhSUQsqimLCu
-         pU6o1ZFOIoWRf4RG7bM/v8K3tphPhYSsstIqJ8e3ncbNAT2u2GsaoqA5IB/nPDaEQsfc
-         fBujO0zSv91Iy4iLFhqZ+kekOVEaTvOxmSnawvy/hof3HSatlYkFnoiEr/TTZY4VKyJT
-         /ojWinWmC6tcloIQ71iT5Xrbfhhqoi0bcGcdcPG52yOro92hkQ/K4S6UhZzg+Js/FQl2
-         imFUDRM9X+Uo2u+vZXD3mkpL1E8vK3QtjedUIZm2Y1ncdEuMQimLxPR5gA0Txj1xJ2kY
-         Na6g==
-X-Gm-Message-State: AOAM530JEiFdo58XNYBAOIu1xxkRNgxqMrTcJaiJeLe8Ny7mFhf2gx33
-        qofg0q3NAhnlPtLA8zLq8b2ilhkHSsLgbwCtI90A3w==
-X-Google-Smtp-Source: ABdhPJwaWVyRTYrod/pJttPl6eOfPN7YN4oV2Ff7Rx7cDDSMWwaxFsTSlvdmGRhuFsgKwiPdwp1Wmw5xH9pEHIajUKQ=
-X-Received: by 2002:a05:6512:2243:: with SMTP id i3mr33685984lfu.46.1621027988910;
- Fri, 14 May 2021 14:33:08 -0700 (PDT)
+        id S233869AbhENWbY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 May 2021 18:31:24 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53480 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233666AbhENWbW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 May 2021 18:31:22 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 864A561453;
+        Fri, 14 May 2021 22:30:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1621031410;
+        bh=qrJLP/r3A3y/0MyfEURktG+DB4zmp3lLFDGbBMOKB8A=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=P0zgoaprDJvd98bH2YsY9oRsUbNpX6X8rgv/5veHPFVbyZwKiayQ+lnPqhh61onti
+         /qgzqCR38fonvkdjL5sUGDu2+AaxoIKOXMHXvG+q91G5ZwsLOu9QuvS8gOKseqEoa3
+         z+j6b7QjwOBdcIG9bzVNluyZQdJux6OLi8vkxm4MLMCTm9UIzH1AAdtgAvaBTo4nSv
+         hQ+1vvNZrSlA75KQ7SJ39pc3U2qCIIWPc2M+mHWXdka1QFkfvnRxKEGL4xqNVJVFfy
+         ysPhyEIXgQa/RHfOIy2Bzug07IMfmVNyvc6h8nsBhO0+MK64/mbSpbRNFHk76WQPnt
+         CNBQlmO82/NXg==
+Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 788F260A02;
+        Fri, 14 May 2021 22:30:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <1620871189-4763-1-git-send-email-wanpengli@tencent.com>
-In-Reply-To: <1620871189-4763-1-git-send-email-wanpengli@tencent.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Fri, 14 May 2021 14:32:42 -0700
-Message-ID: <CALzav=e98KRgG+z5oezPmENKDt+NqtEA57ijYh3kMBZyduQUZg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/4] KVM: X86: Bail out of direct yield in case of
- under-comitted scenarios
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/3] net: use XDP helpers
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <162103141048.10202.7043185141593053010.git-patchwork-notify@kernel.org>
+Date:   Fri, 14 May 2021 22:30:10 +0000
+References: <20210514183954.7129-1-mcroce@linux.microsoft.com>
+In-Reply-To: <20210514183954.7129-1-mcroce@linux.microsoft.com>
+To:     Matteo Croce <mcroce@linux.microsoft.com>
+Cc:     netdev@vger.kernel.org, bpf@vger.kernel.org,
+        intel-wired-lan@lists.osuosl.org,
+        linux-stm32@st-md-mailman.stormreply.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, jesse.brandeburg@intel.com,
+        anthony.l.nguyen@intel.com, davem@davemloft.net, kuba@kernel.org,
+        peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
+        mst@redhat.com, jasowang@redhat.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 12, 2021 at 7:01 PM Wanpeng Li <kernellwp@gmail.com> wrote:
->
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> In case of under-comitted scenarios, vCPU can get scheduling easily,
-> kvm_vcpu_yield_to adds extra overhead, we can observe a lot of race
-> between vcpu->ready is true and yield fails due to p->state is
-> TASK_RUNNING. Let's bail out in such scenarios by checking the length
-> of current cpu runqueue, it can be treated as a hint of under-committed
-> instead of guarantee of accuracy.
->
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
-> v1 -> v2:
->  * move the check after attempted counting
->  * update patch description
->
->  arch/x86/kvm/x86.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 9b6bca6..dfb7c32 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8360,6 +8360,9 @@ static void kvm_sched_yield(struct kvm_vcpu *vcpu, unsigned long dest_id)
->
->         vcpu->stat.directed_yield_attempted++;
->
-> +       if (single_task_running())
-> +               goto no_yield;
+Hello:
 
-Since this is a heuristic, do you have any experimental or real world
-results that show the benefit?
+This series was applied to netdev/net-next.git (refs/heads/master):
 
-> +
->         rcu_read_lock();
->         map = rcu_dereference(vcpu->kvm->arch.apic_map);
->
-> --
-> 2.7.4
->
+On Fri, 14 May 2021 20:39:51 +0200 you wrote:
+> From: Matteo Croce <mcroce@microsoft.com>
+> 
+> The commit 43b5169d8355 ("net, xdp: Introduce xdp_init_buff utility
+> routine") and commit be9df4aff65f ("net, xdp: Introduce xdp_prepare_buff
+> utility routine") introduces two useful helpers to populate xdp_buff.
+> Use it in drivers which still open codes that routines.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,1/3] stmmac: use XDP helpers
+    https://git.kernel.org/netdev/net-next/c/d172268f93cf
+  - [net-next,2/3] igc: use XDP helpers
+    https://git.kernel.org/netdev/net-next/c/082294f294f6
+  - [net-next,3/3] vhost_net: use XDP helpers
+    https://git.kernel.org/netdev/net-next/c/224bf7db5518
+
+You are awesome, thank you!
+--
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
