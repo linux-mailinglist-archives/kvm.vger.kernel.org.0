@@ -2,88 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 102E2380B9D
-	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 16:18:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F586380BA8
+	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 16:19:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233465AbhENOTu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 May 2021 10:19:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37092 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230097AbhENOTu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 May 2021 10:19:50 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9C73C61408;
-        Fri, 14 May 2021 14:18:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1621001918;
-        bh=c7dfcDSUedN/VQoQv/XM8fRZG2HhOOW57vq4i3XI37w=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=OQ+w8jq41p/pK8QPzt383K43rnWDvG9IebEZzoZj7WKu0EgpEM3a4OB9pZnDV5/lC
-         MxVWpkmQpp2inFtKTGn6bM1fAR+gA+04aBXFsHrR34k+VM9wQUFTEenWCHNxw8mV5S
-         Rr3kzMIGVT+KJ8CgQJfj5jt0KJvZQg0gfBfD7ImGjDrz6TXEWqjpD0nn1NC8t6bBSV
-         Y2m7PBzQCXheFvsYF9jZqx3chr66nJXcElBiHfvACPcxjY0VNJoiSeft4M6sPjRp9i
-         /15Ta8qfh6z3LjSIBpnNeZl0hFKEsFjvWWGKfF/qxDT0jcgdTLCyifuXI2D1S1QhIL
-         whK9i7cORQs2g==
-Date:   Fri, 14 May 2021 16:18:25 +0200
-From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To:     Edward Cree <ecree.xilinx@gmail.com>
-Cc:     David Woodhouse <dwmw2@infradead.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Mali DP Maintainers <malidp@foss.arm.com>,
-        alsa-devel@alsa-project.org, coresight@lists.linaro.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
-        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-hwmon@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-sgx@vger.kernel.org, linux-usb@vger.kernel.org,
-        mjpeg-users@lists.sourceforge.net, netdev@vger.kernel.org,
-        rcu@vger.kernel.org
-Subject: Re: [PATCH v2 00/40] Use ASCII subset instead of UTF-8 alternate
- symbols
-Message-ID: <20210514161825.4e4c0d3e@coco.lan>
-In-Reply-To: <8b8bc929-2f07-049d-f24c-cb1f1d85bbaa@gmail.com>
-References: <cover.1620823573.git.mchehab+huawei@kernel.org>
-        <d2fed242fbe200706b8d23a53512f0311d900297.camel@infradead.org>
-        <20210514102118.1b71bec3@coco.lan>
-        <61c286b7afd6c4acf71418feee4eecca2e6c80c8.camel@infradead.org>
-        <8b8bc929-2f07-049d-f24c-cb1f1d85bbaa@gmail.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S233562AbhENOUu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 May 2021 10:20:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50390 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229610AbhENOUr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 May 2021 10:20:47 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 115B3C061574
+        for <kvm@vger.kernel.org>; Fri, 14 May 2021 07:19:36 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id j10so43285942lfb.12
+        for <kvm@vger.kernel.org>; Fri, 14 May 2021 07:19:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=tOxw5SVmfBmJZsWVp0ash7xR3bvJRYuIJQ5qFXcsXHA=;
+        b=tx9wU1U5hFECpxyCJDRlhGXtDfy5TaCOxVKsp1w1DqOQrSOY9xmc/ylcDPqpLM0aS0
+         D17DXI4qMe5zZAKrEaWDux6YMIKH0ys38LI16Kli1zM3w7J/ibXVNT6RorpUowGenRJf
+         C3gYZRib/2QIEV+/KsW84xaFkms5I5tHsP33XzqOHl1nxIw05ZftRBnirHyF5rzOSCOq
+         dNbirna9PEEc9L3Fwfe3+yEIn/JwvjxJaSH1WiyQfuhjf6PdPu7bNtmWqUSHOx3/Gwap
+         ia1AM+e2wYQvU8+Fp1Yz5WnJTr5MbNMTlhsjwh8vOIXRGSbAalsZgWldVGpoyoYFspsU
+         zLiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=tOxw5SVmfBmJZsWVp0ash7xR3bvJRYuIJQ5qFXcsXHA=;
+        b=CeCJzhvMVLNWfsizYPtRUQPzwCe16MIkwIpFRQFVuTtRFQifWXJCbu5r/O/M1ghzH/
+         /XpWKlqAkGXAK+skC5HswHMvSODB/RDyteiO1pkJw0qJyaUfwKUkW+cW2Fqrht8FyKKP
+         qhAmkEhGIaZwXpS0SstYPR4PhHA1iri1gPdDrgOQt+Gs179NMY4YAH8FRPTLid0hE48b
+         p48jECis3+yi0oTTQrxLdWTf+/UWoVzgk9EvKoZj2UIIwloaFPj+9ZzRzdQedTy6foKl
+         MEjk53fc/B1+JHJ82O3nc6bWBPSHPLf9AQQsCDhVZ47j4Xj2SP9yQEWAtCtw1KRcV1gy
+         b5JA==
+X-Gm-Message-State: AOAM533RxdRYh7YRcRGR2ECRS38YFvwEg371Bb/dMKgf+laGe2o8XRDX
+        Yf2gOPbV9qUa0jMFoixUIVPlhE4we2JlYDnQNz12XolWHmuGeg==
+X-Google-Smtp-Source: ABdhPJyztTPoI5ip03CK9uHqiAzOpWhGS6wgDBjUCoBF7m3cu+w6U9xkx5o1iA9rNnGMBDcaP0jiec0vXByQSv+2vGo=
+X-Received: by 2002:a19:431b:: with SMTP id q27mr31293840lfa.226.1621001974221;
+ Fri, 14 May 2021 07:19:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <20210507165947.2502412-1-seanjc@google.com> <20210507165947.2502412-3-seanjc@google.com>
+ <5f084672-5c0d-a6f3-6dcf-38dd76e0bde0@amd.com> <YJla8vpwqCxqgS8C@google.com>
+In-Reply-To: <YJla8vpwqCxqgS8C@google.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Fri, 14 May 2021 08:19:22 -0600
+Message-ID: <CAMkAt6oL9tfF5rvP0htbQNDPr50Zk41Q4KP-dM0N+SJ7xmsWvw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Allow userspace to update tracked sregs for
+ protected guests
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Em Fri, 14 May 2021 12:08:36 +0100
-Edward Cree <ecree.xilinx@gmail.com> escreveu:
+On Mon, May 10, 2021 at 10:10 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Fri, May 07, 2021, Tom Lendacky wrote:
+> > On 5/7/21 11:59 AM, Sean Christopherson wrote:
+> > > Allow userspace to set CR0, CR4, CR8, and EFER via KVM_SET_SREGS for
+> > > protected guests, e.g. for SEV-ES guests with an encrypted VMSA.  KVM
+> > > tracks the aforementioned registers by trapping guest writes, and also
+> > > exposes the values to userspace via KVM_GET_SREGS.  Skipping the regs
+> > > in KVM_SET_SREGS prevents userspace from updating KVM's CPU model to
+> > > match the known hardware state.
+> >
+> > This is very similar to the original patch I had proposed that you were
+> > against :)
+>
+> I hope/think my position was that it should be unnecessary for KVM to need to
+> know the guest's CR0/4/0 and EFER values, i.e. even the trapping is unnecessary.
+> I was going to say I had a change of heart, as EFER.LMA in particular could
+> still be required to identify 64-bit mode, but that's wrong; EFER.LMA only gets
+> us long mode, the full is_64_bit_mode() needs access to cs.L, which AFAICT isn't
+> provided by #VMGEXIT or trapping.
+>
+> Unless I'm missing something, that means that VMGEXIT(VMMCALL) is broken since
+> KVM will incorrectly crush (or preserve) bits 63:32 of GPRs.  I'm guessing no
+> one has reported a bug because either (a) no one has tested a hypercall that
+> requires bits 63:32 in a GPR or (b) the guest just happens to be in 64-bit mode
+> when KVM_SEV_LAUNCH_UPDATE_VMSA is invoked and so the segment registers are
+> frozen to make it appear as if the guest is perpetually in 64-bit mode.
+>
+> I see that sev_es_validate_vmgexit() checks ghcb_cpl_is_valid(), but isn't that
+> either pointless or indicative of a much, much bigger problem?  If VMGEXIT is
+> restricted to CPL0, then the check is pointless.  If VMGEXIT isn't restricted to
+> CPL0, then KVM has a big gaping hole that allows a malicious/broken guest
+> userspace to crash the VM simply by executing VMGEXIT.  Since valid_bitmap is
+> cleared during VMGEXIT handling, I don't think guest userspace can attack/corrupt
+> the guest kernel by doing a replay attack, but it does all but guarantee a
+> VMGEXIT at CPL>0 will be fatal since the required valid bits won't be set.
+>
+> Sadly, the APM doesn't describe the VMGEXIT behavior, nor does any of the SEV-ES
+> documentation I have.  I assume VMGEXIT is recognized at CPL>0 since it morphs
+> to VMMCALL when SEV-ES isn't active.
+>
+> I.e. either the ghcb_cpl_is_valid() check should be nuked, or more likely KVM
+> should do something like this (and then the guest needs to be updated to set the
+> CPL on every VMGEXIT):
+>
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index a9d8d6aafdb8..bb7251e4a3e2 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -2058,7 +2058,7 @@ static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
+>         vcpu->arch.regs[VCPU_REGS_RDX] = ghcb_get_rdx_if_valid(ghcb);
+>         vcpu->arch.regs[VCPU_REGS_RSI] = ghcb_get_rsi_if_valid(ghcb);
+>
+> -       svm->vmcb->save.cpl = ghcb_get_cpl_if_valid(ghcb);
+> +       svm->vmcb->save.cpl = 0;
+>
+>         if (ghcb_xcr0_is_valid(ghcb)) {
+>                 vcpu->arch.xcr0 = ghcb_get_xcr0(ghcb);
+> @@ -2088,6 +2088,10 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+>         if (ghcb->ghcb_usage)
+>                 goto vmgexit_err;
+>
+> +       /* Ignore VMGEXIT at CPL>0 */
+> +       if (!ghcb_cpl_is_valid(ghcb) || ghcb_get_cpl_if_valid(ghcb))
+> +               return 1;
+> +
+>         /*
+>          * Retrieve the exit code now even though is may not be marked valid
+>          * as it could help with debugging.
+> @@ -2142,8 +2146,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+>                 }
+>                 break;
+>         case SVM_EXIT_VMMCALL:
+> -               if (!ghcb_rax_is_valid(ghcb) ||
+> -                   !ghcb_cpl_is_valid(ghcb))
+> +               if (!ghcb_rax_is_valid(ghcb))
+>                         goto vmgexit_err;
+>                 break;
+>         case SVM_EXIT_RDTSCP:
+>
+> > I'm assuming it's meant to make live migration a bit easier?
+>
+> Peter, I forget, were these changes necessary for your work, or was the sole root
+> cause the emulated MMIO bug in our backport?
+>
+> If KVM chugs along happily without these patches, I'd love to pivot and yank out
+> all of the CR0/4/8 and EFER trapping/tracking, and then make KVM_GET_SREGS a nop
+> as well.
 
-> For anyone who doesn't know about it: X has this wonderful thing called
->  the Compose key[1].  For instance, type =E2=8E=84--- to get =E2=80=94, o=
-r =E2=8E=84<" for =E2=80=9C.
-> Much more mnemonic than Unicode codepoints; and you can extend it with
->  user-defined sequences in your ~/.XCompose file.
-
-Good tip. I haven't use composite for years, as US-intl with dead keys is
-enough for 99.999% of my needs.=20
-
-Btw, at least on Fedora with Mate, Composite is disabled by default. It has
-to be enabled first using the same tool that allows changing the Keyboard
-layout[1].
-
-Yet, typing an EN DASH for example, would be "<composite>--.", with is 4
-keystrokes instead of just two ('--'). It means twice the effort ;-)
-
-[1] KDE, GNome, Mate, ... have different ways to enable it and to=20
-    select what key would be considered <composite>:
-
-	https://dry.sailingissues.com/us-international-keyboard-layout.html
-	https://help.ubuntu.com/community/ComposeKey
-
-Thanks,
-Mauro
+Let me look at if these changes are necessary for our SEV-ES copyless
+migration. My initial thoughts are that we still need CR8 trapping and
+setting/getting since its not stored in the VMSA. But I don't think
+we'll need the others.
