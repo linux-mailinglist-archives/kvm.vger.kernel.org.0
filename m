@@ -2,183 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AB7A381067
-	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 21:22:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 47E463812B2
+	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 23:15:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231628AbhENTYA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 May 2021 15:24:00 -0400
-Received: from mail-bn7nam10on2073.outbound.protection.outlook.com ([40.107.92.73]:43105
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229610AbhENTYA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 May 2021 15:24:00 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h7IySrd8MSi73peX7Dz76sGHYK4mCsVbFe34Ln67PaF6lRFnjqjI4yOhYffT/ooZ7MXBewIPCCABLv/p3nAbuvdS1PUoIRlf+H7stK9/sxjSiHUYNRNHFPni/O51/YD6UQpUOjE7eF566fa47CS00FzsAQZoX8u/iNlKjvmAFUDimxuACULQl5bxgWwwOt2wRkvksp7EPYadVtKR2Jth5bxpQAU/OPq7sxhRz02jVAKwQQPgrIDEaFbE7WEBYQNINJWc+GO8Ptg+hhjgF7CYMpRs3Br+Wcin9iGPOnLRQqyd1POoLtUym/Py+MJF5WBIsTENjgM3NOU0EiD0ny3m0w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VepO996Q8zEYKgkFLldzaVYVigxqVmFwVN6bfx3fTb8=;
- b=getjErUrs4AureTy/ZwbvL6pvamx503KE2mr1Ihce0GRN2a1sy68dAhXMGTY6qUYKdjrbnk8Y/usJSSyogTSYnHePucSo5rBvHJZ39+jUmlYR6ASf9ErsDWTDBeyvN9yJPyG2cH9WK6VqoepWlAAAZdxxt6XY/Zx6ykuf3tnf14i/oPbfuszr7FqCuXF1SFJ2tV1zAbdf5EQWWQvy8bEsUrrgnIChCPdADgem6tlATr3HWQYMg0eGtLr0BEjLdSwD/YwgopKG1CEPDQygthvvtu4Uly8vHKA20XQxMm+UubeNaUJP7uscwOMIb70CsJM/Ikd2fsnvdabPfjxWCoA3w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VepO996Q8zEYKgkFLldzaVYVigxqVmFwVN6bfx3fTb8=;
- b=RB771S9AuPe1jrD0E4R9cJMIHVsI1osn+DcAEV1+LpQfc9qacfiGoo+wj0UscIquAWUKQfR0UXomqssl+gFBIUK40AE99eIVaawBXMg6RaJnNMDjL3pa50bbjxzB3K6wFlywD6xtUbgOajPsUXS36qTEbfNcNg7RLppJB+H1kDM=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (10.168.234.7) by
- DM6PR12MB4337.namprd12.prod.outlook.com (20.180.254.76) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4129.25; Fri, 14 May 2021 19:22:46 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::b914:4704:ad6f:aba9]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::b914:4704:ad6f:aba9%12]) with mapi id 15.20.4129.025; Fri, 14 May
- 2021 19:22:46 +0000
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH] KVM: SVM: Do not terminate SEV-ES guests on GHCB validation failure
-Date:   Fri, 14 May 2021 14:22:38 -0500
-Message-Id: <f8811b3768c4306af7fb2732b6b3755489832c55.1621020158.git.thomas.lendacky@amd.com>
-X-Mailer: git-send-email 2.31.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SN1PR12CA0101.namprd12.prod.outlook.com
- (2603:10b6:802:21::36) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+        id S229504AbhENVQv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 May 2021 17:16:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58926 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231625AbhENVQs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 May 2021 17:16:48 -0400
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6523EC06175F
+        for <kvm@vger.kernel.org>; Fri, 14 May 2021 14:15:35 -0700 (PDT)
+Received: by mail-lj1-x231.google.com with SMTP id c15so69178ljr.7
+        for <kvm@vger.kernel.org>; Fri, 14 May 2021 14:15:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=YP+eGppjVWkDeBhjcWdqIDPjokIVDbK7CXUMI0EcWQ8=;
+        b=KaBisoHXMMYWihXKUSL49bKMKjyMoJXFcRiVd/42tDs4JHFQOhL+YomwBom+L0nNM/
+         MvN+FT8kbmcJBRjWtUTwzMN4fXU3BG5dHfsexZJgKtLxbmRvL+eFMEp8ccxyXxA2wF0Q
+         qbQT1ilO2LynIK4S+aZtpSsJdgFXcH2Doim+HgZV5yPrG4N+mq4hEuLZzDuNh6MSXWJx
+         ev8s6aAEa02HhprBkA+r8z1SwOoKF3nBmJvuoz4B47ksOArm+FuNtVEVauzB6W9NXrAJ
+         UpiBCdwwvFwsHgkG1bTrLuPvS/BDRpna5USYlUBbj91bQrpZuUb5GJPGg/fZ5LkSfs8s
+         BzBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=YP+eGppjVWkDeBhjcWdqIDPjokIVDbK7CXUMI0EcWQ8=;
+        b=MEK8/XRRYJ8MKysBDK12gma59S7qZzF291EWh9xnoot47rDUNoVt1WHjgHf8oD2tlW
+         21DboNcDU9JM37tJkseZGCbhSgdb/2Rf6HZks/hOGTjtbzNFPeB/8ueP/asiTQVlQOZb
+         8KSKnCeMIhEqXeRUsDn2QCvt18zbTCVIqRrZHPM91FVS4Oyy4TAoxcGtiSBI/nDH/u+Z
+         ePykCOg/WUl8UPfjm9DnBkdzOzF1u5/ncpx165LDTgCEa1yA3Fc3DsRJOZG6pbaOPfr8
+         x2WOMioQJXwowZBNMEkt2sEd+23YS0pX1yJmi2E6pEZF0ubRbEqdHdqQF4v/B7im+1zO
+         HnHg==
+X-Gm-Message-State: AOAM531Fx27FR6L1XgCRkoB4n8dKPA8m1tVlQbhNWw/rbxFzfpyjN7hx
+        UoAkhKLE1xMhKIXoz2pAhYXZE1hUSJcgMrBgz6QwXw==
+X-Google-Smtp-Source: ABdhPJwc2Ye5WxUiCy3BRkJqAmQL9v+WCQgA5UntPr/ddkuothYSWXBDTDa46pUvThWX6lyJHfyb5IoU2JQRlXUDWHQ=
+X-Received: by 2002:a2e:9a54:: with SMTP id k20mr40269513ljj.448.1621026933346;
+ Fri, 14 May 2021 14:15:33 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from tlendack-t1.amd.com (165.204.77.1) by SN1PR12CA0101.namprd12.prod.outlook.com (2603:10b6:802:21::36) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4108.24 via Frontend Transport; Fri, 14 May 2021 19:22:45 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8f477576-9e5d-4adb-4647-08d9170da768
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4337:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB4337AAF005C7964657440F85EC509@DM6PR12MB4337.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4941;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2ZxxIlxL6rBZhLr8WYxbyxqc9W1nrhh4GZFA5PC6VaLT7rGJBg0WmVZN1lOvnFwPZEkVHChaQGVcPBxk/Kw09KOsJRsSslaUPgHzn0pVUkm2UrVYKDjnlN3FDtp+xcNTkgq+DAnX3Eo+YQDGPXylex1/7MQHICwQd9sO0STPnpA/DiShKl5zIzk+SosQTfXs3TN6FCTWl8BUuPn+h4akeoa4G1tyo/WJa34+kTD9n/iveGCRXe1HXDSo47Ua1ua7IfYKqHSM20TrkZQK6nWXj9wD2UMDGYNaNu9STMLtINdFh7nkmTOUzo9b7Yi71gDh5tH3EoywpF/Ncly6MXANKBNaGf80E6R1IiVXqbCCqkbKpeJbnfx0LEDpkSk5Kt7Rl11X1lfxIlGT54RHRytilFOfb491F3YLW2VMm7RFI7ktQrQvyXb/Nr8DKjPiodJzHB3dtY6pMeF698cft0ulfFHAlFl3z2rc7lVNVdsk0+BjABl3JYNOC8V3aZfv+i1HtQNSN2gsSc6VIT4y5UQqscvPkbCgK0nmoxfJfTjJdvObyVGgb9/zITZavhz4nfexPa29QKD7I5t+4hgmPOmyFCJkmZMLviVs1y/yjyCkkXVrmgUJmIA9oR3MlPEigTyrd3nf/sPpQsoJyJIWQce7HA7BVqt4A6b3Xm0rshR0yFI=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(39860400002)(376002)(396003)(366004)(346002)(83380400001)(4326008)(6666004)(26005)(54906003)(38350700002)(66946007)(66476007)(7696005)(8676002)(7416002)(316002)(52116002)(66556008)(478600001)(86362001)(5660300002)(8936002)(2906002)(186003)(16526019)(2616005)(36756003)(38100700002)(956004)(6486002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?1uyv9d6pUDNEzsVSwuinIZ6jozMq78paiwjNtDIc6c2nThsgwQzvATD73I2q?=
- =?us-ascii?Q?xNOTYKva8Z/LSUhHavjBaPV0BqX0scZLaDYQS6XgNO5RLCSGkiOobWNNcOT0?=
- =?us-ascii?Q?MVn/DjUn0Pe1VnYx4qozRwockGKcCgCsVYDVdFUbh9DxQHmG1Tp313v0Py6/?=
- =?us-ascii?Q?YbJeGMaOBKv9Lc4fp8gZKdoYJAh5AMdugHa17ECdE78zvOnA9qkm0YVJovDi?=
- =?us-ascii?Q?rO9kVIoCrUNCe6HDlZgYycRUHY7QW4Phrn7jp99D6D0meWuAnpaOjNT62HGz?=
- =?us-ascii?Q?eXNNXEZgWKb46wGPfBOkrpac4tx80pUS0nXnqgy8e7eRyZHNwyleV0ePyj6D?=
- =?us-ascii?Q?vwwsVlS6Do2NJKGHHbTV6LlvUUHKsB4JewtmKifKVHMX9IEYJ0tdEMGh5bEp?=
- =?us-ascii?Q?MfR9aiL3Q0DPBMh0EYqewpVmq7WHbNjYfRS26HtB9mgJSZvnfv30ussor95i?=
- =?us-ascii?Q?aHyV7KK6IXRjvqa4b84ktTPEwDM5Y1jpwLPN0JK/9xLPrYz82STvaR+T4usQ?=
- =?us-ascii?Q?V2dj+j1FUQJxVPo3u4gNqBjYtIkOS2ioR6eGyIRvcgfPVIz1B6tiHLN6OGp8?=
- =?us-ascii?Q?KFguwVWDi8G+mlvbseQ1yg8w0Pa9qXxPVXEgvf2K8yXlAHALljLHPgT+NPsR?=
- =?us-ascii?Q?Bql2Zy9IJ2i+mVMEqE0Kc6EpTYEYqN+PlA/MTKNHhDqHaHXWdmD3oLDrG7x4?=
- =?us-ascii?Q?SQnsAyWgJRZYIcFwsFjgnb+n8IsaV5wN2J8nN5CFkwsBZoHkqRx6P/oOwuVy?=
- =?us-ascii?Q?nf9kSwNlK7u1AguV48NksOqNW7bdYiwaIaUYSqIzDdfik7Xkua0VOF4hEMuE?=
- =?us-ascii?Q?mKkvJrugiO6ODQktuaQQ4UKrI8DqECSQaoHkFkuC0M4ApaKAgkLRZu5oYJ5s?=
- =?us-ascii?Q?IrNHxicM4/CnPp71hO1+patGdHDoBELooIY6TYFFoFfvH28yT/EOm5GVuUag?=
- =?us-ascii?Q?oWeDaSVfBJlgtxN5n5FeK68R1Yi7/7B7MfAoXZJiGz1cpspUTiEUyd19KTDC?=
- =?us-ascii?Q?BoplUgHCrCgl//9rbbv/2VPZ6qtToVNrtKFz7ifJxUKE/sMkye7v5tMepRzP?=
- =?us-ascii?Q?s7IzvC2LXPClDBE+fG/fngOqfVO9uOmj5w/fM66UzzRzxn3ztW5jLFtz6Fjv?=
- =?us-ascii?Q?LpV9E+GtT058szlgsCUZNxb2eJRtZhKoKZTrrb+gTYMKrvy+0H3S3Z6I2qsk?=
- =?us-ascii?Q?HaOA5ZXYDrZZ9QWOsP0j1M2U3E/zSuHj9Ve9ShefrSKk5gcBownVylGyMjpx?=
- =?us-ascii?Q?tMQ+ovL3fhhwybVU+bJPnfp/VrYnLnxu0eOoOzO9sOBB7fAucseGX+7fFU63?=
- =?us-ascii?Q?8WmhlnBJqRhNtTPLbbSidCUe?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8f477576-9e5d-4adb-4647-08d9170da768
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2021 19:22:46.1817
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wl2KnUPAZwn9Pq+fYeM0TyiQLW/yjyf6is7J0v532Mm3S+3Q6fVkyQxBqp+xCVpm5EXOpZVDf9R0e8FxfHI64Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4337
+References: <20210511220949.1019978-1-jmattson@google.com>
+In-Reply-To: <20210511220949.1019978-1-jmattson@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Fri, 14 May 2021 14:15:07 -0700
+Message-ID: <CALzav=e+eB1eH0DJSrPBp6a0sE-SYB5osn_7_ShHSWVgvjfb7w@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: Convert vmx_tests.c comments to ASCII
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, an SEV-ES guest is terminated if the validation of the VMGEXIT
-exit code and parameters fail. Since the VMGEXIT instruction can be issued
-from userspace, even though userspace (likely) can't update the GHCB,
-don't allow userspace to be able to kill the guest.
+On Tue, May 11, 2021 at 3:10 PM Jim Mattson <jmattson@google.com> wrote:
+>
+> Some strange characters snuck into this file. Convert them to ASCII
+> for better readability.
+>
+> Signed-off-by: Jim Mattson <jmattson@google.com>
 
-Return a #GP request through the GHCB when validation fails, rather than
-terminating the guest.
+Reviewed-by: David Matlack <dmatlack@google.com>
 
-Fixes: 291bd20d5d88 ("KVM: SVM: Add initial support for a VMGEXIT VMEXIT")
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
----
- arch/x86/kvm/svm/sev.c | 24 +++++++++++++-----------
- 1 file changed, 13 insertions(+), 11 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 5bc887e9a986..bc77f26f0880 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2075,7 +2075,7 @@ static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
- 	memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
- }
- 
--static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
-+static bool sev_es_validate_vmgexit(struct vcpu_svm *svm)
- {
- 	struct kvm_vcpu *vcpu;
- 	struct ghcb *ghcb;
-@@ -2174,7 +2174,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
- 		goto vmgexit_err;
- 	}
- 
--	return 0;
-+	return true;
- 
- vmgexit_err:
- 	vcpu = &svm->vcpu;
-@@ -2188,13 +2188,16 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
- 		dump_ghcb(svm);
- 	}
- 
--	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
--	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
--	vcpu->run->internal.ndata = 2;
--	vcpu->run->internal.data[0] = exit_code;
--	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
-+	/* Clear the valid entries fields */
-+	memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
- 
--	return -EINVAL;
-+	ghcb_set_sw_exit_info_1(ghcb, 1);
-+	ghcb_set_sw_exit_info_2(ghcb,
-+				X86_TRAP_GP |
-+				SVM_EVTINJ_TYPE_EXEPT |
-+				SVM_EVTINJ_VALID);
-+
-+	return false;
- }
- 
- void sev_es_unmap_ghcb(struct vcpu_svm *svm)
-@@ -2459,9 +2462,8 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 
- 	exit_code = ghcb_get_sw_exit_code(ghcb);
- 
--	ret = sev_es_validate_vmgexit(svm);
--	if (ret)
--		return ret;
-+	if (!sev_es_validate_vmgexit(svm))
-+		return 1;
- 
- 	sev_es_sync_from_ghcb(svm);
- 	ghcb_set_sw_exit_info_1(ghcb, 0);
--- 
-2.31.0
-
+> ---
+>  x86/vmx_tests.c | 44 ++++++++++++++++++++++----------------------
+>  1 file changed, 22 insertions(+), 22 deletions(-)
+>
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index 2eb5962..179a55b 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -4049,13 +4049,13 @@ static void test_pi_desc_addr(u64 addr, bool ctrl=
+)
+>  }
+>
+>  /*
+> - * If the =C3=A2=E2=82=AC=C5=93process posted interrupts=C3=A2=E2=82=AC =
+VM-execution control is 1, the
+> + * If the "process posted interrupts" VM-execution control is 1, the
+>   * following must be true:
+>   *
+> - *     - The =C3=A2=E2=82=AC=C5=93virtual-interrupt delivery=C3=A2=E2=82=
+=AC VM-execution control is 1.
+> - *     - The =C3=A2=E2=82=AC=C5=93acknowledge interrupt on exit=C3=A2=E2=
+=82=AC VM-exit control is 1.
+> + *     - The "virtual-interrupt delivery" VM-execution control is 1.
+> + *     - The "acknowledge interrupt on exit" VM-exit control is 1.
+>   *     - The posted-interrupt notification vector has a value in the
+> - *     - range 0=C3=A2=E2=82=AC=E2=80=9C255 (bits 15:8 are all 0).
+> + *     - range 0 - 255 (bits 15:8 are all 0).
+>   *     - Bits 5:0 of the posted-interrupt descriptor address are all 0.
+>   *     - The posted-interrupt descriptor address does not set any bits
+>   *       beyond the processor's physical-address width.
+> @@ -4179,7 +4179,7 @@ static void test_apic_ctls(void)
+>  }
+>
+>  /*
+> - * If the =C3=A2=E2=82=AC=C5=93enable VPID=C3=A2=E2=82=AC VM-execution c=
+ontrol is 1, the value of the
+> + * If the "enable VPID" VM-execution control is 1, the value of the
+>   * of the VPID VM-execution control field must not be 0000H.
+>   * [Intel SDM]
+>   */
+> @@ -4263,7 +4263,7 @@ static void test_invalid_event_injection(void)
+>         vmcs_write(ENT_INTR_ERROR, 0x00000000);
+>         vmcs_write(ENT_INST_LEN, 0x00000001);
+>
+> -       /* The field=E2=80=99s interruption type is not set to a reserved=
+ value. */
+> +       /* The field's interruption type is not set to a reserved value. =
+*/
+>         ent_intr_info =3D ent_intr_info_base | INTR_TYPE_RESERVED | DE_VE=
+CTOR;
+>         report_prefix_pushf("%s, VM-entry intr info=3D0x%x",
+>                             "RESERVED interruption type invalid [-]",
+> @@ -4480,7 +4480,7 @@ skip_unrestricted_guest:
+>         /*
+>          * If the interruption type is software interrupt, software excep=
+tion,
+>          * or privileged software exception, the VM-entry instruction-len=
+gth
+> -        * field is in the range 0=E2=80=9315.
+> +        * field is in the range 0 - 15.
+>          */
+>
+>         for (cnt =3D 0; cnt < 3; cnt++) {
+> @@ -4686,8 +4686,8 @@ out:
+>   *  VM-execution control must be 0.
+>   *  [Intel SDM]
+>   *
+> - *  If the =E2=80=9Cvirtual NMIs=E2=80=9D VM-execution control is 0, the=
+ =E2=80=9CNMI-window
+> - *  exiting=E2=80=9D VM-execution control must be 0.
+> + *  If the "virtual NMIs" VM-execution control is 0, the "NMI-window
+> + *  exiting" VM-execution control must be 0.
+>   *  [Intel SDM]
+>   */
+>  static void test_nmi_ctrls(void)
+> @@ -5448,14 +5448,14 @@ static void test_vm_execution_ctls(void)
+>    * the VM-entry MSR-load count field is non-zero:
+>    *
+>    *    - The lower 4 bits of the VM-entry MSR-load address must be 0.
+> -  *      The address should not set any bits beyond the processor=C3=A2=
+=E2=82=AC=E2=84=A2s
+> +  *      The address should not set any bits beyond the processor's
+>    *      physical-address width.
+>    *
+>    *    - The address of the last byte in the VM-entry MSR-load area
+> -  *      should not set any bits beyond the processor=C3=A2=E2=82=AC=E2=
+=84=A2s physical-address
+> +  *      should not set any bits beyond the processor's physical-address
+>    *      width. The address of this last byte is VM-entry MSR-load addre=
+ss
+>    *      + (MSR count * 16) - 1. (The arithmetic used for the computatio=
+n
+> -  *      uses more bits than the processor=C3=A2=E2=82=AC=E2=84=A2s phys=
+ical-address width.)
+> +  *      uses more bits than the processor's physical-address width.)
+>    *
+>    *
+>    *  [Intel SDM]
+> @@ -5574,14 +5574,14 @@ static void test_vm_entry_ctls(void)
+>   * the VM-exit MSR-store count field is non-zero:
+>   *
+>   *    - The lower 4 bits of the VM-exit MSR-store address must be 0.
+> - *      The address should not set any bits beyond the processor=E2=80=
+=99s
+> + *      The address should not set any bits beyond the processor's
+>   *      physical-address width.
+>   *
+>   *    - The address of the last byte in the VM-exit MSR-store area
+> - *      should not set any bits beyond the processor=E2=80=99s physical-=
+address
+> + *      should not set any bits beyond the processor's physical-address
+>   *      width. The address of this last byte is VM-exit MSR-store addres=
+s
+>   *      + (MSR count * 16) - 1. (The arithmetic used for the computation
+> - *      uses more bits than the processor=E2=80=99s physical-address wid=
+th.)
+> + *      uses more bits than the processor's physical-address width.)
+>   *
+>   * If IA32_VMX_BASIC[48] is read as 1, neither address should set any bi=
+ts
+>   * in the range 63:32.
+> @@ -7172,7 +7172,7 @@ static void test_ctl_reg(const char *cr_name, u64 c=
+r, u64 fixed0, u64 fixed1)
+>   *    operation.
+>   * 3. On processors that support Intel 64 architecture, the CR3 field mu=
+st
+>   *    be such that bits 63:52 and bits in the range 51:32 beyond the
+> - *    processor=C3=A2=E2=82=AC=E2=84=A2s physical-address width must be =
+0.
+> + *    processor's physical-address width must be 0.
+>   *
+>   *  [Intel SDM]
+>   */
+> @@ -7940,11 +7940,11 @@ static void test_load_guest_pat(void)
+>  #define MSR_IA32_BNDCFGS_RSVD_MASK     0x00000ffc
+>
+>  /*
+> - * If the =C3=A2=E2=82=AC=C5=93load IA32_BNDCFGS=C3=A2=E2=82=AC VM-entry=
+ control is 1, the following
+> + * If the "load IA32_BNDCFGS" VM-entry control is 1, the following
+>   * checks are performed on the field for the IA32_BNDCFGS MSR:
+>   *
+> - *   =C3=A2=E2=82=AC=E2=80=9D  Bits reserved in the IA32_BNDCFGS MSR mus=
+t be 0.
+> - *   =C3=A2=E2=82=AC=E2=80=9D  The linear address in bits 63:12 must be =
+canonical.
+> + *   - Bits reserved in the IA32_BNDCFGS MSR must be 0.
+> + *   - The linear address in bits 63:12 must be canonical.
+>   *
+>   *  [Intel SDM]
+>   */
+> @@ -8000,9 +8000,9 @@ do {                                               =
+                       \
+>  /*
+>   * The following checks are done on the Selector field of the Guest Segm=
+ent
+>   * Registers:
+> - *    =E2=80=94 TR. The TI flag (bit 2) must be 0.
+> - *    =E2=80=94 LDTR. If LDTR is usable, the TI flag (bit 2) must be 0.
+> - *    =E2=80=94 SS. If the guest will not be virtual-8086 and the "unres=
+tricted
+> + *    - TR. The TI flag (bit 2) must be 0.
+> + *    - LDTR. If LDTR is usable, the TI flag (bit 2) must be 0.
+> + *    - SS. If the guest will not be virtual-8086 and the "unrestricted
+>   *     guest" VM-execution control is 0, the RPL (bits 1:0) must equal
+>   *     the RPL of the selector field for CS.
+>   *
+> --
+> 2.31.1.607.g51e8a6a459-goog
+>
