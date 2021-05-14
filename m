@@ -2,219 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 87A93380247
-	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 05:10:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E6E838032E
+	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 07:17:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231189AbhENDLB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 May 2021 23:11:01 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3668 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229980AbhENDLB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 May 2021 23:11:01 -0400
-Received: from dggems705-chm.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FhD2z1kWvz1BMP2;
-        Fri, 14 May 2021 11:07:07 +0800 (CST)
-Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
- dggems705-chm.china.huawei.com (10.3.19.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Fri, 14 May 2021 11:09:48 +0800
-Received: from [10.174.185.210] (10.174.185.210) by
- dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2176.2; Fri, 14 May 2021 11:09:47 +0800
-Subject: Re: [PATCH v15 07/12] iommu/smmuv3: Implement cache_invalidate
-To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
-        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-        <will@kernel.org>, <maz@kernel.org>, <robin.murphy@arm.com>,
-        <joro@8bytes.org>, <alex.williamson@redhat.com>, <tn@semihalf.com>,
-        <zhukeqian1@huawei.com>
-CC:     <jacob.jun.pan@linux.intel.com>, <yi.l.liu@intel.com>,
-        <wangxingang5@huawei.com>, <jean-philippe@linaro.org>,
-        <zhangfei.gao@linaro.org>, <zhangfei.gao@gmail.com>,
-        <vivek.gautam@arm.com>, <shameerali.kolothum.thodi@huawei.com>,
-        <yuzenghui@huawei.com>, <nicoleotsuka@gmail.com>,
-        <lushenming@huawei.com>, <vsethi@nvidia.com>,
-        <chenxiang66@hisilicon.com>, <vdumpa@nvidia.com>,
-        <wanghaibin.wang@huawei.com>
-References: <20210411111228.14386-1-eric.auger@redhat.com>
- <20210411111228.14386-8-eric.auger@redhat.com>
-From:   Kunkun Jiang <jiangkunkun@huawei.com>
-Message-ID: <e6483bc3-192b-9b68-b3e1-641b1bed4bf6@huawei.com>
-Date:   Fri, 14 May 2021 11:09:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        id S231179AbhENFNK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 May 2021 01:13:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57618 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229480AbhENFNK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 May 2021 01:13:10 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 509DA6141F
+        for <kvm@vger.kernel.org>; Fri, 14 May 2021 05:11:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1620969119;
+        bh=89LPmC6xl6/RVBJjKjZBJhT2GrBhxlOpYu9HuggbB6o=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=Dfe7d0hhYGed4ACRU3n+0ldK+xNDd20mjVys7UWSGxwdv5+TnophL718h1argZnz+
+         keyzL9d36IqUiv2fOzaU0/mn8ON2sABImEnRrxghu6B+ReovLXK+oMo/a6cR3BLfuk
+         qgFMQDhC0dYuZAdm+4wnwsIWkkCSdS+PH319/QdfXmWQ5OP5pbnkZ9tgRR63jJMv8B
+         f/kkjmxyJS4g1+Dzkv5wyxENsARXtxfKLvloBfzKxTXzPYoY9UL0V03LinTTwTgILf
+         x3YOl2rPRa8iQ22CjhIoAS1o032DCQbiPD5/hfJLMZVgD0pZozAR+8924Bjf89uLSI
+         z2PbwIAfr/BqQ==
+Received: by mail-ed1-f46.google.com with SMTP id df21so6110125edb.3
+        for <kvm@vger.kernel.org>; Thu, 13 May 2021 22:11:59 -0700 (PDT)
+X-Gm-Message-State: AOAM531HN+XxtZlZnGlKOFWaz1sk2Y9xe00mS8uDQ9mO63anSbOFQV5U
+        HzIgP56la7htDzQ110vhUCYP9jmdGzahHrNs5hUYPw==
+X-Google-Smtp-Source: ABdhPJw+ccNrVUgG+d2zJVrnNC3qHf4+8zwUMT2QGD5YHjjIvDUYjg7dBuYBxBqJl8cxUVDm2YAHg5K6SuNf/yEDcXE=
+X-Received: by 2002:aa7:d390:: with SMTP id x16mr52685761edq.172.1620969107558;
+ Thu, 13 May 2021 22:11:47 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210411111228.14386-8-eric.auger@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.174.185.210]
-X-ClientProxiedBy: dggeme706-chm.china.huawei.com (10.1.199.102) To
- dggema765-chm.china.huawei.com (10.1.198.207)
-X-CFilter-Loop: Reflected
+References: <20210507164456.1033-1-jon@nutanix.com>
+In-Reply-To: <20210507164456.1033-1-jon@nutanix.com>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Thu, 13 May 2021 22:11:36 -0700
+X-Gmail-Original-Message-ID: <CALCETrW0_vwpbVVpc+85MvoGqg3qJA+FV=9tmUiZz6an7dQrGg@mail.gmail.com>
+Message-ID: <CALCETrW0_vwpbVVpc+85MvoGqg3qJA+FV=9tmUiZz6an7dQrGg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: add hint to skip hidden rdpkru under kvm_load_host_xsave_state
+To:     Jon Kohler <jon@nutanix.com>
+Cc:     Babu Moger <babu.moger@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Yu-cheng Yu <yu-cheng.yu@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Uros Bizjak <ubizjak@gmail.com>,
+        Petteri Aimonen <jpa@git.mail.kapsi.fi>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Benjamin Thiel <b.thiel@posteo.de>,
+        Fan Yang <Fan_Yang@sjtu.edu.cn>,
+        Juergen Gross <jgross@suse.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, May 7, 2021 at 9:45 AM Jon Kohler <jon@nutanix.com> wrote:
+>
+> kvm_load_host_xsave_state handles xsave on vm exit, part of which is
+> managing memory protection key state. The latest arch.pkru is updated
+> with a rdpkru, and if that doesn't match the base host_pkru (which
+> about 70% of the time), we issue a __write_pkru.
 
+This thread caused me to read the code, and I don't get how it's even
+remotely correct.
 
-On 2021/4/11 19:12, Eric Auger wrote:
-> Implement domain-selective, pasid selective and page-selective
-> IOTLB invalidations.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->
-> ---
-> v4 -> v15:
-> - remove the redundant arm_smmu_cmdq_issue_sync(smmu)
->    in IOMMU_INV_GRANU_ADDR case (Zenghui)
-> - if RIL is not supported by the host, make sure the granule_size
->    that is passed by the userspace is supported or fix it
->    (Chenxiang)
->
-> v13 -> v14:
-> - Add domain invalidation
-> - do global inval when asid is not provided with addr
->    granularity
->
-> v7 -> v8:
-> - ASID based invalidation using iommu_inv_pasid_info
-> - check ARCHID/PASID flags in addr based invalidation
-> - use __arm_smmu_tlb_inv_context and __arm_smmu_tlb_inv_range_nosync
->
-> v6 -> v7
-> - check the uapi version
->
-> v3 -> v4:
-> - adapt to changes in the uapi
-> - add support for leaf parameter
-> - do not use arm_smmu_tlb_inv_range_nosync or arm_smmu_tlb_inv_context
->    anymore
->
-> v2 -> v3:
-> - replace __arm_smmu_tlb_sync by arm_smmu_cmdq_issue_sync
->
-> v1 -> v2:
-> - properly pass the asid
-> ---
->   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 89 +++++++++++++++++++++
->   1 file changed, 89 insertions(+)
->
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index 56a301fbe75a..bfc112cc0d38 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -2961,6 +2961,94 @@ static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
->   	mutex_unlock(&smmu_domain->init_mutex);
->   }
->   
-> +static int
-> +arm_smmu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
-> +			  struct iommu_cache_invalidate_info *inv_info)
-> +{
-> +	struct arm_smmu_cmdq_ent cmd = {.opcode = CMDQ_OP_TLBI_NSNH_ALL};
-> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-> +	struct arm_smmu_device *smmu = smmu_domain->smmu;
-> +
-> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-> +		return -EINVAL;
-> +
-> +	if (!smmu)
-> +		return -EINVAL;
-> +
-> +	if (inv_info->version != IOMMU_CACHE_INVALIDATE_INFO_VERSION_1)
-> +		return -EINVAL;
-> +
-> +	if (inv_info->cache & IOMMU_CACHE_INV_TYPE_PASID ||
-> +	    inv_info->cache & IOMMU_CACHE_INV_TYPE_DEV_IOTLB) {
-> +		return -ENOENT;
-> +	}
-> +
-> +	if (!(inv_info->cache & IOMMU_CACHE_INV_TYPE_IOTLB))
-> +		return -EINVAL;
-> +
-> +	/* IOTLB invalidation */
-> +
-> +	switch (inv_info->granularity) {
-> +	case IOMMU_INV_GRANU_PASID:
-> +	{
-> +		struct iommu_inv_pasid_info *info =
-> +			&inv_info->granu.pasid_info;
-> +
-> +		if (info->flags & IOMMU_INV_ADDR_FLAGS_PASID)
-> +			return -ENOENT;
-> +		if (!(info->flags & IOMMU_INV_PASID_FLAGS_ARCHID))
-> +			return -EINVAL;
-> +
-> +		__arm_smmu_tlb_inv_context(smmu_domain, info->archid);
-> +		return 0;
-> +	}
-> +	case IOMMU_INV_GRANU_ADDR:
-> +	{
-> +		struct iommu_inv_addr_info *info = &inv_info->granu.addr_info;
-> +		size_t granule_size  = info->granule_size;
-> +		size_t size = info->nb_granules * info->granule_size;
-> +		bool leaf = info->flags & IOMMU_INV_ADDR_FLAGS_LEAF;
-> +		int tg;
-> +
-> +		if (info->flags & IOMMU_INV_ADDR_FLAGS_PASID)
-> +			return -ENOENT;
-> +
-> +		if (!(info->flags & IOMMU_INV_ADDR_FLAGS_ARCHID))
-> +			break;
-> +
-> +		tg = __ffs(granule_size);
-> +		if (granule_size & ~(1 << tg))
-> +			return -EINVAL;
-This check looks like to confirm the granule_size is a power of 2.
-Does the granule_size have to be a power of 2?
-I think it should also be handled correctly, even if the granule_size is 
-not a power of 2.
-> +		/*
-> +		 * When RIL is not supported, make sure the granule size that is
-> +		 * passed is supported. In RIL mode, this is enforced in
-> +		 * __arm_smmu_tlb_inv_range()
-> +		 */
-> +		if (!(smmu->features & ARM_SMMU_FEAT_RANGE_INV) &&
-> +		    !(granule_size & smmu_domain->domain.pgsize_bitmap)) {
-> +			tg = __ffs(smmu_domain->domain.pgsize_bitmap);
-> +			granule_size = 1 << tg;
-> +			size = size >> tg;
-Why does size need to be shifted tg bits to the right?
+First, kvm_load_guest_fpu() has this delight:
 
-Thanks,
-Kunkun Jiang
-> +		}
-> +
-> +		arm_smmu_tlb_inv_range_domain(info->addr, size,
-> +					      granule_size, leaf,
-> +					      info->archid, smmu_domain);
-> +		return 0;
-> +	}
-> +	case IOMMU_INV_GRANU_DOMAIN:
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	/* Global S1 invalidation */
-> +	cmd.tlbi.vmid   = smmu_domain->s2_cfg.vmid;
-> +	arm_smmu_cmdq_issue_cmd(smmu, &cmd);
-> +	arm_smmu_cmdq_issue_sync(smmu);
-> +	return 0;
-> +}
-> +
->   static bool arm_smmu_dev_has_feature(struct device *dev,
->   				     enum iommu_dev_features feat)
->   {
-> @@ -3060,6 +3148,7 @@ static struct iommu_ops arm_smmu_ops = {
->   	.put_resv_regions	= generic_iommu_put_resv_regions,
->   	.attach_pasid_table	= arm_smmu_attach_pasid_table,
->   	.detach_pasid_table	= arm_smmu_detach_pasid_table,
-> +	.cache_invalidate	= arm_smmu_cache_invalidate,
->   	.dev_has_feat		= arm_smmu_dev_has_feature,
->   	.dev_feat_enabled	= arm_smmu_dev_feature_enabled,
->   	.dev_enable_feat	= arm_smmu_dev_enable_feature,
+    /*
+     * Guests with protected state can't have it set by the hypervisor,
+     * so skip trying to set it.
+     */
+    if (vcpu->arch.guest_fpu)
+        /* PKRU is separately restored in kvm_x86_ops.run. */
+        __copy_kernel_to_fpregs(&vcpu->arch.guest_fpu->state,
+                    ~XFEATURE_MASK_PKRU);
 
+That's nice, but it fails to restore XINUSE[PKRU].  As far as I know,
+that bit is live, and the only way to restore it to 0 is with
+XRSTOR(S).
 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index cebdaa1e3cf5..cd95adbd140c 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -912,10 +912,10 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu)
+>         }
+>
+>         if (static_cpu_has(X86_FEATURE_PKU) &&
+> -           (kvm_read_cr4_bits(vcpu, X86_CR4_PKE) ||
+> -            (vcpu->arch.xcr0 & XFEATURE_MASK_PKRU)) &&
+> -           vcpu->arch.pkru != vcpu->arch.host_pkru)
+> -               __write_pkru(vcpu->arch.pkru);
+> +           vcpu->arch.pkru != vcpu->arch.host_pkru &&
+> +           ((vcpu->arch.xcr0 & XFEATURE_MASK_PKRU) ||
+> +            kvm_read_cr4_bits(vcpu, X86_CR4_PKE)))
+> +               __write_pkru(vcpu->arch.pkru, false);
+
+Please tell me I'm missing something (e.g. KVM very cleverly managing
+the PKRU register using intercepts) that makes this reliably load the
+guest value.  An innocent or malicious guest could easily make that
+condition evaluate to false, thus allowing the host PKRU value to be
+live in guest mode.  (Or is something fancy going on here?)
+
+I don't even want to think about what happens if a perf NMI hits and
+accesses host user memory while the guest PKRU is live (on VMX -- I
+think this can't happen on SVM).
+
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_load_guest_xsave_state);
+>
+> @@ -925,11 +925,11 @@ void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
+>                 return;
+>
+>         if (static_cpu_has(X86_FEATURE_PKU) &&
+> -           (kvm_read_cr4_bits(vcpu, X86_CR4_PKE) ||
+> -            (vcpu->arch.xcr0 & XFEATURE_MASK_PKRU))) {
+> +           ((vcpu->arch.xcr0 & XFEATURE_MASK_PKRU) ||
+> +            kvm_read_cr4_bits(vcpu, X86_CR4_PKE))) {
+>                 vcpu->arch.pkru = rdpkru();
+>                 if (vcpu->arch.pkru != vcpu->arch.host_pkru)
+> -                       __write_pkru(vcpu->arch.host_pkru);
+> +                       __write_pkru(vcpu->arch.host_pkru, true);
+>         }
+
+Suppose the guest writes to PKRU and then, without exiting, sets PKE =
+0 and XCR0[PKRU] = 0.  (Or are the intercepts such that this can't
+happen except on SEV where maybe SEV magic makes the problem go away?)
+
+I admit I'm fairly mystified as to why KVM doesn't handle PKRU like
+the rest of guest XSTATE.
