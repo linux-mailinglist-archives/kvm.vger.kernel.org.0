@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0795E380A67
-	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 15:31:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75B06380A79
+	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 15:39:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233963AbhENNc5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 May 2021 09:32:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39484 "EHLO
+        id S233981AbhENNk4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 May 2021 09:40:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231576AbhENNc4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 May 2021 09:32:56 -0400
-Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25ADEC061574
-        for <kvm@vger.kernel.org>; Fri, 14 May 2021 06:31:45 -0700 (PDT)
-Received: by mail-qv1-xf31.google.com with SMTP id r13so15408003qvm.7
-        for <kvm@vger.kernel.org>; Fri, 14 May 2021 06:31:45 -0700 (PDT)
+        with ESMTP id S229906AbhENNkz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 May 2021 09:40:55 -0400
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7912C061574
+        for <kvm@vger.kernel.org>; Fri, 14 May 2021 06:39:42 -0700 (PDT)
+Received: by mail-qt1-x82f.google.com with SMTP id h21so18431180qtu.5
+        for <kvm@vger.kernel.org>; Fri, 14 May 2021 06:39:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ziepe.ca; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=oibZ2encQTXVcTS46xz1aln4vXwMiQRn+5Ve6HidmyY=;
-        b=P01L9ipF0WXXprGU/TPHMse5/2JNa5KJigLzB+MgLrkiRFpKV1d2TmruEIRGE/O2rT
-         iiF42kQ3dw4/Ch/XtfZOpwpxPBgVZKlZepQw/F1pT5ms+OVjo7ydBxwBFLOD4pFck3pX
-         f/NebrrJv+SMBUTHk3L2av0vieMiDpXGBAKiDs5U2/zXF1qRjy2armYsx39Ght5EFKH2
-         d91amYNGXarhYvHIiJ3JkLOljk4RqMqWPMXK+okMlwkVyKMoLFmm5GfL7XMQtlV2jACI
-         37Vdw6Mcy5n9S1ZpNBhtDgbvyBrqIrFPqfhlZc44jM/ZWDIhGcb0mFlhmSHuVzBytMpF
-         on1A==
+        bh=fw8jRpLJUUiDLFl+R/OeLe/+vcSlILAW8JDLv7Pnlgw=;
+        b=ZA9iIphKPPHvcLSkBu2C/QMxUDhXyUp7Ql0A7zhq+gl8tX2VVw4d6MWbL3YGt3zMia
+         eovdKfEgpKv/Kc6JgMp9UCw9S8MZR5nPFduJNr7x/z0XbVlGgNLXVftzfUVKBu0b6ABm
+         RinPPw/eYvAo5xq2FjGO1ry+PBwldBVbyqtEvWJumFPyH6ThWymQ9gXFH0NAf+gQaVpn
+         M9srCHz/FBZ/gl8Q7AQ70j9xSGfCbxZD9KMqMhWJ8ejqfvSLeS76TlpPfl+r5p2DMKcd
+         O1K+SZm8GDVksZO0NYGjA4OCifqgsBaX7QsLUNiJf774sdooSmqhK4/lbsOJfcz7ocEi
+         FQ+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=oibZ2encQTXVcTS46xz1aln4vXwMiQRn+5Ve6HidmyY=;
-        b=cxhaZVEtFWqF7ABIv7L0dOpOQHFBkbv2ZkNLKBXfpTh4NhbT3Og6A/ou0gFpmKrM2i
-         VJlMu5O649BEikg6KlbOwJ8/lWr9cFQTu21eRZaaMDXh094lHfchZuUbq7QCTdbKhRY6
-         5Zf4PC8QK2RGEkxHlreRjxD8ge66U7thJ/BwSW3Jd9a2PsX2WnEorzCT7rY4izNs+LuL
-         e09kCGaR1egiSXhMbdKE27nm1uP1SgOE7z4UXsqTqLU+eAnhX9/DoaQPo9MoccgfKrJB
-         YoP1A0KE4vknXJT0yKqyYGM71xIhB1pGCdr52C1nxn8YNrFE4plWH5oT5RXzxrmQo2Lk
-         A/Iw==
-X-Gm-Message-State: AOAM531F8/2AgEifHcWSdwnmjvrxTEje9EdKPDD3aiYqM5A+v1/18JFI
-        fxzDiwY2oPA0lN1hO0H1iI3C85TWNP7IRf3X
-X-Google-Smtp-Source: ABdhPJz/Gqut1q/aFEFJ4dhIoQHY99jUDAFFC+RcHlUQEp277wF1zYHdBA3LTZbkkjtOGNdQocIJpQ==
-X-Received: by 2002:a0c:c488:: with SMTP id u8mr45442908qvi.47.1620999104308;
-        Fri, 14 May 2021 06:31:44 -0700 (PDT)
+        bh=fw8jRpLJUUiDLFl+R/OeLe/+vcSlILAW8JDLv7Pnlgw=;
+        b=odPUPpNwAFiMHbsABenq8e90TNGMK/eEaskO9UzeeoFOZNYOHGZk9Auf7QAUNHlGuQ
+         WNBS3QPskBwLiV2emSSBXcOgppQXx6SfEgschtr3fingmrk7YICsCLDuDRQVZmAdXhCX
+         W+FeVonvQIYHP+O78hm5KE18QsMgHjXwck0A/3NZmTEk64en96dHGe6T/4lvGKRdvp8V
+         lGt2VjJltxSozcG38XGNDFd2Y+CDzpMVALkqIAYYtQ8VKtjoWBcYWcrMh0cnewKTAQ8h
+         kjcmI4Iy+bCFXg4Mq3L2sRJoRChy7WSgcMNwahMWBIXxiyD//8swG3FzlS8ahhEkv1lY
+         cXBg==
+X-Gm-Message-State: AOAM5325RFK5BVAXfi3UK+eXemM0jAHDe/1rNFyPu6br1ZXjF/SSdK7f
+        msw4fvtj4qdzy4Ci1tr68jYbYw==
+X-Google-Smtp-Source: ABdhPJyHkmiobTC20DDQbl/CkwGCuAAsPOfAEooNlfis4Grfk/a3JX140lwF9zGRuivL/kulThANeQ==
+X-Received: by 2002:a05:622a:5c9:: with SMTP id d9mr14474203qtb.177.1620999582009;
+        Fri, 14 May 2021 06:39:42 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-47-55-113-94.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.113.94])
-        by smtp.gmail.com with ESMTPSA id y1sm4582720qkp.21.2021.05.14.06.31.43
+        by smtp.gmail.com with ESMTPSA id 11sm4839279qkk.31.2021.05.14.06.39.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 May 2021 06:31:43 -0700 (PDT)
+        Fri, 14 May 2021 06:39:41 -0700 (PDT)
 Received: from jgg by mlx with local (Exim 4.94)
         (envelope-from <jgg@ziepe.ca>)
-        id 1lhXup-007RZ1-4c; Fri, 14 May 2021 10:31:43 -0300
-Date:   Fri, 14 May 2021 10:31:43 -0300
+        id 1lhY2V-007RfW-Pl; Fri, 14 May 2021 10:39:39 -0300
+Date:   Fri, 14 May 2021 10:39:39 -0300
 From:   Jason Gunthorpe <jgg@ziepe.ca>
 To:     "Tian, Kevin" <kevin.tian@intel.com>
 Cc:     Christoph Hellwig <hch@lst.de>, Joerg Roedel <joro@8bytes.org>,
@@ -64,69 +64,76 @@ Cc:     Christoph Hellwig <hch@lst.de>, Joerg Roedel <joro@8bytes.org>,
         "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 Subject: Re: [PATCH 3/6] vfio: remove the unused mdev iommu hook
-Message-ID: <20210514133143.GK1096940@ziepe.ca>
+Message-ID: <20210514133939.GL1096940@ziepe.ca>
 References: <20210510065405.2334771-1-hch@lst.de>
  <20210510065405.2334771-4-hch@lst.de>
  <20210510155454.GA1096940@ziepe.ca>
  <MWHPR11MB1886E02BF7DE371E9665AA328C519@MWHPR11MB1886.namprd11.prod.outlook.com>
  <20210513120058.GG1096940@ziepe.ca>
- <MWHPR11MB1886B92507ED9015831A0CEA8C509@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210514121925.GI1096940@ziepe.ca>
- <MWHPR11MB18866205125E566FE05867A78C509@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <MWHPR11MB18863613CEBE3CDEEB86F4FC8C509@MWHPR11MB1886.namprd11.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <MWHPR11MB18866205125E566FE05867A78C509@MWHPR11MB1886.namprd11.prod.outlook.com>
+In-Reply-To: <MWHPR11MB18863613CEBE3CDEEB86F4FC8C509@MWHPR11MB1886.namprd11.prod.outlook.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 14, 2021 at 12:58:10PM +0000, Tian, Kevin wrote:
+On Fri, May 14, 2021 at 01:17:23PM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe <jgg@ziepe.ca>
+> > Sent: Thursday, May 13, 2021 8:01 PM
+> > 
+> > On Thu, May 13, 2021 at 03:28:52AM +0000, Tian, Kevin wrote:
+> > 
+> > > Are you specially concerned about this iommu_device hack which
+> > > directly connects mdev_device to iommu layer or the entire removed
+> > > logic including the aux domain concept? For the former we are now
+> > > following up the referred thread to find a clean way. But for the latter
+> > > we feel it's still necessary regardless of how iommu interface is redesigned
+> > > to support device connection from the upper level driver. The reason is
+> > > that with mdev or subdevice one physical device could be attached to
+> > > multiple domains now. there could be a primary domain with DOMAIN_
+> > > DMA type for DMA_API use by parent driver itself, and multiple auxiliary
+> > > domains with DOMAIN_UNMANAGED types for subdevices assigned to
+> > > different VMs.
+> > 
+> > Why do we need more domains than just the physical domain for the
+> > parent? How does auxdomain appear in /dev/ioasid?
+> > 
+> 
+> Another simple reason. Say you have 4 mdevs each from a different 
+> parent are attached to an ioasid. If only using physical domain of the 
+> parent + PASID it means there are 4 domains (thus 4 page tables) under 
+> this IOASID thus every dma map operation must be replicated in all
+> 4 domains which is really unnecessary. Having the domain created
+> with ioasid and allow a device attaching to multiple domains is much
+> cleaner for the upper-layer drivers to work with iommu interface.
 
-> This avoids changing every iommu ops to include a PASID and forcing
-> the upper-layer drivers to do it differently between pdev and mdev.
-> Actually this was a main motivation when working out aux domain
-> proposal with Joerg two years ago.
+Eh? That sounds messed up.
 
-Well, usually when people say stuff like that it means it is a hack..
+The IOASID is the page table. If you have one IOASID and you attach it
+to 4 IOMMU routings (be it pasid, rid, whatever) then there should
+only ever by one page table.
 
-Oh, this does look like a big hack, yes.
+The iommu driver should just point the iommu HW at the shared page
+table for each of the 4 routes and be done with it. At worst it has to
+replicate invalidates, but that is very HW dependent.
 
-/dev/ioasid is focused on IOASIDs. As an API you have to be able to use
-it to create all kinds of IOASID's *against a single HW struct
-device*.
+Domain is just a half-completed-ioasid concept. It is today not
+flexible enough to be a true IOASID, but it still does hold the io
+page table.
 
-In this world you can't create domains for every struct device as hack
-to pass in the PASID.
+Basically your data structure is an IOASID. It holds a single HW
+specific page table. The IOASID has a list of RID and (RID,PASID) that
+are authorized to use it. The IOMMU HW is programed to match the
+RID/(RID,PASID) list and search the single page table. When the page
+table is changed the IOMMU is told to dump caches, however that works.
 
-The IOASID itself must be an object that contains the HW struct device
-and the PASID. IOASID must be a first class object in the entire API.
+When a device driver wants to use an IOASID it tells the iommu to
+setup the route, either RID or (RID,PASID). Setting the route causes
+the IOMMU driver to update the HW.
 
-Remember, when a driver wants to connect to an IOASID it wants to make
-some very simple calls like:
-
-   iommu_attach_ioasid_rid(&pci_device->dev, ioasid_ptr);
-   iommu_attach_ioasid_pasid(&pci_device->dev, ioasid_ptr);
-
-Which is based *only* on what the PCI device does. If the device issues
-TLPs without PASID then the driver must use the first. If the device
-issues TLPs with a PASID then the driver must use the latter.
-
-There is no place for "domain as a carrier of PASID"
-there. mdev_device should NOT participate in the IOMMU layer because
-it is NOT a HW device. Trying to warp mdev_device into an IOMMU
-presence is already the source of a lot of this hacky code.
-
-To juggle multiple IOASID per HW device the IOMMU API obviously has to
-be made IOASID aware. It can't just blindly assume that a struct
-device implies the single IOASID to use and hope for the best.
-
-> The reason is that iommu domain represents an IOVA address
-> space shareable by multiple devices. It should be created at the 
-> point where the address space is managed. 
-
-IOASID represents the IOVA address space.
-
-Two concepts that represent the same thing is not great :)
+The struct device has enough context to provide the RID and the IOMMU
+driver connection when operating on the IOASID.
 
 Jason
