@@ -2,77 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E47C73813C6
-	for <lists+kvm@lfdr.de>; Sat, 15 May 2021 00:30:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF23438140F
+	for <lists+kvm@lfdr.de>; Sat, 15 May 2021 01:05:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233869AbhENWbY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 May 2021 18:31:24 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53480 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233666AbhENWbW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 May 2021 18:31:22 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 864A561453;
-        Fri, 14 May 2021 22:30:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1621031410;
-        bh=qrJLP/r3A3y/0MyfEURktG+DB4zmp3lLFDGbBMOKB8A=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=P0zgoaprDJvd98bH2YsY9oRsUbNpX6X8rgv/5veHPFVbyZwKiayQ+lnPqhh61onti
-         /qgzqCR38fonvkdjL5sUGDu2+AaxoIKOXMHXvG+q91G5ZwsLOu9QuvS8gOKseqEoa3
-         z+j6b7QjwOBdcIG9bzVNluyZQdJux6OLi8vkxm4MLMCTm9UIzH1AAdtgAvaBTo4nSv
-         hQ+1vvNZrSlA75KQ7SJ39pc3U2qCIIWPc2M+mHWXdka1QFkfvnRxKEGL4xqNVJVFfy
-         ysPhyEIXgQa/RHfOIy2Bzug07IMfmVNyvc6h8nsBhO0+MK64/mbSpbRNFHk76WQPnt
-         CNBQlmO82/NXg==
-Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 788F260A02;
-        Fri, 14 May 2021 22:30:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3] net: use XDP helpers
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <162103141048.10202.7043185141593053010.git-patchwork-notify@kernel.org>
-Date:   Fri, 14 May 2021 22:30:10 +0000
-References: <20210514183954.7129-1-mcroce@linux.microsoft.com>
-In-Reply-To: <20210514183954.7129-1-mcroce@linux.microsoft.com>
-To:     Matteo Croce <mcroce@linux.microsoft.com>
-Cc:     netdev@vger.kernel.org, bpf@vger.kernel.org,
-        intel-wired-lan@lists.osuosl.org,
-        linux-stm32@st-md-mailman.stormreply.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, jesse.brandeburg@intel.com,
-        anthony.l.nguyen@intel.com, davem@davemloft.net, kuba@kernel.org,
-        peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
-        mst@redhat.com, jasowang@redhat.com
+        id S234254AbhENXGh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 May 2021 19:06:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54988 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230371AbhENXGg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 May 2021 19:06:36 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FD1FC06174A
+        for <kvm@vger.kernel.org>; Fri, 14 May 2021 16:05:25 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id w1-20020a17090a0281b0290156f7df20a0so622783pja.8
+        for <kvm@vger.kernel.org>; Fri, 14 May 2021 16:05:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=omC2Zg3MHlKG1tFQ/HKAY2Wl9w/KEfII3rpZaUlUwlA=;
+        b=IcWPM2X4gSxjrlaqq2+nJCq2C9taSNotXHB2J54HQtG+ir8xjoedSW4oony2RGvkAA
+         vrzWOP1AqpJxhf3nAyBqVUXyRz1G7s9u9futHi4msXqEoJDVXek7AVGBpuy8PgrPj1ZE
+         jrgGeMJdnvpWgIl8LC21O3UD9DHmhiu+2kh036CUvn7kUtWe8vddXzqJwKpS/SSxHtE0
+         BWXMqOTEqXCahdgRTQF6Z/n8pyLZsYA7GJ/assbtBxn8C416H/q8uHVGQDs2enihB6U9
+         G2Cn5ueqXJrGCVJKA+MN3ITG7Pj/9cF2ehGaykyeBeT/Zwjh1uNKsWko/9ZqKbL8wSjy
+         bAOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=omC2Zg3MHlKG1tFQ/HKAY2Wl9w/KEfII3rpZaUlUwlA=;
+        b=KAVD+FG4NX7Y6R8i9Hhxil/Oyi8vmtZUKfMW/4UOtwaAnHBpOwcXtJWza+52ku6G4y
+         ZGyHVT/ZB/m3wXNESF5PutrJKq0t8dC//oKwLlYXKl79pj6s3vSQ2tDzjnlkBv+COq9d
+         X8N28JecPisrjdOJeKnkBPFqcwrqWXOpBD75yT+R95VO/tL15U418rez1ybgHlEfVgk/
+         YeN24V5jOb6jBnqmA4d9JXAH0T67LVADAXKLb81uuuOH4DofZNyjiAETUeAoE1M1S9ti
+         BpPQFBT1qSQ7sxyJyc93Ma+C/SS/zBQkHcZmGKg7SCsTdUxneVGiU+5ZcusKDOI4gIOt
+         NlnQ==
+X-Gm-Message-State: AOAM532DXhVrv6++FiUe/uc/GsEf0UE7WXbTPBXHf9UuZ35rmF7F3qjr
+        kMQR6hGypCTbacBX26LxQdTUZHPZbXFLMh6TZooLp/9Zi6gEAPek9OjfQvo4pk2YLgy6QER2YPo
+        3672G1ByAcKqrQMJer1FB8ZHifufZkZRkb1o0tERdj+dMZNomyGO4+prj2pQm/T0=
+X-Google-Smtp-Source: ABdhPJxwnWVSDfrxHHAz5FGSdRlfK2vgesG3/qH5vIABnY7JmjsShWtUIIxnjieKSfrvGy+sp1Xe7OSDpmJ5fA==
+X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:19cd])
+ (user=dmatlack job=sendgmr) by 2002:a17:90a:6309:: with SMTP id
+ e9mr14178719pjj.20.1621033523813; Fri, 14 May 2021 16:05:23 -0700 (PDT)
+Date:   Fri, 14 May 2021 23:05:21 +0000
+Message-Id: <20210514230521.2608768-1-dmatlack@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.1.751.gd2f1c929bd-goog
+Subject: [PATCH] KVM: selftests: Fix hang in hardware_disable_test
+From:   David Matlack <dmatlack@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Ignacio Alvarado <ikalvarado@google.com>,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello:
+If /dev/kvm is not available then hardware_disable_test will hang
+indefinitely because the child process exits before posting to the
+semaphore for which the parent is waiting.
 
-This series was applied to netdev/net-next.git (refs/heads/master):
+Fix this by making the parent periodically check if the child has
+exited. We have to be careful to forward the child's exit status to
+preserve a KSFT_SKIP status.
 
-On Fri, 14 May 2021 20:39:51 +0200 you wrote:
-> From: Matteo Croce <mcroce@microsoft.com>
-> 
-> The commit 43b5169d8355 ("net, xdp: Introduce xdp_init_buff utility
-> routine") and commit be9df4aff65f ("net, xdp: Introduce xdp_prepare_buff
-> utility routine") introduces two useful helpers to populate xdp_buff.
-> Use it in drivers which still open codes that routines.
-> 
-> [...]
+I considered just checking for /dev/kvm before creating the child
+process, but there are so many other reasons why the child could exit
+early that it seemed better to handle that as general case.
 
-Here is the summary with links:
-  - [net-next,1/3] stmmac: use XDP helpers
-    https://git.kernel.org/netdev/net-next/c/d172268f93cf
-  - [net-next,2/3] igc: use XDP helpers
-    https://git.kernel.org/netdev/net-next/c/082294f294f6
-  - [net-next,3/3] vhost_net: use XDP helpers
-    https://git.kernel.org/netdev/net-next/c/224bf7db5518
+Tested:
 
-You are awesome, thank you!
---
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+$ ./hardware_disable_test
+/dev/kvm not available, skipping test
+$ echo $?
+4
+$ modprobe kvm_intel
+$ ./hardware_disable_test
+$ echo $?
+0
 
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+ .../selftests/kvm/hardware_disable_test.c     | 32 ++++++++++++++++++-
+ 1 file changed, 31 insertions(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/kvm/hardware_disable_test.c b/tools/testing/selftests/kvm/hardware_disable_test.c
+index 5aadf84c91c0..4b8db3bce610 100644
+--- a/tools/testing/selftests/kvm/hardware_disable_test.c
++++ b/tools/testing/selftests/kvm/hardware_disable_test.c
+@@ -132,6 +132,36 @@ static void run_test(uint32_t run)
+ 	TEST_ASSERT(false, "%s: [%d] child escaped the ninja\n", __func__, run);
+ }
+ 
++void wait_for_child_setup(pid_t pid)
++{
++	/*
++	 * Wait for the child to post to the semaphore, but wake up periodically
++	 * to check if the child exited prematurely.
++	 */
++	for (;;) {
++		const struct timespec wait_period = { .tv_sec = 1 };
++		int status;
++
++		if (!sem_timedwait(sem, &wait_period))
++			return;
++
++		/* Child is still running, keep waiting. */
++		if (pid != waitpid(pid, &status, WNOHANG))
++			continue;
++
++		/*
++		 * Child is no longer running, which is not expected.
++		 *
++		 * If it exited with a non-zero status, we explicitly forward
++		 * the child's status in case it exited with KSFT_SKIP.
++		 */
++		if (WIFEXITED(status))
++			exit(WEXITSTATUS(status));
++		else
++			TEST_ASSERT(false, "Child exited unexpectedly");
++	}
++}
++
+ int main(int argc, char **argv)
+ {
+ 	uint32_t i;
+@@ -148,7 +178,7 @@ int main(int argc, char **argv)
+ 			run_test(i); /* This function always exits */
+ 
+ 		pr_debug("%s: [%d] waiting semaphore\n", __func__, i);
+-		sem_wait(sem);
++		wait_for_child_setup(pid);
+ 		r = (rand() % DELAY_US_MAX) + 1;
+ 		pr_debug("%s: [%d] waiting %dus\n", __func__, i, r);
+ 		usleep(r);
+-- 
+2.31.1.751.gd2f1c929bd-goog
 
