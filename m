@@ -2,108 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CEFCB380123
-	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 02:29:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 87A93380247
+	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 05:10:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231667AbhENAbG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 May 2021 20:31:06 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34508 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229956AbhENAbF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 May 2021 20:31:05 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14E02tvR086166;
-        Thu, 13 May 2021 20:29:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=+3q1+f/7W9aLY/875YVSaLqc+FFnACbfBN12gTUyGGQ=;
- b=gxnOMmTuM6ae4s/+793sMmHkyosb2aOnMKnDXsuWtdFlep5JBfoRki/WKwakfpJtx3UU
- ucsAj02kWr84gvt9L5RsM+xyisXxl8emvH6GrgJAua57rCKNKhdSb/KknYAbsyrbmNgL
- oDITQ2WYVwjzKmp00DFoGMpI4sEa/PcISaYEXaEh/cvb11XVrnS334fQhKG1o7u3rOk1
- XaOdhj5jqDsQGSfm6BpY9uM1SCGXZrX4xwqR2YdS0oi4TQJg9KjdFwedrXPPDYkZIGWw
- dgtamfmubn0rs6DDjuWQys1A5bUUwN6CvKR70ItpyiKrB3venZoSdnCVavKMeI+k//dT FA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38hchcjrgn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 May 2021 20:29:55 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14E04qLm094903;
-        Thu, 13 May 2021 20:29:54 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38hchcjrg3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 May 2021 20:29:54 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14E0TO75013738;
-        Fri, 14 May 2021 00:29:52 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 38hc77g19u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 May 2021 00:29:52 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14E0TM8V27001156
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 14 May 2021 00:29:22 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7795A11C04C;
-        Fri, 14 May 2021 00:29:49 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 06C6C11C054;
-        Fri, 14 May 2021 00:29:49 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.9.250])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Fri, 14 May 2021 00:29:48 +0000 (GMT)
-Date:   Fri, 14 May 2021 02:29:46 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v6 0/3] vfio-ccw: Fix interrupt handling for HALT/CLEAR
-Message-ID: <20210514022946.693936fc.pasic@linux.ibm.com>
-In-Reply-To: <8224aa872f243610583aab327c7e0b813ddaf0dd.camel@linux.ibm.com>
-References: <20210511195631.3995081-1-farman@linux.ibm.com>
-        <20210513030543.67601a8c.pasic@linux.ibm.com>
-        <8224aa872f243610583aab327c7e0b813ddaf0dd.camel@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S231189AbhENDLB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 May 2021 23:11:01 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:3668 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229980AbhENDLB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 May 2021 23:11:01 -0400
+Received: from dggems705-chm.china.huawei.com (unknown [172.30.72.60])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FhD2z1kWvz1BMP2;
+        Fri, 14 May 2021 11:07:07 +0800 (CST)
+Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
+ dggems705-chm.china.huawei.com (10.3.19.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Fri, 14 May 2021 11:09:48 +0800
+Received: from [10.174.185.210] (10.174.185.210) by
+ dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2176.2; Fri, 14 May 2021 11:09:47 +0800
+Subject: Re: [PATCH v15 07/12] iommu/smmuv3: Implement cache_invalidate
+To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <will@kernel.org>, <maz@kernel.org>, <robin.murphy@arm.com>,
+        <joro@8bytes.org>, <alex.williamson@redhat.com>, <tn@semihalf.com>,
+        <zhukeqian1@huawei.com>
+CC:     <jacob.jun.pan@linux.intel.com>, <yi.l.liu@intel.com>,
+        <wangxingang5@huawei.com>, <jean-philippe@linaro.org>,
+        <zhangfei.gao@linaro.org>, <zhangfei.gao@gmail.com>,
+        <vivek.gautam@arm.com>, <shameerali.kolothum.thodi@huawei.com>,
+        <yuzenghui@huawei.com>, <nicoleotsuka@gmail.com>,
+        <lushenming@huawei.com>, <vsethi@nvidia.com>,
+        <chenxiang66@hisilicon.com>, <vdumpa@nvidia.com>,
+        <wanghaibin.wang@huawei.com>
+References: <20210411111228.14386-1-eric.auger@redhat.com>
+ <20210411111228.14386-8-eric.auger@redhat.com>
+From:   Kunkun Jiang <jiangkunkun@huawei.com>
+Message-ID: <e6483bc3-192b-9b68-b3e1-641b1bed4bf6@huawei.com>
+Date:   Fri, 14 May 2021 11:09:47 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Qa2SlGelqLl_dM4JdRTBlQgqqpCaAyjb
-X-Proofpoint-ORIG-GUID: EEe7NS9MGLESw9Nr45bMJzWmni2b9NmC
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-05-13_16:2021-05-12,2021-05-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
- lowpriorityscore=0 clxscore=1015 mlxlogscore=999 suspectscore=0
- spamscore=0 malwarescore=0 priorityscore=1501 bulkscore=0 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2105130171
+In-Reply-To: <20210411111228.14386-8-eric.auger@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.174.185.210]
+X-ClientProxiedBy: dggeme706-chm.china.huawei.com (10.1.199.102) To
+ dggema765-chm.china.huawei.com (10.1.198.207)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 13 May 2021 14:33:20 -0400
-Eric Farman <farman@linux.ibm.com> wrote:
 
-> > 
-> > In any case, I don't want to hold this up any further.
-> >   
-> 
-> Thanks for that. You are correct that there's still a potential issue
-> here, in the handoff between fsm_irq() and vfio_ccw_sch_io_todo(), and
-> another fsm_io_request() that would arrive between those points. But
-> it's not anything that we haven't already discussed, and will hopefully
-> begin discussing in the next couple of weeks.
 
-Thanks for all the explanations and your patience. I know, I can be
-difficult when I'm at discomfort due to dissonances in my mental model
-of a certain problem or a certain solution. Will try to carve out some
-time to at least have a look at those as well.
+On 2021/4/11 19:12, Eric Auger wrote:
+> Implement domain-selective, pasid selective and page-selective
+> IOTLB invalidations.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>
+> ---
+> v4 -> v15:
+> - remove the redundant arm_smmu_cmdq_issue_sync(smmu)
+>    in IOMMU_INV_GRANU_ADDR case (Zenghui)
+> - if RIL is not supported by the host, make sure the granule_size
+>    that is passed by the userspace is supported or fix it
+>    (Chenxiang)
+>
+> v13 -> v14:
+> - Add domain invalidation
+> - do global inval when asid is not provided with addr
+>    granularity
+>
+> v7 -> v8:
+> - ASID based invalidation using iommu_inv_pasid_info
+> - check ARCHID/PASID flags in addr based invalidation
+> - use __arm_smmu_tlb_inv_context and __arm_smmu_tlb_inv_range_nosync
+>
+> v6 -> v7
+> - check the uapi version
+>
+> v3 -> v4:
+> - adapt to changes in the uapi
+> - add support for leaf parameter
+> - do not use arm_smmu_tlb_inv_range_nosync or arm_smmu_tlb_inv_context
+>    anymore
+>
+> v2 -> v3:
+> - replace __arm_smmu_tlb_sync by arm_smmu_cmdq_issue_sync
+>
+> v1 -> v2:
+> - properly pass the asid
+> ---
+>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 89 +++++++++++++++++++++
+>   1 file changed, 89 insertions(+)
+>
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> index 56a301fbe75a..bfc112cc0d38 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> @@ -2961,6 +2961,94 @@ static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
+>   	mutex_unlock(&smmu_domain->init_mutex);
+>   }
+>   
+> +static int
+> +arm_smmu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
+> +			  struct iommu_cache_invalidate_info *inv_info)
+> +{
+> +	struct arm_smmu_cmdq_ent cmd = {.opcode = CMDQ_OP_TLBI_NSNH_ALL};
+> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+> +	struct arm_smmu_device *smmu = smmu_domain->smmu;
+> +
+> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
+> +		return -EINVAL;
+> +
+> +	if (!smmu)
+> +		return -EINVAL;
+> +
+> +	if (inv_info->version != IOMMU_CACHE_INVALIDATE_INFO_VERSION_1)
+> +		return -EINVAL;
+> +
+> +	if (inv_info->cache & IOMMU_CACHE_INV_TYPE_PASID ||
+> +	    inv_info->cache & IOMMU_CACHE_INV_TYPE_DEV_IOTLB) {
+> +		return -ENOENT;
+> +	}
+> +
+> +	if (!(inv_info->cache & IOMMU_CACHE_INV_TYPE_IOTLB))
+> +		return -EINVAL;
+> +
+> +	/* IOTLB invalidation */
+> +
+> +	switch (inv_info->granularity) {
+> +	case IOMMU_INV_GRANU_PASID:
+> +	{
+> +		struct iommu_inv_pasid_info *info =
+> +			&inv_info->granu.pasid_info;
+> +
+> +		if (info->flags & IOMMU_INV_ADDR_FLAGS_PASID)
+> +			return -ENOENT;
+> +		if (!(info->flags & IOMMU_INV_PASID_FLAGS_ARCHID))
+> +			return -EINVAL;
+> +
+> +		__arm_smmu_tlb_inv_context(smmu_domain, info->archid);
+> +		return 0;
+> +	}
+> +	case IOMMU_INV_GRANU_ADDR:
+> +	{
+> +		struct iommu_inv_addr_info *info = &inv_info->granu.addr_info;
+> +		size_t granule_size  = info->granule_size;
+> +		size_t size = info->nb_granules * info->granule_size;
+> +		bool leaf = info->flags & IOMMU_INV_ADDR_FLAGS_LEAF;
+> +		int tg;
+> +
+> +		if (info->flags & IOMMU_INV_ADDR_FLAGS_PASID)
+> +			return -ENOENT;
+> +
+> +		if (!(info->flags & IOMMU_INV_ADDR_FLAGS_ARCHID))
+> +			break;
+> +
+> +		tg = __ffs(granule_size);
+> +		if (granule_size & ~(1 << tg))
+> +			return -EINVAL;
+This check looks like to confirm the granule_size is a power of 2.
+Does the granule_size have to be a power of 2?
+I think it should also be handled correctly, even if the granule_size is 
+not a power of 2.
+> +		/*
+> +		 * When RIL is not supported, make sure the granule size that is
+> +		 * passed is supported. In RIL mode, this is enforced in
+> +		 * __arm_smmu_tlb_inv_range()
+> +		 */
+> +		if (!(smmu->features & ARM_SMMU_FEAT_RANGE_INV) &&
+> +		    !(granule_size & smmu_domain->domain.pgsize_bitmap)) {
+> +			tg = __ffs(smmu_domain->domain.pgsize_bitmap);
+> +			granule_size = 1 << tg;
+> +			size = size >> tg;
+Why does size need to be shifted tg bits to the right?
 
-Have a nice weekend!
+Thanks,
+Kunkun Jiang
+> +		}
+> +
+> +		arm_smmu_tlb_inv_range_domain(info->addr, size,
+> +					      granule_size, leaf,
+> +					      info->archid, smmu_domain);
+> +		return 0;
+> +	}
+> +	case IOMMU_INV_GRANU_DOMAIN:
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* Global S1 invalidation */
+> +	cmd.tlbi.vmid   = smmu_domain->s2_cfg.vmid;
+> +	arm_smmu_cmdq_issue_cmd(smmu, &cmd);
+> +	arm_smmu_cmdq_issue_sync(smmu);
+> +	return 0;
+> +}
+> +
+>   static bool arm_smmu_dev_has_feature(struct device *dev,
+>   				     enum iommu_dev_features feat)
+>   {
+> @@ -3060,6 +3148,7 @@ static struct iommu_ops arm_smmu_ops = {
+>   	.put_resv_regions	= generic_iommu_put_resv_regions,
+>   	.attach_pasid_table	= arm_smmu_attach_pasid_table,
+>   	.detach_pasid_table	= arm_smmu_detach_pasid_table,
+> +	.cache_invalidate	= arm_smmu_cache_invalidate,
+>   	.dev_has_feat		= arm_smmu_dev_has_feature,
+>   	.dev_feat_enabled	= arm_smmu_dev_feature_enabled,
+>   	.dev_enable_feat	= arm_smmu_dev_enable_feature,
 
-Halil 
+
