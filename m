@@ -2,121 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D826D380C1D
-	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 16:44:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09D9E380FC1
+	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 20:31:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232835AbhENOp6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 May 2021 10:45:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56052 "EHLO
+        id S233693AbhENScc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 May 2021 14:32:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231473AbhENOp5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 May 2021 10:45:57 -0400
-Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21828C061574
-        for <kvm@vger.kernel.org>; Fri, 14 May 2021 07:44:45 -0700 (PDT)
-Received: by mail-qt1-x82e.google.com with SMTP id j11so22316467qtn.12
-        for <kvm@vger.kernel.org>; Fri, 14 May 2021 07:44:45 -0700 (PDT)
+        with ESMTP id S229986AbhENSca (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 May 2021 14:32:30 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00DF2C061760
+        for <kvm@vger.kernel.org>; Fri, 14 May 2021 11:31:19 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id 6so200347pgk.5
+        for <kvm@vger.kernel.org>; Fri, 14 May 2021 11:31:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
+        d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=5eRvTdeEB4OFHRkGyw/FepnZIZ1CoxvAuK8I7ThmVnY=;
-        b=nRkdu7k2xQ+YoBCvbAK24g2UZnBtDHdW77UuZWq1TzE1ce/i2vSxDI3PdfKI5Jsm9d
-         JRRwdxdT0Bs39ZNeLlzVgpmazAiVXgM+zzr8ziiO7KgyEikyw7RpioDCezi1XKjxoGNP
-         POVVlFsCMQ9vTbPgGl7v6QzGYQWWYI9OJewyjQmQ3WwsxgYI24sQ6TMMkjKiiYwVXW5x
-         8+ipkG/ael3qLVrlHufx0H2LgX6Tqpg0Z8QC+AqA4v8RN6S8q3zVrRqgoth1O4jzTlAj
-         jwIHjEFqIPmdguSTbvmMbkB3B5avjXAM3F3JkUPS+VqLm2pQ4PjA0Yf2BtzRnkcYpGtT
-         aUTA==
+        bh=9E0wuTet4JopXThnpnWVLzmH9GIGkngbwCTAn/avRcg=;
+        b=goRBrZkKl2sbgciLAmD3ktsJwV7wNxZ1BcVR788hJtYJTxhgb8RdlnM/1V3wuvVXAE
+         jhqJR10uPQLiGkT/WpT5P9HxbS8k9PdfZTd7dQoNCOtX1I/4fnVwPvwOc8mMYLpimbqm
+         1ua3Pf20dPMTZAApXbRkY17Ny9Mr1dQTtX0NUY9/HvNWM16HaqJUUi65R0+6DEn+Fu7y
+         TngnjP2wi99y49A900MYT55pnrGfD8d3t7kcig3puEWydknkswKr6OqUtgVPWbXeRBwS
+         GrqF9Won5bad3AQb/00v75asUB6Le8JHJy60aqCDu2qo13f5rAbAntXHBtZj4xUOFiSz
+         dTig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=5eRvTdeEB4OFHRkGyw/FepnZIZ1CoxvAuK8I7ThmVnY=;
-        b=WuOJVwG4+RNu4+upMfHn6/vhuUrtNLeyNEQQPIhUY0IoORRC20La3ylePVQt8wjtBn
-         V04LKm4UDzTAiKbHYsDkuolQDbuvfBFgdoqw6Pa7Kq8Az6CIC5dSLfZWrpRhbF0r4jP7
-         Xf/sqhNEipHvxU7NJewb1IxbLNrq+xHHFO+5zlShk+abnX8+EXBh85nmL9f9O5xStUq8
-         6CVE9f1Ez1QhtCInYd0ZP32FE4YkvLQMwuW60871pgFLQDtC5FCv6w1dtqBFBGppmPwv
-         tKQCUZyDLH9twwe1tB5E19nKu+u9mnf410xCBjwMiPLKPERhM824IQLocqSQPof20tdy
-         vpoA==
-X-Gm-Message-State: AOAM533l+azo3mTX2+cDq6Z93VmvTZBONSQZpgVKXq9ZFWJ4EBSxZ+aA
-        YjoDsxzJjR8KW+uLsF30I7oWIA==
-X-Google-Smtp-Source: ABdhPJxXWxgtyCMpLAybGYmVkwL/O8mVvUjGMWW8nfKwX9BgEHmZSiHUjb0Crr7tgdUgMOvc0inVcg==
-X-Received: by 2002:a05:622a:1493:: with SMTP id t19mr43119374qtx.147.1621003484390;
-        Fri, 14 May 2021 07:44:44 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-47-55-113-94.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.113.94])
-        by smtp.gmail.com with ESMTPSA id q7sm4886079qki.17.2021.05.14.07.44.43
+        bh=9E0wuTet4JopXThnpnWVLzmH9GIGkngbwCTAn/avRcg=;
+        b=Lojerlxm9HIOVq8Y+PIyre81zyN9YiUaxBLRXiAafip4XwekCjn0OX6QQ+lofc/wF/
+         ZkqpPLXtSrfhOHXR2CYya3+br+BSQJIv6yG7ixFwnc3tjnxNaERci9alYNIXB4r/XLvm
+         5ogw9zpMh4v5UUmHWhDT504CQfigVH4XIm3gp+GCyP5CBijP/e2bwYdttqPj7mH/CaJy
+         3V2ahxnSzTbpSY7ILzU30TSBRrBJ1nxWhsZbN7aQpJBYiOrr/R2TuM8Z8n54j1Ye1M+n
+         fh4xbpnoQ0XaDepBIA9DPhfktZH+rSXOeErysiQCgdhNEv2T2oYnU1W9rQ4T6rF+GcyY
+         MPaw==
+X-Gm-Message-State: AOAM532PGTHMb9dDADHqQqP8B5c19i8Vt1yGZQ/NHcvDy2fWI9hJsHuN
+        bH8GQ5jlZROFdbMluWoI99mDXOh4esj8hBRq
+X-Google-Smtp-Source: ABdhPJzk7gYz4Qlli53km2eo6kviqemudDpAU62A2i0TNtr4F5m6ss+yMWkSWLn48joRzCEHlSSr2g==
+X-Received: by 2002:aa7:9a81:0:b029:28e:b12c:9862 with SMTP id w1-20020aa79a810000b029028eb12c9862mr47973754pfi.51.1621017078283;
+        Fri, 14 May 2021 11:31:18 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id e2sm5038138pjk.31.2021.05.14.11.31.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 May 2021 07:44:43 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1lhZ3T-007Shk-Ai; Fri, 14 May 2021 11:44:43 -0300
-Date:   Fri, 14 May 2021 11:44:43 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Will Deacon <will@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH 3/6] vfio: remove the unused mdev iommu hook
-Message-ID: <20210514144443.GN1096940@ziepe.ca>
-References: <20210510065405.2334771-1-hch@lst.de>
- <20210510065405.2334771-4-hch@lst.de>
- <20210510155454.GA1096940@ziepe.ca>
- <MWHPR11MB1886E02BF7DE371E9665AA328C519@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210513120058.GG1096940@ziepe.ca>
- <MWHPR11MB18863613CEBE3CDEEB86F4FC8C509@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210514133939.GL1096940@ziepe.ca>
- <MWHPR11MB1886AE36746C8F82553471088C509@MWHPR11MB1886.namprd11.prod.outlook.com>
+        Fri, 14 May 2021 11:31:17 -0700 (PDT)
+Date:   Fri, 14 May 2021 11:31:13 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Auger Eric <eric.auger@redhat.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        pbonzini@redhat.com, maz@kernel.org, drjones@redhat.com,
+        alexandru.elisei@arm.com
+Subject: Re: [PATCH v3 0/5] KVM: selftests: arm64 exception handling and
+ debug test
+Message-ID: <YJ7B8TCwvzxJLJH/@google.com>
+References: <20210513002802.3671838-1-ricarkol@google.com>
+ <aeeec52e-5a13-be39-3b9c-cf25a27b97b1@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <MWHPR11MB1886AE36746C8F82553471088C509@MWHPR11MB1886.namprd11.prod.outlook.com>
+In-Reply-To: <aeeec52e-5a13-be39-3b9c-cf25a27b97b1@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 14, 2021 at 02:28:44PM +0000, Tian, Kevin wrote:
-> Well, I see what you meant now. Basically you want to make IOASID 
-> as the first-class object in the entire iommu stack, replacing what 
-> iommu domain fulfill todays. 
+On Thu, May 13, 2021 at 08:37:33AM +0200, Auger Eric wrote:
+> Hi Ricardo,
+> 
+> On 5/13/21 2:27 AM, Ricardo Koller wrote:
+> > Hi,
+> > 
+> > These patches add a debug exception test in aarch64 KVM selftests while
+> > also adding basic exception handling support.
+> > 
+> > The structure of the exception handling is based on its x86 counterpart.
+> > Tests use the same calls to initialize exception handling and both
+> > architectures allow tests to override the handler for a particular
+> > vector, or (vector, ec) for synchronous exceptions in the arm64 case.
+> > 
+> > The debug test is similar to x86_64/debug_regs, except that the x86 one
+> > controls the debugging from outside the VM. This proposed arm64 test
+> > controls and handles debug exceptions from the inside.
+> > 
+> > Thanks,
+> > Ricardo
+> > 
+> > v2 -> v3:
+> > 
+> > Addressed comments from Andrew and Marc (thanks again). Also, many thanks for
+> > the reviews and tests from Eric and Zenghui.
+> You are welcome. This version does not fail anymore on Cavium Sabre so
+> this looks to fix the previously reported issue.
+> 
+> Thanks
 
-Alternatively you transform domain into being a full fledged IOASID.
-I don't know which path works out to be a better patch series.
+Great, thanks Eric. The issue was that writing to mdscr needed ISBs
+afterward (discovered by Zenghui).
 
-> Our original proposal was still based on domain-centric philosophy
-> thus containing IOASID and its routing info only in the uAPI layer
-> of /dev/ioasid and then connecting to domains.
-
-Where do the domains come from though? You still have to hack hack all
-the drivers to create dummy domains to support this plan, and in the
-process PASID is pretty hobbled as an actual API if every PASID
-instance requires a wonky dummy struct device and domain.
-
-> btw are you OK with our ongoing uAPI proposal still based on domain
-> flavor for now? the uAPI semantics should be generic regardless of 
-> how underlying iommu interfaces are designed. At least separate
-> uAPI discussion from iommu ops re-design.
-
-The most important thing is the uAPI, you don't get to change that later.
-
-The next most is the driver facing API.
-
-You can figure out the IOMMU layer internals in stages.
-
-Clearly IOASID == domain today as domain is kind of half a
-IOASID. When you extend to PASID and other stuff I think you have
-little choice but to make a full IOASID more first class.
-
-Dummy domains are a very poor substitute.
-
-In my experiance these kinds of transformations can usually be managed
-as "just alot of typing". Usually the old driver code structure can be
-kept enough to not break it while reorganizing.
-
-Jason
+> 
+> Eric
+> > - add missing ISBs after writing into debug registers.
+> > - not store/restore of sp_el0 on exceptions.
+> > - add default handlers for Error and FIQ.
+> > - change multiple TEST_ASSERT(false, ...) to TEST_FAIL.
+> > - use Andrew's suggestion regarding __GUEST_ASSERT modifications
+> >   in order to easier implement GUEST_ASSERT_EQ (Thanks Andrew).
+> > 
+> > v1 -> v2:
+> > 
+> > Addressed comments from Andrew and Marc (thank you very much):
+> > - rename vm_handle_exception in all tests.
+> > - introduce UCALL_UNHANDLED in x86 first.
+> > - move GUEST_ASSERT_EQ to common utils header.
+> > - handle sync and other exceptions separately: use two tables (like
+> >   kvm-unit-tests).
+> > - add two separate functions for installing sync versus other exceptions
+> > - changes in handlers.S: use the same layout as user_pt_regs, treat the
+> >   EL1t vectors as invalid, refactor the vector table creation to not use
+> >   manual numbering, add comments, remove LR from the stored registers.
+> > - changes in debug-exceptions.c: remove unused headers, use the common
+> >   GUEST_ASSERT_EQ, use vcpu_run instead of _vcpu_run.
+> > - changes in processor.h: write_sysreg with support for xzr, replace EL1
+> >   with current in macro names, define ESR_EC_MASK as ESR_EC_NUM-1.
+> > 
+> > Ricardo Koller (5):
+> >   KVM: selftests: Rename vm_handle_exception
+> >   KVM: selftests: Introduce UCALL_UNHANDLED for unhandled vector
+> >     reporting
+> >   KVM: selftests: Move GUEST_ASSERT_EQ to utils header
+> >   KVM: selftests: Add exception handling support for aarch64
+> >   KVM: selftests: Add aarch64/debug-exceptions test
+> > 
+> >  tools/testing/selftests/kvm/.gitignore        |   1 +
+> >  tools/testing/selftests/kvm/Makefile          |   3 +-
+> >  .../selftests/kvm/aarch64/debug-exceptions.c  | 250 ++++++++++++++++++
+> >  .../selftests/kvm/include/aarch64/processor.h |  83 +++++-
+> >  .../testing/selftests/kvm/include/kvm_util.h  |  23 +-
+> >  .../selftests/kvm/include/x86_64/processor.h  |   4 +-
+> >  .../selftests/kvm/lib/aarch64/handlers.S      | 124 +++++++++
+> >  .../selftests/kvm/lib/aarch64/processor.c     | 131 +++++++++
+> >  .../selftests/kvm/lib/x86_64/processor.c      |  22 +-
+> >  .../selftests/kvm/x86_64/kvm_pv_test.c        |   2 +-
+> >  .../selftests/kvm/x86_64/tsc_msrs_test.c      |   9 -
+> >  .../kvm/x86_64/userspace_msr_exit_test.c      |   8 +-
+> >  .../selftests/kvm/x86_64/xapic_ipi_test.c     |   2 +-
+> >  13 files changed, 615 insertions(+), 47 deletions(-)
+> >  create mode 100644 tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> >  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/handlers.S
+> > 
+> 
