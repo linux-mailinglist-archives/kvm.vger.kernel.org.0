@@ -2,114 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC3C438081E
-	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 13:08:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1572380835
+	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 13:14:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231221AbhENLJv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 May 2021 07:09:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35466 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbhENLJu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 May 2021 07:09:50 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39449C061574;
-        Fri, 14 May 2021 04:08:39 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id n17-20020a7bc5d10000b0290169edfadac9so1248684wmk.1;
-        Fri, 14 May 2021 04:08:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=DnsDrIqkWnYf7da8HpIWFBQQt2XImu+6ZyHWBvjrfcE=;
-        b=sDX/4vOZ59ic93Kj1k7EQHH5H75TwRxFQdfU97NsB2/Y+xVttZgCu6VcmdiZBbTXV4
-         Yd9dS94Y1asR2VIYZN7NEerfwgmtEUFK3NZSUIzeY6J/4AmyVofgnwxiuO5puvulkCHX
-         zAH+iCNJUU2yLFhQkplxklOlcyZUbrmQbTIThNq4BukYbZy9X610Bla24hpoPnMCKKtF
-         HaX7GWwtAjZyjiNuvWcCoIBPkXTf9xY5aCFfjMGcrbRCdRoMLY/c+VX1+t1XGHSYNqtQ
-         /vEAS8jymBn+QTD3oR/5dtU3nH62pPJpzKh6iPn38AjBb8Fr8EpkCArPsjTRrMSNZ8n3
-         9CtA==
+        id S231145AbhENLPH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 May 2021 07:15:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36467 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229445AbhENLPG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 May 2021 07:15:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620990835;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=GcyY5SRYU8znOLGxlQ+VXLYAFrni6/EsXvguEf/Rk+o=;
+        b=ZYbH02KiPau9filrDGpj6XsfzlDwLyIGYeYJM8COAgaHTclrQ9FEyJpwlmLNJoNWglmxAt
+        0yOZnlf0JG5gVrxMoKeui42MmKT+lUQmTMjiP0pEfJID9mZVyZVxQgFoHjd1//xsEzT/XL
+        jdS3v7CiyqWFnz3Swkv28u0eLT++aGA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-366-v1nhCI6APpSp36Ltsb3GOA-1; Fri, 14 May 2021 07:13:53 -0400
+X-MC-Unique: v1nhCI6APpSp36Ltsb3GOA-1
+Received: by mail-wr1-f72.google.com with SMTP id h104-20020adf90710000b029010de8455a3aso12589116wrh.12
+        for <kvm@vger.kernel.org>; Fri, 14 May 2021 04:13:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=DnsDrIqkWnYf7da8HpIWFBQQt2XImu+6ZyHWBvjrfcE=;
-        b=TD856n5ZaQSeJHGEx9lBl3DYJwSrmzWVHV1McUmXOwhUBLbSBNiZ/6VlNVh199g9Ri
-         9ldmsRKsgTpW0jJKu8wKKq9vTGxH8oYk1RYzr0pjjLyUXEWToFutGV6NHvDxrr3dRNcd
-         xpI6drJa0q8KxQI7Q383NhY5taZvAWG0bu4SH+Vv8KsL8GmXv+26WjLv17OjGJIsC9KP
-         zFk3FPiWWaCXwZzHBuEalGXketW02Jwpz/pzIJrrM7hhmVXx0ONOcWgQH31a0goO2DN0
-         0t4ahJ7da1+KepMU+CFz4Dgi5zZsjD3BtWZd2x/DzFYx57euWgcPya3+ADCpQXiDX1a0
-         9KEw==
-X-Gm-Message-State: AOAM530kBEY1aeTl7/fqP01xjKBxsG+XUhMJjIAC3GW4JTFpOAA74x2o
-        06yceDCYnkP+PZ9QsYvx+4mADfV1+btBCg==
-X-Google-Smtp-Source: ABdhPJwViz0BDPUuVH349RqXP0p4zCVFhrVjXNorTYnm55dAjMiaqH0FajvtM+sJwCYcinjBh5k1qQ==
-X-Received: by 2002:a7b:c005:: with SMTP id c5mr21007074wmb.113.1620990517974;
-        Fri, 14 May 2021 04:08:37 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159425-cmbg20-2-0-cust403.5-4.cable.virginm.net. [86.7.189.148])
-        by smtp.gmail.com with ESMTPSA id b10sm7116349wrr.27.2021.05.14.04.08.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 May 2021 04:08:37 -0700 (PDT)
-Subject: Re: [PATCH v2 00/40] Use ASCII subset instead of UTF-8 alternate
- symbols
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Mali DP Maintainers <malidp@foss.arm.com>,
-        alsa-devel@alsa-project.org, coresight@lists.linaro.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
-        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-hwmon@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-sgx@vger.kernel.org, linux-usb@vger.kernel.org,
-        mjpeg-users@lists.sourceforge.net, netdev@vger.kernel.org,
-        rcu@vger.kernel.org
-References: <cover.1620823573.git.mchehab+huawei@kernel.org>
- <d2fed242fbe200706b8d23a53512f0311d900297.camel@infradead.org>
- <20210514102118.1b71bec3@coco.lan>
- <61c286b7afd6c4acf71418feee4eecca2e6c80c8.camel@infradead.org>
-From:   Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <8b8bc929-2f07-049d-f24c-cb1f1d85bbaa@gmail.com>
-Date:   Fri, 14 May 2021 12:08:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=GcyY5SRYU8znOLGxlQ+VXLYAFrni6/EsXvguEf/Rk+o=;
+        b=abyb74bYWtobP2rhQ/0yz7uKHPmU98231DBCz/H5xsaWNwGt/LSWc+lnrJL6+Zd3yQ
+         jLoeuFtFYxFuxTGkpfSbmzy/+QltMQDG4DT66IgQkQvXQgPCyH05kRTam9CgtW2iXVIa
+         HyvZPu6QDTEqz4HsFixpMJ+gV6AYgUrrbtzCWMEqFhV+Z2HJffBGDM0wU9E/PhkzgEuw
+         AjT25TiDFA8DiWpmKy8po4pWwttV04A2GYQjxYQ9Xnc/zn1uEkIF+s173X04CeAFkz6n
+         EFAXDZTZ+PDRRPuvrw8WwvsSYI/SUuuoOT6ps6iQemSjb/hwGuYubhhs1llOu/y5AOHA
+         aQKg==
+X-Gm-Message-State: AOAM530P52FbuP1FIKjGL+y2GRY50cjAbceK/owlhW9TLJpnL9owueJ8
+        8KuUPIhth2D1EwTbk7Zlw7Nki0Yi1f3J0AIHvd0AJtfxA7vpTmR+EKxBrHfOblLVyHnvaC2azoo
+        9uj5NFCSQcvDm
+X-Received: by 2002:a7b:c042:: with SMTP id u2mr9792474wmc.127.1620990832245;
+        Fri, 14 May 2021 04:13:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxZNhppxBIXT6J4oHOEj05xdp5fT5MtIiU2dY4jUT95nukcwuVNGKlHAjd1LlANrcZHhqooTQ==
+X-Received: by 2002:a7b:c042:: with SMTP id u2mr9792463wmc.127.1620990832028;
+        Fri, 14 May 2021 04:13:52 -0700 (PDT)
+Received: from redhat.com ([2a10:800c:1fa6:0:3809:fe0c:bb87:250e])
+        by smtp.gmail.com with ESMTPSA id f7sm5007823wmq.30.2021.05.14.04.13.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 May 2021 04:13:51 -0700 (PDT)
+Date:   Fri, 14 May 2021 07:13:48 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, xieyongji@bytedance.com,
+        stefanha@redhat.com, file@sect.tu-berlin.de, ashish.kalra@amd.com,
+        konrad.wilk@oracle.com, kvm@vger.kernel.org
+Subject: Re: [RFC PATCH V2 0/7] Do not read from descripto ring
+Message-ID: <20210514063516-mutt-send-email-mst@kernel.org>
+References: <20210423080942.2997-1-jasowang@redhat.com>
+ <0e9d70b7-6c8a-4ff5-1fa9-3c4f04885bb8@redhat.com>
+ <20210506041057-mutt-send-email-mst@kernel.org>
+ <20210506123829.GA403858@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <61c286b7afd6c4acf71418feee4eecca2e6c80c8.camel@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210506123829.GA403858@infradead.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Fri, 2021-05-14 at 10:21 +0200, Mauro Carvalho Chehab wrote:
->> I do use a lot of UTF-8 here, as I type texts in Portuguese, but I rely
->> on the US-intl keyboard settings, that allow me to type as "'a" for á.
->> However, there's no shortcut for non-Latin UTF-codes, as far as I know.
->>
->> So, if would need to type a curly comma on the text editors I normally 
->> use for development (vim, nano, kate), I would need to cut-and-paste
->> it from somewhere
+On Thu, May 06, 2021 at 01:38:29PM +0100, Christoph Hellwig wrote:
+> On Thu, May 06, 2021 at 04:12:17AM -0400, Michael S. Tsirkin wrote:
+> > Let's try for just a bit, won't make this window anyway:
+> > 
+> > I have an old idea. Add a way to find out that unmap is a nop
+> > (or more exactly does not use the address/length).
+> > Then in that case even with DMA API we do not need
+> > the extra data. Hmm?
+> 
+> So we actually do have a check for that from the early days of the DMA
+> API, but it only works at compile time: CONFIG_NEED_DMA_MAP_STATE.
+> 
+> But given how rare configs without an iommu or swiotlb are these days
+> it has stopped to be very useful.  Unfortunately a runtime-version is
+> not entirely trivial, but maybe if we allow for false positives we
+> could do something like this
+> 
+> bool dma_direct_need_state(struct device *dev)
+> {
+> 	/* some areas could not be covered by any map at all */
+> 	if (dev->dma_range_map)
+> 		return false;
+> 	if (force_dma_unencrypted(dev))
+> 		return false;
+> 	if (dma_direct_need_sync(dev))
+> 		return false;
+> 	return *dev->dma_mask == DMA_BIT_MASK(64);
+> }
+> 
+> bool dma_need_state(struct device *dev)
+> {
+> 	const struct dma_map_ops *ops = get_dma_ops(dev);
+> 
+> 	if (dma_map_direct(dev, ops))
+> 		return dma_direct_need_state(dev);
+> 	return ops->unmap_page ||
+> 		ops->sync_single_for_cpu || ops->sync_single_for_device;
+> }
 
-For anyone who doesn't know about it: X has this wonderful thing called
- the Compose key[1].  For instance, type ⎄--- to get —, or ⎄<" for “.
-Much more mnemonic than Unicode codepoints; and you can extend it with
- user-defined sequences in your ~/.XCompose file.
-(I assume Wayland supports all this too, but don't know the details.)
+Yea that sounds like a good idea. We will need to document that.
 
-On 14/05/2021 10:06, David Woodhouse wrote:
-> Again, if you want to make specific fixes like removing non-breaking
-> spaces and byte order marks, with specific reasons, then those make
-> sense. But it's got very little to do with UTF-8 and how easy it is to
-> type them. And the excuse you've put in the commit comment for your
-> patches is utterly bogus.
 
-+1
+Something like:
 
--ed
+/*
+ * dma_need_state - report whether unmap calls use the address and length
+ * @dev: device to guery
+ *
+ * This is a runtime version of CONFIG_NEED_DMA_MAP_STATE.
+ *
+ * Return the value indicating whether dma_unmap_* and dma_sync_* calls for the device
+ * use the DMA state parameters passed to them.
+ * The DMA state parameters are: scatter/gather list/table, address and
+ * length.
+ *
+ * If dma_need_state returns false then DMA state parameters are
+ * ignored by all dma_unmap_* and dma_sync_* calls, so it is safe to pass 0 for
+ * address and length, and DMA_UNMAP_SG_TABLE_INVALID and
+ * DMA_UNMAP_SG_LIST_INVALID for s/g table and length respectively.
+ * If dma_need_state returns true then DMA state might
+ * be used and so the actual values are required.
+ */
 
-[1] https://en.wikipedia.org/wiki/Compose_key
+And we will need DMA_UNMAP_SG_TABLE_INVALID and
+DMA_UNMAP_SG_LIST_INVALID as pointers to an empty global table and list
+for calls such as dma_unmap_sgtable that dereference pointers before checking
+they are used.
+
+
+Does this look good?
+
+The table/length variants are for consistency, virtio specifically does
+not use s/g at the moment, but it seems nicer than leaving
+users wonder what to do about these.
+
+Thoughts? Jason want to try implementing?
+
+-- 
+MST
+
