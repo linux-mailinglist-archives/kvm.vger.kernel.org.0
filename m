@@ -2,169 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BCDD7380BE0
-	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 16:33:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D826D380C1D
+	for <lists+kvm@lfdr.de>; Fri, 14 May 2021 16:44:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234474AbhENOeU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 May 2021 10:34:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42326 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234452AbhENOeS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 May 2021 10:34:18 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D55036144A;
-        Fri, 14 May 2021 14:33:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1621002786;
-        bh=dYTBVfySMjVbB9U61SiRuwIXRmeQ7xm3yrwwQXGeH6Y=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Iix3adaG/VjT9C1Dc3KSOp3wzrgKU/ze4Nge3Q/KlTbh1wlffaJhWBeZ2mc9iXXNO
-         rv2hTWJEwlwryNC33AIonQPCMauwlM3bTCPcg2kBN44V0HThVv2bChfspkB+lgG+Z5
-         ib6w1ACwqzEJYu/d1lF4C794n1DWVTlpCI+j8Gss=
-Date:   Fri, 14 May 2021 16:33:03 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Dan Williams <dan.j.williams@intel.com>
-Cc:     "Chen, Mike Ximing" <mike.ximing.chen@intel.com>,
-        Netdev <netdev@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
-        KVM list <kvm@vger.kernel.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>
-Subject: Re: [PATCH v10 00/20] dlb: introduce DLB device driver
-Message-ID: <YJ6KHznWTKvKQZEl@kroah.com>
-References: <20210210175423.1873-1-mike.ximing.chen@intel.com>
- <YEiLI8fGoa9DoCnF@kroah.com>
- <CAPcyv4gCMjoDCc2azLEc8QC5mVhdKeLibic9gj4Lm=Xwpft9ZA@mail.gmail.com>
- <BYAPR11MB30950965A223EDE5414EAE08D96F9@BYAPR11MB3095.namprd11.prod.outlook.com>
- <CAPcyv4htddEBB9ePPSheH+rO+=VJULeHzx0gc384if7qXTUHHg@mail.gmail.com>
- <BYAPR11MB309515F449B8660043A559E5D96C9@BYAPR11MB3095.namprd11.prod.outlook.com>
- <YFBz1BICsjDsSJwv@kroah.com>
- <CAPcyv4g89PjKqPuPp2ag0vB9Vq8igTqh0gdP0h+7ySTVPagQ9w@mail.gmail.com>
+        id S232835AbhENOp6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 May 2021 10:45:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56052 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231473AbhENOp5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 May 2021 10:45:57 -0400
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21828C061574
+        for <kvm@vger.kernel.org>; Fri, 14 May 2021 07:44:45 -0700 (PDT)
+Received: by mail-qt1-x82e.google.com with SMTP id j11so22316467qtn.12
+        for <kvm@vger.kernel.org>; Fri, 14 May 2021 07:44:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5eRvTdeEB4OFHRkGyw/FepnZIZ1CoxvAuK8I7ThmVnY=;
+        b=nRkdu7k2xQ+YoBCvbAK24g2UZnBtDHdW77UuZWq1TzE1ce/i2vSxDI3PdfKI5Jsm9d
+         JRRwdxdT0Bs39ZNeLlzVgpmazAiVXgM+zzr8ziiO7KgyEikyw7RpioDCezi1XKjxoGNP
+         POVVlFsCMQ9vTbPgGl7v6QzGYQWWYI9OJewyjQmQ3WwsxgYI24sQ6TMMkjKiiYwVXW5x
+         8+ipkG/ael3qLVrlHufx0H2LgX6Tqpg0Z8QC+AqA4v8RN6S8q3zVrRqgoth1O4jzTlAj
+         jwIHjEFqIPmdguSTbvmMbkB3B5avjXAM3F3JkUPS+VqLm2pQ4PjA0Yf2BtzRnkcYpGtT
+         aUTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5eRvTdeEB4OFHRkGyw/FepnZIZ1CoxvAuK8I7ThmVnY=;
+        b=WuOJVwG4+RNu4+upMfHn6/vhuUrtNLeyNEQQPIhUY0IoORRC20La3ylePVQt8wjtBn
+         V04LKm4UDzTAiKbHYsDkuolQDbuvfBFgdoqw6Pa7Kq8Az6CIC5dSLfZWrpRhbF0r4jP7
+         Xf/sqhNEipHvxU7NJewb1IxbLNrq+xHHFO+5zlShk+abnX8+EXBh85nmL9f9O5xStUq8
+         6CVE9f1Ez1QhtCInYd0ZP32FE4YkvLQMwuW60871pgFLQDtC5FCv6w1dtqBFBGppmPwv
+         tKQCUZyDLH9twwe1tB5E19nKu+u9mnf410xCBjwMiPLKPERhM824IQLocqSQPof20tdy
+         vpoA==
+X-Gm-Message-State: AOAM533l+azo3mTX2+cDq6Z93VmvTZBONSQZpgVKXq9ZFWJ4EBSxZ+aA
+        YjoDsxzJjR8KW+uLsF30I7oWIA==
+X-Google-Smtp-Source: ABdhPJxXWxgtyCMpLAybGYmVkwL/O8mVvUjGMWW8nfKwX9BgEHmZSiHUjb0Crr7tgdUgMOvc0inVcg==
+X-Received: by 2002:a05:622a:1493:: with SMTP id t19mr43119374qtx.147.1621003484390;
+        Fri, 14 May 2021 07:44:44 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-47-55-113-94.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.113.94])
+        by smtp.gmail.com with ESMTPSA id q7sm4886079qki.17.2021.05.14.07.44.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 May 2021 07:44:43 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1lhZ3T-007Shk-Ai; Fri, 14 May 2021 11:44:43 -0300
+Date:   Fri, 14 May 2021 11:44:43 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Will Deacon <will@kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH 3/6] vfio: remove the unused mdev iommu hook
+Message-ID: <20210514144443.GN1096940@ziepe.ca>
+References: <20210510065405.2334771-1-hch@lst.de>
+ <20210510065405.2334771-4-hch@lst.de>
+ <20210510155454.GA1096940@ziepe.ca>
+ <MWHPR11MB1886E02BF7DE371E9665AA328C519@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210513120058.GG1096940@ziepe.ca>
+ <MWHPR11MB18863613CEBE3CDEEB86F4FC8C509@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210514133939.GL1096940@ziepe.ca>
+ <MWHPR11MB1886AE36746C8F82553471088C509@MWHPR11MB1886.namprd11.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAPcyv4g89PjKqPuPp2ag0vB9Vq8igTqh0gdP0h+7ySTVPagQ9w@mail.gmail.com>
+In-Reply-To: <MWHPR11MB1886AE36746C8F82553471088C509@MWHPR11MB1886.namprd11.prod.outlook.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 12, 2021 at 12:07:31PM -0700, Dan Williams wrote:
-> [ add kvm@vger.kernel.org for VFIO discussion ]
-> 
-> 
-> On Tue, Mar 16, 2021 at 2:01 AM Greg KH <gregkh@linuxfoundation.org> wrote:
-> [..]
-> > > Ioctl interface
-> > > Kernel driver provides ioctl interface for user applications to setup and configure dlb domains, ports, queues, scheduling types, credits,
-> > > sequence numbers, and links between ports and queues.  Applications also use the interface to start, stop and inquire the dlb operations.
-> >
-> > What applications use any of this?  What userspace implementation today
-> > interacts with this?  Where is that code located?
-> >
-> > Too many TLAs here, I have even less of an understanding of what this
-> > driver is supposed to be doing, and what this hardware is now than
-> > before.
-> >
-> > And here I thought I understood hardware devices, and if I am confused,
-> > I pity anyone else looking at this code...
-> >
-> > You all need to get some real documentation together to explain
-> > everything here in terms that anyone can understand.  Without that, this
-> > code is going nowhere.
-> 
-> Hi Greg,
-> 
-> So, for the last few weeks Mike and company have patiently waded
-> through my questions and now I think we are at a point to work through
-> the upstream driver architecture options and tradeoffs. You were not
-> alone in struggling to understand what this device does because it is
-> unlike any other accelerator Linux has ever considered. It shards /
-> load balances a data stream for processing by CPU threads. This is
-> typically a network appliance function / protocol, but could also be
-> any other generic thread pool like the kernel's padata. It saves the
-> CPU cycles spent load balancing work items and marshaling them through
-> a thread pool pipeline. For example, in DPDK applications, DLB2 frees
-> up entire cores that would otherwise be consumed with scheduling and
-> work distribution. A separate proof-of-concept, using DLB2 to
-> accelerate the kernel's "padata" thread pool for a crypto workload,
-> demonstrated ~150% higher throughput with hardware employed to manage
-> work distribution and result ordering. Yes, you need a sufficiently
-> high touch / high throughput protocol before the software load
-> balancing overhead coordinating CPU threads starts to dominate the
-> performance, but there are some specific workloads willing to switch
-> to this regime.
-> 
-> The primary consumer to date has been as a backend for the event
-> handling in the userspace networking stack, DPDK. DLB2 has an existing
-> polled-mode-userspace driver for that use case. So I said, "great,
-> just add more features to that userspace driver and you're done". In
-> fact there was DLB1 hardware that also had a polled-mode-userspace
-> driver. So, the next question is "what's changed in DLB2 where a
-> userspace driver is no longer suitable?". The new use case for DLB2 is
-> new hardware support for a host driver to carve up device resources
-> into smaller sets (vfio-mdevs) that can be assigned to guests (Intel
-> calls this new hardware capability SIOV: Scalable IO Virtualization).
-> 
-> Hardware resource management is difficult to handle in userspace
-> especially when bare-metal hardware events need to coordinate with
-> guest-VM device instances. This includes a mailbox interface for the
-> guest VM to negotiate resources with the host driver. Another more
-> practical roadblock for a "DLB2 in userspace" proposal is the fact
-> that it implements what are in-effect software-defined-interrupts to
-> go beyond the scalability limits of PCI MSI-x (Intel calls this
-> Interrupt Message Store: IMS). So even if hardware resource management
-> was awkwardly plumbed into a userspace daemon there would still need
-> to be kernel enabling for device-specific extensions to
-> drivers/vfio/pci/vfio_pci_intrs.c for it to understand the IMS
-> interrupts of DLB2 in addition to PCI MSI-x.
-> 
-> While that still might be solvable in userspace if you squint at it, I
-> don't think Linux end users are served by pushing all of hardware
-> resource management to userspace. VFIO is mostly built to pass entire
-> PCI devices to guests, or in coordination with a kernel driver to
-> describe a subset of the hardware to a virtual-device (vfio-mdev)
-> interface. The rub here is that to date kernel drivers using VFIO to
-> provision mdevs have some existing responsibilities to the core kernel
-> like a network driver or DMA offload driver. The DLB2 driver offers no
-> such service to the kernel for its primary role of accelerating a
-> userspace data-plane. I am assuming here that  the padata
-> proof-of-concept is interesting, but not a compelling reason to ship a
-> driver compared to giving end users competent kernel-driven
-> hardware-resource assignment for deploying DLB2 virtual instances into
-> guest VMs.
-> 
-> My "just continue in userspace" suggestion has no answer for the IMS
-> interrupt and reliable hardware resource management support
-> requirements. If you're with me so far we can go deeper into the
-> details, but in answer to your previous questions most of the TLAs
-> were from the land of "SIOV" where the VFIO community should be
-> brought in to review. The driver is mostly a configuration plane where
-> the fast path data-plane is entirely in userspace. That configuration
-> plane needs to manage hardware events and resourcing on behalf of
-> guest VMs running on a partitioned subset of the device. There are
-> worthwhile questions about whether some of the uapi can be refactored
-> to common modules like uacce, but I think we need to get to a first
-> order understanding on what DLB2 is and why the kernel has a role
-> before diving into the uapi discussion.
-> 
-> Any clearer?
+On Fri, May 14, 2021 at 02:28:44PM +0000, Tian, Kevin wrote:
+> Well, I see what you meant now. Basically you want to make IOASID 
+> as the first-class object in the entire iommu stack, replacing what 
+> iommu domain fulfill todays. 
 
-A bit, yes, thanks.
+Alternatively you transform domain into being a full fledged IOASID.
+I don't know which path works out to be a better patch series.
 
-> So, in summary drivers/misc/ appears to be the first stop in the
-> review since a host driver needs to be established to start the VFIO
-> enabling campaign. With my community hat on, I think requiring
-> standalone host drivers is healthier for Linux than broaching the
-> subject of VFIO-only drivers. Even if, as in this case, the initial
-> host driver is mostly implementing a capability that could be achieved
-> with a userspace driver.
+> Our original proposal was still based on domain-centric philosophy
+> thus containing IOASID and its routing info only in the uAPI layer
+> of /dev/ioasid and then connecting to domains.
 
-Ok, then how about a much "smaller" kernel driver for all of this, and a
-whole lot of documentation to describe what is going on and what all of
-the TLAs are.
+Where do the domains come from though? You still have to hack hack all
+the drivers to create dummy domains to support this plan, and in the
+process PASID is pretty hobbled as an actual API if every PASID
+instance requires a wonky dummy struct device and domain.
 
-thanks,
+> btw are you OK with our ongoing uAPI proposal still based on domain
+> flavor for now? the uAPI semantics should be generic regardless of 
+> how underlying iommu interfaces are designed. At least separate
+> uAPI discussion from iommu ops re-design.
 
-greg k-h
+The most important thing is the uAPI, you don't get to change that later.
+
+The next most is the driver facing API.
+
+You can figure out the IOMMU layer internals in stages.
+
+Clearly IOASID == domain today as domain is kind of half a
+IOASID. When you extend to PASID and other stuff I think you have
+little choice but to make a full IOASID more first class.
+
+Dummy domains are a very poor substitute.
+
+In my experiance these kinds of transformations can usually be managed
+as "just alot of typing". Usually the old driver code structure can be
+kept enough to not break it while reorganizing.
+
+Jason
