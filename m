@@ -2,115 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A324938176A
-	for <lists+kvm@lfdr.de>; Sat, 15 May 2021 11:59:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E956B3817A7
+	for <lists+kvm@lfdr.de>; Sat, 15 May 2021 12:30:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232249AbhEOKAk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 15 May 2021 06:00:40 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48682 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229524AbhEOKAi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 15 May 2021 06:00:38 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 72A2D61155;
-        Sat, 15 May 2021 09:59:25 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1lhr4t-001X9Q-CQ; Sat, 15 May 2021 10:59:23 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
+        id S231764AbhEOKbd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 15 May 2021 06:31:33 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2665 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229927AbhEOKbc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 15 May 2021 06:31:32 -0400
+Received: from dggems702-chm.china.huawei.com (unknown [172.30.72.58])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Fj1lt5f3YzNydJ;
+        Sat, 15 May 2021 18:26:50 +0800 (CST)
+Received: from dggpeml500013.china.huawei.com (7.185.36.41) by
+ dggems702-chm.china.huawei.com (10.3.19.179) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Sat, 15 May 2021 18:30:16 +0800
+Received: from [10.174.187.161] (10.174.187.161) by
+ dggpeml500013.china.huawei.com (7.185.36.41) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Sat, 15 May 2021 18:30:15 +0800
+Subject: Re: [PATCH v6 00/16] KVM: x86/pmu: Add *basic* support to enable
+ guest PEBS via DS
+To:     Like Xu <like.xu@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20210511024214.280733-1-like.xu@linux.intel.com>
+CC:     Borislav Petkov <bp@alien8.de>,
         Sean Christopherson <seanjc@google.com>,
-        Shaokun Zhang <zhangshaokun@hisilicon.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kernel-team@android.com
-Subject: [GIT PULL] KVM/arm64 fixes for 5.13, take #1
-Date:   Sat, 15 May 2021 10:59:19 +0100
-Message-Id: <20210515095919.6711-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, <weijiang.yang@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>, <ak@linux.intel.com>,
+        <wei.w.wang@intel.com>, <eranian@google.com>,
+        <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+        <kvm@vger.kernel.org>, "Fangyi (Eric)" <eric.fangyi@huawei.com>,
+        Xiexiangyou <xiexiangyou@huawei.com>
+From:   Liuxiangdong <liuxiangdong5@huawei.com>
+Message-ID: <609FA2B7.7030801@huawei.com>
+Date:   Sat, 15 May 2021 18:30:15 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:38.0) Gecko/20100101
+ Thunderbird/38.1.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com, jasowang@redhat.com, mst@redhat.com, qperret@google.com, ricarkol@google.com, seanjc@google.com, zhangshaokun@hisilicon.com, yuzenghui@huawei.com, lingshan.zhu@intel.com, james.morse@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <20210511024214.280733-1-like.xu@linux.intel.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.187.161]
+X-ClientProxiedBy: dggeme710-chm.china.huawei.com (10.1.199.106) To
+ dggpeml500013.china.huawei.com (7.185.36.41)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
 
-Here's the first batch of KVM/arm64 fixes for 5.13. we have three
-regression fixes (irqbypass, debug and exception state), all that will
-require some backporting into stable.
 
-The rest is a pretty mundane set of cleanups after the last merge
-window, including one from "kernel test robot", a first for KVM/arm64.
+On 2021/5/11 10:41, Like Xu wrote:
+> A new kernel cycle has begun, and this version looks promising.
+>
+> The guest Precise Event Based Sampling (PEBS) feature can provide
+> an architectural state of the instruction executed after the guest
+> instruction that exactly caused the event. It needs new hardware
+> facility only available on Intel Ice Lake Server platforms. This
+> patch set enables the basic PEBS feature for KVM guests on ICX.
+>
+> We can use PEBS feature on the Linux guest like native:
+>
+>    # perf record -e instructions:ppp ./br_instr a
+>    # perf record -c 100000 -e instructions:pp ./br_instr a
 
-Please pull,
+Hi, Like.
+Has the qemu patch been modified?
 
-	M.
+https://lore.kernel.org/kvm/f4dcb068-2ddf-428f-50ad-39f65cad3710@intel.com/ 
+?
 
-The following changes since commit 6efb943b8616ec53a5e444193dccf1af9ad627b5:
 
-  Linux 5.13-rc1 (2021-05-09 14:17:44 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.13-1
-
-for you to fetch changes up to cb853ded1d25e5b026ce115dbcde69e3d7e2e831:
-
-  KVM: arm64: Fix debug register indexing (2021-05-15 10:27:59 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 5.13, take #1
-
-- Fix regression with irqbypass not restarting the guest on failed connect
-- Fix regression with debug register decoding resulting in overlapping access
-- Commit exception state on exit to usrspace
-- Fix the MMU notifier return values
-- Add missing 'static' qualifiers in the new host stage-2 code
-
-----------------------------------------------------------------
-Marc Zyngier (3):
-      KVM: arm64: Move __adjust_pc out of line
-      KVM: arm64: Commit pending PC adjustemnts before returning to userspace
-      KVM: arm64: Fix debug register indexing
-
-Quentin Perret (2):
-      KVM: arm64: Mark pkvm_pgtable_mm_ops static
-      KVM: arm64: Mark the host stage-2 memory pools static
-
-Zhu Lingshan (1):
-      Revert "irqbypass: do not start cons/prod when failed connect"
-
-kernel test robot (1):
-      KVM: arm64: Fix boolreturn.cocci warnings
-
- arch/arm64/include/asm/kvm_asm.h           |  3 +++
- arch/arm64/kvm/arm.c                       | 11 ++++++++
- arch/arm64/kvm/hyp/exception.c             | 18 ++++++++++++-
- arch/arm64/kvm/hyp/include/hyp/adjust_pc.h | 18 -------------
- arch/arm64/kvm/hyp/nvhe/hyp-main.c         |  8 ++++++
- arch/arm64/kvm/hyp/nvhe/mem_protect.c      |  4 +--
- arch/arm64/kvm/hyp/nvhe/setup.c            |  2 +-
- arch/arm64/kvm/hyp/nvhe/switch.c           |  3 +--
- arch/arm64/kvm/hyp/vhe/switch.c            |  3 +--
- arch/arm64/kvm/mmu.c                       | 12 ++++-----
- arch/arm64/kvm/sys_regs.c                  | 42 +++++++++++++++---------------
- virt/lib/irqbypass.c                       | 16 +++++-------
- 12 files changed, 77 insertions(+), 63 deletions(-)
+> To emulate guest PEBS facility for the above perf usages,
+> we need to implement 2 code paths:
+>
+> 1) Fast path
+>
+> This is when the host assigned physical PMC has an identical index as
+> the virtual PMC (e.g. using physical PMC0 to emulate virtual PMC0).
+> This path is used in most common use cases.
+>
+> 2) Slow path
+>
+> This is when the host assigned physical PMC has a different index
+> from the virtual PMC (e.g. using physical PMC1 to emulate virtual PMC0)
+> In this case, KVM needs to rewrite the PEBS records to change the
+> applicable counter indexes to the virtual PMC indexes, which would
+> otherwise contain the physical counter index written by PEBS facility,
+> and switch the counter reset values to the offset corresponding to
+> the physical counter indexes in the DS data structure.
+>
+> The previous version [0] enables both fast path and slow path, which
+> seems a bit more complex as the first step. In this patchset, we want
+> to start with the fast path to get the basic guest PEBS enabled while
+> keeping the slow path disabled. More focused discussion on the slow
+> path [1] is planned to be put to another patchset in the next step.
+>
+> Compared to later versions in subsequent steps, the functionality
+> to support host-guest PEBS both enabled and the functionality to
+> emulate guest PEBS when the counter is cross-mapped are missing
+> in this patch set (neither of these are typical scenarios).
+>
+> With the basic support, the guest can retrieve the correct PEBS
+> information from its own PEBS records on the Ice Lake servers.
+> And we expect it should work when migrating to another Ice Lake
+> and no regression about host perf is expected.
+>
+> Here are the results of pebs test from guest/host for same workload:
+>
+> perf report on guest:
+> # Samples: 2K of event 'instructions:ppp', # Event count (approx.): 1473377250
+> # Overhead  Command   Shared Object      Symbol
+>    57.74%  br_instr  br_instr           [.] lfsr_cond
+>    41.40%  br_instr  br_instr           [.] cmp_end
+>     0.21%  br_instr  [kernel.kallsyms]  [k] __lock_acquire
+>
+> perf report on host:
+> # Samples: 2K of event 'instructions:ppp', # Event count (approx.): 1462721386
+> # Overhead  Command   Shared Object     Symbol
+>    57.90%  br_instr  br_instr          [.] lfsr_cond
+>    41.95%  br_instr  br_instr          [.] cmp_end
+>     0.05%  br_instr  [kernel.vmlinux]  [k] lock_acquire
+>     Conclusion: the profiling results on the guest are similar tothat on the host.
+>
+> A minimum guest kernel version may be v5.4 or a backport version
+> support Icelake server PEBS.
+>
+> Please check more details in each commit and feel free to comment.
+>
+> Previous:
+> https://lore.kernel.org/kvm/20210415032016.166201-1-like.xu@linux.intel.com/
+>
+> [0] https://lore.kernel.org/kvm/20210104131542.495413-1-like.xu@linux.intel.com/
+> [1] https://lore.kernel.org/kvm/20210115191113.nktlnmivc3edstiv@two.firstfloor.org/
+>
+> V5 -> V6 Changelog:
+> - Rebased on the latest kvm/queue tree;
+> - Fix a git rebase issue (Liuxiangdong);
+> - Adjust the patch sequence 06/07 for bisection (Liuxiangdong);
+>
+> Like Xu (16):
+>    perf/x86/intel: Add EPT-Friendly PEBS for Ice Lake Server
+>    perf/x86/intel: Handle guest PEBS overflow PMI for KVM guest
+>    perf/x86/core: Pass "struct kvm_pmu *" to determine the guest values
+>    KVM: x86/pmu: Set MSR_IA32_MISC_ENABLE_EMON bit when vPMU is enabled
+>    KVM: x86/pmu: Introduce the ctrl_mask value for fixed counter
+>    KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS
+>    KVM: x86/pmu: Reprogram PEBS event to emulate guest PEBS counter
+>    KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to support guest DS
+>    KVM: x86/pmu: Add PEBS_DATA_CFG MSR emulation to support adaptive PEBS
+>    KVM: x86: Set PEBS_UNAVAIL in IA32_MISC_ENABLE when PEBS is enabled
+>    KVM: x86/pmu: Adjust precise_ip to emulate Ice Lake guest PDIR counter
+>    KVM: x86/pmu: Move pmc_speculative_in_use() to arch/x86/kvm/pmu.h
+>    KVM: x86/pmu: Disable guest PEBS temporarily in two rare situations
+>    KVM: x86/pmu: Add kvm_pmu_cap to optimize perf_get_x86_pmu_capability
+>    KVM: x86/cpuid: Refactor host/guest CPU model consistency check
+>    KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64
+>
+>   arch/x86/events/core.c            |   5 +-
+>   arch/x86/events/intel/core.c      | 129 ++++++++++++++++++++++++------
+>   arch/x86/events/perf_event.h      |   5 +-
+>   arch/x86/include/asm/kvm_host.h   |  16 ++++
+>   arch/x86/include/asm/msr-index.h  |   6 ++
+>   arch/x86/include/asm/perf_event.h |   5 +-
+>   arch/x86/kvm/cpuid.c              |  24 ++----
+>   arch/x86/kvm/cpuid.h              |   5 ++
+>   arch/x86/kvm/pmu.c                |  50 +++++++++---
+>   arch/x86/kvm/pmu.h                |  38 +++++++++
+>   arch/x86/kvm/vmx/capabilities.h   |  26 ++++--
+>   arch/x86/kvm/vmx/pmu_intel.c      | 115 +++++++++++++++++++++-----
+>   arch/x86/kvm/vmx/vmx.c            |  24 +++++-
+>   arch/x86/kvm/vmx/vmx.h            |   2 +-
+>   arch/x86/kvm/x86.c                |  14 ++--
+>   15 files changed, 368 insertions(+), 96 deletions(-)
+>
