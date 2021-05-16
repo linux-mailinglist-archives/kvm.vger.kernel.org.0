@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A547F38213D
-	for <lists+kvm@lfdr.de>; Sun, 16 May 2021 23:45:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A7C7382140
+	for <lists+kvm@lfdr.de>; Sun, 16 May 2021 23:45:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234239AbhEPVq0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 16 May 2021 17:46:26 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:54368 "EHLO vps-vb.mhejs.net"
+        id S234377AbhEPVqf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 16 May 2021 17:46:35 -0400
+Received: from vps-vb.mhejs.net ([37.28.154.113]:54396 "EHLO vps-vb.mhejs.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229917AbhEPVqY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 16 May 2021 17:46:24 -0400
+        id S234296AbhEPVqa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 16 May 2021 17:46:30 -0400
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1liOZ8-0007yt-W7; Sun, 16 May 2021 23:44:51 +0200
+        id 1liOZE-0007z9-Ak; Sun, 16 May 2021 23:44:56 +0200
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>
@@ -37,9 +37,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v3 2/8] KVM: Integrate gfn_to_memslot_approx() into search_memslots()
-Date:   Sun, 16 May 2021 23:44:28 +0200
-Message-Id: <b8258ced64a81c7d90320c2921fe08b11eb47362.1621191551.git.maciej.szmigiero@oracle.com>
+Subject: [PATCH v3 3/8] KVM: Resolve memslot ID via a hash table instead of via a static array
+Date:   Sun, 16 May 2021 23:44:29 +0200
+Message-Id: <4a4867419344338e1419436af1e1b0b8f2405517.1621191551.git.maciej.szmigiero@oracle.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <cover.1621191549.git.maciej.szmigiero@oracle.com>
 References: <cover.1621191549.git.maciej.szmigiero@oracle.com>
@@ -51,146 +51,252 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-s390 arch has gfn_to_memslot_approx() which is almost identical to
-search_memslots(), differing only in that in case the gfn falls in a hole
-one of the memslots bordering the hole is returned.
+Memslot ID to the corresponding memslot mappings are currently kept as
+indices in static id_to_index array.
+The size of this array depends on the maximum allowed memslot count
+(regardless of the number of memslots actually in use).
 
-Add this lookup mode as an option to search_memslots() so we don't have two
-almost identical functions for looking up a memslot by its gfn.
+This has become especially problematic recently, when memslot count cap was
+removed, so the maximum count is now full 32k memslots - the maximum
+allowed by the current KVM API.
+
+Keeping these IDs in a hash table (instead of an array) avoids this
+problem.
+
+Resolving a memslot ID to the actual memslot (instead of its index) will
+also enable transitioning away from an array-based implementation of the
+whole memslots structure in a later commit.
 
 Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 ---
- arch/powerpc/kvm/book3s_64_vio.c    |  2 +-
- arch/powerpc/kvm/book3s_64_vio_hv.c |  2 +-
- arch/s390/kvm/kvm-s390.c            | 39 ++---------------------------
- include/linux/kvm_host.h            | 13 +++++++---
- 4 files changed, 14 insertions(+), 42 deletions(-)
+ include/linux/kvm_host.h | 16 +++++------
+ virt/kvm/kvm_main.c      | 58 ++++++++++++++++++++++++++++++----------
+ 2 files changed, 52 insertions(+), 22 deletions(-)
 
-diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
-index 8da93fdfa59e..148525120504 100644
---- a/arch/powerpc/kvm/book3s_64_vio.c
-+++ b/arch/powerpc/kvm/book3s_64_vio.c
-@@ -346,7 +346,7 @@ static long kvmppc_tce_to_ua(struct kvm *kvm, unsigned long tce,
- 	unsigned long gfn = tce >> PAGE_SHIFT;
- 	struct kvm_memory_slot *memslot;
- 
--	memslot = search_memslots(kvm_memslots(kvm), gfn);
-+	memslot = search_memslots(kvm_memslots(kvm), gfn, false);
- 	if (!memslot)
- 		return -EINVAL;
- 
-diff --git a/arch/powerpc/kvm/book3s_64_vio_hv.c b/arch/powerpc/kvm/book3s_64_vio_hv.c
-index 083a4e037718..a4042403630d 100644
---- a/arch/powerpc/kvm/book3s_64_vio_hv.c
-+++ b/arch/powerpc/kvm/book3s_64_vio_hv.c
-@@ -80,7 +80,7 @@ static long kvmppc_rm_tce_to_ua(struct kvm *kvm,
- 	unsigned long gfn = tce >> PAGE_SHIFT;
- 	struct kvm_memory_slot *memslot;
- 
--	memslot = search_memslots(kvm_memslots_raw(kvm), gfn);
-+	memslot = search_memslots(kvm_memslots_raw(kvm), gfn, false);
- 	if (!memslot)
- 		return -EINVAL;
- 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 1296fc10f80c..75e635ede6ff 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -1921,41 +1921,6 @@ static long kvm_s390_set_skeys(struct kvm *kvm, struct kvm_s390_skeys *args)
- /* for consistency */
- #define KVM_S390_CMMA_SIZE_MAX ((u32)KVM_S390_SKEYS_MAX)
- 
--/*
-- * Similar to gfn_to_memslot, but returns the index of a memslot also when the
-- * address falls in a hole. In that case the index of one of the memslots
-- * bordering the hole is returned.
-- */
--static int gfn_to_memslot_approx(struct kvm_memslots *slots, gfn_t gfn)
--{
--	int start = 0, end = slots->used_slots;
--	int slot = atomic_read(&slots->lru_slot);
--	struct kvm_memory_slot *memslots = slots->memslots;
--
--	if (gfn >= memslots[slot].base_gfn &&
--	    gfn < memslots[slot].base_gfn + memslots[slot].npages)
--		return slot;
--
--	while (start < end) {
--		slot = start + (end - start) / 2;
--
--		if (gfn >= memslots[slot].base_gfn)
--			end = slot;
--		else
--			start = slot + 1;
--	}
--
--	if (start >= slots->used_slots)
--		return slots->used_slots - 1;
--
--	if (gfn >= memslots[start].base_gfn &&
--	    gfn < memslots[start].base_gfn + memslots[start].npages) {
--		atomic_set(&slots->lru_slot, start);
--	}
--
--	return start;
--}
--
- static int kvm_s390_peek_cmma(struct kvm *kvm, struct kvm_s390_cmma_log *args,
- 			      u8 *res, unsigned long bufsize)
- {
-@@ -1982,8 +1947,8 @@ static int kvm_s390_peek_cmma(struct kvm *kvm, struct kvm_s390_cmma_log *args,
- static unsigned long kvm_s390_next_dirty_cmma(struct kvm_memslots *slots,
- 					      unsigned long cur_gfn)
- {
--	int slotidx = gfn_to_memslot_approx(slots, cur_gfn);
--	struct kvm_memory_slot *ms = slots->memslots + slotidx;
-+	struct kvm_memory_slot *ms = search_memslots(slots, cur_gfn, true);
-+	int slotidx = ms - slots->memslots;
- 	unsigned long ofs = cur_gfn - ms->base_gfn;
- 
- 	if (ms->base_gfn + ms->npages <= cur_gfn) {
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 8895b95b6a22..3c40c7d32f7e 100644
+index 3c40c7d32f7e..d3a35646dfd8 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -1091,10 +1091,14 @@ bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
-  * gfn_to_memslot() itself isn't here as an inline because that would
-  * bloat other code too much.
-  *
-+ * With "approx" set returns the memslot also when the address falls
-+ * in a hole. In that case one of the memslots bordering the hole is
-+ * returned.
-+ *
-  * IMPORTANT: Slots are sorted from highest GFN to lowest GFN!
+@@ -27,6 +27,7 @@
+ #include <linux/rcuwait.h>
+ #include <linux/refcount.h>
+ #include <linux/nospec.h>
++#include <linux/hashtable.h>
+ #include <asm/signal.h>
+ 
+ #include <linux/kvm.h>
+@@ -356,6 +357,7 @@ static inline int kvm_vcpu_exiting_guest_mode(struct kvm_vcpu *vcpu)
+ #define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
+ 
+ struct kvm_memory_slot {
++	struct hlist_node id_node;
+ 	gfn_t base_gfn;
+ 	unsigned long npages;
+ 	unsigned long *dirty_bitmap;
+@@ -458,7 +460,7 @@ static inline int kvm_arch_vcpu_memslots_id(struct kvm_vcpu *vcpu)
+ struct kvm_memslots {
+ 	u64 generation;
+ 	/* The mapping table from slot id to the index in memslots[]. */
+-	short id_to_index[KVM_MEM_SLOTS_NUM];
++	DECLARE_HASHTABLE(id_hash, 7);
+ 	atomic_t lru_slot;
+ 	int used_slots;
+ 	struct kvm_memory_slot memslots[];
+@@ -680,16 +682,14 @@ static inline struct kvm_memslots *kvm_vcpu_memslots(struct kvm_vcpu *vcpu)
+ static inline
+ struct kvm_memory_slot *id_to_memslot(struct kvm_memslots *slots, int id)
+ {
+-	int index = slots->id_to_index[id];
+ 	struct kvm_memory_slot *slot;
+ 
+-	if (index < 0)
+-		return NULL;
+-
+-	slot = &slots->memslots[index];
++	hash_for_each_possible(slots->id_hash, slot, id_node, id) {
++		if (slot->id == id)
++			return slot;
++	}
+ 
+-	WARN_ON(slot->id != id);
+-	return slot;
++	return NULL;
+ }
+ 
+ /*
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 6b4feb92dc79..50f9bc9bb1e0 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -781,15 +781,13 @@ static int kvm_init_mmu_notifier(struct kvm *kvm)
+ 
+ static struct kvm_memslots *kvm_alloc_memslots(void)
+ {
+-	int i;
+ 	struct kvm_memslots *slots;
+ 
+ 	slots = kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
+ 	if (!slots)
+ 		return NULL;
+ 
+-	for (i = 0; i < KVM_MEM_SLOTS_NUM; i++)
+-		slots->id_to_index[i] = -1;
++	hash_init(slots->id_hash);
+ 
+ 	return slots;
+ }
+@@ -1097,14 +1095,16 @@ static int kvm_alloc_dirty_bitmap(struct kvm_memory_slot *memslot)
+ /*
+  * Delete a memslot by decrementing the number of used slots and shifting all
+  * other entries in the array forward one spot.
++ * @memslot is a detached dummy struct with just .id and .as_id filled.
   */
- static inline struct kvm_memory_slot *
--search_memslots(struct kvm_memslots *slots, gfn_t gfn)
-+search_memslots(struct kvm_memslots *slots, gfn_t gfn, bool approx)
+ static inline void kvm_memslot_delete(struct kvm_memslots *slots,
+ 				      struct kvm_memory_slot *memslot)
  {
- 	int start = 0, end = slots->used_slots;
- 	int slot = atomic_read(&slots->lru_slot);
-@@ -1116,19 +1120,22 @@ search_memslots(struct kvm_memslots *slots, gfn_t gfn)
- 			start = slot + 1;
- 	}
+ 	struct kvm_memory_slot *mslots = slots->memslots;
++	struct kvm_memory_slot *dmemslot = id_to_memslot(slots, memslot->id);
+ 	int i;
  
-+	if (approx && start >= slots->used_slots)
-+		return &memslots[slots->used_slots - 1];
+-	if (WARN_ON(slots->id_to_index[memslot->id] == -1))
++	if (WARN_ON(!dmemslot))
+ 		return;
+ 
+ 	slots->used_slots--;
+@@ -1112,12 +1112,13 @@ static inline void kvm_memslot_delete(struct kvm_memslots *slots,
+ 	if (atomic_read(&slots->lru_slot) >= slots->used_slots)
+ 		atomic_set(&slots->lru_slot, 0);
+ 
+-	for (i = slots->id_to_index[memslot->id]; i < slots->used_slots; i++) {
++	for (i = dmemslot - mslots; i < slots->used_slots; i++) {
++		hash_del(&mslots[i].id_node);
+ 		mslots[i] = mslots[i + 1];
+-		slots->id_to_index[mslots[i].id] = i;
++		hash_add(slots->id_hash, &mslots[i].id_node, mslots[i].id);
+ 	}
++	hash_del(&mslots[i].id_node);
+ 	mslots[i] = *memslot;
+-	slots->id_to_index[memslot->id] = -1;
+ }
+ 
+ /*
+@@ -1135,31 +1136,41 @@ static inline int kvm_memslot_insert_back(struct kvm_memslots *slots)
+  * itself is not preserved in the array, i.e. not swapped at this time, only
+  * its new index into the array is tracked.  Returns the changed memslot's
+  * current index into the memslots array.
++ * The memslot at the returned index will not be in @slots->id_hash by then.
++ * @memslot is a detached struct with desired final data of the changed slot.
+  */
+ static inline int kvm_memslot_move_backward(struct kvm_memslots *slots,
+ 					    struct kvm_memory_slot *memslot)
+ {
+ 	struct kvm_memory_slot *mslots = slots->memslots;
++	struct kvm_memory_slot *mmemslot = id_to_memslot(slots, memslot->id);
+ 	int i;
+ 
+-	if (WARN_ON_ONCE(slots->id_to_index[memslot->id] == -1) ||
++	if (WARN_ON_ONCE(!mmemslot) ||
+ 	    WARN_ON_ONCE(!slots->used_slots))
+ 		return -1;
+ 
++	/*
++	 * update_memslots() will unconditionally overwrite and re-add the
++	 * target memslot so it has to be removed here first
++	 */
++	hash_del(&mmemslot->id_node);
 +
- 	if (start < slots->used_slots && gfn >= memslots[start].base_gfn &&
- 	    gfn < memslots[start].base_gfn + memslots[start].npages) {
- 		atomic_set(&slots->lru_slot, start);
- 		return &memslots[start];
+ 	/*
+ 	 * Move the target memslot backward in the array by shifting existing
+ 	 * memslots with a higher GFN (than the target memslot) towards the
+ 	 * front of the array.
+ 	 */
+-	for (i = slots->id_to_index[memslot->id]; i < slots->used_slots - 1; i++) {
++	for (i = mmemslot - mslots; i < slots->used_slots - 1; i++) {
+ 		if (memslot->base_gfn > mslots[i + 1].base_gfn)
+ 			break;
+ 
+ 		WARN_ON_ONCE(memslot->base_gfn == mslots[i + 1].base_gfn);
+ 
+ 		/* Shift the next memslot forward one and update its index. */
++		hash_del(&mslots[i + 1].id_node);
+ 		mslots[i] = mslots[i + 1];
+-		slots->id_to_index[mslots[i].id] = i;
++		hash_add(slots->id_hash, &mslots[i].id_node, mslots[i].id);
  	}
+ 	return i;
+ }
+@@ -1170,6 +1181,10 @@ static inline int kvm_memslot_move_backward(struct kvm_memslots *slots,
+  * is not preserved in the array, i.e. not swapped at this time, only its new
+  * index into the array is tracked.  Returns the changed memslot's final index
+  * into the memslots array.
++ * The memslot at the returned index will not be in @slots->id_hash by then.
++ * @memslot is a detached struct with desired final data of the new or
++ * changed slot.
++ * Assumes that the memslot at @start index is not in @slots->id_hash.
+  */
+ static inline int kvm_memslot_move_forward(struct kvm_memslots *slots,
+ 					   struct kvm_memory_slot *memslot,
+@@ -1185,8 +1200,9 @@ static inline int kvm_memslot_move_forward(struct kvm_memslots *slots,
+ 		WARN_ON_ONCE(memslot->base_gfn == mslots[i - 1].base_gfn);
  
--	return NULL;
-+	return approx ? &memslots[start] : NULL;
+ 		/* Shift the next memslot back one and update its index. */
++		hash_del(&mslots[i - 1].id_node);
+ 		mslots[i] = mslots[i - 1];
+-		slots->id_to_index[mslots[i].id] = i;
++		hash_add(slots->id_hash, &mslots[i].id_node, mslots[i].id);
+ 	}
+ 	return i;
+ }
+@@ -1231,6 +1247,9 @@ static inline int kvm_memslot_move_forward(struct kvm_memslots *slots,
+  * most likely to be referenced, sorting it to the front of the array was
+  * advantageous.  The current binary search starts from the middle of the array
+  * and uses an LRU pointer to improve performance for all memslots and GFNs.
++ *
++ * @memslot is a detached struct, not a part of the current or new memslot
++ * array.
+  */
+ static void update_memslots(struct kvm_memslots *slots,
+ 			    struct kvm_memory_slot *memslot,
+@@ -1247,12 +1266,16 @@ static void update_memslots(struct kvm_memslots *slots,
+ 			i = kvm_memslot_move_backward(slots, memslot);
+ 		i = kvm_memslot_move_forward(slots, memslot, i);
+ 
++		if (i < 0)
++			return;
++
+ 		/*
+ 		 * Copy the memslot to its new position in memslots and update
+ 		 * its index accordingly.
+ 		 */
+ 		slots->memslots[i] = *memslot;
+-		slots->id_to_index[memslot->id] = i;
++		hash_add(slots->id_hash, &slots->memslots[i].id_node,
++			 memslot->id);
+ 	}
  }
  
- static inline struct kvm_memory_slot *
- __gfn_to_memslot(struct kvm_memslots *slots, gfn_t gfn)
+@@ -1316,6 +1339,7 @@ static struct kvm_memslots *kvm_dup_memslots(struct kvm_memslots *old,
  {
--	return search_memslots(slots, gfn);
-+	return search_memslots(slots, gfn, false);
- }
+ 	struct kvm_memslots *slots;
+ 	size_t old_size, new_size;
++	struct kvm_memory_slot *memslot;
  
- static inline unsigned long
+ 	old_size = sizeof(struct kvm_memslots) +
+ 		   (sizeof(struct kvm_memory_slot) * old->used_slots);
+@@ -1326,8 +1350,14 @@ static struct kvm_memslots *kvm_dup_memslots(struct kvm_memslots *old,
+ 		new_size = old_size;
+ 
+ 	slots = kvzalloc(new_size, GFP_KERNEL_ACCOUNT);
+-	if (likely(slots))
+-		memcpy(slots, old, old_size);
++	if (unlikely(!slots))
++		return NULL;
++
++	memcpy(slots, old, old_size);
++
++	hash_init(slots->id_hash);
++	kvm_for_each_memslot(memslot, slots)
++		hash_add(slots->id_hash, &memslot->id_node, memslot->id);
+ 
+ 	return slots;
+ }
