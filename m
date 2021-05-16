@@ -2,64 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 882E3381DF8
-	for <lists+kvm@lfdr.de>; Sun, 16 May 2021 12:18:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D00D381DF1
+	for <lists+kvm@lfdr.de>; Sun, 16 May 2021 12:18:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235113AbhEPKUH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 16 May 2021 06:20:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37682 "EHLO mail.kernel.org"
+        id S232298AbhEPKUD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 16 May 2021 06:20:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37558 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231386AbhEPKTx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S231480AbhEPKTx (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 16 May 2021 06:19:53 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 768AD611CA;
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8941961242;
         Sun, 16 May 2021 10:18:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1621160317;
-        bh=uz12JEUkFl1zk0MKhwqoy7Swq0yIqwlg559U5vqLb64=;
-        h=From:To:Cc:Subject:Date:From;
-        b=NZoYuL4T8pZP0XVsuqpo1xaXga3djUflecwXx5LGut8qbhlW3Y9NzBmiQJpti66iQ
-         XEctA9a/tkYn6eIfMFOD23iU2NVyAWENwzAu5GTKImts+lpuYv0eNqgw/CUZ2ZkWss
-         fllyfJ2EOkHcmxftZ1iXvAx83SROwJwSmenZXooYhJTuiuJxIyQ+zDnL2KcckWJO3l
-         HXjHP9OcKsGcnNSkEPNKSqumMlW9xOUSyWQbW7rfHCgaVLEVCKAvIaHdwvFlEJ1a7n
-         T0Jc41mYwmUESpLNWcMxWdQoD+Yw7News+EAAT/i+fb8vmW0PjoNLGp13h2ptdOtyU
-         rkJ7P+/53g9gg==
+        bh=vfreIcvlPF/8OZus3kXkczSP81akAE9RkS16w+hHttA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=HwEBNtghW9V/jdln44alW/pcRzsAKaWn4I/FBghqmMFEbIuQ7jbjvX7EwOm4sZAtv
+         U7plEhjM+Kpzj5sEyxEjZLAu/XL1lWRuZYeDJ+AwA5SoIj7fMOPbh8Md4LGXl2674a
+         BXHfTHf5UM2qWrOJvM4hURQCGiu12+xLYon2xqrxGP91Pb6JDQh1sVTYfWFawDCssJ
+         KhzbNsv8V320MvZpvPcYpNjv09gnSI2z+ei5vfB1EKGaxt1QDIp4SSpHka1MzzF+Ne
+         XpP8fKHN7lFZeLw6ObJDJ6AAmhRcWRS0A6ipXLQXt0QwaJxZiRGlFa66Fo8IfVIXF5
+         FymixdsGColjw==
 Received: by mail.kernel.org with local (Exim 4.94.2)
         (envelope-from <mchehab@kernel.org>)
-        id 1liDr1-003o89-5Z; Sun, 16 May 2021 12:18:35 +0200
+        id 1liDr1-003o96-Of; Sun, 16 May 2021 12:18:35 +0200
 From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
 Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Corentin Labbe <clabbe@baylibre.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Jean Delvare <jdelvare@suse.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Leo Yan <leo.yan@linaro.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Mike Leach <mike.leach@linaro.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Thorsten Leemhuis <linux@leemhuis.info>,
-        alsa-devel@alsa-project.org, coresight@lists.linaro.org,
-        intel-wired-lan@lists.osuosl.org, kvm@vger.kernel.org,
-        linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-ext4@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-usb@vger.kernel.org, mjpeg-users@lists.sourceforge.net,
-        netdev@vger.kernel.org, rcu@vger.kernel.org
-Subject: [PATCH v3 00/16] Replace some bad characters on documents
-Date:   Sun, 16 May 2021 12:18:17 +0200
-Message-Id: <cover.1621159997.git.mchehab+huawei@kernel.org>
+        "Jonathan Corbet" <corbet@lwn.net>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v3 15/16] docs: virt: kvm: api.rst: replace some characters
+Date:   Sun, 16 May 2021 12:18:32 +0200
+Message-Id: <19f884773a95649e7b11609d8d3075f30db00aef.1621159997.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <cover.1621159997.git.mchehab+huawei@kernel.org>
+References: <cover.1621159997.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -68,72 +46,100 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The conversion tools used during DocBook/LaTeX/html/Markdown->ReST 
+The conversion tools used during DocBook/LaTeX/html/Markdown->ReST
 conversion and some cut-and-pasted text contain some characters that
-aren't easily reachable on standard keyboards and/or could cause 
+aren't easily reachable on standard keyboards and/or could cause
 troubles when parsed by the documentation build system.
 
 Replace the occurences of the following characters:
 
-            - U+00a0 (' '): NO-BREAK SPACE
-            - U+00ad ('­'): SOFT HYPHEN
-            - U+2010 ('‐'): HYPHEN
-            - U+2217 ('∗'): ASTERISK OPERATOR
-            - U+feff ('﻿'): BOM
+	- U+00a0 (' '): NO-BREAK SPACE
+	  as it can cause lines being truncated on PDF output
 
-I'll submit in separate another series to address other character occurrences.
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+---
+ Documentation/virt/kvm/api.rst | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
 
-v3:
-  - removed curly commas and changed the patch descriptions.
-v2:
-  - removed EM/EN dashes and changed the patch descriptions.
-
-
-Mauro Carvalho Chehab (16):
-  docs: hwmon: ir36021.rst: replace some characters
-  docs: admin-guide: reporting-issues.rst: replace some characters
-  docs: trace: coresight: coresight-etm4x-reference.rst: replace some
-    characters
-  docs: driver-api: ioctl.rst: replace some characters
-  docs: driver-api: media: drivers: zoran.rst: replace some characters
-  docs: usb: replace some characters
-  docs: userspace-api: media: v4l: dev-decoder.rst: replace some
-    characters
-  docs: userspace-api: media: dvb: intro.rst: replace some characters
-  docs: vm: zswap.rst: replace some characters
-  docs: filesystems: ext4: blockgroup.rst: replace some characters
-  docs: networking: device_drivers: replace some characters
-  docs: PCI: acpi-info.rst: replace some characters
-  docs: sound: kernel-api: writing-an-alsa-driver.rst: replace some
-    characters
-  docs: firmware-guide: acpi: dsd: graph.rst: replace some characters
-  docs: virt: kvm: api.rst: replace some characters
-  docs: RCU: replace some characters
-
- Documentation/PCI/acpi-info.rst               | 18 ++---
- .../Data-Structures/Data-Structures.rst       | 46 ++++++------
- .../Expedited-Grace-Periods.rst               | 36 +++++-----
- .../Tree-RCU-Memory-Ordering.rst              |  2 +-
- .../RCU/Design/Requirements/Requirements.rst  | 70 +++++++++----------
- .../admin-guide/reporting-issues.rst          |  2 +-
- Documentation/driver-api/ioctl.rst            |  8 +--
- .../driver-api/media/drivers/zoran.rst        |  2 +-
- Documentation/filesystems/ext4/blockgroup.rst |  2 +-
- .../firmware-guide/acpi/dsd/graph.rst         |  2 +-
- Documentation/hwmon/ir36021.rst               |  2 +-
- .../device_drivers/ethernet/intel/i40e.rst    |  6 +-
- .../device_drivers/ethernet/intel/iavf.rst    |  2 +-
- .../kernel-api/writing-an-alsa-driver.rst     |  2 +-
- .../coresight/coresight-etm4x-reference.rst   |  2 +-
- Documentation/usb/ehci.rst                    |  2 +-
- Documentation/usb/gadget_printer.rst          |  2 +-
- .../userspace-api/media/dvb/intro.rst         |  4 +-
- .../userspace-api/media/v4l/dev-decoder.rst   |  2 +-
- Documentation/virt/kvm/api.rst                | 28 ++++----
- Documentation/vm/zswap.rst                    |  4 +-
- 21 files changed, 122 insertions(+), 122 deletions(-)
-
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 22d077562149..295daf6178f8 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -850,7 +850,7 @@ in-kernel irqchip (GIC), and for in-kernel irqchip can tell the GIC to
+ use PPIs designated for specific cpus.  The irq field is interpreted
+ like this::
+ 
+-  bits:  |  31 ... 28  | 27 ... 24 | 23  ... 16 | 15 ... 0 |
++  bits:  |  31 ... 28  | 27 ... 24 | 23  ... 16 | 15 ... 0 |
+   field: | vcpu2_index | irq_type  | vcpu_index |  irq_id  |
+ 
+ The irq_type field has the following values:
+@@ -2144,10 +2144,10 @@ prior to calling the KVM_RUN ioctl.
+ Errors:
+ 
+   ======   ============================================================
+-  ENOENT   no such register
+-  EINVAL   invalid register ID, or no such register or used with VMs in
++  ENOENT   no such register
++  EINVAL   invalid register ID, or no such register or used with VMs in
+            protected virtualization mode on s390
+-  EPERM    (arm64) register access not allowed before vcpu finalization
++  EPERM    (arm64) register access not allowed before vcpu finalization
+   ======   ============================================================
+ 
+ (These error codes are indicative only: do not rely on a specific error
+@@ -2585,10 +2585,10 @@ following id bit patterns::
+ Errors include:
+ 
+   ======== ============================================================
+-  ENOENT   no such register
+-  EINVAL   invalid register ID, or no such register or used with VMs in
++  ENOENT   no such register
++  EINVAL   invalid register ID, or no such register or used with VMs in
+            protected virtualization mode on s390
+-  EPERM    (arm64) register access not allowed before vcpu finalization
++  EPERM    (arm64) register access not allowed before vcpu finalization
+   ======== ============================================================
+ 
+ (These error codes are indicative only: do not rely on a specific error
+@@ -3107,13 +3107,13 @@ current state.  "addr" is ignored.
+ Errors:
+ 
+   ======     =================================================================
+-  EINVAL     the target is unknown, or the combination of features is invalid.
+-  ENOENT     a features bit specified is unknown.
++  EINVAL     the target is unknown, or the combination of features is invalid.
++  ENOENT     a features bit specified is unknown.
+   ======     =================================================================
+ 
+ This tells KVM what type of CPU to present to the guest, and what
+-optional features it should have.  This will cause a reset of the cpu
+-registers to their initial values.  If this is not called, KVM_RUN will
++optional features it should have.  This will cause a reset of the cpu
++registers to their initial values.  If this is not called, KVM_RUN will
+ return ENOEXEC for that vcpu.
+ 
+ The initial values are defined as:
+@@ -3234,8 +3234,8 @@ VCPU matching underlying host.
+ Errors:
+ 
+   =====      ==============================================================
+-  E2BIG      the reg index list is too big to fit in the array specified by
+-             the user (the number required will be written into n).
++  E2BIG      the reg index list is too big to fit in the array specified by
++             the user (the number required will be written into n).
+   =====      ==============================================================
+ 
+ ::
+@@ -3283,7 +3283,7 @@ specific device.
+ ARM/arm64 divides the id field into two parts, a device id and an
+ address type id specific to the individual device::
+ 
+-  bits:  | 63        ...       32 | 31    ...    16 | 15    ...    0 |
++  bits:  | 63        ...       32 | 31    ...    16 | 15    ...    0 |
+   field: |        0x00000000      |     device id   |  addr type id  |
+ 
+ ARM/arm64 currently only require this when using the in-kernel GIC
 -- 
 2.31.1
-
 
