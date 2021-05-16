@@ -2,141 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5281E381DC2
-	for <lists+kvm@lfdr.de>; Sun, 16 May 2021 11:51:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 882E3381DF8
+	for <lists+kvm@lfdr.de>; Sun, 16 May 2021 12:18:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231388AbhEPJwR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 16 May 2021 05:52:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30893 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230233AbhEPJwP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 16 May 2021 05:52:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621158660;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=oRO/yJaNjM6VZvBpBMjV2hPGrzuDge/66QAkCSH3I5s=;
-        b=i/fzqz5SlktnNb6/UBe6M3ZnUepgXhShAdW0mn1w6hrmSlvM4+n38EfrEpXtiu7qYZ5d18
-        ok14JJ6qCJOj23sOos4xqIGZX4+lyQNG2KgLMabTayJYOBN/lUAXZNjEhwYANQXEnuOpII
-        lkGWJwP1DFEGlSnF1MbbRTUoI3JbasM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-13-k_zAiPHOPuGDguKcyaQ_OA-1; Sun, 16 May 2021 05:50:57 -0400
-X-MC-Unique: k_zAiPHOPuGDguKcyaQ_OA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46B99100747C;
-        Sun, 16 May 2021 09:50:56 +0000 (UTC)
-Received: from [10.36.112.87] (ovpn-112-87.ams2.redhat.com [10.36.112.87])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 75ADC6EF48;
-        Sun, 16 May 2021 09:50:54 +0000 (UTC)
-Subject: Re: [PATCH v3 3/5] KVM: selftests: Move GUEST_ASSERT_EQ to utils
- header
-To:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     pbonzini@redhat.com, maz@kernel.org, drjones@redhat.com,
-        alexandru.elisei@arm.com
-References: <20210513002802.3671838-1-ricarkol@google.com>
- <20210513002802.3671838-4-ricarkol@google.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <b8e63f39-9545-4a43-362f-75e0489ae715@redhat.com>
-Date:   Sun, 16 May 2021 11:50:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S235113AbhEPKUH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 16 May 2021 06:20:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37682 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231386AbhEPKTx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 16 May 2021 06:19:53 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 768AD611CA;
+        Sun, 16 May 2021 10:18:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1621160317;
+        bh=uz12JEUkFl1zk0MKhwqoy7Swq0yIqwlg559U5vqLb64=;
+        h=From:To:Cc:Subject:Date:From;
+        b=NZoYuL4T8pZP0XVsuqpo1xaXga3djUflecwXx5LGut8qbhlW3Y9NzBmiQJpti66iQ
+         XEctA9a/tkYn6eIfMFOD23iU2NVyAWENwzAu5GTKImts+lpuYv0eNqgw/CUZ2ZkWss
+         fllyfJ2EOkHcmxftZ1iXvAx83SROwJwSmenZXooYhJTuiuJxIyQ+zDnL2KcckWJO3l
+         HXjHP9OcKsGcnNSkEPNKSqumMlW9xOUSyWQbW7rfHCgaVLEVCKAvIaHdwvFlEJ1a7n
+         T0Jc41mYwmUESpLNWcMxWdQoD+Yw7News+EAAT/i+fb8vmW0PjoNLGp13h2ptdOtyU
+         rkJ7P+/53g9gg==
+Received: by mail.kernel.org with local (Exim 4.94.2)
+        (envelope-from <mchehab@kernel.org>)
+        id 1liDr1-003o89-5Z; Sun, 16 May 2021 12:18:35 +0200
+From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
+Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Corentin Labbe <clabbe@baylibre.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Jean Delvare <jdelvare@suse.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Leo Yan <leo.yan@linaro.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Mike Leach <mike.leach@linaro.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Thorsten Leemhuis <linux@leemhuis.info>,
+        alsa-devel@alsa-project.org, coresight@lists.linaro.org,
+        intel-wired-lan@lists.osuosl.org, kvm@vger.kernel.org,
+        linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-ext4@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-usb@vger.kernel.org, mjpeg-users@lists.sourceforge.net,
+        netdev@vger.kernel.org, rcu@vger.kernel.org
+Subject: [PATCH v3 00/16] Replace some bad characters on documents
+Date:   Sun, 16 May 2021 12:18:17 +0200
+Message-Id: <cover.1621159997.git.mchehab+huawei@kernel.org>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <20210513002802.3671838-4-ricarkol@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Sender: Mauro Carvalho Chehab <mchehab@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ricardo,
+The conversion tools used during DocBook/LaTeX/html/Markdown->ReST 
+conversion and some cut-and-pasted text contain some characters that
+aren't easily reachable on standard keyboards and/or could cause 
+troubles when parsed by the documentation build system.
 
-On 5/13/21 2:28 AM, Ricardo Koller wrote:
-> Move GUEST_ASSERT_EQ to a common header, kvm_util.h, for other
-> architectures and tests to use. Also modify __GUEST_ASSERT so it can be
-> reused to implement GUEST_ASSERT_EQ.
-> 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Replace the occurences of the following characters:
 
-Thanks
+            - U+00a0 (' '): NO-BREAK SPACE
+            - U+00ad ('­'): SOFT HYPHEN
+            - U+2010 ('‐'): HYPHEN
+            - U+2217 ('∗'): ASTERISK OPERATOR
+            - U+feff ('﻿'): BOM
 
-Eric
+I'll submit in separate another series to address other character occurrences.
 
-> ---
->  .../testing/selftests/kvm/include/kvm_util.h  | 22 ++++++++++---------
->  .../selftests/kvm/x86_64/tsc_msrs_test.c      |  9 --------
->  2 files changed, 12 insertions(+), 19 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index 7880929ea548..fb2b8964f2ca 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -366,26 +366,28 @@ uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc);
->  				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
->  #define GUEST_SYNC(stage)	ucall(UCALL_SYNC, 2, "hello", stage)
->  #define GUEST_DONE()		ucall(UCALL_DONE, 0)
-> -#define __GUEST_ASSERT(_condition, _nargs, _args...) do {	\
-> -	if (!(_condition))					\
-> -		ucall(UCALL_ABORT, 2 + _nargs,			\
-> -			"Failed guest assert: "			\
-> -			#_condition, __LINE__, _args);		\
-> +#define __GUEST_ASSERT(_condition, _condstr, _nargs, _args...) do {    \
-> +	if (!(_condition))                                              \
-> +		ucall(UCALL_ABORT, 2 + _nargs,                          \
-> +			"Failed guest assert: "                         \
-> +			_condstr, __LINE__, _args);                     \
->  } while (0)
->  
->  #define GUEST_ASSERT(_condition) \
-> -	__GUEST_ASSERT((_condition), 0, 0)
-> +	__GUEST_ASSERT(_condition, #_condition, 0, 0)
->  
->  #define GUEST_ASSERT_1(_condition, arg1) \
-> -	__GUEST_ASSERT((_condition), 1, (arg1))
-> +	__GUEST_ASSERT(_condition, #_condition, 1, (arg1))
->  
->  #define GUEST_ASSERT_2(_condition, arg1, arg2) \
-> -	__GUEST_ASSERT((_condition), 2, (arg1), (arg2))
-> +	__GUEST_ASSERT(_condition, #_condition, 2, (arg1), (arg2))
->  
->  #define GUEST_ASSERT_3(_condition, arg1, arg2, arg3) \
-> -	__GUEST_ASSERT((_condition), 3, (arg1), (arg2), (arg3))
-> +	__GUEST_ASSERT(_condition, #_condition, 3, (arg1), (arg2), (arg3))
->  
->  #define GUEST_ASSERT_4(_condition, arg1, arg2, arg3, arg4) \
-> -	__GUEST_ASSERT((_condition), 4, (arg1), (arg2), (arg3), (arg4))
-> +	__GUEST_ASSERT(_condition, #_condition, 4, (arg1), (arg2), (arg3), (arg4))
-> +
-> +#define GUEST_ASSERT_EQ(a, b) __GUEST_ASSERT((a) == (b), #a " == " #b, 2, a, b)
->  
->  #endif /* SELFTEST_KVM_UTIL_H */
-> diff --git a/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c b/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c
-> index e357d8e222d4..5a6a662f2e59 100644
-> --- a/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c
-> @@ -18,15 +18,6 @@
->  #define rounded_rdmsr(x)       ROUND(rdmsr(x))
->  #define rounded_host_rdmsr(x)  ROUND(vcpu_get_msr(vm, 0, x))
->  
-> -#define GUEST_ASSERT_EQ(a, b) do {				\
-> -	__typeof(a) _a = (a);					\
-> -	__typeof(b) _b = (b);					\
-> -	if (_a != _b)						\
-> -                ucall(UCALL_ABORT, 4,				\
-> -                        "Failed guest assert: "			\
-> -                        #a " == " #b, __LINE__, _a, _b);	\
-> -  } while(0)
-> -
->  static void guest_code(void)
->  {
->  	u64 val = 0;
-> 
+v3:
+  - removed curly commas and changed the patch descriptions.
+v2:
+  - removed EM/EN dashes and changed the patch descriptions.
+
+
+Mauro Carvalho Chehab (16):
+  docs: hwmon: ir36021.rst: replace some characters
+  docs: admin-guide: reporting-issues.rst: replace some characters
+  docs: trace: coresight: coresight-etm4x-reference.rst: replace some
+    characters
+  docs: driver-api: ioctl.rst: replace some characters
+  docs: driver-api: media: drivers: zoran.rst: replace some characters
+  docs: usb: replace some characters
+  docs: userspace-api: media: v4l: dev-decoder.rst: replace some
+    characters
+  docs: userspace-api: media: dvb: intro.rst: replace some characters
+  docs: vm: zswap.rst: replace some characters
+  docs: filesystems: ext4: blockgroup.rst: replace some characters
+  docs: networking: device_drivers: replace some characters
+  docs: PCI: acpi-info.rst: replace some characters
+  docs: sound: kernel-api: writing-an-alsa-driver.rst: replace some
+    characters
+  docs: firmware-guide: acpi: dsd: graph.rst: replace some characters
+  docs: virt: kvm: api.rst: replace some characters
+  docs: RCU: replace some characters
+
+ Documentation/PCI/acpi-info.rst               | 18 ++---
+ .../Data-Structures/Data-Structures.rst       | 46 ++++++------
+ .../Expedited-Grace-Periods.rst               | 36 +++++-----
+ .../Tree-RCU-Memory-Ordering.rst              |  2 +-
+ .../RCU/Design/Requirements/Requirements.rst  | 70 +++++++++----------
+ .../admin-guide/reporting-issues.rst          |  2 +-
+ Documentation/driver-api/ioctl.rst            |  8 +--
+ .../driver-api/media/drivers/zoran.rst        |  2 +-
+ Documentation/filesystems/ext4/blockgroup.rst |  2 +-
+ .../firmware-guide/acpi/dsd/graph.rst         |  2 +-
+ Documentation/hwmon/ir36021.rst               |  2 +-
+ .../device_drivers/ethernet/intel/i40e.rst    |  6 +-
+ .../device_drivers/ethernet/intel/iavf.rst    |  2 +-
+ .../kernel-api/writing-an-alsa-driver.rst     |  2 +-
+ .../coresight/coresight-etm4x-reference.rst   |  2 +-
+ Documentation/usb/ehci.rst                    |  2 +-
+ Documentation/usb/gadget_printer.rst          |  2 +-
+ .../userspace-api/media/dvb/intro.rst         |  4 +-
+ .../userspace-api/media/v4l/dev-decoder.rst   |  2 +-
+ Documentation/virt/kvm/api.rst                | 28 ++++----
+ Documentation/vm/zswap.rst                    |  4 +-
+ 21 files changed, 122 insertions(+), 122 deletions(-)
+
+-- 
+2.31.1
+
 
