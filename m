@@ -2,345 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE1E6382918
-	for <lists+kvm@lfdr.de>; Mon, 17 May 2021 11:58:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 452793829F6
+	for <lists+kvm@lfdr.de>; Mon, 17 May 2021 12:38:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236495AbhEQJ7t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 May 2021 05:59:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35262 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236461AbhEQJ7E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 May 2021 05:59:04 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D32BC0612ED
-        for <kvm@vger.kernel.org>; Mon, 17 May 2021 02:56:45 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id k15so4266954pgb.10
-        for <kvm@vger.kernel.org>; Mon, 17 May 2021 02:56:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=iU39BPoZqk2HqORX3UA9Ncb7R+Ai9Wci3A+87yTYnGc=;
-        b=vJS0FLHo+jEjRSpl4KDvMAXIKV6coCiING2EQZA1u2Y7gKzBes8Am7G0tgOJgxQlrZ
-         Bkdd4TMVPeYuCtXAnN7lHvgd+fGo5r7S18DNsqWRS/+zLqnQXdMn4+dWRtxgaHnmabi7
-         THQzQT3wQSsMuC7EE60tyCdc6m40mjKDwjpd/1WW7rO963r/zo6y3sBIX7e5E2Mp0D7e
-         wV5rIuUrhiuPXFHAatRod8B2KEBFLN32CdPEoRTra2ZEhpJqs8EuDriMsfg43ibR1sFY
-         E1p+zen4658VBftZ+03vFxrfs5JNVUwGNM8ZRnujdVaAFuKkf2tNZ8xNjzcx1TST/zJB
-         o6mA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=iU39BPoZqk2HqORX3UA9Ncb7R+Ai9Wci3A+87yTYnGc=;
-        b=RYN2K4gDm+x6gq43agR4h+Q0mi4NZEZiGVvy2AFx3Ji1aii421L8bUOVb0KANx/Jjy
-         hPmdoEbi4hixKcm1wHzcGdiDf2jq95ymbIfuQ53n50Zm9l9OhPYovc9WhK3SPZ+G6zj7
-         wEoSRHkpxafGUJbTdkPO0FhtI1nYI5cV4NfNZwzHpTboGMe5EMpmQcCX/J77GDxvu8pS
-         ingAz0d8YJV2PHnFK1fN3oyJIyYo8qvk0jyx9P2TbnvoFEGopqKC3Ly00q1Ri0PJmPrq
-         L5wfj5godBr9pPv2eCJ0KTuL3iZX6CNWEkWmu/XT1sP8YWXw0ajXLv0onmhyOGBIYMjx
-         pQBA==
-X-Gm-Message-State: AOAM531+KqDgXBY0PFzV2yIg0rLJn+jqPEBf/xhtA5b6KTmItE4R0n+d
-        9n5IFZB6HyGPxe/2E6m16Gvx
-X-Google-Smtp-Source: ABdhPJwaUmuqxTT6QOW1/dIV2zi3/klVmP6fV6W/ZGKjYhDf6qJpzO5wUPp9BNC/Sl2so2TDfCiGJg==
-X-Received: by 2002:a63:6f8e:: with SMTP id k136mr61696699pgc.326.1621245405101;
-        Mon, 17 May 2021 02:56:45 -0700 (PDT)
-Received: from localhost ([139.177.225.253])
-        by smtp.gmail.com with ESMTPSA id v14sm10441643pgl.86.2021.05.17.02.56.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 May 2021 02:56:44 -0700 (PDT)
-From:   Xie Yongji <xieyongji@bytedance.com>
-To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
-        sgarzare@redhat.com, parav@nvidia.com, hch@infradead.org,
-        christian.brauner@canonical.com, rdunlap@infradead.org,
-        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        bcrl@kvack.org, corbet@lwn.net, mika.penttila@nextfour.com,
-        dan.carpenter@oracle.com, joro@8bytes.org
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v7 12/12] Documentation: Add documentation for VDUSE
-Date:   Mon, 17 May 2021 17:55:13 +0800
-Message-Id: <20210517095513.850-13-xieyongji@bytedance.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210517095513.850-1-xieyongji@bytedance.com>
-References: <20210517095513.850-1-xieyongji@bytedance.com>
+        id S236273AbhEQKjX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 May 2021 06:39:23 -0400
+Received: from foss.arm.com ([217.140.110.172]:47876 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233962AbhEQKjW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 May 2021 06:39:22 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 522B2106F;
+        Mon, 17 May 2021 03:38:06 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 908943F719;
+        Mon, 17 May 2021 03:38:05 -0700 (PDT)
+Subject: Re: [PATCH kvm-unit-tests v3 4/8] arm/arm64: mmu: Stop mapping an
+ assumed IO region
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, nikos.nikoleris@arm.com,
+        andre.przywara@arm.com, eric.auger@redhat.com
+References: <20210429164130.405198-1-drjones@redhat.com>
+ <20210429164130.405198-5-drjones@redhat.com>
+ <94288c5b-8894-5f8b-2477-6e45e087c4b5@arm.com>
+ <0ca20ae5-d797-1c9f-9414-1d162d86f1b5@arm.com>
+ <20210513171844.n3h3c7l5srhuriyy@gator>
+ <20210513174313.j7ff6j5jhzvocnuh@gator>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <b3d12a27-efda-86e0-b86c-c23e1371f473@arm.com>
+Date:   Mon, 17 May 2021 11:38:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
+In-Reply-To: <20210513174313.j7ff6j5jhzvocnuh@gator>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-VDUSE (vDPA Device in Userspace) is a framework to support
-implementing software-emulated vDPA devices in userspace. This
-document is intended to clarify the VDUSE design and usage.
+Hi Drew,
 
-Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
----
- Documentation/userspace-api/index.rst |   1 +
- Documentation/userspace-api/vduse.rst | 243 ++++++++++++++++++++++++++++++++++
- 2 files changed, 244 insertions(+)
- create mode 100644 Documentation/userspace-api/vduse.rst
+On 5/13/21 6:43 PM, Andrew Jones wrote:
+> On Thu, May 13, 2021 at 07:18:44PM +0200, Andrew Jones wrote:
+>> [..]
+>> Thanks Alex,
+>>
+>> I think a better fix is this untested one below, though. If you can test
+>> it out and confirm it also resolves the issue, then I'll add this patch
+>> to the series.
+>>
+>> Thanks,
+>> drew
+>>
+>>
+>> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+>> index 95c418c10eb4..deafd5695c33 100644
+>> --- a/arm/micro-bench.c
+>> +++ b/arm/micro-bench.c
+>> @@ -273,16 +273,22 @@ static void hvc_exec(void)
+>>         asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0");
+>>  }
+>>  
+>> -static void mmio_read_user_exec(void)
+>> +/*
+>> + * FIXME: Read device-id in virtio mmio here in order to
+>> + * force an exit to userspace. This address needs to be
+>> + * updated in the future if any relevant changes in QEMU
+>> + * test-dev are made.
+>> + */
+>> +static void *userspace_emulated_addr;
+>> +
+>> +static bool mmio_read_user_prep(void)
+>>  {
+>> -       /*
+>> -        * FIXME: Read device-id in virtio mmio here in order to
+>> -        * force an exit to userspace. This address needs to be
+>> -        * updated in the future if any relevant changes in QEMU
+>> -        * test-dev are made.
+>> -        */
+>> -       void *userspace_emulated_addr = (void*)0x0a000008;
+>> +       userspace_emulated_addr = (void*)ioremap(0x0a000008, 8);
+>> +       return true;
+>> +}
+>>  
+>> +static void mmio_read_user_exec(void)
+>> +{
+>>         readl(userspace_emulated_addr);
+>>  }
+>>  
+>> @@ -309,14 +315,14 @@ struct exit_test {
+>>  };
+>>  
+>>  static struct exit_test tests[] = {
+>> -       {"hvc",                 NULL,           hvc_exec,               NULL,           65536,          true},
+>> -       {"mmio_read_user",      NULL,           mmio_read_user_exec,    NULL,           65536,          true},
+>> -       {"mmio_read_vgic",      NULL,           mmio_read_vgic_exec,    NULL,           65536,          true},
+>> -       {"eoi",                 NULL,           eoi_exec,               NULL,           65536,          true},
+>> -       {"ipi",                 ipi_prep,       ipi_exec,               NULL,           65536,          true},
+>> -       {"ipi_hw",              ipi_hw_prep,    ipi_exec,               NULL,           65536,          true},
+>> -       {"lpi",                 lpi_prep,       lpi_exec,               NULL,           65536,          true},
+>> -       {"timer_10ms",          timer_prep,     timer_exec,             timer_post,     256,            true},
+>> +       {"hvc",                 NULL,                   hvc_exec,               NULL,           65536,          true},
+>> +       {"mmio_read_user",      mmio_read_user_prep,    mmio_read_user_exec,    NULL,           65536,          true},
+>> +       {"mmio_read_vgic",      NULL,                   mmio_read_vgic_exec,    NULL,           65536,          true},
+>> +       {"eoi",                 NULL,                   eoi_exec,               NULL,           65536,          true},
+>> +       {"ipi",                 ipi_prep,               ipi_exec,               NULL,           65536,          true},
+>> +       {"ipi_hw",              ipi_hw_prep,            ipi_exec,               NULL,           65536,          true},
+>> +       {"lpi",                 lpi_prep,               lpi_exec,               NULL,           65536,          true},
+>> +       {"timer_10ms",          timer_prep,             timer_exec,             timer_post,     256,            true},
+>>  };
+>>  
+>>  struct ns_time {
+>>
+> I still haven't tested it (beyond compiling), but I've tweaked this a bit.
+> You can see it here
+>
+> https://gitlab.com/rhdrjones/kvm-unit-tests/-/commit/71938030d160e021db3388037d0d407df17e8e5e
+>
+> The whole v4 of this series is here
+>
+> https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/efiprep
 
-diff --git a/Documentation/userspace-api/index.rst b/Documentation/userspace-api/index.rst
-index d29b020e5622..2dc25dd9f2aa 100644
---- a/Documentation/userspace-api/index.rst
-+++ b/Documentation/userspace-api/index.rst
-@@ -25,6 +25,7 @@ place where this information is gathered.
-    iommu
-    media/index
-    sysfs-platform_profile
-+   vduse
- 
- .. only::  subproject and html
- 
-diff --git a/Documentation/userspace-api/vduse.rst b/Documentation/userspace-api/vduse.rst
-new file mode 100644
-index 000000000000..a804be347545
---- /dev/null
-+++ b/Documentation/userspace-api/vduse.rst
-@@ -0,0 +1,243 @@
-+==================================
-+VDUSE - "vDPA Device in Userspace"
-+==================================
-+
-+vDPA (virtio data path acceleration) device is a device that uses a
-+datapath which complies with the virtio specifications with vendor
-+specific control path. vDPA devices can be both physically located on
-+the hardware or emulated by software. VDUSE is a framework that makes it
-+possible to implement software-emulated vDPA devices in userspace.
-+
-+In general, the userspace process that emulates the device is able to
-+run unprivileged. And to reduce security risks, we only support emulating
-+a few vDPA devices by default, including: virtio-net device, virtio-blk
-+device, virtio-scsi device and virtio-fs device. Only when a sysadmin trusts
-+the userspace process enough, it can relax the limitation with a
-+'allow_unsafe_device_emulation' module parameter.
-+
-+How VDUSE works
-+===============
-+
-+Start/Stop VDUSE devices
-+------------------------
-+
-+VDUSE devices are started as follows:
-+
-+1. Create a new VDUSE instance with ioctl(VDUSE_CREATE_DEV) on
-+   /dev/vduse/control.
-+
-+2. Begin processing VDUSE messages from /dev/vduse/$NAME. The first
-+   messages will arrive while attaching the VDUSE instance to vDPA.
-+
-+3. Send the VDPA_CMD_DEV_NEW netlink message to attach the VDUSE
-+   instance to vDPA.
-+
-+VDUSE devices are stopped as follows:
-+
-+1. Send the VDPA_CMD_DEV_DEL netlink message to detach the VDUSE
-+   instance to vDPA.
-+
-+2. Close the file descriptor referring to /dev/vduse/$NAME
-+
-+3. Destroy the VDUSE instance with ioctl(VDUSE_DESTROY_DEV) on
-+   /dev/vduse/control
-+
-+The netlink messages metioned above can be sent via vdpa tool in iproute2
-+or use the below sample codes:
-+
-+.. code-block:: c
-+
-+	static int netlink_add_vduse(const char *name, enum vdpa_command cmd)
-+	{
-+		struct nl_sock *nlsock;
-+		struct nl_msg *msg;
-+		int famid;
-+
-+		nlsock = nl_socket_alloc();
-+		if (!nlsock)
-+			return -ENOMEM;
-+
-+		if (genl_connect(nlsock))
-+			goto free_sock;
-+
-+		famid = genl_ctrl_resolve(nlsock, VDPA_GENL_NAME);
-+		if (famid < 0)
-+			goto close_sock;
-+
-+		msg = nlmsg_alloc();
-+		if (!msg)
-+			goto close_sock;
-+
-+		if (!genlmsg_put(msg, NL_AUTO_PORT, NL_AUTO_SEQ, famid, 0, 0, cmd, 0))
-+			goto nla_put_failure;
-+
-+		NLA_PUT_STRING(msg, VDPA_ATTR_DEV_NAME, name);
-+		if (cmd == VDPA_CMD_DEV_NEW)
-+			NLA_PUT_STRING(msg, VDPA_ATTR_MGMTDEV_DEV_NAME, "vduse");
-+
-+		if (nl_send_sync(nlsock, msg))
-+			goto close_sock;
-+
-+		nl_close(nlsock);
-+		nl_socket_free(nlsock);
-+
-+		return 0;
-+	nla_put_failure:
-+		nlmsg_free(msg);
-+	close_sock:
-+		nl_close(nlsock);
-+	free_sock:
-+		nl_socket_free(nlsock);
-+		return -1;
-+	}
-+
-+Emulate VDUSE devices
-+---------------------
-+
-+To emulate a VDUSE device, we always need to implement both control path
-+and data path for it.
-+
-+To implement control path, a message-based communication protocol and some
-+types of control messages are introduced in the VDUSE framework:
-+
-+- VDUSE_SET_VQ_ADDR: Set the vring address of virtqueue.
-+
-+- VDUSE_SET_VQ_NUM: Set the size of virtqueue
-+
-+- VDUSE_SET_VQ_READY: Set ready status of virtqueue
-+
-+- VDUSE_GET_VQ_READY: Get ready status of virtqueue
-+
-+- VDUSE_SET_VQ_STATE: Set the state for virtqueue
-+
-+- VDUSE_GET_VQ_STATE: Get the state for virtqueue
-+
-+- VDUSE_SET_FEATURES: Set virtio features supported by the driver
-+
-+- VDUSE_GET_FEATURES: Get virtio features supported by the device
-+
-+- VDUSE_SET_STATUS: Set the device status
-+
-+- VDUSE_GET_STATUS: Get the device status
-+
-+- VDUSE_SET_CONFIG: Write to device specific configuration space
-+
-+- VDUSE_GET_CONFIG: Read from device specific configuration space
-+
-+- VDUSE_UPDATE_IOTLB: Notify userspace to update the memory mapping in device IOTLB
-+
-+Those control messages are mostly based on the vdpa_config_ops in
-+include/linux/vdpa.h which defines a unified interface to control
-+different types of vdpa device. Userspace needs to read()/write()
-+on /dev/vduse/$NAME to receive/reply those control messages
-+from/to VDUSE kernel module as follows:
-+
-+.. code-block:: c
-+
-+	static int vduse_message_handler(int dev_fd)
-+	{
-+		int len;
-+		struct vduse_dev_request req;
-+		struct vduse_dev_response resp;
-+
-+		len = read(dev_fd, &req, sizeof(req));
-+		if (len != sizeof(req))
-+			return -1;
-+
-+		resp.request_id = req.request_id;
-+
-+		switch (req.type) {
-+
-+		/* handle different types of message */
-+
-+		}
-+
-+		len = write(dev_fd, &resp, sizeof(resp));
-+		if (len != sizeof(resp))
-+			return -1;
-+
-+		return 0;
-+	}
-+
-+In the data path, vDPA device's iova regions will be mapped into userspace
-+with the help of VDUSE_IOTLB_GET_FD ioctl on /dev/vduse/$NAME:
-+
-+- VDUSE_IOTLB_GET_FD: get the file descriptor to the first overlapped iova region.
-+  Userspace can access this iova region by passing fd and corresponding size, offset,
-+  perm to mmap(). For example:
-+
-+.. code-block:: c
-+
-+	static int perm_to_prot(uint8_t perm)
-+	{
-+		int prot = 0;
-+
-+		switch (perm) {
-+		case VDUSE_ACCESS_WO:
-+			prot |= PROT_WRITE;
-+			break;
-+		case VDUSE_ACCESS_RO:
-+			prot |= PROT_READ;
-+			break;
-+		case VDUSE_ACCESS_RW:
-+			prot |= PROT_READ | PROT_WRITE;
-+			break;
-+		}
-+
-+		return prot;
-+	}
-+
-+	static void *iova_to_va(int dev_fd, uint64_t iova, uint64_t *len)
-+	{
-+		int fd;
-+		void *addr;
-+		size_t size;
-+		struct vduse_iotlb_entry entry;
-+
-+		entry.start = iova;
-+		entry.last = iova + 1;
-+		fd = ioctl(dev_fd, VDUSE_IOTLB_GET_FD, &entry);
-+		if (fd < 0)
-+			return NULL;
-+
-+		size = entry.last - entry.start + 1;
-+		*len = entry.last - iova + 1;
-+		addr = mmap(0, size, perm_to_prot(entry.perm), MAP_SHARED,
-+			    fd, entry.offset);
-+		close(fd);
-+		if (addr == MAP_FAILED)
-+			return NULL;
-+
-+		/* do something to cache this iova region */
-+
-+		return addr + iova - entry.start;
-+	}
-+
-+Besides, the following ioctls on /dev/vduse/$NAME are provided to support
-+interrupt injection and setting up eventfd for virtqueue kicks:
-+
-+- VDUSE_VQ_SETUP_KICKFD: set the kickfd for virtqueue, this eventfd is used
-+  by VDUSE kernel module to notify userspace to consume the vring.
-+
-+- VDUSE_INJECT_VQ_IRQ: inject an interrupt for specific virtqueue
-+
-+- VDUSE_INJECT_CONFIG_IRQ: inject a config interrupt
-+
-+MMU-based IOMMU Driver
-+======================
-+
-+VDUSE framework implements an MMU-based on-chip IOMMU driver to support
-+mapping the kernel DMA buffer into the userspace iova region dynamically.
-+This is mainly designed for virtio-vdpa case (kernel virtio drivers).
-+
-+The basic idea behind this driver is treating MMU (VA->PA) as IOMMU (IOVA->PA).
-+The driver will set up MMU mapping instead of IOMMU mapping for the DMA transfer
-+so that the userspace process is able to use its virtual address to access
-+the DMA buffer in kernel.
-+
-+And to avoid security issue, a bounce-buffering mechanism is introduced to
-+prevent userspace accessing the original buffer directly which may contain other
-+kernel data. During the mapping, unmapping, the driver will copy the data from
-+the original buffer to the bounce buffer and back, depending on the direction of
-+the transfer. And the bounce-buffer addresses will be mapped into the user address
-+space instead of the original one.
--- 
-2.11.0
+Had a look at the patch, looks good; in my suggestion I wrongly thought that readl
+reads a long (64 bits), not an uint32_t value:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+I also ran some tests on the v4 series from your repo.
+
+Qemu TCG on x86 machine:
+    - arm compiled with arm-linux-gnu-gcc and arm-none-eabi-gcc
+    - arm64, 4k and 64k pages.
+
+Odroid-c4:
+    - arm, both compilers, under kvmtool
+    - arm64, 4k, 16k and 64k pages under qemu KVM and kvmtool
+
+Rockpro64:
+    - arm, both compilers, under kvmtool
+    - arm64, 4k and 64k pages, under qemu KVM and kvmtool.
+
+The ITS migration tests I had to run manually on the rockpro64 (Odroid has a
+gicv2) because it looks like the run script wasn't detecting the prompt to start
+migration. I'm guessing something on my side, because I had issues with the
+migration tests before. Nonetheless, those tests ran just fine manually under qemu
+and kvmtool, so everything looks correct to me:
+
+Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+
+Alex
 
