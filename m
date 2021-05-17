@@ -2,37 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DC06383BC3
-	for <lists+kvm@lfdr.de>; Mon, 17 May 2021 19:55:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AD6B383BCD
+	for <lists+kvm@lfdr.de>; Mon, 17 May 2021 19:59:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238612AbhEQR4m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 May 2021 13:56:42 -0400
-Received: from mga02.intel.com ([134.134.136.20]:13241 "EHLO mga02.intel.com"
+        id S237854AbhEQSAk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 May 2021 14:00:40 -0400
+Received: from mga17.intel.com ([192.55.52.151]:14805 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236507AbhEQR4k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 May 2021 13:56:40 -0400
-IronPort-SDR: Ad2uRSpmqbXUG8oQGOpYd+bjn01AhdQbGmQ+96127k3tFkEON+t2XwxhkJXzi9yUyKixJMKMPL
- 6gEGihgn5B1g==
-X-IronPort-AV: E=McAfee;i="6200,9189,9987"; a="187647028"
+        id S236218AbhEQSAj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 May 2021 14:00:39 -0400
+IronPort-SDR: asrOERZHWzlPrRhvYm/bp81DfX7oWDf9BzOT3ZkVy2CTgSfkbxfoKZsDAqSkfBnKvd+a8BzcA9
+ AYtt+7fY/TvQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,9987"; a="180804521"
 X-IronPort-AV: E=Sophos;i="5.82,307,1613462400"; 
-   d="scan'208";a="187647028"
+   d="scan'208";a="180804521"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2021 10:55:23 -0700
-IronPort-SDR: URFmJjR/U8SOwOZUNIQnveiEW23LElI4PYxGLS8OE0Jy1d58qGGndUEOuoo5dUomq7ppzuSzZK
- nCJAmtVKZ5RA==
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2021 10:59:22 -0700
+IronPort-SDR: ydYCAJ1+ZCr3aMuA8F+6wlUEwOxy22hTPHfmTBciefBY1IWpNMR6/cn2RRRWns/nLKH1mf7ClV
+ mbzwZCBgf6Yg==
 X-IronPort-AV: E=Sophos;i="5.82,307,1613462400"; 
-   d="scan'208";a="404453953"
+   d="scan'208";a="404454851"
 Received: from seanlmol-mobl.amr.corp.intel.com (HELO [10.209.32.11]) ([10.209.32.11])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2021 10:55:21 -0700
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2021 10:59:21 -0700
 Subject: Re: [PATCH] KVM: x86: add hint to skip hidden rdpkru under
  kvm_load_host_xsave_state
-To:     Sean Christopherson <seanjc@google.com>,
+To:     Andy Lutomirski <luto@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Andy Lutomirski <luto@kernel.org>, Jon Kohler <jon@nutanix.com>,
-        Babu Moger <babu.moger@amd.com>,
+Cc:     Jon Kohler <jon@nutanix.com>, Babu Moger <babu.moger@amd.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -52,12 +53,13 @@ Cc:     Andy Lutomirski <luto@kernel.org>, Jon Kohler <jon@nutanix.com>,
         "Peter Zijlstra (Intel)" <peterz@infradead.org>,
         Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
         Arvind Sankar <nivedita@alum.mit.edu>,
-        LKML <linux-kernel@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         kvm list <kvm@vger.kernel.org>
 References: <20210507164456.1033-1-jon@nutanix.com>
  <CALCETrW0_vwpbVVpc+85MvoGqg3qJA+FV=9tmUiZz6an7dQrGg@mail.gmail.com>
  <5e01d18b-123c-b91f-c7b4-7ec583dd1ec6@redhat.com>
  <YKKqQZH7bX+7PDjX@google.com>
+ <4e6f7056-6b66-46b9-9eac-922ae1c7b526@www.fastmail.com>
 From:   Dave Hansen <dave.hansen@intel.com>
 Autocrypt: addr=dave.hansen@intel.com; keydata=
  xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
@@ -102,12 +104,12 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  OPsw5tV/LmQ5GXH0JQ/TZXWygyRFyyI2FqNTx4WHqUn3yFj8rwTAU1tluRUYyeLy0ayUlKBH
  ybj0N71vWO936MqP6haFERzuPAIpxj2ezwu0xb1GjTk4ynna6h5GjnKgdfOWoRtoWndMZxbA
  z5cecg==
-Message-ID: <d568276b-5eda-80db-146e-273066aa6793@intel.com>
-Date:   Mon, 17 May 2021 10:55:19 -0700
+Message-ID: <342a8ba9-037e-b841-f9b1-cb62e46c0db8@intel.com>
+Date:   Mon, 17 May 2021 10:59:21 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <YKKqQZH7bX+7PDjX@google.com>
+In-Reply-To: <4e6f7056-6b66-46b9-9eac-922ae1c7b526@www.fastmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -115,51 +117,17 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/17/21 10:39 AM, Sean Christopherson wrote:
-> On Mon, May 17, 2021, Paolo Bonzini wrote:
->> On 14/05/21 07:11, Andy Lutomirski wrote:
->>> I don't even want to think about what happens if a perf NMI hits and
->>> accesses host user memory while the guest PKRU is live (on VMX -- I
->>> think this can't happen on SVM).
->> This is indeed a problem, which indeed cannot happen on SVM but is there on
->> VMX.  Note that the function above is not handling all of the xstate, it's
->> handling the *XSAVE state*, that is XCR0, XSS and PKRU.  Thus the window is
->> small, but it's there.
->>
->> Is it solvable at all, without having PKRU fields in the VMCS (and without
->> masking NMIs in the LAPIC which would be too expensive)?  Dave, Sean, what
->> do you think?
-> The least awful solution would be to have the NMI handler restore the host's
-> PKRU.  The NMI handler would need to save/restore the register, a la CR2, but the
-> whole thing could be optimized to run if and only if the NMI lands in the window
-> where the guest's PKRU is loaded.
+On 5/17/21 10:49 AM, Andy Lutomirski wrote:
+>> The least awful solution would be to have the NMI handler restore
+>> the host's PKRU.  The NMI handler would need to save/restore the
+>> register, a la CR2, but the whole thing could be optimized to run
+>> if and only if the NMI lands in the window where the guest's PKRU
+>> is loaded.
+> 
+> Or set a flag causing nmi_uaccess_ok() to return false.
 
-What were you thinking about?  Something like:
+Oh, that doesn't sound too bad.  The VMENTER/EXIT paths are also
+essentially a context switch.
 
-	*this_cpu_ptr(&need_nmi_wpkru) = 1
-	// Enter Guest
-	__write_pkru(vcpu->arch.pkru);
-	*this_cpu_ptr(&need_nmi_wpkru) = 0
-
-And then in the NMI handler:
-
-	u32 pkru;
-
-	if (*this_cpu_ptr(&need_nmi_wpkru)) {
-		pkru = rdpku();
-		__write_pkru(vcpu->arch.pkru);
-	}
-	...
-	copy_*_user_nmi(... whatever ...);
-	...
-	if (*this_cpu_ptr(&need_nmi_wpkru))
-		__write_pkru(pkru);
-
-?
-
-I was thinking we could just blow away PKRU without saving/restoring it
-in the NMI handler, but that might clobber PKRU in the window between
-need_nmi_wpkru=1 and entering the guest.
-
-But, the save/restore seems doable especially since we can do it in C
-and don't have to mess with the NMI stack or anything.
+Will widening the window where nmi_uaccess_okay()==false anger any of
+the perf folks?  It looks like perf knows how to handle it nicely.
