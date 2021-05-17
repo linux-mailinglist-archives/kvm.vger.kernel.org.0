@@ -2,104 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5773A382799
-	for <lists+kvm@lfdr.de>; Mon, 17 May 2021 10:56:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3991C382804
+	for <lists+kvm@lfdr.de>; Mon, 17 May 2021 11:16:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235800AbhEQI5V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 May 2021 04:57:21 -0400
-Received: from mga04.intel.com ([192.55.52.120]:2471 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232924AbhEQI5T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 May 2021 04:57:19 -0400
-IronPort-SDR: enhxaejO5msepE1w+j+ajsBYc4Zfuiv6pZE8MpXEg8F/DXqZwy38tXSHs5jat9No+wX09ynuwT
- IbIbJg7x9rBQ==
-X-IronPort-AV: E=McAfee;i="6200,9189,9986"; a="198466284"
-X-IronPort-AV: E=Sophos;i="5.82,306,1613462400"; 
-   d="scan'208";a="198466284"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2021 01:55:57 -0700
-IronPort-SDR: D1BpDsUshQ4pQouJ7MbqFlOfJyByb+EIHh/s6nPJE8V7JmiwcOTpGUaorT6qW0aWTprGcaM8Wv
- rxpuhGcJtpGw==
-X-IronPort-AV: E=Sophos;i="5.82,306,1613462400"; 
-   d="scan'208";a="472307013"
-Received: from unknown (HELO [10.239.13.114]) ([10.239.13.114])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2021 01:55:53 -0700
-Subject: Re: [PATCH] KVM: VMX: Enable Notify VM exit
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-To:     Andy Lutomirski <luto@kernel.org>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Tao Xu <tao3.xu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        id S235954AbhEQJRs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 May 2021 05:17:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54232 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235887AbhEQJRe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 May 2021 05:17:34 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AC12C061763;
+        Mon, 17 May 2021 02:16:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=fCrrb2wfn5Zi32JbXpVG62C+jD1F3AjSSjfgB0Dmat8=; b=G48hOt5WAJAMdzdaFVHcJvE8D+
+        ZVcQ1Old/mPKH9bPE+m1O+zMsvVEt1M5sePG1vncrhbTVAyb73A5J+kKaV4qPTUIOo9REid6MBe0p
+        vgJNCjFYP2BP/KKiX1XYE7ySKaTj2J46WG+T1YaZ4M3VnGLpVS2McgYkJeLh9AIU6w9QNArl4DR4O
+        ZmcvW9RAm1ocHDz4Ly2PwcXGVXOAPZL611MFky/KfmtXeVqEkEjS4usApoy2V4aavKIC8xNrzKUIF
+        zziHoJ6Mr76nLaWhzLvdNIQg/8fIqBqLhYYjXPdMJI0UI33NFytH8k0+BaR/7iT9x0vKXRHehVEZu
+        UiIQVH2g==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1liZKg-00Cjt0-F6; Mon, 17 May 2021 09:14:41 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id AD098300095;
+        Mon, 17 May 2021 11:14:36 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 9C1702D4489BD; Mon, 17 May 2021 11:14:36 +0200 (CEST)
+Date:   Mon, 17 May 2021 11:14:36 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20201102061445.191638-1-tao3.xu@intel.com>
- <CALCETrVqdq4zw=Dcd6dZzSmUZTMXHP50d=SRSaY2AV5sauUzOw@mail.gmail.com>
- <20201102173130.GC21563@linux.intel.com>
- <CALCETrV0ZsTcQKVCPPSKHnuVgERMC0x86G5y_6E5Rhf=h5JzsA@mail.gmail.com>
- <20201102183359.GE21563@linux.intel.com>
- <5117f8d3-c40c-204d-b09c-e49af42ad665@intel.com>
-Message-ID: <62084ff3-3fe0-ae16-a6c0-8254a81253fa@intel.com>
-Date:   Mon, 17 May 2021 16:55:50 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        Joerg Roedel <joro@8bytes.org>, weijiang.yang@intel.com,
+        Kan Liang <kan.liang@linux.intel.com>, ak@linux.intel.com,
+        wei.w.wang@intel.com, eranian@google.com, liuxiangdong5@huawei.com,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v6 07/16] KVM: x86/pmu: Reprogram PEBS event to emulate
+ guest PEBS counter
+Message-ID: <YKIz/J1HoOvbmR42@hirez.programming.kicks-ass.net>
+References: <20210511024214.280733-1-like.xu@linux.intel.com>
+ <20210511024214.280733-8-like.xu@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <5117f8d3-c40c-204d-b09c-e49af42ad665@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210511024214.280733-8-like.xu@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/17/2021 3:20 PM, Xiaoyao Li wrote:
-> Hi Sean, Andy and Paolo,
+On Tue, May 11, 2021 at 10:42:05AM +0800, Like Xu wrote:
+> @@ -99,6 +109,7 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+>  				  bool exclude_kernel, bool intr,
+>  				  bool in_tx, bool in_tx_cp)
+>  {
+> +	struct kvm_pmu *pmu = vcpu_to_pmu(pmc->vcpu);
+>  	struct perf_event *event;
+>  	struct perf_event_attr attr = {
+>  		.type = type,
+> @@ -110,6 +121,7 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+>  		.exclude_kernel = exclude_kernel,
+>  		.config = config,
+>  	};
+> +	bool pebs = test_bit(pmc->idx, (unsigned long *)&pmu->pebs_enable);
+>  
+>  	attr.sample_period = get_sample_period(pmc, pmc->counter);
+>  
+> @@ -124,9 +136,23 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+>  		attr.sample_period = 0;
+>  		attr.config |= HSW_IN_TX_CHECKPOINTED;
+>  	}
+> +	if (pebs) {
+> +		/*
+> +		 * The non-zero precision level of guest event makes the ordinary
+> +		 * guest event becomes a guest PEBS event and triggers the host
+> +		 * PEBS PMI handler to determine whether the PEBS overflow PMI
+> +		 * comes from the host counters or the guest.
+> +		 *
+> +		 * For most PEBS hardware events, the difference in the software
+> +		 * precision levels of guest and host PEBS events will not affect
+> +		 * the accuracy of the PEBS profiling result, because the "event IP"
+> +		 * in the PEBS record is calibrated on the guest side.
+> +		 */
+> +		attr.precise_ip = 1;
+> +	}
+>  
+>  	event = perf_event_create_kernel_counter(&attr, -1, current,
+> -						 intr ? kvm_perf_overflow_intr :
+> +						 (intr || pebs) ? kvm_perf_overflow_intr :
+>  						 kvm_perf_overflow, pmc);
 
-+ real Sean
+How would pebs && !intr be possible? Also; wouldn't this be more legible
+when written like:
 
-> On 11/3/2020 2:33 AM, Sean Christopherson wrote:
->> On Mon, Nov 02, 2020 at 10:01:16AM -0800, Andy Lutomirski wrote:
->>> On Mon, Nov 2, 2020 at 9:31 AM Sean Christopherson
->>> <sean.j.christopherson@intel.com> wrote:
->>>>
->>>> Tao, this patch should probably be tagged RFC, at least until we can 
->>>> experiment
->>>> with the threshold on real silicon.  KVM and kernel behavior may 
->>>> depend on the
->>>> accuracy of detecting actual attacks, e.g. if we can set a threshold 
->>>> that has
->>>> zero false negatives and near-zero false postives, then it probably 
->>>> makes sense
->>>> to be more assertive in how such VM-Exits are reported and logged.
->>>
->>> If you can actually find a threshold that reliably mitigates the bug
->>> and does not allow a guest to cause undesirably large latency in the
->>> host, then fine.  1/10 if a tick is way too long, I think.
->>
->> Yes, this was my internal review feedback as well.  Either that got 
->> lost along
->> the way or I wasn't clear enough in stating what should be used as a 
->> placeholder
->> until we have silicon in hand.
->>
-> 
-> We have tested on real silicon and found it can work even with threshold 
-> being set to 0.
-> 
-> It has an internal threshold, which is added to vmcs.notify_window as 
-> the final effective threshold. The internal threshold is big enough to 
-> cover normal instructions. For those long latency instructions like 
-> WBINVD, the processor knows they cannot cause no interrupt window 
-> attack. So no Notify VM exit will happen on them.
-> 
-> Initially, our hardware architect wants to set the notify window to 
-> scheduler tick to not break kernel scheduling. But you folks want a 
-> smaller one. So are you OK to set the window to 0?
-> 
-> 
+	perf_overflow_handler_t ovf = kvm_perf_overflow;
+
+	...
+
+	if (intr)
+		ovf = kvm_perf_overflow_intr;
+
+	...
+
+	event = perf_event_create_kernel_counter(&attr, -1, current, ovf, pmc);
 
