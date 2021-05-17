@@ -2,194 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C6F753831F9
-	for <lists+kvm@lfdr.de>; Mon, 17 May 2021 16:43:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AA03F38330A
+	for <lists+kvm@lfdr.de>; Mon, 17 May 2021 16:55:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239681AbhEQOnq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 May 2021 10:43:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41051 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240708AbhEQOlb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 17 May 2021 10:41:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621262414;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=SxUjYdy1tvR24tzvdmrjzuEpUmQ6NlqelxDqornlhWs=;
-        b=KubCOiBoIzWTvn8E77Fa7/xktx39wIR8k6sYuAoal4XBvxTIaItfyXm2knKWoYte4OsN/O
-        F1x8H749sJaBrdPFScm0FRlNDCsx92anP4BfwVmIgpyp2W/cWATvfwDyJlyynCcJ3u4gHI
-        dPj+QWYouKMBxeWUiqRbGNP0JIAIgX0=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-402-J_lVYKpGPjqDDlo7Va2tYA-1; Mon, 17 May 2021 10:40:12 -0400
-X-MC-Unique: J_lVYKpGPjqDDlo7Va2tYA-1
-Received: by mail-ej1-f71.google.com with SMTP id z1-20020a1709068141b02903cd421d7803so1110437ejw.22
-        for <kvm@vger.kernel.org>; Mon, 17 May 2021 07:40:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=SxUjYdy1tvR24tzvdmrjzuEpUmQ6NlqelxDqornlhWs=;
-        b=t29D+tU1//EdVXJfIpwwuwoGXvfNH6SGQN16bZ+RKXExwDyDqlw/NM8HaBaVn1DwB7
-         2lkMHGFtjX47fzdh2z8hX170MgZQOciNmB7Xg57XzdHZtCN18Ue15d41aEcIN0zY2ki0
-         1PxvMNCKlfdOpI0I5WMJJMsmxY+RRiG2n0yxTfpGKd0x2n98nPZaiWyuiT5ypnXlZ9ck
-         CvGREeZTYftHg3wmQpHTB8JF++Tqok/E+Cs/WZC8nQo06egbqx3Zk2H/ejTaU0oCnTDH
-         oWeUaBoWOey3i8UmHMtQfnLTdzT1NSNariza+DEZ38QbvoXyNCnaFgATnXMfQxJKl3dP
-         eejQ==
-X-Gm-Message-State: AOAM532pPTUD09syqa25d1Sb8jErbSb2ov6GDRg+oOomvr/ZjFiPTNua
-        Sc8bmrLp/rFOqHII7Yaun+xttMj0JYOzzK3rY9zc+aeKuv2uTdP9GpfgGuZo3y/ab4lNbZTzz7e
-        Vd+x2Da3ywG7Q
-X-Received: by 2002:aa7:df11:: with SMTP id c17mr376110edy.317.1621262411377;
-        Mon, 17 May 2021 07:40:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz42t5kTR1xxy06OepELp1nQDlUl1jD3Zm9FpDE0EI4Puq5NeCaei+Mj5JPcRuymz3KoGxBYQ==
-X-Received: by 2002:aa7:df11:: with SMTP id c17mr376090edy.317.1621262411180;
-        Mon, 17 May 2021 07:40:11 -0700 (PDT)
-Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id ga12sm8558863ejc.13.2021.05.17.07.40.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 May 2021 07:40:10 -0700 (PDT)
-Date:   Mon, 17 May 2021 16:40:08 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, nikos.nikoleris@arm.com,
-        andre.przywara@arm.com, eric.auger@redhat.com
-Subject: Re: [PATCH kvm-unit-tests v3 4/8] arm/arm64: mmu: Stop mapping an
- assumed IO region
-Message-ID: <20210517144008.b3byacluano7dtyk@gator.home>
-References: <20210429164130.405198-1-drjones@redhat.com>
- <20210429164130.405198-5-drjones@redhat.com>
- <94288c5b-8894-5f8b-2477-6e45e087c4b5@arm.com>
- <0ca20ae5-d797-1c9f-9414-1d162d86f1b5@arm.com>
- <20210513171844.n3h3c7l5srhuriyy@gator>
- <20210513174313.j7ff6j5jhzvocnuh@gator>
- <b3d12a27-efda-86e0-b86c-c23e1371f473@arm.com>
+        id S240675AbhEQOxu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 May 2021 10:53:50 -0400
+Received: from mga06.intel.com ([134.134.136.31]:27010 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239859AbhEQOvr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 May 2021 10:51:47 -0400
+IronPort-SDR: 0Qj2DUlxvdl7NKWCgHayz7bOM+fHbPjO6uzH+pVV8Qc7SET3ppW4LQdObW9SnX8HBvaYC6+xS/
+ BXj4EkW/rzZQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,9987"; a="261716118"
+X-IronPort-AV: E=Sophos;i="5.82,307,1613462400"; 
+   d="scan'208";a="261716118"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2021 07:44:17 -0700
+IronPort-SDR: TVBdBiMGJNmPXfpHnBRHEF8hV71He9y0QgOzdumAeYfZ9h3IdrMQsHpWFbOit0M5yV/LqFnWa3
+ 3ckkIT2XYBaw==
+X-IronPort-AV: E=Sophos;i="5.82,307,1613462400"; 
+   d="scan'208";a="410850924"
+Received: from akleen-mobl1.amr.corp.intel.com (HELO [10.212.163.36]) ([10.212.163.36])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2021 07:44:16 -0700
+Subject: Re: [PATCH v6 07/16] KVM: x86/pmu: Reprogram PEBS event to emulate
+ guest PEBS counter
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Like Xu <like.xu@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, weijiang.yang@intel.com,
+        Kan Liang <kan.liang@linux.intel.com>, wei.w.wang@intel.com,
+        eranian@google.com, liuxiangdong5@huawei.com,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org
+References: <20210511024214.280733-1-like.xu@linux.intel.com>
+ <20210511024214.280733-8-like.xu@linux.intel.com>
+ <YKIrtdbXRcZSiohg@hirez.programming.kicks-ass.net>
+From:   Andi Kleen <ak@linux.intel.com>
+Message-ID: <ff5a419f-188f-d14c-72c8-4b760052734d@linux.intel.com>
+Date:   Mon, 17 May 2021 07:44:15 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b3d12a27-efda-86e0-b86c-c23e1371f473@arm.com>
+In-Reply-To: <YKIrtdbXRcZSiohg@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 17, 2021 at 11:38:46AM +0100, Alexandru Elisei wrote:
-> Hi Drew,
-> 
-> On 5/13/21 6:43 PM, Andrew Jones wrote:
-> > On Thu, May 13, 2021 at 07:18:44PM +0200, Andrew Jones wrote:
-> >> [..]
-> >> Thanks Alex,
-> >>
-> >> I think a better fix is this untested one below, though. If you can test
-> >> it out and confirm it also resolves the issue, then I'll add this patch
-> >> to the series.
-> >>
-> >> Thanks,
-> >> drew
-> >>
-> >>
-> >> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-> >> index 95c418c10eb4..deafd5695c33 100644
-> >> --- a/arm/micro-bench.c
-> >> +++ b/arm/micro-bench.c
-> >> @@ -273,16 +273,22 @@ static void hvc_exec(void)
-> >>         asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0");
-> >>  }
-> >>  
-> >> -static void mmio_read_user_exec(void)
-> >> +/*
-> >> + * FIXME: Read device-id in virtio mmio here in order to
-> >> + * force an exit to userspace. This address needs to be
-> >> + * updated in the future if any relevant changes in QEMU
-> >> + * test-dev are made.
-> >> + */
-> >> +static void *userspace_emulated_addr;
-> >> +
-> >> +static bool mmio_read_user_prep(void)
-> >>  {
-> >> -       /*
-> >> -        * FIXME: Read device-id in virtio mmio here in order to
-> >> -        * force an exit to userspace. This address needs to be
-> >> -        * updated in the future if any relevant changes in QEMU
-> >> -        * test-dev are made.
-> >> -        */
-> >> -       void *userspace_emulated_addr = (void*)0x0a000008;
-> >> +       userspace_emulated_addr = (void*)ioremap(0x0a000008, 8);
-> >> +       return true;
-> >> +}
-> >>  
-> >> +static void mmio_read_user_exec(void)
-> >> +{
-> >>         readl(userspace_emulated_addr);
-> >>  }
-> >>  
-> >> @@ -309,14 +315,14 @@ struct exit_test {
-> >>  };
-> >>  
-> >>  static struct exit_test tests[] = {
-> >> -       {"hvc",                 NULL,           hvc_exec,               NULL,           65536,          true},
-> >> -       {"mmio_read_user",      NULL,           mmio_read_user_exec,    NULL,           65536,          true},
-> >> -       {"mmio_read_vgic",      NULL,           mmio_read_vgic_exec,    NULL,           65536,          true},
-> >> -       {"eoi",                 NULL,           eoi_exec,               NULL,           65536,          true},
-> >> -       {"ipi",                 ipi_prep,       ipi_exec,               NULL,           65536,          true},
-> >> -       {"ipi_hw",              ipi_hw_prep,    ipi_exec,               NULL,           65536,          true},
-> >> -       {"lpi",                 lpi_prep,       lpi_exec,               NULL,           65536,          true},
-> >> -       {"timer_10ms",          timer_prep,     timer_exec,             timer_post,     256,            true},
-> >> +       {"hvc",                 NULL,                   hvc_exec,               NULL,           65536,          true},
-> >> +       {"mmio_read_user",      mmio_read_user_prep,    mmio_read_user_exec,    NULL,           65536,          true},
-> >> +       {"mmio_read_vgic",      NULL,                   mmio_read_vgic_exec,    NULL,           65536,          true},
-> >> +       {"eoi",                 NULL,                   eoi_exec,               NULL,           65536,          true},
-> >> +       {"ipi",                 ipi_prep,               ipi_exec,               NULL,           65536,          true},
-> >> +       {"ipi_hw",              ipi_hw_prep,            ipi_exec,               NULL,           65536,          true},
-> >> +       {"lpi",                 lpi_prep,               lpi_exec,               NULL,           65536,          true},
-> >> +       {"timer_10ms",          timer_prep,             timer_exec,             timer_post,     256,            true},
-> >>  };
-> >>  
-> >>  struct ns_time {
-> >>
-> > I still haven't tested it (beyond compiling), but I've tweaked this a bit.
-> > You can see it here
-> >
-> > https://gitlab.com/rhdrjones/kvm-unit-tests/-/commit/71938030d160e021db3388037d0d407df17e8e5e
-> >
-> > The whole v4 of this series is here
-> >
-> > https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/efiprep
-> 
-> Had a look at the patch, looks good; in my suggestion I wrongly thought that readl
-> reads a long (64 bits), not an uint32_t value:
-> 
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> 
-> I also ran some tests on the v4 series from your repo.
-> 
-> Qemu TCG on x86 machine:
->     - arm compiled with arm-linux-gnu-gcc and arm-none-eabi-gcc
->     - arm64, 4k and 64k pages.
-> 
-> Odroid-c4:
->     - arm, both compilers, under kvmtool
->     - arm64, 4k, 16k and 64k pages under qemu KVM and kvmtool
-> 
-> Rockpro64:
->     - arm, both compilers, under kvmtool
->     - arm64, 4k and 64k pages, under qemu KVM and kvmtool.
-> 
-> The ITS migration tests I had to run manually on the rockpro64 (Odroid has a
-> gicv2) because it looks like the run script wasn't detecting the prompt to start
-> migration. I'm guessing something on my side, because I had issues with the
-> migration tests before. Nonetheless, those tests ran just fine manually under qemu
-> and kvmtool, so everything looks correct to me:
-> 
-> Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
->
 
-Thanks Alex! I've added your tags, applied to arm/queue and sent the pull
-request.
+On 5/17/2021 1:39 AM, Peter Zijlstra wrote:
+> On Tue, May 11, 2021 at 10:42:05AM +0800, Like Xu wrote:
+>> +	if (pebs) {
+>> +		/*
+>> +		 * The non-zero precision level of guest event makes the ordinary
+>> +		 * guest event becomes a guest PEBS event and triggers the host
+>> +		 * PEBS PMI handler to determine whether the PEBS overflow PMI
+>> +		 * comes from the host counters or the guest.
+>> +		 *
+>> +		 * For most PEBS hardware events, the difference in the software
+>> +		 * precision levels of guest and host PEBS events will not affect
+>> +		 * the accuracy of the PEBS profiling result, because the "event IP"
+>> +		 * in the PEBS record is calibrated on the guest side.
+>> +		 */
+>> +		attr.precise_ip = 1;
+>> +	}
+> You've just destroyed precdist, no?
 
-Thanks,
-drew
+precdist can mean multiple things:
+
+- Convert cycles to the precise INST_RETIRED event. That is not 
+meaningful for virtualization because "cycles" doesn't exist, just the 
+raw events.
+
+- For GLC+ and TNT+ it will force the event to a specific counter that 
+is more precise. This would be indeed "destroyed", but right now the 
+patch kit only supports Icelake which doesn't support that anyways.
+
+So I think the code is correct for now, but will need to be changed for 
+later CPUs. Should perhaps fix the comment though to discuss this.
+
+
+-Andi
+
 
