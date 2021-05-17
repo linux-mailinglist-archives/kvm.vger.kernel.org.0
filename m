@@ -2,157 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 452793829F6
-	for <lists+kvm@lfdr.de>; Mon, 17 May 2021 12:38:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 103B7382A22
+	for <lists+kvm@lfdr.de>; Mon, 17 May 2021 12:48:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236273AbhEQKjX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 May 2021 06:39:23 -0400
-Received: from foss.arm.com ([217.140.110.172]:47876 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233962AbhEQKjW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 May 2021 06:39:22 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 522B2106F;
-        Mon, 17 May 2021 03:38:06 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 908943F719;
-        Mon, 17 May 2021 03:38:05 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests v3 4/8] arm/arm64: mmu: Stop mapping an
- assumed IO region
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, nikos.nikoleris@arm.com,
-        andre.przywara@arm.com, eric.auger@redhat.com
-References: <20210429164130.405198-1-drjones@redhat.com>
- <20210429164130.405198-5-drjones@redhat.com>
- <94288c5b-8894-5f8b-2477-6e45e087c4b5@arm.com>
- <0ca20ae5-d797-1c9f-9414-1d162d86f1b5@arm.com>
- <20210513171844.n3h3c7l5srhuriyy@gator>
- <20210513174313.j7ff6j5jhzvocnuh@gator>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <b3d12a27-efda-86e0-b86c-c23e1371f473@arm.com>
-Date:   Mon, 17 May 2021 11:38:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
-MIME-Version: 1.0
-In-Reply-To: <20210513174313.j7ff6j5jhzvocnuh@gator>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+        id S236514AbhEQKtu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 May 2021 06:49:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47072 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236497AbhEQKtp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 May 2021 06:49:45 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33D94C06175F;
+        Mon, 17 May 2021 03:48:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Mime-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=4pCKN455ju1HX92RDpAYjJTG7Bzui8nr0sob64V55MQ=; b=kHpU1Vja76OU38NGhxE5NyejCr
+        PapcJq7FxJ6Mbfj9TTysbUyEOeIR7Gf5Lh60beHwgfcG4ecVcblyLia9yppjft7mHOnEOQH9U05Sq
+        2mXPQvdZigAI3Gtlvlx7jbtfAmCbjOeoI7lq+kAFqDP1TbhAVw/w4lkishKSRjtP5/KYKPvS5PewH
+        L+0VsbLloSvyLKUWD7YPOqDWnMAhQdUBuO/rDgfzeHSqipkdJaSuqA3F/KLNavpKcJM00uAzpZG6I
+        0PxkoNqkYtRuhMpYj3y6niS3tmZWBlfzhyXPk2XoqNbkETB2c2Zp+OT37A2J6ju69l/+9Tzu7av04
+        Do5PygkA==;
+Received: from [2a01:4c8:1073:60f4:5560:f18e:59f3:7425] (helo=u3832b3a9db3152.ant.amazon.com)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lianL-00Dgqm-Vx; Mon, 17 May 2021 10:48:20 +0000
+Message-ID: <30cd6dd9d1049d56b629c92a5f385b84c026b445.camel@infradead.org>
+Subject: Re: [PATCH v3 00/16] Replace some bad characters on documents
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>
+Cc:     linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Corentin Labbe <clabbe@baylibre.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Jean Delvare <jdelvare@suse.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Leo Yan <leo.yan@linaro.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Mike Leach <mike.leach@linaro.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Thorsten Leemhuis <linux@leemhuis.info>,
+        alsa-devel@alsa-project.org, coresight@lists.linaro.org,
+        intel-wired-lan@lists.osuosl.org, kvm@vger.kernel.org,
+        linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-ext4@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-usb@vger.kernel.org, mjpeg-users@lists.sourceforge.net,
+        netdev@vger.kernel.org, rcu@vger.kernel.org
+Date:   Mon, 17 May 2021 11:48:04 +0100
+In-Reply-To: <cover.1621159997.git.mchehab+huawei@kernel.org>
+References: <cover.1621159997.git.mchehab+huawei@kernel.org>
+Content-Type: multipart/signed; micalg="sha-256";
+        protocol="application/x-pkcs7-signature";
+        boundary="=-oDLmv2kJnYR5Gi1fuAS+"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
+Mime-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Drew,
 
-On 5/13/21 6:43 PM, Andrew Jones wrote:
-> On Thu, May 13, 2021 at 07:18:44PM +0200, Andrew Jones wrote:
->> [..]
->> Thanks Alex,
->>
->> I think a better fix is this untested one below, though. If you can test
->> it out and confirm it also resolves the issue, then I'll add this patch
->> to the series.
->>
->> Thanks,
->> drew
->>
->>
->> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
->> index 95c418c10eb4..deafd5695c33 100644
->> --- a/arm/micro-bench.c
->> +++ b/arm/micro-bench.c
->> @@ -273,16 +273,22 @@ static void hvc_exec(void)
->>         asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0");
->>  }
->>  
->> -static void mmio_read_user_exec(void)
->> +/*
->> + * FIXME: Read device-id in virtio mmio here in order to
->> + * force an exit to userspace. This address needs to be
->> + * updated in the future if any relevant changes in QEMU
->> + * test-dev are made.
->> + */
->> +static void *userspace_emulated_addr;
->> +
->> +static bool mmio_read_user_prep(void)
->>  {
->> -       /*
->> -        * FIXME: Read device-id in virtio mmio here in order to
->> -        * force an exit to userspace. This address needs to be
->> -        * updated in the future if any relevant changes in QEMU
->> -        * test-dev are made.
->> -        */
->> -       void *userspace_emulated_addr = (void*)0x0a000008;
->> +       userspace_emulated_addr = (void*)ioremap(0x0a000008, 8);
->> +       return true;
->> +}
->>  
->> +static void mmio_read_user_exec(void)
->> +{
->>         readl(userspace_emulated_addr);
->>  }
->>  
->> @@ -309,14 +315,14 @@ struct exit_test {
->>  };
->>  
->>  static struct exit_test tests[] = {
->> -       {"hvc",                 NULL,           hvc_exec,               NULL,           65536,          true},
->> -       {"mmio_read_user",      NULL,           mmio_read_user_exec,    NULL,           65536,          true},
->> -       {"mmio_read_vgic",      NULL,           mmio_read_vgic_exec,    NULL,           65536,          true},
->> -       {"eoi",                 NULL,           eoi_exec,               NULL,           65536,          true},
->> -       {"ipi",                 ipi_prep,       ipi_exec,               NULL,           65536,          true},
->> -       {"ipi_hw",              ipi_hw_prep,    ipi_exec,               NULL,           65536,          true},
->> -       {"lpi",                 lpi_prep,       lpi_exec,               NULL,           65536,          true},
->> -       {"timer_10ms",          timer_prep,     timer_exec,             timer_post,     256,            true},
->> +       {"hvc",                 NULL,                   hvc_exec,               NULL,           65536,          true},
->> +       {"mmio_read_user",      mmio_read_user_prep,    mmio_read_user_exec,    NULL,           65536,          true},
->> +       {"mmio_read_vgic",      NULL,                   mmio_read_vgic_exec,    NULL,           65536,          true},
->> +       {"eoi",                 NULL,                   eoi_exec,               NULL,           65536,          true},
->> +       {"ipi",                 ipi_prep,               ipi_exec,               NULL,           65536,          true},
->> +       {"ipi_hw",              ipi_hw_prep,            ipi_exec,               NULL,           65536,          true},
->> +       {"lpi",                 lpi_prep,               lpi_exec,               NULL,           65536,          true},
->> +       {"timer_10ms",          timer_prep,             timer_exec,             timer_post,     256,            true},
->>  };
->>  
->>  struct ns_time {
->>
-> I still haven't tested it (beyond compiling), but I've tweaked this a bit.
-> You can see it here
->
-> https://gitlab.com/rhdrjones/kvm-unit-tests/-/commit/71938030d160e021db3388037d0d407df17e8e5e
->
-> The whole v4 of this series is here
->
-> https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/efiprep
+--=-oDLmv2kJnYR5Gi1fuAS+
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Had a look at the patch, looks good; in my suggestion I wrongly thought that readl
-reads a long (64 bits), not an uint32_t value:
+On Sun, 2021-05-16 at 12:18 +0200, Mauro Carvalho Chehab wrote:
+> The conversion tools used during DocBook/LaTeX/html/Markdown->ReST=20
+> conversion and some cut-and-pasted text contain some characters that
+> aren't easily reachable on standard keyboards and/or could cause=20
+> troubles when parsed by the documentation build system.
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Better.
 
-I also ran some tests on the v4 series from your repo.
+But you still don't say *why* it matters whether given characters are
+trivial to reach with standard keyboard layouts, or specify *what*
+'troubles' the offending characters cause.
 
-Qemu TCG on x86 machine:
-    - arm compiled with arm-linux-gnu-gcc and arm-none-eabi-gcc
-    - arm64, 4k and 64k pages.
+--=-oDLmv2kJnYR5Gi1fuAS+
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-Odroid-c4:
-    - arm, both compilers, under kvmtool
-    - arm64, 4k, 16k and 64k pages under qemu KVM and kvmtool
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
+ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
+OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
+RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
+cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
+uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
+Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
+Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
+xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
+BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
+dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
+LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
+Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
+Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
+KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
+YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
+nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
+PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
+7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
+Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
+MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
+NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
+/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
+0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
+vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
+ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
+ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
+CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
+BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
+aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
+bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
+bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
+LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
+CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
+W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
+vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
+gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
+RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
+jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
+b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
+AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
+BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
++bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
+WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
+aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
+CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
+u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
+RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
+QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
+b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
+cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
+SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
+0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
+KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
+E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
+M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
+jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
+yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
+gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
+R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
+ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEw
+NTE3MTA0ODA0WjAvBgkqhkiG9w0BCQQxIgQgbsFCxpvyRlS/5o1Rq0MfjebV0WG+uCLEf62Xhb3f
+QWEwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
+PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
+aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
+DQEBAQUABIIBAFeAhkUjkV3e7it/bQVaNexz/HMIPz+nJ3EcqD9mWtYCfRMGf1CJSuNcJGrzurXQ
+aYHchrhaTQ+hvdExfIBKyBbSLujrHnRrjgU5gFRiHzWEPxiDqb3fsuKstZtCBfyMFc1MDQikB8ZQ
+HQwbgtx4TC9qyB/cfEOKgcPVWRCvCHRd1skj2JcDGsg7eGgBVO7mLFL/ANTkb52QtsTbeqqVHF0G
+ojyCZiV5TpwkYZHqZ+AFg3TIXv8ruNVpSYG4UIZtfGlVnudtvMpM2KwkkXte2fb09veHrZ1MQJZ2
+QMdqYK2m1CMCjqbVwQkQVBc/Y1T3Rsl8k8AY6p/eLLJkuGkb2QwAAAAAAAA=
 
-Rockpro64:
-    - arm, both compilers, under kvmtool
-    - arm64, 4k and 64k pages, under qemu KVM and kvmtool.
 
-The ITS migration tests I had to run manually on the rockpro64 (Odroid has a
-gicv2) because it looks like the run script wasn't detecting the prompt to start
-migration. I'm guessing something on my side, because I had issues with the
-migration tests before. Nonetheless, those tests ran just fine manually under qemu
-and kvmtool, so everything looks correct to me:
-
-Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-
-Alex
+--=-oDLmv2kJnYR5Gi1fuAS+--
 
