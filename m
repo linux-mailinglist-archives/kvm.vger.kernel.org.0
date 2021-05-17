@@ -2,144 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CFB838214A
-	for <lists+kvm@lfdr.de>; Sun, 16 May 2021 23:46:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 68E3A382269
+	for <lists+kvm@lfdr.de>; Mon, 17 May 2021 02:58:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234579AbhEPVrH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 16 May 2021 17:47:07 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:54500 "EHLO vps-vb.mhejs.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234389AbhEPVq4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 16 May 2021 17:46:56 -0400
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1liOZe-000824-SO; Sun, 16 May 2021 23:45:22 +0200
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        id S231355AbhEQA7o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 16 May 2021 20:59:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56732 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229948AbhEQA7o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 16 May 2021 20:59:44 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0B7FC061573;
+        Sun, 16 May 2021 17:58:28 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id z3so5057118oib.5;
+        Sun, 16 May 2021 17:58:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=N871goaSSdA/dHZRX1hFrtYRKni/828JahIgyz5A2aM=;
+        b=kItJFM9jLVEaNef4/kLAjaaOLnFfG9EqgSOOGzXHTNg2UPXHOUUDBjK7XSrkEgJCK+
+         BVjOBK3a1a4z6KAiLiY8F1xGhYFVphhQmENvi1buPcgbusMMxgANLaO/Ral4XRKVhQcf
+         ieo5m9VpVsllIn2u4Hwy/DLoHxqwISDDov3Rwiey4vghkI9+0/em6tA4D65rPhqRtyAV
+         +NALy3/4wwdlRQzGXbiDAbRo/crn3LDsMJ/8UUSLbfgZMcvbv1QwhTyIrgDVubF0ZEsV
+         fdSUXQZUao00m6rI72Oph26hBG1x9fdQDiuvIlrj3/2zCqyy+qgpeIrz/eedpjuSGY2y
+         EhKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=N871goaSSdA/dHZRX1hFrtYRKni/828JahIgyz5A2aM=;
+        b=rbvwYVze/m7n69X8dyugjcbMKeft3kaQeTgIxb5+XzlQaTQWrAa6e1jIR8phPCqyaY
+         5M+6bRjN2QJ2RjizapfchFaPiNS2ejO7VIEu/hW6dhhvPOym4/BG1zisrgTvV743j9Wv
+         DxaeninnL3jHufSf4rV8JFJoRicUe5u4lHhNwe0+tUBemR/dHKhc68fwEFGU73yPsckE
+         +Sk+1Zuq1FTB/oyVmKbq57tnzBJc6mmdbYNyZ3NcWmKMh9eyCrOeaJNeKtJEw0Q3wkOW
+         e0DEuvR/7iP1t/PHjk9jlU66xWVZNIIsMQ4w0FgNk3h7hxnc5VQlEYBspabSPwfaZ064
+         RctQ==
+X-Gm-Message-State: AOAM532+dYM1bFihKrc5qkXNtVuGhgSVAdyp5Vwf4SA4QGN9YiDxBaJ6
+        IgfEvAd0MqRGM1cPQyw5Um0dXaG4pCwCsagp1iq8l7RG
+X-Google-Smtp-Source: ABdhPJxRwDTUXiNGb1hh5dhChiuH/mxrWyl3/XMxs6yLhW9IKZILQ/C9hyAiZp5w27HzWQDUJkFHKBoFgvZq5g1Vl54=
+X-Received: by 2002:a05:6808:206:: with SMTP id l6mr13191170oie.5.1621213108170;
+ Sun, 16 May 2021 17:58:28 -0700 (PDT)
+MIME-Version: 1.0
+References: <1620871084-4639-1-git-send-email-wanpengli@tencent.com> <CALzav=eTC3HhHyxndHvS3NyCfPiBL2Wb5NvU=-+UsxSoMfmqXA@mail.gmail.com>
+In-Reply-To: <CALzav=eTC3HhHyxndHvS3NyCfPiBL2Wb5NvU=-+UsxSoMfmqXA@mail.gmail.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Mon, 17 May 2021 08:58:17 +0800
+Message-ID: <CANRm+CxhnS8QovecA_cW-_kz2JK61+YHRrJBmsMS0Qkd+mFffA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] KVM: PPC: Book3S HV: exit halt polling on
+ need_resched() as well
+To:     David Matlack <dmatlack@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Ben Segall <bsegall@google.com>,
+        Venkatesh Srinivas <venkateshs@chromium.org>,
         Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3 8/8] KVM: Optimize overlapping memslots check
-Date:   Sun, 16 May 2021 23:44:34 +0200
-Message-Id: <61d53c8121b5b906bbed363e493ac75aebbda693.1621191552.git.maciej.szmigiero@oracle.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <cover.1621191549.git.maciej.szmigiero@oracle.com>
-References: <cover.1621191549.git.maciej.szmigiero@oracle.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+On Sat, 15 May 2021 at 05:21, David Matlack <dmatlack@google.com> wrote:
+>
+> On Wed, May 12, 2021 at 6:58 PM Wanpeng Li <kernellwp@gmail.com> wrote:
+> >
+> > From: Wanpeng Li <wanpengli@tencent.com>
+> >
+> > Inspired by commit 262de4102c7bb8 (kvm: exit halt polling on need_resched()
+> > as well), CFS_BANDWIDTH throttling will use resched_task() when there is just
+> > one task to get the task to block. It was likely allowing VMs to overrun their
+> > quota when halt polling. Due to PPC implements an arch specific halt polling
+> > logic, we should add the need_resched() checking there as well.
+> >
+> > Cc: Ben Segall <bsegall@google.com>
+> > Cc: Venkatesh Srinivas <venkateshs@chromium.org>
+> > Cc: Jim Mattson <jmattson@google.com>
+> > Cc: David Matlack <dmatlack@google.com>
+> > Cc: Paul Mackerras <paulus@ozlabs.org>
+> > Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> > ---
+> > v1 -> v2:
+> >  * update patch description
+> >
+> >  arch/powerpc/kvm/book3s_hv.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> > index 28a80d2..6199397 100644
+> > --- a/arch/powerpc/kvm/book3s_hv.c
+> > +++ b/arch/powerpc/kvm/book3s_hv.c
+> > @@ -3936,7 +3936,8 @@ static void kvmppc_vcore_blocked(struct kvmppc_vcore *vc)
+> >                                 break;
+> >                         }
+> >                         cur = ktime_get();
+> > -               } while (single_task_running() && ktime_before(cur, stop));
+> > +               } while (single_task_running() && !need_resched() &&
+> > +                        ktime_before(cur, stop));
+>
+> Consider moving this condition to a helper function that can be shared
+> between book3s and the generic halt-polling loop.
 
-Do a quick lookup for possibly overlapping gfns when creating or moving
-a memslot instead of performing a linear scan of the whole memslot set.
+Will do in the next version, thanks for review. :)
 
-Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
----
- virt/kvm/kvm_main.c | 65 ++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 56 insertions(+), 9 deletions(-)
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 189504b27ca6..11814730cbcb 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1474,6 +1474,59 @@ static int kvm_delete_memslot(struct kvm *kvm,
- 	return kvm_set_memslot(kvm, mem, old, &new, as_id, KVM_MR_DELETE);
- }
- 
-+static bool kvm_check_memslot_overlap(struct kvm_memslots *slots,
-+				      struct kvm_memory_slot *nslot)
-+{
-+	int idxactive = kvm_memslots_idx(slots);
-+	struct rb_node *node;
-+
-+	/*
-+	 * Find the slot with the lowest gfn that can possibly intersect with
-+	 * the new slot, so we'll ideally have slot start <= nslot start
-+	 */
-+	node = kvm_memslots_gfn_upper_bound(slots, nslot->base_gfn);
-+	if (node) {
-+		struct rb_node *pnode;
-+
-+		/*
-+		 * A NULL previous node means that the very first slot
-+		 * already has a higher start gfn.
-+		 * In this case slot start > nslot start.
-+		 */
-+		pnode = rb_prev(node);
-+		if (pnode)
-+			node = pnode;
-+	} else {
-+		/* a NULL node below means no existing slots */
-+		node = rb_last(&slots->gfn_tree);
-+	}
-+
-+	for ( ; node; node = rb_next(node)) {
-+		struct kvm_memory_slot *cslot;
-+
-+		cslot = container_of(node, struct kvm_memory_slot,
-+				     gfn_node[idxactive]);
-+
-+		/*
-+		 * if this slot starts beyond or at the end of the new slot
-+		 * so does every next one
-+		 */
-+		if (cslot->base_gfn >= nslot->base_gfn + nslot->npages)
-+			break;
-+
-+		if (cslot->id == nslot->id)
-+			continue;
-+
-+		if (cslot->base_gfn >= nslot->base_gfn)
-+			return true;
-+
-+		if (cslot->base_gfn + cslot->npages > nslot->base_gfn)
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
- /*
-  * Allocate some memory and give it an address in the guest physical address
-  * space.
-@@ -1559,16 +1612,10 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 	}
- 
- 	if ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) {
--		int ctr;
--
- 		/* Check for overlaps */
--		kvm_for_each_memslot(tmp, ctr, __kvm_memslots(kvm, as_id)) {
--			if (tmp->id == id)
--				continue;
--			if (!((new.base_gfn + new.npages <= tmp->base_gfn) ||
--			      (new.base_gfn >= tmp->base_gfn + tmp->npages)))
--				return -EEXIST;
--		}
-+		if (kvm_check_memslot_overlap(__kvm_memslots(kvm, as_id),
-+					      &new))
-+			return -EEXIST;
- 	}
- 
- 	/* Allocate/free page dirty bitmap as needed */
+    Wanpeng
