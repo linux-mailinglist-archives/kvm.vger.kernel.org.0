@@ -2,288 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 19820383237
-	for <lists+kvm@lfdr.de>; Mon, 17 May 2021 16:49:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6F753831F9
+	for <lists+kvm@lfdr.de>; Mon, 17 May 2021 16:43:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239391AbhEQOqi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 May 2021 10:46:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59768 "EHLO
+        id S239681AbhEQOnq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 May 2021 10:43:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41051 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239966AbhEQOlE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 17 May 2021 10:41:04 -0400
+        by vger.kernel.org with ESMTP id S240708AbhEQOlb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 17 May 2021 10:41:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621262386;
+        s=mimecast20190719; t=1621262414;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lKQftPj3Z5ZtmkJxYxKgI7TzaslR2+NzJjnxrqZSNLo=;
-        b=A4Fa0kgq7OWXK7c3ERsgn/48VhQh85juS0fVjkUrHAT3V4d5gCzbQWX+ZSmYX8ha0ZeHZ5
-        8PFrnO1Rco0QjAbJMLYFPDQ0Rjx3uaXpBmtqfvVB+Tclk2/gZQygBiuFb3DXBLmPnkhEQ5
-        FRh8/BRXqd00+J7ML6goVJ/3v5d4WFY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-538-pEykzksvPta1ZCfCF0rKiw-1; Mon, 17 May 2021 10:39:44 -0400
-X-MC-Unique: pEykzksvPta1ZCfCF0rKiw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 244BD1020C54;
-        Mon, 17 May 2021 14:39:21 +0000 (UTC)
-Received: from gator.redhat.com (unknown [10.40.192.248])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D8E685DDAD;
-        Mon, 17 May 2021 14:39:19 +0000 (UTC)
+        bh=SxUjYdy1tvR24tzvdmrjzuEpUmQ6NlqelxDqornlhWs=;
+        b=KubCOiBoIzWTvn8E77Fa7/xktx39wIR8k6sYuAoal4XBvxTIaItfyXm2knKWoYte4OsN/O
+        F1x8H749sJaBrdPFScm0FRlNDCsx92anP4BfwVmIgpyp2W/cWATvfwDyJlyynCcJ3u4gHI
+        dPj+QWYouKMBxeWUiqRbGNP0JIAIgX0=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-402-J_lVYKpGPjqDDlo7Va2tYA-1; Mon, 17 May 2021 10:40:12 -0400
+X-MC-Unique: J_lVYKpGPjqDDlo7Va2tYA-1
+Received: by mail-ej1-f71.google.com with SMTP id z1-20020a1709068141b02903cd421d7803so1110437ejw.22
+        for <kvm@vger.kernel.org>; Mon, 17 May 2021 07:40:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=SxUjYdy1tvR24tzvdmrjzuEpUmQ6NlqelxDqornlhWs=;
+        b=t29D+tU1//EdVXJfIpwwuwoGXvfNH6SGQN16bZ+RKXExwDyDqlw/NM8HaBaVn1DwB7
+         2lkMHGFtjX47fzdh2z8hX170MgZQOciNmB7Xg57XzdHZtCN18Ue15d41aEcIN0zY2ki0
+         1PxvMNCKlfdOpI0I5WMJJMsmxY+RRiG2n0yxTfpGKd0x2n98nPZaiWyuiT5ypnXlZ9ck
+         CvGREeZTYftHg3wmQpHTB8JF++Tqok/E+Cs/WZC8nQo06egbqx3Zk2H/ejTaU0oCnTDH
+         oWeUaBoWOey3i8UmHMtQfnLTdzT1NSNariza+DEZ38QbvoXyNCnaFgATnXMfQxJKl3dP
+         eejQ==
+X-Gm-Message-State: AOAM532pPTUD09syqa25d1Sb8jErbSb2ov6GDRg+oOomvr/ZjFiPTNua
+        Sc8bmrLp/rFOqHII7Yaun+xttMj0JYOzzK3rY9zc+aeKuv2uTdP9GpfgGuZo3y/ab4lNbZTzz7e
+        Vd+x2Da3ywG7Q
+X-Received: by 2002:aa7:df11:: with SMTP id c17mr376110edy.317.1621262411377;
+        Mon, 17 May 2021 07:40:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz42t5kTR1xxy06OepELp1nQDlUl1jD3Zm9FpDE0EI4Puq5NeCaei+Mj5JPcRuymz3KoGxBYQ==
+X-Received: by 2002:aa7:df11:: with SMTP id c17mr376090edy.317.1621262411180;
+        Mon, 17 May 2021 07:40:11 -0700 (PDT)
+Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+        by smtp.gmail.com with ESMTPSA id ga12sm8558863ejc.13.2021.05.17.07.40.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 May 2021 07:40:10 -0700 (PDT)
+Date:   Mon, 17 May 2021 16:40:08 +0200
 From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PULL kvm-unit-tests 10/10] arm/arm64: psci: Don't assume method is hvc
-Date:   Mon, 17 May 2021 16:39:00 +0200
-Message-Id: <20210517143900.747013-11-drjones@redhat.com>
-In-Reply-To: <20210517143900.747013-1-drjones@redhat.com>
-References: <20210517143900.747013-1-drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, nikos.nikoleris@arm.com,
+        andre.przywara@arm.com, eric.auger@redhat.com
+Subject: Re: [PATCH kvm-unit-tests v3 4/8] arm/arm64: mmu: Stop mapping an
+ assumed IO region
+Message-ID: <20210517144008.b3byacluano7dtyk@gator.home>
+References: <20210429164130.405198-1-drjones@redhat.com>
+ <20210429164130.405198-5-drjones@redhat.com>
+ <94288c5b-8894-5f8b-2477-6e45e087c4b5@arm.com>
+ <0ca20ae5-d797-1c9f-9414-1d162d86f1b5@arm.com>
+ <20210513171844.n3h3c7l5srhuriyy@gator>
+ <20210513174313.j7ff6j5jhzvocnuh@gator>
+ <b3d12a27-efda-86e0-b86c-c23e1371f473@arm.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <b3d12a27-efda-86e0-b86c-c23e1371f473@arm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The method can be smc in addition to hvc, and it will be when running
-on bare metal. Additionally, we move the invocations to assembly so
-we don't have to rely on compiler assumptions. We also fix the
-prototype of psci_invoke. function_id should be an unsigned int, not
-an unsigned long.
+On Mon, May 17, 2021 at 11:38:46AM +0100, Alexandru Elisei wrote:
+> Hi Drew,
+> 
+> On 5/13/21 6:43 PM, Andrew Jones wrote:
+> > On Thu, May 13, 2021 at 07:18:44PM +0200, Andrew Jones wrote:
+> >> [..]
+> >> Thanks Alex,
+> >>
+> >> I think a better fix is this untested one below, though. If you can test
+> >> it out and confirm it also resolves the issue, then I'll add this patch
+> >> to the series.
+> >>
+> >> Thanks,
+> >> drew
+> >>
+> >>
+> >> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+> >> index 95c418c10eb4..deafd5695c33 100644
+> >> --- a/arm/micro-bench.c
+> >> +++ b/arm/micro-bench.c
+> >> @@ -273,16 +273,22 @@ static void hvc_exec(void)
+> >>         asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0");
+> >>  }
+> >>  
+> >> -static void mmio_read_user_exec(void)
+> >> +/*
+> >> + * FIXME: Read device-id in virtio mmio here in order to
+> >> + * force an exit to userspace. This address needs to be
+> >> + * updated in the future if any relevant changes in QEMU
+> >> + * test-dev are made.
+> >> + */
+> >> +static void *userspace_emulated_addr;
+> >> +
+> >> +static bool mmio_read_user_prep(void)
+> >>  {
+> >> -       /*
+> >> -        * FIXME: Read device-id in virtio mmio here in order to
+> >> -        * force an exit to userspace. This address needs to be
+> >> -        * updated in the future if any relevant changes in QEMU
+> >> -        * test-dev are made.
+> >> -        */
+> >> -       void *userspace_emulated_addr = (void*)0x0a000008;
+> >> +       userspace_emulated_addr = (void*)ioremap(0x0a000008, 8);
+> >> +       return true;
+> >> +}
+> >>  
+> >> +static void mmio_read_user_exec(void)
+> >> +{
+> >>         readl(userspace_emulated_addr);
+> >>  }
+> >>  
+> >> @@ -309,14 +315,14 @@ struct exit_test {
+> >>  };
+> >>  
+> >>  static struct exit_test tests[] = {
+> >> -       {"hvc",                 NULL,           hvc_exec,               NULL,           65536,          true},
+> >> -       {"mmio_read_user",      NULL,           mmio_read_user_exec,    NULL,           65536,          true},
+> >> -       {"mmio_read_vgic",      NULL,           mmio_read_vgic_exec,    NULL,           65536,          true},
+> >> -       {"eoi",                 NULL,           eoi_exec,               NULL,           65536,          true},
+> >> -       {"ipi",                 ipi_prep,       ipi_exec,               NULL,           65536,          true},
+> >> -       {"ipi_hw",              ipi_hw_prep,    ipi_exec,               NULL,           65536,          true},
+> >> -       {"lpi",                 lpi_prep,       lpi_exec,               NULL,           65536,          true},
+> >> -       {"timer_10ms",          timer_prep,     timer_exec,             timer_post,     256,            true},
+> >> +       {"hvc",                 NULL,                   hvc_exec,               NULL,           65536,          true},
+> >> +       {"mmio_read_user",      mmio_read_user_prep,    mmio_read_user_exec,    NULL,           65536,          true},
+> >> +       {"mmio_read_vgic",      NULL,                   mmio_read_vgic_exec,    NULL,           65536,          true},
+> >> +       {"eoi",                 NULL,                   eoi_exec,               NULL,           65536,          true},
+> >> +       {"ipi",                 ipi_prep,               ipi_exec,               NULL,           65536,          true},
+> >> +       {"ipi_hw",              ipi_hw_prep,            ipi_exec,               NULL,           65536,          true},
+> >> +       {"lpi",                 lpi_prep,               lpi_exec,               NULL,           65536,          true},
+> >> +       {"timer_10ms",          timer_prep,             timer_exec,             timer_post,     256,            true},
+> >>  };
+> >>  
+> >>  struct ns_time {
+> >>
+> > I still haven't tested it (beyond compiling), but I've tweaked this a bit.
+> > You can see it here
+> >
+> > https://gitlab.com/rhdrjones/kvm-unit-tests/-/commit/71938030d160e021db3388037d0d407df17e8e5e
+> >
+> > The whole v4 of this series is here
+> >
+> > https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/efiprep
+> 
+> Had a look at the patch, looks good; in my suggestion I wrongly thought that readl
+> reads a long (64 bits), not an uint32_t value:
+> 
+> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> 
+> I also ran some tests on the v4 series from your repo.
+> 
+> Qemu TCG on x86 machine:
+>     - arm compiled with arm-linux-gnu-gcc and arm-none-eabi-gcc
+>     - arm64, 4k and 64k pages.
+> 
+> Odroid-c4:
+>     - arm, both compilers, under kvmtool
+>     - arm64, 4k, 16k and 64k pages under qemu KVM and kvmtool
+> 
+> Rockpro64:
+>     - arm, both compilers, under kvmtool
+>     - arm64, 4k and 64k pages, under qemu KVM and kvmtool.
+> 
+> The ITS migration tests I had to run manually on the rockpro64 (Odroid has a
+> gicv2) because it looks like the run script wasn't detecting the prompt to start
+> migration. I'm guessing something on my side, because I had issues with the
+> migration tests before. Nonetheless, those tests ran just fine manually under qemu
+> and kvmtool, so everything looks correct to me:
+> 
+> Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- arm/cstart.S       | 22 ++++++++++++++++++++++
- arm/cstart64.S     | 22 ++++++++++++++++++++++
- arm/selftest.c     | 34 +++++++---------------------------
- lib/arm/asm/psci.h | 10 ++++++++--
- lib/arm/psci.c     | 35 +++++++++++++++++++++++++++--------
- lib/arm/setup.c    |  2 ++
- 6 files changed, 88 insertions(+), 37 deletions(-)
+Thanks Alex! I've added your tags, applied to arm/queue and sent the pull
+request.
 
-diff --git a/arm/cstart.S b/arm/cstart.S
-index 446966de350d..2401d92cdadc 100644
---- a/arm/cstart.S
-+++ b/arm/cstart.S
-@@ -95,6 +95,28 @@ start:
- 
- .text
- 
-+/*
-+ * psci_invoke_hvc / psci_invoke_smc
-+ *
-+ * Inputs:
-+ *   r0 -- function_id
-+ *   r1 -- arg0
-+ *   r2 -- arg1
-+ *   r3 -- arg2
-+ *
-+ * Outputs:
-+ *   r0 -- return code
-+ */
-+.globl psci_invoke_hvc
-+psci_invoke_hvc:
-+	hvc	#0
-+	mov	pc, lr
-+
-+.globl psci_invoke_smc
-+psci_invoke_smc:
-+	smc	#0
-+	mov	pc, lr
-+
- enable_vfp:
- 	/* Enable full access to CP10 and CP11: */
- 	mov	r0, #(3 << 22 | 3 << 20)
-diff --git a/arm/cstart64.S b/arm/cstart64.S
-index 42ba3a3ca249..e4ab7d06251e 100644
---- a/arm/cstart64.S
-+++ b/arm/cstart64.S
-@@ -109,6 +109,28 @@ start:
- 
- .text
- 
-+/*
-+ * psci_invoke_hvc / psci_invoke_smc
-+ *
-+ * Inputs:
-+ *   w0 -- function_id
-+ *   x1 -- arg0
-+ *   x2 -- arg1
-+ *   x3 -- arg2
-+ *
-+ * Outputs:
-+ *   x0 -- return code
-+ */
-+.globl psci_invoke_hvc
-+psci_invoke_hvc:
-+	hvc	#0
-+	ret
-+
-+.globl psci_invoke_smc
-+psci_invoke_smc:
-+	smc	#0
-+	ret
-+
- get_mmu_off:
- 	adrp	x0, auxinfo
- 	ldr	x0, [x0, :lo12:auxinfo + 8]
-diff --git a/arm/selftest.c b/arm/selftest.c
-index 4495b161cdd5..9f459ed3d571 100644
---- a/arm/selftest.c
-+++ b/arm/selftest.c
-@@ -400,33 +400,13 @@ static void check_vectors(void *arg __unused)
- 	exit(report_summary());
- }
- 
--static bool psci_check(void)
-+static void psci_print(void)
- {
--	const struct fdt_property *method;
--	int node, len, ver;
--
--	node = fdt_node_offset_by_compatible(dt_fdt(), -1, "arm,psci-0.2");
--	if (node < 0) {
--		printf("PSCI v0.2 compatibility required\n");
--		return false;
--	}
--
--	method = fdt_get_property(dt_fdt(), node, "method", &len);
--	if (method == NULL) {
--		printf("bad psci device tree node\n");
--		return false;
--	}
--
--	if (len < 4 || strcmp(method->data, "hvc") != 0) {
--		printf("psci method must be hvc\n");
--		return false;
--	}
--
--	ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
--	printf("PSCI version %d.%d\n", PSCI_VERSION_MAJOR(ver),
--				       PSCI_VERSION_MINOR(ver));
--
--	return true;
-+	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-+	report_info("PSCI version: %d.%d", PSCI_VERSION_MAJOR(ver),
-+					  PSCI_VERSION_MINOR(ver));
-+	report_info("PSCI method: %s", psci_invoke == psci_invoke_hvc ?
-+				       "hvc" : "smc");
- }
- 
- static void cpu_report(void *data __unused)
-@@ -465,7 +445,7 @@ int main(int argc, char **argv)
- 
- 	} else if (strcmp(argv[1], "smp") == 0) {
- 
--		report(psci_check(), "PSCI version");
-+		psci_print();
- 		on_cpus(cpu_report, NULL);
- 		while (!cpumask_full(&ready))
- 			cpu_relax();
-diff --git a/lib/arm/asm/psci.h b/lib/arm/asm/psci.h
-index 7b956bf5987d..cf03449ba665 100644
---- a/lib/arm/asm/psci.h
-+++ b/lib/arm/asm/psci.h
-@@ -3,8 +3,14 @@
- #include <libcflat.h>
- #include <linux/psci.h>
- 
--extern int psci_invoke(unsigned long function_id, unsigned long arg0,
--		       unsigned long arg1, unsigned long arg2);
-+typedef int (*psci_invoke_fn)(unsigned int function_id, unsigned long arg0,
-+			      unsigned long arg1, unsigned long arg2);
-+extern psci_invoke_fn psci_invoke;
-+extern int psci_invoke_hvc(unsigned int function_id, unsigned long arg0,
-+			   unsigned long arg1, unsigned long arg2);
-+extern int psci_invoke_smc(unsigned int function_id, unsigned long arg0,
-+			   unsigned long arg1, unsigned long arg2);
-+extern void psci_set_conduit(void);
- extern int psci_cpu_on(unsigned long cpuid, unsigned long entry_point);
- extern void psci_system_reset(void);
- extern int cpu_psci_cpu_boot(unsigned int cpu);
-diff --git a/lib/arm/psci.c b/lib/arm/psci.c
-index 936c83948b6a..9c031a122e9b 100644
---- a/lib/arm/psci.c
-+++ b/lib/arm/psci.c
-@@ -6,22 +6,21 @@
-  *
-  * This work is licensed under the terms of the GNU LGPL, version 2.
-  */
-+#include <devicetree.h>
- #include <asm/psci.h>
- #include <asm/setup.h>
- #include <asm/page.h>
- #include <asm/smp.h>
- 
--__attribute__((noinline))
--int psci_invoke(unsigned long function_id, unsigned long arg0,
--		unsigned long arg1, unsigned long arg2)
-+static int psci_invoke_none(unsigned int function_id, unsigned long arg0,
-+			    unsigned long arg1, unsigned long arg2)
- {
--	asm volatile(
--		"hvc #0"
--	: "+r" (function_id)
--	: "r" (arg0), "r" (arg1), "r" (arg2));
--	return function_id;
-+	printf("No PSCI method configured! Can't invoke...\n");
-+	return PSCI_RET_NOT_PRESENT;
- }
- 
-+psci_invoke_fn psci_invoke = psci_invoke_none;
-+
- int psci_cpu_on(unsigned long cpuid, unsigned long entry_point)
- {
- #ifdef __arm__
-@@ -56,3 +55,23 @@ void psci_system_off(void)
- 	int err = psci_invoke(PSCI_0_2_FN_SYSTEM_OFF, 0, 0, 0);
- 	printf("CPU%d unable to do system off (error = %d)\n", smp_processor_id(), err);
- }
-+
-+void psci_set_conduit(void)
-+{
-+	const void *fdt = dt_fdt();
-+	const struct fdt_property *method;
-+	int node, len;
-+
-+	node = fdt_node_offset_by_compatible(fdt, -1, "arm,psci-0.2");
-+	assert_msg(node >= 0, "PSCI v0.2 compatibility required");
-+
-+	method = fdt_get_property(fdt, node, "method", &len);
-+	assert(method != NULL && len == 4);
-+
-+	if (strcmp(method->data, "hvc") == 0)
-+		psci_invoke = psci_invoke_hvc;
-+	else if (strcmp(method->data, "smc") == 0)
-+		psci_invoke = psci_invoke_smc;
-+	else
-+		assert_msg(false, "Unknown PSCI conduit: %s", method->data);
-+}
-diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index 86f054304baf..bcdf0d78c2e2 100644
---- a/lib/arm/setup.c
-+++ b/lib/arm/setup.c
-@@ -25,6 +25,7 @@
- #include <asm/processor.h>
- #include <asm/smp.h>
- #include <asm/timer.h>
-+#include <asm/psci.h>
- 
- #include "io.h"
- 
-@@ -266,6 +267,7 @@ void setup(const void *fdt, phys_addr_t freemem_start)
- 	mem_regions_add_assumed();
- 	mem_init(PAGE_ALIGN((unsigned long)freemem));
- 
-+	psci_set_conduit();
- 	cpu_init();
- 
- 	/* cpu_init must be called before thread_info_init */
--- 
-2.30.2
+Thanks,
+drew
 
