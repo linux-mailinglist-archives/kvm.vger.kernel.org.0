@@ -2,133 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9987B388099
-	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 21:39:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E36003880DD
+	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 21:57:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351890AbhERTlC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 May 2021 15:41:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26294 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1351887AbhERTlA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 May 2021 15:41:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621366782;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5zqqX1IaXTEbDmyAG1p0aodW9voE4HBxeQmi3CXD/I0=;
-        b=ehbNMkEhXwwh3McQr/KZqVuksHQ0vNIT+ZuzJBhx3xOiF5JeZnEJWz8dwb4e/UoIZYR3TS
-        Wn++zhV2LeT7FZc2bh9WgKfu1oo90dcAGSh5M9mGfWwbm+0W3PyOIwVAfl6SUZ5LvP4HzY
-        EV6/i9XeD9tZh1w+u6gRVnauGH3ivt0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205-ClJTDOeWPvuJVwkRki2Zfg-1; Tue, 18 May 2021 15:39:38 -0400
-X-MC-Unique: ClJTDOeWPvuJVwkRki2Zfg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F419D107ACC7;
-        Tue, 18 May 2021 19:39:36 +0000 (UTC)
-Received: from redhat.com (ovpn-113-225.phx2.redhat.com [10.3.113.225])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8716E5C1CF;
-        Tue, 18 May 2021 19:39:36 +0000 (UTC)
-Date:   Tue, 18 May 2021 13:39:36 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yicong Yang <yangyicong@hisilicon.com>
-Cc:     <qemu-devel@nongnu.org>, <cohuck@redhat.com>,
-        <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Linuxarm <linuxarm@huawei.com>
-Subject: Re: [Question] Indefinitely block in the host when remove the PF
- driver
-Message-ID: <20210518133936.0593d3fc.alex.williamson@redhat.com>
-In-Reply-To: <c09fed39-bde5-b7a9-d945-79ef85260e5a@hisilicon.com>
-References: <c9466e2c-385d-8298-d03c-80dcfc359f52@hisilicon.com>
-        <20210430082940.4b0e0397@redhat.com>
-        <c09fed39-bde5-b7a9-d945-79ef85260e5a@hisilicon.com>
+        id S1351999AbhERT67 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 May 2021 15:58:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45112 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1351993AbhERT67 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 May 2021 15:58:59 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FBCFC061573
+        for <kvm@vger.kernel.org>; Tue, 18 May 2021 12:57:40 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id p6so5707309plr.11
+        for <kvm@vger.kernel.org>; Tue, 18 May 2021 12:57:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=JvjDB9x37KbkhXGo+mBIOIKWP7D/vvjksKE9jNsnqVM=;
+        b=XlBzqimzzkY84/NrA1P3tJSm49jxfiKijMeSOBsbwBNlL6+dhVZ9sUpEyWvvnBMr52
+         sT0udTR/tCkm+5hqS3C1BG00fWJon8JhQezqR32DuJvJTc1eZdxx94zztu0kzi7ooAdI
+         7cq2ep8B5IM6VMgaWLuLIkEklwTqmuexNpLzIsepNCI7vuseTs6whFcCu53wXSHlNiP2
+         gMRw4iKefuEP7ZG/RNntgFHUBIIiM5G+jjoQlDgFWQBO/bLTxcFD5EYXb6ifEnxDlXH6
+         kFQKgVxLSHtAR1LrrAwWRYEpbjYVKKINihgKCXncmNOLzFL4LHLh2NieKWVMS5S8LQUs
+         c9AA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=JvjDB9x37KbkhXGo+mBIOIKWP7D/vvjksKE9jNsnqVM=;
+        b=e4xtairpKh6ZsZnCF6qZkoRRnqE/AhQLmZPhM1iaLZ2Os6mRJBwcy4dSGstNo/P3uR
+         rjvPOG+5qn5ObPuTcUF187a9jQCL7LZin07WOSEjMSR+AHZ+GA+YvhS+XbYimkRBhJYL
+         p+knYcu41fcvf2wr0EY2/bhPC3oyKfDIit2EDC+oE/0KkFhJAc1sd+tda1eJQNNqfPcJ
+         wmIZx8eYZcd6mNI+ZLQpyv1akMLqpMWW3YWebYSu5IyrOaCWUCHsIL4LQ3T+frQubdGT
+         3P5LotQJFud4njwXhpoz4xY5bfSAe6eQCpo4bc/B1uOx1xgevwwWFUM8ao1BM4dTJ79L
+         EUAQ==
+X-Gm-Message-State: AOAM533OaP8efmDpMHiuJmhhcW8P++Jw4EIc2zLUZ3uqMvtI16uEsVQE
+        JppbjjxlE08GuMUmwI36jduWkA==
+X-Google-Smtp-Source: ABdhPJwk6T7X0m8/MN/fEIPyLCYo2XlEldnEZomo4j04VpS+puwXQbF5lr58CXwqsju89hCz1oFTWQ==
+X-Received: by 2002:a17:90a:4593:: with SMTP id v19mr6917000pjg.207.1621367859939;
+        Tue, 18 May 2021 12:57:39 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id g202sm6072346pfb.54.2021.05.18.12.57.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 May 2021 12:57:39 -0700 (PDT)
+Date:   Tue, 18 May 2021 19:57:35 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Kechen Lu <kechenl@nvidia.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/5] KVM: SVM: Drop unneeded CONFIG_X86_LOCAL_APIC
+ check for AVIC
+Message-ID: <YKQcL4ThiuCqWMIf@google.com>
+References: <20210518144339.1987982-1-vkuznets@redhat.com>
+ <20210518144339.1987982-2-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210518144339.1987982-2-vkuznets@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 11 May 2021 11:44:49 +0800
-Yicong Yang <yangyicong@hisilicon.com> wrote:
-
-> [ +qemu-devel ]
+On Tue, May 18, 2021, Vitaly Kuznetsov wrote:
+> AVIC dependency on CONFIG_X86_LOCAL_APIC is dead code since
+> commit e42eef4ba388 ("KVM: add X86_LOCAL_APIC dependency").
 > 
-> On 2021/4/30 22:29, Alex Williamson wrote:
-> > On Fri, 30 Apr 2021 15:57:47 +0800
-> > Yicong Yang <yangyicong@hisilicon.com> wrote:
-> >   
-> >> When I try to remove the PF driver in the host, the process will be blocked
-> >> if the related VF of the device is added in the Qemu as an iEP.
-> >>
-> >> here's what I got in the host:
-> >>
-> >> [root@localhost 0000:75:00.0]# rmmod hisi_zip
-> >> [99760.571352] vfio-pci 0000:75:00.1: Relaying device request to user (#0)
-> >> [99862.992099] vfio-pci 0000:75:00.1: Relaying device request to user (#10)
-> >> [...]
-> >>
-> >> and in the Qemu:
-> >>
-> >> estuary:/$ lspci -tv
-> >> -[0000:00]-+-00.0  Device 1b36:0008
-> >>            +-01.0  Device 1af4:1000
-> >>            +-02.0  Device 1af4:1009
-> >>            \-03.0  Device 19e5:a251 <----- the related VF device
-> >> estuary:/$ qemu-system-aarch64: warning: vfio 0000:75:00.1: Bus 'pcie.0' does not support hotplugging
-> >> qemu-system-aarch64: warning: vfio 0000:75:00.1: Bus 'pcie.0' does not support hotplugging
-> >> qemu-system-aarch64: warning: vfio 0000:75:00.1: Bus 'pcie.0' does not support hotplugging
-> >> qemu-system-aarch64: warning: vfio 0000:75:00.1: Bus 'pcie.0' does not support hotplugging
-> >> [...]
-> >>
-> >> The rmmod process will be blocked until I kill the Qemu process. That's the only way if I
-> >> want to end the rmmod.
-> >>
-> >> So my question is: is such block reasonable? If the VF devcie is occupied or doesn't
-> >> support hotplug in the Qemu, shouldn't we fail the rmmod and return something like -EBUSY
-> >> rather than make the host blocked indefinitely?  
-> > 
-> > Where would we return -EBUSY?  pci_driver.remove() returns void.
-> > Without blocking, I think our only option would be to kill the user
-> > process.
-> >    
-> 
-> yes. the remove() callback of pci_driver doesn't provide a way to abort the process.
-> 
-> >> Add the VF under a pcie root port will avoid this. Is it encouraged to always
-> >> add the VF under a pcie root port rather than directly add it as an iEP?  
-> > 
-> > Releasing a device via the vfio request interrupt is always a
-> > cooperative process currently, the VM needs to be configured such that
-> > the device is capable of being unplugged and the guest needs to respond
-> > to the ejection request.  Thanks,
-> >   
-> 
-> Does it make sense to abort the VM creation and give some warnings if user try to
-> pass a vfio pci device to the Qemu and doesn't attach it to a hotpluggable
-> bridge? Currently I think there isn't such a mechanism in Qemu.
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
 
-You're essentially trying to define a usage policy and pick somewhere
-to impose it.  I think QEMU is not the right place.  There are plenty
-of valid assigned device configurations where the device is not
-hotpluggable.  You therefore either need to look up in the stack if
-your environment demands that VM configurations should always be able
-to release devices at the request of the kernel, or down in the stack
-if you believe the kernel has an obligation to take that device if the
-user fails to respond to a device request.  We've shied away from the
-latter because it generally involves killing the holding process,
-either directly or by closing off access to the device, where in the
-case of mmaps to the device, ongoing access would result in a SIGBUS to
-the process anyway.  I wouldn't object to the kernel having a right to
-do this, but it's not something that has reached a high priority.
-Thanks,
-
-Alex
-
+Reviewed-by: Sean Christopherson <seanjc@google.com>
