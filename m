@@ -2,143 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BC6D387864
-	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 14:04:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35D403878A2
+	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 14:24:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245395AbhERMF1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 May 2021 08:05:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50052 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244853AbhERMFV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 May 2021 08:05:21 -0400
-Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBE3DC061756;
-        Tue, 18 May 2021 05:04:03 -0700 (PDT)
-Received: by mail-ot1-x335.google.com with SMTP id s5-20020a05683004c5b029032307304915so1119253otd.7;
-        Tue, 18 May 2021 05:04:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=hnEkWdOm+ENMVf7yX2CMz4AbmpChSKu1dSZbsT4Oixw=;
-        b=fA10MkgaqDEVhjoHM2C49i5DiSk8QAv4S6KmSm+TWymGUNEmMNwlQWgVBOL+FX5xNJ
-         jBMhtpWp2zR7jsRBbqdKIlYPrkI3GHhwKNET3JTmsE77g6Nq3xdwTNXQwlpNyCzVfwGI
-         8bBel7+0EimQUk0jK0YdphDaRqwBErksDkKo3YQJoXqrz+KvXSwJldlfcYMVMkJVcrDs
-         Neyw/FG6h991r91f4QDnNev86TDyIW/OlVorhwyDbCo4pdVaD3JF75bicZJYqVVgoxlP
-         jixurboqH+jmKiWNvEl4c5AVp9GS6343Id+BXrWYIgUofhRFfEyXDzIL0BYd/LY3kXiX
-         Fozg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=hnEkWdOm+ENMVf7yX2CMz4AbmpChSKu1dSZbsT4Oixw=;
-        b=WUME1Te3JKHh+tV5ER9dUulckhFvycapsnsqOHO9Sl8iYsgEvHcVZPG2C7/CORkJLD
-         0W6XGQdDQoPjI7pHs9MyfOO82oq1yargpDcGHQFMMPWggML2aQwRyBrOKe9/romt8iwL
-         FQ+i42vUQr+n1ZAN/w58ArRjJJkOPkScwbUB60QaxCJf42u8UAm37lzU5WTAtRSEW/wb
-         7j35epn2GcRZbHXmaNSyyVwDSBze2qnEoeouVV2gD8uZ26+4mo4aQKcmE5aClaLEF5Rg
-         7TsFawLQVUgLHLMEJpmrF/3mW7pADGKMwVMtL1YPfJ94FpDrBlPpE8txG31fGHgUxod/
-         momg==
-X-Gm-Message-State: AOAM532pph1ckAK8OjF7+DHDj1fWYwDC1DBH86ZWxg+B1x8nGYUfko+k
-        a+jmCLgg0i5uQy/FzvD3cX/81hO7b0irCsco7kQ=
-X-Google-Smtp-Source: ABdhPJyIaAZb1sIkjlEXWT/sarDwOHEse+DMPZ5WggyfW2+nl28U6UnNUU6DCxuQTi70TB7lL7jko4irKlixMQcEvJM=
-X-Received: by 2002:a9d:2966:: with SMTP id d93mr4007167otb.56.1621339443306;
- Tue, 18 May 2021 05:04:03 -0700 (PDT)
-MIME-Version: 1.0
-References: <1621260028-6467-1-git-send-email-wanpengli@tencent.com>
- <1621260028-6467-5-git-send-email-wanpengli@tencent.com> <YKKtFOl3oklFp1lW@google.com>
-In-Reply-To: <YKKtFOl3oklFp1lW@google.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 18 May 2021 20:03:52 +0800
-Message-ID: <CANRm+CyHSQBXa6D2VYgysNaVwnRbK8xQ02_zoHkvxrKXAh6+CQ@mail.gmail.com>
-Subject: Re: [PATCH v3 5/5] KVM: LAPIC: Narrow the timer latency between
- wait_lapic_expire and world switch
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        id S1349018AbhERMZS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 May 2021 08:25:18 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4730 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232915AbhERMZR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 May 2021 08:25:17 -0400
+Received: from dggems703-chm.china.huawei.com (unknown [172.30.72.58])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Fkw7c6myXzqV90;
+        Tue, 18 May 2021 20:20:28 +0800 (CST)
+Received: from dggpeml500013.china.huawei.com (7.185.36.41) by
+ dggems703-chm.china.huawei.com (10.3.19.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Tue, 18 May 2021 20:23:57 +0800
+Received: from [10.174.187.161] (10.174.187.161) by
+ dggpeml500013.china.huawei.com (7.185.36.41) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Tue, 18 May 2021 20:23:56 +0800
+Subject: Re: [PATCH v6 00/16] KVM: x86/pmu: Add *basic* support to enable
+ guest PEBS via DS
+To:     Like Xu <like.xu@linux.intel.com>
+References: <20210511024214.280733-1-like.xu@linux.intel.com>
+ <609FA2B7.7030801@huawei.com>
+ <868a0ed9-d4a5-c135-811e-a3420b7913ac@linux.intel.com>
+CC:     Borislav Petkov <bp@alien8.de>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>, <weijiang.yang@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>, <ak@linux.intel.com>,
+        <wei.w.wang@intel.com>, <eranian@google.com>,
+        <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+        <kvm@vger.kernel.org>, "Fangyi (Eric)" <eric.fangyi@huawei.com>,
+        Xiexiangyou <xiexiangyou@huawei.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "Paolo Bonzini" <pbonzini@redhat.com>
+From:   Liuxiangdong <liuxiangdong5@huawei.com>
+Message-ID: <60A3B1DC.7000002@huawei.com>
+Date:   Tue, 18 May 2021 20:23:56 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:38.0) Gecko/20100101
+ Thunderbird/38.1.0
+MIME-Version: 1.0
+In-Reply-To: <868a0ed9-d4a5-c135-811e-a3420b7913ac@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.187.161]
+X-ClientProxiedBy: dggeme701-chm.china.huawei.com (10.1.199.97) To
+ dggpeml500013.china.huawei.com (7.185.36.41)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 18 May 2021 at 01:51, Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, May 17, 2021, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > Let's treat lapic_timer_advance_ns automatically tune logic as hypervisor
-> > overhead, move it before wait_lapic_expire instead of between wait_lapic_expire
-> > and the world switch, the wait duration should be calculated by the
-> > up-to-date guest_tsc after the overhead of automatically tune logic. This
-> > patch reduces ~30+ cycles for kvm-unit-tests/tscdeadline-latency when testing
-> > busy waits.
-> >
-> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > ---
-> >  arch/x86/kvm/lapic.c | 7 ++++---
-> >  1 file changed, 4 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index c0ebef560bd1..552d2acf89ab 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -1598,11 +1598,12 @@ static void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
-> >       guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
-> >       apic->lapic_timer.advance_expire_delta = guest_tsc - tsc_deadline;
-> >
-> > -     if (guest_tsc < tsc_deadline)
-> > -             __wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
-> > -
-> >       if (lapic_timer_advance_dynamic)
-> >               adjust_lapic_timer_advance(vcpu, apic->lapic_timer.advance_expire_delta);
-> > +
-> > +     guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
->
-> This is redundant and unnecessary if automatic tuning is disabled, or if the
-> timer did not arrive early.  A comment would also be helpful.  E.g. I think this
-> would micro-optimize all paths:
 
-Do it in v4, thanks.
 
-    Wanpeng
+On 2021/5/17 14:38, Like Xu wrote:
+> Hi xiangdong,
+>
+> On 2021/5/15 18:30, Liuxiangdong wrote:
+>>
+>>
+>> On 2021/5/11 10:41, Like Xu wrote:
+>>> A new kernel cycle has begun, and this version looks promising.
+>>>
+>>> The guest Precise Event Based Sampling (PEBS) feature can provide
+>>> an architectural state of the instruction executed after the guest
+>>> instruction that exactly caused the event. It needs new hardware
+>>> facility only available on Intel Ice Lake Server platforms. This
+>>> patch set enables the basic PEBS feature for KVM guests on ICX.
+>>>
+>>> We can use PEBS feature on the Linux guest like native:
+>>>
+>>>    # perf record -e instructions:ppp ./br_instr a
+>>>    # perf record -c 100000 -e instructions:pp ./br_instr a
+>>
+>> Hi, Like.
+>> Has the qemu patch been modified?
+>>
+>> https://lore.kernel.org/kvm/f4dcb068-2ddf-428f-50ad-39f65cad3710@intel.com/ 
+>> ?
+>
+> I think the qemu part still works based on
+> 609d7596524ab204ccd71ef42c9eee4c7c338ea4 (tag: v6.0.0).
+>
 
+Yes. I applied these two qemu patches to qemu v6.0.0 and this kvm 
+patches set to latest kvm tree.
+
+I can see pebs flags in Guest(linux 5.11) on the IceLake( Model: 106  
+Model name: Intel(R) Xeon(R) Platinum 8378A CPU),
+and i can use PEBS like this.
+
+     #perf record -e instructions:pp
+
+It can work normally.
+
+But  there is no sampling when i use "perf record -e events:pp" or just 
+"perf record" in guest
+unless i delete patch 09 and patch 13 from this kvm patches set.
+
+
+Have you tried "perf record -e events:pp" in this patches set? Does it 
+work normally?
+
+
+
+Thanks!
+Xiangdong Liu
+
+
+
+> When the LBR qemu patch receives the ACK from the maintainer,
+> I will submit PBES qemu support because their changes are very similar.
 >
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index c0ebef560bd1..5d91f2367c31 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1598,11 +1598,19 @@ static void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
->         guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
->         apic->lapic_timer.advance_expire_delta = guest_tsc - tsc_deadline;
+> Please help review this version and
+> feel free to add your comments or "Reviewed-by".
 >
-> +       if (lapic_timer_advance_dynamic) {
-> +               adjust_lapic_timer_advance(vcpu, apic->lapic_timer.advance_expire_delta);
-> +               /*
-> +                * If the timer fired early, reread the TSC to account for the
-> +                * overhead of the above adjustment to avoid waiting longer
-> +                * than is necessary.
-> +                */
-> +               if (guest_tsc < tsc_deadline)
-> +                       guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
-> +       }
-> +
->         if (guest_tsc < tsc_deadline)
->                 __wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
-> -
-> -       if (lapic_timer_advance_dynamic)
-> -               adjust_lapic_timer_advance(vcpu, apic->lapic_timer.advance_expire_delta);
->  }
+> Thanks,
+> Like Xu
 >
->  void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
+>>
+>>
+>>> To emulate guest PEBS facility for the above perf usages,
+>>> we need to implement 2 code paths:
+>>>
+>>> 1) Fast path
+>>>
+>>> This is when the host assigned physical PMC has an identical index as
+>>> the virtual PMC (e.g. using physical PMC0 to emulate virtual PMC0).
+>>> This path is used in most common use cases.
+>>>
+>>> 2) Slow path
+>>>
+>>> This is when the host assigned physical PMC has a different index
+>>> from the virtual PMC (e.g. using physical PMC1 to emulate virtual PMC0)
+>>> In this case, KVM needs to rewrite the PEBS records to change the
+>>> applicable counter indexes to the virtual PMC indexes, which would
+>>> otherwise contain the physical counter index written by PEBS facility,
+>>> and switch the counter reset values to the offset corresponding to
+>>> the physical counter indexes in the DS data structure.
+>>>
+>>> The previous version [0] enables both fast path and slow path, which
+>>> seems a bit more complex as the first step. In this patchset, we want
+>>> to start with the fast path to get the basic guest PEBS enabled while
+>>> keeping the slow path disabled. More focused discussion on the slow
+>>> path [1] is planned to be put to another patchset in the next step.
+>>>
+>>> Compared to later versions in subsequent steps, the functionality
+>>> to support host-guest PEBS both enabled and the functionality to
+>>> emulate guest PEBS when the counter is cross-mapped are missing
+>>> in this patch set (neither of these are typical scenarios).
+>>>
+>>> With the basic support, the guest can retrieve the correct PEBS
+>>> information from its own PEBS records on the Ice Lake servers.
+>>> And we expect it should work when migrating to another Ice Lake
+>>> and no regression about host perf is expected.
+>>>
+>>> Here are the results of pebs test from guest/host for same workload:
+>>>
+>>> perf report on guest:
+>>> # Samples: 2K of event 'instructions:ppp', # Event count (approx.): 
+>>> 1473377250
+>>> # Overhead  Command   Shared Object      Symbol
+>>>    57.74%  br_instr  br_instr           [.] lfsr_cond
+>>>    41.40%  br_instr  br_instr           [.] cmp_end
+>>>     0.21%  br_instr  [kernel.kallsyms]  [k] __lock_acquire
+>>>
+>>> perf report on host:
+>>> # Samples: 2K of event 'instructions:ppp', # Event count (approx.): 
+>>> 1462721386
+>>> # Overhead  Command   Shared Object     Symbol
+>>>    57.90%  br_instr  br_instr          [.] lfsr_cond
+>>>    41.95%  br_instr  br_instr          [.] cmp_end
+>>>     0.05%  br_instr  [kernel.vmlinux]  [k] lock_acquire
+>>>     Conclusion: the profiling results on the guest are similar 
+>>> tothat on the host.
+>>>
+>>> A minimum guest kernel version may be v5.4 or a backport version
+>>> support Icelake server PEBS.
+>>>
+>>> Please check more details in each commit and feel free to comment.
+>>>
+>>> Previous:
+>>> https://lore.kernel.org/kvm/20210415032016.166201-1-like.xu@linux.intel.com/ 
+>>>
+>>>
+>>> [0] 
+>>> https://lore.kernel.org/kvm/20210104131542.495413-1-like.xu@linux.intel.com/
+>>> [1] 
+>>> https://lore.kernel.org/kvm/20210115191113.nktlnmivc3edstiv@two.firstfloor.org/ 
+>>>
+>>>
+>>> V5 -> V6 Changelog:
+>>> - Rebased on the latest kvm/queue tree;
+>>> - Fix a git rebase issue (Liuxiangdong);
+>>> - Adjust the patch sequence 06/07 for bisection (Liuxiangdong);
+>>>
+>>> Like Xu (16):
+>>>    perf/x86/intel: Add EPT-Friendly PEBS for Ice Lake Server
+>>>    perf/x86/intel: Handle guest PEBS overflow PMI for KVM guest
+>>>    perf/x86/core: Pass "struct kvm_pmu *" to determine the guest values
+>>>    KVM: x86/pmu: Set MSR_IA32_MISC_ENABLE_EMON bit when vPMU is enabled
+>>>    KVM: x86/pmu: Introduce the ctrl_mask value for fixed counter
+>>>    KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS
+>>>    KVM: x86/pmu: Reprogram PEBS event to emulate guest PEBS counter
+>>>    KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to support guest DS
+>>>    KVM: x86/pmu: Add PEBS_DATA_CFG MSR emulation to support adaptive 
+>>> PEBS
+>>>    KVM: x86: Set PEBS_UNAVAIL in IA32_MISC_ENABLE when PEBS is enabled
+>>>    KVM: x86/pmu: Adjust precise_ip to emulate Ice Lake guest PDIR 
+>>> counter
+>>>    KVM: x86/pmu: Move pmc_speculative_in_use() to arch/x86/kvm/pmu.h
+>>>    KVM: x86/pmu: Disable guest PEBS temporarily in two rare situations
+>>>    KVM: x86/pmu: Add kvm_pmu_cap to optimize 
+>>> perf_get_x86_pmu_capability
+>>>    KVM: x86/cpuid: Refactor host/guest CPU model consistency check
+>>>    KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64
+>>>
+>>>   arch/x86/events/core.c            |   5 +-
+>>>   arch/x86/events/intel/core.c      | 129 
+>>> ++++++++++++++++++++++++------
+>>>   arch/x86/events/perf_event.h      |   5 +-
+>>>   arch/x86/include/asm/kvm_host.h   |  16 ++++
+>>>   arch/x86/include/asm/msr-index.h  |   6 ++
+>>>   arch/x86/include/asm/perf_event.h |   5 +-
+>>>   arch/x86/kvm/cpuid.c              |  24 ++----
+>>>   arch/x86/kvm/cpuid.h              |   5 ++
+>>>   arch/x86/kvm/pmu.c                |  50 +++++++++---
+>>>   arch/x86/kvm/pmu.h                |  38 +++++++++
+>>>   arch/x86/kvm/vmx/capabilities.h   |  26 ++++--
+>>>   arch/x86/kvm/vmx/pmu_intel.c      | 115 +++++++++++++++++++++-----
+>>>   arch/x86/kvm/vmx/vmx.c            |  24 +++++-
+>>>   arch/x86/kvm/vmx/vmx.h            |   2 +-
+>>>   arch/x86/kvm/x86.c                |  14 ++--
+>>>   15 files changed, 368 insertions(+), 96 deletions(-)
+>>>
 >
-> > +     if (guest_tsc < tsc_deadline)
-> > +             __wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
-> >  }
-> >
-> >  void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
-> > --
-> > 2.25.1
-> >
+
