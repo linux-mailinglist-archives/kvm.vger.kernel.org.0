@@ -2,116 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BA3B388079
-	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 21:24:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9987B388099
+	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 21:39:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351842AbhERTZr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 May 2021 15:25:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37760 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346055AbhERTZo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 May 2021 15:25:44 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09F9FC061573
-        for <kvm@vger.kernel.org>; Tue, 18 May 2021 12:24:25 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id g6-20020a17090adac6b029015d1a9a6f1aso2227239pjx.1
-        for <kvm@vger.kernel.org>; Tue, 18 May 2021 12:24:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=r5Jk+9Ja+kn0VHFuLnbq34Qrw9ShVEHa6rhQvetZyQY=;
-        b=W2or1ahYnIFqgo0AiCmxrnFPCtu43CiGXJ6jy7l9dWtdlzjQ1+AxotfO+umlsoOdWW
-         2vse/gU6FAjBWawxyMBSuI+wZ93MVdfknmitBW1A1XIoqE6iQ9/FjqgvN5m15EOWvW59
-         PnX9x/0BI+A/1LZ0HyApBzpjfhStcel35joRAOJ642HSOwPe48wHvuIfdcV1NDaNUDbG
-         5h1N36k4zHIV+DYydxjsAFlEhkgdGuhvK40NJliLNyvT3CLN/qNRoJs5i8KOb2F7wH06
-         8E1IUoED+G5IWd5XdtGhQ0wq9YBMacdQW+5qpEAkGdhrNr6GTucqTQjFQCFENdoyg77p
-         nUTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=r5Jk+9Ja+kn0VHFuLnbq34Qrw9ShVEHa6rhQvetZyQY=;
-        b=Cnt1V07I3+2hlpfbY2yKL3THn4/f4L9udd2lAMyWJ6S6gphYHJd9RHIYZaP7VExBWO
-         qEYRIQJMr9B7Bp/vemNNpigrnWt6ZgCUKS4QVR58JJHNrYD91XU1Uod/FLvzvRZf7FW1
-         67hOv/hrWsDMFLI56euzu5dO2ZbvtzpI8Hm8BkDbynX4dhpk5uLJxPTPgVNmOslMj0gx
-         lQCMTK+ecSC3U+hiydCXaIHzUi6xeGFp3vNZFFj/rP1XJ4PfZIVFGO9+VejPRtJJAUS3
-         KhcsjmZFjz48RIogyTw9ETk0NaltU8snuQIVGIJ2CNKegel0zJEagOQE57mpUocBNb9F
-         3FfQ==
-X-Gm-Message-State: AOAM533B6txjIsfhZ5n41Ou9OpFqAy21UuBz2xPchw7ocZNJa1HlwFnQ
-        bHJVKAyVLodOLoZ9qqfnhEz4HQ==
-X-Google-Smtp-Source: ABdhPJxc3ZNUABU74g4MkROq1xAEn6f0RnT3SGzwbKXOjV5nZA5lW+lo8QCbwlhpEDeLu0oG/tWc7A==
-X-Received: by 2002:a17:902:dac9:b029:f2:bda7:a4b8 with SMTP id q9-20020a170902dac9b02900f2bda7a4b8mr6229831plx.15.1621365864386;
-        Tue, 18 May 2021 12:24:24 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id o9sm13652828pfh.217.2021.05.18.12.24.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 May 2021 12:24:23 -0700 (PDT)
-Date:   Tue, 18 May 2021 19:24:20 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH 03/15] KVM: SVM: Inject #UD on RDTSCP when it should be
- disabled in the guest
-Message-ID: <YKQUZF8Ejxh7Eytg@google.com>
-References: <20210504171734.1434054-1-seanjc@google.com>
- <20210504171734.1434054-4-seanjc@google.com>
- <CALMp9eSvXRJm-KxCGKOkgPO=4wJPBi5wDFLbCCX91UtvGJ1qBg@mail.gmail.com>
- <YJHCadSIQ/cK/RAw@google.com>
- <1b50b090-2d6d-e13d-9532-e7195ebffe14@redhat.com>
- <CALMp9eSSiPVWDf43Zed3+ukUc+NwMP8z7feoxX0eMmimvrznzA@mail.gmail.com>
- <4a4b9fea4937da7b0b42e6f3179566d73bf022e2.camel@redhat.com>
- <YJlluzMze2IfUM6S@google.com>
- <1245ad2f-78b2-a334-e36a-524579274183@redhat.com>
+        id S1351890AbhERTlC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 May 2021 15:41:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26294 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1351887AbhERTlA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 May 2021 15:41:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621366782;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5zqqX1IaXTEbDmyAG1p0aodW9voE4HBxeQmi3CXD/I0=;
+        b=ehbNMkEhXwwh3McQr/KZqVuksHQ0vNIT+ZuzJBhx3xOiF5JeZnEJWz8dwb4e/UoIZYR3TS
+        Wn++zhV2LeT7FZc2bh9WgKfu1oo90dcAGSh5M9mGfWwbm+0W3PyOIwVAfl6SUZ5LvP4HzY
+        EV6/i9XeD9tZh1w+u6gRVnauGH3ivt0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-205-ClJTDOeWPvuJVwkRki2Zfg-1; Tue, 18 May 2021 15:39:38 -0400
+X-MC-Unique: ClJTDOeWPvuJVwkRki2Zfg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F419D107ACC7;
+        Tue, 18 May 2021 19:39:36 +0000 (UTC)
+Received: from redhat.com (ovpn-113-225.phx2.redhat.com [10.3.113.225])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8716E5C1CF;
+        Tue, 18 May 2021 19:39:36 +0000 (UTC)
+Date:   Tue, 18 May 2021 13:39:36 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yicong Yang <yangyicong@hisilicon.com>
+Cc:     <qemu-devel@nongnu.org>, <cohuck@redhat.com>,
+        <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Linuxarm <linuxarm@huawei.com>
+Subject: Re: [Question] Indefinitely block in the host when remove the PF
+ driver
+Message-ID: <20210518133936.0593d3fc.alex.williamson@redhat.com>
+In-Reply-To: <c09fed39-bde5-b7a9-d945-79ef85260e5a@hisilicon.com>
+References: <c9466e2c-385d-8298-d03c-80dcfc359f52@hisilicon.com>
+        <20210430082940.4b0e0397@redhat.com>
+        <c09fed39-bde5-b7a9-d945-79ef85260e5a@hisilicon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1245ad2f-78b2-a334-e36a-524579274183@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 18, 2021, Paolo Bonzini wrote:
-> On 10/05/21 18:56, Sean Christopherson wrote:
-> > On Mon, May 10, 2021, Maxim Levitsky wrote:
-> > > On Tue, 2021-05-04 at 14:58 -0700, Jim Mattson wrote:
-> > > > On Tue, May 4, 2021 at 2:57 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > > > > On 04/05/21 23:53, Sean Christopherson wrote:
-> > > > > > > Does the right thing happen here if the vCPU is in guest mode when
-> > > > > > > userspace decides to toggle the CPUID.80000001H:EDX.RDTSCP bit on or
-> > > > > > > off?
-> > > > > > I hate our terminology.  By "guest mode", do you mean running the vCPU, or do
-> > > > > > you specifically mean running in L2?
-> > > > > > 
-> > > > > 
-> > > > > Guest mode should mean L2.
-> > > > > 
-> > > > > (I wonder if we should have a capability that says "KVM_SET_CPUID2 can
-> > > > > only be called prior to KVM_RUN").
-> > > > 
-> > > > It would certainly make it easier to reason about potential security issues.
-> > > > 
-> > > I vote too for this.
-> > 
-> > Alternatively, what about adding KVM_VCPU_RESET to let userspace explicitly
-> > pull RESET#, and defining that ioctl() to freeze the vCPU model?  I.e. after
-> > userspace resets the vCPU, KVM_SET_CPUID (and any other relevant ioctls() is
-> > disallowed.
-> > 
-> > Lack of proper RESET emulation is annoying, e.g. userspace has to manually stuff
-> > EDX after vCPU creation to get the right value at RESET.  A dedicated ioctl()
-> > would kill two birds with one stone, without having to add yet another "2"
-> > ioctl().
-> 
-> That has a disadvantage of opting into the more secure behavior, but we can
-> do both (forbidding KVM_SET_CPUID2 after both KVM_RUN and KVM_RESET).
+On Tue, 11 May 2021 11:44:49 +0800
+Yicong Yang <yangyicong@hisilicon.com> wrote:
 
-Doesn't changing KVM_SET_CPUID2 need to be opt-in as well, e.g. if the strict
-behavior is activated via a capability?
+> [ +qemu-devel ]
+> 
+> On 2021/4/30 22:29, Alex Williamson wrote:
+> > On Fri, 30 Apr 2021 15:57:47 +0800
+> > Yicong Yang <yangyicong@hisilicon.com> wrote:
+> >   
+> >> When I try to remove the PF driver in the host, the process will be blocked
+> >> if the related VF of the device is added in the Qemu as an iEP.
+> >>
+> >> here's what I got in the host:
+> >>
+> >> [root@localhost 0000:75:00.0]# rmmod hisi_zip
+> >> [99760.571352] vfio-pci 0000:75:00.1: Relaying device request to user (#0)
+> >> [99862.992099] vfio-pci 0000:75:00.1: Relaying device request to user (#10)
+> >> [...]
+> >>
+> >> and in the Qemu:
+> >>
+> >> estuary:/$ lspci -tv
+> >> -[0000:00]-+-00.0  Device 1b36:0008
+> >>            +-01.0  Device 1af4:1000
+> >>            +-02.0  Device 1af4:1009
+> >>            \-03.0  Device 19e5:a251 <----- the related VF device
+> >> estuary:/$ qemu-system-aarch64: warning: vfio 0000:75:00.1: Bus 'pcie.0' does not support hotplugging
+> >> qemu-system-aarch64: warning: vfio 0000:75:00.1: Bus 'pcie.0' does not support hotplugging
+> >> qemu-system-aarch64: warning: vfio 0000:75:00.1: Bus 'pcie.0' does not support hotplugging
+> >> qemu-system-aarch64: warning: vfio 0000:75:00.1: Bus 'pcie.0' does not support hotplugging
+> >> [...]
+> >>
+> >> The rmmod process will be blocked until I kill the Qemu process. That's the only way if I
+> >> want to end the rmmod.
+> >>
+> >> So my question is: is such block reasonable? If the VF devcie is occupied or doesn't
+> >> support hotplug in the Qemu, shouldn't we fail the rmmod and return something like -EBUSY
+> >> rather than make the host blocked indefinitely?  
+> > 
+> > Where would we return -EBUSY?  pci_driver.remove() returns void.
+> > Without blocking, I think our only option would be to kill the user
+> > process.
+> >    
+> 
+> yes. the remove() callback of pci_driver doesn't provide a way to abort the process.
+> 
+> >> Add the VF under a pcie root port will avoid this. Is it encouraged to always
+> >> add the VF under a pcie root port rather than directly add it as an iEP?  
+> > 
+> > Releasing a device via the vfio request interrupt is always a
+> > cooperative process currently, the VM needs to be configured such that
+> > the device is capable of being unplugged and the guest needs to respond
+> > to the ejection request.  Thanks,
+> >   
+> 
+> Does it make sense to abort the VM creation and give some warnings if user try to
+> pass a vfio pci device to the Qemu and doesn't attach it to a hotpluggable
+> bridge? Currently I think there isn't such a mechanism in Qemu.
+
+You're essentially trying to define a usage policy and pick somewhere
+to impose it.  I think QEMU is not the right place.  There are plenty
+of valid assigned device configurations where the device is not
+hotpluggable.  You therefore either need to look up in the stack if
+your environment demands that VM configurations should always be able
+to release devices at the request of the kernel, or down in the stack
+if you believe the kernel has an obligation to take that device if the
+user fails to respond to a device request.  We've shied away from the
+latter because it generally involves killing the holding process,
+either directly or by closing off access to the device, where in the
+case of mmaps to the device, ongoing access would result in a SIGBUS to
+the process anyway.  I wouldn't object to the kernel having a right to
+do this, but it's not something that has reached a high priority.
+Thanks,
+
+Alex
+
