@@ -2,215 +2,319 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C9AC0387DCD
-	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 18:36:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02D85387DE3
+	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 18:50:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350879AbhERQh0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 May 2021 12:37:26 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12552 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1350859AbhERQhQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 May 2021 12:37:16 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14IGYIce148595;
-        Tue, 18 May 2021 12:35:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=GdRBRmnqVr6QPOCuFGmuEfiUDUiuIams0JIQv92tmcQ=;
- b=Au5W1E682KHSav0TUUcO2TOdJInDnvJcJiJwvB3aYx+Kh3jaV3oZzn+OjbprY3c1D7wJ
- lngRVR0dz/W6z8SLTDqoht84GcUSSFux6qNB6m4PLunT2lTuG3R/2Ii7C2OQAW4nSn5d
- 4evDBFhPfBGF/he1Qefg+5a/VI2raIlynoyWrr74KowZaRrLqNE/qF5L7wA3Vc99UFuh
- lKSW+9CzEcVlvBXP0TctDKktHpT+g9RMRdiWqcM3kqjb4xkWbTgVGtzyKURddc/7Dcn9
- 2wykKjERNbc2f9f2sRf09q4P0a5QRpPnTEaJQmqXehTBPvuZC39HNvZ79UJ0eBAcCuwe zg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38mgjjs39q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 May 2021 12:35:57 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14IGYJUw148660;
-        Tue, 18 May 2021 12:35:57 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38mgjjs38u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 May 2021 12:35:57 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14IGXovv023892;
-        Tue, 18 May 2021 16:35:54 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma05fra.de.ibm.com with ESMTP id 38m19sr8sp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 May 2021 16:35:54 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14IGZp1o19333484
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 May 2021 16:35:51 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7878142041;
-        Tue, 18 May 2021 16:35:51 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 016A942042;
-        Tue, 18 May 2021 16:35:51 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.171.73.129])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 18 May 2021 16:35:50 +0000 (GMT)
-Subject: Re: [PATCH v1 00/11] KVM: s390: pv: implement lazy destroy
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        frankja@linux.ibm.com, thuth@redhat.com, pasic@linux.ibm.com,
-        david@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210517200758.22593-1-imbrenda@linux.ibm.com>
- <20210518170537.58b32ffe.cohuck@redhat.com> <20210518173624.13d043e3@ibm-vm>
- <225fe3ec-f2e9-6c76-97e1-b252fe3326b3@de.ibm.com>
- <20210518181305.2a9d19f3@ibm-vm>
- <896be0fd-5d5d-5998-8cb0-4ac8637412ac@de.ibm.com>
- <20210518183442.6e078ea1@ibm-vm>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <cb21db5f-f303-5b4b-6fab-5b28728e8ef2@de.ibm.com>
-Date:   Tue, 18 May 2021 18:35:50 +0200
+        id S1346743AbhERQvx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 May 2021 12:51:53 -0400
+Received: from foss.arm.com ([217.140.110.172]:56918 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230355AbhERQvu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 May 2021 12:51:50 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0D5986D;
+        Tue, 18 May 2021 09:50:32 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A0A2F3F73B;
+        Tue, 18 May 2021 09:50:30 -0700 (PDT)
+Subject: Re: [PATCH v3 1/9] irqchip/gic: Split vGIC probing information from
+ the GIC code
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Hector Martin <marcan@marcan.st>,
+        Mark Rutland <mark.rutland@arm.com>, kernel-team@android.com
+References: <20210510134824.1910399-1-maz@kernel.org>
+ <20210510134824.1910399-2-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <cca6328e-1710-a7ac-e89e-a7dabe16f81f@arm.com>
+Date:   Tue, 18 May 2021 17:51:11 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20210518183442.6e078ea1@ibm-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <20210510134824.1910399-2-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: YCjkDYYQGDvN0yvMLgwhoav07XzDKegc
-X-Proofpoint-ORIG-GUID: 2KJSULVZ3uDD2dKo0PivT5bqdVYfqaOB
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-05-18_08:2021-05-18,2021-05-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 adultscore=0 impostorscore=0 malwarescore=0 mlxlogscore=999
- phishscore=0 bulkscore=0 clxscore=1015 mlxscore=0 spamscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2105180113
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Marc,
 
+On 5/10/21 2:48 PM, Marc Zyngier wrote:
+> The vGIC advertising code is unsurprisingly very much tied to
+> the GIC implementations. However, we are about to extend the
+> support to lesser implementations.
+>
+> Let's dissociate the vgic registration from the GIC code and
+> move it into KVM, where it makes a bit more sense. This also
+> allows us to mark the gic_kvm_info structures as __initdata.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/vgic/vgic-init.c        | 18 +++++++++--
+>  drivers/irqchip/irq-gic-common.c       | 13 --------
+>  drivers/irqchip/irq-gic-common.h       |  2 --
+>  drivers/irqchip/irq-gic-v3.c           |  6 ++--
+>  drivers/irqchip/irq-gic.c              |  6 ++--
+>  include/linux/irqchip/arm-gic-common.h | 25 +---------------
+>  include/linux/irqchip/arm-vgic-info.h  | 41 ++++++++++++++++++++++++++
+>  7 files changed, 63 insertions(+), 48 deletions(-)
+>  create mode 100644 include/linux/irqchip/arm-vgic-info.h
+>
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index 58cbda00e56d..2fdb65529594 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -482,6 +482,16 @@ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
+>  	return IRQ_HANDLED;
+>  }
+>  
+> +static struct gic_kvm_info *gic_kvm_info;
+> +
+> +void __init vgic_set_kvm_info(const struct gic_kvm_info *info)
+> +{
+> +	BUG_ON(gic_kvm_info != NULL);
+> +	gic_kvm_info = kmalloc(sizeof(*info), GFP_KERNEL);
+> +	if (gic_kvm_info)
+> +		*gic_kvm_info = *info;
+> +}
+> +
+>  /**
+>   * kvm_vgic_init_cpu_hardware - initialize the GIC VE hardware
+>   *
+> @@ -509,10 +519,8 @@ void kvm_vgic_init_cpu_hardware(void)
+>   */
+>  int kvm_vgic_hyp_init(void)
+>  {
+> -	const struct gic_kvm_info *gic_kvm_info;
+>  	int ret;
+>  
+> -	gic_kvm_info = gic_get_kvm_info();
+>  	if (!gic_kvm_info)
+>  		return -ENODEV;
+>  
+> @@ -536,10 +544,14 @@ int kvm_vgic_hyp_init(void)
+>  		ret = -ENODEV;
+>  	}
+>  
+> +	kvm_vgic_global_state.maint_irq = gic_kvm_info->maint_irq;
+> +
+> +	kfree(gic_kvm_info);
+> +	gic_kvm_info = NULL;
 
-On 18.05.21 18:34, Claudio Imbrenda wrote:
-> On Tue, 18 May 2021 18:20:22 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> On 18.05.21 18:13, Claudio Imbrenda wrote:
->>> On Tue, 18 May 2021 17:45:18 +0200
->>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->>>    
->>>> On 18.05.21 17:36, Claudio Imbrenda wrote:
->>>>> On Tue, 18 May 2021 17:05:37 +0200
->>>>> Cornelia Huck <cohuck@redhat.com> wrote:
->>>>>       
->>>>>> On Mon, 17 May 2021 22:07:47 +0200
->>>>>> Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
->>>>>>      
->>>>>>> Previously, when a protected VM was rebooted or when it was shut
->>>>>>> down, its memory was made unprotected, and then the protected VM
->>>>>>> itself was destroyed. Looping over the whole address space can
->>>>>>> take some time, considering the overhead of the various
->>>>>>> Ultravisor Calls (UVCs).  This means that a reboot or a shutdown
->>>>>>> would take a potentially long amount of time, depending on the
->>>>>>> amount of used memory.
->>>>>>>
->>>>>>> This patchseries implements a deferred destroy mechanism for
->>>>>>> protected guests. When a protected guest is destroyed, its
->>>>>>> memory is cleared in background, allowing the guest to restart
->>>>>>> or terminate significantly faster than before.
->>>>>>>
->>>>>>> There are 2 possibilities when a protected VM is torn down:
->>>>>>> * it still has an address space associated (reboot case)
->>>>>>> * it does not have an address space anymore (shutdown case)
->>>>>>>
->>>>>>> For the reboot case, the reference count of the mm is increased,
->>>>>>> and then a background thread is started to clean up. Once the
->>>>>>> thread went through the whole address space, the protected VM is
->>>>>>> actually destroyed.
->>>>>>>
->>>>>>> For the shutdown case, a list of pages to be destroyed is formed
->>>>>>> when the mm is torn down. Instead of just unmapping the pages
->>>>>>> when the address space is being torn down, they are also set
->>>>>>> aside. Later when KVM cleans up the VM, a thread is started to
->>>>>>> clean up the pages from the list.
->>>>>>
->>>>>> Just to make sure, 'clean up' includes doing uv calls?
->>>>>
->>>>> yes
->>>>>       
->>>>>>>
->>>>>>> This means that the same address space can have memory belonging
->>>>>>> to more than one protected guest, although only one will be
->>>>>>> running, the others will in fact not even have any CPUs.
->>>>>>
->>>>>> Are those set-aside-but-not-yet-cleaned-up pages still possibly
->>>>>> accessible in any way? I would assume that they only belong to
->>>>>> the
->>>>>
->>>>> in case of reboot: yes, they are still in the address space of the
->>>>> guest, and can be swapped if needed
->>>>>       
->>>>>> 'zombie' guests, and any new or rebooted guest is a new entity
->>>>>> that needs to get new pages?
->>>>>
->>>>> the rebooted guest (normal or secure) will re-use the same pages
->>>>> of the old guest (before or after cleanup, which is the reason of
->>>>> patches 3 and 4)
->>>>>
->>>>> the KVM guest is not affected in case of reboot, so the userspace
->>>>> address space is not touched.
->>>>>       
->>>>>> Can too many not-yet-cleaned-up pages lead to a (temporary)
->>>>>> memory exhaustion?
->>>>>
->>>>> in case of reboot, not much; the pages were in use are still in
->>>>> use after the reboot, and they can be swapped.
->>>>>
->>>>> in case of a shutdown, yes, because the pages are really taken
->>>>> aside and cleared/destroyed in background. they cannot be
->>>>> swapped. they are freed immediately as they are processed, to try
->>>>> to mitigate memory exhaustion scenarios.
->>>>>
->>>>> in the end, this patchseries is a tradeoff between speed and
->>>>> memory consumption. the memory needs to be cleared up at some
->>>>> point, and that requires time.
->>>>>
->>>>> in cases where this might be an issue, I introduced a new KVM flag
->>>>> to disable lazy destroy (patch 10)
->>>>
->>>> Maybe we could piggy-back on the OOM-kill notifier and then fall
->>>> back to synchronous freeing for some pages?
->>>
->>> I'm not sure I follow
->>>
->>> once the pages have been set aside, it's too late
->>>
->>> while the pages are being set aside, every now and then some memory
->>> needs to be allocated. the allocation is atomic, not allowed to use
->>> emergency reserves, and can fail without warning. if the allocation
->>> fails, we clean up one page and continue, without setting aside
->>> anything (patch 9)
->>>
->>> so if the system is low on memory, the lazy destroy should not make
->>> the situation too much worse.
->>>
->>> the only issue here is starting a normal process in the host (maybe
->>> a non secure guest) that uses a lot of memory very quickly, right
->>> after a large secure guest has terminated.
->>
->> I think page cache page allocations do not need to be atomic.
->> In that case the kernel might stil l decide to trigger the oom
->> killer. We can let it notify ourselves free 256 pages synchronously
->> and avoid the oom kill. Have a look at the virtio-balloon
->> virtio_balloon_oom_notify
-> 
-> the issue is that once the pages have been set aside, it's too late.
-> the OOM notifier would only be useful if we get notified of the OOM
-> situation _while_ setting aside the pages.
-> 
-> unless you mean that the notifier should simply wait until the thread
-> has done (some of) its work?
+I double checked and gic_kvm_info is not used after this point (vgic_{v2,v3}_probe
+make copies of the various fields). And after returning an error (below) this
+function cannot be called again.
 
-Exactly. Let the notifier wait until you have freed 256pages and return
-256 to the oom notifier.
+> +
+>  	if (ret)
+>  		return ret;
+>  
+> -	kvm_vgic_global_state.maint_irq = gic_kvm_info->maint_irq;
+>  	ret = request_percpu_irq(kvm_vgic_global_state.maint_irq,
+>  				 vgic_maintenance_handler,
+>  				 "vgic", kvm_get_running_vcpus());
+> diff --git a/drivers/irqchip/irq-gic-common.c b/drivers/irqchip/irq-gic-common.c
+> index f47b41dfd023..a610821c8ff2 100644
+> --- a/drivers/irqchip/irq-gic-common.c
+> +++ b/drivers/irqchip/irq-gic-common.c
+> @@ -12,19 +12,6 @@
+>  
+>  static DEFINE_RAW_SPINLOCK(irq_controller_lock);
+>  
+> -static const struct gic_kvm_info *gic_kvm_info;
+> -
+> -const struct gic_kvm_info *gic_get_kvm_info(void)
+> -{
+> -	return gic_kvm_info;
+> -}
+> -
+> -void gic_set_kvm_info(const struct gic_kvm_info *info)
+> -{
+> -	BUG_ON(gic_kvm_info != NULL);
+> -	gic_kvm_info = info;
+> -}
+> -
+>  void gic_enable_of_quirks(const struct device_node *np,
+>  			  const struct gic_quirk *quirks, void *data)
+>  {
+> diff --git a/drivers/irqchip/irq-gic-common.h b/drivers/irqchip/irq-gic-common.h
+> index ccba8b0fe0f5..27e3d4ed4f32 100644
+> --- a/drivers/irqchip/irq-gic-common.h
+> +++ b/drivers/irqchip/irq-gic-common.h
+> @@ -28,6 +28,4 @@ void gic_enable_quirks(u32 iidr, const struct gic_quirk *quirks,
+>  void gic_enable_of_quirks(const struct device_node *np,
+>  			  const struct gic_quirk *quirks, void *data);
+>  
+> -void gic_set_kvm_info(const struct gic_kvm_info *info);
+> -
+>  #endif /* _IRQ_GIC_COMMON_H */
+> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+> index 37a23aa6de37..453fc425eede 100644
+> --- a/drivers/irqchip/irq-gic-v3.c
+> +++ b/drivers/irqchip/irq-gic-v3.c
+> @@ -103,7 +103,7 @@ EXPORT_SYMBOL(gic_nonsecure_priorities);
+>  /* ppi_nmi_refs[n] == number of cpus having ppi[n + 16] set as NMI */
+>  static refcount_t *ppi_nmi_refs;
+>  
+> -static struct gic_kvm_info gic_v3_kvm_info;
+> +static struct gic_kvm_info gic_v3_kvm_info __initdata;
+>  static DEFINE_PER_CPU(bool, has_rss);
+>  
+>  #define MPIDR_RS(mpidr)			(((mpidr) & 0xF0UL) >> 4)
+> @@ -1852,7 +1852,7 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
+>  
+>  	gic_v3_kvm_info.has_v4 = gic_data.rdists.has_vlpis;
+>  	gic_v3_kvm_info.has_v4_1 = gic_data.rdists.has_rvpeid;
+> -	gic_set_kvm_info(&gic_v3_kvm_info);
+> +	vgic_set_kvm_info(&gic_v3_kvm_info);
+>  }
+>  
+>  static int __init gic_of_init(struct device_node *node, struct device_node *parent)
+> @@ -2168,7 +2168,7 @@ static void __init gic_acpi_setup_kvm_info(void)
+>  
+>  	gic_v3_kvm_info.has_v4 = gic_data.rdists.has_vlpis;
+>  	gic_v3_kvm_info.has_v4_1 = gic_data.rdists.has_rvpeid;
+> -	gic_set_kvm_info(&gic_v3_kvm_info);
+> +	vgic_set_kvm_info(&gic_v3_kvm_info);
+>  }
+>  
+>  static int __init
+> diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
+> index b1d9c22caf2e..2de9ec8ece0c 100644
+> --- a/drivers/irqchip/irq-gic.c
+> +++ b/drivers/irqchip/irq-gic.c
+> @@ -119,7 +119,7 @@ static DEFINE_STATIC_KEY_TRUE(supports_deactivate_key);
+>  
+>  static struct gic_chip_data gic_data[CONFIG_ARM_GIC_MAX_NR] __read_mostly;
+>  
+> -static struct gic_kvm_info gic_v2_kvm_info;
+> +static struct gic_kvm_info gic_v2_kvm_info __initdata;
+>  
+>  static DEFINE_PER_CPU(u32, sgi_intid);
+>  
+> @@ -1451,7 +1451,7 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
+>  		return;
+>  
+>  	if (static_branch_likely(&supports_deactivate_key))
+> -		gic_set_kvm_info(&gic_v2_kvm_info);
+> +		vgic_set_kvm_info(&gic_v2_kvm_info);
+>  }
+>  
+>  int __init
+> @@ -1618,7 +1618,7 @@ static void __init gic_acpi_setup_kvm_info(void)
+>  
+>  	gic_v2_kvm_info.maint_irq = irq;
+>  
+> -	gic_set_kvm_info(&gic_v2_kvm_info);
+> +	vgic_set_kvm_info(&gic_v2_kvm_info);
+>  }
+>  
+>  static int __init gic_v2_acpi_init(union acpi_subtable_headers *header,
+> diff --git a/include/linux/irqchip/arm-gic-common.h b/include/linux/irqchip/arm-gic-common.h
+> index fa8c0455c352..1177f3a1aed5 100644
+> --- a/include/linux/irqchip/arm-gic-common.h
+> +++ b/include/linux/irqchip/arm-gic-common.h
+> @@ -7,8 +7,7 @@
+>  #ifndef __LINUX_IRQCHIP_ARM_GIC_COMMON_H
+>  #define __LINUX_IRQCHIP_ARM_GIC_COMMON_H
+>  
+> -#include <linux/types.h>
+> -#include <linux/ioport.h>
+> +#include <linux/irqchip/arm-vgic-info.h>
+>  
+>  #define GICD_INT_DEF_PRI		0xa0
+>  #define GICD_INT_DEF_PRI_X4		((GICD_INT_DEF_PRI << 24) |\
+> @@ -16,28 +15,6 @@
+>  					(GICD_INT_DEF_PRI << 8) |\
+>  					GICD_INT_DEF_PRI)
+>  
+> -enum gic_type {
+> -	GIC_V2,
+> -	GIC_V3,
+> -};
+> -
+> -struct gic_kvm_info {
+> -	/* GIC type */
+> -	enum gic_type	type;
+> -	/* Virtual CPU interface */
+> -	struct resource vcpu;
+> -	/* Interrupt number */
+> -	unsigned int	maint_irq;
+> -	/* Virtual control interface */
+> -	struct resource vctrl;
+> -	/* vlpi support */
+> -	bool		has_v4;
+> -	/* rvpeid support */
+> -	bool		has_v4_1;
+> -};
+> -
+> -const struct gic_kvm_info *gic_get_kvm_info(void);
+> -
+>  struct irq_domain;
+>  struct fwnode_handle;
+>  int gicv2m_init(struct fwnode_handle *parent_handle,
+> diff --git a/include/linux/irqchip/arm-vgic-info.h b/include/linux/irqchip/arm-vgic-info.h
+> new file mode 100644
+> index 000000000000..0319636be928
+> --- /dev/null
+> +++ b/include/linux/irqchip/arm-vgic-info.h
+> @@ -0,0 +1,41 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * include/linux/irqchip/arm-vgic-info.h
+> + *
+> + * Copyright (C) 2016 ARM Limited, All Rights Reserved.
+> + */
+> +#ifndef __ARM_VGIC_INFO_H
+> +#define __ARM_VGIC_INFO_H
+
+Totally irrelevant nitpick, but the header guards from the other files in this
+directory are like __LINUX_IRQCHIP_ARM_VGIC_INFO_H. Regardless, the patch looks
+correct to me, the functions are called at the exact moment in the boot flow, only
+where the VGIC info is saved is different:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+
+Alex
+
+> +
+> +#include <linux/types.h>
+> +#include <linux/ioport.h>
+> +
+> +enum gic_type {
+> +	/* Full GICv2 */
+> +	GIC_V2,
+> +	/* Full GICv3, optionally with v2 compat */
+> +	GIC_V3,
+> +};
+> +
+> +struct gic_kvm_info {
+> +	/* GIC type */
+> +	enum gic_type	type;
+> +	/* Virtual CPU interface */
+> +	struct resource vcpu;
+> +	/* Interrupt number */
+> +	unsigned int	maint_irq;
+> +	/* Virtual control interface */
+> +	struct resource vctrl;
+> +	/* vlpi support */
+> +	bool		has_v4;
+> +	/* rvpeid support */
+> +	bool		has_v4_1;
+> +};
+> +
+> +#ifdef CONFIG_KVM
+> +void vgic_set_kvm_info(const struct gic_kvm_info *info);
+> +#else
+> +static inline void vgic_set_kvm_info(const struct gic_kvm_info *info) {}
+> +#endif
+> +
+> +#endif
