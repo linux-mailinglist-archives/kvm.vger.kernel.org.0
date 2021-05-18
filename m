@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 094AF388031
-	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 20:59:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC1D238801B
+	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 20:59:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351817AbhERTAi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 May 2021 15:00:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30389 "EHLO
+        id S1351732AbhERTAY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 May 2021 15:00:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22870 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1351750AbhERTA0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 May 2021 15:00:26 -0400
+        by vger.kernel.org with ESMTP id S243382AbhERTAW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 May 2021 15:00:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621364347;
+        s=mimecast20190719; t=1621364343;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Ax4CDb+Sd6mNQ6JnBMbZp3JYaJV2pPRPTkaJj0ycGsA=;
-        b=AfPrrVBfhFRf/KZTncGlGkLomscCYegUiuzPt6ILj+7Fphv4gs+5tkE8uCyOpAXkjWCNY4
-        eyV4L3QLSficxwGVDRnQzmvB+llgWquz1G0sspLwBFIB+NdkcKw+5fZC8VfGdEvDVJXqS+
-        rk3b+zZY8E9iLuC5bluV5NqEFrwr4cM=
+        bh=l3I+sRgsUz3jPt3eJWkIzspXHxTfKP9apTdFMbo1EQ4=;
+        b=D3T/kdOBui1Go/AjQlLpFBKCXcVgG1jqnBDZb5hHX93JslcNCKLrE5glcZ7OZo5o2NAahM
+        cf4h56GDHFdr8ELQ7fiooSyQTG4FSL8GCJSX+/CzIheLvxGPFP83jhBNxIRT+69S94O74v
+        FWzoCB/k5aNztUGo3Dehjc5XgogVWrM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-399-LSvapAV8PQWv0YsaYRwixg-1; Tue, 18 May 2021 14:59:03 -0400
-X-MC-Unique: LSvapAV8PQWv0YsaYRwixg-1
+ us-mta-98--oKuxaE4Nhqt5xTqP29FOg-1; Tue, 18 May 2021 14:59:01 -0400
+X-MC-Unique: -oKuxaE4Nhqt5xTqP29FOg-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00050100C61D;
-        Tue, 18 May 2021 18:59:00 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09369192AB81;
+        Tue, 18 May 2021 18:58:59 +0000 (UTC)
 Received: from redhat.com (ovpn-113-225.phx2.redhat.com [10.3.113.225])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3A0F6100F49F;
-        Tue, 18 May 2021 18:59:00 +0000 (UTC)
-Date:   Tue, 18 May 2021 12:58:31 -0600
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 20D581037E81;
+        Tue, 18 May 2021 18:58:58 +0000 (UTC)
+Date:   Tue, 18 May 2021 12:58:37 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Shenming Lu <lushenming@huawei.com>
 Cc:     Cornelia Huck <cohuck@redhat.com>, Will Deacon <will@kernel.org>,
@@ -50,220 +50,216 @@ Cc:     Cornelia Huck <cohuck@redhat.com>, Will Deacon <will@kernel.org>,
         Jonathan Cameron <Jonathan.Cameron@huawei.com>,
         Barry Song <song.bao.hua@hisilicon.com>,
         <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
-Subject: Re: [RFC PATCH v3 3/8] vfio/type1: Add an MMU notifier to avoid
- pinning
-Message-ID: <20210518125831.153e039c.alex.williamson@redhat.com>
-In-Reply-To: <20210409034420.1799-4-lushenming@huawei.com>
+Subject: Re: [RFC PATCH v3 2/8] vfio/type1: Add a page fault handler
+Message-ID: <20210518125837.6de73631.alex.williamson@redhat.com>
+In-Reply-To: <20210409034420.1799-3-lushenming@huawei.com>
 References: <20210409034420.1799-1-lushenming@huawei.com>
-        <20210409034420.1799-4-lushenming@huawei.com>
+        <20210409034420.1799-3-lushenming@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 9 Apr 2021 11:44:15 +0800
+On Fri, 9 Apr 2021 11:44:14 +0800
 Shenming Lu <lushenming@huawei.com> wrote:
 
-> To avoid pinning pages when they are mapped in IOMMU page tables, we
-> add an MMU notifier to tell the addresses which are no longer valid
-> and try to unmap them.
-> 
+> VFIO manages the DMA mapping itself. To support IOPF (on-demand paging)
+> for VFIO (IOMMU capable) devices, we add a VFIO page fault handler to
+> serve the reported page faults from the IOMMU driver.
+>=20
 > Signed-off-by: Shenming Lu <lushenming@huawei.com>
 > ---
->  drivers/vfio/vfio_iommu_type1.c | 112 +++++++++++++++++++++++++++++++-
->  1 file changed, 109 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index ab0ff60ee207..1cb9d1f2717b 100644
+>  drivers/vfio/vfio_iommu_type1.c | 114 ++++++++++++++++++++++++++++++++
+>  1 file changed, 114 insertions(+)
+>=20
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_ty=
+pe1.c
+> index 45cbfd4879a5..ab0ff60ee207 100644
 > --- a/drivers/vfio/vfio_iommu_type1.c
 > +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -40,6 +40,7 @@
->  #include <linux/notifier.h>
->  #include <linux/dma-iommu.h>
->  #include <linux/irqdomain.h>
-> +#include <linux/mmu_notifier.h>
->  
->  #define DRIVER_VERSION  "0.2"
->  #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
-> @@ -69,6 +70,7 @@ struct vfio_iommu {
->  	struct mutex		lock;
->  	struct rb_root		dma_list;
->  	struct blocking_notifier_head notifier;
-> +	struct mmu_notifier	mn;
->  	unsigned int		dma_avail;
->  	unsigned int		vaddr_invalid_count;
->  	uint64_t		pgsize_bitmap;
-> @@ -1204,6 +1206,72 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
->  	return unlocked;
+> @@ -101,6 +101,7 @@ struct vfio_dma {
+>  	struct task_struct	*task;
+>  	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
+>  	unsigned long		*bitmap;
+> +	unsigned long		*iopf_mapped_bitmap;
+>  };
+> =20
+>  struct vfio_batch {
+> @@ -141,6 +142,16 @@ struct vfio_regions {
+>  	size_t len;
+>  };
+> =20
+> +/* A global IOPF enabled group list */
+> +static struct rb_root iopf_group_list =3D RB_ROOT;
+> +static DEFINE_MUTEX(iopf_group_list_lock);
+> +
+> +struct vfio_iopf_group {
+> +	struct rb_node		node;
+> +	struct iommu_group	*iommu_group;
+> +	struct vfio_iommu	*iommu;
+> +};
+> +
+>  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
+>  					(!list_empty(&iommu->domain_list))
+> =20
+> @@ -157,6 +168,10 @@ struct vfio_regions {
+>  #define DIRTY_BITMAP_PAGES_MAX	 ((u64)INT_MAX)
+>  #define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
+> =20
+> +#define IOPF_MAPPED_BITMAP_GET(dma, i)	\
+> +			      ((dma->iopf_mapped_bitmap[(i) / BITS_PER_LONG]	\
+> +			       >> ((i) % BITS_PER_LONG)) & 0x1)
+
+
+Can't we just use test_bit()?
+
+
+> +
+>  #define WAITED 1
+> =20
+>  static int put_pfn(unsigned long pfn, int prot);
+> @@ -416,6 +431,34 @@ static int vfio_iova_put_vfio_pfn(struct vfio_dma *d=
+ma, struct vfio_pfn *vpfn)
+>  	return ret;
 >  }
->  
-> +/* Unmap the IOPF mapped pages in the specified range. */
-> +static void vfio_unmap_partial_iopf(struct vfio_iommu *iommu,
-> +				    struct vfio_dma *dma,
-> +				    dma_addr_t start, dma_addr_t end)
+> =20
+> +/*
+> + * Helper functions for iopf_group_list
+> + */
+> +static struct vfio_iopf_group *
+> +vfio_find_iopf_group(struct iommu_group *iommu_group)
 > +{
-> +	struct iommu_iotlb_gather *gathers;
-> +	struct vfio_domain *d;
-> +	int i, num_domains = 0;
+> +	struct vfio_iopf_group *iopf_group;
+> +	struct rb_node *node;
 > +
-> +	list_for_each_entry(d, &iommu->domain_list, next)
-> +		num_domains++;
+> +	mutex_lock(&iopf_group_list_lock);
 > +
-> +	gathers = kzalloc(sizeof(*gathers) * num_domains, GFP_KERNEL);
-> +	if (gathers) {
-> +		for (i = 0; i < num_domains; i++)
-> +			iommu_iotlb_gather_init(&gathers[i]);
-> +	}
-
-
-If we're always serialized on iommu->lock, would it make sense to have
-gathers pre-allocated on the vfio_iommu object?
-
+> +	node =3D iopf_group_list.rb_node;
 > +
-> +	while (start < end) {
-> +		unsigned long bit_offset;
-> +		size_t len;
+> +	while (node) {
+> +		iopf_group =3D rb_entry(node, struct vfio_iopf_group, node);
 > +
-> +		bit_offset = (start - dma->iova) >> PAGE_SHIFT;
-> +
-> +		for (len = 0; start + len < end; len += PAGE_SIZE) {
-> +			if (!IOPF_MAPPED_BITMAP_GET(dma,
-> +					bit_offset + (len >> PAGE_SHIFT)))
-> +				break;
-
-
-There are bitmap helpers for this, find_first_bit(),
-find_next_zero_bit().
-
-
-> +		}
-> +
-> +		if (len) {
-> +			i = 0;
-> +			list_for_each_entry(d, &iommu->domain_list, next) {
-> +				size_t unmapped;
-> +
-> +				if (gathers)
-> +					unmapped = iommu_unmap_fast(d->domain,
-> +								    start, len,
-> +								    &gathers[i++]);
-> +				else
-> +					unmapped = iommu_unmap(d->domain,
-> +							       start, len);
-> +
-> +				if (WARN_ON(unmapped != len))
-
-The IOMMU API does not guarantee arbitrary unmap sizes, this will
-trigger and this exit path is wrong.  If we've already unmapped the
-IOMMU, shouldn't we proceed with @unmapped rather than @len so the
-device can re-fault the extra mappings?  Otherwise the IOMMU state
-doesn't match the iopf bitmap state.
-
-> +					goto out;
-> +			}
-> +
-> +			bitmap_clear(dma->iopf_mapped_bitmap,
-> +				     bit_offset, len >> PAGE_SHIFT);
-> +
-> +			cond_resched();
-> +		}
-> +
-> +		start += (len + PAGE_SIZE);
+> +		if (iommu_group < iopf_group->iommu_group)
+> +			node =3D node->rb_left;
+> +		else if (iommu_group > iopf_group->iommu_group)
+> +			node =3D node->rb_right;
+> +		else
+> +			break;
 > +	}
 > +
-> +out:
-> +	if (gathers) {
-> +		i = 0;
-> +		list_for_each_entry(d, &iommu->domain_list, next)
-> +			iommu_iotlb_sync(d->domain, &gathers[i++]);
-> +
-> +		kfree(gathers);
-> +	}
+> +	mutex_unlock(&iopf_group_list_lock);
+> +	return node ? iopf_group : NULL;
 > +}
+
+This looks like a pretty heavy weight operation per DMA fault.
+
+I'm also suspicious of this validity of this iopf_group after we've
+dropped the locking, the ordering of patches makes this very confusing.
+
 > +
->  static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+>  static int vfio_lock_acct(struct vfio_dma *dma, long npage, bool async)
 >  {
->  	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list));
-> @@ -3197,17 +3265,18 @@ static int vfio_iommu_type1_dma_map_iopf(struct iommu_fault *fault, void *data)
->  
->  	vaddr = iova - dma->iova + dma->vaddr;
->  
-> -	if (vfio_pin_page_external(dma, vaddr, &pfn, true))
-> +	if (vfio_pin_page_external(dma, vaddr, &pfn, false))
->  		goto out_invalid;
->  
->  	if (vfio_iommu_map(iommu, iova, pfn, 1, dma->prot)) {
-> -		if (put_pfn(pfn, dma->prot))
-> -			vfio_lock_acct(dma, -1, true);
-> +		put_pfn(pfn, dma->prot);
->  		goto out_invalid;
->  	}
->  
->  	bitmap_set(dma->iopf_mapped_bitmap, bit_offset, 1);
->  
-> +	put_pfn(pfn, dma->prot);
-> +
->  out_success:
->  	status = IOMMU_PAGE_RESP_SUCCESS;
->  
-> @@ -3220,6 +3289,43 @@ static int vfio_iommu_type1_dma_map_iopf(struct iommu_fault *fault, void *data)
->  	return 0;
+>  	struct mm_struct *mm;
+> @@ -3106,6 +3149,77 @@ static int vfio_iommu_type1_dirty_pages(struct vfi=
+o_iommu *iommu,
+>  	return -EINVAL;
 >  }
->  
-> +static void mn_invalidate_range(struct mmu_notifier *mn, struct mm_struct *mm,
-> +				unsigned long start, unsigned long end)
+> =20
+> +/* VFIO I/O Page Fault handler */
+> +static int vfio_iommu_type1_dma_map_iopf(struct iommu_fault *fault, void=
+ *data)
+
+=46rom the comment, this seems like the IOMMU fault handler (the
+construction of this series makes this difficult to follow) and
+eventually it handles more than DMA mapping, for example transferring
+faults to the device driver.  "dma_map_iopf" seems like a poorly scoped
+name.
+
 > +{
-> +	struct vfio_iommu *iommu = container_of(mn, struct vfio_iommu, mn);
-> +	struct rb_node *n;
+> +	struct device *dev =3D (struct device *)data;
+> +	struct iommu_group *iommu_group;
+> +	struct vfio_iopf_group *iopf_group;
+> +	struct vfio_iommu *iommu;
+> +	struct vfio_dma *dma;
+> +	dma_addr_t iova =3D ALIGN_DOWN(fault->prm.addr, PAGE_SIZE);
+> +	int access_flags =3D 0;
+> +	unsigned long bit_offset, vaddr, pfn;
 > +	int ret;
+> +	enum iommu_page_response_code status =3D IOMMU_PAGE_RESP_INVALID;
+> +	struct iommu_page_response resp =3D {0};
+> +
+> +	if (fault->type !=3D IOMMU_FAULT_PAGE_REQ)
+> +		return -EOPNOTSUPP;
+> +
+> +	iommu_group =3D iommu_group_get(dev);
+> +	if (!iommu_group)
+> +		return -ENODEV;
+> +
+> +	iopf_group =3D vfio_find_iopf_group(iommu_group);
+> +	iommu_group_put(iommu_group);
+> +	if (!iopf_group)
+> +		return -ENODEV;
+> +
+> +	iommu =3D iopf_group->iommu;
 > +
 > +	mutex_lock(&iommu->lock);
-> +
-> +	ret = vfio_wait_all_valid(iommu);
-> +	if (WARN_ON(ret < 0))
-> +		return;
 
-Is WARN_ON sufficient for this error condition?  We've been told to
-evacuate a range of mm, the device still has DMA access, we've removed
-page pinning.  This seems like a BUG_ON condition to me, we can't allow
-the system to continue in any way with pages getting unmapped from
-under the device.
+Again, I'm dubious of our ability to grab this lock from an object with
+an unknown lifecycle and races we might have with that group being
+detached or DMA unmapped.  Also, how effective is enabling IOMMU page
+faulting if we're serializing all faults within a container context?
 
 > +
-> +	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +		unsigned long start_n, end_n;
+> +	ret =3D vfio_find_dma_valid(iommu, iova, PAGE_SIZE, &dma);
+> +	if (ret < 0)
+> +		goto out_invalid;
 > +
-> +		if (end <= dma->vaddr || start >= dma->vaddr + dma->size)
-> +			continue;
+> +	if (fault->prm.perm & IOMMU_FAULT_PERM_READ)
+> +		access_flags |=3D IOMMU_READ;
+> +	if (fault->prm.perm & IOMMU_FAULT_PERM_WRITE)
+> +		access_flags |=3D IOMMU_WRITE;
+> +	if ((dma->prot & access_flags) !=3D access_flags)
+> +		goto out_invalid;
 > +
-> +		start_n = ALIGN_DOWN(max_t(unsigned long, start, dma->vaddr),
-> +				     PAGE_SIZE);
-> +		end_n = ALIGN(min_t(unsigned long, end, dma->vaddr + dma->size),
-> +			      PAGE_SIZE);
+> +	bit_offset =3D (iova - dma->iova) >> PAGE_SHIFT;
+> +	if (IOPF_MAPPED_BITMAP_GET(dma, bit_offset))
+> +		goto out_success;
+
+If the page is mapped, why did we get a fault?  Should we be returning
+success for a fault we shouldn't have received and did nothing to
+resolve?  We're also referencing a bitmap that has only been declared
+and never allocated at this point in the patch series.
+
 > +
-> +		vfio_unmap_partial_iopf(iommu, dma,
-> +					start_n - dma->vaddr + dma->iova,
-> +					end_n - dma->vaddr + dma->iova);
+> +	vaddr =3D iova - dma->iova + dma->vaddr;
+> +
+> +	if (vfio_pin_page_external(dma, vaddr, &pfn, true))
+> +		goto out_invalid;
+> +
+> +	if (vfio_iommu_map(iommu, iova, pfn, 1, dma->prot)) {
+> +		if (put_pfn(pfn, dma->prot))
+> +			vfio_lock_acct(dma, -1, true);
+> +		goto out_invalid;
 > +	}
 > +
-> +	mutex_unlock(&iommu->lock);
-> +}
+> +	bitmap_set(dma->iopf_mapped_bitmap, bit_offset, 1);
 > +
-> +static const struct mmu_notifier_ops vfio_iommu_type1_mn_ops = {
-> +	.invalidate_range	= mn_invalidate_range,
-> +};
+> +out_success:
+> +	status =3D IOMMU_PAGE_RESP_SUCCESS;
+> +
+> +out_invalid:
+> +	mutex_unlock(&iommu->lock);
+> +	resp.version		=3D IOMMU_PAGE_RESP_VERSION_1;
+> +	resp.grpid		=3D fault->prm.grpid;
+> +	resp.code		=3D status;
+> +	iommu_page_response(dev, &resp);
+> +	return 0;
+> +}
 > +
 >  static long vfio_iommu_type1_ioctl(void *iommu_data,
 >  				   unsigned int cmd, unsigned long arg)
 >  {
-
-Again, this patch series is difficult to follow because we're
-introducing dead code until the mmu notifier actually has a path to be
-registered.  We shouldn't be taking any faults until iopf is enabled,
-so it seems like we can add more of the core support alongside this
-code.
 
