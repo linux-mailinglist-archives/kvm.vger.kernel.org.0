@@ -2,222 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD1A038783C
-	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 14:01:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C37D6387845
+	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 14:01:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348946AbhERMBg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 May 2021 08:01:36 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13248 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1348925AbhERMBf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 May 2021 08:01:35 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14IBlY8m058093;
-        Tue, 18 May 2021 08:00:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=fDqI/9Bf4nbAzLJhSZmnuMVCjOZ+SR/1c4d5fB4+Kgw=;
- b=L/3EKFH7Dd2mJQ4vxiQX/fJaE1NCtB/pby1J1B0tylVMrvjDCTwlNNSjJHC4dxnp3L3a
- 7cjNkOzLI2A7Luo1trHdnIMrnAmwfZLD3v/RVhVlqTv634S+KnCzQw9qBCxdnLqPPue7
- fzV1QPGeRQPkSKdHDnKXfgjHgKEuAnXHbRN6FTlLMGpMJjaxwuM+bAl6E0/GhI6JAWks
- FoHiMmj6of2Cf1X8RLhWXoJv/31fxFeXxz0gqzrhanLZJuAzxv1yF1VJ8hW660oxHt59
- q9uFDq7rN7m9x3qaTLE0aAGdoCMqSv9MVOIiW4LLYztFoAlOJZ8ZxaN9OyMhW/0kM8CF bA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38md14g8h2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 May 2021 08:00:16 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14IBr4Ws095044;
-        Tue, 18 May 2021 08:00:15 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38md14g8ej-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 May 2021 08:00:15 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14IBwH4J000902;
-        Tue, 18 May 2021 12:00:13 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma02fra.de.ibm.com with ESMTP id 38mceh80f2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 May 2021 12:00:13 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14IC0Aew39518640
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 May 2021 12:00:10 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 20873A4040;
-        Tue, 18 May 2021 12:00:10 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9C98AA4081;
-        Tue, 18 May 2021 12:00:09 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.37.27])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 18 May 2021 12:00:09 +0000 (GMT)
-Subject: Re: [PATCH v1 01/11] KVM: s390: pv: leak the ASCE page when destroy
- fails
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, cohuck@redhat.com, borntraeger@de.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, david@redhat.com,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210517200758.22593-1-imbrenda@linux.ibm.com>
- <20210517200758.22593-2-imbrenda@linux.ibm.com>
- <13cb02d1-df3b-7994-8a31-99aacfd15566@linux.ibm.com>
- <20210518124027.48f36caa@ibm-vm>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <62e16545-d078-6d91-2370-e4e5677306c7@linux.ibm.com>
-Date:   Tue, 18 May 2021 14:00:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
-MIME-Version: 1.0
-In-Reply-To: <20210518124027.48f36caa@ibm-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: VWvI3ObC1yZIO9X-rdR8eWOQirAD2PrH
-X-Proofpoint-ORIG-GUID: wD2Tqk0huFotGSIbvIukuAjMqMMKGU6f
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-05-18_04:2021-05-18,2021-05-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- suspectscore=0 mlxlogscore=999 spamscore=0 bulkscore=0 priorityscore=1501
- lowpriorityscore=0 phishscore=0 clxscore=1015 impostorscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2105180082
+        id S1348982AbhERMCz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 May 2021 08:02:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49392 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233662AbhERMCu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 May 2021 08:02:50 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65F60C061573;
+        Tue, 18 May 2021 05:01:32 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id j6-20020a17090adc86b02900cbfe6f2c96so1419317pjv.1;
+        Tue, 18 May 2021 05:01:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=em3y75NXotaLU/AKtI4LMXPcEnf5Ld1kv/mHHILm70c=;
+        b=V/p4lH/6d5UguGqICWMegLeErmFH7naXSe4DlY8l+O9zRNBHKkp8LUKd2lN4M2qCZ/
+         Trfkad+GRBI0RamLpWK3ZyCmXmEqFbV6NJePLgTFCNJjgMHwGWgCRtKt00TIYG0joO4k
+         anoh6qGD6DuPuv5gV77s2MQLWPIO5Kx3XOTx+XtklL587DU3TGpUjnvGY3qK9Ntrg/IG
+         /cYtXr8tfUYW2Qkv/HpRerACyiOJdAlfcp0KaWDk0Yvlo+LjdkWl41LDnazF1MNDs5Bw
+         HlfGiR1kq7LWa2iaXyCbebVh9T/ue0MEoJ69JYBlgMZ0z8HSU8xW2H/p7ngeQ7Cqy9ni
+         eJLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=em3y75NXotaLU/AKtI4LMXPcEnf5Ld1kv/mHHILm70c=;
+        b=osG/hjTWDXsgCY9PgdzdlhEM9OlZzIHq+F1PmWpYyzmOZKKuoKD9Q13auMHnCGoK5B
+         2yM0hc5Cgo+8QjUGtRE59skDh8Mua0FsTb2pnPuq+ZGiemUIqri6cDoFO9ITdwpcl/qh
+         Hw32QwOH0dlztBCl3K/h6wpA8cjnEI7L5NyTWAghXn3yioj7jfoF2Y1KVq/VoHjBNUTv
+         AioiQY4z/eJvsiZgFrHAYgCirjEJiKleEXpczWCvShONyqWPM4+wyhNugJDqw1InUX+Y
+         gKb0JH55oSusiJTUz9cm0eeqwzAh3OrWX3E5QD20/trBoFxKjrOD6j7FchhE6VVUA6P6
+         xr0w==
+X-Gm-Message-State: AOAM5329CEqUv76cUaLUwUFubKkIzjj9ZkB5r3xycnMQqU2EEYVvUir9
+        SgwLLUiehss3a4CVC+EJbru/M3OX+Q0=
+X-Google-Smtp-Source: ABdhPJzuaIu1kDieJYdkyutSSE1hKoGm9LjVD+Vi0D2+YlF331ZxLvgY6I3C4fUQhe3dRm4RAN44MQ==
+X-Received: by 2002:a17:902:f203:b029:f0:d225:c6e4 with SMTP id m3-20020a170902f203b02900f0d225c6e4mr4271634plc.0.1621339291776;
+        Tue, 18 May 2021 05:01:31 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.53])
+        by smtp.googlemail.com with ESMTPSA id l20sm12757394pjq.38.2021.05.18.05.01.27
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 18 May 2021 05:01:31 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Ben Segall <bsegall@google.com>,
+        Venkatesh Srinivas <venkateshs@chromium.org>,
+        David Matlack <dmatlack@google.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Subject: [PATCH v4 1/5] KVM: exit halt polling on need_resched() for both book3s and generic halt-polling
+Date:   Tue, 18 May 2021 05:00:31 -0700
+Message-Id: <1621339235-11131-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/18/21 12:40 PM, Claudio Imbrenda wrote:
-> On Tue, 18 May 2021 12:26:51 +0200
-> Janosch Frank <frankja@linux.ibm.com> wrote:
-> 
->> On 5/17/21 10:07 PM, Claudio Imbrenda wrote:
->>> When the destroy configuration UVC fails, the page pointed to by the
->>> ASCE of the VM becomes poisoned, and, to avoid issues it must not be
->>> used again.
->>>
->>> Since the page becomes in practice unusable, we set it aside and
->>> leak it.  
->>
->> I think we need something a bit more specific.
->>
->> On creation of a protected guest the top most level of page tables are
->> marked by the Ultravisor and can only be used as top level page tables
->> for the protected guest that was created. If another protected guest
->> would re-use those pages for its top level page tables the UV would
->> throw errors.
->>
->> When a destroy fails the UV will not remove the markings so these
->> pages are basically unusable since we can't guarantee that they won't
->> be used for a guest ASCE in the future.
->>
->> Hence we choose to leak those pages in the very unlikely event that a
->> destroy fails.
-> 
-> it's more than that. the top level page, once marked, also cannot be
-> used as backing for the virtual and real memory areas donated with the
-> create secure configuration and create secure cpu UVCs.
-> 
-> and there might also other circumstances in which that page cannot be
-> used that I am not aware of
-> 
+From: Wanpeng Li <wanpengli@tencent.com>
 
-Even more reason to document it :)
+Inspired by commit 262de4102c7bb8 (kvm: exit halt polling on need_resched()
+as well), CFS_BANDWIDTH throttling will use resched_task() when there is just
+one task to get the task to block. It was likely allowing VMs to overrun their
+quota when halt polling. Due to PPC implements an arch specific halt polling
+logic, we should add the need_resched() checking there as well. This
+patch adds a helper function that to be shared between book3s and generic
+halt-polling loop.
 
->>
->> LGTM
->>
->>>
->>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
->>> ---
->>>  arch/s390/kvm/pv.c | 53
->>> +++++++++++++++++++++++++++++++++++++++++++++- 1 file changed, 52
->>> insertions(+), 1 deletion(-)
->>>
->>> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
->>> index 813b6e93dc83..e0532ab725bf 100644
->>> --- a/arch/s390/kvm/pv.c
->>> +++ b/arch/s390/kvm/pv.c
->>> @@ -150,6 +150,55 @@ static int kvm_s390_pv_alloc_vm(struct kvm
->>> *kvm) return -ENOMEM;
->>>  }
->>>  
->>> +/*
->>> + * Remove the topmost level of page tables from the list of page
->>> tables of
->>> + * the gmap.
->>> + * This means that it will not be freed when the VM is torn down,
->>> and needs
->>> + * to be handled separately by the caller, unless an intentional
->>> leak is
->>> + * intended.
->>> + */
->>> +static void kvm_s390_pv_remove_old_asce(struct kvm *kvm)
->>> +{
->>> +	struct page *old;
->>> +
->>> +	old = virt_to_page(kvm->arch.gmap->table);
->>> +	list_del(&old->lru);
->>> +	/* in case the ASCE needs to be "removed" multiple times */
->>> +	INIT_LIST_HEAD(&old->lru);  
->>
->> ?
->>
->>> +}
->>> +
->>> +/*
->>> + * Try to replace the current ASCE with another equivalent one.
->>> + * If the allocation of the new top level page table fails, the
->>> ASCE is not
->>> + * replaced.
->>> + * In any case, the old ASCE is removed from the list, therefore
->>> the caller
->>> + * has to make sure to save a pointer to it beforehands, unless an
->>> + * intentional leak is intended.
->>> + */
->>> +static int kvm_s390_pv_replace_asce(struct kvm *kvm)
->>> +{
->>> +	unsigned long asce;
->>> +	struct page *page;
->>> +	void *table;
->>> +
->>> +	kvm_s390_pv_remove_old_asce(kvm);
->>> +
->>> +	page = alloc_pages(GFP_KERNEL_ACCOUNT, CRST_ALLOC_ORDER);
->>> +	if (!page)
->>> +		return -ENOMEM;
->>> +	list_add(&page->lru, &kvm->arch.gmap->crst_list);
->>> +
->>> +	table = page_to_virt(page);
->>> +	memcpy(table, kvm->arch.gmap->table, 1UL <<
->>> (CRST_ALLOC_ORDER + PAGE_SHIFT)); +
->>> +	asce = (kvm->arch.gmap->asce & ~PAGE_MASK) | __pa(table);
->>> +	WRITE_ONCE(kvm->arch.gmap->asce, asce);
->>> +	WRITE_ONCE(kvm->mm->context.gmap_asce, asce);
->>> +	WRITE_ONCE(kvm->arch.gmap->table, table);
->>> +
->>> +	return 0;
->>> +}
->>> +
->>>  /* this should not fail, but if it does, we must not free the
->>> donated memory */ int kvm_s390_pv_deinit_vm(struct kvm *kvm, u16
->>> *rc, u16 *rrc) {
->>> @@ -164,9 +213,11 @@ int kvm_s390_pv_deinit_vm(struct kvm *kvm, u16
->>> *rc, u16 *rrc) atomic_set(&kvm->mm->context.is_protected, 0);
->>>  	KVM_UV_EVENT(kvm, 3, "PROTVIRT DESTROY VM: rc %x rrc %x",
->>> *rc, *rrc); WARN_ONCE(cc, "protvirt destroy vm failed rc %x rrc
->>> %x", *rc, *rrc);
->>> -	/* Inteded memory leak on "impossible" error */
->>> +	/* Intended memory leak on "impossible" error */
->>>  	if (!cc)
->>>  		kvm_s390_pv_dealloc_vm(kvm);
->>> +	else
->>> +		kvm_s390_pv_replace_asce(kvm);
->>>  	return cc ? -EIO : 0;
->>>  }
->>>  
->>>   
->>
-> 
+Reviewed-by: David Matlack <dmatlack@google.com>
+Reviewed-by: Venkatesh Srinivas <venkateshs@chromium.org>
+Cc: Ben Segall <bsegall@google.com>
+Cc: Venkatesh Srinivas <venkateshs@chromium.org>
+Cc: Jim Mattson <jmattson@google.com> 
+Cc: David Matlack <dmatlack@google.com>
+Cc: Paul Mackerras <paulus@ozlabs.org>
+Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+v3 -> v4:
+ * rename to kvm_vcpu_can_poll
+v2 -> v3:
+ * add a helper function
+v1 -> v2:
+ * update patch description
+
+ arch/powerpc/kvm/book3s_hv.c | 2 +-
+ include/linux/kvm_host.h     | 2 ++
+ virt/kvm/kvm_main.c          | 8 ++++++--
+ 3 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 28a80d240b76..7360350e66ff 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -3936,7 +3936,7 @@ static void kvmppc_vcore_blocked(struct kvmppc_vcore *vc)
+ 				break;
+ 			}
+ 			cur = ktime_get();
+-		} while (single_task_running() && ktime_before(cur, stop));
++		} while (kvm_vcpu_can_poll(cur, stop));
+ 
+ 		spin_lock(&vc->lock);
+ 		vc->vcore_state = VCORE_INACTIVE;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 2f34487e21f2..ba682f738a25 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1583,4 +1583,6 @@ static inline void kvm_handle_signal_exit(struct kvm_vcpu *vcpu)
+ /* Max number of entries allowed for each kvm dirty ring */
+ #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
+ 
++bool kvm_vcpu_can_poll(ktime_t cur, ktime_t stop);
++
+ #endif
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 6b4feb92dc79..62522c12beba 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2945,6 +2945,11 @@ update_halt_poll_stats(struct kvm_vcpu *vcpu, u64 poll_ns, bool waited)
+ 		vcpu->stat.halt_poll_success_ns += poll_ns;
+ }
+ 
++bool kvm_vcpu_can_poll(ktime_t cur, ktime_t stop)
++{
++	return single_task_running() && !need_resched() && ktime_before(cur, stop);
++}
++
+ /*
+  * The vCPU has executed a HLT instruction with in-kernel mode enabled.
+  */
+@@ -2973,8 +2978,7 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+ 				goto out;
+ 			}
+ 			poll_end = cur = ktime_get();
+-		} while (single_task_running() && !need_resched() &&
+-			 ktime_before(cur, stop));
++		} while (kvm_vcpu_can_poll(cur, stop));
+ 	}
+ 
+ 	prepare_to_rcuwait(&vcpu->wait);
+-- 
+2.25.1
 
