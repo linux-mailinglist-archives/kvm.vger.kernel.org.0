@@ -2,97 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 26AE73882D6
-	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 00:42:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16E503882E3
+	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 00:53:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352812AbhERWnh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 May 2021 18:43:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53920 "EHLO
+        id S1352821AbhERWyV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 May 2021 18:54:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352808AbhERWnh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 May 2021 18:43:37 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DCFEC06175F
-        for <kvm@vger.kernel.org>; Tue, 18 May 2021 15:42:18 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id t21so5945285plo.2
-        for <kvm@vger.kernel.org>; Tue, 18 May 2021 15:42:18 -0700 (PDT)
+        with ESMTP id S1352806AbhERWyV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 May 2021 18:54:21 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81F62C061573
+        for <kvm@vger.kernel.org>; Tue, 18 May 2021 15:53:02 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id n6-20020a17090ac686b029015d2f7aeea8so2432667pjt.1
+        for <kvm@vger.kernel.org>; Tue, 18 May 2021 15:53:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3XL3tmp4SlD8u+MURb+F7eYCl3cEQ2lvBi6aHFNGgpI=;
-        b=a8TzhFVWYyn0p8gHuauSaF9QAB44THnp4+DIPkJyEETzXJh1jxlquPY9Vl4r2rVW+4
-         Yo2+PnNdCMTjYPe5bgvECgGdwldO4llzgZTYUOyIYPNM0huStFyVZHD1s0TG388izkID
-         iItNKCGPaBhyMC9P9Ii1wEtzIXNi4yUspxpPdM0VK3pbtXpPhqVSCUGen/dTVHQorknP
-         wIfUGGh/XrMOAj4rz+qpXw7suPLE46kbWBisSY8d0JtWIvWpmohahiyPiKRmrwR1Q+2S
-         0P8XRr2L5w41dlXgVleurmGSWpXdNlmlvRL0HfvkFDDfcDQ5KlkvK751danidsYTKGyN
-         O+ew==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=dotWxrOp8K4nhTYCAIVDd9toWE3lkvpXCMU0xA+uEKo=;
+        b=Vm4hjviMk1po1J7O8GIWHEKhXBGcWvWq5kXlisVEr+ff+cjoXY5DvrT19j0NZkrwcj
+         WRdXPVZgN0v917mQyfqn4DmNd1d4AE6m6wPLz8LaBtcD19BkEI+fibBMuTzwSbxGjnDH
+         ToeOpa2ZMwesm1R9RmpD2vRnrC4uKBTpw9vFpWFLMLjUBUq/FXQk6P7p2kMCy0ibWjxI
+         8AP5/F78/x734XO538iTwEvWKAfLI0NhaUd85N4vf98z58cEQkfRcwUurM0NqjELY/i6
+         pZCd0xAs2HwyU+2Hlz1+nAQ7bvj75HOBGAIwjQ88PiZi1ECkNV9r7sRPs/vszlN7eZdg
+         NZ9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3XL3tmp4SlD8u+MURb+F7eYCl3cEQ2lvBi6aHFNGgpI=;
-        b=AKKE/tlA+jOqOT0o/dRoNqxafmHUn3Dh3yDoldfIODbw9XeJH+vFaWqAYrx6PsLonc
-         ta6v8LNDJY9iEkNg3YBMAtfpQabbfmXOxiTbnCtsrwucGxriBwTwPQpKrTNh8dZLMKoP
-         5f2B1DazoArNB+9MMp78WsFSC9loyH/CD8oPaVxRvxNFAvjm5m8LmBUWNf/X/OFPaK0g
-         V8a7/l2cF83Lrhz3ZBom0WUZ43EC6ISlSBDtD6snyXAZtDFhNs/r+v8Ful5Hq6zpZbnD
-         0eBek1gxbkvxIsQivj14xok3cDpDXeShPo8nv2ApLXg8y4GiE2mBfFwCzFMl7MCmMtcu
-         t8kQ==
-X-Gm-Message-State: AOAM5306jp7MNJ2aS5f1IVHLsP1Aq3rNfNeEb0K+swuVzklCG2gHcujq
-        bhUSvBXm3Oyc750xZm1Pjqn0O0nFDtvhtltvoe/M3Q==
-X-Google-Smtp-Source: ABdhPJxILffNNtWQEleAX3EcDbaS2hWIpOqyf1eMTbuGQWCjwjM2RKMZ4DT2Dd217Xr3Qi26abpUlLVRggmxQXklTDU=
-X-Received: by 2002:a17:90a:5288:: with SMTP id w8mr7573739pjh.170.1621377737935;
- Tue, 18 May 2021 15:42:17 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dotWxrOp8K4nhTYCAIVDd9toWE3lkvpXCMU0xA+uEKo=;
+        b=EGDqtaTh4D4P78iMvwgmV5rEHCEmZbBQK+w0swLKrahReKfXWRVnB/+r2gWXftbHQy
+         EB7H2MSstKvPF+OxCODD4STVgWhn+4ABpfG2++rWtqhL4bx0xIhS71DU/jMV8skbSIBc
+         Yri5f2lVAIW39/r94LGzABpBZrUtCE3dJ+fLMlWNIJIh18/2KDJH/FEIPUJEM5htLn4C
+         cb5feP/GbsRDv/dXJ8UJIcfq8cHLAuQWVSLUlNF7KMlaAw/tQJw1gxpQnxgkGTX2fiM/
+         MlSZoWPEIS1nSwbYPTj67BMVg2V21prOJ2vZHKirXe11gAFqu96USGPtolR59yLOCz8I
+         BfGA==
+X-Gm-Message-State: AOAM5316d5vMzW4EZd/w4L2VvxPjq2xBTtMXKSQk58O/szwSSjmXv+Ek
+        JnmGRMIjTrBAQtUGLh2jXPq6uw==
+X-Google-Smtp-Source: ABdhPJwLjao8AmZKDk6HAhx/sRqBwV7F3KweWJZpI0BPD7LL+uKMU+xDSyxXleSc8b7IkUBhycYQmQ==
+X-Received: by 2002:a17:90a:df0a:: with SMTP id gp10mr7756262pjb.27.1621378381944;
+        Tue, 18 May 2021 15:53:01 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id g89sm2661643pjg.30.2021.05.18.15.53.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 May 2021 15:53:01 -0700 (PDT)
+Date:   Tue, 18 May 2021 22:52:57 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ilias Stamatis <ilstam@amazon.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, mlevitsk@redhat.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        zamsden@gmail.com, mtosatti@redhat.com, dwmw@amazon.co.uk
+Subject: Re: [PATCH v2 02/10] KVM: X86: Store L1's TSC scaling ratio in
+ 'struct kvm_vcpu_arch'
+Message-ID: <YKRFSaktB4+tgFUH@google.com>
+References: <20210512150945.4591-1-ilstam@amazon.com>
+ <20210512150945.4591-3-ilstam@amazon.com>
 MIME-Version: 1.0
-References: <20210424004645.3950558-1-seanjc@google.com> <20210424004645.3950558-7-seanjc@google.com>
- <CAAeT=FzS0bP_7_wz6G6cL8-7pudTD7fhavLCVsOE0KnPXf99dQ@mail.gmail.com> <YKQiTlDG1sZ4Zd2E@google.com>
-In-Reply-To: <YKQiTlDG1sZ4Zd2E@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Tue, 18 May 2021 15:42:02 -0700
-Message-ID: <CAAeT=FzsXFNiteMB3sjskM401Ty4Ry_w80YcYB4ZYcZn0dqv5Q@mail.gmail.com>
-Subject: Re: [PATCH 06/43] KVM: x86: Properly reset MMU context at vCPU RESET/INIT
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210512150945.4591-3-ilstam@amazon.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > > +       if (kvm_cr0_mmu_role_changed(old_cr0, kvm_read_cr0(vcpu)) ||
-> > > +           kvm_cr4_mmu_role_changed(old_cr4, kvm_read_cr4(vcpu)))
-> > > +               kvm_mmu_reset_context(vcpu);
-> > >  }
-> >
-> > I'm wondering if kvm_vcpu_reset() should call kvm_mmu_reset_context()
-> > for a change in EFER.NX as well.
->
-> Oooh.  So there _should_ be no need.   Paging has to be enabled for EFER.NX to
-> be relevant, and INIT toggles CR0.PG 1=>0 if paging was enabled and so is
-> guaranteed to trigger a context reset.  And we do want to skip the context reset,
-> e.g. INIT-SIPI-SIPI when the vCPU has paging disabled should continue using the
-> same MMU.
->
-> But, kvm_calc_mmu_role_common() neglects to ignore NX if CR0.PG=0, and so the
-> MMU role will be stale if INIT clears EFER.NX without forcing a context reset.
-> However, that's benign from a functionality perspective because the context
-> itself correctly incorporates CR0.PG, it's only the role that's borked.  I.e.
-> KVM will fail to reuse a page/context due to the spurious role.nxe, but the
-> permission checks are always be correct.
->
-> I'll add a comment here and send a patch to fix the role calculation.
+On Wed, May 12, 2021, Ilias Stamatis wrote:
+> Store L1's scaling ratio in that struct like we already do for L1's TSC
 
-Thank you so much for the explanation !
-I understand your intention and why it would be benign.
+s/that struct/kvm_vcpu_arch.  Forcing the reader to look at the subject to
+understand the changelog is annoying, especially when it saves all of a handful
+of characters.  E.g. I often read patches without the subject in scope.
 
-Then, I'm wondering if kvm_cr4_mmu_role_changed() needs to be
-called here.  Looking at the Intel SDM, in my understanding,
-all the bits kvm_cr4_mmu_role_changed() checks are relevant
-only if paging is enabled.  (Or is my understanding incorrect ??)
+> offset. This allows for easy save/restore when we enter and then exit
+> the nested guest.
+> 
+> Signed-off-by: Ilias Stamatis <ilstam@amazon.com>
+> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
 
-Thanks,
-Reiji
+...
+
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 9b6bca616929..07cf5d7ece38 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -2185,6 +2185,7 @@ static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz, bool scale)
+>  
+>  	/* Guest TSC same frequency as host TSC? */
+>  	if (!scale) {
+> +		vcpu->arch.l1_tsc_scaling_ratio = kvm_default_tsc_scaling_ratio;
+>  		vcpu->arch.tsc_scaling_ratio = kvm_default_tsc_scaling_ratio;
+
+Looks like these are always set as a pair, maybe add a helper, e.g.
+
+static void kvm_set_l1_tsc_scaling_ratio(u64 ratio)
+{
+	vcpu->arch.l1_tsc_scaling_ratio = ratio;
+	vcpu->arch.tsc_scaling_ratio = ratio;
+}
+
+>  		return 0;
+>  	}
+> @@ -2211,7 +2212,7 @@ static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz, bool scale)
+>  		return -1;
+>  	}
+>  
+> -	vcpu->arch.tsc_scaling_ratio = ratio;
+> +	vcpu->arch.l1_tsc_scaling_ratio = vcpu->arch.tsc_scaling_ratio = ratio;
+>  	return 0;
+>  }
+>  
+> @@ -2223,6 +2224,7 @@ static int kvm_set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz)
+>  	/* tsc_khz can be zero if TSC calibration fails */
+>  	if (user_tsc_khz == 0) {
+>  		/* set tsc_scaling_ratio to a safe value */
+> +		vcpu->arch.l1_tsc_scaling_ratio = kvm_default_tsc_scaling_ratio;
+>  		vcpu->arch.tsc_scaling_ratio = kvm_default_tsc_scaling_ratio;
+>  		return -1;
+>  	}
+> @@ -2459,7 +2461,7 @@ static inline void adjust_tsc_offset_guest(struct kvm_vcpu *vcpu,
+>  
+>  static inline void adjust_tsc_offset_host(struct kvm_vcpu *vcpu, s64 adjustment)
+>  {
+> -	if (vcpu->arch.tsc_scaling_ratio != kvm_default_tsc_scaling_ratio)
+> +	if (vcpu->arch.l1_tsc_scaling_ratio != kvm_default_tsc_scaling_ratio)
+>  		WARN_ON(adjustment < 0);
+>  	adjustment = kvm_scale_tsc(vcpu, (u64) adjustment);
+>  	adjust_tsc_offset_guest(vcpu, adjustment);
+> -- 
+> 2.17.1
+> 
