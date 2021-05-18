@@ -2,67 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD210387A77
-	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 15:54:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05486387AA4
+	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 16:06:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343507AbhERNz6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 May 2021 09:55:58 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:34604 "EHLO mail.skyhub.de"
+        id S1349770AbhEROHX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 May 2021 10:07:23 -0400
+Received: from mga14.intel.com ([192.55.52.115]:40327 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S244964AbhERNzz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 May 2021 09:55:55 -0400
-Received: from zn.tnic (p200300ec2f0ae2009a42d70f2967689e.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:e200:9a42:d70f:2967:689e])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 029101EC050D;
-        Tue, 18 May 2021 15:54:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1621346075;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=u4eUluMRW6ql/XQGfzXi2XvOmvNCHQYvmwNvCKSF5go=;
-        b=e4A7xV00ipPerZAZZnidO8rIuXqQAptdKeIWdGsdBGFlbifHKflSDj18yhEkxz5tzO+PDh
-        4JCIEWF9hMQr7Ebg7T+hLJoF1fiWWp2E5XBV16Yf7wJdzih/Y46+1BBVmcE5SKS6PhaTm2
-        DnZf9es6K4iwVxQ/NKStQkq1+QF5TBk=
-Date:   Tue, 18 May 2021 15:54:29 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        tglx@linutronix.de, jroedel@suse.de, thomas.lendacky@amd.com,
-        pbonzini@redhat.com, mingo@redhat.com, dave.hansen@intel.com,
-        rientjes@google.com, seanjc@google.com, peterz@infradead.org,
-        hpa@zytor.com, tony.luck@intel.com
-Subject: Re: [PATCH Part1 RFC v2 06/20] x86/sev: Define SNP guest request NAE
- events
-Message-ID: <YKPHFXR+3t1HM38S@zn.tnic>
-References: <20210430121616.2295-1-brijesh.singh@amd.com>
- <20210430121616.2295-7-brijesh.singh@amd.com>
- <YKOaxBBAB/BJZmbY@zn.tnic>
- <d6736f33-721d-cbe5-eda2-eab7730db962@amd.com>
+        id S244785AbhEROHW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 May 2021 10:07:22 -0400
+IronPort-SDR: mvIvGkY4EEkezmry0/mCOpQuXV/sOyXe8+pbjk92ACcuoLEK0O0mZ33Jlozy8Wy2POcAh7oUFw
+ nmHmIEkOs32Q==
+X-IronPort-AV: E=McAfee;i="6200,9189,9987"; a="200413209"
+X-IronPort-AV: E=Sophos;i="5.82,310,1613462400"; 
+   d="scan'208";a="200413209"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2021 07:06:04 -0700
+IronPort-SDR: jC8sz1bNPimczh67OzWbwHkgHhSoGhxg1bBGuokQrEIPj/pXy9uCtGfPMd3vFO3xrxh9YSCeJE
+ 1HmNRlU2Nmrg==
+X-IronPort-AV: E=Sophos;i="5.82,310,1613462400"; 
+   d="scan'208";a="472969079"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.255.30.127]) ([10.255.30.127])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2021 07:06:00 -0700
+Subject: Re: [PATCH v6 07/16] KVM: x86/pmu: Reprogram PEBS event to emulate
+ guest PEBS counter
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, weijiang.yang@intel.com,
+        Kan Liang <kan.liang@linux.intel.com>, ak@linux.intel.com,
+        wei.w.wang@intel.com, eranian@google.com, liuxiangdong5@huawei.com,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        Like Xu <like.xu@linux.intel.com>
+References: <20210511024214.280733-1-like.xu@linux.intel.com>
+ <20210511024214.280733-8-like.xu@linux.intel.com>
+ <YKIz/J1HoOvbmR42@hirez.programming.kicks-ass.net>
+ <2d874bce-2823-13b4-0714-3de5b7c475f0@intel.com>
+ <YKPCxnKc1MGqXsJ4@hirez.programming.kicks-ass.net>
+From:   "Xu, Like" <like.xu@intel.com>
+Message-ID: <6f4061ef-1a3e-b21c-2dd1-051bb93c846f@intel.com>
+Date:   Tue, 18 May 2021 22:05:56 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <d6736f33-721d-cbe5-eda2-eab7730db962@amd.com>
+In-Reply-To: <YKPCxnKc1MGqXsJ4@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 18, 2021 at 08:42:44AM -0500, Brijesh Singh wrote:
-> This VMGEXIT is optional and is available only when the SNP feature is
-> advertised through HV_FEATURE VMGEXIT. The GHCB specification spells it
-> with the "SNP" prefix" to distinguish it from others. The other
-> "VMGEXIT's" defined in this file are available for both the SNP and ES
-> guests, so we don't need any prefixes.
+On 2021/5/18 21:36, Peter Zijlstra wrote:
+> On Tue, May 18, 2021 at 09:28:52PM +0800, Xu, Like wrote:
+>
+>>> How would pebs && !intr be possible?
+>> I don't think it's possible.
+> And yet you keep that 'intr||pebs' weirdness :/
+>
+>>> Also; wouldn't this be more legible
+>>> when written like:
+>>>
+>>> 	perf_overflow_handler_t ovf = kvm_perf_overflow;
+>>>
+>>> 	...
+>>>
+>>> 	if (intr)
+>>> 		ovf = kvm_perf_overflow_intr;
+>>>
+>>> 	...
+>>>
+>>> 	event = perf_event_create_kernel_counter(&attr, -1, current, ovf, pmc);
+>>>
+>> Please yell if you don't like this:
+>>
+>> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+>> index 711294babb97..a607f5a1b9cd 100644
+>> --- a/arch/x86/kvm/pmu.c
+>> +++ b/arch/x86/kvm/pmu.c
+>> @@ -122,6 +122,8 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc,
+>> u32 type,
+>>                  .config = config,
+>>          };
+>>          bool pebs = test_bit(pmc->idx, (unsigned long *)&pmu->pebs_enable);
+>> +       perf_overflow_handler_t ovf = (intr || pebs) ?
+>> +               kvm_perf_overflow_intr : kvm_perf_overflow;
+> This, that's exactly the kind of code I wanted to get rid of. ?: has
+> it's place I suppose, but you're creating dense ugly code for no reason.
+>
+> 	perf_overflow_handle_t ovf = kvm_perf_overflow;
+>
+> 	if (intr)
+> 		ovf = kvm_perf_overflow_intr;
+>
+> Is so much easier to read. And if you really worry about that pebs
+> thing; you can add:
+>
+> 	WARN_ON_ONCE(pebs && !intr);
+>
 
-Sure but are there any other VMGEXIT guest requests besides those two?
-If not, then they're unique so we can just as well drop the SNP prefix.
-Bottom line is, I'd like the code to be short and readable at a glance.
+Thanks!  Glad you could review my code.
+As a new generation, we do appreciate your patient guidance on your taste 
+in code.
 
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
