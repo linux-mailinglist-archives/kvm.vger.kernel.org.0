@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ACCA638784D
-	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 14:02:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8D73387850
+	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 14:02:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349025AbhERMDQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 May 2021 08:03:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49434 "EHLO
+        id S1349003AbhERMDU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 May 2021 08:03:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348967AbhERMC7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 May 2021 08:02:59 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6831C061573;
-        Tue, 18 May 2021 05:01:41 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id pi6-20020a17090b1e46b029015cec51d7cdso1409791pjb.5;
-        Tue, 18 May 2021 05:01:41 -0700 (PDT)
+        with ESMTP id S1348997AbhERMDC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 May 2021 08:03:02 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E400C061761;
+        Tue, 18 May 2021 05:01:44 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id b13so3477992pfv.4;
+        Tue, 18 May 2021 05:01:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=p6jAyFEHVFCxlZGpGxYbrWuXzrXvA1+9+mG4jRlrIQk=;
-        b=tqDT9KxazuovNRmwbS4IDOkVHtDo6mjoMa1uRcY3W2LdtNltNuSGmnD9tTl3RSQRPV
-         aQ40q/O/ydu3Y+oKrfdL8Grga0tnbpgOaQ/H7F+2BDsN/WI0LNNlNaQ7OSpCDa76b6Zt
-         zNIPVabi3l57HxgDO1vD/JsZWAZ47QxOOfEm9NrNrxsXoLQbYTm8pX1ag0ODn9yviFCx
-         iLXc4NAHQqB/9TpyZ12s/FfjZLVLOia3t/kfxgqSrdOMzLmJLR2DThE3+NMd54ITF8us
-         0zuq6SW+9Hf0wB9ZaKI4HMvSFxK8Q08syOS6UtQcM7P3MJmdfqM4e/6rkIDWPMNCE13E
-         t8Hw==
+        bh=soOUzbLJHd79dLzXUneFH08UM8yTlNutja4acLt0+qU=;
+        b=hIdVLuZbbk0swz4hpVBO5hP1ydSkuNP4SwlXYVJ4f2xrIqZy7KGaH9grl6v6LlNJLY
+         bDirjnkwMnbG96k6JaFACCjjPV3taK7feKB/DCqVY8eq4jpnFPXi3V5pOs3ZevSSzdaj
+         qXSii3s1GknciQzSYzAYHIsP951Uzqo6egApt9F8IVg0MfgNjio+FwycWiJSDO7nCHOv
+         08n40f/UU7WaAZY5IPClwkxtiRyiFD4z2Mh3id4MXy4nuKcyMZIqm0jl1uMxa4uYv0p1
+         ljY1NyOs1CbzGigFkjqB2GHMVfqaiPTF8oB7984LCCzOTS/8795Ug1xMRoddTNoyU2BW
+         K+Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=p6jAyFEHVFCxlZGpGxYbrWuXzrXvA1+9+mG4jRlrIQk=;
-        b=RCdIfmXn7beW5k4nJPNKJGKCK0+Dxoga/D/EF60MDE5TTn843KzJtV0X/2yoHMnHPx
-         cEGhghxDJziwVAPEjUz8JPQwHOYTK7bKO9wos3sP1pJT9XlAhhayhgykxpgTsdpn5IwT
-         bLK+3fQVjNQEQbB5pooswYYPLhhxY6wHygR9RPJ17OqOA8zgWtUikQ+MPQG0I3pNkVZ9
-         mTe/WVDpurGZ5UVE6/pzUlvAYadZZntaNrmxPvrXral5/Fo5rD2IBTRU7ZeL+luUTjL6
-         hEXgHsvPFSu/ub+szPZtjb4lyuw+Y4ogAzmICl/5emSsS033UqRw+2C6C41gQkZ3WZw5
-         b3Lg==
-X-Gm-Message-State: AOAM530DLRnn56OvMbSfwsNtPKYPXd3pzsBs0nAd5iXV0ncmzgk69LzD
-        fh4MJa7DppRU1XUFoAxGq/7teA1O/sk=
-X-Google-Smtp-Source: ABdhPJx3RfT9dV9jIXyfohnH4+VlEo/N3L8V1FP0l3Eoi6Fi1Sa88+ub7ujncc8i0vPmhKB89Z8WYQ==
-X-Received: by 2002:a17:90b:ed5:: with SMTP id gz21mr5200301pjb.102.1621339301043;
-        Tue, 18 May 2021 05:01:41 -0700 (PDT)
+        bh=soOUzbLJHd79dLzXUneFH08UM8yTlNutja4acLt0+qU=;
+        b=ncurSObIRNDrVewa6ONUlxk1LzWx1mCvkmL6Opcn9ytT/LM3eUi7WJCW3/lnBlnHz5
+         uMf5BRmw/a+FjG45hFa4gb06RoabrO1yM/FLGHEbafSyV+YkUN0LVEVxS4J3nW4xxdPc
+         Opq3lCK+Lpsf9imhArM6mSEUAlzr/LgWhMu/7h3XJmQ1Fze+bGnqkaCHaY5diD2usIHA
+         l7ojQ120r+Y5jUMN029Rn4PmPAsIrktN/SA5lOKQ2NLBuC0lMM+WABKFL8oUNm/P3E1I
+         z0KYAZPjhvcUPghWhidaVhJQobSZvN/GXbpZWKvTOrKi0H1GBV7pEzzr5WB8uVDRWBFH
+         YQMQ==
+X-Gm-Message-State: AOAM533lD7Rec7V1kmH4RXBlvIPz5AYZWGkMufDTgfiXRdusPkLUOxIW
+        uNlHJwburaF8y3sY3oBLabvkjfGc0tw=
+X-Google-Smtp-Source: ABdhPJztev0nvWB7p2r+uTPVQkH9uSr4620Rogko2ex6afamBnUY4Y+8h39mp42uX4FtDw+3fhQjsQ==
+X-Received: by 2002:a63:d744:: with SMTP id w4mr4791316pgi.76.1621339303764;
+        Tue, 18 May 2021 05:01:43 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.53])
-        by smtp.googlemail.com with ESMTPSA id l20sm12757394pjq.38.2021.05.18.05.01.38
+        by smtp.googlemail.com with ESMTPSA id l20sm12757394pjq.38.2021.05.18.05.01.41
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 18 May 2021 05:01:40 -0700 (PDT)
+        Tue, 18 May 2021 05:01:43 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
@@ -55,9 +55,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH v4 4/5] KVM: X86: hyper-v: Task srcu lock when accessing kvm_memslots()
-Date:   Tue, 18 May 2021 05:00:34 -0700
-Message-Id: <1621339235-11131-4-git-send-email-wanpengli@tencent.com>
+Subject: [PATCH v4 5/5] KVM: LAPIC: Narrow the timer latency between wait_lapic_expire and world switch
+Date:   Tue, 18 May 2021 05:00:35 -0700
+Message-Id: <1621339235-11131-5-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1621339235-11131-1-git-send-email-wanpengli@tencent.com>
 References: <1621339235-11131-1-git-send-email-wanpengli@tencent.com>
@@ -67,70 +67,49 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-   WARNING: suspicious RCU usage
-   5.13.0-rc1 #4 Not tainted
-   -----------------------------
-   ./include/linux/kvm_host.h:710 suspicious rcu_dereference_check() usage!
+Let's treat lapic_timer_advance_ns automatic tuning logic as hypervisor
+overhead, move it before wait_lapic_expire instead of between wait_lapic_expire 
+and the world switch, the wait duration should be calculated by the 
+up-to-date guest_tsc after the overhead of automatic tuning logic. This 
+patch reduces ~30+ cycles for kvm-unit-tests/tscdeadline-latency when testing 
+busy waits.
 
-  other info that might help us debug this:
-
-  rcu_scheduler_active = 2, debug_locks = 1
-   1 lock held by hyperv_clock/8318:
-    #0: ffffb6b8cb05a7d8 (&hv->hv_lock){+.+.}-{3:3}, at: kvm_hv_invalidate_tsc_page+0x3e/0xa0 [kvm]
-
-  stack backtrace:
-  CPU: 3 PID: 8318 Comm: hyperv_clock Not tainted 5.13.0-rc1 #4
-  Call Trace:
-   dump_stack+0x87/0xb7
-   lockdep_rcu_suspicious+0xce/0xf0
-   kvm_write_guest_page+0x1c1/0x1d0 [kvm]
-   kvm_write_guest+0x50/0x90 [kvm]
-   kvm_hv_invalidate_tsc_page+0x79/0xa0 [kvm]
-   kvm_gen_update_masterclock+0x1d/0x110 [kvm]
-   kvm_arch_vm_ioctl+0x2a7/0xc50 [kvm]
-   kvm_vm_ioctl+0x123/0x11d0 [kvm]
-   __x64_sys_ioctl+0x3ed/0x9d0
-   do_syscall_64+0x3d/0x80
-   entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-kvm_memslots() will be called by kvm_write_guest(), so we should take the srcu lock.
-
-Fixes: e880c6ea5 (KVM: x86: hyper-v: Prevent using not-yet-updated TSC page by secondary CPUs)
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- arch/x86/kvm/hyperv.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+v3 -> v4:
+ * consider automatic tuning is disabled and timer did not arrive early
+ * add a code comment
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index f98370a39936..f00830e5202f 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1172,6 +1172,7 @@ void kvm_hv_invalidate_tsc_page(struct kvm *kvm)
- {
- 	struct kvm_hv *hv = to_kvm_hv(kvm);
- 	u64 gfn;
-+	int idx;
+ arch/x86/kvm/lapic.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index c0ebef560bd1..5d91f2367c31 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1598,11 +1598,19 @@ static void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
+ 	guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
+ 	apic->lapic_timer.advance_expire_delta = guest_tsc - tsc_deadline;
  
- 	if (hv->hv_tsc_page_status == HV_TSC_PAGE_BROKEN ||
- 	    hv->hv_tsc_page_status == HV_TSC_PAGE_UNSET ||
-@@ -1190,9 +1191,16 @@ void kvm_hv_invalidate_tsc_page(struct kvm *kvm)
- 	gfn = hv->hv_tsc_page >> HV_X64_MSR_TSC_REFERENCE_ADDRESS_SHIFT;
- 
- 	hv->tsc_ref.tsc_sequence = 0;
++	if (lapic_timer_advance_dynamic) {
++		adjust_lapic_timer_advance(vcpu, apic->lapic_timer.advance_expire_delta);
++		/*
++		 * If the timer fired early, reread the TSC to account for the
++		 * overhead of the above adjustment to avoid waiting longer
++		 * than is necessary.
++		 */
++		if (guest_tsc < tsc_deadline)
++			guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
++	}
 +
-+	/*
-+	 * Take the srcu lock as memslots will be accessed to check the gfn
-+	 * cache generation against the memslots generation.
-+	 */
-+	idx = srcu_read_lock(&kvm->srcu);
- 	if (kvm_write_guest(kvm, gfn_to_gpa(gfn),
- 			    &hv->tsc_ref, sizeof(hv->tsc_ref.tsc_sequence)))
- 		hv->hv_tsc_page_status = HV_TSC_PAGE_BROKEN;
-+	srcu_read_unlock(&kvm->srcu, idx);
+ 	if (guest_tsc < tsc_deadline)
+ 		__wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
+-
+-	if (lapic_timer_advance_dynamic)
+-		adjust_lapic_timer_advance(vcpu, apic->lapic_timer.advance_expire_delta);
+ }
  
- out_unlock:
- 	mutex_unlock(&hv->hv_lock);
+ void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
 -- 
 2.25.1
 
