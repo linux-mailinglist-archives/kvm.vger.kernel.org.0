@@ -2,91 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C163F388260
-	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 23:47:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F2813882CB
+	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 00:37:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352613AbhERVsS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 May 2021 17:48:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37387 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236298AbhERVsR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 May 2021 17:48:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621374418;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FuWvlQIHVtiLs5PcrSK5tHyRzGUj0cP2/B1i7ADxOx4=;
-        b=EKwzM2Vs4eYuoyBLf45tS4ntFeIFU1P/HZYSry+ct8wsgIYG4uT4mWpeUdTCsAvtj4xsiu
-        KDCQ4xTjR41WDn5hHthcBTPl7seooodx0+iyR7KubslnVe3v5zsvyYBQ0dlE2dzbav11k5
-        ThK3l3ZqBoe/gYHgPZqbxZESLMIw3MQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-416-7fhLPdPRPAaQAtUZ5nyfNA-1; Tue, 18 May 2021 17:46:55 -0400
-X-MC-Unique: 7fhLPdPRPAaQAtUZ5nyfNA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 466A88186E1;
-        Tue, 18 May 2021 21:46:54 +0000 (UTC)
-Received: from redhat.com (ovpn-113-225.phx2.redhat.com [10.3.113.225])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4FF2960877;
-        Tue, 18 May 2021 21:46:47 +0000 (UTC)
-Date:   Tue, 18 May 2021 15:46:47 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yang Yingliang <yangyingliang@huawei.com>
-Cc:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <eric.auger@redhat.com>
-Subject: Re: [PATCH -next] vfio: platform: reset: add missing iounmap() on
- error in vfio_platform_amdxgbe_reset()
-Message-ID: <20210518154647.6541bac2.alex.williamson@redhat.com>
-In-Reply-To: <20210513050924.627625-1-yangyingliang@huawei.com>
-References: <20210513050924.627625-1-yangyingliang@huawei.com>
+        id S1352781AbhERWiW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 May 2021 18:38:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52714 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1352773AbhERWiV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 May 2021 18:38:21 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30332C061573
+        for <kvm@vger.kernel.org>; Tue, 18 May 2021 15:37:03 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id k5so6309577pjj.1
+        for <kvm@vger.kernel.org>; Tue, 18 May 2021 15:37:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ErYWLyExEuHgygjqniSukEyiBQDpGUTXfvaJIDoXeZ8=;
+        b=B45vMhf2Sh7k8DFsMCvVfJjP97JbxlYZhUBQe40WF631th1jdvO5xcR0NwLsM6xmZ/
+         OBFI6aZbhHTDUct0J0bF6me+ITM483gD1TK4KcNvcN+CLPJ5Wiv+0XOnXfIjyODLHlps
+         y0kHY69e2q+PF21u7tdyWBe5g/Ul9MGFB732qtoJ1dl8rbCvmxDk99/Fp6wgOQoWvP6k
+         P0CLHb33oLB856ISGTHEax+pgCwg4KVd21HooUXvvlS0pFX5nuMKBFjzVQDwAT52UNuN
+         JEYnlJBQI5i9Vm5RCQdkwA32pIa3Mdf8KqUU6p/NBuGfu7fNt2oiHXXkGkSq4xld4vT/
+         GUsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ErYWLyExEuHgygjqniSukEyiBQDpGUTXfvaJIDoXeZ8=;
+        b=jTi9+lfFDsDxEBOinIFx7l9bZbf2FYpHxlCOl7dSUfBO/BHsESy6ZMMwzJyPApHSaj
+         MMM4GCFfJz/c4wdZCmFBgK8JFxsIIhiPqDpcaQn3WVbmPQ0/8wfgSCIN42RO5yO1tFKi
+         7d9WBZOyAsFuizmbVDr6Of8ahryPvxnXaF7bYDz6PAXDzw+6PH67tpTlTCi1tzT1YPL0
+         NbEno/6u2pvlCVz5B+kOGvewaNAKJQSoqO4hZXmkQE8A7WdyTf2KWYoHvf33EVCMqq4a
+         5jkvG/Ahc9T2/m/p5wsVxxZtEasEkFyP3TzuKMt6JjUDJ68s3mCQ+Lm0dbI0ZsO1jeMd
+         1eUg==
+X-Gm-Message-State: AOAM533c8k1g2urn/rTBFGbsV9ZNzcSE913o8kR9aJLxop37/vX1dR2X
+        4ukw5vbeqT9Lc3JoVFOJTgYGPw==
+X-Google-Smtp-Source: ABdhPJzmWfrT1mZ2JQVyt3Hix2SH44mhR3YvHd/95Jvgq+OwAsGfPbhPR1gFC0jClAMbSWGpXmYgHA==
+X-Received: by 2002:a17:90a:8d82:: with SMTP id d2mr7880767pjo.200.1621377422589;
+        Tue, 18 May 2021 15:37:02 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id r11sm13583901pgl.34.2021.05.18.15.37.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 May 2021 15:37:01 -0700 (PDT)
+Date:   Tue, 18 May 2021 22:36:58 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ilias Stamatis <ilstam@amazon.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, mlevitsk@redhat.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        zamsden@gmail.com, mtosatti@redhat.com, dwmw@amazon.co.uk
+Subject: Re: [PATCH v2 01/10] math64.h: Add mul_s64_u64_shr()
+Message-ID: <YKRBilQy9K95EJIP@google.com>
+References: <20210512150945.4591-1-ilstam@amazon.com>
+ <20210512150945.4591-2-ilstam@amazon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210512150945.4591-2-ilstam@amazon.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 13 May 2021 13:09:24 +0800
-Yang Yingliang <yangyingliang@huawei.com> wrote:
+On Wed, May 12, 2021, Ilias Stamatis wrote:
+> This function is needed for the nested TSC scaling code where we need to
 
-> Add the missing iounmap() before return from vfio_platform_amdxgbe_reset()
-> in the error handling case.
-> 
-> Fixes: 0990822c9866 ("VFIO: platform: reset: AMD xgbe reset module")
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
-> ---
->  drivers/vfio/platform/reset/vfio_platform_amdxgbe.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c b/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c
-> index abdca900802d..c6d823a27bd6 100644
-> --- a/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c
-> +++ b/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c
-> @@ -61,8 +61,10 @@ static int vfio_platform_amdxgbe_reset(struct vfio_platform_device *vdev)
->  	if (!xpcs_regs->ioaddr) {
->  		xpcs_regs->ioaddr =
->  			ioremap(xpcs_regs->addr, xpcs_regs->size);
-> -		if (!xpcs_regs->ioaddr)
-> +		if (!xpcs_regs->ioaddr) {
-> +			iounmap(xgmac_regs->ioaddr);
->  			return -ENOMEM;
-> +		}
->  	}
->  
->  	/* reset the PHY through MDIO*/
+s/the nested/KVM's nested virtualization.  Non-KVM folk will have no idea what
+"nested" means without context.  They may know not what nested virtualization is,
+but this will at least give them a starting point for asking the right questions.
 
-This actually introduces multiple bugs.  vfio-platform has common code
-for calling iounmap when the device is released and the struct
-vfio_platform_region ioaddr member is re-used throughout the code.
-Performing an iounmap() without setting the value to NULL essentially
-introduces use-after-free and double free bugs.  There's no bug in the
-original afaict, the iounmap occurs lazily on release.  Thanks,
-
-Alex
-
+> multiply the signed TSC offset with the unsigned TSC multiplier.
