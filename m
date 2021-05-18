@@ -2,256 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 11F76387BEE
-	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 17:06:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 56434387C87
+	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 17:36:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344884AbhERPIM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 May 2021 11:08:12 -0400
-Received: from mail-dm6nam11on2089.outbound.protection.outlook.com ([40.107.223.89]:31841
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1343837AbhERPIL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 May 2021 11:08:11 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZXrfaZ8je2eo8lLRAJDgS2Yc5BKQfU2Hhk1pHazMkurwdUzgCscFFBxsyVDhhQsrQKJYN7VgZ0m8mV/4uMuTIrFqttwNNGr5dqJUKMs8Gad4BuHYgrONihw1rltTl+GvaPbqIB2mW3hNH2XolFx73PHelfFIhIpf10I6oNIUQdu3p3AWWDkqsfwcPP8VMh3+tMwL86qz0wUX73kmApKU5aJ1afDJR1VwdDBQGIVN67on6PFffOGA+P/a+W1zWI1d2scdhyyGRduu7iJFRh/HmkaGZiba0XFwzrAsS2rifskVnW3TKa/c8a91ifTcRFQuf1q6zuOuEP0YBDZ4o2rkAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oUl2OUJpG53WwgMA/wXWJysqxnfbiE/gECjORRXH3cU=;
- b=UpofbwSL3YL2JkGjUZvPt1N31huFA36Vuj7tPMdkGrsIiW9NVD0iCHaYJfkojHHInCeOMiNdhWz2cisxkl50QeZX314pXO2VG/Qt1ozc9/bE1GrZ8iQXnQDaLl6OaZ/9nItWdhXX+gLy/bUi0dVWZWyOIjUmK3VNpydcb893POkGLyGTkiDDUACrJMiVqufZv7gQqwm40zO7NvBN43TGqQAg7KyIvgn5AxlhI9V2kncGIvGSqZyxGzurWb2yu/3hWpy7YTyv2TusZ1fUF34PsjTiU7eqYDt8wQrjAzHRO7VkhTw6ErbhY67fFwEfs/zSXbUry6eA4/TYj5M8zkZqew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oUl2OUJpG53WwgMA/wXWJysqxnfbiE/gECjORRXH3cU=;
- b=cc5mPZeFVLEvF+QA0Fb7CpaV14V9grRHz8Xm0Zsf/OyE+uNe9t9ogWdDbqVz34QXfsykw/ixqPNanM5w6M/HJdWszKRwWX+vWL/PVWdDl3w0e9ZVquu775mxQ3P4vTdghL27beLTnz9XVqCw/tE9Kx9esA80CaS//lPaarVX69A=
-Authentication-Results: intel.com; dkim=none (message not signed)
- header.d=none;intel.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN1PR12MB2542.namprd12.prod.outlook.com (2603:10b6:802:26::28) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4129.26; Tue, 18 May
- 2021 15:06:51 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4129.032; Tue, 18 May 2021
- 15:06:51 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        tglx@linutronix.de, jroedel@suse.de, thomas.lendacky@amd.com,
-        pbonzini@redhat.com, mingo@redhat.com, dave.hansen@intel.com,
-        rientjes@google.com, seanjc@google.com, peterz@infradead.org,
-        hpa@zytor.com, tony.luck@intel.com
-Subject: Re: [PATCH Part1 RFC v2 05/20] x86/sev: Define SNP Page State Change
- VMGEXIT structure
-To:     Borislav Petkov <bp@alien8.de>
-References: <20210430121616.2295-1-brijesh.singh@amd.com>
- <20210430121616.2295-6-brijesh.singh@amd.com> <YKOZxMusqBLL1nP6@zn.tnic>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <23f69827-4279-34ca-e8b6-655963c28c49@amd.com>
-Date:   Tue, 18 May 2021 10:06:48 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.0
-In-Reply-To: <YKOZxMusqBLL1nP6@zn.tnic>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [70.112.153.56]
-X-ClientProxiedBy: SN4PR0201CA0029.namprd02.prod.outlook.com
- (2603:10b6:803:2e::15) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        id S1350214AbhERPhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 May 2021 11:37:55 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14542 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238479AbhERPhy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 May 2021 11:37:54 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14IFYA98148886;
+        Tue, 18 May 2021 11:36:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=xcmSylA/4hUoFFzBr2LoBqnjvfn030uzm3Pt7CxycYs=;
+ b=JxXOtaG0vMCFaIJbi/sn+LZvxTTOOCd3rODVUUSIG0MWgUiB36Wc3zkpxh/tfJVZxwb/
+ jdyZLKsF8teVzdFcov/9feg4Zl9YdYskZMARpcanLI9gxIvx3ee4Sayj4Bxy7AXTW45Y
+ ZqXY1Wel4F7ouhN5r2Q8Ekjkirw3u2ksHhb7ZqtTR0jb1X8pdYBJ0VrWco0fCQ2KiAZK
+ EV9uLaRYkWo1pFLRTX3qlGGvtukl/w0FDMakI3iaAdJ54y5/JI8vxrId3Ojz38jUojpO
+ OAlVsLU2UOJ1Oc5Lsmz24s+oBXIS9DH13xY1kz9oNcZ5TbYFpNI80aLwS3G2JBrovBQ3 LQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38me9u4wtu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 May 2021 11:36:31 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14IFYiRD160652;
+        Tue, 18 May 2021 11:36:30 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38me9u4wsm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 May 2021 11:36:30 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14IFZoW1016117;
+        Tue, 18 May 2021 15:36:29 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03ams.nl.ibm.com with ESMTP id 38j5x7sk0p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 May 2021 15:36:29 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14IFaQbR37093754
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 May 2021 15:36:26 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 33ED95204F;
+        Tue, 18 May 2021 15:36:26 +0000 (GMT)
+Received: from ibm-vm (unknown [9.145.14.34])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id C474E5204E;
+        Tue, 18 May 2021 15:36:25 +0000 (GMT)
+Date:   Tue, 18 May 2021 17:36:24 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, david@redhat.com,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 00/11] KVM: s390: pv: implement lazy destroy
+Message-ID: <20210518173624.13d043e3@ibm-vm>
+In-Reply-To: <20210518170537.58b32ffe.cohuck@redhat.com>
+References: <20210517200758.22593-1-imbrenda@linux.ibm.com>
+        <20210518170537.58b32ffe.cohuck@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SN4PR0201CA0029.namprd02.prod.outlook.com (2603:10b6:803:2e::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4108.25 via Frontend Transport; Tue, 18 May 2021 15:06:50 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 87d41f40-742f-48cc-a56c-08d91a0e90f4
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2542:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB25428A8E79B6DC99D31AA1AAE52C9@SN1PR12MB2542.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:935;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wHztSNlNHujwpZ7Jr0nvmvysru9qMdESORMvwMa2hX6S05BnbIT9B+0XiMDyqlpOQScI0Ut/PbJLMb2fneNwyfzrwRaEOm7n6+9sFz7Fo0X1+O2PJq1LfMFDYxX7USpTJ8JYf9iOWRj5p7mFR4TMNDVfXPHTGtXfjAns1i6Bg0GOu0DPpfrcJzcM8ldZ5rkefJ4zZ9aU03nr4J7zVXqEHKcg0i0Pr350Xkb4mbpxjgwPf19lh7uG/2Jiew8yejCnCMy31vTDbzWoM5ICqVf9GJCXXit9Ivw3MJf+LGNuAq6INk6ohJTsbLklqFSbSor4wMsdPmxfHwoFdRJVFI3A8ei2wGCoMxHhtloWOa6hlNErY8P7MroGlDe91AtzMmeKuFVvT3XEUPy9ERywvniTe4j5BDDXU2Ahz6b5dbbzz0ZMkD0+4nHv8U3BsTwv0n+AtqNpMIXmlYMT7xI/TnhPB4q5corcfH5Y+VorajsV6aJK2G+SW6fISdEXwoKcsHMJBjO09ZAYrts7h7AGQH+WjlROYf7mnld9017LS6au3wgywv38Fa4y4xvn263b+FCbejFYsCNSKQ8G+NJq62EcgB6/NhnDVVh75DZmpK0SseF4YzOnuEBtk4r1A6NREr5PpCimnHVRCP0SXHL7kOcA/taGJ5ifu4i8PDMnsA/AROjQLapqEsJmZ1cLLB/VRnW8wkJSfaitoR69fdDbcgysPsDZ99Ty2TTJubH08TCxJEc=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(136003)(366004)(346002)(376002)(396003)(2616005)(6512007)(44832011)(956004)(38350700002)(38100700002)(83380400001)(316002)(6916009)(2906002)(86362001)(26005)(66476007)(66556008)(36756003)(8936002)(186003)(66946007)(6486002)(52116002)(31686004)(31696002)(4326008)(478600001)(53546011)(8676002)(6506007)(16526019)(7416002)(5660300002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?RHpLYm1LOUhWckJJc0JtWXMxclZBL3ZkaXhQT2dJRi9wSWtmZXFVWWNzUy9j?=
- =?utf-8?B?ZDN4WW9uMjQrTStTRCtoRnBzUUtGOGhJbVQwanRpdE5WYTVjTjlxQ3Byb3pz?=
- =?utf-8?B?ckJZZ2FaY0NSNXdZKzdhbkJWVXZ5a29pWERBeDNWOGx5dUlVaHhGbnJIMzJw?=
- =?utf-8?B?Y0NoWStzTUI5VnN0RkRTYlJmdG40WTI0NkpZbmszRVpVYllDM1FDNysvanVl?=
- =?utf-8?B?ZzVacE5XVDB3MmxBZTRGWGRWdHpFTkc5TzFjbXkrZFVEOStGRGt1dFhDV1Jz?=
- =?utf-8?B?UWRlKzUvVmM3cTg2VkNIZzJGTlNpeDN5c0ZReDI3QzRtaHBhZ055VmZ1V2l4?=
- =?utf-8?B?b1V0L1lsb0kwcllRaFhWMmVITmQvWjlHRXFoNDNzaHcwdWZ1TDJNQThpN3Iv?=
- =?utf-8?B?dVd5SWZSclNTV1VBcmt3TlpaTXpLN1Q4YXRJT3VZeVlZbGZ6U0JsSVpzU2hC?=
- =?utf-8?B?RnkzYkx0L1Y0UlRGRFlOemVCMUpNRzBrMjJGQ2dyZGJZSGFzeHJvSUFvVTcv?=
- =?utf-8?B?MGI2Tk9kVVJoNVlDQ2ZzcGZ4K01xOUQrd0cyZzRtVXhPZmhLOWhUeUgxLzZ0?=
- =?utf-8?B?blRyd0lXS2tiaHEwZ0V4UUJGcjBpMGtiSE5iWmh3c08zVFl5Y3ZSSzFscHFr?=
- =?utf-8?B?cGUxQmlrbWVhWW00blZOSnVNNUdnTmJGTi9nQndackl3MkttcVN6WEdReVRs?=
- =?utf-8?B?RnpSc0V4U0UyQTdXSHorejdsb1p5N2pJTWJQS04vSGNxZVZNNmgrOUIxMWJY?=
- =?utf-8?B?SnhCaVRTTW1BazVYVkh6STU0QlRNSmJOc0VORyt2RWMwbFl4ZURNUW9vc0Fn?=
- =?utf-8?B?VE0vaCtBcGxvQktwazBSQmlIMXJSUkw0Y0ZLVGNYMjREZ2hWUWdsODFWUGZ0?=
- =?utf-8?B?UDMrejhwYkl0Umd4dk9zQXVrQm40cCtlWkpPRG5SZTVzUDJuL1NOeXFjbFVZ?=
- =?utf-8?B?M3pDd3VBTEkvQTlhUXgrMFdoVWdPb2xCUll3V1dlTEZwZ3JvYXR6OGZadEVO?=
- =?utf-8?B?SzFKbGR5VjV2Z3RrMFhKM20zcTNtdnpMeldoVWZRbnZLU3V3N2ZWRGEwS3dn?=
- =?utf-8?B?NU9RalNGajNnbjNiTG5FMVBMTW9YdWRETUhUczBKK05TeWE2ME5XdGZRaWlB?=
- =?utf-8?B?TFlnTGMvM3BRQVk4blRCSERtaWpxMlB2MzRNWVdzNytPSjBvcEtpTm5rd3VN?=
- =?utf-8?B?Rm1zSXdUUW42Z2ZIa2I2bW1USUNIcVk3Q25kbjJlL09INUZ1Q1paajUzcm1O?=
- =?utf-8?B?bDAxWnIxNDdKdnFEUVdqcTduNWxkME1JeUtzY2N5dlF3NUVZQitwOVBuL2xE?=
- =?utf-8?B?VmNERXhWV2xFaHljcnA0ZEFJb0hva0FvRFZzcWpqbkd2N0tZOUZhaGlpellR?=
- =?utf-8?B?NGFIVDVQakl6cEFXQjF4aWx4MVlvNmFqVVhhMTcyMjBUSEM3Znk3djQrZjRx?=
- =?utf-8?B?OXErOHZqSngrQm5IV1hMUzhUb0k3VTNKVFhHZytjNzE0SEFHU2U4UzhQN0NG?=
- =?utf-8?B?alg1TGQvSG04ZjRrMGtnYnZGSnlLSndINDVjTktabkF4bEdGclpJMzN2VDBQ?=
- =?utf-8?B?S0lSMXNEdXY2UTRJMC8zcHE3TUNmODRwUmh3ejgrazZiSWYrR1RpMlJuSzhk?=
- =?utf-8?B?MFhEL0NHcnVPQ0JqcC9kdGlGUmwzeE5YK0tNSEpZUjJPUlNuQXIwZXNscXRC?=
- =?utf-8?B?eGhBMVBITlFGNGpWdnJ4U0RtTXVCM2tZbUV3NXF3VkFjbFlvWFFXbHh6RlN3?=
- =?utf-8?Q?396NsC7mzDm4iXa223RwwSKnRKW6JZ/r3qwH25F?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 87d41f40-742f-48cc-a56c-08d91a0e90f4
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2021 15:06:51.5241
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MxItwskaISwfm8Y13oZGh4TZfleULPfNqLixLHG+FEcxkR1alf8mQ2KrbFwakwIfOdUK3DMch1zAWpp114VY5w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2542
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: SlwbSI_7HWxHxEdtH9xjyhEamKTw-7I7
+X-Proofpoint-ORIG-GUID: 75XW01xijpZLMP_SZ34jtcS81s4v_6De
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-18_07:2021-05-18,2021-05-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 impostorscore=0 suspectscore=0 clxscore=1015
+ mlxlogscore=953 phishscore=0 mlxscore=0 adultscore=0 spamscore=0
+ priorityscore=1501 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2104190000 definitions=main-2105180111
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 18 May 2021 17:05:37 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-On 5/18/21 5:41 AM, Borislav Petkov wrote:
-> On Fri, Apr 30, 2021 at 07:16:01AM -0500, Brijesh Singh wrote:
->> An SNP-active guest will use the page state change NAE VMGEXIT defined in
->> the GHCB specification to ask the hypervisor to make the guest page
->> private or shared in the RMP table. In addition to the private/shared,
->> the guest can also ask the hypervisor to split or combine multiple 4K
->> validated pages as a single 2M page or vice versa.
->>
->> See GHCB specification section Page State Change for additional
->> information.
->>
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->> ---
->>  arch/x86/include/asm/sev-common.h | 46 +++++++++++++++++++++++++++++++
->>  arch/x86/include/uapi/asm/svm.h   |  2 ++
->>  2 files changed, 48 insertions(+)
->>
->> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
->> index 8142e247d8da..07b8612bf182 100644
->> --- a/arch/x86/include/asm/sev-common.h
->> +++ b/arch/x86/include/asm/sev-common.h
->> @@ -67,6 +67,52 @@
->>  #define GHCB_HV_FEATURES_SNP_RESTRICTED_INJECTION_TIMER		\
->>  		(BIT_ULL(3) | GHCB_HV_FEATURES_SNP_RESTRICTED_INJECTION)
->>  
->> +/* SNP Page State Change */
->> +#define GHCB_MSR_PSC_REQ		0x014
->> +#define SNP_PAGE_STATE_PRIVATE		1
->> +#define SNP_PAGE_STATE_SHARED		2
->> +#define SNP_PAGE_STATE_PSMASH		3
->> +#define SNP_PAGE_STATE_UNSMASH		4
->> +#define GHCB_MSR_PSC_GFN_POS		12
->> +#define GHCB_MSR_PSC_GFN_MASK		0xffffffffffULL
-> Why don't you use GENMASK_ULL() as I suggested? All those "f"s are
-> harder to count than seeing the start and end of a mask.
->
->> +#define GHCB_MSR_PSC_OP_POS		52
-> Also, having defines for 12 and 52 doesn't make it more readable,
-> frankly.
->
-> When I see GENMASK_ULL(51, 12) it is kinda clear what it is. With the
-> defines, I have to go chase every define and replace it with the number
-> mentally.
+> On Mon, 17 May 2021 22:07:47 +0200
+> Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
+> 
+> > Previously, when a protected VM was rebooted or when it was shut
+> > down, its memory was made unprotected, and then the protected VM
+> > itself was destroyed. Looping over the whole address space can take
+> > some time, considering the overhead of the various Ultravisor Calls
+> > (UVCs).  This means that a reboot or a shutdown would take a
+> > potentially long amount of time, depending on the amount of used
+> > memory.
+> > 
+> > This patchseries implements a deferred destroy mechanism for
+> > protected guests. When a protected guest is destroyed, its memory
+> > is cleared in background, allowing the guest to restart or
+> > terminate significantly faster than before.
+> > 
+> > There are 2 possibilities when a protected VM is torn down:
+> > * it still has an address space associated (reboot case)
+> > * it does not have an address space anymore (shutdown case)
+> > 
+> > For the reboot case, the reference count of the mm is increased, and
+> > then a background thread is started to clean up. Once the thread
+> > went through the whole address space, the protected VM is actually
+> > destroyed.
+> > 
+> > For the shutdown case, a list of pages to be destroyed is formed
+> > when the mm is torn down. Instead of just unmapping the pages when
+> > the address space is being torn down, they are also set aside.
+> > Later when KVM cleans up the VM, a thread is started to clean up
+> > the pages from the list.  
+> 
+> Just to make sure, 'clean up' includes doing uv calls?
 
-I was still adhering to the previous convention in the file to define
-the values. I will submit prepatch to change them to also use GENMASK so
-that its consistent with SNP updates I add in this series.
+yes
 
+> > 
+> > This means that the same address space can have memory belonging to
+> > more than one protected guest, although only one will be running,
+> > the others will in fact not even have any CPUs.  
+> 
+> Are those set-aside-but-not-yet-cleaned-up pages still possibly
+> accessible in any way? I would assume that they only belong to the
 
->> +#define GHCB_MSR_PSC_OP_MASK		0xf
->> +#define GHCB_MSR_PSC_REQ_GFN(gfn, op) 	\
->> +	(((unsigned long)((op) & GHCB_MSR_PSC_OP_MASK) << GHCB_MSR_PSC_OP_POS) | \
->> +	(((gfn) << GHCB_MSR_PSC_GFN_POS) & GHCB_MSR_PSC_GFN_MASK) | GHCB_MSR_PSC_REQ)
->> +
->> +#define GHCB_MSR_PSC_RESP		0x015
->> +#define GHCB_MSR_PSC_ERROR_POS		32
->> +#define GHCB_MSR_PSC_ERROR_MASK		0xffffffffULL
->> +#define GHCB_MSR_PSC_RSVD_POS		12
->> +#define GHCB_MSR_PSC_RSVD_MASK		0xfffffULL
->> +#define GHCB_MSR_PSC_RESP_VAL(val)	((val) >> GHCB_MSR_PSC_ERROR_POS)
->> +
->> +/* SNP Page State Change NAE event */
->> +#define VMGEXIT_PSC_MAX_ENTRY		253
->> +#define VMGEXIT_PSC_INVALID_HEADER	0x100000001
->> +#define VMGEXIT_PSC_INVALID_ENTRY	0x100000002
->> +#define VMGEXIT_PSC_FIRMWARE_ERROR(x)	((x & 0xffffffffULL) | 0x200000000)
->> +
->> +struct __packed snp_page_state_header {
->> +	u16 cur_entry;
->> +	u16 end_entry;
->> +	u32 reserved;
->> +};
->> +
->> +struct __packed snp_page_state_entry {
->> +	u64 cur_page:12;
->> +	u64 gfn:40;
->> +	u64 operation:4;
->> +	u64 pagesize:1;
->> +	u64 reserved:7;
-> Please write it like this:
->
-> 	u64 cur_page 	: 12,
-> 	    gfn		: 40,
-> 	    ...
->
-> to show that all those fields are part of the same u64.
->
-> struct perf_event_attr in include/uapi/linux/perf_event.h is a good
-> example.
->
-Ah, thanks for pointing. I will switch to using it.
+in case of reboot: yes, they are still in the address space of the
+guest, and can be swapped if needed
+
+> 'zombie' guests, and any new or rebooted guest is a new entity that
+> needs to get new pages?
+
+the rebooted guest (normal or secure) will re-use the same pages of the
+old guest (before or after cleanup, which is the reason of patches 3
+and 4)
+
+the KVM guest is not affected in case of reboot, so the userspace
+address space is not touched.
+
+> Can too many not-yet-cleaned-up pages lead to a (temporary) memory
+> exhaustion?
+
+in case of reboot, not much; the pages were in use are still in use
+after the reboot, and they can be swapped.
+
+in case of a shutdown, yes, because the pages are really taken aside
+and cleared/destroyed in background. they cannot be swapped. they are
+freed immediately as they are processed, to try to mitigate memory
+exhaustion scenarios.
+
+in the end, this patchseries is a tradeoff between speed and memory
+consumption. the memory needs to be cleared up at some point, and that
+requires time.
+
+in cases where this might be an issue, I introduced a new KVM flag to
+disable lazy destroy (patch 10)
 
 
->> +};
->> +
->> +struct __packed snp_page_state_change {
->> +	struct snp_page_state_header header;
->> +	struct snp_page_state_entry entry[VMGEXIT_PSC_MAX_ENTRY];
->> +};
->> +
->>  #define GHCB_MSR_TERM_REQ		0x100
->>  #define GHCB_MSR_TERM_REASON_SET_POS	12
->>  #define GHCB_MSR_TERM_REASON_SET_MASK	0xf
->> diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
->> index 7fbc311e2de1..f7bf12cad58c 100644
->> --- a/arch/x86/include/uapi/asm/svm.h
->> +++ b/arch/x86/include/uapi/asm/svm.h
->> @@ -108,6 +108,7 @@
->>  #define SVM_VMGEXIT_AP_JUMP_TABLE		0x80000005
->>  #define SVM_VMGEXIT_SET_AP_JUMP_TABLE		0
->>  #define SVM_VMGEXIT_GET_AP_JUMP_TABLE		1
->> +#define SVM_VMGEXIT_SNP_PAGE_STATE_CHANGE	0x80000010
-> SVM_VMGEXIT_SNP_PSC
-
-Noted.
-
-
->
->>  #define SVM_VMGEXIT_HYPERVISOR_FEATURES		0x8000fffd
->>  #define SVM_VMGEXIT_UNSUPPORTED_EVENT		0x8000ffff
->>  
->> @@ -216,6 +217,7 @@
->>  	{ SVM_VMGEXIT_NMI_COMPLETE,	"vmgexit_nmi_complete" }, \
->>  	{ SVM_VMGEXIT_AP_HLT_LOOP,	"vmgexit_ap_hlt_loop" }, \
->>  	{ SVM_VMGEXIT_AP_JUMP_TABLE,	"vmgexit_ap_jump_table" }, \
->> +	{ SVM_VMGEXIT_SNP_PAGE_STATE_CHANGE,	"vmgexit_page_state_change" }, \
-> Ditto.
-
-These strings are printed in the trace so I thought giving them a full
-name makes sense
-
-
->
-> Thx.
->
