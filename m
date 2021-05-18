@@ -2,108 +2,256 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 627853877C9
-	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 13:35:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8FC1387804
+	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 13:49:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241431AbhERLgx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 May 2021 07:36:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55876 "EHLO
+        id S1348875AbhERLuO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 May 2021 07:50:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22891 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240092AbhERLgw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 May 2021 07:36:52 -0400
+        by vger.kernel.org with ESMTP id S1348868AbhERLuN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 May 2021 07:50:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621337734;
+        s=mimecast20190719; t=1621338534;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=BQTshUjjcW4pqAX06J21RyFPaHFDHA+txFlErPh+Rt4=;
-        b=NKr2G70lILLfO0B0bL+/coaWJ2XVs7myvstBsdVnqCAfkrathdWyMGEWZg+txUFgmwLvfV
-        T3ud77UJ+aSi6UdIAoMXtnKwS12jLPSgFBLmDteBf2rfOIEDesxyJlFaWuSXdBFKMsVXum
-        kv6ftPJLuOm0zbY3KPBPT7MB6BnVco4=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-s_9_yGlRNdyGR2FSmO9lFA-1; Tue, 18 May 2021 07:35:33 -0400
-X-MC-Unique: s_9_yGlRNdyGR2FSmO9lFA-1
-Received: by mail-ej1-f71.google.com with SMTP id i23-20020a17090685d7b02903d089ab83fcso2240722ejy.19
-        for <kvm@vger.kernel.org>; Tue, 18 May 2021 04:35:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=BQTshUjjcW4pqAX06J21RyFPaHFDHA+txFlErPh+Rt4=;
-        b=opwa+QuQy4bxD1vG1z2WBhozmEj6wFfxa2BUGJaphkGw3R8wMO9whOOCqMQvChZxeU
-         NLxrPr9tS0J+M6eaDGEx3NpG/nzvk20QHvduAa65JV3tDElhMs8LIrRptbxAMylEV8aB
-         i+VBQhZgt13g8Sy4Zb/iF3Ht/Gv5QugYz2/IGWi3bzeE1i/pItGLQgDVrNEYPYW8MhrK
-         7+PN+xBpsiM0idHqSRylKyWHAGSN5icn0dUD3H8Da8tuh3DHOTKUUcqBl3pTG9cu4gsp
-         trixzKqLD8HDUGCL8My/Pt2tEDFncEtoMl32RLrbye59JPNnGVQpBqLUxnGEzMQIr71B
-         HSdg==
-X-Gm-Message-State: AOAM533WLXxuhxNiw5l/HL3lyAtRfhBhVz9jPc47TfXt1/7tfKRQnY2X
-        1YhXjNRH4Xlw4ROnRDNhHRoaLfUopt39uhziK9CLri2K5u4IfvtgRt2wiQrCk/U8lQOeVYNa5pB
-        oU4ZN/aevHBHhIQ+I0/kANEG8io7SYp17DLd/q+FS4b5uKfFUmHlsCcYj1Tn+L5w=
-X-Received: by 2002:aa7:d65a:: with SMTP id v26mr3768038edr.185.1621337731937;
-        Tue, 18 May 2021 04:35:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxjFdz5DW357y0IITFNJvwk6VPl+y05oxRsyWk868tUdCPsmP1v99BjHZYTPrSVuCuBH6QS4g==
-X-Received: by 2002:aa7:d65a:: with SMTP id v26mr3768025edr.185.1621337731788;
-        Tue, 18 May 2021 04:35:31 -0700 (PDT)
-Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id f7sm10110869ejz.95.2021.05.18.04.35.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 May 2021 04:35:31 -0700 (PDT)
-Date:   Tue, 18 May 2021 13:35:29 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com
-Subject: Re: [PULL kvm-unit-tests 00/10] arm/arm64: target-efi prep
-Message-ID: <20210518113529.4h44wxdcdjoc25v5@gator.home>
-References: <20210517143900.747013-1-drjones@redhat.com>
+        bh=mlQ7G6nQMS0+u70jyAdMN6frxJBI8Gxh0QekrRUBeO0=;
+        b=c8Wx0W77KntKqi5egR/Yn4KdpMgSzgZOOhQqwYNp4Y6ih63kPsGxTVRECHJB5Ru12qScFX
+        e+m1fFdF+cZF9ShbygPVNd3QISRDDlKyd4LP6HKoQ7PdoqZBnzgZEJxTRTw97cLmiSTqYc
+        q1tSQYwngPVItcPSKOMDzL+jMIdAf1k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-209-h6kIOpP2MM6TE80SuJXNVA-1; Tue, 18 May 2021 07:48:53 -0400
+X-MC-Unique: h6kIOpP2MM6TE80SuJXNVA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A794C107ACE3;
+        Tue, 18 May 2021 11:48:50 +0000 (UTC)
+Received: from [10.36.114.156] (ovpn-114-156.ams2.redhat.com [10.36.114.156])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 457A860855;
+        Tue, 18 May 2021 11:48:43 +0000 (UTC)
+Subject: Re: [PATCH 15/56] KVM: arm64: Add build rules for separate VHE/nVHE
+ object files
+From:   Auger Eric <eric.auger@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Alexander Graf <graf@amazon.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        David Brazdil <dbrazdil@google.com>,
+        Gavin Shan <gshan@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Peng Hao <richard.peng@oppo.com>,
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kernel-team@android.com
+References: <20200805175700.62775-1-maz@kernel.org>
+ <20200805175700.62775-16-maz@kernel.org>
+ <2ff3a1cb-a310-7963-4171-bd1e7d08e39b@redhat.com>
+Message-ID: <5d1853ed-3474-edbc-545a-1f88f2a4e5ca@redhat.com>
+Date:   Tue, 18 May 2021 13:48:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210517143900.747013-1-drjones@redhat.com>
+In-Reply-To: <2ff3a1cb-a310-7963-4171-bd1e7d08e39b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 17, 2021 at 04:38:50PM +0200, Andrew Jones wrote:
-> The patches mostly prepare kvm-unit-tests/arm for targeting EFI
-> platforms. The actually EFI support will come in another series,
-> but these patches are good for removing assumptions from our memory
-> maps and about our PSCI conduit, even if we never merged EFI support.
-> 
-> Thanks,
-> drew
-> 
-> 
-> The following changes since commit 9e7a5929569d61414feefcb1d8024e7685cb7eb3:
-> 
->   arm: add eabi version of 64-bit division functions (2021-05-12 15:52:24 +0200)
-> 
-> are available in the Git repository at:
-> 
->   https://gitlab.com/rhdrjones/kvm-unit-tests.git arm/queue
-> 
-> for you to fetch changes up to bd5bd1577dcc298cafaf0e26d318a628e650b2a7:
-> 
->   arm/arm64: psci: Don't assume method is hvc (2021-05-17 16:08:24 +0200)
-> 
-> ----------------------------------------------------------------
-> Alexandru Elisei (1):
->       configure: arm: Replace --vmm with --target
-> 
-> Andrew Jones (9):
->       arm/arm64: Reorganize cstart assembler
->       arm/arm64: Move setup_vm into setup
->       pci-testdev: ioremap regions
->       arm64: micro-bench: ioremap userspace_emulated_addr
->       arm/arm64: mmu: Stop mapping an assumed IO region
->       arm/arm64: mmu: Remove memory layout assumptions
->       arm/arm64: setup: Consolidate memory layout assumptions
->       chr-testdev: Silently fail init
->       arm/arm64: psci: Don't assume method is hvc
->
+Hi David, Marc,
 
-I see these patches have now been merged. Thanks Paolo!
+On 5/4/21 4:47 PM, Auger Eric wrote:
+> Hi David, Marc,
+> 
+> On 8/5/20 7:56 PM, Marc Zyngier wrote:
+>> From: David Brazdil <dbrazdil@google.com>
+>>
+>> Add new folders arch/arm64/kvm/hyp/{vhe,nvhe} and Makefiles for building code
+>> that runs in EL2 under VHE/nVHE KVM, repsectivelly. Add an include folder for
+>> hyp-specific header files which will include code common to VHE/nVHE.
+>>
+>> Build nVHE code with -D__KVM_NVHE_HYPERVISOR__, VHE code with
+>> -D__KVM_VHE_HYPERVISOR__.
+>>
+>> Under nVHE compile each source file into a `.hyp.tmp.o` object first, then
+>> prefix all its symbols with "__kvm_nvhe_" using `objcopy` and produce
+>> a `.hyp.o`. Suffixes were chosen so that it would be possible for VHE and nVHE
+>> to share some source files, but compiled with different CFLAGS.
+>>
+>> The nVHE ELF symbol prefix is added to kallsyms.c as ignored. EL2-only symbols
+>> will never appear in EL1 stack traces.
+>>
+>> Due to symbol prefixing, add a section in image-vars.h for aliases of symbols
+>> that are defined in nVHE EL2 and accessed by kernel in EL1 or vice versa.
+>>
+>> Signed-off-by: David Brazdil <dbrazdil@google.com>
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> Link: https://lore.kernel.org/r/20200625131420.71444-4-dbrazdil@google.com
+>> ---
+>>  arch/arm64/kernel/image-vars.h   | 14 +++++++++++++
+>>  arch/arm64/kvm/hyp/Makefile      | 10 +++++++---
+>>  arch/arm64/kvm/hyp/nvhe/Makefile | 34 ++++++++++++++++++++++++++++++++
+>>  arch/arm64/kvm/hyp/vhe/Makefile  | 17 ++++++++++++++++
+>>  scripts/kallsyms.c               |  1 +
+>>  5 files changed, 73 insertions(+), 3 deletions(-)
+>>  create mode 100644 arch/arm64/kvm/hyp/nvhe/Makefile
+>>  create mode 100644 arch/arm64/kvm/hyp/vhe/Makefile
+>>
+>> diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+>> index be0a63ffed23..3dc27da47712 100644
+>> --- a/arch/arm64/kernel/image-vars.h
+>> +++ b/arch/arm64/kernel/image-vars.h
+>> @@ -51,4 +51,18 @@ __efistub__ctype		= _ctype;
+>>  
+>>  #endif
+>>  
+>> +#ifdef CONFIG_KVM
+>> +
+>> +/*
+>> + * KVM nVHE code has its own symbol namespace prefixed with __kvm_nvhe_, to
+>> + * separate it from the kernel proper. The following symbols are legally
+>> + * accessed by it, therefore provide aliases to make them linkable.
+>> + * Do not include symbols which may not be safely accessed under hypervisor
+>> + * memory mappings.
+>> + */
+>> +
+>> +#define KVM_NVHE_ALIAS(sym) __kvm_nvhe_##sym = sym;
+>> +
+>> +#endif /* CONFIG_KVM */
+>> +
+>>  #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
+>> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+>> index 5d8357ddc234..9c5dfe6ff80b 100644
+>> --- a/arch/arm64/kvm/hyp/Makefile
+>> +++ b/arch/arm64/kvm/hyp/Makefile
+>> @@ -3,10 +3,14 @@
+>>  # Makefile for Kernel-based Virtual Machine module, HYP part
+>>  #
+>>  
+>> -ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING \
+>> -		$(DISABLE_STACKLEAK_PLUGIN)
+>> +incdir := $(srctree)/$(src)/include
+>> +subdir-asflags-y := -I$(incdir)
+>> +subdir-ccflags-y := -I$(incdir)				\
+>> +		    -fno-stack-protector		\
+>> +		    -DDISABLE_BRANCH_PROFILING		\
+>> +		    $(DISABLE_STACKLEAK_PLUGIN)
+>>  
+>> -obj-$(CONFIG_KVM) += hyp.o
+>> +obj-$(CONFIG_KVM) += hyp.o nvhe/
+>>  obj-$(CONFIG_KVM_INDIRECT_VECTORS) += smccc_wa.o
+>>  
+>>  hyp-y := vgic-v3-sr.o timer-sr.o aarch32.o vgic-v2-cpuif-proxy.o sysreg-sr.o \
+>> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+>> new file mode 100644
+>> index 000000000000..955f4188e00f
+>> --- /dev/null
+>> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+>> @@ -0,0 +1,34 @@
+>> +# SPDX-License-Identifier: GPL-2.0
+>> +#
+>> +# Makefile for Kernel-based Virtual Machine module, HYP/nVHE part
+>> +#
+>> +
+>> +asflags-y := -D__KVM_NVHE_HYPERVISOR__
+>> +ccflags-y := -D__KVM_NVHE_HYPERVISOR__
+>> +
+>> +obj-y :=
+>> +
+>> +obj-y := $(patsubst %.o,%.hyp.o,$(obj-y))
+>> +extra-y := $(patsubst %.hyp.o,%.hyp.tmp.o,$(obj-y))
+>> +
+>> +$(obj)/%.hyp.tmp.o: $(src)/%.c FORCE
+>> +	$(call if_changed_rule,cc_o_c)
+>> +$(obj)/%.hyp.tmp.o: $(src)/%.S FORCE
+>> +	$(call if_changed_rule,as_o_S)
+>> +$(obj)/%.hyp.o: $(obj)/%.hyp.tmp.o FORCE
+>> +	$(call if_changed,hypcopy)
+>> +
+>> +quiet_cmd_hypcopy = HYPCOPY $@
+>> +      cmd_hypcopy = $(OBJCOPY) --prefix-symbols=__kvm_nvhe_ $< $@
+>> +
+>> +# KVM nVHE code is run at a different exception code with a different map, so
+>> +# compiler instrumentation that inserts callbacks or checks into the code may
+>> +# cause crashes. Just disable it.
+>> +GCOV_PROFILE	:= n
+>> +KASAN_SANITIZE	:= n
+>> +UBSAN_SANITIZE	:= n
+>> +KCOV_INSTRUMENT	:= n
+>> +
+>> +# Skip objtool checking for this directory because nVHE code is compiled with
+>> +# non-standard build rules.
+>> +OBJECT_FILES_NON_STANDARD := y
+>> diff --git a/arch/arm64/kvm/hyp/vhe/Makefile b/arch/arm64/kvm/hyp/vhe/Makefile
+>> new file mode 100644
+>> index 000000000000..e04375546081
+>> --- /dev/null
+>> +++ b/arch/arm64/kvm/hyp/vhe/Makefile
+>> @@ -0,0 +1,17 @@
+>> +# SPDX-License-Identifier: GPL-2.0
+>> +#
+>> +# Makefile for Kernel-based Virtual Machine module, HYP/nVHE part
+>> +#
+>> +
+>> +asflags-y := -D__KVM_VHE_HYPERVISOR__
+>> +ccflags-y := -D__KVM_VHE_HYPERVISOR__
+>> +
+>> +obj-y :=
+>> +
+>> +# KVM code is run at a different exception code with a different map, so
+>> +# compiler instrumentation that inserts callbacks or checks into the code may
+>> +# cause crashes. Just disable it.
+>> +GCOV_PROFILE	:= n
+>> +KASAN_SANITIZE	:= n
+>> +UBSAN_SANITIZE	:= n
+>> +KCOV_INSTRUMENT	:= n
+>> diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+>> index 6dc3078649fa..0096cd965332 100644
+>> --- a/scripts/kallsyms.c
+>> +++ b/scripts/kallsyms.c
+>> @@ -109,6 +109,7 @@ static bool is_ignored_symbol(const char *name, char type)
+>>  		".LASANPC",		/* s390 kasan local symbols */
+>>  		"__crc_",		/* modversions */
+>>  		"__efistub_",		/* arm64 EFI stub namespace */
+>> +		"__kvm_nvhe_",		/* arm64 non-VHE KVM namespace */
+> The addition of this line seems to have introduced errors on the
+> 'vmlinux symtab matches kallsyms' perf test (perf test -v 1) which fails
+> on aarch64 for all __kvm_nvhe_ prefixed symbols, like
+> 
+> ERR : <addr> : __kvm_nvhe___invalid not on kallsyms
+> ERR : <addr> : __kvm_nvhe___do_hyp_init not on kallsyms
+> ERR : <addr> : __kvm_nvhe___kvm_handle_stub_hvc not on kallsyms
+> ERR : <addr> : __kvm_nvhe_reset not on kallsyms
+> ../..
+> 
+> I understand we willingly hided those symbols from /proc/kallsyms. Do
+> you confirm the right fix is to upgrade the perf test suite accordingly?
 
-Thanks,
-drew
+Were you eventually able to reproduce?
+
+Thanks
+
+Eric
+> 
+> Thanks
+> 
+> Eric
+> 
+> 
+>>  		NULL
+>>  	};
+>>  
+>>
 
