@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DAAC38739B
-	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 09:55:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C9AE3873C9
+	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 10:14:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242395AbhERH4q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 May 2021 03:56:46 -0400
-Received: from mga11.intel.com ([192.55.52.93]:6291 "EHLO mga11.intel.com"
+        id S1347415AbhERIPB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 May 2021 04:15:01 -0400
+Received: from mga14.intel.com ([192.55.52.115]:11498 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240382AbhERH4p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 May 2021 03:56:45 -0400
-IronPort-SDR: +eEq+CNmZg2mxrVjHuEGKSAPritqby+sEJxal9wB5E9RNhhKirkMXKV+JBI8KR9jHeaEN9LuUb
- VEaCpjp0vocw==
-X-IronPort-AV: E=McAfee;i="6200,9189,9987"; a="197567722"
+        id S242198AbhERIPA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 May 2021 04:15:00 -0400
+IronPort-SDR: +rXcNqY2VF07+JHK/bldMdVcq6MjVzvGYWagfi3PLz+A6yIqr3oNy1jFQXNVk7MePI5NUpcYl+
+ 6n+ZcWX7X4qQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,9987"; a="200350191"
 X-IronPort-AV: E=Sophos;i="5.82,309,1613462400"; 
-   d="scan'208";a="197567722"
+   d="scan'208";a="200350191"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2021 00:55:20 -0700
-IronPort-SDR: /3B3uMeIMrkmVOQIwdCVW1cvukL66BLkMbptcCsQwVGKmkQKzhUzHtQNgGSy6T0w+DcFjRl1Bn
- KgbXL8rshUBA==
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2021 01:13:42 -0700
+IronPort-SDR: DDc3bdMAKnR4RyF+G1GbXBza8dsSJItYN8ny3BQx+KVhdkw14oSIKHv6AHZFsyDBHka+ZPoHrS
+ 6it0w3hbZzCg==
 X-IronPort-AV: E=Sophos;i="5.82,309,1613462400"; 
-   d="scan'208";a="472830856"
+   d="scan'208";a="472841391"
 Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2021 00:55:15 -0700
-Subject: Re: [PATCH v6 05/16] KVM: x86/pmu: Introduce the ctrl_mask value for
- fixed counter
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2021 01:13:36 -0700
+Subject: Re: [PATCH v6 06/16] KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation
+ for extended PEBS
 To:     Peter Zijlstra <peterz@infradead.org>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Borislav Petkov <bp@alien8.de>,
@@ -39,64 +39,124 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
         Like Xu <like.xu@linux.intel.com>
 References: <20210511024214.280733-1-like.xu@linux.intel.com>
- <20210511024214.280733-6-like.xu@linux.intel.com>
- <YKImwdg7LO/OPvVJ@hirez.programming.kicks-ass.net>
+ <20210511024214.280733-7-like.xu@linux.intel.com>
+ <YKIqbph62oclxjnt@hirez.programming.kicks-ass.net>
 From:   "Xu, Like" <like.xu@intel.com>
-Message-ID: <1fb87ea1-d7e6-0ca3-f3ed-4007a7e5a7d7@intel.com>
-Date:   Tue, 18 May 2021 15:55:13 +0800
+Message-ID: <69c3b712-0e6b-65d9-a0f9-40d939cd9d54@intel.com>
+Date:   Tue, 18 May 2021 16:13:34 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <YKImwdg7LO/OPvVJ@hirez.programming.kicks-ass.net>
+In-Reply-To: <YKIqbph62oclxjnt@hirez.programming.kicks-ass.net>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/5/17 16:18, Peter Zijlstra wrote:
-> On Tue, May 11, 2021 at 10:42:03AM +0800, Like Xu wrote:
->> The mask value of fixed counter control register should be dynamic
->> adjusted with the number of fixed counters. This patch introduces a
->> variable that includes the reserved bits of fixed counter control
->> registers. This is needed for later Ice Lake fixed counter changes.
->>
->> Co-developed-by: Luwei Kang <luwei.kang@intel.com>
->> Signed-off-by: Luwei Kang <luwei.kang@intel.com>
->> Signed-off-by: Like Xu <like.xu@linux.intel.com>
->> ---
->>   arch/x86/include/asm/kvm_host.h | 1 +
->>   arch/x86/kvm/vmx/pmu_intel.c    | 6 +++++-
->>   2 files changed, 6 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index 55efbacfc244..49b421bd3dd8 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -457,6 +457,7 @@ struct kvm_pmu {
->>   	unsigned nr_arch_fixed_counters;
->>   	unsigned available_event_types;
->>   	u64 fixed_ctr_ctrl;
->> +	u64 fixed_ctr_ctrl_mask;
->>   	u64 global_ctrl;
->>   	u64 global_status;
->>   	u64 global_ovf_ctrl;
->> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
->> index d9dbebe03cae..ac7fe714e6c1 100644
->> --- a/arch/x86/kvm/vmx/pmu_intel.c
->> +++ b/arch/x86/kvm/vmx/pmu_intel.c
->> @@ -400,7 +400,7 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>   	case MSR_CORE_PERF_FIXED_CTR_CTRL:
->>   		if (pmu->fixed_ctr_ctrl == data)
->>   			return 0;
->> -		if (!(data & 0xfffffffffffff444ull)) {
->> +		if (!(data & pmu->fixed_ctr_ctrl_mask)) {
-> Don't we already have hardware with more than 3 fixed counters?
+On 2021/5/17 16:33, Peter Zijlstra wrote:
+> On Tue, May 11, 2021 at 10:42:04AM +0800, Like Xu wrote:
+>> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+>> index 2f89fd599842..c791765f4761 100644
+>> --- a/arch/x86/events/intel/core.c
+>> +++ b/arch/x86/events/intel/core.c
+>> @@ -3898,31 +3898,49 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
+>>   	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
+>>   	struct perf_guest_switch_msr *arr = cpuc->guest_switch_msrs;
+>>   	u64 intel_ctrl = hybrid(cpuc->pmu, intel_ctrl);
+>> +	u64 pebs_mask = (x86_pmu.flags & PMU_FL_PEBS_ALL) ?
+>> +		cpuc->pebs_enabled : (cpuc->pebs_enabled & PEBS_COUNTER_MASK);
+>> -	if (x86_pmu.flags & PMU_FL_PEBS_ALL)
+>> -		arr[0].guest &= ~cpuc->pebs_enabled;
+>> -	else
+>> -		arr[0].guest &= ~(cpuc->pebs_enabled & PEBS_COUNTER_MASK);
+>> -	*nr = 1;
+> Instead of endlessly mucking about with branches, do we want something
+> like this instead?
 
-Yes, so we update this mask based on the value of pmu->nr_arch_fixed_counters:
+Fine to me. How about the commit message for your below patch:
 
-+    for (i = 0; i < pmu->nr_arch_fixed_counters; i++)
-+        pmu->fixed_ctr_ctrl_mask &= ~(0xbull << (i * 4));
+x86/perf/core: Add pebs_capable to store valid PEBS_COUNTER_MASK value
 
-I assume this comment will not result in any code changes for this patch.
+The value of pebs_counter_mask will be accessed frequently
+for repeated use in the intel_guest_get_msrs(). So it can be
+optimized instead of endlessly mucking about with branches.
+
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+
+>
+> ---
+> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+> index 2521d03de5e0..bcfba11196c8 100644
+> --- a/arch/x86/events/intel/core.c
+> +++ b/arch/x86/events/intel/core.c
+> @@ -2819,10 +2819,7 @@ static int handle_pmi_common(struct pt_regs *regs, u64 status)
+>   	 * counters from the GLOBAL_STATUS mask and we always process PEBS
+>   	 * events via drain_pebs().
+>   	 */
+> -	if (x86_pmu.flags & PMU_FL_PEBS_ALL)
+> -		status &= ~cpuc->pebs_enabled;
+> -	else
+> -		status &= ~(cpuc->pebs_enabled & PEBS_COUNTER_MASK);
+> +	status &= ~(cpuc->pebs_enabled & x86_pmu.pebs_capable);
+>   
+>   	/*
+>   	 * PEBS overflow sets bit 62 in the global status register
+> @@ -3862,10 +3859,7 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr)
+>   	arr[0].msr = MSR_CORE_PERF_GLOBAL_CTRL;
+>   	arr[0].host = intel_ctrl & ~cpuc->intel_ctrl_guest_mask;
+>   	arr[0].guest = intel_ctrl & ~cpuc->intel_ctrl_host_mask;
+> -	if (x86_pmu.flags & PMU_FL_PEBS_ALL)
+> -		arr[0].guest &= ~cpuc->pebs_enabled;
+> -	else
+> -		arr[0].guest &= ~(cpuc->pebs_enabled & PEBS_COUNTER_MASK);
+> +	arr[0].guest &= ~(cpuc->pebs_enabled & x86_pmu.pebs_capable);
+>   	*nr = 1;
+>   
+>   	if (x86_pmu.pebs && x86_pmu.pebs_no_isolation) {
+> @@ -5546,6 +5540,7 @@ __init int intel_pmu_init(void)
+>   	x86_pmu.events_mask_len		= eax.split.mask_length;
+>   
+>   	x86_pmu.max_pebs_events		= min_t(unsigned, MAX_PEBS_EVENTS, x86_pmu.num_counters);
+> +	x86_pmu.pebs_capable		= PEBS_COUNTER_MASK;
+>   
+>   	/*
+>   	 * Quirk: v2 perfmon does not report fixed-purpose events, so
+> @@ -5730,6 +5725,7 @@ __init int intel_pmu_init(void)
+>   		x86_pmu.pebs_aliases = NULL;
+>   		x86_pmu.pebs_prec_dist = true;
+>   		x86_pmu.lbr_pt_coexist = true;
+> +		x86_pmu.pebs_capable = ~0ULL;
+>   		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
+>   		x86_pmu.flags |= PMU_FL_PEBS_ALL;
+>   		x86_pmu.get_event_constraints = glp_get_event_constraints;
+> @@ -6080,6 +6076,7 @@ __init int intel_pmu_init(void)
+>   		x86_pmu.pebs_aliases = NULL;
+>   		x86_pmu.pebs_prec_dist = true;
+>   		x86_pmu.pebs_block = true;
+> +		x86_pmu.pebs_capable = ~0ULL;
+>   		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
+>   		x86_pmu.flags |= PMU_FL_NO_HT_SHARING;
+>   		x86_pmu.flags |= PMU_FL_PEBS_ALL;
+> @@ -6123,6 +6120,7 @@ __init int intel_pmu_init(void)
+>   		x86_pmu.pebs_aliases = NULL;
+>   		x86_pmu.pebs_prec_dist = true;
+>   		x86_pmu.pebs_block = true;
+> +		x86_pmu.pebs_capable = ~0ULL;
+>   		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
+>   		x86_pmu.flags |= PMU_FL_NO_HT_SHARING;
+>   		x86_pmu.flags |= PMU_FL_PEBS_ALL;
+> diff --git a/arch/x86/events/perf_event.h b/arch/x86/events/perf_event.h
+> index 27fa85e7d4fd..6f3cf81ccb1b 100644
+> --- a/arch/x86/events/perf_event.h
+> +++ b/arch/x86/events/perf_event.h
+> @@ -805,6 +805,7 @@ struct x86_pmu {
+>   	void		(*pebs_aliases)(struct perf_event *event);
+>   	unsigned long	large_pebs_flags;
+>   	u64		rtm_abort_event;
+> +	u64		pebs_capable;
+>   
+>   	/*
+>   	 * Intel LBR
+
