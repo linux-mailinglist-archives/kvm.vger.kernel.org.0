@@ -2,184 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 650CC387E1B
-	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 19:01:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3450E387E55
+	for <lists+kvm@lfdr.de>; Tue, 18 May 2021 19:25:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346598AbhERRCT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 May 2021 13:02:19 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50494 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232496AbhERRCS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 May 2021 13:02:18 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14IGYIva111104;
-        Tue, 18 May 2021 13:01:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=PCoxcp5ibyVLV63FLBDq4lpfHqnNx8KVKs7wAk76jCA=;
- b=s/cExPqdOlGdbG7UITyfRKOE+e83OWrU0kV5r148ArTdqNqkbB9eWQeOK90cpW3TuYlH
- tOU4JhMCVr/tCSRnoPxowmG3VV7dAE0fbr8TbcVMQYFHCXf8crzv9P39hm5bJNBzZAtx
- ezjRrubHPNZWIJmODnAVDMCTfR1w2Ymv2akBmBXnz62xnJkRGwcby4Ew9T8EInu9aazg
- hsoHe/BxjVSrhbOzINuVbkNLPbnT/ymyrh4O2yn0od3Y4LCvpFIs520Xt6pYc7ACxknG
- K4w4Czwt9lGmr0pOgQUEaASjVyLgLKzImVcKEhLHJx4YPEGVakV1UHMOLCt8o5hnT1Ol xw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38mg7s2ppa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 May 2021 13:01:00 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14IGZSOD120686;
-        Tue, 18 May 2021 13:00:59 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38mg7s2pkm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 May 2021 13:00:59 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14IGtWk1026200;
-        Tue, 18 May 2021 17:00:56 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 38j5x89m0p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 May 2021 17:00:56 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14IH0rcB28967168
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 May 2021 17:00:53 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 081F252079;
-        Tue, 18 May 2021 17:00:53 +0000 (GMT)
-Received: from ibm-vm (unknown [9.145.14.34])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id A8AAF52065;
-        Tue, 18 May 2021 17:00:50 +0000 (GMT)
-Date:   Tue, 18 May 2021 19:00:49 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        frankja@linux.ibm.com, thuth@redhat.com, pasic@linux.ibm.com,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 00/11] KVM: s390: pv: implement lazy destroy
-Message-ID: <20210518190049.7e6e661f@ibm-vm>
-In-Reply-To: <e66400c5-a1b6-c5fe-d715-c08b166a7b54@de.ibm.com>
-References: <20210517200758.22593-1-imbrenda@linux.ibm.com>
-        <20210518170537.58b32ffe.cohuck@redhat.com>
-        <20210518173624.13d043e3@ibm-vm>
-        <20210518180411.4abf837d.cohuck@redhat.com>
-        <20210518181922.52d04c61@ibm-vm>
-        <a38192d5-0868-8e07-0a34-c1615e1997fc@redhat.com>
-        <20210518183131.1e0cf801@ibm-vm>
-        <e66400c5-a1b6-c5fe-d715-c08b166a7b54@de.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S1351111AbhERR05 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 May 2021 13:26:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39048 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1351108AbhERR05 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 May 2021 13:26:57 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A654CC061761
+        for <kvm@vger.kernel.org>; Tue, 18 May 2021 10:25:38 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id b12so5260364ljp.1
+        for <kvm@vger.kernel.org>; Tue, 18 May 2021 10:25:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mSnQ4LBK1uIXV07PEAq0LLHlwweU24rztLmKUUxmtEw=;
+        b=cVzaFjUacrAERsYDIZbRfiVBm3UJe9PfiIi7VMEBI4+mneYhTfREF32Ug/H7xsKLXF
+         xipKw744Y+OPokHmPOwiIilZlVMYtdOjIl5i+xzJy7TSKI5AdyAp62xAFFvkz5aGK7IR
+         rcFwa6FW0Zd3WOBHc48RIIAD4Evo4cCVo4dzA/EBc5YwUsnO0+ec80kxrOAFwBSHfz24
+         4e/5s/iwhO092+JJCHv/Mly7vK5p7eUvyheKOSI7fXe24zmHVEHwIeyudrmdfiXjw4AW
+         BgKIuFcumclXiaD/TAOYs9fp/I9XvbqU76xLXdbQq1MXVo7j4RToAD81UGguuU1ez9aX
+         XYDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mSnQ4LBK1uIXV07PEAq0LLHlwweU24rztLmKUUxmtEw=;
+        b=WuiWLi9g98Kntg4vBrYqVN0qiXQrmnbHH4WdqgHQB4/5nV/rgT8cf+Rftc1/9mQ+Hz
+         xNE4PYQ5w/2KSeB6EOfjhOdoQjhxl8hT0eu03Wr2nNXGpJZ9arXPgwviNnQYl/Sov8ZI
+         2hGamNtjnMeIb1XYZxf3kDbc5lpxTdfjSRfi0vY27Qkwn5wNqzrbAcq8Qq9KEDMuqIqK
+         9BGtXcydQ8ZKdsvQF0+gWbVtmA4UcmhOeTkfPjFm0tyHe2k2DrkEybB/bmfWkPENsvou
+         YHBxq7d4eDlYKY2D5iJ4shdmJA0pE8PY0uJcYsk8SzvteId9Krxn38K/0BaGJElHKdGL
+         csgQ==
+X-Gm-Message-State: AOAM5318XJxvKe16EJ18b1Ubz+Z6auq/ZxtxMzd0efjMC4xsQaf4qHYQ
+        MnxPKh6+Nuzftp4BMTlMn7ezY5LTdeE6odzvChFPSA==
+X-Google-Smtp-Source: ABdhPJwmvfrKFgUyKP/HRH4nFuJ9B6kEhZAEG5g+dr6hELyJdzM7GIR8aVIZG1uUChl8DfU1otU2kJaVQc2bMkV5kGM=
+X-Received: by 2002:a2e:87ce:: with SMTP id v14mr4952952ljj.28.1621358736766;
+ Tue, 18 May 2021 10:25:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: o7NNWV0vowzARXZ4UsRFtxBVc6NxOltp
-X-Proofpoint-ORIG-GUID: Cy_bc8bftKD4yt5A88wyc_o52gcH1XYS
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-05-18_08:2021-05-18,2021-05-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- lowpriorityscore=0 clxscore=1015 priorityscore=1501 mlxlogscore=999
- mlxscore=0 phishscore=0 spamscore=0 adultscore=0 suspectscore=0
- impostorscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2104190000 definitions=main-2105180113
+References: <20210517145314.157626-1-jingzhangos@google.com>
+ <20210517145314.157626-2-jingzhangos@google.com> <CALzav=dGT7B7FWw_d5v3QaJxgfp6TZv7E4fdchG_7LKh+C17gg@mail.gmail.com>
+ <CAAdAUtjyFhuh4iFJJOkkO20XXKqbcRO-S0ziFfUW1rHL-bkeZw@mail.gmail.com> <CALzav=dHjy8wnLckxifrjVDfVNBmqHcJgeS7PK6BnAp6UCyO5A@mail.gmail.com>
+In-Reply-To: <CALzav=dHjy8wnLckxifrjVDfVNBmqHcJgeS7PK6BnAp6UCyO5A@mail.gmail.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Tue, 18 May 2021 12:25:24 -0500
+Message-ID: <CAAdAUtiXE=CXU_LWG9SpnHsnqUBMC327jC2AvXAFX7-vwwoBog@mail.gmail.com>
+Subject: Re: [PATCH v5 1/4] KVM: stats: Separate common stats from
+ architecture specific ones
+To:     David Matlack <dmatlack@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 18 May 2021 18:55:56 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+Hi David,
 
-> On 18.05.21 18:31, Claudio Imbrenda wrote:
-> > On Tue, 18 May 2021 18:22:42 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> On 18.05.21 18:19, Claudio Imbrenda wrote:  
-> >>> On Tue, 18 May 2021 18:04:11 +0200
-> >>> Cornelia Huck <cohuck@redhat.com> wrote:
-> >>>      
-> >>>> On Tue, 18 May 2021 17:36:24 +0200
-> >>>> Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
-> >>>>     
-> >>>>> On Tue, 18 May 2021 17:05:37 +0200
-> >>>>> Cornelia Huck <cohuck@redhat.com> wrote:
-> >>>>>         
-> >>>>>> On Mon, 17 May 2021 22:07:47 +0200
-> >>>>>> Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:  
-> >>>>     
-> >>>>>>> This means that the same address space can have memory
-> >>>>>>> belonging to more than one protected guest, although only one
-> >>>>>>> will be running, the others will in fact not even have any
-> >>>>>>> CPUs.  
-> >>>>>>
-> >>>>>> Are those set-aside-but-not-yet-cleaned-up pages still possibly
-> >>>>>> accessible in any way? I would assume that they only belong to
-> >>>>>> the  
-> >>>>>
-> >>>>> in case of reboot: yes, they are still in the address space of
-> >>>>> the guest, and can be swapped if needed
-> >>>>>         
-> >>>>>> 'zombie' guests, and any new or rebooted guest is a new entity
-> >>>>>> that needs to get new pages?  
-> >>>>>
-> >>>>> the rebooted guest (normal or secure) will re-use the same pages
-> >>>>> of the old guest (before or after cleanup, which is the reason
-> >>>>> of patches 3 and 4)  
-> >>>>
-> >>>> Took a look at those patches, makes sense.
-> >>>>     
-> >>>>>
-> >>>>> the KVM guest is not affected in case of reboot, so the
-> >>>>> userspace address space is not touched.  
-> >>>>
-> >>>> 'guest' is a bit ambiguous here -- do you mean the vm here, and
-> >>>> the actual guest above?
-> >>>>     
-> >>>
-> >>> yes this is tricky, because there is the guest OS, which
-> >>> terminates or reboots, then there is the "secure configuration"
-> >>> entity, handled by the Ultravisor, and then the KVM VM
-> >>>
-> >>> when a secure guest reboots, the "secure configuration" is
-> >>> dismantled (in this case, in a deferred way), and the KVM VM (and
-> >>> its memory) is not directly affected
-> >>>
-> >>> what happened before was that the secure configuration was
-> >>> dismantled synchronously, and then re-created.
-> >>>
-> >>> now instead, a new secure configuration is created using the same
-> >>> KVM VM (and thus the same mm), before the old secure configuration
-> >>> has been completely dismantled. hence the same KVM VM can have
-> >>> multiple secure configurations associated, sharing the same
-> >>> address space.
-> >>>
-> >>> of course, only the newest one is actually running, the other ones
-> >>> are "zombies", without CPUs.
-> >>>      
-> >>
-> >> Can a guest trigger a DoS?  
-> > 
-> > I don't see how
-> > 
-> > a guest can fill its memory and then reboot, and then fill its
-> > memory again and then reboot... but that will take time, filling
-> > the memory will itself clean up leftover pages from previous boots.
-> >  
-> 
-> In essence this guest will then synchronously wait for the page to be
-> exported and reimported, correct?
+On Tue, May 18, 2021 at 11:27 AM David Matlack <dmatlack@google.com> wrote:
+>
+> On Mon, May 17, 2021 at 5:10 PM Jing Zhang <jingzhangos@google.com> wrote:
+> <snip>
+> > Actually the definition of kvm_{vcpu,vm}_stat are arch specific. There is
+> > no real structure for arch agnostic stats. Most of the stats in common
+> > structures are arch agnostic, but not all of them.
+> > There are some benefits to put all common stats in a separate structure.
+> > e.g. if we want to add a stat in kvm_main.c, we only need to add this stat
+> > in the common structure, don't have to update all kvm_{vcpu,vm}_stat
+> > definition for all architectures.
+>
+> I meant rename the existing arch-specific struct kvm_{vcpu,vm}_stat to
+> kvm_{vcpu,vm}_stat_arch and rename struct kvm_{vcpu,vm}_stat_common to
+> kvm_{vcpu,vm}_stat.
+>
+> So in  include/linux/kvm_types.h you'd have:
+>
+> struct kvm_vm_stat {
+>   ulong remote_tlb_flush;
+>   struct kvm_vm_stat_arch arch;
+> };
+>
+> struct kvm_vcpu_stat {
+>   u64 halt_successful_poll;
+>   u64 halt_attempted_poll;
+>   u64 halt_poll_invalid;
+>   u64 halt_wakeup;
+>   u64 halt_poll_success_ns;
+>   u64 halt_poll_fail_ns;
+>   struct kvm_vcpu_stat_arch arch;
+> };
+>
+> And in arch/x86/include/asm/kvm_host.h you'd have:
+>
+> struct kvm_vm_stat_arch {
+>   ulong mmu_shadow_zapped;
+>   ...
+> };
+>
+> struct kvm_vcpu_stat_arch {
+>   u64 pf_fixed;
+>   u64 pf_guest;
+>   u64 tlb_flush;
+>   ...
+> };
+>
+> You still have the same benefits of having an arch-neutral place to
+> store stats but the struct layout more closely resembles struct
+> kvm_vcpu and struct kvm.
+You are right. This is a more reasonable way to layout the structures.
+I remember that I didn't choose this way is only because that it needs
+touching every arch specific stats in all architectures (stat.name ->
+stat.arch.name) instead of only touching arch neutral stats.
+Let's see if there is any vote from others about this.
 
-correct
-
-> > "normal" reboot loops will be fast, because there won't be much
-> > memory to process
-> > 
-> > I have actually tested mixed reboot/shutdown loops, and the system
-> > behaved as you would expect when under load.  
-> 
-> I guess the memory will continue to be accounted to the memcg?
-> Correct?
-
-for the reboot case, yes, since the mm is not directly affected.
-for the shutdown case, I'm not sure.
+Thanks,
+Jing
