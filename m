@@ -2,111 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4D1C38923E
-	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 17:08:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 506B838927E
+	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 17:23:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354324AbhESPKI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 May 2021 11:10:08 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:45358 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348804AbhESPKG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 May 2021 11:10:06 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14JF5rt9115755;
-        Wed, 19 May 2021 15:08:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2020-01-29;
- bh=O4M1xcTAuM/DDdc0c5CDLl/yAMutYPdkSv4nE2h3AeI=;
- b=oiJTPjfiELJ31h/2dywpDTju0Qrln1slSZD7cshRMtRC1k/KtXgpy+pe9GMtWVazE3OI
- T43P/YIzlig6H66ly2aKF7u3kVapM/k15DD0B3UxeQsIhQv1NV4PSFyb1WryaUD1CZBQ
- FFqwljp8bpOKSyJyNYB4Wyq6SDS4HwAvqlsz2komMzLQEXQsZLN1fCER+K8D+To2ry0B
- 517gY7iFWGrcvZqNfJ/TIrh0AA140vIF1hgaDBZIlVAvxVIcAQtm5DiurBep9g+eiZUT
- UjhhSKTy+SXYwuNJTzyt18K3FAEz/7vz4bre9m2YARBqXaWviYUKa//gMujh8daNUqZY gQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 38j5qr9wfu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 May 2021 15:08:32 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14JF03JH086247;
-        Wed, 19 May 2021 15:08:32 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by aserp3020.oracle.com with ESMTP id 38mecjfk91-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 May 2021 15:08:32 +0000
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 14JF52Qc141441;
-        Wed, 19 May 2021 15:08:31 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 38mecjfk6v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 May 2021 15:08:31 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 14JF8S9g005989;
-        Wed, 19 May 2021 15:08:28 GMT
-Received: from kadam (/41.212.42.34)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 19 May 2021 08:08:27 -0700
-Date:   Wed, 19 May 2021 18:08:14 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Anup Patel <anup@brainfault.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Palmer Dabbelt <palmerdabbelt@google.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Alexander Graf <graf@amazon.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        KVM General <kvm@vger.kernel.org>,
-        kvm-riscv@lists.infradead.org,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        linux-doc@vger.kernel.org,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        linux-staging@lists.linux.dev
-Subject: Re: [PATCH v18 00/18] KVM RISC-V Support
-Message-ID: <20210519150814.GY1955@kadam>
-References: <20210519033553.1110536-1-anup.patel@wdc.com>
- <YKSa48cejI1Lax+/@kroah.com>
- <CAAhSdy18qySXbUdrEsUe-KtbtuEoYrys0TcmsV2UkEA2=7UQzw@mail.gmail.com>
- <YKSgcn5gxE/4u2bT@kroah.com>
- <YKTsyyVYsHVMQC+G@kroah.com>
- <d7d5ad76-aec3-3297-0fac-a9da9b0c3663@redhat.com>
- <YKUDWgZVj82/KiKw@kroah.com>
- <daa30135-8757-8d33-a92e-8db4207168ff@redhat.com>
- <YKUZbb6OK+UYAq+t@kroah.com>
+        id S1346674AbhESPYy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 May 2021 11:24:54 -0400
+Received: from foss.arm.com ([217.140.110.172]:44984 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1354730AbhESPYt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 May 2021 11:24:49 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 34EF511D4;
+        Wed, 19 May 2021 08:23:29 -0700 (PDT)
+Received: from [10.57.66.179] (unknown [10.57.66.179])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7E1C63F73D;
+        Wed, 19 May 2021 08:23:27 -0700 (PDT)
+Subject: Re: [PATCH 3/6] vfio: remove the unused mdev iommu hook
+To:     Joerg Roedel <joro@8bytes.org>, Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+References: <MWHPR11MB1886E02BF7DE371E9665AA328C519@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210513120058.GG1096940@ziepe.ca>
+ <MWHPR11MB1886B92507ED9015831A0CEA8C509@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210514121925.GI1096940@ziepe.ca>
+ <MWHPR11MB18866205125E566FE05867A78C509@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210514133143.GK1096940@ziepe.ca> <YKJf7mphTHZoi7Qr@8bytes.org>
+ <20210517123010.GO1096940@ziepe.ca> <YKJnPGonR+d8rbu/@8bytes.org>
+ <20210517133500.GP1096940@ziepe.ca> <YKKNLrdQ4QjhLrKX@8bytes.org>
+From:   Robin Murphy <robin.murphy@arm.com>
+Message-ID: <131327e3-5066-7a88-5b3c-07013585eb01@arm.com>
+Date:   Wed, 19 May 2021 16:23:21 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YKUZbb6OK+UYAq+t@kroah.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-GUID: DSYkubxMfO3UDZdxS1ycNWkOZn5DmMy3
-X-Proofpoint-ORIG-GUID: DSYkubxMfO3UDZdxS1ycNWkOZn5DmMy3
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9989 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015 impostorscore=0
- mlxscore=0 lowpriorityscore=0 malwarescore=0 mlxlogscore=999
- suspectscore=0 adultscore=0 priorityscore=1501 spamscore=0 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2105190095
+In-Reply-To: <YKKNLrdQ4QjhLrKX@8bytes.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It's sort of frustrating that none of this information was in the commit
-message.
+On 2021-05-17 16:35, Joerg Roedel wrote:
+> On Mon, May 17, 2021 at 10:35:00AM -0300, Jason Gunthorpe wrote:
+>> Well, I'm sorry, but there is a huge other thread talking about the
+>> IOASID design in great detail and why this is all needed. Jumping into
+>> this thread without context and basically rejecting all the
+>> conclusions that were reached over the last several weeks is really
+>> not helpful - especially since your objection is not technical.
+>>
+>> I think you should wait for Intel to put together the /dev/ioasid uAPI
+>> proposal and the example use cases it should address then you can give
+>> feedback there, with proper context.
+> 
+> Yes, I think the next step is that someone who read the whole thread
+> writes up the conclusions and a rough /dev/ioasid API proposal, also
+> mentioning the use-cases it addresses. Based on that we can discuss the
+> implications this needs to have for IOMMU-API and code.
+> 
+>  From the use-cases I know the mdev concept is just fine. But if there is
+> a more generic one we can talk about it.
 
-"This code is not ready to be merged into the arch/risc/ directory
-because the RISC-V Foundation has not certified the hardware spec yet.
-However, the following chips have implemented it ABC12345, ABC6789 and
-they've already shipping to thousands of customers since blah blah blah
-so we should support it."
+Just to add another voice here, I have some colleagues working on 
+drivers where they want to use SMMU Substream IDs for a single hardware 
+block to operate on multiple iommu_domains managed entirely within the 
+kernel. Using an mdev-like approach with aux domains is pretty much the 
+ideal fit for this use-case, while all the IOASID discussion appears 
+centred on SVA and userspace interfaces, and as such barely relevant if 
+at all.
 
-I honestly thought it was an issue with the code or the userspace API.
+I seem to recall a non-trivial amount of effort going into the aux 
+domain design too, so the promise of replacing it with "a big TBD" just 
+because vfio-mdev turned out to be awful hardly fills me with enthusiasm 
+either :/
 
-regards,
-dan carpenter
-
+Robin.
