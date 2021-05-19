@@ -2,161 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D8ADA3898E8
-	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 23:53:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF5F53898EA
+	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 23:54:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229556AbhESVyk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 May 2021 17:54:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57996 "EHLO
+        id S229937AbhESVyx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 May 2021 17:54:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229598AbhESVyj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 May 2021 17:54:39 -0400
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79A93C061761
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 14:53:17 -0700 (PDT)
-Received: by mail-il1-x129.google.com with SMTP id h6so13495524ila.7
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 14:53:17 -0700 (PDT)
+        with ESMTP id S229952AbhESVyu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 May 2021 17:54:50 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4D15C061761
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 14:53:29 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id t4so7835461plc.6
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 14:53:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qHKLEyIhofUJ9O3L6wRXKwbLS4Rc68P4WfTPWjMjPlE=;
-        b=YdhjX1Bx6Wds8k+sGHxeLk5XXdy9lQknlHF5nJ+CZtZ7/QiKRI0LuL4KWEUGxY9pZU
-         YJ6DXWcWfevNK/4Xvz06EFTSmMeSCcCmAuJlGqGvK016b/Tap+LIuxYMHLyBUaXTu25T
-         1NPVQ2oyI303T5RIXMqvJLy+5QmFr7xmC7Jtld9c9cDYhnhKCxeJde4TSf5HOYgXwc1Q
-         +Dgfto6/H0ka/uuKmsIlcDjSJrvZqbKQjYF8JLLftlqbFAcfxQPuRC3R9zFmZd7icWmp
-         wyc8Fj4lqPcTxmrEW7UrPVa36TP3hwCnbf/VtzAmZoW9b2h3ITJAPJPekIXWzBRBzSuS
-         sp2Q==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=BYWFPE3EvGCH/ZPfc06CHtNLRxwGbiv54fFKJQnGuw4=;
+        b=BHQwOQFWvbtK+TB5YY4ZlJSKIje37HMl0Z6UDPjZuIHzUW3n4oc2vp9yxky00w6Xn6
+         2vsJWFvArMvcFbo98bhWiAqUlq8NNriEm3i0i3rqnZpam7DkMsJ1RcSCikN4l0h86bFe
+         EpKgJ9H1at2kpOO+80JnWmmvXZMce2w+KAdGqLSZJ8IpyMq+eZCVfLUwwRMJb4V/Q2Qu
+         8Vh8CTDD9a2k1Pr9uL+bkGeJhI2f8dGnJ96GP6YHoP3WDfwNenl1XOTq9zn9jHjKvY6T
+         Bh351uolKTZZMNQX5mToVhKOcT219NKH2QQB6E76ETHgUcYWIiub6aB6s6TD2uMYxpVS
+         647w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qHKLEyIhofUJ9O3L6wRXKwbLS4Rc68P4WfTPWjMjPlE=;
-        b=dqS1Nr/ET4A99w7oZQ+CkuZlN2lvZB/5aoRh6WsJUxrKTqJTzGxvwfRxKyCL37zWfi
-         WGNYx0OoKWK9OyiORV3czTgQEy3YbCEsomWCbsSsL+Dga2WbhdWdjWeB0kCCagrQtCLM
-         R+Dh2PfC8+r6E0qW5H9iUs40BxM3qBRI6A7/UjL74qUTeNT3ILUwLYvBb1rRGmNjv+/a
-         8thCugiRFxVPvZ2omQ50g7NgrwfNZ0xAy7BHGGE96khm0iousy4FiZUFpCbX8PspRkyN
-         AquR40CaMc7VpsBPwvv5oE5x0ha1Dv5gN6xq5utqwgIZiEBvV/oWClUYoXiM3Lesj+5E
-         I9sA==
-X-Gm-Message-State: AOAM531L04wgUThIF6sPK6DQRSeFUH3cslIBl+jsc4HzRHNp+HYWQacE
-        RJ5xBrwZ/3ctJYebVhjoQ/KokdUlDEIlZGMSdsarNA==
-X-Google-Smtp-Source: ABdhPJyqvn00++/Enjz0iknPn/khIgX0sjeuE6FEcTFhA4v0lx82z3Q5R4bucC9JlNrOHhGRcMkhe9/xXwzgl0hTtoo=
-X-Received: by 2002:a92:c5ac:: with SMTP id r12mr1160400ilt.283.1621461196624;
- Wed, 19 May 2021 14:53:16 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=BYWFPE3EvGCH/ZPfc06CHtNLRxwGbiv54fFKJQnGuw4=;
+        b=EsiimLPcqkcHLl0jRExbpt/L1Ag7oOFm3lTaKyoyHKUF8Z6TLxV/XdlyhBETSjxvP7
+         L3KbcEC6Kmq7JbuMEiB0yyAh+V3NvhoGfiATtvRa436YRdgPRnVO+CVob1Gb9E+Pr3W5
+         5czMGacN58MJKpA93PwA+pgLY0tCkhjGTCixGLUJ8kjl6DE04lPEXcOQW2Z9KAiMTZwb
+         59HsH9GskpOgTaU0ii2bFYbRbyUSCm5fYcOMSaEijYSp6k3Axqr8udxepmz3uakM/OE2
+         Az9+wb74ro/6cXzbxwlA7i0lNTG3weDZw5sKx93Z6WIWkRRFSNU1q+EpJeBNLqwZHcC7
+         uCpg==
+X-Gm-Message-State: AOAM530hM7gwifYaOAji8sl7hh7NQy87uPjId1GcamHzk+FBIXAxHIdi
+        TnfgqZb/3iZaZ3fu1o5BjB8/Ug==
+X-Google-Smtp-Source: ABdhPJw2fOae5m7SrQ14ODV1hBE1kvqVBWsGXHx3rc4csV/j/rZ9+16Pddzyqa1pUD2tssQLv6GaDw==
+X-Received: by 2002:a17:90a:5288:: with SMTP id w8mr1515286pjh.170.1621461209060;
+        Wed, 19 May 2021 14:53:29 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id s6sm348456pjr.29.2021.05.19.14.53.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 May 2021 14:53:28 -0700 (PDT)
+Date:   Wed, 19 May 2021 21:53:24 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jon Kohler <jon@nutanix.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Bijan Mottahedeh <bijan.mottahedeh@nutanix.com>,
+        Raphael Norwitz <raphael.norwitz@nutanix.com>,
+        Junaid Shahid <junaids@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] kvm: x86: move srcu lock out of kvm_vcpu_check_block
+Message-ID: <YKWI1GPdNc4shaCt@google.com>
+References: <20210428173820.13051-1-jon@nutanix.com>
+ <YIxsV6VgSDEdngKA@google.com>
+ <9040b3d8-f83f-beb5-a703-42202d78fabb@redhat.com>
+ <70B34A15-C4A1-4227-B037-7B26B40EDBFE@nutanix.com>
 MIME-Version: 1.0
-References: <20210519200339.829146-1-axelrasmussen@google.com> <20210519200339.829146-6-axelrasmussen@google.com>
-In-Reply-To: <20210519200339.829146-6-axelrasmussen@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 19 May 2021 14:53:06 -0700
-Message-ID: <CANgfPd9K88ddOzUuVSCw007N_7=2-7QMB-wc2BHPKnzdYe5Cnw@mail.gmail.com>
-Subject: Re: [PATCH v2 05/10] KVM: selftests: allow different backing source types
-To:     Axel Rasmussen <axelrasmussen@google.com>
-Cc:     Aaron Lewis <aaronlewis@google.com>,
-        Alexander Graf <graf@amazon.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jacob Xu <jacobhxu@google.com>,
-        Makarand Sonare <makarandsonare@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Yanan Wang <wangyanan55@huawei.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <70B34A15-C4A1-4227-B037-7B26B40EDBFE@nutanix.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 19, 2021 at 1:03 PM Axel Rasmussen <axelrasmussen@google.com> wrote:
->
-> Add an argument which lets us specify a different backing memory type
-> for the test. The default is just to use anonymous, matching existing
-> behavior.
->
-> This is in preparation for testing UFFD minor faults. For that, we'll
-> need to use a new backing memory type which is setup with MAP_SHARED.
->
-> Signed-off-by: Axel Rasmussen <axelrasmussen@google.com>
+On Wed, May 05, 2021, Jon Kohler wrote:
+> 
+> > On May 1, 2021, at 9:05 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > 
+> > On 30/04/21 22:45, Sean Christopherson wrote:
+> >> On Wed, Apr 28, 2021, Jon Kohler wrote:
+> >>> To improve performance, this moves kvm->srcu lock logic from
+> >>> kvm_vcpu_check_block to kvm_vcpu_running and wraps directly around
+> >>> check_events. Also adds a hint for callers to tell
+> >>> kvm_vcpu_running whether or not to acquire srcu, which is useful in
+> >>> situations where the lock may already be held. With this in place, we
+> >>> see roughly 5% improvement in an internal benchmark [3] and no more
+> >>> impact from this lock on non-nested workloads.
+> >> ...
+> >>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> >>> index efc7a82ab140..354f690cc982 100644
+> >>> --- a/arch/x86/kvm/x86.c
+> >>> +++ b/arch/x86/kvm/x86.c
+> >>> @@ -9273,10 +9273,24 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
+> >>>  	return 1;
+> >>>  }
+> >>> 
+> >>> -static inline bool kvm_vcpu_running(struct kvm_vcpu *vcpu)
+> >>> +static inline bool kvm_vcpu_running(struct kvm_vcpu *vcpu, bool acquire_srcu)
+> >>>  {
+> >>> -	if (is_guest_mode(vcpu))
+> >>> -		kvm_x86_ops.nested_ops->check_events(vcpu);
+> >>> +	if (is_guest_mode(vcpu)) {
+> >>> +		if (acquire_srcu) {
+> >>> +			/*
+> >>> +			 * We need to lock because check_events could call
+> >>> +			 * nested_vmx_vmexit() which might need to resolve a
+> >>> +			 * valid memslot. We will have this lock only when
+> >>> +			 * called from vcpu_run but not when called from
+> >>> +			 * kvm_vcpu_check_block > kvm_arch_vcpu_runnable.
+> >>> +			 */
+> >>> +			int idx = srcu_read_lock(&vcpu->kvm->srcu);
+> >>> +			kvm_x86_ops.nested_ops->check_events(vcpu);
+> >>> +			srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> >>> +		} else {
+> >>> +			kvm_x86_ops.nested_ops->check_events(vcpu);
+> >>> +		}
+> >>> +	}
+> >> Obviously not your fault, but I absolutely detest calling check_events() from
+> >> kvm_vcpu_running.  I would much prefer to make baby steps toward cleaning up the
+> >> existing mess instead of piling more weirdness on top.
+> >>
+> >> Ideally, APICv support would be fixed to not require a deep probe into nested
+> >> events just to see if a vCPU can run.  But, that's probably more than we want to
+> >> bite off at this time.
+> >>
+> >> What if we add another nested_ops API to check if the vCPU has an event, but not
+> >> actually process the event?  I think that would allow eliminating the SRCU lock,
+> >> and would get rid of the most egregious behavior of triggering a nested VM-Exit
+> >> in a seemingly innocuous helper.
+> >>
+> >> If this works, we could even explore moving the call to nested_ops->has_events()
+> >> out of kvm_vcpu_running() and into kvm_vcpu_has_events(); I can't tell if the
+> >> side effects in vcpu_block() would get messed up with that change :-/
+> >> Incomplete patch...
+> > 
+> > I think it doesn't even have to be *nested* events.  Most events are the
+> > same inside or outside guest mode, as they already special case guest mode
+> > inside the kvm_x86_ops callbacks (e.g. kvm_arch_interrupt_allowed is
+> > already called by kvm_vcpu_has_events).
+> > 
+> > I think we only need to extend kvm_x86_ops.nested_ops->hv_timer_pending to
+> > cover MTF, plus double check that INIT and SIPI are handled correctly, and
+> > then the call to check_nested_events can go away.
+> 
+> Thanks, Paolo, Sean. I appreciate the prompt response, Sorry for the slow
+> reply, I was out with a hand injury for a few days and am caught up now. 
+> 
+> Just to confirm - In the spirit of baby steps as Sean mentioned, I’m happy to
+> take up the idea that Sean mentioned, that makes sense to me. Perhaps we can
+> do that small patch and leave a TODO do a tuneup for hv_timer_pending and the
+> other double checks Paolo mentioned.
 
-Reviewed-by: Ben Gardon <bgardon@google.com>
+Paolo was pointing out that kvm_vcpu_has_events() already checks hv_timer_pending,
+and that we could add the few missing nested event cases to kvm_vcpu_has_events()
+instead of wholesale checking everything that's in check_nested_events().
 
-> ---
->  tools/testing/selftests/kvm/demand_paging_test.c | 15 +++++++++++----
->  1 file changed, 11 insertions(+), 4 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-> index 94cf047358d5..01890a7b0155 100644
-> --- a/tools/testing/selftests/kvm/demand_paging_test.c
-> +++ b/tools/testing/selftests/kvm/demand_paging_test.c
-> @@ -241,6 +241,7 @@ static void setup_demand_paging(struct kvm_vm *vm,
->  struct test_params {
->         bool use_uffd;
->         useconds_t uffd_delay;
-> +       enum vm_mem_backing_src_type src_type;
->         bool partition_vcpu_memory_access;
->  };
->
-> @@ -258,11 +259,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->         int r;
->
->         vm = perf_test_create_vm(mode, nr_vcpus, guest_percpu_mem_size,
-> -                                VM_MEM_SRC_ANONYMOUS);
-> +                                p->src_type);
->
->         perf_test_args.wr_fract = 1;
->
-> -       demand_paging_size = get_backing_src_pagesz(VM_MEM_SRC_ANONYMOUS);
-> +       demand_paging_size = get_backing_src_pagesz(p->src_type);
->
->         guest_data_prototype = malloc(demand_paging_size);
->         TEST_ASSERT(guest_data_prototype,
-> @@ -378,7 +379,7 @@ static void help(char *name)
->  {
->         puts("");
->         printf("usage: %s [-h] [-m mode] [-u] [-d uffd_delay_usec]\n"
-> -              "          [-b memory] [-v vcpus] [-o]\n", name);
-> +              "          [-b memory] [-t type] [-v vcpus] [-o]\n", name);
->         guest_modes_help();
->         printf(" -u: use User Fault FD to handle vCPU page\n"
->                "     faults.\n");
-> @@ -388,6 +389,8 @@ static void help(char *name)
->         printf(" -b: specify the size of the memory region which should be\n"
->                "     demand paged by each vCPU. e.g. 10M or 3G.\n"
->                "     Default: 1G\n");
-> +       printf(" -t: The type of backing memory to use. Default: anonymous\n");
-> +       backing_src_help();
->         printf(" -v: specify the number of vCPUs to run.\n");
->         printf(" -o: Overlap guest memory accesses instead of partitioning\n"
->                "     them into a separate region of memory for each vCPU.\n");
-> @@ -399,13 +402,14 @@ int main(int argc, char *argv[])
->  {
->         int max_vcpus = kvm_check_cap(KVM_CAP_MAX_VCPUS);
->         struct test_params p = {
-> +               .src_type = VM_MEM_SRC_ANONYMOUS,
->                 .partition_vcpu_memory_access = true,
->         };
->         int opt;
->
->         guest_modes_append_default();
->
-> -       while ((opt = getopt(argc, argv, "hm:ud:b:v:o")) != -1) {
-> +       while ((opt = getopt(argc, argv, "hm:ud:b:t:v:o")) != -1) {
->                 switch (opt) {
->                 case 'm':
->                         guest_modes_cmdline(optarg);
-> @@ -420,6 +424,9 @@ int main(int argc, char *argv[])
->                 case 'b':
->                         guest_percpu_mem_size = parse_size(optarg);
->                         break;
-> +               case 't':
-> +                       p.src_type = parse_backing_src_type(optarg);
-> +                       break;
->                 case 'v':
->                         nr_vcpus = atoi(optarg);
->                         TEST_ASSERT(nr_vcpus > 0 && nr_vcpus <= max_vcpus,
-> --
-> 2.31.1.751.gd2f1c929bd-goog
->
+I believe that would work, as I suspect the underlying bug that was alluded to
+by commit 0ad3bed6c5ec ("kvm: nVMX: move nested events check to kvm_vcpu_running")
+has since been fixed.  But, I'm not sure it makes much difference in practice
+since we'll likely end up with nested_ops->has_events() either way.
+
+Staring a bit more, I'm pretty sure hv_timer_pending() can be made obsolete and
+dropped.  Unless Paolo objects, I still like my original proposal.
+
+I think the safest approach from a bisection standpoint would be to do this in
+3-4 stages:
+
+  1. Refactor check_nested_events() to split out a has_events() helper.
+  2. Move the has_events() call from kvm_vcpu_running() into kvm_vcpu_has_events()
+  3. Drop the explicit hv_timer_pending() in inject_pending_event().  It should
+     be dead code since it's just a pointer to nested_vmx_preemption_timer_pending(),
+     which is handled by vmx_check_nested_events() and called earlier.
+  4. Drop the explicit hv_timer_pending() in kvm_vcpu_has_events() for the same
+     reasons as (3).  This can also drop hv_timer_pending() entirely.
+
+> Or would you rather skip that approach and go right to making
+> check_nested_events go-away first? Guessing that might be a larger effort
+> with more nuances though?
