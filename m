@@ -2,100 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9EB90388F47
-	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 15:39:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7273388F6B
+	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 15:44:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346637AbhESNkx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 May 2021 09:40:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57792 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240097AbhESNkx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 May 2021 09:40:53 -0400
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 701C3C061763
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 06:39:33 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id o5so6422810edc.5
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 06:39:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZyIq8u+kwqwBpbcwfduylW+9xPyGO1H5rtatjl1f/C8=;
-        b=xs/S/LlOVbGml0EAnOsGRxZ5oyqDBbSJlCsgVvbQ04i5427YcKz67n0cj1OtSeZJzl
-         3OctonqM0oElTfaoTOk7R2GorMPYS4s6Btg8XNc/c8YJCgYkjK+9gWKXqHAD42DxLpI8
-         u88O6hu8P5tyhEqbon4FApOFc19n66atecuVED7etO6q1DkSFutUnSZJ47B113wTUxY4
-         BDyFvGJ7MTYq9/FGHolluJ7KGdFbHah2Ii04NPVk3Do6Edo/rTmDaygSrsV/k7OCxbIf
-         5fhm7wm6SKx4287C/a43687P2ouGxwFMVU1e5nxsCdXnJ4V1slDmpOxWqN3L8omzqx2q
-         Gnng==
+        id S1353757AbhESNpq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 May 2021 09:45:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47755 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1353693AbhESNpp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 May 2021 09:45:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621431865;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LJSW7Dy9FR3zafoPH+EoEEnX0R29tbOmjGmAjRdxKk0=;
+        b=NS+BOV8oTUQSAzUuhIrBOkzvEc7zoemyCY2LDpHoQU2aHUDQSR3NBTkHK961TE6xmB6Co9
+        5VCR43NzOtYwVpL4QaKNGPHiqn34O3b7lEMKRJywrCIT7y7vpiy801yYFfqcuasVXkcpIM
+        oXJG5J40z1Ebe2PHll/s0NyFzvZjt14=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-492-zm71SmnyORa4l3welFBryg-1; Wed, 19 May 2021 09:44:21 -0400
+X-MC-Unique: zm71SmnyORa4l3welFBryg-1
+Received: by mail-wr1-f70.google.com with SMTP id p11-20020adfc38b0000b0290111f48b8adfso3696489wrf.7
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 06:44:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZyIq8u+kwqwBpbcwfduylW+9xPyGO1H5rtatjl1f/C8=;
-        b=qLAGYo1PnF7IBwFGXV+ynBwuafgFaQyno5YpSqNZTmpfk1IBJx9pwMOxQ3XrKj7vSR
-         dsonG0qRJeao35QT1I3cOBa3Cxt6Ectk4bx3xfz1FYOqFru54IrG9mBVCeONmBzC+I7D
-         AVsyJVp4zlBGCdMVcebjugUr1pdj7KwkwscBrEtv8+vAjxqIC89pZSMlGbmhg6mTMF54
-         fOel1271mvCMLMUJfVQLHgu251ovhRPoSXygHtcW3BP77pFKvhLQYtt++OwliECtpU0O
-         3X+sqL6VcSBXX+gZYkFf/vkSxawqmlmJwiY5PsQWyld4imlBYAB71gC3m1ji4efNapAJ
-         fIGg==
-X-Gm-Message-State: AOAM531v5t/ihdhO3SAcAbAnibh99ORopuENT1+Z1YRg/QL/cHCswxZn
-        L+JLtLgxWd49dVGl2Im/orcisur16JqqtqWayf3K
-X-Google-Smtp-Source: ABdhPJyUaoeoU6jHmwL2wRih6mMfwzvW50aSrjBZb35A6Wf6KcfF+IKFvuHwvdNQjGh/v4RZkom8EsJySMDZrk7j/3M=
-X-Received: by 2002:a05:6402:4252:: with SMTP id g18mr14312783edb.195.1621431571306;
- Wed, 19 May 2021 06:39:31 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=LJSW7Dy9FR3zafoPH+EoEEnX0R29tbOmjGmAjRdxKk0=;
+        b=jy0b4I7+27YEjJTqhe9dUKkjSQgaa0qZ0mcYwbhPGkFggkUJIq+JFzjgLkaHt1Lked
+         rxvPfhaNw4JER7l0c4s5UUFD/yDc/0uwEJPgds5GCxDJIF2zMq+kg4AsPdmPUNnktPTt
+         06UzYT9hY/AxUjNYvAK2bgtcxIolHhHwS6g/x66QpfQX1J9vsXsYszH6JcQQDV/qitI9
+         jaabBf27AvAKBeP1ft6SUeEjgoKc6rDKrn8s3PC+b6ZBKBLFiKvvMEu/AuePzlJcBVog
+         +u5d0W86wqvwkYbEWxmGtLFxr/K7bE7NU3iX39ZePUhW1xx11R/2bQS13CSh64W9rhOB
+         /l3w==
+X-Gm-Message-State: AOAM530hsw3BJg+vtUiNQOfrmu6HO/N2BMTQsa1AhGhDjlw0YqCmLO9V
+        sm9ztk8PLyjwJRNFg5lwwUNPSafvz1wnhPXQvDdlrNb4/oji5IgtweR09KfkFuuNMpLK9E9bttF
+        64xXyQXvj+CtQ
+X-Received: by 2002:a5d:6285:: with SMTP id k5mr14778071wru.50.1621431860366;
+        Wed, 19 May 2021 06:44:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzPny7uEtz/zZyoiwC9xBSb3weeyHOxeLbadHaxRJN/jHDXuBqP+gHrGOxsnOJ2kyJxeU9ong==
+X-Received: by 2002:a5d:6285:: with SMTP id k5mr14778052wru.50.1621431860200;
+        Wed, 19 May 2021 06:44:20 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id g5sm11409775wmi.8.2021.05.19.06.44.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 May 2021 06:44:19 -0700 (PDT)
+Subject: Re: [PATCH v2 2/4] mm: x86: Invoke hypercall when page encryption
+ status is changed
+To:     Ashish Kalra <ashish.kalra@amd.com>,
+        Steve Rutherford <srutherford@google.com>
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        X86 ML <x86@kernel.org>, KVM list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Venu Busireddy <venu.busireddy@oracle.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+References: <cover.1619193043.git.ashish.kalra@amd.com>
+ <ff68a73e0cdaf89e56add5c8b6e110df881fede1.1619193043.git.ashish.kalra@amd.com>
+ <YJvU+RAvetAPT2XY@zn.tnic> <20210513043441.GA28019@ashkalra_ubuntu_server>
+ <YJ4n2Ypmq/7U1znM@zn.tnic> <7ac12a36-5886-cb07-cc77-a96daa76b854@redhat.com>
+ <20210514090523.GA21627@ashkalra_ubuntu_server> <YJ5EKPLA9WluUdFG@zn.tnic>
+ <20210514100519.GA21705@ashkalra_ubuntu_server>
+ <CABayD+e9NHytm5RA7MakRq5EqPJ+U11jWkEFpJKSqm0otBidaQ@mail.gmail.com>
+ <20210519120642.GA19235@ashkalra_ubuntu_server>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a4766cb8-be69-03d3-6320-55c10bdc1672@redhat.com>
+Date:   Wed, 19 May 2021 15:44:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-References: <20210517095513.850-1-xieyongji@bytedance.com> <20210517095513.850-5-xieyongji@bytedance.com>
-In-Reply-To: <20210517095513.850-5-xieyongji@bytedance.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Wed, 19 May 2021 21:39:20 +0800
-Message-ID: <CACycT3s1rEvNnNkJKQsHGRsyLPADieFdVkb1Sp3GObR0Vox5Fg@mail.gmail.com>
-Subject: Re: [PATCH v7 04/12] virtio-blk: Add validation for block size in
- config space
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org
-Cc:     virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210519120642.GA19235@ashkalra_ubuntu_server>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 17, 2021 at 5:56 PM Xie Yongji <xieyongji@bytedance.com> wrote:
->
-> This ensures that we will not use an invalid block size
-> in config space (might come from an untrusted device).
->
-> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-> ---
->  drivers/block/virtio_blk.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index ebb4d3fe803f..c848aa36d49b 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -826,7 +826,7 @@ static int virtblk_probe(struct virtio_device *vdev)
->         err = virtio_cread_feature(vdev, VIRTIO_BLK_F_BLK_SIZE,
->                                    struct virtio_blk_config, blk_size,
->                                    &blk_size);
-> -       if (!err)
-> +       if (!err && blk_size > 0 && blk_size <= max_size)
+On 19/05/21 14:06, Ashish Kalra wrote:
+> Now these buffers have very short life and only used for immediate I/O
+> and then freed, so they may not be of major concern for SEV
+> migration ?
 
-The check here is incorrect. I will use PAGE_SIZE as the maximum
-boundary in the new version.
+Well, they are a concern because they do break migration.  But it may be 
+indeed good enough to just have a WARN ("bad things may happen and you 
+get to keep both pieces") and not disable future migration.
 
-Thanks,
-Yongji
+A BUG must always be avoided unless you're sure that something *worse* 
+will happen in the future, e.g. a BUG is acceptable if you have detected 
+a use-after-free or a dangling pointer.  This is not the case.
+
+Paolo
+
+> So disabling migration for failure of address lookup or mapping failures
+> on such pages will really be an overkill.
+> Might be in favor of Steve's thoughts above of doing a BUG() here
+> instead.
+
