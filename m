@@ -2,174 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F3721389727
-	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 21:58:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC63438975B
+	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 22:03:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232463AbhEST7z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 May 2021 15:59:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60116 "EHLO
+        id S232572AbhESUFK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 May 2021 16:05:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232460AbhEST7y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 May 2021 15:59:54 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C333C06175F
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 12:58:34 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id i6so2839895plt.4
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 12:58:34 -0700 (PDT)
+        with ESMTP id S232471AbhESUFJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 May 2021 16:05:09 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6628AC061760
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 13:03:48 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id p138-20020a2542900000b029051304a381d9so7099643yba.20
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 13:03:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=j5nrfmcF93AKRgieL57ZADJtNONxgrPmJG86D6uJFj4=;
-        b=SO21Jy/1gMSCHCoovzZ45WTy76Hy7+vgbq0ShV9jDL1liNPLWyjF5M75F14keRkJP1
-         Is1Fdp5HWchYoHA8kvOCkZDALx3mp3YjHKOOhnUmPYQt2p7ZVQJl18E7Sbfb1bWZCicX
-         GAyYpyr+adzDEteRVkaTzDbL2Im9W/iMRDdUlWg1YuK0+nahq0YnW8XddHLL9woFUcrj
-         Jtcq1+RSkIV9DQvqBFMKqk+UdS+lmIF1r3c+4Q3Ng/C7C0zoccWU48HcZ5Kxa4v/qwLC
-         MVPL2atl7AkILaS/4n9fEeYK8ZjWO1QCL3QfIGuSJMJgcO3NqhTBADNJ0BCO4p6JST7U
-         ihKg==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=TRzyq4oNy0xbwezI+8cBZnf/nTLSb+t8cRqYWcWY/Eg=;
+        b=CxvtArSRKX6OIHDHNbloVqlUItuDs1pUVWO461kxImFFcH32VxsUk8wQRTWZwQ6azV
+         xH9kIDgHSGkmKm3QMzYT8uD5SUun0xyFySIS+XdVS0A3rqkbCqR3aWZIGyOmeKCdjjEj
+         ZC2H/hOoPa5G7ZMVYY0Ra3jjN+vFL3opMB+3VKbRuP9Um+YHZNcNdhuIUS/xWwqbJH+i
+         jXPI/8k+0f6H7op/p+Aa0EWorl/GZObZys8KJJnM7xcqT6q9C+QoQGA3cOfd6VG2rF60
+         ETVQ91+uqYc3SF2jfC1c2q0N8ia/NuFB3pTg7Cf2b5wJCmdp2TJch+OuowdqLY9nCkD2
+         dOmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=j5nrfmcF93AKRgieL57ZADJtNONxgrPmJG86D6uJFj4=;
-        b=KGAKdseJP8LwbaE20CKu1KIcsD5Gy6izMvaC8zNuPyZKXWWpVYmLEzvgO/zduvdThD
-         LfEdl2tTqieFSm15pbYTRVlyQ2rU92wZrtemePmna18WY9HfUK19Qtc/MdLIa9rkwnor
-         i0diKMX3YLiyfq9l6VeF1+aXyaEe/1R8D1+ffDNDK3T8eBdV6lAph/9CVEOMwGM8GUza
-         lfbK3UvPdu7fVo8srmdESBCazkCEsF66MQFh2atdMcSAjONIs9P8slh0Q0K3Dv2lLJXE
-         iD2slasMCbDCqtBUVcL6MgTxeifzxjfLVtaUz8oy64DRVVzfhZiKU8aQamx8l598bk+S
-         q2Fg==
-X-Gm-Message-State: AOAM5304xvL2S/4j8VmQM2sCyH4/7yPh4zqanlREpr6taAJ1Fvax/Jlk
-        Dc67yyY5tiVl4YxrYxiiUxkjRQ==
-X-Google-Smtp-Source: ABdhPJyzhx1FtKRNVT6lwCbyTf/m5HXdEAfJf2CsHerYKwPsWe5O63zA+6yN8pqyQtfqiKgNNeE92Q==
-X-Received: by 2002:a17:90a:a10a:: with SMTP id s10mr668570pjp.59.1621454313950;
-        Wed, 19 May 2021 12:58:33 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id c134sm192434pfb.135.2021.05.19.12.58.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 May 2021 12:58:33 -0700 (PDT)
-Date:   Wed, 19 May 2021 19:58:29 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 29/43] KVM: SVM: Tweak order of cr0/cr4/efer writes at
- RESET/INIT
-Message-ID: <YKVt5XVIQMUCUIHd@google.com>
-References: <20210424004645.3950558-1-seanjc@google.com>
- <20210424004645.3950558-30-seanjc@google.com>
- <CAAeT=FzpUBXpzuCT3eD=3sRnV14OYLA+28Eo7YFioC+vc=xVsA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAeT=FzpUBXpzuCT3eD=3sRnV14OYLA+28Eo7YFioC+vc=xVsA@mail.gmail.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=TRzyq4oNy0xbwezI+8cBZnf/nTLSb+t8cRqYWcWY/Eg=;
+        b=hojmyThQqJ0PamAHoNI65yyWgdcjW89H/cA/y/m2MctZt5T8Tq9vmQV4EwV9ZDXKSr
+         2Nhzp545nWyaoDrQL9QDRwoPbCrkOFY3X68TZwgBZ6siS24NZ44zJ8M+Kd/d4RdUFvD5
+         OrnL/rpCcaYJuE4zVRvowySu840dhtgUNN/vappkzvRTBaZZfKIkzsPFcsRal+jtgXnl
+         cTbR8AnOfLcuwnIch6XMM3Gn3698Ctg5Zrked4x1eyOfVPAZ5kBKBfusOWuLtXX53NLN
+         sg9Wts8yP1A/W3rfoe1gBomtHjKDL15DcOVtqq4TThHx3CmeIx1cdvqMYROnAsH2BdrU
+         2Gpg==
+X-Gm-Message-State: AOAM533eVAOe/8xDGAVsPMBjHTdFPpLsiBmmCgr4AUmeJIXD4gt9JBm3
+        NP3LJZ7UaaUCYN5Yi/xu2sGj35ems/MXf504Z/Vb
+X-Google-Smtp-Source: ABdhPJyFo1HijtaGGGcxKGVnq1SWKSvHoMWpsxuc+TwmN6hh5Zag+cdBMzwAriowHUIKTHlRVkauQ7YZIi2LKSLHBpWj
+X-Received: from ajr0.svl.corp.google.com ([2620:15c:2cd:203:7eb5:10bb:834a:d5ec])
+ (user=axelrasmussen job=sendgmr) by 2002:a25:8205:: with SMTP id
+ q5mr1802119ybk.170.1621454627516; Wed, 19 May 2021 13:03:47 -0700 (PDT)
+Date:   Wed, 19 May 2021 13:03:29 -0700
+Message-Id: <20210519200339.829146-1-axelrasmussen@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.1.751.gd2f1c929bd-goog
+Subject: [PATCH v2 00/10] KVM: selftests: exercise userfaultfd minor faults
+From:   Axel Rasmussen <axelrasmussen@google.com>
+To:     Aaron Lewis <aaronlewis@google.com>,
+        Alexander Graf <graf@amazon.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Ben Gardon <bgardon@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jacob Xu <jacobhxu@google.com>,
+        Makarand Sonare <makarandsonare@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Yanan Wang <wangyanan55@huawei.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Axel Rasmussen <axelrasmussen@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 19, 2021, Reiji Watanabe wrote:
-> > @@ -1204,18 +1204,13 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
-> >         init_sys_seg(&save->ldtr, SEG_TYPE_LDT);
-> >         init_sys_seg(&save->tr, SEG_TYPE_BUSY_TSS16);
-> >
-> > +       svm_set_cr0(vcpu, X86_CR0_NW | X86_CR0_CD | X86_CR0_ET);
-> >         svm_set_cr4(vcpu, 0);
-> >         svm_set_efer(vcpu, 0);
-> >         save->dr6 = 0xffff0ff0;
-> >         kvm_set_rflags(vcpu, X86_EFLAGS_FIXED);
-> >         vcpu->arch.regs[VCPU_REGS_RIP] = 0x0000fff0;
-> >
-> > -       /*
-> > -        * svm_set_cr0() sets PG and WP and clears NW and CD on save->cr0.
-> > -        * It also updates the guest-visible cr0 value.
-> > -        */
-> > -       svm_set_cr0(vcpu, X86_CR0_NW | X86_CR0_CD | X86_CR0_ET);
-> 
-> AMD's APM Vol2 (Table 14-1 in Revision 3.37) says CR0 After INIT will be:
-> 
->    CD and NW are unchanged
->    Bit 4 (reserved) = 1
->    All others = 0
-> 
-> (CR0 will be 0x60000010 after RESET)
-> 
-> So, it looks the CR0 value that init_vmcb() sets could be
-> different from what is indicated in the APM for INIT.
-> 
-> BTW, Intel's SDM (April 2021 version) says CR0 for Power up/Reset/INIT
-> will be 0x60000010 with the following note.
-> -------------------------------------------------
-> The CD and NW flags are unchanged,
-> bit 4 is set to 1, all other bits are cleared.
-> -------------------------------------------------
-> The note is attached as '2' to all Power up/Reset/INIT cases
-> looking at the SDM.  I would guess it is erroneous that
-> the note is attached to Power up/Reset though.
+Base
+====
 
-Agreed.  I'll double check that CD and NW are preserved by hardware on INIT,
-and will also ping Intel folks to fix the POWER-UP and RESET footnote.
+These patches are based upon Andrew Morton's v5.13-rc1-mmots-2021-05-13-17-23
+tag. This is because this series depends on:
 
-Hah!  Reading through that section yet again, there's another SDM bug.  It
-contradicts itself with respect to the TLBs after INIT.
+- UFFD minor fault support for hugetlbfs (in v5.13-rc1) [1]
+- UFFD minor fault support for shmem (in Andrew's tree) [2]
 
-  9.1 INITIALIZATION OVERVIEW: 
-    The major difference is that during an INIT, the internal caches, MSRs,
-    MTRRs, and x87 FPU state are left unchanged (although, the TLBs and BTB
-    are invalidated as with a hardware reset)
+[1] https://lore.kernel.org/linux-fsdevel/20210301222728.176417-1-axelrasmussen@google.com/
+[2] https://lore.kernel.org/patchwork/cover/1420967/
 
-while Table 9-1 says:
+Changelog
+=========
 
-  Register                    Power up    Reset      INIT
-  Data and Code Cache, TLBs:  Invalid[6]  Invalid[6] Unchanged
+v1->v2:
+- Picked up Reviewed-by's.
+- Change backing_src_is_shared() to check the flags, instead of the type. This
+  makes it robust to adding new backing source types in the future.
+- Add another commit which refactors setup_demand_paging() error handling.
+- Print UFFD ioctl type once in setup_demand_paging, instead of on every page-in
+  operation.
+- Expand comment on why we use MFD_HUGETLB instead of MAP_HUGETLB.
+- Reworded comment on addr_gpa2alias.
+- Moved demand_paging_test.c timing calls outside of the if (), deduplicating
+  them.
+- Split trivial comment / logging fixups into a separate commit.
+- Add another commit which prints a clarifying message on test skip.
+- Split the commit allowing backing src_type to be modified in two.
+- Split the commit adding the shmem backing type in two.
+- Rebased onto v5.13-rc1-mmots-2021-05-13-17-23.
 
-I'm pretty sure that Intel CPUs are supposed to flush the TLB, i.e. Tabel 9-1 is
-wrong.  Back in my Intel validation days, I remember being involved in a Core2
-bug that manifested as a triple fault after INIT due to global TLB entries not
-being flushed.  Looks like that wasn't fixed:
+Overview
+========
 
-https://www.intel.com/content/dam/support/us/en/documents/processors/mobile/celeron/sb/320121.pdf
+Minor fault handling is a new userfaultfd feature whose goal is generally to
+improve performance. In particular, it is intended for use with demand paging.
+There are more details in the cover letters for this new feature (linked above),
+but at a high level the idea is that we think of these three phases of live
+migration of a VM:
 
-  AZ28. INIT Does Not Clear Global Entries in the TLB
-  Problem: INIT may not flush a TLB entry when:
-    • The processor is in protected mode with paging enabled and the page global enable
-      flag is set (PGE bit of CR4 register)
-    • G bit for the page table entry is set
-    • TLB entry is present in TLB when INIT occurs
-    • Software may encounter unexpected page fault or incorrect address translation due
-      to a TLB entry erroneously left in TLB after INIT.
+1. Precopy, where we copy "some" pages from the source to the target, while the
+   VM is still running on the source machine.
+2. Blackout, where execution stops on the source, and begins on the target.
+3. Postcopy, where the VM is running on the target, some pages are already up
+   to date, and others are not (because they weren't copied, or were modified
+   after being copied).
 
-  Workaround: Write to CR3, CR4 (setting bits PSE, PGE or PAE) or CR0 (setting
-              bits PG or PE) registers before writing to memory early in BIOS
-	      code to clear all the global entries from TLB.
-	      
-  Status: For the steppings affected, see the Summary Tables of Changes.
+During postcopy, the first time the guest touches memory, we intercept a minor
+fault. Userspace checks whether or not the page is already up to date. If
+needed, we copy the final version of the page from the soure machine. This
+could be done with RDMA for example, to do it truly in place / with no copying.
+At this point, all that's left is to setup PTEs for the guest: so we issue
+UFFDIO_CONTINUE. No copying or page allocation needed.
 
-AMD's APM also appears to contradict itself, though that depends on one's
-interpretation of "external intialization".  Like the SDM, its table states that
-the TLBs are not flushed on INIT:
+Because of this use case, it's useful to exercise this as part of the demand
+paging test. It lets us ensure the use case works correctly end-to-end, and also
+gives us an in-tree way to profile the end-to-end flow for future performance
+improvements.
 
-  Table 14-1. Initial Processor State
+Axel Rasmussen (10):
+  KVM: selftests: trivial comment/logging fixes
+  KVM: selftests: simplify setup_demand_paging error handling
+  KVM: selftests: print a message when skipping KVM tests
+  KVM: selftests: compute correct demand paging size
+  KVM: selftests: allow different backing source types
+  KVM: selftests: refactor vm_mem_backing_src_type flags
+  KVM: selftests: add shmem backing source type
+  KVM: selftests: create alias mappings when using shared memory
+  KVM: selftests: allow using UFFD minor faults for demand paging
+  KVM: selftests: add shared hugetlbfs backing source type
 
-  Processor Resource         Value after RESET      Value after INIT
-  Instruction and Data TLBs  Invalidated            Unchanged
+ .../selftests/kvm/demand_paging_test.c        | 175 +++++++++++-------
+ .../testing/selftests/kvm/include/kvm_util.h  |   1 +
+ .../testing/selftests/kvm/include/test_util.h |  12 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  84 ++++++++-
+ .../selftests/kvm/lib/kvm_util_internal.h     |   2 +
+ tools/testing/selftests/kvm/lib/test_util.c   |  51 +++--
+ 6 files changed, 238 insertions(+), 87 deletions(-)
 
-but a blurb later on says:
+--
+2.31.1.751.gd2f1c929bd-goog
 
-  5.5.3 TLB Management
-
-  Implicit Invalidations. The following operations cause the entire TLB to be
-  invalidated, including global pages:
-
-    • External initialization of the processor.
-
-
-All in all, that means KVM also has a bug in the form of a missing guest TLB
-flush on INIT, at least for VMX and probably for SVM.  I'll add a patch to flush
-the guest TLBs on INIT irrespective of vendor.  Even if AMD CPUs don't flush the
-TLB, I see no reason to bank on all guests being paranoid enough to flush the
-TLB immediately after INIT.
