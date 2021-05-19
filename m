@@ -2,137 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC6D33899B4
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 01:15:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 258BA3899C5
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 01:25:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229898AbhESXRF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 May 2021 19:17:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42690 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229465AbhESXRE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 May 2021 19:17:04 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6B10F61073;
-        Wed, 19 May 2021 23:15:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1621466143;
-        bh=beE4/t2PXKApA1HIKdMVG9OOGAVvsn53W5079fVxQ/0=;
-        h=In-Reply-To:References:Date:From:To:Cc:Subject:From;
-        b=XLozLhVPQv/6woT+UnfzEZrnec0PUe+d6LxgEbl2gcjIkECwfIQsIq2XseOagWUYg
-         n54mHH7QANRtQVpvW+joEulDL3hR0UJcJ1B7KXtaCCFHlHI8pB9jRrUNebaSvE3ReV
-         HDFYG9SRQM6RkdeP1hxJoyv6tNLhxgNrHCe2pcPeg89KEBEyV4fwYxnkAmB+LTuTgo
-         p3BKwJTv5gA3jp4LdK2HzB5M+Ls47btJIFIPw35Xz3rsL23lgmwh383uO1Lg3w98HP
-         Ls8poELkNPu5u6MXKyrLKc3AZGYbuDFAaC/YO/JUHRg3OCwfYjYCRsiulV9Bs0ibaf
-         8jfFd+AjQkCRQ==
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
-        by mailauth.nyi.internal (Postfix) with ESMTP id 72A8927C007C;
-        Wed, 19 May 2021 19:15:40 -0400 (EDT)
-Received: from imap21 ([10.202.2.71])
-  by compute2.internal (MEProxy); Wed, 19 May 2021 19:15:40 -0400
-X-ME-Sender: <xms:GZylYPnLzxNtu3_dJKXqLloo9yV7x8vCtLfIxwFAAN-ZFNJAarmdfw>
-    <xme:GZylYC2rPWBl7cozB0Prt83-b5SpWIhD36DDRT9N0twjSjW8yFD-nsjdIwl7-Ql3R
-    15-Y_lxWw_XnFxfAkQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvdejtddgvddtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvffutgfgsehtqhertderreejnecuhfhrohhmpedftehn
-    ugihucfnuhhtohhmihhrshhkihdfuceolhhuthhosehkvghrnhgvlhdrohhrgheqnecugg
-    ftrfgrthhtvghrnhepvdelheejjeevhfdutdeggefftdejtdffgeevteehvdfgjeeiveei
-    ueefveeuvdetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrh
-    homheprghnugihodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduudeiudek
-    heeifedvqddvieefudeiiedtkedqlhhuthhopeepkhgvrhhnvghlrdhorhhgsehlihhnuh
-    igrdhluhhtohdruhhs
-X-ME-Proxy: <xmx:GZylYFqo6Cyo29Tv2pkNc1D38FyCqeJS7CMM5cAEJFWXpcdWqxfECw>
-    <xmx:GZylYHn2K6qjX46ceqkbccWf9PIcI6uh7z3nUGDyKazqBWnvCxSyjA>
-    <xmx:GZylYN1r-FWIAg8kqvADLhJYl-pLeo9-4iqXKbZ-2h9VeeoFkfG3Kw>
-    <xmx:HJylYOcszQWe3wSdQtP4wYcfrxwLBIYWxc6HVQrFsOTyrmy2kangPvqHafCV_u0o8_noIPl7o14>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 2219051C0060; Wed, 19 May 2021 19:15:37 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.5.0-alpha0-448-gae190416c7-fm-20210505.004-gae190416
-Mime-Version: 1.0
-Message-Id: <b2a9056a-d181-44ae-bb9f-a809f52cf691@www.fastmail.com>
-In-Reply-To: <8e45611c-f6ce-763a-ad17-adada33716d6@intel.com>
-References: <20210507164456.1033-1-jon@nutanix.com>
- <CALCETrW0_vwpbVVpc+85MvoGqg3qJA+FV=9tmUiZz6an7dQrGg@mail.gmail.com>
- <5e01d18b-123c-b91f-c7b4-7ec583dd1ec6@redhat.com>
- <8e45611c-f6ce-763a-ad17-adada33716d6@intel.com>
-Date:   Wed, 19 May 2021 16:15:16 -0700
-From:   "Andy Lutomirski" <luto@kernel.org>
-To:     "Dave Hansen" <dave.hansen@intel.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        "Jon Kohler" <jon@nutanix.com>,
-        "Sean Christopherson" <seanjc@google.com>
-Cc:     "Babu Moger" <babu.moger@amd.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        "Wanpeng Li" <wanpengli@tencent.com>,
-        "Jim Mattson" <jmattson@google.com>,
-        "Joerg Roedel" <joro@8bytes.org>,
-        "Fenghua Yu" <fenghua.yu@intel.com>,
-        "Yu-cheng Yu" <yu-cheng.yu@intel.com>,
-        "Tony Luck" <tony.luck@intel.com>,
-        "Uros Bizjak" <ubizjak@gmail.com>,
-        "Petteri Aimonen" <jpa@git.mail.kapsi.fi>,
-        "Kan Liang" <kan.liang@linux.intel.com>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        "Mike Rapoport" <rppt@kernel.org>,
-        "Benjamin Thiel" <b.thiel@posteo.de>,
-        "Fan Yang" <Fan_Yang@sjtu.edu.cn>,
-        "Juergen Gross" <jgross@suse.com>,
-        "Dave Jiang" <dave.jiang@intel.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        "Ricardo Neri" <ricardo.neri-calderon@linux.intel.com>,
-        "Arvind Sankar" <nivedita@alum.mit.edu>,
-        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
-        "kvm list" <kvm@vger.kernel.org>
-Subject: =?UTF-8?Q?Re:_[PATCH]_KVM:_x86:_add_hint_to_skip_hidden_rdpkru_under_kvm?=
- =?UTF-8?Q?=5Fload=5Fhost=5Fxsave=5Fstate?=
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+        id S229556AbhESX0X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 May 2021 19:26:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50528 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229498AbhESX0X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 May 2021 19:26:23 -0400
+Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6778C061574
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 16:25:01 -0700 (PDT)
+Received: by mail-qk1-x72e.google.com with SMTP id v8so14540428qkv.1
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 16:25:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=jofypBmuNK78helxp/ax3lvvaD1SSYgX9AHCXeb2JyI=;
+        b=N+FIikMxArUHq1byG1kV6q6NKiH1yzdaJ73QnFvU7gnei0NcXatMYjDQ/ysJWeBJUz
+         HU+0NNBklt3GiG1WqihmEZDLgrsaMez/pjd1gK+nq1yfEAl4wKARzYJcQ9YvICi1PbfJ
+         YmKCfYOaNFRsx04nfwkEcco4XkSA5EJzUpFfr7AW5h4ojV2pmxtrP0yLMHPB89Npr6MC
+         cYvKGOLX7tUJB9fr5WHNwIUnrPHLmMT3XH1oZkYwxMdMuAS8LI+qL0xR0NfXu2XozXzX
+         mnVR8EYQcltbwycZy/8FNlwePUV7aMDd/SY0pRucP8XY2ZQWC41lv4cyNLN79dAK3X8D
+         3g1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=jofypBmuNK78helxp/ax3lvvaD1SSYgX9AHCXeb2JyI=;
+        b=ugy+5shZ2ZgaLDOAk7r/hhPhoz2G7kocooO77Wlo26vT5Ax8zvULEiQV4ax4oL0GpJ
+         HCvb1HHqwfEXo2cj3GPPwuOOx5wdIhGJjEd5L5AAjnh8P7KjsMbQiEYxEgcYFVOHJxmH
+         74UoVIb2tubcsTvXt1wwIsbx7gkW7GcW1fp5hYLU9OJsddgLyaAAqIuggjDgAn0VdcBP
+         ljlRBxwhuw91KXlIhVr6MffAHIf9iQ5+v/dkNs41cCBrpYIAm6xpzQ2eRx4VfdATKQ5X
+         yZh/VBPhXeyUMum63rNI+2/5g8ZdCw+jkzozHBbTpFfFNL2kItVBuRDGKbPoZcFQIdwD
+         SidA==
+X-Gm-Message-State: AOAM5311G2WN8KT07JkjbnT4VGT/X436oeraWPtJ4V34YNgMZSmOGQG+
+        m1t+/CEm5UhWIPc0WNFrtvC1Ug==
+X-Google-Smtp-Source: ABdhPJwacQNrdgaaDkGD5jqXNtEa9dtPcTdGRZpUC1+HOzqirLQtKg5p7syqrmkzIKN+BpViLEFW6Q==
+X-Received: by 2002:a05:620a:21c5:: with SMTP id h5mr1932597qka.395.1621466700858;
+        Wed, 19 May 2021 16:25:00 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-47-55-113-94.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.113.94])
+        by smtp.gmail.com with ESMTPSA id u186sm918257qkd.30.2021.05.19.16.24.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 May 2021 16:25:00 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1ljVYh-00AxO2-BM; Wed, 19 May 2021 20:24:59 -0300
+Date:   Wed, 19 May 2021 20:24:59 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Robin Murphy <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH 3/6] vfio: remove the unused mdev iommu hook
+Message-ID: <20210519232459.GV1096940@ziepe.ca>
+References: <MWHPR11MB18866205125E566FE05867A78C509@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210514133143.GK1096940@ziepe.ca>
+ <YKJf7mphTHZoi7Qr@8bytes.org>
+ <20210517123010.GO1096940@ziepe.ca>
+ <YKJnPGonR+d8rbu/@8bytes.org>
+ <20210517133500.GP1096940@ziepe.ca>
+ <YKKNLrdQ4QjhLrKX@8bytes.org>
+ <131327e3-5066-7a88-5b3c-07013585eb01@arm.com>
+ <20210519180635.GT1096940@ziepe.ca>
+ <MWHPR11MB1886C64EAEB752DE9E1633358C2B9@MWHPR11MB1886.namprd11.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MWHPR11MB1886C64EAEB752DE9E1633358C2B9@MWHPR11MB1886.namprd11.prod.outlook.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 19, 2021, at 3:44 PM, Dave Hansen wrote:
-> On 5/17/21 12:46 AM, Paolo Bonzini wrote:
-> > On 14/05/21 07:11, Andy Lutomirski wrote:
-> >> That's nice, but it fails to restore XINUSE[PKRU].=C2=A0 As far as =
-I know,
-> >> that bit is live, and the only way to restore it to 0 is with
-> >> XRSTOR(S).
-> >=20
-> > The manual says "It is possible for XINUSE[i] to be 1 even when stat=
-e
-> > component i is in its initial configuration" so this is architectura=
-lly
-> > valid.=C2=A0 Does the XINUSE optimization matter for PKRU which is a=
- single
-> > word?
->=20
-> In Linux with normal userspace, virtually never.
->=20
-> The hardware defaults PKRU to 0x0 which means "no restrictions on any
-> keys".  Linux defaults PKRU via 'init_pkru_value' to the most
-> restrictive value.  This ensures that new non-zero-pkey-assigned memor=
-y
-> is protected by default.
->=20
-> But, that also means PKRU is virtually never in its init state in Linu=
-x.
->  An app would probably need to manipulate PKRU with XRSTOR to get
-> XINUSE[PKRU]=3D0.
->=20
-> It would only even *possibly* be useful if running a KVM guest that ha=
-d
-> PKRU=3D0x0 (sorry I don't consider things using KVM "normal userspace"=
- :P ).
->=20
+On Wed, May 19, 2021 at 11:12:46PM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe <jgg@ziepe.ca>
+> > Sent: Thursday, May 20, 2021 2:07 AM
+> > 
+> > On Wed, May 19, 2021 at 04:23:21PM +0100, Robin Murphy wrote:
+> > > On 2021-05-17 16:35, Joerg Roedel wrote:
+> > > > On Mon, May 17, 2021 at 10:35:00AM -0300, Jason Gunthorpe wrote:
+> > > > > Well, I'm sorry, but there is a huge other thread talking about the
+> > > > > IOASID design in great detail and why this is all needed. Jumping into
+> > > > > this thread without context and basically rejecting all the
+> > > > > conclusions that were reached over the last several weeks is really
+> > > > > not helpful - especially since your objection is not technical.
+> > > > >
+> > > > > I think you should wait for Intel to put together the /dev/ioasid uAPI
+> > > > > proposal and the example use cases it should address then you can give
+> > > > > feedback there, with proper context.
+> > > >
+> > > > Yes, I think the next step is that someone who read the whole thread
+> > > > writes up the conclusions and a rough /dev/ioasid API proposal, also
+> > > > mentioning the use-cases it addresses. Based on that we can discuss the
+> > > > implications this needs to have for IOMMU-API and code.
+> > > >
+> > > >  From the use-cases I know the mdev concept is just fine. But if there is
+> > > > a more generic one we can talk about it.
+> > >
+> > > Just to add another voice here, I have some colleagues working on drivers
+> > > where they want to use SMMU Substream IDs for a single hardware block
+> > to
+> > > operate on multiple iommu_domains managed entirely within the
+> > > kernel.
+> > 
+> > If it is entirely within the kernel I'm confused how mdev gets
+> > involved? mdev is only for vfio which is userspace.
+> > 
+> 
+> Just add some background. aux domain is used to support mdev but they
+> are not tied together. Literally aux domain just implies that there could be 
+> multiple domains attached to a device then when one of them becomes
+> the primary all the remaining are deemed as auxiliary. From this angle it
+> doesn't matter whether the requirement of multiple domains come from
+> user or kernel.
 
-There was at least one report from the rr camp of glibc behaving differe=
-ntly depending on the result of XGETBV(1).  It's at least impolite to ch=
-ange the XINUSE register for a guest behind its back.
+You can't entirely use aux domain from inside the kernel because you
+can't compose it with the DMA API unless you also attach it to some
+struct device, and where will the struct device come from?
 
-Admittedly that particular report wasn't about PKRU, and *Linux* guests =
-won't run with XINUSE[PKRU]=3D0 under normal circumstances, but non-Linu=
-x guests could certainly do so.
+We already talked about this on the "how to use PASID from the kernel"
+thread.
+
+If Robin just wants to use a stream ID from a kernel driver then that
+API to make a PASID == RID seems like a better answer for kernel DMA
+than aux domains is.
+
+Jason
