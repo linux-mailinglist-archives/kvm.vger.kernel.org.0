@@ -2,139 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 258BA3899C5
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 01:25:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BF5B3899E0
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 01:30:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229556AbhESX0X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 May 2021 19:26:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50528 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbhESX0X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 May 2021 19:26:23 -0400
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6778C061574
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 16:25:01 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id v8so14540428qkv.1
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 16:25:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=jofypBmuNK78helxp/ax3lvvaD1SSYgX9AHCXeb2JyI=;
-        b=N+FIikMxArUHq1byG1kV6q6NKiH1yzdaJ73QnFvU7gnei0NcXatMYjDQ/ysJWeBJUz
-         HU+0NNBklt3GiG1WqihmEZDLgrsaMez/pjd1gK+nq1yfEAl4wKARzYJcQ9YvICi1PbfJ
-         YmKCfYOaNFRsx04nfwkEcco4XkSA5EJzUpFfr7AW5h4ojV2pmxtrP0yLMHPB89Npr6MC
-         cYvKGOLX7tUJB9fr5WHNwIUnrPHLmMT3XH1oZkYwxMdMuAS8LI+qL0xR0NfXu2XozXzX
-         mnVR8EYQcltbwycZy/8FNlwePUV7aMDd/SY0pRucP8XY2ZQWC41lv4cyNLN79dAK3X8D
-         3g1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=jofypBmuNK78helxp/ax3lvvaD1SSYgX9AHCXeb2JyI=;
-        b=ugy+5shZ2ZgaLDOAk7r/hhPhoz2G7kocooO77Wlo26vT5Ax8zvULEiQV4ax4oL0GpJ
-         HCvb1HHqwfEXo2cj3GPPwuOOx5wdIhGJjEd5L5AAjnh8P7KjsMbQiEYxEgcYFVOHJxmH
-         74UoVIb2tubcsTvXt1wwIsbx7gkW7GcW1fp5hYLU9OJsddgLyaAAqIuggjDgAn0VdcBP
-         ljlRBxwhuw91KXlIhVr6MffAHIf9iQ5+v/dkNs41cCBrpYIAm6xpzQ2eRx4VfdATKQ5X
-         yZh/VBPhXeyUMum63rNI+2/5g8ZdCw+jkzozHBbTpFfFNL2kItVBuRDGKbPoZcFQIdwD
-         SidA==
-X-Gm-Message-State: AOAM5311G2WN8KT07JkjbnT4VGT/X436oeraWPtJ4V34YNgMZSmOGQG+
-        m1t+/CEm5UhWIPc0WNFrtvC1Ug==
-X-Google-Smtp-Source: ABdhPJwacQNrdgaaDkGD5jqXNtEa9dtPcTdGRZpUC1+HOzqirLQtKg5p7syqrmkzIKN+BpViLEFW6Q==
-X-Received: by 2002:a05:620a:21c5:: with SMTP id h5mr1932597qka.395.1621466700858;
-        Wed, 19 May 2021 16:25:00 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-47-55-113-94.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.113.94])
-        by smtp.gmail.com with ESMTPSA id u186sm918257qkd.30.2021.05.19.16.24.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 May 2021 16:25:00 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1ljVYh-00AxO2-BM; Wed, 19 May 2021 20:24:59 -0300
-Date:   Wed, 19 May 2021 20:24:59 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Robin Murphy <robin.murphy@arm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Will Deacon <will@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Christoph Hellwig <hch@lst.de>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH 3/6] vfio: remove the unused mdev iommu hook
-Message-ID: <20210519232459.GV1096940@ziepe.ca>
-References: <MWHPR11MB18866205125E566FE05867A78C509@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210514133143.GK1096940@ziepe.ca>
- <YKJf7mphTHZoi7Qr@8bytes.org>
- <20210517123010.GO1096940@ziepe.ca>
- <YKJnPGonR+d8rbu/@8bytes.org>
- <20210517133500.GP1096940@ziepe.ca>
- <YKKNLrdQ4QjhLrKX@8bytes.org>
- <131327e3-5066-7a88-5b3c-07013585eb01@arm.com>
- <20210519180635.GT1096940@ziepe.ca>
- <MWHPR11MB1886C64EAEB752DE9E1633358C2B9@MWHPR11MB1886.namprd11.prod.outlook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <MWHPR11MB1886C64EAEB752DE9E1633358C2B9@MWHPR11MB1886.namprd11.prod.outlook.com>
+        id S230095AbhESXbX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 May 2021 19:31:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44514 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229498AbhESXbW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 May 2021 19:31:22 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 44CC6611AB;
+        Wed, 19 May 2021 23:30:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1621467002;
+        bh=8xvSSE3H35qcDXVWBq8krJ/CkeS4P86f6MpxZY+FQsI=;
+        h=In-Reply-To:References:Date:From:To:Cc:Subject:From;
+        b=pdeWnBCOnInNDm8x6YAc+z9QI+Wu0uGxbXPy3JyYre/HD1tUr1yp6Kj89MZ/+rP4j
+         yP5bCoD92a0n36gX2BAgc3g5ShKUr18Xw+WgAzNI8SNW/Sk5rU/KyTIrmiiul6h1Wg
+         eT0zgg4taZ/bludKSSGnXyBVkQKxorWMOnB8PG4P7W2+I07XYaArz+llvLdH4G+O+N
+         tzQE4mXkQcKNXTuv5CU/EnJ5oulujaPddY2b+jkmjSUcR6D3RjGV/vScxk/7tTfePz
+         k34YWGiA5fjDL/STm/OGEjTDauJfOd+tL9eNhUJyrdSknsk/RRxsjrst6a35PUaLNs
+         FdW6geIgOvIKg==
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
+        by mailauth.nyi.internal (Postfix) with ESMTP id 550F327C0054;
+        Wed, 19 May 2021 19:30:00 -0400 (EDT)
+Received: from imap21 ([10.202.2.71])
+  by compute2.internal (MEProxy); Wed, 19 May 2021 19:30:00 -0400
+X-ME-Sender: <xms:d5-lYHGmPWDSX8OSBqh8yqRFL6-TU4DGvAAYQa_ollvI-_ZFCfiU8A>
+    <xme:d5-lYEWA6xPYUhC6Dp-0AaIYZd1uBpZsvgq6yetXcps0f_I2zd7eQCGNfT61HZfO0
+    kAZe7T5DnMvIhY_1Hk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvdejtddgvdefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvffutgesthdtredtreerjeenucfhrhhomhepfdetnhgu
+    hicunfhuthhomhhirhhskhhifdcuoehluhhtoheskhgvrhhnvghlrdhorhhgqeenucggtf
+    frrghtthgvrhhnpeegjefghfdtledvfeegfeelvedtgfevkeeugfekffdvveeffeetieeh
+    ueetveekfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
+    hmpegrnhguhidomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudduiedukeeh
+    ieefvddqvdeifeduieeitdekqdhluhhtoheppehkvghrnhgvlhdrohhrgheslhhinhhugi
+    drlhhuthhordhush
+X-ME-Proxy: <xmx:d5-lYJLzfx3n_y0I3zlLOGlU6QQemwxaAQP1RPrT6w3cifmzFy3kXw>
+    <xmx:d5-lYFFNy--_xYr0kWZptyE06O5JxcTVrqCwu81bzB8JH91a3XzhPA>
+    <xmx:d5-lYNV19oH3DOUeibnsJQfgKXqcPYhjwLeW8Zt2oSxUuuDukuwBvA>
+    <xmx:eJ-lYGvA-tXWjlTjhLx2635WhOntheP6f4M6vGlDhqQ6qROmgFpx5OUCrR3ovjulKRgSqQ>
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 155B051C0060; Wed, 19 May 2021 19:29:58 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.5.0-alpha0-448-gae190416c7-fm-20210505.004-gae190416
+Mime-Version: 1.0
+Message-Id: <86701a5e-87b5-4e73-9b7a-557d8c855f89@www.fastmail.com>
+In-Reply-To: <YJvU+RAvetAPT2XY@zn.tnic>
+References: <cover.1619193043.git.ashish.kalra@amd.com>
+ <ff68a73e0cdaf89e56add5c8b6e110df881fede1.1619193043.git.ashish.kalra@amd.com>
+ <YJvU+RAvetAPT2XY@zn.tnic>
+Date:   Wed, 19 May 2021 16:29:37 -0700
+From:   "Andy Lutomirski" <luto@kernel.org>
+To:     "Borislav Petkov" <bp@alien8.de>,
+        "Ashish Kalra" <Ashish.Kalra@amd.com>,
+        "Sean Christopherson" <seanjc@google.com>
+Cc:     "Paolo Bonzini" <pbonzini@redhat.com>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        "Ingo Molnar" <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>,
+        "Joerg Roedel" <joro@8bytes.org>, thomas.lendacky@amd.com,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        "kvm list" <kvm@vger.kernel.org>,
+        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
+        srutherford@google.com, venu.busireddy@oracle.com,
+        brijesh.singh@amd.com
+Subject: =?UTF-8?Q?Re:_[PATCH_v2_2/4]_mm:_x86:_Invoke_hypercall_when_page_encrypt?=
+ =?UTF-8?Q?ion_status_is_changed?=
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 19, 2021 at 11:12:46PM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@ziepe.ca>
-> > Sent: Thursday, May 20, 2021 2:07 AM
-> > 
-> > On Wed, May 19, 2021 at 04:23:21PM +0100, Robin Murphy wrote:
-> > > On 2021-05-17 16:35, Joerg Roedel wrote:
-> > > > On Mon, May 17, 2021 at 10:35:00AM -0300, Jason Gunthorpe wrote:
-> > > > > Well, I'm sorry, but there is a huge other thread talking about the
-> > > > > IOASID design in great detail and why this is all needed. Jumping into
-> > > > > this thread without context and basically rejecting all the
-> > > > > conclusions that were reached over the last several weeks is really
-> > > > > not helpful - especially since your objection is not technical.
-> > > > >
-> > > > > I think you should wait for Intel to put together the /dev/ioasid uAPI
-> > > > > proposal and the example use cases it should address then you can give
-> > > > > feedback there, with proper context.
-> > > >
-> > > > Yes, I think the next step is that someone who read the whole thread
-> > > > writes up the conclusions and a rough /dev/ioasid API proposal, also
-> > > > mentioning the use-cases it addresses. Based on that we can discuss the
-> > > > implications this needs to have for IOMMU-API and code.
-> > > >
-> > > >  From the use-cases I know the mdev concept is just fine. But if there is
-> > > > a more generic one we can talk about it.
-> > >
-> > > Just to add another voice here, I have some colleagues working on drivers
-> > > where they want to use SMMU Substream IDs for a single hardware block
-> > to
-> > > operate on multiple iommu_domains managed entirely within the
-> > > kernel.
-> > 
-> > If it is entirely within the kernel I'm confused how mdev gets
-> > involved? mdev is only for vfio which is userspace.
-> > 
+On Wed, May 12, 2021, at 6:15 AM, Borislav Petkov wrote:
+> On Fri, Apr 23, 2021 at 03:58:43PM +0000, Ashish Kalra wrote:
+> > +static inline void notify_page_enc_status_changed(unsigned long pfn,
+> > +						  int npages, bool enc)
+> > +{
+> > +	PVOP_VCALL3(mmu.notify_page_enc_status_changed, pfn, npages, enc);
+> > +}
 > 
-> Just add some background. aux domain is used to support mdev but they
-> are not tied together. Literally aux domain just implies that there could be 
-> multiple domains attached to a device then when one of them becomes
-> the primary all the remaining are deemed as auxiliary. From this angle it
-> doesn't matter whether the requirement of multiple domains come from
-> user or kernel.
+> Now the question is whether something like that is needed for TDX, and,
+> if so, could it be shared by both.
 
-You can't entirely use aux domain from inside the kernel because you
-can't compose it with the DMA API unless you also attach it to some
-struct device, and where will the struct device come from?
-
-We already talked about this on the "how to use PASID from the kernel"
-thread.
-
-If Robin just wants to use a stream ID from a kernel driver then that
-API to make a PASID == RID seems like a better answer for kernel DMA
-than aux domains is.
-
-Jason
+The TDX MapGPA call can fail, and presumably it will fail if the page is not sufficiently quiescent from the host's perspective.  It seems like a mistake to me to have a KVM-specific hypercall for this that cannot cleanly fail.
