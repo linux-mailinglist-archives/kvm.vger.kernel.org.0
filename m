@@ -2,145 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A9A12388FB1
-	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 15:58:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35765388FB6
+	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 16:00:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346333AbhESN72 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 May 2021 09:59:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56354 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231627AbhESN72 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 May 2021 09:59:28 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D15586100C;
-        Wed, 19 May 2021 13:58:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1621432687;
-        bh=1VkCYNL0c12Ug0LXnzJjOzCC3hjW/+2zr3MkeEO+0n4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=SMDZeq2XvmrcXuBcr7sl4S4JEZSUBlQkZcFB2xQViTrjZjhCIDg0/Ffa2IMKrgmaW
-         m/b3eNYlCd3m8nvzOaEY5fyWv1IXGkJSq9tyd0ckJ/pn2qTlscaa8jermQrDLwn5Me
-         3fsUl7684B5GSf9aWhkkog0Ibsh8fcFX3y4B1BgE=
-Date:   Wed, 19 May 2021 15:58:05 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Anup Patel <anup@brainfault.org>, Anup Patel <anup.patel@wdc.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Palmer Dabbelt <palmerdabbelt@google.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Alexander Graf <graf@amazon.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        KVM General <kvm@vger.kernel.org>,
-        kvm-riscv@lists.infradead.org,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        linux-doc@vger.kernel.org,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        linux-staging@lists.linux.dev
-Subject: Re: [PATCH v18 00/18] KVM RISC-V Support
-Message-ID: <YKUZbb6OK+UYAq+t@kroah.com>
-References: <20210519033553.1110536-1-anup.patel@wdc.com>
- <YKSa48cejI1Lax+/@kroah.com>
- <CAAhSdy18qySXbUdrEsUe-KtbtuEoYrys0TcmsV2UkEA2=7UQzw@mail.gmail.com>
- <YKSgcn5gxE/4u2bT@kroah.com>
- <YKTsyyVYsHVMQC+G@kroah.com>
- <d7d5ad76-aec3-3297-0fac-a9da9b0c3663@redhat.com>
- <YKUDWgZVj82/KiKw@kroah.com>
- <daa30135-8757-8d33-a92e-8db4207168ff@redhat.com>
+        id S1346748AbhESOB5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 May 2021 10:01:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34408 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231627AbhESOBz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 May 2021 10:01:55 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 877D2C06175F
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 07:00:34 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id b12so8535188ljp.1
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 07:00:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=cH5U9Az7eYofu3eA4ftQUffWK1rQQwjbWurlsdJWGcs=;
+        b=PsWmCiUmc0h6jhfs8n0zs3WyblSVZ2kUwHfBnc2GdYbUF8tQ/EAduwiPqpCBvvWuAV
+         7EBu6Di5txh7+u0aguiGdClwNmaz4jJmdsAPd5jkwP/ynfSUqEmpdorkx0uXGEliS0HL
+         V4gvbj4hLt0shXfOLVUVx4u6jYkqiFJNktSpgbI/rNy4Z/6+Vh8HXBTAA5d5m7MP0C9T
+         bc1cbB8SNyiS9coO2Yy7SqhmCa1y/rpQmJMZ1h48CrC/7tzF6K118RVnOuTM0JaW0i8w
+         57W7aksfsjkAzQ7C0mpUOtbLcHw0FtCEdK5DKFQu2GCYHE5cMoB0VZ4vLuYr3BsKj70T
+         e9gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=cH5U9Az7eYofu3eA4ftQUffWK1rQQwjbWurlsdJWGcs=;
+        b=Co07wj257Bx2WmWR6uBKY10Dvb3uMla1plRw+K9fd1PkFDBGfndRphD9xKeczji8Ob
+         vqzZwkXvaAv1BsQ251986+SO6AG/C9a68Cji6cHNt39GImU+l7Rd5/IQnixw6Y9GJJzV
+         ppP6dNuU8yYaapEStZyjrNpufQRyI3BO54p+TTVIxIPeORYZnC9vYgP4xzw3yNlSPU2r
+         GSgyZM1Z9TxREMu5orVqaMJBEPCQcAHzNt1E1ur5HX1LyyOtg33P0h5o3m/KCe0NGvJW
+         tKoISYRDVeyn6yPTJaiQ6012Em99i8GtwhnPQXPrqVmQE5wpQlPNFt2HY8rFvNipz/GT
+         ihVg==
+X-Gm-Message-State: AOAM533p5u24Y+LEo93MVgVGz6UdCAMuC8GtXHLfC8aE4TPwj8VQChBg
+        jutxrwWdz9QaJVvGTxM5a/u+gQJ6PvFY3eoIH2j76eOkIN0osw==
+X-Google-Smtp-Source: ABdhPJyt1aYpq0/SyLXL0dDpoeoKQD/5+WHAgE9KRT3tffH8yD1OazmgdUfzxGyYtnxIbTs1l9olrGfYGX8yIUMEGYw=
+X-Received: by 2002:a2e:8e26:: with SMTP id r6mr5780477ljk.472.1621432832689;
+ Wed, 19 May 2021 07:00:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <daa30135-8757-8d33-a92e-8db4207168ff@redhat.com>
+From:   Liang Li <liliang324@gmail.com>
+Date:   Wed, 19 May 2021 22:00:20 +0800
+Message-ID: <CA+2MQi-_06J1cmLhKAmV1vkPEnvDx6+bOnK06OciYmdymaNruw@mail.gmail.com>
+Subject: About the performance of hyper-v
+To:     vkuznets@redhat.com
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Tianyu.Lan@microsoft.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 19, 2021 at 03:29:24PM +0200, Paolo Bonzini wrote:
-> On 19/05/21 14:23, Greg Kroah-Hartman wrote:
-> > > - the code could be removed if there's no progress on either changing the
-> > > RISC-V acceptance policy or ratifying the spec
-> > 
-> > I really do not understand the issue here, why can this just not be
-> > merged normally?
-> 
-> Because the RISC-V people only want to merge code for "frozen" or "ratified"
-> processor extensions, and the RISC-V foundation is dragging their feet in
-> ratifying the hypervisor extension.
-> 
-> It's totally a self-inflicted pain on part of the RISC-V maintainers; see
-> Documentation/riscv/patch-acceptance.rst:
-> 
->   We'll only accept patches for new modules or extensions if the
->   specifications for those modules or extensions are listed as being
->   "Frozen" or "Ratified" by the RISC-V Foundation.  (Developers may, of
->   course, maintain their own Linux kernel trees that contain code for
->   any draft extensions that they wish.)
-> 
-> (Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/riscv/patch-acceptance.rst)
+[resend for missing cc]
 
-Lovely, and how is that going to work for code that lives outside of the
-riscv "arch" layer?  Like all drivers?
+Hi Vitaly,
 
-And what exactly is "not ratified" that these patches take advantage of?
-If there is hardware out there with these features, well, Linux needs to
-run on it, so we need to support that.  No external committee rules
-should be relevant here.
+I found a case that the virtualization overhead was almost doubled
+when turning on Hper-v related features compared to that without any
+no hyper-v feature.  It happens when running a 3D game in windows
+guest in qemu kvm environment.
 
-Now if this is for hardware that is not "real", then that's a different
-story.  In that case, who cares, no one can use it, so why not take it?
+By investigation, I found there are a lot of IPIs triggered by guest,
+when turning on the hyer-v related features including stimer, for the
+apicv is turned off, at least two vm exits are needed for processing a
+single IPI.
 
-So what exactly is this trying to "protect" Linux from?
 
-> > All staging drivers need a TODO list that shows what needs to be done in
-> > order to get it out of staging.  All I can tell so far is that the riscv
-> > maintainers do not want to take this for "unknown reasons" so let's dump
-> > it over here for now where we don't have to see it.
-> > 
-> > And that's not good for developers or users, so perhaps the riscv rules
-> > are not very good?
-> 
-> I agree wholeheartedly.
-> 
-> I have heard contrasting opinions on conflict of interest where the
-> employers of the maintainers benefit from slowing down the integration of
-> code in Linus's tree.  I find these allegations believable, but even if that
-> weren't the case, the policy is (to put it kindly) showing its limits.
+perf stat will show something like below [recorded for 5 seconds]
 
-Slowing down code merges is horrible, again, if there's hardware out
-there, and someone sends code to support it, and wants to maintain it,
-then we should not be rejecting it.
+---------
 
-Otherwise we are not doing our job as an operating system kernel, our
-role is to make hardware work.  We don't get to just ignore code because
-we don't like the hardware (oh if only we could!), if a user wants to
-use it, our role is to handle that.
+Analyze events for all VMs, all VCPUs:
+             VM-EXIT    Samples  Samples%     Time%    Min Time    Max
+Time         Avg time
+  EXTERNAL_INTERRUPT     471831    59.89%    68.58%      0.64us
+65.42us      2.34us ( +-   0.11% )
+           MSR_WRITE     238932    30.33%    23.07%      0.48us
+41.05us      1.56us ( +-   0.14% )
 
-> > > Of course there should have been a TODO file explaining the situation. But
-> > > if you think this is not the right place, I totally understand; if my
-> > > opinion had any weight in this, I would just place it in arch/riscv/kvm.
-> > > 
-> > > The RISC-V acceptance policy as is just doesn't work, and the fact that
-> > > people are trying to work around it is proving it.  There are many ways to
-> > > improve it:
-> > 
-> > What is this magical acceptance policy that is preventing working code
-> > from being merged?  And why is it suddenly the rest of the kernel
-> > developer's problems because of this?
-> 
-> It is my problem because I am trying to help Anup merging some perfectly
-> good KVM code; when a new KVM port comes up, I coordinate merging the first
-> arch/*/kvm bits with the arch/ maintainers and from that point on that
-> directory becomes "mine" (or my submaintainers').
+Total Samples:787803, Total events handled time:1611193.84us.
 
-Agreed, but the riscv maintainers should not be forcing this "problem"
-onto all of us, like it seems is starting to happen :(
+I tried turning off hyper-v for the same workload and repeat the test,
+the overall virtualization overhead reduced by about of 50%:
 
-Ok, so, Paul, Palmer, and Albert, what do we do here?  Why can't we take
-working code like this into the kernel if someone is willing to support
-and maintain it over time?
+-------
 
-thanks,
+Analyze events for all VMs, all VCPUs:
 
-greg k-h
+             VM-EXIT    Samples  Samples%     Time%    Min Time    Max
+Time         Avg time
+          APIC_WRITE     255152    74.43%    50.72%      0.49us
+50.01us      1.42us ( +-   0.14% )
+       EPT_MISCONFIG      39967    11.66%    40.58%      1.55us
+686.05us      7.27us ( +-   0.43% )
+           DR_ACCESS      35003    10.21%     4.64%      0.32us
+40.03us      0.95us ( +-   0.32% )
+  EXTERNAL_INTERRUPT       6622     1.93%     2.08%      0.70us
+57.38us      2.25us ( +-   1.42% )
+
+Total Samples:342788, Total events handled time:715695.62us.
+
+For this scenario,  hyper-v works really bad.  stimer works better
+than hpet, but on the other hand, it relies on SynIC which has
+negative effects for IPI intensive workloads.
+Do you have any plans for improvement?
+
+
+Thanks!
+Liang
