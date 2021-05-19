@@ -2,199 +2,291 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95856388A2A
-	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 11:07:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 258CB388A9B
+	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 11:25:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344405AbhESJIX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 May 2021 05:08:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21545 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240090AbhESJIW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 19 May 2021 05:08:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621415221;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KGek2Y6xPrDpb7bs2AvFFQ8RtUI+TRON+hzQiDKzDAk=;
-        b=D2cQMUPETpxg2hIl57qZTX82bpHntYrmJZU8DRnI0xCCHA+fx/5BCQsJUidtL0X3LKSzc0
-        NVQDHGAe3g4euzdYVCcI6Nl8SJTexKLoEu440fezwdQBl1mCVYhoU0+7IaP/mU9fu9blbn
-        K/9xbraPojzieB7bsbU0B3uyjvYVqnE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-71-JZaF_teYMbqNwgKhDO99WQ-1; Wed, 19 May 2021 05:07:00 -0400
-X-MC-Unique: JZaF_teYMbqNwgKhDO99WQ-1
-Received: by mail-wr1-f71.google.com with SMTP id u20-20020a0560001614b02901115c8f2d89so6801880wrb.3
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 02:07:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:organization
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=KGek2Y6xPrDpb7bs2AvFFQ8RtUI+TRON+hzQiDKzDAk=;
-        b=dEJmdeUAjhBl313kGtdtRxHZ0l4GNXPRTyw0jQ3j86Z9yjrAJfWlF4z2CYP6HoRoai
-         c25y0UUbDgWGKDE01ojDiC+9U6HsDIpMLKJPVVhR01oBnDNVFCw7I0ThsQQIdUz0N/+t
-         a5/7XJMTvCoF7F8HU4vG21eoFlGNuGHdDj9qneA2UZXxwzRTfEfylI7PFYP9eUmn3wRd
-         KU+JccFHL1Aax95hlxfV6kByUEEI7EV6H38VhaNq1BhDm1GXBQAnpz3TS6YkR2SupbTm
-         HiUQmN484y5mAWe4su4Eo6LW1QtzGKfVG2ZvmR6oSqfTl0a2Rbs35e6uPiiHx2d+Ifd6
-         ntNg==
-X-Gm-Message-State: AOAM533gyJAs9qxrOIj8us3jCR9WeJB3aYhBICCYG9zEOwz3+dDLTpl8
-        RBz4h+KxXzhjaXP8Ow8bhqYLH/anNfcN9+BD2fyoUSobqveaBmDwQBsHBxoExyJ/dLXdW/g1qJl
-        mAYv/GVK5Ymyh
-X-Received: by 2002:a5d:6a4c:: with SMTP id t12mr13484090wrw.109.1621415219018;
-        Wed, 19 May 2021 02:06:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzu9xU8NcRQvSHW+FuupOoqrazl17zuGiGTCAujbgWDxU5jY235VzO9g84Kr4EidWpzMSB8Bg==
-X-Received: by 2002:a5d:6a4c:: with SMTP id t12mr13484059wrw.109.1621415218713;
-        Wed, 19 May 2021 02:06:58 -0700 (PDT)
-Received: from [192.168.3.132] (p5b0c6694.dip0.t-ipconnect.de. [91.12.102.148])
-        by smtp.gmail.com with ESMTPSA id f188sm5155880wmf.24.2021.05.19.02.06.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 May 2021 02:06:58 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH v2 2/3] lib: s390x: sclp: Extend feature
- probing
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     cohuck@redhat.com, linux-s390@vger.kernel.org,
-        imbrenda@linux.ibm.com, thuth@redhat.com
-References: <20210519082648.46803-1-frankja@linux.ibm.com>
- <20210519082648.46803-3-frankja@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Message-ID: <b7a16b6d-73fc-785f-25e7-2e0c0bfb3619@redhat.com>
-Date:   Wed, 19 May 2021 11:06:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S1344782AbhESJ0w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 May 2021 05:26:52 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:44420 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1344811AbhESJ0v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 May 2021 05:26:51 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14J952n4141949;
+        Wed, 19 May 2021 09:25:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=rdrBqh1+38dvjdiPWGBE+DTr8HN3SKDKWRojemYDsg8=;
+ b=MMAkzDh+aWcVvkveAnh2cLDytKeKDwEvU6b/1bBa4KPxB84xxo+vv4lvb0qW59P6KPIy
+ WsJKrwzGv+0Rw/Qq8Of70284tMT9vDpE3cnfHFOy5ngfsY8fNlBZ0J8E6ernLOM6+KMH
+ oTrgVPOO5TOpoHR/9oayLq4x3tK6jOdTCNqqjURpRLr6DUNamZehpxa+yG3rNDC/xkPK
+ UvxsnwntvoXMS7liwgn5/i29VkzxJqiNGx2kO5kIJ31+4f79145XxK9hIUwxo3wBpQJ2
+ +u0j1DSYWNKzrjTnjr2wOQSND9zOKgCpuZFOdSIZABGbYmlgY8JQ2pxgvsU+98lfHaxn YA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 38j68mgxfe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 May 2021 09:25:05 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14J95rWF009467;
+        Wed, 19 May 2021 09:25:05 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by aserp3020.oracle.com with ESMTP id 38mechm6e3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 May 2021 09:25:05 +0000
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 14J9Lvis123188;
+        Wed, 19 May 2021 09:25:04 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3020.oracle.com with ESMTP id 38mechm6c6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 May 2021 09:25:04 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 14J9Owe8013238;
+        Wed, 19 May 2021 09:24:58 GMT
+Received: from kadam (/41.212.42.34)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 19 May 2021 02:24:57 -0700
+Date:   Wed, 19 May 2021 12:24:41 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Anup Patel <anup.patel@wdc.com>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Palmer Dabbelt <palmerdabbelt@google.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Alexander Graf <graf@amazon.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-staging@lists.linux.dev
+Subject: Re: [PATCH v18 02/18] RISC-V: Add initial skeletal KVM support
+Message-ID: <20210519092441.GQ1955@kadam>
+References: <20210519033553.1110536-1-anup.patel@wdc.com>
+ <20210519033553.1110536-3-anup.patel@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <20210519082648.46803-3-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210519033553.1110536-3-anup.patel@wdc.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-ORIG-GUID: WFKODEbKdUYqjC4MuMXLdYlfJUXJ4yB5
+X-Proofpoint-GUID: WFKODEbKdUYqjC4MuMXLdYlfJUXJ4yB5
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9988 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=999
+ priorityscore=1501 impostorscore=0 suspectscore=0 clxscore=1011
+ adultscore=0 bulkscore=0 phishscore=0 spamscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2105190068
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19.05.21 10:26, Janosch Frank wrote:
-> Lets grab more of the feature bits from SCLP read info so we can use
-> them in the cpumodel tests.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->   lib/s390x/sclp.c | 20 ++++++++++++++++++++
->   lib/s390x/sclp.h | 38 +++++++++++++++++++++++++++++++++++---
->   2 files changed, 55 insertions(+), 3 deletions(-)
-> 
-> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
-> index f11c2035..291924b0 100644
-> --- a/lib/s390x/sclp.c
-> +++ b/lib/s390x/sclp.c
-> @@ -129,6 +129,13 @@ CPUEntry *sclp_get_cpu_entries(void)
->   	return (CPUEntry *)(_read_info + read_info->offset_cpu);
->   }
->   
-> +static bool sclp_feat_check(int byte, int bit)
+On Wed, May 19, 2021 at 09:05:37AM +0530, Anup Patel wrote:
+> +int kvm_arch_hardware_enable(void)
 > +{
-> +	uint8_t *rib = (uint8_t *)read_info;
+> +	unsigned long hideleg, hedeleg;
 > +
-> +	return !!(rib[byte] & (0x80 >> bit));
+> +	hedeleg = 0;
+> +	hedeleg |= (1UL << EXC_INST_MISALIGNED);
+
+You may as well use BIT_UL(EXC_INST_MISALIGNED) for all of these.
+There is a Coccinelle script to convert these so please just make it
+standard like everyone else.
+
+> +	hedeleg |= (1UL << EXC_BREAKPOINT);
+> +	hedeleg |= (1UL << EXC_SYSCALL);
+> +	hedeleg |= (1UL << EXC_INST_PAGE_FAULT);
+> +	hedeleg |= (1UL << EXC_LOAD_PAGE_FAULT);
+> +	hedeleg |= (1UL << EXC_STORE_PAGE_FAULT);
+> +	csr_write(CSR_HEDELEG, hedeleg);
+> +
+> +	hideleg = 0;
+> +	hideleg |= (1UL << IRQ_VS_SOFT);
+> +	hideleg |= (1UL << IRQ_VS_TIMER);
+> +	hideleg |= (1UL << IRQ_VS_EXT);
+> +	csr_write(CSR_HIDELEG, hideleg);
+> +
+> +	csr_write(CSR_HCOUNTEREN, -1UL);
+> +
+> +	csr_write(CSR_HVIP, 0);
+> +
+> +	return 0;
 > +}
 > +
->   void sclp_facilities_setup(void)
->   {
->   	unsigned short cpu0_addr = stap();
-> @@ -140,6 +147,14 @@ void sclp_facilities_setup(void)
->   	cpu = sclp_get_cpu_entries();
->   	if (read_info->offset_cpu > 134)
->   		sclp_facilities.has_diag318 = read_info->byte_134_diag318;
-> +	sclp_facilities.has_gsls = sclp_feat_check(85, SCLP_FEAT_85_BIT_GSLS);
-> +	sclp_facilities.has_kss = sclp_feat_check(98, SCLP_FEAT_98_BIT_KSS);
-> +	sclp_facilities.has_cmma = sclp_feat_check(116, SCLP_FEAT_116_BIT_CMMA);
-> +	sclp_facilities.has_64bscao = sclp_feat_check(116, SCLP_FEAT_116_BIT_64BSCAO);
-> +	sclp_facilities.has_esca = sclp_feat_check(116, SCLP_FEAT_116_BIT_ESCA);
-> +	sclp_facilities.has_ibs = sclp_feat_check(117, SCLP_FEAT_117_BIT_IBS);
-> +	sclp_facilities.has_pfmfi = sclp_feat_check(117, SCLP_FEAT_117_BIT_PFMFI);
+> +void kvm_arch_hardware_disable(void)
+> +{
+> +	csr_write(CSR_HEDELEG, 0);
+> +	csr_write(CSR_HIDELEG, 0);
+> +}
 > +
->   	for (i = 0; i < read_info->entries_cpu; i++, cpu++) {
->   		/*
->   		 * The logic for only reading the facilities from the
-> @@ -150,6 +165,11 @@ void sclp_facilities_setup(void)
->   		 */
->   		if (cpu->address == cpu0_addr) {
->   			sclp_facilities.has_sief2 = cpu->feat_sief2;
-> +			sclp_facilities.has_skeyi = cpu->feat_skeyi;
-> +			sclp_facilities.has_siif = cpu->feat_siif;
-> +			sclp_facilities.has_sigpif = cpu->feat_sigpif;
-> +			sclp_facilities.has_ib = cpu->feat_ib;
-> +			sclp_facilities.has_cei = cpu->feat_cei;
->   			break;
->   		}
->   	}
-> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
-> index 85231333..115bd2fa 100644
-> --- a/lib/s390x/sclp.h
-> +++ b/lib/s390x/sclp.h
-> @@ -94,9 +94,19 @@ typedef struct CPUEntry {
->   	uint8_t reserved0;
->   	uint8_t : 4;
->   	uint8_t feat_sief2 : 1;
-> +	uint8_t feat_skeyi : 1;
-> +	uint8_t : 2;
-> +	uint8_t : 2;
-> +	uint8_t feat_gpere : 1;
-> +	uint8_t feat_siif : 1;
-> +	uint8_t feat_sigpif : 1;
->   	uint8_t : 3;
-> -	uint8_t features_res2 [SCCB_CPU_FEATURE_LEN - 1];
-> -	uint8_t reserved2[6];
-> +	uint8_t reserved2[3];
-> +	uint8_t : 2;
-> +	uint8_t feat_ib : 1;
-> +	uint8_t feat_cei : 1;
-> +	uint8_t : 4;
-> +	uint8_t reserved3[6];
->   	uint8_t type;
->   	uint8_t reserved1;
->   } __attribute__((packed)) CPUEntry;
-> @@ -105,10 +115,32 @@ extern struct sclp_facilities sclp_facilities;
->   
->   struct sclp_facilities {
->   	uint64_t has_sief2 : 1;
-> +	uint64_t has_skeyi : 1;
-> +	uint64_t has_gpere : 1;
-> +	uint64_t has_siif : 1;
-> +	uint64_t has_sigpif : 1;
-> +	uint64_t has_ib : 1;
-> +	uint64_t has_cei : 1;
+> +int kvm_arch_init(void *opaque)
+> +{
+> +	if (!riscv_isa_extension_available(NULL, h)) {
+> +		kvm_info("hypervisor extension not available\n");
+> +		return -ENODEV;
+> +	}
 > +
->   	uint64_t has_diag318 : 1;
-> -	uint64_t : 62;
-> +	uint64_t has_gsls : 1;
-> +	uint64_t has_cmma : 1;
-> +	uint64_t has_64bscao : 1;
-> +	uint64_t has_esca : 1;
-> +	uint64_t has_kss : 1;
-> +	uint64_t has_pfmfi : 1;
-> +	uint64_t has_ibs : 1;
-> +	uint64_t : 64 - 15;
->   };
->   
-> +#define SCLP_FEAT_85_BIT_GSLS		7
-> +#define SCLP_FEAT_98_BIT_KSS		0
-> +#define SCLP_FEAT_116_BIT_64BSCAO	7
-> +#define SCLP_FEAT_116_BIT_CMMA		6
-> +#define SCLP_FEAT_116_BIT_ESCA		3
-> +#define SCLP_FEAT_117_BIT_PFMFI		6
-> +#define SCLP_FEAT_117_BIT_IBS		5
+> +	if (sbi_spec_is_0_1()) {
+> +		kvm_info("require SBI v0.2 or higher\n");
+> +		return -ENODEV;
+> +	}
 > +
->   typedef struct ReadInfo {
->   	SCCBHeader h;
->   	uint16_t rnmax;
-> 
+> +	if (sbi_probe_extension(SBI_EXT_RFENCE) <= 0) {
 
-Acked-by: David Hildenbrand <david@redhat.com>
+sbi_probe_extension() never returns zero.
 
--- 
-Thanks,
 
-David / dhildenb
+> +		kvm_info("require SBI RFENCE extension\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	kvm_info("hypervisor extension available\n");
+> +
+> +	return 0;
+> +}
+> +
+> +void kvm_arch_exit(void)
+> +{
+> +}
+> +
+> +static int riscv_kvm_init(void)
+> +{
+> +	return kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
+> +}
+> +module_init(riscv_kvm_init);
 
+
+[ snip ]
+
+> +int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> +{
+> +	int ret;
+> +	struct kvm_cpu_trap trap;
+> +	struct kvm_run *run = vcpu->run;
+> +
+> +	vcpu->arch.srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +
+> +	/* Process MMIO value returned from user-space */
+> +	if (run->exit_reason == KVM_EXIT_MMIO) {
+> +		ret = kvm_riscv_vcpu_mmio_return(vcpu, vcpu->run);
+> +		if (ret) {
+> +			srcu_read_unlock(&vcpu->kvm->srcu, vcpu->arch.srcu_idx);
+> +			return ret;
+> +		}
+> +	}
+> +
+> +	if (run->immediate_exit) {
+> +		srcu_read_unlock(&vcpu->kvm->srcu, vcpu->arch.srcu_idx);
+> +		return -EINTR;
+> +	}
+> +
+> +	vcpu_load(vcpu);
+> +
+> +	kvm_sigset_activate(vcpu);
+> +
+> +	ret = 1;
+> +	run->exit_reason = KVM_EXIT_UNKNOWN;
+> +	while (ret > 0) {
+> +		/* Check conditions before entering the guest */
+> +		cond_resched();
+> +
+> +		kvm_riscv_check_vcpu_requests(vcpu);
+> +
+> +		preempt_disable();
+> +
+> +		local_irq_disable();
+> +
+> +		/*
+> +		 * Exit if we have a signal pending so that we can deliver
+> +		 * the signal to user space.
+> +		 */
+> +		if (signal_pending(current)) {
+> +			ret = -EINTR;
+> +			run->exit_reason = KVM_EXIT_INTR;
+> +		}
+> +
+> +		/*
+> +		 * Ensure we set mode to IN_GUEST_MODE after we disable
+> +		 * interrupts and before the final VCPU requests check.
+> +		 * See the comment in kvm_vcpu_exiting_guest_mode() and
+> +		 * Documentation/virtual/kvm/vcpu-requests.rst
+> +		 */
+> +		vcpu->mode = IN_GUEST_MODE;
+> +
+> +		srcu_read_unlock(&vcpu->kvm->srcu, vcpu->arch.srcu_idx);
+> +		smp_mb__after_srcu_read_unlock();
+> +
+> +		if (ret <= 0 ||
+
+ret can never be == 0 at this point.
+
+> +		    kvm_request_pending(vcpu)) {
+> +			vcpu->mode = OUTSIDE_GUEST_MODE;
+> +			local_irq_enable();
+> +			preempt_enable();
+> +			vcpu->arch.srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +			continue;
+> +		}
+> +
+> +		guest_enter_irqoff();
+> +
+> +		__kvm_riscv_switch_to(&vcpu->arch);
+> +
+> +		vcpu->mode = OUTSIDE_GUEST_MODE;
+> +		vcpu->stat.exits++;
+> +
+> +		/*
+> +		 * Save SCAUSE, STVAL, HTVAL, and HTINST because we might
+> +		 * get an interrupt between __kvm_riscv_switch_to() and
+> +		 * local_irq_enable() which can potentially change CSRs.
+> +		 */
+> +		trap.sepc = 0;
+> +		trap.scause = csr_read(CSR_SCAUSE);
+> +		trap.stval = csr_read(CSR_STVAL);
+> +		trap.htval = csr_read(CSR_HTVAL);
+> +		trap.htinst = csr_read(CSR_HTINST);
+> +
+> +		/*
+> +		 * We may have taken a host interrupt in VS/VU-mode (i.e.
+> +		 * while executing the guest). This interrupt is still
+> +		 * pending, as we haven't serviced it yet!
+> +		 *
+> +		 * We're now back in HS-mode with interrupts disabled
+> +		 * so enabling the interrupts now will have the effect
+> +		 * of taking the interrupt again, in HS-mode this time.
+> +		 */
+> +		local_irq_enable();
+> +
+> +		/*
+> +		 * We do local_irq_enable() before calling guest_exit() so
+> +		 * that if a timer interrupt hits while running the guest
+> +		 * we account that tick as being spent in the guest. We
+> +		 * enable preemption after calling guest_exit() so that if
+> +		 * we get preempted we make sure ticks after that is not
+> +		 * counted as guest time.
+> +		 */
+> +		guest_exit();
+> +
+> +		preempt_enable();
+> +
+> +		vcpu->arch.srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +
+> +		ret = kvm_riscv_vcpu_exit(vcpu, run, &trap);
+> +	}
+> +
+> +	kvm_sigset_deactivate(vcpu);
+> +
+> +	vcpu_put(vcpu);
+> +
+> +	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->arch.srcu_idx);
+> +
+> +	return ret;
+> +}
+
+regards,
+dan carpenter
