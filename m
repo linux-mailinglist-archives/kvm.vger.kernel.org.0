@@ -2,292 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DA8DB3896C0
-	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 21:30:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0DBE23896CD
+	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 21:34:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232114AbhESTb5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 May 2021 15:31:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53718 "EHLO
+        id S232062AbhESTfq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 May 2021 15:35:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232137AbhESTby (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 May 2021 15:31:54 -0400
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 164B8C061761
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 12:30:34 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id t17so196937ljd.9
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 12:30:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PGDO8fbc/TF+sFisRne/2XCCw74JXT4LwjRMRFualWE=;
-        b=fwQ4F6zK+R/uSAi1p/ou7pQoKsrBbw7/cBP4fUy3DMZ6Va72N1TjdKSCv4dyIRR89a
-         JgZRUiaS1MqjHFeRjGSJ20PZQ1kL1yv3vD2G4z85s5ra40p0FvHVzslzutWbHY3nTwDl
-         Aez0VkOOwOOEhQOwpuLQPmA2By94mk20jT7DDGyb89qgaTqajWG+7xbdlQEWr5yBXTUF
-         V5E5Uvb8o6RXS9Jnrk5/HCGvcoglrHLVWEpGKvvLFwr3zzYtfnjCk+bct7mVEQExkxpf
-         +KXUQ9nZlPWO+rUIdZJaTCD8N3F4OdRjsthyHsS/19QPSOB7sgq/XtLxp7USutiXlB/q
-         5ePg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PGDO8fbc/TF+sFisRne/2XCCw74JXT4LwjRMRFualWE=;
-        b=fkoiaOB3ody0RFaCJ098WdVU8JUagzHeC7xlFQBCfkziU5AeS/wwLVjEfa8yE5LtfE
-         Vt1Ttz71MhRjal8bPWej1hFgoKvx93cyQpCAuEE0KEUx7LcaCCYmySnOCrpTmJ0OCVPB
-         3OrRYdnG1CEWmChwvixsVhaKUw6lu/3w9blxpTDknb2dvWytMaNXeKImtuexNZd/yTVZ
-         xGTjHvu5DeYT3krPgfWZyNg8E29vZBGnD2pmVEOa9Z2gu+Qi3NvfCY5iWaIEV97SSPGf
-         Pc3KGZt+200esqaPtT4nUdTyy9EKnNAcbTVIrwJfoWEU9z32S7RplGIyGaVQet+/pUY3
-         PIfg==
-X-Gm-Message-State: AOAM530X6FFL7+eN+gwH1a8w6waOQtn8kZc9C6wC+YHkGiMvsBUoHPyh
-        ug38U1LS+wn93b6x6twNpy2yV6zZEA+xQjlW2uV7TqfB29uhKMF5
-X-Google-Smtp-Source: ABdhPJyo8bC6y6UGVRkW7FKBnZdE79ScL53BuoAInE7OdE0IuW8eo+EcgjcmmECo9buX4YKaW5GFnqbkZ5ZQQil/rm0=
-X-Received: by 2002:a2e:87ce:: with SMTP id v14mr546211ljj.28.1621452632154;
- Wed, 19 May 2021 12:30:32 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210517145314.157626-1-jingzhangos@google.com>
- <20210517145314.157626-4-jingzhangos@google.com> <CALzav=chQrg=8krzt_aNuUfKW39SADUr-7C=i1iJSvEU5P=P0Q@mail.gmail.com>
-In-Reply-To: <CALzav=chQrg=8krzt_aNuUfKW39SADUr-7C=i1iJSvEU5P=P0Q@mail.gmail.com>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Wed, 19 May 2021 14:30:20 -0500
-Message-ID: <CAAdAUthScueaWbkTTAxKTSDb4MbjDonm0LpMZVp5N8DaO6ENnA@mail.gmail.com>
-Subject: Re: [PATCH v5 3/4] KVM: stats: Add documentation for statistics data
- binary interface
-To:     David Matlack <dmatlack@google.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        LinuxS390 <linux-s390@vger.kernel.org>,
-        Linuxkselftest <linux-kselftest@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
+        with ESMTP id S230177AbhESTfq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 May 2021 15:35:46 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A72BC06175F;
+        Wed, 19 May 2021 12:34:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Wm6Fg6hPEXzb07sPLpGnEeLDWpfOMrauzZEfAlcYzmM=; b=YmoOqAur2JknC74gPCU8jGvugp
+        P88XBQSr2WV4USjdKsyTqVsgFLp9ogTq6CoyV9QmGmhOkRFRSH3OhA1Gk3od5PQ/k6IZ1Hg8LP6hE
+        7e9XrO7uoMSxt3qWDgWa1kpNE2v+ksyiq1GD6PBLx9gLjWBri/dtPcGYBapdd8F0t/oqD88Wp1rHF
+        cPWt5ZzNKurWzPdQrIaF5JmBLwEA7+dixraZw4EC7r3xNq4XFkH6CWVLR720EWcYK3U2dv/vKO7pB
+        4WRNJMV+rsawx3qRiA4q1YRO4uIgJStawTWIEsweO9LksGnPfrFH3CyY3ftNEmem07is3KL5U/TSt
+        F0CD3LEg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=worktop.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1ljRvD-00FFAb-4q; Wed, 19 May 2021 19:32:15 +0000
+Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 4F1D1986465; Wed, 19 May 2021 21:31:58 +0200 (CEST)
+Date:   Wed, 19 May 2021 21:31:58 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Joerg Roedel <jroedel@suse.de>
+Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        Hyunwook Baek <baekhw@google.com>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
         David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v2 5/8] x86/sev-es: Leave NMI-mode before sending signals
+Message-ID: <20210519193158.GJ21560@worktop.programming.kicks-ass.net>
+References: <20210519135251.30093-1-joro@8bytes.org>
+ <20210519135251.30093-6-joro@8bytes.org>
+ <20210519175450.GF21560@worktop.programming.kicks-ass.net>
+ <YKVjRJmva/Y2EHPZ@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YKVjRJmva/Y2EHPZ@suse.de>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi David,
+On Wed, May 19, 2021 at 09:13:08PM +0200, Joerg Roedel wrote:
+> Hi Peter,
+> 
+> thanks for your review.
+> 
+> On Wed, May 19, 2021 at 07:54:50PM +0200, Peter Zijlstra wrote:
+> > On Wed, May 19, 2021 at 03:52:48PM +0200, Joerg Roedel wrote:
+> > > --- a/arch/x86/kernel/sev.c
+> > > +++ b/arch/x86/kernel/sev.c
+> > > @@ -1343,9 +1343,10 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
+> > >  		return;
+> > >  	}
+> > >  
+> > > +	instrumentation_begin();
+> > > +
+> > >  	irq_state = irqentry_nmi_enter(regs);
+> > >  	lockdep_assert_irqs_disabled();
+> > > -	instrumentation_begin();
+> > >  
+> > >  	/*
+> > >  	 * This is invoked through an interrupt gate, so IRQs are disabled. The
+> > 
+> > That's just plain wrong. No instrumentation is allowed before you enter
+> > the exception context.
+> 
+> Okay.
+> 
+> > > +	irqentry_nmi_exit(regs, irq_state);
+> > > +
+> > 
+> > And this is wrong too; because at this point the handler doesn't run in
+> > _any_ context anymore, certainly not one you can call regular C code
+> > from.
+> 
+> The #VC handler is at this point not running on the IST stack anymore,
+> but on the stack it came from or on the task stack. So my believe was
+> that at this point it inherits the context it came from (just like the
+> page-fault handler). But I also don't fully understand the context
+> tracking, so is my assumption wrong?
 
-On Wed, May 19, 2021 at 12:02 PM David Matlack <dmatlack@google.com> wrote:
->
-> On Mon, May 17, 2021 at 9:25 AM Jing Zhang <jingzhangos@google.com> wrote:
-> >
-> > Update KVM API documentation for binary statistics.
-> >
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  Documentation/virt/kvm/api.rst | 171 +++++++++++++++++++++++++++++++++
-> >  1 file changed, 171 insertions(+)
-> >
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index 7fcb2fd38f42..9a6aa9770dfd 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -5034,6 +5034,169 @@ see KVM_XEN_VCPU_SET_ATTR above.
-> >  The KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADJUST type may not be used
-> >  with the KVM_XEN_VCPU_GET_ATTR ioctl.
-> >
-> > +4.130 KVM_STATS_GETFD
-> > +---------------------
-> > +
-> > +:Capability: KVM_CAP_STATS_BINARY_FD
-> > +:Architectures: all
-> > +:Type: vm ioctl, vcpu ioctl
-> > +:Parameters: none
-> > +:Returns: statistics file descriptor on success, < 0 on error
-> > +
-> > +Errors:
-> > +
-> > +  ======     ======================================================
-> > +  ENOMEM     if the fd could not be created due to lack of memory
-> > +  EMFILE     if the number of opened files exceeds the limit
-> > +  ======     ======================================================
-> > +
-> > +The file descriptor can be used to read VM/vCPU statistics data in binary
-> > +format. The file data is organized into three blocks as below:
-> > ++-------------+
-> > +|   Header    |
-> > ++-------------+
-> > +| Descriptors |
-> > ++-------------+
-> > +| Stats Data  |
-> > ++-------------+
-> > +
-> > +The Header block is always at the start of the file. It is only needed to be
-> > +read one time after a system boot.
-> > +It is in the form of ``struct kvm_stats_header`` as below::
-> > +
-> > +       #define KVM_STATS_ID_MAXLEN             64
-> > +
-> > +       struct kvm_stats_header {
-> > +               char id[KVM_STATS_ID_MAXLEN];
-> > +               __u32 name_size;
-> > +               __u32 count;
-> > +               __u32 desc_offset;
-> > +               __u32 data_offset;
-> > +       };
-> > +
-> > +The ``id`` field is identification for the corresponding KVM statistics. For
-> > +KVM statistics, it is in the form of "kvm-{kvm pid}", like "kvm-12345". For
-> > +VCPU statistics, it is in the form of "kvm-{kvm pid}/vcpu-{vcpu id}", like
-> > +"kvm-12345/vcpu-12".
-> > +
-> > +The ``name_size`` field is the size (byte) of the statistics name string
-> > +(including trailing '\0') appended to the end of every statistics descriptor.
-> > +
-> > +The ``count`` field is the number of statistics.
-> > +
-> > +The ``desc_offset`` field is the offset of the Descriptors block from the start
-> > +of the file indicated by the file descriptor.
-> > +
-> > +The ``data_offset`` field is the offset of the Stats Data block from the start
-> > +of the file indicated by the file descriptor.
-> > +
-> > +The Descriptors block is only needed to be read once after a system boot. It is
-> > +an array of ``struct kvm_stats_desc`` as below::
-> > +
-> > +       #define KVM_STATS_TYPE_SHIFT            0
-> > +       #define KVM_STATS_TYPE_MASK             (0xF << KVM_STATS_TYPE_SHIFT)
-> > +       #define KVM_STATS_TYPE_CUMULATIVE       (0x0 << KVM_STATS_TYPE_SHIFT)
-> > +       #define KVM_STATS_TYPE_INSTANT          (0x1 << KVM_STATS_TYPE_SHIFT)
-> > +       #define KVM_STATS_TYPE_MAX              KVM_STATS_TYPE_INSTANT
-> > +
-> > +       #define KVM_STATS_UNIT_SHIFT            4
-> > +       #define KVM_STATS_UNIT_MASK             (0xF << KVM_STATS_UNIT_SHIFT)
-> > +       #define KVM_STATS_UNIT_NONE             (0x0 << KVM_STATS_UNIT_SHIFT)
-> > +       #define KVM_STATS_UNIT_BYTES            (0x1 << KVM_STATS_UNIT_SHIFT)
-> > +       #define KVM_STATS_UNIT_SECONDS          (0x2 << KVM_STATS_UNIT_SHIFT)
-> > +       #define KVM_STATS_UNIT_CYCLES           (0x3 << KVM_STATS_UNIT_SHIFT)
-> > +       #define KVM_STATS_UNIT_MAX              KVM_STATS_UNIT_CYCLES
-> > +
-> > +       #define KVM_STATS_SCALE_SHIFT           8
-> > +       #define KVM_STATS_SCALE_MASK            (0xF << KVM_STATS_SCALE_SHIFT)
-> > +       #define KVM_STATS_SCALE_POW10           (0x0 << KVM_STATS_SCALE_SHIFT)
-> > +       #define KVM_STATS_SCALE_POW2            (0x1 << KVM_STATS_SCALE_SHIFT)
-> > +       #define KVM_STATS_SCALE_MAX             KVM_STATS_SCALE_POW2
-> > +
-> > +       struct kvm_stats_desc {
-> > +               __u32 flags;
-> > +               __s16 exponent;
-> > +               __u16 size;
-> > +               __u32 unused1;
-> > +               __u32 unused2;
-> > +               char name[0];
-> > +       };
-> > +
-> > +The ``flags`` field contains the type and unit of the statistics data described
-> > +by this descriptor. The following flags are supported:
-> > +  * ``KVM_STATS_TYPE_CUMULATIVE``
-> > +    The statistics data is cumulative. The value of data can only be increased.
-> > +    Most of the counters used in KVM are of this type.
-> > +    The corresponding ``count`` filed for this type is always 1.
-> > +  * ``KVM_STATS_TYPE_INSTANT``
-> > +    The statistics data is instantaneous. Its value can be increased or
-> > +    decreased. This type is usually used as a measurement of some resources,
-> > +    like the number of dirty pages, the number of large pages, etc.
-> > +    The corresponding ``count`` field for this type is always 1.
-> > +  * ``KVM_STATS_UNIT_NONE``
-> > +    There is no unit for the value of statistics data. This usually means that
-> > +    the value is a simple counter of an event.
-> > +  * ``KVM_STATS_UNIT_BYTES``
-> > +    It indicates that the statistics data is used to measure memory size, in the
-> > +    unit of Byte, KiByte, MiByte, GiByte, etc. The unit of the data is
-> > +    determined by the ``exponent`` field in the descriptor. The
-> > +    ``KVM_STATS_SCALE_POW2`` flag is valid in this case. The unit of the data is
-> > +    determined by ``pow(2, exponent)``. For example, if value is 10,
-> > +    ``exponent`` is 20, which means the unit of statistics data is MiByte, we
-> > +    can get the statistics data in the unit of Byte by
-> > +    ``value * pow(2, exponent) = 10 * pow(2, 20) = 10 MiByte`` which is
-> > +    10 * 1024 * 1024 Bytes.
-> > +  * ``KVM_STATS_UNIT_SECONDS``
-> > +    It indicates that the statistics data is used to measure time/latency, in
-> > +    the unit of nanosecond, microsecond, millisecond and second. The unit of the
-> > +    data is determined by the ``exponent`` field in the descriptor. The
-> > +    ``KVM_STATS_SCALE_POW10`` flag is valid in this case. The unit of the data
-> > +    is determined by ``pow(10, exponent)``. For example, if value is 2000000,
-> > +    ``exponent`` is -6, which means the unit of statistics data is microsecond,
-> > +    we can get the statistics data in the unit of second by
-> > +    ``value * pow(10, exponent) = 2000000 * pow(10, -6) = 2 seconds``.
-> > +  * ``KVM_STATS_UNIT_CYCLES``
-> > +    It indicates that the statistics data is used to measure CPU clock cycles.
-> > +    The ``KVM_STATS_SCALE_POW10`` flag is valid in this case. For example, if
-> > +    value is 200, ``exponent`` is 4, we can get the number of CPU clock cycles
-> > +    by ``value * pow(10, exponent) = 200 * pow(10, 4) = 2000000``.
-> > +
-> > +The ``exponent`` field is the scale of corresponding statistics data. It has two
-> > +values as follows:
-> > +  * ``KVM_STATS_SCALE_POW10``
-> > +    The scale is based on power of 10. It is used for measurement of time and
-> > +    CPU clock cycles.
-> > +  * ``KVM_STATS_SCALE_POW2``
-> > +    The scale is based on power of 2. It is used for measurement of memory size.
-> > +
-> > +The ``size`` field is the number of values of this statistics data. It is in the
-> > +unit of ``unsigned long`` for VCPU or ``__u64`` for VM.
->
-> Note it is the reverse in the implementation.
-Will fix this. Thanks.
->
-> > +
-> > +The ``unused1`` and ``unused2`` fields are reserved for future
-> > +support for other types of statistics data, like log/linear histogram.
-> > +
-> > +The ``name`` field points to the name string of the statistics data. The name
-> > +string starts at the end of ``struct kvm_stats_desc``.
-> > +The maximum length (including trailing '\0') is indicated by ``name_size``
-> > +in ``struct kvm_stats_header``.
-> > +
-> > +The Stats Data block contains an array of data values of type ``struct
-> > +kvm_vm_stats_data`` or ``struct kvm_vcpu_stats_data``. It would be read by
-> > +user space periodically to pull statistics data.
-> > +The order of data value in Stats Data block is the same as the order of
-> > +descriptors in Descriptors block.
-> > +  * Statistics data for VM::
-> > +
-> > +       struct kvm_vm_stats_data {
-> > +               unsigned long value[0];
-> > +       };
-> > +
-> > +  * Statistics data for VCPU::
-> > +
-> > +       struct kvm_vcpu_stats_data {
-> > +               __u64 value[0];
-> > +       };
-> > +
-> >  5. The kvm_run structure
-> >  ========================
-> >
-> > @@ -6891,3 +7054,11 @@ This capability is always enabled.
-> >  This capability indicates that the KVM virtual PTP service is
-> >  supported in the host. A VMM can check whether the service is
-> >  available to the guest on migration.
-> > +
-> > +8.33 KVM_CAP_STATS_BINARY_FD
-> > +----------------------------
-> > +
-> > +:Architectures: all
-> > +
-> > +This capability indicates the feature that user space can create get a file
-> > +descriptor for every VM and VCPU to read statistics data in binary format.
-> > --
-> > 2.31.1.751.gd2f1c929bd-goog
-> >
+Being on the right stack is only part of the issue; you also need to
+make sure your runtime environment is set up.
+
+Regular kernel C expects a whole lot of things to be present; esp. so
+with all the debug options on. The irqentry_*_enter() family of
+functions very carefully sets up this environment and the
+irqentry_*_exit() undoes it again. Before and after you really cannot
+run normal code.
+
+Just an example, RCU might not be watching, it might think the CPU is in
+userspace and advance the GP while you're relying on it not doing so.
+
+Similarly lockdep is in some undefined state and any lock used can
+trigger random 'funny' things.
+
+Just because this is 'C', doesn't immediately mean you can go call any
+random function. Up until recently most of this was in ASM. There's a
+reason for the noinstr annotations.
