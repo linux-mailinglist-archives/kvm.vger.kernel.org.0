@@ -2,157 +2,425 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 000FB38984F
-	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 23:01:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9530038985A
+	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 23:04:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229643AbhESVCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 May 2021 17:02:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46176 "EHLO
+        id S229875AbhESVGI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 May 2021 17:06:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229550AbhESVCS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 May 2021 17:02:18 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0601C061760
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 14:00:57 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id y32so10309511pga.11
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 14:00:57 -0700 (PDT)
+        with ESMTP id S229845AbhESVGG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 May 2021 17:06:06 -0400
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6DC3C061760
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 14:04:44 -0700 (PDT)
+Received: by mail-qv1-xf4a.google.com with SMTP id d9-20020a0ce4490000b02901f0bee07112so5134794qvm.7
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 14:04:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=8fPkrJZl4xbjKZWSb4LautfbTP6fpPHvxZUlNFpdvSA=;
-        b=wCA+ul9992t4Z3RZZg7u/sCLnlCW1UpUlXad2PEtqU7sXx/IpINVWngj3nGutMGJSM
-         DyOznK2ZiHYjYqGw6jCarfrR/HPvBbZMG06mpWvqewKGFovKCO+wl3aNaJCz+9mzzNJI
-         UHYeVGSB+LmxV9XDidTKfTS/9e9V9o1scQdbUAcivKUkN4rb45ZFLenLJLiNWKU4Fu9W
-         /RWKbyu3hA+jGi/ErLBE8GyqbXE1hmgWycS7xieAiJg8nruu8TXAO6h0BT2o9xki7RCx
-         ce0kPdRUCD0VWcmxZeZsZknMp1uqHWioYiZwh5PzpF2m83LrONvnHU9lm7lLbzhVXIc7
-         3xRA==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=mcIHVITO35jMCdoa/+K0mWqyvv3hln4b/cEKyo+fx/g=;
+        b=NMvN1NfvoWCOQubpJx6gNHgHJNRLoL2KmNlIpDrkbAERisiD8vmpUaspOCzmebJ2c0
+         CWGbjQPAr4eKY86+895nlZqibq/s+2PlK2I5aC7My9hlGLiAOCgW/sv7/lAzhYH5ct+G
+         ulKsGhk+TbU3i8S9rY8vZRDRaixVbijlMmE5ehCvVd+72oRfobWfdPvF9rqA4sABU5hc
+         NMGNvnxghT0eEI2zbXe4hp7BiC5WOzMYFKnZMBDa7zyaIxNLHc8LES5urs5Lkol1ihiB
+         gjvAXWbUG3ge+d9ML3eTOXQo6WrK6Ls2ADF7XA6vIx6DOdvtyVHgZZZTxfq61JLlw/9V
+         /6iA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=8fPkrJZl4xbjKZWSb4LautfbTP6fpPHvxZUlNFpdvSA=;
-        b=P6cChDMbm0TRVd6qKiHtioA4ErQaMge4f/NVddmytDIyb7lhe3Mm99p4gjo4RILbl+
-         FecgEdA1IKnRKvk+4c9aUYXAz8KQYc71aUY9FotAel8ayquJK+olHUQldQX5o+p0SebG
-         m+RLvdtTZ6C488R1ozmFlBiPa29k6Zux1gQ8Kd53S0agGaUJhFtlBzeKy7tviaH7bvtQ
-         MLh6sFTy9nFsyhU96he+VVO5YPzDTML70mWX0B82f9rRVCwYrU5JMHVxTUgKkOb6EZbg
-         ESUfLpDAnu7oqtCA0uBJHb1kAjL6987okZh7A3mVQ41gCt1rtk8nla4Lcv1ZzaXUrxEA
-         DW1Q==
-X-Gm-Message-State: AOAM533t/XWpGCnnLrEEXvx5aRa3XDLyL4Y2T+vJNAmpeUznqP7y3SLv
-        Sb8ZTirhE9TOoUR6n76yoiCzOg==
-X-Google-Smtp-Source: ABdhPJy0Bnrx+iCOczdDbABKesxv6ntU9siwPKi1NgqUCXqUrNZZfXMKKBMKmXgXn85/O4dnm1j3yA==
-X-Received: by 2002:a63:5060:: with SMTP id q32mr1088180pgl.32.1621458056727;
-        Wed, 19 May 2021 14:00:56 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id e7sm251429pfl.171.2021.05.19.14.00.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 May 2021 14:00:56 -0700 (PDT)
-Date:   Wed, 19 May 2021 21:00:52 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 1/8] KVM: x86: Cache total page count to avoid
- traversing the memslot array
-Message-ID: <YKV8hHDS489g9JBS@google.com>
-References: <cover.1621191549.git.maciej.szmigiero@oracle.com>
- <eb1c881ce814705c83813f02a1a13ced96f1b1d1.1621191551.git.maciej.szmigiero@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eb1c881ce814705c83813f02a1a13ced96f1b1d1.1621191551.git.maciej.szmigiero@oracle.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=mcIHVITO35jMCdoa/+K0mWqyvv3hln4b/cEKyo+fx/g=;
+        b=R+Oje+8GzP/D6sYa2SGkoEKKZWaaVFHMgnQjtV7aRqMBs2ZjI1NMpV7V2uGa+Qa+zo
+         FIvxgI196/YKuDk7JCD1KUeFREYv3MFnSIoyYLoxEaDbBOXs1O7Cd7GLqi9v1j+d4wDP
+         uDkQgaJYUY5b5DNHjJrplVjnr2NJ8jzaU6AZjj6vwziZKvpbbC+CJ7SBhrk20Tp8JG0f
+         cBCBc5pHf3PULb6HOBx/TP3CjRJ/79njzwbtTwngBRCUzGV1H7cj/y3XhaQMuMRffJbr
+         7V9EHaVilc9ciyWlafcMw6563MWsJ/DYT/BiCsNyYpyEYN01H//dYYGsh9j82GpEwbxn
+         6VAQ==
+X-Gm-Message-State: AOAM531pV9mgcltRKwnY/kAUl22Ri57UIGTC/kRWQTTz9LcoTNcIcSds
+        rOaYDJ2wYV1sYyNznpgkhXrcoyq69NFQhWgI
+X-Google-Smtp-Source: ABdhPJw8h8/44bJJX8LGPV/gCLydjOOUFU0Q7r2d8wza2xWxfgpDCzlGHUlVrx1PWYBI7xaaAt+FsZBw4WzcPbP7
+X-Received: from jthoughton.c.googlers.com ([fda3:e722:ac3:10:14:4d90:c0a8:2a4f])
+ (user=jthoughton job=sendgmr) by 2002:a05:6214:2125:: with SMTP id
+ r5mr1675192qvc.28.1621458283955; Wed, 19 May 2021 14:04:43 -0700 (PDT)
+Date:   Wed, 19 May 2021 21:04:36 +0000
+Message-Id: <20210519210437.1688484-1-jthoughton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.1.751.gd2f1c929bd-goog
+Subject: [PATCH 1/2] KVM: Deliver VM fault signals to userspace
+From:   James Houghton <jthoughton@google.com>
+To:     Mike Kravetz <mike.kravetz@oracle.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>, Ben Gardon <bgardon@google.com>
+Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Jue Wang <juew@google.com>, Peter Xu <peterx@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        James Houghton <jthoughton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, May 16, 2021, Maciej S. Szmigiero wrote:
-> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-> 
-> There is no point in recalculating from scratch the total number of pages
-> in all memslots each time a memslot is created or deleted.
-> 
-> Just cache the value and update it accordingly on each such operation so
-> the code doesn't need to traverse the whole memslot array each time.
-> 
-> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-> ---
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 5bd550eaf683..8c7738b75393 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -11112,9 +11112,21 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
->  				const struct kvm_memory_slot *new,
->  				enum kvm_mr_change change)
->  {
-> -	if (!kvm->arch.n_requested_mmu_pages)
-> -		kvm_mmu_change_mmu_pages(kvm,
-> -				kvm_mmu_calculate_default_mmu_pages(kvm));
-> +	if (change == KVM_MR_CREATE)
-> +		kvm->arch.n_memslots_pages += new->npages;
-> +	else if (change == KVM_MR_DELETE) {
-> +		WARN_ON(kvm->arch.n_memslots_pages < old->npages);
+This patch has been written to support page-ins using userfaultfd's
+SIGBUS feature.  When a userfaultfd is created with UFFD_FEATURE_SIGBUS,
+`handle_userfault` will return VM_FAULT_SIGBUS instead of putting the
+calling thread to sleep. Normal (non-guest) threads that access memory
+that has been registered with a UFFD_FEATURE_SIGBUS userfaultfd receive
+a SIGBUS.
 
-Heh, so I think this WARN can be triggered at will by userspace on 32-bit KVM by
-causing the running count to wrap.  KVM artificially caps the size of a single
-memslot at ((1UL << 31) - 1), but userspace could create multiple gigantic slots
-to overflow arch.n_memslots_pages.
+When a vCPU gets an EPT page fault in a userfaultfd-registered region,
+KVM calls into `handle_userfault` to resolve the page fault. With
+UFFD_FEATURE_SIGBUS, VM_FAULT_SIGBUS is returned, but a SIGBUS is never
+delivered to the userspace thread. This patch propagates the
+VM_FAULT_SIGBUS error up to KVM, where we then send the signal.
 
-I _think_ changing it to a u64 would fix the problem since KVM forbids overlapping
-memslots in the GPA space.
+Upon receiving a VM_FAULT_SIGBUS, the KVM_RUN ioctl will exit to
+userspace. This functionality already exists. This allows a hypervisor
+to do page-ins with UFFD_FEATURE_SIGBUS:
 
-Also, what about moving the check-and-WARN to prepare_memory_region() so that
-KVM can error out if the check fails?  Doesn't really matter, but an explicit
-error for userspace is preferable to underflowing the number of pages and getting
-weird MMU errors/behavior down the line.
+1. Setup a SIGBUS handler to save the address of the SIGBUS (to a
+   thread-local variable).
+2. Enter the guest.
+3. Immediately after KVM_RUN returns, check if the address has been set.
+4. If an address has been set, we exited due to a page fault that we can
+   now handle.
+5. Userspace can do anything it wants to make the memory available,
+   using MODE_NOWAKE for the UFFDIO memory installation ioctls.
+6. Re-enter the guest. If the memory still isn't ready, this process
+   will repeat.
 
-> +		kvm->arch.n_memslots_pages -= old->npages;
-> +	}
-> +
-> +	if (!kvm->arch.n_requested_mmu_pages) {
+This style of demand paging is significantly faster than the standard
+poll/read/wake mechanism userfaultfd uses and completely bypasses the
+userfaultfd waitq. For a single vCPU, page-in throughput increases by
+about 3-4x.
 
-If we're going to bother caching the number of pages then we should also skip
-the update when the number pages isn't changing, e.g.
+Signed-off-by: James Houghton <jthoughton@google.com>
+Suggested-by: Jue Wang <juew@google.com>
+---
+ include/linux/hugetlb.h |  2 +-
+ include/linux/mm.h      |  3 ++-
+ mm/gup.c                | 57 +++++++++++++++++++++++++++--------------
+ mm/hugetlb.c            |  5 +++-
+ virt/kvm/kvm_main.c     | 30 +++++++++++++++++++++-
+ 5 files changed, 74 insertions(+), 23 deletions(-)
 
-	if (change == KVM_MR_CREATE || change == KVM_MR_DELETE) {
-		if (change == KVM_MR_CREATE)
-			kvm->arch.n_memslots_pages += new->npages;
-		else
-			kvm->arch.n_memslots_pages -= old->npages;
+diff --git a/include/linux/hugetlb.h b/include/linux/hugetlb.h
+index b92f25ccef58..a777fb254df0 100644
+--- a/include/linux/hugetlb.h
++++ b/include/linux/hugetlb.h
+@@ -119,7 +119,7 @@ int copy_hugetlb_page_range(struct mm_struct *, struct mm_struct *, struct vm_ar
+ long follow_hugetlb_page(struct mm_struct *, struct vm_area_struct *,
+ 			 struct page **, struct vm_area_struct **,
+ 			 unsigned long *, unsigned long *, long, unsigned int,
+-			 int *);
++			 int *, int *);
+ void unmap_hugepage_range(struct vm_area_struct *,
+ 			  unsigned long, unsigned long, struct page *);
+ void __unmap_hugepage_range_final(struct mmu_gather *tlb,
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 322ec61d0da7..1dcd1ac81992 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1824,7 +1824,8 @@ long get_user_pages_locked(unsigned long start, unsigned long nr_pages,
+ long pin_user_pages_locked(unsigned long start, unsigned long nr_pages,
+ 		    unsigned int gup_flags, struct page **pages, int *locked);
+ long get_user_pages_unlocked(unsigned long start, unsigned long nr_pages,
+-		    struct page **pages, unsigned int gup_flags);
++		    struct page **pages, unsigned int gup_flags,
++		    int *fault_error);
+ long pin_user_pages_unlocked(unsigned long start, unsigned long nr_pages,
+ 		    struct page **pages, unsigned int gup_flags);
+ 
+diff --git a/mm/gup.c b/mm/gup.c
+index 0697134b6a12..ab55a67aef78 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -881,7 +881,8 @@ static int get_gate_page(struct mm_struct *mm, unsigned long address,
+  * is, *@locked will be set to 0 and -EBUSY returned.
+  */
+ static int faultin_page(struct vm_area_struct *vma,
+-		unsigned long address, unsigned int *flags, int *locked)
++		unsigned long address, unsigned int *flags, int *locked,
++		int *fault_error)
+ {
+ 	unsigned int fault_flags = 0;
+ 	vm_fault_t ret;
+@@ -906,6 +907,8 @@ static int faultin_page(struct vm_area_struct *vma,
+ 	}
+ 
+ 	ret = handle_mm_fault(vma, address, fault_flags, NULL);
++	if (fault_error)
++		*fault_error = ret;
+ 	if (ret & VM_FAULT_ERROR) {
+ 		int err = vm_fault_to_errno(ret, *flags);
+ 
+@@ -996,6 +999,8 @@ static int check_vma_flags(struct vm_area_struct *vma, unsigned long gup_flags)
+  * @vmas:	array of pointers to vmas corresponding to each page.
+  *		Or NULL if the caller does not require them.
+  * @locked:     whether we're still with the mmap_lock held
++ * @fault_error: VM fault error from handle_mm_fault. NULL if the caller
++ *		does not require this error.
+  *
+  * Returns either number of pages pinned (which may be less than the
+  * number requested), or an error. Details about the return value:
+@@ -1040,6 +1045,13 @@ static int check_vma_flags(struct vm_area_struct *vma, unsigned long gup_flags)
+  * when it's been released.  Otherwise, it must be held for either
+  * reading or writing and will not be released.
+  *
++ * If @fault_error != NULL, __get_user_pages will return the VM fault error
++ * from handle_mm_fault() in this argument in the event of a VM fault error.
++ * On success (ret == nr_pages) fault_error is zero.
++ * On failure (ret != nr_pages) fault_error may still be 0 if the error did
++ * not originate from handle_mm_fault().
++ *
++ *
+  * In most cases, get_user_pages or get_user_pages_fast should be used
+  * instead of __get_user_pages. __get_user_pages should be used only if
+  * you need some special @gup_flags.
+@@ -1047,7 +1059,8 @@ static int check_vma_flags(struct vm_area_struct *vma, unsigned long gup_flags)
+ static long __get_user_pages(struct mm_struct *mm,
+ 		unsigned long start, unsigned long nr_pages,
+ 		unsigned int gup_flags, struct page **pages,
+-		struct vm_area_struct **vmas, int *locked)
++		struct vm_area_struct **vmas, int *locked,
++		int *fault_error)
+ {
+ 	long ret = 0, i = 0;
+ 	struct vm_area_struct *vma = NULL;
+@@ -1097,7 +1110,7 @@ static long __get_user_pages(struct mm_struct *mm,
+ 			if (is_vm_hugetlb_page(vma)) {
+ 				i = follow_hugetlb_page(mm, vma, pages, vmas,
+ 						&start, &nr_pages, i,
+-						gup_flags, locked);
++						gup_flags, locked, fault_error);
+ 				if (locked && *locked == 0) {
+ 					/*
+ 					 * We've got a VM_FAULT_RETRY
+@@ -1124,7 +1137,8 @@ static long __get_user_pages(struct mm_struct *mm,
+ 
+ 		page = follow_page_mask(vma, start, foll_flags, &ctx);
+ 		if (!page) {
+-			ret = faultin_page(vma, start, &foll_flags, locked);
++			ret = faultin_page(vma, start, &foll_flags, locked,
++					   fault_error);
+ 			switch (ret) {
+ 			case 0:
+ 				goto retry;
+@@ -1280,7 +1294,8 @@ static __always_inline long __get_user_pages_locked(struct mm_struct *mm,
+ 						struct page **pages,
+ 						struct vm_area_struct **vmas,
+ 						int *locked,
+-						unsigned int flags)
++						unsigned int flags,
++						int *fault_error)
+ {
+ 	long ret, pages_done;
+ 	bool lock_dropped;
+@@ -1311,7 +1326,7 @@ static __always_inline long __get_user_pages_locked(struct mm_struct *mm,
+ 	lock_dropped = false;
+ 	for (;;) {
+ 		ret = __get_user_pages(mm, start, nr_pages, flags, pages,
+-				       vmas, locked);
++				       vmas, locked, fault_error);
+ 		if (!locked)
+ 			/* VM_FAULT_RETRY couldn't trigger, bypass */
+ 			return ret;
+@@ -1371,7 +1386,7 @@ static __always_inline long __get_user_pages_locked(struct mm_struct *mm,
+ 
+ 		*locked = 1;
+ 		ret = __get_user_pages(mm, start, 1, flags | FOLL_TRIED,
+-				       pages, NULL, locked);
++				       pages, NULL, locked, fault_error);
+ 		if (!*locked) {
+ 			/* Continue to retry until we succeeded */
+ 			BUG_ON(ret != 0);
+@@ -1458,7 +1473,7 @@ long populate_vma_page_range(struct vm_area_struct *vma,
+ 	 * not result in a stack expansion that recurses back here.
+ 	 */
+ 	return __get_user_pages(mm, start, nr_pages, gup_flags,
+-				NULL, NULL, locked);
++				NULL, NULL, locked, NULL);
+ }
+ 
+ /*
+@@ -1524,7 +1539,7 @@ int __mm_populate(unsigned long start, unsigned long len, int ignore_errors)
+ static long __get_user_pages_locked(struct mm_struct *mm, unsigned long start,
+ 		unsigned long nr_pages, struct page **pages,
+ 		struct vm_area_struct **vmas, int *locked,
+-		unsigned int foll_flags)
++		unsigned int foll_flags, int *fault_error)
+ {
+ 	struct vm_area_struct *vma;
+ 	unsigned long vm_flags;
+@@ -1590,7 +1605,8 @@ struct page *get_dump_page(unsigned long addr)
+ 	if (mmap_read_lock_killable(mm))
+ 		return NULL;
+ 	ret = __get_user_pages_locked(mm, addr, 1, &page, NULL, &locked,
+-				      FOLL_FORCE | FOLL_DUMP | FOLL_GET);
++				      FOLL_FORCE | FOLL_DUMP | FOLL_GET,
++				      NULL);
+ 	if (locked)
+ 		mmap_read_unlock(mm);
+ 
+@@ -1704,11 +1720,11 @@ static long __gup_longterm_locked(struct mm_struct *mm,
+ 
+ 	if (!(gup_flags & FOLL_LONGTERM))
+ 		return __get_user_pages_locked(mm, start, nr_pages, pages, vmas,
+-					       NULL, gup_flags);
++					       NULL, gup_flags, NULL);
+ 	flags = memalloc_pin_save();
+ 	do {
+ 		rc = __get_user_pages_locked(mm, start, nr_pages, pages, vmas,
+-					     NULL, gup_flags);
++					     NULL, gup_flags, NULL);
+ 		if (rc <= 0)
+ 			break;
+ 		rc = check_and_migrate_movable_pages(rc, pages, gup_flags);
+@@ -1764,7 +1780,8 @@ static long __get_user_pages_remote(struct mm_struct *mm,
+ 
+ 	return __get_user_pages_locked(mm, start, nr_pages, pages, vmas,
+ 				       locked,
+-				       gup_flags | FOLL_TOUCH | FOLL_REMOTE);
++				       gup_flags | FOLL_TOUCH | FOLL_REMOTE,
++				       NULL);
+ }
+ 
+ /**
+@@ -1941,7 +1958,7 @@ long get_user_pages_locked(unsigned long start, unsigned long nr_pages,
+ 
+ 	return __get_user_pages_locked(current->mm, start, nr_pages,
+ 				       pages, NULL, locked,
+-				       gup_flags | FOLL_TOUCH);
++				       gup_flags | FOLL_TOUCH, NULL);
+ }
+ EXPORT_SYMBOL(get_user_pages_locked);
+ 
+@@ -1961,7 +1978,8 @@ EXPORT_SYMBOL(get_user_pages_locked);
+  * (e.g. FOLL_FORCE) are not required.
+  */
+ long get_user_pages_unlocked(unsigned long start, unsigned long nr_pages,
+-			     struct page **pages, unsigned int gup_flags)
++			     struct page **pages, unsigned int gup_flags,
++			     int *fault_error)
+ {
+ 	struct mm_struct *mm = current->mm;
+ 	int locked = 1;
+@@ -1978,7 +1996,8 @@ long get_user_pages_unlocked(unsigned long start, unsigned long nr_pages,
+ 
+ 	mmap_read_lock(mm);
+ 	ret = __get_user_pages_locked(mm, start, nr_pages, pages, NULL,
+-				      &locked, gup_flags | FOLL_TOUCH);
++				      &locked, gup_flags | FOLL_TOUCH,
++				      fault_error);
+ 	if (locked)
+ 		mmap_read_unlock(mm);
+ 	return ret;
+@@ -2550,7 +2569,7 @@ static int __gup_longterm_unlocked(unsigned long start, int nr_pages,
+ 		mmap_read_unlock(current->mm);
+ 	} else {
+ 		ret = get_user_pages_unlocked(start, nr_pages,
+-					      pages, gup_flags);
++					      pages, gup_flags, NULL);
+ 	}
+ 
+ 	return ret;
+@@ -2880,7 +2899,7 @@ long pin_user_pages_unlocked(unsigned long start, unsigned long nr_pages,
+ 		return -EINVAL;
+ 
+ 	gup_flags |= FOLL_PIN;
+-	return get_user_pages_unlocked(start, nr_pages, pages, gup_flags);
++	return get_user_pages_unlocked(start, nr_pages, pages, gup_flags, NULL);
+ }
+ EXPORT_SYMBOL(pin_user_pages_unlocked);
+ 
+@@ -2909,6 +2928,6 @@ long pin_user_pages_locked(unsigned long start, unsigned long nr_pages,
+ 	gup_flags |= FOLL_PIN;
+ 	return __get_user_pages_locked(current->mm, start, nr_pages,
+ 				       pages, NULL, locked,
+-				       gup_flags | FOLL_TOUCH);
++				       gup_flags | FOLL_TOUCH, NULL);
+ }
+ EXPORT_SYMBOL(pin_user_pages_locked);
+diff --git a/mm/hugetlb.c b/mm/hugetlb.c
+index 3db405dea3dc..889ac33d57d5 100644
+--- a/mm/hugetlb.c
++++ b/mm/hugetlb.c
+@@ -5017,7 +5017,8 @@ static void record_subpages_vmas(struct page *page, struct vm_area_struct *vma,
+ long follow_hugetlb_page(struct mm_struct *mm, struct vm_area_struct *vma,
+ 			 struct page **pages, struct vm_area_struct **vmas,
+ 			 unsigned long *position, unsigned long *nr_pages,
+-			 long i, unsigned int flags, int *locked)
++			 long i, unsigned int flags, int *locked,
++			 int  *fault_error)
+ {
+ 	unsigned long pfn_offset;
+ 	unsigned long vaddr = *position;
+@@ -5103,6 +5104,8 @@ long follow_hugetlb_page(struct mm_struct *mm, struct vm_area_struct *vma,
+ 			}
+ 			ret = hugetlb_fault(mm, vma, vaddr, fault_flags);
+ 			if (ret & VM_FAULT_ERROR) {
++				if (fault_error)
++					*fault_error = ret;
+ 				err = vm_fault_to_errno(ret, flags);
+ 				remainder = 0;
+ 				break;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 2799c6660cce..0a20d926ae32 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2004,6 +2004,30 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
+ 	return false;
+ }
+ 
++static void kvm_send_vm_fault_signal(int fault_error, int errno,
++				     unsigned long address,
++				     struct task_struct *tsk)
++{
++	kernel_siginfo_t info;
++
++	clear_siginfo(&info);
++
++	if (fault_error == VM_FAULT_SIGBUS)
++		info.si_signo = SIGBUS;
++	else if (fault_error == VM_FAULT_SIGSEGV)
++		info.si_signo = SIGSEGV;
++	else
++		// Other fault errors should not result in a signal.
++		return;
++
++	info.si_errno = errno;
++	info.si_code = BUS_ADRERR;
++	info.si_addr = (void __user *)address;
++	info.si_addr_lsb = PAGE_SHIFT;
++
++	send_sig_info(info.si_signo, &info, tsk);
++}
++
+ /*
+  * The slow path to get the pfn of the specified host virtual address,
+  * 1 indicates success, -errno is returned if error is detected.
+@@ -2014,6 +2038,7 @@ static int hva_to_pfn_slow(unsigned long addr, bool *async, bool write_fault,
+ 	unsigned int flags = FOLL_HWPOISON;
+ 	struct page *page;
+ 	int npages = 0;
++	int fault_error;
+ 
+ 	might_sleep();
+ 
+@@ -2025,7 +2050,10 @@ static int hva_to_pfn_slow(unsigned long addr, bool *async, bool write_fault,
+ 	if (async)
+ 		flags |= FOLL_NOWAIT;
+ 
+-	npages = get_user_pages_unlocked(addr, 1, &page, flags);
++	npages = get_user_pages_unlocked(addr, 1, &page, flags, &fault_error);
++	if (fault_error & VM_FAULT_ERROR)
++		kvm_send_vm_fault_signal(fault_error, npages, addr, current);
++
+ 	if (npages != 1)
+ 		return npages;
+ 
+-- 
+2.31.1.751.gd2f1c929bd-goog
 
-		if (!kvm->arch.n_requested_mmu_pages) {
-			unsigned long nr_mmu_pages;
-
-			nr_mmu_pages = kvm->arch.n_memslots_pages *
-				       KVM_PERMILLE_MMU_PAGES / 1000;
-			nr_mmu_pages = max(nr_mmu_pages, KVM_MIN_ALLOC_MMU_PAGES);
-			kvm_mmu_change_mmu_pages(kvm, nr_mmu_pages);
-		}
-	}
-
-> +		unsigned long nr_mmu_pages;
-> +
-> +		nr_mmu_pages = kvm->arch.n_memslots_pages *
-> +			       KVM_PERMILLE_MMU_PAGES / 1000;
-> +		nr_mmu_pages = max(nr_mmu_pages, KVM_MIN_ALLOC_MMU_PAGES);
-> +		kvm_mmu_change_mmu_pages(kvm, nr_mmu_pages);
-> +	}
->  
->  	/*
->  	 * FIXME: const-ify all uses of struct kvm_memory_slot.
