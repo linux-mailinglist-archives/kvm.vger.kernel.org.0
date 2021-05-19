@@ -2,112 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35765388FB6
-	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 16:00:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FE60388FE0
+	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 16:07:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346748AbhESOB5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 May 2021 10:01:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34408 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231627AbhESOBz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 May 2021 10:01:55 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 877D2C06175F
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 07:00:34 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id b12so8535188ljp.1
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 07:00:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=cH5U9Az7eYofu3eA4ftQUffWK1rQQwjbWurlsdJWGcs=;
-        b=PsWmCiUmc0h6jhfs8n0zs3WyblSVZ2kUwHfBnc2GdYbUF8tQ/EAduwiPqpCBvvWuAV
-         7EBu6Di5txh7+u0aguiGdClwNmaz4jJmdsAPd5jkwP/ynfSUqEmpdorkx0uXGEliS0HL
-         V4gvbj4hLt0shXfOLVUVx4u6jYkqiFJNktSpgbI/rNy4Z/6+Vh8HXBTAA5d5m7MP0C9T
-         bc1cbB8SNyiS9coO2Yy7SqhmCa1y/rpQmJMZ1h48CrC/7tzF6K118RVnOuTM0JaW0i8w
-         57W7aksfsjkAzQ7C0mpUOtbLcHw0FtCEdK5DKFQu2GCYHE5cMoB0VZ4vLuYr3BsKj70T
-         e9gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=cH5U9Az7eYofu3eA4ftQUffWK1rQQwjbWurlsdJWGcs=;
-        b=Co07wj257Bx2WmWR6uBKY10Dvb3uMla1plRw+K9fd1PkFDBGfndRphD9xKeczji8Ob
-         vqzZwkXvaAv1BsQ251986+SO6AG/C9a68Cji6cHNt39GImU+l7Rd5/IQnixw6Y9GJJzV
-         ppP6dNuU8yYaapEStZyjrNpufQRyI3BO54p+TTVIxIPeORYZnC9vYgP4xzw3yNlSPU2r
-         GSgyZM1Z9TxREMu5orVqaMJBEPCQcAHzNt1E1ur5HX1LyyOtg33P0h5o3m/KCe0NGvJW
-         tKoISYRDVeyn6yPTJaiQ6012Em99i8GtwhnPQXPrqVmQE5wpQlPNFt2HY8rFvNipz/GT
-         ihVg==
-X-Gm-Message-State: AOAM533p5u24Y+LEo93MVgVGz6UdCAMuC8GtXHLfC8aE4TPwj8VQChBg
-        jutxrwWdz9QaJVvGTxM5a/u+gQJ6PvFY3eoIH2j76eOkIN0osw==
-X-Google-Smtp-Source: ABdhPJyt1aYpq0/SyLXL0dDpoeoKQD/5+WHAgE9KRT3tffH8yD1OazmgdUfzxGyYtnxIbTs1l9olrGfYGX8yIUMEGYw=
-X-Received: by 2002:a2e:8e26:: with SMTP id r6mr5780477ljk.472.1621432832689;
- Wed, 19 May 2021 07:00:32 -0700 (PDT)
+        id S1353874AbhESOIx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 May 2021 10:08:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49168 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1353848AbhESOIw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 May 2021 10:08:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621433252;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=w6Ik3ix00seen7f0ACeVszG5V6/4OpjDNwj8RlI2yS0=;
+        b=DYzzXSY/0ivsrY71xJGQc3i51sSTOk3RWV/piOgUJACnTlXQlieBTbpMJCyuuU2ob+hEwh
+        AbsLoHNQzbLQZl51BZ1f4FCGN+GVrr32bNWDVY5nHPJAB4auySmlQQf45L/AEhxwiMAYfA
+        fE9mD4bIC9N4ZBZfmhjRrJQCy4zFIc8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-CPE_d8ZRPu6BV6ilekZGDg-1; Wed, 19 May 2021 10:07:30 -0400
+X-MC-Unique: CPE_d8ZRPu6BV6ilekZGDg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 479B0180FD68;
+        Wed, 19 May 2021 14:07:29 +0000 (UTC)
+Received: from gator.redhat.com (unknown [10.40.192.248])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 350C710013C1;
+        Wed, 19 May 2021 14:07:27 +0000 (UTC)
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     maz@kernel.org, ricarkol@google.com, eric.auger@redhat.com,
+        alexandru.elisei@arm.com, pbonzini@redhat.com
+Subject: [PATCH v2 0/5] KVM: arm64: selftests: Fix get-reg-list
+Date:   Wed, 19 May 2021 16:07:21 +0200
+Message-Id: <20210519140726.892632-1-drjones@redhat.com>
 MIME-Version: 1.0
-From:   Liang Li <liliang324@gmail.com>
-Date:   Wed, 19 May 2021 22:00:20 +0800
-Message-ID: <CA+2MQi-_06J1cmLhKAmV1vkPEnvDx6+bOnK06OciYmdymaNruw@mail.gmail.com>
-Subject: About the performance of hyper-v
-To:     vkuznets@redhat.com
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Tianyu.Lan@microsoft.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[resend for missing cc]
-
-Hi Vitaly,
-
-I found a case that the virtualization overhead was almost doubled
-when turning on Hper-v related features compared to that without any
-no hyper-v feature.  It happens when running a 3D game in windows
-guest in qemu kvm environment.
-
-By investigation, I found there are a lot of IPIs triggered by guest,
-when turning on the hyer-v related features including stimer, for the
-apicv is turned off, at least two vm exits are needed for processing a
-single IPI.
+v2:
+ - Removed some cruft left over from a previous more complex design of the
+   config command line parser
+ - Dropped the list printing factor out patch as it's not necessary
+ - Added a 'PASS' output for passing tests to allow testers to feel good
+ - Changed the "up to date with kernel" comment to reference 5.13.0-rc2
 
 
-perf stat will show something like below [recorded for 5 seconds]
+Since KVM commit 11663111cd49 ("KVM: arm64: Hide PMU registers from
+userspace when not available") the get-reg-list* tests have been
+failing with
 
----------
+  ...
+  ... There are 74 missing registers.
+  The following lines are missing registers:
+  ...
 
-Analyze events for all VMs, all VCPUs:
-             VM-EXIT    Samples  Samples%     Time%    Min Time    Max
-Time         Avg time
-  EXTERNAL_INTERRUPT     471831    59.89%    68.58%      0.64us
-65.42us      2.34us ( +-   0.11% )
-           MSR_WRITE     238932    30.33%    23.07%      0.48us
-41.05us      1.56us ( +-   0.14% )
+where the 74 missing registers are all PMU registers. This isn't a
+bug in KVM that the selftest found, even though it's true that a
+KVM userspace that wasn't setting the KVM_ARM_VCPU_PMU_V3 VCPU
+flag, but still expecting the PMU registers to be in the reg-list,
+would suddenly no longer have their expectations met. In that case,
+the expectations were wrong, though, so that KVM userspace needs to
+be fixed, and so does this selftest.
 
-Total Samples:787803, Total events handled time:1611193.84us.
+We could fix the test with a one-liner since we just need a
 
-I tried turning off hyper-v for the same workload and repeat the test,
-the overall virtualization overhead reduced by about of 50%:
+  init->features[0] |= 1 << KVM_ARM_VCPU_PMU_V3;
 
--------
+in prepare_vcpu_init(), but that's too easy, so here's a 5 patch patch
+series instead :-)  The reason for all the patches and the heavy diffstat
+is to prepare for other vcpu configuration testing, e.g. ptrauth and mte.
+With the refactoring done in this series, we should now be able to easily
+add register sublists and vcpu configs to the get-reg-list test, as the
+last patch demonstrates with the pmu fix.
 
-Analyze events for all VMs, all VCPUs:
-
-             VM-EXIT    Samples  Samples%     Time%    Min Time    Max
-Time         Avg time
-          APIC_WRITE     255152    74.43%    50.72%      0.49us
-50.01us      1.42us ( +-   0.14% )
-       EPT_MISCONFIG      39967    11.66%    40.58%      1.55us
-686.05us      7.27us ( +-   0.43% )
-           DR_ACCESS      35003    10.21%     4.64%      0.32us
-40.03us      0.95us ( +-   0.32% )
-  EXTERNAL_INTERRUPT       6622     1.93%     2.08%      0.70us
-57.38us      2.25us ( +-   1.42% )
-
-Total Samples:342788, Total events handled time:715695.62us.
-
-For this scenario,  hyper-v works really bad.  stimer works better
-than hpet, but on the other hand, it relies on SynIC which has
-negative effects for IPI intensive workloads.
-Do you have any plans for improvement?
+Thanks,
+drew
 
 
-Thanks!
-Liang
+Andrew Jones (5):
+  KVM: arm64: selftests: get-reg-list: Introduce vcpu configs
+  KVM: arm64: selftests: get-reg-list: Prepare to run multiple configs
+    at once
+  KVM: arm64: selftests: get-reg-list: Provide config selection option
+  KVM: arm64: selftests: get-reg-list: Remove get-reg-list-sve
+  KVM: arm64: selftests: get-reg-list: Split base and pmu registers
+
+ tools/testing/selftests/kvm/.gitignore        |   1 -
+ tools/testing/selftests/kvm/Makefile          |   1 -
+ .../selftests/kvm/aarch64/get-reg-list-sve.c  |   3 -
+ .../selftests/kvm/aarch64/get-reg-list.c      | 388 ++++++++++++------
+ 4 files changed, 271 insertions(+), 122 deletions(-)
+ delete mode 100644 tools/testing/selftests/kvm/aarch64/get-reg-list-sve.c
+
+-- 
+2.30.2
+
