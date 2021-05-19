@@ -2,127 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D6C1A389502
-	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 20:06:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4671F389527
+	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 20:16:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231189AbhESSH7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 May 2021 14:07:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34730 "EHLO
+        id S231277AbhESSSP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 May 2021 14:18:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230023AbhESSH7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 May 2021 14:07:59 -0400
-Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11C46C06175F
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 11:06:39 -0700 (PDT)
-Received: by mail-qv1-xf29.google.com with SMTP id e8so3999947qvp.7
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 11:06:39 -0700 (PDT)
+        with ESMTP id S229437AbhESSSN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 May 2021 14:18:13 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE2ABC06175F
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 11:16:53 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id v12so7511364plo.10
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 11:16:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=tImv3Ted6BARmz7M+tuEIdrP9JRn+bjF1ToIbRbbDJ8=;
-        b=Bbfl7flyMPWNyDLufCNwLW0WE4SyDnLCleDYtN7/u2gC0bb9iO/Hkj1b1N8LaK9jVj
-         fFv21pHhR5afJPiTABu+Ns9UNr+b/IYRlZTXuZKrDtFJJ4kpcYylkACvXknYC/tu6iwZ
-         aHZcmydArLtG5/HbT3w8d1hPAEd3OXLH52ztw2rDziHqk6aPSr7SCDOHthEKfk90OyfU
-         AwNjxGHXHO6Kcj6FHUcEI5ANW2fXnbX8TXUtHFrHnkiCemekTOsHtUHxJHpMPhlG6HEU
-         k175NImjnc4rhOfcgzYSFll8wC69/QQbK3OpIkUQKd4DZhvtTDNmCmYiosX/qIG+M9ig
-         aA7w==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=CLFOMXpBdE9Bfa/vJlsX+au0pL0rCjWGCqtbO53j0sI=;
+        b=ESQcwON7SLUKOrT+MYax0/AVotfmbb0XsyujjM3thAc1uAFm4jqxH6aP4XxEsmxMWl
+         zuSg/rvCmZyHfkq0P2FIwTYF8PllSOMntj/U7PCjRb1tGOV7WVosv/ibZILgjPXG5UqB
+         ASLIID4F0DTslwl85Dhyd5vhZ59htMiZPWck3Q727lnHUka96w+25PncyAnKvwn7/C8T
+         Ujxg0wat5cPzrjNV1tpUkBXF8VO5o9OJqBABp6fl+dyt1EXr8VzZYfVVnK/jQph6unH3
+         eutzxDSGV4mfzMJ+hD9wK79iQWjXFbXPqkDPzfRwMkwU4N4MeIcnVz2+9CYdNAq8WK4B
+         2wAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=tImv3Ted6BARmz7M+tuEIdrP9JRn+bjF1ToIbRbbDJ8=;
-        b=MVsXn02rZ2F2mvRdxo83/+qg0/eW8qjRuGA+2rDn5vHKkW6tIAwMJGN8/q3aFMXHfQ
-         pKXDsjoTy3gJ2sMDhoEGxsSwrDKRBmUNBKXReiWoDh9sMlYhs8jIoOcZUnyhkeOVe/c7
-         Kslgx1jXEidiBdm+RzHcWwozKvD8tbHETCF81hT+W/4Zu9TCuw9OWYP5g0tbPicPXjLc
-         AecjyLVtlc8OXw6fTTdaXQYc2N86GQ1/2JvG8RcKSpz9aQ3YcoeJI5OeV8hXfKnaeRmz
-         YYyy3dnZ+dVOGv4hSG33pE8FB/ykPItdCIAy0TAgGlljssEjVJtms+mL9fH4C0nDhWsd
-         foYw==
-X-Gm-Message-State: AOAM5307PQmzpQ09qFDpxUnaYYpXmzoP1lYU3RYEGqFQ2q9MCtCO/iJX
-        rHy6SS5dPPt9XA2X3ru8syZ96g==
-X-Google-Smtp-Source: ABdhPJxfdVisFtDoBA6vNWNzXoLMLU8eFLwTJh2Zrfswd3jA5ooaEQhDs9SHMkNr9LB1GfQ5Oi4EbQ==
-X-Received: by 2002:a0c:ee62:: with SMTP id n2mr906256qvs.20.1621447597322;
-        Wed, 19 May 2021 11:06:37 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-47-55-113-94.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.113.94])
-        by smtp.gmail.com with ESMTPSA id w5sm321655qkf.14.2021.05.19.11.06.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 May 2021 11:06:36 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1ljQaZ-00AnII-Nw; Wed, 19 May 2021 15:06:35 -0300
-Date:   Wed, 19 May 2021 15:06:35 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     Joerg Roedel <joro@8bytes.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Will Deacon <will@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Christoph Hellwig <hch@lst.de>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH 3/6] vfio: remove the unused mdev iommu hook
-Message-ID: <20210519180635.GT1096940@ziepe.ca>
-References: <MWHPR11MB1886B92507ED9015831A0CEA8C509@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210514121925.GI1096940@ziepe.ca>
- <MWHPR11MB18866205125E566FE05867A78C509@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210514133143.GK1096940@ziepe.ca>
- <YKJf7mphTHZoi7Qr@8bytes.org>
- <20210517123010.GO1096940@ziepe.ca>
- <YKJnPGonR+d8rbu/@8bytes.org>
- <20210517133500.GP1096940@ziepe.ca>
- <YKKNLrdQ4QjhLrKX@8bytes.org>
- <131327e3-5066-7a88-5b3c-07013585eb01@arm.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=CLFOMXpBdE9Bfa/vJlsX+au0pL0rCjWGCqtbO53j0sI=;
+        b=da6YaKcWbYy5jGlUdRjJ4sWGqDloAZ2bbLRAvcO1Mm/ioNx5G4lI6ak6KYXR2zxsGc
+         FaQ58GnFzJsAl79JKMSA8pUpLrJZzU3pPYq3hV/LpYaQoyAACe306cTAWb0NXf5VPVZF
+         /dtytgtZWBICJ/gZtXN8EUApgfMw6EZ4/VAA/mS5zQII0Bc4ETIBNwU43dA4ST8k2HIh
+         gLD/b4hVRAWIFb+Y66mbhcorpoxBqguTx/CUgqa6syQRrDt+7jk8hmhfkjT/WlDbvdZ3
+         0w+/GqjlfGcwO0a5TS9O4lgXszpjCAL2HN8SwPBT772iFZezXMc9d1qE/kGl6xpInGgP
+         Bdqw==
+X-Gm-Message-State: AOAM5311H8WnoyCsjquean4GKh6FgpwqFyRien0xjyemh8znW1G87SC3
+        GOs2DPxT5dF61o3M/XhJL4IA/cuRVYISLwFVb16//g==
+X-Google-Smtp-Source: ABdhPJy6NwBBDCQq6YpwLGD5OciCit48q01GnkJo6wDYjUBiUy8kpthyQ0i0x3sO1MiZsK3ub10BV25cuLZsjOfmiZE=
+X-Received: by 2002:a17:90b:1185:: with SMTP id gk5mr262354pjb.168.1621448213191;
+ Wed, 19 May 2021 11:16:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <131327e3-5066-7a88-5b3c-07013585eb01@arm.com>
+References: <20210424004645.3950558-1-seanjc@google.com> <20210424004645.3950558-30-seanjc@google.com>
+In-Reply-To: <20210424004645.3950558-30-seanjc@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Wed, 19 May 2021 11:16:37 -0700
+Message-ID: <CAAeT=FzpUBXpzuCT3eD=3sRnV14OYLA+28Eo7YFioC+vc=xVsA@mail.gmail.com>
+Subject: Re: [PATCH 29/43] KVM: SVM: Tweak order of cr0/cr4/efer writes at RESET/INIT
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 19, 2021 at 04:23:21PM +0100, Robin Murphy wrote:
-> On 2021-05-17 16:35, Joerg Roedel wrote:
-> > On Mon, May 17, 2021 at 10:35:00AM -0300, Jason Gunthorpe wrote:
-> > > Well, I'm sorry, but there is a huge other thread talking about the
-> > > IOASID design in great detail and why this is all needed. Jumping into
-> > > this thread without context and basically rejecting all the
-> > > conclusions that were reached over the last several weeks is really
-> > > not helpful - especially since your objection is not technical.
-> > > 
-> > > I think you should wait for Intel to put together the /dev/ioasid uAPI
-> > > proposal and the example use cases it should address then you can give
-> > > feedback there, with proper context.
-> > 
-> > Yes, I think the next step is that someone who read the whole thread
-> > writes up the conclusions and a rough /dev/ioasid API proposal, also
-> > mentioning the use-cases it addresses. Based on that we can discuss the
-> > implications this needs to have for IOMMU-API and code.
-> > 
-> >  From the use-cases I know the mdev concept is just fine. But if there is
-> > a more generic one we can talk about it.
-> 
-> Just to add another voice here, I have some colleagues working on drivers
-> where they want to use SMMU Substream IDs for a single hardware block to
-> operate on multiple iommu_domains managed entirely within the
-> kernel.
+> @@ -1204,18 +1204,13 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+>         init_sys_seg(&save->ldtr, SEG_TYPE_LDT);
+>         init_sys_seg(&save->tr, SEG_TYPE_BUSY_TSS16);
+>
+> +       svm_set_cr0(vcpu, X86_CR0_NW | X86_CR0_CD | X86_CR0_ET);
+>         svm_set_cr4(vcpu, 0);
+>         svm_set_efer(vcpu, 0);
+>         save->dr6 = 0xffff0ff0;
+>         kvm_set_rflags(vcpu, X86_EFLAGS_FIXED);
+>         vcpu->arch.regs[VCPU_REGS_RIP] = 0x0000fff0;
+>
+> -       /*
+> -        * svm_set_cr0() sets PG and WP and clears NW and CD on save->cr0.
+> -        * It also updates the guest-visible cr0 value.
+> -        */
+> -       svm_set_cr0(vcpu, X86_CR0_NW | X86_CR0_CD | X86_CR0_ET);
 
-If it is entirely within the kernel I'm confused how mdev gets
-involved? mdev is only for vfio which is userspace.
+AMD's APM Vol2 (Table 14-1 in Revision 3.37) says CR0 After INIT will be:
 
-In any event, if you are kernel only it is not quite as big a deal to
-create what you need. A 'substream domain' disconnected from the
-struct device is not unreasonable.
+   CD and NW are unchanged
+   Bit 4 (reserved) = 1
+   All others = 0
 
-> an mdev-like approach with aux domains is pretty much the ideal fit for this
-> use-case, while all the IOASID discussion appears centred on SVA and
-> userspace interfaces, and as such barely relevant if at all.
+(CR0 will be 0x60000010 after RESET)
 
-/dev/ioasid is centered on userspace, but usually the way this works
-is a user API like that will be close to a mirror kernel
-implementation if someone needs such a thing.
+So, it looks the CR0 value that init_vmcb() sets could be
+different from what is indicated in the APM for INIT.
 
-Jason
+BTW, Intel's SDM (April 2021 version) says CR0 for Power up/Reset/INIT
+will be 0x60000010 with the following note.
+-------------------------------------------------
+The CD and NW flags are unchanged,
+bit 4 is set to 1, all other bits are cleared.
+-------------------------------------------------
+The note is attached as '2' to all Power up/Reset/INIT cases
+looking at the SDM.  I would guess it is erroneous that
+the note is attached to Power up/Reset though.
+
+Thanks,
+Reiji
