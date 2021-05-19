@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C0EA388579
-	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 05:37:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04BEC38857C
+	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 05:37:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353131AbhESDi3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 May 2021 23:38:29 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:26416 "EHLO
+        id S1353154AbhESDif (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 May 2021 23:38:35 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:26421 "EHLO
         esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353061AbhESDiR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 May 2021 23:38:17 -0400
+        with ESMTP id S237831AbhESDiW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 May 2021 23:38:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1621395418; x=1652931418;
+  t=1621395423; x=1652931423;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:content-transfer-encoding:mime-version;
-  bh=4y2xZcJ2TbK/Wj9rIB3RIw2qVKz2HbfMfu6xkxnGLaM=;
-  b=j2+URO2E5qyukoiCpC0SJsTW6Oxe8PJeZvTU9Y1OjSe64rzQj7k4hrQV
-   6R/cZB2MmVQMHPnAwrIr42jljrc0bJLjRz6TK3U+haphPAJHGDhuP6y/0
-   qYkhbxAoCGiC5jZs5Z/OZTYwqqirvRPylRObezSiDP+rzl90mSoKhcJ+B
-   0YQBEHv8p8nfTKfJdtkmFBLaR//lv03jhPSTEwU9iCtWYkfKaFJGEiHUk
-   zplbon/D0lRctYk7rlTeN+v8pXAnwX1Wy9ZQxCaWaQ0sRXShkmW2ZZwUv
-   sD2YwA8X7l+xz5+yFSpjspVF1U8oCTFcv3aZhWrGvaQJD6jA/3gkS/kME
-   g==;
-IronPort-SDR: +kr7pIgu8WBBCJCu9n9fa4ajC6OeZRxUZ4s4hYscuYX0QA1uGQ3JhoODq6FTlarXWeyMNrBI7J
- q1AM88YpBUauauUVabH/KN0JeP0cYiBfDF8EQtA3u7VMF+xor+e0PUY9tFwdY9UU7ACj30DtfF
- ussjQoFbpa/M3VmCiANoszjj+taQo+XuXdyESeDYSGn8envl+LC5W60z5pWeOJT2OcQsNFDWrF
- aqpFkA++vo9XAIgHk43ELuvRchOMB/3UufUNZmh1seBMNB21xp5pJyEFuRD8AI1RzP8ce7B7jk
- gts=
+  bh=uJ1cQ5TCpDg7lvQxp7VXMvRgqK+roZt/H/KHq2qUE58=;
+  b=DcC/iGExITWXtZ8uEGQLaRcZ03cS+vDDabRFCIg7rqL7XXcSQjCF4xh3
+   aaEBogRPYhss1B+b1mU9WPhF0peEBl+kPdrz5neCZjAaP0q7ZDpmoAEIA
+   nGCQi9sNOgVUjI4+5EG8MGlVMQvF0liYSAoUyQsUJldv/KSjw7Vp6V09b
+   M/Cxi+b0O9cRl3xX1G74HctkOPX7GXiEkDhCOYjW42PQxViCLrpTZW4NN
+   LXv7RFRapf4GtDOOM+0M+BvIX7fZFlv/SO1mdMEpBcRW+KlCGmy+bsbcI
+   oUcAZ4l3bEDGbNJfyZpwKLZ2k+hXN6rjrAYIl/6uem6QA/a7GDjP2jk/p
+   Q==;
+IronPort-SDR: Dk0GPvGz8GEtmiRhP2I8QpfMuZumbWf4B3UOawWqcFt/TQQnHe7AEMu1O9EyRXBkydH3weBLye
+ 2nspNLe87FahjqlJHKGtKsqWALnsjl2+rmTNOnOfAMAgxetpDVVRaU1oHmqQoibXt9hklDlruP
+ S66fJuPT4V7J82TRGIXrdIgyuX8xYY2Zc0r0ER0a+l59mI5njHH2LAGbT6Q8RStWS6hd5rHsj/
+ Lf6/LLEghw2iaj922gffyGs7LbtBb0tqA1EZFxC83k3EfvcU0kBHmk6UTl62LjHIA1pJ2biFfB
+ HJE=
 X-IronPort-AV: E=Sophos;i="5.82,311,1613404800"; 
-   d="scan'208";a="167950743"
-Received: from mail-co1nam11lp2173.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.173])
-  by ob1.hgst.iphmx.com with ESMTP; 19 May 2021 11:36:57 +0800
+   d="scan'208";a="167950769"
+Received: from mail-co1nam11lp2177.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.177])
+  by ob1.hgst.iphmx.com with ESMTP; 19 May 2021 11:37:02 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ea+2qUAyMyleJt9iLBipb9mRRUfOk//tl5OBIOB/fRFWAhGRaVlYYngv0OENB4lRdtQfeuUnI4iIZ4BwNSKfWQRNgOqQ5chI6sh9Uq+yoXOKOqpxm99zOvoxxo57ELBQ+W0ajmrZBYVNswcNr4VBznA3REh5hN//e679BjOSNckco5vG0ducPx67csOtbG7sE5qGkaDBrQw8Bg4sq1OZUpvIMxWJFwPAtWiW/s/st2rpjrHOrHnxAUqWYgzv0FLQXi54/SP3skfRauvcJvQY8Vs0XsFTTx2hDMX8kanhDWMdST0W4ZyZty7ztkAnHujJKlqMSkzoiOgGFotRH3hiiQ==
+ b=gVtHUBHA9joNnvCyy+kuZc8zQ0YJRacZSqfQAex8TZuKt+PH7MFMmAb9MTZYPLko0H3CuCQ3H8wc82o/uw0xSq64RHkILGXK1OPVvkvOMB7EQBtPInmYr2BZjTf7IiRNWA/oajTgZHfx8Ro49UD1Voo/ue3dolTmMAo9IvK+gAXPf4+3rdrm+A3CwRsdgDdEjlFZhZpJ50FNHedrE3Hroi+YG2P0Vv5CJxvpE/8vdQbro3sGH1YFC6jeUeRfMMVe2vwZIBFNMD4gK2WaY0i+RgtcQfi82lUzlMuFPvybP+Sr4FooavjkrylDYt/TLy3EGUqvcP2CPO2M5eYGoRnTbw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=r3QKKUNElwnkRGJK8s4pmxYrCQBboPB4H20b51wZizM=;
- b=EqT1ncUIYBZYW2WVqNKbiLu/ejSwAcnpwZHT+/QEaydo79WVQ6bbyi3DWMpJJUxqq5aF3llgMjlGb5VxjpGZpnYjN1/ZObTE2g+18lsH5GheRcupXzmvT4s8OlydwPUt0GUQP/k3F0yCxE/L99EP9tt2/aCYaM2tpViHcXj+u+go7gEcN34v4UX5W1cGtESs5bTPcOKZ/7uVfYwZGE8q4bNd6DKoBHEzrfDIB9zE4AJLXsrXWl2a4nit9BKSEkDxpQo7rNrCt4auJo9uuQPbsqCJYg/CtO6zwRln8BksqHZnogHv848yT8lNgmT/dEhTkrZDKYBj4qQzqt89v1spiQ==
+ bh=zLtRx8HEIyMKmZr25UUwzwkT9EU+mkHvtnR9EBUCMDA=;
+ b=K9Pk3qDItm3r6t+u5vZpF6wcJtvEY4LQXEyWN1OeIzrgSUOnUuT+MHr/3P9NNG7CzOVWjdxTvrH5D6ec3tWowZcQeZI0lI55yYW9w5/QF2vGum9jO2CQqXzMALS9Uf8XKPqfIFSFoIC6OyUsP0p2fOkYnTHmnSfCjefCJlu3m2zfm0+yYSkBrecD7joi3ohRgTtrLg66jbSbqvj3CPZ9DLdIySQ+FgcU2TVhjUa3/6TfqOuA1xSCmeutyY4SypxDjywYpoJJL7gH/tyiyzpy7zu4/57Sz4V44kutKq2SZwsRm5XN3sw+3ukSqZXlyK7gnrN4JEcJIgI0IvI2pZ6oug==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=r3QKKUNElwnkRGJK8s4pmxYrCQBboPB4H20b51wZizM=;
- b=oY/YZ6xvsBNNlscHXA9vB2S1EZYTXqxPQsmaLXngTMkE5slowv+mTEppJCIqDKDWDmJnLrXP3rCVfxNDWDv1QtAFwUTkbO+jCWfnklRlb24aXjEDTgkR9xFuM/NJbg+GiK6vGV3xa5sqXvNQOfxGMVmkYkt185hqF/QpbcjNHus=
+ bh=zLtRx8HEIyMKmZr25UUwzwkT9EU+mkHvtnR9EBUCMDA=;
+ b=yhiN3sSzkzOpOB85T7/xdP2aNrATCnXgK0VMlp7ugyufj+1ry1FWKLEs2zl+JOiDLfqpaAlIINCncEvCTYgE5u9aiwrQBk9tp7FK27jkOwf3qIdNYqi+Jhu4Ki//3lLyFDEQ8NfblBCct2dXZnxDzexYAp9qMR6w+OvsN6e4Ofs=
 Authentication-Results: dabbelt.com; dkim=none (message not signed)
  header.d=none;dabbelt.com; dmarc=none action=none header.from=wdc.com;
 Received: from CO6PR04MB7812.namprd04.prod.outlook.com (2603:10b6:303:138::6)
  by CO6PR04MB7761.namprd04.prod.outlook.com (2603:10b6:5:35f::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4129.26; Wed, 19 May
- 2021 03:36:57 +0000
+ 2021 03:37:01 +0000
 Received: from CO6PR04MB7812.namprd04.prod.outlook.com
  ([fe80::88a0:bf18:b01d:1a50]) by CO6PR04MB7812.namprd04.prod.outlook.com
  ([fe80::88a0:bf18:b01d:1a50%4]) with mapi id 15.20.4129.033; Wed, 19 May 2021
- 03:36:57 +0000
+ 03:37:01 +0000
 From:   Anup Patel <anup.patel@wdc.com>
 To:     Palmer Dabbelt <palmer@dabbelt.com>,
         Palmer Dabbelt <palmerdabbelt@google.com>,
@@ -75,9 +75,9 @@ Cc:     Alexander Graf <graf@amazon.com>,
         kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
         linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-staging@lists.linux.dev, Anup Patel <anup.patel@wdc.com>
-Subject: [PATCH v18 08/18] RISC-V: KVM: Handle WFI exits for VCPU
-Date:   Wed, 19 May 2021 09:05:43 +0530
-Message-Id: <20210519033553.1110536-9-anup.patel@wdc.com>
+Subject: [PATCH v18 09/18] RISC-V: KVM: Implement VMID allocator
+Date:   Wed, 19 May 2021 09:05:44 +0530
+Message-Id: <20210519033553.1110536-10-anup.patel@wdc.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210519033553.1110536-1-anup.patel@wdc.com>
 References: <20210519033553.1110536-1-anup.patel@wdc.com>
@@ -89,172 +89,426 @@ X-ClientProxiedBy: MA1PR0101CA0057.INDPRD01.PROD.OUTLOOK.COM
  (2603:10b6:303:138::6)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from wdc.com (122.179.32.148) by MA1PR0101CA0057.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:20::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4129.25 via Frontend Transport; Wed, 19 May 2021 03:36:52 +0000
+Received: from wdc.com (122.179.32.148) by MA1PR0101CA0057.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:20::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4129.25 via Frontend Transport; Wed, 19 May 2021 03:36:57 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d7b677a9-5d1a-4a40-383a-08d91a775a34
+X-MS-Office365-Filtering-Correlation-Id: f0ddecf4-72b0-4f78-2c43-08d91a775d34
 X-MS-TrafficTypeDiagnostic: CO6PR04MB7761:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CO6PR04MB7761DCFCC865F7E05E2A51778D2B9@CO6PR04MB7761.namprd04.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <CO6PR04MB776161D532758A0A0CC6D8968D2B9@CO6PR04MB7761.namprd04.prod.outlook.com>
 WDCIPOUTBOUND: EOP-TRUE
-X-MS-Oob-TLC-OOBClassifiers: OLM:2887;
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Y/fcU2nGZKQcBxczBdDEcZgsD+cpbkOsL12oOWBzywfETMibwHPy/rPsCWB+JzMu7Q9irIr89VeoUz6RXc+jkdoa/crgoi1HvjuNm8jwJu5QNWNlhZ15z8EMQ3TnHdvLgXcknoZKRDjRxkv3S4vLVO0rquRBaX/sPiu+k3RBhlS3cpfTH4pcVxKPxN3SNz83O1ivbkkYaTpGe6ONKngL51Lzv+vI9P8TLdqVmSHxWahE2pUowOCsH1nPVPmxiFhVJzFwKfY+gj0OXdIhkVK66wUttN/HpjahqdQtJGh3MChhbrXInX21wteTORaNc8wUvLw8gJBRiQn9i5Hz1j/ZxVYn75DjqOCP1CgrNnc9ggbWrhNUsGyXyFVFAk0VQdDU15XMXfZHOy4R49Wjg8lhDir1NxiIXAiwouMOlVAImtuHipDXbOLeWvdIRHjs+OEMuJJPMHAvkhc7PR2AD+wFPx2Ok1muExwnS62HuNXQ0fa/Z8u4+7rSQIZut5mQd7Zwk7I2mUPqkeVSb+cOr+n35hVzDGMo8i2ciTAejw2GkxlgwUyHhX1dtriX5E/4ckR2kMPWVjrW74nmnnoS6IfvduTanU0NLrC1RoVcuKg/vZxcyuMj6aXGw1IPxMC0qcli9kl7ijyVYVUeQoo9OX1UCw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR04MB7812.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(396003)(136003)(376002)(39860400002)(346002)(316002)(38350700002)(55016002)(38100700002)(66476007)(66946007)(1076003)(2616005)(186003)(5660300002)(4326008)(26005)(8936002)(478600001)(86362001)(2906002)(52116002)(7696005)(16526019)(110136005)(83380400001)(8676002)(6666004)(66556008)(36756003)(7416002)(956004)(54906003)(44832011)(8886007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?fnZZjx7wl49ukcxtNNP3to6aQNa5Qw3lRnzmtNiypf3+GVFuu5GwCU0V56cx?=
- =?us-ascii?Q?mRx6CzVG6Pr66XTogDYIFgi1NywRDBXrebn8ttMxwoBIX4FMfSWkMQAfLu56?=
- =?us-ascii?Q?YpiCPvPN3jpz7yh71DrNOhuT89wkvifPrCy1dJ79W/EKyE5lqmkDXp9Qdogl?=
- =?us-ascii?Q?isgbEqIbNK5i8X2a89mQQRL+UH55rqiOxqrXWDOeTyNti8mfKIm9GAC90w3I?=
- =?us-ascii?Q?50qQQkYMO7Md8Q3Md5Uoyb4ipUDFG7m1uVlQthbDxiJIhEdBPUuc/wHiIbQu?=
- =?us-ascii?Q?MKKTh7l3PSncSi/tYzpGvfqnNmq7g5g6kzeV9EkcmFXkAidzByMvgWY92mIC?=
- =?us-ascii?Q?oBBFqV0UlzqYWQeQvGiJzepM7H6nPNZ/oo+9uVoif6AI5wJ8AjfzdpMEdMIQ?=
- =?us-ascii?Q?Ul5qARd6YgWC6WiyCZDlG7bxYLxykxL1FoOeQdlRcdbhhIjOfZTHvChj3kuv?=
- =?us-ascii?Q?ldAhtJrsqnGhK9oKC4p7RMBkivS8QVSWC44hrhCloS/uCzReWRcKBGgBKmPe?=
- =?us-ascii?Q?mQIbsIdwuBXs+B2czobi0XUGWCMEes+t9LxFfq0vL6p5OJ0Z4aH5osNaWuJu?=
- =?us-ascii?Q?n6maiXareOD2w5NqQUyObFmHCjynjo5iG6Nf82wl88qnxRW0zOvyODlkpexU?=
- =?us-ascii?Q?S6pLnEgp/VmnJ1hMfnLfPtkmE86OxVXtQVmVVALG/ylF51kTcedt9DB3/c/l?=
- =?us-ascii?Q?+HqDZMRayAmdVQHNelzDVjyf8ZH4arFCkREI29w7+RQ4r5EhotQUuO6cdGDc?=
- =?us-ascii?Q?02DZgMOXyzExbwRBNrlcsrn+eiaDZh4e84MOZQHiy+iIycrKarNamPo7nbVk?=
- =?us-ascii?Q?+26kczBH/xtTo1yY6WsBVfyht3TcjMTWyWE1ULZz+9WPfKBKqQ6xDN0Fw7P4?=
- =?us-ascii?Q?/9qtdJmL0OSZSWsOXznXR2iJNzy4S45/z3rqhxMT7NTVgefBmEVEWMz1M7iF?=
- =?us-ascii?Q?UzeYIn7D9pxBZLcdBTUGCoNCw2Xt5c1ttVjnuUQKlF9Zqnvt7O/QUuC/5oVC?=
- =?us-ascii?Q?dQdnRA5vgAJRGkZpqE+vycU14l75mEiPWp4U2Ves/3nH0r3I4aieIS2+qcY+?=
- =?us-ascii?Q?JQdFMb9BJa68iCxp+w78olR+eA1JgvXrzZvy8Jy59YU2v24AgllPvCHb8LV7?=
- =?us-ascii?Q?Pm/Lm4r11a4ux9BlmR0lpRlhxr5Cd9pu99B2ewRI2hZsM2VJhUXbMxHJAjke?=
- =?us-ascii?Q?JxDzKWvB/v4ikLAsalECYwR8TL7+I049GS1Zn/N5YcAVZhu3LcaoImVKnYDB?=
- =?us-ascii?Q?255eMtaldAKtF2aQED4pK4rQEskqj2APr9heTRqG2lP969yuSnpAOX4O90HR?=
- =?us-ascii?Q?yjtGNrM+SzDw8L7x1IqZL3Fw?=
+X-Microsoft-Antispam-Message-Info: sMS5EQHXlYc1ijVNv9RLkhtERn2opwO+fNOEsCboc4Ba+t6CEo4IUg2bMD3OGPKpFPyDmH78aDWmAAKzbijUbT9KlOfpsYITHfg+v4ajCi/fU7mr4BI0CzSsmVVgxD8bWynUoDKD6aRvEOmjG3YVnyAFrTTRyrE88CA5b4CKxncCD87b41DLMJIvc5/a2Ob8M9iouZZGU70aEXuICJlnEPvuOYzPi4oZmTRQIzrG4cMoztYivDcQIKDRZSDAbpg7nv9JlhEU/vbZQUtaenUNcwQExbqVJc25dByjrKi3z0GduOMXZ6h+hg0aNImT4vaV/6Mz/6uajxU58YLJyRJgtFIm07SRCuPian8FSJkOOFWZV4Dy/1mRqCcl2HI2GxHsFWGRCtOHLuuHbO5+J9ed+XoMtHt3wtfyGpqTCexkeV1bLYvACsxNL/y+rxnvNSYf1BdKE/1BCMAQfvAGM0Aln8mQdR+zte0lUOflza2bsIdDcjX3f7vqD1KfQ/Japmh0aO1vWHujxmHXRVX825fxT1JlO8NMtDLz856A5OBdMSx1ocLxzJ66jVHYTo4sIQEk1y+0iJGO3rsDWiPpqCQvEv7lHPTn+xPxBH+CyvKe1bm5CxILqdzrpb6zMf35L9kwnr1fg+4HwW5IMEuOdYDA2g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR04MB7812.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(396003)(136003)(376002)(39860400002)(346002)(316002)(38350700002)(55016002)(38100700002)(66476007)(66946007)(1076003)(2616005)(186003)(5660300002)(4326008)(26005)(8936002)(478600001)(86362001)(2906002)(52116002)(7696005)(16526019)(110136005)(83380400001)(8676002)(6666004)(66556008)(36756003)(30864003)(7416002)(956004)(54906003)(44832011)(8886007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?OuwbiA7H7ECcV/qWVsYb0zLL9GbHrkDrwhZzZz9xsz8pe5WQaBn7SzrjNlMM?=
+ =?us-ascii?Q?z2j6E112Lre2g0j3FHwzaqM3SItxrZSshRWB3HVRKRdf2AK1GbvLLsimQvzO?=
+ =?us-ascii?Q?wvMU4UFpySpYsdgFlyu/coIBPHlfrpc+j8QtfLo2ng544xKk0GI64kOuthse?=
+ =?us-ascii?Q?2W9XkpmSIZS7QxyWdbvbcy5jkdeg3BHGXOjfbs31Na299WFm3539t/0+O/7O?=
+ =?us-ascii?Q?rMyXVbPxPZW0A5GIhl4ojJ9lAgDVlXbBpXIG6TQVMAX5mfWtQJlS/yn0TJeb?=
+ =?us-ascii?Q?SZkoH8snmfDBfgfNbYxR1qXmJf8t2Xh2O9nvVmVQLrfBEUpO/5UdVH+E4cSI?=
+ =?us-ascii?Q?XHcFmXqCuxM1ZNeVpn9wp0F6HRuaG3MLJrnOxFaTDsT9Nt4T3QIsBLIOXiUQ?=
+ =?us-ascii?Q?i/XReD9X7odGUuYGY0fBnLsNyqa9+jESDiuvqXtgYT2X8D4RfzoddUiK9RYS?=
+ =?us-ascii?Q?P/mOgNF5zHvFdy6G8YqXjlrpeHEyqctcmYkxHex+uFhRpmjKpcWdQ19Lt0hA?=
+ =?us-ascii?Q?RxgHq5BSnDPI6Ic+ThH1R/BhnaZmL1eWkUEbgG0APMggpVtB/2iBe4J6SRAU?=
+ =?us-ascii?Q?+zHBUKuA5J+41Uyyu9OLsMvOxziss+O6QpmsG0yhC+ZqGt3sFIachfWWXoGc?=
+ =?us-ascii?Q?T3ZZHnQHOJ84BxsmClKDdL4/EPcM0X+i6cZJtFF1byKFFgXYv2wmCeu6HG9k?=
+ =?us-ascii?Q?pEfOyl2FykE1IelavubGa3c6NQ2ViDMII5dBBFZGifDjNbONYYqv9pjS7e0s?=
+ =?us-ascii?Q?2OG1p6yDZwNksXSopkYJXJDR2aANuwP2qBo/9SnKEaD560GgWwRNUXTqkLKv?=
+ =?us-ascii?Q?tMrxewNtZrsYdThYApp18EuNAHsPYUov6wOCW873EyvNhBY545dtsDboB57m?=
+ =?us-ascii?Q?goKdeQeIPTWqpC878hvvTwYeHI4p6oaVZwmU/Pn2JLT2NhZMm0PDtW1aT9g7?=
+ =?us-ascii?Q?wBtOHeVxwOR7MICViqGn0sjaJxJWfSvr2Bng1QDA4zo/f5+obLshaElia4jg?=
+ =?us-ascii?Q?0WimbRGHLYVhVqWdInoaJ7YG5kbOz99Rkid8raA9TwaJcRtICsrdHErimr6J?=
+ =?us-ascii?Q?o2FSEyvdLL50wUUDPXICy6dZWiY2iT/6AGRMBIl+rSbMea4I1hEwCDVIYZz/?=
+ =?us-ascii?Q?xcob/YcliEYDfqTt2oecoM8jb5VmMU6csfk38WjMMO+9zA3jHwFy9X8tgSl9?=
+ =?us-ascii?Q?OjbxeqAOmZcTcOupSfkfyFiotcSI3wotrrHAe/y2W32nZfLaca82vwC8HYgq?=
+ =?us-ascii?Q?6CtUZfiaN2PxNCgNfnX3v5Mx3uuRVdD3jhE09qT6ag2LUBuitNBrFkjdV0vb?=
+ =?us-ascii?Q?2Qvo2+K4vK9z/Q+1Erxtnqsp?=
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d7b677a9-5d1a-4a40-383a-08d91a775a34
+X-MS-Exchange-CrossTenant-Network-Message-Id: f0ddecf4-72b0-4f78-2c43-08d91a775d34
 X-MS-Exchange-CrossTenant-AuthSource: CO6PR04MB7812.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2021 03:36:56.9693
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2021 03:37:01.8060
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CeXLzhzqzesI2RxHpmurEWptNAvdOBwulW/TDfBaZCAPwGZzZTa/Q5S87owb1if+cc0fLYdV7vWBU2B03g3n4Q==
+X-MS-Exchange-CrossTenant-UserPrincipalName: wFnJGVY9K/w+w7HZ2tHYXUxV3ZFunUBpAbhj+h4zmtkHqAE2eQzJOmwejY862cHtm4NtI5Laf89EsxlhOgf4nQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR04MB7761
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We get illegal instruction trap whenever Guest/VM executes WFI
-instruction.
-
-This patch handles WFI trap by blocking the trapped VCPU using
-kvm_vcpu_block() API. The blocked VCPU will be automatically
-resumed whenever a VCPU interrupt is injected from user-space
-or from in-kernel IRQCHIP emulation.
+We implement a simple VMID allocator for Guests/VMs which:
+1. Detects number of VMID bits at boot-time
+2. Uses atomic number to track VMID version and increments
+   VMID version whenever we run-out of VMIDs
+3. Flushes Guest TLBs on all host CPUs whenever we run-out
+   of VMIDs
+4. Force updates HW Stage2 VMID for each Guest VCPU whenever
+   VMID changes using VCPU request KVM_REQ_UPDATE_HGATP
 
 Signed-off-by: Anup Patel <anup.patel@wdc.com>
 Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Alexander Graf <graf@amazon.com>
 ---
- arch/riscv/kvm/vcpu_exit.c | 76 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 76 insertions(+)
+ arch/riscv/include/asm/kvm_host.h |  24 ++++++
+ arch/riscv/kvm/Makefile           |   3 +-
+ arch/riscv/kvm/main.c             |   4 +
+ arch/riscv/kvm/tlb.S              |  74 ++++++++++++++++++
+ arch/riscv/kvm/vcpu.c             |   9 +++
+ arch/riscv/kvm/vm.c               |   6 ++
+ arch/riscv/kvm/vmid.c             | 120 ++++++++++++++++++++++++++++++
+ 7 files changed, 239 insertions(+), 1 deletion(-)
+ create mode 100644 arch/riscv/kvm/tlb.S
+ create mode 100644 arch/riscv/kvm/vmid.c
 
-diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
-index 80ab07ff0313..34d9bd9da585 100644
---- a/arch/riscv/kvm/vcpu_exit.c
-+++ b/arch/riscv/kvm/vcpu_exit.c
-@@ -12,6 +12,13 @@
- #include <linux/kvm_host.h>
- #include <asm/kvm_csr.h>
+diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+index bd6d49aeebd9..40449ab2916d 100644
+--- a/arch/riscv/include/asm/kvm_host.h
++++ b/arch/riscv/include/asm/kvm_host.h
+@@ -26,6 +26,7 @@
+ #define KVM_REQ_SLEEP \
+ 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_VCPU_RESET		KVM_ARCH_REQ(1)
++#define KVM_REQ_UPDATE_HGATP		KVM_ARCH_REQ(2)
  
-+#define INSN_OPCODE_MASK	0x007c
-+#define INSN_OPCODE_SHIFT	2
-+#define INSN_OPCODE_SYSTEM	28
-+
-+#define INSN_MASK_WFI		0xffffff00
-+#define INSN_MATCH_WFI		0x10500000
-+
- #define INSN_MATCH_LB		0x3
- #define INSN_MASK_LB		0x707f
- #define INSN_MATCH_LH		0x1003
-@@ -116,6 +123,71 @@
- 				 (s32)(((insn) >> 7) & 0x1f))
- #define MASK_FUNCT3		0x7000
+ struct kvm_vm_stat {
+ 	ulong remote_tlb_flush;
+@@ -48,7 +49,19 @@ struct kvm_vcpu_stat {
+ struct kvm_arch_memory_slot {
+ };
  
-+static int truly_illegal_insn(struct kvm_vcpu *vcpu,
-+			      struct kvm_run *run,
-+			      ulong insn)
-+{
-+	struct kvm_cpu_trap utrap = { 0 };
++struct kvm_vmid {
++	/*
++	 * Writes to vmid_version and vmid happen with vmid_lock held
++	 * whereas reads happen without any lock held.
++	 */
++	unsigned long vmid_version;
++	unsigned long vmid;
++};
 +
-+	/* Redirect trap to Guest VCPU */
-+	utrap.sepc = vcpu->arch.guest_context.sepc;
-+	utrap.scause = EXC_INST_ILLEGAL;
-+	utrap.stval = insn;
-+	kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
+ struct kvm_arch {
++	/* stage2 vmid */
++	struct kvm_vmid vmid;
 +
-+	return 1;
-+}
+ 	/* stage2 page table */
+ 	pgd_t *pgd;
+ 	phys_addr_t pgd_phys;
+@@ -178,6 +191,11 @@ static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+ static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+ static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
+ 
++void __kvm_riscv_hfence_gvma_vmid_gpa(unsigned long gpa, unsigned long vmid);
++void __kvm_riscv_hfence_gvma_vmid(unsigned long vmid);
++void __kvm_riscv_hfence_gvma_gpa(unsigned long gpa);
++void __kvm_riscv_hfence_gvma_all(void);
 +
-+static int system_opcode_insn(struct kvm_vcpu *vcpu,
-+			      struct kvm_run *run,
-+			      ulong insn)
-+{
-+	if ((insn & INSN_MASK_WFI) == INSN_MATCH_WFI) {
-+		vcpu->stat.wfi_exit_stat++;
-+		if (!kvm_arch_vcpu_runnable(vcpu)) {
-+			srcu_read_unlock(&vcpu->kvm->srcu, vcpu->arch.srcu_idx);
-+			kvm_vcpu_block(vcpu);
-+			vcpu->arch.srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
-+			kvm_clear_request(KVM_REQ_UNHALT, vcpu);
-+		}
-+		vcpu->arch.guest_context.sepc += INSN_LEN(insn);
-+		return 1;
+ int kvm_riscv_stage2_map(struct kvm_vcpu *vcpu,
+ 			 struct kvm_memory_slot *memslot,
+ 			 gpa_t gpa, unsigned long hva, bool is_write);
+@@ -186,6 +204,12 @@ int kvm_riscv_stage2_alloc_pgd(struct kvm *kvm);
+ void kvm_riscv_stage2_free_pgd(struct kvm *kvm);
+ void kvm_riscv_stage2_update_hgatp(struct kvm_vcpu *vcpu);
+ 
++void kvm_riscv_stage2_vmid_detect(void);
++unsigned long kvm_riscv_stage2_vmid_bits(void);
++int kvm_riscv_stage2_vmid_init(struct kvm *kvm);
++bool kvm_riscv_stage2_vmid_ver_changed(struct kvm_vmid *vmid);
++void kvm_riscv_stage2_vmid_update(struct kvm_vcpu *vcpu);
++
+ void __kvm_riscv_unpriv_trap(void);
+ 
+ unsigned long kvm_riscv_vcpu_unpriv_read(struct kvm_vcpu *vcpu,
+diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
+index e121b940c9ec..98b294cbd96d 100644
+--- a/arch/riscv/kvm/Makefile
++++ b/arch/riscv/kvm/Makefile
+@@ -9,7 +9,8 @@ ccflags-y := -Ivirt/kvm -Iarch/riscv/kvm
+ 
+ kvm-objs := $(common-objs-y)
+ 
+-kvm-objs += main.o vm.o mmu.o vcpu.o vcpu_exit.o vcpu_switch.o
++kvm-objs += main.o vm.o vmid.o tlb.o mmu.o
++kvm-objs += vcpu.o vcpu_exit.o vcpu_switch.o
+ 
+ obj-$(CONFIG_KVM)	+= kvm.o
+ 
+diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
+index c717d37fd87f..998110227d1e 100644
+--- a/arch/riscv/kvm/main.c
++++ b/arch/riscv/kvm/main.c
+@@ -79,8 +79,12 @@ int kvm_arch_init(void *opaque)
+ 		return -ENODEV;
+ 	}
+ 
++	kvm_riscv_stage2_vmid_detect();
++
+ 	kvm_info("hypervisor extension available\n");
+ 
++	kvm_info("VMID %ld bits available\n", kvm_riscv_stage2_vmid_bits());
++
+ 	return 0;
+ }
+ 
+diff --git a/arch/riscv/kvm/tlb.S b/arch/riscv/kvm/tlb.S
+new file mode 100644
+index 000000000000..c858570f0856
+--- /dev/null
++++ b/arch/riscv/kvm/tlb.S
+@@ -0,0 +1,74 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (C) 2019 Western Digital Corporation or its affiliates.
++ *
++ * Authors:
++ *     Anup Patel <anup.patel@wdc.com>
++ */
++
++#include <linux/linkage.h>
++#include <asm/asm.h>
++
++	.text
++	.altmacro
++	.option norelax
++
++	/*
++	 * Instruction encoding of hfence.gvma is:
++	 * HFENCE.GVMA rs1, rs2
++	 * HFENCE.GVMA zero, rs2
++	 * HFENCE.GVMA rs1
++	 * HFENCE.GVMA
++	 *
++	 * rs1!=zero and rs2!=zero ==> HFENCE.GVMA rs1, rs2
++	 * rs1==zero and rs2!=zero ==> HFENCE.GVMA zero, rs2
++	 * rs1!=zero and rs2==zero ==> HFENCE.GVMA rs1
++	 * rs1==zero and rs2==zero ==> HFENCE.GVMA
++	 *
++	 * Instruction encoding of HFENCE.GVMA is:
++	 * 0110001 rs2(5) rs1(5) 000 00000 1110011
++	 */
++
++ENTRY(__kvm_riscv_hfence_gvma_vmid_gpa)
++	/*
++	 * rs1 = a0 (GPA)
++	 * rs2 = a1 (VMID)
++	 * HFENCE.GVMA a0, a1
++	 * 0110001 01011 01010 000 00000 1110011
++	 */
++	.word 0x62b50073
++	ret
++ENDPROC(__kvm_riscv_hfence_gvma_vmid_gpa)
++
++ENTRY(__kvm_riscv_hfence_gvma_vmid)
++	/*
++	 * rs1 = zero
++	 * rs2 = a0 (VMID)
++	 * HFENCE.GVMA zero, a0
++	 * 0110001 01010 00000 000 00000 1110011
++	 */
++	.word 0x62a00073
++	ret
++ENDPROC(__kvm_riscv_hfence_gvma_vmid)
++
++ENTRY(__kvm_riscv_hfence_gvma_gpa)
++	/*
++	 * rs1 = a0 (GPA)
++	 * rs2 = zero
++	 * HFENCE.GVMA a0
++	 * 0110001 00000 01010 000 00000 1110011
++	 */
++	.word 0x62050073
++	ret
++ENDPROC(__kvm_riscv_hfence_gvma_gpa)
++
++ENTRY(__kvm_riscv_hfence_gvma_all)
++	/*
++	 * rs1 = zero
++	 * rs2 = zero
++	 * HFENCE.GVMA
++	 * 0110001 00000 00000 000 00000 1110011
++	 */
++	.word 0x62000073
++	ret
++ENDPROC(__kvm_riscv_hfence_gvma_all)
+diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+index 654a4834a317..cbaf14502c25 100644
+--- a/arch/riscv/kvm/vcpu.c
++++ b/arch/riscv/kvm/vcpu.c
+@@ -622,6 +622,12 @@ static void kvm_riscv_check_vcpu_requests(struct kvm_vcpu *vcpu)
+ 
+ 		if (kvm_check_request(KVM_REQ_VCPU_RESET, vcpu))
+ 			kvm_riscv_reset_vcpu(vcpu);
++
++		if (kvm_check_request(KVM_REQ_UPDATE_HGATP, vcpu))
++			kvm_riscv_stage2_update_hgatp(vcpu);
++
++		if (kvm_check_request(KVM_REQ_TLB_FLUSH, vcpu))
++			__kvm_riscv_hfence_gvma_all();
+ 	}
+ }
+ 
+@@ -667,6 +673,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		/* Check conditions before entering the guest */
+ 		cond_resched();
+ 
++		kvm_riscv_stage2_vmid_update(vcpu);
++
+ 		kvm_riscv_check_vcpu_requests(vcpu);
+ 
+ 		preempt_disable();
+@@ -703,6 +711,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		kvm_riscv_update_hvip(vcpu);
+ 
+ 		if (ret <= 0 ||
++		    kvm_riscv_stage2_vmid_ver_changed(&vcpu->kvm->arch.vmid) ||
+ 		    kvm_request_pending(vcpu)) {
+ 			vcpu->mode = OUTSIDE_GUEST_MODE;
+ 			local_irq_enable();
+diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+index 496a86a74236..282d67617229 100644
+--- a/arch/riscv/kvm/vm.c
++++ b/arch/riscv/kvm/vm.c
+@@ -26,6 +26,12 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	if (r)
+ 		return r;
+ 
++	r = kvm_riscv_stage2_vmid_init(kvm);
++	if (r) {
++		kvm_riscv_stage2_free_pgd(kvm);
++		return r;
 +	}
 +
-+	return truly_illegal_insn(vcpu, run, insn);
-+}
+ 	return 0;
+ }
+ 
+diff --git a/arch/riscv/kvm/vmid.c b/arch/riscv/kvm/vmid.c
+new file mode 100644
+index 000000000000..aa643001bb6a
+--- /dev/null
++++ b/arch/riscv/kvm/vmid.c
+@@ -0,0 +1,120 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2019 Western Digital Corporation or its affiliates.
++ *
++ * Authors:
++ *     Anup Patel <anup.patel@wdc.com>
++ */
 +
-+static int virtual_inst_fault(struct kvm_vcpu *vcpu, struct kvm_run *run,
-+			      struct kvm_cpu_trap *trap)
++#include <linux/bitops.h>
++#include <linux/cpumask.h>
++#include <linux/errno.h>
++#include <linux/err.h>
++#include <linux/module.h>
++#include <linux/kvm_host.h>
++#include <asm/kvm_csr.h>
++#include <asm/sbi.h>
++
++static unsigned long vmid_version = 1;
++static unsigned long vmid_next;
++static unsigned long vmid_bits;
++static DEFINE_SPINLOCK(vmid_lock);
++
++void kvm_riscv_stage2_vmid_detect(void)
 +{
-+	unsigned long insn = trap->stval;
-+	struct kvm_cpu_trap utrap = { 0 };
-+	struct kvm_cpu_context *ct;
++	unsigned long old;
 +
-+	if (unlikely(INSN_IS_16BIT(insn))) {
-+		if (insn == 0) {
-+			ct = &vcpu->arch.guest_context;
-+			insn = kvm_riscv_vcpu_unpriv_read(vcpu, true,
-+							  ct->sepc,
-+							  &utrap);
-+			if (utrap.scause) {
-+				utrap.sepc = ct->sepc;
-+				kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
-+				return 1;
-+			}
-+		}
-+		if (INSN_IS_16BIT(insn))
-+			return truly_illegal_insn(vcpu, run, insn);
-+	}
++	/* Figure-out number of VMID bits in HW */
++	old = csr_read(CSR_HGATP);
++	csr_write(CSR_HGATP, old | HGATP_VMID_MASK);
++	vmid_bits = csr_read(CSR_HGATP);
++	vmid_bits = (vmid_bits & HGATP_VMID_MASK) >> HGATP_VMID_SHIFT;
++	vmid_bits = fls_long(vmid_bits);
++	csr_write(CSR_HGATP, old);
 +
-+	switch ((insn & INSN_OPCODE_MASK) >> INSN_OPCODE_SHIFT) {
-+	case INSN_OPCODE_SYSTEM:
-+		return system_opcode_insn(vcpu, run, insn);
-+	default:
-+		return truly_illegal_insn(vcpu, run, insn);
-+	}
++	/* We polluted local TLB so flush all guest TLB */
++	__kvm_riscv_hfence_gvma_all();
++
++	/* We don't use VMID bits if they are not sufficient */
++	if ((1UL << vmid_bits) < num_possible_cpus())
++		vmid_bits = 0;
 +}
 +
- static int emulate_load(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 			unsigned long fault_addr, unsigned long htinst)
- {
-@@ -596,6 +668,10 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	ret = -EFAULT;
- 	run->exit_reason = KVM_EXIT_UNKNOWN;
- 	switch (trap->scause) {
-+	case EXC_VIRTUAL_INST_FAULT:
-+		if (vcpu->arch.guest_context.hstatus & HSTATUS_SPV)
-+			ret = virtual_inst_fault(vcpu, run, trap);
-+		break;
- 	case EXC_INST_GUEST_PAGE_FAULT:
- 	case EXC_LOAD_GUEST_PAGE_FAULT:
- 	case EXC_STORE_GUEST_PAGE_FAULT:
++unsigned long kvm_riscv_stage2_vmid_bits(void)
++{
++	return vmid_bits;
++}
++
++int kvm_riscv_stage2_vmid_init(struct kvm *kvm)
++{
++	/* Mark the initial VMID and VMID version invalid */
++	kvm->arch.vmid.vmid_version = 0;
++	kvm->arch.vmid.vmid = 0;
++
++	return 0;
++}
++
++bool kvm_riscv_stage2_vmid_ver_changed(struct kvm_vmid *vmid)
++{
++	if (!vmid_bits)
++		return false;
++
++	return unlikely(READ_ONCE(vmid->vmid_version) !=
++			READ_ONCE(vmid_version));
++}
++
++void kvm_riscv_stage2_vmid_update(struct kvm_vcpu *vcpu)
++{
++	int i;
++	struct kvm_vcpu *v;
++	struct cpumask hmask;
++	struct kvm_vmid *vmid = &vcpu->kvm->arch.vmid;
++
++	if (!kvm_riscv_stage2_vmid_ver_changed(vmid))
++		return;
++
++	spin_lock(&vmid_lock);
++
++	/*
++	 * We need to re-check the vmid_version here to ensure that if
++	 * another vcpu already allocated a valid vmid for this vm.
++	 */
++	if (!kvm_riscv_stage2_vmid_ver_changed(vmid)) {
++		spin_unlock(&vmid_lock);
++		return;
++	}
++
++	/* First user of a new VMID version? */
++	if (unlikely(vmid_next == 0)) {
++		WRITE_ONCE(vmid_version, READ_ONCE(vmid_version) + 1);
++		vmid_next = 1;
++
++		/*
++		 * We ran out of VMIDs so we increment vmid_version and
++		 * start assigning VMIDs from 1.
++		 *
++		 * This also means existing VMIDs assignement to all Guest
++		 * instances is invalid and we have force VMID re-assignement
++		 * for all Guest instances. The Guest instances that were not
++		 * running will automatically pick-up new VMIDs because will
++		 * call kvm_riscv_stage2_vmid_update() whenever they enter
++		 * in-kernel run loop. For Guest instances that are already
++		 * running, we force VM exits on all host CPUs using IPI and
++		 * flush all Guest TLBs.
++		 */
++		riscv_cpuid_to_hartid_mask(cpu_online_mask, &hmask);
++		sbi_remote_hfence_gvma(cpumask_bits(&hmask), 0, 0);
++	}
++
++	vmid->vmid = vmid_next;
++	vmid_next++;
++	vmid_next &= (1 << vmid_bits) - 1;
++
++	WRITE_ONCE(vmid->vmid_version, READ_ONCE(vmid_version));
++
++	spin_unlock(&vmid_lock);
++
++	/* Request stage2 page table update for all VCPUs */
++	kvm_for_each_vcpu(i, v, vcpu->kvm)
++		kvm_make_request(KVM_REQ_UPDATE_HGATP, v);
++}
 -- 
 2.25.1
 
