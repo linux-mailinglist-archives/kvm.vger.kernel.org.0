@@ -2,85 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B5FB38870E
-	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 07:59:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05E5438883E
+	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 09:40:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238044AbhESGBE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 May 2021 02:01:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37860 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235220AbhESGBD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 May 2021 02:01:03 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9709AC06175F
-        for <kvm@vger.kernel.org>; Tue, 18 May 2021 22:59:43 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id g6-20020a17090adac6b029015d1a9a6f1aso2954635pjx.1
-        for <kvm@vger.kernel.org>; Tue, 18 May 2021 22:59:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nAKu+6MtH3s2XmeunaD2gUOZOf681k6swYOZ6Q7YH1o=;
-        b=dl0Y3OWKdChY8uN3dxtupVDMeHqtfCUT/EAQIz6Lpivm3M3ZO/XZgAyyl3WX31vTCN
-         Rtg+MIpdW7PDIup9To1oMb47EX46dRVS742LoPE8/m7vI9WHK5SFYS2tGTZmG2b65ccb
-         l7NcMMixEl8mqbvSlav9WTXVpquyh3bkSsWFPRArj8yhzxJypS5LSLZ8dWukRe3CXwnE
-         xOjuBdJg41kO+t11XTe9j1WAt2/VZY8yUvdNJjhtLMg5OzybUdtAvqLE/a4OYdhLzP8z
-         zJ2VzCXrHdfRzBRXZigvh8/8z8r7ObdtjCbCyN03G8LJQAVHRhBFDi6Wl++/j//elAix
-         H4kw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nAKu+6MtH3s2XmeunaD2gUOZOf681k6swYOZ6Q7YH1o=;
-        b=EYruBadIJflTy4rIva6OLEw7BzrwBtg5LGCgNm0DgGXy8avG4ZF3o6cfzW1std3UAe
-         iOklDHa5nPZqx1KeZzWqibEgSFWih2HA/U1zqQIyxKI3n2IWvHRhABvmt2/m8X8p65kM
-         /gPfped3+/A65dD4hSxmDo+cJVWZ/HwtWy7FPOXMnU4xADkswjhQxWwS0zvjCmnzCnsg
-         0giz/PFNmx4ojrwEI3D9V2Q9pAWKMiUcdjzChqOm5WkGpdwRn0vVlfLCPxK1FROXup5w
-         28WrgMpIloyEskvojeYz9+qncXiEMB9B0wOENJvySmSiAZAM8qDCxsEvZczEQwO2+ZIv
-         tWYA==
-X-Gm-Message-State: AOAM530Y6TnqDso30fXNCikLkJhzNq+RYfR7rwlTaoF1PlyKy3ZiP2cb
-        QgNC9e65t3Z90+OZq+ZEHh2FTPUXVVEC/65IDPZTMQ==
-X-Google-Smtp-Source: ABdhPJzJMo5cw4xYaWDtukM4Rsql7PyzgUfpSjgP4taVIiTuHnLSJ2O+n6zomR9cXECNjhMHzmORzEcZWeEDhyz/2Kg=
-X-Received: by 2002:a17:902:f20c:b029:f0:af3d:c5d8 with SMTP id
- m12-20020a170902f20cb02900f0af3dc5d8mr8859697plc.23.1621403983010; Tue, 18
- May 2021 22:59:43 -0700 (PDT)
+        id S240567AbhESHmB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 May 2021 03:42:01 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28416 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S238476AbhESHmB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 May 2021 03:42:01 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14J7Ztdf107203;
+        Wed, 19 May 2021 03:40:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=3uZmSI77E5TGNyfkRuQlpsM6Hja+QeN+kVV0qwniZ1M=;
+ b=PntznEl3JYZ7ruiC+RIQlVLj6KXmcsJPqD/qIURi2Akdd678MNd68qUnPhlwbSZZLjJD
+ HxuG9wBKA6iv3MGdBH7CVpZC8gR9OFimu8Y+B0gF2oZ7oPvAzBUWXgIKdtSk/JZLbjYH
+ Pbc1WYQYVhCvLvFJ5WwiBd86nbmUobEau1qHroXsYv6bvZCG5xymn9RFU6ABNbCceubU
+ Fga/jAfA9WLQ8igtaY30HnJsCnFC4nGCvxIJ+dXQOgrmqk4CuSwLl3wU8c0/PtR2Qe5/
+ IiODsjKRESGUOQufoCXIa1MOWx1ut3/l1S0aClQBE9Iy1Acq/7M6kgHd97F+YnvsJAae JQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 38mx73ggg5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 May 2021 03:40:41 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14J7aMuN108593;
+        Wed, 19 May 2021 03:40:41 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 38mx73gget-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 May 2021 03:40:41 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14J7bdQM004010;
+        Wed, 19 May 2021 07:40:39 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 38j5x89x73-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 May 2021 07:40:39 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14J7eaLB40829338
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 May 2021 07:40:36 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 70E3AA4060;
+        Wed, 19 May 2021 07:40:36 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A38CAA405C;
+        Wed, 19 May 2021 07:40:35 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 19 May 2021 07:40:35 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        thuth@redhat.com
+Subject: [kvm-unit-tests PATCH v3 1/6] s390x: uv-guest: Add invalid share location test
+Date:   Wed, 19 May 2021 07:40:17 +0000
+Message-Id: <20210519074022.7368-2-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210519074022.7368-1-frankja@linux.ibm.com>
+References: <20210519074022.7368-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
-References: <20210424004645.3950558-1-seanjc@google.com> <20210424004645.3950558-3-seanjc@google.com>
-In-Reply-To: <20210424004645.3950558-3-seanjc@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Tue, 18 May 2021 22:59:27 -0700
-Message-ID: <CAAeT=FyNo1CGvnamc3_J9EEQUn6WcdkMp50-QgmLYYVCFA2fZA@mail.gmail.com>
-Subject: Re: [PATCH 02/43] KVM: VMX: Set EDX at INIT with CPUID.0x1, Family-Model-Stepping
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: NcMP3Ne4QutKwu4WEXMCDZ2oYWUkbfzL
+X-Proofpoint-ORIG-GUID: OlhwDVqisi7uqM7cQ-BGzNzJcyEVNCzT
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-19_02:2021-05-18,2021-05-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ mlxlogscore=999 clxscore=1015 impostorscore=0 malwarescore=0
+ lowpriorityscore=0 priorityscore=1501 adultscore=0 mlxscore=0 bulkscore=0
+ spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2105190055
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> @@ -4504,7 +4505,11 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->
->         vmx->msr_ia32_umwait_control = 0;
->
-> -       vmx->vcpu.arch.regs[VCPU_REGS_RDX] = get_rdx_init_val();
-> +       eax = 1;
-> +       if (!kvm_cpuid(vcpu, &eax, &dummy, &dummy, &dummy, true))
-> +               eax = get_rdx_init_val();
-> +       kvm_rdx_write(vcpu, eax);
+Let's also test sharing unavailable memory.
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+---
+ s390x/uv-guest.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-For RESET, I assume that rdx should be set by userspace
-when userspace changes CPUID.0x1.EAX.
+diff --git a/s390x/uv-guest.c b/s390x/uv-guest.c
+index 99544442..a13669ab 100644
+--- a/s390x/uv-guest.c
++++ b/s390x/uv-guest.c
+@@ -15,6 +15,7 @@
+ #include <asm/interrupt.h>
+ #include <asm/facility.h>
+ #include <asm/uv.h>
++#include <sclp.h>
+ 
+ static unsigned long page;
+ 
+@@ -99,6 +100,10 @@ static void test_sharing(void)
+ 	uvcb.header.len = sizeof(uvcb);
+ 	cc = uv_call(0, (u64)&uvcb);
+ 	report(cc == 0 && uvcb.header.rc == UVC_RC_EXECUTED, "share");
++	uvcb.paddr = get_ram_size() + PAGE_SIZE;
++	cc = uv_call(0, (u64)&uvcb);
++	report(cc == 1 && uvcb.header.rc == 0x101, "invalid memory");
++	uvcb.paddr = page;
+ 	report_prefix_pop();
+ 
+ 	report_prefix_push("unshare");
+-- 
+2.30.2
 
-BTW, I would think having a default CPUID for CPUID.(EAX=0x1)
-would be better for consistency of a vCPU state for RESET.
-I would think it doesn't matter practically anyway though.
-
-Thanks,
-Reiji
