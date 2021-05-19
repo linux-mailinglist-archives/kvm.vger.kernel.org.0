@@ -2,288 +2,367 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D27C938995A
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 00:31:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 27FE6389960
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 00:35:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229932AbhESWdG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 May 2021 18:33:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38552 "EHLO
+        id S229498AbhESWg0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 May 2021 18:36:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229455AbhESWdF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 May 2021 18:33:05 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A3EAC061574
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 15:31:44 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id b15-20020a17090a550fb029015dad75163dso4216119pji.0
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 15:31:44 -0700 (PDT)
+        with ESMTP id S229465AbhESWgZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 May 2021 18:36:25 -0400
+Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ED5DC061574
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 15:35:05 -0700 (PDT)
+Received: by mail-il1-x132.google.com with SMTP id l15so1939059ilh.1
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 15:35:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=3Vx7mu6+ZNKXXoJYS7AVN4Z/38zh285y5Q+544/T8iY=;
-        b=XxRkDCdm53sGRGyY2ZYwH7T0AQIXefX6uNKZpOorQU6EQHDGclhTmzcnRR6oEpDkR9
-         hwPcnNL8Se68VX1SNb6obITM1ng2MKcYq5VQR2zlZY9YhMGuM2rCq6YcajdUhwbxUO7Y
-         bK/rEBsN13eh0y/NjU4uawPATIAhV0LA5d+niD5nZhN+5FE9+OuHWhtyWPV/hbb0PmPG
-         +B84rQsB0fU8U+7/wut17hQ+LErazbfphlbqrM3DPC74TDrcpOxxe304ZjkYT7sRhcRV
-         SHb/lli5vqmguWhu5YcbIk0NxcpbotFtdUkZ2s03CqKo5KaDfVGHmW9JxskcnQCqC2Tl
-         S9cQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8taWKY5LgEYAKZy1/shzdKgVUl6wjUkkU8aHH9O6HjM=;
+        b=Pkw59cBUdOt2BsRLN3pKCcg0cRpOd8hDUQ5v3CIyWdCqMvo0HUogV6cjdSeKnwW/dp
+         cxXsLgWuCI3sCcPrSS4mYKbuvOEOvfBfw+JWKXOB6jAS3SBzlkod60U/H90QpU6BziD2
+         iRg28PHFzNMgcwvrpQivl4uqBj5PMnk//40bg1IkjU3H2iNq7bRO2iFvL8vfEexvEP9o
+         WdIzITvaxwdmoZaPvi4aDUDAVdBCseC9AF6SfWqtjDZZdsosKNRA11kmYiyTcEwPzjTT
+         /4t0VsK+hWn0F3a/5R3nB+jINDaFulLoCit1QFImFHc2NCjz6zXv14+z4BCvfrXkRgUz
+         cXNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=3Vx7mu6+ZNKXXoJYS7AVN4Z/38zh285y5Q+544/T8iY=;
-        b=ZWMEP/g6+mki0zo3/+pEHE1ymIrMvRs07Q6INfFyMtiwGs1iciKwkzTXfOW18BiXZM
-         o6Ek6RfbMDNOI6//mayjg7PVGFAlkUuB1gZLkgNA6Jq2uWxZPMWPlpzoxK15Uvs1XvRV
-         SdwHEAaAnyyNtSYXaIdius7jcN1HV7xyC068321U2kJL+QJY7W4QZ91osjliUudHjbnv
-         GGXpaE9Xj2OSEMdyLl5IZYqPidvvd/lafZ8j7hk+z1eIw3xv3Gf7mdsbbHrdhTJD65sW
-         HK5RkGzqnZPUhXQ/riGsbuu2Cfw7GhOalPfWWFURKPBXIvx0sUnhA0KYnQQH0zvDst6j
-         J7SQ==
-X-Gm-Message-State: AOAM530c0ZPuIbVquved3LAnrU7pVHJxfyuUOb2ezxXD3t0xZCXo6fA+
-        BIrHG6HplUnZTkVZTMhbDLcXWQ==
-X-Google-Smtp-Source: ABdhPJyVa57WZ7TUt99IukPmtNkvrFPQqB+ptTfQty0q1rI/EXjLODYRKiJfCeImcIvIJxb0mHjLaQ==
-X-Received: by 2002:a17:902:d507:b029:f2:c88c:5b45 with SMTP id b7-20020a170902d507b02900f2c88c5b45mr2080651plg.66.1621463503306;
-        Wed, 19 May 2021 15:31:43 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id ge5sm971996pjb.45.2021.05.19.15.31.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 May 2021 15:31:42 -0700 (PDT)
-Date:   Wed, 19 May 2021 22:31:38 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 3/8] KVM: Resolve memslot ID via a hash table instead
- of via a static array
-Message-ID: <YKWRyvyyO5UAHv4U@google.com>
-References: <cover.1621191549.git.maciej.szmigiero@oracle.com>
- <4a4867419344338e1419436af1e1b0b8f2405517.1621191551.git.maciej.szmigiero@oracle.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8taWKY5LgEYAKZy1/shzdKgVUl6wjUkkU8aHH9O6HjM=;
+        b=S4jdI1+/4Gkxgo4VCc8g2VghDv8ICJQfuPC/wZHrT+1o5dE6UyUEihjysW7CTkl5OT
+         4z9aQiQJSktoP44QjVWpfxOz+ubQINp5umwRWYnjahyaiBc2U/tvn0krwhII7rE3hlVM
+         buW0yGuPu/g/GO4A808WRto389ffRxll8lOUqOF/QOLM+eiJU1gbfAc8Q6VmtJ7basH2
+         MkoR5Lv3yDxOoiC4EW25vUUhNhLgOKEUPjoSi/NUpMHQhyafAyaQ55uTon2pa1iVBoXv
+         eKWPWNujwPE8SZP1UdP1yWv/hUsU0F8n/4eGGIoetWZxVW+E64pj0cMzZyHdIH1YZTEN
+         I8iQ==
+X-Gm-Message-State: AOAM532Z5sOU5ETRe/To5mXiHUnVRmFxaP/Lv4/B77Dva0ZCLusc4Q5V
+        doCarNcqR5TJhNVRaJhq01tcfznhH7rFKSztB2mhvw==
+X-Google-Smtp-Source: ABdhPJxLSIPs6OmtcLIIJUwUPBv+pyT0FSHXXjqDKhcwU578B0nnw+iM0scfKQJcUtHiIdMKau7x3aXjDCtKMEaDGjY=
+X-Received: by 2002:a92:dd04:: with SMTP id n4mr1648417ilm.165.1621463704103;
+ Wed, 19 May 2021 15:35:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4a4867419344338e1419436af1e1b0b8f2405517.1621191551.git.maciej.szmigiero@oracle.com>
+References: <20210519200339.829146-1-axelrasmussen@google.com>
+ <20210519200339.829146-10-axelrasmussen@google.com> <CANgfPd-O5aEvK74DSxkbJaTBv5gResLgvNSjpuzP+PJwifNmfQ@mail.gmail.com>
+In-Reply-To: <CANgfPd-O5aEvK74DSxkbJaTBv5gResLgvNSjpuzP+PJwifNmfQ@mail.gmail.com>
+From:   Axel Rasmussen <axelrasmussen@google.com>
+Date:   Wed, 19 May 2021 15:34:28 -0700
+Message-ID: <CAJHvVcgiRJrneUDbExckXgLmp6WaUmpXgeuUtMEWEBq4qtb9ZA@mail.gmail.com>
+Subject: Re: [PATCH v2 09/10] KVM: selftests: allow using UFFD minor faults
+ for demand paging
+To:     Ben Gardon <bgardon@google.com>
+Cc:     Aaron Lewis <aaronlewis@google.com>,
+        Alexander Graf <graf@amazon.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jacob Xu <jacobhxu@google.com>,
+        Makarand Sonare <makarandsonare@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Yanan Wang <wangyanan55@huawei.com>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, May 16, 2021, Maciej S. Szmigiero wrote:
-> @@ -356,6 +357,7 @@ static inline int kvm_vcpu_exiting_guest_mode(struct kvm_vcpu *vcpu)
->  #define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
->  
->  struct kvm_memory_slot {
-> +	struct hlist_node id_node;
->  	gfn_t base_gfn;
->  	unsigned long npages;
->  	unsigned long *dirty_bitmap;
-> @@ -458,7 +460,7 @@ static inline int kvm_arch_vcpu_memslots_id(struct kvm_vcpu *vcpu)
->  struct kvm_memslots {
->  	u64 generation;
->  	/* The mapping table from slot id to the index in memslots[]. */
-> -	short id_to_index[KVM_MEM_SLOTS_NUM];
-> +	DECLARE_HASHTABLE(id_hash, 7);
+On Wed, May 19, 2021 at 3:21 PM Ben Gardon <bgardon@google.com> wrote:
+>
+> On Wed, May 19, 2021 at 1:04 PM Axel Rasmussen <axelrasmussen@google.com> wrote:
+> >
+> > UFFD handling of MINOR faults is a new feature whose use case is to
+> > speed up demand paging (compared to MISSING faults). So, it's
+> > interesting to let this selftest exercise this new mode.
+> >
+> > Modify the demand paging test to have the option of using UFFD minor
+> > faults, as opposed to missing faults. Now, when turning on userfaultfd
+> > with '-u', the desired mode has to be specified ("MISSING" or "MINOR").
+> >
+> > If we're in minor mode, before registering, prefault via the *alias*.
+> > This way, the guest will trigger minor faults, instead of missing
+> > faults, and we can UFFDIO_CONTINUE to resolve them.
+> >
+> > Modify the page fault handler function to use the right ioctl depending
+> > on the mode we're running in. In MINOR mode, use UFFDIO_CONTINUE.
+> >
+> > Signed-off-by: Axel Rasmussen <axelrasmussen@google.com>
+> > ---
+> >  .../selftests/kvm/demand_paging_test.c        | 112 ++++++++++++------
+> >  1 file changed, 79 insertions(+), 33 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+> > index 01890a7b0155..df7190261923 100644
+> > --- a/tools/testing/selftests/kvm/demand_paging_test.c
+> > +++ b/tools/testing/selftests/kvm/demand_paging_test.c
+> > @@ -74,33 +74,48 @@ static void *vcpu_worker(void *data)
+> >         return NULL;
+> >  }
+> >
+> > -static int handle_uffd_page_request(int uffd, uint64_t addr)
+> > +static int handle_uffd_page_request(int uffd_mode, int uffd, uint64_t addr)
+> >  {
+> > -       pid_t tid;
+> > +       pid_t tid = syscall(__NR_gettid);
+> >         struct timespec start;
+> >         struct timespec ts_diff;
+> > -       struct uffdio_copy copy;
+> >         int r;
+> >
+> > -       tid = syscall(__NR_gettid);
+> > +       clock_gettime(CLOCK_MONOTONIC, &start);
+> >
+> > -       copy.src = (uint64_t)guest_data_prototype;
+> > -       copy.dst = addr;
+> > -       copy.len = demand_paging_size;
+> > -       copy.mode = 0;
+> > +       if (uffd_mode == UFFDIO_REGISTER_MODE_MISSING) {
+> > +               struct uffdio_copy copy;
+> >
+> > -       clock_gettime(CLOCK_MONOTONIC, &start);
+> > +               copy.src = (uint64_t)guest_data_prototype;
+> > +               copy.dst = addr;
+> > +               copy.len = demand_paging_size;
+> > +               copy.mode = 0;
+> > +
+> > +               r = ioctl(uffd, UFFDIO_COPY, &copy);
+> > +               if (r == -1) {
+> > +                       pr_info("Failed UFFDIO_COPY in 0x%lx from thread %d with errno: %d\n",
+> > +                               addr, tid, errno);
+> > +                       return r;
+> > +               }
+> > +       } else if (uffd_mode == UFFDIO_REGISTER_MODE_MINOR) {
+> > +               struct uffdio_continue cont = {0};
+> > +
+> > +               cont.range.start = addr;
+> > +               cont.range.len = demand_paging_size;
+> >
+> > -       r = ioctl(uffd, UFFDIO_COPY, &copy);
+> > -       if (r == -1) {
+> > -               pr_info("Failed Paged in 0x%lx from thread %d with errno: %d\n",
+> > -                       addr, tid, errno);
+> > -               return r;
+> > +               r = ioctl(uffd, UFFDIO_CONTINUE, &cont);
+> > +               if (r == -1) {
+> > +                       pr_info("Failed UFFDIO_CONTINUE in 0x%lx from thread %d with errno: %d\n",
+> > +                               addr, tid, errno);
+> > +                       return r;
+> > +               }
+> > +       } else {
+> > +               TEST_FAIL("Invalid uffd mode %d", uffd_mode);
+> >         }
+> >
+> >         ts_diff = timespec_elapsed(start);
+> >
+> > -       PER_PAGE_DEBUG("UFFDIO_COPY %d \t%ld ns\n", tid,
+> > +       PER_PAGE_DEBUG("UFFD page-in %d \t%ld ns\n", tid,
+> >                        timespec_to_ns(ts_diff));
+> >         PER_PAGE_DEBUG("Paged in %ld bytes at 0x%lx from thread %d\n",
+> >                        demand_paging_size, addr, tid);
+> > @@ -111,6 +126,7 @@ static int handle_uffd_page_request(int uffd, uint64_t addr)
+> >  bool quit_uffd_thread;
+> >
+> >  struct uffd_handler_args {
+> > +       int uffd_mode;
+> >         int uffd;
+> >         int pipefd;
+> >         useconds_t delay;
+> > @@ -187,7 +203,7 @@ static void *uffd_handler_thread_fn(void *arg)
+> >                 if (delay)
+> >                         usleep(delay);
+> >                 addr =  msg.arg.pagefault.address;
+> > -               r = handle_uffd_page_request(uffd, addr);
+> > +               r = handle_uffd_page_request(uffd_args->uffd_mode, uffd, addr);
+> >                 if (r < 0)
+> >                         return NULL;
+> >                 pages++;
+> > @@ -203,13 +219,32 @@ static void *uffd_handler_thread_fn(void *arg)
+> >
+> >  static void setup_demand_paging(struct kvm_vm *vm,
+> >                                 pthread_t *uffd_handler_thread, int pipefd,
+> > -                               useconds_t uffd_delay,
+> > +                               int uffd_mode, useconds_t uffd_delay,
+> >                                 struct uffd_handler_args *uffd_args,
+> > -                               void *hva, uint64_t len)
+> > +                               void *hva, void *alias, uint64_t len)
+> >  {
+> > +       bool is_minor = (uffd_mode == UFFDIO_REGISTER_MODE_MINOR);
+> >         int uffd;
+> >         struct uffdio_api uffdio_api;
+> >         struct uffdio_register uffdio_register;
+> > +       uint64_t expected_ioctls = ((uint64_t) 1) << _UFFDIO_COPY;
+> > +
+> > +       PER_PAGE_DEBUG("Userfaultfd %s mode, faults resolved with %s\n",
+> > +                      is_minor ? "MINOR" : "MISSING",
+> > +                      is_minor ? "UFFDIO_CONINUE" : "UFFDIO_COPY");
+> > +
+> > +       /* In order to get minor faults, prefault via the alias. */
+> > +       if (is_minor) {
+> > +               size_t p;
+> > +
+> > +               expected_ioctls = ((uint64_t) 1) << _UFFDIO_CONTINUE;
+> > +
+> > +               TEST_ASSERT(alias != NULL, "Alias required for minor faults");
+> > +               for (p = 0; p < (len / demand_paging_size); ++p) {
+> > +                       memcpy(alias + (p * demand_paging_size),
+> > +                              guest_data_prototype, demand_paging_size);
+> > +               }
+> > +       }
+>
+> Would it be worth timing this operation? I think we'd need to know how
+> long we spent prefaulting the memory to really be able to compare UDDF
+> modes using this test.
 
-Is there any specific motivation for using 7 bits?
+It's easy to time it and print out a value, so I'm happy to add it.
 
->  	atomic_t lru_slot;
->  	int used_slots;
->  	struct kvm_memory_slot memslots[];
+As for how useful it is, I'm not so sure. In general the way I think
+of it is, the prefaulting would happen during the precopy phase of
+live migration. During this phase, the VM is still running on the
+source machine, so the VM owner doesn't notice any performance
+degradation or slowness in this phase.
 
-...
-
-> @@ -1097,14 +1095,16 @@ static int kvm_alloc_dirty_bitmap(struct kvm_memory_slot *memslot)
->  /*
->   * Delete a memslot by decrementing the number of used slots and shifting all
->   * other entries in the array forward one spot.
-> + * @memslot is a detached dummy struct with just .id and .as_id filled.
->   */
->  static inline void kvm_memslot_delete(struct kvm_memslots *slots,
->  				      struct kvm_memory_slot *memslot)
->  {
->  	struct kvm_memory_slot *mslots = slots->memslots;
-> +	struct kvm_memory_slot *dmemslot = id_to_memslot(slots, memslot->id);
-
-I vote to call these local vars "old", or something along those lines.  dmemslot
-isn't too bad, but mmemslot in the helpers below is far too similar to memslot,
-and using the wrong will cause nasty explosions.
-
->  	int i;
->  
-> -	if (WARN_ON(slots->id_to_index[memslot->id] == -1))
-> +	if (WARN_ON(!dmemslot))
->  		return;
->  
->  	slots->used_slots--;
-> @@ -1112,12 +1112,13 @@ static inline void kvm_memslot_delete(struct kvm_memslots *slots,
->  	if (atomic_read(&slots->lru_slot) >= slots->used_slots)
->  		atomic_set(&slots->lru_slot, 0);
->  
-> -	for (i = slots->id_to_index[memslot->id]; i < slots->used_slots; i++) {
-> +	for (i = dmemslot - mslots; i < slots->used_slots; i++) {
-> +		hash_del(&mslots[i].id_node);
->  		mslots[i] = mslots[i + 1];
-> -		slots->id_to_index[mslots[i].id] = i;
-> +		hash_add(slots->id_hash, &mslots[i].id_node, mslots[i].id);
->  	}
-> +	hash_del(&mslots[i].id_node);
->  	mslots[i] = *memslot;
-> -	slots->id_to_index[memslot->id] = -1;
->  }
->  
->  /*
-> @@ -1135,31 +1136,41 @@ static inline int kvm_memslot_insert_back(struct kvm_memslots *slots)
->   * itself is not preserved in the array, i.e. not swapped at this time, only
->   * its new index into the array is tracked.  Returns the changed memslot's
->   * current index into the memslots array.
-> + * The memslot at the returned index will not be in @slots->id_hash by then.
-> + * @memslot is a detached struct with desired final data of the changed slot.
->   */
->  static inline int kvm_memslot_move_backward(struct kvm_memslots *slots,
->  					    struct kvm_memory_slot *memslot)
->  {
->  	struct kvm_memory_slot *mslots = slots->memslots;
-> +	struct kvm_memory_slot *mmemslot = id_to_memslot(slots, memslot->id);
->  	int i;
->  
-> -	if (WARN_ON_ONCE(slots->id_to_index[memslot->id] == -1) ||
-> +	if (WARN_ON_ONCE(!mmemslot) ||
->  	    WARN_ON_ONCE(!slots->used_slots))
->  		return -1;
->  
-> +	/*
-> +	 * update_memslots() will unconditionally overwrite and re-add the
-> +	 * target memslot so it has to be removed here firs
-> +	 */
-
-It would be helpful to explain "why" this is necessary.  Something like:
-
-	/*
-	 * The memslot is being moved, delete its previous hash entry; its new
-	 * entry will be added by updated_memslots().  The old entry cannot be
-	 * kept even though its id is unchanged, because the old entry points at
-	 * the memslot in the old instance of memslots.
-	 */
-
-> +	hash_del(&mmemslot->id_node);
-> +
->  	/*
->  	 * Move the target memslot backward in the array by shifting existing
->  	 * memslots with a higher GFN (than the target memslot) towards the
->  	 * front of the array.
->  	 */
-> -	for (i = slots->id_to_index[memslot->id]; i < slots->used_slots - 1; i++) {
-> +	for (i = mmemslot - mslots; i < slots->used_slots - 1; i++) {
->  		if (memslot->base_gfn > mslots[i + 1].base_gfn)
->  			break;
->  
->  		WARN_ON_ONCE(memslot->base_gfn == mslots[i + 1].base_gfn);
->  
->  		/* Shift the next memslot forward one and update its index. */
-> +		hash_del(&mslots[i + 1].id_node);
->  		mslots[i] = mslots[i + 1];
-> -		slots->id_to_index[mslots[i].id] = i;
-> +		hash_add(slots->id_hash, &mslots[i].id_node, mslots[i].id);
->  	}
->  	return i;
->  }
-> @@ -1170,6 +1181,10 @@ static inline int kvm_memslot_move_backward(struct kvm_memslots *slots,
->   * is not preserved in the array, i.e. not swapped at this time, only its new
->   * index into the array is tracked.  Returns the changed memslot's final index
->   * into the memslots array.
-> + * The memslot at the returned index will not be in @slots->id_hash by then.
-> + * @memslot is a detached struct with desired final data of the new or
-> + * changed slot.
-> + * Assumes that the memslot at @start index is not in @slots->id_hash.
->   */
->  static inline int kvm_memslot_move_forward(struct kvm_memslots *slots,
->  					   struct kvm_memory_slot *memslot,
-> @@ -1185,8 +1200,9 @@ static inline int kvm_memslot_move_forward(struct kvm_memslots *slots,
->  		WARN_ON_ONCE(memslot->base_gfn == mslots[i - 1].base_gfn);
->  
->  		/* Shift the next memslot back one and update its index. */
-> +		hash_del(&mslots[i - 1].id_node);
->  		mslots[i] = mslots[i - 1];
-> -		slots->id_to_index[mslots[i].id] = i;
-> +		hash_add(slots->id_hash, &mslots[i].id_node, mslots[i].id);
->  	}
->  	return i;
->  }
-> @@ -1231,6 +1247,9 @@ static inline int kvm_memslot_move_forward(struct kvm_memslots *slots,
->   * most likely to be referenced, sorting it to the front of the array was
->   * advantageous.  The current binary search starts from the middle of the array
->   * and uses an LRU pointer to improve performance for all memslots and GFNs.
-> + *
-> + * @memslot is a detached struct, not a part of the current or new memslot
-> + * array.
->   */
->  static void update_memslots(struct kvm_memslots *slots,
->  			    struct kvm_memory_slot *memslot,
-> @@ -1247,12 +1266,16 @@ static void update_memslots(struct kvm_memslots *slots,
->  			i = kvm_memslot_move_backward(slots, memslot);
->  		i = kvm_memslot_move_forward(slots, memslot, i);
->  
-> +		if (i < 0)
-> +			return;
-
-Hmm, this is essentially a "fix" to existing code, it should be in a separate
-patch.  And since kvm_memslot_move_forward() can theoretically hit this even if
-kvm_memslot_move_backward() doesn't return -1, i.e. doesn't WARN, what about
-doing WARN_ON_ONCE() here and dropping the WARNs in kvm_memslot_move_backward()?
-It'll be slightly less developer friendly, but anyone that has the unfortunate
-pleasure of breaking and debugging this code is already in for a world of pain.
-
-> +
->  		/*
->  		 * Copy the memslot to its new position in memslots and update
->  		 * its index accordingly.
->  		 */
->  		slots->memslots[i] = *memslot;
-> -		slots->id_to_index[memslot->id] = i;
-> +		hash_add(slots->id_hash, &slots->memslots[i].id_node,
-> +			 memslot->id);
->  	}
->  }
->  
-> @@ -1316,6 +1339,7 @@ static struct kvm_memslots *kvm_dup_memslots(struct kvm_memslots *old,
->  {
->  	struct kvm_memslots *slots;
->  	size_t old_size, new_size;
-> +	struct kvm_memory_slot *memslot;
->  
->  	old_size = sizeof(struct kvm_memslots) +
->  		   (sizeof(struct kvm_memory_slot) * old->used_slots);
-> @@ -1326,8 +1350,14 @@ static struct kvm_memslots *kvm_dup_memslots(struct kvm_memslots *old,
->  		new_size = old_size;
->  
->  	slots = kvzalloc(new_size, GFP_KERNEL_ACCOUNT);
-> -	if (likely(slots))
-> -		memcpy(slots, old, old_size);
-> +	if (unlikely(!slots))
-> +		return NULL;
-> +
-> +	memcpy(slots, old, old_size);
-> +
-> +	hash_init(slots->id_hash);
-> +	kvm_for_each_memslot(memslot, slots)
-> +		hash_add(slots->id_hash, &memslot->id_node, memslot->id);
-
-What's the perf penalty if the number of memslots gets large?  I ask because the
-lazy rmap allocation is adding multiple calls to kvm_dup_memslots().
-
->  	return slots;
->  }
+>
+> >
+> >         uffd = syscall(__NR_userfaultfd, O_CLOEXEC | O_NONBLOCK);
+> >         TEST_ASSERT(uffd >= 0, "uffd creation failed, errno: %d", errno);
+> > @@ -222,12 +257,13 @@ static void setup_demand_paging(struct kvm_vm *vm,
+> >
+> >         uffdio_register.range.start = (uint64_t)hva;
+> >         uffdio_register.range.len = len;
+> > -       uffdio_register.mode = UFFDIO_REGISTER_MODE_MISSING;
+> > +       uffdio_register.mode = uffd_mode;
+> >         TEST_ASSERT(ioctl(uffd, UFFDIO_REGISTER, &uffdio_register) != -1,
+> >                     "ioctl UFFDIO_REGISTER failed");
+> > -       TEST_ASSERT((uffdio_register.ioctls & UFFD_API_RANGE_IOCTLS) ==
+> > -                   UFFD_API_RANGE_IOCTLS, "unexpected userfaultfd ioctl set");
+> > +       TEST_ASSERT((uffdio_register.ioctls & expected_ioctls) ==
+> > +                   expected_ioctls, "missing userfaultfd ioctls");
+> >
+> > +       uffd_args->uffd_mode = uffd_mode;
+> >         uffd_args->uffd = uffd;
+> >         uffd_args->pipefd = pipefd;
+> >         uffd_args->delay = uffd_delay;
+> > @@ -239,7 +275,7 @@ static void setup_demand_paging(struct kvm_vm *vm,
+> >  }
+> >
+> >  struct test_params {
+> > -       bool use_uffd;
+> > +       int uffd_mode;
+> >         useconds_t uffd_delay;
+> >         enum vm_mem_backing_src_type src_type;
+> >         bool partition_vcpu_memory_access;
+> > @@ -276,7 +312,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+> >         perf_test_setup_vcpus(vm, nr_vcpus, guest_percpu_mem_size,
+> >                               p->partition_vcpu_memory_access);
+> >
+> > -       if (p->use_uffd) {
+> > +       if (p->uffd_mode) {
+> >                 uffd_handler_threads =
+> >                         malloc(nr_vcpus * sizeof(*uffd_handler_threads));
+> >                 TEST_ASSERT(uffd_handler_threads, "Memory allocation failed");
+> > @@ -290,6 +326,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+> >                 for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
+> >                         vm_paddr_t vcpu_gpa;
+> >                         void *vcpu_hva;
+> > +                       void *vcpu_alias;
+> >                         uint64_t vcpu_mem_size;
+> >
+> >
+> > @@ -304,8 +341,9 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+> >                         PER_VCPU_DEBUG("Added VCPU %d with test mem gpa [%lx, %lx)\n",
+> >                                        vcpu_id, vcpu_gpa, vcpu_gpa + vcpu_mem_size);
+> >
+> > -                       /* Cache the HVA pointer of the region */
+> > +                       /* Cache the host addresses of the region */
+> >                         vcpu_hva = addr_gpa2hva(vm, vcpu_gpa);
+> > +                       vcpu_alias = addr_gpa2alias(vm, vcpu_gpa);
+> >
+> >                         /*
+> >                          * Set up user fault fd to handle demand paging
+> > @@ -316,8 +354,9 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+> >                         TEST_ASSERT(!r, "Failed to set up pipefd");
+> >
+> >                         setup_demand_paging(vm, &uffd_handler_threads[vcpu_id],
+> > -                                           pipefds[vcpu_id * 2], p->uffd_delay,
+> > -                                           &uffd_args[vcpu_id], vcpu_hva,
+> > +                                           pipefds[vcpu_id * 2], p->uffd_mode,
+> > +                                           p->uffd_delay, &uffd_args[vcpu_id],
+> > +                                           vcpu_hva, vcpu_alias,
+> >                                             vcpu_mem_size);
+> >                 }
+> >         }
+> > @@ -346,7 +385,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+> >
+> >         pr_info("All vCPU threads joined\n");
+> >
+> > -       if (p->use_uffd) {
+> > +       if (p->uffd_mode) {
+> >                 char c;
+> >
+> >                 /* Tell the user fault fd handler threads to quit */
+> > @@ -368,7 +407,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+> >
+> >         free(guest_data_prototype);
+> >         free(vcpu_threads);
+> > -       if (p->use_uffd) {
+> > +       if (p->uffd_mode) {
+> >                 free(uffd_handler_threads);
+> >                 free(uffd_args);
+> >                 free(pipefds);
+> > @@ -378,11 +417,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+> >  static void help(char *name)
+> >  {
+> >         puts("");
+> > -       printf("usage: %s [-h] [-m mode] [-u] [-d uffd_delay_usec]\n"
+> > +       printf("usage: %s [-h] [-m mode] [-u mode] [-d uffd_delay_usec]\n"
+>
+> NIT: maybe use uffd_mode or some word other than mode here to
+> disambiguate with -m
+>
+> >                "          [-b memory] [-t type] [-v vcpus] [-o]\n", name);
+> >         guest_modes_help();
+> > -       printf(" -u: use User Fault FD to handle vCPU page\n"
+> > -              "     faults.\n");
+> > +       printf(" -u: use userfaultfd to handle vCPU page faults. Mode is a\n"
+> > +              "     UFFD registration mode: 'MISSING' or 'MINOR'.\n");
+> >         printf(" -d: add a delay in usec to the User Fault\n"
+> >                "     FD handler to simulate demand paging\n"
+> >                "     overheads. Ignored without -u.\n");
+> > @@ -409,13 +448,17 @@ int main(int argc, char *argv[])
+> >
+> >         guest_modes_append_default();
+> >
+> > -       while ((opt = getopt(argc, argv, "hm:ud:b:t:v:o")) != -1) {
+> > +       while ((opt = getopt(argc, argv, "hm:u:d:b:t:v:o")) != -1) {
+> >                 switch (opt) {
+> >                 case 'm':
+> >                         guest_modes_cmdline(optarg);
+> >                         break;
+> >                 case 'u':
+> > -                       p.use_uffd = true;
+> > +                       if (!strcmp("MISSING", optarg))
+> > +                               p.uffd_mode = UFFDIO_REGISTER_MODE_MISSING;
+> > +                       else if (!strcmp("MINOR", optarg))
+> > +                               p.uffd_mode = UFFDIO_REGISTER_MODE_MINOR;
+> > +                       TEST_ASSERT(p.uffd_mode, "UFFD mode must be 'MISSING' or 'MINOR'.");
+> >                         break;
+> >                 case 'd':
+> >                         p.uffd_delay = strtoul(optarg, NULL, 0);
+> > @@ -442,6 +485,9 @@ int main(int argc, char *argv[])
+> >                 }
+> >         }
+> >
+> > +       TEST_ASSERT(p.uffd_mode != UFFDIO_REGISTER_MODE_MINOR || p.src_type == VM_MEM_SRC_SHMEM,
+> > +                   "userfaultfd MINOR mode requires shared memory; pick a different -t");
+> > +
+> >         for_each_guest_mode(run_test, &p);
+> >
+> >         return 0;
+> > --
+> > 2.31.1.751.gd2f1c929bd-goog
+> >
