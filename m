@@ -2,228 +2,288 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 51DEE389944
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 00:25:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D27C938995A
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 00:31:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229470AbhESW0p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 May 2021 18:26:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37104 "EHLO
+        id S229932AbhESWdG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 May 2021 18:33:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229598AbhESW0n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 May 2021 18:26:43 -0400
-Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 438A9C06175F
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 15:25:22 -0700 (PDT)
-Received: by mail-io1-xd2d.google.com with SMTP id z24so14621297ioi.3
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 15:25:22 -0700 (PDT)
+        with ESMTP id S229455AbhESWdF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 May 2021 18:33:05 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A3EAC061574
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 15:31:44 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id b15-20020a17090a550fb029015dad75163dso4216119pji.0
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 15:31:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=lFxp5Wo5o8KVeHp1UFWe95+41R0OvdliXrOKe6C2icQ=;
-        b=mLnewFJkeeJSpCJWt4VqJyF90CI/PtHxpmF3KzTsZUR3TvUmWFbS7Elq/2JHtCfcxe
-         HRODcbL/3wgoESreTVUidJGGaTCTNHC9LeZuLMzUaAijHXAOQ/0qO5CBngdwCLm+PRNu
-         3jDYarfXCWVEJ19r2SWg8pMT1e0m3mFvMkTKnEILP6XWgI0psLvSVDxmZXGyYsyGcm06
-         ob/rp2UobM9Ez19oqjnMuiniGVOPQHGqWMb2/Bg+S9OH3oVOPHDHB3fYla8oKRhXXTpo
-         kKMiHKkaWWLxv0wBJSPFXew5aQ2wutS7uA2IuNnhgvjRGmbpdnUrH0d8009X80wOfYdm
-         MJog==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=3Vx7mu6+ZNKXXoJYS7AVN4Z/38zh285y5Q+544/T8iY=;
+        b=XxRkDCdm53sGRGyY2ZYwH7T0AQIXefX6uNKZpOorQU6EQHDGclhTmzcnRR6oEpDkR9
+         hwPcnNL8Se68VX1SNb6obITM1ng2MKcYq5VQR2zlZY9YhMGuM2rCq6YcajdUhwbxUO7Y
+         bK/rEBsN13eh0y/NjU4uawPATIAhV0LA5d+niD5nZhN+5FE9+OuHWhtyWPV/hbb0PmPG
+         +B84rQsB0fU8U+7/wut17hQ+LErazbfphlbqrM3DPC74TDrcpOxxe304ZjkYT7sRhcRV
+         SHb/lli5vqmguWhu5YcbIk0NxcpbotFtdUkZ2s03CqKo5KaDfVGHmW9JxskcnQCqC2Tl
+         S9cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=lFxp5Wo5o8KVeHp1UFWe95+41R0OvdliXrOKe6C2icQ=;
-        b=QouHhSSgQT3QUO6njo6XYzprveq7SV0TCqT8uNcORg9MnR4TPly5I/S40pnDhs6YAP
-         Vl48fmh7tBVl3W+7TXeBpyvyHagAqMgrz1+4AEC2eegvM0/UjG6D1fHU9gmpfHTOh+4A
-         HdDg5gAklh8pc27Qch/l58YiCdDi76WAg2jm8P7zpFgBd9ccdNyhWTF/iDOfp78L840e
-         7JTpcytIewHS5Wj7SS8nv6SQ3ySUrZwzLEOewCSvTi/wrAGMsjXwcMKlXVtFhWsns/E2
-         APj8uw/CDc0+5B4WNTCfBP4U9BcTRNkWoWh0/NdZfGK6ogs1OadNIT/+sgbaoUXtA0fH
-         1D1w==
-X-Gm-Message-State: AOAM531UrU/A/JuzF6cEisZpAbPlIqKw5r7MVs8uL1qkWzCPZnQaiJhJ
-        M5n+ywRhoZVOx/nYWr1YaNNSHRAkRNkl72b49fapTQ==
-X-Google-Smtp-Source: ABdhPJzfpozcvCfE5cxMXYtwUSKnQSzRGz6Wf64p8UV1W/+Wg3OT2t0l6IjI+DEPjyWJvD+On9NH7zP+W1hfV8Fju+Q=
-X-Received: by 2002:a05:6638:3395:: with SMTP id h21mr1798024jav.44.1621463121394;
- Wed, 19 May 2021 15:25:21 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=3Vx7mu6+ZNKXXoJYS7AVN4Z/38zh285y5Q+544/T8iY=;
+        b=ZWMEP/g6+mki0zo3/+pEHE1ymIrMvRs07Q6INfFyMtiwGs1iciKwkzTXfOW18BiXZM
+         o6Ek6RfbMDNOI6//mayjg7PVGFAlkUuB1gZLkgNA6Jq2uWxZPMWPlpzoxK15Uvs1XvRV
+         SdwHEAaAnyyNtSYXaIdius7jcN1HV7xyC068321U2kJL+QJY7W4QZ91osjliUudHjbnv
+         GGXpaE9Xj2OSEMdyLl5IZYqPidvvd/lafZ8j7hk+z1eIw3xv3Gf7mdsbbHrdhTJD65sW
+         HK5RkGzqnZPUhXQ/riGsbuu2Cfw7GhOalPfWWFURKPBXIvx0sUnhA0KYnQQH0zvDst6j
+         J7SQ==
+X-Gm-Message-State: AOAM530c0ZPuIbVquved3LAnrU7pVHJxfyuUOb2ezxXD3t0xZCXo6fA+
+        BIrHG6HplUnZTkVZTMhbDLcXWQ==
+X-Google-Smtp-Source: ABdhPJyVa57WZ7TUt99IukPmtNkvrFPQqB+ptTfQty0q1rI/EXjLODYRKiJfCeImcIvIJxb0mHjLaQ==
+X-Received: by 2002:a17:902:d507:b029:f2:c88c:5b45 with SMTP id b7-20020a170902d507b02900f2c88c5b45mr2080651plg.66.1621463503306;
+        Wed, 19 May 2021 15:31:43 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id ge5sm971996pjb.45.2021.05.19.15.31.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 May 2021 15:31:42 -0700 (PDT)
+Date:   Wed, 19 May 2021 22:31:38 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 3/8] KVM: Resolve memslot ID via a hash table instead
+ of via a static array
+Message-ID: <YKWRyvyyO5UAHv4U@google.com>
+References: <cover.1621191549.git.maciej.szmigiero@oracle.com>
+ <4a4867419344338e1419436af1e1b0b8f2405517.1621191551.git.maciej.szmigiero@oracle.com>
 MIME-Version: 1.0
-References: <20210519200339.829146-1-axelrasmussen@google.com>
- <20210519200339.829146-7-axelrasmussen@google.com> <CANgfPd-RuScC1BONf2wBSSJ=GQE5yW=BK4g18L3R2Ebn__+PAg@mail.gmail.com>
- <CAJHvVchMMse=CcSUnHGDXLKd0YSa3wTvyyyPjT8MU3RmmwAXtQ@mail.gmail.com>
-In-Reply-To: <CAJHvVchMMse=CcSUnHGDXLKd0YSa3wTvyyyPjT8MU3RmmwAXtQ@mail.gmail.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 19 May 2021 15:25:10 -0700
-Message-ID: <CANgfPd-_LgX5bf=GG=_CGHS9gNpeiiuW+_UseoirPuBasWU4tQ@mail.gmail.com>
-Subject: Re: [PATCH v2 06/10] KVM: selftests: refactor vm_mem_backing_src_type flags
-To:     Axel Rasmussen <axelrasmussen@google.com>
-Cc:     Aaron Lewis <aaronlewis@google.com>,
-        Alexander Graf <graf@amazon.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jacob Xu <jacobhxu@google.com>,
-        Makarand Sonare <makarandsonare@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Yanan Wang <wangyanan55@huawei.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4a4867419344338e1419436af1e1b0b8f2405517.1621191551.git.maciej.szmigiero@oracle.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 19, 2021 at 3:17 PM Axel Rasmussen <axelrasmussen@google.com> wrote:
->
-> On Wed, May 19, 2021 at 3:02 PM Ben Gardon <bgardon@google.com> wrote:
-> >
-> > On Wed, May 19, 2021 at 1:04 PM Axel Rasmussen <axelrasmussen@google.com> wrote:
-> > >
-> > > Each struct vm_mem_backing_src_alias has a flags field, which denotes
-> > > the flags used to mmap() an area of that type. Previously, this field
-> > > never included MAP_PRIVATE | MAP_ANONYMOUS, because
-> > > vm_userspace_mem_region_add assumed that *all* types would always use
-> > > those flags, and so it hardcoded them.
-> > >
-> > > In a follow-up commit, we'll add a new type: shmem. Areas of this type
-> > > must not have MAP_PRIVATE | MAP_ANONYMOUS, and instead they must have
-> > > MAP_SHARED.
-> > >
-> > > So, refactor things. Make it so that the flags field of
-> > > struct vm_mem_backing_src_alias really is a complete set of flags, and
-> > > don't add in any extras in vm_userspace_mem_region_add. This will let us
-> > > easily tack on shmem.
-> > >
-> > > Signed-off-by: Axel Rasmussen <axelrasmussen@google.com>
-> > > ---
-> > >  tools/testing/selftests/kvm/lib/kvm_util.c  |  5 ++-
-> > >  tools/testing/selftests/kvm/lib/test_util.c | 35 +++++++++++----------
-> > >  2 files changed, 21 insertions(+), 19 deletions(-)
-> > >
-> > > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > > index 0d6ddee429b9..bc405785ac8b 100644
-> > > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> > > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > > @@ -759,9 +759,8 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
-> > >
-> > >         region->mmap_start = mmap(NULL, region->mmap_size,
-> > >                                   PROT_READ | PROT_WRITE,
-> > > -                                 MAP_PRIVATE | MAP_ANONYMOUS
-> > > -                                 | vm_mem_backing_src_alias(src_type)->flag,
-> > > -                                 -1, 0);
-> > > +                                 vm_mem_backing_src_alias(src_type)->flag,
-> > > +                                 region->fd, 0);
-> >
-> > I don't see the region->fd change mentioned in the patch description
-> > or elsewhere in this patch. Is something setting region->fd to -1 or
-> > should this be part of another patch in the series?
->
-> Ah, apologies, this is a mistake from splitting up the commits. When
-> they were all squashed together, we set region->fd = -1 explicitly
-> just above here, but with them separated we can't depend on that. I'll
-> fix this in a v3.
+On Sun, May 16, 2021, Maciej S. Szmigiero wrote:
+> @@ -356,6 +357,7 @@ static inline int kvm_vcpu_exiting_guest_mode(struct kvm_vcpu *vcpu)
+>  #define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
+>  
+>  struct kvm_memory_slot {
+> +	struct hlist_node id_node;
+>  	gfn_t base_gfn;
+>  	unsigned long npages;
+>  	unsigned long *dirty_bitmap;
+> @@ -458,7 +460,7 @@ static inline int kvm_arch_vcpu_memslots_id(struct kvm_vcpu *vcpu)
+>  struct kvm_memslots {
+>  	u64 generation;
+>  	/* The mapping table from slot id to the index in memslots[]. */
+> -	short id_to_index[KVM_MEM_SLOTS_NUM];
+> +	DECLARE_HASHTABLE(id_hash, 7);
 
-Thanks for fixing that and thanks for splitting up the patches in this
-series. It made them super easy to review.
+Is there any specific motivation for using 7 bits?
 
->
-> >
-> > >         TEST_ASSERT(region->mmap_start != MAP_FAILED,
-> > >                     "test_malloc failed, mmap_start: %p errno: %i",
-> > >                     region->mmap_start, errno);
-> > > diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
-> > > index 63d2bc7d757b..06ddde068736 100644
-> > > --- a/tools/testing/selftests/kvm/lib/test_util.c
-> > > +++ b/tools/testing/selftests/kvm/lib/test_util.c
-> > > @@ -168,70 +168,73 @@ size_t get_def_hugetlb_pagesz(void)
-> > >
-> > >  const struct vm_mem_backing_src_alias *vm_mem_backing_src_alias(uint32_t i)
-> > >  {
-> > > +       static const int anon_flags = MAP_PRIVATE | MAP_ANONYMOUS;
-> > > +       static const int anon_huge_flags = anon_flags | MAP_HUGETLB;
-> > > +
-> > >         static const struct vm_mem_backing_src_alias aliases[] = {
-> > >                 [VM_MEM_SRC_ANONYMOUS] = {
-> > >                         .name = "anonymous",
-> > > -                       .flag = 0,
-> > > +                       .flag = anon_flags,
-> > >                 },
-> > >                 [VM_MEM_SRC_ANONYMOUS_THP] = {
-> > >                         .name = "anonymous_thp",
-> > > -                       .flag = 0,
-> > > +                       .flag = anon_flags,
-> > >                 },
-> > >                 [VM_MEM_SRC_ANONYMOUS_HUGETLB] = {
-> > >                         .name = "anonymous_hugetlb",
-> > > -                       .flag = MAP_HUGETLB,
-> > > +                       .flag = anon_huge_flags,
-> > >                 },
-> > >                 [VM_MEM_SRC_ANONYMOUS_HUGETLB_16KB] = {
-> > >                         .name = "anonymous_hugetlb_16kb",
-> > > -                       .flag = MAP_HUGETLB | MAP_HUGE_16KB,
-> > > +                       .flag = anon_huge_flags | MAP_HUGE_16KB,
-> > >                 },
-> > >                 [VM_MEM_SRC_ANONYMOUS_HUGETLB_64KB] = {
-> > >                         .name = "anonymous_hugetlb_64kb",
-> > > -                       .flag = MAP_HUGETLB | MAP_HUGE_64KB,
-> > > +                       .flag = anon_huge_flags | MAP_HUGE_64KB,
-> > >                 },
-> > >                 [VM_MEM_SRC_ANONYMOUS_HUGETLB_512KB] = {
-> > >                         .name = "anonymous_hugetlb_512kb",
-> > > -                       .flag = MAP_HUGETLB | MAP_HUGE_512KB,
-> > > +                       .flag = anon_huge_flags | MAP_HUGE_512KB,
-> > >                 },
-> > >                 [VM_MEM_SRC_ANONYMOUS_HUGETLB_1MB] = {
-> > >                         .name = "anonymous_hugetlb_1mb",
-> > > -                       .flag = MAP_HUGETLB | MAP_HUGE_1MB,
-> > > +                       .flag = anon_huge_flags | MAP_HUGE_1MB,
-> > >                 },
-> > >                 [VM_MEM_SRC_ANONYMOUS_HUGETLB_2MB] = {
-> > >                         .name = "anonymous_hugetlb_2mb",
-> > > -                       .flag = MAP_HUGETLB | MAP_HUGE_2MB,
-> > > +                       .flag = anon_huge_flags | MAP_HUGE_2MB,
-> > >                 },
-> > >                 [VM_MEM_SRC_ANONYMOUS_HUGETLB_8MB] = {
-> > >                         .name = "anonymous_hugetlb_8mb",
-> > > -                       .flag = MAP_HUGETLB | MAP_HUGE_8MB,
-> > > +                       .flag = anon_huge_flags | MAP_HUGE_8MB,
-> > >                 },
-> > >                 [VM_MEM_SRC_ANONYMOUS_HUGETLB_16MB] = {
-> > >                         .name = "anonymous_hugetlb_16mb",
-> > > -                       .flag = MAP_HUGETLB | MAP_HUGE_16MB,
-> > > +                       .flag = anon_huge_flags | MAP_HUGE_16MB,
-> > >                 },
-> > >                 [VM_MEM_SRC_ANONYMOUS_HUGETLB_32MB] = {
-> > >                         .name = "anonymous_hugetlb_32mb",
-> > > -                       .flag = MAP_HUGETLB | MAP_HUGE_32MB,
-> > > +                       .flag = anon_huge_flags | MAP_HUGE_32MB,
-> > >                 },
-> > >                 [VM_MEM_SRC_ANONYMOUS_HUGETLB_256MB] = {
-> > >                         .name = "anonymous_hugetlb_256mb",
-> > > -                       .flag = MAP_HUGETLB | MAP_HUGE_256MB,
-> > > +                       .flag = anon_huge_flags | MAP_HUGE_256MB,
-> > >                 },
-> > >                 [VM_MEM_SRC_ANONYMOUS_HUGETLB_512MB] = {
-> > >                         .name = "anonymous_hugetlb_512mb",
-> > > -                       .flag = MAP_HUGETLB | MAP_HUGE_512MB,
-> > > +                       .flag = anon_huge_flags | MAP_HUGE_512MB,
-> > >                 },
-> > >                 [VM_MEM_SRC_ANONYMOUS_HUGETLB_1GB] = {
-> > >                         .name = "anonymous_hugetlb_1gb",
-> > > -                       .flag = MAP_HUGETLB | MAP_HUGE_1GB,
-> > > +                       .flag = anon_huge_flags | MAP_HUGE_1GB,
-> > >                 },
-> > >                 [VM_MEM_SRC_ANONYMOUS_HUGETLB_2GB] = {
-> > >                         .name = "anonymous_hugetlb_2gb",
-> > > -                       .flag = MAP_HUGETLB | MAP_HUGE_2GB,
-> > > +                       .flag = anon_huge_flags | MAP_HUGE_2GB,
-> > >                 },
-> > >                 [VM_MEM_SRC_ANONYMOUS_HUGETLB_16GB] = {
-> > >                         .name = "anonymous_hugetlb_16gb",
-> > > -                       .flag = MAP_HUGETLB | MAP_HUGE_16GB,
-> > > +                       .flag = anon_huge_flags | MAP_HUGE_16GB,
-> > >                 },
-> > >         };
-> > >         _Static_assert(ARRAY_SIZE(aliases) == NUM_SRC_TYPES,
-> > > --
-> > > 2.31.1.751.gd2f1c929bd-goog
-> > >
+>  	atomic_t lru_slot;
+>  	int used_slots;
+>  	struct kvm_memory_slot memslots[];
+
+...
+
+> @@ -1097,14 +1095,16 @@ static int kvm_alloc_dirty_bitmap(struct kvm_memory_slot *memslot)
+>  /*
+>   * Delete a memslot by decrementing the number of used slots and shifting all
+>   * other entries in the array forward one spot.
+> + * @memslot is a detached dummy struct with just .id and .as_id filled.
+>   */
+>  static inline void kvm_memslot_delete(struct kvm_memslots *slots,
+>  				      struct kvm_memory_slot *memslot)
+>  {
+>  	struct kvm_memory_slot *mslots = slots->memslots;
+> +	struct kvm_memory_slot *dmemslot = id_to_memslot(slots, memslot->id);
+
+I vote to call these local vars "old", or something along those lines.  dmemslot
+isn't too bad, but mmemslot in the helpers below is far too similar to memslot,
+and using the wrong will cause nasty explosions.
+
+>  	int i;
+>  
+> -	if (WARN_ON(slots->id_to_index[memslot->id] == -1))
+> +	if (WARN_ON(!dmemslot))
+>  		return;
+>  
+>  	slots->used_slots--;
+> @@ -1112,12 +1112,13 @@ static inline void kvm_memslot_delete(struct kvm_memslots *slots,
+>  	if (atomic_read(&slots->lru_slot) >= slots->used_slots)
+>  		atomic_set(&slots->lru_slot, 0);
+>  
+> -	for (i = slots->id_to_index[memslot->id]; i < slots->used_slots; i++) {
+> +	for (i = dmemslot - mslots; i < slots->used_slots; i++) {
+> +		hash_del(&mslots[i].id_node);
+>  		mslots[i] = mslots[i + 1];
+> -		slots->id_to_index[mslots[i].id] = i;
+> +		hash_add(slots->id_hash, &mslots[i].id_node, mslots[i].id);
+>  	}
+> +	hash_del(&mslots[i].id_node);
+>  	mslots[i] = *memslot;
+> -	slots->id_to_index[memslot->id] = -1;
+>  }
+>  
+>  /*
+> @@ -1135,31 +1136,41 @@ static inline int kvm_memslot_insert_back(struct kvm_memslots *slots)
+>   * itself is not preserved in the array, i.e. not swapped at this time, only
+>   * its new index into the array is tracked.  Returns the changed memslot's
+>   * current index into the memslots array.
+> + * The memslot at the returned index will not be in @slots->id_hash by then.
+> + * @memslot is a detached struct with desired final data of the changed slot.
+>   */
+>  static inline int kvm_memslot_move_backward(struct kvm_memslots *slots,
+>  					    struct kvm_memory_slot *memslot)
+>  {
+>  	struct kvm_memory_slot *mslots = slots->memslots;
+> +	struct kvm_memory_slot *mmemslot = id_to_memslot(slots, memslot->id);
+>  	int i;
+>  
+> -	if (WARN_ON_ONCE(slots->id_to_index[memslot->id] == -1) ||
+> +	if (WARN_ON_ONCE(!mmemslot) ||
+>  	    WARN_ON_ONCE(!slots->used_slots))
+>  		return -1;
+>  
+> +	/*
+> +	 * update_memslots() will unconditionally overwrite and re-add the
+> +	 * target memslot so it has to be removed here firs
+> +	 */
+
+It would be helpful to explain "why" this is necessary.  Something like:
+
+	/*
+	 * The memslot is being moved, delete its previous hash entry; its new
+	 * entry will be added by updated_memslots().  The old entry cannot be
+	 * kept even though its id is unchanged, because the old entry points at
+	 * the memslot in the old instance of memslots.
+	 */
+
+> +	hash_del(&mmemslot->id_node);
+> +
+>  	/*
+>  	 * Move the target memslot backward in the array by shifting existing
+>  	 * memslots with a higher GFN (than the target memslot) towards the
+>  	 * front of the array.
+>  	 */
+> -	for (i = slots->id_to_index[memslot->id]; i < slots->used_slots - 1; i++) {
+> +	for (i = mmemslot - mslots; i < slots->used_slots - 1; i++) {
+>  		if (memslot->base_gfn > mslots[i + 1].base_gfn)
+>  			break;
+>  
+>  		WARN_ON_ONCE(memslot->base_gfn == mslots[i + 1].base_gfn);
+>  
+>  		/* Shift the next memslot forward one and update its index. */
+> +		hash_del(&mslots[i + 1].id_node);
+>  		mslots[i] = mslots[i + 1];
+> -		slots->id_to_index[mslots[i].id] = i;
+> +		hash_add(slots->id_hash, &mslots[i].id_node, mslots[i].id);
+>  	}
+>  	return i;
+>  }
+> @@ -1170,6 +1181,10 @@ static inline int kvm_memslot_move_backward(struct kvm_memslots *slots,
+>   * is not preserved in the array, i.e. not swapped at this time, only its new
+>   * index into the array is tracked.  Returns the changed memslot's final index
+>   * into the memslots array.
+> + * The memslot at the returned index will not be in @slots->id_hash by then.
+> + * @memslot is a detached struct with desired final data of the new or
+> + * changed slot.
+> + * Assumes that the memslot at @start index is not in @slots->id_hash.
+>   */
+>  static inline int kvm_memslot_move_forward(struct kvm_memslots *slots,
+>  					   struct kvm_memory_slot *memslot,
+> @@ -1185,8 +1200,9 @@ static inline int kvm_memslot_move_forward(struct kvm_memslots *slots,
+>  		WARN_ON_ONCE(memslot->base_gfn == mslots[i - 1].base_gfn);
+>  
+>  		/* Shift the next memslot back one and update its index. */
+> +		hash_del(&mslots[i - 1].id_node);
+>  		mslots[i] = mslots[i - 1];
+> -		slots->id_to_index[mslots[i].id] = i;
+> +		hash_add(slots->id_hash, &mslots[i].id_node, mslots[i].id);
+>  	}
+>  	return i;
+>  }
+> @@ -1231,6 +1247,9 @@ static inline int kvm_memslot_move_forward(struct kvm_memslots *slots,
+>   * most likely to be referenced, sorting it to the front of the array was
+>   * advantageous.  The current binary search starts from the middle of the array
+>   * and uses an LRU pointer to improve performance for all memslots and GFNs.
+> + *
+> + * @memslot is a detached struct, not a part of the current or new memslot
+> + * array.
+>   */
+>  static void update_memslots(struct kvm_memslots *slots,
+>  			    struct kvm_memory_slot *memslot,
+> @@ -1247,12 +1266,16 @@ static void update_memslots(struct kvm_memslots *slots,
+>  			i = kvm_memslot_move_backward(slots, memslot);
+>  		i = kvm_memslot_move_forward(slots, memslot, i);
+>  
+> +		if (i < 0)
+> +			return;
+
+Hmm, this is essentially a "fix" to existing code, it should be in a separate
+patch.  And since kvm_memslot_move_forward() can theoretically hit this even if
+kvm_memslot_move_backward() doesn't return -1, i.e. doesn't WARN, what about
+doing WARN_ON_ONCE() here and dropping the WARNs in kvm_memslot_move_backward()?
+It'll be slightly less developer friendly, but anyone that has the unfortunate
+pleasure of breaking and debugging this code is already in for a world of pain.
+
+> +
+>  		/*
+>  		 * Copy the memslot to its new position in memslots and update
+>  		 * its index accordingly.
+>  		 */
+>  		slots->memslots[i] = *memslot;
+> -		slots->id_to_index[memslot->id] = i;
+> +		hash_add(slots->id_hash, &slots->memslots[i].id_node,
+> +			 memslot->id);
+>  	}
+>  }
+>  
+> @@ -1316,6 +1339,7 @@ static struct kvm_memslots *kvm_dup_memslots(struct kvm_memslots *old,
+>  {
+>  	struct kvm_memslots *slots;
+>  	size_t old_size, new_size;
+> +	struct kvm_memory_slot *memslot;
+>  
+>  	old_size = sizeof(struct kvm_memslots) +
+>  		   (sizeof(struct kvm_memory_slot) * old->used_slots);
+> @@ -1326,8 +1350,14 @@ static struct kvm_memslots *kvm_dup_memslots(struct kvm_memslots *old,
+>  		new_size = old_size;
+>  
+>  	slots = kvzalloc(new_size, GFP_KERNEL_ACCOUNT);
+> -	if (likely(slots))
+> -		memcpy(slots, old, old_size);
+> +	if (unlikely(!slots))
+> +		return NULL;
+> +
+> +	memcpy(slots, old, old_size);
+> +
+> +	hash_init(slots->id_hash);
+> +	kvm_for_each_memslot(memslot, slots)
+> +		hash_add(slots->id_hash, &memslot->id_node, memslot->id);
+
+What's the perf penalty if the number of memslots gets large?  I ask because the
+lazy rmap allocation is adding multiple calls to kvm_dup_memslots().
+
+>  	return slots;
+>  }
