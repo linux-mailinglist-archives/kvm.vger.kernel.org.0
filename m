@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B8737388692
-	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 07:33:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C55BD388696
+	for <lists+kvm@lfdr.de>; Wed, 19 May 2021 07:34:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232573AbhESFfB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 May 2021 01:35:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60202 "EHLO
+        id S242557AbhESFfX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 May 2021 01:35:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237940AbhESFev (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 May 2021 01:34:51 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64372C061347
-        for <kvm@vger.kernel.org>; Tue, 18 May 2021 22:33:10 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id b9-20020a17090a9909b029015cf9effaeaso2859889pjp.5
-        for <kvm@vger.kernel.org>; Tue, 18 May 2021 22:33:10 -0700 (PDT)
+        with ESMTP id S241100AbhESFe7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 May 2021 01:34:59 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EB11C061760
+        for <kvm@vger.kernel.org>; Tue, 18 May 2021 22:33:38 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id s19so6861469pfe.8
+        for <kvm@vger.kernel.org>; Tue, 18 May 2021 22:33:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=ArOATr+a0hXgg0J/jDFFZIaPxMAnGoAVL6O4IK6IU5Q=;
-        b=PA5YOTA74ZqK4ihTbqvYrO6pwXRBFTcGA+K8i1355p/H2iLpC5IVs6RWKWmEK9hNr4
-         MMoc7u6cNDNhMU90PHJtcMwv0OXFRITfQt2V/tARKcNKdN+SVhTce09sc/HC6YWJEvzW
-         IMsZC/cKydRDZ+G23T3Ht7TkYV7vB8h0OHjQuaUuEsg5jpbMtEJPo0phnwLg8C8m+5hu
-         BFDWqPxcF8bysY5K5aCCPUkYnNHB9gbqr/l2YUruyQ/udBaBNJGuVORCP7m9UW14uFSB
-         SNmD2kkEejOExEFCj8qCoHFVMbmRwxCmtZWqv4GMRA/dUZqFnTfuMRHvqe6YMqq12qbO
-         Zwow==
+        bh=+Y3UOQMDJrIHJSBrGqM/NIVAlOdJSyvl9tA8WHC3cmA=;
+        b=JynZLQlWZQBwwqP5hYqHmLnoiPN0RNcy6kEBdRtKlCnVUOus8b4BEbWLOq+haYfyBA
+         HA/CYS7kpl/VZbidtBOdWm0Tdum8xxFHr6456BP1oZnMBf70tNZ1gQKYWz4w/bI4Ysaq
+         WsBdNAF59UxKYmn6KAuA1au6/ZrAhEMNkwlTiWCYRop2uxJ6cWxjTPGfAP3zfIjHQl/w
+         8OhCQXf/7yx9Ww1t2oZjDwTPM15QsGF27qtzhAgzVY8JAdO3ysbtxWUZ5x0DL7GpDgHI
+         gqp12w3X75qiJJoQqQ+9J7RGHJhFFxCTmSj4rFFoLWbvYWRS2ou0b8XXwzeKzPGxocEm
+         VJvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=ArOATr+a0hXgg0J/jDFFZIaPxMAnGoAVL6O4IK6IU5Q=;
-        b=el6/Fi3M4b3OLCNiAl2+YuKDmPh88LCsm91jO64fII2O2EG5w+f7SBYkoRx74fVDiC
-         pBIhUstwO9anwPjYJ3cLZQG1yu1tWVlUtcr3gGknUnzXwJ/95gMPg2CLHaHDtlf6/aI5
-         CYbe1a8+ljyVPbj/fkf+Cy70C6OrQKkyzwVCQEKdQkZ2QkXwAD8+CNupTGGGzs4U+Ann
-         aHlrc16YduZg3JJnpfE/JAG4uszZBH8Rfx7N9RyUv4lcYxH3pirlnLtOWESTYTUP2Z7l
-         Zbx5WFcVJJUKjbRvDyNoK4uEok/LEdD2Et6OAOSYhZFSwzL9yi4eGZ+33BIPyQ7jXqv2
-         uj0A==
-X-Gm-Message-State: AOAM5302pFqjvcuXDB3DGU8o68w+JMcQFQ0f+u6XuPL5R8D557gngcmS
-        yidLf9OCH73jh02Hfmf6cD6iWRpgZ6DeLl6eJVU6/g==
-X-Google-Smtp-Source: ABdhPJwgB/PikSymdwEqi0NsFKS6ad6C5UPBpSBjvW7I4YRC2SriqOp2m3HIhoEvlTgLuxjqp+CO+8H/9EX5oh8nCjQ=
-X-Received: by 2002:a17:90a:6f06:: with SMTP id d6mr9671757pjk.216.1621402389903;
- Tue, 18 May 2021 22:33:09 -0700 (PDT)
+        bh=+Y3UOQMDJrIHJSBrGqM/NIVAlOdJSyvl9tA8WHC3cmA=;
+        b=fD8kvNUkNriQteWzGNDMCNN3PUEfP2fENhVbBdA/ZnyRjYnOZaXugE6wpSZNOHKy2w
+         2pcyaqTJPYjfCbSOEvRCMWLP90r7tAiHBQqYQqDTFG0+p19QfrjWSComDDQJ5rVy8Fgz
+         9FRvO5tWWcsuxFSbzeQinmvZ9AKXiQIOW0ZtJ6suRmzlJ8JNXNH0IG6mJYgN0OKHi5VE
+         Wk2SwQqAtU9EQlFgdHAKVJxoPmXtEJB5NgXYaDdi1pUVzpaBJewi9rVlecuj+wKm8rhi
+         FxW41u7D818PqUHv/KjnabVIMeo/xf/1HXidjMBh6yvzydGmsu1FEhMw7MiH0yConDrA
+         Ur0g==
+X-Gm-Message-State: AOAM530S/bjnlGdCk8hFyKawlS+DmkhhIzMJXgdRitr2LLwHxL8yAkDs
+        RmAs0hx8kWM8pEM1abxFmg5XNcA4ZUnXHT6ywuhjnA==
+X-Google-Smtp-Source: ABdhPJxEpGdn8uDQgZB68gD6XEM3ujleyCYvAVmHX+ZY3gNi5+YKNX+sOlddWkZtc9R+yRESKvqm6MS+N+5T8M4wqAI=
+X-Received: by 2002:a65:61a8:: with SMTP id i8mr9092980pgv.271.1621402418048;
+ Tue, 18 May 2021 22:33:38 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210424004645.3950558-1-seanjc@google.com> <20210424004645.3950558-10-seanjc@google.com>
-In-Reply-To: <20210424004645.3950558-10-seanjc@google.com>
+References: <20210424004645.3950558-1-seanjc@google.com> <20210424004645.3950558-11-seanjc@google.com>
+In-Reply-To: <20210424004645.3950558-11-seanjc@google.com>
 From:   Reiji Watanabe <reijiw@google.com>
-Date:   Tue, 18 May 2021 22:32:54 -0700
-Message-ID: <CAAeT=FzKr2s60gh8ejqLwk92WySwEv_Ooa1se3g0WDP=qu7yiA@mail.gmail.com>
-Subject: Re: [PATCH 09/43] KVM: SVM: Drop a redundant init_vmcb() from svm_create_vcpu()
+Date:   Tue, 18 May 2021 22:33:22 -0700
+Message-ID: <CAAeT=Fxr_xvfVDcW5ivtbDo2jqPSSy8wKTSrg2xVHROaD029sg@mail.gmail.com>
+Subject: Re: [PATCH 10/43] KVM: VMX: Move init_vmcs() invocation to vmx_vcpu_reset()
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -64,12 +64,19 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Apr 23, 2021 at 5:48 PM Sean Christopherson <seanjc@google.com> wrote:
 >
-> Drop an extra init_vmcb() from svm_create_vcpu(), svm_vcpu_reset() is
-> guaranteed to call init_vmcb() and there are no consumers of the VMCB
-> data between ->vcpu_create() and ->vcpu_reset().  Keep the call to
-> svm_switch_vmcb() as sev_es_create_vcpu() touches the current VMCB, but
-> hoist it up a few lines to associate the switch with the allocation of
-> vmcb01.
+> Initialize constant VMCS state in vcpu_vcpu_reset() instead of in
+> vmx_vcpu_create(), which allows for the removal of the open coded "vCPU
+> load" sequence since ->vcpu_reset() is invoked while the vCPU is properly
+> loaded (which is the entire point of vCPU reset...).
+>
+> Deferring initialization is effectively a nop as it's impossible to
+> safely access the VMCS between the current call site and its new home, as
+> both the vCPU and the pCPU are put immediately after init_vmcs(), i.e.
+> the VMCS isn't guaranteed to be loaded.
+>
+> Note, task preemption is not a problem as vmx_sched_in() _can't_ touch
+> the VMCS as ->sched_in() is invoked before the vCPU, and thus VMCS, is
+> reloaded.  I.e. the preemption path also can't consume VMCS state.
 >
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 
