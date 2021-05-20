@@ -2,141 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC8A938B92C
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 23:47:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C59C38B942
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 23:57:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230487AbhETVtN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 May 2021 17:49:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60257 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230521AbhETVtN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 20 May 2021 17:49:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621547270;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XC8hTTPMnhJA7WoqcGgeVhcdrCpAnq7g7eLCDPc50o8=;
-        b=Lpbr1y8VkKtGX4o6kvfhak6zYUvJOnHeX7iviyjsH8zxCvFDBcop+BUINSJL2LU2jKi9b9
-        urpT7k1ewjzdr83S05Z055pNN3IQNZEZXMVSaLD2a2VsulaVS5PGy4QXR/whvjdh+rfgLR
-        x6HZKxV1WO0YfgkepzlGCIKujPVxpyU=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-504-ZvsfezEsOVOtJJAekF6jwg-1; Thu, 20 May 2021 17:47:48 -0400
-X-MC-Unique: ZvsfezEsOVOtJJAekF6jwg-1
-Received: by mail-qv1-f70.google.com with SMTP id bc3-20020ad456830000b02901f47dbd7ef6so4487119qvb.6
-        for <kvm@vger.kernel.org>; Thu, 20 May 2021 14:47:48 -0700 (PDT)
+        id S230460AbhETV6c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 17:58:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44654 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230382AbhETV6c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 May 2021 17:58:32 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9894C061574
+        for <kvm@vger.kernel.org>; Thu, 20 May 2021 14:57:09 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id 131so21647792ljj.3
+        for <kvm@vger.kernel.org>; Thu, 20 May 2021 14:57:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=UJfWB1VaJBJ5Yl+QHokcIZ37jKWO4lVzBlah/HAG0zs=;
+        b=lSeatsn4/9ZkhuXtAWV046PYUuww8IX7iO77h/TKv6Zl2d7TMHPf2yQm8vm2gPkERj
+         bT0RX99GH8Evp3kXku/7uNZydTZEzsaDbkGRmLAFp2bWnbGfi8J1cNuXP82X+s2Aqe1y
+         qRkDJvTbg6+pNL+RMIF6r6wXC893wyhq6BaFzsyIksW9564A3yA/QaNfSqkGlAIMe8pz
+         f1Y+JWmTkrYOPBgIYATt0pgIok0wWIqA+QTsYnR5bhW0APHCz0+3pQLjlbQT0lR5DrwE
+         X1NTXv6PGgaSVM7+2pB+HPOHRISWYRruCQ5JuCeiWdlz9NrQj3uDAw2O/0J/TbZKP1tz
+         uMYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=XC8hTTPMnhJA7WoqcGgeVhcdrCpAnq7g7eLCDPc50o8=;
-        b=plxUuAExrFzBPWePlYreGe4F6HkmcS//KZpqxkMggrUSt9VTmvQ/ka5vf8Fb5CinUZ
-         9svL0NmKxNbh8jZWYdeGW8kMsU31gmYXMRH20ze1QTrbVC3f5xbctV4ilmQ2L5tdQkz8
-         feiJo46SvPHc8UP3eOQTE6RtmG2ubjDXvMqc9SDqr++/30xI1LcPZ6RM96wkfRp6UWSZ
-         +V3+wLGfL0K38OgEvW9UWAacvlhChYaJF1nyWFa6z0488N8HNLd+d21VX+Klmh6EK4SR
-         +ma3g8KEVz7vF1VPMid8xRg2PnAIkzarddaaB/2l1eLNQoCQoTNVzr/AJBL3qHiI4qxQ
-         BbEA==
-X-Gm-Message-State: AOAM5339m+ol7c5fW2bXITGCkyUSUBEfa/8z6ciOVOwqWKFO59remPkN
-        idGLVzE9fCmCwBN2wXq1cDuG5o3tL8O2mpM3fWiQmIJZClgE2P6bKzYafgTFHghllBVrvX53KE2
-        ow8oomqJ8x/hC
-X-Received: by 2002:a05:622a:164d:: with SMTP id y13mr7301966qtj.375.1621547268239;
-        Thu, 20 May 2021 14:47:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxU6KMp3v91B7x/r5MrQsSpt9F0xVg6ZTTOowq6G6Fz6sfjOmn1ALHhmUeCyiWhe8ab7nmxgA==
-X-Received: by 2002:a05:622a:164d:: with SMTP id y13mr7301934qtj.375.1621547267912;
-        Thu, 20 May 2021 14:47:47 -0700 (PDT)
-Received: from t490s (bras-base-toroon474qw-grc-72-184-145-4-219.dsl.bell.ca. [184.145.4.219])
-        by smtp.gmail.com with ESMTPSA id b17sm3192261qka.94.2021.05.20.14.47.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 May 2021 14:47:47 -0700 (PDT)
-Date:   Thu, 20 May 2021 17:47:45 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=UJfWB1VaJBJ5Yl+QHokcIZ37jKWO4lVzBlah/HAG0zs=;
+        b=CwFfShhGDQ54qzJTFdU/yn2vqTa2fBJ2Kj1RpyVlB4BzDG5lHte53j4Wofd07jw98H
+         igmJF7b7mGNDL3zpBzRm4Bbw++BFcYA3rEBbVFQQcshMYrGdGAC7MISHCD0vqVK95d6X
+         KgfABEBD3qeZs/K7YvPFNadBBTFAM1Hmtr805W67OpLNaLqLMWVFngbpoA345Yx11ILR
+         nIIUweLadpTR3CXx/stuvpvD9wzlrWWlxSOzdIlAmmSq2IqEdYyQBmzN000CsXzaAupa
+         3+am739RdlbSAhUNWwxziQNenMHNbMLyOH9oNrNxbONotxITn972YHzuGzN99aohRbkx
+         RpFg==
+X-Gm-Message-State: AOAM533OZecnchJOyW4hMA1FYTCQ55dbx2YbjJl6gD7MBUtXOtsv0AQD
+        9IRvaVOKhBrztn6agDG4MIlf8ec+Bx6AnOzXUTPMkh0cgdUGEIi5
+X-Google-Smtp-Source: ABdhPJxAdXxF34xt+PyKInuXQv69lGYbvbOnCpPE34cFqJyxvoSNjIjxZMPhEuK6QiCwlSvBguywJcKkwIH/xoCaqSk=
+X-Received: by 2002:a2e:5d7:: with SMTP id 206mr4604219ljf.448.1621547827692;
+ Thu, 20 May 2021 14:57:07 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210520212654.712276-1-dmatlack@google.com> <YKbZAT/cE5SobbGX@t490s>
+In-Reply-To: <YKbZAT/cE5SobbGX@t490s>
+From:   David Matlack <dmatlack@google.com>
+Date:   Thu, 20 May 2021 14:56:41 -0700
+Message-ID: <CALzav=dixRORFDyeaj67=SyXko9t++qGgnCJrhWD7bBKqz_3mA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: selftests: Fix 32-bit truncation of vm_get_max_gfn()
+To:     Peter Xu <peterx@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Andrew Jones <drjones@redhat.com>,
         Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH] KVM: selftests: Fix 32-bit truncation of vm_get_max_gfn()
-Message-ID: <YKbZAT/cE5SobbGX@t490s>
-References: <20210520212654.712276-1-dmatlack@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210520212654.712276-1-dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 20, 2021 at 09:26:54PM +0000, David Matlack wrote:
-> vm_get_max_gfn() casts vm->max_gfn from a uint64_t to an unsigned int,
-> which causes the upper 32-bits of the max_gfn to get truncated.
-> 
-> Nobody noticed until now likely because vm_get_max_gfn() is only used
-> as a mechanism to create a memslot in an unused region of the guest
-> physical address space (the top), and the top of the 32-bit physical
-> address space was always good enough.
+On Thu, May 20, 2021 at 2:47 PM Peter Xu <peterx@redhat.com> wrote:
+>
+> On Thu, May 20, 2021 at 09:26:54PM +0000, David Matlack wrote:
+> > vm_get_max_gfn() casts vm->max_gfn from a uint64_t to an unsigned int,
+> > which causes the upper 32-bits of the max_gfn to get truncated.
+> >
+> > Nobody noticed until now likely because vm_get_max_gfn() is only used
+> > as a mechanism to create a memslot in an unused region of the guest
+> > physical address space (the top), and the top of the 32-bit physical
+> > address space was always good enough.
+>
+> s/top/bottom/?
 
-s/top/bottom/?
+I guess it depends on your reference point :). The existing comments
+under tools/testing/selftests/kvm use the convention that "top" ==
+high addresses.
 
-Looks right.. thanks for fixing it!
+>
+> Looks right.. thanks for fixing it!
+>
+> >
+> > This fix reveals a bug in memslot_modification_stress_test which was
+> > trying to create a dummy memslot past the end of guest physical memory.
+> > Fix that by moving the dummy memslot lower.
+>
+> Would it be better to split the different fixes?
 
-> 
-> This fix reveals a bug in memslot_modification_stress_test which was
-> trying to create a dummy memslot past the end of guest physical memory.
-> Fix that by moving the dummy memslot lower.
+I'm fine either way. I figured the net delta was small enough and the
+fixes tightly coupled so sending as one patch made the most sense. Is
+there value in splitting this up?
 
-Would it be better to split the different fixes?
+>
+> >
+> > Fixes: 52200d0d944e ("KVM: selftests: Remove duplicate guest mode handling")
+> > Signed-off-by: David Matlack <dmatlack@google.com>
+> > ---
+> >  tools/testing/selftests/kvm/include/kvm_util.h |  2 +-
+> >  tools/testing/selftests/kvm/lib/kvm_util.c     |  2 +-
+> >  .../testing/selftests/kvm/lib/perf_test_util.c |  2 +-
+> >  .../kvm/memslot_modification_stress_test.c     | 18 +++++++++++-------
+> >  4 files changed, 14 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> > index 84982eb02b29..5d9b35d09251 100644
+> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> > @@ -303,7 +303,7 @@ bool vm_is_unrestricted_guest(struct kvm_vm *vm);
+> >
+> >  unsigned int vm_get_page_size(struct kvm_vm *vm);
+> >  unsigned int vm_get_page_shift(struct kvm_vm *vm);
+> > -unsigned int vm_get_max_gfn(struct kvm_vm *vm);
+> > +uint64_t vm_get_max_gfn(struct kvm_vm *vm);
+> >  int vm_get_fd(struct kvm_vm *vm);
+> >
+> >  unsigned int vm_calc_num_guest_pages(enum vm_guest_mode mode, size_t size);
+> > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > index 1af1009254c4..aeffbb1e7c7d 100644
+> > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > @@ -2058,7 +2058,7 @@ unsigned int vm_get_page_shift(struct kvm_vm *vm)
+> >       return vm->page_shift;
+> >  }
+> >
+> > -unsigned int vm_get_max_gfn(struct kvm_vm *vm)
+> > +uint64_t vm_get_max_gfn(struct kvm_vm *vm)
+> >  {
+> >       return vm->max_gfn;
+> >  }
+> > diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> > index 81490b9b4e32..ed4424ed26d6 100644
+> > --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
+> > +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> > @@ -80,7 +80,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
+> >        */
+> >       TEST_ASSERT(guest_num_pages < vm_get_max_gfn(vm),
+> >                   "Requested more guest memory than address space allows.\n"
+> > -                 "    guest pages: %lx max gfn: %x vcpus: %d wss: %lx]\n",
+> > +                 "    guest pages: %lx max gfn: %lx vcpus: %d wss: %lx]\n",
+>
+> If to fix it, maybe start to use PRIu64 (and include inttypes.h)?
 
-> 
-> Fixes: 52200d0d944e ("KVM: selftests: Remove duplicate guest mode handling")
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
->  tools/testing/selftests/kvm/include/kvm_util.h |  2 +-
->  tools/testing/selftests/kvm/lib/kvm_util.c     |  2 +-
->  .../testing/selftests/kvm/lib/perf_test_util.c |  2 +-
->  .../kvm/memslot_modification_stress_test.c     | 18 +++++++++++-------
->  4 files changed, 14 insertions(+), 10 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index 84982eb02b29..5d9b35d09251 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -303,7 +303,7 @@ bool vm_is_unrestricted_guest(struct kvm_vm *vm);
->  
->  unsigned int vm_get_page_size(struct kvm_vm *vm);
->  unsigned int vm_get_page_shift(struct kvm_vm *vm);
-> -unsigned int vm_get_max_gfn(struct kvm_vm *vm);
-> +uint64_t vm_get_max_gfn(struct kvm_vm *vm);
->  int vm_get_fd(struct kvm_vm *vm);
->  
->  unsigned int vm_calc_num_guest_pages(enum vm_guest_mode mode, size_t size);
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 1af1009254c4..aeffbb1e7c7d 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -2058,7 +2058,7 @@ unsigned int vm_get_page_shift(struct kvm_vm *vm)
->  	return vm->page_shift;
->  }
->  
-> -unsigned int vm_get_max_gfn(struct kvm_vm *vm)
-> +uint64_t vm_get_max_gfn(struct kvm_vm *vm)
->  {
->  	return vm->max_gfn;
->  }
-> diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> index 81490b9b4e32..ed4424ed26d6 100644
-> --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-> +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> @@ -80,7 +80,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
->  	 */
->  	TEST_ASSERT(guest_num_pages < vm_get_max_gfn(vm),
->  		    "Requested more guest memory than address space allows.\n"
-> -		    "    guest pages: %lx max gfn: %x vcpus: %d wss: %lx]\n",
-> +		    "    guest pages: %lx max gfn: %lx vcpus: %d wss: %lx]\n",
+Will do.
 
-If to fix it, maybe start to use PRIu64 (and include inttypes.h)?
+Thanks!
 
-Thanks,
-
--- 
-Peter Xu
-
+>
+> Thanks,
+>
+> --
+> Peter Xu
+>
