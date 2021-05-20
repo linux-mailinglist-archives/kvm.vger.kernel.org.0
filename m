@@ -2,188 +2,395 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B388138B8B5
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 23:04:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F06D638B8D9
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 23:14:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229865AbhETVFp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 May 2021 17:05:45 -0400
-Received: from mail-bn8nam08on2081.outbound.protection.outlook.com ([40.107.100.81]:40385
-        "EHLO NAM04-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229786AbhETVFn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 May 2021 17:05:43 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XxvR4xc79/nESrYNsqAPim+uUL07ppQW54ByPRykhO//Te1SHCrWPftubzpYVHWQOjYnJiY405VtOjBsHe1/LkUHlD13troy6wEXhBUT1IP24sE8uwLGXi/AUDbbDYh5b+zt82kzqDUPG6aUmq/kEOQBfZqtZCQOJOEvvUgHaexoKC3MmofXerAXnwClDwSmwvxct9f3rMLoC55hWG9PmTRAKOgycF8PtuD1rPdpufghmgAT8rmq2IYbpTfwbB1vdimgS/eO/D4lVXiBPmeGbpcR5l04aKAS6BFLc/yvBx2iVAS+OWJpROmQWPKVrrX1IUX+gNbX6THJb7DRe3iVaA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ruSa2mHq5k+sTvwXEwxC10Q5jUzmpxOswgvEzAWgI/w=;
- b=Yw8oQetf1rm9rKJfuneiZQ3h6xm3NrOhJfmszi13sqxc4LqMu5Ct861Z7s26Hu6J6Wc7XIg/BDvBMFLzPFpWWt0wvRd0e6bQmkoNLjyq1HdEhlSA7pcqet9bbu7sSJGR2uXyA8+pepPUp+F4KOsoYIyOecPzSHAJEo9YG2Xv1Jwk6qwjcUMBp6pe/vjL1r1dYuaRNdaJEizm9f5eC593pODZP72UiS27amIymtqwt30aim1lhBkgzGfw6TA+LIoOdH8uNm/H8PS/IeeUqxJrwz7I7+kRdjQ0LkEqqwAj2ojpMMwqje4qnCnbijP8pEjvm7dCgPw53+PpeaYPBXV3Mw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ruSa2mHq5k+sTvwXEwxC10Q5jUzmpxOswgvEzAWgI/w=;
- b=dv4nz752ldUp2U+pOkUG8gbnSz7YcsL7/p000m7n1onwEL/43HH46QsRFdLssUeLUYjLRBTUQ7TW2/R340hc/Oil3vk0nNg8r10AFXxzPJveZXg4R8WUcJydK/+g7/pFBo7T0lfVLhXC0/OY4T+Jc2BCBKK3ErN4DnrnBis5+LA=
-Authentication-Results: amd.com; dkim=none (message not signed)
- header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM6PR12MB3180.namprd12.prod.outlook.com (2603:10b6:5:182::28) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4129.28; Thu, 20 May 2021 21:04:19 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::b914:4704:ad6f:aba9]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::b914:4704:ad6f:aba9%12]) with mapi id 15.20.4129.033; Thu, 20 May
- 2021 21:04:19 +0000
-Subject: Re: [PATCH] KVM: SVM: Do not terminate SEV-ES guests on GHCB
- validation failure
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Peter Gonda <pgonda@google.com>, kvm list <kvm@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Brijesh Singh <brijesh.singh@amd.com>
-References: <f8811b3768c4306af7fb2732b6b3755489832c55.1621020158.git.thomas.lendacky@amd.com>
- <CAMkAt6qJqTvM0PX+ja3rLP3toY-Rr4pSUbiFKL1GwzYZPG6f8g@mail.gmail.com>
- <324d9228-03e9-0fe2-59c0-5e41e449211b@amd.com> <YKa1jduPK9JyjWbx@google.com>
- <YKa4I0cs/8lyy0fN@google.com> <YKbE7m40GnSRZsr1@google.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <8f500f3d-d3a8-c873-50b0-d3cc72ddb372@amd.com>
-Date:   Thu, 20 May 2021 16:04:16 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
-In-Reply-To: <YKbE7m40GnSRZsr1@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [67.79.209.213]
-X-ClientProxiedBy: SN6PR04CA0088.namprd04.prod.outlook.com
- (2603:10b6:805:f2::29) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+        id S230071AbhETVQF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 17:16:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35078 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230062AbhETVQE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 May 2021 17:16:04 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F713C0613ED
+        for <kvm@vger.kernel.org>; Thu, 20 May 2021 14:14:42 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id j10so26499413lfb.12
+        for <kvm@vger.kernel.org>; Thu, 20 May 2021 14:14:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zgjwN9rmESWkDTpYMJ9FM8+UKB/8PQhYuemaTNKdQrk=;
+        b=DCbSDwgjsDhUZ+fXPZEtYWpgw2XWNlgL9t3gofvO+yD0np9C9WPJ8Mt6VW+VwEgLwX
+         CZHiJSdX33FC6pnnlYwqdVAFpjRYXGSLRGW6bxxa4Lm2UBinnpluCzOOUIlzuh+N+Oai
+         0xSc1G3zTaFt+42mFRi4t9WCK66iMqqCKsoz1rIqSXp14uQFEfiuEj29yeRu3NcRbyuQ
+         PbtQUxgVUFMX1jHYrkywBi44mWNQ5YqInSlVYGb64u3Xlf0XDQvY/uTrTvYfC0zbKCce
+         cWJWx0/alKNavGRSegeQ/Z3lMYk+zoKGR4OiaufEowN+BJb52ke9FIbwGe0b6OxJM3bo
+         QVrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zgjwN9rmESWkDTpYMJ9FM8+UKB/8PQhYuemaTNKdQrk=;
+        b=VxQ7KYq2tNweV1n5t7yamY0oakq9215kj/pmncl+cg/+06nSq9rslhiiJ23U53jbY7
+         z/m9t936Fa7GNSRGEpOl6FH4zOmAv8qrebbVf9mPPD6Kp+aedpr0+eueA+jkcDiQXf94
+         r7zeJUcDZ/K7pht/fPTTluzjjYJt2braiAX2MZF1e2bQheJrJnYuZYJHXns+edIWZaOG
+         covW1oqf2C5PSVTqPdThtVjqp9463Xf07Lx4SLecgor0TBqWSyuirTfBS4m7Hf694TeF
+         /zqK69KIOKv9Wq4HG5oubJPa2MnFU49LtTbOVOrTcYPZAenf8g3tSup4amvpiz5Y0qVb
+         TjGA==
+X-Gm-Message-State: AOAM530pyfPCz+w8dQse9khMr0qYGmRS+qI8BRI1AVc6Mrza1n6dFAsl
+        wnQSAkQzo0YLrni0M8ERZALIRtTZrG9G8+fAajejQQ==
+X-Google-Smtp-Source: ABdhPJzMN05hahoYaYLreI7t+gMOonZGHNLcLzdVtYZR0Boy/2szfHvA8qACFgQc8n9lGnOJpVX4002x4Oyu+7Malhk=
+X-Received: by 2002:ac2:4919:: with SMTP id n25mr4402841lfi.646.1621545279862;
+ Thu, 20 May 2021 14:14:39 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from office-linux.texastahm.com (67.79.209.213) by SN6PR04CA0088.namprd04.prod.outlook.com (2603:10b6:805:f2::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4129.33 via Frontend Transport; Thu, 20 May 2021 21:04:18 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 51894b06-2a22-41ad-29c7-08d91bd2d5a4
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3180:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB3180E6CA97CD40C95557A747EC2A9@DM6PR12MB3180.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bulxzNuw0JJqtIz6ErmfsDT+MvL4fX8lM8kadMoybvFZEsm9ogwrNdaJPxiRHDZ2x6EWA8/J2FW+nQwkDqIVadJLBbtolog781hiC8Am3S+Xba/U0Nn8YDAHbY+ZF+VXEK8bFx3dsdLWn0koIoUCtWig2IGi/amoXMEIE8sXtwDQBYU3HkXcM/zflDzG25BCVIoSsWLexX8Ou71JXJPXOGtPjMbSB14IJWLD//xbHMg8hNC+34ZTAxheq5uO0xQieRTI+oXFnXl94SHThPeDQo+71vgCNIYY6uffP4naedQYWUpgTpKrxPgI3bCy4tDNCMMfb7PGGRcVVNzZuAbAudvpZCbY25/iF0JgddKYFikcs06YshSFJAlxndfrR36tUD9imx4EphqrViHsxxLzn3TkeZtHjYJ1JJoFl9ftOxAVw3ez9XJCjiFhKZ7VmNfFrREcKEW5mgGpEvOHY94hns4fcHNQT60E0XvDEQKR2JV+DStmzEczsSJF+5TDgr48Fq62dxGhiJ/sqFMrPJi+UYMi1LXmFjo1772qxYEK+Moog8nuiXsD4SVH20kHSSC1HfR6uND7RsmdfCRjyu4sVvKkkv6KArDtlIXH+dtd/UN5j9tpjJYbrw895quD11FH+oJPUL6yFm4of9q7WfiPupdxXQSz/lV+A8pSf1QdTm39xHcnf0e/vQmkckbFyOER
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39850400004)(376002)(366004)(346002)(136003)(396003)(26005)(6486002)(316002)(54906003)(8936002)(36756003)(7416002)(2906002)(83380400001)(38100700002)(31686004)(2616005)(66476007)(16526019)(6512007)(186003)(8676002)(6916009)(478600001)(31696002)(4326008)(53546011)(6506007)(66946007)(66556008)(956004)(5660300002)(86362001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?ZkhqajY0QTRBNHcrU0QwUHJNaGwreFN2VXgvRnFuYXl0blVMYmVyYTNMN0Zn?=
- =?utf-8?B?ajd4SEtCZGExQ1BCYis4U2NXd09QWHZVVEpKd1A4YS9NMVFyeVJkOWVGcHIy?=
- =?utf-8?B?ai9EaEFXc2phWTRmODc2dFlWM2RsTGdVUmZFZVJTQkJ4aUwwTm93WVhuVjlv?=
- =?utf-8?B?QllpZDFHNmFoamZYMU1pd0wyOGtXbS9JZUdUdmNjb29GM1B4eXNxUWo0b1hs?=
- =?utf-8?B?VitXN1J0T3pnLzNWdUhjaUhjOXo0OU54Zkd4TTduQXhRdEVaaTNrbEZ2SkI0?=
- =?utf-8?B?TXRiWEVVQmdKN0xONXMyME4xQU5GeUxVU2dHUHlwQUtYOS9aanNpcTBYNCtB?=
- =?utf-8?B?d3pQYnJRMDZVUXU5TW9wVFoxSjNKMnFvU2FvRGFEQnlZbGJ6dlJvbVdHc0xC?=
- =?utf-8?B?dmNDZ013SFJvTWRiSHVsZS9sN0VXaC9RYnIrNnFWcWdFc3lIRjBXa3g1OUxR?=
- =?utf-8?B?bHFscWQyRGtVMzcrUWtBVHdRRjQwVFhId3UyeGtkQVp5SEc5T2FBNXdSUmJ1?=
- =?utf-8?B?MUpNS3FWanNpdGUwd3lWallTMmEvTnd3QjFxMTdxZXlXbjJvVXhhdWNESE52?=
- =?utf-8?B?K1BzOTQ0SE9aSFpMK2N0TEVpS0xFMTFxTXR2TEpnOGxtNjJ6VWFNeHVZVVFp?=
- =?utf-8?B?bDY1WFdIa3gwSVNYNXVCUHpVMGdZVjRKSHcrY2VteURqRlAyRmRGTC9uZkNT?=
- =?utf-8?B?V1FDc1FOSEdlUndMZS9TSWtrQzNJaEkzM0VNWW04dlFmZnE3eXpobVp1d1l4?=
- =?utf-8?B?N3JOYys4UEtNSzJqTzI3eFgrdysrMmczdFIwTUhXS2NVSEtyOUZZZjl6d0lo?=
- =?utf-8?B?c08wMkU4Qk16Q01IbSsvaE0xdnJiMTBDLzFBT3l3WU04NzdHeEtuZ0srSE9M?=
- =?utf-8?B?bDJ6a3E0L2JWWW16Q1pVKy8yZlNQMldxUDdjMHdCbXkzaVdBZ3M2d1Qxa2Z5?=
- =?utf-8?B?endrYWdoNkZXQjVoeFpIVDFFNlZlUS9IcWRKaEp0RXFmRkNqVU9nR01IQUgw?=
- =?utf-8?B?SWhQQklLUHB5dEM5eXU4WlFkaktudVVqdFJWVGpOdFdJUG1FV2NZcHF6eFBt?=
- =?utf-8?B?bGdFV3l6QmNTTFczMjhTemNJLzJtdk9WZ0dJcExhdy9TaFY2Sk9EdjJ3V0JG?=
- =?utf-8?B?YXRad3NIMXJuaWg0VGNXNjRsbzdMUkNBUzhzZnVoVVJJTDIvZWoxbjZIY05z?=
- =?utf-8?B?aVVySDNTNnJoNDZSQ2JJNzJpejg5cjRJRnZYSnhVVTNtVWJac1JDR1ptNHUv?=
- =?utf-8?B?RjZ5MXZzSVNIY3kzV2g1ekwvRW1mNFdUd0dhaiszZ0w5T01rNkRlUUcxNFI1?=
- =?utf-8?B?Tk9ObmpJSFMyQ3JhQXJXSWV4d2RHKzZDUlpBd0drNWZudEhLc3A1WXh0OWow?=
- =?utf-8?B?UzE2TGJxdTUxWlZ5ZitFZWRjZDFYbE9ma2s1cC80djhLN2JDQUFKNHYyMUVh?=
- =?utf-8?B?d2ZZVUo0TTMxZU81MTdJQW5wS2lETUV4NUVxR0hEREVnNS9QNVU3NU1ucnJO?=
- =?utf-8?B?RFJRYUVaczZPUWs4UjhFMloxSlhnUlJFV0pybXU2aVlVSFRQYTJ0UHFjaDE3?=
- =?utf-8?B?MnpGbCs5VFpETWhUenRJMlo1UEd1V0ZackJWa0ZRN1VmdExZbTlzUFVsaTl0?=
- =?utf-8?B?TTlMdjJmQ2QwdEFUK1pTY2tIcXdybVJCc0lyN1FMUEs1SHZLWVl1NG1PS2Mw?=
- =?utf-8?B?ZFR1K0Z3ZVpNTW5acmE1T0h6bEZlRHJpRklWS2N6WnVvUmZOQVhCU2Rpa0Q1?=
- =?utf-8?Q?FSiSkCPkX2dzbVPi3jlObeSSFbj7ZF5KqZj3qdL?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 51894b06-2a22-41ad-29c7-08d91bd2d5a4
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2021 21:04:19.4182
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VJbAwnCqCROQBzCTn8owX+tFuSxSnnbcT0sywcg/feaA8huYJAKqzI3jphfeblfyNtGIUQYvIrxfWDPVLYys+A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3180
+References: <20210517145314.157626-1-jingzhangos@google.com>
+ <20210517145314.157626-3-jingzhangos@google.com> <YKXj3gHvUoLnojzB@google.com>
+ <CAAdAUtieAd6kvrXBNXc1TfO84ZxQ4xM30Z_G5F9CoT2gxeGrLA@mail.gmail.com>
+ <YKaxYZYQRp0/9f+A@google.com> <CAAdAUtiZxw9_qQ4eszsxSQmmL7j46LRhixL5zYttcOzL0da42Q@mail.gmail.com>
+ <YKbLsICiX4iI+0AB@google.com>
+In-Reply-To: <YKbLsICiX4iI+0AB@google.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Thu, 20 May 2021 16:14:27 -0500
+Message-ID: <CAAdAUtjBXykziWb2AR5=wb0sJMq9P4dL17X4m5O-nB6mZn1S_Q@mail.gmail.com>
+Subject: Re: [PATCH v5 2/4] KVM: stats: Add fd-based API to read binary stats data
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/20/21 3:22 PM, Sean Christopherson wrote:
-> On Thu, May 20, 2021, Sean Christopherson wrote:
->> On Thu, May 20, 2021, Sean Christopherson wrote:
->>> On Mon, May 17, 2021, Tom Lendacky wrote:
->>>> On 5/14/21 6:06 PM, Peter Gonda wrote:
->>>>> On Fri, May 14, 2021 at 1:22 PM Tom Lendacky <thomas.lendacky@amd.com> wrote:
->>>>>>
->>>>>> Currently, an SEV-ES guest is terminated if the validation of the VMGEXIT
->>>>>> exit code and parameters fail. Since the VMGEXIT instruction can be issued
->>>>>> from userspace, even though userspace (likely) can't update the GHCB,
->>>>>> don't allow userspace to be able to kill the guest.
->>>>>>
->>>>>> Return a #GP request through the GHCB when validation fails, rather than
->>>>>> terminating the guest.
->>>>>
->>>>> Is this a gap in the spec? I don't see anything that details what
->>>>> should happen if the correct fields for NAE are not set in the first
->>>>> couple paragraphs of section 4 'GHCB Protocol'.
->>>>
->>>> No, I don't think the spec needs to spell out everything like this. The
->>>> hypervisor is free to determine its course of action in this case.
->>>
->>> The hypervisor can decide whether to inject/return an error or kill the guest,
->>> but what errors can be returned and how they're returned absolutely needs to be
->>> ABI between guest and host, and to make the ABI vendor agnostic the GHCB spec
->>> is the logical place to define said ABI.
->>>
->>> For example, "injecting" #GP if the guest botched the GHCB on #VMGEXIT(CPUID) is
->>> completely nonsensical.  As is, a Linux guest appears to blindly forward the #GP,
->>> which means if something does go awry KVM has just made debugging the guest that
->>> much harder, e.g. imagine the confusion that will ensue if the end result is a
->>> SIGBUS to userspace on CPUID.
->>>
->>> There needs to be an explicit error code for "you gave me bad data", otherwise
->>> we're signing ourselves up for future pain.
->>
->> More concretely, I think the best course of action is to define a new return code
->> in SW_EXITINFO1[31:0], e.g. '2', with additional information in SW_EXITINFO2.
->>
->> In theory, an old-but-sane guest will interpret the unexpected return code as
->> fatal to whatever triggered the #VMGEXIT, e.g. SIGBUS to userspace.  Unfortunately
->> Linux isn't sane because sev_es_ghcb_hv_call() assumes any non-'1' result means
->> success, but that's trivial to fix and IMO should be fixed irrespective of where
->> this goes.
-> 
-> One last thing (hopefully): Erdem pointed out that if the GCHB GPA (or any
-> derferenced pointers within the GHCB) is invalid or is set to a private GPA
-> (mostly in the context of SNP) then the VMM will likely have no choice but to
-> kill the guest in response to #VMGEXIT.
-> 
-> It's probably a good idea to add a blurb in one of the specs explicitly calling
-> out that #VMGEXIT can be executed from userspace, and that before returning to
-> uesrspace the guest kernel must always ensure that the GCHB points at a legal
-> GPA _and_ all primary fields are marked invalid. 
-
-Yes, the spec can be updated to include a "best practices" section for
-OSes and Hypervisors to follow without actually having to update the
-version of the GHCB spec, so that should be doable.
-
-Thanks,
-Tom
-
-> 
+On Thu, May 20, 2021 at 3:51 PM Ricardo Koller <ricarkol@google.com> wrote:
+>
+> On Thu, May 20, 2021 at 02:46:41PM -0500, Jing Zhang wrote:
+> > Hi Ricardo,
+> >
+> > On Thu, May 20, 2021 at 1:58 PM Ricardo Koller <ricarkol@google.com> wrote:
+> > >
+> > > On Thu, May 20, 2021 at 12:37:59PM -0500, Jing Zhang wrote:
+> > > > Hi Ricardo,
+> > > >
+> > > > On Wed, May 19, 2021 at 11:21 PM Ricardo Koller <ricarkol@google.com> wrote:
+> > > > >
+> > > > > On Mon, May 17, 2021 at 02:53:12PM +0000, Jing Zhang wrote:
+> > > > > > Provides a file descriptor per VM to read VM stats info/data.
+> > > > > > Provides a file descriptor per vCPU to read vCPU stats info/data.
+> > > > > >
+> > > > > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > > > > > ---
+> > > > > >  arch/arm64/kvm/guest.c    |  26 +++++
+> > > > > >  arch/mips/kvm/mips.c      |  52 +++++++++
+> > > > > >  arch/powerpc/kvm/book3s.c |  52 +++++++++
+> > > > > >  arch/powerpc/kvm/booke.c  |  45 ++++++++
+> > > > > >  arch/s390/kvm/kvm-s390.c  | 117 ++++++++++++++++++++
+> > > > > >  arch/x86/kvm/x86.c        |  53 +++++++++
+> > > > > >  include/linux/kvm_host.h  | 127 ++++++++++++++++++++++
+> > > > > >  include/uapi/linux/kvm.h  |  50 +++++++++
+> > > > > >  virt/kvm/kvm_main.c       | 223 ++++++++++++++++++++++++++++++++++++++
+> > > > > >  9 files changed, 745 insertions(+)
+> > > > > >
+> > > > >
+> > > > > > +static ssize_t kvm_vcpu_stats_read(struct file *file, char __user *user_buffer,
+> > > > > > +                           size_t size, loff_t *offset)
+> > > > > > +{
+> > > > > > +     char id[KVM_STATS_ID_MAXLEN];
+> > > > > > +     struct kvm_vcpu *vcpu = file->private_data;
+> > > > > > +     ssize_t copylen, len, remain = size;
+> > > > > > +     size_t size_header, size_desc, size_stats;
+> > > > > > +     loff_t pos = *offset;
+> > > > > > +     char __user *dest = user_buffer;
+> > > > > > +     void *src;
+> > > > >
+> > > > > Nit. Better to do pointer arithmetic on a "char *".  Note that gcc and
+> > > > > clang will do the expected thing.
+> > > > >
+> > > > > > +
+> > > > > > +     snprintf(id, sizeof(id), "kvm-%d/vcpu-%d",
+> > > > > > +                     task_pid_nr(current), vcpu->vcpu_id);
+> > > > > > +     size_header = sizeof(kvm_vcpu_stats_header);
+> > > > > > +     size_desc =
+> > > > > > +             kvm_vcpu_stats_header.count * sizeof(struct _kvm_stats_desc);
+> > > > > > +     size_stats = sizeof(vcpu->stat);
+> > > > > > +
+> > > > > > +     len = sizeof(id) + size_header + size_desc + size_stats - pos;
+> > > > > > +     len = min(len, remain);
+> > > > > > +     if (len <= 0)
+> > > > > > +             return 0;
+> > > > > > +     remain = len;
+> > > > >
+> > > > > If 'desc_offset' is not right after the header, then the 'len'
+> > > > > calculation is missing the gap into account. For example, assuming there
+> > > > > is a gap of 0x1000000 between the header and the descriptors:
+> > > > >
+> > > > >         desc_offset = sizeof(id) + size_header + 0x1000000
+> > > > >
+> > > > > and the user calls the ioctl with enough space for the whole file,
+> > > > > including the gap:
+> > > > >
+> > > > >         *offset = 0
+> > > > >         size = sizeof(id) + size_header + size_desc + size_stats + 0x1000000
+> > > > >
+> > > > > then 'remain' gets the wrong size:
+> > > > >
+> > > > >         remain = sizeof(id) + size_header + size_desc + size_stats
+> > > > >
+> > > > > and ... (more below)
+> > > > >
+> > > > > > +
+> > > > > > +     /* Copy kvm vcpu stats header id string */
+> > > > > > +     copylen = sizeof(id) - pos;
+> > > > > > +     copylen = min(copylen, remain);
+> > > > > > +     if (copylen > 0) {
+> > > > > > +             src = (void *)id + pos;
+> > > > > > +             if (copy_to_user(dest, src, copylen))
+> > > > > > +                     return -EFAULT;
+> > > > > > +             remain -= copylen;
+> > > > > > +             pos += copylen;
+> > > > > > +             dest += copylen;
+> > > > > > +     }
+> > > > > > +     /* Copy kvm vcpu stats header */
+> > > > > > +     copylen = sizeof(id) + size_header - pos;
+> > > > > > +     copylen = min(copylen, remain);
+> > > > > > +     if (copylen > 0) {
+> > > > > > +             src = (void *)&kvm_vcpu_stats_header;
+> > > > > > +             src += pos - sizeof(id);
+> > > > > > +             if (copy_to_user(dest, src, copylen))
+> > > > > > +                     return -EFAULT;
+> > > > > > +             remain -= copylen;
+> > > > > > +             pos += copylen;
+> > > > > > +             dest += copylen;
+> > > > > > +     }
+> > > > > > +     /* Copy kvm vcpu stats descriptors */
+> > > > > > +     copylen = kvm_vcpu_stats_header.desc_offset + size_desc - pos;
+> > > > >
+> > > > > This would be the state at this point:
+> > > > >
+> > > > >         pos     = sizeof(id) + size_header
+> > > > >         copylen = sizeof(id) + size_header + 0x1000000 + size_desc - (sizeof(id) + size_header)
+> > > > >                 = 0x1000000 + size_desc
+> > > > >         remain  = size_desc + size_stats
+> > > > >
+> > > > > > +     copylen = min(copylen, remain);
+> > > > >
+> > > > >         copylen = size_desc + size_stats
+> > > > >
+> > > > > which is not enough to copy the descriptors (and the data).
+> > > > >
+> > > > > > +     if (copylen > 0) {
+> > > > > > +             src = (void *)&kvm_vcpu_stats_desc;
+> > > > > > +             src += pos - kvm_vcpu_stats_header.desc_offset;
+> > > > >
+> > > > > Moreover, src also needs to take the gap into account.
+> > > > >
+> > > > >         src     = &kvm_vcpu_stats_desc + (sizeof(id) + size_header) - (sizeof(id) + size_header + 0x1000000)
+> > > > >                 = &kvm_vcpu_stats_desc - 0x1000000
+> > > > >
+> > > > > Otherwise, src ends up pointing at the wrong place.
+> > > > >
+> > > > > > +             if (copy_to_user(dest, src, copylen))
+> > > > > > +                     return -EFAULT;
+> > > > > > +             remain -= copylen;
+> > > > > > +             pos += copylen;
+> > > > > > +             dest += copylen;
+> > > > > > +     }
+> > > > > > +     /* Copy kvm vcpu stats values */
+> > > > > > +     copylen = kvm_vcpu_stats_header.data_offset + size_stats - pos;
+> > > > >
+> > > > > The same problem occurs here. There is a potential gap before
+> > > > > data_offset that needs to be taken into account for src and len.
+> > > > >
+> > > > > Would it be possible to just ensure that there is no gap? maybe even
+> > > > > remove data_offset and desc_offset and always place them adjacent, and
+> > > > > have the descriptors right after the header.
+> > > > >
+> > > > I guess I didn't make it clear about the offset fields in the header block.
+> > > > We don't create any gap here. In this implementation, kernel knows that
+> > > > descriptor block is right after header block and data block is right after
+> > > > descriptor block.
+> > > > The reason we have offset fields for descriptor block and data block is
+> > > > for flexibility and future potential extension. e.g. we might add another
+> > > > block between header block and descriptor block in the future for some
+> > > > other metadata information.
+> > > > I think we are good here.
+> > >
+> > > Hi Jing,
+> > >
+> > > I realize they are adjacent right now, as the function wouldn't work if
+> > > they weren't. My comment was more about code maintenance, what happens
+> > > if the layout changes. This function depends on an asumption about a
+> > > layout defined somewhere else. For example,
+> > >
+> > >         copylen = kvm_vm_stats_header.desc_offset + size_desc - pos;
+> > >
+> > > makes an assumption about desc_offset being set to:
+> > >
+> > >         .desc_offset = sizeof(struct kvm_stats_header),
+> > >
+> > > and if desc_offset is not exactly that, then the function doesn't
+> > > explicitely fail and instead does unexpected things (probably undetected
+> > > by tests).
+> > >
+> > > I think the solution is to just check the assumptions. Either an assert
+> > > or just bail out with a warning:
+> > >
+> > >         /* This function currently depends on the following layout. */
+> > >         if (kvm_vm_stats_header.desc_offset != sizeof(struct kvm_stats_header) ||
+> > >                         kvm_vm_stats_header.data_offset != sizeof(struct kvm_stats_header) +
+> > >                         sizeof(kvm_vm_stats_desc)) {
+> > >                 warning(...);
+> > >                 return 0;
+> > >         }
+> > >
+> > I understand your concern. But whenever layout changes, the read function needs
+> > to be updated anyway. The read function is actually the place to cook
+> > the data layout
+> > of the anonymous file.
+>
+> Could it be a good idea for header.data_offset and header.desc_offset to
+> be set here (in the function)? so the function has full control of the
+> file layout.
+>
+It is hard to do that since all those values are architecture dependent.
+> > If the vm/vcpu stats header has an incorrect
+> > offset value that is
+> > defined in the read function, the test will complain about wrong stats
+> > descriptor field
+> > values usually.
+> > Anyway, I will add more sanity tests in the selftest to cover the
+> > potential risks.
+> > Thanks.
+> > > > > > +     copylen = min(copylen, remain);
+> > > > > > +     if (copylen > 0) {
+> > > > > > +             src = (void *)&vcpu->stat;
+> > > > > > +             src += pos - kvm_vcpu_stats_header.data_offset;
+> > > > > > +             if (copy_to_user(dest, src, copylen))
+> > > > > > +                     return -EFAULT;
+> > > > > > +             remain -= copylen;
+> > > > > > +             pos += copylen;
+> > > > > > +             dest += copylen;
+> > > > > > +     }
+> > > > > > +
+> > > > > > +     *offset = pos;
+> > > > > > +     return len;
+> > > > > > +}
+> > > > > > +
+> > > > > >
+> > > > >
+> > > > >
+> > > > >
+> > > > > > +static ssize_t kvm_vm_stats_read(struct file *file, char __user *user_buffer,
+> > > > > > +                           size_t size, loff_t *offset)
+> > > > > > +{
+> > > > >
+> > > > > Consider moving the common code between kvm_vcpu_stats_read and this one
+> > > > > into some function that takes pointers to header, desc, and data. Unless
+> > > > > there is something vcpu or vm specific besides that.
+> > > > >
+> > > > Will do that, thanks.
+> > > > > > +     char id[KVM_STATS_ID_MAXLEN];
+> > > > > > +     struct kvm *kvm = file->private_data;
+> > > > > > +     ssize_t copylen, len, remain = size;
+> > > > > > +     size_t size_header, size_desc, size_stats;
+> > > > > > +     loff_t pos = *offset;
+> > > > > > +     char __user *dest = user_buffer;
+> > > > > > +     void *src;
+> > > > > > +
+> > > > > > +     snprintf(id, sizeof(id), "kvm-%d", task_pid_nr(current));
+> > > > > > +     size_header = sizeof(kvm_vm_stats_header);
+> > > > > > +     size_desc = kvm_vm_stats_header.count * sizeof(struct _kvm_stats_desc);
+> > > > > > +     size_stats = sizeof(kvm->stat);
+> > > > > > +
+> > > > > > +     len = sizeof(id) + size_header + size_desc + size_stats - pos;
+> > > > > > +     len = min(len, remain);
+> > > > > > +     if (len <= 0)
+> > > > > > +             return 0;
+> > > > > > +     remain = len;
+> > > > > > +
+> > > > > > +     /* Copy kvm vm stats header id string */
+> > > > > > +     copylen = sizeof(id) - pos;
+> > > > > > +     copylen = min(copylen, remain);
+> > > > > > +     if (copylen > 0) {
+> > > > > > +             src = (void *)id + pos;
+> > > > > > +             if (copy_to_user(dest, src, copylen))
+> > > > > > +                     return -EFAULT;
+> > > > > > +             remain -= copylen;
+> > > > > > +             pos += copylen;
+> > > > > > +             dest += copylen;
+> > > > > > +     }
+> > > > > > +     /* Copy kvm vm stats header */
+> > > > > > +     copylen = sizeof(id) + size_header - pos;
+> > > > > > +     copylen = min(copylen, remain);
+> > > > > > +     if (copylen > 0) {
+> > > > > > +             src = (void *)&kvm_vm_stats_header;
+> > > > > > +             src += pos - sizeof(id);
+> > > > > > +             if (copy_to_user(dest, src, copylen))
+> > > > > > +                     return -EFAULT;
+> > > > > > +             remain -= copylen;
+> > > > > > +             pos += copylen;
+> > > > > > +             dest += copylen;
+> > > > > > +     }
+> > > > > > +     /* Copy kvm vm stats descriptors */
+> > > > > > +     copylen = kvm_vm_stats_header.desc_offset + size_desc - pos;
+> > > > > > +     copylen = min(copylen, remain);
+> > > > > > +     if (copylen > 0) {
+> > > > > > +             src = (void *)&kvm_vm_stats_desc;
+> > > > > > +             src += pos - kvm_vm_stats_header.desc_offset;
+> > > > > > +             if (copy_to_user(dest, src, copylen))
+> > > > > > +                     return -EFAULT;
+> > > > > > +             remain -= copylen;
+> > > > > > +             pos += copylen;
+> > > > > > +             dest += copylen;
+> > > > > > +     }
+> > > > > > +     /* Copy kvm vm stats values */
+> > > > > > +     copylen = kvm_vm_stats_header.data_offset + size_stats - pos;
+> > > > > > +     copylen = min(copylen, remain);
+> > > > > > +     if (copylen > 0) {
+> > > > > > +             src = (void *)&kvm->stat;
+> > > > > > +             src += pos - kvm_vm_stats_header.data_offset;
+> > > > > > +             if (copy_to_user(dest, src, copylen))
+> > > > > > +                     return -EFAULT;
+> > > > > > +             remain -= copylen;
+> > > > > > +             pos += copylen;
+> > > > > > +             dest += copylen;
+> > > > > > +     }
+> > > > > > +
+> > > > > > +     *offset = pos;
+> > > > > > +     return len;
+> > > > > > +}
+> > > > > > +
+> > > > > > --
+> > > > > > 2.31.1.751.gd2f1c929bd-goog
+> > > > > >
+> > > > > > _______________________________________________
+> > > > > > kvmarm mailing list
+> > > > > > kvmarm@lists.cs.columbia.edu
+> > > > > > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> >
+> > Jing
