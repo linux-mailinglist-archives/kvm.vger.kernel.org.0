@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 93189389DFD
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 08:32:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D40BB389E98
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 09:03:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229536AbhETGeQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 May 2021 02:34:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33070 "EHLO
+        id S230522AbhETHEj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 03:04:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229676AbhETGeP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 May 2021 02:34:15 -0400
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAD9DC061760
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 23:32:54 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id l4so23431181ejc.10
-        for <kvm@vger.kernel.org>; Wed, 19 May 2021 23:32:54 -0700 (PDT)
+        with ESMTP id S230350AbhETHEf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 May 2021 03:04:35 -0400
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED0DCC061574
+        for <kvm@vger.kernel.org>; Thu, 20 May 2021 00:03:13 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id l4so23539437ejc.10
+        for <kvm@vger.kernel.org>; Thu, 20 May 2021 00:03:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=/Men5rmBujePBODaPqTxdL7d5Hadu/ohxPE3843bVkM=;
-        b=A7yY9vj41fmYGyDYrkBklpQ9dUGDZHKmyUG0IoLZvByGjHFG/UW2ZN1aqLORfLHnBx
-         QqYKMTRtEi7Z9I16QUhEMhIryMW5cMGumf2bXTMpReFl4KvhBJ3IsB6RpkNcmCxlgSz9
-         zt6OskmxaC4qYaDH8kQvnsFnMUNFKpFwJCeNoqGTrCLTLnN39ys3Gz96V3X6WIhj/Njj
-         Peep5jzTFtVG5kL0RROyLmX/J8k4buO/vDp/GNp2LMt4Al8eRZqhCFBuCEywseyKvRzf
-         qFl4sFlV+mKrMgjVfanq31xDK3tYoh7pWzsFiEb3w3btIjndenXixOANombxaU5ncyPv
-         WbJA==
+        bh=wZuC9MkEtBjxIYtF7kqVL9Ifpq76zVZvowCEWkRzdAs=;
+        b=isU1Bu0LYOcmwo2kZ+cxn6aLNagpy/yAVpavSdt0QoSh70Zxzbz5Cbo9vgX0zVM+vf
+         tJNWmzAPB2voZMyxrgD0fjafieA+/5wH0Mv8ATKJmh53aalUm9SUQODFqqVPbg+PUdXo
+         H9R7EQmWsf3D+ZUsHmp9gvDaJl1QtHo6qQ2vRr8rGBd+2OjYWeVB9bT0M1QVLkN5C8NS
+         CmrUJFwCufbKYOtmvdGOBvbocV6hZEeNWi65kA9s7cR0hY6RVWe/Ei7CHfzZxWR5wnd8
+         oE71NvDhg8fGP9ZL2M9OYpa+NfrMb0l/lEZ9YFBFN741IDnOTCnHVcEs0BWYU0gIhGb4
+         /1xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=/Men5rmBujePBODaPqTxdL7d5Hadu/ohxPE3843bVkM=;
-        b=l4mvbwwMsOsZXkHOJabgvS7imPacK19MZsE7NgWcPAVQQccPR+P+uEF1jANgXmJAV1
-         5/vSHVXaJJEcpYTUmKdClj/sHmpTU3spr8J6gU90zjQcxvLYRCHdOinvRW6bmgZj9Xek
-         cTOeOr6blL9Vw5++jgdpJ5C6jlLc8qop+Pd5oL2h7Z22k5VHZItPCHA7zm2uTKHAkU9l
-         q3E+xxtY6Uozpz2+EB5rbMUpvpRi5lSt2iZgED078T/i/UcH1me80z1L6Z5owguFMQll
-         dnxTJsnm8e+b+rUfCU0Dcl2Js8k89wKyiBbwI+KffhIWGuqye/CBR3b0tN9YRjsVp+uD
-         TRFA==
-X-Gm-Message-State: AOAM5320Y4yraU8RSmVhXFXOLeSID21ycjPmXrLLAGwac+vPAKnkx4u7
-        Np+UVXlG3PLbDlIFSpuLhdPbVQJpwfBid5TBAp23
-X-Google-Smtp-Source: ABdhPJx6xRY71uAWPKVPYMZsfI1C2ZOby/JHxCV6UkDwez9y1Wuqisip7Dr7L+8aPN3fVQWQls2IuNvwZo9GmF/km/A=
-X-Received: by 2002:a17:906:456:: with SMTP id e22mr3000572eja.427.1621492373326;
- Wed, 19 May 2021 23:32:53 -0700 (PDT)
+        bh=wZuC9MkEtBjxIYtF7kqVL9Ifpq76zVZvowCEWkRzdAs=;
+        b=nNvllleb4a1XJ/wYY71gFDOcOXfMEjpd+iDpEp5mhFnhGE0BmQZwcg2yalRuBnkXZh
+         /IH51udpG30gyg++nBgJzVX2dktzODr50+H6tJYWbUDR2ANoQcCUMxnjOxJ38jjmbdqp
+         HleQLwO13WTj/yscvWPmVB+eliYTGMy3rsaGqSQXKDzaYuDx6661o5AfIqwfdIu+AaII
+         5W61ei+BMTFWTbva9MZYJok14BW6k5E7BxHnVLLDDkkoqQv7+9fIBP+KdC9aB/bT+0sW
+         LvdSmQIUuRGNRuc0rhzW8spHieRfNjqUQsitWVsuxfdwkxcqkoRCuTKc08d1SEvhOI9b
+         OepQ==
+X-Gm-Message-State: AOAM5318vtSmoycLYqX2VChDPtjq0a5U0fsbEfrunktK0GoWMCWvDn9A
+        QUpDrPHcEi7CZD0Q5GMCuyFXRRfYDedFQ1Pxnhtn
+X-Google-Smtp-Source: ABdhPJxdx8w+fCqswSdKs59iVuZd4vAf9uGIN8nGG/abyN54M6HaotKLEQyMezCx9lo1kEngrpWm4QyOMlEiGHNAl0E=
+X-Received: by 2002:a17:906:c211:: with SMTP id d17mr3165937ejz.247.1621494192590;
+ Thu, 20 May 2021 00:03:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210517095513.850-1-xieyongji@bytedance.com> <20210517095513.850-3-xieyongji@bytedance.com>
- <YKX/SUq53GDtq84t@zeniv-ca.linux.org.uk>
-In-Reply-To: <YKX/SUq53GDtq84t@zeniv-ca.linux.org.uk>
+References: <20210517095513.850-1-xieyongji@bytedance.com> <20210517095513.850-12-xieyongji@bytedance.com>
+ <YKYBle/F8aOgHO9p@zeniv-ca.linux.org.uk>
+In-Reply-To: <YKYBle/F8aOgHO9p@zeniv-ca.linux.org.uk>
 From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Thu, 20 May 2021 14:32:42 +0800
-Message-ID: <CACycT3uD-D78EXu+njGb5Wctb1qV4VzwyfcN1803x8SY65QSTA@mail.gmail.com>
-Subject: Re: Re: [PATCH v7 02/12] file: Export receive_fd() to modules
+Date:   Thu, 20 May 2021 15:03:01 +0800
+Message-ID: <CACycT3vTvdJN4qnp=O8E5fxR15evMexzsK+V_uFT0LZkRSCitw@mail.gmail.com>
+Subject: Re: Re: [PATCH v7 11/12] vduse: Introduce VDUSE - vDPA Device in Userspace
 To:     Al Viro <viro@zeniv.linux.org.uk>
 Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
@@ -74,21 +74,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 20, 2021 at 2:18 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
+On Thu, May 20, 2021 at 2:28 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
 >
-> On Mon, May 17, 2021 at 05:55:03PM +0800, Xie Yongji wrote:
-> > Export receive_fd() so that some modules can use
-> > it to pass file descriptor between processes without
-> > missing any security stuffs.
+> On Mon, May 17, 2021 at 05:55:12PM +0800, Xie Yongji wrote:
 >
-> Which tree is that against?  Because in mainline this won't even build, let
-> alone work.
+> > +     case VDUSE_IOTLB_GET_FD: {
+> > +             struct vduse_iotlb_entry entry;
+> > +             struct vhost_iotlb_map *map;
+> > +             struct vdpa_map_file *map_file;
+> > +             struct vduse_iova_domain *domain = dev->domain;
+> > +             struct file *f = NULL;
+> > +
+> > +             ret = -EFAULT;
+> > +             if (copy_from_user(&entry, argp, sizeof(entry)))
+> > +                     break;
+>
+>                         return -EFAULT;
+> surely?
+> > +
+> > +             ret = -EINVAL;
+> > +             if (entry.start > entry.last)
+> > +                     break;
+>
+> ... and similar here, etc.
 >
 
-Oh, sorry for that. Now I'm based on vhost.git tree. But looks like I
-miss Christoph's commit
-42eb0d54c08 ("fs: split receive_fd_replace from __receive_fd"). Will
-rebase on it in v8.
+OK.
+
+> > +             spin_lock(&domain->iotlb_lock);
+> > +             map = vhost_iotlb_itree_first(domain->iotlb,
+> > +                                           entry.start, entry.last);
+> > +             if (map) {
+> > +                     map_file = (struct vdpa_map_file *)map->opaque;
+> > +                     f = get_file(map_file->file);
+> > +                     entry.offset = map_file->offset;
+> > +                     entry.start = map->start;
+> > +                     entry.last = map->last;
+> > +                     entry.perm = map->perm;
+> > +             }
+> > +             spin_unlock(&domain->iotlb_lock);
+> > +             ret = -EINVAL;
+> > +             if (!f)
+> > +                     break;
+> > +
+> > +             ret = -EFAULT;
+> > +             if (copy_to_user(argp, &entry, sizeof(entry))) {
+> > +                     fput(f);
+> > +                     break;
+> > +             }
+> > +             ret = receive_fd(f, perm_to_file_flags(entry.perm));
+> > +             fput(f);
+> > +             break;
+>
+> IDGI.  The main difference between receive_fd() and plain old
+> get_unused_fd_flags() + fd_install() is __receive_sock() call.
+> Which does nothing whatsoever in case of non-sockets.  Can you
+> get a socket here?
+>
+
+Actually what I want here is the security_file_receive() hook in receive_fd().
 
 Thanks,
 Yongji
