@@ -2,88 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B024538AE6D
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 14:36:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF28638AE40
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 14:31:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239670AbhETMhr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 May 2021 08:37:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57134 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238589AbhETMhb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 May 2021 08:37:31 -0400
-Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FA1BC0E434B;
-        Thu, 20 May 2021 04:50:22 -0700 (PDT)
-Received: by mail-yb1-xb2d.google.com with SMTP id w1so11081680ybt.1;
-        Thu, 20 May 2021 04:50:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kA7gbYG5mZ/XE5ox6MsJ7wukpRv3oiq5D7tNsc46zVo=;
-        b=vdSRm/MvOkj2jQDDq87RdfrUUuXYO0vQdgSzqw3sn0wA72CJChFzMh9Af+5g8S6oVp
-         MOs/Hf0rhka+MGqnEtuc98XWsaRbTsgYCk/7Ez9tdkMGeUWYBs+HET/Tz5b3DfhPeYuL
-         s1KGy3wMPfUjfSfv+xPjcxkrurXt3k9J5DIPWfCJVdB7VY7TocjTvsyKWV4sLyihG74Q
-         oYCE/UbHH4J69AGYDK5n8Lo0GFuqkvSBV2AaoUEAcVkoTe+dMM85HNSO2ULriwujfwGG
-         6vDAujO/Mu8NUQur4bo/+WJMqW0g+J4fnokAi/RekXmHTY+UiskEsStnEbLXvHCxQ207
-         qsSQ==
+        id S232048AbhETMcu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 08:32:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21942 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232474AbhETMck (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 20 May 2021 08:32:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621513877;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aoSgvFFKVMc3G/pczWgV02L96fZbMJsKlQ5JwPhLQOM=;
+        b=M6Y1xeNtzo4IDPx80lPmbzt46lVkJkkyrwUUbi267faXvsJCyKV6okTw6tizSxEC5zD4og
+        QoAwsNxQyeXAAjMSyHqFTbEloGlXBSFArnf/CaaRk8m6nqCzvjApyvWFG7ePhbAuK+MgE+
+        IWFjHeHyHh7iGqUAGhTSzoCXxu9b1r4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-178-8BLUYeeTNNK17EdY96YhlQ-1; Thu, 20 May 2021 08:31:15 -0400
+X-MC-Unique: 8BLUYeeTNNK17EdY96YhlQ-1
+Received: by mail-wr1-f70.google.com with SMTP id u20-20020a0560001614b02901115c8f2d89so8492122wrb.3
+        for <kvm@vger.kernel.org>; Thu, 20 May 2021 05:31:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kA7gbYG5mZ/XE5ox6MsJ7wukpRv3oiq5D7tNsc46zVo=;
-        b=GF/SjJNHMyz2Lnz7UHoXHz/zWkGvXU+gb+EUdOTnBmj0lOqJn6wimman5lf3i9T6Ux
-         jc6kvEejqpdCJPpNL1CO9YWfNoagZ9WXbuDiwawtWo4R5Z4Gaoj9QREJTSI/T7KZW91i
-         9o4X2MgBkLpoBBDi+xwBIkJgzb0ZksWv55L7KcfXuiz+pFNdxwQMNNqsLFwJlr33URiR
-         dZqhpQTZY3V5MSFbEqe173etL8KElD3tqw2tQRMpnZVu3ZGR6llCbz0ihcqyBjw2ds2s
-         eSFtKJhkjeubkA1PNDjgKbCe1r30snyE8lvAxe60h7iKDU/KdSVELv3R8bPM0CF41BoD
-         41eQ==
-X-Gm-Message-State: AOAM533AoYiVn2tWCccqAq/y9aaweJmULWw7RJR54NDLI5GMUoZGSlIi
-        mSZx4A4+Hm/3mBYNyUGMQ5GF6aAGswK3qZrwFOQ=
-X-Google-Smtp-Source: ABdhPJz4v+1BCu8WOXRXaA62w7PQlZdArSe2T/Ikmc2udv9oOmGPo1CwQzOh8tXoGyW9z4cD7c0SLtAgBihXJP/ArK8=
-X-Received: by 2002:a05:6902:134f:: with SMTP id g15mr6765498ybu.278.1621511421871;
- Thu, 20 May 2021 04:50:21 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210520104343.317119-1-joerichey94@gmail.com> <YKZC9o8019kH76xS@zn.tnic>
-In-Reply-To: <YKZC9o8019kH76xS@zn.tnic>
-From:   Joseph Richey <joerichey94@gmail.com>
-Date:   Thu, 20 May 2021 04:50:11 -0700
-Message-ID: <CAAXkRocqFZgC-pWLc3V+VQLAVRvLXk+wTOhp+F4_WGRByjxhDQ@mail.gmail.com>
-Subject: Re: [PATCH 0/6] Don't use BIT() macro in UAPI headers
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     trivial@kernel.org, Joe Richey <joerichey@google.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=aoSgvFFKVMc3G/pczWgV02L96fZbMJsKlQ5JwPhLQOM=;
+        b=l9b5EY3fx3Fft63ynT2EcMjrMEwHM2vx7YlwO9hr7/7VJmSl0VZ2MRtY+QQxj4o2UV
+         ooh/sCQQGxhxg3LB3PybcM7RNSPjFSt/vb1jpnCtG1qShWz7KN7J00p6x02bv5HmVgik
+         lUqn/IM8DKG7FLUcN5pTkwBav/8CgHDcbo7UZv3vreaQ2lK4ffxiWh0NjDelGCBRniGE
+         ZRJPKqTUHCk3lRm6XD2S6dz9nbCtQeoB5++5XqLoNh3KO6g+tSuzpbcGkZwM+lwjXokn
+         FcVDquRX6+XWbf9vNdKQpVYX7+6lWCsWD/GbkVRXBM+9fP1w4Es+2mowWMjDhSTw9I3l
+         FjTg==
+X-Gm-Message-State: AOAM5316ndo3xeim1y6b6NFyLsfUUWxSBBZbfkucANhiKaZYXic9A+iS
+        zZ1tiFzPe3zQe2h31/F1YwQMWGkzE3CQ0R/StK2X0yxSVhwt5X6frbXvXy/0F7/Str6QRUh0WLy
+        Z0TMiFROZyETW
+X-Received: by 2002:a05:600c:49a2:: with SMTP id h34mr3904564wmp.64.1621513874112;
+        Thu, 20 May 2021 05:31:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwRyVKUDco1XFJtBSF08deqU/vZWKPY1GiHaPpbP6ydk/mHwxQJrYLGMqxtartHHXDv+KRgjA==
+X-Received: by 2002:a05:600c:49a2:: with SMTP id h34mr3904538wmp.64.1621513873934;
+        Thu, 20 May 2021 05:31:13 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id g5sm2734192wmi.8.2021.05.20.05.31.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 May 2021 05:31:12 -0700 (PDT)
+Subject: Re: [PATCH] kvm: x86: move srcu lock out of kvm_vcpu_check_block
+To:     Sean Christopherson <seanjc@google.com>,
+        Jon Kohler <jon@nutanix.com>
+Cc:     Bijan Mottahedeh <bijan.mottahedeh@nutanix.com>,
+        Raphael Norwitz <raphael.norwitz@nutanix.com>,
+        Junaid Shahid <junaids@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "x86@kernel.org" <x86@kernel.org>,
         "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Zhangfei Gao <zhangfei.gao@linaro.org>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
-        linux-accelerators@lists.ozlabs.org
-Content-Type: text/plain; charset="UTF-8"
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20210428173820.13051-1-jon@nutanix.com>
+ <YIxsV6VgSDEdngKA@google.com>
+ <9040b3d8-f83f-beb5-a703-42202d78fabb@redhat.com>
+ <70B34A15-C4A1-4227-B037-7B26B40EDBFE@nutanix.com>
+ <YKWI1GPdNc4shaCt@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3d3622c0-7c7a-3d24-d0f5-3204c5d105f9@redhat.com>
+Date:   Thu, 20 May 2021 14:31:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
+MIME-Version: 1.0
+In-Reply-To: <YKWI1GPdNc4shaCt@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > Currently, the script actually _encourages_ users to use the BIT macro
-> > even if adding things to UAPI.
->
-> How so?
+On 19/05/21 23:53, Sean Christopherson wrote:
+>    1. Refactor check_nested_events() to split out a has_events() helper.
+>    2. Move the has_events() call from kvm_vcpu_running() into kvm_vcpu_has_events()
+>    3. Drop the explicit hv_timer_pending() in inject_pending_event().  It should
+>       be dead code since it's just a pointer to nested_vmx_preemption_timer_pending(),
+>       which is handled by vmx_check_nested_events() and called earlier.
+>    4. Drop the explicit hv_timer_pending() in kvm_vcpu_has_events() for the same
+>       reasons as (3).  This can also drop hv_timer_pending() entirely.
 
-Running checkpatch.pl with --strict gives:
+Sounds good except that I would do (3) first, since if I understand 
+correctly it's a valid cleanup in the current code as well, and do (2) 
+and (4) at the same time since you're basically enlarging the scope of 
+the existing hv_timer_pending call to include all nested events.
 
-CHECK: Prefer using the BIT macro
-#26: FILE: arch/x86/include/uapi/asm/hwcap2.h:9:
-+#define HWCAP2_FSGSBASE                        (1 << 1)
+Paolo
 
-It should probably just recommend the _BITUL macro.
-
-> Also, in your commit messages you refer to patches with patchwork links
-> - please use the respective upstream commit IDs instead. Grep for
-> "Fixes:" here:
-
-Ahhhhh, I figured there was a more standard way. Will fix.
