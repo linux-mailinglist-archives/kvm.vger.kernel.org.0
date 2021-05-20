@@ -2,121 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD2CE389D19
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 07:25:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 453E1389D15
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 07:25:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229923AbhETF07 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 May 2021 01:26:59 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:59366 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230284AbhETF06 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 May 2021 01:26:58 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14K5PDso037740;
-        Thu, 20 May 2021 05:25:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2020-01-29;
- bh=eFILiUcQ+qXVIacYEMB9p6Ww9HjJUgYvnlxUtiT5DOk=;
- b=cmAp4Wz0JOXvT7pi8Q+Rll7JCyNMl3HXcqB4Q7itt7BeXTZHgEAgkXdaI4qO1a8TveF2
- 63wZhNrubYZ+2q4ih4qLmvuQxfFgFgZizQNhG9mqH/0+e+RkiBeSsgdgjz9dcbM+5fSq
- iGRiYRCN4/iPxKFhCR/FN/isvH/q+lApY+fHgAV9B2+uGTEtaAjXRPV8UN0ZY13e4Q6J
- B3HXv5gq6Wj7ub2DI1hJNktRzSW97mFBRcW6q/o9fso53VDAKDo8XGzBIOTPEVJ6jhq6
- gsbRw8IEVzpMTOOUTwY+ObTQJTRP9UsLQzDe6DScXAgGxeSdK9CvWWdo5X1QZE0sUzr9 iw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 38j5qrbh14-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 20 May 2021 05:25:26 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14K5PPgr027992;
-        Thu, 20 May 2021 05:25:26 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by userp3020.oracle.com with ESMTP id 38n491dk9q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 20 May 2021 05:25:26 +0000
-Received: from userp3020.oracle.com (userp3020.oracle.com [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 14K5PPxo027999;
-        Thu, 20 May 2021 05:25:25 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3020.oracle.com with ESMTP id 38n491dk95-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 20 May 2021 05:25:25 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 14K5PNiI020616;
-        Thu, 20 May 2021 05:25:23 GMT
-Received: from kadam (/41.212.42.34)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 19 May 2021 22:25:23 -0700
-Date:   Thu, 20 May 2021 08:25:16 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Wei Yongjun <weiyongjun1@huawei.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, Hulk Robot <hulkci@huawei.com>,
-        kraxel@redhat.com
-Subject: Re: [PATCH -next] samples: vfio-mdev: fix error return code in
- mdpy_fb_probe()
-Message-ID: <20210520052516.GA1955@kadam>
-References: <20210519141559.3031063-1-weiyongjun1@huawei.com>
- <20210519094512.7ed3ea0f.alex.williamson@redhat.com>
+        id S230375AbhETF0w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 01:26:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45902 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229526AbhETF0u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 May 2021 01:26:50 -0400
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C721CC061763
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 22:25:28 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id s22so23039319ejv.12
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 22:25:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=uWBM5AU+ZMmhfuFgx+3Y6a4UcjGbnQI1cx3aK/uVkZc=;
+        b=GL+WlKsfyUHY8seOawsA4s5AlWavihDlxxMiz4lqDQkGQ3TCLutMAu4lMNn1Jxl1jd
+         y6HZQBYQq4ioIg5e1Lo1gqt31jawj5s1SHuxpLit2ITf+CLm+kWietUyVpKk9w4fmD2p
+         H1mq2ZWQ+t44wxCCc60m/5A3JNEqMh/2fd2x9LhB3LxkVed1yMz8Mpz7F/P0y2G397sv
+         VSQF7iSQ5NJLrAtBZr6BqKr6Rz+PbkPQ/INLOdyfBiVRt3/wYV7gh1O0NplzDAANxyj3
+         lbLjDfxqrMTZkAS3Dv9Xk96J7MuslFrqt1MYHRbQds+nk19xlmKW/1bKi0HXgU5HEy19
+         xy7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=uWBM5AU+ZMmhfuFgx+3Y6a4UcjGbnQI1cx3aK/uVkZc=;
+        b=r59wChTfTDz1NBFqBBerEsNmyKtHv/UrDZu1s6DS9Bm+I6TfOb6DwvB35+ivI0LLNZ
+         VVf6QwVXwy1CjR9o6RSaMXktGJw8XlKWtnAVw4+H5G/4YrlRUhi519RBm/Bj/f9TlVlo
+         phAgyA2PbHme4NSeqDfO6saVdmGbSTlVSYnfQjf6f4r0PzmK/0dHpCdHqA/x3r54tZWZ
+         Q3oYQ0W1dQaW9UrSPBZNWAkcW7GstWoxVbrKjw//JXyI/PRoZVruLuTR9TFkbdIJU5HD
+         xsVnj322GSNb56O2pF9ZB5H1Wk/6pbkpUFQEyaaJaavnEwTqLW5M8XGFoHKwppi1RO7H
+         OWVQ==
+X-Gm-Message-State: AOAM5321cKlBrwUSeg2NLcMnTBbVRwIxuunS7m8dd6Tc+vFremjbEozp
+        QLfQjARYEaSwLXkMQwobV2jI9lzjx5AM9H2GYJDg
+X-Google-Smtp-Source: ABdhPJyvwWWA7f5Fzvsx4TdTu7nIvH6pnRUuPJ62OuR0bCAchfYi7vwKGliv4oVBF/L7UoIrnWNYnk0fkzFFBOuZgj8=
+X-Received: by 2002:a17:906:edaf:: with SMTP id sa15mr2877318ejb.174.1621488327265;
+ Wed, 19 May 2021 22:25:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210519094512.7ed3ea0f.alex.williamson@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-GUID: AUShk8Ad4OZZuMgmcBZxSOK_cS3hnaNt
-X-Proofpoint-ORIG-GUID: AUShk8Ad4OZZuMgmcBZxSOK_cS3hnaNt
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9989 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1011 impostorscore=0
- mlxscore=0 lowpriorityscore=0 malwarescore=0 mlxlogscore=999
- suspectscore=0 adultscore=0 priorityscore=1501 spamscore=0 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2105200044
+References: <20210517095513.850-1-xieyongji@bytedance.com> <20210517095513.850-5-xieyongji@bytedance.com>
+ <CACycT3s1rEvNnNkJKQsHGRsyLPADieFdVkb1Sp3GObR0Vox5Fg@mail.gmail.com> <20210519144206.GF32682@kadam>
+In-Reply-To: <20210519144206.GF32682@kadam>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Thu, 20 May 2021 13:25:16 +0800
+Message-ID: <CACycT3veubBFCg9omxLDJJFP7B7QH8++Q+tKmb_M_hmNS45cmw@mail.gmail.com>
+Subject: Re: Re: [PATCH v7 04/12] virtio-blk: Add validation for block size in
+ config space
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        joro@8bytes.org,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 19, 2021 at 09:45:12AM -0600, Alex Williamson wrote:
-> On Wed, 19 May 2021 14:15:59 +0000
-> Wei Yongjun <weiyongjun1@huawei.com> wrote:
-> 
-> > Fix to return negative error code -ENOMEM from the error handling
-> > case instead of 0, as done elsewhere in this function.
-> > 
-> > Reported-by: Hulk Robot <hulkci@huawei.com>
-> > Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
-> > ---
-> >  samples/vfio-mdev/mdpy-fb.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/samples/vfio-mdev/mdpy-fb.c b/samples/vfio-mdev/mdpy-fb.c
-> > index 21dbf63d6e41..d4abc0594dbd 100644
-> > --- a/samples/vfio-mdev/mdpy-fb.c
-> > +++ b/samples/vfio-mdev/mdpy-fb.c
-> > @@ -131,8 +131,10 @@ static int mdpy_fb_probe(struct pci_dev *pdev,
-> >  		 width, height);
-> >  
-> >  	info = framebuffer_alloc(sizeof(struct mdpy_fb_par), &pdev->dev);
-> > -	if (!info)
-> > +	if (!info) {
-> > +		ret = -ENOMEM;
-> >  		goto err_release_regions;
-> > +	}
-> >  	pci_set_drvdata(pdev, info);
-> >  	par = info->par;
-> >  
-> > 
-> 
-> I think there's also a question of why the three 'return -EINVAL;' exit
-> paths between here and the prior call to pci_request_regions() don't
-> also take this goto.  Thanks,
-> 
+On Wed, May 19, 2021 at 10:42 PM Dan Carpenter <dan.carpenter@oracle.com> wrote:
+>
+> On Wed, May 19, 2021 at 09:39:20PM +0800, Yongji Xie wrote:
+> > On Mon, May 17, 2021 at 5:56 PM Xie Yongji <xieyongji@bytedance.com> wrote:
+> > >
+> > > This ensures that we will not use an invalid block size
+> > > in config space (might come from an untrusted device).
+>
+> I looked at if I should add this as an untrusted function so that Smatch
+> could find these sorts of bugs but this is reading data from the host so
+> there has to be some level of trust...
+>
 
-Smatch catches one of these leaks...  Which is weird that it would
-ignore the other error paths.  Perhaps it was intentional?
+It would be great if Smatch could detect this case if possible. The
+data might be trusted in traditional VM cases. But now the data can be
+read from a userspace daemon when VDUSE is enabled.
 
-samples/vfio-mdev/mdpy-fb.c:135 mdpy_fb_probe() warn: missing error code 'ret'
-samples/vfio-mdev/mdpy-fb.c:189 mdpy_fb_probe() warn: 'pdev' not released on lines: 120.
+> I should add some more untrusted data kvm functions to Smatch.  Right
+> now I only have kvm_register_read() and I've added kvm_read_guest_virt()
+> just now.
+>
+> > >
+> > > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> > > ---
+> > >  drivers/block/virtio_blk.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >
+> > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > > index ebb4d3fe803f..c848aa36d49b 100644
+> > > --- a/drivers/block/virtio_blk.c
+> > > +++ b/drivers/block/virtio_blk.c
+> > > @@ -826,7 +826,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+> > >         err = virtio_cread_feature(vdev, VIRTIO_BLK_F_BLK_SIZE,
+> > >                                    struct virtio_blk_config, blk_size,
+> > >                                    &blk_size);
+> > > -       if (!err)
+> > > +       if (!err && blk_size > 0 && blk_size <= max_size)
+> >
+> > The check here is incorrect. I will use PAGE_SIZE as the maximum
+> > boundary in the new version.
+>
+> What does this bug look like to the user?
 
-regards,
-dan carpenter
+The kernel will panic if the block size is larger than PAGE_SIZE.
+
+> A minimum block size of 1 seems pretty crazy.  Surely the minimum should be > higher?
+>
+
+Yes, 512 is better here.
+
+Thanks,
+Yongji
