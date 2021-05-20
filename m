@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F088D38ADB6
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 14:10:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E375638ADB3
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 14:09:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236178AbhETMKf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 May 2021 08:10:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51240 "EHLO
+        id S239944AbhETMKa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 08:10:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237335AbhETMKE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S235472AbhETMKE (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 20 May 2021 08:10:04 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3573C00F78E;
-        Thu, 20 May 2021 03:44:45 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id c12so462511pfl.3;
-        Thu, 20 May 2021 03:44:45 -0700 (PDT)
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41BFEC00F603;
+        Thu, 20 May 2021 03:44:47 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id v13so8776410ple.9;
+        Thu, 20 May 2021 03:44:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=7ZiFgLWMWvuZRELwo2jd+K7U5Q4HIOe8SBImsjcWPpg=;
-        b=PEGXZmX1QZg5eZN102ymP6m47ZpJDcsahQdFjSm6a/+FEr02vOmCcLQWSAm6hZxP3r
-         JO5wS7RX1ObsIwWuIKV7DYdVNiWMTqv7+/wwIFqBwsW505FTcwRiiOuiFJOeI/ILVjFz
-         GoAQUrP7+2JWnX7Zt/+Cnqhkib1bkAJcHlgKmG6ozF8voutTIl2ZURlzfRvhIn2iCA/J
-         HOtK7rSzHTX7ZuT7ynRcid8yAogEpyjHZic8qeQlDQ1Y3jRgOkosl8jAT/T/ro8FYExl
-         QJPx1DAMTmEVxbu3/CnafFrVTODY8Q15UDAstGwLkfNLOrtbge2+C8zytnVgU2zSVJSt
-         Btjg==
+        bh=B5ZWzUeYqTQLFzLVEG/RxjgILJ2YZIhD7PbaUbwdicw=;
+        b=Zpd70lXIV/eUnVrI8F4+xjxllQR6HyPP1iaCcElNF5O1IUn2zHjs9Ucbu1M9iZuNn/
+         9YmiF6pX3Gfy9DMn/15SOarhogNZqzhqItsmjel2+dcIfIuTOW6hbplNW20GcoDWMaeF
+         NDrqzILNelFbOlWqKcmwoNszt0Ijd7b/dVf5IqRLB9gpLgwchqOddFfoXkkvZm/XAceG
+         gEY+3Hewfs12i/vSpcjxEmbUK4vkKFvyG9y7WnbFmlzQcY8yYImONbmRltNM9mibaX4h
+         HsL6l9MFFh6ObQPecz8LoXNwcM8IwI2dXvU+EYXQuGPwa1hBeQo4Nzie51bb/A6McqJL
+         O1kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=7ZiFgLWMWvuZRELwo2jd+K7U5Q4HIOe8SBImsjcWPpg=;
-        b=CMTqDYDYg1b6tjffK8ckFAOf02owkiV+APFNkguhJUeMDiqBuvSnd52990I0/T5YQn
-         251ihEyZGiNT4y52iu0TUmqG2AD/ot4YqQTysjdBkacxWO+9CJ3ch8hT5OIF91WvnrwR
-         wKTXcY1cU74UlpSbJlatLBUMPIWjAan68vZ/c2AuFCDIAvH7Ss88bQY84Bu5g6UCGJ5m
-         12HrohKX8gg1npNwiR7ODY5iOBF3iVda9dZwSmY6QCLo5KWoEtUFk9IP6Nmptgvg4k4W
-         LvAL9oySYVWUknGDh8J+fbHjj8SbOq5362MnTZVN7eINCLGW9+OG6UMkIiTJhQG6SDgj
-         NT4A==
-X-Gm-Message-State: AOAM533gJBsER3+SWE/1Pb8myDx/C+au7TpUEsxP/RdmKaN1ONzAftb0
-        LBTgA3Jupo7YXn1fKtqthQA=
-X-Google-Smtp-Source: ABdhPJxoh1IwwPMV1InzW2164Znzz0uMx6+mRF33S95Wu+6uvNRGeG1KcrO6dglWETXatjWGjDn2fA==
-X-Received: by 2002:a62:f24b:0:b029:2dc:9098:c14c with SMTP id y11-20020a62f24b0000b02902dc9098c14cmr3833071pfl.19.1621507485397;
-        Thu, 20 May 2021 03:44:45 -0700 (PDT)
+        bh=B5ZWzUeYqTQLFzLVEG/RxjgILJ2YZIhD7PbaUbwdicw=;
+        b=B2sakbTUOvnJ7CD2UsFn9rdThvHYLc4neA4FhcfNjUrOzirpqCdHlwBCGQal1nG6e6
+         rIopxSXOEFaJoEnK06O52/v4OAVlaYWp5i2j70DEFrcyMUIfuprVxuSxd3XL3MP84euX
+         kiO4lcvMQGrMPRtOT+ZwH/eLkfDk72+fzcf2gsldzM4MQEQ8ujL1fTEHuc2W11escF/x
+         CRXnlYDk5KMkHBPoWkAHywBGT7hJApQDjgoeVyNuZq+4tISXcvkR9/cMp8qqYq5H9eZA
+         qcYJqssq8afTTUGPU6ZiPrgKM1IftDAFyhdr5GQusnk2c2xpJw8OPSoK5i/OEzRgQLcD
+         S2Wg==
+X-Gm-Message-State: AOAM531VoN/hf8aUxWI2qRgtVE77kSvOKKXoPP9wOKnuiH5X9CSHbZod
+        lUscmKklSNt+Mw5fUvZ7w+U=
+X-Google-Smtp-Source: ABdhPJyLlYQXZjXviGINknEFBWgEqraOFrpfGwkNKpdsDEW6vI6pdjv2iIyooBg0qMZQiifEGrFSEQ==
+X-Received: by 2002:a17:90a:b382:: with SMTP id e2mr4165874pjr.171.1621507486794;
+        Thu, 20 May 2021 03:44:46 -0700 (PDT)
 Received: from pride.localdomain (c-174-61-140-56.hsd1.wa.comcast.net. [174.61.140.56])
-        by smtp.gmail.com with ESMTPSA id z12sm1762572pfk.45.2021.05.20.03.44.44
+        by smtp.gmail.com with ESMTPSA id z12sm1762572pfk.45.2021.05.20.03.44.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 May 2021 03:44:45 -0700 (PDT)
+        Thu, 20 May 2021 03:44:46 -0700 (PDT)
 From:   Joe Richey <joerichey94@gmail.com>
 To:     trivial@kernel.org
 Cc:     Joe Richey <joerichey@google.com>,
@@ -62,9 +62,9 @@ Cc:     Joe Richey <joerichey@google.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
         linux-accelerators@lists.ozlabs.org
-Subject: [PATCH 4/6] uacce: Don't use BIT() macro in UAPI headers
-Date:   Thu, 20 May 2021 03:43:41 -0700
-Message-Id: <20210520104343.317119-5-joerichey94@gmail.com>
+Subject: [PATCH 5/6] media: vicodec: Don't use BIT() macro in UAPI headers
+Date:   Thu, 20 May 2021 03:43:42 -0700
+Message-Id: <20210520104343.317119-6-joerichey94@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210520104343.317119-1-joerichey94@gmail.com>
 References: <20210520104343.317119-1-joerichey94@gmail.com>
@@ -76,30 +76,65 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joe Richey <joerichey@google.com>
 
-A previous patch [1] used the BIT() macro to define UACCE_DEV_SVA.
+A previous patch [1] used the BIT() macro to define the V4L2_FWHT_FL_*
+constants in the UAPI header file.
 
-This macro is defined in the kernel but not in the UAPI headers.
+This macro is defined in the kernel but not in the UAPI headers. Seems
+like this was caused by moving code from inside the kernel.
 
-[1] https://lore.kernel.org/patchwork/patch/11334877/
+[1] https://lore.kernel.org/patchwork/patch/11933745/
 
 Signed-off-by: Joe Richey <joerichey@google.com>
 ---
- include/uapi/misc/uacce/uacce.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/uapi/linux/v4l2-controls.h | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/include/uapi/misc/uacce/uacce.h b/include/uapi/misc/uacce/uacce.h
-index cc7185678f47..a404ec40e000 100644
---- a/include/uapi/misc/uacce/uacce.h
-+++ b/include/uapi/misc/uacce/uacce.h
-@@ -23,7 +23,7 @@
-  *		  Support PASID
-  *		  Support device page faults (PCI PRI or SMMU Stall)
-  */
--#define UACCE_DEV_SVA		BIT(0)
-+#define UACCE_DEV_SVA		(1 << 0)
+diff --git a/include/uapi/linux/v4l2-controls.h b/include/uapi/linux/v4l2-controls.h
+index d43bec5f1afd..6ecefeceba9d 100644
+--- a/include/uapi/linux/v4l2-controls.h
++++ b/include/uapi/linux/v4l2-controls.h
+@@ -1602,30 +1602,30 @@ struct v4l2_ctrl_h264_decode_params {
+ #define V4L2_FWHT_VERSION			3
  
- /**
-  * enum uacce_qfrt: queue file region type
+ /* Set if this is an interlaced format */
+-#define V4L2_FWHT_FL_IS_INTERLACED		BIT(0)
++#define V4L2_FWHT_FL_IS_INTERLACED		(1 << 0)
+ /* Set if this is a bottom-first (NTSC) interlaced format */
+-#define V4L2_FWHT_FL_IS_BOTTOM_FIRST		BIT(1)
++#define V4L2_FWHT_FL_IS_BOTTOM_FIRST		(1 << 1)
+ /* Set if each 'frame' contains just one field */
+-#define V4L2_FWHT_FL_IS_ALTERNATE		BIT(2)
++#define V4L2_FWHT_FL_IS_ALTERNATE		(1 << 2)
+ /*
+  * If V4L2_FWHT_FL_IS_ALTERNATE was set, then this is set if this
+  * 'frame' is the bottom field, else it is the top field.
+  */
+-#define V4L2_FWHT_FL_IS_BOTTOM_FIELD		BIT(3)
++#define V4L2_FWHT_FL_IS_BOTTOM_FIELD		(1 << 3)
+ /* Set if the Y' plane is uncompressed */
+-#define V4L2_FWHT_FL_LUMA_IS_UNCOMPRESSED	BIT(4)
++#define V4L2_FWHT_FL_LUMA_IS_UNCOMPRESSED	(1 << 4)
+ /* Set if the Cb plane is uncompressed */
+-#define V4L2_FWHT_FL_CB_IS_UNCOMPRESSED		BIT(5)
++#define V4L2_FWHT_FL_CB_IS_UNCOMPRESSED		(1 << 5)
+ /* Set if the Cr plane is uncompressed */
+-#define V4L2_FWHT_FL_CR_IS_UNCOMPRESSED		BIT(6)
++#define V4L2_FWHT_FL_CR_IS_UNCOMPRESSED		(1 << 6)
+ /* Set if the chroma plane is full height, if cleared it is half height */
+-#define V4L2_FWHT_FL_CHROMA_FULL_HEIGHT		BIT(7)
++#define V4L2_FWHT_FL_CHROMA_FULL_HEIGHT		(1 << 7)
+ /* Set if the chroma plane is full width, if cleared it is half width */
+-#define V4L2_FWHT_FL_CHROMA_FULL_WIDTH		BIT(8)
++#define V4L2_FWHT_FL_CHROMA_FULL_WIDTH		(1 << 8)
+ /* Set if the alpha plane is uncompressed */
+-#define V4L2_FWHT_FL_ALPHA_IS_UNCOMPRESSED	BIT(9)
++#define V4L2_FWHT_FL_ALPHA_IS_UNCOMPRESSED	(1 << 9)
+ /* Set if this is an I Frame */
+-#define V4L2_FWHT_FL_I_FRAME			BIT(10)
++#define V4L2_FWHT_FL_I_FRAME			(1 << 10)
+ 
+ /* A 4-values flag - the number of components - 1 */
+ #define V4L2_FWHT_FL_COMPONENTS_NUM_MSK		GENMASK(18, 16)
 -- 
 2.31.1
 
