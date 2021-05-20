@@ -2,235 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2664E38B26D
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 17:03:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11CC538B285
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 17:04:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242771AbhETPET (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 May 2021 11:04:19 -0400
-Received: from forward1-smtp.messagingengine.com ([66.111.4.223]:60157 "EHLO
-        forward1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239730AbhETPEG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 20 May 2021 11:04:06 -0400
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailforward.nyi.internal (Postfix) with ESMTP id ED3A01940A11;
-        Thu, 20 May 2021 10:56:54 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Thu, 20 May 2021 10:56:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:date:from
-        :in-reply-to:message-id:mime-version:references:subject:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm2; bh=srBFxlNijYMaSZLP7fEUIq/DXI6Tc+YZQbo62f99oLo=; b=LusbZ505
-        8Nc5/n0P0S9KSPi1XxuCyHxshsUv1AAPbOW8h0+vY9E8AaJVfaucK1t5c8cgEM9/
-        wAYFinyNgulp1Tt86WcpBgDmlHR0K8CPZBYhYgl+OzXOX7+RjfH18TySZid7r4pj
-        59GO4KeJneJ8AoQyoWsVQEmWJpqi1N4cNHoR4uXV66a7gzwAH7inxK5XPK0oFCLY
-        G25katQRGHR7+P0VnAW8lWXPxz7ziJaepcMsANMcMpO7A9rQ7sBFsqfxVifUIBz+
-        NVEs4jHl3lra9TjhpH1hDChIY1LDwGAprtFCrvn01yT8STus6weROUPwP9FqPCZQ
-        xNywFtsgKAbdCg==
-X-ME-Sender: <xms:tnimYJ9NM_gna762UaPthw7LMWM0-ZeklP1XpUWvjxMJAsv6ighS-A>
-    <xme:tnimYNsCH35RMHY-6GRS91m5cNbbpOpMcwx6iTtsMjES3PAvOEi1jCdPY0y-5I0a4
-    7hMJVYSgPWw3Mxyhew>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvdejuddgkedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeffrghvihgu
-    ucfgughmohhnughsohhnuceouggrvhhiugdrvggumhhonhgushhonhesohhrrggtlhgvrd
-    gtohhmqeenucggtffrrghtthgvrhhnpedufeetjefgfefhtdejhfehtdfftefhteekhefg
-    leehfffhiefhgeelgfejtdehkeenucfkphepkedurddukeejrddviedrvdefkeenucevlh
-    hushhtvghrufhiiigvpedunecurfgrrhgrmhepmhgrihhlfhhrohhmpegurghvihgurdgv
-    ughmohhnughsohhnsehorhgrtghlvgdrtghomh
-X-ME-Proxy: <xmx:tnimYHBRCROxca0Xx53fk9IPOZ8mNuriIFT_oVINeKJfd63oLq4X2w>
-    <xmx:tnimYNe4RfLpxWJh9mC_9eA-kOt692aU6nZaRTC8dwl7eUTnkKSqCQ>
-    <xmx:tnimYOOhOODXnKaEVx7IJqK4HRyZNI0KHRAOoiLKMyJmRCLQy17Dpw>
-    <xmx:tnimYIuupIiClUrNGjaxUedpx67FBY__v8SN4e84lJIMHV1WKZfZOg>
-Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net [81.187.26.238])
-        by mail.messagingengine.com (Postfix) with ESMTPA;
-        Thu, 20 May 2021 10:56:53 -0400 (EDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id d2f501d0;
-        Thu, 20 May 2021 14:56:48 +0000 (UTC)
-From:   David Edmondson <david.edmondson@oracle.com>
-To:     qemu-devel@nongnu.org
-Cc:     kvm@vger.kernel.org, Eduardo Habkost <ehabkost@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Babu Moger <babu.moger@amd.com>,
-        David Edmondson <david.edmondson@oracle.com>
-Subject: [RFC PATCH 7/7] target/i386: Manipulate only AMD XSAVE state on AMD
-Date:   Thu, 20 May 2021 15:56:47 +0100
-Message-Id: <20210520145647.3483809-8-david.edmondson@oracle.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210520145647.3483809-1-david.edmondson@oracle.com>
-References: <20210520145647.3483809-1-david.edmondson@oracle.com>
+        id S239826AbhETPF5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 11:05:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35438 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243132AbhETPFj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 May 2021 11:05:39 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74D43C061343
+        for <kvm@vger.kernel.org>; Thu, 20 May 2021 08:04:16 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id l70so12066322pga.1
+        for <kvm@vger.kernel.org>; Thu, 20 May 2021 08:04:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=jrMt9QJez7P5+bvwpasBTmDL6nKnfeamyLw6Z/AnazM=;
+        b=Po7kltvL+25HLzGM75Gdmo9X0cT+vXsymmDgTQtxUSKvzW+YHeGLasvaqtR16iJjOc
+         tA46MXUSWQyMgmoc7o/INR0UrGOT74c3nHqi1aHAK56qFVSjAIj4+ZN7iqDxJbCFltsf
+         E7Q21OHouf3q0+Fva2gLj3RfjWeKBm478pbe9Ucgp+u3OdI58XCPwAhSag7BRtwwVwVP
+         E0jFelyX1woyWtC7IwlwYeC9mC993fPq6bF0fOfeeHZiTTc3ccMnpio+vsjA+8Eg4kzB
+         BN60hkfgm0vVeGzt4KLLcwLZVkXsj7MqfMYD8nPsFo8VahQ+KkfrG7Zb/jVYiKRstUkr
+         wQDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=jrMt9QJez7P5+bvwpasBTmDL6nKnfeamyLw6Z/AnazM=;
+        b=F2OqZNsRZfNoQN9d9bTxKuxVIfvsRi9fI7TVa0tIKwHGpn4CepGy4d3wUkyPO8l6tb
+         Q0/jGOcO4yH4cTmMm0YvF9zUdajhBisfyCi0rcdK5PP8WBOGVuVndsJoQs5N+7eZDYHQ
+         widuOnZnZDgLrIH35dAZyGK4Lj861fpZOzdxWgY35apMyV6JCf84x1G9CFQe2ylXizHP
+         Qu+u86mpAR6LfahGFJod2nL08VGf3MouKotUnxbeGCZmjnRpmBfnveQk+DGtm9kL0Opa
+         movsdAuv9a1xZQ1GsE1ahj+iSsm1Fr+VJ4mPOAox/fXn4+mJZkP0FpNuutQEEWDG8+9p
+         ggEg==
+X-Gm-Message-State: AOAM532IjbMC0coLU3+2uqEPFOdVxgkzak8ag4fPp4OK60jT/HVr2rA7
+        sFe/wyepNhq9ExjJn+NP9cy1PQ==
+X-Google-Smtp-Source: ABdhPJyIiyetgp2/t7PvsfPKZUEs42uWRMgeuPwV3PZwsDzLKTfrqIP0j7wxDH0MZ7q6ddMHwIoVbQ==
+X-Received: by 2002:a63:a19:: with SMTP id 25mr5019828pgk.177.1621523055789;
+        Thu, 20 May 2021 08:04:15 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id s3sm2254541pfu.9.2021.05.20.08.04.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 May 2021 08:04:15 -0700 (PDT)
+Date:   Thu, 20 May 2021 15:04:11 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Subject: Re: [PATCH 4/4 v2] KVM: x86: Add a new VM statistic to show number
+ of VCPUs created in a given VM
+Message-ID: <YKZ6a6UlJt/r985F@google.com>
+References: <20210520005012.68377-1-krish.sadhukhan@oracle.com>
+ <20210520005012.68377-5-krish.sadhukhan@oracle.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210520005012.68377-5-krish.sadhukhan@oracle.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On AMD CPUs, ensure to save/load only the relevant XSAVE state.
+On Wed, May 19, 2021, Krish Sadhukhan wrote:
+> 'struct kvm' already has a member for counting the number of VCPUs created
+> for a given VM. Add this as a new VM statistic to KVM debugfs.
 
-Signed-off-by: David Edmondson <david.edmondson@oracle.com>
----
- target/i386/tcg/fpu_helper.c | 12 +++++--
- target/i386/xsave_helper.c   | 70 ++++++++++++++++++++++--------------
- 2 files changed, 54 insertions(+), 28 deletions(-)
+Huh!??  Why?  Userspace is the one creating the vCPUs, it darn well should know
+how many it's created.
+ 
+> Signed-off-by: Krish Sadhukhan <Krish.Sadhukhan@oracle.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 1 +
+>  arch/x86/kvm/svm/svm.c          | 3 +--
+>  arch/x86/kvm/x86.c              | 1 +
+>  virt/kvm/kvm_main.c             | 2 ++
+>  4 files changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index a19fe2cfaa93..69ca1d6f6557 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1139,6 +1139,7 @@ struct kvm_vm_stat {
+>  	ulong nx_lpage_splits;
+>  	ulong max_mmu_page_hash_collisions;
+>  	ulong vcpus_ran_nested;
+> +	u64 created_vcpus;
+>  };
+>  
+>  struct kvm_vcpu_stat {
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index d1871c51411f..fef0baba043b 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -3875,8 +3875,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+>  
+>  		/* Track VMRUNs that have made past consistency checking */
+>  		if (svm->nested.nested_run_pending &&
+> -		    svm->vmcb->control.exit_code != SVM_EXIT_ERR &&
+> -		    svm->vmcb->control.exit_code != SVM_EXIT_NPF) {
+> +		    svm->vmcb->control.exit_code != SVM_EXIT_ERR) {
 
-diff --git a/target/i386/tcg/fpu_helper.c b/target/i386/tcg/fpu_helper.c
-index fba2de5b04..f1d4704b34 100644
---- a/target/i386/tcg/fpu_helper.c
-+++ b/target/i386/tcg/fpu_helper.c
-@@ -2643,7 +2643,11 @@ static void do_xsave(CPUX86State *env, target_ulong ptr, uint64_t rfbm,
-         do_xsave_bndcsr(env, ptr + XO(intel.bndcsr_state), ra);
-     }
-     if (opt & XSTATE_PKRU_MASK) {
--        do_xsave_pkru(env, ptr + XO(intel.pkru_state), ra);
-+        if (IS_AMD_CPU(env)) {
-+            do_xsave_pkru(env, ptr + XO(amd.pkru_state), ra);
-+        } else {
-+            do_xsave_pkru(env, ptr + XO(intel.pkru_state), ra);
-+        }
-     }
- 
-     /* Update the XSTATE_BV field.  */
-@@ -2854,7 +2858,11 @@ void helper_xrstor(CPUX86State *env, target_ulong ptr, uint64_t rfbm)
-     if (rfbm & XSTATE_PKRU_MASK) {
-         uint64_t old_pkru = env->pkru;
-         if (xstate_bv & XSTATE_PKRU_MASK) {
--            do_xrstor_pkru(env, ptr + XO(intel.pkru_state), ra);
-+            if (IS_AMD_CPU(env)) {
-+                do_xrstor_pkru(env, ptr + XO(amd.pkru_state), ra);
-+            } else {
-+                do_xrstor_pkru(env, ptr + XO(intel.pkru_state), ra);
-+            }
-         } else {
-             env->pkru = 0;
-         }
-diff --git a/target/i386/xsave_helper.c b/target/i386/xsave_helper.c
-index 97dbab85d1..6b4501cf29 100644
---- a/target/i386/xsave_helper.c
-+++ b/target/i386/xsave_helper.c
-@@ -10,6 +10,7 @@ void x86_cpu_xsave_all_areas(X86CPU *cpu, X86XSaveArea *buf)
- {
-     CPUX86State *env = &cpu->env;
-     X86XSaveArea *xsave = buf;
-+    const bool is_amd = IS_AMD_CPU(env);
- 
-     uint16_t cwd, swd, twd;
-     int i;
-@@ -31,30 +32,38 @@ void x86_cpu_xsave_all_areas(X86CPU *cpu, X86XSaveArea *buf)
-             sizeof env->fpregs);
-     xsave->legacy.mxcsr = env->mxcsr;
-     xsave->header.xstate_bv = env->xstate_bv;
--    memcpy(&xsave->intel.bndreg_state.bnd_regs, env->bnd_regs,
--            sizeof env->bnd_regs);
--    xsave->intel.bndcsr_state.bndcsr = env->bndcs_regs;
--    memcpy(&xsave->intel.opmask_state.opmask_regs, env->opmask_regs,
--            sizeof env->opmask_regs);
-+    if (!is_amd) {
-+        memcpy(&xsave->intel.bndreg_state.bnd_regs, env->bnd_regs,
-+               sizeof env->bnd_regs);
-+        xsave->intel.bndcsr_state.bndcsr = env->bndcs_regs;
-+        memcpy(&xsave->intel.opmask_state.opmask_regs, env->opmask_regs,
-+               sizeof env->opmask_regs);
-+    }
- 
-     for (i = 0; i < CPU_NB_REGS; i++) {
-         uint8_t *xmm = xsave->legacy.xmm_regs[i];
-         uint8_t *ymmh = xsave->avx_state.ymmh[i];
--        uint8_t *zmmh = xsave->intel.zmm_hi256_state.zmm_hi256[i];
-         stq_p(xmm,     env->xmm_regs[i].ZMM_Q(0));
-         stq_p(xmm+8,   env->xmm_regs[i].ZMM_Q(1));
-         stq_p(ymmh,    env->xmm_regs[i].ZMM_Q(2));
-         stq_p(ymmh+8,  env->xmm_regs[i].ZMM_Q(3));
--        stq_p(zmmh,    env->xmm_regs[i].ZMM_Q(4));
--        stq_p(zmmh+8,  env->xmm_regs[i].ZMM_Q(5));
--        stq_p(zmmh+16, env->xmm_regs[i].ZMM_Q(6));
--        stq_p(zmmh+24, env->xmm_regs[i].ZMM_Q(7));
-+        if (!is_amd) {
-+            uint8_t *zmmh = xsave->intel.zmm_hi256_state.zmm_hi256[i];
-+            stq_p(zmmh,    env->xmm_regs[i].ZMM_Q(4));
-+            stq_p(zmmh+8,  env->xmm_regs[i].ZMM_Q(5));
-+            stq_p(zmmh+16, env->xmm_regs[i].ZMM_Q(6));
-+            stq_p(zmmh+24, env->xmm_regs[i].ZMM_Q(7));
-+        }
-     }
- 
- #ifdef TARGET_X86_64
--    memcpy(&xsave->intel.hi16_zmm_state.hi16_zmm, &env->xmm_regs[16],
--            16 * sizeof env->xmm_regs[16]);
--    memcpy(&xsave->intel.pkru_state, &env->pkru, sizeof env->pkru);
-+    if (is_amd) {
-+        memcpy(&xsave->amd.pkru_state, &env->pkru, sizeof env->pkru);
-+    } else {
-+        memcpy(&xsave->intel.hi16_zmm_state.hi16_zmm, &env->xmm_regs[16],
-+               16 * sizeof env->xmm_regs[16]);
-+        memcpy(&xsave->intel.pkru_state, &env->pkru, sizeof env->pkru);
-+    }
- #endif
- 
- }
-@@ -64,6 +73,7 @@ void x86_cpu_xrstor_all_areas(X86CPU *cpu, const X86XSaveArea *buf)
- 
-     CPUX86State *env = &cpu->env;
-     const X86XSaveArea *xsave = buf;
-+    const bool is_amd = IS_AMD_CPU(env);
- 
-     int i;
-     uint16_t cwd, swd, twd;
-@@ -83,30 +93,38 @@ void x86_cpu_xrstor_all_areas(X86CPU *cpu, const X86XSaveArea *buf)
-     memcpy(env->fpregs, &xsave->legacy.fpregs,
-             sizeof env->fpregs);
-     env->xstate_bv = xsave->header.xstate_bv;
--    memcpy(env->bnd_regs, &xsave->intel.bndreg_state.bnd_regs,
--            sizeof env->bnd_regs);
--    env->bndcs_regs = xsave->intel.bndcsr_state.bndcsr;
--    memcpy(env->opmask_regs, &xsave->intel.opmask_state.opmask_regs,
--            sizeof env->opmask_regs);
-+    if (!is_amd) {
-+        memcpy(env->bnd_regs, &xsave->intel.bndreg_state.bnd_regs,
-+               sizeof env->bnd_regs);
-+        env->bndcs_regs = xsave->intel.bndcsr_state.bndcsr;
-+        memcpy(env->opmask_regs, &xsave->intel.opmask_state.opmask_regs,
-+               sizeof env->opmask_regs);
-+    }
- 
-     for (i = 0; i < CPU_NB_REGS; i++) {
-         const uint8_t *xmm = xsave->legacy.xmm_regs[i];
-         const uint8_t *ymmh = xsave->avx_state.ymmh[i];
--        const uint8_t *zmmh = xsave->intel.zmm_hi256_state.zmm_hi256[i];
-         env->xmm_regs[i].ZMM_Q(0) = ldq_p(xmm);
-         env->xmm_regs[i].ZMM_Q(1) = ldq_p(xmm+8);
-         env->xmm_regs[i].ZMM_Q(2) = ldq_p(ymmh);
-         env->xmm_regs[i].ZMM_Q(3) = ldq_p(ymmh+8);
--        env->xmm_regs[i].ZMM_Q(4) = ldq_p(zmmh);
--        env->xmm_regs[i].ZMM_Q(5) = ldq_p(zmmh+8);
--        env->xmm_regs[i].ZMM_Q(6) = ldq_p(zmmh+16);
--        env->xmm_regs[i].ZMM_Q(7) = ldq_p(zmmh+24);
-+        if (!is_amd) {
-+            const uint8_t *zmmh = xsave->intel.zmm_hi256_state.zmm_hi256[i];
-+            env->xmm_regs[i].ZMM_Q(4) = ldq_p(zmmh);
-+            env->xmm_regs[i].ZMM_Q(5) = ldq_p(zmmh+8);
-+            env->xmm_regs[i].ZMM_Q(6) = ldq_p(zmmh+16);
-+            env->xmm_regs[i].ZMM_Q(7) = ldq_p(zmmh+24);
-+        }
-     }
- 
- #ifdef TARGET_X86_64
--    memcpy(&env->xmm_regs[16], &xsave->intel.hi16_zmm_state.hi16_zmm,
--           16 * sizeof env->xmm_regs[16]);
--    memcpy(&env->pkru, &xsave->intel.pkru_state, sizeof env->pkru);
-+    if (is_amd) {
-+        memcpy(&env->pkru, &xsave->amd.pkru_state, sizeof env->pkru);
-+    } else {
-+        memcpy(&env->xmm_regs[16], &xsave->intel.hi16_zmm_state.hi16_zmm,
-+               16 * sizeof env->xmm_regs[16]);
-+        memcpy(&env->pkru, &xsave->intel.pkru_state, sizeof env->pkru);
-+    }
- #endif
- 
- }
--- 
-2.30.2
+???
 
+>  			if (!vcpu->stat.nested_runs)
+>  				++vcpu->kvm->stat.vcpus_ran_nested;
+>                          ++vcpu->stat.nested_runs;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index cbca3609a152..a9d27ce4cc93 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -258,6 +258,7 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+>  	VM_STAT("nx_largepages_splitted", nx_lpage_splits, .mode = 0444),
+>  	VM_STAT("max_mmu_page_hash_collisions", max_mmu_page_hash_collisions),
+>  	VM_STAT("vcpus_ran_nested", vcpus_ran_nested),
+> +	VM_STAT("created_vcpus", created_vcpus),
+>  	{ NULL }
+>  };
+>  
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 6b4feb92dc79..ac8f02d8a051 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3318,6 +3318,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
+>  	}
+>  
+>  	kvm->created_vcpus++;
+> +	kvm->stat.created_vcpus++;
+>  	mutex_unlock(&kvm->lock);
+>  
+>  	r = kvm_arch_vcpu_precreate(kvm, id);
+> @@ -3394,6 +3395,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
+>  vcpu_decrement:
+>  	mutex_lock(&kvm->lock);
+>  	kvm->created_vcpus--;
+> +	kvm->stat.created_vcpus--;
+>  	mutex_unlock(&kvm->lock);
+>  	return r;
+>  }
+> -- 
+> 2.27.0
+> 
