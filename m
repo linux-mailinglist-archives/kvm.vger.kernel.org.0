@@ -2,113 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CB9638B56A
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 19:45:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 82E0A38B584
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 19:52:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235118AbhETRrC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 May 2021 13:47:02 -0400
-Received: from foss.arm.com ([217.140.110.172]:56404 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230339AbhETRrB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 May 2021 13:47:01 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2AC0411B3;
-        Thu, 20 May 2021 10:45:39 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CF6BF3F719;
-        Thu, 20 May 2021 10:45:37 -0700 (PDT)
-Subject: Re: [PATCH v3 2/9] KVM: arm64: Handle physical FIQ as an IRQ while
- running a guest
-To:     Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Hector Martin <marcan@marcan.st>,
-        Mark Rutland <mark.rutland@arm.com>, kernel-team@android.com
-References: <20210510134824.1910399-1-maz@kernel.org>
- <20210510134824.1910399-3-maz@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <2311e75e-589c-4602-e81f-c639e7a33bd9@arm.com>
-Date:   Thu, 20 May 2021 18:46:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S235617AbhETRx2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 13:53:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45476 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231680AbhETRx2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 May 2021 13:53:28 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3580C061574;
+        Thu, 20 May 2021 10:52:06 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0eb6009f35b1f88a592069.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:b600:9f35:b1f8:8a59:2069])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6A16B1EC064C;
+        Thu, 20 May 2021 19:52:05 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1621533125;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=QjVcZjqm5/10ZZQkty/TinnzjR8RRiru1ikOMqd1Ri0=;
+        b=owNuv2xMy04KYoWQbdhnDa1orkCnNBBR3QKPzPJ2pOrqn01FoO7lMw8hmu062zokqFRuc7
+        8TdPjT+CGeRmDT7p5b0WR9sMUH5u+dDXiq8x+dtBe2DtmKVrQcd+ztYo+ulXA5o8/e1U02
+        SkYYPhbroDaJlvbQu/UILWw0tvWkO+Y=
+Date:   Thu, 20 May 2021 19:51:57 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        tglx@linutronix.de, jroedel@suse.de, thomas.lendacky@amd.com,
+        pbonzini@redhat.com, mingo@redhat.com, dave.hansen@intel.com,
+        rientjes@google.com, seanjc@google.com, peterz@infradead.org,
+        hpa@zytor.com, tony.luck@intel.com
+Subject: Re: [PATCH Part1 RFC v2 10/20] x86/sev: Add a helper for the
+ PVALIDATE instruction
+Message-ID: <YKahvUZ3hAgWViqd@zn.tnic>
+References: <20210430121616.2295-1-brijesh.singh@amd.com>
+ <20210430121616.2295-11-brijesh.singh@amd.com>
+ <4ecbed35-aca4-9e30-22d0-f5c46b67b70a@amd.com>
+ <YKadOnfjaeffKwav@zn.tnic>
+ <8e7f0a86-55e3-2974-75d6-50228ea179b3@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20210510134824.1910399-3-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <8e7f0a86-55e3-2974-75d6-50228ea179b3@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Thu, May 20, 2021 at 12:44:50PM -0500, Brijesh Singh wrote:
+> Hmm, I use the SIZEMISMATCH later in the patches.
 
-On 5/10/21 2:48 PM, Marc Zyngier wrote:
-> As we we now entertain the possibility of FIQ being used on the host,
-> treat the signalling of a FIQ while running a guest as an IRQ,
-> causing an exit instead of a HYP panic.
+You do, where? Maybe I don't see it.
 
-I've mulling over this, and I can't find anything wrong with it. Any FIQs for
-which there is no handler registered by the interrupt controller will panic in the
-default_handle_fiq() FIQ handler, similar to the current KVM behaviour. And if
-there is a handler registered (only AIC does it for now), then a FIQ will be
-handled just like any other interrupt instead of KVM panic'ing when the host can
-handle it just fine.
+> Since I was introducing the pvalidate in separate patch so decided to
+> define all the return code.
 
-I've briefly considered creating a new return code from __kvm_vcpu_run,
-ARM_EXCEPTION_FIQ, but I really don't see any reason for it, since it will serve
-the same purpose as ARM_EXCEPTION_IRQ, which is to resume the guest without any
-special exit handling.
+You can define them in a comment so that it is clear what PVALIDATE
+returns but not as defines when they're unused.
 
-It makes sense to me for KVM to handle FIQs just like IRQs, now that the kernel
-treats them the same:
+Thx.
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+-- 
+Regards/Gruss,
+    Boris.
 
-Thanks,
-
-Alex
-
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/hyp-entry.S | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-> index 5f49df4ffdd8..9aa9b73475c9 100644
-> --- a/arch/arm64/kvm/hyp/hyp-entry.S
-> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
-> @@ -76,6 +76,7 @@ el1_trap:
->  	b	__guest_exit
->  
->  el1_irq:
-> +el1_fiq:
->  	get_vcpu_ptr	x1, x0
->  	mov	x0, #ARM_EXCEPTION_IRQ
->  	b	__guest_exit
-> @@ -131,7 +132,6 @@ SYM_CODE_END(\label)
->  	invalid_vector	el2t_error_invalid
->  	invalid_vector	el2h_irq_invalid
->  	invalid_vector	el2h_fiq_invalid
-> -	invalid_vector	el1_fiq_invalid
->  
->  	.ltorg
->  
-> @@ -179,12 +179,12 @@ SYM_CODE_START(__kvm_hyp_vector)
->  
->  	valid_vect	el1_sync		// Synchronous 64-bit EL1
->  	valid_vect	el1_irq			// IRQ 64-bit EL1
-> -	invalid_vect	el1_fiq_invalid		// FIQ 64-bit EL1
-> +	valid_vect	el1_fiq			// FIQ 64-bit EL1
->  	valid_vect	el1_error		// Error 64-bit EL1
->  
->  	valid_vect	el1_sync		// Synchronous 32-bit EL1
->  	valid_vect	el1_irq			// IRQ 32-bit EL1
-> -	invalid_vect	el1_fiq_invalid		// FIQ 32-bit EL1
-> +	valid_vect	el1_fiq			// FIQ 32-bit EL1
->  	valid_vect	el1_error		// Error 32-bit EL1
->  SYM_CODE_END(__kvm_hyp_vector)
->  
+https://people.kernel.org/tglx/notes-about-netiquette
