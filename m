@@ -2,118 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3FC438B3FB
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 18:03:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E820638B412
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 18:13:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233433AbhETQEC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 May 2021 12:04:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48898 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233540AbhETQDp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 May 2021 12:03:45 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 695AFC061760;
-        Thu, 20 May 2021 09:02:23 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0eb60047444127d595167e.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:b600:4744:4127:d595:167e])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 274391EC0632;
-        Thu, 20 May 2021 18:02:21 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1621526541;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=GX2XQzvfPLgXrP1lIElAkbHpsf60KiOZXtIKg3YN+BI=;
-        b=gWj7j52NqPF/YFJtdZ/1A706qZ/ee2C5fYgzIo6SUXPKCFU2HDB04OSq02opeZkNi1FWPU
-        zA8LldKclQf3aHEV3chuqYOSMAeIAJe15+jkXsQ5JdsnopD1D0DnyfZ9ktkAdRvpZFlZb3
-        S2Qf3Lfy8R9UdEuaUF1zBneCc7CEhyU=
-Date:   Thu, 20 May 2021 18:02:20 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        tglx@linutronix.de, jroedel@suse.de, thomas.lendacky@amd.com,
-        pbonzini@redhat.com, mingo@redhat.com, dave.hansen@intel.com,
-        rientjes@google.com, seanjc@google.com, peterz@infradead.org,
-        hpa@zytor.com, tony.luck@intel.com
-Subject: Re: [PATCH Part1 RFC v2 09/20] x86/sev: check SEV-SNP features
- support
-Message-ID: <YKaIDAHOz4+soLxi@zn.tnic>
-References: <20210430121616.2295-1-brijesh.singh@amd.com>
- <20210430121616.2295-10-brijesh.singh@amd.com>
+        id S233646AbhETQOd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 12:14:33 -0400
+Received: from mail-mw2nam10on2080.outbound.protection.outlook.com ([40.107.94.80]:5960
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231927AbhETQOc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 May 2021 12:14:32 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=S1jnYzj+cfWwOh1KMBqwii8yJWn8SOrJMaryeKWyGq8ggKsK/PRWRwKDCC7I92xcEWEmRASlyweZFAkKHK25agWsnc+NANlBIyuOTC8VHnIcjKxvck8HPxCWKUVVWPEAz0vIiBP3Xcr+MCEVBWzAhH2rS36sO6tZgYgwVxwXaKrUBjsNZq2Brk9FmB9a4m96VQimp9v/Ld3W/Dzp5eo9mNLcmErk3vuJlktu5f7XoWZnoPdOMtXYTQVWnFfjqX9adLTN5DsQ+9w96pLalWgT08rOrCgqhp/f3fwt4n/MqOaOd6JnaXxZ/4XlNOGBb+B+1r6TgaRyN/Qi2DFQkzoQ3A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zid42nEi3BgCAhyf9Kn6wYnQ6bPOpRs/h9iXHu5iP/w=;
+ b=nF/MtGHrhXdDNHg6ZIguVxwonlMr3ooj/TwB7d3HJW02pk+TySTMURyPbammcXK8WdDK6xlGJR/opK8qV6ze16AHiUdAok3bfzsK2UR3UQjR7JpKckmZoSY438dHXDWx1Ujj5ni1ZuFUtQsSkTLgfcENrIHczqN6itQ2abtpOCAynNBgLLHN36xwOqhxfrU3lANaumE4HvvFXb7QnmMuSGcZ4kLczVIk04M21nc7oRfJtUrJnuOgfB3C0xrmYFpJXqggu2kgnMS4un6PoY+9YFe4/gPIenhuo/9OPphJ4pR0J53/qU0fx8Z9MjbjOdPRWyyMjLaVxLj3lL8kIUjwjA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zid42nEi3BgCAhyf9Kn6wYnQ6bPOpRs/h9iXHu5iP/w=;
+ b=mmXFcxkKmmQigJooDmWczeHACJ+vjxiUs42y6RwBLr6pVYUQsXlyq11sHtAW56GnlFojJi9mhVtQXf6BOm++fcwkuxsSPN5Ygb1CuyMgXJHf0aiUpk/pJ+qTlrukQM+lKpySZS6kG28ShKZFJdht2ukfYkRA6y7kvBWWXhNmzh4Luk5WcvqGDYDdB0NwowmOi3AyPyCxU6earC8FxLFzjf+yDC4NbxnW20x4ApnWIrpgU2nJDIk4j0VX+258VCC+5lWMZ2ukMOvLTxbNtyZWY5OCSfJP5GUqAia8e0/CKjMZqqDCjiV8heYq9+dWQStfkAwaMTUpVk1L55poN7/cwA==
+Received: from DS7PR03CA0099.namprd03.prod.outlook.com (2603:10b6:5:3b7::14)
+ by BY5PR12MB3748.namprd12.prod.outlook.com (2603:10b6:a03:1ad::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4129.29; Thu, 20 May
+ 2021 16:13:10 +0000
+Received: from DM6NAM11FT059.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:3b7:cafe::ca) by DS7PR03CA0099.outlook.office365.com
+ (2603:10b6:5:3b7::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4129.33 via Frontend
+ Transport; Thu, 20 May 2021 16:13:10 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ DM6NAM11FT059.mail.protection.outlook.com (10.13.172.92) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4129.25 via Frontend Transport; Thu, 20 May 2021 16:13:09 +0000
+Received: from [172.27.15.55] (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 20 May
+ 2021 16:13:07 +0000
+Subject: Re: [PATCH 1/1] vfio/pci: Fix error return code in vfio_ecap_init()
+To:     Zhen Lei <thunder.leizhen@huawei.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm <kvm@vger.kernel.org>
+References: <20210515020458.6771-1-thunder.leizhen@huawei.com>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <b72a2be8-a46f-0854-a29d-264c806ba953@nvidia.com>
+Date:   Thu, 20 May 2021 19:13:04 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210430121616.2295-10-brijesh.singh@amd.com>
+In-Reply-To: <20210515020458.6771-1-thunder.leizhen@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 2e8cc8ad-44eb-48ce-7d33-08d91baa2934
+X-MS-TrafficTypeDiagnostic: BY5PR12MB3748:
+X-Microsoft-Antispam-PRVS: <BY5PR12MB374880F49FFF49393FA27675DE2A9@BY5PR12MB3748.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1388;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: M3AP7dgtqf0OlcWNXe0PXZV3kjQF12Mx9QmSUGB1tFPo1GStL1ClLNBcMIEkDV+D2UeAHhO1aUC+jslY/uKfBMFoNQpT/dRo6gf1hXWToFHZCqvCTjUNlQanvfNlqeVVARpbTi2xfKWmmNWx0EvPklpwK1VzGjMaL9CYrSeF8yz0eBKuarPAvyzASSohvSotuzy+4mJ05dVZkR10mU8EUjxbjNjIbIJ6v1dM+eFLN90taCzD1uKM9daC4Etlg1q3Uy20Z/F1zYg8qtLRE1gEH0gGqB+xDBTKPA52ouvl2H3Pci5dQ92OcHM0o22xhF9eVTGaa4msTBISlGyZblXBPtCd4fTW/3onTdiO8J1ASsCT/V8BVWQSXay6hVIgIAosQCI4mrKdbg9qqQ70D5J6SWePcbpupj0B0D8JpxehtG2rnMZnpNZYQvHDIC5HRhrWN2hteUB5v9U4m2NsnkO5YrnA72OpwJUPDNLP72HRW6euCj7+b18utVetifropA99ssdExDw+2R+EGvOoaW3DUoumtUPr8gv+MtMrRABmnT3ucJlEogqclbLsrmHnu2ylv0Xc3kBD8j9Ue+VTSDbSJ5YMaEGb2OF1qhy+Eq+U/XAWBoW3kKLr8iRZ1bRoX832iAcwyqYoNJ72OokhrT3kHwlKeuuIhvLCsjHLy9LABduV2QOy3IsjoaBcu76J4aPX
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(396003)(136003)(376002)(346002)(39860400002)(46966006)(36840700001)(6666004)(86362001)(478600001)(31686004)(47076005)(31696002)(36860700001)(110136005)(426003)(83380400001)(2906002)(26005)(82310400003)(82740400003)(16526019)(186003)(36756003)(70206006)(70586007)(356005)(5660300002)(2616005)(53546011)(4744005)(16576012)(336012)(316002)(36906005)(8936002)(8676002)(7636003)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2021 16:13:09.8192
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2e8cc8ad-44eb-48ce-7d33-08d91baa2934
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT059.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB3748
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 30, 2021 at 07:16:05AM -0500, Brijesh Singh wrote:
-> diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
-> index 6d9055427f37..7badbeb6cb95 100644
-> --- a/arch/x86/boot/compressed/sev.c
-> +++ b/arch/x86/boot/compressed/sev.c
-> @@ -25,6 +25,8 @@
->  
->  struct ghcb boot_ghcb_page __aligned(PAGE_SIZE);
->  struct ghcb *boot_ghcb;
-> +static u64 sev_status_val;
 
-msr_sev_status should be more descriptive.
+On 5/15/2021 5:04 AM, Zhen Lei wrote:
+> The error code returned from vfio_ext_cap_len() is stored in 'len', not
+> in 'ret'.
+>
+> Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
+> ---
+>   drivers/vfio/pci/vfio_pci_config.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+> index d57f037f65b85d4..70e28efbc51f80e 100644
+> --- a/drivers/vfio/pci/vfio_pci_config.c
+> +++ b/drivers/vfio/pci/vfio_pci_config.c
+> @@ -1581,7 +1581,7 @@ static int vfio_ecap_init(struct vfio_pci_device *vdev)
+>   			if (len == 0xFF) {
+>   				len = vfio_ext_cap_len(vdev, ecap, epos);
+>   				if (len < 0)
+> -					return ret;
+> +					return len;
+>   			}
+>   		}
 
-> +static bool sev_status_checked;
+Looks good,
 
-You don't need this one - you can simply do
+Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
 
-	if (!msr_sev_status)
-		read the MSR.
 
->  /*
->   * Copy a version of this function here - insn-eval.c can't be used in
-> @@ -119,11 +121,30 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
->  /* Include code for early handlers */
->  #include "../../kernel/sev-shared.c"
->  
-> +static inline bool sev_snp_enabled(void)
-> +{
-> +	unsigned long low, high;
-> +
-> +	if (!sev_status_checked) {
-> +		asm volatile("rdmsr\n"
-> +			     : "=a" (low), "=d" (high)
-> +			     : "c" (MSR_AMD64_SEV));
-> +		sev_status_val = (high << 32) | low;
-> +		sev_status_checked = true;
-> +	}
-> +
-> +	return sev_status_val & MSR_AMD64_SEV_SNP_ENABLED ? true : false;
-
-	return msr_sev_status & MSR_AMD64_SEV_SNP_ENABLED;
-
-is enough.
-
-> +}
-> +
->  static bool early_setup_sev_es(void)
->  {
->  	if (!sev_es_negotiate_protocol())
->  		sev_es_terminate(0, GHCB_SEV_ES_REASON_PROTOCOL_UNSUPPORTED);
->  
-> +	/* If SEV-SNP is enabled then check if the hypervisor supports the SEV-SNP features. */
-
-80 cols like the rest of this file pls.
-
-> +	if (sev_snp_enabled() && !sev_snp_check_hypervisor_features())
-> +		sev_es_terminate(0, GHCB_SEV_ES_REASON_SNP_UNSUPPORTED);
-> +
->  	if (set_page_decrypted((unsigned long)&boot_ghcb_page))
->  		return false;
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+>   
