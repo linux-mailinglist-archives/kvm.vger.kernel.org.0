@@ -2,35 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B568138B268
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 17:02:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49B2738B26B
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 17:02:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240238AbhETPEG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 May 2021 11:04:06 -0400
-Received: from forward1-smtp.messagingengine.com ([66.111.4.223]:33305 "EHLO
+        id S240781AbhETPEI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 11:04:08 -0400
+Received: from forward1-smtp.messagingengine.com ([66.111.4.223]:37225 "EHLO
         forward1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231330AbhETPEE (ORCPT
+        by vger.kernel.org with ESMTP id S231470AbhETPEE (ORCPT
         <rfc822;kvm@vger.kernel.org>); Thu, 20 May 2021 11:04:04 -0400
-X-Greylist: delayed 351 seconds by postgrey-1.27 at vger.kernel.org; Thu, 20 May 2021 11:04:04 EDT
 Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailforward.nyi.internal (Postfix) with ESMTP id 4E06219409C2;
-        Thu, 20 May 2021 10:56:51 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute3.internal (MEProxy); Thu, 20 May 2021 10:56:51 -0400
+        by mailforward.nyi.internal (Postfix) with ESMTP id 65AE119409FB;
+        Thu, 20 May 2021 10:56:52 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute3.internal (MEProxy); Thu, 20 May 2021 10:56:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
         messagingengine.com; h=cc:content-transfer-encoding:date:from
         :in-reply-to:message-id:mime-version:references:subject:to
         :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm2; bh=0XKNL7YZ691EHtFvC6KzkvGYHe5z3roIn3UQ0rlEtnM=; b=tgS5bYhV
-        mZo58dJtKTN5BR366Z/irlcasJZT4cxXCMPCoQwx0zKMFsRDx8A9+xhQdXwsLRoB
-        xPjXLGw/TapcFnj6feWzDIkisi3nJZrm+E0gpgPSidZRJysojk24FGd5o+X8YNIl
-        OwZDBOolw4O+JhMgTEiGAC4QUE6pHDyzd6BYZff0v94hUmNeMpc4whd9WJzbK2HO
-        esHsMKxKV552dXggzlgNB+ZjhveGN/BlnALYDxW6pMxY9t5FVXU6K6OlXGxNgi/k
-        TTUHIbHRQHmghNE3k5kc3sZr6hp2r4Wqq5lD1GpkPykxRLjlCKc0ie+mOIbxS26j
-        pTWzoIB3JofCPQ==
-X-ME-Sender: <xms:s3imYAUxL4iZ8FzUGdti-Do0jNX8ZHiqd6NirnZUA4mAUkP3J7xP0Q>
-    <xme:s3imYEl5tDAsyveEVXIVRkf4cgP95ooMC5cxakBNBYiuSwl4k-0EqgKuiCnnOC2Gv
-    hhLkIuIcNYla5KX2SA>
+        fm2; bh=DDI408hEzIsKkkLSrWxdgVh7cxIzItBOhihRC+7ELzw=; b=mI09N+Uq
+        0NeWaQRtDFdPgYpD1WJvHI/QLeHD/rdMw3J/Z1qdr3SY8sy7QfMI4S4tLcHPlFkf
+        vbJl7mpT3z/rK2UXoMWyIdoykc1V15GGQb91MMsDa5hNuFUeCy0Qj+RidSGztanj
+        YXhyi5U6cXxHSge51ECE6WcUvDmEUhofiQ3A4+dCBHl9xgW4Ya75taqhXZAJ0sKy
+        eypTF1q/CrwDhr3VBCG4/F0Vtk/3s7q69po3tVAN0Fx4hYyYreFdst7inN4OYsWZ
+        b9SrhCNFJrbEqW3iJCYtXVJHdZtrFO54LRBL2H03nNW3lL4EcnTUT4Y7SioyzP72
+        OKnmc78/m5E8Jw==
+X-ME-Sender: <xms:tHimYI2pD7K0I2geEIRd9ujc4Cv5fDvvpT2D-d1vu6S69rpHTVF5VQ>
+    <xme:tHimYDH78b5cdlu2dCpxdGDAMmEkinacBbvxFYV4nn-b-DeCVM3Ciev9AgSB1DQzU
+    GbbH5p9wzreSWTVrn8>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvdejuddgkeefucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
     uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
@@ -40,15 +39,15 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvdejuddgkeefucetufdoteggod
     leehfffhiefhgeelgfejtdehkeenucfkphepkedurddukeejrddviedrvdefkeenucevlh
     hushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegurghvihgurdgv
     ughmohhnughsohhnsehorhgrtghlvgdrtghomh
-X-ME-Proxy: <xmx:s3imYEaSe_abHYRgc_uOIKK6QyPKPU-7ddz2vK7bj5JYjjhfHNOiKQ>
-    <xmx:s3imYPWXc8m_bHHu2ePp69xm24hzAhfkgnkM2lkB3UjUrIMI1-39gA>
-    <xmx:s3imYKmV3Wh_F4Lj69o1EbOnHdwUsNEXAEZDBtB_Ila73nnx5COKwQ>
-    <xmx:s3imYAldnz52TaQZe05zcf6SL5J64nEaZpjh0-xcg0q-Zqd4DBOORA>
+X-ME-Proxy: <xmx:tHimYA5SQrsPmqFvhfPrAS61E_hXyvKhxElNA4NGTOx2lYTtDP9giw>
+    <xmx:tHimYB3wwF5oZO3M1eQixdO-SC4qpberzWqf8VDZzqS_VMgVj0cPtw>
+    <xmx:tHimYLEO4GxrAA9K4flF-j1Gzd2tttCtF4Av_pZcVZfiE1FmOhjOyg>
+    <xmx:tHimYLEJSzGWh7NdW3ZeGaRKwRvpfJixUUMs_DFReWc7MvSkf0-zJQ>
 Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net [81.187.26.238])
         by mail.messagingengine.com (Postfix) with ESMTPA;
-        Thu, 20 May 2021 10:56:50 -0400 (EDT)
+        Thu, 20 May 2021 10:56:51 -0400 (EDT)
 Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 874f0275;
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 03d9d232;
         Thu, 20 May 2021 14:56:47 +0000 (UTC)
 From:   David Edmondson <david.edmondson@oracle.com>
 To:     qemu-devel@nongnu.org
@@ -58,9 +57,9 @@ Cc:     kvm@vger.kernel.org, Eduardo Habkost <ehabkost@redhat.com>,
         Richard Henderson <richard.henderson@linaro.org>,
         Babu Moger <babu.moger@amd.com>,
         David Edmondson <david.edmondson@oracle.com>
-Subject: [RFC PATCH 1/7] target/i386: Declare constants for XSAVE offsets
-Date:   Thu, 20 May 2021 15:56:41 +0100
-Message-Id: <20210520145647.3483809-2-david.edmondson@oracle.com>
+Subject: [RFC PATCH 2/7] target/i386: Use constants for XSAVE offsets
+Date:   Thu, 20 May 2021 15:56:42 +0100
+Message-Id: <20210520145647.3483809-3-david.edmondson@oracle.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210520145647.3483809-1-david.edmondson@oracle.com>
 References: <20210520145647.3483809-1-david.edmondson@oracle.com>
@@ -70,68 +69,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Declare and use manifest constants for the XSAVE state component
-offsets.
+Where existing constants for XSAVE offsets exists, use them.
 
 Signed-off-by: David Edmondson <david.edmondson@oracle.com>
 ---
- target/i386/cpu.h | 30 +++++++++++++++++++++++-------
- 1 file changed, 23 insertions(+), 7 deletions(-)
+ target/i386/kvm/kvm.c | 56 ++++++++++++++-----------------------------
+ 1 file changed, 18 insertions(+), 38 deletions(-)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index e6836393f7..1fb732f366 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1305,6 +1305,22 @@ typedef struct XSavePKRU {
-     uint32_t padding;
- } XSavePKRU;
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index d972eb4705..aff0774fef 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -2397,44 +2397,24 @@ static int kvm_put_fpu(X86CPU *cpu)
+     return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_FPU, &fpu);
+ }
  
-+#define XSAVE_FCW_FSW_OFFSET    0x000
-+#define XSAVE_FTW_FOP_OFFSET    0x004
-+#define XSAVE_CWD_RIP_OFFSET    0x008
-+#define XSAVE_CWD_RDP_OFFSET    0x010
-+#define XSAVE_MXCSR_OFFSET      0x018
-+#define XSAVE_ST_SPACE_OFFSET   0x020
-+#define XSAVE_XMM_SPACE_OFFSET  0x0a0
-+#define XSAVE_XSTATE_BV_OFFSET  0x200
-+#define XSAVE_AVX_OFFSET        0x240
-+#define XSAVE_BNDREG_OFFSET     0x3c0
-+#define XSAVE_BNDCSR_OFFSET     0x400
-+#define XSAVE_OPMASK_OFFSET     0x440
-+#define XSAVE_ZMM_HI256_OFFSET  0x480
-+#define XSAVE_HI16_ZMM_OFFSET   0x680
-+#define XSAVE_PKRU_OFFSET       0xa80
+-#define XSAVE_FCW_FSW     0
+-#define XSAVE_FTW_FOP     1
+-#define XSAVE_CWD_RIP     2
+-#define XSAVE_CWD_RDP     4
+-#define XSAVE_MXCSR       6
+-#define XSAVE_ST_SPACE    8
+-#define XSAVE_XMM_SPACE   40
+-#define XSAVE_XSTATE_BV   128
+-#define XSAVE_YMMH_SPACE  144
+-#define XSAVE_BNDREGS     240
+-#define XSAVE_BNDCSR      256
+-#define XSAVE_OPMASK      272
+-#define XSAVE_ZMM_Hi256   288
+-#define XSAVE_Hi16_ZMM    416
+-#define XSAVE_PKRU        672
+-
+-#define XSAVE_BYTE_OFFSET(word_offset) \
+-    ((word_offset) * sizeof_field(struct kvm_xsave, region[0]))
+-
+-#define ASSERT_OFFSET(word_offset, field) \
+-    QEMU_BUILD_BUG_ON(XSAVE_BYTE_OFFSET(word_offset) != \
+-                      offsetof(X86XSaveArea, field))
+-
+-ASSERT_OFFSET(XSAVE_FCW_FSW, legacy.fcw);
+-ASSERT_OFFSET(XSAVE_FTW_FOP, legacy.ftw);
+-ASSERT_OFFSET(XSAVE_CWD_RIP, legacy.fpip);
+-ASSERT_OFFSET(XSAVE_CWD_RDP, legacy.fpdp);
+-ASSERT_OFFSET(XSAVE_MXCSR, legacy.mxcsr);
+-ASSERT_OFFSET(XSAVE_ST_SPACE, legacy.fpregs);
+-ASSERT_OFFSET(XSAVE_XMM_SPACE, legacy.xmm_regs);
+-ASSERT_OFFSET(XSAVE_XSTATE_BV, header.xstate_bv);
+-ASSERT_OFFSET(XSAVE_YMMH_SPACE, avx_state);
+-ASSERT_OFFSET(XSAVE_BNDREGS, bndreg_state);
+-ASSERT_OFFSET(XSAVE_BNDCSR, bndcsr_state);
+-ASSERT_OFFSET(XSAVE_OPMASK, opmask_state);
+-ASSERT_OFFSET(XSAVE_ZMM_Hi256, zmm_hi256_state);
+-ASSERT_OFFSET(XSAVE_Hi16_ZMM, hi16_zmm_state);
+-ASSERT_OFFSET(XSAVE_PKRU, pkru_state);
++#define ASSERT_OFFSET(offset, field) \
++    QEMU_BUILD_BUG_ON(offset != offsetof(X86XSaveArea, field))
 +
- typedef struct X86XSaveArea {
-     X86LegacyXSaveArea legacy;
-     X86XSaveHeader header;
-@@ -1325,19 +1341,19 @@ typedef struct X86XSaveArea {
-     XSavePKRU pkru_state;
- } X86XSaveArea;
++ASSERT_OFFSET(XSAVE_FCW_FSW_OFFSET, legacy.fcw);
++ASSERT_OFFSET(XSAVE_FTW_FOP_OFFSET, legacy.ftw);
++ASSERT_OFFSET(XSAVE_CWD_RIP_OFFSET, legacy.fpip);
++ASSERT_OFFSET(XSAVE_CWD_RDP_OFFSET, legacy.fpdp);
++ASSERT_OFFSET(XSAVE_MXCSR_OFFSET, legacy.mxcsr);
++ASSERT_OFFSET(XSAVE_ST_SPACE_OFFSET, legacy.fpregs);
++ASSERT_OFFSET(XSAVE_XMM_SPACE_OFFSET, legacy.xmm_regs);
++ASSERT_OFFSET(XSAVE_XSTATE_BV_OFFSET, header.xstate_bv);
++ASSERT_OFFSET(XSAVE_AVX_OFFSET, avx_state);
++ASSERT_OFFSET(XSAVE_BNDREG_OFFSET, bndreg_state);
++ASSERT_OFFSET(XSAVE_BNDCSR_OFFSET, bndcsr_state);
++ASSERT_OFFSET(XSAVE_OPMASK_OFFSET, opmask_state);
++ASSERT_OFFSET(XSAVE_ZMM_HI256_OFFSET, zmm_hi256_state);
++ASSERT_OFFSET(XSAVE_HI16_ZMM_OFFSET, hi16_zmm_state);
++ASSERT_OFFSET(XSAVE_PKRU_OFFSET, pkru_state);
  
--QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, avx_state) != 0x240);
-+QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, avx_state) != XSAVE_AVX_OFFSET);
- QEMU_BUILD_BUG_ON(sizeof(XSaveAVX) != 0x100);
--QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, bndreg_state) != 0x3c0);
-+QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, bndreg_state) != XSAVE_BNDREG_OFFSET);
- QEMU_BUILD_BUG_ON(sizeof(XSaveBNDREG) != 0x40);
--QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, bndcsr_state) != 0x400);
-+QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, bndcsr_state) != XSAVE_BNDCSR_OFFSET);
- QEMU_BUILD_BUG_ON(sizeof(XSaveBNDCSR) != 0x40);
--QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, opmask_state) != 0x440);
-+QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, opmask_state) != XSAVE_OPMASK_OFFSET);
- QEMU_BUILD_BUG_ON(sizeof(XSaveOpmask) != 0x40);
--QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, zmm_hi256_state) != 0x480);
-+QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, zmm_hi256_state) != XSAVE_ZMM_HI256_OFFSET);
- QEMU_BUILD_BUG_ON(sizeof(XSaveZMM_Hi256) != 0x200);
--QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, hi16_zmm_state) != 0x680);
-+QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, hi16_zmm_state) != XSAVE_HI16_ZMM_OFFSET);
- QEMU_BUILD_BUG_ON(sizeof(XSaveHi16_ZMM) != 0x400);
--QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, pkru_state) != 0xA80);
-+QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, pkru_state) != XSAVE_PKRU_OFFSET);
- QEMU_BUILD_BUG_ON(sizeof(XSavePKRU) != 0x8);
- 
- typedef enum TPRAccess {
+ static int kvm_put_xsave(X86CPU *cpu)
+ {
 -- 
 2.30.2
 
