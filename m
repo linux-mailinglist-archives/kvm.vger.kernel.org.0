@@ -2,93 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 884C6389D38
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 07:44:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16C27389D77
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 08:05:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230392AbhETFpN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 May 2021 01:45:13 -0400
-Received: from mga18.intel.com ([134.134.136.126]:3311 "EHLO mga18.intel.com"
+        id S230350AbhETGG3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 02:06:29 -0400
+Received: from mx2.suse.de ([195.135.220.15]:52860 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230403AbhETFpK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 May 2021 01:45:10 -0400
-IronPort-SDR: zZpQ9X1rvOiFfL2w/q+JzE8hmgdG6AhPi6fOpLXrQ/xVLcnM9RAOoTDzOcQnOchHe8+eYxFfy+
- bYZT0sAaIikg==
-X-IronPort-AV: E=McAfee;i="6200,9189,9989"; a="188553710"
-X-IronPort-AV: E=Sophos;i="5.82,313,1613462400"; 
-   d="scan'208";a="188553710"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2021 22:43:49 -0700
-IronPort-SDR: l86XHgvatcBptmpFu20V5aILv2evHBb0zd6N8/ETmsvws9g1pH0G5RhSv3WcxZrVL91D2+7ULl
- R0J8GxBjTG+g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.82,313,1613462400"; 
-   d="scan'208";a="440160347"
-Received: from michael-optiplex-9020.sh.intel.com ([10.239.159.172])
-  by fmsmga008.fm.intel.com with ESMTP; 19 May 2021 22:43:46 -0700
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     pbonzini@redhat.com, ehabkost@redhat.com, mtosatti@redhat.com,
-        seanjc@google.com, richard.henderson@linaro.org,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-Cc:     Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH v8 6/6] target/i386: Advise CET bits in CPU/MSR feature words
-Date:   Thu, 20 May 2021 13:57:11 +0800
-Message-Id: <1621490231-4765-7-git-send-email-weijiang.yang@intel.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1621490231-4765-1-git-send-email-weijiang.yang@intel.com>
-References: <1621490231-4765-1-git-send-email-weijiang.yang@intel.com>
+        id S229534AbhETGG2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 May 2021 02:06:28 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1621490706; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9aV43J4LYYDq28unM+WOCaDSlePk+ZYEcjPfgd4X2r8=;
+        b=Kv3FDhUuYeHz1ibksc6IbemGP0XoBacHr1xeskd0ZMP1uOFSJvZwah9n9d5kkX0sv+U2KY
+        gA4uv+ScIubFedSeFJOdcBmZOUXL1oORwtresiguorTKqMHcDqjZ9tIedMqzOYl+6ZhZU2
+        Tpuz9MH7qaEWhS7fKMaHEfFp20Y6uHo=
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 6C49EAEE7;
+        Thu, 20 May 2021 06:05:06 +0000 (UTC)
+Message-ID: <2c0f621f2e1d3991edf198cb32d8e788ceeb6d7d.camel@suse.com>
+Subject: Re: [PATCH] Move VMEnter and VMExit tracepoints closer to the
+ actual event
+From:   Dario Faggioli <dfaggioli@suse.com>
+To:     Stefano De Venuto <stefano.devenuto99@gmail.com>,
+        linux-kernel@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, x86@kernel.org,
+        hpa@zytor.com, kvm@vger.kernel.org, rostedt@goodmis.org,
+        y.karadz@gmail.com, Borislav Petkov <bpetkov@suse.de>
+Date:   Thu, 20 May 2021 08:05:04 +0200
+In-Reply-To: <20210519182303.2790-1-stefano.devenuto99@gmail.com>
+References: <20210519182303.2790-1-stefano.devenuto99@gmail.com>
+Content-Type: multipart/signed; micalg="pgp-sha256";
+        protocol="application/pgp-signature"; boundary="=-Q4tI7q0ZmYDhB4CBxseV"
+User-Agent: Evolution 3.40.1 (by Flathub.org) 
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CET SHSTK and IBT feature are enumerated via CPUID.(EAX=07H,ECX=0H):ECX[bit 7]
-and EDX[bit 20]. CET state load/restore at vmentry/vmexit are enabled via
-VMX_ENTRY_CTLS[bit 20] and VMX_EXIT_CTLS[bit 28].
 
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
----
- target/i386/cpu.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+--=-Q4tI7q0ZmYDhB4CBxseV
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index bae827c8d5..b432b681d8 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -958,7 +958,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-         .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL, "avx512vbmi", "umip", "pku",
--            NULL /* ospke */, "waitpkg", "avx512vbmi2", NULL,
-+            NULL /* ospke */, "waitpkg", "avx512vbmi2", "shstk",
-             "gfni", "vaes", "vpclmulqdq", "avx512vnni",
-             "avx512bitalg", NULL, "avx512-vpopcntdq", NULL,
-             "la57", NULL, NULL, NULL,
-@@ -981,7 +981,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "avx512-vp2intersect", NULL, "md-clear", NULL,
-             NULL, NULL, "serialize", NULL,
-             "tsx-ldtrk", NULL, NULL /* pconfig */, NULL,
--            NULL, NULL, NULL, "avx512-fp16",
-+            "ibt", NULL, NULL, "avx512-fp16",
-             NULL, NULL, "spec-ctrl", "stibp",
-             NULL, "arch-capabilities", "core-capability", "ssbd",
-         },
-@@ -1243,7 +1243,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "vmx-exit-save-efer", "vmx-exit-load-efer",
-                 "vmx-exit-save-preemption-timer", "vmx-exit-clear-bndcfgs",
-             NULL, "vmx-exit-clear-rtit-ctl", NULL, NULL,
--            NULL, "vmx-exit-load-pkrs", NULL, NULL,
-+            "vmx-exit-save-cet-ctl", "vmx-exit-load-pkrs", NULL, NULL,
-         },
-         .msr = {
-             .index = MSR_IA32_VMX_TRUE_EXIT_CTLS,
-@@ -1258,7 +1258,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, "vmx-entry-ia32e-mode", NULL, NULL,
-             NULL, "vmx-entry-load-perf-global-ctrl", "vmx-entry-load-pat", "vmx-entry-load-efer",
-             "vmx-entry-load-bndcfgs", NULL, "vmx-entry-load-rtit-ctl", NULL,
--            NULL, NULL, "vmx-entry-load-pkrs", NULL,
-+            "vmx-entry-load-cet-ctl", NULL, "vmx-entry-load-pkrs", NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--- 
-2.26.2
+On Wed, 2021-05-19 at 20:23 +0200, Stefano De Venuto wrote:
+>=20
+> Signed-off-by: Stefano De Venuto <stefano.devenuto99@gmail.com>
+> Signed-off-by: Dario Faggioli <dfaggioli@suse.com>
+>
+So, thanks to Boris, I realized that this is both wrong and
+inconsistent (and it's my fault, not Stefano's).
+
+This is how it should be:
+
+Co-developed-by: Dario Faggioli <dfaggioli@suse.com>
+Signed-off-by: Dario Faggioli <dfaggioli@suse.com>
+Signed-off-by: Stefano De Venuto <stefano.devenuto99@gmail.com>
+
+Of course, we're happy to re-submit with it fixed, if necessary. Just
+let us know.
+
+Sorry and Regards
+--=20
+Dario Faggioli, Ph.D
+http://about.me/dario.faggioli
+Virtualization Software Engineer
+SUSE Labs, SUSE https://www.suse.com/
+-------------------------------------------------------------------
+<<This happens because _I_ choose it to happen!>> (Raistlin Majere)
+
+--=-Q4tI7q0ZmYDhB4CBxseV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEES5ssOj3Vhr0WPnOLFkJ4iaW4c+4FAmCl/BAACgkQFkJ4iaW4
+c+4oOQ//SYj3i96wyJIL8hwnxiMDPVDF6HJj6gKJIuhzuKIWUr0G8MhjRvUiAFoV
+wMGogO6eouUEMDSIYwhwR/p5+PHY5RhVYQWvq80LsD2wEaZVD94XdRSJnC+9C4/K
+TztPFebAMX4ngbWSKc/BalK8Wjmpea9/6qKqv8NGMgXYPiWBdbJnfQXWrhHr9Mdg
+nEN93bhAYJwhH+yG06D/SYDzLt9PMYLEzij+t38SBfeXE5gJdofGVDePwQjxX/oW
+QDyUg+4i34RH9nIbNUUpJwk2tJsH57z+dmCXZ+kMk9MBvoQfuJ7asr0qp6a81auN
+3543xlY34lKLwg6LTvp/Vzctnw7Pvdxssyc/rVuUKe9JesKM5Cv7J0/KyTUELuMt
+1xRe+TJf/5QLoVtvXb83YVHkXcHb8qyk1knqT2sGnoSax/WwO99pmh+mXvK6bLBR
+n3ZADfVLTnAClpTzFdrPLx7Nw06kPQNekPZLOaNd22FExgZEGp7Hr0SALFBnq/ve
+Nu8v69XZ9/UVYmFxnA8AEMbISq3SlVA2QxlU9J6wnw3yUivwHC7f+4eq2qPhrSaF
+neNixMiymSE/9t/hJbrtSsW9FlpcJdYbi46AOegva4+OP33w7qR0CnPjJkXl997w
+G1gfpEjpz5yBd8VLkEF2dLzpwLTj+E/C1/OoxKE9RXZDh2qKjlY=
+=7IoS
+-----END PGP SIGNATURE-----
+
+--=-Q4tI7q0ZmYDhB4CBxseV--
 
