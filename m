@@ -2,97 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C29738B003
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 15:32:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 153FF38B01F
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 15:36:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235741AbhETNdm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 May 2021 09:33:42 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:3628 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231733AbhETNdl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 May 2021 09:33:41 -0400
-Received: from dggems701-chm.china.huawei.com (unknown [172.30.72.60])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Fm9Zy1rlJzmXDj;
-        Thu, 20 May 2021 21:30:02 +0800 (CST)
-Received: from dggema764-chm.china.huawei.com (10.1.198.206) by
- dggems701-chm.china.huawei.com (10.3.19.178) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Thu, 20 May 2021 21:32:19 +0800
-Received: from [10.174.185.179] (10.174.185.179) by
- dggema764-chm.china.huawei.com (10.1.198.206) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2176.2; Thu, 20 May 2021 21:32:18 +0800
-Subject: Re: [PATCH v4 01/66] arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
-To:     Marc Zyngier <maz@kernel.org>
-CC:     <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        Andre Przywara <andre.przywara@arm.com>,
-        "Christoffer Dall" <christoffer.dall@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        "Haibo Xu" <haibo.xu@linaro.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        <kernel-team@android.com>, Jintack Lim <jintack.lim@linaro.org>
-References: <20210510165920.1913477-1-maz@kernel.org>
- <20210510165920.1913477-2-maz@kernel.org>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <e20813df-cb19-9856-b80d-16b3bffc2f7d@huawei.com>
-Date:   Thu, 20 May 2021 21:32:17 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S233191AbhETNiR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 09:38:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32173 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231733AbhETNiP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 20 May 2021 09:38:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621517811;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jDqb0WbNRWfVzDXzZndrXkYjxKSiX/oojU5U/u7mGHY=;
+        b=AhxtC2M0X0MRhSV5BheAnqpBa23Ql1S+kg3g5zCw+LJ+Zg1B0huQcB+vwpMQroGzUxdfIl
+        RStBJSV33OuWsTYdIG/4YrmFrTDHeITT8qdifdqGNAOcUd7fTEvkihHpj/Zs0pB+FR3w+P
+        q1WFkQfVcIB93PG0cVFRlNyyYVQfcr4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-397-xDykYFsDMZy_qaEl3SY-jw-1; Thu, 20 May 2021 09:36:50 -0400
+X-MC-Unique: xDykYFsDMZy_qaEl3SY-jw-1
+Received: by mail-wr1-f72.google.com with SMTP id 1-20020adf93810000b029010fd5ac4ed7so8643291wrp.15
+        for <kvm@vger.kernel.org>; Thu, 20 May 2021 06:36:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:organization
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=jDqb0WbNRWfVzDXzZndrXkYjxKSiX/oojU5U/u7mGHY=;
+        b=KqN9SOk5CPItqChxpDtbxL28P4KIH6r1aibiAQ20jLk3ubJxqg3F8NXMNjd0wOEG5V
+         Ve+E/G1GAxJOhnjmQRFLi3aB1AaS3tWFt7raCCvyfjV9pE3VfFnPnJRYf/Dx8AVzAQdB
+         C+PZ0TzeFdSmaCq8OTicmB4WI85CaPFkRXcZFLce5YN4+GYtlAs7jQfKNAm4ru2T5wiz
+         9qjKkeF5mW8DyQKspWmN1/c0urDdAcLDsFw/zwILZ7YgQlUS8x7TohHZeQ3TfR9D1yn0
+         uk73xaT4oLgFbz2q8pmygJueDHkLqk3yy8NK8nCH3l3UcjG5pdG0sWnOcfVD6UiBTzEd
+         TUDw==
+X-Gm-Message-State: AOAM531Tc5b5MMyUOTUTgNVcHhchnhzr6qRAwZrskksQmm2Qw2pxFVtG
+        JQpwrZi55wExd44VF/iwiM/Zt9pmiDy7YXVAnGj9HrwNwFXTHRmc+I55WfgcxTf7DNB98oZLVY0
+        xugIF57FRM1Yg
+X-Received: by 2002:a5d:500b:: with SMTP id e11mr4383043wrt.209.1621517809072;
+        Thu, 20 May 2021 06:36:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxaorDOozd3/iekfxe00tdpJtoWykCK/Q6hRKJwhMQfLXUiMcAmy0IfmqDRNBhc87uSKFjmXg==
+X-Received: by 2002:a5d:500b:: with SMTP id e11mr4383010wrt.209.1621517808685;
+        Thu, 20 May 2021 06:36:48 -0700 (PDT)
+Received: from [192.168.3.132] (p5b0c6315.dip0.t-ipconnect.de. [91.12.99.21])
+        by smtp.gmail.com with ESMTPSA id y20sm9770638wmi.0.2021.05.20.06.36.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 May 2021 06:36:48 -0700 (PDT)
+Subject: Re: [kvm-unit-tests RFC 0/2] s390x: Add snippet support
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        thuth@redhat.com, cohuck@redhat.com
+References: <20210520094730.55759-1-frankja@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Message-ID: <7c17d790-5a3c-d4ea-8d78-7148dbc6ca60@redhat.com>
+Date:   Thu, 20 May 2021 15:36:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20210510165920.1913477-2-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20210520094730.55759-1-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.185.179]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggema764-chm.china.huawei.com (10.1.198.206)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/5/11 0:58, Marc Zyngier wrote:
-> From: Jintack Lim <jintack.lim@linaro.org>
+On 20.05.21 11:47, Janosch Frank wrote:
+> The SIE support allows us to run guests and test the hypervisor's
+> (V)SIE implementation. However it requires that the guest instructions
+> are binary which limits the complexity of the guest code.
 > 
-> Add a new ARM64_HAS_NESTED_VIRT feature to indicate that the
-> CPU has the ARMv8.3 nested virtualization capability.
+> The snippet support provides a way to write guest code as ASM or C and
+> simply memcpy it into guest memory. Some of the KVM-unit-test library
+> can be re-used which further speeds up guest code development.
 > 
-> This will be used to support nested virtualization in KVM.
+> The included mvpg-sie test helped us to deliver the KVM mvpg fixes
+> which Claudio posted a short while ago. In the future I'll post Secure
+> Execution snippet support patches which was my initial goal with this
+> series anyway.
 > 
-> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  .../admin-guide/kernel-parameters.txt         |  4 +++
->  arch/arm64/include/asm/cpucaps.h              |  1 +
->  arch/arm64/kernel/cpufeature.c                | 25 +++++++++++++++++++
->  3 files changed, 30 insertions(+)
+> I heard you liked tests so I put tests inside tests so you can test
+> while you test.
 
-[...]
+The idea sounds sane to me.
 
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index efed2830d141..056de86d7f6f 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -1645,6 +1645,21 @@ static void cpu_copy_el2regs(const struct arm64_cpu_capabilities *__unused)
->  		write_sysreg(read_sysreg(tpidr_el1), tpidr_el2);
->  }
->  
-> +static bool nested_param;
-> +static bool has_nested_virt_support(const struct arm64_cpu_capabilities *cap,
-> +				    int scope)
-> +{
-> +	return has_cpuid_feature(cap, scope) &&
-> +		nested_param;
-> +}
+-- 
+Thanks,
 
-Nitpick:
+David / dhildenb
 
-How about putting them into a single line (they still perfectly
-fit within the 80-colume limit)?
-
-Zenghui
