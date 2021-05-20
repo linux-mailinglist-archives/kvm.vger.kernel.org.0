@@ -2,112 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 28C6738A3AD
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 11:56:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4095438A351
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 11:50:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234260AbhETJ4D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 May 2021 05:56:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48682 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234394AbhETJwc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 May 2021 05:52:32 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E895FC07E5C1;
-        Thu, 20 May 2021 02:32:07 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id x188so11922745pfd.7;
-        Thu, 20 May 2021 02:32:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=HLfcO/MecS4+rtd6Pd4VQw8XBO3rw/gjM5Y8RjQr1Ds=;
-        b=hmbUgAfMKfKl6L8zVr8C4kuv+fzJpbOFoDCK3X2SnwJDb7AzoGF8V5mY//xvNZ91OR
-         BMyw6GS5vbB5z4dJSPoOuiBmYJCHYLA945ohnJ7UU2bpAi5Gl40wwgxxAIspD3Xtrp2g
-         OCcbB3g+rMVDJ5oxjtsBhVN4a/QvyuUUEuNk7FaNr+gqw48VDXugM3Dngebou3mKHqc4
-         EQTJv4Uxpl2lKdiDbTm2jyCf2a3ZDpukZMngYRhf0JsTZqRZQCQ1BijA+dz6vhkDsJg0
-         QUTtGmec67/GS6UYn264mjcQvSSiEvN2hoHM5usWL72NtPms4rU28fW/yg8V66I+Hpit
-         RfVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=HLfcO/MecS4+rtd6Pd4VQw8XBO3rw/gjM5Y8RjQr1Ds=;
-        b=t5KO7rLVGsLLAbYtFPttr/TLxMTzqeSe+LJqsT1O/zD4AbBorTJmPGSxzhzySYpXbt
-         aW1oZ10gWGcbC/f/rB+5UeZ3+uboRYykZNLHN/ml6BRF7CYi0wkUgPO15rO8tIR68fWG
-         AG7VRvh5xmzCLc8LI50Y8mGo3HTP2ek4pQhrgw/YTV1qVVb5VGre2v4HF4jm48FrM3Mo
-         EAUnhYqdp+29XEVqunoXEqzgQqsjm4bzSe4K9NpJ1fkPbrA0WONUZcJ9JBsfwJnAmQeT
-         hum675C4HUxiTe8UFy/zZc2CSyqEWAqcl2hu0KBKcTEdZIx1mVt4pxOvH9O1DYwsahv8
-         20rw==
-X-Gm-Message-State: AOAM531ssCkKnovW5mgxvmFB9mXmOawOjh5LdxqtdpRyDIm6IZgKU6Os
-        qL9ALJtC3TFJOlyPaF/zw/8=
-X-Google-Smtp-Source: ABdhPJySK9IhwVTlxZj17iML3cV3LYHRtDOolrJuxa9X3Das7Yp30fDO44U/UJ8d5pYuXGyH3TrtzA==
-X-Received: by 2002:a62:6481:0:b029:249:ecee:a05d with SMTP id y123-20020a6264810000b0290249eceea05dmr3648202pfb.9.1621503127359;
-        Thu, 20 May 2021 02:32:07 -0700 (PDT)
-Received: from localhost (public-nat-08.vpngate.v4.open.ad.jp. [219.100.37.240])
-        by smtp.gmail.com with ESMTPSA id t1sm1557398pjo.33.2021.05.20.02.32.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 May 2021 02:32:06 -0700 (PDT)
-Date:   Thu, 20 May 2021 02:31:55 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Connor Kuehl <ckuehl@redhat.com>
-Cc:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        isaku.yamahata@gmail.com
-Subject: Re: [RFC PATCH 00/67] KVM: X86: TDX support
-Message-ID: <20210520093155.GA3602295@private.email.ne.jp>
-References: <cover.1605232743.git.isaku.yamahata@intel.com>
- <3edc0fb2-d552-88df-eead-9e2b80e79be4@redhat.com>
+        id S234165AbhETJvP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 05:51:15 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30740 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234265AbhETJtL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 20 May 2021 05:49:11 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14K9XjdO088791;
+        Thu, 20 May 2021 05:47:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=ppwtvM3q03PSEpYkTapdLu0gB5ibyf+6YUjM7vCkYB8=;
+ b=TzS4tvERt0hBJEaflJAncGpj1kWFVDFnLSjyzyt1oRrmgi/8j8AFeKmoERhJfuoIkiQu
+ HFb/2kf1JNT/COmdlQW9iWv3EHww/uVHxMXT/SttEB7rw0kLgfFLdaKgKP6tmjST7L6y
+ iG3hki/fekmktpYsdHdVmPUH1ovzivwwgcR3IU4nwXwMeG1Tsa3d4MT6zMpe2C10D3EB
+ 2PnZh1WUIJ6l6Z7JlsVNZjxsKN/nqTbuMU/ot+ryJDqbZSrBcKv+v8LESUxklItstCri
+ WINBwClvlROGMh+9iXNdW2wJVQWub5aGsoIU6CXs9PqufCLSu1CJzctWM4FR59itHgGQ jw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38nn5qrh77-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 May 2021 05:47:49 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14K9YD93090380;
+        Thu, 20 May 2021 05:47:49 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38nn5qrh6c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 May 2021 05:47:49 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14K9jWKD013080;
+        Thu, 20 May 2021 09:47:47 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma05fra.de.ibm.com with ESMTP id 38m19srsrr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 May 2021 09:47:47 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14K9lG1533423684
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 20 May 2021 09:47:16 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8C0684203F;
+        Thu, 20 May 2021 09:47:44 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DB6BC42042;
+        Thu, 20 May 2021 09:47:43 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 20 May 2021 09:47:43 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com, cohuck@redhat.com
+Subject: [kvm-unit-tests RFC 0/2] s390x: Add snippet support
+Date:   Thu, 20 May 2021 09:47:28 +0000
+Message-Id: <20210520094730.55759-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3edc0fb2-d552-88df-eead-9e2b80e79be4@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: NH-PkV8Q2EbS2qf2BUht74or0YaG2GEw
+X-Proofpoint-ORIG-GUID: 8uG9A7LqzQINvNFZ8HG2tfDuNqV0n0Gl
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-20_01:2021-05-20,2021-05-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
+ priorityscore=1501 mlxlogscore=999 lowpriorityscore=0 spamscore=0
+ bulkscore=0 mlxscore=0 adultscore=0 phishscore=0 impostorscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2105200071
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 19, 2021 at 11:37:23AM -0500,
-Connor Kuehl <ckuehl@redhat.com> wrote:
+The SIE support allows us to run guests and test the hypervisor's
+(V)SIE implementation. However it requires that the guest instructions
+are binary which limits the complexity of the guest code.
 
-> On 11/16/20 12:25 PM, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > * What's TDX?
-> > TDX stands for Trust Domain Extensions which isolates VMs from
-> > the virtual-machine manager (VMM)/hypervisor and any other software on
-> > the platform. [1]
-> > For details, the specifications, [2], [3], [4], [5], [6], [7], are
-> > available.
-> > 
-> > 
-> > * The goal of this RFC patch
-> > The purpose of this post is to get feedback early on high level design
-> > issue of KVM enhancement for TDX. The detailed coding (variable naming
-> > etc) is not cared of. This patch series is incomplete (not working).
-> > Although multiple software components, not only KVM but also QEMU,
-> > guest Linux and virtual bios, need to be updated, this includes only
-> > KVM VMM part. For those who are curious to changes to other
-> > component, there are public repositories at github. [8], [9]
-> 
-> Hi,
-> 
-> I'm planning on reading through this patch set; but before I do, since
-> it's been several months and it's a non-trivially sized series, I just
-> wanted to confirm that this is the latest revision of the RFC that
-> you'd like comments on. Or, if there's a more recent series that I've
-> missed, I would be grateful for a pointer to it.
+The snippet support provides a way to write guest code as ASM or C and
+simply memcpy it into guest memory. Some of the KVM-unit-test library
+can be re-used which further speeds up guest code development.
 
-Hi. I'm planning to post rebased/updated v2 soon. Hopefully next week.
-So please wait for it. It will include non-trivial change and catch up for the updated spec.
+The included mvpg-sie test helped us to deliver the KVM mvpg fixes
+which Claudio posted a short while ago. In the future I'll post Secure
+Execution snippet support patches which was my initial goal with this
+series anyway.
 
-Thanks,
+I heard you liked tests so I put tests inside tests so you can test
+while you test.
+
+Janosch Frank (2):
+  s390x: Add guest snippet support
+  s390x: mvpg: Add SIE mvpg test
+
+ .gitignore                      |   2 +
+ s390x/Makefile                  |  29 ++++++-
+ s390x/mvpg-sie.c                | 139 ++++++++++++++++++++++++++++++++
+ s390x/snippets/c/cstart.S       |  13 +++
+ s390x/snippets/c/flat.lds       |  51 ++++++++++++
+ s390x/snippets/c/mvpg-snippet.c |  33 ++++++++
+ s390x/unittests.cfg             |   3 +
+ 7 files changed, 267 insertions(+), 3 deletions(-)
+ create mode 100644 s390x/mvpg-sie.c
+ create mode 100644 s390x/snippets/c/cstart.S
+ create mode 100644 s390x/snippets/c/flat.lds
+ create mode 100644 s390x/snippets/c/mvpg-snippet.c
 
 -- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+2.30.2
+
