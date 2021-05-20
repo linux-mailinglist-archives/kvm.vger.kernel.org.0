@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DB9738B9FD
+	by mail.lfdr.de (Postfix) with ESMTP id AA64C38B9FE
 	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 01:04:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232989AbhETXFl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 May 2021 19:05:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59662 "EHLO
+        id S233028AbhETXFm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 19:05:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233099AbhETXFb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 May 2021 19:05:31 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BE3BC061761
-        for <kvm@vger.kernel.org>; Thu, 20 May 2021 16:04:09 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id a7-20020a5b00070000b02904ed415d9d84so24452860ybp.0
-        for <kvm@vger.kernel.org>; Thu, 20 May 2021 16:04:09 -0700 (PDT)
+        with ESMTP id S232977AbhETXFf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 May 2021 19:05:35 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5815C061342
+        for <kvm@vger.kernel.org>; Thu, 20 May 2021 16:04:10 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id x24-20020aa784d80000b02902dd5846d381so7631243pfn.20
+        for <kvm@vger.kernel.org>; Thu, 20 May 2021 16:04:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=+3q9om17bTqPH2OesSYY1pKJuwPpvDBvm1QrRLFR54Y=;
-        b=VHVyUIe1ERl5hNnQgTbqEttXupxPlK0R6KI5lyanvIbdNWxr8Wu+88ERzdEoU3c49s
-         5N3iLsBlLcznAHegMQ+FzZCtHGplUD60a2GPXAIm4mYPrYzugbeCwgkV2HV2km8d+C0b
-         CGi+IUKm/HYkfh+2wMiCdRXU/iF2O2tNDIZnZvyW3+qkXCjPXTNx531ZDtAW8VXiM0U3
-         w7DxFMmwUBQ2mlQLdbqDLzTrpGtunyUErNPIVmtUD19vjZl7aQyKZsGEzSOQPCPLUOLo
-         CIibqMxEqwwj5JOlnUX5I5T+0PXiajISi8F+uEn/hClhkA9cY+XqqFSlz9IhL+U9qTd6
-         X/pg==
+        bh=oIzsQQKUBlmG+L5Z1kb0XOIo6gMIumBtyoNwBG1Mros=;
+        b=ZN1Lfn7D2fMxg2rKY32lCBKVgRSthmgRRVJM76COwTHqcjaN7b0+vxoBA8lqWwctLt
+         y3QY7R9MCeJNUudxCT+cE2tF/xAcH6dWo2y8TDH/UFJiN1YB7mQ4bLOpVd6QPr/p/qrd
+         UVrOOk/6WHDQ1TPvn3Cw/Ums48wTek9UlHi/b9TB8XNOL4KxINgpEyS4JUzFtCOCkLeo
+         HUkxwABXo2pi69tBSWWH4jYFrjwFrwb2YfJqT35YMQX9ZqNjK48yxNGDdbHc1KXF2q52
+         BhBo7nrZu/c/+ExS/sblRX67E6Qqe/omleAyxmIlCm5r/8pXG7ISvv7SCFFGZw2ZSo0f
+         LS8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=+3q9om17bTqPH2OesSYY1pKJuwPpvDBvm1QrRLFR54Y=;
-        b=oOY6xYQSxbtMbLilNoaaCfQZggH2UEPycmXR3ngWDW2l21MwMenbCdcD2nhZrhxZJ5
-         nn7gfuzy9YYBIOmY9LEWlfAqUoZdiC+HwI+beOLY4Tl60y8FqJNNSMS6UdhDHSrvlPjI
-         jeABRBg4iews07FO3zu3UMLJZ3mJ+HsAyOIBJ4XFPTKnkc6sWxjo7/Fbyv6ZJdeR7rak
-         MvaqzjjuJBoRZ04+3DWMFFLVV6oHKQ5YVc3aAdk1Oo5gBqogek+5oUZbrzE+8hsPRTWF
-         sPBclsygsphgrCM7fBlSWgiDHMd8g/mvhkUbvLHv9VjI0McvVjc195TmKoykhpqJ/45Z
-         Nt0g==
-X-Gm-Message-State: AOAM531QLtNkxZxgrQZtBaqOn4OrmO6dHgKIGGGPQQede3bDP+L+ZkVS
-        uN1uLgooMbN90xOGrihwO2EIaJSZjjxYxyuEcs9kA5H0wJrXXf2BUSPNI+qmW38htIx9a22tDJD
-        oL2vb+2e97/hBz1IjM5p7fJ+mmuLwRdC6vrWFV0H4qQ86AYsrjQtMQWK6APb4e1c=
-X-Google-Smtp-Source: ABdhPJzRaHS6oC9aAmD7sDjaDWjusQYfsGcQGVj/ug4NvatEYzMQJslvCFOHcv/ogY2EFFd7fGno7iyeN5ZttQ==
+        bh=oIzsQQKUBlmG+L5Z1kb0XOIo6gMIumBtyoNwBG1Mros=;
+        b=sPg+8ugFczcP1TSbQ2kID7fS3yfZFEVoOOz631cjhcWHHo8c/mxWvSUplma6duofud
+         Rh2diuKp1W8rlep4jflF6KzAP66aoWDyg7BU8MoiAJFFjuJWhyhN2/nIO5dp3C92ruQx
+         lQi8N/Jz3r2D4wDzu0uJ0M+beV+ZlKdHX48pWr7M3+QypjRWnzJbMqI4A/0KjJQuoeGm
+         +CN8oy3CyY+SrSdPATSv1yBAV4nXgYiqLzM9n6d5ui743FtvprRO9S270YHOyVvJm7xb
+         TMilStu+2hl5ACmWms8URXVtqe2WFLDg8h360igI67mLQYbEgPnimwi4gLs0jRCbYxt5
+         pjRA==
+X-Gm-Message-State: AOAM530kL2WnN3yWNQjvzMGP1BxCdVH1nJTZUgLjWZjRLdcVySztdEJu
+        BOmYx8dQTpNFXKTvzEWGn9amgy/NjojcPXz4rLi9+DwGYIKyGAk8BFDjKrQ8Ra1zUCsyvC110ra
+        1HaRuoxurD2R6sETjZsloHV4mRDcBER9FeRFssyNfPhtK53S5TsHlKUGCXfUS6g0=
+X-Google-Smtp-Source: ABdhPJylHSXWop/Ej1LHSKIKYtI8GMoroxVy9mLQM7IJft8k1lX8WhGmiueuNC9e32W32lNDeqfLGGZW3QbXEg==
 X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1a0d])
- (user=jmattson job=sendgmr) by 2002:a05:6902:4ed:: with SMTP id
- w13mr10783042ybs.92.1621551848281; Thu, 20 May 2021 16:04:08 -0700 (PDT)
-Date:   Thu, 20 May 2021 16:03:37 -0700
+ (user=jmattson job=sendgmr) by 2002:a17:90a:ba07:: with SMTP id
+ s7mr7239125pjr.129.1621551849857; Thu, 20 May 2021 16:04:09 -0700 (PDT)
+Date:   Thu, 20 May 2021 16:03:38 -0700
 In-Reply-To: <20210520230339.267445-1-jmattson@google.com>
-Message-Id: <20210520230339.267445-11-jmattson@google.com>
+Message-Id: <20210520230339.267445-12-jmattson@google.com>
 Mime-Version: 1.0
 References: <20210520230339.267445-1-jmattson@google.com>
 X-Mailer: git-send-email 2.31.1.818.g46aad6cb9e-goog
-Subject: [PATCH 10/12] KVM: selftests: Introduce x2APIC register manipulation functions
+Subject: [PATCH 11/12] KVM: selftests: Introduce prepare_tpr_shadow
 From:   Jim Mattson <jmattson@google.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com
 Cc:     Jim Mattson <jmattson@google.com>, Oliver Upton <oupton@google.com>
@@ -60,66 +60,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Standardize reads and writes of the x2APIC MSRs.
+Add support for yet another page to hang from the VMCS12 for nested
+VMX testing: the virtual APIC page. This page is necessary for a
+VMCS12 to be launched with the "use TPR shadow" VM-execution control
+set (except in some oddball circumstances permitted by KVM).
 
 Signed-off-by: Jim Mattson <jmattson@google.com>
 Reviewed-by: Oliver Upton <oupton@google.com>
 ---
- tools/testing/selftests/kvm/include/x86_64/apic.h | 10 ++++++++++
- tools/testing/selftests/kvm/lib/x86_64/apic.c     |  5 ++---
- tools/testing/selftests/kvm/x86_64/smm_test.c     |  4 ++--
- 3 files changed, 14 insertions(+), 5 deletions(-)
+ tools/testing/selftests/kvm/include/x86_64/vmx.h | 5 +++++
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c     | 8 ++++++++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/apic.h b/tools/testing/selftests/kvm/include/x86_64/apic.h
-index e5a9fe040a6c..0be4757f1f20 100644
---- a/tools/testing/selftests/kvm/include/x86_64/apic.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/apic.h
-@@ -78,4 +78,14 @@ static inline void xapic_write_reg(unsigned int reg, uint32_t val)
- 	((volatile uint32_t *)APIC_DEFAULT_GPA)[reg >> 2] = val;
- }
- 
-+static inline uint64_t x2apic_read_reg(unsigned int reg)
-+{
-+	return rdmsr(APIC_BASE_MSR + (reg >> 4));
-+}
+diff --git a/tools/testing/selftests/kvm/include/x86_64/vmx.h b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+index 516c81d86353..83ccb096b966 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/vmx.h
++++ b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+@@ -574,6 +574,10 @@ struct vmx_pages {
+ 	void *apic_access_hva;
+ 	uint64_t apic_access_gpa;
+ 	void *apic_access;
 +
-+static inline void x2apic_write_reg(unsigned int reg, uint64_t value)
-+{
-+	wrmsr(APIC_BASE_MSR + (reg >> 4), value);
-+}
++	void *virtual_apic_hva;
++	uint64_t virtual_apic_gpa;
++	void *virtual_apic;
+ };
+ 
+ union vmx_basic {
+@@ -618,5 +622,6 @@ void prepare_eptp(struct vmx_pages *vmx, struct kvm_vm *vm,
+ 		  uint32_t eptp_memslot);
+ void prepare_virtualize_apic_accesses(struct vmx_pages *vmx, struct kvm_vm *vm,
+ 				      uint32_t eptp_memslot);
++void prepare_tpr_shadow(struct vmx_pages *vmx, struct kvm_vm *vm);
+ 
+ #endif /* SELFTEST_KVM_VMX_H */
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/vmx.c b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
+index 2448b30e8efa..1023760d1bf7 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/vmx.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
+@@ -551,3 +551,11 @@ void prepare_virtualize_apic_accesses(struct vmx_pages *vmx, struct kvm_vm *vm,
+ 	vmx->apic_access_hva = addr_gva2hva(vm, (uintptr_t)vmx->apic_access);
+ 	vmx->apic_access_gpa = addr_gva2gpa(vm, (uintptr_t)vmx->apic_access);
+ }
 +
- #endif /* SELFTEST_KVM_APIC_H */
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/apic.c b/tools/testing/selftests/kvm/lib/x86_64/apic.c
-index 31f318ac67ba..7168e25c194e 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/apic.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/apic.c
-@@ -38,9 +38,8 @@ void xapic_enable(void)
- 
- void x2apic_enable(void)
- {
--	uint32_t spiv_reg = APIC_BASE_MSR + (APIC_SPIV >> 4);
--
- 	wrmsr(MSR_IA32_APICBASE, rdmsr(MSR_IA32_APICBASE) |
- 	      MSR_IA32_APICBASE_ENABLE | MSR_IA32_APICBASE_EXTD);
--	wrmsr(spiv_reg, rdmsr(spiv_reg) | APIC_SPIV_APIC_ENABLED);
-+	x2apic_write_reg(APIC_SPIV,
-+			 x2apic_read_reg(APIC_SPIV) | APIC_SPIV_APIC_ENABLED);
- }
-diff --git a/tools/testing/selftests/kvm/x86_64/smm_test.c b/tools/testing/selftests/kvm/x86_64/smm_test.c
-index 613c42c5a9b8..c1f831803ad2 100644
---- a/tools/testing/selftests/kvm/x86_64/smm_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/smm_test.c
-@@ -55,8 +55,8 @@ static inline void sync_with_host(uint64_t phase)
- 
- void self_smi(void)
- {
--	wrmsr(APIC_BASE_MSR + (APIC_ICR >> 4),
--	      APIC_DEST_SELF | APIC_INT_ASSERT | APIC_DM_SMI);
-+	x2apic_write_reg(APIC_ICR,
-+			 APIC_DEST_SELF | APIC_INT_ASSERT | APIC_DM_SMI);
- }
- 
- void guest_code(void *arg)
++void prepare_tpr_shadow(struct vmx_pages *vmx, struct kvm_vm *vm)
++{
++	vmx->virtual_apic = (void *)vm_vaddr_alloc(vm, getpagesize(),
++						  0x10000, 0, 0);
++	vmx->virtual_apic_hva = addr_gva2hva(vm, (uintptr_t)vmx->virtual_apic);
++	vmx->virtual_apic_gpa = addr_gva2gpa(vm, (uintptr_t)vmx->virtual_apic);
++}
 -- 
 2.31.1.818.g46aad6cb9e-goog
 
