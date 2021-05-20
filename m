@@ -2,130 +2,399 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AE2C38B84E
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 22:22:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AC5338B89B
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 22:51:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236249AbhETUXh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 May 2021 16:23:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51652 "EHLO
+        id S229597AbhETUwZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 16:52:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236062AbhETUXe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 May 2021 16:23:34 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CE38C061761
-        for <kvm@vger.kernel.org>; Thu, 20 May 2021 13:22:11 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id g18so11557536pfr.2
-        for <kvm@vger.kernel.org>; Thu, 20 May 2021 13:22:11 -0700 (PDT)
+        with ESMTP id S229581AbhETUwY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 May 2021 16:52:24 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64EADC0613CE
+        for <kvm@vger.kernel.org>; Thu, 20 May 2021 13:51:02 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id 22so12884068pfv.11
+        for <kvm@vger.kernel.org>; Thu, 20 May 2021 13:51:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=0kHUdBz9cuFf2vqxAG3Pc3rwFQXdOdHIp65C2b34hQI=;
-        b=dEbYyegVNncUJt/SGH/oedIn1Atx8b0ygTK3+FvgB7epKgdgC9Dr0BsUcCu0DxDONy
-         nOdkHnRrc3EBQFs4KDXJ2K2uXczhWNN1TvwwnypClxAMhk225QAwV9ZAelVesgPg4gEr
-         31hxAUaGEeNvn6+euCcc++hR4Xgw1fdJ0bpe9gijjtkWvhSXD/tHe5v0KrdOqvGiZ5NY
-         P6OGPy2PbFW56a9XMokoEoRNtE8kgoqlejBFIcr1DWdGvlU9ZNvYJlWfmLN53bOLE3SM
-         zedriT9bXOz/nINIc4gsQfjJhak9v4hEdPX055ElQy+ecm56rMsB3X+mLdo/0q44EAj4
-         wjHA==
+        bh=q/srcHBdxE4+fuAfsc7N//yn30oGjptaTcxpM4buJc4=;
+        b=qHYwI2yXjzJNQdXlnDMoneTQDXYrHaVxyTBtXB5iN3zp4NMMWVLwNycU9O1Zwblnnw
+         PdkmYTOF2bp4BBLJxkMqYEbN+6rKh95/su3ooLDrBRsENKk0vslpkTFSi0QSqkDaVo7H
+         h3+9t+MiOiMRbW9GVivuTUycM5FQ3Kg3b0iRh6UTTALMyS52bD461wSVAiiMDpShkFeC
+         /DC1buK2TJpy+ApXc1FDpt60Q8RZYMiv6Bh3NWlU394JNam0eq4gtRJmLf1VuBmFN3Rv
+         S9rNgi9GFU+xtAg/hAJ9mE3fB3OUO82wMHngi3cJJABMLvI8xk2Cq/hUmTBitp1OT8ae
+         wBdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=0kHUdBz9cuFf2vqxAG3Pc3rwFQXdOdHIp65C2b34hQI=;
-        b=Yivu37zSPRty50W47ZNMsp2Ykw7cHNl5HPH0+H28KlYq/ShBg38XyzeLX264dpNFt6
-         Q42Ppk2aB6KD0GQR9KpyN6Ft+xuvEzTNjpeS591CIdKK9uZsLNXka6xTN/5o82ZOUGmc
-         6mnuazGvbu4/kRamZiaHDZzVNC8NnnlYWNWkWFBauZgLpF8NasuS2p3Xu/G1tbrKBJ54
-         Y0WsyHwG/bV4oMZ+6dbdTp3YLKTHfYp2SsZQTF57A9ViO0r4CrDL9QdVo86RDfqjJK1A
-         Trv3NF9XSdJTbCdOX44Y4Ksv+X9y0EtRLeBBQOh3jdU+PlSxql8OZ16JPW199AqWYItt
-         A/Tg==
-X-Gm-Message-State: AOAM530NZi6sYSq3hJPHmp5mse6BxJol3OPM5Ia9+1k6B8T1rwLIoM6y
-        hgDrAmOHsTnZ6M1Vhssl2hpDaQ==
-X-Google-Smtp-Source: ABdhPJxE3b2rco77LJIbWnsRpfZ7UydHf0CesLXTf2wlREWqTk3U//LCQG9XIv1gDO7Oo1lfvMXjYw==
-X-Received: by 2002:a63:224d:: with SMTP id t13mr6260936pgm.283.1621542130812;
-        Thu, 20 May 2021 13:22:10 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id x203sm2612206pfc.86.2021.05.20.13.22.10
+        bh=q/srcHBdxE4+fuAfsc7N//yn30oGjptaTcxpM4buJc4=;
+        b=RTOZvK/fVFwrJivYG6kHa0j8O3Rwx9fIzpfUQIYN9mNS/dLuFGHUQDEGvWhun06KcU
+         Vh9VVIIMgDdlVx935sNSonGiFSCLaAddEIIfWaD1lRoYWTIJLxJDmyYNz941MFrirIvL
+         hztRZ+EzFVF9xF9WY/8kh+cEH3cxaWrMgozBz7h06ZfSnuI649WDSRT4reeVsLjDUPo6
+         95UQOf6CI8ctCMAYXykq5Hd6itsrRIN95E1LrGah9Rntm+J5zdCSZP2yobpQ05SLwDsf
+         4CCGjxLsJvnafk7cIlYl5sj2fpwSRjGh/b8bozlHMMznL4vOSjF0CHbueDxwlJmi1uKF
+         xlRA==
+X-Gm-Message-State: AOAM530UmgapxZOoFVJSJd0R/JvRrIRlt9Z5utf9KRM/H9rWj01Lq+Fk
+        z8i6h6dgwC9GMNHKcLCEsRPhxw==
+X-Google-Smtp-Source: ABdhPJzdIvUBfc9WA/IyrauPCe/BCMBHjyTis6cZmxbP4LVnoHZPMzFXdZZK5v/5aLGhcwfGFakFyQ==
+X-Received: by 2002:a63:314:: with SMTP id 20mr6308246pgd.371.1621543861319;
+        Thu, 20 May 2021 13:51:01 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id w26sm2637841pgl.50.2021.05.20.13.51.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 May 2021 13:22:10 -0700 (PDT)
-Date:   Thu, 20 May 2021 20:22:06 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Peter Gonda <pgonda@google.com>, kvm list <kvm@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
+        Thu, 20 May 2021 13:51:00 -0700 (PDT)
+Date:   Thu, 20 May 2021 13:50:56 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH] KVM: SVM: Do not terminate SEV-ES guests on GHCB
- validation failure
-Message-ID: <YKbE7m40GnSRZsr1@google.com>
-References: <f8811b3768c4306af7fb2732b6b3755489832c55.1621020158.git.thomas.lendacky@amd.com>
- <CAMkAt6qJqTvM0PX+ja3rLP3toY-Rr4pSUbiFKL1GwzYZPG6f8g@mail.gmail.com>
- <324d9228-03e9-0fe2-59c0-5e41e449211b@amd.com>
- <YKa1jduPK9JyjWbx@google.com>
- <YKa4I0cs/8lyy0fN@google.com>
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Subject: Re: [PATCH v5 2/4] KVM: stats: Add fd-based API to read binary stats
+ data
+Message-ID: <YKbLsICiX4iI+0AB@google.com>
+References: <20210517145314.157626-1-jingzhangos@google.com>
+ <20210517145314.157626-3-jingzhangos@google.com>
+ <YKXj3gHvUoLnojzB@google.com>
+ <CAAdAUtieAd6kvrXBNXc1TfO84ZxQ4xM30Z_G5F9CoT2gxeGrLA@mail.gmail.com>
+ <YKaxYZYQRp0/9f+A@google.com>
+ <CAAdAUtiZxw9_qQ4eszsxSQmmL7j46LRhixL5zYttcOzL0da42Q@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YKa4I0cs/8lyy0fN@google.com>
+In-Reply-To: <CAAdAUtiZxw9_qQ4eszsxSQmmL7j46LRhixL5zYttcOzL0da42Q@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 20, 2021, Sean Christopherson wrote:
-> On Thu, May 20, 2021, Sean Christopherson wrote:
-> > On Mon, May 17, 2021, Tom Lendacky wrote:
-> > > On 5/14/21 6:06 PM, Peter Gonda wrote:
-> > > > On Fri, May 14, 2021 at 1:22 PM Tom Lendacky <thomas.lendacky@amd.com> wrote:
-> > > >>
-> > > >> Currently, an SEV-ES guest is terminated if the validation of the VMGEXIT
-> > > >> exit code and parameters fail. Since the VMGEXIT instruction can be issued
-> > > >> from userspace, even though userspace (likely) can't update the GHCB,
-> > > >> don't allow userspace to be able to kill the guest.
-> > > >>
-> > > >> Return a #GP request through the GHCB when validation fails, rather than
-> > > >> terminating the guest.
-> > > > 
-> > > > Is this a gap in the spec? I don't see anything that details what
-> > > > should happen if the correct fields for NAE are not set in the first
-> > > > couple paragraphs of section 4 'GHCB Protocol'.
-> > > 
-> > > No, I don't think the spec needs to spell out everything like this. The
-> > > hypervisor is free to determine its course of action in this case.
-> > 
-> > The hypervisor can decide whether to inject/return an error or kill the guest,
-> > but what errors can be returned and how they're returned absolutely needs to be
-> > ABI between guest and host, and to make the ABI vendor agnostic the GHCB spec
-> > is the logical place to define said ABI.
-> > 
-> > For example, "injecting" #GP if the guest botched the GHCB on #VMGEXIT(CPUID) is
-> > completely nonsensical.  As is, a Linux guest appears to blindly forward the #GP,
-> > which means if something does go awry KVM has just made debugging the guest that
-> > much harder, e.g. imagine the confusion that will ensue if the end result is a
-> > SIGBUS to userspace on CPUID.
-> > 
-> > There needs to be an explicit error code for "you gave me bad data", otherwise
-> > we're signing ourselves up for future pain.
+On Thu, May 20, 2021 at 02:46:41PM -0500, Jing Zhang wrote:
+> Hi Ricardo,
 > 
-> More concretely, I think the best course of action is to define a new return code
-> in SW_EXITINFO1[31:0], e.g. '2', with additional information in SW_EXITINFO2.
+> On Thu, May 20, 2021 at 1:58 PM Ricardo Koller <ricarkol@google.com> wrote:
+> >
+> > On Thu, May 20, 2021 at 12:37:59PM -0500, Jing Zhang wrote:
+> > > Hi Ricardo,
+> > >
+> > > On Wed, May 19, 2021 at 11:21 PM Ricardo Koller <ricarkol@google.com> wrote:
+> > > >
+> > > > On Mon, May 17, 2021 at 02:53:12PM +0000, Jing Zhang wrote:
+> > > > > Provides a file descriptor per VM to read VM stats info/data.
+> > > > > Provides a file descriptor per vCPU to read vCPU stats info/data.
+> > > > >
+> > > > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > > > > ---
+> > > > >  arch/arm64/kvm/guest.c    |  26 +++++
+> > > > >  arch/mips/kvm/mips.c      |  52 +++++++++
+> > > > >  arch/powerpc/kvm/book3s.c |  52 +++++++++
+> > > > >  arch/powerpc/kvm/booke.c  |  45 ++++++++
+> > > > >  arch/s390/kvm/kvm-s390.c  | 117 ++++++++++++++++++++
+> > > > >  arch/x86/kvm/x86.c        |  53 +++++++++
+> > > > >  include/linux/kvm_host.h  | 127 ++++++++++++++++++++++
+> > > > >  include/uapi/linux/kvm.h  |  50 +++++++++
+> > > > >  virt/kvm/kvm_main.c       | 223 ++++++++++++++++++++++++++++++++++++++
+> > > > >  9 files changed, 745 insertions(+)
+> > > > >
+> > > >
+> > > > > +static ssize_t kvm_vcpu_stats_read(struct file *file, char __user *user_buffer,
+> > > > > +                           size_t size, loff_t *offset)
+> > > > > +{
+> > > > > +     char id[KVM_STATS_ID_MAXLEN];
+> > > > > +     struct kvm_vcpu *vcpu = file->private_data;
+> > > > > +     ssize_t copylen, len, remain = size;
+> > > > > +     size_t size_header, size_desc, size_stats;
+> > > > > +     loff_t pos = *offset;
+> > > > > +     char __user *dest = user_buffer;
+> > > > > +     void *src;
+> > > >
+> > > > Nit. Better to do pointer arithmetic on a "char *".  Note that gcc and
+> > > > clang will do the expected thing.
+> > > >
+> > > > > +
+> > > > > +     snprintf(id, sizeof(id), "kvm-%d/vcpu-%d",
+> > > > > +                     task_pid_nr(current), vcpu->vcpu_id);
+> > > > > +     size_header = sizeof(kvm_vcpu_stats_header);
+> > > > > +     size_desc =
+> > > > > +             kvm_vcpu_stats_header.count * sizeof(struct _kvm_stats_desc);
+> > > > > +     size_stats = sizeof(vcpu->stat);
+> > > > > +
+> > > > > +     len = sizeof(id) + size_header + size_desc + size_stats - pos;
+> > > > > +     len = min(len, remain);
+> > > > > +     if (len <= 0)
+> > > > > +             return 0;
+> > > > > +     remain = len;
+> > > >
+> > > > If 'desc_offset' is not right after the header, then the 'len'
+> > > > calculation is missing the gap into account. For example, assuming there
+> > > > is a gap of 0x1000000 between the header and the descriptors:
+> > > >
+> > > >         desc_offset = sizeof(id) + size_header + 0x1000000
+> > > >
+> > > > and the user calls the ioctl with enough space for the whole file,
+> > > > including the gap:
+> > > >
+> > > >         *offset = 0
+> > > >         size = sizeof(id) + size_header + size_desc + size_stats + 0x1000000
+> > > >
+> > > > then 'remain' gets the wrong size:
+> > > >
+> > > >         remain = sizeof(id) + size_header + size_desc + size_stats
+> > > >
+> > > > and ... (more below)
+> > > >
+> > > > > +
+> > > > > +     /* Copy kvm vcpu stats header id string */
+> > > > > +     copylen = sizeof(id) - pos;
+> > > > > +     copylen = min(copylen, remain);
+> > > > > +     if (copylen > 0) {
+> > > > > +             src = (void *)id + pos;
+> > > > > +             if (copy_to_user(dest, src, copylen))
+> > > > > +                     return -EFAULT;
+> > > > > +             remain -= copylen;
+> > > > > +             pos += copylen;
+> > > > > +             dest += copylen;
+> > > > > +     }
+> > > > > +     /* Copy kvm vcpu stats header */
+> > > > > +     copylen = sizeof(id) + size_header - pos;
+> > > > > +     copylen = min(copylen, remain);
+> > > > > +     if (copylen > 0) {
+> > > > > +             src = (void *)&kvm_vcpu_stats_header;
+> > > > > +             src += pos - sizeof(id);
+> > > > > +             if (copy_to_user(dest, src, copylen))
+> > > > > +                     return -EFAULT;
+> > > > > +             remain -= copylen;
+> > > > > +             pos += copylen;
+> > > > > +             dest += copylen;
+> > > > > +     }
+> > > > > +     /* Copy kvm vcpu stats descriptors */
+> > > > > +     copylen = kvm_vcpu_stats_header.desc_offset + size_desc - pos;
+> > > >
+> > > > This would be the state at this point:
+> > > >
+> > > >         pos     = sizeof(id) + size_header
+> > > >         copylen = sizeof(id) + size_header + 0x1000000 + size_desc - (sizeof(id) + size_header)
+> > > >                 = 0x1000000 + size_desc
+> > > >         remain  = size_desc + size_stats
+> > > >
+> > > > > +     copylen = min(copylen, remain);
+> > > >
+> > > >         copylen = size_desc + size_stats
+> > > >
+> > > > which is not enough to copy the descriptors (and the data).
+> > > >
+> > > > > +     if (copylen > 0) {
+> > > > > +             src = (void *)&kvm_vcpu_stats_desc;
+> > > > > +             src += pos - kvm_vcpu_stats_header.desc_offset;
+> > > >
+> > > > Moreover, src also needs to take the gap into account.
+> > > >
+> > > >         src     = &kvm_vcpu_stats_desc + (sizeof(id) + size_header) - (sizeof(id) + size_header + 0x1000000)
+> > > >                 = &kvm_vcpu_stats_desc - 0x1000000
+> > > >
+> > > > Otherwise, src ends up pointing at the wrong place.
+> > > >
+> > > > > +             if (copy_to_user(dest, src, copylen))
+> > > > > +                     return -EFAULT;
+> > > > > +             remain -= copylen;
+> > > > > +             pos += copylen;
+> > > > > +             dest += copylen;
+> > > > > +     }
+> > > > > +     /* Copy kvm vcpu stats values */
+> > > > > +     copylen = kvm_vcpu_stats_header.data_offset + size_stats - pos;
+> > > >
+> > > > The same problem occurs here. There is a potential gap before
+> > > > data_offset that needs to be taken into account for src and len.
+> > > >
+> > > > Would it be possible to just ensure that there is no gap? maybe even
+> > > > remove data_offset and desc_offset and always place them adjacent, and
+> > > > have the descriptors right after the header.
+> > > >
+> > > I guess I didn't make it clear about the offset fields in the header block.
+> > > We don't create any gap here. In this implementation, kernel knows that
+> > > descriptor block is right after header block and data block is right after
+> > > descriptor block.
+> > > The reason we have offset fields for descriptor block and data block is
+> > > for flexibility and future potential extension. e.g. we might add another
+> > > block between header block and descriptor block in the future for some
+> > > other metadata information.
+> > > I think we are good here.
+> >
+> > Hi Jing,
+> >
+> > I realize they are adjacent right now, as the function wouldn't work if
+> > they weren't. My comment was more about code maintenance, what happens
+> > if the layout changes. This function depends on an asumption about a
+> > layout defined somewhere else. For example,
+> >
+> >         copylen = kvm_vm_stats_header.desc_offset + size_desc - pos;
+> >
+> > makes an assumption about desc_offset being set to:
+> >
+> >         .desc_offset = sizeof(struct kvm_stats_header),
+> >
+> > and if desc_offset is not exactly that, then the function doesn't
+> > explicitely fail and instead does unexpected things (probably undetected
+> > by tests).
+> >
+> > I think the solution is to just check the assumptions. Either an assert
+> > or just bail out with a warning:
+> >
+> >         /* This function currently depends on the following layout. */
+> >         if (kvm_vm_stats_header.desc_offset != sizeof(struct kvm_stats_header) ||
+> >                         kvm_vm_stats_header.data_offset != sizeof(struct kvm_stats_header) +
+> >                         sizeof(kvm_vm_stats_desc)) {
+> >                 warning(...);
+> >                 return 0;
+> >         }
+> >
+> I understand your concern. But whenever layout changes, the read function needs
+> to be updated anyway. The read function is actually the place to cook
+> the data layout
+> of the anonymous file.
+
+Could it be a good idea for header.data_offset and header.desc_offset to
+be set here (in the function)? so the function has full control of the
+file layout.
+
+> If the vm/vcpu stats header has an incorrect
+> offset value that is
+> defined in the read function, the test will complain about wrong stats
+> descriptor field
+> values usually.
+> Anyway, I will add more sanity tests in the selftest to cover the
+> potential risks.
+> Thanks.
+> > > > > +     copylen = min(copylen, remain);
+> > > > > +     if (copylen > 0) {
+> > > > > +             src = (void *)&vcpu->stat;
+> > > > > +             src += pos - kvm_vcpu_stats_header.data_offset;
+> > > > > +             if (copy_to_user(dest, src, copylen))
+> > > > > +                     return -EFAULT;
+> > > > > +             remain -= copylen;
+> > > > > +             pos += copylen;
+> > > > > +             dest += copylen;
+> > > > > +     }
+> > > > > +
+> > > > > +     *offset = pos;
+> > > > > +     return len;
+> > > > > +}
+> > > > > +
+> > > > >
+> > > >
+> > > >
+> > > >
+> > > > > +static ssize_t kvm_vm_stats_read(struct file *file, char __user *user_buffer,
+> > > > > +                           size_t size, loff_t *offset)
+> > > > > +{
+> > > >
+> > > > Consider moving the common code between kvm_vcpu_stats_read and this one
+> > > > into some function that takes pointers to header, desc, and data. Unless
+> > > > there is something vcpu or vm specific besides that.
+> > > >
+> > > Will do that, thanks.
+> > > > > +     char id[KVM_STATS_ID_MAXLEN];
+> > > > > +     struct kvm *kvm = file->private_data;
+> > > > > +     ssize_t copylen, len, remain = size;
+> > > > > +     size_t size_header, size_desc, size_stats;
+> > > > > +     loff_t pos = *offset;
+> > > > > +     char __user *dest = user_buffer;
+> > > > > +     void *src;
+> > > > > +
+> > > > > +     snprintf(id, sizeof(id), "kvm-%d", task_pid_nr(current));
+> > > > > +     size_header = sizeof(kvm_vm_stats_header);
+> > > > > +     size_desc = kvm_vm_stats_header.count * sizeof(struct _kvm_stats_desc);
+> > > > > +     size_stats = sizeof(kvm->stat);
+> > > > > +
+> > > > > +     len = sizeof(id) + size_header + size_desc + size_stats - pos;
+> > > > > +     len = min(len, remain);
+> > > > > +     if (len <= 0)
+> > > > > +             return 0;
+> > > > > +     remain = len;
+> > > > > +
+> > > > > +     /* Copy kvm vm stats header id string */
+> > > > > +     copylen = sizeof(id) - pos;
+> > > > > +     copylen = min(copylen, remain);
+> > > > > +     if (copylen > 0) {
+> > > > > +             src = (void *)id + pos;
+> > > > > +             if (copy_to_user(dest, src, copylen))
+> > > > > +                     return -EFAULT;
+> > > > > +             remain -= copylen;
+> > > > > +             pos += copylen;
+> > > > > +             dest += copylen;
+> > > > > +     }
+> > > > > +     /* Copy kvm vm stats header */
+> > > > > +     copylen = sizeof(id) + size_header - pos;
+> > > > > +     copylen = min(copylen, remain);
+> > > > > +     if (copylen > 0) {
+> > > > > +             src = (void *)&kvm_vm_stats_header;
+> > > > > +             src += pos - sizeof(id);
+> > > > > +             if (copy_to_user(dest, src, copylen))
+> > > > > +                     return -EFAULT;
+> > > > > +             remain -= copylen;
+> > > > > +             pos += copylen;
+> > > > > +             dest += copylen;
+> > > > > +     }
+> > > > > +     /* Copy kvm vm stats descriptors */
+> > > > > +     copylen = kvm_vm_stats_header.desc_offset + size_desc - pos;
+> > > > > +     copylen = min(copylen, remain);
+> > > > > +     if (copylen > 0) {
+> > > > > +             src = (void *)&kvm_vm_stats_desc;
+> > > > > +             src += pos - kvm_vm_stats_header.desc_offset;
+> > > > > +             if (copy_to_user(dest, src, copylen))
+> > > > > +                     return -EFAULT;
+> > > > > +             remain -= copylen;
+> > > > > +             pos += copylen;
+> > > > > +             dest += copylen;
+> > > > > +     }
+> > > > > +     /* Copy kvm vm stats values */
+> > > > > +     copylen = kvm_vm_stats_header.data_offset + size_stats - pos;
+> > > > > +     copylen = min(copylen, remain);
+> > > > > +     if (copylen > 0) {
+> > > > > +             src = (void *)&kvm->stat;
+> > > > > +             src += pos - kvm_vm_stats_header.data_offset;
+> > > > > +             if (copy_to_user(dest, src, copylen))
+> > > > > +                     return -EFAULT;
+> > > > > +             remain -= copylen;
+> > > > > +             pos += copylen;
+> > > > > +             dest += copylen;
+> > > > > +     }
+> > > > > +
+> > > > > +     *offset = pos;
+> > > > > +     return len;
+> > > > > +}
+> > > > > +
+> > > > > --
+> > > > > 2.31.1.751.gd2f1c929bd-goog
+> > > > >
+> > > > > _______________________________________________
+> > > > > kvmarm mailing list
+> > > > > kvmarm@lists.cs.columbia.edu
+> > > > > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 > 
-> In theory, an old-but-sane guest will interpret the unexpected return code as
-> fatal to whatever triggered the #VMGEXIT, e.g. SIGBUS to userspace.  Unfortunately
-> Linux isn't sane because sev_es_ghcb_hv_call() assumes any non-'1' result means
-> success, but that's trivial to fix and IMO should be fixed irrespective of where
-> this goes.
-
-One last thing (hopefully): Erdem pointed out that if the GCHB GPA (or any
-derferenced pointers within the GHCB) is invalid or is set to a private GPA
-(mostly in the context of SNP) then the VMM will likely have no choice but to
-kill the guest in response to #VMGEXIT.
-
-It's probably a good idea to add a blurb in one of the specs explicitly calling
-out that #VMGEXIT can be executed from userspace, and that before returning to
-uesrspace the guest kernel must always ensure that the GCHB points at a legal
-GPA _and_ all primary fields are marked invalid. 
+> Jing
