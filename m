@@ -2,360 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 22F5C38B9FF
-	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 01:04:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7538938BA66
+	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 01:30:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233187AbhETXFn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 May 2021 19:05:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59682 "EHLO
+        id S234028AbhETXbs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 19:31:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233163AbhETXFh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 May 2021 19:05:37 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13619C061574
-        for <kvm@vger.kernel.org>; Thu, 20 May 2021 16:04:13 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id g11-20020a17090a578bb029015564873bf4so7103176pji.7
-        for <kvm@vger.kernel.org>; Thu, 20 May 2021 16:04:13 -0700 (PDT)
+        with ESMTP id S232547AbhETXbr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 May 2021 19:31:47 -0400
+Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1352C061574
+        for <kvm@vger.kernel.org>; Thu, 20 May 2021 16:30:23 -0700 (PDT)
+Received: by mail-oi1-x22a.google.com with SMTP id w127so14177347oig.12
+        for <kvm@vger.kernel.org>; Thu, 20 May 2021 16:30:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=0B/3IKv0oEcXstXq6WsjIT/uIBUpF+2HF5+KRCArnfs=;
-        b=bA0YnVrexLcJEK692ZPfdLIW1pwS4RLsB0YDvpOFEJyogmpkrCsmHXQ2AWezzk/vOZ
-         CxbhGQ5JoMUoWY587A7/Ogas/uC5syptsPqRuNfqjEnJOsuY3xioAYi46OZDYmz6U6H4
-         yQTPXFmTLQ8e+3QPVlRu6bQPk57nLRIPNUn5mZWk60sfeUwsM0/VWIkqiwJFZyA34P4z
-         Qb2pf2QS0fSnChaxnaTK4gqtILnOQsvlkB8ukGkU5r9ZPuTp7aCEiJAwJ/+k5/AuCrLV
-         otvrrtOVfHoB6n0y4mOjE7Mvc7bnsQdawP2lZNXR9x9LjMNFp6r5L63K0woZjLEom3h+
-         KJDQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=1Q2KD3LuPZ6AgN2atmm/ZxCPqWH/BdpIU71vzTIK6x4=;
+        b=lGxfJX/WL8cid08Q511aT1aZ8UkpjcrClA4MaqA0OflxJB4jhnWNAFW0jxxb3xmxqD
+         J+qexj2kjaz9qgPKBtZnIx/DARZA7hufj9V6esJIByPV0ViJgMQKpxolsUZU/hIKSk/G
+         MCsxXJtXeU6CmxHYJ9IrSDlhM6L6Wq45krfcfZBkFKBgH+s1lqdgg3m6JINhbGcyJeYU
+         XoCo/WmTCztR6CH6MOYpXbdHLjFIg3zwORBPlNLHvoYlBiv2QzBUSQFL6hCC9/6vUHCC
+         AI1B+2igRMSEAlpPky2SfONTrRIELFljNg0UzB1gk+mxbAvsIfPLmhrj2ey5DgC9N/pU
+         fbfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=0B/3IKv0oEcXstXq6WsjIT/uIBUpF+2HF5+KRCArnfs=;
-        b=p8kYPwg4VQk8KjXrplGkeXvyhO2m2RJJH0nOG7RjR4xYNUL4xbJk+jxxDAssx9pIm4
-         VJPU+rEzpjs9CKd5SXfdMNe7l0gxDjc0qkPP1dcz1wHTNuzU2LowuEXSrpSjJ6BaX5ez
-         EoRaZLNb0OGJkSxUfUj282jexA/b8iXDL9/OcZCnjp6t3AZ2l6ea6BN8s2SuRU9evYQK
-         HorHo4Xp1THYFG7+Gdg2AM1ZiRM1+NiiJu1N25Nzn2uyMBWiWeGlAociibKmg8y6lZh3
-         vaxqlOG+hLCeUYsnOi36p8MzDjXtmuC2EdS5Y292QEwUovNSDlGh/nceu3+rxAGVJpHl
-         ypbw==
-X-Gm-Message-State: AOAM531OYsua2mP5ha3Xiv2UFzRLDXmjstjGvITfIPwT9LohoWVkkPQ8
-        gd5u+XxhCmyPYyOAtk+dg3xU4XjpE+TbEKL4PFmBRd0HkTKnLpzpH80g8ukIsur9yutsO+/hlPq
-        7fFcwVn0I2mA2W2hQdoeN2NqA8Ge0iZUTj3EpOV9JIUSnhslhaJLDMTyTMbY2nRk=
-X-Google-Smtp-Source: ABdhPJwgOu2U3+p1YcxRdaUcX8BgStF+6tCt/4/Rt0etBypGoY6Jolgk7GcB+dhG9wLkgFKsQ1OfqkgXMHISMA==
-X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1a0d])
- (user=jmattson job=sendgmr) by 2002:a17:90a:e016:: with SMTP id
- u22mr200919pjy.1.1621551851806; Thu, 20 May 2021 16:04:11 -0700 (PDT)
-Date:   Thu, 20 May 2021 16:03:39 -0700
-In-Reply-To: <20210520230339.267445-1-jmattson@google.com>
-Message-Id: <20210520230339.267445-13-jmattson@google.com>
-Mime-Version: 1.0
-References: <20210520230339.267445-1-jmattson@google.com>
-X-Mailer: git-send-email 2.31.1.818.g46aad6cb9e-goog
-Subject: [PATCH 12/12] KVM: selftests: Add a test of an unbacked nested PI descriptor
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=1Q2KD3LuPZ6AgN2atmm/ZxCPqWH/BdpIU71vzTIK6x4=;
+        b=ZPIwSISFAYtZrBdbn3WS1EnvIWsmhSXzRG9sOBBjzKH/8SoDi/XrRgWfbEBtNVY9kU
+         4TDpsPNGHZhxpwRs4BgRIIkQg/IjJ3OrAszIgikNswQ+jMBfVFwzclk9FGQQETOkP9T6
+         48xTJ+Jrye9MSmYjtj7d44pCbx61FsYPZX8gLMM6EksZn6VugNuu/BMD9zMNiPdLlqvR
+         Uooyaz/WGIAgPKbISvNM0+KIW3GNzjk4xDTQJzfvJCKQYK1lHtsA4HycFJgjOpjkOT9m
+         LWNGk95EqRE+VYDHm83Z1J4HHN5pTOIU1ZIYSHIhA6i5aO+M/OyGlGMOY95el1jC0yWm
+         s44A==
+X-Gm-Message-State: AOAM532KiicjQGCRQz9IS/InpDWDchnCJ+tZvfwZgCf7mRgwgEFh2rjm
+        1Cyixv3JuGyMcthbrHya6IZBiRVNOGbnod6bSyOgXQ==
+X-Google-Smtp-Source: ABdhPJyoaziaRX9mnNdtx0im4dA7pcL5TYsVWFrNHti+7J0ZazMabFmgvVXM8HWa/3dmKcRXYAezutb12iQLBtOF/9E=
+X-Received: by 2002:aca:1205:: with SMTP id 5mr12857ois.6.1621553422891; Thu,
+ 20 May 2021 16:30:22 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210520211708.70069-1-krish.sadhukhan@oracle.com>
+In-Reply-To: <20210520211708.70069-1-krish.sadhukhan@oracle.com>
 From:   Jim Mattson <jmattson@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com
-Cc:     Jim Mattson <jmattson@google.com>, Oliver Upton <oupton@google.com>
+Date:   Thu, 20 May 2021 16:30:11 -0700
+Message-ID: <CALMp9eRkgCjR-NADZcH5Hx1zeO=HkS4tE2FP_9ie_xVqtLQ2Nw@mail.gmail.com>
+Subject: Re: [PATCH] nSVM: Test: Test VMRUN's canonicalization of segement
+ base addresses
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a regression test for the unsupported configuration of a VMCS12
-posted interrupt descriptor that has no backing memory in L1. KVM
-should exit to userspace with KVM_INTERNAL_ERROR rather than just
-silently doing something wrong.
+On Thu, May 20, 2021 at 3:06 PM Krish Sadhukhan
+<krish.sadhukhan@oracle.com> wrote:
+>
+> According to section "Canonicalization and Consistency Checks" in APM vol=
+ 2,
+>
+>     VMRUN canonicalizes (i.e., sign-extend to bit 63) all base addresses
+>     in the segment registers that have been loaded.
+>
+> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> ---
+>  x86/svm_tests.c | 29 +++++++++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
+>
+> diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+> index d689e73..8387bea 100644
+> --- a/x86/svm_tests.c
+> +++ b/x86/svm_tests.c
+> @@ -2499,6 +2499,34 @@ static void test_msrpm_iopm_bitmap_addrs(void)
+>         vmcb->control.intercept =3D saved_intercept;
+>  }
+>
+> +#define TEST_CANONICAL(seg_base, msg)                                  \
+> +       saved_addr =3D seg_base;                                         =
+ \
+> +       seg_base =3D (seg_base & ((1ul << addr_limit) - 1)) | noncanonica=
+l_mask; \
+> +       report(svm_vmrun() =3D=3D SVM_EXIT_VMMCALL, "Test %s.base for can=
+onical form: %lx", msg, seg_base);                                         =
+        \
+> +       seg_base =3D saved_addr;
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
-Reviewed-by: Oliver Upton <oupton@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/x86_64/vmx_pi_mmio_test.c   | 252 ++++++++++++++++++
- 3 files changed, 254 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_pi_mmio_test.c
+This is messy. Why not just set seg_base to NONCANONICAL before
+svm_vmrun() and then check to see that it's equal to
+canonicalize(NONCANONICAL) after #VMEXIT?
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index bd83158e0e0b..f813761ac0a1 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -34,6 +34,7 @@
- /x86_64/xen_vmcall_test
- /x86_64/xss_msr_test
- /x86_64/vmx_pmu_msrs_test
-+/x86_64/vmx_pi_mmio_test
- /demand_paging_test
- /dirty_log_test
- /dirty_log_perf_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index af102e03e698..fef0992f04c9 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -67,6 +67,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/tsc_msrs_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_pmu_msrs_test
- TEST_GEN_PROGS_x86_64 += x86_64/xen_shinfo_test
- TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
-+TEST_GEN_PROGS_x86_64 += x86_64/vmx_pi_mmio_test
- TEST_GEN_PROGS_x86_64 += demand_paging_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
- TEST_GEN_PROGS_x86_64 += dirty_log_perf_test
-diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pi_mmio_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pi_mmio_test.c
-new file mode 100644
-index 000000000000..2246899d8988
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/vmx_pi_mmio_test.c
-@@ -0,0 +1,252 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * vmx_pi_mmio_test
-+ *
-+ * Copyright (C) 2021, Google LLC.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ *
-+ * Test that an L2 vCPU can be launched with an unbacked posted
-+ * interrupt descriptor, but that any attempt to send that vCPU its
-+ * posted interrupt notification vector will result in an exit to
-+ * userspace with KVM_INTERNAL_ERROR.
-+ *
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <pthread.h>
-+#include <inttypes.h>
-+#include <unistd.h>
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+#include "vmx.h"
-+
-+#include "kselftest.h"
-+
-+#define RECEIVER_VCPU_ID	0
-+#define SENDER_VCPU_ID		1
-+
-+#define L2_GUEST_STACK_SIZE	64
-+
-+#define TIMEOUT_SECS		10
-+
-+#define L1_PI_VECTOR		33
-+
-+static struct kvm_vm *vm;
-+
-+static bool l2_active;
-+
-+static void l2_guest_code(void)
-+{
-+	l2_active = true;
-+	__asm__ __volatile__("hlt");
-+	/* NOT REACHED */
-+}
-+
-+static void l1_receiver_code(struct vmx_pages *vmx_pages,
-+			     unsigned long high_gpa)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	uint32_t control;
-+
-+	x2apic_enable();
-+
-+	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
-+	GUEST_ASSERT(load_vmcs(vmx_pages));
-+
-+	prepare_vmcs(vmx_pages, l2_guest_code,
-+		     &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+	control = vmreadz(PIN_BASED_VM_EXEC_CONTROL);
-+	control |= PIN_BASED_EXT_INTR_MASK |
-+		PIN_BASED_POSTED_INTR;
-+	vmwrite(PIN_BASED_VM_EXEC_CONTROL, control);
-+
-+	control = vmreadz(CPU_BASED_VM_EXEC_CONTROL);
-+	control |= CPU_BASED_TPR_SHADOW |
-+		CPU_BASED_ACTIVATE_SECONDARY_CONTROLS;
-+	vmwrite(CPU_BASED_VM_EXEC_CONTROL, control);
-+
-+	control = vmreadz(SECONDARY_VM_EXEC_CONTROL);
-+	control |= SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY;
-+	vmwrite(SECONDARY_VM_EXEC_CONTROL, control);
-+
-+	control = vmreadz(VM_EXIT_CONTROLS);
-+	control |= VM_EXIT_ACK_INTR_ON_EXIT;
-+	vmwrite(VM_EXIT_CONTROLS, control);
-+
-+	vmwrite(VIRTUAL_APIC_PAGE_ADDR, vmx_pages->virtual_apic_gpa);
-+	vmwrite(POSTED_INTR_NV, L1_PI_VECTOR);
-+	vmwrite(POSTED_INTR_DESC_ADDR, high_gpa);
-+
-+	GUEST_ASSERT(!vmlaunch());
-+	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_VMCALL);
-+
-+	GUEST_DONE();
-+}
-+
-+static void l1_sender_code(void *arg)
-+{
-+	x2apic_enable();
-+
-+	x2apic_write_reg(APIC_ICR,
-+			 APIC_INT_ASSERT | APIC_DEST_PHYSICAL |
-+			 APIC_DM_FIXED | L1_PI_VECTOR |
-+			 ((uint64_t)RECEIVER_VCPU_ID << 32));
-+
-+	GUEST_DONE();
-+}
-+
-+static bool vcpu_run_loop(int vcpu_id)
-+{
-+	volatile struct kvm_run *run = vcpu_state(vm, vcpu_id);
-+	bool done = false;
-+	struct ucall uc;
-+
-+	while (!done) {
-+		vcpu_run(vm, vcpu_id);
-+
-+		if (run->exit_reason != KVM_EXIT_IO)
-+			break;
-+
-+		switch (get_ucall(vm, vcpu_id, &uc)) {
-+		case UCALL_ABORT:
-+			TEST_FAIL("vCPU  %d: %s at %s:%ld", vcpu_id,
-+				  (const char *)uc.args[0], __FILE__,
-+				  uc.args[1]);
-+			/* NOT REACHED */
-+		case UCALL_SYNC:
-+			break;
-+		case UCALL_DONE:
-+			done = true;
-+			break;
-+		default:
-+			TEST_FAIL("vCPU %d: Unknown ucall %lu",
-+				  vcpu_id, uc.cmd);
-+			/* NOT REACHED */
-+		}
-+	}
-+
-+	return done;
-+}
-+
-+static void *receiver(void *arg)
-+{
-+	volatile struct kvm_run *run = vcpu_state(vm, RECEIVER_VCPU_ID);
-+	unsigned long high_gpa = *(unsigned long *)arg;
-+	vm_vaddr_t vmx_pages_gva;
-+	struct vmx_pages *vmx;
-+	bool success;
-+
-+	vmx = vcpu_alloc_vmx(vm, &vmx_pages_gva);
-+	prepare_tpr_shadow(vmx, vm);
-+	vcpu_args_set(vm, RECEIVER_VCPU_ID, 2, vmx_pages_gva, high_gpa);
-+
-+	success = vcpu_run_loop(RECEIVER_VCPU_ID);
-+	TEST_ASSERT(!success, "Receiver didn't fail as expected.\n");
-+	TEST_ASSERT(run->exit_reason ==
-+		    KVM_EXIT_INTERNAL_ERROR,
-+		    "Exit reason isn't KVM_EXIT_INTERNAL_ERROR: %u (%s).\n",
-+		    run->exit_reason,
-+		    exit_reason_str(run->exit_reason));
-+	TEST_ASSERT(run->internal.suberror ==
-+		    KVM_INTERNAL_ERROR_EMULATION,
-+		    "Internal suberror isn't KVM_INTERNAL_ERROR_EMULATION: %u.\n",
-+		    run->internal.suberror);
-+
-+	return NULL;
-+}
-+
-+static void sender(void)
-+{
-+	volatile struct kvm_run *run = vcpu_state(vm, SENDER_VCPU_ID);
-+	bool success;
-+
-+	success = vcpu_run_loop(SENDER_VCPU_ID);
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+		    "Sender didn't exit with KVM_EXIT_IO: %u (%s).\n",
-+		    run->exit_reason,
-+		    exit_reason_str(run->exit_reason));
-+	TEST_ASSERT(success, "Sender didn't complete successfully.\n");
-+}
-+
-+void check_constraints(void)
-+{
-+	uint64_t msr;
-+
-+	nested_vmx_check_supported();
-+
-+	msr = kvm_get_feature_msr(MSR_IA32_VMX_PINBASED_CTLS) >> 32;
-+	if (!(msr & PIN_BASED_EXT_INTR_MASK)) {
-+		print_skip("Cannot enable \"external-interrupt exiting\"");
-+		exit(KSFT_SKIP);
-+	}
-+	if (!(msr & PIN_BASED_POSTED_INTR)) {
-+		print_skip("Cannot enable \"process posted interrupts\"");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	msr = kvm_get_feature_msr(MSR_IA32_VMX_PROCBASED_CTLS) >> 32;
-+	if (!(msr & CPU_BASED_TPR_SHADOW)) {
-+		print_skip("Cannot enable \"use TPR shadow\"");
-+		exit(KSFT_SKIP);
-+	}
-+	if (!(msr & CPU_BASED_ACTIVATE_SECONDARY_CONTROLS)) {
-+		print_skip("Cannot enable \"activate secondary controls\"");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	msr = kvm_get_feature_msr(MSR_IA32_VMX_PROCBASED_CTLS2) >> 32;
-+	if (!(msr & SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY)) {
-+		print_skip("Cannot enable \"virtual-interrupt delivery\"");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	msr = kvm_get_feature_msr(MSR_IA32_VMX_EXIT_CTLS) >> 32;
-+	if (!(msr & VM_EXIT_ACK_INTR_ON_EXIT)) {
-+		print_skip("Cannot enable \"acknowledge interrupt on exit\"");
-+		exit(KSFT_SKIP);
-+	}
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	unsigned int paddr_width;
-+	unsigned int vaddr_width;
-+	unsigned long high_gpa;
-+	pthread_t thread;
-+	bool *l2_active_hva;
-+	int r;
-+
-+	kvm_get_cpu_address_width(&paddr_width, &vaddr_width);
-+	high_gpa = (1ul << paddr_width) - getpagesize();
-+	if ((unsigned long)DEFAULT_GUEST_PHY_PAGES * getpagesize() > high_gpa) {
-+		print_skip("No unbacked physical page available");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	check_constraints();
-+
-+	vm = vm_create_default(RECEIVER_VCPU_ID, 0, (void *)l1_receiver_code);
-+	vm_vcpu_add_default(vm, SENDER_VCPU_ID, (void *)l1_sender_code);
-+	vcpu_set_cpuid(vm, SENDER_VCPU_ID, kvm_get_supported_cpuid());
-+
-+	r = pthread_create(&thread, NULL, receiver, &high_gpa);
-+	TEST_ASSERT(r == 0,
-+		    "pthread_create failed errno=%d", errno);
-+
-+	alarm(TIMEOUT_SECS);
-+	l2_active_hva = (bool *)addr_gva2hva(vm, (vm_vaddr_t)&l2_active);
-+	while (!*l2_active_hva)
-+		pthread_yield();
-+
-+	sender();
-+
-+	r = pthread_join(thread, NULL);
-+	TEST_ASSERT(r == 0, "pthread_join failed with errno=%d", r);
-+
-+	kvm_vm_free(vm);
-+
-+	return 0;
-+}
--- 
-2.31.1.818.g46aad6cb9e-goog
+> +/*
+> + * VMRUN canonicalizes (i.e., sign-extend to bit 63) all base addresses
+> + =E2=80=A2 in the segment registers that have been loaded.
+> + */
+> +static void test_vmrun_canonicalization(void)
+> +{
+> +       u64 saved_addr;
+> +       u8 addr_limit =3D cpuid_maxphyaddr();
 
+What constitutes a canonical address depends on the maximum *virtual*
+address width supported, not the maximum physical address width
+supported.
+
+> +       u64 noncanonical_mask =3D NONCANONICAL & ~((1ul << addr_limit) - =
+1);
+> +
+> +       TEST_CANONICAL(vmcb->save.es.base, "ES");
+> +       TEST_CANONICAL(vmcb->save.cs.base, "CS");
+> +       TEST_CANONICAL(vmcb->save.ss.base, "SS");
+> +       TEST_CANONICAL(vmcb->save.ds.base, "DS");
+> +       TEST_CANONICAL(vmcb->save.fs.base, "FS");
+> +       TEST_CANONICAL(vmcb->save.gs.base, "GS");
+> +       TEST_CANONICAL(vmcb->save.gdtr.base, "GDTR");
+> +       TEST_CANONICAL(vmcb->save.ldtr.base, "LDTR");
+> +       TEST_CANONICAL(vmcb->save.idtr.base, "IDTR");
+> +       TEST_CANONICAL(vmcb->save.tr.base, "TR");
+
+There are only 8 segment registers. GDTR and IDTR are not segment
+registers. They may be canonicalized by VMRUN/#VMEXIT, but they are
+not segment registers.
+
+> +}
+> +
+>  static void svm_guest_state_test(void)
+>  {
+>         test_set_guest(basic_guest_main);
+> @@ -2508,6 +2536,7 @@ static void svm_guest_state_test(void)
+>         test_cr4();
+>         test_dr();
+>         test_msrpm_iopm_bitmap_addrs();
+> +       test_vmrun_canonicalization();
+>  }
+>
+>
+> --
+> 2.27.0
+>
