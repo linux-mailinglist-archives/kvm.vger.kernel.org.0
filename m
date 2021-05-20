@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AA64C38B9FE
-	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 01:04:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22F5C38B9FF
+	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 01:04:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233028AbhETXFm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 May 2021 19:05:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59616 "EHLO
+        id S233187AbhETXFn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 19:05:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232977AbhETXFf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 May 2021 19:05:35 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5815C061342
-        for <kvm@vger.kernel.org>; Thu, 20 May 2021 16:04:10 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id x24-20020aa784d80000b02902dd5846d381so7631243pfn.20
-        for <kvm@vger.kernel.org>; Thu, 20 May 2021 16:04:10 -0700 (PDT)
+        with ESMTP id S233163AbhETXFh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 May 2021 19:05:37 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13619C061574
+        for <kvm@vger.kernel.org>; Thu, 20 May 2021 16:04:13 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id g11-20020a17090a578bb029015564873bf4so7103176pji.7
+        for <kvm@vger.kernel.org>; Thu, 20 May 2021 16:04:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=oIzsQQKUBlmG+L5Z1kb0XOIo6gMIumBtyoNwBG1Mros=;
-        b=ZN1Lfn7D2fMxg2rKY32lCBKVgRSthmgRRVJM76COwTHqcjaN7b0+vxoBA8lqWwctLt
-         y3QY7R9MCeJNUudxCT+cE2tF/xAcH6dWo2y8TDH/UFJiN1YB7mQ4bLOpVd6QPr/p/qrd
-         UVrOOk/6WHDQ1TPvn3Cw/Ums48wTek9UlHi/b9TB8XNOL4KxINgpEyS4JUzFtCOCkLeo
-         HUkxwABXo2pi69tBSWWH4jYFrjwFrwb2YfJqT35YMQX9ZqNjK48yxNGDdbHc1KXF2q52
-         BhBo7nrZu/c/+ExS/sblRX67E6Qqe/omleAyxmIlCm5r/8pXG7ISvv7SCFFGZw2ZSo0f
-         LS8Q==
+        bh=0B/3IKv0oEcXstXq6WsjIT/uIBUpF+2HF5+KRCArnfs=;
+        b=bA0YnVrexLcJEK692ZPfdLIW1pwS4RLsB0YDvpOFEJyogmpkrCsmHXQ2AWezzk/vOZ
+         CxbhGQ5JoMUoWY587A7/Ogas/uC5syptsPqRuNfqjEnJOsuY3xioAYi46OZDYmz6U6H4
+         yQTPXFmTLQ8e+3QPVlRu6bQPk57nLRIPNUn5mZWk60sfeUwsM0/VWIkqiwJFZyA34P4z
+         Qb2pf2QS0fSnChaxnaTK4gqtILnOQsvlkB8ukGkU5r9ZPuTp7aCEiJAwJ/+k5/AuCrLV
+         otvrrtOVfHoB6n0y4mOjE7Mvc7bnsQdawP2lZNXR9x9LjMNFp6r5L63K0woZjLEom3h+
+         KJDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=oIzsQQKUBlmG+L5Z1kb0XOIo6gMIumBtyoNwBG1Mros=;
-        b=sPg+8ugFczcP1TSbQ2kID7fS3yfZFEVoOOz631cjhcWHHo8c/mxWvSUplma6duofud
-         Rh2diuKp1W8rlep4jflF6KzAP66aoWDyg7BU8MoiAJFFjuJWhyhN2/nIO5dp3C92ruQx
-         lQi8N/Jz3r2D4wDzu0uJ0M+beV+ZlKdHX48pWr7M3+QypjRWnzJbMqI4A/0KjJQuoeGm
-         +CN8oy3CyY+SrSdPATSv1yBAV4nXgYiqLzM9n6d5ui743FtvprRO9S270YHOyVvJm7xb
-         TMilStu+2hl5ACmWms8URXVtqe2WFLDg8h360igI67mLQYbEgPnimwi4gLs0jRCbYxt5
-         pjRA==
-X-Gm-Message-State: AOAM530kL2WnN3yWNQjvzMGP1BxCdVH1nJTZUgLjWZjRLdcVySztdEJu
-        BOmYx8dQTpNFXKTvzEWGn9amgy/NjojcPXz4rLi9+DwGYIKyGAk8BFDjKrQ8Ra1zUCsyvC110ra
-        1HaRuoxurD2R6sETjZsloHV4mRDcBER9FeRFssyNfPhtK53S5TsHlKUGCXfUS6g0=
-X-Google-Smtp-Source: ABdhPJylHSXWop/Ej1LHSKIKYtI8GMoroxVy9mLQM7IJft8k1lX8WhGmiueuNC9e32W32lNDeqfLGGZW3QbXEg==
+        bh=0B/3IKv0oEcXstXq6WsjIT/uIBUpF+2HF5+KRCArnfs=;
+        b=p8kYPwg4VQk8KjXrplGkeXvyhO2m2RJJH0nOG7RjR4xYNUL4xbJk+jxxDAssx9pIm4
+         VJPU+rEzpjs9CKd5SXfdMNe7l0gxDjc0qkPP1dcz1wHTNuzU2LowuEXSrpSjJ6BaX5ez
+         EoRaZLNb0OGJkSxUfUj282jexA/b8iXDL9/OcZCnjp6t3AZ2l6ea6BN8s2SuRU9evYQK
+         HorHo4Xp1THYFG7+Gdg2AM1ZiRM1+NiiJu1N25Nzn2uyMBWiWeGlAociibKmg8y6lZh3
+         vaxqlOG+hLCeUYsnOi36p8MzDjXtmuC2EdS5Y292QEwUovNSDlGh/nceu3+rxAGVJpHl
+         ypbw==
+X-Gm-Message-State: AOAM531OYsua2mP5ha3Xiv2UFzRLDXmjstjGvITfIPwT9LohoWVkkPQ8
+        gd5u+XxhCmyPYyOAtk+dg3xU4XjpE+TbEKL4PFmBRd0HkTKnLpzpH80g8ukIsur9yutsO+/hlPq
+        7fFcwVn0I2mA2W2hQdoeN2NqA8Ge0iZUTj3EpOV9JIUSnhslhaJLDMTyTMbY2nRk=
+X-Google-Smtp-Source: ABdhPJwgOu2U3+p1YcxRdaUcX8BgStF+6tCt/4/Rt0etBypGoY6Jolgk7GcB+dhG9wLkgFKsQ1OfqkgXMHISMA==
 X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1a0d])
- (user=jmattson job=sendgmr) by 2002:a17:90a:ba07:: with SMTP id
- s7mr7239125pjr.129.1621551849857; Thu, 20 May 2021 16:04:09 -0700 (PDT)
-Date:   Thu, 20 May 2021 16:03:38 -0700
+ (user=jmattson job=sendgmr) by 2002:a17:90a:e016:: with SMTP id
+ u22mr200919pjy.1.1621551851806; Thu, 20 May 2021 16:04:11 -0700 (PDT)
+Date:   Thu, 20 May 2021 16:03:39 -0700
 In-Reply-To: <20210520230339.267445-1-jmattson@google.com>
-Message-Id: <20210520230339.267445-12-jmattson@google.com>
+Message-Id: <20210520230339.267445-13-jmattson@google.com>
 Mime-Version: 1.0
 References: <20210520230339.267445-1-jmattson@google.com>
 X-Mailer: git-send-email 2.31.1.818.g46aad6cb9e-goog
-Subject: [PATCH 11/12] KVM: selftests: Introduce prepare_tpr_shadow
+Subject: [PATCH 12/12] KVM: selftests: Add a test of an unbacked nested PI descriptor
 From:   Jim Mattson <jmattson@google.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com
 Cc:     Jim Mattson <jmattson@google.com>, Oliver Upton <oupton@google.com>
@@ -60,55 +60,301 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add support for yet another page to hang from the VMCS12 for nested
-VMX testing: the virtual APIC page. This page is necessary for a
-VMCS12 to be launched with the "use TPR shadow" VM-execution control
-set (except in some oddball circumstances permitted by KVM).
+Add a regression test for the unsupported configuration of a VMCS12
+posted interrupt descriptor that has no backing memory in L1. KVM
+should exit to userspace with KVM_INTERNAL_ERROR rather than just
+silently doing something wrong.
 
 Signed-off-by: Jim Mattson <jmattson@google.com>
 Reviewed-by: Oliver Upton <oupton@google.com>
 ---
- tools/testing/selftests/kvm/include/x86_64/vmx.h | 5 +++++
- tools/testing/selftests/kvm/lib/x86_64/vmx.c     | 8 ++++++++
- 2 files changed, 13 insertions(+)
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/x86_64/vmx_pi_mmio_test.c   | 252 ++++++++++++++++++
+ 3 files changed, 254 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_pi_mmio_test.c
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/vmx.h b/tools/testing/selftests/kvm/include/x86_64/vmx.h
-index 516c81d86353..83ccb096b966 100644
---- a/tools/testing/selftests/kvm/include/x86_64/vmx.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/vmx.h
-@@ -574,6 +574,10 @@ struct vmx_pages {
- 	void *apic_access_hva;
- 	uint64_t apic_access_gpa;
- 	void *apic_access;
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index bd83158e0e0b..f813761ac0a1 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -34,6 +34,7 @@
+ /x86_64/xen_vmcall_test
+ /x86_64/xss_msr_test
+ /x86_64/vmx_pmu_msrs_test
++/x86_64/vmx_pi_mmio_test
+ /demand_paging_test
+ /dirty_log_test
+ /dirty_log_perf_test
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index af102e03e698..fef0992f04c9 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -67,6 +67,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/tsc_msrs_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_pmu_msrs_test
+ TEST_GEN_PROGS_x86_64 += x86_64/xen_shinfo_test
+ TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
++TEST_GEN_PROGS_x86_64 += x86_64/vmx_pi_mmio_test
+ TEST_GEN_PROGS_x86_64 += demand_paging_test
+ TEST_GEN_PROGS_x86_64 += dirty_log_test
+ TEST_GEN_PROGS_x86_64 += dirty_log_perf_test
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pi_mmio_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pi_mmio_test.c
+new file mode 100644
+index 000000000000..2246899d8988
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/vmx_pi_mmio_test.c
+@@ -0,0 +1,252 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * vmx_pi_mmio_test
++ *
++ * Copyright (C) 2021, Google LLC.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.
++ *
++ * Test that an L2 vCPU can be launched with an unbacked posted
++ * interrupt descriptor, but that any attempt to send that vCPU its
++ * posted interrupt notification vector will result in an exit to
++ * userspace with KVM_INTERNAL_ERROR.
++ *
++ */
 +
-+	void *virtual_apic_hva;
-+	uint64_t virtual_apic_gpa;
-+	void *virtual_apic;
- };
- 
- union vmx_basic {
-@@ -618,5 +622,6 @@ void prepare_eptp(struct vmx_pages *vmx, struct kvm_vm *vm,
- 		  uint32_t eptp_memslot);
- void prepare_virtualize_apic_accesses(struct vmx_pages *vmx, struct kvm_vm *vm,
- 				      uint32_t eptp_memslot);
-+void prepare_tpr_shadow(struct vmx_pages *vmx, struct kvm_vm *vm);
- 
- #endif /* SELFTEST_KVM_VMX_H */
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/vmx.c b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-index 2448b30e8efa..1023760d1bf7 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-@@ -551,3 +551,11 @@ void prepare_virtualize_apic_accesses(struct vmx_pages *vmx, struct kvm_vm *vm,
- 	vmx->apic_access_hva = addr_gva2hva(vm, (uintptr_t)vmx->apic_access);
- 	vmx->apic_access_gpa = addr_gva2gpa(vm, (uintptr_t)vmx->apic_access);
- }
++#define _GNU_SOURCE /* for program_invocation_short_name */
++#include <pthread.h>
++#include <inttypes.h>
++#include <unistd.h>
 +
-+void prepare_tpr_shadow(struct vmx_pages *vmx, struct kvm_vm *vm)
++#include "kvm_util.h"
++#include "processor.h"
++#include "test_util.h"
++#include "vmx.h"
++
++#include "kselftest.h"
++
++#define RECEIVER_VCPU_ID	0
++#define SENDER_VCPU_ID		1
++
++#define L2_GUEST_STACK_SIZE	64
++
++#define TIMEOUT_SECS		10
++
++#define L1_PI_VECTOR		33
++
++static struct kvm_vm *vm;
++
++static bool l2_active;
++
++static void l2_guest_code(void)
 +{
-+	vmx->virtual_apic = (void *)vm_vaddr_alloc(vm, getpagesize(),
-+						  0x10000, 0, 0);
-+	vmx->virtual_apic_hva = addr_gva2hva(vm, (uintptr_t)vmx->virtual_apic);
-+	vmx->virtual_apic_gpa = addr_gva2gpa(vm, (uintptr_t)vmx->virtual_apic);
++	l2_active = true;
++	__asm__ __volatile__("hlt");
++	/* NOT REACHED */
++}
++
++static void l1_receiver_code(struct vmx_pages *vmx_pages,
++			     unsigned long high_gpa)
++{
++	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
++	uint32_t control;
++
++	x2apic_enable();
++
++	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
++	GUEST_ASSERT(load_vmcs(vmx_pages));
++
++	prepare_vmcs(vmx_pages, l2_guest_code,
++		     &l2_guest_stack[L2_GUEST_STACK_SIZE]);
++	control = vmreadz(PIN_BASED_VM_EXEC_CONTROL);
++	control |= PIN_BASED_EXT_INTR_MASK |
++		PIN_BASED_POSTED_INTR;
++	vmwrite(PIN_BASED_VM_EXEC_CONTROL, control);
++
++	control = vmreadz(CPU_BASED_VM_EXEC_CONTROL);
++	control |= CPU_BASED_TPR_SHADOW |
++		CPU_BASED_ACTIVATE_SECONDARY_CONTROLS;
++	vmwrite(CPU_BASED_VM_EXEC_CONTROL, control);
++
++	control = vmreadz(SECONDARY_VM_EXEC_CONTROL);
++	control |= SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY;
++	vmwrite(SECONDARY_VM_EXEC_CONTROL, control);
++
++	control = vmreadz(VM_EXIT_CONTROLS);
++	control |= VM_EXIT_ACK_INTR_ON_EXIT;
++	vmwrite(VM_EXIT_CONTROLS, control);
++
++	vmwrite(VIRTUAL_APIC_PAGE_ADDR, vmx_pages->virtual_apic_gpa);
++	vmwrite(POSTED_INTR_NV, L1_PI_VECTOR);
++	vmwrite(POSTED_INTR_DESC_ADDR, high_gpa);
++
++	GUEST_ASSERT(!vmlaunch());
++	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_VMCALL);
++
++	GUEST_DONE();
++}
++
++static void l1_sender_code(void *arg)
++{
++	x2apic_enable();
++
++	x2apic_write_reg(APIC_ICR,
++			 APIC_INT_ASSERT | APIC_DEST_PHYSICAL |
++			 APIC_DM_FIXED | L1_PI_VECTOR |
++			 ((uint64_t)RECEIVER_VCPU_ID << 32));
++
++	GUEST_DONE();
++}
++
++static bool vcpu_run_loop(int vcpu_id)
++{
++	volatile struct kvm_run *run = vcpu_state(vm, vcpu_id);
++	bool done = false;
++	struct ucall uc;
++
++	while (!done) {
++		vcpu_run(vm, vcpu_id);
++
++		if (run->exit_reason != KVM_EXIT_IO)
++			break;
++
++		switch (get_ucall(vm, vcpu_id, &uc)) {
++		case UCALL_ABORT:
++			TEST_FAIL("vCPU  %d: %s at %s:%ld", vcpu_id,
++				  (const char *)uc.args[0], __FILE__,
++				  uc.args[1]);
++			/* NOT REACHED */
++		case UCALL_SYNC:
++			break;
++		case UCALL_DONE:
++			done = true;
++			break;
++		default:
++			TEST_FAIL("vCPU %d: Unknown ucall %lu",
++				  vcpu_id, uc.cmd);
++			/* NOT REACHED */
++		}
++	}
++
++	return done;
++}
++
++static void *receiver(void *arg)
++{
++	volatile struct kvm_run *run = vcpu_state(vm, RECEIVER_VCPU_ID);
++	unsigned long high_gpa = *(unsigned long *)arg;
++	vm_vaddr_t vmx_pages_gva;
++	struct vmx_pages *vmx;
++	bool success;
++
++	vmx = vcpu_alloc_vmx(vm, &vmx_pages_gva);
++	prepare_tpr_shadow(vmx, vm);
++	vcpu_args_set(vm, RECEIVER_VCPU_ID, 2, vmx_pages_gva, high_gpa);
++
++	success = vcpu_run_loop(RECEIVER_VCPU_ID);
++	TEST_ASSERT(!success, "Receiver didn't fail as expected.\n");
++	TEST_ASSERT(run->exit_reason ==
++		    KVM_EXIT_INTERNAL_ERROR,
++		    "Exit reason isn't KVM_EXIT_INTERNAL_ERROR: %u (%s).\n",
++		    run->exit_reason,
++		    exit_reason_str(run->exit_reason));
++	TEST_ASSERT(run->internal.suberror ==
++		    KVM_INTERNAL_ERROR_EMULATION,
++		    "Internal suberror isn't KVM_INTERNAL_ERROR_EMULATION: %u.\n",
++		    run->internal.suberror);
++
++	return NULL;
++}
++
++static void sender(void)
++{
++	volatile struct kvm_run *run = vcpu_state(vm, SENDER_VCPU_ID);
++	bool success;
++
++	success = vcpu_run_loop(SENDER_VCPU_ID);
++	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
++		    "Sender didn't exit with KVM_EXIT_IO: %u (%s).\n",
++		    run->exit_reason,
++		    exit_reason_str(run->exit_reason));
++	TEST_ASSERT(success, "Sender didn't complete successfully.\n");
++}
++
++void check_constraints(void)
++{
++	uint64_t msr;
++
++	nested_vmx_check_supported();
++
++	msr = kvm_get_feature_msr(MSR_IA32_VMX_PINBASED_CTLS) >> 32;
++	if (!(msr & PIN_BASED_EXT_INTR_MASK)) {
++		print_skip("Cannot enable \"external-interrupt exiting\"");
++		exit(KSFT_SKIP);
++	}
++	if (!(msr & PIN_BASED_POSTED_INTR)) {
++		print_skip("Cannot enable \"process posted interrupts\"");
++		exit(KSFT_SKIP);
++	}
++
++	msr = kvm_get_feature_msr(MSR_IA32_VMX_PROCBASED_CTLS) >> 32;
++	if (!(msr & CPU_BASED_TPR_SHADOW)) {
++		print_skip("Cannot enable \"use TPR shadow\"");
++		exit(KSFT_SKIP);
++	}
++	if (!(msr & CPU_BASED_ACTIVATE_SECONDARY_CONTROLS)) {
++		print_skip("Cannot enable \"activate secondary controls\"");
++		exit(KSFT_SKIP);
++	}
++
++	msr = kvm_get_feature_msr(MSR_IA32_VMX_PROCBASED_CTLS2) >> 32;
++	if (!(msr & SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY)) {
++		print_skip("Cannot enable \"virtual-interrupt delivery\"");
++		exit(KSFT_SKIP);
++	}
++
++	msr = kvm_get_feature_msr(MSR_IA32_VMX_EXIT_CTLS) >> 32;
++	if (!(msr & VM_EXIT_ACK_INTR_ON_EXIT)) {
++		print_skip("Cannot enable \"acknowledge interrupt on exit\"");
++		exit(KSFT_SKIP);
++	}
++}
++
++int main(int argc, char *argv[])
++{
++	unsigned int paddr_width;
++	unsigned int vaddr_width;
++	unsigned long high_gpa;
++	pthread_t thread;
++	bool *l2_active_hva;
++	int r;
++
++	kvm_get_cpu_address_width(&paddr_width, &vaddr_width);
++	high_gpa = (1ul << paddr_width) - getpagesize();
++	if ((unsigned long)DEFAULT_GUEST_PHY_PAGES * getpagesize() > high_gpa) {
++		print_skip("No unbacked physical page available");
++		exit(KSFT_SKIP);
++	}
++
++	check_constraints();
++
++	vm = vm_create_default(RECEIVER_VCPU_ID, 0, (void *)l1_receiver_code);
++	vm_vcpu_add_default(vm, SENDER_VCPU_ID, (void *)l1_sender_code);
++	vcpu_set_cpuid(vm, SENDER_VCPU_ID, kvm_get_supported_cpuid());
++
++	r = pthread_create(&thread, NULL, receiver, &high_gpa);
++	TEST_ASSERT(r == 0,
++		    "pthread_create failed errno=%d", errno);
++
++	alarm(TIMEOUT_SECS);
++	l2_active_hva = (bool *)addr_gva2hva(vm, (vm_vaddr_t)&l2_active);
++	while (!*l2_active_hva)
++		pthread_yield();
++
++	sender();
++
++	r = pthread_join(thread, NULL);
++	TEST_ASSERT(r == 0, "pthread_join failed with errno=%d", r);
++
++	kvm_vm_free(vm);
++
++	return 0;
 +}
 -- 
 2.31.1.818.g46aad6cb9e-goog
