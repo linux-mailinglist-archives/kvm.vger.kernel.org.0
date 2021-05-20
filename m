@@ -2,126 +2,327 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BABA7389B98
-	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 05:05:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00FF7389C6E
+	for <lists+kvm@lfdr.de>; Thu, 20 May 2021 06:22:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230123AbhETDHL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 May 2021 23:07:11 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4759 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229503AbhETDHL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 May 2021 23:07:11 -0400
-Received: from dggems704-chm.china.huawei.com (unknown [172.30.72.58])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Flvff052jzqV3M;
-        Thu, 20 May 2021 11:02:18 +0800 (CST)
-Received: from dggpemm000003.china.huawei.com (7.185.36.128) by
- dggems704-chm.china.huawei.com (10.3.19.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Thu, 20 May 2021 11:05:33 +0800
-Received: from DESKTOP-5IS4806.china.huawei.com (10.174.187.224) by
- dggpemm000003.china.huawei.com (7.185.36.128) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Thu, 20 May 2021 11:05:32 +0800
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-To:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-doc@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>,
+        id S229458AbhETEXT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 00:23:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60066 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229536AbhETEXR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 May 2021 00:23:17 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF80DC061763
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 21:21:55 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id e19so11439744pfv.3
+        for <kvm@vger.kernel.org>; Wed, 19 May 2021 21:21:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=DoLjvzR9Ycpjqcta0VpSiJR4Bdnq46dPXdEKwxdkZyE=;
+        b=KhAuP9uJ0n9pmyTFOxYfvk0m31c9RU1ZSXij+ksAklnEMQOxYzFB8F2NghHrxa0v/q
+         wL/kdDf2JVSyJJnvOnZAZnOHIQwbe3g3IwaONeGKzObQDxihAExXUsj1UNM+FeUaxaCB
+         cs3C6C6BObrMp27EBsoNGKxVfSeEpoLskJddVXnFZCV4+9TX18AgZvLNSOzUDsw9nUkg
+         P0OgZzuc4/aPq+MHVU37o5Rsxp6/Gh/tbpXovUKYmvQmUWUws3uSDkvk9k13v3DQr1VX
+         qJrP3ehBjk3P/TTsuttFjfSyzxtdq7PiNymDcP30iofWSZVHWs4jHZoUb0uN7/oXndKL
+         vkZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=DoLjvzR9Ycpjqcta0VpSiJR4Bdnq46dPXdEKwxdkZyE=;
+        b=WPW88+r4/lVdwDDXuqTKA+6BaYKx0wP3suIr6ysEMLrWGDCq/neip1MD5a8itkRJRM
+         6aOmaXlYbzD8eDiOHhayM6kfr5AycikNBpS2T7dAJO7kGZNmtNEl2x9NEUl6lfLl1vtA
+         17rhZ2UkssS6mqAx4Ppt/anP/a4ZovFkqUdtacJ/g84gH7BDXCVpjKPWuRtnUAJrwoao
+         ZWhdHY7OyeK4WKxDYlRi0NaopaGgFNeGGVOlRmr7xqqOn1HTc7jNyJ1NYuEFZZ3jN2qx
+         t5G+FOTS7FsdDzO8OxIYvGyRK9c49v6gJnIGczC5KiPrTdZhai4WmkVqul18GGUDnriK
+         znYQ==
+X-Gm-Message-State: AOAM533DEGIlsz0ywZVCNh2YPDs6nPrNYYIb+V1xTuCrFA7YOGuSq/Dw
+        z12LndVfw92RrFce5zF/1GnpYg==
+X-Google-Smtp-Source: ABdhPJyUT/W5KKf6QPkIVjnToQh3ryfQCsYn+WRFe/r3PlLYmoitMteeLZgd2ATqkGcuRlOqcbdSDw==
+X-Received: by 2002:a62:860b:0:b029:28e:d45b:4d2e with SMTP id x11-20020a62860b0000b029028ed45b4d2emr2616829pfd.70.1621484514603;
+        Wed, 19 May 2021 21:21:54 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id j23sm738541pfh.179.2021.05.19.21.21.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 May 2021 21:21:53 -0700 (PDT)
+Date:   Wed, 19 May 2021 21:21:50 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        "Jonathan Corbet" <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>
-CC:     <wanghaibin.wang@huawei.com>, <zhang.zhanghailiang@huawei.com>,
-        <gaojinhao@huawei.com>
-Subject: [PATCH] KVM: halt polling: Make the adjustment of polling time clearer
-Date:   Thu, 20 May 2021 11:05:29 +0800
-Message-ID: <20210520030529.22048-1-zhukeqian1@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Subject: Re: [PATCH v5 2/4] KVM: stats: Add fd-based API to read binary stats
+ data
+Message-ID: <YKXj3gHvUoLnojzB@google.com>
+References: <20210517145314.157626-1-jingzhangos@google.com>
+ <20210517145314.157626-3-jingzhangos@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.187.224]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemm000003.china.huawei.com (7.185.36.128)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210517145314.157626-3-jingzhangos@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When we have "block_ns > halt_poll_ns" and "block_ns < max_halt_poll_ns",
-then "halt_poll_ns < max_halt_poll_ns" is true, so we can drop this extra
-condition.
+On Mon, May 17, 2021 at 02:53:12PM +0000, Jing Zhang wrote:
+> Provides a file descriptor per VM to read VM stats info/data.
+> Provides a file descriptor per vCPU to read vCPU stats info/data.
+> 
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/kvm/guest.c    |  26 +++++
+>  arch/mips/kvm/mips.c      |  52 +++++++++
+>  arch/powerpc/kvm/book3s.c |  52 +++++++++
+>  arch/powerpc/kvm/booke.c  |  45 ++++++++
+>  arch/s390/kvm/kvm-s390.c  | 117 ++++++++++++++++++++
+>  arch/x86/kvm/x86.c        |  53 +++++++++
+>  include/linux/kvm_host.h  | 127 ++++++++++++++++++++++
+>  include/uapi/linux/kvm.h  |  50 +++++++++
+>  virt/kvm/kvm_main.c       | 223 ++++++++++++++++++++++++++++++++++++++
+>  9 files changed, 745 insertions(+)
+> 
+  
+> +static ssize_t kvm_vcpu_stats_read(struct file *file, char __user *user_buffer,
+> +			      size_t size, loff_t *offset)
+> +{
+> +	char id[KVM_STATS_ID_MAXLEN];
+> +	struct kvm_vcpu *vcpu = file->private_data;
+> +	ssize_t copylen, len, remain = size;
+> +	size_t size_header, size_desc, size_stats;
+> +	loff_t pos = *offset;
+> +	char __user *dest = user_buffer;
+> +	void *src;
 
-We want to make sure halt_poll_ns is not zero before shrinking it. Put
-the condition in shrinking primitive can make code clearer.
+Nit. Better to do pointer arithmetic on a "char *".  Note that gcc and
+clang will do the expected thing.
 
-None functional change.
+> +
+> +	snprintf(id, sizeof(id), "kvm-%d/vcpu-%d",
+> +			task_pid_nr(current), vcpu->vcpu_id);
+> +	size_header = sizeof(kvm_vcpu_stats_header);
+> +	size_desc =
+> +		kvm_vcpu_stats_header.count * sizeof(struct _kvm_stats_desc);
+> +	size_stats = sizeof(vcpu->stat);
+> +
+> +	len = sizeof(id) + size_header + size_desc + size_stats - pos;
+> +	len = min(len, remain);
+> +	if (len <= 0)
+> +		return 0;
+> +	remain = len;
 
-Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
----
- Documentation/virt/kvm/halt-polling.rst | 21 ++++++++++-----------
- virt/kvm/kvm_main.c                     | 11 ++++++-----
- 2 files changed, 16 insertions(+), 16 deletions(-)
+If 'desc_offset' is not right after the header, then the 'len'
+calculation is missing the gap into account. For example, assuming there
+is a gap of 0x1000000 between the header and the descriptors:
 
-diff --git a/Documentation/virt/kvm/halt-polling.rst b/Documentation/virt/kvm/halt-polling.rst
-index 4922e4a15f18..d9f699395a7f 100644
---- a/Documentation/virt/kvm/halt-polling.rst
-+++ b/Documentation/virt/kvm/halt-polling.rst
-@@ -47,17 +47,16 @@ Thus this is a per vcpu (or vcore) value.
- During polling if a wakeup source is received within the halt polling interval,
- the interval is left unchanged. In the event that a wakeup source isn't
- received during the polling interval (and thus schedule is invoked) there are
--two options, either the polling interval and total block time[0] were less than
--the global max polling interval (see module params below), or the total block
--time was greater than the global max polling interval.
--
--In the event that both the polling interval and total block time were less than
--the global max polling interval then the polling interval can be increased in
--the hope that next time during the longer polling interval the wake up source
--will be received while the host is polling and the latency benefits will be
--received. The polling interval is grown in the function grow_halt_poll_ns() and
--is multiplied by the module parameters halt_poll_ns_grow and
--halt_poll_ns_grow_start.
-+two options, either the total block time[0] were less than the global max
-+polling interval (see module params below), or the total block time was greater
-+than the global max polling interval.
-+
-+In the event that the total block time were less than the global max polling
-+interval then the polling interval can be increased in the hope that next time
-+during the longer polling interval the wake up source will be received while the
-+host is polling and the latency benefits will be received. The polling interval
-+is grown in the function grow_halt_poll_ns() and is multiplied by the module
-+parameters halt_poll_ns_grow and halt_poll_ns_grow_start.
- 
- In the event that the total block time was greater than the global max polling
- interval then the host will never poll for long enough (limited by the global
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 6b4feb92dc79..13a9996c4ccb 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2906,6 +2906,9 @@ static void shrink_halt_poll_ns(struct kvm_vcpu *vcpu)
- 	unsigned int old, val, shrink;
- 
- 	old = val = vcpu->halt_poll_ns;
-+	if (!old)
-+		return;
-+
- 	shrink = READ_ONCE(halt_poll_ns_shrink);
- 	if (shrink == 0)
- 		val = 0;
-@@ -3003,12 +3006,10 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
- 			if (block_ns <= vcpu->halt_poll_ns)
- 				;
- 			/* we had a long block, shrink polling */
--			else if (vcpu->halt_poll_ns &&
--					block_ns > vcpu->kvm->max_halt_poll_ns)
-+			else if (block_ns > vcpu->kvm->max_halt_poll_ns)
- 				shrink_halt_poll_ns(vcpu);
--			/* we had a short halt and our poll time is too small */
--			else if (vcpu->halt_poll_ns < vcpu->kvm->max_halt_poll_ns &&
--					block_ns < vcpu->kvm->max_halt_poll_ns)
-+			/* we had a short block, grow polling */
-+			else if (block_ns < vcpu->kvm->max_halt_poll_ns)
- 				grow_halt_poll_ns(vcpu);
- 		} else {
- 			vcpu->halt_poll_ns = 0;
--- 
-2.19.1
+	desc_offset = sizeof(id) + size_header + 0x1000000
 
+and the user calls the ioctl with enough space for the whole file,
+including the gap:
+
+	*offset = 0
+	size = sizeof(id) + size_header + size_desc + size_stats + 0x1000000
+
+then 'remain' gets the wrong size:
+
+	remain = sizeof(id) + size_header + size_desc + size_stats
+
+and ... (more below)
+
+> +
+> +	/* Copy kvm vcpu stats header id string */
+> +	copylen = sizeof(id) - pos;
+> +	copylen = min(copylen, remain);
+> +	if (copylen > 0) {
+> +		src = (void *)id + pos;
+> +		if (copy_to_user(dest, src, copylen))
+> +			return -EFAULT;
+> +		remain -= copylen;
+> +		pos += copylen;
+> +		dest += copylen;
+> +	}
+> +	/* Copy kvm vcpu stats header */
+> +	copylen = sizeof(id) + size_header - pos;
+> +	copylen = min(copylen, remain);
+> +	if (copylen > 0) {
+> +		src = (void *)&kvm_vcpu_stats_header;
+> +		src += pos - sizeof(id);
+> +		if (copy_to_user(dest, src, copylen))
+> +			return -EFAULT;
+> +		remain -= copylen;
+> +		pos += copylen;
+> +		dest += copylen;
+> +	}
+> +	/* Copy kvm vcpu stats descriptors */
+> +	copylen = kvm_vcpu_stats_header.desc_offset + size_desc - pos;
+
+This would be the state at this point:
+
+	pos	= sizeof(id) + size_header
+	copylen	= sizeof(id) + size_header + 0x1000000 + size_desc - (sizeof(id) + size_header)
+		= 0x1000000 + size_desc
+	remain	= size_desc + size_stats
+
+> +	copylen = min(copylen, remain);
+
+	copylen = size_desc + size_stats
+
+which is not enough to copy the descriptors (and the data).
+
+> +	if (copylen > 0) {
+> +		src = (void *)&kvm_vcpu_stats_desc;
+> +		src += pos - kvm_vcpu_stats_header.desc_offset;
+
+Moreover, src also needs to take the gap into account.
+
+	src	= &kvm_vcpu_stats_desc + (sizeof(id) + size_header) - (sizeof(id) + size_header + 0x1000000)
+		= &kvm_vcpu_stats_desc - 0x1000000
+
+Otherwise, src ends up pointing at the wrong place.
+
+> +		if (copy_to_user(dest, src, copylen))
+> +			return -EFAULT;
+> +		remain -= copylen;
+> +		pos += copylen;
+> +		dest += copylen;
+> +	}
+> +	/* Copy kvm vcpu stats values */
+> +	copylen = kvm_vcpu_stats_header.data_offset + size_stats - pos;
+
+The same problem occurs here. There is a potential gap before
+data_offset that needs to be taken into account for src and len.
+
+Would it be possible to just ensure that there is no gap? maybe even
+remove data_offset and desc_offset and always place them adjacent, and
+have the descriptors right after the header.
+
+> +	copylen = min(copylen, remain);
+> +	if (copylen > 0) {
+> +		src = (void *)&vcpu->stat;
+> +		src += pos - kvm_vcpu_stats_header.data_offset;
+> +		if (copy_to_user(dest, src, copylen))
+> +			return -EFAULT;
+> +		remain -= copylen;
+> +		pos += copylen;
+> +		dest += copylen;
+> +	}
+> +
+> +	*offset = pos;
+> +	return len;
+> +}
+> +
+>  
+
+
+
+> +static ssize_t kvm_vm_stats_read(struct file *file, char __user *user_buffer,
+> +			      size_t size, loff_t *offset)
+> +{
+
+Consider moving the common code between kvm_vcpu_stats_read and this one
+into some function that takes pointers to header, desc, and data. Unless
+there is something vcpu or vm specific besides that.
+
+> +	char id[KVM_STATS_ID_MAXLEN];
+> +	struct kvm *kvm = file->private_data;
+> +	ssize_t copylen, len, remain = size;
+> +	size_t size_header, size_desc, size_stats;
+> +	loff_t pos = *offset;
+> +	char __user *dest = user_buffer;
+> +	void *src;
+> +
+> +	snprintf(id, sizeof(id), "kvm-%d", task_pid_nr(current));
+> +	size_header = sizeof(kvm_vm_stats_header);
+> +	size_desc = kvm_vm_stats_header.count * sizeof(struct _kvm_stats_desc);
+> +	size_stats = sizeof(kvm->stat);
+> +
+> +	len = sizeof(id) + size_header + size_desc + size_stats - pos;
+> +	len = min(len, remain);
+> +	if (len <= 0)
+> +		return 0;
+> +	remain = len;
+> +
+> +	/* Copy kvm vm stats header id string */
+> +	copylen = sizeof(id) - pos;
+> +	copylen = min(copylen, remain);
+> +	if (copylen > 0) {
+> +		src = (void *)id + pos;
+> +		if (copy_to_user(dest, src, copylen))
+> +			return -EFAULT;
+> +		remain -= copylen;
+> +		pos += copylen;
+> +		dest += copylen;
+> +	}
+> +	/* Copy kvm vm stats header */
+> +	copylen = sizeof(id) + size_header - pos;
+> +	copylen = min(copylen, remain);
+> +	if (copylen > 0) {
+> +		src = (void *)&kvm_vm_stats_header;
+> +		src += pos - sizeof(id);
+> +		if (copy_to_user(dest, src, copylen))
+> +			return -EFAULT;
+> +		remain -= copylen;
+> +		pos += copylen;
+> +		dest += copylen;
+> +	}
+> +	/* Copy kvm vm stats descriptors */
+> +	copylen = kvm_vm_stats_header.desc_offset + size_desc - pos;
+> +	copylen = min(copylen, remain);
+> +	if (copylen > 0) {
+> +		src = (void *)&kvm_vm_stats_desc;
+> +		src += pos - kvm_vm_stats_header.desc_offset;
+> +		if (copy_to_user(dest, src, copylen))
+> +			return -EFAULT;
+> +		remain -= copylen;
+> +		pos += copylen;
+> +		dest += copylen;
+> +	}
+> +	/* Copy kvm vm stats values */
+> +	copylen = kvm_vm_stats_header.data_offset + size_stats - pos;
+> +	copylen = min(copylen, remain);
+> +	if (copylen > 0) {
+> +		src = (void *)&kvm->stat;
+> +		src += pos - kvm_vm_stats_header.data_offset;
+> +		if (copy_to_user(dest, src, copylen))
+> +			return -EFAULT;
+> +		remain -= copylen;
+> +		pos += copylen;
+> +		dest += copylen;
+> +	}
+> +
+> +	*offset = pos;
+> +	return len;
+> +}
+> +
+> -- 
+> 2.31.1.751.gd2f1c929bd-goog
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
