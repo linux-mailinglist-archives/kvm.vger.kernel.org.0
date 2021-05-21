@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D50AB38C26F
-	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 10:59:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 076F938C272
+	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 10:59:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234668AbhEUJAu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 May 2021 05:00:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51620 "EHLO
+        id S234466AbhEUJAw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 May 2021 05:00:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234501AbhEUJAr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 May 2021 05:00:47 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B844C0613CE;
-        Fri, 21 May 2021 01:59:23 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id b15-20020a17090a550fb029015dad75163dso6829558pji.0;
-        Fri, 21 May 2021 01:59:23 -0700 (PDT)
+        with ESMTP id S234612AbhEUJAt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 May 2021 05:00:49 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DF85C06138A;
+        Fri, 21 May 2021 01:59:25 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id v14so10996143pgi.6;
+        Fri, 21 May 2021 01:59:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=yM/3QdkJCppokhFbJwJxmhjVf2nsrL4HrLq6id+fxEk=;
-        b=PvEz30dm/K8/j50iH//PbpjEfJzooQ9UREv0KIGi7QlAsFEZ5CsF415d+FyDZlTfCB
-         mN0snlIOptA+BBG8KbBFsYIBvkvNQAYQkfzc0Ize26XRY5tDKPFkTWOJwtugVydkywob
-         RGaYHCsyOU/+UrD+KWX0uQy3fVYCrtLsoclDKCpaDogDpyQ8WVqUWtOfSve2Pedb4L4h
-         pKr2NJsVdJfPFoP3zAN2nmRpOn/VdbQpnJ23AIFCpYAGrlyFXPMqHjgZyfnwgrwK7sTH
-         LjaSFQ30FByisriSdtWNp5a6twgVO4Q7jnWuw48yMjjmgNsHdoXQM5y4amxAwoWAoK+W
-         8PQQ==
+        bh=GRgnjjTyc74OV+vFDIKTcD4cnOw31v5F87VYgn4dO00=;
+        b=JFKQpqxj0ygKabhGTJJ+/xkGGepO/JNO2FMbi0BuqBuK0zIwrUvOUQfkljjTPSpSKW
+         wB9aBkinNrys/SDoxg7RXc8aJBj5Mwp2cA6MVV+u7sSRFfaSYC1LMWKvfgyuFUTt9tEk
+         X7orRttCgEikL7CCIYE78Z4ucQGX7v3FfRR0gQJFFn5GkC2RI9bvWMgALeGyssHK1CbM
+         XDKQmzMS0Pqs4DgMm76QN6Y4mujKdjn5agq5aMlbEdWTFj4MYfc7OVQ+awIAw8hRIalj
+         ZvKkLhFstreG7MxyRt3rfBSvtSfMGYO6Bk6fOCuCgWwWdFeoDMyyByeESrKDrz/fEBI2
+         q64g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=yM/3QdkJCppokhFbJwJxmhjVf2nsrL4HrLq6id+fxEk=;
-        b=UaYwWz0yLN/wO3rZgrVZQWh+zP82QSZZDqj/tElyW5F9zndCl0ash67uy807gAG7ot
-         X/FnVAtx0t/LSqQ62puI+HcWO7B7JnIW3VLgmHF6tPsFXyjMdVuvlLE9QszLE63q1ao+
-         5Xzv/8gPJHFhP98ncmKWlZxz4kb5+TwJmSQDI0oOf4cHpl2cf6GMG6HTw90XpomCsjUo
-         lE/GOzvBPEJEXhKc65nBdm0wSG/cWRQ7iEtnShKz0KCzvYhKa5bwdYOSUKvw6IG2B8+/
-         upQvImTh4fBR/GKJjS4oSaJtX8lEKFqrH5ELDAM9Kzrag7F4PpT+uuRushkrR0pcOw+k
-         eoqQ==
-X-Gm-Message-State: AOAM530IF6ii63/MFSwgPnc2RKCsOmn/3tfqVhXsBY7o5E6xE5zAQMpt
-        aQrVbuBmGvZRPdc5uGlEQwg=
-X-Google-Smtp-Source: ABdhPJzQ+uz7ynSjk7hSnQcnNXkwicmsLqykMuigPly1P5X7ww5hgmnns91iZetd85tDoMaSYRFlBg==
-X-Received: by 2002:a17:902:7e02:b029:f1:62ce:6674 with SMTP id b2-20020a1709027e02b02900f162ce6674mr11071326plm.39.1621587562995;
-        Fri, 21 May 2021 01:59:22 -0700 (PDT)
+        bh=GRgnjjTyc74OV+vFDIKTcD4cnOw31v5F87VYgn4dO00=;
+        b=ufpD4rSLqTipW736xd2/4Jt1JtyN7Fu/PY+JYcweOoXyR6ZE8LbV/nluixhjakSkqw
+         d7dd99u2xmA9YXOB209Pdevqpl0N925IqzvPt8JZ5jVBHP4p4rEOBN7+CRvt3r0ZPuM2
+         b1YaHPFLyFRbrf1u/qHp5HhwKJV2EvLL2nkb79BIqHBe+2yGdc/Lla8MpQj8RIzocqjx
+         M+MTNUox7QSdz8VA0aRsUncovlH0BqUAvMd9sffZ5LXs5fHMOG7ZlnKYkhjVUPSquUUD
+         VX3JF/gzRsWxbm/2rgnPsoji8bM9wBXyEXDFI/hpiD059CAICH1TeNBXTiRGbQMuifdr
+         OVag==
+X-Gm-Message-State: AOAM530zjIN25pI99sgS3OJBz3N9icldwBNBzlrY6s9asDbHLyaDlXV8
+        hufdz4ZoYX0BaeCz3NuTHIY=
+X-Google-Smtp-Source: ABdhPJx2PTi/wpWd6gak1llMG8fVDiGbU+juhvNqBuEyttwwviuaokLn9lG3Ej6ao2/rDQ055IDIVA==
+X-Received: by 2002:a05:6a00:14d0:b029:2cf:ee47:dfd9 with SMTP id w16-20020a056a0014d0b02902cfee47dfd9mr9557263pfu.31.1621587564803;
+        Fri, 21 May 2021 01:59:24 -0700 (PDT)
 Received: from pride.localdomain (c-174-61-140-56.hsd1.wa.comcast.net. [174.61.140.56])
-        by smtp.gmail.com with ESMTPSA id q3sm3914489pff.142.2021.05.21.01.59.21
+        by smtp.gmail.com with ESMTPSA id q3sm3914489pff.142.2021.05.21.01.59.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 May 2021 01:59:22 -0700 (PDT)
+        Fri, 21 May 2021 01:59:24 -0700 (PDT)
 From:   Joe Richey <joerichey94@gmail.com>
 To:     trivial@kernel.org
 Cc:     Joe Richey <joerichey@google.com>,
@@ -63,23 +63,24 @@ Cc:     Joe Richey <joerichey@google.com>,
         Joe Perches <joe@perches.com>,
         Dwaipayan Ray <dwaipayanray1@gmail.com>,
         Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Sasha Levin <sashal@kernel.org>,
         "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Andi Kleen <ak@linux.intel.com>, Peter Xu <peterx@redhat.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        Sasha Levin <sashal@kernel.org>, Peter Xu <peterx@redhat.com>,
         Lei Cao <lei.cao@stratus.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
         Ulf Hansson <ulf.hansson@linaro.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
         "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Kenneth Lee <liguozhu@hisilicon.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
         Zaibo Xu <xuzaibo@huawei.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Hans Verkuil <hverkuil-cisco@xs4all.nl>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
         linux-accelerators@lists.ozlabs.org
-Subject: [PATCH v2 4/7] uacce: Use _BITUL() macro in UAPI headers
-Date:   Fri, 21 May 2021 01:58:45 -0700
-Message-Id: <20210521085849.37676-5-joerichey94@gmail.com>
+Subject: [PATCH v2 5/7] media: vicodec: Use _BITUL() macro in UAPI headers
+Date:   Fri, 21 May 2021 01:58:46 -0700
+Message-Id: <20210521085849.37676-6-joerichey94@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210521085849.37676-1-joerichey94@gmail.com>
 References: <20210520104343.317119-1-joerichey94@gmail.com>
@@ -92,36 +93,69 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joe Richey <joerichey@google.com>
 
-Replace BIT() in uacce's UPAI header with _BITUL(). BIT() is not defined
+Replace BIT() in v4l2's UPAI header with _BITUL(). BIT() is not defined
 in the UAPI headers and its usage may cause userspace build errors.
 
-Fixes: 015d239ac014 ("uacce: add uacce driver")
+Fixes: 206bc0f6fb94 ("media: vicodec: mark the stateless FWHT API as stable")
 Signed-off-by: Joe Richey <joerichey@google.com>
 ---
- include/uapi/misc/uacce/uacce.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ include/uapi/linux/v4l2-controls.h | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/include/uapi/misc/uacce/uacce.h b/include/uapi/misc/uacce/uacce.h
-index cc7185678f47..e0b4c8a2d29c 100644
---- a/include/uapi/misc/uacce/uacce.h
-+++ b/include/uapi/misc/uacce/uacce.h
-@@ -2,6 +2,7 @@
- #ifndef _UAPIUUACCE_H
- #define _UAPIUUACCE_H
+diff --git a/include/uapi/linux/v4l2-controls.h b/include/uapi/linux/v4l2-controls.h
+index d43bec5f1afd..5afc19c68704 100644
+--- a/include/uapi/linux/v4l2-controls.h
++++ b/include/uapi/linux/v4l2-controls.h
+@@ -50,6 +50,7 @@
+ #ifndef __LINUX_V4L2_CONTROLS_H
+ #define __LINUX_V4L2_CONTROLS_H
  
 +#include <linux/const.h>
  #include <linux/types.h>
- #include <linux/ioctl.h>
  
-@@ -23,7 +24,7 @@
-  *		  Support PASID
-  *		  Support device page faults (PCI PRI or SMMU Stall)
+ /* Control classes */
+@@ -1602,30 +1603,30 @@ struct v4l2_ctrl_h264_decode_params {
+ #define V4L2_FWHT_VERSION			3
+ 
+ /* Set if this is an interlaced format */
+-#define V4L2_FWHT_FL_IS_INTERLACED		BIT(0)
++#define V4L2_FWHT_FL_IS_INTERLACED		_BITUL(0)
+ /* Set if this is a bottom-first (NTSC) interlaced format */
+-#define V4L2_FWHT_FL_IS_BOTTOM_FIRST		BIT(1)
++#define V4L2_FWHT_FL_IS_BOTTOM_FIRST		_BITUL(1)
+ /* Set if each 'frame' contains just one field */
+-#define V4L2_FWHT_FL_IS_ALTERNATE		BIT(2)
++#define V4L2_FWHT_FL_IS_ALTERNATE		_BITUL(2)
+ /*
+  * If V4L2_FWHT_FL_IS_ALTERNATE was set, then this is set if this
+  * 'frame' is the bottom field, else it is the top field.
   */
--#define UACCE_DEV_SVA		BIT(0)
-+#define UACCE_DEV_SVA		_BITUL(0)
+-#define V4L2_FWHT_FL_IS_BOTTOM_FIELD		BIT(3)
++#define V4L2_FWHT_FL_IS_BOTTOM_FIELD		_BITUL(3)
+ /* Set if the Y' plane is uncompressed */
+-#define V4L2_FWHT_FL_LUMA_IS_UNCOMPRESSED	BIT(4)
++#define V4L2_FWHT_FL_LUMA_IS_UNCOMPRESSED	_BITUL(4)
+ /* Set if the Cb plane is uncompressed */
+-#define V4L2_FWHT_FL_CB_IS_UNCOMPRESSED		BIT(5)
++#define V4L2_FWHT_FL_CB_IS_UNCOMPRESSED		_BITUL(5)
+ /* Set if the Cr plane is uncompressed */
+-#define V4L2_FWHT_FL_CR_IS_UNCOMPRESSED		BIT(6)
++#define V4L2_FWHT_FL_CR_IS_UNCOMPRESSED		_BITUL(6)
+ /* Set if the chroma plane is full height, if cleared it is half height */
+-#define V4L2_FWHT_FL_CHROMA_FULL_HEIGHT		BIT(7)
++#define V4L2_FWHT_FL_CHROMA_FULL_HEIGHT		_BITUL(7)
+ /* Set if the chroma plane is full width, if cleared it is half width */
+-#define V4L2_FWHT_FL_CHROMA_FULL_WIDTH		BIT(8)
++#define V4L2_FWHT_FL_CHROMA_FULL_WIDTH		_BITUL(8)
+ /* Set if the alpha plane is uncompressed */
+-#define V4L2_FWHT_FL_ALPHA_IS_UNCOMPRESSED	BIT(9)
++#define V4L2_FWHT_FL_ALPHA_IS_UNCOMPRESSED	_BITUL(9)
+ /* Set if this is an I Frame */
+-#define V4L2_FWHT_FL_I_FRAME			BIT(10)
++#define V4L2_FWHT_FL_I_FRAME			_BITUL(10)
  
- /**
-  * enum uacce_qfrt: queue file region type
+ /* A 4-values flag - the number of components - 1 */
+ #define V4L2_FWHT_FL_COMPONENTS_NUM_MSK		GENMASK(18, 16)
 -- 
 2.31.1
 
