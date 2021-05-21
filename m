@@ -2,102 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7432338C2E0
-	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 11:17:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A8EF38C3D8
+	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 11:52:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235995AbhEUJTA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 May 2021 05:19:00 -0400
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:43171 "EHLO
-        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235988AbhEUJS7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 May 2021 05:18:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1621588658; x=1653124658;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=qP5rIrggqubBpYoJjMi9a5/TgC6a6gG6fXhPrFiU3mM=;
-  b=Hf33LtSYLB+dOAKg4RQvvicf+2V5d0wbC3RNpzWN55sx4Sac1zV0Sa2u
-   wgkTywcW/vsQlUGk5vB1Es2pq3gEmB6wG6D6/sO7DClivHod3Pk78VuUE
-   pMwIcxoZwNLi58L9OV8I5yNeZP5WUcjvo0Y80zmGBqeIf6j4/z2fehLpn
-   I=;
-X-IronPort-AV: E=Sophos;i="5.82,313,1613433600"; 
-   d="scan'208";a="110834211"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2a-69849ee2.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP; 21 May 2021 09:17:29 +0000
-Received: from EX13D28EUC003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-2a-69849ee2.us-west-2.amazon.com (Postfix) with ESMTPS id 31662A1C8C;
-        Fri, 21 May 2021 09:17:28 +0000 (UTC)
-Received: from u366d62d47e3651.ant.amazon.com (10.43.161.63) by
- EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
- id 15.0.1497.18; Fri, 21 May 2021 09:17:23 +0000
-Date:   Fri, 21 May 2021 11:17:19 +0200
-From:   Siddharth Chandrasekaran <sidcha@amazon.de>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Cameron Esfahani <dirty@apple.com>,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-CC:     <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-Subject: Windows fails to boot after rebase to QEMU master
-Message-ID: <20210521091451.GA6016@u366d62d47e3651.ant.amazon.com>
+        id S231447AbhEUJxf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 May 2021 05:53:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23703 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229978AbhEUJxe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 May 2021 05:53:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621590731;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=9EvgyunOTuxx3DKVNqTga9PRFrFxnW92MNl8r3qMb1c=;
+        b=H0gMzymmrxaXZjZZZzglWAfLwkvUxfJS76VzADn6qaKb9zdumdjjBKWQW/9k6/v5Y1QmfP
+        /tJUuGsdZZxw9T4ADJ3jeAW5jxWZrAlXZvIM2qvUyVeRAKs0WA/YLDRGbreQSMi+qm5Zf3
+        MPS7spd+ndp07ob8+l8N166/bQpXalw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-578-VWTVRqFzNdyKAVPRPOiUlQ-1; Fri, 21 May 2021 05:52:09 -0400
+X-MC-Unique: VWTVRqFzNdyKAVPRPOiUlQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2AAA81840B;
+        Fri, 21 May 2021 09:52:08 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.195.55])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3D0C76A037;
+        Fri, 21 May 2021 09:52:05 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 00/30] KVM: x86: hyper-v: Fine-grained access check to Hyper-V hypercalls and MSRs
+Date:   Fri, 21 May 2021 11:51:34 +0200
+Message-Id: <20210521095204.2161214-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Originating-IP: [10.43.161.63]
-X-ClientProxiedBy: EX13D19UWA004.ant.amazon.com (10.43.160.102) To
- EX13D28EUC003.ant.amazon.com (10.43.164.43)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-After a rebase to QEMU master, I am having trouble booting windows VMs.
-Git bisect indicates commit f5cc5a5c1686 ("i386: split cpu accelerators
-from cpu.c, using AccelCPUClass") to have introduced the issue. I spent
-some time looking at into it yesterday without much luck.
+Changes since v1:
+- Rebase to kvm/next.
 
-Steps to reproduce:
+Original description:
 
-    $ ./configure --enable-kvm --disable-xen --target-list=x86_64-softmmu --enable-debug
-    $ make -j `nproc`
-    $ ./build/x86_64-softmmu/qemu-system-x86_64 \
-        -cpu host,hv_synic,hv_vpindex,hv_time,hv_runtime,hv_stimer,hv_crash \
-        -enable-kvm \
-        -name test,debug-threads=on \
-        -smp 1,threads=1,cores=1,sockets=1 \
-        -m 4G \
-        -net nic -net user \
-        -boot d,menu=on \
-        -usbdevice tablet \
-        -vnc :3 \
-        -machine q35,smm=on \
-        -drive if=pflash,format=raw,readonly=on,unit=0,file="../OVMF_CODE.secboot.fd" \
-        -drive if=pflash,format=raw,unit=1,file="../OVMF_VARS.secboot.fd" \
-        -global ICH9-LPC.disable_s3=1 \
-        -global driver=cfi.pflash01,property=secure,value=on \
-        -cdrom "../Windows_Server_2016_14393.ISO" \
-        -drive file="../win_server_2016.qcow2",format=qcow2,if=none,id=rootfs_drive \
-        -device ahci,id=ahci \
-        -device ide-hd,drive=rootfs_drive,bus=ahci.0
+Currently, all implemented Hyper-V features (MSRs and hypercalls) are
+available unconditionally to all Hyper-V enabled guests. This is not
+ideal as KVM userspace may decide to provide only a subset of the
+currently implemented features to emulate an older Hyper-V version,
+to reduce attack surface,... Implement checks against guest visible
+CPUIDs for all currently implemented MSRs and hypercalls.
 
-If the issue is not obvious, I'd like some pointers on how to go about
-fixing this issue.
+Vitaly Kuznetsov (30):
+  asm-generic/hyperv: add HV_STATUS_ACCESS_DENIED definition
+  KVM: x86: hyper-v: Introduce KVM_CAP_HYPERV_ENFORCE_CPUID
+  KVM: x86: hyper-v: Cache guest CPUID leaves determining features
+    availability
+  KVM: x86: hyper-v: Prepare to check access to Hyper-V MSRs
+  KVM: x86: hyper-v: Honor HV_MSR_HYPERCALL_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_MSR_VP_RUNTIME_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_MSR_TIME_REF_COUNT_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_MSR_VP_INDEX_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_MSR_RESET_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_MSR_REFERENCE_TSC_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_MSR_SYNIC_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_MSR_SYNTIMER_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_MSR_APIC_ACCESS_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_ACCESS_FREQUENCY_MSRS privilege bit
+  KVM: x86: hyper-v: Honor HV_ACCESS_REENLIGHTENMENT privilege bit
+  KVM: x86: hyper-v: Honor HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE
+    privilege bit
+  KVM: x86: hyper-v: Honor HV_FEATURE_DEBUG_MSRS_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Inverse the default in hv_check_msr_access()
+  KVM: x86: hyper-v: Honor HV_STIMER_DIRECT_MODE_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Prepare to check access to Hyper-V hypercalls
+  KVM: x86: hyper-v: Check access to HVCALL_NOTIFY_LONG_SPIN_WAIT
+    hypercall
+  KVM: x86: hyper-v: Honor HV_POST_MESSAGES privilege bit
+  KVM: x86: hyper-v: Honor HV_SIGNAL_EVENTS privilege bit
+  KVM: x86: hyper-v: Honor HV_DEBUGGING privilege bit
+  KVM: x86: hyper-v: Honor HV_X64_REMOTE_TLB_FLUSH_RECOMMENDED bit
+  KVM: x86: hyper-v: Honor HV_X64_CLUSTER_IPI_RECOMMENDED bit
+  KVM: x86: hyper-v: Honor HV_X64_EX_PROCESSOR_MASKS_RECOMMENDED bit
+  KVM: selftests: move Hyper-V MSR definitions to hyperv.h
+  KVM: selftests: Move evmcs.h to x86_64/
+  KVM: selftests: Introduce hyperv_features test
 
-~ Sid.
+ Documentation/virt/kvm/api.rst                |  11 +
+ arch/x86/include/asm/kvm_host.h               |   9 +
+ arch/x86/kvm/hyperv.c                         | 216 +++++-
+ arch/x86/kvm/hyperv.h                         |   1 +
+ arch/x86/kvm/x86.c                            |   4 +
+ include/asm-generic/hyperv-tlfs.h             |   1 +
+ include/uapi/linux/kvm.h                      |   1 +
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../kvm/include/{ => x86_64}/evmcs.h          |   2 +-
+ .../selftests/kvm/include/x86_64/hyperv.h     | 185 +++++
+ .../selftests/kvm/x86_64/hyperv_clock.c       |   8 +-
+ .../selftests/kvm/x86_64/hyperv_features.c    | 649 ++++++++++++++++++
+ 13 files changed, 1071 insertions(+), 18 deletions(-)
+ rename tools/testing/selftests/kvm/include/{ => x86_64}/evmcs.h (99%)
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/hyperv.h
+ create mode 100644 tools/testing/selftests/kvm/x86_64/hyperv_features.c
 
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
+-- 
+2.31.1
 
