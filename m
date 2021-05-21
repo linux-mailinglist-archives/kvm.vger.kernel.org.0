@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 09D8D38C3F5
-	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 11:54:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 433C438C3F7
+	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 11:54:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237242AbhEUJzj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 May 2021 05:55:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22172 "EHLO
+        id S237365AbhEUJzp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 May 2021 05:55:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24134 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235987AbhEUJyQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 May 2021 05:54:16 -0400
+        by vger.kernel.org with ESMTP id S236203AbhEUJyU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 May 2021 05:54:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621590773;
+        s=mimecast20190719; t=1621590777;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=28BUwX4529NJQRST1+0QsQb7V+C4HlvbOwY90nQZVLI=;
-        b=LVBiYkQqcbkd9/Bf+x9Itl54U/q6nldo/eJcFXoNOcFlrWk+bIbt3W+0LH3yDAASoJyyP9
-        kWXfykk03vkCUyJ7ax0pIrpXEkAisXqjscmVcfTBFajv8RgQ3E10JpG83dVrVySUoPYPIW
-        /LzeJloRYuR+ivOI67YvdM/gc0Cf23U=
+        bh=/Xt7PmRxYVTAIJlEGMg8PvzPXAxrwFagXWP+WFvNkzk=;
+        b=gebut4GBlJ10c2nKh24bxGDRUeu0IBf07W/xU4IL2FwAny/rDugBHA18WqV/bzaokPE+dr
+        DIgZjuc/Eg9QQvd4p9FYK+27MEuAdC1VHSu6UoXUIjJayC3crGRUCvX0uxC7QW+IybfBak
+        43hpg0NLgaw1g9sRrme6yApp+X3tPBQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-9-j70rnqMVMxWpK8AiwvoZuA-1; Fri, 21 May 2021 05:52:51 -0400
-X-MC-Unique: j70rnqMVMxWpK8AiwvoZuA-1
+ us-mta-426-RCbQOItzN1ucFWTnDvT7tQ-1; Fri, 21 May 2021 05:52:53 -0400
+X-MC-Unique: RCbQOItzN1ucFWTnDvT7tQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DD1D802575;
-        Fri, 21 May 2021 09:52:50 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C369C101F7D6;
+        Fri, 21 May 2021 09:52:52 +0000 (UTC)
 Received: from vitty.brq.redhat.com (unknown [10.40.195.55])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 22DAE687F7;
-        Fri, 21 May 2021 09:52:47 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B51266A047;
+        Fri, 21 May 2021 09:52:50 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -40,9 +40,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Jim Mattson <jmattson@google.com>,
         Siddharth Chandrasekaran <sidcha@amazon.de>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 14/30] KVM: x86: hyper-v: Honor HV_ACCESS_FREQUENCY_MSRS privilege bit
-Date:   Fri, 21 May 2021 11:51:48 +0200
-Message-Id: <20210521095204.2161214-15-vkuznets@redhat.com>
+Subject: [PATCH v2 15/30] KVM: x86: hyper-v: Honor HV_ACCESS_REENLIGHTENMENT privilege bit
+Date:   Fri, 21 May 2021 11:51:49 +0200
+Message-Id: <20210521095204.2161214-16-vkuznets@redhat.com>
 In-Reply-To: <20210521095204.2161214-1-vkuznets@redhat.com>
 References: <20210521095204.2161214-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -52,26 +52,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-HV_X64_MSR_TSC_FREQUENCY/HV_X64_MSR_APIC_FREQUENCY are only available to
-guest when HV_ACCESS_FREQUENCY_MSRS bit is exposed.
+HV_X64_MSR_REENLIGHTENMENT_CONTROL/HV_X64_MSR_TSC_EMULATION_CONTROL/
+HV_X64_MSR_TSC_EMULATION_STATUS are only available to guest when
+HV_ACCESS_REENLIGHTENMENT bit is exposed.
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/x86/kvm/hyperv.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/x86/kvm/hyperv.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index a41ad21768ed..8821981e17d3 100644
+index 8821981e17d3..f416c9de73cb 100644
 --- a/arch/x86/kvm/hyperv.c
 +++ b/arch/x86/kvm/hyperv.c
-@@ -1244,6 +1244,10 @@ static bool hv_check_msr_access(struct kvm_vcpu_hv *hv_vcpu, u32 msr)
+@@ -1248,6 +1248,11 @@ static bool hv_check_msr_access(struct kvm_vcpu_hv *hv_vcpu, u32 msr)
+ 	case HV_X64_MSR_APIC_FREQUENCY:
  		return hv_vcpu->cpuid_cache.features_eax &
- 			HV_MSR_APIC_ACCESS_AVAILABLE;
- 		break;
-+	case HV_X64_MSR_TSC_FREQUENCY:
-+	case HV_X64_MSR_APIC_FREQUENCY:
+ 			HV_ACCESS_FREQUENCY_MSRS;
++	case HV_X64_MSR_REENLIGHTENMENT_CONTROL:
++	case HV_X64_MSR_TSC_EMULATION_CONTROL:
++	case HV_X64_MSR_TSC_EMULATION_STATUS:
 +		return hv_vcpu->cpuid_cache.features_eax &
-+			HV_ACCESS_FREQUENCY_MSRS;
++			HV_ACCESS_REENLIGHTENMENT;
  	default:
  		break;
  	}
