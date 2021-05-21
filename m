@@ -2,74 +2,282 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E8B338BB1D
-	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 02:58:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BED038BBAA
+	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 03:37:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235764AbhEUA75 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 May 2021 20:59:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56746 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235619AbhEUA75 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 May 2021 20:59:57 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDE8CC061574
-        for <kvm@vger.kernel.org>; Thu, 20 May 2021 17:58:34 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id 10so13698243pfl.1
-        for <kvm@vger.kernel.org>; Thu, 20 May 2021 17:58:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=1tavHnDzQrw/lLSMUPGH3jGAejKlMAvFR++jdzaZBhs=;
-        b=d2iZ32fnEnJcaTTHtlRzb1fjeCGYRYFzsXwlWwkAAo3YPU4Nfx5LrVaXPk3Cc31lZv
-         QoY5TxGbh2UffgPBnbbkbB8J+6LRT/ITueDJYA6VsidLcKj7y4yQLff3oAx9Mh3h+NcK
-         zDdFuJed5ZYyXgqZxv/daBf/v9WiRljmtYjdBYausLsPJbi7mDYXBfBXnWe3cLCiAU2H
-         I8NyqcDFRpFZSkC+VdNkmCUd+ADmz3X/clErxXycv6QO/unA08Y6EkV6yTvVoutgUnnN
-         fTXwHWezEtA6c1rIbkFvaSHzLjbrLtVD4s1MgzMl2U9RfxUIWV5dj8GLcE4dG+5W45xG
-         xZgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=1tavHnDzQrw/lLSMUPGH3jGAejKlMAvFR++jdzaZBhs=;
-        b=CLX4BWDTmNUu04WBkKQvCEZ3lOJ3bvY7eg6PDbXCAakID7FydP0y7woghjmCveDpj0
-         H3YxJ+BO5t+Vn9PjZ3W2e8D6N0omkXtkJOUscwJXKPGvyytrMQj0zvhZenGqHO/Rbfk2
-         wbaBhWfqTVmQKduQ+nKhjWIXV6A6/y5BxtcyfPLVXbzzYBmJmKHSSWkuO6E8pRONyYVa
-         VOn2KvbmA9OR4ig9Vno8OAQB9/3d3nqNUiel9V524CkSZrudtogn/emxcJCgXoHJW1Gm
-         /jz4O4dzKXna2xmXfO5S+h9iOqgTUBkhal+CULaP3oFZ+3wTcdHO6rJICdTbOy60G2yM
-         o4og==
-X-Gm-Message-State: AOAM5318Y0gl6z/fqT6j8JJ8kdcmkamtv25fwgFC0rNPMAgAaIcE2WSg
-        lI5yhlgqkvfuPQvJp2JQXscU8Q==
-X-Google-Smtp-Source: ABdhPJxkdCYZ5U+kC4eUiVA6ITiA5KXG3yq76Aj1sdFHkB54Cv7zHxh/l3qk8ehuHON1468EqQvwhQ==
-X-Received: by 2002:a05:6a00:10c2:b029:2de:7333:1343 with SMTP id d2-20020a056a0010c2b02902de73331343mr7365478pfu.42.1621558714327;
-        Thu, 20 May 2021 17:58:34 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id s6sm2842634pjr.29.2021.05.20.17.58.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 May 2021 17:58:33 -0700 (PDT)
-Date:   Fri, 21 May 2021 00:58:30 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
-Subject: Re: [PATCH 00/12] KVM: nVMX: Fix vmcs02 PID use-after-free issue
-Message-ID: <YKcFtmEIdxMjw+G3@google.com>
-References: <20210520230339.267445-1-jmattson@google.com>
+        id S237086AbhEUBjO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 May 2021 21:39:14 -0400
+Received: from mga06.intel.com ([134.134.136.31]:15141 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237083AbhEUBjO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 May 2021 21:39:14 -0400
+IronPort-SDR: 2KDCXpEGK3i61rAjF+XqryXsA3LdCtBFY/Ttz29egLGff0Qeo8ASfs7+VyGh7xSVRvg5UWjILo
+ xsDy3jt7cdLw==
+X-IronPort-AV: E=McAfee;i="6200,9189,9990"; a="262600518"
+X-IronPort-AV: E=Sophos;i="5.82,313,1613462400"; 
+   d="scan'208";a="262600518"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2021 18:37:51 -0700
+IronPort-SDR: h+7CNQ3sz8sXcCWBpauv2M09DufJCI8oRGSt6IjW2TUURR7W/SlsIzG75cplX5LNgOJlZ8sTPs
+ ll2FR1Gn1dQg==
+X-IronPort-AV: E=Sophos;i="5.82,313,1613462400"; 
+   d="scan'208";a="474293581"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2021 18:37:47 -0700
+Subject: Re: [PATCH v6 00/16] KVM: x86/pmu: Add *basic* support to enable
+ guest PEBS via DS
+To:     Liuxiangdong <liuxiangdong5@huawei.com>
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, weijiang.yang@intel.com,
+        Kan Liang <kan.liang@linux.intel.com>, ak@linux.intel.com,
+        wei.w.wang@intel.com, eranian@google.com,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        "Fangyi (Eric)" <eric.fangyi@huawei.com>,
+        Xiexiangyou <xiexiangyou@huawei.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Zhu, Lingshan" <lingshan.zhu@intel.com>,
+        "Xu, Like" <like.xu@intel.com>
+References: <20210511024214.280733-1-like.xu@linux.intel.com>
+ <609FA2B7.7030801@huawei.com>
+ <868a0ed9-d4a5-c135-811e-a3420b7913ac@linux.intel.com>
+ <60A3B1DC.7000002@huawei.com>
+ <a65c8556-4eac-b8db-8aa4-98229f47fc8d@intel.com>
+ <60A46D78.3000205@huawei.com>
+From:   Like Xu <like.xu@linux.intel.com>
+Organization: Intel OTC
+Message-ID: <1dae760a-eae6-ab01-12b6-c58bff56e882@linux.intel.com>
+Date:   Fri, 21 May 2021 09:37:44 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210520230339.267445-1-jmattson@google.com>
+In-Reply-To: <60A46D78.3000205@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 20, 2021, Jim Mattson wrote:
-> Initially, I added a new kvm request for a userspace exit on the next guest
-> entry, but Sean hated that approach.
+On 2021/5/19 9:44, Liuxiangdong wrote:
+> 
+> 
+> On 2021/5/18 20:40, Xu, Like wrote:
+>> On 2021/5/18 20:23, Liuxiangdong wrote:
+>>>
+>>>
+>>> On 2021/5/17 14:38, Like Xu wrote:
+>>>> Hi xiangdong,
+>>>>
+>>>> On 2021/5/15 18:30, Liuxiangdong wrote:
+>>>>>
+>>>>>
+>>>>> On 2021/5/11 10:41, Like Xu wrote:
+>>>>>> A new kernel cycle has begun, and this version looks promising.
+>>>>>>
+>>>>>> The guest Precise Event Based Sampling (PEBS) feature can provide
+>>>>>> an architectural state of the instruction executed after the guest
+>>>>>> instruction that exactly caused the event. It needs new hardware
+>>>>>> facility only available on Intel Ice Lake Server platforms. This
+>>>>>> patch set enables the basic PEBS feature for KVM guests on ICX.
+>>>>>>
+>>>>>> We can use PEBS feature on the Linux guest like native:
+>>>>>>
+>>>>>>    # perf record -e instructions:ppp ./br_instr a
+>>>>>>    # perf record -c 100000 -e instructions:pp ./br_instr a
+>>>>>
+>>>>> Hi, Like.
+>>>>> Has the qemu patch been modified?
+>>>>>
+>>>>> https://lore.kernel.org/kvm/f4dcb068-2ddf-428f-50ad-39f65cad3710@intel.com/ 
+>>>>> ?
+>>>>
+>>>> I think the qemu part still works based on
+>>>> 609d7596524ab204ccd71ef42c9eee4c7c338ea4 (tag: v6.0.0).
+>>>>
+>>>
+>>> Yes. I applied these two qemu patches to qemu v6.0.0 and this kvm 
+>>> patches set to latest kvm tree.
+>>>
+>>> I can see pebs flags in Guest(linux 5.11) on the IceLake( Model: 106 
+>>> Model name: Intel(R) Xeon(R) Platinum 8378A CPU),
+>>> and i can use PEBS like this.
+>>>
+>>>     #perf record -e instructions:pp
+>>>
+>>> It can work normally.
+>>>
+>>> But  there is no sampling when i use "perf record -e events:pp" or just 
+>>> "perf record" in guest
+>>> unless i delete patch 09 and patch 13 from this kvm patches set.
+>>>
+>>>
+>>
+>> With patch 9 and 13, does the basic counter sampling still work ?
+>> You may retry w/ "echo 0 > /proc/sys/kernel/watchdog" on the host and guest.
+>>
+> 
+> In fact, I didn't use "echo 0 > /proc/sys/kernel/watchdog" when I tried 
+> PEBS patches V3 on Icelake.
+> Why should we use it now?  What does it have to do with sampling?
 
-Hey!  You could at least say _why_ I hated it. :-D
+In the recent patch sets, we disable the guest PEBS when the guest
+PEBS counter is cross mapped to a host PEBS counter with a
+different index.
 
-My argument is that the only way to guarantee that vcpu->run->exit_reason isn't
-crushed between making the request and servicing the request is by guaranteeing
-that KVM makes it back to the run loop immediately after making the request.
-Since the only way to accomplish that is by forcing a return up the stack, at
-that point we can simply return the "request" directly.
+When we use the watchdog feature on the Intel platforms,
+it may takes a cycle hw counter on the host and it may cause
+the guest PEBS counter temporarily disabled if it's cross mapped.
+
+Check patch 0013 for more details.
+
+> 
+> Thanks!
+> 
+>>> Have you tried "perf record -e events:pp" in this patches set? Does it 
+>>> work normally?
+>>
+>> All my PEBS testcases passed. You may dump guest msr traces from your 
+>> testcase with me.
+>>
+>>>
+>>>
+>>>
+>>> Thanks!
+>>> Xiangdong Liu
+>>>
+>>>
+>>>
+>>>> When the LBR qemu patch receives the ACK from the maintainer,
+>>>> I will submit PBES qemu support because their changes are very similar.
+>>>>
+>>>> Please help review this version and
+>>>> feel free to add your comments or "Reviewed-by".
+>>>>
+>>>> Thanks,
+>>>> Like Xu
+>>>>
+>>>>>
+>>>>>
+>>>>>> To emulate guest PEBS facility for the above perf usages,
+>>>>>> we need to implement 2 code paths:
+>>>>>>
+>>>>>> 1) Fast path
+>>>>>>
+>>>>>> This is when the host assigned physical PMC has an identical index as
+>>>>>> the virtual PMC (e.g. using physical PMC0 to emulate virtual PMC0).
+>>>>>> This path is used in most common use cases.
+>>>>>>
+>>>>>> 2) Slow path
+>>>>>>
+>>>>>> This is when the host assigned physical PMC has a different index
+>>>>>> from the virtual PMC (e.g. using physical PMC1 to emulate virtual PMC0)
+>>>>>> In this case, KVM needs to rewrite the PEBS records to change the
+>>>>>> applicable counter indexes to the virtual PMC indexes, which would
+>>>>>> otherwise contain the physical counter index written by PEBS facility,
+>>>>>> and switch the counter reset values to the offset corresponding to
+>>>>>> the physical counter indexes in the DS data structure.
+>>>>>>
+>>>>>> The previous version [0] enables both fast path and slow path, which
+>>>>>> seems a bit more complex as the first step. In this patchset, we want
+>>>>>> to start with the fast path to get the basic guest PEBS enabled while
+>>>>>> keeping the slow path disabled. More focused discussion on the slow
+>>>>>> path [1] is planned to be put to another patchset in the next step.
+>>>>>>
+>>>>>> Compared to later versions in subsequent steps, the functionality
+>>>>>> to support host-guest PEBS both enabled and the functionality to
+>>>>>> emulate guest PEBS when the counter is cross-mapped are missing
+>>>>>> in this patch set (neither of these are typical scenarios).
+>>>>>>
+>>>>>> With the basic support, the guest can retrieve the correct PEBS
+>>>>>> information from its own PEBS records on the Ice Lake servers.
+>>>>>> And we expect it should work when migrating to another Ice Lake
+>>>>>> and no regression about host perf is expected.
+>>>>>>
+>>>>>> Here are the results of pebs test from guest/host for same workload:
+>>>>>>
+>>>>>> perf report on guest:
+>>>>>> # Samples: 2K of event 'instructions:ppp', # Event count (approx.): 
+>>>>>> 1473377250
+>>>>>> # Overhead  Command   Shared Object      Symbol
+>>>>>>    57.74%  br_instr  br_instr           [.] lfsr_cond
+>>>>>>    41.40%  br_instr  br_instr           [.] cmp_end
+>>>>>>     0.21%  br_instr  [kernel.kallsyms]  [k] __lock_acquire
+>>>>>>
+>>>>>> perf report on host:
+>>>>>> # Samples: 2K of event 'instructions:ppp', # Event count (approx.): 
+>>>>>> 1462721386
+>>>>>> # Overhead  Command   Shared Object     Symbol
+>>>>>>    57.90%  br_instr  br_instr          [.] lfsr_cond
+>>>>>>    41.95%  br_instr  br_instr          [.] cmp_end
+>>>>>>     0.05%  br_instr  [kernel.vmlinux]  [k] lock_acquire
+>>>>>>     Conclusion: the profiling results on the guest are similar tothat 
+>>>>>> on the host.
+>>>>>>
+>>>>>> A minimum guest kernel version may be v5.4 or a backport version
+>>>>>> support Icelake server PEBS.
+>>>>>>
+>>>>>> Please check more details in each commit and feel free to comment.
+>>>>>>
+>>>>>> Previous:
+>>>>>> https://lore.kernel.org/kvm/20210415032016.166201-1-like.xu@linux.intel.com/ 
+>>>>>>
+>>>>>>
+>>>>>> [0] 
+>>>>>> https://lore.kernel.org/kvm/20210104131542.495413-1-like.xu@linux.intel.com/ 
+>>>>>>
+>>>>>> [1] 
+>>>>>> https://lore.kernel.org/kvm/20210115191113.nktlnmivc3edstiv@two.firstfloor.org/ 
+>>>>>>
+>>>>>>
+>>>>>> V5 -> V6 Changelog:
+>>>>>> - Rebased on the latest kvm/queue tree;
+>>>>>> - Fix a git rebase issue (Liuxiangdong);
+>>>>>> - Adjust the patch sequence 06/07 for bisection (Liuxiangdong);
+>>>>>>
+>>>>>> Like Xu (16):
+>>>>>>    perf/x86/intel: Add EPT-Friendly PEBS for Ice Lake Server
+>>>>>>    perf/x86/intel: Handle guest PEBS overflow PMI for KVM guest
+>>>>>>    perf/x86/core: Pass "struct kvm_pmu *" to determine the guest values
+>>>>>>    KVM: x86/pmu: Set MSR_IA32_MISC_ENABLE_EMON bit when vPMU is enabled
+>>>>>>    KVM: x86/pmu: Introduce the ctrl_mask value for fixed counter
+>>>>>>    KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS
+>>>>>>    KVM: x86/pmu: Reprogram PEBS event to emulate guest PEBS counter
+>>>>>>    KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to support guest DS
+>>>>>>    KVM: x86/pmu: Add PEBS_DATA_CFG MSR emulation to support adaptive 
+>>>>>> PEBS
+>>>>>>    KVM: x86: Set PEBS_UNAVAIL in IA32_MISC_ENABLE when PEBS is enabled
+>>>>>>    KVM: x86/pmu: Adjust precise_ip to emulate Ice Lake guest PDIR 
+>>>>>> counter
+>>>>>>    KVM: x86/pmu: Move pmc_speculative_in_use() to arch/x86/kvm/pmu.h
+>>>>>>    KVM: x86/pmu: Disable guest PEBS temporarily in two rare situations
+>>>>>>    KVM: x86/pmu: Add kvm_pmu_cap to optimize perf_get_x86_pmu_capability
+>>>>>>    KVM: x86/cpuid: Refactor host/guest CPU model consistency check
+>>>>>>    KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64
+>>>>>>
+>>>>>>   arch/x86/events/core.c            |   5 +-
+>>>>>>   arch/x86/events/intel/core.c      | 129 ++++++++++++++++++++++++------
+>>>>>>   arch/x86/events/perf_event.h      |   5 +-
+>>>>>>   arch/x86/include/asm/kvm_host.h   |  16 ++++
+>>>>>>   arch/x86/include/asm/msr-index.h  |   6 ++
+>>>>>>   arch/x86/include/asm/perf_event.h |   5 +-
+>>>>>>   arch/x86/kvm/cpuid.c              |  24 ++----
+>>>>>>   arch/x86/kvm/cpuid.h              |   5 ++
+>>>>>>   arch/x86/kvm/pmu.c                |  50 +++++++++---
+>>>>>>   arch/x86/kvm/pmu.h                |  38 +++++++++
+>>>>>>   arch/x86/kvm/vmx/capabilities.h   |  26 ++++--
+>>>>>>   arch/x86/kvm/vmx/pmu_intel.c      | 115 +++++++++++++++++++++-----
+>>>>>>   arch/x86/kvm/vmx/vmx.c            |  24 +++++-
+>>>>>>   arch/x86/kvm/vmx/vmx.h            |   2 +-
+>>>>>>   arch/x86/kvm/x86.c                |  14 ++--
+>>>>>>   15 files changed, 368 insertions(+), 96 deletions(-)
+>>>>>>
+>>>>
+>>>
+>>
+> 
+
