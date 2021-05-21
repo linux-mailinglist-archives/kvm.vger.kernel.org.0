@@ -2,87 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EFC1C38CC93
-	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 19:47:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F91038CCB0
+	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 19:50:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238433AbhEURtR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 May 2021 13:49:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51528 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235755AbhEURtR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 May 2021 13:49:17 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2FA836135C;
-        Fri, 21 May 2021 17:47:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1621619273;
-        bh=xOq3jj2UbZa7lDCzy39FJlunDF10xKfCJ5FyeAWwORQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=KBD6lbrTjL2LnMejfzX5ud65busPKGi/lpJ5soBktqKEEpW0q6Q6RPLPSTn5hfIHM
-         +M+fDBS/u7VpUhjC6axyc2792Z/IHzPsQ6ZlEk30RF72T56Ut8cvZkW3OYoikfOVsI
-         An7+UKMeTx7OhM7Vig7bmYyLVyhSJqX/6Jz6i2BU=
-Date:   Fri, 21 May 2021 19:47:51 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Palmer Dabbelt <palmerdabbelt@google.com>, anup@brainfault.org,
-        Anup Patel <Anup.Patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        aou@eecs.berkeley.edu, corbet@lwn.net, graf@amazon.com,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-staging@lists.linux.dev
-Subject: Re: [PATCH v18 00/18] KVM RISC-V Support
-Message-ID: <YKfyR5jUu3HMvYg5@kroah.com>
-References: <mhng-37377fcb-af8f-455c-be08-db1cd5d4b092@palmerdabbelt-glaptop>
- <ff55329c-709d-c1a5-a807-1942f515bba7@redhat.com>
+        id S238659AbhEURvw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 May 2021 13:51:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39550 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238824AbhEURux (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 May 2021 13:50:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621619369;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=eCxGfuMnfQDDRkSgoJFFHxNWdySUYed2Pe05f2luAA0=;
+        b=aE9Sc92hXStN9ZqL4gRhzkm+G8kJ15IhSfpZLMkD3rSX5ioz/SeXekAaGD3fSdiaTj62A/
+        +JNZqwNYlrKAtR/zETxaoa2v5Y1HfqUdjmGgkE4quO6BjdbfjmgO+upi7Y+DtH2I3b1+r0
+        G0SyMLyNdEMvUUYGD1LMmZ93esgV8zY=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-404-VK99emozMOi3f4VMr68mkg-1; Fri, 21 May 2021 13:49:27 -0400
+X-MC-Unique: VK99emozMOi3f4VMr68mkg-1
+Received: by mail-qt1-f197.google.com with SMTP id j12-20020ac8550c0000b02901dae492d1f2so16152740qtq.0
+        for <kvm@vger.kernel.org>; Fri, 21 May 2021 10:49:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=eCxGfuMnfQDDRkSgoJFFHxNWdySUYed2Pe05f2luAA0=;
+        b=gNqX9X2aiOJ6QfPs4HYF35ZR2H8YYXr4E8pIa/7MBnO8h/GNMvcjwecd8dkgldKnZV
+         szEHTFuUVsrwj4D7JOGSovvhaPnSg8AceINPEVQ70lR9bT7dB24dDGK4o1/4EIaP6uy9
+         pTpr91/8hBx44jkrW6m5mfyS6xYyQpwp5QMwpx6K/skTc3ZQmf0eoLqiOKz16d0unQqW
+         VfCtQjE4SniOFIce31frzJom8nXAl6/DfTX/tIJKA2oSThgsE9RdTEzoJXBdmjtPymDx
+         jLhsVN6wF6xxQnufIy0DPEPWEmWqPxFkbQ8exDyAJJktmKyaQ6H0CJ3OWigdixbZGvu2
+         Vfxg==
+X-Gm-Message-State: AOAM530NYecA1cd0hsvvCpoDqEoLF4qb6hdU86gD96MhHhq3p2FULDAp
+        l5U0vxstEkTgluqopuUI2uNxvKi5B17gNi9zkX/NiQgeBkQrKUZgmJmF4Fqmw5ennFry1wfT5eq
+        J/NnjNQBmWtse
+X-Received: by 2002:a05:620a:208a:: with SMTP id e10mr13819708qka.112.1621619367404;
+        Fri, 21 May 2021 10:49:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzIWrFiYBNV1lMWqMFypLd73cRUR7XXcI8n00vyqQX8k2WQLOZv+V4f4cwC6ev7eFBBG1MJxQ==
+X-Received: by 2002:a05:620a:208a:: with SMTP id e10mr13819684qka.112.1621619367136;
+        Fri, 21 May 2021 10:49:27 -0700 (PDT)
+Received: from t490s (bras-base-toroon474qw-grc-72-184-145-4-219.dsl.bell.ca. [184.145.4.219])
+        by smtp.gmail.com with ESMTPSA id g1sm4791195qtr.32.2021.05.21.10.49.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 May 2021 10:49:26 -0700 (PDT)
+Date:   Fri, 21 May 2021 13:49:25 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     kvm@vger.kernel.org, Venkatesh Srinivas <venkateshs@chromium.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH v2] KVM: selftests: Fix 32-bit truncation of
+ vm_get_max_gfn()
+Message-ID: <YKfypTYnITl76o/L@t490s>
+References: <20210521173828.1180619-1-dmatlack@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ff55329c-709d-c1a5-a807-1942f515bba7@redhat.com>
+In-Reply-To: <20210521173828.1180619-1-dmatlack@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 21, 2021 at 07:21:12PM +0200, Paolo Bonzini wrote:
-> On 21/05/21 19:13, Palmer Dabbelt wrote:
-> > > 
-> > 
-> > I don't view this code as being in a state where it can be
-> > maintained, at least to the standards we generally set within the
-> > kernel.  The ISA extension in question is still subject to change, it
-> > says so right at the top of the H extension <https://github.com/riscv/riscv-isa-manual/blob/master/src/hypervisor.tex#L4>
-> > 
-> >   {\bf Warning! This draft specification may change before being
-> > accepted as standard by the RISC-V Foundation.}
+On Fri, May 21, 2021 at 05:38:28PM +0000, David Matlack wrote:
+> vm_get_max_gfn() casts vm->max_gfn from a uint64_t to an unsigned int,
+> which causes the upper 32-bits of the max_gfn to get truncated.
 > 
-> To give a complete picture, the last three relevant changes have been in
-> August 2019, November 2019 and May 2020.  It seems pretty frozen to me.
+> Nobody noticed until now likely because vm_get_max_gfn() is only used
+> as a mechanism to create a memslot in an unused region of the guest
+> physical address space (the top), and the top of the 32-bit physical
+> address space was always good enough.
 > 
-> In any case, I think it's clear from the experience with Android that
-> the acceptance policy cannot succeed.  The only thing that such a policy
-> guarantees, is that vendors will use more out-of-tree code.  Keeping a
-> fully-developed feature out-of-tree for years is not how Linux is run.
+> This fix reveals a bug in memslot_modification_stress_test which was
+> trying to create a dummy memslot past the end of guest physical memory.
+> Fix that by moving the dummy memslot lower.
 > 
-> > I'm not sure where exactly the line for real hardware is, but for
-> > something like this it would at least involve some chip that is
-> > widely availiable and needs the H extension to be useful
-> 
-> Anup said that "quite a few people have already implemented RISC-V
-> H-extension in hardware as well and KVM RISC-V works on real HW as well".
-> Those people would benefit from having KVM in the Linus tree.
+> Fixes: 52200d0d944e ("KVM: selftests: Remove duplicate guest mode handling")
+> Reviewed-by: Venkatesh Srinivas <venkateshs@chromium.org>
+> Signed-off-by: David Matlack <dmatlack@google.com>
 
-Great, but is this really true?  If so, what hardware has this?  I have
-a new RISC-V device right here next to me, what would I need to do to
-see if this is supported in it or not?
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-If this isn't in any hardware that anyone outside of
-internal-to-company-prototypes, then let's wait until it really is in a
-device that people can test this code on.
+-- 
+Peter Xu
 
-What's the rush to get this merged now if no one can use it?
-
-thanks,
-
-greg k-h
