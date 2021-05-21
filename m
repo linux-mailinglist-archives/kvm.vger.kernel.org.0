@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 70CEB38C407
+	by mail.lfdr.de (Postfix) with ESMTP id 7B7A938C408
 	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 11:54:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237278AbhEUJ4S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 May 2021 05:56:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43223 "EHLO
+        id S237279AbhEUJ4T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 May 2021 05:56:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55046 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237267AbhEUJyy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 May 2021 05:54:54 -0400
+        by vger.kernel.org with ESMTP id S237275AbhEUJyz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 May 2021 05:54:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621590808;
+        s=mimecast20190719; t=1621590812;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=AGjVnbpjWJoXrCLtj+5imnxZMYEvzZlDaWl+KSUGWCI=;
-        b=cQvP2xePhNP7wQFcFKANebnZbtqEvDO6ipDo+XFg4ru9W2iEnvqq77euu/O51Maawa1KZp
-        rp9c2zpRoiAXhGshvn+UKoYkLeYSaT5wlnI1NFRcUAybKINBhd3L3y5wcO13gclQpUSX1b
-        QJJhtgGtipG7eZ8fGTRhIYZ9sLEzEa0=
+        bh=uFFJyYsGinFWRUfBgXSMFbwaCr84HcgqzbG9Gvbm4qk=;
+        b=icMYxjjFpHfK8DZyX2p/UMWMhfrLnurhM5uYKcYrBqkVhnq3JbceqUBsn8Nug8kak5G5xZ
+        gwhrgNLFD9JVnL5oPwEhfrv9t04ZYy94OipN93/NJxXGjM5EIWroku57kelWpVYi+8DE9y
+        09bRKc1Us3XJ0gr5IflDvoy6he0sQU0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-Aff-W5XTOTCKGuUnjx4K0w-1; Fri, 21 May 2021 05:53:26 -0400
-X-MC-Unique: Aff-W5XTOTCKGuUnjx4K0w-1
+ us-mta-485-vDeoN0FsNI2EyMQZy96eyQ-1; Fri, 21 May 2021 05:53:29 -0400
+X-MC-Unique: vDeoN0FsNI2EyMQZy96eyQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B4B7101F7D2;
-        Fri, 21 May 2021 09:53:25 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC48A801106;
+        Fri, 21 May 2021 09:53:27 +0000 (UTC)
 Received: from vitty.brq.redhat.com (unknown [10.40.195.55])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 60BD3687F7;
-        Fri, 21 May 2021 09:53:23 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C708C687F7;
+        Fri, 21 May 2021 09:53:25 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -40,9 +40,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Jim Mattson <jmattson@google.com>,
         Siddharth Chandrasekaran <sidcha@amazon.de>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 24/30] KVM: x86: hyper-v: Honor HV_DEBUGGING privilege bit
-Date:   Fri, 21 May 2021 11:51:58 +0200
-Message-Id: <20210521095204.2161214-25-vkuznets@redhat.com>
+Subject: [PATCH v2 25/30] KVM: x86: hyper-v: Honor HV_X64_REMOTE_TLB_FLUSH_RECOMMENDED bit
+Date:   Fri, 21 May 2021 11:51:59 +0200
+Message-Id: <20210521095204.2161214-26-vkuznets@redhat.com>
 In-Reply-To: <20210521095204.2161214-1-vkuznets@redhat.com>
 References: <20210521095204.2161214-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -52,36 +52,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hyper-V partition must possess 'HV_DEBUGGING' privilege to issue
-HVCALL_POST_DEBUG_DATA/HVCALL_RETRIEVE_DEBUG_DATA/
-HVCALL_RESET_DEBUG_SESSION hypercalls.
-
-Note, when SynDBG is disabled hv_check_hypercall_access() returns
-'true' (like for any other unknown hypercall) so the result will
-be HV_STATUS_INVALID_HYPERCALL_CODE and not HV_STATUS_ACCESS_DENIED.
+Hyper-V partition must possess 'HV_X64_REMOTE_TLB_FLUSH_RECOMMENDED'
+privilege ('recommended' is rather a misnomer) to issue
+HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST/SPACE hypercalls.
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/x86/kvm/hyperv.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ arch/x86/kvm/hyperv.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 523f63287636..36ec688cda4e 100644
+index 36ec688cda4e..f99072e092d0 100644
 --- a/arch/x86/kvm/hyperv.c
 +++ b/arch/x86/kvm/hyperv.c
-@@ -2035,6 +2035,15 @@ static bool hv_check_hypercall_access(struct kvm_vcpu_hv *hv_vcpu, u16 code)
- 		return hv_vcpu->cpuid_cache.features_ebx & HV_POST_MESSAGES;
- 	case HVCALL_SIGNAL_EVENT:
- 		return hv_vcpu->cpuid_cache.features_ebx & HV_SIGNAL_EVENTS;
-+	case HVCALL_POST_DEBUG_DATA:
-+	case HVCALL_RETRIEVE_DEBUG_DATA:
-+	case HVCALL_RESET_DEBUG_SESSION:
-+		/*
-+		 * Return 'true' when SynDBG is disabled so the resulting code
-+		 * will be HV_STATUS_INVALID_HYPERCALL_CODE.
-+		 */
-+		return !kvm_hv_is_syndbg_enabled(hv_vcpu->vcpu) ||
-+			hv_vcpu->cpuid_cache.features_ebx & HV_DEBUGGING;
+@@ -2044,6 +2044,12 @@ static bool hv_check_hypercall_access(struct kvm_vcpu_hv *hv_vcpu, u16 code)
+ 		 */
+ 		return !kvm_hv_is_syndbg_enabled(hv_vcpu->vcpu) ||
+ 			hv_vcpu->cpuid_cache.features_ebx & HV_DEBUGGING;
++	case HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX:
++	case HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX:
++	case HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST:
++	case HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE:
++		return hv_vcpu->cpuid_cache.enlightenments_eax &
++			HV_X64_REMOTE_TLB_FLUSH_RECOMMENDED;
  	default:
  		break;
  	}
