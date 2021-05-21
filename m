@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8365338C058
-	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 09:07:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F85E38C05B
+	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 09:07:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233874AbhEUHIx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S234572AbhEUHIx (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Fri, 21 May 2021 03:08:53 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:47046 "EHLO vps-vb.mhejs.net"
+Received: from vps-vb.mhejs.net ([37.28.154.113]:47080 "EHLO vps-vb.mhejs.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235282AbhEUHIt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 May 2021 03:08:49 -0400
+        id S235286AbhEUHIu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 May 2021 03:08:50 -0400
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1ljzDq-000569-AA; Fri, 21 May 2021 09:05:26 +0200
+        id 1ljzEW-000575-4Q; Fri, 21 May 2021 09:06:08 +0200
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -37,17 +37,16 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <cover.1621191549.git.maciej.szmigiero@oracle.com>
- <4a4867419344338e1419436af1e1b0b8f2405517.1621191551.git.maciej.szmigiero@oracle.com>
- <YKWRyvyyO5UAHv4U@google.com>
+ <cf1695b3e1ba495a4d23cbdc66e0fa9b7b535cc3.1621191551.git.maciej.szmigiero@oracle.com>
+ <YKWaFwgMNSaQQuQP@google.com>
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH v3 3/8] KVM: Resolve memslot ID via a hash table instead
- of via a static array
-Message-ID: <c7ba42ee-dc70-a86c-aeb2-d410c136a5ec@maciej.szmigiero.name>
-Date:   Fri, 21 May 2021 09:05:21 +0200
+Subject: Re: [PATCH v3 4/8] KVM: Introduce memslots hva tree
+Message-ID: <a9a2f5c0-45f4-bde1-8336-3e90d97bc2c9@maciej.szmigiero.name>
+Date:   Fri, 21 May 2021 09:06:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <YKWRyvyyO5UAHv4U@google.com>
+In-Reply-To: <YKWaFwgMNSaQQuQP@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -55,185 +54,194 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20.05.2021 00:31, Sean Christopherson wrote:
-> On Sun, May 16, 2021, Maciej S. Szmigiero wrote:
->> @@ -356,6 +357,7 @@ static inline int kvm_vcpu_exiting_guest_mode(struct kvm_vcpu *vcpu)
->>   #define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
->>   
->>   struct kvm_memory_slot {
->> +	struct hlist_node id_node;
->>   	gfn_t base_gfn;
->>   	unsigned long npages;
->>   	unsigned long *dirty_bitmap;
->> @@ -458,7 +460,7 @@ static inline int kvm_arch_vcpu_memslots_id(struct kvm_vcpu *vcpu)
->>   struct kvm_memslots {
->>   	u64 generation;
->>   	/* The mapping table from slot id to the index in memslots[]. */
->> -	short id_to_index[KVM_MEM_SLOTS_NUM];
->> +	DECLARE_HASHTABLE(id_hash, 7);
-> 
-> Is there any specific motivation for using 7 bits?
-
-At the time this code was written "id_to_index" was 512 entries * 2 bytes =
-1024 bytes in size and I didn't want to unnecessarily make
-struct kvm_memslots bigger so I have tried using a hashtable array of the
-same size (128 bucket-heads * 8 bytes).
-
-I have done a few performance measurements then and I remember there was
-only a small performance difference in comparison to using a larger
-hashtable (for 509 memslots), so it seemed like a good compromise.
-
-The KVM selftest framework patch actually uses a 9-bit hashtable so the
-509 original memslots have chance to be stored without hash collisions.
-
-Another option would be to use a dynamically-resizable hashtable but this
-would make the code significantly more complex and possibly introduce new
-performance corner cases (like a workload that forces the hashtable grow
-and shrink repeatably).
-
->>   	atomic_t lru_slot;
->>   	int used_slots;
->>   	struct kvm_memory_slot memslots[];
-> 
-> ...
-> 
->> @@ -1097,14 +1095,16 @@ static int kvm_alloc_dirty_bitmap(struct kvm_memory_slot *memslot)
->>   /*
->>    * Delete a memslot by decrementing the number of used slots and shifting all
->>    * other entries in the array forward one spot.
->> + * @memslot is a detached dummy struct with just .id and .as_id filled.
->>    */
->>   static inline void kvm_memslot_delete(struct kvm_memslots *slots,
->>   				      struct kvm_memory_slot *memslot)
->>   {
->>   	struct kvm_memory_slot *mslots = slots->memslots;
->> +	struct kvm_memory_slot *dmemslot = id_to_memslot(slots, memslot->id);
-> 
-> I vote to call these local vars "old", or something along those lines.  dmemslot
-> isn't too bad, but mmemslot in the helpers below is far too similar to memslot,
-> and using the wrong will cause nasty explosions.
-
-Will rename to "oldslot" then.
-
-(..)
->> @@ -1135,31 +1136,41 @@ static inline int kvm_memslot_insert_back(struct kvm_memslots *slots)
->>    * itself is not preserved in the array, i.e. not swapped at this time, only
->>    * its new index into the array is tracked.  Returns the changed memslot's
->>    * current index into the memslots array.
->> + * The memslot at the returned index will not be in @slots->id_hash by then.
->> + * @memslot is a detached struct with desired final data of the changed slot.
->>    */
->>   static inline int kvm_memslot_move_backward(struct kvm_memslots *slots,
->>   					    struct kvm_memory_slot *memslot)
->>   {
->>   	struct kvm_memory_slot *mslots = slots->memslots;
->> +	struct kvm_memory_slot *mmemslot = id_to_memslot(slots, memslot->id);
->>   	int i;
->>   
->> -	if (WARN_ON_ONCE(slots->id_to_index[memslot->id] == -1) ||
->> +	if (WARN_ON_ONCE(!mmemslot) ||
->>   	    WARN_ON_ONCE(!slots->used_slots))
->>   		return -1;
->>   
->> +	/*
->> +	 * update_memslots() will unconditionally overwrite and re-add the
->> +	 * target memslot so it has to be removed here firs
->> +	 */
-> 
-> It would be helpful to explain "why" this is necessary.  Something like:
-> 
-> 	/*
-> 	 * The memslot is being moved, delete its previous hash entry; its new
-> 	 * entry will be added by updated_memslots().  The old entry cannot be
-> 	 * kept even though its id is unchanged, because the old entry points at
-> 	 * the memslot in the old instance of memslots.
-> 	 */
-
-Well, this isn't technically true, since kvm_dup_memslots() reinits
-the hashtable of the copied memslots array and re-adds all the existing
-memslots there.
-
-The reasons this memslot is getting removed from the hashtable are that:
-a) The loop below will (possibly) overwrite it with data of the next
-memslot, or a similar loop in kvm_memslot_move_forward() will overwrite
-it with data of the previous memslot,
-
-b) update_memslots() will overwrite it with data of the target memslot.
-
-The comment above only refers to the case b), so I will update it to
-also cover the case a).
-
-(..)
->> @@ -1247,12 +1266,16 @@ static void update_memslots(struct kvm_memslots *slots,
->>   			i = kvm_memslot_move_backward(slots, memslot);
->>   		i = kvm_memslot_move_forward(slots, memslot, i);
->>   
->> +		if (i < 0)
->> +			return;
-> 
-> Hmm, this is essentially a "fix" to existing code, it should be in a separate
-> patch.  And since kvm_memslot_move_forward() can theoretically hit this even if
-> kvm_memslot_move_backward() doesn't return -1, i.e. doesn't WARN, what about
-> doing WARN_ON_ONCE() here and dropping the WARNs in kvm_memslot_move_backward()?
-> It'll be slightly less developer friendly, but anyone that has the unfortunate
-> pleasure of breaking and debugging this code is already in for a world of pain.
+On 20.05.2021 01:07, Sean Christopherson wrote:
+> Nit: something like "KVM: Use interval tree to do fast hva lookup in memslots"
+> would be more helpful when perusing the shortlogs.  Stating that a tree is being
+> added doesn't provide any hint as to why, or even the what is somewhat unclear.
 
 Will do.
 
->> +
->>   		/*
->>   		 * Copy the memslot to its new position in memslots and update
->>   		 * its index accordingly.
->>   		 */
->>   		slots->memslots[i] = *memslot;
->> -		slots->id_to_index[memslot->id] = i;
->> +		hash_add(slots->id_hash, &slots->memslots[i].id_node,
->> +			 memslot->id);
->>   	}
+> On Sun, May 16, 2021, Maciej S. Szmigiero wrote:
+>> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+>>
+>> The current memslots implementation only allows quick binary search by gfn,
+>> quick lookup by hva is not possible - the implementation has to do a linear
+>> scan of the whole memslots array, even though the operation being performed
+>> might apply just to a single memslot.
+>>
+>> This significantly hurts performance of per-hva operations with higher
+>> memslot counts.
+>>
+>> Since hva ranges can overlap between memslots an interval tree is needed
+>> for tracking them.
+>>
+>> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+>> ---
+> 
+> ...
+> 
+>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+>> index d3a35646dfd8..f59847b6e9b3 100644
+>> --- a/include/linux/kvm_host.h
+>> +++ b/include/linux/kvm_host.h
+>> @@ -27,6 +27,7 @@
+>>   #include <linux/rcuwait.h>
+>>   #include <linux/refcount.h>
+>>   #include <linux/nospec.h>
+>> +#include <linux/interval_tree.h>
+>>   #include <linux/hashtable.h>
+>>   #include <asm/signal.h>
+>>   
+>> @@ -358,6 +359,7 @@ static inline int kvm_vcpu_exiting_guest_mode(struct kvm_vcpu *vcpu)
+>>   
+>>   struct kvm_memory_slot {
+>>   	struct hlist_node id_node;
+>> +	struct interval_tree_node hva_node;
+>>   	gfn_t base_gfn;
+>>   	unsigned long npages;
+>>   	unsigned long *dirty_bitmap;
+>> @@ -459,6 +461,7 @@ static inline int kvm_arch_vcpu_memslots_id(struct kvm_vcpu *vcpu)
+>>    */
+>>   struct kvm_memslots {
+>>   	u64 generation;
+>> +	struct rb_root_cached hva_tree;
+>>   	/* The mapping table from slot id to the index in memslots[]. */
+>>   	DECLARE_HASHTABLE(id_hash, 7);
+>>   	atomic_t lru_slot;
+>> @@ -679,6 +682,11 @@ static inline struct kvm_memslots *kvm_vcpu_memslots(struct kvm_vcpu *vcpu)
+>>   	return __kvm_memslots(vcpu->kvm, as_id);
 >>   }
 >>   
->> @@ -1316,6 +1339,7 @@ static struct kvm_memslots *kvm_dup_memslots(struct kvm_memslots *old,
->>   {
->>   	struct kvm_memslots *slots;
->>   	size_t old_size, new_size;
->> +	struct kvm_memory_slot *memslot;
->>   
->>   	old_size = sizeof(struct kvm_memslots) +
->>   		   (sizeof(struct kvm_memory_slot) * old->used_slots);
->> @@ -1326,8 +1350,14 @@ static struct kvm_memslots *kvm_dup_memslots(struct kvm_memslots *old,
->>   		new_size = old_size;
->>   
->>   	slots = kvzalloc(new_size, GFP_KERNEL_ACCOUNT);
->> -	if (likely(slots))
->> -		memcpy(slots, old, old_size);
->> +	if (unlikely(!slots))
->> +		return NULL;
->> +
->> +	memcpy(slots, old, old_size);
->> +
->> +	hash_init(slots->id_hash);
->> +	kvm_for_each_memslot(memslot, slots)
->> +		hash_add(slots->id_hash, &memslot->id_node, memslot->id);
+>> +#define kvm_for_each_hva_range_memslot(node, slots, start, last)	     \
 > 
-> What's the perf penalty if the number of memslots gets large?  I ask because the
-> lazy rmap allocation is adding multiple calls to kvm_dup_memslots().
+> kvm_for_each_memslot_in_range()?  Or kvm_for_each_memslot_in_hva_range()?
 
-I would expect the "move inactive" benchmark to be closest to measuring
-the performance of just a memslot array copy operation but the results
-suggest that the performance stays within ~10% window from 10 to 509
-memslots on the old code (it then climbs 13x for 32k case).
+Will change the name to kvm_for_each_memslot_in_hva_range(), so it is
+obvious it's the *hva* range this iterates over.
 
-That suggests that something else is dominating this benchmark for these
-memslot counts (probably zapping of shadow pages).
+> Please add a comment about whether start is inclusive or exclusive.
 
-At the same time, the tree-based memslots implementation is clearly
-faster in this benchmark, even for smaller memslot counts, so apparently
-copying of the memslot array has some performance impact, too.
+Will do.
 
-Measuring just kvm_dup_memslots() performance would probably be done
-best by benchmarking KVM_MR_FLAGS_ONLY operation - will try to add this
-operation to my set of benchmarks and see how it performs with different
-memslot counts.
+> I'd also be in favor of hiding this in kvm_main.c, just above the MMU notifier
+> usage.  It'd be nice to discourage arch code from adding lookups that more than
+> likely belong in generic code.
+
+Will do.
+
+>> +	for (node = interval_tree_iter_first(&slots->hva_tree, start, last); \
+>> +	     node;							     \
+>> +	     node = interval_tree_iter_next(node, start, last))	     \
+>> +
+>>   static inline
+>>   struct kvm_memory_slot *id_to_memslot(struct kvm_memslots *slots, int id)
+>>   {
+>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>> index 50f9bc9bb1e0..a55309432c9a 100644
+>> --- a/virt/kvm/kvm_main.c
+>> +++ b/virt/kvm/kvm_main.c
+>> @@ -488,6 +488,9 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+>>   	struct kvm_memslots *slots;
+>>   	int i, idx;
+>>   
+>> +	if (range->end == range->start || WARN_ON(range->end < range->start))
+> 
+> I'm pretty sure both of these are WARNable offenses, i.e. they can be combined.
+> It'd also be a good idea to use WARN_ON_ONCE(); if a caller does manage to
+> trigger this, odds are good it will get spammed.
+
+Will do.
+
+> Also, does interval_tree_iter_first() explode if given bad inputs?  If not, I'd
+> probably say just omit this entirely.  
+
+Looking at the interval tree code it seems it does not account for this
+possibility.
+But even if after a deeper analysis it turns out to be safe (as of now)
+there is always a possibility that in the future somebody will optimize
+how this data structure performs its operations.
+After all, garbage in, garbage out.
+
+> If it does explode, it might be a good idea
+> to work the sanity check into the macro, even if the macro is hidden here.
+
+Can be done, although this will make the macro a bit uglier.
+
+>> +		return 0;
+>> +
+>>   	/* A null handler is allowed if and only if on_lock() is provided. */
+>>   	if (WARN_ON_ONCE(IS_KVM_NULL_FN(range->on_lock) &&
+>>   			 IS_KVM_NULL_FN(range->handler)))
+>> @@ -507,15 +510,18 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+>>   	}
+>>   
+>>   	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+>> +		struct interval_tree_node *node;
+>> +
+>>   		slots = __kvm_memslots(kvm, i);
+>> -		kvm_for_each_memslot(slot, slots) {
+>> +		kvm_for_each_hva_range_memslot(node, slots,
+>> +					       range->start, range->end - 1) {
+>>   			unsigned long hva_start, hva_end;
+>>   
+>> +			slot = container_of(node, struct kvm_memory_slot,
+>> +					    hva_node);
+> 
+> Eh, let that poke out.  The 80 limit is more of a guideline.
+
+Okay.
+
+>>   			hva_start = max(range->start, slot->userspace_addr);
+>>   			hva_end = min(range->end, slot->userspace_addr +
+>>   						  (slot->npages << PAGE_SHIFT));
+>> -			if (hva_start >= hva_end)
+>> -				continue;
+>>   
+>>   			/*
+>>   			 * To optimize for the likely case where the address
+>> @@ -787,6 +793,7 @@ static struct kvm_memslots *kvm_alloc_memslots(void)
+>>   	if (!slots)
+>>   		return NULL;
+>>   
+>> +	slots->hva_tree = RB_ROOT_CACHED;
+>>   	hash_init(slots->id_hash);
+>>   
+>>   	return slots;
+>> @@ -1113,10 +1120,14 @@ static inline void kvm_memslot_delete(struct kvm_memslots *slots,
+>>   		atomic_set(&slots->lru_slot, 0);
+>>   
+>>   	for (i = dmemslot - mslots; i < slots->used_slots; i++) {
+>> +		interval_tree_remove(&mslots[i].hva_node, &slots->hva_tree);
+>>   		hash_del(&mslots[i].id_node);
+> 
+> I think it would make sense to add helpers for these?  Not sure I like the names,
+> but it would certainly dedup the code a bit.
+> 
+> static void kvm_memslot_remove(struct kvm_memslots *slots,
+> 			       struct kvm_memslot *memslot)
+> {
+> 	interval_tree_remove(&memslot->hva_node, &slots->hva_tree);
+> 	hash_del(&memslot->id_node);
+> }
+> 
+> static void kvm_memslot_insert(struct kvm_memslots *slots,
+> 			       struct kvm_memslot *memslot)
+> {
+> 	interval_tree_insert(&memslot->hva_node, &slots->hva_tree);
+> 	hash_add(slots->id_hash, &memslot->id_node, memslot->id);> }
+
+This is possible, however patch 6 replaces the whole code anyway
+(and it has kvm_memslot_gfn_insert() and kvm_replace_memslot() helpers).
+
+>> +
+>>   		mslots[i] = mslots[i + 1];
+>> +		interval_tree_insert(&mslots[i].hva_node, &slots->hva_tree);
+>>   		hash_add(slots->id_hash, &mslots[i].id_node, mslots[i].id);
+>>   	}
+>> +	interval_tree_remove(&mslots[i].hva_node, &slots->hva_tree);
+>>   	hash_del(&mslots[i].id_node);
+>>   	mslots[i] = *memslot;
+>>   }
 
 Thanks,
 Maciej
