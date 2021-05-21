@@ -2,121 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 680FD38C8EF
-	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 16:09:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E5E638C945
+	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 16:34:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235464AbhEUOKh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 May 2021 10:10:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57861 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232291AbhEUOKg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 May 2021 10:10:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621606152;
+        id S236123AbhEUOgH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 May 2021 10:36:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42918 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234477AbhEUOgG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 May 2021 10:36:06 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 401F5C061574;
+        Fri, 21 May 2021 07:34:43 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0ea400b1711cbbd717391b.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:a400:b171:1cbb:d717:391b])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 394031EC061D;
+        Fri, 21 May 2021 16:34:41 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1621607681;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ae30da3lTczukBTtcyhtZQMh33Yk+JNXfJS9MzX8LNU=;
-        b=WZjvjpCrG1OjkeLDSdQhNMGVHxQQcMYwUI9OsJguZHa6yG3A/+h7gEJc8kLu5M+QLu/q3v
-        DCwIB7H3bV9ZpB1MJcEwFtFEPF8g/pLxgk+qkgg1hp3gGFNLPT/f8w4uCnTBshTNM0AzMK
-        9hjVZ5FoqrQ4WSk2XQMrh+u6/paFMZ0=
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
- [209.85.161.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-167-mY0Wcen1NTW_DHmANVOsXw-1; Fri, 21 May 2021 10:09:09 -0400
-X-MC-Unique: mY0Wcen1NTW_DHmANVOsXw-1
-Received: by mail-oo1-f71.google.com with SMTP id o1-20020a4adb610000b029020660e40b70so13370527ood.22
-        for <kvm@vger.kernel.org>; Fri, 21 May 2021 07:09:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Ae30da3lTczukBTtcyhtZQMh33Yk+JNXfJS9MzX8LNU=;
-        b=Ml75aGdQmriK+Ph8YWB0R8waOgvPw7pueykFnzIVAmX8NBA9nP/Wv7Z5OshRNiw6Mh
-         8mJuLV/ZRe5abTBlEjDN9zR08V1RBmcEB6nuJBNhedAQV7jiAluts/BLOSI4JyucAs7w
-         EW0txc3faz2K/+ePghpcFtdMOe9zRp96S8egaToAoDBREJOiUYLk1J9u4SSj/Ya2wBRZ
-         JbIwLKTf07RE8r/p9eoTjNUWNkNmKlS0Ht6yY97XmRvu8wrYHqovbdnBzHgcVvXNRzAI
-         usUYR8O2SgGT6QWm7SjluQF0vmqe8skJfArWYfwzAA02k4HMP7Xm0CelCstahtYMq4/+
-         nSCw==
-X-Gm-Message-State: AOAM533Ce4Wf8z4Ro1RmTQgwGM+/AH93OnfxxZUryGyI81E/iW5mcAAr
-        KeQMI+4KSkY11AwraoGasaiCmG08u5/OI3zF6dJe01WJiBwylDPq+t9Qgr+4yhyzUdi2fWAdMyn
-        Xar7UjK8mJytRiQB7+kRQZOjKEcjm7Yvzjyxz16OyRub4RZhf6HU9nvhiqT61JQ==
-X-Received: by 2002:a05:6830:11d7:: with SMTP id v23mr1804180otq.44.1621606148796;
-        Fri, 21 May 2021 07:09:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJytWPQ63oi28CRsyVF44/qTyEPN8ADrsSFKajU2BxpMe/wub6EOk9B7M0fb5K9fgoUInh7NUA==
-X-Received: by 2002:a05:6830:11d7:: with SMTP id v23mr1804151otq.44.1621606148538;
-        Fri, 21 May 2021 07:09:08 -0700 (PDT)
-Received: from [192.168.0.173] (ip68-103-222-6.ks.ok.cox.net. [68.103.222.6])
-        by smtp.gmail.com with ESMTPSA id b18sm1321193otk.62.2021.05.21.07.09.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 May 2021 07:09:08 -0700 (PDT)
-Subject: Re: [RFC PATCH 00/67] KVM: X86: TDX support
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <cover.1605232743.git.isaku.yamahata@intel.com>
- <3edc0fb2-d552-88df-eead-9e2b80e79be4@redhat.com>
- <20210520093155.GA3602295@private.email.ne.jp>
-From:   Connor Kuehl <ckuehl@redhat.com>
-Message-ID: <d584231c-96e8-ca98-6dd1-7763003d7fd3@redhat.com>
-Date:   Fri, 21 May 2021 09:09:06 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=+eiP6mVRfierNZHVHWE39OmfVBD4FccBazbJrnrFRg0=;
+        b=ROd1grQ3afwj6jw9TXiBn8Gd9qql4j0xLcF+A4Lqj4zbmGPwP2BmwMNSG9cy7VgQRH6Y1i
+        q7L03gy8DOnoLw9UiHZ6w+3+1IRtJ3DdPWKaZRMMCu9EkiRcmi3F0YGbVRbTLJm25OqlWG
+        Wz3z6tI68a+fpsHb7fn5HUCNVbQJv6Y=
+Date:   Fri, 21 May 2021 16:34:34 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, Hyunwook Baek <baekhw@google.com>,
+        Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v2 7/8] x86/insn: Extend error reporting from
+ insn_fetch_from_user[_inatomic]()
+Message-ID: <YKfE+gfK5AdE9ckm@zn.tnic>
+References: <20210519135251.30093-1-joro@8bytes.org>
+ <20210519135251.30093-8-joro@8bytes.org>
 MIME-Version: 1.0
-In-Reply-To: <20210520093155.GA3602295@private.email.ne.jp>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <20210519135251.30093-8-joro@8bytes.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/20/21 4:31 AM, Isaku Yamahata wrote:
-> On Wed, May 19, 2021 at 11:37:23AM -0500,
-> Connor Kuehl <ckuehl@redhat.com> wrote:
-> 
->> On 11/16/20 12:25 PM, isaku.yamahata@intel.com wrote:
->>> From: Isaku Yamahata <isaku.yamahata@intel.com>
->>>
->>> * What's TDX?
->>> TDX stands for Trust Domain Extensions which isolates VMs from
->>> the virtual-machine manager (VMM)/hypervisor and any other software on
->>> the platform. [1]
->>> For details, the specifications, [2], [3], [4], [5], [6], [7], are
->>> available.
->>>
->>>
->>> * The goal of this RFC patch
->>> The purpose of this post is to get feedback early on high level design
->>> issue of KVM enhancement for TDX. The detailed coding (variable naming
->>> etc) is not cared of. This patch series is incomplete (not working).
->>> Although multiple software components, not only KVM but also QEMU,
->>> guest Linux and virtual bios, need to be updated, this includes only
->>> KVM VMM part. For those who are curious to changes to other
->>> component, there are public repositories at github. [8], [9]
->>
->> Hi,
->>
->> I'm planning on reading through this patch set; but before I do, since
->> it's been several months and it's a non-trivially sized series, I just
->> wanted to confirm that this is the latest revision of the RFC that
->> you'd like comments on. Or, if there's a more recent series that I've
->> missed, I would be grateful for a pointer to it.
-> 
-> Hi. I'm planning to post rebased/updated v2 soon. Hopefully next week.
-> So please wait for it. It will include non-trivial change and catch up for the updated spec.
+On Wed, May 19, 2021 at 03:52:50PM +0200, Joerg Roedel wrote:
+> diff --git a/arch/x86/lib/insn-eval.c b/arch/x86/lib/insn-eval.c
+> index 4eecb9c7c6a0..d8a057ba0895 100644
+> --- a/arch/x86/lib/insn-eval.c
+> +++ b/arch/x86/lib/insn-eval.c
+> @@ -1442,27 +1442,36 @@ static int insn_get_effective_ip(struct pt_regs *regs, unsigned long *ip)
+>   * insn_fetch_from_user() - Copy instruction bytes from user-space memory
+>   * @regs:	Structure with register values as seen when entering kernel mode
+>   * @buf:	Array to store the fetched instruction
+> + * @copied:	Pointer to an int where the number of copied instruction bytes
+> + *		is stored. Can be NULL.
+>   *
+>   * Gets the linear address of the instruction and copies the instruction bytes
+>   * to the buf.
+>   *
+>   * Returns:
+>   *
+> - * Number of instruction bytes copied.
+> + * -EINVAL if the linear address of the instruction could not be calculated
+> + * -EFAULT if nothing was copied
+> + *       0 on success
+>   *
+> - * 0 if nothing was copied.
+>   */
+> -int insn_fetch_from_user(struct pt_regs *regs, unsigned char buf[MAX_INSN_SIZE])
+> +int insn_fetch_from_user(struct pt_regs *regs, unsigned char buf[MAX_INSN_SIZE],
+> +			 int *copied)
+>  {
+>  	unsigned long ip;
+>  	int not_copied;
+> +	int bytes;
+>  
+>  	if (insn_get_effective_ip(regs, &ip))
+> -		return 0;
+> +		return -EINVAL;
+>  
+>  	not_copied = copy_from_user(buf, (void __user *)ip, MAX_INSN_SIZE);
+>  
+> -	return MAX_INSN_SIZE - not_copied;
+> +	bytes = MAX_INSN_SIZE - not_copied;
+> +	if (copied)
+> +		*copied = bytes;
+> +
+> +	return bytes ? 0 : -EFAULT;
 
-That sounds great. I'll keep an eye out.
+Why not simpler?
 
-Thank you!
+return value >= 0 says how many bytes were copied
+return value < 0 means some kind of error
 
-Connor
+And then you don't need @copied...
 
+Ditto for the other one.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
