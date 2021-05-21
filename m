@@ -2,104 +2,330 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DAAF738C125
-	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 09:58:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86DD938C12A
+	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 09:59:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229512AbhEUH7w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 May 2021 03:59:52 -0400
-Received: from mx2.suse.de ([195.135.220.15]:49766 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229455AbhEUH7p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 May 2021 03:59:45 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1621583902; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2MfCuK8zXiUfS4x7BpQYH57RVEmWBdaLQ5ye3Gim4ps=;
-        b=AuvKwq/s6EAq2b2l8dwrgkqtC+32CxFIHpWu4HYjgXzuDb0+GeRXnhpg7692Uo0TfTZxOC
-        Xx9ZxqcncbC25ytmcnqBL4LfZIxmzIMIcdfonF/Ncu3Hyq9bERRrCGwKpD8wVNpr1MQc3L
-        ePWh/YeZ0nFcwiN2666EiXjMRHT/6Ec=
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id BF605AD5C;
-        Fri, 21 May 2021 07:58:21 +0000 (UTC)
-Message-ID: <4e27adf7df5de525b9a4af9afbb3ca88ec3d09a4.camel@suse.com>
-Subject: Re: [PATCH] Move VMEnter and VMExit tracepoints closer to the
- actual event
-From:   Dario Faggioli <dfaggioli@suse.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Stefano De Venuto <stefano.devenuto99@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, x86@kernel.org,
-        hpa@zytor.com, kvm@vger.kernel.org, rostedt@goodmis.org,
-        y.karadz@gmail.com
-Date:   Fri, 21 May 2021 09:58:17 +0200
-In-Reply-To: <ab44e5b1-4448-d6c8-6cda-5e41866f69f1@redhat.com>
-References: <20210519182303.2790-1-stefano.devenuto99@gmail.com>
-         <YKaBEn6oUXaVAb0K@google.com>
-         <ab44e5b1-4448-d6c8-6cda-5e41866f69f1@redhat.com>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-SuF+Jf1Vs/AnRIDVyYCD"
-User-Agent: Evolution 3.40.1 (by Flathub.org) 
+        id S229610AbhEUIBG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 May 2021 04:01:06 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:5645 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229455AbhEUIBF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 May 2021 04:01:05 -0400
+Received: from dggems704-chm.china.huawei.com (unknown [172.30.72.60])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Fmf851tQ3z16Pkf;
+        Fri, 21 May 2021 15:56:53 +0800 (CST)
+Received: from dggpemm500022.china.huawei.com (7.185.36.162) by
+ dggems704-chm.china.huawei.com (10.3.19.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Fri, 21 May 2021 15:59:40 +0800
+Received: from [10.174.187.155] (10.174.187.155) by
+ dggpemm500022.china.huawei.com (7.185.36.162) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Fri, 21 May 2021 15:59:39 +0800
+Subject: Re: [RFC PATCH v3 8/8] vfio: Add nested IOPF support
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>
+CC:     Cornelia Huck <cohuck@redhat.com>, Will Deacon <will@kernel.org>,
+        "Robin Murphy" <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Jean-Philippe Brucker" <jean-philippe@linaro.org>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <iommu@lists.linux-foundation.org>, <linux-api@vger.kernel.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>, <yi.l.liu@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Barry Song <song.bao.hua@hisilicon.com>,
+        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
+References: <20210409034420.1799-1-lushenming@huawei.com>
+ <20210409034420.1799-9-lushenming@huawei.com>
+ <20210518125808.345b812c.alex.williamson@redhat.com>
+From:   Shenming Lu <lushenming@huawei.com>
+Message-ID: <ea8c92a8-6e51-8be6-de19-d5e6f1d5527f@huawei.com>
+Date:   Fri, 21 May 2021 15:59:39 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
+In-Reply-To: <20210518125808.345b812c.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.187.155]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500022.china.huawei.com (7.185.36.162)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 2021/5/19 2:58, Alex Williamson wrote:
+> On Fri, 9 Apr 2021 11:44:20 +0800
+> Shenming Lu <lushenming@huawei.com> wrote:
+> 
+>> To set up nested mode, drivers such as vfio_pci need to register a
+>> handler to receive stage/level 1 faults from the IOMMU, but since
+>> currently each device can only have one iommu dev fault handler,
+>> and if stage 2 IOPF is already enabled (VFIO_IOMMU_ENABLE_IOPF),
+>> we choose to update the registered handler (a consolidated one) via
+>> flags (set FAULT_REPORT_NESTED_L1), and further deliver the received
+>> stage 1 faults in the handler to the guest through a newly added
+>> vfio_device_ops callback.
+> 
+> Are there proposed in-kernel drivers that would use any of these
+> symbols?
 
---=-SuF+Jf1Vs/AnRIDVyYCD
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I hope that such as Eric's SMMUv3 Nested Stage Setup series [1] can
+use these symbols to consolidate the two page fault handlers into one.
 
-Hi!
+[1] https://patchwork.kernel.org/project/kvm/cover/20210411114659.15051-1-eric.auger@redhat.com/
 
-On Thu, 2021-05-20 at 18:18 +0200, Paolo Bonzini wrote:
-> On 20/05/21 17:32, Sean Christopherson wrote:
-> > On VMX, I think the tracepoint can be moved below the VMWRITEs
-> > without much
-> > contention (though doing so is likely a nop), but moving it below
-> > kvm_load_guest_xsave_state() requires a bit more discussion.
->=20
-> Indeed; as a rule of thumb, the tracepoint on SVM could match the=20
-> clgi/stgi region, and on VMX it could be placed in a similar
-> location.
->=20
-Ok. So, if this is uncontroversial enough, we're more than happy to go
-for it... For now. :-)
+> 
+>> Signed-off-by: Shenming Lu <lushenming@huawei.com>
+>> ---
+>>  drivers/vfio/vfio.c             | 81 +++++++++++++++++++++++++++++++++
+>>  drivers/vfio/vfio_iommu_type1.c | 49 +++++++++++++++++++-
+>>  include/linux/vfio.h            | 12 +++++
+>>  3 files changed, 141 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+>> index 44c8dfabf7de..4245f15914bf 100644
+>> --- a/drivers/vfio/vfio.c
+>> +++ b/drivers/vfio/vfio.c
+>> @@ -2356,6 +2356,87 @@ struct iommu_domain *vfio_group_iommu_domain(struct vfio_group *group)
+>>  }
+>>  EXPORT_SYMBOL_GPL(vfio_group_iommu_domain);
+>>  
+>> +/*
+>> + * Register/Update the VFIO IOPF handler to receive
+>> + * nested stage/level 1 faults.
+>> + */
+>> +int vfio_iommu_dev_fault_handler_register_nested(struct device *dev)
+>> +{
+>> +	struct vfio_container *container;
+>> +	struct vfio_group *group;
+>> +	struct vfio_iommu_driver *driver;
+>> +	int ret;
+>> +
+>> +	if (!dev)
+>> +		return -EINVAL;
+>> +
+>> +	group = vfio_group_get_from_dev(dev);
+>> +	if (!group)
+>> +		return -ENODEV;
+>> +
+>> +	ret = vfio_group_add_container_user(group);
+>> +	if (ret)
+>> +		goto out;
+>> +
+>> +	container = group->container;
+>> +	driver = container->iommu_driver;
+>> +	if (likely(driver && driver->ops->register_handler))
+>> +		ret = driver->ops->register_handler(container->iommu_data, dev);
+>> +	else
+>> +		ret = -ENOTTY;
+>> +
+>> +	vfio_group_try_dissolve_container(group);
+>> +
+>> +out:
+>> +	vfio_group_put(group);
+>> +	return ret;
+>> +}
+>> +EXPORT_SYMBOL_GPL(vfio_iommu_dev_fault_handler_register_nested);
+>> +
+>> +int vfio_iommu_dev_fault_handler_unregister_nested(struct device *dev)
+>> +{
+>> +	struct vfio_container *container;
+>> +	struct vfio_group *group;
+>> +	struct vfio_iommu_driver *driver;
+>> +	int ret;
+>> +
+>> +	if (!dev)
+>> +		return -EINVAL;
+>> +
+>> +	group = vfio_group_get_from_dev(dev);
+>> +	if (!group)
+>> +		return -ENODEV;
+>> +
+>> +	ret = vfio_group_add_container_user(group);
+>> +	if (ret)
+>> +		goto out;
+>> +
+>> +	container = group->container;
+>> +	driver = container->iommu_driver;
+>> +	if (likely(driver && driver->ops->unregister_handler))
+>> +		ret = driver->ops->unregister_handler(container->iommu_data, dev);
+>> +	else
+>> +		ret = -ENOTTY;
+>> +
+>> +	vfio_group_try_dissolve_container(group);
+>> +
+>> +out:
+>> +	vfio_group_put(group);
+>> +	return ret;
+>> +}
+>> +EXPORT_SYMBOL_GPL(vfio_iommu_dev_fault_handler_unregister_nested);
+>> +
+>> +int vfio_transfer_iommu_fault(struct device *dev, struct iommu_fault *fault)
+>> +{
+>> +	struct vfio_device *device = dev_get_drvdata(dev);
+>> +
+>> +	if (unlikely(!device->ops->transfer))
+>> +		return -EOPNOTSUPP;
+>> +
+>> +	return device->ops->transfer(device->device_data, fault);
+>> +}
+>> +EXPORT_SYMBOL_GPL(vfio_transfer_iommu_fault);
+>> +
+>>  /**
+>>   * Module/class support
+>>   */
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>> index ba2b5a1cf6e9..9d1adeddb303 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -3821,13 +3821,32 @@ static int vfio_iommu_type1_dma_map_iopf(struct iommu_fault *fault, void *data)
+>>  	struct vfio_batch batch;
+>>  	struct vfio_range *range;
+>>  	dma_addr_t iova = ALIGN_DOWN(fault->prm.addr, PAGE_SIZE);
+>> -	int access_flags = 0;
+>> +	int access_flags = 0, nested;
+>>  	size_t premap_len, map_len, mapped_len = 0;
+>>  	unsigned long bit_offset, vaddr, pfn, i, npages;
+>>  	int ret;
+>>  	enum iommu_page_response_code status = IOMMU_PAGE_RESP_INVALID;
+>>  	struct iommu_page_response resp = {0};
+>>  
+>> +	if (vfio_dev_domian_nested(dev, &nested))
+>> +		return -ENODEV;
+>> +
+>> +	/*
+>> +	 * When configured in nested mode, further deliver the
+>> +	 * stage/level 1 faults to the guest.
+>> +	 */
+>> +	if (nested) {
+>> +		bool l2;
+>> +
+>> +		if (fault->type == IOMMU_FAULT_PAGE_REQ)
+>> +			l2 = fault->prm.flags & IOMMU_FAULT_PAGE_REQUEST_L2;
+>> +		if (fault->type == IOMMU_FAULT_DMA_UNRECOV)
+>> +			l2 = fault->event.flags & IOMMU_FAULT_UNRECOV_L2;
+>> +
+>> +		if (!l2)
+>> +			return vfio_transfer_iommu_fault(dev, fault);
+>> +	}
+>> +
+>>  	if (fault->type != IOMMU_FAULT_PAGE_REQ)
+>>  		return -EOPNOTSUPP;
+>>  
+>> @@ -4201,6 +4220,32 @@ static void vfio_iommu_type1_notify(void *iommu_data,
+>>  	wake_up_all(&iommu->vaddr_wait);
+>>  }
+>>  
+>> +static int vfio_iommu_type1_register_handler(void *iommu_data,
+>> +					     struct device *dev)
+>> +{
+>> +	struct vfio_iommu *iommu = iommu_data;
+>> +
+>> +	if (iommu->iopf_enabled)
+>> +		return iommu_update_device_fault_handler(dev, ~0,
+>> +						FAULT_REPORT_NESTED_L1);
+>> +	else
+>> +		return iommu_register_device_fault_handler(dev,
+>> +						vfio_iommu_type1_dma_map_iopf,
+>> +						FAULT_REPORT_NESTED_L1, dev);
+>> +}
+>> +
+>> +static int vfio_iommu_type1_unregister_handler(void *iommu_data,
+>> +					       struct device *dev)
+>> +{
+>> +	struct vfio_iommu *iommu = iommu_data;
+>> +
+>> +	if (iommu->iopf_enabled)
+>> +		return iommu_update_device_fault_handler(dev,
+>> +						~FAULT_REPORT_NESTED_L1, 0);
+>> +	else
+>> +		return iommu_unregister_device_fault_handler(dev);
+>> +}
+> 
+> 
+> The path through vfio to register this is pretty ugly, but I don't see
+> any reason for the the update interfaces here, the previously
+> registered handler just changes its behavior.
 
-Let us try it, and see how things end up looking.
+Yeah, this seems not an elegant way...
 
-Thanks and Regards
---=20
-Dario Faggioli, Ph.D
-http://about.me/dario.faggioli
-Virtualization Software Engineer
-SUSE Labs, SUSE https://www.suse.com/
--------------------------------------------------------------------
-<<This happens because _I_ choose it to happen!>> (Raistlin Majere)
+If IOPF(L2) enabled, the fault handler has already been registered, so for
+nested mode setup, we only need to change the flags of the handler in the
+IOMMU driver to receive L1 faults.
+(assume that L1 IOPF is configured after L2 IOPF)
 
---=-SuF+Jf1Vs/AnRIDVyYCD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
+Currently each device can only have one iommu dev fault handler, and L1
+and L2 IOPF are configured separately in nested mode, I am also wondering
+that is there a better solution for this.
 
------BEGIN PGP SIGNATURE-----
+Thanks,
+Shenming
 
-iQIzBAABCAAdFiEES5ssOj3Vhr0WPnOLFkJ4iaW4c+4FAmCnaBkACgkQFkJ4iaW4
-c+7TYw//Yd4x4luYqBBLERLVz7tLFs96a4KjeAjIp/ydzphAy9LtZbv1tU3ZU5T/
-cxvsKeuTobr5AHX9sZEETzhKVzyBBFEbANsqMiPg8VK7i8IyS3r6mB16syVlkBmQ
-9ZfV3Jmlpbv+/b4w6rfdb1XohhE62NFMyhlS4C3fahLp1bljGs0FgkL8tBeusIJd
-3pORdrqFuOtqTbLZhixhLxOS//svOUKEYriBwVB1Bo74H6ktPX0lalrdbmHC5U2m
-KEjjp+saZWGo2vNP5OufB/DuHy5ORd3WMMVqoX8AyOZZPjXEZ95EXdSb0iWE1nIU
-ByxLLLv/o/xwr7Ls9wb00o5+8G7Z5y+nwWkC7Hc7wUQdara0YG2I0C55iTpAJpPQ
-qV/vsDHQsLP5VhEGk7KxYXM4xeBDofUtRbDyLXtC3VwON7qdvsYp8Es+t0vE7AFK
-6IwvkH224FqjZcs8VSvfpiVblYspyGKK7yDMkwxsI1QCw/VeA/nTSzpmZjs3o85G
-wrvlrQ2VSiSLAuXBeELRoPUsu0eCQGl5S2BNXQQ5LKLdzLLDCx63vzmxWbgFEF2M
-g4VLOM+qNQHgUvpez0Wy8/0fE2HGzMe75qAvHheJyw58hNJMC3Ibh6qkZPHBmf0H
-n4sm+iTcDn3rmFeltv37zXbiolqHQMGAbdnFliezt8RTIAEqzDw=
-=+B3i
------END PGP SIGNATURE-----
-
---=-SuF+Jf1Vs/AnRIDVyYCD--
-
+> 
+> 
+>> +
+>>  static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
+>>  	.name			= "vfio-iommu-type1",
+>>  	.owner			= THIS_MODULE,
+>> @@ -4216,6 +4261,8 @@ static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
+>>  	.dma_rw			= vfio_iommu_type1_dma_rw,
+>>  	.group_iommu_domain	= vfio_iommu_type1_group_iommu_domain,
+>>  	.notify			= vfio_iommu_type1_notify,
+>> +	.register_handler	= vfio_iommu_type1_register_handler,
+>> +	.unregister_handler	= vfio_iommu_type1_unregister_handler,
+>>  };
+>>  
+>>  static int __init vfio_iommu_type1_init(void)
+>> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+>> index a7b426d579df..4621d8f0395d 100644
+>> --- a/include/linux/vfio.h
+>> +++ b/include/linux/vfio.h
+>> @@ -29,6 +29,8 @@
+>>   * @match: Optional device name match callback (return: 0 for no-match, >0 for
+>>   *         match, -errno for abort (ex. match with insufficient or incorrect
+>>   *         additional args)
+>> + * @transfer: Optional. Transfer the received stage/level 1 faults to the guest
+>> + *            for nested mode.
+>>   */
+>>  struct vfio_device_ops {
+>>  	char	*name;
+>> @@ -43,6 +45,7 @@ struct vfio_device_ops {
+>>  	int	(*mmap)(void *device_data, struct vm_area_struct *vma);
+>>  	void	(*request)(void *device_data, unsigned int count);
+>>  	int	(*match)(void *device_data, char *buf);
+>> +	int	(*transfer)(void *device_data, struct iommu_fault *fault);
+>>  };
+>>  
+>>  extern struct iommu_group *vfio_iommu_group_get(struct device *dev);
+>> @@ -100,6 +103,10 @@ struct vfio_iommu_driver_ops {
+>>  						   struct iommu_group *group);
+>>  	void		(*notify)(void *iommu_data,
+>>  				  enum vfio_iommu_notify_type event);
+>> +	int		(*register_handler)(void *iommu_data,
+>> +					    struct device *dev);
+>> +	int		(*unregister_handler)(void *iommu_data,
+>> +					      struct device *dev);
+>>  };
+>>  
+>>  extern int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
+>> @@ -161,6 +168,11 @@ extern int vfio_unregister_notifier(struct device *dev,
+>>  struct kvm;
+>>  extern void vfio_group_set_kvm(struct vfio_group *group, struct kvm *kvm);
+>>  
+>> +extern int vfio_iommu_dev_fault_handler_register_nested(struct device *dev);
+>> +extern int vfio_iommu_dev_fault_handler_unregister_nested(struct device *dev);
+>> +extern int vfio_transfer_iommu_fault(struct device *dev,
+>> +				     struct iommu_fault *fault);
+>> +
+>>  /*
+>>   * Sub-module helpers
+>>   */
+> 
+> .
+> 
