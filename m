@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C155638C4BD
-	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 12:27:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EE0838C4B7
+	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 12:27:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233794AbhEUK3F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 May 2021 06:29:05 -0400
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:5898 "EHLO
-        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232269AbhEUK2X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 May 2021 06:28:23 -0400
+        id S232613AbhEUK2o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 May 2021 06:28:44 -0400
+Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:7069 "EHLO
+        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230508AbhEUK2M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 May 2021 06:28:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1621592821; x=1653128821;
+  t=1621592810; x=1653128810;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version;
-  bh=SU+g1QnEecCGtW6dIbozX2en41atljcTC+E2dUOIv3U=;
-  b=Ekd8eBIdHlzdoREBmjYc5AWTh7yLoUO8WXyjOhHCFzXJs/nTSJUByfoX
-   iVk3z6P8n0LulvCVtTKh2IEDtK+OOhACpud9gDCRgNuRt6FrDijB0chxR
-   e8y4TxVGdEen3ICEnhT6jDCT2+N7FXmxSMmPHHGRQxMTOht8DYSWFsJW7
-   E=;
+  bh=H3p8n+UMiRPMFZQgSU5T+cll5gMHrRpDxHrBHlWOZ78=;
+  b=npC8xLQAaUbXFo1ZvKtV1jVREgkAvwxgncpFTUPKcx1owr7n07F8wSAR
+   PaO73mxxfJbkcgM6j+i6C2mWMIdYSuFpmMiwj1k9bJT6biDqLGqUQIGCa
+   k1K3VIy1jJbFWdQv5CzPU2QdIMwGL5pmD7Bf1/O9rRHg5hwM6bF94+jAU
+   Q=;
 X-IronPort-AV: E=Sophos;i="5.82,313,1613433600"; 
-   d="scan'208";a="110855701"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2c-397e131e.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP; 21 May 2021 10:26:52 +0000
-Received: from EX13MTAUEE001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-2c-397e131e.us-west-2.amazon.com (Postfix) with ESMTPS id 0B072A2691;
-        Fri, 21 May 2021 10:26:50 +0000 (UTC)
-Received: from EX13D08UEE004.ant.amazon.com (10.43.62.182) by
- EX13MTAUEE001.ant.amazon.com (10.43.62.226) with Microsoft SMTP Server (TLS)
- id 15.0.1497.18; Fri, 21 May 2021 10:26:36 +0000
+   d="scan'208";a="115202034"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1d-5dd976cd.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP; 21 May 2021 10:26:50 +0000
+Received: from EX13MTAUEE002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-1d-5dd976cd.us-east-1.amazon.com (Postfix) with ESMTPS id B6CACA3631;
+        Fri, 21 May 2021 10:26:45 +0000 (UTC)
+Received: from EX13D08UEE002.ant.amazon.com (10.43.62.92) by
+ EX13MTAUEE002.ant.amazon.com (10.43.62.24) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.18; Fri, 21 May 2021 10:26:45 +0000
 Received: from EX13MTAUEA001.ant.amazon.com (10.43.61.82) by
- EX13D08UEE004.ant.amazon.com (10.43.62.182) with Microsoft SMTP Server (TLS)
- id 15.0.1497.18; Fri, 21 May 2021 10:26:36 +0000
+ EX13D08UEE002.ant.amazon.com (10.43.62.92) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.18; Fri, 21 May 2021 10:26:45 +0000
 Received: from uae075a0dfd4c51.ant.amazon.com (10.106.83.24) by
  mail-relay.amazon.com (10.43.61.243) with Microsoft SMTP Server id
- 15.0.1497.18 via Frontend Transport; Fri, 21 May 2021 10:26:35 +0000
+ 15.0.1497.18 via Frontend Transport; Fri, 21 May 2021 10:26:43 +0000
 From:   Ilias Stamatis <ilstam@amazon.com>
 To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <pbonzini@redhat.com>
@@ -44,9 +44,9 @@ CC:     <mlevitsk@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
         <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
         <zamsden@gmail.com>, <mtosatti@redhat.com>, <dwmw@amazon.co.uk>,
         <ilstam@amazon.com>
-Subject: [PATCH v3 05/12] KVM: VMX: Add a TSC multiplier field in VMCS12
-Date:   Fri, 21 May 2021 11:24:42 +0100
-Message-ID: <20210521102449.21505-6-ilstam@amazon.com>
+Subject: [PATCH v3 06/12] KVM: X86: Add functions for retrieving L2 TSC fields from common code
+Date:   Fri, 21 May 2021 11:24:43 +0100
+Message-ID: <20210521102449.21505-7-ilstam@amazon.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210521102449.21505-1-ilstam@amazon.com>
 References: <20210521102449.21505-1-ilstam@amazon.com>
@@ -56,50 +56,132 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is required for supporting nested TSC scaling.
+In order to implement as much of the nested TSC scaling logic as
+possible in common code, we need these vendor callbacks for retrieving
+the TSC offset and the TSC multiplier that L1 has set for L2.
 
 Signed-off-by: Ilias Stamatis <ilstam@amazon.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/vmx/vmcs12.c | 1 +
- arch/x86/kvm/vmx/vmcs12.h | 4 +++-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/kvm-x86-ops.h |  2 ++
+ arch/x86/include/asm/kvm_host.h    |  2 ++
+ arch/x86/kvm/svm/svm.c             | 14 ++++++++++++++
+ arch/x86/kvm/vmx/vmx.c             | 23 +++++++++++++++++++++++
+ arch/x86/kvm/vmx/vmx.h             |  3 +++
+ 5 files changed, 44 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/vmcs12.c b/arch/x86/kvm/vmx/vmcs12.c
-index 034adb6404dc..d9f5d7c56ae3 100644
---- a/arch/x86/kvm/vmx/vmcs12.c
-+++ b/arch/x86/kvm/vmx/vmcs12.c
-@@ -37,6 +37,7 @@ const unsigned short vmcs_field_to_offset_table[] = {
- 	FIELD64(VM_ENTRY_MSR_LOAD_ADDR, vm_entry_msr_load_addr),
- 	FIELD64(PML_ADDRESS, pml_address),
- 	FIELD64(TSC_OFFSET, tsc_offset),
-+	FIELD64(TSC_MULTIPLIER, tsc_multiplier),
- 	FIELD64(VIRTUAL_APIC_PAGE_ADDR, virtual_apic_page_addr),
- 	FIELD64(APIC_ACCESS_ADDR, apic_access_addr),
- 	FIELD64(POSTED_INTR_DESC_ADDR, posted_intr_desc_addr),
-diff --git a/arch/x86/kvm/vmx/vmcs12.h b/arch/x86/kvm/vmx/vmcs12.h
-index 13494956d0e9..bb81a23afe89 100644
---- a/arch/x86/kvm/vmx/vmcs12.h
-+++ b/arch/x86/kvm/vmx/vmcs12.h
-@@ -70,7 +70,8 @@ struct __packed vmcs12 {
- 	u64 eptp_list_address;
- 	u64 pml_address;
- 	u64 encls_exiting_bitmap;
--	u64 padding64[2]; /* room for future expansion */
-+	u64 tsc_multiplier;
-+	u64 padding64[1]; /* room for future expansion */
- 	/*
- 	 * To allow migration of L1 (complete with its L2 guests) between
- 	 * machines of different natural widths (32 or 64 bit), we cannot have
-@@ -258,6 +259,7 @@ static inline void vmx_check_vmcs12_offsets(void)
- 	CHECK_OFFSET(eptp_list_address, 304);
- 	CHECK_OFFSET(pml_address, 312);
- 	CHECK_OFFSET(encls_exiting_bitmap, 320);
-+	CHECK_OFFSET(tsc_multiplier, 328);
- 	CHECK_OFFSET(cr0_guest_host_mask, 344);
- 	CHECK_OFFSET(cr4_guest_host_mask, 352);
- 	CHECK_OFFSET(cr0_read_shadow, 360);
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 323641097f63..2063616fba1c 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -87,6 +87,8 @@ KVM_X86_OP(set_identity_map_addr)
+ KVM_X86_OP(get_mt_mask)
+ KVM_X86_OP(load_mmu_pgd)
+ KVM_X86_OP_NULL(has_wbinvd_exit)
++KVM_X86_OP(get_l2_tsc_offset)
++KVM_X86_OP(get_l2_tsc_multiplier)
+ KVM_X86_OP(write_l1_tsc_offset)
+ KVM_X86_OP(get_exit_info)
+ KVM_X86_OP(check_intercept)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index b14c2b2b2e21..0f2cf5d1240c 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1305,6 +1305,8 @@ struct kvm_x86_ops {
+ 
+ 	bool (*has_wbinvd_exit)(void);
+ 
++	u64 (*get_l2_tsc_offset)(struct kvm_vcpu *vcpu);
++	u64 (*get_l2_tsc_multiplier)(struct kvm_vcpu *vcpu);
+ 	/* Returns actual tsc_offset set in active VMCS */
+ 	u64 (*write_l1_tsc_offset)(struct kvm_vcpu *vcpu, u64 offset);
+ 
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 05eca131eaf2..ca70e46f9194 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1082,6 +1082,18 @@ static void init_sys_seg(struct vmcb_seg *seg, uint32_t type)
+ 	seg->base = 0;
+ }
+ 
++static u64 svm_get_l2_tsc_offset(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++
++	return svm->nested.ctl.tsc_offset;
++}
++
++static u64 svm_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu)
++{
++	return kvm_default_tsc_scaling_ratio;
++}
++
+ static u64 svm_write_l1_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -4526,6 +4538,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 
+ 	.has_wbinvd_exit = svm_has_wbinvd_exit,
+ 
++	.get_l2_tsc_offset = svm_get_l2_tsc_offset,
++	.get_l2_tsc_multiplier = svm_get_l2_tsc_multiplier,
+ 	.write_l1_tsc_offset = svm_write_l1_tsc_offset,
+ 
+ 	.load_mmu_pgd = svm_load_mmu_pgd,
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 3e4dda8177bb..1c83605eccc1 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1787,6 +1787,27 @@ static void setup_msrs(struct vcpu_vmx *vmx)
+ 	vmx->guest_uret_msrs_loaded = false;
+ }
+ 
++u64 vmx_get_l2_tsc_offset(struct kvm_vcpu *vcpu)
++{
++	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
++
++	if (nested_cpu_has(vmcs12, CPU_BASED_USE_TSC_OFFSETTING))
++		return vmcs12->tsc_offset;
++
++	return 0;
++}
++
++u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu)
++{
++	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
++
++	if (nested_cpu_has(vmcs12, CPU_BASED_USE_TSC_OFFSETTING) &&
++	    nested_cpu_has2(vmcs12, SECONDARY_EXEC_TSC_SCALING))
++		return vmcs12->tsc_multiplier;
++
++	return kvm_default_tsc_scaling_ratio;
++}
++
+ static u64 vmx_write_l1_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
+ {
+ 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+@@ -7700,6 +7721,8 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 
+ 	.has_wbinvd_exit = cpu_has_vmx_wbinvd_exit,
+ 
++	.get_l2_tsc_offset = vmx_get_l2_tsc_offset,
++	.get_l2_tsc_multiplier = vmx_get_l2_tsc_multiplier,
+ 	.write_l1_tsc_offset = vmx_write_l1_tsc_offset,
+ 
+ 	.load_mmu_pgd = vmx_load_mmu_pgd,
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 16e4e457ba23..aa97c82e3451 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -404,6 +404,9 @@ void vmx_ept_load_pdptrs(struct kvm_vcpu *vcpu);
+ void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type);
+ void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type);
+ 
++u64 vmx_get_l2_tsc_offset(struct kvm_vcpu *vcpu);
++u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu);
++
+ static inline void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr,
+ 					     int type, bool value)
+ {
 -- 
 2.17.1
 
