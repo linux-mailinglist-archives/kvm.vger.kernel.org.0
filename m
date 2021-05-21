@@ -2,241 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C924A38BFF6
-	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 08:48:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 678B838C04B
+	for <lists+kvm@lfdr.de>; Fri, 21 May 2021 09:03:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232616AbhEUGtb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 May 2021 02:49:31 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3610 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231303AbhEUGtb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 May 2021 02:49:31 -0400
-Received: from dggems702-chm.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4FmcXf3CB9zQm2c;
-        Fri, 21 May 2021 14:44:34 +0800 (CST)
-Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
- dggems702-chm.china.huawei.com (10.3.19.179) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Fri, 21 May 2021 14:48:06 +0800
-Received: from [10.174.185.210] (10.174.185.210) by
- dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2176.2; Fri, 21 May 2021 14:48:05 +0800
-Subject: Re: [PATCH v15 07/12] iommu/smmuv3: Implement cache_invalidate
-To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
-        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-        <will@kernel.org>, <maz@kernel.org>, <robin.murphy@arm.com>,
-        <joro@8bytes.org>, <alex.williamson@redhat.com>, <tn@semihalf.com>,
-        <zhukeqian1@huawei.com>
-CC:     <jacob.jun.pan@linux.intel.com>, <yi.l.liu@intel.com>,
-        <wangxingang5@huawei.com>, <jean-philippe@linaro.org>,
-        <zhangfei.gao@linaro.org>, <zhangfei.gao@gmail.com>,
-        <vivek.gautam@arm.com>, <shameerali.kolothum.thodi@huawei.com>,
-        <yuzenghui@huawei.com>, <nicoleotsuka@gmail.com>,
-        <lushenming@huawei.com>, <vsethi@nvidia.com>,
-        <chenxiang66@hisilicon.com>, <vdumpa@nvidia.com>,
-        <wanghaibin.wang@huawei.com>
-References: <20210411111228.14386-1-eric.auger@redhat.com>
- <20210411111228.14386-8-eric.auger@redhat.com>
-From:   Kunkun Jiang <jiangkunkun@huawei.com>
-Message-ID: <fa06a2bf-9e85-8f05-cf51-10f694f486ff@huawei.com>
-Date:   Fri, 21 May 2021 14:48:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        id S234948AbhEUHFB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 May 2021 03:05:01 -0400
+Received: from vps-vb.mhejs.net ([37.28.154.113]:46894 "EHLO vps-vb.mhejs.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232634AbhEUHFA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 May 2021 03:05:00 -0400
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1ljzBw-00053m-OA; Fri, 21 May 2021 09:03:28 +0200
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <cover.1621191549.git.maciej.szmigiero@oracle.com>
+ <eb1c881ce814705c83813f02a1a13ced96f1b1d1.1621191551.git.maciej.szmigiero@oracle.com>
+ <YKV8hHDS489g9JBS@google.com>
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: Re: [PATCH v3 1/8] KVM: x86: Cache total page count to avoid
+ traversing the memslot array
+Message-ID: <e3769513-d2d8-e3fb-7887-3c8872b0f00c@maciej.szmigiero.name>
+Date:   Fri, 21 May 2021 09:03:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20210411111228.14386-8-eric.auger@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <YKV8hHDS489g9JBS@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Originating-IP: [10.174.185.210]
-X-ClientProxiedBy: dggeme708-chm.china.huawei.com (10.1.199.104) To
- dggema765-chm.china.huawei.com (10.1.198.207)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+On 19.05.2021 23:00, Sean Christopherson wrote:
+> On Sun, May 16, 2021, Maciej S. Szmigiero wrote:
+>> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+>>
+>> There is no point in recalculating from scratch the total number of pages
+>> in all memslots each time a memslot is created or deleted.
+>>
+>> Just cache the value and update it accordingly on each such operation so
+>> the code doesn't need to traverse the whole memslot array each time.
+>>
+>> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+>> ---
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index 5bd550eaf683..8c7738b75393 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -11112,9 +11112,21 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+>>   				const struct kvm_memory_slot *new,
+>>   				enum kvm_mr_change change)
+>>   {
+>> -	if (!kvm->arch.n_requested_mmu_pages)
+>> -		kvm_mmu_change_mmu_pages(kvm,
+>> -				kvm_mmu_calculate_default_mmu_pages(kvm));
+>> +	if (change == KVM_MR_CREATE)
+>> +		kvm->arch.n_memslots_pages += new->npages;
+>> +	else if (change == KVM_MR_DELETE) {
+>> +		WARN_ON(kvm->arch.n_memslots_pages < old->npages);
+> 
+> Heh, so I think this WARN can be triggered at will by userspace on 32-bit KVM by
+> causing the running count to wrap.  KVM artificially caps the size of a single
+> memslot at ((1UL << 31) - 1), but userspace could create multiple gigantic slots
+> to overflow arch.n_memslots_pages.
+> 
+> I _think_ changing it to a u64 would fix the problem since KVM forbids overlapping
+> memslots in the GPA space.
 
-On 2021/4/11 19:12, Eric Auger wrote:
-> Implement domain-selective, pasid selective and page-selective
-> IOTLB invalidations.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->
-> ---
-> v4 -> v15:
-> - remove the redundant arm_smmu_cmdq_issue_sync(smmu)
->    in IOMMU_INV_GRANU_ADDR case (Zenghui)
-> - if RIL is not supported by the host, make sure the granule_size
->    that is passed by the userspace is supported or fix it
->    (Chenxiang)
->
-> v13 -> v14:
-> - Add domain invalidation
-> - do global inval when asid is not provided with addr
->    granularity
->
-> v7 -> v8:
-> - ASID based invalidation using iommu_inv_pasid_info
-> - check ARCHID/PASID flags in addr based invalidation
-> - use __arm_smmu_tlb_inv_context and __arm_smmu_tlb_inv_range_nosync
->
-> v6 -> v7
-> - check the uapi version
->
-> v3 -> v4:
-> - adapt to changes in the uapi
-> - add support for leaf parameter
-> - do not use arm_smmu_tlb_inv_range_nosync or arm_smmu_tlb_inv_context
->    anymore
->
-> v2 -> v3:
-> - replace __arm_smmu_tlb_sync by arm_smmu_cmdq_issue_sync
->
-> v1 -> v2:
-> - properly pass the asid
-> ---
->   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 89 +++++++++++++++++++++
->   1 file changed, 89 insertions(+)
->
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index 56a301fbe75a..bfc112cc0d38 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -2961,6 +2961,94 @@ static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
->   	mutex_unlock(&smmu_domain->init_mutex);
->   }
->   
-> +static int
-> +arm_smmu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
-> +			  struct iommu_cache_invalidate_info *inv_info)
-> +{
-> +	struct arm_smmu_cmdq_ent cmd = {.opcode = CMDQ_OP_TLBI_NSNH_ALL};
-> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-> +	struct arm_smmu_device *smmu = smmu_domain->smmu;
-> +
-> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-> +		return -EINVAL;
-> +
-> +	if (!smmu)
-> +		return -EINVAL;
-> +
-> +	if (inv_info->version != IOMMU_CACHE_INVALIDATE_INFO_VERSION_1)
-> +		return -EINVAL;
-> +
-> +	if (inv_info->cache & IOMMU_CACHE_INV_TYPE_PASID ||
-> +	    inv_info->cache & IOMMU_CACHE_INV_TYPE_DEV_IOTLB) {
-> +		return -ENOENT;
-> +	}
-> +
-> +	if (!(inv_info->cache & IOMMU_CACHE_INV_TYPE_IOTLB))
-> +		return -EINVAL;
-> +
-> +	/* IOTLB invalidation */
-> +
-> +	switch (inv_info->granularity) {
-> +	case IOMMU_INV_GRANU_PASID:
-> +	{
-> +		struct iommu_inv_pasid_info *info =
-> +			&inv_info->granu.pasid_info;
-> +
-> +		if (info->flags & IOMMU_INV_ADDR_FLAGS_PASID)
-> +			return -ENOENT;
-> +		if (!(info->flags & IOMMU_INV_PASID_FLAGS_ARCHID))
-> +			return -EINVAL;
-> +
-> +		__arm_smmu_tlb_inv_context(smmu_domain, info->archid);
-> +		return 0;
-> +	}
-> +	case IOMMU_INV_GRANU_ADDR:
-> +	{
-> +		struct iommu_inv_addr_info *info = &inv_info->granu.addr_info;
-> +		size_t granule_size  = info->granule_size;
-> +		size_t size = info->nb_granules * info->granule_size;
-> +		bool leaf = info->flags & IOMMU_INV_ADDR_FLAGS_LEAF;
-> +		int tg;
-> +
-> +		if (info->flags & IOMMU_INV_ADDR_FLAGS_PASID)
-> +			return -ENOENT;
-> +
-> +		if (!(info->flags & IOMMU_INV_ADDR_FLAGS_ARCHID))
-> +			break;
-> +
-> +		tg = __ffs(granule_size);
-> +		if (granule_size & ~(1 << tg))
-> +			return -EINVAL;
-> +		/*
-> +		 * When RIL is not supported, make sure the granule size that is
-> +		 * passed is supported. In RIL mode, this is enforced in
-> +		 * __arm_smmu_tlb_inv_range()
-> +		 */
-> +		if (!(smmu->features & ARM_SMMU_FEAT_RANGE_INV) &&
-> +		    !(granule_size & smmu_domain->domain.pgsize_bitmap)) {
-> +			tg = __ffs(smmu_domain->domain.pgsize_bitmap);
-> +			granule_size = 1 << tg;
-> +			size = size >> tg;
-> +		}
-> +
-> +		arm_smmu_tlb_inv_range_domain(info->addr, size,
-> +					      granule_size, leaf,
-> +					      info->archid, smmu_domain);
-I encountered some errors when I tested the SMMU nested mode.
+You are right, n_memslots_pages needs to be u64 so it does not overflow
+on 32-bit KVM.
 
-Test scenario description:
-guest kernel: 4KB translation granule
-host kernel: 16KB translation granule
+The memslot count is limited to 32k in each of 2 address spaces, so in
+the worst case the variable should hold 15-bits + 1 bit + 31-bits = 47 bit number.
 
-errors:
-1. encountered an endless loop in __arm_smmu_tlb_inv_range because
-num_pages is 0
-2. encountered CERROR_ILL because the fields of TLB invalidation
-command are as follow: TG = 2, NUM = 0, SCALE = 0, TTL = 0. The
-combination is exactly the kind of reserved combination pointed
-out in the SMMUv3 spec(page 143-144, version D.a)
+> Also, what about moving the check-and-WARN to prepare_memory_region() so that
+> KVM can error out if the check fails?  Doesn't really matter, but an explicit
+> error for userspace is preferable to underflowing the number of pages and getting
+> weird MMU errors/behavior down the line.
 
-According to my analysis, we should do a bit more validation on the
-'size' and 'granule_size' when SMMU supports RIL:
-1. Align 'size' with the smallest granule size supported by SMMU upwards.
-2. If the granule size isn't supported by SMMU, we set it to the smallest
-granule size supported by SMMU
+In principle this seems like a possibility, however, it is a more
+regression-risky option, in case something has (perhaps unintentionally)
+relied on the fact that kvm_mmu_zap_oldest_mmu_pages() call from
+kvm_mmu_change_mmu_pages() was being done only in the memslot commit
+function.
 
-I sent two patches to fix them in the  __arm_smmu_tlb_inv_range(). [1]
-(These patches may better explain what I want to express.)
-According to the reply, it seems that it is more appropriate to modify here.
+>> +		kvm->arch.n_memslots_pages -= old->npages;
+>> +	}
+>> +
+>> +	if (!kvm->arch.n_requested_mmu_pages) {
+> 
+> If we're going to bother caching the number of pages then we should also skip
+> the update when the number pages isn't changing, e.g.
+> 
+> 	if (change == KVM_MR_CREATE || change == KVM_MR_DELETE) {
+> 		if (change == KVM_MR_CREATE)
+> 			kvm->arch.n_memslots_pages += new->npages;
+> 		else
+> 			kvm->arch.n_memslots_pages -= old->npages;
+> 
+> 		if (!kvm->arch.n_requested_mmu_pages) {
+> 			unsigned long nr_mmu_pages;
+> 
+> 			nr_mmu_pages = kvm->arch.n_memslots_pages *
+> 				       KVM_PERMILLE_MMU_PAGES / 1000;
+> 			nr_mmu_pages = max(nr_mmu_pages, KVM_MIN_ALLOC_MMU_PAGES);
+> 			kvm_mmu_change_mmu_pages(kvm, nr_mmu_pages);
+> 		}
+> 	}
+
+The old code did it that way (unconditionally) and, as in the case above,
+I didn't want to risk an regression.
+If we are going to change this fact then I think it should happen in a
+separate patch.
 
 Thanks,
-Kunkun Jiang
-
-[1] [RFC PATCH v1 0/2] iommu/arm-smmu-v3: Add some parameter check in 
-__arm_smmu_tlb_inv_range()
-https://lore.kernel.org/linux-iommu/20210519094307.3275-1-jiangkunkun@huawei.com/
-> +		return 0;
-> +	}
-> +	case IOMMU_INV_GRANU_DOMAIN:
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	/* Global S1 invalidation */
-> +	cmd.tlbi.vmid   = smmu_domain->s2_cfg.vmid;
-> +	arm_smmu_cmdq_issue_cmd(smmu, &cmd);
-> +	arm_smmu_cmdq_issue_sync(smmu);
-> +	return 0;
-> +}
-> +
->   static bool arm_smmu_dev_has_feature(struct device *dev,
->   				     enum iommu_dev_features feat)
->   {
-> @@ -3060,6 +3148,7 @@ static struct iommu_ops arm_smmu_ops = {
->   	.put_resv_regions	= generic_iommu_put_resv_regions,
->   	.attach_pasid_table	= arm_smmu_attach_pasid_table,
->   	.detach_pasid_table	= arm_smmu_detach_pasid_table,
-> +	.cache_invalidate	= arm_smmu_cache_invalidate,
->   	.dev_has_feat		= arm_smmu_dev_has_feature,
->   	.dev_feat_enabled	= arm_smmu_dev_feature_enabled,
->   	.dev_enable_feat	= arm_smmu_dev_enable_feature,
-
-
+Maciej
