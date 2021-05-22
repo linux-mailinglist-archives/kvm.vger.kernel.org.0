@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C3AE438D249
-	for <lists+kvm@lfdr.de>; Sat, 22 May 2021 02:19:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1F5F38D24D
+	for <lists+kvm@lfdr.de>; Sat, 22 May 2021 02:19:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230259AbhEVAUc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 May 2021 20:20:32 -0400
-Received: from mga11.intel.com ([192.55.52.93]:50278 "EHLO mga11.intel.com"
+        id S230333AbhEVAUi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 May 2021 20:20:38 -0400
+Received: from mga18.intel.com ([134.134.136.126]:45223 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230184AbhEVAUc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 May 2021 20:20:32 -0400
-IronPort-SDR: O4IurjhamkGVBePUVJrcaIYCpOcrKpnen5Z6no/i7VmWQWeSN4CmkpIlM4KMvievDcAU1LCzwG
- Sersn6L+RXgw==
-X-IronPort-AV: E=McAfee;i="6200,9189,9991"; a="198518509"
+        id S230184AbhEVAUh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 May 2021 20:20:37 -0400
+IronPort-SDR: CDvn45KaIoVZ0cTkJr7XBoTX/rMHsn8aO5iU9iA/p/dUptrvyFxGsde0K9ii3n7fSaALnPmZU6
+ +wUQ6/SKp1mQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,9991"; a="188993167"
 X-IronPort-AV: E=Sophos;i="5.82,319,1613462400"; 
-   d="scan'208";a="198518509"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2021 17:19:06 -0700
-IronPort-SDR: lRGVHu3sDlfwO3wRUqFV/IkYVxGdkDnHLbDW/K2U4lgsvy2OYcsmkJ9Wy0fmfsFp7aWZO+8D5C
- XdfWraZxsFZA==
+   d="scan'208";a="188993167"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2021 17:19:12 -0700
+IronPort-SDR: zZ+iUC64phyt/rw0hFaqJh+6G3ZXR3oR0KbwjR+LvOXv/oVm4IuMs1jjWaW5eKgqwrqqZEEqhB
+ J/KZhLW1Tq5g==
 X-IronPort-AV: E=Sophos;i="5.82,319,1613462400"; 
-   d="scan'208";a="434499755"
+   d="scan'208";a="474752627"
 Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2021 17:19:05 -0700
-Subject: [PATCH v6 00/20] Add VFIO mediated device support and DEV-MSI support
- for the idxd driver
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2021 17:19:11 -0700
+Subject: [PATCH v6 01/20] vfio/mdev: idxd: add theory of operation
+ documentation for idxd mdev
 From:   Dave Jiang <dave.jiang@intel.com>
 To:     alex.williamson@redhat.com, kwankhede@nvidia.com,
         tglx@linutronix.de, vkoul@kernel.org, jgg@mellanox.com
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, megha.dey@intel.com,
-        jacob.jun.pan@intel.com, ashok.raj@intel.com, yi.l.liu@intel.com,
-        baolu.lu@intel.com, kevin.tian@intel.com, sanjay.k.kumar@intel.com,
-        tony.luck@intel.com, dan.j.williams@intel.com,
-        eric.auger@redhat.com, pbonzini@redhat.com,
-        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Date:   Fri, 21 May 2021 17:19:05 -0700
-Message-ID: <162164243591.261970.3439987543338120797.stgit@djiang5-desk3.ch.intel.com>
+Cc:     Ashok Raj <ashok.raj@intel.com>, Kevin Tian <kevin.tian@intel.com>,
+        megha.dey@intel.com, jacob.jun.pan@intel.com, ashok.raj@intel.com,
+        yi.l.liu@intel.com, baolu.lu@intel.com, kevin.tian@intel.com,
+        sanjay.k.kumar@intel.com, tony.luck@intel.com,
+        dan.j.williams@intel.com, eric.auger@redhat.com,
+        pbonzini@redhat.com, dmaengine@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Date:   Fri, 21 May 2021 17:19:11 -0700
+Message-ID: <162164275148.261970.30424337261509487.stgit@djiang5-desk3.ch.intel.com>
+In-Reply-To: <162164243591.261970.3439987543338120797.stgit@djiang5-desk3.ch.intel.com>
+References: <162164243591.261970.3439987543338120797.stgit@djiang5-desk3.ch.intel.com>
 User-Agent: StGit/0.23-29-ga622f1
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -48,238 +48,420 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The series is rebased on top of Jason's VFIO refactoring collection:
-https://github.com/jgunthorpe/linux/pull/3
+Add idxd vfio mediated device theory of operation documentation.
+Provide description on mdev design, usage, and why vfio mdev was chosen.
 
-We would like to receive review comments with respect to the mdev driver itself
-and the common VFIO IMS support code that was suggested by Jason. The previous
-version of the DEV-MSI/IMS code is still under review and also the IOASID code
-is under design.
-
-v6:
-- Rebased on top of Jason's recent VFIO refactoring.
-- Move VFIO IMS setup code to common (Jason)
-- Changed patch ordering to minimize code stubs (Jason)
-
-v5:
-- Split out non driver IMS code to its own series.
-- Removed common devsec code, Bjorn asked to deal with it post 5.11 and keep
-custom code for now.
-- Reworked irq_entries for IMS so emulated vector is also included.
-- Reworked vidxd_send_interrupt() to take irq_entry directly (data ready for
-consumption) (Thomas)
-- Removed pointer to msi_entry in irq_entries (Thomas)
-- Removed irq_domain check on free entries (Thomas)
-- Split out irqbypass management code (Thomas)
-- Fix EXPORT_SYMBOL to EXPORT_SYMBOL_GPL (Thomas)
-
-v4:
-dev-msi:
-- Make interrupt remapping code more readable (Thomas)
-- Add flush writes to unmask/write and reset ims slots (Thomas)
-- Interrupt Message Storm-> Interrupt Message Store (Thomas)
-- Merge in pasid programming code. (Thomas)
-
-mdev:
-- Fixed up domain assignment (Thomas)
-- Define magic numbers (Thomas)
-- Move siov detection code to PCI common (Thomas)
-- Remove duplicated MSI entry info (Thomas)
-- Convert code to use ims_slot (Thomas)
-- Add explanation of pasid programming for IMS entry (Thomas)
-- Add release int handle release support due to spec 1.1 update.
-
-v3:
-Dev-msi:
-- No need to add support for 2 different dev-msi irq domains, a common
-once can be used for both the cases(with IR enabled/disabled)
-- Add arch specific function to specify additions to msi_prepare callback
-instead of making the callback a weak function
-- Call platform ops directly instead of a wrapper function
-- Make mask/unmask callbacks as void functions
-dev->msi_domain should be updated at the device driver level before
-calling dev_msi_alloc_irqs()
-dev_msi_alloc/free_irqs() cannot be used for PCI devices
-Followed the generic layering scheme: infrastructure bits->arch
-bits->enabling bits
-
-Mdev:
-- Remove set kvm group notifier (Yan Zhao)
-- Fix VFIO irq trigger removal (Yan Zhao)
-- Add mmio read flush to ims mask (Jason)
-
-v2:
-IMS (now dev-msi):
-- With recommendations from Jason/Thomas/Dan on making IMS more generic:
-- Pass a non-pci generic device(struct device) for IMS management instead of
-mdev
-- Remove all references to mdev and symbol_get/put
-- Remove all references to IMS in common code and replace with dev-msi
-- Remove dynamic allocation of platform-msi interrupts: no groups,no
-new msi list or list helpers
-- Create a generic dev-msi domain with and without interrupt remapping
-enabled.
-- Introduce dev_msi_domain_alloc_irqs and dev_msi_domain_free_irqs apis
-
-mdev:
-- Removing unrelated bits from SVA enabling that’s not necessary for
-the submission. (Kevin)
-- Restructured entire mdev driver series to make reviewing easier (Kevin)
-- Made rw emulation more robust (Kevin)
-- Removed uuid wq type and added single dedicated wq type (Kevin)
-- Locking fixes for vdev (Yan Zhao)
-- VFIO MSIX trigger fixes (Yan Zhao)
-
-This code series will match the support of the 5.6 kernel (stage 1) driver
-but on guest.
-
-The code has dependency on DEV_MSI/IMS enabling code:
-https://lore.kernel.org/lkml/1614370277-23235-1-git-send-email-megha.dey@intel.com/
-
-The code has dependency on idxd driver sub-driver cleanup series:
-https://lore.kernel.org/dmaengine/162163546245.260470.18336189072934823712.stgit@djiang5-desk3.ch.intel.com/T/#t
-
-The code has dependency on Jason's VFIO refactoring:
-https://lore.kernel.org/kvm/0-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com/
-
-Part 1 of the driver has been accepted in v5.6 kernel. It supports dedicated
-workqueue (wq) without Shared Virtual Memory (SVM) support.
-
-Part 2 of the driver supports shared wq and SVM and has been accepted in
-kernel v5.11.
-
-VFIO mediated device framework allows vendor drivers to wrap a portion of
-device resources into virtual devices (mdev). Each mdev can be assigned
-to different guest using the same set of VFIO uAPIs as assigning a
-physical device. Accessing to the mdev resource is served with mixed
-policies. For example, vendor drivers typically mark data-path interface
-as pass-through for fast guest operations, and then trap-and-mediate the
-control-path interface to avoid undesired interference between mdevs. Some
-level of emulation is necessary behind vfio mdev to compose the virtual
-device interface.
-
-This series brings mdev to idxd driver to enable Intel Scalable IOV
-(SIOV), a hardware-assisted mediated pass-through technology. SIOV makes
-each DSA wq independently assignable through PASID-granular resource/DMA
-isolation. It helps improve scalability and reduces mediation complexity
-against purely software-based mdev implementations. Each assigned wq is
-configured by host and exposed to the guest in a read-only configuration
-mode, which allows the guest to use the wq w/o additional setup. This
-design greatly reduces the emulation bits to focus on handling commands
-from guests.
-
-There are two possible avenues to support virtual device composition:
-1. VFIO mediated device (mdev) or 2. User space DMA through char device
-(or UACCE). Given the small portion of emulation to satisfy our needs
-and VFIO mdev having the infrastructure already to support the device
-passthrough, we feel that VFIO mdev is the better route. For more in depth
-explanation, see documentation in Documents/driver-api/vfio/mdev-idxd.rst.
-
-Introducing mdev types “1dwq-v1” type. This mdev type allows
-allocation of a single dedicated wq from available dedicated wqs. After
-a workqueue (wq) is enabled, the user will generate an uuid. On mdev
-creation, the mdev driver code will find a dwq depending on the mdev
-type. When the create operation is successful, the user generated uuid
-can be passed to qemu. When the guest boots up, it should discover a
-DSA device when doing PCI discovery.
-
-For example of “1dwq-v1” type:
-1. Enable wq with “mdev” wq type
-2. A user generated uuid.
-3. The uuid is written to the mdev class sysfs path:
-echo $UUID > /sys/class/mdev_bus/0000\:00\:0a.0/mdev_supported_types/idxd-1dwq-v1/create
-4. Pass the following parameter to qemu:
-"-device vfio-pci,sysfsdev=/sys/bus/pci/devices/0000:00:0a.0/$UUID"
-
-The wq exported through mdev will have the read only config bit set
-for configuration. This means that the device does not require the
-typical configuration. After enabling the device, the user must set the
-WQ type and name. That is all is necessary to enable the WQ and start
-using it. The single wq configuration is not the only way to create the
-mdev. Multi wqs support for mdev will be in the future works.
-
-The mdev utilizes Interrupt Message Store or IMS[3], a device-specific
-MSI implementation, instead of MSIX for interrupts for the guest. This
-preserves MSIX for host usages and also allows a significantly larger
-number of interrupt vectors for guest usage.
-
-The idxd driver implements IMS as on-device memory mapped unified
-storage. Each interrupt message is stored as a DWORD size data payload
-and a 64-bit address (same as MSI-X). Access to the IMS is through the
-host idxd driver.
-
-The idxd driver makes use of the generic IMS irq chip and domain which
-stores the interrupt messages as an array in device memory. Allocation and
-freeing of interrupts happens via the generic msi_domain_alloc/free_irqs()
-interface. One only needs to ensure the interrupt domain is stored in
-the underlying device struct.
-
-The kernel tree can be found at [7].
-
-[1]: https://lore.kernel.org/lkml/157965011794.73301.15960052071729101309.stgit@djiang5-desk3.ch.intel.com/
-[2]: https://software.intel.com/en-us/articles/intel-sdm
-[3]: https://software.intel.com/en-us/download/intel-scalable-io-virtualization-technical-specification
-[4]: https://software.intel.com/en-us/download/intel-data-streaming-accelerator-preliminary-architecture-specification
-[5]: https://01.org/blogs/2019/introducing-intel-data-streaming-accelerator
-[6]: https://intel.github.io/idxd/
-[7]: https://github.com/intel/idxd-driver idxd-stage2.5
-
+Reviewed-by: Ashok Raj <ashok.raj@intel.com>
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+Signed-off-by: Dave Jiang <dave.jiang@intel.com>
 ---
+ Documentation/driver-api/vfio/mdev-idxd.rst |  379 +++++++++++++++++++++++++++
+ MAINTAINERS                                 |    7 
+ 2 files changed, 386 insertions(+)
+ create mode 100644 Documentation/driver-api/vfio/mdev-idxd.rst
 
-Dave Jiang (20):
-      vfio/mdev: idxd: add theory of operation documentation for idxd mdev
-      dmaengine: idxd: add external module driver support for dsa_bus_type
-      dmaengine: idxd: add IMS offset and size retrieval code
-      dmaengine: idxd: add portal offset for IMS portals
-      vfio: mdev: common lib code for setting up Interrupt Message Store
-      vfio/mdev: idxd: add PCI config for read/write for mdev
-      vfio/mdev: idxd: Add administrative commands emulation for mdev
-      vfio/mdev: idxd: Add mdev device context initialization
-      vfio/mdev: Add mmio read/write support for mdev
-      vfio/mdev: idxd: add mdev type as a new wq type
-      vfio/mdev: idxd: Add basic driver setup for idxd mdev
-      vfio: move VFIO PCI macros to common header
-      vfio/mdev: idxd: add mdev driver registration and helper functions
-      vfio/mdev: idxd: add 1dwq-v1 mdev type
-      vfio/mdev: idxd: ims domain setup for the vdcm
-      vfio/mdev: idxd: add new wq state for mdev
-      vfio/mdev: idxd: add error notification from host driver to mediated device
-      vfio: move vfio_pci_set_ctx_trigger_single to common code
-      vfio: mdev: Add device request interface
-      vfio/mdev: idxd: setup request interrupt
+diff --git a/Documentation/driver-api/vfio/mdev-idxd.rst b/Documentation/driver-api/vfio/mdev-idxd.rst
+new file mode 100644
+index 000000000000..5c793638e176
+--- /dev/null
++++ b/Documentation/driver-api/vfio/mdev-idxd.rst
+@@ -0,0 +1,379 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++=============
++IDXD Overview
++=============
++IDXD (Intel Data Accelerator Driver) is the driver for the Intel Data
++Streaming Accelerator (DSA).  Intel DSA is a high performance data copy
++and transformation accelerator. In addition to data move operations,
++the device also supports data fill, CRC generation, Data Integrity Field
++(DIF), and memory compare and delta generation. Intel DSA supports
++a variety of PCI-SIG defined capabilities such as Address Translation
++Services (ATS), Process address Space ID (PASID), Page Request Interface
++(PRI), Message Signalled Interrupts Extended (MSI-X), and Advanced Error
++Reporting (AER). Some of those capabilities enable the device to support
++Shared Virtual Memory (SVM), or also known as Shared Virtual Addressing
++(SVA). Intel DSA also supports Intel Scalable I/O Virtualization (SIOV)
++to improve scalability of device assignment.
++
++
++The Intel DSA device contains the following basic components:
++* Work queue (WQ)
++
++  A WQ is an on device storage to queue descriptors to the
++  device. Requests are added to a WQ by using new CPU instructions
++  (MOVDIR64B and ENQCMD(S)) to write the memory mapped “portal”
++  associated with each WQ.
++
++* Engine
++
++  Operation unit that pulls descriptors from WQs and processes them.
++
++* Group
++
++  Abstract container to associate one or more engines with one or more WQs.
++
++
++Two types of WQs are supported:
++* Dedicated WQ (DWQ)
++
++  Usually a single client owns this exclusively and can submit work
++  to it. The MOVDIR64B instruction is used to submit descriptors to
++  this type of WQ. The instruction is a posted write, therefore the
++  submitter must ensure not exceed the WQ length for submission. The
++  use of PASID is optional with DWQ. Multiple clients can submit to
++  a DWQ, but sychronization is required due to when the WQ is full,
++  the submission is silently dropped.
++
++* Shared WQ (SWQ)
++
++  Multiple clients can submit work to this WQ. The submitter must use
++  ENQMCDS (from supervisor mode) or ENQCMD (from user mode). These
++  instructions are non-posted writes. That means a response is
++  expected from the issued instruction. The EFLAGS.ZF bit will be set
++  when a failure (busy or fail) has occurred from the command.
++  The use of PASID is mandatory to identify the address space
++  of each client.
++
++
++For more information about the new instructions [1][2].
++
++The IDXD driver is broken down into following usages:
++* In kernel interface through dmaengine subsystem API.
++* Userspace DMA support through character device. mmap(2) is utilized
++  to map directly to mmio address (or portals) for descriptor submission.
++* VFIO Mediated device (mdev) supporting device passthrough usages.
++
++This document is only for the mdev usage.
++
++
++=================================
++Assignable Device Interface (ADI)
++=================================
++The term ADI is used to represent the minimal unit of assignment for
++Intel Scalable IOV device. Each ADI instance refers to the set of device
++backend resources that are allocated, configured and organized as an
++isolated unit.
++
++Intel DSA defines each WQ as an ADI. The MMIO registers of each work queue
++are partitioned into two categories:
++* MMIO registers accessed for data-path operations.
++* MMIO registers accessed for control-path operations.
++
++Data-path MMIO registers of each WQ are contained within
++one or more system page size aligned regions and can be mapped in the
++CPU page table for direct access from the guest. Control-path MMIO
++registers of all WQs are located together but segregated from data-path
++MMIO regions. Therefore, guest updates to control-path registers must
++be intercepted and then go through the host driver to be reflected in
++the device.
++
++Data-path MMIO registers of DSA WQ are portals for submitting descriptors
++to the device. There are four portals per WQ, each being 64 bytes
++in size and located on a separate 4KB page in BAR2. Each portal has
++different implications regarding interrupt message type (MSI vs. IMS)
++and occupancy control (limited vs. unlimited). It is not necessary to
++map all portals to the guest.
++
++Control-path MMIO registers of DSA WQ include global configurations
++(shared by all WQs) and WQ-specific configurations. The owner
++(e.g. the guest) of the WQ is expected to only change WQ-specific
++configurations. Intel DSA spec introduces a “Configuration Support”
++capability which, if cleared, indicates that some fields of WQ
++configuration registers are read-only thus pre-configured by the host.
++
++
++Interrupt Message Store (IMS)
++-----------------------------
++The ADI utilizes Interrupt Message Store (IMS), a device-specific MSI
++implementation, instead of MSIX for interrupts for the guest. This
++preserves MSIX for host usages and also allows a significantly larger
++number of interrupt vectors for large number of guests usage.
++
++Intel DSA device implements IMS as on-device memory mapped unified
++storage. Each interrupt message is stored as a DWORD size data payload
++and a 64-bit address (same as MSI-X). Access to the IMS is through the
++host idxd driver.
++
++
++ADI Isolation
++-------------
++Operations or functioning of one ADI must not affect the functioning
++of another ADI or the physical device. Upstream memory requests from
++different ADIs are distinguished using a Process Address Space Identifier
++(PASID). With the support of PASID-granular address translation in Intel
++VT-d, the address space targeted by a request from ADI can be a Host
++Virtual Address (HVA), Host I/O Virtual Address (HIOVA), Guest Physical
++Address (GPA), Guest Virtual Address (GVA), Guest I/O Virtual Address
++(GIOVA), etc. The PASID identity for an ADI is expected to be accessed
++or modified by privileged software through the host driver.
++
++=========================
++Virtual DSA (vDSA) Device
++=========================
++The DSA WQ itself is not a PCI device thus must be composed into a
++virtual DSA device to the guest.
++
++The composition logic needs to handle four main requirements:
++* Emulate PCI config space.
++* Map data-path portals for direct access from the guest.
++* Emulate control-path MMIO registers and selectively forward WQ
++  configuration requests through host driver to the device.
++* Forward and emulate WQ interrupts to the guest.
++
++The composition logic tells the guest which aspects of WQ are configurable
++through a combination of capability fields, e.g.:
++* Configuration Support (if cleared, most aspects are not modifiable).
++* WQ Mode Support (if cleared, cannot change between dedicated and
++  shared mode).
++* Dedicated Mode Support.
++* Shared Mode Support.
++* ...
++
++The virtual capability fields are set according to the vDSA
++type. Following is an example of vDSA types and related WQ configurability:
++* Type ‘1dwq-v1’
++   * One DSA gen1 dedicated WQ
++   * Guest cannot share the WQ between its clients (no guest SVA)
++   * Guest cannot change any WQ configuration
++
++Besides, the composition logic also needs to serve administrative commands
++(thru virtual CMD register) through host driver, including:
++* Drain/abort all descriptors submitted by this guest.
++* Drain/abort descriptors associated with a PASID.
++* Enable/disable/reset the WQ (when it’s not shared by multiple VMs).
++* Request interrupt handle.
++
++With this design, vDSA emulation is **greatly simplified**. Only limited
++configurability is handled with most registers emulated in simple
++READ-ONLY flavor.
++
++=======================================
++Mdev Framework Registration and Release
++=======================================
++
++Intel DSA reports support for Intel Scalable IOV via a PCI Express
++Designated Vendor Specific Extended Capability (DVSEC). In addition,
++PASID-granular address translation capability is required in the
++IOMMU. During host initialization, the IDXD driver should check the
++presence of both capabilities before calling mdev_register_device()
++to register with the VFIO mdev framework and provide a set of ops
++(struct vfio_device_ops). The IOMMU capability is indicated by the
++IOMMU_DEV_FEAT_AUX feature flag with iommu_dev_has_feature() and enabled
++with iommu_dev_enable_feature().
++
++On release, iommu_dev_disable_feature() is called after
++mdev_unregister_device() to disable the IOMMU_DEV_FEAT_AUX flag that
++the driver enabled during host initialization.
++
++The vfio_device_ops data structure is filled out by the driver to provide
++a number of ops called by VFIO core::
++
++        struct vfio_device_ops {
++                .open
++                .release
++                .read
++                .write
++                .mmap
++                .ioctl
++        };
++
++The mdev driver provides supported type group attributes. It also
++registers the mdev driver with probe and remove calls::
++
++        struct mdev_driver {
++                .probe
++                .remove
++                .supported_type_groups
++        };
++
++
++Supported_type_groups
++---------------------
++At the moment only one vDSA type is supported.
++
++“1dwq-v1”:
++  Single dedicated WQ (DSA 1.0) with read-only configuration exposed to
++  the guest. On the guest kernel, a vDSA device shows up with a single
++  WQ that is pre-configured by the host. The configuration for the WQ
++  is entirely read-only and cannot be reconfigured. There is no support
++  of guest SVA on this WQ.
++
++  PCI MSI-X vectors are surfaced from the mdev device to the guest kernel.
++  In the current implementation 2 vectors are supported. Vector 0 is used for
++  device misc operations (admin command completion, error report, etc.) just
++  like on the host. Vector 1 is used for descriptor completion. The vector 0
++  is emulated by the host driver. The second interrupt vector is backed by
++  an IMS vector on the host.
++
++probe
++------
++API function to create the mdev. mdev_set_iommu_device() is called to
++associate the mdev device to the parent PCI device. This function is
++where the driver sets up and initializes the resources to support a single
++mdev device. vfio_init_group_dev() and vfio_register_group_dev() are called
++in order to associate the 'struct vfio_device' with the 'struct device' from
++the mdev and the vfio_device_ops.
++
++remove
++------
++API function that mirrors the create() function and releases all the
++resources backing the mdev.  vfio_unregister_group_dev() is called.
++
++open
++----
++API function that is called down from VFIO userspace when it is ready to claim
++and utilize the mdev.
++
++release
++-------
++The mirror function to open that releases the mdev by VFIO userspace.
++
++read / write
++------------
++This is where the Intel IDXD driver provides read/write emulation of
++the "slow" path of the mdev, including PCI config space and control-path
++MMIO registers. Typically configuration and administrative commands go
++through this path. This allows the mdev to show up as a virtual PCI
++device in the guest kernel.
++
++The emulation of PCI config space is nothing special, which is simply
++copied from kvmgt. In the future this part might be consolidated to
++reduce duplication.
++
++Emulating MMIO reads are simply memory copies. There is no side-effect
++to be emulated upon guest read.
++
++Emulating MMIO writes are required only for a few registers, due to
++read-only configuration on the ‘1dwq-v1’ type. Majority of composition
++logic is hooked in the CMD register for performing administrative commands
++such as WQ drain, abort, enable, disable and reset operations. The rest of
++the emulation is about handling errors (GENCTRL/SWERROR) and interrupts
++(INTCAUSE/MSIXPERM) on the vDSA device. Future mdev types might allow
++limited WQ configurability, which then requires additional emulation of
++the WQCFG register.
++
++mmap
++----
++This is the function that provides the setup to expose a portion of the
++hardware, also known as portals, for direct access for “fast” path
++operations through the mmap() syscall. A limited region of the hardware
++is mapped to the guest for direct I/O submission.
++
++There are four portals per WQ: unlimited MSI-X, limited MSI-X, unlimited
++IMS, limited IMS.  Descriptors submitted to limited portals are subject
++to threshold configuration limitations for shared WQs. The MSI-X portals
++are used for host submissions, and the IMS portals are mapped to vm for
++guest submission. The host driver provides IMS portal through the mmap
++function to be mapped to the user space in order to expose it directly
++to the guest kernel.
++
++ioctl
++-----
++This API function does several things
++* Provides general device information to VFIO userspace.
++* Provides device region information (PCI, mmio, etc).
++* Get interrupts information
++* Setup interrupts for the mediated device.
++* Mdev device reset
++
++The PCI device presented by VFIO to the guest kernel will show that it
++supports MSIX vectors. The Intel idxd driver will support two vectors
++per mdev to back those MSIX vectors. The first vector is emulated by
++the host driver via eventfd in order to support various non I/O operations just
++like the actual device. The second vector is backed by IMS. IMS provides
++additional interrupt vectors on the device outside of PCI MSIX specification
++in order to support significantly more vectors. Eventfd is also used by
++the second vector to notify the guest kernel. However irq bypass manager is
++used to directly inject the interrupt in the guest. When the guest submits
++a descriptor through the IMS portal directly to the device, an IMS interrupt
++is triggered on completion and routed to the guest as an MSIX interrupt.
++
++The idxd driver makes use of the generic IMS irq chip and domain which
++stores the interrupt messages in an array in device memory. Allocation and
++freeing of interrupts happens via the generic msi_domain_alloc/free_irqs()
++interface. Driver only needs to ensure the interrupt domain is stored in
++the underlying device struct.
++
++To allocate IMS, we utilize the IMS array APIs. On host init, we need
++to create the MSI domain::
++
++        struct ims_array_info ims_info;
++        struct device *dev = &pci_dev->dev;
++
++        /* assign the device IMS size */
++        ims_info.max_slots = max_ims_size;
++        /* assign the MMIO base address for the IMS table */
++        ims_info.slots = mmio_base + ims_offset;
++        /* assign the MSI domain to the device */
++        dev->msi_domain = pci_ims_array_create_msi_irq_domain(pci_dev, &ims_info);
++
++When we are ready to allocate the interrupts via the mdev IMS common lib code::
++
++        struct device *dev = &mdev->dev;
++
++        irq_domain = dev_get_msi_domain(dev);
++        /* the irqs are allocated against device of mdev */
++        rc = msi_domain_alloc_irqs(irq_domain, dev, num_vecs);
++
++
++        /* we can retrieve the slot index from msi_entry */
++        irq = dev_msi_irq_vector(dev, vector);
++
++        request_irq(irq, interrupt_handler_function, 0, “ims”, context);
++
++
++The DSA device is structured such that MSI-X table entry 0 is used for
++admin commands completion, error reporting, and other misc commands. The
++remaining MSI-X table entries are used for WQ completion. For vm support,
++the virtual device also presents a similar layout. Therefore, vector 0
++is emulated by the software. Additional vector(s) are associated with IMS.
++
++The index (slot) for the per device IMS entry is managed by the MSI
++core. The index is the “interrupt handle” that the guest kernel
++needs to program into a DMA descriptor. That interrupt handle tells the
++hardware which IMS vector to trigger the interrupt on for the host.
++
++The virtual device presents an admin command called “request interrupt
++handle” that is not supported by the physical device. On probe of
++the DSA device on the guest kernel, the guest driver will issue the
++“request interrupt handle” command in order to get the interrupt
++handle for descriptor programming. The host driver will return the
++assigned slot for the IMS entry table to the guest.
++
++reset
++-----
++
++Device reset is emulated through the mdev. With mdev being a wq rather
++than the whole device, we would not reset the entire device on a reset
++request. The host driver will simulate a reset of the device by
++aborting all the outstanding descriptors on the wq and then disabling
++the wq. All MMIO registers are reset to pre-programmed values.
++
++==========
++References
++==========
++[1] https://software.intel.com/content/www/us/en/develop/download/intel-architecture-instruction-set-extensions-programming-reference.html
++[2] https://software.intel.com/en-us/articles/intel-sdm
++[3] https://software.intel.com/sites/default/files/managed/cc/0e/intel-scalable-io-virtualization-technical-specification.pdf
++[4] https://software.intel.com/en-us/download/intel-data-streaming-accelerator-preliminary-architecture-specification
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 9450e052f1b1..20f91064a4d1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -18878,6 +18878,13 @@ F:	drivers/vfio/mdev/
+ F:	include/linux/mdev.h
+ F:	samples/vfio-mdev/
+ 
++VFIO MEDIATED DEVICE IDXD DRIVER
++M:	Dave Jiang <dave.jiang@intel.com>
++L:	kvm@vger.kernel.org
++S:	Maintained
++F:	Documentation/driver-api/vfio/mdev-idxd.rst
++F:	drivers/vfio/mdev/idxd/
++
+ VFIO PLATFORM DRIVER
+ M:	Eric Auger <eric.auger@redhat.com>
+ L:	kvm@vger.kernel.org
 
-
- .../ABI/stable/sysfs-driver-dma-idxd          |    6 +
- drivers/dma/Kconfig                           |    1 +
- drivers/dma/idxd/Makefile                     |    2 +
- drivers/dma/idxd/cdev.c                       |    4 +-
- drivers/dma/idxd/device.c                     |  102 +-
- drivers/dma/idxd/idxd.h                       |   52 +-
- drivers/dma/idxd/init.c                       |   59 +
- drivers/dma/idxd/irq.c                        |   21 +-
- drivers/dma/idxd/registers.h                  |   25 +-
- drivers/dma/idxd/sysfs.c                      |   22 +
- drivers/vfio/Makefile                         |    2 +-
- drivers/vfio/mdev/Kconfig                     |   21 +
- drivers/vfio/mdev/Makefile                    |    4 +
- drivers/vfio/mdev/idxd/Makefile               |    4 +
- drivers/vfio/mdev/idxd/mdev.c                 |  958 ++++++++++++++++
- drivers/vfio/mdev/idxd/mdev.h                 |  112 ++
- drivers/vfio/mdev/idxd/vdev.c                 | 1016 +++++++++++++++++
- drivers/vfio/mdev/mdev_irqs.c                 |  341 ++++++
- drivers/vfio/pci/vfio_pci_intrs.c             |   63 +-
- drivers/vfio/pci/vfio_pci_private.h           |    6 -
- drivers/vfio/vfio_common.c                    |   74 ++
- include/linux/mdev.h                          |   66 ++
- include/linux/vfio.h                          |   10 +
- include/uapi/linux/idxd.h                     |    2 +
- 24 files changed, 2890 insertions(+), 83 deletions(-)
- create mode 100644 drivers/vfio/mdev/idxd/Makefile
- create mode 100644 drivers/vfio/mdev/idxd/mdev.c
- create mode 100644 drivers/vfio/mdev/idxd/mdev.h
- create mode 100644 drivers/vfio/mdev/idxd/vdev.c
- create mode 100644 drivers/vfio/mdev/mdev_irqs.c
- create mode 100644 drivers/vfio/vfio_common.c
-
---
 
