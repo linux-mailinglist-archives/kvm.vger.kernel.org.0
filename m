@@ -2,30 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EA9E38D253
-	for <lists+kvm@lfdr.de>; Sat, 22 May 2021 02:19:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F74B38D256
+	for <lists+kvm@lfdr.de>; Sat, 22 May 2021 02:19:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230410AbhEVAUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 May 2021 20:20:55 -0400
-Received: from mga14.intel.com ([192.55.52.115]:39645 "EHLO mga14.intel.com"
+        id S230472AbhEVAVC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 May 2021 20:21:02 -0400
+Received: from mga05.intel.com ([192.55.52.43]:23956 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230382AbhEVAUu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 May 2021 20:20:50 -0400
-IronPort-SDR: Q1morS0lcA7UBlWOuN2o8qZpvWByhYgxJCbrrGh6hfa748M++Na94aM99NxKDjK4cUzXiBXoDQ
- GGLSLAGxEEmQ==
-X-IronPort-AV: E=McAfee;i="6200,9189,9991"; a="201312114"
+        id S230429AbhEVAU4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 May 2021 20:20:56 -0400
+IronPort-SDR: GMHoDOlXvgbWADaMrHO0t6GA7zxQMh2NfyyRV5p6TVmBOdui6iXJVzE10GYwLNikAXdPGhqvyo
+ eHtIDpGYPOBQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,9991"; a="287141588"
 X-IronPort-AV: E=Sophos;i="5.82,319,1613462400"; 
-   d="scan'208";a="201312114"
+   d="scan'208";a="287141588"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2021 17:19:25 -0700
-IronPort-SDR: SS8nw179FZK2ypju3HOo8yDQMZGa4TvwCjl2XtqtqE0MprseuOZP3YLsEH01gn5zILEtRFUmyg
- 54HFIk+JupCg==
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2021 17:19:32 -0700
+IronPort-SDR: esG7x3geBjjEJwpaWiErkd74HLovIDMST2CdV6mmZKEub9WlCvtfgIUhggS+y3oTR+f5hRdHj4
+ Ygc5vhS9k3Iw==
 X-IronPort-AV: E=Sophos;i="5.82,319,1613462400"; 
-   d="scan'208";a="406873451"
+   d="scan'208";a="406873535"
 Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2021 17:19:24 -0700
-Subject: [PATCH v6 03/20] dmaengine: idxd: add IMS offset and size retrieval
- code
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2021 17:19:30 -0700
+Subject: [PATCH v6 04/20] dmaengine: idxd: add portal offset for IMS portals
 From:   Dave Jiang <dave.jiang@intel.com>
 To:     alex.williamson@redhat.com, kwankhede@nvidia.com,
         tglx@linutronix.de, vkoul@kernel.org, jgg@mellanox.com
@@ -35,8 +34,8 @@ Cc:     megha.dey@intel.com, jacob.jun.pan@intel.com, ashok.raj@intel.com,
         dan.j.williams@intel.com, eric.auger@redhat.com,
         pbonzini@redhat.com, dmaengine@vger.kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Date:   Fri, 21 May 2021 17:19:24 -0700
-Message-ID: <162164276439.261970.331517339815823049.stgit@djiang5-desk3.ch.intel.com>
+Date:   Fri, 21 May 2021 17:19:30 -0700
+Message-ID: <162164277035.261970.14322823489384216890.stgit@djiang5-desk3.ch.intel.com>
 In-Reply-To: <162164243591.261970.3439987543338120797.stgit@djiang5-desk3.ch.intel.com>
 References: <162164243591.261970.3439987543338120797.stgit@djiang5-desk3.ch.intel.com>
 User-Agent: StGit/0.23-29-ga622f1
@@ -47,113 +46,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add retrieval code for Interrupt Message Store (IMS) related info
-(table offset and size). IMS is used to back the MSIX vectors that
-support the descriptor completion interrupt for the mediated device.
-
-In the SIOV spec [1], IMS is specified as detected via DVSEC. Here's the
-upstream discussion WRT having the device driver doing the detection
-vs a platform detection feature: [2]. The latest agreement is that IMS
-should be done from platform perspective. Given that DSA 1.0 and
-any foreseeable future devices is expected to support IMS, the driver
-will just check the ims size field to determine if IMS is supported.
-
-[1]: https://software.intel.com/en-us/download/intel-scalable-io-virtualization-technical-specification
-[2]: https://lore.kernel.org/dmaengine/20201030224534.GN2620339@nvidia.com/
+Device portal offsets are 4k apart laid out in the order of unlimited
+MSIX portal, limited MSIX portal, unlimited IMS portal, limited IMS
+portal. Add an additional parameter to calculate the IMS portal
+offsets.
 
 Signed-off-by: Dave Jiang <dave.jiang@intel.com>
 ---
- Documentation/ABI/stable/sysfs-driver-dma-idxd |    6 ++++++
- drivers/dma/idxd/idxd.h                        |    2 ++
- drivers/dma/idxd/init.c                        |    4 ++++
- drivers/dma/idxd/sysfs.c                       |    9 +++++++++
- 4 files changed, 21 insertions(+)
+ drivers/dma/idxd/cdev.c   |    4 ++--
+ drivers/dma/idxd/device.c |    2 +-
+ drivers/dma/idxd/idxd.h   |   11 +++--------
+ 3 files changed, 6 insertions(+), 11 deletions(-)
 
-diff --git a/Documentation/ABI/stable/sysfs-driver-dma-idxd b/Documentation/ABI/stable/sysfs-driver-dma-idxd
-index 55285c136cf0..884065b2e85c 100644
---- a/Documentation/ABI/stable/sysfs-driver-dma-idxd
-+++ b/Documentation/ABI/stable/sysfs-driver-dma-idxd
-@@ -129,6 +129,12 @@ KernelVersion:	5.10.0
- Contact:	dmaengine@vger.kernel.org
- Description:	The last executed device administrative command's status/error.
+diff --git a/drivers/dma/idxd/cdev.c b/drivers/dma/idxd/cdev.c
+index e3d29244f752..62a53123fd58 100644
+--- a/drivers/dma/idxd/cdev.c
++++ b/drivers/dma/idxd/cdev.c
+@@ -202,8 +202,8 @@ static int idxd_cdev_mmap(struct file *filp, struct vm_area_struct *vma)
+ 		return rc;
  
-+What:		/sys/bus/dsa/devices/dsa<m>/ims_size
-+Date:		May 3, 2021
-+KernelVersion:	5.14.0
-+Contact:	dmaengine@vger.kernel.org
-+Description:	The total number of vectors available for Interrupt Message Store.
-+
- What:		/sys/bus/dsa/devices/wq<m>.<n>/block_on_fault
- Date:		Oct 27, 2020
- KernelVersion:	5.11.0
+ 	vma->vm_flags |= VM_DONTCOPY;
+-	pfn = (base + idxd_get_wq_portal_full_offset(wq->id,
+-				IDXD_PORTAL_LIMITED)) >> PAGE_SHIFT;
++	pfn = (base + idxd_get_wq_portal_offset(wq->id, IDXD_PORTAL_LIMITED,
++						IDXD_IRQ_MSIX)) >> PAGE_SHIFT;
+ 	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+ 	vma->vm_private_data = ctx;
+ 
+diff --git a/drivers/dma/idxd/device.c b/drivers/dma/idxd/device.c
+index 3549a73fc7db..02e9a050b5bb 100644
+--- a/drivers/dma/idxd/device.c
++++ b/drivers/dma/idxd/device.c
+@@ -300,7 +300,7 @@ int idxd_wq_map_portal(struct idxd_wq *wq)
+ 	resource_size_t start;
+ 
+ 	start = pci_resource_start(pdev, IDXD_WQ_BAR);
+-	start += idxd_get_wq_portal_full_offset(wq->id, IDXD_PORTAL_LIMITED);
++	start += idxd_get_wq_portal_offset(wq->id, IDXD_PORTAL_LIMITED, IDXD_IRQ_MSIX);
+ 
+ 	wq->portal = devm_ioremap(dev, start, IDXD_PORTAL_SIZE);
+ 	if (!wq->portal)
 diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
-index 22afaf7ee637..288e3fe15b3e 100644
+index 288e3fe15b3e..e5b90e6970aa 100644
 --- a/drivers/dma/idxd/idxd.h
 +++ b/drivers/dma/idxd/idxd.h
-@@ -266,6 +266,7 @@ struct idxd_device {
+@@ -459,15 +459,10 @@ enum idxd_interrupt_type {
+ 	IDXD_IRQ_IMS,
+ };
  
- 	int num_groups;
- 
-+	u32 ims_offset;
- 	u32 msix_perm_offset;
- 	u32 wqcfg_offset;
- 	u32 grpcfg_offset;
-@@ -273,6 +274,7 @@ struct idxd_device {
- 
- 	u64 max_xfer_bytes;
- 	u32 max_batch_size;
-+	int ims_size;
- 	int max_groups;
- 	int max_engines;
- 	int max_tokens;
-diff --git a/drivers/dma/idxd/init.c b/drivers/dma/idxd/init.c
-index bed9169152f9..16ff37be2d26 100644
---- a/drivers/dma/idxd/init.c
-+++ b/drivers/dma/idxd/init.c
-@@ -381,6 +381,8 @@ static void idxd_read_table_offsets(struct idxd_device *idxd)
- 	dev_dbg(dev, "IDXD Work Queue Config Offset: %#x\n", idxd->wqcfg_offset);
- 	idxd->msix_perm_offset = offsets.msix_perm * IDXD_TABLE_MULT;
- 	dev_dbg(dev, "IDXD MSIX Permission Offset: %#x\n", idxd->msix_perm_offset);
-+	idxd->ims_offset = offsets.ims * IDXD_TABLE_MULT;
-+	dev_dbg(dev, "IDXD IMS Offset: %#x\n", idxd->ims_offset);
- 	idxd->perfmon_offset = offsets.perfmon * IDXD_TABLE_MULT;
- 	dev_dbg(dev, "IDXD Perfmon Offset: %#x\n", idxd->perfmon_offset);
- }
-@@ -403,6 +405,8 @@ static void idxd_read_caps(struct idxd_device *idxd)
- 	dev_dbg(dev, "max xfer size: %llu bytes\n", idxd->max_xfer_bytes);
- 	idxd->max_batch_size = 1U << idxd->hw.gen_cap.max_batch_shift;
- 	dev_dbg(dev, "max batch size: %u\n", idxd->max_batch_size);
-+	idxd->ims_size = idxd->hw.gen_cap.max_ims_mult * 256ULL;
-+	dev_dbg(dev, "IMS size: %u\n", idxd->ims_size);
- 	if (idxd->hw.gen_cap.config_en)
- 		set_bit(IDXD_FLAG_CONFIGURABLE, &idxd->flags);
- 
-diff --git a/drivers/dma/idxd/sysfs.c b/drivers/dma/idxd/sysfs.c
-index 4fcb8833a4df..6583c9c2e992 100644
---- a/drivers/dma/idxd/sysfs.c
-+++ b/drivers/dma/idxd/sysfs.c
-@@ -1166,6 +1166,14 @@ static ssize_t numa_node_show(struct device *dev,
- }
- static DEVICE_ATTR_RO(numa_node);
- 
-+static ssize_t ims_size_show(struct device *dev, struct device_attribute *attr, char *buf)
-+{
-+	struct idxd_device *idxd = confdev_to_idxd(dev);
-+
-+	return sysfs_emit(buf, "%u\n", idxd->ims_size);
-+}
-+static DEVICE_ATTR_RO(ims_size);
-+
- static ssize_t max_batch_size_show(struct device *dev,
- 				   struct device_attribute *attr, char *buf)
+-static inline int idxd_get_wq_portal_offset(enum idxd_portal_prot prot)
++static inline int idxd_get_wq_portal_offset(int wq_id, enum idxd_portal_prot prot,
++					    enum idxd_interrupt_type irq_type)
  {
-@@ -1352,6 +1360,7 @@ static struct attribute *idxd_device_attributes[] = {
- 	&dev_attr_max_work_queues_size.attr,
- 	&dev_attr_max_engines.attr,
- 	&dev_attr_numa_node.attr,
-+	&dev_attr_ims_size.attr,
- 	&dev_attr_max_batch_size.attr,
- 	&dev_attr_max_transfer_size.attr,
- 	&dev_attr_op_cap.attr,
+-	return prot * 0x1000;
+-}
+-
+-static inline int idxd_get_wq_portal_full_offset(int wq_id,
+-						 enum idxd_portal_prot prot)
+-{
+-	return ((wq_id * 4) << PAGE_SHIFT) + idxd_get_wq_portal_offset(prot);
++	return ((wq_id * 4) << PAGE_SHIFT) + prot * 0x1000 + irq_type * 0x2000;
+ }
+ 
+ static inline void idxd_wq_get(struct idxd_wq *wq)
 
 
