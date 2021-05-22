@@ -2,148 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9198D38D591
-	for <lists+kvm@lfdr.de>; Sat, 22 May 2021 13:12:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C36F238D681
+	for <lists+kvm@lfdr.de>; Sat, 22 May 2021 18:44:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230393AbhEVLNL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 May 2021 07:13:11 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:37668 "EHLO vps-vb.mhejs.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230300AbhEVLNK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 22 May 2021 07:13:10 -0400
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1lkPXb-0001P8-S3; Sat, 22 May 2021 13:11:35 +0200
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-To:     Sean Christopherson <seanjc@google.com>
+        id S231313AbhEVQpl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 May 2021 12:45:41 -0400
+Received: from mail-bn8nam11on2075.outbound.protection.outlook.com ([40.107.236.75]:34528
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231299AbhEVQpj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 22 May 2021 12:45:39 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XndiCgAUsUBSsnPzAHq43FP26A4ozdDi4SVBoYptkqtLjbGuVg9pStvSNEdbL4te4LDfFaAZ4tdCrX3aMQ7t3K6rhPthv3YySfu+vV0AD0De+z0TZ8H0kSngWMNuEtEMJkXAC6IZea08boU5f9FsP2CJXG/nSF4JFhXTtf/nrNYbSaIntE/xhKULDiq1TDskyBOOU3R/vvHJzEk/tEvOolMM98sW3rSvRTZiAu3luj3U4TCro3nWeGipKaexJteGPRzFpgnQwlDhMmgQL7SK2gFl59uDKZmyMa1J/C/mmbdwrv+5YchyUiQHL9nTcEEj36OBKo2mRygLDdVj89NPRA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=boFbrmeMMrEjdn11+jSzXZrzQcrbqpzGV3mI1dXQVI4=;
+ b=nDMgDpXCaRGoQEZ0/A/mkIpfHP99VU1MRq+ZPXn8Jezsf8Njsvmad+tQ+O6EUvPSVAa3mopYQXaEWAf0fpFm60iZ2l1zTj8h1SMtgajOEyk5f7XixHVLvkP5MVhz+jzFhlvtlitTpkvkjcp6fTg77yDuTt/TY/W3rZZmimgoWNzwKiZE/Nm3lZMee7ymUVuUBa6HzD1Cegd09qcj1odWSLuC7n4LzHSPoTZpuwc9zYiNhQv1osFP9YOx2wmokMn8WE+rYzxT5ypZQAJzj7f1vn7YsRAA+78XXCuoXjbFyIA0bo9arl4v2rkbrgbQpmrD/jCS9yO7h2hYyMZNwWW6pg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=boFbrmeMMrEjdn11+jSzXZrzQcrbqpzGV3mI1dXQVI4=;
+ b=NHXF2gVlQFhs3s1UdN19/x5RhA1qgKKnMOoh0roFfPLrnbjvVOdYjJmSL7Ht9sGqM1CXf2yJIgww87YtZ0n/dc29TM6GwY2jXNJVhMT0vCLvsejZMl7ihbQyerLeECr7/o0bH7WR3utb4iVaGggKci48p8PFBII1xo+g/ofNiAs=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
+ DM6PR12MB2828.namprd12.prod.outlook.com (2603:10b6:5:77::11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4150.27; Sat, 22 May 2021 16:44:11 +0000
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::b914:4704:ad6f:aba9]) by DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::b914:4704:ad6f:aba9%12]) with mapi id 15.20.4150.026; Sat, 22 May
+ 2021 16:44:11 +0000
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <cover.1621191549.git.maciej.szmigiero@oracle.com>
- <4a4867419344338e1419436af1e1b0b8f2405517.1621191551.git.maciej.szmigiero@oracle.com>
- <YKWRyvyyO5UAHv4U@google.com>
- <c7ba42ee-dc70-a86c-aeb2-d410c136a5ec@maciej.szmigiero.name>
-Subject: Re: [PATCH v3 3/8] KVM: Resolve memslot ID via a hash table instead
- of via a static array
-Message-ID: <5887de10-c615-175b-e491-86f94e542425@maciej.szmigiero.name>
-Date:   Sat, 22 May 2021 13:11:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
-MIME-Version: 1.0
-In-Reply-To: <c7ba42ee-dc70-a86c-aeb2-d410c136a5ec@maciej.szmigiero.name>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>
+Subject: [PATCH] KVM: SVM: Assume a 64-bit hypercall for guests with protected state
+Date:   Sat, 22 May 2021 11:43:58 -0500
+Message-Id: <d0904f0d049300267665bd4abf96c3d7e7aa4825.1621701837.git.thomas.lendacky@amd.com>
+X-Mailer: git-send-email 2.31.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [165.204.77.1]
+X-ClientProxiedBy: SA9P223CA0018.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:806:26::23) To DM5PR12MB1355.namprd12.prod.outlook.com
+ (2603:10b6:3:6e::7)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from tlendack-t1.amd.com (165.204.77.1) by SA9P223CA0018.NAMP223.PROD.OUTLOOK.COM (2603:10b6:806:26::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4150.27 via Frontend Transport; Sat, 22 May 2021 16:44:10 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b4fe34ac-51dc-4576-9988-08d91d40d365
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2828:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB282811AB102083CD10026CA6EC289@DM6PR12MB2828.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: FoKZVu8fxmjYoPHEKNXjH674wr83y/IKjYx3i+fF1jTtx420L2Eg1OSOtlg5rNRCU7mctE9Do0KwgUVhrnN5E2J6XPiqvLfIq/lBxrtChFuogYcU3WWvbDFn1zjny+9u1X0J9TI/cDT5X/5wVgGbWEAwJUHybaMMKqqacONV6ms75qWsyXnFJA1UBhthbcRqBZdVOL9cFdjFvTxkGlIocnPy3JDjCN13C6EiibXwdfuwRI4MzCt4okuA5iriwVRtijxD2ZxEZ4JBC5ea7jJgMTGrBhqQhY/KNJJHGFJ44RoUixCY++AN7B0UQfD6Y2Hd8fJQ+ZSwq8e1jKztYqm1XpSIzPCWYyEHjevnQuMdMeydEf4WVN7y/BGaC7/wTIg6RA+YitBEZydKpcqhVXVihp+kZ5zDV2Bv6sC8d2aTvXn5R/h7Pkqe1sjyUD0aPwxf2VMGmy5GCUizjXef0Q29zPVNK1LLdzKztsb94oGGKJ/HXxiPEG2P3udbH86QZrN9Mim8AanosLz71enAL071hiJbBe12vsFUk9ScE++mQpXS8lanoyq+6SjGtWgL1nZJDEsEMG8goGdPCTwqqBUKuJ8CyAqTn2W8IW6K7coNJ6/KMJvh8qr7X8OWzAzv+1aX5HoOllnMxsObTWBp5n+WslKHwAbsvt1gBQKn2HSjUUM=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(376002)(136003)(39860400002)(366004)(8676002)(38100700002)(38350700002)(86362001)(2616005)(956004)(8936002)(66556008)(66946007)(186003)(36756003)(7416002)(7696005)(52116002)(66476007)(16526019)(4326008)(6486002)(316002)(54906003)(478600001)(5660300002)(6666004)(2906002)(83380400001)(26005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?wv/9zHw3tB8YfnPvD0FoppnSRezia95Q2yQFH+B5wmaBB7OqFUvaIJQUdDtN?=
+ =?us-ascii?Q?UEuuVyEBHHbnltaHkgJ5tL7elOseZcCHdcR5OnUk8l/kIbwRMOrD8KVLV4p6?=
+ =?us-ascii?Q?STxVssDRPHp2hKdWZIMnc5tQQFOkw34MXBZEjQexbbq53WveL/iyF5Y5MKCy?=
+ =?us-ascii?Q?J0RyQOKxk9OfgJ8oM0mNKDYzdFuZWZVWNn2uUZ2jGAQKPGq4z9adR4LFoB9R?=
+ =?us-ascii?Q?O/dHztycPU0o6vgNXuFJHnp5CArxKmrc4ja6ZMpXkuwb6u+r4rD7Xe+dpn9a?=
+ =?us-ascii?Q?CS6edQNIlAM0oSeuTCw93wsuiEGdwxiPrlZxfUcyRbtRHNAkHt7U2F/4YtOR?=
+ =?us-ascii?Q?ve0HKB4CQkn4HHVRHGCKh/X/QGF8AbKHH4Nnxt8FDD0x1OXZRevXDbwGFNob?=
+ =?us-ascii?Q?sALo89odEjO/X5/wvafKp7haecRBokPML+k1uGajhyUyDTW5g7CEj1nuPUi2?=
+ =?us-ascii?Q?XDiaR6z0Id7qK07V9XPbi4thbZKOKbxKt6arTvtataa3wOd/y2/tNaGJkkh5?=
+ =?us-ascii?Q?1teMcVirrVfrM9ENDnUyYialuWE5qE6i1rtXrLPkiBas72pFh0iUXE+u+asB?=
+ =?us-ascii?Q?DXxMwyX16oehH0Ik13kf9DUDegv+dKOb7VlhbIwuEjoG2em44QRhT96JwuUj?=
+ =?us-ascii?Q?ROcBfQ2QDSpRZjMrpbtu2PtDxmKlZ7EG+zG6VJzFTpnUcVcKUC02p2r9X5Nh?=
+ =?us-ascii?Q?u+9IbGWtO0Sy6R+daVm72aJUh78kynFKpLen68v8J7Y84R5CHyFrLRDgfNld?=
+ =?us-ascii?Q?fpBgUzXph4NkZwly4KdyavOwIQgY1Hi8kC1EgtdnampBiP9eOI2U4p/QMcCD?=
+ =?us-ascii?Q?O2Z2GZBg2zFYlM0RiqUr1qIHGdDcfp9wbZDpXkuX7sN5cNSJTcUCaSWTxcN0?=
+ =?us-ascii?Q?7YT7HJt7menxbd0J/sC2P4yqW8rF7K0zDYadPjEF3V//H/NTJumB42Gw+JJI?=
+ =?us-ascii?Q?Df8BRTG2Tv8Ldx5q2ieSGsJfOfJ2MtJECKCmdnbzBZyRYvBx00JRzgMME1y4?=
+ =?us-ascii?Q?rgYFiUHv3hQ8BldONq3aoCWTOzsran/+xUhS4GS7M0JZXP5IUGPDmiZW/olE?=
+ =?us-ascii?Q?Ay7h/tBb1HH9Yua+RCWGhcE5BPM8JvYa+NKXP+T3Z+aZ2XwQo3S7QP6wbcUR?=
+ =?us-ascii?Q?sUYOI31lU0W7ySNaOCNO94h+BFeOaJ/RF/eeWZuOr2TJaOfu/d6mktivemPV?=
+ =?us-ascii?Q?HaLEmDTgz9Obw56uM9uNj7DUipSPsE3WKRKVmbw8xbfb2QAoJQUnp7NWr40k?=
+ =?us-ascii?Q?feccZqsHrEmI4YM2AyvmE8UNFVQTViqS4k4mUzERZkHHFILJDU/RPFmXe3sE?=
+ =?us-ascii?Q?QMeXnDzQO33z/GChKXMS5Uug?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4fe34ac-51dc-4576-9988-08d91d40d365
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 May 2021 16:44:11.3358
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nuylqWyV+Fvf02RUTeWYSLoh/p6jNPSraB/MJOuEVycGQgxNhgNjIU7tBb7GCooAfIVOgKky97FQuDh5D0U8JA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2828
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21.05.2021 09:05, Maciej S. Szmigiero wrote:
-> On 20.05.2021 00:31, Sean Christopherson wrote:
->> On Sun, May 16, 2021, Maciej S. Szmigiero wrote:
-(..)
->>>           new_size = old_size;
->>>       slots = kvzalloc(new_size, GFP_KERNEL_ACCOUNT);
->>> -    if (likely(slots))
->>> -        memcpy(slots, old, old_size);
->>> +    if (unlikely(!slots))
->>> +        return NULL;
->>> +
->>> +    memcpy(slots, old, old_size);
->>> +
->>> +    hash_init(slots->id_hash);
->>> +    kvm_for_each_memslot(memslot, slots)
->>> +        hash_add(slots->id_hash, &memslot->id_node, memslot->id);
->>
->> What's the perf penalty if the number of memslots gets large?  I ask because the
->> lazy rmap allocation is adding multiple calls to kvm_dup_memslots().
-> 
-> I would expect the "move inactive" benchmark to be closest to measuring
-> the performance of just a memslot array copy operation but the results
-> suggest that the performance stays within ~10% window from 10 to 509
-> memslots on the old code (it then climbs 13x for 32k case).
-> 
-> That suggests that something else is dominating this benchmark for these
-> memslot counts (probably zapping of shadow pages).
-> 
-> At the same time, the tree-based memslots implementation is clearly
-> faster in this benchmark, even for smaller memslot counts, so apparently
-> copying of the memslot array has some performance impact, too.
-> 
-> Measuring just kvm_dup_memslots() performance would probably be done
-> best by benchmarking KVM_MR_FLAGS_ONLY operation - will try to add this
-> operation to my set of benchmarks and see how it performs with different
-> memslot counts.
+When processing a hypercall for a guest with protected state, currently
+SEV-ES guests, the guest CS segment register can't be checked to
+determine if the guest is in 64-bit mode. For an SEV-ES guest, it is
+expected that communication between the guest and the hypervisor is
+performed to shared memory using the GHCB. In order to use the GHCB, the
+guest must have been in long mode, otherwise writes by the guest to the
+GHCB would be encrypted and not be able to be comprehended by the
+hypervisor. Given that, assume that the guest is in 64-bit mode when
+processing a hypercall from a guest with protected state.
 
-Update:
-I've implemented a simple KVM_MR_FLAGS_ONLY benchmark, that repeatably
-sets and unsets KVM_MEM_LOG_DIRTY_PAGES flag on a memslot with a single
-page of memory in it. [1]
+Fixes: f1c6366e3043 ("KVM: SVM: Add required changes to support intercepts under SEV-ES")
+Reported-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+---
+ arch/x86/kvm/x86.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Since on the current code with higher memslot counts the "set flags"
-operation spends a significant time in kvm_mmu_calculate_default_mmu_pages()
-a second set of measurements was done with patch [2] applied.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 9b6bca616929..e715c69bb882 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8403,7 +8403,12 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+ 
+ 	trace_kvm_hypercall(nr, a0, a1, a2, a3);
+ 
+-	op_64_bit = is_64_bit_mode(vcpu);
++	/*
++	 * If running with protected guest state, the CS register is not
++	 * accessible. The hypercall register values will have had to been
++	 * provided in 64-bit mode, so assume the guest is in 64-bit.
++	 */
++	op_64_bit = is_64_bit_mode(vcpu) || vcpu->arch.guest_state_protected;
+ 	if (!op_64_bit) {
+ 		nr &= 0xFFFFFFFF;
+ 		a0 &= 0xFFFFFFFF;
+-- 
+2.31.0
 
-In this case, the top functions in the perf trace are "memcpy" and
-"clear_page" (called from kvm_set_memslot(), most likely from inlined
-kvm_dup_memslots()).
-
-For reference, a set of measurements with the whole patch series
-(patches 1 - 8) applied was also done, as "new code".
-In this case, SRCU-related functions dominate the perf trace.
-
-32k memslots:
-Current code:             0.00130s
-Current code + patch [2]: 0.00104s (13x 4k result)
-New code:                 0.0000144s
-
-4k memslots:
-Current code:             0.0000899s
-Current code + patch [2]: 0.0000799s (+78% 2k result)
-New code:                 0.0000144s
-
-2k memslots:
-Current code:             0.0000495s
-Current code + patch [2]: 0.0000447s (+54% 509 result)
-New code:                 0.0000143s
-
-509 memslots:
-Current code:             0.0000305s
-Current code + patch [2]: 0.0000290s (+5% 100 result)
-New code:                 0.0000141s
-
-100 memslots:
-Current code:             0.0000280s
-Current code + patch [2]: 0.0000275s (same as for 10 slots)
-New code:                 0.0000142s
-
-10 memslots:
-Current code:             0.0000272s
-Current code + patch [2]: 0.0000272s
-New code:                 0.0000141s
-
-Thanks,
-Maciej
-
-[1]: The patch against memslot_perf_test.c is available here:
-https://github.com/maciejsszmigiero/linux/commit/841e94898a55ff79af9d20a08205aa80808bd2a8
-
-[2]: "[PATCH v3 1/8] KVM: x86: Cache total page count to avoid traversing the memslot array"
