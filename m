@@ -2,30 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D809C38D25C
-	for <lists+kvm@lfdr.de>; Sat, 22 May 2021 02:20:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E488338D262
+	for <lists+kvm@lfdr.de>; Sat, 22 May 2021 02:20:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230453AbhEVAVc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 May 2021 20:21:32 -0400
-Received: from mga04.intel.com ([192.55.52.120]:56018 "EHLO mga04.intel.com"
+        id S231135AbhEVAVm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 May 2021 20:21:42 -0400
+Received: from mga06.intel.com ([134.134.136.31]:50235 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230268AbhEVAVU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 May 2021 20:21:20 -0400
-IronPort-SDR: hsUlE92OGPdPQQIThVjWgpIyzua3uImWSBxNB6DRwrxxndKFqTNImptFtWXS7ZURqYwUfSlTnc
- ZVArNoZJ3ogg==
-X-IronPort-AV: E=McAfee;i="6200,9189,9991"; a="199661193"
+        id S230359AbhEVAV0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 May 2021 20:21:26 -0400
+IronPort-SDR: z3Ivjb9gm0NXXq82lehPsnGJsoJ5JLZ27h2uLFcXWugFWBJyZb3/HvAxmZUKHn4NoXnd8E6u9u
+ vEhswLWXmVGA==
+X-IronPort-AV: E=McAfee;i="6200,9189,9991"; a="262818140"
 X-IronPort-AV: E=Sophos;i="5.82,319,1613462400"; 
-   d="scan'208";a="199661193"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2021 17:19:56 -0700
-IronPort-SDR: YkEtAZ80uK9zugMnOdyWsS4n8Nbrq7PRClYcodvuqx8oo6tcL9N6Azy5Gv+Rdi1/1KPKP80sfF
- dW1zVEhNOcrg==
+   d="scan'208";a="262818140"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2021 17:20:02 -0700
+IronPort-SDR: T2uzjo7HAO8glCKV/sYwZjVQ5R2W8fIwzRVf1kRQbkcXbbNDzWtDAqPK3gTS8Tq5qgIFREuROQ
+ 83cTQgKzOGAg==
 X-IronPort-AV: E=Sophos;i="5.82,319,1613462400"; 
-   d="scan'208";a="441149316"
+   d="scan'208";a="441312120"
 Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2021 17:19:55 -0700
-Subject: [PATCH v6 08/20] vfio/mdev: idxd: Add mdev device context
- initialization
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2021 17:20:01 -0700
+Subject: [PATCH v6 09/20] vfio/mdev: Add mmio read/write support for mdev
 From:   Dave Jiang <dave.jiang@intel.com>
 To:     alex.williamson@redhat.com, kwankhede@nvidia.com,
         tglx@linutronix.de, vkoul@kernel.org, jgg@mellanox.com
@@ -35,8 +34,8 @@ Cc:     megha.dey@intel.com, jacob.jun.pan@intel.com, ashok.raj@intel.com,
         dan.j.williams@intel.com, eric.auger@redhat.com,
         pbonzini@redhat.com, dmaengine@vger.kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Date:   Fri, 21 May 2021 17:19:54 -0700
-Message-ID: <162164279478.261970.8966553743790451233.stgit@djiang5-desk3.ch.intel.com>
+Date:   Fri, 21 May 2021 17:20:01 -0700
+Message-ID: <162164280156.261970.13755411310924589194.stgit@djiang5-desk3.ch.intel.com>
 In-Reply-To: <162164243591.261970.3439987543338120797.stgit@djiang5-desk3.ch.intel.com>
 References: <162164243591.261970.3439987543338120797.stgit@djiang5-desk3.ch.intel.com>
 User-Agent: StGit/0.23-29-ga622f1
@@ -47,293 +46,216 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add support functions to initialize the vdcm context and the PCI
-config space region and the MMIO region. These regions are to
-support the emulation paths for the mdev.
-
+The BAR0 MMIO path for the mdev is emulated. Add read/write support
+functions to deal with MMIO access when the guest read/write to
+the device. The support functions deals with the BAR0 MMIO region
+of the mdev.
 
 Signed-off-by: Dave Jiang <dave.jiang@intel.com>
 ---
- drivers/dma/idxd/registers.h  |    3 +
- drivers/vfio/mdev/idxd/mdev.h |    4 +
- drivers/vfio/mdev/idxd/vdev.c |  214 +++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 220 insertions(+), 1 deletion(-)
+ drivers/dma/idxd/device.c     |    1 
+ drivers/dma/idxd/registers.h  |    6 ++
+ drivers/vfio/mdev/idxd/mdev.h |    3 +
+ drivers/vfio/mdev/idxd/vdev.c |  119 +++++++++++++++++++++++++++++++++++++++++
+ include/uapi/linux/idxd.h     |    1 
+ 5 files changed, 129 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/dma/idxd/device.c b/drivers/dma/idxd/device.c
+index 99542c9cbc47..2ea6015e0d53 100644
+--- a/drivers/dma/idxd/device.c
++++ b/drivers/dma/idxd/device.c
+@@ -277,6 +277,7 @@ void idxd_wq_drain(struct idxd_wq *wq)
+ 	operand = BIT(wq->id % 16) | ((wq->id / 16) << 16);
+ 	idxd_cmd_exec(idxd, IDXD_CMD_DRAIN_WQ, operand, NULL);
+ }
++EXPORT_SYMBOL_GPL(idxd_wq_drain);
+ 
+ void idxd_wq_reset(struct idxd_wq *wq)
+ {
 diff --git a/drivers/dma/idxd/registers.h b/drivers/dma/idxd/registers.h
-index c2d558e37baf..8ac2be4e174b 100644
+index 8ac2be4e174b..cf3d513a18e0 100644
 --- a/drivers/dma/idxd/registers.h
 +++ b/drivers/dma/idxd/registers.h
-@@ -88,6 +88,9 @@ struct opcap {
- 	u64 bits[4];
- };
- 
-+#define OPCAP_OFS(op) (op - (0x40 * (op >> 6)))
-+#define OPCAP_BIT(op) (BIT_ULL(OPCAP_OFS(op)))
+@@ -201,7 +201,9 @@ union cmdsts_reg {
+ 	};
+ 	u32 bits;
+ } __packed;
+-#define IDXD_CMDSTS_ACTIVE		0x80000000
 +
- #define IDXD_OPCAP_OFFSET		0x40
++#define IDXD_CMDS_ACTIVE_BIT		31
++#define IDXD_CMDSTS_ACTIVE		BIT(IDXD_CMDS_ACTIVE_BIT)
+ #define IDXD_CMDSTS_ERR_MASK		0xff
+ #define IDXD_CMDSTS_RES_SHIFT		8
  
- #define IDXD_TABLE_OFFSET		0x60
+@@ -285,6 +287,8 @@ union msix_perm {
+ 	u32 bits;
+ } __packed;
+ 
++#define IDXD_MSIX_PERM_MASK	0xfffff00c
++#define IDXD_MSIX_PERM_IGNORE	0x3
+ #define MSIX_ENTRY_MASK_INT	0x1
+ #define MSIX_ENTRY_CTRL_BYTE	12
+ 
 diff --git a/drivers/vfio/mdev/idxd/mdev.h b/drivers/vfio/mdev/idxd/mdev.h
-index e52b50760ee7..91cb2662abd6 100644
+index 91cb2662abd6..f696fe38e374 100644
 --- a/drivers/vfio/mdev/idxd/mdev.h
 +++ b/drivers/vfio/mdev/idxd/mdev.h
-@@ -16,6 +16,7 @@
- #define VIDXD_MSIX_TBL_SZ		0x90
- #define VIDXD_MSIX_PERM_TBL_SZ		0x48
- 
-+#define VIDXD_VERSION_OFFSET		0
- #define VIDXD_MSIX_PERM_OFFSET		0x300
- #define VIDXD_GRPCFG_OFFSET		0x400
- #define VIDXD_WQCFG_OFFSET		0x500
-@@ -74,8 +75,9 @@ static inline u8 vidxd_state(struct vdcm_idxd *vidxd)
- 
- int idxd_mdev_get_pasid(struct mdev_device *mdev, struct vfio_device *vdev, u32 *pasid);
- 
-+void vidxd_init(struct vdcm_idxd *vidxd);
- void vidxd_reset(struct vdcm_idxd *vidxd);
--
-+void vidxd_mmio_init(struct vdcm_idxd *vidxd);
+@@ -80,4 +80,7 @@ void vidxd_reset(struct vdcm_idxd *vidxd);
+ void vidxd_mmio_init(struct vdcm_idxd *vidxd);
  int vidxd_cfg_read(struct vdcm_idxd *vidxd, unsigned int pos, void *buf, unsigned int count);
  int vidxd_cfg_write(struct vdcm_idxd *vidxd, unsigned int pos, void *buf, unsigned int size);
++int vidxd_mmio_write(struct vdcm_idxd *vidxd, u64 pos, void *buf, unsigned int size);
++int vidxd_mmio_read(struct vdcm_idxd *vidxd, u64 pos, void *buf, unsigned int size);
++
  #endif
 diff --git a/drivers/vfio/mdev/idxd/vdev.c b/drivers/vfio/mdev/idxd/vdev.c
-index 4ead50947047..78cc2377e637 100644
+index 78cc2377e637..d2416765ce7e 100644
 --- a/drivers/vfio/mdev/idxd/vdev.c
 +++ b/drivers/vfio/mdev/idxd/vdev.c
-@@ -21,6 +21,62 @@
- #include "idxd.h"
- #include "mdev.h"
+@@ -42,6 +42,8 @@ static u64 idxd_pci_config[] = {
+ 	0x0000000000000000ULL,
+ };
  
-+static u64 idxd_pci_config[] = {
-+	0x0010000000008086ULL,
-+	0x0080000008800000ULL,
-+	0x000000000000000cULL,
-+	0x000000000000000cULL,
-+	0x0000000000000000ULL,
-+	0x2010808600000000ULL,
-+	0x0000004000000000ULL,
-+	0x000000ff00000000ULL,
-+	0x0000060000015011ULL, /* MSI-X capability, hardcoded 2 entries, Encoded as N-1 */
-+	0x0000070000000000ULL,
-+	0x0000000000920010ULL, /* PCIe capability */
-+	0x0000000000000000ULL,
-+	0x0000000000000000ULL,
-+	0x0000000000000000ULL,
-+	0x0000000000000000ULL,
-+	0x0000000000000000ULL,
-+	0x0000000000000000ULL,
-+	0x0000000000000000ULL,
-+};
++static void vidxd_do_command(struct vdcm_idxd *vidxd, u32 val);
 +
-+static void vidxd_reset_config(struct vdcm_idxd *vidxd)
-+{
-+	u16 *devid = (u16 *)(vidxd->cfg + PCI_DEVICE_ID);
-+	struct idxd_device *idxd = vidxd->idxd;
-+
-+	memset(vidxd->cfg, 0, VIDXD_MAX_CFG_SPACE_SZ);
-+	memcpy(vidxd->cfg, idxd_pci_config, sizeof(idxd_pci_config));
-+
-+	if (idxd->data->type == IDXD_TYPE_DSA)
-+		*devid = PCI_DEVICE_ID_INTEL_DSA_SPR0;
-+	else if (idxd->data->type == IDXD_TYPE_IAX)
-+		*devid = PCI_DEVICE_ID_INTEL_IAX_SPR0;
-+}
-+
-+static inline void vidxd_reset_mmio(struct vdcm_idxd *vidxd)
-+{
-+	memset(&vidxd->bar0, 0, VIDXD_MAX_MMIO_SPACE_SZ);
-+}
-+
-+void vidxd_init(struct vdcm_idxd *vidxd)
-+{
-+	struct idxd_wq *wq = vidxd->wq;
-+
-+	vidxd_reset_config(vidxd);
-+	vidxd_reset_mmio(vidxd);
-+
-+	vidxd->bar_size[0] = VIDXD_BAR0_SIZE;
-+	vidxd->bar_size[1] = VIDXD_BAR2_SIZE;
-+
-+	vidxd_mmio_init(vidxd);
-+
-+	if (wq_dedicated(wq) && wq->state == IDXD_WQ_ENABLED)
-+		idxd_wq_disable(wq);
-+}
-+
- void vidxd_send_interrupt(struct vdcm_idxd *vidxd, int vector)
+ static void vidxd_reset_config(struct vdcm_idxd *vidxd)
  {
- 	struct mdev_device *mdev = vidxd->mdev;
-@@ -252,6 +308,163 @@ int vidxd_cfg_write(struct vdcm_idxd *vidxd, unsigned int pos, void *buf, unsign
- 	return 0;
+ 	u16 *devid = (u16 *)(vidxd->cfg + PCI_DEVICE_ID);
+@@ -141,6 +143,123 @@ static void vidxd_report_pci_error(struct vdcm_idxd *vidxd)
+ 	send_halt_interrupt(vidxd);
  }
  
-+static void vidxd_mmio_init_grpcap(struct vdcm_idxd *vidxd)
++static void vidxd_report_swerror(struct vdcm_idxd *vidxd, unsigned int error)
 +{
-+	u8 *bar0 = vidxd->bar0;
-+	union group_cap_reg *grp_cap = (union group_cap_reg *)(bar0 + IDXD_GRPCAP_OFFSET);
-+
-+	/* single group for current implementation */
-+	grp_cap->num_groups = 1;
++	vidxd_set_swerr(vidxd, error);
++	send_swerr_interrupt(vidxd);
 +}
 +
-+static void vidxd_mmio_init_grpcfg(struct vdcm_idxd *vidxd)
++int vidxd_mmio_write(struct vdcm_idxd *vidxd, u64 pos, void *buf, unsigned int size)
 +{
++	u32 offset = pos & (vidxd->bar_size[0] - 1);
 +	u8 *bar0 = vidxd->bar0;
-+	struct grpcfg *grpcfg = (struct grpcfg *)(bar0 + VIDXD_GRPCFG_OFFSET);
-+	struct idxd_wq *wq = vidxd->wq;
-+	struct idxd_group *group = wq->group;
-+	int i;
++	struct device *dev = &vidxd->mdev->dev;
 +
-+	/*
-+	 * At this point, we are only exporting a single workqueue for
-+	 * each mdev.
-+	 */
-+	grpcfg->wqs[0] = BIT(0);
-+	for (i = 0; i < group->num_engines; i++)
-+		grpcfg->engines |= BIT(i);
-+	grpcfg->flags.bits = group->grpcfg.flags.bits;
-+}
++	dev_dbg(dev, "vidxd mmio W %d %x %x: %llx\n", vidxd->wq->id, size,
++		offset, get_reg_val(buf, size));
 +
-+static void vidxd_mmio_init_wqcap(struct vdcm_idxd *vidxd)
-+{
-+	u8 *bar0 = vidxd->bar0;
-+	struct idxd_wq *wq = vidxd->wq;
-+	union wq_cap_reg *wq_cap = (union wq_cap_reg *)(bar0 + IDXD_WQCAP_OFFSET);
++	if (((size & (size - 1)) != 0) || (offset & (size - 1)) != 0)
++		return -EINVAL;
 +
-+	wq_cap->total_wq_size = wq->size;
-+	wq_cap->num_wqs = 1;
-+	wq_cap->dedicated_mode = 1;
-+}
++	/* If we don't limit this, we potentially can write out of bound */
++	if (size > sizeof(u32))
++		return -EINVAL;
 +
-+static void vidxd_mmio_init_wqcfg(struct vdcm_idxd *vidxd)
-+{
-+	struct idxd_device *idxd = vidxd->idxd;
-+	struct idxd_wq *wq = vidxd->wq;
-+	u8 *bar0 = vidxd->bar0;
-+	union wqcfg *wqcfg = (union wqcfg *)(bar0 + VIDXD_WQCFG_OFFSET);
++	switch (offset) {
++	case IDXD_GENCFG_OFFSET ... IDXD_GENCFG_OFFSET + 3:
++		/* Write only when device is disabled. */
++		if (vidxd_state(vidxd) == IDXD_DEVICE_STATE_DISABLED) {
++			dev_warn(dev, "Guest writes to unsupported GENCFG register\n");
++			memcpy(bar0 + offset, buf, size);
++		}
++		break;
 +
-+	wqcfg->wq_size = wq->size;
-+	wqcfg->wq_thresh = wq->threshold;
-+	wqcfg->mode = WQCFG_MODE_DEDICATED;
-+	wqcfg->priority = wq->priority;
-+	wqcfg->max_xfer_shift = idxd->hw.gen_cap.max_xfer_shift;
-+	wqcfg->max_batch_shift = idxd->hw.gen_cap.max_batch_shift;
-+}
++	case IDXD_GENCTRL_OFFSET:
++		memcpy(bar0 + offset, buf, size);
++		break;
 +
-+static void vidxd_mmio_init_engcap(struct vdcm_idxd *vidxd)
-+{
-+	u8 *bar0 = vidxd->bar0;
-+	union engine_cap_reg *engcap = (union engine_cap_reg *)(bar0 + IDXD_ENGCAP_OFFSET);
-+	struct idxd_wq *wq = vidxd->wq;
-+	struct idxd_group *group = wq->group;
++	case IDXD_INTCAUSE_OFFSET:
++		bar0[offset] &= ~(get_reg_val(buf, 1) & GENMASK(4, 0));
++		break;
 +
-+	engcap->num_engines = group->num_engines;
-+}
++	case IDXD_CMD_OFFSET: {
++		u32 *cmdsts = (u32 *)(bar0 + IDXD_CMDSTS_OFFSET);
++		u32 val = get_reg_val(buf, size);
 +
-+static void vidxd_mmio_init_gencap(struct vdcm_idxd *vidxd)
-+{
-+	struct idxd_device *idxd = vidxd->idxd;
-+	u8 *bar0 = vidxd->bar0;
-+	union gen_cap_reg *gencap = (union gen_cap_reg *)(bar0 + IDXD_GENCAP_OFFSET);
++		if (size != sizeof(u32))
++			return -EINVAL;
 +
-+	gencap->overlap_copy = idxd->hw.gen_cap.overlap_copy;
-+	gencap->cache_control_mem = idxd->hw.gen_cap.cache_control_mem;
-+	gencap->cache_control_cache = idxd->hw.gen_cap.cache_control_cache;
-+	gencap->cmd_cap = 1;
-+	gencap->dest_readback = idxd->hw.gen_cap.dest_readback;
-+	gencap->drain_readback = idxd->hw.gen_cap.drain_readback;
-+	gencap->max_xfer_shift = idxd->hw.gen_cap.max_xfer_shift;
-+	gencap->max_batch_shift = idxd->hw.gen_cap.max_batch_shift;
-+	gencap->max_descs_per_engine = idxd->hw.gen_cap.max_descs_per_engine;
-+}
-+
-+static void vidxd_mmio_init_cmdcap(struct vdcm_idxd *vidxd)
-+{
-+	u8 *bar0 = vidxd->bar0;
-+	u32 *cmdcap = (u32 *)(bar0 + IDXD_CMDCAP_OFFSET);
-+
-+	*cmdcap |= BIT(IDXD_CMD_ENABLE_DEVICE) | BIT(IDXD_CMD_DISABLE_DEVICE) |
-+		   BIT(IDXD_CMD_DRAIN_ALL) | BIT(IDXD_CMD_ABORT_ALL) |
-+		   BIT(IDXD_CMD_RESET_DEVICE) | BIT(IDXD_CMD_ENABLE_WQ) |
-+		   BIT(IDXD_CMD_DISABLE_WQ) | BIT(IDXD_CMD_DRAIN_WQ) |
-+		   BIT(IDXD_CMD_ABORT_WQ) | BIT(IDXD_CMD_RESET_WQ) |
-+		   BIT(IDXD_CMD_DRAIN_PASID) | BIT(IDXD_CMD_ABORT_PASID) |
-+		   BIT(IDXD_CMD_REQUEST_INT_HANDLE) | BIT(IDXD_CMD_RELEASE_INT_HANDLE);
-+}
-+
-+static void vidxd_mmio_init_opcap(struct vdcm_idxd *vidxd)
-+{
-+	struct idxd_device *idxd = vidxd->idxd;
-+	u64 opcode;
-+	u8 *bar0 = vidxd->bar0;
-+	u64 *opcap = (u64 *)(bar0 + IDXD_OPCAP_OFFSET);
-+
-+	if (idxd->data->type == IDXD_TYPE_DSA) {
-+		opcode = BIT_ULL(DSA_OPCODE_NOOP) | BIT_ULL(DSA_OPCODE_BATCH) |
-+			 BIT_ULL(DSA_OPCODE_DRAIN) | BIT_ULL(DSA_OPCODE_MEMMOVE) |
-+			 BIT_ULL(DSA_OPCODE_MEMFILL) | BIT_ULL(DSA_OPCODE_COMPARE) |
-+			 BIT_ULL(DSA_OPCODE_COMPVAL) | BIT_ULL(DSA_OPCODE_CR_DELTA) |
-+			 BIT_ULL(DSA_OPCODE_AP_DELTA) | BIT_ULL(DSA_OPCODE_DUALCAST) |
-+			 BIT_ULL(DSA_OPCODE_CRCGEN) | BIT_ULL(DSA_OPCODE_COPY_CRC) |
-+			 BIT_ULL(DSA_OPCODE_DIF_CHECK) | BIT_ULL(DSA_OPCODE_DIF_INS) |
-+			 BIT_ULL(DSA_OPCODE_DIF_STRP) | BIT_ULL(DSA_OPCODE_DIF_UPDT) |
-+			 BIT_ULL(DSA_OPCODE_CFLUSH);
-+		*opcap = opcode;
-+	} else if (idxd->data->type == IDXD_TYPE_IAX) {
-+		opcode = BIT_ULL(IAX_OPCODE_NOOP) | BIT_ULL(IAX_OPCODE_DRAIN) |
-+			 BIT_ULL(IAX_OPCODE_MEMMOVE);
-+		*opcap = opcode;
-+		opcap++;
-+		opcode = OPCAP_BIT(IAX_OPCODE_DECOMPRESS) |
-+			 OPCAP_BIT(IAX_OPCODE_COMPRESS);
-+		*opcap = opcode;
++		/* Check and set command in progress */
++		if (test_and_set_bit(IDXD_CMDS_ACTIVE_BIT, (unsigned long *)cmdsts) == 0)
++			vidxd_do_command(vidxd, val);
++		else
++			vidxd_report_swerror(vidxd, DSA_ERR_CMD_REG);
++		break;
 +	}
++
++	case IDXD_SWERR_OFFSET:
++		/* W1C */
++		bar0[offset] &= ~(get_reg_val(buf, 1) & GENMASK(1, 0));
++		break;
++
++	case VIDXD_MSIX_TABLE_OFFSET ...  VIDXD_MSIX_TABLE_OFFSET + VIDXD_MSIX_TBL_SZ - 1: {
++		int index = (offset - VIDXD_MSIX_TABLE_OFFSET) / 0x10;
++		u8 *msix_entry = &bar0[VIDXD_MSIX_TABLE_OFFSET + index * 0x10];
++		u64 *pba = (u64 *)(bar0 + VIDXD_MSIX_PBA_OFFSET);
++		u8 ctrl, new_mask;
++		int ims_index, ims_off;
++		u32 ims_ctrl, ims_mask;
++		struct idxd_device *idxd = vidxd->idxd;
++
++		memcpy(bar0 + offset, buf, size);
++		ctrl = msix_entry[MSIX_ENTRY_CTRL_BYTE];
++
++		new_mask = ctrl & MSIX_ENTRY_MASK_INT;
++		if (!new_mask && test_and_clear_bit(index, (unsigned long *)pba))
++			vidxd_send_interrupt(vidxd, index);
++
++		if (index == 0)
++			break;
++
++		ims_index = dev_msi_hwirq(dev, index - 1);
++		ims_off = idxd->ims_offset + ims_index * 16 + sizeof(u64);
++		ims_ctrl = ioread32(idxd->reg_base + ims_off);
++		ims_mask = ims_ctrl & MSIX_ENTRY_MASK_INT;
++
++		if (new_mask == ims_mask)
++			break;
++
++		if (new_mask)
++			ims_ctrl |= MSIX_ENTRY_MASK_INT;
++		else
++			ims_ctrl &= ~MSIX_ENTRY_MASK_INT;
++
++		iowrite32(ims_ctrl, idxd->reg_base + ims_off);
++		/* readback to flush */
++		ims_ctrl = ioread32(idxd->reg_base + ims_off);
++		break;
++	}
++
++	case VIDXD_MSIX_PERM_OFFSET ...  VIDXD_MSIX_PERM_OFFSET + VIDXD_MSIX_PERM_TBL_SZ - 1:
++		memcpy(bar0 + offset, buf, size);
++		break;
++	} /* offset */
++
++	return 0;
 +}
 +
-+static void vidxd_mmio_init_version(struct vdcm_idxd *vidxd)
++int vidxd_mmio_read(struct vdcm_idxd *vidxd, u64 pos, void *buf, unsigned int size)
 +{
-+	struct idxd_device *idxd = vidxd->idxd;
-+	u32 *version;
++	u32 offset = pos & (vidxd->bar_size[0] - 1);
++	struct device *dev = &vidxd->mdev->dev;
 +
-+	version = (u32 *)(vidxd->bar0 + VIDXD_VERSION_OFFSET);
-+	*version = idxd->hw.version;
++	memcpy(buf, vidxd->bar0 + offset, size);
++
++	dev_dbg(dev, "vidxd mmio R %d %x %x: %llx\n",
++		vidxd->wq->id, size, offset, get_reg_val(buf, size));
++	return 0;
 +}
 +
-+void vidxd_mmio_init(struct vdcm_idxd *vidxd)
-+{
-+	u8 *bar0 = vidxd->bar0;
-+	union offsets_reg *offsets;
-+
-+	memset(vidxd->bar0, 0, VIDXD_BAR0_SIZE);
-+
-+	vidxd_mmio_init_version(vidxd);
-+	vidxd_mmio_init_gencap(vidxd);
-+	vidxd_mmio_init_wqcap(vidxd);
-+	vidxd_mmio_init_grpcap(vidxd);
-+	vidxd_mmio_init_engcap(vidxd);
-+	vidxd_mmio_init_opcap(vidxd);
-+
-+	offsets = (union offsets_reg *)(bar0 + IDXD_TABLE_OFFSET);
-+	offsets->grpcfg = VIDXD_GRPCFG_OFFSET / 0x100;
-+	offsets->wqcfg = VIDXD_WQCFG_OFFSET / 0x100;
-+	offsets->msix_perm = VIDXD_MSIX_PERM_OFFSET / 0x100;
-+
-+	vidxd_mmio_init_cmdcap(vidxd);
-+	memset(bar0 + VIDXD_MSIX_PERM_OFFSET, 0, VIDXD_MSIX_PERM_TBL_SZ);
-+	vidxd_mmio_init_grpcfg(vidxd);
-+	vidxd_mmio_init_wqcfg(vidxd);
-+}
-+
- static void idxd_complete_command(struct vdcm_idxd *vidxd, enum idxd_cmdsts_err val)
+ int vidxd_cfg_read(struct vdcm_idxd *vidxd, unsigned int pos, void *buf, unsigned int count)
  {
- 	u8 *bar0 = vidxd->bar0;
-@@ -396,6 +609,7 @@ void vidxd_reset(struct vdcm_idxd *vidxd)
- 		}
- 	}
+ 	u32 offset = pos & 0xfff;
+diff --git a/include/uapi/linux/idxd.h b/include/uapi/linux/idxd.h
+index 751f6107217c..e8c39849a526 100644
+--- a/include/uapi/linux/idxd.h
++++ b/include/uapi/linux/idxd.h
+@@ -90,6 +90,7 @@ enum dsa_completion_status {
+ 	DSA_COMP_HW_ERR_DRB,
+ 	DSA_COMP_TRANSLATION_FAIL,
+ 	DSA_ERR_PCI_CFG = 0x51,
++	DSA_ERR_CMD_REG,
+ };
  
-+	vidxd_mmio_init(vidxd);
- 	vwqcfg->wq_state = IDXD_WQ_DISABLED;
- 	gensts->state = IDXD_DEVICE_STATE_DISABLED;
- 	idxd_complete_command(vidxd, IDXD_CMDSTS_SUCCESS);
+ enum iax_completion_status {
 
 
