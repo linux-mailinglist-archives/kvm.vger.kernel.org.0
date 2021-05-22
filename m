@@ -2,102 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B48838D575
-	for <lists+kvm@lfdr.de>; Sat, 22 May 2021 12:59:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9198D38D591
+	for <lists+kvm@lfdr.de>; Sat, 22 May 2021 13:12:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230346AbhEVLAu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 May 2021 07:00:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47657 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230232AbhEVLAt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 22 May 2021 07:00:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621681163;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=j9rn+32PwVgmZlnPZcXzaefsik9C6TcVR0RDLcZXg4E=;
-        b=UfqON+G65GIUQ1Xw9vK+Sapzx1Arowl5yirkSpdGC+sD0X9tOqKcldfGi9ie4R+7uC+wuO
-        GvIp9v/ZASGrRtWuKkWLaW8UU03N7LMTL2ZufAYiVIzwMAbgjN82FxJTkqSY50MQSlwNf7
-        zKKxMM+NjlSbY0cGdoR8HFHIIPPfCKg=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-QEZqpLVVPE6GU44yzdTkDg-1; Sat, 22 May 2021 06:59:21 -0400
-X-MC-Unique: QEZqpLVVPE6GU44yzdTkDg-1
-Received: by mail-ed1-f69.google.com with SMTP id c21-20020a0564021015b029038c3f08ce5aso12842040edu.18
-        for <kvm@vger.kernel.org>; Sat, 22 May 2021 03:59:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=j9rn+32PwVgmZlnPZcXzaefsik9C6TcVR0RDLcZXg4E=;
-        b=P95SUll/lBPC4tA4OhwGwRhPAtMfis+1iERD+BPvxKu9rtpUxtKfFfGnhlgDT+kWDj
-         Tg7ipNlHyQigTUcsGbYUE+ZkO0t38UOWyPLNqsORqWrnSFYzwM+wjT6grusqQxr3NDXW
-         ZVD8yNi7FBOhtgL7EylXqxmckolNIOzTidPQfEbzcQpEtfdCkpU8qBP/pdZhoq6xcrlx
-         +eja/2rVqJ/bfWr3qqxJ4NPPZ/l2uwV+lRyC+PbPsSMrR9RrhjyQayRyqYamp87iXJrH
-         9lVWXGv53PLuwcjPRrRWAKNAihcuL4m1BnDa2wN0yiR6evKcR0lxrWj/Xj7OfmXLh7kK
-         3u3Q==
-X-Gm-Message-State: AOAM530Dl+lUreIWa1O7kumqSECwe1PYG4MgPU88lH0NTZDhWCcjPJPB
-        PcFeTvu/5ERGBsHRpaMoyvVsDT6YhQr8TZlrGvTYNUu6XtnsC1/es2N8fSYKGxGEwoG9I2Isf/m
-        5jCn2lrcRrg66
-X-Received: by 2002:a05:6402:50b:: with SMTP id m11mr16317245edv.367.1621681160272;
-        Sat, 22 May 2021 03:59:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxAAcmWjNrP2tJwk0BC5NT8x24rlkF12MgYLc3PSnIY9kp3sfdaHj9voOCQUgp3fK/PVVdaQA==
-X-Received: by 2002:a05:6402:50b:: with SMTP id m11mr16317227edv.367.1621681160104;
-        Sat, 22 May 2021 03:59:20 -0700 (PDT)
-Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id x10sm6039537edd.30.2021.05.22.03.59.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 May 2021 03:59:19 -0700 (PDT)
-Date:   Sat, 22 May 2021 12:59:18 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     kvm@vger.kernel.org, Venkatesh Srinivas <venkateshs@chromium.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH v2] KVM: selftests: Fix 32-bit truncation of
- vm_get_max_gfn()
-Message-ID: <20210522105918.krdukoxe7jd2df6a@gator>
-References: <20210521173828.1180619-1-dmatlack@google.com>
+        id S230393AbhEVLNL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 May 2021 07:13:11 -0400
+Received: from vps-vb.mhejs.net ([37.28.154.113]:37668 "EHLO vps-vb.mhejs.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230300AbhEVLNK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 22 May 2021 07:13:10 -0400
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1lkPXb-0001P8-S3; Sat, 22 May 2021 13:11:35 +0200
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <cover.1621191549.git.maciej.szmigiero@oracle.com>
+ <4a4867419344338e1419436af1e1b0b8f2405517.1621191551.git.maciej.szmigiero@oracle.com>
+ <YKWRyvyyO5UAHv4U@google.com>
+ <c7ba42ee-dc70-a86c-aeb2-d410c136a5ec@maciej.szmigiero.name>
+Subject: Re: [PATCH v3 3/8] KVM: Resolve memslot ID via a hash table instead
+ of via a static array
+Message-ID: <5887de10-c615-175b-e491-86f94e542425@maciej.szmigiero.name>
+Date:   Sat, 22 May 2021 13:11:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210521173828.1180619-1-dmatlack@google.com>
+In-Reply-To: <c7ba42ee-dc70-a86c-aeb2-d410c136a5ec@maciej.szmigiero.name>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 21, 2021 at 05:38:28PM +0000, David Matlack wrote:
-> vm_get_max_gfn() casts vm->max_gfn from a uint64_t to an unsigned int,
-> which causes the upper 32-bits of the max_gfn to get truncated.
+On 21.05.2021 09:05, Maciej S. Szmigiero wrote:
+> On 20.05.2021 00:31, Sean Christopherson wrote:
+>> On Sun, May 16, 2021, Maciej S. Szmigiero wrote:
+(..)
+>>>           new_size = old_size;
+>>>       slots = kvzalloc(new_size, GFP_KERNEL_ACCOUNT);
+>>> -    if (likely(slots))
+>>> -        memcpy(slots, old, old_size);
+>>> +    if (unlikely(!slots))
+>>> +        return NULL;
+>>> +
+>>> +    memcpy(slots, old, old_size);
+>>> +
+>>> +    hash_init(slots->id_hash);
+>>> +    kvm_for_each_memslot(memslot, slots)
+>>> +        hash_add(slots->id_hash, &memslot->id_node, memslot->id);
+>>
+>> What's the perf penalty if the number of memslots gets large?  I ask because the
+>> lazy rmap allocation is adding multiple calls to kvm_dup_memslots().
 > 
-> Nobody noticed until now likely because vm_get_max_gfn() is only used
-> as a mechanism to create a memslot in an unused region of the guest
-> physical address space (the top), and the top of the 32-bit physical
-> address space was always good enough.
+> I would expect the "move inactive" benchmark to be closest to measuring
+> the performance of just a memslot array copy operation but the results
+> suggest that the performance stays within ~10% window from 10 to 509
+> memslots on the old code (it then climbs 13x for 32k case).
 > 
-> This fix reveals a bug in memslot_modification_stress_test which was
-> trying to create a dummy memslot past the end of guest physical memory.
-> Fix that by moving the dummy memslot lower.
+> That suggests that something else is dominating this benchmark for these
+> memslot counts (probably zapping of shadow pages).
 > 
-> Fixes: 52200d0d944e ("KVM: selftests: Remove duplicate guest mode handling")
-> Reviewed-by: Venkatesh Srinivas <venkateshs@chromium.org>
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
+> At the same time, the tree-based memslots implementation is clearly
+> faster in this benchmark, even for smaller memslot counts, so apparently
+> copying of the memslot array has some performance impact, too.
 > 
-> v1 -> v2:
->  - Added Venkatesh's R-b line.
->  - Used PRIx64 to print uint64_t instead of %lx.
-> 
->  tools/testing/selftests/kvm/include/kvm_util.h |  2 +-
->  tools/testing/selftests/kvm/lib/kvm_util.c     |  2 +-
->  .../testing/selftests/kvm/lib/perf_test_util.c |  4 +++-
->  .../kvm/memslot_modification_stress_test.c     | 18 +++++++++++-------
->  4 files changed, 16 insertions(+), 10 deletions(-)
->
+> Measuring just kvm_dup_memslots() performance would probably be done
+> best by benchmarking KVM_MR_FLAGS_ONLY operation - will try to add this
+> operation to my set of benchmarks and see how it performs with different
+> memslot counts.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Update:
+I've implemented a simple KVM_MR_FLAGS_ONLY benchmark, that repeatably
+sets and unsets KVM_MEM_LOG_DIRTY_PAGES flag on a memslot with a single
+page of memory in it. [1]
+
+Since on the current code with higher memslot counts the "set flags"
+operation spends a significant time in kvm_mmu_calculate_default_mmu_pages()
+a second set of measurements was done with patch [2] applied.
+
+In this case, the top functions in the perf trace are "memcpy" and
+"clear_page" (called from kvm_set_memslot(), most likely from inlined
+kvm_dup_memslots()).
+
+For reference, a set of measurements with the whole patch series
+(patches 1 - 8) applied was also done, as "new code".
+In this case, SRCU-related functions dominate the perf trace.
+
+32k memslots:
+Current code:             0.00130s
+Current code + patch [2]: 0.00104s (13x 4k result)
+New code:                 0.0000144s
+
+4k memslots:
+Current code:             0.0000899s
+Current code + patch [2]: 0.0000799s (+78% 2k result)
+New code:                 0.0000144s
+
+2k memslots:
+Current code:             0.0000495s
+Current code + patch [2]: 0.0000447s (+54% 509 result)
+New code:                 0.0000143s
+
+509 memslots:
+Current code:             0.0000305s
+Current code + patch [2]: 0.0000290s (+5% 100 result)
+New code:                 0.0000141s
+
+100 memslots:
+Current code:             0.0000280s
+Current code + patch [2]: 0.0000275s (same as for 10 slots)
+New code:                 0.0000142s
+
+10 memslots:
+Current code:             0.0000272s
+Current code + patch [2]: 0.0000272s
+New code:                 0.0000141s
 
 Thanks,
-drew
+Maciej
 
+[1]: The patch against memslot_perf_test.c is available here:
+https://github.com/maciejsszmigiero/linux/commit/841e94898a55ff79af9d20a08205aa80808bd2a8
+
+[2]: "[PATCH v3 1/8] KVM: x86: Cache total page count to avoid traversing the memslot array"
