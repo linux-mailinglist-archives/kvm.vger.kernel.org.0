@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CC5038D27D
-	for <lists+kvm@lfdr.de>; Sat, 22 May 2021 02:22:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9660E38D277
+	for <lists+kvm@lfdr.de>; Sat, 22 May 2021 02:21:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231150AbhEVAXj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 May 2021 20:23:39 -0400
-Received: from mga12.intel.com ([192.55.52.136]:24212 "EHLO mga12.intel.com"
+        id S231269AbhEVAXD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 May 2021 20:23:03 -0400
+Received: from mga04.intel.com ([192.55.52.120]:56072 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230429AbhEVAW5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 May 2021 20:22:57 -0400
-IronPort-SDR: 5FW0h8FVWdJ4bgabPRBKyeIbVEJK0GW27bLlcaHowfpgVXrE1eKQnXiVa6jZ1AwubBrRIOIjVV
- QxIx3PCgWj/A==
-X-IronPort-AV: E=McAfee;i="6200,9189,9991"; a="181210685"
+        id S231286AbhEVAWW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 May 2021 20:22:22 -0400
+IronPort-SDR: 3fbRic06r2VCumwW6SahWbJyjULxrDNM5h2XQk4lNxOzH9Bm9jvM7G8m4VOqLAL8+VHFrvqcAS
+ NWn0+MbSb+pQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,9991"; a="199661288"
 X-IronPort-AV: E=Sophos;i="5.82,319,1613462400"; 
-   d="scan'208";a="181210685"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2021 17:20:51 -0700
-IronPort-SDR: MPcVlthEflmHx/IsUHghDBX+s9yREoSIh+uaaWREq5h4+vYWuwki8NFImjdQ6FQssNd/zhVHsJ
- KJR2qgwPq5vA==
+   d="scan'208";a="199661288"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2021 17:20:58 -0700
+IronPort-SDR: r66u16T10yzWEpgnFp0w9VS6i7FXAGZWvjKzU4FWhmUAM8XjWV9w3sHQKzn0pTZmCSLTCeP1RZ
+ epSHqwRlOJGQ==
 X-IronPort-AV: E=Sophos;i="5.82,319,1613462400"; 
-   d="scan'208";a="412801885"
+   d="scan'208";a="474753058"
 Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2021 17:20:50 -0700
-Subject: [PATCH v6 17/20] vfio/mdev: idxd: add error notification from host
- driver to mediated device
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2021 17:20:57 -0700
+Subject: [PATCH v6 18/20] vfio: move vfio_pci_set_ctx_trigger_single to common
+ code
 From:   Dave Jiang <dave.jiang@intel.com>
 To:     alex.williamson@redhat.com, kwankhede@nvidia.com,
         tglx@linutronix.de, vkoul@kernel.org, jgg@mellanox.com
@@ -35,8 +35,8 @@ Cc:     megha.dey@intel.com, jacob.jun.pan@intel.com, ashok.raj@intel.com,
         dan.j.williams@intel.com, eric.auger@redhat.com,
         pbonzini@redhat.com, dmaengine@vger.kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Date:   Fri, 21 May 2021 17:20:49 -0700
-Message-ID: <162164284985.261970.10964903081717121200.stgit@djiang5-desk3.ch.intel.com>
+Date:   Fri, 21 May 2021 17:20:56 -0700
+Message-ID: <162164285626.261970.18327549914978174180.stgit@djiang5-desk3.ch.intel.com>
 In-Reply-To: <162164243591.261970.3439987543338120797.stgit@djiang5-desk3.ch.intel.com>
 References: <162164243591.261970.3439987543338120797.stgit@djiang5-desk3.ch.intel.com>
 User-Agent: StGit/0.23-29-ga622f1
@@ -47,153 +47,211 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a device error occurs, the mediated device need to be notified in
-order to notify the guest of device error. Add support to notify the
-specific mdev when an error is wq specific and broadcast errors to all mdev
-when it's a generic device error.
+With mdev needing to also use the same function, move the function to a
+common place where vfio pci and mdev can both utilize.
 
 Signed-off-by: Dave Jiang <dave.jiang@intel.com>
 ---
- drivers/dma/idxd/idxd.h       |    7 +++++++
- drivers/dma/idxd/irq.c        |   21 +++++++++++++++++++--
- drivers/vfio/mdev/idxd/mdev.c |    5 +++++
- drivers/vfio/mdev/idxd/mdev.h |    1 +
- drivers/vfio/mdev/idxd/vdev.c |   23 +++++++++++++++++++++++
- 5 files changed, 55 insertions(+), 2 deletions(-)
+ drivers/vfio/Makefile             |    2 +
+ drivers/vfio/pci/vfio_pci_intrs.c |   63 ++------------------------------
+ drivers/vfio/vfio_common.c        |   74 +++++++++++++++++++++++++++++++++++++
+ include/linux/vfio.h              |    4 ++
+ 4 files changed, 83 insertions(+), 60 deletions(-)
+ create mode 100644 drivers/vfio/vfio_common.c
 
-diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
-index 5e8da9019c46..b1d94463fce5 100644
---- a/drivers/dma/idxd/idxd.h
-+++ b/drivers/dma/idxd/idxd.h
-@@ -50,10 +50,17 @@ enum idxd_type {
- #define IDXD_NAME_SIZE		128
- #define IDXD_PMU_EVENT_MAX	64
+diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
+index fee73f3d9480..fc7fd2412dee 100644
+--- a/drivers/vfio/Makefile
++++ b/drivers/vfio/Makefile
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+ vfio_virqfd-y := virqfd.o
  
-+struct idxd_wq;
-+
-+struct idxd_device_ops {
-+	void (*notify_error)(struct idxd_wq *wq);
-+};
-+
- struct idxd_device_driver {
- 	const char *name;
- 	int (*probe)(struct device *dev);
- 	void (*remove)(struct device *dev);
-+	struct idxd_device_ops *ops;
- 	struct device_driver drv;
- };
- 
-diff --git a/drivers/dma/idxd/irq.c b/drivers/dma/idxd/irq.c
-index d1a635ecc7f3..b8b6c93f4480 100644
---- a/drivers/dma/idxd/irq.c
-+++ b/drivers/dma/idxd/irq.c
-@@ -104,6 +104,7 @@ static int idxd_device_schedule_fault_process(struct idxd_device *idxd,
- 
- static int process_misc_interrupts(struct idxd_device *idxd, u32 cause)
- {
-+	struct idxd_device_driver *wq_drv;
- 	struct device *dev = &idxd->pdev->dev;
- 	union gensts_reg gensts;
- 	u32 val = 0;
-@@ -123,16 +124,32 @@ static int process_misc_interrupts(struct idxd_device *idxd, u32 cause)
- 			int id = idxd->sw_err.wq_idx;
- 			struct idxd_wq *wq = idxd->wqs[id];
- 
--			if (wq->type == IDXD_WQT_USER)
-+			if (is_idxd_wq_user(wq)) {
- 				wake_up_interruptible(&wq->err_queue);
-+			} else if (is_idxd_wq_mdev(wq)) {
-+				struct device *conf_dev = wq_confdev(wq);
-+				struct device_driver *drv = conf_dev->driver;
-+
-+				wq_drv = container_of(drv, struct idxd_device_driver, drv);
-+				if (wq_drv)
-+					wq_drv->ops->notify_error(wq);
-+			}
- 		} else {
- 			int i;
- 
- 			for (i = 0; i < idxd->max_wqs; i++) {
- 				struct idxd_wq *wq = idxd->wqs[i];
- 
--				if (wq->type == IDXD_WQT_USER)
-+				if (is_idxd_wq_user(wq)) {
- 					wake_up_interruptible(&wq->err_queue);
-+				} else if (is_idxd_wq_mdev(wq)) {
-+					struct device *conf_dev = wq_confdev(wq);
-+					struct device_driver *drv = conf_dev->driver;
-+
-+					wq_drv = container_of(drv, struct idxd_device_driver, drv);
-+					if (wq_drv)
-+						wq_drv->ops->notify_error(wq);
-+				}
- 			}
- 		}
- 
-diff --git a/drivers/vfio/mdev/idxd/mdev.c b/drivers/vfio/mdev/idxd/mdev.c
-index 3257505fb7c7..25d1ac67b0c9 100644
---- a/drivers/vfio/mdev/idxd/mdev.c
-+++ b/drivers/vfio/mdev/idxd/mdev.c
-@@ -904,10 +904,15 @@ static void idxd_mdev_drv_remove(struct device *dev)
- 	put_device(dev);
+-obj-$(CONFIG_VFIO) += vfio.o
++obj-$(CONFIG_VFIO) += vfio.o vfio_common.o
+ obj-$(CONFIG_VFIO_VIRQFD) += vfio_virqfd.o
+ obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
+ obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+index 9c8efad3a859..926cff00146c 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -561,61 +561,6 @@ static int vfio_pci_set_msi_trigger(struct vfio_pci_device *vdev,
+ 	return 0;
  }
  
-+static struct idxd_device_ops mdev_wq_ops = {
-+	.notify_error = idxd_wq_vidxd_send_errors,
-+};
-+
- static struct idxd_device_driver idxd_mdev_driver = {
- 	.probe = idxd_mdev_drv_probe,
- 	.remove = idxd_mdev_drv_remove,
- 	.name = idxd_mdev_drv_name,
-+	.ops = &mdev_wq_ops,
- };
+-static int vfio_pci_set_ctx_trigger_single(struct eventfd_ctx **ctx,
+-					   unsigned int count, uint32_t flags,
+-					   void *data)
+-{
+-	/* DATA_NONE/DATA_BOOL enables loopback testing */
+-	if (flags & VFIO_IRQ_SET_DATA_NONE) {
+-		if (*ctx) {
+-			if (count) {
+-				eventfd_signal(*ctx, 1);
+-			} else {
+-				eventfd_ctx_put(*ctx);
+-				*ctx = NULL;
+-			}
+-			return 0;
+-		}
+-	} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
+-		uint8_t trigger;
+-
+-		if (!count)
+-			return -EINVAL;
+-
+-		trigger = *(uint8_t *)data;
+-		if (trigger && *ctx)
+-			eventfd_signal(*ctx, 1);
+-
+-		return 0;
+-	} else if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
+-		int32_t fd;
+-
+-		if (!count)
+-			return -EINVAL;
+-
+-		fd = *(int32_t *)data;
+-		if (fd == -1) {
+-			if (*ctx)
+-				eventfd_ctx_put(*ctx);
+-			*ctx = NULL;
+-		} else if (fd >= 0) {
+-			struct eventfd_ctx *efdctx;
+-
+-			efdctx = eventfd_ctx_fdget(fd);
+-			if (IS_ERR(efdctx))
+-				return PTR_ERR(efdctx);
+-
+-			if (*ctx)
+-				eventfd_ctx_put(*ctx);
+-
+-			*ctx = efdctx;
+-		}
+-		return 0;
+-	}
+-
+-	return -EINVAL;
+-}
+-
+ static int vfio_pci_set_err_trigger(struct vfio_pci_device *vdev,
+ 				    unsigned index, unsigned start,
+ 				    unsigned count, uint32_t flags, void *data)
+@@ -623,8 +568,8 @@ static int vfio_pci_set_err_trigger(struct vfio_pci_device *vdev,
+ 	if (index != VFIO_PCI_ERR_IRQ_INDEX || start != 0 || count > 1)
+ 		return -EINVAL;
  
- static int __init idxd_mdev_init(void)
-diff --git a/drivers/vfio/mdev/idxd/mdev.h b/drivers/vfio/mdev/idxd/mdev.h
-index dd4290bce772..10358831da6a 100644
---- a/drivers/vfio/mdev/idxd/mdev.h
-+++ b/drivers/vfio/mdev/idxd/mdev.h
-@@ -107,5 +107,6 @@ int vidxd_cfg_read(struct vdcm_idxd *vidxd, unsigned int pos, void *buf, unsigne
- int vidxd_cfg_write(struct vdcm_idxd *vidxd, unsigned int pos, void *buf, unsigned int size);
- int vidxd_mmio_write(struct vdcm_idxd *vidxd, u64 pos, void *buf, unsigned int size);
- int vidxd_mmio_read(struct vdcm_idxd *vidxd, u64 pos, void *buf, unsigned int size);
-+void idxd_wq_vidxd_send_errors(struct idxd_wq *wq);
- 
- #endif
-diff --git a/drivers/vfio/mdev/idxd/vdev.c b/drivers/vfio/mdev/idxd/vdev.c
-index a444a0af8b5f..2a066e483dd8 100644
---- a/drivers/vfio/mdev/idxd/vdev.c
-+++ b/drivers/vfio/mdev/idxd/vdev.c
-@@ -151,6 +151,29 @@ static void vidxd_report_swerror(struct vdcm_idxd *vidxd, unsigned int error)
- 	send_swerr_interrupt(vidxd);
+-	return vfio_pci_set_ctx_trigger_single(&vdev->err_trigger,
+-					       count, flags, data);
++	return vfio_set_ctx_trigger_single(&vdev->err_trigger,
++					   count, flags, data);
  }
  
-+void idxd_wq_vidxd_send_errors(struct idxd_wq *wq)
+ static int vfio_pci_set_req_trigger(struct vfio_pci_device *vdev,
+@@ -634,8 +579,8 @@ static int vfio_pci_set_req_trigger(struct vfio_pci_device *vdev,
+ 	if (index != VFIO_PCI_REQ_IRQ_INDEX || start != 0 || count > 1)
+ 		return -EINVAL;
+ 
+-	return vfio_pci_set_ctx_trigger_single(&vdev->req_trigger,
+-					       count, flags, data);
++	return vfio_set_ctx_trigger_single(&vdev->req_trigger,
++					   count, flags, data);
+ }
+ 
+ int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
+diff --git a/drivers/vfio/vfio_common.c b/drivers/vfio/vfio_common.c
+new file mode 100644
+index 000000000000..b209d57c7312
+--- /dev/null
++++ b/drivers/vfio/vfio_common.c
+@@ -0,0 +1,74 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2021 Intel, Corp. All rights reserved.
++ * Copyright (C) 2012 Red Hat, Inc.  All rights reserved.
++ *     Author: Alex Williamson <alex.williamson@redhat.com>
++ * VFIO common helper functions
++ */
++
++#include <linux/eventfd.h>
++#include <linux/vfio.h>
++
++/*
++ * Common helper to set single eventfd trigger
++ *
++ * @ctx [out]		: address of eventfd ctx to be written to
++ * @count [in]		: number of vectors (should be 1)
++ * @flags [in]		: VFIO IRQ flags
++ * @data [in]		: data from ioctl
++ */
++int vfio_set_ctx_trigger_single(struct eventfd_ctx **ctx,
++				unsigned int count, u32 flags,
++				void *data)
 +{
-+	struct vdcm_idxd *vidxd = wq->vidxd;
-+	struct idxd_device *idxd = vidxd->idxd;
-+	u8 *bar0 = vidxd->bar0;
-+	union sw_err_reg *swerr = (union sw_err_reg *)(bar0 + IDXD_SWERR_OFFSET);
-+	int i;
-+
-+	if (swerr->valid) {
-+		if (!swerr->overflow) {
-+			swerr->overflow = 1;
-+			send_swerr_interrupt(vidxd);
++	/* DATA_NONE/DATA_BOOL enables loopback testing */
++	if (flags & VFIO_IRQ_SET_DATA_NONE) {
++		if (*ctx) {
++			if (count) {
++				eventfd_signal(*ctx, 1);
++			} else {
++				eventfd_ctx_put(*ctx);
++				*ctx = NULL;
++			}
++			return 0;
 +		}
-+		return;
++	} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
++		u8 trigger;
++
++		if (!count)
++			return -EINVAL;
++
++		trigger = *(uint8_t *)data;
++		if (trigger && *ctx)
++			eventfd_signal(*ctx, 1);
++
++		return 0;
++	} else if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
++		s32 fd;
++
++		if (!count)
++			return -EINVAL;
++
++		fd = *(s32 *)data;
++		if (fd == -1) {
++			if (*ctx)
++				eventfd_ctx_put(*ctx);
++			*ctx = NULL;
++		} else if (fd >= 0) {
++			struct eventfd_ctx *efdctx;
++
++			efdctx = eventfd_ctx_fdget(fd);
++			if (IS_ERR(efdctx))
++				return PTR_ERR(efdctx);
++
++			if (*ctx)
++				eventfd_ctx_put(*ctx);
++
++			*ctx = efdctx;
++		}
++		return 0;
 +	}
 +
-+	lockdep_assert_held(&idxd->dev_lock);
-+	for (i = 0; i < 4; i++)
-+		swerr->bits[i] = idxd->sw_err.bits[i];
-+
-+	send_swerr_interrupt(vidxd);
++	return -EINVAL;
 +}
-+
- int vidxd_mmio_write(struct vdcm_idxd *vidxd, u64 pos, void *buf, unsigned int size)
- {
- 	u32 offset = pos & (vidxd->bar_size[0] - 1);
++EXPORT_SYMBOL(vfio_set_ctx_trigger_single);
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index ed5ca027eb49..aa7cb0e1b8b2 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -235,4 +235,8 @@ extern int vfio_virqfd_enable(void *opaque,
+ 			      void *data, struct virqfd **pvirqfd, int fd);
+ extern void vfio_virqfd_disable(struct virqfd **pvirqfd);
+ 
++/* common lib functions */
++extern int vfio_set_ctx_trigger_single(struct eventfd_ctx **ctx,
++				       unsigned int count, u32 flags,
++				       void *data);
+ #endif /* VFIO_H */
 
 
