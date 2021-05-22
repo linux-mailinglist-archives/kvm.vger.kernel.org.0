@@ -2,365 +2,284 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AFFCC38D11C
-	for <lists+kvm@lfdr.de>; Sat, 22 May 2021 00:16:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3AE438D249
+	for <lists+kvm@lfdr.de>; Sat, 22 May 2021 02:19:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229782AbhEUWSD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 May 2021 18:18:03 -0400
-Received: from mail-bn8nam12on2063.outbound.protection.outlook.com ([40.107.237.63]:24192
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229655AbhEUWRX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 May 2021 18:17:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Tad98yJMzz/HXirxVD4vJ/eBoq8pP1MexyQz4r3pfsu+rUsk8KGA7eT76IuwzCh6JJ4XVbYXx/ItGk41o2uHIqn7t1fOSPm88SsgcGFrxnrlYEYYrZ88rmi4CiXvJgspW/ssO1/dXup1gX7Er+NGVYopUMzLeUciJXnDuvGzUlkjp+vD3w8bz0ZnSkAAHf6OlvLtSY7JB7av/OzTEi4Jel7eG6WhQTrduD+KAlhWOiGzJowNp0yFxm4dB4kXjZD3cXnGIURfccTbq/d12uECdYzm6Qs1hhSTdVjYzDrCQ3wau4dzm9r2qxwmfDqg+yNybA3wJ6t87qXEHlT1TMoNRg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Un3Bp9iXgVG4S/cBMGsgHi6nxEXjkaT3n/ISvWDzjuU=;
- b=QeDpNoY8Qmu2woGLqWMf9OPl+MVPYz24CDpSEBrpO0KeLCQO2BgCyC+2ui+zk6LoneZiR5ZQ/gyS1FO42dqb67l6Q9jboVDN9V5U0OT4M7g6e+ZiAE4hBEUHABquOjJeYadKrzaJ/lFUE5+dst8mT023mx+vBbGUJsTDIA8jV3bm0In+y3YbIcOijPWrlm+AQUqpudC+fM4kxBMx6PYsQCwYujAHaOTkHT9qfCoinN8xyjWBPG6i8+iMxlqN5spq7Ecfba6Drh+xSbF/uBKWAIyydGc4APdFB5bsrfeQ1DqFrGC8XEkb3tKXaRL/RKRBAxpwOVNKZwZeMbiWTGTvAg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Un3Bp9iXgVG4S/cBMGsgHi6nxEXjkaT3n/ISvWDzjuU=;
- b=H7zWR0EiL9Wjt97WkRFcqkj4L2G+Ocw8PvzUp/6JCptpZCP+rvRd1Odqyk2njRXHsDUnd1egLs+X2zCjQmvFbMRP8LE8Nf3RGWd9uBwasDESIrWLtccLElOlUJxcH/GVTzKAmlh+WQGHXpVxzQIegxpeGsDgSr7pKvG70G1yCB4=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN6PR12MB2686.namprd12.prod.outlook.com (2603:10b6:805:72::30) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4129.26; Fri, 21 May
- 2021 22:15:56 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4150.023; Fri, 21 May 2021
- 22:15:56 +0000
-Cc:     brijesh.singh@amd.com, armbru@redhat.com, dgilbert@redhat.com,
-        James Bottomley <jejb@linux.ibm.com>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        Eric Blake <eblake@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v3] target/i386/sev: add support to query the attestation
- report
-To:     qemu-devel@nongnu.org
-References: <20210429170728.24322-1-brijesh.singh@amd.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <9da40603-14d0-73f1-7c81-1f059730101c@amd.com>
-Date:   Fri, 21 May 2021 17:15:53 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.0
-In-Reply-To: <20210429170728.24322-1-brijesh.singh@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [70.112.153.56]
-X-ClientProxiedBy: SA0PR11CA0074.namprd11.prod.outlook.com
- (2603:10b6:806:d2::19) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        id S230259AbhEVAUc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 May 2021 20:20:32 -0400
+Received: from mga11.intel.com ([192.55.52.93]:50278 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230184AbhEVAUc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 May 2021 20:20:32 -0400
+IronPort-SDR: O4IurjhamkGVBePUVJrcaIYCpOcrKpnen5Z6no/i7VmWQWeSN4CmkpIlM4KMvievDcAU1LCzwG
+ Sersn6L+RXgw==
+X-IronPort-AV: E=McAfee;i="6200,9189,9991"; a="198518509"
+X-IronPort-AV: E=Sophos;i="5.82,319,1613462400"; 
+   d="scan'208";a="198518509"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2021 17:19:06 -0700
+IronPort-SDR: lRGVHu3sDlfwO3wRUqFV/IkYVxGdkDnHLbDW/K2U4lgsvy2OYcsmkJ9Wy0fmfsFp7aWZO+8D5C
+ XdfWraZxsFZA==
+X-IronPort-AV: E=Sophos;i="5.82,319,1613462400"; 
+   d="scan'208";a="434499755"
+Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2021 17:19:05 -0700
+Subject: [PATCH v6 00/20] Add VFIO mediated device support and DEV-MSI support
+ for the idxd driver
+From:   Dave Jiang <dave.jiang@intel.com>
+To:     alex.williamson@redhat.com, kwankhede@nvidia.com,
+        tglx@linutronix.de, vkoul@kernel.org, jgg@mellanox.com
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, megha.dey@intel.com,
+        jacob.jun.pan@intel.com, ashok.raj@intel.com, yi.l.liu@intel.com,
+        baolu.lu@intel.com, kevin.tian@intel.com, sanjay.k.kumar@intel.com,
+        tony.luck@intel.com, dan.j.williams@intel.com,
+        eric.auger@redhat.com, pbonzini@redhat.com,
+        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Date:   Fri, 21 May 2021 17:19:05 -0700
+Message-ID: <162164243591.261970.3439987543338120797.stgit@djiang5-desk3.ch.intel.com>
+User-Agent: StGit/0.23-29-ga622f1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SA0PR11CA0074.namprd11.prod.outlook.com (2603:10b6:806:d2::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4150.23 via Frontend Transport; Fri, 21 May 2021 22:15:55 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: dee0b9d0-0e72-4a1f-532d-08d91ca60111
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2686:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR12MB26862FED0B9754B7A86EA6E1E5299@SN6PR12MB2686.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2582;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: UoQTnQyC6v2s+4zrMcW/kZVz/yOj5ycoQ84AlJNT2LAhkF2F7ZZ8M8WTY1aJKGwbHmyYMy5TvG3G4k50ehl4dvKi1YKCrtplcF2viYn/IdQxQQzZ2t1kQPQXYQ5aV5zXhTaDJ/GXknqoqy1r8ekdce144ltTWvAzWjyjN1+m2mQ568OTHA+AfN0A1SDuAoT1ZCFeCQRm+cBHMC0MRTXnEA/GhplMzKj/akYZJRWkB9jrOfOciJqBYWw6yE6FEkhNN3ZCz3ER4F7wfwnsY+3GwIjfSWKWlvLgz+EJMZq9L/Mflm2ZeKCKu5U8Yb+k4j6KASLtBkcK8FdZyfGvsbe0xeglcD0OfLqu552vFiUWkSVfch9+3N2LxUROzub6KPqznGnd/d1N0bxom8jRH3QUPYvIN5hh91lCluHWmRivvlmfLYKo8YQZxZOEU/JWAhefa7LSBS41yyFuLnbDutkTqZl8DorsLxKUUDwVNdAsFYK8gN2Q6rRMz6qUTovulxyh78PQB+99pCzh7nX9NiCzXVdoJ0MJ4iloELLukVZxeUL3IsL2e2LWOE27MA4wRHuXdJGv1LsuVLHMZTn/TW7Ox/PWSr+uNzt8B3cOXYS+aPNmiviJTjdBGo9PhamM2VOp4Uh6H7LNJOyDA5/ygSlnwyheweUYDP5HW/RRAXpqGawZjd70X2RC8BIjNXCNsck6yxZgRTEZJD2VCS+oesrQz3JbfjVXDuz124MUqXs9lHw=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(346002)(396003)(366004)(39860400002)(376002)(2616005)(956004)(44832011)(6512007)(6506007)(6916009)(66946007)(66556008)(66476007)(83380400001)(31686004)(316002)(6486002)(36756003)(186003)(8936002)(16526019)(52116002)(53546011)(5660300002)(8676002)(38350700002)(54906003)(86362001)(31696002)(26005)(478600001)(4326008)(2906002)(38100700002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?Ym82bUhETU1aR29Kbjg4UU53bVI4R0ZxUW5QNFArU1prSTlybCtxd1RFdGk3?=
- =?utf-8?B?Q2Fqb1lLOXZ3bWROSWoyTnNIUXpBZUE4bTcwZ0tIRUxhMGdZRWswaTNiTUhq?=
- =?utf-8?B?c0tSTzRUQis1c25VSnRyUWdleVpmc3B6Qys5NFJCcEpIb25PVG1uS0FRKzZx?=
- =?utf-8?B?ZnU0b0c5bmVHV2xXRk5wWTZKbmhCMmJ2NkFvKzVoTGpVN0JPdmQ1Qy9hYmpT?=
- =?utf-8?B?RXh0YzZqWWdBSll2UzROa1lib0wrRGFjczZzM3Q0SG5jSlFCTkVsOWNLN0Q2?=
- =?utf-8?B?OHVLaGxzamw2bkR0MkZGaUkvYkRMQ0lVcEJaZ202dTEvd3RhZkpEenJKREkx?=
- =?utf-8?B?bWlzQWMvOUFVdmNvL3VhM2hrN0wrR1lqMlQ3NUlSeUo0MFk1ZS95blZsdjF5?=
- =?utf-8?B?cC9kdzdTMnFnMVFOdzJlZi9za0N1T0NTcnJlQVNSazYzck0zanhRNzd3d2lL?=
- =?utf-8?B?ZG1OdkFBb3VHN25mdi9ndFlqUFhrVWQxL0FlYWc2djNma01YazRVeUo4dEhu?=
- =?utf-8?B?elRGQW1RSzdXUjd2T0E1aVppREtJUmFrWVlBeFlhMFZ1WmpsTDhhQXcxcGt3?=
- =?utf-8?B?dnY1d0F2bm1JWXNOL1dLSE01cVdUeDFWUlc1QUdZM1UwWGRsSVRacllnaFM5?=
- =?utf-8?B?TmdvZHlvVDJISFFHMGZZV0N0Tyt1U2svVmRNakR0M1ZaVVBPbXRwQndpV1Jm?=
- =?utf-8?B?N1o4TmhsaWxhZEZhSGRBYjY2V2JncEcvWXFWZE5WV1BuVE11QzJrOFd1RVlO?=
- =?utf-8?B?QkMvRm1wSzUzeDNzZWk0NklPckdhZElGUTB2eElxR1Z5bG9YR203d2NxUUpK?=
- =?utf-8?B?WCt0Wjh4ZUdNeGNGRkFtUFkwZWJ5Q3ZLeHByTkRKcG1QQzRPY3BWQnFTOVgv?=
- =?utf-8?B?TDQvME8ySk9NQTNiWW9xb2VZVFpDR2gxS25wV3JsTlJ5bWJQOUw2YVcyTWVH?=
- =?utf-8?B?NzhKbGZrRldtUW85ZUorclFmdWwzdk5LeUhmQUV3cmpFT3NEZW0yRnpiME03?=
- =?utf-8?B?YXV4ajNNZEZDYWh1SWJsWUtnTitRYXRvNFlYMGxrZlVnK1pheE5yZlhmbUxM?=
- =?utf-8?B?bnViVTcybWdOeEFDSW03MUxOWW0wcHdxN0k4WmZlV2JNZi9BT25ZYXJPS0Np?=
- =?utf-8?B?N3BLMjI2MjBqbU5uVWQxKzFpOUloMVNIY3ZVa0R0SGZ3TVIrVHVNczA5R2FP?=
- =?utf-8?B?WksyeFcyd292MktWREsrbHhsUUdOTHdXcHNDcW1IazdoT1IwZWhFR0lFV0kr?=
- =?utf-8?B?WEFtSENiSTBiUGNKSFpoY0tObUNVbzB3Vm8xN0labmF6NzRseVNTOXNnMXds?=
- =?utf-8?B?US9GMjBOM3VjcXo3L0l0YjVuN2toS3pnN3BVajlJTzZpUjlwdE13TWN1Y2FG?=
- =?utf-8?B?eld3SEtydGY5a1pRSFp3NjFhQlZXWTBUeFFyakhKQjJzZGJrYlM3em8yL3hx?=
- =?utf-8?B?NTFrNE0yK283cHpYMmMzT3U1SkM0dFE2N28xZ214cjVWdC9SY1hEZG1IQzRF?=
- =?utf-8?B?Q1kxMXo3RmJGYkpzT1h6eld5bjF6bUlUckl2RWxkRDRSdjNKZEtXTWtIek96?=
- =?utf-8?B?SUQzaDFOeTZwY2VpRWMvdElwYm00bmgwN09LM0dtWE1PMHJQYVNVK0tLMEdn?=
- =?utf-8?B?KzdOS1RRWXlsamplVDljZUc5bjFTOUJoa1kwS2U0dkJpa0RrUFZxaWdwRXd2?=
- =?utf-8?B?TVpmOWIweUJ0VVJjSERUNkFNUVFtaGV3MkdHMGdjUTYvVGV4V3FXQTFEK2NG?=
- =?utf-8?Q?hOpDCBZtl7AObHqQQ3I0rScZavVt/XVrYwdKNwc?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dee0b9d0-0e72-4a1f-532d-08d91ca60111
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 May 2021 22:15:56.0655
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NRVAKwu+OZu6YLvmUFeEYka3huaKI184PRAONR8SEDxNM5PGxNVouQdryRmZnKRC192uOUZPwktQoZrTOizXwQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2686
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+The series is rebased on top of Jason's VFIO refactoring collection:
+https://github.com/jgunthorpe/linux/pull/3
 
-Ping. Please let me know if you have any feedback on this patch.
+We would like to receive review comments with respect to the mdev driver itself
+and the common VFIO IMS support code that was suggested by Jason. The previous
+version of the DEV-MSI/IMS code is still under review and also the IOASID code
+is under design.
 
-Thanks
+v6:
+- Rebased on top of Jason's recent VFIO refactoring.
+- Move VFIO IMS setup code to common (Jason)
+- Changed patch ordering to minimize code stubs (Jason)
 
-On 4/29/21 12:07 PM, Brijesh Singh wrote:
-> The SEV FW >= 0.23 added a new command that can be used to query the
-> attestation report containing the SHA-256 digest of the guest memory
-> and VMSA encrypted with the LAUNCH_UPDATE and sign it with the PEK.
->
-> Note, we already have a command (LAUNCH_MEASURE) that can be used to
-> query the SHA-256 digest of the guest memory encrypted through the
-> LAUNCH_UPDATE. The main difference between previous and this command
-> is that the report is signed with the PEK and unlike the LAUNCH_MEASURE
-> command the ATTESATION_REPORT command can be called while the guest
-> is running.
->
-> Add a QMP interface "query-sev-attestation-report" that can be used
-> to get the report encoded in base64.
->
-> Cc: James Bottomley <jejb@linux.ibm.com>
-> Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: kvm@vger.kernel.org
-> Reviewed-by: James Bottomley <jejb@linux.ibm.com>
-> Tested-by: James Bottomley <jejb@linux.ibm.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
-> v3:
->   * free the buffer in error path.
->
-> v2:
->   * add trace event.
->   * fix the goto to return NULL on failure.
->   * make the mnonce as a base64 encoded string
->
->  linux-headers/linux/kvm.h |  8 +++++
->  qapi/misc-target.json     | 38 ++++++++++++++++++++++
->  target/i386/monitor.c     |  6 ++++
->  target/i386/sev-stub.c    |  7 ++++
->  target/i386/sev.c         | 67 +++++++++++++++++++++++++++++++++++++++
->  target/i386/sev_i386.h    |  2 ++
->  target/i386/trace-events  |  1 +
->  7 files changed, 129 insertions(+)
->
-> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-> index 020b62a619..897f831374 100644
-> --- a/linux-headers/linux/kvm.h
-> +++ b/linux-headers/linux/kvm.h
-> @@ -1591,6 +1591,8 @@ enum sev_cmd_id {
->  	KVM_SEV_DBG_ENCRYPT,
->  	/* Guest certificates commands */
->  	KVM_SEV_CERT_EXPORT,
-> +	/* Attestation report */
-> +	KVM_SEV_GET_ATTESTATION_REPORT,
->  
->  	KVM_SEV_NR_MAX,
->  };
-> @@ -1643,6 +1645,12 @@ struct kvm_sev_dbg {
->  	__u32 len;
->  };
->  
-> +struct kvm_sev_attestation_report {
-> +	__u8 mnonce[16];
-> +	__u64 uaddr;
-> +	__u32 len;
-> +};
-> +
->  #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
->  #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
->  #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
-> diff --git a/qapi/misc-target.json b/qapi/misc-target.json
-> index 0c7491cd82..4b62f0ac05 100644
-> --- a/qapi/misc-target.json
-> +++ b/qapi/misc-target.json
-> @@ -285,3 +285,41 @@
->  ##
->  { 'command': 'query-gic-capabilities', 'returns': ['GICCapability'],
->    'if': 'defined(TARGET_ARM)' }
-> +
-> +
-> +##
-> +# @SevAttestationReport:
-> +#
-> +# The struct describes attestation report for a Secure Encrypted Virtualization
-> +# feature.
-> +#
-> +# @data:  guest attestation report (base64 encoded)
-> +#
-> +#
-> +# Since: 6.1
-> +##
-> +{ 'struct': 'SevAttestationReport',
-> +  'data': { 'data': 'str'},
-> +  'if': 'defined(TARGET_I386)' }
-> +
-> +##
-> +# @query-sev-attestation-report:
-> +#
-> +# This command is used to get the SEV attestation report, and is supported on AMD
-> +# X86 platforms only.
-> +#
-> +# @mnonce: a random 16 bytes value encoded in base64 (it will be included in report)
-> +#
-> +# Returns: SevAttestationReport objects.
-> +#
-> +# Since: 6.1
-> +#
-> +# Example:
-> +#
-> +# -> { "execute" : "query-sev-attestation-report", "arguments": { "mnonce": "aaaaaaa" } }
-> +# <- { "return" : { "data": "aaaaaaaabbbddddd"} }
-> +#
-> +##
-> +{ 'command': 'query-sev-attestation-report', 'data': { 'mnonce': 'str' },
-> +  'returns': 'SevAttestationReport',
-> +  'if': 'defined(TARGET_I386)' }
-> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-> index 5994408bee..119211f0b0 100644
-> --- a/target/i386/monitor.c
-> +++ b/target/i386/monitor.c
-> @@ -757,3 +757,9 @@ void qmp_sev_inject_launch_secret(const char *packet_hdr,
->  
->      sev_inject_launch_secret(packet_hdr, secret, gpa, errp);
->  }
-> +
-> +SevAttestationReport *
-> +qmp_query_sev_attestation_report(const char *mnonce, Error **errp)
-> +{
-> +    return sev_get_attestation_report(mnonce, errp);
-> +}
-> diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-> index 0207f1c5aa..0227cb5177 100644
-> --- a/target/i386/sev-stub.c
-> +++ b/target/i386/sev-stub.c
-> @@ -74,3 +74,10 @@ int sev_es_save_reset_vector(void *flash_ptr, uint64_t flash_size)
->  {
->      abort();
->  }
-> +
-> +SevAttestationReport *
-> +sev_get_attestation_report(const char *mnonce, Error **errp)
-> +{
-> +    error_setg(errp, "SEV is not available in this QEMU");
-> +    return NULL;
-> +}
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index 72b9e2ab40..4b9d7d3bb9 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -491,6 +491,73 @@ out:
->      return cap;
->  }
->  
-> +SevAttestationReport *
-> +sev_get_attestation_report(const char *mnonce, Error **errp)
-> +{
-> +    struct kvm_sev_attestation_report input = {};
-> +    SevAttestationReport *report = NULL;
-> +    SevGuestState *sev = sev_guest;
-> +    guchar *data;
-> +    guchar *buf;
-> +    gsize len;
-> +    int err = 0, ret;
-> +
-> +    if (!sev_enabled()) {
-> +        error_setg(errp, "SEV is not enabled");
-> +        return NULL;
-> +    }
-> +
-> +    /* lets decode the mnonce string */
-> +    buf = g_base64_decode(mnonce, &len);
-> +    if (!buf) {
-> +        error_setg(errp, "SEV: failed to decode mnonce input");
-> +        return NULL;
-> +    }
-> +
-> +    /* verify the input mnonce length */
-> +    if (len != sizeof(input.mnonce)) {
-> +        error_setg(errp, "SEV: mnonce must be %ld bytes (got %ld)",
-> +                sizeof(input.mnonce), len);
-> +        g_free(buf);
-> +        return NULL;
-> +    }
-> +
-> +    /* Query the report length */
-> +    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
-> +            &input, &err);
-> +    if (ret < 0) {
-> +        if (err != SEV_RET_INVALID_LEN) {
-> +            error_setg(errp, "failed to query the attestation report length "
-> +                    "ret=%d fw_err=%d (%s)", ret, err, fw_error_to_str(err));
-> +            g_free(buf);
-> +            return NULL;
-> +        }
-> +    }
-> +
-> +    data = g_malloc(input.len);
-> +    input.uaddr = (unsigned long)data;
-> +    memcpy(input.mnonce, buf, sizeof(input.mnonce));
-> +
-> +    /* Query the report */
-> +    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
-> +            &input, &err);
-> +    if (ret) {
-> +        error_setg_errno(errp, errno, "Failed to get attestation report"
-> +                " ret=%d fw_err=%d (%s)", ret, err, fw_error_to_str(err));
-> +        goto e_free_data;
-> +    }
-> +
-> +    report = g_new0(SevAttestationReport, 1);
-> +    report->data = g_base64_encode(data, input.len);
-> +
-> +    trace_kvm_sev_attestation_report(mnonce, report->data);
-> +
-> +e_free_data:
-> +    g_free(data);
-> +    g_free(buf);
-> +    return report;
-> +}
-> +
->  static int
->  sev_read_file_base64(const char *filename, guchar **data, gsize *len)
->  {
-> diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
-> index ae221d4c72..ae6d840478 100644
-> --- a/target/i386/sev_i386.h
-> +++ b/target/i386/sev_i386.h
-> @@ -35,5 +35,7 @@ extern uint32_t sev_get_cbit_position(void);
->  extern uint32_t sev_get_reduced_phys_bits(void);
->  extern char *sev_get_launch_measurement(void);
->  extern SevCapability *sev_get_capabilities(Error **errp);
-> +extern SevAttestationReport *
-> +sev_get_attestation_report(const char *mnonce, Error **errp);
->  
->  #endif
-> diff --git a/target/i386/trace-events b/target/i386/trace-events
-> index a22ab24e21..8d6437404d 100644
-> --- a/target/i386/trace-events
-> +++ b/target/i386/trace-events
-> @@ -10,3 +10,4 @@ kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 0x%" PRIx64
->  kvm_sev_launch_measurement(const char *value) "data %s"
->  kvm_sev_launch_finish(void) ""
->  kvm_sev_launch_secret(uint64_t hpa, uint64_t hva, uint64_t secret, int len) "hpa 0x%" PRIx64 " hva 0x%" PRIx64 " data 0x%" PRIx64 " len %d"
-> +kvm_sev_attestation_report(const char *mnonce, const char *data) "mnonce %s data %s"
+v5:
+- Split out non driver IMS code to its own series.
+- Removed common devsec code, Bjorn asked to deal with it post 5.11 and keep
+custom code for now.
+- Reworked irq_entries for IMS so emulated vector is also included.
+- Reworked vidxd_send_interrupt() to take irq_entry directly (data ready for
+consumption) (Thomas)
+- Removed pointer to msi_entry in irq_entries (Thomas)
+- Removed irq_domain check on free entries (Thomas)
+- Split out irqbypass management code (Thomas)
+- Fix EXPORT_SYMBOL to EXPORT_SYMBOL_GPL (Thomas)
+
+v4:
+dev-msi:
+- Make interrupt remapping code more readable (Thomas)
+- Add flush writes to unmask/write and reset ims slots (Thomas)
+- Interrupt Message Storm-> Interrupt Message Store (Thomas)
+- Merge in pasid programming code. (Thomas)
+
+mdev:
+- Fixed up domain assignment (Thomas)
+- Define magic numbers (Thomas)
+- Move siov detection code to PCI common (Thomas)
+- Remove duplicated MSI entry info (Thomas)
+- Convert code to use ims_slot (Thomas)
+- Add explanation of pasid programming for IMS entry (Thomas)
+- Add release int handle release support due to spec 1.1 update.
+
+v3:
+Dev-msi:
+- No need to add support for 2 different dev-msi irq domains, a common
+once can be used for both the cases(with IR enabled/disabled)
+- Add arch specific function to specify additions to msi_prepare callback
+instead of making the callback a weak function
+- Call platform ops directly instead of a wrapper function
+- Make mask/unmask callbacks as void functions
+dev->msi_domain should be updated at the device driver level before
+calling dev_msi_alloc_irqs()
+dev_msi_alloc/free_irqs() cannot be used for PCI devices
+Followed the generic layering scheme: infrastructure bits->arch
+bits->enabling bits
+
+Mdev:
+- Remove set kvm group notifier (Yan Zhao)
+- Fix VFIO irq trigger removal (Yan Zhao)
+- Add mmio read flush to ims mask (Jason)
+
+v2:
+IMS (now dev-msi):
+- With recommendations from Jason/Thomas/Dan on making IMS more generic:
+- Pass a non-pci generic device(struct device) for IMS management instead of
+mdev
+- Remove all references to mdev and symbol_get/put
+- Remove all references to IMS in common code and replace with dev-msi
+- Remove dynamic allocation of platform-msi interrupts: no groups,no
+new msi list or list helpers
+- Create a generic dev-msi domain with and without interrupt remapping
+enabled.
+- Introduce dev_msi_domain_alloc_irqs and dev_msi_domain_free_irqs apis
+
+mdev:
+- Removing unrelated bits from SVA enabling that’s not necessary for
+the submission. (Kevin)
+- Restructured entire mdev driver series to make reviewing easier (Kevin)
+- Made rw emulation more robust (Kevin)
+- Removed uuid wq type and added single dedicated wq type (Kevin)
+- Locking fixes for vdev (Yan Zhao)
+- VFIO MSIX trigger fixes (Yan Zhao)
+
+This code series will match the support of the 5.6 kernel (stage 1) driver
+but on guest.
+
+The code has dependency on DEV_MSI/IMS enabling code:
+https://lore.kernel.org/lkml/1614370277-23235-1-git-send-email-megha.dey@intel.com/
+
+The code has dependency on idxd driver sub-driver cleanup series:
+https://lore.kernel.org/dmaengine/162163546245.260470.18336189072934823712.stgit@djiang5-desk3.ch.intel.com/T/#t
+
+The code has dependency on Jason's VFIO refactoring:
+https://lore.kernel.org/kvm/0-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com/
+
+Part 1 of the driver has been accepted in v5.6 kernel. It supports dedicated
+workqueue (wq) without Shared Virtual Memory (SVM) support.
+
+Part 2 of the driver supports shared wq and SVM and has been accepted in
+kernel v5.11.
+
+VFIO mediated device framework allows vendor drivers to wrap a portion of
+device resources into virtual devices (mdev). Each mdev can be assigned
+to different guest using the same set of VFIO uAPIs as assigning a
+physical device. Accessing to the mdev resource is served with mixed
+policies. For example, vendor drivers typically mark data-path interface
+as pass-through for fast guest operations, and then trap-and-mediate the
+control-path interface to avoid undesired interference between mdevs. Some
+level of emulation is necessary behind vfio mdev to compose the virtual
+device interface.
+
+This series brings mdev to idxd driver to enable Intel Scalable IOV
+(SIOV), a hardware-assisted mediated pass-through technology. SIOV makes
+each DSA wq independently assignable through PASID-granular resource/DMA
+isolation. It helps improve scalability and reduces mediation complexity
+against purely software-based mdev implementations. Each assigned wq is
+configured by host and exposed to the guest in a read-only configuration
+mode, which allows the guest to use the wq w/o additional setup. This
+design greatly reduces the emulation bits to focus on handling commands
+from guests.
+
+There are two possible avenues to support virtual device composition:
+1. VFIO mediated device (mdev) or 2. User space DMA through char device
+(or UACCE). Given the small portion of emulation to satisfy our needs
+and VFIO mdev having the infrastructure already to support the device
+passthrough, we feel that VFIO mdev is the better route. For more in depth
+explanation, see documentation in Documents/driver-api/vfio/mdev-idxd.rst.
+
+Introducing mdev types “1dwq-v1” type. This mdev type allows
+allocation of a single dedicated wq from available dedicated wqs. After
+a workqueue (wq) is enabled, the user will generate an uuid. On mdev
+creation, the mdev driver code will find a dwq depending on the mdev
+type. When the create operation is successful, the user generated uuid
+can be passed to qemu. When the guest boots up, it should discover a
+DSA device when doing PCI discovery.
+
+For example of “1dwq-v1” type:
+1. Enable wq with “mdev” wq type
+2. A user generated uuid.
+3. The uuid is written to the mdev class sysfs path:
+echo $UUID > /sys/class/mdev_bus/0000\:00\:0a.0/mdev_supported_types/idxd-1dwq-v1/create
+4. Pass the following parameter to qemu:
+"-device vfio-pci,sysfsdev=/sys/bus/pci/devices/0000:00:0a.0/$UUID"
+
+The wq exported through mdev will have the read only config bit set
+for configuration. This means that the device does not require the
+typical configuration. After enabling the device, the user must set the
+WQ type and name. That is all is necessary to enable the WQ and start
+using it. The single wq configuration is not the only way to create the
+mdev. Multi wqs support for mdev will be in the future works.
+
+The mdev utilizes Interrupt Message Store or IMS[3], a device-specific
+MSI implementation, instead of MSIX for interrupts for the guest. This
+preserves MSIX for host usages and also allows a significantly larger
+number of interrupt vectors for guest usage.
+
+The idxd driver implements IMS as on-device memory mapped unified
+storage. Each interrupt message is stored as a DWORD size data payload
+and a 64-bit address (same as MSI-X). Access to the IMS is through the
+host idxd driver.
+
+The idxd driver makes use of the generic IMS irq chip and domain which
+stores the interrupt messages as an array in device memory. Allocation and
+freeing of interrupts happens via the generic msi_domain_alloc/free_irqs()
+interface. One only needs to ensure the interrupt domain is stored in
+the underlying device struct.
+
+The kernel tree can be found at [7].
+
+[1]: https://lore.kernel.org/lkml/157965011794.73301.15960052071729101309.stgit@djiang5-desk3.ch.intel.com/
+[2]: https://software.intel.com/en-us/articles/intel-sdm
+[3]: https://software.intel.com/en-us/download/intel-scalable-io-virtualization-technical-specification
+[4]: https://software.intel.com/en-us/download/intel-data-streaming-accelerator-preliminary-architecture-specification
+[5]: https://01.org/blogs/2019/introducing-intel-data-streaming-accelerator
+[6]: https://intel.github.io/idxd/
+[7]: https://github.com/intel/idxd-driver idxd-stage2.5
+
+---
+
+Dave Jiang (20):
+      vfio/mdev: idxd: add theory of operation documentation for idxd mdev
+      dmaengine: idxd: add external module driver support for dsa_bus_type
+      dmaengine: idxd: add IMS offset and size retrieval code
+      dmaengine: idxd: add portal offset for IMS portals
+      vfio: mdev: common lib code for setting up Interrupt Message Store
+      vfio/mdev: idxd: add PCI config for read/write for mdev
+      vfio/mdev: idxd: Add administrative commands emulation for mdev
+      vfio/mdev: idxd: Add mdev device context initialization
+      vfio/mdev: Add mmio read/write support for mdev
+      vfio/mdev: idxd: add mdev type as a new wq type
+      vfio/mdev: idxd: Add basic driver setup for idxd mdev
+      vfio: move VFIO PCI macros to common header
+      vfio/mdev: idxd: add mdev driver registration and helper functions
+      vfio/mdev: idxd: add 1dwq-v1 mdev type
+      vfio/mdev: idxd: ims domain setup for the vdcm
+      vfio/mdev: idxd: add new wq state for mdev
+      vfio/mdev: idxd: add error notification from host driver to mediated device
+      vfio: move vfio_pci_set_ctx_trigger_single to common code
+      vfio: mdev: Add device request interface
+      vfio/mdev: idxd: setup request interrupt
+
+
+ .../ABI/stable/sysfs-driver-dma-idxd          |    6 +
+ drivers/dma/Kconfig                           |    1 +
+ drivers/dma/idxd/Makefile                     |    2 +
+ drivers/dma/idxd/cdev.c                       |    4 +-
+ drivers/dma/idxd/device.c                     |  102 +-
+ drivers/dma/idxd/idxd.h                       |   52 +-
+ drivers/dma/idxd/init.c                       |   59 +
+ drivers/dma/idxd/irq.c                        |   21 +-
+ drivers/dma/idxd/registers.h                  |   25 +-
+ drivers/dma/idxd/sysfs.c                      |   22 +
+ drivers/vfio/Makefile                         |    2 +-
+ drivers/vfio/mdev/Kconfig                     |   21 +
+ drivers/vfio/mdev/Makefile                    |    4 +
+ drivers/vfio/mdev/idxd/Makefile               |    4 +
+ drivers/vfio/mdev/idxd/mdev.c                 |  958 ++++++++++++++++
+ drivers/vfio/mdev/idxd/mdev.h                 |  112 ++
+ drivers/vfio/mdev/idxd/vdev.c                 | 1016 +++++++++++++++++
+ drivers/vfio/mdev/mdev_irqs.c                 |  341 ++++++
+ drivers/vfio/pci/vfio_pci_intrs.c             |   63 +-
+ drivers/vfio/pci/vfio_pci_private.h           |    6 -
+ drivers/vfio/vfio_common.c                    |   74 ++
+ include/linux/mdev.h                          |   66 ++
+ include/linux/vfio.h                          |   10 +
+ include/uapi/linux/idxd.h                     |    2 +
+ 24 files changed, 2890 insertions(+), 83 deletions(-)
+ create mode 100644 drivers/vfio/mdev/idxd/Makefile
+ create mode 100644 drivers/vfio/mdev/idxd/mdev.c
+ create mode 100644 drivers/vfio/mdev/idxd/mdev.h
+ create mode 100644 drivers/vfio/mdev/idxd/vdev.c
+ create mode 100644 drivers/vfio/mdev/mdev_irqs.c
+ create mode 100644 drivers/vfio/vfio_common.c
+
+--
+
