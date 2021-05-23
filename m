@@ -2,166 +2,358 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD16738D6EB
-	for <lists+kvm@lfdr.de>; Sat, 22 May 2021 20:17:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EACF738DB21
+	for <lists+kvm@lfdr.de>; Sun, 23 May 2021 14:15:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231377AbhEVSSd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 May 2021 14:18:33 -0400
-Received: from mail-bn7nam10on2067.outbound.protection.outlook.com ([40.107.92.67]:39553
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231370AbhEVSSc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 22 May 2021 14:18:32 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fcHNtkTKKIgWal++E3kgD0JbY4Rc2H1P8yrgnKapl22aImPJWci7TlYnKEaKYflA0YTjNsF3WHiKqWwREGM6JEphvDiScF8Fh3qDauqNSNXBPZfmX8nI6nBo0c8Obcl7W5Yuftiq2r4xZaGK4h02T1CepXAlKm1eN6h2wd8YyRn2K12Xb1cF9YTHX8dqZz7aqfanRqMoEo0wY/1xWh0Vg6K7iJrcSgypFMlMUMB+lq7j99c2Ut4nrIMt7tnybw7sOOgY985s7LcqntLmsdN66w9SiRyB+3Ksus2Hwqajdl0SU8QyYPAPH2rNbh/6p+Y7BVTEL0lpHufXONc2odd3cQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lfxdG3SiuDroZC+Ff21WGLSXGQmwEVKADZ+OQGBpMrI=;
- b=Jirpv0sLfwh1XnrjwuHhzeDaxG6rpp5q1QatzTgR/XszHEn/gS2Lf7PTRrYOKct0y2urp4o/ThYCWsdswUvpfDKP0EYvpQPyE4vQtbzRDqsWH4XhvJTNjoQcMA4k6e8voz/G5J7+7R5Jt5gm01Piv5anbmbap4WY5WGXbDQIc4h1YXC1TKU5zttZ3W2v1iZNbpLn+PHfcR9V50LEAZL/w7R4OVfnSWnN2zA5UJF4J50nDYp6rqwCtbALNm+mKQE7t1f9RJ+rZY/XH74yU5zmGjtVM+2S5ruoPp7e4NdAPdubZkAoZxQgn8qMaYLr+nYVvbbCVWbBBoXc0KPBORNbSg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lfxdG3SiuDroZC+Ff21WGLSXGQmwEVKADZ+OQGBpMrI=;
- b=b+HV9GybJ+GNEDC4RUtYB4xanYDKAJE5wSgkOtqPWsiivi4duUjrv4XiaIW68TkM4cpXFsXVNRyQHAhvc6c2M7IZ4ylCabPKZG/bnKnuXnCc0kOaIxQbMMqbneyjLAa4jtOJ3v2yakYuPsVD7GbvGsGthUqStO5Wh1yCyr3AlMw=
-Authentication-Results: amd.com; dkim=none (message not signed)
- header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM6PR12MB3179.namprd12.prod.outlook.com (2603:10b6:5:183::18) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4150.26; Sat, 22 May 2021 18:17:05 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::b914:4704:ad6f:aba9]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::b914:4704:ad6f:aba9%12]) with mapi id 15.20.4150.026; Sat, 22 May
- 2021 18:17:04 +0000
-Subject: Re: [PATCH] KVM: SVM: Assume a 64-bit hypercall for guests with
- protected state
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>
-References: <d0904f0d049300267665bd4abf96c3d7e7aa4825.1621701837.git.thomas.lendacky@amd.com>
-Message-ID: <f9521737-f46b-4d7b-a04b-7f67c5c5dc65@amd.com>
-Date:   Sat, 22 May 2021 13:17:02 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
-In-Reply-To: <d0904f0d049300267665bd4abf96c3d7e7aa4825.1621701837.git.thomas.lendacky@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [67.79.209.213]
-X-ClientProxiedBy: SN1PR12CA0059.namprd12.prod.outlook.com
- (2603:10b6:802:20::30) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+        id S231783AbhEWMQU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 23 May 2021 08:16:20 -0400
+Received: from mx13.kaspersky-labs.com ([91.103.66.164]:10414 "EHLO
+        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231758AbhEWMQR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 23 May 2021 08:16:17 -0400
+Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
+        by relay13.kaspersky-labs.com (Postfix) with ESMTP id 5A7245216B6;
+        Sun, 23 May 2021 15:14:48 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
+        s=mail202102; t=1621772088;
+        bh=e4La5I3Ios0wIB3LdxR2FsqJZRi+yA8UGaq9flXKk80=;
+        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
+        b=lAkWlLty4ThbXCrBebcRSFYxS8zpt/7zHpyGcYq+G891NwFVKuNRLdf+VCbW5IPM8
+         NirWxlmXEG/ViWa1TLUardOeMdb4ufGZtGviI7QTV5ylKyjJx2rLsNIy5d57VRi9VQ
+         WWQO4i9J7ZbS5dufuw/VIoC7TRQ27+/561dvY4gCh7G0wqsLW3L2a6iw9BL8tkiwux
+         L1hFeoHTLuFmdSZNT4TbO8nVlUxhkOYQEDUOfKhvL5ssLc2AsdiSSgyG7xZPzxtniq
+         dQl3atS9LJ430Iwymq/3NfRukUX+VZpU8fro/BQPS+CMdBUWIbk4xRQaQwllBL+zfi
+         MtzVwXd0c9+5g==
+Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
+        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id 704135216B5;
+        Sun, 23 May 2021 15:14:47 +0300 (MSK)
+Received: from [10.16.171.77] (10.64.68.128) by hqmailmbx3.avp.ru
+ (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.14; Sun, 23
+ May 2021 15:14:46 +0300
+Subject: Re: [PATCH v10 00/18] virtio/vsock: introduce SOCK_SEQPACKET support
+To:     Stefano Garzarella <sgarzare@redhat.com>
+CC:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+References: <20210520191357.1270473-1-arseny.krasnov@kaspersky.com>
+ <20210521075520.ghg75wpzz42zorxg@steredhat>
+From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Message-ID: <108b0bba-5909-cdde-97ee-321b3f5351ca@kaspersky.com>
+Date:   Sun, 23 May 2021 15:14:38 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from office-linux.texastahm.com (67.79.209.213) by SN1PR12CA0059.namprd12.prod.outlook.com (2603:10b6:802:20::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4150.23 via Frontend Transport; Sat, 22 May 2021 18:17:03 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b2f2f5a7-39ee-4877-4398-08d91d4dcd2d
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3179:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB3179010EB4E4E9350B92295AEC289@DM6PR12MB3179.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4714;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vRAFGNGY6IOOJg13m52fJKU1Sbrn1p4vYd+nRU9M/NX+Pt7+JrPkrhP7h4J/pR03/fXtwNGqaYg0xPhSh0W7rqGZ3WLQl04ZagMIrJD3NLcUPm3fKzwSt1PMci1v49HXMcQXnrIws+TZv9Zl0Twyo9+glIoTQcbfGVKYeSFV7Ntv4KVumIWbykRZj2JUrSMhblfIRLm3gjyioTuSSHF+XYs9XzCGv+LQY+XKNnWFxCmNnzH2nyo7eGQ6jCBr2udUARk7BjlhMeO4PI5AdbUwy06pnHJUpTQYPpBSwyQt3fErKKZqWrK2eMJxke5eiDTbf5c3Xp1deIXxALCKYKdWy49BZY+UBUiddER9fIUiBLW4RHiTs4w+9ht2Nc4LKD13MBuTIvioU/tGs/fNJin1dGnqftwPIW7sOiJotme41FfWKyQVAWvt8GSEwurXY2yOPW1tNDaMYJmCduWm5R45o4sFqX1v1VIcNOhHgTxuoz7jw5mWnXPCFRDAvG+PdK/NsamZJnkjVgi7wGaE2xFTTx21Uk882k/YyYhLIPD5tXVq/n5DZg1KvP2BhPKQFqB1v4faOnR/aqv9t15L7LiUwcEt4EcAVY7eI9H0vLLdpxvCLcvM2ztCW6SaDR6cPJjHDr7khgAbwt979csSXRzglLDEVdM1/Grn0fFVOupZlTJykDTQjCS1kKOu+EQYC0pG
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(39860400002)(366004)(136003)(396003)(376002)(38100700002)(86362001)(26005)(478600001)(8676002)(6512007)(2616005)(7416002)(956004)(6506007)(31686004)(53546011)(31696002)(8936002)(36756003)(5660300002)(83380400001)(66556008)(316002)(4326008)(16526019)(186003)(6486002)(54906003)(2906002)(66476007)(66946007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?bGlVYzBYN1l1MXBnV0RLUjBMaWM4OTVWd09RZ05SWkdwejRMcktIU0duc1FQ?=
- =?utf-8?B?VzYvZ0VjV0JpS1dTTWVHb1ZpL3QzakdFc25waGVpTjdJMlZ4RFB2cmI5NWh2?=
- =?utf-8?B?NGYxU0NmMVRvK2UrNFR5bW5PRU5jREpiMkdCRURLWWRXRkVFeUZjQUpjU0Z3?=
- =?utf-8?B?NUJ3bkZWMytxeEZGc0lqSzBMcEpSb01zTUZaZ2x0QU01MUlYVjBBOS94Z0lY?=
- =?utf-8?B?dTEvWDArVm55TmgxUGM4RGNiZldxTmtPU0xhaTRJN0d3YWhGaHFybjFDdEZT?=
- =?utf-8?B?TmhERHB5ZTNSSm5ndVZhYUd0WFZ5c01SVUF5MDZwWHBOOHFpWWpFUGhsWE45?=
- =?utf-8?B?M2Vva2N6ak10UXV1aTc3UDdqOGJOSzAwRjdXaTl2SHF0N0FIS2I3ZGhZejlO?=
- =?utf-8?B?a3BxeXVHcGlDQnNsU1g1akovQVBudlhCTjhZSm5iVlMvNGUvYWd1cDVsYlho?=
- =?utf-8?B?UmZsYm1Cc3VHWmNqdjlScmpxSWJYVGNLKzlsUjNwY1ZkZUJwZXBIU0ltUTM0?=
- =?utf-8?B?d3VSZmJ4dmZaMXlLdU5yUFBuZ3RBR1l3YVhlTzJNcHZ1SHBkaHEzUWYvb2hF?=
- =?utf-8?B?Q1Z6WTZwY3RsUHR1anNMV1RRaUlBYkpiTzI0OTZNNGRSK2JZNGlqUHV5UlEx?=
- =?utf-8?B?VnpDQ0hnSVBwMEhnZW56TzQxT2lSb0Y5REQxbHl6ZWRSTDdZSDJRMWFzRWNK?=
- =?utf-8?B?b1hJN3Y1OE44RWV3V05qN0JPbURTejNHOWN2TzRJbEhMZENBWUNSN1JXOGkv?=
- =?utf-8?B?V3RWYzZjdUpBNzFRVEJWaUxZdVJubmNIWU5nTXVuS215VjI1K2N2QVc4UXJV?=
- =?utf-8?B?a1RRdkJpK3hNM0l0Y1IwRzBtZXZRMDkyVnJURExHazh3NHNBbkdzRzN1bC9y?=
- =?utf-8?B?NG5iTUJyNWFudVBUczlnQXdVdWkxNTQ0SVFxT2RiTXVmQzdjWGYvQXVSZlNm?=
- =?utf-8?B?YVJDU1IwemdtdjJXTUJEcEVjL2FRWktQNEJPVVNCREdJK3FSMlovQXpQcStS?=
- =?utf-8?B?eGhnZnhaTnk3M0x0WFdLTlNiZmtscXg3bHZnRmRUbkZ0bTV5UWlHMU8vS0pQ?=
- =?utf-8?B?NktGbXpNY3FkNkpTRWpFVmUzc3NoNGxCOGFVdnA4RGY5VEtGL0djdm5ZdG4v?=
- =?utf-8?B?ckdQVjJhUThkeGhwWlJaMlNMbVl5TVloZ0tNbGNpSWdUdG9ialdxSzNLM25y?=
- =?utf-8?B?UkpLZUVHWW9mR0ZNUUlCLzFvbHNOc0dFdHpzTTREQk5HM0hiL0dwc1RZR3N5?=
- =?utf-8?B?MVQ5R0hFclpiZGtQK3JMbEJWTXQrcHZ0emZOaDVlS05XV1dRamtLMzJOelY3?=
- =?utf-8?B?SllBaVBqdVM1dE83a3ExdDJaVGZmUVYyUnRZMDFkaktWWjZYbSt5ZHk4RVAr?=
- =?utf-8?B?dEU5WFB4VVVBck9ZeXRtY0NoOGRKV01TcUhLNnFLbTQ2MXo4bERGOWx1U3ZJ?=
- =?utf-8?B?YkVObzNaYkFkMkJEMnpNdXI4UVNpWWYxY3ptTVhxMkovbFJscHUrL28vZE1Q?=
- =?utf-8?B?S1Fvbkw2anlxM2NNL1VQVmJ4dlRBOTlkQVR3OUt2Y0wwVitSUmVldjBwVTE5?=
- =?utf-8?B?a1BHRnpZT0lWSkJBeXphcHRyVUtxQzM4YmNiTDBJWC9KNlhaZHR3cGhQa1VN?=
- =?utf-8?B?dnBkY0tZZm0ydG4xdUpia1d0aDhGMjNQcHRKVWpsN1dFdDBwWjRENDl5Y0cr?=
- =?utf-8?B?L005c241Y2I3RjhzR09NaSs0QTMwSEt6WjR5MzBQSmVLVzNsTlZFQ2tVb2kw?=
- =?utf-8?Q?ZAD6Z53VvO1GRIhWfPJHmIzgZ3ftGCyanYFvJI7?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b2f2f5a7-39ee-4877-4398-08d91d4dcd2d
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 May 2021 18:17:04.6196
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: M0IZbsv5+aFD5ZJExvO6FXuy8zrkdGi6lvd/joXWnsAcqmk3WhsQwHPCisz7JmFMJesUQBiEkWLax3l/KU2eVg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3179
+In-Reply-To: <20210521075520.ghg75wpzz42zorxg@steredhat>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.64.68.128]
+X-ClientProxiedBy: hqmailmbx3.avp.ru (10.64.67.243) To hqmailmbx3.avp.ru
+ (10.64.67.243)
+X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 05/23/2021 11:57:03
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 163859 [May 23 2021]
+X-KSE-AntiSpam-Info: Version: 5.9.20.0
+X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
+X-KSE-AntiSpam-Info: LuaCore: 446 446 0309aa129ce7cd9d810f87a68320917ac2eba541
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: kaspersky.com:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 05/23/2021 11:59:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 23.05.2021 10:52:00
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KLMS-Rule-ID: 52
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2021/05/23 11:23:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/05/23 10:52:00 #16638538
+X-KLMS-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/22/21 11:43 AM, Tom Lendacky wrote:
-> When processing a hypercall for a guest with protected state, currently
-> SEV-ES guests, the guest CS segment register can't be checked to
-> determine if the guest is in 64-bit mode. For an SEV-ES guest, it is
-> expected that communication between the guest and the hypervisor is
-> performed to shared memory using the GHCB. In order to use the GHCB, the
-> guest must have been in long mode, otherwise writes by the guest to the
-> GHCB would be encrypted and not be able to be comprehended by the
-> hypervisor. Given that, assume that the guest is in 64-bit mode when
-> processing a hypercall from a guest with protected state.
-> 
-> Fixes: f1c6366e3043 ("KVM: SVM: Add required changes to support intercepts under SEV-ES")
-> Reported-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> ---
->  arch/x86/kvm/x86.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
 
-Subject should actually be KVM: x86: ..., not KVM: SVM:
+On 21.05.2021 10:55, Stefano Garzarella wrote:
+> Hi Arseny,
+>
+> On Thu, May 20, 2021 at 10:13:53PM +0300, Arseny Krasnov wrote:
+>> 	This patchset implements support of SOCK_SEQPACKET for virtio
+>> transport.
+> I'll carefully review and test this series next Monday, in the mean time 
+> I think we should have at least an agreement about the changes that 
+> regards virtio-spec before merge this series, to avoid any compatibility 
+> issues.
+>
+> Do you plan to send a new version of the specification changes?
+>
+> Thanks,
+> Stefano
 
-Sorry about that.
+Hello, sorry for long answer. I'm on vacation now, but i plan to send
 
-Tom
+it in next several days, because with current implementation it is short
 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 9b6bca616929..e715c69bb882 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8403,7 +8403,12 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
->  
->  	trace_kvm_hypercall(nr, a0, a1, a2, a3);
->  
-> -	op_64_bit = is_64_bit_mode(vcpu);
-> +	/*
-> +	 * If running with protected guest state, the CS register is not
-> +	 * accessible. The hypercall register values will have had to been
-> +	 * provided in 64-bit mode, so assume the guest is in 64-bit.
-> +	 */
-> +	op_64_bit = is_64_bit_mode(vcpu) || vcpu->arch.guest_state_protected;
->  	if (!op_64_bit) {
->  		nr &= 0xFFFFFFFF;
->  		a0 &= 0xFFFFFFFF;
-> 
+
+Thank You
+
+>
+>> 	As SOCK_SEQPACKET guarantees to save record boundaries, so to
+>> do it, new bit for field 'flags' was added: SEQ_EOR. This bit is
+>> set to 1 in last RW packet of message.
+>> 	Now as  packets of one socket are not reordered neither on vsock
+>> nor on vhost transport layers, such bit allows to restore original
+>> message on receiver's side. If user's buffer is smaller than message
+>> length, when all out of size data is dropped.
+>> 	Maximum length of datagram is not limited as in stream socket,
+>> because same credit logic is used. Difference with stream socket is
+>> that user is not woken up until whole record is received or error
+>> occurred. Implementation also supports 'MSG_TRUNC' flags.
+>> 	Tests also implemented.
+>>
+>> 	Thanks to stsp2@yandex.ru for encouragements and initial design
+>> recommendations.
+>>
+>> Arseny Krasnov (18):
+>>  af_vsock: update functions for connectible socket
+>>  af_vsock: separate wait data loop
+>>  af_vsock: separate receive data loop
+>>  af_vsock: implement SEQPACKET receive loop
+>>  af_vsock: implement send logic for SEQPACKET
+>>  af_vsock: rest of SEQPACKET support
+>>  af_vsock: update comments for stream sockets
+>>  virtio/vsock: set packet's type in virtio_transport_send_pkt_info()
+>>  virtio/vsock: simplify credit update function API
+>>  virtio/vsock: defines and constants for SEQPACKET
+>>  virtio/vsock: dequeue callback for SOCK_SEQPACKET
+>>  virtio/vsock: add SEQPACKET receive logic
+>>  virtio/vsock: rest of SOCK_SEQPACKET support
+>>  virtio/vsock: enable SEQPACKET for transport
+>>  vhost/vsock: enable SEQPACKET for transport
+>>  vsock/loopback: enable SEQPACKET for transport
+>>  vsock_test: add SOCK_SEQPACKET tests
+>>  virtio/vsock: update trace event for SEQPACKET
+>>
+>> drivers/vhost/vsock.c                        |  44 +-
+>> include/linux/virtio_vsock.h                 |   9 +
+>> include/net/af_vsock.h                       |   7 +
+>> .../events/vsock_virtio_transport_common.h   |   5 +-
+>> include/uapi/linux/virtio_vsock.h            |   9 +
+>> net/vmw_vsock/af_vsock.c                     | 465 +++++++++++------
+>> net/vmw_vsock/virtio_transport.c             |  25 +
+>> net/vmw_vsock/virtio_transport_common.c      | 133 ++++-
+>> net/vmw_vsock/vsock_loopback.c               |  11 +
+>> tools/testing/vsock/util.c                   |  32 +-
+>> tools/testing/vsock/util.h                   |   3 +
+>> tools/testing/vsock/vsock_test.c             | 116 ++++
+>> 12 files changed, 672 insertions(+), 187 deletions(-)
+>>
+>> v9 -> v10:
+>> General changelog:
+>> - patch for write serialization removed from patchset
+>> - commit messages rephrased
+>> - RFC tag removed
+>>
+>> Per patch changelog:
+>>  see every patch after '---' line.
+>>
+>> v8 -> v9:
+>> General changelog:
+>> - see per patch change log.
+>>
+>> Per patch changelog:
+>>  see every patch after '---' line.
+>>
+>> v7 -> v8:
+>> General changelog:
+>> - whole idea is simplified: channel now considered reliable,
+>>   so SEQ_BEGIN, SEQ_END, 'msg_len' and 'msg_id' were removed.
+>>   Only thing that is used to mark end of message is bit in
+>>   'flags' field of packet header: VIRTIO_VSOCK_SEQ_EOR. Packet
+>>   with such bit set to 1 means, that this is last packet of
+>>   message.
+>>
+>> - POSIX MSG_EOR support is removed, as there is no exact
+>>   description how it works.
+>>
+>> - all changes to 'include/uapi/linux/virtio_vsock.h' moved
+>>   to dedicated patch, as these changes linked with patch to
+>>   spec.
+>>
+>> - patch 'virtio/vsock: SEQPACKET feature bit support' now merged
+>>   to 'virtio/vsock: setup SEQPACKET ops for transport'.
+>>
+>> - patch 'vhost/vsock: SEQPACKET feature bit support' now merged
+>>   to 'vhost/vsock: setup SEQPACKET ops for transport'.
+>>
+>> Per patch changelog:
+>>  see every patch after '---' line.
+>>
+>> v6 -> v7:
+>> General changelog:
+>> - virtio transport callback for message length now removed
+>>   from transport. Length of record is returned by dequeue
+>>   callback.
+>>
+>> - function which tries to get message length now returns 0
+>>   when rx queue is empty. Also length of current message in
+>>   progress is set to 0, when message processed or error
+>>   happens.
+>>
+>> - patches for virtio feature bit moved after patches with
+>>   transport ops.
+>>
+>> Per patch changelog:
+>>  see every patch after '---' line.
+>>
+>> v5 -> v6:
+>> General changelog:
+>> - virtio transport specific callbacks which send SEQ_BEGIN or
+>>   SEQ_END now hidden inside virtio transport. Only enqueue,
+>>   dequeue and record length callbacks are provided by transport.
+>>
+>> - virtio feature bit for SEQPACKET socket support introduced:
+>>   VIRTIO_VSOCK_F_SEQPACKET.
+>>
+>> - 'msg_cnt' field in 'struct virtio_vsock_seq_hdr' renamed to
+>>   'msg_id' and used as id.
+>>
+>> Per patch changelog:
+>> - 'af_vsock: separate wait data loop':
+>>    1) Commit message updated.
+>>    2) 'prepare_to_wait()' moved inside while loop(thanks to
+>>      Jorgen Hansen).
+>>    Marked 'Reviewed-by' with 1), but as 2) I removed R-b.
+>>
+>> - 'af_vsock: separate receive data loop': commit message
+>>    updated.
+>>    Marked 'Reviewed-by' with that fix.
+>>
+>> - 'af_vsock: implement SEQPACKET receive loop': style fixes.
+>>
+>> - 'af_vsock: rest of SEQPACKET support':
+>>    1) 'module_put()' added when transport callback check failed.
+>>    2) Now only 'seqpacket_allow()' callback called to check
+>>       support of SEQPACKET by transport.
+>>
+>> - 'af_vsock: update comments for stream sockets': commit message
+>>    updated.
+>>    Marked 'Reviewed-by' with that fix.
+>>
+>> - 'virtio/vsock: set packet's type in send':
+>>    1) Commit message updated.
+>>    2) Parameter 'type' from 'virtio_transport_send_credit_update()'
+>>       also removed in this patch instead of in next.
+>>
+>> - 'virtio/vsock: dequeue callback for SOCK_SEQPACKET': SEQPACKET
+>>    related state wrapped to special struct.
+>>
+>> - 'virtio/vsock: update trace event for SEQPACKET': format strings
+>>    now not broken by new lines.
+>>
+>> v4 -> v5:
+>> - patches reorganized:
+>>   1) Setting of packet's type in 'virtio_transport_send_pkt_info()'
+>>      is moved to separate patch.
+>>   2) Simplifying of 'virtio_transport_send_credit_update()' is
+>>      moved to separate patch and before main virtio/vsock patches.
+>> - style problem fixed
+>> - in 'af_vsock: separate receive data loop' extra 'release_sock()'
+>>   removed
+>> - added trace event fields for SEQPACKET
+>> - in 'af_vsock: separate wait data loop':
+>>   1) 'vsock_wait_data()' removed 'goto out;'
+>>   2) Comment for invalid data amount is changed.
+>> - in 'af_vsock: rest of SEQPACKET support', 'new_transport' pointer
+>>   check is moved after 'try_module_get()'
+>> - in 'af_vsock: update comments for stream sockets', 'connect-oriented'
+>>   replaced with 'connection-oriented'
+>> - in 'loopback/vsock: setup SEQPACKET ops for transport',
+>>   'loopback/vsock' replaced with 'vsock/loopback'
+>>
+>> v3 -> v4:
+>> - SEQPACKET specific metadata moved from packet header to payload
+>>   and called 'virtio_vsock_seq_hdr'
+>> - record integrity check:
+>>   1) SEQ_END operation was added, which marks end of record.
+>>   2) Both SEQ_BEGIN and SEQ_END carries counter which is incremented
+>>      on every marker send.
+>> - af_vsock.c: socket operations for STREAM and SEQPACKET call same
+>>   functions instead of having own "gates" differs only by names:
+>>   'vsock_seqpacket/stream_getsockopt()' now replaced with
+>>   'vsock_connectible_getsockopt()'.
+>> - af_vsock.c: 'seqpacket_dequeue' callback returns error and flag that
+>>   record ready. There is no need to return number of copied bytes,
+>>   because case when record received successfully is checked at virtio
+>>   transport layer, when SEQ_END is processed. Also user doesn't need
+>>   number of copied bytes, because 'recv()' from SEQPACKET could return
+>>   error, length of users's buffer or length of whole record(both are
+>>   known in af_vsock.c).
+>> - af_vsock.c: both wait loops in af_vsock.c(for data and space) moved
+>>   to separate functions because now both called from several places.
+>> - af_vsock.c: 'vsock_assign_transport()' checks that 'new_transport'
+>>   pointer is not NULL and returns 'ESOCKTNOSUPPORT' instead of 'ENODEV'
+>>   if failed to use transport.
+>> - tools/testing/vsock/vsock_test.c: rename tests
+>>
+>> v2 -> v3:
+>> - patches reorganized: split for prepare and implementation patches
+>> - local variables are declared in "Reverse Christmas tree" manner
+>> - virtio_transport_common.c: valid leXX_to_cpu() for vsock header
+>>   fields access
+>> - af_vsock.c: 'vsock_connectible_*sockopt()' added as shared code
+>>   between stream and seqpacket sockets.
+>> - af_vsock.c: loops in '__vsock_*_recvmsg()' refactored.
+>> - af_vsock.c: 'vsock_wait_data()' refactored.
+>>
+>> v1 -> v2:
+>> - patches reordered: af_vsock.c related changes now before virtio vsock
+>> - patches reorganized: more small patches, where +/- are not mixed
+>> - tests for SOCK_SEQPACKET added
+>> - all commit messages updated
+>> - af_vsock.c: 'vsock_pre_recv_check()' inlined to
+>>   'vsock_connectible_recvmsg()'
+>> - af_vsock.c: 'vsock_assign_transport()' returns ENODEV if transport
+>>   was not found
+>> - virtio_transport_common.c: transport callback for seqpacket dequeue
+>> - virtio_transport_common.c: simplified
+>>   'virtio_transport_recv_connected()'
+>> - virtio_transport_common.c: send reset on socket and packet type
+>> 			      mismatch.
+>>
+>> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>>
+>> -- 
+>> 2.25.1
+>>
+>
