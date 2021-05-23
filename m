@@ -2,152 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2637D38DD91
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 00:38:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3A2B38DDAA
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 01:04:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232021AbhEWWjn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 23 May 2021 18:39:43 -0400
-Received: from mail-dm6nam10on2084.outbound.protection.outlook.com ([40.107.93.84]:15552
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231979AbhEWWjm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 23 May 2021 18:39:42 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=C0zpKAJB+azVqtG7NhZyVH2Do+TrAckHJKLkBHI65/L39tPs3i8z3WC2a9U4BZbV/cEEIbPV5Co4pa866lssWsfawiuitYHhBwg0NgNkIoN3Mmaa6d+KBUnSP3nLUZG5MFq8UIacuWDHdZQY2hf30PdhA2WxFPGh+uB4Q25shPaMuuMXIU7oVjRQnkwf7AvdBIindCE9MnpVpOtShhxEUB59Ic4fP+Vu0ItTLfko0FUrB+rPwXYQNLejI0zpbILhZ4qssN6YfUO3VOh8f8RbX1dp/YiIcIjXubL+7cepompFxLtSHQqrbHRHULIdY03RwGNkHSjZCaB+pPMr+sFxeg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hGjLrR1oU5RJAp81664VRQ3qIGr2BAEBIF7QTWtm9s4=;
- b=Anhhu8qe9TnE5wacbqyIMoBjYUDR4ePl58ykZkNy2AUILkBRqVg7kwnQ/ZeUKtwx0ptJLoBzGxvtnWc1IchWKWhRWgdOeFQ3nL3okQYPeOeIKCPV/AejNkK65a4fKmXMTMCxg50LegjP+3u6w72qP9y8k3BFTuSNWXSdPTnEdqsPDNIpM2TTWun50nJK76aSQwpWNCXV4rwaCqFC8/s5ZlzFBnO06Ja8KwWoUlEqI9U4CutipEjBDS3WK3hf294WsS7fX22W8vqGi8iUFT/vhJkfzhqHajdpbUDe0qa41LUuRFvX2rzApKTfZgw8KmA99e6mrZloytxMCxp9jk6TAg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hGjLrR1oU5RJAp81664VRQ3qIGr2BAEBIF7QTWtm9s4=;
- b=J3HemywCys8quBLNr6vvZ5k+iZF1uzxrDixh2dkDWlVLubkq5sDNLPibItUPagTKLDGTrb7/YZXsmBXMqTPDrBTA3Wgex/I9Cv2hlCsN3QiLFcJaQntoKYl2Lpeu9MLtbZoxAerjQnFTxFcA30p63tATd+1nsvI3OVtvxY4Uvs1OOyBaLrkukGRsxaMZaasVNWh4T97AswIoU+Br/tRRYUDS8n25RgmwIaXkNa5RrRALno71gd+Wq1LFQbAzkwvXfhLQF6paYpw1UyNUvVjqMKByVMbunj5pLwvIDi6tSypQrvPiw7J4Y2CrJ9rM6f9OHISYmClF40N47ec50fzUqQ==
-Authentication-Results: intel.com; dkim=none (message not signed)
- header.d=none;intel.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5318.namprd12.prod.outlook.com (2603:10b6:208:31d::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4150.23; Sun, 23 May
- 2021 22:38:13 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::3d51:a3b9:8611:684e]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::3d51:a3b9:8611:684e%7]) with mapi id 15.20.4150.027; Sun, 23 May 2021
- 22:38:13 +0000
-Date:   Sun, 23 May 2021 19:38:10 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Dave Jiang <dave.jiang@intel.com>
-Cc:     alex.williamson@redhat.com, kwankhede@nvidia.com,
-        tglx@linutronix.de, vkoul@kernel.org, megha.dey@intel.com,
-        jacob.jun.pan@intel.com, ashok.raj@intel.com, yi.l.liu@intel.com,
-        baolu.lu@intel.com, kevin.tian@intel.com, sanjay.k.kumar@intel.com,
-        tony.luck@intel.com, dan.j.williams@intel.com,
-        eric.auger@redhat.com, pbonzini@redhat.com,
-        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v6 19/20] vfio: mdev: Add device request interface
-Message-ID: <20210523223810.GE1002214@nvidia.com>
-References: <162164243591.261970.3439987543338120797.stgit@djiang5-desk3.ch.intel.com>
- <162164286322.261970.2647654897518928545.stgit@djiang5-desk3.ch.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <162164286322.261970.2647654897518928545.stgit@djiang5-desk3.ch.intel.com>
-X-Originating-IP: [206.223.160.26]
-X-ClientProxiedBy: YT1PR01CA0039.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:2e::8) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S232002AbhEWXFr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 23 May 2021 19:05:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52030 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231976AbhEWXFr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 23 May 2021 19:05:47 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BCC1C061574
+        for <kvm@vger.kernel.org>; Sun, 23 May 2021 16:04:20 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id m190so18735854pga.2
+        for <kvm@vger.kernel.org>; Sun, 23 May 2021 16:04:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=taHsl89uHxiOEQf2rPDtNJ/+Mn5yxhgIAL5Q1aLTII0=;
+        b=soHJxP46ycLj4iK/Y25UpjGSoaKN4lEqId1y1MWihWXLiiuqd7GvDvNJMC5+cl59aP
+         lttsFVhe6KGjwJHeylvxoMsiXFgkTgW9I8IeOJASjeCnBIpcCnRvXXpbFTiJ7SGuNifh
+         +7UzXiABj40GUCWl4AB0TNV2XnnIOhU08kTHpX5uuOeYIJp6Tg2gy3gIVo/qHr4eG6xR
+         B5fx6YmJH/ZvkKiefUEz7X7q9LUqreaCkJOSXxkHyXsrEbW1pJF9rG5lAL1W/tc1U9XE
+         IRWN7+VwslIrFNwvgwDLJzeS0cJjetx98JWSyi8bKlYQQySYc4Pi5QQflPkb2FVqDTM1
+         4V4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=taHsl89uHxiOEQf2rPDtNJ/+Mn5yxhgIAL5Q1aLTII0=;
+        b=RrqxxJUEJcoaYZoXuhHFIfHaMEWmHfdEQBLr943q9DbVKA7MN0loFoqmvCVdNEfT9Y
+         cI8x+vwJJnYmeEEKyG8cLXn3o7DsnYR1kbl5jyQx8KfET8MKXRoycfvmGAlHdnZ2CPCY
+         h5Gku14g4jFHCEPq9Z6kmUqWQ9bI0mL9nJ1UOlUoYaTRPenBRB1UMdu91cvF2XUJYbjo
+         9kJJL2gauv2MrvNZbLYVLwjRK30jq6wujluNZQ2p17ymumBfmGy+t2vVnJNvDyZdEhlf
+         smekbX3QZA2hhTQ80ZU0STcpcnp0IWBGdzTSfLkLRv8fCYtMOs6pZWG6DX+X1v6l/CI9
+         Di5Q==
+X-Gm-Message-State: AOAM530vyOtxcQn8deOJoDMkRcyFDWp+F9fpx1M/49xStLtlSdhad7sm
+        YF+k2WLZDA9HhNzFFWkwDDbOPoszP3ag4zdKjxSm4g==
+X-Google-Smtp-Source: ABdhPJwBKgqSdb6/4KY9SxdeUdhk0iD/XR4npedvl94iHjhuk0rcY++RqoKbHkRGpJiVdW3YZdIiv++VHTT0ljyfFVw=
+X-Received: by 2002:aa7:8a85:0:b029:2db:484c:de1a with SMTP id
+ a5-20020aa78a850000b02902db484cde1amr21265286pfc.2.1621811059711; Sun, 23 May
+ 2021 16:04:19 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (206.223.160.26) by YT1PR01CA0039.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b01:2e::8) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4150.27 via Frontend Transport; Sun, 23 May 2021 22:38:13 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lkwja-00DTik-VP; Sun, 23 May 2021 19:38:10 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ff337c33-e647-466d-4aca-08d91e3b7316
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5318:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5318E78371A00A34B9C66669C2279@BL1PR12MB5318.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1923;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: JnJ/IbLAm88Cw0cgWiSszGFcJK6Z79c0r4LcUAkMb4jpxODblGG54Fb/iSgIEzK8D0GeTuCzVWefuvwXi3jZkIn3Ly9uzYPSjUOQvk3aZpZzHHegx09YVJ91hNF/he3aC01vBUHykqTOXsECMsT8QjYy0POjPTHid5hlJyOPOa8K1rxweSx1QdvwREdtYAFFTHu6YC7s1xiTmD+fVKO60S/5H2s9I20nbIKNAsmZEsLVOqgw+qBBghDDDnVCEb1tmkf2TdJizvgKS73JZ2Y5yHdYZj60pjv8MpBP8dffH3LFp3svUCfvFSSiOcNtX96JvzjpF4KLi6ocamxlBKTQs8NTKO/VY4pBxDaVBh0RoEHOMmZUeSxwmRxluBVcIUgLbcqNxhtKsS/vKpbBoq1IQ4a8MRYptbcXpoiwDwL5Zwk/B1xSznMKbt9whK1AT/tQH21QuFKroTPiG1LUKX4vNJ1GZKahIwqqY6sP/UChltT688OU0xoKfI5RjO48By3z90tkPjTCWZhmd+zPkbiEioDTZseS1bpwfYG7ECG7tbqdXUWLBwrFNpvHoJwNldIXRLY3aHKCLtHdL2NERycgKw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(366004)(396003)(136003)(346002)(478600001)(4326008)(2906002)(86362001)(7416002)(5660300002)(66476007)(66556008)(186003)(33656002)(316002)(66946007)(83380400001)(1076003)(38100700002)(2616005)(9786002)(8676002)(426003)(36756003)(9746002)(6916009)(8936002)(26005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?I6IQewYVbrvE7u1M2KuEUusypGO3HWGxvXtqSoJF0wp5epQ3MpOGBmQzh5Yh?=
- =?us-ascii?Q?qWs9pQYQ8MMs1Q/zgkMPa51B7Qz56s++nKKiVJuRVyW4rcBPV/tOUxseTMZk?=
- =?us-ascii?Q?lFeFUOVGrBfQdEB/pnZJ7WbPsI0T9D/8qlGX3eLk6ibYVv1ZjSCUi7QmEnyF?=
- =?us-ascii?Q?+4Wxyh+3qfPNLha8KV5f0BD6NRqgpn3iKRRw9gmdHHVMv0TsOeKLN7/fUi+h?=
- =?us-ascii?Q?+Xuai9kZ3G0F9XH76zENtAuH5kugzGdWycP/tY3FdB6Y6XJiPOodlJbDPdq7?=
- =?us-ascii?Q?qM5a8LN0SNlnPdWGsIhAXOfZeeaagdtGky8jxdBT+n3HFFMyikkXwewXEW7T?=
- =?us-ascii?Q?SyEbe4o+nndpD3z1WEGfb7OShzuo7e+Bx+vwV3EfACtp5lm8b3kd699Y09Ol?=
- =?us-ascii?Q?QiDqgqhTkO19yurTC5Cr9X4SZMi36++hdihfx/c9W+CwCfTMxdFQspE+P9jI?=
- =?us-ascii?Q?Ex6MHY5g8AEpcM5o2oBsBuOjXtV0y5PjXBXUBLkbnS/QnysQ0V0JVmWcBJWH?=
- =?us-ascii?Q?iddV6kfAw4RNSi9xXJ6+3/3+D5PFHKNHy2JWFnNS0ZyR6senKzsPnk+9IhZA?=
- =?us-ascii?Q?TsvdE846sblKIqDIIazZfJi0IwwAGvmSS4IxBw7egS+O95BcoIOzhgKUMCKJ?=
- =?us-ascii?Q?WMvA0ozu7PIMEFP/hIrC9XGnedCJbR4MvRh14Zp6Wwd05oSMFrmPIg5JLkhM?=
- =?us-ascii?Q?T3z4g5vU/MgZEzLWXKsn6NOkKx72WtSTObp277sfWDpqW61uhs409PCzL1mI?=
- =?us-ascii?Q?NfDFDpX44WOrc5KSAoqbeqhleJJlZc7PgP8VCE7S4FxZ66EvUnXlFB19pmUa?=
- =?us-ascii?Q?7GxW5JGFI9AdqQCz4qdD7AIfRowTkaYa1yBw61F8iAW6ZSggJqgfNB4+EMDI?=
- =?us-ascii?Q?2oT/YGWe1Toq0VnnCLyteeqkdxZN6d2ccFvduE+6lNTMXQbIWcRgSD6Eq6zl?=
- =?us-ascii?Q?NPZyXE6z72n6qxY+vpScVAan/1Mjo+n5tRrdIAl6/mQjbIYTCNSYtPr2gJvV?=
- =?us-ascii?Q?DKkF7yzkDf1C/HSOg0JecFRqjcVYZC0HtnwLZofkfMZdJ0d/b9hFlkgxAVs3?=
- =?us-ascii?Q?H6BOtIN+Mzv/QFRqx1R6qcVd6XSmXsJhjDctyqVH9xZuEbXHWfnbC62pO9MD?=
- =?us-ascii?Q?h/ioR8I7Y475k4cM1/qVwUMCNeGwcATYk+C+BJmabPWeyaeu2kPA2T20MqiF?=
- =?us-ascii?Q?TKQsDHtUHjGWgtJrNUnkXqVD/uFu3RNepnhuSbVjwnC1sv3/AzCocbRAklkB?=
- =?us-ascii?Q?eqouJbsau/8v7LTQ8H7KOG58Ho4prlL9S2HjBQeNEhJOEsmIfUJFdiGrvZav?=
- =?us-ascii?Q?hZC7Aq3zR3m5bKMk1f3r7woR?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ff337c33-e647-466d-4aca-08d91e3b7316
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 May 2021 22:38:13.5347
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PwQnlGxQw8o20QAerU6yuIO7qZYEhAWPFC5SwTl6+XTCU9+czsCJhrB96qXaiRlt
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5318
+References: <20210424004645.3950558-1-seanjc@google.com> <20210424004645.3950558-30-seanjc@google.com>
+ <CAAeT=FzpUBXpzuCT3eD=3sRnV14OYLA+28Eo7YFioC+vc=xVsA@mail.gmail.com> <YKVt5XVIQMUCUIHd@google.com>
+In-Reply-To: <YKVt5XVIQMUCUIHd@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Sun, 23 May 2021 16:04:03 -0700
+Message-ID: <CAAeT=FwjdQ768k5fJ2pCHbUwsYMdMdOPH3hXA9qKA+f+2CEQEg@mail.gmail.com>
+Subject: Re: [PATCH 29/43] KVM: SVM: Tweak order of cr0/cr4/efer writes at RESET/INIT
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 21, 2021 at 05:21:03PM -0700, Dave Jiang wrote:
-> Similar to commit 6140a8f56238 ("vfio-pci: Add device request interface").
-> Add request interface for mdev to allow userspace to opt in to receive
-> a device request notification, indicating that the device should be
-> released.
-> 
-> Signed-off-by: Dave Jiang <dave.jiang@intel.com>
-> ---
->  drivers/vfio/mdev/mdev_irqs.c |   23 +++++++++++++++++++++++
->  include/linux/mdev.h          |   15 +++++++++++++++
->  2 files changed, 38 insertions(+)
+> > AMD's APM Vol2 (Table 14-1 in Revision 3.37) says CR0 After INIT will b=
+e:
+> >
+> >    CD and NW are unchanged
+> >    Bit 4 (reserved) =3D 1
+> >    All others =3D 0
+> >
+> > (CR0 will be 0x60000010 after RESET)
+> >
+> > So, it looks the CR0 value that init_vmcb() sets could be
+> > different from what is indicated in the APM for INIT.
+> >
+> > BTW, Intel's SDM (April 2021 version) says CR0 for Power up/Reset/INIT
+> > will be 0x60000010 with the following note.
+> > -------------------------------------------------
+> > The CD and NW flags are unchanged,
+> > bit 4 is set to 1, all other bits are cleared.
+> > -------------------------------------------------
+> > The note is attached as '2' to all Power up/Reset/INIT cases
+> > looking at the SDM.  I would guess it is erroneous that
+> > the note is attached to Power up/Reset though.
+>
+> Agreed.  I'll double check that CD and NW are preserved by hardware on IN=
+IT,
+> and will also ping Intel folks to fix the POWER-UP and RESET footnote.
+>
+> Hah!  Reading through that section yet again, there's another SDM bug.  I=
+t
+> contradicts itself with respect to the TLBs after INIT.
+>
+>   9.1 INITIALIZATION OVERVIEW:
+>     The major difference is that during an INIT, the internal caches, MSR=
+s,
+>     MTRRs, and x87 FPU state are left unchanged (although, the TLBs and B=
+TB
+>     are invalidated as with a hardware reset)
+>
+> while Table 9-1 says:
+>
+>   Register                    Power up    Reset      INIT
+>   Data and Code Cache, TLBs:  Invalid[6]  Invalid[6] Unchanged
+>
+> I'm pretty sure that Intel CPUs are supposed to flush the TLB, i.e. Tabel=
+ 9-1 is
+> wrong.  Back in my Intel validation days, I remember being involved in a =
+Core2
+> bug that manifested as a triple fault after INIT due to global TLB entrie=
+s not
+> being flushed.  Looks like that wasn't fixed:
+>
+> https://www.intel.com/content/dam/support/us/en/documents/processors/mobi=
+le/celeron/sb/320121.pdf
+>
+>   AZ28. INIT Does Not Clear Global Entries in the TLB
+>   Problem: INIT may not flush a TLB entry when:
+>     =E2=80=A2 The processor is in protected mode with paging enabled and =
+the page global enable
+>       flag is set (PGE bit of CR4 register)
+>     =E2=80=A2 G bit for the page table entry is set
+>     =E2=80=A2 TLB entry is present in TLB when INIT occurs
+>     =E2=80=A2 Software may encounter unexpected page fault or incorrect a=
+ddress translation due
+>       to a TLB entry erroneously left in TLB after INIT.
+>
+>   Workaround: Write to CR3, CR4 (setting bits PSE, PGE or PAE) or CR0 (se=
+tting
+>               bits PG or PE) registers before writing to memory early in =
+BIOS
+>               code to clear all the global entries from TLB.
+>
+>   Status: For the steppings affected, see the Summary Tables of Changes.
+>
+> AMD's APM also appears to contradict itself, though that depends on one's
+> interpretation of "external intialization".  Like the SDM, its table stat=
+es that
+> the TLBs are not flushed on INIT:
+>
+>   Table 14-1. Initial Processor State
+>
+>   Processor Resource         Value after RESET      Value after INIT
+>   Instruction and Data TLBs  Invalidated            Unchanged
+>
+> but a blurb later on says:
+>
+>   5.5.3 TLB Management
+>
+>   Implicit Invalidations. The following operations cause the entire TLB t=
+o be
+>   invalidated, including global pages:
+>
+>     =E2=80=A2 External initialization of the processor.
 
-Please don't add new things to mdev, put the req_trigger in the vdcm_idxd
-struct vfio_device class.
+"Table 8-9. Simultaneous Interrupt Priorities" of AMD's APM has
+the words "External Processor Initialization (INIT)", which make
+me guess "the External initialization of the processor" in 5.5.3
+TLB Management means INIT.
 
- 
-> diff --git a/drivers/vfio/mdev/mdev_irqs.c b/drivers/vfio/mdev/mdev_irqs.c
-> index ed2d11a7c729..11b1f8df020c 100644
-> --- a/drivers/vfio/mdev/mdev_irqs.c
-> +++ b/drivers/vfio/mdev/mdev_irqs.c
 
-and similarly this shouldn't be called mdev_irqs and the code in here
-should have nothign to do with mdevs. Providing the special IRQ
-emulation stuff is just generic vfio_device functionality with no
-linkage to mdev.
+> All in all, that means KVM also has a bug in the form of a missing guest =
+TLB
+> flush on INIT, at least for VMX and probably for SVM.  I'll add a patch t=
+o flush
+> the guest TLBs on INIT irrespective of vendor.  Even if AMD CPUs don't fl=
+ush the
+> TLB, I see no reason to bank on all guests being paranoid enough to flush=
+ the
+> TLB immediately after INIT.
 
-> @@ -316,3 +316,26 @@ void mdev_irqs_free(struct mdev_device *mdev)
->  	memset(&mdev->mdev_irq, 0, sizeof(mdev->mdev_irq));
->  }
->  EXPORT_SYMBOL_GPL(mdev_irqs_free);
-> +
-> +void vfio_mdev_request(struct vfio_device *vdev, unsigned int count)
-> +{
-> +	struct device *dev = vdev->dev;
-> +	struct mdev_device *mdev = to_mdev_device(dev);
+Yes, I agree that would be better.
+Thank you so much for all the helpful information !
 
-Yuk, don't do stuff like that, if it needs a mdev then pass in a mdev.
-
-Jason
+Regards,
+Reiji
