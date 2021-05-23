@@ -2,358 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EACF738DB21
-	for <lists+kvm@lfdr.de>; Sun, 23 May 2021 14:15:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DAD338DC9B
+	for <lists+kvm@lfdr.de>; Sun, 23 May 2021 21:38:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231783AbhEWMQU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 23 May 2021 08:16:20 -0400
-Received: from mx13.kaspersky-labs.com ([91.103.66.164]:10414 "EHLO
-        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231758AbhEWMQR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 23 May 2021 08:16:17 -0400
-Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay13.kaspersky-labs.com (Postfix) with ESMTP id 5A7245216B6;
-        Sun, 23 May 2021 15:14:48 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail202102; t=1621772088;
-        bh=e4La5I3Ios0wIB3LdxR2FsqJZRi+yA8UGaq9flXKk80=;
-        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
-        b=lAkWlLty4ThbXCrBebcRSFYxS8zpt/7zHpyGcYq+G891NwFVKuNRLdf+VCbW5IPM8
-         NirWxlmXEG/ViWa1TLUardOeMdb4ufGZtGviI7QTV5ylKyjJx2rLsNIy5d57VRi9VQ
-         WWQO4i9J7ZbS5dufuw/VIoC7TRQ27+/561dvY4gCh7G0wqsLW3L2a6iw9BL8tkiwux
-         L1hFeoHTLuFmdSZNT4TbO8nVlUxhkOYQEDUOfKhvL5ssLc2AsdiSSgyG7xZPzxtniq
-         dQl3atS9LJ430Iwymq/3NfRukUX+VZpU8fro/BQPS+CMdBUWIbk4xRQaQwllBL+zfi
-         MtzVwXd0c9+5g==
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id 704135216B5;
-        Sun, 23 May 2021 15:14:47 +0300 (MSK)
-Received: from [10.16.171.77] (10.64.68.128) by hqmailmbx3.avp.ru
- (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.14; Sun, 23
- May 2021 15:14:46 +0300
-Subject: Re: [PATCH v10 00/18] virtio/vsock: introduce SOCK_SEQPACKET support
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
-References: <20210520191357.1270473-1-arseny.krasnov@kaspersky.com>
- <20210521075520.ghg75wpzz42zorxg@steredhat>
-From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Message-ID: <108b0bba-5909-cdde-97ee-321b3f5351ca@kaspersky.com>
-Date:   Sun, 23 May 2021 15:14:38 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20210521075520.ghg75wpzz42zorxg@steredhat>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.64.68.128]
-X-ClientProxiedBy: hqmailmbx3.avp.ru (10.64.67.243) To hqmailmbx3.avp.ru
- (10.64.67.243)
-X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 05/23/2021 11:57:03
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 163859 [May 23 2021]
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
-X-KSE-AntiSpam-Info: LuaCore: 446 446 0309aa129ce7cd9d810f87a68320917ac2eba541
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: kaspersky.com:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 05/23/2021 11:59:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 23.05.2021 10:52:00
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KLMS-Rule-ID: 52
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2021/05/23 11:23:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/05/23 10:52:00 #16638538
-X-KLMS-AntiVirus-Status: Clean, skipped
+        id S231968AbhEWTj4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 23 May 2021 15:39:56 -0400
+Received: from mga11.intel.com ([192.55.52.93]:31996 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231910AbhEWTjz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 23 May 2021 15:39:55 -0400
+IronPort-SDR: 4Fw3zUvdBrEhKbjxZSur2OLjXrSQ/ilmwLuxraFbQvieNzxzwkRukDRAPRKfNkMk+48yGza3UP
+ beZx2z+ix1bQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,9993"; a="198740673"
+X-IronPort-AV: E=Sophos;i="5.82,319,1613462400"; 
+   d="scan'208";a="198740673"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2021 12:38:28 -0700
+IronPort-SDR: jJ4a1+VHkwPr2jHCF69gssAtV4aoCUhdOrpzyYldyfuUHyhmxIh5nnVzKtEKF/NkfT4ZT3VOZ8
+ Nwrl6XQWXldQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.82,319,1613462400"; 
+   d="scan'208";a="407467062"
+Received: from chang-linux-3.sc.intel.com ([172.25.66.175])
+  by fmsmga007.fm.intel.com with ESMTP; 23 May 2021 12:38:27 -0700
+From:   "Chang S. Bae" <chang.seok.bae@intel.com>
+To:     bp@suse.de, luto@kernel.org, tglx@linutronix.de, mingo@kernel.org,
+        x86@kernel.org
+Cc:     len.brown@intel.com, dave.hansen@intel.com, jing2.liu@intel.com,
+        ravi.v.shankar@intel.com, linux-kernel@vger.kernel.org,
+        chang.seok.bae@intel.com, kvm@vger.kernel.org
+Subject: [PATCH v5 01/28] x86/fpu/xstate: Modify the initialization helper to handle both static and dynamic buffers
+Date:   Sun, 23 May 2021 12:32:32 -0700
+Message-Id: <20210523193259.26200-2-chang.seok.bae@intel.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20210523193259.26200-1-chang.seok.bae@intel.com>
+References: <20210523193259.26200-1-chang.seok.bae@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Have the function initializing the xstate buffer take a struct fpu *
+pointer in preparation for dynamic state buffer support.
 
-On 21.05.2021 10:55, Stefano Garzarella wrote:
-> Hi Arseny,
->
-> On Thu, May 20, 2021 at 10:13:53PM +0300, Arseny Krasnov wrote:
->> 	This patchset implements support of SOCK_SEQPACKET for virtio
->> transport.
-> I'll carefully review and test this series next Monday, in the mean time 
-> I think we should have at least an agreement about the changes that 
-> regards virtio-spec before merge this series, to avoid any compatibility 
-> issues.
->
-> Do you plan to send a new version of the specification changes?
->
-> Thanks,
-> Stefano
+init_fpstate is a special case, which is indicated by a null pointer
+parameter to fpstate_init().
 
-Hello, sorry for long answer. I'm on vacation now, but i plan to send
+Also, fpstate_init_xstate() now accepts the state component bitmap to
+configure XCOMP_BV for the compacted format.
 
-it in next several days, because with current implementation it is short
+No functional change.
 
+Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
+Reviewed-by: Len Brown <len.brown@intel.com>
+Cc: x86@kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org
+---
+Changes from v4:
+* Added a proper function description. (Borislav Petkov)
+* Added the likely() statement as a null pointer is a special case.
 
-Thank You
+Changes from v3:
+* Updated the changelog. (Borislav Petkov)
+* Updated the function comment to use kernel-doc style. (Borislav Petkov)
 
->
->> 	As SOCK_SEQPACKET guarantees to save record boundaries, so to
->> do it, new bit for field 'flags' was added: SEQ_EOR. This bit is
->> set to 1 in last RW packet of message.
->> 	Now as  packets of one socket are not reordered neither on vsock
->> nor on vhost transport layers, such bit allows to restore original
->> message on receiver's side. If user's buffer is smaller than message
->> length, when all out of size data is dropped.
->> 	Maximum length of datagram is not limited as in stream socket,
->> because same credit logic is used. Difference with stream socket is
->> that user is not woken up until whole record is received or error
->> occurred. Implementation also supports 'MSG_TRUNC' flags.
->> 	Tests also implemented.
->>
->> 	Thanks to stsp2@yandex.ru for encouragements and initial design
->> recommendations.
->>
->> Arseny Krasnov (18):
->>  af_vsock: update functions for connectible socket
->>  af_vsock: separate wait data loop
->>  af_vsock: separate receive data loop
->>  af_vsock: implement SEQPACKET receive loop
->>  af_vsock: implement send logic for SEQPACKET
->>  af_vsock: rest of SEQPACKET support
->>  af_vsock: update comments for stream sockets
->>  virtio/vsock: set packet's type in virtio_transport_send_pkt_info()
->>  virtio/vsock: simplify credit update function API
->>  virtio/vsock: defines and constants for SEQPACKET
->>  virtio/vsock: dequeue callback for SOCK_SEQPACKET
->>  virtio/vsock: add SEQPACKET receive logic
->>  virtio/vsock: rest of SOCK_SEQPACKET support
->>  virtio/vsock: enable SEQPACKET for transport
->>  vhost/vsock: enable SEQPACKET for transport
->>  vsock/loopback: enable SEQPACKET for transport
->>  vsock_test: add SOCK_SEQPACKET tests
->>  virtio/vsock: update trace event for SEQPACKET
->>
->> drivers/vhost/vsock.c                        |  44 +-
->> include/linux/virtio_vsock.h                 |   9 +
->> include/net/af_vsock.h                       |   7 +
->> .../events/vsock_virtio_transport_common.h   |   5 +-
->> include/uapi/linux/virtio_vsock.h            |   9 +
->> net/vmw_vsock/af_vsock.c                     | 465 +++++++++++------
->> net/vmw_vsock/virtio_transport.c             |  25 +
->> net/vmw_vsock/virtio_transport_common.c      | 133 ++++-
->> net/vmw_vsock/vsock_loopback.c               |  11 +
->> tools/testing/vsock/util.c                   |  32 +-
->> tools/testing/vsock/util.h                   |   3 +
->> tools/testing/vsock/vsock_test.c             | 116 ++++
->> 12 files changed, 672 insertions(+), 187 deletions(-)
->>
->> v9 -> v10:
->> General changelog:
->> - patch for write serialization removed from patchset
->> - commit messages rephrased
->> - RFC tag removed
->>
->> Per patch changelog:
->>  see every patch after '---' line.
->>
->> v8 -> v9:
->> General changelog:
->> - see per patch change log.
->>
->> Per patch changelog:
->>  see every patch after '---' line.
->>
->> v7 -> v8:
->> General changelog:
->> - whole idea is simplified: channel now considered reliable,
->>   so SEQ_BEGIN, SEQ_END, 'msg_len' and 'msg_id' were removed.
->>   Only thing that is used to mark end of message is bit in
->>   'flags' field of packet header: VIRTIO_VSOCK_SEQ_EOR. Packet
->>   with such bit set to 1 means, that this is last packet of
->>   message.
->>
->> - POSIX MSG_EOR support is removed, as there is no exact
->>   description how it works.
->>
->> - all changes to 'include/uapi/linux/virtio_vsock.h' moved
->>   to dedicated patch, as these changes linked with patch to
->>   spec.
->>
->> - patch 'virtio/vsock: SEQPACKET feature bit support' now merged
->>   to 'virtio/vsock: setup SEQPACKET ops for transport'.
->>
->> - patch 'vhost/vsock: SEQPACKET feature bit support' now merged
->>   to 'vhost/vsock: setup SEQPACKET ops for transport'.
->>
->> Per patch changelog:
->>  see every patch after '---' line.
->>
->> v6 -> v7:
->> General changelog:
->> - virtio transport callback for message length now removed
->>   from transport. Length of record is returned by dequeue
->>   callback.
->>
->> - function which tries to get message length now returns 0
->>   when rx queue is empty. Also length of current message in
->>   progress is set to 0, when message processed or error
->>   happens.
->>
->> - patches for virtio feature bit moved after patches with
->>   transport ops.
->>
->> Per patch changelog:
->>  see every patch after '---' line.
->>
->> v5 -> v6:
->> General changelog:
->> - virtio transport specific callbacks which send SEQ_BEGIN or
->>   SEQ_END now hidden inside virtio transport. Only enqueue,
->>   dequeue and record length callbacks are provided by transport.
->>
->> - virtio feature bit for SEQPACKET socket support introduced:
->>   VIRTIO_VSOCK_F_SEQPACKET.
->>
->> - 'msg_cnt' field in 'struct virtio_vsock_seq_hdr' renamed to
->>   'msg_id' and used as id.
->>
->> Per patch changelog:
->> - 'af_vsock: separate wait data loop':
->>    1) Commit message updated.
->>    2) 'prepare_to_wait()' moved inside while loop(thanks to
->>      Jorgen Hansen).
->>    Marked 'Reviewed-by' with 1), but as 2) I removed R-b.
->>
->> - 'af_vsock: separate receive data loop': commit message
->>    updated.
->>    Marked 'Reviewed-by' with that fix.
->>
->> - 'af_vsock: implement SEQPACKET receive loop': style fixes.
->>
->> - 'af_vsock: rest of SEQPACKET support':
->>    1) 'module_put()' added when transport callback check failed.
->>    2) Now only 'seqpacket_allow()' callback called to check
->>       support of SEQPACKET by transport.
->>
->> - 'af_vsock: update comments for stream sockets': commit message
->>    updated.
->>    Marked 'Reviewed-by' with that fix.
->>
->> - 'virtio/vsock: set packet's type in send':
->>    1) Commit message updated.
->>    2) Parameter 'type' from 'virtio_transport_send_credit_update()'
->>       also removed in this patch instead of in next.
->>
->> - 'virtio/vsock: dequeue callback for SOCK_SEQPACKET': SEQPACKET
->>    related state wrapped to special struct.
->>
->> - 'virtio/vsock: update trace event for SEQPACKET': format strings
->>    now not broken by new lines.
->>
->> v4 -> v5:
->> - patches reorganized:
->>   1) Setting of packet's type in 'virtio_transport_send_pkt_info()'
->>      is moved to separate patch.
->>   2) Simplifying of 'virtio_transport_send_credit_update()' is
->>      moved to separate patch and before main virtio/vsock patches.
->> - style problem fixed
->> - in 'af_vsock: separate receive data loop' extra 'release_sock()'
->>   removed
->> - added trace event fields for SEQPACKET
->> - in 'af_vsock: separate wait data loop':
->>   1) 'vsock_wait_data()' removed 'goto out;'
->>   2) Comment for invalid data amount is changed.
->> - in 'af_vsock: rest of SEQPACKET support', 'new_transport' pointer
->>   check is moved after 'try_module_get()'
->> - in 'af_vsock: update comments for stream sockets', 'connect-oriented'
->>   replaced with 'connection-oriented'
->> - in 'loopback/vsock: setup SEQPACKET ops for transport',
->>   'loopback/vsock' replaced with 'vsock/loopback'
->>
->> v3 -> v4:
->> - SEQPACKET specific metadata moved from packet header to payload
->>   and called 'virtio_vsock_seq_hdr'
->> - record integrity check:
->>   1) SEQ_END operation was added, which marks end of record.
->>   2) Both SEQ_BEGIN and SEQ_END carries counter which is incremented
->>      on every marker send.
->> - af_vsock.c: socket operations for STREAM and SEQPACKET call same
->>   functions instead of having own "gates" differs only by names:
->>   'vsock_seqpacket/stream_getsockopt()' now replaced with
->>   'vsock_connectible_getsockopt()'.
->> - af_vsock.c: 'seqpacket_dequeue' callback returns error and flag that
->>   record ready. There is no need to return number of copied bytes,
->>   because case when record received successfully is checked at virtio
->>   transport layer, when SEQ_END is processed. Also user doesn't need
->>   number of copied bytes, because 'recv()' from SEQPACKET could return
->>   error, length of users's buffer or length of whole record(both are
->>   known in af_vsock.c).
->> - af_vsock.c: both wait loops in af_vsock.c(for data and space) moved
->>   to separate functions because now both called from several places.
->> - af_vsock.c: 'vsock_assign_transport()' checks that 'new_transport'
->>   pointer is not NULL and returns 'ESOCKTNOSUPPORT' instead of 'ENODEV'
->>   if failed to use transport.
->> - tools/testing/vsock/vsock_test.c: rename tests
->>
->> v2 -> v3:
->> - patches reorganized: split for prepare and implementation patches
->> - local variables are declared in "Reverse Christmas tree" manner
->> - virtio_transport_common.c: valid leXX_to_cpu() for vsock header
->>   fields access
->> - af_vsock.c: 'vsock_connectible_*sockopt()' added as shared code
->>   between stream and seqpacket sockets.
->> - af_vsock.c: loops in '__vsock_*_recvmsg()' refactored.
->> - af_vsock.c: 'vsock_wait_data()' refactored.
->>
->> v1 -> v2:
->> - patches reordered: af_vsock.c related changes now before virtio vsock
->> - patches reorganized: more small patches, where +/- are not mixed
->> - tests for SOCK_SEQPACKET added
->> - all commit messages updated
->> - af_vsock.c: 'vsock_pre_recv_check()' inlined to
->>   'vsock_connectible_recvmsg()'
->> - af_vsock.c: 'vsock_assign_transport()' returns ENODEV if transport
->>   was not found
->> - virtio_transport_common.c: transport callback for seqpacket dequeue
->> - virtio_transport_common.c: simplified
->>   'virtio_transport_recv_connected()'
->> - virtio_transport_common.c: send reset on socket and packet type
->> 			      mismatch.
->>
->> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->>
->> -- 
->> 2.25.1
->>
->
+Changes from v2:
+* Updated the changelog with task->fpu removed. (Borislav Petkov)
+---
+ arch/x86/include/asm/fpu/internal.h |  6 +++---
+ arch/x86/kernel/fpu/core.c          | 23 ++++++++++++++++++++---
+ arch/x86/kernel/fpu/init.c          |  2 +-
+ arch/x86/kernel/fpu/regset.c        |  2 +-
+ arch/x86/kernel/fpu/xstate.c        |  3 +--
+ arch/x86/kvm/x86.c                  |  2 +-
+ 6 files changed, 27 insertions(+), 11 deletions(-)
+
+diff --git a/arch/x86/include/asm/fpu/internal.h b/arch/x86/include/asm/fpu/internal.h
+index 8d33ad80704f..d81d8c407dc0 100644
+--- a/arch/x86/include/asm/fpu/internal.h
++++ b/arch/x86/include/asm/fpu/internal.h
+@@ -80,20 +80,20 @@ static __always_inline __pure bool use_fxsr(void)
+ 
+ extern union fpregs_state init_fpstate;
+ 
+-extern void fpstate_init(union fpregs_state *state);
++extern void fpstate_init(struct fpu *fpu);
+ #ifdef CONFIG_MATH_EMULATION
+ extern void fpstate_init_soft(struct swregs_state *soft);
+ #else
+ static inline void fpstate_init_soft(struct swregs_state *soft) {}
+ #endif
+ 
+-static inline void fpstate_init_xstate(struct xregs_state *xsave)
++static inline void fpstate_init_xstate(struct xregs_state *xsave, u64 xcomp_mask)
+ {
+ 	/*
+ 	 * XRSTORS requires these bits set in xcomp_bv, or it will
+ 	 * trigger #GP:
+ 	 */
+-	xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT | xfeatures_mask_all;
++	xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT | xcomp_mask;
+ }
+ 
+ static inline void fpstate_init_fxstate(struct fxregs_state *fx)
+diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
+index 571220ac8bea..52f886477b07 100644
+--- a/arch/x86/kernel/fpu/core.c
++++ b/arch/x86/kernel/fpu/core.c
+@@ -192,8 +192,25 @@ static inline void fpstate_init_fstate(struct fregs_state *fp)
+ 	fp->fos = 0xffff0000u;
+ }
+ 
+-void fpstate_init(union fpregs_state *state)
++/**
++ *
++ * fpstate_init() - initialize the xstate buffer
++ *
++ * If @fpu is NULL, initialize init_fpstate.
++ *
++ * @fpu:	A struct fpu * pointer
++ *
++ * Returns nothing.
++ */
++void fpstate_init(struct fpu *fpu)
+ {
++	union fpregs_state *state;
++
++	if (likely(fpu))
++		state = &fpu->state;
++	else
++		state = &init_fpstate;
++
+ 	if (!static_cpu_has(X86_FEATURE_FPU)) {
+ 		fpstate_init_soft(&state->soft);
+ 		return;
+@@ -202,7 +219,7 @@ void fpstate_init(union fpregs_state *state)
+ 	memset(state, 0, fpu_kernel_xstate_size);
+ 
+ 	if (static_cpu_has(X86_FEATURE_XSAVES))
+-		fpstate_init_xstate(&state->xsave);
++		fpstate_init_xstate(&state->xsave, xfeatures_mask_all);
+ 	if (static_cpu_has(X86_FEATURE_FXSR))
+ 		fpstate_init_fxstate(&state->fxsave);
+ 	else
+@@ -262,7 +279,7 @@ static void fpu__initialize(struct fpu *fpu)
+ 	WARN_ON_FPU(fpu != &current->thread.fpu);
+ 
+ 	set_thread_flag(TIF_NEED_FPU_LOAD);
+-	fpstate_init(&fpu->state);
++	fpstate_init(fpu);
+ 	trace_x86_fpu_init_state(fpu);
+ }
+ 
+diff --git a/arch/x86/kernel/fpu/init.c b/arch/x86/kernel/fpu/init.c
+index 701f196d7c68..74e03e3bc20f 100644
+--- a/arch/x86/kernel/fpu/init.c
++++ b/arch/x86/kernel/fpu/init.c
+@@ -124,7 +124,7 @@ static void __init fpu__init_system_generic(void)
+ 	 * Set up the legacy init FPU context. (xstate init might overwrite this
+ 	 * with a more modern format, if the CPU supports it.)
+ 	 */
+-	fpstate_init(&init_fpstate);
++	fpstate_init(NULL);
+ 
+ 	fpu__init_system_mxcsr();
+ }
+diff --git a/arch/x86/kernel/fpu/regset.c b/arch/x86/kernel/fpu/regset.c
+index c413756ba89f..4c4d9059ff36 100644
+--- a/arch/x86/kernel/fpu/regset.c
++++ b/arch/x86/kernel/fpu/regset.c
+@@ -144,7 +144,7 @@ int xstateregs_set(struct task_struct *target, const struct user_regset *regset,
+ 	 * In case of failure, mark all states as init:
+ 	 */
+ 	if (ret)
+-		fpstate_init(&fpu->state);
++		fpstate_init(fpu);
+ 
+ 	return ret;
+ }
+diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+index a85c64000218..767ad6b008c2 100644
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -457,8 +457,7 @@ static void __init setup_init_fpu_buf(void)
+ 	print_xstate_features();
+ 
+ 	if (boot_cpu_has(X86_FEATURE_XSAVES))
+-		init_fpstate.xsave.header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT |
+-						     xfeatures_mask_all;
++		fpstate_init_xstate(&init_fpstate.xsave, xfeatures_mask_all);
+ 
+ 	/*
+ 	 * Init all the features state with header.xfeatures being 0x0
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index bbc4e04e67ad..9af0a3c52b62 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10248,7 +10248,7 @@ static void fx_init(struct kvm_vcpu *vcpu)
+ 	if (!vcpu->arch.guest_fpu)
+ 		return;
+ 
+-	fpstate_init(&vcpu->arch.guest_fpu->state);
++	fpstate_init(vcpu->arch.guest_fpu);
+ 	if (boot_cpu_has(X86_FEATURE_XSAVES))
+ 		vcpu->arch.guest_fpu->state.xsave.header.xcomp_bv =
+ 			host_xcr0 | XSTATE_COMPACTION_ENABLED;
+-- 
+2.17.1
+
