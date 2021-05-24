@@ -2,104 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 23F1338E664
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 14:13:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF36938E668
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 14:14:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232678AbhEXMOu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 08:14:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55518 "EHLO
+        id S232662AbhEXMQ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 08:16:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29189 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232494AbhEXMOt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 08:14:49 -0400
+        by vger.kernel.org with ESMTP id S232494AbhEXMQZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 08:16:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621858401;
+        s=mimecast20190719; t=1621858497;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=VHS7kDDRvF5zOyGIv8drTO+Pb6C7Uho8V01CDj2scXk=;
-        b=HXGqBKQoOKPIcquXx/RwHjf4xPfG5PmUU3nz2CV7Xv5vffZnOSHHMPDD4XchWITcQVDCNe
-        sYPdxFbxHeHPP8By6VRvdfS0kkotFipLJrD/yodbxpElubWaDkhC2dMqbX55OMpHX0kTZp
-        EfpfkqOCmqxsBHnSaCEmakKJjCYkBjc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-xqcLxzkAOvGzwvBOX-FM5g-1; Mon, 24 May 2021 08:13:19 -0400
-X-MC-Unique: xqcLxzkAOvGzwvBOX-FM5g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D7D58042C9;
-        Mon, 24 May 2021 12:13:18 +0000 (UTC)
-Received: from starship (unknown [10.40.192.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2DDCB7086A;
-        Mon, 24 May 2021 12:13:15 +0000 (UTC)
-Message-ID: <779a182e7ed08484658463a69cf3934dcc87464d.camel@redhat.com>
-Subject: Re: [PATCH v2 2/7] KVM: nVMX: Release enlightened VMCS on VMCLEAR
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Date:   Mon, 24 May 2021 15:13:14 +0300
-In-Reply-To: <20210517135054.1914802-3-vkuznets@redhat.com>
-References: <20210517135054.1914802-1-vkuznets@redhat.com>
-         <20210517135054.1914802-3-vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        bh=6VKp1xofZhd/+4tFw02ffWXfwhEtsPe1dVI9fvTfESM=;
+        b=JiY7ZDWxMr8dtjKbS5Us40gqWc2IjcgupS8KRIayqY3FiwvefA2l7u2YVERLZSP0ri3sQq
+        Yghe/2nu0YRy2WH2H0CfaDBY3qEdy45J8RJkPbhM3GyS8FLsGBeR9BYCI6xYBJjV1sj3/R
+        DxUTGiLo1cjBMfqQ8oMfPkhphCOTlw8=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-365-_b527I7SOYWxLFxpLw73tg-1; Mon, 24 May 2021 08:14:55 -0400
+X-MC-Unique: _b527I7SOYWxLFxpLw73tg-1
+Received: by mail-ed1-f72.google.com with SMTP id d8-20020a0564020008b0290387d38e3ce0so15481374edu.1
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 05:14:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=6VKp1xofZhd/+4tFw02ffWXfwhEtsPe1dVI9fvTfESM=;
+        b=h7FHkP78JbFJMYlMkqB6DHo+DCJjuRbMoxTQsTxSxCZ4e0Tu7JpnmWIAzq0IhYFlnE
+         lGdeRRhpB3Ldetks5pcJOGUZy40/D5CK8ON83sMr2GaB89DBTSZf4cb3yyoAdGWfHi6t
+         g+cF4BC8wrlCixAbzwpGnC4aOLqGr2GeQ3xinAblh8RFc7GfV1oZQ9T8XGFm8tc4tFnL
+         z+frbEe4pShgQf3fZrIEQ2Idf0JhriUF8VDLA4afmcT83hnLO/fW6MHZIu3z5NARR5/3
+         g1qbKs911YBXHHXia4z6u1iIuP9H9WhFLGQ6VNRTr7VgogyriVB3qQAwr8UuPBZCXHIE
+         3t6g==
+X-Gm-Message-State: AOAM531Hv+7d53ldp0WVMBGTQu5+nSHm/83ph81GK75+XtKu7tkGIymY
+        zcqL1NLjhul0dqlqBfiYMSRFK+riDd7FWZzLapDSWc3zd2f/sd7TQin3ZlZjnKGjr7b6nhd9fes
+        OsMqSn3NwWlUU
+X-Received: by 2002:a17:906:eb10:: with SMTP id mb16mr23517145ejb.209.1621858494163;
+        Mon, 24 May 2021 05:14:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxk+0l0weiOvjyF1AGyYnOo0VG6EnvzCZZGMcmr4Lu8V//fg+XmZ0li0ktd4Yb2OtYjlpR1Ug==
+X-Received: by 2002:a17:906:eb10:: with SMTP id mb16mr23517131ejb.209.1621858494009;
+        Mon, 24 May 2021 05:14:54 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id v23sm9221937edx.31.2021.05.24.05.14.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 May 2021 05:14:53 -0700 (PDT)
+Subject: Re: [PATCH v2 0/5] KVM: selftests: arm64 exception handling and debug
+ test
+To:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     maz@kernel.org, drjones@redhat.com, alexandru.elisei@arm.com,
+        eric.auger@redhat.com
+References: <20210430232408.2707420-1-ricarkol@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <362e360d-40c3-1e50-18b0-a2f4297d3746@redhat.com>
+Date:   Mon, 24 May 2021 14:14:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
+In-Reply-To: <20210430232408.2707420-1-ricarkol@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2021-05-17 at 15:50 +0200, Vitaly Kuznetsov wrote:
-> Unlike VMREAD/VMWRITE/VMPTRLD, VMCLEAR is a valid instruction when
-> enlightened VMCS is in use. TLFS has the following brief description:
-> "The L1 hypervisor can execute a VMCLEAR instruction to transition an
-> enlightened VMCS from the active to the non-active state". Normally,
-> this change can be ignored as unmapping active eVMCS can be postponed
-> until the next VMLAUNCH instruction but in case nested state is migrated
-> with KVM_GET_NESTED_STATE/KVM_SET_NESTED_STATE, keeping eVMCS mapped
-> may result in its synchronization with VMCS12 and this is incorrect:
-> L1 hypervisor is free to reuse inactive eVMCS memory for something else.
+On 01/05/21 01:24, Ricardo Koller wrote:
+> Hi,
 > 
-> Inactive eVMCS after VMCLEAR can just be unmapped.
+> These patches add a debug exception test in aarch64 KVM selftests while
+> also adding basic exception handling support.
 > 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 2 ++
->  1 file changed, 2 insertions(+)
+> The structure of the exception handling is based on its x86 counterpart.
+> Tests use the same calls to initialize exception handling and both
+> architectures allow tests to override the handler for a particular
+> vector, or (vector, ec) for synchronous exceptions in the arm64 case.
 > 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 3080e00c8f90..ea2869d8b823 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -5008,6 +5008,8 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
->  				     vmptr + offsetof(struct vmcs12,
->  						      launch_state),
->  				     &zero, sizeof(zero));
-> +	} else if (vmx->nested.hv_evmcs && vmptr == vmx->nested.hv_evmcs_vmptr) {
-> +		nested_release_evmcs(vcpu);
->  	}
+> The debug test is similar to x86_64/debug_regs, except that the x86 one
+> controls the debugging from outside the VM. This proposed arm64 test
+> controls and handles debug exceptions from the inside.
+> 
+> Thanks,
+> Ricardo
 
-Releasing the eVMCS is a good thing not only for migration 
-but for instance for nested_vmx_fail which could write to 
-current eVMCS even outside of nested mode 
-(there is a bug there but you fixed it in the patch 4).
+Marc, are you going to queue this in your tree?
 
+Thanks,
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Paolo
 
-Best regards,
-	Maxim Levitsky
-
-
->  
->  	return nested_vmx_succeed(vcpu);
-
-
-
-
+> v1 -> v2:
+> 
+> Addressed comments from Andrew and Marc (thank you very much):
+> - rename vm_handle_exception in all tests.
+> - introduce UCALL_UNHANDLED in x86 first.
+> - move GUEST_ASSERT_EQ to common utils header.
+> - handle sync and other exceptions separately: use two tables (like
+>    kvm-unit-tests).
+> - add two separate functions for installing sync versus other exceptions
+> - changes in handlers.S: use the same layout as user_pt_regs, treat the
+>    EL1t vectors as invalid, refactor the vector table creation to not use
+>    manual numbering, add comments, remove LR from the stored registers.
+> - changes in debug-exceptions.c: remove unused headers, use the common
+>    GUEST_ASSERT_EQ, use vcpu_run instead of _vcpu_run.
+> - changes in processor.h: write_sysreg with support for xzr, replace EL1
+>    with current in macro names, define ESR_EC_MASK as ESR_EC_NUM-1.
+> 
+> Ricardo Koller (5):
+>    KVM: selftests: Rename vm_handle_exception
+>    KVM: selftests: Introduce UCALL_UNHANDLED for unhandled vector
+>      reporting
+>    KVM: selftests: Move GUEST_ASSERT_EQ to utils header
+>    KVM: selftests: Add exception handling support for aarch64
+>    KVM: selftests: Add aarch64/debug-exceptions test
+> 
+>   tools/testing/selftests/kvm/.gitignore        |   1 +
+>   tools/testing/selftests/kvm/Makefile          |   3 +-
+>   .../selftests/kvm/aarch64/debug-exceptions.c  | 244 ++++++++++++++++++
+>   .../selftests/kvm/include/aarch64/processor.h |  90 ++++++-
+>   .../testing/selftests/kvm/include/kvm_util.h  |  10 +
+>   .../selftests/kvm/include/x86_64/processor.h  |   4 +-
+>   .../selftests/kvm/lib/aarch64/handlers.S      | 130 ++++++++++
+>   .../selftests/kvm/lib/aarch64/processor.c     | 124 +++++++++
+>   .../selftests/kvm/lib/x86_64/processor.c      |  19 +-
+>   .../selftests/kvm/x86_64/kvm_pv_test.c        |   2 +-
+>   .../selftests/kvm/x86_64/tsc_msrs_test.c      |   9 -
+>   .../kvm/x86_64/userspace_msr_exit_test.c      |   8 +-
+>   .../selftests/kvm/x86_64/xapic_ipi_test.c     |   2 +-
+>   13 files changed, 611 insertions(+), 35 deletions(-)
+>   create mode 100644 tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+>   create mode 100644 tools/testing/selftests/kvm/lib/aarch64/handlers.S
+> 
 
