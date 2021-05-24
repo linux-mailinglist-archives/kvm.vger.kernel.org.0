@@ -2,124 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A43138E05D
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 06:30:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 802B338E060
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 06:36:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229777AbhEXEbc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 00:31:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38860 "EHLO
+        id S229824AbhEXEiP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 00:38:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229530AbhEXEba (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 May 2021 00:31:30 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 862FEC061574
-        for <kvm@vger.kernel.org>; Sun, 23 May 2021 21:30:02 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id j6-20020a17090adc86b02900cbfe6f2c96so10406289pjv.1
-        for <kvm@vger.kernel.org>; Sun, 23 May 2021 21:30:02 -0700 (PDT)
+        with ESMTP id S229530AbhEXEiP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 May 2021 00:38:15 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7184C061574;
+        Sun, 23 May 2021 21:36:47 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id v13so13978728ple.9;
+        Sun, 23 May 2021 21:36:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=gKlhqQXM4UBJP6nopL7HhB9INiyQffua7cr3HwkBZ3Y=;
-        b=YIz1361Haj6fycLVqZNIpw9DVTZefr/Q0N9dFydkS+BcaySvcHUBsAxRb99Ra8r8X2
-         Z2hSQOJwy1CLpffwFcDKg2Ybi2ZXkYC3oahSiJZt2x6I4Ah2vq0Kho7ENY1iz4z6dXX/
-         jzd8k9zDZZVXESgmnbPqsTX5kTfu6U+hSPwTG0b3thkA/VPjoTvndHO45r/LGEAO+U4E
-         GnD0jmeY+cbeV0G04z08HaOP93bU5isTzdtY7uBWfudreyIomSbBM2bpJvJ9Zrhh98we
-         HMy2mVoBmlCZqmbkP1o+daVVJPgGog2789RAaD4VOTWvKpgNCcZRSe82UpuMSPmpDd/x
-         4gAQ==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=CFKj4h8D3vKVsrArxInuoUkH3K47MAPJEo/4ElSezfw=;
+        b=suelYebOlkPxLUkUTCooa0nu2Vbc9auUsC0ZpGyRD7QqJCvRFdyVW/w4mVNVNPt5nh
+         INTH9AivNniMLt/7OeOVaz39skE253KoNrvaNG76w0EYBVCjpkU4b3boQdlKbiyIjjyc
+         4smb0q25DNDaEEnnkVCIa0YpeqNJdWaDsCAtj7LzS4OcffH5eeCvRddqgld/RcTUCUX0
+         nBbnO2919hAuvhh+fA295dm8AlTInxsN61FjykuQ04Oi92fGD6gQJMWXYvdZ/tKD+YRn
+         jpf18KTH6azSK+z3L52gIricwlxHYAqFIBTDWUByKkBs82Fqf4UCeg3Ftw4YR/sw2OnU
+         AwYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=gKlhqQXM4UBJP6nopL7HhB9INiyQffua7cr3HwkBZ3Y=;
-        b=hYaU2+5ebiAM37hPIoNIfpwYySf2KJB5/q5ph5Wd+lTef5K/odIg8x3fc01Oepl8G/
-         lx9y1n33LIjUlFsNX+rHOO4DMFQN2E7+tsui0rOjtfdGBCO01jaNdO59EmbLLQzvULhM
-         HNZ+rppKJVwtpawFniYOokB3U+Vhz8h6GqvAgEv8DVcm5nW3N1ZGzegSOurrY1TvuCHM
-         QnqakXOBuB1TDeD1A/YscAgUbg0yGGljWHxFMwPsPkPzO5jr99tAGwy3n56IzDIQO+b9
-         VGB8puY/cjA6G2wA5lw2Mvn8y9AwIr4VRLSYbn/GfB89gWmrPAg3oaTA0Rw/BA3rf3aH
-         5fCw==
-X-Gm-Message-State: AOAM532R791qedhRVgFOtqXajiMVBJyff0njB/e8yDoRiKYj9CzEGtwA
-        0VzmReBhxuiDmeFxD9g2wVBpwjXYd3CBn++d4C5nmA==
-X-Google-Smtp-Source: ABdhPJzgYSfiFrtDLI8M3DaRA9/D7QjOG52lRd7C4La+BN0h68YjrvOXospjM2pYNI1FocKlwXWfikb3csO4MybtZ/0=
-X-Received: by 2002:a17:902:f20c:b029:f0:af3d:c5d8 with SMTP id
- m12-20020a170902f20cb02900f0af3dc5d8mr23344483plc.23.1621830601820; Sun, 23
- May 2021 21:30:01 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210424004645.3950558-1-seanjc@google.com> <20210424004645.3950558-3-seanjc@google.com>
- <CAAeT=FyNo1CGvnamc3_J9EEQUn6WcdkMp50-QgmLYYVCFA2fZA@mail.gmail.com>
- <YKVdUtvSg7/I7Ses@google.com> <CAAeT=FxvS_hzcZbZQ_jQnWwX+xDT0SqQoHKELeviqu_QvvnbYg@mail.gmail.com>
- <YKfRj+I2Wa+t//lb@google.com>
-In-Reply-To: <YKfRj+I2Wa+t//lb@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Sun, 23 May 2021 21:29:46 -0700
-Message-ID: <CAAeT=FxuBEY1C7MMQ5f34-AbQjtDRAgVeR88LkS9=763dCjb=A@mail.gmail.com>
-Subject: Re: [PATCH 02/43] KVM: VMX: Set EDX at INIT with CPUID.0x1, Family-Model-Stepping
-To:     Sean Christopherson <seanjc@google.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=CFKj4h8D3vKVsrArxInuoUkH3K47MAPJEo/4ElSezfw=;
+        b=Pk7vPBusOas1OOvrP9+LPx8HL2l+9l25fxDFUGsP615rNdfyZL4Rm5PopwVIiP2VAG
+         zN9tG2eT9zALg1aWSJxjqY1GyJ3RVE/FkVxxWptcxsWNHbyGvxq6B1HQQFycpm6n4lLg
+         mA8JYVdxdqjuMr6voZfXZQKiK9ZRZ+5xOIK7clLdjGT4VOTtqKYYHwY8QaNyfc75kKg5
+         oPGlGUIuk7ToW/+OrOyTgnFuULgrsWgMM9tG8z0oih6E3TzlaQtV/TV5MwrAxnf+dPoP
+         MHwOr4XhRh76BfmLy5nq82WZnsAiQ4EHElapXlctMKVwkixoftfSzaotCnqZ59YHPcsr
+         eKOw==
+X-Gm-Message-State: AOAM531XsG9Ivd/Q1ZhE6+IeWsl5LviN/SRn+10iWuHSskrBcQ63fh78
+        FAZYb1BypcynX2IoA7MS/hGosBTf9FA=
+X-Google-Smtp-Source: ABdhPJx78sbuuA0VTuQzKqWGNB/d5u4f4KcVr41uLsV7Gks8DRu+CWNOCDsLH9QN+BAsYtAqwTDJHA==
+X-Received: by 2002:a17:90a:9517:: with SMTP id t23mr22396886pjo.130.1621831007083;
+        Sun, 23 May 2021 21:36:47 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.56])
+        by smtp.googlemail.com with ESMTPSA id cc2sm8884703pjb.39.2021.05.23.21.36.43
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 23 May 2021 21:36:46 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH] KVM: X86: Fix warning caused by stale emulation context
+Date:   Sun, 23 May 2021 21:35:54 -0700
+Message-Id: <1621830954-31963-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > > On Tue, May 18, 2021, Reiji Watanabe wrote:
-> > > > BTW, I would think having a default CPUID for CPUID.(EAX=3D0x1) wou=
-ld be better
-> > > > for consistency of a vCPU state for RESET.  I would think it doesn'=
-t matter
-> > > > practically anyway though.
-> > >
-> > > Probably, but that would require defining default values for all of C=
-PUID.0x0 and
-> > > CPUID.0x1, which is a can of worms I'd rather not open.  E.g. vendor =
-info, basic
-> > > feature set, APIC ID, etc... would all need default values.  On the o=
-ther hand,
-> > > the EDX value stuffing predates CPUID, so using 0x600 isn't provably =
-wrong, just
-> > > a bit anachronistic. :-)
-> >
-> > I see... Then I don't think it's worth doing...
-> > Just out of curiosity, can't we simply use a vcpu_id for the APIC ID ?
->
-> That would mostly work, but theoretically we could overflow the 8 bit fie=
-ld
-> because max vCPUs is 288.  Thanks Larrabee.
->
->   commit 682f732ecf7396e9d6fe24d44738966699fae6c0
->   Author: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
->   Date:   Tue Jul 12 22:09:29 2016 +0200
->
->     KVM: x86: bump MAX_VCPUS to 288
->
->     288 is in high demand because of Knights Landing CPU.
->     We cannot set the limit to 640k, because that would be wasting space.
->
-> > Also, can't we simply use the same values that KVM_GET_SUPPORTED_CPUID
-> > provides for other CPUID fields ?
->
-> Yes, that would mostly work.  It's certainly possible to have a moderatel=
-y sane
-> default, but there's essentially zero benefit in doing so since practical=
-ly
-> speaking all userspace VMMs will override CPUID anyways.  KVM could compl=
-etely
-> default to the host CPUID, but again, it wouldn't provide any meaningful =
-benefit,
-> while doing so would step on userspace's toes since KVM's approach is tha=
-t KVM is
-> "just" an accelerator, while userspace defines the CPU model, devices, et=
-c...
-> And it would also mean KVM has to start worrying about silly corner cases=
- like
-> the max vCPUs thing.  That's why I say it's a can of worms :-)
+From: Wanpeng Li <wanpengli@tencent.com>
 
-Ah, I see.  Thank you for the answer and the helpful information !
+Reported by syzkaller:
 
-Regards,
-Reiji
+  WARNING: CPU: 7 PID: 10526 at /home/kernel/ssd/linux/arch/x86/kvm//x86.c:7621 x86_emulate_instruction+0x41b/0x510 [kvm]
+  RIP: 0010:x86_emulate_instruction+0x41b/0x510 [kvm]
+  Call Trace:
+   kvm_mmu_page_fault+0x126/0x8f0 [kvm]
+   vmx_handle_exit+0x11e/0x680 [kvm_intel]
+   vcpu_enter_guest+0xd95/0x1b40 [kvm]
+   kvm_arch_vcpu_ioctl_run+0x377/0x6a0 [kvm]
+   kvm_vcpu_ioctl+0x389/0x630 [kvm]
+   __x64_sys_ioctl+0x8e/0xd0
+   do_syscall_64+0x3c/0xb0
+   entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+Commit 4a1e10d5b5d8c (KVM: x86: handle hardware breakpoints during emulation())
+adds hardware breakpoints check before emulation the instruction and parts of 
+emulation context initialization, actually we don't have EMULTYPE_NO_DECODE flag 
+here and the emulation context will not be reused. Commit c8848cee74ff (KVM: x86: 
+set ctxt->have_exception in x86_decode_insn()) triggers the warning because it 
+catches the stale emulation context has #UD, however, it is not during instruction 
+decoding which should result in EMULATION_FAILED. This patch fixes it by moving 
+the second part emulation context initialization before hardware breakpoints check.
+
+syzkaller source: https://syzkaller.appspot.com/x/repro.c?x=134683fdd00000
+
+Reported-by: syzbot+71271244f206d17f6441@syzkaller.appspotmail.com
+Fixes: 4a1e10d5b5d8 (KVM: x86: handle hardware breakpoints during emulation)
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ arch/x86/kvm/x86.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index bbc4e04..eca69f9 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7552,6 +7552,13 @@ int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
+ 
+ 	init_emulate_ctxt(vcpu);
+ 
++	ctxt->interruptibility = 0;
++	ctxt->have_exception = false;
++	ctxt->exception.vector = -1;
++	ctxt->perm_ok = false;
++
++	ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
++
+ 	/*
+ 	 * We will reenter on the same instruction since we do not set
+ 	 * complete_userspace_io. This does not handle watchpoints yet,
+@@ -7561,13 +7568,6 @@ int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
+ 	    kvm_vcpu_check_breakpoint(vcpu, &r))
+ 		return r;
+ 
+-	ctxt->interruptibility = 0;
+-	ctxt->have_exception = false;
+-	ctxt->exception.vector = -1;
+-	ctxt->perm_ok = false;
+-
+-	ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
+-
+ 	r = x86_decode_insn(ctxt, insn, insn_len);
+ 
+ 	trace_kvm_emulate_insn_start(vcpu);
+-- 
+2.7.4
+
