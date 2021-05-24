@@ -2,119 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EAB0B38E5E1
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 13:53:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DAE438E607
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 14:00:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232625AbhEXLyr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 07:54:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48087 "EHLO
+        id S232868AbhEXMCE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 08:02:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55273 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232665AbhEXLym (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 07:54:42 -0400
+        by vger.kernel.org with ESMTP id S232841AbhEXMB6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 08:01:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621857194;
+        s=mimecast20190719; t=1621857627;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zfCwhka2L7IMBYHuu50/MdZUm2+UjbEqYuiRuQJLXKE=;
-        b=Rn7bA1+jC/ZaZu7RlWmeAy9h+Q8YMLpXZU10BgrXm9qFAqp+W47fmQIdKekIREQaVMKbju
-        Y3zUbR/W7Qjuu3IetPPKJ3npHz+kqa+r3t/XtbEvmEVkBbVxyKmtaNvPDgqhAnG/4aSg51
-        bLoIxPQLNniNQf3itM/npGUR/zYp5nA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-rpp-7mK3PLCaB9QqoTi54Q-1; Mon, 24 May 2021 07:53:13 -0400
-X-MC-Unique: rpp-7mK3PLCaB9QqoTi54Q-1
-Received: by mail-wr1-f69.google.com with SMTP id x10-20020adfc18a0000b029010d83c83f2aso12990199wre.8
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 04:53:12 -0700 (PDT)
+        bh=I3V0D+5HGJhXODEIAf3PixuPKf+j2PO1GcKX5z+lPQc=;
+        b=NUbgdjOTvVm4Zht1LYyddU7ZyshIgVdAj6lqx1GngJgSYxRGa1h2YfGCqmXWYjLuuq0fJ5
+        ZGNA+2D2xVNxSvqp79ejecCxK1jPo4RljLxxqaCwFVMabKYiHRWZ64MJnxZHsKQhSg0UYf
+        fItAeayCS19naMAX5kQPsanBQPz/j3g=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-214-tU84u68DPfS_5wGqgVIUHQ-1; Mon, 24 May 2021 08:00:26 -0400
+X-MC-Unique: tU84u68DPfS_5wGqgVIUHQ-1
+Received: by mail-ej1-f69.google.com with SMTP id sd18-20020a170906ce32b02903cedf584542so7470517ejb.9
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 05:00:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=zfCwhka2L7IMBYHuu50/MdZUm2+UjbEqYuiRuQJLXKE=;
-        b=bgsn8iLdXrurlWAI30Fd0fWoBIlupSy7vELJued/be1DR3Kdkvn6byDbYaDTgneRba
-         vJpqfGN2AKgMFjZUxWPLyEsbHI/ZbRidJPbmUcAniW0bNwVuPFVZLI4a64HPAGet6WzF
-         OidGdGNGM2S72vzAoVTbuRaVCi7hqlKguCkad29YIRbJkHKQaF8wxU50UHHStW9vo56r
-         OMFVOKUGDpbNVq3JNphtPZ7mPmOZVT20qkxeXHMnvBjhtORcGpMwvF8xv3EbEv2V7adp
-         rJQprnCfs/fpHAblnw4bfau2GSxHs3ytDGcWH7dh29hB35u13++1gOm642fsD6irHKh1
-         Aglg==
-X-Gm-Message-State: AOAM531Xwr/aViWB/mtDfaS7WKxpeozsLn2E7zceU8LQOb47AaF3LHCe
-        e2118n0dPnjFmiyresjmLsei5jaFw4P0rRncsvv/Rj04vO8Fq4kNg4/rLuQEgCjoNN1XJs7qnb4
-        4bMmV1SxoymbM
-X-Received: by 2002:a5d:4fce:: with SMTP id h14mr21348351wrw.239.1621857192033;
-        Mon, 24 May 2021 04:53:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzj5hA+mPY/6z6A3gV4eFAIFa4rKF/d+NdxDU035q9t0Udwa9q9VgydrjfjXD6Zu3/m0314gw==
-X-Received: by 2002:a5d:4fce:: with SMTP id h14mr21348330wrw.239.1621857191811;
-        Mon, 24 May 2021 04:53:11 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id p14sm11925985wrm.70.2021.05.24.04.53.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 May 2021 04:53:11 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=I3V0D+5HGJhXODEIAf3PixuPKf+j2PO1GcKX5z+lPQc=;
+        b=EhNJYrkZU7jgnmeuxwQDJm9xMyMbcxpgpVWvijj8MPq/wS+NSVlpliKL+nhL/LT1T7
+         JiNKctBQ3UPyM0TAZL8hnce2vHGvn6mVmXZFoV8Gvr9KXhhcLBjtvNUJpJmchmlfLVF2
+         YbMaOt/jcr3BMgm5GwZVILPy6yCGnBSevBqaI0G1NsdpGk4+z8fzgdObKjoBTFpfz6Nq
+         qv9Z4JekK6E+B5udtHaeZrZJbpkZ1cU8IK1QCF168qjwwmgfB4hBeIIeOAnQHsURXeDW
+         uGlg9Eu7JoSXcwdIXDOv+5Twa6VlGOGx+Wtdf9gZQKrqO7TVNrCBUh8IAvA20UxTXC/T
+         uUew==
+X-Gm-Message-State: AOAM532ZUzP8J/CSE31iJwtF77o0OIl2njslX5OkLpdbUsOMpTR16hH3
+        5nR62lqSMfRNG8qYJnLxuHA7WQmGwvEOx/FJqeN3P4LEDogOABWXnGZ9fdkjdjg4hTObWX4ecPW
+        SxiTIldPWy8DZFrCpMBHY6h2kMrShygME79YuXVrX27SlNuTdm1ewT0zqo1q5sA6n
+X-Received: by 2002:a05:6402:40c1:: with SMTP id z1mr24318024edb.97.1621857624619;
+        Mon, 24 May 2021 05:00:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzUkyhyrAvsVZLNoFrhItAWzyVi++VuBUrZtAbDURNk3L0hXBXWDHC5wJQxCvuOgTmmDyX6dw==
+X-Received: by 2002:a05:6402:40c1:: with SMTP id z1mr24317983edb.97.1621857624354;
+        Mon, 24 May 2021 05:00:24 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id k21sm7865882ejp.23.2021.05.24.05.00.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 May 2021 05:00:23 -0700 (PDT)
+Subject: Re: [PATCH v3 4/4] KVM: hyper-v: Advertise support for fast XMM
+ hypercalls
+To:     Siddharth Chandrasekaran <sidcha@amazon.de>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH] KVM: SVM: Assume a 64-bit hypercall for guests with
- protected state
-In-Reply-To: <d0904f0d049300267665bd4abf96c3d7e7aa4825.1621701837.git.thomas.lendacky@amd.com>
-References: <d0904f0d049300267665bd4abf96c3d7e7aa4825.1621701837.git.thomas.lendacky@amd.com>
-Date:   Mon, 24 May 2021 13:53:08 +0200
-Message-ID: <87pmxg73h7.fsf@vitty.brq.redhat.com>
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     Alexander Graf <graf@amazon.com>,
+        Evgeny Iakovlev <eyakovl@amazon.de>,
+        Liran Alon <liran@amazon.com>,
+        Ioannis Aslanidis <iaslan@amazon.de>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <cover.1618349671.git.sidcha@amazon.de>
+ <33a7e27046c15134667ea891feacbe3fe208f66e.1618349671.git.sidcha@amazon.de>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <17a1ab38-10db-4fdf-411e-921738cd94e1@redhat.com>
+Date:   Mon, 24 May 2021 14:00:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <33a7e27046c15134667ea891feacbe3fe208f66e.1618349671.git.sidcha@amazon.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Tom Lendacky <thomas.lendacky@amd.com> writes:
-
-> When processing a hypercall for a guest with protected state, currently
-> SEV-ES guests, the guest CS segment register can't be checked to
-> determine if the guest is in 64-bit mode. For an SEV-ES guest, it is
-> expected that communication between the guest and the hypervisor is
-> performed to shared memory using the GHCB. In order to use the GHCB, the
-> guest must have been in long mode, otherwise writes by the guest to the
-> GHCB would be encrypted and not be able to be comprehended by the
-> hypervisor. Given that, assume that the guest is in 64-bit mode when
-> processing a hypercall from a guest with protected state.
->
-> Fixes: f1c6366e3043 ("KVM: SVM: Add required changes to support intercepts under SEV-ES")
-> Reported-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+On 13/04/21 23:50, Siddharth Chandrasekaran wrote:
+> Now that kvm_hv_flush_tlb() has been patched to support XMM hypercall
+> inputs, we can start advertising this feature to guests.
+> 
+> Cc: Alexander Graf <graf@amazon.com>
+> Cc: Evgeny Iakovlev <eyakovl@amazon.de>
+> Signed-off-by: Siddharth Chandrasekaran <sidcha@amazon.de>
 > ---
->  arch/x86/kvm/x86.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 9b6bca616929..e715c69bb882 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8403,7 +8403,12 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
->  
->  	trace_kvm_hypercall(nr, a0, a1, a2, a3);
->  
-> -	op_64_bit = is_64_bit_mode(vcpu);
-> +	/*
-> +	 * If running with protected guest state, the CS register is not
-> +	 * accessible. The hypercall register values will have had to been
-> +	 * provided in 64-bit mode, so assume the guest is in 64-bit.
-> +	 */
-> +	op_64_bit = is_64_bit_mode(vcpu) || vcpu->arch.guest_state_protected;
->  	if (!op_64_bit) {
->  		nr &= 0xFFFFFFFF;
->  		a0 &= 0xFFFFFFFF;
+>   arch/x86/include/asm/hyperv-tlfs.h | 7 ++++++-
+>   arch/x86/kvm/hyperv.c              | 1 +
+>   2 files changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
+> index ee6336a54f92..597ae1142864 100644
+> --- a/arch/x86/include/asm/hyperv-tlfs.h
+> +++ b/arch/x86/include/asm/hyperv-tlfs.h
+> @@ -52,7 +52,7 @@
+>    * Support for passing hypercall input parameter block via XMM
+>    * registers is available
+>    */
+> -#define HV_X64_HYPERCALL_PARAMS_XMM_AVAILABLE		BIT(4)
+> +#define HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE		BIT(4)
+>   /* Support for a virtual guest idle state is available */
+>   #define HV_X64_GUEST_IDLE_STATE_AVAILABLE		BIT(5)
+>   /* Frequency MSRs available */
+> @@ -61,6 +61,11 @@
+>   #define HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE		BIT(10)
+>   /* Support for debug MSRs available */
+>   #define HV_FEATURE_DEBUG_MSRS_AVAILABLE			BIT(11)
+> +/*
+> + * Support for returning hypercall output block via XMM
+> + * registers is available
+> + */
+> +#define HV_X64_HYPERCALL_XMM_OUTPUT_AVAILABLE		BIT(15)
+>   /* stimer Direct Mode is available */
+>   #define HV_STIMER_DIRECT_MODE_AVAILABLE			BIT(19)
+>   
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index cd6c6f1f06a4..0f6fd7550510 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -2235,6 +2235,7 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
+>   			ent->ebx |= HV_POST_MESSAGES;
+>   			ent->ebx |= HV_SIGNAL_EVENTS;
+>   
+> +			ent->edx |= HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE;
+>   			ent->edx |= HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
+>   			ent->edx |= HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE;
+>   
+> 
 
-While this is might be a very theoretical question, what about other
-is_64_bit_mode() users? Namely, a very similar to the above check exists
-in kvm_hv_hypercall() and kvm_xen_hypercall().
+Queued, thanks.
 
--- 
-Vitaly
+Paolo
 
