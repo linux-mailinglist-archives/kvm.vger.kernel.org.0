@@ -2,146 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DAECD38E6AC
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 14:34:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F38EC38E6B0
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 14:35:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232790AbhEXMgK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 08:36:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31404 "EHLO
+        id S232840AbhEXMg6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 08:36:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44036 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232744AbhEXMgJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 08:36:09 -0400
+        by vger.kernel.org with ESMTP id S232486AbhEXMgq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 08:36:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621859681;
+        s=mimecast20190719; t=1621859718;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=VWAemnMdLESRbRSHAcnPaLJhW1sdIBiwkO7JDr1KeaY=;
-        b=EvzovdQaqZGL4vKZewpg8UYbzJbf8BeN6oWBgTkdm3zOkHUvIwD1dqTU3101r/WM5ec1KL
-        diMvEsQxyZfgOFH5jJE9aEiKvqxbZ86lOB+3nyY//eNHhhyo0fnyhNYv+oAKP/kK+qMl6Z
-        0xP3Ke1vtqST6TuRSA17vBHy7vDjCog=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-416-cS7AYd5zOkulW-jISTK3UA-1; Mon, 24 May 2021 08:34:39 -0400
-X-MC-Unique: cS7AYd5zOkulW-jISTK3UA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3AEF41083E93;
-        Mon, 24 May 2021 12:34:38 +0000 (UTC)
-Received: from starship (unknown [10.40.192.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 197A46267F;
-        Mon, 24 May 2021 12:34:35 +0000 (UTC)
-Message-ID: <2abf028db2a77c940d89618d66c4e6cbc3347bc4.camel@redhat.com>
-Subject: Re: [PATCH v2 5/7] KVM: nVMX: Reset eVMCS clean fields data from
- prepare_vmcs02()
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        bh=PpgAUyiKcsxyyDpd43AlLz5pN+mpE43cHu+cRRsUC+8=;
+        b=JRGenMJtm2mFA5wVL7ljyY47DPgCM3PsceNh8S/dwZsDnSphtu8r23L6ReeCaH35hW3mLC
+        tTmbvl5BewDuIgbe51P8qKZzL+35jG3oeRrjWFuYH+KrlfB81XSVInZ81aKgmGNOcAG02c
+        /hCqQ1nb4zJQHatYDLmVgAAjhWGctrQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-263-LWy9e_PFNX-4klg8F9OBEQ-1; Mon, 24 May 2021 08:35:16 -0400
+X-MC-Unique: LWy9e_PFNX-4klg8F9OBEQ-1
+Received: by mail-wr1-f69.google.com with SMTP id v5-20020adf9e450000b029010e708f05b3so13075926wre.6
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 05:35:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=PpgAUyiKcsxyyDpd43AlLz5pN+mpE43cHu+cRRsUC+8=;
+        b=PrleIY6hTK/1ZL8IlysPlpN/ElHft/WyU2X1r6j1Ob+vFDDPbGMW2Neyb2Fn2X3Jzc
+         SCYE0AC74LL4A4ZA/Cqh6g7UJ444HLfRz+mfn9b0UWpa8hgWYGXCjh0yDSo0BWLAr4sW
+         ++V0x6uIiqllL4xYXhGsL43lFIbQsJVZ8iBRdMzDp4eHT/dvHYlFPbhu5N2uyZyw21UA
+         uF/vJH0ootGO1F7toZt8YVNtdzVxBjjJwfa09VU0XXCdsz13QOT4gU9hBySZ7ulW5/I+
+         lejCP/T9nA5P+6mT6Oku4VBQzHtlzA24iE5xLdVfO6Ks9WX+9RGFdGLwt7YebH/vmn2F
+         oefA==
+X-Gm-Message-State: AOAM530w5JFUU9Wv6pTjVtuLhp88LycqqeVlxRcNR3rfhHS0u3RldDdR
+        d73D+uHWBcFIY8KFHWIjmyFwIvxPFDX5oynouE267IV8OKtmNCeq8/FHPIbMz7K/BLnzcyDPa0e
+        kF1Xbh0g8JXQq
+X-Received: by 2002:a5d:4fce:: with SMTP id h14mr21536321wrw.239.1621859715729;
+        Mon, 24 May 2021 05:35:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwJaSdc2G2JIlQi2ysSOdWJOO94g1Ez7aGhHWhFsXXKj8SOWwzwrCkMWWBxRFqpEPku9GxM5Q==
+X-Received: by 2002:a5d:4fce:: with SMTP id h14mr21536302wrw.239.1621859715485;
+        Mon, 24 May 2021 05:35:15 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id t11sm12357620wrz.57.2021.05.24.05.35.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 May 2021 05:35:15 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Date:   Mon, 24 May 2021 15:34:34 +0300
-In-Reply-To: <20210517135054.1914802-6-vkuznets@redhat.com>
+Subject: Re: [PATCH v2 1/7] KVM: nVMX: Introduce nested_evmcs_is_used()
+In-Reply-To: <80892ca2e3d7122b5b92f696ecf4c1943b0245b9.camel@redhat.com>
 References: <20210517135054.1914802-1-vkuznets@redhat.com>
-         <20210517135054.1914802-6-vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ <20210517135054.1914802-2-vkuznets@redhat.com>
+ <80892ca2e3d7122b5b92f696ecf4c1943b0245b9.camel@redhat.com>
+Date:   Mon, 24 May 2021 14:35:14 +0200
+Message-ID: <875yz871j1.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2021-05-17 at 15:50 +0200, Vitaly Kuznetsov wrote:
-> When nested state migration happens during L1's execution, it
-> is incorrect to modify eVMCS as it is L1 who 'owns' it at the moment.
-> At lease genuine Hyper-v seems to not be very happy when 'clean fields'
-> data changes underneath it.
-> 
-> 'Clean fields' data is used in KVM twice: by copy_enlightened_to_vmcs12()
-> and prepare_vmcs02_rare() so we can reset it from prepare_vmcs02() instead.
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index eb2d25a93356..3bfbf991bf45 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -2081,14 +2081,10 @@ void nested_sync_vmcs12_to_shadow(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  
-> -	if (vmx->nested.hv_evmcs) {
-> +	if (vmx->nested.hv_evmcs)
->  		copy_vmcs12_to_enlightened(vmx);
-> -		/* All fields are clean */
-> -		vmx->nested.hv_evmcs->hv_clean_fields |=
-> -			HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL;
-> -	} else {
-> +	else
->  		copy_vmcs12_to_shadow(vmx);
-> -	}
->  
->  	vmx->nested.need_vmcs12_to_shadow_sync = false;
->  }
-> @@ -2629,6 +2625,12 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
->  
->  	kvm_rsp_write(vcpu, vmcs12->guest_rsp);
->  	kvm_rip_write(vcpu, vmcs12->guest_rip);
-> +
-> +	/* Mark all fields as clean so L1 hypervisor can set what's dirty */
-> +	if (hv_evmcs)
-> +		vmx->nested.hv_evmcs->hv_clean_fields |=
-> +			HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL;
-> +
->  	return 0;
->  }
-> 
+Maxim Levitsky <mlevitsk@redhat.com> writes:
 
-Hi!
- 
-If we avoid calling copy_enlightened_to_vmcs12 from 
-vmx_get_nested_state, then we don't need this patch, right?
- 
-In addition to that I think that we need to research on why 
-do we need to touch these clean bits, as from the spec, and
-assuming that the clean bits should behave similar to how AMD
-does it, clean bits should only be set by the L1 and never touched by
-us.
- 
-We currently set clean bits in two places:
- 
-1. nested_vmx_handle_enlightened_vmptrld with vmlaunch, where it seems
-like it is a workaround for a case (as we discussed on IRC) where
-L1 keeps more than one active evmcs on a same vcpu, and 'vmresume's
-them. Since we don't support this and have to do full context switch
-when we switch a vmcs, we reset the clean bits so that evmcs is loaded
-fully.
-Also we reset the clean bits when a evmcs is 'vmlaunched' which
-is also something we need to check if needed, and if needed
-we probably should document that this is because of a bug in Hyper-V,
-as it really should initialize these bits in this case.
- 
-I think that we should just ignore the clean bits in those cases
-instead of resetting them in the evmcs.
- 
- 
-2. In nested_sync_vmcs12_to_shadow which in practise is done only
-on nested vmexits, when we updated the vmcs12 and need to update evmcs.
-In this case you told me that Hyper-V has a bug that it expects
-the clean bits to be cleaned by us and doesn't clean it on its own.
-This makes sense although it is not documented in the Hyper-V spec,
-and I would appreciate if we were to document this explicitly in the code.
+> On Mon, 2021-05-17 at 15:50 +0200, Vitaly Kuznetsov wrote:
+>> Unlike regular set_current_vmptr(), nested_vmx_handle_enlightened_vmptrld()
+>> can not be called directly from vmx_set_nested_state() as KVM may not have
+>> all the information yet (e.g. HV_X64_MSR_VP_ASSIST_PAGE MSR may not be
+>> restored yet). Enlightened VMCS is mapped later while getting nested state
+>> pages. In the meantime, vmx->nested.hv_evmcs remains NULL and using it
+>> for various checks is incorrect. In particular, if KVM_GET_NESTED_STATE is
+>> called right after KVM_SET_NESTED_STATE, KVM_STATE_NESTED_EVMCS flag in the
+>> resulting state will be unset (and such state will later fail to load).
+>> 
+>> Introduce nested_evmcs_is_used() and use 'is_guest_mode(vcpu) &&
+>> vmx->nested.current_vmptr == -1ull' check to detect not-yet-mapped eVMCS
+>> after restore.
+>> 
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  arch/x86/kvm/vmx/nested.c | 31 ++++++++++++++++++++++++++-----
+>>  1 file changed, 26 insertions(+), 5 deletions(-)
+>> 
+>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>> index 6058a65a6ede..3080e00c8f90 100644
+>> --- a/arch/x86/kvm/vmx/nested.c
+>> +++ b/arch/x86/kvm/vmx/nested.c
+>> @@ -141,6 +141,27 @@ static void init_vmcs_shadow_fields(void)
+>>  	max_shadow_read_write_fields = j;
+>>  }
+>>  
+>> +static inline bool nested_evmcs_is_used(struct vcpu_vmx *vmx)
+>> +{
+>> +	struct kvm_vcpu *vcpu = &vmx->vcpu;
+>> +
+>> +	if (vmx->nested.hv_evmcs)
+>> +		return true;
+>> +
+>> +	/*
+>> +	 * After KVM_SET_NESTED_STATE, enlightened VMCS is mapped during
+>> +	 * KVM_REQ_GET_NESTED_STATE_PAGES handling and until the request is
+>> +	 * processed vmx->nested.hv_evmcs is NULL. It is, however, possible to
+>> +	 * detect such state by checking 'nested.current_vmptr == -1ull' when
+>> +	 * vCPU is in guest mode, it is only possible with eVMCS.
+>> +	 */
+>> +	if (unlikely(vmx->nested.enlightened_vmcs_enabled && is_guest_mode(vcpu) &&
+>> +		     (vmx->nested.current_vmptr == -1ull)))
+>> +		return true;
+>> +
+>> +	return false;
+>> +}
+>
+>
+> I think that this is a valid way to solve the issue,
+> but it feels like there might be a better way.
+> I don't mind though to accept this patch as is.
+>
+> So here are my 2 cents about this:
+>
+> First of all after studying how evmcs works I take my words back
+> about needing to migrate its contents. 
+>
+> It is indeed enough to migrate its physical address, 
+> or maybe even just a flag that evmcs is loaded
+> (and to my surprise we already do this - KVM_STATE_NESTED_EVMCS)
+>
+> So how about just having a boolean flag that indicates that evmcs is in use, 
+> but doesn't imply that we know its address or that it is mapped 
+> to host address space, something like 'vmx->nested.enlightened_vmcs_loaded'
+>
+> On migration that flag saved and restored as the KVM_STATE_NESTED_EVMCS,
+> otherwise it set when we load an evmcs and cleared when it is released.
+>
+> Then as far as I can see we can use this flag in nested_evmcs_is_used
+> since all its callers don't touch evmcs, thus don't need it to be
+> mapped.
+>
+> What do you think?
+>
 
- 
-Best regards,
-	Maxim Levitsky
->  
+First, we need to be compatible with older KVMs which don't have the
+flag and this is problematic: currently, we always expect vmcs12 to
+carry valid contents. This is challenging.
 
+Second, vCPU can be migrated in three different states:
+1) While L2 was running ('true' nested state is in VMCS02)
+2) While L1 was running ('true' nested state is in eVMCS)
+3) Right after an exit from L2 to L1 was forced
+('need_vmcs12_to_shadow_sync = true') ('true' nested state is in
+VMCS12).
+
+The current solution is to always use VMCS12 as a container to transfer
+the state and conceptually, it is at least easier to understand.
+
+We can, indeed, transfer eVMCS (or VMCS12) in case 2) through guest
+memory and I even tried that but that was making the code more complex
+so eventually I gave up and decided to preserve the 'always use VMCS12
+as a container' status quo.
+
+-- 
+Vitaly
 
