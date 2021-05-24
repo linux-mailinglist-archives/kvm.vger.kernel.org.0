@@ -2,143 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 45BBB38F2BE
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 20:09:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19C7A38F299
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 19:54:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233422AbhEXSLR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 14:11:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31260 "EHLO
+        id S233568AbhEXRze (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 13:55:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31754 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232789AbhEXSLR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 14:11:17 -0400
+        by vger.kernel.org with ESMTP id S232789AbhEXRzd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 13:55:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621879788;
+        s=mimecast20190719; t=1621878844;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iMjXbW9SM+WJ106CAXddqbI+c1ykzUuuZtqW2sf8qno=;
-        b=R0bTGe0H4okAyfUSICLthxpOnJ7FmWu2IBV87qlKjQeOlcaqjNets5vGqS7SM3AIYNyv5C
-        d1vl9X17f7ulP/Y68kwZDLpsGz2zSCw4A0kUnhmJ2Usa+GiiwU9vTp295XoT0oxQ+DJ6Rf
-        cVHBP84YmPtLaTfnFI+NR/LZkIdTiag=
+        bh=eU3fA2KEKT/WOFixl2f9WK5sIlL2IQKSCLc2pU9iNpE=;
+        b=XuuJe54RPENDmPHgIPGc3E36KYcmhZaWmXp/LWWnz5r9BaHe5+FTJnkM27COMBSCNbPbOv
+        3aLRXOpgJpsK7ds2nCq05WUkpLOXkFXNtqfl7gCfUtF+6HINixYLWii5cQv+S+yD12tIU1
+        B4nbp9uvoDmdsE49Gc97DfomdZD37pg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97--I_ZvZtnPyeqK4wjpd9bag-1; Mon, 24 May 2021 14:09:46 -0400
-X-MC-Unique: -I_ZvZtnPyeqK4wjpd9bag-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-174-Wx1ubxTWNMeDwYTZLroKSg-1; Mon, 24 May 2021 13:54:01 -0400
+X-MC-Unique: Wx1ubxTWNMeDwYTZLroKSg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E3B2801817;
-        Mon, 24 May 2021 18:09:45 +0000 (UTC)
-Received: from fuller.cnet (ovpn-112-4.gru2.redhat.com [10.97.112.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F01525D71D;
-        Mon, 24 May 2021 18:09:37 +0000 (UTC)
-Received: by fuller.cnet (Postfix, from userid 1000)
-        id A33B74172EDB; Mon, 24 May 2021 14:53:29 -0300 (-03)
-Date:   Mon, 24 May 2021 14:53:29 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Xu <peterx@redhat.com>, Pei Zhang <pezhang@redhat.com>
-Subject: Re: [patch 4/4] KVM: VMX: update vcpu posted-interrupt descriptor
- when assigning device
-Message-ID: <20210524175329.GA19468@fuller.cnet>
-References: <20210510172646.930550753@redhat.com>
- <20210510172818.025080848@redhat.com>
- <e929da71-8f7d-52b2-2a71-30cb078535d3@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C2E21007B01;
+        Mon, 24 May 2021 17:53:59 +0000 (UTC)
+Received: from starship (unknown [10.40.192.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 977AB5C230;
+        Mon, 24 May 2021 17:53:55 +0000 (UTC)
+Message-ID: <2b3bc8aff14a09c4ea4a1b648f750b5ffb1a15a0.camel@redhat.com>
+Subject: Re: [PATCH v3 09/12] KVM: VMX: Remove vmx->current_tsc_ratio and
+ decache_tsc_multiplier()
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Ilias Stamatis <ilstam@amazon.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com
+Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, zamsden@gmail.com,
+        mtosatti@redhat.com, dwmw@amazon.co.uk
+Date:   Mon, 24 May 2021 20:53:54 +0300
+In-Reply-To: <20210521102449.21505-10-ilstam@amazon.com>
+References: <20210521102449.21505-1-ilstam@amazon.com>
+         <20210521102449.21505-10-ilstam@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e929da71-8f7d-52b2-2a71-30cb078535d3@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 24, 2021 at 05:55:18PM +0200, Paolo Bonzini wrote:
-> On 10/05/21 19:26, Marcelo Tosatti wrote:
-> > +void vmx_pi_start_assignment(struct kvm *kvm)
-> > +{
-> > +	struct kvm_vcpu *vcpu;
-> > +	int i;
-> > +
-> > +	if (!irq_remapping_cap(IRQ_POSTING_CAP))
-> > +		return;
-> > +
-> > +	/*
-> > +	 * Wakeup will cause the vCPU to bail out of kvm_vcpu_block() and
-> > +	 * go back through vcpu_block().
-> > +	 */
-> > +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> > +		if (!kvm_vcpu_apicv_active(vcpu))
-> > +			continue;
-> > +
-> > +		kvm_vcpu_wake_up(vcpu);
+On Fri, 2021-05-21 at 11:24 +0100, Ilias Stamatis wrote:
+> The vmx->current_tsc_ratio field is redundant as
+> vcpu->arch.tsc_scaling_ratio already tracks the current TSC scaling
+> ratio. Removing this field makes decache_tsc_multiplier() an one-liner
+> so remove that too and do a vmcs_write64() directly in order to be more
+> consistent with surrounding code.
+Not to mention that 'decache_tsc_multiplier' isn't a good name IMHO
+for this....
+
+
 > 
-> Would you still need the check_block callback, if you also added a
-> kvm_make_request(KVM_REQ_EVENT)?
+> Signed-off-by: Ilias Stamatis <ilstam@amazon.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 9 ++++-----
+>  arch/x86/kvm/vmx/vmx.c    | 5 ++---
+>  arch/x86/kvm/vmx/vmx.h    | 8 --------
+>  3 files changed, 6 insertions(+), 16 deletions(-)
 > 
-> In fact, since this is entirely not a hot path, can you just do
-> kvm_make_all_cpus_request(kvm, KVM_REQ_EVENT) instead of this loop?
-> 
-> Thanks,
-> 
-> Paolo
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 6058a65a6ede..239154d3e4e7 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -2533,9 +2533,8 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>  	}
+>  
+>  	vmcs_write64(TSC_OFFSET, vcpu->arch.tsc_offset);
+> -
+>  	if (kvm_has_tsc_control)
+> -		decache_tsc_multiplier(vmx);
+> +		vmcs_write64(TSC_MULTIPLIER, vcpu->arch.tsc_scaling_ratio);
+>  
+>  	nested_vmx_transition_tlb_flush(vcpu, vmcs12, true);
+>  
+> @@ -4501,12 +4500,12 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+>  	vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, vmx->msr_autoload.host.nr);
+>  	vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, vmx->msr_autoload.guest.nr);
+>  	vmcs_write64(TSC_OFFSET, vcpu->arch.tsc_offset);
+> +	if (kvm_has_tsc_control)
+> +		vmcs_write64(TSC_MULTIPLIER, vcpu->arch.tsc_scaling_ratio);
+> +
+>  	if (vmx->nested.l1_tpr_threshold != -1)
+>  		vmcs_write32(TPR_THRESHOLD, vmx->nested.l1_tpr_threshold);
+>  
+> -	if (kvm_has_tsc_control)
+> -		decache_tsc_multiplier(vmx);
+> -
+>  	if (vmx->nested.change_vmcs01_virtual_apic_mode) {
+>  		vmx->nested.change_vmcs01_virtual_apic_mode = false;
+>  		vmx_set_virtual_apic_mode(vcpu);
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 4b70431c2edd..7c52c697cfe3 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1392,9 +1392,8 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
+>  	}
+>  
+>  	/* Setup TSC multiplier */
+> -	if (kvm_has_tsc_control &&
+> -	    vmx->current_tsc_ratio != vcpu->arch.tsc_scaling_ratio)
+> -		decache_tsc_multiplier(vmx);
+> +	if (kvm_has_tsc_control)
+> +		vmcs_write64(TSC_MULTIPLIER, vcpu->arch.tsc_scaling_ratio);
 
-Hi Paolo,
+This might have an overhead of writing the TSC scaling ratio even if
+it is unchanged. I haven't measured how expensive vmread/vmwrites are but
+at least when nested, the vmreads/vmwrites can be very expensive (if they
+cause a vmexit).
 
-Don't think so:
-
-int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
-{
-        return kvm_vcpu_running(vcpu) || kvm_vcpu_has_events(vcpu);
-}
-
-static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
-{
-        int ret = -EINTR;
-        int idx = srcu_read_lock(&vcpu->kvm->srcu);
-
-        if (kvm_arch_vcpu_runnable(vcpu)) {
-                kvm_make_request(KVM_REQ_UNHALT, vcpu);  <---- don't want KVM_REQ_UNHALT
-                goto out;
-        }
-        if (kvm_cpu_has_pending_timer(vcpu))
-                goto out;
-        if (signal_pending(current))
-                goto out;
-
-        ret = 0;
-out:
-        srcu_read_unlock(&vcpu->kvm->srcu, idx);
-        return ret;
-}
-
-See previous discussion:
+This is why I think the 'vmx->current_tsc_ratio' exists - to have
+a cached value of TSC scale ratio to avoid either 'vmread'ing
+or 'vmwrite'ing it without a need.
 
 
-Date: Wed, 12 May 2021 14:41:56 +0000                                                                                   
-From: Sean Christopherson <seanjc@google.com>                                                                           
-To: Marcelo Tosatti <mtosatti@redhat.com>                                                                               
-Cc: Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Alex Williamson             
-        <alex.williamson@redhat.com>, Pei Zhang <pezhang@redhat.com>                                                    
-Subject: Re: [patch 4/4] KVM: VMX: update vcpu posted-interrupt descriptor when assigning device                        
+Best regards,
+	Maxim Levitsky
 
-On Tue, May 11, 2021, Marcelo Tosatti wrote:
-> > The KVM_REQ_UNBLOCK patch will resume execution even any such event                                                 
->                                                                                                                       
->                                                 even without any such event                                           
->                                                                                                                       
-> > occuring. So the behaviour would be different from baremetal.                                                       
-
-I agree with Marcelo, we don't want to spuriously unhalt the vCPU.  It's legal,
-albeit risky, to do something like
-
-       	hlt
-       	/* #UD to triple fault if this CPU is awakened. */
-       	ud2
-
-when offlining a CPU, in which case the spurious wake event will crash the guest.
+>  }
+>  
+>  /*
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index aa97c82e3451..3eaa86a0ba3e 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -322,8 +322,6 @@ struct vcpu_vmx {
+>  	/* apic deadline value in host tsc */
+>  	u64 hv_deadline_tsc;
+>  
+> -	u64 current_tsc_ratio;
+> -
+>  	unsigned long host_debugctlmsr;
+>  
+>  	/*
+> @@ -532,12 +530,6 @@ static inline struct vmcs *alloc_vmcs(bool shadow)
+>  			      GFP_KERNEL_ACCOUNT);
+>  }
+>  
+> -static inline void decache_tsc_multiplier(struct vcpu_vmx *vmx)
+> -{
+> -	vmx->current_tsc_ratio = vmx->vcpu.arch.tsc_scaling_ratio;
+> -	vmcs_write64(TSC_MULTIPLIER, vmx->current_tsc_ratio);
+> -}
+> -
+>  static inline bool vmx_has_waitpkg(struct vcpu_vmx *vmx)
+>  {
+>  	return vmx->secondary_exec_control &
 
 
