@@ -2,356 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0625F38F2A1
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 19:55:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B75DB38F2D5
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 20:18:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233622AbhEXR4r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 13:56:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28092 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233686AbhEXR4r (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 13:56:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621878918;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QNt+OQSlS3mTXE/v0H/mMgx2cakdAp54/y8aOuh2iUw=;
-        b=amv7ArzMFgjwutt3VrILrfM9KPqaUa7po0+NUcpTlvm13XnTDEmTBAlM3kq1JUPOzMnurx
-        +EGqIpSu0XHTjgsYATVdKOVROl9Sz1pH1NKFi5xMFQXBxE/K02i24Hz7C6VytnOYGqtrnK
-        JqagXnNA4fysRxERl3OU1NRieS/73+E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283-HQ7Wi4HmNT2umaT401zJ5g-1; Mon, 24 May 2021 13:55:15 -0400
-X-MC-Unique: HQ7Wi4HmNT2umaT401zJ5g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 319521937FC0;
-        Mon, 24 May 2021 17:55:14 +0000 (UTC)
-Received: from starship (unknown [10.40.192.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D30DA100238C;
-        Mon, 24 May 2021 17:55:10 +0000 (UTC)
-Message-ID: <36312790b8ce4a981e3d2ed834a230cbcf733f53.camel@redhat.com>
-Subject: Re: [PATCH v3 12/12] KVM: selftests: x86: Add
- vmx_nested_tsc_scaling_test
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Ilias Stamatis <ilstam@amazon.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com
-Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, zamsden@gmail.com,
-        mtosatti@redhat.com, dwmw@amazon.co.uk
-Date:   Mon, 24 May 2021 20:55:09 +0300
-In-Reply-To: <20210521102449.21505-13-ilstam@amazon.com>
-References: <20210521102449.21505-1-ilstam@amazon.com>
-         <20210521102449.21505-13-ilstam@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S233723AbhEXSUL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 14:20:11 -0400
+Received: from foss.arm.com ([217.140.110.172]:46308 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232985AbhEXSUJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 May 2021 14:20:09 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E6FE26D;
+        Mon, 24 May 2021 11:18:40 -0700 (PDT)
+Received: from [10.57.73.64] (unknown [10.57.73.64])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 45FC53F73B;
+        Mon, 24 May 2021 11:18:39 -0700 (PDT)
+From:   Robin Murphy <robin.murphy@arm.com>
+Subject: Re: [PATCH 3/6] vfio: remove the unused mdev iommu hook
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+References: <YKJf7mphTHZoi7Qr@8bytes.org> <20210517123010.GO1096940@ziepe.ca>
+ <YKJnPGonR+d8rbu/@8bytes.org> <20210517133500.GP1096940@ziepe.ca>
+ <YKKNLrdQ4QjhLrKX@8bytes.org> <131327e3-5066-7a88-5b3c-07013585eb01@arm.com>
+ <20210519180635.GT1096940@ziepe.ca>
+ <MWHPR11MB1886C64EAEB752DE9E1633358C2B9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210519232459.GV1096940@ziepe.ca>
+ <1d154445-f762-1147-0b8c-6e244e7c66dc@arm.com>
+ <20210520143420.GW1096940@ziepe.ca>
+Message-ID: <9d34b473-3a37-5de2-95f8-b508d85e558c@arm.com>
+Date:   Mon, 24 May 2021 19:18:33 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
+In-Reply-To: <20210520143420.GW1096940@ziepe.ca>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-05-21 at 11:24 +0100, Ilias Stamatis wrote:
-> Test that nested TSC scaling works as expected with both L1 and L2
-> scaled.
+On 2021-05-20 15:34, Jason Gunthorpe wrote:
+> On Thu, May 20, 2021 at 03:13:55PM +0100, Robin Murphy wrote:
 > 
-> Signed-off-by: Ilias Stamatis <ilstam@amazon.com>
-> ---
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../kvm/x86_64/vmx_nested_tsc_scaling_test.c  | 242 ++++++++++++++++++
->  3 files changed, 244 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_nested_tsc_scaling_test.c
+>> By "mdev-like" I mean it's very similar in shape to the general SIOV-style
+>> mediated device concept - i.e. a physical device with an awareness of
+>> operating on multiple contexts at once, using a Substream ID/PASID for each
+>> one - but instead of exposing control of the contexts to anyone else, they
+>> remain hidden behind the kernel driver which already has its own abstracted
+>> uAPI, so overall it ends up as more just internal housekeeping than any
+>> actual mediation. We were looking at the mdev code for inspiration, but
+>> directly using it was never the plan.
 > 
-> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> index bd83158e0e0b..cc02022f9951 100644
-> --- a/tools/testing/selftests/kvm/.gitignore
-> +++ b/tools/testing/selftests/kvm/.gitignore
-> @@ -29,6 +29,7 @@
->  /x86_64/vmx_preemption_timer_test
->  /x86_64/vmx_set_nested_state_test
->  /x86_64/vmx_tsc_adjust_test
-> +/x86_64/vmx_nested_tsc_scaling_test
->  /x86_64/xapic_ipi_test
->  /x86_64/xen_shinfo_test
->  /x86_64/xen_vmcall_test
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index e439d027939d..1078240b1313 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -60,6 +60,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
->  TEST_GEN_PROGS_x86_64 += x86_64/vmx_dirty_log_test
->  TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
->  TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
-> +TEST_GEN_PROGS_x86_64 += x86_64/vmx_nested_tsc_scaling_test
->  TEST_GEN_PROGS_x86_64 += x86_64/xapic_ipi_test
->  TEST_GEN_PROGS_x86_64 += x86_64/xss_msr_test
->  TEST_GEN_PROGS_x86_64 += x86_64/debug_regs
-> diff --git a/tools/testing/selftests/kvm/x86_64/vmx_nested_tsc_scaling_test.c b/tools/testing/selftests/kvm/x86_64/vmx_nested_tsc_scaling_test.c
-> new file mode 100644
-> index 000000000000..2c130250fe3b
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/x86_64/vmx_nested_tsc_scaling_test.c
-> @@ -0,0 +1,242 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * vmx_nested_tsc_scaling_test
-> + *
-> + * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.
-> + *
-> + * This test case verifies that nested TSC scaling behaves as expected when
-> + * both L1 and L2 are scaled using different ratios. For this test we scale
-> + * L1 down and scale L2 up.
-> + */
-> +
-> +#include <time.h>
-> +
-> +#include "kvm_util.h"
-> +#include "vmx.h"
-> +#include "kselftest.h"
-> +
-> +
-> +#define VCPU_ID 0
-> +
-> +/* L2 is scaled up (from L1's perspective) by this factor */
-> +#define L2_SCALE_FACTOR 4ULL
-> +
-> +#define TSC_OFFSET_L2 ((uint64_t) -33125236320908)
-> +#define TSC_MULTIPLIER_L2 (L2_SCALE_FACTOR << 48)
-> +
-> +#define L2_GUEST_STACK_SIZE 64
-> +
-> +enum { USLEEP, UCHECK_L1, UCHECK_L2 };
-> +#define GUEST_SLEEP(sec)         ucall(UCALL_SYNC, 2, USLEEP, sec)
-> +#define GUEST_CHECK(level, freq) ucall(UCALL_SYNC, 2, level, freq)
-> +
-> +
-> +/*
-> + * This function checks whether the "actual" TSC frequency of a guest matches
-> + * its expected frequency. In order to account for delays in taking the TSC
-> + * measurements, a difference of 1% between the actual and the expected value
-> + * is tolerated.
-> + */
-> +static void compare_tsc_freq(uint64_t actual, uint64_t expected)
-> +{
-> +	uint64_t tolerance, thresh_low, thresh_high;
-> +
-> +	tolerance = expected / 100;
-> +	thresh_low = expected - tolerance;
-> +	thresh_high = expected + tolerance;
-> +
-> +	TEST_ASSERT(thresh_low < actual,
-> +		"TSC freq is expected to be between %"PRIu64" and %"PRIu64
-> +		" but it actually is %"PRIu64,
-> +		thresh_low, thresh_high, actual);
-> +	TEST_ASSERT(thresh_high > actual,
-> +		"TSC freq is expected to be between %"PRIu64" and %"PRIu64
-> +		" but it actually is %"PRIu64,
-> +		thresh_low, thresh_high, actual);
-> +}
-> +
-> +static void check_tsc_freq(int level)
-> +{
-> +	uint64_t tsc_start, tsc_end, tsc_freq;
-> +
-> +	/*
-> +	 * Reading the TSC twice with about a second's difference should give
-> +	 * us an approximation of the TSC frequency from the guest's
-> +	 * perspective. Now, this won't be completely accurate, but it should
-> +	 * be good enough for the purposes of this test.
-> +	 */
-> +	tsc_start = rdmsr(MSR_IA32_TSC);
-> +	GUEST_SLEEP(1);
-> +	tsc_end = rdmsr(MSR_IA32_TSC);
-> +
-> +	tsc_freq = tsc_end - tsc_start;
-> +
-> +	GUEST_CHECK(level, tsc_freq);
-> +}
-> +
-> +static void l2_guest_code(void)
-> +{
-> +	check_tsc_freq(UCHECK_L2);
-> +
-> +	/* exit to L1 */
-> +	__asm__ __volatile__("vmcall");
-> +}
-> +
-> +static void l1_guest_code(struct vmx_pages *vmx_pages)
-> +{
-> +	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-> +	uint32_t control;
-> +
-> +	/* check that L1's frequency looks alright before launching L2 */
-> +	check_tsc_freq(UCHECK_L1);
-> +
-> +	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
-> +	GUEST_ASSERT(load_vmcs(vmx_pages));
-> +
-> +	/* prepare the VMCS for L2 execution */
-> +	prepare_vmcs(vmx_pages, l2_guest_code, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-> +
-> +	/* enable TSC offsetting and TSC scaling for L2 */
-> +	control = vmreadz(CPU_BASED_VM_EXEC_CONTROL);
-> +	control |= CPU_BASED_USE_MSR_BITMAPS | CPU_BASED_USE_TSC_OFFSETTING;
-> +	vmwrite(CPU_BASED_VM_EXEC_CONTROL, control);
-> +
-> +	control = vmreadz(SECONDARY_VM_EXEC_CONTROL);
-> +	control |= SECONDARY_EXEC_TSC_SCALING;
-> +	vmwrite(SECONDARY_VM_EXEC_CONTROL, control);
-> +
-> +	vmwrite(TSC_OFFSET, TSC_OFFSET_L2);
-> +	vmwrite(TSC_MULTIPLIER, TSC_MULTIPLIER_L2);
-> +	vmwrite(TSC_MULTIPLIER_HIGH, TSC_MULTIPLIER_L2 >> 32);
-> +
-> +	/* launch L2 */
-> +	GUEST_ASSERT(!vmlaunch());
-> +	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_VMCALL);
-> +
-> +	/* check that L1's frequency still looks good */
-> +	check_tsc_freq(UCHECK_L1);
-> +
-> +	GUEST_DONE();
-> +}
-> +
-> +static void tsc_scaling_check_supported(void)
-> +{
-> +	if (!kvm_check_cap(KVM_CAP_TSC_CONTROL)) {
-> +		print_skip("TSC scaling not supported by the HW");
-> +		exit(KSFT_SKIP);
-> +	}
-> +}
-> +
-> +static void stable_tsc_check_supported(void)
-> +{
-> +	FILE *fp;
-> +	char buf[4];
-> +
-> +	fp = fopen("/sys/devices/system/clocksource/clocksource0/current_clocksource", "r");
-> +	if (fp == NULL)
-> +		goto skip_test;
-> +
-> +	if (fgets(buf, sizeof(buf), fp) == NULL)
-> +		goto skip_test;
-> +
-> +	if (strncmp(buf, "tsc", sizeof(buf)))
-> +		goto skip_test;
-> +
-> +	return;
-> +skip_test:
-> +	print_skip("TSC is not stable");
+> Well:
+>   - Who maps memory into the IOASID (ie the specific sub stream id)?
 
-Tiny nitpick: I would print a message that expains the hack a bit better,
-something like
+Sorry to nitpick, but I think it's important to get terminology right 
+here to avoid unnecessary misunderstanding. You can't map memory into an 
+address space ID; it's just a number. Ultimately that identifier ends up 
+pointing at some actual address space, and most of the current work is 
+focused on the case of that address space being provided by an mm where 
+things are mapped implicitly by a userspace process; I care about the 
+case of it being provided by an iommu_domain where things are mapped 
+explicitly by a kernel driver. I would be extremely wary of creating 
+some new third *address space* abstraction.
 
-"Kernel doesn't use TSC clocksource - assuming that host TSC is not stable - skipping test"
+>   - What memory must be mapped?
+>   - Who triggers DMA to this memory?
 
+It's a pretty typical DMA flow, as far as I understand. Userspace 
+allocates some buffers (in this case, via the kernel driver, but in 
+general I'm not sure it makes much difference), puts data in the 
+buffers, issues an ioctl to say "process this data", and polls for 
+completion; the kernel driver makes sure the buffers are mapped in the 
+device address space (at allocation time in this case, but in general I 
+assume it could equally be done at request time for user pages), and 
+deals with scheduling requests onto the hardware. I understand this 
+interface is already deployed in a driver stack which supports a single 
+client process at once; extending the internals to allow requests from 
+multiple processes to run in parallel using Substream IDs for isolation 
+is the future goal. The interface itself shouldn't change, only some 
+internal arbitration details.
 
-> +	exit(KSFT_SKIP);
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	struct kvm_vm *vm;
-> +	vm_vaddr_t vmx_pages_gva;
-> +
-> +	uint64_t tsc_start, tsc_end;
-> +	uint64_t tsc_khz;
-> +	uint64_t l1_scale_factor;
-> +	uint64_t l0_tsc_freq = 0;
-> +	uint64_t l1_tsc_freq = 0;
-> +	uint64_t l2_tsc_freq = 0;
-> +
-> +	nested_vmx_check_supported();
-> +	tsc_scaling_check_supported();
-> +	stable_tsc_check_supported();
-> +
-> +	/*
-> +	 * We set L1's scale factor to be a random number from 2 to 10.
-> +	 * Ideally we would do the same for L2's factor but that one is
-> +	 * referenced by both main() and l1_guest_code() and using a global
-> +	 * variable does not work.
-> +	 */
-> +	srand(time(NULL));
-> +	l1_scale_factor = (rand() % 9) + 2;
-> +	printf("L1's scale down factor is: %"PRIu64"\n", l1_scale_factor);
-> +	printf("L2's scale up factor is: %llu\n", L2_SCALE_FACTOR);
-> +
-> +	tsc_start = rdtsc();
-> +	sleep(1);
-> +	tsc_end = rdtsc();
-> +
-> +	l0_tsc_freq = tsc_end - tsc_start;
-> +	printf("real TSC frequency is around: %"PRIu64"\n", l0_tsc_freq);
-> +
-> +	vm = vm_create_default(VCPU_ID, 0, (void *) l1_guest_code);
-> +	vcpu_alloc_vmx(vm, &vmx_pages_gva);
-> +	vcpu_args_set(vm, VCPU_ID, 1, vmx_pages_gva);
-> +
-> +	tsc_khz = _vcpu_ioctl(vm, VCPU_ID, KVM_GET_TSC_KHZ, NULL);
-> +	TEST_ASSERT(tsc_khz != -1, "vcpu ioctl KVM_GET_TSC_KHZ failed");
-> +
-> +	/* scale down L1's TSC frequency */
-> +	vcpu_ioctl(vm, VCPU_ID, KVM_SET_TSC_KHZ,
-> +		  (void *) (tsc_khz / l1_scale_factor));
-> +
-> +	for (;;) {
-> +		volatile struct kvm_run *run = vcpu_state(vm, VCPU_ID);
-> +		struct ucall uc;
-> +
-> +		vcpu_run(vm, VCPU_ID);
-> +		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-> +			    "Got exit_reason other than KVM_EXIT_IO: %u (%s)\n",
-> +			    run->exit_reason,
-> +			    exit_reason_str(run->exit_reason));
-> +
-> +		switch (get_ucall(vm, VCPU_ID, &uc)) {
-> +		case UCALL_ABORT:
-> +			TEST_FAIL("%s", (const char *) uc.args[0]);
-> +		case UCALL_SYNC:
-> +			switch (uc.args[0]) {
-> +			case USLEEP:
-> +				sleep(uc.args[1]);
-> +				break;
-> +			case UCHECK_L1:
-> +				l1_tsc_freq = uc.args[1];
-> +				printf("L1's TSC frequency is around: %"PRIu64
-> +				       "\n", l1_tsc_freq);
-> +
-> +				compare_tsc_freq(l1_tsc_freq,
-> +						 l0_tsc_freq / l1_scale_factor);
-> +				break;
-> +			case UCHECK_L2:
-> +				l2_tsc_freq = uc.args[1];
-> +				printf("L2's TSC frequency is around: %"PRIu64
-> +				       "\n", l2_tsc_freq);
-> +
-> +				compare_tsc_freq(l2_tsc_freq,
-> +						 l1_tsc_freq * L2_SCALE_FACTOR);
-> +				break;
-> +			}
-> +			break;
-> +		case UCALL_DONE:
-> +			goto done;
-> +		default:
-> +			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-> +		}
-> +	}
-> +
-> +done:
-> +	kvm_vm_free(vm);
-> +	return 0;
-> +}
+>> The driver simply needs to keep track of the domains and PASIDs -
+>> when a process submits some work, it can look up the relevant
+>> domain, iommu_map() the user pages to the right addresses, dma_map()
+>> them for coherency, then poke in the PASID as part of scheduling the
+>> work on the physical device.
+> 
+> If you are doing stuff like this then the /dev/ioasid is what you
+> actually want. The userprocess can create its own IOASID, program the
+> io page tables for that IOASID to point to pages as it wants and then
+> just hand over a fully instantiated io page table to the device
+> driver.
 
+No. In our case, the device does not need to operate on userspace 
+addresses, in fact quite the opposite. There may need to be additional 
+things mapped into the device address space which are not, and should 
+not be, visible to userspace. There are also some quite weird criteria 
+for optimal address space layout which frankly are best left hidden 
+inside the kernel driver. Said driver is already explicitly managing its 
+own iommu_domain in the same manner as various DRM drivers and others, 
+so growing that to multiple parallel domains really isn't a big leap. 
+Moving any of this responsibility into userspace would be unwanted and 
+unnecessary upheaval.
 
-Overall looks good to me. Thanks!
+> What you are describing is the literal use case of /dev/ioasid - a
+> clean seperation of managing the IOMMU related parts through
+> /dev/ioasid and the device driver itself is only concerned with
+> generating device DMA that has the proper PASID/substream tag.
+> 
+> The entire point is to not duplicate all the iommu code you are
+> describing having written into every driver that just wants an IOASID.
+> 
+> In particular, you are talking about having a substream capable device
+> and driver but your driver's uAPI is so limited it can't address the
+> full range of substream configurations:
+> 
+>   - A substream pointing at a SVA
+>   - A substream pointing a IO page table nested under another
+>   - A substream pointing at an IOMMU page table shared by many users
+> 
+> And more. Which is bad.
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+None of which make much if any sense for the way this device and the 
+rest of its software stack are designed to work, though. Anyway, the 
+actual uAPI in question is essentially just chucking buffer fds about in 
+a very abstract manner, so I don't see that it has any relevance here. 
+We're talking about a kernel driver *internally* managing how it chooses 
+to expose the buffers backing those fds to the hardware. SVA has no 
+meaning in that context (there's nothing to share), and I don't even 
+understand your second case, but attaching multiple SSIDs to a single 
+domain is absolutely something which _could_ be done, there's just zero 
+point in a single driver doing that privately when it could simply run 
+the relevant jobs under the same SSID instead.
 
-Best regards,
-	Maxim Levitsky
+>>> We already talked about this on the "how to use PASID from the kernel"
+>>> thread.
+>>
+>> Do you have a pointer to the right thread so I can catch up? It's not the
+>> easiest thing to search for on lore amongst all the other PASID-related
+>> business :(
+> 
+> Somewhere in here:
+> 
+> http://lore.kernel.org/r/20210517143758.GP1002214@nvidia.com
 
+Thanks, along with our discussion here that kind of confirms my concern. 
+Assuming IOASID can wrap up a whole encapsulated thing which is either 
+SVA or IOMMU_DOMAIN_DMA is too much of an overabstraction. There 
+definitely *are* uses for IOMMU_DOMAIN_DMA - say you want to put some 
+SIOV ADIs to work for the host kernel using their regular 
+non-IOMMU-aware driver - but there will also be cases for 
+IOMMU_DOMAIN_UNMANAGED, although I do mostly expect those to be SoC 
+devices whose drivers are already IOMMU-aware and just want to be so at 
+a finer-grained level, not PCI devices. Even IOMMU_DOMAIN_PASSTHROUGH 
+for IOASIDs _could_ be doable if a sufficiently compelling reason came 
+along. I agree that SVA on init_mm is pretty bonkers, but don't get too 
+hung up on the DMA API angle which is really orthogonal - passthrough 
+domains with dma-direct ops have been working fine for years.
+
+>> FWIW my non-SVA view is that a PASID is merely an index into a set of
+>> iommu_domains, and in that context it doesn't even really matter *who*
+>> allocates them, only that the device driver and IOMMU driver are in sync :)
+> 
+> Right, this is where /dev/ioasid is going.
+> 
+> However it gets worked out at the kAPI level in the iommu layer the
+> things you asked for are intended to be solved, and lots more.
+
+Great! It feels like one of the major things will be that, at least 
+without major surgery to the DMA API, most of the use-cases will likely 
+still need a struct device wrapped around the IOASID. I think the 
+particular one I want to solve is actually the odd one out in that it 
+doesn't really care, and could be made to work either way.
+
+Thanks,
+Robin.
