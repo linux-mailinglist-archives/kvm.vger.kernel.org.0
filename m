@@ -2,90 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 31EEF38F63E
-	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 01:29:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D03038F644
+	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 01:32:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229543AbhEXXbY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 19:31:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42040 "EHLO
+        id S229894AbhEXXd7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 19:33:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229503AbhEXXbW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 May 2021 19:31:22 -0400
-Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FCB1C061574
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 16:29:51 -0700 (PDT)
-Received: by mail-ot1-x333.google.com with SMTP id 66-20020a9d02c80000b02903615edf7c1aso4970780otl.13
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 16:29:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ti4cgFrJdpvqYbMYrp+IlnSpYCTJp9eMSxEDADNx2No=;
-        b=Mx5H3mnj7w+wvY0Hsy5o4AnoyKLfSSOqLoA+41srDK54Ms/ywomrVqeXG5LDfOxoa2
-         juU9CV8gMxJIKqUyCzKzKInzyHhqfRImrszaB1SGi+o1cPKj0A2Tu7wwmKBvqgloQ2JF
-         MuuT9gWj/NlDMyNd+M8qu1XyWMmaC6Uu3ZmCJaA3TtKxChPlnEVFbKskekr9gO9wIG02
-         TYNJgqcs+W8gSfxZumpe6pcCD16A2NriYwBg5Vo8ziJAZ9tB8uq7agUhGm/4YoYwMhT9
-         jUjSdVy8CPWAR1U0hnLg+PGnzpGefAA2wPM51y6VOAXvoZ1HK3a+h2Sb1DEDBrXGxOQ9
-         7iyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ti4cgFrJdpvqYbMYrp+IlnSpYCTJp9eMSxEDADNx2No=;
-        b=Nl58Qu1YZYJTM6sFhXUErdNDktMNphpiovqPBXycM6DJBCt8YHnC1KQ9jxR3M0ZgQg
-         TvmpPvOKAv8L3rdegk03g9mvLeZ8PKs/eM+k44oNOe27sId0In9Un+/1WJ1cOYri5THl
-         JVBz8R2ZLswPp5G6HtUrYP+yF0AyoPS7tbbQeWDrNHBz4ioQjFeAkSBHk37yR0reBIRL
-         cX8DIoh1OgEAkZwjaXV7w8mzsheXPIq34pcuanzsOqkznHjzeSXEcq9ywyN2hnaFFgup
-         6xEOVxFyBFCFlDHVlsIxDGSK3+tNe0rKvkkrLsDDWCUf0DxL6J62P/s8ajk5UimtbRXh
-         sVGg==
-X-Gm-Message-State: AOAM532nZeRmrS4kwiQA7fJfi834lUsXvnKih5lMAdZzS5og9rlK+w++
-        ESo+u0VWEbJplZrmhmxBXlQh+4MrGVO76nn5GUgTwQ==
-X-Google-Smtp-Source: ABdhPJyK5op8Y5YWWsd6zVPg85iXedDYKq9mT6ig7L3VZcIG786KQ2o1kpYu3mKl9epztlQ7Cw37t/pr7PlvHEb1oKw=
-X-Received: by 2002:a9d:684e:: with SMTP id c14mr20833064oto.295.1621898990579;
- Mon, 24 May 2021 16:29:50 -0700 (PDT)
+        with ESMTP id S229600AbhEXXd5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 May 2021 19:33:57 -0400
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06BEBC061574;
+        Mon, 24 May 2021 16:32:28 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Fptm712zLz9sSn;
+        Tue, 25 May 2021 09:32:23 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1621899144;
+        bh=R//UBP3I4gk7Nu1ajpoLEfWbDGM7+Ta6syJtcvbDEl8=;
+        h=Date:From:To:Cc:Subject:From;
+        b=RAug8AFFihouSinJi36M5Zv/zn+sEuYy5jiimldYHcz2VabD4BBxlQoFS4/jHXWqp
+         kJPmhB5ja8h6buN4LKk6J5Ot9yPnCEIkB5M1gHzcfqJzsZ5kgXwFcHZixNDK20fQ7F
+         fojHfaU3EejF9CC9oapvcgxIy9cgVUOmG5xUGszHqFvKcJ1+gozmfkSM9xeFSuWaxi
+         lxPcHV1LqsNRE7POFRKk6oqEoXejWNxDWAWxRN9K7wSMnFayaM7SNLE1aQirvDos1z
+         qM/poNoKLDJhwozDVYe9+hbVGnNHChGzUD+Z7UglynezKN5hixOX5ZfPL5y6TzKZEG
+         IapTEaPpkQStA==
+Date:   Tue, 25 May 2021 09:32:21 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the kvm-fixes tree
+Message-ID: <20210525093221.1b62a5f4@canb.auug.org.au>
 MIME-Version: 1.0
-References: <20210520230339.267445-1-jmattson@google.com> <20210520230339.267445-3-jmattson@google.com>
- <10d51d46-8b60-e147-c590-62a68f26f616@redhat.com> <CALMp9eQ0LQoesyRYA+PN=nzjLDVXjpNw6OxgupmL8vOgWqjiMA@mail.gmail.com>
- <e2ed4a75-e7d2-e391-0a19-5977bf087cdf@redhat.com> <YKwydQlAXHeockLx@google.com>
- <CALMp9eRQXwpM8N6BzrY+gt0cPCCxYuf2UVgdgxjEN6=SrgTkjg@mail.gmail.com> <YKw1vEzfWG0dPhNM@google.com>
-In-Reply-To: <YKw1vEzfWG0dPhNM@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 24 May 2021 16:29:39 -0700
-Message-ID: <CALMp9eQL_VwYEz8YTg8kQWprmAZSyqDAyCTuXvtNzKMTEza3HA@mail.gmail.com>
-Subject: Re: [PATCH 02/12] KVM: x86: Wake up a vCPU when kvm_check_nested_events
- fails
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/Z1iCdp2gUzSu7CyUEtrQIrb";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 24, 2021 at 4:24 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, May 24, 2021, Jim Mattson wrote:
-> > On Mon, May 24, 2021 at 4:10 PM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > On Mon, May 24, 2021, Paolo Bonzini wrote:
-> > > > On 24/05/21 18:39, Jim Mattson wrote:
-> > > > > Without this patch, the accompanying selftest never wakes up from HLT
-> > > > > in L2. If you can get the selftest to work without this patch, feel
-> > > > > free to drop it.
-> > > >
-> > > > Ok, that's a pretty good reason.  I'll try to debug it.
-> > >
-> > > I don't think there's any debug necessary, the hack of unconditionally calling
-> > > kvm_check_nested_events() in kvm_vcpu_running() ...
-> >
-> > We don't unconditionally call kvm_check_nested_events() in
-> > kvm_vcpu_running(). We still call kvm_check_nested_events() only when
-> > is_guest_mode(vcpu). The only change introduced in this patch is that
-> > we stop ignoring the result.
->
-> Doh, sorry, bad use of "unconditionally".  I meant "unconditionally when in L2". :-)
+--Sig_/Z1iCdp2gUzSu7CyUEtrQIrb
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Again, the conditions under which we call kvm_check_nested_events are
-unchanged. The only "hack" here is the hack of not ignoring the return
-value.
+Hi all,
+
+After merging the kvm-fixes tree, today's linux-next build (powerpc
+ppc64_defconfig) failed like this:
+
+ERROR: modpost: ".kvm_vcpu_can_poll" [arch/powerpc/kvm/kvm-hv.ko] undefined!
+
+Caused by commit
+
+  0fee89fbc44b ("KVM: PPC: exit halt polling on need_resched()")
+
+I have used the kvm-fixes tree from next-20210524 for today.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/Z1iCdp2gUzSu7CyUEtrQIrb
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmCsN4UACgkQAVBC80lX
+0Gzf4AgAhp0w5DSqtCsrFNqrKkz6dPUXzhLuKVVl57CfATZGdQ0HjgmHcgNwq1jO
+kitQeWxEbWkitDlAfp+LYDXRZp3RdCfU1JF8d6LwQoaLDTwUJ5wD5NxjXK/UDfkX
+q5bpAVztqiKq2LKM8tIJ8gPaQRn82Adhj0G62nwqCXYoEchLHBM7SVvu027aoUDc
+2p2V77FhEUEj67wB/Lgj4NEr0AkgSjtkpvgGC/yQmLauZ4y41ApiIAxi3IEk/nVj
+4owPaP3YY4eOIIFQrXNAFruultbLy8tpwSmx436JhfWW3j1nVSgoad2zbg5agffV
+IB57FUPKN4jfJpzY/SkFI5EuZCjNGg==
+=q0Ef
+-----END PGP SIGNATURE-----
+
+--Sig_/Z1iCdp2gUzSu7CyUEtrQIrb--
