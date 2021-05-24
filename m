@@ -2,45 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D20C738F3C6
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 21:35:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C08738F3D3
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 21:47:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233168AbhEXThU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 15:37:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21001 "EHLO
+        id S232911AbhEXTs2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 15:48:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43945 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232911AbhEXThT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 15:37:19 -0400
+        by vger.kernel.org with ESMTP id S232107AbhEXTs1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 15:48:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621884951;
+        s=mimecast20190719; t=1621885619;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=nQAyBAxfxfWDYAtqb1BB6klbTmzWLAaG7tBwwGsm+Lo=;
-        b=AKdo36hX7lJMzhEj9IDl1li+6oDf+UbRCgygXiMqWVToA2U4p0afv7eeY7xwyDreZey5Ip
-        TWqCXg0nAvAMDHwj0wfjDHRqeaUD14cfkVaZpYLlI/GplwWvIwYgtPdTw+q0ExklU5tjf1
-        zn2e0TXCCzBANL3+QmYr5ewlhz7zjJo=
+        bh=eSgniuYleIfy2mqxkBpQSaiY72k4S+9CRx4cslFPjKs=;
+        b=cBoAKza0SjxvvD8ltJ+TyVw5iKEyoC/I7DxzYmHx1U1o1Yl680jLxu7p7uazIYdxLiNHJq
+        qvZeE+ikVRuQLhsHcXr5jvRS60Cni/t8FK9Ja7/0Km6pDF9K7ADPQbNFZTQiWF5Hvrh//Q
+        t4fp70m+P0t0DcObyq1Iupho0l7xypo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-76-ir_ifxBNMuKmwK_rwds2eQ-1; Mon, 24 May 2021 15:35:49 -0400
-X-MC-Unique: ir_ifxBNMuKmwK_rwds2eQ-1
+ us-mta-171-kyzoSgi-NX6e45auhMDkyg-1; Mon, 24 May 2021 15:46:56 -0400
+X-MC-Unique: kyzoSgi-NX6e45auhMDkyg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B9E5F801107;
-        Mon, 24 May 2021 19:35:47 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C6E5803622;
+        Mon, 24 May 2021 19:46:55 +0000 (UTC)
 Received: from x1.home.shazbot.org (ovpn-113-225.phx2.redhat.com [10.3.113.225])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 92A345C701;
-        Mon, 24 May 2021 19:35:47 +0000 (UTC)
-Date:   Mon, 24 May 2021 13:35:47 -0600
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AB3595C701;
+        Mon, 24 May 2021 19:46:50 +0000 (UTC)
+Date:   Mon, 24 May 2021 13:46:50 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Zhen Lei <thunder.leizhen@huawei.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm <kvm@vger.kernel.org>
-Subject: Re: [PATCH 1/1] vfio/pci: Fix error return code in vfio_ecap_init()
-Message-ID: <20210524133547.0850d213@x1.home.shazbot.org>
-In-Reply-To: <20210515020458.6771-1-thunder.leizhen@huawei.com>
-References: <20210515020458.6771-1-thunder.leizhen@huawei.com>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH] vfio/pci: zap_vma_ptes() needs MMU
+Message-ID: <20210524134650.01ed417b@x1.home.shazbot.org>
+In-Reply-To: <20210515190856.2130-1-rdunlap@infradead.org>
+References: <20210515190856.2130-1-rdunlap@infradead.org>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -50,34 +53,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 15 May 2021 10:04:58 +0800
-Zhen Lei <thunder.leizhen@huawei.com> wrote:
+On Sat, 15 May 2021 12:08:56 -0700
+Randy Dunlap <rdunlap@infradead.org> wrote:
 
-> The error code returned from vfio_ext_cap_len() is stored in 'len', not
-> in 'ret'.
+> zap_vma_ptes() is only available when CONFIG_MMU is set/enabled.
+> Without CONFIG_MMU, vfio_pci.o has build errors, so make
+> VFIO_PCI depend on MMU.
+> 
+> riscv64-linux-ld: drivers/vfio/pci/vfio_pci.o: in function `vfio_pci_mmap_open':
+> vfio_pci.c:(.text+0x1ec): undefined reference to `zap_vma_ptes'
+> riscv64-linux-ld: drivers/vfio/pci/vfio_pci.o: in function `.L0 ':
+> vfio_pci.c:(.text+0x165c): undefined reference to `zap_vma_ptes'
 > 
 > Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: kvm@vger.kernel.org
+> Cc: Jason Gunthorpe <jgg@nvidia.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
 > ---
->  drivers/vfio/pci/vfio_pci_config.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/vfio/pci/Kconfig |    1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-> index d57f037f65b85d4..70e28efbc51f80e 100644
-> --- a/drivers/vfio/pci/vfio_pci_config.c
-> +++ b/drivers/vfio/pci/vfio_pci_config.c
-> @@ -1581,7 +1581,7 @@ static int vfio_ecap_init(struct vfio_pci_device *vdev)
->  			if (len == 0xFF) {
->  				len = vfio_ext_cap_len(vdev, ecap, epos);
->  				if (len < 0)
-> -					return ret;
-> +					return len;
->  			}
->  		}
->  
+> --- linux-next-20210514.orig/drivers/vfio/pci/Kconfig
+> +++ linux-next-20210514/drivers/vfio/pci/Kconfig
+> @@ -2,6 +2,7 @@
+>  config VFIO_PCI
+>  	tristate "VFIO support for PCI devices"
+>  	depends on VFIO && PCI && EVENTFD
+> +	depends on MMU
+>  	select VFIO_VIRQFD
+>  	select IRQ_BYPASS_MANAGER
+>  	help
 
-Added to vfio for-linus branch for v5.13 w/ Max's R-b.  Thanks!
+
+Yes, these !MMU configs are getting annoying and I don't know of any
+demand for vfio in them.  I suspect we were ok with !MMU until
+11c4cd07ba11 though, that's where we added zap_vma_ptes usage.  I
+updated the Fixes: tag but I suspect either case would reach the same
+set of stable trees.  Applied to vfio for-linus branch for v5.13.
+Thanks!
 
 Alex
 
