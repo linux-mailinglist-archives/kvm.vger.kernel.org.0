@@ -2,140 +2,312 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CF36938E668
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 14:14:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BCF538E68A
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 14:27:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232662AbhEXMQ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 08:16:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29189 "EHLO
+        id S232638AbhEXM2f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 08:28:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39677 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232494AbhEXMQZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 08:16:25 -0400
+        by vger.kernel.org with ESMTP id S232476AbhEXM2d (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 08:28:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621858497;
+        s=mimecast20190719; t=1621859224;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6VKp1xofZhd/+4tFw02ffWXfwhEtsPe1dVI9fvTfESM=;
-        b=JiY7ZDWxMr8dtjKbS5Us40gqWc2IjcgupS8KRIayqY3FiwvefA2l7u2YVERLZSP0ri3sQq
-        Yghe/2nu0YRy2WH2H0CfaDBY3qEdy45J8RJkPbhM3GyS8FLsGBeR9BYCI6xYBJjV1sj3/R
-        DxUTGiLo1cjBMfqQ8oMfPkhphCOTlw8=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-365-_b527I7SOYWxLFxpLw73tg-1; Mon, 24 May 2021 08:14:55 -0400
-X-MC-Unique: _b527I7SOYWxLFxpLw73tg-1
-Received: by mail-ed1-f72.google.com with SMTP id d8-20020a0564020008b0290387d38e3ce0so15481374edu.1
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 05:14:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=6VKp1xofZhd/+4tFw02ffWXfwhEtsPe1dVI9fvTfESM=;
-        b=h7FHkP78JbFJMYlMkqB6DHo+DCJjuRbMoxTQsTxSxCZ4e0Tu7JpnmWIAzq0IhYFlnE
-         lGdeRRhpB3Ldetks5pcJOGUZy40/D5CK8ON83sMr2GaB89DBTSZf4cb3yyoAdGWfHi6t
-         g+cF4BC8wrlCixAbzwpGnC4aOLqGr2GeQ3xinAblh8RFc7GfV1oZQ9T8XGFm8tc4tFnL
-         z+frbEe4pShgQf3fZrIEQ2Idf0JhriUF8VDLA4afmcT83hnLO/fW6MHZIu3z5NARR5/3
-         g1qbKs911YBXHHXia4z6u1iIuP9H9WhFLGQ6VNRTr7VgogyriVB3qQAwr8UuPBZCXHIE
-         3t6g==
-X-Gm-Message-State: AOAM531Hv+7d53ldp0WVMBGTQu5+nSHm/83ph81GK75+XtKu7tkGIymY
-        zcqL1NLjhul0dqlqBfiYMSRFK+riDd7FWZzLapDSWc3zd2f/sd7TQin3ZlZjnKGjr7b6nhd9fes
-        OsMqSn3NwWlUU
-X-Received: by 2002:a17:906:eb10:: with SMTP id mb16mr23517145ejb.209.1621858494163;
-        Mon, 24 May 2021 05:14:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxk+0l0weiOvjyF1AGyYnOo0VG6EnvzCZZGMcmr4Lu8V//fg+XmZ0li0ktd4Yb2OtYjlpR1Ug==
-X-Received: by 2002:a17:906:eb10:: with SMTP id mb16mr23517131ejb.209.1621858494009;
-        Mon, 24 May 2021 05:14:54 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id v23sm9221937edx.31.2021.05.24.05.14.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 May 2021 05:14:53 -0700 (PDT)
-Subject: Re: [PATCH v2 0/5] KVM: selftests: arm64 exception handling and debug
- test
-To:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     maz@kernel.org, drjones@redhat.com, alexandru.elisei@arm.com,
-        eric.auger@redhat.com
-References: <20210430232408.2707420-1-ricarkol@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <362e360d-40c3-1e50-18b0-a2f4297d3746@redhat.com>
-Date:   Mon, 24 May 2021 14:14:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        bh=XSzr21vwqst9EpOmT8fSgxup5KtjbpG83J7rKiSxd2M=;
+        b=AyHJQIr+/g57DFrv17de6KwWalxR0uXMBbuykpdEGcOr5ZpQfJrQx++3IYrs4whyW2+YVD
+        UMlVqt2P9aWsVMHF08ZhzlcMWMqeqPVAjKSJ2m34NyHD6fahDFv8ZSJIJf4/GfkhdVP6f1
+        OY/L52ivzlbdSUJNY95MT7+lQpe6iAs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-513-uVzqynCLPzOOT0DtSpDH-Q-1; Mon, 24 May 2021 08:27:02 -0400
+X-MC-Unique: uVzqynCLPzOOT0DtSpDH-Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D0ED100945F;
+        Mon, 24 May 2021 12:27:01 +0000 (UTC)
+Received: from starship (unknown [10.40.192.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 329E71037E80;
+        Mon, 24 May 2021 12:26:58 +0000 (UTC)
+Message-ID: <48f7950dd6504a9ecc7a5209db264587958cafdf.camel@redhat.com>
+Subject: Re: [PATCH v2 3/7] KVM: nVMX: Ignore 'hv_clean_fields' data when
+ eVMCS data is copied in vmx_get_nested_state()
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+Date:   Mon, 24 May 2021 15:26:57 +0300
+In-Reply-To: <20210517135054.1914802-4-vkuznets@redhat.com>
+References: <20210517135054.1914802-1-vkuznets@redhat.com>
+         <20210517135054.1914802-4-vkuznets@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <20210430232408.2707420-1-ricarkol@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/05/21 01:24, Ricardo Koller wrote:
-> Hi,
+On Mon, 2021-05-17 at 15:50 +0200, Vitaly Kuznetsov wrote:
+> 'Clean fields' data from enlightened VMCS is only valid upon vmentry: L1
+> hypervisor is not obliged to keep it up-to-date while it is mangling L2's
+> state, KVM_GET_NESTED_STATE request may come at a wrong moment when actual
+> eVMCS changes are unsynchronized with 'hv_clean_fields'. As upon migration
+> VMCS12 is used as a source of ultimate truth, we must make sure we pick all
+> the changes to eVMCS and thus 'clean fields' data must be ignored.
 > 
-> These patches add a debug exception test in aarch64 KVM selftests while
-> also adding basic exception handling support.
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 49 +++++++++++++++++++++++----------------
+>  1 file changed, 29 insertions(+), 20 deletions(-)
 > 
-> The structure of the exception handling is based on its x86 counterpart.
-> Tests use the same calls to initialize exception handling and both
-> architectures allow tests to override the handler for a particular
-> vector, or (vector, ec) for synchronous exceptions in the arm64 case.
-> 
-> The debug test is similar to x86_64/debug_regs, except that the x86 one
-> controls the debugging from outside the VM. This proposed arm64 test
-> controls and handles debug exceptions from the inside.
-> 
-> Thanks,
-> Ricardo
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index ea2869d8b823..ec476f64df73 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -1607,7 +1607,7 @@ static void copy_vmcs12_to_shadow(struct vcpu_vmx *vmx)
+>  	vmcs_load(vmx->loaded_vmcs->vmcs);
+>  }
+>  
+> -static int copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx)
+> +static int copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields)
+>  {
+>  	struct vmcs12 *vmcs12 = vmx->nested.cached_vmcs12;
+>  	struct hv_enlightened_vmcs *evmcs = vmx->nested.hv_evmcs;
+> @@ -1616,7 +1616,7 @@ static int copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx)
+>  	vmcs12->tpr_threshold = evmcs->tpr_threshold;
+>  	vmcs12->guest_rip = evmcs->guest_rip;
+>  
+> -	if (unlikely(!(evmcs->hv_clean_fields &
+> +	if (unlikely(!(hv_clean_fields &
+>  		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_BASIC))) {
+>  		vmcs12->guest_rsp = evmcs->guest_rsp;
+>  		vmcs12->guest_rflags = evmcs->guest_rflags;
+> @@ -1624,23 +1624,23 @@ static int copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx)
+>  			evmcs->guest_interruptibility_info;
+>  	}
+>  
+> -	if (unlikely(!(evmcs->hv_clean_fields &
+> +	if (unlikely(!(hv_clean_fields &
+>  		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_PROC))) {
+>  		vmcs12->cpu_based_vm_exec_control =
+>  			evmcs->cpu_based_vm_exec_control;
+>  	}
+>  
+> -	if (unlikely(!(evmcs->hv_clean_fields &
+> +	if (unlikely(!(hv_clean_fields &
+>  		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_EXCPN))) {
+>  		vmcs12->exception_bitmap = evmcs->exception_bitmap;
+>  	}
+>  
+> -	if (unlikely(!(evmcs->hv_clean_fields &
+> +	if (unlikely(!(hv_clean_fields &
+>  		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_ENTRY))) {
+>  		vmcs12->vm_entry_controls = evmcs->vm_entry_controls;
+>  	}
+>  
+> -	if (unlikely(!(evmcs->hv_clean_fields &
+> +	if (unlikely(!(hv_clean_fields &
+>  		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_EVENT))) {
+>  		vmcs12->vm_entry_intr_info_field =
+>  			evmcs->vm_entry_intr_info_field;
+> @@ -1650,7 +1650,7 @@ static int copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx)
+>  			evmcs->vm_entry_instruction_len;
+>  	}
+>  
+> -	if (unlikely(!(evmcs->hv_clean_fields &
+> +	if (unlikely(!(hv_clean_fields &
+>  		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1))) {
+>  		vmcs12->host_ia32_pat = evmcs->host_ia32_pat;
+>  		vmcs12->host_ia32_efer = evmcs->host_ia32_efer;
+> @@ -1670,7 +1670,7 @@ static int copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx)
+>  		vmcs12->host_tr_selector = evmcs->host_tr_selector;
+>  	}
+>  
+> -	if (unlikely(!(evmcs->hv_clean_fields &
+> +	if (unlikely(!(hv_clean_fields &
+>  		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP1))) {
+>  		vmcs12->pin_based_vm_exec_control =
+>  			evmcs->pin_based_vm_exec_control;
+> @@ -1679,18 +1679,18 @@ static int copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx)
+>  			evmcs->secondary_vm_exec_control;
+>  	}
+>  
+> -	if (unlikely(!(evmcs->hv_clean_fields &
+> +	if (unlikely(!(hv_clean_fields &
+>  		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_IO_BITMAP))) {
+>  		vmcs12->io_bitmap_a = evmcs->io_bitmap_a;
+>  		vmcs12->io_bitmap_b = evmcs->io_bitmap_b;
+>  	}
+>  
+> -	if (unlikely(!(evmcs->hv_clean_fields &
+> +	if (unlikely(!(hv_clean_fields &
+>  		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP))) {
+>  		vmcs12->msr_bitmap = evmcs->msr_bitmap;
+>  	}
+>  
+> -	if (unlikely(!(evmcs->hv_clean_fields &
+> +	if (unlikely(!(hv_clean_fields &
+>  		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2))) {
+>  		vmcs12->guest_es_base = evmcs->guest_es_base;
+>  		vmcs12->guest_cs_base = evmcs->guest_cs_base;
+> @@ -1730,14 +1730,14 @@ static int copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx)
+>  		vmcs12->guest_tr_selector = evmcs->guest_tr_selector;
+>  	}
+>  
+> -	if (unlikely(!(evmcs->hv_clean_fields &
+> +	if (unlikely(!(hv_clean_fields &
+>  		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP2))) {
+>  		vmcs12->tsc_offset = evmcs->tsc_offset;
+>  		vmcs12->virtual_apic_page_addr = evmcs->virtual_apic_page_addr;
+>  		vmcs12->xss_exit_bitmap = evmcs->xss_exit_bitmap;
+>  	}
+>  
+> -	if (unlikely(!(evmcs->hv_clean_fields &
+> +	if (unlikely(!(hv_clean_fields &
+>  		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR))) {
+>  		vmcs12->cr0_guest_host_mask = evmcs->cr0_guest_host_mask;
+>  		vmcs12->cr4_guest_host_mask = evmcs->cr4_guest_host_mask;
+> @@ -1749,7 +1749,7 @@ static int copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx)
+>  		vmcs12->guest_dr7 = evmcs->guest_dr7;
+>  	}
+>  
+> -	if (unlikely(!(evmcs->hv_clean_fields &
+> +	if (unlikely(!(hv_clean_fields &
+>  		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_POINTER))) {
+>  		vmcs12->host_fs_base = evmcs->host_fs_base;
+>  		vmcs12->host_gs_base = evmcs->host_gs_base;
+> @@ -1759,13 +1759,13 @@ static int copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx)
+>  		vmcs12->host_rsp = evmcs->host_rsp;
+>  	}
+>  
+> -	if (unlikely(!(evmcs->hv_clean_fields &
+> +	if (unlikely(!(hv_clean_fields &
+>  		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_XLAT))) {
+>  		vmcs12->ept_pointer = evmcs->ept_pointer;
+>  		vmcs12->virtual_processor_id = evmcs->virtual_processor_id;
+>  	}
+>  
+> -	if (unlikely(!(evmcs->hv_clean_fields &
+> +	if (unlikely(!(hv_clean_fields &
+>  		       HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1))) {
+>  		vmcs12->vmcs_link_pointer = evmcs->vmcs_link_pointer;
+>  		vmcs12->guest_ia32_debugctl = evmcs->guest_ia32_debugctl;
+> @@ -3473,6 +3473,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+>  	enum nvmx_vmentry_status status;
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>  	u32 interrupt_shadow = vmx_get_interrupt_shadow(vcpu);
+> +	struct hv_enlightened_vmcs *evmcs;
+>  	enum nested_evmptrld_status evmptrld_status;
+>  
+>  	++vcpu->stat.nested_run;
+> @@ -3488,7 +3489,8 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+>  		return nested_vmx_failInvalid(vcpu);
+>  	}
+>  
+> -	if (CC(!vmx->nested.hv_evmcs && vmx->nested.current_vmptr == -1ull))
+> +	evmcs = vmx->nested.hv_evmcs;
+> +	if (CC(!evmcs && vmx->nested.current_vmptr == -1ull))
+>  		return nested_vmx_failInvalid(vcpu);
+>  
+>  	vmcs12 = get_vmcs12(vcpu);
+> @@ -3502,8 +3504,8 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+>  	if (CC(vmcs12->hdr.shadow_vmcs))
+>  		return nested_vmx_failInvalid(vcpu);
+>  
+> -	if (vmx->nested.hv_evmcs) {
+> -		copy_enlightened_to_vmcs12(vmx);
+> +	if (evmcs) {
+> +		copy_enlightened_to_vmcs12(vmx, evmcs->hv_clean_fields);
+>  		/* Enlightened VMCS doesn't have launch state */
+>  		vmcs12->launch_state = !launch;
+>  	} else if (enable_shadow_vmcs) {
+> @@ -6136,7 +6138,14 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
+>  		copy_vmcs02_to_vmcs12_rare(vcpu, get_vmcs12(vcpu));
+>  		if (!vmx->nested.need_vmcs12_to_shadow_sync) {
+>  			if (vmx->nested.hv_evmcs)
+> -				copy_enlightened_to_vmcs12(vmx);
+> +				/*
+> +				 * L1 hypervisor is not obliged to keep eVMCS
+> +				 * clean fields data always up-to-date while
+> +				 * not in guest mode, 'hv_clean_fields' is only
+> +				 * supposed to be actual upon vmentry so we need
+> +				 * to ignore it here and do full copy.
+> +				 */
+> +				copy_enlightened_to_vmcs12(vmx, 0);
 
-Marc, are you going to queue this in your tree?
+Hi Vitaly!
 
-Thanks,
+This patch had lead me to a deep rabbit hole,
+so I would like to share my thoughts about it:
 
-Paolo
+Initially I thought that we should just drop the copy of the evmcs to vmcs12
+instead, based on the following argument:
+ 
+When L2 is running we don't copy it since then guest must not
+modify it just like normal vmcs, and L2 state is in our vmcs02.
+ 
+And when L1 is running, then essentially evmcs is just a guest memory.
 
-> v1 -> v2:
-> 
-> Addressed comments from Andrew and Marc (thank you very much):
-> - rename vm_handle_exception in all tests.
-> - introduce UCALL_UNHANDLED in x86 first.
-> - move GUEST_ASSERT_EQ to common utils header.
-> - handle sync and other exceptions separately: use two tables (like
->    kvm-unit-tests).
-> - add two separate functions for installing sync versus other exceptions
-> - changes in handlers.S: use the same layout as user_pt_regs, treat the
->    EL1t vectors as invalid, refactor the vector table creation to not use
->    manual numbering, add comments, remove LR from the stored registers.
-> - changes in debug-exceptions.c: remove unused headers, use the common
->    GUEST_ASSERT_EQ, use vcpu_run instead of _vcpu_run.
-> - changes in processor.h: write_sysreg with support for xzr, replace EL1
->    with current in macro names, define ESR_EC_MASK as ESR_EC_NUM-1.
-> 
-> Ricardo Koller (5):
->    KVM: selftests: Rename vm_handle_exception
->    KVM: selftests: Introduce UCALL_UNHANDLED for unhandled vector
->      reporting
->    KVM: selftests: Move GUEST_ASSERT_EQ to utils header
->    KVM: selftests: Add exception handling support for aarch64
->    KVM: selftests: Add aarch64/debug-exceptions test
-> 
->   tools/testing/selftests/kvm/.gitignore        |   1 +
->   tools/testing/selftests/kvm/Makefile          |   3 +-
->   .../selftests/kvm/aarch64/debug-exceptions.c  | 244 ++++++++++++++++++
->   .../selftests/kvm/include/aarch64/processor.h |  90 ++++++-
->   .../testing/selftests/kvm/include/kvm_util.h  |  10 +
->   .../selftests/kvm/include/x86_64/processor.h  |   4 +-
->   .../selftests/kvm/lib/aarch64/handlers.S      | 130 ++++++++++
->   .../selftests/kvm/lib/aarch64/processor.c     | 124 +++++++++
->   .../selftests/kvm/lib/x86_64/processor.c      |  19 +-
->   .../selftests/kvm/x86_64/kvm_pv_test.c        |   2 +-
->   .../selftests/kvm/x86_64/tsc_msrs_test.c      |   9 -
->   .../kvm/x86_64/userspace_msr_exit_test.c      |   8 +-
->   .../selftests/kvm/x86_64/xapic_ipi_test.c     |   2 +-
->   13 files changed, 611 insertions(+), 35 deletions(-)
->   create mode 100644 tools/testing/selftests/kvm/aarch64/debug-exceptions.c
->   create mode 100644 tools/testing/selftests/kvm/lib/aarch64/handlers.S
-> 
+Even when loaded by previous vm entry,
+we barely touch that evmcs
+(we only touch it to update the vmx instruction error),
+and even for that we need to update the evmcs (vmcs12->evmcs) and not vice versa.
+
+Reading whole evmcs while the L1 is running indeed 
+feels wrong since at this point the L1 owns it.
+
+However we have another bug that you fixed in patch 6, which I sadly rediscovered
+while reviewing this patch, which makes the above approach impossible.
+After a migration we won't be able to know if evmcs is more up to date,
+or if vmcs12 is more up to date.
+
+I was thinking that for later case (vmcs12 more up to date) it would be cleaner
+to sync evmcs here and then drop the copy_enlightened_to_vmcs12 call.
+
+However we can't do this since in KVM_GET_NESTED_STATE handler we are not allowed
+to dirtify the guest memory since at the point, this ioctl is called, the userspace
+assumes that it has already copied all of the guest memory, 
+and that this ioctl won't dirtify the guest memory again.
+(see commit fa58a9fa74979f845fc6c94a58501e67f3abb6de)
+
+It is still possible to go with my suggestion though if we avoid using
+need_vmcs12_to_shadow_sync for evmcs, and sync evmcs right away
+in the two places where it needed:
+On nested vmexit and when updating the VM_INSTRUCTION_ERROR.
+This shouldn't cause any performance regressions.
+
+Then we can just drop the copy_enlightened_to_vmcs12, drop this patch, patch 5 and patch 6,
+and now have the assumption that when we migrate L1 then
+whatever evmcs was previously used we
+fully updated it on last nested vmexit, and then maybe L1 modified it,
+while vmcs12 continues to hold state of the vm that we wrote
+during last nested vm exit.
+
+In regard to backward compatibility the evmcs nested migration 
+was very broken prior to these fixes anyway thus the change
+that I propose shoudn't make things worse.
+
+What do you think?
+
+Best regards,
+	Maxim Levitsky
+
+
+
+>  			else if (enable_shadow_vmcs)
+>  				copy_shadow_to_vmcs12(vmx);
+>  		}
+
+
+
+
+
 
