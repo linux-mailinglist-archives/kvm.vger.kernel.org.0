@@ -2,111 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DD7FD38F152
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 18:16:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09C6438F156
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 18:19:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233467AbhEXQRa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 12:17:30 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12078 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232918AbhEXQR2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 12:17:28 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14OG4dm0020170;
-        Mon, 24 May 2021 12:15:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=DrvjMI3EBxdgZsRm5hUVcKMed5KOSzIm0p0poRBgU7I=;
- b=awlCksOA8wO/oE75Y4b+FA/58Eo419/0EhuYhrubBrec0sL2kvdy6vp0k9s9GwMBkMa6
- w5brFjErIdu+bzdLGokSpAOZG9So96atuBCaYZR9nH5x9SezjsMNh+Itb3Qh0iiHn/pR
- rzJ7sALtFJGRj2Pt37+kHI2YKlMghnxV7SLGHe2SLDMcTyBbuvnrFVAVq23GfDSWyR9K
- LjELVNO8wxVbFpO0Bkqpm4vSgLXovsIlyRO/Vrm4C3ucHDaVDciwk2vMeS1BDQbxzKe8
- M8BJjlArwCUD8CU/F5z56lE733e/SrDomc4eeoEkiigeu5sKpvwLCDyVndwwHNyfNfDv pA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38repqhkte-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 24 May 2021 12:15:58 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14OG7plf038733;
-        Mon, 24 May 2021 12:15:58 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38repqhks5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 24 May 2021 12:15:57 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14OGBKip016476;
-        Mon, 24 May 2021 16:15:54 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06fra.de.ibm.com with ESMTP id 38ps7h8fyv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 24 May 2021 16:15:53 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14OGFoiV20316452
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 24 May 2021 16:15:50 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 75CB14203F;
-        Mon, 24 May 2021 16:15:50 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A722A42042;
-        Mon, 24 May 2021 16:15:49 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.37.230])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Mon, 24 May 2021 16:15:49 +0000 (GMT)
-Date:   Mon, 24 May 2021 18:15:48 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com, freude@linux.ibm.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com
-Subject: Re: [PATCH v16 06/14] s390/vfio-ap: refresh guest's APCB by
- filtering APQNs assigned to mdev
-Message-ID: <20210524181548.4dbe52bc.pasic@linux.ibm.com>
-In-Reply-To: <20210510164423.346858-7-akrowiak@linux.ibm.com>
-References: <20210510164423.346858-1-akrowiak@linux.ibm.com>
-        <20210510164423.346858-7-akrowiak@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S232974AbhEXQUc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 12:20:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36063 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232676AbhEXQUb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 12:20:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621873143;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Zx+Q390U8pLPzbAiF6wzLy2oac+v3wRma2N/BJbHIrA=;
+        b=bAnP9DNb0FnNFcYY7hAHmaaJ05q6GBBKZy8ndqzliKYxitX6acj9NMqcIwMZNbnpp2FVBr
+        MU0ykkZWZ9NymJ+ajBRVHMpmJyL3TEOs68V8PMwFwfMTGSwz8zYrHbi5xIWw5RqcX3BnZp
+        C3yynSBGIAICkd9bTpxw0ziX7029D+c=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-558-Dna3DI6NNwqcSlzLWH0fug-1; Mon, 24 May 2021 12:19:01 -0400
+X-MC-Unique: Dna3DI6NNwqcSlzLWH0fug-1
+Received: by mail-ej1-f72.google.com with SMTP id i8-20020a1709068508b02903d75f46b7aeso7459591ejx.18
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 09:19:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Zx+Q390U8pLPzbAiF6wzLy2oac+v3wRma2N/BJbHIrA=;
+        b=UepkeftFWrlwipeTJAJME3AXXh4k0EALgeKXNZfF8MollX0dnBLIae2GDnx/b3rLRy
+         0VJs0G9N4RZ4nvTrVyxJZCu14g4QTDX5KHG/Enc2PWUOM2HK6WX8FJOu6UTNeg7pZKlh
+         P04Gz7C/I66dJjdrzS7qwoQEIYwSoL++gaqFOHqgCOcupEvBXizbq17lzC4ax/XGJCaz
+         tREOBUp03LznQ5FkJRiTdnOFlOUYCmNXLJ4PKBl2yBZakbqONE7ELoeCN42PXXDlz+Vc
+         yfOivNWmTXFvuQyCoHj4NZkZIR2y54dDte2G68D7fyPjGVwbdaglBynRQRlv+ib3Nq8z
+         Ypqg==
+X-Gm-Message-State: AOAM533lanWtyhj4Tg8WTTi25pyCMJWokgi9fS+fX44KGX7M4DSS3ezi
+        uX+pbYHCDDFMKf0V0g3IiB3z+sosd/aU/Vb6Q1zRnF9uVfrzZNzGDlbwoKOM8OtSq3hVlhN1lX8
+        3J63lE+7qRBpr
+X-Received: by 2002:a17:906:4714:: with SMTP id y20mr12021982ejq.235.1621873140399;
+        Mon, 24 May 2021 09:19:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy/+1MKBcytF0mddgWHhWR2Rr4Ab0MBYT96t0xHKcOjWgUHEzAof7QfJACzqp6Tfyn9ofc37Q==
+X-Received: by 2002:a17:906:4714:: with SMTP id y20mr12021960ejq.235.1621873140194;
+        Mon, 24 May 2021 09:19:00 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id p11sm3043022edt.22.2021.05.24.09.18.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 May 2021 09:18:59 -0700 (PDT)
+To:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Kechen Lu <kechenl@nvidia.com>, linux-kernel@vger.kernel.org
+References: <20210518144339.1987982-1-vkuznets@redhat.com>
+ <20210518144339.1987982-4-vkuznets@redhat.com> <YKQmG3rMpwSI3WrV@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 3/5] KVM: x86: Use common 'enable_apicv' variable for
+ both APICv and AVIC
+Message-ID: <12eadbce-f688-77a1-27bf-c33fee2e7543@redhat.com>
+Date:   Mon, 24 May 2021 18:18:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <YKQmG3rMpwSI3WrV@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: RIR_5a4GtCOQa80qHPekiPEvbcLNYu2E
-X-Proofpoint-GUID: 7VqVILMie_E9GoIdmJ3Ae-jvQlXJalKg
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-05-24_08:2021-05-24,2021-05-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 malwarescore=0
- mlxlogscore=999 spamscore=0 mlxscore=0 bulkscore=0 priorityscore=1501
- impostorscore=0 clxscore=1015 lowpriorityscore=0 phishscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2105240096
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 10 May 2021 12:44:15 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On 18/05/21 22:39, Sean Christopherson wrote:
+>> +/* enable / disable AVIC */
+>> +static int avic;
+>> +module_param(avic, int, 0444);
+> We should opportunistically make avic a "bool".
+> 
 
-> @@ -1601,8 +1676,10 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
->  	mutex_lock(&matrix_dev->lock);
->  	q = dev_get_drvdata(&apdev->device);
->  
-> -	if (q->matrix_mdev)
-> +	if (q->matrix_mdev) {
->  		vfio_ap_mdev_unlink_queue_fr_mdev(q);
-> +		vfio_ap_mdev_refresh_apcb(q->matrix_mdev);
-> +	}
->  
->  	vfio_ap_mdev_reset_queue(q, 1);
->  	dev_set_drvdata(&apdev->device, NULL);
+And also:
 
-At this point we don't know if !!kvm_busy or kvm_busy AFAICT. If
-!!kvm_busy, then we may end up changing a shadow_apcb while an other
-thread is in the middle of committing it to the SD satellite. That
-would be no good.
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 11714c22c9f1..48cb498ff070 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -185,9 +185,12 @@ module_param(vls, int, 0444);
+  static int vgif = true;
+  module_param(vgif, int, 0444);
+  
+-/* enable / disable AVIC */
+-static int avic;
+-module_param(avic, int, 0444);
++/*
++ * enable / disable AVIC.  Because the defaults differ for APICv
++ * support between VMX and SVM we cannot use module_param_named.
++ */
++static bool avic;
++module_param(avic, bool, 0444);
+  
+  bool __read_mostly dump_invalid_vmcb;
+  module_param(dump_invalid_vmcb, bool, 0644);
+@@ -1013,11 +1016,7 @@ static __init int svm_hardware_setup(void)
+  			nrips = false;
+  	}
+  
+-	if (!npt_enabled || !boot_cpu_has(X86_FEATURE_AVIC))
+-		avic = false;
+-
+-	/* 'enable_apicv' is common between VMX/SVM but the defaults differ */
+-	enable_apicv = avic;
++	enable_apicv = avic && npt_enabled && boot_cpu_has(X86_FEATURE_AVIC);
+  	if (enable_apicv) {
+  		pr_info("AVIC enabled\n");
+  
 
-Regards,
-Halil
+The "if" can come back when AVIC is enabled by default.
+
+Paolo
+
