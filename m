@@ -2,93 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D276B38F59B
-	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 00:28:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E96238F5C2
+	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 00:44:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229571AbhEXWaO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 18:30:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56474 "EHLO
+        id S229581AbhEXWp4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 18:45:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229503AbhEXWaO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 May 2021 18:30:14 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA203C061574
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 15:28:44 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id v13-20020a17090abb8db029015f9f7d7290so720080pjr.0
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 15:28:44 -0700 (PDT)
+        with ESMTP id S229503AbhEXWp4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 May 2021 18:45:56 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7291C061574
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 15:44:27 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id d16so22030548pfn.12
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 15:44:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=wjHpPJplladoMyN508+roXM5QX3joM77pztZx4dnUzs=;
-        b=Vh9c4pDMcMGHrDB/DXKm60YSRnio8FmkVEXBrs70mST+GX+GqtGg7DbzngmZeLYOlF
-         TwnPui9rY6g+IixjZoEWmDWk93pl3ZSH7muk3fn0u/oYcmafAkQopuNDOCq2/2c3Pojj
-         k0SCysDD0W33PzlYFD/w7g8YVnxrccbFHdewjygkBEo2FPzOGp3yzkBD0cmpufPBplk8
-         kgXTPHhfByDtKazuIeTBKos7tsz5uIUFkMtMygnyCmzDO5cfFeFhiL5g/D0U5wX5uu3A
-         odJzYyursS1h8P1XGBBbX1ifx5CX2zpMxcfMRFZult61SqSolWMpn638LEPINTSPKaQL
-         cj6w==
+        bh=moS6oggcxprsPW7Vp6d1rxzceuGswLolHPrUHPRtQoE=;
+        b=oh2uiXOdqhEKSOEolu5a8GzBcl8el+8zQzTE8McxvCRCcY6pmZpWRvSM5QxFQRcuXv
+         mD1pMEu13vUg+qn+X2iQXaEdfShgTQ17886vh1ONinU9JW2yrJq6i6+bH3j8KpoM1Zr+
+         EWYBFnQW9dLTyCvpNEAwPzsI8FRlg3AJ0lBIw1c7AA1kpEV1u4BwMPoN7SwOuGo80DIX
+         d3x4WArgQdBaoffF2NConzqpRkVCNQ69RyyVM1ptFGgLZZ2A/CX7tkNdfCJerSN9VBuM
+         PMl0gxTgnNNfO0lk7r9+odLmNk3xeawNts1DFJQGrYbMM4DYdYbCjt78bMYmkaDhMNa8
+         r1dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=wjHpPJplladoMyN508+roXM5QX3joM77pztZx4dnUzs=;
-        b=deTwZdslgmrSbgA6LhzuyRurCFeS2e+u4WD402juDrlWvSrCjelWfxf/Ihcbzm0VXW
-         QSP1E2xQyzxCFhcsMdnT/8PX2Q9Fzm+S/x6YobzuCF4RaBBf7m4p5Y+VW90CtpiulxuS
-         e0ZUzutmOp9ll/55RYKufMSB+dVejzs8LEiXG4NB+xdY8IEo/qVZdYMWAJwY8sXxMeLs
-         oOM6eiVA13JvOV1oWjnZMHHIfX1M0GLDbHP7C8LSSUm1ZTK4rLppsnpUVyOhH+0v6d6x
-         KOkU3+0Us/L5QjbmXKPlvFkSbTKYOP56/VcieLEJZpUXQ0zYJzZJLEjMHZsiWOfPhtn6
-         ohzg==
-X-Gm-Message-State: AOAM531qpCs0060MaPhd63JFxxnffefI9teFt39sRut88ibL0bK8jxeb
-        Wu6gNjCn5ZJcO0SVvTWy5J8ggQ==
-X-Google-Smtp-Source: ABdhPJymBcH3mXTox6PlhJFMX+WysdycfN2VP+NWNbw7SdmI4w4ynWj/wQqPhVDzRBOWP01+PF/G0A==
-X-Received: by 2002:a17:902:f545:b029:f5:4b82:9cc9 with SMTP id h5-20020a170902f545b02900f54b829cc9mr27428087plf.68.1621895324070;
-        Mon, 24 May 2021 15:28:44 -0700 (PDT)
+        bh=moS6oggcxprsPW7Vp6d1rxzceuGswLolHPrUHPRtQoE=;
+        b=aXCcsjQ5NoUjP9feukVP2b3Ou0SKFZCVklcfvjDXsMVHnvZmP8TxOnUIi19FJmpypT
+         7B0iQ87Z9CcvKRJmIwK/VzHbvYlKnHSmAFzdpNSytjslU06Sv3j0xVad9yvhtO/A7c3c
+         DjDkcS+Pd1rJ7RclpieV3Wr0TLCOmFuY3Y/sYBvrBRlNvMDmCTur3Ndy56EhZpSRwj7j
+         XQy07gg4dMjrpspgB9sj7da2DtO0JRMDllmCqujaRhW8PYpVkD8MbiM5FMbhT4sVLVPC
+         Zl9YCBzwv8B2JOfLU24BaSZHrDQF3KaBLZsZOarkCnHJp9N45XzhKhsJfyIJnMhBjBnp
+         RQ9w==
+X-Gm-Message-State: AOAM532pCRjRUBEObTmLc57xrvVHIjYgTa2p1Cn3er4mnA/KVrKKpR10
+        BKVk+jMgwPhwQnMvIhfAQFbmEA==
+X-Google-Smtp-Source: ABdhPJxSh18GawCsjpGGc8gjOk8Vp48a3+k4tw5NRMvMkH4EZvvHo8CAwnSHf8a0mOw2fnr0cnPyvg==
+X-Received: by 2002:a63:79c3:: with SMTP id u186mr15844970pgc.203.1621896267147;
+        Mon, 24 May 2021 15:44:27 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id b23sm2385959pfi.34.2021.05.24.15.28.43
+        by smtp.gmail.com with ESMTPSA id 66sm12793435pgj.9.2021.05.24.15.44.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 May 2021 15:28:43 -0700 (PDT)
-Date:   Mon, 24 May 2021 22:28:40 +0000
+        Mon, 24 May 2021 15:44:26 -0700 (PDT)
+Date:   Mon, 24 May 2021 22:44:22 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 42/43] KVM: VMX: Drop VMWRITEs to zero fields at vCPU
- RESET
-Message-ID: <YKwomNuTEwgf4Xt0@google.com>
-References: <20210424004645.3950558-1-seanjc@google.com>
- <20210424004645.3950558-43-seanjc@google.com>
- <e2974b79-a6e5-81be-2adb-456f114391da@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>, Marc Orr <marcorr@google.com>,
+        kvm list <kvm@vger.kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        linux-mm <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Wanpeng Li <kernellwp@gmail.com>
+Subject: Re: [kvm PATCH v6 0/2] shrink vcpu_vmx down to order 2
+Message-ID: <YKwsRhDWi3LZNSai@google.com>
+References: <20181031234928.144206-1-marcorr@google.com>
+ <CALMp9eT-tKmt2nFy4eQ0bfLqHrZd9EruQ45p=AsR2aPWnj97gA@mail.gmail.com>
+ <34bf7026-4f83-067e-f3d8-aad76f9cf624@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e2974b79-a6e5-81be-2adb-456f114391da@redhat.com>
+In-Reply-To: <34bf7026-4f83-067e-f3d8-aad76f9cf624@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, May 24, 2021, Paolo Bonzini wrote:
-> On 24/04/21 02:46, Sean Christopherson wrote:
-> > Don't waste time writing zeros via VMWRITE during vCPU RESET, the VMCS
-> > is zero allocated.
+> On 21/05/21 22:58, Jim Mattson wrote:
+> > On Wed, Oct 31, 2018 at 4:49 PM Marc Orr <marcorr@google.com> wrote:
+> > > 
+> > > Compared to the last version, I've:
+> > > (1) dropped the vmalloc patches
+> > > (2) updated the kmem cache for the guest_fpu field in the kvm_vcpu_arch
+> > >      struct to be sized according to fpu_kernel_xstate_size
+> > > (3) Added minimum FPU checks in KVM's x86 init logic to avoid memory
+> > >      corruption issues.
+> > > 
+> > > Marc Orr (2):
+> > >    kvm: x86: Use task structs fpu field for user
+> > >    kvm: x86: Dynamically allocate guest_fpu
+> > > 
+> > >   arch/x86/include/asm/kvm_host.h | 10 +++---
+> > >   arch/x86/kvm/svm.c              | 10 ++++++
+> > >   arch/x86/kvm/vmx.c              | 10 ++++++
+> > >   arch/x86/kvm/x86.c              | 55 ++++++++++++++++++++++++---------
+> > >   4 files changed, 65 insertions(+), 20 deletions(-)
+> > > 
+> > > --
+> > 
+> > Whatever happened to this series?
 > 
-> Is this guaranteed to be valid, or could the VMCS in principle use some
-> weird encoding? (Like it does for the access rights, even though this does
-> not matter for this patch).
+> There was a question about the usage of kmem_cache_create_usercopy, and a v7
+> was never sent.
 
-Phooey.  In principle, the CPU can do whatever it wants, e.g. the SDM states that
-software should never write to the data portion of the VMCS under any circumstance.
+What's that go to do with anything? :-D
 
-In practice, I would be flabbergasted if Intel ever ships a CPU that doesn't play
-nice with zero initiazing the VMCS via software writes.  I'd bet dollars to
-donuts that KVM isn't the only software that relies on that behavior.
-
-That said, I'm not against switching to VMWRITE for everything, but regardless
-of which route we choose, we should commit to one or the other.  I.e. double down
-on memset() and bet that Intel won't break KVM, or replace the memset() in
-alloc_vmcs_cpu() with a sequence that writes all known (possible?) fields.  The
-current approach of zeroing the memory in software but initializing _some_ fields
-is the worst option, e.g. I highly doubt vmcs01 and vmcs02 do VMWRITE(..., 0) on
-the same fields.
+  b666a4b69739 ("kvm: x86: Dynamically allocate guest_fpu")
+  240c35a3783a ("kvm: x86: Use task structs fpu field for user")
