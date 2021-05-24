@@ -2,108 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE6DE38E8AA
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 16:23:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B9C138E8D9
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 16:38:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232987AbhEXOYm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 10:24:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57564 "EHLO
+        id S233035AbhEXOjm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 10:39:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26042 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232920AbhEXOYk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 10:24:40 -0400
+        by vger.kernel.org with ESMTP id S233009AbhEXOjg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 10:39:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621866191;
+        s=mimecast20190719; t=1621867088;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=kSxK4tWZIJT5bCptETDU8DGp8zILSQdltaxd/yNnY9s=;
-        b=A0uM1BOAr3YKjjusn0HkMDIrHsCUh/CMPCrgWOaz70xSpP1W7vRwrkfF1RX4RC94I7WOLw
-        D+HirIGVQp4qYUBr/VohPH5YDwkkCbmgJpEweVucgDvU2JhI66fGdPkX0RbzF04tomfHxD
-        a3lpBhxL4DwZGyJg7Q5Q4Ka4HRpaFr4=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-R6b83LSoPZO3QJbMH9le8w-1; Mon, 24 May 2021 10:23:09 -0400
-X-MC-Unique: R6b83LSoPZO3QJbMH9le8w-1
-Received: by mail-ed1-f69.google.com with SMTP id h16-20020a0564020950b029038cbdae8cbaso15614594edz.6
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 07:23:09 -0700 (PDT)
+        bh=MwTVkYpE+xLZ+L9XkvcMXjd+Zl3U7ycgPiVSmNWbDF4=;
+        b=hSoedQmacms0F6toOrtj5/gaKjnLu/ZbCVOlkkcSjGlGf/LiQuumiS/HDaeKADJ98Kn65P
+        CrMJmS0BeXeg1Fc/EJgf+DdOdKvSmObPTXSZJq6Y6wzxxFQebzf4UBc1SvB+lH6z7Kwrbg
+        cIzVepfWhdt41D4cdERvykV0TvH/pRg=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-554-aZqL7ITKOdyu1BFjd2suBw-1; Mon, 24 May 2021 10:38:02 -0400
+X-MC-Unique: aZqL7ITKOdyu1BFjd2suBw-1
+Received: by mail-wr1-f71.google.com with SMTP id 7-20020adf95070000b02901104ad3ef04so13198878wrs.16
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 07:38:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=kSxK4tWZIJT5bCptETDU8DGp8zILSQdltaxd/yNnY9s=;
-        b=G13k0ZgB/yr9RffQn+MNUEyBI9iesssveLyL5FLgBODkokeb9cT9UCvlwCOzPpQCFs
-         tK8rJutRBZs6LWtZKU9H3qH4JA7g2KCj772iYrsKRdGtU1W1w6oBYygeJe8uNPJD/48O
-         VxVs+3aBaivdewXV9qyiyhpG/XqMURJl156TWo6NCbPvrbljvUmRXjYmsq8P7E8dvA46
-         qG+PD7o2GOAEaoiAuklxw/l4XxE/wxc55tmkrVb63tfTKT4PNWvn2um/NJBABtBDQJOI
-         cjOvIcnGixprelVX8NWJMmh6P5KW8kKAtN8zDukxBkEhODH/1LYqtTJQTuYUPvaFO6Sq
-         OXcw==
-X-Gm-Message-State: AOAM533qf+Up41HOT0gcrnLSJMUwzWVhFSjp6wA8pqy+4Q7vwistHnN7
-        fPfkIIz5EseuROheED1prvzvmkspHnq9vVRJ1OiPTWRtC/30UoPw6R1Wd4NOhCzrp+K/+VwlOBc
-        zQkf8k+0KQ/OK
-X-Received: by 2002:a17:906:1f91:: with SMTP id t17mr23310957ejr.217.1621866188481;
-        Mon, 24 May 2021 07:23:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxIgkDRdVV+E7jd/IGylsPVUfdUbKs15rXOWvjJ9bB3PUB3LR50e4FMcVRGghtLOiNziuBT/g==
-X-Received: by 2002:a17:906:1f91:: with SMTP id t17mr23310941ejr.217.1621866188285;
-        Mon, 24 May 2021 07:23:08 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id o21sm7821393ejh.57.2021.05.24.07.23.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 May 2021 07:23:07 -0700 (PDT)
-Subject: Re: [PATCH v3 04/12] KVM: X86: Add a ratio parameter to
- kvm_scale_tsc()
-To:     Ilias Stamatis <ilstam@amazon.com>, kvm@vger.kernel.org,
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=MwTVkYpE+xLZ+L9XkvcMXjd+Zl3U7ycgPiVSmNWbDF4=;
+        b=tgAzsgrwY0yTCKOjPFOdMuByq/hLE7eP6KUVwy3iZsxWNloqx1i4SuHMb8cK5Tpy2S
+         99Ft6iHgiejZA31eWZJg9qr1m8GZr+gpYgTuNyKZE0YnVG87zYPErLTsTzhkg0pA04vk
+         1hCa/LSiplNvLvBZ8egzmxi+dLzmoTcirL3xOXeIvILbJ6k76LxaKD8L0PBMUcmiMNLB
+         rCt+i882kbYsaQt+bG5vmfVXx1vgr5vukz1Nz1qjNsyZoh0yNt1FOiPzZPsQcluD3tyA
+         tHauY7vVdzJZpPAMxu2/QHePYByRf227EgAx64FFQWYqZlcoRctTmq03+dqmUxapke5N
+         RhgQ==
+X-Gm-Message-State: AOAM530kTRzc2oj4HlMeWEt1iK26suiX0FrSyVC73DCxuG0Kb0rBMpZ8
+        nAzBXt7ZIbseMpiB5yozPFsgtlDJqW6VMPKrj6hjXTQ5CsnaUAxGenc4dj65Slz7i+5IxKElU9c
+        /KDDm196f64YU
+X-Received: by 2002:adf:f54b:: with SMTP id j11mr21122605wrp.376.1621867081143;
+        Mon, 24 May 2021 07:38:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzbJEoi9TrHxGwxpZRByUMSDNTVDSgWJX9G30qYssPN8Bc323jcyH+1k1mhtks4tAA7Fm1b9A==
+X-Received: by 2002:adf:f54b:: with SMTP id j11mr21122594wrp.376.1621867080971;
+        Mon, 24 May 2021 07:38:00 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id y137sm8143918wmc.11.2021.05.24.07.38.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 May 2021 07:38:00 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
         linux-kernel@vger.kernel.org
-Cc:     mlevitsk@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        zamsden@gmail.com, mtosatti@redhat.com, dwmw@amazon.co.uk
-References: <20210521102449.21505-1-ilstam@amazon.com>
- <20210521102449.21505-5-ilstam@amazon.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cba90aa4-0665-a2d5-29e0-133e0aa45ad2@redhat.com>
-Date:   Mon, 24 May 2021 16:23:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+Subject: Re: [PATCH v2 1/7] KVM: nVMX: Introduce nested_evmcs_is_used()
+In-Reply-To: <37a6d13d-58ae-65e1-75f9-681a40d819a1@redhat.com>
+References: <20210517135054.1914802-1-vkuznets@redhat.com>
+ <20210517135054.1914802-2-vkuznets@redhat.com>
+ <115fcae7-0c88-4865-6494-bdf6fb672382@redhat.com>
+ <87r1hw8br1.fsf@vitty.brq.redhat.com>
+ <37a6d13d-58ae-65e1-75f9-681a40d819a1@redhat.com>
+Date:   Mon, 24 May 2021 16:37:59 +0200
+Message-ID: <87lf848aew.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210521102449.21505-5-ilstam@amazon.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/05/21 12:24, Ilias Stamatis wrote:
-> @@ -3537,10 +3539,14 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   		 * return L1's TSC value to ensure backwards-compatible
->   		 * behavior for migration.
->   		 */
-> -		u64 tsc_offset = msr_info->host_initiated ? vcpu->arch.l1_tsc_offset :
-> -							    vcpu->arch.tsc_offset;
-> -
-> -		msr_info->data = kvm_scale_tsc(vcpu, rdtsc()) + tsc_offset;
-> +		if (msr_info->host_initiated)
-> +			msr_info->data = kvm_scale_tsc(
-> +				vcpu, rdtsc(), vcpu->arch.l1_tsc_scaling_ratio
-> +				) + vcpu->arch.l1_tsc_offset;
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Better indentation:
+> On 24/05/21 16:09, Vitaly Kuznetsov wrote:
+>> You mean we'll be using:
+>> 
+>> "hv_evmcs_ptr == 0" meaning "no evmcs" (like now)
+>> "hv_evmcs_ptr == -1" meaing "evmcs not yet mapped" (and
+>> nested_evmcs_is_used() will check for both '0' and '-1')
+>> "hv_evmcs_ptr == anything else" - eVMCS mapped.
+>
+> I was thinking of:
+>
+> hv_evmcs_ptr == -1 meaning no evmcs
+>
+> hv_evmcs == NULL meaning "evmcs not yet mapped" (I think)
+>
+> hv_evmcs != NULL meaning "evmcs mapped".
+>
+> As usual with my suggestions, I'm not sure if this makes sense :) but if 
+> it does, the code should be nicer.
 
-	msr_info->data = vcpu->arch.l1_tsc_offset +
-		kvm_scale_tsc(vcpu, rdtsc(),
-			      vcpu->arch.tsc_scaling_ratio);
+Ok, let me try this!
 
-Same below.
-
-Paolo
-
-> +		else
-> +			msr_info->data = kvm_scale_tsc(
-> +				vcpu, rdtsc(), vcpu->arch.tsc_scaling_ratio
-> +				) + vcpu->arch.tsc_offset;
->   		break;
->   	}
->   	case MSR_MTRRcap:
-> 
+-- 
+Vitaly
 
