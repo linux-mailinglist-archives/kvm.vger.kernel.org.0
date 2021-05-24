@@ -2,399 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6263838F0CE
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 18:07:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F20D838F0D2
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 18:07:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233646AbhEXQGY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 12:06:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53098 "EHLO
+        id S236146AbhEXQG3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 12:06:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237220AbhEXQFO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 May 2021 12:05:14 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 671E0C026BE3
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 08:18:39 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id mj3-20020a17090b3683b029015d71f2ddc5so12481792pjb.3
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 08:18:39 -0700 (PDT)
+        with ESMTP id S237887AbhEXQFn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 May 2021 12:05:43 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2605C045A7E
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 08:32:42 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id n6-20020a17090ac686b029015d2f7aeea8so11450799pjt.1
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 08:32:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=UegFRYct3sLqT7pl1JEE19wyOxnWvgvclbZj0R5joEw=;
-        b=ApeANbFrUsOLWs657ASas6zyPJp3sMEzvjJ6diCCbgEJfKHg7jPnVB+X8KJ2K9wObp
-         Oym8WfmPp6FmRvXl4xxMWYVtbSqL9squwfQ6HIhTGK0jnMNLfMrM8u6nt5pw9xf8yqdJ
-         G5828StXxoL9CUmGGe7bZAS1YApU/djbLwlT2Eyc0UGxAtiF8ImhtB6lllo2NLlSBE2V
-         JhMajTpHchhM45gpFd/nKdBAcqThdLRRkXQYbL8RZYtJx53wS90JQ/i/lZEfusGswPXm
-         eVcNdKONN4zvjnR2fHra8MctvrdqUw85ivuIzEXFFbaXF85c8rkRgfxeC760gQzTbXEd
-         tPFQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=wTLQS1Z8FEOlhUo8e2ilHpdsLeUEYIz1e8HwtA36wZk=;
+        b=ELl8gQHks3M1m3jDMgds2oCt9ZzM+QGOqQzNafipEtpgJV3IDTx/dWwW9bOtykOWN4
+         bL0nlV4qIv6mSlWJR9QsfqLylH+wsJlRat9n64rzY2U7khdoAGjD12/9U4Ztk60Pb45s
+         otzNVn6x4WCeK5aFLxqnX/SzETjkZGwszG5xL/lAedFiowI/hN8Pdu2St4HUdCqnxzfJ
+         bM5jToCtqUxksi9U/+qqOkahEGvv6Nvqgk22C3iBCgOv/1wgxpg2MGoy+4BlbFvssZs8
+         2xDtSt/OT3Cg7mY5JcnUi/Lq6bl5mZT0r11pilfsKin4MNThXHZH9UkreA9RzuTeAzmJ
+         iSXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=UegFRYct3sLqT7pl1JEE19wyOxnWvgvclbZj0R5joEw=;
-        b=kx/Z1WnerrYcfeXrxDn/PXKr3YSeSfOtlCH7sM35V/vqmS6iTw/R0AVMW+A73ZpuZW
-         NDg/mowj7Ev7aT35QDAx8VF31iempEui/trx46pafucTCvnV5dUbkXarXLgvT3/9mzvN
-         pGHbLOk2tmQHQdmxwQnfnZgSMxV/5/iZjGL0RZOFbDYqKrHduZ3LnVDWYiUjGtw6+Tpt
-         VUs1eLhtwlkCAM1e4oBVD9vnkWe+A6zFLHbVY493gcYF/rSC1KDkYxvmD/xkN/yLZ35q
-         2UiVZSMIKEnUIjwEledxoBQ7/iBcecqYBRo2ePq7aZFftdjLl+woJ1kOkGGAa3owH5Th
-         6tZg==
-X-Gm-Message-State: AOAM532G0MuaA6sCd65w5Wmr2hui4zQ5QJ2FkHA5EM/rvqnzzK+MbxuO
-        SialBpAr77bug0jO+/Mk/8NqzjLjpWQL5fZiuWKNVxfvX/fD5DA5DyMAjSEvSxHo8EELTuWAUHI
-        ilF8CvahmSpLmgWiXLe897PtfdW07ZgESnZ/0dT+rDt+rpjXoc8bypYf0hsmxPPsoqHYnPAE=
-X-Google-Smtp-Source: ABdhPJyU4RXPh5DqjZvaKB+BvjwGCDsf7NbHS3MikVnZnMV5T1gQ7C3fkbsfHjLDDoBtFaAUFlYadVoAgve8b/ej+w==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a17:90a:ab0c:: with SMTP id
- m12mr25307556pjq.179.1621869518420; Mon, 24 May 2021 08:18:38 -0700 (PDT)
-Date:   Mon, 24 May 2021 15:18:28 +0000
-In-Reply-To: <20210524151828.4113777-1-jingzhangos@google.com>
-Message-Id: <20210524151828.4113777-5-jingzhangos@google.com>
-Mime-Version: 1.0
-References: <20210524151828.4113777-1-jingzhangos@google.com>
-X-Mailer: git-send-email 2.31.1.818.g46aad6cb9e-goog
-Subject: [PATCH v6 4/4] KVM: selftests: Add selftest for KVM statistics data
- binary interface
-From:   Jing Zhang <jingzhangos@google.com>
-To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        LinuxS390 <linux-s390@vger.kernel.org>,
-        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=wTLQS1Z8FEOlhUo8e2ilHpdsLeUEYIz1e8HwtA36wZk=;
+        b=B2Q6bEFY9xoc2of2/y48nKQuVTGdlN11LnGbpGksOmADQUIMAqu4Q1uqmMC5p/L/WZ
+         2dNnap8zmyf+6eWHDmn4GfM/bU+htdrxCPOzNEzYfV4g/KQzNE2EweptwFle/dbdyyXP
+         bLG1Ts7cN4ZDRouiKRSh2Os8vWd7cRCBYo7NUEPXWhEUXzn50oIGgsYU8ydMr8GmcOIm
+         9vsTGKvILxN+sX8oJYlUvlRsM1BsrfroTtrAymeXNP8b2FG+I5dKcMSi1/botXaaIkY2
+         QvxTc3BYxrGHOlrkSKtoNlpXbcabVWroppD2PnpRvPmyzl5/xfv0yfltGuQFgXgwK4je
+         Lz0g==
+X-Gm-Message-State: AOAM530LKaMlYSN9KJAfuYbzbLM13jZ6h/S9FmGHaMEo6ZNzUizo0YtC
+        zJgCWFy42wl8bEL+eNxlhQyqPg==
+X-Google-Smtp-Source: ABdhPJzv8M36y7M+fAk2A5ZVct66fqarKzloUPfE3zH7nFYkpU2HKrbENkvu7RK07vtFMywuEM7+jg==
+X-Received: by 2002:a17:902:b7c3:b029:ef:8d29:a7d1 with SMTP id v3-20020a170902b7c3b02900ef8d29a7d1mr25994712plz.55.1621870362015;
+        Mon, 24 May 2021 08:32:42 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id t22sm11118530pfl.50.2021.05.24.08.32.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 May 2021 08:32:41 -0700 (PDT)
+Date:   Mon, 24 May 2021 15:32:37 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH] KVM: X86: Fix warning caused by stale emulation context
+Message-ID: <YKvHFbPfGnaQ4huw@google.com>
+References: <1621830954-31963-1-git-send-email-wanpengli@tencent.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1621830954-31963-1-git-send-email-wanpengli@tencent.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add selftest to check KVM stats descriptors validity.
+On Sun, May 23, 2021, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+> 
+> Reported by syzkaller:
+> 
+>   WARNING: CPU: 7 PID: 10526 at /home/kernel/ssd/linux/arch/x86/kvm//x86.c:7621 x86_emulate_instruction+0x41b/0x510 [kvm]
+>   RIP: 0010:x86_emulate_instruction+0x41b/0x510 [kvm]
+>   Call Trace:
+>    kvm_mmu_page_fault+0x126/0x8f0 [kvm]
+>    vmx_handle_exit+0x11e/0x680 [kvm_intel]
+>    vcpu_enter_guest+0xd95/0x1b40 [kvm]
+>    kvm_arch_vcpu_ioctl_run+0x377/0x6a0 [kvm]
+>    kvm_vcpu_ioctl+0x389/0x630 [kvm]
+>    __x64_sys_ioctl+0x8e/0xd0
+>    do_syscall_64+0x3c/0xb0
+>    entry_SYSCALL_64_after_hwframe+0x44/0xae
+> 
+> Commit 4a1e10d5b5d8c (KVM: x86: handle hardware breakpoints during emulation())
+> adds hardware breakpoints check before emulation the instruction and parts of 
+> emulation context initialization, actually we don't have EMULTYPE_NO_DECODE flag 
+> here and the emulation context will not be reused. Commit c8848cee74ff (KVM: x86: 
+> set ctxt->have_exception in x86_decode_insn()) triggers the warning because it 
+> catches the stale emulation context has #UD, however, it is not during instruction 
+> decoding which should result in EMULATION_FAILED. This patch fixes it by moving 
+> the second part emulation context initialization before hardware breakpoints check.
+> 
+> syzkaller source: https://syzkaller.appspot.com/x/repro.c?x=134683fdd00000
+> 
+> Reported-by: syzbot+71271244f206d17f6441@syzkaller.appspotmail.com
+> Fixes: 4a1e10d5b5d8 (KVM: x86: handle hardware breakpoints during emulation)
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  arch/x86/kvm/x86.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index bbc4e04..eca69f9 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7552,6 +7552,13 @@ int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
+>  
+>  	init_emulate_ctxt(vcpu);
+>  
+> +	ctxt->interruptibility = 0;
+> +	ctxt->have_exception = false;
+> +	ctxt->exception.vector = -1;
+> +	ctxt->perm_ok = false;
 
-Reviewed-by: David Matlack <dmatlack@google.com>
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   3 +
- .../testing/selftests/kvm/include/kvm_util.h  |   3 +
- .../selftests/kvm/kvm_bin_form_stats.c        | 216 ++++++++++++++++++
- tools/testing/selftests/kvm/lib/kvm_util.c    |  12 +
- 5 files changed, 235 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/kvm_bin_form_stats.c
+What about moving this block all the way into init_emulate_ctxt()?
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index bd83158e0e0b..35796667c944 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -43,3 +43,4 @@
- /memslot_modification_stress_test
- /set_memory_region_test
- /steal_time
-+/kvm_bin_form_stats
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index e439d027939d..2984c86c848a 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -76,6 +76,7 @@ TEST_GEN_PROGS_x86_64 += kvm_page_table_test
- TEST_GEN_PROGS_x86_64 += memslot_modification_stress_test
- TEST_GEN_PROGS_x86_64 += set_memory_region_test
- TEST_GEN_PROGS_x86_64 += steal_time
-+TEST_GEN_PROGS_x86_64 += kvm_bin_form_stats
- 
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list-sve
-@@ -87,6 +88,7 @@ TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
- TEST_GEN_PROGS_aarch64 += kvm_page_table_test
- TEST_GEN_PROGS_aarch64 += set_memory_region_test
- TEST_GEN_PROGS_aarch64 += steal_time
-+TEST_GEN_PROGS_aarch64 += kvm_bin_form_stats
- 
- TEST_GEN_PROGS_s390x = s390x/memop
- TEST_GEN_PROGS_s390x += s390x/resets
-@@ -96,6 +98,7 @@ TEST_GEN_PROGS_s390x += dirty_log_test
- TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
- TEST_GEN_PROGS_s390x += kvm_page_table_test
- TEST_GEN_PROGS_s390x += set_memory_region_test
-+TEST_GEN_PROGS_s390x += kvm_bin_form_stats
- 
- TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
- LIBKVM += $(LIBKVM_$(UNAME_M))
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index a8f022794ce3..ee01a67022d9 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -387,4 +387,7 @@ uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc);
- #define GUEST_ASSERT_4(_condition, arg1, arg2, arg3, arg4) \
- 	__GUEST_ASSERT((_condition), 4, (arg1), (arg2), (arg3), (arg4))
- 
-+int vm_get_statsfd(struct kvm_vm *vm);
-+int vcpu_get_statsfd(struct kvm_vm *vm, uint32_t vcpuid);
-+
- #endif /* SELFTEST_KVM_UTIL_H */
-diff --git a/tools/testing/selftests/kvm/kvm_bin_form_stats.c b/tools/testing/selftests/kvm/kvm_bin_form_stats.c
-new file mode 100644
-index 000000000000..09e12c5838af
---- /dev/null
-+++ b/tools/testing/selftests/kvm/kvm_bin_form_stats.c
-@@ -0,0 +1,216 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * kvm_bin_form_stats
-+ *
-+ * Copyright (C) 2021, Google LLC.
-+ *
-+ * Test the fd-based interface for KVM statistics.
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <errno.h>
-+
-+#include "test_util.h"
-+
-+#include "kvm_util.h"
-+#include "asm/kvm.h"
-+#include "linux/kvm.h"
-+
-+int stats_test(int stats_fd, int size_stat)
-+{
-+	ssize_t ret;
-+	int i;
-+	size_t size_desc, size_data = 0;
-+	struct kvm_stats_header header;
-+	struct kvm_stats_desc *stats_desc, *pdesc;
-+	void *stats_data;
-+
-+	/* Read kvm stats header */
-+	ret = read(stats_fd, &header, sizeof(header));
-+	TEST_ASSERT(ret == sizeof(header), "Read stats header");
-+	size_desc = sizeof(*stats_desc) + header.name_size;
-+
-+	/* Check id string in header, that should start with "kvm" */
-+	TEST_ASSERT(!strncmp(header.id, "kvm", 3) &&
-+			strlen(header.id) < KVM_STATS_ID_MAXLEN,
-+			"Invalid KVM stats type");
-+
-+	/* Sanity check for other fields in header */
-+	if (header.count == 0)
-+		return 0;
-+	/* Check overlap */
-+	TEST_ASSERT(header.desc_offset > 0 && header.data_offset > 0
-+			&& header.desc_offset >= sizeof(header)
-+			&& header.data_offset >= sizeof(header),
-+			"Invalid offset fields in header");
-+	TEST_ASSERT(header.desc_offset > header.data_offset
-+			|| (header.desc_offset + size_desc * header.count <=
-+				header.data_offset),
-+			"Descriptor block is overlapped with data block");
-+
-+	/* Allocate memory for stats descriptors */
-+	stats_desc = calloc(header.count, size_desc);
-+	TEST_ASSERT(stats_desc, "Allocate memory for stats descriptors");
-+	/* Read kvm stats descriptors */
-+	ret = pread(stats_fd, stats_desc,
-+			size_desc * header.count, header.desc_offset);
-+	TEST_ASSERT(ret == size_desc * header.count,
-+			"Read KVM stats descriptors");
-+
-+	/* Sanity check for fields in descriptors */
-+	for (i = 0; i < header.count; ++i) {
-+		pdesc = (void *)stats_desc + i * size_desc;
-+		/* Check type,unit,base boundaries */
-+		TEST_ASSERT((pdesc->flags & KVM_STATS_TYPE_MASK)
-+				<= KVM_STATS_TYPE_MAX, "Unknown KVM stats type");
-+		TEST_ASSERT((pdesc->flags & KVM_STATS_UNIT_MASK)
-+				<= KVM_STATS_UNIT_MAX, "Unknown KVM stats unit");
-+		TEST_ASSERT((pdesc->flags & KVM_STATS_BASE_MASK)
-+				<= KVM_STATS_BASE_MAX, "Unknown KVM stats base");
-+		/* Check exponent for stats unit
-+		 * Exponent for counter should be greater than or equal to 0
-+		 * Exponent for unit bytes should be greater than or equal to 0
-+		 * Exponent for unit seconds should be less than or equal to 0
-+		 * Exponent for unit clock cycles should be greater than or
-+		 * equal to 0
-+		 */
-+		switch (pdesc->flags & KVM_STATS_UNIT_MASK) {
-+		case KVM_STATS_UNIT_NONE:
-+		case KVM_STATS_UNIT_BYTES:
-+		case KVM_STATS_UNIT_CYCLES:
-+			TEST_ASSERT(pdesc->exponent >= 0,
-+					"Unsupported KVM stats unit");
-+			break;
-+		case KVM_STATS_UNIT_SECONDS:
-+			TEST_ASSERT(pdesc->exponent <= 0,
-+					"Unsupported KVM stats unit");
-+			break;
-+		}
-+		/* Check name string */
-+		TEST_ASSERT(strlen(pdesc->name) < header.name_size,
-+				"KVM stats name(%s) too long", pdesc->name);
-+		/* Check size field, which should not be zero */
-+		TEST_ASSERT(pdesc->size, "KVM descriptor(%s) with size of 0",
-+				pdesc->name);
-+		size_data += pdesc->size * size_stat;
-+	}
-+	/* Check overlap */
-+	TEST_ASSERT(header.data_offset >= header.desc_offset
-+			|| header.data_offset + size_data <= header.desc_offset,
-+			"Data block is overlapped with Descriptor block");
-+	/* Check validity of all stats data size */
-+	TEST_ASSERT(size_data >= header.count * size_stat,
-+			"Data size is not correct");
-+
-+	/* Allocate memory for stats data */
-+	stats_data = malloc(size_data);
-+	TEST_ASSERT(stats_data, "Allocate memory for stats data");
-+	/* Read kvm stats data as a bulk */
-+	ret = pread(stats_fd, stats_data, size_data, header.data_offset);
-+	TEST_ASSERT(ret == size_data, "Read KVM stats data");
-+	/* Read kvm stats data one by one */
-+	size_data = 0;
-+	for (i = 0; i < header.count; ++i) {
-+		pdesc = (void *)stats_desc + i * size_desc;
-+		ret = pread(stats_fd, stats_data, pdesc->size * size_stat,
-+				header.data_offset + size_data);
-+		TEST_ASSERT(ret == pdesc->size * size_stat,
-+				"Read data of KVM stats: %s", pdesc->name);
-+		size_data += pdesc->size * size_stat;
-+	}
-+
-+	free(stats_data);
-+	free(stats_desc);
-+	return 0;
-+}
-+
-+
-+int vm_stats_test(struct kvm_vm *vm)
-+{
-+	int stats_fd;
-+	struct kvm_vm_stats_data *stats_data;
-+
-+	/* Get fd for VM stats */
-+	stats_fd = vm_get_statsfd(vm);
-+	TEST_ASSERT(stats_fd >= 0, "Get VM stats fd");
-+
-+	stats_test(stats_fd, sizeof(stats_data->value[0]));
-+	close(stats_fd);
-+
-+	return 0;
-+}
-+
-+int vcpu_stats_test(struct kvm_vm *vm, int vcpu_id)
-+{
-+	int stats_fd;
-+	struct kvm_vcpu_stats_data *stats_data;
-+
-+	/* Get fd for VCPU stats */
-+	stats_fd = vcpu_get_statsfd(vm, vcpu_id);
-+	TEST_ASSERT(stats_fd >= 0, "Get VCPU stats fd");
-+
-+	stats_test(stats_fd, sizeof(stats_data->value[0]));
-+	close(stats_fd);
-+
-+	return 0;
-+}
-+
-+#define DEFAULT_NUM_VM		4
-+#define DEFAULT_NUM_VCPU	4
-+
-+/*
-+ * Usage: kvm_bin_form_stats [#vm] [#vcpu]
-+ * The first parameter #vm set the number of VMs being created.
-+ * The second parameter #vcpu set the number of VCPUs being created.
-+ * By default, DEFAULT_NUM_VM VM and DEFAULT_NUM_VCPU VCPU for the VM would be
-+ * created for testing.
-+ */
-+
-+int main(int argc, char *argv[])
-+{
-+	int max_vm = DEFAULT_NUM_VM, max_vcpu = DEFAULT_NUM_VCPU, ret, i, j;
-+	struct kvm_vm **vms;
-+
-+	/* Get the number of VMs and VCPUs that would be created for testing. */
-+	if (argc > 1) {
-+		max_vm = strtol(argv[1], NULL, 0);
-+		if (max_vm <= 0)
-+			max_vm = DEFAULT_NUM_VM;
-+	}
-+	if (argc > 2) {
-+		max_vcpu = strtol(argv[2], NULL, 0);
-+		if (max_vcpu <= 0)
-+			max_vcpu = DEFAULT_NUM_VCPU;
-+	}
-+
-+	/* Check the extension for binary stats */
-+	ret = kvm_check_cap(KVM_CAP_STATS_BINARY_FD);
-+	TEST_ASSERT(ret >= 0,
-+			"Binary form statistics interface is not supported");
-+
-+	/* Create VMs and VCPUs */
-+	vms = malloc(sizeof(vms[0]) * max_vm);
-+	TEST_ASSERT(vms, "Allocate memory for storing VM pointers");
-+	for (i = 0; i < max_vm; ++i) {
-+		vms[i] = vm_create(VM_MODE_DEFAULT,
-+				DEFAULT_GUEST_PHY_PAGES, O_RDWR);
-+		for (j = 0; j < max_vcpu; ++j)
-+			vm_vcpu_add(vms[i], j);
-+	}
-+
-+	/* Check stats read for every VM and VCPU */
-+	for (i = 0; i < max_vm; ++i) {
-+		vm_stats_test(vms[i]);
-+		for (j = 0; j < max_vcpu; ++j)
-+			vcpu_stats_test(vms[i], j);
-+	}
-+
-+	for (i = 0; i < max_vm; ++i)
-+		kvm_vm_free(vms[i]);
-+	free(vms);
-+	return 0;
-+}
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index fc83f6c5902d..d9e0b2c8b906 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -2090,3 +2090,15 @@ unsigned int vm_calc_num_guest_pages(enum vm_guest_mode mode, size_t size)
- 	n = DIV_ROUND_UP(size, vm_guest_mode_params[mode].page_size);
- 	return vm_adjust_num_guest_pages(mode, n);
- }
-+
-+int vm_get_statsfd(struct kvm_vm *vm)
-+{
-+	return ioctl(vm->fd, KVM_STATS_GETFD, NULL);
-+}
-+
-+int vcpu_get_statsfd(struct kvm_vm *vm, uint32_t vcpuid)
-+{
-+	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
-+
-+	return ioctl(vcpu->fd, KVM_STATS_GETFD, NULL);
-+}
--- 
-2.31.1.818.g46aad6cb9e-goog
+> +	ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
 
+This can be left where it is since ctxt->ud is consumed only by x86_decode_insn().
+I don't have a strong preference as it really only matters for the backport.  For
+upstream, we can kill it off in a follow-up patch by passing emulation_type to
+x86_decode_insn() and dropping ctxt->ud altogether.  Tracking that info in ctxt
+for literally one call is silly.
+
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 8a0ccdb56076..b62944046d7d 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -5322,7 +5322,8 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len)
+
+        ctxt->execute = opcode.u.execute;
+
+-       if (unlikely(ctxt->ud) && likely(!(ctxt->d & EmulateOnUD)))
++       if (unlikely(emulation_type & EMULTYPE_TRAP_UD) &&
++           likely(!(ctxt->d & EmulateOnUD)))
+                return EMULATION_FAILED;
+
+        if (unlikely(ctxt->d &
+diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+index f016838faedd..2ad32600a8e3 100644
+--- a/arch/x86/kvm/kvm_emulate.h
++++ b/arch/x86/kvm/kvm_emulate.h
+@@ -314,7 +314,6 @@ struct x86_emulate_ctxt {
+        int interruptibility;
+
+        bool perm_ok; /* do not check permissions if true */
+-       bool ud;        /* inject an #UD if host doesn't support insn */
+        bool tf;        /* TF value before instruction (after for syscall/sysret) */
+
+        bool have_exception;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a224601d89e2..48b49c24c086 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7552,8 +7552,6 @@ int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
+
+        init_emulate_ctxt(vcpu);
+
+-       ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
+-
+        /*
+         * We will reenter on the same instruction since we do not set
+         * complete_userspace_io. This does not handle watchpoints yet,
+@@ -7563,7 +7561,7 @@ int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
+            kvm_vcpu_check_breakpoint(vcpu, &r))
+                return r;
+
+-       r = x86_decode_insn(ctxt, insn, insn_len);
++       r = x86_decode_insn(ctxt, insn, insn_len, emulation_type);
+
+        trace_kvm_emulate_insn_start(vcpu);
+        ++vcpu->stat.insn_emulation;
+
+> +
+>  	/*
+>  	 * We will reenter on the same instruction since we do not set
+>  	 * complete_userspace_io. This does not handle watchpoints yet,
+> @@ -7561,13 +7568,6 @@ int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
+>  	    kvm_vcpu_check_breakpoint(vcpu, &r))
+>  		return r;
+>  
+> -	ctxt->interruptibility = 0;
+> -	ctxt->have_exception = false;
+> -	ctxt->exception.vector = -1;
+> -	ctxt->perm_ok = false;
+> -
+> -	ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
+> -
+>  	r = x86_decode_insn(ctxt, insn, insn_len);
+>  
+>  	trace_kvm_emulate_insn_start(vcpu);
+> -- 
+> 2.7.4
+> 
