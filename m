@@ -2,132 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 802B338E060
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 06:36:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3545838E086
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 06:57:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229824AbhEXEiP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 00:38:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40326 "EHLO
+        id S232125AbhEXE7R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 00:59:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229530AbhEXEiP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 May 2021 00:38:15 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7184C061574;
-        Sun, 23 May 2021 21:36:47 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id v13so13978728ple.9;
-        Sun, 23 May 2021 21:36:47 -0700 (PDT)
+        with ESMTP id S229633AbhEXE7Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 May 2021 00:59:16 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E3CEC061574
+        for <kvm@vger.kernel.org>; Sun, 23 May 2021 21:57:48 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id q67so2803056pfb.4
+        for <kvm@vger.kernel.org>; Sun, 23 May 2021 21:57:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=CFKj4h8D3vKVsrArxInuoUkH3K47MAPJEo/4ElSezfw=;
-        b=suelYebOlkPxLUkUTCooa0nu2Vbc9auUsC0ZpGyRD7QqJCvRFdyVW/w4mVNVNPt5nh
-         INTH9AivNniMLt/7OeOVaz39skE253KoNrvaNG76w0EYBVCjpkU4b3boQdlKbiyIjjyc
-         4smb0q25DNDaEEnnkVCIa0YpeqNJdWaDsCAtj7LzS4OcffH5eeCvRddqgld/RcTUCUX0
-         nBbnO2919hAuvhh+fA295dm8AlTInxsN61FjykuQ04Oi92fGD6gQJMWXYvdZ/tKD+YRn
-         jpf18KTH6azSK+z3L52gIricwlxHYAqFIBTDWUByKkBs82Fqf4UCeg3Ftw4YR/sw2OnU
-         AwYA==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5elIPDTXRjLLPudcp8o02c7J6ZLjvAHG6TdyshBpqHM=;
+        b=GWDeEevlJHCXyEL1BH5HMf5da6qvir0//wvvQybCoUH2K+Q2NqDqUCJp7MH7jOQI5g
+         QKF/OOjUn+h+YmGjjHES0dGefuvap12Tr8lrjCxE8s9e2bId60fT490TEHBs1vtN0a+r
+         ix9YhH1hTViU72dRKmc8cZl6nidX1fM/fhPBfsHWblsJywSPXlJUzOrdRS6tMMbvAVKK
+         O2yLR1XwJth/8XHsuLJ+Rz2NUGlU1Q5IXK3Ttw3+cve/Uxqf7CqhvPJkSpNwfnn+KSbA
+         c20a31xQuZGDFCMpLBACa4GOfpEz6kHEUw2PWJeJ/kmKJSPTXWADzF2OOQHpc+G0p1s1
+         UOfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=CFKj4h8D3vKVsrArxInuoUkH3K47MAPJEo/4ElSezfw=;
-        b=Pk7vPBusOas1OOvrP9+LPx8HL2l+9l25fxDFUGsP615rNdfyZL4Rm5PopwVIiP2VAG
-         zN9tG2eT9zALg1aWSJxjqY1GyJ3RVE/FkVxxWptcxsWNHbyGvxq6B1HQQFycpm6n4lLg
-         mA8JYVdxdqjuMr6voZfXZQKiK9ZRZ+5xOIK7clLdjGT4VOTtqKYYHwY8QaNyfc75kKg5
-         oPGlGUIuk7ToW/+OrOyTgnFuULgrsWgMM9tG8z0oih6E3TzlaQtV/TV5MwrAxnf+dPoP
-         MHwOr4XhRh76BfmLy5nq82WZnsAiQ4EHElapXlctMKVwkixoftfSzaotCnqZ59YHPcsr
-         eKOw==
-X-Gm-Message-State: AOAM531XsG9Ivd/Q1ZhE6+IeWsl5LviN/SRn+10iWuHSskrBcQ63fh78
-        FAZYb1BypcynX2IoA7MS/hGosBTf9FA=
-X-Google-Smtp-Source: ABdhPJx78sbuuA0VTuQzKqWGNB/d5u4f4KcVr41uLsV7Gks8DRu+CWNOCDsLH9QN+BAsYtAqwTDJHA==
-X-Received: by 2002:a17:90a:9517:: with SMTP id t23mr22396886pjo.130.1621831007083;
-        Sun, 23 May 2021 21:36:47 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.56])
-        by smtp.googlemail.com with ESMTPSA id cc2sm8884703pjb.39.2021.05.23.21.36.43
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 23 May 2021 21:36:46 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5elIPDTXRjLLPudcp8o02c7J6ZLjvAHG6TdyshBpqHM=;
+        b=e0RVPrinaQPStcgG6p0wCOEz2zJOiqylSmMLm4zZ09lAIfRnfxihmmPxsAVsJaFAuA
+         poUqRYMIYnXu/x3KAzivwqt34DpcsWy5D5dBCSYC4prP2qkwgU3vt4o4dTpiz+CVc7Tu
+         XdUKUtPO8oPZZt1ReiJn63jSwzZYjBR3kwP9cNndHK+WV/HBLbwqHjkSUS583P6MEVpC
+         oMpZ0N5oOFkyRJoKiqvGjSlIOcW6hfBsGSYaE9N3C+AVIFmjA4KPZfHl5ydRJl8ssYU+
+         y9O1j9+KTvOemZwLQ/strMbyd3M5b3bJCq8zq/IIaTSWUOawGx0F1p3Xaqv9ke+SKnCI
+         1KhA==
+X-Gm-Message-State: AOAM531xbSwQSS0t4MLnSYTTy/SuyG9gq8hYjsgcoADJDin2LbytwuVG
+        f/BdNVPRyiC7Wm0Eha+hcq8vOfdldBvcMYRHGmvKSQ==
+X-Google-Smtp-Source: ABdhPJz2s/6JAGw+NL3QrTHg+jeS1T5q4PDbtAvgk6IlTF0h9XB36MnFhjRoAg+6LOvjbpKDPjYCubpOO5MD1FRK2x0=
+X-Received: by 2002:a63:1e4f:: with SMTP id p15mr11633324pgm.40.1621832267459;
+ Sun, 23 May 2021 21:57:47 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210424004645.3950558-1-seanjc@google.com> <20210424004645.3950558-7-seanjc@google.com>
+ <CAAeT=FzS0bP_7_wz6G6cL8-7pudTD7fhavLCVsOE0KnPXf99dQ@mail.gmail.com>
+ <YKQiTlDG1sZ4Zd2E@google.com> <CAAeT=FzsXFNiteMB3sjskM401Ty4Ry_w80YcYB4ZYcZn0dqv5Q@mail.gmail.com>
+ <YKVH4mzdAa+H9ROJ@google.com>
+In-Reply-To: <YKVH4mzdAa+H9ROJ@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Sun, 23 May 2021 21:57:31 -0700
+Message-ID: <CAAeT=Fz0Mn26riv3rG_x0ZXdrWLvqz=zv2g1064Os_jUdOhUaA@mail.gmail.com>
+Subject: Re: [PATCH 06/43] KVM: x86: Properly reset MMU context at vCPU RESET/INIT
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH] KVM: X86: Fix warning caused by stale emulation context
-Date:   Sun, 23 May 2021 21:35:54 -0700
-Message-Id: <1621830954-31963-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Wed, May 19, 2021 at 10:16 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Tue, May 18, 2021, Reiji Watanabe wrote:
+> > > > > +       if (kvm_cr0_mmu_role_changed(old_cr0, kvm_read_cr0(vcpu)) ||
+> > > > > +           kvm_cr4_mmu_role_changed(old_cr4, kvm_read_cr4(vcpu)))
+> > > > > +               kvm_mmu_reset_context(vcpu);
+> > > > >  }
+> > > >
+> > > > I'm wondering if kvm_vcpu_reset() should call kvm_mmu_reset_context()
+> > > > for a change in EFER.NX as well.
+> > >
+> > > Oooh.  So there _should_ be no need.   Paging has to be enabled for EFER.NX to
+> > > be relevant, and INIT toggles CR0.PG 1=>0 if paging was enabled and so is
+> > > guaranteed to trigger a context reset.  And we do want to skip the context reset,
+> > > e.g. INIT-SIPI-SIPI when the vCPU has paging disabled should continue using the
+> > > same MMU.
+> > >
+> > > But, kvm_calc_mmu_role_common() neglects to ignore NX if CR0.PG=0, and so the
+> > > MMU role will be stale if INIT clears EFER.NX without forcing a context reset.
+> > > However, that's benign from a functionality perspective because the context
+> > > itself correctly incorporates CR0.PG, it's only the role that's borked.  I.e.
+> > > KVM will fail to reuse a page/context due to the spurious role.nxe, but the
+> > > permission checks are always be correct.
+> > >
+> > > I'll add a comment here and send a patch to fix the role calculation.
+> >
+> > Thank you so much for the explanation !
+> > I understand your intention and why it would be benign.
+> >
+> > Then, I'm wondering if kvm_cr4_mmu_role_changed() needs to be
+> > called here.  Looking at the Intel SDM, in my understanding,
+> > all the bits kvm_cr4_mmu_role_changed() checks are relevant
+> > only if paging is enabled.  (Or is my understanding incorrect ??)
+>
+> Duh, yes.  And it goes even beyond that, CR0.WP is only relevant if CR0.PG=1,
+> i.e. INIT with CR0.PG=0 and CR0.WP=1 will incorrectly trigger a MMU reset with
+> the current logic.
+>
+> Sadly, simply omitting the CR4 check puts us in an awkward situation where, due
+> to the MMU role CR4 calculations not accounting for CR0.PG=0, KVM will run with
+> a stale role.
+>
+> The other consideration is that kvm_post_set_cr4() and kvm_post_set_cr0() should
+> also skip kvm_mmu_reset_context() if CR0.PG=0, but again that requires fixing
+> the role calculations first (or at the same time).
+>
+> I think I'll throw in those cleanups to the beginning of this series.  The result
+> is going to be disgustingly long, but I really don't want to introduce code that
+> knowingly leaves KVM in an inconsistent state, nor do I want to add useless
+> checks on CR4 and EFER.
 
-Reported by syzkaller:
+Yes, I would think having the cleanups would be better.
 
-  WARNING: CPU: 7 PID: 10526 at /home/kernel/ssd/linux/arch/x86/kvm//x86.c:7621 x86_emulate_instruction+0x41b/0x510 [kvm]
-  RIP: 0010:x86_emulate_instruction+0x41b/0x510 [kvm]
-  Call Trace:
-   kvm_mmu_page_fault+0x126/0x8f0 [kvm]
-   vmx_handle_exit+0x11e/0x680 [kvm_intel]
-   vcpu_enter_guest+0xd95/0x1b40 [kvm]
-   kvm_arch_vcpu_ioctl_run+0x377/0x6a0 [kvm]
-   kvm_vcpu_ioctl+0x389/0x630 [kvm]
-   __x64_sys_ioctl+0x8e/0xd0
-   do_syscall_64+0x3c/0xb0
-   entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-Commit 4a1e10d5b5d8c (KVM: x86: handle hardware breakpoints during emulation())
-adds hardware breakpoints check before emulation the instruction and parts of 
-emulation context initialization, actually we don't have EMULTYPE_NO_DECODE flag 
-here and the emulation context will not be reused. Commit c8848cee74ff (KVM: x86: 
-set ctxt->have_exception in x86_decode_insn()) triggers the warning because it 
-catches the stale emulation context has #UD, however, it is not during instruction 
-decoding which should result in EMULATION_FAILED. This patch fixes it by moving 
-the second part emulation context initialization before hardware breakpoints check.
-
-syzkaller source: https://syzkaller.appspot.com/x/repro.c?x=134683fdd00000
-
-Reported-by: syzbot+71271244f206d17f6441@syzkaller.appspotmail.com
-Fixes: 4a1e10d5b5d8 (KVM: x86: handle hardware breakpoints during emulation)
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/x86.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index bbc4e04..eca69f9 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7552,6 +7552,13 @@ int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
- 
- 	init_emulate_ctxt(vcpu);
- 
-+	ctxt->interruptibility = 0;
-+	ctxt->have_exception = false;
-+	ctxt->exception.vector = -1;
-+	ctxt->perm_ok = false;
-+
-+	ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
-+
- 	/*
- 	 * We will reenter on the same instruction since we do not set
- 	 * complete_userspace_io. This does not handle watchpoints yet,
-@@ -7561,13 +7568,6 @@ int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
- 	    kvm_vcpu_check_breakpoint(vcpu, &r))
- 		return r;
- 
--	ctxt->interruptibility = 0;
--	ctxt->have_exception = false;
--	ctxt->exception.vector = -1;
--	ctxt->perm_ok = false;
--
--	ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
--
- 	r = x86_decode_insn(ctxt, insn, insn_len);
- 
- 	trace_kvm_emulate_insn_start(vcpu);
--- 
-2.7.4
-
+Thank you !
+Reiji
