@@ -2,151 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 680B638F101
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 18:08:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD7FD38F152
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 18:16:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237561AbhEXQIR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 12:08:17 -0400
-Received: from mail-co1nam11on2069.outbound.protection.outlook.com ([40.107.220.69]:59041
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S236856AbhEXQHb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 May 2021 12:07:31 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WnWEXa8w1gKC/5y6noR3t/Roi18rSKdMlGhElv4dvMyY7s94kB85DcaCrVUl33mZlbpquBMNahb0VrkOwsLaKg8hsSOk2zTtm63EQm2WgE9rioq5tOnqLdNtFiCC+0YRV16fm2qneOCdbtbJ8SMYHVkye6e/l5OU8IWO5qw0Rb2z8F4mwVETWaYIKWtwI1aiIlf3a0JqlQiu29fmpFbv+wRjeuRnML3FOVy2r5/CtQH+YbxZkszXvSeyutU01SI+xcCyz1hYuzXkXTUoXSpAEQh7EUIuGl8boa7nrIbPFewUakxx/sIybJnn0mZarLWSuPPLhIKjoZBVuTcgXJ/zWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lrLvtsGpIdSjLnLR50tqnfco293sxDutj2yl/sQtRyE=;
- b=Ar78Jz2WNG8RkAZaJ3EqUwUVZ3/JXgcy6A8Vtk+54WIfpXHhjncgN4v3Px7xabYRuF1n4q2y8+VzOmdi9Oo+iOfcSosq6wH8kU/3kPZoAsj/wSK5n3GCS7quvi2bL9d2hrRA4UHe86Zp72zW+vLFmiBuYcQx+dTVPJ6KVbF6JnjUWpsAaI0n+2bU2muv+imq9SstcEf8bLVBxAbIa+UxgOoDwm/pq2Nkmd+EVFLEZZfVDFNZwetuQ7IU40GFUiUm/yv4/08j9wxl63EGS6Sp6SMSCrcz6MDSIEwI5MPomg0iR77fFT5jMxIQdFaw2I17bfTuJsQEETvqW6G4UgaCUg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lrLvtsGpIdSjLnLR50tqnfco293sxDutj2yl/sQtRyE=;
- b=Tp9SPRe6ky9rsJfZCbQavZEMYoI3tMEYwkultwGwD17JdLWdkAxy+sP2fE8SIS3FknniZgIpotkyUV3avkXWy1ricNY05vDpQNmtXiLtX11mOW2k2xMshZTdLUcOXgy2haKC6AYlDz8QaLVAD6UF5s9ljmVhveVYtW2ieg7sY00=
-Authentication-Results: kernel.org; dkim=none (message not signed)
- header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM5PR1201MB0217.namprd12.prod.outlook.com (2603:10b6:4:54::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4150.26; Mon, 24 May 2021 16:06:01 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::b914:4704:ad6f:aba9]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::b914:4704:ad6f:aba9%12]) with mapi id 15.20.4150.027; Mon, 24 May
- 2021 16:06:01 +0000
-Subject: Re: [PATCH] KVM: SVM: Assume a 64-bit hypercall for guests with
- protected state
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, x86@kernel.org
-References: <d0904f0d049300267665bd4abf96c3d7e7aa4825.1621701837.git.thomas.lendacky@amd.com>
- <87pmxg73h7.fsf@vitty.brq.redhat.com>
- <a947ee05-4205-fb3d-a1e6-f5df7275014e@amd.com>
- <87tums8cn0.fsf@vitty.brq.redhat.com>
- <211d5285-e209-b9ef-3099-8da646051661@amd.com>
- <c6864982-b30a-29b5-9a10-3cfdd331057e@redhat.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <b25ed6ca-ea45-ee98-4dfa-d24ee9bf524b@amd.com>
-Date:   Mon, 24 May 2021 11:05:58 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
-In-Reply-To: <c6864982-b30a-29b5-9a10-3cfdd331057e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [67.79.209.213]
-X-ClientProxiedBy: SA9PR13CA0138.namprd13.prod.outlook.com
- (2603:10b6:806:27::23) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+        id S233467AbhEXQRa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 12:17:30 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12078 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232918AbhEXQR2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 12:17:28 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14OG4dm0020170;
+        Mon, 24 May 2021 12:15:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=DrvjMI3EBxdgZsRm5hUVcKMed5KOSzIm0p0poRBgU7I=;
+ b=awlCksOA8wO/oE75Y4b+FA/58Eo419/0EhuYhrubBrec0sL2kvdy6vp0k9s9GwMBkMa6
+ w5brFjErIdu+bzdLGokSpAOZG9So96atuBCaYZR9nH5x9SezjsMNh+Itb3Qh0iiHn/pR
+ rzJ7sALtFJGRj2Pt37+kHI2YKlMghnxV7SLGHe2SLDMcTyBbuvnrFVAVq23GfDSWyR9K
+ LjELVNO8wxVbFpO0Bkqpm4vSgLXovsIlyRO/Vrm4C3ucHDaVDciwk2vMeS1BDQbxzKe8
+ M8BJjlArwCUD8CU/F5z56lE733e/SrDomc4eeoEkiigeu5sKpvwLCDyVndwwHNyfNfDv pA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38repqhkte-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 May 2021 12:15:58 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14OG7plf038733;
+        Mon, 24 May 2021 12:15:58 -0400
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38repqhks5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 May 2021 12:15:57 -0400
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14OGBKip016476;
+        Mon, 24 May 2021 16:15:54 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06fra.de.ibm.com with ESMTP id 38ps7h8fyv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 May 2021 16:15:53 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14OGFoiV20316452
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 24 May 2021 16:15:50 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 75CB14203F;
+        Mon, 24 May 2021 16:15:50 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A722A42042;
+        Mon, 24 May 2021 16:15:49 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.37.230])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Mon, 24 May 2021 16:15:49 +0000 (GMT)
+Date:   Mon, 24 May 2021 18:15:48 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com, freude@linux.ibm.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com
+Subject: Re: [PATCH v16 06/14] s390/vfio-ap: refresh guest's APCB by
+ filtering APQNs assigned to mdev
+Message-ID: <20210524181548.4dbe52bc.pasic@linux.ibm.com>
+In-Reply-To: <20210510164423.346858-7-akrowiak@linux.ibm.com>
+References: <20210510164423.346858-1-akrowiak@linux.ibm.com>
+        <20210510164423.346858-7-akrowiak@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from office-linux.texastahm.com (67.79.209.213) by SA9PR13CA0138.namprd13.prod.outlook.com (2603:10b6:806:27::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.12 via Frontend Transport; Mon, 24 May 2021 16:06:00 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f4879400-955b-47ef-8966-08d91ecdd322
-X-MS-TrafficTypeDiagnostic: DM5PR1201MB0217:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR1201MB02174C51B1CC3190D419BE49EC269@DM5PR1201MB0217.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +lnTTVX2rAJfEiDpWVM3fMY2qmImmL9tMW/BCabbzIb5zf5bICc+yDeUaeATBokZ570ikOf/yz+rcmRPgThxn4LpTSkeZH4wNSKd6yWhePCZLVszb3m0PSD8wvdfFU6MZOoKu82Ls6EOYeBYZ9WgVepIi9I6nXSopLHSdtTs9p5ZJDYgEa+cI4UdMxOPrZ+YKtOu+oY1LQXd9o5p/idLpJRrLECKdsFir1rRawB1ykSwMHvhy/lpr7MZp7t0/JmUBrFcwc4PCqjFDiUs1fH96A78d/86KVW/Hyh6t8aj72litM3avjyrYkE4N0E4chhDvClXLcBJ9WBG/mdnXmUK0Xn7jI2HVl9Tl0RMbPRnQjVfKzW8EYPntR+95QwkBHmNfhqmDwLX9r1i8NaXP5Tw1GJ6upiSBKAGLA6zfpjkifix5cvq4WBuqgRPVF9N2thS3C0GMSmIUcEdSayUbew1aNYEl7Sy3/8rrIYR3QF523iFh2R1ss/2N8LzmV76fJ/Wg5UiAFEh3037WTjZ2e8BBDWoRDJk9PhgFJzKuElKk5lZ2tnlC6sfrGAtul1MHoDiNYKlsmZzc+kyk0M3KOUY/H7Je6Hj+CsM8XmF3taBk9THUHVjCauhGre+uQPRMjd75XNXc/kvqS7kfUSxoDQDE0MYCbAYuDjTs8vjlg0R+/6Hw65a2Y/DCIw0KTcrpEGo
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(376002)(136003)(39860400002)(346002)(396003)(316002)(31696002)(6486002)(110136005)(54906003)(26005)(8936002)(4744005)(7416002)(5660300002)(4326008)(36756003)(6506007)(53546011)(8676002)(38100700002)(66476007)(956004)(6512007)(478600001)(86362001)(2906002)(66946007)(186003)(2616005)(66556008)(31686004)(16526019)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?ZUZxV3RyZkpIQ3JSTVEwTDdjcHAzL3NMc1lOTTdWUWVrazZ5K2JlTVQ2SGMy?=
- =?utf-8?B?NEZNSFlZdVZKbXZ3cERKTEREc0VIVVdEckwxM1h4TG9WUExRNkJnTzN1OWVI?=
- =?utf-8?B?R0pSdFZIbG5MUlNRWW1DWE5iM1I1d3BYQ0l1bjVSK2VYZDNmM0ZOZjJMYmg0?=
- =?utf-8?B?c0JwSmJrSDRtWGI1OHFQSW5pYmlOU20wcEFveW53Nk9IdjRnZktOOHJNWmRB?=
- =?utf-8?B?czU0bFZ1MGtUa1pKNkFqYU90cFhFRDA2M1NJV2RMeEJTMFZ0MFdRNWpseWkx?=
- =?utf-8?B?bHFQNzVJYm5CTmxWNGR2UkpuaHhEQUtZT3Y4d3FkUXBVTm5JRXZmdGhCdWYz?=
- =?utf-8?B?dEFMZERaaDhDRFlBTGZFMzh4WjBaNmJsNElJdDFLTTRmVXBaamRPN01nQ3Jt?=
- =?utf-8?B?bHY5bzRXeEcxeUZQcWtXYm1ZbFlvZTNMMTdGRG9GT2NGOGZPUkswMmhQWmtJ?=
- =?utf-8?B?em1oTnFYS0pLVkxUcXFrTzdjVzc5TWI1L29XTnBSdkd4aFc0QU41SUlrOU9v?=
- =?utf-8?B?ZGNuSENBbS8vTnlXTU1OM1lySmtQRmNZVWN3WkF3bHhWbWZkd3U0WUxPZ1JD?=
- =?utf-8?B?ZVdSaW1ETVpray9lZGRYUnpKb3kxczJhZTg3ejRsR29RWllCUFJPdi92emJu?=
- =?utf-8?B?TmFGYU12M2NTQ2JyVXhJN0ZhZEVZTjJUemQ4bmRtNkd6YkZyM1R6NjRPNmRU?=
- =?utf-8?B?dXprcVdESnNyQWk4TmdtYlRwOWR5TVc4VUd1eHFDa2VpY0lNbGhHNFJac3JW?=
- =?utf-8?B?N0VZZDhWSm1JMXJ0QVVoenVVaTBWQ2RhR291Z2ROTE1kSlZVekkzOG5QN0hE?=
- =?utf-8?B?VDVua1l5WnZIRUtaYTc4RXdQUmphUE1LbTFFd1pXaW11cSt1MW5IS1pML0N5?=
- =?utf-8?B?a1FyN3VqdCtFaVFJczd1VUc2RStzNDVscXFkUFJLcDFvZUhzamRCeTdML1pD?=
- =?utf-8?B?R2lYcEZkeWNWT3ZqbFp3ZnFTUlh1Ym1DZndRb0EvVFF0bndSY0RTOFpPd0dS?=
- =?utf-8?B?OXd5V0lrcGpDUDRxMGZ2RzkxVkxaYjdZcEpPUnRhR0cxc1VjdmJ1MzNENmhB?=
- =?utf-8?B?OEN1M1ZzMVl5eHNtOWxLekM0TXFjQ2pmU2FVSTFQQ25KcWcyYzBZQ1lYRmVD?=
- =?utf-8?B?SWluWXMyLzBxN3RwYjM3Vi9yMk5KR0FlZUc2aTBkaDdMMkJ6dHVjQ2ZwUDE5?=
- =?utf-8?B?c2l5SDUwSFpiNkxoaS8zRFBsVjliUlFldmE0cjAyNGt1OGNTSkM2VXVYWU4w?=
- =?utf-8?B?MU4wdTdjWnVEbjY1eFV4U0p5Z3B6Y2gxTURDNXA0MXhnRW50aVJrWmJHT3Bi?=
- =?utf-8?B?N2o1azVNUDUrNmQ0c0hPS0ljVy9wdXJSdjdmRDdaM3UwclRHMk9ZbG5ZZWlo?=
- =?utf-8?B?eCtXQVphc2RwOFR0K3pTYk10WUgwUFJFK1FyMUZ5cVgxb2U3YjJLc2pSUkpP?=
- =?utf-8?B?c08xMXJtQlZ2TktHc0h0MFJMa08vbWxnS0tIQlExa1V3QTcyVWFwUGNVSFhv?=
- =?utf-8?B?eHZBb1ZuTW9iM0FYcEhZWW5YQ0tLcWoyQStwOSs3RjloMTlqejV3NlRYaWd2?=
- =?utf-8?B?UkViY2k2Y1RxTmFoMHJFZWM1QUtIUG9iZ1Y1MncvL0FPT2xEbU01a01kUVR1?=
- =?utf-8?B?ZlhwK21qNGo4eUdZTFVvejUzOFFKSmFReFNMMk1YVUgxVnVvd1lINlRhdjU0?=
- =?utf-8?B?Y1pPSGprSVNKbDRyNXFMVlhZOHpFVGR5VkNVUGRNeXJzWlNVMk5HLyttc1B3?=
- =?utf-8?Q?W2QMfXhsPKTcn5IEf5aViXgRYD3Ekh6UYEM20XL?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f4879400-955b-47ef-8966-08d91ecdd322
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 May 2021 16:06:01.0690
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jfTnqIox2xFzHqlO/ng/Z5OxuyYp/Q7QG/RTyx8RjxJGVI8JbP/QU9PLxKOkD3+Uh3r9TeK19oTKZYrto5ZR5A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1201MB0217
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: RIR_5a4GtCOQa80qHPekiPEvbcLNYu2E
+X-Proofpoint-GUID: 7VqVILMie_E9GoIdmJ3Ae-jvQlXJalKg
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-24_08:2021-05-24,2021-05-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 malwarescore=0
+ mlxlogscore=999 spamscore=0 mlxscore=0 bulkscore=0 priorityscore=1501
+ impostorscore=0 clxscore=1015 lowpriorityscore=0 phishscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
+ definitions=main-2105240096
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/24/21 9:20 AM, Paolo Bonzini wrote:
-> On 24/05/21 15:58, Tom Lendacky wrote:
->>> Would it hurt if we just move 'vcpu->arch.guest_state_protected' check
->>> to is_64_bit_mode() itself? It seems to be too easy to miss this
->>> peculiar detail about SEV in review if new is_64_bit_mode() users are to
->>> be added.
->> I thought about that, but wondered if is_64_bit_mode() was to be used in
->> other places in the future, if it would be a concern. I think it would be
->> safe since anyone adding it to a new section of code is likely to look at
->> what that function is doing first.
->>
->> I'm ok with this. Paolo, I know you already queued this, but would you
->> prefer moving the check into is_64_bit_mode()?
-> 
-> Let's introduce a new wrapper is_64_bit_hypercall, and add a
-> WARN_ON_ONCE(vcpu->arch.guest_state_protected) to is_64_bit_mode.
+On Mon, 10 May 2021 12:44:15 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-Will do.
+> @@ -1601,8 +1676,10 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
+>  	mutex_lock(&matrix_dev->lock);
+>  	q = dev_get_drvdata(&apdev->device);
+>  
+> -	if (q->matrix_mdev)
+> +	if (q->matrix_mdev) {
+>  		vfio_ap_mdev_unlink_queue_fr_mdev(q);
+> +		vfio_ap_mdev_refresh_apcb(q->matrix_mdev);
+> +	}
+>  
+>  	vfio_ap_mdev_reset_queue(q, 1);
+>  	dev_set_drvdata(&apdev->device, NULL);
 
-Thanks,
-Tom
+At this point we don't know if !!kvm_busy or kvm_busy AFAICT. If
+!!kvm_busy, then we may end up changing a shadow_apcb while an other
+thread is in the middle of committing it to the SD satellite. That
+would be no good.
 
-> 
-> Paolo
-> 
+Regards,
+Halil
