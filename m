@@ -2,86 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B293F38F3D6
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 21:48:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D096038F3DA
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 21:49:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233186AbhEXTti (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 15:49:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52783 "EHLO
+        id S233191AbhEXTvQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 15:51:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33961 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232693AbhEXTtg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 15:49:36 -0400
+        by vger.kernel.org with ESMTP id S232107AbhEXTvP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 15:51:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621885687;
+        s=mimecast20190719; t=1621885786;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zfxZbd43HV5BQck0fhkJc4tszzGku44t8kIMaje1IsQ=;
-        b=PQozXDmQePLaD9Xd+81L1Kgd8pJbz4Unz77711lu817uq0Jxwe+uGYNcCYYnlYC5BDtWN0
-        v4QJ75XyCvAxV2RUl4zNbiBEpB8gpHEoOHd/AWTQBsKwveypntGhZc6TlxIEwB53kOq1m9
-        MactYfqwPie1gnvCvn8Wzfh0YN3mz1E=
+        bh=/ks2ewGQDMjkPlSXbPudMhSXdnsqWMPCcsnAWLRBS1E=;
+        b=CkTVlvIKtt0IH91Iz0vblkfjLI8KJHGOr0BmkHryUoeuOd8eti9OkhYowpjXcPZEUMZ17W
+        n7/mCZpA4qB05+40RpS3Pw4sxKZwwQx63egBWkUoTTC6hM5qKjAweMRNtA3XGlqb0gkF/S
+        +Nv/lU8fT/6mgKOxAzfjQgEV76T1iqw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-570-pD1I8wdkO_2yhId0Ep0XBA-1; Mon, 24 May 2021 15:48:03 -0400
-X-MC-Unique: pD1I8wdkO_2yhId0Ep0XBA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-473-oba3XaYtNWq1VGhUF2Fz9w-1; Mon, 24 May 2021 15:49:44 -0400
+X-MC-Unique: oba3XaYtNWq1VGhUF2Fz9w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D015180FD65;
-        Mon, 24 May 2021 19:48:02 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2CACD107ACC7;
+        Mon, 24 May 2021 19:49:43 +0000 (UTC)
 Received: from x1.home.shazbot.org (ovpn-113-225.phx2.redhat.com [10.3.113.225])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3A6641001281;
-        Mon, 24 May 2021 19:48:02 +0000 (UTC)
-Date:   Mon, 24 May 2021 13:48:01 -0600
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 72678E14D;
+        Mon, 24 May 2021 19:49:39 +0000 (UTC)
+Date:   Mon, 24 May 2021 13:49:38 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH][next] vfio/iommu_type1: Use struct_size() for kzalloc()
-Message-ID: <20210524134801.406bc4bf@x1.home.shazbot.org>
-In-Reply-To: <20210513230155.GA217517@embeddedor>
-References: <20210513230155.GA217517@embeddedor>
+To:     Wei Yongjun <weiyongjun1@huawei.com>
+Cc:     Gerd Hoffmann <kraxel@redhat.com>,
+        "Kirti Wankhede" <kwankhede@nvidia.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        <kvm@vger.kernel.org>, <kernel-janitors@vger.kernel.org>,
+        Hulk Robot <hulkci@huawei.com>
+Subject: Re: [PATCH -next v2] samples: vfio-mdev: fix error handing in
+ mdpy_fb_probe()
+Message-ID: <20210524134938.0d736615@x1.home.shazbot.org>
+In-Reply-To: <20210520133641.1421378-1-weiyongjun1@huawei.com>
+References: <20210520133641.1421378-1-weiyongjun1@huawei.com>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 13 May 2021 18:01:55 -0500
-"Gustavo A. R. Silva" <gustavoars@kernel.org> wrote:
+On Thu, 20 May 2021 13:36:41 +0000
+Wei Yongjun <weiyongjun1@huawei.com> wrote:
 
-> Make use of the struct_size() helper instead of an open-coded version,
-> in order to avoid any potential type mistakes or integer overflows
-> that, in the worst scenario, could lead to heap overflows.
+> Fix to return a negative error code from the framebuffer_alloc() error
+> handling case instead of 0, also release regions in some error handing
+> cases.
 > 
-> This code was detected with the help of Coccinelle and, audited and
-> fixed manually.
-> 
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> Fixes: cacade1946a4 ("sample: vfio mdev display - guest driver")
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
 > ---
->  drivers/vfio/vfio_iommu_type1.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> v1 -> v2: add missing regions release.
+> ---
+>  samples/vfio-mdev/mdpy-fb.c | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
 > 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index a0747c35a778..a3e925a41b0d 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -2795,7 +2795,7 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
->  		return 0;
+> diff --git a/samples/vfio-mdev/mdpy-fb.c b/samples/vfio-mdev/mdpy-fb.c
+> index 21dbf63d6e41..9ec93d90e8a5 100644
+> --- a/samples/vfio-mdev/mdpy-fb.c
+> +++ b/samples/vfio-mdev/mdpy-fb.c
+> @@ -117,22 +117,27 @@ static int mdpy_fb_probe(struct pci_dev *pdev,
+>  	if (format != DRM_FORMAT_XRGB8888) {
+>  		pci_err(pdev, "format mismatch (0x%x != 0x%x)\n",
+>  			format, DRM_FORMAT_XRGB8888);
+> -		return -EINVAL;
+> +		ret = -EINVAL;
+> +		goto err_release_regions;
 >  	}
+>  	if (width < 100	 || width > 10000) {
+>  		pci_err(pdev, "width (%d) out of range\n", width);
+> -		return -EINVAL;
+> +		ret = -EINVAL;
+> +		goto err_release_regions;
+>  	}
+>  	if (height < 100 || height > 10000) {
+>  		pci_err(pdev, "height (%d) out of range\n", height);
+> -		return -EINVAL;
+> +		ret = -EINVAL;
+> +		goto err_release_regions;
+>  	}
+>  	pci_info(pdev, "mdpy found: %dx%d framebuffer\n",
+>  		 width, height);
 >  
-> -	size = sizeof(*cap_iovas) + (iovas * sizeof(*cap_iovas->iova_ranges));
-> +	size = struct_size(cap_iovas, iova_ranges, iovas);
+>  	info = framebuffer_alloc(sizeof(struct mdpy_fb_par), &pdev->dev);
+> -	if (!info)
+> +	if (!info) {
+> +		ret = -ENOMEM;
+>  		goto err_release_regions;
+> +	}
+>  	pci_set_drvdata(pdev, info);
+>  	par = info->par;
 >  
->  	cap_iovas = kzalloc(size, GFP_KERNEL);
->  	if (!cap_iovas)
+> 
 
-
-Looks good, applied to vfio for-linus branch for v5.13.  Thanks,
+Thanks for adding the extra error cases.  Applied to vfio for-linus
+branch for v5.13.  Thanks,
 
 Alex
 
