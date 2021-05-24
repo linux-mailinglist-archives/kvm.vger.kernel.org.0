@@ -2,190 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 730F538E658
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 14:11:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A534538E662
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 14:13:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232735AbhEXMM6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 08:12:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34229 "EHLO
+        id S232848AbhEXMOb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 08:14:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27825 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232110AbhEXMM5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 08:12:57 -0400
+        by vger.kernel.org with ESMTP id S232764AbhEXMOb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 08:14:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621858289;
+        s=mimecast20190719; t=1621858382;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=t4Ck7JW/it+WkxekzEcK+Q4d7evwM/U5ne/XMWEIO/o=;
-        b=GNuYCa2jfNONiI67AYNIbCI4ZOSwNk4cJkjjo4onPl5aRcEZlzVR0Q7K9+tGyLfMFsPtyQ
-        5EII6WAaYrN6iiMuePETNBB/TFbxZeFeDSSVeGvitIY3y4N+OuGlL0jQrW5sPyKRdKopJF
-        es7G0UtfJaBQ6UPpWqbyzbJPY+WxL+4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-195-P7ZEpIegMvSKOhmvewhgCw-1; Mon, 24 May 2021 08:11:27 -0400
-X-MC-Unique: P7ZEpIegMvSKOhmvewhgCw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4911E8049CD;
-        Mon, 24 May 2021 12:11:26 +0000 (UTC)
-Received: from starship (unknown [10.40.192.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EC21A6684A;
-        Mon, 24 May 2021 12:11:23 +0000 (UTC)
-Message-ID: <80892ca2e3d7122b5b92f696ecf4c1943b0245b9.camel@redhat.com>
-Subject: Re: [PATCH v2 1/7] KVM: nVMX: Introduce nested_evmcs_is_used()
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Date:   Mon, 24 May 2021 15:11:22 +0300
-In-Reply-To: <20210517135054.1914802-2-vkuznets@redhat.com>
-References: <20210517135054.1914802-1-vkuznets@redhat.com>
-         <20210517135054.1914802-2-vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        bh=2MCm7qit8ZYLShiRct9tpllpW2huWEfdYgkF33c711U=;
+        b=TOkyKJ3M1prwA9FFe8GCtnO3IfoLZCEW/VQFFhFVgwuFIDYNZN2AVFYCQnE0vWFeviIYI0
+        Vew6lugqxUQhKj97i2YvbUkN5BnWhA3qTBhvTZhvcZXasE8Ggpn5/GFNPqUwLiZtfm4V8g
+        WTUG2xen5tkkUCZ1lWhG+rz5irSaH1E=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-360-A-qBCiSyNn6xjOJHT0usHw-1; Mon, 24 May 2021 08:13:01 -0400
+X-MC-Unique: A-qBCiSyNn6xjOJHT0usHw-1
+Received: by mail-ej1-f70.google.com with SMTP id dr20-20020a1709077214b02903db77503922so3844533ejc.6
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 05:13:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2MCm7qit8ZYLShiRct9tpllpW2huWEfdYgkF33c711U=;
+        b=JHhOHD/In4wQFk+3jCGDiTxuEMhcmeFbNV42ZJiM586jfbKAm8Y+Bd1kJWqpXyd7Ks
+         LJ15rwFYFyNYE2AL7+IZZCrFHB7mzptoixDK1gKWgQ4Ki4a40XkyXPGdDO0gC1wF8E2b
+         YDmdB6yHsUqY7JAMtl32lzPcszB1BzCihmNNz/Q3hxnBHEOVfV1zSAkXov0HS3+9vbQT
+         m4M2pgkJGrU8S2toARaOULjy6ZK1KvVwLbEo/kpZ1NeAzEmhF3MS4bZu9rtmM9nPU0Jw
+         ycjXuD7CH7qHiyRJtoYkp3JxcAbJEhUIqAnBmWDKsRgWw9KxwaFqbqRXQj7U/GfMR8R1
+         wnsQ==
+X-Gm-Message-State: AOAM533uQyxDI3H8i8q/dfysi+zT/s/UmaWVFGiu1YHQorhoMVqGHTvu
+        9htrc/bPnuq26phKCOlDnwJvAra4lxhQna7wlhVf4qwyV1hcX18VVoVViAsZCD2qKzKTFhtrQGH
+        xOuemrkUQNxVk
+X-Received: by 2002:a05:6402:1686:: with SMTP id a6mr25319776edv.123.1621858380015;
+        Mon, 24 May 2021 05:13:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwaQRCD3471EAwtjBrPBX9jqu40j0iyRCZazTEGTdNG/r3uQFJNUsgTC++PsfmRbLXHekG9sw==
+X-Received: by 2002:a05:6402:1686:: with SMTP id a6mr25319754edv.123.1621858379827;
+        Mon, 24 May 2021 05:12:59 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id r17sm9137183edt.33.2021.05.24.05.12.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 May 2021 05:12:59 -0700 (PDT)
+Subject: Re: [PATCH v3 2/2] KVM: x86: Not wr-protect huge page with
+ init_all_set dirty log
+To:     Keqian Zhu <zhukeqian1@huawei.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        Ben Gardon <bgardon@google.com>
+Cc:     wanghaibin.wang@huawei.com
+References: <20210429034115.35560-1-zhukeqian1@huawei.com>
+ <20210429034115.35560-3-zhukeqian1@huawei.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <acc35587-1fbe-3101-d3cc-86327ebb5837@redhat.com>
+Date:   Mon, 24 May 2021 14:12:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
+In-Reply-To: <20210429034115.35560-3-zhukeqian1@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2021-05-17 at 15:50 +0200, Vitaly Kuznetsov wrote:
-> Unlike regular set_current_vmptr(), nested_vmx_handle_enlightened_vmptrld()
-> can not be called directly from vmx_set_nested_state() as KVM may not have
-> all the information yet (e.g. HV_X64_MSR_VP_ASSIST_PAGE MSR may not be
-> restored yet). Enlightened VMCS is mapped later while getting nested state
-> pages. In the meantime, vmx->nested.hv_evmcs remains NULL and using it
-> for various checks is incorrect. In particular, if KVM_GET_NESTED_STATE is
-> called right after KVM_SET_NESTED_STATE, KVM_STATE_NESTED_EVMCS flag in the
-> resulting state will be unset (and such state will later fail to load).
+On 29/04/21 05:41, Keqian Zhu wrote:
+> Currently during start dirty logging, if we're with init-all-set,
+> we write protect huge pages and leave normal pages untouched, for
+> that we can enable dirty logging for these pages lazily.
 > 
-> Introduce nested_evmcs_is_used() and use 'is_guest_mode(vcpu) &&
-> vmx->nested.current_vmptr == -1ull' check to detect not-yet-mapped eVMCS
-> after restore.
+> Actually enable dirty logging lazily for huge pages is feasible
+> too, which not only reduces the time of start dirty logging, also
+> greatly reduces side-effect on guest when there is high dirty rate.
 > 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
 > ---
->  arch/x86/kvm/vmx/nested.c | 31 ++++++++++++++++++++++++++-----
->  1 file changed, 26 insertions(+), 5 deletions(-)
+>   arch/x86/kvm/mmu/mmu.c | 29 +++++++++++++++++++++++++----
+>   arch/x86/kvm/x86.c     | 37 ++++++++++---------------------------
+>   2 files changed, 35 insertions(+), 31 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 6058a65a6ede..3080e00c8f90 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -141,6 +141,27 @@ static void init_vmcs_shadow_fields(void)
->  	max_shadow_read_write_fields = j;
->  }
->  
-> +static inline bool nested_evmcs_is_used(struct vcpu_vmx *vmx)
-> +{
-> +	struct kvm_vcpu *vcpu = &vmx->vcpu;
-> +
-> +	if (vmx->nested.hv_evmcs)
-> +		return true;
-> +
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 2ce5bc2ea46d..f52c7ceafb72 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -1188,8 +1188,7 @@ static bool __rmap_clear_dirty(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+>    * @gfn_offset: start of the BITS_PER_LONG pages we care about
+>    * @mask: indicates which pages we should protect
+>    *
+> - * Used when we do not need to care about huge page mappings: e.g. during dirty
+> - * logging we do not have any such mappings.
+> + * Used when we do not need to care about huge page mappings.
+>    */
+>   static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
+>   				     struct kvm_memory_slot *slot,
+> @@ -1246,13 +1245,35 @@ static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+>    * It calls kvm_mmu_write_protect_pt_masked to write protect selected pages to
+>    * enable dirty logging for them.
+>    *
+> - * Used when we do not need to care about huge page mappings: e.g. during dirty
+> - * logging we do not have any such mappings.
+> + * We need to care about huge page mappings: e.g. during dirty logging we may
+> + * have any such mappings.
+>    */
+>   void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+>   				struct kvm_memory_slot *slot,
+>   				gfn_t gfn_offset, unsigned long mask)
+>   {
 > +	/*
-> +	 * After KVM_SET_NESTED_STATE, enlightened VMCS is mapped during
-> +	 * KVM_REQ_GET_NESTED_STATE_PAGES handling and until the request is
-> +	 * processed vmx->nested.hv_evmcs is NULL. It is, however, possible to
-> +	 * detect such state by checking 'nested.current_vmptr == -1ull' when
-> +	 * vCPU is in guest mode, it is only possible with eVMCS.
+> +	 * Huge pages are NOT write protected when we start dirty log with
+> +	 * init-all-set, so we must write protect them at here.
+> +	 *
+> +	 * The gfn_offset is guaranteed to be aligned to 64, but the base_gfn
+> +	 * of memslot has no such restriction, so the range can cross two large
+> +	 * pages.
 > +	 */
-> +	if (unlikely(vmx->nested.enlightened_vmcs_enabled && is_guest_mode(vcpu) &&
-> +		     (vmx->nested.current_vmptr == -1ull)))
-> +		return true;
+> +	if (kvm_dirty_log_manual_protect_and_init_set(kvm)) {
+> +		gfn_t start = slot->base_gfn + gfn_offset + __ffs(mask);
+> +		gfn_t end = slot->base_gfn + gfn_offset + __fls(mask);
 > +
-> +	return false;
-> +}
+> +		kvm_mmu_slot_gfn_write_protect(kvm, slot, start, PG_LEVEL_2M);
+> +
+> +		/* Cross two large pages? */
+> +		if (ALIGN(start << PAGE_SHIFT, PMD_SIZE) !=
+> +		    ALIGN(end << PAGE_SHIFT, PMD_SIZE))
+> +			kvm_mmu_slot_gfn_write_protect(kvm, slot, end,
+> +						       PG_LEVEL_2M);
+> +	}
+> +
+> +	/* Then we can handle the PT level pages */
+>   	if (kvm_x86_ops.cpu_dirty_log_size)
+>   		kvm_mmu_clear_dirty_pt_masked(kvm, slot, gfn_offset, mask);
+>   	else
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index eca63625aee4..dfd676ffa7da 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10888,36 +10888,19 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+>   		 */
+>   		kvm_mmu_zap_collapsible_sptes(kvm, new);
+>   	} else {
+> -		/* By default, write-protect everything to log writes. */
+> -		int level = PG_LEVEL_4K;
+> +		/*
+> +		 * If we're with initial-all-set, we don't need to write protect
+> +		 * any page because they're reported as dirty already.
+> +		 */
+> +		if (kvm_dirty_log_manual_protect_and_init_set(kvm))
+> +			return;
+>   
+>   		if (kvm_x86_ops.cpu_dirty_log_size) {
+> -			/*
+> -			 * Clear all dirty bits, unless pages are treated as
+> -			 * dirty from the get-go.
+> -			 */
+> -			if (!kvm_dirty_log_manual_protect_and_init_set(kvm))
+> -				kvm_mmu_slot_leaf_clear_dirty(kvm, new);
+> -
+> -			/*
+> -			 * Write-protect large pages on write so that dirty
+> -			 * logging happens at 4k granularity.  No need to
+> -			 * write-protect small SPTEs since write accesses are
+> -			 * logged by the CPU via dirty bits.
+> -			 */
+> -			level = PG_LEVEL_2M;
+> -		} else if (kvm_dirty_log_manual_protect_and_init_set(kvm)) {
+> -			/*
+> -			 * If we're with initial-all-set, we don't need
+> -			 * to write protect any small page because
+> -			 * they're reported as dirty already.  However
+> -			 * we still need to write-protect huge pages
+> -			 * so that the page split can happen lazily on
+> -			 * the first write to the huge page.
+> -			 */
+> -			level = PG_LEVEL_2M;
+> +			kvm_mmu_slot_leaf_clear_dirty(kvm, new);
+> +			kvm_mmu_slot_remove_write_access(kvm, new, PG_LEVEL_2M);
+> +		} else {
+> +			kvm_mmu_slot_remove_write_access(kvm, new, PG_LEVEL_4K);
+>   		}
+> -		kvm_mmu_slot_remove_write_access(kvm, new, level);
+>   	}
+>   }
+>   
+> 
 
+Queued (with a few adjustments to the comments and commit messages), thanks.
 
-I think that this is a valid way to solve the issue,
-but it feels like there might be a better way.
-I don't mind though to accept this patch as is.
-
-So here are my 2 cents about this:
-
-First of all after studying how evmcs works I take my words back
-about needing to migrate its contents. 
-
-It is indeed enough to migrate its physical address, 
-or maybe even just a flag that evmcs is loaded
-(and to my surprise we already do this - KVM_STATE_NESTED_EVMCS)
-
-So how about just having a boolean flag that indicates that evmcs is in use, 
-but doesn't imply that we know its address or that it is mapped 
-to host address space, something like 'vmx->nested.enlightened_vmcs_loaded'
-
-On migration that flag saved and restored as the KVM_STATE_NESTED_EVMCS,
-otherwise it set when we load an evmcs and cleared when it is released.
-
-Then as far as I can see we can use this flag in nested_evmcs_is_used
-since all its callers don't touch evmcs, thus don't need it to be
-mapped.
-
-What do you think?
-
-Best regards,
-	Maxim Levitsky
-
-
-
-
-
->  /*
->   * The following 3 functions, nested_vmx_succeed()/failValid()/failInvalid(),
->   * set the success or error code of an emulated VMX instruction (as specified
-> @@ -187,7 +208,7 @@ static int nested_vmx_fail(struct kvm_vcpu *vcpu, u32 vm_instruction_error)
->  	 * failValid writes the error number to the current VMCS, which
->  	 * can't be done if there isn't a current VMCS.
->  	 */
-> -	if (vmx->nested.current_vmptr == -1ull && !vmx->nested.hv_evmcs)
-> +	if (vmx->nested.current_vmptr == -1ull && !nested_evmcs_is_used(vmx))
->  		return nested_vmx_failInvalid(vcpu);
->  
->  	return nested_vmx_failValid(vcpu, vm_instruction_error);
-> @@ -2208,7 +2229,7 @@ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
->  	u32 exec_control;
->  	u64 guest_efer = nested_vmx_calc_efer(vmx, vmcs12);
->  
-> -	if (vmx->nested.dirty_vmcs12 || vmx->nested.hv_evmcs)
-> +	if (vmx->nested.dirty_vmcs12 || nested_evmcs_is_used(vmx))
->  		prepare_vmcs02_early_rare(vmx, vmcs12);
->  
->  	/*
-> @@ -3437,7 +3458,7 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
->  
->  	load_vmcs12_host_state(vcpu, vmcs12);
->  	vmcs12->vm_exit_reason = exit_reason.full;
-> -	if (enable_shadow_vmcs || vmx->nested.hv_evmcs)
-> +	if (enable_shadow_vmcs || nested_evmcs_is_used(vmx))
->  		vmx->nested.need_vmcs12_to_shadow_sync = true;
->  	return NVMX_VMENTRY_VMEXIT;
->  }
-> @@ -4032,7 +4053,7 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
->  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  
-> -	if (vmx->nested.hv_evmcs)
-> +	if (nested_evmcs_is_used(vmx))
->  		sync_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
->  
->  	vmx->nested.need_sync_vmcs02_to_vmcs12_rare = !vmx->nested.hv_evmcs;
-> @@ -6056,7 +6077,7 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
->  		if (vmx_has_valid_vmcs12(vcpu)) {
->  			kvm_state.size += sizeof(user_vmx_nested_state->vmcs12);
->  
-> -			if (vmx->nested.hv_evmcs)
-> +			if (nested_evmcs_is_used(vmx))
->  				kvm_state.flags |= KVM_STATE_NESTED_EVMCS;
->  
->  			if (is_guest_mode(vcpu) &&
-
-
-
-
+Paolo
 
