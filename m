@@ -2,88 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3AB5138F549
-	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 00:00:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F327F38F557
+	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 00:06:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233519AbhEXWB2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 18:01:28 -0400
-Received: from ozlabs.org ([203.11.71.1]:41509 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232911AbhEXWB1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 May 2021 18:01:27 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4FprjQ2Vsjz9sCD;
-        Tue, 25 May 2021 07:59:54 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1621893597;
-        bh=G2Y0e7wWrKIKRqOW15v6KmOSfL/fu6zcYoSI6jq9krU=;
-        h=Date:From:To:Cc:Subject:From;
-        b=TSxZz8AGFlIO40LsAhExMdR0QFMHq1kzALDqc6MAwNejQuk/mi4AcbE8OrOS3yJyY
-         8kDvom6/ZGDg+6Y+9MlbgszXZHjxVSTH8BoSldqDA6oH8Va904LbSjHdAcrTpeH55J
-         3rnudh5Nzc9bz72qeafFGKd7WaQQyMLUjQuFFu+Fdr2XE7zUNGP3UDnrAi2nqKA3H/
-         Yb6/piXpTTzVA7fvyh2D6fyquR51ENdw161F9u409p0xaExYB5mMRo7NT374r9YGs5
-         2AHEeFXcvWVn70Qgq07f6roiZNtUe3uD3ul07yr9iLZlKLdjiJ2yR5FbrHmaO9oyzA
-         sxmlpnhC5U7oA==
-Date:   Tue, 25 May 2021 07:59:53 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: Fixes tag needs some work in the kvm-fixes tree
-Message-ID: <20210525075953.78857fee@canb.auug.org.au>
+        id S233905AbhEXWH7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 18:07:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51434 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233519AbhEXWH7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 May 2021 18:07:59 -0400
+Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CDA1C061574
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 15:06:29 -0700 (PDT)
+Received: by mail-ot1-x335.google.com with SMTP id i14-20020a9d624e0000b029033683c71999so15509625otk.5
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 15:06:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=0x7KBa33YCdVpWQcerdsesPKCRJBcikDlHAi09xfS34=;
+        b=rgfuObfd7/poNAOG7HADeiA06piRoZurmGfRdshD9nR6+/A1XwcwHBvr0fIuXJzTAe
+         Bkh+E0t0AjhEyoqyxwfWpNleTenSMsqifsVjcsL40F+AlKaZrOqXdtv3khemVGnARE0E
+         5EteI+YhBAJxnuMmq5MMPd0RGCc292UG81YeprAZUxQi/XGGMlIsBJF45esOXqY9eUUe
+         Bq3M9XWw+JQkd74ygxUdxx/9g8ybvDDHcVLL9cQzYzynMuU75F3ecNzMBrO3S+/PRDvd
+         jSgjLBfc3/EK3k1ydIoMgeGMp4l6VBb3E7+/HvRS9JMVRL2/lWHBGPW9ax8kPvodyPZM
+         wP2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=0x7KBa33YCdVpWQcerdsesPKCRJBcikDlHAi09xfS34=;
+        b=pPlox92V2tbdTq0dBAmKrMKP1kEQplPU8cpga644FBrpyo/lcXrbvTEOmnfkOuv43x
+         /f1dcqywGxBhIjMG7S6eJAT2ycDH+nvKtBC3rmS6ir/JtsUsKTzuxXkNODbZQjtn6zRS
+         px9w/9S+Op8v8SNerxUldYMJk466+5AAdF2V6WLctHipQGeOTD9LLfdAgZqh8o3nT8Sp
+         fk0VBHl63xpEGC3IaOn6tQMrp57IFSfJyVQUKX8fcq3TgHkfowgUDuE6DGX6bn/sgyNt
+         Fb4qM326hJ2zP9z2m17gdakWNxq0G8bsRagAdmvisGiar7f5kl5iZHH3s81bnuX1OdKO
+         G58A==
+X-Gm-Message-State: AOAM530S/EJ99DGSrcwSYo4QN0aM2CmriACHjr52Pcx8kM5rCNBlSjoa
+        Qr0zUSd9+y4iIkz7D3qC3SrvW5C3wWwQYcyjY3Y6AbPHhkdJyg==
+X-Google-Smtp-Source: ABdhPJxtCHIcf2YnfiuPHuBuBex18cxxq/QNS2VH1iDkBXBEJiRiDhEZCcB7y8XACmI3TQfSKbxiJELVGfEjPcEAOVU=
+X-Received: by 2002:a9d:5786:: with SMTP id q6mr20763785oth.56.1621893988639;
+ Mon, 24 May 2021 15:06:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/_ez4FV699I61gMjAAD0M4p8";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+References: <20210207154256.52850-1-jing2.liu@linux.intel.com> <20210207154256.52850-5-jing2.liu@linux.intel.com>
+In-Reply-To: <20210207154256.52850-5-jing2.liu@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 24 May 2021 15:06:17 -0700
+Message-ID: <CALMp9eT8SoD0X=RZNv+o4LJLZZioTaPPXBnT199AGJKAwJ=W7Q@mail.gmail.com>
+Subject: Re: [PATCH RFC 4/7] kvm: x86: Add new ioctls for XSAVE extension
+To:     Jing Liu <jing2.liu@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, jing2.liu@intel.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/_ez4FV699I61gMjAAD0M4p8
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Sat, Feb 6, 2021 at 11:00 PM Jing Liu <jing2.liu@linux.intel.com> wrote:
+>
+> The static xstate buffer kvm_xsave contains the extended register
+> states, but it is not enough for dynamic features with large state.
+>
+> Introduce a new capability called KVM_CAP_X86_XSAVE_EXTENSION to
+> detect if hardware has XSAVE extension (XFD). Meanwhile, add two
+> new ioctl interfaces to get/set the whole xstate using struct
+> kvm_xsave_extension buffer containing both static and dynamic
+> xfeatures. Reuse fill_xsave and load_xsave for both cases.
+>
+> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+> ---
 
-Hi all,
+> +#define KVM_GET_XSAVE_EXTENSION   _IOW(KVMIO,  0xa4, struct kvm_xsave_extension)
+> +#define KVM_SET_XSAVE_EXTENSION   _IOW(KVMIO,  0xa5, struct kvm_xsave_extension)
+Isn't the convention to call these KVM_GET_XSAVE2 and KVM_SET_XSAVE2?
 
-In commit
-
-  1c017567ae24 ("KVM: X86: hyper-v: Task srcu lock when accessing kvm_memsl=
-ots()")
-
-Fixes tag
-
-  Fixes: e880c6ea5 (KVM: x86: hyper-v: Prevent using not-yet-updated TSC pa=
-ge by secondary CPUs)
-
-has these problem(s):
-
-  - SHA1 should be at least 12 digits long
-
-Probably not worth rebasing to fix, but this can be avoided in the
-future by setting core.abbrev to 12 (or more) or (for git v2.11 or later)
-just making sure it is not set (or set to "auto").
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/_ez4FV699I61gMjAAD0M4p8
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmCsIdkACgkQAVBC80lX
-0GyDPwf+J/LbmSRgwIccwiUESsevPMwKZxBQ+obDqA1YSJhqts+a/j2rcovfLhZD
-Or2aHlu2haj6XJfpmLtHNZJXjBQ6OQBJIr4rFxnoKp/hFaKj75iKcZeiXY1NPFo9
-rg4zAoIUC4omOGW+L8/xwSlesFR9VNjHw+A/cSkySHu4boZ7iKDNnNa569wCWiES
-mPZg1nTZ6sQ3qlT28KxwEAOT7kKMdQNZYX5/DkTEPBpz73pcNParfwQ0Wol3OYnV
-zS4GSy5Q9IpJ+C8CnSiO1u+lC55WTHk1D5pQHMejfSgFwQN28mveTneTFUvP/s3I
-dzS52G5BBsmv1NOu4mVlyzEVeedGKg==
-=z8d8
------END PGP SIGNATURE-----
-
---Sig_/_ez4FV699I61gMjAAD0M4p8--
+Do you have any documentation to add to Documentation/virt/kvm/api.rst?
