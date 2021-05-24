@@ -2,73 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E013138E697
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 14:29:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B388138E699
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 14:29:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232864AbhEXMai (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 08:30:38 -0400
-Received: from foss.arm.com ([217.140.110.172]:41710 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232476AbhEXMah (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 May 2021 08:30:37 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 02C2C113E;
-        Mon, 24 May 2021 05:29:09 -0700 (PDT)
-Received: from C02TD0UTHF1T.local (unknown [10.57.38.161])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D91A03F719;
-        Mon, 24 May 2021 05:29:04 -0700 (PDT)
-Date:   Mon, 24 May 2021 13:29:01 +0100
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Joe Richey <joerichey94@gmail.com>, trivial@kernel.org,
-        Joe Richey <joerichey@google.com>,
+        id S232881AbhEXMbG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 08:31:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45035 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232503AbhEXMbF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 08:31:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621859377;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MF/OZbyChnf7NefLWpOKRbGY5MjAOqZmWg+o3M3i8A8=;
+        b=NyL+kfzGEYY3RZlyh+X3mZlmstSpSnOVZbzRCYyFo5un3Rl9M/ZNdoWVq2CPKIFNa0DDgo
+        avF58E5GpAeJRgmOWXXafdv5RKKUS6IJNrUj4pdPNzZaCsdLHqb/oOjQD8hGOXzV+BCQUq
+        cIXnAa5Zul+us2Nh+uUs68fEW2fWj48=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-142-H_9l4njvMlqLFGIAu_P3NA-1; Mon, 24 May 2021 08:29:35 -0400
+X-MC-Unique: H_9l4njvMlqLFGIAu_P3NA-1
+Received: by mail-ej1-f69.google.com with SMTP id m18-20020a1709062352b02903d2d831f9baso7476312eja.20
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 05:29:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MF/OZbyChnf7NefLWpOKRbGY5MjAOqZmWg+o3M3i8A8=;
+        b=KJMn9vRr2ljQg9gL44JvebWw/jzlvJyENmluOCOafPDywERj/iY0e3ga06UDjX6LPo
+         aomD5uAKtk2z0GEVDUXpuDRPx3ynh72e12Ho07hCdBkKKQQVDWsiH0FB5fB595oCM4ek
+         Ug58SiI+mCcZ0Wa/fxZtT7lqtNn1tL2nAMuFAaBvvKZ7JOU3g4LN/WddAAHDkIhWN+3Z
+         ckDO1AlreHRAwLEp40InqXnRqErUF3a/t8CWXOE7nSQJZJcCPKfTAYn5vx4Fh9gs/+oD
+         W4MmxB2Yr80Dq0U/1qAXg063qn7GxsH5Jk+rwB8N6em7K0uwyHJjhzdYkFtftp8TBswG
+         JdQQ==
+X-Gm-Message-State: AOAM532qIDZmZ+G91Ouhef91aEY+q4FyDeN1qXqY5cNdebr90n6h5YBY
+        BNudYzVqNO5z1lTVqoEQ7kkLRoUklLmTiAj/A6xTSBCXLK8A1HspV65KWNNlPIZKe+hEscKapUW
+        x5/05zEMysMt9
+X-Received: by 2002:a17:906:a0a:: with SMTP id w10mr23066248ejf.416.1621859374594;
+        Mon, 24 May 2021 05:29:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJycsnShuJqQ9FXZ6dWkQDbxNdD9tWWnao+pMnZmWDe96PE9gC/dNyHSgTXXNr/kd9G8JHMUKA==
+X-Received: by 2002:a17:906:a0a:: with SMTP id w10mr23066229ejf.416.1621859374440;
+        Mon, 24 May 2021 05:29:34 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id t23sm9432789edq.74.2021.05.24.05.29.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 May 2021 05:29:33 -0700 (PDT)
+Subject: Re: [PATCH] KVM: SVM: Assume a 64-bit hypercall for guests with
+ protected state
+To:     Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org
+Cc:     Jim Mattson <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Zhangfei Gao <zhangfei.gao@linaro.org>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
-        linux-accelerators@lists.ozlabs.org
-Subject: Re: [PATCH 0/6] Don't use BIT() macro in UAPI headers
-Message-ID: <20210524122901.GH1040@C02TD0UTHF1T.local>
-References: <20210520104343.317119-1-joerichey94@gmail.com>
- <YKuSEnfEbjpOOgLS@infradead.org>
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>
+References: <d0904f0d049300267665bd4abf96c3d7e7aa4825.1621701837.git.thomas.lendacky@amd.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <98671460-e0db-3f04-ce4f-157f133c82a0@redhat.com>
+Date:   Mon, 24 May 2021 14:29:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YKuSEnfEbjpOOgLS@infradead.org>
+In-Reply-To: <d0904f0d049300267665bd4abf96c3d7e7aa4825.1621701837.git.thomas.lendacky@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 24, 2021 at 12:46:26PM +0100, Christoph Hellwig wrote:
-> On Thu, May 20, 2021 at 03:43:37AM -0700, Joe Richey wrote:
-> > This patch series changes all UAPI uses of BIT() to just be open-coded.
-> > However, there really should be a check for this in checkpatch.pl
-> > Currently, the script actually _encourages_ users to use the BIT macro
-> > even if adding things to UAPI.
+On 22/05/21 18:43, Tom Lendacky wrote:
+> When processing a hypercall for a guest with protected state, currently
+> SEV-ES guests, the guest CS segment register can't be checked to
+> determine if the guest is in 64-bit mode. For an SEV-ES guest, it is
+> expected that communication between the guest and the hypervisor is
+> performed to shared memory using the GHCB. In order to use the GHCB, the
+> guest must have been in long mode, otherwise writes by the guest to the
+> GHCB would be encrypted and not be able to be comprehended by the
+> hypervisor. Given that, assume that the guest is in 64-bit mode when
+> processing a hypercall from a guest with protected state.
 > 
-> Yes.  In fact it should warn about BIT() in general.  It is totally
-> pointless obsfucation that doesn't even save any typing at all.
+> Fixes: f1c6366e3043 ("KVM: SVM: Add required changes to support intercepts under SEV-ES")
+> Reported-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> ---
+>   arch/x86/kvm/x86.c | 7 ++++++-
+>   1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 9b6bca616929..e715c69bb882 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8403,7 +8403,12 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>   
+>   	trace_kvm_hypercall(nr, a0, a1, a2, a3);
+>   
+> -	op_64_bit = is_64_bit_mode(vcpu);
+> +	/*
+> +	 * If running with protected guest state, the CS register is not
+> +	 * accessible. The hypercall register values will have had to been
+> +	 * provided in 64-bit mode, so assume the guest is in 64-bit.
+> +	 */
+> +	op_64_bit = is_64_bit_mode(vcpu) || vcpu->arch.guest_state_protected;
+>   	if (!op_64_bit) {
+>   		nr &= 0xFFFFFFFF;
+>   		a0 &= 0xFFFFFFFF;
+> 
 
-That's not quite true; the point is that if you use BIT() consistently,
-then even when you refer to bits 32 to 63 you won't accidentally
-introduce shifts of more than the width of int, and the definition will
-work equally well for assembly and C, which isn't true if you use `1UL`
-in the definition.
+Queued, thanks.
 
-With that in mind it's shorter and clearer than its functional
-equivalent:
+Paolo
 
-  BIT(x)
-  (UL(1) << (x))
-
-So IMO it's preferable to use BIT() generally, or _BITUL() in uapi
-headers.
-
-Thanks,
-Mark.
