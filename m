@@ -2,124 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 850F538F672
-	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 01:45:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BEF5038F68A
+	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 01:55:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229550AbhEXXrH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 19:47:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45622 "EHLO
+        id S229734AbhEXX4r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 19:56:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229539AbhEXXrG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 May 2021 19:47:06 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C31ABC061574
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 16:45:35 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id c12so10554914pfl.3
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 16:45:35 -0700 (PDT)
+        with ESMTP id S229503AbhEXX4p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 May 2021 19:56:45 -0400
+Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D446C061574;
+        Mon, 24 May 2021 16:55:15 -0700 (PDT)
+Received: by mail-oo1-xc32.google.com with SMTP id v13-20020a4ac00d0000b029020b43b918eeso6751745oop.9;
+        Mon, 24 May 2021 16:55:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=LrFCaE4ws9tZKOYM6YBLVMi6hRmeNqHhYOSM/UPEs6s=;
-        b=NoD/UcGKGQuGp0nBEQUmRj4Thal2UtNy+ClGYEC9UXmbadHX8AsIAM0oqgsxbtbbL4
-         d68VLAA48N63vW+QUPE2v0Iq3ON5EH9gf0NrQs92YpdFbXj86Elv36al/bdRncBvCNfX
-         z/gEK17gNUqQfUeD1QD24yoad5wHE4HaPUcwTOHtm34InfOypeLXYnGX4uxXUM1x8Nsk
-         MZOXpUEddQoq0u71yDYdCycmVqkJpP2VUlkzPvzrze0BMCtX2qxK7PmC1QbF8s3HOAXi
-         W/W7tZPBLOX3x8casoiEkm5BRG2fKgmqONjDKlE52+0VCZ0Lff1/fsfeYmaw8eBzeqrC
-         /Kug==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=VRnXCD+92FNz7EDcLk9ph/Nc8eMDGwxajC0s/Qy/6Wo=;
+        b=leZimnSf/OOoTBvgyCGyeSDpGQp6rEt9Rkz5dbOG7WixjZpf2hxOwkzJ1jqk+mHx3Z
+         xLgz8HQ9C6YZ6j+ISKKyqrpkWrDY1LihASZ+XYbV+gePRIhddSKpVwBum+lYuMEJ+4R0
+         1cpO/9ZW7zjc53d3yH7RY5AxeL0W8vTxvhJaKBYoYWjGQyZyyXmsNsi7nUgkmbN0FicR
+         zskl1xhZjFz7ayqVW+zmQhz6yxdR7dz3Y6ZSjDMv2bDwjZtuwXrCOeGJhzkxlrRCU69C
+         K/mbmrQdplYpyc2BifhWLIfQD/gHTznO8oWfa3lLanmoyfgV3Lr79c8QYLhuFppIPgRV
+         u2RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=LrFCaE4ws9tZKOYM6YBLVMi6hRmeNqHhYOSM/UPEs6s=;
-        b=lGuFlh6P7EFtEqvK6mP1yxqbGPoif69rs85pF6DXhqXUabjb2C5k295PTK3k+b3RDz
-         J2kEogucVMi6Uf3LrQTvWdkJ38t3jFsK4zkQT4DQhdyGTS6665EGjvVYjwAkiNylgGiL
-         FQc1+wNqfrzMkHJK7cn2q05RcM/n7EKDv1zWNeLMgfzKNV/EwEH0VDpBZl/DHaTZHxnk
-         1nYukJtLoOTIquH8AGbrl+4hunTEJwAfqJlOz1LzAbrNElKyt17+mhiAsFgSuDnTJPYb
-         W29kZj+Jjm+nDiGDKCjfik821KPuSKvHCKcy1Rmuyrxwos//rTwJdoza8JYqfdB7H+Td
-         XhCA==
-X-Gm-Message-State: AOAM530OwKTFZ3L6MtZ9GgejTxSUW9ofCxoUlI7Syu/lkVGZl6VtpDwr
-        DztZn8swVL42KIm/awlOKzhMsQ==
-X-Google-Smtp-Source: ABdhPJxDJTseKVy3jphs9YqxOPY85UwWFH7WKK/o4nsfEcrRZF/+WD78yfj9wE4+Y5MQZlATZpi1sQ==
-X-Received: by 2002:a65:5a08:: with SMTP id y8mr11598162pgs.199.1621899935076;
-        Mon, 24 May 2021 16:45:35 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id 204sm11646761pfy.56.2021.05.24.16.45.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 May 2021 16:45:34 -0700 (PDT)
-Date:   Mon, 24 May 2021 23:45:30 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 07/12] KVM: nVMX: Disable vmcs02 posted interrupts if
- vmcs12 PID isn't mappable
-Message-ID: <YKw6mpWe3UFY2Gnp@google.com>
-References: <20210520230339.267445-1-jmattson@google.com>
- <20210520230339.267445-8-jmattson@google.com>
- <YKw1FGuq5YzSiael@google.com>
- <CALMp9eQikiZRzX+UtdTW4rHO+jT2uo5xmrtGGs1V96kEZAHh_A@mail.gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=VRnXCD+92FNz7EDcLk9ph/Nc8eMDGwxajC0s/Qy/6Wo=;
+        b=DI7ZOaJWtS4uS9pJfibE+R8lK9JvoyGUq0Rchrmb6RlB3AIqAKX8bsXWCRd7fSNWm7
+         bXa9mKP6R2DLHkFPsZxyYvRreoJkYP7rgHvRloPHOa/aid5o9lodVgU6/iKBwjwHauc1
+         o8VYsgAhPi7S6IQF9983vjLbPfbcqffUdRdjRnedUSmdsVJ/oXrua6ATiLs+xrEqOYJY
+         63hPRo1IJOD1ig8oysKozHsOvc/F1KuWsDaOYLcspz/KGtGuLf9hepdeKRdchSOE6oq6
+         qpSYjwJgYnlZn+fijuKQyEXOgUFrGxVDUJJ9Dg7Nu69kuu9neD4XWdZ0LfhNCqkjY4Lu
+         e6bg==
+X-Gm-Message-State: AOAM532WoEvAGOoBnYPCvD9RwzbWvUgdzqUdENzJfRXCA7viI7NLpD71
+        hhzyEJGfof3u16L3zFFthrQecNIiegE4Ij2QV7E=
+X-Google-Smtp-Source: ABdhPJwzG4XtZSuaatRoAIedCLWwMklX/5iEANj/5kMsuk42vdeuM007l0yGTVz4ydVLT5dN9eeR/LyQfLAWDX+UeaU=
+X-Received: by 2002:a4a:8706:: with SMTP id z6mr20307749ooh.41.1621900514993;
+ Mon, 24 May 2021 16:55:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eQikiZRzX+UtdTW4rHO+jT2uo5xmrtGGs1V96kEZAHh_A@mail.gmail.com>
+References: <20210525093221.1b62a5f4@canb.auug.org.au>
+In-Reply-To: <20210525093221.1b62a5f4@canb.auug.org.au>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 25 May 2021 07:55:03 +0800
+Message-ID: <CANRm+CyrwrC8ccgJo0ymQ1m9KF7XeYCwsLQewt_4w7DYZgm7nw@mail.gmail.com>
+Subject: Re: linux-next: build failure after merge of the kvm-fixes tree
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 24, 2021, Jim Mattson wrote:
-> On Mon, May 24, 2021 at 4:22 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Thu, May 20, 2021, Jim Mattson wrote:
-> > > Don't allow posted interrupts to modify a stale posted interrupt
-> > > descriptor (including the initial value of 0).
-> > >
-> > > Empirical tests on real hardware reveal that a posted interrupt
-> > > descriptor referencing an unbacked address has PCI bus error semantics
-> > > (reads as all 1's; writes are ignored). However, kvm can't distinguish
-> > > unbacked addresses from device-backed (MMIO) addresses, so it should
-> > > really ask userspace for an MMIO completion. That's overly
-> > > complicated, so just punt with KVM_INTERNAL_ERROR.
-> > >
-> > > Don't return the error until the posted interrupt descriptor is
-> > > actually accessed. We don't want to break the existing kvm-unit-tests
-> > > that assume they can launch an L2 VM with a posted interrupt
-> > > descriptor that references MMIO space in L1.
-> > >
-> > > Fixes: 6beb7bd52e48 ("kvm: nVMX: Refactor nested_get_vmcs12_pages()")
-> > > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > > ---
-> > >  arch/x86/kvm/vmx/nested.c | 15 ++++++++++++++-
-> > >  1 file changed, 14 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > > index 706c31821362..defd42201bb4 100644
-> > > --- a/arch/x86/kvm/vmx/nested.c
-> > > +++ b/arch/x86/kvm/vmx/nested.c
-> > > @@ -3175,6 +3175,15 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
-> > >                               offset_in_page(vmcs12->posted_intr_desc_addr));
-> > >                       vmcs_write64(POSTED_INTR_DESC_ADDR,
-> > >                                    pfn_to_hpa(map->pfn) + offset_in_page(vmcs12->posted_intr_desc_addr));
-> > > +             } else {
-> > > +                     /*
-> > > +                      * Defer the KVM_INTERNAL_ERROR exit until
-> > > +                      * someone tries to trigger posted interrupt
-> > > +                      * processing on this vCPU, to avoid breaking
-> > > +                      * existing kvm-unit-tests.
-> >
-> > Run the lines out to 80 chars.  Also, can we change the comment to tie it to
-> > CPU behavior in someway?  A few years down the road, "existing kvm-unit-tests"
-> > may not have any relevant meaning, and it's not like kvm-unit-tests is bug free
-> > either.  E.g. something like
-> >
-> >                         /*
-> >                          * Defer the KVM_INTERNAL_ERROR exit until posted
-> >                          * interrupt processing actually occurs on this vCPU.
-> >                          * Until that happens, the descriptor is not accessed,
-> >                          * and userspace can technically rely on that behavior.
-> >                          */
-> Okay...except for the fact that kvm will rather gratuitously process
-> posted interrupts in situations where hardware won't. That makes it
-> difficult to tie this to hardware behavior.
+On Tue, 25 May 2021 at 07:33, Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+>
+> Hi all,
+>
+> After merging the kvm-fixes tree, today's linux-next build (powerpc
+> ppc64_defconfig) failed like this:
+>
+> ERROR: modpost: ".kvm_vcpu_can_poll" [arch/powerpc/kvm/kvm-hv.ko] undefined!
+>
+> Caused by commit
+>
+>   0fee89fbc44b ("KVM: PPC: exit halt polling on need_resched()")
 
-Hrm, true, but we can at say that KVM won't bail if there's zero chance of posted
-interrupts being processed.  I hope?
+This is my fault.
+
+From b2a6d98b48fc6b22a0b47f57a98dc3203c678195 Mon Sep 17 00:00:00 2001
+From: Wanpeng Li <wanpengli@tencent.com>
+Date: Tue, 25 May 2021 07:50:08 +0800
+Subject: [PATCH] KVM: Fix ERROR: modpost: .kvm_vcpu_can_poll undefined!
+
+From: Wanpeng Li <wanpengli@tencent.com>
+
+Export kvm_vcpu_can_poll to fix ERROR: modpost: .kvm_vcpu_can_poll undefined!
+
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ virt/kvm/kvm_main.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 62522c1..8eaec42 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2949,6 +2949,7 @@ bool kvm_vcpu_can_poll(ktime_t cur, ktime_t stop)
+ {
+     return single_task_running() && !need_resched() && ktime_before(cur, stop);
+ }
++EXPORT_SYMBOL_GPL(kvm_vcpu_can_poll);
+
+ /*
+  * The vCPU has executed a HLT instruction with in-kernel mode enabled.
+--
+2.7.4
