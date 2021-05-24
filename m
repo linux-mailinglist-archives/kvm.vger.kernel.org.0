@@ -2,196 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F20D838F0D2
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 18:07:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C6D438EDBB
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 17:40:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236146AbhEXQG3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 12:06:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53090 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237887AbhEXQFn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 May 2021 12:05:43 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2605C045A7E
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 08:32:42 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id n6-20020a17090ac686b029015d2f7aeea8so11450799pjt.1
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 08:32:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=wTLQS1Z8FEOlhUo8e2ilHpdsLeUEYIz1e8HwtA36wZk=;
-        b=ELl8gQHks3M1m3jDMgds2oCt9ZzM+QGOqQzNafipEtpgJV3IDTx/dWwW9bOtykOWN4
-         bL0nlV4qIv6mSlWJR9QsfqLylH+wsJlRat9n64rzY2U7khdoAGjD12/9U4Ztk60Pb45s
-         otzNVn6x4WCeK5aFLxqnX/SzETjkZGwszG5xL/lAedFiowI/hN8Pdu2St4HUdCqnxzfJ
-         bM5jToCtqUxksi9U/+qqOkahEGvv6Nvqgk22C3iBCgOv/1wgxpg2MGoy+4BlbFvssZs8
-         2xDtSt/OT3Cg7mY5JcnUi/Lq6bl5mZT0r11pilfsKin4MNThXHZH9UkreA9RzuTeAzmJ
-         iSXQ==
+        id S234019AbhEXPlX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 11:41:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20101 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234152AbhEXPjB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 11:39:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621870650;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=uwoIxOxl2r2xIjwfirZmXNL1cV9XOqsSrH6Pev8GZW8=;
+        b=C6IB79VFoHoSkomIcpikbDYAKzZML5yUnxNMgZzO6h6rQRBoAk3giuMc+VrvUawvsGGdBU
+        Ad3RrUgFRzQJzAbFCK++5bfVmVJoeZi11YQmMPTLvXThX8mcO/BFPJCmTVX7O9azq8wOi5
+        UcMstYW1/hb9QUe1tdSDZZV/BVayZFg=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-7-dP37vE1zMouJH_JYv4s5eA-1; Mon, 24 May 2021 11:37:28 -0400
+X-MC-Unique: dP37vE1zMouJH_JYv4s5eA-1
+Received: by mail-ej1-f70.google.com with SMTP id mp38-20020a1709071b26b02903df8ccd76fbso931136ejc.23
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 08:37:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=wTLQS1Z8FEOlhUo8e2ilHpdsLeUEYIz1e8HwtA36wZk=;
-        b=B2Q6bEFY9xoc2of2/y48nKQuVTGdlN11LnGbpGksOmADQUIMAqu4Q1uqmMC5p/L/WZ
-         2dNnap8zmyf+6eWHDmn4GfM/bU+htdrxCPOzNEzYfV4g/KQzNE2EweptwFle/dbdyyXP
-         bLG1Ts7cN4ZDRouiKRSh2Os8vWd7cRCBYo7NUEPXWhEUXzn50oIGgsYU8ydMr8GmcOIm
-         9vsTGKvILxN+sX8oJYlUvlRsM1BsrfroTtrAymeXNP8b2FG+I5dKcMSi1/botXaaIkY2
-         QvxTc3BYxrGHOlrkSKtoNlpXbcabVWroppD2PnpRvPmyzl5/xfv0yfltGuQFgXgwK4je
-         Lz0g==
-X-Gm-Message-State: AOAM530LKaMlYSN9KJAfuYbzbLM13jZ6h/S9FmGHaMEo6ZNzUizo0YtC
-        zJgCWFy42wl8bEL+eNxlhQyqPg==
-X-Google-Smtp-Source: ABdhPJzv8M36y7M+fAk2A5ZVct66fqarKzloUPfE3zH7nFYkpU2HKrbENkvu7RK07vtFMywuEM7+jg==
-X-Received: by 2002:a17:902:b7c3:b029:ef:8d29:a7d1 with SMTP id v3-20020a170902b7c3b02900ef8d29a7d1mr25994712plz.55.1621870362015;
-        Mon, 24 May 2021 08:32:42 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id t22sm11118530pfl.50.2021.05.24.08.32.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 May 2021 08:32:41 -0700 (PDT)
-Date:   Mon, 24 May 2021 15:32:37 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] KVM: X86: Fix warning caused by stale emulation context
-Message-ID: <YKvHFbPfGnaQ4huw@google.com>
-References: <1621830954-31963-1-git-send-email-wanpengli@tencent.com>
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=uwoIxOxl2r2xIjwfirZmXNL1cV9XOqsSrH6Pev8GZW8=;
+        b=tuoihT5WH5L79y10zfw4QJ0x0k9f2hT3mLyq3XWcOaPoxs+/frpLMpBygA5/KDknTH
+         y7yx7Q8VFnx2K7oCj+PJRMwAtukEgbow/XR/5M0ygdDJi5yLklQCf1PlwWbFVsiSkqv0
+         wwcfU4PAQgT0BNSIIp68WKCcjyJ28cBIJlb/d7IAlNBXFvcaBSvU+sZskXxw+xrlZMX9
+         Tvez+Z0IPFoYJs8yunFBd8nRS5a/Y0EuUOfE09BsQnXz78UDdWcn680Z1n34gYV9tlak
+         hp3GxyziGUNBDVxP8mnPuxk5INnMdVATBzI4D9x7wgRr2k+gNZJaouVKinDvqW0Gu/gw
+         grIA==
+X-Gm-Message-State: AOAM530gPyJC1EWzWjPYNXHT4CUEuP3PJ1LnOzlKZ400FUKKMrN8mUPg
+        rbkoLZCOrpzWEJwQXc2M4lutJcGGAvrhYM4usopVlLqmKas0TXeEOiHmUkjmPLnvCAGqxdIQ9xc
+        2SGMhGe0Oz17U
+X-Received: by 2002:a17:906:5608:: with SMTP id f8mr23894090ejq.390.1621870647587;
+        Mon, 24 May 2021 08:37:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwV4HYWCQYEhf+JFOjvNGGj/EBWUVsvsXzhiz2dQtb0oV8ZsNF79LkF8LDkAH//6I7bKCQfAw==
+X-Received: by 2002:a17:906:5608:: with SMTP id f8mr23894062ejq.390.1621870647347;
+        Mon, 24 May 2021 08:37:27 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id b25sm9658855edv.9.2021.05.24.08.37.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 May 2021 08:37:26 -0700 (PDT)
+To:     Ilias Stamatis <ilstam@amazon.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     mlevitsk@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        zamsden@gmail.com, mtosatti@redhat.com, dwmw@amazon.co.uk
+References: <20210521102449.21505-1-ilstam@amazon.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 00/12] KVM: Implement nested TSC scaling
+Message-ID: <92071380-a81f-7db2-6954-6abd4e390905@redhat.com>
+Date:   Mon, 24 May 2021 17:37:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1621830954-31963-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <20210521102449.21505-1-ilstam@amazon.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, May 23, 2021, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
+On 21/05/21 12:24, Ilias Stamatis wrote:
+> KVM currently supports hardware-assisted TSC scaling but only for L1;
+> the feature is not exposed to nested guests. This patch series adds
+> support for nested TSC scaling and allows both L1 and L2 to be scaled
+> with different scaling factors. That is achieved by "merging" the 01 and
+> 02 values together.
 > 
-> Reported by syzkaller:
+> Most of the logic in this series is implemented in common code (by doing
+> the necessary restructurings), however the patches add support for VMX
+> only. Adding support for SVM should be easy at this point and Maxim
+> Levitsky has volunteered to do this (thanks!).
 > 
->   WARNING: CPU: 7 PID: 10526 at /home/kernel/ssd/linux/arch/x86/kvm//x86.c:7621 x86_emulate_instruction+0x41b/0x510 [kvm]
->   RIP: 0010:x86_emulate_instruction+0x41b/0x510 [kvm]
->   Call Trace:
->    kvm_mmu_page_fault+0x126/0x8f0 [kvm]
->    vmx_handle_exit+0x11e/0x680 [kvm_intel]
->    vcpu_enter_guest+0xd95/0x1b40 [kvm]
->    kvm_arch_vcpu_ioctl_run+0x377/0x6a0 [kvm]
->    kvm_vcpu_ioctl+0x389/0x630 [kvm]
->    __x64_sys_ioctl+0x8e/0xd0
->    do_syscall_64+0x3c/0xb0
->    entry_SYSCALL_64_after_hwframe+0x44/0xae
+> Changelog:
+> v3:
+>    - Applied Sean's feedback
+>    - Refactored patches 7 to 10
 > 
-> Commit 4a1e10d5b5d8c (KVM: x86: handle hardware breakpoints during emulation())
-> adds hardware breakpoints check before emulation the instruction and parts of 
-> emulation context initialization, actually we don't have EMULTYPE_NO_DECODE flag 
-> here and the emulation context will not be reused. Commit c8848cee74ff (KVM: x86: 
-> set ctxt->have_exception in x86_decode_insn()) triggers the warning because it 
-> catches the stale emulation context has #UD, however, it is not during instruction 
-> decoding which should result in EMULATION_FAILED. This patch fixes it by moving 
-> the second part emulation context initialization before hardware breakpoints check.
+> v2:
+>    - Applied all of Maxim's feedback
+>    - Added a mul_s64_u64_shr function in math64.h
+>    - Added a separate kvm_scale_tsc_l1 function instead of passing an
+>      argument to kvm_scale_tsc
+>    - Implemented the 02 fields calculations in common code
+>    - Moved all of write_l1_tsc_offset's logic to common code
+>    - Added a check for whether the TSC is stable in patch 10
+>    - Used a random L1 factor and a negative offset in patch 10
 > 
-> syzkaller source: https://syzkaller.appspot.com/x/repro.c?x=134683fdd00000
+> Ilias Stamatis (12):
+>    math64.h: Add mul_s64_u64_shr()
+>    KVM: X86: Store L1's TSC scaling ratio in 'struct kvm_vcpu_arch'
+>    KVM: X86: Rename kvm_compute_tsc_offset() to
+>      kvm_compute_tsc_offset_l1()
+>    KVM: X86: Add a ratio parameter to kvm_scale_tsc()
+>    KVM: VMX: Add a TSC multiplier field in VMCS12
+>    KVM: X86: Add functions for retrieving L2 TSC fields from common code
+>    KVM: X86: Add functions that calculate L2's TSC offset and multiplier
+>    KVM: X86: Move write_l1_tsc_offset() logic to common code and rename
+>      it
+>    KVM: VMX: Remove vmx->current_tsc_ratio and decache_tsc_multiplier()
+>    KVM: VMX: Set the TSC offset and multiplier on nested entry and exit
+>    KVM: VMX: Expose TSC scaling to L2
+>    KVM: selftests: x86: Add vmx_nested_tsc_scaling_test
 > 
-> Reported-by: syzbot+71271244f206d17f6441@syzkaller.appspotmail.com
-> Fixes: 4a1e10d5b5d8 (KVM: x86: handle hardware breakpoints during emulation)
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kvm/x86.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
+>   arch/x86/include/asm/kvm-x86-ops.h            |   4 +-
+>   arch/x86/include/asm/kvm_host.h               |  14 +-
+>   arch/x86/kvm/svm/svm.c                        |  29 ++-
+>   arch/x86/kvm/vmx/nested.c                     |  33 ++-
+>   arch/x86/kvm/vmx/vmcs12.c                     |   1 +
+>   arch/x86/kvm/vmx/vmcs12.h                     |   4 +-
+>   arch/x86/kvm/vmx/vmx.c                        |  49 ++--
+>   arch/x86/kvm/vmx/vmx.h                        |  11 +-
+>   arch/x86/kvm/x86.c                            |  91 +++++--
+>   include/linux/math64.h                        |  19 ++
+>   tools/testing/selftests/kvm/.gitignore        |   1 +
+>   tools/testing/selftests/kvm/Makefile          |   1 +
+>   .../kvm/x86_64/vmx_nested_tsc_scaling_test.c  | 242 ++++++++++++++++++
+>   13 files changed, 417 insertions(+), 82 deletions(-)
+>   create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_nested_tsc_scaling_test.c
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index bbc4e04..eca69f9 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7552,6 +7552,13 @@ int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
->  
->  	init_emulate_ctxt(vcpu);
->  
-> +	ctxt->interruptibility = 0;
-> +	ctxt->have_exception = false;
-> +	ctxt->exception.vector = -1;
-> +	ctxt->perm_ok = false;
-
-What about moving this block all the way into init_emulate_ctxt()?
-
-> +	ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
-
-This can be left where it is since ctxt->ud is consumed only by x86_decode_insn().
-I don't have a strong preference as it really only matters for the backport.  For
-upstream, we can kill it off in a follow-up patch by passing emulation_type to
-x86_decode_insn() and dropping ctxt->ud altogether.  Tracking that info in ctxt
-for literally one call is silly.
-
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 8a0ccdb56076..b62944046d7d 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -5322,7 +5322,8 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len)
-
-        ctxt->execute = opcode.u.execute;
-
--       if (unlikely(ctxt->ud) && likely(!(ctxt->d & EmulateOnUD)))
-+       if (unlikely(emulation_type & EMULTYPE_TRAP_UD) &&
-+           likely(!(ctxt->d & EmulateOnUD)))
-                return EMULATION_FAILED;
-
-        if (unlikely(ctxt->d &
-diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index f016838faedd..2ad32600a8e3 100644
---- a/arch/x86/kvm/kvm_emulate.h
-+++ b/arch/x86/kvm/kvm_emulate.h
-@@ -314,7 +314,6 @@ struct x86_emulate_ctxt {
-        int interruptibility;
-
-        bool perm_ok; /* do not check permissions if true */
--       bool ud;        /* inject an #UD if host doesn't support insn */
-        bool tf;        /* TF value before instruction (after for syscall/sysret) */
-
-        bool have_exception;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a224601d89e2..48b49c24c086 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7552,8 +7552,6 @@ int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
-
-        init_emulate_ctxt(vcpu);
-
--       ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
--
-        /*
-         * We will reenter on the same instruction since we do not set
-         * complete_userspace_io. This does not handle watchpoints yet,
-@@ -7563,7 +7561,7 @@ int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
-            kvm_vcpu_check_breakpoint(vcpu, &r))
-                return r;
-
--       r = x86_decode_insn(ctxt, insn, insn_len);
-+       r = x86_decode_insn(ctxt, insn, insn_len, emulation_type);
-
-        trace_kvm_emulate_insn_start(vcpu);
-        ++vcpu->stat.insn_emulation;
-
-> +
->  	/*
->  	 * We will reenter on the same instruction since we do not set
->  	 * complete_userspace_io. This does not handle watchpoints yet,
-> @@ -7561,13 +7568,6 @@ int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
->  	    kvm_vcpu_check_breakpoint(vcpu, &r))
->  		return r;
->  
-> -	ctxt->interruptibility = 0;
-> -	ctxt->have_exception = false;
-> -	ctxt->exception.vector = -1;
-> -	ctxt->perm_ok = false;
-> -
-> -	ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
-> -
->  	r = x86_decode_insn(ctxt, insn, insn_len);
->  
->  	trace_kvm_emulate_insn_start(vcpu);
-> -- 
-> 2.7.4
+> --
+> 2.17.1
 > 
+
+Queued, thanks.
+
+The new kvm_x86_ops should go in kvm_x86_ops.nested, but those are not 
+yet static_calls so we can leave that for later.
+
+Paolo
+
