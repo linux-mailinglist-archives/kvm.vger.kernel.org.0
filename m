@@ -2,81 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 017D138F50D
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 23:43:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B642E38F52A
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 23:50:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233936AbhEXVog (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 17:44:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46154 "EHLO
+        id S233652AbhEXVwR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 17:52:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233826AbhEXVof (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 May 2021 17:44:35 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A82A3C061574
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 14:43:05 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id c12so10346543pfl.3
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 14:43:05 -0700 (PDT)
+        with ESMTP id S233109AbhEXVwP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 May 2021 17:52:15 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C586C061574
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 14:50:45 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id h20-20020a17090aa894b029015db8f3969eso11343414pjq.3
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 14:50:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=lfftMmJm9tuvTykxsaiC5x+KQRUJrTAxoeeFR+VObs0=;
-        b=T8Egf3tz7QWX7637yfEHPh325jFcbZ2ZmuDaXWDryojJ1B05uyZCWyM9us7h2/ykI1
-         GvTfQbBIB09OaPIZyQ+w8qXp5RzxARbvvaoWZeWjUfWD1jo2kE0U/wP3L3x9InEy1sEZ
-         gpsLjGofRIW5SONfb/rCnPnJtqQE8luO3oIs6VEqt7d99Detxn0mEkcoX5jVZOlj08+y
-         iHpkYHyNlEFb3yhhUclSmGZaV847rTGIKpYEUgkcE1gS7sK9g0UlxjtuIqV6CIXZMb6N
-         IIh2dvkvcFECUQzAqUemfrustuHJDff9vBUP7JCF6uEjWS4EGBuVHNunVh/81CrtCag3
-         zOqA==
+        bh=1LIxY7Ij3UrUOv7Il7P47ofsQIlqfktbuapxHDHzy9s=;
+        b=XSHnRITS8nxoftyiOoXlCMe4sR9i1NxJcUp5NBp6zR97O3o1TsPjpDr4wYxD3WdWhc
+         i5sThETjwzSJZTDPMKR1n3eyrmop8QhDSda4cNgpLVHhNvqtBvwm02GoAHJDuANs0SYE
+         dsU52zcDMiSpL9eGDdqQOF4f81bgfzFZCPi7KnzL//GiH/LsAcKL3q5fT9eZk5YprqEw
+         wcj9SZoTmGMMWPRyYaEAGqJROGe20yQbXcfzETZczk+vMwzdcWeZiyAvxvC54rBfxfQY
+         9Bl1LUaVxr1LkcHroTYIh89UyQF6DukJbePqTrdz2F3+GYrTUFyOPcE0rJXLQob7MijR
+         6ZxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=lfftMmJm9tuvTykxsaiC5x+KQRUJrTAxoeeFR+VObs0=;
-        b=JiCek+5G43zC1J31MCUKw8A18AuXr6KBPRzNKAYlaqUVBgMTRGgW7NkX7Qm3qTzYIB
-         7xatLJURHwMlQwEsErOMq0Ilg0J2M3ejLK18w55d9xAJBKoiL4qLFDnHOCxtecBi7EUC
-         ZsZ3fwqZfCfJsGRfhelpBGe2GZn92TyOcqi0lkwkwZLU5wP4Me8nHMCTjihIF6jiZ1wS
-         K2IqKHjwppJFZv6zqMt7OJR0Id4CrbA+qVkWHMWxQp1EKBPFImm/twu0vwRPyDm9XCzY
-         lPV8wHhLqLXOR+qg1sKqSvJPl6r2x8CRw2Pxk/CUIEho8Ho6Q5qKbTSwzaPBykfQp2Ik
-         IBLA==
-X-Gm-Message-State: AOAM533Z0gNfvdX8VnB0ubKu7WFb7zCZQ3BBkExONLKy5vGNcc2ofBl/
-        IsiCkBm8IqF7Vmc51ZcFIFfMfQ==
-X-Google-Smtp-Source: ABdhPJwZJK/Hm/PkKpz6Ejit2JtZyXnl8T4Pt5vknor47K6z8fQc1g7/83fUsS0E5zccng6f8buqGw==
-X-Received: by 2002:a63:581c:: with SMTP id m28mr15367289pgb.353.1621892585061;
-        Mon, 24 May 2021 14:43:05 -0700 (PDT)
+        bh=1LIxY7Ij3UrUOv7Il7P47ofsQIlqfktbuapxHDHzy9s=;
+        b=pIO77SV9WX+abYIPdqiZNU+eaATy16+FNUlnASWNhnZKTnK01B7zm5YoyCrPOJu2kH
+         bwj+oDCo+FLt5VNRVLttvAFAHrPWGxItGdR53/U0MSWPKKzeuuyNXQ4zXmGr4OJSGCxk
+         DFvIq8NPWu1g72vnckT15tdoXo+QuXzahQhTLkgnj5ruwFhdIzGixi6UEr8E/yK99ove
+         9PUA4d1WQ0fQa5ZbjUrADTK5+EGpr9uEgKce1ysnw/DaYuM7fdTxJ0vWW8dleheVUroT
+         stNgo4SQYkf8W5H0VI32zwUPIwOd2EK5cmzwgYksJiDfXUEekZD+6IoKWWyr63yIGcRI
+         U+NQ==
+X-Gm-Message-State: AOAM5319iWIdAZJubrfz0seTLgqxply3NCg6NfzQXeMpDzWwHrwf7rh9
+        d2t/BpIJ7gV7CsTWeBLLZEvrQw==
+X-Google-Smtp-Source: ABdhPJwemR0Csu7duh/l9o7U7SM+60b46wfosFlH/WytvymUKyVC7vyQyWpdSfuaq8B26q2ab5Cl6g==
+X-Received: by 2002:a17:90a:cc06:: with SMTP id b6mr1298484pju.19.1621893044680;
+        Mon, 24 May 2021 14:50:44 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id a15sm11249185pff.128.2021.05.24.14.43.04
+        by smtp.gmail.com with ESMTPSA id k21sm11880753pgb.56.2021.05.24.14.50.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 May 2021 14:43:04 -0700 (PDT)
-Date:   Mon, 24 May 2021 21:43:00 +0000
+        Mon, 24 May 2021 14:50:43 -0700 (PDT)
+Date:   Mon, 24 May 2021 21:50:40 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Jing Liu <jing2.liu@linux.intel.com>
 Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, jing2.liu@intel.com
-Subject: Re: [PATCH RFC 2/7] kvm: x86: Introduce XFD MSRs as passthrough to
- guest
-Message-ID: <YKwd5OTXr97Fxfok@google.com>
+Subject: Re: [PATCH RFC 4/7] kvm: x86: Add new ioctls for XSAVE extension
+Message-ID: <YKwfsIT5DuE+L+4M@google.com>
 References: <20210207154256.52850-1-jing2.liu@linux.intel.com>
- <20210207154256.52850-3-jing2.liu@linux.intel.com>
+ <20210207154256.52850-5-jing2.liu@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210207154256.52850-3-jing2.liu@linux.intel.com>
+In-Reply-To: <20210207154256.52850-5-jing2.liu@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Sun, Feb 07, 2021, Jing Liu wrote:
-> Passthrough both MSRs to let guest access and write without vmexit.
+> The static xstate buffer kvm_xsave contains the extended register
+> states, but it is not enough for dynamic features with large state.
+> 
+> Introduce a new capability called KVM_CAP_X86_XSAVE_EXTENSION to
+> detect if hardware has XSAVE extension (XFD). Meanwhile, add two
+> new ioctl interfaces to get/set the whole xstate using struct
+> kvm_xsave_extension buffer containing both static and dynamic
+> xfeatures. Reuse fill_xsave and load_xsave for both cases.
+> 
+> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+> ---
+>  arch/x86/include/uapi/asm/kvm.h |  5 +++
+>  arch/x86/kvm/x86.c              | 70 +++++++++++++++++++++++++--------
+>  include/uapi/linux/kvm.h        |  8 ++++
+>  3 files changed, 66 insertions(+), 17 deletions(-)
+> 
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index 89e5f3d1bba8..bf785e89a728 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -362,6 +362,11 @@ struct kvm_xsave {
+>  	__u32 region[1024];
+>  };
+>  
+> +/* for KVM_CAP_XSAVE_EXTENSION */
+> +struct kvm_xsave_extension {
+> +	__u32 region[3072];
 
-Why?  Except for read-only MSRs, e.g. MSR_CORE_C1_RES, passthrough MSRs are
-costly to support because KVM must context switch the MSR (which, by the by, is
-completely missing from the patch).
+Fool me once, shame on you (Intel).  Fool me twice, shame on me (KVM).
 
-In other words, if these MSRs are full RW passthrough, guests with XFD enabled
-will need to load the guest value on entry, save the guest value on exit, and
-load the host value on exit.  That's in the neighborhood of a 40% increase in
-latency for a single VM-Enter/VM-Exit roundtrip (~1500 cycles => >2000 cycles).
+As amusing as kvm_xsave_really_extended would be, the required size should be
+discoverable, not hardcoded.  Nothing prevents a hardware vendor from inventing
+a newfangled feature that requires yet more space.
 
-I'm not saying these can't be passhthrough, but there needs to be strong
-justification for letting the guest read/write them directly.
-
+As an alternative to adding a dedicated capability, can we leverage
+GET_SUPPORTED_CPUID, leaf CPUID.0xD, to enumerate the minimum required size and
+state that the new ioctl() is available if the min size is greater than 1024?
+Or is that unnecessarily convoluted...
