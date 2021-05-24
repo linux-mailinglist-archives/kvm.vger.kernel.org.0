@@ -2,113 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DB7A038F3E7
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 21:55:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4527838F446
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 22:22:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232977AbhEXT5Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 15:57:25 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:44734 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232831AbhEXT5Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 May 2021 15:57:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1621886157; x=1653422157;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version;
-  bh=5pzt10yIIjzwUF6BelVfnSNpnXyncgMpqkanGTHNZ9E=;
-  b=TKe3CGoBqzL/VWMppq3GKJtjexJos4mdvzhgxlOi63u/QYBJo1737Azp
-   ysYciTF8xunHzQzhq3kg2exOotQXD1KYiDoGkwZAF0+OILrTxUTRPx0Je
-   Oe8GyaHUmmD8/mpXZ6ZPBSYAsHVwILFfQAdJhcF0vffdCvsCQE5LuJ5f5
-   A=;
-X-IronPort-AV: E=Sophos;i="5.82,325,1613433600"; 
-   d="scan'208";a="136607583"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-1d-16425a8d.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP; 24 May 2021 19:55:49 +0000
-Received: from EX13D28EUC003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-1d-16425a8d.us-east-1.amazon.com (Postfix) with ESMTPS id 66646100B25;
-        Mon, 24 May 2021 19:55:47 +0000 (UTC)
-Received: from uc8bbc9586ea454.ant.amazon.com (10.43.161.253) by
- EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
- id 15.0.1497.18; Mon, 24 May 2021 19:55:43 +0000
-From:   Siddharth Chandrasekaran <sidcha@amazon.de>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-CC:     Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Siddharth Chandrasekaran <sidcha.dev@gmail.com>,
-        Alexander Graf <graf@amazon.com>,
-        Evgeny Iakovlev <eyakovl@amazon.de>,
-        Liran Alon <liran@amazon.com>,
-        Ioannis Aslanidis <iaslan@amazon.de>, <qemu-devel@nongnu.org>,
-        <kvm@vger.kernel.org>
-Subject: [PATCH 4/6] kvm/i386: Avoid multiple calls to check_extension(KVM_CAP_HYPERV)
-Date:   Mon, 24 May 2021 21:54:07 +0200
-Message-ID: <ff4e06369b32aa715ac37fb51d151681cd66e401.1621885749.git.sidcha@amazon.de>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <cover.1621885749.git.sidcha@amazon.de>
-References: <cover.1621885749.git.sidcha@amazon.de>
+        id S233490AbhEXUX5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 16:23:57 -0400
+Received: from gateway22.websitewelcome.com ([192.185.47.100]:36147 "EHLO
+        gateway22.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232900AbhEXUX5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 16:23:57 -0400
+X-Greylist: delayed 1392 seconds by postgrey-1.27 at vger.kernel.org; Mon, 24 May 2021 16:23:57 EDT
+Received: from cm13.websitewelcome.com (cm13.websitewelcome.com [100.42.49.6])
+        by gateway22.websitewelcome.com (Postfix) with ESMTP id C4AF4399D
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 14:59:14 -0500 (CDT)
+Received: from gator4166.hostgator.com ([108.167.133.22])
+        by cmsmtp with SMTP
+        id lGjKlfpC3AEP6lGjKlE4PP; Mon, 24 May 2021 14:59:14 -0500
+X-Authority-Reason: nr=8
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=CiA82PE7hVTPaKelOYSFnTkobrNKOhOAioZP6OhsoYo=; b=Af/e7v/Waf5X6+OHmRb88tNB8V
+        Oq+uMhguLC3ocU21j3Q+TkVYY0Z4GwkGH5zFiF47qrW2J4z1o7Nk3KvXt4uyTUoias1gz6okCrSHD
+        eHDL+McVLpNQ31+cZS+iW6UqFPeXl60FfsekYl2cI/WtxfFNZYhGRUyudZgdCVw9elSnwr88j0NN5
+        uOZiSVfFjXL0u9eJy9E/T+FbwONvGC3lZx1DO9/FD4QmRS7eSV00e58yTjKiz4Bbg4Rhnvh0DP7rj
+        O4alG/6IOwlICJfICrKZlodw8tynHKCGYoLwG+80yxech/z1BySyfd7EV21vTzSJSdW6ZmPGHks9E
+        rrWyeNhw==;
+Received: from 187-162-31-110.static.axtel.net ([187.162.31.110]:33224 helo=[192.168.15.8])
+        by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <gustavo@embeddedor.com>)
+        id 1llGjI-00135M-CO; Mon, 24 May 2021 14:59:12 -0500
+Subject: Re: [PATCH][next] vfio/iommu_type1: Use struct_size() for kzalloc()
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <20210513230155.GA217517@embeddedor>
+ <20210524134801.406bc4bf@x1.home.shazbot.org>
+From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Message-ID: <cb4eac12-dfe3-09a0-8b55-17e62f47a47d@embeddedor.com>
+Date:   Mon, 24 May 2021 14:59:59 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.43.161.253]
-X-ClientProxiedBy: EX13D10UWB004.ant.amazon.com (10.43.161.121) To
- EX13D28EUC003.ant.amazon.com (10.43.164.43)
+In-Reply-To: <20210524134801.406bc4bf@x1.home.shazbot.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 187.162.31.110
+X-Source-L: No
+X-Exim-ID: 1llGjI-00135M-CO
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: 187-162-31-110.static.axtel.net ([192.168.15.8]) [187.162.31.110]:33224
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 4
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM_CAP_HYPERV is a VM ioctl and can be cached at kvm_arch_init()
-instead of performing an ioctl each time in hyperv_enabled() which is
-called foreach vCPU. Apart from that, this variable will come in handy
-in a subsequent patch.
-
-Signed-off-by: Siddharth Chandrasekaran <sidcha@amazon.de>
----
- target/i386/kvm/kvm.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index d19a2913fd..362f04ab3f 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -93,6 +93,7 @@ static bool has_msr_misc_enable;
- static bool has_msr_smbase;
- static bool has_msr_bndcfgs;
- static int lm_capable_kernel;
-+static bool has_hyperv;
- static bool has_msr_hv_hypercall;
- static bool has_msr_hv_crash;
- static bool has_msr_hv_reset;
-@@ -715,8 +716,7 @@ unsigned long kvm_arch_vcpu_id(CPUState *cs)
- 
- static bool hyperv_enabled(X86CPU *cpu)
- {
--    CPUState *cs = CPU(cpu);
--    return kvm_check_extension(cs->kvm_state, KVM_CAP_HYPERV) > 0 &&
-+    return has_hyperv &&
-         ((cpu->hyperv_spinlock_attempts != HYPERV_SPINLOCK_NEVER_NOTIFY) ||
-          cpu->hyperv_features || cpu->hyperv_passthrough);
- }
-@@ -2172,6 +2172,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     has_xsave = kvm_check_extension(s, KVM_CAP_XSAVE);
-     has_xcrs = kvm_check_extension(s, KVM_CAP_XCRS);
-     has_pit_state2 = kvm_check_extension(s, KVM_CAP_PIT_STATE2);
-+    has_hyperv = kvm_check_extension(s, KVM_CAP_HYPERV);
- 
-     hv_vpindex_settable = kvm_check_extension(s, KVM_CAP_HYPERV_VP_INDEX);
- 
--- 
-2.17.1
 
 
+On 5/24/21 14:48, Alex Williamson wrote:
 
+> Looks good, applied to vfio for-linus branch for v5.13.  Thanks,
 
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
+Thanks, Alex. :)
 
-
-
+--
+Gustavo
