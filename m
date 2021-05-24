@@ -2,192 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A06E738F1CA
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 18:52:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6574638F1EA
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 19:02:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232835AbhEXQxv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 12:53:51 -0400
-Received: from foss.arm.com ([217.140.110.172]:45222 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232107AbhEXQxt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 May 2021 12:53:49 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2C1D5ED1;
-        Mon, 24 May 2021 09:52:20 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C9E4D3F73B;
-        Mon, 24 May 2021 09:52:18 -0700 (PDT)
-Subject: Re: [PATCH v3 6/9] KVM: arm64: vgic: Implement SW-driven deactivation
-To:     Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Hector Martin <marcan@marcan.st>,
-        Mark Rutland <mark.rutland@arm.com>, kernel-team@android.com
-References: <20210510134824.1910399-1-maz@kernel.org>
- <20210510134824.1910399-7-maz@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <fbd86687-b0cb-9979-b0a1-7e67efdd6b0a@arm.com>
-Date:   Mon, 24 May 2021 17:53:04 +0100
+        id S233236AbhEXRDw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 13:03:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59383 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232543AbhEXRDv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 13:03:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1621875742;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wcEmMLIpMt542BRC/ArOGeP47HD5D7lnjpPaTzmc9ZE=;
+        b=QlVKloIjU3AIAbw0y2qpja744EZQbV0ko1ORS26Dh5DWZfu5iha/vnFRgqVF1rHW4tYH1E
+        ISbpTtgIt+q+H7EgcycmPaHiluVEHA1jY59pB3y8omy6SQ02A/c1v8l+L9CjP2k7diwWRF
+        2sGyspnfkyUuTSjPuMWbw3TXeQvPnZo=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-596-4rnwcmtTO527gYbUCpIMOQ-1; Mon, 24 May 2021 13:02:21 -0400
+X-MC-Unique: 4rnwcmtTO527gYbUCpIMOQ-1
+Received: by mail-ej1-f72.google.com with SMTP id nd10-20020a170907628ab02903a324b229bfso7851268ejc.7
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 10:02:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=wcEmMLIpMt542BRC/ArOGeP47HD5D7lnjpPaTzmc9ZE=;
+        b=C7ZKJQkNkUxe3qhY9PpFz6gV7ZA47PbMeD1H3EZQ0dmuqpjsOLv6j7D031rfYkbBAv
+         tojwz//SdzpH5iNwmqdykKUqdyEt5cQMOM/tSki+XnewyWzPJxoEmoFWEVBT89durAg3
+         r8QkgpFwwo6X3awy/NOrYmA7Uah+0tBll/JMytujp5bW8YqetskatP20YtnJT1lgdEHM
+         XYkJD2kM6NiWts/xCnxThZGr6LQutazUBLQQEyVjWTNIBXfnOGUm46SQAt7QhhK1tOGw
+         fBDaamcAktU8INLnrX40xKyvXbwqyhBWx+VyuGArSpqzD5INzoPh+50tt7Jx8hoMqxeY
+         r58w==
+X-Gm-Message-State: AOAM533uso6fakQmla5Zv/l0Yn+GIYI2w7yH7viKwQaugHNj/657oTMj
+        c4UplrR17HCBZzw0h74Gcf9DiajoG2NPtgxPAcvMk93Wc7ZoZVqL+wWW6HDOsoI6VZfIDZZfn82
+        3cfPem1/5TRJI
+X-Received: by 2002:a50:9346:: with SMTP id n6mr26905867eda.365.1621875740147;
+        Mon, 24 May 2021 10:02:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzXLp1wRWeU2aBKnMEdIF+0UPlJKMdflp6xiudWJxTSxzYSssv1QjXUKON/oNsCX11ZOGuiqw==
+X-Received: by 2002:a50:9346:: with SMTP id n6mr26905848eda.365.1621875739988;
+        Mon, 24 May 2021 10:02:19 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id q16sm9562165edw.87.2021.05.24.10.02.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 May 2021 10:02:19 -0700 (PDT)
+Subject: Re: [PATCH v2 3/5] KVM: x86: Use common 'enable_apicv' variable for
+ both APICv and AVIC
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Kechen Lu <kechenl@nvidia.com>, linux-kernel@vger.kernel.org
+References: <20210518144339.1987982-1-vkuznets@redhat.com>
+ <20210518144339.1987982-4-vkuznets@redhat.com> <YKQmG3rMpwSI3WrV@google.com>
+ <12eadbce-f688-77a1-27bf-c33fee2e7543@redhat.com>
+ <YKvZ6vI2vFVmkCeb@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <aa5ef24e-6235-ad25-2f01-580efd2f1bbb@redhat.com>
+Date:   Mon, 24 May 2021 19:02:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210510134824.1910399-7-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <YKvZ6vI2vFVmkCeb@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On 24/05/21 18:52, Sean Christopherson wrote:
+> On Mon, May 24, 2021, Paolo Bonzini wrote:
+>> On 18/05/21 22:39, Sean Christopherson wrote:
+>>>> +/* enable / disable AVIC */
+>>>> +static int avic;
+>>>> +module_param(avic, int, 0444);
+>>> We should opportunistically make avic a "bool".
+>>>
+>>
+>> And also:
+>>
+>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>> index 11714c22c9f1..48cb498ff070 100644
+>> --- a/arch/x86/kvm/svm/svm.c
+>> +++ b/arch/x86/kvm/svm/svm.c
+>> @@ -185,9 +185,12 @@ module_param(vls, int, 0444);
+>>   static int vgif = true;
+>>   module_param(vgif, int, 0444);
+>> -/* enable / disable AVIC */
+>> -static int avic;
+>> -module_param(avic, int, 0444);
+>> +/*
+>> + * enable / disable AVIC.  Because the defaults differ for APICv
+>> + * support between VMX and SVM we cannot use module_param_named.
+>> + */
+>> +static bool avic;
+>> +module_param(avic, bool, 0444);
+>>   bool __read_mostly dump_invalid_vmcb;
+>>   module_param(dump_invalid_vmcb, bool, 0644);
+>> @@ -1013,11 +1016,7 @@ static __init int svm_hardware_setup(void)
+>>   			nrips = false;
+>>   	}
+>> -	if (!npt_enabled || !boot_cpu_has(X86_FEATURE_AVIC))
+>> -		avic = false;
+>> -
+>> -	/* 'enable_apicv' is common between VMX/SVM but the defaults differ */
+>> -	enable_apicv = avic;
+>> +	enable_apicv = avic && npt_enabled && boot_cpu_has(X86_FEATURE_AVIC);
+>>   	if (enable_apicv) {
+>>   		pr_info("AVIC enabled\n");
+>>
+>> The "if" can come back when AVIC is enabled by default.
+> 
+> But "avic" is connected to the module param, even if it's off by default its
+> effective value should be reflected in sysfs.  E.g. the user may incorrectly
+> think AVIC is in use if they set avic=1 but the CPU doesn't support AVIC.
+> Forcing the user to check /proc/cpuinfo or look for "AVIC enabled" in dmesg is
+> kludgy at best.
 
-Some questions regarding how this is supposed to work.
+Indeed -- I even tested the above, but only before realizing that 
+module_param_named would change the default.  So for now this needs to
+be "enable_apicv = avic = ...", and later it can become just
 
-On 5/10/21 2:48 PM, Marc Zyngier wrote:
-> In order to deal with these systems that do not offer HW-based
-> deactivation of interrupts, let implement a SW-based approach:
->
-> - When the irq is queued into a LR, treat it as a pure virtual
->   interrupt and set the EOI flag in the LR.
->
-> - When the interrupt state is read back from the LR, force a
->   deactivation when the state is invalid (neither active nor
->   pending)
->
-> Interrupts requiring such treatment get the VGIC_SW_RESAMPLE flag.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/vgic/vgic-v2.c | 19 +++++++++++++++----
->  arch/arm64/kvm/vgic/vgic-v3.c | 19 +++++++++++++++----
->  include/kvm/arm_vgic.h        | 10 ++++++++++
->  3 files changed, 40 insertions(+), 8 deletions(-)
->
-> diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-> index 11934c2af2f4..2c580204f1dc 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v2.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v2.c
-> @@ -108,11 +108,22 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
->  		 * If this causes us to lower the level, we have to also clear
->  		 * the physical active state, since we will otherwise never be
->  		 * told when the interrupt becomes asserted again.
-> +		 *
-> +		 * Another case is when the interrupt requires a helping hand
-> +		 * on deactivation (no HW deactivation, for example).
->  		 */
-> -		if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT)) {
-> -			irq->line_level = vgic_get_phys_line_level(irq);
-> +		if (vgic_irq_is_mapped_level(irq)) {
-> +			bool resample = false;
-> +
-> +			if (val & GICH_LR_PENDING_BIT) {
-> +				irq->line_level = vgic_get_phys_line_level(irq);
-> +				resample = !irq->line_level;
-> +			} else if (vgic_irq_needs_resampling(irq) &&
-> +				   !(irq->active || irq->pending_latch)) {
+	enable_apicv &= npt_enabled && boot_cpu_has(X86_FEATURE_AVIC);
 
-So this means that if the IRQ has the special flag, if it's not pending in the LR
-or at the software level, and it's not active either, then perform interrupt
-deactivation. I don't see where the state of the interrupt is checked again, am I
-correct in assuming that we rely on the CPU interface to assert the interrupt to
-the host while we run with interrupts enabled in the run loop, and the handler for
-the interrupt will mark it pending for kvm_vgic_sync_hw_state->vgic_vx_fold_lr_state?
+Paolo
 
-> +				resample = true;
-> +			}
->  
-> -			if (!irq->line_level)
-> +			if (resample)
 
-This name, "resample", is confusing to me, quite possibly because I'm not familiar
-with the irqchip subsystem. It was my impression that "resample" means that at
-some point, the physical interrupt state will be checked again, yet I don't see
-that happening anywhere when VGIC_IRQ_SW_RESAMPLE is set. Am I mistaken in my
-assumptions?
-
-Thanks,
-
-Alex
-
->  				vgic_irq_set_phys_active(irq, false);
->  		}
->  
-> @@ -152,7 +163,7 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
->  	if (irq->group)
->  		val |= GICH_LR_GROUP1;
->  
-> -	if (irq->hw) {
-> +	if (irq->hw && !vgic_irq_needs_resampling(irq)) {
->  		val |= GICH_LR_HW;
->  		val |= irq->hwintid << GICH_LR_PHYSID_CPUID_SHIFT;
->  		/*
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> index 41ecf219c333..66004f61cd83 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> @@ -101,11 +101,22 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
->  		 * If this causes us to lower the level, we have to also clear
->  		 * the physical active state, since we will otherwise never be
->  		 * told when the interrupt becomes asserted again.
-> +		 *
-> +		 * Another case is when the interrupt requires a helping hand
-> +		 * on deactivation (no HW deactivation, for example).
->  		 */
-> -		if (vgic_irq_is_mapped_level(irq) && (val & ICH_LR_PENDING_BIT)) {
-> -			irq->line_level = vgic_get_phys_line_level(irq);
-> +		if (vgic_irq_is_mapped_level(irq)) {
-> +			bool resample = false;
-> +
-> +			if (val & ICH_LR_PENDING_BIT) {
-> +				irq->line_level = vgic_get_phys_line_level(irq);
-> +				resample = !irq->line_level;
-> +			} else if (vgic_irq_needs_resampling(irq) &&
-> +				   !(irq->active || irq->pending_latch)) {
-> +				resample = true;
-> +			}
->  
-> -			if (!irq->line_level)
-> +			if (resample)
->  				vgic_irq_set_phys_active(irq, false);
->  		}
->  
-> @@ -136,7 +147,7 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
->  		}
->  	}
->  
-> -	if (irq->hw) {
-> +	if (irq->hw && !vgic_irq_needs_resampling(irq)) {
->  		val |= ICH_LR_HW;
->  		val |= ((u64)irq->hwintid) << ICH_LR_PHYS_ID_SHIFT;
->  		/*
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index e5f06df000f2..e602d848fc1a 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -99,6 +99,11 @@ enum vgic_irq_config {
->   * kvm_arm_get_running_vcpu() to get the vcpu pointer for private IRQs.
->   */
->  struct irq_ops {
-> +	/* Per interrupt flags for special-cased interrupts */
-> +	unsigned long flags;
-> +
-> +#define VGIC_IRQ_SW_RESAMPLE	BIT(0)	/* Clear the active state for resampling */
-> +
->  	/*
->  	 * Callback function pointer to in-kernel devices that can tell us the
->  	 * state of the input level of mapped level-triggered IRQ faster than
-> @@ -150,6 +155,11 @@ struct vgic_irq {
->  					   for in-kernel devices. */
->  };
->  
-> +static inline bool vgic_irq_needs_resampling(struct vgic_irq *irq)
-> +{
-> +	return irq->ops && (irq->ops->flags & VGIC_IRQ_SW_RESAMPLE);
-> +}
-> +
->  struct vgic_register_region;
->  struct vgic_its;
->  
