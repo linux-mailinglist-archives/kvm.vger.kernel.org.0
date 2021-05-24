@@ -2,107 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0754D38F533
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 23:54:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5538C38F53D
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 23:57:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233049AbhEXVza (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 17:55:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48596 "EHLO
+        id S233519AbhEXV7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 17:59:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232662AbhEXVz3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 May 2021 17:55:29 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 106E2C061756
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 14:54:01 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id i5so21132795pgm.0
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 14:54:01 -0700 (PDT)
+        with ESMTP id S233701AbhEXV7L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 May 2021 17:59:11 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5350C061574
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 14:57:41 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id t24so12913875oiw.3
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 14:57:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=y7H6pCP7/yViKEmHdKMC147HRDRySUoBtMkLMOdzOEY=;
-        b=QkDsj98CjSxsb0UVBSUKnaRnpNYKcn+hGZ9oD5zxCYio1dHxtpr/gk8UTTwhWYwyYP
-         h1RBH+oRPt5vanKSGKlCbL7DCgH3Jqo+i4kcIxadUbNjV1jMH7fIu8gc8hgo8aBLGeAG
-         D40biFug8QAimDQ3VPX5TDjLk/0ySZebc4j5D5kFYrX0ODB1XVMF6ogSm6ahTsyxrnK1
-         j2Otr8+l2q9GHCs1T4MA1zQYvTYOdTcfawV+5vjb2a9otNsa0QUxd0DDrddKHf5AlqKF
-         UfuBH8aQvpsvk97CFt4byKXdErvqzoDGe/EDQmJGTI5Jp8TVmeyycw/XBOcz4ahUf7+a
-         VI5A==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+QOd1KfRYOgHgN+WbksAwHnKrFOkuvhhmy1/CWBQTUM=;
+        b=KhP+msE1sBjTgPeZHuqohUHYU8q1MCHlCmd7BM0DG/QQPq0BVCAhBRoWQAvvPWXC3B
+         dzIdRw0drYiWC6puPbIgYlYpn/RgzymNyAilhIgJHplegheMKxhJbEiyiZoetKiLi/mn
+         ykAJ174khzSSndRTgw6U9AFmHJqWdsxK8JkbtQEwXXdc36S/CA52VJhna92gSZPmwv5R
+         nA3R24Fgi6zEBCNS9WMqIu2SUly94l6303+0NMmlDms+eHSHwj63TutGiZcfguZfweaS
+         orQsAc7kJ9A+u8KBtS9xkbgxtn6aqY6RxeQWOQi93tbqG6KQcnrL00+D/o/+n3fp0k32
+         0EVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=y7H6pCP7/yViKEmHdKMC147HRDRySUoBtMkLMOdzOEY=;
-        b=iG1opvs/c30wgNxaijoKHbbPXSvKxcsaguMQ9BIT2FYdGWgYfKOWQnNHzNwD3RkpFs
-         SeoH99ZxoAcla56s5Qp2A4ghDp4eW4bZurXylkFuIjWWNPB4mt709PQEPfSAS5nKP4Vc
-         AM9QdJ+h9dZYfFYJLmujn4NtwXunvMKZTBOG9QgfBaUOZImekMoWmJr8jRH75lTOmSNg
-         /rNQ/WGTB0MXHzeIwkHSPYgS3Lk/PC9eUBPjzogWq2F2mqJ3aG0vI41kHALCA9sYUJK4
-         RGdIaXFdoZaBuuEUs7FdZkFKy4G7+XfE4auspVNw3wd0vMvhoFVHmIxClQucCmkjJmaT
-         kG3w==
-X-Gm-Message-State: AOAM533y+lDaPr+yDysStaZrzQLh8NdEaGI3Ep7SxpuUhFTYN13UrAAa
-        A+f7yCRseaklpUWyvoZwMp98Jw==
-X-Google-Smtp-Source: ABdhPJwOHx8ecBfE8DDXSATrpxTZSwQywYuF9nhhh9re21Qri4jNYnxAiTEG7CWkP8IKSrkddgSz8g==
-X-Received: by 2002:a05:6a00:882:b029:2de:b01d:755a with SMTP id q2-20020a056a000882b02902deb01d755amr26872259pfj.43.1621893240451;
-        Mon, 24 May 2021 14:54:00 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id q24sm12235699pgk.32.2021.05.24.14.53.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 May 2021 14:53:59 -0700 (PDT)
-Date:   Mon, 24 May 2021 21:53:56 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jing Liu <jing2.liu@linux.intel.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jing2.liu@intel.com
-Subject: Re: [PATCH RFC 7/7] kvm: x86: AMX XCR0 support for guest
-Message-ID: <YKwgdBTqiyuItL6b@google.com>
-References: <20210207154256.52850-1-jing2.liu@linux.intel.com>
- <20210207154256.52850-8-jing2.liu@linux.intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+QOd1KfRYOgHgN+WbksAwHnKrFOkuvhhmy1/CWBQTUM=;
+        b=g1XNMv+XvS044FjM5KvfVaQjbQxm3hRGNb3wswt2Cv+puYrpBDKkVqey7l525l2I0L
+         cqQn0s7Dsha9vDymI0q0dTxpH2Tso0L0HMVGAzGdMpbtv7jYk5teQhgXH6WczFs4eot0
+         11vvj8RI6/mfT6SoomVvwq89TP6dBd09UaFmL/74HhQTgA9ldv0A2ROaYGAAaeI4aduv
+         EUeaSH16lkVcPYjhBo83uwzUXRuntf7xrR7FMqUyo3sKp2ZbpT19QaIqoU4x7ArqrYKj
+         LXshcXXiMAYrP4C3SIhb/1LWkVCIMKkH8MLB6RxgVt/1iOQTKHdQmCS5W2PKHmKtudWh
+         vZVQ==
+X-Gm-Message-State: AOAM531gTqgU7mevh2TDJfV46xbdrlyMC7RHmJbP+yrpcCRftQHTBduT
+        2LNI2Yg8p87Zgla2fRmcS/d0isbIFkIIv3iN9jIzgA==
+X-Google-Smtp-Source: ABdhPJy0YshGVdkHTmCXqcoHfIQ+x4WlPzk0E5xPuG+DSS7cOf2zkUjT30pxzPVVIfEn2OfQJJKGqrgDGo1sw/qbKs8=
+X-Received: by 2002:aca:280a:: with SMTP id 10mr813875oix.13.1621893460868;
+ Mon, 24 May 2021 14:57:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210207154256.52850-8-jing2.liu@linux.intel.com>
+References: <20210207154256.52850-1-jing2.liu@linux.intel.com>
+ <20210207154256.52850-3-jing2.liu@linux.intel.com> <YKwd5OTXr97Fxfok@google.com>
+In-Reply-To: <YKwd5OTXr97Fxfok@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 24 May 2021 14:57:29 -0700
+Message-ID: <CALMp9eTjgMDG2rKqKkb3WAsQXqfss1QEHWo5CJZHdd8r_XHRqg@mail.gmail.com>
+Subject: Re: [PATCH RFC 2/7] kvm: x86: Introduce XFD MSRs as passthrough to guest
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Jing Liu <jing2.liu@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, jing2.liu@intel.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Feb 07, 2021, Jing Liu wrote:
-> Two XCR0 bits are defined for AMX to support XSAVE mechanism.
-> Bit 17 is for tilecfg and bit 18 is for tiledata.
+On Mon, May 24, 2021 at 2:44 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Sun, Feb 07, 2021, Jing Liu wrote:
+> > Passthrough both MSRs to let guest access and write without vmexit.
+>
+> Why?  Except for read-only MSRs, e.g. MSR_CORE_C1_RES, passthrough MSRs are
+> costly to support because KVM must context switch the MSR (which, by the by, is
+> completely missing from the patch).
+>
+> In other words, if these MSRs are full RW passthrough, guests with XFD enabled
+> will need to load the guest value on entry, save the guest value on exit, and
+> load the host value on exit.  That's in the neighborhood of a 40% increase in
+> latency for a single VM-Enter/VM-Exit roundtrip (~1500 cycles => >2000 cycles).
+>
+> I'm not saying these can't be passhthrough, but there needs to be strong
+> justification for letting the guest read/write them directly.
 
-This fails to explain why they must be set in tandem.  Out of curisoity, assuming
-they do indeed need to be set/cleared as a pair, what's the point of having two
-separate bits?
+If we virtualize XFD, we have to context switch the guest/host values
+on VM-entry/VM-exit, don't we? If we don't, we're forced to synthesize
+the #NM on any instruction that would access a disabled state
+component, and I don't think we have any way of doing that. We could
+intercept a guest WRMSR to these MSRs, but it sounds like the guest
+can still implicitly write to IA32_XFD_ERR, if we allow it to have a
+non-zero IA32_XFD.
 
-> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
-> ---
->  arch/x86/kvm/x86.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index bfbde877221e..f1c5893dee18 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -189,7 +189,7 @@ static struct kvm_user_return_msrs __percpu *user_return_msrs;
->  #define KVM_SUPPORTED_XCR0     (XFEATURE_MASK_FP | XFEATURE_MASK_SSE \
->  				| XFEATURE_MASK_YMM | XFEATURE_MASK_BNDREGS \
->  				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
-> -				| XFEATURE_MASK_PKRU)
-> +				| XFEATURE_MASK_PKRU | XFEATURE_MASK_XTILE)
->  
->  u64 __read_mostly host_efer;
->  EXPORT_SYMBOL_GPL(host_efer);
-> @@ -946,6 +946,12 @@ static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
->  		if ((xcr0 & XFEATURE_MASK_AVX512) != XFEATURE_MASK_AVX512)
->  			return 1;
->  	}
-> +
-> +	if (xcr0 & XFEATURE_MASK_XTILE) {
-> +		if ((xcr0 & XFEATURE_MASK_XTILE) != XFEATURE_MASK_XTILE)
-> +			return 1;
-> +	}
-> +
->  	vcpu->arch.xcr0 = xcr0;
->  
->  	if ((xcr0 ^ old_xcr0) & XFEATURE_MASK_EXTEND)
-> -- 
-> 2.18.4
-> 
+Perhaps the answer is "don't virtualize XFD."
