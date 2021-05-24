@@ -2,98 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B9C138E8D9
-	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 16:38:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C10CF38F0C2
+	for <lists+kvm@lfdr.de>; Mon, 24 May 2021 18:07:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233035AbhEXOjm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 10:39:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26042 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233009AbhEXOjg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 10:39:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621867088;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=MwTVkYpE+xLZ+L9XkvcMXjd+Zl3U7ycgPiVSmNWbDF4=;
-        b=hSoedQmacms0F6toOrtj5/gaKjnLu/ZbCVOlkkcSjGlGf/LiQuumiS/HDaeKADJ98Kn65P
-        CrMJmS0BeXeg1Fc/EJgf+DdOdKvSmObPTXSZJq6Y6wzxxFQebzf4UBc1SvB+lH6z7Kwrbg
-        cIzVepfWhdt41D4cdERvykV0TvH/pRg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-554-aZqL7ITKOdyu1BFjd2suBw-1; Mon, 24 May 2021 10:38:02 -0400
-X-MC-Unique: aZqL7ITKOdyu1BFjd2suBw-1
-Received: by mail-wr1-f71.google.com with SMTP id 7-20020adf95070000b02901104ad3ef04so13198878wrs.16
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 07:38:02 -0700 (PDT)
+        id S233168AbhEXQGN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 12:06:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52902 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237126AbhEXQFK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 May 2021 12:05:10 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9191BC061288
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 08:18:32 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id 9-20020a056a000729b029025d0d3c2062so18428413pfm.1
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 08:18:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=hsUoOGhK41uMiUMibdY4aJzD3L98/UiwuU5d74aCT5c=;
+        b=grl3R4lWY+xXFxpFitAl3zhdfmFAs89StA2Ji9s3d/B2KH6pdBk72CLWtEduhvKNfo
+         iIz00QlLOwJ6Y6Ai8wBpzGPfcGEwBACfhGYtOGLvLrgSDG4mnLPIk5zIThj/UOzmczx7
+         p/SP0aizUe+vwZfezt4kWxQh9FvmJN7ScVdPnbFt3b3X2xhWLbgRMBhpWhOFdVnuNrLA
+         JoZSB7oVUumnRupw3HeRzO6TaAwLVK8M7I4kcWjBtBGLSCfRzB9++ypo8b2OSo+qG124
+         gYSQWV6jgypmwYgMZyfG/lE973elU2q2ykhk6ZZDeN6dBwjT+sBsDlwg86sgs0sGLfdL
+         9Ipg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=MwTVkYpE+xLZ+L9XkvcMXjd+Zl3U7ycgPiVSmNWbDF4=;
-        b=tgAzsgrwY0yTCKOjPFOdMuByq/hLE7eP6KUVwy3iZsxWNloqx1i4SuHMb8cK5Tpy2S
-         99Ft6iHgiejZA31eWZJg9qr1m8GZr+gpYgTuNyKZE0YnVG87zYPErLTsTzhkg0pA04vk
-         1hCa/LSiplNvLvBZ8egzmxi+dLzmoTcirL3xOXeIvILbJ6k76LxaKD8L0PBMUcmiMNLB
-         rCt+i882kbYsaQt+bG5vmfVXx1vgr5vukz1Nz1qjNsyZoh0yNt1FOiPzZPsQcluD3tyA
-         tHauY7vVdzJZpPAMxu2/QHePYByRf227EgAx64FFQWYqZlcoRctTmq03+dqmUxapke5N
-         RhgQ==
-X-Gm-Message-State: AOAM530kTRzc2oj4HlMeWEt1iK26suiX0FrSyVC73DCxuG0Kb0rBMpZ8
-        nAzBXt7ZIbseMpiB5yozPFsgtlDJqW6VMPKrj6hjXTQ5CsnaUAxGenc4dj65Slz7i+5IxKElU9c
-        /KDDm196f64YU
-X-Received: by 2002:adf:f54b:: with SMTP id j11mr21122605wrp.376.1621867081143;
-        Mon, 24 May 2021 07:38:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzbJEoi9TrHxGwxpZRByUMSDNTVDSgWJX9G30qYssPN8Bc323jcyH+1k1mhtks4tAA7Fm1b9A==
-X-Received: by 2002:adf:f54b:: with SMTP id j11mr21122594wrp.376.1621867080971;
-        Mon, 24 May 2021 07:38:00 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id y137sm8143918wmc.11.2021.05.24.07.38.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 May 2021 07:38:00 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=hsUoOGhK41uMiUMibdY4aJzD3L98/UiwuU5d74aCT5c=;
+        b=A1VyGS/j/hLXGwE/dpSX4oRVMRsw+H5VJIIRdg+J44KeMrYbnIOqsxtzyl5VEMCUKq
+         i0pUAfc6HZGdGC42SaNQQ+pdXzEdAcfO6HzBHfRPDnNmK0Y7J/yxBDtprp8fissryPqN
+         XSbspesPESJ1aDN/W0d3TptKXv7cMZ2PT9ABJnDJh23huzucdkX6iftkK9ZwE4LAtqUC
+         I3TJnk7EQ+RU/2TV0I6qK1mYGFeZvsDHOErIzjw48OJRd/4Om1JnQMRTT3uXUwoVeQf7
+         z5cZVYFe7mbjc4GaCgNdTUDr8efRZ/LLBF5C96DRL/Pjgm6dG0VtZhI9O6zmnNHfH7VY
+         lwgA==
+X-Gm-Message-State: AOAM531qOBO3wsXNpbaIJt94ztYj/skngZLAKDaO/SCH39MQCG6ZhRh3
+        YSfXyrR+ACwTsjGkVeum6S/AghVHfipYWnef4nE0ivFW5FvmaNIrOtnS2QvGL8YOWQpT9orRFcR
+        5QFQ1v0S7App8PbTDJeuXhflgXsPTGGkrCYOQToPwQvD/CWu2lGK5UOIU0+xtu8wEC+kLPYE=
+X-Google-Smtp-Source: ABdhPJxXtI/1dIGUSOnlwdZP5pVxH5ZIpkvTAxwzuzAnLE0CS16jMydJPMj+BH0vIgpLcLjWr90NhFsWDjXmEfhRlA==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a05:6a00:882:b029:2de:b01d:755a with
+ SMTP id q2-20020a056a000882b02902deb01d755amr25260828pfj.43.1621869511859;
+ Mon, 24 May 2021 08:18:31 -0700 (PDT)
+Date:   Mon, 24 May 2021 15:18:24 +0000
+Message-Id: <20210524151828.4113777-1-jingzhangos@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.1.818.g46aad6cb9e-goog
+Subject: [PATCH v6 0/4] KVM statistics data fd-based binary interface
+From:   Jing Zhang <jingzhangos@google.com>
+To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/7] KVM: nVMX: Introduce nested_evmcs_is_used()
-In-Reply-To: <37a6d13d-58ae-65e1-75f9-681a40d819a1@redhat.com>
-References: <20210517135054.1914802-1-vkuznets@redhat.com>
- <20210517135054.1914802-2-vkuznets@redhat.com>
- <115fcae7-0c88-4865-6494-bdf6fb672382@redhat.com>
- <87r1hw8br1.fsf@vitty.brq.redhat.com>
- <37a6d13d-58ae-65e1-75f9-681a40d819a1@redhat.com>
-Date:   Mon, 24 May 2021 16:37:59 +0200
-Message-ID: <87lf848aew.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+This patchset provides a file descriptor for every VM and VCPU to read
+KVM statistics data in binary format.
+It is meant to provide a lightweight, flexible, scalable and efficient
+lock-free solution for user space telemetry applications to pull the
+statistics data periodically for large scale systems. The pulling
+frequency could be as high as a few times per second.
+In this patchset, every statistics data are treated to have some
+attributes as below:
+  * architecture dependent or common
+  * VM statistics data or VCPU statistics data
+  * type: cumulative, instantaneous,
+  * unit: none for simple counter, nanosecond, microsecond,
+    millisecond, second, Byte, KiByte, MiByte, GiByte. Clock Cycles
+Since no lock/synchronization is used, the consistency between all
+the statistics data is not guaranteed. That means not all statistics
+data are read out at the exact same time, since the statistics date
+are still being updated by KVM subsystems while they are read out.
 
-> On 24/05/21 16:09, Vitaly Kuznetsov wrote:
->> You mean we'll be using:
->> 
->> "hv_evmcs_ptr == 0" meaning "no evmcs" (like now)
->> "hv_evmcs_ptr == -1" meaing "evmcs not yet mapped" (and
->> nested_evmcs_is_used() will check for both '0' and '-1')
->> "hv_evmcs_ptr == anything else" - eVMCS mapped.
->
-> I was thinking of:
->
-> hv_evmcs_ptr == -1 meaning no evmcs
->
-> hv_evmcs == NULL meaning "evmcs not yet mapped" (I think)
->
-> hv_evmcs != NULL meaning "evmcs mapped".
->
-> As usual with my suggestions, I'm not sure if this makes sense :) but if 
-> it does, the code should be nicer.
+---
 
-Ok, let me try this!
+* v5 -> v6
+  - Use designated initializers for STATS_DESC
+  - Change KVM_STATS_SCALE... to KVM_STATS_BASE...
+  - Use a common function for kvm_[vm|vcpu]_stats_read
+  - Fix some documentation errors/missings
+  - Use TEST_ASSERT in selftest
+  - Use a common function for [vm|vcpu]_stats_test in selftest
 
+* v4 -> v5
+  - Rebase to kvm/queue, commit a4345a7cecfb ("Merge tag
+    'kvmarm-fixes-5.13-1'")
+  - Change maximum stats name length to 48
+  - Replace VM_STATS_COMMON/VCPU_STATS_COMMON macros with stats
+    descriptor definition macros.
+  - Fixed some errors/warnings reported by checkpatch.pl
+
+* v3 -> v4
+  - Rebase to kvm/queue, commit 9f242010c3b4 ("KVM: avoid "deadlock"
+    between install_new_memslots and MMU notifier")
+  - Use C-stype comments in the whole patch
+  - Fix wrong count for x86 VCPU stats descriptors
+  - Fix KVM stats data size counting and validity check in selftest
+
+* v2 -> v3
+  - Rebase to kvm/queue, commit edf408f5257b ("KVM: avoid "deadlock"
+    between install_new_memslots and MMU notifier")
+  - Resolve some nitpicks about format
+
+* v1 -> v2
+  - Use ARRAY_SIZE to count the number of stats descriptors
+  - Fix missing `size` field initialization in macro STATS_DESC
+
+[1] https://lore.kernel.org/kvm/20210402224359.2297157-1-jingzhangos@google.com
+[2] https://lore.kernel.org/kvm/20210415151741.1607806-1-jingzhangos@google.com
+[3] https://lore.kernel.org/kvm/20210423181727.596466-1-jingzhangos@google.com
+[4] https://lore.kernel.org/kvm/20210429203740.1935629-1-jingzhangos@google.com
+[5] https://lore.kernel.org/kvm/20210517145314.157626-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (4):
+  KVM: stats: Separate common stats from architecture specific ones
+  KVM: stats: Add fd-based API to read binary stats data
+  KVM: stats: Add documentation for statistics data binary interface
+  KVM: selftests: Add selftest for KVM statistics data binary interface
+
+ Documentation/virt/kvm/api.rst                | 179 +++++++++++++++
+ arch/arm64/include/asm/kvm_host.h             |   9 +-
+ arch/arm64/kvm/guest.c                        |  38 ++-
+ arch/mips/include/asm/kvm_host.h              |   9 +-
+ arch/mips/kvm/mips.c                          |  64 +++++-
+ arch/powerpc/include/asm/kvm_host.h           |   9 +-
+ arch/powerpc/kvm/book3s.c                     |  64 +++++-
+ arch/powerpc/kvm/book3s_hv.c                  |  12 +-
+ arch/powerpc/kvm/book3s_pr.c                  |   2 +-
+ arch/powerpc/kvm/book3s_pr_papr.c             |   2 +-
+ arch/powerpc/kvm/booke.c                      |  59 ++++-
+ arch/s390/include/asm/kvm_host.h              |   9 +-
+ arch/s390/kvm/kvm-s390.c                      | 129 ++++++++++-
+ arch/x86/include/asm/kvm_host.h               |   9 +-
+ arch/x86/kvm/x86.c                            |  67 +++++-
+ include/linux/kvm_host.h                      | 141 +++++++++++-
+ include/linux/kvm_types.h                     |  12 +
+ include/uapi/linux/kvm.h                      |  50 ++++
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   3 +
+ .../selftests/kvm/kvm_bin_form_stats.c        | 216 ++++++++++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  12 +
+ virt/kvm/kvm_main.c                           | 179 ++++++++++++++-
+ 24 files changed, 1188 insertions(+), 90 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/kvm_bin_form_stats.c
+
+
+base-commit: a4345a7cecfb91ae78cd43d26b0c6a956420761a
 -- 
-Vitaly
+2.31.1.818.g46aad6cb9e-goog
 
