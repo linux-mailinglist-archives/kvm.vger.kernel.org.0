@@ -2,125 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 42171390664
-	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 18:16:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EF51390680
+	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 18:21:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233210AbhEYQRk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 May 2021 12:17:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43756 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233302AbhEYQRi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 May 2021 12:17:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621959363;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MWKQ2FRMeKpEI6HlpFxdCErCeQjuf2CVv/zTj1uud2U=;
-        b=Z98UUDe35mDhtxT2YFgpuRrBQewpgCGUuzny+7IEDP+FPEvdv8ekp/h1r0E5cPn4O/Xs+i
-        xzumUjPhXdmjdrmUwjwQyqo6x4QQ604Lag6dK+92qGCTHYOpK2h1YXsBbyI41RlrZRYdfp
-        dDjmqetiIzhI5wuzjnPw9n9oJeD/c0A=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-72-r1tf-S3mMz-oMYfgiDEwjg-1; Tue, 25 May 2021 12:15:59 -0400
-X-MC-Unique: r1tf-S3mMz-oMYfgiDEwjg-1
-Received: by mail-ed1-f70.google.com with SMTP id v18-20020a0564023492b029038d5ad7c8a8so12673713edc.11
-        for <kvm@vger.kernel.org>; Tue, 25 May 2021 09:15:59 -0700 (PDT)
+        id S232636AbhEYQWe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 May 2021 12:22:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44620 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231586AbhEYQWc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 May 2021 12:22:32 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38376C061574
+        for <kvm@vger.kernel.org>; Tue, 25 May 2021 09:21:01 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id e15so9985845plh.1
+        for <kvm@vger.kernel.org>; Tue, 25 May 2021 09:21:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=XFC9iWJT/MQ8UEFztmuB49DTENqBYgd89Ij8J4hz14w=;
+        b=bX5fLELA0/L/al7izHeFvwadEsP7L/qU8d3yun2fUzzW8+1Z7qpxKGvzfGm/2sky3H
+         vwt/3hQ8/RBUy/fJFmqpnP+LYP2O5bOsA8RhtGjMp0TDQ+heuI8yfLb2j0+UaD8WIpq7
+         TbvPoMMJUMtFcF7cPS6n75TDrTsKov7dQQaHeY9V2SIYjiZIe7ZflWyx9DcKTfJLAvPp
+         gJcVDpwYsIT4QQxfJe70EfCfMCMA/C6WX9hC+EA47WABARytB+0krmDQMh1Uq7DHNYVz
+         1GC1fC8cQfjPI2E1imroo2moXw8cM+2suiw6VQ09lkq7AStC+9qJjzBJEeMOf9FOX4IK
+         r0Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=MWKQ2FRMeKpEI6HlpFxdCErCeQjuf2CVv/zTj1uud2U=;
-        b=oZ7xwXQv4vVSRPeYpqxoST7oRb4zFN/84TlmrxL3JVSeEKWkJqw5RxRd3O4a5YO/op
-         pyi/Ey4JeVYYKH76/pxPrrez2/nwhFRFHDl70wn3CruSvvy+VFPZarfiGzHw9TDLlXXH
-         5pmPieiSVFb9ITxRSThra8M1IlJa4LTGthp14RglCtnKTZ/nR9EHCJeJPzzjWaYwGwup
-         XCLH8577wFtZBUS0qk4QjXiOk2X3mqWWrKPquiHfFos+8yH3e8Pyar+dfSMzqy34llzz
-         HhgHRtwlhr1EhfiVszy0V3/8pEO5GM7NlJzemujXd3B7CwxjjI7DmRcIkXh5b3BoJnE+
-         d7DA==
-X-Gm-Message-State: AOAM531UIy+h52eRJkpsY014pWBKu6Q5cyzvtlYJxueIRC+EvWo3PuiZ
-        +WJbY8xEx3l6mecOi8GuBuD7kN5yJcGcN5gXcO/KgceNITTPUZxADLPI9As8Q7KJkPTrfQ9ii7O
-        UQWkTF6TbV0nQ
-X-Received: by 2002:a17:906:3644:: with SMTP id r4mr29254815ejb.140.1621959358262;
-        Tue, 25 May 2021 09:15:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx2Pf5t+DkvwwiPx0XllA23W7L/9RiYDfji124wzQSvXBcL3fzCNNBoTyrr73mQ0LIqxj2Slw==
-X-Received: by 2002:a17:906:3644:: with SMTP id r4mr29254792ejb.140.1621959358110;
-        Tue, 25 May 2021 09:15:58 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id gt37sm1929280ejc.68.2021.05.25.09.15.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 May 2021 09:15:57 -0700 (PDT)
-To:     Sean Christopherson <seanjc@google.com>,
-        "Stamatis, Ilias" <ilstam@amazon.com>
-Cc:     "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "zamsden@gmail.com" <zamsden@gmail.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>
-References: <20210521102449.21505-1-ilstam@amazon.com>
- <20210521102449.21505-10-ilstam@amazon.com>
- <2b3bc8aff14a09c4ea4a1b648f750b5ffb1a15a0.camel@redhat.com>
- <YKv0KA+wJNCbfc/M@google.com>
- <8a13dedc5bc118072d1e79d8af13b5026de736b3.camel@amazon.com>
- <YK0emU2NjWZWBovh@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 09/12] KVM: VMX: Remove vmx->current_tsc_ratio and
- decache_tsc_multiplier()
-Message-ID: <0220f903-2915-f072-b1da-0b58fc07f416@redhat.com>
-Date:   Tue, 25 May 2021 18:15:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=XFC9iWJT/MQ8UEFztmuB49DTENqBYgd89Ij8J4hz14w=;
+        b=GWVaSg3n7+YA0tz+1Sk1e+VdfEEjuKpILOx8ksQ9YJOem2RD4yWh6QKryOyodui2jQ
+         WoRc/DnFXaY6dNoPbGzDa5Ngc/8Ps5U4jiLj3+dcW8iS/yf6E3HVYmi3uzqZAPEN3FVs
+         qBOnkwJFB2sPj/WNPMP7ONaJzvuF045DVAzPME+4hStfyIJlo56pEh90bBy/FiyIKL/e
+         RdlvH3U2WJDs4/68mWsqPwKPC+RxLBIO0uLHo8h+stE+LFAu5/gRd/LYICz8Ey9V1FIl
+         +XaLTt7iR5P2jKUAcEmsUdMtA0wKQiiX9FnkC+dyOmdGFN8vIC5NzxLVASmRBBuDsrRV
+         LSEQ==
+X-Gm-Message-State: AOAM5335DcU1WFvMsvjg7dw8DAf2k8z0STA1a5nmaunZWeWupajC/cK7
+        /UYUcnrqaM+ctxHr+Xu66jZXcw==
+X-Google-Smtp-Source: ABdhPJz4EUTjaP4w7VQByc/KHY+qRzurLSemWKMMDKHGjZyqNhbJH+fDs0qdTtOturi+Xh3NixjSuA==
+X-Received: by 2002:a17:90a:ec05:: with SMTP id l5mr5677044pjy.141.1621959660505;
+        Tue, 25 May 2021 09:21:00 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id r28sm14388368pgm.53.2021.05.25.09.20.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 May 2021 09:20:59 -0700 (PDT)
+Date:   Tue, 25 May 2021 16:20:56 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Dario Faggioli <dfaggioli@suse.com>
+Cc:     Stefano De Venuto <stefano.devenuto99@gmail.com>,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
+        rostedt@goodmis.org, y.karadz@gmail.com
+Subject: Re: [PATCH] Move VMEnter and VMExit tracepoints closer to the actual
+ event
+Message-ID: <YK0j6MrOCFeQSHCa@google.com>
+References: <20210519182303.2790-1-stefano.devenuto99@gmail.com>
+ <YKaBEn6oUXaVAb0K@google.com>
+ <5e6ad92a72e139877fa0e7a1d77682a075060d16.camel@suse.com>
 MIME-Version: 1.0
-In-Reply-To: <YK0emU2NjWZWBovh@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5e6ad92a72e139877fa0e7a1d77682a075060d16.camel@suse.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/05/21 17:58, Sean Christopherson wrote:
->> The right place for the hw multiplier
->> field to be updated is inside set_tsc_khz() in common code when the ratio
->> changes.
-
-Sort of, the problem is that you have two VMCS's to update.  If properly 
-fixed, the cache is useful to fix the issue with KVM_SET_TSC_KHZ needing 
-to update both of them.  For that to work, you'd have to move the cache 
-to struct loaded_vmcs.
-
-So you can:
-
-1) move the cached tsc_ratio to struct loaded_vmcs
-
-2) add a function in common code (update_tsc_parameters or something 
-like that) to update both the offset and the ratio depending on 
-is_guest_mode()
-
-3) call that function from nested vmentry/vmexit
-
-And at that point the cache will do its job and figure out whether a 
-vmwrite is needed, on both vmentry and vmexit.
-
-I actually like the idea of storing the expected value in kvm_vcpu and 
-the current value in loaded_vmcs.  We might use it for other things such 
-as reload_vmcs01_apic_access_page perhaps.
-
-Paolo
-
->> However, this requires adding another vendor callback etc. As all
->> this is further refactoring I believe it's better to leave this series as is -
->> ie only touching code that is directly related to nested TSC scaling and not
->> try to do everything as part of the same series.
-> But it directly impacts your code, e.g. the nested enter/exit flows would need
-> to dance around the decache silliness.  And I believe it even more directly
-> impacts this series: kvm_set_tsc_khz() fails to handle the case where userspace
-> invokes KVM_SET_TSC_KHZ while L2 is active.
+On Fri, May 21, 2021, Dario Faggioli wrote:
+> Hi Sean,
 > 
+> On Thu, 2021-05-20 at 15:32 +0000, Sean Christopherson wrote:
+> > I 100% agree that the current behavior can be a bit confusing, but I wonder
+> > if we'd be better off "solving" that problem through documentation.
+> > 
+> Indeed. So, do you happen to have in mind what could be the best place
+> and the best way for documenting this?
 
+I didn't have anything in mind, but my gut reaction is to add a new file dedicated
+to tracing/tracepoints in KVM, e.g. 
+
+  Documentation/virt/kvm/tracepoints.rst or Documentation/virt/kvm/tracing.rst
+
+I'm sure there are all sorts of tips and tricks people have for using KVM's
+tracepoints, it would be nice to provide a way to capture and disseminate them.
+My only hesitation is that Documentation/virt/kvm/ might be too formal for what
+would effectively be a wiki of sorts.
