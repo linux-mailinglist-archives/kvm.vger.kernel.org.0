@@ -2,196 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5520438FAD9
-	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 08:25:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C84438FB10
+	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 08:41:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231190AbhEYG1I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 May 2021 02:27:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43875 "EHLO
+        id S231297AbhEYGmm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 May 2021 02:42:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53345 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230462AbhEYG1H (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 May 2021 02:27:07 -0400
+        by vger.kernel.org with ESMTP id S230404AbhEYGmk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 25 May 2021 02:42:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621923937;
+        s=mimecast20190719; t=1621924871;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=O2u8/KcKMigjRFo17Ta45XDICW0GwxksgjFfdg5+KBE=;
-        b=Omkw1PwSALA5IGbe8g1DQOG7qGHVyO4AGZ2Py2CYwUZ5pjN2hQLZN/SwyZYy9Gb1nEiI0g
-        0N/UD6QMz/ztoFNtjhvRdOq47/i2sDKxBdAUvxm+i75pOFkQyn3KS9TtPgygSb3Ib5sw3y
-        kkfAFKYmxGFCDTOIe5g9BevzHVWo7ds=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-140-nHijEJpRPCaZ5bNNmOVFyA-1; Tue, 25 May 2021 02:25:36 -0400
-X-MC-Unique: nHijEJpRPCaZ5bNNmOVFyA-1
-Received: by mail-wr1-f70.google.com with SMTP id i102-20020adf90ef0000b029010dfcfc46c0so14146797wri.1
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 23:25:35 -0700 (PDT)
+        bh=kLSwktyFZs8E7VOwk5zUKYu4aQ38NyP9gI4c+eI8elE=;
+        b=ildTRYDEVgGruupSsdPZMZ33vcNyKjAbc68c+BghAtVGmHqp9hg4D/FB6mep/w9F8/aBwL
+        aST6GOcZ956OsllGE5ybvj6A/54LlfPW4LE9MprKAiRDl6CU2PyqvjZe9+UeNdbkp3lFYu
+        iMoRsSu5jHvGM9TK1x87ROjiIZSPwSs=
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-547-cV6CRiA6NqGH02ZOJzzP6w-1; Tue, 25 May 2021 02:41:08 -0400
+X-MC-Unique: cV6CRiA6NqGH02ZOJzzP6w-1
+Received: by mail-pf1-f200.google.com with SMTP id o16-20020a056a0015d0b02902e11ab01eb7so11006760pfu.14
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 23:41:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=O2u8/KcKMigjRFo17Ta45XDICW0GwxksgjFfdg5+KBE=;
-        b=BQraARIA6sGYgXtar+MoySJ3lefL4CZ6ANVoibOx5vpuPbulep6Jw9lWLheyG3a2IN
-         Wq6f9BbOl+uAM/fvSFuYPL/HhPMhwd+2+Z7TMM8Gx3BarRbTmpkRF7A3hGeAA2FV9kHl
-         mRL104KwLmCkmum7uCbq5Ozhyy+mGtIBBQLxHk6AJOpN5cJvp8r+7NxvGZdIQhGQWrMg
-         xy3f2ncHdvJdJZkEB7gZRc1hw4+S+dRR43ENBIiGvB1x6PD9Bcye/diVs0tM5KAvmRKm
-         KItY71Oe7vWVd//y7QUG1snQRPVCiv/SVQfxpqduzjk35IKOatwvOlpPZDR5kgvi4cmC
-         KLRg==
-X-Gm-Message-State: AOAM5300spO3r6jHx+9IdHzHeeB1bQdLtSn5EJ36oLD+JDsQa/jQHcVX
-        5tFVURmFWKJ0lrWTO9b86fkLFA+Ie73i3+6Bn3Gu0sCvJcub/kBqVCz+cFYECiTRa2hK+wQP2Lt
-        5Vsjr5b2p5m/f
-X-Received: by 2002:adf:ed52:: with SMTP id u18mr24752092wro.379.1621923934828;
-        Mon, 24 May 2021 23:25:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwFbS+Phm3Wzu6vFH9TExvTJCPfhn0t9gxxsslxSgPxz1EyZ+IFtsbxGHbauYQDHqhFsO4k/A==
-X-Received: by 2002:adf:ed52:: with SMTP id u18mr24752079wro.379.1621923934677;
-        Mon, 24 May 2021 23:25:34 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id i5sm15145188wrw.29.2021.05.24.23.25.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 May 2021 23:25:34 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v2] KVM: x86: Assume a 64-bit hypercall for guests with
- protected state
-In-Reply-To: <e0b20c770c9d0d1403f23d83e785385104211f74.1621878537.git.thomas.lendacky@amd.com>
-References: <e0b20c770c9d0d1403f23d83e785385104211f74.1621878537.git.thomas.lendacky@amd.com>
-Date:   Tue, 25 May 2021 08:25:32 +0200
-Message-ID: <87cztf8h43.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=kLSwktyFZs8E7VOwk5zUKYu4aQ38NyP9gI4c+eI8elE=;
+        b=VWvVM/5M1tChZvwbK7bPvqqWBs055GotgXzSwQMoiq+7VgBHhhtj5y3+f1TWSo5Y6s
+         OeYbGy07/rfV9xyhDG/L7fQVnCheSOz2MwJIi22qxmze27An8Kl/y3GMP8isdAcoyN9b
+         rcQeeBalA8MPNWmCb6C9A2tmfUQb4Sv9xg8X5GIE59IRmKsO3nFfa6nh8ZFcxGlq8Uch
+         oVZbC60t2Jgm/oG/QNAakxY2da9ew6iEKxgS86LGlCufZAQoYZ6Da+nR3VfVSXSMr5Uu
+         WdQaQy88eaSMAZn7PlsDJTYCjDjw8bys/AFzTqSFdlxKLkIXhRHLpDcOAQl/fwSRFV/X
+         +tBQ==
+X-Gm-Message-State: AOAM531s63LB8WVEeNSEBbHWxnjW8ue2IUYSK80rYHfe8rJVMzKFB3KR
+        GGz+W+qewk93olPo8xmUqR1sNcCYRooqJNQPQi8kcazgoPjOAvgpXcJXT+PYjIRfAk+no0ZPGOP
+        sv5mmXil/EmVq
+X-Received: by 2002:a62:1a0d:0:b029:2da:21a6:6838 with SMTP id a13-20020a621a0d0000b02902da21a66838mr28058937pfa.76.1621924866769;
+        Mon, 24 May 2021 23:41:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxVyOOkl2rdMpz8JwUhVMKIvPn854Rr2/gwU3WBwB4yeNP+uBLNOYgawAwFCiB5p2EW6WnAew==
+X-Received: by 2002:a62:1a0d:0:b029:2da:21a6:6838 with SMTP id a13-20020a621a0d0000b02902da21a66838mr28058912pfa.76.1621924866445;
+        Mon, 24 May 2021 23:41:06 -0700 (PDT)
+Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id x29sm13141650pgl.49.2021.05.24.23.40.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 May 2021 23:41:06 -0700 (PDT)
+Subject: Re: [PATCH v7 00/12] Introduce VDUSE - vDPA Device in Userspace
+To:     Yongji Xie <xieyongji@bytedance.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=c3=a4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+References: <20210517095513.850-1-xieyongji@bytedance.com>
+ <20210520014349-mutt-send-email-mst@kernel.org>
+ <CACycT3tKY2V=dmOJjeiZxkqA3cH8_KF93NNbRnNU04e5Job2cw@mail.gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <2a79fa0f-352d-b8e9-f60a-181960d054ec@redhat.com>
+Date:   Tue, 25 May 2021 14:40:57 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.10.2
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CACycT3tKY2V=dmOJjeiZxkqA3cH8_KF93NNbRnNU04e5Job2cw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Tom Lendacky <thomas.lendacky@amd.com> writes:
 
-> When processing a hypercall for a guest with protected state, currently
-> SEV-ES guests, the guest CS segment register can't be checked to
-> determine if the guest is in 64-bit mode. For an SEV-ES guest, it is
-> expected that communication between the guest and the hypervisor is
-> performed to shared memory using the GHCB. In order to use the GHCB, the
-> guest must have been in long mode, otherwise writes by the guest to the
-> GHCB would be encrypted and not be able to be comprehended by the
-> hypervisor.
->
-> Create a new helper function, is_64_bit_hypercall(), that assumes the
-> guest is in 64-bit mode when the guest has protected state, and returns
-> true, otherwise invoking is_64_bit_mode() to determine the mode. Update
-> the hypercall related routines to use is_64_bit_hypercall() instead of
-> is_64_bit_mode().
->
-> Add a WARN_ON_ONCE() to is_64_bit_mode() to catch occurences of calls to
-> this helper function for a guest running with protected state.
->
-> Fixes: f1c6366e3043 ("KVM: SVM: Add required changes to support intercepts under SEV-ES")
-> Reported-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> ---
->
-> Changes since v1:
-> - Create a new helper routine, is_64_bit_hypercall(), and use it in place
->   of is_64_bit_mode() in hypercall related areas.
-> - Add a WARN_ON_ONCE() to is_64_bit_mode() to issue a warning if invoked
->   for a guest with protected state.
-> ---
->  arch/x86/kvm/hyperv.c |  4 ++--
->  arch/x86/kvm/x86.c    |  2 +-
->  arch/x86/kvm/x86.h    | 12 ++++++++++++
->  arch/x86/kvm/xen.c    |  2 +-
->  4 files changed, 16 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index f98370a39936..1cdf2b213f41 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -1818,7 +1818,7 @@ static void kvm_hv_hypercall_set_result(struct kvm_vcpu *vcpu, u64 result)
->  {
->  	bool longmode;
->  
-> -	longmode = is_64_bit_mode(vcpu);
-> +	longmode = is_64_bit_hypercall(vcpu);
->  	if (longmode)
->  		kvm_rax_write(vcpu, result);
->  	else {
-> @@ -1895,7 +1895,7 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
->  	}
->  
->  #ifdef CONFIG_X86_64
-> -	if (is_64_bit_mode(vcpu)) {
-> +	if (is_64_bit_hypercall(vcpu)) {
->  		param = kvm_rcx_read(vcpu);
->  		ingpa = kvm_rdx_read(vcpu);
->  		outgpa = kvm_r8_read(vcpu);
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 9b6bca616929..dc72f0a1609a 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8403,7 +8403,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
->  
->  	trace_kvm_hypercall(nr, a0, a1, a2, a3);
->  
-> -	op_64_bit = is_64_bit_mode(vcpu);
-> +	op_64_bit = is_64_bit_hypercall(vcpu);
->  	if (!op_64_bit) {
->  		nr &= 0xFFFFFFFF;
->  		a0 &= 0xFFFFFFFF;
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index 521f74e5bbf2..3102caf689d2 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -151,12 +151,24 @@ static inline bool is_64_bit_mode(struct kvm_vcpu *vcpu)
->  {
->  	int cs_db, cs_l;
->  
-> +	WARN_ON_ONCE(vcpu->arch.guest_state_protected);
-> +
->  	if (!is_long_mode(vcpu))
->  		return false;
->  	static_call(kvm_x86_get_cs_db_l_bits)(vcpu, &cs_db, &cs_l);
->  	return cs_l;
->  }
->  
-> +static inline bool is_64_bit_hypercall(struct kvm_vcpu *vcpu)
-> +{
-> +	/*
-> +	 * If running with protected guest state, the CS register is not
-> +	 * accessible. The hypercall register values will have had to been
-> +	 * provided in 64-bit mode, so assume the guest is in 64-bit.
-> +	 */
-> +	return vcpu->arch.guest_state_protected || is_64_bit_mode(vcpu);
-> +}
-> +
->  static inline bool is_la57_mode(struct kvm_vcpu *vcpu)
->  {
->  #ifdef CONFIG_X86_64
-> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> index ae17250e1efe..c58f6369e668 100644
-> --- a/arch/x86/kvm/xen.c
-> +++ b/arch/x86/kvm/xen.c
-> @@ -680,7 +680,7 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
->  	    kvm_hv_hypercall_enabled(vcpu))
->  		return kvm_hv_hypercall(vcpu);
->  
-> -	longmode = is_64_bit_mode(vcpu);
-> +	longmode = is_64_bit_hypercall(vcpu);
->  	if (!longmode) {
->  		params[0] = (u32)kvm_rbx_read(vcpu);
->  		params[1] = (u32)kvm_rcx_read(vcpu);
+在 2021/5/20 下午5:06, Yongji Xie 写道:
+> On Thu, May 20, 2021 at 2:06 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>> On Mon, May 17, 2021 at 05:55:01PM +0800, Xie Yongji wrote:
+>>> This series introduces a framework, which can be used to implement
+>>> vDPA Devices in a userspace program. The work consist of two parts:
+>>> control path forwarding and data path offloading.
+>>>
+>>> In the control path, the VDUSE driver will make use of message
+>>> mechnism to forward the config operation from vdpa bus driver
+>>> to userspace. Userspace can use read()/write() to receive/reply
+>>> those control messages.
+>>>
+>>> In the data path, the core is mapping dma buffer into VDUSE
+>>> daemon's address space, which can be implemented in different ways
+>>> depending on the vdpa bus to which the vDPA device is attached.
+>>>
+>>> In virtio-vdpa case, we implements a MMU-based on-chip IOMMU driver with
+>>> bounce-buffering mechanism to achieve that. And in vhost-vdpa case, the dma
+>>> buffer is reside in a userspace memory region which can be shared to the
+>>> VDUSE userspace processs via transferring the shmfd.
+>>>
+>>> The details and our user case is shown below:
+>>>
+>>> ------------------------    -------------------------   ----------------------------------------------
+>>> |            Container |    |              QEMU(VM) |   |                               VDUSE daemon |
+>>> |       ---------      |    |  -------------------  |   | ------------------------- ---------------- |
+>>> |       |dev/vdx|      |    |  |/dev/vhost-vdpa-x|  |   | | vDPA device emulation | | block driver | |
+>>> ------------+-----------     -----------+------------   -------------+----------------------+---------
+>>>              |                           |                            |                      |
+>>>              |                           |                            |                      |
+>>> ------------+---------------------------+----------------------------+----------------------+---------
+>>> |    | block device |           |  vhost device |            | vduse driver |          | TCP/IP |    |
+>>> |    -------+--------           --------+--------            -------+--------          -----+----    |
+>>> |           |                           |                           |                       |        |
+>>> | ----------+----------       ----------+-----------         -------+-------                |        |
+>>> | | virtio-blk driver |       |  vhost-vdpa driver |         | vdpa device |                |        |
+>>> | ----------+----------       ----------+-----------         -------+-------                |        |
+>>> |           |      virtio bus           |                           |                       |        |
+>>> |   --------+----+-----------           |                           |                       |        |
+>>> |                |                      |                           |                       |        |
+>>> |      ----------+----------            |                           |                       |        |
+>>> |      | virtio-blk device |            |                           |                       |        |
+>>> |      ----------+----------            |                           |                       |        |
+>>> |                |                      |                           |                       |        |
+>>> |     -----------+-----------           |                           |                       |        |
+>>> |     |  virtio-vdpa driver |           |                           |                       |        |
+>>> |     -----------+-----------           |                           |                       |        |
+>>> |                |                      |                           |    vdpa bus           |        |
+>>> |     -----------+----------------------+---------------------------+------------           |        |
+>>> |                                                                                        ---+---     |
+>>> -----------------------------------------------------------------------------------------| NIC |------
+>>>                                                                                           ---+---
+>>>                                                                                              |
+>>>                                                                                     ---------+---------
+>>>                                                                                     | Remote Storages |
+>>>                                                                                     -------------------
+>>>
+>>> We make use of it to implement a block device connecting to
+>>> our distributed storage, which can be used both in containers and
+>>> VMs. Thus, we can have an unified technology stack in this two cases.
+>>>
+>>> To test it with null-blk:
+>>>
+>>>    $ qemu-storage-daemon \
+>>>        --chardev socket,id=charmonitor,path=/tmp/qmp.sock,server,nowait \
+>>>        --monitor chardev=charmonitor \
+>>>        --blockdev driver=host_device,cache.direct=on,aio=native,filename=/dev/nullb0,node-name=disk0 \
+>>>        --export type=vduse-blk,id=test,node-name=disk0,writable=on,name=vduse-null,num-queues=16,queue-size=128
+>>>
+>>> The qemu-storage-daemon can be found at https://github.com/bytedance/qemu/tree/vduse
+>>>
+>>> To make the userspace VDUSE processes such as qemu-storage-daemon able to
+>>> run unprivileged. We did some works on virtio driver to avoid trusting
+>>> device, including:
+>>>
+>>>    - validating the device status:
+>>>
+>>>      * https://lore.kernel.org/lkml/20210517093428.670-1-xieyongji@bytedance.com/
+>>>
+>>>    - validating the used length:
+>>>
+>>>      * https://lore.kernel.org/lkml/20210517090836.533-1-xieyongji@bytedance.com/
+>>>
+>>>    - validating the device config:
+>>>
+>>>      * patch 4 ("virtio-blk: Add validation for block size in config space")
+>>>
+>>>    - validating the device response:
+>>>
+>>>      * patch 5 ("virtio_scsi: Add validation for residual bytes from response")
+>>>
+>>> Since I'm not sure if I missing something during auditing, especially on some
+>>> virtio device drivers that I'm not familiar with, now we only support emualting
+>>> a few vDPA devices by default, including: virtio-net device, virtio-blk device,
+>>> virtio-scsi device and virtio-fs device. This limitation can help to reduce
+>>> security risks.
+>> I suspect there are a lot of assumptions even with these 4.
+>> Just what are the security assumptions and guarantees here?
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-Thanks!
+Note that VDUSE is not the only device that may suffer from this, 
+here're two others:
 
--- 
-Vitaly
+1) Encrypted VM
+2) Smart NICs
+
+
+> The attack surface from a virtio device is limited with IOMMU enabled.
+> It should be able to avoid security risk if we can validate all data
+> such as config space and used length from device in device driver.
+>
+>> E.g. it seems pretty clear that exposing a malformed FS
+>> to a random kernel config can cause untold mischief.
+>>
+>> Things like virtnet_send_command are also an easy way for
+>> the device to DOS the kernel.
+
+
+I think the virtnet_send_command() needs to use interrupt instead of 
+polling.
+
+Thanks
+
+
+>> And before you try to add
+>> an arbitrary timeout there - please don't,
+>> the fix is moving things that must be guaranteed into kernel
+>> and making things that are not guaranteed asynchronous.
+>> Right now there are some things that happen with locks taken,
+>> where if we don't wait for device we lose the ability to report failures
+>> to userspace. E.g. all kind of netlink things are like this.
+>> One can think of a bunch of ways to address this, this
+>> needs to be discussed with the relevant subsystem maintainers.
+>>
+>>
+>> If I were you I would start with one type of device, and as simple one
+>> as possible.
+>>
+> Make sense to me. The virtio-blk device might be a good start. We
+> already have some existing interface like NBD to do similar things.
+>
+>>
+>>> When a sysadmin trusts the userspace process enough, it can relax
+>>> the limitation with a 'allow_unsafe_device_emulation' module parameter.
+>> That's not a great security interface. It's a global module specific knob
+>> that just allows any userspace to emulate anything at all.
+>> Coming up with a reasonable interface isn't going to be easy.
+>> For now maybe just have people patch their kernels if they want to
+>> move fast and break things.
+>>
+> OK. A reasonable interface can be added if we need it in the future.
+>
+> Thanks,
+> Yongji
 
