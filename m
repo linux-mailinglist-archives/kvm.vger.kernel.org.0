@@ -2,100 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D61A138F6B0
-	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 02:03:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3658138F6C5
+	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 02:04:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230125AbhEYAEa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 20:04:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42578 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229854AbhEYAER (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 May 2021 20:04:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621900967;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6JwmMpBs7TpaCI3ZuipI6pwwy6y5d3sU9vlG1AsbdUE=;
-        b=VTJMr5kGXrPAMo7H4AumdHWKzzj76f63C1fCGAH5oW/CatTiXoYS4dh4cDP0+BT+kJkvD/
-        zKfqsngP7I+26cANXpaeJCHlTDaR9NaWNTGU0LzZJjGR+Q0z0okTdt72+GanpP1AUWPU3o
-        FZUS8cfXDAs8bzNfURk5TlO5CTtdDL0=
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
- [209.85.210.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-LazULh1nN7Og2qhrUXOXOw-1; Mon, 24 May 2021 20:02:45 -0400
-X-MC-Unique: LazULh1nN7Og2qhrUXOXOw-1
-Received: by mail-pf1-f197.google.com with SMTP id g144-20020a6252960000b029023d959faca6so19206014pfb.9
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 17:02:45 -0700 (PDT)
+        id S229896AbhEYAGZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 20:06:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49540 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230026AbhEYAF6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 May 2021 20:05:58 -0400
+Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA2B6C06135A
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 17:04:01 -0700 (PDT)
+Received: by mail-oi1-x235.google.com with SMTP id z3so28655056oib.5
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 17:04:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=pEoq10BsxMRuM2WTvWSRXQ9cA8Vnp+Fa+RnoSfCphgI=;
+        b=cTCJ1dLMO67d1IHNSrQZBYAQs7cuzD83O/nHjtc2ZQPCUnhiOEjtJdZWVIYvv0XjJ6
+         MKN+twdRYeojrHFrwTARKAkRKwg0DdvC7V7BnP1OoiU+w4bhciuhyWXKeFpJpv+jl61B
+         RXREnAstub21camjVlq2Om09IZHkWTh72HVpezOG6UDklzZLF6Cflr3UdiTFjDWXeY1I
+         cLYbbmwxyvJCf1GCS+hFvRG0f9q0i8kewSnDWyfqA+7WbwBBnpwiRNesOdScQ1F8nQQ/
+         4TAJABrxUZlKSN9L3vCLDheyAbmDNHAoPP315s2nj1pSK5AHH04b7y9zBU3OtlB8YFLU
+         Kbwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=6JwmMpBs7TpaCI3ZuipI6pwwy6y5d3sU9vlG1AsbdUE=;
-        b=k14ZZkU5so+3GwPGtagnra5tFvXQFTi02trfdjITtBXODMYPYWtTdQsuExCp3uA59E
-         bLs8kMqSydUGbzD0R4klXB4xij9IXMSFJgB1F0m5rame9A3FUEsx6aC/m/3FMy4q7BMe
-         RRGr75q/kvhpE6YpwSKfqxQMfXkoU4e/l2wL83ywO3ZWpe0FrXqvU+00yxLfZA47mvuV
-         8z64eNm2OoQRuaPK2MwO0meUDXtWEaCtmkQv8gQ31HDeb92/x/YnKsqUlRLEAzKSszti
-         0tH1y4wTQMCH/Hgs5drxu1yUUUGqIntMLFAJIhfQy8SLyeDt6JgBsrmswPt1xwfxlflc
-         h38A==
-X-Gm-Message-State: AOAM5336KVnRYPF97npltV3vJdFPjTVuhA9XUI6FQLpVIqsKCZKYUIwU
-        4T9fVF7nknUKEIUIqRjgU302eRAVTjXnza/8gd1yZcY/Wfh3gJBGLcMadTWhlO4tUQXDp6zdyLj
-        Hc6WUCOzdgVj6
-X-Received: by 2002:aa7:828c:0:b029:2d2:3231:7ef8 with SMTP id s12-20020aa7828c0000b02902d232317ef8mr26847627pfm.80.1621900964803;
-        Mon, 24 May 2021 17:02:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxbyrmCLUcE53s8m/jtPYUcLYHs6nAUzwHtcyLOuUAj4w+gEoX+N4uv8UIlnp35amw76TvK2w==
-X-Received: by 2002:aa7:828c:0:b029:2d2:3231:7ef8 with SMTP id s12-20020aa7828c0000b02902d232317ef8mr26847606pfm.80.1621900964580;
-        Mon, 24 May 2021 17:02:44 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id c7sm12444120pga.4.2021.05.24.17.02.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 May 2021 17:02:44 -0700 (PDT)
-Subject: Re: [PATCH] vhost: Remove the repeated declaration
-To:     Shaokun Zhang <zhangshaokun@hisilicon.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>
-References: <1621857884-19964-1-git-send-email-zhangshaokun@hisilicon.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <c93bda5e-edd0-0d63-b8bd-0d73fc505d90@redhat.com>
-Date:   Tue, 25 May 2021 08:02:41 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.2
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=pEoq10BsxMRuM2WTvWSRXQ9cA8Vnp+Fa+RnoSfCphgI=;
+        b=RHdxYnOspBHNJ/ql06nsVFSEgc2mhlTgwgi4phwlbliWAYZg8jD2ZCVhMtN9P4+cl1
+         h8vW7JQYd/RX1Ub5j+FdaUwV+fJeR532Zl2YozhKmR7NUJ15ks5Z/cx7A/tjEtX3a6ws
+         EiwPtHjWDK+w9s7s0dEQbymX8m0Q90OqFCiivUeFD1nxMrEAMGvYp+dylvaXgaVlTaXL
+         /8gdB6aZv8xF77mnlUoOutlf/cz9hEG5RqLtJfz1xyTZ+EIehb4mEtpmnrf8zw+kcW8x
+         Zlx398jCxpLzg6di9Hhl4DPbLjp8KsRg6KEBqrbUbj5ZKIjonKqx+yyKXYHLCtqSgx70
+         oA5g==
+X-Gm-Message-State: AOAM533vt+aBIJIjYh3vMuMNpDJegMV3rNicQ3//3R2Cj0m4MYMlVQN5
+        oivhrNuTc0LdYrdOQKTGrSKgG/UJ2PwygcW0Gp+FMqbogeM=
+X-Google-Smtp-Source: ABdhPJzE+ioA61reGimanwlkKtB5oIxpTryTMr7yr7LEcU0X/Hc9lkV1Oqp74FdL9yrV1gnBvvAaxFy5M1jrBilI618=
+X-Received: by 2002:aca:1e07:: with SMTP id m7mr12013060oic.28.1621901040698;
+ Mon, 24 May 2021 17:04:00 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1621857884-19964-1-git-send-email-zhangshaokun@hisilicon.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+References: <20210520230339.267445-1-jmattson@google.com> <20210520230339.267445-8-jmattson@google.com>
+ <YKw1FGuq5YzSiael@google.com> <CALMp9eQikiZRzX+UtdTW4rHO+jT2uo5xmrtGGs1V96kEZAHh_A@mail.gmail.com>
+ <YKw6mpWe3UFY2Gnp@google.com>
+In-Reply-To: <YKw6mpWe3UFY2Gnp@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 24 May 2021 17:03:49 -0700
+Message-ID: <CALMp9eQy=JhQDzk_LYwrOpbv3hhhi_BT=5rwjHpfTuTQShzkww@mail.gmail.com>
+Subject: Re: [PATCH 07/12] KVM: nVMX: Disable vmcs02 posted interrupts if
+ vmcs12 PID isn't mappable
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-ÔÚ 2021/5/24 ÏÂÎç8:04, Shaokun Zhang Ð´µÀ:
-> Function 'vhost_vring_ioctl' is declared twice, remove the repeated
-> declaration.
+On Mon, May 24, 2021 at 4:45 PM Sean Christopherson <seanjc@google.com> wrote:
 >
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Shaokun Zhang <zhangshaokun@hisilicon.com>
-> ---
->   drivers/vhost/vhost.h | 1 -
->   1 file changed, 1 deletion(-)
+> On Mon, May 24, 2021, Jim Mattson wrote:
+> > On Mon, May 24, 2021 at 4:22 PM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Thu, May 20, 2021, Jim Mattson wrote:
+> > > > Don't allow posted interrupts to modify a stale posted interrupt
+> > > > descriptor (including the initial value of 0).
+> > > >
+> > > > Empirical tests on real hardware reveal that a posted interrupt
+> > > > descriptor referencing an unbacked address has PCI bus error semantics
+> > > > (reads as all 1's; writes are ignored). However, kvm can't distinguish
+> > > > unbacked addresses from device-backed (MMIO) addresses, so it should
+> > > > really ask userspace for an MMIO completion. That's overly
+> > > > complicated, so just punt with KVM_INTERNAL_ERROR.
+> > > >
+> > > > Don't return the error until the posted interrupt descriptor is
+> > > > actually accessed. We don't want to break the existing kvm-unit-tests
+> > > > that assume they can launch an L2 VM with a posted interrupt
+> > > > descriptor that references MMIO space in L1.
+> > > >
+> > > > Fixes: 6beb7bd52e48 ("kvm: nVMX: Refactor nested_get_vmcs12_pages()")
+> > > > Signed-off-by: Jim Mattson <jmattson@google.com>
+> > > > ---
+> > > >  arch/x86/kvm/vmx/nested.c | 15 ++++++++++++++-
+> > > >  1 file changed, 14 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > > > index 706c31821362..defd42201bb4 100644
+> > > > --- a/arch/x86/kvm/vmx/nested.c
+> > > > +++ b/arch/x86/kvm/vmx/nested.c
+> > > > @@ -3175,6 +3175,15 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+> > > >                               offset_in_page(vmcs12->posted_intr_desc_addr));
+> > > >                       vmcs_write64(POSTED_INTR_DESC_ADDR,
+> > > >                                    pfn_to_hpa(map->pfn) + offset_in_page(vmcs12->posted_intr_desc_addr));
+> > > > +             } else {
+> > > > +                     /*
+> > > > +                      * Defer the KVM_INTERNAL_ERROR exit until
+> > > > +                      * someone tries to trigger posted interrupt
+> > > > +                      * processing on this vCPU, to avoid breaking
+> > > > +                      * existing kvm-unit-tests.
+> > >
+> > > Run the lines out to 80 chars.  Also, can we change the comment to tie it to
+> > > CPU behavior in someway?  A few years down the road, "existing kvm-unit-tests"
+> > > may not have any relevant meaning, and it's not like kvm-unit-tests is bug free
+> > > either.  E.g. something like
+> > >
+> > >                         /*
+> > >                          * Defer the KVM_INTERNAL_ERROR exit until posted
+> > >                          * interrupt processing actually occurs on this vCPU.
+> > >                          * Until that happens, the descriptor is not accessed,
+> > >                          * and userspace can technically rely on that behavior.
+> > >                          */
+> > Okay...except for the fact that kvm will rather gratuitously process
+> > posted interrupts in situations where hardware won't. That makes it
+> > difficult to tie this to hardware behavior.
 >
-> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-> index b063324c7669..374f4795cb5a 100644
-> --- a/drivers/vhost/vhost.h
-> +++ b/drivers/vhost/vhost.h
-> @@ -47,7 +47,6 @@ void vhost_poll_stop(struct vhost_poll *poll);
->   void vhost_poll_flush(struct vhost_poll *poll);
->   void vhost_poll_queue(struct vhost_poll *poll);
->   void vhost_work_flush(struct vhost_dev *dev, struct vhost_work *work);
-> -long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp);
->   
->   struct vhost_log {
->   	u64 addr;
+> Hrm, true, but we can at say that KVM won't bail if there's zero chance of posted
+> interrupts being processed.  I hope?
+Zero chance in KVM, or zero chance on hardware?
 
-
-Acked-by: Jason Wang <jasowang@redhat.com>
-
-
+For instance, set TPR high enough to block the posted interrupt vector
+from being delivered, and there is zero chance of posted interrupts
+being processed by hardware. However, if another L1 vCPU sends that
+vector by IPI, there is a 100% chance that KVM will bail, because it
+ignores TPR for processing posted interrupts.
