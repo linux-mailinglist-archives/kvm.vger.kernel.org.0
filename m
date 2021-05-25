@@ -2,252 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F96238FB2D
-	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 08:48:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DEAC938FB71
+	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 09:11:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231410AbhEYGuN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 May 2021 02:50:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26970 "EHLO
+        id S231504AbhEYHMt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 May 2021 03:12:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34325 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231396AbhEYGuL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 May 2021 02:50:11 -0400
+        by vger.kernel.org with ESMTP id S230366AbhEYHMr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 25 May 2021 03:12:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621925322;
+        s=mimecast20190719; t=1621926675;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ul3miHPA+1C0mVf5IsSNMuGBmo+BqIM3N/sQ86Z+ItM=;
-        b=U+MXAtJ+92tLWvy1A8WClR1rTAynn2EprzDjAnUev7Pn7nRzpZpgbQvJeBNH6wSf2T7Urr
-        hoUj/ihCg6QAkkNPhNv11/Gfi7rWhot4ndvyeO7BeNa4gYKNDsLcfvcDooPOVBBs2bTzxs
-        hQ3nIjYS1hajEqoS3YTYhwMgtOE6vC8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-395-YLPGeeXvMEiGWcREdz5_AQ-1; Tue, 25 May 2021 02:48:38 -0400
-X-MC-Unique: YLPGeeXvMEiGWcREdz5_AQ-1
-Received: by mail-wr1-f72.google.com with SMTP id i15-20020a5d558f0000b029011215b1cf5cso7735580wrv.22
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 23:48:37 -0700 (PDT)
+        bh=7mLmIW6ehg0LCjXEELVdzJZToVTG1vKZ+tSeDNW/S8w=;
+        b=EJp/O0WkRxe4EAvCjKvg5lDSVDETEbVAa20UBVb+eIH4ZGjyo803sFJWOI6GNFO95Gft4M
+        3KIM1Voa86BHg7Tv4HHHwhhY8945nPI9yWiD6ukxs1XeF8eDP8nIrL3r3r9/UoQABWr22s
+        V50MgiYT4S+P4sTopewX+o68T8mIczM=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-535-ft6zJySdOMed5J8zbHY8iw-1; Tue, 25 May 2021 03:11:14 -0400
+X-MC-Unique: ft6zJySdOMed5J8zbHY8iw-1
+Received: by mail-ed1-f70.google.com with SMTP id s20-20020a0564025214b029038752a2d8f3so16822262edd.2
+        for <kvm@vger.kernel.org>; Tue, 25 May 2021 00:11:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=ul3miHPA+1C0mVf5IsSNMuGBmo+BqIM3N/sQ86Z+ItM=;
-        b=QXk0LymVX/EM85bEvEl513PmfmgSW2lACI0rk/31uRn/rZs6HTs+Rd78KZvhq62R2X
-         Cb8FpJFwUguFzCQ5sej2cjLpyPL+y1WENoGl85YqHN3sCQQri0yFQeNp/9XKG854v5Wt
-         36cLKwQcLwWkdRZKgKlb6qVyVBkunZqiCVajQUBpu4i0gcNQsiYUpFpOsi1i+L5QCmFS
-         HuHYzM16ng9Ur0UuClQB3dSMMuvvpmC8f9FCk4x56JM/g80C8cpPoQZD31Y9uuT9aJub
-         O8o/Sn7t3lUEf6C0SBoyAy99BCPCYe/ukYkj/+Sjcr8xZkNydIM6XECjcTN38jjv8Thc
-         SvyQ==
-X-Gm-Message-State: AOAM530sfSiEf8lFbN+RMGOWjIxbyuReA+0nY+jZunaOsEhMGHMOOtPJ
-        psVEaMCneM2tovH2TVKj3rGeVAbkMMnLkjSDfwmjoSb07CVmdgdTwQG2MzKUxDzeQ6Rs4j6enge
-        tGvj3nUYH20b7
-X-Received: by 2002:a5d:58d0:: with SMTP id o16mr25535516wrf.420.1621925317003;
-        Mon, 24 May 2021 23:48:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwHrJfvA/haiL2kDkU2Sc824s/VhxDUz9WKfrjZUVALV+rMusOmrmXdB7xQ8MMFAx4z9xMC5w==
-X-Received: by 2002:a5d:58d0:: with SMTP id o16mr25535496wrf.420.1621925316796;
-        Mon, 24 May 2021 23:48:36 -0700 (PDT)
-Received: from redhat.com ([2a10:8006:fcda:0:90d:c7e7:9e26:b297])
-        by smtp.gmail.com with ESMTPSA id g78sm1839253wme.27.2021.05.24.23.48.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 May 2021 23:48:34 -0700 (PDT)
-Date:   Tue, 25 May 2021 02:48:30 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Yongji Xie <xieyongji@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Mika =?iso-8859-1?Q?Penttil=E4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v7 00/12] Introduce VDUSE - vDPA Device in Userspace
-Message-ID: <20210525024500-mutt-send-email-mst@kernel.org>
-References: <20210517095513.850-1-xieyongji@bytedance.com>
- <20210520014349-mutt-send-email-mst@kernel.org>
- <CACycT3tKY2V=dmOJjeiZxkqA3cH8_KF93NNbRnNU04e5Job2cw@mail.gmail.com>
- <2a79fa0f-352d-b8e9-f60a-181960d054ec@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7mLmIW6ehg0LCjXEELVdzJZToVTG1vKZ+tSeDNW/S8w=;
+        b=j0544Ytxsw56O4wDpHu5p0LGVCl8lSSk2BLS8WzH3lKfv7ECvODZFslDgJWaOPns7j
+         7GwJURBg2A4bFBn8GG8RjvxXwll0W6JrvGjxmdwNd+MsKPr4x3itG6EYpS8HZAYwERox
+         Ufo3HLjnICiT/rdkgjP0PJrcAsl582vZDyirkUfTndmWPd0PiZUJlsVmddWCYrHgb9kc
+         gIgXHIwrEV4BquA78vW4jNAr4RWiJ9ecEfGckQJqw0DJxNxtoT/Smr05EfbybdExm6L5
+         rtfsOcOBhCJxRxj/8wLroTANzZ5pujEH4kgsQYaTGyL7kbt+Oxjr8Y7QMieyjMd1Cczi
+         AfBQ==
+X-Gm-Message-State: AOAM530Awp2DHs+ND8uV+6cdLAfsw/PyABJnkvVJH8mxUCYQcXPDl5/N
+        qeorb6PNM9C51xSRXurLN1ET+jInxZseG5BpBJYGAFgbawg0D/VWAxffYctKgYc+YvkSYtuY9d4
+        aZTOOVr0AMB1H
+X-Received: by 2002:a05:6402:c8:: with SMTP id i8mr11472862edu.380.1621926673166;
+        Tue, 25 May 2021 00:11:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwiPJkqMYvGP9jvqBWS9kpUE2n3iiJUQJOaGaZuwoHN+m9v6QC3OymSTLFWevkXIv8urAMHkQ==
+X-Received: by 2002:a05:6402:c8:: with SMTP id i8mr11472845edu.380.1621926673036;
+        Tue, 25 May 2021 00:11:13 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id n24sm10390224edv.51.2021.05.25.00.11.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 May 2021 00:11:12 -0700 (PDT)
+Subject: Re: [PATCH v2 5/5] KVM: x86: hyper-v: Deactivate APICv only when
+ AutoEOI feature is in use
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Kechen Lu <kechenl@nvidia.com>, linux-kernel@vger.kernel.org
+References: <20210518144339.1987982-1-vkuznets@redhat.com>
+ <20210518144339.1987982-6-vkuznets@redhat.com>
+ <82e2a6a0-337a-4b92-2271-493344a38960@redhat.com>
+ <87fsyb8h7s.fsf@vitty.brq.redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2b8d0e27-a893-b090-7ecd-df17eefdf6f1@redhat.com>
+Date:   Tue, 25 May 2021 09:11:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2a79fa0f-352d-b8e9-f60a-181960d054ec@redhat.com>
+In-Reply-To: <87fsyb8h7s.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 25, 2021 at 02:40:57PM +0800, Jason Wang wrote:
-> 
-> 在 2021/5/20 下午5:06, Yongji Xie 写道:
-> > On Thu, May 20, 2021 at 2:06 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > On Mon, May 17, 2021 at 05:55:01PM +0800, Xie Yongji wrote:
-> > > > This series introduces a framework, which can be used to implement
-> > > > vDPA Devices in a userspace program. The work consist of two parts:
-> > > > control path forwarding and data path offloading.
-> > > > 
-> > > > In the control path, the VDUSE driver will make use of message
-> > > > mechnism to forward the config operation from vdpa bus driver
-> > > > to userspace. Userspace can use read()/write() to receive/reply
-> > > > those control messages.
-> > > > 
-> > > > In the data path, the core is mapping dma buffer into VDUSE
-> > > > daemon's address space, which can be implemented in different ways
-> > > > depending on the vdpa bus to which the vDPA device is attached.
-> > > > 
-> > > > In virtio-vdpa case, we implements a MMU-based on-chip IOMMU driver with
-> > > > bounce-buffering mechanism to achieve that. And in vhost-vdpa case, the dma
-> > > > buffer is reside in a userspace memory region which can be shared to the
-> > > > VDUSE userspace processs via transferring the shmfd.
-> > > > 
-> > > > The details and our user case is shown below:
-> > > > 
-> > > > ------------------------    -------------------------   ----------------------------------------------
-> > > > |            Container |    |              QEMU(VM) |   |                               VDUSE daemon |
-> > > > |       ---------      |    |  -------------------  |   | ------------------------- ---------------- |
-> > > > |       |dev/vdx|      |    |  |/dev/vhost-vdpa-x|  |   | | vDPA device emulation | | block driver | |
-> > > > ------------+-----------     -----------+------------   -------------+----------------------+---------
-> > > >              |                           |                            |                      |
-> > > >              |                           |                            |                      |
-> > > > ------------+---------------------------+----------------------------+----------------------+---------
-> > > > |    | block device |           |  vhost device |            | vduse driver |          | TCP/IP |    |
-> > > > |    -------+--------           --------+--------            -------+--------          -----+----    |
-> > > > |           |                           |                           |                       |        |
-> > > > | ----------+----------       ----------+-----------         -------+-------                |        |
-> > > > | | virtio-blk driver |       |  vhost-vdpa driver |         | vdpa device |                |        |
-> > > > | ----------+----------       ----------+-----------         -------+-------                |        |
-> > > > |           |      virtio bus           |                           |                       |        |
-> > > > |   --------+----+-----------           |                           |                       |        |
-> > > > |                |                      |                           |                       |        |
-> > > > |      ----------+----------            |                           |                       |        |
-> > > > |      | virtio-blk device |            |                           |                       |        |
-> > > > |      ----------+----------            |                           |                       |        |
-> > > > |                |                      |                           |                       |        |
-> > > > |     -----------+-----------           |                           |                       |        |
-> > > > |     |  virtio-vdpa driver |           |                           |                       |        |
-> > > > |     -----------+-----------           |                           |                       |        |
-> > > > |                |                      |                           |    vdpa bus           |        |
-> > > > |     -----------+----------------------+---------------------------+------------           |        |
-> > > > |                                                                                        ---+---     |
-> > > > -----------------------------------------------------------------------------------------| NIC |------
-> > > >                                                                                           ---+---
-> > > >                                                                                              |
-> > > >                                                                                     ---------+---------
-> > > >                                                                                     | Remote Storages |
-> > > >                                                                                     -------------------
-> > > > 
-> > > > We make use of it to implement a block device connecting to
-> > > > our distributed storage, which can be used both in containers and
-> > > > VMs. Thus, we can have an unified technology stack in this two cases.
-> > > > 
-> > > > To test it with null-blk:
-> > > > 
-> > > >    $ qemu-storage-daemon \
-> > > >        --chardev socket,id=charmonitor,path=/tmp/qmp.sock,server,nowait \
-> > > >        --monitor chardev=charmonitor \
-> > > >        --blockdev driver=host_device,cache.direct=on,aio=native,filename=/dev/nullb0,node-name=disk0 \
-> > > >        --export type=vduse-blk,id=test,node-name=disk0,writable=on,name=vduse-null,num-queues=16,queue-size=128
-> > > > 
-> > > > The qemu-storage-daemon can be found at https://github.com/bytedance/qemu/tree/vduse
-> > > > 
-> > > > To make the userspace VDUSE processes such as qemu-storage-daemon able to
-> > > > run unprivileged. We did some works on virtio driver to avoid trusting
-> > > > device, including:
-> > > > 
-> > > >    - validating the device status:
-> > > > 
-> > > >      * https://lore.kernel.org/lkml/20210517093428.670-1-xieyongji@bytedance.com/
-> > > > 
-> > > >    - validating the used length:
-> > > > 
-> > > >      * https://lore.kernel.org/lkml/20210517090836.533-1-xieyongji@bytedance.com/
-> > > > 
-> > > >    - validating the device config:
-> > > > 
-> > > >      * patch 4 ("virtio-blk: Add validation for block size in config space")
-> > > > 
-> > > >    - validating the device response:
-> > > > 
-> > > >      * patch 5 ("virtio_scsi: Add validation for residual bytes from response")
-> > > > 
-> > > > Since I'm not sure if I missing something during auditing, especially on some
-> > > > virtio device drivers that I'm not familiar with, now we only support emualting
-> > > > a few vDPA devices by default, including: virtio-net device, virtio-blk device,
-> > > > virtio-scsi device and virtio-fs device. This limitation can help to reduce
-> > > > security risks.
-> > > I suspect there are a lot of assumptions even with these 4.
-> > > Just what are the security assumptions and guarantees here?
-> 
-> 
-> Note that VDUSE is not the only device that may suffer from this, here're
-> two others:
-> 
-> 1) Encrypted VM
+On 25/05/21 08:23, Vitaly Kuznetsov wrote:
+>> Should it also disable APICv unconditionally if
+>> HV_DEPRECATING_AEOI_RECOMMENDED is not in the guest CPUID?  That should
+>> avoid ping-pong between enabled and disabled APICv even in pathological
+>> cases that we cannot think about.
+> When you run Hyper-V on KVM it doesn't use SynIC (let alone AutoEOI) but
+> we still inhibit APICv unconditionally. The patch as-is improves this
+> without any userspace changes required and I see it as a benefit. Going
+> forward, we will definitely add something like 'hv-synic-noaeoi' to QEMU
+> to make non-nesting setups benefit too but it'll take a while for this
+> option to propagate to real world configurations (sigh).
 
-Encrypted VMs are generally understood not to be fully
-protected from attacks by a malicious hypervisor. For example
-a DoS by a hypervisor is currently trivial.
+Ok, if enable<->disable APICv becomes an issue we can also consider 
+disabling APICv forever if AutoEOI is ever used.
 
-> 2) Smart NICs
-
-More or less the same thing.
-
-
-> 
-> > The attack surface from a virtio device is limited with IOMMU enabled.
-> > It should be able to avoid security risk if we can validate all data
-> > such as config space and used length from device in device driver.
-> > 
-> > > E.g. it seems pretty clear that exposing a malformed FS
-> > > to a random kernel config can cause untold mischief.
-> > > 
-> > > Things like virtnet_send_command are also an easy way for
-> > > the device to DOS the kernel.
-> 
-> 
-> I think the virtnet_send_command() needs to use interrupt instead of
-> polling.
-> 
-> Thanks
-> 
-> 
-> > > And before you try to add
-> > > an arbitrary timeout there - please don't,
-> > > the fix is moving things that must be guaranteed into kernel
-> > > and making things that are not guaranteed asynchronous.
-> > > Right now there are some things that happen with locks taken,
-> > > where if we don't wait for device we lose the ability to report failures
-> > > to userspace. E.g. all kind of netlink things are like this.
-> > > One can think of a bunch of ways to address this, this
-> > > needs to be discussed with the relevant subsystem maintainers.
-> > > 
-> > > 
-> > > If I were you I would start with one type of device, and as simple one
-> > > as possible.
-> > > 
-> > Make sense to me. The virtio-blk device might be a good start. We
-> > already have some existing interface like NBD to do similar things.
-> > 
-> > > 
-> > > > When a sysadmin trusts the userspace process enough, it can relax
-> > > > the limitation with a 'allow_unsafe_device_emulation' module parameter.
-> > > That's not a great security interface. It's a global module specific knob
-> > > that just allows any userspace to emulate anything at all.
-> > > Coming up with a reasonable interface isn't going to be easy.
-> > > For now maybe just have people patch their kernels if they want to
-> > > move fast and break things.
-> > > 
-> > OK. A reasonable interface can be added if we need it in the future.
-> > 
-> > Thanks,
-> > Yongji
+Paolo
 
