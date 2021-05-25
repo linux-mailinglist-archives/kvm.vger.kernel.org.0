@@ -2,101 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E38C338FAD3
-	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 08:23:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5520438FAD9
+	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 08:25:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230224AbhEYGYy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 May 2021 02:24:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22751 "EHLO
+        id S231190AbhEYG1I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 May 2021 02:27:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43875 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230334AbhEYGYx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 May 2021 02:24:53 -0400
+        by vger.kernel.org with ESMTP id S230462AbhEYG1H (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 25 May 2021 02:27:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621923804;
+        s=mimecast20190719; t=1621923937;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=kJI9B3UDrsS5ZG82dGOTDBKrm8/JabWsy+34uznhI0Y=;
-        b=NK4XKEtIoB2nQX1dfF0CIKAzeZ+eyIbLX6Rqztqwlq2GmEzKfM+xCluCSoF9nGAeJlBF7I
-        7sDBITSX9ydjgdKtvreFz6tLi8qXeRwNrSm4Qu8MOVCIByiuD9UANBMQFQXkNq1eNj79cs
-        oe/VflAD+125acE63wx8G1tefobt/Lg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-5-f3EZyRjQMr-wEhQuqd_mYA-1; Tue, 25 May 2021 02:23:22 -0400
-X-MC-Unique: f3EZyRjQMr-wEhQuqd_mYA-1
-Received: by mail-wr1-f71.google.com with SMTP id g3-20020adfd1e30000b02901122a4b850aso6100411wrd.20
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 23:23:22 -0700 (PDT)
+        bh=O2u8/KcKMigjRFo17Ta45XDICW0GwxksgjFfdg5+KBE=;
+        b=Omkw1PwSALA5IGbe8g1DQOG7qGHVyO4AGZ2Py2CYwUZ5pjN2hQLZN/SwyZYy9Gb1nEiI0g
+        0N/UD6QMz/ztoFNtjhvRdOq47/i2sDKxBdAUvxm+i75pOFkQyn3KS9TtPgygSb3Ib5sw3y
+        kkfAFKYmxGFCDTOIe5g9BevzHVWo7ds=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-nHijEJpRPCaZ5bNNmOVFyA-1; Tue, 25 May 2021 02:25:36 -0400
+X-MC-Unique: nHijEJpRPCaZ5bNNmOVFyA-1
+Received: by mail-wr1-f70.google.com with SMTP id i102-20020adf90ef0000b029010dfcfc46c0so14146797wri.1
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 23:25:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=kJI9B3UDrsS5ZG82dGOTDBKrm8/JabWsy+34uznhI0Y=;
-        b=Sp2L5KMbLLQpy8idfATbFmqANJ+6rBdb4SOjt5uIV4/pvmPT/BGmX+o9G/ctBp0XXs
-         7Lt8G/MClLSanvsvuRTIowm3tgYQe9kRRNXmJJlNGYkh5HCNlb+HSpOOQukV6u6PPXYr
-         vbCyOz+W9/aUOWf8oGTbwQNC/fvSHcUxhg5qWsOWCr/VzYg0g/3ln8FF1qWe0RdGMibg
-         krJpG2K3JQ9cgzXsetgXPh+2rZlbXEvxM48RdJX9nw/sFDX9L53nVyp49lONSQMYZ2/k
-         mg+F6Po7xgnPYeLRx/zMvLrEzeCxolj6ZO9vRkkSxFLHZQ6sgKn+aDLWhaFm6qW3zYix
-         MFOg==
-X-Gm-Message-State: AOAM531Bk7wxq3UYPlX4Xk0mAax+YmVUkbldtASIwA+tlzC9IazkZvH0
-        VLBujhcscaWmzK6fL5a4tb1naeFHMQFlkHLWNGSaIznhmZ91R+ayR5YX+mWAGGKu/cJUOEue3n8
-        M7u7zvApHICCS
-X-Received: by 2002:adf:fd81:: with SMTP id d1mr25720244wrr.37.1621923801599;
-        Mon, 24 May 2021 23:23:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw5iZuU+Q62kXzDBukK4J7FbYpVjOGZNWnlJDEeNvhevYharSYKA5CYOQitXD6QBTBf/I26hA==
-X-Received: by 2002:adf:fd81:: with SMTP id d1mr25720236wrr.37.1621923801480;
-        Mon, 24 May 2021 23:23:21 -0700 (PDT)
+        bh=O2u8/KcKMigjRFo17Ta45XDICW0GwxksgjFfdg5+KBE=;
+        b=BQraARIA6sGYgXtar+MoySJ3lefL4CZ6ANVoibOx5vpuPbulep6Jw9lWLheyG3a2IN
+         Wq6f9BbOl+uAM/fvSFuYPL/HhPMhwd+2+Z7TMM8Gx3BarRbTmpkRF7A3hGeAA2FV9kHl
+         mRL104KwLmCkmum7uCbq5Ozhyy+mGtIBBQLxHk6AJOpN5cJvp8r+7NxvGZdIQhGQWrMg
+         xy3f2ncHdvJdJZkEB7gZRc1hw4+S+dRR43ENBIiGvB1x6PD9Bcye/diVs0tM5KAvmRKm
+         KItY71Oe7vWVd//y7QUG1snQRPVCiv/SVQfxpqduzjk35IKOatwvOlpPZDR5kgvi4cmC
+         KLRg==
+X-Gm-Message-State: AOAM5300spO3r6jHx+9IdHzHeeB1bQdLtSn5EJ36oLD+JDsQa/jQHcVX
+        5tFVURmFWKJ0lrWTO9b86fkLFA+Ie73i3+6Bn3Gu0sCvJcub/kBqVCz+cFYECiTRa2hK+wQP2Lt
+        5Vsjr5b2p5m/f
+X-Received: by 2002:adf:ed52:: with SMTP id u18mr24752092wro.379.1621923934828;
+        Mon, 24 May 2021 23:25:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwFbS+Phm3Wzu6vFH9TExvTJCPfhn0t9gxxsslxSgPxz1EyZ+IFtsbxGHbauYQDHqhFsO4k/A==
+X-Received: by 2002:adf:ed52:: with SMTP id u18mr24752079wro.379.1621923934677;
+        Mon, 24 May 2021 23:25:34 -0700 (PDT)
 Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id 61sm15690877wrm.52.2021.05.24.23.23.20
+        by smtp.gmail.com with ESMTPSA id i5sm15145188wrw.29.2021.05.24.23.25.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 May 2021 23:23:20 -0700 (PDT)
+        Mon, 24 May 2021 23:25:34 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+To:     Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Kechen Lu <kechenl@nvidia.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 5/5] KVM: x86: hyper-v: Deactivate APICv only when
- AutoEOI feature is in use
-In-Reply-To: <82e2a6a0-337a-4b92-2271-493344a38960@redhat.com>
-References: <20210518144339.1987982-1-vkuznets@redhat.com>
- <20210518144339.1987982-6-vkuznets@redhat.com>
- <82e2a6a0-337a-4b92-2271-493344a38960@redhat.com>
-Date:   Tue, 25 May 2021 08:23:19 +0200
-Message-ID: <87fsyb8h7s.fsf@vitty.brq.redhat.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v2] KVM: x86: Assume a 64-bit hypercall for guests with
+ protected state
+In-Reply-To: <e0b20c770c9d0d1403f23d83e785385104211f74.1621878537.git.thomas.lendacky@amd.com>
+References: <e0b20c770c9d0d1403f23d83e785385104211f74.1621878537.git.thomas.lendacky@amd.com>
+Date:   Tue, 25 May 2021 08:25:32 +0200
+Message-ID: <87cztf8h43.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Tom Lendacky <thomas.lendacky@amd.com> writes:
 
-> On 18/05/21 16:43, Vitaly Kuznetsov wrote:
->> APICV_INHIBIT_REASON_HYPERV is currently unconditionally forced upon
->> SynIC activation as SynIC's AutoEOI is incompatible with APICv/AVIC. It is,
->> however, possible to track whether the feature was actually used by the
->> guest and only inhibit APICv/AVIC when needed.
->> 
->> TLFS suggests a dedicated 'HV_DEPRECATING_AEOI_RECOMMENDED' flag to let
->> Windows know that AutoEOI feature should be avoided. While it's up to
->> KVM userspace to set the flag, KVM can help a bit by exposing global
->> APICv/AVIC enablement: in case APICv/AVIC usage is impossible, AutoEOI
->> is still preferred.
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> When processing a hypercall for a guest with protected state, currently
+> SEV-ES guests, the guest CS segment register can't be checked to
+> determine if the guest is in 64-bit mode. For an SEV-ES guest, it is
+> expected that communication between the guest and the hypervisor is
+> performed to shared memory using the GHCB. In order to use the GHCB, the
+> guest must have been in long mode, otherwise writes by the guest to the
+> GHCB would be encrypted and not be able to be comprehended by the
+> hypervisor.
 >
-> Should it also disable APICv unconditionally if 
-> HV_DEPRECATING_AEOI_RECOMMENDED is not in the guest CPUID?  That should 
-> avoid ping-pong between enabled and disabled APICv even in pathological 
-> cases that we cannot think about.
+> Create a new helper function, is_64_bit_hypercall(), that assumes the
+> guest is in 64-bit mode when the guest has protected state, and returns
+> true, otherwise invoking is_64_bit_mode() to determine the mode. Update
+> the hypercall related routines to use is_64_bit_hypercall() instead of
+> is_64_bit_mode().
+>
+> Add a WARN_ON_ONCE() to is_64_bit_mode() to catch occurences of calls to
+> this helper function for a guest running with protected state.
+>
+> Fixes: f1c6366e3043 ("KVM: SVM: Add required changes to support intercepts under SEV-ES")
+> Reported-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> ---
+>
+> Changes since v1:
+> - Create a new helper routine, is_64_bit_hypercall(), and use it in place
+>   of is_64_bit_mode() in hypercall related areas.
+> - Add a WARN_ON_ONCE() to is_64_bit_mode() to issue a warning if invoked
+>   for a guest with protected state.
+> ---
+>  arch/x86/kvm/hyperv.c |  4 ++--
+>  arch/x86/kvm/x86.c    |  2 +-
+>  arch/x86/kvm/x86.h    | 12 ++++++++++++
+>  arch/x86/kvm/xen.c    |  2 +-
+>  4 files changed, 16 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index f98370a39936..1cdf2b213f41 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -1818,7 +1818,7 @@ static void kvm_hv_hypercall_set_result(struct kvm_vcpu *vcpu, u64 result)
+>  {
+>  	bool longmode;
+>  
+> -	longmode = is_64_bit_mode(vcpu);
+> +	longmode = is_64_bit_hypercall(vcpu);
+>  	if (longmode)
+>  		kvm_rax_write(vcpu, result);
+>  	else {
+> @@ -1895,7 +1895,7 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+>  	}
+>  
+>  #ifdef CONFIG_X86_64
+> -	if (is_64_bit_mode(vcpu)) {
+> +	if (is_64_bit_hypercall(vcpu)) {
+>  		param = kvm_rcx_read(vcpu);
+>  		ingpa = kvm_rdx_read(vcpu);
+>  		outgpa = kvm_r8_read(vcpu);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 9b6bca616929..dc72f0a1609a 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8403,7 +8403,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>  
+>  	trace_kvm_hypercall(nr, a0, a1, a2, a3);
+>  
+> -	op_64_bit = is_64_bit_mode(vcpu);
+> +	op_64_bit = is_64_bit_hypercall(vcpu);
+>  	if (!op_64_bit) {
+>  		nr &= 0xFFFFFFFF;
+>  		a0 &= 0xFFFFFFFF;
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 521f74e5bbf2..3102caf689d2 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -151,12 +151,24 @@ static inline bool is_64_bit_mode(struct kvm_vcpu *vcpu)
+>  {
+>  	int cs_db, cs_l;
+>  
+> +	WARN_ON_ONCE(vcpu->arch.guest_state_protected);
+> +
+>  	if (!is_long_mode(vcpu))
+>  		return false;
+>  	static_call(kvm_x86_get_cs_db_l_bits)(vcpu, &cs_db, &cs_l);
+>  	return cs_l;
+>  }
+>  
+> +static inline bool is_64_bit_hypercall(struct kvm_vcpu *vcpu)
+> +{
+> +	/*
+> +	 * If running with protected guest state, the CS register is not
+> +	 * accessible. The hypercall register values will have had to been
+> +	 * provided in 64-bit mode, so assume the guest is in 64-bit.
+> +	 */
+> +	return vcpu->arch.guest_state_protected || is_64_bit_mode(vcpu);
+> +}
+> +
+>  static inline bool is_la57_mode(struct kvm_vcpu *vcpu)
+>  {
+>  #ifdef CONFIG_X86_64
+> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> index ae17250e1efe..c58f6369e668 100644
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -680,7 +680,7 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
+>  	    kvm_hv_hypercall_enabled(vcpu))
+>  		return kvm_hv_hypercall(vcpu);
+>  
+> -	longmode = is_64_bit_mode(vcpu);
+> +	longmode = is_64_bit_hypercall(vcpu);
+>  	if (!longmode) {
+>  		params[0] = (u32)kvm_rbx_read(vcpu);
+>  		params[1] = (u32)kvm_rcx_read(vcpu);
 
-When you run Hyper-V on KVM it doesn't use SynIC (let alone AutoEOI) but
-we still inhibit APICv unconditionally. The patch as-is improves this
-without any userspace changes required and I see it as a benefit. Going
-forward, we will definitely add something like 'hv-synic-noaeoi' to QEMU
-to make non-nesting setups benefit too but it'll take a while for this
-option to propagate to real world configurations (sigh).
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+Thanks!
 
 -- 
 Vitaly
