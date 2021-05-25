@@ -2,314 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E83FB390602
-	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 17:58:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BAA3539062E
+	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 18:06:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234306AbhEYP76 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 May 2021 11:59:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39464 "EHLO
+        id S234327AbhEYQHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 May 2021 12:07:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232858AbhEYP7x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 May 2021 11:59:53 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF952C061574
-        for <kvm@vger.kernel.org>; Tue, 25 May 2021 08:58:22 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id z4so14382217plg.8
-        for <kvm@vger.kernel.org>; Tue, 25 May 2021 08:58:22 -0700 (PDT)
+        with ESMTP id S230422AbhEYQHh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 May 2021 12:07:37 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D947FC061756
+        for <kvm@vger.kernel.org>; Tue, 25 May 2021 09:06:04 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id r1so8254673pgk.8
+        for <kvm@vger.kernel.org>; Tue, 25 May 2021 09:06:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=GrNYyp8yFCM3OjtEgwsRlPYZghJBZxh+aIazEW9zPPY=;
-        b=klmzJr10Hwz5hESiRxrs9bZ1OQdihS5xP7/1ioX/BAEl9X+FVsytvGtpEQeT/LFhib
-         1Hw1QsKmh359WG2XCkq2Jx7wI1a/v4IW1Evv80o5coZNSG+x8BKn4BSTgYgFgb7i1bDu
-         S8IM4beVYZBZUiI0SQZetFVL85X80t/HBxEguuLG4DDRMbhZKJ+gGRr/jx5oscaKy1Tg
-         w7sQb3jKYO0ctxlGLms6S8w8lZr46IomCP+dmOEI/oc1ilfdP0xECj5O1CoKW/K11fYO
-         smhwW7vIH8aQUUmcXk/ai2wyYi1spgw5u5k369EskIXHhV92VSB70DvpoLvsh/4eSEtv
-         ybnQ==
+        bh=LgVOVY2ibuyGuU/9wT6gXOqlRQyyb5+usGB0r4sYDWo=;
+        b=RrfJyelQGFQ10gxDLNjm7SXx+DIwmxk6NevLQkNWMmrut40zA/RdZf1xzB54H3BJHE
+         a5D4wR4VEGUIskrKVZnNE2MEhXYj9e4f21/b6gRkrt5iZH5pL+LSSQeLtMZO7XmuoRDN
+         +ckoRMemeP1aW8Ui5BNNxJEbtU+E9t1llc67qUjWPQPoEOjbkcxxfu37ofHkYE4NDmMF
+         7JKkDcHcM0f12uyw353MJuc1hT0HjBkVKCM5Hojk/VcAMjo14S83lopi0DLq512ou6e2
+         320XDjwIb0y+zwKIrHVYwnAla8iSi5IMOOk6Se8HvqUIQN8IzxMZ2tmZuZr2tkQ5f5lA
+         DK2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=GrNYyp8yFCM3OjtEgwsRlPYZghJBZxh+aIazEW9zPPY=;
-        b=pRHWjGW3Q2/YBOre6rkdSZLOlUzpvwjD7CePYnmJykBlphYoxCLcAjP7+yhkowW+Zi
-         PQjGBsO+C0LutY9zjHZJX3D3I6DxLq5HVVZxiRVd3u9tEW9NPcDZKV4vJx5uZWrY3eW9
-         lMyaMni9hgf9wklHri681X1+nioqfPARRlZx4Az4jZF4QFpZg1+0kjZYCn8g9ZPOIs/V
-         DHmWHFU9sE3kJRMm2mLtD6X4WTHXwZd9C2uweMewsxeutGgFHCb5YI7rdV9XwNze+1X+
-         L1VLkhw9PQR9ViXQwfT/8J54H5Jv6WAP1gg22MoLN5Zb9DXzF8M1UA57WjnRrZlFbPRZ
-         AHgw==
-X-Gm-Message-State: AOAM532znKXSp5hrP3VFzUdX4uVVxUVGxq9bU+/Wp+mAZM/JDlvgFWFN
-        vySb/TsIH2h+LvbACzGZVCDsag==
-X-Google-Smtp-Source: ABdhPJxiTE1MXZy29GZ6ygzEV+/Xn203KaZ2CJKzl3TAXPY1HaIedzMdVsdUpKrSioL1WSB6gvqKsg==
-X-Received: by 2002:a17:90a:ab90:: with SMTP id n16mr5389652pjq.223.1621958302021;
-        Tue, 25 May 2021 08:58:22 -0700 (PDT)
+        bh=LgVOVY2ibuyGuU/9wT6gXOqlRQyyb5+usGB0r4sYDWo=;
+        b=lo4V3HvbmsXv2qCLRye2+w/vY/mdOLRZ/ZQA5O9rWTR7uRJs4XBizdaPHK0wcIOvsO
+         eSWr8kBuZhE+K7P8MkJ0KWxVcyzIz3D0HGGHYoPpWVIbkgUtRGfZ/VPxALBdLCma7SpV
+         kOjakCpd7cKkgVUT310qiEkNK2W7ToszlssFXo0WIkuYmBFwsX0jBGrvh6Fz105KBquD
+         IP+7yEZ2c2BlkEOcZq6YAoLkEIjw44S76WxXNRSBJ8jP0a5cYyKiOZK1HdoidGWm3V8o
+         ca5Vq67mxTTWWBlhQdoP5UrdQpQIzdmcT2j7D4rnFNDjsKF7aXVwsKgG+svsU1oKSsdb
+         uIaw==
+X-Gm-Message-State: AOAM530LiYOE2uTHNJ3i10QyXGMXxo/fr+v8JmG0attW/c0268QMXr+p
+        azQmwAuk1yLsaa/HP3Du5X3jzw==
+X-Google-Smtp-Source: ABdhPJxPfpL1r4PSy4t6tPOfWDdctGgiCOwK/xTk1FvajZnTSCfgq3VdUH4BkHF6Zh2BZ4YSVR23dw==
+X-Received: by 2002:aa7:8b44:0:b029:2dd:4cfc:7666 with SMTP id i4-20020aa78b440000b02902dd4cfc7666mr31201526pfd.73.1621958764164;
+        Tue, 25 May 2021 09:06:04 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id x22sm2340419pjp.42.2021.05.25.08.58.21
+        by smtp.gmail.com with ESMTPSA id h9sm12938162pja.42.2021.05.25.09.06.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 May 2021 08:58:21 -0700 (PDT)
-Date:   Tue, 25 May 2021 15:58:17 +0000
+        Tue, 25 May 2021 09:06:03 -0700 (PDT)
+Date:   Tue, 25 May 2021 16:05:59 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     "Stamatis, Ilias" <ilstam@amazon.com>
-Cc:     "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "zamsden@gmail.com" <zamsden@gmail.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>
-Subject: Re: [PATCH v3 09/12] KVM: VMX: Remove vmx->current_tsc_ratio and
- decache_tsc_multiplier()
-Message-ID: <YK0emU2NjWZWBovh@google.com>
+To:     Ilias Stamatis <ilstam@amazon.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, mlevitsk@redhat.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        zamsden@gmail.com, mtosatti@redhat.com, dwmw@amazon.co.uk
+Subject: Re: [PATCH v3 10/12] KVM: VMX: Set the TSC offset and multiplier on
+ nested entry and exit
+Message-ID: <YK0gZ7ugquQxm2ce@google.com>
 References: <20210521102449.21505-1-ilstam@amazon.com>
- <20210521102449.21505-10-ilstam@amazon.com>
- <2b3bc8aff14a09c4ea4a1b648f750b5ffb1a15a0.camel@redhat.com>
- <YKv0KA+wJNCbfc/M@google.com>
- <8a13dedc5bc118072d1e79d8af13b5026de736b3.camel@amazon.com>
+ <20210521102449.21505-11-ilstam@amazon.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8a13dedc5bc118072d1e79d8af13b5026de736b3.camel@amazon.com>
+In-Reply-To: <20210521102449.21505-11-ilstam@amazon.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 25, 2021, Stamatis, Ilias wrote:
-> On Mon, 2021-05-24 at 18:44 +0000, Sean Christopherson wrote:
-> > Yes, but its existence is a complete hack.  vmx->current_tsc_ratio has the same
-> > scope as vcpu->arch.tsc_scaling_ratio, i.e. vmx == vcpu == vcpu->arch.  Unlike
-> > per-VMCS tracking, it should not be useful, keyword "should".
-> > 
-> > What I meant by my earlier comment:
-> > 
-> >   Its use in vmx_vcpu_load_vmcs() is basically "write the VMCS if we forgot to
-> >   earlier", which is all kinds of wrong.
-> > 
-> > is that vmx_vcpu_load_vmcs() should never write vmcs.TSC_MULTIPLIER.  The correct
-> > behavior is to set the field at VMCS initialization, and then immediately set it
-> > whenever the ratio is changed, e.g. on nested transition, from userspace, etc...
-> > In other words, my unclear feedback was to make it obsolete (and drop it) by
-> > fixing the underlying mess, not to just drop the optimization hack.
+"KVM: nVMX:" for the scope.
+
+The shortlog is also a bit confusing.  I usually think of "set == write", i.e.
+I expected VMWRITEs in the diff.  The nested_vmx_vmexit() case in particular is
+gnarly because the actual VMWRITEs aren't captured in the diff's context.
+
+What about combining this with the next patch that exposes the feature to L1?
+E.g. "KVM: nVMX: Enable nested TSC scaling" or so.
+
+That would avoid bikeshedding the meaning of "set", fix the goof in the next patch's
+shortlog (KVM exposes the feature to L1, not L2), and eliminate an unnecessary
+patch for bisection purposes.  Bisecting to a patch that exposes the feature but
+doesn't introduce any actual functionality isn't all that helpful, e.g. if there
+is a bug in _this_ patch then bisection will arguably point at the wrong patch.
+
+On Fri, May 21, 2021, Ilias Stamatis wrote:
+> Calculate the nested TSC offset and multiplier on entering L2 using the
+> corresponding functions. Restore the L1 values on L2's exit.
 > 
-> I understood this and replied earlier. The right place for the hw multiplier
-> field to be updated is inside set_tsc_khz() in common code when the ratio
-> changes. However, this requires adding another vendor callback etc. As all
-> this is further refactoring I believe it's better to leave this series as is -
-> ie only touching code that is directly related to nested TSC scaling and not
-> try to do everything as part of the same series.
-
-But it directly impacts your code, e.g. the nested enter/exit flows would need
-to dance around the decache silliness.  And I believe it even more directly
-impacts this series: kvm_set_tsc_khz() fails to handle the case where userspace
-invokes KVM_SET_TSC_KHZ while L2 is active.
-
-> This makes testing easier too.
-
-Hmm, sort of.  Yes, the fewer patches/modifications in a series definitely makes
-the series itself easier to test.  But stepping back and looking at the total
-cost of testing, I would argue that punting related changes to a later time
-increases the overall cost.  E.g. if someone else picks up the clean up work,
-then they have to redo most, if not all, of the testing that you are already
-doing, including getting access to the proper hardware, understanding what tests
-to prioritize, etc...  Whereas adding one more patch to your series is an
-incremental cost since you already have the hardware setup, know which tests to
-run, etc...
-
-> We can still implement these changes later.
-
-We can, but we shouldn't.  Simply dropping vmx->current_tsc_ratio is not an
-option; it knowingly introduces a (minor) performance regression, for no reason
-other than wanting to avoid code churn.  Piling more stuff on top of the flawed
-decache logic is impolite, as it adds more work for the person that ends up
-doing the cleanup.  I would 100% agree if this were a significant cleanup and/or
-completely unrelated, but IMO that's not the case.
-
-Compile tested only...
-
-
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index 029c9615378f..34ad7a17458a 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -90,6 +90,7 @@ KVM_X86_OP_NULL(has_wbinvd_exit)
- KVM_X86_OP(get_l2_tsc_offset)
- KVM_X86_OP(get_l2_tsc_multiplier)
- KVM_X86_OP(write_tsc_offset)
-+KVM_X86_OP(write_tsc_multiplier)
- KVM_X86_OP(get_exit_info)
- KVM_X86_OP(check_intercept)
- KVM_X86_OP(handle_exit_irqoff)
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index f099277b993d..a334ce7741ab 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1308,6 +1308,7 @@ struct kvm_x86_ops {
-        u64 (*get_l2_tsc_offset)(struct kvm_vcpu *vcpu);
-        u64 (*get_l2_tsc_multiplier)(struct kvm_vcpu *vcpu);
-        void (*write_tsc_offset)(struct kvm_vcpu *vcpu, u64 offset);
-+       void (*write_tsc_multiplier)(struct kvm_vcpu *vcpu, u64 multiplier);
-
-        /*
-         * Retrieve somewhat arbitrary exit information.  Intended to be used
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index b18f60463073..914afcceb46d 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1103,6 +1103,14 @@ static void svm_write_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
-        vmcb_mark_dirty(svm->vmcb, VMCB_INTERCEPTS);
- }
-
-+static void svm_write_tsc_multiplier(struct kvm_vcpu *vcpu, u64 l1_multiplier)
-+{
-+       /*
-+        * Handled when loading guest state since the ratio is programmed via
-+        * MSR_AMD64_TSC_RATIO, not a field in the VMCB.
-+        */
-+}
-+
- /* Evaluate instruction intercepts that depend on guest CPUID features. */
- static void svm_recalc_instruction_intercepts(struct kvm_vcpu *vcpu,
-                                              struct vcpu_svm *svm)
-@@ -4528,6 +4536,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
-        .get_l2_tsc_offset = svm_get_l2_tsc_offset,
-        .get_l2_tsc_multiplier = svm_get_l2_tsc_multiplier,
-        .write_tsc_offset = svm_write_tsc_offset,
-+       .write_tsc_multiplier = svm_write_tsc_multiplier,
-
-        .load_mmu_pgd = svm_load_mmu_pgd,
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 6058a65a6ede..712190493926 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2535,7 +2535,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
-        vmcs_write64(TSC_OFFSET, vcpu->arch.tsc_offset);
-
-        if (kvm_has_tsc_control)
--               decache_tsc_multiplier(vmx);
-+               vmcs_write64(TSC_OFFSET, vcpu->arch.tsc_scaling_ratio);
-
-        nested_vmx_transition_tlb_flush(vcpu, vmcs12, true);
-
-@@ -4505,7 +4505,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
-                vmcs_write32(TPR_THRESHOLD, vmx->nested.l1_tpr_threshold);
-
-        if (kvm_has_tsc_control)
--               decache_tsc_multiplier(vmx);
-+               vmcs_write64(TSC_OFFSET, vcpu->arch.tsc_scaling_ratio);
-
-        if (vmx->nested.change_vmcs01_virtual_apic_mode) {
-                vmx->nested.change_vmcs01_virtual_apic_mode = false;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 4b70431c2edd..bf845a08995e 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1390,11 +1390,6 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
-
-                vmx->loaded_vmcs->cpu = cpu;
-        }
--
--       /* Setup TSC multiplier */
--       if (kvm_has_tsc_control &&
--           vmx->current_tsc_ratio != vcpu->arch.tsc_scaling_ratio)
--               decache_tsc_multiplier(vmx);
- }
-
- /*
-@@ -1813,6 +1808,11 @@ static void vmx_write_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
-        vmcs_write64(TSC_OFFSET, offset);
-...skipping...
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -322,8 +322,6 @@ struct vcpu_vmx {
-        /* apic deadline value in host tsc */
-        u64 hv_deadline_tsc;
-
--       u64 current_tsc_ratio;
--
-        unsigned long host_debugctlmsr;
-
-        /*
-@@ -532,12 +530,6 @@ static inline struct vmcs *alloc_vmcs(bool shadow)
-                              GFP_KERNEL_ACCOUNT);
- }
-
--static inline void decache_tsc_multiplier(struct vcpu_vmx *vmx)
--{
--       vmx->current_tsc_ratio = vmx->vcpu.arch.tsc_scaling_ratio;
--       vmcs_write64(TSC_MULTIPLIER, vmx->current_tsc_ratio);
--}
--
- static inline bool vmx_has_waitpkg(struct vcpu_vmx *vmx)
- {
-        return vmx->secondary_exec_control &
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b61b54cea495..690de1868873 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2179,14 +2179,16 @@ static u32 adjust_tsc_khz(u32 khz, s32 ppm)
-        return v;
- }
-
-+static void kvm_vcpu_write_tsc_multiplier(struct kvm_vcpu *vcpu,
-+                                         u64 l1_multiplier);
-+
- static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz, bool scale)
- {
-        u64 ratio;
-
-        /* Guest TSC same frequency as host TSC? */
-        if (!scale) {
--               vcpu->arch.l1_tsc_scaling_ratio = kvm_default_tsc_scaling_ratio;
--               vcpu->arch.tsc_scaling_ratio = kvm_default_tsc_scaling_ratio;
-+               kvm_vcpu_write_tsc_multiplier(vcpu, kvm_default_tsc_scaling_ratio);
-                return 0;
-        }
-
-@@ -2212,7 +2214,7 @@ static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz, bool scale)
-                return -1;
-        }
-
--       vcpu->arch.l1_tsc_scaling_ratio = vcpu->arch.tsc_scaling_ratio = ratio;
-+       kvm_vcpu_write_tsc_multiplier(vcpu, ratio);
-        return 0;
- }
-
-@@ -2224,8 +2226,7 @@ static int kvm_set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz)
-        /* tsc_khz can be zero if TSC calibration fails */
-        if (user_tsc_khz == 0) {
-                /* set tsc_scaling_ratio to a safe value */
--               vcpu->arch.l1_tsc_scaling_ratio = kvm_default_tsc_scaling_ratio;
--               vcpu->arch.tsc_scaling_ratio = kvm_default_tsc_scaling_ratio;
-+               kvm_vcpu_write_tsc_multiplier(vcpu, kvm_default_tsc_scaling_ratio);
-                return -1;
-        }
-
-@@ -2383,6 +2384,25 @@ static void kvm_vcpu_write_tsc_offset(struct kvm_vcpu *vcpu, u64 l1_offset)
-        static_call(kvm_x86_write_tsc_offset)(vcpu, vcpu->arch.tsc_offset);
- }
-
-+static void kvm_vcpu_write_tsc_multiplier(struct kvm_vcpu *vcpu,
-+                                         u64 l1_multiplier)
-+{
-+       if (!kvm_has_tsc_control)
-+               return;
-+
-+       vcpu->arch.l1_tsc_scaling_ratio = l1_multiplier;
-+
-+       /* Userspace is changing the multiplier while L2 is active... */
-+       if (is_guest_mode(vcpu))
-+               vcpu->arch.tsc_scaling_ratio = kvm_calc_nested_tsc_multiplier(
-+                       l1_multiplier,
-+                       static_call(kvm_x86_get_l2_tsc_multiplier)(vcpu));
-+       else
-+               vcpu->arch.tsc_scaling_ratio = l1_multiplier;
-+
-+       static_call(kvm_x86_write_tsc_multiplier)(vcpu, vcpu->arch.tsc_scaling_ratio);
-+}
-+
- static inline bool kvm_check_tsc_unstable(void)
- {
- #ifdef CONFIG_X86_64
+> Signed-off-by: Ilias Stamatis <ilstam@amazon.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 18 ++++++++++++++----
+>  1 file changed, 14 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 239154d3e4e7..f75c4174cbcf 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -2532,6 +2532,15 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>  		vmcs_write64(GUEST_IA32_PAT, vmx->vcpu.arch.pat);
+>  	}
+>  
+> +	vcpu->arch.tsc_offset = kvm_calc_nested_tsc_offset(
+> +			vcpu->arch.l1_tsc_offset,
+> +			vmx_get_l2_tsc_offset(vcpu),
+> +			vmx_get_l2_tsc_multiplier(vcpu));
+> +
+> +	vcpu->arch.tsc_scaling_ratio = kvm_calc_nested_tsc_multiplier(
+> +			vcpu->arch.l1_tsc_scaling_ratio,
+> +			vmx_get_l2_tsc_multiplier(vcpu));
+> +
+>  	vmcs_write64(TSC_OFFSET, vcpu->arch.tsc_offset);
+>  	if (kvm_has_tsc_control)
+>  		vmcs_write64(TSC_MULTIPLIER, vcpu->arch.tsc_scaling_ratio);
+> @@ -3353,8 +3362,6 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+>  	}
+>  
+>  	enter_guest_mode(vcpu);
+> -	if (vmcs12->cpu_based_vm_exec_control & CPU_BASED_USE_TSC_OFFSETTING)
+> -		vcpu->arch.tsc_offset += vmcs12->tsc_offset;
+>  
+>  	if (prepare_vmcs02(vcpu, vmcs12, &entry_failure_code)) {
+>  		exit_reason.basic = EXIT_REASON_INVALID_STATE;
+> @@ -4462,8 +4469,11 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+>  	if (nested_cpu_has_preemption_timer(vmcs12))
+>  		hrtimer_cancel(&to_vmx(vcpu)->nested.preemption_timer);
+>  
+> -	if (vmcs12->cpu_based_vm_exec_control & CPU_BASED_USE_TSC_OFFSETTING)
+> -		vcpu->arch.tsc_offset -= vmcs12->tsc_offset;
+> +	if (nested_cpu_has(vmcs12, CPU_BASED_USE_TSC_OFFSETTING)) {
+> +		vcpu->arch.tsc_offset = vcpu->arch.l1_tsc_offset;
+> +		if (nested_cpu_has2(vmcs12, SECONDARY_EXEC_TSC_SCALING))
+> +			vcpu->arch.tsc_scaling_ratio = vcpu->arch.l1_tsc_scaling_ratio;
+> +	}
+>  
+>  	if (likely(!vmx->fail)) {
+>  		sync_vmcs02_to_vmcs12(vcpu, vmcs12);
+> -- 
+> 2.17.1
+> 
