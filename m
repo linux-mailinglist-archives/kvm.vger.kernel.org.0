@@ -2,322 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BA47838FB75
-	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 09:11:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13D0B38FBDF
+	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 09:37:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231556AbhEYHNK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 May 2021 03:13:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37897 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231533AbhEYHNK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 May 2021 03:13:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621926700;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=c+jOwuXnrv6w5E8VQc63WP+bAoAy3VD+Yg2CcTHav28=;
-        b=WM8QZGrLZ1eHeollpMeFZQKOcPXofA6+Mjt9crAp3FC3lCBIGCvydffisHrSWVWFxr//gr
-        pwgYzDYz64BzMvrLo5g9zwrQxhBgDFk5SjlxnzgIHlcmWKB3I9SCcFkZNyn5EqGTLK1Ac8
-        LGir5tnj6jTj5Q+WZ6CLGGzvABEo31o=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-396-xpvJXSa9M4m38VINXp_wjg-1; Tue, 25 May 2021 03:11:38 -0400
-X-MC-Unique: xpvJXSa9M4m38VINXp_wjg-1
-Received: by mail-lf1-f70.google.com with SMTP id f6-20020a0565123226b02901fcd6f0d1d9so7431844lfe.14
-        for <kvm@vger.kernel.org>; Tue, 25 May 2021 00:11:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=c+jOwuXnrv6w5E8VQc63WP+bAoAy3VD+Yg2CcTHav28=;
-        b=MgP/n9BtzhJlacyATp0nGvmSZYxcsqdnJGE/RY0kF7EatxBYrBrm+G6TFOy4xDXk5E
-         NrQQ3O6pcqvSZr9W3bNlTLs4gVfIOe5SFhE8xyCYQ+wlBVt6/mnC664Cik8PVgGqqQDU
-         CdW7dd8h/94sA6qE7DsDoOZgYimEPfbRovI5Db32tZ8gRZP/sriy8cuSo9yIAxA6q6US
-         3OZ1NHiJmge9RR4ePpUOvlsPnXTN5C4hNJF3d4I+MFbplJFqb9f7dQV7JsUdQ9q/ji9j
-         lEEL0DfcMi6aJvDCWj3xo6daZAJcpve9bMywgmL2ntZDXqy/n818kevcQJ1kMhY1GFTW
-         d3GQ==
-X-Gm-Message-State: AOAM530MV+bIZaCU8ZuCnh2lziglrp+92b2Kn/DIeOyxO3z6Xw2R9w08
-        N06rliQgTW3BrKwezHOwDySwsuKF9OEN28hfgvapIT20bJ0iaB/AWpCy9hmvOXmafKjMQ90szWZ
-        XxuwAUIYt9TK9/YdPWGM/Suw+Z73n
-X-Received: by 2002:a2e:8681:: with SMTP id l1mr19878099lji.494.1621926696914;
-        Tue, 25 May 2021 00:11:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyczZMOa2TWeLJ/W/lfSx4o8+fNsMYOICnJsWfNJWAJpdMrk6M2MyFHAccwCNFcVyF65ZRhbqOH/Ioxg4NXiOk=
-X-Received: by 2002:a2e:8681:: with SMTP id l1mr19878075lji.494.1621926696622;
- Tue, 25 May 2021 00:11:36 -0700 (PDT)
+        id S231794AbhEYHio (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 May 2021 03:38:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34268 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231477AbhEYHin (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 May 2021 03:38:43 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 511F161417;
+        Tue, 25 May 2021 07:37:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1621928233;
+        bh=8smSQFHHk77+VQ3Wa9iNI4/luQ0j33dqUigN4+FCyA0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Nnvhn2zwdz8/ljqYIFSsXNkn8JbOP+hM4SLU8Y7IPP8G6iufLkG/MhQGUS4+/STU+
+         kK8D3TJ5NZN7ePf7Ew91EPvVyIrqTWc8srHDmGLM9ysBnq3thLheXQCh1Ik+TC+Ld4
+         KS0WPD5LBDeKyCYg5QKqIrpwyaXMHejofwOT6mgY=
+Date:   Tue, 25 May 2021 09:37:11 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     Palmer Dabbelt <palmerdabbelt@google.com>,
+        "guoren@kernel.org" <guoren@kernel.org>,
+        Anup Patel <Anup.Patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "graf@amazon.com" <graf@amazon.com>,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        "anup@brainfault.org" <anup@brainfault.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>
+Subject: Re: [PATCH v18 00/18] KVM RISC-V Support
+Message-ID: <YKypJ5SJg2sDtn7/@kroah.com>
+References: <mhng-b093a5aa-ff9d-437f-a10b-47558f182639@palmerdabbelt-glaptop>
+ <DM6PR04MB708173B754E145BC843C4123E7269@DM6PR04MB7081.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-References: <20210517095513.850-1-xieyongji@bytedance.com> <20210520014349-mutt-send-email-mst@kernel.org>
- <CACycT3tKY2V=dmOJjeiZxkqA3cH8_KF93NNbRnNU04e5Job2cw@mail.gmail.com>
- <2a79fa0f-352d-b8e9-f60a-181960d054ec@redhat.com> <20210525024500-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20210525024500-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Tue, 25 May 2021 15:11:25 +0800
-Message-ID: <CACGkMEsg1X95nmnVsm9x8vML7EUOE195gQrvRdr+3woOEcNBeA@mail.gmail.com>
-Subject: Re: [PATCH v7 00/12] Introduce VDUSE - vDPA Device in Userspace
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Yongji Xie <xieyongji@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR04MB708173B754E145BC843C4123E7269@DM6PR04MB7081.namprd04.prod.outlook.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 25, 2021 at 2:48 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Tue, May 25, 2021 at 02:40:57PM +0800, Jason Wang wrote:
-> >
-> > =E5=9C=A8 2021/5/20 =E4=B8=8B=E5=8D=885:06, Yongji Xie =E5=86=99=E9=81=
-=93:
-> > > On Thu, May 20, 2021 at 2:06 PM Michael S. Tsirkin <mst@redhat.com> w=
-rote:
-> > > > On Mon, May 17, 2021 at 05:55:01PM +0800, Xie Yongji wrote:
-> > > > > This series introduces a framework, which can be used to implemen=
-t
-> > > > > vDPA Devices in a userspace program. The work consist of two part=
-s:
-> > > > > control path forwarding and data path offloading.
-> > > > >
-> > > > > In the control path, the VDUSE driver will make use of message
-> > > > > mechnism to forward the config operation from vdpa bus driver
-> > > > > to userspace. Userspace can use read()/write() to receive/reply
-> > > > > those control messages.
-> > > > >
-> > > > > In the data path, the core is mapping dma buffer into VDUSE
-> > > > > daemon's address space, which can be implemented in different way=
-s
-> > > > > depending on the vdpa bus to which the vDPA device is attached.
-> > > > >
-> > > > > In virtio-vdpa case, we implements a MMU-based on-chip IOMMU driv=
-er with
-> > > > > bounce-buffering mechanism to achieve that. And in vhost-vdpa cas=
-e, the dma
-> > > > > buffer is reside in a userspace memory region which can be shared=
- to the
-> > > > > VDUSE userspace processs via transferring the shmfd.
-> > > > >
-> > > > > The details and our user case is shown below:
-> > > > >
-> > > > > ------------------------    -------------------------   ---------=
--------------------------------------
-> > > > > |            Container |    |              QEMU(VM) |   |        =
-                       VDUSE daemon |
-> > > > > |       ---------      |    |  -------------------  |   | -------=
------------------- ---------------- |
-> > > > > |       |dev/vdx|      |    |  |/dev/vhost-vdpa-x|  |   | | vDPA =
-device emulation | | block driver | |
-> > > > > ------------+-----------     -----------+------------   ---------=
-----+----------------------+---------
-> > > > >              |                           |                       =
-     |                      |
-> > > > >              |                           |                       =
-     |                      |
-> > > > > ------------+---------------------------+------------------------=
-----+----------------------+---------
-> > > > > |    | block device |           |  vhost device |            | vd=
-use driver |          | TCP/IP |    |
-> > > > > |    -------+--------           --------+--------            ----=
----+--------          -----+----    |
-> > > > > |           |                           |                        =
-   |                       |        |
-> > > > > | ----------+----------       ----------+-----------         ----=
----+-------                |        |
-> > > > > | | virtio-blk driver |       |  vhost-vdpa driver |         | vd=
-pa device |                |        |
-> > > > > | ----------+----------       ----------+-----------         ----=
----+-------                |        |
-> > > > > |           |      virtio bus           |                        =
-   |                       |        |
-> > > > > |   --------+----+-----------           |                        =
-   |                       |        |
-> > > > > |                |                      |                        =
-   |                       |        |
-> > > > > |      ----------+----------            |                        =
-   |                       |        |
-> > > > > |      | virtio-blk device |            |                        =
-   |                       |        |
-> > > > > |      ----------+----------            |                        =
-   |                       |        |
-> > > > > |                |                      |                        =
-   |                       |        |
-> > > > > |     -----------+-----------           |                        =
-   |                       |        |
-> > > > > |     |  virtio-vdpa driver |           |                        =
-   |                       |        |
-> > > > > |     -----------+-----------           |                        =
-   |                       |        |
-> > > > > |                |                      |                        =
-   |    vdpa bus           |        |
-> > > > > |     -----------+----------------------+------------------------=
----+------------           |        |
-> > > > > |                                                                =
-                        ---+---     |
-> > > > > -----------------------------------------------------------------=
-------------------------| NIC |------
-> > > > >                                                                  =
-                         ---+---
-> > > > >                                                                  =
-                            |
-> > > > >                                                                  =
-                   ---------+---------
-> > > > >                                                                  =
-                   | Remote Storages |
-> > > > >                                                                  =
-                   -------------------
-> > > > >
-> > > > > We make use of it to implement a block device connecting to
-> > > > > our distributed storage, which can be used both in containers and
-> > > > > VMs. Thus, we can have an unified technology stack in this two ca=
-ses.
-> > > > >
-> > > > > To test it with null-blk:
-> > > > >
-> > > > >    $ qemu-storage-daemon \
-> > > > >        --chardev socket,id=3Dcharmonitor,path=3D/tmp/qmp.sock,ser=
-ver,nowait \
-> > > > >        --monitor chardev=3Dcharmonitor \
-> > > > >        --blockdev driver=3Dhost_device,cache.direct=3Don,aio=3Dna=
-tive,filename=3D/dev/nullb0,node-name=3Ddisk0 \
-> > > > >        --export type=3Dvduse-blk,id=3Dtest,node-name=3Ddisk0,writ=
-able=3Don,name=3Dvduse-null,num-queues=3D16,queue-size=3D128
-> > > > >
-> > > > > The qemu-storage-daemon can be found at https://github.com/byteda=
-nce/qemu/tree/vduse
-> > > > >
-> > > > > To make the userspace VDUSE processes such as qemu-storage-daemon=
- able to
-> > > > > run unprivileged. We did some works on virtio driver to avoid tru=
-sting
-> > > > > device, including:
-> > > > >
-> > > > >    - validating the device status:
-> > > > >
-> > > > >      * https://lore.kernel.org/lkml/20210517093428.670-1-xieyongj=
-i@bytedance.com/
-> > > > >
-> > > > >    - validating the used length:
-> > > > >
-> > > > >      * https://lore.kernel.org/lkml/20210517090836.533-1-xieyongj=
-i@bytedance.com/
-> > > > >
-> > > > >    - validating the device config:
-> > > > >
-> > > > >      * patch 4 ("virtio-blk: Add validation for block size in con=
-fig space")
-> > > > >
-> > > > >    - validating the device response:
-> > > > >
-> > > > >      * patch 5 ("virtio_scsi: Add validation for residual bytes f=
-rom response")
-> > > > >
-> > > > > Since I'm not sure if I missing something during auditing, especi=
-ally on some
-> > > > > virtio device drivers that I'm not familiar with, now we only sup=
-port emualting
-> > > > > a few vDPA devices by default, including: virtio-net device, virt=
-io-blk device,
-> > > > > virtio-scsi device and virtio-fs device. This limitation can help=
- to reduce
-> > > > > security risks.
-> > > > I suspect there are a lot of assumptions even with these 4.
-> > > > Just what are the security assumptions and guarantees here?
-> >
-> >
-> > Note that VDUSE is not the only device that may suffer from this, here'=
-re
-> > two others:
-> >
-> > 1) Encrypted VM
->
-> Encrypted VMs are generally understood not to be fully
-> protected from attacks by a malicious hypervisor. For example
-> a DoS by a hypervisor is currently trivial.
+On Mon, May 24, 2021 at 11:08:30PM +0000, Damien Le Moal wrote:
+> On 2021/05/25 7:57, Palmer Dabbelt wrote:
+> > On Mon, 24 May 2021 00:09:45 PDT (-0700), guoren@kernel.org wrote:
+> >> Thx Anup,
+> >>
+> >> Tested-by: Guo Ren <guoren@kernel.org> (Just on qemu-rv64)
+> >>
+> >> I'm following your KVM patchset and it's a great job for riscv
+> >> H-extension. I think hardware companies hope Linux KVM ready first
+> >> before the real chip. That means we can ensure the hardware could run
+> >> mainline linux.
+> > 
+> > I understand that it would be wonderful for hardware vendors to have a 
+> > guarantee that their hardware will be supported by the software 
+> > ecosystem, but that's not what we're talking about here.  Specifically, 
+> > the proposal for this code is to track the latest draft extension which 
+> > would specifically leave vendors who implement the current draft out in 
+> > the cold was something to change.  In practice that is the only way to 
+> > move forward with any draft extension that doesn't have hardware 
+> > available, as the software RISC-V implementations rapidly deprecate 
+> > draft extensions and without a way to test our code it is destined to 
+> > bit rot.
+> 
+> To facilitate the process of implementing, and updating, against draft
+> specifications, I proposed to have arch/riscv/staging added. This would be the
+> place to put code based on drafts. Some simple rules can be put in place:
+> 1) The code and eventual ABI may change any time, no guarantees of backward
+> compatibility
+> 2) Once the specifications are frozen, the code is moved out of staging
+> somewhere else.
+> 3) The code may be removed any time if the specification proposal is dropped, or
+> any other valid reason (can't think of any other right now)
+> 4) ...
+> 
+> This way, the implementation process would be greatly facilitated and
+> interactions between different extensions can be explored much more easily.
+> 
+> Thoughts ?
 
-Right, but I mainly meant the emulated virtio-net device in the case
-of an encrypted VM. We should not leak information to the
-device/hypervisor.
+It will not work, unless you are mean and ruthless and people will get
+mad at you.  I do not recommend it at all.
 
->
-> > 2) Smart NICs
->
-> More or less the same thing.
+Once code shows up in the kernel tree, and people rely on it, you now
+_have_ to support it.  Users don't know the difference between "staging
+or not staging" at all.  We have reported problems of staging media
+drivers breaking userspace apps and people having problems with that,
+despite the media developers trying to tell the world, "DO NOT RELY ON
+THESE!".
 
-In my opinion, this is more similar to VDUSE. Without an encrypted VM,
-we trust the hypervisor but not the device so DOS from a device should
-be eliminated.
+And if this can't be done with tiny simple single drivers, you are going
+to have a world-of-hurt if you put arch/platform support into
+arch/riscv/.  Once it's there, you will never be able to delete it,
+trust me.
 
-Thanks
+If you REALLY wanted to do this, you could create drivers/staging/riscv/
+and try to make the following rules:
 
->
->
-> >
-> > > The attack surface from a virtio device is limited with IOMMU enabled=
-.
-> > > It should be able to avoid security risk if we can validate all data
-> > > such as config space and used length from device in device driver.
-> > >
-> > > > E.g. it seems pretty clear that exposing a malformed FS
-> > > > to a random kernel config can cause untold mischief.
-> > > >
-> > > > Things like virtnet_send_command are also an easy way for
-> > > > the device to DOS the kernel.
-> >
-> >
-> > I think the virtnet_send_command() needs to use interrupt instead of
-> > polling.
-> >
-> > Thanks
-> >
-> >
-> > > > And before you try to add
-> > > > an arbitrary timeout there - please don't,
-> > > > the fix is moving things that must be guaranteed into kernel
-> > > > and making things that are not guaranteed asynchronous.
-> > > > Right now there are some things that happen with locks taken,
-> > > > where if we don't wait for device we lose the ability to report fai=
-lures
-> > > > to userspace. E.g. all kind of netlink things are like this.
-> > > > One can think of a bunch of ways to address this, this
-> > > > needs to be discussed with the relevant subsystem maintainers.
-> > > >
-> > > >
-> > > > If I were you I would start with one type of device, and as simple =
-one
-> > > > as possible.
-> > > >
-> > > Make sense to me. The virtio-blk device might be a good start. We
-> > > already have some existing interface like NBD to do similar things.
-> > >
-> > > >
-> > > > > When a sysadmin trusts the userspace process enough, it can relax
-> > > > > the limitation with a 'allow_unsafe_device_emulation' module para=
-meter.
-> > > > That's not a great security interface. It's a global module specifi=
-c knob
-> > > > that just allows any userspace to emulate anything at all.
-> > > > Coming up with a reasonable interface isn't going to be easy.
-> > > > For now maybe just have people patch their kernels if they want to
-> > > > move fast and break things.
-> > > >
-> > > OK. A reasonable interface can be added if we need it in the future.
-> > >
-> > > Thanks,
-> > > Yongji
->
+	- stand-alone code only, can not depend on ANYTHING outside of
+	  the directory that is not also used by other in-kernel code
+	- does not expose any userspace apis
+	- interacts only with existing in-kernel code.
+	- can be deleted at any time, UNLESS someone is using it for
+	  functionality on a system
 
+But what use would that be?  What could you put into there that anyone
+would be able to actually use?
+
+Remember the rule we made to our user community over 15 years ago:
+
+	We will not break userspace functionality*
+
+With the caveat of "* - in a way that you notice".
+
+That means we can remove and change things that no one relies on
+anymore, as long as if someone pops up that does rely on it, we put it
+back.
+
+We do this because we never want anyone to be afraid to drop in a new
+kernel, because they know we did not break their existing hardware and
+userspace workloads.  And if we did, we will work quickly to fix it.
+
+So back to the original issue here, what is the problem that you are
+trying to solve?  Why do you want to have in-kernel code for hardware
+that no one else can have access to, and that isn't part of a "finalized
+spec" that ends up touching other subsystems and is not self-contained?
+
+Why not take the energy here and go get that spec ratified so we aren't
+having this argument anymore?  What needs to be done to make that happen
+and why hasn't anyone done that?  There's nothing keeping kernel
+developers from working on spec groups, right?
+
+thanks,
+
+greg k-h
