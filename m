@@ -2,138 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BAA3539062E
-	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 18:06:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A8F039063B
+	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 18:09:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234327AbhEYQHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 May 2021 12:07:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41216 "EHLO
+        id S231321AbhEYQLJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 May 2021 12:11:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230422AbhEYQHh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 May 2021 12:07:37 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D947FC061756
-        for <kvm@vger.kernel.org>; Tue, 25 May 2021 09:06:04 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id r1so8254673pgk.8
-        for <kvm@vger.kernel.org>; Tue, 25 May 2021 09:06:04 -0700 (PDT)
+        with ESMTP id S230150AbhEYQLI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 May 2021 12:11:08 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 361C2C061574
+        for <kvm@vger.kernel.org>; Tue, 25 May 2021 09:09:38 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id e17so13369948pfl.5
+        for <kvm@vger.kernel.org>; Tue, 25 May 2021 09:09:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=LgVOVY2ibuyGuU/9wT6gXOqlRQyyb5+usGB0r4sYDWo=;
-        b=RrfJyelQGFQ10gxDLNjm7SXx+DIwmxk6NevLQkNWMmrut40zA/RdZf1xzB54H3BJHE
-         a5D4wR4VEGUIskrKVZnNE2MEhXYj9e4f21/b6gRkrt5iZH5pL+LSSQeLtMZO7XmuoRDN
-         +ckoRMemeP1aW8Ui5BNNxJEbtU+E9t1llc67qUjWPQPoEOjbkcxxfu37ofHkYE4NDmMF
-         7JKkDcHcM0f12uyw353MJuc1hT0HjBkVKCM5Hojk/VcAMjo14S83lopi0DLq512ou6e2
-         320XDjwIb0y+zwKIrHVYwnAla8iSi5IMOOk6Se8HvqUIQN8IzxMZ2tmZuZr2tkQ5f5lA
-         DK2Q==
+        bh=H3sWTarjnvX1yMAm2uYSNfwdZYeMBB25uCb5WK431zU=;
+        b=C6qPA5FhSJHG3wI1WyKnxYEf2VjLBIwUjC5lyLlyCbbGo7PABplZ6kD1VBVKuYrGKE
+         Ee9LqveN6PdkTNfi3V0/gTKUCaWs3ZP7nKWy3DwF59dGZxgvGR49b7K16rT1JANCw8V6
+         sohJKwbhYJUECd1gqM1jZbP/2ClEo9ne1t6t4WS4Uf0QqDrn5Htadumd2Cf/RqOXGONE
+         vfedwaUNIrDr6mBAHd0m8jLIsSFc5XHj2DaWrEXu4qqrgqJvU2O3OLidC8+9ZMmlYCxH
+         Wd8DCv4Nwtg9yY+oFxk8WQBrL07JzSrZteALP77eoVa1cNoByn9vapZ7Q4gkOsD+7tlI
+         WeIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=LgVOVY2ibuyGuU/9wT6gXOqlRQyyb5+usGB0r4sYDWo=;
-        b=lo4V3HvbmsXv2qCLRye2+w/vY/mdOLRZ/ZQA5O9rWTR7uRJs4XBizdaPHK0wcIOvsO
-         eSWr8kBuZhE+K7P8MkJ0KWxVcyzIz3D0HGGHYoPpWVIbkgUtRGfZ/VPxALBdLCma7SpV
-         kOjakCpd7cKkgVUT310qiEkNK2W7ToszlssFXo0WIkuYmBFwsX0jBGrvh6Fz105KBquD
-         IP+7yEZ2c2BlkEOcZq6YAoLkEIjw44S76WxXNRSBJ8jP0a5cYyKiOZK1HdoidGWm3V8o
-         ca5Vq67mxTTWWBlhQdoP5UrdQpQIzdmcT2j7D4rnFNDjsKF7aXVwsKgG+svsU1oKSsdb
-         uIaw==
-X-Gm-Message-State: AOAM530LiYOE2uTHNJ3i10QyXGMXxo/fr+v8JmG0attW/c0268QMXr+p
-        azQmwAuk1yLsaa/HP3Du5X3jzw==
-X-Google-Smtp-Source: ABdhPJxPfpL1r4PSy4t6tPOfWDdctGgiCOwK/xTk1FvajZnTSCfgq3VdUH4BkHF6Zh2BZ4YSVR23dw==
-X-Received: by 2002:aa7:8b44:0:b029:2dd:4cfc:7666 with SMTP id i4-20020aa78b440000b02902dd4cfc7666mr31201526pfd.73.1621958764164;
-        Tue, 25 May 2021 09:06:04 -0700 (PDT)
+        bh=H3sWTarjnvX1yMAm2uYSNfwdZYeMBB25uCb5WK431zU=;
+        b=XUcL3HhbKAqNW/S1+dowxIccJOIBJw/GH6zpVrnNlnBe0pBswWb3KDD6qB3Ko7NOBa
+         sIS+nuCKt8TLMjoe/ws9Te+3pKjkuGGWptMot7BqAVI71Wq2d7avFcXKBLKEXmLjS+kf
+         pV4b2mwIFYDxZ7cPdhduZDPEmBSa59t6xIPr/7DXc6fgwwRv9uRxgCNkVbPPsNp/lMKL
+         R6giGQXdX1bU8OJpDzhOGNh8XWz2EFJtZjp0+N+CaQy2moorx5mKQmVZ6a9JKdVv0dsU
+         gK8vw+yWWTNCW0O6EospcLaatFDn/U5Pk3+X/gtPhHJHMQzDRO0co6VvE/Ck2e6H8WbS
+         g9vg==
+X-Gm-Message-State: AOAM532BdW0bvBsVPG/J/wljx8Hsc9F7CQzXfGgo1icjZqV2cBneoryx
+        H5OtpEIVVkwDIRH5H3iwrCRcyw==
+X-Google-Smtp-Source: ABdhPJyUa1oamz+bNtxoEJrCmoVhnufYrp6eapK4+RUTD/BghM60I/51xnlaPjhjZfei9ha8rv78yw==
+X-Received: by 2002:a62:7f51:0:b029:2dc:e1c9:ef71 with SMTP id a78-20020a627f510000b02902dce1c9ef71mr30816282pfd.33.1621958977566;
+        Tue, 25 May 2021 09:09:37 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id h9sm12938162pja.42.2021.05.25.09.06.02
+        by smtp.gmail.com with ESMTPSA id ck21sm12873674pjb.24.2021.05.25.09.09.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 May 2021 09:06:03 -0700 (PDT)
-Date:   Tue, 25 May 2021 16:05:59 +0000
+        Tue, 25 May 2021 09:09:36 -0700 (PDT)
+Date:   Tue, 25 May 2021 16:09:33 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Ilias Stamatis <ilstam@amazon.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, mlevitsk@redhat.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        zamsden@gmail.com, mtosatti@redhat.com, dwmw@amazon.co.uk
-Subject: Re: [PATCH v3 10/12] KVM: VMX: Set the TSC offset and multiplier on
- nested entry and exit
-Message-ID: <YK0gZ7ugquQxm2ce@google.com>
-References: <20210521102449.21505-1-ilstam@amazon.com>
- <20210521102449.21505-11-ilstam@amazon.com>
+To:     Shaokun Zhang <zhangshaokun@hisilicon.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Remove the repeated declaration
+Message-ID: <YK0hPadppDR1sPaD@google.com>
+References: <1621910615-29985-1-git-send-email-zhangshaokun@hisilicon.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210521102449.21505-11-ilstam@amazon.com>
+In-Reply-To: <1621910615-29985-1-git-send-email-zhangshaokun@hisilicon.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-"KVM: nVMX:" for the scope.
-
-The shortlog is also a bit confusing.  I usually think of "set == write", i.e.
-I expected VMWRITEs in the diff.  The nested_vmx_vmexit() case in particular is
-gnarly because the actual VMWRITEs aren't captured in the diff's context.
-
-What about combining this with the next patch that exposes the feature to L1?
-E.g. "KVM: nVMX: Enable nested TSC scaling" or so.
-
-That would avoid bikeshedding the meaning of "set", fix the goof in the next patch's
-shortlog (KVM exposes the feature to L1, not L2), and eliminate an unnecessary
-patch for bisection purposes.  Bisecting to a patch that exposes the feature but
-doesn't introduce any actual functionality isn't all that helpful, e.g. if there
-is a bug in _this_ patch then bisection will arguably point at the wrong patch.
-
-On Fri, May 21, 2021, Ilias Stamatis wrote:
-> Calculate the nested TSC offset and multiplier on entering L2 using the
-> corresponding functions. Restore the L1 values on L2's exit.
+On Tue, May 25, 2021, Shaokun Zhang wrote:
+> Function 'is_nx_huge_page_enabled' is declared twice, remove the
+> repeated declaration.
 > 
-> Signed-off-by: Ilias Stamatis <ilstam@amazon.com>
+> Cc: Ben Gardon <bgardon@google.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Shaokun Zhang <zhangshaokun@hisilicon.com>
 > ---
->  arch/x86/kvm/vmx/nested.c | 18 ++++++++++++++----
->  1 file changed, 14 insertions(+), 4 deletions(-)
+>  arch/x86/kvm/mmu/mmu_internal.h | 2 --
+>  1 file changed, 2 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 239154d3e4e7..f75c4174cbcf 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -2532,6 +2532,15 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
->  		vmcs_write64(GUEST_IA32_PAT, vmx->vcpu.arch.pat);
->  	}
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index d64ccb417c60..54c6e6193ff2 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -158,8 +158,6 @@ int kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, gfn_t gfn,
+>  void disallowed_hugepage_adjust(u64 spte, gfn_t gfn, int cur_level,
+>  				kvm_pfn_t *pfnp, int *goal_levelp);
 >  
-> +	vcpu->arch.tsc_offset = kvm_calc_nested_tsc_offset(
-> +			vcpu->arch.l1_tsc_offset,
-> +			vmx_get_l2_tsc_offset(vcpu),
-> +			vmx_get_l2_tsc_multiplier(vcpu));
-> +
-> +	vcpu->arch.tsc_scaling_ratio = kvm_calc_nested_tsc_multiplier(
-> +			vcpu->arch.l1_tsc_scaling_ratio,
-> +			vmx_get_l2_tsc_multiplier(vcpu));
-> +
->  	vmcs_write64(TSC_OFFSET, vcpu->arch.tsc_offset);
->  	if (kvm_has_tsc_control)
->  		vmcs_write64(TSC_MULTIPLIER, vcpu->arch.tsc_scaling_ratio);
-> @@ -3353,8 +3362,6 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
->  	}
+> -bool is_nx_huge_page_enabled(void);
+
+Rather than simply delete the extra declaration, what about converting this to
+static inline and opportunistically deleting the duplicate?  The implementation
+is a single operation and this is MMU-internal, i.e. there's no need to export
+and limited exposure of nx_huge_pages to other code.
+
+> -
+>  void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
 >  
->  	enter_guest_mode(vcpu);
-> -	if (vmcs12->cpu_based_vm_exec_control & CPU_BASED_USE_TSC_OFFSETTING)
-> -		vcpu->arch.tsc_offset += vmcs12->tsc_offset;
->  
->  	if (prepare_vmcs02(vcpu, vmcs12, &entry_failure_code)) {
->  		exit_reason.basic = EXIT_REASON_INVALID_STATE;
-> @@ -4462,8 +4469,11 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
->  	if (nested_cpu_has_preemption_timer(vmcs12))
->  		hrtimer_cancel(&to_vmx(vcpu)->nested.preemption_timer);
->  
-> -	if (vmcs12->cpu_based_vm_exec_control & CPU_BASED_USE_TSC_OFFSETTING)
-> -		vcpu->arch.tsc_offset -= vmcs12->tsc_offset;
-> +	if (nested_cpu_has(vmcs12, CPU_BASED_USE_TSC_OFFSETTING)) {
-> +		vcpu->arch.tsc_offset = vcpu->arch.l1_tsc_offset;
-> +		if (nested_cpu_has2(vmcs12, SECONDARY_EXEC_TSC_SCALING))
-> +			vcpu->arch.tsc_scaling_ratio = vcpu->arch.l1_tsc_scaling_ratio;
-> +	}
->  
->  	if (likely(!vmx->fail)) {
->  		sync_vmcs02_to_vmcs12(vcpu, vmcs12);
+>  void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
 > -- 
-> 2.17.1
+> 2.7.4
 > 
