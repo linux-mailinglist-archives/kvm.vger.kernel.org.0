@@ -2,129 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C38D838FF72
-	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 12:42:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6ECA538FFD6
+	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 13:14:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230125AbhEYKns (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 May 2021 06:43:48 -0400
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:2953 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230229AbhEYKne (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 May 2021 06:43:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1621939325; x=1653475325;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-id:content-transfer-encoding:mime-version:subject;
-  bh=tUT6RGQzMtfL1WXUZu6ijJGzZF98Qy6ogSzIyCGVpp4=;
-  b=DH+ykjKngD9ATbH5Jo/MJLCYoiKgF0ZiULhJ9ZmLiztALAhcZNoWFYJO
-   L9WUU6roochqAosGVSCnnM0mWcjm4hGLgNRRy8iPE5QqHcaE1mabOzSDL
-   /RJ26fTN2MCswCiT2fMUWaYdu5Ds6EIxHr/ffA/l8/7Rikq6m2JKVgOZL
-   E=;
-X-IronPort-AV: E=Sophos;i="5.82,328,1613433600"; 
-   d="scan'208";a="114447996"
-Subject: Re: [PATCH v3 09/12] KVM: VMX: Remove vmx->current_tsc_ratio and
- decache_tsc_multiplier()
-Thread-Topic: [PATCH v3 09/12] KVM: VMX: Remove vmx->current_tsc_ratio and
- decache_tsc_multiplier()
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1d-16425a8d.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP; 25 May 2021 10:41:52 +0000
-Received: from EX13MTAUEE001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1d-16425a8d.us-east-1.amazon.com (Postfix) with ESMTPS id 295DE100C54;
-        Tue, 25 May 2021 10:41:47 +0000 (UTC)
-Received: from EX13D08UEB001.ant.amazon.com (10.43.60.245) by
- EX13MTAUEE001.ant.amazon.com (10.43.62.226) with Microsoft SMTP Server (TLS)
- id 15.0.1497.18; Tue, 25 May 2021 10:41:46 +0000
-Received: from EX13D18EUA001.ant.amazon.com (10.43.165.58) by
- EX13D08UEB001.ant.amazon.com (10.43.60.245) with Microsoft SMTP Server (TLS)
- id 15.0.1497.18; Tue, 25 May 2021 10:41:46 +0000
-Received: from EX13D18EUA001.ant.amazon.com ([10.43.165.58]) by
- EX13D18EUA001.ant.amazon.com ([10.43.165.58]) with mapi id 15.00.1497.018;
- Tue, 25 May 2021 10:41:46 +0000
-From:   "Stamatis, Ilias" <ilstam@amazon.com>
-To:     "seanjc@google.com" <seanjc@google.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "zamsden@gmail.com" <zamsden@gmail.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>
-Thread-Index: AQHXTivfZrJO8fNe80G3shVQMiBIQary7y4AgAAOQgCAAQnvgA==
-Date:   Tue, 25 May 2021 10:41:45 +0000
-Message-ID: <8a13dedc5bc118072d1e79d8af13b5026de736b3.camel@amazon.com>
-References: <20210521102449.21505-1-ilstam@amazon.com>
-         <20210521102449.21505-10-ilstam@amazon.com>
-         <2b3bc8aff14a09c4ea4a1b648f750b5ffb1a15a0.camel@redhat.com>
-         <YKv0KA+wJNCbfc/M@google.com>
-In-Reply-To: <YKv0KA+wJNCbfc/M@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.165.65]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <ABB45646647AB54CB670EC0547BEB513@amazon.com>
-Content-Transfer-Encoding: base64
+        id S231259AbhEYLQE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 May 2021 07:16:04 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:54362 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231321AbhEYLPs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 May 2021 07:15:48 -0400
+Received: from zn.tnic (p4fed31b3.dip0.t-ipconnect.de [79.237.49.179])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id DF24B1EC0257;
+        Tue, 25 May 2021 13:14:15 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1621941256;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=3WUEjvyF9yEtk54sAKl6O+BqtnsSwU8FDEFqA7AwfNo=;
+        b=Avet1harNC20FDGsndm5GkQtMcSXZ3VZBTO1N1jFtCzGKphtkq/Fi9m2p4KTUkLVlKyGev
+        OQBZdZQ1fXmr070dY1EkStjDMPZJPYdLF1jJHpXpqjgQmRxjh4DtTqueQ8uUeQYtoA17/0
+        bqj1uN84/BG7RIGgEjx6LNcXn3c2Tkg=
+Date:   Tue, 25 May 2021 13:11:59 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        tglx@linutronix.de, jroedel@suse.de, thomas.lendacky@amd.com,
+        pbonzini@redhat.com, mingo@redhat.com, dave.hansen@intel.com,
+        rientjes@google.com, seanjc@google.com, peterz@infradead.org,
+        hpa@zytor.com, tony.luck@intel.com
+Subject: Re: [PATCH Part1 RFC v2 13/20] x86/sev: Register GHCB memory when
+ SEV-SNP is active
+Message-ID: <YKzbfwD6nHL7ChcJ@zn.tnic>
+References: <20210430121616.2295-1-brijesh.singh@amd.com>
+ <20210430121616.2295-14-brijesh.singh@amd.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210430121616.2295-14-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gTW9uLCAyMDIxLTA1LTI0IGF0IDE4OjQ0ICswMDAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOg0KPiBPbiBNb24sIE1heSAyNCwgMjAyMSwgTWF4aW0gTGV2aXRza3kgd3JvdGU6DQo+ID4g
-T24gRnJpLCAyMDIxLTA1LTIxIGF0IDExOjI0ICswMTAwLCBJbGlhcyBTdGFtYXRpcyB3cm90ZToN
-Cj4gPiA+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0vdm14L3ZteC5jIGIvYXJjaC94ODYva3Zt
-L3ZteC92bXguYw0KPiA+ID4gaW5kZXggNGI3MDQzMWMyZWRkLi43YzUyYzY5N2NmZTMgMTAwNjQ0
-DQo+ID4gPiAtLS0gYS9hcmNoL3g4Ni9rdm0vdm14L3ZteC5jDQo+ID4gPiArKysgYi9hcmNoL3g4
-Ni9rdm0vdm14L3ZteC5jDQo+ID4gPiBAQCAtMTM5Miw5ICsxMzkyLDggQEAgdm9pZCB2bXhfdmNw
-dV9sb2FkX3ZtY3Moc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBpbnQgY3B1LA0KPiA+ID4gICAgIH0N
-Cj4gPiA+IA0KPiA+ID4gICAgIC8qIFNldHVwIFRTQyBtdWx0aXBsaWVyICovDQo+ID4gPiAtICAg
-aWYgKGt2bV9oYXNfdHNjX2NvbnRyb2wgJiYNCj4gPiA+IC0gICAgICAgdm14LT5jdXJyZW50X3Rz
-Y19yYXRpbyAhPSB2Y3B1LT5hcmNoLnRzY19zY2FsaW5nX3JhdGlvKQ0KPiA+ID4gLSAgICAgICAg
-ICAgZGVjYWNoZV90c2NfbXVsdGlwbGllcih2bXgpOw0KPiA+ID4gKyAgIGlmIChrdm1faGFzX3Rz
-Y19jb250cm9sKQ0KPiA+ID4gKyAgICAgICAgICAgdm1jc193cml0ZTY0KFRTQ19NVUxUSVBMSUVS
-LCB2Y3B1LT5hcmNoLnRzY19zY2FsaW5nX3JhdGlvKTsNCj4gPiANCj4gPiBUaGlzIG1pZ2h0IGhh
-dmUgYW4gb3ZlcmhlYWQgb2Ygd3JpdGluZyB0aGUgVFNDIHNjYWxpbmcgcmF0aW8gZXZlbiBpZg0K
-PiA+IGl0IGlzIHVuY2hhbmdlZC4gSSBoYXZlbid0IG1lYXN1cmVkIGhvdyBleHBlbnNpdmUgdm1y
-ZWFkL3Ztd3JpdGVzIGFyZSBidXQNCj4gPiBhdCBsZWFzdCB3aGVuIG5lc3RlZCwgdGhlIHZtcmVh
-ZHMvdm13cml0ZXMgY2FuIGJlIHZlcnkgZXhwZW5zaXZlIChpZiB0aGV5DQo+ID4gY2F1c2UgYSB2
-bWV4aXQpLg0KPiA+IA0KPiA+IFRoaXMgaXMgd2h5IEkgdGhpbmsgdGhlICd2bXgtPmN1cnJlbnRf
-dHNjX3JhdGlvJyBleGlzdHMgLSB0byBoYXZlDQo+ID4gYSBjYWNoZWQgdmFsdWUgb2YgVFNDIHNj
-YWxlIHJhdGlvIHRvIGF2b2lkIGVpdGhlciAndm1yZWFkJ2luZw0KPiA+IG9yICd2bXdyaXRlJ2lu
-ZyBpdCB3aXRob3V0IGEgbmVlZC4NCg0KUmlnaHQuIEkgdGhvdWdodCB0aGUgb3ZlcmhlYWQgbWln
-aHQgbm90IGJlIHRoYXQgc2lnbmlmaWNhbnQgc2luY2Ugd2UncmUgZG9pbmcNCmxvdHMgb2Ygdm13
-cml0ZXMgb24gdm1lbnRyeS92bWV4aXQgYW55d2F5LCBidXQgeWVhaCwgd2h5IGludHJvZHVjZSBh
-bnkga2luZCBvZg0KZXh0cmEgb3ZlcmhlYWQgYW55d2F5Lg0KDQpJJ20gZmluZSB3aXRoIHRoaXMg
-cGFydGljdWxhciBwYXRjaCBnZXR0aW5nIGRyb3BwZWQuIEl0J3Mgbm90IGRpcmVjdGx5IHJlbGF0
-ZWQgDQp0byB0aGUgc2VyaWVzIGFueXdheS4NCg0KPiANCj4gWWVzLCBidXQgaXRzIGV4aXN0ZW5j
-ZSBpcyBhIGNvbXBsZXRlIGhhY2suICB2bXgtPmN1cnJlbnRfdHNjX3JhdGlvIGhhcyB0aGUgc2Ft
-ZQ0KPiBzY29wZSBhcyB2Y3B1LT5hcmNoLnRzY19zY2FsaW5nX3JhdGlvLCBpLmUuIHZteCA9PSB2
-Y3B1ID09IHZjcHUtPmFyY2guICBVbmxpa2UNCj4gcGVyLVZNQ1MgdHJhY2tpbmcsIGl0IHNob3Vs
-ZCBub3QgYmUgdXNlZnVsLCBrZXl3b3JkICJzaG91bGQiLg0KPiANCj4gV2hhdCBJIG1lYW50IGJ5
-IG15IGVhcmxpZXIgY29tbWVudDoNCj4gDQo+ICAgSXRzIHVzZSBpbiB2bXhfdmNwdV9sb2FkX3Zt
-Y3MoKSBpcyBiYXNpY2FsbHkgIndyaXRlIHRoZSBWTUNTIGlmIHdlIGZvcmdvdCB0bw0KPiAgIGVh
-cmxpZXIiLCB3aGljaCBpcyBhbGwga2luZHMgb2Ygd3JvbmcuDQo+IA0KPiBpcyB0aGF0IHZteF92
-Y3B1X2xvYWRfdm1jcygpIHNob3VsZCBuZXZlciB3cml0ZSB2bWNzLlRTQ19NVUxUSVBMSUVSLiAg
-VGhlIGNvcnJlY3QNCj4gYmVoYXZpb3IgaXMgdG8gc2V0IHRoZSBmaWVsZCBhdCBWTUNTIGluaXRp
-YWxpemF0aW9uLCBhbmQgdGhlbiBpbW1lZGlhdGVseSBzZXQgaXQNCj4gd2hlbmV2ZXIgdGhlIHJh
-dGlvIGlzIGNoYW5nZWQsIGUuZy4gb24gbmVzdGVkIHRyYW5zaXRpb24sIGZyb20gdXNlcnNwYWNl
-LCBldGMuLi4NCj4gSW4gb3RoZXIgd29yZHMsIG15IHVuY2xlYXIgZmVlZGJhY2sgd2FzIHRvIG1h
-a2UgaXQgb2Jzb2xldGUgKGFuZCBkcm9wIGl0KSBieQ0KPiBmaXhpbmcgdGhlIHVuZGVybHlpbmcg
-bWVzcywgbm90IHRvIGp1c3QgZHJvcCB0aGUgb3B0aW1pemF0aW9uIGhhY2suDQoNCkkgdW5kZXJz
-dG9vZCB0aGlzIGFuZCByZXBsaWVkIGVhcmxpZXIuIFRoZSByaWdodCBwbGFjZSBmb3IgdGhlIGh3
-IG11bHRpcGxpZXINCmZpZWxkIHRvIGJlIHVwZGF0ZWQgaXMgaW5zaWRlIHNldF90c2Nfa2h6KCkg
-aW4gY29tbW9uIGNvZGUgd2hlbiB0aGUgcmF0aW8NCmNoYW5nZXMuIEhvd2V2ZXIsIHRoaXMgcmVx
-dWlyZXMgYWRkaW5nIGFub3RoZXIgdmVuZG9yIGNhbGxiYWNrIGV0Yy4gQXMgYWxsDQp0aGlzIGlz
-IGZ1cnRoZXIgcmVmYWN0b3JpbmcgSSBiZWxpZXZlIGl0J3MgYmV0dGVyIHRvIGxlYXZlIHRoaXMg
-c2VyaWVzIGFzIGlzIC0NCmllIG9ubHkgdG91Y2hpbmcgY29kZSB0aGF0IGlzIGRpcmVjdGx5IHJl
-bGF0ZWQgdG8gbmVzdGVkIFRTQyBzY2FsaW5nIGFuZCBub3QNCnRyeSB0byBkbyBldmVyeXRoaW5n
-IGFzIHBhcnQgb2YgdGhlIHNhbWUgc2VyaWVzLiBUaGlzIG1ha2VzIHRlc3RpbmcgZWFzaWVyDQp0
-b28uIFdlIGNhbiBzdGlsbCBpbXBsZW1lbnQgdGhlc2UgY2hhbmdlcyBsYXRlci4NCg0KVGhhbmtz
-LA0KSWxpYXMNCg0K
+On Fri, Apr 30, 2021 at 07:16:09AM -0500, Brijesh Singh wrote:
+> The SEV-SNP guest is required to perform GHCB GPA registration. This is
+> because the hypervisor may prefer that a guest use a consistent and/or
+> specific GPA for the GHCB associated with a vCPU. For more information,
+> see the GHCB specification section GHCB GPA Registration.
+> 
+> During the boot, init_ghcb() allocates a per-cpu GHCB page. On very first
+> VC exception, the exception handler switch to using the per-cpu GHCB page
+> allocated during the init_ghcb(). The GHCB page must be registered in
+> the current vcpu context.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/kernel/sev.c | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+> 
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index 8c8c939a1754..e6819f170ec4 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -88,6 +88,13 @@ struct sev_es_runtime_data {
+>  	 * is currently unsupported in SEV-ES guests.
+>  	 */
+>  	unsigned long dr7;
+> +
+> +	/*
+> +	 * SEV-SNP requires that the GHCB must be registered before using it.
+> +	 * The flag below will indicate whether the GHCB is registered, if its
+> +	 * not registered then sev_es_get_ghcb() will perform the registration.
+> +	 */
+> +	bool snp_ghcb_registered;
+>  };
+>  
+>  struct ghcb_state {
+> @@ -100,6 +107,9 @@ DEFINE_STATIC_KEY_FALSE(sev_es_enable_key);
+>  /* Needed in vc_early_forward_exception */
+>  void do_early_exception(struct pt_regs *regs, int trapnr);
+>  
+> +/* Defined in sev-shared.c */
+> +static void snp_register_ghcb(unsigned long paddr);
+
+Can we get rid of those forward declarations pls? Due to sev-shared.c
+this file is starting to spawn those and that's ugly.
+
+Either through a code reorg or even defining a sev-internal.h header
+which contains all those so that they don't pollute the code?
+
+Thx.
+
+> +
+>  static void __init setup_vc_stacks(int cpu)
+>  {
+>  	struct sev_es_runtime_data *data;
+> @@ -218,6 +228,12 @@ static __always_inline struct ghcb *sev_es_get_ghcb(struct ghcb_state *state)
+>  		data->ghcb_active = true;
+>  	}
+>  
+> +	/* SEV-SNP guest requires that GHCB must be registered before using it. */
+> +	if (sev_snp_active() && !data->snp_ghcb_registered) {
+> +		snp_register_ghcb(__pa(ghcb));
+> +		data->snp_ghcb_registered = true;
+> +	}
+
+More missed review from last time:
+
+"This needs to be set to true in the function itself, in the success
+case."
+
+Can you please be more careful and go through all review comments so
+that I don't have to do the same work twice?
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
