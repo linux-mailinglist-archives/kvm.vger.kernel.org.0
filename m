@@ -2,170 +2,366 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E653538FC57
-	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 10:12:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A636238FCA3
+	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 10:23:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230403AbhEYINc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 May 2021 04:13:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50954 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231931AbhEYINC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 May 2021 04:13:02 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id C60E46135F;
-        Tue, 25 May 2021 08:11:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1621930293;
-        bh=sq30Nux5kzxrfWlMxk8Z+sT6DW7J2lC9jSS4VULUTTw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=MRHmbz1/2b7962bKYp/12EcWXOXO/yMTQF+Q7PDxe3EcO15qk+CCl7pi0sY87LaHE
-         wn5/VWiiP2gbtBg7MCE5HS5Z5qtFyL+9NHkOboMNDNNEhJDod5hDD5hXCyjRQAEwWP
-         7gzDC4MyxnvXF6GlnHJKhjAadj7My6Ruqu05cw9E=
-Date:   Tue, 25 May 2021 10:11:31 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     Palmer Dabbelt <palmerdabbelt@google.com>,
-        "guoren@kernel.org" <guoren@kernel.org>,
-        Anup Patel <Anup.Patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "graf@amazon.com" <graf@amazon.com>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        "anup@brainfault.org" <anup@brainfault.org>,
+        id S232332AbhEYIYe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 May 2021 04:24:34 -0400
+Received: from mx13.kaspersky-labs.com ([91.103.66.164]:55892 "EHLO
+        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232335AbhEYIYU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 May 2021 04:24:20 -0400
+Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
+        by relay13.kaspersky-labs.com (Postfix) with ESMTP id 4ECC4521855;
+        Tue, 25 May 2021 11:22:12 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
+        s=mail202102; t=1621930932;
+        bh=dt0jIqv5AU8v4lv061SG2AhWJ3eKe3Fm7GiZNUUDUfc=;
+        h=Subject:From:To:Message-ID:Date:MIME-Version:Content-Type;
+        b=k9Bpe9MdWsbT8AL+2sHy1QyKrWSQ04ZZ9xVaV9C7wQ5S+owdziy61Rk7Y1pQSLc8U
+         RJb3eRB8v7jEJCkWNNAtC+zrwWfTM+UJOyy8D4Vv2KYQTFdYzmpQ3Z4Akz5d6oasC7
+         gLyAG1Cu44y4lzdZLl5UINeO9JsgwUImBeRM73KZNWrY/9x3mEvzoP6pXl4ClhcJlp
+         cDIcN7ko2eynXOTnc3bVY0DJfd5XE4yKUGd8vb6DmX/yGyQPu+X7pkAIJTz1LC+ofs
+         /KPSsoq0pcd15mlhK5HKWfG2KqlO+4ChwATRtICmfsGprZgjS69an7dqAQ4so6xUYg
+         FE8qXr5xmJZqQ==
+Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
+        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id 6F57D521856;
+        Tue, 25 May 2021 11:22:11 +0300 (MSK)
+Received: from [10.16.171.77] (10.64.68.129) by hqmailmbx3.avp.ru
+ (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.14; Tue, 25
+ May 2021 11:22:09 +0300
+Subject: Re: [PATCH v10 00/18] virtio/vsock: introduce SOCK_SEQPACKET support
+From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+CC:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Andra Paraschiv <andraprs@amazon.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>
-Subject: Re: [PATCH v18 00/18] KVM RISC-V Support
-Message-ID: <YKyxMy+djlscUhr1@kroah.com>
-References: <mhng-b093a5aa-ff9d-437f-a10b-47558f182639@palmerdabbelt-glaptop>
- <DM6PR04MB708173B754E145BC843C4123E7269@DM6PR04MB7081.namprd04.prod.outlook.com>
- <YKypJ5SJg2sDtn7/@kroah.com>
- <DM6PR04MB7081843419AFCECABA75AD74E7259@DM6PR04MB7081.namprd04.prod.outlook.com>
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+References: <20210520191357.1270473-1-arseny.krasnov@kaspersky.com>
+ <20210521075520.ghg75wpzz42zorxg@steredhat>
+ <108b0bba-5909-cdde-97ee-321b3f5351ca@kaspersky.com>
+Message-ID: <b8dd3b55-0e2c-935a-d9bb-b13b7adc4458@kaspersky.com>
+Date:   Tue, 25 May 2021 11:22:09 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM6PR04MB7081843419AFCECABA75AD74E7259@DM6PR04MB7081.namprd04.prod.outlook.com>
+In-Reply-To: <108b0bba-5909-cdde-97ee-321b3f5351ca@kaspersky.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.64.68.129]
+X-ClientProxiedBy: hqmailmbx3.avp.ru (10.64.67.243) To hqmailmbx3.avp.ru
+ (10.64.67.243)
+X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 05/25/2021 07:55:57
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 163906 [May 25 2021]
+X-KSE-AntiSpam-Info: Version: 5.9.20.0
+X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
+X-KSE-AntiSpam-Info: LuaCore: 448 448 71fb1b37213ce9a885768d4012c46ac449c77b17
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;kaspersky.com:7.1.1;lists.oasis-open.org:7.1.1
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 05/25/2021 07:58:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 25.05.2021 5:07:00
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KLMS-Rule-ID: 52
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2021/05/25 07:41:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/05/25 05:07:00 #16646705
+X-KLMS-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 25, 2021 at 08:01:01AM +0000, Damien Le Moal wrote:
-> On 2021/05/25 16:37, Greg KH wrote:
-> > On Mon, May 24, 2021 at 11:08:30PM +0000, Damien Le Moal wrote:
-> >> On 2021/05/25 7:57, Palmer Dabbelt wrote:
-> >>> On Mon, 24 May 2021 00:09:45 PDT (-0700), guoren@kernel.org wrote:
-> >>>> Thx Anup,
-> >>>>
-> >>>> Tested-by: Guo Ren <guoren@kernel.org> (Just on qemu-rv64)
-> >>>>
-> >>>> I'm following your KVM patchset and it's a great job for riscv
-> >>>> H-extension. I think hardware companies hope Linux KVM ready first
-> >>>> before the real chip. That means we can ensure the hardware could run
-> >>>> mainline linux.
-> >>>
-> >>> I understand that it would be wonderful for hardware vendors to have a 
-> >>> guarantee that their hardware will be supported by the software 
-> >>> ecosystem, but that's not what we're talking about here.  Specifically, 
-> >>> the proposal for this code is to track the latest draft extension which 
-> >>> would specifically leave vendors who implement the current draft out in 
-> >>> the cold was something to change.  In practice that is the only way to 
-> >>> move forward with any draft extension that doesn't have hardware 
-> >>> available, as the software RISC-V implementations rapidly deprecate 
-> >>> draft extensions and without a way to test our code it is destined to 
-> >>> bit rot.
-> >>
-> >> To facilitate the process of implementing, and updating, against draft
-> >> specifications, I proposed to have arch/riscv/staging added. This would be the
-> >> place to put code based on drafts. Some simple rules can be put in place:
-> >> 1) The code and eventual ABI may change any time, no guarantees of backward
-> >> compatibility
-> >> 2) Once the specifications are frozen, the code is moved out of staging
-> >> somewhere else.
-> >> 3) The code may be removed any time if the specification proposal is dropped, or
-> >> any other valid reason (can't think of any other right now)
-> >> 4) ...
-> >>
-> >> This way, the implementation process would be greatly facilitated and
-> >> interactions between different extensions can be explored much more easily.
-> >>
-> >> Thoughts ?
-> > 
-> > It will not work, unless you are mean and ruthless and people will get
-> > mad at you.  I do not recommend it at all.
-> > 
-> > Once code shows up in the kernel tree, and people rely on it, you now
-> > _have_ to support it.  Users don't know the difference between "staging
-> > or not staging" at all.  We have reported problems of staging media
-> > drivers breaking userspace apps and people having problems with that,
-> > despite the media developers trying to tell the world, "DO NOT RELY ON
-> > THESE!".
-> > 
-> > And if this can't be done with tiny simple single drivers, you are going
-> > to have a world-of-hurt if you put arch/platform support into
-> > arch/riscv/.  Once it's there, you will never be able to delete it,
-> > trust me.
-> 
-> All very good points. Thank you for sharing.
-> 
-> > If you REALLY wanted to do this, you could create drivers/staging/riscv/
-> > and try to make the following rules:
-> > 
-> > 	- stand-alone code only, can not depend on ANYTHING outside of
-> > 	  the directory that is not also used by other in-kernel code
-> > 	- does not expose any userspace apis
-> > 	- interacts only with existing in-kernel code.
-> > 	- can be deleted at any time, UNLESS someone is using it for
-> > 	  functionality on a system
-> > 
-> > But what use would that be?  What could you put into there that anyone
-> > would be able to actually use?
-> 
-> Yes, you already mentioned this and we were not thinking about this solution.
-> drivers/staging really is for device drivers and does not apply to arch code.
 
-Then you can not use the "staging model" anywhere else, especially in
-arch code.  We tried that many years ago, and it instantly failed and we
-ripped it out.  Learn from our mistakes please.
+On 23.05.2021 15:14, Arseny Krasnov wrote:
+> On 21.05.2021 10:55, Stefano Garzarella wrote:
+>> Hi Arseny,
+>>
+>> On Thu, May 20, 2021 at 10:13:53PM +0300, Arseny Krasnov wrote:
+>>> 	This patchset implements support of SOCK_SEQPACKET for virtio
+>>> transport.
+>> I'll carefully review and test this series next Monday, in the mean time 
+>> I think we should have at least an agreement about the changes that 
+>> regards virtio-spec before merge this series, to avoid any compatibility 
+>> issues.
+>>
+>> Do you plan to send a new version of the specification changes?
+>>
+>> Thanks,
+>> Stefano
+> Hello, sorry for long answer. I'm on vacation now, but i plan to send
+>
+> it in next several days, because with current implementation it is short
+>
+>
+> Thank You
 
-> > So back to the original issue here, what is the problem that you are
-> > trying to solve?  Why do you want to have in-kernel code for hardware
-> > that no one else can have access to, and that isn't part of a "finalized
-> > spec" that ends up touching other subsystems and is not self-contained?
-> 
-> For the case at hand, the only thing that would be outside of the staging area
-> would be the ABI definition, but that one depends only on the ratified riscv ISA
-> specs. So having it outside of staging would be OK. The idea of the arch staging
-> area is 2 fold:
-> 1) facilitate the development work overall, both for Paolo and Anup on the KVM
-> part, but also others to check that their changes do not break KVM support.
+Hello, here is spec patch:
 
-Who are the "others" here?  You can't force your code into the tree just
-to keep it up to date with internal apis that others are changing, if
-you have no real users for it yet.  That's asking others to do your work
-for you :(
+https://lists.oasis-open.org/archives/virtio-comment/202105/msg00017.html
 
-> 2) Provide feedback to the specs groups that their concerns are moot. E.g. one
-> reason the hypervisor specs are being delayed is concerns with interrupt
-> handling. With a working implementation based on current ratified specs for
-> other components (e.g. interrupt controller), the hope is that the specs group
-> can speed up freezing of the specs.
+Let's discuss it
 
-There is the issue of specs-without-working-code that can cause major
-problems.  But you have code, it does not have to be merged into the
-kernel tree to prove/disprove specs, so don't push the inability of your
-standards group to come to an agreement to the kernel developer
-community.  Again, you are making us do your work for you here :(
+Thank You
 
-> But your points about how users will likely end up using this potentially
-> creates a lot more problems than we are solving...
-
-Thank you for understanding.
-
-good luck with your standards meetings!
-
-greg k-h
+>>> 	As SOCK_SEQPACKET guarantees to save record boundaries, so to
+>>> do it, new bit for field 'flags' was added: SEQ_EOR. This bit is
+>>> set to 1 in last RW packet of message.
+>>> 	Now as  packets of one socket are not reordered neither on vsock
+>>> nor on vhost transport layers, such bit allows to restore original
+>>> message on receiver's side. If user's buffer is smaller than message
+>>> length, when all out of size data is dropped.
+>>> 	Maximum length of datagram is not limited as in stream socket,
+>>> because same credit logic is used. Difference with stream socket is
+>>> that user is not woken up until whole record is received or error
+>>> occurred. Implementation also supports 'MSG_TRUNC' flags.
+>>> 	Tests also implemented.
+>>>
+>>> 	Thanks to stsp2@yandex.ru for encouragements and initial design
+>>> recommendations.
+>>>
+>>> Arseny Krasnov (18):
+>>>  af_vsock: update functions for connectible socket
+>>>  af_vsock: separate wait data loop
+>>>  af_vsock: separate receive data loop
+>>>  af_vsock: implement SEQPACKET receive loop
+>>>  af_vsock: implement send logic for SEQPACKET
+>>>  af_vsock: rest of SEQPACKET support
+>>>  af_vsock: update comments for stream sockets
+>>>  virtio/vsock: set packet's type in virtio_transport_send_pkt_info()
+>>>  virtio/vsock: simplify credit update function API
+>>>  virtio/vsock: defines and constants for SEQPACKET
+>>>  virtio/vsock: dequeue callback for SOCK_SEQPACKET
+>>>  virtio/vsock: add SEQPACKET receive logic
+>>>  virtio/vsock: rest of SOCK_SEQPACKET support
+>>>  virtio/vsock: enable SEQPACKET for transport
+>>>  vhost/vsock: enable SEQPACKET for transport
+>>>  vsock/loopback: enable SEQPACKET for transport
+>>>  vsock_test: add SOCK_SEQPACKET tests
+>>>  virtio/vsock: update trace event for SEQPACKET
+>>>
+>>> drivers/vhost/vsock.c                        |  44 +-
+>>> include/linux/virtio_vsock.h                 |   9 +
+>>> include/net/af_vsock.h                       |   7 +
+>>> .../events/vsock_virtio_transport_common.h   |   5 +-
+>>> include/uapi/linux/virtio_vsock.h            |   9 +
+>>> net/vmw_vsock/af_vsock.c                     | 465 +++++++++++------
+>>> net/vmw_vsock/virtio_transport.c             |  25 +
+>>> net/vmw_vsock/virtio_transport_common.c      | 133 ++++-
+>>> net/vmw_vsock/vsock_loopback.c               |  11 +
+>>> tools/testing/vsock/util.c                   |  32 +-
+>>> tools/testing/vsock/util.h                   |   3 +
+>>> tools/testing/vsock/vsock_test.c             | 116 ++++
+>>> 12 files changed, 672 insertions(+), 187 deletions(-)
+>>>
+>>> v9 -> v10:
+>>> General changelog:
+>>> - patch for write serialization removed from patchset
+>>> - commit messages rephrased
+>>> - RFC tag removed
+>>>
+>>> Per patch changelog:
+>>>  see every patch after '---' line.
+>>>
+>>> v8 -> v9:
+>>> General changelog:
+>>> - see per patch change log.
+>>>
+>>> Per patch changelog:
+>>>  see every patch after '---' line.
+>>>
+>>> v7 -> v8:
+>>> General changelog:
+>>> - whole idea is simplified: channel now considered reliable,
+>>>   so SEQ_BEGIN, SEQ_END, 'msg_len' and 'msg_id' were removed.
+>>>   Only thing that is used to mark end of message is bit in
+>>>   'flags' field of packet header: VIRTIO_VSOCK_SEQ_EOR. Packet
+>>>   with such bit set to 1 means, that this is last packet of
+>>>   message.
+>>>
+>>> - POSIX MSG_EOR support is removed, as there is no exact
+>>>   description how it works.
+>>>
+>>> - all changes to 'include/uapi/linux/virtio_vsock.h' moved
+>>>   to dedicated patch, as these changes linked with patch to
+>>>   spec.
+>>>
+>>> - patch 'virtio/vsock: SEQPACKET feature bit support' now merged
+>>>   to 'virtio/vsock: setup SEQPACKET ops for transport'.
+>>>
+>>> - patch 'vhost/vsock: SEQPACKET feature bit support' now merged
+>>>   to 'vhost/vsock: setup SEQPACKET ops for transport'.
+>>>
+>>> Per patch changelog:
+>>>  see every patch after '---' line.
+>>>
+>>> v6 -> v7:
+>>> General changelog:
+>>> - virtio transport callback for message length now removed
+>>>   from transport. Length of record is returned by dequeue
+>>>   callback.
+>>>
+>>> - function which tries to get message length now returns 0
+>>>   when rx queue is empty. Also length of current message in
+>>>   progress is set to 0, when message processed or error
+>>>   happens.
+>>>
+>>> - patches for virtio feature bit moved after patches with
+>>>   transport ops.
+>>>
+>>> Per patch changelog:
+>>>  see every patch after '---' line.
+>>>
+>>> v5 -> v6:
+>>> General changelog:
+>>> - virtio transport specific callbacks which send SEQ_BEGIN or
+>>>   SEQ_END now hidden inside virtio transport. Only enqueue,
+>>>   dequeue and record length callbacks are provided by transport.
+>>>
+>>> - virtio feature bit for SEQPACKET socket support introduced:
+>>>   VIRTIO_VSOCK_F_SEQPACKET.
+>>>
+>>> - 'msg_cnt' field in 'struct virtio_vsock_seq_hdr' renamed to
+>>>   'msg_id' and used as id.
+>>>
+>>> Per patch changelog:
+>>> - 'af_vsock: separate wait data loop':
+>>>    1) Commit message updated.
+>>>    2) 'prepare_to_wait()' moved inside while loop(thanks to
+>>>      Jorgen Hansen).
+>>>    Marked 'Reviewed-by' with 1), but as 2) I removed R-b.
+>>>
+>>> - 'af_vsock: separate receive data loop': commit message
+>>>    updated.
+>>>    Marked 'Reviewed-by' with that fix.
+>>>
+>>> - 'af_vsock: implement SEQPACKET receive loop': style fixes.
+>>>
+>>> - 'af_vsock: rest of SEQPACKET support':
+>>>    1) 'module_put()' added when transport callback check failed.
+>>>    2) Now only 'seqpacket_allow()' callback called to check
+>>>       support of SEQPACKET by transport.
+>>>
+>>> - 'af_vsock: update comments for stream sockets': commit message
+>>>    updated.
+>>>    Marked 'Reviewed-by' with that fix.
+>>>
+>>> - 'virtio/vsock: set packet's type in send':
+>>>    1) Commit message updated.
+>>>    2) Parameter 'type' from 'virtio_transport_send_credit_update()'
+>>>       also removed in this patch instead of in next.
+>>>
+>>> - 'virtio/vsock: dequeue callback for SOCK_SEQPACKET': SEQPACKET
+>>>    related state wrapped to special struct.
+>>>
+>>> - 'virtio/vsock: update trace event for SEQPACKET': format strings
+>>>    now not broken by new lines.
+>>>
+>>> v4 -> v5:
+>>> - patches reorganized:
+>>>   1) Setting of packet's type in 'virtio_transport_send_pkt_info()'
+>>>      is moved to separate patch.
+>>>   2) Simplifying of 'virtio_transport_send_credit_update()' is
+>>>      moved to separate patch and before main virtio/vsock patches.
+>>> - style problem fixed
+>>> - in 'af_vsock: separate receive data loop' extra 'release_sock()'
+>>>   removed
+>>> - added trace event fields for SEQPACKET
+>>> - in 'af_vsock: separate wait data loop':
+>>>   1) 'vsock_wait_data()' removed 'goto out;'
+>>>   2) Comment for invalid data amount is changed.
+>>> - in 'af_vsock: rest of SEQPACKET support', 'new_transport' pointer
+>>>   check is moved after 'try_module_get()'
+>>> - in 'af_vsock: update comments for stream sockets', 'connect-oriented'
+>>>   replaced with 'connection-oriented'
+>>> - in 'loopback/vsock: setup SEQPACKET ops for transport',
+>>>   'loopback/vsock' replaced with 'vsock/loopback'
+>>>
+>>> v3 -> v4:
+>>> - SEQPACKET specific metadata moved from packet header to payload
+>>>   and called 'virtio_vsock_seq_hdr'
+>>> - record integrity check:
+>>>   1) SEQ_END operation was added, which marks end of record.
+>>>   2) Both SEQ_BEGIN and SEQ_END carries counter which is incremented
+>>>      on every marker send.
+>>> - af_vsock.c: socket operations for STREAM and SEQPACKET call same
+>>>   functions instead of having own "gates" differs only by names:
+>>>   'vsock_seqpacket/stream_getsockopt()' now replaced with
+>>>   'vsock_connectible_getsockopt()'.
+>>> - af_vsock.c: 'seqpacket_dequeue' callback returns error and flag that
+>>>   record ready. There is no need to return number of copied bytes,
+>>>   because case when record received successfully is checked at virtio
+>>>   transport layer, when SEQ_END is processed. Also user doesn't need
+>>>   number of copied bytes, because 'recv()' from SEQPACKET could return
+>>>   error, length of users's buffer or length of whole record(both are
+>>>   known in af_vsock.c).
+>>> - af_vsock.c: both wait loops in af_vsock.c(for data and space) moved
+>>>   to separate functions because now both called from several places.
+>>> - af_vsock.c: 'vsock_assign_transport()' checks that 'new_transport'
+>>>   pointer is not NULL and returns 'ESOCKTNOSUPPORT' instead of 'ENODEV'
+>>>   if failed to use transport.
+>>> - tools/testing/vsock/vsock_test.c: rename tests
+>>>
+>>> v2 -> v3:
+>>> - patches reorganized: split for prepare and implementation patches
+>>> - local variables are declared in "Reverse Christmas tree" manner
+>>> - virtio_transport_common.c: valid leXX_to_cpu() for vsock header
+>>>   fields access
+>>> - af_vsock.c: 'vsock_connectible_*sockopt()' added as shared code
+>>>   between stream and seqpacket sockets.
+>>> - af_vsock.c: loops in '__vsock_*_recvmsg()' refactored.
+>>> - af_vsock.c: 'vsock_wait_data()' refactored.
+>>>
+>>> v1 -> v2:
+>>> - patches reordered: af_vsock.c related changes now before virtio vsock
+>>> - patches reorganized: more small patches, where +/- are not mixed
+>>> - tests for SOCK_SEQPACKET added
+>>> - all commit messages updated
+>>> - af_vsock.c: 'vsock_pre_recv_check()' inlined to
+>>>   'vsock_connectible_recvmsg()'
+>>> - af_vsock.c: 'vsock_assign_transport()' returns ENODEV if transport
+>>>   was not found
+>>> - virtio_transport_common.c: transport callback for seqpacket dequeue
+>>> - virtio_transport_common.c: simplified
+>>>   'virtio_transport_recv_connected()'
+>>> - virtio_transport_common.c: send reset on socket and packet type
+>>> 			      mismatch.
+>>>
+>>> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>>>
+>>> -- 
+>>> 2.25.1
+>>>
