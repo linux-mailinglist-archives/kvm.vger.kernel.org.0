@@ -2,89 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F361738F72E
-	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 02:57:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62EB538F749
+	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 03:03:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229575AbhEYA7J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 May 2021 20:59:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33506 "EHLO
+        id S229598AbhEYBE2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 May 2021 21:04:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229539AbhEYA7J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 May 2021 20:59:09 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90FA5C061574
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 17:57:40 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id gb21-20020a17090b0615b029015d1a863a91so12265275pjb.2
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 17:57:40 -0700 (PDT)
+        with ESMTP id S229541AbhEYBE2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 May 2021 21:04:28 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EB25C061756
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 18:02:58 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d16so22253605pfn.12
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 18:02:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=7tuqKTglpJW525ZsMGnz4XtJGD4FdhFwkTMNsXzTdys=;
-        b=geu/XqLVheEmFDeQqYOpW+xgqLzwLmXBDSOIBMqPbpcwuSNDSpbkYk+ll9iso4i0nz
-         5MjxYjQ420khRilg6wzB7RGquSgfRtY9L8pjiquMTenMapn7SlRGwVm5d60jc5Sb9A4z
-         hQ7oACQsh8u8Cb81CEkca+sh4SbKTjBUleh+9aXncR7PpIoeYXAraTnOHSZugmp8WCPd
-         wP4hzuMF8N91g9OZRo5biU6IIvCowUM5Nqq7TlK+A1XfVQhNtHDrzTXwpu/I9QHEnL7C
-         6T2dcSKclrsSE6685yclHeUsXK/SitnKYx6bfZe8xWKrAHAHMZcprFOc5FGOabogRP2g
-         +ToQ==
+        bh=Z58QfC5D6YeFAbzSgFuFnv7cuq5vhjfp0Kxje8RxtIo=;
+        b=W+B3bpONTpGdLIhDuxN26qGvLBjiytIUAf4B7oENMOFgCrlz6Q+Ybrm9jrsflLeJm5
+         rcCnaEuGr2lC/mn11sX0oH5IM73f2dlBowVs1UXKTXeGqM+g3JP9ps0l8SIwWTB8ihDq
+         aUEU4szrh2FCBAHV6gQWxAakJjUgdIuzHxCC7QRwlgvlistXUVTZTITy4F3+EH1fWF5m
+         4ET9qis/9K3bAFK43k9U7SHr73rE6SY6bebeTKb2ipuWfCC9EIh/l+NDu30IsorkZXfK
+         5zJlE137c6UTrUx0t9w+xZBb80U3N6HmUN4liigml7SDZUY1yxuAdqWhaIjISooGS5g/
+         4a1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=7tuqKTglpJW525ZsMGnz4XtJGD4FdhFwkTMNsXzTdys=;
-        b=eOyEqBIFY3w8pKWsmWHwtM8sdBgfUQ706f4ErM18pugJSkIZtaoUGIiycL4Fooaabh
-         k9cUcf9p2GHF46P4AMGqmMqVs9/wPDT54iAgQR8m0Fb7xjNktj4H4sj/yJqlq94C/E7n
-         aQ4KFDLc3LKKkQlTPeo4xQsqUxGHCg6WPbHTQp9jQutEJSTptY7DI1tHNkXvKTio6+EA
-         4OlW9RCT81UXXONrWYi4+uAecLltPqTafMgBgXoYtxtewmUvYjThBmypHwilYwGqa/so
-         HO25/Gi3if6YYCTzxHnJjJmGdYgqWSQgp28JFxrUfZMfmEge89cSkfq/Beu8qpRuGPl+
-         OeCw==
-X-Gm-Message-State: AOAM531mpCdYcB3bHnj0YFGkHi5OiBVBuyYzqWNN50zLBAYMbIkm0/XS
-        LRBfN7v9zDbwPT1o65WkR4V3Vg==
-X-Google-Smtp-Source: ABdhPJz+t2BoYNFau7gIvZdzt/zauBCl5AABVX6lSemcj7PJJZlsCcmCCWMfqy56uRugwmLXUtpdxQ==
-X-Received: by 2002:a17:902:bd42:b029:ee:2ada:b6fc with SMTP id b2-20020a170902bd42b02900ee2adab6fcmr28119729plx.59.1621904260028;
-        Mon, 24 May 2021 17:57:40 -0700 (PDT)
+        bh=Z58QfC5D6YeFAbzSgFuFnv7cuq5vhjfp0Kxje8RxtIo=;
+        b=fH2lgsHbKaqTTDRiZ6Q3xjIVsnfGQSU+b1U4AsDTvFp6qONII6PoMdetG/m9f5LGgq
+         0gmoE7HLpnR4PG4helEhov5KlQujKox5Z/6lvmbONoZsrm0FdxJLn6Y9+oIm7oOwuixO
+         38QKgjoe613dtdwV7Y/mH3zOAlGaQjIb2T4C7tOM/C4wcwqV1fHSkUMbiSlb/t0bWkk0
+         05MnULZ0qzs8K72IssxJVAZpSkfGQ6AFl722XFz61wlm/NpL+Z4/i55Ih5kZiqF5f/sR
+         ZIPLYHdK8Ca3CizDRWRa64s5OKIhCYrXOACwX5Pk6us1N8XSI9Fu+H9qv040aEVrir2B
+         whmw==
+X-Gm-Message-State: AOAM530SCLaxiI6rYa47u2UcYhYp13ARMaK26QOOz58onDJdX3DW5o5/
+        rNaCHucsDR+yScSDZ0CYuhwFzg==
+X-Google-Smtp-Source: ABdhPJyY878/s4A/o8aiG0cDhKDvPtIrkjtz94B+7lT2MUtgJ4XDTGei4+Ezb+bDvWjuG/rNERawxg==
+X-Received: by 2002:a05:6a00:84f:b029:2be:3b80:e9eb with SMTP id q15-20020a056a00084fb02902be3b80e9ebmr27677157pfk.39.1621904577837;
+        Mon, 24 May 2021 18:02:57 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id v18sm12446765pff.90.2021.05.24.17.57.39
+        by smtp.gmail.com with ESMTPSA id s5sm6567319pjo.10.2021.05.24.18.02.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 May 2021 17:57:39 -0700 (PDT)
-Date:   Tue, 25 May 2021 00:57:35 +0000
+        Mon, 24 May 2021 18:02:57 -0700 (PDT)
+Date:   Tue, 25 May 2021 01:02:53 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 07/12] KVM: nVMX: Disable vmcs02 posted interrupts if
- vmcs12 PID isn't mappable
-Message-ID: <YKxLf8546GQ6ZEQd@google.com>
-References: <20210520230339.267445-1-jmattson@google.com>
- <20210520230339.267445-8-jmattson@google.com>
- <YKw1FGuq5YzSiael@google.com>
- <CALMp9eQikiZRzX+UtdTW4rHO+jT2uo5xmrtGGs1V96kEZAHh_A@mail.gmail.com>
- <YKw6mpWe3UFY2Gnp@google.com>
- <CALMp9eQy=JhQDzk_LYwrOpbv3hhhi_BT=5rwjHpfTuTQShzkww@mail.gmail.com>
- <YKxAsZzO1uQx7sf8@google.com>
- <CALMp9eSae040kCsHApTdTgh0wKYiB9kRzgsyQVU7p_FaqwXwGg@mail.gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 42/43] KVM: VMX: Drop VMWRITEs to zero fields at vCPU
+ RESET
+Message-ID: <YKxMvVCqOvGSQa2U@google.com>
+References: <20210424004645.3950558-1-seanjc@google.com>
+ <20210424004645.3950558-43-seanjc@google.com>
+ <e2974b79-a6e5-81be-2adb-456f114391da@redhat.com>
+ <YKwomNuTEwgf4Xt0@google.com>
+ <CALMp9eSsOw0=n4-rn5B1A_T9nYBB0UkXWQ+oOJNx6ammfJ6Q-A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALMp9eSae040kCsHApTdTgh0wKYiB9kRzgsyQVU7p_FaqwXwGg@mail.gmail.com>
+In-Reply-To: <CALMp9eSsOw0=n4-rn5B1A_T9nYBB0UkXWQ+oOJNx6ammfJ6Q-A@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, May 24, 2021, Jim Mattson wrote:
-> On Mon, May 24, 2021 at 5:11 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > Can we instead word it along the lines of:
-> >
-> >   Defer the KVM_INTERNAL_EXIT until KVM actually attempts to consume the posted
-> >   interrupt descriptor on behalf of the vCPU.  Note, KVM may process posted
-> >   interrupts when it architecturally should not.  Bugs aside, userspace can at
-> >   least rely on KVM to not process posted interrupts if there is no (posted?)
-> >   interrupt activity whatsoever.
+> On Mon, May 24, 2021 at 3:28 PM Sean Christopherson <seanjc@google.com> wrote:
+> > That said, I'm not against switching to VMWRITE for everything, but regardless
+> > of which route we choose, we should commit to one or the other.  I.e. double down
+> > on memset() and bet that Intel won't break KVM, or replace the memset() in
+> > alloc_vmcs_cpu() with a sequence that writes all known (possible?) fields.  The
+> > current approach of zeroing the memory in software but initializing _some_ fields
+> > is the worst option, e.g. I highly doubt vmcs01 and vmcs02 do VMWRITE(..., 0) on
+> > the same fields.
 > 
-> How about:
-> 
-> Defer the KVM_INTERNAL_EXIT until KVM tries to access the contents of
-> the VMCS12 posted interrupt descriptor. (Note that KVM may do this
-> when it should not, per the architectural specification.)
+> The memset should probably be dropped, unless it is there to prevent
+> information leakage. However, it is not necessary to VMWRITE all known
+> (or possible) fields--just those that aren't guarded by an enable bit.
 
-Works for me!
+Yeah, I was thinking of defense-in-depth, e.g. better to have VM-Enter consume
+'0' than random garbage because KVM botched an enabling sequence.  We essentially
+get that today via the memset().  I'll fiddle with the sequence and see how much
+overhead a paranoid and/or really paranoid approach would incur.
