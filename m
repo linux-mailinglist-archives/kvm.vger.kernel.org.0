@@ -2,98 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 93FFA38FA79
-	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 08:06:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E38C338FAD3
+	for <lists+kvm@lfdr.de>; Tue, 25 May 2021 08:23:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230368AbhEYGHb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 May 2021 02:07:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30676 "EHLO
+        id S230224AbhEYGYy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 May 2021 02:24:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22751 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230308AbhEYGHa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 May 2021 02:07:30 -0400
+        by vger.kernel.org with ESMTP id S230334AbhEYGYx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 25 May 2021 02:24:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1621922760;
+        s=mimecast20190719; t=1621923804;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=r9QfkiWTazDYUtE1Luc4hV82nC6GoaJdxYTDUHwiTtU=;
-        b=elkSVROjKOW/SlkKOE2jCFZnuWBJWfUW4poMUXWdHFPbvTNKwX+7DG117k160kCNFkDCJJ
-        Nz5aaSOqs06nEWlbt2JM/fIAmug2D/mF2aT1TlTE1ns8GKNcpoxmeljXLkbjXFtzXKZ2J4
-        vu/Sj0C1GDH+w6TJmnTIJ+RP8M+b718=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-553-mCXE189QOFyKKvt6yJVTDw-1; Tue, 25 May 2021 02:05:57 -0400
-X-MC-Unique: mCXE189QOFyKKvt6yJVTDw-1
-Received: by mail-wm1-f70.google.com with SMTP id l185-20020a1c25c20000b029014b0624775eso5515642wml.6
-        for <kvm@vger.kernel.org>; Mon, 24 May 2021 23:05:57 -0700 (PDT)
+        bh=kJI9B3UDrsS5ZG82dGOTDBKrm8/JabWsy+34uznhI0Y=;
+        b=NK4XKEtIoB2nQX1dfF0CIKAzeZ+eyIbLX6Rqztqwlq2GmEzKfM+xCluCSoF9nGAeJlBF7I
+        7sDBITSX9ydjgdKtvreFz6tLi8qXeRwNrSm4Qu8MOVCIByiuD9UANBMQFQXkNq1eNj79cs
+        oe/VflAD+125acE63wx8G1tefobt/Lg=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-5-f3EZyRjQMr-wEhQuqd_mYA-1; Tue, 25 May 2021 02:23:22 -0400
+X-MC-Unique: f3EZyRjQMr-wEhQuqd_mYA-1
+Received: by mail-wr1-f71.google.com with SMTP id g3-20020adfd1e30000b02901122a4b850aso6100411wrd.20
+        for <kvm@vger.kernel.org>; Mon, 24 May 2021 23:23:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=r9QfkiWTazDYUtE1Luc4hV82nC6GoaJdxYTDUHwiTtU=;
-        b=iZym7FCqaaXiI76AaEkJfQE0dCjdu67sZnci3cpyBvW0J8aF+lu/fNAOtxR9qxxYJG
-         HP1E/ptwfSIN/lv64CGWFD9jgXUjcLIEcNlds47KYVwCIeqcwPOFGEHwuaaD6miWDRg0
-         LyJE5RbSzp38zKibWUJ9j1Ar0wNWBnTEdg2uZOe7w3aCnC+T/Qxw0YRPzSoEbWoBua6R
-         tvudZpmYsYvv9xOzaZMW9uc8f+62W9ZPnxAXjPUIfOF0AJPUaryW0ZtbrRjuj9otyZ/7
-         5nasqp897ob6U6lh9SBXuTN7bX3Rg5Uqvk7EvTRBmssMX0F0DNp5dygHp2JGauOMnecZ
-         Z6qQ==
-X-Gm-Message-State: AOAM530ebIiinCpddtiHk/2MexZ0vWckVxvlzZLY4JRkwKEqTvlB2kk5
-        UHEzOrHTqE6hBI0dmAcHvkBzuXgtrH1yhu4LRYLdkPO16XJ5O5+zroxF+GjnsGuk0pnOforXHMC
-        aL2vwNeuRq5VJsgbuqig+i3SgESbVgrTNg5RCRRifCmQO9iowfJGTxOkTUtTdhX+m
-X-Received: by 2002:a5d:64cf:: with SMTP id f15mr24582950wri.327.1621922756265;
-        Mon, 24 May 2021 23:05:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyfsthrHqZDORFny3PkPPPeOrcDPeoQH9q5hYHy/9xCUEv21MTIaAZm54SxRMgPqJN2wFdkfQ==
-X-Received: by 2002:a5d:64cf:: with SMTP id f15mr24582933wri.327.1621922756019;
-        Mon, 24 May 2021 23:05:56 -0700 (PDT)
+        bh=kJI9B3UDrsS5ZG82dGOTDBKrm8/JabWsy+34uznhI0Y=;
+        b=Sp2L5KMbLLQpy8idfATbFmqANJ+6rBdb4SOjt5uIV4/pvmPT/BGmX+o9G/ctBp0XXs
+         7Lt8G/MClLSanvsvuRTIowm3tgYQe9kRRNXmJJlNGYkh5HCNlb+HSpOOQukV6u6PPXYr
+         vbCyOz+W9/aUOWf8oGTbwQNC/fvSHcUxhg5qWsOWCr/VzYg0g/3ln8FF1qWe0RdGMibg
+         krJpG2K3JQ9cgzXsetgXPh+2rZlbXEvxM48RdJX9nw/sFDX9L53nVyp49lONSQMYZ2/k
+         mg+F6Po7xgnPYeLRx/zMvLrEzeCxolj6ZO9vRkkSxFLHZQ6sgKn+aDLWhaFm6qW3zYix
+         MFOg==
+X-Gm-Message-State: AOAM531Bk7wxq3UYPlX4Xk0mAax+YmVUkbldtASIwA+tlzC9IazkZvH0
+        VLBujhcscaWmzK6fL5a4tb1naeFHMQFlkHLWNGSaIznhmZ91R+ayR5YX+mWAGGKu/cJUOEue3n8
+        M7u7zvApHICCS
+X-Received: by 2002:adf:fd81:: with SMTP id d1mr25720244wrr.37.1621923801599;
+        Mon, 24 May 2021 23:23:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw5iZuU+Q62kXzDBukK4J7FbYpVjOGZNWnlJDEeNvhevYharSYKA5CYOQitXD6QBTBf/I26hA==
+X-Received: by 2002:adf:fd81:: with SMTP id d1mr25720236wrr.37.1621923801480;
+        Mon, 24 May 2021 23:23:21 -0700 (PDT)
 Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id n20sm9759911wmk.12.2021.05.24.23.05.55
+        by smtp.gmail.com with ESMTPSA id 61sm15690877wrm.52.2021.05.24.23.23.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 May 2021 23:05:55 -0700 (PDT)
+        Mon, 24 May 2021 23:23:20 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: Fix ERROR: modpost: .kvm_vcpu_can_poll undefined!
-In-Reply-To: <1621911770-11744-1-git-send-email-wanpengli@tencent.com>
-References: <1621911770-11744-1-git-send-email-wanpengli@tencent.com>
-Date:   Tue, 25 May 2021 08:05:54 +0200
-Message-ID: <87im378i0t.fsf@vitty.brq.redhat.com>
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Kechen Lu <kechenl@nvidia.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 5/5] KVM: x86: hyper-v: Deactivate APICv only when
+ AutoEOI feature is in use
+In-Reply-To: <82e2a6a0-337a-4b92-2271-493344a38960@redhat.com>
+References: <20210518144339.1987982-1-vkuznets@redhat.com>
+ <20210518144339.1987982-6-vkuznets@redhat.com>
+ <82e2a6a0-337a-4b92-2271-493344a38960@redhat.com>
+Date:   Tue, 25 May 2021 08:23:19 +0200
+Message-ID: <87fsyb8h7s.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wanpeng Li <kernellwp@gmail.com> writes:
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> From: Wanpeng Li <wanpengli@tencent.com>
+> On 18/05/21 16:43, Vitaly Kuznetsov wrote:
+>> APICV_INHIBIT_REASON_HYPERV is currently unconditionally forced upon
+>> SynIC activation as SynIC's AutoEOI is incompatible with APICv/AVIC. It is,
+>> however, possible to track whether the feature was actually used by the
+>> guest and only inhibit APICv/AVIC when needed.
+>> 
+>> TLFS suggests a dedicated 'HV_DEPRECATING_AEOI_RECOMMENDED' flag to let
+>> Windows know that AutoEOI feature should be avoided. While it's up to
+>> KVM userspace to set the flag, KVM can help a bit by exposing global
+>> APICv/AVIC enablement: in case APICv/AVIC usage is impossible, AutoEOI
+>> is still preferred.
+>> 
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 >
-> Export kvm_vcpu_can_poll to fix ERROR: modpost: .kvm_vcpu_can_poll undefined!
->
+> Should it also disable APICv unconditionally if 
+> HV_DEPRECATING_AEOI_RECOMMENDED is not in the guest CPUID?  That should 
+> avoid ping-pong between enabled and disabled APICv even in pathological 
+> cases that we cannot think about.
 
-Fixes: 0fee89fbc44b ("KVM: PPC: exit halt polling on need_resched()")
-
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  virt/kvm/kvm_main.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 62522c1..8eaec42 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2949,6 +2949,7 @@ bool kvm_vcpu_can_poll(ktime_t cur, ktime_t stop)
->  {
->  	return single_task_running() && !need_resched() && ktime_before(cur, stop);
->  }
-> +EXPORT_SYMBOL_GPL(kvm_vcpu_can_poll);
->  
->  /*
->   * The vCPU has executed a HLT instruction with in-kernel mode enabled.
+When you run Hyper-V on KVM it doesn't use SynIC (let alone AutoEOI) but
+we still inhibit APICv unconditionally. The patch as-is improves this
+without any userspace changes required and I see it as a benefit. Going
+forward, we will definitely add something like 'hv-synic-noaeoi' to QEMU
+to make non-nesting setups benefit too but it'll take a while for this
+option to propagate to real world configurations (sigh).
 
 -- 
 Vitaly
