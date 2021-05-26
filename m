@@ -2,177 +2,260 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E339391450
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 12:02:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AAC5C391497
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 12:12:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233264AbhEZKEU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 06:04:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49867 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233568AbhEZKEQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 May 2021 06:04:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622023365;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BMCDyJ751N8hnlsCOUH+lAy3d3kC1AGxZCaqwRQmLu4=;
-        b=YugpLJ5saMSnsgtq4b5l6QQ1wH/6I0QaxkvdzC15R4mC9cjMcVGHaGnvkuH0c8LYdZ0agp
-        WpbwTbK5e830Csh4qYybJZscyzqEnKVOEmMJMUKSragLqhPsspMYl+74BF0wiPmc1oAaon
-        YF9act7kTdIq3N2Gfu/7YYSikriQVuk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-103-GijBgnq_Nn2oBQZCDfftCw-1; Wed, 26 May 2021 06:02:42 -0400
-X-MC-Unique: GijBgnq_Nn2oBQZCDfftCw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 914F319251CC;
-        Wed, 26 May 2021 10:02:27 +0000 (UTC)
-Received: from starship (unknown [10.40.192.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 358295C230;
-        Wed, 26 May 2021 10:02:24 +0000 (UTC)
-Message-ID: <572a0dbf8f656f49dfcf49596f2b6e10236ba7a9.camel@redhat.com>
-Subject: Re: [PATCH v2 5/5] KVM: x86: hyper-v: Deactivate APICv only when
- AutoEOI feature is in use
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Kechen Lu <kechenl@nvidia.com>, linux-kernel@vger.kernel.org
-Date:   Wed, 26 May 2021 13:02:23 +0300
-In-Reply-To: <82e2a6a0-337a-4b92-2271-493344a38960@redhat.com>
-References: <20210518144339.1987982-1-vkuznets@redhat.com>
-         <20210518144339.1987982-6-vkuznets@redhat.com>
-         <82e2a6a0-337a-4b92-2271-493344a38960@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S233803AbhEZKOL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 06:14:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33468 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S233869AbhEZKOJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 May 2021 06:14:09 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14QA3Rr8088854;
+        Wed, 26 May 2021 06:12:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=5zToOrEQp17qLS7K+dsBb1hOdp/BouDlOTq1R/wZNRc=;
+ b=bu26H2JC244yjx63t1f2cZNIBKW3Uc16HXzxDA1MEjWWiRF/lx8XXo6qMzJD4EMSgiYw
+ VhVh1563peLzuFlguu5ms+5pHoZ2WzvqRFfwk+khPw2hJqh6Ba/XdFccBfCTxYq1dXp3
+ j488zHsnPGqCNHGf2p6G9amhiauv0mXAJw+p/QJXKO4yoyAeVfJS4W98Kp76TlDp32Im
+ EYWFm3autN9ytLJs+RPmGn0HUuemDkP3P9iCDIvUJWwJAgRAyDn4sUgJKjDmlX+nIxHx
+ YUiIEfqm2qq6X+Jxz15MaK5qgML2v4lHQKn225oC1++nfiPKm10cvhr4/c6sPaD16QKI tQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 38sh3m61rt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 May 2021 06:12:37 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14QA3Sft089015;
+        Wed, 26 May 2021 06:12:37 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 38sh3m61r4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 May 2021 06:12:37 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 14QAA4Db004322;
+        Wed, 26 May 2021 10:12:35 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma05fra.de.ibm.com with ESMTP id 38s1r508cp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 May 2021 10:12:35 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14QACWZb26673596
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 26 May 2021 10:12:32 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C27A34C04A;
+        Wed, 26 May 2021 10:12:32 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 913D64C046;
+        Wed, 26 May 2021 10:12:31 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.174.11])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 26 May 2021 10:12:31 +0000 (GMT)
+Subject: Re: [kvm-unit-tests RFC 1/2] s390x: Add guest snippet support
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
+        thuth@redhat.com, cohuck@redhat.com
+References: <20210520094730.55759-1-frankja@linux.ibm.com>
+ <20210520094730.55759-2-frankja@linux.ibm.com>
+ <20210525184454.2d0693ef@ibm-vm>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Message-ID: <0b971b37-ce5c-74ba-1a59-0863ee2f8354@linux.ibm.com>
+Date:   Wed, 26 May 2021 12:12:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20210525184454.2d0693ef@ibm-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: zEBvuHQTJwE9S-D-xLa_0qluNtdKV-8g
+X-Proofpoint-GUID: w7aufgTLbCG4jc2SXz70kWkuWf4T-3oz
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-26_06:2021-05-26,2021-05-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
+ suspectscore=0 spamscore=0 phishscore=0 mlxlogscore=999 mlxscore=0
+ priorityscore=1501 lowpriorityscore=0 bulkscore=0 malwarescore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2105260067
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2021-05-24 at 18:21 +0200, Paolo Bonzini wrote:
-> On 18/05/21 16:43, Vitaly Kuznetsov wrote:
-> > APICV_INHIBIT_REASON_HYPERV is currently unconditionally forced upon
-> > SynIC activation as SynIC's AutoEOI is incompatible with APICv/AVIC. It is,
-> > however, possible to track whether the feature was actually used by the
-> > guest and only inhibit APICv/AVIC when needed.
-> > 
-> > TLFS suggests a dedicated 'HV_DEPRECATING_AEOI_RECOMMENDED' flag to let
-> > Windows know that AutoEOI feature should be avoided. While it's up to
-> > KVM userspace to set the flag, KVM can help a bit by exposing global
-> > APICv/AVIC enablement: in case APICv/AVIC usage is impossible, AutoEOI
-> > is still preferred.
-> > 
-> > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+On 5/25/21 6:44 PM, Claudio Imbrenda wrote:
+> On Thu, 20 May 2021 09:47:29 +0000
+> Janosch Frank <frankja@linux.ibm.com> wrote:
 > 
-> Should it also disable APICv unconditionally if 
-> HV_DEPRECATING_AEOI_RECOMMENDED is not in the guest CPUID?  That should 
-> avoid ping-pong between enabled and disabled APICv even in pathological 
-> cases that we cannot think about.
+>> Snippets can be used to easily write and run guest (SIE) tests.
+>> The snippet is linked into the test binaries and can therefore be
+>> accessed via a ptr.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  .gitignore                |  2 ++
+>>  s390x/Makefile            | 28 ++++++++++++++++++---
+>>  s390x/snippets/c/cstart.S | 13 ++++++++++
+>>  s390x/snippets/c/flat.lds | 51
+>> +++++++++++++++++++++++++++++++++++++++ 4 files changed, 91
+>> insertions(+), 3 deletions(-) create mode 100644
+>> s390x/snippets/c/cstart.S create mode 100644 s390x/snippets/c/flat.lds
+>>
+>> diff --git a/.gitignore b/.gitignore
+>> index 784cb2dd..29d3635b 100644
+>> --- a/.gitignore
+>> +++ b/.gitignore
+>> @@ -22,3 +22,5 @@ cscope.*
+>>  /api/dirty-log
+>>  /api/dirty-log-perf
+>>  /s390x/*.bin
+>> +/s390x/snippets/*/*.bin
+>> +/s390x/snippets/*/*.gbin
+>> diff --git a/s390x/Makefile b/s390x/Makefile
+>> index 8de926ab..fe267011 100644
+>> --- a/s390x/Makefile
+>> +++ b/s390x/Makefile
+>> @@ -75,11 +75,33 @@ OBJDIRS += lib/s390x
+>>  asmlib = $(TEST_DIR)/cstart64.o $(TEST_DIR)/cpu.o
+>>  
+>>  FLATLIBS = $(libcflat)
+>> -%.elf: %.o $(FLATLIBS) $(SRCDIR)/s390x/flat.lds $(asmlib)
+>> +
+>> +SNIPPET_DIR = $(TEST_DIR)/snippets
+>> +
+>> +# C snippets that need to be linked
+>> +snippets-c =
+>> +
+>> +# ASM snippets that are directly compiled and converted to a *.gbin
+>> +snippets-a =
+>> +
+>> +snippets = $(snippets-a)$(snippets-c)
+>                           ↑↑
+> I'm not a Makefile expert, but, don't you need a space between the two
+> variable expansions?
+> 
 
-Probably not worth it, as the guest might still not use it.
-We already disable/enable AVIC at the rate of a few iterations
-per second when PIC sends its interrupts via ExtINT,
-and we need an interrupt window.
+Yup, I already fixed that one
 
-This is sadly something that windows still does use and
-it seems to work.
+>> +snippets-o += $(patsubst %.gbin,%.o,$(snippets))
+>> +
+>> +$(snippets-a): $(snippets-o) $(FLATLIBS)
+>> +	$(OBJCOPY) -O binary $(patsubst %.gbin,%.o,$@) $@
+>> +	$(OBJCOPY) -I binary -O elf64-s390 -B "s390:64-bit" $@ $@
+>> +
+>> +$(snippets-c): $(snippets-o) $(SNIPPET_DIR)/c/cstart.o  $(FLATLIBS)
+>> +	$(CC) $(LDFLAGS) -o $@ -T $(SNIPPET_DIR)/c/flat.lds \
+>> +		$(filter %.o, $^) $(FLATLIBS)
+>> +	$(OBJCOPY) -O binary $@ $@
+>> +	$(OBJCOPY) -I binary -O elf64-s390 -B "s390:64-bit" $@ $@
+>> +
+>> +%.elf: $(snippets) %.o $(FLATLIBS) $(SRCDIR)/s390x/flat.lds $(asmlib)
+> 
+> I would keep the %.o as the first in the list>
+>>  	$(CC) $(CFLAGS) -c -o $(@:.elf=.aux.o) \
+>>  		$(SRCDIR)/lib/auxinfo.c -DPROGNAME=\"$@\"
+>>  	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/flat.lds \
+>> -		$(filter %.o, $^) $(FLATLIBS) $(@:.elf=.aux.o)
+>> +		$(filter %.o, $^) $(FLATLIBS) $(snippets)
+> 
+> so all the snippets are always baked in every test?
 
-Best regards,
-	Maxim Levitsky
+Currently yes.
+Do you have better ideas?
 
 > 
-> Paolo
+>> $(@:.elf=.aux.o) $(RM) $(@:.elf=.aux.o)
+>>  	@chmod a-x $@
+>>  
+>> @@ -93,7 +115,7 @@ FLATLIBS = $(libcflat)
+>>  	$(GENPROTIMG) --host-key-document $(HOST_KEY_DOCUMENT)
+>> --no-verify --image $< -o $@ 
+>>  arch_clean: asm_offsets_clean
+>> -	$(RM) $(TEST_DIR)/*.{o,elf,bin} $(TEST_DIR)/.*.d
+>> lib/s390x/.*.d
+>> +	$(RM) $(TEST_DIR)/*.{o,elf,bin}
+>> $(SNIPPET_DIR)/c/*.{o,elf,bin,gbin} $(SNIPPET_DIR)/.*.d
+>> $(TEST_DIR)/.*.d lib/s390x/.*.d generated-files = $(asm-offsets)
+>>  $(tests:.elf=.o) $(asmlib) $(cflatobjs): $(generated-files)
+>> diff --git a/s390x/snippets/c/cstart.S b/s390x/snippets/c/cstart.S
+>> new file mode 100644
+>> index 00000000..02a3338b
+>> --- /dev/null
+>> +++ b/s390x/snippets/c/cstart.S
+>> @@ -0,0 +1,13 @@
+>> +#include <asm/sigp.h>
+>> +
+>> +.section .init
+>> +	.globl start
+>> +start:
+>> +	/* XOR all registers with themselves to clear them fully. */
+>> +	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+>> +	xgr \i,\i
+>> +	.endr
+>> +	/* 0x3000 is the stack page for now */
+>> +	lghi	%r15, 0x4000
+>> +	brasl	%r14, main
+>> +	sigp    %r1, %r0, SIGP_STOP
+>> diff --git a/s390x/snippets/c/flat.lds b/s390x/snippets/c/flat.lds
+>> new file mode 100644
+>> index 00000000..5e707325
+>> --- /dev/null
+>> +++ b/s390x/snippets/c/flat.lds
+>> @@ -0,0 +1,51 @@
+>> +SECTIONS
+>> +{
+>> +	.lowcore : {
+>> +		/*
+>> +		 * Initial short psw for disk boot, with 31 bit
+>> addressing for
+>> +		 * non z/Arch environment compatibility and the
+>> instruction
+>> +		 * address 0x10000 (cstart64.S .init).
+>> +		 */
+>> +		. = 0;
+>> +		 LONG(0x00080000)
+>> +		 LONG(0x80004000)
+>> +		 /* Restart new PSW for booting via PSW restart. */
+>> +		 . = 0x1a0;
+>> +		 QUAD(0x0000000180000000)
+>> +		 QUAD(0x0000000000004000)
+>> +	}
+>> +	. = 0x4000;
+>> +	.text : {
+>> +		*(.init)
+>> +		*(.text)
+>> +		*(.text.*)
+>> +	}
+>> +	. = ALIGN(64K);
+>> +	etext = .;
+>> +	.opd : { *(.opd) }
+>> +	. = ALIGN(16);
+>> +	.dynamic : {
+>> +		dynamic_start = .;
+>> +		*(.dynamic)
+>> +	}
+>> +	.dynsym : {
+>> +		dynsym_start = .;
+>> +		*(.dynsym)
+>> +	}
+>> +	.rela.dyn : { *(.rela*) }
+>> +	. = ALIGN(16);
+>> +	.data : {
+>> +		*(.data)
+>> +		*(.data.rel*)
+>> +	}
+>> +	. = ALIGN(16);
+>> +	.rodata : { *(.rodata) *(.rodata.*) }
+>> +	. = ALIGN(16);
+>> +	__bss_start = .;
+>> +	.bss : { *(.bss) }
+>> +	__bss_end = .;
+>> +	. = ALIGN(64K);
+>> +	edata = .;
+>> +	. += 64K;
+>> +	. = ALIGN(64K);
+>> +}
 > 
-> > ---
-> >   arch/x86/include/asm/kvm_host.h |  3 +++
-> >   arch/x86/kvm/hyperv.c           | 27 +++++++++++++++++++++------
-> >   2 files changed, 24 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index bf5807d35339..5e03ab4c0e4f 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -936,6 +936,9 @@ struct kvm_hv {
-> >   	/* How many vCPUs have VP index != vCPU index */
-> >   	atomic_t num_mismatched_vp_indexes;
-> >   
-> > +	/* How many SynICs use 'AutoEOI' feature */
-> > +	atomic_t synic_auto_eoi_used;
-> > +
-> >   	struct hv_partition_assist_pg *hv_pa_pg;
-> >   	struct kvm_hv_syndbg hv_syndbg;
-> >   };
-> > diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> > index f98370a39936..89e7d5b99279 100644
-> > --- a/arch/x86/kvm/hyperv.c
-> > +++ b/arch/x86/kvm/hyperv.c
-> > @@ -87,6 +87,10 @@ static bool synic_has_vector_auto_eoi(struct kvm_vcpu_hv_synic *synic,
-> >   static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
-> >   				int vector)
-> >   {
-> > +	struct kvm_vcpu *vcpu = hv_synic_to_vcpu(synic);
-> > +	struct kvm_hv *hv = to_kvm_hv(vcpu->kvm);
-> > +	int auto_eoi_old, auto_eoi_new;
-> > +
-> >   	if (vector < HV_SYNIC_FIRST_VALID_VECTOR)
-> >   		return;
-> >   
-> > @@ -95,10 +99,25 @@ static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
-> >   	else
-> >   		__clear_bit(vector, synic->vec_bitmap);
-> >   
-> > +	auto_eoi_old = bitmap_weight(synic->auto_eoi_bitmap, 256);
-> > +
-> >   	if (synic_has_vector_auto_eoi(synic, vector))
-> >   		__set_bit(vector, synic->auto_eoi_bitmap);
-> >   	else
-> >   		__clear_bit(vector, synic->auto_eoi_bitmap);
-> > +
-> > +	auto_eoi_new = bitmap_weight(synic->auto_eoi_bitmap, 256);
-> > +
-> > +	/* Hyper-V SynIC auto EOI SINTs are not compatible with APICV */
-> > +	if (!auto_eoi_old && auto_eoi_new) {
-> > +		if (atomic_inc_return(&hv->synic_auto_eoi_used) == 1)
-> > +			kvm_request_apicv_update(vcpu->kvm, false,
-> > +						 APICV_INHIBIT_REASON_HYPERV);
-> > +	} else if (!auto_eoi_new && auto_eoi_old) {
-> > +		if (atomic_dec_return(&hv->synic_auto_eoi_used) == 0)
-> > +			kvm_request_apicv_update(vcpu->kvm, true,
-> > +						 APICV_INHIBIT_REASON_HYPERV);
-> > +	}
-> >   }
-> >   
-> >   static int synic_set_sint(struct kvm_vcpu_hv_synic *synic, int sint,
-> > @@ -931,12 +950,6 @@ int kvm_hv_activate_synic(struct kvm_vcpu *vcpu, bool dont_zero_synic_pages)
-> >   
-> >   	synic = to_hv_synic(vcpu);
-> >   
-> > -	/*
-> > -	 * Hyper-V SynIC auto EOI SINT's are
-> > -	 * not compatible with APICV, so request
-> > -	 * to deactivate APICV permanently.
-> > -	 */
-> > -	kvm_request_apicv_update(vcpu->kvm, false, APICV_INHIBIT_REASON_HYPERV);
-> >   	synic->active = true;
-> >   	synic->dont_zero_synic_pages = dont_zero_synic_pages;
-> >   	synic->control = HV_SYNIC_CONTROL_ENABLE;
-> > @@ -2198,6 +2211,8 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
-> >   				ent->eax |= HV_X64_ENLIGHTENED_VMCS_RECOMMENDED;
-> >   			if (!cpu_smt_possible())
-> >   				ent->eax |= HV_X64_NO_NONARCH_CORESHARING;
-> > +			if (enable_apicv)
-> > +				ent->eax |= HV_DEPRECATING_AEOI_RECOMMENDED;
-> >   			/*
-> >   			 * Default number of spinlock retry attempts, matches
-> >   			 * HyperV 2016.
-> > 
-
 
