@@ -2,132 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B9B91391D15
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 18:33:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD42C391DBD
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 19:20:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234700AbhEZQfU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 12:35:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22977 "EHLO
+        id S233997AbhEZRWH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 13:22:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32700 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234665AbhEZQfT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 May 2021 12:35:19 -0400
+        by vger.kernel.org with ESMTP id S232386AbhEZRWG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 May 2021 13:22:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622046826;
+        s=mimecast20190719; t=1622049634;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XVqT1swsX27I0j5hE9T0VhOfylfMr7I1wTfKCDuG8vY=;
-        b=AHUQ+zGwwHmODkq60Y0WposShXXR4W5ZQl7yfZ3p1snbqbvIW/4z8AEaGjntRWt/1tLMrC
-        vG4Ikb7S5sTfGgAYwYhLyPP7LBYOAVS0bg0LPwwKeph9FN4WeIz9xudlNeI24CoxGtP0A6
-        7R2q0xodwIcgWRpjRszjKv6yeYzG//U=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-79-WAGt0rSZNU6G177R4SbM8w-1; Wed, 26 May 2021 12:33:45 -0400
-X-MC-Unique: WAGt0rSZNU6G177R4SbM8w-1
-Received: by mail-ej1-f69.google.com with SMTP id i23-20020a17090685d7b02903d089ab83fcso604054ejy.19
-        for <kvm@vger.kernel.org>; Wed, 26 May 2021 09:33:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=XVqT1swsX27I0j5hE9T0VhOfylfMr7I1wTfKCDuG8vY=;
-        b=s6iTl3zWo42hTyZ/Ji2lQxzCDuvlZvXGiuJFHVl79ccJRw1ZHBxwH4p/uLEjvlPfbN
-         m2YJ+tqljziVNBNfGzbjr7MKwY7eMIwlTPALfAzTwWIYsS+DKqjD9CbPY79d/ce7BqoT
-         r6vixKfvsOw3YxEFhsbMY3OKz4oHnV8oEinHrEJez3DWpcaciC/Kr7v7daIr8MJ3VaHt
-         hQmNnWVSie661gWyYaOpa6pQjw/I19RnpnzLv2Bmd28lAizBsx//AoJVxurld9oMMWu5
-         gLeftpRBZ32mcop5AkovLWgM+oFw5epxPaaaBKKG4/qTJRU4IyjgaOlC6DuIwjGKXcV2
-         08mw==
-X-Gm-Message-State: AOAM5321li9D6Nwo/aaj8Ly8Ht/mpKF+sBwctsroK1wUgWHCtDYAupZr
-        xavPxucyezqovtTx1oK3+z2GCpEni0X7FsvadGQTsNuflloSm1Vva9esfTo+kqpwAs6LvPMg8XK
-        P60KlF8NVuEw+
-X-Received: by 2002:a05:6402:1d18:: with SMTP id dg24mr38325807edb.369.1622046822963;
-        Wed, 26 May 2021 09:33:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwA9vMTjHhMUlf8GRrLD1umE9XiUdNeeF6QGlgK/FIicWbivIH+K1niCaR6uYncMTljDKHfKg==
-X-Received: by 2002:a05:6402:1d18:: with SMTP id dg24mr38325789edb.369.1622046822758;
-        Wed, 26 May 2021 09:33:42 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id b9sm12882306edt.71.2021.05.26.09.33.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 May 2021 09:33:42 -0700 (PDT)
-Subject: Re: [kvm-unit-tests GIT PULL 0/9] s390x update 2021-26-05
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, david@redhat.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, linux-s390@vger.kernel.org,
-        imbrenda@linux.ibm.com, thuth@redhat.com
-References: <20210526145539.52008-1-frankja@linux.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <605341e9-d6e8-b02e-eed3-f6756517d2a4@redhat.com>
-Date:   Wed, 26 May 2021 18:33:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        bh=g++RKsuvKjaEKQu5RfO6EzgIJ6tRl7iozPHy4sMKPPs=;
+        b=Vwerphx5+VCywcXY2K1K+ZDZ4dySQkmP/dw54gXwgFI3v7cldt2tezijiqF7O7ITUPDKf7
+        WMiG0SwvxhXQNdGsF3hRbWHdoSIx++TaQn6y6vNaVfeRF3NeOZcvv/cpoGYuZ7ERDobAtm
+        J7xBPATsmvB5loW6eQNCf0Hl+5KNHz4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-587-uIV2pHOfOLqbJdhhZTkNpg-1; Wed, 26 May 2021 13:20:28 -0400
+X-MC-Unique: uIV2pHOfOLqbJdhhZTkNpg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16B1AFC88;
+        Wed, 26 May 2021 17:20:27 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-7.gru2.redhat.com [10.97.112.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DB8B0136F5;
+        Wed, 26 May 2021 17:20:18 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id 528404172ED4; Wed, 26 May 2021 14:20:14 -0300 (-03)
+Date:   Wed, 26 May 2021 14:20:14 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Pei Zhang <pezhang@redhat.com>
+Subject: [patch 3/3 V2] KVM: VMX: update vcpu posted-interrupt descriptor
+ when assigning device
+Message-ID: <20210526172014.GA29007@fuller.cnet>
+References: <20210525134115.135966361@redhat.com>
+ <20210525134321.345140341@redhat.com>
+ <YK1WHWsA7XuwTQR3@t490s>
 MIME-Version: 1.0
-In-Reply-To: <20210526145539.52008-1-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YK1WHWsA7XuwTQR3@t490s>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/05/21 16:55, Janosch Frank wrote:
-> Dear Paolo,
-> 
-> please merge or pull the following changes:
-> * SCLP feature probing
-> * SCLP cpu model check
-> * UV host tests
-> 
-> MERGE:
-> https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/merge_requests/9
-> 
-> PIPELINE:
-> https://gitlab.com/frankja/kvm-unit-tests/-/pipelines/309936640
-> 
-> PULL:
-> The following changes since commit 74ff0e9675ec6d9477f5e98ec7d5d50878fa7ebc:
-> 
->    Merge branch 'arm/queue' into 'master' (2021-05-18 11:07:08 +0000)
-> 
-> are available in the Git repository at:
-> 
->    https://gitlab.com/frankja/kvm-unit-tests.git s390x-pull-2021-26-05
-> 
-> for you to fetch changes up to 21f5f67675830e1c088539656cdc0f63bc18e4e0:
-> 
->    s390x: cpumodel: FMT2 and FMT4 SCLP test (2021-05-26 14:27:09 +0000)
-> 
-> 
-> Janosch Frank (9):
->    s390x: uv-guest: Add invalid share location test
->    s390x: Add more Ultravisor command structure definitions
->    s390x: uv: Add UV lib
->    s390x: Test for share/unshare call support before using them
->    s390x: uv-guest: Test invalid commands
->    s390x: Add UV host test
->    s390x: sclp: Only fetch read info byte 134 if cpu entries are above it
->    lib: s390x: sclp: Extend feature probing
->    s390x: cpumodel: FMT2 and FMT4 SCLP test
-> 
->   lib/s390x/asm/uv.h    | 152 ++++++++++++-
->   lib/s390x/io.c        |   2 +
->   lib/s390x/malloc_io.c |   5 +-
->   lib/s390x/sclp.c      |  23 +-
->   lib/s390x/sclp.h      |  39 +++-
->   lib/s390x/uv.c        |  45 ++++
->   lib/s390x/uv.h        |  10 +
->   s390x/Makefile        |   2 +
->   s390x/cpumodel.c      |  71 ++++++-
->   s390x/uv-guest.c      |  60 +++++-
->   s390x/uv-host.c       | 480 ++++++++++++++++++++++++++++++++++++++++++
->   11 files changed, 871 insertions(+), 18 deletions(-)
->   create mode 100644 lib/s390x/uv.c
->   create mode 100644 lib/s390x/uv.h
->   create mode 100644 s390x/uv-host.c
-> 
 
-Pulled, thanks!
+For VMX, when a vcpu enters HLT emulation, pi_post_block will:
 
-Paolo
+1) Add vcpu to per-cpu list of blocked vcpus.
+
+2) Program the posted-interrupt descriptor "notification vector" 
+to POSTED_INTR_WAKEUP_VECTOR
+
+With interrupt remapping, an interrupt will set the PIR bit for the 
+vector programmed for the device on the CPU, test-and-set the 
+ON bit on the posted interrupt descriptor, and if the ON bit is clear
+generate an interrupt for the notification vector.
+
+This way, the target CPU wakes upon a device interrupt and wakes up
+the target vcpu.
+
+Problem is that pi_post_block only programs the notification vector
+if kvm_arch_has_assigned_device() is true. Its possible for the
+following to happen:
+
+1) vcpu V HLTs on pcpu P, kvm_arch_has_assigned_device is false,
+notification vector is not programmed
+2) device is assigned to VM
+3) device interrupts vcpu V, sets ON bit
+(notification vector not programmed, so pcpu P remains in idle)
+4) vcpu 0 IPIs vcpu V (in guest), but since pi descriptor ON bit is set,
+kvm_vcpu_kick is skipped
+5) vcpu 0 busy spins on vcpu V's response for several seconds, until
+RCU watchdog NMIs all vCPUs.
+
+To fix this, use the start_assignment kvm_x86_ops callback to kick
+vcpus out of the halt loop, so the notification vector is 
+properly reprogrammed to the wakeup vector.
+
+Reported-by: Pei Zhang <pezhang@redhat.com>
+Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+
+For build error:
+Reported-by: kernel test robot <lkp@intel.com>
+
+---
+
+v2: Add brief comment to vmx_pi_start_assignment (Peter Xu).
+    Export kvm_make_all_cpus_request (kernel test robot).
+
+
+Index: linux-2.6/arch/x86/kvm/vmx/posted_intr.c
+===================================================================
+--- linux-2.6.orig/arch/x86/kvm/vmx/posted_intr.c
++++ linux-2.6/arch/x86/kvm/vmx/posted_intr.c
+@@ -238,6 +238,20 @@ bool pi_has_pending_interrupt(struct kvm
+ 
+ 
+ /*
++ * Bail out of the block loop if the VM has an assigned
++ * device, but the blocking vCPU didn't reconfigure the
++ * PI.NV to the wakeup vector, i.e. the assigned device
++ * came along after the initial check in pi_pre_block().
++ */
++void vmx_pi_start_assignment(struct kvm *kvm)
++{
++	if (!irq_remapping_cap(IRQ_POSTING_CAP))
++		return;
++
++	kvm_make_all_cpus_request(kvm, KVM_REQ_UNBLOCK);
++}
++
++/*
+  * pi_update_irte - set IRTE for Posted-Interrupts
+  *
+  * @kvm: kvm
+Index: linux-2.6/arch/x86/kvm/vmx/posted_intr.h
+===================================================================
+--- linux-2.6.orig/arch/x86/kvm/vmx/posted_intr.h
++++ linux-2.6/arch/x86/kvm/vmx/posted_intr.h
+@@ -95,5 +95,6 @@ void __init pi_init_cpu(int cpu);
+ bool pi_has_pending_interrupt(struct kvm_vcpu *vcpu);
+ int pi_update_irte(struct kvm *kvm, unsigned int host_irq, uint32_t guest_irq,
+ 		   bool set);
++void vmx_pi_start_assignment(struct kvm *kvm);
+ 
+ #endif /* __KVM_X86_VMX_POSTED_INTR_H */
+Index: linux-2.6/arch/x86/kvm/vmx/vmx.c
+===================================================================
+--- linux-2.6.orig/arch/x86/kvm/vmx/vmx.c
++++ linux-2.6/arch/x86/kvm/vmx/vmx.c
+@@ -7732,6 +7732,7 @@ static struct kvm_x86_ops vmx_x86_ops __
+ 	.nested_ops = &vmx_nested_ops,
+ 
+ 	.update_pi_irte = pi_update_irte,
++	.start_assignment = vmx_pi_start_assignment,
+ 
+ #ifdef CONFIG_X86_64
+ 	.set_hv_timer = vmx_set_hv_timer,
+Index: linux-2.6/virt/kvm/kvm_main.c
+===================================================================
+--- linux-2.6.orig/virt/kvm/kvm_main.c
++++ linux-2.6/virt/kvm/kvm_main.c
+@@ -307,6 +307,7 @@ bool kvm_make_all_cpus_request(struct kv
+ {
+ 	return kvm_make_all_cpus_request_except(kvm, req, NULL);
+ }
++EXPORT_SYMBOL_GPL(kvm_make_all_cpus_request);
+ 
+ #ifndef CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
+ void kvm_flush_remote_tlbs(struct kvm *kvm)
 
