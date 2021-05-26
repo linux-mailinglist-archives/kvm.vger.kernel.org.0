@@ -2,344 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DD0F391F84
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 20:47:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00BFE391FAD
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 20:51:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235735AbhEZStK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 14:49:10 -0400
-Received: from smtp-fw-9103.amazon.com ([207.171.188.200]:40520 "EHLO
-        smtp-fw-9103.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235745AbhEZStC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 May 2021 14:49:02 -0400
+        id S234799AbhEZSxZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 14:53:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37094 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234595AbhEZSxX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 May 2021 14:53:23 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A06CC06175F
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 11:51:50 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id t11so1340312pjm.0
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 11:51:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1622054851; x=1653590851;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version;
-  bh=wf6oPCQVhXI/wsqk7wYd4ziyT8UncL2gGbeWfr+1mL8=;
-  b=RTTYQBmhu9Xj/92G5Nb8LaYKQKE7OTl7HbevQ3p8oG/AlP7XngIlmclL
-   KHc0h5kncLFdLz8e9c+0xcfoPkQ0ENHwiX/spmag1N7FF2qcBNT5gCbNs
-   e8IGJPQyZAw38FPW/TBdVc2cm8hc6oBDHRRgMbBDWqxApG26RdhVyNl8t
-   c=;
-X-IronPort-AV: E=Sophos;i="5.82,331,1613433600"; 
-   d="scan'208";a="935213104"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-2a-41350382.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9103.sea19.amazon.com with ESMTP; 26 May 2021 18:47:23 +0000
-Received: from EX13MTAUEB002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-2a-41350382.us-west-2.amazon.com (Postfix) with ESMTPS id 2EC91C0BBB;
-        Wed, 26 May 2021 18:47:23 +0000 (UTC)
-Received: from EX13D08UEB002.ant.amazon.com (10.43.60.107) by
- EX13MTAUEB002.ant.amazon.com (10.43.60.12) with Microsoft SMTP Server (TLS)
- id 15.0.1497.18; Wed, 26 May 2021 18:47:22 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (10.43.61.82) by
- EX13D08UEB002.ant.amazon.com (10.43.60.107) with Microsoft SMTP Server (TLS)
- id 15.0.1497.18; Wed, 26 May 2021 18:47:22 +0000
-Received: from uae075a0dfd4c51.ant.amazon.com (10.106.82.24) by
- mail-relay.amazon.com (10.43.61.243) with Microsoft SMTP Server id
- 15.0.1497.18 via Frontend Transport; Wed, 26 May 2021 18:47:21 +0000
-From:   Ilias Stamatis <ilstam@amazon.com>
-To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <pbonzini@redhat.com>
-CC:     <mlevitsk@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
-        <zamsden@gmail.com>, <mtosatti@redhat.com>, <dwmw@amazon.co.uk>,
-        <ilstam@amazon.com>
-Subject: [PATCH v4 11/11] KVM: selftests: x86: Add vmx_nested_tsc_scaling_test
-Date:   Wed, 26 May 2021 19:44:18 +0100
-Message-ID: <20210526184418.28881-12-ilstam@amazon.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20210526184418.28881-1-ilstam@amazon.com>
-References: <20210526184418.28881-1-ilstam@amazon.com>
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=JUQMqFWMF9OsPMjr/8zQdKceWkWn6w3pQ1sepukRIDE=;
+        b=EltVmmIyDtrKcE3lSfAlwzqdZzZlvMPC/5LQthNTa/UiG2iPgNrx/OQEhIcH9RUPdP
+         YmB0M477D/HWOaQAajuLvbk1G+l0rR8c1HnHWFRlnbj8OkdnnsQMDnukdIhxCSGK5ar2
+         aFz7RyET4i9ZJJts6iXM0euGqAhj14p5DNt6hlLpyCSc1BBWwrK0cq1TM5L0vZnzkD8t
+         3cQu+bFfUWaN9/RlaJEEb14TMXAu/EI4z9G8Jrou0li2n9e463hRhZbsCcuMZb9ey/nH
+         NCwDO24ddcU1HruSBqtlmcrQftXyYmQu2D9JKOFwJXBQVwaekjmHNo6CA44B3BxNY2P+
+         o0cQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=JUQMqFWMF9OsPMjr/8zQdKceWkWn6w3pQ1sepukRIDE=;
+        b=MpRl+l4E+GPr9KrULuCltcYtwZuorpCPCVfbn1apU88VwgvcqlbxLQaN3QJpWHACIP
+         yY8OFiuo5IQaAVTgA+iuk1cUZu376oHj7s6nGYuU8VKJW6E+PGo34kcvLqD2CMkNB8jr
+         bW+9jYUWQsrvYnt+61Z9geD8bzOVEVdlh69lDwNpRzcKcfRoJfKEl0oaaWF1p/VE3LSm
+         O8nli/H5LOXhERRY1WS6aaJJiQ+9tfCjoIixmbGuAA+or69TLOok1pac+DyIa07hzi1i
+         5ISuoqfmdGJpb6aSZCLieuWVRtNr8ymTG4nDw2kMN0koWDud0wMEb06q/WR15TD5KO8y
+         Z44A==
+X-Gm-Message-State: AOAM533X1T/oHoJp6CqXGSIBhG/1/4qBqPxoLSjfRaheYMjgPE8i4RUJ
+        PmaZp347tg6EA5qIzzmDSWFLMM0WEDqCxA==
+X-Google-Smtp-Source: ABdhPJzw6NTJlJLDXOtwM0Fn21BEDJBmh9TNOKv8CgcT6i65WcEHg9z4o1N36Y1EB3dYYLHKbhTPyw==
+X-Received: by 2002:a17:90a:7896:: with SMTP id x22mr5404377pjk.11.1622055110031;
+        Wed, 26 May 2021 11:51:50 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id c12sm16282814pfr.154.2021.05.26.11.51.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 May 2021 11:51:49 -0700 (PDT)
+Date:   Wed, 26 May 2021 18:51:46 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Fix comment mentioning skip_4k
+Message-ID: <YK6Ywl57/FXqcSR0@google.com>
+References: <20210526163227.3113557-1-dmatlack@google.com>
+ <YK6FdtswnFklJuAO@google.com>
+ <CALzav=dsgEP6cdfLic_7ffjf22Z8R8LTrJODyVWw3HqSZR4zFQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALzav=dsgEP6cdfLic_7ffjf22Z8R8LTrJODyVWw3HqSZR4zFQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test that nested TSC scaling works as expected with both L1 and L2
-scaled.
+On Wed, May 26, 2021, David Matlack wrote:
+> On Wed, May 26, 2021 at 10:29 AM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > Put version information in the subject, otherwise it's not always obvious which
+> > patch you want to be accepted, e.g.
+> >
+> >   [PATCH v2] KVM: x86/mmu: Fix comment mentioning skip_4k
+> 
+> Got it. My thinking was that I changed the title of the patch so
+> should omit the v2, but that doesn't really make sense.
 
-Signed-off-by: Ilias Stamatis <ilstam@amazon.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/x86_64/vmx_nested_tsc_scaling_test.c  | 242 ++++++++++++++++++
- 3 files changed, 244 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_nested_tsc_scaling_test.c
+Ha, yeah, the version should get bumped even if a patch/series gets heavily
+rewritten.  There are exceptions (though I'm struggling to think of a good
+example), but even then it's helpful to describe the relationship to any
+previous series.
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index bd83158e0e0b..cc02022f9951 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -29,6 +29,7 @@
- /x86_64/vmx_preemption_timer_test
- /x86_64/vmx_set_nested_state_test
- /x86_64/vmx_tsc_adjust_test
-+/x86_64/vmx_nested_tsc_scaling_test
- /x86_64/xapic_ipi_test
- /x86_64/xen_shinfo_test
- /x86_64/xen_vmcall_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index e439d027939d..1078240b1313 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -60,6 +60,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_dirty_log_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
-+TEST_GEN_PROGS_x86_64 += x86_64/vmx_nested_tsc_scaling_test
- TEST_GEN_PROGS_x86_64 += x86_64/xapic_ipi_test
- TEST_GEN_PROGS_x86_64 += x86_64/xss_msr_test
- TEST_GEN_PROGS_x86_64 += x86_64/debug_regs
-diff --git a/tools/testing/selftests/kvm/x86_64/vmx_nested_tsc_scaling_test.c b/tools/testing/selftests/kvm/x86_64/vmx_nested_tsc_scaling_test.c
-new file mode 100644
-index 000000000000..280c01fd2412
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/vmx_nested_tsc_scaling_test.c
-@@ -0,0 +1,242 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * vmx_nested_tsc_scaling_test
-+ *
-+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-+ *
-+ * This test case verifies that nested TSC scaling behaves as expected when
-+ * both L1 and L2 are scaled using different ratios. For this test we scale
-+ * L1 down and scale L2 up.
-+ */
-+
-+#include <time.h>
-+
-+#include "kvm_util.h"
-+#include "vmx.h"
-+#include "kselftest.h"
-+
-+
-+#define VCPU_ID 0
-+
-+/* L2 is scaled up (from L1's perspective) by this factor */
-+#define L2_SCALE_FACTOR 4ULL
-+
-+#define TSC_OFFSET_L2 ((uint64_t) -33125236320908)
-+#define TSC_MULTIPLIER_L2 (L2_SCALE_FACTOR << 48)
-+
-+#define L2_GUEST_STACK_SIZE 64
-+
-+enum { USLEEP, UCHECK_L1, UCHECK_L2 };
-+#define GUEST_SLEEP(sec)         ucall(UCALL_SYNC, 2, USLEEP, sec)
-+#define GUEST_CHECK(level, freq) ucall(UCALL_SYNC, 2, level, freq)
-+
-+
-+/*
-+ * This function checks whether the "actual" TSC frequency of a guest matches
-+ * its expected frequency. In order to account for delays in taking the TSC
-+ * measurements, a difference of 1% between the actual and the expected value
-+ * is tolerated.
-+ */
-+static void compare_tsc_freq(uint64_t actual, uint64_t expected)
-+{
-+	uint64_t tolerance, thresh_low, thresh_high;
-+
-+	tolerance = expected / 100;
-+	thresh_low = expected - tolerance;
-+	thresh_high = expected + tolerance;
-+
-+	TEST_ASSERT(thresh_low < actual,
-+		"TSC freq is expected to be between %"PRIu64" and %"PRIu64
-+		" but it actually is %"PRIu64,
-+		thresh_low, thresh_high, actual);
-+	TEST_ASSERT(thresh_high > actual,
-+		"TSC freq is expected to be between %"PRIu64" and %"PRIu64
-+		" but it actually is %"PRIu64,
-+		thresh_low, thresh_high, actual);
-+}
-+
-+static void check_tsc_freq(int level)
-+{
-+	uint64_t tsc_start, tsc_end, tsc_freq;
-+
-+	/*
-+	 * Reading the TSC twice with about a second's difference should give
-+	 * us an approximation of the TSC frequency from the guest's
-+	 * perspective. Now, this won't be completely accurate, but it should
-+	 * be good enough for the purposes of this test.
-+	 */
-+	tsc_start = rdmsr(MSR_IA32_TSC);
-+	GUEST_SLEEP(1);
-+	tsc_end = rdmsr(MSR_IA32_TSC);
-+
-+	tsc_freq = tsc_end - tsc_start;
-+
-+	GUEST_CHECK(level, tsc_freq);
-+}
-+
-+static void l2_guest_code(void)
-+{
-+	check_tsc_freq(UCHECK_L2);
-+
-+	/* exit to L1 */
-+	__asm__ __volatile__("vmcall");
-+}
-+
-+static void l1_guest_code(struct vmx_pages *vmx_pages)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	uint32_t control;
-+
-+	/* check that L1's frequency looks alright before launching L2 */
-+	check_tsc_freq(UCHECK_L1);
-+
-+	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
-+	GUEST_ASSERT(load_vmcs(vmx_pages));
-+
-+	/* prepare the VMCS for L2 execution */
-+	prepare_vmcs(vmx_pages, l2_guest_code, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	/* enable TSC offsetting and TSC scaling for L2 */
-+	control = vmreadz(CPU_BASED_VM_EXEC_CONTROL);
-+	control |= CPU_BASED_USE_MSR_BITMAPS | CPU_BASED_USE_TSC_OFFSETTING;
-+	vmwrite(CPU_BASED_VM_EXEC_CONTROL, control);
-+
-+	control = vmreadz(SECONDARY_VM_EXEC_CONTROL);
-+	control |= SECONDARY_EXEC_TSC_SCALING;
-+	vmwrite(SECONDARY_VM_EXEC_CONTROL, control);
-+
-+	vmwrite(TSC_OFFSET, TSC_OFFSET_L2);
-+	vmwrite(TSC_MULTIPLIER, TSC_MULTIPLIER_L2);
-+	vmwrite(TSC_MULTIPLIER_HIGH, TSC_MULTIPLIER_L2 >> 32);
-+
-+	/* launch L2 */
-+	GUEST_ASSERT(!vmlaunch());
-+	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_VMCALL);
-+
-+	/* check that L1's frequency still looks good */
-+	check_tsc_freq(UCHECK_L1);
-+
-+	GUEST_DONE();
-+}
-+
-+static void tsc_scaling_check_supported(void)
-+{
-+	if (!kvm_check_cap(KVM_CAP_TSC_CONTROL)) {
-+		print_skip("TSC scaling not supported by the HW");
-+		exit(KSFT_SKIP);
-+	}
-+}
-+
-+static void stable_tsc_check_supported(void)
-+{
-+	FILE *fp;
-+	char buf[4];
-+
-+	fp = fopen("/sys/devices/system/clocksource/clocksource0/current_clocksource", "r");
-+	if (fp == NULL)
-+		goto skip_test;
-+
-+	if (fgets(buf, sizeof(buf), fp) == NULL)
-+		goto skip_test;
-+
-+	if (strncmp(buf, "tsc", sizeof(buf)))
-+		goto skip_test;
-+
-+	return;
-+skip_test:
-+	print_skip("Kernel does not use TSC clocksource - assuming that host TSC is not stable");
-+	exit(KSFT_SKIP);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vm *vm;
-+	vm_vaddr_t vmx_pages_gva;
-+
-+	uint64_t tsc_start, tsc_end;
-+	uint64_t tsc_khz;
-+	uint64_t l1_scale_factor;
-+	uint64_t l0_tsc_freq = 0;
-+	uint64_t l1_tsc_freq = 0;
-+	uint64_t l2_tsc_freq = 0;
-+
-+	nested_vmx_check_supported();
-+	tsc_scaling_check_supported();
-+	stable_tsc_check_supported();
-+
-+	/*
-+	 * We set L1's scale factor to be a random number from 2 to 10.
-+	 * Ideally we would do the same for L2's factor but that one is
-+	 * referenced by both main() and l1_guest_code() and using a global
-+	 * variable does not work.
-+	 */
-+	srand(time(NULL));
-+	l1_scale_factor = (rand() % 9) + 2;
-+	printf("L1's scale down factor is: %"PRIu64"\n", l1_scale_factor);
-+	printf("L2's scale up factor is: %llu\n", L2_SCALE_FACTOR);
-+
-+	tsc_start = rdtsc();
-+	sleep(1);
-+	tsc_end = rdtsc();
-+
-+	l0_tsc_freq = tsc_end - tsc_start;
-+	printf("real TSC frequency is around: %"PRIu64"\n", l0_tsc_freq);
-+
-+	vm = vm_create_default(VCPU_ID, 0, (void *) l1_guest_code);
-+	vcpu_alloc_vmx(vm, &vmx_pages_gva);
-+	vcpu_args_set(vm, VCPU_ID, 1, vmx_pages_gva);
-+
-+	tsc_khz = _vcpu_ioctl(vm, VCPU_ID, KVM_GET_TSC_KHZ, NULL);
-+	TEST_ASSERT(tsc_khz != -1, "vcpu ioctl KVM_GET_TSC_KHZ failed");
-+
-+	/* scale down L1's TSC frequency */
-+	vcpu_ioctl(vm, VCPU_ID, KVM_SET_TSC_KHZ,
-+		  (void *) (tsc_khz / l1_scale_factor));
-+
-+	for (;;) {
-+		volatile struct kvm_run *run = vcpu_state(vm, VCPU_ID);
-+		struct ucall uc;
-+
-+		vcpu_run(vm, VCPU_ID);
-+		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+			    "Got exit_reason other than KVM_EXIT_IO: %u (%s)\n",
-+			    run->exit_reason,
-+			    exit_reason_str(run->exit_reason));
-+
-+		switch (get_ucall(vm, VCPU_ID, &uc)) {
-+		case UCALL_ABORT:
-+			TEST_FAIL("%s", (const char *) uc.args[0]);
-+		case UCALL_SYNC:
-+			switch (uc.args[0]) {
-+			case USLEEP:
-+				sleep(uc.args[1]);
-+				break;
-+			case UCHECK_L1:
-+				l1_tsc_freq = uc.args[1];
-+				printf("L1's TSC frequency is around: %"PRIu64
-+				       "\n", l1_tsc_freq);
-+
-+				compare_tsc_freq(l1_tsc_freq,
-+						 l0_tsc_freq / l1_scale_factor);
-+				break;
-+			case UCHECK_L2:
-+				l2_tsc_freq = uc.args[1];
-+				printf("L2's TSC frequency is around: %"PRIu64
-+				       "\n", l2_tsc_freq);
-+
-+				compare_tsc_freq(l2_tsc_freq,
-+						 l1_tsc_freq * L2_SCALE_FACTOR);
-+				break;
-+			}
-+			break;
-+		case UCALL_DONE:
-+			goto done;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	}
-+
-+done:
-+	kvm_vm_free(vm);
-+	return 0;
-+}
--- 
-2.17.1
+It's also customery to describe the changes between versions in the cover letter,
+or in the case of a one-off patch, in the part of the patch that git ignores.
 
+And my own personal preference is to also include lore links to previous versions,
+e.g. in this case I would do something like:
+
+  v2: Reword comment to document min_level. [sean]
+
+  v1: https://lkml.kernel.org/r/20210526163227.3113557-1-dmatlack@google.com
+
+Providing the explicit link in addition to the delta summaray makes it easy for
+reviewers to see the history and understand the context of _why_ changes were
+made.  That's especially helpful for reviewers that didn't read/review earlier
+versions.
