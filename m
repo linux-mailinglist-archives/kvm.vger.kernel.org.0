@@ -2,107 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BA03539119B
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 09:54:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5F3C3911BD
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 10:02:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231843AbhEZH4T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 03:56:19 -0400
-Received: from mga12.intel.com ([192.55.52.136]:32259 "EHLO mga12.intel.com"
+        id S232881AbhEZIDh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 04:03:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38396 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229493AbhEZH4S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 May 2021 03:56:18 -0400
-IronPort-SDR: iTmoIPfQMq/5ummyGniLQzfMScKRBD+7dvtXQKWLugT+B3LKU8ozmrFONkTGVFh4Fx4eXUwbDh
- cdXjz8PB/CqQ==
-X-IronPort-AV: E=McAfee;i="6200,9189,9995"; a="182049407"
-X-IronPort-AV: E=Sophos;i="5.82,330,1613462400"; 
-   d="scan'208";a="182049407"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2021 00:54:28 -0700
-IronPort-SDR: 1eDK10l4aELIeN+e7qSF++9Ypk821KL2VW5dlFw7M+S5sV4oFNOL/GUJ6THLMWqdrq16tEHfLY
- TNHwFZgOmtRg==
-X-IronPort-AV: E=Sophos;i="5.82,330,1613462400"; 
-   d="scan'208";a="476818609"
-Received: from unknown (HELO [10.238.130.158]) ([10.238.130.158])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2021 00:54:26 -0700
-Subject: Re: [PATCH RFC 7/7] kvm: x86: AMX XCR0 support for guest
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jing2.liu@intel.com
-References: <20210207154256.52850-1-jing2.liu@linux.intel.com>
- <20210207154256.52850-8-jing2.liu@linux.intel.com>
- <YKwgdBTqiyuItL6b@google.com>
-From:   "Liu, Jing2" <jing2.liu@linux.intel.com>
-Message-ID: <43eb3317-4101-0786-57f4-f35e7ec094eb@linux.intel.com>
-Date:   Wed, 26 May 2021 15:54:23 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
-MIME-Version: 1.0
-In-Reply-To: <YKwgdBTqiyuItL6b@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+        id S232431AbhEZIDa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 May 2021 04:03:30 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 85A97613D3;
+        Wed, 26 May 2021 08:01:43 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1lloU1-003gEi-El; Wed, 26 May 2021 09:01:41 +0100
+Date:   Wed, 26 May 2021 09:01:40 +0100
+Message-ID: <8735u9x6sb.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+Cc:     jianyong.wu@arm.com, netdev <netdev@vger.kernel.org>,
+        Yangbo Lu <yangbo.lu@nxp.com>,
+        John Stultz <john.stultz@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Paolo Bonzini <pbonzini@redhat.com>, seanjc@google.com,
+        Richard Cochran <richardcochran@gmail.com>,
+        Mark Rutland <Mark.Rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Andre Przywara <Andre.Przywara@arm.com>,
+        Steven Price <steven.price@arm.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        kvmarm@lists.cs.columbia.edu, KVM list <kvm@vger.kernel.org>,
+        Steve Capper <Steve.Capper@arm.com>, justin.he@arm.com,
+        Android Kernel Team <kernel-team@android.com>
+Subject: Re: [PATCH v19 7/7] ptp: arm/arm64: Enable ptp_kvm for arm/arm64
+In-Reply-To: <CAMuHMdWzBqLVOVn_z8S2H-x-kL+DfOsM5mDb_D8OKsyRJtKpdA@mail.gmail.com>
+References: <20210330145430.996981-1-maz@kernel.org>
+        <20210330145430.996981-8-maz@kernel.org>
+        <CAMuHMdWd5261ti-zKsroFLvWs0abaWa7G4DKefgPwFb3rEjnNw@mail.gmail.com>
+        <6c522f8116f54fa6f23a2d217d966c5a@kernel.org>
+        <CAMuHMdWzBqLVOVn_z8S2H-x-kL+DfOsM5mDb_D8OKsyRJtKpdA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: geert@linux-m68k.org, jianyong.wu@arm.com, netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de, pbonzini@redhat.com, seanjc@google.com, richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com, Andre.Przywara@arm.com, steven.price@arm.com, lorenzo.pieralisi@arm.com, sudeep.holla@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Geert,
 
+On Wed, 26 May 2021 08:52:42 +0100,
+Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> 
+> Hi Marc,
+> 
+> On Tue, May 11, 2021 at 11:13 AM Marc Zyngier <maz@kernel.org> wrote:
+> > On 2021-05-11 10:07, Geert Uytterhoeven wrote:
+> > > On Tue, Mar 30, 2021 at 4:56 PM Marc Zyngier <maz@kernel.org> wrote:
+> > >> From: Jianyong Wu <jianyong.wu@arm.com>
+> > >
+> > >> --- a/drivers/ptp/Kconfig
+> > >> +++ b/drivers/ptp/Kconfig
+> > >> @@ -108,7 +108,7 @@ config PTP_1588_CLOCK_PCH
+> > >>  config PTP_1588_CLOCK_KVM
+> > >>         tristate "KVM virtual PTP clock"
+> > >>         depends on PTP_1588_CLOCK
+> > >> -       depends on KVM_GUEST && X86
+> > >> +       depends on (KVM_GUEST && X86) || (HAVE_ARM_SMCCC_DISCOVERY &&
+> > >> ARM_ARCH_TIMER)
+> > >
+> > > Why does this not depend on KVM_GUEST on ARM?
+> > > I.e. shouldn't the dependency be:
+> > >
+> > >     KVM_GUEST && (X86 || (HAVE_ARM_SMCCC_DISCOVERY && ARM_ARCH_TIMER))
+> > >
+> > > ?
+> >
+> > arm/arm64 do not select KVM_GUEST. Any kernel can be used for a guest,
+> > and KVM/arm64 doesn't know about this configuration symbol.
+> 
+> OK.
+> 
+> Does PTP_1588_CLOCK_KVM need to default to yes?
+> Perhaps only on X86, to maintain the status quo?
 
-On 5/25/2021 5:53 AM, Sean Christopherson wrote:
-> On Sun, Feb 07, 2021, Jing Liu wrote:
->> Two XCR0 bits are defined for AMX to support XSAVE mechanism.
->> Bit 17 is for tilecfg and bit 18 is for tiledata.
-> This fails to explain why they must be set in tandem.
-The spec says,
-"executing the XSETBV instruction causes a general-protection fault 
-(#GP) if ECX=0
-and EAX[17] ≠ EAX[18] (XTILECFG and XTILEDATA must be enabled together). 
-This
-implies that the value of XCR0[17:18] is always either 00b or 11b."
-
-I can add more to changelog if this is reasonable.
->   Out of curisoity, assuming
-> they do indeed need to be set/cleared as a pair, what's the point of having two
-> separate bits?
-What I can see is to separate different states and mirror by XFD which 
-can set
-bits separately.
+I think I don't really understand the problem you are trying to
+solve. Is it that 'make oldconfig' now asks you about this new driver?
+Why is that an issue?
 
 Thanks,
-Jing
 
->
->> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
->> ---
->>   arch/x86/kvm/x86.c | 8 +++++++-
->>   1 file changed, 7 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index bfbde877221e..f1c5893dee18 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -189,7 +189,7 @@ static struct kvm_user_return_msrs __percpu *user_return_msrs;
->>   #define KVM_SUPPORTED_XCR0     (XFEATURE_MASK_FP | XFEATURE_MASK_SSE \
->>   				| XFEATURE_MASK_YMM | XFEATURE_MASK_BNDREGS \
->>   				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
->> -				| XFEATURE_MASK_PKRU)
->> +				| XFEATURE_MASK_PKRU | XFEATURE_MASK_XTILE)
->>   
->>   u64 __read_mostly host_efer;
->>   EXPORT_SYMBOL_GPL(host_efer);
->> @@ -946,6 +946,12 @@ static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
->>   		if ((xcr0 & XFEATURE_MASK_AVX512) != XFEATURE_MASK_AVX512)
->>   			return 1;
->>   	}
->> +
->> +	if (xcr0 & XFEATURE_MASK_XTILE) {
->> +		if ((xcr0 & XFEATURE_MASK_XTILE) != XFEATURE_MASK_XTILE)
->> +			return 1;
->> +	}
->> +
->>   	vcpu->arch.xcr0 = xcr0;
->>   
->>   	if ((xcr0 ^ old_xcr0) & XFEATURE_MASK_EXTEND)
->> -- 
->> 2.18.4
->>
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
