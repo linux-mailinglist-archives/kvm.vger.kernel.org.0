@@ -2,144 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B18C5391E19
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 19:27:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5E27391E21
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 19:28:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232674AbhEZR2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 13:28:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45802 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232134AbhEZR2i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 May 2021 13:28:38 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 927A5C061756
-        for <kvm@vger.kernel.org>; Wed, 26 May 2021 10:27:05 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id kr9so1184435pjb.5
-        for <kvm@vger.kernel.org>; Wed, 26 May 2021 10:27:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=CoNplCfjrcSDFcQORSZKbieGzoFc0tVb2QaR+5+KW4o=;
-        b=R3RaDZ5pPOEcRrGF7YAc9kKiy/s8YyUZPVZigdVu56JdrWEZ5RJmXIqAm16XpdjKR0
-         RHaamhV47DtinB3cdibBoorf/HXghHZzXt8BWdNo7YmiN0xerI7l/seKjf5GGoDO802O
-         ZROzCsrvp0XjrK3ceden6UztWmQE6kGxZ8PsNpXrO1uUiSxro+Lk9jVC7gMUgwJQY5Tg
-         saSa4FplZV8oLd7y0oCsnxANWb1v8PXpi90I0ST+0zDogjRGn3gDlabhPfVHtp7IA6Ei
-         +EdC22DACWxWz+d8HTDlioNk+VRu5OcO4q+yiY/KzqQgOu4FtMbA4bnzaMv5ZOTQFNQS
-         t6OA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=CoNplCfjrcSDFcQORSZKbieGzoFc0tVb2QaR+5+KW4o=;
-        b=nWPlWqnwLtvRLalrI8vfmGmVNTCjEtngoA3zSZk2bq5nWnVy22deulSSODVQWZ0Igv
-         tpDviqv49hjVRf2T1OewIPaoycP9NsxGzYU3SHbfVQbDtMhGBpObigP/9lQk3hX8emvs
-         oswllmUljIFqATYV08Wm8BdXtOJPhfyovinEVk96IhBiNBpqooKKS6e023vAWlVyln4K
-         Ypr6lSTZJ7xKa8phTU6Z0jqYePzsMAgY3km9qP5eW8PAsGt9NMsq0xHKzuzVEdywVLTt
-         BAbUlteIjDQWeWeNPST4PLv8wy5JiLBw9lobeF2N9x/iTK47qNMbA3J69FTXl04yZniz
-         I9Ag==
-X-Gm-Message-State: AOAM531F36PjKlF467ZRmQExImyn0x+B89DWaMXUcVS19Wy+C5lkMMCE
-        vCuSPfYPDOXTLMHHFrGWspNxQw==
-X-Google-Smtp-Source: ABdhPJya+m+m16xOAuZHqbYdFnytU2u2a+uxUSV+KpX0U1uXb08CAe/nSl/mBbQmPAtCbwDILB/v2g==
-X-Received: by 2002:a17:90a:9105:: with SMTP id k5mr37340618pjo.48.1622050024875;
-        Wed, 26 May 2021 10:27:04 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id s3sm18479111pgs.62.2021.05.26.10.27.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 May 2021 10:27:04 -0700 (PDT)
-Date:   Wed, 26 May 2021 17:27:00 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Pu Wen <puwen@hygon.cn>
-Cc:     x86@kernel.org, joro@8bytes.org, thomas.lendacky@amd.com,
-        dave.hansen@linux.intel.com, peterz@infradead.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@suse.de, hpa@zytor.com,
-        jroedel@suse.de, sashal@kernel.org, gregkh@linuxfoundation.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH] x86/sev: Check whether SEV or SME is supported first
-Message-ID: <YK6E5NnmRpYYDMTA@google.com>
-References: <20210526072424.22453-1-puwen@hygon.cn>
+        id S233997AbhEZR3h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 13:29:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40934 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232922AbhEZR3g (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 May 2021 13:29:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622050084;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=p6XxipKydzrcITdhyVZGRf71Ytpka3MoF9cMJA3KZGw=;
+        b=iiucR6NUd5TUs634DJKMV+G8LiLlErAzJXT8jzF38TOWxxYSLip4NwuVC6lJHUhaWsq2r3
+        S9/xCNO4rc0oQXKKVWDxxZyOBvan8pthtU17AsCD2yEesHlGCcaucskO6Eg9UJR6fOeVSb
+        9maDY883/DlZY2XyLtEM+ciFwuopfAo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-95-0vfgcZ5zMTGHMMyieQGBJA-1; Wed, 26 May 2021 13:28:01 -0400
+X-MC-Unique: 0vfgcZ5zMTGHMMyieQGBJA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCD64800C60;
+        Wed, 26 May 2021 17:27:59 +0000 (UTC)
+Received: from [10.36.112.15] (ovpn-112-15.ams2.redhat.com [10.36.112.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0BABD19D9D;
+        Wed, 26 May 2021 17:27:54 +0000 (UTC)
+Subject: Re: [PATCH 1/3] vfio/platform: fix module_put call in error flow
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>, jgg@nvidia.com,
+        cohuck@redhat.com, kvm@vger.kernel.org, alex.williamson@redhat.com
+Cc:     oren@nvidia.com
+References: <20210518192133.59195-1-mgurtovoy@nvidia.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <e37f6e0f-4310-31eb-4da8-0d010a8f7cdb@redhat.com>
+Date:   Wed, 26 May 2021 19:27:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210526072424.22453-1-puwen@hygon.cn>
+In-Reply-To: <20210518192133.59195-1-mgurtovoy@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 26, 2021, Pu Wen wrote:
-> The first two bits of the CPUID leaf 0x8000001F EAX indicate whether
-> SEV or SME is supported respectively. It's better to check whether
-> SEV or SME is supported before checking the SEV MSR(0xc0010131) to
-> see whether SEV or SME is enabled.
+Hi Max,
+
+On 5/18/21 9:21 PM, Max Gurtovoy wrote:
+> The ->parent_module is the one that use in try_module_get. It should
+> also be the one the we use in module_put during vfio_platform_open().
 > 
-> This also avoid the MSR reading failure on the first generation Hygon
-> Dhyana CPU which does not support SEV or SME.
+> Fixes: 32a2d71c4e808 ("vfio: platform: introduce vfio-platform-base module")
 > 
-> Fixes: eab696d8e8b9 ("x86/sev: Do not require Hypervisor CPUID bit for SEV guests")
-> Cc: <stable@vger.kernel.org> # v5.10+
-> Signed-off-by: Pu Wen <puwen@hygon.cn>
+> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+Acked-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks!
+
+Eric
+
 > ---
->  arch/x86/mm/mem_encrypt_identity.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
+>  drivers/vfio/platform/vfio_platform_common.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/mm/mem_encrypt_identity.c b/arch/x86/mm/mem_encrypt_identity.c
-> index a9639f663d25..470b20208430 100644
-> --- a/arch/x86/mm/mem_encrypt_identity.c
-> +++ b/arch/x86/mm/mem_encrypt_identity.c
-> @@ -504,10 +504,6 @@ void __init sme_enable(struct boot_params *bp)
->  #define AMD_SME_BIT	BIT(0)
->  #define AMD_SEV_BIT	BIT(1)
+> diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
+> index 361e5b57e369..470fcf7dac56 100644
+> --- a/drivers/vfio/platform/vfio_platform_common.c
+> +++ b/drivers/vfio/platform/vfio_platform_common.c
+> @@ -291,7 +291,7 @@ static int vfio_platform_open(struct vfio_device *core_vdev)
+>  	vfio_platform_regions_cleanup(vdev);
+>  err_reg:
+>  	mutex_unlock(&driver_lock);
+> -	module_put(THIS_MODULE);
+> +	module_put(vdev->parent_module);
+>  	return ret;
+>  }
 >  
-> -	/* Check the SEV MSR whether SEV or SME is enabled */
-> -	sev_status   = __rdmsr(MSR_AMD64_SEV);
-> -	feature_mask = (sev_status & MSR_AMD64_SEV_ENABLED) ? AMD_SEV_BIT : AMD_SME_BIT;
-> -
->  	/*
->  	 * Check for the SME/SEV feature:
->  	 *   CPUID Fn8000_001F[EAX]
-> @@ -519,11 +515,16 @@ void __init sme_enable(struct boot_params *bp)
->  	eax = 0x8000001f;
->  	ecx = 0;
->  	native_cpuid(&eax, &ebx, &ecx, &edx);
-> -	if (!(eax & feature_mask))
-> +	/* Check whether SEV or SME is supported */
-> +	if (!(eax & (AMD_SEV_BIT | AMD_SME_BIT)))
-
-Hmm, checking CPUID at all before MSR_AMD64_SEV is flawed for SEV, e.g. the VMM
-doesn't need to pass-through CPUID to attack the guest, it can lie directly.
-
-SEV-ES is protected by virtue of CPUID interception being reflected as #VC, which
-effectively tells the guest that it's (probably) an SEV-ES guest and also gives
-the guest the opportunity to sanity check the emulated CPUID values provided by
-the VMM.
-
-In other words, this patch is flawed, but commit eab696d8e8b9 was also flawed by
-conditioning the SEV path on CPUID.0x80000000.
-
-Given that #VC can be handled cleanly, the kernel should be able to handle a #GP
-at this point.  So I think the proper fix is to change __rdmsr() to
-native_read_msr_safe(), or an open coded variant if necessary, and drop the CPUID
-checks for SEV.
-
-The other alternative is to admit that the VMM is still trusted for SEV guests
-and take this patch as is (with a reworded changelog).  This probably has my
-vote, I don't see much value in pretending that the VMM can't exfiltrate data
-from an SEV guest.  In fact, a malicious VMM is probably more likely to get
-access to interesting data by _not_ lying about SEV being enabled, because lying
-about SEV itself will hose the guest sooner than later.
-
->  		return;
->  
->  	me_mask = 1UL << (ebx & 0x3f);
->  
-> +	/* Check the SEV MSR whether SEV or SME is enabled */
-> +	sev_status   = __rdmsr(MSR_AMD64_SEV);
-> +	feature_mask = (sev_status & MSR_AMD64_SEV_ENABLED) ? AMD_SEV_BIT : AMD_SME_BIT;
-> +
->  	/* Check if memory encryption is enabled */
->  	if (feature_mask == AMD_SME_BIT) {
->  		/*
-> -- 
-> 2.23.0
 > 
+
