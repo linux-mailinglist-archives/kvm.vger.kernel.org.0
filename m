@@ -2,117 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 876DB391B6E
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 17:15:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DC34391C49
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 17:44:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235367AbhEZPQk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 11:16:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43832 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235223AbhEZPQk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 May 2021 11:16:40 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 811ABC061574
-        for <kvm@vger.kernel.org>; Wed, 26 May 2021 08:15:08 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id 27so1219702pgy.3
-        for <kvm@vger.kernel.org>; Wed, 26 May 2021 08:15:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=gyPqMlWx0UGmus8UTSY9WUsK8ZBsk5nqFBqX0s/G7yY=;
-        b=p/Ou/fdmAh55byEwBF8c18CI5ZSzs8YfUQ6WzubkB1roSNmpO8jAtO0ruzU2WRzTZb
-         OTPta8JD+/cVxf1qamokAXWgTI6siNRm3yG706F4Ba9GBdDI+dtUZgeb7P92tW/+arGh
-         OlIsi9Ir/+WIeXYP/th89Jf8VfoNsY5trO+Q2Z6njeDAHeWdNhiNBNEg+rWcjE2Q1aFi
-         PCWZj7FdC94BdPguA+h3UmiUk0/gCNBoc7yhftUXDjrNZJTq0S5avzbwYyGPzvEmuQFS
-         i6TlRmDo72KHfPLNA0bfq7AyEB1YP+U0XHK8SQtK5XPBGdihpoHSoAYKhNa20YnLVRa0
-         Qm+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gyPqMlWx0UGmus8UTSY9WUsK8ZBsk5nqFBqX0s/G7yY=;
-        b=tb+9kz5j53jwHQgkX79woT9rEe+u4cwtkQ/HCL6eH+GyyCHgUzyCGPE8swVIhNLs+Q
-         Zz/kLlAX8GYJhdZ6w6KKBaTDvNy360hnNuAKdj7yymudZxNV28QmgS7TCedKxO3U8MXK
-         mHnJntG/6cYfvqMSAhHBcCecvH3eMpSmYC4pceyTvIwaA7+a4DFi6zxRJG+zL1cqlcRp
-         FJC0tMpYXqWNsEyOWaXdesMnUuobArPMktKg9nAM+kZushB/ra5GLEzL4lKYhIh+TB+z
-         4rL2+T6Iu0e3j8g3YLVtna1TrWSgNsF84KZz6q+1KC8cs9YCQRNJctmbeYbmHW8fkOLe
-         vnPA==
-X-Gm-Message-State: AOAM531tzHStGfzFr0wvCXBG3ezPjJMyAK9BgO8wBAAsDGHbKYe2jwda
-        Kv2ce8uOcRe8JGiFYhHGmwvATg==
-X-Google-Smtp-Source: ABdhPJxc7QcsdxpS5IJfjnCaFHxER5bNMrdafpqQ+D5Uiod1DLIdizne556iLrpewx1qXxweLHIIHA==
-X-Received: by 2002:a63:e14:: with SMTP id d20mr26047737pgl.35.1622042107988;
-        Wed, 26 May 2021 08:15:07 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id 184sm15445516pfv.38.2021.05.26.08.15.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 May 2021 08:15:07 -0700 (PDT)
-Date:   Wed, 26 May 2021 15:15:03 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 17/43] KVM: x86: Open code necessary bits of
- kvm_lapic_set_base() at vCPU RESET
-Message-ID: <YK5l9/73AHeuVw0q@google.com>
-References: <20210424004645.3950558-1-seanjc@google.com>
- <20210424004645.3950558-18-seanjc@google.com>
- <CAAeT=Fw2zfvTkvCSuRqo6K1+L7LaPOpsSHHU1oGbUnUSDtELVQ@mail.gmail.com>
+        id S233767AbhEZPqJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 11:46:09 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54304 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233354AbhEZPqI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 May 2021 11:46:08 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14QFZHM0091469;
+        Wed, 26 May 2021 11:44:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=KLQMidqpNJXuUcsX6USaZJHzqRrH8FWeJImszu+cH9Y=;
+ b=gtlPXz9vb97Lo4KPxSrHwBDOXCal1nmIyTMQW1JG34wMHY+KXEG9juEiY3cxl+95lIrs
+ yaE8ik7fvJgoZRyXjnyC2lIMymfnPyREu6BVskt5ANV35CvCxqtSOJ36UlxU8YLToBX7
+ 00GUbRzxlzRCocOgb4qs5NwBMpT6yQIC+Fo/dWR/8U1B+dsoR5QVZ8LPas8XqujPg+XJ
+ ly+N5lc/9lftJM/bGT4zcd7lhgH4CYlmxazd97LuFwO/Bnenbo6H5Glq4Dj42XAUKMyA
+ b5Kt1s9KGwNDrW1dOrjPY7UU0bxzen5ttD6N/B6LyPM1GBHjCWxztQwzaBFxAE1garKx vg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38srkp9nj9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 May 2021 11:44:36 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14QFZXsi094790;
+        Wed, 26 May 2021 11:44:35 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38srkp9nhh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 May 2021 11:44:35 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 14QFiHNg001697;
+        Wed, 26 May 2021 15:44:33 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 38sba2rg58-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 May 2021 15:44:33 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14QFi1ZI29688228
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 26 May 2021 15:44:01 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 87265AE053;
+        Wed, 26 May 2021 15:44:30 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2454CAE04D;
+        Wed, 26 May 2021 15:44:30 +0000 (GMT)
+Received: from ibm-vm.ibmuc.com (unknown [9.145.7.194])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 26 May 2021 15:44:30 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
+        cohuck@redhat.com, kvm390-list@tuxmaker.boeblingen.de.ibm.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com
+Subject: [PATCH v1 1/1] KVM: s390: fix for hugepage vmalloc
+Date:   Wed, 26 May 2021 17:44:29 +0200
+Message-Id: <20210526154429.143591-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeT=Fw2zfvTkvCSuRqo6K1+L7LaPOpsSHHU1oGbUnUSDtELVQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: MJjluDSso3oXTUoBxpyzjk1MTgcwPizj
+X-Proofpoint-GUID: 1VrA7vWxPEal-QxMAb_xzuAx8G63x9bm
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-26_10:2021-05-26,2021-05-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ mlxlogscore=987 spamscore=0 malwarescore=0 adultscore=0 bulkscore=0
+ clxscore=1015 phishscore=0 suspectscore=0 impostorscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2105260104
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 26, 2021, Reiji Watanabe wrote:
-> On Fri, Apr 23, 2021 at 5:51 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > Stuff vcpu->arch.apic_base and apic->base_address directly during APIC
-> > reset, as opposed to bouncing through kvm_set_apic_base() while fudging
-> > the ENABLE bit during creation to avoid the other, unwanted side effects.
-> >
-> > This is a step towards consolidating the APIC RESET logic across x86,
-> > VMX, and SVM.
-> >
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/lapic.c | 15 ++++++---------
-> >  1 file changed, 6 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index b088f6984b37..b1366df46d1d 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -2305,7 +2305,6 @@ EXPORT_SYMBOL_GPL(kvm_apic_update_apicv);
-> >  void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
-> >  {
-> >         struct kvm_lapic *apic = vcpu->arch.apic;
-> > -       u64 msr_val;
-> >         int i;
-> >
-> >         if (!apic)
-> > @@ -2315,10 +2314,13 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
-> >         hrtimer_cancel(&apic->lapic_timer.timer);
-> >
-> >         if (!init_event) {
-> > -               msr_val = APIC_DEFAULT_PHYS_BASE | MSR_IA32_APICBASE_ENABLE;
-> > +               vcpu->arch.apic_base = APIC_DEFAULT_PHYS_BASE |
-> > +                                      MSR_IA32_APICBASE_ENABLE;
-> >                 if (kvm_vcpu_is_reset_bsp(vcpu))
-> > -                       msr_val |= MSR_IA32_APICBASE_BSP;
-> > -               kvm_lapic_set_base(vcpu, msr_val);
-> > +                       vcpu->arch.apic_base |= MSR_IA32_APICBASE_BSP;
-> > +
-> > +               apic->base_address = MSR_IA32_APICBASE_ENABLE;
-> 
-> I think you wanted to make the code above set apic->base_address
-> to APIC_DEFAULT_PHYS_BASE (not MSR_IA32_APICBASE_ENABLE).
+The Create Secure Configuration Ultravisor Call does not support using
+large pages for the virtual memory area.
 
-Indeed!  It also means I need to double check that I'm testing a guest without
-x2apic enabled.  Thanks much!
+This patch replaces the vzalloc call with a longer but equivalent
+__vmalloc_node_range call, also setting the VM_NO_HUGE_VMAP flag, to
+guarantee that this allocation will not be performed with large pages.
+
+Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ arch/s390/kvm/pv.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+index 813b6e93dc83..2c848606d7b9 100644
+--- a/arch/s390/kvm/pv.c
++++ b/arch/s390/kvm/pv.c
+@@ -140,7 +140,10 @@ static int kvm_s390_pv_alloc_vm(struct kvm *kvm)
+ 	/* Allocate variable storage */
+ 	vlen = ALIGN(virt * ((npages * PAGE_SIZE) / HPAGE_SIZE), PAGE_SIZE);
+ 	vlen += uv_info.guest_virt_base_stor_len;
+-	kvm->arch.pv.stor_var = vzalloc(vlen);
++	kvm->arch.pv.stor_var = __vmalloc_node_range(vlen, PAGE_SIZE, VMALLOC_START, VMALLOC_END,
++						GFP_KERNEL | __GFP_ZERO, PAGE_KERNEL,
++						VM_NO_HUGE_VMAP, NUMA_NO_NODE,
++						__builtin_return_address(0));
+ 	if (!kvm->arch.pv.stor_var)
+ 		goto out_err;
+ 	return 0;
+-- 
+2.31.1
+
