@@ -2,73 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E271339191C
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 15:43:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C614539191A
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 15:43:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234511AbhEZNoc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 09:44:32 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34000 "EHLO
+        id S234456AbhEZNoa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 09:44:30 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46566 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S233906AbhEZNoY (ORCPT
+        by vger.kernel.org with ESMTP id S233940AbhEZNoY (ORCPT
         <rfc822;kvm@vger.kernel.org>); Wed, 26 May 2021 09:44:24 -0400
 Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14QDfmBa120559;
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14QDfnqE120602;
         Wed, 26 May 2021 09:42:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=tthunQM6TvWqOneQ54r6M/uVz2c93evkxz3BD3njV+M=;
- b=L+rBt73kZMVy4d+wXk71kIuIVRTgAP1o3PUeEN8z0Mx3opy/nFR/BrIAs+Z1uvX0mAIG
- 7LyUFaZBmC6Ja2rzlVi3McofKbr1mccG9KNOCkwvwgQKz5i50Jsj2KntbbSyZ1CkVrQg
- kHV7JRt+5QkbQHoGiaSNjZCibiuWwamdz5kzOhJbXOmWXZx+MfI2YTlcDU45qXlZN0TS
- /X1MDIe/vbdszQ5MUtbGLOAcGGQUgVpep+3qmg672BJ98Yq01MbKTRe0Ny5dMkeDpFoR
- 3MFJpj930ReFanTee+EmHRCFuyxr2noizOkrxPjE8fthK48GxG1pLinREy5hbeV28qvG wA== 
+ bh=dI8Asb4v1eAgzN68mLxDAuUsQNicQJPLRvlEYv7tI74=;
+ b=UPj/BeRTiKEDFmcAy/FrDY1AuwAfWzY/Ns1hTpYabhu69jtpvqi05jrHH3EHlPAoiWEm
+ 0K0KEBqrgdhh4QuveTbOGHHPeIWaqUfXb0T8umuj8ULwv99s5pvJKb4NpYYWm0N6EIlW
+ CSKpnXKpy+DeczzEhASdPcKmDYObv6dwzEZxbHW7PhVsqo95iWKLo7NyeBKuK4wg0Bhj
+ 7POj1BrAOJ+xNAmFqagYxporKXlIAGYEPt4AWllBE06aofnBy8+lv/PWF1ChXiBxlLg5
+ HhFH6dLiGbiBvKbjCHkNS2jeupqzDKK0xG3CkzypxS+zrGv6WWtUbQKUPODei18rPtFV Tw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 38sq1krmvx-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 38sq1krmvy-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Wed, 26 May 2021 09:42:52 -0400
 Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14QDflHX120528;
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14QDfmw8120565;
         Wed, 26 May 2021 09:42:52 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 38sq1krmvh-1
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 38sq1krmvm-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Wed, 26 May 2021 09:42:52 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 14QDb4m3012282;
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 14QDdUmr022406;
         Wed, 26 May 2021 13:42:50 GMT
 Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03ams.nl.ibm.com with ESMTP id 38sba2rb0x-1
+        by ppma04ams.nl.ibm.com with ESMTP id 38s1r48jpf-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Wed, 26 May 2021 13:42:50 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14QDglun24904044
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14QDgll221823804
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 26 May 2021 13:42:47 GMT
+        Wed, 26 May 2021 13:42:48 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4FEBA42041;
+        by IMSVA (Postfix) with ESMTP id AF4A04203F;
         Wed, 26 May 2021 13:42:47 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0508A42049;
+        by IMSVA (Postfix) with ESMTP id 6409642047;
         Wed, 26 May 2021 13:42:47 +0000 (GMT)
 Received: from ibm-vm.ibmuc.com (unknown [9.145.7.194])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 26 May 2021 13:42:46 +0000 (GMT)
+        Wed, 26 May 2021 13:42:47 +0000 (GMT)
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
         frankja@linux.ibm.com, cohuck@redhat.com
-Subject: [kvm-unit-tests PATCH v4 3/7] s390x: lib: fix pgtable.h
-Date:   Wed, 26 May 2021 15:42:41 +0200
-Message-Id: <20210526134245.138906-4-imbrenda@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v4 4/7] s390x: lib: Add idte and other huge pages functions/macros
+Date:   Wed, 26 May 2021 15:42:42 +0200
+Message-Id: <20210526134245.138906-5-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210526134245.138906-1-imbrenda@linux.ibm.com>
 References: <20210526134245.138906-1-imbrenda@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 1NuR7t-4MCCnR5khtpCNsRINQJBwpX18
-X-Proofpoint-GUID: frgTWQmP5_SR_2fKokl6JGhM-wMZGrwf
+X-Proofpoint-ORIG-GUID: -zoWfWHaZjIJb3SlFYvFlVHperHnusFK
+X-Proofpoint-GUID: Mz3e5aL5aL_uvsa0AZokHBowbCNn7eYC
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
  definitions=2021-05-26_08:2021-05-26,2021-05-26 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
@@ -80,80 +80,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix pgtable.h:
+Improve pgtable.h:
 
-* SEGMENT_ENTRY_SFAA had one extra bit set
-* pmd entries don't have a length field
-* ipte does not need to clear the lower bits
- - clearing the 12 lower bits is technically incorrect, as page tables are
-   architecturally aligned to 11 bit addresses (even though the unit tests
-   allocate always one full page)
-* region table entries should use REGION_ENTRY_TL instead of *_TABLE_LENGTH
- - *_TABLE_LENGTH need to stay, because they should be used for ASCEs
+* add macros to check whether a pmd or a pud are large / huge
+* add idte functions for pmd, pud, p4d and pgd
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Acked-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- lib/s390x/asm/pgtable.h | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ lib/s390x/asm/pgtable.h | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
 diff --git a/lib/s390x/asm/pgtable.h b/lib/s390x/asm/pgtable.h
-index 277f3480..1a21f175 100644
+index 1a21f175..f166dcc6 100644
 --- a/lib/s390x/asm/pgtable.h
 +++ b/lib/s390x/asm/pgtable.h
-@@ -60,7 +60,7 @@
- #define SEGMENT_SHIFT			20
+@@ -100,6 +100,9 @@
+ #define pmd_none(entry) (pmd_val(entry) & SEGMENT_ENTRY_I)
+ #define pte_none(entry) (pte_val(entry) & PAGE_ENTRY_I)
  
- #define SEGMENT_ENTRY_ORIGIN		0xfffffffffffff800UL
--#define SEGMENT_ENTRY_SFAA		0xfffffffffff80000UL
-+#define SEGMENT_ENTRY_SFAA		0xfffffffffff00000UL
- #define SEGMENT_ENTRY_AV		0x0000000000010000UL
- #define SEGMENT_ENTRY_ACC		0x000000000000f000UL
- #define SEGMENT_ENTRY_F			0x0000000000000800UL
-@@ -143,7 +143,7 @@ static inline p4d_t *p4d_alloc(pgd_t *pgd, unsigned long addr)
- 	if (pgd_none(*pgd)) {
- 		p4d_t *p4d = p4d_alloc_one();
- 		pgd_val(*pgd) = __pa(p4d) | REGION_ENTRY_TT_REGION1 |
--				REGION_TABLE_LENGTH;
-+				REGION_ENTRY_TL;
- 	}
- 	return p4d_offset(pgd, addr);
- }
-@@ -163,7 +163,7 @@ static inline pud_t *pud_alloc(p4d_t *p4d, unsigned long addr)
- 	if (p4d_none(*p4d)) {
- 		pud_t *pud = pud_alloc_one();
- 		p4d_val(*p4d) = __pa(pud) | REGION_ENTRY_TT_REGION2 |
--				REGION_TABLE_LENGTH;
-+				REGION_ENTRY_TL;
- 	}
- 	return pud_offset(p4d, addr);
- }
-@@ -183,7 +183,7 @@ static inline pmd_t *pmd_alloc(pud_t *pud, unsigned long addr)
- 	if (pud_none(*pud)) {
- 		pmd_t *pmd = pmd_alloc_one();
- 		pud_val(*pud) = __pa(pmd) | REGION_ENTRY_TT_REGION3 |
--				REGION_TABLE_LENGTH;
-+				REGION_ENTRY_TL;
- 	}
- 	return pmd_offset(pud, addr);
- }
-@@ -202,15 +202,14 @@ static inline pte_t *pte_alloc(pmd_t *pmd, unsigned long addr)
- {
- 	if (pmd_none(*pmd)) {
- 		pte_t *pte = pte_alloc_one();
--		pmd_val(*pmd) = __pa(pte) | SEGMENT_ENTRY_TT_SEGMENT |
--				SEGMENT_TABLE_LENGTH;
-+		pmd_val(*pmd) = __pa(pte) | SEGMENT_ENTRY_TT_SEGMENT;
- 	}
- 	return pte_offset(pmd, addr);
++#define pud_huge(entry)  (pud_val(entry) & REGION3_ENTRY_FC)
++#define pmd_large(entry) (pmd_val(entry) & SEGMENT_ENTRY_FC)
++
+ #define pgd_addr(entry) __va(pgd_val(entry) & REGION_ENTRY_ORIGIN)
+ #define p4d_addr(entry) __va(p4d_val(entry) & REGION_ENTRY_ORIGIN)
+ #define pud_addr(entry) __va(pud_val(entry) & REGION_ENTRY_ORIGIN)
+@@ -216,6 +219,34 @@ static inline void ipte(unsigned long vaddr, pteval_t *p_pte)
+ 		: : "a" (table_origin), "a" (vaddr) : "memory");
  }
  
- static inline void ipte(unsigned long vaddr, pteval_t *p_pte)
- {
--	unsigned long table_origin = (unsigned long)p_pte & PAGE_MASK;
-+	unsigned long table_origin = (unsigned long)p_pte;
++static inline void idte(unsigned long table_origin, unsigned long vaddr)
++{
++	vaddr &= SEGMENT_ENTRY_SFAA;
++	asm volatile(
++		"	idte %0,0,%1\n"
++		: : "a" (table_origin), "a" (vaddr) : "memory");
++}
++
++static inline void idte_pmdp(unsigned long vaddr, pmdval_t *pmdp)
++{
++	idte((unsigned long)(pmdp - pmd_index(vaddr)) | ASCE_DT_SEGMENT, vaddr);
++}
++
++static inline void idte_pudp(unsigned long vaddr, pudval_t *pudp)
++{
++	idte((unsigned long)(pudp - pud_index(vaddr)) | ASCE_DT_REGION3, vaddr);
++}
++
++static inline void idte_p4dp(unsigned long vaddr, p4dval_t *p4dp)
++{
++	idte((unsigned long)(p4dp - p4d_index(vaddr)) | ASCE_DT_REGION2, vaddr);
++}
++
++static inline void idte_pgdp(unsigned long vaddr, pgdval_t *pgdp)
++{
++	idte((unsigned long)(pgdp - pgd_index(vaddr)) | ASCE_DT_REGION1, vaddr);
++}
++
+ void configure_dat(int enable);
  
- 	asm volatile(
- 		"	ipte %0,%1\n"
+ #endif /* _ASMS390X_PGTABLE_H_ */
 -- 
 2.31.1
 
