@@ -2,88 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC9BE391ACB
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 16:52:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC6F3391ACF
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 16:54:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235077AbhEZOyK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 10:54:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38408 "EHLO
+        id S235159AbhEZOzi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 10:55:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235079AbhEZOyJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 May 2021 10:54:09 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18461C061574
-        for <kvm@vger.kernel.org>; Wed, 26 May 2021 07:52:38 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id ot16so922971pjb.3
-        for <kvm@vger.kernel.org>; Wed, 26 May 2021 07:52:38 -0700 (PDT)
+        with ESMTP id S235066AbhEZOzh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 May 2021 10:55:37 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 462B2C061574
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 07:54:06 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id m124so1144869pgm.13
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 07:54:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=eoAeJOslU32tSMc2qJZf18amvBfvR8t1rjHXFS5iqFU=;
-        b=Pmd9mMAbLGhN1DQQPINGPRjI69nF/3FyQCsUVo6FPnf2PAy6ozaO5JJmpjXmB4PODw
-         UxxJiVUdstI3yktjMXfnlwJSkHVBTsocM+mkjJyTvjHQZsG9WUQOw+OligCLoFu2yxC1
-         972TDZpVGLRNBUbxH9dwQN462+SlCbj0wR4Lp0uj2kT8OSY63RoaVj9jc1ol7HZ6bqP9
-         j19bO8R6wBztlBB4SHhWjBTiD+MThV1aPz/T3LH56EWQkrhhbJ0bicaXan/Ny46RO7+C
-         aiF4ZABx8NORIgiwRgNdfiSf8TW47ZnC23aJmJuLbH2xSFLShgsew1bL1EWjHtWj+2Gs
-         9NYA==
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=+GScnmVdacRASdZ6acXofN+D5Tlo5vzk3Jj+0xXhnBs=;
+        b=ZYIDSNqauuNmVnIUAuIoNdVNNM2lQjPM+LT4mr3k7iqCbm2CS2JAJW2PvDpPIsNYWv
+         L1q8BX81tSCVLgMVqm6EhgDppexrZdN2KU8FY9FObpX9YpLxzxSWZfQRPtoG3KR4pmJ5
+         woKMn0hPLltjsd9+WNBmmuUlEM8S9I0Y5Vug4Le47r6H1sKH362Uekz3kEFkdMfJf/TA
+         c389q1zYA3waMXh98Ah/9taeEEF6WDpS2noTjs6QXTWtVXolJfL4LwR5jBBvvUn0tgjI
+         RNNzXLpj4Rr/zgktfpU/kuGbv+WInnNlelnRXD06e2o/CzO3J3bNMkqX5+j3PK3icKqQ
+         7JVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=eoAeJOslU32tSMc2qJZf18amvBfvR8t1rjHXFS5iqFU=;
-        b=K5LOnVvsBA0zJKBs8zmP10ryiQTc430rA1fUPKN4sDrn3SQtv9TjzidKjOn4SNSBUf
-         QGGeQAkK/+lefFY5f79sLQEdnQGX2MRfYK3r/tbmFlutWwDD8tTvslpvxqR+ocVrX1Ez
-         t7gkqoosqRuOtZLrOyO7MJR41qiBEHSq28gpZoLxlgPui1QBmQrYFtvBPH24EY6usJvc
-         HWQ2MrkO+/yejZmrQtWz2nQQDfueHAoyHhZZV7ZVPzRqMDBowR0xw2P51FDYXQ+lPLVQ
-         6eC/s3z5ZSLWXpwcRJIvAnk7ccxaggSjzepLORVvYXdrDN2/omACrCGKq3JjG5EdJpH3
-         onBQ==
-X-Gm-Message-State: AOAM533Thr+eKstOYy8aBF0GNK0OF38eBtZ/m+47U/mMaQGspJrPr8X4
-        yRzVtpx55BCzjC4sB8wSObEong==
-X-Google-Smtp-Source: ABdhPJzHJUFntFD6C1nrIoG6sKdQ3gptyGrzaPLnbX37KX3nn2H0asaB5b/I74SVE6mKgwWRBrVBGA==
-X-Received: by 2002:a17:902:c112:b029:f0:d571:8fb0 with SMTP id 18-20020a170902c112b02900f0d5718fb0mr36486961pli.11.1622040757372;
-        Wed, 26 May 2021 07:52:37 -0700 (PDT)
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=+GScnmVdacRASdZ6acXofN+D5Tlo5vzk3Jj+0xXhnBs=;
+        b=RYMchgmANg1mRDwe09HL1j3JnrZEZFcxmFnryAWFHheyywDh8aizktGK/NAwT46IEN
+         q86pxT5Z6bZfwr4Xedzaeios8XWVsdjVsP59vZLMXFnI9KxYTOSSDXt9gC4hfR4XknE4
+         LAYzygXgys0BoFVaG938TBGuXx6Ei2oToSxqCFNsRpiZbuwm2P8HTrgi07mQX3cHEkYj
+         dw6cxHUO1GZPUH6EFGuVmvA9GjTelXIFMhuhML1qEXUN4Y6jBFtBUfru2/sismtieJgE
+         6p2jUfwtOMjEGltkmcEOVuXOnvC3wqwnOwxHCHytyPFljp9y8iNEb3faauh8o8HmcoOc
+         tXKQ==
+X-Gm-Message-State: AOAM533af2BsIEigF8n79iD993CS5p5+aVdIUMt+0LZYy3ycRD9Sf0pc
+        Pgof/lCFxxHKJST5YsNykhwLEQ==
+X-Google-Smtp-Source: ABdhPJy/4bHs4xkk+2NL5sdmo643CgS2zx60hGlhSq8WGMvUzh6ma3fHy5ASZe6EKhoY1bkqfa42aA==
+X-Received: by 2002:a62:60c4:0:b029:2ca:ebf7:cd0d with SMTP id u187-20020a6260c40000b02902caebf7cd0dmr35557829pfb.71.1622040845628;
+        Wed, 26 May 2021 07:54:05 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id mj7sm4421086pjb.47.2021.05.26.07.52.36
+        by smtp.gmail.com with ESMTPSA id e17sm12841738pfi.131.2021.05.26.07.54.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 May 2021 07:52:36 -0700 (PDT)
-Date:   Wed, 26 May 2021 14:52:33 +0000
+        Wed, 26 May 2021 07:54:05 -0700 (PDT)
+Date:   Wed, 26 May 2021 14:54:01 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Yuan Yao <yuan.yao@linux.intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Yuan Yao <yuan.yao@intel.com>
-Subject: Re: [PATCH] KVM: X86: Use kvm_get_linear_rip() in single-step and
- #DB/#BP interception
-Message-ID: <YK5gsUVi2AJkt0uu@google.com>
-References: <20210526063828.1173-1-yuan.yao@linux.intel.com>
+To:     "Liu, Jing2" <jing2.liu@linux.intel.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jing2.liu@intel.com
+Subject: Re: [PATCH RFC 7/7] kvm: x86: AMX XCR0 support for guest
+Message-ID: <YK5hCUoPo4OJzeU0@google.com>
+References: <20210207154256.52850-1-jing2.liu@linux.intel.com>
+ <20210207154256.52850-8-jing2.liu@linux.intel.com>
+ <YKwgdBTqiyuItL6b@google.com>
+ <43eb3317-4101-0786-57f4-f35e7ec094eb@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210526063828.1173-1-yuan.yao@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <43eb3317-4101-0786-57f4-f35e7ec094eb@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 26, 2021, Yuan Yao wrote:
-> From: Yuan Yao <yuan.yao@intel.com>
+On Wed, May 26, 2021, Liu, Jing2 wrote:
 > 
-> The kvm_get_linear_rip() handles x86/long mode cases well and has
-> better readability, __kvm_set_rflags() also use the paired
-> fucntion kvm_is_linear_rip() to check the vcpu->arch.singlestep_rip
-  ^^^^^^^^
-  function
-
-Please run checkpatch before submitting in the future, it will catch some of
-these misspellings.
-
-> set in kvm_arch_vcpu_ioctl_set_guest_debug(), so change the
-> "CS.BASE + RIP" code in kvm_arch_vcpu_ioctl_set_guest_debug() and
-> handle_exception_nmi() to this one.
+> On 5/25/2021 5:53 AM, Sean Christopherson wrote:
+> > On Sun, Feb 07, 2021, Jing Liu wrote:
+> > > Two XCR0 bits are defined for AMX to support XSAVE mechanism.
+> > > Bit 17 is for tilecfg and bit 18 is for tiledata.
+> > This fails to explain why they must be set in tandem.
+> The spec says, "executing the XSETBV instruction causes a general-protection
+> fault (#GP) if ECX=0 and EAX[17] ≠ EAX[18] (XTILECFG and XTILEDATA must be
+> enabled together).  This implies that the value of XCR0[17:18] is always
+> either 00b or 11b."
 > 
-> Signed-off-by: Yuan Yao <yuan.yao@intel.com>
+> I can add more to changelog if this is reasonable.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Ya, please do.  It doesn't have to be the full thing verbatim (but that's ok, too),
+but the requirement does need to be called out.
+
+> >  Out of curisoity, assuming they do indeed need to be set/cleared as a
+> >  pair, what's the point of having two separate bits?
+>
+> What I can see is to separate different states and mirror by XFD which can
+> set bits separately.
+
+Ah, that would make sense.  Thanks!
