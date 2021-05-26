@@ -2,110 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0686E392147
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 22:09:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3002C3921C9
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 23:11:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234732AbhEZUKu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 16:10:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54432 "EHLO
+        id S233897AbhEZVMb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 17:12:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233486AbhEZUKs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 May 2021 16:10:48 -0400
-Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 327E3C06175F
-        for <kvm@vger.kernel.org>; Wed, 26 May 2021 13:09:17 -0700 (PDT)
-Received: by mail-io1-xd2b.google.com with SMTP id z24so2380155ioi.3
-        for <kvm@vger.kernel.org>; Wed, 26 May 2021 13:09:17 -0700 (PDT)
+        with ESMTP id S231321AbhEZVM0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 May 2021 17:12:26 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52D82C06175F
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 14:10:54 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id d78so1915541pfd.10
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 14:10:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=vFDYuBmh7yjJdj9CItzBZCqIL81Dc5QxJ2wo0EOE5jA=;
-        b=eSdmwcymhc7rdEp+teYEOB16ky0YRohcKnfTC1vyL86VHp2vg3ykTARcUlGBXFbERN
-         bFAuI0leHXnFoB5GsT5DUA+5stgu/OTpXblQsuOceye4b2Cdzbt0DwcVax95Xc5YcuNZ
-         7uxH9vue10owHgSPud9NNCdktGdd2w/ymV1nXIGmTdVO+rTwNYAQ8qS2obswcWA9SOlz
-         sFYoo8QJ6yQrhxmHntLi0c3MxMHwTD6qnseeUkgpUw1E0wkaR/t7nDhaF16a3qZjRCQq
-         qMoFfQCrFTP/UjF1KcugAZSM2D7UkAYrsmoR4GO/Iz6qjk/hOrVOqqR5dmRvYLvDLk1c
-         GwAQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=f/rbjKviRvFVX0Te8u4k8bqeiTictapTyzo3WDV9mhs=;
+        b=Memse1iJsMVqDZS5ISUSOn2BjkDNVbGZ2ReD6ANclbxOAXOX3XbY10C31X5O97HFbe
+         D2z7fgKGs44dEuKE+PB4kGr6DjpUXnajPR0vdWaTZiW87hEYN0Y+XZyb2KGUA/Hiy3hX
+         AWWoBXvpL22VtsdZ1z4Dvn0bWZp+48g7MsGEyuVdGdSTvb4vZN3JUb4V0fm5It7dFlHp
+         IlRlVf5JaL5yXltVC48qFKg5rgvIZ/Yob9p2R8j36IW6PvI2A7kCqhKxhQebVfrMSu/+
+         nSZ1Ppqy7V6fkzjvXCfj1aSgTtOLlufuXsdJ0TFgC+Vfu7PLdQd+ch5HBc1fdteiB+z2
+         /Z5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=vFDYuBmh7yjJdj9CItzBZCqIL81Dc5QxJ2wo0EOE5jA=;
-        b=QuGMWAZXLANb/pOKItKDGOQb3ChYywoFdr1zIt2bkjgnXUv9ClTsky/G6PPFtVuD6X
-         mGX/0rwUkh9nJPuIs2ap8nnI6pldzDrVKRQ9BTtt6/5NZU2mH4CdRloXdjANWS+Ecgkq
-         a3+8H/ry5wbiOfBHVSl76Xk+hBZsNWAmPAY6/sm9/+yTOprcZohQD9tLBzlHs/309iDV
-         vCgiFz4VGYnKbBdeBOblVuz1EC3xCGFT62gW6FomatHVCj6tW2xIm9IVn5sOPC/yrm/C
-         gFF72KzvC/skJ2JZw7soqmVSG7swm16B8N1x5gDP4bZnbFBjaXLbvDIu+Uohv4HQQUad
-         6MGg==
-X-Gm-Message-State: AOAM5324PtO6BFEHxgJ3L5W0UuqTsdNd47S45ML+ZarQ6bbTqV8sykWy
-        64V3MVp4qJnJrwOAM2nS5PN7MtwL3x6dwQF3lw6BLg==
-X-Google-Smtp-Source: ABdhPJxKrCQ/dX9bWJ+BgPNFhovSjFU1bGvGRRjO7GrW6LMZLB4Zicb8G+rTOo4MGC/QtfnXpk780gwfFH3QfBlM5i4=
-X-Received: by 2002:a05:6638:124b:: with SMTP id o11mr4875459jas.4.1622059755162;
- Wed, 26 May 2021 13:09:15 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=f/rbjKviRvFVX0Te8u4k8bqeiTictapTyzo3WDV9mhs=;
+        b=t5OFMNCqobDkXIJ1qnc3uoNd9BhBxI879AMtkxyTzwjMjSYmUS8EH8hjn5ish66IgR
+         YjYrMkGtZ2OX9TiGWaU7fNfpnx/CSAf3+oyGFUzbf+ywHz917NHn6tYE8u0Ufx+yGVp0
+         vJ5dp3cNtC2AL2CVZ1LsLidFDI0FjyNScQnTNI1awec+A1y9tu8XDDPfpXN3JcLFjtrB
+         Bju3tg0g0o6BeKNmzjrZ49QNNpZaWn3UR78zPOhzkJ6U2UG28GSWOV43ctX4IdnIDNHL
+         X99WrA+zxEOW7ET5354J5znih3D/bW3JRKScY6OwpMqqdumLWDVoTvN4Xm4OBqgUsU+Z
+         wNvQ==
+X-Gm-Message-State: AOAM531JCNqXvSHAQS6+PHTCXo+K1a/TlTdVMJ/6s9aZjKSyx8UnaPyo
+        4/KyYlAOUvHl5TsWggXTaSCvxLPgfbq9/A==
+X-Google-Smtp-Source: ABdhPJwEpf8QCKAcrBl9kdSuy27Ib13bkmT1ykfsRRAaonJmBmQooZBPSunJU6Yma+he3eQ1OqYBBg==
+X-Received: by 2002:a65:6a52:: with SMTP id o18mr392699pgu.177.1622063452156;
+        Wed, 26 May 2021 14:10:52 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id o7sm9219pgs.45.2021.05.26.14.10.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 May 2021 14:10:51 -0700 (PDT)
+Date:   Wed, 26 May 2021 21:10:47 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Isaku Yamahata <isaku.yamahata@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, isaku.yamahata@gmail.com
+Subject: Re: [RFC PATCH 00/10] KVM: x86/mmu: simplify argument to kvm page
+ fault handler
+Message-ID: <YK65V++S2Kt1OLTu@google.com>
+References: <cover.1618914692.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
-References: <CANgfPd_Pq2MkRUZiJynh7zkNuKE5oFGRjKeCjmgYP4vwvfMc1g@mail.gmail.com>
- <35fe7a86-d808-00e9-a6aa-e77b731bd4bf@redhat.com> <2fd417c59f40bd10a3446f9ed4be434e17e9a64f.camel@redhat.com>
- <YK5s5SUQh69a19/F@google.com> <927cbe06-7183-1153-95ea-f97eb4ff12f6@redhat.com>
-In-Reply-To: <927cbe06-7183-1153-95ea-f97eb4ff12f6@redhat.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 26 May 2021 13:09:03 -0700
-Message-ID: <CANgfPd-wcyP_nNNSuXMcZ0S+fmkcOEpQaPTS_5EUmDsEVguSCw@mail.gmail.com>
-Subject: Re: Writable module parameters in KVM
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1618914692.git.isaku.yamahata@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 26, 2021 at 9:30 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 26/05/21 17:44, Sean Christopherson wrote:
-> >> Sure, making them writable is okay.
-> >
-> > making a param writable (new or existing) must come with strong
-> > justification for taking on the extra complexity.
->
-> I agree.  It's the same for every change, and it's the reason why most
-> parameters are read-only: no justification for the extra complexity.
-> But if somebody has a usecase, it can be considered.
->
-> > Making 'npt' writable is probably feasible ('ept' would be beyond messy), but I
-> > strongly prefer to keep it read-only.  The direct impacts on the MMU and SVM
-> > aren't too bad, but NPT is required for SEV and VLS, affects kvm_cpu_caps, etc...
-> > And, no offense to win98, there's isn't a strong use case because outside of
-> > personal usage, the host admin/VMM doesn't know that the guest will be running a
-> > broken kernel.
->
-> Making 'npt' writable would be beyond messy too; allowing select VMs to
-> disable EPT/NPT might be simpler, but not that much.  I can't say
-> offhand if the code would be ugly or not.
+On Tue, Apr 20, 2021, Isaku Yamahata wrote:
+> This is a preliminary clean up for TDX which complicates KVM page fault
+> execution path.
 
-Thanks for the guidance all. We'll probably send out more writable
-module params in the future in that case, and will add a Documentation
-file whenever we send out the first one.
+Ooh, a series to complicate the page fault path!  ;-)
 
-I don't know if there's a great way to formally encode this
-distinction, but I see two major classes of writable params in terms
-of complexity:
-1. parameters that are captured on VM creation and follow the life of
-the VM e.g. the TDP MMU
-2. parameters which have an effect on all VMs on the system when
-changed e.g. internally we have sysctls to change NX reclaim
-parameters
+Grammatical snarkiness aside, I'm all in favor of adding a struct to collect the
+page fault collateral.  Overarching feedback:
 
-I think class 1 is substantially easier to reason about from a code
-perspective, but might be more confusing to userspace, as the current
-value of the parameter has no bearing on the value captured by the VM.
-Class 2 will probably be more complex to implement, require
-synchronization, and need a better justification.
+  - Have kvm_mmu_do_page_fault() handle initialization of the struct.  That
+    will allow making most of the fields const, and will avoid the rather painful
+    kvm_page_fault_init().
 
->
-> Paolo
->
+  - Pass @vcpu separately.  Yes, it's associated with the fault, but literally
+    the first line in every consumer is "struct kvm_vcpu *vcpu = kpf->vcpu;".
+
+  - Use "fault" instead of "kpf", mostly because it reads better for people that
+    aren't intimately familiar with the code, but also to avoid having to refactor
+    a huge amount of code if we decide to rename kvm_page_fault, e.g. if we decide
+    to use that name to return fault information to userspace.
+
+  - Snapshot anything that is computed in multiple places, even if it is
+    derivative of existing info.  E.g. it probably makes sense to grab
+    write/fetch (or exec).
+
+
+E.g. I'm thinking something like
+
+struct kvm_page_fault {
+	const gpa_t cr2_or_gpa;
+	const u32 error_code;
+	const bool write;
+	const bool read;
+	const bool fetch;
+	const bool prefault;
+	const bool is_tdp;
+
+	gfn_t gfn;
+	hva_t hva;
+	int max_level;
+
+	kvm_pfn_t pfn;
+	bool map_writable;
+};
+
+int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+
+static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+					u32 err, bool prefault)
+{
+	struct kvm_page_fault fault = {
+		.cr2_or_gpa = cr2_or_gpa,
+		.error_code = err,
+		.write	    = err & PFERR_WRITE_MASK,
+		.fetch	    = err & PFERR_FETCH_MASK,
+		.perm	    = ...
+		.rsvd	    = err & PFERR_RSVD_MASK,
+
+		.is_tdp	    = vcpu->arch.mmu->page_fault == kvm_tdp_page_fault,
+
+		...
+	};
+
+#ifdef CONFIG_RETPOLINE
+	if (likely(fault.is_tdp))
+		return kvm_tdp_page_fault(vcpu, &fault);
+#endif
+	return vcpu->arch.mmu->page_fault(vcpu, &fault);
+}
+
