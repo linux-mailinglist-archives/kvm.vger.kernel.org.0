@@ -2,96 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E76639105F
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 08:09:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3208F391072
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 08:12:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232299AbhEZGLJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 02:11:09 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:4009 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232626AbhEZGLC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 May 2021 02:11:02 -0400
-Received: from dggems705-chm.china.huawei.com (unknown [172.30.72.58])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FqgT85qz9zmZ9F;
-        Wed, 26 May 2021 14:07:08 +0800 (CST)
-Received: from dggpeml500023.china.huawei.com (7.185.36.114) by
- dggems705-chm.china.huawei.com (10.3.19.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Wed, 26 May 2021 14:09:29 +0800
-Received: from [10.67.77.175] (10.67.77.175) by dggpeml500023.china.huawei.com
- (7.185.36.114) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Wed, 26 May
- 2021 14:09:29 +0800
-Subject: Re: [PATCH] KVM: x86/mmu: Remove the repeated declaration
-To:     Sean Christopherson <seanjc@google.com>
-CC:     <x86@kernel.org>, <kvm@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <1621910615-29985-1-git-send-email-zhangshaokun@hisilicon.com>
- <YK0hPadppDR1sPaD@google.com>
-From:   Shaokun Zhang <zhangshaokun@hisilicon.com>
-Message-ID: <b0e4d53e-c59e-bebc-a6c3-22f89e1c0a5f@hisilicon.com>
-Date:   Wed, 26 May 2021 14:09:29 +0800
+        id S232788AbhEZGNc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 02:13:32 -0400
+Received: from mga03.intel.com ([134.134.136.65]:9993 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232734AbhEZGNb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 May 2021 02:13:31 -0400
+IronPort-SDR: NGRhW1Bu98CWIBXWKNp4zUjX2MCJq0ul8zlEZO6w5rBL7zzp/CCF7oMjOyEJHQf9CFHcwIrZyd
+ lPiGTPaD+r7w==
+X-IronPort-AV: E=McAfee;i="6200,9189,9995"; a="202427906"
+X-IronPort-AV: E=Sophos;i="5.82,330,1613462400"; 
+   d="scan'208";a="202427906"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2021 23:12:00 -0700
+IronPort-SDR: HXzVmDFmx9YLRavm+0HGn3TbVDMu+xTUzDV+jZmKfV/9Ex232tslEmWG004A1DePsLC1+B4Ij0
+ BRGP3VJZaCbg==
+X-IronPort-AV: E=Sophos;i="5.82,330,1613462400"; 
+   d="scan'208";a="476776700"
+Received: from unknown (HELO [10.238.130.158]) ([10.238.130.158])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2021 23:11:58 -0700
+Subject: Re: [PATCH RFC 4/7] kvm: x86: Add new ioctls for XSAVE extension
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, jing2.liu@intel.com
+References: <20210207154256.52850-1-jing2.liu@linux.intel.com>
+ <20210207154256.52850-5-jing2.liu@linux.intel.com>
+ <CALMp9eT8SoD0X=RZNv+o4LJLZZioTaPPXBnT199AGJKAwJ=W7Q@mail.gmail.com>
+From:   "Liu, Jing2" <jing2.liu@linux.intel.com>
+Message-ID: <645508cb-abf5-350d-f0ae-6044ecc3ceb8@linux.intel.com>
+Date:   Wed, 26 May 2021 14:11:56 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <YK0hPadppDR1sPaD@google.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+In-Reply-To: <CALMp9eT8SoD0X=RZNv+o4LJLZZioTaPPXBnT199AGJKAwJ=W7Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.77.175]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpeml500023.china.huawei.com (7.185.36.114)
-X-CFilter-Loop: Reflected
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
 
-On 2021/5/26 0:09, Sean Christopherson wrote:
-> On Tue, May 25, 2021, Shaokun Zhang wrote:
->> Function 'is_nx_huge_page_enabled' is declared twice, remove the
->> repeated declaration.
+
+On 5/25/2021 6:06 AM, Jim Mattson wrote:
+> On Sat, Feb 6, 2021 at 11:00 PM Jing Liu <jing2.liu@linux.intel.com> wrote:
+>> The static xstate buffer kvm_xsave contains the extended register
+>> states, but it is not enough for dynamic features with large state.
 >>
->> Cc: Ben Gardon <bgardon@google.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Signed-off-by: Shaokun Zhang <zhangshaokun@hisilicon.com>
+>> Introduce a new capability called KVM_CAP_X86_XSAVE_EXTENSION to
+>> detect if hardware has XSAVE extension (XFD). Meanwhile, add two
+>> new ioctl interfaces to get/set the whole xstate using struct
+>> kvm_xsave_extension buffer containing both static and dynamic
+>> xfeatures. Reuse fill_xsave and load_xsave for both cases.
+>>
+>> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
 >> ---
->>  arch/x86/kvm/mmu/mmu_internal.h | 2 --
->>  1 file changed, 2 deletions(-)
->>
->> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
->> index d64ccb417c60..54c6e6193ff2 100644
->> --- a/arch/x86/kvm/mmu/mmu_internal.h
->> +++ b/arch/x86/kvm/mmu/mmu_internal.h
->> @@ -158,8 +158,6 @@ int kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, gfn_t gfn,
->>  void disallowed_hugepage_adjust(u64 spte, gfn_t gfn, int cur_level,
->>  				kvm_pfn_t *pfnp, int *goal_levelp);
->>  
->> -bool is_nx_huge_page_enabled(void);
-> 
-> Rather than simply delete the extra declaration, what about converting this to
-> static inline and opportunistically deleting the duplicate?  The implementation
+>> +#define KVM_GET_XSAVE_EXTENSION   _IOW(KVMIO,  0xa4, struct kvm_xsave_extension)
+>> +#define KVM_SET_XSAVE_EXTENSION   _IOW(KVMIO,  0xa5, struct kvm_xsave_extension)
+> Isn't the convention to call these KVM_GET_XSAVE2 and KVM_SET_XSAVE2?
+>
+> Do you have any documentation to add to Documentation/virt/kvm/api.rst?
+Thanks for reviewing the patch.
+I'll change the name as convention and add documentation if new apis are 
+needed.
 
-It seems that you want to make it static inline in mmu_internal.h, right?
-
-> is a single operation and this is MMU-internal, i.e. there's no need to export
-> and limited exposure of nx_huge_pages to other code.
-
-If is_nx_huge_page_enabled is inline in mmu_internal.h, nx_huge_pages will be
-external in mmu_internal.h and exposed to other code. Do I miss something?
-
-Thanks,
-Shaokun
-
-> 
->> -
->>  void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
->>  
->>  void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
->> -- 
->> 2.7.4
->>
-> .
-> 
+BRs,
+Jing
