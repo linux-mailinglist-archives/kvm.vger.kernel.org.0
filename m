@@ -2,124 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E9387391C4B
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 17:44:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AB6B391C76
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 17:52:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235390AbhEZPqQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 11:46:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50786 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235381AbhEZPqO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 May 2021 11:46:14 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89BC1C06175F
-        for <kvm@vger.kernel.org>; Wed, 26 May 2021 08:44:42 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id n6-20020a17090ac686b029015d2f7aeea8so562484pjt.1
-        for <kvm@vger.kernel.org>; Wed, 26 May 2021 08:44:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=xH9Vy/L4PH5PgZ75Lk40znIEfGow9JElmm1w/62eWLM=;
-        b=rJ8j7n0kErNXIoZSRax9qpZ+vYVs1+0fFNK8WhAJkMXZzI3a87O8oeML8U2jTFhUQx
-         e6GxZ6TX2CX8DRvtmmOEtp2gtnSnng48tCMRAFXemZPzrExO+tZ5Kwe3w7b53nj0KB6j
-         4lbHCHqdBy8oLfx94ri2u0PXhWLPQYm2yIAIYD74dCkQV3f8G+S9vo60yAv4C8+PPmnQ
-         if83H6wUx6SgYjzfhh8oRh3KPdrMBIGH5Fh9RSg4vrrNG91TifX++VTimjYemKiMHDCG
-         aJmInNZDCrpgcUBISMvXHVYAucwlH0ArNXde2sxdBPg6MZmmMHQ2H6wHk0/HSOzyI1XT
-         1HfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xH9Vy/L4PH5PgZ75Lk40znIEfGow9JElmm1w/62eWLM=;
-        b=d44WDW353sO8nwmKQbvImTOxiiK3ipd58KYqx0g5pOQe4rJoGcunWz81wfER+OobuY
-         wNUj+jgRnRpYMy3soEoGImwmqS2iVa33Vi79n4CUZR08hWyDUTYiKGzi5668yttS65RT
-         K38egRZP8OD0eVvKv+bpeFtplpHt21X0vKsq7kC3q5mDmWZv+eTItvwGFpEwjPtYzQfl
-         9ainR0rNYmu2eqs+fYlf2Zr9sdVyhwKcEZoKxdj46pqZWVaWdg3bu5oQCtnuEcgZZCPg
-         S19+StjZZFp/XKtcB3b2pUadhtaG38kFKpZTpMW8ZAvFXPFWfSwi0X58iuH0Bfhiuuqh
-         yGyA==
-X-Gm-Message-State: AOAM5339lgcGdJuUFcFw6wqGuJaF0OngooTWOTIcaQW8z8gHSQRiEAV0
-        RjlcdHntaJZAC5vtu/Rd2dIvJA==
-X-Google-Smtp-Source: ABdhPJweAGgjDENCEg6+wJtGzTpXibg4GLJHlrqIbo/XesV0zJzhrytQ1vkPogyZie6uaBFHWRpvdQ==
-X-Received: by 2002:a17:902:6f09:b029:f9:173e:847d with SMTP id w9-20020a1709026f09b02900f9173e847dmr19275180plk.35.1622043881842;
-        Wed, 26 May 2021 08:44:41 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id q24sm17055036pgb.19.2021.05.26.08.44.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 May 2021 08:44:41 -0700 (PDT)
-Date:   Wed, 26 May 2021 15:44:37 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
+        id S235405AbhEZPyH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 11:54:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53750 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234798AbhEZPyG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 May 2021 11:54:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622044354;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0VyAuC1F8BnKggqnnpy3D59/MnIA3mks41oudTXHz3o=;
+        b=Pb88UE4t3ilGfXvk+N0juJYilTGbfG2QKoKxcDbyPEqEV8oXRaSGNe7kvj+vt5exyqTxuD
+        nCBvLz8CJlkpVyv0zgJyPEZDKZ8l8oMoVaQdZRQmIqlmEyuDghs9ixEIyGFY7J4kh5EhtP
+        Uu9TbVPR0u6zFRe4MIIiwpL+2ZpTRVU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-357-aXZAA8OlNuShkeCY2-xiPA-1; Wed, 26 May 2021 11:52:29 -0400
+X-MC-Unique: aXZAA8OlNuShkeCY2-xiPA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F330801817;
+        Wed, 26 May 2021 15:52:28 +0000 (UTC)
+Received: from starship (unknown [10.40.192.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C5DBE5D723;
+        Wed, 26 May 2021 15:52:25 +0000 (UTC)
+Message-ID: <8e2570c580baf6d4d650ebc28b98a5ed76cb4f9b.camel@redhat.com>
+Subject: Re: [PATCH v2 3/5] KVM: x86: Use common 'enable_apicv' variable for
+ both APICv and AVIC
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Subject: Re: Writable module parameters in KVM
-Message-ID: <YK5s5SUQh69a19/F@google.com>
-References: <CANgfPd_Pq2MkRUZiJynh7zkNuKE5oFGRjKeCjmgYP4vwvfMc1g@mail.gmail.com>
- <35fe7a86-d808-00e9-a6aa-e77b731bd4bf@redhat.com>
- <2fd417c59f40bd10a3446f9ed4be434e17e9a64f.camel@redhat.com>
+        Kechen Lu <kechenl@nvidia.com>, linux-kernel@vger.kernel.org
+Date:   Wed, 26 May 2021 18:52:24 +0300
+In-Reply-To: <YK5kQcTh8LmE0+8I@google.com>
+References: <20210518144339.1987982-1-vkuznets@redhat.com>
+         <20210518144339.1987982-4-vkuznets@redhat.com>
+         <1b9a654596f755ee5ef42ce11136ed2bbb3995a0.camel@redhat.com>
+         <YK5kQcTh8LmE0+8I@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2fd417c59f40bd10a3446f9ed4be434e17e9a64f.camel@redhat.com>
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 26, 2021, Maxim Levitsky wrote:
-> On Wed, 2021-05-26 at 12:49 +0200, Paolo Bonzini wrote:
-> > On 26/05/21 01:45, Ben Gardon wrote:
-> > > At Google we have an informal practice of adding sysctls to control some 
-> > > KVM features. Usually these just act as simple "chicken bits" which 
-> > > allow us to turn off a feature without having to stall a kernel rollout 
-> > > if some feature causes problems. (Sysctls were used for reasons specific 
-> > > to Google infrastructure, not because they're necessarily better.)
-> > > 
-> > > We'd like to get rid of this divergence with upstream by converting the 
-> > > sysctls to writable module parameters, but I'm not sure what the general 
-> > > guidance is on writable module parameters. Looking through KVM, it seems 
-> > > like we have several writable parameters, but they're mostly read-only.
+On Wed, 2021-05-26 at 15:07 +0000, Sean Christopherson wrote:
+> On Wed, May 26, 2021, Maxim Levitsky wrote:
+> > On Tue, 2021-05-18 at 16:43 +0200, Vitaly Kuznetsov wrote:
+> > > Unify VMX and SVM code by moving APICv/AVIC enablement tracking to common
+> > > 'enable_apicv' variable. Note: unlike APICv, AVIC is disabled by default.
+> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > index 9b6bca616929..23fdbba6b394 100644
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -209,6 +209,9 @@ EXPORT_SYMBOL_GPL(host_efer);
+> > >  bool __read_mostly allow_smaller_maxphyaddr = 0;
+> > >  EXPORT_SYMBOL_GPL(allow_smaller_maxphyaddr);
+> > >  
+> > > +bool __read_mostly enable_apicv = true;
 > > 
-> > Sure, making them writable is okay.  Most KVM parameters are read-only 
-> > because it's much simpler (the usecase for introducing them was simply 
-> > "test what would happen on old processors").  What are these features 
-> > that you'd like to control?
-
-My $0.02 is that most parameters should remain read-only, and making a param
-writable (new or existing) must come with strong justification for taking on the
-extra complexity.
-
-I absolutely agree that making select params writable adds a ton of value, e.g.
-being able to switch to/from the TDP MMU without reloading KVM saves a lot of
-time when testing, toggling forced flush/sync on PGD reuse is extremely valuable
-for triage and/or mitigation, etc...  But writable params should either bring a
-lot of value and/or add near-zero complexity.
-
-> > > I also don't see central documentation of the module parameters. They're 
-> > > mentioned in the documentation for other features, but don't have their 
-> > > own section / file. Should they?
+> > Nitpick: I don't like this asymmetry.
 > > 
-> > They probably should, yes.
-> > 
-> > Paolo
-> > 
-> I vote (because I have fun with my win98 once in a while), to make 'npt'
-> writable, since that is the only way to make it run on KVM on AMD.
-
-For posterity, "that" refers to disabling NPT, not making 'npt' writable :-)
-
-Making 'npt' writable is probably feasible ('ept' would be beyond messy), but I
-strongly prefer to keep it read-only.  The direct impacts on the MMU and SVM
-aren't too bad, but NPT is required for SEV and VLS, affects kvm_cpu_caps, etc...
-And, no offense to win98, there's isn't a strong use case because outside of
-personal usage, the host admin/VMM doesn't know that the guest will be running a
-broken kernel.
-
-> My personal itch only though!
+> > VMX and the common code uses the enable_apicv module param and variable,
+> > while SVM uses avic, which sets the enable_apicv variable.
+> >  
+> > I'll prefer both VMX and SVM have their own private variable for their
+> > avic/apicv module param, which should set a common variable later.
 > 
-> Best regards,
-> 	Maxim Levitsky
+> I don't love the intermediate "avic" either, but there isn't a good alternative.
+> Forcing VMX to also use an intermediate doesn't make much sense, we'd be penalizing
+> ourselves in the form of unnecessary complexity just because AVIC needs to be
+> disabled by default for reasons KVM can't fix.
+This is also something we should eventually reconsider. 
+These days, the AVIC works quite well and disables itself when needed.
+When do you think it will be the time to enable it by default?
+
 > 
+> As for the asymmetry, I actually like it because it makes "avic" stand out and
+> highlights that there is weirdness with enabling AVIC.
+You mean that it is disabled by default?
+
+Anyway I don't have that strong opinion on this,
+so let it be like this.
+
+Best regards,
+	Maxim Levitsky
+
+
+> 
+
+
