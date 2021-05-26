@@ -2,74 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3208F391072
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 08:12:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 103303910C8
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 08:38:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232788AbhEZGNc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 02:13:32 -0400
-Received: from mga03.intel.com ([134.134.136.65]:9993 "EHLO mga03.intel.com"
+        id S232336AbhEZGkP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 02:40:15 -0400
+Received: from mga02.intel.com ([134.134.136.20]:40358 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232734AbhEZGNb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 May 2021 02:13:31 -0400
-IronPort-SDR: NGRhW1Bu98CWIBXWKNp4zUjX2MCJq0ul8zlEZO6w5rBL7zzp/CCF7oMjOyEJHQf9CFHcwIrZyd
- lPiGTPaD+r7w==
-X-IronPort-AV: E=McAfee;i="6200,9189,9995"; a="202427906"
+        id S230007AbhEZGkO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 May 2021 02:40:14 -0400
+IronPort-SDR: Je+gkYmLU4KXyteWi/4KKwJ2AxbN1A+37PRATa2xzd2Oq8Kk/cx/ByDsgTxV0qUxRp30ECZ2hv
+ 7gGK1nxRmmhw==
+X-IronPort-AV: E=McAfee;i="6200,9189,9995"; a="189513058"
 X-IronPort-AV: E=Sophos;i="5.82,330,1613462400"; 
-   d="scan'208";a="202427906"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2021 23:12:00 -0700
-IronPort-SDR: HXzVmDFmx9YLRavm+0HGn3TbVDMu+xTUzDV+jZmKfV/9Ex232tslEmWG004A1DePsLC1+B4Ij0
- BRGP3VJZaCbg==
+   d="scan'208";a="189513058"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2021 23:38:40 -0700
+IronPort-SDR: k7OCLjSf/s4sFvSyLsZpYZ64x5gvSIMMWwLnHjwpAoYE/2qytgf/YD1Gpk9sAoJ6bxfNutlhEU
+ rKJMQes8HuzQ==
 X-IronPort-AV: E=Sophos;i="5.82,330,1613462400"; 
-   d="scan'208";a="476776700"
-Received: from unknown (HELO [10.238.130.158]) ([10.238.130.158])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2021 23:11:58 -0700
-Subject: Re: [PATCH RFC 4/7] kvm: x86: Add new ioctls for XSAVE extension
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+   d="scan'208";a="414336179"
+Received: from yy-desk-7060.sh.intel.com ([10.239.159.22])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2021 23:38:37 -0700
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, jing2.liu@intel.com
-References: <20210207154256.52850-1-jing2.liu@linux.intel.com>
- <20210207154256.52850-5-jing2.liu@linux.intel.com>
- <CALMp9eT8SoD0X=RZNv+o4LJLZZioTaPPXBnT199AGJKAwJ=W7Q@mail.gmail.com>
-From:   "Liu, Jing2" <jing2.liu@linux.intel.com>
-Message-ID: <645508cb-abf5-350d-f0ae-6044ecc3ceb8@linux.intel.com>
-Date:   Wed, 26 May 2021 14:11:56 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
-MIME-Version: 1.0
-In-Reply-To: <CALMp9eT8SoD0X=RZNv+o4LJLZZioTaPPXBnT199AGJKAwJ=W7Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org
+Cc:     Yuan Yao <yuan.yao@intel.com>
+Subject: [PATCH] KVM: X86: Use kvm_get_linear_rip() in single-step and #DB/#BP interception
+Date:   Wed, 26 May 2021 14:38:28 +0800
+Message-Id: <20210526063828.1173-1-yuan.yao@linux.intel.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Yuan Yao <yuan.yao@intel.com>
 
+The kvm_get_linear_rip() handles x86/long mode cases well and has
+better readability, __kvm_set_rflags() also use the paired
+fucntion kvm_is_linear_rip() to check the vcpu->arch.singlestep_rip
+set in kvm_arch_vcpu_ioctl_set_guest_debug(), so change the
+"CS.BASE + RIP" code in kvm_arch_vcpu_ioctl_set_guest_debug() and
+handle_exception_nmi() to this one.
 
-On 5/25/2021 6:06 AM, Jim Mattson wrote:
-> On Sat, Feb 6, 2021 at 11:00 PM Jing Liu <jing2.liu@linux.intel.com> wrote:
->> The static xstate buffer kvm_xsave contains the extended register
->> states, but it is not enough for dynamic features with large state.
->>
->> Introduce a new capability called KVM_CAP_X86_XSAVE_EXTENSION to
->> detect if hardware has XSAVE extension (XFD). Meanwhile, add two
->> new ioctl interfaces to get/set the whole xstate using struct
->> kvm_xsave_extension buffer containing both static and dynamic
->> xfeatures. Reuse fill_xsave and load_xsave for both cases.
->>
->> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
->> ---
->> +#define KVM_GET_XSAVE_EXTENSION   _IOW(KVMIO,  0xa4, struct kvm_xsave_extension)
->> +#define KVM_SET_XSAVE_EXTENSION   _IOW(KVMIO,  0xa5, struct kvm_xsave_extension)
-> Isn't the convention to call these KVM_GET_XSAVE2 and KVM_SET_XSAVE2?
->
-> Do you have any documentation to add to Documentation/virt/kvm/api.rst?
-Thanks for reviewing the patch.
-I'll change the name as convention and add documentation if new apis are 
-needed.
+Signed-off-by: Yuan Yao <yuan.yao@intel.com>
 
-BRs,
-Jing
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 4bceb5ca3a89..0db05cfbe434 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4843,7 +4843,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	struct kvm_run *kvm_run = vcpu->run;
+ 	u32 intr_info, ex_no, error_code;
+-	unsigned long cr2, rip, dr6;
++	unsigned long cr2, dr6;
+ 	u32 vect_info;
+ 
+ 	vect_info = vmx->idt_vectoring_info;
+@@ -4933,8 +4933,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+ 		vmx->vcpu.arch.event_exit_inst_len =
+ 			vmcs_read32(VM_EXIT_INSTRUCTION_LEN);
+ 		kvm_run->exit_reason = KVM_EXIT_DEBUG;
+-		rip = kvm_rip_read(vcpu);
+-		kvm_run->debug.arch.pc = vmcs_readl(GUEST_CS_BASE) + rip;
++		kvm_run->debug.arch.pc = kvm_get_linear_rip(vcpu);
+ 		kvm_run->debug.arch.exception = ex_no;
+ 		break;
+ 	case AC_VECTOR:
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 9b6bca616929..5cac5d883710 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10115,8 +10115,7 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+ 	kvm_update_dr7(vcpu);
+ 
+ 	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)
+-		vcpu->arch.singlestep_rip = kvm_rip_read(vcpu) +
+-			get_segment_base(vcpu, VCPU_SREG_CS);
++		vcpu->arch.singlestep_rip = kvm_get_linear_rip(vcpu);
+ 
+ 	/*
+ 	 * Trigger an rflags update that will inject or remove the trace
+-- 
+2.17.1
+
