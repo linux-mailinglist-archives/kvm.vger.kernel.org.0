@@ -2,177 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15E333920DF
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 21:30:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72D33392117
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 21:47:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234181AbhEZTcG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 15:32:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49370 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232430AbhEZTb4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 May 2021 15:31:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622057423;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7QSW0OHCbKjjac6wEa5djuZz7N9XrcbLcvjqTAkCZDs=;
-        b=IFahDJLFS8kTnPNObA+fqBfUJ+536hEhKLAfR1l3n1XISR0D0Q04k22WPqooWqxz5Ud5jP
-        bPwlkuO60E1Ac9aiwqSBTnUpwOkGy97KhtYkIOtLYsc33qms6O9xl4AVCMg1Oh8TJsKBD3
-        qHEoMkiQRfuxDD3EjXPMJP5+T8PLpE4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-oEeXumTmPVCYECcozaPJdg-1; Wed, 26 May 2021 15:30:20 -0400
-X-MC-Unique: oEeXumTmPVCYECcozaPJdg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1FF07180FD60;
-        Wed, 26 May 2021 19:30:19 +0000 (UTC)
-Received: from work-vm (ovpn-114-247.ams2.redhat.com [10.36.114.247])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E1C206787D;
-        Wed, 26 May 2021 19:30:04 +0000 (UTC)
-Date:   Wed, 26 May 2021 20:30:02 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>, cfontana@suse.de
-Cc:     Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: Windows fails to boot after rebase to QEMU master
-Message-ID: <YK6hunkEnft6VJHz@work-vm>
-References: <20210521091451.GA6016@u366d62d47e3651.ant.amazon.com>
- <20210524055322-mutt-send-email-mst@kernel.org>
+        id S234386AbhEZTsc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 15:48:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49498 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231924AbhEZTsb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 May 2021 15:48:31 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB86AC06175F
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 12:46:57 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id t193so1842899pgb.4
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 12:46:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=hEQ3MdXmpdNmcX6sa1MKz2lUFHPHmPostz9Pp0Yt+54=;
+        b=b1ledajAYuzSP2VsYjLXXA+yLdhz9jMTPLKR8jN1BmCm06HetxB4+K+9y1UkLgPGJU
+         8FJJevRA+tNRkxZEmKTbGAEI201rzRZoz5+VL7ftvW0M84XkhdamXP09FeQBf0gDMQGU
+         0k9I1ORp07R5N8pLA1QDajOqd6fOK0a7s0zKXZ7MRZknul8dbZAVK3KNwxMHmNCQfBLY
+         jJ3jy8WK2GAgyehfuQVJdPflw5Uv2kQBba7LRL5vNSkwHjO/TeZhiuXKJEuo7EZFqXnP
+         6CqLhRB4GytEUeiguuk8nexR6qzpY5MWCLAB7GLELwSWrKeTRKKlEoIKE4X5J/7EgIkv
+         hv3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hEQ3MdXmpdNmcX6sa1MKz2lUFHPHmPostz9Pp0Yt+54=;
+        b=DAoaAwVAHOT+kxSx1y2TlaODSjtC/Akp+b22YmvzC9Gl3/2vnGhpbfImDvO5AlpAx5
+         pVqZvtR2X7UOxztZieFNPV6NK4DBPYaV3SY1yMCej/DGBA4wvcAg9VjXX1gZPf5HaJhB
+         hrv5TQp+AM2u3dhw1UlGDgbVFh8TLVZLy0lZyQDhuRLVTXNUk1yHwRvij4n9lqQ5hb+J
+         o4VeU0f0KU6RYZxFh0ylfQqDHS+dpnuH0J+IZExsyOWMACT74ya4IC8/g1rSgYRWA2JS
+         tmf6ifL38n/tttEIhaMRL4WH8yyi9LOhjOWKgkWaAzVYUoBibWS0DLC7xRFGbuWPFv+E
+         aU5g==
+X-Gm-Message-State: AOAM530dUm/kzsAsH1wo8xwAI83xl2Bgj1kSeC7w48xX5Hog+RSNaX2i
+        czj2pJir3srBe9YVJsxxsYpGSg==
+X-Google-Smtp-Source: ABdhPJwBXUXILPsFBDFo9CFR/JDpKVm78Qh7x+mpCE2hRYo8JoIxtQJXcXaDoL8EHmqAouWcIEOiWQ==
+X-Received: by 2002:a62:cec9:0:b029:2e3:9125:c280 with SMTP id y192-20020a62cec90000b02902e39125c280mr65079pfg.11.1622058417033;
+        Wed, 26 May 2021 12:46:57 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id f9sm46220pfc.42.2021.05.26.12.46.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 May 2021 12:46:56 -0700 (PDT)
+Date:   Wed, 26 May 2021 19:46:52 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>
+Cc:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jim Mattson <jmattson@google.com>,
+        David Rientjes <rientjes@google.com>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Steve Rutherford <srutherford@google.com>,
+        Peter Gonda <pgonda@google.com>,
+        David Hildenbrand <david@redhat.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFCv2 13/13] KVM: unmap guest memory using poisoned pages
+Message-ID: <YK6lrHeaeUZvHMJC@google.com>
+References: <YHnJtvXdrZE+AfM3@google.com>
+ <20210419142602.khjbzktk5tk5l6lk@box.shutemov.name>
+ <YH2pam5b837wFM3z@google.com>
+ <20210419164027.dqiptkebhdt5cfmy@box.shutemov.name>
+ <YH3HWeOXFiCTZN4y@google.com>
+ <20210419185354.v3rgandtrel7bzjj@box>
+ <YH3jaf5ThzLZdY4K@google.com>
+ <20210419225755.nsrtjfvfcqscyb6m@box.shutemov.name>
+ <YH8L0ihIzL6UB6qD@google.com>
+ <20210521123148.a3t4uh4iezm6ax47@box>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210524055322-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/2.0.7 (2021-05-04)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20210521123148.a3t4uh4iezm6ax47@box>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Fri, May 21, 2021 at 11:17:19AM +0200, Siddharth Chandrasekaran wrote:
-> > After a rebase to QEMU master, I am having trouble booting windows VMs.
-> > Git bisect indicates commit f5cc5a5c1686 ("i386: split cpu accelerators
-> > from cpu.c, using AccelCPUClass") to have introduced the issue. I spent
-> > some time looking at into it yesterday without much luck.
-> > 
-> > Steps to reproduce:
-> > 
-> >     $ ./configure --enable-kvm --disable-xen --target-list=x86_64-softmmu --enable-debug
-> >     $ make -j `nproc`
-> >     $ ./build/x86_64-softmmu/qemu-system-x86_64 \
-> >         -cpu host,hv_synic,hv_vpindex,hv_time,hv_runtime,hv_stimer,hv_crash \
-> >         -enable-kvm \
-> >         -name test,debug-threads=on \
-> >         -smp 1,threads=1,cores=1,sockets=1 \
-> >         -m 4G \
-> >         -net nic -net user \
-> >         -boot d,menu=on \
-> >         -usbdevice tablet \
-> >         -vnc :3 \
-> >         -machine q35,smm=on \
-> >         -drive if=pflash,format=raw,readonly=on,unit=0,file="../OVMF_CODE.secboot.fd" \
-> >         -drive if=pflash,format=raw,unit=1,file="../OVMF_VARS.secboot.fd" \
-> >         -global ICH9-LPC.disable_s3=1 \
-> >         -global driver=cfi.pflash01,property=secure,value=on \
-> >         -cdrom "../Windows_Server_2016_14393.ISO" \
-> >         -drive file="../win_server_2016.qcow2",format=qcow2,if=none,id=rootfs_drive \
-> >         -device ahci,id=ahci \
-> >         -device ide-hd,drive=rootfs_drive,bus=ahci.0
-> > 
-> > If the issue is not obvious, I'd like some pointers on how to go about
-> > fixing this issue.
-> > 
-> > ~ Sid.
-> > 
+On Fri, May 21, 2021, Kirill A. Shutemov wrote:
+> Hi Sean,
 > 
-> At a guess this commit inadvertently changed something in the CPU ID.
-> I'd start by using a linux guest to dump cpuid before and after the
-> change.
-
-I've not had a chance to do that yet, however I did just end up with a
-bisect of a linux guest failure bisecting to the same patch:
-
-[dgilbert@dgilbert-t580 qemu]$ git bisect bad
-f5cc5a5c168674f84bf061cdb307c2d25fba5448 is the first bad commit
-commit f5cc5a5c168674f84bf061cdb307c2d25fba5448
-Author: Claudio Fontana <cfontana@suse.de>
-Date:   Mon Mar 22 14:27:40 2021 +0100
-
-    i386: split cpu accelerators from cpu.c, using AccelCPUClass
-    
-    i386 is the first user of AccelCPUClass, allowing to split
-    cpu.c into:
-    
-    cpu.c            cpuid and common x86 cpu functionality
-    host-cpu.c       host x86 cpu functions and "host" cpu type
-    kvm/kvm-cpu.c    KVM x86 AccelCPUClass
-    hvf/hvf-cpu.c    HVF x86 AccelCPUClass
-    tcg/tcg-cpu.c    TCG x86 AccelCPUClass
-    
-
-The guest crash is:
-[   85.008985][ T1524] BUG: unable to handle page fault for address: ffffffff810d9c42
-[   85.012868][ T1524] #PF: supervisor write access in kernel mode
-[   85.012962][ T1524] #PF: error_code(0x0003) - permissions violation
-[   85.013043][ T1524] PGD 2224067 P4D 2224067 PUD 2225063 PMD 10001e1 
-[   85.013180][ T1524] Oops: 0003 [#1] SMP NOPTI
-[   85.013295][ T1524] CPU: 2 PID: 1524 Comm: blogbench Not tainted 5.11.0-rc7 #100
-[   85.013395][ T1524] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
-[   85.013546][ T1524] RIP: 0010:kvm_kick_cpu+0x22/0x30
-[   85.013630][ T1524] Code: 0f 1f 84 00 00 00 00 00 55 48 63 ff 48 c7 c0 78 11 01 00 48 8b 14 fd c0 36 11 82 48 89 e5 53 31 db 0f b7 0c 02 b8 05 00 00 00 <0f> 01 d9 5b 5d c3 0f 1f 84 00 00 00 00 00 55 48 89 e5 53 48 89 fb
-[   85.013852][ T1524] RSP: 0018:ffffc90000747c08 EFLAGS: 00010046
-[   85.013951][ T1524] RAX: 0000000000000005 RBX: 0000000000000000 RCX: 0000000000000000
-[   85.014058][ T1524] RDX: ffff88807c600000 RSI: 0000000000000100 RDI: 0000000000000000
-[   85.014153][ T1524] RBP: ffffc90000747c10 R08: ffff88807c72a800 R09: ffff88807ffd6000
-[   85.014248][ T1524] R10: 0000000000000001 R11: 0000000000000046 R12: ffff88807c72a800
-[   85.014343][ T1524] R13: 0000000000000000 R14: ffff888005409940 R15: ffff88807c72a818
-[   85.014437][ T1524] FS:  00007fa2f750a700(0000) GS:ffff88807c700000(0000) knlGS:0000000000000000
-[   85.014559][ T1524] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   85.014644][ T1524] CR2: ffffffff810d9c42 CR3: 0000000009016003 CR4: 0000000000370ea0
-[   85.014741][ T1524] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[   85.014842][ T1524] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[   85.014945][ T1524] Call Trace:
-[   85.014998][ T1524]  __pv_queued_spin_unlock_slowpath+0xa0/0xd0
-[   85.015103][ T1524]  __raw_callee_save___pv_queued_spin_unlock_slowpath+0x15/0x24
-[   85.015206][ T1524]  .slowpath+0x9/0x15
-[   85.015261][ T1524]  do_raw_spin_unlock+0x48/0xc0
-[   85.015333][ T1524]  _raw_spin_unlock_irq+0x1d/0x30
-[   85.015404][ T1524]  finish_task_switch+0xcc/0x2c0
-[   85.015478][ T1524]  __schedule+0x283/0x9a0
-[   85.015534][ T1524]  schedule+0x50/0xc0
-[   85.015588][ T1524]  request_wait_answer+0x126/0x240
-[   85.015667][ T1524]  ? finish_wait+0x90/0x90
-[   85.015740][ T1524]  fuse_simple_request+0x17c/0x2e0
-
-the backtrace moves about a bit, but it always ends up as
-a page fault in kvm_kick_cpu.
-
-My qemu commandline being:
-./x86_64-softmmu/qemu-system-x86_64 -M pc,memory-backend=mem,accel=kvm -cpu host  -m 2G,maxmem=16G,slots=16 -smp 4 -object memory-backend-memfd,id=mem,size=2G,share=on -chardev socket,id=char0,path=/tmp/vhostqemu -device vhost-user-fs-pci,queue-size=1024,chardev=char0,tag=myfs -kernel /home/dgilbert/virtio-fs/kernel-builds/monolithic-dax-20210209a -initrd /home/dgilbert/virtio-fs/test-initramfs.img -chardev stdio,mux=on,id=mon -mon chardev=mon,mode=readline  -device virtio-serial-pci,disable-modern=on -device virtconsole,chardev=mon -object rng-random,id=objrng0,filename=/dev/urandom -device virtio-rng-pci,rng=objrng0,id=rng0,disable-legacy=on -vga none -append "console=hvc0  debug loglevel=9 systemd.journald.forward_to_console" -display none  -overcommit mem-lock=off -netdev user,id=usernet -device virtio-net-pci,netdev=usernet -name debug-threads=on
-
-
+> The core patch of the approach we've discussed before is below. It
+> introduce a new page type with the required semantics.
 > 
-> > 
-> > 
-> > Amazon Development Center Germany GmbH
-> > Krausenstr. 38
-> > 10117 Berlin
-> > Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-> > Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-> > Sitz: Berlin
-> > Ust-ID: DE 289 237 879
-> > 
-> > 
+> The full patchset can be found here:
 > 
+>  git://git.kernel.org/pub/scm/linux/kernel/git/kas/linux.git kvm-unmapped-guest-only
 > 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> but only the patch below is relevant for TDX. QEMU patch is attached.
 
+Can you post the whole series?  The KVM behavior and usage of FOLL_GUEST is very
+relevant to TDX.
+
+> CONFIG_HAVE_KVM_PROTECTED_MEMORY has to be changed to what is appropriate
+> for TDX and FOLL_GUEST has to be used in hva_to_pfn_slow() when running
+> TDX guest.
+
+This behavior in particular is relevant; KVM should provide FOLL_GUEST iff the
+access is private or the VM type doesn't differentiate between private and
+shared.
+
+> When page get inserted into private sept we must make sure it is
+> PageGuest() or SIGBUS otherwise.
+
+More KVM feedback :-)
+
+Ideally, KVM will synchronously exit to userspace with detailed information on
+the bad behavior, not do SIGBUS.  Hopefully that infrastructure will be in place
+sooner than later.
+
+https://lkml.kernel.org/r/YKxJLcg/WomPE422@google.com
+
+> Inserting PageGuest() into shared is fine, but the page will not be accessible
+> from userspace.
+
+Even if it can be functionally fine, I don't think we want to allow KVM to map
+PageGuest() as shared memory.  The only reason to map memory shared is to share
+it with something, e.g. the host, that doesn't have access to private memory, so
+I can't envision a use case.
+
+On the KVM side, it's trivially easy to omit FOLL_GUEST for shared memory, while
+always passing FOLL_GUEST would require manually zapping.  Manual zapping isn't
+a big deal, but I do think it can be avoided if userspace must either remap the
+hva or define a new KVM memslot (new gpa->hva), both of which will automatically
+zap any existing translations.
+
+Aha, thought of a concrete problem.  If KVM maps PageGuest() into shared memory,
+then KVM must ensure that the page is not mapped private via a different hva/gpa,
+and is not mapped _any_ other guest because the TDX-Module's 1:1 PFN:TD+GPA
+enforcement only applies to private memory.  The explicit "VM_WRITE | VM_SHARED"
+requirement below makes me think this wouldn't be prevented.
+
+Oh, and the other nicety is that I think it would avoid having to explicitly
+handle PageGuest() memory that is being accessed from kernel/KVM, i.e. if all
+memory exposed to KVM must be !PageGuest(), then it is also eligible for
+copy_{to,from}_user().
+
+> Any feedback is welcome.
+> 
+> -------------------------------8<-------------------------------------------
+> 
+> From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+> Date: Fri, 16 Apr 2021 01:30:48 +0300
+> Subject: [PATCH] mm: Introduce guest-only pages
+> 
+> PageGuest() pages are only allowed to be used as guest memory. Userspace
+> is not allowed read from or write to such pages.
+> 
+> On page fault, PageGuest() pages produce PROT_NONE page table entries.
+> Read or write there will trigger SIGBUS. Access to such pages via
+> syscall leads to -EIO.
+> 
+> The new mprotect(2) flag PROT_GUEST translates to VM_GUEST. Any page
+> fault to VM_GUEST VMA produces PageGuest() page.
+> 
+> Only shared tmpfs/shmem mappings are supported.
+
+Is limiting this to tmpfs/shmem only for the PoC/RFC, or is it also expected to
+be the long-term behavior?
+
+> GUP normally fails on such pages. KVM will use the new FOLL_GUEST flag
+> to access them.
