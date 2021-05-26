@@ -2,207 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 604953918BE
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 15:23:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A835A3918EC
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 15:34:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233520AbhEZNZU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 09:25:20 -0400
-Received: from mail-dm6nam11on2077.outbound.protection.outlook.com ([40.107.223.77]:15539
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        id S234249AbhEZNgQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 09:36:16 -0400
+Received: from mail-mw2nam08on2072.outbound.protection.outlook.com ([40.107.101.72]:62688
+        "EHLO NAM04-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233130AbhEZNZT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 May 2021 09:25:19 -0400
+        id S234096AbhEZNgP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 May 2021 09:36:15 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Me7XT6BXXwIuQsCQjGtnAphjqKfimVyf93WV6W0Yqw1GrZjHzIX8s2vQCG+IrGk6NWMxig3OgBbfgZvAQp64ZfGYWm9vjME6PsCaJ7etHwyAAmxQFfi8n4HSZ+PGxE91HzOUAgazm+pDIoPCmxNqSRO7pDY0V2eRbGGlj4WsXyjoF/R6NIT1vQ+j5x5hEJBteCeMQFeVvdwSgftOtd639anrHFlLNqYOt+fWnwGEDN07U2YyFdMSEeYqgGJmh8RIcvsph6H5tEtIgPRuQHtet3trkuVpA8CGGo/ikyHT4sVFYcd8xPZOadvE6ySvmPpj5Z/1s+cL+CtISwzVcpp9PA==
+ b=gj9w1MlnXtPTogp86VIg5FA80+zmntiZMdMJxlfhKDbmlVZrLSbYIa5npdUzi28x42EPgj2yWIckDTV1zRWsA7iVqTwadRB2N0zINpqTM2yCJW/SM/N7Og58NVHP9NORULk2s4X0MH1oF7q2oqNur4FH/yBVxeG+pOncF6XZUyZVPsQGWhg6EDvMdpsRaFCIYKHIKrtUl74mGkSd+ToQzCAoMt/uoABc2HD1xTH7POxDratV/Nlr42rGmihSqO5/+S5+OZEWSahxFj8fUARaF7WwXvbmTkkSHrMux4Vq/Sn8TxQEtt3mbWN5Y1PXmBIWCihkDh6za/zNU6dMgX+O0g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xjp2sDNuJ898l30QtUPCykiPOrseNsZ04qjONJSxJrM=;
- b=OjC/IlOVqpixTH2v8etjgUMsOfMjxT0EqP/Pad3ACev0SXrxtIvVUuuXt9MIJY/MAsjcQ7nrS9kyPeBQoz9mX9b6ri+7NfwMhgA5vEQkoysbNPRHqVUootwXM83Dl7/NtoAgGiXLVTtxFHIJ29VN61nRO3NuDexe+hLQp+hpbPGry932gipSmb+CR47EsGxq5yeTkmBaeM5//oYcYvGOAuzWbfzshnCGtnvrcfGNlCC5b8eo6nd7K1i4G3IGPQzvi+JpoM0qTqpKz62GkPB4NAW3auDI8v1hfAT7JbBmniLVWvVm4kkY9VFwl8E6ikC5kOjWNcw2zah8xiEFG7Is7g==
+ bh=zzNyPzoRmIrd4W+4cNvOqkt2UTEWm503AoFNnMZBytw=;
+ b=PfdJReFfQpqSYHLb7Y6f/R0HuaVrLGvA3FYpIVCue28CGkopXxDK5d6TtwwcJzyVH8QsFpsG9ZPk0G0ZZc2QuEQJk+AapTK+K656DUksEx//N+SlI3Zj0F+7kqgAeZoFwN69U8g4lya+OUDzfCCGUNJfIaHmoMFTtzw/iA8atv02LwZADu66UNvZbQk167oBFB2mSIin3ulNZicM+tP2+zPT1piHik5lLb5qZx/eZsYz6KDOy4ATFU22oMtyWo+OBTr0spclLyhrWrWwEUNC96vI0fGtBSihej29HWetS7jSfYpojy3GBJh1ThWgVWwsuequzXG4rtfBXbNP9OB/4A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xjp2sDNuJ898l30QtUPCykiPOrseNsZ04qjONJSxJrM=;
- b=hE3cf/KqIy1LcON4vV7SDpIwk8MyHY/Jmo2/5Ed13l65gKYbE7Kqq1hnSjTkMoiVwrqIya38WZgFI9wFrm/pcbnmaxLuOrm18bYi88cu1HXoPzr3prVfQMDyfBa3ZolaoDBy+K2dk+nE+fSr5X+yvW5dLOJ53Cx00ynX/+eVMHA=
+ bh=zzNyPzoRmIrd4W+4cNvOqkt2UTEWm503AoFNnMZBytw=;
+ b=E/+JNo+UUnq2SvJsh0zJqyRHeuCQ90QtP9U04DaVb4o7ndGisMzwTu+KOMCOnhUM9kDZOTI9qFdw0wu7xnWfY8TfbOqU+zJYuJSlkXWlVW2tor682wh0fOsWClb6QrR1jOqyA7UtFSpiYSpWpQbPgus9cCmxaZeaPetTkltljNI=
 Authentication-Results: intel.com; dkim=none (message not signed)
  header.d=none;intel.com; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN1PR12MB2414.namprd12.prod.outlook.com (2603:10b6:802:2e::31) with
+ by SA0PR12MB4510.namprd12.prod.outlook.com (2603:10b6:806:94::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4150.23; Wed, 26 May
- 2021 13:23:46 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.21; Wed, 26 May
+ 2021 13:34:39 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4150.023; Wed, 26 May 2021
- 13:23:46 +0000
+ 13:34:39 +0000
 Cc:     brijesh.singh@amd.com, x86@kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         tglx@linutronix.de, jroedel@suse.de, thomas.lendacky@amd.com,
         pbonzini@redhat.com, mingo@redhat.com, dave.hansen@intel.com,
         rientjes@google.com, seanjc@google.com, peterz@infradead.org,
         hpa@zytor.com, tony.luck@intel.com
-Subject: Re: [PATCH Part1 RFC v2 13/20] x86/sev: Register GHCB memory when
- SEV-SNP is active
+Subject: Re: [PATCH Part1 RFC v2 14/20] x86/sev: Add helper for validating
+ pages in early enc attribute changes
 To:     Borislav Petkov <bp@alien8.de>
 References: <20210430121616.2295-1-brijesh.singh@amd.com>
- <20210430121616.2295-14-brijesh.singh@amd.com> <YKzbfwD6nHL7ChcJ@zn.tnic>
- <b15cd25b-ee69-237d-9044-84fba2cf4bb2@amd.com> <YK0LFk3xMjfirG9E@zn.tnic>
- <9e7b7406-ec24-2991-3577-ce7da61a61ca@amd.com> <YK4bnQiJ6cVzCCE9@zn.tnic>
+ <20210430121616.2295-15-brijesh.singh@amd.com> <YK4lTP+bHBzUxAOZ@zn.tnic>
 From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <9fada61c-274d-5348-ef1f-eb1b3bb337e5@amd.com>
-Date:   Wed, 26 May 2021 08:23:43 -0500
+Message-ID: <5177b468-c05b-a286-7042-88a64f063ff3@amd.com>
+Date:   Wed, 26 May 2021 08:34:37 -0500
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
  Gecko/20100101 Thunderbird/78.10.0
-In-Reply-To: <YK4bnQiJ6cVzCCE9@zn.tnic>
+In-Reply-To: <YK4lTP+bHBzUxAOZ@zn.tnic>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
 X-Originating-IP: [70.112.153.56]
-X-ClientProxiedBy: SN4PR0201CA0030.namprd02.prod.outlook.com
- (2603:10b6:803:2e::16) To SN6PR12MB2718.namprd12.prod.outlook.com
+X-ClientProxiedBy: SN1PR12CA0044.namprd12.prod.outlook.com
+ (2603:10b6:802:20::15) To SN6PR12MB2718.namprd12.prod.outlook.com
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SN4PR0201CA0030.namprd02.prod.outlook.com (2603:10b6:803:2e::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.20 via Frontend Transport; Wed, 26 May 2021 13:23:44 +0000
+Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SN1PR12CA0044.namprd12.prod.outlook.com (2603:10b6:802:20::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.20 via Frontend Transport; Wed, 26 May 2021 13:34:38 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 42f6cbc9-56bd-4a5d-00ea-08d920497d6e
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2414:
+X-MS-Office365-Filtering-Correlation-Id: eed96b32-04f4-4148-8819-08d9204b02ed
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4510:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2414464CBCDE7F091D4B0BE2E5249@SN1PR12MB2414.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB451058D0A1976C39FDD8E1F6E5249@SA0PR12MB4510.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8D/861nY45v7Fg4LQXWaJWGAJao7Ai3na6U7J7CoLTuzLzlWCArJBc0EgYwXNp6585NSah7wblgH/T3oSZGRAkNUPuXY7UT2/nOKgnWL+6L3eFxfedxwd4AKo6I4e9TpdEyJCcA+Vjd9JWIp8d4o6ihXbil0UvIABdnZ/QQoQ+oJ3pvpDtVXRnZu8SnZBc/Q7iu6CQXWDYDh5BzwOIq3IGmAGrddGypOxK8tmTypP+rwGcWmVW9s7MnHz00kCspn/OK5cjIdehhaj1iZBivVxl68zaK7ITvbQluM9VFsI9D4P9k0F4HhZiyyK7CwXjR/IYCdukKxiiSdaH0tb0VaDkpz4veMWpbgRdK2AlI3hBoXE10x/yCBsOHpD3PSu1riCKtdZm66t0ShsQAhPIg8SjFD3lq/wgZEofFo6XD0vCFmpyUdVjP2QpbDjojUZkbBrRgU+qEWs5mbDV6lRadb6dsQ1DMaa9hAwvoQd0VZcrdA9FEG6wolHLb+FfjQfhDxik3IPML0Lsa+U6o4D8D7ctd2dRUMAstWotW6a0W8HQzNwLFp3LQQ80w/LR1bpDheYaO1fCx9rT1XDTanmdKqnzDrKiwKHeacgJogEJxRp9E51B0V+vfjdR3jZBW08b2sSXeg4blReEMfZGggdDL6VDfKHIb9uA9qvelymgLnM28cMbAGYEt/k/bNBY6QaDUnNdGNjqkD0G42ZmTvM7FXjg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(396003)(366004)(39860400002)(346002)(136003)(8936002)(16526019)(4326008)(6916009)(31686004)(186003)(2616005)(31696002)(2906002)(38100700002)(38350700002)(66476007)(66556008)(8676002)(6512007)(26005)(316002)(5660300002)(86362001)(66946007)(53546011)(6486002)(6506007)(7416002)(36756003)(478600001)(956004)(52116002)(44832011)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?OElwbS9Bc3RGc3RtQ1NaOTFDZVRRRm11em1Ib0R5b2ZuZ3d6UlA1anlOWWUz?=
- =?utf-8?B?cmFxMmdoZkNFTDBGRmxReEVYVGRHRms1QTVYRlZCVVpCWWpZZFZVRDFWTXha?=
- =?utf-8?B?WlBuWUd6N3Z0aXV1bjZac2hPMVhaYUgzRjM3TytHSjBDeEhFT1BZTzU1dzZk?=
- =?utf-8?B?Y2d3Mk04SDBrTnNEVTd4NVRCTUh4UFZWUUdZdGRwNkhwdzhXVVlmRWIvVzVT?=
- =?utf-8?B?eDNQd05MN2Q3T1pZVE5WK25WSWhPZ2ROeVJjUDRkWFF1ampzNWg2WTU4dWY2?=
- =?utf-8?B?NG9oT1ZIK0I2UHFXcFFaVFBDdGpsSHlvN3RpOFJsMER0QVhPamlpcnRSTy9P?=
- =?utf-8?B?UUNsbEJtTU9GcUVIOUlFRk44QlNKL1c2UkVaeko3cWoxTGF6RG5CMXpoK0p4?=
- =?utf-8?B?RDVWejRyOXZaMUhHRHh0bDIvTjAzRktQWjhEY3NreG00SDVMK29MY05vSFll?=
- =?utf-8?B?NFc2Q2RPZW9Ja2tYc3pwdkdlYlpmN2ZhNk5jR2lSdGZ1ZDRVRm9HY1dMY0lU?=
- =?utf-8?B?N0k3R3pKZUpIUHo0dTIwdXpPQ1MxZWs5QTl4V3NvMEUrTldKU1dYN0FiRGsz?=
- =?utf-8?B?blBxRzREWk9xdFlGRktBK1lsanVwanZ0SWtWMEQzTjB5OVBDUXNpYWVtR1hY?=
- =?utf-8?B?bjVGNWY2QnlZWEpqdE5uRUIwK21OVGZlWnY3WEZ3OEMrZlBaZlg5K2V4S09h?=
- =?utf-8?B?clVFS0JYVEo2MWMra3I0MXpVeUNKSTBGV1d0bVkvblBka1ErelhnVVVteWg0?=
- =?utf-8?B?c0UrYTBsZDUxS0RzQ0ZRNkFURGZMMlN3ZVV3VVUvUVhsbklVTHNhMldqTXND?=
- =?utf-8?B?WlpvdmdVM0NrN25Pd2FTWnhxR1RZalI4MGtaVzJFTzJUVm4zMkR4Yk5nSGM5?=
- =?utf-8?B?SHZBNEZpQWEzdGQyZG1QRjNZd0RmYjNBYk15eXpTUWsyUGQzUERDVm8vN0gv?=
- =?utf-8?B?UnNUeG84cEx4d3hDQytyellWVXlDOExFV3gzcmkxRnlERGp3SDBsNHUyMXEr?=
- =?utf-8?B?ZEhKTWpjZmVvSDNRWUg1T1NQSlAwOFFxUFo0eU5Udk0xVzZlM1ZpNXY1TUgw?=
- =?utf-8?B?cVFmZ3B6SktDS09xL1BrMGdkOGttSVZINmtWUTRpbjFpazFwQlMwRDRhMjV4?=
- =?utf-8?B?ZjdVUzdYL1YrU1RZdzhadGlOZmMzOGQ4c3F4Yms0VDlwQlBBK012cTNDYy9C?=
- =?utf-8?B?Z1NnRHNieUIrU2xHc1daN0YxaU1wcW52Nk5NZVZsdlFhNW54TXhFcGFleUVQ?=
- =?utf-8?B?QlZlY2FhVmliMXdqNlpSMkRCc2NqRW5tMlhnU0ZFOFc0NEJEVno3YmFiNTlD?=
- =?utf-8?B?ZTNtTzBWRmtRUlZqcmRyYzBib2k0bC8rVzJBK1E1RWo3TE5xTmQ4eGs5VU85?=
- =?utf-8?B?b3M3K0g5VHBzT0gySzhBOVRPTTdJL2ZPRFMxRnFxZW9rQjZGMzQzbldqZFp3?=
- =?utf-8?B?WkhOTVYyMmRCSzdadXZlNndtcCtGWUFBUTlNTC84MUh4TFZ5ZG8waHFCSzhS?=
- =?utf-8?B?aEQ2Sk4rNk9ISXNxZk40a0lOaVhCMjNxbWhmNENzbWxSWTFnckxwV2k1OHNn?=
- =?utf-8?B?dWVoVFhCcExPL21GVGh0NExrU093VDJqdTNHdlpXb1ZCTVRDU0tIQ1UyMzFw?=
- =?utf-8?B?SmY4eWZrN29IWWZvaVdReUk4R1BhODh0OS9hSFBXSzBhNjByTFlkcHkwMkFO?=
- =?utf-8?B?YWkwNVNKRktQZGtyRVhsVmtKZzk1TmpSaEJlOWdlSVk2ZGlkdkZzQ3BzL1VQ?=
- =?utf-8?Q?RVlFN0g+6fngVZlozNWyySarN6Z/G/ZPlrnsCOL?=
+X-Microsoft-Antispam-Message-Info: 923cgw1miYk635ZYxtJfU/BHcAheLiULj7ITQBoQqq+kXo68gBn5L9ZyfUFK3HtC9cyLLypMgMSXpt+1M9fAVkDUpDIJ6K0zRTUovsz+2quJb2cfOgr861Q4jlxaBJ+OEYuN7VmjqPN6XzgcJxgoBrql+1toHMvdEvxaajM6x69yLptIAewlru5Xg2ZrmshtW9hut/ypYgLXu5JhZSMEgo1jYFKo+Z03P5sA4JzG4XxUwjExkX/93OdM/vz5bY7H2jdYedeAj1Z8hThcKS0Oh+HD/hZ8KmpPV0FrAvCnEazLZXaxUdWuEB9LYIBYDoLIYKUhsPCUy9i7ve1TM1addzugtNrW+HeTUaAmaF8nVb/TaPkLwsga9hl9PMwAtBA1IIL/porXwrenY3xj/ItD/hJNTBzPwIVaBnxx6/rRcAN3NyqdtvIV4JkEKccqXcQzhKbX77bkssAtaJO1S8lkzangCELXyuUWYG1LZ62M3NcSkFWxwD37nPdN0nfgKwv8jeWKLNoJ0vKZXjXsOYKrs0uf/04NjkTZlcOWAZA6s7VSM6yiANM221JMkclEyPAle+0XTg558v8sWtfULmJRLQhr/ekzzQ16kgg1fY5+Ukn0/HksI4zdqUcItUfnKfIsOLXave3D0qFQsHP5QM6yeq56MAedI3Dd6uuG4tdewob4fEOPCp0udamYoxvhaDK3luhB4NRyr/FOhqo6FZx46crZcUlzEqUrj6ME7z9am8M=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(136003)(376002)(346002)(396003)(39860400002)(66476007)(66556008)(2906002)(8676002)(83380400001)(6916009)(86362001)(26005)(36756003)(52116002)(53546011)(6506007)(66946007)(4326008)(38350700002)(31686004)(6486002)(38100700002)(8936002)(478600001)(5660300002)(6512007)(7416002)(16526019)(44832011)(186003)(316002)(31696002)(956004)(2616005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?a0VqWnVFejZjdjZGUksrazJVa1pBTnlFdm1VM3NpSnZHbVZtTFd2RDY5QnRF?=
+ =?utf-8?B?Sk1oRmJFcDlmZ2VPcWpGZk5KSHl1dEMrdUxzeHB2c29YKzYybWRhdHFaRWdS?=
+ =?utf-8?B?aFgzMzZvWEc5U3UweVYwbDVvMDU1MURKQWttM1RxRG1OZ3NaYUtKM09XVU9v?=
+ =?utf-8?B?STNoNnVIby9QMzM4Tm52NzJDL0xvUmlTWVRydzVGNGpMU2dEVzBZa0VqT2xN?=
+ =?utf-8?B?b3Z2RTNzRkhXbXVrRGV3ODQ2NkhtODhIYjJ6YVJJZFp3VGJkWGxUeHZCbmJn?=
+ =?utf-8?B?WFdqQmROenphcUNTRU8yZDV4czNnRkJ4R2xLTmlHMmh4eU02UHdnaW5nUUZJ?=
+ =?utf-8?B?K283alVnUHVPTjNEeEt2S0U3dTBmdEp6ZnRibXJqZnVNVStYazVyY1lsZlFW?=
+ =?utf-8?B?QXdsUW9rcWlPWk9sUGxGK2xpbTBuVTZEL1VFQndPdzl4VHg0ZlhESjVGbEpF?=
+ =?utf-8?B?RWFkQmpyM1YxUVV4amRVVEpvdmxsNFd2c0U0NnNUZENvTnYxLzBuWWVlV1cr?=
+ =?utf-8?B?NHV3QWcxMXZJd3pYVzBMcGtDb042Qy9DaDFxNzFKckZ5ZnBKd0oxU0FRaDR6?=
+ =?utf-8?B?dDQ5a2hWdU5oOEx0TXFIeW1sRWZ3QTg4UGhPaGJyTGJRcklORE1ncTNnV3F1?=
+ =?utf-8?B?aU5zanZBTWdySEVRdkRyMzFqbzF2NzBISmtyZzRTejA2dHBvYXlZT3FmYnhK?=
+ =?utf-8?B?YjV6WTZyVDJLQ2dmTGdEUzZhWEEyVGxwYmtUbSt2RVFzdHlZQ3BUUUhlblB3?=
+ =?utf-8?B?U0VUeGFuNG5DOUg5ZDIybFNnWnhONk1acE1PamR3QmRKaVBlMHBWOU9ja1J3?=
+ =?utf-8?B?U2QxMFE1R29nc2F1b1lnT2EvTlprRmFaMVEyRTdtZUcrZG5hNWdzQTg0TzY4?=
+ =?utf-8?B?VzM2OWJFUzA4VWgzTmtXZGhsNlBJR2pMTEZXVWZXQWN6cTJWcUNrWmg1b1Jk?=
+ =?utf-8?B?MXpJZnhDdStCaDZoNlFuUzdTdnZzY1g3TGREVUJCRlYxaEdOTXpNeTc2bmRp?=
+ =?utf-8?B?anZ6SlhhTFJ3RjlJcURhdHdnRm9xZzh4VHRaLzR4OVJCZ3ZaRHM2dk9HQ1ZI?=
+ =?utf-8?B?cEQ0UTc3eEdGcTcwdXBZU0E2TU9HN0k1bCtYL2JodFdHSWxpdUtDcUlhazJJ?=
+ =?utf-8?B?cDFoZXpQMjhNdERwVU53d3BjUnVxdHN2NVdkTVJaVHN5NTR6WDBIcFYzbmlO?=
+ =?utf-8?B?M1YyYU8zd3NMcXlSY05YeEFTQ21naDgrbUF0ZmVyZU5jTUNEbWNLOUZMRlp0?=
+ =?utf-8?B?YVpOSjlVRnpiZjkvcS8vMEwydzhHNDN1ckkxaWY4WjNuZ2sxbG1ENkgzWDc3?=
+ =?utf-8?B?Zk1QRkV2dGUzbll0WkhrZUNmUGNRd1lTcExXUEVUQjZ0NVRrSkJjMURlVmtJ?=
+ =?utf-8?B?WUl5K1hML2QybG9EdEVJMm1Oa2M1UXJGNTJGVzk1NnVjdEJSNklwK1JGTy8w?=
+ =?utf-8?B?UlNOV0hOTFhaakxkMkxoS3QrdXJ4eDE0ODdMWStVbEE4UktkQURLSEgvZVY5?=
+ =?utf-8?B?YlgweCsrMndUcmN3TnF2OStYR2o0T0FQN1J1RmlmTDRWL054Z3Z2M2p5blpn?=
+ =?utf-8?B?N0FHaS9YWWcvNUFNUnVneUtyM0c1NG8vaEdOdERLazhSQlJiaWFSRW5Kcy9m?=
+ =?utf-8?B?K2JPWUtmSzVWZmltMlJWTFdMcmNDS1Fxc3BNQ080Tm5Gc2c2V3FxNGVkNCsy?=
+ =?utf-8?B?aHNqdjUvNTE2Y2xLWE9LVGR0UU9PNjFENmw4M3h2VFdZZEc2ODV4YjVHSkdD?=
+ =?utf-8?Q?Og3+TC5UCPGeI/Ls5Xcsr5h4yyKjCsNjydqf3V0?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 42f6cbc9-56bd-4a5d-00ea-08d920497d6e
+X-MS-Exchange-CrossTenant-Network-Message-Id: eed96b32-04f4-4148-8819-08d9204b02ed
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2021 13:23:46.1087
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2021 13:34:39.6011
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bKmAiEAi8llEU7OqPjJ45O9lfLkipUxafWOJo1X3o42R4YUyIlIO8XUj7gLWqT2MUbBVhiY+9pF/iO/5HOlqXQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2414
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9H5cv7FFL4NkHbfaM1MtzvXE/e2lErVAEFdhSg+xStuPDnBliUQIatBMMTd8nHrA4fYDfPaBHI73aM/cnLOBsA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4510
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 5/26/21 4:57 AM, Borislav Petkov wrote:
-> On Tue, May 25, 2021 at 09:47:24AM -0500, Brijesh Singh wrote:
->> Maybe I should have said, its not applicable in the decompressed path.
-> Aha, ok. How's that, ontop of yours:
+On 5/26/21 5:39 AM, Borislav Petkov wrote:
+> On Fri, Apr 30, 2021 at 07:16:10AM -0500, Brijesh Singh wrote:
+>> +static void pvalidate_pages(unsigned long vaddr, unsigned int npages, bool validate)
+>> +{
+>> +	unsigned long vaddr_end;
+>> +	int rc;
+>> +
+>> +	vaddr = vaddr & PAGE_MASK;
+>> +	vaddr_end = vaddr + (npages << PAGE_SHIFT);
+>> +
+>> +	while (vaddr < vaddr_end) {
+>> +		rc = pvalidate(vaddr, RMP_PG_SIZE_4K, validate);
+>> +		if (rc) {
+>> +			WARN(rc, "Failed to validate address 0x%lx ret %d", vaddr, rc);
+> WARN does return the condition it warned on, look at its definition.
+>
+> IOW, you can do (and btw e_fail is not needed either):
+>
+>                 rc = pvalidate(vaddr, RMP_PG_SIZE_4K, validate);
+>                 if (WARN(rc, "Failed to validate address 0x%lx ret %d", vaddr, rc))
+> 			sev_es_terminate(1, GHCB_TERM_PVALIDATE);
+>
+> Ditto for the other WARN.
 
-Sure, its fine with me. I will apply this change.
+Okay, I agree with comment, I will go through each code block and use
+the return value from the WARN().
 
--Birjesh
+..
+>> +	unsigned long npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
+>> +
+>> +	if (dec) {
+>> +		/* If the paddr needs to be accessed decrypted, make the page shared before memcpy. */
+>> +		early_snp_set_memory_shared((unsigned long)__va(paddr), paddr, npages);
+>> +
+>> +		memcpy(dst, src, sz);
+>> +
+>> +		/* Restore the page state after the memcpy. */
+>> +		early_snp_set_memory_private((unsigned long)__va(paddr), paddr, npages);
+>> +	} else {
+>> +		memcpy(dst, src, sz);
+>> +	}
+> Hmm, this function needs reorg. How about this:
+
+I think with your edits its looking similar to what I had in v1. In v1
+early_snp_set_memory_shared() was not doing sev_snp_active()  check
+whereas it does now.I didn't check the sev_snp_active() in this function
+but I agree that it can be reorg. I am good with your changes. thanks
 
 
-> ---
-> diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
-> index 07b9529d7d95..c9dd98b9dcdf 100644
-> --- a/arch/x86/boot/compressed/sev.c
-> +++ b/arch/x86/boot/compressed/sev.c
-> @@ -208,7 +208,7 @@ static bool early_setup_sev_es(void)
->  
->  	/* SEV-SNP guest requires the GHCB GPA must be registered */
->  	if (sev_snp_enabled())
-> -		snp_register_ghcb(__pa(&boot_ghcb_page));
-> +		snp_register_ghcb_early(__pa(&boot_ghcb_page));
->  
->  	return true;
->  }
-> diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
-> index 37a23c524f8c..7200f44d6b6b 100644
-> --- a/arch/x86/kernel/sev-shared.c
-> +++ b/arch/x86/kernel/sev-shared.c
-> @@ -81,7 +81,7 @@ static bool ghcb_get_hv_features(void)
->  	return true;
->  }
->  
-> -static void snp_register_ghcb(unsigned long paddr)
-> +static void snp_register_ghcb_early(unsigned long paddr)
->  {
->  	unsigned long pfn = paddr >> PAGE_SHIFT;
->  	u64 val;
-> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index 5544557d9fb6..144c20479cae 100644
-> --- a/arch/x86/kernel/sev.c
-> +++ b/arch/x86/kernel/sev.c
-> @@ -108,7 +108,18 @@ DEFINE_STATIC_KEY_FALSE(sev_es_enable_key);
->  void do_early_exception(struct pt_regs *regs, int trapnr);
->  
->  /* Defined in sev-shared.c */
-> -static void snp_register_ghcb(unsigned long paddr);
-> +static void snp_register_ghcb_early(unsigned long paddr);
-> +
-> +static void snp_register_ghcb(struct sev_es_runtime_data *data,
-> +			      unsigned long paddr)
-> +{
-> +	if (data->snp_ghcb_registered)
-> +		return;
-> +
-> +	snp_register_ghcb_early(paddr);
-> +
-> +	data->snp_ghcb_registered = true;
-> +}
->  
->  static void __init setup_vc_stacks(int cpu)
->  {
-> @@ -239,10 +250,8 @@ static __always_inline struct ghcb *sev_es_get_ghcb(struct ghcb_state *state)
->  	}
->  
->  	/* SEV-SNP guest requires that GHCB must be registered before using it. */
-> -	if (sev_snp_active() && !data->snp_ghcb_registered) {
-> -		snp_register_ghcb(__pa(ghcb));
-> -		data->snp_ghcb_registered = true;
-> -	}
-> +	if (sev_snp_active())
-> +		snp_register_ghcb(data, __pa(ghcb));
->  
->  	return ghcb;
->  }
-> @@ -681,7 +690,7 @@ static bool __init sev_es_setup_ghcb(void)
->  
->  	/* SEV-SNP guest requires that GHCB GPA must be registered */
->  	if (sev_snp_active())
-> -		snp_register_ghcb(__pa(&boot_ghcb_page));
-> +		snp_register_ghcb_early(__pa(&boot_ghcb_page));
->  
->  	return true;
->  }
+>
+> /*
+>  * When SNP is active, change the page state from private to shared before
+>  * copying the data from the source to destination and restore after the copy.
+>  * This is required because the source address is mapped as decrypted by the
+>  * caller of the routine.
+>  */
+> static inline void __init snp_memcpy(void *dst, void *src, size_t sz,
+>                                      unsigned long paddr, bool decrypt)
+> {
+>         unsigned long npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
+>
+>         if (!sev_snp_active() || !decrypt) {
+>                 memcpy(dst, src, sz);
+>                 return;
+> 	}
+>
+>         /*
+>          * If the paddr needs to be accessed decrypted, mark the page
+>          * shared in the RMP table before copying it.
+>          */
+>         early_snp_set_memory_shared((unsigned long)__va(paddr), paddr, npages);
+>
+>         memcpy(dst, src, sz);
+>
+>         /* Restore the page state after the memcpy. */
+>         early_snp_set_memory_private((unsigned long)__va(paddr), paddr, npages);
+> }
+>
 >
