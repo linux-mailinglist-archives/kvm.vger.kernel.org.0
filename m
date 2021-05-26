@@ -2,123 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 734C339118E
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 09:53:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA03539119B
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 09:54:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232310AbhEZHy3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 03:54:29 -0400
-Received: from mail-ua1-f52.google.com ([209.85.222.52]:34546 "EHLO
-        mail-ua1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbhEZHyZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 May 2021 03:54:25 -0400
-Received: by mail-ua1-f52.google.com with SMTP id x1so287942uau.1;
-        Wed, 26 May 2021 00:52:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DF4Qym5vi5urmQVozT7x89feYVqRBLX860c1iUhsLiU=;
-        b=YzPVqcY1EPZbaSCvOFGIgiiu8fiZbg23q0itrX0saQgR0RC2NdOe5weYcHR2TC1WUJ
-         tj/RqrjAY0a6KwH5mM0ge2ust62kc9dqk6VTt7lgY7WJdBRcjzTnqV1FpkzvSnZ9eqiD
-         Emgt/9b+ss1NCdhhnD4ZjNJ09d5pa7uuCZVOoLJziJMUBkwxW63KoYD+u3O5LosX/NaK
-         Pwo1oh4Lm9Rj+GJ2GvWtWJWE8NXaQHF6ffRl5VaEzohtx0VOqXHh7KSt6pAgauYvdJSH
-         tJlRD/4seN1HvODGVKrCm5zU6PTZmEVdfa3OxlwlTKtRwkddsrmAemtmeTaF1yGP0bf5
-         eK5A==
-X-Gm-Message-State: AOAM5324tQN9FLCLU9Z5CHomQvW2a/TzMdG8DOkLdnQCaYFN/khIz3tK
-        veEJqwooJkfHglTTPgcH3tSUYvWrl7LzytuVDMk=
-X-Google-Smtp-Source: ABdhPJxZSU7OcT6+Xw6agQLX8qT6DqdHwFEcdKKd93N3mCPT/ubOM0JdG4oGvbsyUb2+YK1Dc2xb1IMQ8nAWxqjy1SU=
-X-Received: by 2002:a1f:9505:: with SMTP id x5mr26222492vkd.6.1622015574205;
- Wed, 26 May 2021 00:52:54 -0700 (PDT)
+        id S231843AbhEZH4T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 03:56:19 -0400
+Received: from mga12.intel.com ([192.55.52.136]:32259 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229493AbhEZH4S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 May 2021 03:56:18 -0400
+IronPort-SDR: iTmoIPfQMq/5ummyGniLQzfMScKRBD+7dvtXQKWLugT+B3LKU8ozmrFONkTGVFh4Fx4eXUwbDh
+ cdXjz8PB/CqQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,9995"; a="182049407"
+X-IronPort-AV: E=Sophos;i="5.82,330,1613462400"; 
+   d="scan'208";a="182049407"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2021 00:54:28 -0700
+IronPort-SDR: 1eDK10l4aELIeN+e7qSF++9Ypk821KL2VW5dlFw7M+S5sV4oFNOL/GUJ6THLMWqdrq16tEHfLY
+ TNHwFZgOmtRg==
+X-IronPort-AV: E=Sophos;i="5.82,330,1613462400"; 
+   d="scan'208";a="476818609"
+Received: from unknown (HELO [10.238.130.158]) ([10.238.130.158])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2021 00:54:26 -0700
+Subject: Re: [PATCH RFC 7/7] kvm: x86: AMX XCR0 support for guest
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jing2.liu@intel.com
+References: <20210207154256.52850-1-jing2.liu@linux.intel.com>
+ <20210207154256.52850-8-jing2.liu@linux.intel.com>
+ <YKwgdBTqiyuItL6b@google.com>
+From:   "Liu, Jing2" <jing2.liu@linux.intel.com>
+Message-ID: <43eb3317-4101-0786-57f4-f35e7ec094eb@linux.intel.com>
+Date:   Wed, 26 May 2021 15:54:23 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-References: <20210330145430.996981-1-maz@kernel.org> <20210330145430.996981-8-maz@kernel.org>
- <CAMuHMdWd5261ti-zKsroFLvWs0abaWa7G4DKefgPwFb3rEjnNw@mail.gmail.com> <6c522f8116f54fa6f23a2d217d966c5a@kernel.org>
-In-Reply-To: <6c522f8116f54fa6f23a2d217d966c5a@kernel.org>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Wed, 26 May 2021 09:52:42 +0200
-Message-ID: <CAMuHMdWzBqLVOVn_z8S2H-x-kL+DfOsM5mDb_D8OKsyRJtKpdA@mail.gmail.com>
-Subject: Re: [PATCH v19 7/7] ptp: arm/arm64: Enable ptp_kvm for arm/arm64
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     jianyong.wu@arm.com, netdev <netdev@vger.kernel.org>,
-        Yangbo Lu <yangbo.lu@nxp.com>,
-        John Stultz <john.stultz@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Paolo Bonzini <pbonzini@redhat.com>, seanjc@google.com,
-        Richard Cochran <richardcochran@gmail.com>,
-        Mark Rutland <Mark.Rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Andre Przywara <Andre.Przywara@arm.com>,
-        Steven Price <steven.price@arm.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        kvmarm@lists.cs.columbia.edu, KVM list <kvm@vger.kernel.org>,
-        Steve Capper <Steve.Capper@arm.com>, justin.he@arm.com,
-        Android Kernel Team <kernel-team@android.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <YKwgdBTqiyuItL6b@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
 
-On Tue, May 11, 2021 at 11:13 AM Marc Zyngier <maz@kernel.org> wrote:
-> On 2021-05-11 10:07, Geert Uytterhoeven wrote:
-> > On Tue, Mar 30, 2021 at 4:56 PM Marc Zyngier <maz@kernel.org> wrote:
-> >> From: Jianyong Wu <jianyong.wu@arm.com>
-> >>
-> >> Currently, there is no mechanism to keep time sync between guest and
-> >> host
-> >> in arm/arm64 virtualization environment. Time in guest will drift
-> >> compared
-> >> with host after boot up as they may both use third party time sources
-> >> to correct their time respectively. The time deviation will be in
-> >> order
-> >> of milliseconds. But in some scenarios,like in cloud environment, we
-> >> ask
-> >> for higher time precision.
-> >>
-> >> kvm ptp clock, which chooses the host clock source as a reference
-> >> clock to sync time between guest and host, has been adopted by x86
-> >> which takes the time sync order from milliseconds to nanoseconds.
-> >>
-> >> This patch enables kvm ptp clock for arm/arm64 and improves clock sync
-> >> precision
-> >> significantly.
-> >
-> >> --- a/drivers/ptp/Kconfig
-> >> +++ b/drivers/ptp/Kconfig
-> >> @@ -108,7 +108,7 @@ config PTP_1588_CLOCK_PCH
-> >>  config PTP_1588_CLOCK_KVM
-> >>         tristate "KVM virtual PTP clock"
-> >>         depends on PTP_1588_CLOCK
-> >> -       depends on KVM_GUEST && X86
-> >> +       depends on (KVM_GUEST && X86) || (HAVE_ARM_SMCCC_DISCOVERY &&
-> >> ARM_ARCH_TIMER)
-> >
-> > Why does this not depend on KVM_GUEST on ARM?
-> > I.e. shouldn't the dependency be:
-> >
-> >     KVM_GUEST && (X86 || (HAVE_ARM_SMCCC_DISCOVERY && ARM_ARCH_TIMER))
-> >
-> > ?
+
+On 5/25/2021 5:53 AM, Sean Christopherson wrote:
+> On Sun, Feb 07, 2021, Jing Liu wrote:
+>> Two XCR0 bits are defined for AMX to support XSAVE mechanism.
+>> Bit 17 is for tilecfg and bit 18 is for tiledata.
+> This fails to explain why they must be set in tandem.
+The spec says,
+"executing the XSETBV instruction causes a general-protection fault 
+(#GP) if ECX=0
+and EAX[17] ≠ EAX[18] (XTILECFG and XTILEDATA must be enabled together). 
+This
+implies that the value of XCR0[17:18] is always either 00b or 11b."
+
+I can add more to changelog if this is reasonable.
+>   Out of curisoity, assuming
+> they do indeed need to be set/cleared as a pair, what's the point of having two
+> separate bits?
+What I can see is to separate different states and mirror by XFD which 
+can set
+bits separately.
+
+Thanks,
+Jing
+
 >
-> arm/arm64 do not select KVM_GUEST. Any kernel can be used for a guest,
-> and KVM/arm64 doesn't know about this configuration symbol.
+>> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+>> ---
+>>   arch/x86/kvm/x86.c | 8 +++++++-
+>>   1 file changed, 7 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index bfbde877221e..f1c5893dee18 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -189,7 +189,7 @@ static struct kvm_user_return_msrs __percpu *user_return_msrs;
+>>   #define KVM_SUPPORTED_XCR0     (XFEATURE_MASK_FP | XFEATURE_MASK_SSE \
+>>   				| XFEATURE_MASK_YMM | XFEATURE_MASK_BNDREGS \
+>>   				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
+>> -				| XFEATURE_MASK_PKRU)
+>> +				| XFEATURE_MASK_PKRU | XFEATURE_MASK_XTILE)
+>>   
+>>   u64 __read_mostly host_efer;
+>>   EXPORT_SYMBOL_GPL(host_efer);
+>> @@ -946,6 +946,12 @@ static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
+>>   		if ((xcr0 & XFEATURE_MASK_AVX512) != XFEATURE_MASK_AVX512)
+>>   			return 1;
+>>   	}
+>> +
+>> +	if (xcr0 & XFEATURE_MASK_XTILE) {
+>> +		if ((xcr0 & XFEATURE_MASK_XTILE) != XFEATURE_MASK_XTILE)
+>> +			return 1;
+>> +	}
+>> +
+>>   	vcpu->arch.xcr0 = xcr0;
+>>   
+>>   	if ((xcr0 ^ old_xcr0) & XFEATURE_MASK_EXTEND)
+>> -- 
+>> 2.18.4
+>>
 
-OK.
-
-Does PTP_1588_CLOCK_KVM need to default to yes?
-Perhaps only on X86, to maintain the status quo?
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
