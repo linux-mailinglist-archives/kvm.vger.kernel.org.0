@@ -2,88 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B5E27391E21
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 19:28:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F3E1B391E25
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 19:29:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233997AbhEZR3h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 13:29:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40934 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232922AbhEZR3g (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 May 2021 13:29:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622050084;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=p6XxipKydzrcITdhyVZGRf71Ytpka3MoF9cMJA3KZGw=;
-        b=iiucR6NUd5TUs634DJKMV+G8LiLlErAzJXT8jzF38TOWxxYSLip4NwuVC6lJHUhaWsq2r3
-        S9/xCNO4rc0oQXKKVWDxxZyOBvan8pthtU17AsCD2yEesHlGCcaucskO6Eg9UJR6fOeVSb
-        9maDY883/DlZY2XyLtEM+ciFwuopfAo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-95-0vfgcZ5zMTGHMMyieQGBJA-1; Wed, 26 May 2021 13:28:01 -0400
-X-MC-Unique: 0vfgcZ5zMTGHMMyieQGBJA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCD64800C60;
-        Wed, 26 May 2021 17:27:59 +0000 (UTC)
-Received: from [10.36.112.15] (ovpn-112-15.ams2.redhat.com [10.36.112.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0BABD19D9D;
-        Wed, 26 May 2021 17:27:54 +0000 (UTC)
-Subject: Re: [PATCH 1/3] vfio/platform: fix module_put call in error flow
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>, jgg@nvidia.com,
-        cohuck@redhat.com, kvm@vger.kernel.org, alex.williamson@redhat.com
-Cc:     oren@nvidia.com
-References: <20210518192133.59195-1-mgurtovoy@nvidia.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <e37f6e0f-4310-31eb-4da8-0d010a8f7cdb@redhat.com>
-Date:   Wed, 26 May 2021 19:27:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S234149AbhEZRbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 13:31:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46400 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234072AbhEZRbD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 May 2021 13:31:03 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9569FC061574
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 10:29:31 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id t11so1216032pjm.0
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 10:29:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=zxcwJdMitJagdoUHLIPfOd7FzZjdzJOPb4YTYoW3nPI=;
+        b=u+mlRBqhXwN50NmfvFgzDxZcIXXTbUCbiXZlJ6c7lVV8C3cSrP1Pv9bnx1BLDEx1fq
+         cSu6u5D7AyDjkdFFLI822oe/1vnSDeyYLeRxwVfFQ2kFIkglBHBGcEhpG5eNQmv/mD4D
+         kFMPSa5kH7eNQOiVdcfJ9iGdWiYl6KKvWZpHHRwo8SO5BZwu2X0vBULg2A+zr/RicDAZ
+         IYnQ4SY8ymoobptF0GphGKMefjjWEbr63C/hqbo16jannOYLunu5VcUyntmwdS4A4sIj
+         +xcgq1sL0xw9G57DAPlrF+mz7nm6YBTpEzohppL4CLZpF96BZHmBSVeQoNy1Yx3c/5rU
+         k9eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=zxcwJdMitJagdoUHLIPfOd7FzZjdzJOPb4YTYoW3nPI=;
+        b=smKAGpFsK7ygH0xRI2bNIgbrMG5X6Tl854iWS4t56CHJov0HtCvF3gm3tfv7zp+hQn
+         D3vDYGBDzWyCVh2proQi1AQtTf+Wz2xvNYiHV9zQjCIeUgFP2BmxSawuyECrQVDK0dPt
+         r1zCpOEmlN3LL9tPSOwWQtiaoxoFN+4PWLdsvOWaSA1b0GlGYCVa70JOlukX40x7okbx
+         LSlZxHsDcyll0QdAthi6ve0T4hzCB/GVrm5pV13tDdf23jLdW1sbB5QC2IW3RHquAoAE
+         Jmex+j1ncIiZhLjuEPJ1YyF7ozfjwniMK5IbqqS1c6QUMocZ0DG+7V7wI5wszJK6eeT5
+         4Ckw==
+X-Gm-Message-State: AOAM533m+sGwFLOEltk0Nj+A2eak7vcCqJMsDl5y+Brkn8NbpwKoLV+0
+        3EAe9akF9cHb0vDg1tBqj6nxhDEWPPk0Pg==
+X-Google-Smtp-Source: ABdhPJwDUUoDCsXbotSL+sh3sDSo0nHTpVUko/FtHZT4BdWgCasfYVpF393baQS8jU4/ovF0p5z/Lg==
+X-Received: by 2002:a17:902:6501:b029:ef:8518:a25a with SMTP id b1-20020a1709026501b02900ef8518a25amr37122355plk.64.1622050171045;
+        Wed, 26 May 2021 10:29:31 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id t19sm16669158pfg.70.2021.05.26.10.29.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 May 2021 10:29:30 -0700 (PDT)
+Date:   Wed, 26 May 2021 17:29:26 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Fix comment mentioning skip_4k
+Message-ID: <YK6FdtswnFklJuAO@google.com>
+References: <20210526163227.3113557-1-dmatlack@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210518192133.59195-1-mgurtovoy@nvidia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210526163227.3113557-1-dmatlack@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Max,
+Put version information in the subject, otherwise it's not always obvious which
+patch you want to be accepted, e.g.
 
-On 5/18/21 9:21 PM, Max Gurtovoy wrote:
-> The ->parent_module is the one that use in try_module_get. It should
-> also be the one the we use in module_put during vfio_platform_open().
+  [PATCH v2] KVM: x86/mmu: Fix comment mentioning skip_4k
+
+On Wed, May 26, 2021, David Matlack wrote:
+> This comment was left over from a previous version of the patch that
+> introduced wrprot_gfn_range, when skip_4k was passed in instead of
+> min_level.
 > 
-> Fixes: 32a2d71c4e808 ("vfio: platform: introduce vfio-platform-base module")
-> 
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-Acked-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: David Matlack <dmatlack@google.com>
 
-Thanks!
-
-Eric
-
-> ---
->  drivers/vfio/platform/vfio_platform_common.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
-> index 361e5b57e369..470fcf7dac56 100644
-> --- a/drivers/vfio/platform/vfio_platform_common.c
-> +++ b/drivers/vfio/platform/vfio_platform_common.c
-> @@ -291,7 +291,7 @@ static int vfio_platform_open(struct vfio_device *core_vdev)
->  	vfio_platform_regions_cleanup(vdev);
->  err_reg:
->  	mutex_unlock(&driver_lock);
-> -	module_put(THIS_MODULE);
-> +	module_put(vdev->parent_module);
->  	return ret;
->  }
->  
-> 
-
+Reviewed-by: Sean Christopherson <seanjc@google.com> 
