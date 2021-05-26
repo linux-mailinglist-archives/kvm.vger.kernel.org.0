@@ -2,165 +2,258 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD42C391DBD
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 19:20:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A312C391E08
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 19:23:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233997AbhEZRWH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 13:22:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32700 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232386AbhEZRWG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 May 2021 13:22:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622049634;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=g++RKsuvKjaEKQu5RfO6EzgIJ6tRl7iozPHy4sMKPPs=;
-        b=Vwerphx5+VCywcXY2K1K+ZDZ4dySQkmP/dw54gXwgFI3v7cldt2tezijiqF7O7ITUPDKf7
-        WMiG0SwvxhXQNdGsF3hRbWHdoSIx++TaQn6y6vNaVfeRF3NeOZcvv/cpoGYuZ7ERDobAtm
-        J7xBPATsmvB5loW6eQNCf0Hl+5KNHz4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-587-uIV2pHOfOLqbJdhhZTkNpg-1; Wed, 26 May 2021 13:20:28 -0400
-X-MC-Unique: uIV2pHOfOLqbJdhhZTkNpg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16B1AFC88;
-        Wed, 26 May 2021 17:20:27 +0000 (UTC)
-Received: from fuller.cnet (ovpn-112-7.gru2.redhat.com [10.97.112.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DB8B0136F5;
-        Wed, 26 May 2021 17:20:18 +0000 (UTC)
-Received: by fuller.cnet (Postfix, from userid 1000)
-        id 528404172ED4; Wed, 26 May 2021 14:20:14 -0300 (-03)
-Date:   Wed, 26 May 2021 14:20:14 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Pei Zhang <pezhang@redhat.com>
-Subject: [patch 3/3 V2] KVM: VMX: update vcpu posted-interrupt descriptor
- when assigning device
-Message-ID: <20210526172014.GA29007@fuller.cnet>
-References: <20210525134115.135966361@redhat.com>
- <20210525134321.345140341@redhat.com>
- <YK1WHWsA7XuwTQR3@t490s>
+        id S234461AbhEZRZG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 13:25:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44912 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234713AbhEZRYk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 May 2021 13:24:40 -0400
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5404C06138C
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 10:23:08 -0700 (PDT)
+Received: by mail-io1-xd32.google.com with SMTP id z24so1835948ioi.3
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 10:23:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xXqdvXVIi2BTMQVuMR+ERicAWv//Z2jtTIRswIPhlJw=;
+        b=iPH7/QUqg68fUwmfweOJTajKopapSuUJfYXJNUijF69hNFm+WlgN18exJoYiY5B0mS
+         mmnvAUZDFfvLLZZ3dENcidj3nRm3xsuoSuS/EPm1rg5pKwVEtAlHRtW4t1P30AjYUpKM
+         IKTKlFifjr+pJh1dTCOP5d1Txp8H5N1alicmb5e3rAfl25+pL8I8hYC54DXklUcJxZO+
+         huTUEDxWacMx7+PebG9S/8UzwOVKajzbocyvb9t0tY6BirXG9+4s5H9eXzfvarrCK7bB
+         yBzTSYH9Rh4s1KuFYLCjx3R+qTbJS5t4J/LWHJPFdHHc7KaZGZvhBxn0nJ0x0au73u94
+         kMIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xXqdvXVIi2BTMQVuMR+ERicAWv//Z2jtTIRswIPhlJw=;
+        b=oxKFDCluZxBsb4hr7JVaGpebuf8iCdxAth9Sb3JmLUS+25u/21QRqm+vnsdnRIlnL1
+         CuYqFAAUnhogYoO3awpFgo+NxbaUUCf17atxjcovtK1qzWzwqwv3f9fvPHyN/S6Bo4C/
+         z9KC+GItWcfWvBiSaD7tBoY3sGm3TdTe0+HXpcLwtNjRn6AQl06k/NTiJrCUVn78qMXz
+         fuyPn9ZjPKiUAi0N9fYoIkQDqNDg5uepkcQC0xCiaI/7kYtv/4hDFHBOVyyYl7dXVxSC
+         1TVdgws/hXWdgfUX49ZYtRR9AnzFAVROu84ksNgMqSO+qFHRRVYXtyCcJlmaIKttZtLV
+         fq8g==
+X-Gm-Message-State: AOAM530Uc4s2hLWQCeYeIMJmebFXP2l0NZR7H494uwdebc/QG1UtjYFd
+        vKUJsI6IbDUKmaHEgD3eOrE27wUd19YW38CbYeVAFw==
+X-Google-Smtp-Source: ABdhPJxaM0WqpetiyIHXAqAdGubPPZineHyZfo4UwsQQru0bHgfLF4fEQaD15VcN35CYzCMHDsqz/3kK7ndS2K8Cxz0=
+X-Received: by 2002:a6b:3b92:: with SMTP id i140mr25430682ioa.23.1622049787744;
+ Wed, 26 May 2021 10:23:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YK1WHWsA7XuwTQR3@t490s>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+References: <20210519200339.829146-1-axelrasmussen@google.com>
+ <20210519200339.829146-9-axelrasmussen@google.com> <CALzav=eGi2_TBx=LDYpg6hRi8JabGPsHLC8M5-Vzf8DJHomSVQ@mail.gmail.com>
+In-Reply-To: <CALzav=eGi2_TBx=LDYpg6hRi8JabGPsHLC8M5-Vzf8DJHomSVQ@mail.gmail.com>
+From:   Axel Rasmussen <axelrasmussen@google.com>
+Date:   Wed, 26 May 2021 10:22:32 -0700
+Message-ID: <CAJHvVcjFJT8E35nhiNCLzT=f3DsPaWu1RjJNQqPWK9zspoBnSw@mail.gmail.com>
+Subject: Re: [PATCH v2 08/10] KVM: selftests: create alias mappings when using
+ shared memory
+To:     David Matlack <dmatlack@google.com>
+Cc:     Aaron Lewis <aaronlewis@google.com>,
+        Alexander Graf <graf@amazon.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Ben Gardon <bgardon@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jacob Xu <jacobhxu@google.com>,
+        Makarand Sonare <makarandsonare@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+I applied this change on top of kvm/master and tested it, and indeed
+it compiles and works correctly.
 
-For VMX, when a vcpu enters HLT emulation, pi_post_block will:
+Paolo, feel free to take this with a:
 
-1) Add vcpu to per-cpu list of blocked vcpus.
+Reviewed-by: Axel Rasmussen <axelrasmussen@google.com>
 
-2) Program the posted-interrupt descriptor "notification vector" 
-to POSTED_INTR_WAKEUP_VECTOR
+Or alternatively if you prefer I'm happy to send it as a real
+git-send-email patch.
 
-With interrupt remapping, an interrupt will set the PIR bit for the 
-vector programmed for the device on the CPU, test-and-set the 
-ON bit on the posted interrupt descriptor, and if the ON bit is clear
-generate an interrupt for the notification vector.
-
-This way, the target CPU wakes upon a device interrupt and wakes up
-the target vcpu.
-
-Problem is that pi_post_block only programs the notification vector
-if kvm_arch_has_assigned_device() is true. Its possible for the
-following to happen:
-
-1) vcpu V HLTs on pcpu P, kvm_arch_has_assigned_device is false,
-notification vector is not programmed
-2) device is assigned to VM
-3) device interrupts vcpu V, sets ON bit
-(notification vector not programmed, so pcpu P remains in idle)
-4) vcpu 0 IPIs vcpu V (in guest), but since pi descriptor ON bit is set,
-kvm_vcpu_kick is skipped
-5) vcpu 0 busy spins on vcpu V's response for several seconds, until
-RCU watchdog NMIs all vCPUs.
-
-To fix this, use the start_assignment kvm_x86_ops callback to kick
-vcpus out of the halt loop, so the notification vector is 
-properly reprogrammed to the wakeup vector.
-
-Reported-by: Pei Zhang <pezhang@redhat.com>
-Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
-
-For build error:
-Reported-by: kernel test robot <lkp@intel.com>
-
----
-
-v2: Add brief comment to vmx_pi_start_assignment (Peter Xu).
-    Export kvm_make_all_cpus_request (kernel test robot).
-
-
-Index: linux-2.6/arch/x86/kvm/vmx/posted_intr.c
-===================================================================
---- linux-2.6.orig/arch/x86/kvm/vmx/posted_intr.c
-+++ linux-2.6/arch/x86/kvm/vmx/posted_intr.c
-@@ -238,6 +238,20 @@ bool pi_has_pending_interrupt(struct kvm
- 
- 
- /*
-+ * Bail out of the block loop if the VM has an assigned
-+ * device, but the blocking vCPU didn't reconfigure the
-+ * PI.NV to the wakeup vector, i.e. the assigned device
-+ * came along after the initial check in pi_pre_block().
-+ */
-+void vmx_pi_start_assignment(struct kvm *kvm)
-+{
-+	if (!irq_remapping_cap(IRQ_POSTING_CAP))
-+		return;
-+
-+	kvm_make_all_cpus_request(kvm, KVM_REQ_UNBLOCK);
-+}
-+
-+/*
-  * pi_update_irte - set IRTE for Posted-Interrupts
-  *
-  * @kvm: kvm
-Index: linux-2.6/arch/x86/kvm/vmx/posted_intr.h
-===================================================================
---- linux-2.6.orig/arch/x86/kvm/vmx/posted_intr.h
-+++ linux-2.6/arch/x86/kvm/vmx/posted_intr.h
-@@ -95,5 +95,6 @@ void __init pi_init_cpu(int cpu);
- bool pi_has_pending_interrupt(struct kvm_vcpu *vcpu);
- int pi_update_irte(struct kvm *kvm, unsigned int host_irq, uint32_t guest_irq,
- 		   bool set);
-+void vmx_pi_start_assignment(struct kvm *kvm);
- 
- #endif /* __KVM_X86_VMX_POSTED_INTR_H */
-Index: linux-2.6/arch/x86/kvm/vmx/vmx.c
-===================================================================
---- linux-2.6.orig/arch/x86/kvm/vmx/vmx.c
-+++ linux-2.6/arch/x86/kvm/vmx/vmx.c
-@@ -7732,6 +7732,7 @@ static struct kvm_x86_ops vmx_x86_ops __
- 	.nested_ops = &vmx_nested_ops,
- 
- 	.update_pi_irte = pi_update_irte,
-+	.start_assignment = vmx_pi_start_assignment,
- 
- #ifdef CONFIG_X86_64
- 	.set_hv_timer = vmx_set_hv_timer,
-Index: linux-2.6/virt/kvm/kvm_main.c
-===================================================================
---- linux-2.6.orig/virt/kvm/kvm_main.c
-+++ linux-2.6/virt/kvm/kvm_main.c
-@@ -307,6 +307,7 @@ bool kvm_make_all_cpus_request(struct kv
- {
- 	return kvm_make_all_cpus_request_except(kvm, req, NULL);
- }
-+EXPORT_SYMBOL_GPL(kvm_make_all_cpus_request);
- 
- #ifndef CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
- void kvm_flush_remote_tlbs(struct kvm *kvm)
-
+On Tue, May 25, 2021 at 4:50 PM David Matlack <dmatlack@google.com> wrote:
+>
+> On Wed, May 19, 2021 at 1:04 PM Axel Rasmussen <axelrasmussen@google.com> wrote:
+> >
+> > When a memory region is added with a src_type specifying that it should
+> > use some kind of shared memory, also create an alias mapping to the same
+> > underlying physical pages.
+> >
+> > And, add an API so tests can get access to these alias addresses.
+> > Basically, for a guest physical address, let us look up the analogous
+> > host *alias* address.
+> >
+> > In a future commit, we'll modify the demand paging test to take
+> > advantage of this to exercise UFFD minor faults. The idea is, we
+> > pre-fault the underlying pages *via the alias*. When the *guest*
+> > faults, it gets a "minor" fault (PTEs don't exist yet, but a page is
+> > already in the page cache). Then, the userfaultfd theads can handle the
+> > fault: they could potentially modify the underlying memory *via the
+> > alias* if they wanted to, and then they install the PTEs and let the
+> > guest carry on via a UFFDIO_CONTINUE ioctl.
+> >
+> > Reviewed-by: Ben Gardon <bgardon@google.com>
+> > Signed-off-by: Axel Rasmussen <axelrasmussen@google.com>
+> > ---
+> >  .../testing/selftests/kvm/include/kvm_util.h  |  1 +
+> >  tools/testing/selftests/kvm/lib/kvm_util.c    | 51 +++++++++++++++++++
+> >  .../selftests/kvm/lib/kvm_util_internal.h     |  2 +
+> >  3 files changed, 54 insertions(+)
+> >
+> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> > index a8f022794ce3..0624f25a6803 100644
+> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> > @@ -146,6 +146,7 @@ void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+> >  void *addr_gpa2hva(struct kvm_vm *vm, vm_paddr_t gpa);
+> >  void *addr_gva2hva(struct kvm_vm *vm, vm_vaddr_t gva);
+> >  vm_paddr_t addr_hva2gpa(struct kvm_vm *vm, void *hva);
+> > +void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t gpa);
+> >
+> >  /*
+> >   * Address Guest Virtual to Guest Physical
+> > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > index e4a8d0c43c5e..0b88d1bbc1e0 100644
+> > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > @@ -811,6 +811,19 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+> >
+> >         /* Add to linked-list of memory regions. */
+> >         list_add(&region->list, &vm->userspace_mem_regions);
+> > +
+> > +       /* If shared memory, create an alias. */
+> > +       if (region->fd >= 0) {
+> > +               region->mmap_alias = mmap(NULL, region->mmap_size,
+> > +                                         PROT_READ | PROT_WRITE,
+> > +                                         vm_mem_backing_src_alias(src_type)->flag,
+> > +                                         region->fd, 0);
+> > +               TEST_ASSERT(region->mmap_alias != MAP_FAILED,
+> > +                           "mmap of alias failed, errno: %i", errno);
+> > +
+> > +               /* Align host alias address */
+> > +               region->host_alias = align(region->mmap_alias, alignment);
+> > +       }
+> >  }
+> >
+> >  /*
+> > @@ -1239,6 +1252,44 @@ vm_paddr_t addr_hva2gpa(struct kvm_vm *vm, void *hva)
+> >         return -1;
+> >  }
+> >
+> > +/*
+> > + * Address VM physical to Host Virtual *alias*.
+> > + *
+> > + * Input Args:
+> > + *   vm - Virtual Machine
+> > + *   gpa - VM physical address
+> > + *
+> > + * Output Args: None
+> > + *
+> > + * Return:
+> > + *   Equivalent address within the host virtual *alias* area, or NULL
+> > + *   (without failing the test) if the guest memory is not shared (so
+> > + *   no alias exists).
+> > + *
+> > + * When vm_create() and related functions are called with a shared memory
+> > + * src_type, we also create a writable, shared alias mapping of the
+> > + * underlying guest memory. This allows the host to manipulate guest memory
+> > + * without mapping that memory in the guest's address space. And, for
+> > + * userfaultfd-based demand paging, we can do so without triggering userfaults.
+> > + */
+> > +void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t gpa)
+> > +{
+> > +       struct userspace_mem_region *region;
+> > +
+> > +       list_for_each_entry(region, &vm->userspace_mem_regions, list) {
+>
+> This patch fails to compile on top of with db0670ce3361 ("KVM:
+> selftests: Keep track of memslots more efficiently").
+>
+> This can be reproduced by checking out kvm/master and running `make -C
+> tools/testing/selftests/kvm`.
+>
+> The following diff fixes the compilation error but I did not have time
+> to test it yet:
+>
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c
+> b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index c98db1846e1b..28e528c19d28 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -1374,19 +1374,17 @@ vm_paddr_t addr_hva2gpa(struct kvm_vm *vm, void *hva)
+>  void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t gpa)
+>  {
+>         struct userspace_mem_region *region;
+> +       uintptr_t offset;
+>
+> -       list_for_each_entry(region, &vm->userspace_mem_regions, list) {
+> -               if (!region->host_alias)
+> -                       continue;
+> +       region = userspace_mem_region_find(vm, gpa, gpa);
+> +       if (!region)
+> +               return NULL;
+>
+> -               if ((gpa >= region->region.guest_phys_addr)
+> -                       && (gpa <= (region->region.guest_phys_addr
+> -                               + region->region.memory_size - 1)))
+> -                       return (void *) ((uintptr_t) region->host_alias
+> -                               + (gpa - region->region.guest_phys_addr));
+> -       }
+> +       if (!region->host_alias)
+> +               return NULL;
+>
+> -       return NULL;
+> +       offset = gpa - region->region.guest_phys_addr;
+> +       return (void *) ((uintptr_t) region->host_alias + offset);
+>  }
+>
+>  /*
+>
+>
+>
+> > +               if (!region->host_alias)
+> > +                       continue;
+> > +
+> > +               if ((gpa >= region->region.guest_phys_addr)
+> > +                       && (gpa <= (region->region.guest_phys_addr
+> > +                               + region->region.memory_size - 1)))
+> > +                       return (void *) ((uintptr_t) region->host_alias
+> > +                               + (gpa - region->region.guest_phys_addr));
+> > +       }
+> > +
+> > +       return NULL;
+> > +}
+> > +
+> >  /*
+> >   * VM Create IRQ Chip
+> >   *
+> > diff --git a/tools/testing/selftests/kvm/lib/kvm_util_internal.h b/tools/testing/selftests/kvm/lib/kvm_util_internal.h
+> > index 91ce1b5d480b..a25af33d4a9c 100644
+> > --- a/tools/testing/selftests/kvm/lib/kvm_util_internal.h
+> > +++ b/tools/testing/selftests/kvm/lib/kvm_util_internal.h
+> > @@ -16,7 +16,9 @@ struct userspace_mem_region {
+> >         int fd;
+> >         off_t offset;
+> >         void *host_mem;
+> > +       void *host_alias;
+> >         void *mmap_start;
+> > +       void *mmap_alias;
+> >         size_t mmap_size;
+> >         struct list_head list;
+> >  };
+> > --
+> > 2.31.1.751.gd2f1c929bd-goog
+> >
