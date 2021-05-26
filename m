@@ -2,279 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F991391F2B
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 20:31:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 07BBD391F6A
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 20:45:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235556AbhEZSd1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 14:33:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23895 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235539AbhEZSd0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 May 2021 14:33:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622053914;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=94syvOS2iq38iWgkmR3FPLbAVi2GFd1p/dJkRiGRhzE=;
-        b=eYyQfHe51CTv8OvkyM9yBMtuII2JFa60adtTursqTIMN0VsYxHnilOnLCc8jRKyull4iRm
-        DystXtF+O8qPaLM7A/Yy2n1lUdnRDLhjr2sCOGO1YDSimKE1eQulisJGq/zyEORNFpYyhv
-        aqK9U2jQrbwMWeudJUCo4UZb7zudKDk=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-3B0ARhmXNhKu7lUhRelaWA-1; Wed, 26 May 2021 14:31:52 -0400
-X-MC-Unique: 3B0ARhmXNhKu7lUhRelaWA-1
-Received: by mail-ej1-f69.google.com with SMTP id dt6-20020a170906b786b02903dc2a6918d6so747461ejb.1
-        for <kvm@vger.kernel.org>; Wed, 26 May 2021 11:31:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=94syvOS2iq38iWgkmR3FPLbAVi2GFd1p/dJkRiGRhzE=;
-        b=eJHbLmD2LOoASV7G7UHKby1vaQ1Mlqo/R1dktdu6EQrDke0qDaXwgNtqBVOuEj7T+7
-         0E6f5vfFGimI3ZVzqugPM2XmXHXgbHb8psFFaXeYVsjjavX4HVKoj3vnPCm8gfmb/Erw
-         jJVE67hHZXJvBaCgycgc9GaHvSHPZIcUr9fO6DvYPGtB3V/TXu6DC7c15YvKeYrcHSnZ
-         zvUaWoa012Qr4ngTaaNdFQCJ49Tie266CpARsqB4kdmcR88jivrL6mmoJlJT/PLNXY1s
-         +00s+wqkecAvdYkdN6+gWWFIy4zmQzGCwui/qMCzbo5MysGI8hVyjty5xG6ENT6jkt9Q
-         MS9w==
-X-Gm-Message-State: AOAM53356xFJdkoiKlH3alniJrn0Wgi7WDqNXOCLitlfadqI63NBE7p6
-        1ilcL2c8CtTZ1P6KOmyQfuRclYu3VQJZF9wroF+OWrbypg9mXRrGEwXwY+xCjm3fEDTYA3ZE9u9
-        MAwx4QgInsZZn
-X-Received: by 2002:a50:fd9a:: with SMTP id o26mr38385071edt.76.1622053911609;
-        Wed, 26 May 2021 11:31:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxj/b4bQQAPZkwDCfSoX9eFDQaSkp7wcMIVVjBNJ19mjHBr5KE8Y3yPV7V8ObuGwD50taeBew==
-X-Received: by 2002:a50:fd9a:: with SMTP id o26mr38385033edt.76.1622053911300;
-        Wed, 26 May 2021 11:31:51 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id dh21sm12995260edb.28.2021.05.26.11.31.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 May 2021 11:31:50 -0700 (PDT)
-Subject: Re: [PATCH v2 08/10] KVM: selftests: create alias mappings when using
- shared memory
-To:     Axel Rasmussen <axelrasmussen@google.com>,
-        David Matlack <dmatlack@google.com>
-Cc:     Aaron Lewis <aaronlewis@google.com>,
-        Alexander Graf <graf@amazon.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Ben Gardon <bgardon@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jacob Xu <jacobhxu@google.com>,
-        Makarand Sonare <makarandsonare@google.com>,
-        Oliver Upton <oupton@google.com>, Peter Xu <peterx@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linuxkselftest <linux-kselftest@vger.kernel.org>
-References: <20210519200339.829146-1-axelrasmussen@google.com>
- <20210519200339.829146-9-axelrasmussen@google.com>
- <CALzav=eGi2_TBx=LDYpg6hRi8JabGPsHLC8M5-Vzf8DJHomSVQ@mail.gmail.com>
- <CAJHvVcjFJT8E35nhiNCLzT=f3DsPaWu1RjJNQqPWK9zspoBnSw@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <553e0fdc-53ff-10a6-385a-2cf47f00899f@redhat.com>
-Date:   Wed, 26 May 2021 20:31:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        id S235596AbhEZSrD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 14:47:03 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:29632 "EHLO
+        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232964AbhEZSrC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 May 2021 14:47:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1622054731; x=1653590731;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=VjHKWOUbi6AsBQGrFu6LwnjmojKTzUmMLMOu456RPpE=;
+  b=ExDzAdAwX2JQgAmJu5JalElie5QEiO0s+vBVDazarZ5u8NeFf+6C7iNU
+   61eRybBwe8Ul0nE8Kh9xnRWZMaO2BWITLDkAc+YfL/ZvZxPpSJGYYw60K
+   3+JE6tX6qTiP/nkUelnvteY6wRaGczd+fMXKZlOXktFnWfep6FfZ9g9G1
+   U=;
+X-IronPort-AV: E=Sophos;i="5.82,331,1613433600"; 
+   d="scan'208";a="110382147"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2c-2225282c.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-4101.iad4.amazon.com with ESMTP; 26 May 2021 18:45:22 +0000
+Received: from EX13MTAUEE002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-2c-2225282c.us-west-2.amazon.com (Postfix) with ESMTPS id 97ABFA18BD;
+        Wed, 26 May 2021 18:45:21 +0000 (UTC)
+Received: from EX13D08UEE003.ant.amazon.com (10.43.62.118) by
+ EX13MTAUEE002.ant.amazon.com (10.43.62.24) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.18; Wed, 26 May 2021 18:45:21 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (10.43.61.82) by
+ EX13D08UEE003.ant.amazon.com (10.43.62.118) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.18; Wed, 26 May 2021 18:45:21 +0000
+Received: from uae075a0dfd4c51.ant.amazon.com (10.106.82.24) by
+ mail-relay.amazon.com (10.43.61.243) with Microsoft SMTP Server id
+ 15.0.1497.18 via Frontend Transport; Wed, 26 May 2021 18:45:19 +0000
+From:   Ilias Stamatis <ilstam@amazon.com>
+To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <pbonzini@redhat.com>
+CC:     <mlevitsk@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
+        <zamsden@gmail.com>, <mtosatti@redhat.com>, <dwmw@amazon.co.uk>,
+        <ilstam@amazon.com>
+Subject: [PATCH v4 00/11] KVM: Implement nested TSC scaling
+Date:   Wed, 26 May 2021 19:44:07 +0100
+Message-ID: <20210526184418.28881-1-ilstam@amazon.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <CAJHvVcjFJT8E35nhiNCLzT=f3DsPaWu1RjJNQqPWK9zspoBnSw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/05/21 19:22, Axel Rasmussen wrote:
-> I applied this change on top of kvm/master and tested it, and indeed
-> it compiles and works correctly.
-> 
-> Paolo, feel free to take this with a:
-> 
-> Reviewed-by: Axel Rasmussen <axelrasmussen@google.com>
-> 
-> Or alternatively if you prefer I'm happy to send it as a real
-> git-send-email patch.
+KVM currently supports hardware-assisted TSC scaling but only for L1;
+the feature is not exposed to nested guests. This patch series adds
+support for nested TSC scaling and allows both L1 and L2 to be scaled
+with different scaling factors. That is achieved by "merging" the 01 and
+02 values together.
 
-Yes, I squashed it.
+Most of the logic in this series is implemented in common code (by doing
+the necessary restructurings), however the patches add support for VMX
+only. Adding support for SVM should be easy at this point and Maxim
+Levitsky has volunteered to do this (thanks!).
 
-Paolo
+Changelog:
 
-> On Tue, May 25, 2021 at 4:50 PM David Matlack <dmatlack@google.com> wrote:
->>
->> On Wed, May 19, 2021 at 1:04 PM Axel Rasmussen <axelrasmussen@google.com> wrote:
->>>
->>> When a memory region is added with a src_type specifying that it should
->>> use some kind of shared memory, also create an alias mapping to the same
->>> underlying physical pages.
->>>
->>> And, add an API so tests can get access to these alias addresses.
->>> Basically, for a guest physical address, let us look up the analogous
->>> host *alias* address.
->>>
->>> In a future commit, we'll modify the demand paging test to take
->>> advantage of this to exercise UFFD minor faults. The idea is, we
->>> pre-fault the underlying pages *via the alias*. When the *guest*
->>> faults, it gets a "minor" fault (PTEs don't exist yet, but a page is
->>> already in the page cache). Then, the userfaultfd theads can handle the
->>> fault: they could potentially modify the underlying memory *via the
->>> alias* if they wanted to, and then they install the PTEs and let the
->>> guest carry on via a UFFDIO_CONTINUE ioctl.
->>>
->>> Reviewed-by: Ben Gardon <bgardon@google.com>
->>> Signed-off-by: Axel Rasmussen <axelrasmussen@google.com>
->>> ---
->>>   .../testing/selftests/kvm/include/kvm_util.h  |  1 +
->>>   tools/testing/selftests/kvm/lib/kvm_util.c    | 51 +++++++++++++++++++
->>>   .../selftests/kvm/lib/kvm_util_internal.h     |  2 +
->>>   3 files changed, 54 insertions(+)
->>>
->>> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
->>> index a8f022794ce3..0624f25a6803 100644
->>> --- a/tools/testing/selftests/kvm/include/kvm_util.h
->>> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
->>> @@ -146,6 +146,7 @@ void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
->>>   void *addr_gpa2hva(struct kvm_vm *vm, vm_paddr_t gpa);
->>>   void *addr_gva2hva(struct kvm_vm *vm, vm_vaddr_t gva);
->>>   vm_paddr_t addr_hva2gpa(struct kvm_vm *vm, void *hva);
->>> +void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t gpa);
->>>
->>>   /*
->>>    * Address Guest Virtual to Guest Physical
->>> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
->>> index e4a8d0c43c5e..0b88d1bbc1e0 100644
->>> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
->>> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
->>> @@ -811,6 +811,19 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
->>>
->>>          /* Add to linked-list of memory regions. */
->>>          list_add(&region->list, &vm->userspace_mem_regions);
->>> +
->>> +       /* If shared memory, create an alias. */
->>> +       if (region->fd >= 0) {
->>> +               region->mmap_alias = mmap(NULL, region->mmap_size,
->>> +                                         PROT_READ | PROT_WRITE,
->>> +                                         vm_mem_backing_src_alias(src_type)->flag,
->>> +                                         region->fd, 0);
->>> +               TEST_ASSERT(region->mmap_alias != MAP_FAILED,
->>> +                           "mmap of alias failed, errno: %i", errno);
->>> +
->>> +               /* Align host alias address */
->>> +               region->host_alias = align(region->mmap_alias, alignment);
->>> +       }
->>>   }
->>>
->>>   /*
->>> @@ -1239,6 +1252,44 @@ vm_paddr_t addr_hva2gpa(struct kvm_vm *vm, void *hva)
->>>          return -1;
->>>   }
->>>
->>> +/*
->>> + * Address VM physical to Host Virtual *alias*.
->>> + *
->>> + * Input Args:
->>> + *   vm - Virtual Machine
->>> + *   gpa - VM physical address
->>> + *
->>> + * Output Args: None
->>> + *
->>> + * Return:
->>> + *   Equivalent address within the host virtual *alias* area, or NULL
->>> + *   (without failing the test) if the guest memory is not shared (so
->>> + *   no alias exists).
->>> + *
->>> + * When vm_create() and related functions are called with a shared memory
->>> + * src_type, we also create a writable, shared alias mapping of the
->>> + * underlying guest memory. This allows the host to manipulate guest memory
->>> + * without mapping that memory in the guest's address space. And, for
->>> + * userfaultfd-based demand paging, we can do so without triggering userfaults.
->>> + */
->>> +void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t gpa)
->>> +{
->>> +       struct userspace_mem_region *region;
->>> +
->>> +       list_for_each_entry(region, &vm->userspace_mem_regions, list) {
->>
->> This patch fails to compile on top of with db0670ce3361 ("KVM:
->> selftests: Keep track of memslots more efficiently").
->>
->> This can be reproduced by checking out kvm/master and running `make -C
->> tools/testing/selftests/kvm`.
->>
->> The following diff fixes the compilation error but I did not have time
->> to test it yet:
->>
->> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c
->> b/tools/testing/selftests/kvm/lib/kvm_util.c
->> index c98db1846e1b..28e528c19d28 100644
->> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
->> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
->> @@ -1374,19 +1374,17 @@ vm_paddr_t addr_hva2gpa(struct kvm_vm *vm, void *hva)
->>   void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t gpa)
->>   {
->>          struct userspace_mem_region *region;
->> +       uintptr_t offset;
->>
->> -       list_for_each_entry(region, &vm->userspace_mem_regions, list) {
->> -               if (!region->host_alias)
->> -                       continue;
->> +       region = userspace_mem_region_find(vm, gpa, gpa);
->> +       if (!region)
->> +               return NULL;
->>
->> -               if ((gpa >= region->region.guest_phys_addr)
->> -                       && (gpa <= (region->region.guest_phys_addr
->> -                               + region->region.memory_size - 1)))
->> -                       return (void *) ((uintptr_t) region->host_alias
->> -                               + (gpa - region->region.guest_phys_addr));
->> -       }
->> +       if (!region->host_alias)
->> +               return NULL;
->>
->> -       return NULL;
->> +       offset = gpa - region->region.guest_phys_addr;
->> +       return (void *) ((uintptr_t) region->host_alias + offset);
->>   }
->>
->>   /*
->>
->>
->>
->>> +               if (!region->host_alias)
->>> +                       continue;
->>> +
->>> +               if ((gpa >= region->region.guest_phys_addr)
->>> +                       && (gpa <= (region->region.guest_phys_addr
->>> +                               + region->region.memory_size - 1)))
->>> +                       return (void *) ((uintptr_t) region->host_alias
->>> +                               + (gpa - region->region.guest_phys_addr));
->>> +       }
->>> +
->>> +       return NULL;
->>> +}
->>> +
->>>   /*
->>>    * VM Create IRQ Chip
->>>    *
->>> diff --git a/tools/testing/selftests/kvm/lib/kvm_util_internal.h b/tools/testing/selftests/kvm/lib/kvm_util_internal.h
->>> index 91ce1b5d480b..a25af33d4a9c 100644
->>> --- a/tools/testing/selftests/kvm/lib/kvm_util_internal.h
->>> +++ b/tools/testing/selftests/kvm/lib/kvm_util_internal.h
->>> @@ -16,7 +16,9 @@ struct userspace_mem_region {
->>>          int fd;
->>>          off_t offset;
->>>          void *host_mem;
->>> +       void *host_alias;
->>>          void *mmap_start;
->>> +       void *mmap_alias;
->>>          size_t mmap_size;
->>>          struct list_head list;
->>>   };
->>> --
->>> 2.31.1.751.gd2f1c929bd-goog
->>>
-> 
+Only patch 9 needs reviewing at this point, but I am re-sending the
+whole series as I also applied nitpicks suggested to some of the other
+pathces.
+
+v4:
+  - Added vendor callbacks for writing the TSC multiplier
+  - Moved the VMCS multiplier writes from the VMCS load path to common
+    code that only gets called on TSC ratio changes
+  - Merged together patches 10 and 11 of v3
+  - Applied all nitpick-feedback of the previous versions
+
+v3:
+  - Applied Sean's feedback
+  - Refactored patches 7 to 10
+
+v2:
+  - Applied all of Maxim's feedback
+  - Added a mul_s64_u64_shr function in math64.h
+  - Added a separate kvm_scale_tsc_l1 function instead of passing an
+    argument to kvm_scale_tsc
+  - Implemented the 02 fields calculations in common code
+  - Moved all of write_l1_tsc_offset's logic to common code
+  - Added a check for whether the TSC is stable in patch 10
+  - Used a random L1 factor and a negative offset in patch 10
+
+Ilias Stamatis (11):
+  math64.h: Add mul_s64_u64_shr()
+  KVM: X86: Store L1's TSC scaling ratio in 'struct kvm_vcpu_arch'
+  KVM: X86: Rename kvm_compute_tsc_offset() to
+    kvm_compute_l1_tsc_offset()
+  KVM: X86: Add a ratio parameter to kvm_scale_tsc()
+  KVM: nVMX: Add a TSC multiplier field in VMCS12
+  KVM: X86: Add functions for retrieving L2 TSC fields from common code
+  KVM: X86: Add functions that calculate the nested TSC fields
+  KVM: X86: Move write_l1_tsc_offset() logic to common code and rename
+    it
+  KVM: X86: Add vendor callbacks for writing the TSC multiplier
+  KVM: nVMX: Enable nested TSC scaling
+  KVM: selftests: x86: Add vmx_nested_tsc_scaling_test
+
+ arch/x86/include/asm/kvm-x86-ops.h            |   5 +-
+ arch/x86/include/asm/kvm_host.h               |  15 +-
+ arch/x86/kvm/svm/svm.c                        |  35 ++-
+ arch/x86/kvm/vmx/nested.c                     |  33 ++-
+ arch/x86/kvm/vmx/vmcs12.c                     |   1 +
+ arch/x86/kvm/vmx/vmcs12.h                     |   4 +-
+ arch/x86/kvm/vmx/vmx.c                        |  55 ++--
+ arch/x86/kvm/vmx/vmx.h                        |  11 +-
+ arch/x86/kvm/x86.c                            | 114 +++++++--
+ include/linux/math64.h                        |  19 ++
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../kvm/x86_64/vmx_nested_tsc_scaling_test.c  | 242 ++++++++++++++++++
+ 13 files changed, 451 insertions(+), 85 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_nested_tsc_scaling_test.c
+
+-- 
+2.17.1
 
