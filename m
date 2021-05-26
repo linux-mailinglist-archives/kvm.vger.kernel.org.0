@@ -2,105 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 058F5391A56
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 16:34:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9DEF391A7C
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 16:41:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234867AbhEZOgC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 10:36:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54367 "EHLO
+        id S234899AbhEZOmr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 10:42:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22184 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234868AbhEZOf7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 May 2021 10:35:59 -0400
+        by vger.kernel.org with ESMTP id S234654AbhEZOmp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 May 2021 10:42:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622039668;
+        s=mimecast20190719; t=1622040074;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cqBPgPyUlAbZ7Kk+oGgbHiAKQDgT/aGEeIFiCp5+zq4=;
-        b=AJIPNQODLzMGr5LmdNbow5R7RhEeEg6wAx/xDimQus7OZurLrX51Rd+iJ6ITph27YvNQjC
-        toSjRPgc7Vx+Gfr+gGw2ikKPfKzwFG/gESYQItGC90GBN9kb+iwf2yQbutae0Hwb3n67Qq
-        vgLr7mg603rT37TDIDxLdFlOkUwECvA=
+        bh=addEguLCFCfMeZSUgzkPSgkeBd39ItE0TvGuUn/CT60=;
+        b=QIscCEqG27Th0WLTdOpRPLR+ICCuSk8xt8gfnwjKb4Z0sbUgpoBV0RaRrrqiaiE8Kzch8+
+        ebEi/WIEbulBAe3U+vIAu08p6PwRqbV8HLGlWri++n7TRHpwCmpvUmBBSpc6f7suOdIOdp
+        /hwDYPY6XNi70MAxDPQqJFdaTkN4P2M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-384-D2hxjXQtPpStZr2pCmQUGA-1; Wed, 26 May 2021 10:34:25 -0400
-X-MC-Unique: D2hxjXQtPpStZr2pCmQUGA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-470-sfXyBForPxOBFjjYbMcgWA-1; Wed, 26 May 2021 10:41:10 -0400
+X-MC-Unique: sfXyBForPxOBFjjYbMcgWA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3911A107AD35;
-        Wed, 26 May 2021 14:34:24 +0000 (UTC)
-Received: from gondolin.fritz.box (ovpn-113-79.ams2.redhat.com [10.36.113.79])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C85BA1037F21;
-        Wed, 26 May 2021 14:34:22 +0000 (UTC)
-Date:   Wed, 26 May 2021 16:34:20 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>
-Cc:     linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Subject: Re: [PATCH RFC 0/2] virtio-ccw: allow to disable legacy virtio
-Message-ID: <20210526163420.4620f342.cohuck@redhat.com>
-In-Reply-To: <20210304132715.1587211-1-cohuck@redhat.com>
-References: <20210304132715.1587211-1-cohuck@redhat.com>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0DD886D588;
+        Wed, 26 May 2021 14:41:08 +0000 (UTC)
+Received: from starship (unknown [10.40.192.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D63425DEF8;
+        Wed, 26 May 2021 14:41:04 +0000 (UTC)
+Message-ID: <5a6314ff3c7b9cc8e6bdf452008ad1b264c95608.camel@redhat.com>
+Subject: Re: [PATCH v2 0/7] KVM: nVMX: Fixes for nested state migration when
+ eVMCS is in use
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Date:   Wed, 26 May 2021 17:41:03 +0300
+In-Reply-To: <8735uc713d.fsf@vitty.brq.redhat.com>
+References: <20210517135054.1914802-1-vkuznets@redhat.com>
+         <ea9a392d018ced61478482763f7a59472110104c.camel@redhat.com>
+         <8735uc713d.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  4 Mar 2021 14:27:13 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+On Mon, 2021-05-24 at 14:44 +0200, Vitaly Kuznetsov wrote:
+> Maxim Levitsky <mlevitsk@redhat.com> writes:
+> 
+> > On Mon, 2021-05-17 at 15:50 +0200, Vitaly Kuznetsov wrote:
+> > > Changes since v1 (Sean):
+> > > - Drop now-unneeded curly braces in nested_sync_vmcs12_to_shadow().
+> > > - Pass 'evmcs->hv_clean_fields' instead of 'bool from_vmentry' to
+> > >   copy_enlightened_to_vmcs12().
+> > > 
+> > > Commit f5c7e8425f18 ("KVM: nVMX: Always make an attempt to map eVMCS after
+> > > migration") fixed the most obvious reason why Hyper-V on KVM (e.g. Win10
+> > >  + WSL2) was crashing immediately after migration. It was also reported
+> > > that we have more issues to fix as, while the failure rate was lowered 
+> > > signifincatly, it was still possible to observe crashes after several
+> > > dozens of migration. Turns out, the issue arises when we manage to issue
+> > > KVM_GET_NESTED_STATE right after L2->L2 VMEXIT but before L1 gets a chance
+> > > to run. This state is tracked with 'need_vmcs12_to_shadow_sync' flag but
+> > > the flag itself is not part of saved nested state. A few other less 
+> > > significant issues are fixed along the way.
+> > > 
+> > > While there's no proof this series fixes all eVMCS related problems,
+> > > Win10+WSL2 was able to survive 3333 (thanks, Max!) migrations without
+> > > crashing in testing.
+> > > 
+> > > Patches are based on the current kvm/next tree.
+> > > 
+> > > Vitaly Kuznetsov (7):
+> > >   KVM: nVMX: Introduce nested_evmcs_is_used()
+> > >   KVM: nVMX: Release enlightened VMCS on VMCLEAR
+> > >   KVM: nVMX: Ignore 'hv_clean_fields' data when eVMCS data is copied in
+> > >     vmx_get_nested_state()
+> > >   KVM: nVMX: Force enlightened VMCS sync from nested_vmx_failValid()
+> > >   KVM: nVMX: Reset eVMCS clean fields data from prepare_vmcs02()
+> > >   KVM: nVMX: Request to sync eVMCS from VMCS12 after migration
+> > >   KVM: selftests: evmcs_test: Test that KVM_STATE_NESTED_EVMCS is never
+> > >     lost
+> > > 
+> > >  arch/x86/kvm/vmx/nested.c                     | 110 ++++++++++++------
+> > >  .../testing/selftests/kvm/x86_64/evmcs_test.c |  64 +++++-----
+> > >  2 files changed, 115 insertions(+), 59 deletions(-)
+> > > 
+> > 
+> > Hi Vitaly!
+> > 
+> > In addition to the review of this patch series,
+> 
+> Thanks by the way!
+No problem!
 
-Just found this old series sitting there... does anyone have an opinion
-on the general approach?
+> 
+> >  I would like
+> > to share an idea on how to avoid the hack of mapping the evmcs
+> > in nested_vmx_vmexit, because I think I found a possible generic
+> > solution to this and similar issues:
+> > 
+> > The solution is to always set nested_run_pending after 
+> > nested migration (which means that we won't really
+> > need to migrate this flag anymore).
+> > 
+> > I was thinking a lot about it and I think that there is no downside to this,
+> > other than sometimes a one extra vmexit after migration.
+> > 
+> > Otherwise there is always a risk of the following scenario:
+> > 
+> >   1. We migrate with nested_run_pending=0 (but don't restore all the state
+> >   yet, like that HV_X64_MSR_VP_ASSIST_PAGE msr,
+> >   or just the guest memory map is not up to date, guest is in smm or something
+> >   like that)
+> > 
+> >   2. Userspace calls some ioctl that causes a nested vmexit
+> > 
+> >   This can happen today if the userspace calls 
+> >   kvm_arch_vcpu_ioctl_get_mpstate -> kvm_apic_accept_events -> kvm_check_nested_events
+> > 
+> >   3. Userspace finally sets correct guest's msrs, correct guest memory map and only
+> >   then calls KVM_RUN
+> > 
+> > This means that at (2) we can't map and write the evmcs/vmcs12/vmcb12 even
+> > if KVM_REQ_GET_NESTED_STATE_PAGES is pending,
+> > but we have to do so to complete the nested vmexit.
+> 
+> Why do we need to write to eVMCS to complete vmexit? AFAICT, there's
+> only one place which calls copy_vmcs12_to_enlightened():
+> nested_sync_vmcs12_to_shadow() which, in its turn, has only 1 caller:
+> vmx_prepare_switch_to_guest() so unless userspace decided to execute
+> not-fully-restored guest this should not happen. I'm probably missing
+> something in your scenario)
+You are right! 
+The evmcs write is delayed to the next vmentry.
 
-> Unlike virtio-pci, virtio-ccw is currently always a transitional
-> driver (i.e. it always includes support for legacy devices.) The
-> differences between legacy and virtio-1+ virtio-ccw devices are not
-> that big (the most interesting things are in common virtio code
-> anyway.)
+However since we are now mapping the evmcs during nested vmexit,
+and this can fail for example that HV assist msr is not up to date.
+
+For example consider this: 
+
+1. Userspace first sets nested state
+2. Userspace calls KVM_GET_MP_STATE.
+3. Nested vmexit that happened in 2 will end up not be able to map the evmcs,
+since HV_ASSIST msr is not yet loaded.
+
+
+Also the vmcb write (that is for SVM) _is_ done right away on nested vmexit 
+and conceptually has the same issue.
+(if memory map is not up to date, we might not be able to read/write the 
+vmcb12 on nested vmexit)
+
+
 > 
-> It might be beneficial to make support for legacy virtio generally
-> configurable, in case we want to remove it completely in a future
-> where we all have flying cars. As a prereq, we need to make it
-> configurable for virtio-ccw.
+> > To some extent, the entry to the nested mode after a migration is only complete
+> > when we process the KVM_REQ_GET_NESTED_STATE_PAGES, so we shoudn't interrupt it.
+> > 
+> > This will allow us to avoid dealing with KVM_REQ_GET_NESTED_STATE_PAGES on
+> > nested vmexit path at all. 
 > 
-> Patch 1 introduces a parameter; now that I look at it, it's probably
-> not that useful (not even for testing), so I'm inclined to drop it
-> again.
+> Remember, we have three possible states when nested state is
+> transferred:
+> 1) L2 was running
+> 2) L1 was running
+> 3) We're in beetween L2 and L1 (need_vmcs12_to_shadow_sync = true).
+
+I understand. This suggestion wasn't meant to fix the case 3, but more to fix
+case 1, where we are in L2, migrate, and then immediately decide to 
+do a nested vmexit before we processed the KVM_REQ_GET_NESTED_STATE_PAGES
+request, and also before potentially before the guest state was fully uploaded
+(see that KVM_GET_MP_STATE thing).
+ 
+In a nutshell, I vote for not allowing nested vmexits from the moment
+when we set the nested state and until the moment we enter the nested
+guest once (maybe with request for immediate vmexit),
+because during this time period, the guest state is not fully consistent.
+
+Best regards,
+	Maxim Levitsky
+
 > 
-> Patch 2 adds a new config symbol for generic legacy virtio support,
-> which currently does not do anything but being selected by the
-> legacy options for virtio-pci and virtio-ccw. A virtio-ccw driver
-> without legacy support will require a revision of 1 or higher to
-> be supported by the device.
+> Is 'nested_run_pending' suitable for all of them? Could you maybe draft
+> a patch so we can see how this works (in both 'normal' and 'evmcs'
+> cases)?
 > 
-> A virtio-ccw driver with legacy turned off works well for me with
-> transitional devices and fails onlining gracefully for legacy devices
-> (max_revision=0 in QEMU).
-> 
-> (I also have some code that allows to make devices non-transitional
-> in QEMU, but I haven't yet found time to polish the patches.)
-> 
-> Cornelia Huck (2):
->   virtio/s390: add parameter for minimum revision
->   virtio/s390: make legacy support configurable
-> 
->  arch/s390/Kconfig                       |  11 ++
->  drivers/s390/virtio/Makefile            |   1 +
->  drivers/s390/virtio/virtio_ccw.c        | 179 ++++++++----------------
->  drivers/s390/virtio/virtio_ccw_common.h | 113 +++++++++++++++
->  drivers/s390/virtio/virtio_ccw_legacy.c | 138 ++++++++++++++++++
->  drivers/virtio/Kconfig                  |   8 ++
->  6 files changed, 330 insertions(+), 120 deletions(-)
->  create mode 100644 drivers/s390/virtio/virtio_ccw_common.h
->  create mode 100644 drivers/s390/virtio/virtio_ccw_legacy.c
-> 
-> 
-> base-commit: cf6acb8bdb1d829b85a4daa2944bf9e71c93f4b9
+
 
