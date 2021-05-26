@@ -2,151 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A62E8391431
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 11:57:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CAFD391435
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 11:58:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233720AbhEZJ6w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 05:58:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57738 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233633AbhEZJ6v (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 May 2021 05:58:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622023040;
+        id S233722AbhEZJ73 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 05:59:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55762 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233264AbhEZJ72 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 May 2021 05:59:28 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8FA0C061574;
+        Wed, 26 May 2021 02:57:57 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0d49009660c40ecb662901.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:4900:9660:c40e:cb66:2901])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 24D731EC00F8;
+        Wed, 26 May 2021 11:57:56 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1622023076;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=unCurEyf03WeyFENhvIK3vbQ4htz+pnh3XxNexbl9u0=;
-        b=Y0aZE1qVPFG3gcOA65xsuDC8XJAqtu7nu4C/raZH8Hmq35bvyByEGnvSmC69fx+EeZjPVT
-        +5Uq8y8Eqnq/WcEr63R3vCJLxSwKzI+Jm0du89jdK6Gs27pLICxQ5soAXAtdt4uptYKPxH
-        IqQDt/RjSMjVdznrzTQJlRBlwdKQQMw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-4dcgwtsCOO-omgphrP6d3Q-1; Wed, 26 May 2021 05:57:18 -0400
-X-MC-Unique: 4dcgwtsCOO-omgphrP6d3Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ADD6C802B78;
-        Wed, 26 May 2021 09:57:16 +0000 (UTC)
-Received: from starship (unknown [10.40.192.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5329460CC6;
-        Wed, 26 May 2021 09:57:14 +0000 (UTC)
-Message-ID: <69697643ea2b5756fac99e7d87ef09c32c76f930.camel@redhat.com>
-Subject: Re: [PATCH v2 4/5] KVM: x86: Invert APICv/AVIC enablement check
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Kechen Lu <kechenl@nvidia.com>, linux-kernel@vger.kernel.org
-Date:   Wed, 26 May 2021 12:57:13 +0300
-In-Reply-To: <20210518144339.1987982-5-vkuznets@redhat.com>
-References: <20210518144339.1987982-1-vkuznets@redhat.com>
-         <20210518144339.1987982-5-vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=ZYec1RD/pAYHWEfyt3NxEqaQmOs6KRO4H8TlOe6OKwU=;
+        b=qMRf+0ia2MF62yECVGrkUp8oRx+DLq3UpYfSEZKePqrHhSEwYGZBHCnEAxbdBAlzCMdwBR
+        OdTbM3ld8Zm+utIu3IWe6eUAp/RwzRRBu4ToGhjlNrBB7W2Qh3ZYwePXxeCWka0RdBxE1I
+        rhGg7P/KRRtAC5HS39qmIRuwQKOzx94=
+Date:   Wed, 26 May 2021 11:57:49 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        tglx@linutronix.de, jroedel@suse.de, thomas.lendacky@amd.com,
+        pbonzini@redhat.com, mingo@redhat.com, dave.hansen@intel.com,
+        rientjes@google.com, seanjc@google.com, peterz@infradead.org,
+        hpa@zytor.com, tony.luck@intel.com
+Subject: Re: [PATCH Part1 RFC v2 13/20] x86/sev: Register GHCB memory when
+ SEV-SNP is active
+Message-ID: <YK4bnQiJ6cVzCCE9@zn.tnic>
+References: <20210430121616.2295-1-brijesh.singh@amd.com>
+ <20210430121616.2295-14-brijesh.singh@amd.com>
+ <YKzbfwD6nHL7ChcJ@zn.tnic>
+ <b15cd25b-ee69-237d-9044-84fba2cf4bb2@amd.com>
+ <YK0LFk3xMjfirG9E@zn.tnic>
+ <9e7b7406-ec24-2991-3577-ce7da61a61ca@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <9e7b7406-ec24-2991-3577-ce7da61a61ca@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-05-18 at 16:43 +0200, Vitaly Kuznetsov wrote:
-> Now that APICv/AVIC enablement is kept in common 'enable_apicv' variable,
-> there's no need to call kvm_apicv_init() from vendor specific code.
-> 
-> No functional change intended.
+On Tue, May 25, 2021 at 09:47:24AM -0500, Brijesh Singh wrote:
+> Maybe I should have said, its not applicable in the decompressed path.
 
-Minor nitpick: I don't see any invert here, but rather
-a unification of SVM/VMX virtual apic enablement code.
-Maybe update the subject a bit?
+Aha, ok. How's that, ontop of yours:
 
-For the code:
+---
+diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
+index 07b9529d7d95..c9dd98b9dcdf 100644
+--- a/arch/x86/boot/compressed/sev.c
++++ b/arch/x86/boot/compressed/sev.c
+@@ -208,7 +208,7 @@ static bool early_setup_sev_es(void)
+ 
+ 	/* SEV-SNP guest requires the GHCB GPA must be registered */
+ 	if (sev_snp_enabled())
+-		snp_register_ghcb(__pa(&boot_ghcb_page));
++		snp_register_ghcb_early(__pa(&boot_ghcb_page));
+ 
+ 	return true;
+ }
+diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
+index 37a23c524f8c..7200f44d6b6b 100644
+--- a/arch/x86/kernel/sev-shared.c
++++ b/arch/x86/kernel/sev-shared.c
+@@ -81,7 +81,7 @@ static bool ghcb_get_hv_features(void)
+ 	return true;
+ }
+ 
+-static void snp_register_ghcb(unsigned long paddr)
++static void snp_register_ghcb_early(unsigned long paddr)
+ {
+ 	unsigned long pfn = paddr >> PAGE_SHIFT;
+ 	u64 val;
+diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+index 5544557d9fb6..144c20479cae 100644
+--- a/arch/x86/kernel/sev.c
++++ b/arch/x86/kernel/sev.c
+@@ -108,7 +108,18 @@ DEFINE_STATIC_KEY_FALSE(sev_es_enable_key);
+ void do_early_exception(struct pt_regs *regs, int trapnr);
+ 
+ /* Defined in sev-shared.c */
+-static void snp_register_ghcb(unsigned long paddr);
++static void snp_register_ghcb_early(unsigned long paddr);
++
++static void snp_register_ghcb(struct sev_es_runtime_data *data,
++			      unsigned long paddr)
++{
++	if (data->snp_ghcb_registered)
++		return;
++
++	snp_register_ghcb_early(paddr);
++
++	data->snp_ghcb_registered = true;
++}
+ 
+ static void __init setup_vc_stacks(int cpu)
+ {
+@@ -239,10 +250,8 @@ static __always_inline struct ghcb *sev_es_get_ghcb(struct ghcb_state *state)
+ 	}
+ 
+ 	/* SEV-SNP guest requires that GHCB must be registered before using it. */
+-	if (sev_snp_active() && !data->snp_ghcb_registered) {
+-		snp_register_ghcb(__pa(ghcb));
+-		data->snp_ghcb_registered = true;
+-	}
++	if (sev_snp_active())
++		snp_register_ghcb(data, __pa(ghcb));
+ 
+ 	return ghcb;
+ }
+@@ -681,7 +690,7 @@ static bool __init sev_es_setup_ghcb(void)
+ 
+ 	/* SEV-SNP guest requires that GHCB GPA must be registered */
+ 	if (sev_snp_active())
+-		snp_register_ghcb(__pa(&boot_ghcb_page));
++		snp_register_ghcb_early(__pa(&boot_ghcb_page));
+ 
+ 	return true;
+ }
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+-- 
+Regards/Gruss,
+    Boris.
 
-Best regards,
-	Maxim Levitsky
-
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 1 -
->  arch/x86/kvm/svm/svm.c          | 1 -
->  arch/x86/kvm/vmx/vmx.c          | 1 -
->  arch/x86/kvm/x86.c              | 6 +++---
->  4 files changed, 3 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index a2197fcf0e7c..bf5807d35339 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1662,7 +1662,6 @@ gpa_t kvm_mmu_gva_to_gpa_system(struct kvm_vcpu *vcpu, gva_t gva,
->  				struct x86_exception *exception);
->  
->  bool kvm_apicv_activated(struct kvm *kvm);
-> -void kvm_apicv_init(struct kvm *kvm, bool enable);
->  void kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu);
->  void kvm_request_apicv_update(struct kvm *kvm, bool activate,
->  			      unsigned long bit);
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 0d6ec34d1e4b..84f58e8b2f49 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4438,7 +4438,6 @@ static int svm_vm_init(struct kvm *kvm)
->  			return ret;
->  	}
->  
-> -	kvm_apicv_init(kvm, enable_apicv);
->  	return 0;
->  }
->  
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 5e9ba10e9c2d..697dd54c7df8 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7000,7 +7000,6 @@ static int vmx_vm_init(struct kvm *kvm)
->  			break;
->  		}
->  	}
-> -	kvm_apicv_init(kvm, enable_apicv);
->  	return 0;
->  }
->  
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 23fdbba6b394..22a1e2b438c3 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8345,16 +8345,15 @@ bool kvm_apicv_activated(struct kvm *kvm)
->  }
->  EXPORT_SYMBOL_GPL(kvm_apicv_activated);
->  
-> -void kvm_apicv_init(struct kvm *kvm, bool enable)
-> +static void kvm_apicv_init(struct kvm *kvm)
->  {
-> -	if (enable)
-> +	if (enable_apicv)
->  		clear_bit(APICV_INHIBIT_REASON_DISABLE,
->  			  &kvm->arch.apicv_inhibit_reasons);
->  	else
->  		set_bit(APICV_INHIBIT_REASON_DISABLE,
->  			&kvm->arch.apicv_inhibit_reasons);
->  }
-> -EXPORT_SYMBOL_GPL(kvm_apicv_init);
->  
->  static void kvm_sched_yield(struct kvm_vcpu *vcpu, unsigned long dest_id)
->  {
-> @@ -10739,6 +10738,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  	INIT_DELAYED_WORK(&kvm->arch.kvmclock_update_work, kvmclock_update_fn);
->  	INIT_DELAYED_WORK(&kvm->arch.kvmclock_sync_work, kvmclock_sync_fn);
->  
-> +	kvm_apicv_init(kvm);
->  	kvm_hv_init_vm(kvm);
->  	kvm_page_track_init(kvm);
->  	kvm_mmu_init_vm(kvm);
-
-
+https://people.kernel.org/tglx/notes-about-netiquette
