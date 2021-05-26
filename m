@@ -2,95 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56DD6391FE4
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 21:01:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 15E333920DF
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 21:30:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235190AbhEZTDF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 15:03:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39302 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235215AbhEZTDD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 May 2021 15:03:03 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2344BC061756
-        for <kvm@vger.kernel.org>; Wed, 26 May 2021 12:01:28 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id w7so3060860lji.6
-        for <kvm@vger.kernel.org>; Wed, 26 May 2021 12:01:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=LZnBooSrTbsSOnYbfhKHaDk4XuLdXNGP1B/S6YvK9d4=;
-        b=txIwSIHp0E61getYyScW68BHZcr0Q6sr4xrTHzySprBTLrKpMKwTG6VxIsRS9GWZmj
-         6z2NIvPxdhiaqTGQFJqe8Wktp+zztSLGYzBrzHyUQnEBuUB/gRk8ITKpH7LGdI1WISBy
-         QhvaNvv2JBqoWt6pYFdCKc8LlpT8eFfgTiYpENgFt5GJAniyPxME+omAQ3cuJ3hy9yQN
-         /X0NVf3ailAL/q4qIseOSD3lo1w5lKbcPvTcEZ4Z3551pvbCdH0ZbG94ySPH3Q9lnDJC
-         Xlhzfu96fZQa1DRyjxtV488uJzBjhguDNNOmPNCEkObWbgKi4Vq2JhYEsSqOGVbcf1QV
-         W/aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=LZnBooSrTbsSOnYbfhKHaDk4XuLdXNGP1B/S6YvK9d4=;
-        b=PEzUw5z+mwzLxNLJ4FH+kLPeR5ei6DBQdsfEXMWZVrdzSANeXsRETZvi5autwMub9e
-         9puvgbLsIPWQsMuerC3ZiwRtJoVw+BnWRD888Le/9G+2yn3NjxBy3XSacWcrhuCVtvs7
-         FT9pxD725pgUUfulkseNGc3plbgTs4lInrFb8je5mRcPqmKexQ/F9by3B1JcpLbq7a++
-         FfLtKFy7GGz9JjXksYnAKOHNAT7U9Vph0qIyXCD7vzPfkIIiK54gMgMi8Vov1QUGt5wB
-         gtdiZvGbWGCJmaFEWUqh8kiTnnMQhQGiGWJ6RJ+hy1HRqOWauVdU5Jl1MO9+sGTWrCLQ
-         gQCw==
-X-Gm-Message-State: AOAM531EQds3h/BqJkWPjpqWjjQL5ogLJmL+LQrNJqanIbOt2k5vHooc
-        sKBqheVjUjnGAR0qS6xUCdTFfdSPjCprscST6odnQQ==
-X-Google-Smtp-Source: ABdhPJxLqxCryoZfaXvG+tWF+sReBvFKKYUujFi7cDcNkFCKx9hOGm8wGfrFLoWaigt/U+qbqFT8pLsXRjuMpILbGsQ=
-X-Received: by 2002:a2e:b4e9:: with SMTP id s9mr3330984ljm.383.1622055686213;
- Wed, 26 May 2021 12:01:26 -0700 (PDT)
+        id S234181AbhEZTcG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 15:32:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49370 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232430AbhEZTb4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 May 2021 15:31:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622057423;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7QSW0OHCbKjjac6wEa5djuZz7N9XrcbLcvjqTAkCZDs=;
+        b=IFahDJLFS8kTnPNObA+fqBfUJ+536hEhKLAfR1l3n1XISR0D0Q04k22WPqooWqxz5Ud5jP
+        bPwlkuO60E1Ac9aiwqSBTnUpwOkGy97KhtYkIOtLYsc33qms6O9xl4AVCMg1Oh8TJsKBD3
+        qHEoMkiQRfuxDD3EjXPMJP5+T8PLpE4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-438-oEeXumTmPVCYECcozaPJdg-1; Wed, 26 May 2021 15:30:20 -0400
+X-MC-Unique: oEeXumTmPVCYECcozaPJdg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1FF07180FD60;
+        Wed, 26 May 2021 19:30:19 +0000 (UTC)
+Received: from work-vm (ovpn-114-247.ams2.redhat.com [10.36.114.247])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E1C206787D;
+        Wed, 26 May 2021 19:30:04 +0000 (UTC)
+Date:   Wed, 26 May 2021 20:30:02 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>, cfontana@suse.de
+Cc:     Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: Windows fails to boot after rebase to QEMU master
+Message-ID: <YK6hunkEnft6VJHz@work-vm>
+References: <20210521091451.GA6016@u366d62d47e3651.ant.amazon.com>
+ <20210524055322-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-References: <20210526163227.3113557-1-dmatlack@google.com> <YK6FdtswnFklJuAO@google.com>
- <CALzav=dsgEP6cdfLic_7ffjf22Z8R8LTrJODyVWw3HqSZR4zFQ@mail.gmail.com> <YK6Ywl57/FXqcSR0@google.com>
-In-Reply-To: <YK6Ywl57/FXqcSR0@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Wed, 26 May 2021 12:00:59 -0700
-Message-ID: <CALzav=dN5sAv8GaH5tQ3nkPAEhufXVTDweQk5NF8GjB+NeDOfQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Fix comment mentioning skip_4k
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210524055322-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/2.0.7 (2021-05-04)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 26, 2021 at 11:51 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, May 26, 2021, David Matlack wrote:
-> > On Wed, May 26, 2021 at 10:29 AM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > Put version information in the subject, otherwise it's not always obvious which
-> > > patch you want to be accepted, e.g.
-> > >
-> > >   [PATCH v2] KVM: x86/mmu: Fix comment mentioning skip_4k
-> >
-> > Got it. My thinking was that I changed the title of the patch so
-> > should omit the v2, but that doesn't really make sense.
->
-> Ha, yeah, the version should get bumped even if a patch/series gets heavily
-> rewritten.  There are exceptions (though I'm struggling to think of a good
-> example), but even then it's helpful to describe the relationship to any
-> previous series.
->
-> It's also customery to describe the changes between versions in the cover letter,
-> or in the case of a one-off patch, in the part of the patch that git ignores.
->
-> And my own personal preference is to also include lore links to previous versions,
-> e.g. in this case I would do something like:
->
->   v2: Reword comment to document min_level. [sean]
->
->   v1: https://lkml.kernel.org/r/20210526163227.3113557-1-dmatlack@google.com
->
-> Providing the explicit link in addition to the delta summaray makes it easy for
-> reviewers to see the history and understand the context of _why_ changes were
-> made.  That's especially helpful for reviewers that didn't read/review earlier
-> versions.
+* Michael S. Tsirkin (mst@redhat.com) wrote:
+> On Fri, May 21, 2021 at 11:17:19AM +0200, Siddharth Chandrasekaran wrote:
+> > After a rebase to QEMU master, I am having trouble booting windows VMs.
+> > Git bisect indicates commit f5cc5a5c1686 ("i386: split cpu accelerators
+> > from cpu.c, using AccelCPUClass") to have introduced the issue. I spent
+> > some time looking at into it yesterday without much luck.
+> > 
+> > Steps to reproduce:
+> > 
+> >     $ ./configure --enable-kvm --disable-xen --target-list=x86_64-softmmu --enable-debug
+> >     $ make -j `nproc`
+> >     $ ./build/x86_64-softmmu/qemu-system-x86_64 \
+> >         -cpu host,hv_synic,hv_vpindex,hv_time,hv_runtime,hv_stimer,hv_crash \
+> >         -enable-kvm \
+> >         -name test,debug-threads=on \
+> >         -smp 1,threads=1,cores=1,sockets=1 \
+> >         -m 4G \
+> >         -net nic -net user \
+> >         -boot d,menu=on \
+> >         -usbdevice tablet \
+> >         -vnc :3 \
+> >         -machine q35,smm=on \
+> >         -drive if=pflash,format=raw,readonly=on,unit=0,file="../OVMF_CODE.secboot.fd" \
+> >         -drive if=pflash,format=raw,unit=1,file="../OVMF_VARS.secboot.fd" \
+> >         -global ICH9-LPC.disable_s3=1 \
+> >         -global driver=cfi.pflash01,property=secure,value=on \
+> >         -cdrom "../Windows_Server_2016_14393.ISO" \
+> >         -drive file="../win_server_2016.qcow2",format=qcow2,if=none,id=rootfs_drive \
+> >         -device ahci,id=ahci \
+> >         -device ide-hd,drive=rootfs_drive,bus=ahci.0
+> > 
+> > If the issue is not obvious, I'd like some pointers on how to go about
+> > fixing this issue.
+> > 
+> > ~ Sid.
+> > 
+> 
+> At a guess this commit inadvertently changed something in the CPU ID.
+> I'd start by using a linux guest to dump cpuid before and after the
+> change.
 
-Great advice. Thanks Sean!
+I've not had a chance to do that yet, however I did just end up with a
+bisect of a linux guest failure bisecting to the same patch:
+
+[dgilbert@dgilbert-t580 qemu]$ git bisect bad
+f5cc5a5c168674f84bf061cdb307c2d25fba5448 is the first bad commit
+commit f5cc5a5c168674f84bf061cdb307c2d25fba5448
+Author: Claudio Fontana <cfontana@suse.de>
+Date:   Mon Mar 22 14:27:40 2021 +0100
+
+    i386: split cpu accelerators from cpu.c, using AccelCPUClass
+    
+    i386 is the first user of AccelCPUClass, allowing to split
+    cpu.c into:
+    
+    cpu.c            cpuid and common x86 cpu functionality
+    host-cpu.c       host x86 cpu functions and "host" cpu type
+    kvm/kvm-cpu.c    KVM x86 AccelCPUClass
+    hvf/hvf-cpu.c    HVF x86 AccelCPUClass
+    tcg/tcg-cpu.c    TCG x86 AccelCPUClass
+    
+
+The guest crash is:
+[   85.008985][ T1524] BUG: unable to handle page fault for address: ffffffff810d9c42
+[   85.012868][ T1524] #PF: supervisor write access in kernel mode
+[   85.012962][ T1524] #PF: error_code(0x0003) - permissions violation
+[   85.013043][ T1524] PGD 2224067 P4D 2224067 PUD 2225063 PMD 10001e1 
+[   85.013180][ T1524] Oops: 0003 [#1] SMP NOPTI
+[   85.013295][ T1524] CPU: 2 PID: 1524 Comm: blogbench Not tainted 5.11.0-rc7 #100
+[   85.013395][ T1524] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
+[   85.013546][ T1524] RIP: 0010:kvm_kick_cpu+0x22/0x30
+[   85.013630][ T1524] Code: 0f 1f 84 00 00 00 00 00 55 48 63 ff 48 c7 c0 78 11 01 00 48 8b 14 fd c0 36 11 82 48 89 e5 53 31 db 0f b7 0c 02 b8 05 00 00 00 <0f> 01 d9 5b 5d c3 0f 1f 84 00 00 00 00 00 55 48 89 e5 53 48 89 fb
+[   85.013852][ T1524] RSP: 0018:ffffc90000747c08 EFLAGS: 00010046
+[   85.013951][ T1524] RAX: 0000000000000005 RBX: 0000000000000000 RCX: 0000000000000000
+[   85.014058][ T1524] RDX: ffff88807c600000 RSI: 0000000000000100 RDI: 0000000000000000
+[   85.014153][ T1524] RBP: ffffc90000747c10 R08: ffff88807c72a800 R09: ffff88807ffd6000
+[   85.014248][ T1524] R10: 0000000000000001 R11: 0000000000000046 R12: ffff88807c72a800
+[   85.014343][ T1524] R13: 0000000000000000 R14: ffff888005409940 R15: ffff88807c72a818
+[   85.014437][ T1524] FS:  00007fa2f750a700(0000) GS:ffff88807c700000(0000) knlGS:0000000000000000
+[   85.014559][ T1524] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   85.014644][ T1524] CR2: ffffffff810d9c42 CR3: 0000000009016003 CR4: 0000000000370ea0
+[   85.014741][ T1524] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[   85.014842][ T1524] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[   85.014945][ T1524] Call Trace:
+[   85.014998][ T1524]  __pv_queued_spin_unlock_slowpath+0xa0/0xd0
+[   85.015103][ T1524]  __raw_callee_save___pv_queued_spin_unlock_slowpath+0x15/0x24
+[   85.015206][ T1524]  .slowpath+0x9/0x15
+[   85.015261][ T1524]  do_raw_spin_unlock+0x48/0xc0
+[   85.015333][ T1524]  _raw_spin_unlock_irq+0x1d/0x30
+[   85.015404][ T1524]  finish_task_switch+0xcc/0x2c0
+[   85.015478][ T1524]  __schedule+0x283/0x9a0
+[   85.015534][ T1524]  schedule+0x50/0xc0
+[   85.015588][ T1524]  request_wait_answer+0x126/0x240
+[   85.015667][ T1524]  ? finish_wait+0x90/0x90
+[   85.015740][ T1524]  fuse_simple_request+0x17c/0x2e0
+
+the backtrace moves about a bit, but it always ends up as
+a page fault in kvm_kick_cpu.
+
+My qemu commandline being:
+./x86_64-softmmu/qemu-system-x86_64 -M pc,memory-backend=mem,accel=kvm -cpu host  -m 2G,maxmem=16G,slots=16 -smp 4 -object memory-backend-memfd,id=mem,size=2G,share=on -chardev socket,id=char0,path=/tmp/vhostqemu -device vhost-user-fs-pci,queue-size=1024,chardev=char0,tag=myfs -kernel /home/dgilbert/virtio-fs/kernel-builds/monolithic-dax-20210209a -initrd /home/dgilbert/virtio-fs/test-initramfs.img -chardev stdio,mux=on,id=mon -mon chardev=mon,mode=readline  -device virtio-serial-pci,disable-modern=on -device virtconsole,chardev=mon -object rng-random,id=objrng0,filename=/dev/urandom -device virtio-rng-pci,rng=objrng0,id=rng0,disable-legacy=on -vga none -append "console=hvc0  debug loglevel=9 systemd.journald.forward_to_console" -display none  -overcommit mem-lock=off -netdev user,id=usernet -device virtio-net-pci,netdev=usernet -name debug-threads=on
+
+
+> 
+> > 
+> > 
+> > Amazon Development Center Germany GmbH
+> > Krausenstr. 38
+> > 10117 Berlin
+> > Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+> > Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+> > Sitz: Berlin
+> > Ust-ID: DE 289 237 879
+> > 
+> > 
+> 
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
