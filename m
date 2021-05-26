@@ -2,112 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DEAF4390E68
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 04:44:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD43239105D
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 08:09:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232394AbhEZCpS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 May 2021 22:45:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42648 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232308AbhEZCpR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 May 2021 22:45:17 -0400
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BBBCC061756
-        for <kvm@vger.kernel.org>; Tue, 25 May 2021 19:43:45 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id k14so52994eji.2
-        for <kvm@vger.kernel.org>; Tue, 25 May 2021 19:43:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=cyqKIBrVaRZ0+l7SzJYRtSgO5kugLUClFhe3a16fIks=;
-        b=xKidA34PKHbdo2S/y22PDRHuVMfazORIWEYHJGkmXyiAr04A+1NKfCILQLnwTFsJTw
-         lRVUQruT7CSfwCc2cJ2LKYGi325kEZ4NNyjn0UtAMMopoI0WzAE5ZrPqYsCmv/lbWb0c
-         z7ZqeM601wal6FC3dk9EhBre/t358GYPWlBkbbUdYNaKqlAK5vqVByIYmyXwX/y93vzO
-         bRNWCBb4JkU4DGAkIgbl4WTCvgU7CxcbWXya1+zo+mLJ+4sIWFlH/9XI6s69LnYlT6TH
-         Md+EyrgGTL9No0zpG2C/7ZHuO/606d+nruZSCbn/IOzSAExbb+3m94kMbAuqlPQ0irwx
-         J8oA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=cyqKIBrVaRZ0+l7SzJYRtSgO5kugLUClFhe3a16fIks=;
-        b=PYuswn5oJn5x6BW9CJIHnOmu5UUEMIINZHLzedq9GI8F3YRGi2ggejL2tF4GyycKsK
-         N3ggPJEFAI5r0F3Q+ENyMzaHmzGFZpw1IhS3ZDANgHh72fBkRDWLi+VtRT3WaUFE9GSA
-         XAPn8ZZyAW0ByRchmU9B/VSaa9YHpotY3RpmT7guNM3jnWh2VhLG3MDjzYZOdkvffb7K
-         Zj4cptkVY5XmSUgj0hVxqmc26QLV+gchwVx/yrNELlu2WpFIk86LLYQ24Okoo1FSFz9q
-         b0YilvEa0wuCY477fGVS1Snt5sGUWcMUEgUwkFlOIwKv3oUZbl+amNJKEl5LacXoJi7W
-         c4EQ==
-X-Gm-Message-State: AOAM533pG702XWw20QOgyY8SAFZeNkGzr1bH+3cgFLsfdQKHmSH1OOe2
-        VtsFntrcVGdOChhi7JVq+eC9wgD/yADPR9pmbBpN
-X-Google-Smtp-Source: ABdhPJzi0wHuPmnuk+fERsSUwpHSaQvSPFz85+F584XY7DhSy3CxdOjcgz0J1YNwvp5PC9EH+9a60IN41oTUEUABAxo=
-X-Received: by 2002:a17:906:456:: with SMTP id e22mr31013766eja.427.1621997023688;
- Tue, 25 May 2021 19:43:43 -0700 (PDT)
+        id S232604AbhEZGK6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 02:10:58 -0400
+Received: from mga03.intel.com ([134.134.136.65]:9834 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231573AbhEZGK5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 May 2021 02:10:57 -0400
+IronPort-SDR: fJ51qK/kXeUw55tJoZ5CGhQT8+bv6qdHEWxG5jJLAw2bGyvGQExlB3Pac8dqCzsFJjH8oz474s
+ Bup+3HFtyw3w==
+X-IronPort-AV: E=McAfee;i="6200,9189,9995"; a="202427615"
+X-IronPort-AV: E=Sophos;i="5.82,330,1613462400"; 
+   d="scan'208";a="202427615"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2021 23:09:26 -0700
+IronPort-SDR: D6ePKFlh8DlgJp4lXdFPgR+RLGvecW1w7fEWB3xxqEnhw7uEZNrdy/c+cpt6uKc/h1jF0j9uSM
+ bnEBWrzSLWGw==
+X-IronPort-AV: E=Sophos;i="5.82,330,1613462400"; 
+   d="scan'208";a="476775930"
+Received: from unknown (HELO [10.238.130.158]) ([10.238.130.158])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2021 23:09:23 -0700
+Subject: Re: [PATCH RFC 4/7] kvm: x86: Add new ioctls for XSAVE extension
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jing2.liu@intel.com
+References: <20210207154256.52850-1-jing2.liu@linux.intel.com>
+ <20210207154256.52850-5-jing2.liu@linux.intel.com>
+ <YKwfsIT5DuE+L+4M@google.com>
+From:   "Liu, Jing2" <jing2.liu@linux.intel.com>
+Message-ID: <920df897-56d8-1f81-7ce2-0050fb744bd7@linux.intel.com>
+Date:   Wed, 26 May 2021 14:09:03 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-References: <20210517095513.850-1-xieyongji@bytedance.com> <20210517095513.850-2-xieyongji@bytedance.com>
- <6ca337fe-2c8c-95c9-672e-0d4f104f66eb@redhat.com>
-In-Reply-To: <6ca337fe-2c8c-95c9-672e-0d4f104f66eb@redhat.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Wed, 26 May 2021 10:43:33 +0800
-Message-ID: <CACycT3sA7jYr1TbBT+Q4wkiiqvk-sJppwzXvffeEUAgBMXOxfA@mail.gmail.com>
-Subject: Re: Re: [PATCH v7 01/12] iova: Export alloc_iova_fast()
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <YKwfsIT5DuE+L+4M@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 26, 2021 at 10:36 AM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> =E5=9C=A8 2021/5/17 =E4=B8=8B=E5=8D=885:55, Xie Yongji =E5=86=99=E9=81=93=
-:
-> > Export alloc_iova_fast() so that some modules can use it
-> > to improve iova allocation efficiency.
-> >
-> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-> > ---
-> >   drivers/iommu/iova.c | 1 +
-> >   1 file changed, 1 insertion(+)
-> >
-> > diff --git a/drivers/iommu/iova.c b/drivers/iommu/iova.c
-> > index e6e2fa85271c..317eef64ffef 100644
-> > --- a/drivers/iommu/iova.c
-> > +++ b/drivers/iommu/iova.c
-> > @@ -450,6 +450,7 @@ alloc_iova_fast(struct iova_domain *iovad, unsigned=
- long size,
-> >
-> >       return new_iova->pfn_lo;
-> >   }
-> > +EXPORT_SYMBOL_GPL(alloc_iova_fast);
-> >
-> >   /**
-> >    * free_iova_fast - free iova pfn range into rcache
->
->
-> Interesting, do we need export free_iova_fast() as well?
->
 
-Oh, yes. I missed this commit 6e1ea50a06 ("iommu: Stop exporting
-free_iova_fast()"). Will rebase on the newest kernel tree.
+
+On 5/25/2021 5:50 AM, Sean Christopherson wrote:
+> On Sun, Feb 07, 2021, Jing Liu wrote:
+>> The static xstate buffer kvm_xsave contains the extended register
+>> states, but it is not enough for dynamic features with large state.
+>>
+>> Introduce a new capability called KVM_CAP_X86_XSAVE_EXTENSION to
+>> detect if hardware has XSAVE extension (XFD). Meanwhile, add two
+>> new ioctl interfaces to get/set the whole xstate using struct
+>> kvm_xsave_extension buffer containing both static and dynamic
+>> xfeatures. Reuse fill_xsave and load_xsave for both cases.
+>>
+>> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+>> ---
+>>   arch/x86/include/uapi/asm/kvm.h |  5 +++
+>>   arch/x86/kvm/x86.c              | 70 +++++++++++++++++++++++++--------
+>>   include/uapi/linux/kvm.h        |  8 ++++
+>>   3 files changed, 66 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+>> index 89e5f3d1bba8..bf785e89a728 100644
+>> --- a/arch/x86/include/uapi/asm/kvm.h
+>> +++ b/arch/x86/include/uapi/asm/kvm.h
+>> @@ -362,6 +362,11 @@ struct kvm_xsave {
+>>   	__u32 region[1024];
+>>   };
+>>   
+>> +/* for KVM_CAP_XSAVE_EXTENSION */
+>> +struct kvm_xsave_extension {
+>> +	__u32 region[3072];
+> Fool me once, shame on you (Intel).  Fool me twice, shame on me (KVM).
+>
+> As amusing as kvm_xsave_really_extended would be, the required size should be
+> discoverable, not hardcoded.
+Thanks for reviewing the patch.
+When looking at current kvm_xsave structure, I felt confusing about the 
+static
+hardcoding of 1024 bytes, but failed to find clue for its final decision 
+in 2010[1].
+So we'd prefer to changing the way right? Please correct me if I 
+misunderstood.
+
+> Nothing prevents a hardware vendor from inventing
+> a newfangled feature that requires yet more space.
+> As an alternative to adding a dedicated capability, can we leverage
+> GET_SUPPORTED_CPUID, leaf CPUID.0xD,
+Yes, this is a good way to avoid a dedicated capability. Thanks for the
+suggestion.
+Use 0xD.1.EBX for size of enabled xcr0|xss if supposing kvm_xsave cares 
+both.
+> to enumerate the minimum required size and
+> state
+For the state, an extreme case is using an old qemu as follows, but a
+new kvm with more future_featureZ supported. If hardware vendor arranges
+one by one, it's OK to use static state like X86XSaveArea(2) and
+get/set between userspace and kvm because it's non-compacted. If not,
+the state will not correct.
+So far it is OK, so I'm wondering if this would be an issue for now?
+
+X86XSaveArea2 {
+     ...
+     XSaveAVX
+     ...
+     AMX_XTILE;
+     future_featureX;
+     future_featureY;
+}
+
+>   that the new ioctl() is available if the min size is greater than 1024?
+> Or is that unnecessarily convoluted...
+To enable a dynamic size kvm_xsave2(Thanks Jim's name suggestion), if 
+things as
+follows are what we might want.
+/* for xstate large than 1024 */
+struct kvm_xsave2 {
+     int size; // size of the whole xstate
+     void *ptr; // xstate pointer
+}
+#define KVM_GET_XSAVE2   _IOW(KVMIO,  0xa4, struct kvm_xsave2)
+
+Take @size together, so KVM need not fetch 0xd.1.ebx each time or a 
+dedicated
+variable.
+
+For Userspace(Qemu):
+struct X86XSaveArea2 {...}// new struct holding all features
+
+if 0xd.1.ebx <= sizeof(kvm_xsave)
+     env->xsave_buf = alloc(sizeof(kvm_xsave))
+     ...
+     ioctl(KVM_GET/SET_XSAVE, X86XSaveArea *)
+else
+     env->xsave_buf = alloc(0xd.1.ebx + sizeof(int))
+     ...
+     xsave2 = env->xsave_buf
+     xsave2->size = ...
+X86XSaveArea2 *area2 = xsave2->ptr
+ioctl(KVM_GET/SET_XSAVE2, xsave2)
+endif
+
+[1] https://lore.kernel.org/kvm/4C10AE1D.40604@redhat.com/
 
 Thanks,
-Yongji
+Jing
