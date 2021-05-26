@@ -2,81 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5661E391A84
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 16:43:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D715391A86
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 16:43:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234957AbhEZOot (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 10:44:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36162 "EHLO
+        id S234973AbhEZOov (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 10:44:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234951AbhEZOos (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 May 2021 10:44:48 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7128C061574;
-        Wed, 26 May 2021 07:43:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=LMFF8VTnEm5kj35Myws1C3qxUFhbJOOxFDs5F+/lqOg=; b=JeZPPKazDKGzh6J0X3JIPQ5rmj
-        mtKGeMKDyhgFn5IzTf0Y6pA3rkcWzJytlQxZXAVGsM8riOG20rBGL7lnPUlr5DHqwLiZ93zBl4m44
-        /jQLSQTzpz8ED3pIvVY35Da24jT85PS2bjCjR4g7bmR3398d/L08BrjvCrfALR/Pwemt05BQDzE24
-        bXud+h0A6EWKBj9ucHnPRw2pvGW0xITn1ztIh9HV2ZmtVCQloh6opQp0FbELnkxiM77IVj+xdvzcG
-        aYd1q8yWQ5f6hOC6/QQe9Dm/3iKmttzn1pHDiTqJgXDN5304mKQcFL8DASK/zNHZgo/Fel3m2L21s
-        Kgj2SPiA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1llukL-000foH-34; Wed, 26 May 2021 14:43:04 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 613BD300242;
-        Wed, 26 May 2021 16:43:03 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 320BC201FF8B9; Wed, 26 May 2021 16:43:03 +0200 (CEST)
-Date:   Wed, 26 May 2021 16:43:03 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Masanori Misono <m.misono760@gmail.com>
-Cc:     David Woodhouse <dwmw@amazon.co.uk>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Rohit Jain <rohit.k.jain@oracle.com>,
-        Ingo Molnar <mingo@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC 0/1] Make vCPUs that are HLT state candidates for
- load balancing
-Message-ID: <YK5ed8ixweIAsvlL@hirez.programming.kicks-ass.net>
-References: <20210526133727.42339-1-m.misono760@gmail.com>
+        with ESMTP id S234951AbhEZOov (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 May 2021 10:44:51 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06392C061756
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 07:43:19 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id q15so1112521pgg.12
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 07:43:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=aLXEknxHX1fry+v1BRHRWIkWG1uersOnv4l1GCaoi1o=;
+        b=bhTR+vIdT1Ck42Xd2MP3S6CdcgVG1iDOt5UULUaGYIDZT5p3c9ukWW3Lxt/mkA580Z
+         B2YIr2mUG/q7T2Zd00Qnm9/dmTgu1vJEd4Lwmx/L766uhktR1bBlnj7MB9TouiGeyhYg
+         NIg2YumYUriWK54ArHBhI7ng2fg6EPOlYusORqV/6BdHWdD2wVFfe2hXyhHM5n09XLqb
+         z2sHBgR/ThbRJKpBKEgjTpwOHc57ReNH+926Xa/rgRYC1dPalwITkuASw8KkSXzeaFlq
+         vvLcBOyHBg5JnNFnaO+GGDwGVkG22QFPBWfoofcARbmqT8tKfQoZ2WL/BrnziN3CdKmG
+         AfRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=aLXEknxHX1fry+v1BRHRWIkWG1uersOnv4l1GCaoi1o=;
+        b=lVF48lQN98Bc+qaXXzSknbjerddeejo9Em9qLEJeDhG/IEBpJ//fgUF5naYjgvD3Fb
+         fYWFCkF+sumv5cm94Wg8qdT2x+oQrV8npoOaQf5ibIyHMTG9rORY/6fqllX/IlCXHg+3
+         I+xkpDLR0tK4dDzESKdL/UkFJbUn9z7bkFmLzVP8tzzq3Vby4yo4tu4+lBlszyDa8g1f
+         6SG5kCpULIr8JyYcyK1P7nuvSuJAz2U0T1VxcZa4H66jn3WNJtTx9649joWSsjmCCEGp
+         O36iFY1X4ss6LVWcZSUnP3sfEHXiPcyC5JvM8c6zNe2yexwFeEqDeGg6LoG4+Ifu5JHC
+         IeoQ==
+X-Gm-Message-State: AOAM530IOGtJNy0fgk6A8r4Ks+SVc/Dsolbct9SQuWuS9g+4stlPmp08
+        eemFJn1C5RrRmm87cWuBn9BxEA==
+X-Google-Smtp-Source: ABdhPJwKBuDUdATA68/3+Ml4QROh2TxX9FfUim4U2V5A3IxPY2sIUd64iPwmjeoqlJ6f2Ohl3vX/qw==
+X-Received: by 2002:a65:5305:: with SMTP id m5mr25340986pgq.155.1622040198289;
+        Wed, 26 May 2021 07:43:18 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id mt24sm14871624pjb.18.2021.05.26.07.43.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 May 2021 07:43:17 -0700 (PDT)
+Date:   Wed, 26 May 2021 14:43:13 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Liu, Jing2" <jing2.liu@linux.intel.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jing2.liu@intel.com
+Subject: Re: [PATCH RFC 4/7] kvm: x86: Add new ioctls for XSAVE extension
+Message-ID: <YK5egUs+Wl2d+wWz@google.com>
+References: <20210207154256.52850-1-jing2.liu@linux.intel.com>
+ <20210207154256.52850-5-jing2.liu@linux.intel.com>
+ <YKwfsIT5DuE+L+4M@google.com>
+ <920df897-56d8-1f81-7ce2-0050fb744bd7@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20210526133727.42339-1-m.misono760@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <920df897-56d8-1f81-7ce2-0050fb744bd7@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 26, 2021 at 10:37:26PM +0900, Masanori Misono wrote:
-> is_vcpu_preempted() is also used in PV spinlock implementations to mitigate
-> lock holder preemption problems,
+On Wed, May 26, 2021, Liu, Jing2 wrote:
+> 
+> On 5/25/2021 5:50 AM, Sean Christopherson wrote:
+> > On Sun, Feb 07, 2021, Jing Liu wrote:
+> > > The static xstate buffer kvm_xsave contains the extended register
+> > > states, but it is not enough for dynamic features with large state.
+> > > 
+> > > Introduce a new capability called KVM_CAP_X86_XSAVE_EXTENSION to
+> > > detect if hardware has XSAVE extension (XFD). Meanwhile, add two
+> > > new ioctl interfaces to get/set the whole xstate using struct
+> > > kvm_xsave_extension buffer containing both static and dynamic
+> > > xfeatures. Reuse fill_xsave and load_xsave for both cases.
+> > > 
+> > > Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+> > > ---
+> > >   arch/x86/include/uapi/asm/kvm.h |  5 +++
+> > >   arch/x86/kvm/x86.c              | 70 +++++++++++++++++++++++++--------
+> > >   include/uapi/linux/kvm.h        |  8 ++++
+> > >   3 files changed, 66 insertions(+), 17 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> > > index 89e5f3d1bba8..bf785e89a728 100644
+> > > --- a/arch/x86/include/uapi/asm/kvm.h
+> > > +++ b/arch/x86/include/uapi/asm/kvm.h
+> > > @@ -362,6 +362,11 @@ struct kvm_xsave {
+> > >   	__u32 region[1024];
 
-It's used to abort optimistic spinners.
+Hold up a sec.  How big is the AMX data?  The existing size is 4096 bytes, not
+1024 bytes.  IIRC, AMX is >4k, so we still need a new ioctl(), but we should be
+careful to mentally adjust for the __u32 when mentioning the sizes.
 
-> etc. A vCPU holding a lock does not do HLT,
+> > >   };
+> > > +/* for KVM_CAP_XSAVE_EXTENSION */
+> > > +struct kvm_xsave_extension {
+> > > +	__u32 region[3072];
+> > Fool me once, shame on you (Intel).  Fool me twice, shame on me (KVM).
+> > 
+> > As amusing as kvm_xsave_really_extended would be, the required size should be
+> > discoverable, not hardcoded.
+> Thanks for reviewing the patch.  When looking at current kvm_xsave structure,
+> I felt confusing about the static hardcoding of 1024 bytes, but failed to
+> find clue for its final decision in 2010[1].
 
-Optimistic spinning is actually part of mutexes and rwsems too, and in
-those cases we might very well end up in idle while holding the lock.
-However; in that case the task will have been scheduled out and the
-optimistic spin loop will terminate due to that (see the ->on_cpu
-condition).
+Simplicitly and lack of foresight :-)
 
-> so I think this patch doesn't affect them.
+> So we'd prefer to changing the way right? Please correct me if I misunderstood.
 
-That is correct.
+Sadly, we can't fix the existing ioctl() without breaking userspace.  But for
+the new ioctl(), yes, its size should not be hardcoded.
 
-> However, pCPU may be
-> running the host's thread that has higher priority than a vCPU thread, and
-> in that case, is_vcpu_preempted() should return 0 ideally.
+> > Nothing prevents a hardware vendor from inventing a newfangled feature that
+> > requires yet more space.  As an alternative to adding a dedicated
+> > capability, can we leverage GET_SUPPORTED_CPUID, leaf CPUID.0xD,
+> Yes, this is a good way to avoid a dedicated capability. Thanks for the
+> suggestion.  Use 0xD.1.EBX for size of enabled xcr0|xss if supposing
+> kvm_xsave cares both.
+> > to enumerate the minimum required size and state
+> For the state, an extreme case is using an old qemu as follows, but a
+> new kvm with more future_featureZ supported. If hardware vendor arranges
+> one by one, it's OK to use static state like X86XSaveArea(2) and
+> get/set between userspace and kvm because it's non-compacted. If not,
+> the state will not correct.
+> So far it is OK, so I'm wondering if this would be an issue for now?
 
-No, in that case vcpu_is_preempted() really should return true. There is
-no saying how long the vcpu is gone for.
+Oh, you're saying that, because kvm_xsave is non-compacted, future features may
+overflow kvm_xsave simply because the architectural offset overflows 4096 bytes.
 
+That should be a non-issue for old KVM/kernels, since the new features shouldn't
+be enabled.  For new KVM, I think the right approach is to reject KVM_GET_XSAVE
+and KVM_SET_XSAVE if the required size is greater than sizeof(struct kvm_xsave).
+I.e. force userspace to either hide the features from the guest, or use
+KVM_{G,S}ET_XSAVE2.
+
+> X86XSaveArea2 {
+>     ...
+>     XSaveAVX
+>     ...
+>     AMX_XTILE;
+>     future_featureX;
+>     future_featureY;
+> }
+> 
+> >   that the new ioctl() is available if the min size is greater than 1024?
+> > Or is that unnecessarily convoluted...
+> To enable a dynamic size kvm_xsave2(Thanks Jim's name suggestion), if things
+> as follows are what we might want.
+> /* for xstate large than 1024 */
+> struct kvm_xsave2 {
+>     int size; // size of the whole xstate
+>     void *ptr; // xstate pointer
+> }
+> #define KVM_GET_XSAVE2   _IOW(KVMIO,  0xa4, struct kvm_xsave2)
+> 
+> Take @size together, so KVM need not fetch 0xd.1.ebx each time or a dedicated
+> variable.
+
+Yes, userspace needs to provide the size so that KVM doesn't unintentionally
+overflow the buffer provided by userspace.  We might also want to hedge by adding
+a flags?  Can't think of a use for it at the moment, though.
+
+  struct kvm_xsave2 {
+  	__u32 flags;
+	__u32 size;
+	__u8  state[0];
+  };
