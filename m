@@ -2,193 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F3203916BA
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 13:54:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB8AA3916CE
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 13:57:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232902AbhEZL4I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 07:56:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27896 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233999AbhEZLz3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 May 2021 07:55:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622030036;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=J4tfG3Iivr0UDU/243VjSMS2UCgnXJX6AdyOu5WgiuE=;
-        b=PepEzagc5d/caNfCIpX6LBJRnxCa8SdMosTmSQd//fELCvLn3hEykomlWJqanA9nf2qpx/
-        VvDI0qQg+62iHaRR8jL0iIuDfdB73Bk6Vbs6GER1ODysGLyz324ZgMoCQ60dqr4DXIE27A
-        NesIC523jnkUO/tEasKGL/UNNdqv9H4=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-396-4jeLMr9HOaa-s6j9-fi3-g-1; Wed, 26 May 2021 07:53:54 -0400
-X-MC-Unique: 4jeLMr9HOaa-s6j9-fi3-g-1
-Received: by mail-ej1-f70.google.com with SMTP id p18-20020a1709067852b02903dab2a3e1easo302378ejm.17
-        for <kvm@vger.kernel.org>; Wed, 26 May 2021 04:53:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=J4tfG3Iivr0UDU/243VjSMS2UCgnXJX6AdyOu5WgiuE=;
-        b=iDHnwtr6kXL39cKb8EhbPt5Lw5pb9KKGvwHAgcqH9EKdQRzPJwo24tGYxufxiE9XVu
-         B/2MQ0FwmJctIhgulmMDKwZHfyY3+k9qjVeGbp7ZxBVO4sHMRafLpAjEjRh1w2LO5CmL
-         phbpPt0kebZBlIz1LAdN4krEp+k3gTpEf7iVpLNmYAqnEz/zxhvSkitWvO3r8sZ3El+O
-         uTu3ajpoiCtHdHq+iuMWEmf4GVBMobZ0QiVBNN5peYIQWALbPENGPdY37qkXPILPqFNh
-         UDkohM9bLdjhKZsJu7VfEWQs0dfL4yXKS5Enh1A2YLRKxFeNmWJH2Xgx9hTe1+M/iW25
-         3xBg==
-X-Gm-Message-State: AOAM5328fA7rwQPeb1/KDsgGIueZQEdKI8+/icOXjI+VsC9bcaJS4NMH
-        fhLi/yoSWU1J+gSdXT3RU/h8suGLNw4E3eTrDV5wUuV1Fd9Zx/e1xTG2X5ReM8Iz1585wZ9uCxi
-        2SgrfxQamLzQy
-X-Received: by 2002:a17:906:e0d5:: with SMTP id gl21mr33494695ejb.93.1622030033142;
-        Wed, 26 May 2021 04:53:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxt8+d1iX+DqR1qPCPmxp6q8NikFchjRljNvew5YHy3SdlULrSNFp6cnmOS2D/UnyGUZ2Y1FA==
-X-Received: by 2002:a17:906:e0d5:: with SMTP id gl21mr33494666ejb.93.1622030032758;
-        Wed, 26 May 2021 04:53:52 -0700 (PDT)
-Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id n24sm12465472edv.51.2021.05.26.04.53.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 May 2021 04:53:52 -0700 (PDT)
-Date:   Wed, 26 May 2021 13:53:50 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, eric.auger@redhat.com,
-        alexandru.elisei@arm.com, pbonzini@redhat.com
-Subject: Re: [PATCH v2 5/5] KVM: arm64: selftests: get-reg-list: Split base
- and pmu registers
-Message-ID: <20210526115350.t72q34km2wyxtmpn@gator.home>
-References: <20210519140726.892632-1-drjones@redhat.com>
- <20210519140726.892632-6-drjones@redhat.com>
- <YK1ZcqgyLFSDH14+@google.com>
- <87zgwhvq7r.wl-maz@kernel.org>
- <20210526093211.loppoo42twel6inw@gator.home>
- <87y2c1vm1m.wl-maz@kernel.org>
+        id S233081AbhEZL6h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 07:58:37 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37256 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232869AbhEZL6g (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 May 2021 07:58:36 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14QBZ061171514;
+        Wed, 26 May 2021 07:57:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=eO8+n+Sq2ZxdbE7fydKtJxxn77bqvxKFRhLTUXbsAdc=;
+ b=VEYDl1bwRKw7Qpl/Df4QCMQ+ojmViELmF4i2C//WWp8XyeeimoaMcqRHz+mK+b6b+Hgw
+ xwwMBM4hX2qS9xSk9cIz7mDbvORWvJZu2hp5D4xm2KEhGjZA9IvlPqiui3/GD+o179xQ
+ cZiRC94oXblwDBb5Gde3PRw83rVVpbh9ChYwZGihk9rCW5xDsVyuFMWq0YTYgjL3UUT4
+ 7aQKfRB9jska1YcUhPnBYrd9yTwFgKAvAxOKwyWXR61Xscsh+kn3lwYmq5111iBfYVGd
+ ub6dAwpMkYMrDxLwSQCMJnBqqBGUEIzdhg21j2IK8HptJ2Com9ezy8oA69Z3fckHc6q2 aA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38smgm2fek-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 May 2021 07:57:04 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14QBZ60R173013;
+        Wed, 26 May 2021 07:57:04 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38smgm2fe1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 May 2021 07:57:04 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 14QBrmV1013272;
+        Wed, 26 May 2021 11:57:02 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 38s1r48gvr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 May 2021 11:57:01 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14QBux3b32768438
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 26 May 2021 11:56:59 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 010454C04E;
+        Wed, 26 May 2021 11:56:59 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 718354C044;
+        Wed, 26 May 2021 11:56:58 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.174.11])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 26 May 2021 11:56:58 +0000 (GMT)
+Subject: Re: [PATCH v1 07/11] KVM: s390: pv: add export before import
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     cohuck@redhat.com, borntraeger@de.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20210517200758.22593-1-imbrenda@linux.ibm.com>
+ <20210517200758.22593-8-imbrenda@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Message-ID: <2ccebdfa-af59-a81f-9a18-35c3fb080331@linux.ibm.com>
+Date:   Wed, 26 May 2021 13:56:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87y2c1vm1m.wl-maz@kernel.org>
+In-Reply-To: <20210517200758.22593-8-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 6kB_OUbu9yEuqU2TKvNrxfqAwd8gtELF
+X-Proofpoint-ORIG-GUID: mMriH-6jgR_8uHuwK78QEmK9ezzsoTBC
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-26_08:2021-05-26,2021-05-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0
+ bulkscore=0 clxscore=1015 mlxscore=0 phishscore=0 impostorscore=0
+ priorityscore=1501 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2104190000 definitions=main-2105260077
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 26, 2021 at 11:15:01AM +0100, Marc Zyngier wrote:
-> On Wed, 26 May 2021 10:32:11 +0100,
-> Andrew Jones <drjones@redhat.com> wrote:
-> > 
-> > On Wed, May 26, 2021 at 09:44:56AM +0100, Marc Zyngier wrote:
-> > > On Tue, 25 May 2021 21:09:22 +0100,
-> > > Ricardo Koller <ricarkol@google.com> wrote:
-> > > > 
-> > > > On Wed, May 19, 2021 at 04:07:26PM +0200, Andrew Jones wrote:
-> > > > > Since KVM commit 11663111cd49 ("KVM: arm64: Hide PMU registers from
-> > > > > userspace when not available") the get-reg-list* tests have been
-> > > > > failing with
-> > > > > 
-> > > > >   ...
-> > > > >   ... There are 74 missing registers.
-> > > > >   The following lines are missing registers:
-> > > > >   ...
-> > > > > 
-> > > > > where the 74 missing registers are all PMU registers. This isn't a
-> > > > > bug in KVM that the selftest found, even though it's true that a
-> > > > > KVM userspace that wasn't setting the KVM_ARM_VCPU_PMU_V3 VCPU
-> > > > > flag, but still expecting the PMU registers to be in the reg-list,
-> > > > > would suddenly no longer have their expectations met. In that case,
-> > > > > the expectations were wrong, though, so that KVM userspace needs to
-> > > > > be fixed, and so does this selftest. The fix for this selftest is to
-> > > > > pull the PMU registers out of the base register sublist into their
-> > > > > own sublist and then create new, pmu-enabled vcpu configs which can
-> > > > > be tested.
-> > > > > 
-> > > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > > > ---
-> > > > >  .../selftests/kvm/aarch64/get-reg-list.c      | 46 +++++++++++++++----
-> > > > >  1 file changed, 38 insertions(+), 8 deletions(-)
-> > > > > 
-> > > > > diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> > > > > index dc06a28bfb74..78d8949bddbd 100644
-> > > > > --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> > > > > +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> > > > > @@ -47,6 +47,7 @@ struct reg_sublist {
-> > > > >  struct vcpu_config {
-> > > > >  	const char *name;
-> > > > >  	bool sve;
-> > > > > +	bool pmu;
-> > > > >  	struct reg_sublist sublists[];
-> > > > >  };
-> > > > 
-> > > > I think it's possible that the number of sublists keeps increasing: it
-> > > > would be very nice/useful if KVM allowed enabling/disabling more
-> > > > features from userspace (besides SVE, PMU etc).
-> > > 
-> > > [tangential semi-rant]
-> > > 
-> > > While this is a very noble goal, it also doubles the validation space
-> > > each time you add an option. Given how little testing gets done
-> > > relative to the diversity of features and implementations, that's a
-> > > *big* problem.
-> > 
-> > It's my hope that this test, especially now after its refactoring, will
-> > allow us to test all configurations easily and therefore frequently.
-> > 
-> > > 
-> > > I'm not against it for big ticket items that result in a substantial
-> > > amount of state to be context-switched (SVE, NV). However, doing that
-> > > for more discrete features would require a radical change in the way
-> > > we develop, review and test KVM/arm64.
-> > >
-> > 
-> > I'm not sure I understand how we should change the development and
-> > review processes.
-> 
-> I'm worried that the current ratio of development vs review vs testing
-> is simply not right. We have a huge reviewing deficit, and we end-up
-> merging buggy code. Some of the features we simply cannot test. It was
-> OK up to 3 years ago, but I'm not sure it is sustainable anymore.
-> 
-> So making more and more things optional seems to go further in the
-> direction of an uncontrolled bitrot.
+On 5/17/21 10:07 PM, Claudio Imbrenda wrote:
+> Due to upcoming changes, it will be possible to temporarily have
+> multiple protected VMs in the same address space. When that happens,
+> it is necessary to perform an export of every page that is to be
+> imported.
 
-I guess the optional CPU features are just going to keep on coming. And,
-while more reviewers would help, there will never be enough. I think the
-only solution is to get more CI.
+... since the Ultravisor doesn't allow KVM to import a secure page
+belonging to guest A to be imported for guest B in order to guarantee
+proper guest isolation.
+
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
 > 
-> > As for testing, with simple tests like this one,
-> > we can actually achieve exhaustive configuration testing fast, at
-> > least with respect to checking for expected registers and checking
-> > that we can get/set_one_reg on them. If we were to try and setup
-> > QEMU migration tests for all the possible configurations, then it
-> > would take way too long.
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>  arch/s390/kernel/uv.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 > 
-> I'm not worried about this get/set thing. I'm worried about the full
-> end-to-end migration, which hardly anyone tests in anger, with all the
-> variability of the architecture and options.
-
-It does get tested downstream, but certain configurations will likely
-be neglected. For example, we've rarely, if ever, tested with the PMU
-disabled. Also, testing downstream is a bit late. It'd be better if
-tests were running on upstream branches, before even being merged to
-master.
-
-As for testing migration of devices other than the CPU, we do have
-some QEMU unit tests for that which gate merger to QEMU master.
-
-Anyway, while unit tests like this one may seem too simple to be useful,
-assuming the tests mimic key parts of the fully integrated function, and
-are run frequently, then they may catch regressions sooner, even during
-development. The less frequently run integrated tests which happen later,
-and with limited configs, may then be sufficient.
-
-BTW, kvm-unit-tests can also test migrations. The VM configs are limited,
-but CPU feature combinations could be tested thoroughly without too
-much difficulty. That would at least include QEMU in the integration
-testing, but unless we modify the tests to migrate between hosts with
-different kernel versions (it's nice to try and support older -> newer),
-then we're not testing the same type of thing that we're testing here with
-this test.
-
-Thanks,
-drew
+> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
+> index b19b1a1444ec..dbcf4434eb53 100644
+> --- a/arch/s390/kernel/uv.c
+> +++ b/arch/s390/kernel/uv.c
+> @@ -242,6 +242,12 @@ static int make_secure_pte(pte_t *ptep, unsigned long addr,
+>  	return rc;
+>  }
+>  
+> +static bool should_export_before_import(struct uv_cb_header *uvcb, struct mm_struct *mm)
+> +{
+> +	return uvcb->cmd != UVC_CMD_UNPIN_PAGE_SHARED &&
+> +		atomic_read(&mm->context.is_protected) > 1;
+> +}
+> +
+>  /*
+>   * Requests the Ultravisor to make a page accessible to a guest.
+>   * If it's brought in the first time, it will be cleared. If
+> @@ -285,6 +291,8 @@ int gmap_make_secure(struct gmap *gmap, unsigned long gaddr, void *uvcb)
+>  
+>  	lock_page(page);
+>  	ptep = get_locked_pte(gmap->mm, uaddr, &ptelock);
+> +	if (should_export_before_import(uvcb, gmap->mm))
+> +		uv_convert_from_secure(page_to_phys(page));
+>  	rc = make_secure_pte(ptep, uaddr, page, uvcb);
+>  	pte_unmap_unlock(ptep, ptelock);
+>  	unlock_page(page);
+> 
 
