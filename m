@@ -2,171 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 72D33392117
-	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 21:47:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0686E392147
+	for <lists+kvm@lfdr.de>; Wed, 26 May 2021 22:09:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234386AbhEZTsc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 15:48:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49498 "EHLO
+        id S234732AbhEZUKu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 16:10:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231924AbhEZTsb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 May 2021 15:48:31 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB86AC06175F
-        for <kvm@vger.kernel.org>; Wed, 26 May 2021 12:46:57 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id t193so1842899pgb.4
-        for <kvm@vger.kernel.org>; Wed, 26 May 2021 12:46:57 -0700 (PDT)
+        with ESMTP id S233486AbhEZUKs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 May 2021 16:10:48 -0400
+Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 327E3C06175F
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 13:09:17 -0700 (PDT)
+Received: by mail-io1-xd2b.google.com with SMTP id z24so2380155ioi.3
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 13:09:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=hEQ3MdXmpdNmcX6sa1MKz2lUFHPHmPostz9Pp0Yt+54=;
-        b=b1ledajAYuzSP2VsYjLXXA+yLdhz9jMTPLKR8jN1BmCm06HetxB4+K+9y1UkLgPGJU
-         8FJJevRA+tNRkxZEmKTbGAEI201rzRZoz5+VL7ftvW0M84XkhdamXP09FeQBf0gDMQGU
-         0k9I1ORp07R5N8pLA1QDajOqd6fOK0a7s0zKXZ7MRZknul8dbZAVK3KNwxMHmNCQfBLY
-         jJ3jy8WK2GAgyehfuQVJdPflw5Uv2kQBba7LRL5vNSkwHjO/TeZhiuXKJEuo7EZFqXnP
-         6CqLhRB4GytEUeiguuk8nexR6qzpY5MWCLAB7GLELwSWrKeTRKKlEoIKE4X5J/7EgIkv
-         hv3A==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=vFDYuBmh7yjJdj9CItzBZCqIL81Dc5QxJ2wo0EOE5jA=;
+        b=eSdmwcymhc7rdEp+teYEOB16ky0YRohcKnfTC1vyL86VHp2vg3ykTARcUlGBXFbERN
+         bFAuI0leHXnFoB5GsT5DUA+5stgu/OTpXblQsuOceye4b2Cdzbt0DwcVax95Xc5YcuNZ
+         7uxH9vue10owHgSPud9NNCdktGdd2w/ymV1nXIGmTdVO+rTwNYAQ8qS2obswcWA9SOlz
+         sFYoo8QJ6yQrhxmHntLi0c3MxMHwTD6qnseeUkgpUw1E0wkaR/t7nDhaF16a3qZjRCQq
+         qMoFfQCrFTP/UjF1KcugAZSM2D7UkAYrsmoR4GO/Iz6qjk/hOrVOqqR5dmRvYLvDLk1c
+         GwAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=hEQ3MdXmpdNmcX6sa1MKz2lUFHPHmPostz9Pp0Yt+54=;
-        b=DAoaAwVAHOT+kxSx1y2TlaODSjtC/Akp+b22YmvzC9Gl3/2vnGhpbfImDvO5AlpAx5
-         pVqZvtR2X7UOxztZieFNPV6NK4DBPYaV3SY1yMCej/DGBA4wvcAg9VjXX1gZPf5HaJhB
-         hrv5TQp+AM2u3dhw1UlGDgbVFh8TLVZLy0lZyQDhuRLVTXNUk1yHwRvij4n9lqQ5hb+J
-         o4VeU0f0KU6RYZxFh0ylfQqDHS+dpnuH0J+IZExsyOWMACT74ya4IC8/g1rSgYRWA2JS
-         tmf6ifL38n/tttEIhaMRL4WH8yyi9LOhjOWKgkWaAzVYUoBibWS0DLC7xRFGbuWPFv+E
-         aU5g==
-X-Gm-Message-State: AOAM530dUm/kzsAsH1wo8xwAI83xl2Bgj1kSeC7w48xX5Hog+RSNaX2i
-        czj2pJir3srBe9YVJsxxsYpGSg==
-X-Google-Smtp-Source: ABdhPJwBXUXILPsFBDFo9CFR/JDpKVm78Qh7x+mpCE2hRYo8JoIxtQJXcXaDoL8EHmqAouWcIEOiWQ==
-X-Received: by 2002:a62:cec9:0:b029:2e3:9125:c280 with SMTP id y192-20020a62cec90000b02902e39125c280mr65079pfg.11.1622058417033;
-        Wed, 26 May 2021 12:46:57 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id f9sm46220pfc.42.2021.05.26.12.46.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 May 2021 12:46:56 -0700 (PDT)
-Date:   Wed, 26 May 2021 19:46:52 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jim Mattson <jmattson@google.com>,
-        David Rientjes <rientjes@google.com>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Steve Rutherford <srutherford@google.com>,
-        Peter Gonda <pgonda@google.com>,
-        David Hildenbrand <david@redhat.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFCv2 13/13] KVM: unmap guest memory using poisoned pages
-Message-ID: <YK6lrHeaeUZvHMJC@google.com>
-References: <YHnJtvXdrZE+AfM3@google.com>
- <20210419142602.khjbzktk5tk5l6lk@box.shutemov.name>
- <YH2pam5b837wFM3z@google.com>
- <20210419164027.dqiptkebhdt5cfmy@box.shutemov.name>
- <YH3HWeOXFiCTZN4y@google.com>
- <20210419185354.v3rgandtrel7bzjj@box>
- <YH3jaf5ThzLZdY4K@google.com>
- <20210419225755.nsrtjfvfcqscyb6m@box.shutemov.name>
- <YH8L0ihIzL6UB6qD@google.com>
- <20210521123148.a3t4uh4iezm6ax47@box>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=vFDYuBmh7yjJdj9CItzBZCqIL81Dc5QxJ2wo0EOE5jA=;
+        b=QuGMWAZXLANb/pOKItKDGOQb3ChYywoFdr1zIt2bkjgnXUv9ClTsky/G6PPFtVuD6X
+         mGX/0rwUkh9nJPuIs2ap8nnI6pldzDrVKRQ9BTtt6/5NZU2mH4CdRloXdjANWS+Ecgkq
+         a3+8H/ry5wbiOfBHVSl76Xk+hBZsNWAmPAY6/sm9/+yTOprcZohQD9tLBzlHs/309iDV
+         vCgiFz4VGYnKbBdeBOblVuz1EC3xCGFT62gW6FomatHVCj6tW2xIm9IVn5sOPC/yrm/C
+         gFF72KzvC/skJ2JZw7soqmVSG7swm16B8N1x5gDP4bZnbFBjaXLbvDIu+Uohv4HQQUad
+         6MGg==
+X-Gm-Message-State: AOAM5324PtO6BFEHxgJ3L5W0UuqTsdNd47S45ML+ZarQ6bbTqV8sykWy
+        64V3MVp4qJnJrwOAM2nS5PN7MtwL3x6dwQF3lw6BLg==
+X-Google-Smtp-Source: ABdhPJxKrCQ/dX9bWJ+BgPNFhovSjFU1bGvGRRjO7GrW6LMZLB4Zicb8G+rTOo4MGC/QtfnXpk780gwfFH3QfBlM5i4=
+X-Received: by 2002:a05:6638:124b:: with SMTP id o11mr4875459jas.4.1622059755162;
+ Wed, 26 May 2021 13:09:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210521123148.a3t4uh4iezm6ax47@box>
+References: <CANgfPd_Pq2MkRUZiJynh7zkNuKE5oFGRjKeCjmgYP4vwvfMc1g@mail.gmail.com>
+ <35fe7a86-d808-00e9-a6aa-e77b731bd4bf@redhat.com> <2fd417c59f40bd10a3446f9ed4be434e17e9a64f.camel@redhat.com>
+ <YK5s5SUQh69a19/F@google.com> <927cbe06-7183-1153-95ea-f97eb4ff12f6@redhat.com>
+In-Reply-To: <927cbe06-7183-1153-95ea-f97eb4ff12f6@redhat.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 26 May 2021 13:09:03 -0700
+Message-ID: <CANgfPd-wcyP_nNNSuXMcZ0S+fmkcOEpQaPTS_5EUmDsEVguSCw@mail.gmail.com>
+Subject: Re: Writable module parameters in KVM
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 21, 2021, Kirill A. Shutemov wrote:
-> Hi Sean,
-> 
-> The core patch of the approach we've discussed before is below. It
-> introduce a new page type with the required semantics.
-> 
-> The full patchset can be found here:
-> 
->  git://git.kernel.org/pub/scm/linux/kernel/git/kas/linux.git kvm-unmapped-guest-only
-> 
-> but only the patch below is relevant for TDX. QEMU patch is attached.
+On Wed, May 26, 2021 at 9:30 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 26/05/21 17:44, Sean Christopherson wrote:
+> >> Sure, making them writable is okay.
+> >
+> > making a param writable (new or existing) must come with strong
+> > justification for taking on the extra complexity.
+>
+> I agree.  It's the same for every change, and it's the reason why most
+> parameters are read-only: no justification for the extra complexity.
+> But if somebody has a usecase, it can be considered.
+>
+> > Making 'npt' writable is probably feasible ('ept' would be beyond messy), but I
+> > strongly prefer to keep it read-only.  The direct impacts on the MMU and SVM
+> > aren't too bad, but NPT is required for SEV and VLS, affects kvm_cpu_caps, etc...
+> > And, no offense to win98, there's isn't a strong use case because outside of
+> > personal usage, the host admin/VMM doesn't know that the guest will be running a
+> > broken kernel.
+>
+> Making 'npt' writable would be beyond messy too; allowing select VMs to
+> disable EPT/NPT might be simpler, but not that much.  I can't say
+> offhand if the code would be ugly or not.
 
-Can you post the whole series?  The KVM behavior and usage of FOLL_GUEST is very
-relevant to TDX.
+Thanks for the guidance all. We'll probably send out more writable
+module params in the future in that case, and will add a Documentation
+file whenever we send out the first one.
 
-> CONFIG_HAVE_KVM_PROTECTED_MEMORY has to be changed to what is appropriate
-> for TDX and FOLL_GUEST has to be used in hva_to_pfn_slow() when running
-> TDX guest.
+I don't know if there's a great way to formally encode this
+distinction, but I see two major classes of writable params in terms
+of complexity:
+1. parameters that are captured on VM creation and follow the life of
+the VM e.g. the TDP MMU
+2. parameters which have an effect on all VMs on the system when
+changed e.g. internally we have sysctls to change NX reclaim
+parameters
 
-This behavior in particular is relevant; KVM should provide FOLL_GUEST iff the
-access is private or the VM type doesn't differentiate between private and
-shared.
+I think class 1 is substantially easier to reason about from a code
+perspective, but might be more confusing to userspace, as the current
+value of the parameter has no bearing on the value captured by the VM.
+Class 2 will probably be more complex to implement, require
+synchronization, and need a better justification.
 
-> When page get inserted into private sept we must make sure it is
-> PageGuest() or SIGBUS otherwise.
-
-More KVM feedback :-)
-
-Ideally, KVM will synchronously exit to userspace with detailed information on
-the bad behavior, not do SIGBUS.  Hopefully that infrastructure will be in place
-sooner than later.
-
-https://lkml.kernel.org/r/YKxJLcg/WomPE422@google.com
-
-> Inserting PageGuest() into shared is fine, but the page will not be accessible
-> from userspace.
-
-Even if it can be functionally fine, I don't think we want to allow KVM to map
-PageGuest() as shared memory.  The only reason to map memory shared is to share
-it with something, e.g. the host, that doesn't have access to private memory, so
-I can't envision a use case.
-
-On the KVM side, it's trivially easy to omit FOLL_GUEST for shared memory, while
-always passing FOLL_GUEST would require manually zapping.  Manual zapping isn't
-a big deal, but I do think it can be avoided if userspace must either remap the
-hva or define a new KVM memslot (new gpa->hva), both of which will automatically
-zap any existing translations.
-
-Aha, thought of a concrete problem.  If KVM maps PageGuest() into shared memory,
-then KVM must ensure that the page is not mapped private via a different hva/gpa,
-and is not mapped _any_ other guest because the TDX-Module's 1:1 PFN:TD+GPA
-enforcement only applies to private memory.  The explicit "VM_WRITE | VM_SHARED"
-requirement below makes me think this wouldn't be prevented.
-
-Oh, and the other nicety is that I think it would avoid having to explicitly
-handle PageGuest() memory that is being accessed from kernel/KVM, i.e. if all
-memory exposed to KVM must be !PageGuest(), then it is also eligible for
-copy_{to,from}_user().
-
-> Any feedback is welcome.
-> 
-> -------------------------------8<-------------------------------------------
-> 
-> From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-> Date: Fri, 16 Apr 2021 01:30:48 +0300
-> Subject: [PATCH] mm: Introduce guest-only pages
-> 
-> PageGuest() pages are only allowed to be used as guest memory. Userspace
-> is not allowed read from or write to such pages.
-> 
-> On page fault, PageGuest() pages produce PROT_NONE page table entries.
-> Read or write there will trigger SIGBUS. Access to such pages via
-> syscall leads to -EIO.
-> 
-> The new mprotect(2) flag PROT_GUEST translates to VM_GUEST. Any page
-> fault to VM_GUEST VMA produces PageGuest() page.
-> 
-> Only shared tmpfs/shmem mappings are supported.
-
-Is limiting this to tmpfs/shmem only for the PoC/RFC, or is it also expected to
-be the long-term behavior?
-
-> GUP normally fails on such pages. KVM will use the new FOLL_GUEST flag
-> to access them.
+>
+> Paolo
+>
