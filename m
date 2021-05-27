@@ -2,65 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD4D839253C
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 05:10:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C679A3925F1
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 06:13:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234382AbhE0DLb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 23:11:31 -0400
-Received: from mga18.intel.com ([134.134.136.126]:30989 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232725AbhE0DLb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 May 2021 23:11:31 -0400
-IronPort-SDR: cGMMyJVGIT8aKnvQcbxYVSoCrD4l+YySGBi/PHOKHajtJl9kgwrYBLy7UKByBh5wKqEoxF24iO
- 1LoCTs6+2KIA==
-X-IronPort-AV: E=McAfee;i="6200,9189,9996"; a="190012571"
-X-IronPort-AV: E=Sophos;i="5.82,333,1613462400"; 
-   d="scan'208";a="190012571"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2021 20:09:57 -0700
-IronPort-SDR: K4E8Aidec6aRDQPngzIsQrkDj9rjiYqd0aRLYHYjBD2Zt+jn7/vKYDGhisfS+zCRVxiuKTDyHc
- CV69Fev6gqBQ==
-X-IronPort-AV: E=Sophos;i="5.82,333,1613462400"; 
-   d="scan'208";a="477298112"
-Received: from shao2-debian.sh.intel.com (HELO localhost) ([10.239.13.11])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2021 20:09:56 -0700
-Date:   Thu, 27 May 2021 11:08:41 +0800
-From:   kernel test robot <rong.a.chen@intel.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
-        Robert Hu <robert.hu@intel.com>,
-        Farrah Chen <farrah.chen@intel.com>,
-        Danmei Wei <danmei.wei@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [kvm:master 128/130] Warning: Kernel ABI header at
- 'tools/arch/x86/include/uapi/asm/kvm.h' differs from latest version at
- 'arch/x86/include/uapi/asm/kvm.h':  408> #define
- KVM_X86_QUIRK_TSC_HOST_ACCESS      (1 << 5)
-Message-ID: <20210527030841.GX2687475@shao2-debian>
+        id S229706AbhE0EOq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 00:14:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25014 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229692AbhE0EOp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 27 May 2021 00:14:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622088792;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=q3igEycLd8J73C7Vxb8Ui44QuvOprk+cULPfcPtYoIg=;
+        b=QFdc+ari0AIkQho7ZuWviXnT6YLKKHox7vh4d/LpQ7EaRavPHH0nekqPuTcJEIztGRMmuV
+        SXATnMWMK4sDVnHvVXgpJFQAe5RByazoRNWWOxzVEagnHCOwcAZ50xNFfv6JE+m4SO29u9
+        t/U+pFUY8xRs4sIZ3hoWB37rjK81GuE=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-386-FlU6jLdfP4uDEJwk8HLPLQ-1; Thu, 27 May 2021 00:13:08 -0400
+X-MC-Unique: FlU6jLdfP4uDEJwk8HLPLQ-1
+Received: by mail-pj1-f72.google.com with SMTP id cv23-20020a17090afd17b029015cdd292fe8so1657205pjb.8
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 21:13:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=q3igEycLd8J73C7Vxb8Ui44QuvOprk+cULPfcPtYoIg=;
+        b=AAYrC/G9TKe7LVNu+cZ+UEtBGUXLTAw6JBc3W5o279Dre+H08O9+yD309gXq5CkHWG
+         rCQboB+7KXngVhegW13YI/GZ9eC/bBVP5gEhLEOxKt1jWUp4Hlh+ybcEBWe/y5e37nRU
+         T2/g/gtUv5DOtVLRGceqFRCdQSfz/0tax16pEIDRbCP0+nCn7b7M9RxTscVLT+fKp5OJ
+         b6i24vjA5RbIScSZjBPS6Dy4HHHzAjdL/h3/wK8zHs+SitKMjhYV0bibHH4U1tRRQJpA
+         YrG1Jj36jERz1VIr0olhbd3xfpz+0uFbLczNBdA41VkyqJzjku1yjO5YfOs2K7S+1XC4
+         T3dg==
+X-Gm-Message-State: AOAM530FrWoQu+GSvEx6g0C1b2UGzkwhnFMGpbtFD1xyg1lQUYCXU2xh
+        cahm5zFvJxi3KGxesomxWiiWuzvIuvSNSgtXoo88C1r797c4cOe9i1SGIwNXkVa7hEMCLd5u/YH
+        /xQ1nVTX/16Zi
+X-Received: by 2002:a63:3c0e:: with SMTP id j14mr1842312pga.427.1622088787573;
+        Wed, 26 May 2021 21:13:07 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzNWCYMnMC1HxMoP07R/3S3m3jilU3dNCIEmruTMAtVdxqR2yiJbYdkUNhO/NZQxyTwe/4ddA==
+X-Received: by 2002:a63:3c0e:: with SMTP id j14mr1842274pga.427.1622088787269;
+        Wed, 26 May 2021 21:13:07 -0700 (PDT)
+Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id c134sm622801pfb.135.2021.05.26.21.13.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 May 2021 21:13:06 -0700 (PDT)
+Subject: Re: [PATCH v7 11/12] vduse: Introduce VDUSE - vDPA Device in
+ Userspace
+To:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
+        stefanha@redhat.com, sgarzare@redhat.com, parav@nvidia.com,
+        hch@infradead.org, christian.brauner@canonical.com,
+        rdunlap@infradead.org, willy@infradead.org,
+        viro@zeniv.linux.org.uk, axboe@kernel.dk, bcrl@kvack.org,
+        corbet@lwn.net, mika.penttila@nextfour.com,
+        dan.carpenter@oracle.com, joro@8bytes.org
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
+References: <20210517095513.850-1-xieyongji@bytedance.com>
+ <20210517095513.850-12-xieyongji@bytedance.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <3740c7eb-e457-07f3-5048-917c8606275d@redhat.com>
+Date:   Thu, 27 May 2021 12:12:58 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.10.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20210517095513.850-12-xieyongji@bytedance.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git master
-head:   f7d7a93c553f6242b1732b64edc8120c7a061b78
-commit: 37a3ce1ca196ed06edcef4fe20bd19a05af7d56c [128/130] KVM: x86: introduce KVM_X86_QUIRK_TSC_HOST_ACCESS
-compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
-reproduce:
-cd tools/perf && ./check-headers.sh
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+ÔÚ 2021/5/17 ÏÂÎç5:55, Xie Yongji Ð´µÀ:
+> +
+> +static int vduse_dev_msg_sync(struct vduse_dev *dev,
+> +			      struct vduse_dev_msg *msg)
+> +{
+> +	init_waitqueue_head(&msg->waitq);
+> +	spin_lock(&dev->msg_lock);
+> +	vduse_enqueue_msg(&dev->send_list, msg);
+> +	wake_up(&dev->waitq);
+> +	spin_unlock(&dev->msg_lock);
+> +	wait_event_killable(msg->waitq, msg->completed);
 
 
-perfheadercheck warnings: (new ones prefixed by >>)
->> Warning: Kernel ABI header at 'tools/arch/x86/include/uapi/asm/kvm.h' differs from latest version at 'arch/x86/include/uapi/asm/kvm.h':  408> #define KVM_X86_QUIRK_TSC_HOST_ACCESS      (1 << 5)
-   Warning: Kernel ABI header at 'tools/arch/x86/include/uapi/asm/kvm.h' differs from latest version at 'arch/x86/include/uapi/asm/kvm.h':  440> 
-   Warning: Kernel ABI header at 'tools/arch/x86/include/uapi/asm/kvm.h' differs from latest version at 'arch/x86/include/uapi/asm/kvm.h':  441> 	__u16 pad;
+What happens if the userspace(malicous) doesn't give a response forever?
 
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+It looks like a DOS. If yes, we need to consider a way to fix that.
+
+Thanks
+
+
+> +	spin_lock(&dev->msg_lock);
+> +	if (!msg->completed) {
+> +		list_del(&msg->list);
+> +		msg->resp.result = VDUSE_REQUEST_FAILED;
+> +	}
+> +	spin_unlock(&dev->msg_lock);
+> +
+> +	return (msg->resp.result == VDUSE_REQUEST_OK) ? 0 : -1;
+> +}
+
