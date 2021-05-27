@@ -2,178 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 671C63931B2
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 17:05:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5231D3931F3
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 17:12:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235124AbhE0PGp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 11:06:45 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14398 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229774AbhE0PGo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 May 2021 11:06:44 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14RF3sHj079795;
-        Thu, 27 May 2021 11:05:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=nIPdJ+FRa7U9Yatl5ghlocd7ojAdQJ+SLaNmWFFXnSY=;
- b=ZYsnGola19lRZLGlbIGzjYrrwxAUZuDzorQHq2uuXIREbps+lLfvADvQrLCM/EQrDORc
- 3pAKkLEx+6FZ1B2z6BzTHEQUI6r8kgomZ/w+nbrLdLAM5aUDJTT+9NynWMdaS65wf60s
- 2l5lALND3E9OqofoPVFVCGvdlOQ3Hgx840xGK2YpqxXJzwAZOj5mU77plo0rnEbvKmEE
- N5Zx74QcQEyx23T0wR24nrVv0ObEO2V3nAlhSpJh4lbJ9iTqCBYFkQQwO9ZrRH9rdnN3
- ZMf1mK1W2/AgT7dDwU4w7D7S9fnBaOWwiQ4I0W7zIbhrjKDrBGetkZ2LTY/Y+MYNHnP5 Vg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38tcmqar78-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 May 2021 11:05:11 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14RF3wgc080092;
-        Thu, 27 May 2021 11:05:11 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38tcmqar5h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 May 2021 11:05:11 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 14RF3Ife017061;
-        Thu, 27 May 2021 15:05:09 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03ams.nl.ibm.com with ESMTP id 38sba2s18a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 May 2021 15:05:08 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14RF56kP12517816
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 27 May 2021 15:05:06 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 99DC5AE055;
-        Thu, 27 May 2021 15:05:06 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 10C73AE056;
-        Thu, 27 May 2021 15:05:06 +0000 (GMT)
-Received: from ibm-vm (unknown [9.145.7.194])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 27 May 2021 15:05:05 +0000 (GMT)
-Date:   Thu, 27 May 2021 17:05:04 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        thuth@redhat.com, cohuck@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v4 5/7] s390x: lib: add teid union and
- clear teid from lowcore
-Message-ID: <20210527170504.33a82226@ibm-vm>
-In-Reply-To: <3afb626a-35d0-a1af-c99f-92e4d4ae5cba@linux.ibm.com>
-References: <20210526134245.138906-1-imbrenda@linux.ibm.com>
-        <20210526134245.138906-6-imbrenda@linux.ibm.com>
-        <3afb626a-35d0-a1af-c99f-92e4d4ae5cba@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S236834AbhE0PNs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 11:13:48 -0400
+Received: from [110.188.70.11] ([110.188.70.11]:46805 "EHLO spam2.hygon.cn"
+        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S235400AbhE0PNq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 May 2021 11:13:46 -0400
+Received: from MK-FE.hygon.cn ([172.23.18.61])
+        by spam2.hygon.cn with ESMTP id 14RF9B2Q005775;
+        Thu, 27 May 2021 23:09:11 +0800 (GMT-8)
+        (envelope-from puwen@hygon.cn)
+Received: from cncheex01.Hygon.cn ([172.23.18.10])
+        by MK-FE.hygon.cn with ESMTP id 14RF97TT002292;
+        Thu, 27 May 2021 23:09:07 +0800 (GMT-8)
+        (envelope-from puwen@hygon.cn)
+Received: from [192.168.1.193] (172.23.18.44) by cncheex01.Hygon.cn
+ (172.23.18.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1466.3; Thu, 27 May
+ 2021 23:09:03 +0800
+Subject: Re: [PATCH] x86/sev: Check whether SEV or SME is supported first
+To:     Sean Christopherson <seanjc@google.com>
+CC:     <x86@kernel.org>, <joro@8bytes.org>, <thomas.lendacky@amd.com>,
+        <dave.hansen@linux.intel.com>, <peterz@infradead.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@suse.de>,
+        <hpa@zytor.com>, <jroedel@suse.de>, <sashal@kernel.org>,
+        <gregkh@linuxfoundation.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <stable@vger.kernel.org>
+References: <20210526072424.22453-1-puwen@hygon.cn>
+ <YK6E5NnmRpYYDMTA@google.com>
+From:   Pu Wen <puwen@hygon.cn>
+Message-ID: <905ecd90-54d2-35f1-c8ab-c123d8a3d9a0@hygon.cn>
+Date:   Thu, 27 May 2021 23:08:32 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <YK6E5NnmRpYYDMTA@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: bM3VR6co51rHZOelEqvRoq4vzEyiXI70
-X-Proofpoint-ORIG-GUID: yulGzT6H2MKAglPDW5H22eQeZXDxa8mg
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-05-27_07:2021-05-27,2021-05-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 impostorscore=0 spamscore=0 phishscore=0 adultscore=0
- clxscore=1015 suspectscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2105270099
+X-Originating-IP: [172.23.18.44]
+X-ClientProxiedBy: cncheex02.Hygon.cn (172.23.18.12) To cncheex01.Hygon.cn
+ (172.23.18.10)
+X-MAIL: spam2.hygon.cn 14RF9B2Q005775
+X-DNSRBL: 
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 27 May 2021 16:52:48 +0200
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> On 5/26/21 3:42 PM, Claudio Imbrenda wrote:
-> > Add a union to represent Translation-Exception Identification
-> > (TEID).
-> > 
-> > Clear the TEID in expect_pgm_int clear_pgm_int.
-> > 
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>  
+On 2021/5/27 1:27, Sean Christopherson wrote:
+> On Wed, May 26, 2021, Pu Wen wrote:
+>> The first two bits of the CPUID leaf 0x8000001F EAX indicate whether
+>> SEV or SME is supported respectively. It's better to check whether
+>> SEV or SME is supported before checking the SEV MSR(0xc0010131) to
+>> see whether SEV or SME is enabled.
+>>
+>> This also avoid the MSR reading failure on the first generation Hygon
+>> Dhyana CPU which does not support SEV or SME.
+>>
+>> Fixes: eab696d8e8b9 ("x86/sev: Do not require Hypervisor CPUID bit for SEV guests")
+>> Cc: <stable@vger.kernel.org> # v5.10+
+>> Signed-off-by: Pu Wen <puwen@hygon.cn>
+>> ---
+>>   arch/x86/mm/mem_encrypt_identity.c | 11 ++++++-----
+>>   1 file changed, 6 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/arch/x86/mm/mem_encrypt_identity.c b/arch/x86/mm/mem_encrypt_identity.c
+>> index a9639f663d25..470b20208430 100644
+>> --- a/arch/x86/mm/mem_encrypt_identity.c
+>> +++ b/arch/x86/mm/mem_encrypt_identity.c
+>> @@ -504,10 +504,6 @@ void __init sme_enable(struct boot_params *bp)
+>>   #define AMD_SME_BIT	BIT(0)
+>>   #define AMD_SEV_BIT	BIT(1)
+>>   
+>> -	/* Check the SEV MSR whether SEV or SME is enabled */
+>> -	sev_status   = __rdmsr(MSR_AMD64_SEV);
+>> -	feature_mask = (sev_status & MSR_AMD64_SEV_ENABLED) ? AMD_SEV_BIT : AMD_SME_BIT;
+>> -
+>>   	/*
+>>   	 * Check for the SME/SEV feature:
+>>   	 *   CPUID Fn8000_001F[EAX]
+>> @@ -519,11 +515,16 @@ void __init sme_enable(struct boot_params *bp)
+>>   	eax = 0x8000001f;
+>>   	ecx = 0;
+>>   	native_cpuid(&eax, &ebx, &ecx, &edx);
+>> -	if (!(eax & feature_mask))
+>> +	/* Check whether SEV or SME is supported */
+>> +	if (!(eax & (AMD_SEV_BIT | AMD_SME_BIT)))
 > 
-> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+> Hmm, checking CPUID at all before MSR_AMD64_SEV is flawed for SEV, e.g. the VMM
+> doesn't need to pass-through CPUID to attack the guest, it can lie directly.
 > 
-> > ---
-> >  lib/s390x/asm/interrupt.h | 22 ++++++++++++++++++++++
-> >  lib/s390x/interrupt.c     |  2 ++
-> >  2 files changed, 24 insertions(+)
-> > 
-> > diff --git a/lib/s390x/asm/interrupt.h b/lib/s390x/asm/interrupt.h
-> > index bf0eb40d..b40def65 100644
-> > --- a/lib/s390x/asm/interrupt.h
-> > +++ b/lib/s390x/asm/interrupt.h
-> > @@ -13,6 +13,28 @@
-> >  #define EXT_IRQ_EXTERNAL_CALL	0x1202
-> >  #define EXT_IRQ_SERVICE_SIG	0x2401
-> >  
-> > +#define TEID_ASCE_PRIMARY	0
-> > +#define TEID_ASCE_AR		1
-> > +#define TEID_ASCE_SECONDARY	2
-> > +#define TEID_ASCE_HOME		3
-> > +
-> > +union teid {
-> > +	unsigned long val;
-> > +	struct {
-> > +		unsigned long addr:52;
-> > +		unsigned long fetch:1;
-> > +		unsigned long store:1;
-> > +		unsigned long reserved:6;
-> > +		unsigned long acc_list_prot:1;
-> > +		/* depending on the exception and the installed
-> > facilities,
-> > +		 * the m field can indicate severel different
-> > things,  
+> SEV-ES is protected by virtue of CPUID interception being reflected as #VC, which
+> effectively tells the guest that it's (probably) an SEV-ES guest and also gives
+> the guest the opportunity to sanity check the emulated CPUID values provided by
+> the VMM.
 > 
-> several
+> In other words, this patch is flawed, but commit eab696d8e8b9 was also flawed by
+> conditioning the SEV path on CPUID.0x80000000.
 
-fixed
+Yes, so I think we'd better admit that the VMM is still trusted for SEV guests
+as you mentioned below.
 
-> > +		 * including whether the exception was triggered
-> > by a MVPG
-> > +		 * instruction, or whether the addr field is
-> > meaningful */  
 > 
-> Could you please convert the comment style to this?
+> Given that #VC can be handled cleanly, the kernel should be able to handle a #GP
+> at this point.  So I think the proper fix is to change __rdmsr() to
+> native_read_msr_safe(), or an open coded variant if necessary, and drop the CPUID
+
+Reading MSR_AMD64_SEV which is not implemented on Hygon Dhyana CPU will cause
+the kernel reboot, and native_read_msr_safe() has no help.
+
+> checks for SEV.
 > 
-> /*
->  * Text
->  */
+> The other alternative is to admit that the VMM is still trusted for SEV guests
 
-and fixed
+Agree with that.
 
-> > +		unsigned long m:1;
-> > +		unsigned long asce_id:2;
-> > +	};
-> > +};
-> > +
-> >  void register_pgm_cleanup_func(void (*f)(void));
-> >  void handle_pgm_int(struct stack_frame_int *stack);
-> >  void handle_ext_int(struct stack_frame_int *stack);
-> > diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
-> > index ce0003de..b627942f 100644
-> > --- a/lib/s390x/interrupt.c
-> > +++ b/lib/s390x/interrupt.c
-> > @@ -22,6 +22,7 @@ void expect_pgm_int(void)
-> >  {
-> >  	pgm_int_expected = true;
-> >  	lc->pgm_int_code = 0;
-> > +	lc->trans_exc_id = 0;
-> >  	mb();
-> >  }
-> >  
-> > @@ -39,6 +40,7 @@ uint16_t clear_pgm_int(void)
-> >  	mb();
-> >  	code = lc->pgm_int_code;
-> >  	lc->pgm_int_code = 0;
-> > +	lc->trans_exc_id = 0;
-> >  	pgm_int_expected = false;
-> >  	return code;
-> >  }
-> >   
+-- 
+Regards,
+Pu Wen
+
+> and take this patch as is (with a reworded changelog).  This probably has my
+> vote, I don't see much value in pretending that the VMM can't exfiltrate data
+> from an SEV guest.  In fact, a malicious VMM is probably more likely to get
+> access to interesting data by _not_ lying about SEV being enabled, because lying
+> about SEV itself will hose the guest sooner than later.
 > 
-
+>>   		return;
+>>   
+>>   	me_mask = 1UL << (ebx & 0x3f);
+>>   
+>> +	/* Check the SEV MSR whether SEV or SME is enabled */
+>> +	sev_status   = __rdmsr(MSR_AMD64_SEV);
+>> +	feature_mask = (sev_status & MSR_AMD64_SEV_ENABLED) ? AMD_SEV_BIT : AMD_SME_BIT;
+>> +
+>>   	/* Check if memory encryption is enabled */
+>>   	if (feature_mask == AMD_SME_BIT) {
+>>   		/*
+>> -- 
+>> 2.23.0
+>>
