@@ -2,219 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E9D5E392929
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 10:02:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BDD3D39299C
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 10:31:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235250AbhE0IDz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 04:03:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33232 "EHLO
+        id S235509AbhE0IdZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 04:33:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28569 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234865AbhE0IDM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 May 2021 04:03:12 -0400
+        by vger.kernel.org with ESMTP id S235336AbhE0IdY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 27 May 2021 04:33:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622102494;
+        s=mimecast20190719; t=1622104311;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=xoDODitHzPFniCdWYgKL23i/M0QDFnJ8IY5fp7VUoLE=;
-        b=aiquNv8oAqp+VqFqAdCmqOz2Qey3f5EZN4CggcG51ozaNsdldZh2NHSqxHb2N2VnMyj9ht
-        5LU5dumNppfUo+XqEKTsKq40OzxxyA1FzltfNexD/sbNm5WFCqHuQEECq4XR8q6HZje3qm
-        BjljYM/j/hEjUIL9s68PGHMoC4DeR5k=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-443-Fo6Hck4wNmKmDD1rFR2fUg-1; Thu, 27 May 2021 04:01:23 -0400
-X-MC-Unique: Fo6Hck4wNmKmDD1rFR2fUg-1
-Received: by mail-wm1-f72.google.com with SMTP id b68-20020a1c80470000b02901846052c7a7so1052038wmd.2
-        for <kvm@vger.kernel.org>; Thu, 27 May 2021 01:01:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=xoDODitHzPFniCdWYgKL23i/M0QDFnJ8IY5fp7VUoLE=;
-        b=jUAq1UH0uCXMAGfpl9HP4gYRbfPV9QF0qpcmWbGGBvlSlxbcLRgCcuk+Wzt8STprIY
-         XWGP5NUQP5aFr2WUSKPYlZFuGSSvjQkpcR/YRA099ZET3KhqHu7928mUrKYar3A9mKwR
-         v2snNyv8l1VLpp4OsWbW5JZbC/iHz/7cid1KO7duhxXonmLoMQzV7hNiXKwlC0tndjyn
-         viDzqVgs8F6d2Aq/ZA7V9dpFOHt9aCE3rrBn3C7DUlQNT2K6etNI1H1gPnjIBDh0xJCO
-         DnJxdVXTSS7AIKmIJtrPmuCITx724Ah88jCiTArngdD2M1Ii+zums+hK/V+SXd1P9VGX
-         NIww==
-X-Gm-Message-State: AOAM530lqzbaEOdUH/XLTLZfh1Y/Y/EVIXBCOK+7I5tjevLp1Rnji8B5
-        oPRmuBzCxOKSl0xmbfCtIs2iqOKDlqHDs3qjiDRd8AGUD4mPK+9EYL1e+4M3kUDx6o8xJkri6i4
-        JWj9WMATzZ0N1
-X-Received: by 2002:a5d:6484:: with SMTP id o4mr1899444wri.8.1622102482124;
-        Thu, 27 May 2021 01:01:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzroZnDP3c30CzWt95Kb7cZSjkFDLdIValTkLLWuRdunNmvtk2w5xcuSJkXqs9lh4LXHXKPNg==
-X-Received: by 2002:a5d:6484:: with SMTP id o4mr1899419wri.8.1622102481845;
-        Thu, 27 May 2021 01:01:21 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id d131sm5096451wmd.4.2021.05.27.01.01.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 May 2021 01:01:21 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        bh=jJfbDlOdCHEBuP0/2VSWt2Xp4aAvYX7fFfLqYRlsGu4=;
+        b=DlXOCHotNnmPKc7koT7ij/BjUwk1U2WvkFp+p34UFOQT94H72SHfhno/SvpKJPoI8/uQ7B
+        p3hxQMTnDWG2aBQDU+uBmpyiQJEP1bb8okmbbDt1U0tsUAp2py4oBxXDLCzr9WEMUAP0ig
+        OmOtRcPl+vQvaGjUgID5JBfTPegoH20=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-452-rqmPXCPROH-VJcFesIzF_w-1; Thu, 27 May 2021 04:31:47 -0400
+X-MC-Unique: rqmPXCPROH-VJcFesIzF_w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7A25501F4;
+        Thu, 27 May 2021 08:31:46 +0000 (UTC)
+Received: from work-vm (ovpn-114-249.ams2.redhat.com [10.36.114.249])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F5326EF42;
+        Thu, 27 May 2021 08:31:41 +0000 (UTC)
+Date:   Thu, 27 May 2021 09:31:39 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Claudio Fontana <cfontana@suse.de>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 0/7] KVM: nVMX: Fixes for nested state migration when
- eVMCS is in use
-In-Reply-To: <5a6314ff3c7b9cc8e6bdf452008ad1b264c95608.camel@redhat.com>
-References: <20210517135054.1914802-1-vkuznets@redhat.com>
- <ea9a392d018ced61478482763f7a59472110104c.camel@redhat.com>
- <8735uc713d.fsf@vitty.brq.redhat.com>
- <5a6314ff3c7b9cc8e6bdf452008ad1b264c95608.camel@redhat.com>
-Date:   Thu, 27 May 2021 10:01:20 +0200
-Message-ID: <87a6og7ghb.fsf@vitty.brq.redhat.com>
+Subject: Re: Windows fails to boot after rebase to QEMU master
+Message-ID: <YK9Y64U0wjU5K753@work-vm>
+References: <20210521091451.GA6016@u366d62d47e3651.ant.amazon.com>
+ <20210524055322-mutt-send-email-mst@kernel.org>
+ <YK6hunkEnft6VJHz@work-vm>
+ <d71fee00-0c21-c5e8-dbc6-00b7ace11c5a@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d71fee00-0c21-c5e8-dbc6-00b7ace11c5a@suse.de>
+User-Agent: Mutt/2.0.7 (2021-05-04)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Maxim Levitsky <mlevitsk@redhat.com> writes:
+* Claudio Fontana (cfontana@suse.de) wrote:
+> On 5/26/21 9:30 PM, Dr. David Alan Gilbert wrote:
+> > * Michael S. Tsirkin (mst@redhat.com) wrote:
+> >> On Fri, May 21, 2021 at 11:17:19AM +0200, Siddharth Chandrasekaran wrote:
+> >>> After a rebase to QEMU master, I am having trouble booting windows VMs.
+> >>> Git bisect indicates commit f5cc5a5c1686 ("i386: split cpu accelerators
+> >>> from cpu.c, using AccelCPUClass") to have introduced the issue. I spent
+> >>> some time looking at into it yesterday without much luck.
+> >>>
+> >>> Steps to reproduce:
+> >>>
+> >>>     $ ./configure --enable-kvm --disable-xen --target-list=x86_64-softmmu --enable-debug
+> >>>     $ make -j `nproc`
+> >>>     $ ./build/x86_64-softmmu/qemu-system-x86_64 \
+> >>>         -cpu host,hv_synic,hv_vpindex,hv_time,hv_runtime,hv_stimer,hv_crash \
+> >>>         -enable-kvm \
+> >>>         -name test,debug-threads=on \
+> >>>         -smp 1,threads=1,cores=1,sockets=1 \
+> >>>         -m 4G \
+> >>>         -net nic -net user \
+> >>>         -boot d,menu=on \
+> >>>         -usbdevice tablet \
+> >>>         -vnc :3 \
+> >>>         -machine q35,smm=on \
+> >>>         -drive if=pflash,format=raw,readonly=on,unit=0,file="../OVMF_CODE.secboot.fd" \
+> >>>         -drive if=pflash,format=raw,unit=1,file="../OVMF_VARS.secboot.fd" \
+> >>>         -global ICH9-LPC.disable_s3=1 \
+> >>>         -global driver=cfi.pflash01,property=secure,value=on \
+> >>>         -cdrom "../Windows_Server_2016_14393.ISO" \
+> >>>         -drive file="../win_server_2016.qcow2",format=qcow2,if=none,id=rootfs_drive \
+> >>>         -device ahci,id=ahci \
+> >>>         -device ide-hd,drive=rootfs_drive,bus=ahci.0
+> >>>
+> >>> If the issue is not obvious, I'd like some pointers on how to go about
+> >>> fixing this issue.
+> >>>
+> >>> ~ Sid.
+> >>>
+> >>
+> >> At a guess this commit inadvertently changed something in the CPU ID.
+> >> I'd start by using a linux guest to dump cpuid before and after the
+> >> change.
+> > 
+> > I've not had a chance to do that yet, however I did just end up with a
+> > bisect of a linux guest failure bisecting to the same patch:
+> > 
+> > [dgilbert@dgilbert-t580 qemu]$ git bisect bad
+> > f5cc5a5c168674f84bf061cdb307c2d25fba5448 is the first bad commit
+> > commit f5cc5a5c168674f84bf061cdb307c2d25fba5448
+> > Author: Claudio Fontana <cfontana@suse.de>
+> > Date:   Mon Mar 22 14:27:40 2021 +0100
+> > 
+> >     i386: split cpu accelerators from cpu.c, using AccelCPUClass
+> >     
+> >     i386 is the first user of AccelCPUClass, allowing to split
+> >     cpu.c into:
+> >     
+> >     cpu.c            cpuid and common x86 cpu functionality
+> >     host-cpu.c       host x86 cpu functions and "host" cpu type
+> >     kvm/kvm-cpu.c    KVM x86 AccelCPUClass
+> >     hvf/hvf-cpu.c    HVF x86 AccelCPUClass
+> >     tcg/tcg-cpu.c    TCG x86 AccelCPUClass
+> >     
+> > 
+> 
+> Paolo, it seems to me that something went wrong in the merge of this commit.
+> 
+> The last version of the series I sent had this comment in the commit message,
+> as part of a very long series of rebases after review.
+> 
+> [claudio]: Rebased on commit b8184135 ("target/i386: allow modifying TCG phys-addr-bits")
+> 
+> 
+> While I do not see this comment in the commit posted here. So I suspect that an older version of the series was included?
 
-> On Mon, 2021-05-24 at 14:44 +0200, Vitaly Kuznetsov wrote:
->> Maxim Levitsky <mlevitsk@redhat.com> writes:
->> 
->> > On Mon, 2021-05-17 at 15:50 +0200, Vitaly Kuznetsov wrote:
->> > > Changes since v1 (Sean):
->> > > - Drop now-unneeded curly braces in nested_sync_vmcs12_to_shadow().
->> > > - Pass 'evmcs->hv_clean_fields' instead of 'bool from_vmentry' to
->> > >   copy_enlightened_to_vmcs12().
->> > > 
->> > > Commit f5c7e8425f18 ("KVM: nVMX: Always make an attempt to map eVMCS after
->> > > migration") fixed the most obvious reason why Hyper-V on KVM (e.g. Win10
->> > >  + WSL2) was crashing immediately after migration. It was also reported
->> > > that we have more issues to fix as, while the failure rate was lowered 
->> > > signifincatly, it was still possible to observe crashes after several
->> > > dozens of migration. Turns out, the issue arises when we manage to issue
->> > > KVM_GET_NESTED_STATE right after L2->L2 VMEXIT but before L1 gets a chance
->> > > to run. This state is tracked with 'need_vmcs12_to_shadow_sync' flag but
->> > > the flag itself is not part of saved nested state. A few other less 
->> > > significant issues are fixed along the way.
->> > > 
->> > > While there's no proof this series fixes all eVMCS related problems,
->> > > Win10+WSL2 was able to survive 3333 (thanks, Max!) migrations without
->> > > crashing in testing.
->> > > 
->> > > Patches are based on the current kvm/next tree.
->> > > 
->> > > Vitaly Kuznetsov (7):
->> > >   KVM: nVMX: Introduce nested_evmcs_is_used()
->> > >   KVM: nVMX: Release enlightened VMCS on VMCLEAR
->> > >   KVM: nVMX: Ignore 'hv_clean_fields' data when eVMCS data is copied in
->> > >     vmx_get_nested_state()
->> > >   KVM: nVMX: Force enlightened VMCS sync from nested_vmx_failValid()
->> > >   KVM: nVMX: Reset eVMCS clean fields data from prepare_vmcs02()
->> > >   KVM: nVMX: Request to sync eVMCS from VMCS12 after migration
->> > >   KVM: selftests: evmcs_test: Test that KVM_STATE_NESTED_EVMCS is never
->> > >     lost
->> > > 
->> > >  arch/x86/kvm/vmx/nested.c                     | 110 ++++++++++++------
->> > >  .../testing/selftests/kvm/x86_64/evmcs_test.c |  64 +++++-----
->> > >  2 files changed, 115 insertions(+), 59 deletions(-)
->> > > 
->> > 
->> > Hi Vitaly!
->> > 
->> > In addition to the review of this patch series,
->> 
->> Thanks by the way!
-> No problem!
->
->> 
->> >  I would like
->> > to share an idea on how to avoid the hack of mapping the evmcs
->> > in nested_vmx_vmexit, because I think I found a possible generic
->> > solution to this and similar issues:
->> > 
->> > The solution is to always set nested_run_pending after 
->> > nested migration (which means that we won't really
->> > need to migrate this flag anymore).
->> > 
->> > I was thinking a lot about it and I think that there is no downside to this,
->> > other than sometimes a one extra vmexit after migration.
->> > 
->> > Otherwise there is always a risk of the following scenario:
->> > 
->> >   1. We migrate with nested_run_pending=0 (but don't restore all the state
->> >   yet, like that HV_X64_MSR_VP_ASSIST_PAGE msr,
->> >   or just the guest memory map is not up to date, guest is in smm or something
->> >   like that)
->> > 
->> >   2. Userspace calls some ioctl that causes a nested vmexit
->> > 
->> >   This can happen today if the userspace calls 
->> >   kvm_arch_vcpu_ioctl_get_mpstate -> kvm_apic_accept_events -> kvm_check_nested_events
->> > 
->> >   3. Userspace finally sets correct guest's msrs, correct guest memory map and only
->> >   then calls KVM_RUN
->> > 
->> > This means that at (2) we can't map and write the evmcs/vmcs12/vmcb12 even
->> > if KVM_REQ_GET_NESTED_STATE_PAGES is pending,
->> > but we have to do so to complete the nested vmexit.
->> 
->> Why do we need to write to eVMCS to complete vmexit? AFAICT, there's
->> only one place which calls copy_vmcs12_to_enlightened():
->> nested_sync_vmcs12_to_shadow() which, in its turn, has only 1 caller:
->> vmx_prepare_switch_to_guest() so unless userspace decided to execute
->> not-fully-restored guest this should not happen. I'm probably missing
->> something in your scenario)
-> You are right! 
-> The evmcs write is delayed to the next vmentry.
->
-> However since we are now mapping the evmcs during nested vmexit,
-> and this can fail for example that HV assist msr is not up to date.
->
-> For example consider this: 
->
-> 1. Userspace first sets nested state
-> 2. Userspace calls KVM_GET_MP_STATE.
-> 3. Nested vmexit that happened in 2 will end up not be able to map the evmcs,
-> since HV_ASSIST msr is not yet loaded.
->
->
-> Also the vmcb write (that is for SVM) _is_ done right away on nested vmexit 
-> and conceptually has the same issue.
-> (if memory map is not up to date, we might not be able to read/write the 
-> vmcb12 on nested vmexit)
->
+That comment is there in the one merged:
+    [claudio]:
+    Rebased on commit b8184135 ("target/i386: allow modifying TCG phys-addr-bits")
 
-It seems we have one correct way to restore a guest and a number of
-incorrect ones :-) It may happen that this is not even a nested-only
-thing (think about trying to resore caps, regs, msrs, cpuids, in a
-random sequence). I'd vote for documenting the right one somewhere, even
-if we'll just be extracting it from QEMU.
+and I don't see any difference in this commit or the 2 previous ones in
+the upstream compared with your i386_cleanup_9 branch.
 
->
->> 
->> > To some extent, the entry to the nested mode after a migration is only complete
->> > when we process the KVM_REQ_GET_NESTED_STATE_PAGES, so we shoudn't interrupt it.
->> > 
->> > This will allow us to avoid dealing with KVM_REQ_GET_NESTED_STATE_PAGES on
->> > nested vmexit path at all. 
->> 
->> Remember, we have three possible states when nested state is
->> transferred:
->> 1) L2 was running
->> 2) L1 was running
->> 3) We're in beetween L2 and L1 (need_vmcs12_to_shadow_sync = true).
->
-> I understand. This suggestion wasn't meant to fix the case 3, but more to fix
-> case 1, where we are in L2, migrate, and then immediately decide to 
-> do a nested vmexit before we processed the KVM_REQ_GET_NESTED_STATE_PAGES
-> request, and also before potentially before the guest state was fully uploaded
-> (see that KVM_GET_MP_STATE thing).
->  
-> In a nutshell, I vote for not allowing nested vmexits from the moment
-> when we set the nested state and until the moment we enter the nested
-> guest once (maybe with request for immediate vmexit),
-> because during this time period, the guest state is not fully consistent.
->
+Dave
 
-Using 'nested_run_pending=1' perhaps? Or, we can get back to 'vm_bugged'
-idea and kill the guest immediately if something forces such an exit.
 
+> The series is also available as:
+> 
+> https://github.com/hw-claudio/qemu.git "i386_cleanup_9"
+> 
+> Thanks,
+> 
+> Claudio
+> 
+> 
+> 
+> 
+> > The guest crash is:
+> > [   85.008985][ T1524] BUG: unable to handle page fault for address: ffffffff810d9c42
+> > [   85.012868][ T1524] #PF: supervisor write access in kernel mode
+> > [   85.012962][ T1524] #PF: error_code(0x0003) - permissions violation
+> > [   85.013043][ T1524] PGD 2224067 P4D 2224067 PUD 2225063 PMD 10001e1 
+> > [   85.013180][ T1524] Oops: 0003 [#1] SMP NOPTI
+> > [   85.013295][ T1524] CPU: 2 PID: 1524 Comm: blogbench Not tainted 5.11.0-rc7 #100
+> > [   85.013395][ T1524] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
+> > [   85.013546][ T1524] RIP: 0010:kvm_kick_cpu+0x22/0x30
+> > [   85.013630][ T1524] Code: 0f 1f 84 00 00 00 00 00 55 48 63 ff 48 c7 c0 78 11 01 00 48 8b 14 fd c0 36 11 82 48 89 e5 53 31 db 0f b7 0c 02 b8 05 00 00 00 <0f> 01 d9 5b 5d c3 0f 1f 84 00 00 00 00 00 55 48 89 e5 53 48 89 fb
+> > [   85.013852][ T1524] RSP: 0018:ffffc90000747c08 EFLAGS: 00010046
+> > [   85.013951][ T1524] RAX: 0000000000000005 RBX: 0000000000000000 RCX: 0000000000000000
+> > [   85.014058][ T1524] RDX: ffff88807c600000 RSI: 0000000000000100 RDI: 0000000000000000
+> > [   85.014153][ T1524] RBP: ffffc90000747c10 R08: ffff88807c72a800 R09: ffff88807ffd6000
+> > [   85.014248][ T1524] R10: 0000000000000001 R11: 0000000000000046 R12: ffff88807c72a800
+> > [   85.014343][ T1524] R13: 0000000000000000 R14: ffff888005409940 R15: ffff88807c72a818
+> > [   85.014437][ T1524] FS:  00007fa2f750a700(0000) GS:ffff88807c700000(0000) knlGS:0000000000000000
+> > [   85.014559][ T1524] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > [   85.014644][ T1524] CR2: ffffffff810d9c42 CR3: 0000000009016003 CR4: 0000000000370ea0
+> > [   85.014741][ T1524] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > [   85.014842][ T1524] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > [   85.014945][ T1524] Call Trace:
+> > [   85.014998][ T1524]  __pv_queued_spin_unlock_slowpath+0xa0/0xd0
+> > [   85.015103][ T1524]  __raw_callee_save___pv_queued_spin_unlock_slowpath+0x15/0x24
+> > [   85.015206][ T1524]  .slowpath+0x9/0x15
+> > [   85.015261][ T1524]  do_raw_spin_unlock+0x48/0xc0
+> > [   85.015333][ T1524]  _raw_spin_unlock_irq+0x1d/0x30
+> > [   85.015404][ T1524]  finish_task_switch+0xcc/0x2c0
+> > [   85.015478][ T1524]  __schedule+0x283/0x9a0
+> > [   85.015534][ T1524]  schedule+0x50/0xc0
+> > [   85.015588][ T1524]  request_wait_answer+0x126/0x240
+> > [   85.015667][ T1524]  ? finish_wait+0x90/0x90
+> > [   85.015740][ T1524]  fuse_simple_request+0x17c/0x2e0
+> > 
+> > the backtrace moves about a bit, but it always ends up as
+> > a page fault in kvm_kick_cpu.
+> > 
+> > My qemu commandline being:
+> > ./x86_64-softmmu/qemu-system-x86_64 -M pc,memory-backend=mem,accel=kvm -cpu host  -m 2G,maxmem=16G,slots=16 -smp 4 -object memory-backend-memfd,id=mem,size=2G,share=on -chardev socket,id=char0,path=/tmp/vhostqemu -device vhost-user-fs-pci,queue-size=1024,chardev=char0,tag=myfs -kernel /home/dgilbert/virtio-fs/kernel-builds/monolithic-dax-20210209a -initrd /home/dgilbert/virtio-fs/test-initramfs.img -chardev stdio,mux=on,id=mon -mon chardev=mon,mode=readline  -device virtio-serial-pci,disable-modern=on -device virtconsole,chardev=mon -object rng-random,id=objrng0,filename=/dev/urandom -device virtio-rng-pci,rng=objrng0,id=rng0,disable-legacy=on -vga none -append "console=hvc0  debug loglevel=9 systemd.journald.forward_to_console" -display none  -overcommit mem-lock=off -netdev user,id=usernet -device virtio-net-pci,netdev=usernet -name debug-threads=on
+> > 
+> > 
+> >>
+> >>>
+> >>>
+> >>> Amazon Development Center Germany GmbH
+> >>> Krausenstr. 38
+> >>> 10117 Berlin
+> >>> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+> >>> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+> >>> Sitz: Berlin
+> >>> Ust-ID: DE 289 237 879
+> >>>
+> >>>
+> >>
+> >>
+> 
 -- 
-Vitaly
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
