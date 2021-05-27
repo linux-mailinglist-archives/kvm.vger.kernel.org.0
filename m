@@ -2,215 +2,246 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BDD3D39299C
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 10:31:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 368E139299E
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 10:33:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235509AbhE0IdZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 04:33:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28569 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235336AbhE0IdY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 May 2021 04:33:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622104311;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jJfbDlOdCHEBuP0/2VSWt2Xp4aAvYX7fFfLqYRlsGu4=;
-        b=DlXOCHotNnmPKc7koT7ij/BjUwk1U2WvkFp+p34UFOQT94H72SHfhno/SvpKJPoI8/uQ7B
-        p3hxQMTnDWG2aBQDU+uBmpyiQJEP1bb8okmbbDt1U0tsUAp2py4oBxXDLCzr9WEMUAP0ig
-        OmOtRcPl+vQvaGjUgID5JBfTPegoH20=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-452-rqmPXCPROH-VJcFesIzF_w-1; Thu, 27 May 2021 04:31:47 -0400
-X-MC-Unique: rqmPXCPROH-VJcFesIzF_w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7A25501F4;
-        Thu, 27 May 2021 08:31:46 +0000 (UTC)
-Received: from work-vm (ovpn-114-249.ams2.redhat.com [10.36.114.249])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F5326EF42;
-        Thu, 27 May 2021 08:31:41 +0000 (UTC)
-Date:   Thu, 27 May 2021 09:31:39 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Claudio Fontana <cfontana@suse.de>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: Windows fails to boot after rebase to QEMU master
-Message-ID: <YK9Y64U0wjU5K753@work-vm>
-References: <20210521091451.GA6016@u366d62d47e3651.ant.amazon.com>
- <20210524055322-mutt-send-email-mst@kernel.org>
- <YK6hunkEnft6VJHz@work-vm>
- <d71fee00-0c21-c5e8-dbc6-00b7ace11c5a@suse.de>
+        id S235516AbhE0Iet (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 04:34:49 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:54145 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235336AbhE0Ies (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 May 2021 04:34:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1622104396; x=1653640396;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=t04v8eLrUYZzhE2uMGLmuGPDI3PlzcdLI+LNs76E+64=;
+  b=h/RfZChRBBUkxAms1QqyqkZt+XejWYMj57WKQVtVMsaJycpD7jcjSszv
+   j74w+X5eVsmFNy4NTNcjq46is2ctsCW7xRswx7Sr5Lm2vn9DaWwrkjFw/
+   xeunc9fyyKg9iAY0e/qA4eXIPjCMWN7gyAsfZO6EIPpRiAeGX2zxtunty
+   s=;
+X-IronPort-AV: E=Sophos;i="5.82,334,1613433600"; 
+   d="scan'208";a="137124375"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-2c-4e7c8266.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP; 27 May 2021 08:33:09 +0000
+Received: from EX13MTAUEE001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-2c-4e7c8266.us-west-2.amazon.com (Postfix) with ESMTPS id E267FA06D8;
+        Thu, 27 May 2021 08:33:08 +0000 (UTC)
+Received: from EX13D08UEB004.ant.amazon.com (10.43.60.142) by
+ EX13MTAUEE001.ant.amazon.com (10.43.62.200) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.18; Thu, 27 May 2021 08:33:06 +0000
+Received: from EX13D18EUA001.ant.amazon.com (10.43.165.58) by
+ EX13D08UEB004.ant.amazon.com (10.43.60.142) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.18; Thu, 27 May 2021 08:33:05 +0000
+Received: from EX13D18EUA001.ant.amazon.com ([10.43.165.58]) by
+ EX13D18EUA001.ant.amazon.com ([10.43.165.58]) with mapi id 15.00.1497.018;
+ Thu, 27 May 2021 08:33:04 +0000
+From:   "Stamatis, Ilias" <ilstam@amazon.com>
+To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+CC:     "jmattson@google.com" <jmattson@google.com>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "zamsden@gmail.com" <zamsden@gmail.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>
+Subject: Re: [PATCH v4 09/11] KVM: X86: Add vendor callbacks for writing the
+ TSC multiplier
+Thread-Topic: [PATCH v4 09/11] KVM: X86: Add vendor callbacks for writing the
+ TSC multiplier
+Thread-Index: AQHXUl+DVXrUInoPkUqUWhsxRdGR0qr3AMQA
+Date:   Thu, 27 May 2021 08:33:04 +0000
+Message-ID: <faa225b3b7518feea7df0ee69d6bf386a04824dc.camel@amazon.com>
+References: <20210526184418.28881-1-ilstam@amazon.com>
+         <20210526184418.28881-10-ilstam@amazon.com>
+In-Reply-To: <20210526184418.28881-10-ilstam@amazon.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.166.148]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <699E66AB0F89164F92ED23581C6D40F4@amazon.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d71fee00-0c21-c5e8-dbc6-00b7ace11c5a@suse.de>
-User-Agent: Mutt/2.0.7 (2021-05-04)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Claudio Fontana (cfontana@suse.de) wrote:
-> On 5/26/21 9:30 PM, Dr. David Alan Gilbert wrote:
-> > * Michael S. Tsirkin (mst@redhat.com) wrote:
-> >> On Fri, May 21, 2021 at 11:17:19AM +0200, Siddharth Chandrasekaran wrote:
-> >>> After a rebase to QEMU master, I am having trouble booting windows VMs.
-> >>> Git bisect indicates commit f5cc5a5c1686 ("i386: split cpu accelerators
-> >>> from cpu.c, using AccelCPUClass") to have introduced the issue. I spent
-> >>> some time looking at into it yesterday without much luck.
-> >>>
-> >>> Steps to reproduce:
-> >>>
-> >>>     $ ./configure --enable-kvm --disable-xen --target-list=x86_64-softmmu --enable-debug
-> >>>     $ make -j `nproc`
-> >>>     $ ./build/x86_64-softmmu/qemu-system-x86_64 \
-> >>>         -cpu host,hv_synic,hv_vpindex,hv_time,hv_runtime,hv_stimer,hv_crash \
-> >>>         -enable-kvm \
-> >>>         -name test,debug-threads=on \
-> >>>         -smp 1,threads=1,cores=1,sockets=1 \
-> >>>         -m 4G \
-> >>>         -net nic -net user \
-> >>>         -boot d,menu=on \
-> >>>         -usbdevice tablet \
-> >>>         -vnc :3 \
-> >>>         -machine q35,smm=on \
-> >>>         -drive if=pflash,format=raw,readonly=on,unit=0,file="../OVMF_CODE.secboot.fd" \
-> >>>         -drive if=pflash,format=raw,unit=1,file="../OVMF_VARS.secboot.fd" \
-> >>>         -global ICH9-LPC.disable_s3=1 \
-> >>>         -global driver=cfi.pflash01,property=secure,value=on \
-> >>>         -cdrom "../Windows_Server_2016_14393.ISO" \
-> >>>         -drive file="../win_server_2016.qcow2",format=qcow2,if=none,id=rootfs_drive \
-> >>>         -device ahci,id=ahci \
-> >>>         -device ide-hd,drive=rootfs_drive,bus=ahci.0
-> >>>
-> >>> If the issue is not obvious, I'd like some pointers on how to go about
-> >>> fixing this issue.
-> >>>
-> >>> ~ Sid.
-> >>>
-> >>
-> >> At a guess this commit inadvertently changed something in the CPU ID.
-> >> I'd start by using a linux guest to dump cpuid before and after the
-> >> change.
-> > 
-> > I've not had a chance to do that yet, however I did just end up with a
-> > bisect of a linux guest failure bisecting to the same patch:
-> > 
-> > [dgilbert@dgilbert-t580 qemu]$ git bisect bad
-> > f5cc5a5c168674f84bf061cdb307c2d25fba5448 is the first bad commit
-> > commit f5cc5a5c168674f84bf061cdb307c2d25fba5448
-> > Author: Claudio Fontana <cfontana@suse.de>
-> > Date:   Mon Mar 22 14:27:40 2021 +0100
-> > 
-> >     i386: split cpu accelerators from cpu.c, using AccelCPUClass
-> >     
-> >     i386 is the first user of AccelCPUClass, allowing to split
-> >     cpu.c into:
-> >     
-> >     cpu.c            cpuid and common x86 cpu functionality
-> >     host-cpu.c       host x86 cpu functions and "host" cpu type
-> >     kvm/kvm-cpu.c    KVM x86 AccelCPUClass
-> >     hvf/hvf-cpu.c    HVF x86 AccelCPUClass
-> >     tcg/tcg-cpu.c    TCG x86 AccelCPUClass
-> >     
-> > 
-> 
-> Paolo, it seems to me that something went wrong in the merge of this commit.
-> 
-> The last version of the series I sent had this comment in the commit message,
-> as part of a very long series of rebases after review.
-> 
-> [claudio]: Rebased on commit b8184135 ("target/i386: allow modifying TCG phys-addr-bits")
-> 
-> 
-> While I do not see this comment in the commit posted here. So I suspect that an older version of the series was included?
-
-That comment is there in the one merged:
-    [claudio]:
-    Rebased on commit b8184135 ("target/i386: allow modifying TCG phys-addr-bits")
-
-and I don't see any difference in this commit or the 2 previous ones in
-the upstream compared with your i386_cleanup_9 branch.
-
-Dave
-
-
-> The series is also available as:
-> 
-> https://github.com/hw-claudio/qemu.git "i386_cleanup_9"
-> 
-> Thanks,
-> 
-> Claudio
-> 
-> 
-> 
-> 
-> > The guest crash is:
-> > [   85.008985][ T1524] BUG: unable to handle page fault for address: ffffffff810d9c42
-> > [   85.012868][ T1524] #PF: supervisor write access in kernel mode
-> > [   85.012962][ T1524] #PF: error_code(0x0003) - permissions violation
-> > [   85.013043][ T1524] PGD 2224067 P4D 2224067 PUD 2225063 PMD 10001e1 
-> > [   85.013180][ T1524] Oops: 0003 [#1] SMP NOPTI
-> > [   85.013295][ T1524] CPU: 2 PID: 1524 Comm: blogbench Not tainted 5.11.0-rc7 #100
-> > [   85.013395][ T1524] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
-> > [   85.013546][ T1524] RIP: 0010:kvm_kick_cpu+0x22/0x30
-> > [   85.013630][ T1524] Code: 0f 1f 84 00 00 00 00 00 55 48 63 ff 48 c7 c0 78 11 01 00 48 8b 14 fd c0 36 11 82 48 89 e5 53 31 db 0f b7 0c 02 b8 05 00 00 00 <0f> 01 d9 5b 5d c3 0f 1f 84 00 00 00 00 00 55 48 89 e5 53 48 89 fb
-> > [   85.013852][ T1524] RSP: 0018:ffffc90000747c08 EFLAGS: 00010046
-> > [   85.013951][ T1524] RAX: 0000000000000005 RBX: 0000000000000000 RCX: 0000000000000000
-> > [   85.014058][ T1524] RDX: ffff88807c600000 RSI: 0000000000000100 RDI: 0000000000000000
-> > [   85.014153][ T1524] RBP: ffffc90000747c10 R08: ffff88807c72a800 R09: ffff88807ffd6000
-> > [   85.014248][ T1524] R10: 0000000000000001 R11: 0000000000000046 R12: ffff88807c72a800
-> > [   85.014343][ T1524] R13: 0000000000000000 R14: ffff888005409940 R15: ffff88807c72a818
-> > [   85.014437][ T1524] FS:  00007fa2f750a700(0000) GS:ffff88807c700000(0000) knlGS:0000000000000000
-> > [   85.014559][ T1524] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [   85.014644][ T1524] CR2: ffffffff810d9c42 CR3: 0000000009016003 CR4: 0000000000370ea0
-> > [   85.014741][ T1524] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > [   85.014842][ T1524] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > [   85.014945][ T1524] Call Trace:
-> > [   85.014998][ T1524]  __pv_queued_spin_unlock_slowpath+0xa0/0xd0
-> > [   85.015103][ T1524]  __raw_callee_save___pv_queued_spin_unlock_slowpath+0x15/0x24
-> > [   85.015206][ T1524]  .slowpath+0x9/0x15
-> > [   85.015261][ T1524]  do_raw_spin_unlock+0x48/0xc0
-> > [   85.015333][ T1524]  _raw_spin_unlock_irq+0x1d/0x30
-> > [   85.015404][ T1524]  finish_task_switch+0xcc/0x2c0
-> > [   85.015478][ T1524]  __schedule+0x283/0x9a0
-> > [   85.015534][ T1524]  schedule+0x50/0xc0
-> > [   85.015588][ T1524]  request_wait_answer+0x126/0x240
-> > [   85.015667][ T1524]  ? finish_wait+0x90/0x90
-> > [   85.015740][ T1524]  fuse_simple_request+0x17c/0x2e0
-> > 
-> > the backtrace moves about a bit, but it always ends up as
-> > a page fault in kvm_kick_cpu.
-> > 
-> > My qemu commandline being:
-> > ./x86_64-softmmu/qemu-system-x86_64 -M pc,memory-backend=mem,accel=kvm -cpu host  -m 2G,maxmem=16G,slots=16 -smp 4 -object memory-backend-memfd,id=mem,size=2G,share=on -chardev socket,id=char0,path=/tmp/vhostqemu -device vhost-user-fs-pci,queue-size=1024,chardev=char0,tag=myfs -kernel /home/dgilbert/virtio-fs/kernel-builds/monolithic-dax-20210209a -initrd /home/dgilbert/virtio-fs/test-initramfs.img -chardev stdio,mux=on,id=mon -mon chardev=mon,mode=readline  -device virtio-serial-pci,disable-modern=on -device virtconsole,chardev=mon -object rng-random,id=objrng0,filename=/dev/urandom -device virtio-rng-pci,rng=objrng0,id=rng0,disable-legacy=on -vga none -append "console=hvc0  debug loglevel=9 systemd.journald.forward_to_console" -display none  -overcommit mem-lock=off -netdev user,id=usernet -device virtio-net-pci,netdev=usernet -name debug-threads=on
-> > 
-> > 
-> >>
-> >>>
-> >>>
-> >>> Amazon Development Center Germany GmbH
-> >>> Krausenstr. 38
-> >>> 10117 Berlin
-> >>> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-> >>> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-> >>> Sitz: Berlin
-> >>> Ust-ID: DE 289 237 879
-> >>>
-> >>>
-> >>
-> >>
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+T24gV2VkLCAyMDIxLTA1LTI2IGF0IDE5OjQ0ICswMTAwLCBJbGlhcyBTdGFtYXRpcyB3cm90ZToN
+Cj4gQ3VycmVudGx5IHZteF92Y3B1X2xvYWRfdm1jcygpIHdyaXRlcyB0aGUgVFNDX01VTFRJUExJ
+RVIgZmllbGQgb2YgdGhlDQo+IFZNQ1MgZXZlcnkgdGltZSB0aGUgVk1DUyBpcyBsb2FkZWQuIElu
+c3RlYWQgb2YgZG9pbmcgdGhpcywgc2V0IHRoaXMNCj4gZmllbGQgZnJvbSBjb21tb24gY29kZSBv
+biBpbml0aWFsaXphdGlvbiBhbmQgd2hlbmV2ZXIgdGhlIHNjYWxpbmcgcmF0aW8NCj4gY2hhbmdl
+cy4NCj4gDQo+IEFkZGl0aW9uYWxseSByZW1vdmUgdm14LT5jdXJyZW50X3RzY19yYXRpby4gVGhp
+cyBmaWVsZCBpcyByZWR1bmRhbnQgYXMNCj4gdmNwdS0+YXJjaC50c2Nfc2NhbGluZ19yYXRpbyBh
+bHJlYWR5IHRyYWNrcyB0aGUgY3VycmVudCBUU0Mgc2NhbGluZw0KPiByYXRpby4gVGhlIHZteC0+
+Y3VycmVudF90c2NfcmF0aW8gZmllbGQgaXMgb25seSB1c2VkIGZvciBhdm9pZGluZw0KPiB1bm5l
+Y2Vzc2FyeSB3cml0ZXMgYnV0IGl0IGlzIG5vIGxvbmdlciBuZWVkZWQgYWZ0ZXIgcmVtb3Zpbmcg
+dGhlIGNvZGUNCj4gZnJvbSB0aGUgVk1DUyBsb2FkIHBhdGguDQo+IA0KPiBTdWdnZXN0ZWQtYnk6
+IFNlYW4gQ2hyaXN0b3BoZXJzb24gPHNlYW5qY0Bnb29nbGUuY29tPg0KPiBTaWduZWQtb2ZmLWJ5
+OiBJbGlhcyBTdGFtYXRpcyA8aWxzdGFtQGFtYXpvbi5jb20+DQo+IC0tLQ0KPiAgYXJjaC94ODYv
+aW5jbHVkZS9hc20va3ZtLXg4Ni1vcHMuaCB8ICAxICsNCj4gIGFyY2gveDg2L2luY2x1ZGUvYXNt
+L2t2bV9ob3N0LmggICAgfCAgMSArDQo+ICBhcmNoL3g4Ni9rdm0vc3ZtL3N2bS5jICAgICAgICAg
+ICAgIHwgIDYgKysrKysrDQo+ICBhcmNoL3g4Ni9rdm0vdm14L25lc3RlZC5jICAgICAgICAgIHwg
+IDkgKysrKy0tLS0tDQo+ICBhcmNoL3g4Ni9rdm0vdm14L3ZteC5jICAgICAgICAgICAgIHwgMTEg
+KysrKysrLS0tLS0NCj4gIGFyY2gveDg2L2t2bS92bXgvdm14LmggICAgICAgICAgICAgfCAgOCAt
+LS0tLS0tLQ0KPiAgYXJjaC94ODYva3ZtL3g4Ni5jICAgICAgICAgICAgICAgICB8IDI4ICsrKysr
+KysrKysrKysrKysrKysrKysrLS0tLS0NCj4gIDcgZmlsZXMgY2hhbmdlZCwgNDEgaW5zZXJ0aW9u
+cygrKSwgMjMgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYvaW5jbHVk
+ZS9hc20va3ZtLXg4Ni1vcHMuaCBiL2FyY2gveDg2L2luY2x1ZGUvYXNtL2t2bS14ODYtb3BzLmgN
+Cj4gaW5kZXggMDI5Yzk2MTUzNzhmLi4zNGFkN2ExNzQ1OGEgMTAwNjQ0DQo+IC0tLSBhL2FyY2gv
+eDg2L2luY2x1ZGUvYXNtL2t2bS14ODYtb3BzLmgNCj4gKysrIGIvYXJjaC94ODYvaW5jbHVkZS9h
+c20va3ZtLXg4Ni1vcHMuaA0KPiBAQCAtOTAsNiArOTAsNyBAQCBLVk1fWDg2X09QX05VTEwoaGFz
+X3diaW52ZF9leGl0KQ0KPiAgS1ZNX1g4Nl9PUChnZXRfbDJfdHNjX29mZnNldCkNCj4gIEtWTV9Y
+ODZfT1AoZ2V0X2wyX3RzY19tdWx0aXBsaWVyKQ0KPiAgS1ZNX1g4Nl9PUCh3cml0ZV90c2Nfb2Zm
+c2V0KQ0KPiArS1ZNX1g4Nl9PUCh3cml0ZV90c2NfbXVsdGlwbGllcikNCj4gIEtWTV9YODZfT1Ao
+Z2V0X2V4aXRfaW5mbykNCj4gIEtWTV9YODZfT1AoY2hlY2tfaW50ZXJjZXB0KQ0KPiAgS1ZNX1g4
+Nl9PUChoYW5kbGVfZXhpdF9pcnFvZmYpDQo+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9pbmNsdWRl
+L2FzbS9rdm1faG9zdC5oIGIvYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaA0KPiBpbmRl
+eCBmMDk5Mjc3Yjk5M2QuLmEzMzRjZTc3NDFhYiAxMDA2NDQNCj4gLS0tIGEvYXJjaC94ODYvaW5j
+bHVkZS9hc20va3ZtX2hvc3QuaA0KPiArKysgYi9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9z
+dC5oDQo+IEBAIC0xMzA4LDYgKzEzMDgsNyBAQCBzdHJ1Y3Qga3ZtX3g4Nl9vcHMgew0KPiAgCXU2
+NCAoKmdldF9sMl90c2Nfb2Zmc2V0KShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOw0KPiAgCXU2NCAo
+KmdldF9sMl90c2NfbXVsdGlwbGllcikoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KTsNCj4gIAl2b2lk
+ICgqd3JpdGVfdHNjX29mZnNldCkoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1NjQgb2Zmc2V0KTsN
+Cj4gKwl2b2lkICgqd3JpdGVfdHNjX211bHRpcGxpZXIpKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwg
+dTY0IG11bHRpcGxpZXIpOw0KPiAgDQo+ICAJLyoNCj4gIAkgKiBSZXRyaWV2ZSBzb21ld2hhdCBh
+cmJpdHJhcnkgZXhpdCBpbmZvcm1hdGlvbi4gIEludGVuZGVkIHRvIGJlIHVzZWQNCj4gZGlmZiAt
+LWdpdCBhL2FyY2gveDg2L2t2bS9zdm0vc3ZtLmMgYi9hcmNoL3g4Ni9rdm0vc3ZtL3N2bS5jDQo+
+IGluZGV4IDhkZmIyNTEzYjcyYS4uY2I3MDFiNDJiMDhiIDEwMDY0NA0KPiAtLS0gYS9hcmNoL3g4
+Ni9rdm0vc3ZtL3N2bS5jDQo+ICsrKyBiL2FyY2gveDg2L2t2bS9zdm0vc3ZtLmMNCj4gQEAgLTEx
+MDMsNiArMTEwMywxMSBAQCBzdGF0aWMgdm9pZCBzdm1fd3JpdGVfdHNjX29mZnNldChzdHJ1Y3Qg
+a3ZtX3ZjcHUgKnZjcHUsIHU2NCBvZmZzZXQpDQo+ICAJdm1jYl9tYXJrX2RpcnR5KHN2bS0+dm1j
+YiwgVk1DQl9JTlRFUkNFUFRTKTsNCj4gIH0NCj4gIA0KPiArc3RhdGljIHZvaWQgc3ZtX3dyaXRl
+X3RzY19tdWx0aXBsaWVyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTY0IG11bHRpcGxpZXIpDQo+
+ICt7DQo+ICsJd3Jtc3JsKE1TUl9BTUQ2NF9UU0NfUkFUSU8sIG11bHRpcGxpZXIpOw0KPiArfQ0K
+PiArDQo+ICAvKiBFdmFsdWF0ZSBpbnN0cnVjdGlvbiBpbnRlcmNlcHRzIHRoYXQgZGVwZW5kIG9u
+IGd1ZXN0IENQVUlEIGZlYXR1cmVzLiAqLw0KPiAgc3RhdGljIHZvaWQgc3ZtX3JlY2FsY19pbnN0
+cnVjdGlvbl9pbnRlcmNlcHRzKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwNCj4gIAkJCQkJICAgICAg
+c3RydWN0IHZjcHVfc3ZtICpzdm0pDQo+IEBAIC00NTI4LDYgKzQ1MzMsNyBAQCBzdGF0aWMgc3Ry
+dWN0IGt2bV94ODZfb3BzIHN2bV94ODZfb3BzIF9faW5pdGRhdGEgPSB7DQo+ICAJLmdldF9sMl90
+c2Nfb2Zmc2V0ID0gc3ZtX2dldF9sMl90c2Nfb2Zmc2V0LA0KPiAgCS5nZXRfbDJfdHNjX211bHRp
+cGxpZXIgPSBzdm1fZ2V0X2wyX3RzY19tdWx0aXBsaWVyLA0KPiAgCS53cml0ZV90c2Nfb2Zmc2V0
+ID0gc3ZtX3dyaXRlX3RzY19vZmZzZXQsDQo+ICsJLndyaXRlX3RzY19tdWx0aXBsaWVyID0gc3Zt
+X3dyaXRlX3RzY19tdWx0aXBsaWVyLA0KPiAgDQo+ICAJLmxvYWRfbW11X3BnZCA9IHN2bV9sb2Fk
+X21tdV9wZ2QsDQo+ICANCj4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS92bXgvbmVzdGVkLmMg
+Yi9hcmNoL3g4Ni9rdm0vdm14L25lc3RlZC5jDQo+IGluZGV4IDYwNThhNjVhNmVkZS4uMjM5MTU0
+ZDNlNGU3IDEwMDY0NA0KPiAtLS0gYS9hcmNoL3g4Ni9rdm0vdm14L25lc3RlZC5jDQo+ICsrKyBi
+L2FyY2gveDg2L2t2bS92bXgvbmVzdGVkLmMNCj4gQEAgLTI1MzMsOSArMjUzMyw4IEBAIHN0YXRp
+YyBpbnQgcHJlcGFyZV92bWNzMDIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBzdHJ1Y3Qgdm1jczEy
+ICp2bWNzMTIsDQo+ICAJfQ0KPiAgDQo+ICAJdm1jc193cml0ZTY0KFRTQ19PRkZTRVQsIHZjcHUt
+PmFyY2gudHNjX29mZnNldCk7DQo+IC0NCj4gIAlpZiAoa3ZtX2hhc190c2NfY29udHJvbCkNCj4g
+LQkJZGVjYWNoZV90c2NfbXVsdGlwbGllcih2bXgpOw0KPiArCQl2bWNzX3dyaXRlNjQoVFNDX01V
+TFRJUExJRVIsIHZjcHUtPmFyY2gudHNjX3NjYWxpbmdfcmF0aW8pOw0KPiAgDQo+ICAJbmVzdGVk
+X3ZteF90cmFuc2l0aW9uX3RsYl9mbHVzaCh2Y3B1LCB2bWNzMTIsIHRydWUpOw0KPiAgDQo+IEBA
+IC00NTAxLDEyICs0NTAwLDEyIEBAIHZvaWQgbmVzdGVkX3ZteF92bWV4aXQoc3RydWN0IGt2bV92
+Y3B1ICp2Y3B1LCB1MzIgdm1fZXhpdF9yZWFzb24sDQo+ICAJdm1jc193cml0ZTMyKFZNX0VYSVRf
+TVNSX0xPQURfQ09VTlQsIHZteC0+bXNyX2F1dG9sb2FkLmhvc3QubnIpOw0KPiAgCXZtY3Nfd3Jp
+dGUzMihWTV9FTlRSWV9NU1JfTE9BRF9DT1VOVCwgdm14LT5tc3JfYXV0b2xvYWQuZ3Vlc3QubnIp
+Ow0KPiAgCXZtY3Nfd3JpdGU2NChUU0NfT0ZGU0VULCB2Y3B1LT5hcmNoLnRzY19vZmZzZXQpOw0K
+PiArCWlmIChrdm1faGFzX3RzY19jb250cm9sKQ0KPiArCQl2bWNzX3dyaXRlNjQoVFNDX01VTFRJ
+UExJRVIsIHZjcHUtPmFyY2gudHNjX3NjYWxpbmdfcmF0aW8pOw0KPiArDQo+ICAJaWYgKHZteC0+
+bmVzdGVkLmwxX3Rwcl90aHJlc2hvbGQgIT0gLTEpDQo+ICAJCXZtY3Nfd3JpdGUzMihUUFJfVEhS
+RVNIT0xELCB2bXgtPm5lc3RlZC5sMV90cHJfdGhyZXNob2xkKTsNCj4gIA0KPiAtCWlmIChrdm1f
+aGFzX3RzY19jb250cm9sKQ0KPiAtCQlkZWNhY2hlX3RzY19tdWx0aXBsaWVyKHZteCk7DQo+IC0N
+Cj4gIAlpZiAodm14LT5uZXN0ZWQuY2hhbmdlX3ZtY3MwMV92aXJ0dWFsX2FwaWNfbW9kZSkgew0K
+PiAgCQl2bXgtPm5lc3RlZC5jaGFuZ2Vfdm1jczAxX3ZpcnR1YWxfYXBpY19tb2RlID0gZmFsc2U7
+DQo+ICAJCXZteF9zZXRfdmlydHVhbF9hcGljX21vZGUodmNwdSk7DQo+IGRpZmYgLS1naXQgYS9h
+cmNoL3g4Ni9rdm0vdm14L3ZteC5jIGIvYXJjaC94ODYva3ZtL3ZteC92bXguYw0KPiBpbmRleCA0
+YjcwNDMxYzJlZGQuLmJmODQ1YTA4OTk1ZSAxMDA2NDQNCj4gLS0tIGEvYXJjaC94ODYva3ZtL3Zt
+eC92bXguYw0KPiArKysgYi9hcmNoL3g4Ni9rdm0vdm14L3ZteC5jDQo+IEBAIC0xMzkwLDExICsx
+MzkwLDYgQEAgdm9pZCB2bXhfdmNwdV9sb2FkX3ZtY3Moc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBp
+bnQgY3B1LA0KPiAgDQo+ICAJCXZteC0+bG9hZGVkX3ZtY3MtPmNwdSA9IGNwdTsNCj4gIAl9DQo+
+IC0NCj4gLQkvKiBTZXR1cCBUU0MgbXVsdGlwbGllciAqLw0KPiAtCWlmIChrdm1faGFzX3RzY19j
+b250cm9sICYmDQo+IC0JICAgIHZteC0+Y3VycmVudF90c2NfcmF0aW8gIT0gdmNwdS0+YXJjaC50
+c2Nfc2NhbGluZ19yYXRpbykNCj4gLQkJZGVjYWNoZV90c2NfbXVsdGlwbGllcih2bXgpOw0KPiAg
+fQ0KPiAgDQo+ICAvKg0KPiBAQCAtMTgxMyw2ICsxODA4LDExIEBAIHN0YXRpYyB2b2lkIHZteF93
+cml0ZV90c2Nfb2Zmc2V0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTY0IG9mZnNldCkNCj4gIAl2
+bWNzX3dyaXRlNjQoVFNDX09GRlNFVCwgb2Zmc2V0KTsNCj4gIH0NCj4gIA0KPiArc3RhdGljIHZv
+aWQgdm14X3dyaXRlX3RzY19tdWx0aXBsaWVyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTY0IG11
+bHRpcGxpZXIpDQo+ICt7DQo+ICsJdm1jc193cml0ZTY0KFRTQ19NVUxUSVBMSUVSLCBtdWx0aXBs
+aWVyKTsNCj4gK30NCj4gKw0KPiAgLyoNCj4gICAqIG5lc3RlZF92bXhfYWxsb3dlZCgpIGNoZWNr
+cyB3aGV0aGVyIGEgZ3Vlc3Qgc2hvdWxkIGJlIGFsbG93ZWQgdG8gdXNlIFZNWA0KPiAgICogaW5z
+dHJ1Y3Rpb25zIGFuZCBNU1JzIChpLmUuLCBuZXN0ZWQgVk1YKS4gTmVzdGVkIFZNWCBpcyBkaXNh
+YmxlZCBmb3INCj4gQEAgLTc3MDcsNiArNzcwNyw3IEBAIHN0YXRpYyBzdHJ1Y3Qga3ZtX3g4Nl9v
+cHMgdm14X3g4Nl9vcHMgX19pbml0ZGF0YSA9IHsNCj4gIAkuZ2V0X2wyX3RzY19vZmZzZXQgPSB2
+bXhfZ2V0X2wyX3RzY19vZmZzZXQsDQo+ICAJLmdldF9sMl90c2NfbXVsdGlwbGllciA9IHZteF9n
+ZXRfbDJfdHNjX211bHRpcGxpZXIsDQo+ICAJLndyaXRlX3RzY19vZmZzZXQgPSB2bXhfd3JpdGVf
+dHNjX29mZnNldCwNCj4gKwkud3JpdGVfdHNjX211bHRpcGxpZXIgPSB2bXhfd3JpdGVfdHNjX211
+bHRpcGxpZXIsDQo+ICANCj4gIAkubG9hZF9tbXVfcGdkID0gdm14X2xvYWRfbW11X3BnZCwNCj4g
+IA0KPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL3ZteC92bXguaCBiL2FyY2gveDg2L2t2bS92
+bXgvdm14LmgNCj4gaW5kZXggYWE5N2M4MmUzNDUxLi4zZWFhODZhMGJhM2UgMTAwNjQ0DQo+IC0t
+LSBhL2FyY2gveDg2L2t2bS92bXgvdm14LmgNCj4gKysrIGIvYXJjaC94ODYva3ZtL3ZteC92bXgu
+aA0KPiBAQCAtMzIyLDggKzMyMiw2IEBAIHN0cnVjdCB2Y3B1X3ZteCB7DQo+ICAJLyogYXBpYyBk
+ZWFkbGluZSB2YWx1ZSBpbiBob3N0IHRzYyAqLw0KPiAgCXU2NCBodl9kZWFkbGluZV90c2M7DQo+
+ICANCj4gLQl1NjQgY3VycmVudF90c2NfcmF0aW87DQo+IC0NCj4gIAl1bnNpZ25lZCBsb25nIGhv
+c3RfZGVidWdjdGxtc3I7DQo+ICANCj4gIAkvKg0KPiBAQCAtNTMyLDEyICs1MzAsNiBAQCBzdGF0
+aWMgaW5saW5lIHN0cnVjdCB2bWNzICphbGxvY192bWNzKGJvb2wgc2hhZG93KQ0KPiAgCQkJICAg
+ICAgR0ZQX0tFUk5FTF9BQ0NPVU5UKTsNCj4gIH0NCj4gIA0KPiAtc3RhdGljIGlubGluZSB2b2lk
+IGRlY2FjaGVfdHNjX211bHRpcGxpZXIoc3RydWN0IHZjcHVfdm14ICp2bXgpDQo+IC17DQo+IC0J
+dm14LT5jdXJyZW50X3RzY19yYXRpbyA9IHZteC0+dmNwdS5hcmNoLnRzY19zY2FsaW5nX3JhdGlv
+Ow0KPiAtCXZtY3Nfd3JpdGU2NChUU0NfTVVMVElQTElFUiwgdm14LT5jdXJyZW50X3RzY19yYXRp
+byk7DQo+IC19DQo+IC0NCj4gIHN0YXRpYyBpbmxpbmUgYm9vbCB2bXhfaGFzX3dhaXRwa2coc3Ry
+dWN0IHZjcHVfdm14ICp2bXgpDQo+ICB7DQo+ICAJcmV0dXJuIHZteC0+c2Vjb25kYXJ5X2V4ZWNf
+Y29udHJvbCAmDQo+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0veDg2LmMgYi9hcmNoL3g4Ni9r
+dm0veDg2LmMNCj4gaW5kZXggODAxZmExZThlOTE1Li44YWZlMmMyOTE4M2MgMTAwNjQ0DQo+IC0t
+LSBhL2FyY2gveDg2L2t2bS94ODYuYw0KPiArKysgYi9hcmNoL3g4Ni9rdm0veDg2LmMNCj4gQEAg
+LTIxNzksMTQgKzIxNzksMTUgQEAgc3RhdGljIHUzMiBhZGp1c3RfdHNjX2toeih1MzIga2h6LCBz
+MzIgcHBtKQ0KPiAgCXJldHVybiB2Ow0KPiAgfQ0KPiAgDQo+ICtzdGF0aWMgdm9pZCBrdm1fdmNw
+dV93cml0ZV90c2NfbXVsdGlwbGllcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHU2NCBsMV9tdWx0
+aXBsaWVyKTsNCj4gKw0KPiAgc3RhdGljIGludCBzZXRfdHNjX2toeihzdHJ1Y3Qga3ZtX3ZjcHUg
+KnZjcHUsIHUzMiB1c2VyX3RzY19raHosIGJvb2wgc2NhbGUpDQo+ICB7DQo+ICAJdTY0IHJhdGlv
+Ow0KPiAgDQo+ICAJLyogR3Vlc3QgVFNDIHNhbWUgZnJlcXVlbmN5IGFzIGhvc3QgVFNDPyAqLw0K
+PiAgCWlmICghc2NhbGUpIHsNCj4gLQkJdmNwdS0+YXJjaC5sMV90c2Nfc2NhbGluZ19yYXRpbyA9
+IGt2bV9kZWZhdWx0X3RzY19zY2FsaW5nX3JhdGlvOw0KPiAtCQl2Y3B1LT5hcmNoLnRzY19zY2Fs
+aW5nX3JhdGlvID0ga3ZtX2RlZmF1bHRfdHNjX3NjYWxpbmdfcmF0aW87DQo+ICsJCWt2bV92Y3B1
+X3dyaXRlX3RzY19tdWx0aXBsaWVyKHZjcHUsIGt2bV9kZWZhdWx0X3RzY19zY2FsaW5nX3JhdGlv
+KTsNCj4gIAkJcmV0dXJuIDA7DQo+ICAJfQ0KPiAgDQo+IEBAIC0yMjEyLDcgKzIyMTMsNyBAQCBz
+dGF0aWMgaW50IHNldF90c2Nfa2h6KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTMyIHVzZXJfdHNj
+X2toeiwgYm9vbCBzY2FsZSkNCj4gIAkJcmV0dXJuIC0xOw0KPiAgCX0NCj4gIA0KPiAtCXZjcHUt
+PmFyY2gubDFfdHNjX3NjYWxpbmdfcmF0aW8gPSB2Y3B1LT5hcmNoLnRzY19zY2FsaW5nX3JhdGlv
+ID0gcmF0aW87DQo+ICsJa3ZtX3ZjcHVfd3JpdGVfdHNjX211bHRpcGxpZXIodmNwdSwgcmF0aW8p
+Ow0KPiAgCXJldHVybiAwOw0KPiAgfQ0KPiAgDQo+IEBAIC0yMjI0LDggKzIyMjUsNyBAQCBzdGF0
+aWMgaW50IGt2bV9zZXRfdHNjX2toeihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHUzMiB1c2VyX3Rz
+Y19raHopDQo+ICAJLyogdHNjX2toeiBjYW4gYmUgemVybyBpZiBUU0MgY2FsaWJyYXRpb24gZmFp
+bHMgKi8NCj4gIAlpZiAodXNlcl90c2Nfa2h6ID09IDApIHsNCj4gIAkJLyogc2V0IHRzY19zY2Fs
+aW5nX3JhdGlvIHRvIGEgc2FmZSB2YWx1ZSAqLw0KPiAtCQl2Y3B1LT5hcmNoLmwxX3RzY19zY2Fs
+aW5nX3JhdGlvID0ga3ZtX2RlZmF1bHRfdHNjX3NjYWxpbmdfcmF0aW87DQo+IC0JCXZjcHUtPmFy
+Y2gudHNjX3NjYWxpbmdfcmF0aW8gPSBrdm1fZGVmYXVsdF90c2Nfc2NhbGluZ19yYXRpbzsNCj4g
+KwkJa3ZtX3ZjcHVfd3JpdGVfdHNjX211bHRpcGxpZXIodmNwdSwga3ZtX2RlZmF1bHRfdHNjX3Nj
+YWxpbmdfcmF0aW8pOw0KPiAgCQlyZXR1cm4gLTE7DQo+ICAJfQ0KPiAgDQo+IEBAIC0yMzgzLDYg
+KzIzODMsMjMgQEAgc3RhdGljIHZvaWQga3ZtX3ZjcHVfd3JpdGVfdHNjX29mZnNldChzdHJ1Y3Qg
+a3ZtX3ZjcHUgKnZjcHUsIHU2NCBsMV9vZmZzZXQpDQo+ICAJc3RhdGljX2NhbGwoa3ZtX3g4Nl93
+cml0ZV90c2Nfb2Zmc2V0KSh2Y3B1LCB2Y3B1LT5hcmNoLnRzY19vZmZzZXQpOw0KPiAgfQ0KPiAg
+DQo+ICtzdGF0aWMgdm9pZCBrdm1fdmNwdV93cml0ZV90c2NfbXVsdGlwbGllcihzdHJ1Y3Qga3Zt
+X3ZjcHUgKnZjcHUsIHU2NCBsMV9tdWx0aXBsaWVyKQ0KPiArew0KPiArCXZjcHUtPmFyY2gubDFf
+dHNjX3NjYWxpbmdfcmF0aW8gPSBsMV9tdWx0aXBsaWVyOw0KPiArDQo+ICsJLyogVXNlcnNwYWNl
+IGlzIGNoYW5naW5nIHRoZSBtdWx0aXBsaWVyIHdoaWxlIEwyIGlzIGFjdGl2ZSAqLw0KPiArCWlm
+IChpc19ndWVzdF9tb2RlKHZjcHUpKQ0KPiArCQl2Y3B1LT5hcmNoLnRzY19zY2FsaW5nX3JhdGlv
+ID0ga3ZtX2NhbGNfbmVzdGVkX3RzY19tdWx0aXBsaWVyKA0KPiArCQkJbDFfbXVsdGlwbGllciwN
+Cj4gKwkJCXN0YXRpY19jYWxsKGt2bV94ODZfZ2V0X2wyX3RzY19tdWx0aXBsaWVyKSh2Y3B1KSk7
+DQo+ICsJZWxzZQ0KPiArCQl2Y3B1LT5hcmNoLnRzY19zY2FsaW5nX3JhdGlvID0gbDFfbXVsdGlw
+bGllcjsNCj4gKw0KPiArCWlmIChrdm1faGFzX3RzY19jb250cm9sKQ0KPiArCQlzdGF0aWNfY2Fs
+bChrdm1feDg2X3dyaXRlX3RzY19tdWx0aXBsaWVyKSgNCj4gKwkJCXZjcHUsIHZjcHUtPmFyY2gu
+dHNjX3NjYWxpbmdfcmF0aW8pOw0KPiArfQ0KPiArDQo+ICBzdGF0aWMgaW5saW5lIGJvb2wga3Zt
+X2NoZWNrX3RzY191bnN0YWJsZSh2b2lkKQ0KPiAgew0KPiAgI2lmZGVmIENPTkZJR19YODZfNjQN
+Cj4gQEAgLTEwNDQ0LDYgKzEwNDYxLDcgQEAgdm9pZCBrdm1fYXJjaF92Y3B1X3Bvc3RjcmVhdGUo
+c3RydWN0IGt2bV92Y3B1ICp2Y3B1KQ0KPiAgCQlyZXR1cm47DQo+ICAJdmNwdV9sb2FkKHZjcHUp
+Ow0KPiAgCWt2bV9zeW5jaHJvbml6ZV90c2ModmNwdSwgMCk7DQo+ICsJa3ZtX3ZjcHVfd3JpdGVf
+dHNjX211bHRpcGxpZXIodmNwdSwga3ZtX2RlZmF1bHRfdHNjX3NjYWxpbmdfcmF0aW8pOw0KDQpI
+bW0sIEknbSBhY3R1YWxseSB0aGlua2luZyBub3cgdGhhdCB0aGlzIG1pZ2h0IG5vdCBiZSBjb3Jy
+ZWN0LiBGb3IgZXhhbXBsZSBpbg0KY2FzZSB3ZSBob3RwbHVnIGEgbmV3IHZDUFUgYnV0IHRoZSBv
+dGhlciB2Q1BVcyBkb24ndCB1c2UgdGhlIGRlZmF1bHQgcmF0aW8uDQoNCkhvdyBhYm91dCBrZWVw
+aW5nIHZteC0+Y3VycmVudF90c2NfcmF0aW8gYWZ0ZXIgYWxsPyBBcHBhcmVudGx5IHRoaXMgaXMg
+YW5vdGhlcg0Kcm9sZSBpdCBwbGF5cy4gT3IgbW92ZSBpdCB0byBrdm0tPmFyY2g/DQoNCj4gIAl2
+Y3B1X3B1dCh2Y3B1KTsNCj4gIA0KPiAgCS8qIHBvbGwgY29udHJvbCBlbmFibGVkIGJ5IGRlZmF1
+bHQgKi8NCg0K
