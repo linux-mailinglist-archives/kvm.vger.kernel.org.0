@@ -2,180 +2,351 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 363C7392F53
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 15:18:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E0E7392F5B
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 15:21:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236412AbhE0NTr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 09:19:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60584 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236378AbhE0NTp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 May 2021 09:19:45 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF331C061760
-        for <kvm@vger.kernel.org>; Thu, 27 May 2021 06:18:10 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id lz27so7968371ejb.11
-        for <kvm@vger.kernel.org>; Thu, 27 May 2021 06:18:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=nQgFn8dxliqZkV+84EDBr5D6XtzraqZ1JcCt4vcxaEg=;
-        b=U+4BjfZGBFAb1qVG2dykR4pGeBdKBFy1a0gYiCM/bVIvP4FQgP0Rlv2zd+rc7Cb3qV
-         pR+aE2uu9wEZvhgfWfZxsIR/HpvJ2SiNN/uDvKZIKLLr9rQzwjL8rIyIyDU6Qh6tshvo
-         fPVAeH9h6ZTQlSdYq8Z3GN9z4duLY02ZtqKLyiXt4CnpYZLHuHaD5CywUaq9UxR1K9JO
-         RCRP/QniKCl0pELJZt2SJ4/29wuT+lh8Gu/dnTU2TsNSQ7CgvIKF0SytFPqHlZAnOd0g
-         949d1X4Aehx49vMb6axO60paWMz84o4PHz2KAygA9S9MxJyuPxN+bjMMCpX/d/j0cmuN
-         lQTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=nQgFn8dxliqZkV+84EDBr5D6XtzraqZ1JcCt4vcxaEg=;
-        b=qrO2utc3tvgixATwhoSOQVaZv+HQsX0Re9Y3fyVyE3uKhHvTLYAMthuy/R+wMStoDq
-         /g3C3I7xwvomqOOLD5U4kWwgplIjJu2sAlx4t4o6L7iTdN4yBwyvhJaOVvpoB1YuNpTp
-         K99Sgf7kwTgRbWwq1OKwekMU6rhcL/gAaLe56jC8RdWF6fEC4ZEjYYF/XEqB1+gUgw8l
-         rzunnkKzJ4GswBjGRiShPGsY5nvI3z+4ptmonF805pLhSD1+WtdmzDhN4Yw3oGBu0+GF
-         1++riuy0Pdt7kSeczEfq/FPLEdR2GPKMwj/AcErqhSLSvNrv8dnvXHySt3CTbWMSd2MU
-         Fj/g==
-X-Gm-Message-State: AOAM532I+hW6Q02RI+opoZak0zLhBGVKa25MtqCj5tdcOj+s8KX+xkoR
-        71QS47EUKq4J2+hGoCVXBVEAeokwo1NGqscIYLmA
-X-Google-Smtp-Source: ABdhPJzONeuUPApTMkYwvFbbcILylmfJeY2yh2SKaw7NmLK0VfeRDhi2UdjgnlJsCGuc2sUrB8OCqSsNbGKNja1zLzI=
-X-Received: by 2002:a17:907:1b11:: with SMTP id mp17mr3810051ejc.1.1622121484390;
- Thu, 27 May 2021 06:18:04 -0700 (PDT)
+        id S236306AbhE0NXK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 09:23:10 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:35706 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236159AbhE0NXJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 May 2021 09:23:09 -0400
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id A26D21FD2F;
+        Thu, 27 May 2021 13:21:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1622121695; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=sLde00ReYYFhogQJnGxp6VQvCGwKd586fku4K5tVG4A=;
+        b=v+I1pIh+9uFwlKZXBfDUhan2gO1BpIJ/g99yHR61t3avafIof7YFKH1sMnTHBryS/To5E7
+        Vr2itGgwk2Q/opNKYprcKwnBeiHO+v10zJwA/S8f900oKpHytRydYsgOy8aJ/izGHskFCy
+        Lu97rGLuLko0l4KY4Y5KOhmngpGWRsk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1622121695;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=sLde00ReYYFhogQJnGxp6VQvCGwKd586fku4K5tVG4A=;
+        b=OTMhoEd5C06toRHRkZedKh75Srsp/dh8Lf++lJlmGSYa/ktHP4dXcl49YBu4/E670acJgU
+        B+abfrglRkz+ATCA==
+Received: from director2.suse.de (director2.suse-dmz.suse.de [192.168.254.72])
+        by imap.suse.de (Postfix) with ESMTPSA id 2B5BA11A98;
+        Thu, 27 May 2021 13:21:35 +0000 (UTC)
+Subject: Re: Windows fails to boot after rebase to QEMU master
+From:   Claudio Fontana <cfontana@suse.de>
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>,
+        Alex Bennee <alex.bennee@linaro.org>, Liang Yan <lyan@suse.com>
+References: <20210521091451.GA6016@u366d62d47e3651.ant.amazon.com>
+ <20210524055322-mutt-send-email-mst@kernel.org> <YK6hunkEnft6VJHz@work-vm>
+ <d71fee00-0c21-c5e8-dbc6-00b7ace11c5a@suse.de> <YK9Y64U0wjU5K753@work-vm>
+ <16a5085f-868b-7e1a-f6de-1dab16103a66@redhat.com> <YK9jOdCPUGQF4t0D@work-vm>
+ <855c9f5c-a8e8-82b4-d71e-db9c966ddcc3@suse.de>
+ <3b8f2f3b-0254-22c1-6391-44569c8ff821@suse.de>
+ <d43ca6d9-d00c-6c2e-6838-36554de3fba5@suse.de>
+Message-ID: <faa34115-e468-32a1-b9e3-5d887c038e88@suse.de>
+Date:   Thu, 27 May 2021 15:21:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-References: <20210517095513.850-1-xieyongji@bytedance.com> <20210517095513.850-12-xieyongji@bytedance.com>
- <3740c7eb-e457-07f3-5048-917c8606275d@redhat.com> <CACycT3uAqa6azso_8MGreh+quj-JXO1piuGnrV8k2kTfc34N2g@mail.gmail.com>
- <5a68bb7c-fd05-ce02-cd61-8a601055c604@redhat.com> <CACycT3ve7YvKF+F+AnTQoJZMPua+jDvGMs_ox8GQe_=SGdeCMA@mail.gmail.com>
- <ee00efca-b26d-c1be-68d2-f9e34a735515@redhat.com> <CACycT3ufok97cKpk47NjUBTc0QAyfauFUyuFvhWKmuqCGJ7zZw@mail.gmail.com>
- <00ded99f-91b6-ba92-5d92-2366b163f129@redhat.com>
-In-Reply-To: <00ded99f-91b6-ba92-5d92-2366b163f129@redhat.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Thu, 27 May 2021 21:17:54 +0800
-Message-ID: <CACycT3uK_Fuade-b8FVYkGCKZnne_UGGbYRFwv7WOH2oKCsXSg@mail.gmail.com>
-Subject: Re: Re: [PATCH v7 11/12] vduse: Introduce VDUSE - vDPA Device in Userspace
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <d43ca6d9-d00c-6c2e-6838-36554de3fba5@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 27, 2021 at 4:41 PM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> =E5=9C=A8 2021/5/27 =E4=B8=8B=E5=8D=883:34, Yongji Xie =E5=86=99=E9=81=93=
-:
-> > On Thu, May 27, 2021 at 1:40 PM Jason Wang <jasowang@redhat.com> wrote:
-> >>
-> >> =E5=9C=A8 2021/5/27 =E4=B8=8B=E5=8D=881:08, Yongji Xie =E5=86=99=E9=81=
-=93:
-> >>> On Thu, May 27, 2021 at 1:00 PM Jason Wang <jasowang@redhat.com> wrot=
-e:
-> >>>> =E5=9C=A8 2021/5/27 =E4=B8=8B=E5=8D=8812:57, Yongji Xie =E5=86=99=E9=
-=81=93:
-> >>>>> On Thu, May 27, 2021 at 12:13 PM Jason Wang <jasowang@redhat.com> w=
-rote:
-> >>>>>> =E5=9C=A8 2021/5/17 =E4=B8=8B=E5=8D=885:55, Xie Yongji =E5=86=99=
-=E9=81=93:
-> >>>>>>> +
-> >>>>>>> +static int vduse_dev_msg_sync(struct vduse_dev *dev,
-> >>>>>>> +                           struct vduse_dev_msg *msg)
-> >>>>>>> +{
-> >>>>>>> +     init_waitqueue_head(&msg->waitq);
-> >>>>>>> +     spin_lock(&dev->msg_lock);
-> >>>>>>> +     vduse_enqueue_msg(&dev->send_list, msg);
-> >>>>>>> +     wake_up(&dev->waitq);
-> >>>>>>> +     spin_unlock(&dev->msg_lock);
-> >>>>>>> +     wait_event_killable(msg->waitq, msg->completed);
-> >>>>>> What happens if the userspace(malicous) doesn't give a response fo=
-rever?
-> >>>>>>
-> >>>>>> It looks like a DOS. If yes, we need to consider a way to fix that=
-.
-> >>>>>>
-> >>>>> How about using wait_event_killable_timeout() instead?
-> >>>> Probably, and then we need choose a suitable timeout and more import=
-ant,
-> >>>> need to report the failure to virtio.
-> >>>>
-> >>> Makes sense to me. But it looks like some
-> >>> vdpa_config_ops/virtio_config_ops such as set_status() didn't have a
-> >>> return value.  Now I add a WARN_ON() for the failure. Do you mean we
-> >>> need to add some change for virtio core to handle the failure?
-> >>
-> >> Maybe, but I'm not sure how hard we can do that.
-> >>
-> > We need to change all virtio device drivers in this way.
->
->
-> Probably.
->
->
-> >
-> >> We had NEEDS_RESET but it looks we don't implement it.
-> >>
-> > Could it handle the failure of get_feature() and get/set_config()?
->
->
-> Looks not:
->
-> "
->
-> The device SHOULD set DEVICE_NEEDS_RESET when it enters an error state
-> that a reset is needed. If DRIVER_OK is set, after it sets
-> DEVICE_NEEDS_RESET, the device MUST send a device configuration change
-> notification to the driver.
->
-> "
->
-> This looks implies that NEEDS_RESET may only work after device is
-> probed. But in the current design, even the reset() is not reliable.
->
->
-> >
-> >> Or a rough idea is that maybe need some relaxing to be coupled loosely
-> >> with userspace. E.g the device (control path) is implemented in the
-> >> kernel but the datapath is implemented in the userspace like TUN/TAP.
-> >>
-> > I think it can work for most cases. One problem is that the set_config
-> > might change the behavior of the data path at runtime, e.g.
-> > virtnet_set_mac_address() in the virtio-net driver and
-> > cache_type_store() in the virtio-blk driver. Not sure if this path is
-> > able to return before the datapath is aware of this change.
->
->
-> Good point.
->
-> But set_config() should be rare:
->
-> E.g in the case of virtio-net with VERSION_1, config space is read only,
-> and it was set via control vq.
->
-> For block, we can
->
-> 1) start from without WCE or
-> 2) we add a config change notification to userspace or
+On 5/27/21 1:36 PM, Claudio Fontana wrote:
+> On 5/27/21 12:53 PM, Claudio Fontana wrote:
+>> On 5/27/21 11:48 AM, Claudio Fontana wrote:
+>>> On 5/27/21 11:15 AM, Dr. David Alan Gilbert wrote:
+>>>> * Philippe Mathieu-Daudé (philmd@redhat.com) wrote:
+>>>>> On 5/27/21 10:31 AM, Dr. David Alan Gilbert wrote:
+>>>>>> * Claudio Fontana (cfontana@suse.de) wrote:
+>>>>>>> On 5/26/21 9:30 PM, Dr. David Alan Gilbert wrote:
+>>>>>>>> * Michael S. Tsirkin (mst@redhat.com) wrote:
+>>>>>>>>> On Fri, May 21, 2021 at 11:17:19AM +0200, Siddharth Chandrasekaran wrote:
+>>>>>>>>>> After a rebase to QEMU master, I am having trouble booting windows VMs.
+>>>>>>>>>> Git bisect indicates commit f5cc5a5c1686 ("i386: split cpu accelerators
+>>>>>>>>>> from cpu.c, using AccelCPUClass") to have introduced the issue. I spent
+>>>>>>>>>> some time looking at into it yesterday without much luck.
+>>>>>>>>>>
+>>>>>>>>>> Steps to reproduce:
+>>>>>>>>>>
+>>>>>>>>>>     $ ./configure --enable-kvm --disable-xen --target-list=x86_64-softmmu --enable-debug
+>>>>>>>>>>     $ make -j `nproc`
+>>>>>>>>>>     $ ./build/x86_64-softmmu/qemu-system-x86_64 \
+>>>>>>>>>>         -cpu host,hv_synic,hv_vpindex,hv_time,hv_runtime,hv_stimer,hv_crash \
+>>>>>>>>>>         -enable-kvm \
+>>>>>>>>>>         -name test,debug-threads=on \
+>>>>>>>>>>         -smp 1,threads=1,cores=1,sockets=1 \
+>>>>>>>>>>         -m 4G \
+>>>>>>>>>>         -net nic -net user \
+>>>>>>>>>>         -boot d,menu=on \
+>>>>>>>>>>         -usbdevice tablet \
+>>>>>>>>>>         -vnc :3 \
+>>>>>>>>>>         -machine q35,smm=on \
+>>>>>>>>>>         -drive if=pflash,format=raw,readonly=on,unit=0,file="../OVMF_CODE.secboot.fd" \
+>>>>>>>>>>         -drive if=pflash,format=raw,unit=1,file="../OVMF_VARS.secboot.fd" \
+>>>>>>>>>>         -global ICH9-LPC.disable_s3=1 \
+>>>>>>>>>>         -global driver=cfi.pflash01,property=secure,value=on \
+>>>>>>>>>>         -cdrom "../Windows_Server_2016_14393.ISO" \
+>>>>>>>>>>         -drive file="../win_server_2016.qcow2",format=qcow2,if=none,id=rootfs_drive \
+>>>>>>>>>>         -device ahci,id=ahci \
+>>>>>>>>>>         -device ide-hd,drive=rootfs_drive,bus=ahci.0
+>>>>>>>>>>
+>>>>>>>>>> If the issue is not obvious, I'd like some pointers on how to go about
+>>>>>>>>>> fixing this issue.
+>>>>>>>>>>
+>>>>>>>>>> ~ Sid.
+>>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> At a guess this commit inadvertently changed something in the CPU ID.
+>>>>>>>>> I'd start by using a linux guest to dump cpuid before and after the
+>>>>>>>>> change.
+>>>>>>>>
+>>>>>>>> I've not had a chance to do that yet, however I did just end up with a
+>>>>>>>> bisect of a linux guest failure bisecting to the same patch:
+>>>>>>>>
+>>>>>>>> [dgilbert@dgilbert-t580 qemu]$ git bisect bad
+>>>>>>>> f5cc5a5c168674f84bf061cdb307c2d25fba5448 is the first bad commit
+>>>>>>>> commit f5cc5a5c168674f84bf061cdb307c2d25fba5448
+>>>>>>>> Author: Claudio Fontana <cfontana@suse.de>
+>>>>>>>> Date:   Mon Mar 22 14:27:40 2021 +0100
+>>>>>>>>
+>>>>>>>>     i386: split cpu accelerators from cpu.c, using AccelCPUClass
+>>>>>>>>     
+>>>>>>>>     i386 is the first user of AccelCPUClass, allowing to split
+>>>>>>>>     cpu.c into:
+>>>>>>>>     
+>>>>>>>>     cpu.c            cpuid and common x86 cpu functionality
+>>>>>>>>     host-cpu.c       host x86 cpu functions and "host" cpu type
+>>>>>>>>     kvm/kvm-cpu.c    KVM x86 AccelCPUClass
+>>>>>>>>     hvf/hvf-cpu.c    HVF x86 AccelCPUClass
+>>>>>>>>     tcg/tcg-cpu.c    TCG x86 AccelCPUClass
+>>>>>
+>>>>> Well this is a big commit... I'm not custom to x86 target, and am
+>>>>> having hard time following the cpu host/max change.
+>>>>>
+>>>>> Is it working when you use '-cpu max,...' instead of '-cpu host,'?
+>>>>
+>>>> No; and in fact the cpuid's are almost entirely different with and
+>>>> without this patch! (both with -cpu host).  It looks like with this
+>>>> patch we're getting the cpuid for the TCG cpuid rather than the host:
+>>>>
+>>>> Prior to this patch:
+>>>> :/# cat /proc/cpuinfo
+>>>> processor       : 0
+>>>> vendor_id       : GenuineIntel
+>>>> cpu family      : 6
+>>>> model           : 142
+>>>> model name      : Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz
+>>>> stepping        : 10
+>>>> microcode       : 0xe0
+>>>> cpu MHz         : 2111.998
+>>>> cache size      : 16384 KB
+>>>> physical id     : 0
+>>>> siblings        : 1
+>>>> core id         : 0
+>>>> cpu cores       : 1
+>>>> apicid          : 0
+>>>> initial apicid  : 0
+>>>> fpu             : yes
+>>>> fpu_exception   : yes
+>>>> cpuid level     : 22
+>>>> wp              : yes
+>>>> flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss syscall nx pdpe1gb rdtscp lm constant
+>>>> _tsc arch_perfmon rep_good nopl xtopology cpuid tsc_known_freq pni pclmulqdq vmx ssse3 fma cx16 pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_tim
+>>>> er aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch cpuid_fault invpcid_single pti ssbd ibrs ibpb stibp tpr_shadow vnmi flexpriority ept vpid
+>>>> ept_ad fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt xsaveopt xsavec xgetbv1 xsaves arat umip md_clear arch_ca
+>>>> pabilities
+>>>> vmx flags       : vnmi preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offset vtpr mtf vapic ept vpid unrestricted_guest shadow_vmcs pml
+>>>> bugs            : cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs taa srbds
+>>>> bogomips        : 4223.99
+>>>> clflush size    : 64
+>>>> cache_alignment : 64
+>>>> address sizes   : 39 bits physical, 48 bits virtual
+>>>> power management:
+>>>>
+>>>> With this patch:
+>>>> processor       : 0
+>>>> vendor_id       : AuthenticAMD
+>>>> cpu family      : 6
+>>>> model           : 6
+>>>> model name      : QEMU TCG CPU version 2.5+
+>>>> stepping        : 3
+>>>> cpu MHz         : 2111.998
+>>>> cache size      : 512 KB
+>>>> physical id     : 0
+>>>> siblings        : 1
+>>>> core id         : 0
+>>>> cpu cores       : 1
+>>>> apicid          : 0
+>>>> initial apicid  : 0
+>>>> fpu             : yes
+>>>> fpu_exception   : yes
+>>>> cpuid level     : 13
+>>>> wp              : yes
+>>>> flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss syscall nx pdpe1gb rdtscp lm nopl cpu
+>>>> id tsc_known_freq pni pclmulqdq vmx ssse3 fma cx16 pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_
+>>>> lm abm 3dnowprefetch invpcid_single ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt
+>>>>  xsaveopt xsavec xgetbv1 xsaves arat umip md_clear arch_capabilities
+>>>> bugs            : fxsave_leak sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass taa
+>>>> bogomips        : 4223.99
+>>>> TLB size        : 1024 4K pages
+>>>> clflush size    : 64
+>>>> cache_alignment : 64
+>>>> address sizes   : 40 bits physical, 48 bits virtual
+>>>> power management:
+>>>>
+>>>> cpuid.f5cc5a5c16
+>>>>
+>>>> CPU 0:
+>>>>    0x00000000 0x00: eax=0x0000000d ebx=0x68747541 ecx=0x444d4163 edx=0x69746e65
+>>>>    0x00000001 0x00: eax=0x00000663 ebx=0x00000800 ecx=0xfffab223 edx=0x0f8bfbff
+>>>>    0x00000002 0x00: eax=0x00000001 ebx=0x00000000 ecx=0x0000004d edx=0x002c307d
+>>>>    0x00000003 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x00000004 0x00: eax=0x00000121 ebx=0x01c0003f ecx=0x0000003f edx=0x00000001
+>>>>    0x00000004 0x01: eax=0x00000122 ebx=0x01c0003f ecx=0x0000003f edx=0x00000001
+>>>>    0x00000004 0x02: eax=0x00000143 ebx=0x03c0003f ecx=0x00000fff edx=0x00000001
+>>>>    0x00000004 0x03: eax=0x00000163 ebx=0x03c0003f ecx=0x00003fff edx=0x00000006
+>>>>    0x00000005 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000003 edx=0x00000000
+>>>>    0x00000006 0x00: eax=0x00000004 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x00000007 0x00: eax=0x00000000 ebx=0x009c4fbb ecx=0x00000004 edx=0xac000400
+>>>>    0x00000008 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x00000009 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x0000000a 0x00: eax=0x07300402 ebx=0x00000000 ecx=0x00000000 edx=0x00008603
+>>>>    0x0000000b 0x00: eax=0x00000000 ebx=0x00000001 ecx=0x00000100 edx=0x00000000
+>>>>    0x0000000b 0x01: eax=0x00000000 ebx=0x00000001 ecx=0x00000201 edx=0x00000000
+>>>>    0x0000000c 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x0000000d 0x00: eax=0x0000001f ebx=0x00000440 ecx=0x00000440 edx=0x00000000
+>>>>    0x0000000d 0x01: eax=0x0000000f ebx=0x000003c0 ecx=0x00000000 edx=0x00000000
+>>>>    0x0000000d 0x02: eax=0x00000100 ebx=0x00000240 ecx=0x00000000 edx=0x00000000
+>>>>    0x0000000d 0x03: eax=0x00000040 ebx=0x000003c0 ecx=0x00000000 edx=0x00000000
+>>>>    0x0000000d 0x04: eax=0x00000040 ebx=0x00000400 ecx=0x00000000 edx=0x00000000
+>>>>    0x40000000 0x00: eax=0x40000001 ebx=0x4b4d564b ecx=0x564b4d56 edx=0x0000004d
+>>>>    0x40000001 0x00: eax=0x01007afb ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x80000000 0x00: eax=0x80000008 ebx=0x68747541 ecx=0x444d4163 edx=0x69746e65
+>>>>    0x80000001 0x00: eax=0x00000663 ebx=0x00000000 ecx=0x00000121 edx=0x2d93fbff
+>>>>    0x80000002 0x00: eax=0x554d4551 ebx=0x47435420 ecx=0x55504320 edx=0x72657620
+>>>>    0x80000003 0x00: eax=0x6e6f6973 ebx=0x352e3220 ecx=0x0000002b edx=0x00000000
+>>>>    0x80000004 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x80000005 0x00: eax=0x01ff01ff ebx=0x01ff01ff ecx=0x40020140 edx=0x40020140
+>>>>    0x80000006 0x00: eax=0x00000000 ebx=0x42004200 ecx=0x02008140 edx=0x00808140
+>>>>    0x80000007 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x80000008 0x00: eax=0x00003028 ebx=0x0100d000 ecx=0x00000000 edx=0x00000000
+>>>>    0x80860000 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0xc0000000 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>
+>>>>
+>>>> cpuid.0ac2b19743
+>>>>
+>>>> CPU 0:
+>>>>    0x00000000 0x00: eax=0x00000016 ebx=0x756e6547 ecx=0x6c65746e edx=0x49656e69
+>>>>    0x00000001 0x00: eax=0x000806ea ebx=0x00000800 ecx=0xfffab223 edx=0x0f8bfbff
+>>>>    0x00000002 0x00: eax=0x00000001 ebx=0x00000000 ecx=0x0000004d edx=0x002c307d
+>>>>    0x00000003 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x00000004 0x00: eax=0x00000121 ebx=0x01c0003f ecx=0x0000003f edx=0x00000001
+>>>>    0x00000004 0x01: eax=0x00000122 ebx=0x01c0003f ecx=0x0000003f edx=0x00000001
+>>>>    0x00000004 0x02: eax=0x00000143 ebx=0x03c0003f ecx=0x00000fff edx=0x00000001
+>>>>    0x00000004 0x03: eax=0x00000163 ebx=0x03c0003f ecx=0x00003fff edx=0x00000006
+>>>>    0x00000005 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000003 edx=0x00000000
+>>>>    0x00000006 0x00: eax=0x00000004 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x00000007 0x00: eax=0x00000000 ebx=0x009c4fbb ecx=0x00000004 edx=0xac000400
+>>>>    0x00000008 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x00000009 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x0000000a 0x00: eax=0x07300402 ebx=0x00000000 ecx=0x00000000 edx=0x00008603
+>>>>    0x0000000b 0x00: eax=0x00000000 ebx=0x00000001 ecx=0x00000100 edx=0x00000000
+>>>>    0x0000000b 0x01: eax=0x00000000 ebx=0x00000001 ecx=0x00000201 edx=0x00000000
+>>>>    0x0000000c 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x0000000d 0x00: eax=0x0000001f ebx=0x00000440 ecx=0x00000440 edx=0x00000000
+>>>>    0x0000000d 0x01: eax=0x0000000f ebx=0x000003c0 ecx=0x00000000 edx=0x00000000
+>>>>    0x0000000d 0x02: eax=0x00000100 ebx=0x00000240 ecx=0x00000000 edx=0x00000000
+>>>>    0x0000000d 0x03: eax=0x00000040 ebx=0x000003c0 ecx=0x00000000 edx=0x00000000
+>>>>    0x0000000d 0x04: eax=0x00000040 ebx=0x00000400 ecx=0x00000000 edx=0x00000000
+>>>>    0x0000000e 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x0000000f 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x00000010 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x00000011 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x00000012 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x00000013 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x00000014 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x00000015 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x00000016 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x40000000 0x00: eax=0x40000001 ebx=0x4b4d564b ecx=0x564b4d56 edx=0x0000004d
+>>>>    0x40000001 0x00: eax=0x01007afb ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x80000000 0x00: eax=0x80000008 ebx=0x756e6547 ecx=0x6c65746e edx=0x49656e69
+>>>>    0x80000001 0x00: eax=0x000806ea ebx=0x00000000 ecx=0x00000121 edx=0x2c100800
+>>>>    0x80000002 0x00: eax=0x65746e49 ebx=0x2952286c ecx=0x726f4320 edx=0x4d542865
+>>>>    0x80000003 0x00: eax=0x37692029 ebx=0x3536382d ecx=0x43205530 edx=0x40205550
+>>>>    0x80000004 0x00: eax=0x392e3120 ebx=0x7a484730 ecx=0x00000000 edx=0x00000000
+>>>>    0x80000005 0x00: eax=0x01ff01ff ebx=0x01ff01ff ecx=0x40020140 edx=0x40020140
+>>>>    0x80000006 0x00: eax=0x00000000 ebx=0x42004200 ecx=0x02008140 edx=0x00808140
+>>>>    0x80000007 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0x80000008 0x00: eax=0x00003027 ebx=0x0100d000 ecx=0x00000000 edx=0x00000000
+>>>>    0x80860000 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>    0xc0000000 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>>>>
+>>>
+>>> I started looking at it.
+>>>
+>>> Claudio
+>>>
+>>
+>> I wonder how I missed this, the initialization functions for max_x86_cpu_initfn and kvm_cpu_max_instance_init end up being called in the wrong order.
+>>
+> 
+> 
+> Just to check whether this is actually the issue we are talking about, Sid et al, could you try this?
+> 
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index c496bfa1c2..810c46281b 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -4252,6 +4252,7 @@ static void max_x86_cpu_initfn(Object *obj)
+>      object_property_set_str(OBJECT(cpu), "model-id",
+>                              "QEMU TCG CPU version " QEMU_HW_VERSION,
+>                              &error_abort);
+> +    accel_cpu_instance_init(CPU(cpu));
+>  }
+> 
+>  static const TypeInfo max_x86_cpu_type_info = {
+> ------------------------------------------------------------------------------------------
+> 
+> Does this band-aid happen to cover-up the issue?
+> 
+> 
+> I need to think about the proper fix though, any suggestions Paolo, Eduardo?
+> 
+> The pickle here is that we'd need to call the accelerator specific initialization of the x86 accel-cpu only after the x86 cpu subclass initfn,
+> otherwise the accel-specific cpu initialization code has no chance to see the subclass (max) trying to set ->max_features.
+> 
+> C.
+> 
 
-I prefer this way. And I think we also need to do similar things for
-set/get_vq_state().
+thinking about this, maybe here we'd need something similar to what is present in ARM with "arm_cpu_post_init".
+
+The difficulty here is that the best place for accel_cpu_instance_init to be called is after the whole CPU class hierarchy is already initialized,
+in order to take into account "max", "host" etc, since the accel cpu initialization depends on whether max_features is on or not.
+
+Thoughts?
 
 Thanks,
-Yongji
+
+Claudio
+
