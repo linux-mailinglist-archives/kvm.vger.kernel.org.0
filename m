@@ -2,305 +2,307 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 50A20392C2D
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 12:53:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E860392C48
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 13:03:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236287AbhE0KzS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 06:55:18 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:34764 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236248AbhE0KzR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 May 2021 06:55:17 -0400
-Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id A12A61FD2E;
-        Thu, 27 May 2021 10:53:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1622112823; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=B+vi8rBL8iqXGM0lvV3ZOEU0P+t1gz8gxJY1hci1ZSs=;
-        b=i7TUa/ybgpuBfOy18JiIsMfd7kp0rpAI0AjszkLktHdUeAygl0nymUBT06Q6u4jMlKr8Ls
-        JFmxxmZ0Yyaw2inx5GgPeGN6WkAKMkX84WjtdMldeJD9ZK6O2/ohTtLQxl7CEKxrHv+rMq
-        RpFxTliSSWd4sjXdEGtwWkEakz649Do=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1622112823;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=B+vi8rBL8iqXGM0lvV3ZOEU0P+t1gz8gxJY1hci1ZSs=;
-        b=XP6RBX+UEr1mKvLcc8ryaF4btdwabXXtPCioyfZv/LLxipRd+FeMPmsGZkzNPhHiN+erkp
-        qQLDn0n2/dE1e9AA==
-Received: from director2.suse.de (director2.suse-dmz.suse.de [192.168.254.72])
-        by imap.suse.de (Postfix) with ESMTPSA id 3AB2411A98;
-        Thu, 27 May 2021 10:53:43 +0000 (UTC)
-Subject: Re: Windows fails to boot after rebase to QEMU master
-From:   Claudio Fontana <cfontana@suse.de>
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Cc:     Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20210521091451.GA6016@u366d62d47e3651.ant.amazon.com>
- <20210524055322-mutt-send-email-mst@kernel.org> <YK6hunkEnft6VJHz@work-vm>
- <d71fee00-0c21-c5e8-dbc6-00b7ace11c5a@suse.de> <YK9Y64U0wjU5K753@work-vm>
- <16a5085f-868b-7e1a-f6de-1dab16103a66@redhat.com> <YK9jOdCPUGQF4t0D@work-vm>
- <855c9f5c-a8e8-82b4-d71e-db9c966ddcc3@suse.de>
-Message-ID: <3b8f2f3b-0254-22c1-6391-44569c8ff821@suse.de>
-Date:   Thu, 27 May 2021 12:53:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S236315AbhE0LFH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 07:05:07 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2501 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236239AbhE0LFC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 May 2021 07:05:02 -0400
+Received: from dggeml758-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4FrPxV3zWJzYqPF;
+        Thu, 27 May 2021 19:00:46 +0800 (CST)
+Received: from dggpemm500022.china.huawei.com (7.185.36.162) by
+ dggeml758-chm.china.huawei.com (10.1.199.159) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2176.2; Thu, 27 May 2021 19:03:26 +0800
+Received: from [10.174.185.220] (10.174.185.220) by
+ dggpemm500022.china.huawei.com (7.185.36.162) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 27 May 2021 19:03:25 +0800
+Subject: Re: [RFC PATCH v3 8/8] vfio: Add nested IOPF support
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>
+CC:     Eric Auger <eric.auger@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "Joerg Roedel" <joro@8bytes.org>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <iommu@lists.linux-foundation.org>, <linux-api@vger.kernel.org>,
+        Kevin Tian <kevin.tian@intel.com>, <yi.l.liu@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Barry Song <song.bao.hua@hisilicon.com>,
+        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
+References: <20210409034420.1799-1-lushenming@huawei.com>
+ <20210409034420.1799-9-lushenming@huawei.com>
+ <20210518125808.345b812c.alex.williamson@redhat.com>
+ <ea8c92a8-6e51-8be6-de19-d5e6f1d5527f@huawei.com>
+ <83747758-ceb6-b498-8d95-609fdd0d763b@huawei.com>
+ <20210524161129.085503ad@x1.home.shazbot.org>
+From:   Shenming Lu <lushenming@huawei.com>
+Message-ID: <90b00e7d-7934-ee79-7643-e2949e2d3af4@huawei.com>
+Date:   Thu, 27 May 2021 19:03:14 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-In-Reply-To: <855c9f5c-a8e8-82b4-d71e-db9c966ddcc3@suse.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20210524161129.085503ad@x1.home.shazbot.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.185.220]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500022.china.huawei.com (7.185.36.162)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/27/21 11:48 AM, Claudio Fontana wrote:
-> On 5/27/21 11:15 AM, Dr. David Alan Gilbert wrote:
->> * Philippe Mathieu-Daudé (philmd@redhat.com) wrote:
->>> On 5/27/21 10:31 AM, Dr. David Alan Gilbert wrote:
->>>> * Claudio Fontana (cfontana@suse.de) wrote:
->>>>> On 5/26/21 9:30 PM, Dr. David Alan Gilbert wrote:
->>>>>> * Michael S. Tsirkin (mst@redhat.com) wrote:
->>>>>>> On Fri, May 21, 2021 at 11:17:19AM +0200, Siddharth Chandrasekaran wrote:
->>>>>>>> After a rebase to QEMU master, I am having trouble booting windows VMs.
->>>>>>>> Git bisect indicates commit f5cc5a5c1686 ("i386: split cpu accelerators
->>>>>>>> from cpu.c, using AccelCPUClass") to have introduced the issue. I spent
->>>>>>>> some time looking at into it yesterday without much luck.
->>>>>>>>
->>>>>>>> Steps to reproduce:
->>>>>>>>
->>>>>>>>     $ ./configure --enable-kvm --disable-xen --target-list=x86_64-softmmu --enable-debug
->>>>>>>>     $ make -j `nproc`
->>>>>>>>     $ ./build/x86_64-softmmu/qemu-system-x86_64 \
->>>>>>>>         -cpu host,hv_synic,hv_vpindex,hv_time,hv_runtime,hv_stimer,hv_crash \
->>>>>>>>         -enable-kvm \
->>>>>>>>         -name test,debug-threads=on \
->>>>>>>>         -smp 1,threads=1,cores=1,sockets=1 \
->>>>>>>>         -m 4G \
->>>>>>>>         -net nic -net user \
->>>>>>>>         -boot d,menu=on \
->>>>>>>>         -usbdevice tablet \
->>>>>>>>         -vnc :3 \
->>>>>>>>         -machine q35,smm=on \
->>>>>>>>         -drive if=pflash,format=raw,readonly=on,unit=0,file="../OVMF_CODE.secboot.fd" \
->>>>>>>>         -drive if=pflash,format=raw,unit=1,file="../OVMF_VARS.secboot.fd" \
->>>>>>>>         -global ICH9-LPC.disable_s3=1 \
->>>>>>>>         -global driver=cfi.pflash01,property=secure,value=on \
->>>>>>>>         -cdrom "../Windows_Server_2016_14393.ISO" \
->>>>>>>>         -drive file="../win_server_2016.qcow2",format=qcow2,if=none,id=rootfs_drive \
->>>>>>>>         -device ahci,id=ahci \
->>>>>>>>         -device ide-hd,drive=rootfs_drive,bus=ahci.0
->>>>>>>>
->>>>>>>> If the issue is not obvious, I'd like some pointers on how to go about
->>>>>>>> fixing this issue.
->>>>>>>>
->>>>>>>> ~ Sid.
->>>>>>>>
->>>>>>>
->>>>>>> At a guess this commit inadvertently changed something in the CPU ID.
->>>>>>> I'd start by using a linux guest to dump cpuid before and after the
->>>>>>> change.
->>>>>>
->>>>>> I've not had a chance to do that yet, however I did just end up with a
->>>>>> bisect of a linux guest failure bisecting to the same patch:
->>>>>>
->>>>>> [dgilbert@dgilbert-t580 qemu]$ git bisect bad
->>>>>> f5cc5a5c168674f84bf061cdb307c2d25fba5448 is the first bad commit
->>>>>> commit f5cc5a5c168674f84bf061cdb307c2d25fba5448
->>>>>> Author: Claudio Fontana <cfontana@suse.de>
->>>>>> Date:   Mon Mar 22 14:27:40 2021 +0100
->>>>>>
->>>>>>     i386: split cpu accelerators from cpu.c, using AccelCPUClass
->>>>>>     
->>>>>>     i386 is the first user of AccelCPUClass, allowing to split
->>>>>>     cpu.c into:
->>>>>>     
->>>>>>     cpu.c            cpuid and common x86 cpu functionality
->>>>>>     host-cpu.c       host x86 cpu functions and "host" cpu type
->>>>>>     kvm/kvm-cpu.c    KVM x86 AccelCPUClass
->>>>>>     hvf/hvf-cpu.c    HVF x86 AccelCPUClass
->>>>>>     tcg/tcg-cpu.c    TCG x86 AccelCPUClass
+On 2021/5/25 6:11, Alex Williamson wrote:
+> On Mon, 24 May 2021 21:11:11 +0800
+> Shenming Lu <lushenming@huawei.com> wrote:
+> 
+>> On 2021/5/21 15:59, Shenming Lu wrote:
+>>> On 2021/5/19 2:58, Alex Williamson wrote:  
+>>>> On Fri, 9 Apr 2021 11:44:20 +0800
+>>>> Shenming Lu <lushenming@huawei.com> wrote:
+>>>>  
+>>>>> To set up nested mode, drivers such as vfio_pci need to register a
+>>>>> handler to receive stage/level 1 faults from the IOMMU, but since
+>>>>> currently each device can only have one iommu dev fault handler,
+>>>>> and if stage 2 IOPF is already enabled (VFIO_IOMMU_ENABLE_IOPF),
+>>>>> we choose to update the registered handler (a consolidated one) via
+>>>>> flags (set FAULT_REPORT_NESTED_L1), and further deliver the received
+>>>>> stage 1 faults in the handler to the guest through a newly added
+>>>>> vfio_device_ops callback.  
+>>>>
+>>>> Are there proposed in-kernel drivers that would use any of these
+>>>> symbols?  
 >>>
->>> Well this is a big commit... I'm not custom to x86 target, and am
->>> having hard time following the cpu host/max change.
+>>> I hope that such as Eric's SMMUv3 Nested Stage Setup series [1] can
+>>> use these symbols to consolidate the two page fault handlers into one.
 >>>
->>> Is it working when you use '-cpu max,...' instead of '-cpu host,'?
->>
->> No; and in fact the cpuid's are almost entirely different with and
->> without this patch! (both with -cpu host).  It looks like with this
->> patch we're getting the cpuid for the TCG cpuid rather than the host:
->>
->> Prior to this patch:
->> :/# cat /proc/cpuinfo
->> processor       : 0
->> vendor_id       : GenuineIntel
->> cpu family      : 6
->> model           : 142
->> model name      : Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz
->> stepping        : 10
->> microcode       : 0xe0
->> cpu MHz         : 2111.998
->> cache size      : 16384 KB
->> physical id     : 0
->> siblings        : 1
->> core id         : 0
->> cpu cores       : 1
->> apicid          : 0
->> initial apicid  : 0
->> fpu             : yes
->> fpu_exception   : yes
->> cpuid level     : 22
->> wp              : yes
->> flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss syscall nx pdpe1gb rdtscp lm constant
->> _tsc arch_perfmon rep_good nopl xtopology cpuid tsc_known_freq pni pclmulqdq vmx ssse3 fma cx16 pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_tim
->> er aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch cpuid_fault invpcid_single pti ssbd ibrs ibpb stibp tpr_shadow vnmi flexpriority ept vpid
->> ept_ad fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt xsaveopt xsavec xgetbv1 xsaves arat umip md_clear arch_ca
->> pabilities
->> vmx flags       : vnmi preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offset vtpr mtf vapic ept vpid unrestricted_guest shadow_vmcs pml
->> bugs            : cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs taa srbds
->> bogomips        : 4223.99
->> clflush size    : 64
->> cache_alignment : 64
->> address sizes   : 39 bits physical, 48 bits virtual
->> power management:
->>
->> With this patch:
->> processor       : 0
->> vendor_id       : AuthenticAMD
->> cpu family      : 6
->> model           : 6
->> model name      : QEMU TCG CPU version 2.5+
->> stepping        : 3
->> cpu MHz         : 2111.998
->> cache size      : 512 KB
->> physical id     : 0
->> siblings        : 1
->> core id         : 0
->> cpu cores       : 1
->> apicid          : 0
->> initial apicid  : 0
->> fpu             : yes
->> fpu_exception   : yes
->> cpuid level     : 13
->> wp              : yes
->> flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss syscall nx pdpe1gb rdtscp lm nopl cpu
->> id tsc_known_freq pni pclmulqdq vmx ssse3 fma cx16 pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_
->> lm abm 3dnowprefetch invpcid_single ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt
->>  xsaveopt xsavec xgetbv1 xsaves arat umip md_clear arch_capabilities
->> bugs            : fxsave_leak sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass taa
->> bogomips        : 4223.99
->> TLB size        : 1024 4K pages
->> clflush size    : 64
->> cache_alignment : 64
->> address sizes   : 40 bits physical, 48 bits virtual
->> power management:
->>
->> cpuid.f5cc5a5c16
->>
->> CPU 0:
->>    0x00000000 0x00: eax=0x0000000d ebx=0x68747541 ecx=0x444d4163 edx=0x69746e65
->>    0x00000001 0x00: eax=0x00000663 ebx=0x00000800 ecx=0xfffab223 edx=0x0f8bfbff
->>    0x00000002 0x00: eax=0x00000001 ebx=0x00000000 ecx=0x0000004d edx=0x002c307d
->>    0x00000003 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x00000004 0x00: eax=0x00000121 ebx=0x01c0003f ecx=0x0000003f edx=0x00000001
->>    0x00000004 0x01: eax=0x00000122 ebx=0x01c0003f ecx=0x0000003f edx=0x00000001
->>    0x00000004 0x02: eax=0x00000143 ebx=0x03c0003f ecx=0x00000fff edx=0x00000001
->>    0x00000004 0x03: eax=0x00000163 ebx=0x03c0003f ecx=0x00003fff edx=0x00000006
->>    0x00000005 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000003 edx=0x00000000
->>    0x00000006 0x00: eax=0x00000004 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x00000007 0x00: eax=0x00000000 ebx=0x009c4fbb ecx=0x00000004 edx=0xac000400
->>    0x00000008 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x00000009 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x0000000a 0x00: eax=0x07300402 ebx=0x00000000 ecx=0x00000000 edx=0x00008603
->>    0x0000000b 0x00: eax=0x00000000 ebx=0x00000001 ecx=0x00000100 edx=0x00000000
->>    0x0000000b 0x01: eax=0x00000000 ebx=0x00000001 ecx=0x00000201 edx=0x00000000
->>    0x0000000c 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x0000000d 0x00: eax=0x0000001f ebx=0x00000440 ecx=0x00000440 edx=0x00000000
->>    0x0000000d 0x01: eax=0x0000000f ebx=0x000003c0 ecx=0x00000000 edx=0x00000000
->>    0x0000000d 0x02: eax=0x00000100 ebx=0x00000240 ecx=0x00000000 edx=0x00000000
->>    0x0000000d 0x03: eax=0x00000040 ebx=0x000003c0 ecx=0x00000000 edx=0x00000000
->>    0x0000000d 0x04: eax=0x00000040 ebx=0x00000400 ecx=0x00000000 edx=0x00000000
->>    0x40000000 0x00: eax=0x40000001 ebx=0x4b4d564b ecx=0x564b4d56 edx=0x0000004d
->>    0x40000001 0x00: eax=0x01007afb ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x80000000 0x00: eax=0x80000008 ebx=0x68747541 ecx=0x444d4163 edx=0x69746e65
->>    0x80000001 0x00: eax=0x00000663 ebx=0x00000000 ecx=0x00000121 edx=0x2d93fbff
->>    0x80000002 0x00: eax=0x554d4551 ebx=0x47435420 ecx=0x55504320 edx=0x72657620
->>    0x80000003 0x00: eax=0x6e6f6973 ebx=0x352e3220 ecx=0x0000002b edx=0x00000000
->>    0x80000004 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x80000005 0x00: eax=0x01ff01ff ebx=0x01ff01ff ecx=0x40020140 edx=0x40020140
->>    0x80000006 0x00: eax=0x00000000 ebx=0x42004200 ecx=0x02008140 edx=0x00808140
->>    0x80000007 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x80000008 0x00: eax=0x00003028 ebx=0x0100d000 ecx=0x00000000 edx=0x00000000
->>    0x80860000 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0xc0000000 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>
->>
->> cpuid.0ac2b19743
->>
->> CPU 0:
->>    0x00000000 0x00: eax=0x00000016 ebx=0x756e6547 ecx=0x6c65746e edx=0x49656e69
->>    0x00000001 0x00: eax=0x000806ea ebx=0x00000800 ecx=0xfffab223 edx=0x0f8bfbff
->>    0x00000002 0x00: eax=0x00000001 ebx=0x00000000 ecx=0x0000004d edx=0x002c307d
->>    0x00000003 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x00000004 0x00: eax=0x00000121 ebx=0x01c0003f ecx=0x0000003f edx=0x00000001
->>    0x00000004 0x01: eax=0x00000122 ebx=0x01c0003f ecx=0x0000003f edx=0x00000001
->>    0x00000004 0x02: eax=0x00000143 ebx=0x03c0003f ecx=0x00000fff edx=0x00000001
->>    0x00000004 0x03: eax=0x00000163 ebx=0x03c0003f ecx=0x00003fff edx=0x00000006
->>    0x00000005 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000003 edx=0x00000000
->>    0x00000006 0x00: eax=0x00000004 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x00000007 0x00: eax=0x00000000 ebx=0x009c4fbb ecx=0x00000004 edx=0xac000400
->>    0x00000008 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x00000009 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x0000000a 0x00: eax=0x07300402 ebx=0x00000000 ecx=0x00000000 edx=0x00008603
->>    0x0000000b 0x00: eax=0x00000000 ebx=0x00000001 ecx=0x00000100 edx=0x00000000
->>    0x0000000b 0x01: eax=0x00000000 ebx=0x00000001 ecx=0x00000201 edx=0x00000000
->>    0x0000000c 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x0000000d 0x00: eax=0x0000001f ebx=0x00000440 ecx=0x00000440 edx=0x00000000
->>    0x0000000d 0x01: eax=0x0000000f ebx=0x000003c0 ecx=0x00000000 edx=0x00000000
->>    0x0000000d 0x02: eax=0x00000100 ebx=0x00000240 ecx=0x00000000 edx=0x00000000
->>    0x0000000d 0x03: eax=0x00000040 ebx=0x000003c0 ecx=0x00000000 edx=0x00000000
->>    0x0000000d 0x04: eax=0x00000040 ebx=0x00000400 ecx=0x00000000 edx=0x00000000
->>    0x0000000e 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x0000000f 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x00000010 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x00000011 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x00000012 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x00000013 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x00000014 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x00000015 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x00000016 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x40000000 0x00: eax=0x40000001 ebx=0x4b4d564b ecx=0x564b4d56 edx=0x0000004d
->>    0x40000001 0x00: eax=0x01007afb ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x80000000 0x00: eax=0x80000008 ebx=0x756e6547 ecx=0x6c65746e edx=0x49656e69
->>    0x80000001 0x00: eax=0x000806ea ebx=0x00000000 ecx=0x00000121 edx=0x2c100800
->>    0x80000002 0x00: eax=0x65746e49 ebx=0x2952286c ecx=0x726f4320 edx=0x4d542865
->>    0x80000003 0x00: eax=0x37692029 ebx=0x3536382d ecx=0x43205530 edx=0x40205550
->>    0x80000004 0x00: eax=0x392e3120 ebx=0x7a484730 ecx=0x00000000 edx=0x00000000
->>    0x80000005 0x00: eax=0x01ff01ff ebx=0x01ff01ff ecx=0x40020140 edx=0x40020140
->>    0x80000006 0x00: eax=0x00000000 ebx=0x42004200 ecx=0x02008140 edx=0x00808140
->>    0x80000007 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0x80000008 0x00: eax=0x00003027 ebx=0x0100d000 ecx=0x00000000 edx=0x00000000
->>    0x80860000 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>    0xc0000000 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>
+>>> [1] https://patchwork.kernel.org/project/kvm/cover/20210411114659.15051-1-eric.auger@redhat.com/
+>>>   
+>>>>  
+>>>>> Signed-off-by: Shenming Lu <lushenming@huawei.com>
+>>>>> ---
+>>>>>  drivers/vfio/vfio.c             | 81 +++++++++++++++++++++++++++++++++
+>>>>>  drivers/vfio/vfio_iommu_type1.c | 49 +++++++++++++++++++-
+>>>>>  include/linux/vfio.h            | 12 +++++
+>>>>>  3 files changed, 141 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+>>>>> index 44c8dfabf7de..4245f15914bf 100644
+>>>>> --- a/drivers/vfio/vfio.c
+>>>>> +++ b/drivers/vfio/vfio.c
+>>>>> @@ -2356,6 +2356,87 @@ struct iommu_domain *vfio_group_iommu_domain(struct vfio_group *group)
+>>>>>  }
+>>>>>  EXPORT_SYMBOL_GPL(vfio_group_iommu_domain);
+>>>>>  
+>>>>> +/*
+>>>>> + * Register/Update the VFIO IOPF handler to receive
+>>>>> + * nested stage/level 1 faults.
+>>>>> + */
+>>>>> +int vfio_iommu_dev_fault_handler_register_nested(struct device *dev)
+>>>>> +{
+>>>>> +	struct vfio_container *container;
+>>>>> +	struct vfio_group *group;
+>>>>> +	struct vfio_iommu_driver *driver;
+>>>>> +	int ret;
+>>>>> +
+>>>>> +	if (!dev)
+>>>>> +		return -EINVAL;
+>>>>> +
+>>>>> +	group = vfio_group_get_from_dev(dev);
+>>>>> +	if (!group)
+>>>>> +		return -ENODEV;
+>>>>> +
+>>>>> +	ret = vfio_group_add_container_user(group);
+>>>>> +	if (ret)
+>>>>> +		goto out;
+>>>>> +
+>>>>> +	container = group->container;
+>>>>> +	driver = container->iommu_driver;
+>>>>> +	if (likely(driver && driver->ops->register_handler))
+>>>>> +		ret = driver->ops->register_handler(container->iommu_data, dev);
+>>>>> +	else
+>>>>> +		ret = -ENOTTY;
+>>>>> +
+>>>>> +	vfio_group_try_dissolve_container(group);
+>>>>> +
+>>>>> +out:
+>>>>> +	vfio_group_put(group);
+>>>>> +	return ret;
+>>>>> +}
+>>>>> +EXPORT_SYMBOL_GPL(vfio_iommu_dev_fault_handler_register_nested);
+>>>>> +
+>>>>> +int vfio_iommu_dev_fault_handler_unregister_nested(struct device *dev)
+>>>>> +{
+>>>>> +	struct vfio_container *container;
+>>>>> +	struct vfio_group *group;
+>>>>> +	struct vfio_iommu_driver *driver;
+>>>>> +	int ret;
+>>>>> +
+>>>>> +	if (!dev)
+>>>>> +		return -EINVAL;
+>>>>> +
+>>>>> +	group = vfio_group_get_from_dev(dev);
+>>>>> +	if (!group)
+>>>>> +		return -ENODEV;
+>>>>> +
+>>>>> +	ret = vfio_group_add_container_user(group);
+>>>>> +	if (ret)
+>>>>> +		goto out;
+>>>>> +
+>>>>> +	container = group->container;
+>>>>> +	driver = container->iommu_driver;
+>>>>> +	if (likely(driver && driver->ops->unregister_handler))
+>>>>> +		ret = driver->ops->unregister_handler(container->iommu_data, dev);
+>>>>> +	else
+>>>>> +		ret = -ENOTTY;
+>>>>> +
+>>>>> +	vfio_group_try_dissolve_container(group);
+>>>>> +
+>>>>> +out:
+>>>>> +	vfio_group_put(group);
+>>>>> +	return ret;
+>>>>> +}
+>>>>> +EXPORT_SYMBOL_GPL(vfio_iommu_dev_fault_handler_unregister_nested);
+>>>>> +
+>>>>> +int vfio_transfer_iommu_fault(struct device *dev, struct iommu_fault *fault)
+>>>>> +{
+>>>>> +	struct vfio_device *device = dev_get_drvdata(dev);
+>>>>> +
+>>>>> +	if (unlikely(!device->ops->transfer))
+>>>>> +		return -EOPNOTSUPP;
+>>>>> +
+>>>>> +	return device->ops->transfer(device->device_data, fault);
+>>>>> +}
+>>>>> +EXPORT_SYMBOL_GPL(vfio_transfer_iommu_fault);
+>>>>> +
+>>>>>  /**
+>>>>>   * Module/class support
+>>>>>   */
+>>>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>>>>> index ba2b5a1cf6e9..9d1adeddb303 100644
+>>>>> --- a/drivers/vfio/vfio_iommu_type1.c
+>>>>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>>>>> @@ -3821,13 +3821,32 @@ static int vfio_iommu_type1_dma_map_iopf(struct iommu_fault *fault, void *data)
+>>>>>  	struct vfio_batch batch;
+>>>>>  	struct vfio_range *range;
+>>>>>  	dma_addr_t iova = ALIGN_DOWN(fault->prm.addr, PAGE_SIZE);
+>>>>> -	int access_flags = 0;
+>>>>> +	int access_flags = 0, nested;
+>>>>>  	size_t premap_len, map_len, mapped_len = 0;
+>>>>>  	unsigned long bit_offset, vaddr, pfn, i, npages;
+>>>>>  	int ret;
+>>>>>  	enum iommu_page_response_code status = IOMMU_PAGE_RESP_INVALID;
+>>>>>  	struct iommu_page_response resp = {0};
+>>>>>  
+>>>>> +	if (vfio_dev_domian_nested(dev, &nested))
+>>>>> +		return -ENODEV;
+>>>>> +
+>>>>> +	/*
+>>>>> +	 * When configured in nested mode, further deliver the
+>>>>> +	 * stage/level 1 faults to the guest.
+>>>>> +	 */
+>>>>> +	if (nested) {
+>>>>> +		bool l2;
+>>>>> +
+>>>>> +		if (fault->type == IOMMU_FAULT_PAGE_REQ)
+>>>>> +			l2 = fault->prm.flags & IOMMU_FAULT_PAGE_REQUEST_L2;
+>>>>> +		if (fault->type == IOMMU_FAULT_DMA_UNRECOV)
+>>>>> +			l2 = fault->event.flags & IOMMU_FAULT_UNRECOV_L2;
+>>>>> +
+>>>>> +		if (!l2)
+>>>>> +			return vfio_transfer_iommu_fault(dev, fault);
+>>>>> +	}
+>>>>> +
+>>>>>  	if (fault->type != IOMMU_FAULT_PAGE_REQ)
+>>>>>  		return -EOPNOTSUPP;
+>>>>>  
+>>>>> @@ -4201,6 +4220,32 @@ static void vfio_iommu_type1_notify(void *iommu_data,
+>>>>>  	wake_up_all(&iommu->vaddr_wait);
+>>>>>  }
+>>>>>  
+>>>>> +static int vfio_iommu_type1_register_handler(void *iommu_data,
+>>>>> +					     struct device *dev)
+>>>>> +{
+>>>>> +	struct vfio_iommu *iommu = iommu_data;
+>>>>> +
+>>>>> +	if (iommu->iopf_enabled)
+>>>>> +		return iommu_update_device_fault_handler(dev, ~0,
+>>>>> +						FAULT_REPORT_NESTED_L1);
+>>>>> +	else
+>>>>> +		return iommu_register_device_fault_handler(dev,
+>>>>> +						vfio_iommu_type1_dma_map_iopf,
+>>>>> +						FAULT_REPORT_NESTED_L1, dev);
+>>>>> +}
+>>>>> +
+>>>>> +static int vfio_iommu_type1_unregister_handler(void *iommu_data,
+>>>>> +					       struct device *dev)
+>>>>> +{
+>>>>> +	struct vfio_iommu *iommu = iommu_data;
+>>>>> +
+>>>>> +	if (iommu->iopf_enabled)
+>>>>> +		return iommu_update_device_fault_handler(dev,
+>>>>> +						~FAULT_REPORT_NESTED_L1, 0);
+>>>>> +	else
+>>>>> +		return iommu_unregister_device_fault_handler(dev);
+>>>>> +}  
+>>>>
+>>>>
+>>>> The path through vfio to register this is pretty ugly, but I don't see
+>>>> any reason for the the update interfaces here, the previously
+>>>> registered handler just changes its behavior.  
+>>>
+>>> Yeah, this seems not an elegant way...
+>>>
+>>> If IOPF(L2) enabled, the fault handler has already been registered, so for
+>>> nested mode setup, we only need to change the flags of the handler in the
+>>> IOMMU driver to receive L1 faults.
+>>> (assume that L1 IOPF is configured after L2 IOPF)
+>>>
+>>> Currently each device can only have one iommu dev fault handler, and L1
+>>> and L2 IOPF are configured separately in nested mode, I am also wondering
+>>> that is there a better solution for this.  
 > 
-> I started looking at it.
-> 
-> Claudio
-> 
+> I haven't fully read all the references, but who imposes the fact that
+> there's only one fault handler per device?  If type1 could register one
+> handler and the vfio-pci bus driver another for the other level, would
+> we need this path through vfio-core?
 
-I wonder how I missed this, the initialization functions for max_x86_cpu_initfn and kvm_cpu_max_instance_init end up being called in the wrong order.
+If we could register more than one handler per device, things would become
+much more simple, and the path through vfio-core would not be needed.
 
+Hi Baolu,
+Is there any restriction for having more than one handler per device?
+
+> 
+>> Let me simply add, maybe there is another way for this:
+>> Would it be better to set host IOPF enabled (L2 faults) in the VFIO_IOMMU_MAP_DMA
+>> ioctl (no need to add a new ioctl, and we can specify whether this mapping is IOPF
+>> available or statically pinned), and set guest IOPF enabled (L1 faults) in the
+>> VFIO_IOMMU_SET_PASID_TABLE (from Eric's series) ioctl?
+>> And we have no requirement for the sequence of these two ioctls. The first called
+>> one will register the handler, and the later one will just update the handler...
+> 
+> This is looking more and more like it belongs with the IOASID work.  I
+> think Eric has shifted his focus there too.  Thanks,
+
+I will pay more attention to the IOASID work.
+
+Thanks,
+Shenming
+
+> 
+> Alex
+> 
+> .
+> 
