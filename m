@@ -2,433 +2,261 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2237E3932D9
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 17:49:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57F053932E0
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 17:51:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229846AbhE0Pu6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 11:50:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31463 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229732AbhE0Puy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 May 2021 11:50:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622130560;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Y3A/8aMKrYCFcSkywAwP15MCzraIxFgLHfugJjZv14E=;
-        b=UwRerj6q21bPPRKFLzhLfJfZWvmiCghNiwSMaoetf3SvcnBbG1UcllDLaryXTNqxZd/cGm
-        7owILTSX2eU6uSNyjRSTG/aKR6M9pFB/FUYRkKmeQyojoe8KUz1saNQ/pvGJ3LAxj0C5jz
-        rxiHebX3W4IJzlwad3Hx7taE0lDCOPI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-gtGEQbHMNFOKxr66SUjHGQ-1; Thu, 27 May 2021 11:49:19 -0400
-X-MC-Unique: gtGEQbHMNFOKxr66SUjHGQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8044E7B40;
-        Thu, 27 May 2021 15:49:17 +0000 (UTC)
-Received: from starship (unknown [10.40.192.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D52BE60CDE;
-        Thu, 27 May 2021 15:49:14 +0000 (UTC)
-Message-ID: <bebc01e5e5cf0c8897c4b29f6139b709902fe527.camel@redhat.com>
-Subject: Re: [PATCH v2 0/5] KVM: x86: hyper-v: Conditionally allow SynIC
- with APICv/AVIC
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Kechen Lu <kechenl@nvidia.com>, linux-kernel@vger.kernel.org,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Date:   Thu, 27 May 2021 18:49:13 +0300
-In-Reply-To: <874keo7ew5.fsf@vitty.brq.redhat.com>
-References: <20210518144339.1987982-1-vkuznets@redhat.com>
-         <2409eb8593804eb879ae6fb961a709ca8c20f329.camel@redhat.com>
-         <874keo7ew5.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S233270AbhE0PxO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 11:53:14 -0400
+Received: from mail-dm6nam11on2061.outbound.protection.outlook.com ([40.107.223.61]:39904
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229713AbhE0PxE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 May 2021 11:53:04 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gX7Rz4LTggFJH+ugPjY0OtFz111nK4sSl0w1kH30IIGAu7klGHiaH4vT72X5CXgpYIWiTN4YDzstGpAAkjhbTQpP+YeZWbrKhMoJUbLf0chn1RqiaTYXnrdNnc1jge7jU2hOyGHapksMwMQSYMd/GFUg2BgKYYellEP6YktfXhAKtIGzVL1qd1Y8QkXRbXg/0V11isvHxDlpr4NCBMT+edlHXUKVQCiSDCk/DFSYteVdqwYZB+Oq9PBbbznDv9xguRJYh0NcEZGJUF90x/cXQVyAoz7JFOGWaryz02MvPr6NawB2PMMQrrd9RSwOYkodysfS08SP9oNYcpiPl1xDjg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=orUom83ewoKjB//GmzTtNwJcu9TFiWCjMgINqGYlgGA=;
+ b=n/PN+eNGoBGo//NLVeUGlI1M5GxBmylFDEp7HA2ALnaRbUDvG1EgDn0TRHuRBomHzwKrxt2Xl3swwo0GHR2CPjuwmZLnmZ590TGRYD7ZdsBr0XsPI4MABi1kVQox3L1uKW+qZmvOadkIADXSca8t1ELiIr6oOnn74SQE1pVtN0SlQgynOWukrT5p6t3iLw1rbvLvliXYF3Hpi3rPh6io/ncZluVfEKZ6iuqXt5TccZuCZ0UV2ppcd/N/Mweu2WNDUoSRdwUshHiUPSAN2GWt+clgePndHCmF2z9d0jWUB2e/v0/2miKOhYwKpGgMVDyYvjBB/VpievBBVliy1HtxPw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=orUom83ewoKjB//GmzTtNwJcu9TFiWCjMgINqGYlgGA=;
+ b=vTlTgvPBzur9yfaE5U6wRX3eff/iAtwVeN5rW4N/ehWg/Q57zlFWVplwV7UNDHQQt1hOdHUCJMb2xaG5YHxJBF9Z3TpU4/4hQxwbk3Ujxq452chhgUorE25ng1vv1DKbk/c7VihM3JVBWZGOAtk5JoRuz/aF7w2qEcLBD4XXAMs=
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SN6PR12MB2687.namprd12.prod.outlook.com (2603:10b6:805:73::26) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.22; Thu, 27 May
+ 2021 15:51:29 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::1fb:7d59:2c24:615e]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::1fb:7d59:2c24:615e%6]) with mapi id 15.20.4129.036; Thu, 27 May 2021
+ 15:51:29 +0000
+From:   "Kalra, Ashish" <Ashish.Kalra@amd.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Tobin Feldman-Fitzthum <tobin@linux.ibm.com>,
+        "natet@google.com" <natet@google.com>
+CC:     Dov Murik <dovmurik@linux.vnet.ibm.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "srutherford@google.com" <srutherford@google.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Hubertus Franke <frankeh@us.ibm.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: RE: [RFC] KVM: x86: Support KVM VMs sharing SEV context
+Thread-Topic: [RFC] KVM: x86: Support KVM VMs sharing SEV context
+Thread-Index: AQHXCot5SNFL8RrPlkCutU8OGpQ4JKp/Ae+AgAAQa4CAdHeyEIAEX2Pw
+Date:   Thu, 27 May 2021 15:51:29 +0000
+Message-ID: <SN6PR12MB276726B5FEF171E1099B91AC8E239@SN6PR12MB2767.namprd12.prod.outlook.com>
+References: <20210224085915.28751-1-natet@google.com>
+ <7829472d-741c-1057-c61f-321fcfb5bdcd@linux.ibm.com>
+ <35dde628-f1a8-c3bf-9c7d-7789166b0ee1@redhat.com>
+ <SN6PR12MB276780007C17ADD273EB70FC8E269@SN6PR12MB2767.namprd12.prod.outlook.com>
+In-Reply-To: <SN6PR12MB276780007C17ADD273EB70FC8E269@SN6PR12MB2767.namprd12.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_Enabled=true;
+ MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_SetDate=2021-05-27T15:51:25Z;
+ MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_Method=Privileged;
+ MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_Name=Public_0;
+ MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
+ MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_ActionId=c0e1fa55-cc39-48d4-80c0-6013c0b193d0;
+ MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_ContentBits=1
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+x-originating-ip: [183.83.213.75]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: da5904f3-231a-4827-4802-08d921274ad4
+x-ms-traffictypediagnostic: SN6PR12MB2687:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <SN6PR12MB2687A66441A9A0332D0F66428E239@SN6PR12MB2687.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4125;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: VSvQsQxHnGVye0ee6g6pSbEV9n1povuxQ9uUJL3Z+NdZHbALyKQ0SRzFC6s6x2OwQTo4SpVTdaI9Fr/2D4HUldfOn89m+VV/T9oD6medxtaympjcQ/nAI/V5WSdVxlH/8vwibhHDiQWBVAsIoNZ6MHJqDNt0vfT8qAApFWn3DhnnE+hIgddT2R2wlOjm9Xv149I3a+ViTLofHTLUwgHCgcb/exWL8k4sMymnBGz9QH+c59lmAvMc/vBhdrktlDwT+JnEdaWHypYSnCcdcLBf7/3q4Ql2bRkvQJWlgH1RR5DsVnv5wZHTRJw8EOOJUhrccIlt2lv7daojeWSaCVrNWB/kABnwoOnC55QOP7z3jun8D3B8SXRi6rVIq+BWhqZJl+cQuZhW78mi1YhafC4kdhaaAhvMkSR+uTGvyia/VEvBhCltkukcHK3NYAaQxWkYzdvG53v1ZAYfZXeaZV85/vVKDOdac1zEypabt6XZNhv3jio2Xu7w3AV3S9PynBX+EFNpp5AtF3E6KvMTarpg8Bm7cyNSh1OjfujvJKSnq5ilbjdee8TW9Fyr0qRTfDVSYOdXJDnSx6cUyprj2ttsbGHkzupV9G0gjOWuSXWVz/4=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(366004)(39860400002)(396003)(136003)(376002)(4326008)(26005)(33656002)(71200400001)(53546011)(6506007)(7696005)(86362001)(55016002)(122000001)(38100700002)(64756008)(76116006)(52536014)(7416002)(2906002)(8936002)(9686003)(5660300002)(186003)(316002)(478600001)(66446008)(66556008)(8676002)(83380400001)(66946007)(66476007)(54906003)(110136005);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: =?utf-8?B?TmxnQzFXeEVWc3ZoMTRWRW1oZzBVdlBVQzlUTHVTTlc1Sm1FYkxzNVF3aG8z?=
+ =?utf-8?B?N3VkcHhGeWZtbUpGV0dXdVBaUHFtQ0ZGQW01bnNRdm1KSUdsUmFXN3I2RnRI?=
+ =?utf-8?B?bTJKblJyK2huUHdndzg5REN3MkFYUStKRlhhZnJRdmQyN3FQaGIwUTZEaHZi?=
+ =?utf-8?B?Wld4c095VFVrZmhXL3luQmIzU3lmOWRTOXZGMXY3RmlSZlVkL2hVTitGaFMr?=
+ =?utf-8?B?MWRkaDlWTUxURTNKdEdUTU8xWUhoQ0Rxdy9rSlZkWE0zWTRrNFowc0hLQ0w1?=
+ =?utf-8?B?dFUrTHlHaXpqdktQY3VGUDllS0dyNTdIT1htVit6cU5Ra05qQmloWVhGdEVU?=
+ =?utf-8?B?NlNsZVJNN09EZkVjb2pVZ2hHUmkrT2w4Z1p0T3J6T2ZzY0lrM2U4NzhTWXp5?=
+ =?utf-8?B?c3VYcjVLK0gyVHVGaWdsaFdBcmN0SFVtUXJtN0hJUGpjaW5LVWJTUnVicGU2?=
+ =?utf-8?B?YjdkVkVxMU51bkl0bis4SXFnMnhndEZ0RzMvdnh1MVlXc3ptSXlqWjZTUmJU?=
+ =?utf-8?B?M3dXYVFtSkwxeWNtbkk3ZFRWNGMvaE1uZzZOcUt0VEtDRXJqeGVFa0Q3dXZF?=
+ =?utf-8?B?T3lySUdpME9kOXAvRVJHNXdycStsZXZlbFkxRkNvVWs3Nk5JOGxrd253cUcv?=
+ =?utf-8?B?c2dxNDVySjVJVFpvSnA3bHVOOTVnVWRYaStCOTMxZUpQZkRWSVVmRjEwK2pF?=
+ =?utf-8?B?WHhyOFRYUDE3Z0hsQTMrZUtVYTZGcjRWcjV4dzREaVduQWg3TDVPVUpWV2R3?=
+ =?utf-8?B?NW1vMjdmNitLMFRta3VkcXdUbjJqd3JVYXR5YVE2MWZRd1h1Rm04VTJEWWJ3?=
+ =?utf-8?B?NnU4M0o4NG00QU1TSTFrZk4rYitBdC9tRWJGL2drYU93T1YwVXV5b0k2c25H?=
+ =?utf-8?B?N2QxYlRPRW02MjgrdU9uT0ZwMGZMbHkxa0VReTJBY0lRSmhsRG5JVVUyNCtq?=
+ =?utf-8?B?TExjbEZ4cURsdXpGMEZsU1ZtamFmSjNLWElVZ0U2QWc4YjlZeWZhL015MXVp?=
+ =?utf-8?B?S1ZBUVJpdHlwVlJHNTR1MDYya2ExQjBQSERaMTdXdWRlL3E5THZUWU5lekw5?=
+ =?utf-8?B?Rk1OL0dOODhOeEJlMGdZUVVqR0NGZ0wzYzEzeERHOXI3ZTJmYThraFViUnNP?=
+ =?utf-8?B?MXRGci9ETnZocmo0NjFEMFgwM1VXZUdJOFhxQXB0cEY0YnhDZTEyYk0yQmp2?=
+ =?utf-8?B?UjJIc0R2OWZiZmZkcU1OYmwxekVCVDRNNnFpczdZR2V6clFIemVmVk9hSzhr?=
+ =?utf-8?B?Rys0dFRmMjNLanovOGhYMlNGQkczdmRGd01GczlDd0hTWlQyb0hoTEpKTWVm?=
+ =?utf-8?B?RTVCaWtRWnZXMEJaUk9GSkx5QnNUSUFPN1oyWHhnM2VMSThFS0hIWFZJUFBS?=
+ =?utf-8?B?bFR1cnp2ek9MK0ZpbGdCTnBwTVNZOXRwVzltTlhBb0IxZWpWTENWYzlwTFVQ?=
+ =?utf-8?B?QnhYWTdNbEphOGI4aXc3R3AvYWQvQkZNUFVlSTFCd3daK2JrbHJxR3lVZ1NR?=
+ =?utf-8?B?Uk9iRDJpK2xzT0swb1p5UTMwVlY5ZmtXZnNGS05WL2dRMjhieE52Y2xwaEpH?=
+ =?utf-8?B?YlBhODdCQ1lGU0RZOVdwcWhEaUhETGV1MjBkbDlmelk0ZlJoTUg3dzg0RDBI?=
+ =?utf-8?B?cGFtWUdhYXh0eHM4OG5kM1B2ODI1RU5TcmRWdXlSOXhmOExGVzNkTWI4TkVX?=
+ =?utf-8?B?Ynk3cS8xclhGVlBrUHdaZExVaXMxZ1BvZlUwNmd5R0hEeXUreWpnWTFrYVVD?=
+ =?utf-8?Q?2O5yEop4L0I4iIjx/Pjhjklk4MAAPbeS/VvV/ld?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: da5904f3-231a-4827-4802-08d921274ad4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 May 2021 15:51:29.1253
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2dR64nPLEB0begIXFaXMS8ha3QNfoBA5JrGjeK8D/2X7xzbXuaUP9OzuZjLnKdE7S6EBVOyubaVoXtjZht5uQg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2687
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-05-27 at 10:35 +0200, Vitaly Kuznetsov wrote:
-> Maxim Levitsky <mlevitsk@redhat.com> writes:
-> 
-> > On Tue, 2021-05-18 at 16:43 +0200, Vitaly Kuznetsov wrote:
-> > > Changes since v1 (Sean):
-> > > - Use common 'enable_apicv' variable for both APICv and AVIC instead of 
-> > >  adding a new hook to 'struct kvm_x86_ops'.
-> > > - Drop unneded CONFIG_X86_LOCAL_APIC checks from VMX/SVM code along the
-> > >  way.
-> > > 
-> > > Original description:
-> > > 
-> > > APICV_INHIBIT_REASON_HYPERV is currently unconditionally forced upon
-> > > SynIC activation as SynIC's AutoEOI is incompatible with APICv/AVIC. It is,
-> > > however, possible to track whether the feature was actually used by the
-> > > guest and only inhibit APICv/AVIC when needed.
-> > > 
-> > > The feature can be tested with QEMU's 'hv-passthrough' debug mode.
-> > > 
-> > > Note, 'avic' kvm-amd module parameter is '0' by default and thus needs to
-> > > be explicitly enabled.
-> > > 
-> > > Vitaly Kuznetsov (5):
-> > >   KVM: SVM: Drop unneeded CONFIG_X86_LOCAL_APIC check for AVIC
-> > >   KVM: VMX: Drop unneeded CONFIG_X86_LOCAL_APIC check from
-> > >     cpu_has_vmx_posted_intr()
-> > >   KVM: x86: Use common 'enable_apicv' variable for both APICv and AVIC
-> > >   KVM: x86: Invert APICv/AVIC enablement check
-> > >   KVM: x86: hyper-v: Deactivate APICv only when AutoEOI feature is in
-> > >     use
-> > > 
-> > >  arch/x86/include/asm/kvm_host.h |  5 ++++-
-> > >  arch/x86/kvm/hyperv.c           | 27 +++++++++++++++++++++------
-> > >  arch/x86/kvm/svm/avic.c         | 16 +++++-----------
-> > >  arch/x86/kvm/svm/svm.c          | 24 +++++++++++++-----------
-> > >  arch/x86/kvm/svm/svm.h          |  2 --
-> > >  arch/x86/kvm/vmx/capabilities.h |  4 +---
-> > >  arch/x86/kvm/vmx/vmx.c          |  2 --
-> > >  arch/x86/kvm/x86.c              |  9 ++++++---
-> > >  8 files changed, 50 insertions(+), 39 deletions(-)
-> > > 
-> > 
-> > I tested this patch set and this is what I found.
-> > 
-> > For reference,
-> > First of all, indeed to make AVIC work I need to:
-> >  
-> > 1. Disable SVM - I wonder if I can make this on demand
-> > too when the guest actually uses a nested guest or at least
-> > enables nesting in IA32_FEATURE_CONTROL.
-> > I naturally run most of my VMs with nesting enabled,
-> > thus I tend to not have avic enabled due to this.
-> > I'll prepare a patch soon for this.
-> >  
-> > 2. Disable x2apic, naturally x2apic can't be used with avic.
-> > In theory we can also disable avic when the guest switches on
-> > the x2apic mode, but in practice the guest will likely to pick the x2apic
-> > when it can.
-> >  
-> > 3. (for hyperv) Disable 'hv_vapic', because otherwise hyper-v
-> > uses its own PV APIC msrs which AVIC doesn't support.
-> > 
-> > This HV enlightment turns on in the CPUID both the 
-> > HV_APIC_ACCESS_AVAILABLE which isn't that bad 
-> > (it only tells that we have the VP assist page),
-> > and HV_APIC_ACCESS_RECOMMENDED which hints the guest
-> > to use HyperV PV APIC MSRS and use PV EOI field in 
-> > the APIC access page, which means that the guest 
-> > won't use the real apic at all.
-> > 
-> > 4. and of course enable SynIC autoeoi deprecation.
-> > 
-> > Otherwise indeed windows enables autoeoi.
-> > 
-> > hv-passthrough indeed can't be used to test this
-> > as it both enables autoeoi depreciation and *hv-vapic*. 
-> > I had to use the patch that you posted
-> > in 'About the performance of hyper-v' thread.
-> >  
-> > In addition to that when I don't use the autoeoi depreciation patch,
-> > then the guest indeed enables autoeoi, and this triggers a deadlock.
-> >  
-> 
-> Hm, why don't I see in my testing? I'm pretty sure I'm testing both
-> cases...
-
-Hi!
-
-For me it hangs when windows enables the autoeoi for the first time.
-
-I use 5.13-rc3 kernel with kvm/queue merged, your patches and some my patches
-that shouldn't affect things. 
-I use qemu commit 3791642c8d60029adf9b00bcb4e34d7d8a1aea4d
-
-I use the following qemu command line:
-
-/home/mlevitsk/Qemu/master/build-master/output/bin/qemu-system-x86_64
--smp 4
--name debug-threads=on
--pidfile /run/vmspawn/win10_ojiejx07/qemu.pid
--accel kvm,kernel-irqchip=on
--nodefaults
--display none
--smp maxcpus=64,sockets=1,cores=32,threads=2
--machine q35,sata=off,usb=off,vmport=off,smbus=off
--rtc base=localtime,clock=host
--global mc146818rtc.lost_tick_policy=discard
--global kvm-pit.lost_tick_policy=discard
--no-hpet
--global ICH9-LPC.disable_s3=1
--global ICH9-LPC.disable_s4=1
--boot menu=on,strict=on,splash-time=1000
--L .bios
--machine pflash0=flash0,pflash1=flash1,smm=off
--blockdev node-name=flash0,driver=file,filename=./.bios/OVMF_CODE_nosmm.fd,read-only=on
--blockdev node-name=flash1,driver=file,filename=./.bios/OVMF_VARS.fd
--device pcie-root-port,slot=0,id=rport.0,bus=pcie.0,addr=0x1c.0x0,multifunction=on
--device pcie-root-port,slot=1,id=rport.1,bus=pcie.0,addr=0x1c.0x1
--device pcie-root-port,slot=2,id=rport.2,bus=pcie.0,addr=0x1c.0x2
--device pcie-root-port,slot=3,id=rport.3,bus=pcie.0,addr=0x1c.0x3
--device pcie-root-port,slot=4,id=rport.4,bus=pcie.0,addr=0x1c.0x4
--device pcie-root-port,slot=5,id=rport.5,bus=pcie.0,addr=0x1c.0x5
--device pcie-root-port,slot=6,id=rport.6,bus=pcie.0,addr=0x1c.0x6
--device pcie-root-port,slot=7,id=rport.7,bus=pcie.0,addr=0x1c.0x7
--device pcie-root-port,slot=8,id=rport.8,bus=pcie.0,addr=0x1d.0x0,multifunction=on
--device pcie-root-port,slot=9,id=rport.9,bus=pcie.0,addr=0x1d.0x1
--device pcie-root-port,slot=10,id=rport.10,bus=pcie.0,addr=0x1d.0x2
--device pcie-root-port,slot=11,id=rport.11,bus=pcie.0,addr=0x1d.0x3
--cpu host,host-cache-info,hv_relaxed,hv_spinlocks=0x1fff,hv_vpindex,hv_runtime,hv_synic,hv-tlbflush,hv-frequencies,hv_stimer,hv-stimer-direct,hv_time,-x2apic,topoext,-svm,invtsc,hv-passthrough,-hv-
-vapic
--overcommit mem-lock=on
--m 6G
--device virtio-scsi,id=scsi-ctrl,bus=rport.0,iothread=,num_queues=4
--drive if=none,id=os_image,file=./disk_s1.qcow2,aio=native,discard=unmap,cache=none
--device scsi-hd,drive=os_image,bus=scsi-ctrl.0,bootindex=1,id=auto_id21
--netdev tap,id=tap0,vhost=on,ifname=tap0_windows10,script=no,downscript=no
--device virtio-net-pci,id=net0,mac=02:00:00:A9:4D:A7,netdev=tap0,bus=rport.1,disable-legacy=on
--display gtk,gl=off,zoom-to-fit=on,window-close=off
--device virtio-vga,virgl=off,id=auto_id23
--device qemu-xhci,id=usb0,bus=pcie.0,addr=0x14.0x0,p3=16,p2=16
--device usb-tablet,id=auto_id24
--audiodev pa,id=pulseaudio0,server=/run/user/103992/pulse/native,timer-period=2000,out.mixing-engine=off,out.fixed-settings=off,out.buffer-length=50000
--device ich9-intel-hda,id=sound0,msi=on,bus=pcie.0,addr=0x1f.0x4
--device hda-micro,id=sound0-codec0,bus=sound0.0,cad=0,audiodev=pulseaudio0
--device virtio-serial-pci,id=virtio-serial0,bus=rport.2,disable-legacy=on
--chardev socket,id=chr_qga,path=/run/vmspawn/win10_ojiejx07/guest_agent.socket,server,nowait
--device virtserialport,bus=virtio-serial0.0,nr=1,chardev=chr_qga,name=org.qemu.guest_agent.0,id=auto_id25
--chardev socket,path=/run/vmspawn/win10_ojiejx07/hmp_monitor.socket,id=internal_hmp_monitor_socket_chardev,server=on,wait=off
--mon chardev=internal_hmp_monitor_socket_chardev,mode=readline
--chardev socket,path=/run/vmspawn/win10_ojiejx07/qmp_monitor.socket,id=internal_qmp_monitor_socket_chardev,server=on,wait=off
--mon chardev=internal_qmp_monitor_socket_chardev,mode=control
--chardev socket,path=/run/vmspawn/win10_ojiejx07/serial.socket,id=internal_serial0_chardev,server=on,logfile=/mnt/shared/home/mlevitsk/VM/win10/.logs/serial.log,wait=off
--device isa-serial,chardev=internal_serial0_chardev,index=0,id=auto_id28
--chardev file,path=/mnt/shared/home/mlevitsk/VM/win10/.logs/ovmf.log,id=internal_debugcon0_chardev
--device isa-debugcon,chardev=internal_debugcon0_chardev,iobase=1026,id=auto_id29
-
-
-And then I get this eventually in dmesg:
-
-[  245.196253] INFO: task qemu-system-x86:3487 blocked for more than 122 seconds.
-[  245.196461]       Tainted: G           O      5.13.0-rc2.unstable #28
-[  245.196640] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[  245.196855] task:qemu-system-x86 state:D stack:    0 pid: 3487 ppid:  3480 flags:0x00000000
-[  245.197095] Call Trace:
-[  245.197194]  __schedule+0x2d0/0x940
-[  245.197307]  schedule+0x4f/0xc0
-[  245.197402]  schedule_preempt_disabled+0xe/0x20
-[  245.197535]  __mutex_lock.constprop.0+0x2ab/0x480
-[  245.197675]  __mutex_lock_slowpath+0x13/0x20
-[  245.197802]  mutex_lock+0x34/0x40
-[  245.197905]  kvm_vm_ioctl+0x395/0xee0 [kvm]
-[  245.198092]  ? _copy_to_user+0x20/0x40
-[  245.198213]  ? put_timespec64+0x3d/0x60
-[  245.198334]  ? poll_select_finish+0x1b3/0x220
-[  245.198465]  __x64_sys_ioctl+0x8e/0xc0
-[  245.198577]  do_syscall_64+0x3a/0x80
-[  245.198688]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-[  245.198838] RIP: 0033:0x7f66caec74eb
-[  245.198944] RSP: 002b:00007ffd0e8ddc98 EFLAGS: 00000206 ORIG_RAX: 0000000000000010
-[  245.199157] RAX: ffffffffffffffda RBX: 00000000000a0000 RCX: 00007f66caec74eb
-[  245.199354] RDX: 00007ffd0e8dde00 RSI: 000000004010ae42 RDI: 000000000000001e
-[  245.199550] RBP: 00007ffd0e8ddd90 R08: 0000000000855628 R09: 0000000000000000
-[  245.199745] R10: 00007ffd0e8ef080 R11: 0000000000000206 R12: 00000000004231b0
-[  245.199948] R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-[  245.200206] INFO: task CPU 0/KVM:3543 blocked for more than 122 seconds.
-[  245.200403]       Tainted: G           O      5.13.0-rc2.unstable #28
-[  245.200590] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[  245.200812] task:CPU 0/KVM       state:D stack:    0 pid: 3543 ppid:  3480 flags:0x00004000
-[  245.201047] Call Trace:
-[  245.201122]  __schedule+0x2d0/0x940
-[  245.201226]  schedule+0x4f/0xc0
-[  245.201318]  schedule_timeout+0xfe/0x140
-[  245.201432]  wait_for_completion+0x88/0xe0
-[  245.201547]  __synchronize_srcu+0x79/0xa0
-[  245.201662]  ? __bpf_trace_rcu_stall_warning+0x20/0x20
-[  245.201808]  synchronize_srcu_expedited+0x1e/0x40
-[  245.201941]  install_new_memslots+0x5c/0xa0 [kvm]
-[  245.202122]  kvm_set_memslot+0x361/0x680 [kvm]
-[  245.202292]  kvm_delete_memslot+0x68/0xe0 [kvm]
-[  245.202464]  __kvm_set_memory_region+0x517/0x560 [kvm]
-[  245.202653]  __x86_set_memory_region+0xe3/0x200 [kvm]
-[  245.202848]  avic_update_access_page+0x75/0xa0 [kvm_amd]
-[  245.203003]  svm_pre_update_apicv_exec_ctrl+0x12/0x20 [kvm_amd]
-[  245.203176]  kvm_request_apicv_update+0xf6/0x160 [kvm]
-[  245.203367]  synic_update_vector.cold+0x6d/0xb3 [kvm]
-[  245.203565]  kvm_hv_set_msr_common+0x57e/0xc00 [kvm]
-[  245.203760]  ? mutex_lock+0x13/0x40
-[  245.203861]  kvm_set_msr_common+0x162/0xe60 [kvm]
-[  245.204068]  svm_set_msr+0x40b/0x800 [kvm_amd]
-[  245.204240]  __kvm_set_msr+0x8f/0x1e0 [kvm]
-[  245.204430]  kvm_emulate_wrmsr+0x3a/0x180 [kvm]
-[  245.204620]  msr_interception+0x1c/0x40 [kvm_amd]
-[  245.204763]  svm_invoke_exit_handler+0x2a/0xe0 [kvm_amd]
-[  245.204921]  handle_exit+0xb8/0x220 [kvm_amd]
-[  245.205047]  kvm_arch_vcpu_ioctl_run+0xbe7/0x17c0 [kvm]
-[  245.205251]  ? kthread_queue_work+0x3d/0x80
-[  245.205370]  ? timerqueue_add+0x6e/0xc0
-[  245.205482]  ? enqueue_hrtimer+0x39/0x80
-[  245.205595]  kvm_vcpu_ioctl+0x247/0x600 [kvm]
-[  245.205763]  ? tick_program_event+0x41/0x80
-[  245.205887]  __x64_sys_ioctl+0x8e/0xc0
-[  245.206002]  do_syscall_64+0x3a/0x80
-[  245.206119]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-[  245.206270] RIP: 0033:0x7f66caec74eb
-[  245.206376] RSP: 002b:00007f66b56f7608 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-[  245.206595] RAX: ffffffffffffffda RBX: 0000000002939360 RCX: 00007f66caec74eb
-[  245.206799] RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000026
-[  245.206998] RBP: 00007f66b56f7700 R08: 0000000000d87130 R09: 000000000000ffff
-[  245.207198] R10: 0000000000918ea4 R11: 0000000000000246 R12: 00007ffd0e8dd92e
-[  245.207395] R13: 00007ffd0e8dd92f R14: 0000000000000000 R15: 00007f66b56f9640
-
-
-> 
-> > The reason is that kvm_request_apicv_update must not be called with
-> > srcu lock held vcpu->kvm->srcu (there is a warning about that
-> > in kvm_request_apicv_update), but guest msr writes which come
-> > from vcpu thread do hold it.
-> >  
-> > The other place where we disable AVIC on demand is svm_toggle_avic_for_irq_window.
-> > And that code has a hack to drop this lock and take 
-> > it back around the call to kvm_request_apicv_update.
-> > This hack is safe as this code is called only from the vcpu thread.
-> >  
-> > Also for reference the reason for the fact that we need to
-> > disable AVIC on the interrupt window request, or more correctly
-> > why we still need to request interrupt windows with AVIC,
-> > is that the local apic can act sadly as a pass-through device 
-> > for legacy PIC, when one of its LINTn pins is configured in ExtINT mode.
-> > In this mode when such pin is raised, the local apic asks the PIC for
-> > the interrupt vector and then delivers it to the APIC
-> > without touching the IRR/ISR.
-> > 
-> > The later means that if guest's interrupts are disabled,
-> > such interrupt can't be queued via IRR to VAPIC
-> > but instead the regular interrupt window has to be requested, 
-> > but on AMD, the only way to request interrupt window
-> > is to queue a VIRQ, and intercept its delivery,
-> > a feature that is disabled when AVIC is active.
-> >  
-> > Finally for SynIC this srcu lock drop hack can be extended to this gross hack:
-> > It seems to work though:
-> > 
-> > 
-> > diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> > index bedd9b6cc26a..925b76e7b45e 100644
-> > --- a/arch/x86/kvm/hyperv.c
-> > +++ b/arch/x86/kvm/hyperv.c
-> > @@ -85,7 +85,7 @@ static bool synic_has_vector_auto_eoi(struct kvm_vcpu_hv_synic *synic,
-> >  }
-> >  
-> >  static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
-> > -				int vector)
-> > +				int vector, bool host)
-> >  {
-> >  	struct kvm_vcpu *vcpu = hv_synic_to_vcpu(synic);
-> >  	struct kvm_hv *hv = to_kvm_hv(vcpu->kvm);
-> > @@ -109,6 +109,9 @@ static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
-> >  
-> >  	auto_eoi_new = bitmap_weight(synic->auto_eoi_bitmap, 256);
-> >  
-> > +	if (!host)
-> > +		srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
-> > +
-> >  	/* Hyper-V SynIC auto EOI SINTs are not compatible with APICV */
-> >  	if (!auto_eoi_old && auto_eoi_new) {
-> >  		printk("Synic: inhibiting avic %d %d\n", auto_eoi_old, auto_eoi_new);
-> > @@ -121,6 +124,10 @@ static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
-> >  			kvm_request_apicv_update(vcpu->kvm, true,
-> >  						 APICV_INHIBIT_REASON_HYPERV);
-> >  	}
-> > +
-> > +	if (!host)
-> > +		vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
-> > +
-> >  }
-> >  
-> >  static int synic_set_sint(struct kvm_vcpu_hv_synic *synic, int sint,
-> > @@ -149,9 +156,9 @@ static int synic_set_sint(struct kvm_vcpu_hv_synic *synic, int sint,
-> >  
-> >  	atomic64_set(&synic->sint[sint], data);
-> >  
-> > -	synic_update_vector(synic, old_vector);
-> > +	synic_update_vector(synic, old_vector, host);
-> >  
-> > -	synic_update_vector(synic, vector);
-> > +	synic_update_vector(synic, vector, host);
-> >  
-> >  	/* Load SynIC vectors into EOI exit bitmap */
-> >  	kvm_make_request(KVM_REQ_SCAN_IOAPIC, hv_synic_to_vcpu(synic));
-> > 
-> > 
-> > Assuming that we don't want this gross hack,  
-> 
-> Is it dangerous or just ugly?
-
-It *should* work, but as it is always with locking,
-if something changes, the assumption that MSR write
-is called with SRCU held only on guest initiated writes
-might be not true anymore.
-
-Honestly I don't like the workaround that drops the lock in
-svm_toggle_avic_for_irq_window either for the same reason.
-
-> 
-> > I wonder if we can avoid full blown memslot 
-> > update when we disable avic, but rather have some 
-> > smaller hack like only manually patching its
-> > NPT mapping to have RW permissions instead 
-> > of reserved bits which we use for MMIO. 
-> > 
-> > The AVIC spec says that NPT is only used to check that
-> > guest has RW permission to the page, 
-> > while the HVA in the NPT entry itself is ignored.
-> 
-> Assuming kvm_request_apicv_update() is called very rarely, I'd rather
-> kicked all vCPUs out (similar to KVM_REQ_MCLOCK_INPROGRESS) and
-> schedule_work() to make memslot update happen ourside of sRCU lock.
-
-Adding Suravee Suthikulpanit to CC.
-
-
-I tested it again and indeed I only see a burst of kvm_request_apicv_update
-which ends when Windows enables IO apic
-(this is a result of svm_toggle_avic_for_irq_window)
-
-
-The AVIC disable due to SynIC autoeoi also happens I think
-once per VCPU (I didn't verify this) and that is it.
-
-So yes I do vote to make APICV update done in safer manner
-as you suggest.
-
-
-BTW I forgot about another reason that disables AVIC
-The 'kvm-pit.lost_tick_policy=discard' has to be set,
-since otherwise the in-kernel PIT reinject code relies
-on EOI interception and thus disables AVIC as well.
-
-
-Best regards,
-	Maxim Levitsky
-
-> 
-> > Best regards,
-> > 	Maxim Levitsky
-> > 
-> > 
-> > 
-> > 
-> > 
-
-
-
-
+W0FNRCBQdWJsaWMgVXNlXQ0KDQpMb29raW5nIGF0IGt2bSBzZWxmdGVzdHMgaW4gdGhlIGtlcm5l
+bCwgSSB0aGluayB0aGUgb3RoZXIgYWx0ZXJuYXRpdmUgaXMgdG8gOg0KDQpNYWludGFpbiBzZXBh
+cmF0ZSBkYXRhIHN0cnVjdHVyZXMgbGlrZSBzdHJ1Y3Qga3ZtX3ZtLCBzdHJ1Y3QgdmNwdSBmb3Ig
+dGhlIG1pcnJvciBWTSwgYnV0IHRoZW4gdGhhdCBtZWFucyBxdWl0ZSBhIGJpdCBvZiANCnRoZSBL
+Vk0gY29kZSBpbiBRZW11IGZvciB0aGUgbWlycm9yIFZNIHdpbGwgYmUgZHVwbGljYXRlZC4gDQoN
+CkZvciBleGFtcGxlLCB0aGlzIHdpbGwgYWRkIHNlcGFyYXRlIGFuZCBkdXBsaWNhdGVkIGZ1bmN0
+aW9uYWxpdHkgZm9yIDogDQoNCnZtX2NoZWNrX2NhcC92bV9lbmFibGVfY2FwLA0Kdm1fY3JlYXRl
+LA0KdmNwdV9ydW4sDQp2Y3B1X2dldF9yZWdzLCB2Y3B1X3NyZWdzX2dldC9zZXQsDQp2Y3B1X2lv
+Y3RsLA0Kdm1faW9jdGwsIGV0Yy4sIGV0Yy4NCg0KQWxzbyBJIHRoaW5rIHRoYXQgb25jZSB0aGUg
+bWlycm9yIFZNIHN0YXJ0cyBib290aW5nIGFuZCBydW5uaW5nIHRoZSBVRUZJIGNvZGUsIGl0IG1p
+Z2h0IGJlIG9ubHkgZHVyaW5nIHRoZSBQRUkgb3IgRFhFIHBoYXNlIHdoZXJlDQppdCB3aWxsIHN0
+YXJ0IGFjdHVhbGx5IHJ1bm5pbmcgdGhlIE1IIGNvZGUsIHNvIG1pcnJvciBWTSBwcm9iYWJseSBz
+dGlsbCBuZWVkIHRvIGhhbmRsZXMgS1ZNX0VYSVRfSU8sIHdoZW4gU0VDIHBoYXNlIGRvZXMgSS9P
+LA0KSSBjYW4gc2VlIFBJQyBhY2Nlc3NlcyBhbmQgRGVidWcgQWdlbnQgaW5pdGlhbGl6YXRpb24g
+c3R1ZmYgaW4gU2VjIHN0YXJ0dXAgY29kZS4NCg0KVGhhbmtzLA0KQXNoaXNoDQoNCi0tLS0tT3Jp
+Z2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBLYWxyYSwgQXNoaXNoIA0KU2VudDogTW9uZGF5LCBN
+YXkgMjQsIDIwMjEgNDoyOSBQTQ0KVG86IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5j
+b20+OyBUb2JpbiBGZWxkbWFuLUZpdHp0aHVtIDx0b2JpbkBsaW51eC5pYm0uY29tPjsgbmF0ZXRA
+Z29vZ2xlLmNvbQ0KQ2M6IERvdiBNdXJpayA8ZG92bXVyaWtAbGludXgudm5ldC5pYm0uY29tPjsg
+TGVuZGFja3ksIFRob21hcyA8VGhvbWFzLkxlbmRhY2t5QGFtZC5jb20+OyB4ODZAa2VybmVsLm9y
+Zzsga3ZtQHZnZXIua2VybmVsLm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsgc3J1
+dGhlcmZvcmRAZ29vZ2xlLmNvbTsgc2VhbmpjQGdvb2dsZS5jb207IHJpZW50amVzQGdvb2dsZS5j
+b207IFNpbmdoLCBCcmlqZXNoIDxicmlqZXNoLnNpbmdoQGFtZC5jb20+OyBMYXN6bG8gRXJzZWsg
+PGxlcnNla0ByZWRoYXQuY29tPjsgSmFtZXMgQm90dG9tbGV5IDxqZWpiQGxpbnV4LmlibS5jb20+
+OyBIdWJlcnR1cyBGcmFua2UgPGZyYW5rZWhAdXMuaWJtLmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251
+Lm9yZw0KU3ViamVjdDogUkU6IFtSRkNdIEtWTTogeDg2OiBTdXBwb3J0IEtWTSBWTXMgc2hhcmlu
+ZyBTRVYgY29udGV4dA0KDQpbQU1EIFB1YmxpYyBVc2VdDQoNCkhlbGxvIFBhb2xvLA0KDQpJIGFt
+IHdvcmtpbmcgb24gcHJvdG90eXBlIGNvZGUgaW4gcWVtdSB0byBzdGFydCBhIG1pcnJvciBWTSBy
+dW5uaW5nIGluIHBhcmFsbGVsIHRvIHRoZSBwcmltYXJ5IFZNLiBJbml0aWFsbHkgSSBoYWQgYW4g
+aWRlYSBvZiBhIHJ1bm5pbmcgYSBjb21wbGV0ZWx5IHBhcmFsbGVsIFZNIGxpa2UgdXNpbmcgdGhl
+IHFlbXXigJlzIG1pY3Jvdm0gbWFjaGluZS9wbGF0Zm9ybSwgYnV0IHRoZSBtYWluIGlzc3VlIHdp
+dGggdGhpcyBpZGVhIGlzIHRoZSBkaWZmaWN1bHR5IGluIHNoYXJpbmcgdGhlIG1lbW9yeSBvZiBw
+cmltYXJ5IFZNIHdpdGggaXQuDQoNCkhlbmNlLCBJIHN0YXJ0ZWQgZXhwbG9yaW5nIHJ1bm5pbmcg
+YW4gaW50ZXJuYWwgdGhyZWFkIGxpa2UgdGhlIGN1cnJlbnQgcGVyLXZDUFUgdGhyZWFkKHMpIGlu
+IHFlbXUuIFRoZSBtYWluIGlzc3VlIGlzIHRoYXQgcWVtdSBoYXMgYSBsb3Qgb2YgZ2xvYmFsIHN0
+YXRlLCBlc3BlY2lhbGx5IHRoZSBLVk1TdGF0ZSBzdHJ1Y3R1cmUgd2hpY2ggaXMgcGVyLVZNLCBh
+bmQgYWxsIHRoZSBLVk0gdkNQVXMgYXJlIHZlcnkgdGlnaHRseSB0aWVkIGludG8gaXQuIEl0IGRv
+ZXMgbm90IG1ha2Ugc2Vuc2UgdG8gYWRkIGEgY29tcGxldGVseSBuZXcgS1ZNU3RhdGUgc3RydWN0
+dXJlIGluc3RhbmNlIGZvciB0aGUgbWlycm9yIFZNIGFzIHRoZW4gdGhlIG1pcnJvciBWTSBkb2Vz
+IG5vdCByZW1haW4gbGlnaHR3ZWlnaHQgYXQgYWxsLiANCg0KSGVuY2UsIHRoZSBtaXJyb3IgVk0g
+aSBhbSBhZGRpbmcsIGhhcyB0byBpbnRlZ3JhdGUgd2l0aCB0aGUgY3VycmVudCBLVk1TdGF0ZSBz
+dHJ1Y3R1cmUgYW5kIHRoZSDigJxnbG9iYWzigJ0gS1ZNIHN0YXRlIGluIHFlbXUsIHRoaXMgcmVx
+dWlyZWQgYWRkaW5nIHNvbWUgcGFyYWxsZWwgS1ZNIGNvZGUgaW4gcWVtdSwgZm9yIGV4YW1wbGUg
+dG8gZG8gaW9jdGwncyBvbiB0aGUgbWlycm9yIFZNLCBzaW1pbGFyIHRvIHRoZSBwcmltYXJ5IFZN
+LiBEZXRhaWxzIGJlbG93IDoNCg0KVGhlIG1pcnJvcl92bV9mZCBpcyBhZGRlZCB0byB0aGUgS1ZN
+U3RhdGUgc3RydWN0dXJlIGl0c2VsZi4gDQoNClRoZSBwYXJhbGxlbCBjb2RlIEkgbWVudGlvbmVk
+IGlzIGxpa2UgdGhlIGZvbGxvd2luZyA6DQoNCiNkZWZpbmUga3ZtX21pcnJvcl92bV9lbmFibGVf
+Y2FwKHMsIGNhcGFiaWxpdHksIGNhcF9mbGFncywgLi4uKSAgICAgIFwNCiAgICAoeyAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwN
+CiAgICAgICAgc3RydWN0IGt2bV9lbmFibGVfY2FwIGNhcCA9IHsgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIFwNCiAgICAgICAgICAgIC5jYXAgPSBjYXBhYmlsaXR5LCAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwNCiAgICAgICAgICAgIC5mbGFncyA9IGNhcF9m
+bGFncywgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwNCiAgICAgICAgfTsg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IFwNCiAgICAgICAgdWludDY0X3QgYXJnc190bXBbXSA9IHsgX19WQV9BUkdTX18gfTsgICAgICAg
+ICAgICAgICAgICAgICAgIFwNCiAgICAgICAgc2l6ZV90IG4gPSBNSU4oQVJSQVlfU0laRShhcmdz
+X3RtcCksIEFSUkFZX1NJWkUoY2FwLmFyZ3MpKTsgIFwNCiAgICAgICAgbWVtY3B5KGNhcC5hcmdz
+LCBhcmdzX3RtcCwgbiAqIHNpemVvZihjYXAuYXJnc1swXSkpOyAgICAgICAgIFwNCiAgICAgICAg
+a3ZtX21pcnJvcl92bV9pb2N0bChzLCBLVk1fRU5BQkxFX0NBUCwgJmNhcCk7ICAgICAgICAgICAg
+ICAgIFwNCiAgICB9KQ0KDQoNCitpbnQga3ZtX21pcnJvcl92bV9pb2N0bChLVk1TdGF0ZSAqcywg
+aW50IHR5cGUsIC4uLikgew0KKyAgICBpbnQgcmV0Ow0KKyAgICB2b2lkICphcmc7DQorICAgIHZh
+X2xpc3QgYXA7DQorDQorICAgIHZhX3N0YXJ0KGFwLCB0eXBlKTsNCisgICAgYXJnID0gdmFfYXJn
+KGFwLCB2b2lkICopOw0KKyAgICB2YV9lbmQoYXApOw0KKw0KKyAgICB0cmFjZV9rdm1fdm1faW9j
+dGwodHlwZSwgYXJnKTsNCisgICAgcmV0ID0gaW9jdGwocy0+bWlycm9yX3ZtX2ZkLCB0eXBlLCBh
+cmcpOw0KKyAgICBpZiAocmV0ID09IC0xKSB7DQorICAgICAgICByZXQgPSAtZXJybm87DQorICAg
+IH0NCisgICAgcmV0dXJuIHJldDsNCit9DQorDQoNClRoZSB2Y3B1IGlvY3RsIGNvZGUgd29ya3Mg
+YXMgaXQgaXMuIA0KDQpUaGUga3ZtX2FyY2hfcHV0X3JlZ2lzdGVycygpIGFsc28gbmVlZGVkIGEg
+bWlycm9yIFZNIHZhcmlhbnQga3ZtX2FyY2hfbWlycm9yX3B1dF9yZWdpc3RlcnMoKSwgZm9yIHJl
+YXNvbnMgc3VjaCBhcyBzYXZpbmcgTVNScyBvbiB0aGUgbWlycm9yIFZNIHJlcXVpcmVkIGVuYWJs
+aW5nIHRoZSBpbi1rZXJuZWwgaXJxY2hpcCBzdXBwb3J0IG9uIHRoZSBtaXJyb3IgVk0sIG90aGVy
+d2lzZSwga3ZtX3B1dF9tc3JzKCkgZmFpbHMuIEhlbmNlLCBrdm1fYXJjaF9taXJyb3JfcHV0X3Jl
+Z2lzdGVycygpIG1ha2VzIHRoZSBtaXJyb3IgVk0gc2ltcGxlciBieSBub3Qgc2F2aW5nIGFueSBN
+U1JzIGFuZCBub3QgbmVlZGluZyB0aGUgaW4ta2VybmVsIGlycWNoaXAgc3VwcG9ydC4NCg0KSSBo
+YWQgbG90IG9mIGlzc3VlcyBpbiBkeW5hbWljYWxseSBhZGRpbmcgYSBuZXcgdkNQVSwgaS5lLiwg
+dGhlIENQVVN0YXRlIHN0cnVjdHVyZSBkdWUgdG8gcWVtdSdzIG9iamVjdCBtb2RlbCAoUU9NKSB3
+aGljaCByZXF1aXJlcyB0aGF0IGV2ZXJ5IHFlbXUgc3RydWN0dXJlL29iamVjdCBoYXMgdG8gY29u
+dGFpbiB0aGUgcGFyZW50L2Jhc2UgY2xhc3Mvb2JqZWN0IGFuZCB0aGVuIGFsbCB0aGUgZGVyaXZl
+ZCBjbGFzc2VzIGFmdGVyIHRoYXQuIEl0IHdhcyBkaWZmaWN1bHQgdG8gYWRkIGEgbmV3IENQVSBv
+YmplY3QgZHluYW1pY2FsbHksIGhlbmNlIEkgaGF2ZSB0byByZXVzZSBvbmUgb2YgdGhlIOKAnC1z
+bXDigJ0gIGNwdXMgcGFzc2VkIG9uIHFlbXUgY29tbWFuZCBsaW5lIGFzIHRoZSBtaXJyb3IgdkNQ
+VS4gVGhpcyBhbHNvIGFzc2lzdHMgaW4gaGF2aW5nIHRoZSBYODZDUFUgImJhY2tpbmciIHN0cnVj
+dHVyZSBmb3IgdGhlIG1pcnJvciB2Q1BV4oCZcyBDUFUgb2JqZWN0LCB3aGljaCBhbGxvd3MgdXNp
+bmcgbW9zdCBvZiB0aGUgS1ZNIGNvZGUgaW4gcWVtdSBmb3IgdGhlIG1pcnJvciB2Q1BVLiBBbHNv
+IHRoZSBtaXJyb3IgdkNQVSBDUFUgb2JqZWN0IHdpbGwgaGF2ZSB0aGUgQ1BVWDg2U3RhdGUgc3Ry
+dWN0dXJlIGVtYmVkZGVkIHdoaWNoIGNvbnRhaW5zIHRoZSBjcHUgcmVnaXN0ZXIgc3RhdGUgZm9y
+IHRoZSBtaXJyb3IgdkNQVS4gDQoNClRoZSBtaXJyb3IgdkNQVSBpcyBub3cgcnVubmluZyBhIHNp
+bXBsZXIgS1ZNIHJ1biBsb29wLCBpdCBkb2VzIG5vdCBoYXZlIGFueSBpbi1rZXJuZWwgaXJxY2hp
+cCAoaW50ZXJydXB0IGNvbnRyb2xsZXIpIG9yIGFueSBvdGhlciBrdm1hcGljIGludGVycnVwdCBj
+b250cm9sbGVyIHN1cHBvcnRlZCBhbmQgZW5hYmxlZCBmb3IgaXQuIEFzIG9mIG5vdyBpdCBpcyBz
+dGlsbCBkb2luZyBib3RoIEkvTyBhbmQgTU1JTyBoYW5kbGluZy4NCg0KTG9va2luZyBmd2QuIHRv
+IGNvbW1lbnRzLCBmZWVkYmFjaywgdGhvdWdodHMgb24gdGhlIGFib3ZlIGFwcHJvYWNoLg0KDQpU
+aGFua3MsDQpBc2hpc2gNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IFBhb2xv
+IEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+DQpTZW50OiBUaHVyc2RheSwgTWFyY2ggMTEs
+IDIwMjEgMTA6MzAgQU0NClRvOiBUb2JpbiBGZWxkbWFuLUZpdHp0aHVtIDx0b2JpbkBsaW51eC5p
+Ym0uY29tPjsgbmF0ZXRAZ29vZ2xlLmNvbQ0KQ2M6IERvdiBNdXJpayA8ZG92bXVyaWtAbGludXgu
+dm5ldC5pYm0uY29tPjsgTGVuZGFja3ksIFRob21hcyA8VGhvbWFzLkxlbmRhY2t5QGFtZC5jb20+
+OyB4ODZAa2VybmVsLm9yZzsga3ZtQHZnZXIua2VybmVsLm9yZzsgbGludXgta2VybmVsQHZnZXIu
+a2VybmVsLm9yZzsgc3J1dGhlcmZvcmRAZ29vZ2xlLmNvbTsgc2VhbmpjQGdvb2dsZS5jb207IHJp
+ZW50amVzQGdvb2dsZS5jb207IFNpbmdoLCBCcmlqZXNoIDxicmlqZXNoLnNpbmdoQGFtZC5jb20+
+OyBLYWxyYSwgQXNoaXNoIDxBc2hpc2guS2FscmFAYW1kLmNvbT47IExhc3psbyBFcnNlayA8bGVy
+c2VrQHJlZGhhdC5jb20+OyBKYW1lcyBCb3R0b21sZXkgPGplamJAbGludXguaWJtLmNvbT47IEh1
+YmVydHVzIEZyYW5rZSA8ZnJhbmtlaEB1cy5pYm0uY29tPg0KU3ViamVjdDogUmU6IFtSRkNdIEtW
+TTogeDg2OiBTdXBwb3J0IEtWTSBWTXMgc2hhcmluZyBTRVYgY29udGV4dA0KDQpPbiAxMS8wMy8y
+MSAxNjozMCwgVG9iaW4gRmVsZG1hbi1GaXR6dGh1bSB3cm90ZToNCj4gSSBhbSBub3Qgc3VyZSBo
+b3cgdGhlIG1pcnJvciBWTSB3aWxsIGJlIHN1cHBvcnRlZCBpbiBRRU1VLiBVc3VhbGx5IA0KPiB0
+aGVyZSBpcyBvbmUgUUVNVSBwcm9jZXNzIHBlci12bS4gTm93IHdlIHdvdWxkIG5lZWQgdG8gcnVu
+IGEgc2Vjb25kIFZNIA0KPiBhbmQgY29tbXVuaWNhdGUgd2l0aCBpdCBkdXJpbmcgbWlncmF0aW9u
+LiBJcyB0aGVyZSBhIHdheSB0byBkbyB0aGlzIA0KPiB3aXRob3V0IGFkZGluZyBzaWduaWZpY2Fu
+dCBjb21wbGV4aXR5Pw0KDQpJIGNhbiBhbnN3ZXIgdGhpcyBwYXJ0LiAgSSB0aGluayB0aGlzIHdp
+bGwgYWN0dWFsbHkgYmUgc2ltcGxlciB0aGFuIHdpdGggYXV4aWxpYXJ5IHZDUFVzLiAgVGhlcmUg
+d2lsbCBiZSBhIHNlcGFyYXRlIHBhaXIgb2YgVk0rdkNQVSBmaWxlIGRlc2NyaXB0b3JzIHdpdGhp
+biB0aGUgc2FtZSBRRU1VIHByb2Nlc3MsIGFuZCBzb21lIGNvZGUgdG8gc2V0IHVwIHRoZSBtZW1v
+cnkgbWFwIHVzaW5nIEtWTV9TRVRfVVNFUl9NRU1PUllfUkVHSU9OLg0KDQpIb3dldmVyLCB0aGUg
+Y29kZSB0byBydW4gdGhpcyBWTSB3aWxsIGJlIHZlcnkgc21hbGwgYXMgdGhlIFZNIGRvZXMgbm90
+IGhhdmUgdG8gZG8gTU1JTywgaW50ZXJydXB0cywgbGl2ZSBtaWdyYXRpb24gKG9mIGl0c2VsZiks
+IGV0Yy4gIEl0IGp1c3Qgc3RhcnRzIHVwIGFuZCBjb21tdW5pY2F0ZXMgd2l0aCBRRU1VIHVzaW5n
+IGEgbWFpbGJveCBhdCBhIHByZWRldGVybWluZWQgYWRkcmVzcy4NCg0KSSBhbHNvIHRoaW5rIChi
+dXQgSSdtIG5vdCAxMDAlIHN1cmUpIHRoYXQgdGhlIGF1eGlsaWFyeSBWTSBkb2VzIG5vdCBoYXZl
+IHRvIHdhdGNoIGNoYW5nZXMgaW4gdGhlIHByaW1hcnkgVk0ncyBtZW1vcnkgbWFwIChlLmcuIG1h
+cHBpbmcgYW5kIHVubWFwcGluZyBvZiBCQVJzKS4gIEluIFFFTVUgdGVybXMsIHRoZSBhdXhpbGlh
+cnkgVk0ncyBtZW1vcnkgbWFwIHRyYWNrcyBSQU1CbG9ja3MsIG5vdCBNZW1vcnlSZWdpb25zLCB3
+aGljaCBtYWtlcyB0aGluZ3MgbXVjaCBzaW1wbGVyLg0KDQpUaGVyZSBhcmUgYWxyZWFkeSBtYW55
+IGV4YW1wbGVzIG9mIG1pbmkgVk1NcyBydW5uaW5nIHNwZWNpYWwgcHVycG9zZSBWTXMgaW4gdGhl
+IGtlcm5lbCdzIHRvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bSBkaXJlY3RvcnksIGFuZCBJIGRv
+bid0IHRoaW5rIHRoZSBRRU1VIGNvZGUgd291bGQgYmUgYW55IG1vcmUgY29tcGxleCB0aGFuIHRo
+YXQuDQoNClBhb2xvDQo=
