@@ -2,513 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 29CE339358D
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 20:43:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE169393601
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 21:11:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234135AbhE0Sox (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 14:44:53 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:58132 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229712AbhE0Sow (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 May 2021 14:44:52 -0400
-Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 0C22C218DD;
-        Thu, 27 May 2021 18:43:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1622140998; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nk8SuQJCzYcSH8Tvi68XQy6bNpiT4lEaVoobdQyROxc=;
-        b=VlxmeaOA1moBNpsfXyg9vKnDkg05ZESLkFfWYwUTwRNszCt4HYBIVOR3V2RublW9M2tM6c
-        OVmdFEWIPCwHUl9VDKS1vrTeggolA7RJJ7XB96z+qIc/SiITB212uSFVLjMH1HHJkTbw4x
-        W5/NzZRje7T0lX9wVAKdj7BeBBkb/aY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1622140998;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nk8SuQJCzYcSH8Tvi68XQy6bNpiT4lEaVoobdQyROxc=;
-        b=eQjjI1sFmzH8CgAmuQkbgG+cmyIxzjKiXEWGTER5UksKY++q+LpVjYA6UDn7kDkoVUBtOj
-        vDhpXSXn7EgUfMCg==
-Received: from director2.suse.de (director2.suse-dmz.suse.de [192.168.254.72])
-        by imap.suse.de (Postfix) with ESMTPSA id 8AB5411A98;
-        Thu, 27 May 2021 18:43:17 +0000 (UTC)
-Subject: Re: Windows fails to boot after rebase to QEMU master
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20210521091451.GA6016@u366d62d47e3651.ant.amazon.com>
- <20210524055322-mutt-send-email-mst@kernel.org> <YK6hunkEnft6VJHz@work-vm>
- <d71fee00-0c21-c5e8-dbc6-00b7ace11c5a@suse.de> <YK9Y64U0wjU5K753@work-vm>
- <16a5085f-868b-7e1a-f6de-1dab16103a66@redhat.com> <YK9jOdCPUGQF4t0D@work-vm>
- <855c9f5c-a8e8-82b4-d71e-db9c966ddcc3@suse.de>
- <3b8f2f3b-0254-22c1-6391-44569c8ff821@suse.de>
- <d43ca6d9-d00c-6c2e-6838-36554de3fba5@suse.de> <YK+dlWz8H+dUm95Y@work-vm>
-From:   Claudio Fontana <cfontana@suse.de>
-Message-ID: <4f447035-7a09-dba5-419e-80b2394c6a0e@suse.de>
-Date:   Thu, 27 May 2021 20:43:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S234071AbhE0TNP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 15:13:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56342 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229866AbhE0TNP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 May 2021 15:13:15 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC8D1C061574
+        for <kvm@vger.kernel.org>; Thu, 27 May 2021 12:11:41 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id d16so1302618pfn.12
+        for <kvm@vger.kernel.org>; Thu, 27 May 2021 12:11:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=RE1qcP7vRIDhMC+4p2UKC8eKad09zvQ8yhQM/ragHj8=;
+        b=qLKb8JgiNEKyopizIPmcyaNgma9muoqIc9lRad1LH0VqqoQ5mjTChUbotc4AbndIvg
+         mX5GqBuqdwLcm5G9Ni6/RmGDxvhj3EbZzwFDCx2Xbik4+QoU+RVj+Nk3PD9CjvgJ5r8i
+         sKsldL31c5wfm2dJM+R/vkzG3qdkkL+56LSwt0mbAKGYVpJgVco8hn7Dnv4emuwvvnLX
+         7GDOceUUV1ZMZAzgINptnSRgrQ7oSoOk2obk1mOmkorFerFPSK3S4FO5v+qYygM/EOEO
+         9Ma4SS2/KRZ0A299gNY4XensWaQyHVUlMvL2ttjCQS89DS6ngIVgchzPpjKnRmGb9giG
+         RHUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=RE1qcP7vRIDhMC+4p2UKC8eKad09zvQ8yhQM/ragHj8=;
+        b=DuM+Va42kKZZ/qwtUTK9//satAIyLu0vnYnekdrLUAqV+2+/k+2xI/tTKfdcT88GrV
+         Prn/+Udk/iX/7u3ut7T4syDIzu9WAAF8RTswIOB6tWf5BQqTyCnNOPFFCsJwqV6p1Ij4
+         LYx04I7ZvYMHUPlxk8Vr8csAiTJYVU7ODynIBf/FyrkcUsRunmkH7C5/KDettLRQggVx
+         9phFy9C3Xdu0S7qU+gIMBOv3yhiLnl5WHKi3sQbBysximJDGqoDlc93jfop7kXnepsSY
+         5oIgNhA8fI4O5azaU1Ch2PdrVnqma6cQloynxwyk0GtRGleTF/8irPcg2s2PSZax3OBc
+         bepg==
+X-Gm-Message-State: AOAM53388Wn3aOtDvayx7Vn1WM+KmYJKVkVVN171cmFowr6YqTkcTnTr
+        aq3HixHnvNipuuFsifeVNAEiuC9biqzGcQ==
+X-Google-Smtp-Source: ABdhPJzTYCsAJgciUstnbjttdGVE4ouT7ErBqkdg+J2DgWFJEwSPTJW5HTkOSa30TY6ufM8ArnBbaQ==
+X-Received: by 2002:a63:1b0b:: with SMTP id b11mr5135456pgb.410.1622142701157;
+        Thu, 27 May 2021 12:11:41 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id f18sm2423360pjh.55.2021.05.27.12.11.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 May 2021 12:11:40 -0700 (PDT)
+Date:   Thu, 27 May 2021 19:11:36 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 43/43] KVM: x86: Drop pointless @reset_roots from
+ kvm_init_mmu()
+Message-ID: <YK/u6N18S9gG7Fua@google.com>
+References: <20210424004645.3950558-1-seanjc@google.com>
+ <20210424004645.3950558-44-seanjc@google.com>
 MIME-Version: 1.0
-In-Reply-To: <YK+dlWz8H+dUm95Y@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210424004645.3950558-44-seanjc@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/27/21 3:24 PM, Dr. David Alan Gilbert wrote:
-> * Claudio Fontana (cfontana@suse.de) wrote:
->> On 5/27/21 12:53 PM, Claudio Fontana wrote:
->>> On 5/27/21 11:48 AM, Claudio Fontana wrote:
->>>> On 5/27/21 11:15 AM, Dr. David Alan Gilbert wrote:
->>>>> * Philippe Mathieu-Daudé (philmd@redhat.com) wrote:
->>>>>> On 5/27/21 10:31 AM, Dr. David Alan Gilbert wrote:
->>>>>>> * Claudio Fontana (cfontana@suse.de) wrote:
->>>>>>>> On 5/26/21 9:30 PM, Dr. David Alan Gilbert wrote:
->>>>>>>>> * Michael S. Tsirkin (mst@redhat.com) wrote:
->>>>>>>>>> On Fri, May 21, 2021 at 11:17:19AM +0200, Siddharth Chandrasekaran wrote:
->>>>>>>>>>> After a rebase to QEMU master, I am having trouble booting windows VMs.
->>>>>>>>>>> Git bisect indicates commit f5cc5a5c1686 ("i386: split cpu accelerators
->>>>>>>>>>> from cpu.c, using AccelCPUClass") to have introduced the issue. I spent
->>>>>>>>>>> some time looking at into it yesterday without much luck.
->>>>>>>>>>>
->>>>>>>>>>> Steps to reproduce:
->>>>>>>>>>>
->>>>>>>>>>>     $ ./configure --enable-kvm --disable-xen --target-list=x86_64-softmmu --enable-debug
->>>>>>>>>>>     $ make -j `nproc`
->>>>>>>>>>>     $ ./build/x86_64-softmmu/qemu-system-x86_64 \
->>>>>>>>>>>         -cpu host,hv_synic,hv_vpindex,hv_time,hv_runtime,hv_stimer,hv_crash \
->>>>>>>>>>>         -enable-kvm \
->>>>>>>>>>>         -name test,debug-threads=on \
->>>>>>>>>>>         -smp 1,threads=1,cores=1,sockets=1 \
->>>>>>>>>>>         -m 4G \
->>>>>>>>>>>         -net nic -net user \
->>>>>>>>>>>         -boot d,menu=on \
->>>>>>>>>>>         -usbdevice tablet \
->>>>>>>>>>>         -vnc :3 \
->>>>>>>>>>>         -machine q35,smm=on \
->>>>>>>>>>>         -drive if=pflash,format=raw,readonly=on,unit=0,file="../OVMF_CODE.secboot.fd" \
->>>>>>>>>>>         -drive if=pflash,format=raw,unit=1,file="../OVMF_VARS.secboot.fd" \
->>>>>>>>>>>         -global ICH9-LPC.disable_s3=1 \
->>>>>>>>>>>         -global driver=cfi.pflash01,property=secure,value=on \
->>>>>>>>>>>         -cdrom "../Windows_Server_2016_14393.ISO" \
->>>>>>>>>>>         -drive file="../win_server_2016.qcow2",format=qcow2,if=none,id=rootfs_drive \
->>>>>>>>>>>         -device ahci,id=ahci \
->>>>>>>>>>>         -device ide-hd,drive=rootfs_drive,bus=ahci.0
->>>>>>>>>>>
->>>>>>>>>>> If the issue is not obvious, I'd like some pointers on how to go about
->>>>>>>>>>> fixing this issue.
->>>>>>>>>>>
->>>>>>>>>>> ~ Sid.
->>>>>>>>>>>
->>>>>>>>>>
->>>>>>>>>> At a guess this commit inadvertently changed something in the CPU ID.
->>>>>>>>>> I'd start by using a linux guest to dump cpuid before and after the
->>>>>>>>>> change.
->>>>>>>>>
->>>>>>>>> I've not had a chance to do that yet, however I did just end up with a
->>>>>>>>> bisect of a linux guest failure bisecting to the same patch:
->>>>>>>>>
->>>>>>>>> [dgilbert@dgilbert-t580 qemu]$ git bisect bad
->>>>>>>>> f5cc5a5c168674f84bf061cdb307c2d25fba5448 is the first bad commit
->>>>>>>>> commit f5cc5a5c168674f84bf061cdb307c2d25fba5448
->>>>>>>>> Author: Claudio Fontana <cfontana@suse.de>
->>>>>>>>> Date:   Mon Mar 22 14:27:40 2021 +0100
->>>>>>>>>
->>>>>>>>>     i386: split cpu accelerators from cpu.c, using AccelCPUClass
->>>>>>>>>     
->>>>>>>>>     i386 is the first user of AccelCPUClass, allowing to split
->>>>>>>>>     cpu.c into:
->>>>>>>>>     
->>>>>>>>>     cpu.c            cpuid and common x86 cpu functionality
->>>>>>>>>     host-cpu.c       host x86 cpu functions and "host" cpu type
->>>>>>>>>     kvm/kvm-cpu.c    KVM x86 AccelCPUClass
->>>>>>>>>     hvf/hvf-cpu.c    HVF x86 AccelCPUClass
->>>>>>>>>     tcg/tcg-cpu.c    TCG x86 AccelCPUClass
->>>>>>
->>>>>> Well this is a big commit... I'm not custom to x86 target, and am
->>>>>> having hard time following the cpu host/max change.
->>>>>>
->>>>>> Is it working when you use '-cpu max,...' instead of '-cpu host,'?
->>>>>
->>>>> No; and in fact the cpuid's are almost entirely different with and
->>>>> without this patch! (both with -cpu host).  It looks like with this
->>>>> patch we're getting the cpuid for the TCG cpuid rather than the host:
->>>>>
->>>>> Prior to this patch:
->>>>> :/# cat /proc/cpuinfo
->>>>> processor       : 0
->>>>> vendor_id       : GenuineIntel
->>>>> cpu family      : 6
->>>>> model           : 142
->>>>> model name      : Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz
->>>>> stepping        : 10
->>>>> microcode       : 0xe0
->>>>> cpu MHz         : 2111.998
->>>>> cache size      : 16384 KB
->>>>> physical id     : 0
->>>>> siblings        : 1
->>>>> core id         : 0
->>>>> cpu cores       : 1
->>>>> apicid          : 0
->>>>> initial apicid  : 0
->>>>> fpu             : yes
->>>>> fpu_exception   : yes
->>>>> cpuid level     : 22
->>>>> wp              : yes
->>>>> flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss syscall nx pdpe1gb rdtscp lm constant
->>>>> _tsc arch_perfmon rep_good nopl xtopology cpuid tsc_known_freq pni pclmulqdq vmx ssse3 fma cx16 pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_tim
->>>>> er aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch cpuid_fault invpcid_single pti ssbd ibrs ibpb stibp tpr_shadow vnmi flexpriority ept vpid
->>>>> ept_ad fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt xsaveopt xsavec xgetbv1 xsaves arat umip md_clear arch_ca
->>>>> pabilities
->>>>> vmx flags       : vnmi preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offset vtpr mtf vapic ept vpid unrestricted_guest shadow_vmcs pml
->>>>> bugs            : cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs taa srbds
->>>>> bogomips        : 4223.99
->>>>> clflush size    : 64
->>>>> cache_alignment : 64
->>>>> address sizes   : 39 bits physical, 48 bits virtual
->>>>> power management:
->>>>>
->>>>> With this patch:
->>>>> processor       : 0
->>>>> vendor_id       : AuthenticAMD
->>>>> cpu family      : 6
->>>>> model           : 6
->>>>> model name      : QEMU TCG CPU version 2.5+
->>>>> stepping        : 3
->>>>> cpu MHz         : 2111.998
->>>>> cache size      : 512 KB
->>>>> physical id     : 0
->>>>> siblings        : 1
->>>>> core id         : 0
->>>>> cpu cores       : 1
->>>>> apicid          : 0
->>>>> initial apicid  : 0
->>>>> fpu             : yes
->>>>> fpu_exception   : yes
->>>>> cpuid level     : 13
->>>>> wp              : yes
->>>>> flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss syscall nx pdpe1gb rdtscp lm nopl cpu
->>>>> id tsc_known_freq pni pclmulqdq vmx ssse3 fma cx16 pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_
->>>>> lm abm 3dnowprefetch invpcid_single ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt
->>>>>  xsaveopt xsavec xgetbv1 xsaves arat umip md_clear arch_capabilities
->>>>> bugs            : fxsave_leak sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass taa
->>>>> bogomips        : 4223.99
->>>>> TLB size        : 1024 4K pages
->>>>> clflush size    : 64
->>>>> cache_alignment : 64
->>>>> address sizes   : 40 bits physical, 48 bits virtual
->>>>> power management:
->>>>>
->>>>> cpuid.f5cc5a5c16
->>>>>
->>>>> CPU 0:
->>>>>    0x00000000 0x00: eax=0x0000000d ebx=0x68747541 ecx=0x444d4163 edx=0x69746e65
->>>>>    0x00000001 0x00: eax=0x00000663 ebx=0x00000800 ecx=0xfffab223 edx=0x0f8bfbff
->>>>>    0x00000002 0x00: eax=0x00000001 ebx=0x00000000 ecx=0x0000004d edx=0x002c307d
->>>>>    0x00000003 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x00000004 0x00: eax=0x00000121 ebx=0x01c0003f ecx=0x0000003f edx=0x00000001
->>>>>    0x00000004 0x01: eax=0x00000122 ebx=0x01c0003f ecx=0x0000003f edx=0x00000001
->>>>>    0x00000004 0x02: eax=0x00000143 ebx=0x03c0003f ecx=0x00000fff edx=0x00000001
->>>>>    0x00000004 0x03: eax=0x00000163 ebx=0x03c0003f ecx=0x00003fff edx=0x00000006
->>>>>    0x00000005 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000003 edx=0x00000000
->>>>>    0x00000006 0x00: eax=0x00000004 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x00000007 0x00: eax=0x00000000 ebx=0x009c4fbb ecx=0x00000004 edx=0xac000400
->>>>>    0x00000008 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x00000009 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x0000000a 0x00: eax=0x07300402 ebx=0x00000000 ecx=0x00000000 edx=0x00008603
->>>>>    0x0000000b 0x00: eax=0x00000000 ebx=0x00000001 ecx=0x00000100 edx=0x00000000
->>>>>    0x0000000b 0x01: eax=0x00000000 ebx=0x00000001 ecx=0x00000201 edx=0x00000000
->>>>>    0x0000000c 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x0000000d 0x00: eax=0x0000001f ebx=0x00000440 ecx=0x00000440 edx=0x00000000
->>>>>    0x0000000d 0x01: eax=0x0000000f ebx=0x000003c0 ecx=0x00000000 edx=0x00000000
->>>>>    0x0000000d 0x02: eax=0x00000100 ebx=0x00000240 ecx=0x00000000 edx=0x00000000
->>>>>    0x0000000d 0x03: eax=0x00000040 ebx=0x000003c0 ecx=0x00000000 edx=0x00000000
->>>>>    0x0000000d 0x04: eax=0x00000040 ebx=0x00000400 ecx=0x00000000 edx=0x00000000
->>>>>    0x40000000 0x00: eax=0x40000001 ebx=0x4b4d564b ecx=0x564b4d56 edx=0x0000004d
->>>>>    0x40000001 0x00: eax=0x01007afb ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x80000000 0x00: eax=0x80000008 ebx=0x68747541 ecx=0x444d4163 edx=0x69746e65
->>>>>    0x80000001 0x00: eax=0x00000663 ebx=0x00000000 ecx=0x00000121 edx=0x2d93fbff
->>>>>    0x80000002 0x00: eax=0x554d4551 ebx=0x47435420 ecx=0x55504320 edx=0x72657620
->>>>>    0x80000003 0x00: eax=0x6e6f6973 ebx=0x352e3220 ecx=0x0000002b edx=0x00000000
->>>>>    0x80000004 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x80000005 0x00: eax=0x01ff01ff ebx=0x01ff01ff ecx=0x40020140 edx=0x40020140
->>>>>    0x80000006 0x00: eax=0x00000000 ebx=0x42004200 ecx=0x02008140 edx=0x00808140
->>>>>    0x80000007 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x80000008 0x00: eax=0x00003028 ebx=0x0100d000 ecx=0x00000000 edx=0x00000000
->>>>>    0x80860000 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0xc0000000 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>
->>>>>
->>>>> cpuid.0ac2b19743
->>>>>
->>>>> CPU 0:
->>>>>    0x00000000 0x00: eax=0x00000016 ebx=0x756e6547 ecx=0x6c65746e edx=0x49656e69
->>>>>    0x00000001 0x00: eax=0x000806ea ebx=0x00000800 ecx=0xfffab223 edx=0x0f8bfbff
->>>>>    0x00000002 0x00: eax=0x00000001 ebx=0x00000000 ecx=0x0000004d edx=0x002c307d
->>>>>    0x00000003 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x00000004 0x00: eax=0x00000121 ebx=0x01c0003f ecx=0x0000003f edx=0x00000001
->>>>>    0x00000004 0x01: eax=0x00000122 ebx=0x01c0003f ecx=0x0000003f edx=0x00000001
->>>>>    0x00000004 0x02: eax=0x00000143 ebx=0x03c0003f ecx=0x00000fff edx=0x00000001
->>>>>    0x00000004 0x03: eax=0x00000163 ebx=0x03c0003f ecx=0x00003fff edx=0x00000006
->>>>>    0x00000005 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000003 edx=0x00000000
->>>>>    0x00000006 0x00: eax=0x00000004 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x00000007 0x00: eax=0x00000000 ebx=0x009c4fbb ecx=0x00000004 edx=0xac000400
->>>>>    0x00000008 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x00000009 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x0000000a 0x00: eax=0x07300402 ebx=0x00000000 ecx=0x00000000 edx=0x00008603
->>>>>    0x0000000b 0x00: eax=0x00000000 ebx=0x00000001 ecx=0x00000100 edx=0x00000000
->>>>>    0x0000000b 0x01: eax=0x00000000 ebx=0x00000001 ecx=0x00000201 edx=0x00000000
->>>>>    0x0000000c 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x0000000d 0x00: eax=0x0000001f ebx=0x00000440 ecx=0x00000440 edx=0x00000000
->>>>>    0x0000000d 0x01: eax=0x0000000f ebx=0x000003c0 ecx=0x00000000 edx=0x00000000
->>>>>    0x0000000d 0x02: eax=0x00000100 ebx=0x00000240 ecx=0x00000000 edx=0x00000000
->>>>>    0x0000000d 0x03: eax=0x00000040 ebx=0x000003c0 ecx=0x00000000 edx=0x00000000
->>>>>    0x0000000d 0x04: eax=0x00000040 ebx=0x00000400 ecx=0x00000000 edx=0x00000000
->>>>>    0x0000000e 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x0000000f 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x00000010 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x00000011 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x00000012 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x00000013 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x00000014 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x00000015 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x00000016 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x40000000 0x00: eax=0x40000001 ebx=0x4b4d564b ecx=0x564b4d56 edx=0x0000004d
->>>>>    0x40000001 0x00: eax=0x01007afb ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x80000000 0x00: eax=0x80000008 ebx=0x756e6547 ecx=0x6c65746e edx=0x49656e69
->>>>>    0x80000001 0x00: eax=0x000806ea ebx=0x00000000 ecx=0x00000121 edx=0x2c100800
->>>>>    0x80000002 0x00: eax=0x65746e49 ebx=0x2952286c ecx=0x726f4320 edx=0x4d542865
->>>>>    0x80000003 0x00: eax=0x37692029 ebx=0x3536382d ecx=0x43205530 edx=0x40205550
->>>>>    0x80000004 0x00: eax=0x392e3120 ebx=0x7a484730 ecx=0x00000000 edx=0x00000000
->>>>>    0x80000005 0x00: eax=0x01ff01ff ebx=0x01ff01ff ecx=0x40020140 edx=0x40020140
->>>>>    0x80000006 0x00: eax=0x00000000 ebx=0x42004200 ecx=0x02008140 edx=0x00808140
->>>>>    0x80000007 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0x80000008 0x00: eax=0x00003027 ebx=0x0100d000 ecx=0x00000000 edx=0x00000000
->>>>>    0x80860000 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>    0xc0000000 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
->>>>>
->>>>
->>>> I started looking at it.
->>>>
->>>> Claudio
->>>>
->>>
->>> I wonder how I missed this, the initialization functions for max_x86_cpu_initfn and kvm_cpu_max_instance_init end up being called in the wrong order.
->>>
->>
->>
->> Just to check whether this is actually the issue we are talking about, Sid et al, could you try this?
->>
->>
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index c496bfa1c2..810c46281b 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -4252,6 +4252,7 @@ static void max_x86_cpu_initfn(Object *obj)
->>      object_property_set_str(OBJECT(cpu), "model-id",
->>                              "QEMU TCG CPU version " QEMU_HW_VERSION,
->>                              &error_abort);
->> +    accel_cpu_instance_init(CPU(cpu));
->>  }
->>
->>  static const TypeInfo max_x86_cpu_type_info = {
->> ------------------------------------------------------------------------------------------
->>
->> Does this band-aid happen to cover-up the issue?
+On Fri, Apr 23, 2021, Sean Christopherson wrote:
+> Remove the @reset_roots param from kvm_init_mmu(), the one user,
+> kvm_mmu_reset_context() has already unloaded the MMU and thus freed and
+> invalidated all roots.  This also happens to be why the reset_roots=true
+> paths doesn't leak roots; they're already invalid.
 > 
-> I think it mostly does - thanks; however the address widths are still
-> wrong:
+> No functional change intended.
 > 
-> address sizes	: 40 bits physical, 48 bits virtual
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/mmu.h        |  2 +-
+>  arch/x86/kvm/mmu/mmu.c    | 13 ++-----------
+>  arch/x86/kvm/svm/nested.c |  2 +-
+>  arch/x86/kvm/vmx/nested.c |  2 +-
+>  4 files changed, 5 insertions(+), 14 deletions(-)
 > 
-> where as my little laptop can only think in 39bits physical; so I think
-> that's still coming through from the TCG def.
-> 
-> Dave
+> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> index 88d0ed5225a4..63b49725fb24 100644
+> --- a/arch/x86/kvm/mmu.h
+> +++ b/arch/x86/kvm/mmu.h
+> @@ -65,7 +65,7 @@ void kvm_mmu_set_ept_masks(bool has_ad_bits, bool has_exec_only);
+>  void
+>  reset_shadow_zero_bits_mask(struct kvm_vcpu *vcpu, struct kvm_mmu *context);
+>  
+> -void kvm_init_mmu(struct kvm_vcpu *vcpu, bool reset_roots);
+> +void kvm_init_mmu(struct kvm_vcpu *vcpu);
+>  void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, u32 cr0, u32 cr4, u32 efer,
+>  			     gpa_t nested_cr3);
+>  void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 930ac8a7e7c9..ff3e200b32dd 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4793,17 +4793,8 @@ static void init_kvm_nested_mmu(struct kvm_vcpu *vcpu)
+>  	update_last_nonleaf_level(vcpu, g_context);
+>  }
+>  
+> -void kvm_init_mmu(struct kvm_vcpu *vcpu, bool reset_roots)
+> +void kvm_init_mmu(struct kvm_vcpu *vcpu)
+>  {
+> -	if (reset_roots) {
+> -		uint i;
+> -
+> -		vcpu->arch.mmu->root_hpa = INVALID_PAGE;
+> -
+> -		for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+> -			vcpu->arch.mmu->prev_roots[i] = KVM_MMU_ROOT_INFO_INVALID;
 
+Egad!  This is wrong.  mmu->root_hpa is guaranteed to be INVALID_PAGE, but the
+prev_roots are not!  I'll drop this patch and do cleanup of this code in a
+separate series.
 
-Oh my, Another problem in that commit.
-
-Here I am attempting a fix, but for the proper reordering I'd need a good re-review of this.
-
-I am currently toying with these two changes, feedback and opinions welcome.
-
-The first uses instance_post_init to call accel_cpu_instance_init,
-in order to attempt to fix the max/host call order problem.
-
-The second moves the call to cpu_exec_realizefn() in a better place,
-in particular after the expansion of features.
-
-commit 5080a46d8833aad18ecb89e3270b726231a21f09 (HEAD -> master)
-Author: Claudio Fontana <cfontana@suse.de>
-Date:   Thu May 27 20:01:22 2021 +0200
-
-    i386: run accel_cpu_instance_init as instance_post_init
-    
-    This partially fixes host and max cpu initialization,
-    by running the accel cpu initialization only after all instance
-    init functions are called for all X86 cpu subclasses.
-    
-    Partial Fix.
-    
-    Fixes: 48afe6e4eabf ("i386: split cpu accelerators from cpu.c, using AccelCPUClass")
-    Signed-off-by: Claudio Fontana <cfontana@suse.de>
-
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 6bcb7dbc2c..ae148fbd2f 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -6422,6 +6422,11 @@ static void x86_cpu_register_feature_bit_props(X86CPUClass *xcc,
-     x86_cpu_register_bit_prop(xcc, name, w, bitnr);
- }
- 
-+static void x86_cpu_post_initfn(Object *obj)
-+{
-+    accel_cpu_instance_init(CPU(obj));
-+}
-+
- static void x86_cpu_initfn(Object *obj)
- {
-     X86CPU *cpu = X86_CPU(obj);
-@@ -6473,9 +6478,6 @@ static void x86_cpu_initfn(Object *obj)
-     if (xcc->model) {
-         x86_cpu_load_model(cpu, xcc->model);
-     }
--
--    /* if required, do accelerator-specific cpu initializations */
--    accel_cpu_instance_init(CPU(obj));
- }
- 
- static int64_t x86_cpu_get_arch_id(CPUState *cs)
-@@ -6810,6 +6812,8 @@ static const TypeInfo x86_cpu_type_info = {
-     .parent = TYPE_CPU,
-     .instance_size = sizeof(X86CPU),
-     .instance_init = x86_cpu_initfn,
-+    .instance_post_init = x86_cpu_post_initfn,
-+
-     .abstract = true,
-     .class_size = sizeof(X86CPUClass),
-     .class_init = x86_cpu_common_class_init,
-
-commit 50191ee2792326b68d9203bb0a4867d4243ab250
-Author: Claudio Fontana <cfontana@suse.de>
-Date:   Thu May 27 19:55:39 2021 +0200
-
-    i386: reorder call to cpu_exec_realizefn in x86_cpu_realizefn
-    
-    we need to expand features first, before we attempt to check them
-    in the accel realizefn code called by cpu_exec_realizefn().
-    
-    At the same time we need checks for code_urev and host_cpuid_required,
-    and modifications to cpu->mwait to happen after the initial setting
-    of them inside the accel realizefn code.
-    
-    Partial Fix.
-    
-    Fixes: 48afe6e4eabf ("i386: split cpu accelerators from cpu.c, using AccelCPUClass")
-    Signed-off-by: Claudio Fontana <cfontana@suse.de>
-
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 9e211ac2ce..6bcb7dbc2c 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -6133,34 +6133,6 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-     Error *local_err = NULL;
-     static bool ht_warned;
- 
--    /* Process Hyper-V enlightenments */
--    x86_cpu_hyperv_realize(cpu);
--
--    cpu_exec_realizefn(cs, &local_err);
--    if (local_err != NULL) {
--        error_propagate(errp, local_err);
--        return;
--    }
--
--    if (xcc->host_cpuid_required && !accel_uses_host_cpuid()) {
--        g_autofree char *name = x86_cpu_class_get_model_name(xcc);
--        error_setg(&local_err, "CPU model '%s' requires KVM or HVF", name);
--        goto out;
--    }
--
--    if (cpu->ucode_rev == 0) {
--        /* The default is the same as KVM's.  */
--        if (IS_AMD_CPU(env)) {
--            cpu->ucode_rev = 0x01000065;
--        } else {
--            cpu->ucode_rev = 0x100000000ULL;
--        }
--    }
--
--    /* mwait extended info: needed for Core compatibility */
--    /* We always wake on interrupt even if host does not have the capability */
--    cpu->mwait.ecx |= CPUID_MWAIT_EMX | CPUID_MWAIT_IBE;
--
-     if (cpu->apic_id == UNASSIGNED_APIC_ID) {
-         error_setg(errp, "apic-id property was not initialized properly");
-         return;
-@@ -6190,6 +6162,34 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-            & CPUID_EXT2_AMD_ALIASES);
-     }
- 
-+    /* Process Hyper-V enlightenments */
-+    x86_cpu_hyperv_realize(cpu);
-+
-+    cpu_exec_realizefn(cs, &local_err);
-+    if (local_err != NULL) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    if (xcc->host_cpuid_required && !accel_uses_host_cpuid()) {
-+        g_autofree char *name = x86_cpu_class_get_model_name(xcc);
-+        error_setg(&local_err, "CPU model '%s' requires KVM or HVF", name);
-+        goto out;
-+    }
-+
-+    if (cpu->ucode_rev == 0) {
-+        /* The default is the same as KVM's.  */
-+        if (IS_AMD_CPU(env)) {
-+            cpu->ucode_rev = 0x01000065;
-+        } else {
-+            cpu->ucode_rev = 0x100000000ULL;
-+        }
-+    }
-+
-+    /* mwait extended info: needed for Core compatibility */
-+    /* We always wake on interrupt even if host does not have the capability */
-+    cpu->mwait.ecx |= CPUID_MWAIT_EMX | CPUID_MWAIT_IBE;
-+
-     /* For 64bit systems think about the number of physical bits to present.
-      * ideally this should be the same as the host; anything other than matching
-      * the host can cause incorrect guest behaviour.
-
------------------------------------------------------------------------------------------
-
-
-
-
-> 
->>
->> I need to think about the proper fix though, any suggestions Paolo, Eduardo?
->>
->> The pickle here is that we'd need to call the accelerator specific initialization of the x86 accel-cpu only after the x86 cpu subclass initfn,
->> otherwise the accel-specific cpu initialization code has no chance to see the subclass (max) trying to set ->max_features.
->>
->> C.
->>
-
+> -	}
+> -
+>  	if (mmu_is_nested(vcpu))
+>  		init_kvm_nested_mmu(vcpu);
+>  	else if (tdp_enabled)
