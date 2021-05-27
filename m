@@ -2,149 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CC023926B8
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 07:02:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79BEB3926B3
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 07:01:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234987AbhE0FDw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 01:03:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60278 "EHLO
+        id S234853AbhE0FDP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 01:03:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234964AbhE0FDr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 May 2021 01:03:47 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71935C061574;
-        Wed, 26 May 2021 22:02:14 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id v13so1733552ple.9;
-        Wed, 26 May 2021 22:02:14 -0700 (PDT)
+        with ESMTP id S233565AbhE0FDM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 May 2021 01:03:12 -0400
+Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFA42C061574;
+        Wed, 26 May 2021 22:01:38 -0700 (PDT)
+Received: by mail-ot1-x336.google.com with SMTP id 69-20020a9d0a4b0000b02902ed42f141e1so3288898otg.2;
+        Wed, 26 May 2021 22:01:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=l7VuWFdCQyNw6QUbl6mT63Xq+VHRKrFG3jQVWST27ZU=;
-        b=R4NE0vQyugGc63JoThiZhysQsbp1MdngY/pUndjsX1O8znXI9+cgoU0wDmqRFrMslf
-         w0SRPdxuNlfVFMJ4vbtauHOTVG9hTTS7woYwH42qnGRHaBvlexevEUw++3g7i43DDcpq
-         gN3uC1Ss3yT+Q3dLLaa0a7RNSZfNtqeMg+8BT/MNAlKRzCxXT/3qVjULmXed+QvNz5tj
-         D35W2qJC5OrVN63EbXZwQtuCVc7kf3IWI9MmWAP951gDZUMEAGpavG1oLAc7NC9abPN0
-         6P+TDB+mKbLwWVJNqy7KFNZUwE3HArmRF10yCmjOp1GmyB4WAo2Law7tfkoy8JVC+wFb
-         QOSg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=DIK2MOYtXTz8u/COwFfkEUBc1F17aIjpQwkU8e8HnG4=;
+        b=hovM366yPdOjJhudKnIBOrLFHbGxlKMe4kde9ZZEtCyhdQSIy0GY44P5SWYFwG4rqt
+         ykxKk8ISwJ7m5mBdp+bfdmiqbq77F95dma9zswVifgjavO10CwVjitOjhPAp+sdrXdhm
+         46zgNNIQBVw37ptR8UUS7iMJCusslA0DMwJspzj1pmLiplCOZ3z1xh4oDtAqEGrdGewe
+         X9YlWcNEXR4xNnj4dU7C4JCbajb3mxKah9xZe84gg3zNFk32zwcFHiwjnEJrG3G4YBBw
+         gXK5njeVgT2K320YTmQ8lpLzekMHJqXtJ/LoULGtwl2Zyex8bDXrqnjpdxHOTrpS8G65
+         BoTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=l7VuWFdCQyNw6QUbl6mT63Xq+VHRKrFG3jQVWST27ZU=;
-        b=oWwkTdxJ6bh6aOTHen3ts7LkZABIZJSybp9cFW72qI98hRGU9bKo0+h7y3YsYaoDrA
-         b4oDRBpO9raUmV7zqtx39lnijv+ToHJ+T0ga5hOe7UuFsJu27wqo1TcqWX8z3sVrTn9L
-         HOJOZVOAkRrp5XsAVn/jKgg4fFS1+EdfK+TARbMkHzNzUn/jCTw7tlrVm0QfLuOa2Pqb
-         hbeu5xKCPYvC9nXi/1cl8CRAZjSEfoiDtcPvKbN6K1M92o3k+AgTAUfvpR/zKC0OPFDz
-         UOIkAcJIbP2kl5YDQgjcQaj8ixb9Jn7wmbR8Zvc128tMPV30A6grvU2xvZZQeY6Kxlck
-         zMeA==
-X-Gm-Message-State: AOAM5336+VXn1AcsXOh+nPG0lk+9XiNO9l9mdI1F4cvGeRLuHr2xuzLK
-        ek2+LTBeLiBRoD2jonZh3KBBhclwEyE=
-X-Google-Smtp-Source: ABdhPJwZLUsdt3ZlRkWWrKCJIljnp9XhZ5QFo8W/7wIZUECDt4xSMGx9pH6u9xehQ3SnMQuIRKw5Jw==
-X-Received: by 2002:a17:902:b594:b029:f8:fb4f:f8d3 with SMTP id a20-20020a170902b594b02900f8fb4ff8d3mr1609343pls.25.1622091733714;
-        Wed, 26 May 2021 22:02:13 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.40])
-        by smtp.googlemail.com with ESMTPSA id z7sm668384pgr.28.2021.05.26.22.02.10
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 26 May 2021 22:02:13 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=DIK2MOYtXTz8u/COwFfkEUBc1F17aIjpQwkU8e8HnG4=;
+        b=gWkZfEH6mDjH1ZrQS4GioKJs5VD1ABAs56+VnXjcMevUpVnhzX4vYuDLfgNn+inSOg
+         mWK5aJPE0IIbqCIDhVFPK5ChA4dEqXgZto1j/3m6SrcyXBIkHuN4fMRgoXV3CfLtETl8
+         4Wi89Q7ms9/9IR18AeTSvNuKmedICvbL5AMMT7FETKOJduGJHFfXlonhndNXEKUYeYM3
+         hidhfFe46bI9oxp/Az4/NQUuc9sxnvQTLr8R+4FzNEE9uf3GcZsGxKBtLlE58zF/7vgO
+         nsHF7E/QujrahSNgW07a/YeY3y8sLhfZYaJgCbv1rLQTHLp3sh0TFlCt84XrEOo6aM8Z
+         WRyw==
+X-Gm-Message-State: AOAM533dqvtKU+hb5/VViGtCUYgUngJuY6zNIfyUDl+e9ISrRh2GziGD
+        omDq6uij85wf20NkwV/DQNPbEP0Xh0h0B6JTo5A=
+X-Google-Smtp-Source: ABdhPJy3zn9EMrhIm28+FpEzc47MCQ+tfLr43fPZTRroAGEhnk3DKyn1eo1OADbJ6r32Gf8RbEZlSWm4LGoUOxLwsog=
+X-Received: by 2002:a9d:4b0e:: with SMTP id q14mr1316258otf.254.1622091698046;
+ Wed, 26 May 2021 22:01:38 -0700 (PDT)
+MIME-Version: 1.0
+References: <1621911767-11703-1-git-send-email-wanpengli@tencent.com> <YK6Ky7+QJUZjO0DT@google.com>
+In-Reply-To: <YK6Ky7+QJUZjO0DT@google.com>
 From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+Date:   Thu, 27 May 2021 13:01:26 +0800
+Message-ID: <CANRm+CxaDUKOx7OFEREi76DHBuX0kZhjbh4D1SKjLUtvxjdJUA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] KVM: X86: Fix warning caused by stale emulation context
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH v3 2/2] KVM: X86: Kill off ctxt->ud
-Date:   Wed, 26 May 2021 22:01:19 -0700
-Message-Id: <1622091679-31683-2-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1622091679-31683-1-git-send-email-wanpengli@tencent.com>
-References: <1622091679-31683-1-git-send-email-wanpengli@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Thu, 27 May 2021 at 01:52, Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, May 24, 2021, Wanpeng Li wrote:
+> > From: Wanpeng Li <wanpengli@tencent.com>
+> >
+> > Reported by syzkaller:
+> >
+> >   WARNING: CPU: 7 PID: 10526 at /home/kernel/ssd/linux/arch/x86/kvm//x86.c:7621 x86_emulate_instruction+0x41b/0x510 [kvm]
+> >   RIP: 0010:x86_emulate_instruction+0x41b/0x510 [kvm]
+> >   Call Trace:
+> >    kvm_mmu_page_fault+0x126/0x8f0 [kvm]
+> >    vmx_handle_exit+0x11e/0x680 [kvm_intel]
+> >    vcpu_enter_guest+0xd95/0x1b40 [kvm]
+> >    kvm_arch_vcpu_ioctl_run+0x377/0x6a0 [kvm]
+> >    kvm_vcpu_ioctl+0x389/0x630 [kvm]
+> >    __x64_sys_ioctl+0x8e/0xd0
+> >    do_syscall_64+0x3c/0xb0
+> >    entry_SYSCALL_64_after_hwframe+0x44/0xae
+> >
+> > Commit 4a1e10d5b5d8c (KVM: x86: handle hardware breakpoints during emulation())
+> > adds hardware breakpoints check before emulation the instruction and parts of
+> > emulation context initialization, actually we don't have the EMULTYPE_NO_DECODE flag
+> > here and the emulation context will not be reused. Commit c8848cee74ff (KVM: x86:
+> > set ctxt->have_exception in x86_decode_insn()) triggers the warning because it
+> > catches the stale emulation context has #UD, however, it is not during instruction
+> > decoding which should result in EMULATION_FAILED. This patch fixes it by moving
+> > the second part emulation context initialization into init_emulate_ctxt() and
+> > before hardware breakpoints check. The ctxt->ud will be dropped by a follow-up
+> > patch.
+> >
+> > syzkaller source: https://syzkaller.appspot.com/x/repro.c?x=134683fdd00000
+> >
+> > Reported-by: syzbot+71271244f206d17f6441@syzkaller.appspotmail.com
+> > Fixes: 4a1e10d5b5d8 (KVM: x86: handle hardware breakpoints during emulation)
+> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> > ---
+> > v1 -> v2:
+> >  * move the second part emulation context initialization into init_emulate_ctxt()
+> >
+> >  arch/x86/kvm/x86.c | 14 +++++++-------
+> >  1 file changed, 7 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index bed7b53..3c109d3 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -7228,6 +7228,11 @@ static void init_emulate_ctxt(struct kvm_vcpu *vcpu)
+> >       BUILD_BUG_ON(HF_SMM_MASK != X86EMUL_SMM_MASK);
+> >       BUILD_BUG_ON(HF_SMM_INSIDE_NMI_MASK != X86EMUL_SMM_INSIDE_NMI_MASK);
+> >
+> > +     ctxt->interruptibility = 0;
+> > +     ctxt->have_exception = false;
+> > +     ctxt->exception.vector = -1;
+> > +     ctxt->perm_ok = false;
+> > +
+> >       init_decode_cache(ctxt);
+> >       vcpu->arch.emulate_regs_need_sync_from_vcpu = false;
+> >  }
+> > @@ -7554,6 +7559,8 @@ int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
+> >
+> >       init_emulate_ctxt(vcpu);
+> >
+> > +     ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
+>
+> Heh, you sent the delta relative to v1.  To avoid confusion, can you post v3
+> with this squashed in?
 
-ctxt->ud is consumed only by x86_decode_insn(), we can kill it off by passing
-emulation_type to x86_decode_insn() and dropping ctxt->ud altogether. Tracking 
-that info in ctxt for literally one call is silly.
+Do it in v3.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/emulate.c     | 5 +++--
- arch/x86/kvm/kvm_emulate.h | 3 +--
- arch/x86/kvm/x86.c         | 4 +---
- 3 files changed, 5 insertions(+), 7 deletions(-)
-
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 8a0ccdb..5e5de05 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -5111,7 +5111,7 @@ static int decode_operand(struct x86_emulate_ctxt *ctxt, struct operand *op,
- 	return rc;
- }
- 
--int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len)
-+int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int emulation_type)
- {
- 	int rc = X86EMUL_CONTINUE;
- 	int mode = ctxt->mode;
-@@ -5322,7 +5322,8 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len)
- 
- 	ctxt->execute = opcode.u.execute;
- 
--	if (unlikely(ctxt->ud) && likely(!(ctxt->d & EmulateOnUD)))
-+	if (unlikely(emulation_type & EMULTYPE_TRAP_UD) &&
-+	    likely(!(ctxt->d & EmulateOnUD)))
- 		return EMULATION_FAILED;
- 
- 	if (unlikely(ctxt->d &
-diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index f016838..3e870bf 100644
---- a/arch/x86/kvm/kvm_emulate.h
-+++ b/arch/x86/kvm/kvm_emulate.h
-@@ -314,7 +314,6 @@ struct x86_emulate_ctxt {
- 	int interruptibility;
- 
- 	bool perm_ok; /* do not check permissions if true */
--	bool ud;	/* inject an #UD if host doesn't support insn */
- 	bool tf;	/* TF value before instruction (after for syscall/sysret) */
- 
- 	bool have_exception;
-@@ -491,7 +490,7 @@ enum x86_intercept {
- #define X86EMUL_MODE_HOST X86EMUL_MODE_PROT64
- #endif
- 
--int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len);
-+int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int emulation_type);
- bool x86_page_table_writing_insn(struct x86_emulate_ctxt *ctxt);
- #define EMULATION_FAILED -1
- #define EMULATION_OK 0
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ae47b19..d752345 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7231,8 +7231,6 @@ static void init_emulate_ctxt(struct kvm_vcpu *vcpu)
- 	ctxt->exception.vector = -1;
- 	ctxt->perm_ok = false;
- 
--	ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
--
- 	init_decode_cache(ctxt);
- 	vcpu->arch.emulate_regs_need_sync_from_vcpu = false;
- }
-@@ -7568,7 +7566,7 @@ int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
- 	    kvm_vcpu_check_breakpoint(vcpu, &r))
- 		return r;
- 
--	r = x86_decode_insn(ctxt, insn, insn_len);
-+	r = x86_decode_insn(ctxt, insn, insn_len, emulation_type);
- 
- 	trace_kvm_emulate_insn_start(vcpu);
- 	++vcpu->stat.insn_emulation;
--- 
-2.7.4
-
+    Wanpeng
