@@ -2,113 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B6D93923BB
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 02:22:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 642583923E4
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 02:49:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233972AbhE0AX7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 May 2021 20:23:59 -0400
-Received: from mga12.intel.com ([192.55.52.136]:57917 "EHLO mga12.intel.com"
+        id S232922AbhE0AvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 20:51:10 -0400
+Received: from mga06.intel.com ([134.134.136.31]:32733 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232916AbhE0AX6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 May 2021 20:23:58 -0400
-IronPort-SDR: cjNgE5E0lSk/oyQrDIK/EK2mhvKSPpQIRcmSIPQnkLUGYEwBObWJ72qEsPKBHn3klEuOidVXbO
- 60DfuDY0zslg==
-X-IronPort-AV: E=McAfee;i="6200,9189,9996"; a="182267163"
+        id S232229AbhE0AvJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 May 2021 20:51:09 -0400
+IronPort-SDR: iP/2AfnEmJXFj0bLt30Sb8JAGVX8s1b51+DJftFF1ERTEC+p2bM4J6MdLpzEwn94XmD5qA0Dyh
+ Q7SgYRUyTnOg==
+X-IronPort-AV: E=McAfee;i="6200,9189,9996"; a="263823024"
 X-IronPort-AV: E=Sophos;i="5.82,333,1613462400"; 
-   d="scan'208";a="182267163"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2021 17:22:25 -0700
-IronPort-SDR: lReY4mf/OSOR576x/j9wiVXic53pGNKIMBXd9Q5X67WVlkom8Pmyt0pOkhSksaugZcWYbBl+Ua
- aRjSY6JaussA==
+   d="scan'208";a="263823024"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2021 17:49:12 -0700
+IronPort-SDR: catWLoIPb5eWn29l+PLW8YiXoXjGwVc9Nj+GWek6I+RT58XPlURLdg/Vyfl6EZA0AJHCs5fhn8
+ 9zKB4A3tWpxA==
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.82,333,1613462400"; 
-   d="scan'208";a="397527172"
-Received: from djiang5-mobl1.amr.corp.intel.com (HELO [10.212.10.31]) ([10.212.10.31])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2021 17:22:23 -0700
-Subject: Re: [PATCH v6 15/20] vfio/mdev: idxd: ims domain setup for the vdcm
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     alex.williamson@redhat.com, kwankhede@nvidia.com,
-        tglx@linutronix.de, vkoul@kernel.org, megha.dey@intel.com,
-        jacob.jun.pan@intel.com, ashok.raj@intel.com, yi.l.liu@intel.com,
-        baolu.lu@intel.com, kevin.tian@intel.com, sanjay.k.kumar@intel.com,
-        tony.luck@intel.com, dan.j.williams@intel.com,
-        eric.auger@redhat.com, pbonzini@redhat.com,
-        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <162164243591.261970.3439987543338120797.stgit@djiang5-desk3.ch.intel.com>
- <162164283796.261970.11020270418798826121.stgit@djiang5-desk3.ch.intel.com>
- <20210523235023.GL1002214@nvidia.com>
-From:   Dave Jiang <dave.jiang@intel.com>
-Message-ID: <29cec5cd-3f23-f947-4545-f507b3f70988@intel.com>
-Date:   Wed, 26 May 2021 17:22:22 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+   d="scan'208";a="472249464"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.22])
+  by FMSMGA003.fm.intel.com with ESMTP; 26 May 2021 17:49:09 -0700
+Date:   Thu, 27 May 2021 08:49:08 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Yuan Yao <yuan.yao@intel.com>
+Subject: Re: [PATCH] KVM: X86: Use kvm_get_linear_rip() in single-step and
+ #DB/#BP interception
+Message-ID: <20210527004908.4pyrz3kxy74hh7sy@yy-desk-7060>
+References: <20210526063828.1173-1-yuan.yao@linux.intel.com>
+ <YK5gsUVi2AJkt0uu@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210523235023.GL1002214@nvidia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YK5gsUVi2AJkt0uu@google.com>
+User-Agent: NeoMutt/20171215
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, May 26, 2021 at 02:52:33PM +0000, Sean Christopherson wrote:
+> On Wed, May 26, 2021, Yuan Yao wrote:
+> > From: Yuan Yao <yuan.yao@intel.com>
+> > 
+> > The kvm_get_linear_rip() handles x86/long mode cases well and has
+> > better readability, __kvm_set_rflags() also use the paired
+> > fucntion kvm_is_linear_rip() to check the vcpu->arch.singlestep_rip
+>   ^^^^^^^^
+>   function
+> 
+> Please run checkpatch before submitting in the future, it will catch some of
+> these misspellings.
 
-On 5/23/2021 4:50 PM, Jason Gunthorpe wrote:
-> On Fri, May 21, 2021 at 05:20:37PM -0700, Dave Jiang wrote:
->> @@ -77,8 +80,18 @@ int idxd_mdev_host_init(struct idxd_device *idxd, struct mdev_driver *drv)
->>   		return rc;
->>   	}
->>   
->> +	ims_info.max_slots = idxd->ims_size;
->> +	ims_info.slots = idxd->reg_base + idxd->ims_offset;
->> +	idxd->ims_domain = pci_ims_array_create_msi_irq_domain(idxd->pdev, &ims_info);
->> +	if (!idxd->ims_domain) {
->> +		dev_warn(dev, "Fail to acquire IMS domain\n");
->> +		iommu_dev_disable_feature(dev, IOMMU_DEV_FEAT_AUX);
->> +		return -ENODEV;
->> +	}
-> I'm quite surprised that every mdev doesn't create its own ims_domain
-> in its probe function.
->
-> This places a global total limit on the # of vectors which makes me
-> ask what was the point of using IMS in the first place ?
->
-> The entire idea for IMS was to make the whole allocation system fully
-> dynamic based on demand.
+Sorry for this mistake, I will take care next time.
 
-Hi Jason, thank you for the review of the series.
-
-My understanding is that the driver creates a single IMS domain for the 
-device and provides the address base and IMS numbers for the domain 
-based on device IMS resources. So the IMS region needs to be contiguous. 
-Each mdev can call msi_domain_alloc_irqs() and acquire the number of IMS 
-vectors it desires and the DEV MSI core code will keep track of which 
-vectors are being used. This allows the mdev devices to dynamically 
-allocate based on demand. If the driver allocates a domain per mdev, 
-it'll needs to do internal accounting of the base and vector numbers for 
-each of those domains that the MSI core already provides. Isn't that 
-what we are trying to avoid? As mdevs come and go, that partitioning 
-will become fragmented.
-
-For example, mdev 0 allocates 1 vector, mdev 1 allocates 2 vectors, and 
-mdev 3 allocates 3 vector. You have 1 vectors unallocated. When mdev 1 
-goes away and a new mdev shows up wanting 3 vectors, you won't be able 
-to allocate the domain because of fragmentation even though you have 
-enough vectors.
-
-If all mdevs allocate the same IMS numbers, the fragmentation issue does 
-not exist. But the driver still has to keep track of which vectors are 
-free and which ones are used in order to provide the appropriate base. 
-And dev msi core already does this for us if we have a single domain. 
-Feels like we would just be duplicating code doing the same thing?
-
-
->
->>   	rc = mdev_register_device(dev, drv);
->>   	if (rc < 0) {
->> +		irq_domain_remove(idxd->ims_domain);
->>   		iommu_dev_disable_feature(dev, IOMMU_DEV_FEAT_AUX);
->>   		return rc;
->>   	}
-> This really wants a goto error unwind
->
-> Jason
+> 
+> > set in kvm_arch_vcpu_ioctl_set_guest_debug(), so change the
+> > "CS.BASE + RIP" code in kvm_arch_vcpu_ioctl_set_guest_debug() and
+> > handle_exception_nmi() to this one.
+> > 
+> > Signed-off-by: Yuan Yao <yuan.yao@intel.com>
+> 
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
