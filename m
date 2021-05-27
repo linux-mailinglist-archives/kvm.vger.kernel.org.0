@@ -2,162 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 408BA392DE5
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 14:24:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8090D39253A
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 05:07:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235179AbhE0MZw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 08:25:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47950 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234352AbhE0MZu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 May 2021 08:25:50 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51C43C061574;
-        Thu, 27 May 2021 05:24:17 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d78so434697pfd.10;
-        Thu, 27 May 2021 05:24:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=DNgCYPsiAmP4Dyq0SqF2LavFgHResxue5gZuOKqTCTo=;
-        b=LZbQvTSspQCnXldbjiWssLU4xUYEJSH54s7488V+enpYivJpUUOQGCCqM5zVbQdIam
-         +5gWZMoMBNMqaXY+tWtvoFKGn+jcZgkFCTzF/KmuxgMnxpBTVt9aCB5Jk6p3a+GZ2Alw
-         np89SubG+3zL1FrZ9xlk8vybHAP0aGJlI0qqSWX+5ffSgNO8/Xv2IW7ypcOgh/hU+ME9
-         m8enROfUH5oQnfQFv1gOExuUB5xkfZiBBQmzKNFKZY9bj7qwsZKv2P5k4jk/AxCbod6G
-         JGErIXfGCeFwvgkFjnWodECTXvr+9ll2w2nA8CR/dL6MV2IYNhN/qXxvpMFrot8t+9vc
-         0Erw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=DNgCYPsiAmP4Dyq0SqF2LavFgHResxue5gZuOKqTCTo=;
-        b=GBJdQJIE8gg8esUHiEiV9KhmJsSKbU+iA9+xRDFRFoKRvCj7ghULka5RuGCzbGrPJm
-         KXwHcrH2kF+2V0EQSh0lLDzdsNFkTtXNW6Vj03xN0xQA/tLJixCI2uctumkB1sAuuw8t
-         11mJ/Qkdebq5WB0fdcCIOkbxtnNroNmH58d2Jj6qGe16yyJ2gCy5qd00hpOS7EiwagVm
-         ItqaZLn4a+K2G+ETo0LeK9Cp1qONMLmLlvyJKda527F3yXuy+oZ0sTJNPldqF09S9OIH
-         lB8kTN3u04dm9bc0coHDySZeJLUyaFHVaoA/qVa4wHpHDY7A12gcKkCaKEsTiKED2paN
-         ZzGw==
-X-Gm-Message-State: AOAM531W2UTxRBfumW0RutHMrbCO3ahJm0kX85h9U3heQ5QgeovwULZj
-        TKHjfCPPnayPgmcGWaxOHXxtO2cB4Pw=
-X-Google-Smtp-Source: ABdhPJxm1lkzPIGUYRgLyp5+PcNfUfq+BDc4a2l+8W32D0pUn1mm61ACUdaZesQPVCWEzlukDQtsSw==
-X-Received: by 2002:a63:7048:: with SMTP id a8mr3537645pgn.194.1622118256436;
-        Thu, 27 May 2021 05:24:16 -0700 (PDT)
-Received: from localhost ([47.251.4.198])
-        by smtp.gmail.com with ESMTPSA id p1sm1825576pfp.137.2021.05.27.05.24.14
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 27 May 2021 05:24:15 -0700 (PDT)
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        id S234421AbhE0DJZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 May 2021 23:09:25 -0400
+Received: from mga03.intel.com ([134.134.136.65]:61216 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232725AbhE0DJY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 May 2021 23:09:24 -0400
+IronPort-SDR: RpR4kgUGsNKc36Mb101THhMHJig94eh2ncZ+KkYdcOvERqXZQdCB+YFNV/nNW+Veo+uEyHOCTb
+ tnWdRNgbaNsA==
+X-IronPort-AV: E=McAfee;i="6200,9189,9996"; a="202670650"
+X-IronPort-AV: E=Sophos;i="5.82,333,1613462400"; 
+   d="scan'208";a="202670650"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2021 20:07:50 -0700
+IronPort-SDR: AITx/xKyIRYiWp3ViftoHT6HhB7da14kz2E3t6JcsCM0h5a/FBXlJHtYjxuZIX+fXHvZ+SlQqP
+ awMr7SZJFmBA==
+X-IronPort-AV: E=Sophos;i="5.82,333,1613462400"; 
+   d="scan'208";a="444401399"
+Received: from shao2-debian.sh.intel.com (HELO localhost) ([10.239.13.11])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2021 20:07:48 -0700
+Date:   Thu, 27 May 2021 11:06:33 +0800
+From:   kernel test robot <rong.a.chen@intel.com>
+To:     Ashish Kalra <ashish.kalra@amd.com>
+Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>,
+        Farrah Chen <farrah.chen@intel.com>,
+        Danmei Wei <danmei.wei@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org
-Subject: [PATCH] KVM: X86: fix tlb_flush_guest()
-Date:   Thu, 27 May 2021 10:39:21 +0800
-Message-Id: <20210527023922.2017-1-jiangshanlai@gmail.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
+        Steve Rutherford <srutherford@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: [kvm:master 125/130] Warning: Kernel ABI header at
+ 'tools/include/uapi/linux/kvm.h' differs from latest version at
+ 'include/uapi/linux/kvm.h': 1086> #define KVM_CAP_EXIT_HYPERCALL 199
+Message-ID: <20210527030633.GW2687475@shao2-debian>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lai Jiangshan <laijs@linux.alibaba.com>
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git master
+head:   f7d7a93c553f6242b1732b64edc8120c7a061b78
+commit: 824d9fb23eb5f359c4da99023c1a2ced05b5911c [125/130] KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS hypercall
+compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
+reproduce:
+cd tools/perf && ./check-headers.sh
 
-For KVM_VCPU_FLUSH_TLB used in kvm_flush_tlb_multi(), the guest expects
-the hypervisor do the operation that equals to native_flush_tlb_global()
-or invpcid_flush_all() in the specified guest CPU.
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
-When TDP is enabled, there is no problem to just flush the hardware
-TLB of the specified guest CPU.
 
-But when using shadowpaging, the hypervisor should have to sync the
-shadow pagetable at first before flushing the hardware TLB so that
-it can truely emulate the operation of invpcid_flush_all() in guest.
+perfheadercheck warnings: (new ones prefixed by >>)
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1082> #define KVM_CAP_SET_GUEST_DEBUG2 195
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1083> #define KVM_CAP_SGX_ATTRIBUTE 196
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1084> #define KVM_CAP_VM_COPY_ENC_CONTEXT_FROM 197
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1085> #define KVM_CAP_PTP_KVM 198
+>> Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1086> #define KVM_CAP_EXIT_HYPERCALL 199
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1680> 	/* Guest Migration Extension */
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1681> 	KVM_SEV_SEND_CANCEL,
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1738> };
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1739> 
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1740> struct kvm_sev_send_start {
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1741> 	__u32 policy;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1742> 	__u64 pdh_cert_uaddr;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1743> 	__u32 pdh_cert_len;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1744> 	__u64 plat_certs_uaddr;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1745> 	__u32 plat_certs_len;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1746> 	__u64 amd_certs_uaddr;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1747> 	__u32 amd_certs_len;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1748> 	__u64 session_uaddr;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1749> 	__u32 session_len;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1750> };
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1751> 
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1752> struct kvm_sev_send_update_data {
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1753> 	__u64 hdr_uaddr;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1754> 	__u32 hdr_len;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1755> 	__u64 guest_uaddr;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1756> 	__u32 guest_len;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1757> 	__u64 trans_uaddr;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1758> 	__u32 trans_len;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1759> };
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1760> 
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1761> struct kvm_sev_receive_start {
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1762> 	__u32 handle;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1763> 	__u32 policy;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1764> 	__u64 pdh_uaddr;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1765> 	__u32 pdh_len;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1766> 	__u64 session_uaddr;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1767> 	__u32 session_len;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1768> };
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1769> 
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1770> struct kvm_sev_receive_update_data {
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1771> 	__u64 hdr_uaddr;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1772> 	__u32 hdr_len;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1773> 	__u64 guest_uaddr;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1774> 	__u32 guest_len;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1775> 	__u64 trans_uaddr;
+   Warning: Kernel ABI header at 'tools/include/uapi/linux/kvm.h' differs from latest version at 'include/uapi/linux/kvm.h': 1776> 	__u32 trans_len;
 
-The problem exists since the first implementation of KVM_VCPU_FLUSH_TLB
-in commit f38a7b75267f ("KVM: X86: support paravirtualized help for TLB
-shootdowns").  But I don't think it would be a real world problem that
-time since the local CPU's tlb is flushed at first in guest before queuing
-KVM_VCPU_FLUSH_TLB to other CPUs.  It means that the hypervisor syncs the
-shadow pagetable before seeing the corresponding KVM_VCPU_FLUSH_TLBs.
-
-After commit 4ce94eabac16 ("x86/mm/tlb: Flush remote and local TLBs
-concurrently"), the guest doesn't flush local CPU's tlb at first and
-the hypervisor can handle other VCPU's KVM_VCPU_FLUSH_TLB earlier than
-local VCPU's tlb flush and might flush the hardware tlb without syncing
-the shadow pagetable beforehand.
-
-Fixes: f38a7b75267f ("KVM: X86: support paravirtualized help for TLB shootdowns")
-Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
 ---
- arch/x86/kvm/svm/svm.c | 16 +++++++++++++++-
- arch/x86/kvm/vmx/vmx.c |  8 +++++++-
- 2 files changed, 22 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 05eca131eaf2..f4523c859245 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3575,6 +3575,20 @@ void svm_flush_tlb(struct kvm_vcpu *vcpu)
- 		svm->current_vmcb->asid_generation--;
- }
- 
-+static void svm_flush_tlb_guest(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * When NPT is enabled, just flush the ASID.
-+	 *
-+	 * When NPT is not enabled, the operation should be equal to
-+	 * native_flush_tlb_global(), invpcid_flush_all() in guest.
-+	 */
-+	if (npt_enabled)
-+		svm_flush_tlb(vcpu);
-+	else
-+		kvm_make_request(KVM_REQ_MMU_RELOAD, vcpu);
-+}
-+
- static void svm_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t gva)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
-@@ -4486,7 +4500,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.tlb_flush_all = svm_flush_tlb,
- 	.tlb_flush_current = svm_flush_tlb,
- 	.tlb_flush_gva = svm_flush_tlb_gva,
--	.tlb_flush_guest = svm_flush_tlb,
-+	.tlb_flush_guest = svm_flush_tlb_guest,
- 
- 	.run = svm_vcpu_run,
- 	.handle_exit = handle_exit,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 4bceb5ca3a89..1913504e3472 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -3049,8 +3049,14 @@ static void vmx_flush_tlb_guest(struct kvm_vcpu *vcpu)
- 	 * are required to flush GVA->{G,H}PA mappings from the TLB if vpid is
- 	 * disabled (VM-Enter with vpid enabled and vpid==0 is disallowed),
- 	 * i.e. no explicit INVVPID is necessary.
-+	 *
-+	 * When EPT is not enabled, the operation should be equal to
-+	 * native_flush_tlb_global(), invpcid_flush_all() in guest.
- 	 */
--	vpid_sync_context(to_vmx(vcpu)->vpid);
-+	if (enable_ept)
-+		vpid_sync_context(to_vmx(vcpu)->vpid);
-+	else
-+		kvm_make_request(KVM_REQ_MMU_RELOAD, vcpu);
- }
- 
- void vmx_ept_load_pdptrs(struct kvm_vcpu *vcpu)
--- 
-2.19.1.6.gb485710b
-
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
