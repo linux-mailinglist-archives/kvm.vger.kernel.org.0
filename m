@@ -2,83 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BFAF939379B
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 22:55:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B91AD3938D1
+	for <lists+kvm@lfdr.de>; Fri, 28 May 2021 00:52:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233253AbhE0U5V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 16:57:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39629 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229835AbhE0U5U (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 May 2021 16:57:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622148946;
+        id S236136AbhE0Wxl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 18:53:41 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:37420 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233203AbhE0Wxk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 May 2021 18:53:40 -0400
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1622155923;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=0ni+6hZkXSLJW6jwPDxlTzbnxmvvtFCkE6EjrUKSV94=;
-        b=VGsD/lt/qxQw5+PyuVYfbCCytXQdE145c3LsJPG1RtSVEPoE0KPb1OslDkfBNgXLmOBriW
-        ETavVrybfY2fpvVbx+GfDjZtYykr8pKbf/Viirxu8lyTkrD6GjFx5c6sIu04O4I+bmjre4
-        d8Lw0x8l9tI+9TfSKfxWSLKNiP1xY5c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-9-1JOpoCinNia1tgIZzHnFqA-1; Thu, 27 May 2021 16:55:44 -0400
-X-MC-Unique: 1JOpoCinNia1tgIZzHnFqA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E237100AA27;
-        Thu, 27 May 2021 20:55:39 +0000 (UTC)
-Received: from localhost (ovpn-117-209.rdu2.redhat.com [10.10.117.209])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A39C5189C7;
-        Thu, 27 May 2021 20:55:38 +0000 (UTC)
-Date:   Thu, 27 May 2021 16:55:37 -0400
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     qemu-devel@nongnu.org, armbru@redhat.com, dgilbert@redhat.com,
-        James Bottomley <jejb@linux.ibm.com>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        Eric Blake <eblake@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v3] target/i386/sev: add support to query the attestation
- report
-Message-ID: <20210527205537.nesslxq4hcnrlo7w@habkost.net>
-References: <20210429170728.24322-1-brijesh.singh@amd.com>
+        bh=uAIoLlMtrjzvrcsBxWhaicEwWt4fesWA8JrISGhrLd8=;
+        b=XK0pzWuM+eObk9PdHaBYcRiPNn68IG5lkkSx+/M1IFv1KJVDo4XGjreMmYtvfcptFdJaMK
+        o8SAPmC2vpJsvRPrME1koGoJpxNT6UHo6MNWwTVoUwCCdTjyFu2gEKbVN3gcCQ1uAWpKn2
+        eMP0WdUIgfjHREIlP0+JcDkIW057x0G6Nzuk+8V0P741kSHsc8BdMuqlCin/skeHZ1v9tl
+        d57tofIlP/91yyXfeHbJcEQb4au943NVBZRydPidUONCE+/77OLFVbPnRAffEEYUhuqdE1
+        1OVM4filzuJMq3TAb9snPrtMAq5hUXBcXu/CpEd4kL/ZC/dDScu36YsxvKFbiw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1622155923;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uAIoLlMtrjzvrcsBxWhaicEwWt4fesWA8JrISGhrLd8=;
+        b=NgIBE2poQuAfCdybmeEvdWm3RcgZ7+Cwxqm+Hlou0f5BLGQUi1m1uWytGTEfuproQ+/nss
+        kUTkS29UD5CGimCw==
+To:     syzbot <syzbot+71271244f206d17f6441@syzkaller.appspotmail.com>,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        jarkko@kernel.org, jmattson@google.com, joro@8bytes.org,
+        kan.liang@linux.intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sgx@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com, peterz@infradead.org,
+        seanjc@google.com, steve.wahl@hpe.com,
+        syzkaller-bugs@googlegroups.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, x86@kernel.org
+Subject: Re: [syzbot] WARNING in x86_emulate_instruction
+In-Reply-To: <000000000000f3fc9305c2e24311@google.com>
+References: <000000000000f3fc9305c2e24311@google.com>
+Date:   Fri, 28 May 2021 00:52:03 +0200
+Message-ID: <87v9737pt8.ffs@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210429170728.24322-1-brijesh.singh@amd.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 29, 2021 at 12:07:28PM -0500, Brijesh Singh wrote:
-> The SEV FW >= 0.23 added a new command that can be used to query the
-> attestation report containing the SHA-256 digest of the guest memory
-> and VMSA encrypted with the LAUNCH_UPDATE and sign it with the PEK.
-> 
-> Note, we already have a command (LAUNCH_MEASURE) that can be used to
-> query the SHA-256 digest of the guest memory encrypted through the
-> LAUNCH_UPDATE. The main difference between previous and this command
-> is that the report is signed with the PEK and unlike the LAUNCH_MEASURE
-> command the ATTESATION_REPORT command can be called while the guest
-> is running.
-> 
-> Add a QMP interface "query-sev-attestation-report" that can be used
-> to get the report encoded in base64.
-> 
-> Cc: James Bottomley <jejb@linux.ibm.com>
-> Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: kvm@vger.kernel.org
-> Reviewed-by: James Bottomley <jejb@linux.ibm.com>
-> Tested-by: James Bottomley <jejb@linux.ibm.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+On Fri, May 21 2021 at 19:52, syzbot wrote:
 
-Queued, thanks!
+> Hello,
+>
+> syzbot found the following issue on:
+>
+> HEAD commit:    8ac91e6c Merge tag 'for-5.13-rc2-tag' of git://git.kernel...
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=16a80fc7d00000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=dddb87edd6431081
+> dashboard link: https://syzkaller.appspot.com/bug?extid=71271244f206d17f6441
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12d1f89bd00000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=134683fdd00000
+>
+> The issue was bisected to:
+>
+> commit 9a7832ce3d920426a36cdd78eda4b3568d4d09e3
+> Author: Steve Wahl <steve.wahl@hpe.com>
+> Date:   Fri Jan 8 15:35:49 2021 +0000
+>
+>     perf/x86/intel/uncore: With > 8 nodes, get pci bus die id from NUMA info
+>
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=152bf9b3d00000
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=172bf9b3d00000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=132bf9b3d00000
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+71271244f206d17f6441@syzkaller.appspotmail.com
+> Fixes: 9a7832ce3d92 ("perf/x86/intel/uncore: With > 8 nodes, get pci bus die id from NUMA info")
 
--- 
-Eduardo
+So this is stale for a week now. It's fully reproducible and nobody
+can't be bothered to look at that?
 
+What's wrong with you people?
+
+Thanks,
+
+        tglx
