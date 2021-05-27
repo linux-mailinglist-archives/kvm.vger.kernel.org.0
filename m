@@ -2,197 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE076392B8F
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 12:14:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60902392BE8
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 12:35:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236125AbhE0KQS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 06:16:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46532 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236113AbhE0KQQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 May 2021 06:16:16 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 140DBC061763
-        for <kvm@vger.kernel.org>; Thu, 27 May 2021 03:14:41 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id df21so223563edb.3
-        for <kvm@vger.kernel.org>; Thu, 27 May 2021 03:14:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=o38M2BO4ULC4BwKVVDJHYXw+IueHUfFLXYDhWYbT5Ig=;
-        b=bk97lq21A/Gg9EU/Cabtt5Dqiuz3zBqg0ZUgn7vHbNo202Sf8zs+esbsZi1472wnDw
-         S7tg6T6IbhEKaYeIj4ycsX234NuYYQ0O03FJH5OuiLMpN12/IGb9B/GLV656R4LkrXT7
-         zQXhfkYtCReY5f9nCUn7YrhTXkoz5KTPkbYMp2eVWnOvCvOgMk7Ao4RZ5Kt3v2UB38LU
-         FgaCGvVGlM5kjH6PanAP74M5XXJO0vEBEDZcBdVLoVPKz7aiDJuuycVw1/jPmGZ/Y2Zw
-         NVvS36r16Wba8DeiGMEViGPX9yGp3JsaaE96mEEaPQwksZ0ldz0nzt72uYtVn0AqNCTd
-         81Rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=o38M2BO4ULC4BwKVVDJHYXw+IueHUfFLXYDhWYbT5Ig=;
-        b=HEnyqH+26jJCG1fF99pBWXZREud9cF58p2FJnQHID8tQgUP25pwR9XzB9PdyzTpWo2
-         NN6lgsop96l5BAeH15J61t0dGU749ygSee+47+fY1kivRUhs6lXN1iMIiJUx2QTdnbmb
-         zP8V3YoPDaXfZ9nnXgSmzOVcil9FokLwM/4rZ1brVDhXGbAh7TPaaC2oQDU38qO0o8V0
-         okSHn94Z9YBg7tuGWwNUT07NI4ohrBRaY+DTuoDfkVU0+5JrlxieeEzBBYtI8gqDWh1B
-         IU82sjzj0xd7OE7k3UnzDlOwmPiK0nwRljP5YnF/9PemDf5rgrWAAbbIofcmHSGnPMUC
-         82JQ==
-X-Gm-Message-State: AOAM533Snd4vrrnwgYb/dc+35ArC8LAM1xjkfkh1unp99Pn7JSzepy2S
-        qJPqg26GjjoTlQASo5+vJ5pBI49UGW/tw09e9oqg
-X-Google-Smtp-Source: ABdhPJxWXHvU/O2LATe1oBP0kHpNNov+YKoz7byZgiRDTGMJZExbTJNux7H0l7VRJaIaAseiGKHKWtgXJ2fM2OTaKZE=
-X-Received: by 2002:a05:6402:4252:: with SMTP id g18mr3221715edb.195.1622110479663;
- Thu, 27 May 2021 03:14:39 -0700 (PDT)
+        id S236192AbhE0KhU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 06:37:20 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41016 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S235950AbhE0KhS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 27 May 2021 06:37:18 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14RAXtRR153268;
+        Thu, 27 May 2021 06:35:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=UcmNkgsGMF9YBSHsLQD9v8WnRBSvndasoAjAPC/Fn8g=;
+ b=qe8n354LcF1FSQWMI5ORnYkLg9/r1V9V5PloT0IVfrxHXtri26GTOdYKk1zSM0g4WTl5
+ 7PAn1GnIfkefzeITM/4dYi3ZcbJvMiYvM9QlJbm2FTXdPgtP8dnEL6pr877ch/vva6wz
+ nAI5RbBEWCx+f+Y7j3of8otC27mmesCdE9RuzJy0EZjdidWMu1mf5m3fLL/8AAQJp4nu
+ ZGSZq5YDWiyaRJ3oSJXKj01npdfnN66ZsruOfibEKFmPE/xEJ+38TPps4PywogHMw2E2
+ htG3JvoQUGz39ilOm/4/InpaBCJbRDRTBv+FjiSU7mcfmAgew+iVwNiNkPG7rJV1Lp0X EQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 38t8fkag0y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 May 2021 06:35:44 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14RAZiL7161835;
+        Thu, 27 May 2021 06:35:44 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 38t8fkag04-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 May 2021 06:35:43 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 14RAS8I8028781;
+        Thu, 27 May 2021 10:35:41 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 38s1ukh4ax-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 May 2021 10:35:41 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14RAZcHd26542396
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 May 2021 10:35:39 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DA41711C050;
+        Thu, 27 May 2021 10:35:38 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6AB6B11C04A;
+        Thu, 27 May 2021 10:35:38 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.86.253])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 27 May 2021 10:35:38 +0000 (GMT)
+Subject: Re: [PATCH v1 10/11] KVM: s390: pv: module parameter to fence lazy
+ destroy
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     cohuck@redhat.com, borntraeger@de.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20210517200758.22593-1-imbrenda@linux.ibm.com>
+ <20210517200758.22593-11-imbrenda@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Message-ID: <7b43f05f-30e0-1c84-74f1-c28fdd6fcff4@linux.ibm.com>
+Date:   Thu, 27 May 2021 12:35:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-References: <20210517095513.850-1-xieyongji@bytedance.com> <20210517095513.850-12-xieyongji@bytedance.com>
- <3740c7eb-e457-07f3-5048-917c8606275d@redhat.com> <CACycT3uAqa6azso_8MGreh+quj-JXO1piuGnrV8k2kTfc34N2g@mail.gmail.com>
- <5a68bb7c-fd05-ce02-cd61-8a601055c604@redhat.com> <CACycT3ve7YvKF+F+AnTQoJZMPua+jDvGMs_ox8GQe_=SGdeCMA@mail.gmail.com>
- <ee00efca-b26d-c1be-68d2-f9e34a735515@redhat.com> <CACycT3ufok97cKpk47NjUBTc0QAyfauFUyuFvhWKmuqCGJ7zZw@mail.gmail.com>
- <00ded99f-91b6-ba92-5d92-2366b163f129@redhat.com> <3cc7407d-9637-227e-9afa-402b6894d8ac@redhat.com>
-In-Reply-To: <3cc7407d-9637-227e-9afa-402b6894d8ac@redhat.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Thu, 27 May 2021 18:14:27 +0800
-Message-ID: <CACycT3s6SkER09KL_Ns9d03quYSKOuZwd3=HJ_s1SL7eH7y5gA@mail.gmail.com>
-Subject: Re: Re: [PATCH v7 11/12] vduse: Introduce VDUSE - vDPA Device in Userspace
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20210517200758.22593-11-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Ob1OI9kh7xDqOy2NSMECDARFhcLe_MRh
+X-Proofpoint-GUID: yf_WtlHvJM8fsY1cS8pRIfYvDlkUBH2T
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-27_04:2021-05-26,2021-05-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ mlxlogscore=999 phishscore=0 clxscore=1015 bulkscore=0 lowpriorityscore=0
+ malwarescore=0 suspectscore=0 priorityscore=1501 mlxscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2105270069
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 27, 2021 at 4:43 PM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> =E5=9C=A8 2021/5/27 =E4=B8=8B=E5=8D=884:41, Jason Wang =E5=86=99=E9=81=93=
-:
-> >
-> > =E5=9C=A8 2021/5/27 =E4=B8=8B=E5=8D=883:34, Yongji Xie =E5=86=99=E9=81=
-=93:
-> >> On Thu, May 27, 2021 at 1:40 PM Jason Wang <jasowang@redhat.com> wrote=
-:
-> >>>
-> >>> =E5=9C=A8 2021/5/27 =E4=B8=8B=E5=8D=881:08, Yongji Xie =E5=86=99=E9=
-=81=93:
-> >>>> On Thu, May 27, 2021 at 1:00 PM Jason Wang <jasowang@redhat.com>
-> >>>> wrote:
-> >>>>> =E5=9C=A8 2021/5/27 =E4=B8=8B=E5=8D=8812:57, Yongji Xie =E5=86=99=
-=E9=81=93:
-> >>>>>> On Thu, May 27, 2021 at 12:13 PM Jason Wang <jasowang@redhat.com>
-> >>>>>> wrote:
-> >>>>>>> =E5=9C=A8 2021/5/17 =E4=B8=8B=E5=8D=885:55, Xie Yongji =E5=86=99=
-=E9=81=93:
-> >>>>>>>> +
-> >>>>>>>> +static int vduse_dev_msg_sync(struct vduse_dev *dev,
-> >>>>>>>> +                           struct vduse_dev_msg *msg)
-> >>>>>>>> +{
-> >>>>>>>> +     init_waitqueue_head(&msg->waitq);
-> >>>>>>>> +     spin_lock(&dev->msg_lock);
-> >>>>>>>> +     vduse_enqueue_msg(&dev->send_list, msg);
-> >>>>>>>> +     wake_up(&dev->waitq);
-> >>>>>>>> +     spin_unlock(&dev->msg_lock);
-> >>>>>>>> +     wait_event_killable(msg->waitq, msg->completed);
-> >>>>>>> What happens if the userspace(malicous) doesn't give a response
-> >>>>>>> forever?
-> >>>>>>>
-> >>>>>>> It looks like a DOS. If yes, we need to consider a way to fix tha=
-t.
-> >>>>>>>
-> >>>>>> How about using wait_event_killable_timeout() instead?
-> >>>>> Probably, and then we need choose a suitable timeout and more
-> >>>>> important,
-> >>>>> need to report the failure to virtio.
-> >>>>>
-> >>>> Makes sense to me. But it looks like some
-> >>>> vdpa_config_ops/virtio_config_ops such as set_status() didn't have a
-> >>>> return value.  Now I add a WARN_ON() for the failure. Do you mean we
-> >>>> need to add some change for virtio core to handle the failure?
-> >>>
-> >>> Maybe, but I'm not sure how hard we can do that.
-> >>>
-> >> We need to change all virtio device drivers in this way.
-> >
-> >
-> > Probably.
-> >
-> >
-> >>
-> >>> We had NEEDS_RESET but it looks we don't implement it.
-> >>>
-> >> Could it handle the failure of get_feature() and get/set_config()?
-> >
-> >
-> > Looks not:
-> >
-> > "
-> >
-> > The device SHOULD set DEVICE_NEEDS_RESET when it enters an error state
-> > that a reset is needed. If DRIVER_OK is set, after it sets
-> > DEVICE_NEEDS_RESET, the device MUST send a device configuration change
-> > notification to the driver.
-> >
-> > "
-> >
-> > This looks implies that NEEDS_RESET may only work after device is
-> > probed. But in the current design, even the reset() is not reliable.
-> >
-> >
-> >>
-> >>> Or a rough idea is that maybe need some relaxing to be coupled loosel=
-y
-> >>> with userspace. E.g the device (control path) is implemented in the
-> >>> kernel but the datapath is implemented in the userspace like TUN/TAP.
-> >>>
-> >> I think it can work for most cases. One problem is that the set_config
-> >> might change the behavior of the data path at runtime, e.g.
-> >> virtnet_set_mac_address() in the virtio-net driver and
-> >> cache_type_store() in the virtio-blk driver. Not sure if this path is
-> >> able to return before the datapath is aware of this change.
-> >
-> >
-> > Good point.
-> >
-> > But set_config() should be rare:
-> >
-> > E.g in the case of virtio-net with VERSION_1, config space is read
-> > only, and it was set via control vq.
-> >
-> > For block, we can
-> >
-> > 1) start from without WCE or
-> > 2) we add a config change notification to userspace or
-> > 3) extend the spec to use vq instead of config space
-> >
-> > Thanks
->
->
-> Another thing if we want to go this way:
->
-> We need find a way to terminate the data path from the kernel side, to
-> implement to reset semantic.
->
+On 5/17/21 10:07 PM, Claudio Imbrenda wrote:
+> Add the module parameter "lazy_destroy", to allow the lazy destroy
+> mechanism to be switched off. This might be useful for debugging
+> purposes.
+> 
+> The parameter is enabled by default.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>  arch/s390/kvm/pv.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+> index 4333d3e54ef0..00c14406205f 100644
+> --- a/arch/s390/kvm/pv.c
+> +++ b/arch/s390/kvm/pv.c
+> @@ -26,6 +26,10 @@ struct deferred_priv {
+>  	unsigned long real;
+>  };
+>  
+> +static int lazy_destroy = 1;
+> +module_param(lazy_destroy, int, 0444);
 
-Do you mean terminate the data path in vdpa_reset(). Is it ok to just
-notify userspace to stop data path asynchronously? Userspace should
-not be able to do any I/O at that time because the iotlb mapping is
-already removed.
+I'm pondering if we want to make that writable or not.
 
-Thanks,
-Yongji
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+
+> +MODULE_PARM_DESC(lazy_destroy, "Deferred destroy for protected guests");
+> +
+>  int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc)
+>  {
+>  	int cc = 0;
+> @@ -348,6 +352,9 @@ int kvm_s390_pv_deinit_vm_deferred(struct kvm *kvm, u16 *rc, u16 *rrc)
+>  {
+>  	struct deferred_priv *priv;
+>  
+> +	if (!lazy_destroy)
+> +		kvm_s390_pv_deinit_vm_now(kvm, rc, rrc);
+> +
+>  	priv = kmalloc(sizeof(*priv), GFP_KERNEL | __GFP_ZERO);
+>  	if (!priv)
+>  		return kvm_s390_pv_deinit_vm_now(kvm, rc, rrc);
+> @@ -396,6 +403,12 @@ int kvm_s390_pv_init_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
+>  	/* Outputs */
+>  	kvm->arch.pv.handle = uvcb.guest_handle;
+>  
+> +	if (!lazy_destroy) {
+> +		mmap_write_lock(kvm->mm);
+> +		kvm->mm->context.pv_sync_destroy = 1;
+> +		mmap_write_unlock(kvm->mm);
+> +	}
+> +
+>  	atomic_inc(&kvm->mm->context.is_protected);
+>  	if (cc) {
+>  		if (uvcb.header.rc & UVC_RC_NEED_DESTROY) {
+> 
+
