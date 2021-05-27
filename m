@@ -2,318 +2,300 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F3604392AF9
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 11:43:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DE690392B36
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 11:57:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235909AbhE0JpM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 05:45:12 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:16752 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235675AbhE0JpM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 May 2021 05:45:12 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14R9Y4Yh011614;
-        Thu, 27 May 2021 05:43:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
- from : subject : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=sd0+oPEZoxRo7IA9fLMmxZ1fKV+LmrHFhCD3OIXtSz4=;
- b=YHI8WjbC22gAJrxQajvYsa4MTQxpsHAbq4SIkpnW/HRjaL9AQq61KKxMUqQ3URnaReqv
- wVb6utt1GoXYErYqufA/cWLLux2C3gj2HQRjzO2rvlxlOvwVZNhMuhl/LbeCl4oOlhDM
- WP5TmAu7ca+OF7c7irMRijzyFtBylrYb3RKU9ePchzhm+cJIftLcSPfR2U3lx/7fB6XO
- 21UC5pRwiVnRlBAr2VfukOlbuSqK2pZO+cVvXVAedLAz/1uz8sJw/uZUlTn+J7suEfza
- VqCnmY9WOIgWwPb/3btGgPKJlsmAUkpMA02xdcr1N23Dp3ZGawhb2ouOXDV5NDHG1OWe wQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38t7y49st8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 May 2021 05:43:39 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14R9YCRV011878;
-        Thu, 27 May 2021 05:43:38 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38t7y49ssk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 May 2021 05:43:38 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 14R9ha5D004806;
-        Thu, 27 May 2021 09:43:36 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 38sba2ruyv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 May 2021 09:43:36 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14R9hXtP15925640
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 27 May 2021 09:43:33 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7F64311C04A;
-        Thu, 27 May 2021 09:43:33 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 046B311C05E;
-        Thu, 27 May 2021 09:43:33 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.86.253])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 27 May 2021 09:43:32 +0000 (GMT)
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     cohuck@redhat.com, borntraeger@de.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210517200758.22593-1-imbrenda@linux.ibm.com>
- <20210517200758.22593-9-imbrenda@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v1 08/11] KVM: s390: pv: lazy destroy for reboot
-Message-ID: <1eb61235-75a7-4a57-38ca-d7a1219f1b8d@linux.ibm.com>
-Date:   Thu, 27 May 2021 11:43:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S235873AbhE0J64 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 05:58:56 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:54556 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235768AbhE0J6y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 May 2021 05:58:54 -0400
+X-Greylist: delayed 501 seconds by postgrey-1.27 at vger.kernel.org; Thu, 27 May 2021 05:58:54 EDT
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id EAFB8218DD;
+        Thu, 27 May 2021 09:48:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1622108937; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MT3cenYDBC/LCgpC+QZ/T4xnWTUd84w/z+MeM3LFr4c=;
+        b=ko44UhKl8ZYVQajb3alGBI1bTadCVGneUaryyBk8SrBZJ3jhals8oZlrbymVhKKt4d8BtD
+        cifAoWqCv6+3/fbdIjTXt8puH4dcg16f9P8lnETGPP17t94j09315rp+Ei5guT6ZAlCnBF
+        3ctKAdmnPSHGcxHN+0UKSCPmavzzfg8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1622108937;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MT3cenYDBC/LCgpC+QZ/T4xnWTUd84w/z+MeM3LFr4c=;
+        b=5lh2vVOTi/WGTomlGqb67dfUfgjwH7ePpNSbQ2oiab/UDQF97jC/ymKWSvF8oeb/3GA0R2
+        zk8j7j9GRofvWyCg==
+Received: from director2.suse.de (director2.suse-dmz.suse.de [192.168.254.72])
+        by imap.suse.de (Postfix) with ESMTPSA id 8B0FD11A98;
+        Thu, 27 May 2021 09:48:57 +0000 (UTC)
+Subject: Re: Windows fails to boot after rebase to QEMU master
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc:     Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20210521091451.GA6016@u366d62d47e3651.ant.amazon.com>
+ <20210524055322-mutt-send-email-mst@kernel.org> <YK6hunkEnft6VJHz@work-vm>
+ <d71fee00-0c21-c5e8-dbc6-00b7ace11c5a@suse.de> <YK9Y64U0wjU5K753@work-vm>
+ <16a5085f-868b-7e1a-f6de-1dab16103a66@redhat.com> <YK9jOdCPUGQF4t0D@work-vm>
+From:   Claudio Fontana <cfontana@suse.de>
+Message-ID: <855c9f5c-a8e8-82b4-d71e-db9c966ddcc3@suse.de>
+Date:   Thu, 27 May 2021 11:48:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20210517200758.22593-9-imbrenda@linux.ibm.com>
+In-Reply-To: <YK9jOdCPUGQF4t0D@work-vm>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3b2yRhmgVRyYSSgT8CZvd0Q1SEc1NxPy
-X-Proofpoint-ORIG-GUID: XBD8x2Gfd42l7Go-6kSG0Sf4bM-YOYxU
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-05-27_04:2021-05-26,2021-05-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
- malwarescore=0 lowpriorityscore=0 priorityscore=1501 spamscore=0
- clxscore=1015 mlxlogscore=999 impostorscore=0 phishscore=0 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2105270063
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/17/21 10:07 PM, Claudio Imbrenda wrote:
-> Until now, destroying a protected guest was an entirely synchronous
-> operation that could potentially take a very long time, depending on
-> the size of the guest, due to the time needed to clean up the address
-> space from protected pages.
+On 5/27/21 11:15 AM, Dr. David Alan Gilbert wrote:
+> * Philippe Mathieu-Daudé (philmd@redhat.com) wrote:
+>> On 5/27/21 10:31 AM, Dr. David Alan Gilbert wrote:
+>>> * Claudio Fontana (cfontana@suse.de) wrote:
+>>>> On 5/26/21 9:30 PM, Dr. David Alan Gilbert wrote:
+>>>>> * Michael S. Tsirkin (mst@redhat.com) wrote:
+>>>>>> On Fri, May 21, 2021 at 11:17:19AM +0200, Siddharth Chandrasekaran wrote:
+>>>>>>> After a rebase to QEMU master, I am having trouble booting windows VMs.
+>>>>>>> Git bisect indicates commit f5cc5a5c1686 ("i386: split cpu accelerators
+>>>>>>> from cpu.c, using AccelCPUClass") to have introduced the issue. I spent
+>>>>>>> some time looking at into it yesterday without much luck.
+>>>>>>>
+>>>>>>> Steps to reproduce:
+>>>>>>>
+>>>>>>>     $ ./configure --enable-kvm --disable-xen --target-list=x86_64-softmmu --enable-debug
+>>>>>>>     $ make -j `nproc`
+>>>>>>>     $ ./build/x86_64-softmmu/qemu-system-x86_64 \
+>>>>>>>         -cpu host,hv_synic,hv_vpindex,hv_time,hv_runtime,hv_stimer,hv_crash \
+>>>>>>>         -enable-kvm \
+>>>>>>>         -name test,debug-threads=on \
+>>>>>>>         -smp 1,threads=1,cores=1,sockets=1 \
+>>>>>>>         -m 4G \
+>>>>>>>         -net nic -net user \
+>>>>>>>         -boot d,menu=on \
+>>>>>>>         -usbdevice tablet \
+>>>>>>>         -vnc :3 \
+>>>>>>>         -machine q35,smm=on \
+>>>>>>>         -drive if=pflash,format=raw,readonly=on,unit=0,file="../OVMF_CODE.secboot.fd" \
+>>>>>>>         -drive if=pflash,format=raw,unit=1,file="../OVMF_VARS.secboot.fd" \
+>>>>>>>         -global ICH9-LPC.disable_s3=1 \
+>>>>>>>         -global driver=cfi.pflash01,property=secure,value=on \
+>>>>>>>         -cdrom "../Windows_Server_2016_14393.ISO" \
+>>>>>>>         -drive file="../win_server_2016.qcow2",format=qcow2,if=none,id=rootfs_drive \
+>>>>>>>         -device ahci,id=ahci \
+>>>>>>>         -device ide-hd,drive=rootfs_drive,bus=ahci.0
+>>>>>>>
+>>>>>>> If the issue is not obvious, I'd like some pointers on how to go about
+>>>>>>> fixing this issue.
+>>>>>>>
+>>>>>>> ~ Sid.
+>>>>>>>
+>>>>>>
+>>>>>> At a guess this commit inadvertently changed something in the CPU ID.
+>>>>>> I'd start by using a linux guest to dump cpuid before and after the
+>>>>>> change.
+>>>>>
+>>>>> I've not had a chance to do that yet, however I did just end up with a
+>>>>> bisect of a linux guest failure bisecting to the same patch:
+>>>>>
+>>>>> [dgilbert@dgilbert-t580 qemu]$ git bisect bad
+>>>>> f5cc5a5c168674f84bf061cdb307c2d25fba5448 is the first bad commit
+>>>>> commit f5cc5a5c168674f84bf061cdb307c2d25fba5448
+>>>>> Author: Claudio Fontana <cfontana@suse.de>
+>>>>> Date:   Mon Mar 22 14:27:40 2021 +0100
+>>>>>
+>>>>>     i386: split cpu accelerators from cpu.c, using AccelCPUClass
+>>>>>     
+>>>>>     i386 is the first user of AccelCPUClass, allowing to split
+>>>>>     cpu.c into:
+>>>>>     
+>>>>>     cpu.c            cpuid and common x86 cpu functionality
+>>>>>     host-cpu.c       host x86 cpu functions and "host" cpu type
+>>>>>     kvm/kvm-cpu.c    KVM x86 AccelCPUClass
+>>>>>     hvf/hvf-cpu.c    HVF x86 AccelCPUClass
+>>>>>     tcg/tcg-cpu.c    TCG x86 AccelCPUClass
+>>
+>> Well this is a big commit... I'm not custom to x86 target, and am
+>> having hard time following the cpu host/max change.
+>>
+>> Is it working when you use '-cpu max,...' instead of '-cpu host,'?
 > 
-> This patch implements a lazy destroy mechanism, that allows a protected
-> guest to reboot significantly faster than previously.
+> No; and in fact the cpuid's are almost entirely different with and
+> without this patch! (both with -cpu host).  It looks like with this
+> patch we're getting the cpuid for the TCG cpuid rather than the host:
 > 
-> This is achieved by clearing the pages of the old guest in background.
-> In case of reboot, the new guest will be able to run in the same
-> address space almost immediately.
+> Prior to this patch:
+> :/# cat /proc/cpuinfo
+> processor       : 0
+> vendor_id       : GenuineIntel
+> cpu family      : 6
+> model           : 142
+> model name      : Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz
+> stepping        : 10
+> microcode       : 0xe0
+> cpu MHz         : 2111.998
+> cache size      : 16384 KB
+> physical id     : 0
+> siblings        : 1
+> core id         : 0
+> cpu cores       : 1
+> apicid          : 0
+> initial apicid  : 0
+> fpu             : yes
+> fpu_exception   : yes
+> cpuid level     : 22
+> wp              : yes
+> flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss syscall nx pdpe1gb rdtscp lm constant
+> _tsc arch_perfmon rep_good nopl xtopology cpuid tsc_known_freq pni pclmulqdq vmx ssse3 fma cx16 pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_tim
+> er aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch cpuid_fault invpcid_single pti ssbd ibrs ibpb stibp tpr_shadow vnmi flexpriority ept vpid
+> ept_ad fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt xsaveopt xsavec xgetbv1 xsaves arat umip md_clear arch_ca
+> pabilities
+> vmx flags       : vnmi preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offset vtpr mtf vapic ept vpid unrestricted_guest shadow_vmcs pml
+> bugs            : cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs taa srbds
+> bogomips        : 4223.99
+> clflush size    : 64
+> cache_alignment : 64
+> address sizes   : 39 bits physical, 48 bits virtual
+> power management:
 > 
-> The old protected guest is then only destroyed when all of its memory has
-> been destroyed or otherwise made non protected.
-
-LGTM some comments below
-
+> With this patch:
+> processor       : 0
+> vendor_id       : AuthenticAMD
+> cpu family      : 6
+> model           : 6
+> model name      : QEMU TCG CPU version 2.5+
+> stepping        : 3
+> cpu MHz         : 2111.998
+> cache size      : 512 KB
+> physical id     : 0
+> siblings        : 1
+> core id         : 0
+> cpu cores       : 1
+> apicid          : 0
+> initial apicid  : 0
+> fpu             : yes
+> fpu_exception   : yes
+> cpuid level     : 13
+> wp              : yes
+> flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss syscall nx pdpe1gb rdtscp lm nopl cpu
+> id tsc_known_freq pni pclmulqdq vmx ssse3 fma cx16 pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_
+> lm abm 3dnowprefetch invpcid_single ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt
+>  xsaveopt xsavec xgetbv1 xsaves arat umip md_clear arch_capabilities
+> bugs            : fxsave_leak sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass taa
+> bogomips        : 4223.99
+> TLB size        : 1024 4K pages
+> clflush size    : 64
+> cache_alignment : 64
+> address sizes   : 40 bits physical, 48 bits virtual
+> power management:
 > 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->  arch/s390/kvm/kvm-s390.c |   6 +-
->  arch/s390/kvm/kvm-s390.h |   2 +-
->  arch/s390/kvm/pv.c       | 118 ++++++++++++++++++++++++++++++++++++++-
->  3 files changed, 120 insertions(+), 6 deletions(-)
+> cpuid.f5cc5a5c16
 > 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 2f09e9d7dc95..db25aa1fb6a6 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2248,7 +2248,7 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->  
->  		r = kvm_s390_cpus_to_pv(kvm, &cmd->rc, &cmd->rrc);
->  		if (r)
-> -			kvm_s390_pv_deinit_vm(kvm, &dummy, &dummy);
-> +			kvm_s390_pv_deinit_vm_deferred(kvm, &dummy, &dummy);
->  
->  		/* we need to block service interrupts from now on */
->  		set_bit(IRQ_PEND_EXT_SERVICE, &kvm->arch.float_int.masked_irqs);
-> @@ -2267,7 +2267,7 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->  		 */
->  		if (r)
->  			break;
-> -		r = kvm_s390_pv_deinit_vm(kvm, &cmd->rc, &cmd->rrc);
-> +		r = kvm_s390_pv_deinit_vm_deferred(kvm, &cmd->rc, &cmd->rrc);
->  
->  		/* no need to block service interrupts any more */
->  		clear_bit(IRQ_PEND_EXT_SERVICE, &kvm->arch.float_int.masked_irqs);
-> @@ -2796,7 +2796,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
->  	 * complaining we do not use kvm_s390_pv_is_protected.
->  	 */
->  	if (kvm_s390_pv_get_handle(kvm))
-> -		kvm_s390_pv_deinit_vm(kvm, &rc, &rrc);
-> +		kvm_s390_pv_deinit_vm_deferred(kvm, &rc, &rrc);
->  	debug_unregister(kvm->arch.dbf);
->  	free_page((unsigned long)kvm->arch.sie_page2);
->  	if (!kvm_is_ucontrol(kvm))
-> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-> index 79dcd647b378..b3c0796a3cc1 100644
-> --- a/arch/s390/kvm/kvm-s390.h
-> +++ b/arch/s390/kvm/kvm-s390.h
-> @@ -211,7 +211,7 @@ static inline int kvm_s390_user_cpu_state_ctrl(struct kvm *kvm)
->  /* implemented in pv.c */
->  int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc);
->  int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc);
-> -int kvm_s390_pv_deinit_vm(struct kvm *kvm, u16 *rc, u16 *rrc);
-> +int kvm_s390_pv_deinit_vm_deferred(struct kvm *kvm, u16 *rc, u16 *rrc);
->  int kvm_s390_pv_init_vm(struct kvm *kvm, u16 *rc, u16 *rrc);
->  int kvm_s390_pv_set_sec_parms(struct kvm *kvm, void *hdr, u64 length, u16 *rc,
->  			      u16 *rrc);
-> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-> index 59039b8a7be7..9a3547966e18 100644
-> --- a/arch/s390/kvm/pv.c
-> +++ b/arch/s390/kvm/pv.c
-> @@ -14,8 +14,17 @@
->  #include <asm/mman.h>
->  #include <linux/pagewalk.h>
->  #include <linux/sched/mm.h>
-> +#include <linux/kthread.h>
->  #include "kvm-s390.h"
->  
-> +struct deferred_priv {
-> +	struct mm_struct *mm;
-> +	unsigned long old_table;
-> +	u64 handle;
-> +	void *virt;
-> +	unsigned long real;
-> +};
-> +
->  int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc)
->  {
->  	int cc = 0;
-> @@ -202,7 +211,7 @@ static int kvm_s390_pv_replace_asce(struct kvm *kvm)
->  }
->  
->  /* this should not fail, but if it does, we must not free the donated memory */
-> -int kvm_s390_pv_deinit_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
-> +static int kvm_s390_pv_deinit_vm_now(struct kvm *kvm, u16 *rc, u16 *rrc)
->  {
->  	int cc;
->  
-> @@ -230,6 +239,111 @@ int kvm_s390_pv_deinit_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
->  	return cc ? -EIO : 0;
->  }
->  
-> +static int kvm_s390_pv_destroy_vm_thread(void *priv)
-> +{
-> +	struct deferred_priv *p = priv;
-> +	u16 rc, rrc;
-> +	int r = 1;
-> +
-> +	/* Exit early if we end up being the only users of the mm */
-> +	s390_uv_destroy_range(p->mm, 1, 0, TASK_SIZE_MAX);
-> +	mmput(p->mm);
-
-Where do we exit early?
-
-> +
-> +	r = uv_cmd_nodata(p->handle, UVC_CMD_DESTROY_SEC_CONF, &rc, &rrc);
-> +	WARN_ONCE(r, "protvirt destroy vm failed rc %x rrc %x", rc, rrc);
-> +	if (r)
-> +		return r;
-> +	atomic_dec(&p->mm->context.is_protected);
-> +
-> +	/*
-> +	 * Intentional leak in case the destroy secure VM call fails. The
-> +	 * call should never fail if the hardware is not broken.
-> +	 */
-> +	free_pages(p->real, get_order(uv_info.guest_base_stor_len));
-> +	free_pages(p->old_table, CRST_ALLOC_ORDER);
-> +	vfree(p->virt);
-> +	kfree(p);
-> +	return 0;
-> +}
-> +
-> +static int deferred_destroy(struct kvm *kvm, struct deferred_priv *priv, u16 *rc, u16 *rrc)
-> +{
-> +	struct task_struct *t;
-> +
-> +	priv->virt = kvm->arch.pv.stor_var;
-> +	priv->real = kvm->arch.pv.stor_base;
-
-Now I know what the struct members actually mean...
-Is there a reson you didn't like config_stor_* as a name or something
-similar?
-
-> +	priv->handle = kvm_s390_pv_get_handle(kvm);
-> +	priv->old_table = (unsigned long)kvm->arch.gmap->table;
-> +	WRITE_ONCE(kvm->arch.gmap->guest_handle, 0);
-> +
-> +	if (kvm_s390_pv_replace_asce(kvm))
-> +		goto fail;
-> +
-> +	t = kthread_create(kvm_s390_pv_destroy_vm_thread, priv,
-> +			   "kvm_s390_pv_destroy_vm_thread");
-> +	if (IS_ERR_OR_NULL(t))
-> +		goto fail;
-> +
-> +	memset(&kvm->arch.pv, 0, sizeof(kvm->arch.pv));
-> +	KVM_UV_EVENT(kvm, 3, "PROTVIRT DESTROY VM DEFERRED %d", t->pid);
-> +	wake_up_process(t);
-> +	/*
-> +	 * no actual UVC is performed at this point, just return a successful
-> +	 * rc value to make userspace happy, and an arbitrary rrc
-> +	 */
-> +	*rc = 1;
-> +	*rrc = 42;
-> +
-> +	return 0;
-> +
-> +fail:
-> +	kfree(priv);
-> +	return kvm_s390_pv_deinit_vm_now(kvm, rc, rrc);
-> +}
-> +
-> +/*  Clear the first 2GB of guest memory, to avoid prefix issues after reboot */
-> +static void kvm_s390_clear_2g(struct kvm *kvm)
-> +{
-> +	struct kvm_memory_slot *slot;
-> +	struct kvm_memslots *slots;
-> +	unsigned long lim;
-> +	int idx;
-> +
-> +	idx = srcu_read_lock(&kvm->srcu);
-> +
-> +	slots = kvm_memslots(kvm);
-> +	kvm_for_each_memslot(slot, slots) {
-> +		if (slot->base_gfn >= (SZ_2G / PAGE_SIZE))
-> +			continue;
-> +		if (slot->base_gfn + slot->npages > (SZ_2G / PAGE_SIZE))
-> +			lim = slot->userspace_addr + SZ_2G - slot->base_gfn * PAGE_SIZE;
-> +		else
-> +			lim = slot->userspace_addr + slot->npages * PAGE_SIZE;
-> +		s390_uv_destroy_range(kvm->mm, 1, slot->userspace_addr, lim);
-> +	}
-> +
-> +	srcu_read_unlock(&kvm->srcu, idx);
-> +}
-> +
-> +int kvm_s390_pv_deinit_vm_deferred(struct kvm *kvm, u16 *rc, u16 *rrc)
-> +{
-> +	struct deferred_priv *priv;
-> +
-> +	priv = kmalloc(sizeof(*priv), GFP_KERNEL | __GFP_ZERO);
-> +	if (!priv)
-> +		return kvm_s390_pv_deinit_vm_now(kvm, rc, rrc);
-> +
-> +	if (mmget_not_zero(kvm->mm)) {
-> +		kvm_s390_clear_2g(kvm);
-> +	} else {
-> +		/* No deferred work to do */
-> +		kfree(priv);
-> +		return kvm_s390_pv_deinit_vm_now(kvm, rc, rrc);
-> +	}
-> +	priv->mm = kvm->mm;
-> +	return deferred_destroy(kvm, priv, rc, rrc);
-> +}
-> +
->  int kvm_s390_pv_init_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
->  {
->  	struct uv_cb_cgc uvcb = {
-> @@ -263,7 +377,7 @@ int kvm_s390_pv_init_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
->  	atomic_inc(&kvm->mm->context.is_protected);
->  	if (cc) {
->  		if (uvcb.header.rc & UVC_RC_NEED_DESTROY) {
-> -			kvm_s390_pv_deinit_vm(kvm, &dummy, &dummy);
-> +			kvm_s390_pv_deinit_vm_now(kvm, &dummy, &dummy);
->  		} else {
->  			atomic_dec(&kvm->mm->context.is_protected);
->  			kvm_s390_pv_dealloc_vm(kvm);
+> CPU 0:
+>    0x00000000 0x00: eax=0x0000000d ebx=0x68747541 ecx=0x444d4163 edx=0x69746e65
+>    0x00000001 0x00: eax=0x00000663 ebx=0x00000800 ecx=0xfffab223 edx=0x0f8bfbff
+>    0x00000002 0x00: eax=0x00000001 ebx=0x00000000 ecx=0x0000004d edx=0x002c307d
+>    0x00000003 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x00000004 0x00: eax=0x00000121 ebx=0x01c0003f ecx=0x0000003f edx=0x00000001
+>    0x00000004 0x01: eax=0x00000122 ebx=0x01c0003f ecx=0x0000003f edx=0x00000001
+>    0x00000004 0x02: eax=0x00000143 ebx=0x03c0003f ecx=0x00000fff edx=0x00000001
+>    0x00000004 0x03: eax=0x00000163 ebx=0x03c0003f ecx=0x00003fff edx=0x00000006
+>    0x00000005 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000003 edx=0x00000000
+>    0x00000006 0x00: eax=0x00000004 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x00000007 0x00: eax=0x00000000 ebx=0x009c4fbb ecx=0x00000004 edx=0xac000400
+>    0x00000008 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x00000009 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x0000000a 0x00: eax=0x07300402 ebx=0x00000000 ecx=0x00000000 edx=0x00008603
+>    0x0000000b 0x00: eax=0x00000000 ebx=0x00000001 ecx=0x00000100 edx=0x00000000
+>    0x0000000b 0x01: eax=0x00000000 ebx=0x00000001 ecx=0x00000201 edx=0x00000000
+>    0x0000000c 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x0000000d 0x00: eax=0x0000001f ebx=0x00000440 ecx=0x00000440 edx=0x00000000
+>    0x0000000d 0x01: eax=0x0000000f ebx=0x000003c0 ecx=0x00000000 edx=0x00000000
+>    0x0000000d 0x02: eax=0x00000100 ebx=0x00000240 ecx=0x00000000 edx=0x00000000
+>    0x0000000d 0x03: eax=0x00000040 ebx=0x000003c0 ecx=0x00000000 edx=0x00000000
+>    0x0000000d 0x04: eax=0x00000040 ebx=0x00000400 ecx=0x00000000 edx=0x00000000
+>    0x40000000 0x00: eax=0x40000001 ebx=0x4b4d564b ecx=0x564b4d56 edx=0x0000004d
+>    0x40000001 0x00: eax=0x01007afb ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x80000000 0x00: eax=0x80000008 ebx=0x68747541 ecx=0x444d4163 edx=0x69746e65
+>    0x80000001 0x00: eax=0x00000663 ebx=0x00000000 ecx=0x00000121 edx=0x2d93fbff
+>    0x80000002 0x00: eax=0x554d4551 ebx=0x47435420 ecx=0x55504320 edx=0x72657620
+>    0x80000003 0x00: eax=0x6e6f6973 ebx=0x352e3220 ecx=0x0000002b edx=0x00000000
+>    0x80000004 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x80000005 0x00: eax=0x01ff01ff ebx=0x01ff01ff ecx=0x40020140 edx=0x40020140
+>    0x80000006 0x00: eax=0x00000000 ebx=0x42004200 ecx=0x02008140 edx=0x00808140
+>    0x80000007 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x80000008 0x00: eax=0x00003028 ebx=0x0100d000 ecx=0x00000000 edx=0x00000000
+>    0x80860000 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0xc0000000 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+> 
+> 
+> cpuid.0ac2b19743
+> 
+> CPU 0:
+>    0x00000000 0x00: eax=0x00000016 ebx=0x756e6547 ecx=0x6c65746e edx=0x49656e69
+>    0x00000001 0x00: eax=0x000806ea ebx=0x00000800 ecx=0xfffab223 edx=0x0f8bfbff
+>    0x00000002 0x00: eax=0x00000001 ebx=0x00000000 ecx=0x0000004d edx=0x002c307d
+>    0x00000003 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x00000004 0x00: eax=0x00000121 ebx=0x01c0003f ecx=0x0000003f edx=0x00000001
+>    0x00000004 0x01: eax=0x00000122 ebx=0x01c0003f ecx=0x0000003f edx=0x00000001
+>    0x00000004 0x02: eax=0x00000143 ebx=0x03c0003f ecx=0x00000fff edx=0x00000001
+>    0x00000004 0x03: eax=0x00000163 ebx=0x03c0003f ecx=0x00003fff edx=0x00000006
+>    0x00000005 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000003 edx=0x00000000
+>    0x00000006 0x00: eax=0x00000004 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x00000007 0x00: eax=0x00000000 ebx=0x009c4fbb ecx=0x00000004 edx=0xac000400
+>    0x00000008 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x00000009 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x0000000a 0x00: eax=0x07300402 ebx=0x00000000 ecx=0x00000000 edx=0x00008603
+>    0x0000000b 0x00: eax=0x00000000 ebx=0x00000001 ecx=0x00000100 edx=0x00000000
+>    0x0000000b 0x01: eax=0x00000000 ebx=0x00000001 ecx=0x00000201 edx=0x00000000
+>    0x0000000c 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x0000000d 0x00: eax=0x0000001f ebx=0x00000440 ecx=0x00000440 edx=0x00000000
+>    0x0000000d 0x01: eax=0x0000000f ebx=0x000003c0 ecx=0x00000000 edx=0x00000000
+>    0x0000000d 0x02: eax=0x00000100 ebx=0x00000240 ecx=0x00000000 edx=0x00000000
+>    0x0000000d 0x03: eax=0x00000040 ebx=0x000003c0 ecx=0x00000000 edx=0x00000000
+>    0x0000000d 0x04: eax=0x00000040 ebx=0x00000400 ecx=0x00000000 edx=0x00000000
+>    0x0000000e 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x0000000f 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x00000010 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x00000011 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x00000012 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x00000013 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x00000014 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x00000015 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x00000016 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x40000000 0x00: eax=0x40000001 ebx=0x4b4d564b ecx=0x564b4d56 edx=0x0000004d
+>    0x40000001 0x00: eax=0x01007afb ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x80000000 0x00: eax=0x80000008 ebx=0x756e6547 ecx=0x6c65746e edx=0x49656e69
+>    0x80000001 0x00: eax=0x000806ea ebx=0x00000000 ecx=0x00000121 edx=0x2c100800
+>    0x80000002 0x00: eax=0x65746e49 ebx=0x2952286c ecx=0x726f4320 edx=0x4d542865
+>    0x80000003 0x00: eax=0x37692029 ebx=0x3536382d ecx=0x43205530 edx=0x40205550
+>    0x80000004 0x00: eax=0x392e3120 ebx=0x7a484730 ecx=0x00000000 edx=0x00000000
+>    0x80000005 0x00: eax=0x01ff01ff ebx=0x01ff01ff ecx=0x40020140 edx=0x40020140
+>    0x80000006 0x00: eax=0x00000000 ebx=0x42004200 ecx=0x02008140 edx=0x00808140
+>    0x80000007 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0x80000008 0x00: eax=0x00003027 ebx=0x0100d000 ecx=0x00000000 edx=0x00000000
+>    0x80860000 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
+>    0xc0000000 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
 > 
 
+I started looking at it.
+
+Claudio
