@@ -2,205 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59AEF3929BC
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 10:44:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A0DA392A2B
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 11:01:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235499AbhE0Ipi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 04:45:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42197 "EHLO
+        id S235588AbhE0JDP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 05:03:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40718 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235560AbhE0Ipa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 May 2021 04:45:30 -0400
+        by vger.kernel.org with ESMTP id S235392AbhE0JDP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 27 May 2021 05:03:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622105037;
+        s=mimecast20190719; t=1622106102;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Q4kOVJ8GB+3GLW+q/BipT5oGozNfefpPrW2ucSt2yL8=;
-        b=F0CUrN+5SQzrbCk2O4jpJrINsKBJi4ZRMN472MQqS8uN6ZdwgQmWzXAkAsFoFGpmLVitGc
-        5jGRon7XQE6PH6C4N8Td8tw5RNjpazB4aZ+5rouwPNSoE7V4qvmYkymEuHaJYj5srLmomP
-        91bO8Sx4fIlrXrht6y+FtxHman5KimE=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-34L5-yX8MQyAaNU41OpviQ-1; Thu, 27 May 2021 04:43:50 -0400
-X-MC-Unique: 34L5-yX8MQyAaNU41OpviQ-1
-Received: by mail-pj1-f72.google.com with SMTP id w1-20020a17090a0281b0290156f7df20a0so21675pja.8
-        for <kvm@vger.kernel.org>; Thu, 27 May 2021 01:43:49 -0700 (PDT)
+        bh=5CiivE3Vnn0R5qTnBTFv6hBLIZ7Lvp+YBUi/WevVtdA=;
+        b=dAvlHuPeu3ejahEiI5a7OQvfjtiJCoLJ+rOSXZQb9oNgUhImWarcrmVpQ7CAyz0FoBVppg
+        0bOqp2eaCDmnIABZUmGwiHC8EQTPwiXNgKBfoQCo4wP/muUn+W5UAQPDVAaFw28M65jpMM
+        IuHoe20rV8XnYFD47nNkzMRQnad2yC8=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-71-oOq3_iOVNo-yhwi26e4UPA-1; Thu, 27 May 2021 05:01:39 -0400
+X-MC-Unique: oOq3_iOVNo-yhwi26e4UPA-1
+Received: by mail-wr1-f72.google.com with SMTP id u5-20020adf9e050000b029010df603f280so1473343wre.18
+        for <kvm@vger.kernel.org>; Thu, 27 May 2021 02:01:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=Q4kOVJ8GB+3GLW+q/BipT5oGozNfefpPrW2ucSt2yL8=;
-        b=lqFJkpvmgzgm5tQyrycpWb6EMvlykNUMp9ZEQt9sSZUxkCGbah3FNF9+Jrzn7OAsb5
-         5I4xJhglhehBZb6lNWC+GRpIvtXfVpExu/0QY6J9Y4ZbU2pPSLL/aNVEKGPxkZLjkAAs
-         kan7AdO3zWUM/9Pi74YQ82JDhX+sfX0Iuw155+DJq9ASshPbwfWn0LDlfrfIftgyw5Zo
-         RbKtLZ6cCneOol7sAnkktfrhdNC9s5ppzZ9yEG5UKrlzmyH0tPEAqOV2WQ0UND3S9iQa
-         uiU3erV1YAjrsfNTIK5DcBoRF9tOmnwh6rEBGhsOa3QJiO/id8wmB1rU+ShiCphM+yPB
-         ndww==
-X-Gm-Message-State: AOAM531AMSxeJfqHZUoyJqc3mnWH694ugMb7W5rlSuGXVjjY8ueyQ4hh
-        4wuUiuTMm72wotrJX8rf+rsH/m8KZluEzF3+3s3ejmX4fT5D0IyLjoKlthD1+xqIWKocbAHImVx
-        HXqVVVT3Opbfz
-X-Received: by 2002:a17:902:aa42:b029:ee:f55a:b2c1 with SMTP id c2-20020a170902aa42b02900eef55ab2c1mr2283378plr.15.1622105028986;
-        Thu, 27 May 2021 01:43:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxSObctLvNp4FosLHglZe975VrI39ki5xw8bXJ8rCFLiK5AHUwDmp+dxI3a8RKS9e1DfhzunA==
-X-Received: by 2002:a17:902:aa42:b029:ee:f55a:b2c1 with SMTP id c2-20020a170902aa42b02900eef55ab2c1mr2283358plr.15.1622105028736;
-        Thu, 27 May 2021 01:43:48 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id e29sm1364517pfm.110.2021.05.27.01.43.41
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5CiivE3Vnn0R5qTnBTFv6hBLIZ7Lvp+YBUi/WevVtdA=;
+        b=QLQGZi8ncdwK4nWwD76LS5yIxwGuuyq0kT1VWIPjvbNlLoJuZ2P3m1NIgkqlyc5eh6
+         lXdPUzKDjzKsIXA87Jhg78goc7+52DxMVIsPJrIYW4TKLk+b3tc5QxtRkoPiZLCTBA+H
+         Sufp080WBuO3Moeu5Y8BvSg8IY++9GKLcQ5Jxv+mpoxf8SirrBuJqGzAFZeaCU+b8Shy
+         OArFFgZCmuUxtx/np/X0FoUNxeHmbtM4EDGWL2UPV4SA6RYN6cYpt5sSwjNXM6YIdQNE
+         dSudCRT6OB143bhvkY1VNzarXdKng5Nu1upjakrEjVhhwfSW46i6cgdtnkOhqRCAD2du
+         KBQQ==
+X-Gm-Message-State: AOAM532MffKT6BsSVWq2MfIFs5WzdY9uHn43P9R4qh2sGxSPqgVAyUzC
+        S2XE+aXhrtlWhuuzc1pkNmcrJp44o/M0DguNNxO5ecynNthKLxKjtXhRm/WPZVJfq8GGML5APPc
+        3Plvg/vdZYP0N
+X-Received: by 2002:a5d:618f:: with SMTP id j15mr2159471wru.273.1622106098655;
+        Thu, 27 May 2021 02:01:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw6t06kgGMpsbHr3NQEiAmofF4RM5HNwsCcMMtfwPaaXZQqEnPOl+QpNlz9weesFO43T00x5A==
+X-Received: by 2002:a5d:618f:: with SMTP id j15mr2159453wru.273.1622106098492;
+        Thu, 27 May 2021 02:01:38 -0700 (PDT)
+Received: from [192.168.1.36] (235.red-83-57-168.dynamicip.rima-tde.net. [83.57.168.235])
+        by smtp.gmail.com with ESMTPSA id y22sm11306208wma.36.2021.05.27.02.01.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 May 2021 01:43:48 -0700 (PDT)
-Subject: Re: [PATCH v7 11/12] vduse: Introduce VDUSE - vDPA Device in
- Userspace
-From:   Jason Wang <jasowang@redhat.com>
-To:     Yongji Xie <xieyongji@bytedance.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=c3=a4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-References: <20210517095513.850-1-xieyongji@bytedance.com>
- <20210517095513.850-12-xieyongji@bytedance.com>
- <3740c7eb-e457-07f3-5048-917c8606275d@redhat.com>
- <CACycT3uAqa6azso_8MGreh+quj-JXO1piuGnrV8k2kTfc34N2g@mail.gmail.com>
- <5a68bb7c-fd05-ce02-cd61-8a601055c604@redhat.com>
- <CACycT3ve7YvKF+F+AnTQoJZMPua+jDvGMs_ox8GQe_=SGdeCMA@mail.gmail.com>
- <ee00efca-b26d-c1be-68d2-f9e34a735515@redhat.com>
- <CACycT3ufok97cKpk47NjUBTc0QAyfauFUyuFvhWKmuqCGJ7zZw@mail.gmail.com>
- <00ded99f-91b6-ba92-5d92-2366b163f129@redhat.com>
-Message-ID: <3cc7407d-9637-227e-9afa-402b6894d8ac@redhat.com>
-Date:   Thu, 27 May 2021 16:43:40 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.2
+        Thu, 27 May 2021 02:01:37 -0700 (PDT)
+Subject: Re: Windows fails to boot after rebase to QEMU master
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>
+Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Claudio Fontana <cfontana@suse.de>
+References: <20210521091451.GA6016@u366d62d47e3651.ant.amazon.com>
+ <20210524055322-mutt-send-email-mst@kernel.org> <YK6hunkEnft6VJHz@work-vm>
+ <d71fee00-0c21-c5e8-dbc6-00b7ace11c5a@suse.de> <YK9Y64U0wjU5K753@work-vm>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <16a5085f-868b-7e1a-f6de-1dab16103a66@redhat.com>
+Date:   Thu, 27 May 2021 11:01:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <00ded99f-91b6-ba92-5d92-2366b163f129@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <YK9Y64U0wjU5K753@work-vm>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-在 2021/5/27 下午4:41, Jason Wang 写道:
->
-> 在 2021/5/27 下午3:34, Yongji Xie 写道:
->> On Thu, May 27, 2021 at 1:40 PM Jason Wang <jasowang@redhat.com> wrote:
->>>
->>> 在 2021/5/27 下午1:08, Yongji Xie 写道:
->>>> On Thu, May 27, 2021 at 1:00 PM Jason Wang <jasowang@redhat.com> 
->>>> wrote:
->>>>> 在 2021/5/27 下午12:57, Yongji Xie 写道:
->>>>>> On Thu, May 27, 2021 at 12:13 PM Jason Wang <jasowang@redhat.com> 
->>>>>> wrote:
->>>>>>> 在 2021/5/17 下午5:55, Xie Yongji 写道:
->>>>>>>> +
->>>>>>>> +static int vduse_dev_msg_sync(struct vduse_dev *dev,
->>>>>>>> +                           struct vduse_dev_msg *msg)
->>>>>>>> +{
->>>>>>>> +     init_waitqueue_head(&msg->waitq);
->>>>>>>> +     spin_lock(&dev->msg_lock);
->>>>>>>> +     vduse_enqueue_msg(&dev->send_list, msg);
->>>>>>>> +     wake_up(&dev->waitq);
->>>>>>>> +     spin_unlock(&dev->msg_lock);
->>>>>>>> +     wait_event_killable(msg->waitq, msg->completed);
->>>>>>> What happens if the userspace(malicous) doesn't give a response 
->>>>>>> forever?
->>>>>>>
->>>>>>> It looks like a DOS. If yes, we need to consider a way to fix that.
->>>>>>>
->>>>>> How about using wait_event_killable_timeout() instead?
->>>>> Probably, and then we need choose a suitable timeout and more 
->>>>> important,
->>>>> need to report the failure to virtio.
+On 5/27/21 10:31 AM, Dr. David Alan Gilbert wrote:
+> * Claudio Fontana (cfontana@suse.de) wrote:
+>> On 5/26/21 9:30 PM, Dr. David Alan Gilbert wrote:
+>>> * Michael S. Tsirkin (mst@redhat.com) wrote:
+>>>> On Fri, May 21, 2021 at 11:17:19AM +0200, Siddharth Chandrasekaran wrote:
+>>>>> After a rebase to QEMU master, I am having trouble booting windows VMs.
+>>>>> Git bisect indicates commit f5cc5a5c1686 ("i386: split cpu accelerators
+>>>>> from cpu.c, using AccelCPUClass") to have introduced the issue. I spent
+>>>>> some time looking at into it yesterday without much luck.
 >>>>>
->>>> Makes sense to me. But it looks like some
->>>> vdpa_config_ops/virtio_config_ops such as set_status() didn't have a
->>>> return value.  Now I add a WARN_ON() for the failure. Do you mean we
->>>> need to add some change for virtio core to handle the failure?
+>>>>> Steps to reproduce:
+>>>>>
+>>>>>     $ ./configure --enable-kvm --disable-xen --target-list=x86_64-softmmu --enable-debug
+>>>>>     $ make -j `nproc`
+>>>>>     $ ./build/x86_64-softmmu/qemu-system-x86_64 \
+>>>>>         -cpu host,hv_synic,hv_vpindex,hv_time,hv_runtime,hv_stimer,hv_crash \
+>>>>>         -enable-kvm \
+>>>>>         -name test,debug-threads=on \
+>>>>>         -smp 1,threads=1,cores=1,sockets=1 \
+>>>>>         -m 4G \
+>>>>>         -net nic -net user \
+>>>>>         -boot d,menu=on \
+>>>>>         -usbdevice tablet \
+>>>>>         -vnc :3 \
+>>>>>         -machine q35,smm=on \
+>>>>>         -drive if=pflash,format=raw,readonly=on,unit=0,file="../OVMF_CODE.secboot.fd" \
+>>>>>         -drive if=pflash,format=raw,unit=1,file="../OVMF_VARS.secboot.fd" \
+>>>>>         -global ICH9-LPC.disable_s3=1 \
+>>>>>         -global driver=cfi.pflash01,property=secure,value=on \
+>>>>>         -cdrom "../Windows_Server_2016_14393.ISO" \
+>>>>>         -drive file="../win_server_2016.qcow2",format=qcow2,if=none,id=rootfs_drive \
+>>>>>         -device ahci,id=ahci \
+>>>>>         -device ide-hd,drive=rootfs_drive,bus=ahci.0
+>>>>>
+>>>>> If the issue is not obvious, I'd like some pointers on how to go about
+>>>>> fixing this issue.
+>>>>>
+>>>>> ~ Sid.
+>>>>>
+>>>>
+>>>> At a guess this commit inadvertently changed something in the CPU ID.
+>>>> I'd start by using a linux guest to dump cpuid before and after the
+>>>> change.
 >>>
->>> Maybe, but I'm not sure how hard we can do that.
+>>> I've not had a chance to do that yet, however I did just end up with a
+>>> bisect of a linux guest failure bisecting to the same patch:
 >>>
->> We need to change all virtio device drivers in this way.
->
->
-> Probably.
->
->
->>
->>> We had NEEDS_RESET but it looks we don't implement it.
+>>> [dgilbert@dgilbert-t580 qemu]$ git bisect bad
+>>> f5cc5a5c168674f84bf061cdb307c2d25fba5448 is the first bad commit
+>>> commit f5cc5a5c168674f84bf061cdb307c2d25fba5448
+>>> Author: Claudio Fontana <cfontana@suse.de>
+>>> Date:   Mon Mar 22 14:27:40 2021 +0100
 >>>
->> Could it handle the failure of get_feature() and get/set_config()?
->
->
-> Looks not:
->
-> "
->
-> The device SHOULD set DEVICE_NEEDS_RESET when it enters an error state 
-> that a reset is needed. If DRIVER_OK is set, after it sets 
-> DEVICE_NEEDS_RESET, the device MUST send a device configuration change 
-> notification to the driver.
->
-> "
->
-> This looks implies that NEEDS_RESET may only work after device is 
-> probed. But in the current design, even the reset() is not reliable.
->
->
->>
->>> Or a rough idea is that maybe need some relaxing to be coupled loosely
->>> with userspace. E.g the device (control path) is implemented in the
->>> kernel but the datapath is implemented in the userspace like TUN/TAP.
->>>
->> I think it can work for most cases. One problem is that the set_config
->> might change the behavior of the data path at runtime, e.g.
->> virtnet_set_mac_address() in the virtio-net driver and
->> cache_type_store() in the virtio-blk driver. Not sure if this path is
->> able to return before the datapath is aware of this change.
->
->
-> Good point.
->
-> But set_config() should be rare:
->
-> E.g in the case of virtio-net with VERSION_1, config space is read 
-> only, and it was set via control vq.
->
-> For block, we can
->
-> 1) start from without WCE or
-> 2) we add a config change notification to userspace or
-> 3) extend the spec to use vq instead of config space
->
-> Thanks
+>>>     i386: split cpu accelerators from cpu.c, using AccelCPUClass
+>>>     
+>>>     i386 is the first user of AccelCPUClass, allowing to split
+>>>     cpu.c into:
+>>>     
+>>>     cpu.c            cpuid and common x86 cpu functionality
+>>>     host-cpu.c       host x86 cpu functions and "host" cpu type
+>>>     kvm/kvm-cpu.c    KVM x86 AccelCPUClass
+>>>     hvf/hvf-cpu.c    HVF x86 AccelCPUClass
+>>>     tcg/tcg-cpu.c    TCG x86 AccelCPUClass
 
+Well this is a big commit... I'm not custom to x86 target, and am
+having hard time following the cpu host/max change.
 
-Another thing if we want to go this way:
-
-We need find a way to terminate the data path from the kernel side, to 
-implement to reset semantic.
-
-Thanks
-
-
->
->
->>
->> Thanks,
->> Yongji
->>
+Is it working when you use '-cpu max,...' instead of '-cpu host,'?
 
