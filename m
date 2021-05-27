@@ -2,246 +2,263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 368E139299E
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 10:33:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A8F03929A5
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 10:35:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235516AbhE0Iet (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 04:34:49 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:54145 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235336AbhE0Ies (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 May 2021 04:34:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1622104396; x=1653640396;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=t04v8eLrUYZzhE2uMGLmuGPDI3PlzcdLI+LNs76E+64=;
-  b=h/RfZChRBBUkxAms1QqyqkZt+XejWYMj57WKQVtVMsaJycpD7jcjSszv
-   j74w+X5eVsmFNy4NTNcjq46is2ctsCW7xRswx7Sr5Lm2vn9DaWwrkjFw/
-   xeunc9fyyKg9iAY0e/qA4eXIPjCMWN7gyAsfZO6EIPpRiAeGX2zxtunty
-   s=;
-X-IronPort-AV: E=Sophos;i="5.82,334,1613433600"; 
-   d="scan'208";a="137124375"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-2c-4e7c8266.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP; 27 May 2021 08:33:09 +0000
-Received: from EX13MTAUEE001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-2c-4e7c8266.us-west-2.amazon.com (Postfix) with ESMTPS id E267FA06D8;
-        Thu, 27 May 2021 08:33:08 +0000 (UTC)
-Received: from EX13D08UEB004.ant.amazon.com (10.43.60.142) by
- EX13MTAUEE001.ant.amazon.com (10.43.62.200) with Microsoft SMTP Server (TLS)
- id 15.0.1497.18; Thu, 27 May 2021 08:33:06 +0000
-Received: from EX13D18EUA001.ant.amazon.com (10.43.165.58) by
- EX13D08UEB004.ant.amazon.com (10.43.60.142) with Microsoft SMTP Server (TLS)
- id 15.0.1497.18; Thu, 27 May 2021 08:33:05 +0000
-Received: from EX13D18EUA001.ant.amazon.com ([10.43.165.58]) by
- EX13D18EUA001.ant.amazon.com ([10.43.165.58]) with mapi id 15.00.1497.018;
- Thu, 27 May 2021 08:33:04 +0000
-From:   "Stamatis, Ilias" <ilstam@amazon.com>
-To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>
-CC:     "jmattson@google.com" <jmattson@google.com>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "zamsden@gmail.com" <zamsden@gmail.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>
-Subject: Re: [PATCH v4 09/11] KVM: X86: Add vendor callbacks for writing the
- TSC multiplier
-Thread-Topic: [PATCH v4 09/11] KVM: X86: Add vendor callbacks for writing the
- TSC multiplier
-Thread-Index: AQHXUl+DVXrUInoPkUqUWhsxRdGR0qr3AMQA
-Date:   Thu, 27 May 2021 08:33:04 +0000
-Message-ID: <faa225b3b7518feea7df0ee69d6bf386a04824dc.camel@amazon.com>
-References: <20210526184418.28881-1-ilstam@amazon.com>
-         <20210526184418.28881-10-ilstam@amazon.com>
-In-Reply-To: <20210526184418.28881-10-ilstam@amazon.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.166.148]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <699E66AB0F89164F92ED23581C6D40F4@amazon.com>
-Content-Transfer-Encoding: base64
+        id S235477AbhE0IhS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 04:37:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21304 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235284AbhE0IhQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 27 May 2021 04:37:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622104543;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=vBslrakqO+6W0zgSMz624pjA0p7Sqe872IJTzAdcodQ=;
+        b=WGdF0qXLbaFyo9wBj7V3Elp9tRsGFnnXa4/h7BFT9/OsklxXhndXni9GH6YkRbzwxurXWU
+        0qq79HiwTMPMhce/tn87r5MQg2UfQigr0k32sEyOOWvP+lr3yXaA4ftaaAZD4kZGo5F+xF
+        pR+rj9kZhBDZJwri0Rkcd6N1gC/TUKE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-363-HGC21idbPWaooZzBcC9KrQ-1; Thu, 27 May 2021 04:35:41 -0400
+X-MC-Unique: HGC21idbPWaooZzBcC9KrQ-1
+Received: by mail-wm1-f70.google.com with SMTP id n20-20020a05600c4f94b029017f371265feso1228728wmq.5
+        for <kvm@vger.kernel.org>; Thu, 27 May 2021 01:35:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=vBslrakqO+6W0zgSMz624pjA0p7Sqe872IJTzAdcodQ=;
+        b=TRvY4ro7CDYuRGI9643SZChzjh6S45dG29YzIoWG9GYo8ltaKjOr4DO9XwACroSJ2C
+         jw4Mzcrq6RTLTczBEwtbBqPWN8ZVuEpNDpKajKz/vcqvlprltw5pXr6d23/57aivgqfH
+         0Z/RZbWV/XlfcsNPnvyH9OhInz4Vv2PnajD1HV6zS+C7FxDB0tB6/uqJditjYX4gxCHF
+         04Az21FBd3Z9PedTj79NwwO7uGmctUmcJJ/SVK93Or80KCSZBuiR3+MuAiKqa/vuQDhb
+         Yhm0ZMpha753Hm6u1lqeylwFJ/dZyeDo4tKKvC4xSUFiFkcVN38V8xymTsnU4HFaAKw0
+         cYKQ==
+X-Gm-Message-State: AOAM532ttOMZR3vA7ojqgIVR5SNBjv2LjeKOWhRP39ZRjnvqCIQV1IVF
+        /WK1rBCnBfD2cdwsMyZINyTYZ32zmscpVrmoHYD79wAJMGanqjUqUlZxIr9ZjT9Z8sTW9r6oXQC
+        ySrK0txCHtaDL
+X-Received: by 2002:a7b:ce8d:: with SMTP id q13mr7132419wmj.109.1622104540069;
+        Thu, 27 May 2021 01:35:40 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxVmdZpdmJFQxFD7MlW5X9vtBcqu4gT4wNnF2sND/4u9whBcq2yYO3LxpBNDHnCL0iHOEyeIQ==
+X-Received: by 2002:a7b:ce8d:: with SMTP id q13mr7132393wmj.109.1622104539818;
+        Thu, 27 May 2021 01:35:39 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id t17sm1936561wrp.89.2021.05.27.01.35.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 May 2021 01:35:39 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Kechen Lu <kechenl@nvidia.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/5] KVM: x86: hyper-v: Conditionally allow SynIC
+ with APICv/AVIC
+In-Reply-To: <2409eb8593804eb879ae6fb961a709ca8c20f329.camel@redhat.com>
+References: <20210518144339.1987982-1-vkuznets@redhat.com>
+ <2409eb8593804eb879ae6fb961a709ca8c20f329.camel@redhat.com>
+Date:   Thu, 27 May 2021 10:35:38 +0200
+Message-ID: <874keo7ew5.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gV2VkLCAyMDIxLTA1LTI2IGF0IDE5OjQ0ICswMTAwLCBJbGlhcyBTdGFtYXRpcyB3cm90ZToN
-Cj4gQ3VycmVudGx5IHZteF92Y3B1X2xvYWRfdm1jcygpIHdyaXRlcyB0aGUgVFNDX01VTFRJUExJ
-RVIgZmllbGQgb2YgdGhlDQo+IFZNQ1MgZXZlcnkgdGltZSB0aGUgVk1DUyBpcyBsb2FkZWQuIElu
-c3RlYWQgb2YgZG9pbmcgdGhpcywgc2V0IHRoaXMNCj4gZmllbGQgZnJvbSBjb21tb24gY29kZSBv
-biBpbml0aWFsaXphdGlvbiBhbmQgd2hlbmV2ZXIgdGhlIHNjYWxpbmcgcmF0aW8NCj4gY2hhbmdl
-cy4NCj4gDQo+IEFkZGl0aW9uYWxseSByZW1vdmUgdm14LT5jdXJyZW50X3RzY19yYXRpby4gVGhp
-cyBmaWVsZCBpcyByZWR1bmRhbnQgYXMNCj4gdmNwdS0+YXJjaC50c2Nfc2NhbGluZ19yYXRpbyBh
-bHJlYWR5IHRyYWNrcyB0aGUgY3VycmVudCBUU0Mgc2NhbGluZw0KPiByYXRpby4gVGhlIHZteC0+
-Y3VycmVudF90c2NfcmF0aW8gZmllbGQgaXMgb25seSB1c2VkIGZvciBhdm9pZGluZw0KPiB1bm5l
-Y2Vzc2FyeSB3cml0ZXMgYnV0IGl0IGlzIG5vIGxvbmdlciBuZWVkZWQgYWZ0ZXIgcmVtb3Zpbmcg
-dGhlIGNvZGUNCj4gZnJvbSB0aGUgVk1DUyBsb2FkIHBhdGguDQo+IA0KPiBTdWdnZXN0ZWQtYnk6
-IFNlYW4gQ2hyaXN0b3BoZXJzb24gPHNlYW5qY0Bnb29nbGUuY29tPg0KPiBTaWduZWQtb2ZmLWJ5
-OiBJbGlhcyBTdGFtYXRpcyA8aWxzdGFtQGFtYXpvbi5jb20+DQo+IC0tLQ0KPiAgYXJjaC94ODYv
-aW5jbHVkZS9hc20va3ZtLXg4Ni1vcHMuaCB8ICAxICsNCj4gIGFyY2gveDg2L2luY2x1ZGUvYXNt
-L2t2bV9ob3N0LmggICAgfCAgMSArDQo+ICBhcmNoL3g4Ni9rdm0vc3ZtL3N2bS5jICAgICAgICAg
-ICAgIHwgIDYgKysrKysrDQo+ICBhcmNoL3g4Ni9rdm0vdm14L25lc3RlZC5jICAgICAgICAgIHwg
-IDkgKysrKy0tLS0tDQo+ICBhcmNoL3g4Ni9rdm0vdm14L3ZteC5jICAgICAgICAgICAgIHwgMTEg
-KysrKysrLS0tLS0NCj4gIGFyY2gveDg2L2t2bS92bXgvdm14LmggICAgICAgICAgICAgfCAgOCAt
-LS0tLS0tLQ0KPiAgYXJjaC94ODYva3ZtL3g4Ni5jICAgICAgICAgICAgICAgICB8IDI4ICsrKysr
-KysrKysrKysrKysrKysrKysrLS0tLS0NCj4gIDcgZmlsZXMgY2hhbmdlZCwgNDEgaW5zZXJ0aW9u
-cygrKSwgMjMgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYvaW5jbHVk
-ZS9hc20va3ZtLXg4Ni1vcHMuaCBiL2FyY2gveDg2L2luY2x1ZGUvYXNtL2t2bS14ODYtb3BzLmgN
-Cj4gaW5kZXggMDI5Yzk2MTUzNzhmLi4zNGFkN2ExNzQ1OGEgMTAwNjQ0DQo+IC0tLSBhL2FyY2gv
-eDg2L2luY2x1ZGUvYXNtL2t2bS14ODYtb3BzLmgNCj4gKysrIGIvYXJjaC94ODYvaW5jbHVkZS9h
-c20va3ZtLXg4Ni1vcHMuaA0KPiBAQCAtOTAsNiArOTAsNyBAQCBLVk1fWDg2X09QX05VTEwoaGFz
-X3diaW52ZF9leGl0KQ0KPiAgS1ZNX1g4Nl9PUChnZXRfbDJfdHNjX29mZnNldCkNCj4gIEtWTV9Y
-ODZfT1AoZ2V0X2wyX3RzY19tdWx0aXBsaWVyKQ0KPiAgS1ZNX1g4Nl9PUCh3cml0ZV90c2Nfb2Zm
-c2V0KQ0KPiArS1ZNX1g4Nl9PUCh3cml0ZV90c2NfbXVsdGlwbGllcikNCj4gIEtWTV9YODZfT1Ao
-Z2V0X2V4aXRfaW5mbykNCj4gIEtWTV9YODZfT1AoY2hlY2tfaW50ZXJjZXB0KQ0KPiAgS1ZNX1g4
-Nl9PUChoYW5kbGVfZXhpdF9pcnFvZmYpDQo+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9pbmNsdWRl
-L2FzbS9rdm1faG9zdC5oIGIvYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaA0KPiBpbmRl
-eCBmMDk5Mjc3Yjk5M2QuLmEzMzRjZTc3NDFhYiAxMDA2NDQNCj4gLS0tIGEvYXJjaC94ODYvaW5j
-bHVkZS9hc20va3ZtX2hvc3QuaA0KPiArKysgYi9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9z
-dC5oDQo+IEBAIC0xMzA4LDYgKzEzMDgsNyBAQCBzdHJ1Y3Qga3ZtX3g4Nl9vcHMgew0KPiAgCXU2
-NCAoKmdldF9sMl90c2Nfb2Zmc2V0KShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOw0KPiAgCXU2NCAo
-KmdldF9sMl90c2NfbXVsdGlwbGllcikoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KTsNCj4gIAl2b2lk
-ICgqd3JpdGVfdHNjX29mZnNldCkoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1NjQgb2Zmc2V0KTsN
-Cj4gKwl2b2lkICgqd3JpdGVfdHNjX211bHRpcGxpZXIpKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwg
-dTY0IG11bHRpcGxpZXIpOw0KPiAgDQo+ICAJLyoNCj4gIAkgKiBSZXRyaWV2ZSBzb21ld2hhdCBh
-cmJpdHJhcnkgZXhpdCBpbmZvcm1hdGlvbi4gIEludGVuZGVkIHRvIGJlIHVzZWQNCj4gZGlmZiAt
-LWdpdCBhL2FyY2gveDg2L2t2bS9zdm0vc3ZtLmMgYi9hcmNoL3g4Ni9rdm0vc3ZtL3N2bS5jDQo+
-IGluZGV4IDhkZmIyNTEzYjcyYS4uY2I3MDFiNDJiMDhiIDEwMDY0NA0KPiAtLS0gYS9hcmNoL3g4
-Ni9rdm0vc3ZtL3N2bS5jDQo+ICsrKyBiL2FyY2gveDg2L2t2bS9zdm0vc3ZtLmMNCj4gQEAgLTEx
-MDMsNiArMTEwMywxMSBAQCBzdGF0aWMgdm9pZCBzdm1fd3JpdGVfdHNjX29mZnNldChzdHJ1Y3Qg
-a3ZtX3ZjcHUgKnZjcHUsIHU2NCBvZmZzZXQpDQo+ICAJdm1jYl9tYXJrX2RpcnR5KHN2bS0+dm1j
-YiwgVk1DQl9JTlRFUkNFUFRTKTsNCj4gIH0NCj4gIA0KPiArc3RhdGljIHZvaWQgc3ZtX3dyaXRl
-X3RzY19tdWx0aXBsaWVyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTY0IG11bHRpcGxpZXIpDQo+
-ICt7DQo+ICsJd3Jtc3JsKE1TUl9BTUQ2NF9UU0NfUkFUSU8sIG11bHRpcGxpZXIpOw0KPiArfQ0K
-PiArDQo+ICAvKiBFdmFsdWF0ZSBpbnN0cnVjdGlvbiBpbnRlcmNlcHRzIHRoYXQgZGVwZW5kIG9u
-IGd1ZXN0IENQVUlEIGZlYXR1cmVzLiAqLw0KPiAgc3RhdGljIHZvaWQgc3ZtX3JlY2FsY19pbnN0
-cnVjdGlvbl9pbnRlcmNlcHRzKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwNCj4gIAkJCQkJICAgICAg
-c3RydWN0IHZjcHVfc3ZtICpzdm0pDQo+IEBAIC00NTI4LDYgKzQ1MzMsNyBAQCBzdGF0aWMgc3Ry
-dWN0IGt2bV94ODZfb3BzIHN2bV94ODZfb3BzIF9faW5pdGRhdGEgPSB7DQo+ICAJLmdldF9sMl90
-c2Nfb2Zmc2V0ID0gc3ZtX2dldF9sMl90c2Nfb2Zmc2V0LA0KPiAgCS5nZXRfbDJfdHNjX211bHRp
-cGxpZXIgPSBzdm1fZ2V0X2wyX3RzY19tdWx0aXBsaWVyLA0KPiAgCS53cml0ZV90c2Nfb2Zmc2V0
-ID0gc3ZtX3dyaXRlX3RzY19vZmZzZXQsDQo+ICsJLndyaXRlX3RzY19tdWx0aXBsaWVyID0gc3Zt
-X3dyaXRlX3RzY19tdWx0aXBsaWVyLA0KPiAgDQo+ICAJLmxvYWRfbW11X3BnZCA9IHN2bV9sb2Fk
-X21tdV9wZ2QsDQo+ICANCj4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS92bXgvbmVzdGVkLmMg
-Yi9hcmNoL3g4Ni9rdm0vdm14L25lc3RlZC5jDQo+IGluZGV4IDYwNThhNjVhNmVkZS4uMjM5MTU0
-ZDNlNGU3IDEwMDY0NA0KPiAtLS0gYS9hcmNoL3g4Ni9rdm0vdm14L25lc3RlZC5jDQo+ICsrKyBi
-L2FyY2gveDg2L2t2bS92bXgvbmVzdGVkLmMNCj4gQEAgLTI1MzMsOSArMjUzMyw4IEBAIHN0YXRp
-YyBpbnQgcHJlcGFyZV92bWNzMDIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBzdHJ1Y3Qgdm1jczEy
-ICp2bWNzMTIsDQo+ICAJfQ0KPiAgDQo+ICAJdm1jc193cml0ZTY0KFRTQ19PRkZTRVQsIHZjcHUt
-PmFyY2gudHNjX29mZnNldCk7DQo+IC0NCj4gIAlpZiAoa3ZtX2hhc190c2NfY29udHJvbCkNCj4g
-LQkJZGVjYWNoZV90c2NfbXVsdGlwbGllcih2bXgpOw0KPiArCQl2bWNzX3dyaXRlNjQoVFNDX01V
-TFRJUExJRVIsIHZjcHUtPmFyY2gudHNjX3NjYWxpbmdfcmF0aW8pOw0KPiAgDQo+ICAJbmVzdGVk
-X3ZteF90cmFuc2l0aW9uX3RsYl9mbHVzaCh2Y3B1LCB2bWNzMTIsIHRydWUpOw0KPiAgDQo+IEBA
-IC00NTAxLDEyICs0NTAwLDEyIEBAIHZvaWQgbmVzdGVkX3ZteF92bWV4aXQoc3RydWN0IGt2bV92
-Y3B1ICp2Y3B1LCB1MzIgdm1fZXhpdF9yZWFzb24sDQo+ICAJdm1jc193cml0ZTMyKFZNX0VYSVRf
-TVNSX0xPQURfQ09VTlQsIHZteC0+bXNyX2F1dG9sb2FkLmhvc3QubnIpOw0KPiAgCXZtY3Nfd3Jp
-dGUzMihWTV9FTlRSWV9NU1JfTE9BRF9DT1VOVCwgdm14LT5tc3JfYXV0b2xvYWQuZ3Vlc3QubnIp
-Ow0KPiAgCXZtY3Nfd3JpdGU2NChUU0NfT0ZGU0VULCB2Y3B1LT5hcmNoLnRzY19vZmZzZXQpOw0K
-PiArCWlmIChrdm1faGFzX3RzY19jb250cm9sKQ0KPiArCQl2bWNzX3dyaXRlNjQoVFNDX01VTFRJ
-UExJRVIsIHZjcHUtPmFyY2gudHNjX3NjYWxpbmdfcmF0aW8pOw0KPiArDQo+ICAJaWYgKHZteC0+
-bmVzdGVkLmwxX3Rwcl90aHJlc2hvbGQgIT0gLTEpDQo+ICAJCXZtY3Nfd3JpdGUzMihUUFJfVEhS
-RVNIT0xELCB2bXgtPm5lc3RlZC5sMV90cHJfdGhyZXNob2xkKTsNCj4gIA0KPiAtCWlmIChrdm1f
-aGFzX3RzY19jb250cm9sKQ0KPiAtCQlkZWNhY2hlX3RzY19tdWx0aXBsaWVyKHZteCk7DQo+IC0N
-Cj4gIAlpZiAodm14LT5uZXN0ZWQuY2hhbmdlX3ZtY3MwMV92aXJ0dWFsX2FwaWNfbW9kZSkgew0K
-PiAgCQl2bXgtPm5lc3RlZC5jaGFuZ2Vfdm1jczAxX3ZpcnR1YWxfYXBpY19tb2RlID0gZmFsc2U7
-DQo+ICAJCXZteF9zZXRfdmlydHVhbF9hcGljX21vZGUodmNwdSk7DQo+IGRpZmYgLS1naXQgYS9h
-cmNoL3g4Ni9rdm0vdm14L3ZteC5jIGIvYXJjaC94ODYva3ZtL3ZteC92bXguYw0KPiBpbmRleCA0
-YjcwNDMxYzJlZGQuLmJmODQ1YTA4OTk1ZSAxMDA2NDQNCj4gLS0tIGEvYXJjaC94ODYva3ZtL3Zt
-eC92bXguYw0KPiArKysgYi9hcmNoL3g4Ni9rdm0vdm14L3ZteC5jDQo+IEBAIC0xMzkwLDExICsx
-MzkwLDYgQEAgdm9pZCB2bXhfdmNwdV9sb2FkX3ZtY3Moc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBp
-bnQgY3B1LA0KPiAgDQo+ICAJCXZteC0+bG9hZGVkX3ZtY3MtPmNwdSA9IGNwdTsNCj4gIAl9DQo+
-IC0NCj4gLQkvKiBTZXR1cCBUU0MgbXVsdGlwbGllciAqLw0KPiAtCWlmIChrdm1faGFzX3RzY19j
-b250cm9sICYmDQo+IC0JICAgIHZteC0+Y3VycmVudF90c2NfcmF0aW8gIT0gdmNwdS0+YXJjaC50
-c2Nfc2NhbGluZ19yYXRpbykNCj4gLQkJZGVjYWNoZV90c2NfbXVsdGlwbGllcih2bXgpOw0KPiAg
-fQ0KPiAgDQo+ICAvKg0KPiBAQCAtMTgxMyw2ICsxODA4LDExIEBAIHN0YXRpYyB2b2lkIHZteF93
-cml0ZV90c2Nfb2Zmc2V0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTY0IG9mZnNldCkNCj4gIAl2
-bWNzX3dyaXRlNjQoVFNDX09GRlNFVCwgb2Zmc2V0KTsNCj4gIH0NCj4gIA0KPiArc3RhdGljIHZv
-aWQgdm14X3dyaXRlX3RzY19tdWx0aXBsaWVyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTY0IG11
-bHRpcGxpZXIpDQo+ICt7DQo+ICsJdm1jc193cml0ZTY0KFRTQ19NVUxUSVBMSUVSLCBtdWx0aXBs
-aWVyKTsNCj4gK30NCj4gKw0KPiAgLyoNCj4gICAqIG5lc3RlZF92bXhfYWxsb3dlZCgpIGNoZWNr
-cyB3aGV0aGVyIGEgZ3Vlc3Qgc2hvdWxkIGJlIGFsbG93ZWQgdG8gdXNlIFZNWA0KPiAgICogaW5z
-dHJ1Y3Rpb25zIGFuZCBNU1JzIChpLmUuLCBuZXN0ZWQgVk1YKS4gTmVzdGVkIFZNWCBpcyBkaXNh
-YmxlZCBmb3INCj4gQEAgLTc3MDcsNiArNzcwNyw3IEBAIHN0YXRpYyBzdHJ1Y3Qga3ZtX3g4Nl9v
-cHMgdm14X3g4Nl9vcHMgX19pbml0ZGF0YSA9IHsNCj4gIAkuZ2V0X2wyX3RzY19vZmZzZXQgPSB2
-bXhfZ2V0X2wyX3RzY19vZmZzZXQsDQo+ICAJLmdldF9sMl90c2NfbXVsdGlwbGllciA9IHZteF9n
-ZXRfbDJfdHNjX211bHRpcGxpZXIsDQo+ICAJLndyaXRlX3RzY19vZmZzZXQgPSB2bXhfd3JpdGVf
-dHNjX29mZnNldCwNCj4gKwkud3JpdGVfdHNjX211bHRpcGxpZXIgPSB2bXhfd3JpdGVfdHNjX211
-bHRpcGxpZXIsDQo+ICANCj4gIAkubG9hZF9tbXVfcGdkID0gdm14X2xvYWRfbW11X3BnZCwNCj4g
-IA0KPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL3ZteC92bXguaCBiL2FyY2gveDg2L2t2bS92
-bXgvdm14LmgNCj4gaW5kZXggYWE5N2M4MmUzNDUxLi4zZWFhODZhMGJhM2UgMTAwNjQ0DQo+IC0t
-LSBhL2FyY2gveDg2L2t2bS92bXgvdm14LmgNCj4gKysrIGIvYXJjaC94ODYva3ZtL3ZteC92bXgu
-aA0KPiBAQCAtMzIyLDggKzMyMiw2IEBAIHN0cnVjdCB2Y3B1X3ZteCB7DQo+ICAJLyogYXBpYyBk
-ZWFkbGluZSB2YWx1ZSBpbiBob3N0IHRzYyAqLw0KPiAgCXU2NCBodl9kZWFkbGluZV90c2M7DQo+
-ICANCj4gLQl1NjQgY3VycmVudF90c2NfcmF0aW87DQo+IC0NCj4gIAl1bnNpZ25lZCBsb25nIGhv
-c3RfZGVidWdjdGxtc3I7DQo+ICANCj4gIAkvKg0KPiBAQCAtNTMyLDEyICs1MzAsNiBAQCBzdGF0
-aWMgaW5saW5lIHN0cnVjdCB2bWNzICphbGxvY192bWNzKGJvb2wgc2hhZG93KQ0KPiAgCQkJICAg
-ICAgR0ZQX0tFUk5FTF9BQ0NPVU5UKTsNCj4gIH0NCj4gIA0KPiAtc3RhdGljIGlubGluZSB2b2lk
-IGRlY2FjaGVfdHNjX211bHRpcGxpZXIoc3RydWN0IHZjcHVfdm14ICp2bXgpDQo+IC17DQo+IC0J
-dm14LT5jdXJyZW50X3RzY19yYXRpbyA9IHZteC0+dmNwdS5hcmNoLnRzY19zY2FsaW5nX3JhdGlv
-Ow0KPiAtCXZtY3Nfd3JpdGU2NChUU0NfTVVMVElQTElFUiwgdm14LT5jdXJyZW50X3RzY19yYXRp
-byk7DQo+IC19DQo+IC0NCj4gIHN0YXRpYyBpbmxpbmUgYm9vbCB2bXhfaGFzX3dhaXRwa2coc3Ry
-dWN0IHZjcHVfdm14ICp2bXgpDQo+ICB7DQo+ICAJcmV0dXJuIHZteC0+c2Vjb25kYXJ5X2V4ZWNf
-Y29udHJvbCAmDQo+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0veDg2LmMgYi9hcmNoL3g4Ni9r
-dm0veDg2LmMNCj4gaW5kZXggODAxZmExZThlOTE1Li44YWZlMmMyOTE4M2MgMTAwNjQ0DQo+IC0t
-LSBhL2FyY2gveDg2L2t2bS94ODYuYw0KPiArKysgYi9hcmNoL3g4Ni9rdm0veDg2LmMNCj4gQEAg
-LTIxNzksMTQgKzIxNzksMTUgQEAgc3RhdGljIHUzMiBhZGp1c3RfdHNjX2toeih1MzIga2h6LCBz
-MzIgcHBtKQ0KPiAgCXJldHVybiB2Ow0KPiAgfQ0KPiAgDQo+ICtzdGF0aWMgdm9pZCBrdm1fdmNw
-dV93cml0ZV90c2NfbXVsdGlwbGllcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHU2NCBsMV9tdWx0
-aXBsaWVyKTsNCj4gKw0KPiAgc3RhdGljIGludCBzZXRfdHNjX2toeihzdHJ1Y3Qga3ZtX3ZjcHUg
-KnZjcHUsIHUzMiB1c2VyX3RzY19raHosIGJvb2wgc2NhbGUpDQo+ICB7DQo+ICAJdTY0IHJhdGlv
-Ow0KPiAgDQo+ICAJLyogR3Vlc3QgVFNDIHNhbWUgZnJlcXVlbmN5IGFzIGhvc3QgVFNDPyAqLw0K
-PiAgCWlmICghc2NhbGUpIHsNCj4gLQkJdmNwdS0+YXJjaC5sMV90c2Nfc2NhbGluZ19yYXRpbyA9
-IGt2bV9kZWZhdWx0X3RzY19zY2FsaW5nX3JhdGlvOw0KPiAtCQl2Y3B1LT5hcmNoLnRzY19zY2Fs
-aW5nX3JhdGlvID0ga3ZtX2RlZmF1bHRfdHNjX3NjYWxpbmdfcmF0aW87DQo+ICsJCWt2bV92Y3B1
-X3dyaXRlX3RzY19tdWx0aXBsaWVyKHZjcHUsIGt2bV9kZWZhdWx0X3RzY19zY2FsaW5nX3JhdGlv
-KTsNCj4gIAkJcmV0dXJuIDA7DQo+ICAJfQ0KPiAgDQo+IEBAIC0yMjEyLDcgKzIyMTMsNyBAQCBz
-dGF0aWMgaW50IHNldF90c2Nfa2h6KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTMyIHVzZXJfdHNj
-X2toeiwgYm9vbCBzY2FsZSkNCj4gIAkJcmV0dXJuIC0xOw0KPiAgCX0NCj4gIA0KPiAtCXZjcHUt
-PmFyY2gubDFfdHNjX3NjYWxpbmdfcmF0aW8gPSB2Y3B1LT5hcmNoLnRzY19zY2FsaW5nX3JhdGlv
-ID0gcmF0aW87DQo+ICsJa3ZtX3ZjcHVfd3JpdGVfdHNjX211bHRpcGxpZXIodmNwdSwgcmF0aW8p
-Ow0KPiAgCXJldHVybiAwOw0KPiAgfQ0KPiAgDQo+IEBAIC0yMjI0LDggKzIyMjUsNyBAQCBzdGF0
-aWMgaW50IGt2bV9zZXRfdHNjX2toeihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHUzMiB1c2VyX3Rz
-Y19raHopDQo+ICAJLyogdHNjX2toeiBjYW4gYmUgemVybyBpZiBUU0MgY2FsaWJyYXRpb24gZmFp
-bHMgKi8NCj4gIAlpZiAodXNlcl90c2Nfa2h6ID09IDApIHsNCj4gIAkJLyogc2V0IHRzY19zY2Fs
-aW5nX3JhdGlvIHRvIGEgc2FmZSB2YWx1ZSAqLw0KPiAtCQl2Y3B1LT5hcmNoLmwxX3RzY19zY2Fs
-aW5nX3JhdGlvID0ga3ZtX2RlZmF1bHRfdHNjX3NjYWxpbmdfcmF0aW87DQo+IC0JCXZjcHUtPmFy
-Y2gudHNjX3NjYWxpbmdfcmF0aW8gPSBrdm1fZGVmYXVsdF90c2Nfc2NhbGluZ19yYXRpbzsNCj4g
-KwkJa3ZtX3ZjcHVfd3JpdGVfdHNjX211bHRpcGxpZXIodmNwdSwga3ZtX2RlZmF1bHRfdHNjX3Nj
-YWxpbmdfcmF0aW8pOw0KPiAgCQlyZXR1cm4gLTE7DQo+ICAJfQ0KPiAgDQo+IEBAIC0yMzgzLDYg
-KzIzODMsMjMgQEAgc3RhdGljIHZvaWQga3ZtX3ZjcHVfd3JpdGVfdHNjX29mZnNldChzdHJ1Y3Qg
-a3ZtX3ZjcHUgKnZjcHUsIHU2NCBsMV9vZmZzZXQpDQo+ICAJc3RhdGljX2NhbGwoa3ZtX3g4Nl93
-cml0ZV90c2Nfb2Zmc2V0KSh2Y3B1LCB2Y3B1LT5hcmNoLnRzY19vZmZzZXQpOw0KPiAgfQ0KPiAg
-DQo+ICtzdGF0aWMgdm9pZCBrdm1fdmNwdV93cml0ZV90c2NfbXVsdGlwbGllcihzdHJ1Y3Qga3Zt
-X3ZjcHUgKnZjcHUsIHU2NCBsMV9tdWx0aXBsaWVyKQ0KPiArew0KPiArCXZjcHUtPmFyY2gubDFf
-dHNjX3NjYWxpbmdfcmF0aW8gPSBsMV9tdWx0aXBsaWVyOw0KPiArDQo+ICsJLyogVXNlcnNwYWNl
-IGlzIGNoYW5naW5nIHRoZSBtdWx0aXBsaWVyIHdoaWxlIEwyIGlzIGFjdGl2ZSAqLw0KPiArCWlm
-IChpc19ndWVzdF9tb2RlKHZjcHUpKQ0KPiArCQl2Y3B1LT5hcmNoLnRzY19zY2FsaW5nX3JhdGlv
-ID0ga3ZtX2NhbGNfbmVzdGVkX3RzY19tdWx0aXBsaWVyKA0KPiArCQkJbDFfbXVsdGlwbGllciwN
-Cj4gKwkJCXN0YXRpY19jYWxsKGt2bV94ODZfZ2V0X2wyX3RzY19tdWx0aXBsaWVyKSh2Y3B1KSk7
-DQo+ICsJZWxzZQ0KPiArCQl2Y3B1LT5hcmNoLnRzY19zY2FsaW5nX3JhdGlvID0gbDFfbXVsdGlw
-bGllcjsNCj4gKw0KPiArCWlmIChrdm1faGFzX3RzY19jb250cm9sKQ0KPiArCQlzdGF0aWNfY2Fs
-bChrdm1feDg2X3dyaXRlX3RzY19tdWx0aXBsaWVyKSgNCj4gKwkJCXZjcHUsIHZjcHUtPmFyY2gu
-dHNjX3NjYWxpbmdfcmF0aW8pOw0KPiArfQ0KPiArDQo+ICBzdGF0aWMgaW5saW5lIGJvb2wga3Zt
-X2NoZWNrX3RzY191bnN0YWJsZSh2b2lkKQ0KPiAgew0KPiAgI2lmZGVmIENPTkZJR19YODZfNjQN
-Cj4gQEAgLTEwNDQ0LDYgKzEwNDYxLDcgQEAgdm9pZCBrdm1fYXJjaF92Y3B1X3Bvc3RjcmVhdGUo
-c3RydWN0IGt2bV92Y3B1ICp2Y3B1KQ0KPiAgCQlyZXR1cm47DQo+ICAJdmNwdV9sb2FkKHZjcHUp
-Ow0KPiAgCWt2bV9zeW5jaHJvbml6ZV90c2ModmNwdSwgMCk7DQo+ICsJa3ZtX3ZjcHVfd3JpdGVf
-dHNjX211bHRpcGxpZXIodmNwdSwga3ZtX2RlZmF1bHRfdHNjX3NjYWxpbmdfcmF0aW8pOw0KDQpI
-bW0sIEknbSBhY3R1YWxseSB0aGlua2luZyBub3cgdGhhdCB0aGlzIG1pZ2h0IG5vdCBiZSBjb3Jy
-ZWN0LiBGb3IgZXhhbXBsZSBpbg0KY2FzZSB3ZSBob3RwbHVnIGEgbmV3IHZDUFUgYnV0IHRoZSBv
-dGhlciB2Q1BVcyBkb24ndCB1c2UgdGhlIGRlZmF1bHQgcmF0aW8uDQoNCkhvdyBhYm91dCBrZWVw
-aW5nIHZteC0+Y3VycmVudF90c2NfcmF0aW8gYWZ0ZXIgYWxsPyBBcHBhcmVudGx5IHRoaXMgaXMg
-YW5vdGhlcg0Kcm9sZSBpdCBwbGF5cy4gT3IgbW92ZSBpdCB0byBrdm0tPmFyY2g/DQoNCj4gIAl2
-Y3B1X3B1dCh2Y3B1KTsNCj4gIA0KPiAgCS8qIHBvbGwgY29udHJvbCBlbmFibGVkIGJ5IGRlZmF1
-bHQgKi8NCg0K
+Maxim Levitsky <mlevitsk@redhat.com> writes:
+
+> On Tue, 2021-05-18 at 16:43 +0200, Vitaly Kuznetsov wrote:
+>> Changes since v1 (Sean):
+>> - Use common 'enable_apicv' variable for both APICv and AVIC instead of 
+>>  adding a new hook to 'struct kvm_x86_ops'.
+>> - Drop unneded CONFIG_X86_LOCAL_APIC checks from VMX/SVM code along the
+>>  way.
+>> 
+>> Original description:
+>> 
+>> APICV_INHIBIT_REASON_HYPERV is currently unconditionally forced upon
+>> SynIC activation as SynIC's AutoEOI is incompatible with APICv/AVIC. It is,
+>> however, possible to track whether the feature was actually used by the
+>> guest and only inhibit APICv/AVIC when needed.
+>> 
+>> The feature can be tested with QEMU's 'hv-passthrough' debug mode.
+>> 
+>> Note, 'avic' kvm-amd module parameter is '0' by default and thus needs to
+>> be explicitly enabled.
+>> 
+>> Vitaly Kuznetsov (5):
+>>   KVM: SVM: Drop unneeded CONFIG_X86_LOCAL_APIC check for AVIC
+>>   KVM: VMX: Drop unneeded CONFIG_X86_LOCAL_APIC check from
+>>     cpu_has_vmx_posted_intr()
+>>   KVM: x86: Use common 'enable_apicv' variable for both APICv and AVIC
+>>   KVM: x86: Invert APICv/AVIC enablement check
+>>   KVM: x86: hyper-v: Deactivate APICv only when AutoEOI feature is in
+>>     use
+>> 
+>>  arch/x86/include/asm/kvm_host.h |  5 ++++-
+>>  arch/x86/kvm/hyperv.c           | 27 +++++++++++++++++++++------
+>>  arch/x86/kvm/svm/avic.c         | 16 +++++-----------
+>>  arch/x86/kvm/svm/svm.c          | 24 +++++++++++++-----------
+>>  arch/x86/kvm/svm/svm.h          |  2 --
+>>  arch/x86/kvm/vmx/capabilities.h |  4 +---
+>>  arch/x86/kvm/vmx/vmx.c          |  2 --
+>>  arch/x86/kvm/x86.c              |  9 ++++++---
+>>  8 files changed, 50 insertions(+), 39 deletions(-)
+>> 
+>
+> I tested this patch set and this is what I found.
+>
+> For reference,
+> First of all, indeed to make AVIC work I need to:
+>  
+> 1. Disable SVM - I wonder if I can make this on demand
+> too when the guest actually uses a nested guest or at least
+> enables nesting in IA32_FEATURE_CONTROL.
+> I naturally run most of my VMs with nesting enabled,
+> thus I tend to not have avic enabled due to this.
+> I'll prepare a patch soon for this.
+>  
+> 2. Disable x2apic, naturally x2apic can't be used with avic.
+> In theory we can also disable avic when the guest switches on
+> the x2apic mode, but in practice the guest will likely to pick the x2apic
+> when it can.
+>  
+> 3. (for hyperv) Disable 'hv_vapic', because otherwise hyper-v
+> uses its own PV APIC msrs which AVIC doesn't support.
+>
+> This HV enlightment turns on in the CPUID both the 
+> HV_APIC_ACCESS_AVAILABLE which isn't that bad 
+> (it only tells that we have the VP assist page),
+> and HV_APIC_ACCESS_RECOMMENDED which hints the guest
+> to use HyperV PV APIC MSRS and use PV EOI field in 
+> the APIC access page, which means that the guest 
+> won't use the real apic at all.
+>
+> 4. and of course enable SynIC autoeoi deprecation.
+>
+> Otherwise indeed windows enables autoeoi.
+>
+> hv-passthrough indeed can't be used to test this
+> as it both enables autoeoi depreciation and *hv-vapic*. 
+> I had to use the patch that you posted
+> in 'About the performance of hyper-v' thread.
+>  
+> In addition to that when I don't use the autoeoi depreciation patch,
+> then the guest indeed enables autoeoi, and this triggers a deadlock.
+>  
+
+Hm, why don't I see in my testing? I'm pretty sure I'm testing both
+cases...
+
+> The reason is that kvm_request_apicv_update must not be called with
+> srcu lock held vcpu->kvm->srcu (there is a warning about that
+> in kvm_request_apicv_update), but guest msr writes which come
+> from vcpu thread do hold it.
+>  
+> The other place where we disable AVIC on demand is svm_toggle_avic_for_irq_window.
+> And that code has a hack to drop this lock and take 
+> it back around the call to kvm_request_apicv_update.
+> This hack is safe as this code is called only from the vcpu thread.
+>  
+> Also for reference the reason for the fact that we need to
+> disable AVIC on the interrupt window request, or more correctly
+> why we still need to request interrupt windows with AVIC,
+> is that the local apic can act sadly as a pass-through device 
+> for legacy PIC, when one of its LINTn pins is configured in ExtINT mode.
+> In this mode when such pin is raised, the local apic asks the PIC for
+> the interrupt vector and then delivers it to the APIC
+> without touching the IRR/ISR.
+>
+> The later means that if guest's interrupts are disabled,
+> such interrupt can't be queued via IRR to VAPIC
+> but instead the regular interrupt window has to be requested, 
+> but on AMD, the only way to request interrupt window
+> is to queue a VIRQ, and intercept its delivery,
+> a feature that is disabled when AVIC is active.
+>  
+> Finally for SynIC this srcu lock drop hack can be extended to this gross hack:
+> It seems to work though:
+>
+>
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index bedd9b6cc26a..925b76e7b45e 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -85,7 +85,7 @@ static bool synic_has_vector_auto_eoi(struct kvm_vcpu_hv_synic *synic,
+>  }
+>  
+>  static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
+> -				int vector)
+> +				int vector, bool host)
+>  {
+>  	struct kvm_vcpu *vcpu = hv_synic_to_vcpu(synic);
+>  	struct kvm_hv *hv = to_kvm_hv(vcpu->kvm);
+> @@ -109,6 +109,9 @@ static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
+>  
+>  	auto_eoi_new = bitmap_weight(synic->auto_eoi_bitmap, 256);
+>  
+> +	if (!host)
+> +		srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+> +
+>  	/* Hyper-V SynIC auto EOI SINTs are not compatible with APICV */
+>  	if (!auto_eoi_old && auto_eoi_new) {
+>  		printk("Synic: inhibiting avic %d %d\n", auto_eoi_old, auto_eoi_new);
+> @@ -121,6 +124,10 @@ static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
+>  			kvm_request_apicv_update(vcpu->kvm, true,
+>  						 APICV_INHIBIT_REASON_HYPERV);
+>  	}
+> +
+> +	if (!host)
+> +		vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +
+>  }
+>  
+>  static int synic_set_sint(struct kvm_vcpu_hv_synic *synic, int sint,
+> @@ -149,9 +156,9 @@ static int synic_set_sint(struct kvm_vcpu_hv_synic *synic, int sint,
+>  
+>  	atomic64_set(&synic->sint[sint], data);
+>  
+> -	synic_update_vector(synic, old_vector);
+> +	synic_update_vector(synic, old_vector, host);
+>  
+> -	synic_update_vector(synic, vector);
+> +	synic_update_vector(synic, vector, host);
+>  
+>  	/* Load SynIC vectors into EOI exit bitmap */
+>  	kvm_make_request(KVM_REQ_SCAN_IOAPIC, hv_synic_to_vcpu(synic));
+>
+>
+> Assuming that we don't want this gross hack,  
+
+Is it dangerous or just ugly?
+
+> I wonder if we can avoid full blown memslot 
+> update when we disable avic, but rather have some 
+> smaller hack like only manually patching its
+> NPT mapping to have RW permissions instead 
+> of reserved bits which we use for MMIO. 
+>
+> The AVIC spec says that NPT is only used to check that
+> guest has RW permission to the page, 
+> while the HVA in the NPT entry itself is ignored.
+
+Assuming kvm_request_apicv_update() is called very rarely, I'd rather
+kicked all vCPUs out (similar to KVM_REQ_MCLOCK_INPROGRESS) and
+schedule_work() to make memslot update happen ourside of sRCU lock.
+
+>
+> Best regards,
+> 	Maxim Levitsky
+>
+>
+>
+>
+>
+
+-- 
+Vitaly
+
