@@ -2,124 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D43D3926A3
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 06:57:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EEE8D3926A5
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 06:57:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234577AbhE0E6m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 00:58:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59060 "EHLO
+        id S234744AbhE0E6y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 00:58:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234431AbhE0E6j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 May 2021 00:58:39 -0400
-Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCB90C061760;
-        Wed, 26 May 2021 21:57:05 -0700 (PDT)
-Received: by mail-ot1-x331.google.com with SMTP id i23-20020a9d68d70000b02902dc19ed4c15so3308588oto.0;
-        Wed, 26 May 2021 21:57:05 -0700 (PDT)
+        with ESMTP id S234635AbhE0E6x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 May 2021 00:58:53 -0400
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74355C061760
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 21:57:20 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id w12so4215887edx.1
+        for <kvm@vger.kernel.org>; Wed, 26 May 2021 21:57:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zd33jEwk8aHcS5XVZ56yw2Oa1m/r43mn4HOR1FizvXU=;
-        b=S3Q3irWuVCW9yu9MDQAE7KTjnhM/caOcdVcxZmKxu/a9WxHh1BOfD970uWtTPqCQrV
-         Rj3gsWRoMHvBobnlMbQnZ72NxeQ7761HUk1xPHQPwd4EUO4GuHlFpkMDjnBCyBFxn2CB
-         ERnwMOp1G48Pu8Y6nKL++IroC/7XOJoUCI0U9RF/uC4k+ghA84wsIxp0u204F6biLwid
-         sfI/p9qDDPAe7cD9bmPs1aT3JxF/2w/vK6pgiJFlF3YoFei4UlaWzcgQhJnJwFkCMjoq
-         NzN1eORSy+VODVm72LhiDH3MRgAyZY/btEjET53xim+VaMZtYGClYdAH41XmdhEAjWJM
-         YvCQ==
+         :cc:content-transfer-encoding;
+        bh=YJ0dWA2LN7YqfF1ySTSNQvt81ovDnTZhfscP6j/isLs=;
+        b=gKB8fvK0cCWN4lEkm4wDH6rz4Sa0FsxRwsg5F16JeFZeSk5+GIGcIQz76DqI7jCKna
+         1n5SBDwT2tPkv3xz9FZpqyHuntur92hGyhaJqhPLvrxOpxjMAwWwnzEI+ond1RyDNj2M
+         hSKTWiLfyXawwcHjtm/qvhYeQS3O4ky+w5QeGyceqwSLyP/TheaH2Ne18IVUbd8qIt3/
+         KCdb3Z51nRn7l+3Pmv10fGurtavWFZ1jh73TQbyQtJqZwO5c78iH8kmQAAcbOJ6mGvgX
+         3uDqtsAOrG8BYjKnqsMxPZMs+PQNCK4Ce6nPSunMJjOob1tFMqZxwaa9xuHBoDSMyEVR
+         hSNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zd33jEwk8aHcS5XVZ56yw2Oa1m/r43mn4HOR1FizvXU=;
-        b=kbcd00dkUXUcYELmsrsGkEXZVCZtTAdc+Gwg9yANL5NWBFZ4C52UNzhI/ov24ZQVU1
-         wHjq3eErHQIFi9UTkm7riM3LAFVCj/aE5o7prMtuS1PvYirVQRe3Zk2A0SUrG41pUVFc
-         SoWddebKWTLSq85uWWEcnxiaMdKPSLh69yeN/bBGevuT+LkAx9F8rMpJ0tWP9LzYwODQ
-         CuKod1YjTocWFodRu+glvBWGq4FFSivHf0/HdoSqcX4be0mhmW4VXnSq6EOD2tW/TnNt
-         /lDIQF03htLOMfL15IXwC3BW5uDKKMeI9gnmDFKL+WsI/YeYVi3wWsa26+f2LoHHMJdl
-         OKVw==
-X-Gm-Message-State: AOAM533d0stulAPMGvyEOJfnQ5Fe5yvMifB9juX69j8OsEP7Uig83GcB
-        BhVHeAcqCZfIpDkDFBvSLdweqkPoxjU0jQn5fD8=
-X-Google-Smtp-Source: ABdhPJyqy6tKSYJTO5Q/P3AU0dl27HaGrFoIR5zhBPvAV35Y/8Rt1mNAb4MgMs8/FoG3RwsudmZ9xYXw33XpsO6chec=
-X-Received: by 2002:a9d:4b0e:: with SMTP id q14mr1304495otf.254.1622091425262;
- Wed, 26 May 2021 21:57:05 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=YJ0dWA2LN7YqfF1ySTSNQvt81ovDnTZhfscP6j/isLs=;
+        b=eYphr/hl9WW9kInvO8n6J6zfhA7Agm5cX5o9A/zf9TwHTitjDY3EGbxPaGuw+gze70
+         aeVPX9A0cmIrQZgDtS9CTyd/UJWjRZtVdFMSFyiZa5UK58pvhfCR6Lj+WiMhRuwdP76Z
+         Yfvpm07mWRcLJbZJcX5r4okPCxanR0TpXvmxqO9TJ5LD+wkWpKgzKzfJ4MgrmMXUekG+
+         TOaQ7Xbvbfo4EJJyjZiSKVka9CvYJThIuAzHZqwfxfGenGJ9GYuajrHXQvoULwkM1ulW
+         +mCogMfdlLzfw5owbjG5GtvWLP5K4g663ZmkAu4w/HGQxxXniWVLeFuNhOh00KzEl6pK
+         tj2Q==
+X-Gm-Message-State: AOAM530y9FccYAuBt91/l+40KykNTUeGaDJkx58Nj+uDhboSoyh/RIOJ
+        5qB4QPDxjzzx4sHFjF5YVDXtu6sIMr6ezZLHKqax
+X-Google-Smtp-Source: ABdhPJz7HIu5MQLRpH/FbPdTqRTue+3JMybVC+vY85i/I/de3bl/zvWYSVdjNKEUlXy6fDXCcVP8dUSaDhAFYIw47Ng=
+X-Received: by 2002:a05:6402:4252:: with SMTP id g18mr1953908edb.195.1622091439123;
+ Wed, 26 May 2021 21:57:19 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210527084356.12c2784f@canb.auug.org.au>
-In-Reply-To: <20210527084356.12c2784f@canb.auug.org.au>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 27 May 2021 12:56:54 +0800
-Message-ID: <CANRm+CyC+=hMrVJCVWZ7cTC_F3CXYKRms2xNFQCvWa5rPS3U-w@mail.gmail.com>
-Subject: Re: linux-next: build failure after merge of the kvm-fixes tree
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
+References: <20210517095513.850-1-xieyongji@bytedance.com> <20210517095513.850-12-xieyongji@bytedance.com>
+ <3740c7eb-e457-07f3-5048-917c8606275d@redhat.com>
+In-Reply-To: <3740c7eb-e457-07f3-5048-917c8606275d@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Thu, 27 May 2021 12:57:08 +0800
+Message-ID: <CACycT3uAqa6azso_8MGreh+quj-JXO1piuGnrV8k2kTfc34N2g@mail.gmail.com>
+Subject: Re: Re: [PATCH v7 11/12] vduse: Introduce VDUSE - vDPA Device in Userspace
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 27 May 2021 at 10:50, Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+On Thu, May 27, 2021 at 12:13 PM Jason Wang <jasowang@redhat.com> wrote:
 >
-> Hi all,
 >
-> After merging the kvm-fixes tree, today's linux-next build (powerpc
-> ppc64_defconfig) failed like this:
+> =E5=9C=A8 2021/5/17 =E4=B8=8B=E5=8D=885:55, Xie Yongji =E5=86=99=E9=81=93=
+:
+> > +
+> > +static int vduse_dev_msg_sync(struct vduse_dev *dev,
+> > +                           struct vduse_dev_msg *msg)
+> > +{
+> > +     init_waitqueue_head(&msg->waitq);
+> > +     spin_lock(&dev->msg_lock);
+> > +     vduse_enqueue_msg(&dev->send_list, msg);
+> > +     wake_up(&dev->waitq);
+> > +     spin_unlock(&dev->msg_lock);
+> > +     wait_event_killable(msg->waitq, msg->completed);
 >
-> In file included from arch/powerpc/include/asm/kvm_ppc.h:19,
->                  from arch/powerpc/include/asm/dbell.h:17,
->                  from arch/powerpc/kernel/asm-offsets.c:38:
-> include/linux/kvm_host.h: In function 'kvm_vcpu_can_poll':
-> include/linux/kvm_host.h:270:9: error: implicit declaration of function 'single_task_running' [-Werror=implicit-function-declaration]
->   270 |  return single_task_running() && !need_resched() && ktime_before(cur, stop);
->       |         ^~~~~~~~~~~~~~~~~~~
 >
-> Caused by commit
+> What happens if the userspace(malicous) doesn't give a response forever?
 >
->   85d4c3baeb45 ("KVM: PPC: exit halt polling on need_resched()")
+> It looks like a DOS. If yes, we need to consider a way to fix that.
 >
-> I have used the kvm-fixes tree from next-20210524 again today.
 
-The kvm/master is broken by several patches.
+How about using wait_event_killable_timeout() instead?
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 0f6f394..e851671 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1659,7 +1659,7 @@ struct kvm_hv_hcall {
-
- static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct
-kvm_hv_hcall *hc, bool ex)
- {
--    int i, j;
-+    int i;
-     gpa_t gpa;
-     struct kvm *kvm = vcpu->kvm;
-     struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9d095bed..feb9611 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3604,7 +3604,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu,
-struct msr_data *msr_info)
-          * to ensure backwards-compatible behavior for migration.
-          */
-         if (msr_info->host_initiated &&
--            kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_TSC_HOST_ACCESS))
-+            kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_TSC_HOST_ACCESS)) {
-             offset = vcpu->arch.l1_tsc_offset;
-             ratio = vcpu->arch.l1_tsc_scaling_ratio;
-         } else {
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 18905c9..4273e04 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -10,6 +10,7 @@
- #include <linux/spinlock.h>
- #include <linux/signal.h>
- #include <linux/sched.h>
-+#include <linux/sched/stat.h>
- #include <linux/bug.h>
- #include <linux/minmax.h>
- #include <linux/mm.h>
+Thanks,
+Yongji
