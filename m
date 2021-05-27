@@ -2,161 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A9A93938E4
-	for <lists+kvm@lfdr.de>; Fri, 28 May 2021 01:03:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0390639391C
+	for <lists+kvm@lfdr.de>; Fri, 28 May 2021 01:21:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236426AbhE0XFM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 19:05:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51598 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233203AbhE0XFL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 May 2021 19:05:11 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97286C061574;
-        Thu, 27 May 2021 16:03:37 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id l1so2567111ejb.6;
-        Thu, 27 May 2021 16:03:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=S9besEpmPZmfRI3aBf2tbBwcQShTomayh485iY22oVA=;
-        b=oUWb+S9PbFqilEYFBHn/Z4KzrfSY6rB+h6crboBnNCYufx5Ta4+0SvKfjpdZBEcfMH
-         XtfZjtfuJ58kVrC2AcgnAQs+mCV1OSF7PeZtw/Kx1cUreyNxEnFORHtTdkFKq+0JIsvz
-         p5HNpFmtVPYHZEvRSHEoGGj4tKbl17PZ97fNP6sX4F2EoVWAMehS9Xoi4qSRNA/EW4Lk
-         GMkUxVbxmBzZRKyMzjGQrsAKPAiR2DdAf1lJ+3lPDM5qXeGUNPpsTuFRzZhwidbcSZwB
-         sKUaBQldWyNN+49i6tt3+tp/zlOlWebBkefQiuWclZTobLC4qakJv8loK1inHrDmvWqD
-         SvnA==
+        id S236623AbhE0XXE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 19:23:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25051 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236562AbhE0XXD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 27 May 2021 19:23:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622157689;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nCWKzoy9kj1pT7s/LMAs2R0z3NMNhJpdEi2dqYprz/8=;
+        b=SRSPXVFG1Epz1+Asu3MkXQ0V9pBUz86biq/PMyYM3sL+RxhJVNmp/EQSe1cz5eHywEJ90q
+        V3RcaCjc4Yg7w8RYU3jyo+tLIbQm8V2Jc9VIk1Gw79rchdOmCM3hsQ3WJih0bTIhLu7ij7
+        q1xOME7VbubN4OQUW6/5bRLiP/eSHIA=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-348-Cpa_JZKZM9mi5hhB89wfOw-1; Thu, 27 May 2021 19:21:27 -0400
+X-MC-Unique: Cpa_JZKZM9mi5hhB89wfOw-1
+Received: by mail-ed1-f70.google.com with SMTP id x3-20020a50ba830000b029038caed0dd2eso1107384ede.7
+        for <kvm@vger.kernel.org>; Thu, 27 May 2021 16:21:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=S9besEpmPZmfRI3aBf2tbBwcQShTomayh485iY22oVA=;
-        b=hY2KbdEnhTGEd3YUzHAXsF+O/jUworlJzHhnIfNaZsQZ+Vw09TV7onJ/b2lud54biI
-         HfBPNtSEGXZyFUF6US8vhO9uTuE5oQF+pWy2fgLDNNGIRc6/vlD8jALfMtSZCUN8hUYX
-         0MOfFuI927vmsN/JLyXktyCtdDV9gRg20kYmmbjMErLgL2gvhfW2dZ3mvX3QR0UiNP7/
-         L9ltTSbA+nMcQIIfRxqMDiQYFYAWOftqK4Cc2+DedN9qbPUUJP1MIwF6ct0dshGKhdnw
-         rVQlVNLhrqWm7VeniZis4jCzF8y4xE41kmYQrIKccOREBtHHHHktG0Ss3PmfGYAtKC34
-         TDWw==
-X-Gm-Message-State: AOAM532qTB5WL9tyoUIY6tAQeKJ1a4AtkIRWxb6yojRoy+Ydpb1tzvhI
-        fr2gK3EdnZofficMt/sMX59FoaY2d+UDTKNd9nw=
-X-Google-Smtp-Source: ABdhPJzZLL54J01xv+oFJrTdTOOm2zwkQnYQxL9UUVADFG1eA0OFVodZarOeSMKwIjXPQQtukXV3RQT9X9MouM1E+U8=
-X-Received: by 2002:a17:906:f285:: with SMTP id gu5mr6402516ejb.226.1622156615069;
- Thu, 27 May 2021 16:03:35 -0700 (PDT)
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nCWKzoy9kj1pT7s/LMAs2R0z3NMNhJpdEi2dqYprz/8=;
+        b=aqwtTQgEXE9DSvautXSc/QN/uVbHBcTHFpxwVFvVhHQ1eMphhTVMTxAnodLITTvvjs
+         mKw/1rTaY3oV8Xw9w3KUfxybrO7fLkpi7PiMa4GDB/F9n5mRgLPeu3tbZUr3v6hBd99f
+         GL9QLKmu2PI9lBzm6vmy+IO5XNN2uePjuIi41t038+AZOG13BvzEQu7JRMc5XyGYR94m
+         JRfz+v++qm1zf8SV/AOhNRvotqQ/6auJrZ4RwdNeZN44CR6EK41YTo2udCfhE5xc8zYk
+         573lXiIJ0S5lpOlC1ByF1tZ5iBcmEhGNHdpIGHcznk75rncIakElLuiHU85v638PCpkZ
+         WG7A==
+X-Gm-Message-State: AOAM5308y9/K2TQM9rJgG16mSsvxun3Wsb4paE/tomhQwlKQbDlLF6Mo
+        uq1UXMpqQgfdfSaCeayNPLcoL525GIDnLzp5jVX51sV+TxoTzchoJOjYjFwhmaOOx1PYlHo1spD
+        gR1kJceGs984/
+X-Received: by 2002:a17:906:68c:: with SMTP id u12mr6263653ejb.470.1622157686503;
+        Thu, 27 May 2021 16:21:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzzgiXFMi0YlkhIN3byuem1Kgwi4TTcVzAYR+6zTso/Cq/N5U9JF7ehTOA7isPY90/EHZ2CWQ==
+X-Received: by 2002:a17:906:68c:: with SMTP id u12mr6263641ejb.470.1622157686347;
+        Thu, 27 May 2021 16:21:26 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id e22sm1889267edu.35.2021.05.27.16.21.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 May 2021 16:21:25 -0700 (PDT)
+Subject: Re: [syzbot] WARNING in x86_emulate_instruction
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        syzbot <syzbot+71271244f206d17f6441@syzkaller.appspotmail.com>,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        jarkko@kernel.org, jmattson@google.com, joro@8bytes.org,
+        kan.liang@linux.intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sgx@vger.kernel.org,
+        mingo@redhat.com, peterz@infradead.org, seanjc@google.com,
+        steve.wahl@hpe.com, syzkaller-bugs@googlegroups.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
+References: <000000000000f3fc9305c2e24311@google.com>
+ <87v9737pt8.ffs@nanos.tec.linutronix.de>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0f6e6423-f93a-5d96-f452-4e08dbad9b23@redhat.com>
+Date:   Fri, 28 May 2021 01:21:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-References: <1622091679-31683-1-git-send-email-wanpengli@tencent.com> <YK/Q7ESa44lcqlMM@google.com>
-In-Reply-To: <YK/Q7ESa44lcqlMM@google.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Fri, 28 May 2021 07:03:24 +0800
-Message-ID: <CANRm+CwL-uS3FPZxpW_cB=vdD4WKLRDPTpd4hsn57eWpKZ_CtQ@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] KVM: X86: Fix warning caused by stale emulation context
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <87v9737pt8.ffs@nanos.tec.linutronix.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 28 May 2021 at 01:03, Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, May 26, 2021, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > Reported by syzkaller:
-> >
-> >   WARNING: CPU: 7 PID: 10526 at /home/kernel/ssd/linux/arch/x86/kvm//x86.c:7621 x86_emulate_instruction+0x41b/0x510 [kvm]
->
-> "/home/kernel/ssd/linux/" can be omitted to make the line length a bit shorter.
-> checkpatch also complains about using absolute path instead of relative path.
->
-> >   RIP: 0010:x86_emulate_instruction+0x41b/0x510 [kvm]
-> >   Call Trace:
-> >    kvm_mmu_page_fault+0x126/0x8f0 [kvm]
-> >    vmx_handle_exit+0x11e/0x680 [kvm_intel]
-> >    vcpu_enter_guest+0xd95/0x1b40 [kvm]
-> >    kvm_arch_vcpu_ioctl_run+0x377/0x6a0 [kvm]
-> >    kvm_vcpu_ioctl+0x389/0x630 [kvm]
-> >    __x64_sys_ioctl+0x8e/0xd0
-> >    do_syscall_64+0x3c/0xb0
-> >    entry_SYSCALL_64_after_hwframe+0x44/0xae
-> >
-> > Commit 4a1e10d5b5d8c (KVM: x86: handle hardware breakpoints during emulation())
-> > adds hardware breakpoints check before emulation the instruction and parts of
-> > emulation context initialization, actually we don't have the EMULTYPE_NO_DECODE flag
-> > here and the emulation context will not be reused. Commit c8848cee74ff (KVM: x86:
-> > set ctxt->have_exception in x86_decode_insn()) triggers the warning because it
-> > catches the stale emulation context has #UD, however, it is not during instruction
-> > decoding which should result in EMULATION_FAILED. This patch fixes it by moving
-> > the second part emulation context initialization into init_emulate_ctxt() and
-> > before hardware breakpoints check.
-> >
-> > syzkaller source: https://syzkaller.appspot.com/x/repro.c?x=134683fdd00000
-> >
-> > Reported-by: syzbot+71271244f206d17f6441@syzkaller.appspotmail.com
-> > Fixes: 4a1e10d5b5d8 (KVM: x86: handle hardware breakpoints during emulation)
-> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > ---
-> > v2 -> v3:
-> >  * squash ctxt->ud
-> > v1 -> v2:
-> >  * move the second part emulation context initialization into init_emulate_ctxt()
-> >
-> >  arch/x86/kvm/x86.c | 14 +++++++-------
-> >  1 file changed, 7 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index bbc4e04..ae47b19 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -7226,6 +7226,13 @@ static void init_emulate_ctxt(struct kvm_vcpu *vcpu)
-> >       BUILD_BUG_ON(HF_SMM_MASK != X86EMUL_SMM_MASK);
-> >       BUILD_BUG_ON(HF_SMM_INSIDE_NMI_MASK != X86EMUL_SMM_INSIDE_NMI_MASK);
-> >
-> > +     ctxt->interruptibility = 0;
-> > +     ctxt->have_exception = false;
-> > +     ctxt->exception.vector = -1;
-> > +     ctxt->perm_ok = false;
-> > +
-> > +     ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
->
-> "ctxt->ud" should be left where it is in patch 01.  "emulation_type" isn't passed
-> to init_emulate_ctxt(), and I don't see any reason to add it to the params since
-> ctxt->ud is only consumed by x86_decode_insn(), i.e. moving ctxt->ud isn't
-> necessary to fix the bug.
+On 28/05/21 00:52, Thomas Gleixner wrote:
+> 
+> So this is stale for a week now. It's fully reproducible and nobody
+> can't be bothered to look at that?
+> 
+> What's wrong with you people?
 
-How about this?
+Actually there's a patch on list ("KVM: X86: Fix warning caused by stale 
+emulation context").  Take care.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index bbc4e04..dba8077 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7226,6 +7226,11 @@ static void init_emulate_ctxt(struct kvm_vcpu *vcpu)
-        BUILD_BUG_ON(HF_SMM_MASK != X86EMUL_SMM_MASK);
-        BUILD_BUG_ON(HF_SMM_INSIDE_NMI_MASK != X86EMUL_SMM_INSIDE_NMI_MASK);
+Paolo
 
-+       ctxt->interruptibility = 0;
-+       ctxt->have_exception = false;
-+       ctxt->exception.vector = -1;
-+       ctxt->perm_ok = false;
-+
-        init_decode_cache(ctxt);
-        vcpu->arch.emulate_regs_need_sync_from_vcpu = false;
- }
-@@ -7561,11 +7566,6 @@ int x86_decode_emulated_instruction(struct
-kvm_vcpu *vcpu, int emulation_type,
-            kvm_vcpu_check_breakpoint(vcpu, &r))
-                return r;
-
--       ctxt->interruptibility = 0;
--       ctxt->have_exception = false;
--       ctxt->exception.vector = -1;
--       ctxt->perm_ok = false;
--
-        ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
-
-        r = x86_decode_insn(ctxt, insn, insn_len);
