@@ -2,261 +2,445 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 57F053932E0
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 17:51:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 164D83932F1
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 17:54:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233270AbhE0PxO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 11:53:14 -0400
-Received: from mail-dm6nam11on2061.outbound.protection.outlook.com ([40.107.223.61]:39904
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229713AbhE0PxE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 May 2021 11:53:04 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gX7Rz4LTggFJH+ugPjY0OtFz111nK4sSl0w1kH30IIGAu7klGHiaH4vT72X5CXgpYIWiTN4YDzstGpAAkjhbTQpP+YeZWbrKhMoJUbLf0chn1RqiaTYXnrdNnc1jge7jU2hOyGHapksMwMQSYMd/GFUg2BgKYYellEP6YktfXhAKtIGzVL1qd1Y8QkXRbXg/0V11isvHxDlpr4NCBMT+edlHXUKVQCiSDCk/DFSYteVdqwYZB+Oq9PBbbznDv9xguRJYh0NcEZGJUF90x/cXQVyAoz7JFOGWaryz02MvPr6NawB2PMMQrrd9RSwOYkodysfS08SP9oNYcpiPl1xDjg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=orUom83ewoKjB//GmzTtNwJcu9TFiWCjMgINqGYlgGA=;
- b=n/PN+eNGoBGo//NLVeUGlI1M5GxBmylFDEp7HA2ALnaRbUDvG1EgDn0TRHuRBomHzwKrxt2Xl3swwo0GHR2CPjuwmZLnmZ590TGRYD7ZdsBr0XsPI4MABi1kVQox3L1uKW+qZmvOadkIADXSca8t1ELiIr6oOnn74SQE1pVtN0SlQgynOWukrT5p6t3iLw1rbvLvliXYF3Hpi3rPh6io/ncZluVfEKZ6iuqXt5TccZuCZ0UV2ppcd/N/Mweu2WNDUoSRdwUshHiUPSAN2GWt+clgePndHCmF2z9d0jWUB2e/v0/2miKOhYwKpGgMVDyYvjBB/VpievBBVliy1HtxPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=orUom83ewoKjB//GmzTtNwJcu9TFiWCjMgINqGYlgGA=;
- b=vTlTgvPBzur9yfaE5U6wRX3eff/iAtwVeN5rW4N/ehWg/Q57zlFWVplwV7UNDHQQt1hOdHUCJMb2xaG5YHxJBF9Z3TpU4/4hQxwbk3Ujxq452chhgUorE25ng1vv1DKbk/c7VihM3JVBWZGOAtk5JoRuz/aF7w2qEcLBD4XXAMs=
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SN6PR12MB2687.namprd12.prod.outlook.com (2603:10b6:805:73::26) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.22; Thu, 27 May
- 2021 15:51:29 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::1fb:7d59:2c24:615e]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::1fb:7d59:2c24:615e%6]) with mapi id 15.20.4129.036; Thu, 27 May 2021
- 15:51:29 +0000
-From:   "Kalra, Ashish" <Ashish.Kalra@amd.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Tobin Feldman-Fitzthum <tobin@linux.ibm.com>,
-        "natet@google.com" <natet@google.com>
-CC:     Dov Murik <dovmurik@linux.vnet.ibm.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "srutherford@google.com" <srutherford@google.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Hubertus Franke <frankeh@us.ibm.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: RE: [RFC] KVM: x86: Support KVM VMs sharing SEV context
-Thread-Topic: [RFC] KVM: x86: Support KVM VMs sharing SEV context
-Thread-Index: AQHXCot5SNFL8RrPlkCutU8OGpQ4JKp/Ae+AgAAQa4CAdHeyEIAEX2Pw
-Date:   Thu, 27 May 2021 15:51:29 +0000
-Message-ID: <SN6PR12MB276726B5FEF171E1099B91AC8E239@SN6PR12MB2767.namprd12.prod.outlook.com>
-References: <20210224085915.28751-1-natet@google.com>
- <7829472d-741c-1057-c61f-321fcfb5bdcd@linux.ibm.com>
- <35dde628-f1a8-c3bf-9c7d-7789166b0ee1@redhat.com>
- <SN6PR12MB276780007C17ADD273EB70FC8E269@SN6PR12MB2767.namprd12.prod.outlook.com>
-In-Reply-To: <SN6PR12MB276780007C17ADD273EB70FC8E269@SN6PR12MB2767.namprd12.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_Enabled=true;
- MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_SetDate=2021-05-27T15:51:25Z;
- MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_Method=Privileged;
- MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_Name=Public_0;
- MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
- MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_ActionId=c0e1fa55-cc39-48d4-80c0-6013c0b193d0;
- MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_ContentBits=1
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-x-originating-ip: [183.83.213.75]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: da5904f3-231a-4827-4802-08d921274ad4
-x-ms-traffictypediagnostic: SN6PR12MB2687:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SN6PR12MB2687A66441A9A0332D0F66428E239@SN6PR12MB2687.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4125;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: VSvQsQxHnGVye0ee6g6pSbEV9n1povuxQ9uUJL3Z+NdZHbALyKQ0SRzFC6s6x2OwQTo4SpVTdaI9Fr/2D4HUldfOn89m+VV/T9oD6medxtaympjcQ/nAI/V5WSdVxlH/8vwibhHDiQWBVAsIoNZ6MHJqDNt0vfT8qAApFWn3DhnnE+hIgddT2R2wlOjm9Xv149I3a+ViTLofHTLUwgHCgcb/exWL8k4sMymnBGz9QH+c59lmAvMc/vBhdrktlDwT+JnEdaWHypYSnCcdcLBf7/3q4Ql2bRkvQJWlgH1RR5DsVnv5wZHTRJw8EOOJUhrccIlt2lv7daojeWSaCVrNWB/kABnwoOnC55QOP7z3jun8D3B8SXRi6rVIq+BWhqZJl+cQuZhW78mi1YhafC4kdhaaAhvMkSR+uTGvyia/VEvBhCltkukcHK3NYAaQxWkYzdvG53v1ZAYfZXeaZV85/vVKDOdac1zEypabt6XZNhv3jio2Xu7w3AV3S9PynBX+EFNpp5AtF3E6KvMTarpg8Bm7cyNSh1OjfujvJKSnq5ilbjdee8TW9Fyr0qRTfDVSYOdXJDnSx6cUyprj2ttsbGHkzupV9G0gjOWuSXWVz/4=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(366004)(39860400002)(396003)(136003)(376002)(4326008)(26005)(33656002)(71200400001)(53546011)(6506007)(7696005)(86362001)(55016002)(122000001)(38100700002)(64756008)(76116006)(52536014)(7416002)(2906002)(8936002)(9686003)(5660300002)(186003)(316002)(478600001)(66446008)(66556008)(8676002)(83380400001)(66946007)(66476007)(54906003)(110136005);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: =?utf-8?B?TmxnQzFXeEVWc3ZoMTRWRW1oZzBVdlBVQzlUTHVTTlc1Sm1FYkxzNVF3aG8z?=
- =?utf-8?B?N3VkcHhGeWZtbUpGV0dXdVBaUHFtQ0ZGQW01bnNRdm1KSUdsUmFXN3I2RnRI?=
- =?utf-8?B?bTJKblJyK2huUHdndzg5REN3MkFYUStKRlhhZnJRdmQyN3FQaGIwUTZEaHZi?=
- =?utf-8?B?Wld4c095VFVrZmhXL3luQmIzU3lmOWRTOXZGMXY3RmlSZlVkL2hVTitGaFMr?=
- =?utf-8?B?MWRkaDlWTUxURTNKdEdUTU8xWUhoQ0Rxdy9rSlZkWE0zWTRrNFowc0hLQ0w1?=
- =?utf-8?B?dFUrTHlHaXpqdktQY3VGUDllS0dyNTdIT1htVit6cU5Ra05qQmloWVhGdEVU?=
- =?utf-8?B?NlNsZVJNN09EZkVjb2pVZ2hHUmkrT2w4Z1p0T3J6T2ZzY0lrM2U4NzhTWXp5?=
- =?utf-8?B?c3VYcjVLK0gyVHVGaWdsaFdBcmN0SFVtUXJtN0hJUGpjaW5LVWJTUnVicGU2?=
- =?utf-8?B?YjdkVkVxMU51bkl0bis4SXFnMnhndEZ0RzMvdnh1MVlXc3ptSXlqWjZTUmJU?=
- =?utf-8?B?M3dXYVFtSkwxeWNtbkk3ZFRWNGMvaE1uZzZOcUt0VEtDRXJqeGVFa0Q3dXZF?=
- =?utf-8?B?T3lySUdpME9kOXAvRVJHNXdycStsZXZlbFkxRkNvVWs3Nk5JOGxrd253cUcv?=
- =?utf-8?B?c2dxNDVySjVJVFpvSnA3bHVOOTVnVWRYaStCOTMxZUpQZkRWSVVmRjEwK2pF?=
- =?utf-8?B?WHhyOFRYUDE3Z0hsQTMrZUtVYTZGcjRWcjV4dzREaVduQWg3TDVPVUpWV2R3?=
- =?utf-8?B?NW1vMjdmNitLMFRta3VkcXdUbjJqd3JVYXR5YVE2MWZRd1h1Rm04VTJEWWJ3?=
- =?utf-8?B?NnU4M0o4NG00QU1TSTFrZk4rYitBdC9tRWJGL2drYU93T1YwVXV5b0k2c25H?=
- =?utf-8?B?N2QxYlRPRW02MjgrdU9uT0ZwMGZMbHkxa0VReTJBY0lRSmhsRG5JVVUyNCtq?=
- =?utf-8?B?TExjbEZ4cURsdXpGMEZsU1ZtamFmSjNLWElVZ0U2QWc4YjlZeWZhL015MXVp?=
- =?utf-8?B?S1ZBUVJpdHlwVlJHNTR1MDYya2ExQjBQSERaMTdXdWRlL3E5THZUWU5lekw5?=
- =?utf-8?B?Rk1OL0dOODhOeEJlMGdZUVVqR0NGZ0wzYzEzeERHOXI3ZTJmYThraFViUnNP?=
- =?utf-8?B?MXRGci9ETnZocmo0NjFEMFgwM1VXZUdJOFhxQXB0cEY0YnhDZTEyYk0yQmp2?=
- =?utf-8?B?UjJIc0R2OWZiZmZkcU1OYmwxekVCVDRNNnFpczdZR2V6clFIemVmVk9hSzhr?=
- =?utf-8?B?Rys0dFRmMjNLanovOGhYMlNGQkczdmRGd01GczlDd0hTWlQyb0hoTEpKTWVm?=
- =?utf-8?B?RTVCaWtRWnZXMEJaUk9GSkx5QnNUSUFPN1oyWHhnM2VMSThFS0hIWFZJUFBS?=
- =?utf-8?B?bFR1cnp2ek9MK0ZpbGdCTnBwTVNZOXRwVzltTlhBb0IxZWpWTENWYzlwTFVQ?=
- =?utf-8?B?QnhYWTdNbEphOGI4aXc3R3AvYWQvQkZNUFVlSTFCd3daK2JrbHJxR3lVZ1NR?=
- =?utf-8?B?Uk9iRDJpK2xzT0swb1p5UTMwVlY5ZmtXZnNGS05WL2dRMjhieE52Y2xwaEpH?=
- =?utf-8?B?YlBhODdCQ1lGU0RZOVdwcWhEaUhETGV1MjBkbDlmelk0ZlJoTUg3dzg0RDBI?=
- =?utf-8?B?cGFtWUdhYXh0eHM4OG5kM1B2ODI1RU5TcmRWdXlSOXhmOExGVzNkTWI4TkVX?=
- =?utf-8?B?Ynk3cS8xclhGVlBrUHdaZExVaXMxZ1BvZlUwNmd5R0hEeXUreWpnWTFrYVVD?=
- =?utf-8?Q?2O5yEop4L0I4iIjx/Pjhjklk4MAAPbeS/VvV/ld?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S234071AbhE0P4G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 11:56:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40280 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233886AbhE0P4F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 May 2021 11:56:05 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A120C0613CE
+        for <kvm@vger.kernel.org>; Thu, 27 May 2021 08:54:30 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id j6so763104lfr.11
+        for <kvm@vger.kernel.org>; Thu, 27 May 2021 08:54:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=si4bZGT6UWZDcxNapGYxNQN+Ga6Xu5y16MozxfyXdx8=;
+        b=ftSLp/bnXXqjvZwQkcI38JOab6H3xJHrUczkyOfrknEOOSz0G7idUJorPnhzIYSURh
+         dF1dWBULgxU5icnNJrQV+VH4+m10hKsefr9yaEV3tTbr7DDutdPEvxAV21C8jbSEfWqU
+         0OPHFnaQag7dLirQdivMvnqRTu0+5MnERsIfLNwZoEBvRjXpFKNSlUJsuh28J3VErx6F
+         N6Wr8moHeW7Fw1sZ+ffvpaXsjdmPnOwTmGjvlsCeOta+BLf9MDJ4aps5sekNG3XcXVxL
+         jtv6UFjB928EQi1yevKa7Ld9wV3bBv9qvfG5B4tK1XjEO12KdvV0QdhvuUukUSMrEo0S
+         WM4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=si4bZGT6UWZDcxNapGYxNQN+Ga6Xu5y16MozxfyXdx8=;
+        b=fm4gLSELXxOrfBWAf240/az8cKqH99pf7TKiOsxQOdCXubx8mlK9ypaUfondLeTwdp
+         MjxUAJQ2AEOPmva7aU60OEC88X2yuB1ZvRR92jXlysbNQSj9pZ9pWyLiN3UgGvMBKBaU
+         iHf7nV1boxxthEtndWqDxtksrxEQAvQSsSltcJlE1i5eyVRyadt4Z/AX4Z5XmlFKVENL
+         9SwnNkO7XLzL/4Vl+expzCGtgpY/UUtWQwTUl1MzXI1k4rPVJO/QvscHjLOb2VwrJIbP
+         j+jd4gfHkByEBOLyxJoEnGkIO2j3DREYka0lK3Svo0d8GJaSauSWEE5WNmkEmyXl4nUM
+         5aSw==
+X-Gm-Message-State: AOAM530SA9e6enp5eUK/1hzGKTa84QnkzU56UBsX1sX/p1IVQOv2y3dQ
+        JV4I4op007zxsIxmqGTanOKbp1U/hR/lnCiGfjP2eg==
+X-Google-Smtp-Source: ABdhPJzmOJcg8wZZMDTZWT33t97iXrEeo69CAvEHEEPARmsHZgmi6jy/VSYVgDsBAc6TGwCnRbkC3CT+kTQUgW7rJgI=
+X-Received: by 2002:a05:6512:3d8a:: with SMTP id k10mr2781848lfv.473.1622130868033;
+ Thu, 27 May 2021 08:54:28 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: da5904f3-231a-4827-4802-08d921274ad4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 May 2021 15:51:29.1253
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2dR64nPLEB0begIXFaXMS8ha3QNfoBA5JrGjeK8D/2X7xzbXuaUP9OzuZjLnKdE7S6EBVOyubaVoXtjZht5uQg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2687
+References: <20210524151828.4113777-1-jingzhangos@google.com>
+ <20210524151828.4113777-5-jingzhangos@google.com> <bad9e2cb-0e23-f2ea-054f-23556dbfd7e1@oracle.com>
+In-Reply-To: <bad9e2cb-0e23-f2ea-054f-23556dbfd7e1@oracle.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Thu, 27 May 2021 10:54:17 -0500
+Message-ID: <CAAdAUtjoSUVDeZs4VzBPYVEt87JrQN4RCGhViqrW67unn8zRJA@mail.gmail.com>
+Subject: Re: [PATCH v6 4/4] KVM: selftests: Add selftest for KVM statistics
+ data binary interface
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-W0FNRCBQdWJsaWMgVXNlXQ0KDQpMb29raW5nIGF0IGt2bSBzZWxmdGVzdHMgaW4gdGhlIGtlcm5l
-bCwgSSB0aGluayB0aGUgb3RoZXIgYWx0ZXJuYXRpdmUgaXMgdG8gOg0KDQpNYWludGFpbiBzZXBh
-cmF0ZSBkYXRhIHN0cnVjdHVyZXMgbGlrZSBzdHJ1Y3Qga3ZtX3ZtLCBzdHJ1Y3QgdmNwdSBmb3Ig
-dGhlIG1pcnJvciBWTSwgYnV0IHRoZW4gdGhhdCBtZWFucyBxdWl0ZSBhIGJpdCBvZiANCnRoZSBL
-Vk0gY29kZSBpbiBRZW11IGZvciB0aGUgbWlycm9yIFZNIHdpbGwgYmUgZHVwbGljYXRlZC4gDQoN
-CkZvciBleGFtcGxlLCB0aGlzIHdpbGwgYWRkIHNlcGFyYXRlIGFuZCBkdXBsaWNhdGVkIGZ1bmN0
-aW9uYWxpdHkgZm9yIDogDQoNCnZtX2NoZWNrX2NhcC92bV9lbmFibGVfY2FwLA0Kdm1fY3JlYXRl
-LA0KdmNwdV9ydW4sDQp2Y3B1X2dldF9yZWdzLCB2Y3B1X3NyZWdzX2dldC9zZXQsDQp2Y3B1X2lv
-Y3RsLA0Kdm1faW9jdGwsIGV0Yy4sIGV0Yy4NCg0KQWxzbyBJIHRoaW5rIHRoYXQgb25jZSB0aGUg
-bWlycm9yIFZNIHN0YXJ0cyBib290aW5nIGFuZCBydW5uaW5nIHRoZSBVRUZJIGNvZGUsIGl0IG1p
-Z2h0IGJlIG9ubHkgZHVyaW5nIHRoZSBQRUkgb3IgRFhFIHBoYXNlIHdoZXJlDQppdCB3aWxsIHN0
-YXJ0IGFjdHVhbGx5IHJ1bm5pbmcgdGhlIE1IIGNvZGUsIHNvIG1pcnJvciBWTSBwcm9iYWJseSBz
-dGlsbCBuZWVkIHRvIGhhbmRsZXMgS1ZNX0VYSVRfSU8sIHdoZW4gU0VDIHBoYXNlIGRvZXMgSS9P
-LA0KSSBjYW4gc2VlIFBJQyBhY2Nlc3NlcyBhbmQgRGVidWcgQWdlbnQgaW5pdGlhbGl6YXRpb24g
-c3R1ZmYgaW4gU2VjIHN0YXJ0dXAgY29kZS4NCg0KVGhhbmtzLA0KQXNoaXNoDQoNCi0tLS0tT3Jp
-Z2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBLYWxyYSwgQXNoaXNoIA0KU2VudDogTW9uZGF5LCBN
-YXkgMjQsIDIwMjEgNDoyOSBQTQ0KVG86IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5j
-b20+OyBUb2JpbiBGZWxkbWFuLUZpdHp0aHVtIDx0b2JpbkBsaW51eC5pYm0uY29tPjsgbmF0ZXRA
-Z29vZ2xlLmNvbQ0KQ2M6IERvdiBNdXJpayA8ZG92bXVyaWtAbGludXgudm5ldC5pYm0uY29tPjsg
-TGVuZGFja3ksIFRob21hcyA8VGhvbWFzLkxlbmRhY2t5QGFtZC5jb20+OyB4ODZAa2VybmVsLm9y
-Zzsga3ZtQHZnZXIua2VybmVsLm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsgc3J1
-dGhlcmZvcmRAZ29vZ2xlLmNvbTsgc2VhbmpjQGdvb2dsZS5jb207IHJpZW50amVzQGdvb2dsZS5j
-b207IFNpbmdoLCBCcmlqZXNoIDxicmlqZXNoLnNpbmdoQGFtZC5jb20+OyBMYXN6bG8gRXJzZWsg
-PGxlcnNla0ByZWRoYXQuY29tPjsgSmFtZXMgQm90dG9tbGV5IDxqZWpiQGxpbnV4LmlibS5jb20+
-OyBIdWJlcnR1cyBGcmFua2UgPGZyYW5rZWhAdXMuaWJtLmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251
-Lm9yZw0KU3ViamVjdDogUkU6IFtSRkNdIEtWTTogeDg2OiBTdXBwb3J0IEtWTSBWTXMgc2hhcmlu
-ZyBTRVYgY29udGV4dA0KDQpbQU1EIFB1YmxpYyBVc2VdDQoNCkhlbGxvIFBhb2xvLA0KDQpJIGFt
-IHdvcmtpbmcgb24gcHJvdG90eXBlIGNvZGUgaW4gcWVtdSB0byBzdGFydCBhIG1pcnJvciBWTSBy
-dW5uaW5nIGluIHBhcmFsbGVsIHRvIHRoZSBwcmltYXJ5IFZNLiBJbml0aWFsbHkgSSBoYWQgYW4g
-aWRlYSBvZiBhIHJ1bm5pbmcgYSBjb21wbGV0ZWx5IHBhcmFsbGVsIFZNIGxpa2UgdXNpbmcgdGhl
-IHFlbXXigJlzIG1pY3Jvdm0gbWFjaGluZS9wbGF0Zm9ybSwgYnV0IHRoZSBtYWluIGlzc3VlIHdp
-dGggdGhpcyBpZGVhIGlzIHRoZSBkaWZmaWN1bHR5IGluIHNoYXJpbmcgdGhlIG1lbW9yeSBvZiBw
-cmltYXJ5IFZNIHdpdGggaXQuDQoNCkhlbmNlLCBJIHN0YXJ0ZWQgZXhwbG9yaW5nIHJ1bm5pbmcg
-YW4gaW50ZXJuYWwgdGhyZWFkIGxpa2UgdGhlIGN1cnJlbnQgcGVyLXZDUFUgdGhyZWFkKHMpIGlu
-IHFlbXUuIFRoZSBtYWluIGlzc3VlIGlzIHRoYXQgcWVtdSBoYXMgYSBsb3Qgb2YgZ2xvYmFsIHN0
-YXRlLCBlc3BlY2lhbGx5IHRoZSBLVk1TdGF0ZSBzdHJ1Y3R1cmUgd2hpY2ggaXMgcGVyLVZNLCBh
-bmQgYWxsIHRoZSBLVk0gdkNQVXMgYXJlIHZlcnkgdGlnaHRseSB0aWVkIGludG8gaXQuIEl0IGRv
-ZXMgbm90IG1ha2Ugc2Vuc2UgdG8gYWRkIGEgY29tcGxldGVseSBuZXcgS1ZNU3RhdGUgc3RydWN0
-dXJlIGluc3RhbmNlIGZvciB0aGUgbWlycm9yIFZNIGFzIHRoZW4gdGhlIG1pcnJvciBWTSBkb2Vz
-IG5vdCByZW1haW4gbGlnaHR3ZWlnaHQgYXQgYWxsLiANCg0KSGVuY2UsIHRoZSBtaXJyb3IgVk0g
-aSBhbSBhZGRpbmcsIGhhcyB0byBpbnRlZ3JhdGUgd2l0aCB0aGUgY3VycmVudCBLVk1TdGF0ZSBz
-dHJ1Y3R1cmUgYW5kIHRoZSDigJxnbG9iYWzigJ0gS1ZNIHN0YXRlIGluIHFlbXUsIHRoaXMgcmVx
-dWlyZWQgYWRkaW5nIHNvbWUgcGFyYWxsZWwgS1ZNIGNvZGUgaW4gcWVtdSwgZm9yIGV4YW1wbGUg
-dG8gZG8gaW9jdGwncyBvbiB0aGUgbWlycm9yIFZNLCBzaW1pbGFyIHRvIHRoZSBwcmltYXJ5IFZN
-LiBEZXRhaWxzIGJlbG93IDoNCg0KVGhlIG1pcnJvcl92bV9mZCBpcyBhZGRlZCB0byB0aGUgS1ZN
-U3RhdGUgc3RydWN0dXJlIGl0c2VsZi4gDQoNClRoZSBwYXJhbGxlbCBjb2RlIEkgbWVudGlvbmVk
-IGlzIGxpa2UgdGhlIGZvbGxvd2luZyA6DQoNCiNkZWZpbmUga3ZtX21pcnJvcl92bV9lbmFibGVf
-Y2FwKHMsIGNhcGFiaWxpdHksIGNhcF9mbGFncywgLi4uKSAgICAgIFwNCiAgICAoeyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwN
-CiAgICAgICAgc3RydWN0IGt2bV9lbmFibGVfY2FwIGNhcCA9IHsgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIFwNCiAgICAgICAgICAgIC5jYXAgPSBjYXBhYmlsaXR5LCAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwNCiAgICAgICAgICAgIC5mbGFncyA9IGNhcF9m
-bGFncywgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwNCiAgICAgICAgfTsg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IFwNCiAgICAgICAgdWludDY0X3QgYXJnc190bXBbXSA9IHsgX19WQV9BUkdTX18gfTsgICAgICAg
-ICAgICAgICAgICAgICAgIFwNCiAgICAgICAgc2l6ZV90IG4gPSBNSU4oQVJSQVlfU0laRShhcmdz
-X3RtcCksIEFSUkFZX1NJWkUoY2FwLmFyZ3MpKTsgIFwNCiAgICAgICAgbWVtY3B5KGNhcC5hcmdz
-LCBhcmdzX3RtcCwgbiAqIHNpemVvZihjYXAuYXJnc1swXSkpOyAgICAgICAgIFwNCiAgICAgICAg
-a3ZtX21pcnJvcl92bV9pb2N0bChzLCBLVk1fRU5BQkxFX0NBUCwgJmNhcCk7ICAgICAgICAgICAg
-ICAgIFwNCiAgICB9KQ0KDQoNCitpbnQga3ZtX21pcnJvcl92bV9pb2N0bChLVk1TdGF0ZSAqcywg
-aW50IHR5cGUsIC4uLikgew0KKyAgICBpbnQgcmV0Ow0KKyAgICB2b2lkICphcmc7DQorICAgIHZh
-X2xpc3QgYXA7DQorDQorICAgIHZhX3N0YXJ0KGFwLCB0eXBlKTsNCisgICAgYXJnID0gdmFfYXJn
-KGFwLCB2b2lkICopOw0KKyAgICB2YV9lbmQoYXApOw0KKw0KKyAgICB0cmFjZV9rdm1fdm1faW9j
-dGwodHlwZSwgYXJnKTsNCisgICAgcmV0ID0gaW9jdGwocy0+bWlycm9yX3ZtX2ZkLCB0eXBlLCBh
-cmcpOw0KKyAgICBpZiAocmV0ID09IC0xKSB7DQorICAgICAgICByZXQgPSAtZXJybm87DQorICAg
-IH0NCisgICAgcmV0dXJuIHJldDsNCit9DQorDQoNClRoZSB2Y3B1IGlvY3RsIGNvZGUgd29ya3Mg
-YXMgaXQgaXMuIA0KDQpUaGUga3ZtX2FyY2hfcHV0X3JlZ2lzdGVycygpIGFsc28gbmVlZGVkIGEg
-bWlycm9yIFZNIHZhcmlhbnQga3ZtX2FyY2hfbWlycm9yX3B1dF9yZWdpc3RlcnMoKSwgZm9yIHJl
-YXNvbnMgc3VjaCBhcyBzYXZpbmcgTVNScyBvbiB0aGUgbWlycm9yIFZNIHJlcXVpcmVkIGVuYWJs
-aW5nIHRoZSBpbi1rZXJuZWwgaXJxY2hpcCBzdXBwb3J0IG9uIHRoZSBtaXJyb3IgVk0sIG90aGVy
-d2lzZSwga3ZtX3B1dF9tc3JzKCkgZmFpbHMuIEhlbmNlLCBrdm1fYXJjaF9taXJyb3JfcHV0X3Jl
-Z2lzdGVycygpIG1ha2VzIHRoZSBtaXJyb3IgVk0gc2ltcGxlciBieSBub3Qgc2F2aW5nIGFueSBN
-U1JzIGFuZCBub3QgbmVlZGluZyB0aGUgaW4ta2VybmVsIGlycWNoaXAgc3VwcG9ydC4NCg0KSSBo
-YWQgbG90IG9mIGlzc3VlcyBpbiBkeW5hbWljYWxseSBhZGRpbmcgYSBuZXcgdkNQVSwgaS5lLiwg
-dGhlIENQVVN0YXRlIHN0cnVjdHVyZSBkdWUgdG8gcWVtdSdzIG9iamVjdCBtb2RlbCAoUU9NKSB3
-aGljaCByZXF1aXJlcyB0aGF0IGV2ZXJ5IHFlbXUgc3RydWN0dXJlL29iamVjdCBoYXMgdG8gY29u
-dGFpbiB0aGUgcGFyZW50L2Jhc2UgY2xhc3Mvb2JqZWN0IGFuZCB0aGVuIGFsbCB0aGUgZGVyaXZl
-ZCBjbGFzc2VzIGFmdGVyIHRoYXQuIEl0IHdhcyBkaWZmaWN1bHQgdG8gYWRkIGEgbmV3IENQVSBv
-YmplY3QgZHluYW1pY2FsbHksIGhlbmNlIEkgaGF2ZSB0byByZXVzZSBvbmUgb2YgdGhlIOKAnC1z
-bXDigJ0gIGNwdXMgcGFzc2VkIG9uIHFlbXUgY29tbWFuZCBsaW5lIGFzIHRoZSBtaXJyb3IgdkNQ
-VS4gVGhpcyBhbHNvIGFzc2lzdHMgaW4gaGF2aW5nIHRoZSBYODZDUFUgImJhY2tpbmciIHN0cnVj
-dHVyZSBmb3IgdGhlIG1pcnJvciB2Q1BV4oCZcyBDUFUgb2JqZWN0LCB3aGljaCBhbGxvd3MgdXNp
-bmcgbW9zdCBvZiB0aGUgS1ZNIGNvZGUgaW4gcWVtdSBmb3IgdGhlIG1pcnJvciB2Q1BVLiBBbHNv
-IHRoZSBtaXJyb3IgdkNQVSBDUFUgb2JqZWN0IHdpbGwgaGF2ZSB0aGUgQ1BVWDg2U3RhdGUgc3Ry
-dWN0dXJlIGVtYmVkZGVkIHdoaWNoIGNvbnRhaW5zIHRoZSBjcHUgcmVnaXN0ZXIgc3RhdGUgZm9y
-IHRoZSBtaXJyb3IgdkNQVS4gDQoNClRoZSBtaXJyb3IgdkNQVSBpcyBub3cgcnVubmluZyBhIHNp
-bXBsZXIgS1ZNIHJ1biBsb29wLCBpdCBkb2VzIG5vdCBoYXZlIGFueSBpbi1rZXJuZWwgaXJxY2hp
-cCAoaW50ZXJydXB0IGNvbnRyb2xsZXIpIG9yIGFueSBvdGhlciBrdm1hcGljIGludGVycnVwdCBj
-b250cm9sbGVyIHN1cHBvcnRlZCBhbmQgZW5hYmxlZCBmb3IgaXQuIEFzIG9mIG5vdyBpdCBpcyBz
-dGlsbCBkb2luZyBib3RoIEkvTyBhbmQgTU1JTyBoYW5kbGluZy4NCg0KTG9va2luZyBmd2QuIHRv
-IGNvbW1lbnRzLCBmZWVkYmFjaywgdGhvdWdodHMgb24gdGhlIGFib3ZlIGFwcHJvYWNoLg0KDQpU
-aGFua3MsDQpBc2hpc2gNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IFBhb2xv
-IEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+DQpTZW50OiBUaHVyc2RheSwgTWFyY2ggMTEs
-IDIwMjEgMTA6MzAgQU0NClRvOiBUb2JpbiBGZWxkbWFuLUZpdHp0aHVtIDx0b2JpbkBsaW51eC5p
-Ym0uY29tPjsgbmF0ZXRAZ29vZ2xlLmNvbQ0KQ2M6IERvdiBNdXJpayA8ZG92bXVyaWtAbGludXgu
-dm5ldC5pYm0uY29tPjsgTGVuZGFja3ksIFRob21hcyA8VGhvbWFzLkxlbmRhY2t5QGFtZC5jb20+
-OyB4ODZAa2VybmVsLm9yZzsga3ZtQHZnZXIua2VybmVsLm9yZzsgbGludXgta2VybmVsQHZnZXIu
-a2VybmVsLm9yZzsgc3J1dGhlcmZvcmRAZ29vZ2xlLmNvbTsgc2VhbmpjQGdvb2dsZS5jb207IHJp
-ZW50amVzQGdvb2dsZS5jb207IFNpbmdoLCBCcmlqZXNoIDxicmlqZXNoLnNpbmdoQGFtZC5jb20+
-OyBLYWxyYSwgQXNoaXNoIDxBc2hpc2guS2FscmFAYW1kLmNvbT47IExhc3psbyBFcnNlayA8bGVy
-c2VrQHJlZGhhdC5jb20+OyBKYW1lcyBCb3R0b21sZXkgPGplamJAbGludXguaWJtLmNvbT47IEh1
-YmVydHVzIEZyYW5rZSA8ZnJhbmtlaEB1cy5pYm0uY29tPg0KU3ViamVjdDogUmU6IFtSRkNdIEtW
-TTogeDg2OiBTdXBwb3J0IEtWTSBWTXMgc2hhcmluZyBTRVYgY29udGV4dA0KDQpPbiAxMS8wMy8y
-MSAxNjozMCwgVG9iaW4gRmVsZG1hbi1GaXR6dGh1bSB3cm90ZToNCj4gSSBhbSBub3Qgc3VyZSBo
-b3cgdGhlIG1pcnJvciBWTSB3aWxsIGJlIHN1cHBvcnRlZCBpbiBRRU1VLiBVc3VhbGx5IA0KPiB0
-aGVyZSBpcyBvbmUgUUVNVSBwcm9jZXNzIHBlci12bS4gTm93IHdlIHdvdWxkIG5lZWQgdG8gcnVu
-IGEgc2Vjb25kIFZNIA0KPiBhbmQgY29tbXVuaWNhdGUgd2l0aCBpdCBkdXJpbmcgbWlncmF0aW9u
-LiBJcyB0aGVyZSBhIHdheSB0byBkbyB0aGlzIA0KPiB3aXRob3V0IGFkZGluZyBzaWduaWZpY2Fu
-dCBjb21wbGV4aXR5Pw0KDQpJIGNhbiBhbnN3ZXIgdGhpcyBwYXJ0LiAgSSB0aGluayB0aGlzIHdp
-bGwgYWN0dWFsbHkgYmUgc2ltcGxlciB0aGFuIHdpdGggYXV4aWxpYXJ5IHZDUFVzLiAgVGhlcmUg
-d2lsbCBiZSBhIHNlcGFyYXRlIHBhaXIgb2YgVk0rdkNQVSBmaWxlIGRlc2NyaXB0b3JzIHdpdGhp
-biB0aGUgc2FtZSBRRU1VIHByb2Nlc3MsIGFuZCBzb21lIGNvZGUgdG8gc2V0IHVwIHRoZSBtZW1v
-cnkgbWFwIHVzaW5nIEtWTV9TRVRfVVNFUl9NRU1PUllfUkVHSU9OLg0KDQpIb3dldmVyLCB0aGUg
-Y29kZSB0byBydW4gdGhpcyBWTSB3aWxsIGJlIHZlcnkgc21hbGwgYXMgdGhlIFZNIGRvZXMgbm90
-IGhhdmUgdG8gZG8gTU1JTywgaW50ZXJydXB0cywgbGl2ZSBtaWdyYXRpb24gKG9mIGl0c2VsZiks
-IGV0Yy4gIEl0IGp1c3Qgc3RhcnRzIHVwIGFuZCBjb21tdW5pY2F0ZXMgd2l0aCBRRU1VIHVzaW5n
-IGEgbWFpbGJveCBhdCBhIHByZWRldGVybWluZWQgYWRkcmVzcy4NCg0KSSBhbHNvIHRoaW5rIChi
-dXQgSSdtIG5vdCAxMDAlIHN1cmUpIHRoYXQgdGhlIGF1eGlsaWFyeSBWTSBkb2VzIG5vdCBoYXZl
-IHRvIHdhdGNoIGNoYW5nZXMgaW4gdGhlIHByaW1hcnkgVk0ncyBtZW1vcnkgbWFwIChlLmcuIG1h
-cHBpbmcgYW5kIHVubWFwcGluZyBvZiBCQVJzKS4gIEluIFFFTVUgdGVybXMsIHRoZSBhdXhpbGlh
-cnkgVk0ncyBtZW1vcnkgbWFwIHRyYWNrcyBSQU1CbG9ja3MsIG5vdCBNZW1vcnlSZWdpb25zLCB3
-aGljaCBtYWtlcyB0aGluZ3MgbXVjaCBzaW1wbGVyLg0KDQpUaGVyZSBhcmUgYWxyZWFkeSBtYW55
-IGV4YW1wbGVzIG9mIG1pbmkgVk1NcyBydW5uaW5nIHNwZWNpYWwgcHVycG9zZSBWTXMgaW4gdGhl
-IGtlcm5lbCdzIHRvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bSBkaXJlY3RvcnksIGFuZCBJIGRv
-bid0IHRoaW5rIHRoZSBRRU1VIGNvZGUgd291bGQgYmUgYW55IG1vcmUgY29tcGxleCB0aGFuIHRo
-YXQuDQoNClBhb2xvDQo=
+Hi Krish,
+
+On Wed, May 26, 2021 at 5:34 PM Krish Sadhukhan
+<krish.sadhukhan@oracle.com> wrote:
+>
+>
+> On 5/24/21 8:18 AM, Jing Zhang wrote:
+> > Add selftest to check KVM stats descriptors validity.
+> >
+> > Reviewed-by: David Matlack <dmatlack@google.com>
+> > Reviewed-by: Ricardo Koller <ricarkol@google.com>
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >   tools/testing/selftests/kvm/.gitignore        |   1 +
+> >   tools/testing/selftests/kvm/Makefile          |   3 +
+> >   .../testing/selftests/kvm/include/kvm_util.h  |   3 +
+> >   .../selftests/kvm/kvm_bin_form_stats.c        | 216 ++++++++++++++++++
+> >   tools/testing/selftests/kvm/lib/kvm_util.c    |  12 +
+> >   5 files changed, 235 insertions(+)
+> >   create mode 100644 tools/testing/selftests/kvm/kvm_bin_form_stats.c
+>
+>
+> We should probably follow the naming convention for the majority of the
+> files in the kvm directory and name it kvm_stats_read_test.c or
+> kvm_stats_test.c or something like that.
+>
+Sure. Will change the name.
+> >
+> > diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> > index bd83158e0e0b..35796667c944 100644
+> > --- a/tools/testing/selftests/kvm/.gitignore
+> > +++ b/tools/testing/selftests/kvm/.gitignore
+> > @@ -43,3 +43,4 @@
+> >   /memslot_modification_stress_test
+> >   /set_memory_region_test
+> >   /steal_time
+> > +/kvm_bin_form_stats
+> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> > index e439d027939d..2984c86c848a 100644
+> > --- a/tools/testing/selftests/kvm/Makefile
+> > +++ b/tools/testing/selftests/kvm/Makefile
+> > @@ -76,6 +76,7 @@ TEST_GEN_PROGS_x86_64 += kvm_page_table_test
+> >   TEST_GEN_PROGS_x86_64 += memslot_modification_stress_test
+> >   TEST_GEN_PROGS_x86_64 += set_memory_region_test
+> >   TEST_GEN_PROGS_x86_64 += steal_time
+> > +TEST_GEN_PROGS_x86_64 += kvm_bin_form_stats
+> >
+> >   TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
+> >   TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list-sve
+> > @@ -87,6 +88,7 @@ TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
+> >   TEST_GEN_PROGS_aarch64 += kvm_page_table_test
+> >   TEST_GEN_PROGS_aarch64 += set_memory_region_test
+> >   TEST_GEN_PROGS_aarch64 += steal_time
+> > +TEST_GEN_PROGS_aarch64 += kvm_bin_form_stats
+> >
+> >   TEST_GEN_PROGS_s390x = s390x/memop
+> >   TEST_GEN_PROGS_s390x += s390x/resets
+> > @@ -96,6 +98,7 @@ TEST_GEN_PROGS_s390x += dirty_log_test
+> >   TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
+> >   TEST_GEN_PROGS_s390x += kvm_page_table_test
+> >   TEST_GEN_PROGS_s390x += set_memory_region_test
+> > +TEST_GEN_PROGS_s390x += kvm_bin_form_stats
+> >
+> >   TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
+> >   LIBKVM += $(LIBKVM_$(UNAME_M))
+> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> > index a8f022794ce3..ee01a67022d9 100644
+> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> > @@ -387,4 +387,7 @@ uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc);
+> >   #define GUEST_ASSERT_4(_condition, arg1, arg2, arg3, arg4) \
+> >       __GUEST_ASSERT((_condition), 4, (arg1), (arg2), (arg3), (arg4))
+> >
+> > +int vm_get_statsfd(struct kvm_vm *vm);
+> > +int vcpu_get_statsfd(struct kvm_vm *vm, uint32_t vcpuid);
+> > +
+> >   #endif /* SELFTEST_KVM_UTIL_H */
+> > diff --git a/tools/testing/selftests/kvm/kvm_bin_form_stats.c b/tools/testing/selftests/kvm/kvm_bin_form_stats.c
+> > new file mode 100644
+> > index 000000000000..09e12c5838af
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/kvm_bin_form_stats.c
+> > @@ -0,0 +1,216 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/*
+> > + * kvm_bin_form_stats
+> > + *
+> > + * Copyright (C) 2021, Google LLC.
+> > + *
+> > + * Test the fd-based interface for KVM statistics.
+> > + */
+> > +
+> > +#define _GNU_SOURCE /* for program_invocation_short_name */
+> > +#include <fcntl.h>
+> > +#include <stdio.h>
+> > +#include <stdlib.h>
+> > +#include <string.h>
+> > +#include <errno.h>
+> > +
+> > +#include "test_util.h"
+> > +
+> > +#include "kvm_util.h"
+> > +#include "asm/kvm.h"
+> > +#include "linux/kvm.h"
+> > +
+> > +int stats_test(int stats_fd, int size_stat)
+>
+>
+> The return value is not used by the caller. Perhaps make it a void ?
+>
+Will do.
+> > +{
+> > +     ssize_t ret;
+> > +     int i;
+> > +     size_t size_desc, size_data = 0;
+> > +     struct kvm_stats_header header;
+> > +     struct kvm_stats_desc *stats_desc, *pdesc;
+> > +     void *stats_data;
+> > +
+> > +     /* Read kvm stats header */
+> > +     ret = read(stats_fd, &header, sizeof(header));
+> > +     TEST_ASSERT(ret == sizeof(header), "Read stats header");
+> > +     size_desc = sizeof(*stats_desc) + header.name_size;
+> > +
+> > +     /* Check id string in header, that should start with "kvm" */
+> > +     TEST_ASSERT(!strncmp(header.id, "kvm", 3) &&
+> > +                     strlen(header.id) < KVM_STATS_ID_MAXLEN,
+> > +                     "Invalid KVM stats type");
+> > +
+> > +     /* Sanity check for other fields in header */
+> > +     if (header.count == 0)
+>
+>
+> Does this need a message as to why count is zero ?
+>
+Will add a warning message here.
+> > +             return 0;
+> > +     /* Check overlap */
+> > +     TEST_ASSERT(header.desc_offset > 0 && header.data_offset > 0
+> > +                     && header.desc_offset >= sizeof(header)
+> > +                     && header.data_offset >= sizeof(header),
+> > +                     "Invalid offset fields in header");
+> > +     TEST_ASSERT(header.desc_offset > header.data_offset
+> > +                     || (header.desc_offset + size_desc * header.count <=
+> > +                             header.data_offset),
+> > +                     "Descriptor block is overlapped with data block");
+> > +
+> > +     /* Allocate memory for stats descriptors */
+> > +     stats_desc = calloc(header.count, size_desc);
+> > +     TEST_ASSERT(stats_desc, "Allocate memory for stats descriptors");
+> > +     /* Read kvm stats descriptors */
+> > +     ret = pread(stats_fd, stats_desc,
+> > +                     size_desc * header.count, header.desc_offset);
+> > +     TEST_ASSERT(ret == size_desc * header.count,
+> > +                     "Read KVM stats descriptors");
+> > +
+> > +     /* Sanity check for fields in descriptors */
+> > +     for (i = 0; i < header.count; ++i) {
+> > +             pdesc = (void *)stats_desc + i * size_desc;
+> > +             /* Check type,unit,base boundaries */
+> > +             TEST_ASSERT((pdesc->flags & KVM_STATS_TYPE_MASK)
+> > +                             <= KVM_STATS_TYPE_MAX, "Unknown KVM stats type");
+> > +             TEST_ASSERT((pdesc->flags & KVM_STATS_UNIT_MASK)
+> > +                             <= KVM_STATS_UNIT_MAX, "Unknown KVM stats unit");
+> > +             TEST_ASSERT((pdesc->flags & KVM_STATS_BASE_MASK)
+> > +                             <= KVM_STATS_BASE_MAX, "Unknown KVM stats base");
+> > +             /* Check exponent for stats unit
+> > +              * Exponent for counter should be greater than or equal to 0
+> > +              * Exponent for unit bytes should be greater than or equal to 0
+> > +              * Exponent for unit seconds should be less than or equal to 0
+> > +              * Exponent for unit clock cycles should be greater than or
+> > +              * equal to 0
+> > +              */
+> > +             switch (pdesc->flags & KVM_STATS_UNIT_MASK) {
+> > +             case KVM_STATS_UNIT_NONE:
+> > +             case KVM_STATS_UNIT_BYTES:
+> > +             case KVM_STATS_UNIT_CYCLES:
+> > +                     TEST_ASSERT(pdesc->exponent >= 0,
+> > +                                     "Unsupported KVM stats unit");
+> > +                     break;
+> > +             case KVM_STATS_UNIT_SECONDS:
+> > +                     TEST_ASSERT(pdesc->exponent <= 0,
+> > +                                     "Unsupported KVM stats unit");
+> > +                     break;
+> > +             }
+> > +             /* Check name string */
+> > +             TEST_ASSERT(strlen(pdesc->name) < header.name_size,
+> > +                             "KVM stats name(%s) too long", pdesc->name);
+> > +             /* Check size field, which should not be zero */
+> > +             TEST_ASSERT(pdesc->size, "KVM descriptor(%s) with size of 0",
+> > +                             pdesc->name);
+> > +             size_data += pdesc->size * size_stat;
+> > +     }
+> > +     /* Check overlap */
+> > +     TEST_ASSERT(header.data_offset >= header.desc_offset
+> > +                     || header.data_offset + size_data <= header.desc_offset,
+> > +                     "Data block is overlapped with Descriptor block");
+> > +     /* Check validity of all stats data size */
+> > +     TEST_ASSERT(size_data >= header.count * size_stat,
+> > +                     "Data size is not correct");
+> > +
+> > +     /* Allocate memory for stats data */
+> > +     stats_data = malloc(size_data);
+> > +     TEST_ASSERT(stats_data, "Allocate memory for stats data");
+> > +     /* Read kvm stats data as a bulk */
+> > +     ret = pread(stats_fd, stats_data, size_data, header.data_offset);
+> > +     TEST_ASSERT(ret == size_data, "Read KVM stats data");
+> > +     /* Read kvm stats data one by one */
+> > +     size_data = 0;
+> > +     for (i = 0; i < header.count; ++i) {
+> > +             pdesc = (void *)stats_desc + i * size_desc;
+> > +             ret = pread(stats_fd, stats_data, pdesc->size * size_stat,
+> > +                             header.data_offset + size_data);
+> > +             TEST_ASSERT(ret == pdesc->size * size_stat,
+> > +                             "Read data of KVM stats: %s", pdesc->name);
+> > +             size_data += pdesc->size * size_stat;
+> > +     }
+> > +
+> > +     free(stats_data);
+> > +     free(stats_desc);
+> > +     return 0;
+> > +}
+> > +
+> > +
+> > +int vm_stats_test(struct kvm_vm *vm)
+> > +{
+> > +     int stats_fd;
+> > +     struct kvm_vm_stats_data *stats_data;
+> > +
+> > +     /* Get fd for VM stats */
+> > +     stats_fd = vm_get_statsfd(vm);
+> > +     TEST_ASSERT(stats_fd >= 0, "Get VM stats fd");
+> > +
+> > +     stats_test(stats_fd, sizeof(stats_data->value[0]));
+> > +     close(stats_fd);
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +int vcpu_stats_test(struct kvm_vm *vm, int vcpu_id)
+> > +{
+> > +     int stats_fd;
+> > +     struct kvm_vcpu_stats_data *stats_data;
+> > +
+> > +     /* Get fd for VCPU stats */
+> > +     stats_fd = vcpu_get_statsfd(vm, vcpu_id);
+> > +     TEST_ASSERT(stats_fd >= 0, "Get VCPU stats fd");
+> > +
+> > +     stats_test(stats_fd, sizeof(stats_data->value[0]));
+> > +     close(stats_fd);
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +#define DEFAULT_NUM_VM               4
+> > +#define DEFAULT_NUM_VCPU     4
+> > +
+> > +/*
+> > + * Usage: kvm_bin_form_stats [#vm] [#vcpu]
+> > + * The first parameter #vm set the number of VMs being created.
+> > + * The second parameter #vcpu set the number of VCPUs being created.
+> > + * By default, DEFAULT_NUM_VM VM and DEFAULT_NUM_VCPU VCPU for the VM would be
+> > + * created for testing.
+> > + */
+> > +
+> > +int main(int argc, char *argv[])
+> > +{
+> > +     int max_vm = DEFAULT_NUM_VM, max_vcpu = DEFAULT_NUM_VCPU, ret, i, j;
+> > +     struct kvm_vm **vms;
+> > +
+> > +     /* Get the number of VMs and VCPUs that would be created for testing. */
+> > +     if (argc > 1) {
+> > +             max_vm = strtol(argv[1], NULL, 0);
+> > +             if (max_vm <= 0)
+> > +                     max_vm = DEFAULT_NUM_VM;
+> > +     }
+> > +     if (argc > 2) {
+> > +             max_vcpu = strtol(argv[2], NULL, 0);
+> > +             if (max_vcpu <= 0)
+> > +                     max_vcpu = DEFAULT_NUM_VCPU;
+> > +     }
+> > +
+> > +     /* Check the extension for binary stats */
+> > +     ret = kvm_check_cap(KVM_CAP_STATS_BINARY_FD);
+> > +     TEST_ASSERT(ret >= 0,
+> > +                     "Binary form statistics interface is not supported");
+> > +
+> > +     /* Create VMs and VCPUs */
+> > +     vms = malloc(sizeof(vms[0]) * max_vm);
+> > +     TEST_ASSERT(vms, "Allocate memory for storing VM pointers");
+> > +     for (i = 0; i < max_vm; ++i) {
+> > +             vms[i] = vm_create(VM_MODE_DEFAULT,
+> > +                             DEFAULT_GUEST_PHY_PAGES, O_RDWR);
+> > +             for (j = 0; j < max_vcpu; ++j)
+> > +                     vm_vcpu_add(vms[i], j);
+> > +     }
+> > +
+> > +     /* Check stats read for every VM and VCPU */
+> > +     for (i = 0; i < max_vm; ++i) {
+> > +             vm_stats_test(vms[i]);
+> > +             for (j = 0; j < max_vcpu; ++j)
+> > +                     vcpu_stats_test(vms[i], j);
+> > +     }
+> > +
+>
+>
+> Does it make sense to add one more test case here to test this fd
+> interface on a VM or on a VCPU that has been deleted ? For example, how
+> does this fd interface behave if we delete the 4th VM and the 4th VCPU
+> in the 3rd VM ?
+>
+If you meant to test the behavior when we are trying to access a
+invalid fd which belongs
+to a VM or VCPU that doesn't exist, that's a good idea. I will add a
+test for that. thanks.
+> > +     for (i = 0; i < max_vm; ++i)
+> > +             kvm_vm_free(vms[i]);
+> > +     free(vms);
+> > +     return 0;
+> > +}
+> > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > index fc83f6c5902d..d9e0b2c8b906 100644
+> > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > @@ -2090,3 +2090,15 @@ unsigned int vm_calc_num_guest_pages(enum vm_guest_mode mode, size_t size)
+> >       n = DIV_ROUND_UP(size, vm_guest_mode_params[mode].page_size);
+> >       return vm_adjust_num_guest_pages(mode, n);
+> >   }
+> > +
+> > +int vm_get_statsfd(struct kvm_vm *vm)
+> > +{
+> > +     return ioctl(vm->fd, KVM_STATS_GETFD, NULL);
+> > +}
+> > +
+> > +int vcpu_get_statsfd(struct kvm_vm *vm, uint32_t vcpuid)
+> > +{
+> > +     struct vcpu *vcpu = vcpu_find(vm, vcpuid);
+> > +
+> > +     return ioctl(vcpu->fd, KVM_STATS_GETFD, NULL);
+> > +}
+>
+>
+> Do we need separate functions if they are called just once ?  Or perhaps
+> have a single function for the ioctl call, like ?
+>
+>       int get_stats_fd(int fd, int type)
+>
+>       {
+>
+>              return ioctl(fd, type, NULL);
+>
+>       }
+>
+I guess two separate functions are more clear, one function does one thing.
+
+Thanks,
+Jing
