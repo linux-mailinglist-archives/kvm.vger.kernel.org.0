@@ -2,131 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 99298392F25
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 15:08:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 363C7392F53
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 15:18:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236379AbhE0NKG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 09:10:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52006 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236388AbhE0NKA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 May 2021 09:10:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622120906;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vni5r2RGrY6+247rlHUMyvtn3Oe0hxaKsSPvURPHeLc=;
-        b=GcTc7yR0z0WwIO4Ly1SsImNoNBNz7CphYM+nruizcISExNFJjeIluQaifPkuPmjOF4OC3A
-        i168FBIKC1Cjz/puXzsLs4+W/X2/R/MjGUs+bbNixRx0iLrFHwPD3E0cORj/LPhxmfIgp+
-        W/a5eMYOMMzOOkPIivOK+4UZx9nnPXU=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-562-tU-n5_dWOSGOoWBnhFf6fA-1; Thu, 27 May 2021 09:08:25 -0400
-X-MC-Unique: tU-n5_dWOSGOoWBnhFf6fA-1
-Received: by mail-ej1-f71.google.com with SMTP id eb10-20020a170907280ab02903d65bd14481so1640763ejc.21
-        for <kvm@vger.kernel.org>; Thu, 27 May 2021 06:08:24 -0700 (PDT)
+        id S236412AbhE0NTr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 09:19:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60584 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236378AbhE0NTp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 May 2021 09:19:45 -0400
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF331C061760
+        for <kvm@vger.kernel.org>; Thu, 27 May 2021 06:18:10 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id lz27so7968371ejb.11
+        for <kvm@vger.kernel.org>; Thu, 27 May 2021 06:18:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=nQgFn8dxliqZkV+84EDBr5D6XtzraqZ1JcCt4vcxaEg=;
+        b=U+4BjfZGBFAb1qVG2dykR4pGeBdKBFy1a0gYiCM/bVIvP4FQgP0Rlv2zd+rc7Cb3qV
+         pR+aE2uu9wEZvhgfWfZxsIR/HpvJ2SiNN/uDvKZIKLLr9rQzwjL8rIyIyDU6Qh6tshvo
+         fPVAeH9h6ZTQlSdYq8Z3GN9z4duLY02ZtqKLyiXt4CnpYZLHuHaD5CywUaq9UxR1K9JO
+         RCRP/QniKCl0pELJZt2SJ4/29wuT+lh8Gu/dnTU2TsNSQ7CgvIKF0SytFPqHlZAnOd0g
+         949d1X4Aehx49vMb6axO60paWMz84o4PHz2KAygA9S9MxJyuPxN+bjMMCpX/d/j0cmuN
+         lQTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vni5r2RGrY6+247rlHUMyvtn3Oe0hxaKsSPvURPHeLc=;
-        b=djk5z+zp5fmPI4qlVN5MRiZdMlRnv7yolqV9WbwKi9wlVH++iPKh7WexKRJQNjgySt
-         JhwiJBwrALLQ/cc6qrNWxdDoRxfMEbePUj6In+jp7X37nZ+VUmfC1/jWpKIU/v3tZOZM
-         y5uI8CWKl6heFZHjtPsS3ByQS9SO+y58fnH/6vegyDW8PI9gGcGGRh4ddR1ctbCjmHW7
-         KttMkTI78ONtuxiPrEg3/KgTEfZbWrg7YjnfjQZetJOVBVXnTJg9Yk4dLKvuY81Zi4Cd
-         wX2mFtXqqnZOW7wwSwiKqswJFATxx6616na+9SAD9xCGactXZpPn6hU/nGAqdcqoF2Q7
-         6gzg==
-X-Gm-Message-State: AOAM5338m9iPuZ0zk7eQTfy6Hzb4uRNfcxiwoyCuJf8YcEk09phfC/8Y
-        8YHnh8d7+0U1sJbd8ncU6jCNfMS6xxQIzConKFOEDWrqbRGlTLJrUxIItp6g58YeZ37wCeFjxCS
-        vo7agrvpcsuUz
-X-Received: by 2002:a17:906:5fd1:: with SMTP id k17mr3632354ejv.78.1622120903887;
-        Thu, 27 May 2021 06:08:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzNOGqQXPQP9WHdqlowsy6B9C/h7LOb8yyMFanNqozysCvXHFri3MHKMuL9VRZZYdCa2YmY9g==
-X-Received: by 2002:a17:906:5fd1:: with SMTP id k17mr3632338ejv.78.1622120903721;
-        Thu, 27 May 2021 06:08:23 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id r17sm1074698edt.33.2021.05.27.06.08.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 May 2021 06:08:22 -0700 (PDT)
-Subject: Re: [PATCH] KVM: X86: Use kvm_get_linear_rip() in single-step and
- #DB/#BP interception
-To:     Yuan Yao <yuan.yao@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org
-Cc:     Yuan Yao <yuan.yao@intel.com>
-References: <20210526063828.1173-1-yuan.yao@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <faadf727-dd9a-5d4f-2e6b-8e75f2dad28a@redhat.com>
-Date:   Thu, 27 May 2021 15:08:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=nQgFn8dxliqZkV+84EDBr5D6XtzraqZ1JcCt4vcxaEg=;
+        b=qrO2utc3tvgixATwhoSOQVaZv+HQsX0Re9Y3fyVyE3uKhHvTLYAMthuy/R+wMStoDq
+         /g3C3I7xwvomqOOLD5U4kWwgplIjJu2sAlx4t4o6L7iTdN4yBwyvhJaOVvpoB1YuNpTp
+         K99Sgf7kwTgRbWwq1OKwekMU6rhcL/gAaLe56jC8RdWF6fEC4ZEjYYF/XEqB1+gUgw8l
+         rzunnkKzJ4GswBjGRiShPGsY5nvI3z+4ptmonF805pLhSD1+WtdmzDhN4Yw3oGBu0+GF
+         1++riuy0Pdt7kSeczEfq/FPLEdR2GPKMwj/AcErqhSLSvNrv8dnvXHySt3CTbWMSd2MU
+         Fj/g==
+X-Gm-Message-State: AOAM532I+hW6Q02RI+opoZak0zLhBGVKa25MtqCj5tdcOj+s8KX+xkoR
+        71QS47EUKq4J2+hGoCVXBVEAeokwo1NGqscIYLmA
+X-Google-Smtp-Source: ABdhPJzONeuUPApTMkYwvFbbcILylmfJeY2yh2SKaw7NmLK0VfeRDhi2UdjgnlJsCGuc2sUrB8OCqSsNbGKNja1zLzI=
+X-Received: by 2002:a17:907:1b11:: with SMTP id mp17mr3810051ejc.1.1622121484390;
+ Thu, 27 May 2021 06:18:04 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210526063828.1173-1-yuan.yao@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20210517095513.850-1-xieyongji@bytedance.com> <20210517095513.850-12-xieyongji@bytedance.com>
+ <3740c7eb-e457-07f3-5048-917c8606275d@redhat.com> <CACycT3uAqa6azso_8MGreh+quj-JXO1piuGnrV8k2kTfc34N2g@mail.gmail.com>
+ <5a68bb7c-fd05-ce02-cd61-8a601055c604@redhat.com> <CACycT3ve7YvKF+F+AnTQoJZMPua+jDvGMs_ox8GQe_=SGdeCMA@mail.gmail.com>
+ <ee00efca-b26d-c1be-68d2-f9e34a735515@redhat.com> <CACycT3ufok97cKpk47NjUBTc0QAyfauFUyuFvhWKmuqCGJ7zZw@mail.gmail.com>
+ <00ded99f-91b6-ba92-5d92-2366b163f129@redhat.com>
+In-Reply-To: <00ded99f-91b6-ba92-5d92-2366b163f129@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Thu, 27 May 2021 21:17:54 +0800
+Message-ID: <CACycT3uK_Fuade-b8FVYkGCKZnne_UGGbYRFwv7WOH2oKCsXSg@mail.gmail.com>
+Subject: Re: Re: [PATCH v7 11/12] vduse: Introduce VDUSE - vDPA Device in Userspace
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/05/21 08:38, Yuan Yao wrote:
-> From: Yuan Yao <yuan.yao@intel.com>
-> 
-> The kvm_get_linear_rip() handles x86/long mode cases well and has
-> better readability, __kvm_set_rflags() also use the paired
-> fucntion kvm_is_linear_rip() to check the vcpu->arch.singlestep_rip
-> set in kvm_arch_vcpu_ioctl_set_guest_debug(), so change the
-> "CS.BASE + RIP" code in kvm_arch_vcpu_ioctl_set_guest_debug() and
-> handle_exception_nmi() to this one.
-> 
-> Signed-off-by: Yuan Yao <yuan.yao@intel.com>
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 4bceb5ca3a89..0db05cfbe434 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4843,7 +4843,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
->   	struct vcpu_vmx *vmx = to_vmx(vcpu);
->   	struct kvm_run *kvm_run = vcpu->run;
->   	u32 intr_info, ex_no, error_code;
-> -	unsigned long cr2, rip, dr6;
-> +	unsigned long cr2, dr6;
->   	u32 vect_info;
->   
->   	vect_info = vmx->idt_vectoring_info;
-> @@ -4933,8 +4933,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
->   		vmx->vcpu.arch.event_exit_inst_len =
->   			vmcs_read32(VM_EXIT_INSTRUCTION_LEN);
->   		kvm_run->exit_reason = KVM_EXIT_DEBUG;
-> -		rip = kvm_rip_read(vcpu);
-> -		kvm_run->debug.arch.pc = vmcs_readl(GUEST_CS_BASE) + rip;
-> +		kvm_run->debug.arch.pc = kvm_get_linear_rip(vcpu);
->   		kvm_run->debug.arch.exception = ex_no;
->   		break;
->   	case AC_VECTOR:
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 9b6bca616929..5cac5d883710 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10115,8 +10115,7 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
->   	kvm_update_dr7(vcpu);
->   
->   	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)
-> -		vcpu->arch.singlestep_rip = kvm_rip_read(vcpu) +
-> -			get_segment_base(vcpu, VCPU_SREG_CS);
-> +		vcpu->arch.singlestep_rip = kvm_get_linear_rip(vcpu);
->   
->   	/*
->   	 * Trigger an rflags update that will inject or remove the trace
-> 
+On Thu, May 27, 2021 at 4:41 PM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> =E5=9C=A8 2021/5/27 =E4=B8=8B=E5=8D=883:34, Yongji Xie =E5=86=99=E9=81=93=
+:
+> > On Thu, May 27, 2021 at 1:40 PM Jason Wang <jasowang@redhat.com> wrote:
+> >>
+> >> =E5=9C=A8 2021/5/27 =E4=B8=8B=E5=8D=881:08, Yongji Xie =E5=86=99=E9=81=
+=93:
+> >>> On Thu, May 27, 2021 at 1:00 PM Jason Wang <jasowang@redhat.com> wrot=
+e:
+> >>>> =E5=9C=A8 2021/5/27 =E4=B8=8B=E5=8D=8812:57, Yongji Xie =E5=86=99=E9=
+=81=93:
+> >>>>> On Thu, May 27, 2021 at 12:13 PM Jason Wang <jasowang@redhat.com> w=
+rote:
+> >>>>>> =E5=9C=A8 2021/5/17 =E4=B8=8B=E5=8D=885:55, Xie Yongji =E5=86=99=
+=E9=81=93:
+> >>>>>>> +
+> >>>>>>> +static int vduse_dev_msg_sync(struct vduse_dev *dev,
+> >>>>>>> +                           struct vduse_dev_msg *msg)
+> >>>>>>> +{
+> >>>>>>> +     init_waitqueue_head(&msg->waitq);
+> >>>>>>> +     spin_lock(&dev->msg_lock);
+> >>>>>>> +     vduse_enqueue_msg(&dev->send_list, msg);
+> >>>>>>> +     wake_up(&dev->waitq);
+> >>>>>>> +     spin_unlock(&dev->msg_lock);
+> >>>>>>> +     wait_event_killable(msg->waitq, msg->completed);
+> >>>>>> What happens if the userspace(malicous) doesn't give a response fo=
+rever?
+> >>>>>>
+> >>>>>> It looks like a DOS. If yes, we need to consider a way to fix that=
+.
+> >>>>>>
+> >>>>> How about using wait_event_killable_timeout() instead?
+> >>>> Probably, and then we need choose a suitable timeout and more import=
+ant,
+> >>>> need to report the failure to virtio.
+> >>>>
+> >>> Makes sense to me. But it looks like some
+> >>> vdpa_config_ops/virtio_config_ops such as set_status() didn't have a
+> >>> return value.  Now I add a WARN_ON() for the failure. Do you mean we
+> >>> need to add some change for virtio core to handle the failure?
+> >>
+> >> Maybe, but I'm not sure how hard we can do that.
+> >>
+> > We need to change all virtio device drivers in this way.
+>
+>
+> Probably.
+>
+>
+> >
+> >> We had NEEDS_RESET but it looks we don't implement it.
+> >>
+> > Could it handle the failure of get_feature() and get/set_config()?
+>
+>
+> Looks not:
+>
+> "
+>
+> The device SHOULD set DEVICE_NEEDS_RESET when it enters an error state
+> that a reset is needed. If DRIVER_OK is set, after it sets
+> DEVICE_NEEDS_RESET, the device MUST send a device configuration change
+> notification to the driver.
+>
+> "
+>
+> This looks implies that NEEDS_RESET may only work after device is
+> probed. But in the current design, even the reset() is not reliable.
+>
+>
+> >
+> >> Or a rough idea is that maybe need some relaxing to be coupled loosely
+> >> with userspace. E.g the device (control path) is implemented in the
+> >> kernel but the datapath is implemented in the userspace like TUN/TAP.
+> >>
+> > I think it can work for most cases. One problem is that the set_config
+> > might change the behavior of the data path at runtime, e.g.
+> > virtnet_set_mac_address() in the virtio-net driver and
+> > cache_type_store() in the virtio-blk driver. Not sure if this path is
+> > able to return before the datapath is aware of this change.
+>
+>
+> Good point.
+>
+> But set_config() should be rare:
+>
+> E.g in the case of virtio-net with VERSION_1, config space is read only,
+> and it was set via control vq.
+>
+> For block, we can
+>
+> 1) start from without WCE or
+> 2) we add a config change notification to userspace or
 
-Queued, thanks.
+I prefer this way. And I think we also need to do similar things for
+set/get_vq_state().
 
-Paolo
-
+Thanks,
+Yongji
