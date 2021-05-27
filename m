@@ -2,103 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 38D873927B1
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 08:33:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 254D939289F
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 09:34:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232240AbhE0GfA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 02:35:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34148 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230107AbhE0Gey (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 May 2021 02:34:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622097202;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nHImtBYkw4lCcg0C5T7A+w8BKD0CNflxB4DhqBvnb7E=;
-        b=ey2afOaVlkp9IoMzLrSDoaDiCeIliDIVlUaVsRxjQIhP4iGLGfjCYIYeF4OT6dCeAZzMEi
-        StJPDlcfJZCYRNH5spiwuBLAfxftVrD5pxfuTonrKP/0sk/RJ2LQv3i6Zue0+eeNmdDxQf
-        wjx6aW3W99/B3cSzbVTexN4OcN3KQhI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-521-hFVtQeprPU69iecJpCDfrw-1; Thu, 27 May 2021 02:33:18 -0400
-X-MC-Unique: hFVtQeprPU69iecJpCDfrw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4BBB18766D4;
-        Thu, 27 May 2021 06:33:16 +0000 (UTC)
-Received: from gondolin.fritz.box (ovpn-113-46.ams2.redhat.com [10.36.113.46])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BF4BF5C3E9;
-        Thu, 27 May 2021 06:33:15 +0000 (UTC)
-Date:   Thu, 27 May 2021 08:33:13 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Vasily Gorbik <gor@linux.ibm.com>
-Cc:     Heiko Carstens <hca@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-Subject: b4 usage (was: [PULL 0/3] vfio-ccw: some fixes)
-Message-ID: <20210527083313.0f5b9553.cohuck@redhat.com>
-In-Reply-To: <your-ad-here.call-01622068380-ext-9894@work.hours>
-References: <20210520113450.267893-1-cohuck@redhat.com>
-        <your-ad-here.call-01622068380-ext-9894@work.hours>
-Organization: Red Hat GmbH
+        id S234205AbhE0Hf6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 03:35:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37726 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233595AbhE0Hfy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 May 2021 03:35:54 -0400
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF382C061763
+        for <kvm@vger.kernel.org>; Thu, 27 May 2021 00:34:21 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id h20so5079859ejg.1
+        for <kvm@vger.kernel.org>; Thu, 27 May 2021 00:34:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=JpPCkjOAGobfSNtpJxvUsntsk9lsRgQ1IR3+Mq27bcI=;
+        b=uMfYoJuLhl1KdRjAz6yEq3nbDEYIPQGLPOZo1dzv2U1WiTHQwyTUwYCbEPLT8+euBR
+         88x6YAEk2hBave7+d7G+vz7hvjmmWMj7KtUuw++18w7mDwPL4FmzZsGHehLYCV/JxvWB
+         0hXKY78gxyqW23n0ICW56b92UcN6Emj4izFb+TMFEGsfxuWSVVmCM7ddoNKpxI/zUDlC
+         kYi91qI7d/gPDmflc8jbzkRfQvBe8r0E9Rl9fmnhOl3WM+9wsfv/3a3WUQk+YAipuc0y
+         sU4BmfNzMxrrzrFXEaeHWUakPY+IGpQWpVBiWhRBKWSdEIGn1O73/meTmJtMab333NDZ
+         4luA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=JpPCkjOAGobfSNtpJxvUsntsk9lsRgQ1IR3+Mq27bcI=;
+        b=OVAGfK3BmvbyWxFa8wynSMwxxFOO16NjYUw12luoILPNxRpZbjX3+k8KT2Ql/J0pnP
+         +ofEwqVG9eUbhtw/xs4uKPyT4V0FM071YSZhbvwgR5S/e4RAzvH9U46Sr5oOUo04mrd+
+         kT6PgUPCm+x8mQNgZoKBHZYwWHDLuGjbl7wcfSzzTbkqzhyB/IudjPCTheBJzs9wU8Bn
+         bT/uryUh1Q7Jst9BcoRwRrj1vGWE4HMar9471SHEhbKjWjUoApJ6GiUzzVRJX/09edOW
+         av5OHY03de5MXKlfIx/AzS7cRyO4sFyvfv5cY1A5i6LFdvKHyLMhpbIBa4z7nEsy7y/G
+         s7lQ==
+X-Gm-Message-State: AOAM531gzvo1F62j6k+OPVis2zqCoZ6F5ol52z07GBxDnKACNNXFgC4j
+        PvKoAF236Lj2HmnfT9wtvXLKuyFjLrC0xZayM85f
+X-Google-Smtp-Source: ABdhPJx+nv79LV9LGHH2XXyBW6TJ1VbhAhSRhvc0U1UpO3biGSUk5ekbz3VHC3tbBnZ/C+qT8NXNA6kYjMYh4+evHdM=
+X-Received: by 2002:a17:907:7684:: with SMTP id jv4mr2315095ejc.427.1622100860243;
+ Thu, 27 May 2021 00:34:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20210517095513.850-1-xieyongji@bytedance.com> <20210517095513.850-12-xieyongji@bytedance.com>
+ <3740c7eb-e457-07f3-5048-917c8606275d@redhat.com> <CACycT3uAqa6azso_8MGreh+quj-JXO1piuGnrV8k2kTfc34N2g@mail.gmail.com>
+ <5a68bb7c-fd05-ce02-cd61-8a601055c604@redhat.com> <CACycT3ve7YvKF+F+AnTQoJZMPua+jDvGMs_ox8GQe_=SGdeCMA@mail.gmail.com>
+ <ee00efca-b26d-c1be-68d2-f9e34a735515@redhat.com>
+In-Reply-To: <ee00efca-b26d-c1be-68d2-f9e34a735515@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Thu, 27 May 2021 15:34:09 +0800
+Message-ID: <CACycT3ufok97cKpk47NjUBTc0QAyfauFUyuFvhWKmuqCGJ7zZw@mail.gmail.com>
+Subject: Re: Re: [PATCH v7 11/12] vduse: Introduce VDUSE - vDPA Device in Userspace
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 27 May 2021 00:33:00 +0200
-Vasily Gorbik <gor@linux.ibm.com> wrote:
+On Thu, May 27, 2021 at 1:40 PM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> =E5=9C=A8 2021/5/27 =E4=B8=8B=E5=8D=881:08, Yongji Xie =E5=86=99=E9=81=93=
+:
+> > On Thu, May 27, 2021 at 1:00 PM Jason Wang <jasowang@redhat.com> wrote:
+> >>
+> >> =E5=9C=A8 2021/5/27 =E4=B8=8B=E5=8D=8812:57, Yongji Xie =E5=86=99=E9=
+=81=93:
+> >>> On Thu, May 27, 2021 at 12:13 PM Jason Wang <jasowang@redhat.com> wro=
+te:
+> >>>> =E5=9C=A8 2021/5/17 =E4=B8=8B=E5=8D=885:55, Xie Yongji =E5=86=99=E9=
+=81=93:
+> >>>>> +
+> >>>>> +static int vduse_dev_msg_sync(struct vduse_dev *dev,
+> >>>>> +                           struct vduse_dev_msg *msg)
+> >>>>> +{
+> >>>>> +     init_waitqueue_head(&msg->waitq);
+> >>>>> +     spin_lock(&dev->msg_lock);
+> >>>>> +     vduse_enqueue_msg(&dev->send_list, msg);
+> >>>>> +     wake_up(&dev->waitq);
+> >>>>> +     spin_unlock(&dev->msg_lock);
+> >>>>> +     wait_event_killable(msg->waitq, msg->completed);
+> >>>> What happens if the userspace(malicous) doesn't give a response fore=
+ver?
+> >>>>
+> >>>> It looks like a DOS. If yes, we need to consider a way to fix that.
+> >>>>
+> >>> How about using wait_event_killable_timeout() instead?
+> >>
+> >> Probably, and then we need choose a suitable timeout and more importan=
+t,
+> >> need to report the failure to virtio.
+> >>
+> > Makes sense to me. But it looks like some
+> > vdpa_config_ops/virtio_config_ops such as set_status() didn't have a
+> > return value.  Now I add a WARN_ON() for the failure. Do you mean we
+> > need to add some change for virtio core to handle the failure?
+>
+>
+> Maybe, but I'm not sure how hard we can do that.
+>
 
-> On Thu, May 20, 2021 at 01:34:47PM +0200, Cornelia Huck wrote:
-> > The following changes since commit 6efb943b8616ec53a5e444193dccf1af9ad6=
-27b5:
-> >=20
-> >   Linux 5.13-rc1 (2021-05-09 14:17:44 -0700)
-> >=20
-> > are available in the Git repository at:
-> >=20
-> >   https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw.git =
-tags/vfio-ccw-20210520
-> >=20
-> > for you to fetch changes up to 2af7a834a435460d546f0cf0a8b8e4d259f1d910:
-> >=20
-> >   vfio-ccw: Serialize FSM IDLE state with I/O completion (2021-05-12 12=
-:59:50 +0200)
-> >=20
-> > ----------------------------------------------------------------
-> > Avoid some races in vfio-ccw request handling.
-> >=20
-> > ----------------------------------------------------------------
-> >=20
-> > Eric Farman (3):
-> >   vfio-ccw: Check initialized flag in cp_init()
-> >   vfio-ccw: Reset FSM state to IDLE inside FSM
-> >   vfio-ccw: Serialize FSM IDLE state with I/O completion =20
->=20
-> Pulled into fixes, thanks.
->=20
-> BTW, linux-s390@vger.kernel.org is now archived on lore and we started
+We need to change all virtio device drivers in this way.
 
-Oh, nice.
+> We had NEEDS_RESET but it looks we don't implement it.
+>
 
-> using b4 (https://git.kernel.org/pub/scm/utils/b4/b4.git) to pick up
-> changes. Besides all other features, it can convert Message-Id: to Link:
+Could it handle the failure of get_feature() and get/set_config()?
 
-I've been using b4 to pick patches (Linux and especially QEMU) for
-quite some time now, but never felt the need to convert Message-Id: to
-Link:. If you prefer the Link: format, I can certainly start using that
-for kernel patches.
+> Or a rough idea is that maybe need some relaxing to be coupled loosely
+> with userspace. E.g the device (control path) is implemented in the
+> kernel but the datapath is implemented in the userspace like TUN/TAP.
+>
 
->=20
-> Hm, and b4 also now complains:
-> =E2=9C=97 BADSIG: DKIM/ibm.com
-> have to look into that...
->=20
+I think it can work for most cases. One problem is that the set_config
+might change the behavior of the data path at runtime, e.g.
+virtnet_set_mac_address() in the virtio-net driver and
+cache_type_store() in the virtio-blk driver. Not sure if this path is
+able to return before the datapath is aware of this change.
 
+Thanks,
+Yongji
