@@ -2,111 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C679A3925F1
-	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 06:13:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D43D3926A3
+	for <lists+kvm@lfdr.de>; Thu, 27 May 2021 06:57:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229706AbhE0EOq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 00:14:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25014 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229692AbhE0EOp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 May 2021 00:14:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622088792;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=q3igEycLd8J73C7Vxb8Ui44QuvOprk+cULPfcPtYoIg=;
-        b=QFdc+ari0AIkQho7ZuWviXnT6YLKKHox7vh4d/LpQ7EaRavPHH0nekqPuTcJEIztGRMmuV
-        SXATnMWMK4sDVnHvVXgpJFQAe5RByazoRNWWOxzVEagnHCOwcAZ50xNFfv6JE+m4SO29u9
-        t/U+pFUY8xRs4sIZ3hoWB37rjK81GuE=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-FlU6jLdfP4uDEJwk8HLPLQ-1; Thu, 27 May 2021 00:13:08 -0400
-X-MC-Unique: FlU6jLdfP4uDEJwk8HLPLQ-1
-Received: by mail-pj1-f72.google.com with SMTP id cv23-20020a17090afd17b029015cdd292fe8so1657205pjb.8
-        for <kvm@vger.kernel.org>; Wed, 26 May 2021 21:13:08 -0700 (PDT)
+        id S234577AbhE0E6m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 00:58:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59060 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234431AbhE0E6j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 May 2021 00:58:39 -0400
+Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCB90C061760;
+        Wed, 26 May 2021 21:57:05 -0700 (PDT)
+Received: by mail-ot1-x331.google.com with SMTP id i23-20020a9d68d70000b02902dc19ed4c15so3308588oto.0;
+        Wed, 26 May 2021 21:57:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zd33jEwk8aHcS5XVZ56yw2Oa1m/r43mn4HOR1FizvXU=;
+        b=S3Q3irWuVCW9yu9MDQAE7KTjnhM/caOcdVcxZmKxu/a9WxHh1BOfD970uWtTPqCQrV
+         Rj3gsWRoMHvBobnlMbQnZ72NxeQ7761HUk1xPHQPwd4EUO4GuHlFpkMDjnBCyBFxn2CB
+         ERnwMOp1G48Pu8Y6nKL++IroC/7XOJoUCI0U9RF/uC4k+ghA84wsIxp0u204F6biLwid
+         sfI/p9qDDPAe7cD9bmPs1aT3JxF/2w/vK6pgiJFlF3YoFei4UlaWzcgQhJnJwFkCMjoq
+         NzN1eORSy+VODVm72LhiDH3MRgAyZY/btEjET53xim+VaMZtYGClYdAH41XmdhEAjWJM
+         YvCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=q3igEycLd8J73C7Vxb8Ui44QuvOprk+cULPfcPtYoIg=;
-        b=AAYrC/G9TKe7LVNu+cZ+UEtBGUXLTAw6JBc3W5o279Dre+H08O9+yD309gXq5CkHWG
-         rCQboB+7KXngVhegW13YI/GZ9eC/bBVP5gEhLEOxKt1jWUp4Hlh+ybcEBWe/y5e37nRU
-         T2/g/gtUv5DOtVLRGceqFRCdQSfz/0tax16pEIDRbCP0+nCn7b7M9RxTscVLT+fKp5OJ
-         b6i24vjA5RbIScSZjBPS6Dy4HHHzAjdL/h3/wK8zHs+SitKMjhYV0bibHH4U1tRRQJpA
-         YrG1Jj36jERz1VIr0olhbd3xfpz+0uFbLczNBdA41VkyqJzjku1yjO5YfOs2K7S+1XC4
-         T3dg==
-X-Gm-Message-State: AOAM530FrWoQu+GSvEx6g0C1b2UGzkwhnFMGpbtFD1xyg1lQUYCXU2xh
-        cahm5zFvJxi3KGxesomxWiiWuzvIuvSNSgtXoo88C1r797c4cOe9i1SGIwNXkVa7hEMCLd5u/YH
-        /xQ1nVTX/16Zi
-X-Received: by 2002:a63:3c0e:: with SMTP id j14mr1842312pga.427.1622088787573;
-        Wed, 26 May 2021 21:13:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzNWCYMnMC1HxMoP07R/3S3m3jilU3dNCIEmruTMAtVdxqR2yiJbYdkUNhO/NZQxyTwe/4ddA==
-X-Received: by 2002:a63:3c0e:: with SMTP id j14mr1842274pga.427.1622088787269;
-        Wed, 26 May 2021 21:13:07 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id c134sm622801pfb.135.2021.05.26.21.13.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 May 2021 21:13:06 -0700 (PDT)
-Subject: Re: [PATCH v7 11/12] vduse: Introduce VDUSE - vDPA Device in
- Userspace
-To:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
-        stefanha@redhat.com, sgarzare@redhat.com, parav@nvidia.com,
-        hch@infradead.org, christian.brauner@canonical.com,
-        rdunlap@infradead.org, willy@infradead.org,
-        viro@zeniv.linux.org.uk, axboe@kernel.dk, bcrl@kvack.org,
-        corbet@lwn.net, mika.penttila@nextfour.com,
-        dan.carpenter@oracle.com, joro@8bytes.org
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
-References: <20210517095513.850-1-xieyongji@bytedance.com>
- <20210517095513.850-12-xieyongji@bytedance.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <3740c7eb-e457-07f3-5048-917c8606275d@redhat.com>
-Date:   Thu, 27 May 2021 12:12:58 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.2
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zd33jEwk8aHcS5XVZ56yw2Oa1m/r43mn4HOR1FizvXU=;
+        b=kbcd00dkUXUcYELmsrsGkEXZVCZtTAdc+Gwg9yANL5NWBFZ4C52UNzhI/ov24ZQVU1
+         wHjq3eErHQIFi9UTkm7riM3LAFVCj/aE5o7prMtuS1PvYirVQRe3Zk2A0SUrG41pUVFc
+         SoWddebKWTLSq85uWWEcnxiaMdKPSLh69yeN/bBGevuT+LkAx9F8rMpJ0tWP9LzYwODQ
+         CuKod1YjTocWFodRu+glvBWGq4FFSivHf0/HdoSqcX4be0mhmW4VXnSq6EOD2tW/TnNt
+         /lDIQF03htLOMfL15IXwC3BW5uDKKMeI9gnmDFKL+WsI/YeYVi3wWsa26+f2LoHHMJdl
+         OKVw==
+X-Gm-Message-State: AOAM533d0stulAPMGvyEOJfnQ5Fe5yvMifB9juX69j8OsEP7Uig83GcB
+        BhVHeAcqCZfIpDkDFBvSLdweqkPoxjU0jQn5fD8=
+X-Google-Smtp-Source: ABdhPJyqy6tKSYJTO5Q/P3AU0dl27HaGrFoIR5zhBPvAV35Y/8Rt1mNAb4MgMs8/FoG3RwsudmZ9xYXw33XpsO6chec=
+X-Received: by 2002:a9d:4b0e:: with SMTP id q14mr1304495otf.254.1622091425262;
+ Wed, 26 May 2021 21:57:05 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210517095513.850-12-xieyongji@bytedance.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+References: <20210527084356.12c2784f@canb.auug.org.au>
+In-Reply-To: <20210527084356.12c2784f@canb.auug.org.au>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Thu, 27 May 2021 12:56:54 +0800
+Message-ID: <CANRm+CyC+=hMrVJCVWZ7cTC_F3CXYKRms2xNFQCvWa5rPS3U-w@mail.gmail.com>
+Subject: Re: linux-next: build failure after merge of the kvm-fixes tree
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, 27 May 2021 at 10:50, Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+>
+> Hi all,
+>
+> After merging the kvm-fixes tree, today's linux-next build (powerpc
+> ppc64_defconfig) failed like this:
+>
+> In file included from arch/powerpc/include/asm/kvm_ppc.h:19,
+>                  from arch/powerpc/include/asm/dbell.h:17,
+>                  from arch/powerpc/kernel/asm-offsets.c:38:
+> include/linux/kvm_host.h: In function 'kvm_vcpu_can_poll':
+> include/linux/kvm_host.h:270:9: error: implicit declaration of function 'single_task_running' [-Werror=implicit-function-declaration]
+>   270 |  return single_task_running() && !need_resched() && ktime_before(cur, stop);
+>       |         ^~~~~~~~~~~~~~~~~~~
+>
+> Caused by commit
+>
+>   85d4c3baeb45 ("KVM: PPC: exit halt polling on need_resched()")
+>
+> I have used the kvm-fixes tree from next-20210524 again today.
 
-ÔÚ 2021/5/17 ÏÂÎç5:55, Xie Yongji Ð´µÀ:
-> +
-> +static int vduse_dev_msg_sync(struct vduse_dev *dev,
-> +			      struct vduse_dev_msg *msg)
-> +{
-> +	init_waitqueue_head(&msg->waitq);
-> +	spin_lock(&dev->msg_lock);
-> +	vduse_enqueue_msg(&dev->send_list, msg);
-> +	wake_up(&dev->waitq);
-> +	spin_unlock(&dev->msg_lock);
-> +	wait_event_killable(msg->waitq, msg->completed);
+The kvm/master is broken by several patches.
 
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 0f6f394..e851671 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -1659,7 +1659,7 @@ struct kvm_hv_hcall {
 
-What happens if the userspace(malicous) doesn't give a response forever?
-
-It looks like a DOS. If yes, we need to consider a way to fix that.
-
-Thanks
-
-
-> +	spin_lock(&dev->msg_lock);
-> +	if (!msg->completed) {
-> +		list_del(&msg->list);
-> +		msg->resp.result = VDUSE_REQUEST_FAILED;
-> +	}
-> +	spin_unlock(&dev->msg_lock);
-> +
-> +	return (msg->resp.result == VDUSE_REQUEST_OK) ? 0 : -1;
-> +}
-
+ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct
+kvm_hv_hcall *hc, bool ex)
+ {
+-    int i, j;
++    int i;
+     gpa_t gpa;
+     struct kvm *kvm = vcpu->kvm;
+     struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 9d095bed..feb9611 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3604,7 +3604,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu,
+struct msr_data *msr_info)
+          * to ensure backwards-compatible behavior for migration.
+          */
+         if (msr_info->host_initiated &&
+-            kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_TSC_HOST_ACCESS))
++            kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_TSC_HOST_ACCESS)) {
+             offset = vcpu->arch.l1_tsc_offset;
+             ratio = vcpu->arch.l1_tsc_scaling_ratio;
+         } else {
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 18905c9..4273e04 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -10,6 +10,7 @@
+ #include <linux/spinlock.h>
+ #include <linux/signal.h>
+ #include <linux/sched.h>
++#include <linux/sched/stat.h>
+ #include <linux/bug.h>
+ #include <linux/minmax.h>
+ #include <linux/mm.h>
