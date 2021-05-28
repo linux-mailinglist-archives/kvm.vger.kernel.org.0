@@ -2,231 +2,306 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BFDC393D3A
-	for <lists+kvm@lfdr.de>; Fri, 28 May 2021 08:39:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E673F393EED
+	for <lists+kvm@lfdr.de>; Fri, 28 May 2021 10:44:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230299AbhE1Gkp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 May 2021 02:40:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57629 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229569AbhE1Gko (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 28 May 2021 02:40:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622183949;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6RpP8rpfd8a3e0y5nF0RPgT5RVi2VhGM0rPjlvoSzx4=;
-        b=gDBkzqxqKfaeQ7Oxt0B4O42Rxx8iJ+KkV0cRLpR+v1/ymXcZ2RyWNdQEd9H1xErqpdsmpU
-        ubdptE17Ves63meELxr8LXNnSDBJ+xtKlme4FoujSB0IqVUPSIJCYndhJ+2Whg2U5TyJGf
-        W2P1AE1/z0j7H437mAmElCaTSoMZIFo=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-588-wGL0-BWYNLiZXsST72Cscw-1; Fri, 28 May 2021 02:39:08 -0400
-X-MC-Unique: wGL0-BWYNLiZXsST72Cscw-1
-Received: by mail-pf1-f200.google.com with SMTP id a8-20020a62d4080000b029028db7db58adso1871629pfh.22
-        for <kvm@vger.kernel.org>; Thu, 27 May 2021 23:39:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=6RpP8rpfd8a3e0y5nF0RPgT5RVi2VhGM0rPjlvoSzx4=;
-        b=IKL/e+WGddZApdHlfm3mbaNjuSI3qujC5NC70P17WBSxFV0QxDBtxlj3Zbugg2bFNX
-         EgNPhUhlo92Sr/f0h/JDzwsbk1kpOv//IGhHFtTP/y+QiKqvbeoquNIsVJjDFtM3dARK
-         PZkI0JmdHTLBUibelb/y9n8Kv7nZ8oqN8zQtAqefAocVq7JaTU1c/UItW1k6OfjzGuDI
-         NdFn5H4pb8vDhn2xITI/uAGO2uJhsuFC92/RorwKFwg9SXd6yR+76U0vrNT+odltzbox
-         mZUZ8N3WBkj28ZbbPOm+k4/UrKfq4LYuv7nlLMOKl7O6lT3WqKyXW75pEeUHtOjR+ASW
-         VZQg==
-X-Gm-Message-State: AOAM532wmJbiDGx5h1pEVnGjIFHssvdPHOUvkWi9tczLfHO1SyqZoIQL
-        SFvf4s8GZcdB9Aw8BXnLUEw5uz/981lZnQXL5TcUYAmUs8JxpuVS0mwY0LVxR/AKEW+shvJMFjc
-        od2+SgAQ/JOtG
-X-Received: by 2002:a17:90a:bd05:: with SMTP id y5mr2664312pjr.229.1622183947110;
-        Thu, 27 May 2021 23:39:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxGNmAqjgmxntdDKOd5qocBDSk4ZjOlVFy0XRLBTCjKcdzj+d4zuGqzz/QNeE7UYpYTrC3W9A==
-X-Received: by 2002:a17:90a:bd05:: with SMTP id y5mr2664285pjr.229.1622183946816;
-        Thu, 27 May 2021 23:39:06 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id q24sm3476480pjp.6.2021.05.27.23.38.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 May 2021 23:39:06 -0700 (PDT)
-Subject: Re: [PATCH v7 11/12] vduse: Introduce VDUSE - vDPA Device in
- Userspace
-To:     Yongji Xie <xieyongji@bytedance.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=c3=a4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-References: <20210517095513.850-1-xieyongji@bytedance.com>
- <20210517095513.850-12-xieyongji@bytedance.com>
- <3740c7eb-e457-07f3-5048-917c8606275d@redhat.com>
- <CACycT3uAqa6azso_8MGreh+quj-JXO1piuGnrV8k2kTfc34N2g@mail.gmail.com>
- <5a68bb7c-fd05-ce02-cd61-8a601055c604@redhat.com>
- <CACycT3ve7YvKF+F+AnTQoJZMPua+jDvGMs_ox8GQe_=SGdeCMA@mail.gmail.com>
- <ee00efca-b26d-c1be-68d2-f9e34a735515@redhat.com>
- <CACycT3ufok97cKpk47NjUBTc0QAyfauFUyuFvhWKmuqCGJ7zZw@mail.gmail.com>
- <00ded99f-91b6-ba92-5d92-2366b163f129@redhat.com>
- <3cc7407d-9637-227e-9afa-402b6894d8ac@redhat.com>
- <CACycT3s6SkER09KL_Ns9d03quYSKOuZwd3=HJ_s1SL7eH7y5gA@mail.gmail.com>
- <baf0016a-7930-2ae2-399f-c28259f415c1@redhat.com>
- <CACycT3vKZ3y0gga8PrSVtssZfNV0Y-A8=iYZSi9sbpHRNkVf-A@mail.gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <503cee35-e5d7-7ccf-347b-73487872ac11@redhat.com>
-Date:   Fri, 28 May 2021 14:38:54 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.2
+        id S234786AbhE1IqN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 May 2021 04:46:13 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52970 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229950AbhE1IqN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 28 May 2021 04:46:13 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14S8Wmmx005468;
+        Fri, 28 May 2021 04:44:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : subject : to : cc
+ : references : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=wMppRQYJE7ZUvGYNBkA87k0HI0zkhoEIyDLCTOErjRU=;
+ b=Nyvh0xRz1CyV4mOL1Pw9UdkLKtJHkApBR6WHp3jnEE2ESgUK1LWzsS3n/ZG3rZWrk6eQ
+ +I4iZWqXtwI0Kv3sPtlg+2zu6PDaSEweEyKL3FI93VlWDKukYtNnDPctgeP7L0gjnzFA
+ FXSNiFp0gjTtPzV+iNMx7j1+XvwRfvpfY9jCRr03y/sAw76ijo7QzHyEP0WuAY8x9pIi
+ qWcfxG56LT+nGQdfhJ0dRfp86yTazy/grI7mno0RIzI46DF17TVpYUwtxB0z2xLkBHaE
+ vngZMe2bx2t9c6tq6YBK3pkkJkH5dJjk20+338czLDEgLPx5nxTVZP8QfvZ897z57ZHe RA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38tu4dv46u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 28 May 2021 04:44:38 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14S8XYpX007280;
+        Fri, 28 May 2021 04:44:38 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38tu4dv45u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 28 May 2021 04:44:38 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 14S8gV0u014066;
+        Fri, 28 May 2021 08:44:36 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 38s1r49nen-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 28 May 2021 08:44:35 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14S8iXv332178456
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 28 May 2021 08:44:33 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BE9414C040;
+        Fri, 28 May 2021 08:44:33 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5D4C64C04A;
+        Fri, 28 May 2021 08:44:33 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.69.40])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 28 May 2021 08:44:33 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v4 6/7] s390x: mmu: add support for large
+ pages
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com
+References: <20210526134245.138906-1-imbrenda@linux.ibm.com>
+ <20210526134245.138906-7-imbrenda@linux.ibm.com>
+Message-ID: <23d596c4-331f-088c-8373-74df78568e8a@linux.ibm.com>
+Date:   Fri, 28 May 2021 10:44:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <CACycT3vKZ3y0gga8PrSVtssZfNV0Y-A8=iYZSi9sbpHRNkVf-A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210526134245.138906-7-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: WnCFt4xQ1sjcLQRMsRDqlh9_b7qd33Je
+X-Proofpoint-GUID: UOD47vThhlm40tStLlDXvp7aJ5F7wZ5t
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-28_04:2021-05-27,2021-05-28 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 malwarescore=0
+ clxscore=1015 impostorscore=0 priorityscore=1501 spamscore=0
+ mlxlogscore=999 phishscore=0 lowpriorityscore=0 mlxscore=0 bulkscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2105280055
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 5/26/21 3:42 PM, Claudio Imbrenda wrote:
+> Add support for 1M and 2G pages.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>  lib/s390x/mmu.h |  73 +++++++++++++-
+>  lib/s390x/mmu.c | 260 +++++++++++++++++++++++++++++++++++++++++++-----
+>  2 files changed, 307 insertions(+), 26 deletions(-)
+> 
+> diff --git a/lib/s390x/mmu.h b/lib/s390x/mmu.h
+> index 603f289e..93208467 100644
+> --- a/lib/s390x/mmu.h
+> +++ b/lib/s390x/mmu.h
+> @@ -10,9 +10,78 @@
+>  #ifndef _ASMS390X_MMU_H_
+>  #define _ASMS390X_MMU_H_
+>  
+> -void protect_page(void *vaddr, unsigned long prot);
+> +/*
+> + * Splits the pagetables down to the given DAT tables level.
+> + * Returns a pointer to the DAT table entry of the given level.
+> + * @pgtable root of the page table tree
+> + * @vaddr address whose page tables are to split
+> + * @level 3 (for 2GB pud), 4 (for 1 MB pmd) or 5 (for 4KB pages)
+> + */
+> +void *split_page(pgd_t *pgtable, void *vaddr, unsigned int level);
+> +
+> +/*
+> + * Applies the given protection bits to the given DAT tables level,
+> + * splitting if necessary.
+> + * @pgtable root of the page table tree
+> + * @vaddr address whose protection bits are to be changed
+> + * @prot the protection bits to set
+> + * @level 3 (for 2GB pud), 4 (for 1MB pmd) or 5 (for 4KB pages)
+> + */
+> +void protect_dat_entry(void *vaddr, unsigned long prot, unsigned int level);
+> +/*
+> + * Clears the given protection bits from the given DAT tables level,
+> + * splitting if necessary.
+> + * @pgtable root of the page table tree
+> + * @vaddr address whose protection bits are to be changed
+> + * @prot the protection bits to clear
+> + * @level 3 (for 2GB pud), 4 (for 1MB pmd) or 5 (for 4kB pages)
+> + */
+> +void unprotect_dat_entry(void *vaddr, unsigned long prot, unsigned int level);
+> +
+> +/*
+> + * Applies the given protection bits to the given 4kB pages range,
+> + * splitting if necessary.
+> + * @start starting address whose protection bits are to be changed
+> + * @len size in bytes
+> + * @prot the protection bits to set
+> + */
+>  void protect_range(void *start, unsigned long len, unsigned long prot);
+> -void unprotect_page(void *vaddr, unsigned long prot);
+> +/*
+> + * Clears the given protection bits from the given 4kB pages range,
+> + * splitting if necessary.
+> + * @start starting address whose protection bits are to be changed
+> + * @len size in bytes
+> + * @prot the protection bits to set
+> + */
+>  void unprotect_range(void *start, unsigned long len, unsigned long prot);
+>  
+> +/* Similar to install_page, maps the virtual address to the physical address
+> + * for the given page tables, using 1MB large pages.
+> + * Returns a pointer to the DAT table entry.
+> + * @pgtable root of the page table tree
+> + * @phys physical address to map, must be 1MB aligned!
+> + * @vaddr virtual address to map, must be 1MB aligned!
+> + */
+> +pmdval_t *install_large_page(pgd_t *pgtable, phys_addr_t phys, void *vaddr);
+> +
+> +/* Similar to install_page, maps the virtual address to the physical address
+> + * for the given page tables, using 2GB huge pages.
+> + * Returns a pointer to the DAT table entry.
+> + * @pgtable root of the page table tree
+> + * @phys physical address to map, must be 2GB aligned!
+> + * @vaddr virtual address to map, must be 2GB aligned!
+> + */
+> +pudval_t *install_huge_page(pgd_t *pgtable, phys_addr_t phys, void *vaddr);
+> +
+> +static inline void protect_page(void *vaddr, unsigned long prot)
+> +{
+> +	protect_dat_entry(vaddr, prot, 5);
+> +}
+> +
+> +static inline void unprotect_page(void *vaddr, unsigned long prot)
+> +{
+> +	unprotect_dat_entry(vaddr, prot, 5);
+> +}
 
-在 2021/5/28 上午11:54, Yongji Xie 写道:
-> On Fri, May 28, 2021 at 9:33 AM Jason Wang <jasowang@redhat.com> wrote:
->>
->> 在 2021/5/27 下午6:14, Yongji Xie 写道:
->>> On Thu, May 27, 2021 at 4:43 PM Jason Wang <jasowang@redhat.com> wrote:
->>>> 在 2021/5/27 下午4:41, Jason Wang 写道:
->>>>> 在 2021/5/27 下午3:34, Yongji Xie 写道:
->>>>>> On Thu, May 27, 2021 at 1:40 PM Jason Wang <jasowang@redhat.com> wrote:
->>>>>>> 在 2021/5/27 下午1:08, Yongji Xie 写道:
->>>>>>>> On Thu, May 27, 2021 at 1:00 PM Jason Wang <jasowang@redhat.com>
->>>>>>>> wrote:
->>>>>>>>> 在 2021/5/27 下午12:57, Yongji Xie 写道:
->>>>>>>>>> On Thu, May 27, 2021 at 12:13 PM Jason Wang <jasowang@redhat.com>
->>>>>>>>>> wrote:
->>>>>>>>>>> 在 2021/5/17 下午5:55, Xie Yongji 写道:
->>>>>>>>>>>> +
->>>>>>>>>>>> +static int vduse_dev_msg_sync(struct vduse_dev *dev,
->>>>>>>>>>>> +                           struct vduse_dev_msg *msg)
->>>>>>>>>>>> +{
->>>>>>>>>>>> +     init_waitqueue_head(&msg->waitq);
->>>>>>>>>>>> +     spin_lock(&dev->msg_lock);
->>>>>>>>>>>> +     vduse_enqueue_msg(&dev->send_list, msg);
->>>>>>>>>>>> +     wake_up(&dev->waitq);
->>>>>>>>>>>> +     spin_unlock(&dev->msg_lock);
->>>>>>>>>>>> +     wait_event_killable(msg->waitq, msg->completed);
->>>>>>>>>>> What happens if the userspace(malicous) doesn't give a response
->>>>>>>>>>> forever?
->>>>>>>>>>>
->>>>>>>>>>> It looks like a DOS. If yes, we need to consider a way to fix that.
->>>>>>>>>>>
->>>>>>>>>> How about using wait_event_killable_timeout() instead?
->>>>>>>>> Probably, and then we need choose a suitable timeout and more
->>>>>>>>> important,
->>>>>>>>> need to report the failure to virtio.
->>>>>>>>>
->>>>>>>> Makes sense to me. But it looks like some
->>>>>>>> vdpa_config_ops/virtio_config_ops such as set_status() didn't have a
->>>>>>>> return value.  Now I add a WARN_ON() for the failure. Do you mean we
->>>>>>>> need to add some change for virtio core to handle the failure?
->>>>>>> Maybe, but I'm not sure how hard we can do that.
->>>>>>>
->>>>>> We need to change all virtio device drivers in this way.
->>>>> Probably.
->>>>>
->>>>>
->>>>>>> We had NEEDS_RESET but it looks we don't implement it.
->>>>>>>
->>>>>> Could it handle the failure of get_feature() and get/set_config()?
->>>>> Looks not:
->>>>>
->>>>> "
->>>>>
->>>>> The device SHOULD set DEVICE_NEEDS_RESET when it enters an error state
->>>>> that a reset is needed. If DRIVER_OK is set, after it sets
->>>>> DEVICE_NEEDS_RESET, the device MUST send a device configuration change
->>>>> notification to the driver.
->>>>>
->>>>> "
->>>>>
->>>>> This looks implies that NEEDS_RESET may only work after device is
->>>>> probed. But in the current design, even the reset() is not reliable.
->>>>>
->>>>>
->>>>>>> Or a rough idea is that maybe need some relaxing to be coupled loosely
->>>>>>> with userspace. E.g the device (control path) is implemented in the
->>>>>>> kernel but the datapath is implemented in the userspace like TUN/TAP.
->>>>>>>
->>>>>> I think it can work for most cases. One problem is that the set_config
->>>>>> might change the behavior of the data path at runtime, e.g.
->>>>>> virtnet_set_mac_address() in the virtio-net driver and
->>>>>> cache_type_store() in the virtio-blk driver. Not sure if this path is
->>>>>> able to return before the datapath is aware of this change.
->>>>> Good point.
->>>>>
->>>>> But set_config() should be rare:
->>>>>
->>>>> E.g in the case of virtio-net with VERSION_1, config space is read
->>>>> only, and it was set via control vq.
->>>>>
->>>>> For block, we can
->>>>>
->>>>> 1) start from without WCE or
->>>>> 2) we add a config change notification to userspace or
->>>>> 3) extend the spec to use vq instead of config space
->>>>>
->>>>> Thanks
->>>> Another thing if we want to go this way:
->>>>
->>>> We need find a way to terminate the data path from the kernel side, to
->>>> implement to reset semantic.
->>>>
->>> Do you mean terminate the data path in vdpa_reset().
->>
->> Yes.
->>
->>
->>>    Is it ok to just
->>> notify userspace to stop data path asynchronously?
->>
->> For well-behaved userspace, yes but no for buggy or malicious ones.
->>
-> But the buggy or malicious daemons can't do anything if my
-> understanding is correct.
+\n
 
+> +void *get_dat_entry(pgd_t *pgtable, void *vaddr, unsigned int level);
+> +
+>  #endif /* _ASMS390X_MMU_H_ */
+> diff --git a/lib/s390x/mmu.c b/lib/s390x/mmu.c
+> index 5c517366..def91334 100644
+> --- a/lib/s390x/mmu.c
+> +++ b/lib/s390x/mmu.c
+> @@ -15,6 +15,18 @@
+>  #include <vmalloc.h>
+>  #include "mmu.h"
+>  
+> +/*
+> + * The naming convention used here is the same as used in the Linux kernel,
+> + * and this is the corrispondence between the s390x architectural names and
 
-You're right. I originally thought there can still have bouncing. But 
-consider we don't do that during fault.
+corresponds
 
-It should be safe.
+> + * the Linux ones:
+> + *
+> + * pgd - region 1 table entry
+> + * p4d - region 2 table entry
+> + * pud - region 3 table entry
+> + * pmd - segment table entry
+> + * pte - page table entry
+> + */
+> +
+>  static pgd_t *table_root;
+>  
+>  void configure_dat(int enable)
+> @@ -46,54 +58,254 @@ static void mmu_enable(pgd_t *pgtable)
+>  	lc->pgm_new_psw.mask |= PSW_MASK_DAT;
+>  }
+>  
+> -static pteval_t *get_pte(pgd_t *pgtable, uintptr_t vaddr)
+> +/*
+> + * Get the pud (region 3) DAT table entry for the given address and root,
+> + * allocating it if necessary
+> + */
+> +static inline pud_t *get_pud(pgd_t *pgtable, uintptr_t vaddr)
+>  {
+>  	pgd_t *pgd = pgd_offset(pgtable, vaddr);
+>  	p4d_t *p4d = p4d_alloc(pgd, vaddr);
+>  	pud_t *pud = pud_alloc(p4d, vaddr);
+> -	pmd_t *pmd = pmd_alloc(pud, vaddr);
+> -	pte_t *pte = pte_alloc(pmd, vaddr);
+>  
+> -	return &pte_val(*pte);
+> +	return pud;
+> +}
+> +
+> +/*
+> + * Get the pmd (segment) DAT table entry for the given address and pud,
+> + * allocating it if necessary.
+> + * The pud must not be huge.
+> + */
+> +static inline pmd_t *get_pmd(pud_t *pud, uintptr_t vaddr)
+> +{
+> +	pmd_t *pmd;
+> +
+> +	assert(!pud_huge(*pud));
+> +	pmd = pmd_alloc(pud, vaddr);
 
+Don't we have the *_alloc_map() functions in the kernel whic either map
+or allocate? I'd prefer that naming over *_alloc() if you also map if
+already allocated.
 
->
->> I had an idea, how about terminate IOTLB in this case? Then we're in
->> fact turn datapath off.
->>
-> Sorry, I didn't get your point here. What do you mean by terminating
-> IOTLB?
+> +	return pmd;
+> +}
+> +
+> +/*
+> + * Get the pte (page) DAT table entry for the given address and pmd,
+> + * allocating it if necessary.
+> + * The pmd must not be large.
+> + */
+> +static inline pte_t *get_pte(pmd_t *pmd, uintptr_t vaddr)
+> +{
+> +	pte_t *pte;
+> +
+> +	assert(!pmd_large(*pmd));
+> +	pte = pte_alloc(pmd, vaddr);
+> +	return pte;
+> +}
+> +
+> +/*
+> + * Splits a large pmd (segment) DAT table entry into equivalent 4kB small
+> + * pages.
+> + * @pmd The pmd to split, it must be large.
+> + * @va the virtual address corresponding to this pmd.
+> + */
+> +static void split_pmd(pmd_t *pmd, uintptr_t va)
+> +{
+> +	phys_addr_t pa = pmd_val(*pmd) & SEGMENT_ENTRY_SFAA;
+> +	unsigned long i;
+> +	pte_t *pte;
+> +
+> +	assert(pmd_large(*pmd));
+> +	pte = alloc_pages(PAGE_TABLE_ORDER);
+> +	for (i = 0; i < PAGE_TABLE_ENTRIES; i++)
+> +		pte_val(pte[i]) =  pa | PAGE_SIZE * i;
+> +	idte_pmdp(va, &pmd_val(*pmd));
+> +	pmd_val(*pmd) = __pa(pte) | SEGMENT_ENTRY_TT_SEGMENT;
 
+Equivalent would mean we carry over protection, no?
 
-I meant terminate the bouncing but it looks safe after a second thought :)
-
-Thanks
-
-
->   Remove iotlb mapping? But userspace can still access the mapped
-> region.
->
-> Thanks,
-> Yongji
->
-
+> +
+> +}
+> +
+> +/*
+> + * Splits a huge pud (region 3) DAT table entry into equivalent 1MB large
+> + * pages.
+> + * @pud The pud to split, it must be huge.
+> + * @va the virtual address corresponding to this pud.
+> + */
+> +static void split_pud(pud_t *pud, uintptr_t va)
+> +{
+> +	phys_addr_t pa = pud_val(*pud) & REGION3_ENTRY_RFAA;
+> +	unsigned long i;
+> +	pmd_t *pmd;
+> +
+> +	assert(pud_huge(*pud));
+> +	pmd = alloc_pages(SEGMENT_TABLE_ORDER);
+> +	for (i = 0; i < SEGMENT_TABLE_ENTRIES; i++)
+> +		pmd_val(pmd[i]) =  pa | SZ_1M * i | SEGMENT_ENTRY_FC | SEGMENT_ENTRY_TT_SEGMENT;
+> +	idte_pudp(va, &pud_val(*pud));
+> +	pud_val(*pud) = __pa(pmd) | REGION_ENTRY_TT_REGION3 | REGION_TABLE_LENGTH;
+> +}
