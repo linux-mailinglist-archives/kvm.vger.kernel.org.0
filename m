@@ -2,136 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C126A393B01
-	for <lists+kvm@lfdr.de>; Fri, 28 May 2021 03:29:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D17F8393B0C
+	for <lists+kvm@lfdr.de>; Fri, 28 May 2021 03:33:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235763AbhE1BbK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 May 2021 21:31:10 -0400
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:13712 "EHLO
-        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235727AbhE1BbI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 May 2021 21:31:08 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=laijs@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0UaKDkdE_1622165361;
-Received: from C02XQCBJJG5H.local(mailfrom:laijs@linux.alibaba.com fp:SMTPD_---0UaKDkdE_1622165361)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 28 May 2021 09:29:22 +0800
-Subject: Re: [PATCH] KVM: X86: fix tlb_flush_guest()
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        linux-kernel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
-References: <20210527023922.2017-1-jiangshanlai@gmail.com>
- <78ad9dff-9a20-c17f-cd8f-931090834133@redhat.com>
- <YK/FGYejaIu6EzSn@google.com>
- <d96f8c11-19e6-2c2d-91ff-6a7a51fa1b9c@linux.alibaba.com>
- <YLA4peMjgeVvKlEn@google.com>
-From:   Lai Jiangshan <laijs@linux.alibaba.com>
-Message-ID: <332beac2-5a0b-2e5c-f22a-7609ed98acb9@linux.alibaba.com>
-Date:   Fri, 28 May 2021 09:29:21 +0800
+        id S235925AbhE1Bf3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 May 2021 21:35:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23562 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235837AbhE1Bf2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 27 May 2021 21:35:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622165634;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8EflzxBdWy0wiqxEhDGP+Q2T2EKetKqpgEpZkAeYf/A=;
+        b=S4yJIAdo04HShBOeEztagfuSKahh7K8Fs6P3wYnWR3yYdOQycT+MVrrAoZUfJ93bznh5cW
+        JnMj6D9FZ/Zfkkw+6343e4kc/73qiP1AixXluONg6+MbYoGrOMQN2dxECYmzxslQ0tnPKU
+        CoSeACifCz8qPc/Y4ykVSaIX221zrpc=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-9-m22t8a7wOjKMs_gyi2Zdfw-1; Thu, 27 May 2021 21:33:53 -0400
+X-MC-Unique: m22t8a7wOjKMs_gyi2Zdfw-1
+Received: by mail-pj1-f71.google.com with SMTP id c13-20020a17090aa60db029015c73ea2ce5so1639976pjq.0
+        for <kvm@vger.kernel.org>; Thu, 27 May 2021 18:33:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=8EflzxBdWy0wiqxEhDGP+Q2T2EKetKqpgEpZkAeYf/A=;
+        b=s8mM3CWYht6oc25T7PRDaORULz4dre//hL5H8eJzpEDbClgdbPbW2FIm7xZ055HlLM
+         Lzn6FK81lyowpboSaHFqDGkGes7IAaEmlgrHlcRd41oX1QsRTsF6ZFmiaDGWx30dSmZq
+         5srRaYBl+XxyFtrrA8iUmaXmwNEphrHar0hQFi2F39LLGarTk5iRfmL1Xgu78OMMpj+c
+         ANAXWx5jGBngF0XPIBPOVNPZXCx3jwjAyTWUmirznEL7TYcygS0ht9po9SMmyTDbxmye
+         nEhamdVA413eXkszDHWq2BpzfAUJlrO51ivigXrOT2ybK5FlU5j6kSlWiFwHRZfw1m6X
+         Sebg==
+X-Gm-Message-State: AOAM533ObN8yq9Ok0Qnd83pSZoHwKQ5mKAdvneRYswDajDWkbDZ35gxg
+        DRnIUw2/L/dZ8kkPl0UL0guF5jFFOe+sZeA0dZ7uqqUnb4fY6nk0a4zpnrjB3FmejlpDBqW6G20
+        rrjyR8lO3j8S6
+X-Received: by 2002:a17:90a:4d01:: with SMTP id c1mr1544231pjg.113.1622165631946;
+        Thu, 27 May 2021 18:33:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJydC/stmtwVBAw7vn0dDxdtXv7rokRxoXkgRqgTNFUSMcTPVSj5vrj1iqRSI/twfonCL/POEw==
+X-Received: by 2002:a17:90a:4d01:: with SMTP id c1mr1544208pjg.113.1622165631682;
+        Thu, 27 May 2021 18:33:51 -0700 (PDT)
+Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id g4sm2964265pgu.46.2021.05.27.18.33.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 May 2021 18:33:51 -0700 (PDT)
+Subject: Re: [PATCH v7 11/12] vduse: Introduce VDUSE - vDPA Device in
+ Userspace
+To:     Yongji Xie <xieyongji@bytedance.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=c3=a4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+References: <20210517095513.850-1-xieyongji@bytedance.com>
+ <20210517095513.850-12-xieyongji@bytedance.com>
+ <3740c7eb-e457-07f3-5048-917c8606275d@redhat.com>
+ <CACycT3uAqa6azso_8MGreh+quj-JXO1piuGnrV8k2kTfc34N2g@mail.gmail.com>
+ <5a68bb7c-fd05-ce02-cd61-8a601055c604@redhat.com>
+ <CACycT3ve7YvKF+F+AnTQoJZMPua+jDvGMs_ox8GQe_=SGdeCMA@mail.gmail.com>
+ <ee00efca-b26d-c1be-68d2-f9e34a735515@redhat.com>
+ <CACycT3ufok97cKpk47NjUBTc0QAyfauFUyuFvhWKmuqCGJ7zZw@mail.gmail.com>
+ <00ded99f-91b6-ba92-5d92-2366b163f129@redhat.com>
+ <3cc7407d-9637-227e-9afa-402b6894d8ac@redhat.com>
+ <CACycT3s6SkER09KL_Ns9d03quYSKOuZwd3=HJ_s1SL7eH7y5gA@mail.gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <baf0016a-7930-2ae2-399f-c28259f415c1@redhat.com>
+Date:   Fri, 28 May 2021 09:33:43 +0800
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.7.1
+ Gecko/20100101 Thunderbird/78.10.2
 MIME-Version: 1.0
-In-Reply-To: <YLA4peMjgeVvKlEn@google.com>
+In-Reply-To: <CACycT3s6SkER09KL_Ns9d03quYSKOuZwd3=HJ_s1SL7eH7y5gA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-
-On 2021/5/28 08:26, Sean Christopherson wrote:
-> On Fri, May 28, 2021, Lai Jiangshan wrote:
+在 2021/5/27 下午6:14, Yongji Xie 写道:
+> On Thu, May 27, 2021 at 4:43 PM Jason Wang <jasowang@redhat.com> wrote:
 >>
->> On 2021/5/28 00:13, Sean Christopherson wrote:
->>> And making a request won't work without revamping the order of request handling
->>> in vcpu_enter_guest(), e.g. KVM_REQ_MMU_RELOAD and KVM_REQ_MMU_SYNC are both
->>> serviced before KVM_REQ_STEAL_UPDATE.
->>
->> Yes, it just fixes the said problem in the simplest way.
->> I copied KVM_REQ_MMU_RELOAD from kvm_handle_invpcid(INVPCID_TYPE_ALL_INCL_GLOBAL).
->> (If the guest is not preempted, it will call invpcid_flush_all() and will be handled
->> by this way)
-> 
-> The problem is that record_steal_time() is called after KVM_REQ_MMU_RELOAD
-> in vcpu_enter_guest() and so the reload request won't be recognized until the
-> next VM-Exit.  It works for kvm_handle_invpcid() because vcpu_enter_guest() is
-> guaranteed to run between the invcpid code and VM-Enter.
-
-Kvm will recheck the request before VM-enter.
-See kvm_vcpu_exit_request().
-It won't lost any request, it just causes a additional iteration.
-
-> 
->> The improvement code will go later, and will not be backported.
-> 
-> I would argue that introducing a potential performance regression is in itself a
-> bug.  IMO, going straight to kvm_mmu_sync_roots() is not high risk.
-
-I think we can introduce a kvm_mmu_sync_roots_all() which syncs current
-root and handles prev_roots (mark need_sync or drop) as cleanup/preparation patch
-and then fix the problem.
-
-Do we need to backport the cleanup/preparation patch or just backport the way
-with KVM_REQ_MMU_RELOAD?
-
-
-> 
->> The proper way to flush guest is to use code in
->>
->> https://lore.kernel.org/lkml/20210525213920.3340-1-jiangshanlai@gmail.com/
->> as:
->> +		kvm_mmu_sync_roots(vcpu);
->> +		kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu); //or just call flush_current directly
->> +		for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
->> +			vcpu->arch.mmu->prev_roots[i].need_sync = true;
->>
->> If need_sync patch is not accepted, we can just use kvm_mmu_sync_roots(vcpu)
->> to keep the current pagetable and use kvm_mmu_free_roots() to free all the other
->> roots in prev_roots.
-> 
-> I like the idea, I just haven't gotten around to reviewing that patch yet.
-> 
->>> Cleaning up and documenting the MMU related requests is on my todo list, but the
->>> immediate fix should be tiny and I can do my cleanups on top.
+>> 在 2021/5/27 下午4:41, Jason Wang 写道:
+>>> 在 2021/5/27 下午3:34, Yongji Xie 写道:
+>>>> On Thu, May 27, 2021 at 1:40 PM Jason Wang <jasowang@redhat.com> wrote:
+>>>>> 在 2021/5/27 下午1:08, Yongji Xie 写道:
+>>>>>> On Thu, May 27, 2021 at 1:00 PM Jason Wang <jasowang@redhat.com>
+>>>>>> wrote:
+>>>>>>> 在 2021/5/27 下午12:57, Yongji Xie 写道:
+>>>>>>>> On Thu, May 27, 2021 at 12:13 PM Jason Wang <jasowang@redhat.com>
+>>>>>>>> wrote:
+>>>>>>>>> 在 2021/5/17 下午5:55, Xie Yongji 写道:
+>>>>>>>>>> +
+>>>>>>>>>> +static int vduse_dev_msg_sync(struct vduse_dev *dev,
+>>>>>>>>>> +                           struct vduse_dev_msg *msg)
+>>>>>>>>>> +{
+>>>>>>>>>> +     init_waitqueue_head(&msg->waitq);
+>>>>>>>>>> +     spin_lock(&dev->msg_lock);
+>>>>>>>>>> +     vduse_enqueue_msg(&dev->send_list, msg);
+>>>>>>>>>> +     wake_up(&dev->waitq);
+>>>>>>>>>> +     spin_unlock(&dev->msg_lock);
+>>>>>>>>>> +     wait_event_killable(msg->waitq, msg->completed);
+>>>>>>>>> What happens if the userspace(malicous) doesn't give a response
+>>>>>>>>> forever?
+>>>>>>>>>
+>>>>>>>>> It looks like a DOS. If yes, we need to consider a way to fix that.
+>>>>>>>>>
+>>>>>>>> How about using wait_event_killable_timeout() instead?
+>>>>>>> Probably, and then we need choose a suitable timeout and more
+>>>>>>> important,
+>>>>>>> need to report the failure to virtio.
+>>>>>>>
+>>>>>> Makes sense to me. But it looks like some
+>>>>>> vdpa_config_ops/virtio_config_ops such as set_status() didn't have a
+>>>>>> return value.  Now I add a WARN_ON() for the failure. Do you mean we
+>>>>>> need to add some change for virtio core to handle the failure?
+>>>>> Maybe, but I'm not sure how hard we can do that.
+>>>>>
+>>>> We need to change all virtio device drivers in this way.
 >>>
->>> I believe the minimal fix is:
+>>> Probably.
 >>>
->>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->>> index 81ab3b8f22e5..b0072063f9bf 100644
->>> --- a/arch/x86/kvm/x86.c
->>> +++ b/arch/x86/kvm/x86.c
->>> @@ -3072,6 +3072,9 @@ static void kvm_vcpu_flush_tlb_all(struct kvm_vcpu *vcpu)
->>>    static void kvm_vcpu_flush_tlb_guest(struct kvm_vcpu *vcpu)
->>>    {
->>>           ++vcpu->stat.tlb_flush;
->>> +
->>> +       if (!tdp_enabled)
->>> +               kvm_mmu_sync_roots(vcpu);
->>
->> it doesn't handle prev_roots which are also needed as
->> shown in kvm_handle_invpcid(INVPCID_TYPE_ALL_INCL_GLOBAL).
-> 
-> Ya, I belated realized this :-)
-> 
->>>           static_call(kvm_x86_tlb_flush_guest)(vcpu);
->>
->> For tdp_enabled, I think it is better to use kvm_x86_tlb_flush_current()
->> to make it consistent with other shadowpage code.
-
-For !tdp_enabled, I think it is better to use kvm_x86_tlb_flush_current()
-to make it consistent with other shadowpage code.
-
->>
->>>    }
 >>>
+>>>>> We had NEEDS_RESET but it looks we don't implement it.
+>>>>>
+>>>> Could it handle the failure of get_feature() and get/set_config()?
+>>>
+>>> Looks not:
+>>>
+>>> "
+>>>
+>>> The device SHOULD set DEVICE_NEEDS_RESET when it enters an error state
+>>> that a reset is needed. If DRIVER_OK is set, after it sets
+>>> DEVICE_NEEDS_RESET, the device MUST send a device configuration change
+>>> notification to the driver.
+>>>
+>>> "
+>>>
+>>> This looks implies that NEEDS_RESET may only work after device is
+>>> probed. But in the current design, even the reset() is not reliable.
+>>>
+>>>
+>>>>> Or a rough idea is that maybe need some relaxing to be coupled loosely
+>>>>> with userspace. E.g the device (control path) is implemented in the
+>>>>> kernel but the datapath is implemented in the userspace like TUN/TAP.
+>>>>>
+>>>> I think it can work for most cases. One problem is that the set_config
+>>>> might change the behavior of the data path at runtime, e.g.
+>>>> virtnet_set_mac_address() in the virtio-net driver and
+>>>> cache_type_store() in the virtio-blk driver. Not sure if this path is
+>>>> able to return before the datapath is aware of this change.
+>>>
+>>> Good point.
+>>>
+>>> But set_config() should be rare:
+>>>
+>>> E.g in the case of virtio-net with VERSION_1, config space is read
+>>> only, and it was set via control vq.
+>>>
+>>> For block, we can
+>>>
+>>> 1) start from without WCE or
+>>> 2) we add a config change notification to userspace or
+>>> 3) extend the spec to use vq instead of config space
+>>>
+>>> Thanks
+>>
+>> Another thing if we want to go this way:
+>>
+>> We need find a way to terminate the data path from the kernel side, to
+>> implement to reset semantic.
+>>
+> Do you mean terminate the data path in vdpa_reset().
+
+
+Yes.
+
+
+>   Is it ok to just
+> notify userspace to stop data path asynchronously?
+
+
+For well-behaved userspace, yes but no for buggy or malicious ones.
+
+I had an idea, how about terminate IOTLB in this case? Then we're in 
+fact turn datapath off.
+
+Thanks
+
+
+>   Userspace should
+> not be able to do any I/O at that time because the iotlb mapping is
+> already removed.
+>
+> Thanks,
+> Yongji
+>
+
