@@ -2,161 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 27D4F39461D
-	for <lists+kvm@lfdr.de>; Fri, 28 May 2021 18:57:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 554F8394620
+	for <lists+kvm@lfdr.de>; Fri, 28 May 2021 18:57:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235848AbhE1Q6g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 May 2021 12:58:36 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:35194 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236198AbhE1Q6b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 May 2021 12:58:31 -0400
-Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 3993E218B3;
-        Fri, 28 May 2021 16:55:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1622220945; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        id S236068AbhE1Q7Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 May 2021 12:59:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33626 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230337AbhE1Q7W (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 28 May 2021 12:59:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622221067;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TFHyn06x92pSJnqljPdfsH/lyyqMtzPyPJZV7LtKFPQ=;
-        b=AL93GJKvwnA1U8pUcBQzZP8PuTSgNgos1GXvblt4gcjmzdffACxLG8VzRDvEo1ukLQrZPa
-        IFqGkWr6jcZ0GMeeL3UY8CV6z34csOixZQM0YpBJWYTgAtC6+9MNFbYdFIApa8ko37TIiS
-        EU6JLBZsPAShVyPJf5D0SEAxPXtdJa8=
-Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id 3C4AF118DD;
-        Fri, 28 May 2021 16:55:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1622220944; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TFHyn06x92pSJnqljPdfsH/lyyqMtzPyPJZV7LtKFPQ=;
-        b=a4zBuVQ5S8t4WOzh8YWZl/3lQN12H0BMLkhKWiS/BFwYKGwGxK6taa4w9AvOkbIHblxm9m
-        5FnJ8z5ckES01r0AU66B9LdQHO706/HgBoQ3IQVNP11MSPi0zgeFdW0iTnp5OyngR4vXBu
-        nmcilxEUnwCAPFL+IBtxgr7z3bYK6gU=
-Received: from director2.suse.de ([192.168.254.72])
-        by imap3-int with ESMTPSA
-        id kag5DJAgsWDOPgAALh3uQQ
-        (envelope-from <dfaggioli@suse.com>); Fri, 28 May 2021 16:55:44 +0000
-Message-ID: <d7dc2464a8aa3caf64f955fe6c9df0cb8fe3b746.camel@suse.com>
-Subject: Re: [PATCH] Move VMEnter and VMExit tracepoints closer to the
- actual event
-From:   Dario Faggioli <dfaggioli@suse.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+        bh=nsUDfVx6kw1QKKH4CSV+8SNh91THtBJmewd0AtxZsM0=;
+        b=WcwqrGMXKSFcWxhaeVWMCFRDrxtR44lbjLMX1IJ/pwZbFX8HGsEPca563kDOL2GqKTu+zh
+        lD1CbFchB4dqwVfpqgOuJQhdZH0bmJtiJAdx+kEs9J5GC0+0lCrdQSX1vpas+fAqztnGkN
+        j8dUiwXPcZVFRsTr3FnnFkRFEVkqx0s=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-24-diGgjC2jOvmgWArvhjYHJw-1; Fri, 28 May 2021 12:57:46 -0400
+X-MC-Unique: diGgjC2jOvmgWArvhjYHJw-1
+Received: by mail-ed1-f70.google.com with SMTP id q18-20020a0564025192b02903888712212fso2410179edd.19
+        for <kvm@vger.kernel.org>; Fri, 28 May 2021 09:57:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nsUDfVx6kw1QKKH4CSV+8SNh91THtBJmewd0AtxZsM0=;
+        b=NFos6V2S4iUauicklZHKX/vXSK5eE3SthzlS/Glul/2Mb7nZaEXy5HZfWFF4D30wR1
+         HzuIb75cBXhYyyJy7PuOi+RfyVpbZ9dVvaZoOAhsn7ruyqsjdyZb1VRH0WYtELKloK/0
+         GeTq6yVR22piHIEqyfpLBcEhCl+ZDIOIoAi067Cvd+xaCPwz0eR+Q7ZDCh4V+mK5LSHN
+         unXfaIVK7ZcMMp6L103TmzDjOS3nDIWzvFMpLPCh/iJUGlUoT1s+QambCFs/cMI/Utq8
+         XduCgtzFgozQQ7APamOO0TRvx+L/pUBfW1hAt8cxjh5K2PXAmydH5Gsp7zQTsiegn4UU
+         aJEQ==
+X-Gm-Message-State: AOAM533WP6DdfiZqypXjq27lLCCz8KUO4C9BxhAkwbXCmElRuDNgDzrN
+        wt5DLhJN/dWHBLLJJXu750FI5ZXYr17/IoDIHTCAXIp5L1LcT/NjP3ldkJoIeVk1wu+Os7ToYvx
+        Wo2upfzlLbOkp
+X-Received: by 2002:a17:906:a88c:: with SMTP id ha12mr10040287ejb.129.1622221064240;
+        Fri, 28 May 2021 09:57:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz7sI8kp8yuGAgJ1e35LlzT33u7gefY6svEG8stz3Z+BamOigP5rdwUT8mplASzQlfiImy/Jw==
+X-Received: by 2002:a17:906:a88c:: with SMTP id ha12mr10040273ejb.129.1622221064030;
+        Fri, 28 May 2021 09:57:44 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id l19sm2197864edw.58.2021.05.28.09.57.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 May 2021 09:57:43 -0700 (PDT)
+Subject: Re: [PATCH] Move VMEnter and VMExit tracepoints closer to the actual
+ event
+To:     Dario Faggioli <dfaggioli@suse.com>,
         Sean Christopherson <seanjc@google.com>,
         Stefano De Venuto <stefano.devenuto99@gmail.com>
 Cc:     linux-kernel@vger.kernel.org, vkuznets@redhat.com,
         wanpengli@tencent.com, jmattson@google.com, x86@kernel.org,
         hpa@zytor.com, kvm@vger.kernel.org, rostedt@goodmis.org,
         y.karadz@gmail.com
-Date:   Fri, 28 May 2021 18:55:43 +0200
-In-Reply-To: <ab44e5b1-4448-d6c8-6cda-5e41866f69f1@redhat.com>
 References: <20210519182303.2790-1-stefano.devenuto99@gmail.com>
-         <YKaBEn6oUXaVAb0K@google.com>
-         <ab44e5b1-4448-d6c8-6cda-5e41866f69f1@redhat.com>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-JNouEV/PXAMFUgcK4W2M"
-User-Agent: Evolution 3.40.1 (by Flathub.org) 
+ <YKaBEn6oUXaVAb0K@google.com>
+ <ab44e5b1-4448-d6c8-6cda-5e41866f69f1@redhat.com>
+ <d7dc2464a8aa3caf64f955fe6c9df0cb8fe3b746.camel@suse.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c30bfb44-2dc7-cb9c-c038-5ab08f611586@redhat.com>
+Date:   Fri, 28 May 2021 18:57:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Authentication-Results: imap.suse.de;
-        none
-X-Spam-Level: 
-X-Spam-Score: -0.60
-X-Spamd-Result: default: False [-0.60 / 100.00];
-         ARC_NA(0.00)[];
-         RCVD_VIA_SMTP_AUTH(0.00)[];
-         FROM_HAS_DN(0.00)[];
-         TO_DN_SOME(0.00)[];
-         TO_MATCH_ENVRCPT_ALL(0.00)[];
-         FREEMAIL_ENVRCPT(0.00)[gmail.com];
-         TAGGED_RCPT(0.00)[];
-         MIME_GOOD(-0.20)[multipart/signed,text/plain];
-         DKIM_SIGNED(0.00)[suse.com:s=susede1];
-         RCPT_COUNT_TWELVE(0.00)[12];
-         SIGNED_PGP(-2.00)[];
-         FREEMAIL_TO(0.00)[redhat.com,google.com,gmail.com];
-         RCVD_NO_TLS_LAST(0.10)[];
-         FROM_EQ_ENVFROM(0.00)[];
-         MIME_TRACE(0.00)[0:+,1:+,2:~];
-         RCVD_COUNT_TWO(0.00)[2];
-         MID_RHS_MATCH_FROM(0.00)[];
-         SUSPICIOUS_RECIPS(1.50)[];
-         FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,tencent.com,google.com,kernel.org,zytor.com,goodmis.org,gmail.com]
-X-Spam-Flag: NO
+In-Reply-To: <d7dc2464a8aa3caf64f955fe6c9df0cb8fe3b746.camel@suse.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 28/05/21 18:55, Dario Faggioli wrote:
+> So, Paolo, just to be sure, when you said "the tracepoint on SVM could
+> match the clgi/stgi region", did you mean they should be outside of
+> this region (i.e., trace_kvm_enter() just before clgi() and
+> trace_kvm_exit() after stgi())? Or vice versa?:-)
 
---=-JNouEV/PXAMFUgcK4W2M
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Just outside, yes.
 
-On Thu, 2021-05-20 at 18:18 +0200, Paolo Bonzini wrote:
-> On 20/05/21 17:32, Sean Christopherson wrote:
-> > On VMX, I think the tracepoint can be moved below the VMWRITEs
-> > without much
-> > contention (though doing so is likely a nop), but moving it below
-> > kvm_load_guest_xsave_state() requires a bit more discussion.
->=20
-> Indeed; as a rule of thumb, the tracepoint on SVM could match the=20
-> clgi/stgi region, and on VMX it could be placed in a similar location.
->=20
-So, we played a little bit with this and, as envisioned, we can confirm
-that moving the tracepoint outside of the xsave handling calls results
-in the actual trace looking pretty much the same as it does right now.
-
-Still, I think we should go for it, and we're planning to send a v2 of
-this patch that does exactly that. In fact, I think it's still better
-to have the tracepoint closer to the actual instruction (provided they
-don't end up too close, as we were saying in this thread).
-
-For instance, despite the sequence of events being the same in the
-"output", the timestamp of the event that we see in the trace would be
-more accurate (although, we're of course talking about very small
-differences) and, more importantly, we reduce the chances that more
-events creeps in, if tracepoints for them are added in the code between
-where the trace_kvm_enter/exit() code are now and where we'd like to
-move them.
-
-So, Paolo, just to be sure, when you said "the tracepoint on SVM could
-match the clgi/stgi region", did you mean they should be outside of
-this region (i.e., trace_kvm_enter() just before clgi() and
-trace_kvm_exit() after stgi())? Or vice versa? :-)
-
-Thanks and Regards
-
-Dario
---=20
-Dario Faggioli, Ph.D
-http://about.me/dario.faggioli
-Virtualization Software Engineer
-SUSE Labs, SUSE https://www.suse.com/
--------------------------------------------------------------------
-<<This happens because _I_ choose it to happen!>> (Raistlin Majere)
-
---=-JNouEV/PXAMFUgcK4W2M
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEES5ssOj3Vhr0WPnOLFkJ4iaW4c+4FAmCxII8ACgkQFkJ4iaW4
-c+7z9BAAjkfVactXWKL+SnXmPSstEcjdkAQL+6VF2MA2DNTmvIjrec/x9o8Mjatz
-M90zfqxq+TuvF7BY6XvYmEoy2Ris4vNh4YFtecWKudI5QsJh6d0Snr+v5s3rHeAS
-JXAEfXnVKkvYrxSNpcW28qZlcbbAx3KTy0CjlySBmba99wq4JekJ5pQEmvxNeA9y
-eWTuHiUyS3S7dlf5xGydLVjF6TjbuuCuQ7AMb2aNMlALHkDfuZmohOvEWrUZP6dm
-injNK0G9HDETwqTwKIVw6HWbkAKp8d5plPAvRmI6PwDfrZKfS++yxl/KSbloJhrt
-7R41Shxu5RzwER86F61EeRwHlr5JXSCJq8D27auWZ29Qo6c4sdfu9Qw43zz4Vmy/
-lDyJbOnG6lE6XuPbxVe/ak/VAZlMGEVoQa/4FR62716JgoradjfiBGGqqy3YFzkJ
-z2ikf4y7eFCLUe487KGxhdOQqBoY4eHmFGMe8pFZSyanVXCHblcryvh3/ZiNNlRe
-9YbQ0L5z+XJX2zUFbSfkcdUZmpMyy2toTeishktXAxuiaTOenACDMWFvr+pGpL/A
-AkgKQBzJBKb+AAFH60jddDbg4z17A5STr9Qfoj+DbsCxiyTNhk83msh9CMFU/dz4
-8uk/Gzkq+vxWX3BuJ32H1R1hMjczxG0DaT7OgSFHJLZ+FD/jWXA=
-=rz+r
------END PGP SIGNATURE-----
-
---=-JNouEV/PXAMFUgcK4W2M--
+Paolo
 
