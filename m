@@ -2,156 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BAC9394B34
-	for <lists+kvm@lfdr.de>; Sat, 29 May 2021 11:13:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04487394B99
+	for <lists+kvm@lfdr.de>; Sat, 29 May 2021 12:20:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229724AbhE2JO4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 29 May 2021 05:14:56 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:36714 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229723AbhE2JOz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 29 May 2021 05:14:55 -0400
-Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id ADBB121915;
-        Sat, 29 May 2021 09:13:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1622279598; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
+        id S229674AbhE2KV6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 29 May 2021 06:21:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53897 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229575AbhE2KV6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 29 May 2021 06:21:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622283620;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+RLLpKzaG6cee9YoeuvdoRHLOhiqV7lPKVjXnQJR+5c=;
-        b=ykylH80xEmwxgMd21Qls+Am+RypWoqSTD20zrUMEAKHyvYo32N13VBtqkNUBSn9bPFOlmp
-        wD08aKkXlJlyRMwO+gUvcgzNQqxQ5T1r1sNjzRa3lp/2KfoDy7Uny1fPtG+ol2p2lX8gA7
-        A9YL/fgbeg0Klc0TSlSbiW81iwI+8Sk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1622279598;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+RLLpKzaG6cee9YoeuvdoRHLOhiqV7lPKVjXnQJR+5c=;
-        b=VUMBoPN7OJgUBq3ojM8vbVmDbzggH7zjcBinnkn5SNbz6NlbY72o2YYlaT1iYHD9hc5Pj9
-        AYD9y77TYu77UABA==
-Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id C3FD4118DD;
-        Sat, 29 May 2021 09:13:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1622279598; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+RLLpKzaG6cee9YoeuvdoRHLOhiqV7lPKVjXnQJR+5c=;
-        b=ykylH80xEmwxgMd21Qls+Am+RypWoqSTD20zrUMEAKHyvYo32N13VBtqkNUBSn9bPFOlmp
-        wD08aKkXlJlyRMwO+gUvcgzNQqxQ5T1r1sNjzRa3lp/2KfoDy7Uny1fPtG+ol2p2lX8gA7
-        A9YL/fgbeg0Klc0TSlSbiW81iwI+8Sk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1622279598;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+RLLpKzaG6cee9YoeuvdoRHLOhiqV7lPKVjXnQJR+5c=;
-        b=VUMBoPN7OJgUBq3ojM8vbVmDbzggH7zjcBinnkn5SNbz6NlbY72o2YYlaT1iYHD9hc5Pj9
-        AYD9y77TYu77UABA==
-Received: from director2.suse.de ([192.168.254.72])
-        by imap3-int with ESMTPSA
-        id cPj/La0FsmCbEwAALh3uQQ
-        (envelope-from <cfontana@suse.de>); Sat, 29 May 2021 09:13:17 +0000
-From:   Claudio Fontana <cfontana@suse.de>
-To:     Peter Maydell <peter.maydell@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc:     Claudio Fontana <cfontana@suse.de>,
-        "Michael S . Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Cameron Esfahani <dirty@apple.com>,
-        Roman Bolshakov <r.bolshakov@yadro.com>, qemu-devel@nongnu.org
-Subject: [PATCH 2/2] i386: run accel_cpu_instance_init as instance_post_init
-Date:   Sat, 29 May 2021 11:13:13 +0200
-Message-Id: <20210529091313.16708-3-cfontana@suse.de>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20210529091313.16708-1-cfontana@suse.de>
-References: <20210529091313.16708-1-cfontana@suse.de>
+        bh=rAj07ZCK5KDIXiVxu56SXtmyW8X/Uzs85mSHd9xMkE0=;
+        b=Dy0fz1clsorLO0ZRSOFo+6ye4CNaA9v6MbaCAlidURiwERVAHQCEK4xYrm1hsyZPDF9xNv
+        WLVAvRusEvRTjs/3Av9w4aqEMlNfEz4Ymi98Rlqw52eS/mO9brnACjm6pt3BjMZ7/gBVwk
+        W9kUzPP0uoEWDitLdkUlbS7R0Pd8i5k=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-386--hc6BkpUOnKe6wemcU7arA-1; Sat, 29 May 2021 06:20:19 -0400
+X-MC-Unique: -hc6BkpUOnKe6wemcU7arA-1
+Received: by mail-wm1-f70.google.com with SMTP id v20-20020a05600c2154b029019a6368bfe4so26305wml.2
+        for <kvm@vger.kernel.org>; Sat, 29 May 2021 03:20:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rAj07ZCK5KDIXiVxu56SXtmyW8X/Uzs85mSHd9xMkE0=;
+        b=B8jytfHVdrlX+1MsSA67YaC7dPIa3zwdpIDO2u1YjNoG9JG0QOsjLragXEnRA7G7n/
+         VT+ZjMNLLN4YH1g7sPlKud7bcpdX5dTWs4lD7vu+yIzpgz46ssqb2DYgVovjYbj4MTa0
+         aam9XcwbhjyCPHoRrG8P1B6gJ3m0CgA0MAsCI7gDuUFPsntrzjVWA+817+gijghVT6M8
+         abR8YutyeLRB4v52qfhAW1LiojK3xLycsCZktSjWMxWu4cu+2iUQ7j5Ls/aoA0PN+Z2j
+         wsEEKPLdlwU4zibJLtMyWjTI9qcxRmzxCHcTUIVtNdJC/ZulmBT2oWLcaDIMwC4aU5n9
+         R6sQ==
+X-Gm-Message-State: AOAM531eu4oVZrxcFEVIxLTUHTjhtjG+m8U0TKNgV0vqw6PWInpT8OGy
+        9f+iQ+uc79Ik/zuGAnKwT6j19HdPD64NFDDB+1S0z306DGSfXC80JS7ejZSiWUfNJqWsR7j8Quo
+        fNIXm5aiwoXRYzTrZluafs5b51n+F04EBHuu/6SF/ov25n9is518NwAeQtLfsGZaL
+X-Received: by 2002:a1c:4e0b:: with SMTP id g11mr12374218wmh.3.1622283617847;
+        Sat, 29 May 2021 03:20:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwKTruQR1WsSRzgozbspnFpcPccqWYRWEgR4ui7XPhdvKvdRXAA+HovZdppQC/XVpJjPue7WQ==
+X-Received: by 2002:a1c:4e0b:: with SMTP id g11mr12374199wmh.3.1622283617636;
+        Sat, 29 May 2021 03:20:17 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id 92sm7981736wrp.88.2021.05.29.03.20.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 29 May 2021 03:20:17 -0700 (PDT)
+To:     "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20210528191134.3740950-1-pbonzini@redhat.com>
+ <285623f6-52e4-7f8d-fab6-0476a00af68b@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] selftests: kvm: fix overlapping addresses in
+ memslot_perf_test
+Message-ID: <fc41bfc4-949f-03c5-3b20-2c1563ad7f62@redhat.com>
+Date:   Sat, 29 May 2021 12:20:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
+In-Reply-To: <285623f6-52e4-7f8d-fab6-0476a00af68b@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Authentication-Results: imap.suse.de;
-        none
-X-Spam-Level: *
-X-Spam-Score: 1.00
-X-Spamd-Result: default: False [1.00 / 100.00];
-         ARC_NA(0.00)[];
-         RCVD_VIA_SMTP_AUTH(0.00)[];
-         FROM_HAS_DN(0.00)[];
-         TO_DN_SOME(0.00)[];
-         TO_MATCH_ENVRCPT_ALL(0.00)[];
-         R_MISSING_CHARSET(2.50)[];
-         MIME_GOOD(-0.10)[text/plain];
-         REPLY(-4.00)[];
-         BROKEN_CONTENT_TYPE(1.50)[];
-         DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-         RCPT_COUNT_TWELVE(0.00)[13];
-         MID_CONTAINS_FROM(1.00)[];
-         RCVD_NO_TLS_LAST(0.10)[];
-         FROM_EQ_ENVFROM(0.00)[];
-         MIME_TRACE(0.00)[0:+];
-         RCVD_COUNT_TWO(0.00)[2]
-X-Spam-Flag: NO
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This partially fixes host and max cpu initialization,
-by running the accel cpu initialization only after all instance
-init functions are called for all X86 cpu subclasses.
+On 28/05/21 21:51, Maciej S. Szmigiero wrote:
+> On 28.05.2021 21:11, Paolo Bonzini wrote:
+>> The memory that is allocated in vm_create is already mapped close to
+>> GPA 0, because test_execute passes the requested memory to
+>> prepare_vm.  This causes overlapping memory regions and the
+>> test crashes.  For simplicity just move MEM_GPA higher.
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> I am not sure that I understand the issue correctly, is vm_create_default()
+> already reserving low GPAs (around 0x10000000) on some arches or run
+> environments?
 
-Partial Fix.
+It maps the number of pages you pass in the second argument, see
+vm_create.
 
-Fixes: 48afe6e4eabf ("i386: split cpu accelerators from cpu.c, using AccelCPUClass")
-Signed-off-by: Claudio Fontana <cfontana@suse.de>
----
- target/i386/cpu.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+   if (phy_pages != 0)
+     vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+                                 0, 0, phy_pages, 0);
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 6bcb7dbc2c..ae148fbd2f 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -6422,6 +6422,11 @@ static void x86_cpu_register_feature_bit_props(X86CPUClass *xcc,
-     x86_cpu_register_bit_prop(xcc, name, w, bitnr);
- }
- 
-+static void x86_cpu_post_initfn(Object *obj)
-+{
-+    accel_cpu_instance_init(CPU(obj));
-+}
-+
- static void x86_cpu_initfn(Object *obj)
- {
-     X86CPU *cpu = X86_CPU(obj);
-@@ -6473,9 +6478,6 @@ static void x86_cpu_initfn(Object *obj)
-     if (xcc->model) {
-         x86_cpu_load_model(cpu, xcc->model);
-     }
--
--    /* if required, do accelerator-specific cpu initializations */
--    accel_cpu_instance_init(CPU(obj));
- }
- 
- static int64_t x86_cpu_get_arch_id(CPUState *cs)
-@@ -6810,6 +6812,8 @@ static const TypeInfo x86_cpu_type_info = {
-     .parent = TYPE_CPU,
-     .instance_size = sizeof(X86CPU),
-     .instance_init = x86_cpu_initfn,
-+    .instance_post_init = x86_cpu_post_initfn,
-+
-     .abstract = true,
-     .class_size = sizeof(X86CPUClass),
-     .class_init = x86_cpu_common_class_init,
--- 
-2.26.2
+In this case:
+
+   data->vm = vm_create_default(VCPU_ID, mempages, guest_code);
+
+called here:
+
+   if (!prepare_vm(data, nslots, maxslots, tdata->guest_code,
+                   mem_size, slot_runtime)) {
+
+where mempages is mem_size, which is declared as:
+
+         uint64_t mem_size = tdata->mem_size ? : MEM_SIZE_PAGES;
+
+but actually a better fix is just to pass a small fixed value (e.g. 
+1024) to vm_create_default, since all other regions are added by hand.
+
+Paolo
 
