@@ -2,273 +2,313 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AE613966B5
-	for <lists+kvm@lfdr.de>; Mon, 31 May 2021 19:16:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B332F396709
+	for <lists+kvm@lfdr.de>; Mon, 31 May 2021 19:27:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231971AbhEaRSb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 May 2021 13:18:31 -0400
-Received: from prt-mail.chinatelecom.cn ([42.123.76.219]:58424 "EHLO
-        chinatelecom.cn" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S233794AbhEaRRY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 May 2021 13:17:24 -0400
-HMM_SOURCE_IP: 172.18.0.218:42706.1466219582
-HMM_ATTACHE_NUM: 0000
-HMM_SOURCE_TYPE: SMTP
-Received: from clientip-202.80.192.39?logid-8790cfef0ba147a299cbd8acf210f1a0 (unknown [172.18.0.218])
-        by chinatelecom.cn (HERMES) with SMTP id 5A2E42800B2;
-        Tue,  1 Jun 2021 01:06:29 +0800 (CST)
-X-189-SAVE-TO-SEND: +huangy81@chinatelecom.cn
-Received: from  ([172.18.0.218])
-        by app0025 with ESMTP id 8790cfef0ba147a299cbd8acf210f1a0 for qemu-devel@nongnu.org;
-        Tue Jun  1 01:06:27 2021
-X-Transaction-ID: 8790cfef0ba147a299cbd8acf210f1a0
-X-filter-score:  filter<0>
-X-Real-From: huangy81@chinatelecom.cn
-X-Receive-IP: 172.18.0.218
-X-MEDUSA-Status: 0
-Sender: huangy81@chinatelecom.cn
-From:   huangy81@chinatelecom.cn
-To:     <qemu-devel@nongnu.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-        Juan Quintela <quintela@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Hyman <huangy81@chinatelecom.cn>
-Subject: [PATCH v1 6/6] migration/dirtyrate: implement dirty-ring dirtyrate calculation
-Date:   Tue,  1 Jun 2021 01:06:29 +0800
-Message-Id: <27607e12038273706273203b2146c5d4a40ac487.1622479162.git.huangy81@chinatelecom.cn>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <cover.1622479161.git.huangy81@chinatelecom.cn>
-References: <cover.1622479161.git.huangy81@chinatelecom.cn>
+        id S233271AbhEaR3c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 May 2021 13:29:32 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:50650 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233807AbhEaR3T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 May 2021 13:29:19 -0400
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id A1B861FD2D;
+        Mon, 31 May 2021 17:27:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1622482054; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9r+HYlHoDmXgDEx/An+i51OIXR93+B0KpGhVQdrq2ug=;
+        b=Ioq8YZwwWG+c/LG8OkwMX8dnz44ErBxS0wdLi1yq1IueF6vSHbjX269GM9tiMZ3wks7aZi
+        BiluPS4Tc2lJ1ZpBjmi617tc4pO2YnKzLQs+Sm6pjaWg5hC2Am6OW5fuaJ2reOHb60gf9K
+        VfObev3hM7B95hVjU9dPDjFX3wH3hps=
+Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        by imap.suse.de (Postfix) with ESMTP id F13C4118DD;
+        Mon, 31 May 2021 17:27:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1622482054; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9r+HYlHoDmXgDEx/An+i51OIXR93+B0KpGhVQdrq2ug=;
+        b=Ioq8YZwwWG+c/LG8OkwMX8dnz44ErBxS0wdLi1yq1IueF6vSHbjX269GM9tiMZ3wks7aZi
+        BiluPS4Tc2lJ1ZpBjmi617tc4pO2YnKzLQs+Sm6pjaWg5hC2Am6OW5fuaJ2reOHb60gf9K
+        VfObev3hM7B95hVjU9dPDjFX3wH3hps=
+Received: from director2.suse.de ([192.168.254.72])
+        by imap3-int with ESMTPSA
+        id LYHcOIUctWAXWgAALh3uQQ
+        (envelope-from <varad.gautam@suse.com>); Mon, 31 May 2021 17:27:33 +0000
+From:   Varad Gautam <varad.gautam@suse.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Varad Gautam <varad.gautam@suse.com>, kvm@vger.kernel.org,
+        x86@kernel.org, Borislav Petkov <bp@alien8.de>,
+        Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Subject: [PATCH v2] x86: Add a test for AMD SEV-ES #VC handling
+Date:   Mon, 31 May 2021 19:27:07 +0200
+Message-Id: <20210531172707.7909-1-varad.gautam@suse.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210531125035.21105-1-varad.gautam@suse.com>
+References: <20210531125035.21105-1-varad.gautam@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Authentication-Results: imap.suse.de;
+        none
+X-Spam-Level: 
+X-Spam-Score: 0.00
+X-Spamd-Result: default: False [0.00 / 100.00];
+         ARC_NA(0.00)[];
+         RCVD_VIA_SMTP_AUTH(0.00)[];
+         FROM_HAS_DN(0.00)[];
+         TO_DN_SOME(0.00)[];
+         TO_MATCH_ENVRCPT_ALL(0.00)[];
+         R_MISSING_CHARSET(2.50)[];
+         MIME_GOOD(-0.10)[text/plain];
+         REPLY(-4.00)[];
+         BROKEN_CONTENT_TYPE(1.50)[];
+         DKIM_SIGNED(0.00)[suse.com:s=susede1];
+         NEURAL_HAM_SHORT(-1.00)[-1.000];
+         RCPT_COUNT_SEVEN(0.00)[7];
+         MID_CONTAINS_FROM(1.00)[];
+         RCVD_NO_TLS_LAST(0.10)[];
+         FROM_EQ_ENVFROM(0.00)[];
+         MIME_TRACE(0.00)[0:+];
+         RCVD_COUNT_TWO(0.00)[2]
+X-Spam-Flag: NO
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Hyman Huang(黄勇) <huangy81@chinatelecom.cn>
+Some vmexits on a SEV-ES guest need special handling within the guest
+before exiting to the hypervisor. This must happen within the guest's
+\#VC exception handler, triggered on every non automatic exit.
 
-use dirty ring feature to implement dirtyrate calculation.
-to enable it, set vcpu option as true in qmp calc-dirty-rate.
+Add a KUnit based test to validate Linux's VC handling. The test:
+1. installs a kretprobe on the #VC handler (sev_es_ghcb_hv_call, to
+   access GHCB before/after the resulting VMGEXIT).
+2. tiggers an NAE.
+3. checks that the kretprobe was hit with the right exit_code available
+   in GHCB.
 
-Signed-off-by: Hyman Huang(黄勇) <huangy81@chinatelecom.cn>
+Since relying on kprobes, the test does not cover NMI contexts.
+
+Signed-off-by: Varad Gautam <varad.gautam@suse.com>
 ---
- migration/dirtyrate.c  | 146 ++++++++++++++++++++++++++++++++++++++---
- migration/trace-events |   1 +
- 2 files changed, 139 insertions(+), 8 deletions(-)
+v2: Add a testcase for MMIO read/write.
 
-diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index da6500c8ec..028c11d117 100644
---- a/migration/dirtyrate.c
-+++ b/migration/dirtyrate.c
-@@ -16,14 +16,22 @@
- #include "cpu.h"
- #include "exec/ramblock.h"
- #include "qemu/rcu_queue.h"
-+#include "qemu/main-loop.h"
- #include "sysemu/kvm.h"
- #include "qapi/qapi-commands-migration.h"
- #include "ram.h"
- #include "trace.h"
- #include "dirtyrate.h"
+ arch/x86/Kconfig              |   9 ++
+ arch/x86/kernel/Makefile      |   5 ++
+ arch/x86/kernel/sev-test-vc.c | 155 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 169 insertions(+)
+ create mode 100644 arch/x86/kernel/sev-test-vc.c
+
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 0045e1b441902..0a3c3f31813f1 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -1543,6 +1543,15 @@ config AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT
+ 	  If set to N, then the encryption of system memory can be
+ 	  activated with the mem_encrypt=on command line option.
  
-+typedef enum {
-+    CALC_NONE = 0,
-+    CALC_DIRTY_RING,
-+    CALC_SAMPLE_PAGES,
-+} CalcMethod;
++config AMD_MEM_ENCRYPT_TEST_VC
++	bool "Test for AMD Secure Memory Encryption (SME) support"
++	depends on AMD_MEM_ENCRYPT
++	select KUNIT
++	select FUNCTION_TRACER
++	help
++	  Enable KUnit-based testing for the encryption of system memory
++	  using AMD SEV-ES. Currently only tests #VC handling.
 +
- static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
- static struct DirtyRateStat DirtyStat;
-+static CalcMethod last_method = CALC_NONE;
+ # Common NUMA Features
+ config NUMA
+ 	bool "NUMA Memory Allocation and Scheduler Support"
+diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
+index 0f66682ac02a6..360c5d33580ca 100644
+--- a/arch/x86/kernel/Makefile
++++ b/arch/x86/kernel/Makefile
+@@ -23,6 +23,10 @@ CFLAGS_REMOVE_head64.o = -pg
+ CFLAGS_REMOVE_sev.o = -pg
+ endif
  
- static int64_t set_sample_page_period(int64_t msec, int64_t initial_time)
- {
-@@ -64,6 +72,7 @@ static struct DirtyRateInfo *query_dirty_rate_info(void)
- {
-     int64_t dirty_rate = DirtyStat.dirty_rate;
-     struct DirtyRateInfo *info = g_malloc0(sizeof(DirtyRateInfo));
-+    DirtyRateVcpuList *head = NULL, **tail = &head;
- 
-     if (qatomic_read(&CalculatingState) == DIRTY_RATE_STATUS_MEASURED) {
-         info->has_dirty_rate = true;
-@@ -73,6 +82,22 @@ static struct DirtyRateInfo *query_dirty_rate_info(void)
-     info->status = CalculatingState;
-     info->start_time = DirtyStat.start_time;
-     info->calc_time = DirtyStat.calc_time;
-+    info->has_vcpu = true;
++ifdef CONFIG_AMD_MEM_ENCRYPT_TEST_VC
++CFLAGS_sev.o	+= -fno-ipa-sra
++endif
 +
-+    if (last_method == CALC_DIRTY_RING) {
-+        int i = 0;
-+        info->vcpu = true;
-+        info->has_vcpu_dirty_rate = true;
-+        for (i = 0; i < DirtyStat.method.vcpu.nvcpu; i++) {
-+            DirtyRateVcpu *rate = g_malloc0(sizeof(DirtyRateVcpu));
-+            rate->id = DirtyStat.method.vcpu.rates[i].id;
-+            rate->dirty_rate = DirtyStat.method.vcpu.rates[i].dirty_rate;
-+            QAPI_LIST_APPEND(tail, rate);
-+        }
-+        info->vcpu_dirty_rate = head;
-+    } else {
-+        info->vcpu = false;
-+    }
+ KASAN_SANITIZE_head$(BITS).o				:= n
+ KASAN_SANITIZE_dumpstack.o				:= n
+ KASAN_SANITIZE_dumpstack_$(BITS).o			:= n
+@@ -149,6 +153,7 @@ obj-$(CONFIG_UNWINDER_FRAME_POINTER)	+= unwind_frame.o
+ obj-$(CONFIG_UNWINDER_GUESS)		+= unwind_guess.o
  
-     trace_query_dirty_rate_info(DirtyRateStatus_str(CalculatingState));
- 
-@@ -87,13 +112,29 @@ static void init_dirtyrate_stat(int64_t start_time,
-     DirtyStat.start_time = start_time;
-     DirtyStat.calc_time = calc_time;
- 
--    if (config.vcpu) {
--        DirtyStat.method.vcpu.nvcpu = -1;
--        DirtyStat.method.vcpu.rates = NULL;
--    } else {
--        DirtyStat.method.vm.total_dirty_samples = 0;
--        DirtyStat.method.vm.total_sample_count = 0;
--        DirtyStat.method.vm.total_block_mem_MB = 0;
-+    switch (last_method) {
-+    case CALC_NONE:
-+    case CALC_SAMPLE_PAGES:
-+        if (config.vcpu) {
-+            DirtyStat.method.vcpu.nvcpu = -1;
-+            DirtyStat.method.vcpu.rates = NULL;
-+        } else {
-+            DirtyStat.method.vm.total_dirty_samples = 0;
-+            DirtyStat.method.vm.total_sample_count = 0;
-+            DirtyStat.method.vm.total_block_mem_MB = 0;
-+        }
-+        break;
-+    case CALC_DIRTY_RING:
-+        if (!config.vcpu) {
-+            g_free(DirtyStat.method.vcpu.rates);
-+            DirtyStat.method.vcpu.rates = NULL;
-+            DirtyStat.method.vm.total_dirty_samples = 0;
-+            DirtyStat.method.vm.total_sample_count = 0;
-+            DirtyStat.method.vm.total_block_mem_MB = 0;
-+        }
-+        break;
-+    default:
-+        break;
-     }
- }
- 
-@@ -331,7 +372,84 @@ static bool compare_page_hash_info(struct RamblockDirtyInfo *info,
-     return true;
- }
- 
--static void calculate_dirtyrate(struct DirtyRateConfig config)
-+static void stat_dirtypages(CPUState *cpu, bool start)
+ obj-$(CONFIG_AMD_MEM_ENCRYPT)		+= sev.o
++obj-$(CONFIG_AMD_MEM_ENCRYPT_TEST_VC)	+= sev-test-vc.o
+ ###
+ # 64 bit specific files
+ ifeq ($(CONFIG_X86_64),y)
+diff --git a/arch/x86/kernel/sev-test-vc.c b/arch/x86/kernel/sev-test-vc.c
+new file mode 100644
+index 0000000000000..2475270b844e8
+--- /dev/null
++++ b/arch/x86/kernel/sev-test-vc.c
+@@ -0,0 +1,155 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2021 SUSE
++ *
++ * Author: Varad Gautam <varad.gautam@suse.com>
++ */
++
++#include <asm/cpufeature.h>
++#include <asm/debugreg.h>
++#include <asm/io.h>
++#include <asm/sev-common.h>
++#include <asm/svm.h>
++#include <kunit/test.h>
++#include <linux/kprobes.h>
++
++static struct kretprobe hv_call_krp;
++
++static int hv_call_krp_entry(struct kretprobe_instance *krpi,
++				    struct pt_regs *regs)
 +{
-+    cpu->stat_dirty_pages = start;
++	unsigned long ghcb_vaddr = regs_get_kernel_argument(regs, 0);
++	*((unsigned long *) krpi->data) = ghcb_vaddr;
++
++	return 0;
 +}
 +
-+static void start_kvm_dirty_log(void)
++static int hv_call_krp_ret(struct kretprobe_instance *krpi,
++				    struct pt_regs *regs)
 +{
-+    qemu_mutex_lock_iothread();
-+    memory_global_dirty_log_start();
-+    qemu_mutex_unlock_iothread();
++	unsigned long ghcb_vaddr = *((unsigned long *) krpi->data);
++	struct ghcb *ghcb = (struct ghcb *) ghcb_vaddr;
++	struct kunit *test = current->kunit_test;
++
++	if (test && strstr(test->name, "sev_es_") && test->priv)
++		cmpxchg((unsigned long *) test->priv, ghcb->save.sw_exit_code, 1);
++
++	return 0;
 +}
 +
-+static void stop_kvm_dirty_log(void)
++int sev_test_vc_init(struct kunit *test)
 +{
-+    qemu_mutex_lock_iothread();
-+    memory_global_dirty_log_stop();
-+    qemu_mutex_unlock_iothread();
++	int ret;
++
++	if (!sev_es_active()) {
++		pr_err("Not a SEV-ES guest. Skipping.");
++		ret = -EINVAL;
++		goto out;
++	}
++
++	memset(&hv_call_krp, 0, sizeof(hv_call_krp));
++	hv_call_krp.entry_handler = hv_call_krp_entry;
++	hv_call_krp.handler = hv_call_krp_ret;
++	hv_call_krp.maxactive = 100;
++	hv_call_krp.data_size = sizeof(unsigned long);
++	hv_call_krp.kp.symbol_name = "sev_es_ghcb_hv_call";
++	hv_call_krp.kp.addr = 0;
++
++	ret = register_kretprobe(&hv_call_krp);
++	if (ret < 0) {
++		pr_err("Could not register kretprobe. Skipping.");
++		goto out;
++	}
++
++	test->priv = kunit_kzalloc(test, sizeof(unsigned long), GFP_KERNEL);
++	if (!test->priv) {
++		ret = -ENOMEM;
++		pr_err("Could not allocate. Skipping.");
++		goto out;
++	}
++
++out:
++	return ret;
 +}
 +
-+static int64_t do_calculate_dirtyrate_vcpu(CPUState *cpu)
++void sev_test_vc_exit(struct kunit *test)
 +{
-+    uint64_t memory_size_MB;
-+    int64_t time_s;
++	if (test->priv)
++		kunit_kfree(test, test->priv);
 +
-+    memory_size_MB = (cpu->dirty_pages * TARGET_PAGE_SIZE) >> 20;
-+    time_s = DirtyStat.calc_time;
-+
-+    return memory_size_MB / time_s;
++	if (hv_call_krp.kp.addr)
++		unregister_kretprobe(&hv_call_krp);
 +}
 +
-+static void calculate_dirtyrate_vcpu(struct DirtyRateConfig config)
++#define guarded_op(kt, ec, op)				\
++do {							\
++	struct kunit *t = (struct kunit *) kt;		\
++	smp_store_release((typeof(ec) *) t->priv, ec);	\
++	op;						\
++	KUNIT_EXPECT_EQ(t, (typeof(ec)) 1, 		\
++		(typeof(ec)) smp_load_acquire((typeof(ec) *) t->priv));	\
++} while(0)
++
++static void sev_es_nae_cpuid(struct kunit *test)
 +{
-+    CPUState *cpu;
-+    int64_t msec = 0;
-+    int64_t start_time;
-+    uint64_t dirtyrate = 0;
-+    uint64_t dirtyrate_sum = 0;
-+    int nvcpu, i = 0;
++	unsigned int cpuid_fn = 0x8000001f;
 +
-+    CPU_FOREACH(cpu) {
-+        stat_dirtypages(cpu, true);
-+        nvcpu++;
-+    }
-+
-+    DirtyStat.method.vcpu.nvcpu = nvcpu;
-+
-+    if (last_method != CALC_DIRTY_RING) {
-+        DirtyStat.method.vcpu.rates =
-+            g_malloc0(sizeof(DirtyRateVcpu) * nvcpu);
-+    }
-+
-+    start_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-+    DirtyStat.start_time = start_time / 1000;
-+
-+    start_kvm_dirty_log();
-+
-+    msec = config.sample_period_seconds * 1000;
-+    msec = set_sample_page_period(msec, start_time);
-+    DirtyStat.calc_time = msec / 1000;
-+
-+    CPU_FOREACH(cpu) {
-+        stat_dirtypages(cpu, false);
-+    }
-+
-+    stop_kvm_dirty_log();
-+
-+    CPU_FOREACH(cpu) {
-+        dirtyrate = do_calculate_dirtyrate_vcpu(cpu);
-+        DirtyStat.method.vcpu.rates[i].id = cpu->cpu_index;
-+        DirtyStat.method.vcpu.rates[i].dirty_rate = dirtyrate;
-+        dirtyrate_sum += dirtyrate;
-+        i++;
-+    }
-+
-+    DirtyStat.dirty_rate = dirtyrate_sum / nvcpu;
++	guarded_op(test, SVM_EXIT_CPUID, native_cpuid_eax(cpuid_fn));
 +}
 +
-+static void calculate_dirtyrate_sample_vm(struct DirtyRateConfig config)
- {
-     struct RamblockDirtyInfo *block_dinfo = NULL;
-     int block_count = 0;
-@@ -364,6 +482,18 @@ out:
-     rcu_unregister_thread();
- }
- 
-+static void calculate_dirtyrate(struct DirtyRateConfig config)
++static void sev_es_nae_wbinvd(struct kunit *test)
 +{
-+    if (config.vcpu) {
-+        calculate_dirtyrate_vcpu(config);
-+        last_method = CALC_DIRTY_RING;
-+    } else {
-+        calculate_dirtyrate_sample_vm(config);
-+        last_method = CALC_SAMPLE_PAGES;
-+    }
-+    trace_calculate_dirtyrate(DirtyStat.dirty_rate);
++	guarded_op(test, SVM_EXIT_WBINVD, wbinvd());
 +}
 +
- void *get_dirtyrate_thread(void *arg)
- {
-     struct DirtyRateConfig config = *(struct DirtyRateConfig *)arg;
-diff --git a/migration/trace-events b/migration/trace-events
-index 668c562fed..5a80b39a62 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -330,6 +330,7 @@ get_ramblock_vfn_hash(const char *idstr, uint64_t vfn, uint32_t crc) "ramblock n
- calc_page_dirty_rate(const char *idstr, uint32_t new_crc, uint32_t old_crc) "ramblock name: %s, new crc: %" PRIu32 ", old crc: %" PRIu32
- skip_sample_ramblock(const char *idstr, uint64_t ramblock_size) "ramblock name: %s, ramblock size: %" PRIu64
- find_page_matched(const char *idstr) "ramblock %s addr or size changed"
-+calculate_dirtyrate(int64_t dirtyrate) "dirty rate: %" PRIi64
- 
- # block.c
- migration_block_init_shared(const char *blk_device_name) "Start migration for %s with shared base image"
++static void sev_es_nae_msr(struct kunit *test)
++{
++	guarded_op(test, SVM_EXIT_MSR, __rdmsr(MSR_IA32_TSC));
++}
++
++static void sev_es_nae_dr7_rw(struct kunit *test)
++{
++	guarded_op(test, SVM_EXIT_WRITE_DR7,
++		   native_set_debugreg(7, native_get_debugreg(7)));
++}
++
++static void sev_es_nae_ioio(struct kunit *test)
++{
++	unsigned long port = 0x80;
++	char val = 0;
++
++	guarded_op(test, SVM_EXIT_IOIO, val = inb(port));
++	guarded_op(test, SVM_EXIT_IOIO, outb(val, port));
++	guarded_op(test, SVM_EXIT_IOIO, insb(port, &val, sizeof(val)));
++	guarded_op(test, SVM_EXIT_IOIO, outsb(port, &val, sizeof(val)));
++}
++
++static void sev_es_nae_mmio(struct kunit *test)
++{
++	unsigned long lapic_ver_pa = 0xfee00030; /* APIC_DEFAULT_PHYS_BASE + APIC_LVR */
++	unsigned __iomem *lapic = ioremap(lapic_ver_pa, 0x4);
++	unsigned lapic_version = 0;
++
++	guarded_op(test, SVM_VMGEXIT_MMIO_READ, lapic_version = *lapic);
++	guarded_op(test, SVM_VMGEXIT_MMIO_WRITE, *lapic = lapic_version);
++
++	iounmap(lapic);
++}
++
++static struct kunit_case sev_test_vc_testcases[] = {
++	KUNIT_CASE(sev_es_nae_cpuid),
++	KUNIT_CASE(sev_es_nae_wbinvd),
++	KUNIT_CASE(sev_es_nae_msr),
++	KUNIT_CASE(sev_es_nae_dr7_rw),
++	KUNIT_CASE(sev_es_nae_ioio),
++	KUNIT_CASE(sev_es_nae_mmio),
++	{}
++};
++
++static struct kunit_suite sev_vc_test_suite = {
++	.name = "sev_test_vc",
++	.init = sev_test_vc_init,
++	.exit = sev_test_vc_exit,
++	.test_cases = sev_test_vc_testcases,
++};
++kunit_test_suite(sev_vc_test_suite);
 -- 
-2.24.3
+2.30.2
 
