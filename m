@@ -2,94 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EC705395921
-	for <lists+kvm@lfdr.de>; Mon, 31 May 2021 12:41:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28A8B39593B
+	for <lists+kvm@lfdr.de>; Mon, 31 May 2021 12:50:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231426AbhEaKnd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 May 2021 06:43:33 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:53646 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231409AbhEaKnH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 May 2021 06:43:07 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1622457686;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to; bh=DkYWBZqlHfDLHs3VHHFUBhkPLWH2ujbiiCtKaGt9OtQ=;
-        b=kbzeZ8HzzmHvgOCTjbZY5uO8IB+f2P1hWy09rAQnAK9BajcqlRlz7Vb2pVN93vxRC0jakC
-        1VYEFmZkuqoj1WBL5rduadQ607w9N2MN84Od15JjMpz8STZhdbO4EtRO8tQ0t2kydC3zET
-        GWRqm1j/Xl85y8DNsY/7qjRDTGTpfy56MezIh9zA6VPyepkG1hNOjD+TOkUL3yOoB1aDmb
-        aGWlqbm5pootOphYg6oX3F3QASAopGDpEMU5sF1P0UK72Vo9hrkeufTy1J8lG0jFiFBko8
-        ScdXGt6I4IPnd8n6XjgWVxWJpSpKQVPOu/CBArbMGCl1Owwn79wLc7fdirj8ZQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1622457686;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to; bh=DkYWBZqlHfDLHs3VHHFUBhkPLWH2ujbiiCtKaGt9OtQ=;
-        b=HE9eE0UX5y+lRuLEaHmipJm7gxrOIieS0Yq85ci2o6WS45RWZl/WDd3g9+lTuhWiSfXtR+
-        g8kAEvB2DD/J5WAQ==
-To:     Jason Gunthorpe <jgg@nvidia.com>, Dave Jiang <dave.jiang@intel.com>
-Cc:     alex.williamson@redhat.com, kwankhede@nvidia.com, vkoul@kernel.org,
-        megha.dey@intel.com, jacob.jun.pan@intel.com, ashok.raj@intel.com,
-        yi.l.liu@intel.com, baolu.lu@intel.com, kevin.tian@intel.com,
-        sanjay.k.kumar@intel.com, tony.luck@intel.com,
-        dan.j.williams@intel.com, eric.auger@redhat.com,
-        pbonzini@redhat.com, dmaengine@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v6 05/20] vfio: mdev: common lib code for setting up Interrupt Message Store
-In-Reply-To: <20210528163906.GN1002214@nvidia.com>
-Date:   Mon, 31 May 2021 12:41:25 +0200
-Message-ID: <87tumj423u.ffs@nanos.tec.linutronix.de>
+        id S231240AbhEaKwV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 May 2021 06:52:21 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29498 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230518AbhEaKwR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 31 May 2021 06:52:17 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14VAXs8a076717;
+        Mon, 31 May 2021 06:50:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=2+nrFyx6S43CHiLPYIp2Ak+zvfJkcKxsC5zMZR9SbwY=;
+ b=Bk+XVkGgNBKZoT6rgQU856mh1gqA1jy/+L4fF3BLvsg5HAlGck4q7wTiU0zpObO5cw5E
+ 4wpSW5HQURJzRlbsOUHUBWt4RgK3VIAXh4sKT6Q6I3GCPb8Z/ozN6p6P2xBKuoYjkL4B
+ lOTkmcFgA1r2bzcX5OqPqssxZoaEaHXttPG+D1yBX+rc4/F+ZqQ8urTnAaOW6AJVFn0P
+ HIWj95fu5wh84rTop7pKP+1ShIOx/Zf0ufwdLe2auAVjcS+wwJk9OhXkUxDH2VvLqY/Q
+ s5DSK4oxzIStkFbtuGBeV2QFcuyoh5omJgkXD6T3cbO2OiQCBgv/7yvTPzUTp3ohwtcS 2g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38vs1rg2ey-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 31 May 2021 06:50:36 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14VAZ85g083187;
+        Mon, 31 May 2021 06:50:36 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38vs1rg2e9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 31 May 2021 06:50:36 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 14VAh01H030773;
+        Mon, 31 May 2021 10:50:34 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 38ud888yfg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 31 May 2021 10:50:34 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14VAoWAu11141450
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 31 May 2021 10:50:32 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1E29D52050;
+        Mon, 31 May 2021 10:50:32 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 6C1DE5204E;
+        Mon, 31 May 2021 10:50:31 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com, cohuck@redhat.com
+Subject: [kvm-unit-tests PATCH] s390x: selftest: Fix report output
+Date:   Mon, 31 May 2021 10:50:03 +0000
+Message-Id: <20210531105003.44737-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: aa-pZdmFiLd__BFdukLpMD9GVM4hsX2f
+X-Proofpoint-GUID: oug8H962GbdrlhyOhE1LcRkDXBhs-ayQ
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-31_07:2021-05-31,2021-05-31 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ priorityscore=1501 suspectscore=0 bulkscore=0 mlxscore=0
+ lowpriorityscore=0 mlxlogscore=999 spamscore=0 adultscore=0 malwarescore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2105310075
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 28 2021 at 13:39, Jason Gunthorpe wrote:
-> On Fri, May 28, 2021 at 09:37:56AM -0700, Dave Jiang wrote:
->> On 5/28/2021 5:21 AM, Jason Gunthorpe wrote:
->> > On Thu, May 27, 2021 at 06:49:59PM -0700, Dave Jiang wrote:
->> > > > > +static int mdev_msix_enable(struct mdev_irq *mdev_irq, int nvec)
->> > > > > +{
->> > > > > +	struct mdev_device *mdev = irq_to_mdev(mdev_irq);
->> > > > > +	struct device *dev;
->> > > > > +	int rc;
->> > > > > +
->> > > > > +	if (nvec != mdev_irq->num)
->> > > > > +		return -EINVAL;
->> > > > > +
->> > > > > +	if (mdev_irq->ims_num) {
->> > > > > +		dev = &mdev->dev;
->> > > > > +		rc = msi_domain_alloc_irqs(dev_get_msi_domain(dev), dev, mdev_irq->ims_num);
->> > > >
->> > > > Huh? The PCI device should be the only device touching IRQ stuff. I'm
->> > > > nervous to see you mix in the mdev struct device into this function.
->> > >
->> > > As we talked about in the other thread. We have a single IMS domain per
->> > > device. The domain is set to the mdev 'struct device' and we allocate the
->> > > vectors to each mdev 'struct device' so we can manage those IMS vectors
->> > > specifically for that mdev.
->> >
->> > That is not the point, I'm asking if you should be calling
->> > dev_set_msi_domain(mdev) at all
->> 
->> I'm not familiar with the standard way of doing this. Should I not set the
->> domain to the mdev 'struct device' because I can have multiple mdev using
->> the same domain? With the domain set, I am able to retrieve it and call the
->> msi_domain_alloc_irqs() in common code. Alternatively we can pass in the
->> domain during init and not rely on dev->msi_
->
-> Honestly, I don't know. I would prefer Thomas confirm what is the
-> correct way to use the msi_domain as IDXD is going to be the reference
-> everyone copies.
+To make our TAP parser (and me) happy we don't want to have to reports
+with exactly the same wording.
 
-The general expectation is that the MSI irqdomain is retrievable from
-struct device for any device which supports MSI.
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ s390x/selftest.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-Thanks,
-
-        tglx
-
+diff --git a/s390x/selftest.c b/s390x/selftest.c
+index b2fe2e7b..c2ca9896 100644
+--- a/s390x/selftest.c
++++ b/s390x/selftest.c
+@@ -47,12 +47,19 @@ static void test_malloc(void)
+ 	*tmp2 = 123456789;
+ 	mb();
+ 
+-	report((uintptr_t)tmp & 0xf000000000000000ul, "malloc: got vaddr");
+-	report(*tmp == 123456789, "malloc: access works");
++	report_prefix_push("malloc");
++	report_prefix_push("ptr_0");
++	report((uintptr_t)tmp & 0xf000000000000000ul, "allocated memory");
++	report(*tmp == 123456789, "wrote allocated memory");
++	report_prefix_pop();
++
++	report_prefix_push("ptr_1");
+ 	report((uintptr_t)tmp2 & 0xf000000000000000ul,
+-	       "malloc: got 2nd vaddr");
+-	report((*tmp2 == 123456789), "malloc: access works");
+-	report(tmp != tmp2, "malloc: addresses differ");
++	       "allocated memory");
++	report((*tmp2 == 123456789), "wrote allocated memory");
++	report_prefix_pop();
++
++	report(tmp != tmp2, "allocated memory addresses differ");
+ 
+ 	expect_pgm_int();
+ 	configure_dat(0);
+@@ -62,6 +69,7 @@ static void test_malloc(void)
+ 
+ 	free(tmp);
+ 	free(tmp2);
++	report_prefix_pop();
+ }
+ 
+ int main(int argc, char**argv)
+-- 
+2.30.2
 
