@@ -2,215 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CF2073968A0
-	for <lists+kvm@lfdr.de>; Mon, 31 May 2021 22:07:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 264F3396A2F
+	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 01:55:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231809AbhEaUIr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 May 2021 16:08:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33672 "EHLO
+        id S232351AbhEaX5I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 May 2021 19:57:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230505AbhEaUIp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 May 2021 16:08:45 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED9F9C061574
-        for <kvm@vger.kernel.org>; Mon, 31 May 2021 13:07:04 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id bn21so9025494ljb.1
-        for <kvm@vger.kernel.org>; Mon, 31 May 2021 13:07:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=2PYA1pYVKDAI4+09LVa/AjMjJk2rf6grA0gDFLIFu60=;
-        b=jMGB9HVWu7We5YKyc81ESVoYoaXoMM9Q5VcAD9ur8rFnJFXGQm8l3uQzQpe1w75++g
-         EGGRMbNCSB+pUHPUaToaTLfJM9PSx/lfkp1TPuCum3/5XAfyo8vUnThe7wR/PSxhuNjX
-         PLdCe68JHlRwsBMVUV3Yk91Q+xLlWtAed+KQNGnqrFnCqaOSL9WXfhm9HPl89rB9jgBT
-         lXNrJVfdnevcf+ZuYu91HI/Oj90bR3leOdHh3fdpECSOLnwVcyXGSf5uEXwZlTvzQz5t
-         D0DPjQKZY+R6QDOnDshhaidiSAo3n1Kal6Afo3rBJsdiDsqtiwCAsEyLQy5Cmiku20XH
-         G6uw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=2PYA1pYVKDAI4+09LVa/AjMjJk2rf6grA0gDFLIFu60=;
-        b=lry0eVsE7BOriaeZQup3Y+FrEv3+lLxJ6TUberaSDYYxnPfbts2eTtZr2ZWk8ghM1U
-         qacuVIhf3CDfTiBs4ViPK8IYoC9ALxjeNzbu0Jh/L22TTs7Q5GgfpZx8N8/Yia5J6YVa
-         zlFNeG2deHM2RPZtZ4lx6cF4HfhdH4UkYGlciB3VUqWkiya5v4PlD+cCnrSf1HF6+ZbG
-         xFNs8QiBpM+qY4RqNfmde3SVbn0DfdVzNjBKc6F/dJ/OPCRS+QW4sOXIZXgUMQyGIobE
-         vAMnkkcPYzk74ELpUv0W5XhD05OZpyzUEYHCLki1oyAnIF2fEfcCNrA4XOMhPRNjNrCK
-         wNgQ==
-X-Gm-Message-State: AOAM533iamhdR466a2hMtY2ETEB3zi/UW+QTnKKb4l94kkct4ytKTZgz
-        vAH+wEheoqbaCQo02agDV6VIXQ==
-X-Google-Smtp-Source: ABdhPJxMTxMJUUNo0WMO/JnVrApwkxYHhCSvQj5H71CpvqX3vnANi8jtHW+c4iUXlu8zYG8p9cfaFQ==
-X-Received: by 2002:a2e:7605:: with SMTP id r5mr18025459ljc.414.1622491623271;
-        Mon, 31 May 2021 13:07:03 -0700 (PDT)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id f4sm1440832lfu.133.2021.05.31.13.07.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 May 2021 13:07:02 -0700 (PDT)
-Received: by box.localdomain (Postfix, from userid 1000)
-        id 76C441027C1; Mon, 31 May 2021 23:07:12 +0300 (+03)
-Date:   Mon, 31 May 2021 23:07:12 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jim Mattson <jmattson@google.com>,
-        David Rientjes <rientjes@google.com>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Steve Rutherford <srutherford@google.com>,
-        Peter Gonda <pgonda@google.com>,
-        David Hildenbrand <david@redhat.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFCv2 13/13] KVM: unmap guest memory using poisoned pages
-Message-ID: <20210531200712.qjxghakcaj4s6ara@box.shutemov.name>
-References: <20210419142602.khjbzktk5tk5l6lk@box.shutemov.name>
- <YH2pam5b837wFM3z@google.com>
- <20210419164027.dqiptkebhdt5cfmy@box.shutemov.name>
- <YH3HWeOXFiCTZN4y@google.com>
- <20210419185354.v3rgandtrel7bzjj@box>
- <YH3jaf5ThzLZdY4K@google.com>
- <20210419225755.nsrtjfvfcqscyb6m@box.shutemov.name>
- <YH8L0ihIzL6UB6qD@google.com>
- <20210521123148.a3t4uh4iezm6ax47@box>
- <YK6lrHeaeUZvHMJC@google.com>
+        with ESMTP id S231144AbhEaX5G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 May 2021 19:57:06 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E960FC061574;
+        Mon, 31 May 2021 16:55:25 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1622505322;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=u5vmi0BzxnECvD2BBqu/D7TOOgm9sE7/xlUP8a9uvWs=;
+        b=H5FKsko1bTRHWPqeQ2kRNRMqLN4bOcJ9nfCBeWkLBObvDeLp54FgetIr6v1e6QopS3QkSR
+        mfx/tB377SutMQutlDIQByh9Wmyf+Ir3B/VbcQv3seYIJk101FW3G8m8k9HbaxbNGzzZ34
+        D7LEaXY/QfL+XRnTx94MPwT+xivbHJVRCSUGgtlZXghkZ7v6+NVgZEkGQpOx/ZR/qmp9n5
+        wLDBIeAat1f9eHTE3LXcsyyUNquKP8fb6EhKBa6oya4N7kINX/7K5g5lVBUdWjjOKcmotR
+        d7+mMvuC91vmjVwuZtp8l3IKw88ieD4JadxykMSV5lPGLziC00ALD5SfqnehZQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1622505322;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=u5vmi0BzxnECvD2BBqu/D7TOOgm9sE7/xlUP8a9uvWs=;
+        b=EnKEeq4eCDQWpPXobGzy1vV5xqo1QlJ7DDzMdhqa/6bwfBXMdBYNq6bqLtaDAehgUQmAPu
+        c/oCuCqK2sxtUICQ==
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Dave Jiang <dave.jiang@intel.com>, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, vkoul@kernel.org, megha.dey@intel.com,
+        jacob.jun.pan@intel.com, ashok.raj@intel.com, yi.l.liu@intel.com,
+        baolu.lu@intel.com, kevin.tian@intel.com, sanjay.k.kumar@intel.com,
+        tony.luck@intel.com, dan.j.williams@intel.com,
+        eric.auger@redhat.com, pbonzini@redhat.com,
+        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v6 15/20] vfio/mdev: idxd: ims domain setup for the vdcm
+In-Reply-To: <20210531165754.GV1002214@nvidia.com>
+References: <162164243591.261970.3439987543338120797.stgit@djiang5-desk3.ch.intel.com> <162164283796.261970.11020270418798826121.stgit@djiang5-desk3.ch.intel.com> <20210523235023.GL1002214@nvidia.com> <87mtsb3sth.ffs@nanos.tec.linutronix.de> <20210531165754.GV1002214@nvidia.com>
+Date:   Tue, 01 Jun 2021 01:55:22 +0200
+Message-ID: <875yyy31cl.ffs@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YK6lrHeaeUZvHMJC@google.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 26, 2021 at 07:46:52PM +0000, Sean Christopherson wrote:
-> On Fri, May 21, 2021, Kirill A. Shutemov wrote:
-> > Hi Sean,
-> > 
-> > The core patch of the approach we've discussed before is below. It
-> > introduce a new page type with the required semantics.
-> > 
-> > The full patchset can be found here:
-> > 
-> >  git://git.kernel.org/pub/scm/linux/kernel/git/kas/linux.git kvm-unmapped-guest-only
-> > 
-> > but only the patch below is relevant for TDX. QEMU patch is attached.
-> 
-> Can you post the whole series?
+On Mon, May 31 2021 at 13:57, Jason Gunthorpe wrote:
+> On Mon, May 31, 2021 at 04:02:02PM +0200, Thomas Gleixner wrote:
+>> > I'm quite surprised that every mdev doesn't create its own ims_domain
+>> > in its probe function.
+>> 
+>> What for?
+>
+> IDXD wouldn't need it, but proper IMS HW with no bound of number of
+> vectors can't provide a ims_info.max_slots value here.
 
-I hoped to get it posted as part of TDX host enabling.
+There is no need to do so:
 
-As it is the feature is incomplete for pure KVM. I didn't implement on KVM
-side checks that provided by TDX module/hardware, so nothing prevents the
-same page to be added to multiple KVM instances.
+     https://lore.kernel.org/r/20200826112335.202234502@linutronix.de
 
-> The KVM behavior and usage of FOLL_GUEST is very relevant to TDX.
+which has the IMS_MSI_QUEUE variant at which you looked at and said:
 
-The patch can be found here:
+ "I haven't looked through everything in detail, but this does look like
+  it is good for the mlx5 devices."
 
-https://git.kernel.org/pub/scm/linux/kernel/git/kas/linux.git/commit/?h=kvm-unmapped-guest-only&id=2cd6c2c20528696a46a2a59383ca81638bf856b5
+ims_info.max_slots is a property of the IMS_MSI_ARRAY and does not make
+any restrictions on other storage.
+  
+> Instead each use use site, like VFIO, would want to specify the number
+> of vectors to allocate for its own usage, then parcel them out one by
+> one in the normal way. Basically VFIO is emulating a normal MSI-X
+> table.
 
-> > CONFIG_HAVE_KVM_PROTECTED_MEMORY has to be changed to what is appropriate
-> > for TDX and FOLL_GUEST has to be used in hva_to_pfn_slow() when running
-> > TDX guest.
-> 
-> This behavior in particular is relevant; KVM should provide FOLL_GUEST iff the
-> access is private or the VM type doesn't differentiate between private and
-> shared.
+Just with a size which exceeds a normal MSI-X table, but that's an
+implementation detail of the underlying physical device. It does not put
+any restrictions on mdev at all.
 
-I added FOL_GUEST if the KVM instance has the feature enabled.
+>> > This places a global total limit on the # of vectors which makes me
+>> > ask what was the point of using IMS in the first place ?
+>>
+>> That depends on how IMS is implemented. The IDXD variant has a fixed
+>> sized message store which is shared between all subdevices, so yet
+>> another domain would not provide any value.
+>
+> Right, IDXD would have been perfectly happy to use the normal MSI-X
+> table from what I can see.
 
-On top of that TDX-specific code has to check that the page is in fact
-PageGuest() before inserting it into private SEPT.
+Again. No, it's a storage size problem and regular MSI-X does not
+support auxiliary data.
 
-The scheme makes sure that user-accessible memory cannot be not added as
-private to TD.
+>> For the case where the IMS store is seperate, you still have one central
+>> irqdomain per physical device. The domain allocation function can then
+>> create storage on demand or reuse existing storage and just fill in the
+>> pointers.
+>
+> I think it is philosophically backwards, and it is in part what is
+> motivating pretending this weird auxdomain and PASID stuff is generic.
 
-> > When page get inserted into private sept we must make sure it is
-> > PageGuest() or SIGBUS otherwise.
-> 
-> More KVM feedback :-)
-> 
-> Ideally, KVM will synchronously exit to userspace with detailed information on
-> the bad behavior, not do SIGBUS.  Hopefully that infrastructure will be in place
-> sooner than later.
-> 
-> https://lkml.kernel.org/r/YKxJLcg/WomPE422@google.com
+That's a different story and as I explained to Dave already hacking all
+this into mdev is backwards, but that does not make your idea of a
+irqdomain per mdev any more reasonable.
 
-My experiments are still v5.11, but I can rebase to whatever needed once
-the infrastructure hits upstream.
+The mdev does not do anything irq chip/domain related. It uses what the
+underlying physical device provides. If you think otherwise then please
+provide me the hierarchical model which I explained here:
 
-> > Inserting PageGuest() into shared is fine, but the page will not be accessible
-> > from userspace.
-> 
-> Even if it can be functionally fine, I don't think we want to allow KVM to map
-> PageGuest() as shared memory.  The only reason to map memory shared is to share
-> it with something, e.g. the host, that doesn't have access to private memory, so
-> I can't envision a use case.
-> 
-> On the KVM side, it's trivially easy to omit FOLL_GUEST for shared memory, while
-> always passing FOLL_GUEST would require manually zapping.  Manual zapping isn't
-> a big deal, but I do think it can be avoided if userspace must either remap the
-> hva or define a new KVM memslot (new gpa->hva), both of which will automatically
-> zap any existing translations.
-> 
-> Aha, thought of a concrete problem.  If KVM maps PageGuest() into shared memory,
-> then KVM must ensure that the page is not mapped private via a different hva/gpa,
-> and is not mapped _any_ other guest because the TDX-Module's 1:1 PFN:TD+GPA
-> enforcement only applies to private memory.  The explicit "VM_WRITE | VM_SHARED"
-> requirement below makes me think this wouldn't be prevented.
+ https://lore.kernel.org/r/87h7tcgbs2.fsf@nanos.tec.linutronix.de
+ https://lore.kernel.org/r/87bljg7u4f.fsf@nanos.tec.linutronix.de
 
-Hm. I didn't realize that TDX module doesn't prevent the same page to be
-used as shared and private at the same time.
+> The VFIO model is the IRQ table is associated with a VM. When the
+> vfio_device is created it decides how big the MSI-X table will be and
+> it needs to allocate a block of interrupts to emulate it. For security
+> those interrupts need to be linked in the HW to the vfio_device and
+> the VM. ie VM A cannot trigger an interrupt that would deliver to VM
+> B.
 
-Omitting FOLL_GUEST for shared memory doesn't look like a right approach.
-IIUC, it would require the kernel to track what memory is share and what
-private, which defeat the purpose of the rework. I would rather enforce
-!PageGuest() when share SEPT is populated in addition to enforcing
-PageGuest() fro private SEPT.
+Fine.
 
-Do you see any problems with this?
+> IDXD choose to use the PASID, but other HW might use a generic VM_ID.
 
-> Oh, and the other nicety is that I think it would avoid having to explicitly
-> handle PageGuest() memory that is being accessed from kernel/KVM, i.e. if all
-> memory exposed to KVM must be !PageGuest(), then it is also eligible for
-> copy_{to,from}_user().
+So what?
 
-copy_{to,from}_user() enforce by setting PTE entries to PROT_NONE.
-Or do I miss your point?
+> Further, IDXD choose to use a VM_ID per IMS entry, but other HW is
+> likely to use a VM_ID per block of IMS entries. Ie the HW tree starts
+> a VM object, then locates the IMS table for that object, then triggers
+> the interrupt.
 
-> 
-> > Any feedback is welcome.
-> > 
-> > -------------------------------8<-------------------------------------------
-> > 
-> > From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-> > Date: Fri, 16 Apr 2021 01:30:48 +0300
-> > Subject: [PATCH] mm: Introduce guest-only pages
-> > 
-> > PageGuest() pages are only allowed to be used as guest memory. Userspace
-> > is not allowed read from or write to such pages.
-> > 
-> > On page fault, PageGuest() pages produce PROT_NONE page table entries.
-> > Read or write there will trigger SIGBUS. Access to such pages via
-> > syscall leads to -EIO.
-> > 
-> > The new mprotect(2) flag PROT_GUEST translates to VM_GUEST. Any page
-> > fault to VM_GUEST VMA produces PageGuest() page.
-> > 
-> > Only shared tmpfs/shmem mappings are supported.
-> 
-> Is limiting this to tmpfs/shmem only for the PoC/RFC, or is it also expected to
-> be the long-term behavior?
+If you read my other reply to Dave carefuly then you might have noticed
+that this is crap and irrelevant because the ID (whatever it is) is per
+device and that ID has to be stored in the device. Whether the actual
+irq chip/domain driver implementation uses it per associated irq or not
+does not matter at all.
 
-I expect it to be enough to cover all relevant cases, no?
+> If we think about the later sort of HW I don't think the whole aux
+> data and domain per pci function makes alot of sense.
 
-Note that MAP_ANONYMOUS|MAP_SHARED also fits here.
+First of all that is already debunked and will go nowhere and second
+there is no requirement to implement this for some other incarnation of
+IMS when done correctly. That whole irq_set_auxdata() stuff is not going
+anywhere simply because it's not needed at all.
 
--- 
- Kirill A. Shutemov
+All what's needed is a function to store some sort of ID per device
+(mdev) and the underlying IMS driver takes care of what to do with it.
+
+That has to happen before the interrupts are allocated and if that info
+is invalid then the allocation function can reject it.
+
+> You'd want a domain per VM_ID and all the IMS entires in that domain
+> share the same VM_ID. In this regard the irq domain will correspond to
+> the security boundary.
+
+The real problems are:
+
+  - Intel misled me with the requirement to set PASID after the fact
+    which is simply wrong and what caused me to come up with that
+    irq_set_auxdata() workaround.
+
+  - Their absolute ignorance for proper layering led to adding all that
+    irq_set_auxdata() muck to this mdev library.
+
+Ergo, the proper thing to do is to fix this ID storage problem (PASID,
+VM_ID or whatever) at the proper place, i.e. store it in struct device
+(which is associated to that mdev) and let the individual drivers handle
+it as they require.
+
+It's that simple and this needs to be fixed and not some made up
+philosophical question about irqdomains per mdev. Those would be even
+worse than what Intel did here.
+
+Thanks,
+
+        tglx
+
+
