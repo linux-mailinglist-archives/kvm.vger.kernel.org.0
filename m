@@ -2,180 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FED0395902
-	for <lists+kvm@lfdr.de>; Mon, 31 May 2021 12:34:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC705395921
+	for <lists+kvm@lfdr.de>; Mon, 31 May 2021 12:41:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231366AbhEaKf4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 May 2021 06:35:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33289 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231338AbhEaKfv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 31 May 2021 06:35:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622457251;
+        id S231426AbhEaKnd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 May 2021 06:43:33 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:53646 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231409AbhEaKnH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 May 2021 06:43:07 -0400
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1622457686;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0vWlpLeqe+h7IWNv7jE/nVWyaS5tVXhak42tjTLyHuE=;
-        b=PwEJaKS9yRFGNcgmGNYR/BgK/Bfmz146ClFevM3PkNhuOvNSWmjM3h5lwILeVrddqcZsuX
-        kn77O5Lvbo9sIrnrAhrze1DAvsO+ZJY73svDXX6bXDq8mRScJRkZVPDyQUHRnBEATVn7Id
-        B5EKUVsppzEdvoMKNyF6zH7IrfgNjuk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490-3qjLcSZ6NUWiwyF1jCpIrg-1; Mon, 31 May 2021 06:34:10 -0400
-X-MC-Unique: 3qjLcSZ6NUWiwyF1jCpIrg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9843A8005AD;
-        Mon, 31 May 2021 10:34:09 +0000 (UTC)
-Received: from gator.redhat.com (unknown [10.40.195.13])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F28905D9CD;
-        Mon, 31 May 2021 10:34:01 +0000 (UTC)
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     maz@kernel.org, ricarkol@google.com, eric.auger@redhat.com,
-        alexandru.elisei@arm.com, pbonzini@redhat.com
-Subject: [PATCH v3 5/5] KVM: arm64: selftests: get-reg-list: Split base and pmu registers
-Date:   Mon, 31 May 2021 12:33:44 +0200
-Message-Id: <20210531103344.29325-6-drjones@redhat.com>
-In-Reply-To: <20210531103344.29325-1-drjones@redhat.com>
-References: <20210531103344.29325-1-drjones@redhat.com>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to; bh=DkYWBZqlHfDLHs3VHHFUBhkPLWH2ujbiiCtKaGt9OtQ=;
+        b=kbzeZ8HzzmHvgOCTjbZY5uO8IB+f2P1hWy09rAQnAK9BajcqlRlz7Vb2pVN93vxRC0jakC
+        1VYEFmZkuqoj1WBL5rduadQ607w9N2MN84Od15JjMpz8STZhdbO4EtRO8tQ0t2kydC3zET
+        GWRqm1j/Xl85y8DNsY/7qjRDTGTpfy56MezIh9zA6VPyepkG1hNOjD+TOkUL3yOoB1aDmb
+        aGWlqbm5pootOphYg6oX3F3QASAopGDpEMU5sF1P0UK72Vo9hrkeufTy1J8lG0jFiFBko8
+        ScdXGt6I4IPnd8n6XjgWVxWJpSpKQVPOu/CBArbMGCl1Owwn79wLc7fdirj8ZQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1622457686;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to; bh=DkYWBZqlHfDLHs3VHHFUBhkPLWH2ujbiiCtKaGt9OtQ=;
+        b=HE9eE0UX5y+lRuLEaHmipJm7gxrOIieS0Yq85ci2o6WS45RWZl/WDd3g9+lTuhWiSfXtR+
+        g8kAEvB2DD/J5WAQ==
+To:     Jason Gunthorpe <jgg@nvidia.com>, Dave Jiang <dave.jiang@intel.com>
+Cc:     alex.williamson@redhat.com, kwankhede@nvidia.com, vkoul@kernel.org,
+        megha.dey@intel.com, jacob.jun.pan@intel.com, ashok.raj@intel.com,
+        yi.l.liu@intel.com, baolu.lu@intel.com, kevin.tian@intel.com,
+        sanjay.k.kumar@intel.com, tony.luck@intel.com,
+        dan.j.williams@intel.com, eric.auger@redhat.com,
+        pbonzini@redhat.com, dmaengine@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v6 05/20] vfio: mdev: common lib code for setting up Interrupt Message Store
+In-Reply-To: <20210528163906.GN1002214@nvidia.com>
+Date:   Mon, 31 May 2021 12:41:25 +0200
+Message-ID: <87tumj423u.ffs@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since KVM commit 11663111cd49 ("KVM: arm64: Hide PMU registers from
-userspace when not available") the get-reg-list* tests have been
-failing with
+On Fri, May 28 2021 at 13:39, Jason Gunthorpe wrote:
+> On Fri, May 28, 2021 at 09:37:56AM -0700, Dave Jiang wrote:
+>> On 5/28/2021 5:21 AM, Jason Gunthorpe wrote:
+>> > On Thu, May 27, 2021 at 06:49:59PM -0700, Dave Jiang wrote:
+>> > > > > +static int mdev_msix_enable(struct mdev_irq *mdev_irq, int nvec)
+>> > > > > +{
+>> > > > > +	struct mdev_device *mdev = irq_to_mdev(mdev_irq);
+>> > > > > +	struct device *dev;
+>> > > > > +	int rc;
+>> > > > > +
+>> > > > > +	if (nvec != mdev_irq->num)
+>> > > > > +		return -EINVAL;
+>> > > > > +
+>> > > > > +	if (mdev_irq->ims_num) {
+>> > > > > +		dev = &mdev->dev;
+>> > > > > +		rc = msi_domain_alloc_irqs(dev_get_msi_domain(dev), dev, mdev_irq->ims_num);
+>> > > >
+>> > > > Huh? The PCI device should be the only device touching IRQ stuff. I'm
+>> > > > nervous to see you mix in the mdev struct device into this function.
+>> > >
+>> > > As we talked about in the other thread. We have a single IMS domain per
+>> > > device. The domain is set to the mdev 'struct device' and we allocate the
+>> > > vectors to each mdev 'struct device' so we can manage those IMS vectors
+>> > > specifically for that mdev.
+>> >
+>> > That is not the point, I'm asking if you should be calling
+>> > dev_set_msi_domain(mdev) at all
+>> 
+>> I'm not familiar with the standard way of doing this. Should I not set the
+>> domain to the mdev 'struct device' because I can have multiple mdev using
+>> the same domain? With the domain set, I am able to retrieve it and call the
+>> msi_domain_alloc_irqs() in common code. Alternatively we can pass in the
+>> domain during init and not rely on dev->msi_
+>
+> Honestly, I don't know. I would prefer Thomas confirm what is the
+> correct way to use the msi_domain as IDXD is going to be the reference
+> everyone copies.
 
-  ...
-  ... There are 74 missing registers.
-  The following lines are missing registers:
-  ...
+The general expectation is that the MSI irqdomain is retrievable from
+struct device for any device which supports MSI.
 
-where the 74 missing registers are all PMU registers. This isn't a
-bug in KVM that the selftest found, even though it's true that a
-KVM userspace that wasn't setting the KVM_ARM_VCPU_PMU_V3 VCPU
-flag, but still expecting the PMU registers to be in the reg-list,
-would suddenly no longer have their expectations met. In that case,
-the expectations were wrong, though, so that KVM userspace needs to
-be fixed, and so does this selftest. The fix for this selftest is to
-pull the PMU registers out of the base register sublist into their
-own sublist and then create new, pmu-enabled vcpu configs which can
-be tested.
+Thanks,
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- .../selftests/kvm/aarch64/get-reg-list.c      | 39 +++++++++++++++----
- 1 file changed, 31 insertions(+), 8 deletions(-)
+        tglx
 
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index b46b8a1fdc0c..a16c8f05366c 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -637,7 +637,7 @@ int main(int ac, char **av)
-  * The current blessed list was primed with the output of kernel version
-  * v4.15 with --core-reg-fixup and then later updated with new registers.
-  *
-- * The blessed list is up to date with kernel version v5.10-rc5
-+ * The blessed list is up to date with kernel version v5.13-rc3
-  */
- static __u64 base_regs[] = {
- 	KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(regs.regs[0]),
-@@ -829,8 +829,6 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 0, 5, 2, 0),	/* ESR_EL1 */
- 	ARM64_SYS_REG(3, 0, 6, 0, 0),	/* FAR_EL1 */
- 	ARM64_SYS_REG(3, 0, 7, 4, 0),	/* PAR_EL1 */
--	ARM64_SYS_REG(3, 0, 9, 14, 1),	/* PMINTENSET_EL1 */
--	ARM64_SYS_REG(3, 0, 9, 14, 2),	/* PMINTENCLR_EL1 */
- 	ARM64_SYS_REG(3, 0, 10, 2, 0),	/* MAIR_EL1 */
- 	ARM64_SYS_REG(3, 0, 10, 3, 0),	/* AMAIR_EL1 */
- 	ARM64_SYS_REG(3, 0, 12, 0, 0),	/* VBAR_EL1 */
-@@ -839,6 +837,16 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 0, 13, 0, 4),	/* TPIDR_EL1 */
- 	ARM64_SYS_REG(3, 0, 14, 1, 0),	/* CNTKCTL_EL1 */
- 	ARM64_SYS_REG(3, 2, 0, 0, 0),	/* CSSELR_EL1 */
-+	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
-+	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
-+	ARM64_SYS_REG(3, 4, 3, 0, 0),	/* DACR32_EL2 */
-+	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
-+	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
-+};
-+
-+static __u64 pmu_regs[] = {
-+	ARM64_SYS_REG(3, 0, 9, 14, 1),	/* PMINTENSET_EL1 */
-+	ARM64_SYS_REG(3, 0, 9, 14, 2),	/* PMINTENCLR_EL1 */
- 	ARM64_SYS_REG(3, 3, 9, 12, 0),	/* PMCR_EL0 */
- 	ARM64_SYS_REG(3, 3, 9, 12, 1),	/* PMCNTENSET_EL0 */
- 	ARM64_SYS_REG(3, 3, 9, 12, 2),	/* PMCNTENCLR_EL0 */
-@@ -848,8 +856,6 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 3, 9, 13, 0),	/* PMCCNTR_EL0 */
- 	ARM64_SYS_REG(3, 3, 9, 14, 0),	/* PMUSERENR_EL0 */
- 	ARM64_SYS_REG(3, 3, 9, 14, 3),	/* PMOVSSET_EL0 */
--	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
--	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
- 	ARM64_SYS_REG(3, 3, 14, 8, 0),
- 	ARM64_SYS_REG(3, 3, 14, 8, 1),
- 	ARM64_SYS_REG(3, 3, 14, 8, 2),
-@@ -913,9 +919,6 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 3, 14, 15, 5),
- 	ARM64_SYS_REG(3, 3, 14, 15, 6),
- 	ARM64_SYS_REG(3, 3, 14, 15, 7),	/* PMCCFILTR_EL0 */
--	ARM64_SYS_REG(3, 4, 3, 0, 0),	/* DACR32_EL2 */
--	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
--	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
- };
- 
- static __u64 vregs[] = {
-@@ -1015,6 +1018,8 @@ static __u64 sve_rejects_set[] = {
- 	{ "base", .regs = base_regs, .regs_n = ARRAY_SIZE(base_regs), }
- #define VREGS_SUBLIST \
- 	{ "vregs", .regs = vregs, .regs_n = ARRAY_SIZE(vregs), }
-+#define PMU_SUBLIST \
-+	{ "pmu", .regs = pmu_regs, .regs_n = ARRAY_SIZE(pmu_regs), }
- #define SVE_SUBLIST \
- 	{ "sve", .capability = KVM_CAP_ARM_SVE, .feature = KVM_ARM_VCPU_SVE, .finalize = true, \
- 	  .regs = sve_regs, .regs_n = ARRAY_SIZE(sve_regs), \
-@@ -1027,6 +1032,14 @@ static struct vcpu_config vregs_config = {
- 	{0},
- 	},
- };
-+static struct vcpu_config vregs_pmu_config = {
-+	.sublists = {
-+	BASE_SUBLIST,
-+	VREGS_SUBLIST,
-+	PMU_SUBLIST,
-+	{0},
-+	},
-+};
- static struct vcpu_config sve_config = {
- 	.sublists = {
- 	BASE_SUBLIST,
-@@ -1034,9 +1047,19 @@ static struct vcpu_config sve_config = {
- 	{0},
- 	},
- };
-+static struct vcpu_config sve_pmu_config = {
-+	.sublists = {
-+	BASE_SUBLIST,
-+	SVE_SUBLIST,
-+	PMU_SUBLIST,
-+	{0},
-+	},
-+};
- 
- static struct vcpu_config *vcpu_configs[] = {
- 	&vregs_config,
-+	&vregs_pmu_config,
- 	&sve_config,
-+	&sve_pmu_config,
- };
- static int vcpu_configs_n = ARRAY_SIZE(vcpu_configs);
--- 
-2.31.1
 
