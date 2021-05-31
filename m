@@ -2,92 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DF5539569C
-	for <lists+kvm@lfdr.de>; Mon, 31 May 2021 09:58:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E66F6395834
+	for <lists+kvm@lfdr.de>; Mon, 31 May 2021 11:37:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230368AbhEaH76 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 May 2021 03:59:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29341 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230288AbhEaH75 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 31 May 2021 03:59:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622447894;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EdRsDMw4H1zTHoV4Q0DDi+MXBcsk6roz9PziidrlNag=;
-        b=DnqUoRAy4Uqw1XaHjWu3Kw3vuvVNS1jH6yTUe1z2TWGbaaWKr0aHglMEl29BbYKR3ij8t0
-        N2Mv1E24gEhb51fgWifKSjAe94EN7onPgmzj59OiiiZ7+3qo1KWZtHvZh0fTvL2V9nBv+A
-        sLqr2l+qrnQevTfG/W5iOm37aTVQN0k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-462-I3OLvASbNja5hRImbNs9cg-1; Mon, 31 May 2021 03:58:12 -0400
-X-MC-Unique: I3OLvASbNja5hRImbNs9cg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S231239AbhEaJi5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 May 2021 05:38:57 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:40498 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231172AbhEaJiu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 May 2021 05:38:50 -0400
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C7F8107ACCA;
-        Mon, 31 May 2021 07:58:11 +0000 (UTC)
-Received: from gondolin.fritz.box (ovpn-113-190.ams2.redhat.com [10.36.113.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4F0D91E6;
-        Mon, 31 May 2021 07:58:07 +0000 (UTC)
-Date:   Mon, 31 May 2021 09:58:04 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Zhu Lingshan <lingshan.zhu@intel.com>
-Cc:     jasowang@redhat.com, mst@redhat.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH RESEND 1/2] virtio: update virtio id table, add
- transitional ids
-Message-ID: <20210531095804.47629646.cohuck@redhat.com>
-In-Reply-To: <20210531072743.363171-2-lingshan.zhu@intel.com>
-References: <20210531072743.363171-1-lingshan.zhu@intel.com>
-        <20210531072743.363171-2-lingshan.zhu@intel.com>
-Organization: Red Hat GmbH
+        by smtp-out1.suse.de (Postfix) with ESMTPS id EAE752191B;
+        Mon, 31 May 2021 09:37:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1622453829; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wfuKeKQBwRNhlmIIYywYKWqSPum7bvOeAX1XbngvXSc=;
+        b=dRYhpdCHgSNRFkL4tdQz8iWSDEmREm1IeprU4mEnlMlDFuRDJLl+ZWEAfw5Afxd/VDNQv9
+        EKvl6KDzrcniS99P8nlt0AolP84CygUwNLTcDbtCdozpK2OZYfvo0VzzQLkz31yIy662Gl
+        EX3W5FYajoMfI7AAEpqiKCzJ74kKWw4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1622453829;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wfuKeKQBwRNhlmIIYywYKWqSPum7bvOeAX1XbngvXSc=;
+        b=/A7b72mGthQ0Lqy4EDhiPW/E50LU9fHVcXA+RtPKkvg+3vI+W0W4JIRSNFW09LuSTvvbBT
+        ia/FEjChQKbpLGAA==
+Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        by imap.suse.de (Postfix) with ESMTP id 6178E118DD;
+        Mon, 31 May 2021 09:37:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1622453829; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wfuKeKQBwRNhlmIIYywYKWqSPum7bvOeAX1XbngvXSc=;
+        b=dRYhpdCHgSNRFkL4tdQz8iWSDEmREm1IeprU4mEnlMlDFuRDJLl+ZWEAfw5Afxd/VDNQv9
+        EKvl6KDzrcniS99P8nlt0AolP84CygUwNLTcDbtCdozpK2OZYfvo0VzzQLkz31yIy662Gl
+        EX3W5FYajoMfI7AAEpqiKCzJ74kKWw4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1622453829;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wfuKeKQBwRNhlmIIYywYKWqSPum7bvOeAX1XbngvXSc=;
+        b=/A7b72mGthQ0Lqy4EDhiPW/E50LU9fHVcXA+RtPKkvg+3vI+W0W4JIRSNFW09LuSTvvbBT
+        ia/FEjChQKbpLGAA==
+Received: from director2.suse.de ([192.168.254.72])
+        by imap3-int with ESMTPSA
+        id Y7AlFkWutGBeXQAALh3uQQ
+        (envelope-from <jroedel@suse.de>); Mon, 31 May 2021 09:37:09 +0000
+Date:   Mon, 31 May 2021 11:37:08 +0200
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Pu Wen <puwen@hygon.cn>
+Cc:     Sean Christopherson <seanjc@google.com>, x86@kernel.org,
+        joro@8bytes.org, thomas.lendacky@amd.com,
+        dave.hansen@linux.intel.com, peterz@infradead.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@suse.de, hpa@zytor.com,
+        sashal@kernel.org, gregkh@linuxfoundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] x86/sev: Check whether SEV or SME is supported first
+Message-ID: <YLSuRBzM6piigP8t@suse.de>
+References: <20210526072424.22453-1-puwen@hygon.cn>
+ <YK6E5NnmRpYYDMTA@google.com>
+ <905ecd90-54d2-35f1-c8ab-c123d8a3d9a0@hygon.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <905ecd90-54d2-35f1-c8ab-c123d8a3d9a0@hygon.cn>
+Authentication-Results: imap.suse.de;
+        none
+X-Spam-Level: 
+X-Spam-Score: 0.00
+X-Spamd-Result: default: False [0.00 / 100.00];
+         ARC_NA(0.00)[];
+         RCVD_VIA_SMTP_AUTH(0.00)[];
+         FROM_HAS_DN(0.00)[];
+         TO_DN_SOME(0.00)[];
+         TO_MATCH_ENVRCPT_ALL(0.00)[];
+         MIME_GOOD(-0.10)[text/plain];
+         DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+         RCPT_COUNT_TWELVE(0.00)[16];
+         RCVD_NO_TLS_LAST(0.10)[];
+         FROM_EQ_ENVFROM(0.00)[];
+         MIME_TRACE(0.00)[0:+];
+         RCVD_COUNT_TWO(0.00)[2];
+         MID_RHS_MATCH_FROM(0.00)[]
+X-Spam-Flag: NO
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 31 May 2021 15:27:42 +0800
-Zhu Lingshan <lingshan.zhu@intel.com> wrote:
+On Thu, May 27, 2021 at 11:08:32PM +0800, Pu Wen wrote:
+> Reading MSR_AMD64_SEV which is not implemented on Hygon Dhyana CPU will cause
+> the kernel reboot, and native_read_msr_safe() has no help.
 
-> This commit updates virtio id table by adding transitional device
-> ids
-> 
-> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-> ---
->  include/uapi/linux/virtio_ids.h | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/include/uapi/linux/virtio_ids.h b/include/uapi/linux/virtio_ids.h
-> index f0c35ce8628c..fcc9ec6a73c1 100644
-> --- a/include/uapi/linux/virtio_ids.h
-> +++ b/include/uapi/linux/virtio_ids.h
-> @@ -57,4 +57,16 @@
->  #define VIRTIO_ID_BT			28 /* virtio bluetooth */
->  #define VIRTIO_ID_MAC80211_HWSIM	29 /* virtio mac80211-hwsim */
->  
-> +/*
-> + * Virtio Transitional IDs
-> + */
-> +
-> +#define VIRTIO_TRANS_ID_NET		1000 /* transitional virtio net */
-> +#define VIRTIO_TRANS_ID_BLOCK		1001 /* transitional virtio block */
-> +#define VIRTIO_TRANS_ID_BALLOON		1002 /* transitional virtio balloon */
-> +#define VIRTIO_TRANS_ID_CONSOLE		1003 /* transitional virtio console */
-> +#define VIRTIO_TRANS_ID_SCSI		1004 /* transitional virtio SCSI */
-> +#define VIRTIO_TRANS_ID_RNG		1005 /* transitional virtio rng */
-> +#define VIRTIO_TRANS_ID_9P		1009 /* transitional virtio 9p console */
-> +
->  #endif /* _LINUX_VIRTIO_IDS_H */
+The reason for the reboot is that there is no #GP or #DF handler set up
+when this MSR is read, so its propagated to a shutdown event. But there
+is an IDT already, so you can set up early and #GP handler to fix the
+reboot.
 
-Isn't this a purely virtio-pci concept? (The spec lists the virtio ids
-in the common section, and those transitional ids in the pci section.)
-IOW, is there a better, virtio-pci specific, header for this?
+Regards,
 
+	Joerg
