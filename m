@@ -2,333 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55B91395056
-	for <lists+kvm@lfdr.de>; Sun, 30 May 2021 11:52:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E9B439549C
+	for <lists+kvm@lfdr.de>; Mon, 31 May 2021 06:27:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229667AbhE3JxW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 May 2021 05:53:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57889 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229500AbhE3JxV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 30 May 2021 05:53:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622368303;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=P3ffxqTfU4HqDTbC5f2X/EqLBvYMVGh5CefPOnB+h58=;
-        b=dnlM81VbfqmwbHzl1oFw5JskWbdaWE/HHZwRU1LL0iQd86lmK8bToa8qGRBrMCK9+R0OP4
-        BAQXhVEd9ImmEyTtiCDMc/gzIVW8eUwmh2Ef8iOpt0jlWF6Ybs9LdlVRcp9urwXlYar9eB
-        w6AHEgEbKTSECBaH7S5zIsXYmXF+o48=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-VmAeqNalNTOzYQNLq14RpA-1; Sun, 30 May 2021 05:51:42 -0400
-X-MC-Unique: VmAeqNalNTOzYQNLq14RpA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7598E180FD62;
-        Sun, 30 May 2021 09:51:40 +0000 (UTC)
-Received: from starship (unknown [10.40.192.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D699267898;
-        Sun, 30 May 2021 09:51:36 +0000 (UTC)
-Message-ID: <630c273d554b422b9caacb0b82995ead0b7e2dbd.camel@redhat.com>
-Subject: Re: [PATCH v5 09/11] KVM: X86: Add vendor callbacks for writing the
- TSC multiplier
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Ilias Stamatis <ilstam@amazon.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com
-Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, zamsden@gmail.com,
-        mtosatti@redhat.com, dwmw@amazon.co.uk
-Date:   Sun, 30 May 2021 12:51:35 +0300
-In-Reply-To: <20210528105745.1047-1-ilstam@amazon.com>
-References: <20210528105745.1047-1-ilstam@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S230078AbhEaE3W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 May 2021 00:29:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50464 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229717AbhEaE3U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 May 2021 00:29:20 -0400
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0345C061760
+        for <kvm@vger.kernel.org>; Sun, 30 May 2021 21:27:39 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id h24so10702472ejy.2
+        for <kvm@vger.kernel.org>; Sun, 30 May 2021 21:27:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=j6WTPEiBQdPonWFjY55x7ZuSzgTUsPLMHH6aX/4/Gw8=;
+        b=EXENnrfEXaCiPMCaojpc5es9c4FAJrIpcPU8gJJf9odMOs7D8t1cPqCLzQVxVp8cbn
+         W2gadoISAhB0Zx5YzlO7O3crhw6O+npP4SIchdHydbmf7MhAaAqn6OY+orHyvKJxMtPC
+         TG1LHwL6aBkBg/I5k0qODQ82E0gszg399vZza4Ktkk+3QsObwVcYhvDRjwfgSKUKbz0H
+         ZdvrMAvKDBRKfx7j1LyV2vpm5rLOHjEpJKpDIut/0u2C0r7wm7TLozEeYbmmy+s+3mBm
+         UgmsyRSKfdyCLeq1aVgJCnko00wNUy6PRwe3GG2SIQIMzBpr9nDRNHEQHrxA3n7H0jef
+         l+vA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=j6WTPEiBQdPonWFjY55x7ZuSzgTUsPLMHH6aX/4/Gw8=;
+        b=k1pl4MXjQXHj/+GdT4YA2IcCN9WVMd4MOIyo/TrdwAPotg2gwYMp/pUq9rY0cTQq36
+         P33fD1PGWkX97gmnSObflkR+jx6LuRTodxajLcBbUXGApS1A6TyFy1wk5g4SLGLGEdm1
+         wwOrkcHmD7gNRFNmIEQ6pLDdMJTYCqRfPXmCgU+aAxX03BmQ8x4U1AaWTgLrC19kxcgv
+         AxXiQKRK2YzJQhFnKvU3hLiNNLW45R+WCUpe5W/gAVJaVe7Fo+0TFlXmvL/gPk8KRvgW
+         IuyH85d98EaGRzs8ZSA76EzN73RnBYLDM6WJF8zncsC7KC3Lh5ripyQEfknMinmcD6Xf
+         8JeA==
+X-Gm-Message-State: AOAM530m2PuH0MEa8ys1kFRRqkZMNCa49j+eUP+aFdn+vemRI/jEPmxU
+        0cbdfzsJWAML9GehRPkv1m82X2Vdtgs9cpYJAfrH
+X-Google-Smtp-Source: ABdhPJwhWkGN+YD4HVomVtgpj6PoKjpLAKuMwiNQd38DxcDTR1RBUa8K6flHPHMrV8WCVdAdhenY0lyPQ9+3KiWhFNo=
+X-Received: by 2002:a17:906:c211:: with SMTP id d17mr21087083ejz.247.1622435258309;
+ Sun, 30 May 2021 21:27:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <20210517095513.850-1-xieyongji@bytedance.com> <20210517095513.850-12-xieyongji@bytedance.com>
+ <3740c7eb-e457-07f3-5048-917c8606275d@redhat.com> <CACycT3uAqa6azso_8MGreh+quj-JXO1piuGnrV8k2kTfc34N2g@mail.gmail.com>
+ <5a68bb7c-fd05-ce02-cd61-8a601055c604@redhat.com> <CACycT3ve7YvKF+F+AnTQoJZMPua+jDvGMs_ox8GQe_=SGdeCMA@mail.gmail.com>
+ <ee00efca-b26d-c1be-68d2-f9e34a735515@redhat.com> <CACycT3ufok97cKpk47NjUBTc0QAyfauFUyuFvhWKmuqCGJ7zZw@mail.gmail.com>
+ <00ded99f-91b6-ba92-5d92-2366b163f129@redhat.com> <CACycT3uK_Fuade-b8FVYkGCKZnne_UGGbYRFwv7WOH2oKCsXSg@mail.gmail.com>
+ <f20edd55-20cb-c016-b347-dd71c5406ed8@redhat.com>
+In-Reply-To: <f20edd55-20cb-c016-b347-dd71c5406ed8@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Mon, 31 May 2021 12:27:27 +0800
+Message-ID: <CACycT3tLj6a7-tbqO9SzCLStwYrOALdkfnt1jxQBv3s0VzD6AQ@mail.gmail.com>
+Subject: Re: Re: [PATCH v7 11/12] vduse: Introduce VDUSE - vDPA Device in Userspace
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-05-28 at 11:57 +0100, Ilias Stamatis wrote:
-> Currently vmx_vcpu_load_vmcs() writes the TSC_MULTIPLIER field of the
-> VMCS every time the VMCS is loaded. Instead of doing this, set this
-> field from common code on initialization and whenever the scaling ratio
-> changes.
-> 
-> Additionally remove vmx->current_tsc_ratio. This field is redundant as
-> vcpu->arch.tsc_scaling_ratio already tracks the current TSC scaling
-> ratio. The vmx->current_tsc_ratio field is only used for avoiding
-> unnecessary writes but it is no longer needed after removing the code
-> from the VMCS load path.
-> 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Ilias Stamatis <ilstam@amazon.com>
-> ---
->  arch/x86/include/asm/kvm-x86-ops.h |  1 +
->  arch/x86/include/asm/kvm_host.h    |  1 +
->  arch/x86/kvm/svm/svm.c             |  6 ++++++
->  arch/x86/kvm/vmx/nested.c          |  9 ++++-----
->  arch/x86/kvm/vmx/vmx.c             | 11 ++++++-----
->  arch/x86/kvm/vmx/vmx.h             |  8 --------
->  arch/x86/kvm/x86.c                 | 30 +++++++++++++++++++++++-------
->  7 files changed, 41 insertions(+), 25 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index 029c9615378f..34ad7a17458a 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -90,6 +90,7 @@ KVM_X86_OP_NULL(has_wbinvd_exit)
->  KVM_X86_OP(get_l2_tsc_offset)
->  KVM_X86_OP(get_l2_tsc_multiplier)
->  KVM_X86_OP(write_tsc_offset)
-> +KVM_X86_OP(write_tsc_multiplier)
->  KVM_X86_OP(get_exit_info)
->  KVM_X86_OP(check_intercept)
->  KVM_X86_OP(handle_exit_irqoff)
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index f099277b993d..a334ce7741ab 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1308,6 +1308,7 @@ struct kvm_x86_ops {
->  	u64 (*get_l2_tsc_offset)(struct kvm_vcpu *vcpu);
->  	u64 (*get_l2_tsc_multiplier)(struct kvm_vcpu *vcpu);
->  	void (*write_tsc_offset)(struct kvm_vcpu *vcpu, u64 offset);
-> +	void (*write_tsc_multiplier)(struct kvm_vcpu *vcpu, u64 multiplier);
->  
->  	/*
->  	 * Retrieve somewhat arbitrary exit information.  Intended to be used
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 8dfb2513b72a..cb701b42b08b 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1103,6 +1103,11 @@ static void svm_write_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
->  	vmcb_mark_dirty(svm->vmcb, VMCB_INTERCEPTS);
->  }
->  
-> +static void svm_write_tsc_multiplier(struct kvm_vcpu *vcpu, u64 multiplier)
-> +{
-> +	wrmsrl(MSR_AMD64_TSC_RATIO, multiplier);
-> +}
-> +
->  /* Evaluate instruction intercepts that depend on guest CPUID features. */
->  static void svm_recalc_instruction_intercepts(struct kvm_vcpu *vcpu,
->  					      struct vcpu_svm *svm)
-> @@ -4528,6 +4533,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.get_l2_tsc_offset = svm_get_l2_tsc_offset,
->  	.get_l2_tsc_multiplier = svm_get_l2_tsc_multiplier,
->  	.write_tsc_offset = svm_write_tsc_offset,
-> +	.write_tsc_multiplier = svm_write_tsc_multiplier,
->  
->  	.load_mmu_pgd = svm_load_mmu_pgd,
->  
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 6058a65a6ede..239154d3e4e7 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -2533,9 +2533,8 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
->  	}
->  
->  	vmcs_write64(TSC_OFFSET, vcpu->arch.tsc_offset);
-> -
->  	if (kvm_has_tsc_control)
-> -		decache_tsc_multiplier(vmx);
-> +		vmcs_write64(TSC_MULTIPLIER, vcpu->arch.tsc_scaling_ratio);
+On Fri, May 28, 2021 at 10:31 AM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> =E5=9C=A8 2021/5/27 =E4=B8=8B=E5=8D=889:17, Yongji Xie =E5=86=99=E9=81=93=
+:
+> > On Thu, May 27, 2021 at 4:41 PM Jason Wang <jasowang@redhat.com> wrote:
+> >>
+> >> =E5=9C=A8 2021/5/27 =E4=B8=8B=E5=8D=883:34, Yongji Xie =E5=86=99=E9=81=
+=93:
+> >>> On Thu, May 27, 2021 at 1:40 PM Jason Wang <jasowang@redhat.com> wrot=
+e:
+> >>>> =E5=9C=A8 2021/5/27 =E4=B8=8B=E5=8D=881:08, Yongji Xie =E5=86=99=E9=
+=81=93:
+> >>>>> On Thu, May 27, 2021 at 1:00 PM Jason Wang <jasowang@redhat.com> wr=
+ote:
+> >>>>>> =E5=9C=A8 2021/5/27 =E4=B8=8B=E5=8D=8812:57, Yongji Xie =E5=86=99=
+=E9=81=93:
+> >>>>>>> On Thu, May 27, 2021 at 12:13 PM Jason Wang <jasowang@redhat.com>=
+ wrote:
+> >>>>>>>> =E5=9C=A8 2021/5/17 =E4=B8=8B=E5=8D=885:55, Xie Yongji =E5=86=99=
+=E9=81=93:
+> >>>>>>>>> +
+> >>>>>>>>> +static int vduse_dev_msg_sync(struct vduse_dev *dev,
+> >>>>>>>>> +                           struct vduse_dev_msg *msg)
+> >>>>>>>>> +{
+> >>>>>>>>> +     init_waitqueue_head(&msg->waitq);
+> >>>>>>>>> +     spin_lock(&dev->msg_lock);
+> >>>>>>>>> +     vduse_enqueue_msg(&dev->send_list, msg);
+> >>>>>>>>> +     wake_up(&dev->waitq);
+> >>>>>>>>> +     spin_unlock(&dev->msg_lock);
+> >>>>>>>>> +     wait_event_killable(msg->waitq, msg->completed);
+> >>>>>>>> What happens if the userspace(malicous) doesn't give a response =
+forever?
+> >>>>>>>>
+> >>>>>>>> It looks like a DOS. If yes, we need to consider a way to fix th=
+at.
+> >>>>>>>>
+> >>>>>>> How about using wait_event_killable_timeout() instead?
+> >>>>>> Probably, and then we need choose a suitable timeout and more impo=
+rtant,
+> >>>>>> need to report the failure to virtio.
+> >>>>>>
+> >>>>> Makes sense to me. But it looks like some
+> >>>>> vdpa_config_ops/virtio_config_ops such as set_status() didn't have =
+a
+> >>>>> return value.  Now I add a WARN_ON() for the failure. Do you mean w=
+e
+> >>>>> need to add some change for virtio core to handle the failure?
+> >>>> Maybe, but I'm not sure how hard we can do that.
+> >>>>
+> >>> We need to change all virtio device drivers in this way.
+> >>
+> >> Probably.
+> >>
+> >>
+> >>>> We had NEEDS_RESET but it looks we don't implement it.
+> >>>>
+> >>> Could it handle the failure of get_feature() and get/set_config()?
+> >>
+> >> Looks not:
+> >>
+> >> "
+> >>
+> >> The device SHOULD set DEVICE_NEEDS_RESET when it enters an error state
+> >> that a reset is needed. If DRIVER_OK is set, after it sets
+> >> DEVICE_NEEDS_RESET, the device MUST send a device configuration change
+> >> notification to the driver.
+> >>
+> >> "
+> >>
+> >> This looks implies that NEEDS_RESET may only work after device is
+> >> probed. But in the current design, even the reset() is not reliable.
+> >>
+> >>
+> >>>> Or a rough idea is that maybe need some relaxing to be coupled loose=
+ly
+> >>>> with userspace. E.g the device (control path) is implemented in the
+> >>>> kernel but the datapath is implemented in the userspace like TUN/TAP=
+.
+> >>>>
+> >>> I think it can work for most cases. One problem is that the set_confi=
+g
+> >>> might change the behavior of the data path at runtime, e.g.
+> >>> virtnet_set_mac_address() in the virtio-net driver and
+> >>> cache_type_store() in the virtio-blk driver. Not sure if this path is
+> >>> able to return before the datapath is aware of this change.
+> >>
+> >> Good point.
+> >>
+> >> But set_config() should be rare:
+> >>
+> >> E.g in the case of virtio-net with VERSION_1, config space is read onl=
+y,
+> >> and it was set via control vq.
+> >>
+> >> For block, we can
+> >>
+> >> 1) start from without WCE or
+> >> 2) we add a config change notification to userspace or
+> > I prefer this way. And I think we also need to do similar things for
+> > set/get_vq_state().
+>
+>
+> Yes, I agree.
+>
 
-We still end up writing the TSC_MULTIPLIER in the vmcs02 on each nested VM entry
-almost always for nothing since for the vast majority of the entries we will
-write the same value.
+Hi Jason,
 
-It is probably OK for now to leave it like that, and then add some sort of 'dirty' tracking
-to track if the userspace or L1 changed the TSC multiplier for L2 (L1 writes to vmcb12 
-are tracked by using the 'dirty_vmcs' flag, assuming that we don't shadow TSC_MULTIPLIER field)
+Now I'm working on this. But I found the config change notification
+must be synchronous in the virtio-blk case, which means the kernel
+still needs to wait for the response from userspace in set_config().
+Otherwise, some I/Os might still run the old way after we change the
+cache_type in sysfs.
 
-So the above should later go to prepare_vmcs02_rare, and it should also be done if
-host TSC multiplier changed (not a problem IMHO to have another piece of code doing that).
+The simple ways to solve this problem are:
 
+1. Only support read-only config space, disable WCE as you suggested
+2. Add a return value to set_config() and handle the failure only in
+virtio-blk driver
+3. Print some warnings after timeout since it only affects the
+dataplane which is under userspace's control
 
-> 
->  	nested_vmx_transition_tlb_flush(vcpu, vmcs12, true);
->  
-> @@ -4501,12 +4500,12 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
->  	vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, vmx->msr_autoload.host.nr);
->  	vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, vmx->msr_autoload.guest.nr);
->  	vmcs_write64(TSC_OFFSET, vcpu->arch.tsc_offset);
-> +	if (kvm_has_tsc_control)
-> +		vmcs_write64(TSC_MULTIPLIER, vcpu->arch.tsc_scaling_ratio);
+Any suggestions?
 
-This I think isn't needed, since this write is done after we have already
-switched to vmcs01, and it should have the L1 value it had prior
-to the nested entry.
-
-
-> +
->  	if (vmx->nested.l1_tpr_threshold != -1)
->  		vmcs_write32(TPR_THRESHOLD, vmx->nested.l1_tpr_threshold);
->  
-> -	if (kvm_has_tsc_control)
-> -		decache_tsc_multiplier(vmx);
-> -
->  	if (vmx->nested.change_vmcs01_virtual_apic_mode) {
->  		vmx->nested.change_vmcs01_virtual_apic_mode = false;
->  		vmx_set_virtual_apic_mode(vcpu);
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 4b70431c2edd..bf845a08995e 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1390,11 +1390,6 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
->  
->  		vmx->loaded_vmcs->cpu = cpu;
->  	}
-> -
-> -	/* Setup TSC multiplier */
-> -	if (kvm_has_tsc_control &&
-> -	    vmx->current_tsc_ratio != vcpu->arch.tsc_scaling_ratio)
-> -		decache_tsc_multiplier(vmx);
->  }
->  
->  /*
-> @@ -1813,6 +1808,11 @@ static void vmx_write_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
->  	vmcs_write64(TSC_OFFSET, offset);
->  }
->  
-> +static void vmx_write_tsc_multiplier(struct kvm_vcpu *vcpu, u64 multiplier)
-> +{
-> +	vmcs_write64(TSC_MULTIPLIER, multiplier);
-> +}
-> +
->  /*
->   * nested_vmx_allowed() checks whether a guest should be allowed to use VMX
->   * instructions and MSRs (i.e., nested VMX). Nested VMX is disabled for
-> @@ -7707,6 +7707,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
->  	.get_l2_tsc_offset = vmx_get_l2_tsc_offset,
->  	.get_l2_tsc_multiplier = vmx_get_l2_tsc_multiplier,
->  	.write_tsc_offset = vmx_write_tsc_offset,
-> +	.write_tsc_multiplier = vmx_write_tsc_multiplier,
->  
->  	.load_mmu_pgd = vmx_load_mmu_pgd,
->  
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index aa97c82e3451..3eaa86a0ba3e 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -322,8 +322,6 @@ struct vcpu_vmx {
->  	/* apic deadline value in host tsc */
->  	u64 hv_deadline_tsc;
->  
-> -	u64 current_tsc_ratio;
-> -
->  	unsigned long host_debugctlmsr;
->  
->  	/*
-> @@ -532,12 +530,6 @@ static inline struct vmcs *alloc_vmcs(bool shadow)
->  			      GFP_KERNEL_ACCOUNT);
->  }
->  
-> -static inline void decache_tsc_multiplier(struct vcpu_vmx *vmx)
-> -{
-> -	vmx->current_tsc_ratio = vmx->vcpu.arch.tsc_scaling_ratio;
-> -	vmcs_write64(TSC_MULTIPLIER, vmx->current_tsc_ratio);
-> -}
-> -
->  static inline bool vmx_has_waitpkg(struct vcpu_vmx *vmx)
->  {
->  	return vmx->secondary_exec_control &
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 801fa1e8e915..c1e14dadad2d 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -2179,14 +2179,15 @@ static u32 adjust_tsc_khz(u32 khz, s32 ppm)
->  	return v;
->  }
->  
-> +static void kvm_vcpu_write_tsc_multiplier(struct kvm_vcpu *vcpu, u64 l1_multiplier);
-> +
->  static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz, bool scale)
->  {
->  	u64 ratio;
->  
->  	/* Guest TSC same frequency as host TSC? */
->  	if (!scale) {
-> -		vcpu->arch.l1_tsc_scaling_ratio = kvm_default_tsc_scaling_ratio;
-> -		vcpu->arch.tsc_scaling_ratio = kvm_default_tsc_scaling_ratio;
-> +		kvm_vcpu_write_tsc_multiplier(vcpu, kvm_default_tsc_scaling_ratio);
->  		return 0;
->  	}
->  
-> @@ -2212,7 +2213,7 @@ static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz, bool scale)
->  		return -1;
->  	}
->  
-> -	vcpu->arch.l1_tsc_scaling_ratio = vcpu->arch.tsc_scaling_ratio = ratio;
-> +	kvm_vcpu_write_tsc_multiplier(vcpu, ratio);
->  	return 0;
->  }
->  
-> @@ -2224,8 +2225,7 @@ static int kvm_set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz)
->  	/* tsc_khz can be zero if TSC calibration fails */
->  	if (user_tsc_khz == 0) {
->  		/* set tsc_scaling_ratio to a safe value */
-> -		vcpu->arch.l1_tsc_scaling_ratio = kvm_default_tsc_scaling_ratio;
-> -		vcpu->arch.tsc_scaling_ratio = kvm_default_tsc_scaling_ratio;
-> +		kvm_vcpu_write_tsc_multiplier(vcpu, kvm_default_tsc_scaling_ratio);
->  		return -1;
->  	}
->  
-> @@ -2383,6 +2383,23 @@ static void kvm_vcpu_write_tsc_offset(struct kvm_vcpu *vcpu, u64 l1_offset)
->  	static_call(kvm_x86_write_tsc_offset)(vcpu, vcpu->arch.tsc_offset);
->  }
->  
-> +static void kvm_vcpu_write_tsc_multiplier(struct kvm_vcpu *vcpu, u64 l1_multiplier)
-> +{
-> +	vcpu->arch.l1_tsc_scaling_ratio = l1_multiplier;
-> +
-> +	/* Userspace is changing the multiplier while L2 is active */
-
-Nitpick about the comment:
-On SVM, the TSC multiplier is a MSR, so a crazy L1 can give L2 access to it,
-so L2 can in theory change its TSC multiplier as well
-(I am not sure if this is even allowed by the SVM spec)
-
-> +	if (is_guest_mode(vcpu))
-> +		vcpu->arch.tsc_scaling_ratio = kvm_calc_nested_tsc_multiplier(
-> +			l1_multiplier,
-> +			static_call(kvm_x86_get_l2_tsc_multiplier)(vcpu));
-> +	else
-> +		vcpu->arch.tsc_scaling_ratio = l1_multiplier;
-> +
-> +	if (kvm_has_tsc_control)
-> +		static_call(kvm_x86_write_tsc_multiplier)(
-> +			vcpu, vcpu->arch.tsc_scaling_ratio);
-> +}
-> +
->  static inline bool kvm_check_tsc_unstable(void)
->  {
->  #ifdef CONFIG_X86_64
-> @@ -10343,8 +10360,6 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  	else
->  		vcpu->arch.mp_state = KVM_MP_STATE_UNINITIALIZED;
->  
-> -	kvm_set_tsc_khz(vcpu, max_tsc_khz);
-> -
->  	r = kvm_mmu_create(vcpu);
->  	if (r < 0)
->  		return r;
-> @@ -10443,6 +10458,7 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
->  	if (mutex_lock_killable(&vcpu->mutex))
->  		return;
->  	vcpu_load(vcpu);
-> +	kvm_set_tsc_khz(vcpu, max_tsc_khz);
->  	kvm_synchronize_tsc(vcpu, 0);
->  	vcpu_put(vcpu);
->  
-
-
-Best regards,
-	Maxim Levitsky
-
-
+Thanks,
+Yongji
