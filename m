@@ -2,100 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B7E8E395887
-	for <lists+kvm@lfdr.de>; Mon, 31 May 2021 11:58:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E75C93958DF
+	for <lists+kvm@lfdr.de>; Mon, 31 May 2021 12:20:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231296AbhEaJ7e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 May 2021 05:59:34 -0400
-Received: from mga18.intel.com ([134.134.136.126]:43332 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231231AbhEaJ7c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 May 2021 05:59:32 -0400
-IronPort-SDR: iu8iJt7uMtizO2c9WWv12EbH6YHIQCxepLragOWhKeyS/tq0uKxCIF2sdKk/IEAk9CBp8GXL0v
- fSMmntFcxD2A==
-X-IronPort-AV: E=McAfee;i="6200,9189,10000"; a="190694848"
-X-IronPort-AV: E=Sophos;i="5.83,236,1616482800"; 
-   d="scan'208";a="190694848"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2021 02:57:51 -0700
-IronPort-SDR: D87E8g807KfBxpAgMw14PAIF7Ktmu5SkA5rUR+BxswgTXbo+LICnf2zriB4odrnAD94HSgI4np
- PRB7Ctemt9gw==
-X-IronPort-AV: E=Sophos;i="5.83,236,1616482800"; 
-   d="scan'208";a="478856558"
-Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.254.215.190]) ([10.254.215.190])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2021 02:57:50 -0700
-Subject: Re: [PATCH RESEND 1/2] virtio: update virtio id table, add
- transitional ids
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     jasowang@redhat.com, mst@redhat.com,
+        id S231296AbhEaKWK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 May 2021 06:22:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29451 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231283AbhEaKWJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 31 May 2021 06:22:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622456429;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=h+I4L8Ybm0KB4Gou+uepbAq9mkXVhCftc/wwnbvVOfU=;
+        b=ED1/MRfNBtXi8RWgpJk8Q16ERjrjDdpJF29y7YqEQ+m144VUD5NPpNcF1XBb/3QSKGnyvH
+        ugAWI7VKqhMXLokB/pqSGvgarbsq0IrnBNiFaf3M8SdtPGAg6zhLpAJJPi2U+j71+oMUT0
+        ISneGiwk0eQcU2mmSO8DRt+eEFx+ecM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-348-I2vkDMB3MnKxc9QshipBGA-1; Mon, 31 May 2021 06:20:26 -0400
+X-MC-Unique: I2vkDMB3MnKxc9QshipBGA-1
+Received: by mail-wr1-f71.google.com with SMTP id n2-20020adfb7420000b029010e47b59f31so3766944wre.9
+        for <kvm@vger.kernel.org>; Mon, 31 May 2021 03:20:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=h+I4L8Ybm0KB4Gou+uepbAq9mkXVhCftc/wwnbvVOfU=;
+        b=HAyBk0sWi4ILYjzBO4nGBtQ32XebCOM6oQjTpJXdjeYIY+rgweo28ezLLETENdk1so
+         TK0APPPru5u5omAUDRjOZVKuN6BEWa/6nGtgKNYq/KqP4GqXB4axB+AhdCx7cjcivUUn
+         v3qaNZ2I9F/KWRMtIbN52dNiu/gQ4Joqp7uUykAIwVMPAKaHds/trVeMu7cZxuzhEarU
+         06vmmIdB+naVzbhjVyqqy689r9L9n38TogRnQbqRWcY4Z/ZS5WY8u8H1QaYNYCrp/DvX
+         eO83vvVC8Thj2YY4VP8VGMRKsUturZzHtEvvCxmWR3Hi3N5saRYMgPcxHgvC+BuIuuY9
+         49kg==
+X-Gm-Message-State: AOAM532m//DDYTOPttj16pA7nZ4vs7iTsd7Y6+Oa/HhnJA2SFRZVzT0R
+        PH+GnXbqsdp19ulE9HyqweK83V5hEHcFFVBtzafXi76PYxYIDfB3sfmsApFC00QN5MuvBxfHDvT
+        5wvy0+mAklFKM
+X-Received: by 2002:a7b:c7c6:: with SMTP id z6mr20568571wmk.35.1622456424963;
+        Mon, 31 May 2021 03:20:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzPYHUVdhYBLl6N+z8Oi12/8I7xJS2//O9Zz03YW4kCtGt7KRIltZrH+UlPPfleL3cO8QH9mQ==
+X-Received: by 2002:a7b:c7c6:: with SMTP id z6mr20568557wmk.35.1622456424786;
+        Mon, 31 May 2021 03:20:24 -0700 (PDT)
+Received: from redhat.com ([2a00:a040:196:94e6::1002])
+        by smtp.gmail.com with ESMTPSA id u8sm5115260wrb.77.2021.05.31.03.20.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 May 2021 03:20:24 -0700 (PDT)
+Date:   Mon, 31 May 2021 06:20:20 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, jasowang@redhat.com,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         kvm@vger.kernel.org
+Subject: Re: [PATCH RESEND 1/2] virtio: update virtio id table, add
+ transitional ids
+Message-ID: <20210531061955-mutt-send-email-mst@kernel.org>
 References: <20210531072743.363171-1-lingshan.zhu@intel.com>
  <20210531072743.363171-2-lingshan.zhu@intel.com>
  <20210531095804.47629646.cohuck@redhat.com>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-Message-ID: <53862384-be2b-4a5f-adbb-37eb25ec9fe1@intel.com>
-Date:   Mon, 31 May 2021 17:57:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+ <53862384-be2b-4a5f-adbb-37eb25ec9fe1@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20210531095804.47629646.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <53862384-be2b-4a5f-adbb-37eb25ec9fe1@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, May 31, 2021 at 05:57:47PM +0800, Zhu, Lingshan wrote:
+> 
+> 
+> On 5/31/2021 3:58 PM, Cornelia Huck wrote:
+> > On Mon, 31 May 2021 15:27:42 +0800
+> > Zhu Lingshan <lingshan.zhu@intel.com> wrote:
+> > 
+> > > This commit updates virtio id table by adding transitional device
+> > > ids
+> > > virtio_pci_common.h
+> > > Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> > > ---
+> > >   include/uapi/linux/virtio_ids.h | 12 ++++++++++++
+> > >   1 file changed, 12 insertions(+)
+> > > 
+> > > diff --git a/include/uapi/linux/virtio_ids.h b/include/uapi/linux/virtio_ids.h
+> > > index f0c35ce8628c..fcc9ec6a73c1 100644
+> > > --- a/include/uapi/linux/virtio_ids.h
+> > > +++ b/include/uapi/linux/virtio_ids.h
+> > > @@ -57,4 +57,16 @@
+> > >   #define VIRTIO_ID_BT			28 /* virtio bluetooth */
+> > >   #define VIRTIO_ID_MAC80211_HWSIM	29 /* virtio mac80211-hwsim */
+> > > +/*
+> > > + * Virtio Transitional IDs
+> > > + */
+> > > +
+> > > +#define VIRTIO_TRANS_ID_NET		1000 /* transitional virtio net */
+> > > +#define VIRTIO_TRANS_ID_BLOCK		1001 /* transitional virtio block */
+> > > +#define VIRTIO_TRANS_ID_BALLOON		1002 /* transitional virtio balloon */
+> > > +#define VIRTIO_TRANS_ID_CONSOLE		1003 /* transitional virtio console */
+> > > +#define VIRTIO_TRANS_ID_SCSI		1004 /* transitional virtio SCSI */
+> > > +#define VIRTIO_TRANS_ID_RNG		1005 /* transitional virtio rng */
+> > > +#define VIRTIO_TRANS_ID_9P		1009 /* transitional virtio 9p console */
+> > > +
+> > >   #endif /* _LINUX_VIRTIO_IDS_H */
+> > Isn't this a purely virtio-pci concept? (The spec lists the virtio ids
+> > in the common section, and those transitional ids in the pci section.)
+> > IOW, is there a better, virtio-pci specific, header for this?
+> Hi Cornelia,
+> 
+> yes they are pure virtio-pci transitional concept. There is a virtio_pci.h,
+> but not looks like
+> a good place for these stuffs, Michael ever suggested to add these ids to
+> virtio_ids.h, so I have
+> chosen this file.
+> 
+> https://www.spinics.net/lists/netdev/msg739269.html
 
+Didn't think straight, virtio_pci.h is better.
 
-On 5/31/2021 3:58 PM, Cornelia Huck wrote:
-> On Mon, 31 May 2021 15:27:42 +0800
-> Zhu Lingshan <lingshan.zhu@intel.com> wrote:
->
->> This commit updates virtio id table by adding transitional device
->> ids
->> virtio_pci_common.h
->> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->> ---
->>   include/uapi/linux/virtio_ids.h | 12 ++++++++++++
->>   1 file changed, 12 insertions(+)
->>
->> diff --git a/include/uapi/linux/virtio_ids.h b/include/uapi/linux/virtio_ids.h
->> index f0c35ce8628c..fcc9ec6a73c1 100644
->> --- a/include/uapi/linux/virtio_ids.h
->> +++ b/include/uapi/linux/virtio_ids.h
->> @@ -57,4 +57,16 @@
->>   #define VIRTIO_ID_BT			28 /* virtio bluetooth */
->>   #define VIRTIO_ID_MAC80211_HWSIM	29 /* virtio mac80211-hwsim */
->>   
->> +/*
->> + * Virtio Transitional IDs
->> + */
->> +
->> +#define VIRTIO_TRANS_ID_NET		1000 /* transitional virtio net */
->> +#define VIRTIO_TRANS_ID_BLOCK		1001 /* transitional virtio block */
->> +#define VIRTIO_TRANS_ID_BALLOON		1002 /* transitional virtio balloon */
->> +#define VIRTIO_TRANS_ID_CONSOLE		1003 /* transitional virtio console */
->> +#define VIRTIO_TRANS_ID_SCSI		1004 /* transitional virtio SCSI */
->> +#define VIRTIO_TRANS_ID_RNG		1005 /* transitional virtio rng */
->> +#define VIRTIO_TRANS_ID_9P		1009 /* transitional virtio 9p console */
->> +
->>   #endif /* _LINUX_VIRTIO_IDS_H */
-> Isn't this a purely virtio-pci concept? (The spec lists the virtio ids
-> in the common section, and those transitional ids in the pci section.)
-> IOW, is there a better, virtio-pci specific, header for this?
-Hi Cornelia,
-
-yes they are pure virtio-pci transitional concept. There is a 
-virtio_pci.h, but not looks like
-a good place for these stuffs, Michael ever suggested to add these ids 
-to virtio_ids.h, so I have
-chosen this file.
-
-https://www.spinics.net/lists/netdev/msg739269.html
-
-Thanks
-Zhu Lingshan
->
+> Thanks
+> Zhu Lingshan
+> > 
 
