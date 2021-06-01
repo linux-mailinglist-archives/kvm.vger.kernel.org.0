@@ -2,147 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2798D396FCD
-	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 11:03:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB231397076
+	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 11:35:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233597AbhFAJFX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 05:05:23 -0400
-Received: from mga18.intel.com ([134.134.136.126]:36550 "EHLO mga18.intel.com"
+        id S233299AbhFAJgq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 05:36:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49546 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232869AbhFAJFX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Jun 2021 05:05:23 -0400
-IronPort-SDR: bXjv26V61Ha+BXtc3te2czQLbXemRLFhaQXw+c5wFjxivtLoUrXxa8QtdIWGTDO3Ule3W44gh0
- jM5N4T1xW3IQ==
-X-IronPort-AV: E=McAfee;i="6200,9189,10001"; a="190862736"
-X-IronPort-AV: E=Sophos;i="5.83,239,1616482800"; 
-   d="scan'208";a="190862736"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2021 02:03:41 -0700
-IronPort-SDR: 2YhH0qmkGRYSzS3nMEORkuSpV41nkD+6Fo/2j0bacEuhhBeEy2VmaSn5pQGbNDyEJLzLkeLRvj
- Q6o0uMm1V80A==
-X-IronPort-AV: E=Sophos;i="5.83,239,1616482800"; 
-   d="scan'208";a="549668408"
-Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.254.211.211]) ([10.254.211.211])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2021 02:03:39 -0700
-Subject: Re: [PATCH V3 2/2] vDPA/ifcvf: implement doorbell mapping for ifcvf
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-To:     Jason Wang <jasowang@redhat.com>, mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        id S233218AbhFAJgp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Jun 2021 05:36:45 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8A78A60FE5;
+        Tue,  1 Jun 2021 09:35:04 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1lo0ne-004mgj-HR; Tue, 01 Jun 2021 10:35:02 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
-References: <20210601062850.4547-1-lingshan.zhu@intel.com>
- <20210601062850.4547-3-lingshan.zhu@intel.com>
- <d286a8f9-ac5c-ba95-777e-df926ea45292@redhat.com>
- <0e40f29a-5d37-796a-5d01-8594b3afbfdb@intel.com>
- <5c8ebd49-59fe-31c3-71bf-44bd0bf64e2a@redhat.com>
- <68a31c70-cc9f-346a-14a0-cbc05905c287@intel.com>
-Message-ID: <9ecf0004-6022-121d-5515-97f543c3acd3@intel.com>
-Date:   Tue, 1 Jun 2021 17:03:37 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+Cc:     pbonzini@redhat.com, drjones@redhat.com, alexandru.elisei@arm.com,
+        eric.auger@redhat.com
+Subject: Re: [PATCH v3 0/5] KVM: selftests: arm64 exception handling and debug test
+Date:   Tue,  1 Jun 2021 10:34:57 +0100
+Message-Id: <162254008305.3715765.2263457388442707736.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210513002802.3671838-1-ricarkol@google.com>
+References: <20210513002802.3671838-1-ricarkol@google.com>
 MIME-Version: 1.0
-In-Reply-To: <68a31c70-cc9f-346a-14a0-cbc05905c287@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: ricarkol@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, 12 May 2021 17:27:57 -0700, Ricardo Koller wrote:
+> These patches add a debug exception test in aarch64 KVM selftests while
+> also adding basic exception handling support.
+> 
+> The structure of the exception handling is based on its x86 counterpart.
+> Tests use the same calls to initialize exception handling and both
+> architectures allow tests to override the handler for a particular
+> vector, or (vector, ec) for synchronous exceptions in the arm64 case.
+> 
+> [...]
 
+Applied to next, thanks!
 
-On 6/1/2021 4:58 PM, Zhu, Lingshan wrote:
->
->
-> On 6/1/2021 4:57 PM, Jason Wang wrote:
->>
->> 在 2021/6/1 下午4:56, Zhu, Lingshan 写道:
->>>
->>>
->>> On 6/1/2021 4:50 PM, Jason Wang wrote:
->>>>
->>>> 在 2021/6/1 下午2:28, Zhu Lingshan 写道:
->>>>> This commit implements doorbell mapping feature for ifcvf.
->>>>> This feature maps the notify page to userspace, to eliminate
->>>>> vmexit when kick a vq.
->>>>>
->>>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->>>>> ---
->>>>>   drivers/vdpa/ifcvf/ifcvf_main.c | 21 +++++++++++++++++++++
->>>>>   1 file changed, 21 insertions(+)
->>>>>
->>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c 
->>>>> b/drivers/vdpa/ifcvf/ifcvf_main.c
->>>>> index ab0ab5cf0f6e..d41db042612c 100644
->>>>> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
->>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
->>>>> @@ -413,6 +413,26 @@ static int ifcvf_vdpa_get_vq_irq(struct 
->>>>> vdpa_device *vdpa_dev,
->>>>>       return vf->vring[qid].irq;
->>>>>   }
->>>>>   +static struct vdpa_notification_area 
->>>>> ifcvf_get_vq_notification(struct vdpa_device *vdpa_dev,
->>>>> +                                   u16 idx)
->>>>> +{
->>>>> +    struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
->>>>> +    struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
->>>>> +    struct pci_dev *pdev = adapter->pdev;
->>>>> +    struct vdpa_notification_area area;
->>>>> +
->>>>> +    area.addr = vf->vring[idx].notify_pa;
->>>>> +    if (!vf->notify_off_multiplier)
->>>>> +        area.size = PAGE_SIZE;
->>>>> +    else
->>>>> +        area.size = vf->notify_off_multiplier;
->>>>> +
->>>>> +    if (area.addr % PAGE_SIZE)
->>>>> +        IFCVF_DBG(pdev, "vq %u doorbell address is not PAGE_SIZE 
->>>>> aligned\n", idx);
->>>>
->>>>
->>>> I don't see the reason to keep this, or get_notification is not the 
->>>> proper place to do this kind of warning.
->>>>
->>>> Thanks
->>> some customers have ever complained have troubles to enable such 
->>> features with their IP,
->>> I think this can help them debug.
->>
->>
->> If you want to do this, the ifcvf_init_hw() is the proper place.
->>
->> Note that this function is called by userspace.
->>
->> Thanks
-> OK, will move to there.
->
-> Thanks!
-oh, I see patch 1 is already has been acked, so I will remove this warning.
+[1/5] KVM: selftests: Rename vm_handle_exception
+      commit: a2bad6a990a4a7493cf5cae2f91e6b8643d2ed84
+[2/5] KVM: selftests: Introduce UCALL_UNHANDLED for unhandled vector reporting
+      commit: 8c4680c968180739e3facd9a65e8f7939a3bdc6d
+[3/5] KVM: selftests: Move GUEST_ASSERT_EQ to utils header
+      commit: 124d7bb43462d1b4eaee2463fcbc7e9e41cac20f
+[4/5] KVM: selftests: Add exception handling support for aarch64
+      commit: cc968fa1dd8212557c588f348d37d907008117e8
+[5/5] KVM: selftests: Add aarch64/debug-exceptions test
+      commit: 9c066f39c5fb96bad7533de7e96a85040c7a00a0
 
-Thanks!
->>
->>
->>>
->>> Thanks
->>>>
->>>>
->>>>> +
->>>>> +    return area;
->>>>> +}
->>>>> +
->>>>>   /*
->>>>>    * IFCVF currently does't have on-chip IOMMU, so not
->>>>>    * implemented set_map()/dma_map()/dma_unmap()
->>>>> @@ -440,6 +460,7 @@ static const struct vdpa_config_ops 
->>>>> ifc_vdpa_ops = {
->>>>>       .get_config    = ifcvf_vdpa_get_config,
->>>>>       .set_config    = ifcvf_vdpa_set_config,
->>>>>       .set_config_cb  = ifcvf_vdpa_set_config_cb,
->>>>> +    .get_vq_notification = ifcvf_get_vq_notification,
->>>>>   };
->>>>>     static int ifcvf_probe(struct pci_dev *pdev, const struct 
->>>>> pci_device_id *id)
->>>>
->>>
->>
->
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
 
