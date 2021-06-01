@@ -2,86 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C5DB397CF7
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 01:20:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6A60397D19
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 01:39:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235162AbhFAXVq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 19:21:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53094 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234766AbhFAXVq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 1 Jun 2021 19:21:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622589603;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GxsHHoTk80ra37uWURN30H/nOhBanmqVqpOS4/rL0zo=;
-        b=XKBG0sOf6zzLafEIBxUwucanlGXWUuriDvh6+jFbKitIX9zTtdkdemvl3breRE2vGLQ+Cd
-        jFFWpmHhhKvTTIY2lkd2QQn2BKarNt3SeQbNp8DIfrYKzxB3+1pdtBS/ldWflqS9JZ+fj3
-        RWvr5lz7ct+mwUrAHXotzI8BmT9L90c=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-39-qwMogrWGOhqgrRd9CZPPLQ-1; Tue, 01 Jun 2021 19:20:02 -0400
-X-MC-Unique: qwMogrWGOhqgrRd9CZPPLQ-1
-Received: by mail-qt1-f200.google.com with SMTP id a12-20020ac8108c0000b029023c90fba3dcso338583qtj.7
-        for <kvm@vger.kernel.org>; Tue, 01 Jun 2021 16:20:02 -0700 (PDT)
+        id S235134AbhFAXkn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 19:40:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36774 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234766AbhFAXkn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Jun 2021 19:40:43 -0400
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0184AC06174A
+        for <kvm@vger.kernel.org>; Tue,  1 Jun 2021 16:38:59 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id w15so172441ljo.10
+        for <kvm@vger.kernel.org>; Tue, 01 Jun 2021 16:38:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=B2PaLi7oXvFmWaByjFopf8bMZiskZ7jNsrvCbPcpC6M=;
+        b=ecO6cD2cyPx82xkn88vpOQbd+XPrfG34JcB+uNxNoB9ITQiAufHhHQMU5+eEsL/EG0
+         M4C6HPlq+PFXEKby/mNkM9vU02gcOKzwx3SBYZI9hibVN8mGg+H53IvdFCfkiMEmBhP2
+         mVMqHXF5E1jJBmOSp90mFoj+Ra/Tvx7/IDVe9qsCG3u7IX41+ShNyxY+By5MZHt9ZcUI
+         26n1yH17KtMqcLWdV94RUPsMpbKipmLsBYPLFMlN62E0rtVQw0MZiUH3SCyU/hbUyPU+
+         NTLs0oYr2jNwYXIkAlrjZBZWzi/x/CR7C7QFOEGAIKosEgka1uWZB+w6iWw1v9d5Ff35
+         8etg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=GxsHHoTk80ra37uWURN30H/nOhBanmqVqpOS4/rL0zo=;
-        b=dm88qa0S9lcspZ8YKPBFSH76WXcbbbMQg1bg8vsclRSxlvwE9tnDqdp0fkRDQXOJsE
-         ZivtHPMY9RhpdUbuHHi5rzpowIcXwrQpn9QQ6vQ8hryekI4t8l4jKX7symuMaOAFa4gZ
-         +a0kqbd8HGq4cZIBNeb3wXgx8VK/R0kv7wraHExjsM6clyrHFZFDdkS48nPgCGrK+Lz+
-         7tYrLINtVZnmFkBvCHpTxZUXvudaQ/UcMifPK0QGOugJKyKg3Uzo/PD1jy5TDcunL7UY
-         4IeGMKivPRUUQv19EraMRBRKzI/7MLPnZw6jaQQ6T2nkETyuUfDbtHn4LQVmqMoxDFF6
-         FDww==
-X-Gm-Message-State: AOAM5305OwLDIBaWKcFu5MtRH4/3tjuV+mtPOr9wwla3Wq9EwPfkHa/F
-        iE3Adtj5wrvyeknkST0AcIi5nWpRzMEVuEb78AQyeZhIDUv0Cj9nuk4pgY+9tUHAjn2Z+rpgYjH
-        VnKfTxULYD4Zu
-X-Received: by 2002:a37:6f05:: with SMTP id k5mr18097458qkc.313.1622589602140;
-        Tue, 01 Jun 2021 16:20:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx85uMM/8lal6FIJBvU/Vwx7SFNkcGoQadjr8btCxPa6PjVNzBqxzT6QDoAgGUEfi/DQRYuSA==
-X-Received: by 2002:a37:6f05:: with SMTP id k5mr18097442qkc.313.1622589601924;
-        Tue, 01 Jun 2021 16:20:01 -0700 (PDT)
-Received: from t490s (bras-base-toroon474qw-grc-61-184-147-118-108.dsl.bell.ca. [184.147.118.108])
-        by smtp.gmail.com with ESMTPSA id a23sm12138420qkl.6.2021.06.01.16.20.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Jun 2021 16:20:01 -0700 (PDT)
-Date:   Tue, 1 Jun 2021 19:20:00 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     huangy81@chinatelecom.cn
-Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        kvm@vger.kernel.org, Juan Quintela <quintela@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v1 2/6] KVM: introduce dirty_pages into CPUState
-Message-ID: <YLbAoEWOE+no+a7H@t490s>
-References: <cover.1622479161.git.huangy81@chinatelecom.cn>
- <78cc154863754a93d88070d1fae9fed6a1ec5f01.1622479161.git.huangy81@chinatelecom.cn>
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=B2PaLi7oXvFmWaByjFopf8bMZiskZ7jNsrvCbPcpC6M=;
+        b=EP5aElCYhajJJcqM6pi+Hi3CM7fHfllvtQR70x+BRCHGgVrEtA83NlmZ19Wu1L7Zqf
+         td9h75p5rkPUxuZLWe3iozsQ5arF2wbDvpkPz9SP5l1wmRhVY4a42yj28/86d5F4L/kP
+         m4zXGruYGlaFpGVwB+4LLCdgMJ9nd4gNoYF3dEZj+Yi7C+3YrCkEbf1Z16lDepUCkn1D
+         Y06+qKsspsia0qrK/Y9OxrYF23384bDI4f/FNj3UcWYJPVVa1TWhRm2CRrYQNNAArPVr
+         WI68Nb+5/PsdIKafUdHOlNbjv8071XIfbgfjgHMh5xIc0/IPi7BEC/MSyF7P86ncnBCQ
+         EE7Q==
+X-Gm-Message-State: AOAM5334nVARW6UWK6w+9SoVQV1r1nPvSllYo5/Db0wJ9YLplE2e/3Sq
+        PF41yQ8F0TpYUvWiIdTWbbMSJzdxbuXoI3MjyM0=
+X-Google-Smtp-Source: ABdhPJwdBrNPjcPz6yiM1H7KqsqxsGzJ2O1bCWL3HBp5UEmnfFFqfRJLhj0TgVzevjYe1fWrdB1rLFXjwnHSgI9Lp08=
+X-Received: by 2002:a2e:b4c2:: with SMTP id r2mr479188ljm.313.1622590738204;
+ Tue, 01 Jun 2021 16:38:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <78cc154863754a93d88070d1fae9fed6a1ec5f01.1622479161.git.huangy81@chinatelecom.cn>
+Received: by 2002:ab0:4a46:0:0:0:0:0 with HTTP; Tue, 1 Jun 2021 16:38:53 -0700 (PDT)
+Reply-To: mrschantalawrence@gmail.com
+From:   mrs chantal <roggerwoods6@gmail.com>
+Date:   Tue, 1 Jun 2021 16:38:53 -0700
+Message-ID: <CAPHCW_4RY0QkdWzNS_L_4s7JbUN53_DfTT8m5Efjz2QNJvsgGA@mail.gmail.com>
+Subject: Good day To You,
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 01, 2021 at 01:04:06AM +0800, huangy81@chinatelecom.cn wrote:
-> diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-> index 044f668a6e..973c193501 100644
-> --- a/include/hw/core/cpu.h
-> +++ b/include/hw/core/cpu.h
-> @@ -375,6 +375,8 @@ struct CPUState {
->      struct kvm_run *kvm_run;
->      struct kvm_dirty_gfn *kvm_dirty_gfns;
->      uint32_t kvm_fetch_index;
-> +    uint64_t dirty_pages;
-> +    bool stat_dirty_pages;
-
-Shall we make this bool a global one?  As I don't think we'll be able to only
-enable it on a subset of cpus?
-
 -- 
-Peter Xu
+hello....
 
+
+You have been compensated with the sum of 5.7 million dollars
+
+in this united nation the payment will be issue into atm visa card and
+
+send to you from the santander bank we need your address and your
+
+whatsapp
+number
+
+
+here is my email address   mrschantalawrence75@gmail.com
