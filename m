@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EB9B93971AA
-	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 12:40:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11BD63971A9
+	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 12:40:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233661AbhFAKmA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 06:42:00 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59304 "EHLO mail.kernel.org"
+        id S233628AbhFAKl6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 06:41:58 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59336 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233422AbhFAKlz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S233437AbhFAKlz (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 1 Jun 2021 06:41:55 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4B4D8613AF;
+        by mail.kernel.org (Postfix) with ESMTPSA id C5712613B1;
         Tue,  1 Jun 2021 10:40:14 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1lo1oi-004nNs-JJ; Tue, 01 Jun 2021 11:40:12 +0100
+        id 1lo1oj-004nNs-3j; Tue, 01 Jun 2021 11:40:13 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu
@@ -31,9 +31,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Hector Martin <marcan@marcan.st>,
         Mark Rutland <mark.rutland@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>, kernel-team@android.com
-Subject: [PATCH v4 3/9] KVM: arm64: vgic: Be tolerant to the lack of maintenance interrupt masking
-Date:   Tue,  1 Jun 2021 11:39:59 +0100
-Message-Id: <20210601104005.81332-4-maz@kernel.org>
+Subject: [PATCH v4 4/9] KVM: arm64: vgic: Let an interrupt controller advertise lack of HW deactivation
+Date:   Tue,  1 Jun 2021 11:40:00 +0100
+Message-Id: <20210601104005.81332-5-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210601104005.81332-1-maz@kernel.org>
 References: <20210601104005.81332-1-maz@kernel.org>
@@ -47,66 +47,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As it turns out, not all the interrupt controllers are able to
-expose a vGIC maintenance interrupt that can be independently
-enabled/disabled.
+The vGIC, as architected by ARM, allows a virtual interrupt to
+trigger the deactivation of a physical interrupt. This allows
+the following interrupt to be delivered without requiring an exit.
 
-And to be fair, it doesn't really matter as all we require is
-for the interrupt to kick us out of guest mode out way or another.
+However, some implementations have choosen not to implement this,
+meaning that we will need some unsavoury workarounds to deal with this.
 
-To that effect, add gic_kvm_info.no_maint_irq_mask for an interrupt
-controller to advertise the lack of masking.
+On detecting such a case, taint the kernel and spit a nastygram.
+We'll deal with this in later patches.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-init.c       | 8 +++++++-
- include/linux/irqchip/arm-vgic-info.h | 2 ++
- 2 files changed, 9 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/vgic/vgic-init.c       | 10 ++++++++++
+ include/kvm/arm_vgic.h                |  3 +++
+ include/linux/irqchip/arm-vgic-info.h |  2 ++
+ 3 files changed, 15 insertions(+)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 2fdb65529594..6752d084934d 100644
+index 6752d084934d..340c51d87677 100644
 --- a/arch/arm64/kvm/vgic/vgic-init.c
 +++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -519,12 +519,15 @@ void kvm_vgic_init_cpu_hardware(void)
-  */
- int kvm_vgic_hyp_init(void)
- {
-+	bool has_mask;
- 	int ret;
- 
- 	if (!gic_kvm_info)
- 		return -ENODEV;
- 
--	if (!gic_kvm_info->maint_irq) {
-+	has_mask = !gic_kvm_info->no_maint_irq_mask;
-+
-+	if (has_mask && !gic_kvm_info->maint_irq) {
- 		kvm_err("No vgic maintenance irq\n");
+@@ -532,6 +532,16 @@ int kvm_vgic_hyp_init(void)
  		return -ENXIO;
  	}
-@@ -552,6 +555,9 @@ int kvm_vgic_hyp_init(void)
- 	if (ret)
- 		return ret;
  
-+	if (!has_mask)
-+		return 0;
++	/*
++	 * If we get one of these oddball non-GICs, taint the kernel,
++	 * as we have no idea of how they *really* behave.
++	 */
++	if (gic_kvm_info->no_hw_deactivation) {
++		kvm_info("Non-architectural vgic, tainting kernel\n");
++		add_taint(TAINT_CPU_OUT_OF_SPEC, LOCKDEP_STILL_OK);
++		kvm_vgic_global_state.no_hw_deactivation = true;
++	}
 +
- 	ret = request_percpu_irq(kvm_vgic_global_state.maint_irq,
- 				 vgic_maintenance_handler,
- 				 "vgic", kvm_get_running_vcpus());
+ 	switch (gic_kvm_info->type) {
+ 	case GIC_V2:
+ 		ret = vgic_v2_probe(gic_kvm_info);
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index ec621180ef09..e45b26e8d479 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -72,6 +72,9 @@ struct vgic_global {
+ 	bool			has_gicv4;
+ 	bool			has_gicv4_1;
+ 
++	/* Pseudo GICv3 from outer space */
++	bool			no_hw_deactivation;
++
+ 	/* GIC system register CPU interface */
+ 	struct static_key_false gicv3_cpuif;
+ 
 diff --git a/include/linux/irqchip/arm-vgic-info.h b/include/linux/irqchip/arm-vgic-info.h
-index a25d4da5697d..7c0d08ebb82c 100644
+index 7c0d08ebb82c..a75b2c7de69d 100644
 --- a/include/linux/irqchip/arm-vgic-info.h
 +++ b/include/linux/irqchip/arm-vgic-info.h
-@@ -24,6 +24,8 @@ struct gic_kvm_info {
- 	struct resource vcpu;
- 	/* Interrupt number */
- 	unsigned int	maint_irq;
-+	/* No interrupt mask, no need to use the above field */
-+	bool		no_maint_irq_mask;
- 	/* Virtual control interface */
- 	struct resource vctrl;
- 	/* vlpi support */
+@@ -32,6 +32,8 @@ struct gic_kvm_info {
+ 	bool		has_v4;
+ 	/* rvpeid support */
+ 	bool		has_v4_1;
++	/* Deactivation impared, subpar stuff */
++	bool		no_hw_deactivation;
+ };
+ 
+ #ifdef CONFIG_KVM
 -- 
 2.30.2
 
