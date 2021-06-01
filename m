@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BD54396F7A
+	by mail.lfdr.de (Postfix) with ESMTP id B4DAB396F7C
 	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 10:49:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234041AbhFAIus (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 04:50:48 -0400
-Received: from mga07.intel.com ([134.134.136.100]:45208 "EHLO mga07.intel.com"
+        id S233832AbhFAIuu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 04:50:50 -0400
+Received: from mga07.intel.com ([134.134.136.100]:45213 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233813AbhFAIuW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S233818AbhFAIuW (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 1 Jun 2021 04:50:22 -0400
-IronPort-SDR: nulyBmdU0wcg3FjdYAUGmbbpy/Pf1F/hi5s02WznrO/oI5tObkX0XjGsHIJP+Dw0I28PSgDnAC
- LYltx+dde82Q==
-X-IronPort-AV: E=McAfee;i="6200,9189,10001"; a="267381416"
+IronPort-SDR: yKVa4fsE+CY758/R3/1tXTyFV9uKKEsa/STmFlcLQBrhF5YHL5ZNNNmC7GgRI8dsQPDIYEsp4T
+ 3U5KyKaC+lTw==
+X-IronPort-AV: E=McAfee;i="6200,9189,10001"; a="267381439"
 X-IronPort-AV: E=Sophos;i="5.83,239,1616482800"; 
-   d="scan'208";a="267381416"
+   d="scan'208";a="267381439"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2021 01:48:24 -0700
-IronPort-SDR: LckntoZwfGAbor9II+7dgzhSuNyZ5pUXvjsNlFgA53Y40Qsu1oIgscdPH2w+9Tm3onCwLob7kf
- oQcfnSZRdvgA==
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2021 01:48:27 -0700
+IronPort-SDR: j6+pw+2suYFV1Y2iWYvoJjKwf6F8XIkYNO0Pqgtt9LxZMUu2Y0p9wiB3HbeYfTCrnkNTaIAK/2
+ SEYyGd2ZNX5A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.83,239,1616482800"; 
-   d="scan'208";a="437967817"
+   d="scan'208";a="437967826"
 Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by orsmga007.jf.intel.com with ESMTP; 01 Jun 2021 01:48:21 -0700
+  by orsmga007.jf.intel.com with ESMTP; 01 Jun 2021 01:48:24 -0700
 From:   Robert Hoo <robert.hu@linux.intel.com>
 To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
         wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
@@ -32,9 +32,9 @@ To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
         chang.seok.bae@intel.com, robert.hu@intel.com,
         robert.hu@linux.intel.com
-Subject: [PATCH 09/15] kvm/cpuid: Enumerate Key Locker feature in KVM
-Date:   Tue,  1 Jun 2021 16:47:48 +0800
-Message-Id: <1622537274-146420-10-git-send-email-robert.hu@linux.intel.com>
+Subject: [PATCH 10/15] kvm/vmx/nested: Support new IA32_VMX_PROCBASED_CTLS3 vmx capability MSR
+Date:   Tue,  1 Jun 2021 16:47:49 +0800
+Message-Id: <1622537274-146420-11-git-send-email-robert.hu@linux.intel.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1622537274-146420-1-git-send-email-robert.hu@linux.intel.com>
 References: <1622537274-146420-1-git-send-email-robert.hu@linux.intel.com>
@@ -42,196 +42,145 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In kvm_set_cpu_caps(), add Key Locker feature enumeration, under the
-condition that 1) HW supports this feature 2) host Kernel isn't
-enabled with this feature.
+Add this new VMX capability MSR in nested_vmx_msrs, and related functions
+for its nested support.
 
-Among its sub-features, filter out randomization support bit
-(CPUID.0x19.ECX[1]), as by design it cannot be supported at this moment.
-(Refer to Intel Key Locker Spec.)
-
-Also, CPUID.0x19.EBX[0] (Key Locker instructions is enabled) is dynamic,
-based on CR4.KL status, thus reserve CR4.KL, and update this CPUID bit
-dynamically.
+Don't set its LOADIWKEY VM-Exit bit at present. It will be enabled in last
+patch when everything's prepared.
 
 Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 +-
- arch/x86/kvm/cpuid.c            | 26 ++++++++++++++++++++++++--
- arch/x86/kvm/reverse_cpuid.h    | 32 ++++++++++++++++++++++++++++----
- arch/x86/kvm/vmx/vmx.c          |  2 +-
- arch/x86/kvm/x86.h              |  2 ++
- 5 files changed, 56 insertions(+), 8 deletions(-)
+ arch/x86/kvm/vmx/capabilities.h |  2 ++
+ arch/x86/kvm/vmx/nested.c       | 22 +++++++++++++++++++++-
+ arch/x86/kvm/vmx/vmx.c          |  6 +++---
+ arch/x86/kvm/x86.c              |  2 ++
+ 4 files changed, 28 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 4b929dc..aec9ccc 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -103,7 +103,7 @@
- 			  | X86_CR4_PGE | X86_CR4_PCE | X86_CR4_OSFXSR | X86_CR4_PCIDE \
- 			  | X86_CR4_OSXSAVE | X86_CR4_SMEP | X86_CR4_FSGSBASE \
- 			  | X86_CR4_OSXMMEXCPT | X86_CR4_LA57 | X86_CR4_VMXE \
--			  | X86_CR4_SMAP | X86_CR4_PKE | X86_CR4_UMIP))
-+			  | X86_CR4_SMAP | X86_CR4_PKE | X86_CR4_UMIP | X86_CR4_KEYLOCKER))
- 
- #define CR8_RESERVED_BITS (~(unsigned long)X86_CR8_TPR)
- 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 19606a3..f3b00ae 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -135,6 +135,12 @@ void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
- 		     cpuid_entry_has(best, X86_FEATURE_XSAVEC)))
- 		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
- 
-+	/* update CPUID.0x19.EBX[0], depends on CR4.KL */
-+	best = kvm_find_cpuid_entry(vcpu, 0x19, 0);
-+	if (best)
-+		cpuid_entry_change(best, X86_FEATURE_KL_INS_ENABLED,
-+					kvm_read_cr4_bits(vcpu, X86_CR4_KEYLOCKER));
-+
- 	best = kvm_find_cpuid_entry(vcpu, KVM_CPUID_FEATURES, 0);
- 	if (kvm_hlt_in_guest(vcpu->kvm) && best &&
- 		(best->eax & (1 << KVM_FEATURE_PV_UNHALT)))
-@@ -456,14 +462,20 @@ void kvm_set_cpu_caps(void)
- 	kvm_cpu_cap_mask(CPUID_7_ECX,
- 		F(AVX512VBMI) | F(LA57) | F(PKU) | 0 /*OSPKE*/ | F(RDPID) |
- 		F(AVX512_VPOPCNTDQ) | F(UMIP) | F(AVX512_VBMI2) | F(GFNI) |
--		F(VAES) | F(VPCLMULQDQ) | F(AVX512_VNNI) | F(AVX512_BITALG) |
--		F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/ |
-+		F(VAES) | 0 /*KEYLOCKER*/ | F(VPCLMULQDQ) | F(AVX512_VNNI) |
-+		F(AVX512_BITALG) | F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/ |
- 		F(SGX_LC)
- 	);
-+
- 	/* Set LA57 based on hardware capability. */
- 	if (cpuid_ecx(7) & F(LA57))
- 		kvm_cpu_cap_set(X86_FEATURE_LA57);
- 
-+	/* At present, host and guest can only exclusively use KeyLocker */
-+	if (!boot_cpu_has(X86_FEATURE_KEYLOCKER) && (cpuid_ecx(0x7) &
-+		feature_bit(KEYLOCKER)))
-+		kvm_cpu_cap_set(X86_FEATURE_KEYLOCKER);
-+
- 	/*
- 	 * PKU not yet implemented for shadow paging and requires OSPKE
- 	 * to be set on the host. Clear it if that is not the case
-@@ -500,6 +512,10 @@ void kvm_set_cpu_caps(void)
- 	kvm_cpu_cap_init_scattered(CPUID_12_EAX,
- 		SF(SGX1) | SF(SGX2)
- 	);
-+	kvm_cpu_cap_init_scattered(CPUID_19_EBX, SF(KL_INS_ENABLED) | SF(KL_WIDE) |
-+		SF(IWKEY_BACKUP));
-+	/* No randomize exposed to guest */
-+	kvm_cpu_cap_init_scattered(CPUID_19_ECX, SF(IWKEY_NOBACKUP));
- 
- 	kvm_cpu_cap_mask(CPUID_8000_0001_ECX,
- 		F(LAHF_LM) | F(CMP_LEGACY) | 0 /*SVM*/ | 0 /* ExtApicSpace */ |
-@@ -870,6 +886,12 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 				goto out;
- 		}
+diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+index df7550c..0a0bea9 100644
+--- a/arch/x86/kvm/vmx/capabilities.h
++++ b/arch/x86/kvm/vmx/capabilities.h
+@@ -33,6 +33,8 @@ struct nested_vmx_msrs {
+ 	u32 procbased_ctls_high;
+ 	u32 secondary_ctls_low;
+ 	u32 secondary_ctls_high;
++	/* Tertiary Controls is 64bit allow-1 semantics */
++	u64 tertiary_ctls;
+ 	u32 pinbased_ctls_low;
+ 	u32 pinbased_ctls_high;
+ 	u32 exit_ctls_low;
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index bced766..b04184b 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -1272,6 +1272,18 @@ static int vmx_restore_vmx_basic(struct vcpu_vmx *vmx, u64 data)
+ 		lowp = &vmx->nested.msrs.secondary_ctls_low;
+ 		highp = &vmx->nested.msrs.secondary_ctls_high;
  		break;
-+	/* KeyLocker */
-+	case 0x19:
-+		cpuid_entry_override(entry, CPUID_19_EBX);
-+		cpuid_entry_override(entry, CPUID_19_ECX);
++	/*
++	 * MSR_IA32_VMX_PROCBASED_CTLS3 is 64bit, all allow-1 (must-be-0)
++	 * semantics.
++	 */
++	case MSR_IA32_VMX_PROCBASED_CTLS3:
++		/* Check must-be-0 bits are still 0. */
++		if (!is_bitwise_subset(vmx->nested.msrs.tertiary_ctls,
++				       data, GENMASK_ULL(63, 0)))
++			return -EINVAL;
++
++		vmx->nested.msrs.tertiary_ctls = data;
++		return 0;
+ 	default:
+ 		BUG();
+ 	}
+@@ -1408,6 +1420,7 @@ int vmx_set_vmx_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 data)
+ 	case MSR_IA32_VMX_TRUE_EXIT_CTLS:
+ 	case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
+ 	case MSR_IA32_VMX_PROCBASED_CTLS2:
++	case MSR_IA32_VMX_PROCBASED_CTLS3:
+ 		return vmx_restore_control_msr(vmx, msr_index, data);
+ 	case MSR_IA32_VMX_MISC:
+ 		return vmx_restore_vmx_misc(vmx, data);
+@@ -1503,6 +1516,9 @@ int vmx_get_vmx_msr(struct nested_vmx_msrs *msrs, u32 msr_index, u64 *pdata)
+ 			msrs->secondary_ctls_low,
+ 			msrs->secondary_ctls_high);
+ 		break;
++	case MSR_IA32_VMX_PROCBASED_CTLS3:
++		*pdata = msrs->tertiary_ctls;
 +		break;
-+
- 	case KVM_CPUID_SIGNATURE: {
- 		static const char signature[12] = "KVMKVMKVM\0\0";
- 		const u32 *sigptr = (const u32 *)signature;
-diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
-index a19d473..3ea8875 100644
---- a/arch/x86/kvm/reverse_cpuid.h
-+++ b/arch/x86/kvm/reverse_cpuid.h
-@@ -13,6 +13,9 @@
-  */
- enum kvm_only_cpuid_leafs {
- 	CPUID_12_EAX	 = NCAPINTS,
-+	CPUID_19_EBX,
-+	CPUID_19_ECX,
-+
- 	NR_KVM_CPU_CAPS,
+ 	case MSR_IA32_VMX_EPT_VPID_CAP:
+ 		*pdata = msrs->ept_caps |
+ 			((u64)msrs->vpid_caps << 32);
+@@ -6429,7 +6445,8 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
+ 		CPU_BASED_USE_IO_BITMAPS | CPU_BASED_MONITOR_TRAP_FLAG |
+ 		CPU_BASED_MONITOR_EXITING | CPU_BASED_RDPMC_EXITING |
+ 		CPU_BASED_RDTSC_EXITING | CPU_BASED_PAUSE_EXITING |
+-		CPU_BASED_TPR_SHADOW | CPU_BASED_ACTIVATE_SECONDARY_CONTROLS;
++		CPU_BASED_TPR_SHADOW | CPU_BASED_ACTIVATE_SECONDARY_CONTROLS |
++		CPU_BASED_ACTIVATE_TERTIARY_CONTROLS;
+ 	/*
+ 	 * We can allow some features even when not supported by the
+ 	 * hardware. For example, L1 can specify an MSR bitmap - and we
+@@ -6467,6 +6484,9 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
+ 		SECONDARY_EXEC_RDSEED_EXITING |
+ 		SECONDARY_EXEC_XSAVES;
  
- 	NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
-@@ -24,6 +27,13 @@ enum kvm_only_cpuid_leafs {
- #define KVM_X86_FEATURE_SGX1		KVM_X86_FEATURE(CPUID_12_EAX, 0)
- #define KVM_X86_FEATURE_SGX2		KVM_X86_FEATURE(CPUID_12_EAX, 1)
- 
-+/* Intel-defined Key Locker sub-features, CPUID level 0x19 (EBX). */
-+#define KVM_X86_FEATURE_KL_INS_ENABLED   KVM_X86_FEATURE(CPUID_19_EBX, 0)
-+#define KVM_X86_FEATURE_KL_WIDE          KVM_X86_FEATURE(CPUID_19_EBX, 2)
-+#define KVM_X86_FEATURE_IWKEY_BACKUP     KVM_X86_FEATURE(CPUID_19_EBX, 4)
-+#define KVM_X86_FEATURE_IWKEY_NOBACKUP   KVM_X86_FEATURE(CPUID_19_ECX, 0)
-+#define KVM_X86_FEATURE_IWKEY_RAND       KVM_X86_FEATURE(CPUID_19_ECX, 1)
-+
- struct cpuid_reg {
- 	u32 function;
- 	u32 index;
-@@ -48,6 +58,8 @@ struct cpuid_reg {
- 	[CPUID_7_1_EAX]       = {         7, 1, CPUID_EAX},
- 	[CPUID_12_EAX]        = {0x00000012, 0, CPUID_EAX},
- 	[CPUID_8000_001F_EAX] = {0x8000001f, 0, CPUID_EAX},
-+	[CPUID_19_EBX]        = {      0x19, 0, CPUID_EBX},
-+	[CPUID_19_ECX]        = {      0x19, 0, CPUID_ECX},
- };
- 
- /*
-@@ -74,12 +86,24 @@ static __always_inline void reverse_cpuid_check(unsigned int x86_leaf)
-  */
- static __always_inline u32 __feature_translate(int x86_feature)
- {
--	if (x86_feature == X86_FEATURE_SGX1)
-+	switch (x86_feature) {
-+	case X86_FEATURE_SGX1:
- 		return KVM_X86_FEATURE_SGX1;
--	else if (x86_feature == X86_FEATURE_SGX2)
-+	case X86_FEATURE_SGX2:
- 		return KVM_X86_FEATURE_SGX2;
--
--	return x86_feature;
-+	case X86_FEATURE_KL_INS_ENABLED:
-+		return KVM_X86_FEATURE_KL_INS_ENABLED;
-+	case X86_FEATURE_KL_WIDE:
-+		return KVM_X86_FEATURE_KL_WIDE;
-+	case X86_FEATURE_IWKEY_BACKUP:
-+		return KVM_X86_FEATURE_IWKEY_BACKUP;
-+	case X86_FEATURE_IWKEY_NOBACKUP:
-+		return KVM_X86_FEATURE_IWKEY_NOBACKUP;
-+	case X86_FEATURE_IWKEY_RAND:
-+		return KVM_X86_FEATURE_IWKEY_RAND;
-+	default:
-+		return x86_feature;
-+	}
- }
- 
- static __always_inline u32 __feature_leaf(int x86_feature)
++	if (msrs->procbased_ctls_high & CPU_BASED_ACTIVATE_TERTIARY_CONTROLS)
++		rdmsrl(MSR_IA32_VMX_PROCBASED_CTLS3, msrs->tertiary_ctls);
++	msrs->tertiary_ctls &= 0;
+ 	/*
+ 	 * We can emulate "VMCS shadowing," even if the hardware
+ 	 * doesn't support it.
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 752b1e4..da4c123 100644
+index da4c123..44c9f16 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -3507,7 +3507,7 @@ void vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
- 	vmcs_writel(CR4_READ_SHADOW, cr4);
- 	vmcs_writel(GUEST_CR4, hw_cr4);
+@@ -1981,7 +1981,7 @@ static inline bool vmx_feature_control_msr_valid(struct kvm_vcpu *vcpu,
+ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
+ {
+ 	switch (msr->index) {
+-	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
++	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_PROCBASED_CTLS3:
+ 		if (!nested)
+ 			return 1;
+ 		return vmx_get_vmx_msr(&vmcs_config.nested, msr->index, &msr->data);
+@@ -2069,7 +2069,7 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		msr_info->data = to_vmx(vcpu)->msr_ia32_sgxlepubkeyhash
+ 			[msr_info->index - MSR_IA32_SGXLEPUBKEYHASH0];
+ 		break;
+-	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
++	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_PROCBASED_CTLS3:
+ 		if (!nested_vmx_allowed(vcpu))
+ 			return 1;
+ 		if (vmx_get_vmx_msr(&vmx->nested.msrs, msr_info->index,
+@@ -2399,7 +2399,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		vmx->msr_ia32_sgxlepubkeyhash
+ 			[msr_index - MSR_IA32_SGXLEPUBKEYHASH0] = data;
+ 		break;
+-	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
++	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_PROCBASED_CTLS3:
+ 		if (!msr_info->host_initiated)
+ 			return 1; /* they are read-only */
+ 		if (!nested_vmx_allowed(vcpu))
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 6eda283..9b87e64 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1332,6 +1332,7 @@ int kvm_emulate_rdpmc(struct kvm_vcpu *vcpu)
+ 	MSR_IA32_VMX_PROCBASED_CTLS2,
+ 	MSR_IA32_VMX_EPT_VPID_CAP,
+ 	MSR_IA32_VMX_VMFUNC,
++	MSR_IA32_VMX_PROCBASED_CTLS3,
  
--	if ((cr4 ^ old_cr4) & (X86_CR4_OSXSAVE | X86_CR4_PKE))
-+	if ((cr4 ^ old_cr4) & (X86_CR4_OSXSAVE | X86_CR4_PKE | X86_CR4_KEYLOCKER))
- 		kvm_update_cpuid_runtime(vcpu);
- }
+ 	MSR_K7_HWCR,
+ 	MSR_KVM_POLL_CONTROL,
+@@ -1363,6 +1364,7 @@ int kvm_emulate_rdpmc(struct kvm_vcpu *vcpu)
+ 	MSR_IA32_VMX_PROCBASED_CTLS2,
+ 	MSR_IA32_VMX_EPT_VPID_CAP,
+ 	MSR_IA32_VMX_VMFUNC,
++	MSR_IA32_VMX_PROCBASED_CTLS3,
  
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 521f74e..b0cf5f7 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -485,6 +485,8 @@ int kvm_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
- 		__reserved_bits |= X86_CR4_VMXE;        \
- 	if (!__cpu_has(__c, X86_FEATURE_PCID))          \
- 		__reserved_bits |= X86_CR4_PCIDE;       \
-+	if (!__cpu_has(__c, X86_FEATURE_KEYLOCKER))		\
-+		__reserved_bits |= X86_CR4_KEYLOCKER;	\
- 	__reserved_bits;                                \
- })
- 
+ 	MSR_F10H_DECFG,
+ 	MSR_IA32_UCODE_REV,
 -- 
 1.8.3.1
 
