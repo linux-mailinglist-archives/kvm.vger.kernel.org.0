@@ -2,296 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F6653979C9
-	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 20:10:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DA00397A07
+	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 20:24:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233970AbhFASMW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 14:12:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26604 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231331AbhFASMV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 1 Jun 2021 14:12:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622571039;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OiznvOiw988Q6wohYwG7BaAaFXlSoFR15pAhGpAEt6w=;
-        b=akUfc5k7BQtobmQkrQ+6g0Xu1yotkNefDcxJMv23WUz4sE4GCJZ9LVf9n0jrWCiaZkxUbl
-        u+L/bq/sl5+TNIVKV4w28jwe4K3h5eAz1PRLDWsJzf3ecBrmUTR5bWz7Horc5vXPdp/Z1u
-        mxHETKSOkx7YDCS0hNgZA7cVVyyfnrw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-406-qCi5fKTeP6K0j0O814c44Q-1; Tue, 01 Jun 2021 14:10:38 -0400
-X-MC-Unique: qCi5fKTeP6K0j0O814c44Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S234637AbhFASZu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 14:25:50 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:53694 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233853AbhFASZt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Jun 2021 14:25:49 -0400
+Received: from zn.tnic (p200300ec2f111d0082e984b2e91ac710.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:1d00:82e9:84b2:e91a:c710])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C512E801107;
-        Tue,  1 Jun 2021 18:10:36 +0000 (UTC)
-Received: from localhost (ovpn-112-239.rdu2.redhat.com [10.10.112.239])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 883DA60D52;
-        Tue,  1 Jun 2021 18:10:36 +0000 (UTC)
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        Eric Blake <eblake@redhat.com>, kvm@vger.kernel.org,
-        Connor Kuehl <ckuehl@redhat.com>
-Subject: [PULL 22/24] target/i386/sev: add support to query the attestation report
-Date:   Tue,  1 Jun 2021 14:10:12 -0400
-Message-Id: <20210601181014.2568861-23-ehabkost@redhat.com>
-In-Reply-To: <20210601181014.2568861-1-ehabkost@redhat.com>
-References: <20210601181014.2568861-1-ehabkost@redhat.com>
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 75E241EC01B7;
+        Tue,  1 Jun 2021 20:24:06 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1622571846;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=tJXA6HXVxWBrx0FMpdafT6CUV8iMBF5xHQeDny+jk8w=;
+        b=Sp9xEdkP1iBv9cZbO0Mn4+CaJvstno+vSwzYVQTaFWWB5MSoaE/igdzH8AE5b5t56A3ZGd
+        Vq4zQGdd2fgpuAvhZKV1tUGF0HfKpcBc3MyfSqQHIbiZdJJLILjzLxEao6a8ipfddoX808
+        bk+WtVkH6cvTgz27zsb1iklH1JszDUs=
+Date:   Tue, 1 Jun 2021 20:24:02 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>, Pu Wen <puwen@hygon.cn>,
+        Joerg Roedel <jroedel@suse.de>, x86@kernel.org,
+        joro@8bytes.org, dave.hansen@linux.intel.com, peterz@infradead.org,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        sashal@kernel.org, gregkh@linuxfoundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] x86/sev: Check whether SEV or SME is supported first
+Message-ID: <YLZ7Qu2fY6gmzTTN@zn.tnic>
+References: <905ecd90-54d2-35f1-c8ab-c123d8a3d9a0@hygon.cn>
+ <YLSuRBzM6piigP8t@suse.de>
+ <e1ad087e-a951-4128-923e-867a8b38ecec@hygon.cn>
+ <YLZGuTYXDin2K9wx@zn.tnic>
+ <YLZc3sFKSjpd2yPS@google.com>
+ <dbc4e48f-187a-4b2d-2625-b62d334f60b2@amd.com>
+ <YLZneRWzoujEe+6b@zn.tnic>
+ <YLZrXEQ8w5ntu7ov@google.com>
+ <YLZy+JR7TNEeNA6C@zn.tnic>
+ <YLZ3k77CK+F9v8fF@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <YLZ3k77CK+F9v8fF@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Brijesh Singh <brijesh.singh@amd.com>
+On Tue, Jun 01, 2021 at 06:08:19PM +0000, Sean Christopherson wrote:
+> But we have not yet verified that 0x8000001f is supported, only that the result
+> of CPUID.0x8000001f can be trusted (to handle Intel CPUs which return data from
+> the highest supported leaf if the provided leaf function is greater than the max
+> supported leaf).  Verifying that 0x8000001f is supported doesn't happen until
+> 0x8000001f is actually read, which is currently done after the RDMSR that #GPs
+> and explodes.
 
-The SEV FW >= 0.23 added a new command that can be used to query the
-attestation report containing the SHA-256 digest of the guest memory
-and VMSA encrypted with the LAUNCH_UPDATE and sign it with the PEK.
+Yeah yeah, Tom just convinced me on IRC that the patch is ok after
+all... so let's do that. And again, we cannot stop hypervisors from
+doing shady things here so I don't even wanna try to. People should run
+SNP/TDX guests only anyway if they care about this stuff.
 
-Note, we already have a command (LAUNCH_MEASURE) that can be used to
-query the SHA-256 digest of the guest memory encrypted through the
-LAUNCH_UPDATE. The main difference between previous and this command
-is that the report is signed with the PEK and unlike the LAUNCH_MEASURE
-command the ATTESATION_REPORT command can be called while the guest
-is running.
-
-Add a QMP interface "query-sev-attestation-report" that can be used
-to get the report encoded in base64.
-
-Cc: James Bottomley <jejb@linux.ibm.com>
-Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org
-Reviewed-by: James Bottomley <jejb@linux.ibm.com>
-Tested-by: James Bottomley <jejb@linux.ibm.com>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Reviewed-by: Connor Kuehl <ckuehl@redhat.com>
-Message-Id: <20210429170728.24322-1-brijesh.singh@amd.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- linux-headers/linux/kvm.h |  8 +++++
- target/i386/sev_i386.h    |  2 ++
- qapi/misc-target.json     | 38 ++++++++++++++++++++++
- target/i386/monitor.c     |  6 ++++
- target/i386/sev-stub.c    |  7 ++++
- target/i386/sev.c         | 67 +++++++++++++++++++++++++++++++++++++++
- target/i386/trace-events  |  1 +
- 7 files changed, 129 insertions(+)
-
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 020b62a619a..897f8313749 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -1591,6 +1591,8 @@ enum sev_cmd_id {
- 	KVM_SEV_DBG_ENCRYPT,
- 	/* Guest certificates commands */
- 	KVM_SEV_CERT_EXPORT,
-+	/* Attestation report */
-+	KVM_SEV_GET_ATTESTATION_REPORT,
- 
- 	KVM_SEV_NR_MAX,
- };
-@@ -1643,6 +1645,12 @@ struct kvm_sev_dbg {
- 	__u32 len;
- };
- 
-+struct kvm_sev_attestation_report {
-+	__u8 mnonce[16];
-+	__u64 uaddr;
-+	__u32 len;
-+};
-+
- #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
- #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
- #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
-diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
-index ae221d4c724..ae6d8404787 100644
---- a/target/i386/sev_i386.h
-+++ b/target/i386/sev_i386.h
-@@ -35,5 +35,7 @@ extern uint32_t sev_get_cbit_position(void);
- extern uint32_t sev_get_reduced_phys_bits(void);
- extern char *sev_get_launch_measurement(void);
- extern SevCapability *sev_get_capabilities(Error **errp);
-+extern SevAttestationReport *
-+sev_get_attestation_report(const char *mnonce, Error **errp);
- 
- #endif
-diff --git a/qapi/misc-target.json b/qapi/misc-target.json
-index 6200c671bef..5573dcf8f08 100644
---- a/qapi/misc-target.json
-+++ b/qapi/misc-target.json
-@@ -285,3 +285,41 @@
- ##
- { 'command': 'query-gic-capabilities', 'returns': ['GICCapability'],
-   'if': 'defined(TARGET_ARM)' }
-+
-+
-+##
-+# @SevAttestationReport:
-+#
-+# The struct describes attestation report for a Secure Encrypted Virtualization
-+# feature.
-+#
-+# @data:  guest attestation report (base64 encoded)
-+#
-+#
-+# Since: 6.1
-+##
-+{ 'struct': 'SevAttestationReport',
-+  'data': { 'data': 'str'},
-+  'if': 'defined(TARGET_I386)' }
-+
-+##
-+# @query-sev-attestation-report:
-+#
-+# This command is used to get the SEV attestation report, and is supported on AMD
-+# X86 platforms only.
-+#
-+# @mnonce: a random 16 bytes value encoded in base64 (it will be included in report)
-+#
-+# Returns: SevAttestationReport objects.
-+#
-+# Since: 6.1
-+#
-+# Example:
-+#
-+# -> { "execute" : "query-sev-attestation-report", "arguments": { "mnonce": "aaaaaaa" } }
-+# <- { "return" : { "data": "aaaaaaaabbbddddd"} }
-+#
-+##
-+{ 'command': 'query-sev-attestation-report', 'data': { 'mnonce': 'str' },
-+  'returns': 'SevAttestationReport',
-+  'if': 'defined(TARGET_I386)' }
-diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-index 5994408bee1..119211f0b06 100644
---- a/target/i386/monitor.c
-+++ b/target/i386/monitor.c
-@@ -757,3 +757,9 @@ void qmp_sev_inject_launch_secret(const char *packet_hdr,
- 
-     sev_inject_launch_secret(packet_hdr, secret, gpa, errp);
- }
-+
-+SevAttestationReport *
-+qmp_query_sev_attestation_report(const char *mnonce, Error **errp)
-+{
-+    return sev_get_attestation_report(mnonce, errp);
-+}
-diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-index 0207f1c5aae..0227cb51778 100644
---- a/target/i386/sev-stub.c
-+++ b/target/i386/sev-stub.c
-@@ -74,3 +74,10 @@ int sev_es_save_reset_vector(void *flash_ptr, uint64_t flash_size)
- {
-     abort();
- }
-+
-+SevAttestationReport *
-+sev_get_attestation_report(const char *mnonce, Error **errp)
-+{
-+    error_setg(errp, "SEV is not available in this QEMU");
-+    return NULL;
-+}
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 41f7800b5f7..1a88f127035 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -492,6 +492,73 @@ out:
-     return cap;
- }
- 
-+SevAttestationReport *
-+sev_get_attestation_report(const char *mnonce, Error **errp)
-+{
-+    struct kvm_sev_attestation_report input = {};
-+    SevAttestationReport *report = NULL;
-+    SevGuestState *sev = sev_guest;
-+    guchar *data;
-+    guchar *buf;
-+    gsize len;
-+    int err = 0, ret;
-+
-+    if (!sev_enabled()) {
-+        error_setg(errp, "SEV is not enabled");
-+        return NULL;
-+    }
-+
-+    /* lets decode the mnonce string */
-+    buf = g_base64_decode(mnonce, &len);
-+    if (!buf) {
-+        error_setg(errp, "SEV: failed to decode mnonce input");
-+        return NULL;
-+    }
-+
-+    /* verify the input mnonce length */
-+    if (len != sizeof(input.mnonce)) {
-+        error_setg(errp, "SEV: mnonce must be %zu bytes (got %" G_GSIZE_FORMAT ")",
-+                sizeof(input.mnonce), len);
-+        g_free(buf);
-+        return NULL;
-+    }
-+
-+    /* Query the report length */
-+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
-+            &input, &err);
-+    if (ret < 0) {
-+        if (err != SEV_RET_INVALID_LEN) {
-+            error_setg(errp, "failed to query the attestation report length "
-+                    "ret=%d fw_err=%d (%s)", ret, err, fw_error_to_str(err));
-+            g_free(buf);
-+            return NULL;
-+        }
-+    }
-+
-+    data = g_malloc(input.len);
-+    input.uaddr = (unsigned long)data;
-+    memcpy(input.mnonce, buf, sizeof(input.mnonce));
-+
-+    /* Query the report */
-+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
-+            &input, &err);
-+    if (ret) {
-+        error_setg_errno(errp, errno, "Failed to get attestation report"
-+                " ret=%d fw_err=%d (%s)", ret, err, fw_error_to_str(err));
-+        goto e_free_data;
-+    }
-+
-+    report = g_new0(SevAttestationReport, 1);
-+    report->data = g_base64_encode(data, input.len);
-+
-+    trace_kvm_sev_attestation_report(mnonce, report->data);
-+
-+e_free_data:
-+    g_free(data);
-+    g_free(buf);
-+    return report;
-+}
-+
- static int
- sev_read_file_base64(const char *filename, guchar **data, gsize *len)
- {
-diff --git a/target/i386/trace-events b/target/i386/trace-events
-index a22ab24e214..8d6437404d5 100644
---- a/target/i386/trace-events
-+++ b/target/i386/trace-events
-@@ -10,3 +10,4 @@ kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 0x%" PRIx64
- kvm_sev_launch_measurement(const char *value) "data %s"
- kvm_sev_launch_finish(void) ""
- kvm_sev_launch_secret(uint64_t hpa, uint64_t hva, uint64_t secret, int len) "hpa 0x%" PRIx64 " hva 0x%" PRIx64 " data 0x%" PRIx64 " len %d"
-+kvm_sev_attestation_report(const char *mnonce, const char *data) "mnonce %s data %s"
 -- 
-2.30.2
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
