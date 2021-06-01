@@ -2,139 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 92523397BEE
-	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 23:54:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24712397C63
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 00:22:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234833AbhFAVzu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 17:55:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21050 "EHLO
+        id S235035AbhFAWYP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 18:24:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27876 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234698AbhFAVzu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 1 Jun 2021 17:55:50 -0400
+        by vger.kernel.org with ESMTP id S234863AbhFAWYO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 1 Jun 2021 18:24:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622584447;
+        s=mimecast20190719; t=1622586151;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TLmTFs79Kk/HdqD2U3Jsivs3GJU2uRn31j0/SZFo+5Y=;
-        b=CZz+aERLjfH5M645R6+VPZh+PxvBh/Fpg2G7nFz0Nodw0KtVSox8uvTNnJAlcLKAbS+gq+
-        la2xgZ83+TN9fNNev+og522oiX9mvbvJDd9pGA/rGR8lPimbFNMBI3w9Cicw135LMGGTt4
-        q/B/dXfJR0JRU1lFDkk8klWQzksv4eo=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-563-_jN1rs2aMiqh_DH2_CK8Lw-1; Tue, 01 Jun 2021 17:54:06 -0400
-X-MC-Unique: _jN1rs2aMiqh_DH2_CK8Lw-1
-Received: by mail-qk1-f198.google.com with SMTP id u9-20020a05620a4549b02902e956c2a3c8so184015qkp.20
-        for <kvm@vger.kernel.org>; Tue, 01 Jun 2021 14:54:06 -0700 (PDT)
+        bh=QQ6OOCiaBJ+Tmwz5+IKCbPSSgkslxV7sVjnAnThBj/I=;
+        b=QFx5/2YQFLheMt9tT9vDaiGlYB9IoriOPHFxarmsYmeC+8jseGbC3SpXmQqcIRIutnmI5K
+        Us0iSE/PMBNzM2cBcjtgdq4hfUj65nSY8a9CkhH5ko5yPhLf5CkVLBEaVqTHTTz4QaYX5S
+        83WHuDngofJx5vL4Lj+cOp5bXxF5wgM=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-RB37QnVlMoSFtMeQvHsyFQ-1; Tue, 01 Jun 2021 18:22:30 -0400
+X-MC-Unique: RB37QnVlMoSFtMeQvHsyFQ-1
+Received: by mail-ot1-f71.google.com with SMTP id 88-20020a9d06e10000b029030513a66c79so454500otx.0
+        for <kvm@vger.kernel.org>; Tue, 01 Jun 2021 15:22:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=TLmTFs79Kk/HdqD2U3Jsivs3GJU2uRn31j0/SZFo+5Y=;
-        b=suXMXML5r9I+1vL9nPcAe9C2cHYLfomXVwFu1boZJhj7aSBWDb6faREgPXbvdN/WKn
-         YX6m4mEkUAtYWdrHNp+BM5yPolauVibZ/ikyYjo+dst++6sgMAsSViw+b/T3/b+zLPCG
-         vI6cvo1dSnsmtLvjR+g4PZ5mZzc/KW0dAqLoG7f3hG+lkCZgM219pcjp6DmSp4SPr+dn
-         Et6WD+9JdxxfekdEm81t/6M1SvjzlJ+l3/ZzUAbDCkWfSnR52xl5sBd9Md59JKo+86so
-         ChXWwEJzJmp5gL4MijQUQ2vYuzIQ6YblwM69LgIIf3vyZH7WorUDPOFulrF6yVsuB2tH
-         0aeA==
-X-Gm-Message-State: AOAM533mgk5Ds3QVMjePo4WYaHg94a28LkxykE8ibrJl8yufmA5vZJcV
-        XRSlos0dWnlFMImQXXzhWayRlu2LumRom0ztadRW9R2v+srHQ+jYPOZwjdwRfRSgrHiCWZ/mz+g
-        aM0RnYGAzmC7a
-X-Received: by 2002:ac8:698b:: with SMTP id o11mr12834843qtq.148.1622584445794;
-        Tue, 01 Jun 2021 14:54:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzw3PnREwzRNFGSUnTvVgUPY8IkQ4jACsTTBjVGul0hqJfwLurKsrUBHidzwlCZJ8f3TECqFA==
-X-Received: by 2002:ac8:698b:: with SMTP id o11mr12834820qtq.148.1622584445481;
-        Tue, 01 Jun 2021 14:54:05 -0700 (PDT)
-Received: from t490s (bras-base-toroon474qw-grc-61-184-147-118-108.dsl.bell.ca. [184.147.118.108])
-        by smtp.gmail.com with ESMTPSA id i1sm11121297qtg.81.2021.06.01.14.54.04
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=QQ6OOCiaBJ+Tmwz5+IKCbPSSgkslxV7sVjnAnThBj/I=;
+        b=RCRvmiQL5M+U9dxFqgslNZRzzt4bbZnnEjuDGpc29AIetNDaFvTEUIfqf/tjmNGPwT
+         JxbJp9tL0TQh4DK1eWcxFJedyELA53X4YNytrLQKQzjgasX0OGW2L9ECkRCRHlziiTmn
+         PPlRTVK0Zp3DZ5JBSPw/xQrRgrIvFMLdLdaiBy7SSzujE9mIZwRHjXqtTaqoWKC78DNg
+         UC5X442QVsFwTVM4rn/RLyekHcuYhnhFrgb217CIbTOQ93VgQpsYj27EjqVYCo7tQ8Qd
+         G+3jK7ZR/4idVbDKfFjCBdO5i1C4iSBvPBHO+QqJujol6TiPL2YVjuPbrEc59seKWsUf
+         J8Ig==
+X-Gm-Message-State: AOAM531h5WFkhMUs9CnEzW1dBvl2OuH7menscOoQZJzV4bi7hNT8J7p+
+        dwKNJe7S/3t5Ok0pgMgSqQl44mlR8rR74GXfIMYBgepx8JIRHAo6Ss1YICHhN2FiIKh0C17RRT1
+        QRBwqXe5tc9k2
+X-Received: by 2002:aca:6505:: with SMTP id m5mr18776744oim.93.1622586150038;
+        Tue, 01 Jun 2021 15:22:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxi5D5R/YKBkpuFV42WBo2g+RPZt7CRIoVFlvzPv1SWguiDXnA+px3cN3uoGLgwkwtxnkMPhw==
+X-Received: by 2002:aca:6505:: with SMTP id m5mr18776727oim.93.1622586149841;
+        Tue, 01 Jun 2021 15:22:29 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id w10sm3658007oou.35.2021.06.01.15.22.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Jun 2021 14:54:04 -0700 (PDT)
-Date:   Tue, 1 Jun 2021 17:54:03 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     huangy81@chinatelecom.cn
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Juan Quintela <quintela@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Chuan Zheng <zhengchuan@huawei.com>
-Subject: Re: [PATCH v1 0/6] support dirtyrate at the granualrity of vcpu
-Message-ID: <YLase9l34N7i1C6S@t490s>
-References: <cover.1622479161.git.huangy81@chinatelecom.cn>
+        Tue, 01 Jun 2021 15:22:29 -0700 (PDT)
+Date:   Tue, 1 Jun 2021 16:22:25 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Lu Baolu" <baolu.lu@linux.intel.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "Robin Murphy" <robin.murphy@arm.com>
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+Message-ID: <20210601162225.259923bc.alex.williamson@redhat.com>
+In-Reply-To: <MWHPR11MB188685D57653827B566BF9B38C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
+References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
+        <20210528200311.GP1002214@nvidia.com>
+        <MWHPR11MB188685D57653827B566BF9B38C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <cover.1622479161.git.huangy81@chinatelecom.cn>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 01, 2021 at 01:02:45AM +0800, huangy81@chinatelecom.cn wrote:
-> From: Hyman Huang(黄勇) <huangy81@chinatelecom.cn>
+On Tue, 1 Jun 2021 07:01:57 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 > 
-> Since the Dirty Ring on QEMU part has been merged recently, how to use
-> this feature is under consideration.
+> I summarized five opens here, about:
 > 
-> In the scene of migration, it is valuable to provide a more accurante
-> interface to track dirty memory than existing one, so that the upper
-> layer application can make a wise decision, or whatever. More importantly,
-> dirtyrate info at the granualrity of vcpu could provide a possibility to
-> make migration convergent by imposing restriction on vcpu. With Dirty
-> Ring, we can calculate dirtyrate efficiently and cheaply.
+> 1)  Finalizing the name to replace /dev/ioasid;
+> 2)  Whether one device is allowed to bind to multiple IOASID fd's;
+> 3)  Carry device information in invalidation/fault reporting uAPI;
+> 4)  What should/could be specified when allocating an IOASID;
+> 5)  The protocol between vfio group and kvm;
 > 
-> The old interface implemented by sampling pages, it consumes cpu 
-> resource, and the larger guest memory size become, the more cpu resource
-> it consumes, namely, hard to scale. New interface has no such drawback.
+...
+> 
+> For 5), I'd expect Alex to chime in. Per my understanding looks the
+> original purpose of this protocol is not about I/O address space. It's
+> for KVM to know whether any device is assigned to this VM and then
+> do something special (e.g. posted interrupt, EPT cache attribute, etc.).
 
-Yong,
+Right, the original use case was for KVM to determine whether it needs
+to emulate invlpg, so it needs to be aware when an assigned device is
+present and be able to test if DMA for that device is cache coherent.
+The user, QEMU, creates a KVM "pseudo" device representing the vfio
+group, providing the file descriptor of that group to show ownership.
+The ugly symbol_get code is to avoid hard module dependencies, ie. the
+kvm module should not pull in or require the vfio module, but vfio will
+be present if attempting to register this device.
 
-Thanks for working on this!
+With kvmgt, the interface also became a way to register the kvm pointer
+with vfio for the translation mentioned elsewhere in this thread.
 
-Some high-level comments:
+The PPC/SPAPR support allows KVM to associate a vfio group to an IOMMU
+page table so that it can handle iotlb programming from pre-registered
+memory without trapping out to userspace.
 
-- The layout of the patch looks a bit odd.  E.g., you introduced the new "vcpu"
-  qmp parameter in patch 3, however it's not yet implemented, meanwhile I feel
-  like you squashed mostly all the rest into patch 6.  It's okay to use a
-  single big patch, but IMHO better to not declare that flag in QMP before it's
-  working, so ideally that should be the last patch to do that.
+> Because KVM deduces some policy based on the fact of assigned device, 
+> it needs to hold a reference to related vfio group. this part is irrelevant
+> to this RFC. 
 
-  From that POV: patch 1/2/4 look ok to be separated; perhaps squash patch
-  3/5/6 into one single patch to enable the new method as the last one?
+All of these use cases are related to the IOMMU, whether DMA is
+coherent, translating device IOVA to GPA, and an acceleration path to
+emulate IOMMU programming in kernel... they seem pretty relevant.
 
-- You used "vcpu" across the patchset to show the per-vcpu new method.  Shall
-  we rename it globally to "per_vcpu" or "vcpu_based"?  A raw "vcpu" looks more
-  like a struct pointer not a boolean.
+> But ARM's VMID usage is related to I/O address space thus needs some
+> consideration. Another strange thing is about PPC. Looks it also leverages
+> this protocol to do iommu group attach: kvm_spapr_tce_attach_iommu_
+> group. I don't know why it's done through KVM instead of VFIO uAPI in
+> the first place.
 
-- Using memory_global_dirty_log_start|stop() may not be wise too IMHO, at least
-  we need to make sure it's not during migration, otherwise we could call the
-  stop() before migration ends then that'll be a problem..
+AIUI, IOMMU programming on PPC is done through hypercalls, so KVM needs
+to know how to handle those for in-kernel acceleration.  Thanks,
 
-  Maybe we can start to make global_dirty_log a bitmask? Then we define:
-
-    GLOBAL_DIRTY_MIGRATION
-    GLOBAL_DIRTY_DIRTY_RATE
-
-  All references to global_dirty_log should mostly be untouched because any bit
-  set there should justify that global dirty logging is enabled (either for
-  migration or for dirty rate measurement).
-
-  Migration starting half-way of dirty rate measurement seems okay too even
-  taking things like init-all-set into account, afaict.. as long as dirty rate
-  code never touches the qemu dirty bitmap, but only do the accounting when
-  collecting the pages...
-
-  Feel free to think more about it on any other potential conflict with
-  migration, but in general seems working to me.
-
-- Would you consider picking up my HMP patch and let HMP work from the 1st day?
-
-- Please Cc the author of dirty rate too (Chuan Zheng <zhengchuan@huawei.com>),
-  while I already started to do so in this email.
-
-Thanks,
-
--- 
-Peter Xu
+Alex
 
