@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 44DF73971B4
+	by mail.lfdr.de (Postfix) with ESMTP id 8CCAA3971B6
 	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 12:40:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233698AbhFAKmG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 06:42:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59436 "EHLO mail.kernel.org"
+        id S233586AbhFAKmH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 06:42:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59464 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233626AbhFAKl5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Jun 2021 06:41:57 -0400
+        id S233632AbhFAKl6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Jun 2021 06:41:58 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D40E1613BD;
-        Tue,  1 Jun 2021 10:40:16 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 88DF2613C1;
+        Tue,  1 Jun 2021 10:40:17 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1lo1ol-004nNs-6h; Tue, 01 Jun 2021 11:40:15 +0100
+        id 1lo1ol-004nNs-TW; Tue, 01 Jun 2021 11:40:16 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu
@@ -31,9 +31,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Hector Martin <marcan@marcan.st>,
         Mark Rutland <mark.rutland@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>, kernel-team@android.com
-Subject: [PATCH v4 8/9] KVM: arm64: timer: Add support for SW-based deactivation
-Date:   Tue,  1 Jun 2021 11:40:04 +0100
-Message-Id: <20210601104005.81332-9-maz@kernel.org>
+Subject: [PATCH v4 9/9] irqchip/apple-aic: Advertise some level of vGICv3 compatibility
+Date:   Tue,  1 Jun 2021 11:40:05 +0100
+Message-Id: <20210601104005.81332-10-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210601104005.81332-1-maz@kernel.org>
 References: <20210601104005.81332-1-maz@kernel.org>
@@ -47,172 +47,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In order to deal with the lack of active state, we need to use
-the mask/unmask primitives (after all, the active state is just an
-additional mask on top of the normal one).
+The CPUs in the Apple M1 SoC partially implement a virtual GICv3
+CPU interface, although one that is incapable of HW deactivation
+of interrupts, nor masking the maintenance interrupt.
 
-To avoid adding a bunch of ugly conditionals in the timer and vgic
-code, let's use a timer-specific irqdomain to deal with the state
-conversion. Yes, this is an unexpected use of irqdomains, but
-there is no reason not to be just as creative as the designers
-of the HW...
-
-This involves overloading the vcpu_affinity, set_irqchip_state
-and eoi callbacks so that the rest of the KVM code can continue
-ignoring the oddities of the underlying platform.
+Advertise the support to KVM.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arch_timer.c | 105 ++++++++++++++++++++++++++++++++++--
- 1 file changed, 101 insertions(+), 4 deletions(-)
+ drivers/irqchip/irq-apple-aic.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 3cd170388d88..3df67c127489 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -9,6 +9,7 @@
- #include <linux/kvm_host.h>
- #include <linux/interrupt.h>
- #include <linux/irq.h>
-+#include <linux/irqdomain.h>
- #include <linux/uaccess.h>
- 
- #include <clocksource/arm_arch_timer.h>
-@@ -973,6 +974,77 @@ static int kvm_timer_dying_cpu(unsigned int cpu)
+diff --git a/drivers/irqchip/irq-apple-aic.c b/drivers/irqchip/irq-apple-aic.c
+index c179e27062fd..b8c06bd8659e 100644
+--- a/drivers/irqchip/irq-apple-aic.c
++++ b/drivers/irqchip/irq-apple-aic.c
+@@ -50,6 +50,7 @@
+ #include <linux/cpuhotplug.h>
+ #include <linux/io.h>
+ #include <linux/irqchip.h>
++#include <linux/irqchip/arm-vgic-info.h>
+ #include <linux/irqdomain.h>
+ #include <linux/limits.h>
+ #include <linux/of_address.h>
+@@ -787,6 +788,12 @@ static int aic_init_cpu(unsigned int cpu)
  	return 0;
  }
  
-+static int timer_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu)
-+{
-+	if (vcpu)
-+		irqd_set_forwarded_to_vcpu(d);
-+	else
-+		irqd_clr_forwarded_to_vcpu(d);
-+
-+	return 0;
-+}
-+
-+static int timer_irq_set_irqchip_state(struct irq_data *d,
-+				       enum irqchip_irq_state which, bool val)
-+{
-+	if (which != IRQCHIP_STATE_ACTIVE || !irqd_is_forwarded_to_vcpu(d))
-+		return irq_chip_set_parent_state(d, which, val);
-+
-+	if (val)
-+		irq_chip_mask_parent(d);
-+	else
-+		irq_chip_unmask_parent(d);
-+
-+	return 0;
-+}
-+
-+static void timer_irq_eoi(struct irq_data *d)
-+{
-+	if (!irqd_is_forwarded_to_vcpu(d))
-+		irq_chip_eoi_parent(d);
-+}
-+
-+static void timer_irq_ack(struct irq_data *d)
-+{
-+	d = d->parent_data;
-+	if (d->chip->irq_ack)
-+		d->chip->irq_ack(d);
-+}
-+
-+static struct irq_chip timer_chip = {
-+	.name			= "KVM",
-+	.irq_ack		= timer_irq_ack,
-+	.irq_mask		= irq_chip_mask_parent,
-+	.irq_unmask		= irq_chip_unmask_parent,
-+	.irq_eoi		= timer_irq_eoi,
-+	.irq_set_type		= irq_chip_set_type_parent,
-+	.irq_set_vcpu_affinity	= timer_irq_set_vcpu_affinity,
-+	.irq_set_irqchip_state	= timer_irq_set_irqchip_state,
++static struct gic_kvm_info vgic_info __initdata = {
++	.type			= GIC_V3,
++	.no_maint_irq_mask	= true,
++	.no_hw_deactivation	= true,
 +};
 +
-+static int timer_irq_domain_alloc(struct irq_domain *domain, unsigned int virq,
-+				  unsigned int nr_irqs, void *arg)
-+{
-+	irq_hw_number_t hwirq = (uintptr_t)arg;
-+
-+	return irq_domain_set_hwirq_and_chip(domain, virq, hwirq,
-+					     &timer_chip, NULL);
-+}
-+
-+static void timer_irq_domain_free(struct irq_domain *domain, unsigned int virq,
-+				  unsigned int nr_irqs)
-+{
-+}
-+
-+static const struct irq_domain_ops timer_domain_ops = {
-+	.alloc	= timer_irq_domain_alloc,
-+	.free	= timer_irq_domain_free,
-+};
-+
-+static struct irq_ops arch_timer_irq_ops = {
-+	.get_input_level = kvm_arch_timer_get_input_level,
-+};
-+
- static void kvm_irq_fixup_flags(unsigned int virq, u32 *flags)
+ static int __init aic_of_ic_init(struct device_node *node, struct device_node *parent)
  {
- 	*flags = irq_get_trigger_type(virq);
-@@ -985,6 +1057,8 @@ static void kvm_irq_fixup_flags(unsigned int virq, u32 *flags)
+ 	int i;
+@@ -843,6 +850,8 @@ static int __init aic_of_ic_init(struct device_node *node, struct device_node *p
+ 			  "irqchip/apple-aic/ipi:starting",
+ 			  aic_init_cpu, NULL);
  
- static int kvm_irq_init(struct arch_timer_kvm_info *info)
- {
-+	struct irq_domain *domain = NULL;
++	vgic_set_kvm_info(&vgic_info);
 +
- 	if (info->virtual_irq <= 0) {
- 		kvm_err("kvm_arch_timer: invalid virtual timer IRQ: %d\n",
- 			info->virtual_irq);
-@@ -994,9 +1068,36 @@ static int kvm_irq_init(struct arch_timer_kvm_info *info)
- 	host_vtimer_irq = info->virtual_irq;
- 	kvm_irq_fixup_flags(host_vtimer_irq, &host_vtimer_irq_flags);
+ 	pr_info("Initialized with %d IRQs, %d FIQs, %d vIPIs\n",
+ 		irqc->nr_hw, AIC_NR_FIQ, AIC_NR_SWIPI);
  
-+	if (kvm_vgic_global_state.no_hw_deactivation) {
-+		struct fwnode_handle *fwnode;
-+		struct irq_data *data;
-+
-+		fwnode = irq_domain_alloc_named_fwnode("kvm-timer");
-+		if (!fwnode)
-+			return -ENOMEM;
-+
-+		/* Assume both vtimer and ptimer in the same parent */
-+		data = irq_get_irq_data(host_vtimer_irq);
-+		domain = irq_domain_create_hierarchy(data->domain, 0,
-+						     NR_KVM_TIMERS, fwnode,
-+						     &timer_domain_ops, NULL);
-+		if (!domain) {
-+			irq_domain_free_fwnode(fwnode);
-+			return -ENOMEM;
-+		}
-+
-+		arch_timer_irq_ops.flags |= VGIC_IRQ_SW_RESAMPLE;
-+		WARN_ON(irq_domain_push_irq(domain, host_vtimer_irq,
-+					    (void *)TIMER_VTIMER));
-+	}
-+
- 	if (info->physical_irq > 0) {
- 		host_ptimer_irq = info->physical_irq;
- 		kvm_irq_fixup_flags(host_ptimer_irq, &host_ptimer_irq_flags);
-+
-+		if (domain)
-+			WARN_ON(irq_domain_push_irq(domain, host_ptimer_irq,
-+						    (void *)TIMER_PTIMER));
- 	}
- 
- 	return 0;
-@@ -1125,10 +1226,6 @@ bool kvm_arch_timer_get_input_level(int vintid)
- 	return kvm_timer_should_fire(timer);
- }
- 
--static struct irq_ops arch_timer_irq_ops = {
--	.get_input_level = kvm_arch_timer_get_input_level,
--};
--
- int kvm_timer_enable(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
 -- 
 2.30.2
 
