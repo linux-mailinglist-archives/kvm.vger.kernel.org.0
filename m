@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6468B3978C7
-	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 19:09:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 033053978E6
+	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 19:16:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234622AbhFARK4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 13:10:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34910 "EHLO
+        id S234495AbhFARSB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 13:18:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234388AbhFARKw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Jun 2021 13:10:52 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 649F6C061574
-        for <kvm@vger.kernel.org>; Tue,  1 Jun 2021 10:09:09 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id v13so7215077ple.9
-        for <kvm@vger.kernel.org>; Tue, 01 Jun 2021 10:09:09 -0700 (PDT)
+        with ESMTP id S233657AbhFARR7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Jun 2021 13:17:59 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86D54C06174A
+        for <kvm@vger.kernel.org>; Tue,  1 Jun 2021 10:16:17 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id l10-20020a17090a150ab0290162974722f2so78756pja.2
+        for <kvm@vger.kernel.org>; Tue, 01 Jun 2021 10:16:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=402d1vT6kafYaa9OYO/pPQP5D7goCvQWXQjnoTnBYFQ=;
-        b=nvD1x9UnnGp3hae8WGb9Lu3uwOLha5HnwrxcS+3j/a6aVYtpRG3lQRNKHRXn9MZsRo
-         cNHa5eqm6imtzc1nHTEQSRxeQdANEiUh5XwzWfjTcPfnBmIaFkkVijToJHe4NCFliK26
-         fKer1rpr36RWINI+Df+gLfUl/5a0QT+3O6/XxilFO9yyoVnPfBLtbTIGbobVWZHcHEg4
-         /5DB0DmTugmIZAdvxkisovnHLX0zwBq7lE9Od9xAisuJeqdsIYybWuRmHib6Fz2rJBtC
-         ZBcmcDNbyflRDUhDnexP1Tk+7wL85JusaA39AOX+dygv3qWsAOEYG7SaqDHXN9sEZNof
-         MkKA==
+        bh=03YGTpNwQSOs+dI0DajKWE/HnlTsHUlOJKv/uB8bu8o=;
+        b=lQf4HXK19/hFZG81cGyUp07I8F+flEDEOIxVB1Z/Rt2SEAWS3YszoIHLRAJgmgAUTw
+         Edy2QW9uzPi+mzLbA9XbJwsVRcfjLOMRajCMS1vssNlGY6HyMiUnwxvLpqT2iiGAWkNY
+         CqORDo3gPhJlFccupKxkE2/usq7xSdkR7wYPJtsIjxN8VIgPoGjDk9clMHss+BEafbJw
+         +LNWiFb7hJLe3xFkbB33M/EUXFPgszY8Om3Uf2prmU0HnrOWUwnfO+cEi4c3fC+sizsE
+         kE4wbGfst49nJFzgDNQMbjlKmUogCyjYPViFQ0cJjHZAyqqxR9XosG3Ova7FUWdFywbQ
+         RL2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=402d1vT6kafYaa9OYO/pPQP5D7goCvQWXQjnoTnBYFQ=;
-        b=hUn4Yi5ZS0m0i/58xaOtheMfvhiPc/vqtTaoiG9CWLUQupzR3xx/rEErE9qo69mHlC
-         WdAjkBCvP0qI12kI+/2Z04+vdY6AbEuw8Vpr17n6TnqgmN3ZXY7WDkMiX7hMdbORcQbw
-         xnXvqC0+jCyv6hzn3PWl0OK1dyHL+vqNOglO+i0kxbe8+atuRRoO5vimD/UO3hTPfqPA
-         ZupkxpgpU3howGCsr0lRbA8+lqVZckmlSVbQzZlPlroyIFzkcvcr895LrWV7FHTbwDfk
-         CNxAGUpgULiB1Jy/aUmm5fQDf8vrB2wt74nEMcvECv0cqvq8o5ott8ohucLBa21715p5
-         poZg==
-X-Gm-Message-State: AOAM533fBiN1cSxCX/2XzhXca0NJUT0AKsZgxd7cEcHj/yCJiTXh6Xkx
-        JS7XoFiDhPET4Ak6ItS/P88bHg==
-X-Google-Smtp-Source: ABdhPJzdKyTOillNzs0rsuVx1le6bvyhxJP5iSe1FXNQm6CSoJOIo4hsR6+K15AV3rAQNWrH7caPQg==
-X-Received: by 2002:a17:902:6b42:b029:107:a6d5:fc8a with SMTP id g2-20020a1709026b42b0290107a6d5fc8amr5375144plt.76.1622567348693;
-        Tue, 01 Jun 2021 10:09:08 -0700 (PDT)
+        bh=03YGTpNwQSOs+dI0DajKWE/HnlTsHUlOJKv/uB8bu8o=;
+        b=toF+A6L4UpMq/4EPYaYqLTCcSnJQsen1mXumlmAneZUHF8d8GChfMepjRgYoPrNYec
+         FypxHms4pCytVYHXUwDEFiHjcPio5CgPWQOhJ+5l3bsFlNAJHXjkcrp4+MM5teaIKgLw
+         LqTxubWtSZVMFwMeWGd55uao64uD4L4ZQODV85Zs6pNaPjbvPW9Qt4PdFSOmhwb+D/B1
+         BZzmKWb6aqjcY72TKUGeLwInKmmPOuNB5D+qHnm0ezB71/N1y8qPhLxx1wAxdujAroZu
+         SYtOpGaiWTwoX5eMdzq5i5tbjTWHBU/0/SYAKuZ95i/7FBQ4e0NkdmFLciYqWVylPPOf
+         T+Bw==
+X-Gm-Message-State: AOAM532D6kcN8VcCDJfs4m3IJ8w5tiTYJRZctPeZykVPpMOdYmun6swn
+        hOB3htJ6rrxftTBqnIV4WehqPg==
+X-Google-Smtp-Source: ABdhPJx0tglHxBZ0iTUaqoezKcBQbxi4tmxT77btfq43yF4S/S/GHJomHt8fhQx/ETbZVaqtivdbBg==
+X-Received: by 2002:a17:90a:e7c2:: with SMTP id kb2mr26667597pjb.193.1622567776919;
+        Tue, 01 Jun 2021 10:16:16 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id z12sm14331891pfk.45.2021.06.01.10.09.07
+        by smtp.gmail.com with ESMTPSA id b10sm8787458pfi.122.2021.06.01.10.16.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Jun 2021 10:09:07 -0700 (PDT)
-Date:   Tue, 1 Jun 2021 17:09:04 +0000
+        Tue, 01 Jun 2021 10:16:16 -0700 (PDT)
+Date:   Tue, 1 Jun 2021 17:16:12 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Borislav Petkov <bp@alien8.de>, Pu Wen <puwen@hygon.cn>,
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>, Pu Wen <puwen@hygon.cn>,
         Joerg Roedel <jroedel@suse.de>, x86@kernel.org,
         joro@8bytes.org, dave.hansen@linux.intel.com, peterz@infradead.org,
         tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
@@ -58,7 +58,7 @@ Cc:     Borislav Petkov <bp@alien8.de>, Pu Wen <puwen@hygon.cn>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         stable@vger.kernel.org
 Subject: Re: [PATCH] x86/sev: Check whether SEV or SME is supported first
-Message-ID: <YLZpsPli0ALRISvV@google.com>
+Message-ID: <YLZrXEQ8w5ntu7ov@google.com>
 References: <20210526072424.22453-1-puwen@hygon.cn>
  <YK6E5NnmRpYYDMTA@google.com>
  <905ecd90-54d2-35f1-c8ab-c123d8a3d9a0@hygon.cn>
@@ -67,59 +67,24 @@ References: <20210526072424.22453-1-puwen@hygon.cn>
  <YLZGuTYXDin2K9wx@zn.tnic>
  <YLZc3sFKSjpd2yPS@google.com>
  <dbc4e48f-187a-4b2d-2625-b62d334f60b2@amd.com>
+ <YLZneRWzoujEe+6b@zn.tnic>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <dbc4e48f-187a-4b2d-2625-b62d334f60b2@amd.com>
+In-Reply-To: <YLZneRWzoujEe+6b@zn.tnic>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 01, 2021, Tom Lendacky wrote:
-> 
-> On 6/1/21 11:14 AM, Sean Christopherson wrote:
-> > On Tue, Jun 01, 2021, Borislav Petkov wrote:
-> >> On Mon, May 31, 2021 at 10:56:50PM +0800, Pu Wen wrote:
-> >>> Thanks for your suggestion, I'll try to set up early #GP handler to fix
-> >>> the problem.
-> >>
-> >> Why? AFAICT, you only need to return early in sme_enable() if CPUID is
-> >> not "AuthenticAMD". Just do that please.
-> > 
-> > I don't think that would suffice, presumably MSR_AMD64_SEV doesn't exist on older
-> > AMD CPUs either.  E.g. there's no mention of MSR 0xC001_0131 in the dev's guide
-> > from 2015[*].
-> 
-> That is the reason for checking the maximum supported leaf being at least
-> 0x8000001f. If that leaf is supported, we expect the SEV status MSR to be
-> valid. The problem is that the Hygon ucode does not support the MSR in
-> question. I'm not sure what it would take for that to be added to their
-> ucode and just always return 0.
+On Tue, Jun 01, 2021, Borislav Petkov wrote:
+> Yah, ain't gonna happen. I'm not taking some #GP handler to the early
+> code just because some hardware is operating out of spec.
 
-Ah.  But it's also legal/possible for the max extended leaf to be greater than
-0x8000001f, e.g. 0x80000020, without 0x8000001f itself being supported.  Even
-if AMD can guarantee no such processor will exist, I don't think it would be
-illegal for a hypervisor to emulate a feature (on an "AuthenticAMD" virtual CPU)
-enumerated by a higher leaf on an older physical AMD CPU (or non-AMD CPU!) that
-doesn't support MSR_AMD64_SEV.
+The bug isn't limited to out-of-spec hardware.  At the point of #GP, sme_enable()
+has only verified the max leaf is greater than 0x8000001f, it has not verified
+that 0x8000001f is actually supported.  The APM itself declares several leafs
+between 0x80000000 and 0x8000001f as reserved/unsupported, so we can't argue that
+0x8000001f must be supported if the max leaf is greater than 0x8000001f.
 
-> > I also don't see the point in checking the vendor string.  A malicious hypervisor
-> > can lie about CPUID.0x0 just as easily as it can lie about CPUID.0x8000001f, so
-> > for SEV the options are to either trust the hypervisor or eat #GPs on RDMSR for
-> > non-SEV CPUs.  If we go with "trust the hypervisor", then the original patch of
-> > hoisting the CPUID.0x8000001f check up is simpler than checking the vendor string.
-> 
-> Because a hypervisor can put anything it wants in the CPUID 0x0 /
-> 0x80000000 fields, I don't think we can just check for "AuthenticAMD".
-> 
-> If we want the read of CPUID 0x8000001f done before reading the SEV status
-> MSR, then the original patch is close, but slightly flawed, e.g. only SME
-> can be indicated but then MSR_AMD64_SEV can say SEV active.
-
-I didn't follow this.  Bare metal CPUs should never report only SME in CPUID and
-then report SEV as being active in the MSR.
-
-In the SEV case, relying on CPUID in any way, shape, or form requires trusting
-the hypervisor.  The code could assert that CPUID and the MSR are consistent, but
-I don't see any value in doing so as a much more effective attack would be to
-report neither SME nor SEV as supported.
+The only way to verify that 0x8000001f is supported is to find a non-zero bit,
+which is what Pu Wen's patch does.
