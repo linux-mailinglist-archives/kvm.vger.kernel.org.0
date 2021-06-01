@@ -2,92 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D8C6396D6A
-	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 08:34:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 561FE396DAC
+	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 09:02:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233072AbhFAGgQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 02:36:16 -0400
-Received: from mga07.intel.com ([134.134.136.100]:35631 "EHLO mga07.intel.com"
+        id S232963AbhFAHEb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 03:04:31 -0400
+Received: from mga04.intel.com ([192.55.52.120]:1489 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233084AbhFAGgO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Jun 2021 02:36:14 -0400
-IronPort-SDR: 91KIK59/M1LRNK/3tZxQkllBvGKG+PaJ5t7AuWod82FOfOY4ccyzpbGu4bk4NR3GFKLtBa/4/P
- eiWA1gw/EfWQ==
-X-IronPort-AV: E=McAfee;i="6200,9189,10001"; a="267361150"
+        id S229984AbhFAHE1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Jun 2021 03:04:27 -0400
+IronPort-SDR: PEjl+a1Rpb3pIvl/KhZUXb2ZYGQv6a+yga3028SpI6SpW3CLsYJdFRf85pENLQld3paUwlV4vQ
+ Pdkn+Aby5/Eg==
+X-IronPort-AV: E=McAfee;i="6200,9189,10001"; a="201619813"
 X-IronPort-AV: E=Sophos;i="5.83,239,1616482800"; 
-   d="scan'208";a="267361150"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2021 23:34:33 -0700
-IronPort-SDR: N8QGlVauSPU46wudV08MV7CUmBMQI7zFzfF3ys80T0NGH7FiTphBHDT5eibx4HUpOrXpDYDp1T
- DrTWY73BiJZA==
+   d="scan'208";a="201619813"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2021 00:02:46 -0700
+IronPort-SDR: TpFA7Zl5EkJiXcEFW4CauoXkkmIg9YJIxIY7Ag3HkZSl+2CC8HaLc7yf/9kUs1UOwWoQQYt46a
+ vaaQN2RXDWrQ==
 X-IronPort-AV: E=Sophos;i="5.83,239,1616482800"; 
-   d="scan'208";a="446839328"
+   d="scan'208";a="445224681"
 Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.192.107])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2021 23:34:30 -0700
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2021 00:02:44 -0700
 From:   Zhu Lingshan <lingshan.zhu@intel.com>
 To:     jasowang@redhat.com, mst@redhat.com
 Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         kvm@vger.kernel.org, Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH V3 2/2] vDPA/ifcvf: implement doorbell mapping for ifcvf
-Date:   Tue,  1 Jun 2021 14:28:50 +0800
-Message-Id: <20210601062850.4547-3-lingshan.zhu@intel.com>
+Subject: [PATCH V2 0/2] virtio: update virtio id table
+Date:   Tue,  1 Jun 2021 14:57:08 +0800
+Message-Id: <20210601065710.224300-1-lingshan.zhu@intel.com>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210601062850.4547-1-lingshan.zhu@intel.com>
-References: <20210601062850.4547-1-lingshan.zhu@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit implements doorbell mapping feature for ifcvf.
-This feature maps the notify page to userspace, to eliminate
-vmexit when kick a vq.
+This series adds transitional device ids in virtio pci
+header. Then reuses the ids in ifcvf driver
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
----
- drivers/vdpa/ifcvf/ifcvf_main.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+Zhu Lingshan (2):
+  virtio-pci: add transitional device ids in virtio pci header
+  vDPA/ifcvf: reuse pre-defined macros for device ids and vendor ids
 
-diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-index ab0ab5cf0f6e..d41db042612c 100644
---- a/drivers/vdpa/ifcvf/ifcvf_main.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-@@ -413,6 +413,26 @@ static int ifcvf_vdpa_get_vq_irq(struct vdpa_device *vdpa_dev,
- 	return vf->vring[qid].irq;
- }
- 
-+static struct vdpa_notification_area ifcvf_get_vq_notification(struct vdpa_device *vdpa_dev,
-+							       u16 idx)
-+{
-+	struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
-+	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
-+	struct pci_dev *pdev = adapter->pdev;
-+	struct vdpa_notification_area area;
-+
-+	area.addr = vf->vring[idx].notify_pa;
-+	if (!vf->notify_off_multiplier)
-+		area.size = PAGE_SIZE;
-+	else
-+		area.size = vf->notify_off_multiplier;
-+
-+	if (area.addr % PAGE_SIZE)
-+		IFCVF_DBG(pdev, "vq %u doorbell address is not PAGE_SIZE aligned\n", idx);
-+
-+	return area;
-+}
-+
- /*
-  * IFCVF currently does't have on-chip IOMMU, so not
-  * implemented set_map()/dma_map()/dma_unmap()
-@@ -440,6 +460,7 @@ static const struct vdpa_config_ops ifc_vdpa_ops = {
- 	.get_config	= ifcvf_vdpa_get_config,
- 	.set_config	= ifcvf_vdpa_set_config,
- 	.set_config_cb  = ifcvf_vdpa_set_config_cb,
-+	.get_vq_notification = ifcvf_get_vq_notification,
- };
- 
- static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ drivers/vdpa/ifcvf/ifcvf_base.h | 12 ------------
+ drivers/vdpa/ifcvf/ifcvf_main.c | 23 +++++++++++++----------
+ include/uapi/linux/virtio_pci.h | 12 ++++++++++++
+ 3 files changed, 25 insertions(+), 22 deletions(-)
+
 -- 
 2.27.0
 
