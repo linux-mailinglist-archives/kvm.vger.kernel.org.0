@@ -2,142 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B901F3973E3
-	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 15:11:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53AE4397402
+	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 15:22:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233994AbhFANMk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 09:12:40 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3367 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233768AbhFANMj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Jun 2021 09:12:39 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4FvXW34ZMTz67Pr;
-        Tue,  1 Jun 2021 21:07:11 +0800 (CST)
-Received: from dggpemm500022.china.huawei.com (7.185.36.162) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Tue, 1 Jun 2021 21:10:55 +0800
-Received: from [10.174.185.220] (10.174.185.220) by
- dggpemm500022.china.huawei.com (7.185.36.162) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Tue, 1 Jun 2021 21:10:54 +0800
-Subject: Re: [RFC] /dev/ioasid uAPI proposal
-To:     Lu Baolu <baolu.lu@linux.intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Jason Gunthorpe" <jgg@nvidia.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Alex Williamson (alex.williamson@redhat.com)" 
-        <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>
-CC:     Eric Auger <eric.auger@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>
-References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
- <c9c066ae-2a25-0799-51a7-0ca47fff41a1@huawei.com>
- <aa1624bf-e472-2b66-1d20-54ca23c19fd2@linux.intel.com>
- <ed4f6e57-4847-3ed2-75de-cea80b2fbdb8@huawei.com>
- <01fe5034-42c8-6923-32f1-e287cc36bccc@linux.intel.com>
-From:   Shenming Lu <lushenming@huawei.com>
-Message-ID: <b343c294-e097-0c94-e480-4dde80c308d1@huawei.com>
-Date:   Tue, 1 Jun 2021 21:10:42 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
+        id S233823AbhFANXn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 09:23:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26552 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233758AbhFANXn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 1 Jun 2021 09:23:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622553721;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ThmhXV5C1Mdx87JvqBPyBVcdeP2i7QEeRJhDPg8Jb0Y=;
+        b=UJR7GtPI22bYDieQRkOQP5b0jdBIHRfEETEjU13DSu/xMYUEs3VpmCk5gIDvLx+/5ie24E
+        ioIaXtfrPOe0bBncJZbCT/dRvSFmmQ/HnR7Jp/bmJ83oUxjtfNTRxitBhuW1PiP0CwxQXW
+        T4m4fG7Cty/tI9RLrV6yMI0GWZH+2xE=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-465-BcLfYdDjOVSfYufOFlYFJw-1; Tue, 01 Jun 2021 09:22:00 -0400
+X-MC-Unique: BcLfYdDjOVSfYufOFlYFJw-1
+Received: by mail-ed1-f69.google.com with SMTP id q7-20020aa7cc070000b029038f59dab1c5so7849240edt.23
+        for <kvm@vger.kernel.org>; Tue, 01 Jun 2021 06:22:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=ThmhXV5C1Mdx87JvqBPyBVcdeP2i7QEeRJhDPg8Jb0Y=;
+        b=qNdWc6XeDBsTduTCt5jvNu6qOhwHPruNrJprU28qfO+FzZIDZdy2mTd7YS45voBACM
+         z8lB1jVPsiA3DiHYvN4iXHMQ+YWAqybh2XkpCLudEiD36//u0TMMGkyWzxhdxGsZAEVU
+         VkAbhZ08mp4YrCzWwyJV/frG9Dwp+O5xIiAKcDkgOi3fgC8YNIBxDBCWoG7iRyd9nQW2
+         8QCQXVOeNBqhf0NKyS2rqWx0ejsXvjDLc1vMqXoKohvQZSmae7i79QhUB+aYBKQDUp1X
+         kqGtEiYJ7DBjnQLq3fr3rrssELEbJbl/yqkeC/aEALSQuxaUI44KU6AA53kEmzjgIU+Z
+         Sw/g==
+X-Gm-Message-State: AOAM530lI4IOTwNJCUNcJ8uX95U4rQ0Bo9awizgunBug2d8cTOzfos6D
+        ayExQJhvWa5KpiilgeXTZmynYmVdRJbeYkypVXJIN8a+X1zP/5A9DtbuAjSD1l6OUK4GLL4Ijml
+        JaaFfiTiJyZ8z
+X-Received: by 2002:a50:fd13:: with SMTP id i19mr7558988eds.280.1622553719256;
+        Tue, 01 Jun 2021 06:21:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwib9IzYrXbEw79+Z8nE2OguJl12IzGR+VIrSFD6C5CbyzCFWlk9D3q1IvxJWKKa0r/vLCqGw==
+X-Received: by 2002:a50:fd13:: with SMTP id i19mr7558970eds.280.1622553719129;
+        Tue, 01 Jun 2021 06:21:59 -0700 (PDT)
+Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+        by smtp.gmail.com with ESMTPSA id nc26sm1596965ejc.106.2021.06.01.06.21.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Jun 2021 06:21:58 -0700 (PDT)
+Date:   Tue, 1 Jun 2021 15:21:56 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc:     kvm@vger.kernel.org, maz@kernel.org, shashi.mallela@linaro.org,
+        qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [kvm-unit-tests PATCH v2 4/4] arm64: split
+ its-migrate-unmapped-collection into KVM and TCG variants
+Message-ID: <20210601132156.qtgcfkvlr7i7rf2d@gator.home>
+References: <20210525172628.2088-1-alex.bennee@linaro.org>
+ <20210525172628.2088-5-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <01fe5034-42c8-6923-32f1-e287cc36bccc@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.185.220]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500022.china.huawei.com (7.185.36.162)
-X-CFilter-Loop: Reflected
+In-Reply-To: <20210525172628.2088-5-alex.bennee@linaro.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/6/1 20:30, Lu Baolu wrote:
-> On 2021/6/1 15:15, Shenming Lu wrote:
->> On 2021/6/1 13:10, Lu Baolu wrote:
->>> Hi Shenming,
->>>
->>> On 6/1/21 12:31 PM, Shenming Lu wrote:
->>>> On 2021/5/27 15:58, Tian, Kevin wrote:
->>>>> /dev/ioasid provides an unified interface for managing I/O page tables for
->>>>> devices assigned to userspace. Device passthrough frameworks (VFIO, vDPA,
->>>>> etc.) are expected to use this interface instead of creating their own logic to
->>>>> isolate untrusted device DMAs initiated by userspace.
->>>>>
->>>>> This proposal describes the uAPI of /dev/ioasid and also sample sequences
->>>>> with VFIO as example in typical usages. The driver-facing kernel API provided
->>>>> by the iommu layer is still TBD, which can be discussed after consensus is
->>>>> made on this uAPI.
->>>>>
->>>>> It's based on a lengthy discussion starting from here:
->>>>>      https://lore.kernel.org/linux-iommu/20210330132830.GO2356281@nvidia.com/
->>>>>
->>>>> It ends up to be a long writing due to many things to be summarized and
->>>>> non-trivial effort required to connect them into a complete proposal.
->>>>> Hope it provides a clean base to converge.
->>>>>
->>>> [..]
->>>>
->>>>> /*
->>>>>     * Page fault report and response
->>>>>     *
->>>>>     * This is TBD. Can be added after other parts are cleared up. Likely it
->>>>>     * will be a ring buffer shared between user/kernel, an eventfd to notify
->>>>>     * the user and an ioctl to complete the fault.
->>>>>     *
->>>>>     * The fault data is per I/O address space, i.e.: IOASID + faulting_addr
->>>>>     */
->>>> Hi,
->>>>
->>>> It seems that the ioasid has different usage in different situation, it could
->>>> be directly used in the physical routing, or just a virtual handle that indicates
->>>> a page table or a vPASID table (such as the GPA address space, in the simple
->>>> passthrough case, the DMA input to IOMMU will just contain a Stream ID, no
->>>> Substream ID), right?
->>>>
->>>> And Baolu suggested that since one device might consume multiple page tables,
->>>> it's more reasonable to have one fault handler per page table. By this, do we
->>>> have to maintain such an ioasid info list in the IOMMU layer?
->>> As discussed earlier, the I/O page fault and cache invalidation paths
->>> will have "device labels" so that the information could be easily
->>> translated and routed.
->>>
->>> So it's likely the per-device fault handler registering API in iommu
->>> core can be kept, but /dev/ioasid will be grown with a layer to
->>> translate and propagate I/O page fault information to the right
->>> consumers.
->> Yeah, having a general preprocessing of the faults in IOASID seems to be
->> a doable direction. But since there may be more than one consumer at the
->> same time, who is responsible for registering the per-device fault handler?
+On Tue, May 25, 2021 at 06:26:28PM +0100, Alex Benn�e wrote:
+> When running the test in TCG we are basically running on bare metal so
+> don't rely on having a particular kernel errata applied.
 > 
-> The drivers register per page table fault handlers to /dev/ioasid which
-> will then register itself to iommu core to listen and route the per-
-> device I/O page faults. This is just a top level thought. Haven't gone
-> through the details yet. Need to wait and see what /dev/ioasid finally
-> looks like.
+> You might wonder why we handle this with a totally new test name
+> instead of adjusting the append to take an extra parameter? Well the
+> run_migration shell script uses eval "$@" which unwraps the -append
+> leading to any second parameter being split and leaving QEMU very
+> confused and the test hanging. This seemed simpler than re-writing all
+> the test running logic in something sane ;-)
 
-OK. And it needs to be confirmed by Jean since we might migrate the code from
-io-pgfault.c to IOASID... Anyway, finalize /dev/ioasid first.  Thanks,
+Yes, bash is a pain for this. I may try to get migration with more than
+one parameter to work at some point though. But, for generally determining
+if a unit test is running with tcg or with kvm, we have the QEMU_ACCEL
+environment variable. So you could just do getenv("QEMU_ACCEL") in the
+unit test. However, I wouldn't use it for this case, since the purpose is
+just to force errata to be ignored. We have the "ERRATA_FORCE" environment
+variable for that already. You can set it yourself, e.g.
 
-Shenming
+ $ ERRATA_FORCE=y tests/its-migration
 
-> 
-> Best regards,
-> baolu
-> .
+or, if you plan to run all tests, then with
+
+ $ ./run_tests.sh -a
+
+but that also runs nodefault tests. Maybe we should teach run_tests.sh
+to always set ERRATA_FORCE=y when running with TCG?
+
+Thanks,
+drew
+
