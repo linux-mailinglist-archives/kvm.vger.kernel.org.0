@@ -2,167 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E0D0396F51
-	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 10:47:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0464396F62
+	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 10:48:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233374AbhFAItJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 04:49:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27638 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233322AbhFAItI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 1 Jun 2021 04:49:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622537247;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PYTowN5h1GdgeSz4pVIaEJ+JP4FgfgDASAC8d+STYRY=;
-        b=dFpAPDvpcuzrxyjTwWDQFRqNi1rCszT5WsS4YuaEmIqi3c7gEhDIU4OmowfsJk5bgfV4Tw
-        5duBKfxUlLbSP2H8yr7+Oy3DCnfkxqHLAZCBxVI2Z3BgP5SZsai3eQny2CXv/vD4u+12UW
-        f+IEBFHvBjOX8vzK2NOSQHxu30Inhkg=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-grIJ0tIhM4qjpU0fvqeFCg-1; Tue, 01 Jun 2021 04:47:26 -0400
-X-MC-Unique: grIJ0tIhM4qjpU0fvqeFCg-1
-Received: by mail-pj1-f72.google.com with SMTP id t10-20020a17090a5d8ab029015f9a066bc3so1560530pji.2
-        for <kvm@vger.kernel.org>; Tue, 01 Jun 2021 01:47:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=PYTowN5h1GdgeSz4pVIaEJ+JP4FgfgDASAC8d+STYRY=;
-        b=E+SZuP5fXU3Adme3JQrBmtU0qp29FH1iOuAcXU1e2NOmLLgTlTgSG/gKB7itvlXRSu
-         os+YZ+FTRJy08wWQ+CQm1Or6tDIEzy1BSXtAweqmYgxz+01hYLAsmnt1nnIfoNk3AlTy
-         dcpUwe91hYHjMoKXwBSrLKANeHchKU5maguI8F3BLwmdiCfVtSIAYR1095Epx5XDJzEk
-         F6rR1DXnWWqtC/OCiInYI+NDcpcsWyZxt6m0f/NoRJzuTjqdH4rH0E/MLX+nMXCLtoi2
-         9Pdkch1n8+Czkb9ycrb8D9oIAUbUhCjihOhs3ngoJKTK9DmNM1hb5DUHD9F8rTJWxl4o
-         vlcQ==
-X-Gm-Message-State: AOAM533rN6BasFYu6IDeXv+GgV8MMH3yqJXK0iEzu73nN4w2LEX0WdEY
-        aJCRKz66h5+gECcmutRsWZiuCtIAptPP7JMsPY2dqCWDZMDrgDnp5LvYICgoYkFSPvTKi74R/G2
-        zVyIQMMfVOS8F
-X-Received: by 2002:a17:90a:28a6:: with SMTP id f35mr3817352pjd.1.1622537244923;
-        Tue, 01 Jun 2021 01:47:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzscRLjTOrJzV1p867VwF0SvDWPDq+DR2OEkGDg2XAVKt86UYa+sx9GG+cra3Z9boNIhyiUZg==
-X-Received: by 2002:a17:90a:28a6:: with SMTP id f35mr3817332pjd.1.1622537244626;
-        Tue, 01 Jun 2021 01:47:24 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id f5sm1553146pjp.37.2021.06.01.01.47.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Jun 2021 01:47:24 -0700 (PDT)
-Subject: Re: [RFC] /dev/ioasid uAPI proposal
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Liu Yi L <yi.l.liu@linux.intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "Alex Williamson (alex.williamson@redhat.com)\"\"" 
-        <alex.williamson@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>,
-        David Woodhouse <dwmw2@infradead.org>
-References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
- <f510f916-e91c-236d-e938-513a5992d3b5@redhat.com>
- <20210531164118.265789ee@yiliu-dev>
- <78ee2638-1a03-fcc8-50a5-81040f677e69@redhat.com>
- <20210601113152.6d09e47b@yiliu-dev>
- <164ee532-17b0-e180-81d3-12d49b82ac9f@redhat.com>
- <64898584-a482-e6ac-fd71-23549368c508@linux.intel.com>
- <429d9c2f-3597-eb29-7764-fad3ec9a934f@redhat.com>
- <MWHPR11MB1886FC7A46837588254794048C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <05d7f790-870d-5551-1ced-86926a0aa1a6@redhat.com>
- <MWHPR11MB1886269E2B3DE471F1A9A7618C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <42a71462-1abc-0404-156c-60a7ee1ad333@redhat.com>
-Date:   Tue, 1 Jun 2021 16:47:15 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.2
+        id S233764AbhFAItn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 04:49:43 -0400
+Received: from mga07.intel.com ([134.134.136.100]:45129 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233561AbhFAItj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Jun 2021 04:49:39 -0400
+IronPort-SDR: Plp4X3BqkkHDZUK4TEh+CqRwdaNSfBBddRHiLmlciDvkqPC4q21YqEPHQNeEJdUSL9gdq+Pnzf
+ rzNavRevziTQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,10001"; a="267381282"
+X-IronPort-AV: E=Sophos;i="5.83,239,1616482800"; 
+   d="scan'208";a="267381282"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2021 01:47:58 -0700
+IronPort-SDR: lrZRXcbg4/b7RscuTnXd4PtKeNIMa/vn4TqWFjEcs+W1ppUsVkOdTTO5jp6Gm1QXTaTQ19NsHV
+ hZd15I7lgNqA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.83,239,1616482800"; 
+   d="scan'208";a="437967726"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by orsmga007.jf.intel.com with ESMTP; 01 Jun 2021 01:47:54 -0700
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        chang.seok.bae@intel.com, robert.hu@intel.com,
+        robert.hu@linux.intel.com
+Subject: [PATCH 00/15] KVM: Support Intel Key Locker
+Date:   Tue,  1 Jun 2021 16:47:39 +0800
+Message-Id: <1622537274-146420-1-git-send-email-robert.hu@linux.intel.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-In-Reply-To: <MWHPR11MB1886269E2B3DE471F1A9A7618C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=y
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This patch set is to support KVM virtualization of Key Locker feature
+[1][2].
 
-在 2021/6/1 下午2:16, Tian, Kevin 写道:
->> From: Jason Wang
->> Sent: Tuesday, June 1, 2021 2:07 PM
->>
->> 在 2021/6/1 下午1:42, Tian, Kevin 写道:
->>>> From: Jason Wang
->>>> Sent: Tuesday, June 1, 2021 1:30 PM
->>>>
->>>> 在 2021/6/1 下午1:23, Lu Baolu 写道:
->>>>> Hi Jason W,
->>>>>
->>>>> On 6/1/21 1:08 PM, Jason Wang wrote:
->>>>>>>> 2) If yes, what's the reason for not simply use the fd opened from
->>>>>>>> /dev/ioas. (This is the question that is not answered) and what
->>>>>>>> happens
->>>>>>>> if we call GET_INFO for the ioasid_fd?
->>>>>>>> 3) If not, how GET_INFO work?
->>>>>>> oh, missed this question in prior reply. Personally, no special reason
->>>>>>> yet. But using ID may give us opportunity to customize the
->> management
->>>>>>> of the handle. For one, better lookup efficiency by using xarray to
->>>>>>> store the allocated IDs. For two, could categorize the allocated IDs
->>>>>>> (parent or nested). GET_INFO just works with an input FD and an ID.
->>>>>> I'm not sure I get this, for nesting cases you can still make the
->>>>>> child an fd.
->>>>>>
->>>>>> And a question still, under what case we need to create multiple
->>>>>> ioasids on a single ioasid fd?
->>>>> One possible situation where multiple IOASIDs per FD could be used is
->>>>> that devices with different underlying IOMMU capabilities are sharing a
->>>>> single FD. In this case, only devices with consistent underlying IOMMU
->>>>> capabilities could be put in an IOASID and multiple IOASIDs per FD could
->>>>> be applied.
->>>>>
->>>>> Though, I still not sure about "multiple IOASID per-FD" vs "multiple
->>>>> IOASID FDs" for such case.
->>>> Right, that's exactly my question. The latter seems much more easier to
->>>> be understood and implemented.
->>>>
->>> A simple reason discussed in previous thread - there could be 1M's
->>> I/O address spaces per device while #FD's are precious resource.
->>
->> Is the concern for ulimit or performance? Note that we had
->>
->> #define NR_OPEN_MAX ~0U
->>
->> And with the fd semantic, you can do a lot of other stuffs: close on
->> exec, passing via SCM_RIGHTS.
-> yes, fd has its merits.
->
->> For the case of 1M, I would like to know what's the use case for a
->> single process to handle 1M+ address spaces?
-> This single process is Qemu with an assigned device. Within the guest
-> there could be many guest processes. Though in reality I didn't see
-> such 1M processes on a single device, better not restrict it in uAPI?
+Key Locker provides a mechanism to encrypt and decrypt data without
+directly providing AES key but a "handle" instead.
+Handles are essentially an encrypted form of those underlying real AES
+keys. "IWKey (Internal Wrapping Key)", loaded inside CPU, inaccessible from
+outside, is the key used to seal real AES Keys into handles.
+Thus, a real AES Key exists in memory for only a short period of time, when
+user is requesting a 'handle' from it. After that, the real AES Key can be
+erased, user then uses handle, with new Key Locker instructions, to perform
+AES encryption/decryption. By OS policy, usually, handles will be revoked
+after reboot, then any handles that may have been stolen should no longer
+be useful to the attacker after the reboot.
+
+IWKey, is the core of this framework. It is loaded into CPU by LOADIWKEY
+instruction, then inaccessible from CPU-outside anymore. LOADIWKEY is the
+only Key Locker instruction that will cause VM-exit (if we set so in VM
+Execution Control). When load IWKey into CPU, we can ask CPU further
+randomize it, if HW supports this.
+The IWKey can also be distributed among CPUs, rather than LOADIWKEY on each
+CPU, by: first backup IWKey to platform specific storage, then copy it on
+target CPU. The backup process is triggered by writing to MSR
+IA32_COPY_LOCAL_TO_PLATFORM. The restore process is triggered by writing to
+MSR IA32_COPY_PLATFORM_LOCAL.
+
+Virtualization Design
+Key Locker Spec [2] indicates virtualization limitations by current HW
+implementation.
+1) IWKey cannot be read from CPU after it's loaded (this is the nature of
+this feature) and only 1 copy of IWKey inside 1 CPU.
+2) Initial implementations may take a significant amount of time to perform
+a copy of IWKeyBackup to IWKey (via a write to MSR
+IA32_COPY_PLATFORM_LOCAL) so it may cause a significant performance impact
+to reload IWKey after each VM exit.
+
+Due to above reasons, virtualization design makes below decisions
+1) don't expose HW randomize IWKey capability (CPUID.0x19.ECX[1]) to
+guest. As such, guest IWKey cannot be preserved by VMM across vCPU switch.
+(VMM cannot know what IWKey is set in physical CPU if HW randomized.)
+2) guests and host can only use Key Locker feature exclusively. [4] 
+
+The virtualization implementation is generally straight forward
+1) On VM-Exit of guest 'LOADIWKEY', VMM stores the IWKey of that vCPU, and
+set in physical CPU on behalf.
+2) On each vCPU load/put, VMM is responsible to set IWKEY to pCPU or clear
+it.
+3) On guest backup local to platform operation, VMM traps the write
+   to MSR, and simulate the IWKey store process by store it in a KVM
+   scope area (kvm_arch), mark the success status in the shadow
+   msr_ia32_iwkey_backup_status and msr_ia32_copy_status.
+4) On guest copy from platform to local operation, VMM traps the write
+   to MSR and simulate the process by load kvm_arch.iwkey_backup to
+   vCPU.iwkey; and simulate the success status in the
+   shadow msr_ia32_copy_status.
+5) Guest read the 2 status MSRs will also be trapped and return the shadow
+   value.
+6) Other Key Locker instructions can run without VM-Exit in non-root mode.
+
+To the end, we don't suggest this feature to be migratable, as if so, IWKey
+would have to be exposed to user space, which would further weaken this
+feature's security significance.
+
+P.S. this patch set is based on Chang's Kernel Key Locker upstream-v2
+https://lore.kernel.org/lkml/20210514201508.27967-1-chang.seok.bae@intel.com/
+
+Patch 1 ~ 3, x86 code, which lay the foundation of following KVM patches.
+Have been reviewed by Tony Luck.
+Patch 4 ~ 9, KVM enabling of Key Locker.
+Patch 10 ~ 15, nested VMX support for Key Locker.
+
+[1] Intel Architecture Instruction Set Extensions Programming Reference:
+https://software.intel.com/content/www/us/en/develop/download/intel-architecture-instruction-set-extensions-programming-reference.html
+
+[2] Intel Key Locker Specification:
+https://software.intel.com/content/www/us/en/develop/download/intel-key-locker-specification.html 
+
+[3] Kernel enablement patch:
+https://lore.kernel.org/lkml/20201216174146.10446-1-chang.seok.bae@intel.com/
+
+[4] It's possible to use Key Locker by both the guest and host, albeit with
+reduced security benefits. I.e., store host IWKey in VMM scoped place
+(memory/register), VMM switches host-IWKey and guest-IWKey between
+VM-{Exit/Entry} by LOADIWKEY instruction.
+But in this case, an adversary that can observe arbitrary VMM memory may be
+able to steal both the handles and IWKey. And this case also require the
+VMM to be running before the first IWKey load.
+
+---
+Change log since last RFC patch set:
+* Don't loadiwkey every VM-Exit/Entry. (Sean Christopherson)
+* Don't enable Tertiary VM-Exec Control if using eVMCS, as its support in
+enlightened VMCS isn't ready yet. (Vitaly Kuznetsov)
+* Extended BUILD_CONTROLS_SHADOW to support 64-bit variation. (Sean
+Christopherson)
+* Refactored patch set and other changes.
 
 
-Sorry I don't get here.
+Hu, Robert (2):
+  kvm/vmx: Detect Tertiary VM-Execution control when setup VMCS config
+  kvm/vmx: dump_vmcs() reports tertiary_exec_control field as well
 
-We can open up to ~0U file descriptors, I don't see why we need to 
-restrict it in uAPI.
+Robert Hoo (13):
+  x86/keylocker: Move KEYSRC_{SW,HW}RAND to keylocker.h
+  x86/cpufeatures: Define Key Locker sub feature flags
+  x86/feat_ctl: Add new VMX feature, Tertiary VM-Execution control and  
+      LOADIWKEY Exiting
+  kvm/vmx: Extend BUILD_CONTROLS_SHADOW macro to support 64-bit
+    variation
+  kvm/vmx: Set Tertiary VM-Execution control field When init vCPU's VMCS
+  kvm/vmx: Add KVM support on guest Key Locker operations
+  kvm/cpuid: Enumerate Key Locker feature in KVM
+  kvm/vmx/nested: Support new IA32_VMX_PROCBASED_CTLS3 vmx capability
+    MSR
+  kvm/vmx: Implement vmx_compute_tertiary_exec_control()
+  kvm/vmx/vmcs12: Add Tertiary VM-Exec control field in vmcs12
+  kvm/vmx/nested: Support Tertiary VM-Exec control in vmcs02
+  kvm/vmx/nested: Support CR4.KL in nested
+  kvm/vmx/nested: Enable nested LOADIWKEY VM-exit
 
-Thanks
+ arch/x86/include/asm/cpufeatures.h |   5 +
+ arch/x86/include/asm/keylocker.h   |   3 +
+ arch/x86/include/asm/kvm_host.h    |  24 ++-
+ arch/x86/include/asm/msr-index.h   |   1 +
+ arch/x86/include/asm/vmx.h         |   9 ++
+ arch/x86/include/asm/vmxfeatures.h |   6 +-
+ arch/x86/include/uapi/asm/vmx.h    |   2 +
+ arch/x86/kernel/cpu/feat_ctl.c     |   9 ++
+ arch/x86/kernel/cpu/scattered.c    |   5 +
+ arch/x86/kernel/keylocker.c        |   2 -
+ arch/x86/kvm/cpuid.c               |  26 +++-
+ arch/x86/kvm/reverse_cpuid.h       |  32 +++-
+ arch/x86/kvm/vmx/capabilities.h    |   9 ++
+ arch/x86/kvm/vmx/evmcs.c           |   2 +
+ arch/x86/kvm/vmx/evmcs.h           |   1 +
+ arch/x86/kvm/vmx/nested.c          |  38 ++++-
+ arch/x86/kvm/vmx/nested.h          |   7 +
+ arch/x86/kvm/vmx/vmcs.h            |   1 +
+ arch/x86/kvm/vmx/vmcs12.c          |   1 +
+ arch/x86/kvm/vmx/vmcs12.h          |   4 +-
+ arch/x86/kvm/vmx/vmx.c             | 290 ++++++++++++++++++++++++++++++++++++-
+ arch/x86/kvm/vmx/vmx.h             |  24 +--
+ arch/x86/kvm/x86.c                 |   2 +
+ arch/x86/kvm/x86.h                 |   2 +
+ 24 files changed, 475 insertions(+), 30 deletions(-)
 
-
->
->>
->>> So this RFC treats fd as a container of address spaces which is each
->>> tagged by an IOASID.
->>
->> If the container and address space is 1:1 then the container seems useless.
->>
-> yes, 1:1 then container is useless. But here it's assumed 1:M then
-> even a single fd is sufficient for all intended usages.
->
-> Thanks
-> Kevin
+-- 
+1.8.3.1
 
