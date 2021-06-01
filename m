@@ -2,124 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8285B396CAD
-	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 07:10:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80744396CAE
+	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 07:11:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232876AbhFAFM2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 01:12:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40769 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232860AbhFAFM1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 1 Jun 2021 01:12:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622524246;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/e5q/5xjzsRkEDNz5ZxlpC3JGa3sYqjV3MHMYvl155U=;
-        b=OBvvL/xTlpHYaIWmzsMJBL06o1arpDz7xfI78lBvl16XOvyZZM7CMs8FEu0BcmtznmrzWQ
-        kjORc/++qUKVTpmq8a566J9Tzn06Bd/sFneL7U40vKjJN2dgaED7i0vLQYOEQ4NA0GqxcN
-        5aGsy5hyVPYpRTBC3jgSVO1y9i2esnI=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-455-XuCOmm_NOPOHuRXkNipL3A-1; Tue, 01 Jun 2021 01:10:42 -0400
-X-MC-Unique: XuCOmm_NOPOHuRXkNipL3A-1
-Received: by mail-pf1-f200.google.com with SMTP id p18-20020a62ab120000b02902e923e4779bso6750499pff.1
-        for <kvm@vger.kernel.org>; Mon, 31 May 2021 22:10:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=/e5q/5xjzsRkEDNz5ZxlpC3JGa3sYqjV3MHMYvl155U=;
-        b=swFf0l1RM+jUFrMnMeRprKH5KDNxKWrYBeVpkadLTcisE3KA2+lPFcPUBbxwzNGNVn
-         FyYYBWD1fu7e8vb+iW69GXV5FsyBb0PDf5cuR1x1vD3+5pQufQPfqqgZE9rOM6hjl9OU
-         wtq0pODLWt1g6MiDL2kRR0zB2iNoHgmjcwVajEavZMfP+AA2oZ7y0j+4nfOM8ByJXsFv
-         xI5bU3AITttZtg9/Lg85jit+VGZXX7lZZeT8ta+K4VS2XwMP/L2bG+cKNkVl+9ID3QjI
-         21Qj0xtKVsB/vbjdFxDPQ0UD7ZF3VHdW1OUEMhhoyLdes2mVZpp9G8LLZOKMAncK0Iab
-         a0nA==
-X-Gm-Message-State: AOAM532lZqsGsAwD+r8UrffwqtD4celJR9MGXEiUTJwecHZ9Z8jBMQOd
-        B4jKpOerO2h+gMSbM6yVjypmlG7qilCLHV/YiSvoDn8uzBXSKW+USK1JNVeVbRvsrPbjNtXWnI8
-        Njp9qjAvUH33Y
-X-Received: by 2002:a62:e705:0:b029:2e0:3497:32d3 with SMTP id s5-20020a62e7050000b02902e0349732d3mr20356160pfh.8.1622524241676;
-        Mon, 31 May 2021 22:10:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJytHxyR4BWmCRVtKpv5IYBYhq4d+/sKgZ9pMx4Js9IFNC7XvBhu73uGhDC20WcBEh8d9BaQzw==
-X-Received: by 2002:a62:e705:0:b029:2e0:3497:32d3 with SMTP id s5-20020a62e7050000b02902e0349732d3mr20356134pfh.8.1622524241480;
-        Mon, 31 May 2021 22:10:41 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id j20sm11866560pfj.40.2021.05.31.22.10.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 31 May 2021 22:10:41 -0700 (PDT)
+        id S232860AbhFAFN3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 01:13:29 -0400
+Received: from mga11.intel.com ([192.55.52.93]:10932 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230009AbhFAFN3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Jun 2021 01:13:29 -0400
+IronPort-SDR: vmffTixqHfbCYJCuDr82n1SEw8NpYHUhs9TNW3AZaoJ+hXQjSF+h8R0fySksLD7dLGSnKCnT9F
+ +9YU6MZHhIFQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,10001"; a="200459999"
+X-IronPort-AV: E=Sophos;i="5.83,239,1616482800"; 
+   d="scan'208";a="200459999"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2021 22:11:48 -0700
+IronPort-SDR: 2u84hOhaJd6strBWTEy1SyIBU8ZG0t9ohTKiepOBGgZdaA3rUcLdkxYaa5xaivPzcblATQnkGx
+ tGSQqDI4DQEw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.83,239,1616482800"; 
+   d="scan'208";a="632747255"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.105]) ([10.239.159.105])
+  by fmsmga006.fm.intel.com with ESMTP; 31 May 2021 22:11:42 -0700
+Cc:     baolu.lu@linux.intel.com, Eric Auger <eric.auger@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>
 Subject: Re: [RFC] /dev/ioasid uAPI proposal
 To:     Shenming Lu <lushenming@huawei.com>,
-        Liu Yi L <yi.l.liu@linux.intel.com>
-Cc:     yi.l.liu@intel.com, "Tian, Kevin" <kevin.tian@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
         LKML <linux-kernel@vger.kernel.org>,
         Joerg Roedel <joro@8bytes.org>,
         Jason Gunthorpe <jgg@nvidia.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
         David Woodhouse <dwmw2@infradead.org>,
         "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Alex Williamson (alex.williamson@redhat.com)\"" 
-        <alex.williamson@redhat.com>, Eric Auger <eric.auger@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>
+        "Alex Williamson (alex.williamson@redhat.com)" 
+        <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>
 References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
- <f510f916-e91c-236d-e938-513a5992d3b5@redhat.com>
- <20210531164118.265789ee@yiliu-dev>
- <78ee2638-1a03-fcc8-50a5-81040f677e69@redhat.com>
- <1fedcd93-1a8a-884f-d0c8-3e2c21ed7654@huawei.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <e95add68-7556-f8a3-695b-40389742a682@redhat.com>
-Date:   Tue, 1 Jun 2021 13:10:30 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.2
+ <c9c066ae-2a25-0799-51a7-0ca47fff41a1@huawei.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <aa1624bf-e472-2b66-1d20-54ca23c19fd2@linux.intel.com>
+Date:   Tue, 1 Jun 2021 13:10:34 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <1fedcd93-1a8a-884f-d0c8-3e2c21ed7654@huawei.com>
+In-Reply-To: <c9c066ae-2a25-0799-51a7-0ca47fff41a1@huawei.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Shenming,
 
-在 2021/6/1 下午12:27, Shenming Lu 写道:
-> On 2021/6/1 10:36, Jason Wang wrote:
->> åœ¨ 2021/5/31 ä¸‹å�ˆ4:41, Liu Yi L å†™é�“:
->>>> I guess VFIO_ATTACH_IOASID will fail if the underlayer doesn't support
->>>> hardware nesting. Or is there way to detect the capability before?
->>> I think it could fail in the IOASID_CREATE_NESTING. If the gpa_ioasid
->>> is not able to support nesting, then should fail it.
->>>
->>>> I think GET_INFO only works after the ATTACH.
->>> yes. After attaching to gpa_ioasid, userspace could GET_INFO on the
->>> gpa_ioasid and check if nesting is supported or not. right?
+On 6/1/21 12:31 PM, Shenming Lu wrote:
+> On 2021/5/27 15:58, Tian, Kevin wrote:
+>> /dev/ioasid provides an unified interface for managing I/O page tables for
+>> devices assigned to userspace. Device passthrough frameworks (VFIO, vDPA,
+>> etc.) are expected to use this interface instead of creating their own logic to
+>> isolate untrusted device DMAs initiated by userspace.
 >>
->> Some more questions:
+>> This proposal describes the uAPI of /dev/ioasid and also sample sequences
+>> with VFIO as example in typical usages. The driver-facing kernel API provided
+>> by the iommu layer is still TBD, which can be discussed after consensus is
+>> made on this uAPI.
 >>
->> 1) Is the handle returned by IOASID_ALLOC an fd?
->> 2) If yes, what's the reason for not simply use the fd opened from /dev/ioas. (This is the question that is not answered) and what happens if we call GET_INFO for the ioasid_fd?
->> 3) If not, how GET_INFO work?
-> It seems that the return value from IOASID_ALLOC is an IOASID number in the
-> ioasid_data struct, then when calling GET_INFO, we should convey this IOASID
-> number to get the associated I/O address space attributes (depend on the
-> physical IOMMU, which could be discovered when attaching a device to the
-> IOASID fd or number), right?
+>> It's based on a lengthy discussion starting from here:
+>> 	https://lore.kernel.org/linux-iommu/20210330132830.GO2356281@nvidia.com/
+>>
+>> It ends up to be a long writing due to many things to be summarized and
+>> non-trivial effort required to connect them into a complete proposal.
+>> Hope it provides a clean base to converge.
+>>
+> 
+> [..]
+> 
+>>
+>> /*
+>>    * Page fault report and response
+>>    *
+>>    * This is TBD. Can be added after other parts are cleared up. Likely it
+>>    * will be a ring buffer shared between user/kernel, an eventfd to notify
+>>    * the user and an ioctl to complete the fault.
+>>    *
+>>    * The fault data is per I/O address space, i.e.: IOASID + faulting_addr
+>>    */
+> 
+> Hi,
+> 
+> It seems that the ioasid has different usage in different situation, it could
+> be directly used in the physical routing, or just a virtual handle that indicates
+> a page table or a vPASID table (such as the GPA address space, in the simple
+> passthrough case, the DMA input to IOMMU will just contain a Stream ID, no
+> Substream ID), right?
+> 
+> And Baolu suggested that since one device might consume multiple page tables,
+> it's more reasonable to have one fault handler per page table. By this, do we
+> have to maintain such an ioasid info list in the IOMMU layer?
 
+As discussed earlier, the I/O page fault and cache invalidation paths
+will have "device labels" so that the information could be easily
+translated and routed.
 
-Right, but the question is why need such indirection? Unless there's a 
-case that you need to create multiple IOASIDs per ioasid fd. It's more 
-simpler to attach the metadata into the ioasid fd itself.
+So it's likely the per-device fault handler registering API in iommu
+core can be kept, but /dev/ioasid will be grown with a layer to
+translate and propagate I/O page fault information to the right
+consumers.
 
-Thanks
+If things evolve in this way, probably the SVA I/O page fault also needs
+to be ported to /dev/ioasid.
 
+> 
+> Then if we add host IOPF support (for the GPA address space) in the future
+> (I have sent a series for this but it aimed for VFIO, I will convert it for
+> IOASID later [1] :-)), how could we find the handler for the received fault
+> event which only contains a Stream ID... Do we also have to maintain a
+> dev(vPASID)->ioasid mapping in the IOMMU layer?
+> 
+> [1] https://lore.kernel.org/patchwork/cover/1410223/
 
->
-> Thanks,
-> Shenming
->
-
+Best regards,
+baolu
