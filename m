@@ -2,287 +2,609 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F41D396EE4
-	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 10:26:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23B7E396F0D
+	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 10:38:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233300AbhFAI2h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 04:28:37 -0400
-Received: from mail-dm3nam07on2087.outbound.protection.outlook.com ([40.107.95.87]:25113
-        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233157AbhFAI2g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Jun 2021 04:28:36 -0400
+        id S233225AbhFAIjw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 04:39:52 -0400
+Received: from mga04.intel.com ([192.55.52.120]:14211 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231139AbhFAIju (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Jun 2021 04:39:50 -0400
+IronPort-SDR: lnaO/ir8U4pnoPnr6QOFeHEueLfXHbi41Z0FSsEPfSRQZugOi7ET7vkGRnFWfw1BpLxYuoYrG6
+ arPtxdSCGf3Q==
+X-IronPort-AV: E=McAfee;i="6200,9189,10001"; a="201634730"
+X-IronPort-AV: E=Sophos;i="5.83,239,1616482800"; 
+   d="scan'208";a="201634730"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2021 01:38:08 -0700
+IronPort-SDR: 9rp6pOGsIEs8ILyyrY7eJ9xFu2Nl6QFFV0mqWywHwKYYFnEOBQRhOXhIxmQXVnIBt/FHLTIwb8
+ WXnLo9Pbci+w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.83,239,1616482800"; 
+   d="scan'208";a="446877303"
+Received: from orsmsx605.amr.corp.intel.com ([10.22.229.18])
+  by fmsmga008.fm.intel.com with ESMTP; 01 Jun 2021 01:38:07 -0700
+Received: from orsmsx606.amr.corp.intel.com (10.22.229.19) by
+ ORSMSX605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.4; Tue, 1 Jun 2021 01:38:03 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4
+ via Frontend Transport; Tue, 1 Jun 2021 01:38:03 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.173)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2242.4; Tue, 1 Jun 2021 01:38:03 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PrpGNpdQdzyshZgZuXNCbenP43dqZt0yMutbY+PvLCCBphf4MQxl0q2QPpdxxDIbKPB/8sYnmfEFapru8ZZobdjjVy33j86bdvLBabpcm0RwY5qNpSz/mZQZ+HZv3H1bzguWeFga60BtasOlXxdr2PFB89Tkyfh5Ka8V2jSMt87TuXuKtb3dkKr0r2JH1bl2upEqWXdHJnvw0W3XFHj/q2T/Z1Uyj4iBENrLUOam3ntyvv8SylEugyNpcfgoJAbr/R6eGIzxkTRgIkaN4a7gsxMri46lt0XCKpdXYJTQBbOeCl4LZZ9GGCwULjrgiDEhF+1kRyoHTeEyRWtLbUQJ/Q==
+ b=Wmu3/f6VPMcRJqWI564bg8xdihNeDoEtra1wd4rG05g8W+bLtkXLajo8RRATAM4QfafI8oc2ZZN9xWvzr1vaYl+G9mmj4v9DpJlJcpaNW1H1EHh+j2A/4nerwTJRw1kPNJZn+mkKYgKDsBM3mGlE1wEc9EJmYrPS0tOA1CAHr/coOum4hbaMTqBHh/BCmYxjH6ZMoO7ybXX9XQ9/+8GZ+0jiIE5PQS//M7Xu3MxqP0Mc4Mxt+WWwIDVKqjTxsBeCXxNEQzIAIlldx3kH68KEWeZ0kbRL2mnYUgmwsqnQGL3+CYtRW9DKfzyFayqdoC3HXT2tGLAql24aFg8AbzO7WA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BeKRV5YPXdSq8z3WHrQp1H3WJdeMz4bqlV9lJ12BUas=;
- b=i4dXL3mCtYcENms+mjfTZC5qjN7nmtdL1kydHK5oBP+NcdInGevlxKb0QmH7KfrV3vsikj1tR9t8Ut5AHQgx0Fry8c3NJzb57jcaquvYmMlWsSgEMt2dehvYLHLWdNyj5mifbM4w4K8Jdj9I3AD3HwGLVK+eBTgtIjw5dnuXllPrU7jP3N3uVkjmS4ekowesOQtbiIIuHFp6Vdwe8OnpavI3MyD+VQo94HOMRLvBQcinEypNClFbZ4ggo9ziBMVZvuk2SE9j3vzEQAzZlhCzPlZyJRQ4QgJMnWt4vGur4BydWDH5lEe68ULdvDIm14QVlpoXRREBpF2qhBuf1gED2Q==
+ bh=k1s+XpvQfIJOaOHcOGr/hS/vtPq3/S4uaLmSyveQ52k=;
+ b=GBO3SJ/p7ev+bWTcctYsxa6nKQcUC1CTq0yNE1yZy9rZ5Hgs8PFCeAqA0e25Uk6fvKbB35UDNSL5g8yToYsAcOypGTVAg2IUI4t0mWrXF/gGfUOYMg+w2QlrqGwqytHtbgOHx1Kv6qT0og3EnZZyOVFA+zGtheu7Hmz0SzkSDVdWNXZOq9/t5v6pAUtz2JcfSwkueVkq2qaXbT1rnhYuyTmKypzBBkum4TkwX0eNsSYhiNSC84bkYKkfJY4eS3+gr6v93dFJdOxIV1RzT8GF5TnaGtscDzGsz2uq3IXjT/ferwl3peSFfO/iQl5EZs3avCo5pGo6aIM9U4PJcL2vVQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BeKRV5YPXdSq8z3WHrQp1H3WJdeMz4bqlV9lJ12BUas=;
- b=Y6ckdN9Acvrmb4x8ehkYWjskR6lvUsJXqNJuILenl2RAzV88g8kXOMldd3aZACMZjlPX6M3JO5yf4msJ0AAVu8c/buD06fBk74onHflE7TIOJP3uwSR5fdYc4xI/R8p4MGLRwvCeqfjZFSVTSr607CEP2UYwwu7pGZMw0+zT2Go=
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SN6PR12MB2783.namprd12.prod.outlook.com (2603:10b6:805:78::18) with
+ bh=k1s+XpvQfIJOaOHcOGr/hS/vtPq3/S4uaLmSyveQ52k=;
+ b=E9+Hao1tIhJ0Tg29zZAz/OhvZhCLwydsHuL18+ykrLhlc4O5OY5A0U+eLMBo/HBskasdBSmu+GCwcBLNhQ8dO317pU2PKv5BmwDvsyw3MowJmZgb00lblyOPdAN64kRs0Y2Jc8sweu+0bJKtmtx4ae4BEEsZDbIYOuD/Qqeqk6o=
+Received: from MWHPR11MB1886.namprd11.prod.outlook.com (2603:10b6:300:110::9)
+ by MWHPR11MB1837.namprd11.prod.outlook.com (2603:10b6:300:10f::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.22; Tue, 1 Jun
- 2021 08:26:52 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::1fb:7d59:2c24:615e]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::1fb:7d59:2c24:615e%6]) with mapi id 15.20.4173.030; Tue, 1 Jun 2021
- 08:26:51 +0000
-From:   "Kalra, Ashish" <Ashish.Kalra@amd.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Tobin Feldman-Fitzthum <tobin@linux.ibm.com>,
-        "natet@google.com" <natet@google.com>
-CC:     Dov Murik <dovmurik@linux.vnet.ibm.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "x86@kernel.org" <x86@kernel.org>,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.20; Tue, 1 Jun
+ 2021 08:38:01 +0000
+Received: from MWHPR11MB1886.namprd11.prod.outlook.com
+ ([fe80::6597:eb05:c507:c6c1]) by MWHPR11MB1886.namprd11.prod.outlook.com
+ ([fe80::6597:eb05:c507:c6c1%12]) with mapi id 15.20.4173.030; Tue, 1 Jun 2021
+ 08:38:01 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     LKML <linux-kernel@vger.kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Lu Baolu" <baolu.lu@linux.intel.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "srutherford@google.com" <srutherford@google.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Hubertus Franke <frankeh@us.ibm.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: RE: [RFC] KVM: x86: Support KVM VMs sharing SEV context
-Thread-Topic: [RFC] KVM: x86: Support KVM VMs sharing SEV context
-Thread-Index: AQHXCot5SNFL8RrPlkCutU8OGpQ4JKp/Ae+AgAAQa4CAdHeyEIAEX2PwgAd1TYA=
-Date:   Tue, 1 Jun 2021 08:26:51 +0000
-Message-ID: <SN6PR12MB276727DE9AFD387B11C404418E3E9@SN6PR12MB2767.namprd12.prod.outlook.com>
-References: <20210224085915.28751-1-natet@google.com>
- <7829472d-741c-1057-c61f-321fcfb5bdcd@linux.ibm.com>
- <35dde628-f1a8-c3bf-9c7d-7789166b0ee1@redhat.com>
- <SN6PR12MB276780007C17ADD273EB70FC8E269@SN6PR12MB2767.namprd12.prod.outlook.com>
- <SN6PR12MB276726B5FEF171E1099B91AC8E239@SN6PR12MB2767.namprd12.prod.outlook.com>
-In-Reply-To: <SN6PR12MB276726B5FEF171E1099B91AC8E239@SN6PR12MB2767.namprd12.prod.outlook.com>
+        "Alex Williamson (alex.williamson@redhat.com)" 
+        <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "Robin Murphy" <robin.murphy@arm.com>
+Subject: RE: [RFC] /dev/ioasid uAPI proposal
+Thread-Topic: [RFC] /dev/ioasid uAPI proposal
+Thread-Index: AddSzQ970oLnVHLeQca/ysPD8zMJZwBLsqGAALCWeVA=
+Date:   Tue, 1 Jun 2021 08:38:00 +0000
+Message-ID: <MWHPR11MB1886A17F36CF744857C531148C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
+References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210528195839.GO1002214@nvidia.com>
+In-Reply-To: <20210528195839.GO1002214@nvidia.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_Enabled=true;
- MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_SetDate=2021-06-01T08:26:46Z;
- MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_Method=Privileged;
- MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_Name=Public_0;
- MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
- MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_ActionId=c0e1fa55-cc39-48d4-80c0-6013c0b193d0;
- MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_ContentBits=1
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-x-originating-ip: [183.83.213.75]
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: nvidia.com; dkim=none (message not signed)
+ header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [192.198.142.24]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4af3b194-64ca-430d-ec50-08d924d701ee
-x-ms-traffictypediagnostic: SN6PR12MB2783:
+x-ms-office365-filtering-correlation-id: 97a59c20-8036-4b93-4c88-08d924d890c5
+x-ms-traffictypediagnostic: MWHPR11MB1837:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SN6PR12MB27836DE06ED1CD715C6A3F178E3E9@SN6PR12MB2783.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4125;
+x-microsoft-antispam-prvs: <MWHPR11MB1837EE6279D8BF24DE21A7E78C3E9@MWHPR11MB1837.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: WYoO1CMZfgD8/63EWK2qMxA02W4obudsnFOrCCHeBUzz159EMfLHdqlEOFYok0bvDzZjNImr/iWSthwTchacV2jkIf9IKlTqRz2Wmgx2xKG3hjqJ+idjOQtKpE/1z81MhJPDQP4xWsUGgJjzR3RoF38BR4iTHslTLY2JF6+Q7yQ1eatgjdaU3JWSNDPSZOLsjyeW0Etj5r4TMdu4Cslf4jOsUOK1Z4VW9zgX6jFmBcUyulNDF73s3cMapsk3yOeHC4bc6kGuoJFQD6rfp5pZBzvr3dpl/hjf1qEbh5TyFTnbam3snq+CuOaLKfbn39mnTVfHx0xQtvgpUAAhXK3iqShOY6EIbZEaTmyMlgAmDvuBva80QFSHPCMVX/k9l9ZRd6RPzOwVl4AS41FNfQQ94ntjaKnHfVihwD8vrFY/HpSU4bpIngEZT+N+tofuN+rsOiuxuQAlG8+EZFCFowNNa32BfzSnX3Sn9JIRW8myEO4FUFN5BQZR9A1IArElIGVwMBDQ2onMkli/AF0wwhR5pnDgr8B3M3+7tL6/DHo6i1U8R3M1K6PV5X8Q/r59wodMUFusFssZOyRGM3MFcKcOnPH6xtPPpB5bp1yaf2X1sug=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(39860400002)(396003)(136003)(346002)(376002)(5660300002)(83380400001)(478600001)(53546011)(6506007)(26005)(9686003)(8676002)(86362001)(8936002)(38100700002)(66946007)(66446008)(64756008)(66556008)(7696005)(66476007)(7416002)(110136005)(54906003)(2906002)(4326008)(186003)(122000001)(52536014)(76116006)(316002)(55016002)(33656002)(71200400001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: =?utf-8?B?QkRyZ3RYV2FwUzh1cGtBZ1dhQURVd0wydzVkUzd3ajN0Qno2blZsYlhGMWhk?=
- =?utf-8?B?K2dqSlpicmlCT20yMXNZN2NhOXd5d1JjT216azRjbFFwdnE0THM3Vk9XTUlT?=
- =?utf-8?B?cm9YaW5ESVZuWEU4WFRQaEhzMllZYzBoSDJqckwzWFRycVZjbHhvQU9nbzVR?=
- =?utf-8?B?UmIwUVJvVDBSWW1aK0NtY0RUaXJ5QjlaK1ltRm93bUhNbnZSTkJ6RFAwWDhC?=
- =?utf-8?B?MGxVSEZnS1krS2paMXZ3Q1kzV0JVSml3M2dXd2J3OUVzZ3cwdUN5Qm1pOWZq?=
- =?utf-8?B?LzhtUGNiNkNrU2xncTdJakdNNklUOForOEVIYVVCZG16WUdsOE1YZkxzUGNO?=
- =?utf-8?B?WHdBR2JJb2hLWE83dS95R0d0aWtDSWhNZWVsNk5pdTJmcXJtMmVFenVSOTVz?=
- =?utf-8?B?aHA3eUhWNDRocjljdWdVcGQ2Z1FVOUZ0K2JvZzdGRVNoTlhCc0lZZy9vRkQw?=
- =?utf-8?B?Z1BTcFd5T0NERk55UGs3bkoxcW1mVU1BaHNsQzB6SDFXSzVqRFhQL3FSWW1E?=
- =?utf-8?B?TGFoSWM0a2wrQ0dMZUlJSm5YOU9JYy9uaGRoQmI5S3c5WjBLb2w1d25YeGRC?=
- =?utf-8?B?a2tNZmdacUd6WEZjRUdNMFlENjd0N3FpdUxNb1BkL3ZvVW1VUGwwdEorUEhr?=
- =?utf-8?B?aVRkcWtFY3NUTGxkb1RxSUdpUkw3WE1XNXFOczk2N2VwNUZiZnNwemE1MmRl?=
- =?utf-8?B?cFJ3ZlJTdWRRMWZnWTlSSm1MSnRPdlJMcDBTcHlnTHBnVkIyZEFtUjdMNEpN?=
- =?utf-8?B?SnNWVFZkcEUxb2dXK3Zza0I2NGxtcnd2OEVpdDNQVjZnbmVla0RVcXV1c2Fn?=
- =?utf-8?B?VUpyTUI3Qi9TYi9JOGRWK3FkUmJHSzExbG1WbFpoTkJkLzZsQXQzei9iQ3E2?=
- =?utf-8?B?ZHl1aEFVRkV6b3ZGVEVvK1hvVlFiNlRYYXlsNWZtMEdyVE5ZMm45cms4TUFT?=
- =?utf-8?B?U1poanlieFYvRXViR3lOZ1d0WXJuTVMrZjRGRHp6NUJzYkZTM2FnQTh2Y0VZ?=
- =?utf-8?B?ZzFkMVlqYWVSL1FQUHFDbGxtUmc2TXhTZlpvNkFqbC91WGhKZTl1Z1gxRTZF?=
- =?utf-8?B?T2FaYW03TnVDcS90WW85RTRhaFFZaStHbHBSUVhSVk5qaFhnNko3Q1phZ2Ju?=
- =?utf-8?B?UUpWcnRnZEVHOFNUZzdjMFpiRlhNWGpLWHozdnVwSTE5Z3BxZTE5ZjcweVZ2?=
- =?utf-8?B?TmM2aWxtQWo1MURXbnNPN3BWUFJPb1VWV2IwM21tTTdyaHRSYUg4cERJRHFv?=
- =?utf-8?B?UERoVGNiS0U5MUtmdTdvK09vRGRUekd2SDM4SGROY0UwQ3J2OThQeWR0eWNp?=
- =?utf-8?B?VnRaejJpcG9IZlJNL3A1RytHN0F4YWthcDVVR2NJVkMxUGdaYkgzQlZhUTJV?=
- =?utf-8?B?cWdNbE9tVys0SjZhdlh4elc4b2tlSWw2a1R6d2FzREVQUUlQRVA0WEtQaWNw?=
- =?utf-8?B?anh0WnE2L1VWTkh2MEljOUU2elM0eFpLdm42ZkltUEFsNDhkem8yVzZVeVpT?=
- =?utf-8?B?SDVyZDRqVnJ6VjFGMHdaeklIOU4vSTlsSm9rM0ZIQldXNEJqNlU0VlRSRjN0?=
- =?utf-8?B?TzhGTTFNMTlnbG5CNnp2UFQ4bWV1TEZaNVBxRzhrZzhYb0V6TnFXZmFycUls?=
- =?utf-8?B?a3pJbld6b21pTFZSKzVKZFVIZDZ2MUxWRXU5bFFnejFkRUdUaVpWdC9XdFdV?=
- =?utf-8?B?NDJPQXRrNnp6UDFDNFQ5eGI0UHp2emtNeU1iODVYOUJRS1BiRFJhTzMxODZx?=
- =?utf-8?Q?3DmSxGIKPZLdPLoLVDO+ITEhah46eGIFGxWDgRb?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+x-microsoft-antispam-message-info: +/mSFDpmGyNSZP8QRpp3cX4adfzDSuY1JNi4ag66SmJL/TrBDQOF7id/R1kSKfijfGX07Y2MDXGmDgr1f0y3BGLFsmhE4RqVzH+oJoGCqA75e6fsW8FS/jWjvMWrCkSizW1erCgScT//5WdqJbhCTlgYSL+QMQBF+2KTUPGJcUWWYdyDD6SIX7HEL0gcfxBPC9uObMAj53q6hPNk9gShoSjP0TY/49b9bUGr+P9TMWVvZsE+vBmddHDLFIvy8BG9Twa9Cdy/aBXH6ZCQxfx/KEN97o1pna9pp6L1u+1VG9aj0LQknV1lgn9JUz4DFQq4OWmey3I5cr8oXeN7kV2Dng2aGuMM2t8G0+3h1Xh1XdM03fsCfgsS2s5rv6mLhReoG8Agx12MXjHcCVuQ9ULhPBb806RXAFADdzD/45HKuBPY9V7t0FyvccfbklNeP0BwzUlnsaAaTeh5CcAmBeXvLuKW0xnmdlzsHNeFGsrqux1XCs/ZV48y2BHAXqhjBBFCaYBOaQMg75MPv15tCjb5X71T/BrtoECrOmw24nUxx5oPnbQHSyWwaJG+HxHU3ANxkKwciFZ9qxF276U9TdQIHQc973rlzIq/v0bFrFaTK3c=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1886.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(136003)(396003)(376002)(346002)(39860400002)(6506007)(38100700002)(55016002)(33656002)(7416002)(5660300002)(71200400001)(9686003)(6916009)(7696005)(26005)(186003)(83380400001)(478600001)(122000001)(64756008)(30864003)(66446008)(76116006)(316002)(66946007)(8936002)(8676002)(2906002)(66556008)(66476007)(86362001)(54906003)(52536014)(4326008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?qu3J82PnHrSqrNSYjg6XMpnX3kGbYogZvfQ7ZKdXH94WxoLUNp/1+0XphYqV?=
+ =?us-ascii?Q?Lx5E4DkG9zMTiMk21pVOOO3LOicYtBKXbujDYRZwierZxCuPFlV+Gh0Un2Qd?=
+ =?us-ascii?Q?4VjowgZcV+Vzj+r7QfwSEWx0Ng5ryJkUaQOga0bnosGikIn/w5wVR66W8kmo?=
+ =?us-ascii?Q?YQIqgWtTsvBAfXLNN2nVbomVvkE//NSc39fMpebgJAZeKiSI3dHzJ8WZIzcR?=
+ =?us-ascii?Q?eCoQAJnnE+Lb5vToz7sMZGdwlfGRe3z7dRRgg1KY9fU1NziwhSOMYCH8kFnF?=
+ =?us-ascii?Q?exh5TlfvY4eUGl17FRF4QSOuIAnS82JgKGgEhnJ6pM+5XNHm1esxHk0nxRoU?=
+ =?us-ascii?Q?eNb7ca++A3yvCqPtjvPTtWyiFQ73jy6WarjiXcvRWvevmfykGA6Fl8YdM4og?=
+ =?us-ascii?Q?8Ih3k0ARy9f6MZDybsKdBxzGVYOVcoQyrw1kPw35kvX20Q0kEIKtc/DqGJa2?=
+ =?us-ascii?Q?GpFcMRp0gpSRzfXIlm2Y842paabdImD8x3c6EhcxvycBUfYQ8r+ZO7Q/mcRZ?=
+ =?us-ascii?Q?q7nT9utJUiZfbbcWxsrrH93KtOim4D0lEVHYbsEUHHh8Re21d+5MRsDaS90P?=
+ =?us-ascii?Q?JlNz0lVoA+XQP8/bRMDh7Efb0hcVDdvKDUG68mDO8XNllLd0SCFGRmNT9F3V?=
+ =?us-ascii?Q?88aEitIdL+dbtSdfyDioHrV9mgr6zfoOQhrE0ri5T+cD+gU3st0e28UKIkds?=
+ =?us-ascii?Q?j3Qn9Yp7yQJ4zDqCY+Uh4OHKHpLG0vyugv936wbxVRxe9XQuFN+OIcj0Svov?=
+ =?us-ascii?Q?1BeJ2aOpUFSU2asecnIMc3QIp9Zh81aKauzOTnsmQlVxtaKW/mbudjqMCmh5?=
+ =?us-ascii?Q?uxmXzsb3tv9J44S/0wxoISagViS5pLxjfdDLjTn0SZ9IpWH51rIQuKJP6TFK?=
+ =?us-ascii?Q?8qC2OfeW4Etb98S2x7lQHKtufh+6n8Wlhbrvp1sKP9BK4ni8t8i/O9ID9YQy?=
+ =?us-ascii?Q?9vJFHo2ab0pNIIBxduNY6PUizHdqhZYktdiwqx7ObplvQVRCjaqInQ6OXKKN?=
+ =?us-ascii?Q?Z1YSVLk+4aZefiwcj+3EFUHYmNSWvJIrLAiAdymneRAWg0GkvGIYiPg9iRsm?=
+ =?us-ascii?Q?HIbm15bvc6CdrHvfx57qjlYlj8gseGvwwss2iJS+r2Dk7GjLQx3uf6Hkge6l?=
+ =?us-ascii?Q?k0DvQajs+A2RQb5cz26N2ARjKxSAp1hcuAO7hnx7XHxl7/DZsaSjXszR91fW?=
+ =?us-ascii?Q?BavRx3yR/bJvrwr5oUYYb17bhkvqWHGmuhnKKUi1wjnzVMR4ljKLPyTt+6bm?=
+ =?us-ascii?Q?zURkPoouCQ4ZgDPTqqMU38TEXe1pI4QcamZzJPDtDw+4918GPlRcJ4SIzgym?=
+ =?us-ascii?Q?hpljbNg3SfRJ6XuE+EcIdbSz?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4af3b194-64ca-430d-ec50-08d924d701ee
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Jun 2021 08:26:51.6650
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1886.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 97a59c20-8036-4b93-4c88-08d924d890c5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Jun 2021 08:38:00.7452
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 5iW7mWH53hRl30ENEyEM/qpcys0F/2LlbdVftFhl4NoWI1X5IWgvAjgU9tQh/Anna2eRfTReY/ka4yDLEYdBKw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2783
+X-MS-Exchange-CrossTenant-userprincipalname: C0znJX1JSXhvxOTN07h5xnAf1lE08d0bTCUReUuyNDTBsNt4YYcpPXGkjkiqK4skVvzDMSLMjkgeYwJ29eeWfw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1837
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-W0FNRCBQdWJsaWMgVXNlXQ0KDQpUbyBhZGQsIHVzaW5nIHRoaXMgYWx0ZXJuYXRpdmUgYXBwcm9h
-Y2ggYW5kIGhhbmRsaW5nIEtWTV9FWElUX0lPIHVzaW5nIGt2bV9oYW5kbGVfaW8sIHN0aWxsIHJl
-cXVpcmVzIA0KQ1BVU3RhdGV7Li59IHN0cnVjdHVyZSBhbmQgdGhlIGJhY2tpbmcgIlg4NkNQVSIg
-c3RydWN0dXJlLCBmb3IgZXhhbXBsZSwgYXMgcGFydCBvZiBrdm1fYXJjaF9wb3N0X3J1bigpDQp0
-byBnZXQgdGhlIE1lbVR4QXR0cnMgbmVlZGVkIGJ5IGt2bV9oYW5kbGVfaW8oKS4NCg0KT3IgdGhl
-IG90aGVyIG9wdGlvbiBpcyB0byBlbWJlZCB0aGUgQ1BVWDg2U3RhdGUgYXMgcGFydCBvZiB0aGUg
-c3RydWN0IHZjcHUgZm9yIHRoZSBtaXJyb3IgVk0sIGFuZCB0aGVuDQp1c2UgaXQgdG8gZ2V0IHRo
-ZSBNZW1UeEF0dHJzLg0KDQpTbyB0aGVyZSBpcyBzdGlsbCBxdWl0ZSBhIGJpdCBvZiBLVk0gY29k
-ZSBkdXBsaWNhdGlvbiBpbiBxZW11IHdpdGggdGhlIGFsdGVybmF0aXZlIGFwcHJvYWNoLCBidXQg
-aXQgaXMNCnByb2JhYmx5IHN0aWxsIGNsZWFuZXIgdGhhbiB0aGUgaW5pdGlhbCBhcHByb2FjaC4N
-Cg0KVGhhbmtzLA0KQXNoaXNoWw0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTog
-S2FscmEsIEFzaGlzaCANClNlbnQ6IFRodXJzZGF5LCBNYXkgMjcsIDIwMjEgMTA6NTEgQU0NClRv
-OiAnUGFvbG8gQm9uemluaScgPHBib256aW5pQHJlZGhhdC5jb20+OyAnVG9iaW4gRmVsZG1hbi1G
-aXR6dGh1bScgPHRvYmluQGxpbnV4LmlibS5jb20+OyAnbmF0ZXRAZ29vZ2xlLmNvbScgPG5hdGV0
-QGdvb2dsZS5jb20+DQpDYzogJ0RvdiBNdXJpaycgPGRvdm11cmlrQGxpbnV4LnZuZXQuaWJtLmNv
-bT47IExlbmRhY2t5LCBUaG9tYXMgPFRob21hcy5MZW5kYWNreUBhbWQuY29tPjsgJ3g4NkBrZXJu
-ZWwub3JnJyA8eDg2QGtlcm5lbC5vcmc+OyAna3ZtQHZnZXIua2VybmVsLm9yZycgPGt2bUB2Z2Vy
-Lmtlcm5lbC5vcmc+OyAnbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZycgPGxpbnV4LWtlcm5l
-bEB2Z2VyLmtlcm5lbC5vcmc+OyAnc3J1dGhlcmZvcmRAZ29vZ2xlLmNvbScgPHNydXRoZXJmb3Jk
-QGdvb2dsZS5jb20+OyAnc2VhbmpjQGdvb2dsZS5jb20nIDxzZWFuamNAZ29vZ2xlLmNvbT47ICdy
-aWVudGplc0Bnb29nbGUuY29tJyA8cmllbnRqZXNAZ29vZ2xlLmNvbT47IFNpbmdoLCBCcmlqZXNo
-IDxicmlqZXNoLnNpbmdoQGFtZC5jb20+OyAnTGFzemxvIEVyc2VrJyA8bGVyc2VrQHJlZGhhdC5j
-b20+OyAnSmFtZXMgQm90dG9tbGV5JyA8amVqYkBsaW51eC5pYm0uY29tPjsgJ0h1YmVydHVzIEZy
-YW5rZScgPGZyYW5rZWhAdXMuaWJtLmNvbT47ICdxZW11LWRldmVsQG5vbmdudS5vcmcnIDxxZW11
-LWRldmVsQG5vbmdudS5vcmc+DQpTdWJqZWN0OiBSRTogW1JGQ10gS1ZNOiB4ODY6IFN1cHBvcnQg
-S1ZNIFZNcyBzaGFyaW5nIFNFViBjb250ZXh0DQoNCltBTUQgUHVibGljIFVzZV0NCg0KTG9va2lu
-ZyBhdCBrdm0gc2VsZnRlc3RzIGluIHRoZSBrZXJuZWwsIEkgdGhpbmsgdGhlIG90aGVyIGFsdGVy
-bmF0aXZlIGlzIHRvIDoNCg0KTWFpbnRhaW4gc2VwYXJhdGUgZGF0YSBzdHJ1Y3R1cmVzIGxpa2Ug
-c3RydWN0IGt2bV92bSwgc3RydWN0IHZjcHUgZm9yIHRoZSBtaXJyb3IgVk0sIGJ1dCB0aGVuIHRo
-YXQgbWVhbnMgcXVpdGUgYSBiaXQgb2YgdGhlIEtWTSBjb2RlIGluIFFlbXUgZm9yIHRoZSBtaXJy
-b3IgVk0gd2lsbCBiZSBkdXBsaWNhdGVkLiANCg0KRm9yIGV4YW1wbGUsIHRoaXMgd2lsbCBhZGQg
-c2VwYXJhdGUgYW5kIGR1cGxpY2F0ZWQgZnVuY3Rpb25hbGl0eSBmb3IgOiANCg0Kdm1fY2hlY2tf
-Y2FwL3ZtX2VuYWJsZV9jYXAsDQp2bV9jcmVhdGUsDQp2Y3B1X3J1biwNCnZjcHVfZ2V0X3JlZ3Ms
-IHZjcHVfc3JlZ3NfZ2V0L3NldCwNCnZjcHVfaW9jdGwsDQp2bV9pb2N0bCwgZXRjLiwgZXRjLg0K
-DQpBbHNvIEkgdGhpbmsgdGhhdCBvbmNlIHRoZSBtaXJyb3IgVk0gc3RhcnRzIGJvb3RpbmcgYW5k
-IHJ1bm5pbmcgdGhlIFVFRkkgY29kZSwgaXQgbWlnaHQgYmUgb25seSBkdXJpbmcgdGhlIFBFSSBv
-ciBEWEUgcGhhc2Ugd2hlcmUgaXQgd2lsbCBzdGFydCBhY3R1YWxseSBydW5uaW5nIHRoZSBNSCBj
-b2RlLCBzbyBtaXJyb3IgVk0gcHJvYmFibHkgc3RpbGwgbmVlZCB0byBoYW5kbGVzIEtWTV9FWElU
-X0lPLCB3aGVuIFNFQyBwaGFzZSBkb2VzIEkvTywgSSBjYW4gc2VlIFBJQyBhY2Nlc3NlcyBhbmQg
-RGVidWcgQWdlbnQgaW5pdGlhbGl6YXRpb24gc3R1ZmYgaW4gU2VjIHN0YXJ0dXAgY29kZS4NCg0K
-VGhhbmtzLA0KQXNoaXNoDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBLYWxy
-YSwgQXNoaXNoDQpTZW50OiBNb25kYXksIE1heSAyNCwgMjAyMSA0OjI5IFBNDQpUbzogUGFvbG8g
-Qm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT47IFRvYmluIEZlbGRtYW4tRml0enRodW0gPHRv
-YmluQGxpbnV4LmlibS5jb20+OyBuYXRldEBnb29nbGUuY29tDQpDYzogRG92IE11cmlrIDxkb3Zt
-dXJpa0BsaW51eC52bmV0LmlibS5jb20+OyBMZW5kYWNreSwgVGhvbWFzIDxUaG9tYXMuTGVuZGFj
-a3lAYW1kLmNvbT47IHg4NkBrZXJuZWwub3JnOyBrdm1Admdlci5rZXJuZWwub3JnOyBsaW51eC1r
-ZXJuZWxAdmdlci5rZXJuZWwub3JnOyBzcnV0aGVyZm9yZEBnb29nbGUuY29tOyBzZWFuamNAZ29v
-Z2xlLmNvbTsgcmllbnRqZXNAZ29vZ2xlLmNvbTsgU2luZ2gsIEJyaWplc2ggPGJyaWplc2guc2lu
-Z2hAYW1kLmNvbT47IExhc3psbyBFcnNlayA8bGVyc2VrQHJlZGhhdC5jb20+OyBKYW1lcyBCb3R0
-b21sZXkgPGplamJAbGludXguaWJtLmNvbT47IEh1YmVydHVzIEZyYW5rZSA8ZnJhbmtlaEB1cy5p
-Ym0uY29tPjsgcWVtdS1kZXZlbEBub25nbnUub3JnDQpTdWJqZWN0OiBSRTogW1JGQ10gS1ZNOiB4
-ODY6IFN1cHBvcnQgS1ZNIFZNcyBzaGFyaW5nIFNFViBjb250ZXh0DQoNCltBTUQgUHVibGljIFVz
-ZV0NCg0KSGVsbG8gUGFvbG8sDQoNCkkgYW0gd29ya2luZyBvbiBwcm90b3R5cGUgY29kZSBpbiBx
-ZW11IHRvIHN0YXJ0IGEgbWlycm9yIFZNIHJ1bm5pbmcgaW4gcGFyYWxsZWwgdG8gdGhlIHByaW1h
-cnkgVk0uIEluaXRpYWxseSBJIGhhZCBhbiBpZGVhIG9mIGEgcnVubmluZyBhIGNvbXBsZXRlbHkg
-cGFyYWxsZWwgVk0gbGlrZSB1c2luZyB0aGUgcWVtdeKAmXMgbWljcm92bSBtYWNoaW5lL3BsYXRm
-b3JtLCBidXQgdGhlIG1haW4gaXNzdWUgd2l0aCB0aGlzIGlkZWEgaXMgdGhlIGRpZmZpY3VsdHkg
-aW4gc2hhcmluZyB0aGUgbWVtb3J5IG9mIHByaW1hcnkgVk0gd2l0aCBpdC4NCg0KSGVuY2UsIEkg
-c3RhcnRlZCBleHBsb3JpbmcgcnVubmluZyBhbiBpbnRlcm5hbCB0aHJlYWQgbGlrZSB0aGUgY3Vy
-cmVudCBwZXItdkNQVSB0aHJlYWQocykgaW4gcWVtdS4gVGhlIG1haW4gaXNzdWUgaXMgdGhhdCBx
-ZW11IGhhcyBhIGxvdCBvZiBnbG9iYWwgc3RhdGUsIGVzcGVjaWFsbHkgdGhlIEtWTVN0YXRlIHN0
-cnVjdHVyZSB3aGljaCBpcyBwZXItVk0sIGFuZCBhbGwgdGhlIEtWTSB2Q1BVcyBhcmUgdmVyeSB0
-aWdodGx5IHRpZWQgaW50byBpdC4gSXQgZG9lcyBub3QgbWFrZSBzZW5zZSB0byBhZGQgYSBjb21w
-bGV0ZWx5IG5ldyBLVk1TdGF0ZSBzdHJ1Y3R1cmUgaW5zdGFuY2UgZm9yIHRoZSBtaXJyb3IgVk0g
-YXMgdGhlbiB0aGUgbWlycm9yIFZNIGRvZXMgbm90IHJlbWFpbiBsaWdodHdlaWdodCBhdCBhbGwu
-IA0KDQpIZW5jZSwgdGhlIG1pcnJvciBWTSBpIGFtIGFkZGluZywgaGFzIHRvIGludGVncmF0ZSB3
-aXRoIHRoZSBjdXJyZW50IEtWTVN0YXRlIHN0cnVjdHVyZSBhbmQgdGhlIOKAnGdsb2JhbOKAnSBL
-Vk0gc3RhdGUgaW4gcWVtdSwgdGhpcyByZXF1aXJlZCBhZGRpbmcgc29tZSBwYXJhbGxlbCBLVk0g
-Y29kZSBpbiBxZW11LCBmb3IgZXhhbXBsZSB0byBkbyBpb2N0bCdzIG9uIHRoZSBtaXJyb3IgVk0s
-IHNpbWlsYXIgdG8gdGhlIHByaW1hcnkgVk0uIERldGFpbHMgYmVsb3cgOg0KDQpUaGUgbWlycm9y
-X3ZtX2ZkIGlzIGFkZGVkIHRvIHRoZSBLVk1TdGF0ZSBzdHJ1Y3R1cmUgaXRzZWxmLiANCg0KVGhl
-IHBhcmFsbGVsIGNvZGUgSSBtZW50aW9uZWQgaXMgbGlrZSB0aGUgZm9sbG93aW5nIDoNCg0KI2Rl
-ZmluZSBrdm1fbWlycm9yX3ZtX2VuYWJsZV9jYXAocywgY2FwYWJpbGl0eSwgY2FwX2ZsYWdzLCAu
-Li4pICAgICAgXA0KICAgICh7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgXA0KICAgICAgICBzdHJ1Y3Qga3ZtX2VuYWJsZV9jYXAg
-Y2FwID0geyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KICAgICAgICAgICAgLmNh
-cCA9IGNhcGFiaWxpdHksICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0K
-ICAgICAgICAgICAgLmZsYWdzID0gY2FwX2ZsYWdzLCAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXA0KICAgICAgICB9OyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KICAgICAgICB1aW50NjRfdCBhcmdzX3RtcFtd
-ID0geyBfX1ZBX0FSR1NfXyB9OyAgICAgICAgICAgICAgICAgICAgICAgXA0KICAgICAgICBzaXpl
-X3QgbiA9IE1JTihBUlJBWV9TSVpFKGFyZ3NfdG1wKSwgQVJSQVlfU0laRShjYXAuYXJncykpOyAg
-XA0KICAgICAgICBtZW1jcHkoY2FwLmFyZ3MsIGFyZ3NfdG1wLCBuICogc2l6ZW9mKGNhcC5hcmdz
-WzBdKSk7ICAgICAgICAgXA0KICAgICAgICBrdm1fbWlycm9yX3ZtX2lvY3RsKHMsIEtWTV9FTkFC
-TEVfQ0FQLCAmY2FwKTsgICAgICAgICAgICAgICAgXA0KICAgIH0pDQoNCg0KK2ludCBrdm1fbWly
-cm9yX3ZtX2lvY3RsKEtWTVN0YXRlICpzLCBpbnQgdHlwZSwgLi4uKSB7DQorICAgIGludCByZXQ7
-DQorICAgIHZvaWQgKmFyZzsNCisgICAgdmFfbGlzdCBhcDsNCisNCisgICAgdmFfc3RhcnQoYXAs
-IHR5cGUpOw0KKyAgICBhcmcgPSB2YV9hcmcoYXAsIHZvaWQgKik7DQorICAgIHZhX2VuZChhcCk7
-DQorDQorICAgIHRyYWNlX2t2bV92bV9pb2N0bCh0eXBlLCBhcmcpOw0KKyAgICByZXQgPSBpb2N0
-bChzLT5taXJyb3Jfdm1fZmQsIHR5cGUsIGFyZyk7DQorICAgIGlmIChyZXQgPT0gLTEpIHsNCisg
-ICAgICAgIHJldCA9IC1lcnJubzsNCisgICAgfQ0KKyAgICByZXR1cm4gcmV0Ow0KK30NCisNCg0K
-VGhlIHZjcHUgaW9jdGwgY29kZSB3b3JrcyBhcyBpdCBpcy4gDQoNClRoZSBrdm1fYXJjaF9wdXRf
-cmVnaXN0ZXJzKCkgYWxzbyBuZWVkZWQgYSBtaXJyb3IgVk0gdmFyaWFudCBrdm1fYXJjaF9taXJy
-b3JfcHV0X3JlZ2lzdGVycygpLCBmb3IgcmVhc29ucyBzdWNoIGFzIHNhdmluZyBNU1JzIG9uIHRo
-ZSBtaXJyb3IgVk0gcmVxdWlyZWQgZW5hYmxpbmcgdGhlIGluLWtlcm5lbCBpcnFjaGlwIHN1cHBv
-cnQgb24gdGhlIG1pcnJvciBWTSwgb3RoZXJ3aXNlLCBrdm1fcHV0X21zcnMoKSBmYWlscy4gSGVu
-Y2UsIGt2bV9hcmNoX21pcnJvcl9wdXRfcmVnaXN0ZXJzKCkgbWFrZXMgdGhlIG1pcnJvciBWTSBz
-aW1wbGVyIGJ5IG5vdCBzYXZpbmcgYW55IE1TUnMgYW5kIG5vdCBuZWVkaW5nIHRoZSBpbi1rZXJu
-ZWwgaXJxY2hpcCBzdXBwb3J0Lg0KDQpJIGhhZCBsb3Qgb2YgaXNzdWVzIGluIGR5bmFtaWNhbGx5
-IGFkZGluZyBhIG5ldyB2Q1BVLCBpLmUuLCB0aGUgQ1BVU3RhdGUgc3RydWN0dXJlIGR1ZSB0byBx
-ZW11J3Mgb2JqZWN0IG1vZGVsIChRT00pIHdoaWNoIHJlcXVpcmVzIHRoYXQgZXZlcnkgcWVtdSBz
-dHJ1Y3R1cmUvb2JqZWN0IGhhcyB0byBjb250YWluIHRoZSBwYXJlbnQvYmFzZSBjbGFzcy9vYmpl
-Y3QgYW5kIHRoZW4gYWxsIHRoZSBkZXJpdmVkIGNsYXNzZXMgYWZ0ZXIgdGhhdC4gSXQgd2FzIGRp
-ZmZpY3VsdCB0byBhZGQgYSBuZXcgQ1BVIG9iamVjdCBkeW5hbWljYWxseSwgaGVuY2UgSSBoYXZl
-IHRvIHJldXNlIG9uZSBvZiB0aGUg4oCcLXNtcOKAnSAgY3B1cyBwYXNzZWQgb24gcWVtdSBjb21t
-YW5kIGxpbmUgYXMgdGhlIG1pcnJvciB2Q1BVLiBUaGlzIGFsc28gYXNzaXN0cyBpbiBoYXZpbmcg
-dGhlIFg4NkNQVSAiYmFja2luZyIgc3RydWN0dXJlIGZvciB0aGUgbWlycm9yIHZDUFXigJlzIENQ
-VSBvYmplY3QsIHdoaWNoIGFsbG93cyB1c2luZyBtb3N0IG9mIHRoZSBLVk0gY29kZSBpbiBxZW11
-IGZvciB0aGUgbWlycm9yIHZDUFUuIEFsc28gdGhlIG1pcnJvciB2Q1BVIENQVSBvYmplY3Qgd2ls
-bCBoYXZlIHRoZSBDUFVYODZTdGF0ZSBzdHJ1Y3R1cmUgZW1iZWRkZWQgd2hpY2ggY29udGFpbnMg
-dGhlIGNwdSByZWdpc3RlciBzdGF0ZSBmb3IgdGhlIG1pcnJvciB2Q1BVLiANCg0KVGhlIG1pcnJv
-ciB2Q1BVIGlzIG5vdyBydW5uaW5nIGEgc2ltcGxlciBLVk0gcnVuIGxvb3AsIGl0IGRvZXMgbm90
-IGhhdmUgYW55IGluLWtlcm5lbCBpcnFjaGlwIChpbnRlcnJ1cHQgY29udHJvbGxlcikgb3IgYW55
-IG90aGVyIGt2bWFwaWMgaW50ZXJydXB0IGNvbnRyb2xsZXIgc3VwcG9ydGVkIGFuZCBlbmFibGVk
-IGZvciBpdC4gQXMgb2Ygbm93IGl0IGlzIHN0aWxsIGRvaW5nIGJvdGggSS9PIGFuZCBNTUlPIGhh
-bmRsaW5nLg0KDQpMb29raW5nIGZ3ZC4gdG8gY29tbWVudHMsIGZlZWRiYWNrLCB0aG91Z2h0cyBv
-biB0aGUgYWJvdmUgYXBwcm9hY2guDQoNClRoYW5rcywNCkFzaGlzaA0KDQotLS0tLU9yaWdpbmFs
-IE1lc3NhZ2UtLS0tLQ0KRnJvbTogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4N
-ClNlbnQ6IFRodXJzZGF5LCBNYXJjaCAxMSwgMjAyMSAxMDozMCBBTQ0KVG86IFRvYmluIEZlbGRt
-YW4tRml0enRodW0gPHRvYmluQGxpbnV4LmlibS5jb20+OyBuYXRldEBnb29nbGUuY29tDQpDYzog
-RG92IE11cmlrIDxkb3ZtdXJpa0BsaW51eC52bmV0LmlibS5jb20+OyBMZW5kYWNreSwgVGhvbWFz
-IDxUaG9tYXMuTGVuZGFja3lAYW1kLmNvbT47IHg4NkBrZXJuZWwub3JnOyBrdm1Admdlci5rZXJu
-ZWwub3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBzcnV0aGVyZm9yZEBnb29nbGUu
-Y29tOyBzZWFuamNAZ29vZ2xlLmNvbTsgcmllbnRqZXNAZ29vZ2xlLmNvbTsgU2luZ2gsIEJyaWpl
-c2ggPGJyaWplc2guc2luZ2hAYW1kLmNvbT47IEthbHJhLCBBc2hpc2ggPEFzaGlzaC5LYWxyYUBh
-bWQuY29tPjsgTGFzemxvIEVyc2VrIDxsZXJzZWtAcmVkaGF0LmNvbT47IEphbWVzIEJvdHRvbWxl
-eSA8amVqYkBsaW51eC5pYm0uY29tPjsgSHViZXJ0dXMgRnJhbmtlIDxmcmFua2VoQHVzLmlibS5j
-b20+DQpTdWJqZWN0OiBSZTogW1JGQ10gS1ZNOiB4ODY6IFN1cHBvcnQgS1ZNIFZNcyBzaGFyaW5n
-IFNFViBjb250ZXh0DQoNCk9uIDExLzAzLzIxIDE2OjMwLCBUb2JpbiBGZWxkbWFuLUZpdHp0aHVt
-IHdyb3RlOg0KPiBJIGFtIG5vdCBzdXJlIGhvdyB0aGUgbWlycm9yIFZNIHdpbGwgYmUgc3VwcG9y
-dGVkIGluIFFFTVUuIFVzdWFsbHkgDQo+IHRoZXJlIGlzIG9uZSBRRU1VIHByb2Nlc3MgcGVyLXZt
-LiBOb3cgd2Ugd291bGQgbmVlZCB0byBydW4gYSBzZWNvbmQgVk0gDQo+IGFuZCBjb21tdW5pY2F0
-ZSB3aXRoIGl0IGR1cmluZyBtaWdyYXRpb24uIElzIHRoZXJlIGEgd2F5IHRvIGRvIHRoaXMgDQo+
-IHdpdGhvdXQgYWRkaW5nIHNpZ25pZmljYW50IGNvbXBsZXhpdHk/DQoNCkkgY2FuIGFuc3dlciB0
-aGlzIHBhcnQuICBJIHRoaW5rIHRoaXMgd2lsbCBhY3R1YWxseSBiZSBzaW1wbGVyIHRoYW4gd2l0
-aCBhdXhpbGlhcnkgdkNQVXMuICBUaGVyZSB3aWxsIGJlIGEgc2VwYXJhdGUgcGFpciBvZiBWTSt2
-Q1BVIGZpbGUgZGVzY3JpcHRvcnMgd2l0aGluIHRoZSBzYW1lIFFFTVUgcHJvY2VzcywgYW5kIHNv
-bWUgY29kZSB0byBzZXQgdXAgdGhlIG1lbW9yeSBtYXAgdXNpbmcgS1ZNX1NFVF9VU0VSX01FTU9S
-WV9SRUdJT04uDQoNCkhvd2V2ZXIsIHRoZSBjb2RlIHRvIHJ1biB0aGlzIFZNIHdpbGwgYmUgdmVy
-eSBzbWFsbCBhcyB0aGUgVk0gZG9lcyBub3QgaGF2ZSB0byBkbyBNTUlPLCBpbnRlcnJ1cHRzLCBs
-aXZlIG1pZ3JhdGlvbiAob2YgaXRzZWxmKSwgZXRjLiAgSXQganVzdCBzdGFydHMgdXAgYW5kIGNv
-bW11bmljYXRlcyB3aXRoIFFFTVUgdXNpbmcgYSBtYWlsYm94IGF0IGEgcHJlZGV0ZXJtaW5lZCBh
-ZGRyZXNzLg0KDQpJIGFsc28gdGhpbmsgKGJ1dCBJJ20gbm90IDEwMCUgc3VyZSkgdGhhdCB0aGUg
-YXV4aWxpYXJ5IFZNIGRvZXMgbm90IGhhdmUgdG8gd2F0Y2ggY2hhbmdlcyBpbiB0aGUgcHJpbWFy
-eSBWTSdzIG1lbW9yeSBtYXAgKGUuZy4gbWFwcGluZyBhbmQgdW5tYXBwaW5nIG9mIEJBUnMpLiAg
-SW4gUUVNVSB0ZXJtcywgdGhlIGF1eGlsaWFyeSBWTSdzIG1lbW9yeSBtYXAgdHJhY2tzIFJBTUJs
-b2Nrcywgbm90IE1lbW9yeVJlZ2lvbnMsIHdoaWNoIG1ha2VzIHRoaW5ncyBtdWNoIHNpbXBsZXIu
-DQoNClRoZXJlIGFyZSBhbHJlYWR5IG1hbnkgZXhhbXBsZXMgb2YgbWluaSBWTU1zIHJ1bm5pbmcg
-c3BlY2lhbCBwdXJwb3NlIFZNcyBpbiB0aGUga2VybmVsJ3MgdG9vbHMvdGVzdGluZy9zZWxmdGVz
-dHMva3ZtIGRpcmVjdG9yeSwgYW5kIEkgZG9uJ3QgdGhpbmsgdGhlIFFFTVUgY29kZSB3b3VsZCBi
-ZSBhbnkgbW9yZSBjb21wbGV4IHRoYW4gdGhhdC4NCg0KUGFvbG8NCg==
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Saturday, May 29, 2021 3:59 AM
+>=20
+> On Thu, May 27, 2021 at 07:58:12AM +0000, Tian, Kevin wrote:
+> >
+> > 5. Use Cases and Flows
+> >
+> > Here assume VFIO will support a new model where every bound device
+> > is explicitly listed under /dev/vfio thus a device fd can be acquired w=
+/o
+> > going through legacy container/group interface. For illustration purpos=
+e
+> > those devices are just called dev[1...N]:
+> >
+> > 	device_fd[1...N] =3D open("/dev/vfio/devices/dev[1...N]", mode);
+> >
+> > As explained earlier, one IOASID fd is sufficient for all intended use =
+cases:
+> >
+> > 	ioasid_fd =3D open("/dev/ioasid", mode);
+> >
+> > For simplicity below examples are all made for the virtualization story=
+.
+> > They are representative and could be easily adapted to a non-virtualiza=
+tion
+> > scenario.
+>=20
+> For others, I don't think this is *strictly* necessary, we can
+> probably still get to the device_fd using the group_fd and fit in
+> /dev/ioasid. It does make the rest of this more readable though.
+
+Jason, want to confirm here. Per earlier discussion we remain an
+impression that you want VFIO to be a pure device driver thus
+container/group are used only for legacy application. From this
+comment are you suggesting that VFIO can still keep container/
+group concepts and user just deprecates the use of vfio iommu
+uAPI (e.g. VFIO_SET_IOMMU) by using /dev/ioasid (which has
+a simple policy that an IOASID will reject cmd if partially-attached=20
+group exists)?
+
+>=20
+>=20
+> > Three types of IOASIDs are considered:
+> >
+> > 	gpa_ioasid[1...N]: 	for GPA address space
+> > 	giova_ioasid[1...N]:	for guest IOVA address space
+> > 	gva_ioasid[1...N]:	for guest CPU VA address space
+> >
+> > At least one gpa_ioasid must always be created per guest, while the oth=
+er
+> > two are relevant as far as vIOMMU is concerned.
+> >
+> > Examples here apply to both pdev and mdev, if not explicitly marked out
+> > (e.g. in section 5.5). VFIO device driver in the kernel will figure out=
+ the
+> > associated routing information in the attaching operation.
+> >
+> > For illustration simplicity, IOASID_CHECK_EXTENSION and IOASID_GET_
+> > INFO are skipped in these examples.
+> >
+> > 5.1. A simple example
+> > ++++++++++++++++++
+> >
+> > Dev1 is assigned to the guest. One gpa_ioasid is created. The GPA addre=
+ss
+> > space is managed through DMA mapping protocol:
+> >
+> > 	/* Bind device to IOASID fd */
+> > 	device_fd =3D open("/dev/vfio/devices/dev1", mode);
+> > 	ioasid_fd =3D open("/dev/ioasid", mode);
+> > 	ioctl(device_fd, VFIO_BIND_IOASID_FD, ioasid_fd);
+> >
+> > 	/* Attach device to IOASID */
+> > 	gpa_ioasid =3D ioctl(ioasid_fd, IOASID_ALLOC);
+> > 	at_data =3D { .ioasid =3D gpa_ioasid};
+> > 	ioctl(device_fd, VFIO_ATTACH_IOASID, &at_data);
+> >
+> > 	/* Setup GPA mapping */
+> > 	dma_map =3D {
+> > 		.ioasid	=3D gpa_ioasid;
+> > 		.iova	=3D 0;		// GPA
+> > 		.vaddr	=3D 0x40000000;	// HVA
+> > 		.size	=3D 1GB;
+> > 	};
+> > 	ioctl(ioasid_fd, IOASID_DMA_MAP, &dma_map);
+> >
+> > If the guest is assigned with more than dev1, user follows above sequen=
+ce
+> > to attach other devices to the same gpa_ioasid i.e. sharing the GPA
+> > address space cross all assigned devices.
+>=20
+> eg
+>=20
+>  	device2_fd =3D open("/dev/vfio/devices/dev1", mode);
+>  	ioctl(device2_fd, VFIO_BIND_IOASID_FD, ioasid_fd);
+>  	ioctl(device2_fd, VFIO_ATTACH_IOASID, &at_data);
+>=20
+> Right?
+
+Exactly, except a small typo ('dev1' -> 'dev2'). :)
+
+>=20
+> >
+> > 5.2. Multiple IOASIDs (no nesting)
+> > ++++++++++++++++++++++++++++
+> >
+> > Dev1 and dev2 are assigned to the guest. vIOMMU is enabled. Initially
+> > both devices are attached to gpa_ioasid. After boot the guest creates
+> > an GIOVA address space (giova_ioasid) for dev2, leaving dev1 in pass
+> > through mode (gpa_ioasid).
+> >
+> > Suppose IOASID nesting is not supported in this case. Qemu need to
+> > generate shadow mappings in userspace for giova_ioasid (like how
+> > VFIO works today).
+> >
+> > To avoid duplicated locked page accounting, it's recommended to pre-
+> > register the virtual address range that will be used for DMA:
+> >
+> > 	device_fd1 =3D open("/dev/vfio/devices/dev1", mode);
+> > 	device_fd2 =3D open("/dev/vfio/devices/dev2", mode);
+> > 	ioasid_fd =3D open("/dev/ioasid", mode);
+> > 	ioctl(device_fd1, VFIO_BIND_IOASID_FD, ioasid_fd);
+> > 	ioctl(device_fd2, VFIO_BIND_IOASID_FD, ioasid_fd);
+> >
+> > 	/* pre-register the virtual address range for accounting */
+> > 	mem_info =3D { .vaddr =3D 0x40000000; .size =3D 1GB };
+> > 	ioctl(ioasid_fd, IOASID_REGISTER_MEMORY, &mem_info);
+> >
+> > 	/* Attach dev1 and dev2 to gpa_ioasid */
+> > 	gpa_ioasid =3D ioctl(ioasid_fd, IOASID_ALLOC);
+> > 	at_data =3D { .ioasid =3D gpa_ioasid};
+> > 	ioctl(device_fd1, VFIO_ATTACH_IOASID, &at_data);
+> > 	ioctl(device_fd2, VFIO_ATTACH_IOASID, &at_data);
+> >
+> > 	/* Setup GPA mapping */
+> > 	dma_map =3D {
+> > 		.ioasid	=3D gpa_ioasid;
+> > 		.iova	=3D 0; 		// GPA
+> > 		.vaddr	=3D 0x40000000;	// HVA
+> > 		.size	=3D 1GB;
+> > 	};
+> > 	ioctl(ioasid_fd, IOASID_DMA_MAP, &dma_map);
+> >
+> > 	/* After boot, guest enables an GIOVA space for dev2 */
+> > 	giova_ioasid =3D ioctl(ioasid_fd, IOASID_ALLOC);
+> >
+> > 	/* First detach dev2 from previous address space */
+> > 	at_data =3D { .ioasid =3D gpa_ioasid};
+> > 	ioctl(device_fd2, VFIO_DETACH_IOASID, &at_data);
+> >
+> > 	/* Then attach dev2 to the new address space */
+> > 	at_data =3D { .ioasid =3D giova_ioasid};
+> > 	ioctl(device_fd2, VFIO_ATTACH_IOASID, &at_data);
+> >
+> > 	/* Setup a shadow DMA mapping according to vIOMMU
+> > 	  * GIOVA (0x2000) -> GPA (0x1000) -> HVA (0x40001000)
+> > 	  */
+>=20
+> Here "shadow DMA" means relay the guest's vIOMMU page tables to the HW
+> IOMMU?
+
+'shadow' means the merged mapping: GIOVA(0x2000) -> HVA (0x40001000)
+
+>=20
+> > 	dma_map =3D {
+> > 		.ioasid	=3D giova_ioasid;
+> > 		.iova	=3D 0x2000; 	// GIOVA
+> > 		.vaddr	=3D 0x40001000;	// HVA
+>=20
+> eg HVA came from reading the guest's page tables and finding it wanted
+> GPA 0x1000 mapped to IOVA 0x2000?
+
+yes
+
+>=20
+>=20
+> > 5.3. IOASID nesting (software)
+> > +++++++++++++++++++++++++
+> >
+> > Same usage scenario as 5.2, with software-based IOASID nesting
+> > available. In this mode it is the kernel instead of user to create the
+> > shadow mapping.
+> >
+> > The flow before guest boots is same as 5.2, except one point. Because
+> > giova_ioasid is nested on gpa_ioasid, locked accounting is only
+> > conducted for gpa_ioasid. So it's not necessary to pre-register virtual
+> > memory.
+> >
+> > To save space we only list the steps after boots (i.e. both dev1/dev2
+> > have been attached to gpa_ioasid before guest boots):
+> >
+> > 	/* After boots */
+> > 	/* Make GIOVA space nested on GPA space */
+> > 	giova_ioasid =3D ioctl(ioasid_fd, IOASID_CREATE_NESTING,
+> > 				gpa_ioasid);
+> >
+> > 	/* Attach dev2 to the new address space (child)
+> > 	  * Note dev2 is still attached to gpa_ioasid (parent)
+> > 	  */
+> > 	at_data =3D { .ioasid =3D giova_ioasid};
+> > 	ioctl(device_fd2, VFIO_ATTACH_IOASID, &at_data);
+> >
+> > 	/* Setup a GIOVA->GPA mapping for giova_ioasid, which will be
+> > 	  * merged by the kernel with GPA->HVA mapping of gpa_ioasid
+> > 	  * to form a shadow mapping.
+> > 	  */
+> > 	dma_map =3D {
+> > 		.ioasid	=3D giova_ioasid;
+> > 		.iova	=3D 0x2000;	// GIOVA
+> > 		.vaddr	=3D 0x1000;	// GPA
+> > 		.size	=3D 4KB;
+> > 	};
+> > 	ioctl(ioasid_fd, IOASID_DMA_MAP, &dma_map);
+>=20
+> And in this version the kernel reaches into the parent IOASID's page
+> tables to translate 0x1000 to 0x40001000 to physical page? So we
+> basically remove the qemu process address space entirely from this
+> translation. It does seem convenient
+
+yes.
+
+>=20
+> > 5.4. IOASID nesting (hardware)
+> > +++++++++++++++++++++++++
+> >
+> > Same usage scenario as 5.2, with hardware-based IOASID nesting
+> > available. In this mode the pgtable binding protocol is used to
+> > bind the guest IOVA page table with the IOMMU:
+> >
+> > 	/* After boots */
+> > 	/* Make GIOVA space nested on GPA space */
+> > 	giova_ioasid =3D ioctl(ioasid_fd, IOASID_CREATE_NESTING,
+> > 				gpa_ioasid);
+> >
+> > 	/* Attach dev2 to the new address space (child)
+> > 	  * Note dev2 is still attached to gpa_ioasid (parent)
+> > 	  */
+> > 	at_data =3D { .ioasid =3D giova_ioasid};
+> > 	ioctl(device_fd2, VFIO_ATTACH_IOASID, &at_data);
+> >
+> > 	/* Bind guest I/O page table  */
+> > 	bind_data =3D {
+> > 		.ioasid	=3D giova_ioasid;
+> > 		.addr	=3D giova_pgtable;
+> > 		// and format information
+> > 	};
+> > 	ioctl(ioasid_fd, IOASID_BIND_PGTABLE, &bind_data);
+>=20
+> I really think you need to use consistent language. Things that
+> allocate a new IOASID should be calle IOASID_ALLOC_IOASID. If multiple
+> IOCTLs are needed then it is IOASID_ALLOC_IOASID_PGTABLE, etc.
+> alloc/create/bind is too confusing.
+>=20
+> > 5.5. Guest SVA (vSVA)
+> > ++++++++++++++++++
+> >
+> > After boots the guest further create a GVA address spaces (gpasid1) on
+> > dev1. Dev2 is not affected (still attached to giova_ioasid).
+> >
+> > As explained in section 4, user should avoid expose ENQCMD on both
+> > pdev and mdev.
+> >
+> > The sequence applies to all device types (being pdev or mdev), except
+> > one additional step to call KVM for ENQCMD-capable mdev:
+> >
+> > 	/* After boots */
+> > 	/* Make GVA space nested on GPA space */
+> > 	gva_ioasid =3D ioctl(ioasid_fd, IOASID_CREATE_NESTING,
+> > 				gpa_ioasid);
+> >
+> > 	/* Attach dev1 to the new address space and specify vPASID */
+> > 	at_data =3D {
+> > 		.ioasid		=3D gva_ioasid;
+> > 		.flag 		=3D IOASID_ATTACH_USER_PASID;
+> > 		.user_pasid	=3D gpasid1;
+> > 	};
+> > 	ioctl(device_fd1, VFIO_ATTACH_IOASID, &at_data);
+>=20
+> Still a little unsure why the vPASID is here not on the gva_ioasid. Is
+> there any scenario where we want different vpasid's for the same
+> IOASID? I guess it is OK like this. Hum.
+
+Yes, it's completely sane that the guest links a I/O page table to=20
+different vpasids on dev1 and dev2. The IOMMU doesn't mandate
+that when multiple devices share an I/O page table they must use
+the same PASID#.=20
+
+>=20
+> > 	/* if dev1 is ENQCMD-capable mdev, update CPU PASID
+> > 	  * translation structure through KVM
+> > 	  */
+> > 	pa_data =3D {
+> > 		.ioasid_fd	=3D ioasid_fd;
+> > 		.ioasid		=3D gva_ioasid;
+> > 		.guest_pasid	=3D gpasid1;
+> > 	};
+> > 	ioctl(kvm_fd, KVM_MAP_PASID, &pa_data);
+>=20
+> Make sense
+>=20
+> > 	/* Bind guest I/O page table  */
+> > 	bind_data =3D {
+> > 		.ioasid	=3D gva_ioasid;
+> > 		.addr	=3D gva_pgtable1;
+> > 		// and format information
+> > 	};
+> > 	ioctl(ioasid_fd, IOASID_BIND_PGTABLE, &bind_data);
+>=20
+> Again I do wonder if this should just be part of alloc_ioasid. Is
+> there any reason to split these things? The only advantage to the
+> split is the device is known, but the device shouldn't impact
+> anything..
+
+I summarized this as open#4 in another mail for focused discussion.
+
+>=20
+> > 5.6. I/O page fault
+> > +++++++++++++++
+> >
+> > (uAPI is TBD. Here is just about the high-level flow from host IOMMU dr=
+iver
+> > to guest IOMMU driver and backwards).
+> >
+> > -   Host IOMMU driver receives a page request with raw fault_data {rid,
+> >     pasid, addr};
+> >
+> > -   Host IOMMU driver identifies the faulting I/O page table according =
+to
+> >     information registered by IOASID fault handler;
+> >
+> > -   IOASID fault handler is called with raw fault_data (rid, pasid, add=
+r),
+> which
+> >     is saved in ioasid_data->fault_data (used for response);
+> >
+> > -   IOASID fault handler generates an user fault_data (ioasid, addr), l=
+inks it
+> >     to the shared ring buffer and triggers eventfd to userspace;
+>=20
+> Here rid should be translated to a labeled device and return the
+> device label from VFIO_BIND_IOASID_FD. Depending on how the device
+> bound the label might match to a rid or to a rid,pasid
+
+Yes, I acknowledged this input from you and Jean about page fault and=20
+bind_pasid_table. I summarized it as open#3 in another mail.
+
+thus following is skipped...
+
+Thanks
+Kevin
+
+>=20
+> > -   Upon received event, Qemu needs to find the virtual routing informa=
+tion
+> >     (v_rid + v_pasid) of the device attached to the faulting ioasid. If=
+ there are
+> >     multiple, pick a random one. This should be fine since the purpose =
+is to
+> >     fix the I/O page table on the guest;
+>=20
+> The device label should fix this
+>=20
+> > -   Qemu finds the pending fault event, converts virtual completion dat=
+a
+> >     into (ioasid, response_code), and then calls a /dev/ioasid ioctl to
+> >     complete the pending fault;
+> >
+> > -   /dev/ioasid finds out the pending fault data {rid, pasid, addr} sav=
+ed in
+> >     ioasid_data->fault_data, and then calls iommu api to complete it wi=
+th
+> >     {rid, pasid, response_code};
+>=20
+> So resuming a fault on an ioasid will resume all devices pending on
+> the fault?
+>=20
+> > 5.7. BIND_PASID_TABLE
+> > ++++++++++++++++++++
+> >
+> > PASID table is put in the GPA space on some platform, thus must be
+> updated
+> > by the guest. It is treated as another user page table to be bound with=
+ the
+> > IOMMU.
+> >
+> > As explained earlier, the user still needs to explicitly bind every use=
+r I/O
+> > page table to the kernel so the same pgtable binding protocol (bind, ca=
+che
+> > invalidate and fault handling) is unified cross platforms.
+> >
+> > vIOMMUs may include a caching mode (or paravirtualized way) which,
+> once
+> > enabled, requires the guest to invalidate PASID cache for any change on=
+ the
+> > PASID table. This allows Qemu to track the lifespan of guest I/O page t=
+ables.
+> >
+> > In case of missing such capability, Qemu could enable write-protection =
+on
+> > the guest PASID table to achieve the same effect.
+> >
+> > 	/* After boots */
+> > 	/* Make vPASID space nested on GPA space */
+> > 	pasidtbl_ioasid =3D ioctl(ioasid_fd, IOASID_CREATE_NESTING,
+> > 				gpa_ioasid);
+> >
+> > 	/* Attach dev1 to pasidtbl_ioasid */
+> > 	at_data =3D { .ioasid =3D pasidtbl_ioasid};
+> > 	ioctl(device_fd1, VFIO_ATTACH_IOASID, &at_data);
+> >
+> > 	/* Bind PASID table */
+> > 	bind_data =3D {
+> > 		.ioasid	=3D pasidtbl_ioasid;
+> > 		.addr	=3D gpa_pasid_table;
+> > 		// and format information
+> > 	};
+> > 	ioctl(ioasid_fd, IOASID_BIND_PASID_TABLE, &bind_data);
+> >
+> > 	/* vIOMMU detects a new GVA I/O space created */
+> > 	gva_ioasid =3D ioctl(ioasid_fd, IOASID_CREATE_NESTING,
+> > 				gpa_ioasid);
+> >
+> > 	/* Attach dev1 to the new address space, with gpasid1 */
+> > 	at_data =3D {
+> > 		.ioasid		=3D gva_ioasid;
+> > 		.flag 		=3D IOASID_ATTACH_USER_PASID;
+> > 		.user_pasid	=3D gpasid1;
+> > 	};
+> > 	ioctl(device_fd1, VFIO_ATTACH_IOASID, &at_data);
+> >
+> > 	/* Bind guest I/O page table. Because SET_PASID_TABLE has been
+> > 	  * used, the kernel will not update the PASID table. Instead, just
+> > 	  * track the bound I/O page table for handling invalidation and
+> > 	  * I/O page faults.
+> > 	  */
+> > 	bind_data =3D {
+> > 		.ioasid	=3D gva_ioasid;
+> > 		.addr	=3D gva_pgtable1;
+> > 		// and format information
+> > 	};
+> > 	ioctl(ioasid_fd, IOASID_BIND_PGTABLE, &bind_data);
+>=20
+> I still don't quite get the benifit from doing this.
+>=20
+> The idea to create an all PASID IOASID seems to work better with less
+> fuss on HW that is directly parsing the guest's PASID table.
+>=20
+> Cache invalidate seems easy enough to support
+>=20
+> Fault handling needs to return the (ioasid, device_label, pasid) when
+> working with this kind of ioasid.
+>=20
+> It is true that it does create an additional flow qemu has to
+> implement, but it does directly mirror the HW.
+>=20
+> Jason
