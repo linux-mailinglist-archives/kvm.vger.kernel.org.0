@@ -2,80 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F93B397884
-	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 18:55:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63540397894
+	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 18:59:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233971AbhFAQ5Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 12:57:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50571 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230288AbhFAQ5P (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 1 Jun 2021 12:57:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622566534;
+        id S234438AbhFARBb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 13:01:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60982 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232490AbhFARBa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Jun 2021 13:01:30 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AFD0C061574;
+        Tue,  1 Jun 2021 09:59:49 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f111d00a3e97a9775243981.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:1d00:a3e9:7a97:7524:3981])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7E37E1EC0288;
+        Tue,  1 Jun 2021 18:59:44 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1622566784;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=V46U5BjZCJkONhTvdGGIniGrnFBz3Ay4NH7d08zkjm8=;
-        b=FRoxEMumDvsV34kn7mDgN4fsKM1GlWCu2f/GDU/ysIDoLV70MHfQYIF2bInchb+VNhYrfZ
-        EXBrmhUSASDAtUdUFsLSfiGfK/vpfPXS0cEh3DR/hdn57Oqf7FKlXHL7k95kvl5H6l6VO0
-        StR3MOdhO3DSHXJmWeuDO05gVUvnaoY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-266-F0wLloOoM82Tt1Ae2T9PUQ-1; Tue, 01 Jun 2021 12:55:30 -0400
-X-MC-Unique: F0wLloOoM82Tt1Ae2T9PUQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6CB41020C33;
-        Tue,  1 Jun 2021 16:55:29 +0000 (UTC)
-Received: from localhost (ovpn-113-153.ams2.redhat.com [10.36.113.153])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 625DE60C0F;
-        Tue,  1 Jun 2021 16:55:26 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH] s390x: unify header guards
-In-Reply-To: <20210601182545.36acdc98@ibm-vm>
-Organization: Red Hat GmbH
-References: <20210601161525.462315-1-cohuck@redhat.com>
- <20210601182545.36acdc98@ibm-vm>
-User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
-Date:   Tue, 01 Jun 2021 18:55:24 +0200
-Message-ID: <87k0ndr0cj.fsf@redhat.com>
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=5nsnQeki0sXWJtABZE7YGdEDhyEL/jgo3r8JFWG5AfU=;
+        b=dFSpLZGU8LIIn6vzob4eDC/+rLlcNMy9tZl/FRSRpotWwlyvzyhLQ/usMlGWImznHUDKlf
+        jUbZHKlQNymCF0P+6Ajl6NaQF0Nzb1qOdfJKPXrgxByTLgwynIubRIrSJA4hmKw8v3BDFu
+        W7K87gj50j5VV6f4e39P8FSDJOf0050=
+Date:   Tue, 1 Jun 2021 18:59:37 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Sean Christopherson <seanjc@google.com>, Pu Wen <puwen@hygon.cn>,
+        Joerg Roedel <jroedel@suse.de>, x86@kernel.org,
+        joro@8bytes.org, dave.hansen@linux.intel.com, peterz@infradead.org,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        sashal@kernel.org, gregkh@linuxfoundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] x86/sev: Check whether SEV or SME is supported first
+Message-ID: <YLZneRWzoujEe+6b@zn.tnic>
+References: <20210526072424.22453-1-puwen@hygon.cn>
+ <YK6E5NnmRpYYDMTA@google.com>
+ <905ecd90-54d2-35f1-c8ab-c123d8a3d9a0@hygon.cn>
+ <YLSuRBzM6piigP8t@suse.de>
+ <e1ad087e-a951-4128-923e-867a8b38ecec@hygon.cn>
+ <YLZGuTYXDin2K9wx@zn.tnic>
+ <YLZc3sFKSjpd2yPS@google.com>
+ <dbc4e48f-187a-4b2d-2625-b62d334f60b2@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <dbc4e48f-187a-4b2d-2625-b62d334f60b2@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Claudio Imbrenda <imbrenda@linux.ibm.com> writes:
+On Tue, Jun 01, 2021 at 11:36:31AM -0500, Tom Lendacky wrote:
+> That is the reason for checking the maximum supported leaf being at least
+> 0x8000001f. If that leaf is supported, we expect the SEV status MSR to be
+> valid. The problem is that the Hygon ucode does not support the MSR in
+> question. I'm not sure what it would take for that to be added to their
+> ucode and just always return 0.
 
-> On Tue,  1 Jun 2021 18:15:25 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
->
->> Let's unify the header guards to _ASM_S390X_FILE_H_ respectively
->> _S390X_FILE_H_. This makes it more obvious what the file is
->> about, and avoids possible name space collisions.
->> 
->> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->
-> LGTM, but... what about the other architectures? I think we should 
-> try to standardize more generally
+Yap, that sounds good too.
 
-See my comment below :)
+> Because a hypervisor can put anything it wants in the CPUID 0x0 /
+> 0x80000000 fields, I don't think we can just check for "AuthenticAMD".
 
-I think it would make sense to standardize all architectures; but I
-would also like some feedback on the format I have chosen.
+By that logic you can forget even checking CPUID at all in that case.
+The only reliable check you can do is MSR_AMD64_SEV which is guest-only.
 
->
->> ---
->> 
->> Only did s390x for now; the other archs seem to be inconsistent in
->> places as well, and I can also try to tackle them if it makes sense.
->> 
+> If we want the read of CPUID 0x8000001f done before reading the SEV status
+> MSR, then the original patch is close, but slightly flawed, e.g. only SME
+> can be indicated but then MSR_AMD64_SEV can say SEV active.
+> 
+> If we want to introduce support for handling/detecting #GP, this might
+> become overly complicated because of the very early, identity mapped state
+> the code is in - especially for backport to stable.
 
+Yah, ain't gonna happen. I'm not taking some #GP handler to the early
+code just because some hardware is operating out of spec.
+
+If some hypervisor running on Hygon hardware is lying and says it is an
+AMD which supports the 0x8000001f leaf, then that hypervisor gets to
+keep both pieces.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
