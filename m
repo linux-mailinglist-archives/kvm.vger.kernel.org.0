@@ -2,60 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE64D3978A5
-	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 19:03:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6468B3978C7
+	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 19:09:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234438AbhFAREk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 13:04:40 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:41618 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234388AbhFAREh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Jun 2021 13:04:37 -0400
-Received: from zn.tnic (p200300ec2f111d00a3e97a9775243981.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:1d00:a3e9:7a97:7524:3981])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 364261EC0288;
-        Tue,  1 Jun 2021 19:02:54 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1622566974;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=dIdCWzqgU6kcRDTdTE0n9okx57SCKfxWQpZpdqAC19k=;
-        b=avCcUpsSY5P7Qted1BZrbeOJlTsVvz32We/YD4oBuQ8ERSItO2tXwJwanqayk+jETqUJn9
-        hQ/ATfINA0OUit10cikpLQ8GycTkq3AerqwJsoAD8f1UXy2wdu0xWDMtXlVJqe/VmHUapM
-        rm27ZU4Zh//kt6LoTKRW3dcA2INPkG8=
-Date:   Tue, 1 Jun 2021 19:02:53 +0200
-From:   Borislav Petkov <bp@alien8.de>
+        id S234622AbhFARK4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 13:10:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34910 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234388AbhFARKw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Jun 2021 13:10:52 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 649F6C061574
+        for <kvm@vger.kernel.org>; Tue,  1 Jun 2021 10:09:09 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id v13so7215077ple.9
+        for <kvm@vger.kernel.org>; Tue, 01 Jun 2021 10:09:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=402d1vT6kafYaa9OYO/pPQP5D7goCvQWXQjnoTnBYFQ=;
+        b=nvD1x9UnnGp3hae8WGb9Lu3uwOLha5HnwrxcS+3j/a6aVYtpRG3lQRNKHRXn9MZsRo
+         cNHa5eqm6imtzc1nHTEQSRxeQdANEiUh5XwzWfjTcPfnBmIaFkkVijToJHe4NCFliK26
+         fKer1rpr36RWINI+Df+gLfUl/5a0QT+3O6/XxilFO9yyoVnPfBLtbTIGbobVWZHcHEg4
+         /5DB0DmTugmIZAdvxkisovnHLX0zwBq7lE9Od9xAisuJeqdsIYybWuRmHib6Fz2rJBtC
+         ZBcmcDNbyflRDUhDnexP1Tk+7wL85JusaA39AOX+dygv3qWsAOEYG7SaqDHXN9sEZNof
+         MkKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=402d1vT6kafYaa9OYO/pPQP5D7goCvQWXQjnoTnBYFQ=;
+        b=hUn4Yi5ZS0m0i/58xaOtheMfvhiPc/vqtTaoiG9CWLUQupzR3xx/rEErE9qo69mHlC
+         WdAjkBCvP0qI12kI+/2Z04+vdY6AbEuw8Vpr17n6TnqgmN3ZXY7WDkMiX7hMdbORcQbw
+         xnXvqC0+jCyv6hzn3PWl0OK1dyHL+vqNOglO+i0kxbe8+atuRRoO5vimD/UO3hTPfqPA
+         ZupkxpgpU3howGCsr0lRbA8+lqVZckmlSVbQzZlPlroyIFzkcvcr895LrWV7FHTbwDfk
+         CNxAGUpgULiB1Jy/aUmm5fQDf8vrB2wt74nEMcvECv0cqvq8o5ott8ohucLBa21715p5
+         poZg==
+X-Gm-Message-State: AOAM533fBiN1cSxCX/2XzhXca0NJUT0AKsZgxd7cEcHj/yCJiTXh6Xkx
+        JS7XoFiDhPET4Ak6ItS/P88bHg==
+X-Google-Smtp-Source: ABdhPJzdKyTOillNzs0rsuVx1le6bvyhxJP5iSe1FXNQm6CSoJOIo4hsR6+K15AV3rAQNWrH7caPQg==
+X-Received: by 2002:a17:902:6b42:b029:107:a6d5:fc8a with SMTP id g2-20020a1709026b42b0290107a6d5fc8amr5375144plt.76.1622567348693;
+        Tue, 01 Jun 2021 10:09:08 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id z12sm14331891pfk.45.2021.06.01.10.09.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Jun 2021 10:09:07 -0700 (PDT)
+Date:   Tue, 1 Jun 2021 17:09:04 +0000
+From:   Sean Christopherson <seanjc@google.com>
 To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Varad Gautam <varad.gautam@suse.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, Joerg Roedel <jroedel@suse.de>
-Subject: Re: [PATCH v2] x86: Add a test for AMD SEV-ES #VC handling
-Message-ID: <YLZoPTQxQKWcWZOC@zn.tnic>
-References: <20210531125035.21105-1-varad.gautam@suse.com>
- <20210531172707.7909-1-varad.gautam@suse.com>
- <fdc55029-bbb5-6d3e-5523-cada1aae8ddc@amd.com>
+Cc:     Borislav Petkov <bp@alien8.de>, Pu Wen <puwen@hygon.cn>,
+        Joerg Roedel <jroedel@suse.de>, x86@kernel.org,
+        joro@8bytes.org, dave.hansen@linux.intel.com, peterz@infradead.org,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        sashal@kernel.org, gregkh@linuxfoundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] x86/sev: Check whether SEV or SME is supported first
+Message-ID: <YLZpsPli0ALRISvV@google.com>
+References: <20210526072424.22453-1-puwen@hygon.cn>
+ <YK6E5NnmRpYYDMTA@google.com>
+ <905ecd90-54d2-35f1-c8ab-c123d8a3d9a0@hygon.cn>
+ <YLSuRBzM6piigP8t@suse.de>
+ <e1ad087e-a951-4128-923e-867a8b38ecec@hygon.cn>
+ <YLZGuTYXDin2K9wx@zn.tnic>
+ <YLZc3sFKSjpd2yPS@google.com>
+ <dbc4e48f-187a-4b2d-2625-b62d334f60b2@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fdc55029-bbb5-6d3e-5523-cada1aae8ddc@amd.com>
+In-Reply-To: <dbc4e48f-187a-4b2d-2625-b62d334f60b2@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 01, 2021 at 11:41:31AM -0500, Tom Lendacky wrote:
-> > +ifdef CONFIG_AMD_MEM_ENCRYPT_TEST_VC
-> > +CFLAGS_sev.o	+= -fno-ipa-sra
-> > +endif
+On Tue, Jun 01, 2021, Tom Lendacky wrote:
 > 
-> Maybe add something in the commit message as to why this is needed.
+> On 6/1/21 11:14 AM, Sean Christopherson wrote:
+> > On Tue, Jun 01, 2021, Borislav Petkov wrote:
+> >> On Mon, May 31, 2021 at 10:56:50PM +0800, Pu Wen wrote:
+> >>> Thanks for your suggestion, I'll try to set up early #GP handler to fix
+> >>> the problem.
+> >>
+> >> Why? AFAICT, you only need to return early in sme_enable() if CPUID is
+> >> not "AuthenticAMD". Just do that please.
+> > 
+> > I don't think that would suffice, presumably MSR_AMD64_SEV doesn't exist on older
+> > AMD CPUs either.  E.g. there's no mention of MSR 0xC001_0131 in the dev's guide
+> > from 2015[*].
+> 
+> That is the reason for checking the maximum supported leaf being at least
+> 0x8000001f. If that leaf is supported, we expect the SEV status MSR to be
+> valid. The problem is that the Hygon ucode does not support the MSR in
+> question. I'm not sure what it would take for that to be added to their
+> ucode and just always return 0.
 
-Or even better - in a comment above it. Commit messages are harder to
-find when time passes and other commits touch this line and you have to
-go and do git archeology just to figure out why this was done...
+Ah.  But it's also legal/possible for the max extended leaf to be greater than
+0x8000001f, e.g. 0x80000020, without 0x8000001f itself being supported.  Even
+if AMD can guarantee no such processor will exist, I don't think it would be
+illegal for a hypervisor to emulate a feature (on an "AuthenticAMD" virtual CPU)
+enumerated by a higher leaf on an older physical AMD CPU (or non-AMD CPU!) that
+doesn't support MSR_AMD64_SEV.
 
--- 
-Regards/Gruss,
-    Boris.
+> > I also don't see the point in checking the vendor string.  A malicious hypervisor
+> > can lie about CPUID.0x0 just as easily as it can lie about CPUID.0x8000001f, so
+> > for SEV the options are to either trust the hypervisor or eat #GPs on RDMSR for
+> > non-SEV CPUs.  If we go with "trust the hypervisor", then the original patch of
+> > hoisting the CPUID.0x8000001f check up is simpler than checking the vendor string.
+> 
+> Because a hypervisor can put anything it wants in the CPUID 0x0 /
+> 0x80000000 fields, I don't think we can just check for "AuthenticAMD".
+> 
+> If we want the read of CPUID 0x8000001f done before reading the SEV status
+> MSR, then the original patch is close, but slightly flawed, e.g. only SME
+> can be indicated but then MSR_AMD64_SEV can say SEV active.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+I didn't follow this.  Bare metal CPUs should never report only SME in CPUID and
+then report SEV as being active in the MSR.
+
+In the SEV case, relying on CPUID in any way, shape, or form requires trusting
+the hypervisor.  The code could assert that CPUID and the MSR are consistent, but
+I don't see any value in doing so as a much more effective attack would be to
+report neither SME nor SEV as supported.
