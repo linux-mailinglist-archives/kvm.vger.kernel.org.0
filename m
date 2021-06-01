@@ -2,79 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A28F397A55
-	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 21:00:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC4DF397A2F
+	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 20:48:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234701AbhFATB6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 15:01:58 -0400
-Received: from [201.28.113.2] ([201.28.113.2]:59984 "EHLO
-        outlook.eldorado.org.br" rhost-flags-FAIL-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S234684AbhFATBy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 1 Jun 2021 15:01:54 -0400
-X-Greylist: delayed 1024 seconds by postgrey-1.27 at vger.kernel.org; Tue, 01 Jun 2021 15:01:54 EDT
-Received: from power9a ([10.10.71.235]) by outlook.eldorado.org.br with Microsoft SMTPSVC(8.5.9600.16384);
-         Tue, 1 Jun 2021 15:43:04 -0300
-Received: from eldorado.org.br (unknown [10.10.71.235])
-        by power9a (Postfix) with ESMTP id 161CF80148B;
-        Tue,  1 Jun 2021 15:43:04 -0300 (-03)
-From:   "Bruno Larsen (billionai)" <bruno.larsen@eldorado.org.br>
-To:     qemu-devel@nongnu.org
-Cc:     "Bruno Larsen (billionai)" <bruno.larsen@eldorado.org.br>,
-        fernando.valle@eldorado.org.br, matheus.ferst@eldorado.org.br,
-        david@gibson.dropbear.id.au, farosas@linux.ibm.com,
-        lucas.araujo@eldorado.org.br, luis.pires@eldorado.org.br,
-        qemu-ppc@nongnu.org, richard.henderson@linaro.org,
-        Greg Kurz <groug@kaod.org>,
+        id S234692AbhFASuY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 14:50:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46456 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233397AbhFASuX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 1 Jun 2021 14:50:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622573321;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+m2fLJU9ZegzR8OXJWZy5OSSO9kKVan2LDTUGDxd89w=;
+        b=ftU94JatIcIt2jzR57uvTd9NM2yWvNcGDW83A99IsIG6kRxHuAJO8n9aHJxMTUhQW+EGB/
+        5m0h/ezlYAnyc+43FWNqV17M8FCC5UHE89jxWBT8VGmivMMzTawNUVXn85fgbi0iDrqjaj
+        b8FPmvgfFZs95jZefPBBcjTAZRivuAA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-535-k9wSXOa1NHuf7xPzmVusyw-1; Tue, 01 Jun 2021 14:48:38 -0400
+X-MC-Unique: k9wSXOa1NHuf7xPzmVusyw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CE666D581;
+        Tue,  1 Jun 2021 18:48:37 +0000 (UTC)
+Received: from localhost (ovpn-112-239.rdu2.redhat.com [10.10.112.239])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A897F1002EF0;
+        Tue,  1 Jun 2021 18:48:33 +0000 (UTC)
+Date:   Tue, 1 Jun 2021 14:48:32 -0400
+From:   Eduardo Habkost <ehabkost@redhat.com>
+To:     Claudio Fontana <cfontana@suse.de>
+Cc:     Peter Maydell <peter.maydell@linaro.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        kvm@vger.kernel.org (open list:Overall KVM CPUs)
-Subject: [RFC PATCH] target/ppc: removed usage of ppc_store_sdr1 in kvm.c
-Date:   Tue,  1 Jun 2021 15:42:42 -0300
-Message-Id: <20210601184242.122895-1-bruno.larsen@eldorado.org.br>
-X-Mailer: git-send-email 2.17.1
-X-OriginalArrivalTime: 01 Jun 2021 18:43:04.0226 (UTC) FILETIME=[F4B6A820:01D75715]
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Cameron Esfahani <dirty@apple.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>, qemu-devel@nongnu.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH 1/2] i386: reorder call to cpu_exec_realizefn in
+ x86_cpu_realizefn
+Message-ID: <20210601184832.teij5fkz6dvyctrp@habkost.net>
+References: <20210529091313.16708-1-cfontana@suse.de>
+ <20210529091313.16708-2-cfontana@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210529091313.16708-2-cfontana@suse.de>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The only use of this function in kvm.c is right after using the KVM
-ioctl to get the registers themselves, so there is no need to do the
-error checks done by ppc_store_sdr1.
++Vitaly
 
-The probable reason this was here before is because of the hack where
-KVM PR stores the hash table size along with the SDR1 information, but
-since ppc_store_sdr1 would also store that information, there should be
-no need to do any extra processing here.
+On Sat, May 29, 2021 at 11:13:12AM +0200, Claudio Fontana wrote:
+> we need to expand features first, before we attempt to check them
+> in the accel realizefn code called by cpu_exec_realizefn().
+> 
+> At the same time we need checks for code_urev and host_cpuid_required,
+> and modifications to cpu->mwait to happen after the initial setting
+> of them inside the accel realizefn code.
 
-Signed-off-by: Bruno Larsen (billionai) <bruno.larsen@eldorado.org.br>
----
+I miss an explanation why those 3 steps need to happen after
+accel realizefn.
 
-This change means we won't have to compile ppc_store_sdr1 when we get
-disable-tcg working, but I'm not working on that code motion just yet
-since Lucas is dealing with the same file.
+I'm worried by the fragility of the ordering.  If there are
+specific things that must be done before/after
+cpu_exec_realizefn(), this needs to be clear in the code.
 
-I'm sending this as an RFC because I'm pretty sure I'm missing
-something, but from what I can see, this is all we'd need
+> 
+> Partial Fix.
+> 
+> Fixes: 48afe6e4eabf ("i386: split cpu accelerators from cpu.c, using AccelCPUClass")
 
- target/ppc/kvm.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Shouldn't this be
+  f5cc5a5c1686 ("i386: split cpu accelerators from cpu.c, using AccelCPUClass")
+?
 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 104a308abb..3f52a7189d 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -1159,7 +1159,11 @@ static int kvmppc_get_books_sregs(PowerPCCPU *cpu)
-     }
- 
-     if (!cpu->vhyp) {
--        ppc_store_sdr1(env, sregs.u.s.sdr1);
-+        /*
-+         * We have just gotten the SDR1, there should be no
-+         * reason to do error checking.... right?
-+         */
-+        env->spr[SPR_SDR1] = sregs.u.s.sdr1;
-     }
- 
-     /* Sync SLB */
+Also, it looks like part of the ordering change was made in
+commit 30565f10e907 ("cpu: call AccelCPUClass::cpu_realizefn in
+cpu_exec_realizefn").
+
+
+
+> Signed-off-by: Claudio Fontana <cfontana@suse.de>
+> ---
+>  target/i386/cpu.c | 56 +++++++++++++++++++++++------------------------
+>  1 file changed, 28 insertions(+), 28 deletions(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 9e211ac2ce..6bcb7dbc2c 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -6133,34 +6133,6 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+>      Error *local_err = NULL;
+>      static bool ht_warned;
+>  
+> -    /* Process Hyper-V enlightenments */
+> -    x86_cpu_hyperv_realize(cpu);
+
+Vitaly, is this reordering going to affect the Hyper-V cleanup
+work you are doing?  It seems harmless and it makes sense to keep
+the "realize" functions close together, but I'd like to confirm.
+
+> -
+> -    cpu_exec_realizefn(cs, &local_err);
+> -    if (local_err != NULL) {
+> -        error_propagate(errp, local_err);
+> -        return;
+> -    }
+> -
+> -    if (xcc->host_cpuid_required && !accel_uses_host_cpuid()) {
+> -        g_autofree char *name = x86_cpu_class_get_model_name(xcc);
+> -        error_setg(&local_err, "CPU model '%s' requires KVM or HVF", name);
+> -        goto out;
+> -    }
+> -
+> -    if (cpu->ucode_rev == 0) {
+> -        /* The default is the same as KVM's.  */
+> -        if (IS_AMD_CPU(env)) {
+> -            cpu->ucode_rev = 0x01000065;
+> -        } else {
+> -            cpu->ucode_rev = 0x100000000ULL;
+> -        }
+> -    }
+> -
+> -    /* mwait extended info: needed for Core compatibility */
+> -    /* We always wake on interrupt even if host does not have the capability */
+> -    cpu->mwait.ecx |= CPUID_MWAIT_EMX | CPUID_MWAIT_IBE;
+> -
+>      if (cpu->apic_id == UNASSIGNED_APIC_ID) {
+>          error_setg(errp, "apic-id property was not initialized properly");
+>          return;
+> @@ -6190,6 +6162,34 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+>             & CPUID_EXT2_AMD_ALIASES);
+>      }
+>  
+> +    /* Process Hyper-V enlightenments */
+> +    x86_cpu_hyperv_realize(cpu);
+> +
+> +    cpu_exec_realizefn(cs, &local_err);
+
+I'm worried by the reordering of cpu_exec_realizefn().  That
+function does a lot, and reordering it might have even more
+unwanted side effects.
+
+I wonder if it wouldn't be easier to revert commit 30565f10e907
+("cpu: call AccelCPUClass::cpu_realizefn in cpu_exec_realizefn").
+
+
+> +    if (local_err != NULL) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    if (xcc->host_cpuid_required && !accel_uses_host_cpuid()) {
+> +        g_autofree char *name = x86_cpu_class_get_model_name(xcc);
+> +        error_setg(&local_err, "CPU model '%s' requires KVM or HVF", name);
+> +        goto out;
+> +    }
+> +
+> +    if (cpu->ucode_rev == 0) {
+> +        /* The default is the same as KVM's.  */
+> +        if (IS_AMD_CPU(env)) {
+> +            cpu->ucode_rev = 0x01000065;
+> +        } else {
+> +            cpu->ucode_rev = 0x100000000ULL;
+> +        }
+> +    }
+> +
+> +    /* mwait extended info: needed for Core compatibility */
+> +    /* We always wake on interrupt even if host does not have the capability */
+> +    cpu->mwait.ecx |= CPUID_MWAIT_EMX | CPUID_MWAIT_IBE;
+> +
+
+The dependency between those lines and cpu_exec_realizefn() is
+completely unclear here.  What can we do to make this clearer and
+less fragile?
+
+Note that this is not a comment on this fix, specifically, but on
+how the initialization ordering is easy to break here.
+
+
+>      /* For 64bit systems think about the number of physical bits to present.
+>       * ideally this should be the same as the host; anything other than matching
+>       * the host can cause incorrect guest behaviour.
+> -- 
+> 2.26.2
+> 
+
 -- 
-2.17.1
+Eduardo
 
