@@ -2,236 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B36CD397BE5
-	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 23:51:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92523397BEE
+	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 23:54:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234766AbhFAVxJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 17:53:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41262 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234656AbhFAVxI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Jun 2021 17:53:08 -0400
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0B6FC061574
-        for <kvm@vger.kernel.org>; Tue,  1 Jun 2021 14:51:25 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id n17-20020a7bc5d10000b0290169edfadac9so2482795wmk.1
-        for <kvm@vger.kernel.org>; Tue, 01 Jun 2021 14:51:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=references:user-agent:from:to:cc:subject:date:in-reply-to
-         :message-id:mime-version:content-transfer-encoding;
-        bh=eEnFmGo+UZqq9usDjM1VKElE9vmoR0P36JtXIWuNBME=;
-        b=zLN3ODyt+z+dh7cCItJooplLlyn6/+d455ILyy98nrCpsg2UcVN5IPIShVd2buvODK
-         q/Aq9XD97xHJEpMvxZ1oNVZwLgxiFAEk3x+LV7G56ygvllQak9fBw6yas11//76bHLFN
-         +vY6O4pHFU6FZdKfUX47qd/46xrAzthLWEwKqDpqyY+hg424pn1aJyiOcmZEzYa6inC6
-         bs2tr314Tjm2o1ZTr6g1w/8gI6d7rPtEbYxo8DnvQ6aInpY8VSx0WJE3uiZppucnpv1D
-         pQK1S2qT6VDS2dLAJRMXsgBUmzwBf7sq72Ov9CLcKUZl3bYaYY9k45F2GRp0kwIlQgrb
-         gC3A==
+        id S234833AbhFAVzu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 17:55:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21050 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234698AbhFAVzu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 1 Jun 2021 17:55:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622584447;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TLmTFs79Kk/HdqD2U3Jsivs3GJU2uRn31j0/SZFo+5Y=;
+        b=CZz+aERLjfH5M645R6+VPZh+PxvBh/Fpg2G7nFz0Nodw0KtVSox8uvTNnJAlcLKAbS+gq+
+        la2xgZ83+TN9fNNev+og522oiX9mvbvJDd9pGA/rGR8lPimbFNMBI3w9Cicw135LMGGTt4
+        q/B/dXfJR0JRU1lFDkk8klWQzksv4eo=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-563-_jN1rs2aMiqh_DH2_CK8Lw-1; Tue, 01 Jun 2021 17:54:06 -0400
+X-MC-Unique: _jN1rs2aMiqh_DH2_CK8Lw-1
+Received: by mail-qk1-f198.google.com with SMTP id u9-20020a05620a4549b02902e956c2a3c8so184015qkp.20
+        for <kvm@vger.kernel.org>; Tue, 01 Jun 2021 14:54:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
-         :in-reply-to:message-id:mime-version:content-transfer-encoding;
-        bh=eEnFmGo+UZqq9usDjM1VKElE9vmoR0P36JtXIWuNBME=;
-        b=skLKSr+4xmeCgubQ7yLl2hoStnkPRCkidqLR/sXkDAk5jD7lr6Aw8AffZzsfK3R3vd
-         Bl9vwC+mSaa66d3Jelzf5MYZK7eRkc2wp7PZYtuj4jcE5tUv0RQUF1HOzhyruveXHhW5
-         zfWMKc70lll30ud7fUm3/Do9ryoM50BsXIZXQ5is35W779cPZc0hqzPtJyfPIITAekEg
-         7QkulnSLT7McEWNKha7UYLk6jltwe98O4KiHt6H/QEx1la4+JjbDib/LFQgjMP5YVvVN
-         /XQ50dX/AQ0KpTDc/j9tucmxTShgCNPV7PpURI10fbgcF1H8dqvk1cc74kGdWV7hRjCu
-         Nk+A==
-X-Gm-Message-State: AOAM530i1n5FzCPXGHwzsCaXohX8Bc118NYtwpXsTtQcBNIW5U1cm1nL
-        1/d6JnfZiiz6siqEup99AUtMnw==
-X-Google-Smtp-Source: ABdhPJy+O/9yUXByk5CtPEKI69bRLs831YKZ/VATXi6NUYp3immwAkZ80g7J3CvcHwxl1kHruVDz2w==
-X-Received: by 2002:a7b:c4d0:: with SMTP id g16mr1811216wmk.147.1622584284192;
-        Tue, 01 Jun 2021 14:51:24 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
-        by smtp.gmail.com with ESMTPSA id z10sm71291wmb.26.2021.06.01.14.51.23
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=TLmTFs79Kk/HdqD2U3Jsivs3GJU2uRn31j0/SZFo+5Y=;
+        b=suXMXML5r9I+1vL9nPcAe9C2cHYLfomXVwFu1boZJhj7aSBWDb6faREgPXbvdN/WKn
+         YX6m4mEkUAtYWdrHNp+BM5yPolauVibZ/ikyYjo+dst++6sgMAsSViw+b/T3/b+zLPCG
+         vI6cvo1dSnsmtLvjR+g4PZ5mZzc/KW0dAqLoG7f3hG+lkCZgM219pcjp6DmSp4SPr+dn
+         Et6WD+9JdxxfekdEm81t/6M1SvjzlJ+l3/ZzUAbDCkWfSnR52xl5sBd9Md59JKo+86so
+         ChXWwEJzJmp5gL4MijQUQ2vYuzIQ6YblwM69LgIIf3vyZH7WorUDPOFulrF6yVsuB2tH
+         0aeA==
+X-Gm-Message-State: AOAM533mgk5Ds3QVMjePo4WYaHg94a28LkxykE8ibrJl8yufmA5vZJcV
+        XRSlos0dWnlFMImQXXzhWayRlu2LumRom0ztadRW9R2v+srHQ+jYPOZwjdwRfRSgrHiCWZ/mz+g
+        aM0RnYGAzmC7a
+X-Received: by 2002:ac8:698b:: with SMTP id o11mr12834843qtq.148.1622584445794;
+        Tue, 01 Jun 2021 14:54:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzw3PnREwzRNFGSUnTvVgUPY8IkQ4jACsTTBjVGul0hqJfwLurKsrUBHidzwlCZJ8f3TECqFA==
+X-Received: by 2002:ac8:698b:: with SMTP id o11mr12834820qtq.148.1622584445481;
+        Tue, 01 Jun 2021 14:54:05 -0700 (PDT)
+Received: from t490s (bras-base-toroon474qw-grc-61-184-147-118-108.dsl.bell.ca. [184.147.118.108])
+        by smtp.gmail.com with ESMTPSA id i1sm11121297qtg.81.2021.06.01.14.54.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Jun 2021 14:51:23 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 7DD671FF7E;
-        Tue,  1 Jun 2021 22:51:22 +0100 (BST)
-References: <20210525172628.2088-1-alex.bennee@linaro.org>
- <20210525172628.2088-5-alex.bennee@linaro.org>
- <5fe1c796-c886-e5c6-6e61-e12d0f73a884@redhat.com>
- <87sg21bk7r.fsf@linaro.org> <20210601194648.fdymtxiz6lkxycsx@gator.home>
-User-agent: mu4e 1.5.13; emacs 28.0.50
-From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Auger Eric <eric.auger@redhat.com>, kvm@vger.kernel.org,
-        maz@kernel.org, shashi.mallela@linaro.org, qemu-arm@nongnu.org,
-        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Subject: Re: [kvm-unit-tests PATCH v2 4/4] arm64: split
- its-migrate-unmapped-collection into KVM and TCG variants
-Date:   Tue, 01 Jun 2021 22:50:15 +0100
-In-reply-to: <20210601194648.fdymtxiz6lkxycsx@gator.home>
-Message-ID: <87pmx5b6ed.fsf@linaro.org>
+        Tue, 01 Jun 2021 14:54:04 -0700 (PDT)
+Date:   Tue, 1 Jun 2021 17:54:03 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     huangy81@chinatelecom.cn
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Juan Quintela <quintela@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Chuan Zheng <zhengchuan@huawei.com>
+Subject: Re: [PATCH v1 0/6] support dirtyrate at the granualrity of vcpu
+Message-ID: <YLase9l34N7i1C6S@t490s>
+References: <cover.1622479161.git.huangy81@chinatelecom.cn>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cover.1622479161.git.huangy81@chinatelecom.cn>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jun 01, 2021 at 01:02:45AM +0800, huangy81@chinatelecom.cn wrote:
+> From: Hyman Huang(黄勇) <huangy81@chinatelecom.cn>
+> 
+> Since the Dirty Ring on QEMU part has been merged recently, how to use
+> this feature is under consideration.
+> 
+> In the scene of migration, it is valuable to provide a more accurante
+> interface to track dirty memory than existing one, so that the upper
+> layer application can make a wise decision, or whatever. More importantly,
+> dirtyrate info at the granualrity of vcpu could provide a possibility to
+> make migration convergent by imposing restriction on vcpu. With Dirty
+> Ring, we can calculate dirtyrate efficiently and cheaply.
+> 
+> The old interface implemented by sampling pages, it consumes cpu 
+> resource, and the larger guest memory size become, the more cpu resource
+> it consumes, namely, hard to scale. New interface has no such drawback.
 
-Andrew Jones <drjones@redhat.com> writes:
+Yong,
 
-> On Tue, Jun 01, 2021 at 05:49:01PM +0100, Alex Benn=C3=A9e wrote:
->>=20
->> Auger Eric <eric.auger@redhat.com> writes:
->>=20
->> > Hi Alex,
->> >
->> > On 5/25/21 7:26 PM, Alex Benn=C3=A9e wrote:
->> >> When running the test in TCG we are basically running on bare metal so
->> >> don't rely on having a particular kernel errata applied.
->> >>=20
->> >> You might wonder why we handle this with a totally new test name
->> >> instead of adjusting the append to take an extra parameter? Well the
->> >> run_migration shell script uses eval "$@" which unwraps the -append
->> >> leading to any second parameter being split and leaving QEMU very
->> >> confused and the test hanging. This seemed simpler than re-writing all
->> >> the test running logic in something sane ;-)
->> >
->> > there is
->> > lib/s390x/vm.h:bool vm_is_tcg(void)
->> >
->> > but I don't see any particular ID we could use to differentiate both t=
-he
->> > KVM and the TCG mode, do you?
->>=20
->> For -cpu max we do:
->>=20
->>         /*
->>          * Reset MIDR so the guest doesn't mistake our 'max' CPU type fo=
-r a real
->>          * one and try to apply errata workarounds or use impdef feature=
-s we
->>          * don't provide.
->>          * An IMPLEMENTER field of 0 means "reserved for software use";
->>          * ARCHITECTURE must be 0xf indicating "v7 or later, check ID re=
-gisters
->>          * to see which features are present";
->>          * the VARIANT, PARTNUM and REVISION fields are all implementati=
-on
->>          * defined and we choose to define PARTNUM just in case guest
->>          * code needs to distinguish this QEMU CPU from other software
->>          * implementations, though this shouldn't be needed.
->>          */
->>         t =3D FIELD_DP64(0, MIDR_EL1, IMPLEMENTER, 0);
->>         t =3D FIELD_DP64(t, MIDR_EL1, ARCHITECTURE, 0xf);
->>         t =3D FIELD_DP64(t, MIDR_EL1, PARTNUM, 'Q');
->>         t =3D FIELD_DP64(t, MIDR_EL1, VARIANT, 0);
->>         t =3D FIELD_DP64(t, MIDR_EL1, REVISION, 0);
->>         cpu->midr =3D t;
->>=20
->> However for the default -cpu cortex-a57 we aim to look just like the
->> real thing - only without any annoying micro-architecture bugs ;-)
->>=20
->> >
->> > without a more elegant solution,
->>=20
->> I'll look into the suggestion made by Richard.
->
-> Where did Richard make a suggestion? And what is it?
+Thanks for working on this!
 
-Sorry - I had a brain fart, I was of course referring to your
-ERRATA_FORCE suggestion.
+Some high-level comments:
 
->
-> Thanks,
-> drew
->
->>=20
->> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
->> >
->> > Thanks
->> >
->> > Eric
->> >
->> >
->> >>=20
->> >> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> >> Cc: Shashi Mallela <shashi.mallela@linaro.org>
->> >> ---
->> >>  arm/gic.c         |  8 +++++++-
->> >>  arm/unittests.cfg | 10 +++++++++-
->> >>  2 files changed, 16 insertions(+), 2 deletions(-)
->> >>=20
->> >> diff --git a/arm/gic.c b/arm/gic.c
->> >> index bef061a..0fce2a4 100644
->> >> --- a/arm/gic.c
->> >> +++ b/arm/gic.c
->> >> @@ -36,6 +36,7 @@ static struct gic *gic;
->> >>  static int acked[NR_CPUS], spurious[NR_CPUS];
->> >>  static int irq_sender[NR_CPUS], irq_number[NR_CPUS];
->> >>  static cpumask_t ready;
->> >> +static bool under_tcg;
->> >>=20=20
->> >>  static void nr_cpu_check(int nr)
->> >>  {
->> >> @@ -834,7 +835,7 @@ static void test_migrate_unmapped_collection(void)
->> >>  		goto do_migrate;
->> >>  	}
->> >>=20=20
->> >> -	if (!errata(ERRATA_UNMAPPED_COLLECTIONS)) {
->> >> +	if (!errata(ERRATA_UNMAPPED_COLLECTIONS) && !under_tcg) {
->> >>  		report_skip("Skipping test, as this test hangs without the fix. "
->> >>  			    "Set %s=3Dy to enable.", ERRATA_UNMAPPED_COLLECTIONS);
->> >>  		test_skipped =3D true;
->> >> @@ -1005,6 +1006,11 @@ int main(int argc, char **argv)
->> >>  		report_prefix_push(argv[1]);
->> >>  		test_migrate_unmapped_collection();
->> >>  		report_prefix_pop();
->> >> +	} else if (!strcmp(argv[1], "its-migrate-unmapped-collection-tcg"))=
- {
->> >> +		under_tcg =3D true;
->> >> +		report_prefix_push(argv[1]);
->> >> +		test_migrate_unmapped_collection();
->> >> +		report_prefix_pop();
->> >>  	} else if (strcmp(argv[1], "its-introspection") =3D=3D 0) {
->> >>  		report_prefix_push(argv[1]);
->> >>  		test_its_introspection();
->> >> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
->> >> index 1a39428..adc1bbf 100644
->> >> --- a/arm/unittests.cfg
->> >> +++ b/arm/unittests.cfg
->> >> @@ -205,7 +205,7 @@ extra_params =3D -machine gic-version=3D3 -append=
- 'its-pending-migration'
->> >>  groups =3D its migration
->> >>  arch =3D arm64
->> >>=20=20
->> >> -[its-migrate-unmapped-collection]
->> >> +[its-migrate-unmapped-collection-kvm]
->> >>  file =3D gic.flat
->> >>  smp =3D $MAX_SMP
->> >>  accel =3D kvm
->> >> @@ -213,6 +213,14 @@ extra_params =3D -machine gic-version=3D3 -appen=
-d 'its-migrate-unmapped-collection'
->> >>  groups =3D its migration
->> >>  arch =3D arm64
->> >>=20=20
->> >> +[its-migrate-unmapped-collection-tcg]
->> >> +file =3D gic.flat
->> >> +smp =3D $MAX_SMP
->> >> +accel =3D tcg
->> >> +extra_params =3D -machine gic-version=3D3 -append 'its-migrate-unmap=
-ped-collection-tcg'
->> >> +groups =3D its migration
->> >> +arch =3D arm64
->> >> +
->> >>  # Test PSCI emulation
->> >>  [psci]
->> >>  file =3D psci.flat
->> >>=20
->>=20
->>=20
->> --=20
->> Alex Benn=C3=A9e
->> _______________________________________________
->> kvmarm mailing list
->> kvmarm@lists.cs.columbia.edu
->> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+- The layout of the patch looks a bit odd.  E.g., you introduced the new "vcpu"
+  qmp parameter in patch 3, however it's not yet implemented, meanwhile I feel
+  like you squashed mostly all the rest into patch 6.  It's okay to use a
+  single big patch, but IMHO better to not declare that flag in QMP before it's
+  working, so ideally that should be the last patch to do that.
 
+  From that POV: patch 1/2/4 look ok to be separated; perhaps squash patch
+  3/5/6 into one single patch to enable the new method as the last one?
 
---=20
-Alex Benn=C3=A9e
+- You used "vcpu" across the patchset to show the per-vcpu new method.  Shall
+  we rename it globally to "per_vcpu" or "vcpu_based"?  A raw "vcpu" looks more
+  like a struct pointer not a boolean.
+
+- Using memory_global_dirty_log_start|stop() may not be wise too IMHO, at least
+  we need to make sure it's not during migration, otherwise we could call the
+  stop() before migration ends then that'll be a problem..
+
+  Maybe we can start to make global_dirty_log a bitmask? Then we define:
+
+    GLOBAL_DIRTY_MIGRATION
+    GLOBAL_DIRTY_DIRTY_RATE
+
+  All references to global_dirty_log should mostly be untouched because any bit
+  set there should justify that global dirty logging is enabled (either for
+  migration or for dirty rate measurement).
+
+  Migration starting half-way of dirty rate measurement seems okay too even
+  taking things like init-all-set into account, afaict.. as long as dirty rate
+  code never touches the qemu dirty bitmap, but only do the accounting when
+  collecting the pages...
+
+  Feel free to think more about it on any other potential conflict with
+  migration, but in general seems working to me.
+
+- Would you consider picking up my HMP patch and let HMP work from the 1st day?
+
+- Please Cc the author of dirty rate too (Chuan Zheng <zhengchuan@huawei.com>),
+  while I already started to do so in this email.
+
+Thanks,
+
+-- 
+Peter Xu
+
