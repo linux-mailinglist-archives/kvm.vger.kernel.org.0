@@ -2,167 +2,379 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A934A397828
-	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 18:36:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 497BE397839
+	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 18:41:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233064AbhFAQiW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 12:38:22 -0400
-Received: from mail-bn8nam11on2053.outbound.protection.outlook.com ([40.107.236.53]:37063
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        id S233925AbhFAQnS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 12:43:18 -0400
+Received: from mail-mw2nam12on2083.outbound.protection.outlook.com ([40.107.244.83]:64224
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231918AbhFAQiU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Jun 2021 12:38:20 -0400
+        id S230288AbhFAQnR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Jun 2021 12:43:17 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oF3Gb63ulld6iLo7vHsI+3nz2MKloKbaf8ibZHPOspJNc5XGu/YsXJYxavja6s8s0P/GvqR9d3vk6hkKIL6O74gzCTOIKDleFCP4QxZRuFohm08/V9EKEPY8skwcwnYhQIH9BxGoRT2CKnbRx9ghlB06j+1Na8Yd7AzTe4ThLVkFjnJUbwz046+hFEfkfqwB1OfClts77Uwv8DrPTJmUewBZmpqezrnm5HwGmRrlAG8huEpYqRXqjbKHnEYqoGZJz7aDGQfwQXAImrhficz1ZDU4TiX7kLp00J2q18TjafoIe2yYQ3fzI3nyI8HU6cmc8Ae+yLjfLgSlX4gD3fVkcw==
+ b=A4Dfb9zv4lCA2rh1GaxccBeVbfzl9dx1glckNkMEjUK8sH7Dc6aVUOzcCT6iNXHMcNRsy5HUh51babSao7japuAQI6FfxxOnLE/5Z2E7ZCIZ9LGrV5N7knzyD9nBKYbLB6szBoVCCMkKG8JTApVP9rKdfojFnZAuP+ujyhQZe5yYq4H3Y+dAjPDUxwviWcytEhOsNwouSnkm8jS/hLkRsoWrQWhjqT+oWnwumy4qd2zUW7AdE2g8gVoApHCgD/DADP+7C5+mVYOfvJY74osIkGnK4FQsAx+gHdd0oK9Zb2RPA5iZMVh6GPp8sHOZKyPa+HyZeBCOTwk42LUaql5n2A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0GsdBc8n5XPgCtR5m+YRKkzDXHZBbAjhhFPWM0wStbI=;
- b=PltW5JoLhh5egnbah+s5DHyCejrzqqhiiNHWsUwXeF+Dg32h0s8Ss75f9ZR0GT40CpKvvb+9YAOgQ6gzGBYrkzf3mCPqB4PWIlz2RlQ+c9nufqEEBU9xzg0YnTMrqZ5P6r1y3wKDsocsgHVmTe+ktyJIHkALJ0N3rHHQVuHWUPLFtbHovIX5x5Oodweac7/ixHUlZDBL5S2CVQ/DpIuKj7nFiOheJgf/o3ojigqKL5DGXcQOfi+6vhWASryGIAeC7eX3CfyEMsxrTLKsaQP2xunEbG1IDIBZNQ9F5+UmrD211FA1xeNO2xFL8O4ScyBytGVlIDzntqRqvt+2l4jBUQ==
+ bh=BKM8oxpiHyJ3XIIsUF6N6jeuww9Vg/xShn9LqzBy8/I=;
+ b=BhvK51SDyfoHNH98JblOUdgNkymSEIa8DDyQqlSkBAQm6hoA5YonaqwpAnPCax5kTqVzACpxfnMJhEDtyGuQF3AbDqMyye4Iu0tkCZv3bvq/JUNg7kPdsZJCqxi48cHIRybq0HEORvplp9sHFL4vvcbURL34RfbjnolxVUEOgLiNoetx2t/0OffNqmywZSvRLGPC06k/FU/OZODEtc8zoN6xoCh0fXT079UQ++2yW86J3Cr7Sb7QB7vOnK/4sA2CccYc1UdthmuOA9y1by52CvkM/Hkln+h6tBjToR/tQMaTl03CN4Zglt5FZWhjtmRvbxIi7Z9M3nlmy5rKouDeCg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0GsdBc8n5XPgCtR5m+YRKkzDXHZBbAjhhFPWM0wStbI=;
- b=TA8RpTSTXIW+SwYKcetx6eYKy5xob4wEjps/o5a0UJT45nhBDVI+zRvFGJYiuFYjFEyddpYN8crAjr8HScL6tWm5B5Z30mr2mo9Q7TmyE6ao3lMqwDuUQeuKQuXmmDqL2njqaqx6cVFQB5H7H3Cc2we+nErxI6ET3h93YAUI9/I=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+ bh=BKM8oxpiHyJ3XIIsUF6N6jeuww9Vg/xShn9LqzBy8/I=;
+ b=CbX829fAGi67dH7gZhThfE5zOEwSr3mat474CKGSXImIT0CGI2+1WECmEBLwZ8S9hWFBM0DzzEu+Mtn3/EV6/I3SfiYUkSwvLQAQEd47u0RdXM+0KADD9bQ9FwN5s1O98wugTlg1klz0hFBteqMzxeAAwmqfFtMWiDZ0zgavKz8=
+Authentication-Results: suse.de; dkim=none (message not signed)
+ header.d=none;suse.de; dmarc=none action=none header.from=amd.com;
 Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM6PR12MB2988.namprd12.prod.outlook.com (2603:10b6:5:3d::23) with Microsoft
+ DM6PR12MB2619.namprd12.prod.outlook.com (2603:10b6:5:45::18) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4173.20; Tue, 1 Jun 2021 16:36:35 +0000
+ 15.20.4173.26; Tue, 1 Jun 2021 16:41:33 +0000
 Received: from DM5PR12MB1355.namprd12.prod.outlook.com
  ([fe80::b914:4704:ad6f:aba9]) by DM5PR12MB1355.namprd12.prod.outlook.com
  ([fe80::b914:4704:ad6f:aba9%12]) with mapi id 15.20.4173.030; Tue, 1 Jun 2021
- 16:36:35 +0000
-Subject: Re: [PATCH] x86/sev: Check whether SEV or SME is supported first
-To:     Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@alien8.de>
-Cc:     Pu Wen <puwen@hygon.cn>, Joerg Roedel <jroedel@suse.de>,
-        x86@kernel.org, joro@8bytes.org, dave.hansen@linux.intel.com,
-        peterz@infradead.org, tglx@linutronix.de, mingo@redhat.com,
-        hpa@zytor.com, sashal@kernel.org, gregkh@linuxfoundation.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org
-References: <20210526072424.22453-1-puwen@hygon.cn>
- <YK6E5NnmRpYYDMTA@google.com> <905ecd90-54d2-35f1-c8ab-c123d8a3d9a0@hygon.cn>
- <YLSuRBzM6piigP8t@suse.de> <e1ad087e-a951-4128-923e-867a8b38ecec@hygon.cn>
- <YLZGuTYXDin2K9wx@zn.tnic> <YLZc3sFKSjpd2yPS@google.com>
+ 16:41:33 +0000
+Subject: Re: [PATCH v2] x86: Add a test for AMD SEV-ES #VC handling
+To:     Varad Gautam <varad.gautam@suse.com>, linux-kernel@vger.kernel.org
+Cc:     kvm@vger.kernel.org, x86@kernel.org,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <jroedel@suse.de>
+References: <20210531125035.21105-1-varad.gautam@suse.com>
+ <20210531172707.7909-1-varad.gautam@suse.com>
 From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <dbc4e48f-187a-4b2d-2625-b62d334f60b2@amd.com>
-Date:   Tue, 1 Jun 2021 11:36:31 -0500
+Message-ID: <fdc55029-bbb5-6d3e-5523-cada1aae8ddc@amd.com>
+Date:   Tue, 1 Jun 2021 11:41:31 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.1
-In-Reply-To: <YLZc3sFKSjpd2yPS@google.com>
+In-Reply-To: <20210531172707.7909-1-varad.gautam@suse.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [67.79.209.213]
-X-ClientProxiedBy: SA9PR10CA0015.namprd10.prod.outlook.com
- (2603:10b6:806:a7::20) To DM5PR12MB1355.namprd12.prod.outlook.com
+X-ClientProxiedBy: SA0PR11CA0017.namprd11.prod.outlook.com
+ (2603:10b6:806:d3::22) To DM5PR12MB1355.namprd12.prod.outlook.com
  (2603:10b6:3:6e::7)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from office-linux.texastahm.com (67.79.209.213) by SA9PR10CA0015.namprd10.prod.outlook.com (2603:10b6:806:a7::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.22 via Frontend Transport; Tue, 1 Jun 2021 16:36:33 +0000
+Received: from office-linux.texastahm.com (67.79.209.213) by SA0PR11CA0017.namprd11.prod.outlook.com (2603:10b6:806:d3::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.24 via Frontend Transport; Tue, 1 Jun 2021 16:41:32 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c8a2d9b9-b774-4adf-71ba-08d9251b6b5d
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2988:
-X-Microsoft-Antispam-PRVS: <DM6PR12MB2988CBE42326C60CD4658FBFEC3E9@DM6PR12MB2988.namprd12.prod.outlook.com>
-X-MS-Exchange-Transport-Forked: True
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-MS-Office365-Filtering-Correlation-Id: 6fd6d657-dbe9-480c-0095-08d9251c1d76
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2619:
+X-Microsoft-Antispam-PRVS: <DM6PR12MB26195E38F4AA457D61B4B733EC3E9@DM6PR12MB2619.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6nYlBwge119La6/Vw3CJ1h19Wcig48OQPWUcwEp7dIui5Rjo8PDD81za1SQHAIypcj31rTF/aG3ufRSOTFvcqKaL/B4E2MzVMWImwXSeQpWqxsm9+d8Hv0uuFBi7y9PZ6soxtPEfBSjPHeRhJyTqsDa+bvC0vKPXrajWPrQiXggIOBPJFIl2WswVIzvuIbAp3nNuuijZt0e+gR5JPuOjToGFnu5P9nnBplR+DGfQjbF9PzU3gfPWopndqVlrrkt7AHf+MjSfBpE+1OrN61zPsXQBHpSaPDXkHWClFRFdQGEbYIGnH07jKfI7WUGrfsRNyBN6zrlbBsAY7y/zcYKR/4znoU3YDBXIgKMgqX2fnwf1uUMACkm+Y3rHdQRGUNe+bCZgRG0qquzTV8m3CL+d18dj81TnXOLEEVdp1x9aKqO4f01OXR9dn01kbeKdzfz6dybPH67DY+gNZNMxX11QNZTsgNE7FystZmgzxCu5MiiDqqWVtHTKIAUu9sQ5AE80lfeQAH6QRnhRFKDWNBbEejVtbkF0lFCnSlsHlFgI72kY2Fl/EeDubv71idRObrCuBKnDvNW6NdwKIosEux2gxRmgN1a5bnbMJ7w4QmNLmNRBSOOIl4nP0JDFrR9vCN6cdvmTSbxIx9Gm4CWj5VQcM0i0agsHZmqo5Q603MN/ysR5eZWwjYsqwqJXgBZHvwUJPCN6k9wEHipOSc3JaVBzAWNI2GL4FIKHX/72f8Yr4eIg6SH5s/QAQh5wtjQXAVBokPF2XmOE/PBf5uN6AEqe0k6Mq8vbfmWvMSukR1n2S07Cn/7rnxqPuHrwNChVlm76
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(366004)(346002)(396003)(136003)(39860400002)(4326008)(6506007)(53546011)(26005)(478600001)(966005)(5660300002)(54906003)(16526019)(110136005)(66946007)(66476007)(45080400002)(36756003)(2906002)(66556008)(6512007)(316002)(83380400001)(6486002)(186003)(31686004)(7416002)(31696002)(956004)(38100700002)(8936002)(8676002)(86362001)(2616005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?UUhFK1pQaHBuWDZzbkdTOHFTd0lFQmExR1NVYXN3QnE4d3F2M2RJWEVvb3A1?=
- =?utf-8?B?dm9RdGpqTU8zMzRuMlhFVjBhbE1TYmg5R2kxc3BBZkRlaDBYQUZGNEFOdFRm?=
- =?utf-8?B?aUpsRTFIclhKNitJa2JhWmlLMkVoTmJvZGlQYjQ3aElMdTNOZ3pmaW9Jekk2?=
- =?utf-8?B?ZjRrSU9WV1lLU3FhK0ZTd3E4WVNsQVRwSlNBUkJJYzlRNmExQzhaZElZampk?=
- =?utf-8?B?OEVlV0JWVk9iMmNSYTR0OVBsQXJzdmxDOStCWEM4M0tOVVRHVXM2U292MWEy?=
- =?utf-8?B?a1hIMlZKRk5PcXRGVzE0RVNZSVZVcVpOMkxoWm9jekw1ai96UW16UE9Gckoz?=
- =?utf-8?B?SUx6V3BZN2RESlhSdXNEbUk5WFNyMVF5bUI1RXBVd2VCbi84V0Q5M0EyTHBC?=
- =?utf-8?B?S3BENGQ4YzV4YjhBbFBIc2s1aXByUFV4b2hhaUFVVnVuU1Eza3hPbmVZZ08y?=
- =?utf-8?B?alh0VFZVS2lSSTRoMnlkRk1sMjlOKzlybXkxdHZuUHV2TG1KTXVCSzE0V1dL?=
- =?utf-8?B?YktQVHR6M25YR3ppTm51Q0VHQ05EaVB3WUtvaklVTDJrdnFQVUdKaS82RTAw?=
- =?utf-8?B?NXNaVlRhbDcweVM2WmRxNjF4Vk1hZmE3OElCM2lLQ21pRElKdS8wTDhmYmRh?=
- =?utf-8?B?TFFjbmI1K3BFSHdFRDFZVWJvN20xd0l5MjArM1JPYVJ5YzV5YlJmUFRCSHMw?=
- =?utf-8?B?N3VxcVFnWWo1Tm9qLzFYckd4ZWc0dVp6MjRxVEZEVmU3dXFLWFBZQ1hHMEVv?=
- =?utf-8?B?U1hCVlE3YUNCdW1QM2E5OE41VCtuWnRqVmFFRzN5SEloMzA1cEJxbWFzNk50?=
- =?utf-8?B?THNzOFJybkFFSlRLZzFXYUk0QnU1TkFVRjVKaWQ5bzhuSFZYMmtOektVUDN2?=
- =?utf-8?B?b3FxMFhIR2loa0dpdHdReEd4cWNOTjMzMCs1VVZWUHJXMkFMUFVITlF5c1BV?=
- =?utf-8?B?RUwyZzhIZHM5VmdzTWpWc2JQTkF5ci9HODZ3RXBITXk3SjFmWjFWbmY3bktv?=
- =?utf-8?B?MzYvRkIxOHpkTWdyakIrTFBGaVk4dkNybTZaalRabUl4THc2ei90YXJTbHdF?=
- =?utf-8?B?V2VUU0ZPL2ZwbUJsUmtiUDhLbWh5TTRqcFdpQkZ6VWJiejQ4SFArN3V0djhU?=
- =?utf-8?B?SUVSd3VvWjlmTEk2V1pRdk1uY0htazNNMWozYTQrYTkxc0FqZUF0T3Jqd3Ay?=
- =?utf-8?B?Q1RBSUFpbUU0clFrR2tGczRuN0hwZUtwWG9sZkVYRlFzZlJHdEZkVCtqVnlL?=
- =?utf-8?B?V0N6aTNsKzNKcHFacXR4MXpmSk5nbHJoZmdnYTFwRTJ1Q2VpNTRVUFFRTUk4?=
- =?utf-8?B?azZhenhXZ2xyVnVGTmpJT1ZBNW5Da011T0FOa012anlhNXBBL3J2SGowUjVT?=
- =?utf-8?B?Tjc3QjB3dTBVVTZVOGF1MXpxK2NwZjM3UlpJaWpvUUEzWE1ISGxXVGVESWdz?=
- =?utf-8?B?cDBUeVhVZUZMVDBEVjgxdWFSUTNFQy95VHZxcy9HbFBNTHRaWDNpVGNCek84?=
- =?utf-8?B?YkpzMGN5Q1dZU01PODh2dUpCZFVxUHdHam4wL1RqcXBMeGJvUTltVFpwemNW?=
- =?utf-8?B?YUlTT3kzOHVVcGh3N0VWNkJvSTc0WWhXS0xTWkVoa2VBZ1dicXJVS1JWVUN5?=
- =?utf-8?B?M1RkanIzK0xjd2dMS2dTSXZSWkFBckFYVzFWeUhrSmc1bVFHWmZxL2d5QVFD?=
- =?utf-8?B?UnVmbVIzTnp1aEpCdGJEVkxpYy9ScWNPWHA5M1N1NnRYbjN0NmFoR0Z6c0Er?=
- =?utf-8?Q?+rF+VkdL+msdvN3AJRGOV21ybBy5/fefvD2qKRG?=
+X-Microsoft-Antispam-Message-Info: 2h/Vam0181CgtPRMf2BTHDhCij5gaMRQLFosnw+LHvtzYiplbso75u6IKRz2y2Nr/AMaunezDi0zTLwoltxI93/XS8FLU452ABSdrV3fDk0N5AsHYaWnS5+kKNvE98YTnxQ8Wx8Vj2Hj3kHo9MOT5NirLrcO6BNNEAochcXrKTES4K2ddlBsxrj9KTYjEaU+Kd9ZLa4P9F1R1zWKG30HIF1ZsTn7KlodK6uvFTHC+tj1iy8CHY3imO1pZ+xzG43E1e+TPBTBR8urRw/70MQh+6L3I9Zfb1rLnDbxNXALlFCYbi61mt+rGfb+vLQkvgsuhnitt0yhIV+h5KARBkJhJ6h7y6a8v3/TSj3PjlLoFKKVlJEAzj7ZtUJhJupWnacSRJ29onzca1TBzw/1WnmmApK2CePVGAnlAv23z4gIex630vhkfmz8DUZn7UDTQzNkmuoTZgsEF19XybGWYWy7Q1g7M1CKWxwyTvGzi9z33yoiGpQj3+/F/jibTrdyCLWx0CfxW9F5uNlAqqoDMSCuAXjmz+oo0SPSc//2VrggRpaJ+63tTGrJpNut7q7m9a5VN6RCs9ZDyge1qvhmtf9OsiEAjtkHRsNr/zxA7zHjiEzaMto6U46GT6oAFiVZELE7M+/vNUijflIUxCSkkVEGqQuukvGGkJnLaIfgwJyHpaqRdOBGvy6MW9aiynoEEXMq
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(366004)(136003)(346002)(39860400002)(376002)(26005)(66476007)(83380400001)(31686004)(6512007)(8676002)(38100700002)(2906002)(66556008)(86362001)(54906003)(4326008)(66946007)(478600001)(31696002)(8936002)(186003)(16526019)(6486002)(6506007)(956004)(2616005)(5660300002)(316002)(53546011)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?YXU0ZEs4US95d3d6b0FuU1BBOEllQTBOeE1Dem1DY21vNEdpL3NXd2oxcldk?=
+ =?utf-8?B?MFBXZGJaY1VBV3JML3czQUY2SFExUmI4b2NiWm40aTVpb0pPMUIxTTVMcEdL?=
+ =?utf-8?B?U2RtY2w0YzdYeGRGNG5qVEd1WHNEdjRQb3ZGNjFWV0JneEx2NFcyTCtSN1cw?=
+ =?utf-8?B?WUFhNmdjRXJkMXdwT3VyNlZEcUpTR0RDREl5MTAvaUcrb2I2dmZUcWlUL2d3?=
+ =?utf-8?B?dHhXbE80VTdTOG4wRTJmanBiSnJxc1h2UGpaSXB3SEpnTnhONUdEVWVsQVpu?=
+ =?utf-8?B?cjFyRERmTjdjVlMyVlVRcGQ4eVk5TmRINHJjYklERkQvR3BvNjc5cVcvVlB4?=
+ =?utf-8?B?YWlQRHpyenRnbURnMGRyenZTVGlDd2RBbnhjZjFtR3ZObHluckZhSzhlWmJ5?=
+ =?utf-8?B?MGFvQTgzV2NoMVRRQW5UM3d3V3Zqc2t4Mmg0cVllMlBkQXB0dkdtdjlHZkFv?=
+ =?utf-8?B?b2JVQzVMSjdFbktCMkUzYWZmcnpBNzlhWjh3b1lkQVNPSFhPRENRWS8wYnZI?=
+ =?utf-8?B?SjBDZm5lQWEwRUJYdTd1QU1LbFpEbEhGbHBXemhQTW10eVQxWlRxQzU2TlNs?=
+ =?utf-8?B?clkzdktQUlFjMU10OXp6N3VpZ212WldSL2FhVVNGb2VUanZRS1g3VGZ3Y3Zi?=
+ =?utf-8?B?Ti9DUjJSOERDU2kvQmFtZ2JoK1U0ckpYK1c2OWM3Rm5lUDBYZ3RhOHNyZk9k?=
+ =?utf-8?B?VWswTVJLcW1CVFM1dWh5TlB2NjFZSDg2OE5JWHRPK2pTc2k1VlhmSk4xWHVk?=
+ =?utf-8?B?MU5NVGNLRlB2K0VRck02TFlxazNVWURLL2txNWRIbTBaaE1xam1FM3FDdm1u?=
+ =?utf-8?B?SVB1SzNNN1FYbnpVRXltSzNKckVSK0svdmdPODBtYm0vaVBMSXRGQm82eS9n?=
+ =?utf-8?B?dnZGWEdQMjhuT3cxeitQSzlHYVNMb2lLMnFvZDlLb2VzQlZyaHRGdjViMzd3?=
+ =?utf-8?B?eTg0ZnNLWEUvclU0NUUzY0hHUkRNaUw3WjdvQ0V1OGp5d2VLOWhPREhyRjg2?=
+ =?utf-8?B?MGhWUVVnN1g2b3pDV21HUUpjdnBxRFE2dEg3OTM5MTU2SHZJTVRzbE9Gc3JL?=
+ =?utf-8?B?bFQ2ZVRzUk1ybit5RmNhSkFXdjlCc0M3Z2g5RGxtSmtHalFGUEF1ai9BN3oy?=
+ =?utf-8?B?cVp1d1UzVU1GOTJJZ0ZqWi9TZmlsb0crRE4vNkhVbUtJeGRGRm9mWmhsODV1?=
+ =?utf-8?B?blBpQlgzUkc5aFNLdGJUZ0VmenkwOGl2YmJlSzZvVHpEV3FsMDVhUWgzVUdQ?=
+ =?utf-8?B?cVovdlREcW1ERTlWQVFCTnlHSW5VeTg0c0FoZlNCZ3I3RmRTMDdTaHhMTmxl?=
+ =?utf-8?B?L1hqYjlqZnRpcGpYTldocnlkUVVaMVBnQ1F5UlJ6aEFManNCK2NCMnpmWkFr?=
+ =?utf-8?B?VWgrcklmeFRreEdDSkJaNDVYUVRKMlhBVHFvRzl2N2NIN2NLSUNETlhFbDNp?=
+ =?utf-8?B?bUNscWdmVVc1eU1PTUFSUkJJdmV2cittNmlUV2lkM2RCTE1UbnhNb0FrR00r?=
+ =?utf-8?B?M0dMYWh4c1lqNCtvY2I4QUVHa1BKUmNWRVcrT1JTcTBZcCsyTUNvSFRjSFFx?=
+ =?utf-8?B?emdBejBkTDFIOTVFczlhYmdOVXA4ZlFOcExFOFpvNkRsSTZTN2RQc3hwQko0?=
+ =?utf-8?B?dm9COS9JVS9wMG1BNTRQVU82VXZpSFB2a2p5U0k3M1JrajFmSVlTNDJ0ajJm?=
+ =?utf-8?B?YzgyeWNKeWxyTE8rSjZsUWdzcVl1eGVyMVJBZ1Rqem1BQUpvZE9qK2E2MlpP?=
+ =?utf-8?Q?qzR6JuCTV1+L5FzCPzfPUG19HEN09/ddbbuqZRU?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c8a2d9b9-b774-4adf-71ba-08d9251b6b5d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6fd6d657-dbe9-480c-0095-08d9251c1d76
 X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jun 2021 16:36:34.8505
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jun 2021 16:41:33.4869
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SUEqZI4JqiVRbnC6ALTUpJhVkNChAr2IAqrYk6v8ehuWXqa7ugJMm9l71g3kFQCRkuP2FVXEDPFxB/qOaxcc2g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2988
+X-MS-Exchange-CrossTenant-UserPrincipalName: nW7YGSqsaJ/RDWyyzleq/NdSTYruQ4E7IA4a93hXPVFw5EDhXATnZdAmHA3TW5KIbIK3rWSYK/aednggZ2dMOg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2619
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 6/1/21 11:14 AM, Sean Christopherson wrote:
-> On Tue, Jun 01, 2021, Borislav Petkov wrote:
->> On Mon, May 31, 2021 at 10:56:50PM +0800, Pu Wen wrote:
->>> Thanks for your suggestion, I'll try to set up early #GP handler to fix
->>> the problem.
->>
->> Why? AFAICT, you only need to return early in sme_enable() if CPUID is
->> not "AuthenticAMD". Just do that please.
+On 5/31/21 12:27 PM, Varad Gautam wrote:
+> Some vmexits on a SEV-ES guest need special handling within the guest
+> before exiting to the hypervisor. This must happen within the guest's
+> \#VC exception handler, triggered on every non automatic exit.
 > 
-> I don't think that would suffice, presumably MSR_AMD64_SEV doesn't exist on older
-> AMD CPUs either.  E.g. there's no mention of MSR 0xC001_0131 in the dev's guide
-> from 2015[*].
+> Add a KUnit based test to validate Linux's VC handling. The test:
+> 1. installs a kretprobe on the #VC handler (sev_es_ghcb_hv_call, to
+>    access GHCB before/after the resulting VMGEXIT).
+> 2. tiggers an NAE.
+> 3. checks that the kretprobe was hit with the right exit_code available
+>    in GHCB.
+> 
+> Since relying on kprobes, the test does not cover NMI contexts.
 
-That is the reason for checking the maximum supported leaf being at least
-0x8000001f. If that leaf is supported, we expect the SEV status MSR to be
-valid. The problem is that the Hygon ucode does not support the MSR in
-question. I'm not sure what it would take for that to be added to their
-ucode and just always return 0.
+I'm not very familiar with these types of tests, so just general feedback
+below.
 
 > 
-> I also don't see the point in checking the vendor string.  A malicious hypervisor
-> can lie about CPUID.0x0 just as easily as it can lie about CPUID.0x8000001f, so
-> for SEV the options are to either trust the hypervisor or eat #GPs on RDMSR for
-> non-SEV CPUs.  If we go with "trust the hypervisor", then the original patch of
-> hoisting the CPUID.0x8000001f check up is simpler than checking the vendor string.
+> Signed-off-by: Varad Gautam <varad.gautam@suse.com>
+> ---
+> v2: Add a testcase for MMIO read/write.
+> 
+>  arch/x86/Kconfig              |   9 ++
+>  arch/x86/kernel/Makefile      |   5 ++
+>  arch/x86/kernel/sev-test-vc.c | 155 ++++++++++++++++++++++++++++++++++
+>  3 files changed, 169 insertions(+)
+>  create mode 100644 arch/x86/kernel/sev-test-vc.c
+> 
+> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> index 0045e1b441902..0a3c3f31813f1 100644
+> --- a/arch/x86/Kconfig
+> +++ b/arch/x86/Kconfig
+> @@ -1543,6 +1543,15 @@ config AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT
+>  	  If set to N, then the encryption of system memory can be
+>  	  activated with the mem_encrypt=on command line option.
+>  
+> +config AMD_MEM_ENCRYPT_TEST_VC
+> +	bool "Test for AMD Secure Memory Encryption (SME) support"
 
-Because a hypervisor can put anything it wants in the CPUID 0x0 /
-0x80000000 fields, I don't think we can just check for "AuthenticAMD".
-
-If we want the read of CPUID 0x8000001f done before reading the SEV status
-MSR, then the original patch is close, but slightly flawed, e.g. only SME
-can be indicated but then MSR_AMD64_SEV can say SEV active.
-
-If we want to introduce support for handling/detecting #GP, this might
-become overly complicated because of the very early, identity mapped state
-the code is in - especially for backport to stable.
+I would change this to indicate that this is specifically for testing
+SEV-ES support. We messed up and didn't update the AMD_MEM_ENCRYPT entry
+when the SEV support was submitted.
 
 Thanks,
 Tom
 
-> 
-> 
-> [*] https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwww.amd.com%2Fsystem%2Ffiles%2FTechDocs%2F48751_16h_bkdg.pdf&amp;data=04%7C01%7Cthomas.lendacky%40amd.com%7C6025fb08694e4e6b74bb08d92518549a%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637581608717458896%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=CeJXPNxAOPiXQYYXxDKqSrcVBbiY%2FrkQ%2FmPzbRXbSHQ%3D&amp;reserved=0
+> +	depends on AMD_MEM_ENCRYPT
+> +	select KUNIT
+> +	select FUNCTION_TRACER
+> +	help
+> +	  Enable KUnit-based testing for the encryption of system memory
+> +	  using AMD SEV-ES. Currently only tests #VC handling.
+> +
+>  # Common NUMA Features
+>  config NUMA
+>  	bool "NUMA Memory Allocation and Scheduler Support"
+> diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
+> index 0f66682ac02a6..360c5d33580ca 100644
+> --- a/arch/x86/kernel/Makefile
+> +++ b/arch/x86/kernel/Makefile
+> @@ -23,6 +23,10 @@ CFLAGS_REMOVE_head64.o = -pg
+>  CFLAGS_REMOVE_sev.o = -pg
+>  endif
+>  
+> +ifdef CONFIG_AMD_MEM_ENCRYPT_TEST_VC
+> +CFLAGS_sev.o	+= -fno-ipa-sra
+> +endif
+
+Maybe add something in the commit message as to why this is needed.
+
+> +
+>  KASAN_SANITIZE_head$(BITS).o				:= n
+>  KASAN_SANITIZE_dumpstack.o				:= n
+>  KASAN_SANITIZE_dumpstack_$(BITS).o			:= n
+> @@ -149,6 +153,7 @@ obj-$(CONFIG_UNWINDER_FRAME_POINTER)	+= unwind_frame.o
+>  obj-$(CONFIG_UNWINDER_GUESS)		+= unwind_guess.o
+>  
+>  obj-$(CONFIG_AMD_MEM_ENCRYPT)		+= sev.o
+> +obj-$(CONFIG_AMD_MEM_ENCRYPT_TEST_VC)	+= sev-test-vc.o
+>  ###
+>  # 64 bit specific files
+>  ifeq ($(CONFIG_X86_64),y)
+> diff --git a/arch/x86/kernel/sev-test-vc.c b/arch/x86/kernel/sev-test-vc.c
+> new file mode 100644
+> index 0000000000000..2475270b844e8
+> --- /dev/null
+> +++ b/arch/x86/kernel/sev-test-vc.c
+> @@ -0,0 +1,155 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2021 SUSE
+> + *
+> + * Author: Varad Gautam <varad.gautam@suse.com>
+> + */
+> +
+> +#include <asm/cpufeature.h>
+> +#include <asm/debugreg.h>
+> +#include <asm/io.h>
+> +#include <asm/sev-common.h>
+> +#include <asm/svm.h>
+> +#include <kunit/test.h>
+> +#include <linux/kprobes.h>
+> +
+> +static struct kretprobe hv_call_krp;
+> +
+> +static int hv_call_krp_entry(struct kretprobe_instance *krpi,
+> +				    struct pt_regs *regs)
+
+Align with the argument above.
+
+> +{
+> +	unsigned long ghcb_vaddr = regs_get_kernel_argument(regs, 0);
+> +	*((unsigned long *) krpi->data) = ghcb_vaddr;
+> +
+> +	return 0;
+> +}
+> +
+> +static int hv_call_krp_ret(struct kretprobe_instance *krpi,
+> +				    struct pt_regs *regs)
+
+Align with the argument above.
+
+> +{
+> +	unsigned long ghcb_vaddr = *((unsigned long *) krpi->data);
+> +	struct ghcb *ghcb = (struct ghcb *) ghcb_vaddr;
+> +	struct kunit *test = current->kunit_test;
+> +
+> +	if (test && strstr(test->name, "sev_es_") && test->priv)
+> +		cmpxchg((unsigned long *) test->priv, ghcb->save.sw_exit_code, 1);
+> +
+> +	return 0;
+> +}
+> +
+> +int sev_test_vc_init(struct kunit *test)
+> +{
+> +	int ret;
+> +
+> +	if (!sev_es_active()) {
+> +		pr_err("Not a SEV-ES guest. Skipping.");
+
+Should this be a pr_info vs a pr_err?
+
+Should you define a pr_fmt above for the pr_ messages?
+
+> +		ret = -EINVAL;
+> +		goto out;
+> +	}
+> +
+> +	memset(&hv_call_krp, 0, sizeof(hv_call_krp));
+> +	hv_call_krp.entry_handler = hv_call_krp_entry;
+> +	hv_call_krp.handler = hv_call_krp_ret;
+> +	hv_call_krp.maxactive = 100;
+> +	hv_call_krp.data_size = sizeof(unsigned long);
+> +	hv_call_krp.kp.symbol_name = "sev_es_ghcb_hv_call";
+> +	hv_call_krp.kp.addr = 0;
+> +
+> +	ret = register_kretprobe(&hv_call_krp);
+> +	if (ret < 0) {
+
+Should this just be "if (ret) {"? Can a positive number be returned and if
+so, what does it mean?
+
+> +		pr_err("Could not register kretprobe. Skipping.");
+> +		goto out;
+> +	}
+> +
+> +	test->priv = kunit_kzalloc(test, sizeof(unsigned long), GFP_KERNEL);
+> +	if (!test->priv) {
+> +		ret = -ENOMEM;
+> +		pr_err("Could not allocate. Skipping.");
+> +		goto out;
+> +	}
+> +
+> +out:
+> +	return ret;
+> +}
+> +
+> +void sev_test_vc_exit(struct kunit *test)
+> +{
+> +	if (test->priv)
+> +		kunit_kfree(test, test->priv);
+> +
+> +	if (hv_call_krp.kp.addr)
+> +		unregister_kretprobe(&hv_call_krp);
+> +}
+> +
+> +#define guarded_op(kt, ec, op)				\
+> +do {							\
+> +	struct kunit *t = (struct kunit *) kt;		\
+> +	smp_store_release((typeof(ec) *) t->priv, ec);	\
+> +	op;						\
+> +	KUNIT_EXPECT_EQ(t, (typeof(ec)) 1, 		\
+> +		(typeof(ec)) smp_load_acquire((typeof(ec) *) t->priv));	\
+
+I usually like seeing all the '\' characters lined up, rather than having
+just the one hanging out.
+
+Thanks,
+Tom
+
+> +} while(0)
+> +
+> +static void sev_es_nae_cpuid(struct kunit *test)
+> +{
+> +	unsigned int cpuid_fn = 0x8000001f;
+> +
+> +	guarded_op(test, SVM_EXIT_CPUID, native_cpuid_eax(cpuid_fn));
+> +}
+> +
+> +static void sev_es_nae_wbinvd(struct kunit *test)
+> +{
+> +	guarded_op(test, SVM_EXIT_WBINVD, wbinvd());
+> +}
+> +
+> +static void sev_es_nae_msr(struct kunit *test)
+> +{
+> +	guarded_op(test, SVM_EXIT_MSR, __rdmsr(MSR_IA32_TSC));
+> +}
+> +
+> +static void sev_es_nae_dr7_rw(struct kunit *test)
+> +{
+> +	guarded_op(test, SVM_EXIT_WRITE_DR7,
+> +		   native_set_debugreg(7, native_get_debugreg(7)));
+> +}
+> +
+> +static void sev_es_nae_ioio(struct kunit *test)
+> +{
+> +	unsigned long port = 0x80;
+> +	char val = 0;
+> +
+> +	guarded_op(test, SVM_EXIT_IOIO, val = inb(port));
+> +	guarded_op(test, SVM_EXIT_IOIO, outb(val, port));
+> +	guarded_op(test, SVM_EXIT_IOIO, insb(port, &val, sizeof(val)));
+> +	guarded_op(test, SVM_EXIT_IOIO, outsb(port, &val, sizeof(val)));
+> +}
+> +
+> +static void sev_es_nae_mmio(struct kunit *test)
+> +{
+> +	unsigned long lapic_ver_pa = 0xfee00030; /* APIC_DEFAULT_PHYS_BASE + APIC_LVR */
+> +	unsigned __iomem *lapic = ioremap(lapic_ver_pa, 0x4);
+> +	unsigned lapic_version = 0;
+> +
+> +	guarded_op(test, SVM_VMGEXIT_MMIO_READ, lapic_version = *lapic);
+> +	guarded_op(test, SVM_VMGEXIT_MMIO_WRITE, *lapic = lapic_version);
+> +
+> +	iounmap(lapic);
+> +}
+> +
+> +static struct kunit_case sev_test_vc_testcases[] = {
+> +	KUNIT_CASE(sev_es_nae_cpuid),
+> +	KUNIT_CASE(sev_es_nae_wbinvd),
+> +	KUNIT_CASE(sev_es_nae_msr),
+> +	KUNIT_CASE(sev_es_nae_dr7_rw),
+> +	KUNIT_CASE(sev_es_nae_ioio),
+> +	KUNIT_CASE(sev_es_nae_mmio),
+> +	{}
+> +};
+> +
+> +static struct kunit_suite sev_vc_test_suite = {
+> +	.name = "sev_test_vc",
+> +	.init = sev_test_vc_init,
+> +	.exit = sev_test_vc_exit,
+> +	.test_cases = sev_test_vc_testcases,
+> +};
+> +kunit_test_suite(sev_vc_test_suite);
 > 
