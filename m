@@ -2,160 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E54C6397433
-	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 15:30:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D644D397465
+	for <lists+kvm@lfdr.de>; Tue,  1 Jun 2021 15:34:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233983AbhFANbw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 09:31:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40624 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233925AbhFANbv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Jun 2021 09:31:51 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CC30C061574
-        for <kvm@vger.kernel.org>; Tue,  1 Jun 2021 06:30:10 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id b18so17720354lfv.11
-        for <kvm@vger.kernel.org>; Tue, 01 Jun 2021 06:30:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=jkQlDO685xDJqrzL2iqgvvvwo6S6SiI7DXtQHAtFDwE=;
-        b=J2TEc2TsluRQv/aSFtt9HpGQNKdiHCrBqozRc97ihuc5xiZPS6OqQ3stQTBNhT9JdV
-         KFD+pMaw7mLE09bHOlbpjzxoa0ikJ0bebIkNN/Nxm9hiidBxP7VTKhwAYryT6Bliixc9
-         88HROxFQAJw/z368D2tz7tkM1YpZ798OTDEadfycJSP9GEyRlKG1nc585/Ef3ja0751d
-         MEji4FkTBSEUwLAh4oc3kfMV7DoRnXzfnz0Q5465WY37VwWPTvFSUP5hDDH9TX/Oiyh3
-         +iD0JiScaMb3ZgktZVNoWivg3omtHQywtkwLk8aSHyytQ4Ad8H5DYASrJq+BxwN9WGMN
-         5Q1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=jkQlDO685xDJqrzL2iqgvvvwo6S6SiI7DXtQHAtFDwE=;
-        b=AF+VnKlvIlbfscFuP5xI+4F2IyDzRfff2KhgriH8rEoqeiRyJ5kfvtGpu64KLnZ5uk
-         DEkhG8X9D0WVxVlsdjBh79jXUOhHeg5ALHfJLxjBIt8rLs+4ofPRhbZ1bpwohFV8cqPl
-         xNqHotWI1bE1lopbaoCyugdGd4VpDESz8pQb4AgmI6E96oOmIMeCYaZOi+05LcTIOPn7
-         F9Vrc5mPNNwxUETuIhs+j80PgjPpmx9ePPpmVjA4acokiEe5FZmP++7pyVaHn4mEImrC
-         xIA/TsCgHZt8dUiGhEBaHOgtEauOTgMBWlK70BJ6JNgF8UdTo53iun50kidZbRDbL0Bf
-         9IUQ==
-X-Gm-Message-State: AOAM533aiZHatDwvlf4Dm3PpVYLAwTZGHmBzW5o3GxQ8k4FHzyTEnnwK
-        kVTgZBLh4qmS1VG4uskF6cOqDOlZLZHpoLPiTpo=
-X-Google-Smtp-Source: ABdhPJzei4zXDgEQqyxuNHcw6Z/T2nPFniWQDacaeCUN6yb55DWytOea/sHrBJu7MEsj6XeA+jmy2gxyfJ97IXbkjsY=
-X-Received: by 2002:ac2:5d29:: with SMTP id i9mr18833884lfb.638.1622554208031;
- Tue, 01 Jun 2021 06:30:08 -0700 (PDT)
+        id S233960AbhFANgA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 09:36:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54109 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233797AbhFANf7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 1 Jun 2021 09:35:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622554457;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=s5BnUVJUREQAF3ygqKJiUIsj3UNH9ZT21LBJhvMbwvA=;
+        b=HXjkRP6jiqbnpC9u76+QSHX6c25/GAMHf6v//O37zX+h0608NSvggWAuuKpsT0DL0OVSjd
+        gOHxOVbJER63+DN77fPHsggEmYw7tHHaoNpDhfjHD2Cqw39uVUl0+lxDZIJyoXuCX4I4ZO
+        DX9H8+jH4z96tzWDJEQF32B7HYEIFqU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-371-DRyoV5llNzGHklLRVGwNXw-1; Tue, 01 Jun 2021 09:34:16 -0400
+X-MC-Unique: DRyoV5llNzGHklLRVGwNXw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15B23BBEE8;
+        Tue,  1 Jun 2021 13:34:15 +0000 (UTC)
+Received: from localhost (ovpn-112-239.rdu2.redhat.com [10.10.112.239])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BEB875D9CD;
+        Tue,  1 Jun 2021 13:34:14 +0000 (UTC)
+Date:   Tue, 1 Jun 2021 09:34:14 -0400
+From:   Eduardo Habkost <ehabkost@redhat.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     Tom Lendacky <Thomas.Lendacky@amd.com>, kvm@vger.kernel.org,
+        armbru@redhat.com, James Bottomley <jejb@linux.ibm.com>,
+        qemu-devel@nongnu.org, dgilbert@redhat.com,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3] target/i386/sev: add support to query the attestation
+ report
+Message-ID: <20210601133414.rmwt725cv3ipejmk@habkost.net>
+References: <20210429170728.24322-1-brijesh.singh@amd.com>
+ <20210531200116.phfr6vo3penynb4f@habkost.net>
 MIME-Version: 1.0
-References: <CA+2MQi-_06J1cmLhKAmV1vkPEnvDx6+bOnK06OciYmdymaNruw@mail.gmail.com>
- <87cztmkdlp.fsf@vitty.brq.redhat.com> <CA+2MQi_LG57KRRFjMR_zPvJBDaH4z16S5J=c+U+-Ss_Z71Ax7g@mail.gmail.com>
- <87y2c8iia0.fsf@vitty.brq.redhat.com> <CA+2MQi-OK5zK_sBtm8k-nnqVPQTSzE1UVTEfQ4KBChMHc=Npzg@mail.gmail.com>
- <87k0no4k4q.fsf@vitty.brq.redhat.com>
-In-Reply-To: <87k0no4k4q.fsf@vitty.brq.redhat.com>
-From:   Liang Li <liliang324@gmail.com>
-Date:   Tue, 1 Jun 2021 21:29:56 +0800
-Message-ID: <CA+2MQi_1N=HD7z7s6-MOcQ6xS14KxPS=TqjHTrWDdTP7jteMPw@mail.gmail.com>
-Subject: Re: About the performance of hyper-v
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Tianyu.Lan@microsoft.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210531200116.phfr6vo3penynb4f@habkost.net>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-==========================
-> > Analyze events for all VMs, all VCPUs:
-> >              VM-EXIT    Samples  Samples%     Time%    Min Time    Max
-> > Time         Avg time
-> >            MSR_WRITE     924045    89.96%    81.10%      0.42us
-> > 68.42us      1.26us ( +-   0.07% )
-> >            DR_ACCESS      44669     4.35%     2.36%      0.32us
-> > 50.74us      0.76us ( +-   0.32% )
-> >   EXTERNAL_INTERRUPT      29809     2.90%     6.42%      0.66us
-> > 70.75us      3.10us ( +-   0.54% )
-> >               VMCALL      17819     1.73%     5.21%      0.75us
-> > 15.64us      4.20us ( +-   0.33%
-> >
-> > Total Samples:1027227, Total events handled time:1436343.94us.
-> > ===============================
-> >
-> > The result shows the overhead increased.  enable the apicv can help to
-> > reduce the vm-exit
-> > caused by interrupt injection, but on the other side, there are a lot
-> > of vm-exit caused by APIC_EOI.
-> >
-> > When turning off the hyper-v and using the kvm apicv, there is no such
-> > overhead.
->
-> I think I know what's happening. We've asked Windows to use synthetic
-> MSRs to access APIC (HV_APIC_ACCESS_RECOMMENDED) and this can't be
-> accelerated in hardware.
->
-> Could you please try the following hack (KVM):
->
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index c8f2592ccc99..66ee85a83e9a 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -145,6 +145,13 @@ void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
->                                            vcpu->arch.ia32_misc_enable_msr &
->                                            MSR_IA32_MISC_ENABLE_MWAIT);
->         }
-> +
-> +       /* Dirty hack: force HV_DEPRECATING_AEOI_RECOMMENDED. Not to be merged! */
-> +       best = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_ENLIGHTMENT_INFO, 0);
-> +       if (best) {
-> +               best->eax &= ~HV_X64_APIC_ACCESS_RECOMMENDED;
-> +               best->eax |= HV_DEPRECATING_AEOI_RECOMMENDED;
-> +       }
->  }
->  EXPORT_SYMBOL_GPL(kvm_update_cpuid_runtime);
->
-> > It seems turning on hyper V related features is not always the best
-> > choice for a windows guest.
->
-> Generally it is, we'll just need to make QEMU smarter when setting
-> 'recommendation' bits.
->
+On Mon, May 31, 2021 at 04:01:16PM -0400, Eduardo Habkost wrote:
+> On Thu, Apr 29, 2021 at 12:07:28PM -0500, Brijesh Singh wrote:
+> > The SEV FW >= 0.23 added a new command that can be used to query the
+> > attestation report containing the SHA-256 digest of the guest memory
+> > and VMSA encrypted with the LAUNCH_UPDATE and sign it with the PEK.
+> > 
+> > Note, we already have a command (LAUNCH_MEASURE) that can be used to
+> > query the SHA-256 digest of the guest memory encrypted through the
+> > LAUNCH_UPDATE. The main difference between previous and this command
+> > is that the report is signed with the PEK and unlike the LAUNCH_MEASURE
+> > command the ATTESATION_REPORT command can be called while the guest
+> > is running.
+> > 
+> > Add a QMP interface "query-sev-attestation-report" that can be used
+> > to get the report encoded in base64.
+> > 
+> > Cc: James Bottomley <jejb@linux.ibm.com>
+> > Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
+> > Cc: Eric Blake <eblake@redhat.com>
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: kvm@vger.kernel.org
+> > Reviewed-by: James Bottomley <jejb@linux.ibm.com>
+> > Tested-by: James Bottomley <jejb@linux.ibm.com>
+> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> > ---
+> [...]
+> > +    gsize len;
+> [...]
+> > +    /* verify the input mnonce length */
+> > +    if (len != sizeof(input.mnonce)) {
+> > +        error_setg(errp, "SEV: mnonce must be %ld bytes (got %ld)",
+> > +                sizeof(input.mnonce), len);
+> 
+> This breaks the build on i386.  Failed CI job:
+> https://gitlab.com/ehabkost/qemu/-/jobs/1300032082
+> 
+> I'm applying the following fixup.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index 12899a31736..0e135d56e53 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -517,7 +517,7 @@ sev_get_attestation_report(const char *mnonce, Error **errp)
+>  
+>      /* verify the input mnonce length */
+>      if (len != sizeof(input.mnonce)) {
+> -        error_setg(errp, "SEV: mnonce must be %ld bytes (got %ld)",
+> +        error_setg(errp, "SEV: mnonce must be %ld bytes (got %" G_GSIZE_FORMAT ")",
+>                  sizeof(input.mnonce), len);
+>          g_free(buf);
+>          return NULL;
 
-Hi Vitaly,
+The fix was incomplete, additional fixup was required.
 
-I have tried your patch and found it can help to reduce the overhead.
-it works as well as
-the  option  "<feature policy='disable' name='hypervisor'/>" is set in
-libvirt xml.
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+diff --git a/0e135d56e53 b/target/i386/sev.c
+index 0e135d56e53..1a88f127035 100644
+--- a/0e135d56e53
++++ b/target/i386/sev.c
+@@ -517,7 +517,7 @@ sev_get_attestation_report(const char *mnonce, Error **errp)
+ 
+     /* verify the input mnonce length */
+     if (len != sizeof(input.mnonce)) {
+-        error_setg(errp, "SEV: mnonce must be %ld bytes (got %" G_GSIZE_FORMAT ")",
++        error_setg(errp, "SEV: mnonce must be %zu bytes (got %" G_GSIZE_FORMAT ")",
+                 sizeof(input.mnonce), len);
+         g_free(buf);
+         return NULL;
 
-=======with your patch and stimer enabled=====
-Analyze events for all VMs, all VCPUs:
-             VM-EXIT    Samples  Samples%     Time%    Min Time    Max
-Time         Avg time
-          APIC_WRITE     172232    78.36%    68.99%      0.70us
-47.71us      1.48us ( +-   0.18% )
-         DR_ACCESS      19136     8.71%     4.42%      0.55us
-4.42us      0.85us ( +-   0.32% )
-  EXTERNAL_INTERRUPT      15921     7.24%    13.84%      0.87us
-55.28us      3.21us ( +-   0.55% )
-              VMCALL       6971     3.17%    10.34%      1.16us
-12.02us      5.48us ( +-   0.49%
-Total Samples:219802, Total events handled time:369310.30us.
+-- 
+Eduardo
 
-===========with hypervisor disabled=========
-
-Analyze events for all VMs, all VCPUs:
-             VM-EXIT    Samples  Samples%     Time%    Min Time    Max
-Time         Avg time
-          APIC_WRITE     200482    78.51%    68.62%      0.64us
-49.51us      1.37us ( +-   0.16% )
-           DR_ACCESS      24235     9.49%     4.92%      0.55us
-3.65us      0.81us ( +-   0.26% )
-  EXTERNAL_INTERRUPT      17084     6.69%    13.20%      0.89us
-56.38us      3.09us ( +-   0.53% )
-              VMCALL       7124     2.79%     9.87%      1.26us
-12.39us      5.54us ( +-   0.49% )
-         EOI_INDUCED       5066     1.98%     1.36%      0.66us
-2.64us      1.07us ( +-   0.25% )
-      IO_INSTRUCTION        591     0.23%     1.27%      3.37us
-673.23us      8.59us ( +-  13.69% )
-Total Samples:255363, Total events handled time:399954.27us.
-
-
-Thanks!
-Liang
