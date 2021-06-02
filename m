@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9519E398C7C
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:18:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DCD09398C30
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:14:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230478AbhFBOSz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 10:18:55 -0400
-Received: from mail-dm6nam12on2079.outbound.protection.outlook.com ([40.107.243.79]:15104
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        id S232157AbhFBOPw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 10:15:52 -0400
+Received: from mail-dm3nam07on2076.outbound.protection.outlook.com ([40.107.95.76]:3297
+        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231653AbhFBOQx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 10:16:53 -0400
+        id S231765AbhFBOOX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 10:14:23 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bI1VX0wUunEp5GZ/OephPMlHO67cBJp1GJRJ6/yLdXVcBqll0gYHkdZWG1l0PTaoTn/DqYg2kHai/eusrH73ldrzkFtJpahKCV9uCusTIkijJ4AULkGDbI6f+5u8/+raJnZ0zokRWJ2SfncVH/NRsiX7ylIecm4RYudfSPO8GZiJDiVbR8Daw80UtJ2p8SXfR/YPUR7b74KR3fAonNHNMuyKHO9mdTKlgAGex9WN9yUdvYqzLTvNFbjHLqxemNfHwqQFbwhvgcJNI05kLB2y2aEIT4oCg5n93Ykfp1ny+T3OdyyvrJHPjDuYGaWZ3dRH/L3Jr59zBfTd4txdqD7EmQ==
+ b=f/ONCllHpZe2SZUtiv0PdBI24gECKimv8M1GRzD5LRMdXo/I0eTE6tzSpgYxvLdkv/K4iuwlFYcMEgZvEgpm4FgzaNeO24o6qFmGAnqULblJq2mqqtft6VLxldrR9roemUVnCFv0veNS4qcXZ7mbZazW1H4wPvgx7/eK+2xSiMJbz9IW4gWD24Vu3BhbASfTIBRemYfDd5UF+bT9ElASdEZd8ZtAJgZcz7P9BLRacqbUxZEZWze/EWZKK70OM6CPbCwT85/RmyunFlPZp+j2HzcHeLviVVWngPm7P+72I4wxIiXuz24409G3LVRqBV3WyEe0H6qgpUo6lv97+fIyRA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KooHv0mllq5V/tjmM2u3XNXV0Y9fxysjExz0F1f2TiU=;
- b=SI9MqEwndRY1nWAizzZKtc5omI+HmOd84wHIJNeGWY+0EVe8SIqnRqKRCDxRHdY3ZvV5Mitj3bXF0T4ijMKtylYudoszwPLvM7qOLf11TJm48sxBME0hmAGejWuTmlM7IbNbAwjxMHlWWFzK1PJOw6WGGXMnntrlOetvv6SR7M0MOLCVbcmGX5VNHajS/CCh+GZGKt/uTfBC9jMvxsJzK9kt94j1R+5thUri4vXdZ/ZbY0VrxRpYtLeKm69VLHdzL4AFiOSzddMiFDjaxZW+vSVggCryzanRdeDT8BWtsxtCzRqKG2sANBPqXKMHd3ntN2Nw9EoyxcTrahFeId6szA==
+ bh=rVtWgC7hpGHszr+GQ7wUzkkLKdRLKB2IIVX9lHAB/tc=;
+ b=Hx9scSvcSITHGPj453PhRhGZySCBjFYaLPGyDRgoZ3sfa//0/sar4YjHPBxWo9sOnGlg8CuW3Bob3rbH5ewB8kYN5LlMxRf/NTsh9TGqdL10n0d7QaPUoMsDUPQNWMgr4nA/LK3ujXY+L9CXmN3q1BkSNd7ICT0q7MLhX0lZDlrE2aW3fZvn2W0F2Sphcs3hh63+OwWcTL4k1K3ppsnPhowJ6lihjuf6ddWrdJ1W1O1GTbAsrcPswSN4hGWVz1BO8YZOhm7oH8a+I9gXnN0Td3m3mvPx2hnwUz47K+pst/ErX/bwDmjfI3tdayRbuwECe8om4m7+VWKOX7TwiOizcQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KooHv0mllq5V/tjmM2u3XNXV0Y9fxysjExz0F1f2TiU=;
- b=oUViDX+5dylzk4O0uyEan1OshcOazB4Vj7nty6TP+38WJ8EoguGyPGcCRSxBgWRvIcq5wXCOaLa2UtOgUkX83vRjOlHJrXIxIWRsIVQ76mZQ1Ahusu9jeY8t96UeDKY/XDIKDIANdMZ3YeTJcEFeGZq7JejZGheSUEB8jcq0cVo=
+ bh=rVtWgC7hpGHszr+GQ7wUzkkLKdRLKB2IIVX9lHAB/tc=;
+ b=Rydro723hNpC7EPHNsG3fvBcAtZylRd0Z5A4VVnwkeUUWm/Kh/fPxttUFmibCFmYeAf6Qrs2oyJqUfttrwCeIJV51x8XXK+sXHGn/OqFHP9BPzpv+ZndwdceT6HAqPxRGOmn+0toc3glBa8R5zS73k3A1+hmSMjLEOVuRa0r7A4=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4592.namprd12.prod.outlook.com (2603:10b6:806:9b::16) with
+ by SA0PR12MB4574.namprd12.prod.outlook.com (2603:10b6:806:94::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.22; Wed, 2 Jun
- 2021 14:12:06 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.20; Wed, 2 Jun
+ 2021 14:12:37 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4173.030; Wed, 2 Jun 2021
- 14:12:06 +0000
+ 14:12:37 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
@@ -58,9 +58,9 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         David Rientjes <rientjes@google.com>, tony.luck@intel.com,
         npmccallum@redhat.com, Borislav Petkov <bp@suse.de>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH Part2 RFC v3 29/37] KVM: SVM: Add support to handle GHCB GPA register VMGEXIT
-Date:   Wed,  2 Jun 2021 09:10:49 -0500
-Message-Id: <20210602141057.27107-30-brijesh.singh@amd.com>
+Subject: [PATCH Part2 RFC v3 30/37] KVM: SVM: Add support to handle MSR based Page State Change VMGEXIT
+Date:   Wed,  2 Jun 2021 09:10:50 -0500
+Message-Id: <20210602141057.27107-31-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210602141057.27107-1-brijesh.singh@amd.com>
 References: <20210602141057.27107-1-brijesh.singh@amd.com>
@@ -71,151 +71,251 @@ X-ClientProxiedBy: SA0PR11CA0056.namprd11.prod.outlook.com
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0056.namprd11.prod.outlook.com (2603:10b6:806:d0::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20 via Frontend Transport; Wed, 2 Jun 2021 14:12:04 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0056.namprd11.prod.outlook.com (2603:10b6:806:d0::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20 via Frontend Transport; Wed, 2 Jun 2021 14:12:06 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 36cdc39e-1f27-4e69-cb92-08d925d066b8
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4592:
+X-MS-Office365-Filtering-Correlation-Id: c0319594-6256-4db4-7d92-08d925d0676f
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4574:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4592A75EE4BBB94F31545FA7E53D9@SA0PR12MB4592.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB457456D2B3EC606205FC6995E53D9@SA0PR12MB4574.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: F4L4x/cu/I+t2iyzrDwJUwIMWZITBNQoFvj/Uq7c2Xno7n6tb+1i7+4r8W7n1h5tHB6xrQBkePfHn2JfPII+naGQdsr8+VGe2aDpi3N7Jp7AU/5rTZ+XToGo6eeCJKleKVtTL9kR3A4B7STtg3DwCNDXH6Dab27rf33J1IUoxiW0VP8X3yY+y1uHMdaR1PTdzuCtkzUuoIT9qS17EazGXfSEuknZdd9eVJaGVl9djdxTn+/mv2w2mrl4fqlrYKV6iJnl/kzEXSrvboN7mdvj9WGJVcuI6f8yI0F62ZcQsKzUhSB59NIa9ZdYEIHqU3c+HraYTZ3Ef6svXQa6F03gHtLL9+6evh6LN91fuA2XUXO3eZa8Pwclh3CTe2bVSGyQZEhv2CIpfsbVTIHP5bWLRBs/s8N8ax5QfS5jdHdeOOE48FvYoY8mSBoN0e5GJxH6CHuFNk3ozKvFkzkFTeAmBru3sai8fQDKoONpwAF+In1SSwgwL03Zjs5avQgDSaxT0MJsqrni0GfTZPahmQR0kEtTD9yLP88UorPnyWtAfyyIBxlJVXBMgit58+lPqFpjsoAOiNL6/IPLSAyM156kY4QhWYnaYzskgy2i15GTQ8mUXBCsVNurw6pQUpo0jI4vv7t3RiHx5yFlHdpQfF3QBA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(136003)(39860400002)(366004)(376002)(956004)(8936002)(8676002)(36756003)(478600001)(54906003)(83380400001)(1076003)(44832011)(2616005)(6666004)(38350700002)(38100700002)(5660300002)(66476007)(66556008)(2906002)(66946007)(4326008)(26005)(86362001)(186003)(7696005)(52116002)(16526019)(6486002)(7416002)(316002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?vd4PGtCPOErTv6d5hXfCjzV6v0sgEBskZ3THYXtwkm426tQ4hP8O04fFTK9l?=
- =?us-ascii?Q?lJCJVXom1koT98zPk+4hD5o8i/3sDFNCwcLAzizQou+FncBjHKYrbVT10xKl?=
- =?us-ascii?Q?y0qg0RX1fGopIgA10YpBfYIhZSdAd9UivbIJtzOxX5webNdKXG8lszadHb/g?=
- =?us-ascii?Q?XSWUwOtr30aLCa2/CSD1Lyi0TgsHTFXswuzQuSbUss+1safA5hVLySj79ExD?=
- =?us-ascii?Q?aqJHVw8fqxtkJ7J5EJBlmUcm8m/KaW54dBr9Q1q+KzJvJiz6jRYiWL2uBSth?=
- =?us-ascii?Q?Uw/1VZFO4SbLxgWmzr2k7ico5+7190jxHi/U+fjfFoRv4I7kHNIHKaSYFPsT?=
- =?us-ascii?Q?HEogRX7qETicaFTDTkbIo3XPqtV+BJ7HrM4dztxJmThy9aR20stPWx/HIi+F?=
- =?us-ascii?Q?fsTO0v+Z1efwTblZ+/IMMhtfvI3vTqDRFW5mCFxs1sBM9OXRwPVCzgHSDhij?=
- =?us-ascii?Q?c2gAg6n6YLF4GTBoyZvdpM9daKCp3BhBfTtFVSZM5aRyavEvdwPGOYGR3kwZ?=
- =?us-ascii?Q?1mgdZdIh8Ac7YAyRCtx5YRwxNNTKtMTHz4mmteN3iQpFrl2reAAZwzawV7c6?=
- =?us-ascii?Q?T1GR4z1bj6Njzx1GyP0vxKV5WOXbUMok7w0gloOO6B8A4wXsq6PgqdU3CVYU?=
- =?us-ascii?Q?3RWEu3JjQkAAVE/Kyr1fyrppFBrW6vg5fl9Ic+XDo1IZy0qzKS05LlqKfHR5?=
- =?us-ascii?Q?kxfG792XtnEkxRAnMDTUXp5ODOT5MNYXl/ioQOv1Inw7KbngLGdod7YrpzVQ?=
- =?us-ascii?Q?LLb5spGdR53EYgl0t8LxIn8XExQn2QaH8TA+5X1m64XRG00j+zjQ3HwYTi7f?=
- =?us-ascii?Q?pAPfFzokS7F+papmNjiHc/5B+D7gHK4bw3sEIWnJye5xGN+u+fdQK4S2FJyd?=
- =?us-ascii?Q?ChEGZzlD2KWJPCRcHhgfhpac9GU7GEhs30+Nr6iw2TokSAQK09bNdpVniMN/?=
- =?us-ascii?Q?r8Hd1xu3QmYTJz+faggEt+sB+xIPRmah/fXf7X4ioSBMYOLfOygV/Rgn7IeJ?=
- =?us-ascii?Q?dzLgJNCtsTJwhFMbdGdWLBmPd5b3KUC70HbS8DQvQkGvyMbTrrpXpYSLfRaO?=
- =?us-ascii?Q?6gnNBh56Vesq4zftHdUjF0Hco5gEdRGyUt01C3p0r3pZCSEnVFMSzGv6NpM3?=
- =?us-ascii?Q?2ggSQzo0UbOPijV/TBRxLpvQLmysgyFMBLwy7PVGWz8KSglf5WpRknblfRr/?=
- =?us-ascii?Q?PEzBjTPAkwr/vv54oWCztrh+8vrZbKHJNl4xmSZBsWtedAfen9Ldgh+7UP7U?=
- =?us-ascii?Q?O6ay6183LL6cbti4FlyaMdBJofO+MHFI+S9w3gcpho62TFcOelj5IQyLmGIK?=
- =?us-ascii?Q?fM1xRyLd4xLeNtLyY+nRRyps?=
+X-Microsoft-Antispam-Message-Info: kpCSXD9DbZ6BrJgltix/JyRFdbOzkHkhFgTvYb9xSP77LVSqrijCbI9y4ZzWlaodTrx6BvqsNiPjCeWomVlq9/GAaIi1RwnC53g0C0FLoOCWZMb2yxykBYUwyP+k+JDvVFSADJtwZAxGGUyrnmXDSd6D2xOBV4heNzsCanPKPcSGImEUpn6mPLrsAqbGUp5nclmo1N7lEg6z9OlQcpnYiWEn7AGFMxOBZdyPFapQDHNCpAuzh90/ghKp+DjjqtUlEPHmdgcC9usMMFyrC64ElAqXJBPWRRgv+wxJfHtA/ta1b1VTCmlvw5pTW3OAfWQf9jjdzjc+13ZiAREBwiR3qRw/0uzhcOE/XIfjqKICj8NSdc11TZaZdrqJXejXSKVOSxPH+1X8xKkD4ju/oW365x6Zg/xZLKMhQWq8nu1zD14oBGzE7GatQ5x+Hcg0GuHtlSKAZqnlpCItfE0aDjdGEod3JH2t+3bX4knwTd2ovKqGFsiUygl+Gr3lGj/16fjGDPhI3wMUWbSNs3eYX2z5vnsBUH40Ll9u0rMjYu44U7NYgTGf+5ofjk2uLsvKcOhZwbvpbDm06or6PskbzKwYgo+gIhqvH8QpzVr6boSScwWRzyHI7o/7OzbvN54YkzFFNgrQIywADjauIsPZPGQGUg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(366004)(376002)(396003)(136003)(39860400002)(86362001)(8936002)(7696005)(52116002)(956004)(478600001)(2616005)(66476007)(66946007)(2906002)(26005)(186003)(16526019)(7416002)(4326008)(1076003)(316002)(6666004)(38100700002)(38350700002)(66556008)(44832011)(83380400001)(8676002)(5660300002)(6486002)(54906003)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?9cUbvnfuRL7/+TeXrjCU7HYsRogvTNxAZHfYDPhnkS2MgYq11jg8GXbQNOzQ?=
+ =?us-ascii?Q?1VvlSO/bkk1PEcvPYDlT2N9STB9dTl6J4C5mdkilbt0qsrGQQj5byYyDjAa7?=
+ =?us-ascii?Q?CII8VkVLw1BsRp2IC79+yolUC4MS3oVV8RX26qE6bVsqgJjbZ458dxIl/tIu?=
+ =?us-ascii?Q?FkAeG2mB03FfxK3KSQMhmgCSw2tx+3Q7iWkUFf9BuX5Wl2lyNGx5+qrl4RL8?=
+ =?us-ascii?Q?500q5oZqZ3QqZ3OsoOvbOILUmV8nZ7WH+PvVTUUo5GpYC0JElYCYUnH22BuE?=
+ =?us-ascii?Q?RkV5YErfxTpAXFu5DF5rHrH2CIeMGf9SbXxpotNxp3TiD4PDx9VwyD1FJE0G?=
+ =?us-ascii?Q?CNDuMNeFwi3M9sqAPl2W051tMB5VZt/kHeEDoj0PjqngpkWNjpGYEXkws+CE?=
+ =?us-ascii?Q?q+iXP6N1rocpdIfAhrnx8DZOuACJTdF/nWg6j0RlNULbSWTSuhCMhaE/GC1Z?=
+ =?us-ascii?Q?Tm/MFpnyRZyXKJsypmQOG280u4TUhbpaXN+GuzctSOSveeTO98vie9VGsY4x?=
+ =?us-ascii?Q?xxzrCQp0YT+DEOW1VVa84A2Jxi9/F13E05dvMm6MpTSKrkgVtPJ+eqb901e1?=
+ =?us-ascii?Q?gCBpJob64Gc2UYup9/Jbusw8npbaTnjSGyZpVVhe1+kJYB7Eq90JJSj+nw8h?=
+ =?us-ascii?Q?I84OoupvNdtp/YtiGQOmkeiPzIU7519avQiJKL7Etct7dIq2RQ7FOlho2mDh?=
+ =?us-ascii?Q?BdW1V3G+2D4LIsSOfHo58MLWTDuKzy41N39rlM9MXBh/WwmktsqJtaO04RAL?=
+ =?us-ascii?Q?jCOKy7BnW8a17YdkhuV7jCM/FU+Q4rcdWAlFMSANWczkJdH1HYMmevrvGhWX?=
+ =?us-ascii?Q?21KTDTZwn6DMyMfdhSlEGHO+7ltXtygRYqbSvWDb2ZTXIAKTV041/F00Ab4h?=
+ =?us-ascii?Q?HCxfe/zY76M8Xv3MC4yyCfZYJf37Kfq1LCZDztZENAqvIdmoZvF+kQEW32Hj?=
+ =?us-ascii?Q?s4rybzleUV0YphKRHQ8MfkEf7YPnDcAFDmReCcrN4mCEFX3WH/EbfRbPCYjF?=
+ =?us-ascii?Q?EAjudtQkv8Cf8MbuEvAAKOtr6NBIG3u5DtPAVmCzFfvxneYSa7QD1cI1KBs8?=
+ =?us-ascii?Q?TgDx283KGQCrcJzqCEnzQxv1MDnpckwytwHkZgqkTWLUCMbZkRZz/YUmqZpK?=
+ =?us-ascii?Q?AcsXL9aWgCi/z9Vw1vsoN3nS6L7bkHH+z97GQpcKLcCb9sgYMW5B477yfTUy?=
+ =?us-ascii?Q?utCFJHW+Pdak4o9Hgt2ic01xpy7xjvp6gFfDI2sKh/wodKkry3U4W1MsO3nl?=
+ =?us-ascii?Q?6aRv8FQZZA6OqP/Ys1jkc3O+5FMuiORxW79kf3f86az4xQ7sIOO7PnVn2tDT?=
+ =?us-ascii?Q?wvrfuXHBUGWIfV3REUmuQF14?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 36cdc39e-1f27-4e69-cb92-08d925d066b8
+X-MS-Exchange-CrossTenant-Network-Message-Id: c0319594-6256-4db4-7d92-08d925d0676f
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2021 14:12:05.8546
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2021 14:12:07.3937
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: e/Vsmnb7QF2/EC8QAAUB5NEhYfgZvVA78Wly7y9MNbbIt1FRM17iqEVIg9GMhvI9OVZRxa0aLTJJXhf031dSJw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4592
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4av2C5RhpCDbYWQVtRqNRLJma9PB2t7bPh20tsmgdBOR4591hmC/RmupUWykzB4ddlhENNbFJy/JBV8KF2I67g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4574
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SEV-SNP guests are required to perform a GHCB GPA registration (see
-section 2.5.2 in GHCB specification). Before using a GHCB GPA for a vCPU
-the first time, a guest must register the vCPU GHCB GPA. If hypervisor
-can work with the guest requested GPA then it must respond back with the
-same GPA otherwise return -1.
+SEV-SNP VMs can ask the hypervisor to change the page state in the RMP
+table to be private or shared using the Page State Change MSR protocol
+as defined in the GHCB specification.
 
-On VMEXIT, Verify that GHCB GPA matches with the registered value. If a
-mismatch is detected then abort the guest.
+Before changing the page state in the RMP entry, we lookup the page in
+the TDP to make sure that there is a valid mapping for it. If the mapping
+exist then try to find a workable page level between the TDP and RMP for
+the page. If the page is not mapped in the TDP, then create a fault such
+that it gets mapped before we change the page state in the RMP entry.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/include/asm/sev-common.h |  1 +
- arch/x86/kvm/svm/sev.c            | 25 +++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.h            |  7 +++++++
- 3 files changed, 33 insertions(+)
+ arch/x86/include/asm/sev-common.h |   3 +
+ arch/x86/kvm/svm/sev.c            | 141 ++++++++++++++++++++++++++++++
+ 2 files changed, 144 insertions(+)
 
 diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-index 97137f1a567b..e7c6ce2ce45e 100644
+index e7c6ce2ce45e..ed417340ed42 100644
 --- a/arch/x86/include/asm/sev-common.h
 +++ b/arch/x86/include/asm/sev-common.h
-@@ -93,6 +93,7 @@
- 	GHCB_MSR_GPA_REG_REQ)
+@@ -82,6 +82,9 @@
  
- #define GHCB_MSR_GPA_REG_RESP		0x013
-+#define GHCB_MSR_GPA_REG_ERROR		GENMASK_ULL(51, 0)
- #define GHCB_MSR_GPA_REG_RESP_VAL(v)	((v) >> GHCB_MSR_GPA_REG_VALUE_POS)
+ #define GHCB_MSR_PSC_RESP		0x015
+ #define GHCB_MSR_PSC_ERROR_POS		32
++#define GHCB_MSR_PSC_ERROR_MASK		GENMASK_ULL(31, 0)
++#define GHCB_MSR_PSC_RSVD_POS		12
++#define GHCB_MSR_PSC_RSVD_MASK		GENMASK_ULL(19, 0)
+ #define GHCB_MSR_PSC_RESP_VAL(val)	((val) >> GHCB_MSR_PSC_ERROR_POS)
  
- /* SNP Page State Change NAE event */
+ /* GHCB GPA Register */
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 6b0c230c5f37..81c0fc883261 100644
+index 81c0fc883261..dac7042464be 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -2900,6 +2900,25 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- 				GHCB_MSR_INFO_MASK, GHCB_MSR_INFO_POS);
+@@ -28,6 +28,7 @@
+ #include "svm_ops.h"
+ #include "cpuid.h"
+ #include "trace.h"
++#include "mmu.h"
+ 
+ #define __ex(x) __kvm_handle_fault_on_reboot(x)
+ 
+@@ -2821,6 +2822,127 @@ static void set_ghcb_msr(struct vcpu_svm *svm, u64 value)
+ 	svm->vmcb->control.ghcb_gpa = value;
+ }
+ 
++static int snp_rmptable_psmash(struct kvm_vcpu *vcpu, kvm_pfn_t pfn)
++{
++	pfn = pfn & ~(KVM_PAGES_PER_HPAGE(PG_LEVEL_2M) - 1);
++
++	return psmash(pfn_to_page(pfn));
++}
++
++static int snp_make_page_shared(struct kvm_vcpu *vcpu, gpa_t gpa, kvm_pfn_t pfn, int level)
++{
++	struct rmpupdate val;
++	int rc, rmp_level;
++	struct rmpentry *e;
++
++	e = snp_lookup_page_in_rmptable(pfn_to_page(pfn), &rmp_level);
++	if (!e)
++		return -EINVAL;
++
++	if (!rmpentry_assigned(e))
++		return 0;
++
++	/* Log if the entry is validated */
++	if (rmpentry_validated(e))
++		pr_warn_ratelimited("Remove RMP entry for a validated gpa 0x%llx\n", gpa);
++
++	/*
++	 * Is the page part of an existing 2M RMP entry ? Split the 2MB into multiple
++	 * of 4K-page before making the memory shared.
++	 */
++	if ((level == PG_LEVEL_4K) && (rmp_level == PG_LEVEL_2M)) {
++		rc = snp_rmptable_psmash(vcpu, pfn);
++		if (rc)
++			return rc;
++	}
++
++	memset(&val, 0, sizeof(val));
++	val.pagesize = X86_TO_RMP_PG_LEVEL(level);
++	return rmpupdate(pfn_to_page(pfn), &val);
++}
++
++static int snp_make_page_private(struct kvm_vcpu *vcpu, gpa_t gpa, kvm_pfn_t pfn, int level)
++{
++	struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
++	struct rmpupdate val;
++	struct rmpentry *e;
++	int rmp_level;
++
++	e = snp_lookup_page_in_rmptable(pfn_to_page(pfn), &rmp_level);
++	if (!e)
++		return -EINVAL;
++
++	/* Log if the entry is validated */
++	if (rmpentry_validated(e))
++		pr_warn_ratelimited("Asked to make a pre-validated gpa %llx private\n", gpa);
++
++	memset(&val, 0, sizeof(val));
++	val.gpa = gpa;
++	val.asid = sev->asid;
++	val.pagesize = X86_TO_RMP_PG_LEVEL(level);
++	val.assigned = true;
++
++	return rmpupdate(pfn_to_page(pfn), &val);
++}
++
++static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, int op, gpa_t gpa, int level)
++{
++	struct kvm *kvm = vcpu->kvm;
++	int rc, tdp_level;
++	kvm_pfn_t pfn;
++	gpa_t gpa_end;
++
++	gpa_end = gpa + page_level_size(level);
++
++	while (gpa < gpa_end) {
++		/*
++		 * Get the pfn and level for the gpa from the nested page table.
++		 *
++		 * If the TDP walk failed, then its safe to say that we don't have a valid
++		 * mapping for the gpa in the nested page table. Create a fault to map the
++		 * page is nested page table.
++		 */
++		if (!kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &tdp_level)) {
++			pfn = kvm_mmu_map_tdp_page(vcpu, gpa, PFERR_USER_MASK, level);
++			if (is_error_noslot_pfn(pfn))
++				goto out;
++
++			if (!kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &tdp_level))
++				goto out;
++		}
++
++		/* Adjust the level so that we don't go higher than the backing page level */
++		level = min_t(size_t, level, tdp_level);
++
++		write_lock(&kvm->mmu_lock);
++
++		switch (op) {
++		case SNP_PAGE_STATE_SHARED:
++			rc = snp_make_page_shared(vcpu, gpa, pfn, level);
++			break;
++		case SNP_PAGE_STATE_PRIVATE:
++			rc = snp_make_page_private(vcpu, gpa, pfn, level);
++			break;
++		default:
++			rc = -EINVAL;
++			break;
++		}
++
++		write_unlock(&kvm->mmu_lock);
++
++		if (rc) {
++			pr_err_ratelimited("Error op %d gpa %llx pfn %llx level %d rc %d\n",
++					   op, gpa, pfn, level, rc);
++			goto out;
++		}
++
++		gpa = gpa + page_level_size(level);
++	}
++
++out:
++	return rc;
++}
++
+ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ {
+ 	struct vmcb_control_area *control = &svm->vmcb->control;
+@@ -2919,6 +3041,25 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ 				  GHCB_MSR_INFO_POS);
  		break;
  	}
-+	case GHCB_MSR_GPA_REG_REQ: {
-+		kvm_pfn_t pfn;
-+		u64 gfn;
++	case GHCB_MSR_PSC_REQ: {
++		gfn_t gfn;
++		int ret;
++		u8 op;
 +
-+		gfn = get_ghcb_msr_bits(svm, GHCB_MSR_GPA_REG_GFN_MASK,
-+					GHCB_MSR_GPA_REG_VALUE_POS);
++		gfn = get_ghcb_msr_bits(svm, GHCB_MSR_PSC_GFN_MASK, GHCB_MSR_PSC_GFN_POS);
++		op = get_ghcb_msr_bits(svm, GHCB_MSR_PSC_OP_MASK, GHCB_MSR_PSC_OP_POS);
 +
-+		pfn = kvm_vcpu_gfn_to_pfn(vcpu, gfn);
-+		if (is_error_noslot_pfn(pfn))
-+			gfn = GHCB_MSR_GPA_REG_ERROR;
-+		else
-+			svm->ghcb_registered_gpa = gfn_to_gpa(gfn);
++		ret = __snp_handle_page_state_change(vcpu, op, gfn_to_gpa(gfn), PG_LEVEL_4K);
 +
-+		set_ghcb_msr_bits(svm, gfn, GHCB_MSR_GPA_REG_GFN_MASK,
-+				  GHCB_MSR_GPA_REG_VALUE_POS);
-+		set_ghcb_msr_bits(svm, GHCB_MSR_GPA_REG_RESP, GHCB_MSR_INFO_MASK,
-+				  GHCB_MSR_INFO_POS);
++		/* If failed to change the state then spec requires to return all F's */
++		if (ret)
++			ret = -1;
++
++		set_ghcb_msr_bits(svm, ret, GHCB_MSR_PSC_ERROR_MASK, GHCB_MSR_PSC_ERROR_POS);
++		set_ghcb_msr_bits(svm, 0, GHCB_MSR_PSC_RSVD_MASK, GHCB_MSR_PSC_RSVD_POS);
++		set_ghcb_msr_bits(svm, GHCB_MSR_PSC_RESP, GHCB_MSR_INFO_MASK, GHCB_MSR_INFO_POS);
 +		break;
 +	}
  	case GHCB_MSR_TERM_REQ: {
  		u64 reason_set, reason_code;
  
-@@ -2948,6 +2967,12 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 		return -EINVAL;
- 	}
- 
-+	/* SEV-SNP guest requires that the GHCB GPA must be registered */
-+	if (sev_snp_guest(svm->vcpu.kvm) && !ghcb_gpa_is_registered(svm, ghcb_gpa)) {
-+		vcpu_unimpl(&svm->vcpu, "vmgexit: GHCB GPA [%#llx] is not registered.\n", ghcb_gpa);
-+		return -EINVAL;
-+	}
-+
- 	svm->ghcb = svm->ghcb_map.hva;
- 	ghcb = svm->ghcb_map.hva;
- 
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 32abcbd774d0..af4cce39b30f 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -185,6 +185,8 @@ struct vcpu_svm {
- 	bool ghcb_sa_free;
- 
- 	bool guest_state_loaded;
-+
-+	u64 ghcb_registered_gpa;
- };
- 
- struct svm_cpu_data {
-@@ -245,6 +247,11 @@ static inline bool sev_snp_guest(struct kvm *kvm)
- #endif
- }
- 
-+static inline bool ghcb_gpa_is_registered(struct vcpu_svm *svm, u64 val)
-+{
-+	return svm->ghcb_registered_gpa == val;
-+}
-+
- static inline void vmcb_mark_all_dirty(struct vmcb *vmcb)
- {
- 	vmcb->control.clean = 0;
 -- 
 2.17.1
 
