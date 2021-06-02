@@ -2,112 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 60CF83982AB
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 09:07:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 407AF398296
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 09:05:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231527AbhFBHIz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 03:08:55 -0400
-Received: from [110.188.70.11] ([110.188.70.11]:55775 "EHLO spam1.hygon.cn"
-        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229753AbhFBHIw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 03:08:52 -0400
-Received: from MK-FE.hygon.cn ([172.23.18.61])
-        by spam1.hygon.cn with ESMTP id 15273S92001983;
-        Wed, 2 Jun 2021 15:03:28 +0800 (GMT-8)
-        (envelope-from puwen@hygon.cn)
-Received: from cncheex01.Hygon.cn ([172.23.18.10])
-        by MK-FE.hygon.cn with ESMTP id 15273P1T031653;
-        Wed, 2 Jun 2021 15:03:25 +0800 (GMT-8)
-        (envelope-from puwen@hygon.cn)
-Received: from ubuntu1604-2.higon.com (172.23.18.44) by cncheex01.Hygon.cn
- (172.23.18.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.10; Wed, 2 Jun
- 2021 15:03:25 +0800
-From:   Pu Wen <puwen@hygon.cn>
-To:     <x86@kernel.org>
-CC:     <puwen@hygon.cn>, <thomas.lendacky@amd.com>, <bp@alien8.de>,
-        <jroedel@suse.de>, <seanjc@google.com>,
-        <dave.hansen@linux.intel.com>, <peterz@infradead.org>,
-        <mingo@redhat.com>, <hpa@zytor.com>, <sashal@kernel.org>,
-        <gregkh@linuxfoundation.org>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <stable@vger.kernel.org>
-Subject: [PATCH v2] x86/sev: Check whether SEV or SME is supported first
-Date:   Wed, 2 Jun 2021 15:02:07 +0800
-Message-ID: <20210602070207.2480-1-puwen@hygon.cn>
-X-Mailer: git-send-email 2.23.0
+        id S230264AbhFBHH3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 03:07:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48061 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231459AbhFBHHZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Jun 2021 03:07:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622617542;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=N7AFjn1kAaIwJ7yXpW9H7ltpl4fJk13y2xBWVC0JT2Y=;
+        b=XQqwCCK83td8iyoCHwRbkrQJfEEViyskBWWP/l5JN3SqssOiB3yMB6dPzjfcNOqMzOXr7p
+        1Yic3raL4w0t0qJ72DkimFZ4cHj0N3l/QYpNNi0jcikfqsOrFkW9RvfryA21GQu1F05/ES
+        rDTkd9i6rTk4v9S+SkUbq3CxcRukN0A=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-417-slffrRzrNVWEM6l1IwxmdQ-1; Wed, 02 Jun 2021 03:05:41 -0400
+X-MC-Unique: slffrRzrNVWEM6l1IwxmdQ-1
+Received: by mail-pj1-f72.google.com with SMTP id z3-20020a17090a4683b029015f6c19f126so1111110pjf.1
+        for <kvm@vger.kernel.org>; Wed, 02 Jun 2021 00:05:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=N7AFjn1kAaIwJ7yXpW9H7ltpl4fJk13y2xBWVC0JT2Y=;
+        b=WcodhSiNoEuGNki0EzVinXVM68YFKWSB5dGcdebXGUawnHb1VF/oyrmtNczy4RXOeM
+         13sQrjMG9Sy7/52yueiTfyahBtzdFg5R+doyt7kmtvjfPXqKergYY2ERZjMPNiRM0Y2A
+         A+9WmtTv4E0L4rbjj98CGlDmPfEpFaDIs7F1pB4JDSkK0o8gMBdMS+KeU1MSt7hXNTcc
+         H5LWUTAMSMT5qsBxvVnUENmJr4Q2cZk0AvPldRokUgMcZe9tSawGoAd6/hSGfIlZHRPa
+         P7z3x651aMKW2xsGZw9uf7zzoYjJquxst4S2VVYw6yiCopVgi1aE0fzu8UOqdF8aIVUw
+         X/zQ==
+X-Gm-Message-State: AOAM530HghbUcPOtSQkvsSyeLOUaTPapAnN/f2JzEWAUonOMB2ViJZ1p
+        pe1AbMinEl0rlDR49M4IW7RXtkRmXEUpGxQGtwndAGb821JmQS3WMG8RoMNR9ykKjhOkm2+NTPH
+        i77OYNsRxJUyz
+X-Received: by 2002:a63:d908:: with SMTP id r8mr17698730pgg.414.1622617540708;
+        Wed, 02 Jun 2021 00:05:40 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxi1fo5eUxqSSq1jhRLtWR5oM/z3BQO8r5DzrHXf+icFTZlIa8TZoB63MRifCqrns7bI6/5cA==
+X-Received: by 2002:a63:d908:: with SMTP id r8mr17698704pgg.414.1622617540453;
+        Wed, 02 Jun 2021 00:05:40 -0700 (PDT)
+Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id x19sm15554961pgj.66.2021.06.02.00.05.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Jun 2021 00:05:40 -0700 (PDT)
+Subject: Re: [PATCH V2 3/4] vp_vdpa: allow set vq state to initial state after
+ reset
+To:     Eli Cohen <elic@nvidia.com>
+Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, eli@mellanox.com
+References: <20210602021043.39201-1-jasowang@redhat.com>
+ <20210602021043.39201-4-jasowang@redhat.com>
+ <20210602061324.GA8662@mtl-vdi-166.wap.labs.mlnx>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <091dc6d0-8754-7b2a-64ec-985ef9db6329@redhat.com>
+Date:   Wed, 2 Jun 2021 15:05:35 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.10.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [172.23.18.44]
-X-ClientProxiedBy: cncheex02.Hygon.cn (172.23.18.12) To cncheex01.Hygon.cn
- (172.23.18.10)
-X-MAIL: spam1.hygon.cn 15273S92001983
-X-DNSRBL: 
+In-Reply-To: <20210602061324.GA8662@mtl-vdi-166.wap.labs.mlnx>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The first two bits of the CPUID leaf 0x8000001F EAX indicate whether
-SEV or SME is supported respectively. It's better to check whether
-SEV or SME is actually supported before checking the MSR_AMD64_SEV
-to see whether SEV or SME is enabled.
 
-This is both a bare-metal issue and a guest/VM issue. Since the first
-generation Hygon Dhyana CPU doesn't support MSR_AMD64_SEV, reading that
-MSR results in a #GP - either directly from hardware in the bare-metal
-case or via the hypervisor (because the RDMSR is actually intercepted)
-in the guest/VM case, resulting in a failed boot. And since this is very
-early in the boot phase, rdmsrl_safe()/native_read_msr_safe() can't be
-used.
+ÔÚ 2021/6/2 ÏÂÎç2:13, Eli Cohen Ð´µÀ:
+> On Wed, Jun 02, 2021 at 10:10:42AM +0800, Jason Wang wrote:
+>> We used to fail the set_vq_state() since it was not supported yet by
+>> the virtio spec. But if the bus tries to set the state which is equal
+>> to the device initial state after reset, we can let it go.
+>>
+>> This is a must for virtio_vdpa() to set vq state during probe which is
+>> required for some vDPA parents.
+>>
+>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>> ---
+>>   drivers/vdpa/virtio_pci/vp_vdpa.c | 42 ++++++++++++++++++++++++++++---
+>>   1 file changed, 39 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
+>> index c76ebb531212..18bf4a422772 100644
+>> --- a/drivers/vdpa/virtio_pci/vp_vdpa.c
+>> +++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
+>> @@ -210,13 +210,49 @@ static int vp_vdpa_get_vq_state(struct vdpa_device *vdpa, u16 qid,
+>>   	return -EOPNOTSUPP;
+>>   }
+>>   
+>> +static int vp_vdpa_set_vq_state_split(struct vdpa_device *vdpa,
+>> +				      const struct vdpa_vq_state *state)
+>> +{
+>> +	const struct vdpa_vq_state_split *split = &state->split;
+>> +
+>> +	if (split->avail_index == 0)
+>> +		return 0;
+>> +
+>> +	return -EOPNOTSUPP;
+>> +}
+>> +
+>> +static int vp_vdpa_set_vq_state_packed(struct vdpa_device *vdpa,
+>> +				       const struct vdpa_vq_state *state)
+>> +{
+>> +	const struct vdpa_vq_state_packed *packed = &state->packed;
+>> +
+>> +	if (packed->last_avail_counter == 1 &&
+> Can you elaborate on the requirement on last_avail_counter and
+> last_used_counter?
 
-So by checking the CPUID information before attempting the RDMSR, this
-goes back to the behavior before the patch identified in the commit
-eab696d8e8b9.
 
-Fixes: eab696d8e8b9 ("x86/sev: Do not require Hypervisor CPUID bit for SEV guests")
-Cc: <stable@vger.kernel.org> # v5.10+
-Signed-off-by: Pu Wen <puwen@hygon.cn>
-Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
----
-v1->v2:
-  - Provide more details with improved commit messages.
+This is required by the virtio spec:
 
- arch/x86/mm/mem_encrypt_identity.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+"
+2.7.1 Driver and Device Ring Wrap Counters
+Each of the driver and the device are expected to maintain, internally, 
+a single-bit ring wrap counter initialized to 1.
+"
 
-diff --git a/arch/x86/mm/mem_encrypt_identity.c b/arch/x86/mm/mem_encrypt_identity.c
-index a9639f663d25..470b20208430 100644
---- a/arch/x86/mm/mem_encrypt_identity.c
-+++ b/arch/x86/mm/mem_encrypt_identity.c
-@@ -504,10 +504,6 @@ void __init sme_enable(struct boot_params *bp)
- #define AMD_SME_BIT	BIT(0)
- #define AMD_SEV_BIT	BIT(1)
- 
--	/* Check the SEV MSR whether SEV or SME is enabled */
--	sev_status   = __rdmsr(MSR_AMD64_SEV);
--	feature_mask = (sev_status & MSR_AMD64_SEV_ENABLED) ? AMD_SEV_BIT : AMD_SME_BIT;
--
- 	/*
- 	 * Check for the SME/SEV feature:
- 	 *   CPUID Fn8000_001F[EAX]
-@@ -519,11 +515,16 @@ void __init sme_enable(struct boot_params *bp)
- 	eax = 0x8000001f;
- 	ecx = 0;
- 	native_cpuid(&eax, &ebx, &ecx, &edx);
--	if (!(eax & feature_mask))
-+	/* Check whether SEV or SME is supported */
-+	if (!(eax & (AMD_SEV_BIT | AMD_SME_BIT)))
- 		return;
- 
- 	me_mask = 1UL << (ebx & 0x3f);
- 
-+	/* Check the SEV MSR whether SEV or SME is enabled */
-+	sev_status   = __rdmsr(MSR_AMD64_SEV);
-+	feature_mask = (sev_status & MSR_AMD64_SEV_ENABLED) ? AMD_SEV_BIT : AMD_SME_BIT;
-+
- 	/* Check if memory encryption is enabled */
- 	if (feature_mask == AMD_SME_BIT) {
- 		/*
--- 
-2.23.0
+For virtio-pci device, since there's no way to assign the value of those 
+counters, the counters will be reset to 1 after reset, otherwise the 
+driver can't work.
+
+Thanks
+
+
+>
+>> +	    packed->last_avail_idx == 0 &&
+>> +	    packed->last_used_counter == 1 &&
+>> +	    packed->last_used_idx == 0)
+>> +		return 0;
+>> +
+>> +	return -EOPNOTSUPP;
+>> +}
+>> +
+>>   static int vp_vdpa_set_vq_state(struct vdpa_device *vdpa, u16 qid,
+>>   				const struct vdpa_vq_state *state)
+>>   {
+>> -	/* Note that this is not supported by virtio specification, so
+>> -	 * we return -ENOPOTSUPP here. This means we can't support live
+>> -	 * migration, vhost device start/stop.
+>> +	struct virtio_pci_modern_device *mdev = vdpa_to_mdev(vdpa);
+>> +
+>> +	/* Note that this is not supported by virtio specification.
+>> +	 * But if the state is by chance equal to the device initial
+>> +	 * state, we can let it go.
+>>   	 */
+>> +	if ((vp_modern_get_status(mdev) & VIRTIO_CONFIG_S_FEATURES_OK) &&
+>> +	    !vp_modern_get_queue_enable(mdev, qid)) {
+>> +		if (vp_modern_get_driver_features(mdev) &
+>> +		    BIT_ULL(VIRTIO_F_RING_PACKED))
+>> +			return vp_vdpa_set_vq_state_packed(vdpa, state);
+>> +		else
+>> +			return vp_vdpa_set_vq_state_split(vdpa,	state);
+>> +	}
+>> +
+>>   	return -EOPNOTSUPP;
+>>   }
+>>   
+>> -- 
+>> 2.25.1
+>>
 
