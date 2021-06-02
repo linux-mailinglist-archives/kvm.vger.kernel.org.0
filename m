@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89A9A398C02
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:12:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3B1C398C08
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:12:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231382AbhFBONv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 10:13:51 -0400
-Received: from mail-bn8nam11on2066.outbound.protection.outlook.com ([40.107.236.66]:15585
+        id S231524AbhFBOOG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 10:14:06 -0400
+Received: from mail-bn8nam11on2062.outbound.protection.outlook.com ([40.107.236.62]:57888
         "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230029AbhFBON0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 10:13:26 -0400
+        id S230234AbhFBONh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 10:13:37 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZjUs7zkZyX+mUjz95dZd6sRgSx1Ea6kv1v8iRGEvX9WuB2IwYM0oHGwQ/rP1DLeECNUa/yjWEb64tBYQxngIWPsBiNsktMldAmOT8hwdfmAOfbUW2YgcndfBNzdDhye9Kk/BMC36j+MpEq/bPVYUALg2i+n18PkZ1jvKwhwX2I+ITsIuP9V9BbwzPl+n/v5GFTTDqNEimv9uQnRhrvUxuJEsofbbPyHRAZjMu7vOjVbgIkPV99mYs/rxacEFiPLPVCDsfmrXD0RIO3nJHs7XdttfTkObqQcJLFFPQhRJNHl0C1FVPX76phNx5vJlxHZc559s4lvmbE1iJBmD3Lpwkg==
+ b=AlSZLEjeg7eDOwUbgqJ0Bp0tPyZwXNsw1F4vK/gCQycbxyhEb78T4NoZD8SINKYqPCWc+0mi5fjtn8qVXc8SvhtoTRumqcZJ8bKAYIdbU4lVA/nObCE2AFPbV36lYn7VzTp275MT6l2mNzC61PodNtSxOl722RkkFYr5flv7/PZE16trTJ18rwB/siDB5JaU/LLdUukqOU3GWRqHsLzxOTMfs79+Sh4R2waJBxYrraINXd3AEWXz96TtFxovFBzi9fLaOI5zNxXYMA/kAatrYZJoAPTNCPqu36Prz52GaH2n4GCDZjV96JBys8lY5REaocf/lEJSLFrTMcpIG8/BWQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1UphxcpY5uChYPHuOjoorgCa1mz8ved+dqYE3LBHz70=;
- b=fvtcJjR3tD316KOLsgkuOxYiWBoumYB3DRA7NtHfG5gvGmyfnVbMZJg+uR3xwcSdylWAEkUX7Dihz2s1gsEfci5o5sIDxlRCr/ML03iMzzZ974y0IEbTqp5/x8Twi4kUGE4/GAnCCToXoASKgUucy221NHwCJp1VvuxXP8NE0AIcvsqRoBZd0l153ofL79hOCg7yonlqJ/KF/72xro68pdqIz4EZz9Mf55cXEwE8wGAuRPUo2F7FRNV0bBAkYuHbbBkyww0tfTggpNdoEodkDJS0sAFpstV1V0TuQDE6EbnXo1Hqg4Uuda/OTsnMs0DHwFHq/IV6sJlL5cdkLfaD3w==
+ bh=o5FeCbgJvCPDvNZucTG6C/Be5DjljDLwjfU1yTbGz3c=;
+ b=TY2unl9Bn0+gYOR5KBXrA78lSQxlA2K6KUgv7Vgg1iJbWO1Jmqu9ViVlGAdKzjpKPZRXQ/JjjsEWxHufCybRiNbTTIQCkcaILtkH5LEopt7M1471IYR1MaXnIXJUCV+kzJy1OnAGXn6kr63rdtrz/dYQbDHYFoBXMqxlFgpUDdN5hKN1koTohjREzqLq2t/pFXPWnAma5qAbiyA2+ywK+EYQ6EALkXqUtcFFyy+s8Ak3WWRoThIuAarMPc5wVxpjHl0sCmaWVEI0VIl5ByeS3jrDgK3xlSJPuq7QAM23RUwRsFMRYhY5UG3KV1Tmf35UalV28rUpNj/Sbo2aytjiZA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1UphxcpY5uChYPHuOjoorgCa1mz8ved+dqYE3LBHz70=;
- b=3YaLkSTOm2nHMb+lmDc2TvCsa7Cuja5HBxLF9X4XhJTEK25hXBhT1UIhu3e4hDm1KTBl0TDKZ2jGPXoTo+vUdlSmh4nvWqmC2RQi/t0+6wScVsTQv1fviOy8eXSmLIlMqm2K5/iyl/oT13RKfsFhJ/wzfINXuaNQ1cMa5XxzG3Y=
+ bh=o5FeCbgJvCPDvNZucTG6C/Be5DjljDLwjfU1yTbGz3c=;
+ b=L1orI7FmTdpKRbgmDwBg96RjF/tICP0FErx2qc91HbJb1LTCoesCE7jNnnFzQ+eiXI6L21uggrZMstojC07lQoxBqC8iTQBlpdJcsiYI2MmP3twIyQgulXd+IVAqGAfPX1D/BrOrfWDAgUllNo4oI+3hC5YUY31IvokhH4btaoM=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
  by SN1PR12MB2368.namprd12.prod.outlook.com (2603:10b6:802:32::23) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20; Wed, 2 Jun
- 2021 14:11:34 +0000
+ 2021 14:11:35 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4173.030; Wed, 2 Jun 2021
- 14:11:34 +0000
+ 14:11:35 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
@@ -58,9 +58,9 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         David Rientjes <rientjes@google.com>, tony.luck@intel.com,
         npmccallum@redhat.com, Borislav Petkov <bp@suse.de>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH Part2 RFC v3 04/37] x86/sev: Add the host SEV-SNP initialization support
-Date:   Wed,  2 Jun 2021 09:10:24 -0500
-Message-Id: <20210602141057.27107-5-brijesh.singh@amd.com>
+Subject: [PATCH Part2 RFC v3 05/37] x86/sev: Add RMP entry lookup helpers
+Date:   Wed,  2 Jun 2021 09:10:25 -0500
+Message-Id: <20210602141057.27107-6-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210602141057.27107-1-brijesh.singh@amd.com>
 References: <20210602141057.27107-1-brijesh.singh@amd.com>
@@ -71,274 +71,189 @@ X-ClientProxiedBy: SA0PR11CA0056.namprd11.prod.outlook.com
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0056.namprd11.prod.outlook.com (2603:10b6:806:d0::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20 via Frontend Transport; Wed, 2 Jun 2021 14:11:32 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0056.namprd11.prod.outlook.com (2603:10b6:806:d0::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20 via Frontend Transport; Wed, 2 Jun 2021 14:11:33 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 025ba9c4-ed41-4ca3-e2fc-08d925d05371
+X-MS-Office365-Filtering-Correlation-Id: 3d93bc58-4741-45b7-ecaf-08d925d0541b
 X-MS-TrafficTypeDiagnostic: SN1PR12MB2368:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB23689FA05E1305B0B7623D0DE53D9@SN1PR12MB2368.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Microsoft-Antispam-PRVS: <SN1PR12MB23681E81E6B88E35286E006FE53D9@SN1PR12MB2368.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jYrpWFsqujSvcHKdrDhKkOwUbeKCOkNCvA2kc4LQUoV9m4uCBO4j0LP1m4YDO3dkXIsMk+SUxcfNnXfVncoqUFffnptxs91c4IDfwWvfZja03HEWZnB6PFXeXGhdhXqx9/Eo72SzHr4ZD9wkwLR94coS12dk41AYW3jY8/3UBL/ZXEPtOKxl/GFYQfYl7+9EJpF5+g6VR2+PRKaRPJfpFqiehK2UNRpjpOZEgvMeCBMZttE85C5tJrQtPgGkSH2Af8tLinI1Qpg98xduW04Upbh/92gu4mafAJT43vfeGXrXMzxuq+k2TKoLSa2T6gQeCG8MgMUCWyFGzVwyYqqTamB4bjTUV5g6KQogrCHdgPcfKRAp2lCK4nxZgZdKdoMSDBxetK9IqK2FWb0c+3rFxFk1ePTj/z93tfqt8fnqi9tH39OKg50IbsBnGvO+89brVNCO6HxDVfYiaukn5g9+FUkMK8PulKFQpZks5/YjWpxg3tnBDgh+4VV7Bw5KU4f0+xT3MfrtQX61qn63B6NvkDA2L4rMsZ63ek6aU8EmYOSX3Li/vdKdgpaNCdSXE4ruo1cRRW0bQ1h+417m0tJcNH4qn+1k1++uZkI47BjpQOHwnz/ljIskHSaPwhRnltuFXHZYJN5mOzsSa7Key1/h8A==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(396003)(376002)(366004)(346002)(39860400002)(5660300002)(86362001)(6486002)(52116002)(7696005)(44832011)(38350700002)(38100700002)(956004)(2616005)(1076003)(8676002)(7416002)(8936002)(478600001)(186003)(316002)(4326008)(16526019)(26005)(66556008)(66476007)(2906002)(36756003)(54906003)(83380400001)(6666004)(66946007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?tedJwENNpupSH40iWmDpWNExfA+E7/8RAygnFGj953xk/XEIBGoGTRuHFm7q?=
- =?us-ascii?Q?wQ5WUWLaI8wUSufC8zaeIMkW64FgKEqz+nhFbTsSAZLTz85tDQEK+HKDu8s7?=
- =?us-ascii?Q?nX0IIGNPEHXZh+kSVU7tNlcXY6Zyqh5pC7jeGgmN/YZKbkIJFhqRYSWCkPaY?=
- =?us-ascii?Q?GhbUd+CXreKdtQnnMMyUPU2827vUlvlpcVaojwrtE4c+RYgZinGWSJ5cf2J4?=
- =?us-ascii?Q?O1DfpO9mi84UAQT1pVzNY9dYoxVpet/bwk1GIYyT7qxrggzbeBk8xFDUs+gl?=
- =?us-ascii?Q?WVGzBdEK5uuRHtSxbrYMIKQ91GAj9OJklNhZG9Qb/Z8eoox72QAtP4pmoZ0m?=
- =?us-ascii?Q?5e3rGzYIFXEm8g6N6vXeIUFLWLBg1AiyQGbqPRxzRQFGWJsfqdZ/X+EhuucN?=
- =?us-ascii?Q?LxwdDz9FyCoB+7K2XDEZxUdPrQ0i107C/7ywXbE3P37ycb19ukY8JlXQmA7b?=
- =?us-ascii?Q?q6WKx4LG/OtyutIgGDyWwZXevueJk/H2iry3PwjPLXIpCXnKILEomyFEo4oy?=
- =?us-ascii?Q?oGZpA/IesqdxYOat57Uct+AzyAWUKLGWcgpce+Tke62IMo/2lkjHW6ENsAGf?=
- =?us-ascii?Q?YcoqXpedstHmZqeg1BM7rkpBzuarVnpOk5DHN3H8NMunpmfaV5CFBrF516BB?=
- =?us-ascii?Q?YiJtO7zk5DMM405xl44Ck1c97ybkgfAvh4g/xXiRq+yi4aHeb8z+0wBaaTJr?=
- =?us-ascii?Q?CL5czMX37EogjZmQISdj1d3kGgWeeJCpDaWQjPTZvDRwH0N38yY3Scg1XHuH?=
- =?us-ascii?Q?eVJ+qt4xf6mrdzK+MXPyiMqH6zoZIwMvQZ/yqwp4ywiwwkiTksF+gnFeiIRF?=
- =?us-ascii?Q?++FG0Q9+SMrCjFjy12ilsScJC4nqcz7/wKSwUOg4ejmxzXgfIS4idwZu5yZd?=
- =?us-ascii?Q?LSlWqy41rK1ouwo/gRW1RH/gzS98/FV1Bj5fNEmItkJEwip+0UQc08g4yaR8?=
- =?us-ascii?Q?nx/6YYr/d7VIzaVMB8cL5QR6X53pHHmXR/CFdfthvKytxmMp46UpNrHl/s3k?=
- =?us-ascii?Q?EgDeaiG2FsbwA4p6KbzWaQ4kj7SkfMG4rKaBHBLnnghHaTmkeyAeP8j9wQcZ?=
- =?us-ascii?Q?WgYfrxjUo41UjEmNNiCQbxVvsiSdP51qaejRmEQeBQYASIpXS36U24HMwelS?=
- =?us-ascii?Q?/FNx+NijzOhAiSlkQgnXsVZcHEMVrBW+IqHP2l6A7nHbov7aOh9EAXyzixsh?=
- =?us-ascii?Q?gwun3mjgqHMkKFIqYBHk1XhKy4X5WWfdfdK3Ofv3SWtIiIPJJYfDv7qabGHI?=
- =?us-ascii?Q?Z/54YHNaHoTEgdp3nrqx8R2Dd7uXJAUIvuhzTO9KaKULZP8xUzQYzxetbBSo?=
- =?us-ascii?Q?mI2kjJss6YJwrHk60OUgMCK0?=
+X-Microsoft-Antispam-Message-Info: cwEXj2G1id13+xvZBTNiYGMkxdPHBwII5WrimSoKIo539E+Z/paSSL1aQdKq6NIX/7ivLU3R4o1CjXBDitypLB4CX4pigEbHy/H0qJ5wSJU24AOasbr6HfMz/rvhE3dKo9GHBtd2pLc/dtOhTJ+JcVeBfbQUSRDIDpOC+nBuLFcFm77luuD1+2JDyFvgaTr4VO14/J3JvCU8hiDXo5dUj0MVIuNdO4WIcvm9A9tFjSiIyBPdBgG5dV2Wd/GbMC42rgio+uzltI0wpVlPvfeevRVvyWF8X1dShnmBna8ulr/eQiZrDNtslcAZVOFwftCd1LQy/Td5GxbErZB6qC/Bj4edncC1e3FsTViCx6tRIp4V3pehi6BwvucqMYwSmHt71+fDJFGFN/2qxf8l1kb7iulT82BYz7M1NPbh34ZyZiyBRUAl71yd7TbjOyrZ2cIJn5dgQ0lDmDNeMIdTaRpQjTi5ultzF3rtU8H+lS6iQMEoB8gp/QzaswqedbBR8HQx+v01dLvp3arSgrQY6nAR6NTdnr+zM433B6k2m9U6B5/0dk6D17Tmm+G9CyndeAULHm+p2GUkxqRH1YnqEgilS9DT11AGIjSuIkYs6ctMs5sJUNo7495ZPL05nH+RntEXAGys8lIfmyrAFTeSny/TCtXVw+wnez0BFTRQnDaq08o5sk9l7xwG4MlYUXER1/H7FssGrrIdNu3/odFj7fs3k9oa+HFGXt7EYN72rmyfoHG7/KJJ95zKNuAPh3c+ih1kJ+PPPMWCJm0+bp1NHfb+qg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(396003)(376002)(366004)(346002)(39860400002)(5660300002)(86362001)(6486002)(52116002)(7696005)(44832011)(38350700002)(966005)(38100700002)(956004)(2616005)(1076003)(8676002)(7416002)(8936002)(478600001)(186003)(316002)(4326008)(16526019)(26005)(66556008)(66476007)(2906002)(36756003)(54906003)(83380400001)(6666004)(66946007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?zBSld+TuNf6/haO0tZT1K/xqBnmj+ca7s7QDmKbOtkHl+g3UHbO1aCIl4QqP?=
+ =?us-ascii?Q?QJ5RzrhVuY+WP96cUmKtigpmtajn+OQt3Nn9e0W2rDEbGJGkj3m1RrcNVrPa?=
+ =?us-ascii?Q?ovzVI8rne+Ocoy4TwEasUrF9uQ2gSOyENAknHRrdWdXzLj+hOYuKNlXUjUJh?=
+ =?us-ascii?Q?k5uxwSAlrkg7Kiofe+GoRWnevQE4bY5PbXcsJNmLDnBvuOkTrp/XuFc0uh8m?=
+ =?us-ascii?Q?CvMPaWEkh4aCFbG2vQYL07QxNLQTz7DMRNfL+cIjiFUHWS0BtkAXeQSf+Uau?=
+ =?us-ascii?Q?o3o0Hc5hfK1J8MW7V05hAXgZCyeHvj7qZcuxcw41+8Q111bIGrauS6wbvAKm?=
+ =?us-ascii?Q?bj2O5YbUp8CJ50nbN0uUdl4nEfLzNDjqKSBlnDW8kaVp2kWGTt2qBpttiuB0?=
+ =?us-ascii?Q?t5YR3SK5jSgzsKeIfYT4XnB2iaGxFe+L9E6V2YfOMG0b2QlVhiMou1BD7xmp?=
+ =?us-ascii?Q?Nd2/wrmr3Gfhkqrh9DrYnjf2UYFNSUtrvX1cX1Gf8FidjnNkMzoZL0U28EeP?=
+ =?us-ascii?Q?6ELL7DZWc24Jxe8M9/apRe+qFsJtF7/kZD3p8oAyqLKbCJE0mquqRjG5Q268?=
+ =?us-ascii?Q?nhSUfz7qvDHU2mb8bgRRAxTSs4j4GD0+3KjbS3T5Tnjbruu6tCQPQ1DwN92I?=
+ =?us-ascii?Q?tkFnCmuHhzzxEYhbLqyxLKqFDLAkjihN2TRbgahDI3WDAzdrMgGd5MxqaA/G?=
+ =?us-ascii?Q?Ky/erszbI5HkWgv/Sjb1QMx/hiVpOJOZcOFpgRUAZ9fGkV9aU7ofe7Ty/8qM?=
+ =?us-ascii?Q?9MrHhgatrSIpBBgkpfTqeSgwmmqsZAKS/Dy2dJa/kBfDMGWGH6M5Dm1FaJxp?=
+ =?us-ascii?Q?fF/GcjMTk2ErSMUW8vsAwt+X8AHxxAN8JWqvgrU/eelRiJT2vIbv/gub2fzn?=
+ =?us-ascii?Q?WA/c+uf94UC5MDXtFiT/eNR5y5siS2ZOFT6rCbkvd/nZGXVt8HsNDhrcjJWh?=
+ =?us-ascii?Q?JOzrhRzE6m9WDVahYSFo08VZUaR0hKf4Pnm76PGyFDcdIjZabKp/7UeYiyL1?=
+ =?us-ascii?Q?CS2cROnebfspErFDAd48xTKB6g7y4l2X4b437bpM8P/PLrayO0GBg+qg5jni?=
+ =?us-ascii?Q?oL8q+xTJks56Nn3JrtIr4WxsrXJggGUv6obWzMUYSXtNyoM1pAV3dYiTD+UI?=
+ =?us-ascii?Q?fRzWiLL9xu8PYyzc2N77sKHKDjAjj6JW7AQLCnDm6Yon6dQ43xBkycc038Ku?=
+ =?us-ascii?Q?VjK5Hwd2PSeQcOSjvwpQeJwpNT+n/LgWW6/HuG8GUtiGK6KFmsBwa2pMet+i?=
+ =?us-ascii?Q?D6J2wHbYkRu9NBnZJ7pqqZvUPR5Mxl7e+lQ+jag8LYatkfULBEMUWKdq/iBa?=
+ =?us-ascii?Q?l67UoZ65WJfGSJNaXWTifK1q?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 025ba9c4-ed41-4ca3-e2fc-08d925d05371
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3d93bc58-4741-45b7-ecaf-08d925d0541b
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2021 14:11:33.5242
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2021 14:11:34.6126
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: s8LadkHFVD+9sZs4VRGO9LXFTQ5LjhfHaSecUDL8jH4hsTg6yoGYcVCVD+3twKh8oihWJYV00Z1CQrK8E6z1NQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9i+wQwB0Dmb4NtK6Foir73OXN7Ze5RP3r4mfUgC0lUK86sCg7kDLx2CX7qtOW16FQSlIfS2x9hg9nHT+EKc1wQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2368
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The memory integrity guarantees of SEV-SNP are enforced through a new
-structure called the Reverse Map Table (RMP). The RMP is a single data
-structure shared across the system that contains one entry for every 4K
-page of DRAM that may be used by SEV-SNP VMs. The goal of RMP is to
-track the owner of each page of memory. Pages of memory can be owned by
-the hypervisor, owned by a specific VM or owned by the AMD-SP. See APM2
-section 15.36.3 for more detail on RMP.
-
-The RMP table is used to enforce access control to memory. The table itself
-is not directly writable by the software. New CPU instructions (RMPUPDATE,
-PVALIDATE, RMPADJUST) are used to manipulate the RMP entries.
-
-Based on the platform configuration, the BIOS reserves the memory used
-for the RMP table. The start and end address of the RMP table must be
-queried by reading the RMP_BASE and RMP_END MSRs. If the RMP_BASE and
-RMP_END are not set then disable the SEV-SNP feature.
-
-The SEV-SNP feature is enabled only after the RMP table is successfully
-initialized.
+The snp_lookup_page_in_rmptable() can be used by the host to read the RMP
+entry for a given page. The RMP entry format is documented in AMD PPR, see
+https://bugzilla.kernel.org/attachment.cgi?id=296015.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/include/asm/disabled-features.h |   8 +-
- arch/x86/include/asm/msr-index.h         |   6 ++
- arch/x86/kernel/sev.c                    | 113 +++++++++++++++++++++++
- 3 files changed, 126 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/sev.h |  4 +--
+ arch/x86/kernel/sev.c      | 28 +++++++++++++++++++++
+ include/linux/sev.h        | 51 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 80 insertions(+), 3 deletions(-)
+ create mode 100644 include/linux/sev.h
 
-diff --git a/arch/x86/include/asm/disabled-features.h b/arch/x86/include/asm/disabled-features.h
-index b7dd944dc867..0d5c8d08185c 100644
---- a/arch/x86/include/asm/disabled-features.h
-+++ b/arch/x86/include/asm/disabled-features.h
-@@ -68,6 +68,12 @@
- # define DISABLE_SGX	(1 << (X86_FEATURE_SGX & 31))
- #endif
+diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+index da2f757cd9bc..2764a438dbeb 100644
+--- a/arch/x86/include/asm/sev.h
++++ b/arch/x86/include/asm/sev.h
+@@ -9,6 +9,7 @@
+ #define __ASM_ENCRYPTED_STATE_H
  
-+#ifdef CONFIG_AMD_MEM_ENCRYPT
-+# define DISABLE_SEV_SNP	0
-+#else
-+# define DISABLE_SEV_SNP	(1 << (X86_FEATURE_SEV_SNP & 31))
-+#endif
-+
- /*
-  * Make sure to add features to the correct mask
-  */
-@@ -91,7 +97,7 @@
- 			 DISABLE_ENQCMD)
- #define DISABLED_MASK17	0
- #define DISABLED_MASK18	0
--#define DISABLED_MASK19	0
-+#define DISABLED_MASK19	(DISABLE_SEV_SNP)
- #define DISABLED_MASK_CHECK BUILD_BUG_ON_ZERO(NCAPINTS != 20)
+ #include <linux/types.h>
++#include <linux/sev.h>
+ #include <asm/insn.h>
+ #include <asm/sev-common.h>
  
- #endif /* _ASM_X86_DISABLED_FEATURES_H */
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index 69ce50fa3565..e8d45929010a 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -485,6 +485,8 @@
- #define MSR_AMD64_SEV_ENABLED		BIT_ULL(MSR_AMD64_SEV_ENABLED_BIT)
- #define MSR_AMD64_SEV_ES_ENABLED	BIT_ULL(MSR_AMD64_SEV_ES_ENABLED_BIT)
- #define MSR_AMD64_SEV_SNP_ENABLED	BIT_ULL(MSR_AMD64_SEV_SNP_ENABLED_BIT)
-+#define MSR_AMD64_RMP_BASE		0xc0010132
-+#define MSR_AMD64_RMP_END		0xc0010133
+@@ -74,9 +75,6 @@ struct cc_blob_sev_info {
+ /* Software defined (when rFlags.CF = 1) */
+ #define PVALIDATE_FAIL_NOUPDATE		255
  
- #define MSR_AMD64_VIRT_SPEC_CTRL	0xc001011f
- 
-@@ -542,6 +544,10 @@
- #define MSR_AMD64_SYSCFG		0xc0010010
- #define MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT	23
- #define MSR_AMD64_SYSCFG_MEM_ENCRYPT	BIT_ULL(MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT)
-+#define MSR_AMD64_SYSCFG_SNP_EN_BIT		24
-+#define MSR_AMD64_SYSCFG_SNP_EN		BIT_ULL(MSR_AMD64_SYSCFG_SNP_EN_BIT)
-+#define MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT	25
-+#define MSR_AMD64_SYSCFG_SNP_VMPL_EN	BIT_ULL(MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT)
- #define MSR_K8_INT_PENDING_MSG		0xc0010055
- /* C1E active bits in int pending message */
- #define K8_INTP_C1E_ACTIVE_MASK		0x18000000
+-/* RMP page size */
+-#define RMP_PG_SIZE_4K			0
+-
+ /* Memory opertion for snp_prep_memory() */
+ enum snp_mem_op {
+ 	MEMORY_PRIVATE,
 diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-index 8aae1166f52e..172497d6cbb9 100644
+index 172497d6cbb9..51676ab1a321 100644
 --- a/arch/x86/kernel/sev.c
 +++ b/arch/x86/kernel/sev.c
-@@ -24,6 +24,8 @@
- #include <linux/mm.h>
- #include <linux/cpumask.h>
- #include <linux/io.h>
-+#include <linux/io.h>
-+#include <linux/iommu.h>
+@@ -46,6 +46,10 @@
  
- #include <asm/cpu_entry_area.h>
- #include <asm/stacktrace.h>
-@@ -38,6 +40,7 @@
- #include <asm/cpu.h>
- #include <asm/apic.h>
- #include <asm/setup.h>		/* For struct boot_params */
-+#include <asm/iommu.h>
+ #define DR7_RESET_VALUE        0x400
  
- #include "sev-internal.h"
- 
-@@ -54,6 +57,9 @@ static struct ghcb __initdata *boot_ghcb;
- 
- static unsigned long snp_secrets_phys;
- 
-+static unsigned long rmptable_start __ro_after_init;
-+static unsigned long rmptable_end __ro_after_init;
++#define RMPTABLE_ENTRIES_OFFSET	0x4000
++#define RMPENTRY_SHIFT		8
++#define rmptable_page_offset(x)	(RMPTABLE_ENTRIES_OFFSET + (((unsigned long)x) >> RMPENTRY_SHIFT))
 +
- /* #VC handler runtime per-CPU data */
- struct sev_es_runtime_data {
- 	struct ghcb ghcb_page;
-@@ -2085,3 +2091,110 @@ unsigned long snp_issue_guest_request(int type, struct snp_guest_request_data *i
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(snp_issue_guest_request);
+ /* For early boot hypervisor communication in SEV-ES enabled guests */
+ static struct ghcb boot_ghcb_page __bss_decrypted __aligned(PAGE_SIZE);
+ 
+@@ -2198,3 +2202,27 @@ static int __init snp_rmptable_init(void)
+  * passthough state, and it is available after subsys_initcall().
+  */
+ fs_initcall(snp_rmptable_init);
 +
-+#undef pr_fmt
-+#define pr_fmt(fmt)	"SEV-SNP: " fmt
-+
-+static int __snp_enable(unsigned int cpu)
++struct rmpentry *snp_lookup_page_in_rmptable(struct page *page, int *level)
 +{
-+	u64 val;
++	unsigned long phys = page_to_pfn(page) << PAGE_SHIFT;
++	struct rmpentry *entry, *large_entry;
++	unsigned long vaddr;
 +
 +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+		return 0;
++		return NULL;
 +
-+	rdmsrl(MSR_AMD64_SYSCFG, val);
++	vaddr = rmptable_start + rmptable_page_offset(phys);
++	if (unlikely(vaddr > rmptable_end))
++		return NULL;
 +
-+	val |= MSR_AMD64_SYSCFG_SNP_EN;
-+	val |= MSR_AMD64_SYSCFG_SNP_VMPL_EN;
++	entry = (struct rmpentry *)vaddr;
 +
-+	wrmsrl(MSR_AMD64_SYSCFG, val);
++	/* Read a large RMP entry to get the correct page level used in RMP entry. */
++	vaddr = rmptable_start + rmptable_page_offset(phys & PMD_MASK);
++	large_entry = (struct rmpentry *)vaddr;
++	*level = RMP_TO_X86_PG_LEVEL(rmpentry_pagesize(large_entry));
 +
-+	return 0;
++	return entry;
 +}
-+
-+static __init void snp_enable(void *arg)
-+{
-+	__snp_enable(smp_processor_id());
-+}
-+
-+static __init int __snp_rmptable_init(void)
-+{
-+	u64 rmp_base, rmp_end;
-+	unsigned long sz;
-+	void *start;
-+	u64 val;
-+
-+	rdmsrl(MSR_AMD64_RMP_BASE, rmp_base);
-+	rdmsrl(MSR_AMD64_RMP_END, rmp_end);
-+
-+	if (!rmp_base || !rmp_end) {
-+		pr_info("Memory for the RMP table has not been reserved by BIOS\n");
-+		return 1;
-+	}
-+
-+	sz = rmp_end - rmp_base + 1;
-+
-+	start = memremap(rmp_base, sz, MEMREMAP_WB);
-+	if (!start) {
-+		pr_err("Failed to map RMP table 0x%llx-0x%llx\n", rmp_base, rmp_end);
-+		return 1;
-+	}
-+
-+	/*
-+	 * Check if SEV-SNP is already enabled, this can happen if we are coming from
-+	 * kexec boot.
-+	 */
-+	rdmsrl(MSR_AMD64_SYSCFG, val);
-+	if (val & MSR_AMD64_SYSCFG_SNP_EN)
-+		goto skip_enable;
-+
-+	/* Initialize the RMP table to zero */
-+	memset(start, 0, sz);
-+
-+	/* Flush the caches to ensure that data is written before SNP is enabled. */
-+	wbinvd_on_all_cpus();
-+
-+	/* Enable SNP on all CPUs. */
-+	on_each_cpu(snp_enable, NULL, 1);
-+
-+skip_enable:
-+	rmptable_start = (unsigned long)start;
-+	rmptable_end = rmptable_start + sz;
-+
-+	pr_info("RMP table physical address 0x%016llx - 0x%016llx\n", rmp_base, rmp_end);
-+
-+	return 0;
-+}
-+
-+static int __init snp_rmptable_init(void)
-+{
-+	if (!boot_cpu_has(X86_FEATURE_SEV_SNP))
-+		return 0;
-+
-+	/*
-+	 * The SEV-SNP support requires that IOMMU must be enabled, and is not
-+	 * configured in the passthrough mode.
-+	 */
-+	if (no_iommu || iommu_default_passthrough()) {
-+		setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
-+		pr_err("IOMMU is either disabled or configured in passthrough mode.\n");
-+		return 0;
-+	}
-+
-+	if (__snp_rmptable_init()) {
-+		setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
-+		return 1;
-+	}
-+
-+	cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "x86/rmptable_init:online", __snp_enable, NULL);
-+
-+	return 0;
-+}
-+
++EXPORT_SYMBOL_GPL(snp_lookup_page_in_rmptable);
+diff --git a/include/linux/sev.h b/include/linux/sev.h
+new file mode 100644
+index 000000000000..83c89e999999
+--- /dev/null
++++ b/include/linux/sev.h
+@@ -0,0 +1,51 @@
++/* SPDX-License-Identifier: GPL-2.0 */
 +/*
-+ * This must be called after the PCI subsystem. This is because before enabling
-+ * the SNP feature we need to ensure that IOMMU is not configured in the
-+ * passthrough mode. The iommu_default_passthrough() is used for checking the
-+ * passthough state, and it is available after subsys_initcall().
++ * AMD Secure Encrypted Virtualization
++ *
++ * Author: Brijesh Singh <brijesh.singh@amd.com>
 + */
-+fs_initcall(snp_rmptable_init);
++
++#ifndef __LINUX_SEV_H
++#define __LINUX_SEV_H
++
++struct __packed rmpentry {
++	union {
++		struct {
++			u64	assigned	: 1,
++				pagesize	: 1,
++				immutable	: 1,
++				rsvd1		: 9,
++				gpa		: 39,
++				asid		: 10,
++				vmsa		: 1,
++				validated	: 1,
++				rsvd2		: 1;
++		} info;
++		u64 low;
++	};
++	u64 high;
++};
++
++#define rmpentry_assigned(x)	((x)->info.assigned)
++#define rmpentry_pagesize(x)	((x)->info.pagesize)
++#define rmpentry_vmsa(x)	((x)->info.vmsa)
++#define rmpentry_asid(x)	((x)->info.asid)
++#define rmpentry_validated(x)	((x)->info.validated)
++#define rmpentry_gpa(x)		((unsigned long)(x)->info.gpa)
++#define rmpentry_immutable(x)	((x)->info.immutable)
++
++/* RMP page size */
++#define RMP_PG_SIZE_4K			0
++
++#define RMP_TO_X86_PG_LEVEL(level)	(((level) == RMP_PG_SIZE_4K) ? PG_LEVEL_4K : PG_LEVEL_2M)
++
++#ifdef CONFIG_AMD_MEM_ENCRYPT
++struct rmpentry *snp_lookup_page_in_rmptable(struct page *page, int *level);
++#else
++static inline struct rmpentry *snp_lookup_page_in_rmptable(struct page *page, int *level)
++{
++	return NULL;
++}
++
++#endif /* CONFIG_AMD_MEM_ENCRYPT */
++#endif /* __LINUX_SEV_H */
 -- 
 2.17.1
 
