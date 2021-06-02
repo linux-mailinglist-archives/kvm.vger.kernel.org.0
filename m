@@ -2,293 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C418398E3C
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 17:18:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F513398DC5
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 17:02:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232216AbhFBPUL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 11:20:11 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:58470 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231848AbhFBPUK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 11:20:10 -0400
-Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id D936322BCC;
-        Wed,  2 Jun 2021 15:18:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1622647106; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xwiNFasbWPElTA67bc6SiF98MBFIqX9yXTH9bP0dODk=;
-        b=AnkbJdmMPDma7/9/tt9UQI5UaxU2hcCYgKash0Dt+hDj8WzkYYBZ8o2hB6cE/ME00NohEz
-        WpkwQkXj2HPreV4MZyRLNHD2/RbO0DbSZgq+Wj6aq8L9iqAzTGZMQqmwwEQec7pJk9rGyg
-        wDhybyYYrqbYMn5jSgJrIlS1Lq1bYr8=
-Received: by imap.suse.de (Postfix, from userid 51)
-        id CDAB711CDB; Wed,  2 Jun 2021 15:28:32 +0000 (UTC)
-Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id 935CC11D81;
-        Wed,  2 Jun 2021 10:23:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1622629425; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xwiNFasbWPElTA67bc6SiF98MBFIqX9yXTH9bP0dODk=;
-        b=plH+bLhaIjZGR4v9T5CxvzsBDF3E8kPFNxc0FIap/GG0pDE7mQ/gp3WabTFjCm6CglSRmo
-        DVf0qzVmn5zdr9P8hxeK7d+8tHo23wvpPpjM6fEho1Q6u2lfUjSeazuUeosvlGS8FTMIM2
-        t86eGue92wang57/obhvCzcJT4qRxVI=
-Received: from director2.suse.de ([192.168.254.72])
-        by imap3-int with ESMTPSA
-        id HSM0IjFct2BZSgAALh3uQQ
-        (envelope-from <varad.gautam@suse.com>); Wed, 02 Jun 2021 10:23:45 +0000
-From:   Varad Gautam <varad.gautam@suse.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Varad Gautam <varad.gautam@suse.com>, kvm@vger.kernel.org,
-        x86@kernel.org, Borislav Petkov <bp@alien8.de>,
-        Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH v3] x86: Add a test for AMD SEV-ES guest #VC handling
-Date:   Wed,  2 Jun 2021 12:23:40 +0200
-Message-Id: <20210602102340.19441-1-varad.gautam@suse.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210531125035.21105-1-varad.gautam@suse.com>
-References: <20210531125035.21105-1-varad.gautam@suse.com>
+        id S231706AbhFBPEU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 11:04:20 -0400
+Received: from mail-pl1-f176.google.com ([209.85.214.176]:37416 "EHLO
+        mail-pl1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232082AbhFBPEN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 11:04:13 -0400
+Received: by mail-pl1-f176.google.com with SMTP id u7so1246245plq.4
+        for <kvm@vger.kernel.org>; Wed, 02 Jun 2021 08:02:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=P21AYfjvRn1BPnlQ+AuEW3lVoQo2ATf7BrIzySahaEs=;
+        b=R5gg7DhQN4H+wZF5g/WQAoR96Vr5pqvoqeMCaKveARCoeDJ1T6+yAtasV7zgdrFYoe
+         ZH+1FFPbwdW0E5tpPz5SLkZJPQ9lV+3w9OVAYmro7b3Lvwh3gNdrNo85HXGjfqHXKcg0
+         8AAY9zxYHN4BQOZhKJHn5qadv+Fl6sj4GLSSBS3YsKGSgbQi3Yl/vHxdiP3unlVD0hIQ
+         X3yTO96Pv1Lz0/klcPi8k57bWiP5YKZoQyQjuTlebQh5U8PSMBP/K9UNsYTYySdzbNmL
+         hWj/EMLazVIuu6yTrsMNp6hnGfswhrXmdfheUY44qdcLOAXNOEAGuCGEl7IsOFcYTsLA
+         KDDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=P21AYfjvRn1BPnlQ+AuEW3lVoQo2ATf7BrIzySahaEs=;
+        b=kXC0li5oszZSLNW3bb0zts7uXR1UdEW3TBbGvTi8xH336imk4xR9BaDAk+hWAfqPyP
+         wHFMvsD1bCRRe1UpylFmBbgO/uILpHwEXZlqg44X4qvzbwHhWeKY6fbCCXtfrIEadJh3
+         ge0sTR4j0CDym/4YPxaG9Nhkpv0J2HVuD7M7j9YhDYktCtU3Q2/v/bHoU6bssqdsnpNj
+         Xqox7QbqKQgcqeUu+fSowBfBqSZXI8jEMvzmpfvmWf1gJma/gCOCeRFYRDV2Hoq4YeSd
+         wr991vzR9EuUctsq3a2fv/N9vbCAWDv4pjcoO5SgfRcegQVmnLql/OyIWsbXr70Aamkj
+         tiSw==
+X-Gm-Message-State: AOAM531caOWEDmredBoa9jPfTlMpa8IYCNgfvgq+APseadlBpibXtboH
+        +howTHN+Iz3YEu1vbRLhbY0gLg==
+X-Google-Smtp-Source: ABdhPJzijG29Y5EMgZHAl3/fJi5+zpU6KE+aKWI43cl8NwduoI35nqmdoMXkgKl3k9TWDp6kaKvQkA==
+X-Received: by 2002:a17:90b:38ca:: with SMTP id nn10mr18826901pjb.127.1622646081188;
+        Wed, 02 Jun 2021 08:01:21 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id e17sm3513pfi.131.2021.06.02.08.01.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jun 2021 08:01:20 -0700 (PDT)
+Date:   Wed, 2 Jun 2021 15:01:16 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Lai Jiangshan <laijs@linux.alibaba.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH] KVM: X86: fix tlb_flush_guest()
+Message-ID: <YLedPIkBvPrjguCC@google.com>
+References: <20210527023922.2017-1-jiangshanlai@gmail.com>
+ <78ad9dff-9a20-c17f-cd8f-931090834133@redhat.com>
+ <YK/FGYejaIu6EzSn@google.com>
+ <d96f8c11-19e6-2c2d-91ff-6a7a51fa1b9c@linux.alibaba.com>
+ <YLA4peMjgeVvKlEn@google.com>
+ <332beac2-5a0b-2e5c-f22a-7609ed98acb9@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <332beac2-5a0b-2e5c-f22a-7609ed98acb9@linux.alibaba.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some vmexits on a SEV-ES guest need special handling within the guest
-before exiting to the hypervisor. This must happen within the guest's
-\#VC exception handler, triggered on every non automatic exit.
+On Fri, May 28, 2021, Lai Jiangshan wrote:
+> 
+> On 2021/5/28 08:26, Sean Christopherson wrote:
+> > On Fri, May 28, 2021, Lai Jiangshan wrote:
+> > > 
+> > > On 2021/5/28 00:13, Sean Christopherson wrote:
+> > > > And making a request won't work without revamping the order of request handling
+> > > > in vcpu_enter_guest(), e.g. KVM_REQ_MMU_RELOAD and KVM_REQ_MMU_SYNC are both
+> > > > serviced before KVM_REQ_STEAL_UPDATE.
+> > > 
+> > > Yes, it just fixes the said problem in the simplest way.
+> > > I copied KVM_REQ_MMU_RELOAD from kvm_handle_invpcid(INVPCID_TYPE_ALL_INCL_GLOBAL).
+> > > (If the guest is not preempted, it will call invpcid_flush_all() and will be handled
+> > > by this way)
+> > 
+> > The problem is that record_steal_time() is called after KVM_REQ_MMU_RELOAD
+> > in vcpu_enter_guest() and so the reload request won't be recognized until the
+> > next VM-Exit.  It works for kvm_handle_invpcid() because vcpu_enter_guest() is
+> > guaranteed to run between the invcpid code and VM-Enter.
+> 
+> Kvm will recheck the request before VM-enter.
+> See kvm_vcpu_exit_request().
 
-Add a KUnit based test to validate Linux's VC handling. The test:
-1. installs a kretprobe on the #VC handler (sev_es_ghcb_hv_call, to
-   access GHCB before/after the resulting VMGEXIT).
-2. tiggers an NAE.
-3. checks that the kretprobe was hit with the right exit_code available
-   in GHCB.
-
-Since relying on kprobes, the test does not cover NMI contexts.
-
-Signed-off-by: Varad Gautam <varad.gautam@suse.com>
----
- arch/x86/Kconfig                 |   9 ++
- arch/x86/kernel/Makefile         |   8 ++
- arch/x86/kernel/sev-es-test-vc.c | 155 +++++++++++++++++++++++++++++++
- 3 files changed, 172 insertions(+)
- create mode 100644 arch/x86/kernel/sev-es-test-vc.c
-
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 0045e1b441902..85b8ac450ba56 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -1543,6 +1543,15 @@ config AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT
- 	  If set to N, then the encryption of system memory can be
- 	  activated with the mem_encrypt=on command line option.
- 
-+config AMD_SEV_ES_TEST_VC
-+	bool "Test for AMD SEV-ES VC exception handling."
-+	depends on AMD_MEM_ENCRYPT
-+	select FUNCTION_TRACER
-+	select KPROBES
-+	select KUNIT
-+	help
-+	  Enable KUnit-based testing for AMD SEV-ES #VC exception handling.
-+
- # Common NUMA Features
- config NUMA
- 	bool "NUMA Memory Allocation and Scheduler Support"
-diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-index 0f66682ac02a6..1632d6156be6e 100644
---- a/arch/x86/kernel/Makefile
-+++ b/arch/x86/kernel/Makefile
-@@ -23,6 +23,13 @@ CFLAGS_REMOVE_head64.o = -pg
- CFLAGS_REMOVE_sev.o = -pg
- endif
- 
-+# AMD_SEV_ES_TEST_VC registers a kprobe by function name. IPA-SRA creates
-+# function copies and renames them to have an .isra suffix, which breaks kprobes'
-+# lookup. Build with -fno-ipa-sra for the test.
-+ifdef CONFIG_AMD_SEV_ES_TEST_VC
-+CFLAGS_sev.o	+= -fno-ipa-sra
-+endif
-+
- KASAN_SANITIZE_head$(BITS).o				:= n
- KASAN_SANITIZE_dumpstack.o				:= n
- KASAN_SANITIZE_dumpstack_$(BITS).o			:= n
-@@ -149,6 +156,7 @@ obj-$(CONFIG_UNWINDER_FRAME_POINTER)	+= unwind_frame.o
- obj-$(CONFIG_UNWINDER_GUESS)		+= unwind_guess.o
- 
- obj-$(CONFIG_AMD_MEM_ENCRYPT)		+= sev.o
-+obj-$(CONFIG_AMD_SEV_ES_TEST_VC)	+= sev-es-test-vc.o
- ###
- # 64 bit specific files
- ifeq ($(CONFIG_X86_64),y)
-diff --git a/arch/x86/kernel/sev-es-test-vc.c b/arch/x86/kernel/sev-es-test-vc.c
-new file mode 100644
-index 0000000000000..98dc38572ed5d
---- /dev/null
-+++ b/arch/x86/kernel/sev-es-test-vc.c
-@@ -0,0 +1,155 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2021 SUSE
-+ *
-+ * Author: Varad Gautam <varad.gautam@suse.com>
-+ */
-+
-+#include <asm/cpufeature.h>
-+#include <asm/debugreg.h>
-+#include <asm/io.h>
-+#include <asm/sev-common.h>
-+#include <asm/svm.h>
-+#include <kunit/test.h>
-+#include <linux/kprobes.h>
-+
-+static struct kretprobe hv_call_krp;
-+
-+static int hv_call_krp_entry(struct kretprobe_instance *krpi,
-+			     struct pt_regs *regs)
-+{
-+	unsigned long ghcb_vaddr = regs_get_kernel_argument(regs, 0);
-+	*((unsigned long *) krpi->data) = ghcb_vaddr;
-+
-+	return 0;
-+}
-+
-+static int hv_call_krp_ret(struct kretprobe_instance *krpi,
-+			   struct pt_regs *regs)
-+{
-+	unsigned long ghcb_vaddr = *((unsigned long *) krpi->data);
-+	struct ghcb *ghcb = (struct ghcb *) ghcb_vaddr;
-+	struct kunit *test = current->kunit_test;
-+
-+	if (test && strstr(test->name, "sev_es_") && test->priv)
-+		cmpxchg((unsigned long *) test->priv, ghcb->save.sw_exit_code, 1);
-+
-+	return 0;
-+}
-+
-+int sev_es_test_vc_init(struct kunit *test)
-+{
-+	int ret;
-+
-+	if (!sev_es_active()) {
-+		kunit_info(test, "Not a SEV-ES guest. Skipping.");
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	memset(&hv_call_krp, 0, sizeof(hv_call_krp));
-+	hv_call_krp.entry_handler = hv_call_krp_entry;
-+	hv_call_krp.handler = hv_call_krp_ret;
-+	hv_call_krp.maxactive = 100;
-+	hv_call_krp.data_size = sizeof(unsigned long);
-+	hv_call_krp.kp.symbol_name = "sev_es_ghcb_hv_call";
-+	hv_call_krp.kp.addr = 0;
-+
-+	ret = register_kretprobe(&hv_call_krp);
-+	if (ret) {
-+		kunit_info(test, "Could not register kretprobe. Skipping.");
-+		goto out;
-+	}
-+
-+	test->priv = kunit_kzalloc(test, sizeof(unsigned long), GFP_KERNEL);
-+	if (!test->priv) {
-+		ret = -ENOMEM;
-+		kunit_info(test, "Could not allocate. Skipping.");
-+		goto out;
-+	}
-+
-+out:
-+	return ret;
-+}
-+
-+void sev_es_test_vc_exit(struct kunit *test)
-+{
-+	if (test->priv)
-+		kunit_kfree(test, test->priv);
-+
-+	if (hv_call_krp.kp.addr)
-+		unregister_kretprobe(&hv_call_krp);
-+}
-+
-+#define guarded_op(kt, ec, op)						\
-+do {									\
-+	struct kunit *t = (struct kunit *) kt;				\
-+	smp_store_release((typeof(ec) *) t->priv, ec);			\
-+	op;								\
-+	KUNIT_EXPECT_EQ(t, (typeof(ec)) 1, 				\
-+		(typeof(ec)) smp_load_acquire((typeof(ec) *) t->priv));	\
-+} while(0)
-+
-+static void sev_es_nae_cpuid(struct kunit *test)
-+{
-+	unsigned int cpuid_fn = 0x8000001f;
-+
-+	guarded_op(test, SVM_EXIT_CPUID, native_cpuid_eax(cpuid_fn));
-+}
-+
-+static void sev_es_nae_wbinvd(struct kunit *test)
-+{
-+	guarded_op(test, SVM_EXIT_WBINVD, wbinvd());
-+}
-+
-+static void sev_es_nae_msr(struct kunit *test)
-+{
-+	guarded_op(test, SVM_EXIT_MSR, __rdmsr(MSR_IA32_TSC));
-+}
-+
-+static void sev_es_nae_dr7_rw(struct kunit *test)
-+{
-+	guarded_op(test, SVM_EXIT_WRITE_DR7,
-+		   native_set_debugreg(7, native_get_debugreg(7)));
-+}
-+
-+static void sev_es_nae_ioio(struct kunit *test)
-+{
-+	unsigned long port = 0x80;
-+	char val = 0;
-+
-+	guarded_op(test, SVM_EXIT_IOIO, val = inb(port));
-+	guarded_op(test, SVM_EXIT_IOIO, outb(val, port));
-+	guarded_op(test, SVM_EXIT_IOIO, insb(port, &val, sizeof(val)));
-+	guarded_op(test, SVM_EXIT_IOIO, outsb(port, &val, sizeof(val)));
-+}
-+
-+static void sev_es_nae_mmio(struct kunit *test)
-+{
-+	unsigned long lapic_ver_pa = 0xfee00030; /* APIC_DEFAULT_PHYS_BASE + APIC_LVR */
-+	unsigned __iomem *lapic = ioremap(lapic_ver_pa, 0x4);
-+	unsigned lapic_version = 0;
-+
-+	guarded_op(test, SVM_VMGEXIT_MMIO_READ, lapic_version = *lapic);
-+	guarded_op(test, SVM_VMGEXIT_MMIO_WRITE, *lapic = lapic_version);
-+
-+	iounmap(lapic);
-+}
-+
-+static struct kunit_case sev_es_vc_testcases[] = {
-+	KUNIT_CASE(sev_es_nae_cpuid),
-+	KUNIT_CASE(sev_es_nae_wbinvd),
-+	KUNIT_CASE(sev_es_nae_msr),
-+	KUNIT_CASE(sev_es_nae_dr7_rw),
-+	KUNIT_CASE(sev_es_nae_ioio),
-+	KUNIT_CASE(sev_es_nae_mmio),
-+	{}
-+};
-+
-+static struct kunit_suite sev_es_vc_test_suite = {
-+	.name = "sev_es_test_vc",
-+	.init = sev_es_test_vc_init,
-+	.exit = sev_es_test_vc_exit,
-+	.test_cases = sev_es_vc_testcases,
-+};
-+kunit_test_suite(sev_es_vc_test_suite);
--- 
-2.30.2
-
+Ah, right, forgot requests are rechecked.  Thanks!
