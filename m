@@ -2,152 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F73A398100
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 08:17:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E0B6398165
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 08:50:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230500AbhFBGTS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 02:19:18 -0400
-Received: from mail-mw2nam08on2048.outbound.protection.outlook.com ([40.107.101.48]:45266
-        "EHLO NAM04-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230468AbhFBGTR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 02:19:17 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LSTQJjybnOg8b9R1dx7uzz6d3pnHxC3VSBt47qj26d6NebK4wOLUt+leBUVmyvpt/1WStNTTP3wYlYL0oWuJZmESmtcjBSdphyMhLU4ZLn6ngN8ayt7xKn5ki9PRH2YbLfX5fLCUkLDwBY8Dx7cjvOBl6/FSZKD5P+qC+sIG2/bc89frXAtg9IRG+saPhOYngKbY7nJXQ7Q05bZsJMAK5E4kSR8RsulZGkuqL/G5jCMMFu02/Hgp75FUXi0SRs0OPR4JLJVGWInJnrjMhCG4odhkJyKRHMWe9c4KjvNiJG9uGjvBJu00OfrXDNTckkqTFwP8G85Z5BfyIb+yUUe0Nw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3PzUl2Ss1hcWxO7tCB4pdwvj5nFmJLmfX2QL6XWMl8s=;
- b=E+hVZX93lgFnHas0Z0QAmS2iGQ7pGUaZvMid7xEJ66DaQNgZyg3uD5/8sJ0ae4XgU6MJ2iSZAbXLoqrsAuHDgzAxD8YWbx6UxUbJb5gngJqgp4ru4b8MoOYZ/bEq7xMbdQJQGkl9DHt15q1935gmujBTnFqChIV0ENKQ0B7T4leTlWkAkWOiqdpmAxq+s+1nLKfBoy5nMJGYm/gV7tb9Yv5BAR3WHqBnFg/ynNguv6O7UULz0Kx3UcPn4GXzuqsDO3UPDEjG9IyXPA2Yq+fa8GtlrGwo2+6srTMfoC+DPLgrx+b0omq8FSEaWpeySxZmfmIPFiPsRvuoTTQSMpVKmw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3PzUl2Ss1hcWxO7tCB4pdwvj5nFmJLmfX2QL6XWMl8s=;
- b=jrduVEDFRKyI2fVv3NNufnwAf6Yf5zHYbasLspGVzAdWd7M+QtEAIHhEA2w6iyrOZUtrm11pODu4bOYqwdmjPKVUYTQYQPfHxEaBEAVUpLNzb9vMbNlXzlP2riZELaACQJvuIuY61ElgaOXCloVU1pgAAGfpeHi0wyUGMypWG3h6sVrr61AuPdOokKlP6dJs6mhERe02vzOdM0jHwZBR6oT6+g9DL610RmxVYG0k5TzwMEw9G4SUe+fFW72kIG6IUFkK++oHKl7Z4r0UkSyOiClv4aNqJmgYQFcTwFSP+4mtiVXNsy7NCKEJRN1iYRE8IllcI7lnhiU1Q5zXOwdhMw==
-Received: from BN6PR14CA0032.namprd14.prod.outlook.com (2603:10b6:404:13f::18)
- by MWHPR12MB1550.namprd12.prod.outlook.com (2603:10b6:301:8::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.20; Wed, 2 Jun
- 2021 06:17:30 +0000
-Received: from BN8NAM11FT017.eop-nam11.prod.protection.outlook.com
- (2603:10b6:404:13f:cafe::f) by BN6PR14CA0032.outlook.office365.com
- (2603:10b6:404:13f::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.22 via Frontend
- Transport; Wed, 2 Jun 2021 06:17:29 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
- smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.34; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.34) by
- BN8NAM11FT017.mail.protection.outlook.com (10.13.177.93) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4150.30 via Frontend Transport; Wed, 2 Jun 2021 06:17:29 +0000
-Received: from mtl-vdi-166.wap.labs.mlnx (172.20.187.5) by
- HQMAIL107.nvidia.com (172.20.187.13) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Wed, 2 Jun 2021 06:17:27 +0000
-Date:   Wed, 2 Jun 2021 09:17:23 +0300
-From:   Eli Cohen <elic@nvidia.com>
-To:     Jason Wang <jasowang@redhat.com>
-CC:     <mst@redhat.com>, <virtualization@lists.linux-foundation.org>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <eli@mellanox.com>
-Subject: Re: [PATCH V2 4/4] virtio/vdpa: clear the virtqueue state during
- probe
-Message-ID: <20210602061723.GB8662@mtl-vdi-166.wap.labs.mlnx>
-References: <20210602021043.39201-1-jasowang@redhat.com>
- <20210602021043.39201-5-jasowang@redhat.com>
+        id S229967AbhFBGvq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 02:51:46 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:9732 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229737AbhFBGvl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Jun 2021 02:51:41 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1526YESt183504;
+        Wed, 2 Jun 2021 02:49:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=eV7OHaaJkxhnxAKYxQ3UBXiQubYpTc8z6/Iva34uIBE=;
+ b=gCkyuaVJJGpN2/Vgzs7G/zu6ZJRxyMhNA1/xyWcO5kxDJVfghYUVQFtwNz5qM7DP3XP5
+ cS3NCvg1jOEzC2QKh0C+x2ymgXeJpF4r/91hg6FXWv+dhVHmr4OH/ugkjAUS/TK/3wY7
+ LuHkRqx3JBFeEhmB9B4PBuGpMELcXubSIWsKbqkwJkjyss8ydf3q7i0rFHWLGcXypwCZ
+ 3XIACI1milEwAss4DV3Jrte9DXoD3f21LGKc6ZS6X+K78ZXoBKSlyHEM3xUdF5JbeY1Z
+ bhZg6lHSaBUJkMXIRUPl1pbQUTFQajGywANqx9fz9z7UfxtL+1AXkojyxPQHpjMyyt5h FQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 38x20j43s4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Jun 2021 02:49:58 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1526ZUHi186605;
+        Wed, 2 Jun 2021 02:49:58 -0400
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 38x20j43rq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Jun 2021 02:49:58 -0400
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1526n89r030702;
+        Wed, 2 Jun 2021 06:49:56 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma01fra.de.ibm.com with ESMTP id 38ud88964d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Jun 2021 06:49:56 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1526nsDB29491474
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 2 Jun 2021 06:49:54 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EBA684C040;
+        Wed,  2 Jun 2021 06:49:53 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 501634C046;
+        Wed,  2 Jun 2021 06:49:53 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.24.5])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  2 Jun 2021 06:49:53 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH] s390x: unify header guards
+To:     Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Jones <drjones@redhat.com>
+References: <20210601161525.462315-1-cohuck@redhat.com>
+ <d87b32d6-1d41-1413-96c6-0d6b2361b079@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Message-ID: <28419313-ab8e-322e-4995-30f42e4f5236@linux.ibm.com>
+Date:   Wed, 2 Jun 2021 08:49:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20210602021043.39201-5-jasowang@redhat.com>
-User-Agent: Mutt/1.9.5 (bf161cf53efb) (2018-04-13)
-X-Originating-IP: [172.20.187.5]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ec2e45e9-a5d7-464e-1c6d-08d9258e19e0
-X-MS-TrafficTypeDiagnostic: MWHPR12MB1550:
-X-Microsoft-Antispam-PRVS: <MWHPR12MB1550EC82F48A09EE0F2325F7AB3D9@MWHPR12MB1550.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:196;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: snIBeVmWBd4z8LGFrNnhi/wiQCOjM70w4BBMw030Y8smNRbX5+Vf3G2OdXDk0AgKxV50VwKKO6lOimnRyWKc5SKFx93Q6c1x6S06kO9+oMHoE3kq9EIVBKONtnu60ol8bWA9ngnkZtDwlsqYk16+OLcSZhcJfk+80E71mrQCvaBI9b0F+TVyyzp4ufOtX8kYhLWmiG0u7/sGkTlzJvNEBP0ht2ti6mK6kZUZJqnWLdrFgTbooOSZ7GZeT8j6FRUecVFOAGv/UbMKyC5TPamXwQN5dwxeC1ZQyY50okQwkG7uE9SmZOOwoMOXhFJIOa+ulMVCYdpVofIecs4HsOujY0GD5QOnlw/xd55GQkd9atLmnU40HFFUFoVgi+s/FJlJ6j0ZSvR/1s1Qot7idqvbePT0pg1TawrRDEpQKs0IKfv9Filim3OWGcEIV2d2kyzpM9iEgyHbqMrhK+wx40l9A4jdlQ4NNsGkTDphvwVHE5zZ8OPGe7VUjp/z3tRynQA8brhU+7skNg6gWRXOTWBWJH0URqUnmLECGGP8xne2GbfzaOBnk4MBYQyqT0QWZo7iUzXtHHTiNxcyDqqzNoSyCKCLmRFfTeTuj51rdZwOzvEqRnbZGgQTOnbL790aF2sF+NfVA6mhaFPI9j1Dy/72cA==
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(39860400002)(346002)(376002)(396003)(136003)(46966006)(36840700001)(82310400003)(8936002)(47076005)(7636003)(478600001)(8676002)(70586007)(82740400003)(36906005)(4326008)(316002)(33656002)(7696005)(107886003)(16526019)(186003)(26005)(36860700001)(6916009)(1076003)(86362001)(55016002)(426003)(356005)(5660300002)(54906003)(2906002)(6666004)(336012)(70206006)(83380400001)(9686003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2021 06:17:29.7465
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ec2e45e9-a5d7-464e-1c6d-08d9258e19e0
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT017.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR12MB1550
+In-Reply-To: <d87b32d6-1d41-1413-96c6-0d6b2361b079@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: qCyUMehGgiQSabYvi8dtvaYi9iY-ejG8
+X-Proofpoint-ORIG-GUID: pq3rBoS0tiEPDm9VcysTNGXlnoHTfwua
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-06-02_01:2021-06-01,2021-06-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 mlxlogscore=999 phishscore=0 priorityscore=1501
+ lowpriorityscore=0 spamscore=0 bulkscore=0 mlxscore=0 adultscore=0
+ clxscore=1015 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2104190000 definitions=main-2106020041
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 02, 2021 at 10:10:43AM +0800, Jason Wang wrote:
-> From: Eli Cohen <elic@nvidia.com>
+On 6/2/21 5:56 AM, Thomas Huth wrote:
+> On 01/06/2021 18.15, Cornelia Huck wrote:
+>> Let's unify the header guards to _ASM_S390X_FILE_H_ respectively
+>> _S390X_FILE_H_. This makes it more obvious what the file is
+>> about, and avoids possible name space collisions.
+>>
+>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>> ---
+>>
+>> Only did s390x for now; the other archs seem to be inconsistent in
+>> places as well, and I can also try to tackle them if it makes sense.
+> ...
+>> diff --git a/lib/s390x/asm/bitops.h b/lib/s390x/asm/bitops.h
+>> index 792881ec3249..61cd38fd36b7 100644
+>> --- a/lib/s390x/asm/bitops.h
+>> +++ b/lib/s390x/asm/bitops.h
+>> @@ -8,8 +8,8 @@
+>>    *    Author(s): Martin Schwidefsky <schwidefsky@de.ibm.com>,
+>>    *
+>>    */
+>> -#ifndef _ASMS390X_BITOPS_H_
+>> -#define _ASMS390X_BITOPS_H_
+>> +#ifndef _ASM_S390X_BITOPS_H_
+>> +#define _ASM_S390X_BITOPS_H_
 > 
-> Clear the available index as part of the initialization process to
-> clear and values that might be left from previous usage of the device.
-> For example, if the device was previously used by vhost_vdpa and now
-> probed by vhost_vdpa, you want to start with indices.
+> Why not the other way round (S390X_ASM_BITOPS_H) ?
 > 
-> Fixes: c043b4a8cf3b ("virtio: introduce a vDPA based transport")
-> Signed-off-by: Eli Cohen <elic@nvidia.com>
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->  drivers/virtio/virtio_vdpa.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
+>  > diff --git a/s390x/sthyi.h b/s390x/sthyi.h
+>  > index bbd74c6197c3..eb92fdd2f2b2 100644
+>  > --- a/s390x/sthyi.h
+>  > +++ b/s390x/sthyi.h
+>  > @@ -7,8 +7,8 @@
+>  >   * Authors:
+>  >   *    Janosch Frank <frankja@linux.vnet.ibm.com>
+>  >   */
+>  > -#ifndef _STHYI_H_
+>  > -#define _STHYI_H_
+>  > +#ifndef _S390X_STHYI_H_
+>  > +#define _S390X_STHYI_H_
 > 
-> diff --git a/drivers/virtio/virtio_vdpa.c b/drivers/virtio/virtio_vdpa.c
-> index e28acf482e0c..e1a141135992 100644
-> --- a/drivers/virtio/virtio_vdpa.c
-> +++ b/drivers/virtio/virtio_vdpa.c
-> @@ -142,6 +142,8 @@ virtio_vdpa_setup_vq(struct virtio_device *vdev, unsigned int index,
->  	struct vdpa_callback cb;
->  	struct virtqueue *vq;
->  	u64 desc_addr, driver_addr, device_addr;
-> +	/* Assume split virtqueue, switch to packed if necessary */
-> +	struct vdpa_vq_state state = {0};
->  	unsigned long flags;
->  	u32 align, num;
->  	int err;
-> @@ -191,6 +193,19 @@ virtio_vdpa_setup_vq(struct virtio_device *vdev, unsigned int index,
->  		goto err_vq;
->  	}
->  
-> +	/* reset virtqueue state index */
-> +	if (virtio_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-> +		struct vdpa_vq_state_packed *s = &state.packed;
-> +
-> +		s->last_avail_counter = 1;
-> +		s->last_avail_idx = 0;
+> While we're at it: Do we also want to drop the leading (and trailing) 
+> underscores here? ... since leading underscore followed by a capital letter 
+> is a reserved namespace in C and you should normally not use these in nice 
+> programs...? I think I'm ok with keeping the underscores in the files in the 
+> lib folder (since these are our core libraries, similar to the system and 
+> libc headers on a normal system), but in files that are not part of the lib 
+> folder, we should rather avoid them.
 
-It's already 0
+Yes please.
+Also, I have the feeling that we should document our decision so we can
+point people to a file if questions arise.
 
-> +		s->last_used_counter = 1;
-> +		s->last_used_idx = 0;
 
-already 0
-
-> +	}
-> +	err = ops->set_vq_state(vdpa, index, &state);
-> +	if (err)
-> +		goto err_vq;
-> +
->  	ops->set_vq_ready(vdpa, index, 1);
->  
->  	vq->priv = info;
-> -- 
-> 2.25.1
 > 
+>   Thomas
+> 
+
