@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D9FE398C3E
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:14:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6DB9398C56
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:16:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231288AbhFBOQ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 10:16:26 -0400
-Received: from mail-dm3nam07on2058.outbound.protection.outlook.com ([40.107.95.58]:6980
-        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
+        id S232431AbhFBORf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 10:17:35 -0400
+Received: from mail-bn8nam11on2088.outbound.protection.outlook.com ([40.107.236.88]:32416
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230031AbhFBOOj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 10:14:39 -0400
+        id S229762AbhFBOP3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 10:15:29 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=C9HbEJwFF8DwElwcAq0dM8mQCrIOp0iGFvYm3MlLTgWmlP7wJXduTmzeuct1ogL0vH4C802dG6s05zvjIMSCoD/NYFBxcFsGtKSbTg7+nZvZzr5nkr1QFwbI2ViAyFqZD9Dym2XpIQqrOFY3wEMSo68iVyDMWpj6M+so1ejbTsUJ2jRe5FzAsIWwURPS+Ot6jkiUA8Ek3zDjzlOphAjEe7A4rbvd367ZkJSeuxwbuy2u4dmWvQ48tio1LHfpPDAWHdLfYTER4PcQqm26UNNiBCYafa6+0+I5EbTgcg/2jz6IG4Qnx/imiPurFNtlXj2hnIXhMLDukF/Jf+Xqxb2ByA==
+ b=UrM/kOYUDZ0XvALZIodZI8oLynEdwRrVcyC+WtJNj2MIjWlYqVTPNKQTmoNk2U0DXjoWE2tF3mHLZMcXgXiEiTx7SEOIdt/VTul3WIoGLmDXiOUqL7fXYRcmZu08Gykt/QyUYIoZ2+APycH4olDdWjk/XEi9vHli6aUX9NqsxE6fagwTi6Ivyr+EJexB1kcTv7/B5HPSF6Tw4NxhvqipP4lSDOhCK7hV/5MUtaV2uYNLTpgMXKA+9VBngrCJjRvvSgvSwf8Pt16onxn2P29erTEUZt7yuKfdYxVUKPRv4ZMlVkt8j67sk+oe9Th6w2ZtxeAoexu3fu8AGs6TCD/O6Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MOlQ2aCoAvg7b5HxXGUyXDe7t2qSxR8TcFCpfqVN4UI=;
- b=S6oL2SuU0sB2uMlPZO3g1/6E89O2NXZlzvEqT/2VroH/YFXRxugJ5qiWHVherDBVZtj1pacbMCP69V0uz/VhcgbJSf21x9ZW5nGfw8Bq1usBJW8QwRScgJX3MOBaqbOXdCDPolq/XdCGzRbat1XayZoKdOL1ATIXPG83Zl7He3Aod/Tax4qtKHj9bWeP8BIrkH3PpfwzRKhJCoNQUUjua9HWdyCK3eSoxPi/2c4YWt+qFPCRToda8xTTJcxgNd5PrMUxhki42NnCk37vLJdtMbUCXNvbvpkj12b1vKk2VtU990+nCsrWyf2VOZxan07lqMNQEm1j8TZPO229/xpX7A==
+ bh=u4/a7g6CsJ5AEPBd2g0WE1mD86STTW1l6r7T2FpRne4=;
+ b=nFnOlbAnvcOteE6LvKP4fElFsSNZBgacJjsf6BTmcqQwd0gp6rPjd0UXj4bJ2/1fFs2nWAdkTHZTFjM/9MdytRyG8nMX5r/RP5M5/dQrm3t/OTDohK1WJY6ytm1aEyEDcNJmrwyJgwL/UO3SE5AQrrZaptaqpviyUwqpbYjSIf15hMzX6v/21ZnBJpkTqUr/GJ1ntlVuVutV3BJxwaxUW21Hj9KI1PKLehooOFOmca6KZ5EgimsRvqlX7e1imWE/O+vndELF0Qo2d9Q7MOKGisVOk3RiDL5eqUiA3UsrKuoipcQO9hBECL1085Ha9+/94rIIwQGAwp69E8ukZoglfg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MOlQ2aCoAvg7b5HxXGUyXDe7t2qSxR8TcFCpfqVN4UI=;
- b=Tca6a5YZQ/zGz9QQNMeJnHB1ZKx0aKN8POWLXfarhldOkNNf7ZYu6vTrqAbaCl7ITTA5b0M1loVOPhDcGrxEgBPOU3QkWNYdi7NxvpLbt/TusKeAD+tcOILrZP25rABYwJUlY23SSrp6iV+wc4UK9dZMc1oWgoAYMA3v9he+11I=
+ bh=u4/a7g6CsJ5AEPBd2g0WE1mD86STTW1l6r7T2FpRne4=;
+ b=Ch4lArar0/NGFQOu+YiaYwe6HEtl7YQvj4uP/0Dfy5PaqP2sQDgdLlZdQHxDjyymtg6mlsAdrdCTI137KH4BndJmrDeru6GATNJg97jIecsm7+wLLgPoXu//BzobpINTV9bLUTLGzgTTlDBzcC5fkYvFCVaXkkPK/a7tNtIUxRo=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4495.namprd12.prod.outlook.com (2603:10b6:806:70::13) with
+ by SN1PR12MB2368.namprd12.prod.outlook.com (2603:10b6:802:32::23) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20; Wed, 2 Jun
- 2021 14:11:47 +0000
+ 2021 14:11:48 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4173.030; Wed, 2 Jun 2021
- 14:11:47 +0000
+ 14:11:48 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
@@ -58,9 +58,9 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         David Rientjes <rientjes@google.com>, tony.luck@intel.com,
         npmccallum@redhat.com, Borislav Petkov <bp@suse.de>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH Part2 RFC v3 15/37] crypto: ccp: Handle the legacy TMR allocation when SNP is enabled
-Date:   Wed,  2 Jun 2021 09:10:35 -0500
-Message-Id: <20210602141057.27107-16-brijesh.singh@amd.com>
+Subject: [PATCH Part2 RFC v3 16/37] crypto: ccp: Handle the legacy SEV command when SNP is enabled
+Date:   Wed,  2 Jun 2021 09:10:36 -0500
+Message-Id: <20210602141057.27107-17-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210602141057.27107-1-brijesh.singh@amd.com>
 References: <20210602141057.27107-1-brijesh.singh@amd.com>
@@ -71,310 +71,546 @@ X-ClientProxiedBy: SA0PR11CA0056.namprd11.prod.outlook.com
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0056.namprd11.prod.outlook.com (2603:10b6:806:d0::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20 via Frontend Transport; Wed, 2 Jun 2021 14:11:45 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0056.namprd11.prod.outlook.com (2603:10b6:806:d0::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20 via Frontend Transport; Wed, 2 Jun 2021 14:11:47 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 151b1f33-4e24-4cfe-77b9-08d925d05b4a
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4495:
+X-MS-Office365-Filtering-Correlation-Id: e5c2487b-3e8a-4e6c-dedf-08d925d05c4d
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2368:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4495294B660939A57A31B64BE53D9@SA0PR12MB4495.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Microsoft-Antispam-PRVS: <SN1PR12MB23683132F7F0C3012DF4F88BE53D9@SN1PR12MB2368.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1468;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Lx8WJvuuPwyatsYg0v2aLfUvDN+u/Krc90HGMTaLEFbDNrgDlzLPMuaAhd+RFdC8QwGPeS/pB+dIYm8AjADNyDlP3E7X4hj5Oo/YkBmDbTBtGjVxEur6J/kuO4TSne1o6HrTt9zffFylfPG/OB744p4AueecqliE6lODlSea8/o5wugBXXUNX/Mf0vD0M3wzbwqIM2uqF+vEj5FJgMoWG2eWUVysfaC29MtrFF5B6fxHKlXrCtZHo/jnYMsPjIUglQ5ke6MaK3p2Hym0oR2vLemcLk4sh1mwuREHDxfxrolgxGJkffiaKXwCCYYXoR3pd3PZL8swuVeVtAOUgV2UjqYvhs0b4nZHT160SZEh/fFGSzHyU38XuBjdRZcIETKJ9cT6NfhcZFmKfHxMRCMR+rX57HNRfOpPKgtJiwS9fkIdb1uTVtAGGuJDJwFwoNQ71Yoclz79q6ulu6D1kEnJRwTdaE5uy6tMRdtB6H/tSVnnv8TkY97+uT3tTm2vlgQJM4ZZcfrlb+cDtiKjVsqlmliQ2mmgpF9Qj7ml/hIgqm0/MLf/NSVKgMjza5dlzJPLsLQ8lTvvVw3FHhV9yksl48eVJOi5bIGwGo3SB4kPikH0TBkq/XalY5WcLBPvzPdgeUdHtk7etQ6XO2H9oZpnDg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(396003)(346002)(366004)(39860400002)(1076003)(54906003)(44832011)(8676002)(2616005)(956004)(478600001)(6486002)(316002)(86362001)(4326008)(7416002)(6666004)(38100700002)(7696005)(38350700002)(52116002)(16526019)(26005)(186003)(2906002)(5660300002)(66946007)(8936002)(83380400001)(36756003)(66556008)(66476007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?Pxy3rbvJzGkgF2Tv0M0axEYe/6JZbRQSUTQJSsenhsEIzV+KoK/aaD91wF/B?=
- =?us-ascii?Q?p7xEv2CgO3tjAde2w6J0xAM09tEBLyBf3JUBEjk+SOGBkBl76kWYoHBXgkN8?=
- =?us-ascii?Q?Qz+o2xxQbSfCa1BhmkO/KXCoK1IxvC0xY4QUTvKiN/xgVZqbQTPxY+eMAxYl?=
- =?us-ascii?Q?avn3IHTXkZUAdwC5HMfw7woxGG4k5pBaIjlyz75VF5G23TXXBic9YK09dMkU?=
- =?us-ascii?Q?Te+UOsNYoRjozlhZiHmcOxLpHwXyCH08jmaacO8lcHQOqrMlTnnq//No4ea2?=
- =?us-ascii?Q?3e5PYnEy8YG2TmmlHqIoruat6VoOWzx8l0MvOdZQyqb1BO5KP6j+6k0+pUv/?=
- =?us-ascii?Q?ZQagUUJFt8YI652lGMSOQGuO/IMiLL2KRxLRsFiylHbvT1sM1RL4JLuYJ72r?=
- =?us-ascii?Q?6hX6Zz8nkWmWL7HckYWlC2Ri+QoFz/ggbBu4YjZzG8GinzY1BJxaLE2SgDzy?=
- =?us-ascii?Q?jHsX7B5UllvquDTLUoZO0a0Z24sQG0QkGm2sw/gHLtraNTrNCcLJ4D7eTlkz?=
- =?us-ascii?Q?14LBkA7YT/EGNA6HRin+RH4DmD1qC4fMhzX+g6SaztzxC+prwefJpQh+l9p6?=
- =?us-ascii?Q?4wbNnjcawl4PqQGuIIjNPFvFnoJMvGyY4ZG9xJeiIoATl5hujiqsUWX+6g7c?=
- =?us-ascii?Q?Foum7yXs8wwKVSK8EysVrBjEvJjWhxc9W4uWNJSK5ksZ5yEGjkm5Lqdglig/?=
- =?us-ascii?Q?KuJHWb1IOfnB9jiQZNeuFek9MXwm3NRhdSsYNHcxCYG40izlC4cNRJYsEbM2?=
- =?us-ascii?Q?8e9r+6GDt4do3EtrBu5DkWmCdg8Wt1MdYNO/a/WTNOMO1NtTnXJxHc4Q/Men?=
- =?us-ascii?Q?+KsRPTgCODWrOg8M6HtxSogqKjIs1Hc0vcxJyXcbtGzs5Ch6cR+XfwyMaRJ9?=
- =?us-ascii?Q?Zuz6AJqtbLUmAhRMSR3T0d7ewURtupldIyaRLvcRqlul2N9qUonk6eIVWrE5?=
- =?us-ascii?Q?Hqyn62Bvo+rEHDnUYJ3fXWHi0A8gXEgwfwmp5+/mrPLedClRMryA/sIro9It?=
- =?us-ascii?Q?00q0LDYzSehxVBfnKVe+SrSxftlaEhagHeFwQZp1DfYaDVw72hsRjBuQxE+q?=
- =?us-ascii?Q?H/qRk3Sjve+kfn3lsgT5xsTHo3NTZYKntKKykR+s4+BZMZRWK4OMzTS4B8+O?=
- =?us-ascii?Q?vs5p1PM9pKtQRPZs/C9Gk0eZ0RbhuX9xyrZ59yLZWVgeT701jgPMNEGQRxqK?=
- =?us-ascii?Q?jhx/rYmWeQRX/midPEY+2NX+7PHtwqHrQbZo0DAnkRiXVzpajR0fnH82/+Ee?=
- =?us-ascii?Q?pYIX+rNIW1xarYIOYRCUzs7jdw76paG2Kf/SBgwmZuQCEjfzSCjPs3kQv8iJ?=
- =?us-ascii?Q?2EQdtgmFA0gDqB4ud/Rpmxap?=
+X-Microsoft-Antispam-Message-Info: hjiH7v6f9ql0TVy3l/BWVdOm8+6uwmAUwZIOea1BS+toqHagxEAezciLSGthiJCPRENhqls/UIvjaZfr0UPXeN6/gldAxR6/56bIgwV7dvsbsT+P84uAdvLe6sCUJC5Wr6lxGIOqun3tfHm+CKsx/mgC0f+mcXuXNxwZF4CG+xehc/JfzjkFl3a+GlTuxdOsOKCGueGgdWpUU+2w5W5tiLSJbtU+VmZHhzurC6kSTeItfO82M50BCSoLRfcHHxuM9xFJL2WODSAd//c3ZEHKvTCsvl6PASmBS30VucIg8ryFQNbcA2y+LD1ASUFV5j3zrg5bVnM1Tvjtrl/16lusF4HNNpnW/b/Qyl2++M8VWmla1iWlz6HOUxLYNoOVLl1BcZ0KVN6CmCdqdVLAyyQJWiZT+KbkmRhMi6wG7imMhi9ZGxopfV+i2Nwt+O/e8Hoz2MJ3lELEVU1CMFrEZzQVniWzaI9NtBWuygPXK1oDCcwGY+MkEX4SoGHKpwLq/xSTlmoXaMN2LEi+DIK4ug/Q0Ku2+hEBHzk5TZZPYoh8dnd+Vhx6lEALIsIx8qZ80UGEVZYKdHlaLi8BBWpH03nOdOaPC9AlAPERZ1/W8LQGCStx03oVFVPuHHfopvOUUxjKRJa89o6FQB8HgHalW2Ioog==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(396003)(376002)(366004)(346002)(39860400002)(5660300002)(86362001)(6486002)(52116002)(7696005)(44832011)(38350700002)(38100700002)(956004)(2616005)(1076003)(8676002)(7416002)(8936002)(478600001)(186003)(316002)(4326008)(16526019)(26005)(66556008)(66476007)(2906002)(36756003)(30864003)(54906003)(83380400001)(6666004)(66946007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?TJcHCSA3gV+d9wG5XeeQKYtx2bjDw6/9dt8c+IfzH5ALYAqBTyjG5sSXpOg6?=
+ =?us-ascii?Q?o91B6fYIDJbRhhCPurJABSQSkq1Gl83vkEsQS7djRcwldXg/a7+VNRc9Pix/?=
+ =?us-ascii?Q?ucNmrfxQGXocOQpEiomZw347Vyo2D3krKKlOB/2VMd8XxA/zEQ60VWAfQOFd?=
+ =?us-ascii?Q?xqa5ifDh2DTqXdq8qI+yDehChsI6iDLFpbZ+Kh3DMacMNPB15MA0zh16cd/f?=
+ =?us-ascii?Q?xBBSAq6Bg/9FmforIzOZvc1Ls/84fFmKhPd/G86vGkxHUmztdnWmp0Cun1z1?=
+ =?us-ascii?Q?dmvuM4kWqy43aQC+WmYqX21T8plGwFZjqgQ95ZDRICRmq9mesCyWDT1v9d9+?=
+ =?us-ascii?Q?JbkfCD1o75Sd8QS0wAqybx1dCDG4WRUmu9G0+Qqk94ObdDSIy+iJ+ggKAMk0?=
+ =?us-ascii?Q?BH6pYtaTEh7wt7wVhrpviOhgAs7XHzJuIuKEjCOdhezcijthQH55QHjkItjw?=
+ =?us-ascii?Q?iURpv4VidD1H3uYPo3JODgEUsYm+qPHezeHPmQqhb7z+DqUlsMRg+f2Zl3sD?=
+ =?us-ascii?Q?LC4YAaL/UDO9OUzZTYQJ3DdfXPdtvx2mkrZL+qMx2cOFbTDVezXMsRJtvQAZ?=
+ =?us-ascii?Q?LhAWbgFTZhCBb9JbwV7nAttGMwkpwBxX+5GcaqZHeXg4ZHBLnvPMMVI/5Dlc?=
+ =?us-ascii?Q?1U+ftKWTc/q9gR6EPmUCwTixAOK0bH4MIvoPFR09rBV27Y0s3Js6lZ2vwqKC?=
+ =?us-ascii?Q?DJunLpVfcWUSOLy2uHTHwxn/R5d4E/yGSBWGXe6COdCSGQO8+TIUs6NhbvnH?=
+ =?us-ascii?Q?9HSGltxwWEfLXm34bgfUS/v3UNNzaMm/p6rZlazgbyiSWEmVRqTuvEnakg+a?=
+ =?us-ascii?Q?tWrdnzoyhi3ctTBG4MOW6xUjwVBAEzVYbMiSzWoqBs6z0CbSWrUXKUtfcBgS?=
+ =?us-ascii?Q?x3yTAzZGGMywpXGJ9cdXp/rvfeqy+FQS85OhuMTlGXcsUdC8wC5p1Onn0i8j?=
+ =?us-ascii?Q?oMne975BlAlfvm14q02sORPvrG/N0IoyKAs0ZANCLLBVMDhIUpJgMZsKzfaN?=
+ =?us-ascii?Q?uHVFQvAyUVGPUCESTw9W5ao6dZp/bApAE8fDd12Mv8hrpFqp92YNU7AfTDC0?=
+ =?us-ascii?Q?Km68embKhy4swCvYpmh/JUHBP8/vBl2AFFP7NP44GchOg4Il94WLPClFD4fH?=
+ =?us-ascii?Q?ROLMKTQ2mZUGlQYu3bQPcmOKnUiBphJjp/DVD6PnvJULrBnfnyB23RevebER?=
+ =?us-ascii?Q?MwmwEFDDWM5VMm94sD9bvlK2XeeuDN0YDQTDTK5fvVcokmuneym54NKy2ryc?=
+ =?us-ascii?Q?m6Xc3pcAPd7EPoIKLa+bUoNROspsHW/86mBtJbzaV8st34YnU6Iv1kSw0Yw7?=
+ =?us-ascii?Q?Rir5tKUAZ937c2m4DBuaPhRl?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 151b1f33-4e24-4cfe-77b9-08d925d05b4a
+X-MS-Exchange-CrossTenant-Network-Message-Id: e5c2487b-3e8a-4e6c-dedf-08d925d05c4d
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2021 14:11:46.8535
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2021 14:11:48.3547
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: o7rOshOIz0W37jhJfeifaYPjIGnOAnXxuZHHdm3sbYX5mOnIki97ut2pEJOph3gHjCuPMYdo0jmTMxqX6tzZGg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4495
+X-MS-Exchange-CrossTenant-UserPrincipalName: /ZgAVMh1VDDh4v5PNy1J19e8rHj3U/LqNBUk421DmDI9WY0IURVhQBiiq3c9B1ZCEmgIw9pH4KvT44FCCEyz5g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2368
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The behavior and requirement for the SEV-legacy command is altered when
-the SNP firmware is in the INIT state. See SEV-SNP firmware specification
-for more details.
+The behavior of the SEV-legacy commands is altered when the SNP firmware
+is in the INIT state. When SNP is in INIT state, all the SEV-legacy
+commands that cause the firmware to write to memory must be in the
+firmware state before issuing the command..
 
-When SNP is INIT state, all the SEV-legacy commands that cause the
-firmware to write memory must be in the firmware state. The TMR memory
-is allocated by the host but updated by the firmware, so, it must be
-in the firmware state.  Additionally, the TMR memory must be a 2MB aligned
-instead of the 1MB, and the TMR length need to be 2MB instead of 1MB.
-The helper __snp_{alloc,free}_firmware_pages() can be used for allocating
-and freeing the memory used by the firmware.
+A command buffer may contains a system physical address that the firmware
+may write to. There are two cases that need to be handled:
 
-While at it, provide API that can be used by others to allocate a page
-that can be used by the firmware. The immediate user for this API will
-be the KVM driver. The KVM driver to need to allocate a firmware context
-page during the guest creation. The context page need to be updated
-by the firmware. See the SEV-SNP specification for further details.
+1) system physical address points to a guest memory
+2) system physical address points to a host memory
+
+To handle the case #1, map_firmware_writeable() helper simply
+changes the page state in the RMP table before and after the command is
+sent to the firmware.
+
+For the case #2, the map_firmware_writeable() replaces the host system
+physical memory with a pre-allocated firmware page, and after the command
+completes, the unmap_firmware_writeable() copies the content from
+pre-allocated firmware page to original host system physical.
+
+The unmap_firmware_writeable() calls a __sev_do_cmd_locked() to clear
+the immutable bit from the memory page. To support the nested calling,
+a separate command buffer is required. Allocate a backup command buffer
+and keep reference count of it. If a nested call is detected then use the
+backup cmd_buf to complete the command submission.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- drivers/crypto/ccp/sev-dev.c | 142 +++++++++++++++++++++++++++++++----
- include/linux/psp-sev.h      |  11 +++
- 2 files changed, 140 insertions(+), 13 deletions(-)
+ drivers/crypto/ccp/sev-dev.c | 348 ++++++++++++++++++++++++++++++++++-
+ drivers/crypto/ccp/sev-dev.h |  12 ++
+ 2 files changed, 350 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index def2996111db..cbf77cbf1887 100644
+index cbf77cbf1887..c886d76ae31d 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
-@@ -54,6 +54,14 @@ static int psp_timeout;
- #define SEV_ES_TMR_SIZE		(1024 * 1024)
- static void *sev_es_tmr;
- 
-+/* When SEV-SNP is enabled the TMR need to be 2MB aligned and 2MB size. */
-+#define SEV_SNP_ES_TMR_SIZE	(2 * 1024 * 1024)
-+
-+static size_t sev_es_tmr_size = SEV_ES_TMR_SIZE;
-+
-+static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret);
-+static int sev_do_cmd(int cmd, void *data, int *psp_ret);
-+
- static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
- {
- 	struct sev_device *sev = psp_master->sev_data;
-@@ -151,6 +159,112 @@ static int sev_cmd_buffer_len(int cmd)
- 	return 0;
+@@ -265,12 +265,299 @@ void snp_free_firmware_page(void *addr)
  }
+ EXPORT_SYMBOL(snp_free_firmware_page);
  
-+static int snp_reclaim_page(struct page *page, bool locked)
++static int alloc_snp_host_map(struct sev_device *sev)
 +{
-+	struct sev_data_snp_page_reclaim data = {};
-+	int ret, err;
++	struct page *page;
++	int i;
 +
-+	data.paddr = page_to_pfn(page) << PAGE_SHIFT;
++	for (i = 0; i < MAX_SNP_HOST_MAP_BUFS; i++) {
++		struct snp_host_map *map = &sev->snp_host_map[i];
 +
-+	if (locked)
-+		ret = __sev_do_cmd_locked(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
-+	else
-+		ret = sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
++		memset(map, 0, sizeof(*map));
 +
-+	return ret;
-+}
++		page = __snp_alloc_firmware_pages(GFP_KERNEL_ACCOUNT,
++						  get_order(SEV_FW_BLOB_MAX_SIZE));
++		if (!page)
++			return -ENOMEM;
 +
-+static int snp_set_rmptable_state(unsigned long paddr, int npages,
-+				  struct rmpupdate *val, bool locked, bool need_reclaim)
-+{
-+	unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT;
-+	unsigned long pfn_end = pfn + npages;
-+	struct psp_device *psp = psp_master;
-+	struct sev_device *sev;
-+	int rc;
-+
-+	if (!psp || !psp->sev_data)
-+		return 0;
-+
-+	/* If SEV-SNP is initialized then add the page in RMP table. */
-+	sev = psp->sev_data;
-+	if (!sev->snp_inited)
-+		return 0;
-+
-+	while (pfn < pfn_end) {
-+		if (need_reclaim)
-+			if (snp_reclaim_page(pfn_to_page(pfn), locked))
-+				return -EFAULT;
-+
-+		rc = rmpupdate(pfn_to_page(pfn), val);
-+		if (rc)
-+			return rc;
-+
-+		pfn++;
++		map->host = page_address(page);
 +	}
 +
 +	return 0;
 +}
 +
-+static struct page *__snp_alloc_firmware_pages(gfp_t gfp_mask, int order)
++static void free_snp_host_map(struct sev_device *sev)
 +{
-+	struct rmpupdate val = {};
-+	unsigned long paddr;
-+	struct page *page;
++	int i;
 +
-+	page = alloc_pages(gfp_mask, order);
-+	if (!page)
-+		return NULL;
++	for (i = 0; i < MAX_SNP_HOST_MAP_BUFS; i++) {
++		struct snp_host_map *map = &sev->snp_host_map[i];
 +
-+	val.assigned = 1;
-+	val.immutable = 1;
-+	paddr = __pa((unsigned long)page_address(page));
++		if (map->host) {
++			__snp_free_firmware_pages(virt_to_page(map->host),
++						  get_order(SEV_FW_BLOB_MAX_SIZE));
++			memset(map, 0, sizeof(*map));
++		}
++	}
++}
 +
-+	if (snp_set_rmptable_state(paddr, 1 << order, &val, false, true)) {
-+		pr_warn("Failed to set page state (leaking it)\n");
-+		return NULL;
++static int map_firmware_writeable(u64 *paddr, u32 len, bool guest, struct snp_host_map *map)
++{
++	unsigned int npages = PAGE_ALIGN(len) >> PAGE_SHIFT;
++	int ret;
++
++	map->active = false;
++
++	if (!paddr || !len)
++		return 0;
++
++	map->paddr = *paddr;
++	map->len = len;
++
++	/* If paddr points to a guest memory then change the page state to firmwware. */
++	if (guest) {
++		struct rmpupdate val = {};
++
++		val.immutable = true;
++		val.assigned = true;
++		ret = snp_set_rmptable_state(*paddr, npages, &val, true, false);
++		if (ret)
++			return ret;
++
++		goto done;
 +	}
 +
-+	return page;
++	if (unlikely(!map->host))
++		return -EINVAL;
++
++	/* Check if the pre-allocated buffer can be used to fullfil the request. */
++	if (unlikely(len > SEV_FW_BLOB_MAX_SIZE))
++		return -EINVAL;
++
++	/* Set the paddr to use an intermediate firmware buffer */
++	*paddr = __psp_pa(map->host);
++
++done:
++	map->active = true;
++	return 0;
 +}
 +
-+void *snp_alloc_firmware_page(gfp_t gfp_mask)
++static int unmap_firmware_writeable(u64 *paddr, u32 len, bool guest, struct snp_host_map *map)
 +{
-+	struct page *page;
++	unsigned int npages = PAGE_ALIGN(len) >> PAGE_SHIFT;
++	int ret;
 +
-+	page = __snp_alloc_firmware_pages(gfp_mask, 0);
++	if (!map->active)
++		return 0;
 +
-+	return page ? page_address(page) : NULL;
-+}
-+EXPORT_SYMBOL_GPL(snp_alloc_firmware_page);
++	/* If paddr points to a guest memory then restore the page state to hypervisor. */
++	if (guest) {
++		struct rmpupdate val = {};
 +
-+static void __snp_free_firmware_pages(struct page *page, int order)
-+{
-+	struct rmpupdate val = {};
-+	unsigned long paddr;
++		ret = snp_set_rmptable_state(*paddr, npages, &val, true, true);
++		if (ret)
++			return ret;
 +
-+	if (!page)
-+		return;
-+
-+	paddr = __pa((unsigned long)page_address(page));
-+
-+	if (snp_set_rmptable_state(paddr, 1 << order, &val, false, true)) {
-+		pr_warn("Failed to set page state (leaking it)\n");
-+		return;
++		goto done;
 +	}
 +
-+	__free_pages(page, order);
++	/* Copy the response data firmware buffer to the callers buffer. */
++	memcpy(__va(__sme_clr(map->paddr)), map->host, min_t(size_t, len, map->len));
++	*paddr = map->paddr;
++
++done:
++	map->active = false;
++	return 0;
 +}
 +
-+void snp_free_firmware_page(void *addr)
++static bool sev_legacy_cmd_buf_writable(int cmd)
 +{
-+	if (!addr)
-+		return;
-+
-+	__snp_free_firmware_pages(virt_to_page(addr), 0);
++	switch (cmd) {
++	case SEV_CMD_PLATFORM_STATUS:
++	case SEV_CMD_GUEST_STATUS:
++	case SEV_CMD_LAUNCH_START:
++	case SEV_CMD_RECEIVE_START:
++	case SEV_CMD_LAUNCH_MEASURE:
++	case SEV_CMD_SEND_START:
++	case SEV_CMD_SEND_UPDATE_DATA:
++	case SEV_CMD_SEND_UPDATE_VMSA:
++	case SEV_CMD_PEK_CSR:
++	case SEV_CMD_PDH_CERT_EXPORT:
++	case SEV_CMD_GET_ID:
++	case SEV_CMD_ATTESTATION_REPORT:
++		return true;
++	default:
++		return false;
++	}
 +}
-+EXPORT_SYMBOL(snp_free_firmware_page);
++
++#define prep_buffer(name, addr, len, guest, map)  \
++	   func(&((typeof(name *))cmd_buf)->addr, ((typeof(name *))cmd_buf)->len, guest, map)
++
++static int __snp_cmd_buf_copy(int cmd, void *cmd_buf, bool to_fw, int fw_err)
++{
++	int (*func)(u64 *paddr, u32 len, bool guest, struct snp_host_map *map);
++	struct sev_device *sev = psp_master->sev_data;
++	struct rmpupdate val = {};
++	bool from_fw = !to_fw;
++	int ret;
++
++	/*
++	 * After the command is completed, change the command buffer memory to
++	 * hypervisor state.
++	 *
++	 * The immutable bit is automatically cleared by the firmware, so
++	 * no not need to reclaim the page.
++	 */
++	if (from_fw && sev_legacy_cmd_buf_writable(cmd)) {
++		ret = snp_set_rmptable_state(__pa(cmd_buf), 1, &val, true, false);
++		if (ret)
++			return ret;
++
++		/* No need to go further if firmware failed to execute command. */
++		if (fw_err)
++			return 0;
++	}
++
++	if (to_fw)
++		func = map_firmware_writeable;
++	else
++		func = unmap_firmware_writeable;
++
++	/*
++	 * A command buffer may contains a system physical address. If the address
++	 * points to a host memory then use an intermediate firmware page otherwise
++	 * change the page state in the RMP table.
++	 */
++	switch (cmd) {
++	case SEV_CMD_PDH_CERT_EXPORT:
++		if (prep_buffer(struct sev_data_pdh_cert_export, pdh_cert_address,
++				pdh_cert_len, false, &sev->snp_host_map[0]))
++			goto err;
++		if (prep_buffer(struct sev_data_pdh_cert_export, cert_chain_address,
++				cert_chain_len, false, &sev->snp_host_map[1]))
++			goto err;
++		break;
++	case SEV_CMD_GET_ID:
++		if (prep_buffer(struct sev_data_get_id, address, len,
++				false, &sev->snp_host_map[0]))
++			goto err;
++		break;
++	case SEV_CMD_PEK_CSR:
++		if (prep_buffer(struct sev_data_pek_csr, address, len,
++				    false, &sev->snp_host_map[0]))
++			goto err;
++		break;
++	case SEV_CMD_LAUNCH_UPDATE_DATA:
++		if (prep_buffer(struct sev_data_launch_update_data, address, len,
++				    true, &sev->snp_host_map[0]))
++			goto err;
++		break;
++	case SEV_CMD_LAUNCH_UPDATE_VMSA:
++		if (prep_buffer(struct sev_data_launch_update_vmsa, address, len,
++				true, &sev->snp_host_map[0]))
++			goto err;
++		break;
++	case SEV_CMD_LAUNCH_MEASURE:
++		if (prep_buffer(struct sev_data_launch_measure, address, len,
++				false, &sev->snp_host_map[0]))
++			goto err;
++		break;
++	case SEV_CMD_LAUNCH_UPDATE_SECRET:
++		if (prep_buffer(struct sev_data_launch_secret, guest_address, guest_len,
++				true, &sev->snp_host_map[0]))
++			goto err;
++		break;
++	case SEV_CMD_DBG_DECRYPT:
++		if (prep_buffer(struct sev_data_dbg, dst_addr, len, false,
++				&sev->snp_host_map[0]))
++			goto err;
++		break;
++	case SEV_CMD_DBG_ENCRYPT:
++		if (prep_buffer(struct sev_data_dbg, dst_addr, len, true,
++				&sev->snp_host_map[0]))
++			goto err;
++		break;
++	case SEV_CMD_ATTESTATION_REPORT:
++		if (prep_buffer(struct sev_data_attestation_report, address, len,
++				false, &sev->snp_host_map[0]))
++			goto err;
++		break;
++	case SEV_CMD_SEND_START:
++		if (prep_buffer(struct sev_data_send_start, session_address,
++				session_len, false, &sev->snp_host_map[0]))
++			goto err;
++		break;
++	case SEV_CMD_SEND_UPDATE_DATA:
++		if (prep_buffer(struct sev_data_send_update_data, hdr_address, hdr_len,
++				false, &sev->snp_host_map[0]))
++			goto err;
++		if (prep_buffer(struct sev_data_send_update_data, trans_address,
++				trans_len, false, &sev->snp_host_map[1]))
++			goto err;
++		break;
++	case SEV_CMD_SEND_UPDATE_VMSA:
++		if (prep_buffer(struct sev_data_send_update_vmsa, hdr_address, hdr_len,
++				false, &sev->snp_host_map[0]))
++			goto err;
++		if (prep_buffer(struct sev_data_send_update_vmsa, trans_address,
++				trans_len, false, &sev->snp_host_map[1]))
++			goto err;
++		break;
++	case SEV_CMD_RECEIVE_UPDATE_DATA:
++		if (prep_buffer(struct sev_data_receive_update_data, guest_address,
++				guest_len, true, &sev->snp_host_map[0]))
++			goto err;
++		break;
++	case SEV_CMD_RECEIVE_UPDATE_VMSA:
++		if (prep_buffer(struct sev_data_receive_update_vmsa, guest_address,
++				guest_len, true, &sev->snp_host_map[0]))
++			goto err;
++		break;
++	default:
++		break;
++	}
++
++	/* The command buffer need to be in the firmware state. */
++	if (to_fw && sev_legacy_cmd_buf_writable(cmd)) {
++		val.assigned = true;
++		val.immutable = true;
++		ret = snp_set_rmptable_state(__pa(cmd_buf), 1, &val, true, false);
++		if (ret)
++			return ret;
++	}
++
++	return 0;
++
++err:
++	return -EINVAL;
++}
++
++static inline bool need_firmware_copy(int cmd)
++{
++	struct sev_device *sev = psp_master->sev_data;
++
++	/* After SNP is INIT'ed, the behavior of legacy SEV command is changed. */
++	return ((cmd < SEV_CMD_SNP_INIT) && sev->snp_inited) ? true : false;
++}
++
++static int snp_aware_copy_to_firmware(int cmd, void *data)
++{
++	return __snp_cmd_buf_copy(cmd, data, true, 0);
++}
++
++static int snp_aware_copy_from_firmware(int cmd, void *data, int fw_err)
++{
++	return __snp_cmd_buf_copy(cmd, data, false, fw_err);
++}
 +
  static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
  {
  	struct psp_device *psp = psp_master;
-@@ -273,7 +387,7 @@ static int __sev_platform_init_locked(int *error)
+ 	struct sev_device *sev;
+ 	unsigned int phys_lsb, phys_msb;
+ 	unsigned int reg, ret = 0;
++	void *cmd_buf;
+ 	int buf_len;
  
- 		data.flags |= SEV_INIT_FLAGS_SEV_ES;
- 		data.tmr_address = tmr_pa;
--		data.tmr_len = SEV_ES_TMR_SIZE;
-+		data.tmr_len = sev_es_tmr_size;
+ 	if (!psp || !psp->sev_data)
+@@ -290,12 +577,26 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+ 	 * work for some memory, e.g. vmalloc'd addresses, and @data may not be
+ 	 * physically contiguous.
+ 	 */
+-	if (data)
+-		memcpy(sev->cmd_buf, data, buf_len);
++	if (data) {
++		if (unlikely(sev->cmd_buf_active > 2))
++			return -EBUSY;
++
++		cmd_buf = sev->cmd_buf_active ? sev->cmd_buf_backup : sev->cmd_buf;
++
++		memcpy(cmd_buf, data, buf_len);
++		sev->cmd_buf_active++;
++
++		/*
++		 * The behavior of the SEV-legacy commands is altered when the
++		 * SNP firmware is in the INIT state.
++		 */
++		if (need_firmware_copy(cmd) && snp_aware_copy_to_firmware(cmd, sev->cmd_buf))
++			return -EFAULT;
++	}
+ 
+ 	/* Get the physical address of the command buffer */
+-	phys_lsb = data ? lower_32_bits(__psp_pa(sev->cmd_buf)) : 0;
+-	phys_msb = data ? upper_32_bits(__psp_pa(sev->cmd_buf)) : 0;
++	phys_lsb = data ? lower_32_bits(__psp_pa(cmd_buf)) : 0;
++	phys_msb = data ? upper_32_bits(__psp_pa(cmd_buf)) : 0;
+ 
+ 	dev_dbg(sev->dev, "sev command id %#x buffer 0x%08x%08x timeout %us\n",
+ 		cmd, phys_msb, phys_lsb, psp_timeout);
+@@ -336,15 +637,24 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+ 		ret = -EIO;
  	}
  
- 	rc = __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
-@@ -627,6 +741,8 @@ static int __sev_snp_init_locked(int *error)
- 	sev->snp_inited = true;
- 	dev_dbg(sev->dev, "SEV-SNP firmware initialized\n");
- 
-+	sev_es_tmr_size = SEV_SNP_ES_TMR_SIZE;
+-	print_hex_dump_debug("(out): ", DUMP_PREFIX_OFFSET, 16, 2, data,
+-			     buf_len, false);
+-
+ 	/*
+ 	 * Copy potential output from the PSP back to data.  Do this even on
+ 	 * failure in case the caller wants to glean something from the error.
+ 	 */
+-	if (data)
+-		memcpy(data, sev->cmd_buf, buf_len);
++	if (data) {
++		/*
++		 * Restore the page state after the command completes.
++		 */
++		if (need_firmware_copy(cmd) &&
++		    snp_aware_copy_from_firmware(cmd, cmd_buf, ret))
++			return -EFAULT;
 +
- 	return rc;
++		memcpy(data, cmd_buf, buf_len);
++		sev->cmd_buf_active--;
++	}
++
++	print_hex_dump_debug("(out): ", DUMP_PREFIX_OFFSET, 16, 2, data,
++			     buf_len, false);
+ 
+ 	return ret;
  }
+@@ -1216,10 +1526,12 @@ int sev_dev_init(struct psp_device *psp)
+ 	if (!sev)
+ 		goto e_err;
  
-@@ -1150,8 +1266,8 @@ static void sev_firmware_shutdown(struct sev_device *sev)
- 		/* The TMR area was encrypted, flush it from the cache */
- 		wbinvd_on_all_cpus();
+-	sev->cmd_buf = (void *)devm_get_free_pages(dev, GFP_KERNEL, 0);
++	sev->cmd_buf = (void *)devm_get_free_pages(dev, GFP_KERNEL, 1);
+ 	if (!sev->cmd_buf)
+ 		goto e_sev;
  
--		free_pages((unsigned long)sev_es_tmr,
--			   get_order(SEV_ES_TMR_SIZE));
++	sev->cmd_buf_backup = (uint8_t *)sev->cmd_buf + PAGE_SIZE;
 +
-+		__snp_free_firmware_pages(virt_to_page(sev_es_tmr), get_order(sev_es_tmr_size));
+ 	psp->sev_data = sev;
+ 
+ 	sev->dev = dev;
+@@ -1271,6 +1583,12 @@ static void sev_firmware_shutdown(struct sev_device *sev)
  		sev_es_tmr = NULL;
  	}
  
-@@ -1201,16 +1317,6 @@ void sev_pci_init(void)
- 	    sev_update_firmware(sev->dev) == 0)
- 		sev_get_api_version();
- 
--	/* Obtain the TMR memory area for SEV-ES use */
--	tmr_page = alloc_pages(GFP_KERNEL, get_order(SEV_ES_TMR_SIZE));
--	if (tmr_page) {
--		sev_es_tmr = page_address(tmr_page);
--	} else {
--		sev_es_tmr = NULL;
--		dev_warn(sev->dev,
--			 "SEV: TMR allocation failed, SEV-ES support unavailable\n");
--	}
--
- 	/*
- 	 * If boot CPU supports the SNP, then let first attempt to initialize
- 	 * the SNP firmware.
-@@ -1226,6 +1332,16 @@ void sev_pci_init(void)
- 		}
- 	}
- 
-+	/* Obtain the TMR memory area for SEV-ES use */
-+	tmr_page = __snp_alloc_firmware_pages(GFP_KERNEL, get_order(sev_es_tmr_size));
-+	if (tmr_page) {
-+		sev_es_tmr = page_address(tmr_page);
-+	} else {
-+		sev_es_tmr = NULL;
-+		dev_warn(sev->dev,
-+			 "SEV: TMR allocation failed, SEV-ES support unavailable\n");
-+	}
++	/*
++	 * The host map need to clear the immutable bit so it must be free'd before the
++	 * SNP firmware shutdown.
++	 */
++	free_snp_host_map(sev);
 +
- 	/* Initialize the platform */
- 	rc = sev_platform_init(&error);
- 	if (rc && (error == SEV_RET_SECURE_DATA_INVALID)) {
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 63ef766cbd7a..b72a74f6a4e9 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -12,6 +12,8 @@
- #ifndef __PSP_SEV_H__
- #define __PSP_SEV_H__
- 
-+#include <linux/sev.h>
-+
- #include <uapi/linux/psp-sev.h>
- 
- #ifdef CONFIG_X86
-@@ -920,6 +922,8 @@ int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error);
- 
- 
- void *psp_copy_user_blob(u64 uaddr, u32 len);
-+void *snp_alloc_firmware_page(gfp_t mask);
-+void snp_free_firmware_page(void *addr);
- 
- #else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
- 
-@@ -961,6 +965,13 @@ static inline int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *erro
- 	return -ENODEV;
+ 	sev_snp_shutdown(NULL);
  }
  
-+static inline void *snp_alloc_firmware_page(gfp_t mask)
-+{
-+	return NULL;
-+}
+@@ -1330,6 +1648,14 @@ void sev_pci_init(void)
+ 			 */
+ 			dev_err(sev->dev, "SEV-SNP: failed to INIT error %#x\n", error);
+ 		}
 +
-+static inline void snp_free_firmware_page(void *addr) { }
-+
- #endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
++		/*
++		 * Allocate the intermediate buffers used for the legacy command handling.
++		 */
++		if (alloc_snp_host_map(sev)) {
++			dev_notice(sev->dev, "Failed to alloc host map (disabling legacy SEV)\n");
++			goto skip_legacy;
++		}
+ 	}
  
- #endif	/* __PSP_SEV_H__ */
+ 	/* Obtain the TMR memory area for SEV-ES use */
+@@ -1359,12 +1685,14 @@ void sev_pci_init(void)
+ 	if (rc)
+ 		dev_err(sev->dev, "SEV: failed to INIT error %#x\n", error);
+ 
++skip_legacy:
+ 	dev_info(sev->dev, "SEV%s API:%d.%d build:%d\n", sev->snp_inited ?
+ 		"-SNP" : "", sev->api_major, sev->api_minor, sev->build);
+ 
+ 	return;
+ 
+ err:
++	free_snp_host_map(sev);
+ 	psp_master->sev_data = NULL;
+ }
+ 
+diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
+index 186ad20cbd24..fe5d7a3ebace 100644
+--- a/drivers/crypto/ccp/sev-dev.h
++++ b/drivers/crypto/ccp/sev-dev.h
+@@ -29,11 +29,20 @@
+ #define SEV_CMDRESP_CMD_SHIFT		16
+ #define SEV_CMDRESP_IOC			BIT(0)
+ 
++#define MAX_SNP_HOST_MAP_BUFS		2
++
+ struct sev_misc_dev {
+ 	struct kref refcount;
+ 	struct miscdevice misc;
+ };
+ 
++struct snp_host_map {
++	u64 paddr;
++	u32 len;
++	void *host;
++	bool active;
++};
++
+ struct sev_device {
+ 	struct device *dev;
+ 	struct psp_device *psp;
+@@ -52,8 +61,11 @@ struct sev_device {
+ 	u8 build;
+ 
+ 	void *cmd_buf;
++	void *cmd_buf_backup;
++	int cmd_buf_active;
+ 
+ 	bool snp_inited;
++	struct snp_host_map snp_host_map[MAX_SNP_HOST_MAP_BUFS];
+ };
+ 
+ int sev_dev_init(struct psp_device *psp);
 -- 
 2.17.1
 
