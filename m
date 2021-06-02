@@ -2,71 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 407AF398296
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 09:05:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5ABD3982A5
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 09:07:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230264AbhFBHH3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 03:07:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48061 "EHLO
+        id S231468AbhFBHIw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 03:08:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20497 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231459AbhFBHHZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Jun 2021 03:07:25 -0400
+        by vger.kernel.org with ESMTP id S231346AbhFBHIv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Jun 2021 03:08:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622617542;
+        s=mimecast20190719; t=1622617628;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=N7AFjn1kAaIwJ7yXpW9H7ltpl4fJk13y2xBWVC0JT2Y=;
-        b=XQqwCCK83td8iyoCHwRbkrQJfEEViyskBWWP/l5JN3SqssOiB3yMB6dPzjfcNOqMzOXr7p
-        1Yic3raL4w0t0qJ72DkimFZ4cHj0N3l/QYpNNi0jcikfqsOrFkW9RvfryA21GQu1F05/ES
-        rDTkd9i6rTk4v9S+SkUbq3CxcRukN0A=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-slffrRzrNVWEM6l1IwxmdQ-1; Wed, 02 Jun 2021 03:05:41 -0400
-X-MC-Unique: slffrRzrNVWEM6l1IwxmdQ-1
-Received: by mail-pj1-f72.google.com with SMTP id z3-20020a17090a4683b029015f6c19f126so1111110pjf.1
-        for <kvm@vger.kernel.org>; Wed, 02 Jun 2021 00:05:41 -0700 (PDT)
+        bh=DIn7oU6+FWaajjVOBnVnDXXj1rPq+MuBcxlSw0xkwZE=;
+        b=SG8TnGdZMWOTDQnHTL1//IgN5SneSrV/eZFgWwGlrRnzntBPVzZMjAcxdW/3VtI/2Tp+tS
+        b8yzsnuBGvfTKLToo0k5M3h9x5olo8+FBPKoajBRpOW52LlWXIKbapYTYupsj3zFXl+Qxm
+        6LzuCiJVelUK25ndn881d/QxekUKodc=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-102-aN2YxHrvNfawhPrBGjZZYw-1; Wed, 02 Jun 2021 03:07:07 -0400
+X-MC-Unique: aN2YxHrvNfawhPrBGjZZYw-1
+Received: by mail-pj1-f71.google.com with SMTP id 15-20020a17090a0f0fb029016ad0f32fd0so591899pjy.6
+        for <kvm@vger.kernel.org>; Wed, 02 Jun 2021 00:07:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-transfer-encoding
          :content-language;
-        bh=N7AFjn1kAaIwJ7yXpW9H7ltpl4fJk13y2xBWVC0JT2Y=;
-        b=WcodhSiNoEuGNki0EzVinXVM68YFKWSB5dGcdebXGUawnHb1VF/oyrmtNczy4RXOeM
-         13sQrjMG9Sy7/52yueiTfyahBtzdFg5R+doyt7kmtvjfPXqKergYY2ERZjMPNiRM0Y2A
-         A+9WmtTv4E0L4rbjj98CGlDmPfEpFaDIs7F1pB4JDSkK0o8gMBdMS+KeU1MSt7hXNTcc
-         H5LWUTAMSMT5qsBxvVnUENmJr4Q2cZk0AvPldRokUgMcZe9tSawGoAd6/hSGfIlZHRPa
-         P7z3x651aMKW2xsGZw9uf7zzoYjJquxst4S2VVYw6yiCopVgi1aE0fzu8UOqdF8aIVUw
-         X/zQ==
-X-Gm-Message-State: AOAM530HghbUcPOtSQkvsSyeLOUaTPapAnN/f2JzEWAUonOMB2ViJZ1p
-        pe1AbMinEl0rlDR49M4IW7RXtkRmXEUpGxQGtwndAGb821JmQS3WMG8RoMNR9ykKjhOkm2+NTPH
-        i77OYNsRxJUyz
-X-Received: by 2002:a63:d908:: with SMTP id r8mr17698730pgg.414.1622617540708;
-        Wed, 02 Jun 2021 00:05:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxi1fo5eUxqSSq1jhRLtWR5oM/z3BQO8r5DzrHXf+icFTZlIa8TZoB63MRifCqrns7bI6/5cA==
-X-Received: by 2002:a63:d908:: with SMTP id r8mr17698704pgg.414.1622617540453;
-        Wed, 02 Jun 2021 00:05:40 -0700 (PDT)
+        bh=DIn7oU6+FWaajjVOBnVnDXXj1rPq+MuBcxlSw0xkwZE=;
+        b=U8izPTXttKH3uVPbeQSg0jVksafr8Ahbt/iUljHiIJuqc0Nae/piuO59E3WJyfSCH+
+         axwyT/RHa7aRnOAoweGR8eJnpbnWiFX90iH55WAscNmeMhR7a7Jb9D44HFSNv22b38MU
+         wW0ziwQPhxoQZf1a4k0WGJAwrhy15Hbehlr44yd4WnhVbFcMi6mVYvM8BpDLZ+4R0tFZ
+         kt1NyfD/QtOaULTZ3DUwFhG+fOooGjw0vyplMNpsEY3BsKKf+QhEXKLqyRYDMXoFmYFN
+         JuoGWDzXXwp5uA2+DW2n8hjajkUUYHAyuu+3UKx6X/N5Bz3dpQczGILggEkf5BYasU7O
+         npRA==
+X-Gm-Message-State: AOAM5325MZbjbOnkaY+KdJk2feTDnotZ3xas5Xk9PY4A8Jbl1wLHaa0z
+        VI89qe3XVEHBToqTOGpT26icxG2x0SOvwM9f8kMvVyw5WGgQ5eGwabslpI+cEVgha6cnjy+geNi
+        3jswj42hPJnye
+X-Received: by 2002:a63:370b:: with SMTP id e11mr2997522pga.356.1622617625654;
+        Wed, 02 Jun 2021 00:07:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwQPBUIaMSz6qvd9JSBnMqXSurn4bBEos0N6fpw0TLZWd+uW/3B70u5qTqpAn9peLKQgziDfg==
+X-Received: by 2002:a63:370b:: with SMTP id e11mr2997512pga.356.1622617625499;
+        Wed, 02 Jun 2021 00:07:05 -0700 (PDT)
 Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id x19sm15554961pgj.66.2021.06.02.00.05.37
+        by smtp.gmail.com with ESMTPSA id p26sm3560856pfw.178.2021.06.02.00.07.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Jun 2021 00:05:40 -0700 (PDT)
-Subject: Re: [PATCH V2 3/4] vp_vdpa: allow set vq state to initial state after
- reset
+        Wed, 02 Jun 2021 00:07:05 -0700 (PDT)
+Subject: Re: [PATCH V2 4/4] virtio/vdpa: clear the virtqueue state during
+ probe
 To:     Eli Cohen <elic@nvidia.com>
 Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         netdev@vger.kernel.org, eli@mellanox.com
 References: <20210602021043.39201-1-jasowang@redhat.com>
- <20210602021043.39201-4-jasowang@redhat.com>
- <20210602061324.GA8662@mtl-vdi-166.wap.labs.mlnx>
+ <20210602021043.39201-5-jasowang@redhat.com>
+ <20210602061723.GB8662@mtl-vdi-166.wap.labs.mlnx>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <091dc6d0-8754-7b2a-64ec-985ef9db6329@redhat.com>
-Date:   Wed, 2 Jun 2021 15:05:35 +0800
+Message-ID: <7ce52bd6-60b7-b733-9881-682cfba51ad8@redhat.com>
+Date:   Wed, 2 Jun 2021 15:07:00 +0800
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
  Gecko/20100101 Thunderbird/78.10.2
 MIME-Version: 1.0
-In-Reply-To: <20210602061324.GA8662@mtl-vdi-166.wap.labs.mlnx>
+In-Reply-To: <20210602061723.GB8662@mtl-vdi-166.wap.labs.mlnx>
 Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
@@ -75,97 +75,67 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-在 2021/6/2 下午2:13, Eli Cohen 写道:
-> On Wed, Jun 02, 2021 at 10:10:42AM +0800, Jason Wang wrote:
->> We used to fail the set_vq_state() since it was not supported yet by
->> the virtio spec. But if the bus tries to set the state which is equal
->> to the device initial state after reset, we can let it go.
+在 2021/6/2 下午2:17, Eli Cohen 写道:
+> On Wed, Jun 02, 2021 at 10:10:43AM +0800, Jason Wang wrote:
+>> From: Eli Cohen <elic@nvidia.com>
 >>
->> This is a must for virtio_vdpa() to set vq state during probe which is
->> required for some vDPA parents.
+>> Clear the available index as part of the initialization process to
+>> clear and values that might be left from previous usage of the device.
+>> For example, if the device was previously used by vhost_vdpa and now
+>> probed by vhost_vdpa, you want to start with indices.
 >>
+>> Fixes: c043b4a8cf3b ("virtio: introduce a vDPA based transport")
+>> Signed-off-by: Eli Cohen <elic@nvidia.com>
 >> Signed-off-by: Jason Wang <jasowang@redhat.com>
 >> ---
->>   drivers/vdpa/virtio_pci/vp_vdpa.c | 42 ++++++++++++++++++++++++++++---
->>   1 file changed, 39 insertions(+), 3 deletions(-)
+>>   drivers/virtio/virtio_vdpa.c | 15 +++++++++++++++
+>>   1 file changed, 15 insertions(+)
 >>
->> diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
->> index c76ebb531212..18bf4a422772 100644
->> --- a/drivers/vdpa/virtio_pci/vp_vdpa.c
->> +++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
->> @@ -210,13 +210,49 @@ static int vp_vdpa_get_vq_state(struct vdpa_device *vdpa, u16 qid,
->>   	return -EOPNOTSUPP;
->>   }
+>> diff --git a/drivers/virtio/virtio_vdpa.c b/drivers/virtio/virtio_vdpa.c
+>> index e28acf482e0c..e1a141135992 100644
+>> --- a/drivers/virtio/virtio_vdpa.c
+>> +++ b/drivers/virtio/virtio_vdpa.c
+>> @@ -142,6 +142,8 @@ virtio_vdpa_setup_vq(struct virtio_device *vdev, unsigned int index,
+>>   	struct vdpa_callback cb;
+>>   	struct virtqueue *vq;
+>>   	u64 desc_addr, driver_addr, device_addr;
+>> +	/* Assume split virtqueue, switch to packed if necessary */
+>> +	struct vdpa_vq_state state = {0};
+>>   	unsigned long flags;
+>>   	u32 align, num;
+>>   	int err;
+>> @@ -191,6 +193,19 @@ virtio_vdpa_setup_vq(struct virtio_device *vdev, unsigned int index,
+>>   		goto err_vq;
+>>   	}
 >>   
->> +static int vp_vdpa_set_vq_state_split(struct vdpa_device *vdpa,
->> +				      const struct vdpa_vq_state *state)
->> +{
->> +	const struct vdpa_vq_state_split *split = &state->split;
+>> +	/* reset virtqueue state index */
+>> +	if (virtio_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
+>> +		struct vdpa_vq_state_packed *s = &state.packed;
 >> +
->> +	if (split->avail_index == 0)
->> +		return 0;
->> +
->> +	return -EOPNOTSUPP;
->> +}
->> +
->> +static int vp_vdpa_set_vq_state_packed(struct vdpa_device *vdpa,
->> +				       const struct vdpa_vq_state *state)
->> +{
->> +	const struct vdpa_vq_state_packed *packed = &state->packed;
->> +
->> +	if (packed->last_avail_counter == 1 &&
-> Can you elaborate on the requirement on last_avail_counter and
-> last_used_counter?
+>> +		s->last_avail_counter = 1;
+>> +		s->last_avail_idx = 0;
+> It's already 0
+>
+>> +		s->last_used_counter = 1;
+>> +		s->last_used_idx = 0;
+> already 0
 
 
-This is required by the virtio spec:
-
-"
-2.7.1 Driver and Device Ring Wrap Counters
-Each of the driver and the device are expected to maintain, internally, 
-a single-bit ring wrap counter initialized to 1.
-"
-
-For virtio-pci device, since there's no way to assign the value of those 
-counters, the counters will be reset to 1 after reset, otherwise the 
-driver can't work.
+Yes, but for completeness and make code easy to read, it's no harm to 
+keep them I think.
 
 Thanks
 
 
 >
->> +	    packed->last_avail_idx == 0 &&
->> +	    packed->last_used_counter == 1 &&
->> +	    packed->last_used_idx == 0)
->> +		return 0;
->> +
->> +	return -EOPNOTSUPP;
->> +}
->> +
->>   static int vp_vdpa_set_vq_state(struct vdpa_device *vdpa, u16 qid,
->>   				const struct vdpa_vq_state *state)
->>   {
->> -	/* Note that this is not supported by virtio specification, so
->> -	 * we return -ENOPOTSUPP here. This means we can't support live
->> -	 * migration, vhost device start/stop.
->> +	struct virtio_pci_modern_device *mdev = vdpa_to_mdev(vdpa);
->> +
->> +	/* Note that this is not supported by virtio specification.
->> +	 * But if the state is by chance equal to the device initial
->> +	 * state, we can let it go.
->>   	 */
->> +	if ((vp_modern_get_status(mdev) & VIRTIO_CONFIG_S_FEATURES_OK) &&
->> +	    !vp_modern_get_queue_enable(mdev, qid)) {
->> +		if (vp_modern_get_driver_features(mdev) &
->> +		    BIT_ULL(VIRTIO_F_RING_PACKED))
->> +			return vp_vdpa_set_vq_state_packed(vdpa, state);
->> +		else
->> +			return vp_vdpa_set_vq_state_split(vdpa,	state);
 >> +	}
+>> +	err = ops->set_vq_state(vdpa, index, &state);
+>> +	if (err)
+>> +		goto err_vq;
 >> +
->>   	return -EOPNOTSUPP;
->>   }
+>>   	ops->set_vq_ready(vdpa, index, 1);
 >>   
+>>   	vq->priv = info;
 >> -- 
 >> 2.25.1
 >>
