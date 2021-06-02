@@ -2,124 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 545253984EE
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 11:06:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E54073984FF
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 11:11:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231312AbhFBJIb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 05:08:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26733 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231258AbhFBJI1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Jun 2021 05:08:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622624804;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4SKDhNmHqN2aKK0+XSIC4OXwk6NfJlgx4QyzKzOMn5g=;
-        b=LihfZ3YVSxod1cNLQ5LhSyAD3NzgmK/hIsNkws4+8my5qz7rSZthyuvSkzg9o43b8qhvnu
-        UeWbO7/PT5lvH+tczElj7uuSEOZOQULHzMqNG95tSJyufM5j/R/PRhM/wPHEyG35lDcKka
-        aoL0joV2K+fhrj0gTu8oq5xak8rvb6o=
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
- [209.85.215.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-102-9NcSkFfNN26fpckIKGoNTA-1; Wed, 02 Jun 2021 05:06:43 -0400
-X-MC-Unique: 9NcSkFfNN26fpckIKGoNTA-1
-Received: by mail-pg1-f199.google.com with SMTP id 30-20020a630a1e0000b029021a63d9d4cdso1285289pgk.11
-        for <kvm@vger.kernel.org>; Wed, 02 Jun 2021 02:06:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=4SKDhNmHqN2aKK0+XSIC4OXwk6NfJlgx4QyzKzOMn5g=;
-        b=WSilery/+JYIHrZsM9Z91CCIe3nmABQulAt7ecimvZfqo6KuwXAO2iLe/shdyR0LLf
-         4UMU0DIqGOrELhhnvJ+0duTEHUMROHJYVqtd4RyUTKbbJJI1j5FD8SJxTWsn/XPB1fG5
-         yhnZEhCDJGpl4SXyPvWcepM32y9C8RKLTYUjZhnuc6nFRfrOKWvgh+eV4df7FrZHD9Di
-         dgMnfX2FH37mm8/Wai5mqtwq53t3RvCsFZUOL7Kv1JizFx6g9ntbbLp0MWBuRl6La5Xn
-         Bwa6fWeboFuilhqic83esvcNsac39depLWsy2WSeeifJbAI9XZPn7HubLQLGNfe8mwI0
-         HeMg==
-X-Gm-Message-State: AOAM530k6/2IdaEpazrpajcaIgPleEWx+HJpMUynUAkrb3t+RecMlVCc
-        ks359M4jjE8vIBYZNICMxQoqAUaRjRD/F/8pRdLbOz3pP3qUIhSJc2rK+U+qhma34b/YS45yUBK
-        9gr8YBFzJbhmJKQT1B9I43JOx2dzlKnwfm4YUGndrHDF9EwDC7ALHe9KC8aC3ErsT
-X-Received: by 2002:a17:90a:d106:: with SMTP id l6mr29442517pju.164.1622624802408;
-        Wed, 02 Jun 2021 02:06:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJywOxQ+NWTfjlQmSNDqckkjmrNWhEkCDBhZCvcjcZYkfXqk+RN3ycPoZAbDZtUF42apd9FTcg==
-X-Received: by 2002:a17:90a:d106:: with SMTP id l6mr29442495pju.164.1622624802084;
-        Wed, 02 Jun 2021 02:06:42 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id bo14sm249140pjb.40.2021.06.02.02.06.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Jun 2021 02:06:41 -0700 (PDT)
-Subject: Re: [RESEND PATCH V4 2/2] vDPA/ifcvf: implement doorbell mapping for
- ifcvf
-To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20210602084550.289599-1-lingshan.zhu@intel.com>
- <20210602084550.289599-3-lingshan.zhu@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <87adb0ea-689e-f014-d81d-37b2ee032c54@redhat.com>
-Date:   Wed, 2 Jun 2021 17:06:34 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.2
-MIME-Version: 1.0
-In-Reply-To: <20210602084550.289599-3-lingshan.zhu@intel.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+        id S230193AbhFBJM4 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 2 Jun 2021 05:12:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46526 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229745AbhFBJMz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 05:12:55 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id AD0FB608FE;
+        Wed,  2 Jun 2021 09:11:12 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1loMu6-004zLH-Ha; Wed, 02 Jun 2021 10:11:10 +0100
+Date:   Wed, 02 Jun 2021 10:11:09 +0100
+Message-ID: <87a6o81viq.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Vikram Sethi <vsethi@nvidia.com>,
+        Mark Kettenis <mark.kettenis@xs4all.nl>,
+        Shanker Donthineni <sdonthineni@nvidia.com>,
+        "will@kernel.org" <will@kernel.org>,
+        "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+        "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jason Sequeira <jsequeira@nvidia.com>
+Subject: Re: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR region in VMA
+In-Reply-To: <20210504120348.2eec075b@redhat.com>
+References: <20210429162906.32742-1-sdonthineni@nvidia.com>
+        <20210429162906.32742-2-sdonthineni@nvidia.com>
+        <20210429122840.4f98f78e@redhat.com>
+        <470360a7-0242-9ae5-816f-13608f957bf6@nvidia.com>
+        <20210429134659.321a5c3c@redhat.com>
+        <e3d7fda8-5263-211c-3686-f699765ab715@nvidia.com>
+        <87czucngdc.wl-maz@kernel.org>
+        <1edb2c4e-23f0-5730-245b-fc6d289951e1@nvidia.com>
+        <878s4zokll.wl-maz@kernel.org>
+        <BL0PR12MB2532CC436EBF626966B15994BD5E9@BL0PR12MB2532.namprd12.prod.outlook.com>
+        <87eeeqvm1d.wl-maz@kernel.org>
+        <BL0PR12MB25329EF5DFA7BBAA732064A7BD5C9@BL0PR12MB2532.namprd12.prod.outlook.com>
+        <87bl9sunnw.wl-maz@kernel.org>
+        <c1bd514a531988c9@bloch.sibelius.xs4all.nl>
+        <BL0PR12MB253296086906C4A850EC68E6BD5B9@BL0PR12MB2532.namprd12.prod.outlook.com>
+        <20210503084432.75e0126d@x1.home.shazbot.org>
+        <BL0PR12MB2532BEAE226E7D68A8A2F97EBD5B9@BL0PR12MB2532.namprd12.prod.outlook.com>
+        <20210504120348.2eec075b@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: alex.williamson@redhat.com, vsethi@nvidia.com, mark.kettenis@xs4all.nl, sdonthineni@nvidia.com, will@kernel.org, catalin.marinas@arm.com, christoffer.dall@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, jsequeira@nvidia.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 04 May 2021 19:03:48 +0100,
+Alex Williamson <alex.williamson@redhat.com> wrote:
+> 
+> On Mon, 3 May 2021 22:03:59 +0000
+> Vikram Sethi <vsethi@nvidia.com> wrote:
+> 
+> > Hi Alex,
+> > > From: Alex Williamson <alex.williamson@redhat.com>
+> > > On Mon, 3 May 2021 13:59:43 +0000
+> > > Vikram Sethi <vsethi@nvidia.com> wrote:  
+> > > > > From: Mark Kettenis <mark.kettenis@xs4all.nl>  
+> > > > > > From: Marc Zyngier <maz@kernel.org>  
+> > > >
+> > > > snip  
+> > > > > > If, by enumerating the properties of Prefetchable, you can show
+> > > > > > that they are a strict superset of Normal_NC, I'm on board. I
+> > > > > > haven't seen such an enumeration so far.
+> > > > > >  
+> > > > snip  
+> > > > > > Right, so we have made a small step in the direction of mapping
+> > > > > > "prefetchable" onto "Normal_NC", thanks for that. What about all
+> > > > > > the other properties (unaligned accesses, ordering, gathering)?  
+> > > > >  
+> > > > Regarding gathering/write combining, that is also allowed to
+> > > > prefetchable per PCI spec  
+> > > 
+> > > As others have stated, gather/write combining itself is not well defined.
+> > >   
+> > > > From 1.3.2.2 of 5/0 base spec:
+> > > > A PCI Express Endpoint requesting memory resources through a BAR must
+> > > > set the BAR's Prefetchable bit unless the range contains locations
+> > > > with read side-effects or locations in which the Function does not tolerate  
+> > > write merging.
+> > > 
+> > > "write merging"  This is a very specific thing, per PCI 3.0, 3.2.6:
+> > > 
+> > >   Byte Merging â€“ occurs when a sequence of individual memory writes
+> > >   (bytes or words) are merged into a single DWORD.
+> > > 
+> > > The semantics suggest quadword support in addition to dword, but
+> > > don't require it.  Writes to bytes within a dword can be merged,
+> > > but duplicate writes cannot.
+> > > 
+> > > It seems like an extremely liberal application to suggest that
+> > > this one write semantic encompasses full write combining
+> > > semantics, which itself is not clearly defined.
+> > >  
+> > Talking to our PCIe SIG representative, PCIe switches are not
+> > allowed do any of the byte Merging/combining etc as defined in the
+> > PCI spec, and per a rather poorly worded Implementation note in
+> > the spec says that no known PCIe Host Briddges/Root ports do it
+> > either.  So for PCIe we don't think believe there is any byte
+> > merging that happens in the PCIe fabric so it's really a matter of
+> > what happens in the CPU core and interconnect before it gets to
+> > the PCIe hierarchy.
+> 
+> Yes, but merged writes, no matter where they happen, are still the only
+> type of write combining that a prefetchable BAR on an endpoint is
+> required to support.
+> 
+> > Stepping back from this patchset, do you agree that it is
+> > desirable to support Write combining as understood by ioremap_wc
+> > to work in all ISA guests including ARMv8?
+> 
+> Yes, a userspace vfio driver should be able to take advantage of the
+> hardware capabilities.  I think where we disagree is whether it's
+> universally safe to assume write combining based on the PCI
+> prefetchable capability of a BAR.  If that's something that can be
+> assumed universally for ARMv8 based on the architecture specification
+> compatibility with the PCI definition of a prefetchable BAR, then I
+> would expect a helper somewhere in arch code that returns the right
+> page protection flags, so that arch maintainers don't need to scour
+> device drivers for architecture hacks.  Otherwise, it needs to be
+> exposed through the vfio uAPI to allow the userspace device driver
+> itself to select these semantics.
+> 
+> > You note that x86 virtualization doesn't have this issue, but
+> > KVM-ARM does because KVM maps all device BARs as Device Memory
+> > type nGnRE which doesn't allow ioremap_wc from within the guest to
+> > get the actual semantics desired.
+> > 
+> > Marc and others have suggested that userspace should provide the
+> > hints. But the question is how would qemu vfio do this either? We
+> > would be stuck in the same arguments as here, as to what is the
+> > correct way to determine the desired attributes for a given BAR
+> > such that eventually when a driver in the guest asks for
+> > ioremap_wc it actually has a chance of working in the guest, in
+> > all ISAs.  Do you have any suggestions on how to make progress
+> > here?
+> 
+> We do need some way for userspace drivers to also make use of WC
+> semantics, there were some discussions in the past, I think others have
+> referenced them as well, but nothing has been proposed for a vfio API.
+> 
+> If we had that API, QEMU deciding to universally enable WC for all
+> vfio prefetchable BARs seems only marginally better than this approach.
+> Ultimately the mapping should be based on the guest driver semantics,
+> and if you don't have any visibility to that on KVM/arm like we have on
+> KVM/x86, then it seems like there's nothing to trigger a vfio API here
+> anyway.
 
-ÔÚ 2021/6/2 ÏÂÎç4:45, Zhu Lingshan Ð´µÀ:
-> This commit implements doorbell mapping feature for ifcvf.
-> This feature maps the notify page to userspace, to eliminate
-> vmexit when kick a vq.
->
-> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+There isn't much KVM/arm64 can do here unless it is being told what to
+do. We don't have visibility on the guest's page tables in a reliable
+way, and trusting them is not something I want to entertain anyway.
 
+> If that's the case, I'd probably go back to letting the arch/arm64 folks
+> declare that WC is compatible with the definition of PCI prefetchable
+> and export some sort of pgprot_pci_prefetchable() helper where the
+> default would be to #define it as pgproc_noncached() #ifndef by the
+> arch.
+> 
+> > A device specific list of which BARs are OK to allow ioremap_wc
+> > for seems terrible and I'm not sure if a commandline qemu option
+> > is any better. Is the user of device assignment/sysadmin supposed
+> > to know which BAR of which device is OK to allow ioremap_wc for?
+> 
+> No, a device specific userspace driver should know such device
+> semantics, but QEMU is not such a driver.  Burdening the hypervisor
+> user/admin is not a good solution either.  I'd lean on KVM/arm64 folks
+> to know how the guest driver semantics can be exposed to the
+> hypervisor.  Thanks,
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+I don't see a good way for that, unless we make it a per-guest buy-in
+where all PCI prefetchable mappings get the same treatment. I'm
+prepared to bet that this will break when two devices will have
+different requirements. It would also require userspace to buy into
+this scheme though, which is crap.
 
+Exposing the guest's preference on a per-device basis seems difficult
+(KVM knows nothing about the PCI devices) and would require some PV
+interface that will quickly become unmaintainable.
 
-> ---
->   drivers/vdpa/ifcvf/ifcvf_main.c | 16 ++++++++++++++++
->   1 file changed, 16 insertions(+)
->
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-> index ab0ab5cf0f6e..46a992eab3e5 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
-> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-> @@ -413,6 +413,21 @@ static int ifcvf_vdpa_get_vq_irq(struct vdpa_device *vdpa_dev,
->   	return vf->vring[qid].irq;
->   }
->   
-> +static struct vdpa_notification_area ifcvf_get_vq_notification(struct vdpa_device *vdpa_dev,
-> +							       u16 idx)
-> +{
-> +	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
-> +	struct vdpa_notification_area area;
-> +
-> +	area.addr = vf->vring[idx].notify_pa;
-> +	if (!vf->notify_off_multiplier)
-> +		area.size = PAGE_SIZE;
-> +	else
-> +		area.size = vf->notify_off_multiplier;
-> +
-> +	return area;
-> +}
-> +
->   /*
->    * IFCVF currently does't have on-chip IOMMU, so not
->    * implemented set_map()/dma_map()/dma_unmap()
-> @@ -440,6 +455,7 @@ static const struct vdpa_config_ops ifc_vdpa_ops = {
->   	.get_config	= ifcvf_vdpa_get_config,
->   	.set_config	= ifcvf_vdpa_set_config,
->   	.set_config_cb  = ifcvf_vdpa_set_config_cb,
-> +	.get_vq_notification = ifcvf_get_vq_notification,
->   };
->   
->   static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
