@@ -2,129 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 22199398DFD
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 17:10:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A970398ED7
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 17:40:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231751AbhFBPMO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 11:12:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38692 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230456AbhFBPML (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 11:12:11 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 73C1A61182;
-        Wed,  2 Jun 2021 15:10:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1622646628;
-        bh=MmmB5edNPbRN/+c+2On4lV0BgwteW7Cw405ip5Z8YuI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=eoW8oxXoywj95HF19beDzh3Wa+WhWkiyj9FjvvSEw7ScJ8OuGQbEy6+2TGjP0xVYN
-         XSSJAJXvhI5MOj1+GRdHIbg46k9rJSpJMlo/HDJefXpEwJPCDFcYn8COIR/VQO5DZl
-         47yzM30C6QaWLqEpy6LeVNCLBHEk+aKjfkrC6CQ5ViDR3bMQ0fCKMIt+zFjJNZMY+v
-         SNl2CwOo9QKvwQF6AUEFLQH9ccSyIziiULTl3YApDUWutkiYOLv0+Q04TM9wwWdkfx
-         bdsysjlbcoFBsmj9C1l84fr+oHwMhBsnHonyI6jC2MFd17CoX0BlIS16/UkYyFRS6U
-         MochfZ+/mAepQ==
-Date:   Wed, 2 Jun 2021 16:10:11 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Jens Axboe <axboe@kernel.dk>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Felipe Balbi <balbi@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jason Wessel <jason.wessel@windriver.com>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Douglas Anderson <dianders@chromium.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, Waiman Long <longman@redhat.com>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Oleg Nesterov <oleg@redhat.com>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        John Stultz <john.stultz@linaro.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
+        id S232079AbhFBPlm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 11:41:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54966 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231618AbhFBPll (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 11:41:41 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19A70C06174A
+        for <kvm@vger.kernel.org>; Wed,  2 Jun 2021 08:39:52 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id s14so1608958pfd.9
+        for <kvm@vger.kernel.org>; Wed, 02 Jun 2021 08:39:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Ql9d/9lC/Z+oDU+E2Te9dSYsTCkeZFltxB8n5ToB/Gw=;
+        b=eDmjm6x3PDZ43U95ZfqC/7h/3BXiLvCQpHMtTLWt0PoVyzou8OV6f4KCKtUevfBuZv
+         3svHbVtP1wOf47r0ACg9gzxYVBF6qeE7gNos1aKDY23hu1Pu9MSgE2rJPnUgj0MpGXXo
+         2puFR9jQpNlLACRzjAYhoY3f1xtfTT0D1NPhDRK8OQlpNqzg3vfcs+aZ7/wnmzJTiheh
+         Ph5oe532nJEhPyRFLq7lYCnbLdx3tPM++hbFtdJMu9QJ2EvAqkPhF8Qodv5vJHewFH1Y
+         SMeW8kAnzhi1j0Qc5fuC007pRMRVfxRvjQRj2tOQcuC+QbnP5H+w8KMQHKGBvDPOPsxb
+         7PAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Ql9d/9lC/Z+oDU+E2Te9dSYsTCkeZFltxB8n5ToB/Gw=;
+        b=Y66ABvWSCOPNPd4BIYbl0JnVGIwFGyuc99jWuAY4XOGHtCSsr8A3kXrBiKnYap2Pwv
+         25RtzHvtXKrL4iRFcHEAH8TcD6w6oTZFR+cZcQMPUxVIPEw+HnyGBdpRvxmyoUXiCabG
+         2pEtPzIKowZJNYvsrqffk0PLcSUyE0BoegZiEtXZmuSkHRQwHjXPTvGkllwJ8NuZuOFa
+         nb3fYcH06R+eiH82Fp3lL0c5HotxIib2qgBISkkyZPJqD9WaCtkjfee37PnurKh1hndZ
+         S8RDiywmvgIIKCFSmKJmEOKJlYcijb0IJS0lqf1qKhaPr6vqDhct9gEWLqr92Nt1glF3
+         vBsw==
+X-Gm-Message-State: AOAM532rU8cBLGQmgmJGnsoDytYQgvWflJApelBcIYTnnbtiRcRqGaTn
+        S9eUTJvwQbOrcU8F/RIko9+wWw==
+X-Google-Smtp-Source: ABdhPJyoFdBqGNzP8RjidgmmG03Wg/fcm/E0mpp8XjjIzR9WkDNNSXTACznsMKOveIcatXdp+UyYmQ==
+X-Received: by 2002:a63:145e:: with SMTP id 30mr34900690pgu.174.1622648391388;
+        Wed, 02 Jun 2021 08:39:51 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id o27sm156917pgb.70.2021.06.02.08.39.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jun 2021 08:39:50 -0700 (PDT)
+Date:   Wed, 2 Jun 2021 15:39:47 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Lai Jiangshan <laijs@linux.alibaba.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, cgroups@vger.kernel.org,
-        kgdb-bugreport@lists.sourceforge.net,
-        linux-perf-users@vger.kernel.org, linux-pm@vger.kernel.org,
-        rcu@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 6/6] sched: Change task_struct::state
-Message-ID: <20210602151010.GE31179@willie-the-truck>
-References: <20210602131225.336600299@infradead.org>
- <20210602133040.587042016@infradead.org>
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH V2] KVM: X86: fix tlb_flush_guest()
+Message-ID: <YLemQ++Xdvh5TVNe@google.com>
+References: <4c3ef411ba68ca726531a379fb6c9d16178c8513.camel@redhat.com>
+ <20210531172256.2908-1-jiangshanlai@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210602133040.587042016@infradead.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20210531172256.2908-1-jiangshanlai@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 02, 2021 at 03:12:31PM +0200, Peter Zijlstra wrote:
-> Change the type and name of task_struct::state. Drop the volatile and
-> shrink it to an 'unsigned int'. Rename it in order to find all uses
-> such that we can use READ_ONCE/WRITE_ONCE as appropriate.
+On Tue, Jun 01, 2021, Lai Jiangshan wrote:
+> From: Lai Jiangshan <laijs@linux.alibaba.com>
 > 
-> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> For KVM_VCPU_FLUSH_TLB used in kvm_flush_tlb_multi(), the guest expects
+> the hypervisor do the operation that equals to native_flush_tlb_global()
+> or invpcid_flush_all() in the specified guest CPU.
+
+I don't like referencing guest code, here and in the comment.  The paravirt
+flush isn't limited to Linux guests, the existing kernel code might change, and
+it doesn't directly explain KVM's responsibilities in response to a guest TLB
+flush.
+
+Something like:
+
+  When using shadow paging, unload the guest MMU when emulating a guest TLB
+  flush to all roots are synchronized.  From the guest's perspective,
+  flushing the TLB ensure any and all modifications to its PTEs will be
+  recognized by the CPU.
+
+  Note, unloading the MMU is overkill, but is done to mirror KVM's existing
+  handling of INVPCID(all) and ensure the bug is squashed.  Future cleanup
+  can be done to more precisely synchronize roots when servicing a guest
+  TLB flush.
+  
+> When TDP is enabled, there is no problem to just flush the hardware
+> TLB of the specified guest CPU.
+> 
+> But when using shadowpaging, the hypervisor should have to sync the
+> shadow pagetable at first before flushing the hardware TLB so that
+> it can truely emulate the operation of invpcid_flush_all() in guest.
+> 
+> The problem exists since the first implementation of KVM_VCPU_FLUSH_TLB
+> in commit f38a7b75267f ("KVM: X86: support paravirtualized help for TLB
+> shootdowns").  But I don't think it would be a real world problem that
+> time since the local CPU's tlb is flushed at first in guest before queuing
+> KVM_VCPU_FLUSH_TLB to other CPUs.  It means that the hypervisor syncs the
+> shadow pagetable before seeing the corresponding KVM_VCPU_FLUSH_TLBs.
+> 
+> After commit 4ce94eabac16 ("x86/mm/tlb: Flush remote and local TLBs
+> concurrently"), the guest doesn't flush local CPU's tlb at first and
+> the hypervisor can handle other VCPU's KVM_VCPU_FLUSH_TLB earlier than
+> local VCPU's tlb flush and might flush the hardware tlb without syncing
+> the shadow pagetable beforehand.
+
+Maybe reword the last two paragraphs to make it clear that a change in the Linux
+kernel exposed the KVM bug?
+
+  This bug has existed since the introduction of KVM_VCPU_FLUSH_TLB, but
+  was only recently exposed after Linux guests stopped flushing the local
+  CPU's TLB prior to flushing remote TLBs (see commit 4ce94eabac16,
+  "x86/mm/tlb: Flush remote and local TLBs concurrently").
+
+> Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> Fixes: f38a7b75267f ("KVM: X86: support paravirtualized help for TLB shootdowns")
+> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
 > ---
->  block/blk-mq.c                 |    2 -
->  drivers/md/dm.c                |    6 ++--
->  fs/binfmt_elf.c                |    8 +++---
->  fs/userfaultfd.c               |    4 +--
->  include/linux/sched.h          |   31 +++++++++++------------
->  include/linux/sched/debug.h    |    2 -
->  include/linux/sched/signal.h   |    2 -
->  init/init_task.c               |    2 -
->  kernel/cgroup/cgroup-v1.c      |    2 -
->  kernel/debug/kdb/kdb_support.c |   18 +++++++------
->  kernel/fork.c                  |    4 +--
->  kernel/hung_task.c             |    2 -
->  kernel/kthread.c               |    4 +--
->  kernel/locking/mutex.c         |    6 ++--
->  kernel/locking/rtmutex.c       |    4 +--
->  kernel/locking/rwsem.c         |    2 -
->  kernel/ptrace.c                |   12 ++++-----
->  kernel/rcu/rcutorture.c        |    4 +--
->  kernel/rcu/tree_stall.h        |   12 ++++-----
->  kernel/sched/core.c            |   53 +++++++++++++++++++++--------------------
->  kernel/sched/deadline.c        |   10 +++----
->  kernel/sched/fair.c            |   11 +++++---
->  lib/syscall.c                  |    4 +--
->  net/core/dev.c                 |    2 -
->  24 files changed, 108 insertions(+), 99 deletions(-)
+> Changed from V1
+> 	Use kvm_mmu_unload() instead of KVM_REQ_MMU_RELOAD to avoid
+> 	causing unneeded iteration of vcpu_enter_guest().
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index bbc4e04e67ad..27248e330767 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3072,6 +3072,22 @@ static void kvm_vcpu_flush_tlb_all(struct kvm_vcpu *vcpu)
+>  static void kvm_vcpu_flush_tlb_guest(struct kvm_vcpu *vcpu)
+>  {
+>  	++vcpu->stat.tlb_flush;
+> +
+> +	if (!tdp_enabled) {
+> +		/*
+> +		 * When two dimensional paging is not enabled, the
+> +		 * operation should equal to native_flush_tlb_global()
+> +		 * or invpcid_flush_all() on the guest's behalf via
+> +		 * synchronzing shadow pagetable and flushing.
+> +		 *
+> +		 * kvm_mmu_unload() results consequent kvm_mmu_load()
+> +		 * before entering guest which will do the required
+> +		 * pagetable synchronzing and TLB flushing.
+> +		 */
+> +		kvm_mmu_unload(vcpu);
 
-I think this makes the code a _lot_ easier to understand, so:
+I don't like the full unload, but I suppose the big hammer does make sense for a
+backport since handle_invcpid() and toggling CR4.PGE already nuke everything.  :-/
 
-Acked-by: Will Deacon <will@kernel.org>
-
-on the assumption that you'll fix get_wchan() for !x86 as well.
-
-Cheers,
-
-Will
+> +		return;
+> +	}
+> +
+>  	static_call(kvm_x86_tlb_flush_guest)(vcpu);
+>  }
+>  
+> -- 
+> 2.19.1.6.gb485710b
+> 
