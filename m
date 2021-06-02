@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 54661398D6F
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:48:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8ADD0398D94
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:59:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231416AbhFBOtw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 10:49:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33254 "EHLO mail.kernel.org"
+        id S231542AbhFBPBU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 11:01:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34894 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230092AbhFBOtv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 10:49:51 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0E82261207;
-        Wed,  2 Jun 2021 14:47:58 +0000 (UTC)
+        id S230031AbhFBPBT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 11:01:19 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B95E7613B4;
+        Wed,  2 Jun 2021 14:59:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1622645288;
-        bh=ytbkft451AVHu/sv9O+1yHxWE5QaUUcYpHinzQWGilY=;
+        s=k20201202; t=1622645976;
+        bh=lULBTNw8ShimVVrtBYDbb5vhV5dQ9U6lx3o98b0hW5w=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=oFaPf/EGcp1bqCNSfbPd9OF2xa7o2Ntfin1h55YHUCHihLqUhuRWFALcsjyJqVvu3
-         Y91bwUZOIsEFC/tL7PsAT3NW2pmuCMMri5f6mMQdOP0nuAVKe9SwYQcmWW9WbZ/XpA
-         PoIpRGydGKIhIKVtHhzVu6FV2kTgGYhx9VOZ08mm/nHsF72YOGlYy3Wo5rD1Ycl6VO
-         iEfCLUY4hdvzrtVG3Pt7BekNhlDuUClohcALpyQQ1KVISUxk8dSk+DozQEt+xxMpvZ
-         6oRLbg4A4VBWbNLsQ8t27gcIkpn2wcsBwsMswN4j9Vrag6G0GPb4whAagnddnPqQmz
-         nNoYUZ6ZDqJdQ==
-Date:   Wed, 2 Jun 2021 15:47:55 +0100
+        b=OQiBvXalcmFDhP4VUJkLfFfjUL+AdCowcIIHtwCBDEqTOBmz1OdBU6rrODvuN+9rD
+         mOLZKyuSS6i9EOd55gn+hVr2qB4URf3FK/46utTh8Mh1nd3yfAS9gC2T8qY5RT3IQY
+         b4rlXGea5BqIi+sm9FltOrrnryu0LA5VhApDTgyH63PLiPiZ2y0qibL1ECCDe/bn4n
+         SELGuhZLGN0WPbHVxREPrkTVpEWesEuUbZ+F7OzJ3FIIUPCtX92osJVk5KljY297eg
+         yycYme0OjJHY2hdQ/MWGMhjJv0YWgp66DxbyRygrcbb6F9I+DfNX1xA1IgwfjJU0xb
+         xfBJRIrGQb7lw==
+Date:   Wed, 2 Jun 2021 15:59:21 +0100
 From:   Will Deacon <will@kernel.org>
 To:     Peter Zijlstra <peterz@infradead.org>
 Cc:     Thomas Gleixner <tglx@linutronix.de>,
@@ -73,50 +73,49 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         kgdb-bugreport@lists.sourceforge.net,
         linux-perf-users@vger.kernel.org, linux-pm@vger.kernel.org,
         rcu@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 1/6] sched: Unbreak wakeups
-Message-ID: <20210602144755.GA31179@willie-the-truck>
+Subject: Re: [PATCH 2/6] sched: Introduce task_is_running()
+Message-ID: <20210602145921.GB31179@willie-the-truck>
 References: <20210602131225.336600299@infradead.org>
- <20210602133040.271625424@infradead.org>
+ <20210602133040.334970485@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210602133040.271625424@infradead.org>
+In-Reply-To: <20210602133040.334970485@infradead.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 02, 2021 at 03:12:26PM +0200, Peter Zijlstra wrote:
-> Remove broken task->state references and let wake_up_process() DTRT.
-> 
-> The anti-pattern in these patches breaks the ordering of ->state vs
-> COND as described in the comment near set_current_state() and can lead
-> to missed wakeups:
-> 
-> 	(OoO load, observes RUNNING)<-.
-> 	for (;;) {                    |
-> 	  t->state = UNINTERRUPTIBLE; |
-> 	  smp_mb();          ,-----> ,' (OoO load, observed !COND)
->                              |       |
-> 	                     |       |	COND = 1;
-> 			     |	     `- if (t->state != RUNNING)
->                              |		  wake_up_process(t); // not done
-> 	  if (COND) ---------'
-> 	    break;
-> 	  schedule(); // forever waiting
-> 	}
-> 	t->state = TASK_RUNNING;
+On Wed, Jun 02, 2021 at 03:12:27PM +0200, Peter Zijlstra wrote:
+> Replace a bunch of 'p->state == TASK_RUNNING' with a new helper:
+> task_is_running(p).
 > 
 > Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 > ---
->  drivers/net/ethernet/qualcomm/qca_spi.c |    6 ++----
->  drivers/usb/gadget/udc/max3420_udc.c    |   15 +++++----------
->  drivers/usb/host/max3421-hcd.c          |    3 +--
->  kernel/softirq.c                        |    2 +-
->  4 files changed, 9 insertions(+), 17 deletions(-)
+>  arch/x86/kernel/process.c |    4 ++--
+>  block/blk-mq.c            |    2 +-
+>  include/linux/sched.h     |    2 ++
+>  kernel/locking/lockdep.c  |    2 +-
+>  kernel/rcu/tree_plugin.h  |    2 +-
+>  kernel/sched/core.c       |    6 +++---
+>  kernel/sched/stats.h      |    2 +-
+>  kernel/signal.c           |    2 +-
+>  kernel/softirq.c          |    3 +--
+>  mm/compaction.c           |    2 +-
+>  10 files changed, 14 insertions(+), 13 deletions(-)
+> 
+> --- a/arch/x86/kernel/process.c
+> +++ b/arch/x86/kernel/process.c
+> @@ -931,7 +931,7 @@ unsigned long get_wchan(struct task_stru
+>  	unsigned long start, bottom, top, sp, fp, ip, ret = 0;
+>  	int count = 0;
+>  
+> -	if (p == current || p->state == TASK_RUNNING)
+> +	if (p == current || task_is_running(p))
 
-Acked-by: Will Deacon <will@kernel.org>
+Looks like this one in get_wchan() has been cargo-culted across most of
+arch/ so they'll need fixing up before you rename the struct member.
 
-I couldn't spot any others.
+There's also a weird one in tools/bpf/runqslower/runqslower.bpf.c (!)
 
 Will
