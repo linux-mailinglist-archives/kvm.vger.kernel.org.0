@@ -2,180 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A229399652
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 01:24:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FADF39965C
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 01:28:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229906AbhFBXZy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 19:25:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57215 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229626AbhFBXZv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Jun 2021 19:25:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622676247;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=32yapjM7P2WKlGgXTw+cmudjE2tHbVURPSGd4GZ1TRs=;
-        b=J3VdWDFw0OL+Oq/ywe04xT/wdFtwGvfmEgODzEFjUomO7UBsV+Yrf+wCK0e1MU9rikxNHe
-        l6h9jYG/L3l1HwhYRTy3X6hmK4KiPDOW+7Pi9QvmniakoMObYM+eW7HtjqdbvyuQqP4sr2
-        ZisQ3GMZ6IeoMLk8BcJ9rC2s8S9ujC4=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-531-2YiF1Q6DOmKeyw94KIjFxQ-1; Wed, 02 Jun 2021 19:24:06 -0400
-X-MC-Unique: 2YiF1Q6DOmKeyw94KIjFxQ-1
-Received: by mail-ed1-f70.google.com with SMTP id x8-20020aa7d3880000b029038fe468f5f4so2253176edq.10
-        for <kvm@vger.kernel.org>; Wed, 02 Jun 2021 16:24:06 -0700 (PDT)
+        id S229849AbhFBX3o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 19:29:44 -0400
+Received: from mail-pg1-f179.google.com ([209.85.215.179]:46952 "EHLO
+        mail-pg1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229626AbhFBX3n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 19:29:43 -0400
+Received: by mail-pg1-f179.google.com with SMTP id n12so3579678pgs.13
+        for <kvm@vger.kernel.org>; Wed, 02 Jun 2021 16:27:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=qVLg4Q35iCp+LlhdPI9P9bXpg6OFtieobQceA0Gb/Xk=;
+        b=htyn0vTZfw8IfuHoWZd5HiZ+suevAlDWCSkhs+BOEVeTFRufexfOiwfuxvpNaCtwuZ
+         byqWD32hXz49RAK9QxzCF8WjQevSGmkmcx8I10QW2eyIk96oJsKZ5D7z76hRfo3wz7HI
+         1Yo8K0oN+IJPB28T8p7kpxiDEcdwfLlP/N5xC+zMro9P9pJRH4AyRfuveOjPvdH33XGG
+         Z3FZB8AkluzJC0xivxo5TRqN9GTxqlSH6FuHnkNLIc2xFhTenZo4+dimh+OJsvJ0dm1h
+         z9XTytYXbExNzWv0Gb56M4irnma4K6JjGsy9CCnYV8FMpiEPcYfR2kMB2ObPujM1hiJc
+         D9Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=32yapjM7P2WKlGgXTw+cmudjE2tHbVURPSGd4GZ1TRs=;
-        b=lEGLfuXomlFL1jb8jZ3r/f3Uv291IjdUgxWGyqDvaduvChJHrzj9mtSDFwZycKZSD3
-         iwIVQAyE40zDQa3DdANyquhNzRd9L6CgrpVodF0oZfHqkdnd58c2pG1jRDI7S6z/6qPV
-         U04y547BB5LsniP8Zpzhcxa9XSvVtvBOMOwdzVB2nrZFM0qsaePH3SJSxakbsLugwrGB
-         BexmgBBGed3iJwItffgdc0pms/ezNZoipREZMAsORPEZHqpYWfktlRK/bvMTCfxx9WXO
-         fzuncNVcv53FEBbWlil4PQnRHjDGqWM/4d6s9UldXV4UB8t7CMdo1A2WV2wIxA+0ah6S
-         lSnQ==
-X-Gm-Message-State: AOAM533b1RxrkymbdDrblry85FXrsx6wy3LHe6EDU2Fb4czD8CJ3XaPa
-        x11FXSq/u7Wu9bie6VpRFco8qdG+VvyltAW+4peJlinBA0QduYBn3loIaI5boeSA3Ylyhp/n6un
-        U5ebtL6KRk2ZM
-X-Received: by 2002:a17:906:6c88:: with SMTP id s8mr10970068ejr.129.1622676244496;
-        Wed, 02 Jun 2021 16:24:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwEBz6BrPcvbQgWkbTtc7tntpee6QnsimtFGcGxwdyc60NnAEn6IvC0i7FqK1ccayc+NGrvpQ==
-X-Received: by 2002:a17:906:6c88:: with SMTP id s8mr10970059ejr.129.1622676244290;
-        Wed, 02 Jun 2021 16:24:04 -0700 (PDT)
-Received: from [192.168.1.36] (235.red-83-57-168.dynamicip.rima-tde.net. [83.57.168.235])
-        by smtp.gmail.com with ESMTPSA id r1sm724495edp.90.2021.06.02.16.24.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Jun 2021 16:24:03 -0700 (PDT)
-Subject: Re: [PATCH v8] qapi: introduce 'query-kvm-cpuid' action
-To:     Eduardo Habkost <ehabkost@redhat.com>
-Cc:     Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
-        qemu-devel@nongnu.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Eric Blake <eblake@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
-        Denis Lunev <den@openvz.org>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20210531123806.23030-1-valeriy.vdovin@virtuozzo.com>
- <266974fa-da6c-d0fc-ce12-6a7ce1752fa6@redhat.com>
- <20210602204604.crsxvqixkkll4ef4@habkost.net>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <4e53e323-076c-da89-4239-cb15df8de210@redhat.com>
-Date:   Thu, 3 Jun 2021 01:24:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=qVLg4Q35iCp+LlhdPI9P9bXpg6OFtieobQceA0Gb/Xk=;
+        b=p0rjNW803KMtvmjdmC2R/ZFohg+jKaK70zhOjUGKxbjluZrg0o5LQfJTNUiUM7YoAS
+         69QvQdiNZGJDWYQbVvT86pZ71Gr6GrglNc3GsPgsYVnrYhVyWRZI5UY4nFXx0N74xD4p
+         sTZTfHGjeCaUFJgZbZC6dPsaasB5Zexu2infPOdJ+whBu3bwv8rPt5ftk57o9xsG+xnh
+         JiQlzBIlT4QPBPm+7kjJR8OqIrjBuj0/2Ln2QmWWKaPSffKk39neDITpRkdiL3nOStsh
+         awn5fmSnvfXJvNYeAbJbxd4qUnvTZRyROWGNwyXDEgVKeN/TzbTXXbi4/cQIlx6JvN6k
+         zPbg==
+X-Gm-Message-State: AOAM532R7SnUXZAIoQWOmhlerpaeopqZ+DjSbB1Z+8cqUsDS2ts6dTbd
+        cHP3j/+Gw6JpHDF7GySt4StG0g==
+X-Google-Smtp-Source: ABdhPJyFKVnJ0duxYPD4Y/Doon1B87bwqj4O5vlJHiiZBYmVCJxx+kLmIYEwIt97YKOsGmDPZN6lMA==
+X-Received: by 2002:a63:f815:: with SMTP id n21mr37018823pgh.2.1622676415852;
+        Wed, 02 Jun 2021 16:26:55 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id o10sm536969pfh.67.2021.06.02.16.26.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jun 2021 16:26:55 -0700 (PDT)
+Date:   Wed, 2 Jun 2021 16:26:51 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org,
+        eric.auger@redhat.com, alexandru.elisei@arm.com,
+        pbonzini@redhat.com
+Subject: Re: [PATCH v3 5/5] KVM: arm64: selftests: get-reg-list: Split base
+ and pmu registers
+Message-ID: <YLgTu4EEnwfrtHSo@google.com>
+References: <20210531103344.29325-1-drjones@redhat.com>
+ <20210531103344.29325-6-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210602204604.crsxvqixkkll4ef4@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210531103344.29325-6-drjones@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/2/21 10:46 PM, Eduardo Habkost wrote:
-> On Wed, Jun 02, 2021 at 08:17:28PM +0200, Philippe Mathieu-Daudé wrote:
->> Hi Valeriy,
->>
->> (Sorry for not looking earlier than v8)
->>
->> On 5/31/21 2:38 PM, Valeriy Vdovin wrote:
->>> Introducing new qapi method 'query-kvm-cpuid'. This method can be used to
->>> get virtualized cpu model info generated by QEMU during VM initialization in
->>> the form of cpuid representation.
->>>
->>> Diving into more details about virtual cpu generation: QEMU first parses '-cpu'
->>> command line option. From there it takes the name of the model as the basis for
->>> feature set of the new virtual cpu. After that it uses trailing '-cpu' options,
->>> that state if additional cpu features should be present on the virtual cpu or
->>> excluded from it (tokens '+'/'-' or '=on'/'=off').
->>> After that QEMU checks if the host's cpu can actually support the derived
->>> feature set and applies host limitations to it.
->>> After this initialization procedure, virtual cpu has it's model and
->>> vendor names, and a working feature set and is ready for identification
->>> instructions such as CPUID.
->>>
->>> Currently full output for this method is only supported for x86 cpus.
->>>
->>> To learn exactly how virtual cpu is presented to the guest machine via CPUID
->>> instruction, new qapi method can be used. By calling 'query-kvm-cpuid'
->>> method, one can get a full listing of all CPUID leafs with subleafs which are
->>> supported by the initialized virtual cpu.
->>>
->>> Other than debug, the method is useful in cases when we would like to
->>> utilize QEMU's virtual cpu initialization routines and put the retrieved
->>> values into kernel CPUID overriding mechanics for more precise control
->>> over how various processes perceive its underlying hardware with
->>> container processes as a good example.
->>>
->>> Output format:
->>> The output is a plain list of leaf/subleaf agrument combinations, that
->>> return 4 words in registers EAX, EBX, ECX, EDX.
->>>
->>> Use example:
->>> qmp_request: {
->>>   "execute": "query-kvm-cpuid"
->>> }
->>>
->>> qmp_response: [
->>>   {
->>>     "eax": 1073741825,
->>>     "edx": 77,
->>>     "in_eax": 1073741824,
->>>     "ecx": 1447775574,
->>>     "ebx": 1263359563,
->>>   },
->>>   {
->>>     "eax": 16777339,
->>>     "edx": 0,
->>>     "in_eax": 1073741825,
->>>     "ecx": 0,
->>>     "ebx": 0,
->>>   },
->>>   {
->>>     "eax": 13,
->>>     "edx": 1231384169,
->>>     "in_eax": 0,
->>>     "ecx": 1818588270,
->>>     "ebx": 1970169159,
->>>   },
->>>   {
->>>     "eax": 198354,
->>>     "edx": 126614527,
->>>   ....
->>>
->>> Signed-off-by: Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
-
->>> +##
->>> +# @query-kvm-cpuid:
->>> +#
->>> +# Returns raw data from the KVM CPUID table for the first VCPU.
->>> +# The KVM CPUID table defines the response to the CPUID
->>> +# instruction when executed by the guest operating system.
->>
->> What is specific to KVM here?
->>
->> What about 'query-accel-cpuid' or 'query-vm-cpu-id'?
+On Mon, May 31, 2021 at 12:33:44PM +0200, Andrew Jones wrote:
+> Since KVM commit 11663111cd49 ("KVM: arm64: Hide PMU registers from
+> userspace when not available") the get-reg-list* tests have been
+> failing with
 > 
-> The implementation is KVM-specific.  I believe it's a reasonable
-> compromise because the implementation is trivial, and a raw copy
-> of the KVM CPUID table makes it a more useful (KVM-specific)
-> debugging/testing mechanism.
+>   ...
+>   ... There are 74 missing registers.
+>   The following lines are missing registers:
+>   ...
 > 
-> I don't really mind how the command is called, but I would prefer
-> to add a more complex abstraction only if maintainers of other
-> accelerators are interested and volunteer to provide similar
-> functionality.  I don't want to introduce complexity for use
-> cases that may not even exist.
+> where the 74 missing registers are all PMU registers. This isn't a
+> bug in KVM that the selftest found, even though it's true that a
+> KVM userspace that wasn't setting the KVM_ARM_VCPU_PMU_V3 VCPU
+> flag, but still expecting the PMU registers to be in the reg-list,
+> would suddenly no longer have their expectations met. In that case,
+> the expectations were wrong, though, so that KVM userspace needs to
+> be fixed, and so does this selftest. The fix for this selftest is to
+> pull the PMU registers out of the base register sublist into their
+> own sublist and then create new, pmu-enabled vcpu configs which can
+> be tested.
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
 
-Fine, fair enough.
+Reviewed-by: Ricardo Koller <ricarkol@google.com>
 
+> ---
+>  .../selftests/kvm/aarch64/get-reg-list.c      | 39 +++++++++++++++----
+>  1 file changed, 31 insertions(+), 8 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> index b46b8a1fdc0c..a16c8f05366c 100644
+> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> @@ -637,7 +637,7 @@ int main(int ac, char **av)
+>   * The current blessed list was primed with the output of kernel version
+>   * v4.15 with --core-reg-fixup and then later updated with new registers.
+>   *
+> - * The blessed list is up to date with kernel version v5.10-rc5
+> + * The blessed list is up to date with kernel version v5.13-rc3
+>   */
+>  static __u64 base_regs[] = {
+>  	KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(regs.regs[0]),
+> @@ -829,8 +829,6 @@ static __u64 base_regs[] = {
+>  	ARM64_SYS_REG(3, 0, 5, 2, 0),	/* ESR_EL1 */
+>  	ARM64_SYS_REG(3, 0, 6, 0, 0),	/* FAR_EL1 */
+>  	ARM64_SYS_REG(3, 0, 7, 4, 0),	/* PAR_EL1 */
+> -	ARM64_SYS_REG(3, 0, 9, 14, 1),	/* PMINTENSET_EL1 */
+> -	ARM64_SYS_REG(3, 0, 9, 14, 2),	/* PMINTENCLR_EL1 */
+>  	ARM64_SYS_REG(3, 0, 10, 2, 0),	/* MAIR_EL1 */
+>  	ARM64_SYS_REG(3, 0, 10, 3, 0),	/* AMAIR_EL1 */
+>  	ARM64_SYS_REG(3, 0, 12, 0, 0),	/* VBAR_EL1 */
+> @@ -839,6 +837,16 @@ static __u64 base_regs[] = {
+>  	ARM64_SYS_REG(3, 0, 13, 0, 4),	/* TPIDR_EL1 */
+>  	ARM64_SYS_REG(3, 0, 14, 1, 0),	/* CNTKCTL_EL1 */
+>  	ARM64_SYS_REG(3, 2, 0, 0, 0),	/* CSSELR_EL1 */
+> +	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
+> +	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
+> +	ARM64_SYS_REG(3, 4, 3, 0, 0),	/* DACR32_EL2 */
+> +	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
+> +	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
+> +};
+> +
+> +static __u64 pmu_regs[] = {
+> +	ARM64_SYS_REG(3, 0, 9, 14, 1),	/* PMINTENSET_EL1 */
+> +	ARM64_SYS_REG(3, 0, 9, 14, 2),	/* PMINTENCLR_EL1 */
+>  	ARM64_SYS_REG(3, 3, 9, 12, 0),	/* PMCR_EL0 */
+>  	ARM64_SYS_REG(3, 3, 9, 12, 1),	/* PMCNTENSET_EL0 */
+>  	ARM64_SYS_REG(3, 3, 9, 12, 2),	/* PMCNTENCLR_EL0 */
+> @@ -848,8 +856,6 @@ static __u64 base_regs[] = {
+>  	ARM64_SYS_REG(3, 3, 9, 13, 0),	/* PMCCNTR_EL0 */
+>  	ARM64_SYS_REG(3, 3, 9, 14, 0),	/* PMUSERENR_EL0 */
+>  	ARM64_SYS_REG(3, 3, 9, 14, 3),	/* PMOVSSET_EL0 */
+> -	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
+> -	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
+>  	ARM64_SYS_REG(3, 3, 14, 8, 0),
+>  	ARM64_SYS_REG(3, 3, 14, 8, 1),
+>  	ARM64_SYS_REG(3, 3, 14, 8, 2),
+> @@ -913,9 +919,6 @@ static __u64 base_regs[] = {
+>  	ARM64_SYS_REG(3, 3, 14, 15, 5),
+>  	ARM64_SYS_REG(3, 3, 14, 15, 6),
+>  	ARM64_SYS_REG(3, 3, 14, 15, 7),	/* PMCCFILTR_EL0 */
+> -	ARM64_SYS_REG(3, 4, 3, 0, 0),	/* DACR32_EL2 */
+> -	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
+> -	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
+>  };
+>  
+>  static __u64 vregs[] = {
+> @@ -1015,6 +1018,8 @@ static __u64 sve_rejects_set[] = {
+>  	{ "base", .regs = base_regs, .regs_n = ARRAY_SIZE(base_regs), }
+>  #define VREGS_SUBLIST \
+>  	{ "vregs", .regs = vregs, .regs_n = ARRAY_SIZE(vregs), }
+> +#define PMU_SUBLIST \
+> +	{ "pmu", .regs = pmu_regs, .regs_n = ARRAY_SIZE(pmu_regs), }
+>  #define SVE_SUBLIST \
+>  	{ "sve", .capability = KVM_CAP_ARM_SVE, .feature = KVM_ARM_VCPU_SVE, .finalize = true, \
+>  	  .regs = sve_regs, .regs_n = ARRAY_SIZE(sve_regs), \
+> @@ -1027,6 +1032,14 @@ static struct vcpu_config vregs_config = {
+>  	{0},
+>  	},
+>  };
+> +static struct vcpu_config vregs_pmu_config = {
+> +	.sublists = {
+> +	BASE_SUBLIST,
+> +	VREGS_SUBLIST,
+> +	PMU_SUBLIST,
+> +	{0},
+> +	},
+> +};
+>  static struct vcpu_config sve_config = {
+>  	.sublists = {
+>  	BASE_SUBLIST,
+> @@ -1034,9 +1047,19 @@ static struct vcpu_config sve_config = {
+>  	{0},
+>  	},
+>  };
+> +static struct vcpu_config sve_pmu_config = {
+> +	.sublists = {
+> +	BASE_SUBLIST,
+> +	SVE_SUBLIST,
+> +	PMU_SUBLIST,
+> +	{0},
+> +	},
+> +};
+>  
+>  static struct vcpu_config *vcpu_configs[] = {
+>  	&vregs_config,
+> +	&vregs_pmu_config,
+>  	&sve_config,
+> +	&sve_pmu_config,
+>  };
+>  static int vcpu_configs_n = ARRAY_SIZE(vcpu_configs);
+> -- 
+> 2.31.1
+> 
