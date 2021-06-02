@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E755C398B41
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 15:59:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8517398B4D
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:01:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230037AbhFBOAy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 10:00:54 -0400
-Received: from mail.efficios.com ([167.114.26.124]:35192 "EHLO
+        id S229938AbhFBODP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 10:03:15 -0400
+Received: from mail.efficios.com ([167.114.26.124]:36082 "EHLO
         mail.efficios.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230029AbhFBOAw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 10:00:52 -0400
+        with ESMTP id S229719AbhFBODO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 10:03:14 -0400
 Received: from localhost (localhost [127.0.0.1])
-        by mail.efficios.com (Postfix) with ESMTP id 0BB63302B2C;
-        Wed,  2 Jun 2021 09:59:09 -0400 (EDT)
+        by mail.efficios.com (Postfix) with ESMTP id 805643029EA;
+        Wed,  2 Jun 2021 10:01:30 -0400 (EDT)
 Received: from mail.efficios.com ([127.0.0.1])
         by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id zle7ixm03a6t; Wed,  2 Jun 2021 09:59:08 -0400 (EDT)
+        with ESMTP id 5aXZqKFUnM5u; Wed,  2 Jun 2021 10:01:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
-        by mail.efficios.com (Postfix) with ESMTP id 3623D302779;
-        Wed,  2 Jun 2021 09:59:08 -0400 (EDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.efficios.com 3623D302779
+        by mail.efficios.com (Postfix) with ESMTP id 78F88302B31;
+        Wed,  2 Jun 2021 10:01:29 -0400 (EDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.efficios.com 78F88302B31
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=efficios.com;
-        s=default; t=1622642348;
-        bh=3NQkpeJ7B+hKtKJgR6oI37w8WcTETaBafQ5/DPMEWwI=;
+        s=default; t=1622642489;
+        bh=ildkMTk0vYSZK39yeI6C0NluRoGntZ1yA5EuqMA4g8k=;
         h=Date:From:To:Message-ID:MIME-Version;
-        b=ZlLvrNpb7FSQdBC5tIEKb93seCOYMQlGgXqNDCt4mx931pzNw8PkQPGTIAknvIKON
-         NpDSBJXZebM5bdDBEXJUhkVKv214RxCfD9cnMAu+E9jlJUbxCT0sSH9pfYpV4sduq4
-         x3/Ha4HOzhfJ5u6uVpyJg0D3SZEpnzu++L3CaXS5k4TUIGuZ+VTcOcX9C3+gYxGHL4
-         vP87muDZtj763iw70P68DkCsJf/o77PvwVPhmezDZ6qbVfVNe7D4w95pMohMEmylCc
-         wLPLpR4HOsL54+3PlAjOEK3N1Uw5WtMxdLnoo8ef/7RMfiFuOK3kBtQodyzCCa6QyK
-         u+WAXvtkoLOCw==
+        b=L/w8o2fJN3kmP73a2vMCtFWwO5YPeIOe9ZmTydEyFWmyEaOlcyFybIdRWoe8hmy34
+         bHqWF5FDpTTdDr9jNR/6ossgQUg8/lo1uSvmOEMQI+8PvcMWXQjFHlESOaJErckXTB
+         oIuIBEBiJQ9FvKa8qYSLXZLHpWnciBfTelSzOSmbORnUr52zBvJXfWQpx94UqNlbmY
+         Y6yF4/4xX5ToklNVtEYeJ+rmH/TXxAzWx0JJ6vQD3FMua0nJmkIgpXS7yGiTDiDM65
+         T6y687zdG38LDyLZ4Slpb06ysgcGN+OXRe4bfPmRBCeqmhnbNwAWPu5258Lpn1Ta7C
+         10t9Cfwl8X+bQ==
 X-Virus-Scanned: amavisd-new at efficios.com
 Received: from mail.efficios.com ([127.0.0.1])
         by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id sGHjL0HFYOjb; Wed,  2 Jun 2021 09:59:08 -0400 (EDT)
+        with ESMTP id 6Pg28DJCgmhR; Wed,  2 Jun 2021 10:01:29 -0400 (EDT)
 Received: from mail03.efficios.com (mail03.efficios.com [167.114.26.124])
-        by mail.efficios.com (Postfix) with ESMTP id 00C463028D6;
-        Wed,  2 Jun 2021 09:59:08 -0400 (EDT)
-Date:   Wed, 2 Jun 2021 09:59:07 -0400 (EDT)
+        by mail.efficios.com (Postfix) with ESMTP id 44D173029E9;
+        Wed,  2 Jun 2021 10:01:29 -0400 (EDT)
+Date:   Wed, 2 Jun 2021 10:01:29 -0400 (EDT)
 From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
 To:     Peter Zijlstra <peterz@infradead.org>
 Cc:     Thomas Gleixner <tglx@linutronix.de>,
@@ -51,7 +51,8 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Borislav Petkov <bp@alien8.de>, x86 <x86@kernel.org>,
         "H. Peter Anvin" <hpa@zytor.com>, Jens Axboe <axboe@kernel.dk>,
         Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Mike Snitzer <snitzer@redhat.com>,
+        dm-devel <dm-devel@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Felipe Balbi <balbi@kernel.org>,
@@ -81,84 +82,50 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Andrew Morton <akpm@linux-foundation.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org, netdev <netdev@vger.kernel.org>,
-        linux-usb@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        linux-usb <linux-usb@vger.kernel.org>,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         cgroups <cgroups@vger.kernel.org>,
-        kgdb-bugreport@lists.sourceforge.net,
-        linux-perf-users@vger.kernel.org, linux-pm@vger.kernel.org,
-        rcu <rcu@vger.kernel.org>, linux-mm <linux-mm@kvack.org>,
-        KVM list <kvm@vger.kernel.org>
-Message-ID: <1873020549.5854.1622642347895.JavaMail.zimbra@efficios.com>
-In-Reply-To: <20210602133040.398289363@infradead.org>
-References: <20210602131225.336600299@infradead.org> <20210602133040.398289363@infradead.org>
-Subject: Re: [PATCH 3/6] sched,perf,kvm: Fix preemption condition
+        kgdb-bugreport <kgdb-bugreport@lists.sourceforge.net>,
+        linux-perf-users <linux-perf-users@vger.kernel.org>,
+        linux-pm <linux-pm@vger.kernel.org>, rcu <rcu@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>, KVM list <kvm@vger.kernel.org>
+Message-ID: <1731339790.5856.1622642489232.JavaMail.zimbra@efficios.com>
+In-Reply-To: <20210602133040.461908001@infradead.org>
+References: <20210602131225.336600299@infradead.org> <20210602133040.461908001@infradead.org>
+Subject: Re: [PATCH 4/6] sched: Add get_current_state()
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [167.114.26.124]
 X-Mailer: Zimbra 8.8.15_GA_4018 (ZimbraWebClient - FF88 (Linux)/8.8.15_GA_4026)
-Thread-Topic: sched,perf,kvm: Fix preemption condition
-Thread-Index: r+iuleOU2QevO+uazLhH122pXkMx7g==
+Thread-Topic: sched: Add get_current_state()
+Thread-Index: E1ntXBdpTHBBRaSFxkm2wa7EtTrnhg==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 ----- On Jun 2, 2021, at 9:12 AM, Peter Zijlstra peterz@infradead.org wrote:
 
-> When ran from the sched-out path (preempt_notifier or perf_event),
-> p->state is irrelevant to determine preemption. You can get preempted
-> with !task_is_running() just fine.
-> 
-> The right indicator for preemption is if the task is still on the
-> runqueue in the sched-out path.
-> 
-> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> ---
-> kernel/events/core.c |    7 +++----
-> virt/kvm/kvm_main.c  |    2 +-
-> 2 files changed, 4 insertions(+), 5 deletions(-)
-> 
-> --- a/kernel/events/core.c
-> +++ b/kernel/events/core.c
-> @@ -8568,13 +8568,12 @@ static void perf_event_switch(struct tas
-> 		},
-> 	};
-> 
-> -	if (!sched_in && task->state == TASK_RUNNING)
-> +	if (!sched_in && current->on_rq) {
+> Remove yet another few p->state accesses.
 
-This changes from checking task->state to current->on_rq, but this change
-from "task" to "current" is not described in the commit message, which is odd.
+[...]
 
-Are we really sure that task == current here ?
+> 
+> --- a/include/linux/sched.h
+> +++ b/include/linux/sched.h
+> @@ -212,6 +212,8 @@ struct task_group;
+> 
+> #endif
+> 
+> +#define get_current_state()	READ_ONCE(current->state)
+
+Why use a macro rather than a static inline here ?
 
 Thanks,
 
 Mathieu
-
-> 		switch_event.event_id.header.misc |=
-> 				PERF_RECORD_MISC_SWITCH_OUT_PREEMPT;
-> +	}
-> 
-> -	perf_iterate_sb(perf_event_switch_output,
-> -		       &switch_event,
-> -		       NULL);
-> +	perf_iterate_sb(perf_event_switch_output, &switch_event, NULL);
-> }
-> 
-> /*
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -4869,7 +4869,7 @@ static void kvm_sched_out(struct preempt
-> {
-> 	struct kvm_vcpu *vcpu = preempt_notifier_to_vcpu(pn);
-> 
-> -	if (current->state == TASK_RUNNING) {
-> +	if (current->on_rq) {
-> 		WRITE_ONCE(vcpu->preempted, true);
-> 		WRITE_ONCE(vcpu->ready, true);
->  	}
 
 -- 
 Mathieu Desnoyers
