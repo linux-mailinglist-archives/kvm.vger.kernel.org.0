@@ -2,91 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A8AF539840B
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 10:26:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97F37398462
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 10:39:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229754AbhFBI1k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 04:27:40 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:47988 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232553AbhFBI1k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 04:27:40 -0400
-Received: from mail-pj1-f69.google.com ([209.85.216.69])
-        by youngberry.canonical.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <po-hsu.lin@canonical.com>)
-        id 1loMCK-00074h-IR
-        for kvm@vger.kernel.org; Wed, 02 Jun 2021 08:25:56 +0000
-Received: by mail-pj1-f69.google.com with SMTP id j8-20020a17090a8408b02901651fe80217so1010669pjn.1
-        for <kvm@vger.kernel.org>; Wed, 02 Jun 2021 01:25:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=xbQcGiodPWh6gOeS43hcB6RdC+/EN+hEVrh9/5lw9BA=;
-        b=bULKexXwbK5DNrxIXJ4PEB2HuHy4ZlKgzGjtw/ZJo20mGUXBtqa5b/kZ1eVR34p1Zq
-         f6iXDlcYhu0oARrYXjR8XpxEFNYX4/Mu3XFEE5GfFTbxUad6JN2sGVBnSWty1iPEvbIP
-         KcEC8Au5vGF3ascRsoCK9WoEDE6URlEaSFxYS4HO96kxE8gRPZC9SVJzb17B+x8OJmur
-         LQlCNM6JKyee71RP00nT5f6QMzSdojzPthhHcXF/CalOVLc29xa2oFv4n/njRP2nMxgG
-         9cCaVEi6yXjBDctgBWj/iRZ4gtnbTaRXj26AVTcbSiM7nvw1x16K85bnHIn86wJS5smj
-         qZqQ==
-X-Gm-Message-State: AOAM533K+WD4OPwo2cDPY7roz4/5vx/LspKfJFHQR/LOGBj5HAupKMhg
-        bLlnTnqOw3WZ6Lk1y5ZyYR+jHAeTot4UOgIPiCRtWljPVIrI+3Q8qEZTPa0ZgYXOoPcRA5D7y9V
-        xiqpfeSwkXeBSx/EtJtu9Lrx82MMY
-X-Received: by 2002:a63:e64b:: with SMTP id p11mr6991368pgj.25.1622622355300;
-        Wed, 02 Jun 2021 01:25:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw1Xk3ivnQ2s1hesuZz9dgJxyx/v0DNQ4qR29fUNc4ubXtj7yGZBkuRuLkq9LZiCVUZnSZaDw==
-X-Received: by 2002:a63:e64b:: with SMTP id p11mr6991352pgj.25.1622622355041;
-        Wed, 02 Jun 2021 01:25:55 -0700 (PDT)
-Received: from localhost.localdomain (223-136-96-51.emome-ip.hinet.net. [223.136.96.51])
-        by smtp.gmail.com with ESMTPSA id t1sm15118388pjo.33.2021.06.02.01.25.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jun 2021 01:25:54 -0700 (PDT)
-From:   Po-Hsu Lin <po-hsu.lin@canonical.com>
-To:     kvm@vger.kernel.org
-Cc:     drjones@redhat.com, po-hsu.lin@canonical.com, pbonzini@redhat.com,
-        thuth@redhat.com
-Subject: [kvm-unit-tests PATCH] compiler: use __builtin_add_overflow_p for gcc >= 7.1.0
-Date:   Wed,  2 Jun 2021 16:24:43 +0800
-Message-Id: <20210602082443.20252-1-po-hsu.lin@canonical.com>
-X-Mailer: git-send-email 2.25.1
+        id S232705AbhFBIlL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 04:41:11 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:60309 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232663AbhFBIlK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 04:41:10 -0400
+Received: from [192.168.1.155] ([95.114.42.59]) by mrelayeu.kundenserver.de
+ (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1MFsAJ-1lbUtk1PzT-00HQ57; Wed, 02 Jun 2021 10:38:55 +0200
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+To:     Parav Pandit <parav@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Alex Williamson (alex.williamson@redhat.com)" 
+        <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc:     Eric Auger <eric.auger@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Robin Murphy <robin.murphy@arm.com>
+References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <PH0PR12MB5481C1B2249615257A461EEDDC3F9@PH0PR12MB5481.namprd12.prod.outlook.com>
+From:   "Enrico Weigelt, metux IT consult" <lkml@metux.net>
+Message-ID: <06892e6a-02c9-6c25-84eb-6a4b2177b48d@metux.net>
+Date:   Wed, 2 Jun 2021 10:38:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <PH0PR12MB5481C1B2249615257A461EEDDC3F9@PH0PR12MB5481.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: tl
 Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:l+r3sN5SfjQDzPJscBIPShHltDwqwPcayg5WV/CYRoSgPIqQpVf
+ nypmndPm+Xcga8629Rm3atqfOUY4jtIpCRBkSvl3tL9FdJLtVCs2fkgZOVCMoIk+e6poH6N
+ Lr1tS/QP3jPWg8oSFFvv1qUsaZfJobcxa3TkLpasX1rJQr+iKvnAf+so6R+0G298HvJhAsJ
+ ckCAZxKX77S/iFXJir6Vg==
+X-Spam-Flag: NO
+X-UI-Out-Filterresults: notjunk:1;V03:K0:9QK8tjMINWQ=:W2FJjeVB+RAwhnh4xrLNDf
+ WvktQrxYIXErcpfmwKotIsgYXO0C22lPSrzEErm6UdeH0xpW1KHDoS9pId8CXpLUdyHpactFE
+ E2pP1xG8D9bFDaulLLucajREXeayDRyct24u9v9I03HKY/nKR5lsp/zisZQodIh3F3S65iZBN
+ nvjeergISyU9JJi9VQy6wcSzDh/YHWqkAyNtr9Vw/rEEHzWUA+LrJcvpT4YZULTjqvh+VfG5G
+ l/5EBuVMUQZls0dtnoypFxp1Bk7Oi/cqwDZUe40JaZL3XOVTzRMX8RJeYgY1Cyhul4/uExXoo
+ Gr4YeVY9lleA7Fk9cDrS4wEQkFGL3T0bgjtjKiCqx3nVG9Z7Q1hyhPJ8QKOsSYKaA5QbdAip3
+ MIMqNC8bktJHQNNs6aFxc8R+KYKzSUd/3gQtsODbqIxASa9WXxQk4ezurd0pQKiZseaYL1toS
+ W+CMqlYweNttLAeS7+q1iuILjK+iKpVcz5Jm/g7J9TG7I8/mDmEt3jMp/4Y4RcJiOfyCvrZN8
+ EBOzJFhZ1vkMWMC5LScSrs=
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Compilation on Ubuntu Xenial 4.4.0-210-generic i386 with gcc version 5.4.0
-20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.12) will fail with:
-  lib/linux/compiler.h:37:34: error: implicit declaration of function
-    ‘__builtin_add_overflow_p’ [-Werror=implicit-function-declaration]
+On 31.05.21 19:37, Parav Pandit wrote:
 
-From the GCC document[1] it looks like this built-in function was only
-introduced since 7.1.0
+> It appears that this is only to make map ioctl faster apart from accounting.
+> It doesn't have any ioasid handle input either.
+> 
+> In that case, can it be a new system call? Why does it have to be under /dev/ioasid?
+> For example few years back such system call mpin() thought was proposed in [1].
 
-This can be fixed by simply changing the version check from 5.1.0 to 7.1.0
+I'm very reluctant to more syscall inflation. We already have lots of
+syscalls that could have been easily done via devices or filesystems
+(yes, some of them are just old Unix relics).
 
-[1] https://gcc.gnu.org/onlinedocs/gcc-7.1.0/gcc/Integer-Overflow-Builtins.html
+Syscalls don't play well w/ modules, containers, distributed systems,
+etc, and need extra low-level code for most non-C languages (eg.
+scripting languages).
 
-Signed-off-by: Po-Hsu Lin <po-hsu.lin@canonical.com>
----
- lib/linux/compiler.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/lib/linux/compiler.h b/lib/linux/compiler.h
-index 745792a..5d9552a 100644
---- a/lib/linux/compiler.h
-+++ b/lib/linux/compiler.h
-@@ -30,7 +30,7 @@
- 	__builtin_mul_overflow(a, b, &__d);		\
- })
- #endif
--#elif GCC_VERSION >= 50100
-+#elif GCC_VERSION >= 70100
- #define COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW 1
- #define check_add_overflow(a, b) __builtin_add_overflow_p(a, b, (typeof((a) + (b)))0)
- #define check_sub_overflow(a, b) __builtin_add_overflow_p(a, b, (typeof((a) - (b)))0)
+--mtx
+
 -- 
-2.25.1
-
+---
+Hinweis: unverschlüsselte E-Mails können leicht abgehört und manipuliert
+werden ! Für eine vertrauliche Kommunikation senden Sie bitte ihren
+GPG/PGP-Schlüssel zu.
+---
+Enrico Weigelt, metux IT consult
+Free software and Linux embedded engineering
+info@metux.net -- +49-151-27565287
