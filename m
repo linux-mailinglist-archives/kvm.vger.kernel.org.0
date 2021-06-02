@@ -2,44 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CE3C3994C6
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 22:46:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F170D3994D6
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 22:51:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229640AbhFBUrw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 16:47:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35186 "EHLO
+        id S229604AbhFBUwz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 16:52:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44632 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229552AbhFBUrv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Jun 2021 16:47:51 -0400
+        by vger.kernel.org with ESMTP id S229552AbhFBUwv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Jun 2021 16:52:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622666767;
+        s=mimecast20190719; t=1622667067;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MaJkGqCRd62/z/KrcCCUMeTbWp2LlOC2T7zrXxn/tg8=;
-        b=QvKC9DiHIwTfHGYpkeQhmXm97YJ6FCFENDvWtO+3jqgLrcxdrhjnvo93migvxjpyKwQjEH
-        uSPJbkVerDp8wLIvjPD0nj5CfU2Wnqrex5yTgdiUdnO+S1o4IZ1n4jTPNievAyfiwxOn+i
-        LoLaOD1X/FANfSp57R0FlnEnuyDqaa8=
+        bh=YBa8+PXTDwcq19n3IVtQxJ5sM4F8l1dhPEHZRkOdih4=;
+        b=jLunE66IFsfETxitTT3EzfjF61qqRc/FVDAQc5E0XoNlKF/3+ZcJufFfo3fANRNcSBmMj5
+        6SyqKs8arVmvhYxuvCMYoxlFfJjf+uM4r4Ngc6+J9ooGr3JMc1SUNpxkkvziP8b74ZCle1
+        r0wBc/oxEK9zlVRSdhg6vOGqqB3i+X8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-238-ftUovkHqOzyTza5n908Vqw-1; Wed, 02 Jun 2021 16:46:06 -0400
-X-MC-Unique: ftUovkHqOzyTza5n908Vqw-1
+ us-mta-13-DI4OmT3zO8aGQzLRPw8dUg-1; Wed, 02 Jun 2021 16:51:06 -0400
+X-MC-Unique: DI4OmT3zO8aGQzLRPw8dUg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D2048030A1;
-        Wed,  2 Jun 2021 20:46:05 +0000 (UTC)
-Received: from localhost (ovpn-119-154.rdu2.redhat.com [10.10.119.154])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B4FA5687F6;
-        Wed,  2 Jun 2021 20:46:04 +0000 (UTC)
-Date:   Wed, 2 Jun 2021 16:46:04 -0400
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc:     Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
-        qemu-devel@nongnu.org,
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB8FA100A240;
+        Wed,  2 Jun 2021 20:51:04 +0000 (UTC)
+Received: from redhat.com (ovpn-113-154.phx2.redhat.com [10.3.113.154])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CD176687F6;
+        Wed,  2 Jun 2021 20:51:03 +0000 (UTC)
+Date:   Wed, 2 Jun 2021 15:51:02 -0500
+From:   Eric Blake <eblake@redhat.com>
+To:     Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+Cc:     qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Eric Blake <eblake@redhat.com>,
         Markus Armbruster <armbru@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Marcelo Tosatti <mtosatti@redhat.com>,
@@ -49,206 +46,113 @@ Cc:     Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
         Denis Lunev <den@openvz.org>,
         Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Subject: Re: [PATCH v8] qapi: introduce 'query-kvm-cpuid' action
-Message-ID: <20210602204604.crsxvqixkkll4ef4@habkost.net>
+Message-ID: <20210602205102.icdqspki66rwvc3n@redhat.com>
 References: <20210531123806.23030-1-valeriy.vdovin@virtuozzo.com>
- <266974fa-da6c-d0fc-ce12-6a7ce1752fa6@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <266974fa-da6c-d0fc-ce12-6a7ce1752fa6@redhat.com>
+In-Reply-To: <20210531123806.23030-1-valeriy.vdovin@virtuozzo.com>
+User-Agent: NeoMutt/20210205
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 02, 2021 at 08:17:28PM +0200, Philippe Mathieu-Daudé wrote:
-> Hi Valeriy,
+On Mon, May 31, 2021 at 03:38:06PM +0300, Valeriy Vdovin wrote:
+> Introducing new qapi method 'query-kvm-cpuid'. This method can be used to
+> get virtualized cpu model info generated by QEMU during VM initialization in
+> the form of cpuid representation.
 > 
-> (Sorry for not looking earlier than v8)
 > 
-> On 5/31/21 2:38 PM, Valeriy Vdovin wrote:
-> > Introducing new qapi method 'query-kvm-cpuid'. This method can be used to
-> > get virtualized cpu model info generated by QEMU during VM initialization in
-> > the form of cpuid representation.
-> > 
-> > Diving into more details about virtual cpu generation: QEMU first parses '-cpu'
-> > command line option. From there it takes the name of the model as the basis for
-> > feature set of the new virtual cpu. After that it uses trailing '-cpu' options,
-> > that state if additional cpu features should be present on the virtual cpu or
-> > excluded from it (tokens '+'/'-' or '=on'/'=off').
-> > After that QEMU checks if the host's cpu can actually support the derived
-> > feature set and applies host limitations to it.
-> > After this initialization procedure, virtual cpu has it's model and
-> > vendor names, and a working feature set and is ready for identification
-> > instructions such as CPUID.
-> > 
-> > Currently full output for this method is only supported for x86 cpus.
-> > 
-> > To learn exactly how virtual cpu is presented to the guest machine via CPUID
-> > instruction, new qapi method can be used. By calling 'query-kvm-cpuid'
-> > method, one can get a full listing of all CPUID leafs with subleafs which are
-> > supported by the initialized virtual cpu.
-> > 
-> > Other than debug, the method is useful in cases when we would like to
-> > utilize QEMU's virtual cpu initialization routines and put the retrieved
-> > values into kernel CPUID overriding mechanics for more precise control
-> > over how various processes perceive its underlying hardware with
-> > container processes as a good example.
-> > 
-> > Output format:
-> > The output is a plain list of leaf/subleaf agrument combinations, that
-> > return 4 words in registers EAX, EBX, ECX, EDX.
-> > 
-> > Use example:
-> > qmp_request: {
-> >   "execute": "query-kvm-cpuid"
-> > }
-> > 
-> > qmp_response: [
-> >   {
-> >     "eax": 1073741825,
-> >     "edx": 77,
-> >     "in_eax": 1073741824,
-> >     "ecx": 1447775574,
-> >     "ebx": 1263359563,
-> >   },
-> >   {
-> >     "eax": 16777339,
-> >     "edx": 0,
-> >     "in_eax": 1073741825,
-> >     "ecx": 0,
-> >     "ebx": 0,
-> >   },
-> >   {
-> >     "eax": 13,
-> >     "edx": 1231384169,
-> >     "in_eax": 0,
-> >     "ecx": 1818588270,
-> >     "ebx": 1970169159,
-> >   },
-> >   {
-> >     "eax": 198354,
-> >     "edx": 126614527,
-> >   ....
-> > 
-> > Signed-off-by: Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+> Use example:
+> qmp_request: {
+>   "execute": "query-kvm-cpuid"
+> }
 > 
+> qmp_response: [
+>   {
+>     "eax": 1073741825,
+>     "edx": 77,
+>     "in_eax": 1073741824,
+>     "ecx": 1447775574,
+>     "ebx": 1263359563,
+>   },
+
+JSON does not permit a trailing ',' before '}'; which means you did
+not actually paste an actual QMP response here.
+
 > ---
+>  qapi/machine-target.json   | 43 ++++++++++++++++++++++++++++++++++++++
+>  target/i386/kvm/kvm.c      | 37 ++++++++++++++++++++++++++++++++
+>  tests/qtest/qmp-cmd-test.c |  1 +
+>  3 files changed, 81 insertions(+)
 > 
-> > 
-> > v2: - Removed leaf/subleaf iterators.
-> >     - Modified cpu_x86_cpuid to return false in cases when count is
-> >       greater than supported subleaves.
-> > v3: - Fixed structure name coding style.
-> >     - Added more comments
-> >     - Ensured buildability for non-x86 targets.
-> > v4: - Fixed cpu_x86_cpuid return value logic and handling of 0xA leaf.
-> >     - Fixed comments.
-> >     - Removed target check in qmp_query_cpu_model_cpuid.
-> > v5: - Added error handling code in qmp_query_cpu_model_cpuid
-> > v6: - Fixed error handling code. Added method to query_error_class
-> > v7: - Changed implementation in favor of cached cpuid_data for
-> >       KVM_SET_CPUID2
-> > v8: - Renamed qmp method to query-kvm-cpuid and some fields in response.
-> >     - Modified documentation to qmp method
-> >     - Removed helper struct declaration
-> > ---
-> 
-> ^ Below this '---' go your comments.
-> 
-> >  qapi/machine-target.json   | 43 ++++++++++++++++++++++++++++++++++++++
-> >  target/i386/kvm/kvm.c      | 37 ++++++++++++++++++++++++++++++++
-> >  tests/qtest/qmp-cmd-test.c |  1 +
-> >  3 files changed, 81 insertions(+)
-> > 
-> > diff --git a/qapi/machine-target.json b/qapi/machine-target.json
-> > index e7811654b7..a83180dd24 100644
-> > --- a/qapi/machine-target.json
-> > +++ b/qapi/machine-target.json
-> > @@ -329,3 +329,46 @@
-> >  ##
-> >  { 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
-> >    'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I386) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
-> > +
-> > +##
-> > +# @CpuidEntry:
-> > +#
-> > +# A single entry of a CPUID response.
-> > +#
-> > +# One entry holds full set of information (leaf) returned to the guest in response
-> > +# to it calling a CPUID instruction with eax, ecx used as the agruments to that
-> > +# instruction. ecx is an optional argument as not all of the leaves support it.
-> > +#
-> > +# @in_eax: CPUID argument in eax
-> > +# @in_ecx: CPUID argument in ecx
-> > +# @eax: eax
-> > +# @ebx: ebx
-> > +# @ecx: ecx
-> > +# @edx: edx
-> > +#
-> > +# Since: 6.1
-> > +##
-> > +{ 'struct': 'CpuidEntry',
-> > +  'data': { 'in_eax' : 'uint32',
-> > +            '*in_ecx' : 'uint32',
-> > +            'eax' : 'uint32',
-> > +            'ebx' : 'uint32',
-> > +            'ecx' : 'uint32',
-> > +            'edx' : 'uint32'
-> > +          },
-> > +  'if': 'defined(TARGET_I386) && defined(CONFIG_KVM)' }
-> 
-> What about other accelerators?
-> 
-> > +
-> > +##
-> > +# @query-kvm-cpuid:
-> > +#
-> > +# Returns raw data from the KVM CPUID table for the first VCPU.
-> > +# The KVM CPUID table defines the response to the CPUID
-> > +# instruction when executed by the guest operating system.
-> 
-> What is specific to KVM here?
-> 
-> What about 'query-accel-cpuid' or 'query-vm-cpu-id'?
+> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+> index e7811654b7..a83180dd24 100644
+> --- a/qapi/machine-target.json
+> +++ b/qapi/machine-target.json
+> @@ -329,3 +329,46 @@
+>  ##
+>  { 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
+>    'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I386) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
+> +
+> +##
+> +# @CpuidEntry:
+> +#
+> +# A single entry of a CPUID response.
+> +#
+> +# One entry holds full set of information (leaf) returned to the guest in response
+> +# to it calling a CPUID instruction with eax, ecx used as the agruments to that
 
-The implementation is KVM-specific.  I believe it's a reasonable
-compromise because the implementation is trivial, and a raw copy
-of the KVM CPUID table makes it a more useful (KVM-specific)
-debugging/testing mechanism.
+arguments
 
-I don't really mind how the command is called, but I would prefer
-to add a more complex abstraction only if maintainers of other
-accelerators are interested and volunteer to provide similar
-functionality.  I don't want to introduce complexity for use
-cases that may not even exist.
+> +# instruction. ecx is an optional argument as not all of the leaves support it.
 
-> 
-> > +#
-> > +# Returns: a list of CpuidEntry
-> > +#
-> > +# Since: 6.1
-> > +##
-> > +{ 'command': 'query-kvm-cpuid',
-> > +  'returns': ['CpuidEntry'],
-> > +  'if': 'defined(TARGET_I386) && defined(CONFIG_KVM)' }
-> ...
-> > diff --git a/tests/qtest/qmp-cmd-test.c b/tests/qtest/qmp-cmd-test.c
-> > index c98b78d033..48add3ada1 100644
-> > --- a/tests/qtest/qmp-cmd-test.c
-> > +++ b/tests/qtest/qmp-cmd-test.c
-> > @@ -46,6 +46,7 @@ static int query_error_class(const char *cmd)
-> >          { "query-balloon", ERROR_CLASS_DEVICE_NOT_ACTIVE },
-> >          { "query-hotpluggable-cpus", ERROR_CLASS_GENERIC_ERROR },
-> >          { "query-vm-generation-id", ERROR_CLASS_GENERIC_ERROR },
-> > +        { "query-kvm-cpuid", ERROR_CLASS_GENERIC_ERROR },
-> >          { NULL, -1 }
-> >      };
-> >      int i;
-> > 
-> 
+Is there a default value of ecx for when it is not provided by the
+user but needed by the leaf?  Or is it an error if ecx is omitted in
+that case?  Similarly, is it an error if ecx is provided but not
+needed?
+
+> +#
+> +# @in_eax: CPUID argument in eax
+> +# @in_ecx: CPUID argument in ecx
+
+Should be in-eax, in-ecx.
+
+> +# @eax: eax
+> +# @ebx: ebx
+> +# @ecx: ecx
+> +# @edx: edx
+> +#
+> +# Since: 6.1
+> +##
+> +{ 'struct': 'CpuidEntry',
+> +  'data': { 'in_eax' : 'uint32',
+> +            '*in_ecx' : 'uint32',
+> +            'eax' : 'uint32',
+> +            'ebx' : 'uint32',
+> +            'ecx' : 'uint32',
+> +            'edx' : 'uint32'
+> +          },
+> +  'if': 'defined(TARGET_I386) && defined(CONFIG_KVM)' }
+> +
+> +##
+> +# @query-kvm-cpuid:
+> +#
+> +# Returns raw data from the KVM CPUID table for the first VCPU.
+> +# The KVM CPUID table defines the response to the CPUID
+> +# instruction when executed by the guest operating system.
+> +#
+> +# Returns: a list of CpuidEntry
+> +#
+> +# Since: 6.1
+> +##
+> +{ 'command': 'query-kvm-cpuid',
+> +  'returns': ['CpuidEntry'],
+> +  'if': 'defined(TARGET_I386) && defined(CONFIG_KVM)' }
 
 -- 
-Eduardo
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
