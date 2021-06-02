@@ -2,163 +2,586 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D333F399665
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 01:34:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BE7939966E
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 01:41:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229774AbhFBXfu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 19:35:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46720 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229724AbhFBXft (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 19:35:49 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B6F7C06174A
-        for <kvm@vger.kernel.org>; Wed,  2 Jun 2021 16:33:49 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id u22so4736220ljh.7
-        for <kvm@vger.kernel.org>; Wed, 02 Jun 2021 16:33:49 -0700 (PDT)
+        id S229610AbhFBXnR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 19:43:17 -0400
+Received: from mail-pf1-f180.google.com ([209.85.210.180]:39688 "EHLO
+        mail-pf1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229553AbhFBXnQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 19:43:16 -0400
+Received: by mail-pf1-f180.google.com with SMTP id k15so3462634pfp.6
+        for <kvm@vger.kernel.org>; Wed, 02 Jun 2021 16:41:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
+        d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=PTfQXWxpT7/vPk75BLaU1gGVmYZcPYEwaABzwTpX4X8=;
-        b=xoIjz3sZWLuffKRVh0YALgXm6O8hnsf+f+WCDpt4AdwtSsGKBjFrDkpv6SHmOKfLvQ
-         ag6Zz3+0PVbskBft46UU1iBPu+6JCm+XXaKgAsY1YTm7Ib3+vfaTARypU8kuS4DO8bU4
-         4erqAmfO60o4/Y1v3inpt4u+tjLPknSeFcCnLA9KJ6i+IHoPzKxtEqsTAYOUcyv0H/ip
-         1H2ACkRBA30VtVgxpEFXPfXt7aT1I0vO4gIY+bd0BjcOMeDMWrsQIC89RzVjDvUkQ6Me
-         nUD6UbBJ4qa2eYALWuISCxy5eyq2hsGJQ20/+Fy776Zq2mDn6g5z5YbtJm0dl/EkdAIS
-         D2lw==
+        bh=rafY+AZs/MuJxHPEDMdR9lqdfZ16fWhtCwttZNJsfDA=;
+        b=Hd3Ji8aryv+y0Hkh3BQbT1z0ESQeSLlscxLX4JWpIynlXWbmEY+16/nWhhOFG8iUA3
+         tRDWehhc4PiceYOdg+mvjjlX8sRm00UsWUC/I8R2GqTbOhga7RWsZqytK3S30drklbiF
+         9s78tADxrN3UvIx2WfBjYF+dairKHxSelivuFmsM/GUDXjsTELfgAW4zqJ+wGrn1CL6d
+         fXBGUjOC0z9iT7Ru9XdZdRWhF4LASJvopXIvm9cRzSSMuEUvx3lhHwKQJii37l4gB1Ga
+         UlXicUOkl7nTedSmHqlQmDA7NtrjU5nd1OJk8Bm3BDJknLDQYoOkc0qOnKwrJSm25Wl9
+         nkGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=PTfQXWxpT7/vPk75BLaU1gGVmYZcPYEwaABzwTpX4X8=;
-        b=mfvht6ThmnlCXCaQOrsbcMP8/bI35fMtp9C/iUIRs5nPwk/39ONtQ1i/DCfqff55hj
-         LZvUu2EmunDn5FpboM7NGjgsHjyqUC6d++QhrdwbSvXQvRufB+oR+6z2yD3VJk0+FvGJ
-         rGBbrrEjSXl3hbTHHGFn8neoS8Pjybj7sCFSQLaXc9Y5zL5o5JtOZh19MSfVhUhITVvq
-         k6buk5KZ6QTeT3VRTdUGDvkegUTWq73rADJzxpV2LH+d/kYFRFQG1RN1hYRdQm9Pkj9r
-         hwxw2fN+qeufiGm+cbA4kA40judG9a3tjX+6wyEIRTSddHEbkOFblirU1dh4Wi3y6IXy
-         mvDA==
-X-Gm-Message-State: AOAM532lmTZJDNqpP16eQ7RNE4TfIqeWdvo/CoAdY8CXspOO8xvaWF8X
-        wg60nZmJag8ALe/TLdf3jkNfkw==
-X-Google-Smtp-Source: ABdhPJyxY2uHTU5pxb90Q61I0oFx+mfHXgdsajfEDRhtoMh/thfpDCvGB+RQADYTGQ5zaZ+IYKauew==
-X-Received: by 2002:a2e:a489:: with SMTP id h9mr27552130lji.21.1622676823199;
-        Wed, 02 Jun 2021 16:33:43 -0700 (PDT)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id p1sm132646lfr.78.2021.06.02.16.33.42
+        bh=rafY+AZs/MuJxHPEDMdR9lqdfZ16fWhtCwttZNJsfDA=;
+        b=Tvt19hj0Bf/z/xf8g9u+OVIOK6g0KlacVyOQh8Epj4MDXMzc9cEcC0d3knsRRI8QgR
+         KHJS+dHXU2pQGQU9ItcWtg/Q7s/NBvZzxnUvxraA7opzriyiWTWuViI0Sx4TGM5UrORg
+         8lRRbVEAnjA93fIoSp1ereu54usgbgxGTlP/ioHzEAhLjutrK8cChKCpqZGGUTITsNm5
+         +wLlBdPzcntQhBfKWS7Lu2ms+GLHYjogNQuQyg08eJBx/hvWsjLTZra/KiT2mNB4MCRb
+         1oYrGOFQ+rN0xVw2MoKazerJ4qecu1aOa6IQZvFC3kKV2GMLxTHA9tAmmoWDTHwTCXl6
+         20iQ==
+X-Gm-Message-State: AOAM532Jc4DPmavymKDAShYL2xQVfgRnGlnse+z7ps0bA2EsckFDbCub
+        nRuSyyzvErdKMfREEKV9n3m+SQ==
+X-Google-Smtp-Source: ABdhPJybz8C4HEfzhBjSDMcuXDuS6fWkmNo0mEqSHrsDokRqB7iB0Xv60VUtEj5gXAwD/b940Q2kcQ==
+X-Received: by 2002:a62:7cca:0:b029:2e9:c89d:d8a9 with SMTP id x193-20020a627cca0000b02902e9c89dd8a9mr18477390pfc.55.1622677232434;
+        Wed, 02 Jun 2021 16:40:32 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id z28sm557597pfr.76.2021.06.02.16.40.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jun 2021 16:33:42 -0700 (PDT)
-Received: by box.localdomain (Postfix, from userid 1000)
-        id 70984102781; Thu,  3 Jun 2021 02:33:53 +0300 (+03)
-Date:   Thu, 3 Jun 2021 02:33:53 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jim Mattson <jmattson@google.com>,
-        David Rientjes <rientjes@google.com>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Steve Rutherford <srutherford@google.com>,
-        Peter Gonda <pgonda@google.com>,
-        David Hildenbrand <david@redhat.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFCv2 13/13] KVM: unmap guest memory using poisoned pages
-Message-ID: <20210602233353.gxq35yxluhas5knp@box>
-References: <20210419164027.dqiptkebhdt5cfmy@box.shutemov.name>
- <YH3HWeOXFiCTZN4y@google.com>
- <20210419185354.v3rgandtrel7bzjj@box>
- <YH3jaf5ThzLZdY4K@google.com>
- <20210419225755.nsrtjfvfcqscyb6m@box.shutemov.name>
- <YH8L0ihIzL6UB6qD@google.com>
- <20210521123148.a3t4uh4iezm6ax47@box>
- <YK6lrHeaeUZvHMJC@google.com>
- <20210531200712.qjxghakcaj4s6ara@box.shutemov.name>
- <YLfFBgPeWZ91TfH7@google.com>
+        Wed, 02 Jun 2021 16:40:31 -0700 (PDT)
+Date:   Wed, 2 Jun 2021 16:40:28 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org,
+        eric.auger@redhat.com, alexandru.elisei@arm.com,
+        pbonzini@redhat.com
+Subject: Re: [PATCH v3 1/5] KVM: arm64: selftests: get-reg-list: Introduce
+ vcpu configs
+Message-ID: <YLgW7BDz6zAyU+Of@google.com>
+References: <20210531103344.29325-1-drjones@redhat.com>
+ <20210531103344.29325-2-drjones@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YLfFBgPeWZ91TfH7@google.com>
+In-Reply-To: <20210531103344.29325-2-drjones@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 02, 2021 at 05:51:02PM +0000, Sean Christopherson wrote:
-> > Omitting FOLL_GUEST for shared memory doesn't look like a right approach.
-> > IIUC, it would require the kernel to track what memory is share and what
-> > private, which defeat the purpose of the rework. I would rather enforce
-> > !PageGuest() when share SEPT is populated in addition to enforcing
-> > PageGuest() fro private SEPT.
+On Mon, May 31, 2021 at 12:33:40PM +0200, Andrew Jones wrote:
+> We already break register lists into sublists that get selected based
+> on vcpu config. However, since we only had two configs (vregs and sve),
+> we didn't structure the code very well to manage them. Restructure it
+> now to more cleanly handle register sublists that are dependent on the
+> vcpu config.
 > 
-> Isn't that what omitting FOLL_GUEST would accomplish?  For shared memory,
-> including mapping memory into the shared EPT, KVM will omit FOLL_GUEST and thus
-> require the memory to be readable/writable according to the guest access type.
-
-Ah. I guess I see what you're saying: we can pipe down the shared bit from
-GPA from direct_page_fault() (or whatever handles the fault) down to
-hva_to_pfn_slow() and omit FOLL_GUEST if the shared bit is set. Right?
-
-I guest it's doable, but codeshuffling going to be ugly.
-
-> By definition, that excludes PageGuest() because PageGuest() pages must always
-> be unmapped, e.g. PROTNONE.  And for private EPT, because PageGuest() is always
-> PROTNONE or whatever, it will require FOLL_GUEST to retrieve the PTE/PMD/Pxx.
+> This patch has no intended functional change (except for the vcpu
+> config name now being prepended to all output).
 > 
-> On a semi-related topic, I don't think can_follow_write_pte() is the correct
-> place to hook PageGuest().  TDX's S-EPT has a quirk where all private guest
-> memory must be mapped writable, but that quirk doesn't hold true for non-TDX
-> guests.  It should be legal to map private guest memory as read-only.
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
 
-Hm. The point of the change in can_follow_write_pte() is to only allow to
-write to a PageGuest() page if FOLL_GUEST is used and the mapping is
-writable. Without the change gup(FOLL_GUEST|FOLL_WRITE) would fail.
+Reviewed-by: Ricardo Koller <ricarkol@google.com>
 
-It doesn't prevent using read-only guest mappings as read-only. But if you
-want to write to it it has to writable (in addtion to FOLL_GUEST). 
-
-> And I believe the below snippet in follow_page_pte() will be problematic
-> too, since FOLL_NUMA is added unless FOLL_FORCE is set.  I suspect the
-> correct approach is to handle FOLL_GUEST as an exception to
-> pte_protnone(), though that might require adjusting pte_protnone() to be
-> meaningful even when CONFIG_NUMA_BALANCING=n.
+> ---
+>  .../selftests/kvm/aarch64/get-reg-list.c      | 265 ++++++++++++------
+>  1 file changed, 175 insertions(+), 90 deletions(-)
 > 
-> 	if ((flags & FOLL_NUMA) && pte_protnone(pte))
-> 		goto no_page;
-> 	if ((flags & FOLL_WRITE) && !can_follow_write_pte(pte, flags)) {
-> 		pte_unmap_unlock(ptep, ptl);
-> 		return NULL;
-> 	}
+> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> index 486932164cf2..7bb09ce20dde 100644
+> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> @@ -37,7 +37,30 @@
+>  #define reg_list_sve() (false)
+>  #endif
+>  
+> -#define REG_MASK (KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK | KVM_REG_ARM_COPROC_MASK)
+> +static struct kvm_reg_list *reg_list;
+> +static __u64 *blessed_reg, blessed_n;
+> +
+> +struct reg_sublist {
+> +	const char *name;
+> +	long capability;
+> +	int feature;
+> +	bool finalize;
+> +	__u64 *regs;
+> +	__u64 regs_n;
+> +	__u64 *rejects_set;
+> +	__u64 rejects_set_n;
+> +};
+> +
+> +struct vcpu_config {
+> +	char *name;
+> +	struct reg_sublist sublists[];
+> +};
+> +
+> +static struct vcpu_config vregs_config;
+> +static struct vcpu_config sve_config;
+> +
+> +#define for_each_sublist(c, s)							\
+> +	for ((s) = &(c)->sublists[0]; (s)->regs; ++(s))
+>  
+>  #define for_each_reg(i)								\
+>  	for ((i) = 0; (i) < reg_list->n; ++(i))
+> @@ -54,12 +77,41 @@
+>  	for_each_reg_filtered(i)						\
+>  		if (!find_reg(blessed_reg, blessed_n, reg_list->reg[i]))
+>  
+> +static const char *config_name(struct vcpu_config *c)
+> +{
+> +	struct reg_sublist *s;
+> +	int len = 0;
+>  
+> -static struct kvm_reg_list *reg_list;
+> +	if (c->name)
+> +		return c->name;
+>  
+> -static __u64 base_regs[], vregs[], sve_regs[], rejects_set[];
+> -static __u64 base_regs_n, vregs_n, sve_regs_n, rejects_set_n;
+> -static __u64 *blessed_reg, blessed_n;
+> +	for_each_sublist(c, s)
+> +		len += strlen(s->name) + 1;
+> +
+> +	c->name = malloc(len);
+> +
+> +	len = 0;
+> +	for_each_sublist(c, s) {
+> +		if (!strcmp(s->name, "base"))
+> +			continue;
+> +		strcat(c->name + len, s->name);
+> +		len += strlen(s->name) + 1;
+> +		c->name[len - 1] = '+';
+> +	}
+> +	c->name[len - 1] = '\0';
+> +
+> +	return c->name;
+> +}
+> +
+> +static bool has_cap(struct vcpu_config *c, long capability)
+> +{
+> +	struct reg_sublist *s;
+> +
+> +	for_each_sublist(c, s)
+> +		if (s->capability == capability)
+> +			return true;
+> +	return false;
+> +}
+>  
+>  static bool filter_reg(__u64 reg)
+>  {
+> @@ -96,11 +148,13 @@ static const char *str_with_index(const char *template, __u64 index)
+>  	return (const char *)str;
+>  }
+>  
+> +#define REG_MASK (KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK | KVM_REG_ARM_COPROC_MASK)
+> +
+>  #define CORE_REGS_XX_NR_WORDS	2
+>  #define CORE_SPSR_XX_NR_WORDS	2
+>  #define CORE_FPREGS_XX_NR_WORDS	4
+>  
+> -static const char *core_id_to_str(__u64 id)
+> +static const char *core_id_to_str(struct vcpu_config *c, __u64 id)
+>  {
+>  	__u64 core_off = id & ~REG_MASK, idx;
+>  
+> @@ -111,7 +165,7 @@ static const char *core_id_to_str(__u64 id)
+>  	case KVM_REG_ARM_CORE_REG(regs.regs[0]) ...
+>  	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
+>  		idx = (core_off - KVM_REG_ARM_CORE_REG(regs.regs[0])) / CORE_REGS_XX_NR_WORDS;
+> -		TEST_ASSERT(idx < 31, "Unexpected regs.regs index: %lld", idx);
+> +		TEST_ASSERT(idx < 31, "%s: Unexpected regs.regs index: %lld", config_name(c), idx);
+>  		return str_with_index("KVM_REG_ARM_CORE_REG(regs.regs[##])", idx);
+>  	case KVM_REG_ARM_CORE_REG(regs.sp):
+>  		return "KVM_REG_ARM_CORE_REG(regs.sp)";
+> @@ -126,12 +180,12 @@ static const char *core_id_to_str(__u64 id)
+>  	case KVM_REG_ARM_CORE_REG(spsr[0]) ...
+>  	     KVM_REG_ARM_CORE_REG(spsr[KVM_NR_SPSR - 1]):
+>  		idx = (core_off - KVM_REG_ARM_CORE_REG(spsr[0])) / CORE_SPSR_XX_NR_WORDS;
+> -		TEST_ASSERT(idx < KVM_NR_SPSR, "Unexpected spsr index: %lld", idx);
+> +		TEST_ASSERT(idx < KVM_NR_SPSR, "%s: Unexpected spsr index: %lld", config_name(c), idx);
+>  		return str_with_index("KVM_REG_ARM_CORE_REG(spsr[##])", idx);
+>  	case KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]) ...
+>  	     KVM_REG_ARM_CORE_REG(fp_regs.vregs[31]):
+>  		idx = (core_off - KVM_REG_ARM_CORE_REG(fp_regs.vregs[0])) / CORE_FPREGS_XX_NR_WORDS;
+> -		TEST_ASSERT(idx < 32, "Unexpected fp_regs.vregs index: %lld", idx);
+> +		TEST_ASSERT(idx < 32, "%s: Unexpected fp_regs.vregs index: %lld", config_name(c), idx);
+>  		return str_with_index("KVM_REG_ARM_CORE_REG(fp_regs.vregs[##])", idx);
+>  	case KVM_REG_ARM_CORE_REG(fp_regs.fpsr):
+>  		return "KVM_REG_ARM_CORE_REG(fp_regs.fpsr)";
+> @@ -139,11 +193,11 @@ static const char *core_id_to_str(__u64 id)
+>  		return "KVM_REG_ARM_CORE_REG(fp_regs.fpcr)";
+>  	}
+>  
+> -	TEST_FAIL("Unknown core reg id: 0x%llx", id);
+> +	TEST_FAIL("%s: Unknown core reg id: 0x%llx", config_name(c), id);
+>  	return NULL;
+>  }
+>  
+> -static const char *sve_id_to_str(__u64 id)
+> +static const char *sve_id_to_str(struct vcpu_config *c, __u64 id)
+>  {
+>  	__u64 sve_off, n, i;
+>  
+> @@ -153,37 +207,37 @@ static const char *sve_id_to_str(__u64 id)
+>  	sve_off = id & ~(REG_MASK | ((1ULL << 5) - 1));
+>  	i = id & (KVM_ARM64_SVE_MAX_SLICES - 1);
+>  
+> -	TEST_ASSERT(i == 0, "Currently we don't expect slice > 0, reg id 0x%llx", id);
+> +	TEST_ASSERT(i == 0, "%s: Currently we don't expect slice > 0, reg id 0x%llx", config_name(c), id);
+>  
+>  	switch (sve_off) {
+>  	case KVM_REG_ARM64_SVE_ZREG_BASE ...
+>  	     KVM_REG_ARM64_SVE_ZREG_BASE + (1ULL << 5) * KVM_ARM64_SVE_NUM_ZREGS - 1:
+>  		n = (id >> 5) & (KVM_ARM64_SVE_NUM_ZREGS - 1);
+>  		TEST_ASSERT(id == KVM_REG_ARM64_SVE_ZREG(n, 0),
+> -			    "Unexpected bits set in SVE ZREG id: 0x%llx", id);
+> +			    "%s: Unexpected bits set in SVE ZREG id: 0x%llx", config_name(c), id);
+>  		return str_with_index("KVM_REG_ARM64_SVE_ZREG(##, 0)", n);
+>  	case KVM_REG_ARM64_SVE_PREG_BASE ...
+>  	     KVM_REG_ARM64_SVE_PREG_BASE + (1ULL << 5) * KVM_ARM64_SVE_NUM_PREGS - 1:
+>  		n = (id >> 5) & (KVM_ARM64_SVE_NUM_PREGS - 1);
+>  		TEST_ASSERT(id == KVM_REG_ARM64_SVE_PREG(n, 0),
+> -			    "Unexpected bits set in SVE PREG id: 0x%llx", id);
+> +			    "%s: Unexpected bits set in SVE PREG id: 0x%llx", config_name(c), id);
+>  		return str_with_index("KVM_REG_ARM64_SVE_PREG(##, 0)", n);
+>  	case KVM_REG_ARM64_SVE_FFR_BASE:
+>  		TEST_ASSERT(id == KVM_REG_ARM64_SVE_FFR(0),
+> -			    "Unexpected bits set in SVE FFR id: 0x%llx", id);
+> +			    "%s: Unexpected bits set in SVE FFR id: 0x%llx", config_name(c), id);
+>  		return "KVM_REG_ARM64_SVE_FFR(0)";
+>  	}
+>  
+>  	return NULL;
+>  }
+>  
+> -static void print_reg(__u64 id)
+> +static void print_reg(struct vcpu_config *c, __u64 id)
+>  {
+>  	unsigned op0, op1, crn, crm, op2;
+>  	const char *reg_size = NULL;
+>  
+>  	TEST_ASSERT((id & KVM_REG_ARCH_MASK) == KVM_REG_ARM64,
+> -		    "KVM_REG_ARM64 missing in reg id: 0x%llx", id);
+> +		    "%s: KVM_REG_ARM64 missing in reg id: 0x%llx", config_name(c), id);
+>  
+>  	switch (id & KVM_REG_SIZE_MASK) {
+>  	case KVM_REG_SIZE_U8:
+> @@ -214,17 +268,17 @@ static void print_reg(__u64 id)
+>  		reg_size = "KVM_REG_SIZE_U2048";
+>  		break;
+>  	default:
+> -		TEST_FAIL("Unexpected reg size: 0x%llx in reg id: 0x%llx",
+> -			  (id & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT, id);
+> +		TEST_FAIL("%s: Unexpected reg size: 0x%llx in reg id: 0x%llx",
+> +			  config_name(c), (id & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT, id);
+>  	}
+>  
+>  	switch (id & KVM_REG_ARM_COPROC_MASK) {
+>  	case KVM_REG_ARM_CORE:
+> -		printf("\tKVM_REG_ARM64 | %s | KVM_REG_ARM_CORE | %s,\n", reg_size, core_id_to_str(id));
+> +		printf("\tKVM_REG_ARM64 | %s | KVM_REG_ARM_CORE | %s,\n", reg_size, core_id_to_str(c, id));
+>  		break;
+>  	case KVM_REG_ARM_DEMUX:
+>  		TEST_ASSERT(!(id & ~(REG_MASK | KVM_REG_ARM_DEMUX_ID_MASK | KVM_REG_ARM_DEMUX_VAL_MASK)),
+> -			    "Unexpected bits set in DEMUX reg id: 0x%llx", id);
+> +			    "%s: Unexpected bits set in DEMUX reg id: 0x%llx", config_name(c), id);
+>  		printf("\tKVM_REG_ARM64 | %s | KVM_REG_ARM_DEMUX | KVM_REG_ARM_DEMUX_ID_CCSIDR | %lld,\n",
+>  		       reg_size, id & KVM_REG_ARM_DEMUX_VAL_MASK);
+>  		break;
+> @@ -235,23 +289,23 @@ static void print_reg(__u64 id)
+>  		crm = (id & KVM_REG_ARM64_SYSREG_CRM_MASK) >> KVM_REG_ARM64_SYSREG_CRM_SHIFT;
+>  		op2 = (id & KVM_REG_ARM64_SYSREG_OP2_MASK) >> KVM_REG_ARM64_SYSREG_OP2_SHIFT;
+>  		TEST_ASSERT(id == ARM64_SYS_REG(op0, op1, crn, crm, op2),
+> -			    "Unexpected bits set in SYSREG reg id: 0x%llx", id);
+> +			    "%s: Unexpected bits set in SYSREG reg id: 0x%llx", config_name(c), id);
+>  		printf("\tARM64_SYS_REG(%d, %d, %d, %d, %d),\n", op0, op1, crn, crm, op2);
+>  		break;
+>  	case KVM_REG_ARM_FW:
+>  		TEST_ASSERT(id == KVM_REG_ARM_FW_REG(id & 0xffff),
+> -			    "Unexpected bits set in FW reg id: 0x%llx", id);
+> +			    "%s: Unexpected bits set in FW reg id: 0x%llx", config_name(c), id);
+>  		printf("\tKVM_REG_ARM_FW_REG(%lld),\n", id & 0xffff);
+>  		break;
+>  	case KVM_REG_ARM64_SVE:
+> -		if (reg_list_sve())
+> -			printf("\t%s,\n", sve_id_to_str(id));
+> +		if (has_cap(c, KVM_CAP_ARM_SVE))
+> +			printf("\t%s,\n", sve_id_to_str(c, id));
+>  		else
+> -			TEST_FAIL("KVM_REG_ARM64_SVE is an unexpected coproc type in reg id: 0x%llx", id);
+> +			TEST_FAIL("%s: KVM_REG_ARM64_SVE is an unexpected coproc type in reg id: 0x%llx", config_name(c), id);
+>  		break;
+>  	default:
+> -		TEST_FAIL("Unexpected coproc type: 0x%llx in reg id: 0x%llx",
+> -			  (id & KVM_REG_ARM_COPROC_MASK) >> KVM_REG_ARM_COPROC_SHIFT, id);
+> +		TEST_FAIL("%s: Unexpected coproc type: 0x%llx in reg id: 0x%llx",
+> +			  config_name(c), (id & KVM_REG_ARM_COPROC_MASK) >> KVM_REG_ARM_COPROC_SHIFT, id);
+>  	}
+>  }
+>  
+> @@ -312,40 +366,51 @@ static void core_reg_fixup(void)
+>  	reg_list = tmp;
+>  }
+>  
+> -static void prepare_vcpu_init(struct kvm_vcpu_init *init)
+> +static void prepare_vcpu_init(struct vcpu_config *c, struct kvm_vcpu_init *init)
+>  {
+> -	if (reg_list_sve())
+> -		init->features[0] |= 1 << KVM_ARM_VCPU_SVE;
+> +	struct reg_sublist *s;
+> +
+> +	for_each_sublist(c, s)
+> +		if (s->capability)
+> +			init->features[s->feature / 32] |= 1 << (s->feature % 32);
+>  }
+>  
+> -static void finalize_vcpu(struct kvm_vm *vm, uint32_t vcpuid)
+> +static void finalize_vcpu(struct kvm_vm *vm, uint32_t vcpuid, struct vcpu_config *c)
+>  {
+> +	struct reg_sublist *s;
+>  	int feature;
+>  
+> -	if (reg_list_sve()) {
+> -		feature = KVM_ARM_VCPU_SVE;
+> -		vcpu_ioctl(vm, vcpuid, KVM_ARM_VCPU_FINALIZE, &feature);
+> +	for_each_sublist(c, s) {
+> +		if (s->finalize) {
+> +			feature = s->feature;
+> +			vcpu_ioctl(vm, vcpuid, KVM_ARM_VCPU_FINALIZE, &feature);
+> +		}
+>  	}
+>  }
+>  
+> -static void check_supported(void)
+> +static void check_supported(struct vcpu_config *c)
+>  {
+> -	if (reg_list_sve() && !kvm_check_cap(KVM_CAP_ARM_SVE)) {
+> -		fprintf(stderr, "SVE not available, skipping tests\n");
+> -		exit(KSFT_SKIP);
+> +	struct reg_sublist *s;
+> +
+> +	for_each_sublist(c, s) {
+> +		if (s->capability && !kvm_check_cap(s->capability)) {
+> +			fprintf(stderr, "%s: %s not available, skipping tests\n", config_name(c), s->name);
+> +			exit(KSFT_SKIP);
+> +		}
+>  	}
+>  }
+>  
+>  int main(int ac, char **av)
+>  {
+> +	struct vcpu_config *c = reg_list_sve() ? &sve_config : &vregs_config;
+>  	struct kvm_vcpu_init init = { .target = -1, };
+> -	int new_regs = 0, missing_regs = 0, i;
+> +	int new_regs = 0, missing_regs = 0, i, n;
+>  	int failed_get = 0, failed_set = 0, failed_reject = 0;
+>  	bool print_list = false, print_filtered = false, fixup_core_regs = false;
+>  	struct kvm_vm *vm;
+> -	__u64 *vec_regs;
+> +	struct reg_sublist *s;
+>  
+> -	check_supported();
+> +	check_supported(c);
+>  
+>  	for (i = 1; i < ac; ++i) {
+>  		if (strcmp(av[i], "--core-reg-fixup") == 0)
+> @@ -359,9 +424,9 @@ int main(int ac, char **av)
+>  	}
+>  
+>  	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
+> -	prepare_vcpu_init(&init);
+> +	prepare_vcpu_init(c, &init);
+>  	aarch64_vcpu_add_default(vm, 0, &init, NULL);
+> -	finalize_vcpu(vm, 0);
+> +	finalize_vcpu(vm, 0, c);
+>  
+>  	reg_list = vcpu_get_reg_list(vm, 0);
+>  
+> @@ -374,7 +439,7 @@ int main(int ac, char **av)
+>  			__u64 id = reg_list->reg[i];
+>  			if ((print_list && !filter_reg(id)) ||
+>  			    (print_filtered && filter_reg(id)))
+> -				print_reg(id);
+> +				print_reg(c, id);
+>  		}
+>  		putchar('\n');
+>  		return 0;
+> @@ -396,50 +461,52 @@ int main(int ac, char **av)
+>  			.id = reg_list->reg[i],
+>  			.addr = (__u64)&addr,
+>  		};
+> +		bool reject_reg = false;
+>  		int ret;
+>  
+>  		ret = _vcpu_ioctl(vm, 0, KVM_GET_ONE_REG, &reg);
+>  		if (ret) {
+> -			puts("Failed to get ");
+> -			print_reg(reg.id);
+> +			printf("%s: Failed to get ", config_name(c));
+> +			print_reg(c, reg.id);
+>  			putchar('\n');
+>  			++failed_get;
+>  		}
+>  
+>  		/* rejects_set registers are rejected after KVM_ARM_VCPU_FINALIZE */
+> -		if (find_reg(rejects_set, rejects_set_n, reg.id)) {
+> -			ret = _vcpu_ioctl(vm, 0, KVM_SET_ONE_REG, &reg);
+> -			if (ret != -1 || errno != EPERM) {
+> -				printf("Failed to reject (ret=%d, errno=%d) ", ret, errno);
+> -				print_reg(reg.id);
+> -				putchar('\n');
+> -				++failed_reject;
+> +		for_each_sublist(c, s) {
+> +			if (s->rejects_set && find_reg(s->rejects_set, s->rejects_set_n, reg.id)) {
+> +				reject_reg = true;
+> +				ret = _vcpu_ioctl(vm, 0, KVM_SET_ONE_REG, &reg);
+> +				if (ret != -1 || errno != EPERM) {
+> +					printf("%s: Failed to reject (ret=%d, errno=%d) ", config_name(c), ret, errno);
+> +					print_reg(c, reg.id);
+> +					putchar('\n');
+> +					++failed_reject;
+> +				}
+> +				break;
+>  			}
+> -			continue;
+>  		}
+>  
+> -		ret = _vcpu_ioctl(vm, 0, KVM_SET_ONE_REG, &reg);
+> -		if (ret) {
+> -			puts("Failed to set ");
+> -			print_reg(reg.id);
+> -			putchar('\n');
+> -			++failed_set;
+> +		if (!reject_reg) {
+> +			ret = _vcpu_ioctl(vm, 0, KVM_SET_ONE_REG, &reg);
+> +			if (ret) {
+> +				printf("%s: Failed to set ", config_name(c));
+> +				print_reg(c, reg.id);
+> +				putchar('\n');
+> +				++failed_set;
+> +			}
+>  		}
+>  	}
+>  
+> -	if (reg_list_sve()) {
+> -		blessed_n = base_regs_n + sve_regs_n;
+> -		vec_regs = sve_regs;
+> -	} else {
+> -		blessed_n = base_regs_n + vregs_n;
+> -		vec_regs = vregs;
+> -	}
+> -
+> +	for_each_sublist(c, s)
+> +		blessed_n += s->regs_n;
+>  	blessed_reg = calloc(blessed_n, sizeof(__u64));
+> -	for (i = 0; i < base_regs_n; ++i)
+> -		blessed_reg[i] = base_regs[i];
+> -	for (i = 0; i < blessed_n - base_regs_n; ++i)
+> -		blessed_reg[base_regs_n + i] = vec_regs[i];
+> +
+> +	n = 0;
+> +	for_each_sublist(c, s) {
+> +		for (i = 0; i < s->regs_n; ++i)
+> +			blessed_reg[n++] = s->regs[i];
+> +	}
+>  
+>  	for_each_new_reg(i)
+>  		++new_regs;
+> @@ -448,31 +515,31 @@ int main(int ac, char **av)
+>  		++missing_regs;
+>  
+>  	if (new_regs || missing_regs) {
+> -		printf("Number blessed registers: %5lld\n", blessed_n);
+> -		printf("Number registers:         %5lld\n", reg_list->n);
+> +		printf("%s: Number blessed registers: %5lld\n", config_name(c), blessed_n);
+> +		printf("%s: Number registers:         %5lld\n", config_name(c), reg_list->n);
+>  	}
+>  
+>  	if (new_regs) {
+> -		printf("\nThere are %d new registers.\n"
+> +		printf("\n%s: There are %d new registers.\n"
+>  		       "Consider adding them to the blessed reg "
+> -		       "list with the following lines:\n\n", new_regs);
+> +		       "list with the following lines:\n\n", config_name(c), new_regs);
+>  		for_each_new_reg(i)
+> -			print_reg(reg_list->reg[i]);
+> +			print_reg(c, reg_list->reg[i]);
+>  		putchar('\n');
+>  	}
+>  
+>  	if (missing_regs) {
+> -		printf("\nThere are %d missing registers.\n"
+> -		       "The following lines are missing registers:\n\n", missing_regs);
+> +		printf("\n%s: There are %d missing registers.\n"
+> +		       "The following lines are missing registers:\n\n", config_name(c), missing_regs);
+>  		for_each_missing_reg(i)
+> -			print_reg(blessed_reg[i]);
+> +			print_reg(c, blessed_reg[i]);
+>  		putchar('\n');
+>  	}
+>  
+>  	TEST_ASSERT(!missing_regs && !failed_get && !failed_set && !failed_reject,
+> -		    "There are %d missing registers; "
+> +		    "%s: There are %d missing registers; "
+>  		    "%d registers failed get; %d registers failed set; %d registers failed reject",
+> -		    missing_regs, failed_get, failed_set, failed_reject);
+> +		    config_name(c), missing_regs, failed_get, failed_set, failed_reject);
+>  
+>  	return 0;
+>  }
+> @@ -761,7 +828,6 @@ static __u64 base_regs[] = {
+>  	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
+>  	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
+>  };
+> -static __u64 base_regs_n = ARRAY_SIZE(base_regs);
+>  
+>  static __u64 vregs[] = {
+>  	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]),
+> @@ -797,7 +863,6 @@ static __u64 vregs[] = {
+>  	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[30]),
+>  	KVM_REG_ARM64 | KVM_REG_SIZE_U128 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.vregs[31]),
+>  };
+> -static __u64 vregs_n = ARRAY_SIZE(vregs);
+>  
+>  static __u64 sve_regs[] = {
+>  	KVM_REG_ARM64_SVE_VLS,
+> @@ -852,11 +917,31 @@ static __u64 sve_regs[] = {
+>  	KVM_REG_ARM64_SVE_FFR(0),
+>  	ARM64_SYS_REG(3, 0, 1, 2, 0),   /* ZCR_EL1 */
+>  };
+> -static __u64 sve_regs_n = ARRAY_SIZE(sve_regs);
+>  
+> -static __u64 rejects_set[] = {
+> -#ifdef REG_LIST_SVE
+> +static __u64 sve_rejects_set[] = {
+>  	KVM_REG_ARM64_SVE_VLS,
+> -#endif
+>  };
+> -static __u64 rejects_set_n = ARRAY_SIZE(rejects_set);
+> +
+> +#define BASE_SUBLIST \
+> +	{ "base", .regs = base_regs, .regs_n = ARRAY_SIZE(base_regs), }
 
-Good catch. I'll look into how to untangle NUMA balancing and PageGuest().
-It shouldn't be hard. PageGuest() pages should be subject for balancing.
+I don't think it matters that much for this test, but ".capability = 0"
+is already taken:
 
-> > Do you see any problems with this?
-> > 
-> > > Oh, and the other nicety is that I think it would avoid having to explicitly
-> > > handle PageGuest() memory that is being accessed from kernel/KVM, i.e. if all
-> > > memory exposed to KVM must be !PageGuest(), then it is also eligible for
-> > > copy_{to,from}_user().
-> > 
-> > copy_{to,from}_user() enforce by setting PTE entries to PROT_NONE.
+#define KVM_CAP_IRQCHIP	  0
+
+> +#define VREGS_SUBLIST \
+> +	{ "vregs", .regs = vregs, .regs_n = ARRAY_SIZE(vregs), }
+> +#define SVE_SUBLIST \
+> +	{ "sve", .capability = KVM_CAP_ARM_SVE, .feature = KVM_ARM_VCPU_SVE, .finalize = true, \
+> +	  .regs = sve_regs, .regs_n = ARRAY_SIZE(sve_regs), \
+> +	  .rejects_set = sve_rejects_set, .rejects_set_n = ARRAY_SIZE(sve_rejects_set), }
+> +
+> +static struct vcpu_config vregs_config = {
+> +	.sublists = {
+> +	BASE_SUBLIST,
+> +	VREGS_SUBLIST,
+> +	{0},
+> +	},
+> +};
+> +static struct vcpu_config sve_config = {
+> +	.sublists = {
+> +	BASE_SUBLIST,
+> +	SVE_SUBLIST,
+> +	{0},
+> +	},
+> +};
+> -- 
+> 2.31.1
 > 
-> But KVM does _not_ want those PTEs PROT_NONE.  If KVM is accessing memory that
-> is also accessible by the the guest, then it must be shared.  And if it's shared,
-> it must also be accessible to host userspace, i.e. something other than PROT_NONE,
-> otherwise the memory isn't actually shared with anything.
-> 
-> As above, any guest-accessible memory that is accessed by the host must be
-> shared, and so must be mapped with the required permissions.
-
-I don't see contradiction here: copy_{to,from}_user() would fail with
--EFAULT on PROT_NONE PTE.
-
-By saying in initial posting that inserting PageGuest() into shared is
-fine, I didn't mean it's usefule, just allowed.
-
--- 
- Kirill A. Shutemov
