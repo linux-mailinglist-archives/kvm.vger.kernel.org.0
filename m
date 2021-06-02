@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F8BC398AC8
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 15:33:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D5DB398ABD
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 15:33:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229801AbhFBNfW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 09:35:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54472 "EHLO
+        id S230205AbhFBNe6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 09:34:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230138AbhFBNfM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 09:35:12 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CF39C06174A;
-        Wed,  2 Jun 2021 06:33:29 -0700 (PDT)
+        with ESMTP id S230080AbhFBNe1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 09:34:27 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABBAAC061342;
+        Wed,  2 Jun 2021 06:32:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:References:
+        d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=Sj4Xan1+3aJ6Po5iAXxX9E8AwNGjzz5eYxQ6hRhen0g=; b=hMlj520jMnvNI6O5tUqcyzOgHW
-        EHiJoaUSJQ6hVJ7Wpebgbxf98jjwH5xRoh67t9mLVd2A/HfLxY2Yx4h5lqvgKDYtgGojEvu4IefSN
-        3DS6NOM57KiQOuJ7YRpVuKxZsMsiHqnRArRHs23pjdvHMQBl6lq9QREaZLgYa75oH3MWB+gJ1tC1J
-        +wH4gCxswnyNBmjCumjXo1vOZE8FBxAebh/yrQhXJi8Y54MOt/nDCRBdOX3lrbMZSfd4Wjc7Ev0IX
-        oIeI/gLN/0oqtU5QOuXfbcGteiSWIxBhDz2ucFEF9xi8LFZyzr9Fj0M1df6hbsxkqYJsywFl4l0AK
-        rwAquI9Q==;
+        bh=ZM/OZzCTna+H0NVHgaZG9RysfqZrZbVctmrXuvKDhRg=; b=Y4KjVcAVs++u5aWG8t3gz7Zmdm
+        2GCCs43oozUZx+EtBSVivOvona+vh800bFDlXP3+vZhGLq9LHKpyLPPoBAn1rRYCCcALnq2iBn3qi
+        MaERsXXM6+x7+/J8899O1kiYvL9TAxD6Zljthg0HfcVxNIohePy8ytwNYVprNkPCZjTMttAfDdM5g
+        5KwiCrJMDzwRbGhdMjmXxhzxS1ITsVDM6G31nZqJOA7KWsEk8nkmFZWwCwuPLepKXuKwII1/UGGIB
+        +DR2n/OyDqazhheBKOtqI7M+p0fenDjIhPGAkcT4D/YDi1MNXCIEjbsoIuoh4Bzi5lhHvKvOR/Ja3
+        YhspdwAA==;
 Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1loQxh-00B8o4-IG; Wed, 02 Jun 2021 13:31:12 +0000
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1loQxb-002tok-Ab; Wed, 02 Jun 2021 13:31:10 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 492F93004DE;
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 5345830050D;
         Wed,  2 Jun 2021 15:31:05 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id 9ED912C189403; Wed,  2 Jun 2021 15:31:04 +0200 (CEST)
-Message-ID: <20210602133040.461908001@infradead.org>
+        id A55642C1AB5EA; Wed,  2 Jun 2021 15:31:04 +0200 (CEST)
+Message-ID: <20210602133040.524487671@infradead.org>
 User-Agent: quilt/0.66
-Date:   Wed, 02 Jun 2021 15:12:29 +0200
+Date:   Wed, 02 Jun 2021 15:12:30 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
@@ -88,7 +88,7 @@ Cc:     Borislav Petkov <bp@alien8.de>, x86@kernel.org,
         kgdb-bugreport@lists.sourceforge.net,
         linux-perf-users@vger.kernel.org, linux-pm@vger.kernel.org,
         rcu@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org
-Subject: [PATCH 4/6] sched: Add get_current_state()
+Subject: [PATCH 5/6] sched,timer: Use __set_current_state()
 References: <20210602131225.336600299@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -96,69 +96,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove yet another few p->state accesses.
 
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- block/blk-mq.c        |    2 +-
- include/linux/sched.h |    2 ++
- kernel/freezer.c      |    2 +-
- kernel/sched/core.c   |    6 +++---
- 4 files changed, 7 insertions(+), 5 deletions(-)
+ kernel/time/timer.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3891,7 +3891,7 @@ int blk_poll(struct request_queue *q, bl
- 
- 	hctx->poll_considered++;
- 
--	state = current->state;
-+	state = get_current_state();
- 	do {
- 		int ret;
- 
---- a/include/linux/sched.h
-+++ b/include/linux/sched.h
-@@ -212,6 +212,8 @@ struct task_group;
- 
- #endif
- 
-+#define get_current_state()	READ_ONCE(current->state)
-+
- /* Task command name length: */
- #define TASK_COMM_LEN			16
- 
---- a/kernel/freezer.c
-+++ b/kernel/freezer.c
-@@ -58,7 +58,7 @@ bool __refrigerator(bool check_kthr_stop
- 	/* Hmm, should we be allowed to suspend when there are realtime
- 	   processes around? */
- 	bool was_frozen = false;
--	long save = current->state;
-+	unsigned int save = get_current_state();
- 
- 	pr_debug("%s entered refrigerator\n", current->comm);
- 
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -8273,15 +8273,15 @@ static inline int preempt_count_equals(i
- 
- void __might_sleep(const char *file, int line, int preempt_offset)
- {
-+	unsigned int state = get_current_state();
- 	/*
- 	 * Blocking primitives will set (and therefore destroy) current->state,
- 	 * since we will exit with TASK_RUNNING make sure we enter with it,
- 	 * otherwise we will destroy state.
- 	 */
--	WARN_ONCE(current->state != TASK_RUNNING && current->task_state_change,
-+	WARN_ONCE(state != TASK_RUNNING && current->task_state_change,
- 			"do not call blocking ops when !TASK_RUNNING; "
--			"state=%lx set at [<%p>] %pS\n",
--			current->state,
-+			"state=%x set at [<%p>] %pS\n", state,
- 			(void *)current->task_state_change,
- 			(void *)current->task_state_change);
- 
+--- a/kernel/time/timer.c
++++ b/kernel/time/timer.c
+@@ -1879,7 +1879,7 @@ signed long __sched schedule_timeout(sig
+ 			printk(KERN_ERR "schedule_timeout: wrong timeout "
+ 				"value %lx\n", timeout);
+ 			dump_stack();
+-			current->state = TASK_RUNNING;
++			__set_current_state(TASK_RUNNING);
+ 			goto out;
+ 		}
+ 	}
 
 
