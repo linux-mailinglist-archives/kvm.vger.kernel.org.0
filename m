@@ -2,260 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D1CC3982F1
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 09:29:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8110539834D
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 09:42:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231688AbhFBHbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 03:31:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55984 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231622AbhFBHbC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 03:31:02 -0400
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92E46C061756;
-        Wed,  2 Jun 2021 00:29:18 -0700 (PDT)
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4Fw0yh4N0nz9sW4; Wed,  2 Jun 2021 17:29:16 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1622618956;
-        bh=uGza2ambRaw52uUD6+0AHLe+nMsKVTQGJ2WrG5YyBgM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Tjx74IuRulizpaNftVChf7BNNeGl+1EoQNhIlUofWpJQxeibH3wdkpHdG2F9SnY3M
-         /+XTbp+kE+ukN9tHYbjk6ddIPAas4n4QjEsZOYxVxc7/4EeaRuhvn2Mb03GDarZYdi
-         vRQ/ZSkrrqyNesAQVv650ekDxOUzfDCcA7V0Fxwg=
-Date:   Wed, 2 Jun 2021 17:22:13 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Alex Williamson (alex.williamson@redhat.com)" 
-        <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [RFC] /dev/ioasid uAPI proposal
-Message-ID: <YLcxpYDkT1h7hIbQ@yekko>
-References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210528233649.GB3816344@nvidia.com>
+        id S230208AbhFBHoA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 03:44:00 -0400
+Received: from mail-dm6nam10on2075.outbound.protection.outlook.com ([40.107.93.75]:1504
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229604AbhFBHn5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 03:43:57 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=f31WV9tswuRJNpjad9wgB6xxS4EiK/dFbPo7hM6DiY8KiutVF/6/6Y1fgSsl49ufR4zoAQuHyGYfHsNEH3CZexDDbhHxCJBmYw+yBOt2kTcv8brUr9b+pyIH4/tBnhuKtmKBBrBLeXuLXi/z9+10e8JoYoDYXXSHUbj/FPZn6DtJ5Y6vIYX+Em5DDnu2ahpGe4oZ2091SRok4t/3aDvOBLnn8UPAwmuRu88M0ZXM/oYWsd/LFLvIbjYzuWd6EOTw8rMAXgbjJkGcr5q1umwJwdERNfAkslrPxQzSzr2ctG0YN54gh/qrkgYNWCaRqiDkhHPc/bqTI21MSD55U1ZnZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nZpVudIeSVRodlvGdffdv/xyhOiliWqDvZBSsQMjm8k=;
+ b=Qm70sbS915AD7T1dWZkhZZZIk7WDBQlijBuGgzvKQx70DgwOu2oRUBRuEeCCpZOUwqsWNa01eF6tW6/ebwRwLUo68XjdPYKSsEZAmfo4sjYmSvxuERNu/yw2crRwOwmT58h3R63Mwzj0uLOvxcwv4RKORg7rWq9mr/GRaCC+814LvpYZ03LOdQArpetZsWX8iDED6nTRa1TVTFY/R5tKpFBEF7qqSHNTMvhTYN6ADu2soQrU5tfNaiFTRBa+xiGFzshnI1gCHGUeby+vfN8C+ofhDhrC8FZckFkYhz1Lp6EehUwZX24y9qFgCtR3ZHNz3gQzRD+CL+Ny0Uq/tIxH5Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nZpVudIeSVRodlvGdffdv/xyhOiliWqDvZBSsQMjm8k=;
+ b=uSK9WORQgIP59FqXuyUFsFGRV85EACj2lXJlgSwl4IaazmGbiVx5zbtDiv+IAUwXpNb2oHTx+jGn3g/4W1lsr390juYZtK+HprHXBPk41T6wp0bHTiT0nLV5Y1qrSMALx6clJY7hOvyPWQ8H22t3rQEYBlAXAw+dFsCkwLpIE6mQ5qk9+YVTeFcSfbiObbERlb03WVP4TvtIH7HfZQocAZDgHCUtW+M/5w/0puXGiPuBqubgppvSAYq5/5piZNM5aiK94dBosjEk/WGRmmK4c+LEulSc3X1RCkInZxW7bp1NNsCQMvqPmTNulWYpaj2qUA2H5qAjFiuuDX3ERwDl/Q==
+Received: from BN9PR03CA0023.namprd03.prod.outlook.com (2603:10b6:408:fa::28)
+ by DM6PR12MB2748.namprd12.prod.outlook.com (2603:10b6:5:43::28) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.29; Wed, 2 Jun
+ 2021 07:42:13 +0000
+Received: from BN8NAM11FT029.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:fa:cafe::64) by BN9PR03CA0023.outlook.office365.com
+ (2603:10b6:408:fa::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.22 via Frontend
+ Transport; Wed, 2 Jun 2021 07:42:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ BN8NAM11FT029.mail.protection.outlook.com (10.13.177.68) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4150.30 via Frontend Transport; Wed, 2 Jun 2021 07:42:13 +0000
+Received: from mtl-vdi-166.wap.labs.mlnx (172.20.187.5) by
+ HQMAIL107.nvidia.com (172.20.187.13) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Wed, 2 Jun 2021 07:42:10 +0000
+Date:   Wed, 2 Jun 2021 10:42:05 +0300
+From:   Eli Cohen <elic@nvidia.com>
+To:     Jason Wang <jasowang@redhat.com>
+CC:     <mst@redhat.com>, <virtualization@lists.linux-foundation.org>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <eli@mellanox.com>
+Subject: Re: [PATCH V2 3/4] vp_vdpa: allow set vq state to initial state
+ after reset
+Message-ID: <20210602074205.GA12498@mtl-vdi-166.wap.labs.mlnx>
+References: <20210602021043.39201-1-jasowang@redhat.com>
+ <20210602021043.39201-4-jasowang@redhat.com>
+ <20210602061324.GA8662@mtl-vdi-166.wap.labs.mlnx>
+ <091dc6d0-8754-7b2a-64ec-985ef9db6329@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="j/FYRtVn/XN5nkYp"
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-In-Reply-To: <20210528233649.GB3816344@nvidia.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <091dc6d0-8754-7b2a-64ec-985ef9db6329@redhat.com>
+User-Agent: Mutt/1.9.5 (bf161cf53efb) (2018-04-13)
+X-Originating-IP: [172.20.187.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 83b53868-fbb8-4693-bd75-08d92599efc3
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2748:
+X-Microsoft-Antispam-PRVS: <DM6PR12MB27481BA7A55298EAC0E09479AB3D9@DM6PR12MB2748.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: r4RqsfLRZzjXCYN32etHJmeCfH2arhJv8UxpwIvNqnQlQ24Pi5VACkLb20EYhDZFqmtVkXIM57JOefORTH/AG8Pbn7AK/hpOqvbMrdLmQR08fzpej7xcpTgtDIPfw0yx2EUwxLFqfIUX+xM/YXsl591Lw5tWzIAEOVBjprv1zDbn0YNwnvmOjtupUX4AcR7Im9owGQMIi4O7vaBO5xbJ/AI3jxOulohQpYiLufJRmMFswCCvflNsKVfFYt+l8cbU1M/lCCBwiWUNPBmQvZgbF8rTC1qqvoY8gpPL3gmXxtfvmIu/MniJwP7L2jpQeNotocGljSH6Opw05LwR+eyAnQMxLM6pfLwqce/t7BUWJ0uJwlZbrWxBpgaZRUQC12y09o/2kLxUNwfPZypV5wllLndKcs5vkvTuQmKboDvv34xXMQ4zQ7zgR6PBdP43v3k2QVy35GIZgmhZABFzQ6sOPBMV8kgpJhSAjBqyhOVfXsC2v34/fsRccvtAwFLUAskDFwTqbb81/C29jNni5uZCDIWB7VmcPcbHZPG48CcvHb9zFikEgurhjx2j6w529qt96GNAy+1ZzeC3ghH4gxBECRu4OW+uXBhkOjmNMnqGZ4QUGohnM+E2au6bVitWbTSiFkqnVxbcYNQL8Q7+Kjv5MihODESooFtSY7RquXcO1vU=
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(136003)(376002)(346002)(39860400002)(396003)(36840700001)(46966006)(82310400003)(70206006)(8676002)(316002)(36906005)(86362001)(55016002)(36860700001)(6916009)(54906003)(8936002)(5660300002)(2906002)(426003)(83380400001)(1076003)(7636003)(336012)(82740400003)(16526019)(186003)(7696005)(26005)(107886003)(9686003)(70586007)(33656002)(47076005)(356005)(6666004)(478600001)(4326008);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2021 07:42:13.0643
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 83b53868-fbb8-4693-bd75-08d92599efc3
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT029.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2748
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Jun 02, 2021 at 03:05:35PM +0800, Jason Wang wrote:
+> 
+> 在 2021/6/2 下午2:13, Eli Cohen 写道:
+> > On Wed, Jun 02, 2021 at 10:10:42AM +0800, Jason Wang wrote:
+> > > We used to fail the set_vq_state() since it was not supported yet by
+> > > the virtio spec. But if the bus tries to set the state which is equal
+> > > to the device initial state after reset, we can let it go.
+> > > 
+> > > This is a must for virtio_vdpa() to set vq state during probe which is
+> > > required for some vDPA parents.
+> > > 
+> > > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > > ---
+> > >   drivers/vdpa/virtio_pci/vp_vdpa.c | 42 ++++++++++++++++++++++++++++---
+> > >   1 file changed, 39 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
+> > > index c76ebb531212..18bf4a422772 100644
+> > > --- a/drivers/vdpa/virtio_pci/vp_vdpa.c
+> > > +++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
+> > > @@ -210,13 +210,49 @@ static int vp_vdpa_get_vq_state(struct vdpa_device *vdpa, u16 qid,
+> > >   	return -EOPNOTSUPP;
+> > >   }
+> > > +static int vp_vdpa_set_vq_state_split(struct vdpa_device *vdpa,
+> > > +				      const struct vdpa_vq_state *state)
+> > > +{
+> > > +	const struct vdpa_vq_state_split *split = &state->split;
+> > > +
+> > > +	if (split->avail_index == 0)
+> > > +		return 0;
+> > > +
+> > > +	return -EOPNOTSUPP;
+> > > +}
+> > > +
+> > > +static int vp_vdpa_set_vq_state_packed(struct vdpa_device *vdpa,
+> > > +				       const struct vdpa_vq_state *state)
+> > > +{
+> > > +	const struct vdpa_vq_state_packed *packed = &state->packed;
+> > > +
+> > > +	if (packed->last_avail_counter == 1 &&
+> > Can you elaborate on the requirement on last_avail_counter and
+> > last_used_counter?
+> 
+> 
+> This is required by the virtio spec:
+> 
+> "
+> 2.7.1 Driver and Device Ring Wrap Counters
+> Each of the driver and the device are expected to maintain, internally, a
+> single-bit ring wrap counter initialized to 1.
+> "
+> 
+> For virtio-pci device, since there's no way to assign the value of those
+> counters, the counters will be reset to 1 after reset, otherwise the driver
+> can't work.
 
---j/FYRtVn/XN5nkYp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I see, thanks for the explanation.
 
-On Fri, May 28, 2021 at 08:36:49PM -0300, Jason Gunthorpe wrote:
-> On Thu, May 27, 2021 at 07:58:12AM +0000, Tian, Kevin wrote:
->=20
-> > 2.1. /dev/ioasid uAPI
-> > +++++++++++++++++
-> >=20
-> > /*
-> >   * Check whether an uAPI extension is supported.=20
-> >   *
-> >   * This is for FD-level capabilities, such as locked page pre-registra=
-tion.=20
-> >   * IOASID-level capabilities are reported through IOASID_GET_INFO.
-> >   *
-> >   * Return: 0 if not supported, 1 if supported.
-> >   */
-> > #define IOASID_CHECK_EXTENSION	_IO(IOASID_TYPE, IOASID_BASE + 0)
->=20
-> =20
-> > /*
-> >   * Register user space memory where DMA is allowed.
-> >   *
-> >   * It pins user pages and does the locked memory accounting so sub-
-> >   * sequent IOASID_MAP/UNMAP_DMA calls get faster.
-> >   *
-> >   * When this ioctl is not used, one user page might be accounted
-> >   * multiple times when it is mapped by multiple IOASIDs which are
-> >   * not nested together.
-> >   *
-> >   * Input parameters:
-> >   *	- vaddr;
-> >   *	- size;
-> >   *
-> >   * Return: 0 on success, -errno on failure.
-> >   */
-> > #define IOASID_REGISTER_MEMORY	_IO(IOASID_TYPE, IOASID_BASE + 1)
-> > #define IOASID_UNREGISTER_MEMORY	_IO(IOASID_TYPE, IOASID_BASE + 2)
->=20
-> So VA ranges are pinned and stored in a tree and later references to
-> those VA ranges by any other IOASID use the pin cached in the tree?
->=20
-> It seems reasonable and is similar to the ioasid parent/child I
-> suggested for PPC.
->=20
-> IMHO this should be merged with the all SW IOASID that is required for
-> today's mdev drivers. If this can be done while keeping this uAPI then
-> great, otherwise I don't think it is so bad to weakly nest a physical
-> IOASID under a SW one just to optimize page pinning.
-
-Right, I think we can simplify the interface by modelling the
-preregistration as a nesting layer.  Well, mostly.. the wrinkle is
-that generally you can't do anything with an ioasid until you've
-attached devices to it, but that doesn't really make sense for the
-prereg layer.  I expect we can find some way to deal with that,
-though.
-
-Actually... to simplify that "weak nesting" concept I wonder if we
-want to expand to 3 ways of specifying the pagetables for the ioasid:
-  1) kernel managed (MAP/UNMAP)
-  2) user managed (BIND/INVALIDATE)
-  3) pass-though (IOVA=3D=3Dparent address)
-
-Obviously pass-through wouldn't be allowed in all circumstances.
-
-> Either way this seems like a smart direction
->=20
-> > /*
-> >   * Allocate an IOASID.=20
-> >   *
-> >   * IOASID is the FD-local software handle representing an I/O address=
-=20
-> >   * space. Each IOASID is associated with a single I/O page table. User=
-=20
-> >   * must call this ioctl to get an IOASID for every I/O address space t=
-hat is
-> >   * intended to be enabled in the IOMMU.
-> >   *
-> >   * A newly-created IOASID doesn't accept any command before it is=20
-> >   * attached to a device. Once attached, an empty I/O page table is=20
-> >   * bound with the IOMMU then the user could use either DMA mapping=20
-> >   * or pgtable binding commands to manage this I/O page table.
->=20
-> Can the IOASID can be populated before being attached?
-
-I don't think it reasonably can.  Until attached, you don't actually
-know what hardware IOMMU will be backing it, and therefore you don't
-know it's capabilities.  You can't really allow mappings if you don't
-even know allowed IOVA ranges and page size.
-
-> >   * Device attachment is initiated through device driver uAPI (e.g. VFI=
-O)
-> >   *
-> >   * Return: allocated ioasid on success, -errno on failure.
-> >   */
-> > #define IOASID_ALLOC	_IO(IOASID_TYPE, IOASID_BASE + 3)
-> > #define IOASID_FREE	_IO(IOASID_TYPE, IOASID_BASE + 4)
->=20
-> I assume alloc will include quite a big structure to satisfy the
-> various vendor needs?
->=20
-> > /*
-> >   * Get information about an I/O address space
-> >   *
-> >   * Supported capabilities:
-> >   *	- VFIO type1 map/unmap;
-> >   *	- pgtable/pasid_table binding
-> >   *	- hardware nesting vs. software nesting;
-> >   *	- ...
-> >   *
-> >   * Related attributes:
-> >   * 	- supported page sizes, reserved IOVA ranges (DMA mapping);
-> >   *	- vendor pgtable formats (pgtable binding);
-> >   *	- number of child IOASIDs (nesting);
-> >   *	- ...
-> >   *
-> >   * Above information is available only after one or more devices are
-> >   * attached to the specified IOASID. Otherwise the IOASID is just a
-> >   * number w/o any capability or attribute.
->=20
-> This feels wrong to learn most of these attributes of the IOASID after
-> attaching to a device.
-
-Yes... but as above, we have no idea what the IOMMU's capabilities are
-until devices are attached.
-
-> The user should have some idea how it intends to use the IOASID when
-> it creates it and the rest of the system should match the intention.
->=20
-> For instance if the user is creating a IOASID to cover the guest GPA
-> with the intention of making children it should indicate this during
-> alloc.
->=20
-> If the user is intending to point a child IOASID to a guest page table
-> in a certain descriptor format then it should indicate it during
-> alloc.
->=20
-> device bind should fail if the device somehow isn't compatible with
-> the scheme the user is tring to use.
-
-[snip]
-> > 2.2. /dev/vfio uAPI
-> > ++++++++++++++++
->=20
-> To be clear you mean the 'struct vfio_device' API, these are not
-> IOCTLs on the container or group?
->=20
-> > /*
-> >    * Bind a vfio_device to the specified IOASID fd
-> >    *
-> >    * Multiple vfio devices can be bound to a single ioasid_fd, but a si=
-ngle
-> >    * vfio device should not be bound to multiple ioasid_fd's.
-> >    *
-> >    * Input parameters:
-> >    *  - ioasid_fd;
-> >    *
-> >    * Return: 0 on success, -errno on failure.
-> >    */
-> > #define VFIO_BIND_IOASID_FD           _IO(VFIO_TYPE, VFIO_BASE + 22)
-> > #define VFIO_UNBIND_IOASID_FD _IO(VFIO_TYPE, VFIO_BASE + 23)
->=20
-> This is where it would make sense to have an output "device id" that
-> allows /dev/ioasid to refer to this "device" by number in events and
-> other related things.
-
-The group number could be used for that, even if there are no group
-fds.  You generally can't identify things more narrowly than group
-anyway.
-
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---j/FYRtVn/XN5nkYp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmC3MZ8ACgkQbDjKyiDZ
-s5Lp5hAAruXb3NLVtuLjvyAaqaKjXI0hJf+T5aYV2GsPEuBFfL3eejzD0+HE4dI8
-Ww0npi2zKzGpAmFoPvMvfpYsANsnmLH5MdHs2DJ9WxFPGvSF67gZLc44rx1XBc2T
-7IboRgMjF5kcKo0HFI+M7pkuvkwMEkkzZzMj7LQtSGOdyFewTJO24aSQZPwTv+JR
-/+MXWXQqI1zkfOIVm8kCHqtAcz5Z6IlXJ1JYeRxLBZou8j1JJqkq1Xt/pEXhI1oZ
-uIuoQxBwBOEoqBtnlmvUWPYfZ8MI0LnJdMWvBAkqFwzMMgkzfqxM4+hV8OfVBRyh
-R6ZIVtEyNT5EuoTVLz8HEPUMgdMNgu9xObrZBRXJpzv/+lV010P44354bz3VxEvi
-sgwjcCNYH8ZXNq3LuJOs1ApKoSwrE+FDNxJe5RmHVNp0ORzRqVeZ33JZS+sSk/CI
-aem0ComVy47umR3JTjjiq+mBhQDISCIh7efu4tYLZsLbE3zKeHEfq7s87v8yYVcG
-tcUzKYNMUONch/X+ChfbmubBr4aVxpgZ1BU3UzfTmQUWybljRVTdMA5qOsBewNIY
-g9AMwr4/JWlA74pERIu+EDqPLAXt4DRHf7kmiG/uKTlZenCopwn3QGs40W+dAF7Y
-82Etp785d9v9Yg8v5JMKc4nNcY4MK2ilEd0QVB+sK3kX3Zea6CM=
-=TTLB
------END PGP SIGNATURE-----
-
---j/FYRtVn/XN5nkYp--
+> 
+> Thanks
+> 
+> 
+> > 
+> > > +	    packed->last_avail_idx == 0 &&
+> > > +	    packed->last_used_counter == 1 &&
+> > > +	    packed->last_used_idx == 0)
+> > > +		return 0;
+> > > +
+> > > +	return -EOPNOTSUPP;
+> > > +}
+> > > +
+> > >   static int vp_vdpa_set_vq_state(struct vdpa_device *vdpa, u16 qid,
+> > >   				const struct vdpa_vq_state *state)
+> > >   {
+> > > -	/* Note that this is not supported by virtio specification, so
+> > > -	 * we return -ENOPOTSUPP here. This means we can't support live
+> > > -	 * migration, vhost device start/stop.
+> > > +	struct virtio_pci_modern_device *mdev = vdpa_to_mdev(vdpa);
+> > > +
+> > > +	/* Note that this is not supported by virtio specification.
+> > > +	 * But if the state is by chance equal to the device initial
+> > > +	 * state, we can let it go.
+> > >   	 */
+> > > +	if ((vp_modern_get_status(mdev) & VIRTIO_CONFIG_S_FEATURES_OK) &&
+> > > +	    !vp_modern_get_queue_enable(mdev, qid)) {
+> > > +		if (vp_modern_get_driver_features(mdev) &
+> > > +		    BIT_ULL(VIRTIO_F_RING_PACKED))
+> > > +			return vp_vdpa_set_vq_state_packed(vdpa, state);
+> > > +		else
+> > > +			return vp_vdpa_set_vq_state_split(vdpa,	state);
+> > > +	}
+> > > +
+> > >   	return -EOPNOTSUPP;
+> > >   }
+> > > -- 
+> > > 2.25.1
+> > > 
+> 
