@@ -2,100 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F513398DC5
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 17:02:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A375398DC1
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 17:02:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231706AbhFBPEU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 11:04:20 -0400
-Received: from mail-pl1-f176.google.com ([209.85.214.176]:37416 "EHLO
-        mail-pl1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232082AbhFBPEN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 11:04:13 -0400
-Received: by mail-pl1-f176.google.com with SMTP id u7so1246245plq.4
-        for <kvm@vger.kernel.org>; Wed, 02 Jun 2021 08:02:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=P21AYfjvRn1BPnlQ+AuEW3lVoQo2ATf7BrIzySahaEs=;
-        b=R5gg7DhQN4H+wZF5g/WQAoR96Vr5pqvoqeMCaKveARCoeDJ1T6+yAtasV7zgdrFYoe
-         ZH+1FFPbwdW0E5tpPz5SLkZJPQ9lV+3w9OVAYmro7b3Lvwh3gNdrNo85HXGjfqHXKcg0
-         8AAY9zxYHN4BQOZhKJHn5qadv+Fl6sj4GLSSBS3YsKGSgbQi3Yl/vHxdiP3unlVD0hIQ
-         X3yTO96Pv1Lz0/klcPi8k57bWiP5YKZoQyQjuTlebQh5U8PSMBP/K9UNsYTYySdzbNmL
-         hWj/EMLazVIuu6yTrsMNp6hnGfswhrXmdfheUY44qdcLOAXNOEAGuCGEl7IsOFcYTsLA
-         KDDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=P21AYfjvRn1BPnlQ+AuEW3lVoQo2ATf7BrIzySahaEs=;
-        b=kXC0li5oszZSLNW3bb0zts7uXR1UdEW3TBbGvTi8xH336imk4xR9BaDAk+hWAfqPyP
-         wHFMvsD1bCRRe1UpylFmBbgO/uILpHwEXZlqg44X4qvzbwHhWeKY6fbCCXtfrIEadJh3
-         ge0sTR4j0CDym/4YPxaG9Nhkpv0J2HVuD7M7j9YhDYktCtU3Q2/v/bHoU6bssqdsnpNj
-         Xqox7QbqKQgcqeUu+fSowBfBqSZXI8jEMvzmpfvmWf1gJma/gCOCeRFYRDV2Hoq4YeSd
-         wr991vzR9EuUctsq3a2fv/N9vbCAWDv4pjcoO5SgfRcegQVmnLql/OyIWsbXr70Aamkj
-         tiSw==
-X-Gm-Message-State: AOAM531caOWEDmredBoa9jPfTlMpa8IYCNgfvgq+APseadlBpibXtboH
-        +howTHN+Iz3YEu1vbRLhbY0gLg==
-X-Google-Smtp-Source: ABdhPJzijG29Y5EMgZHAl3/fJi5+zpU6KE+aKWI43cl8NwduoI35nqmdoMXkgKl3k9TWDp6kaKvQkA==
-X-Received: by 2002:a17:90b:38ca:: with SMTP id nn10mr18826901pjb.127.1622646081188;
-        Wed, 02 Jun 2021 08:01:21 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id e17sm3513pfi.131.2021.06.02.08.01.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jun 2021 08:01:20 -0700 (PDT)
-Date:   Wed, 2 Jun 2021 15:01:16 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <laijs@linux.alibaba.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        id S232053AbhFBPEL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 11:04:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36236 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232054AbhFBPEH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 11:04:07 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 407C1613BF;
+        Wed,  2 Jun 2021 15:02:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1622646144;
+        bh=iqy0WVYDEpl3OEqiwYR2vHlixZDZNAuGOuMgnWDXeR8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=O+pqG+GrEcw9WVS8/OW/fQfSxSijYrBV2XZxysaVScijAUnd0cVcWSF4nom6VYF7/
+         Xyj4yQuXkrrTuHJnUpufQZyClixRruRrV6dddsrZRqOQc+UgpG4vsSCBUy91HBwhfj
+         S4qt9rHniezYWqyJmpYVr3rEugD00r4pGxG9asyrSW0y4cnvEcyeHwtxVwtOD0WKZZ
+         CxVeWNbOBJkHO0H7W+0s6rOxAZoTcR6qnwXcmM/nQ5icf4zBj8IsluJAeqSZ9roUcx
+         S4+extTRu1FhJzpL0fTK8fMnTglu0lQMSa9EV3Tq/LcFiaa96LORrcAJlT/uJ7FgCX
+         ZTIEp+h3YHIzg==
+Date:   Wed, 2 Jun 2021 16:02:11 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Jens Axboe <axboe@kernel.dk>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Felipe Balbi <balbi@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jason Wessel <jason.wessel@windriver.com>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, Waiman Long <longman@redhat.com>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Oleg Nesterov <oleg@redhat.com>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
         Lai Jiangshan <jiangshanlai@gmail.com>,
-        linux-kernel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH] KVM: X86: fix tlb_flush_guest()
-Message-ID: <YLedPIkBvPrjguCC@google.com>
-References: <20210527023922.2017-1-jiangshanlai@gmail.com>
- <78ad9dff-9a20-c17f-cd8f-931090834133@redhat.com>
- <YK/FGYejaIu6EzSn@google.com>
- <d96f8c11-19e6-2c2d-91ff-6a7a51fa1b9c@linux.alibaba.com>
- <YLA4peMjgeVvKlEn@google.com>
- <332beac2-5a0b-2e5c-f22a-7609ed98acb9@linux.alibaba.com>
+        Joel Fernandes <joel@joelfernandes.org>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, cgroups@vger.kernel.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        linux-perf-users@vger.kernel.org, linux-pm@vger.kernel.org,
+        rcu@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 4/6] sched: Add get_current_state()
+Message-ID: <20210602150211.GC31179@willie-the-truck>
+References: <20210602131225.336600299@infradead.org>
+ <20210602133040.461908001@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <332beac2-5a0b-2e5c-f22a-7609ed98acb9@linux.alibaba.com>
+In-Reply-To: <20210602133040.461908001@infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 28, 2021, Lai Jiangshan wrote:
+On Wed, Jun 02, 2021 at 03:12:29PM +0200, Peter Zijlstra wrote:
+> Remove yet another few p->state accesses.
 > 
-> On 2021/5/28 08:26, Sean Christopherson wrote:
-> > On Fri, May 28, 2021, Lai Jiangshan wrote:
-> > > 
-> > > On 2021/5/28 00:13, Sean Christopherson wrote:
-> > > > And making a request won't work without revamping the order of request handling
-> > > > in vcpu_enter_guest(), e.g. KVM_REQ_MMU_RELOAD and KVM_REQ_MMU_SYNC are both
-> > > > serviced before KVM_REQ_STEAL_UPDATE.
-> > > 
-> > > Yes, it just fixes the said problem in the simplest way.
-> > > I copied KVM_REQ_MMU_RELOAD from kvm_handle_invpcid(INVPCID_TYPE_ALL_INCL_GLOBAL).
-> > > (If the guest is not preempted, it will call invpcid_flush_all() and will be handled
-> > > by this way)
-> > 
-> > The problem is that record_steal_time() is called after KVM_REQ_MMU_RELOAD
-> > in vcpu_enter_guest() and so the reload request won't be recognized until the
-> > next VM-Exit.  It works for kvm_handle_invpcid() because vcpu_enter_guest() is
-> > guaranteed to run between the invcpid code and VM-Enter.
-> 
-> Kvm will recheck the request before VM-enter.
-> See kvm_vcpu_exit_request().
+> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> ---
+>  block/blk-mq.c        |    2 +-
+>  include/linux/sched.h |    2 ++
+>  kernel/freezer.c      |    2 +-
+>  kernel/sched/core.c   |    6 +++---
+>  4 files changed, 7 insertions(+), 5 deletions(-)
 
-Ah, right, forgot requests are rechecked.  Thanks!
+I think you can include kernel/kcsan/report.c here too.
+
+With that:
+
+Acked-by: Will Deacon <will@kernel.org>
+
+Will
