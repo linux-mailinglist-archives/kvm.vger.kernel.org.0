@@ -2,254 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B8E5399253
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 20:17:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CBE539930D
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 21:01:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229583AbhFBSTT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 14:19:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26494 "EHLO
+        id S229685AbhFBTCl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 15:02:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43534 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229467AbhFBSTQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Jun 2021 14:19:16 -0400
+        by vger.kernel.org with ESMTP id S229650AbhFBTCl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Jun 2021 15:02:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622657853;
+        s=mimecast20190719; t=1622660457;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ahzsiWMZxojr9G4HDfeT3zH2J1bsBxHW/tNRfW/BP5w=;
-        b=d7KxiTKHjIs/D/L1k5XvcM37IcETHNzMB+bvw/BVVlj7topR9zgcRgEypakCuBHqV/oywi
-        k93RMQjB9sW64SEkandyZB5u6znylDiMUAVuNe7G4CLh+kWmmizQJantz5n+U4oXyTPl/g
-        Efvl8geibW7C+K7W0/Obkpj1wl/y4lU=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-582-RiK_yFzbMa2HlVCEYAtxRQ-1; Wed, 02 Jun 2021 14:17:32 -0400
-X-MC-Unique: RiK_yFzbMa2HlVCEYAtxRQ-1
-Received: by mail-ej1-f71.google.com with SMTP id h18-20020a1709063992b02903d59b32b039so1011832eje.12
-        for <kvm@vger.kernel.org>; Wed, 02 Jun 2021 11:17:32 -0700 (PDT)
+        bh=MXz63wHFCtBChG1iHvZvXLJp7K/v2y7oMTVIZRydq2I=;
+        b=b2X2uSLOiD2nTJfjhPhwh6TPwda/5s3DBuavmbeqah5Z+vB5hs2pS0bqsUlF4UQd+styPE
+        ZBvVWOMn0t7RD+qhvJqXukltV6MBimHPL+QMKaGI5L9K1+Akn/FVjHTSvX68/TvJZiWsFz
+        ni+smoPMiJ0/tScx+PkOaF6QD2cYWU4=
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
+ [209.85.167.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-361-8E7u3yulNV6fM1AbeBJOnQ-1; Wed, 02 Jun 2021 15:00:56 -0400
+X-MC-Unique: 8E7u3yulNV6fM1AbeBJOnQ-1
+Received: by mail-oi1-f200.google.com with SMTP id i6-20020a5440860000b02901f1ccd87497so970446oii.10
+        for <kvm@vger.kernel.org>; Wed, 02 Jun 2021 12:00:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ahzsiWMZxojr9G4HDfeT3zH2J1bsBxHW/tNRfW/BP5w=;
-        b=I3EX8aonba/hOHhMwjsisKdp3Kz8lvAOp90RPLlHa3agdxtnk91BiXCkR5z8CQvqqx
-         tuKkA7Y2xOngdDW433uNFXytHT1Ce2pxJh3BpcJ/NQpjrx8MKDCwKZu99v+e/hCAfw35
-         YPdtAgLwZ7vU4uiXKM8vAzlv0sAMydb8s+XATQivP+EftWPTuZ7q+DKbhX4HlKfHJO9w
-         USLHc67TuQCk6JD4uvVpVaUeLj2dXdEV65p7OwgTBHNtef3Szp0NJugJi/iw+TJu5kxP
-         Bt73fl9Ud9w2Rx/HJ29OaBW1+CRuYUOKilKlYhd57lezdkVFDdoJCMiZl0JuFc6G/8Av
-         5l1Q==
-X-Gm-Message-State: AOAM532qRzdgdo+x3ZG6M4/5pZP9WWcGLgzQ6QfCNUn82LCR6O3papv0
-        1ZgGXT14S0Lnh8AfSgVcHgYb3B9H8LnwAKEG/MCrUE3hanrCbxOOx9O+jKkQtWnhZ2QB+/8gaQ/
-        TrbH9AdLhOuZR
-X-Received: by 2002:a05:6402:19a:: with SMTP id r26mr39471582edv.44.1622657850937;
-        Wed, 02 Jun 2021 11:17:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy2oN509+nTdrCca9UrcwIHrB2+SWUokwV4NMe2lgeRHf0w3zhFoEIikLSFOFJUSFqEAwBiSQ==
-X-Received: by 2002:a05:6402:19a:: with SMTP id r26mr39471573edv.44.1622657850747;
-        Wed, 02 Jun 2021 11:17:30 -0700 (PDT)
-Received: from [192.168.1.36] (235.red-83-57-168.dynamicip.rima-tde.net. [83.57.168.235])
-        by smtp.gmail.com with ESMTPSA id v1sm341281ejw.117.2021.06.02.11.17.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Jun 2021 11:17:30 -0700 (PDT)
-Subject: Re: [PATCH v8] qapi: introduce 'query-kvm-cpuid' action
-To:     Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
-        qemu-devel@nongnu.org
-Cc:     Eduardo Habkost <ehabkost@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Eric Blake <eblake@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
-        Denis Lunev <den@openvz.org>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20210531123806.23030-1-valeriy.vdovin@virtuozzo.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <266974fa-da6c-d0fc-ce12-6a7ce1752fa6@redhat.com>
-Date:   Wed, 2 Jun 2021 20:17:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=MXz63wHFCtBChG1iHvZvXLJp7K/v2y7oMTVIZRydq2I=;
+        b=AGGFqzh6Nrhx7+FaqN4Wl3ljugvSD0APPGAa9Lo+uMxWwI+Z58WXKDo2F3On1EEW4q
+         EKa45wk+YJIq3IOIikgSJiieF3uGGwmRwSEjuvf8/FuaOQrz5r41NzDpO9AW/bObod3y
+         ps1RjWiqkgVDONjy29pCnbhpYYQuGiS/s8qPyXafLYtR9bnvItMz8tA17OAevRYJoQ9d
+         brFF7JMhH3iCpO+FXhA4LxGC1YdjRJWZPjve3nMenxeZN/BsM0RBnGsCBDyAS91PYwO7
+         Vyao5SNSREvKtA98lns5sX1YQVSh25ci39GthHGF+OphBREvibinTt16fENU4wXGnvh3
+         Qnig==
+X-Gm-Message-State: AOAM533A8doP6FJEdcsyIAUlwh5BOVpG8o3mg7e72ytolfkVsUUGgvyh
+        Y/p2hhho5fTmvoUwdcB8/9J0M0Y4EmfNQgKXcoWIX5NXujvAC7KLadl9MFrN6cRMz/y7A/2aK8l
+        zq8KuYJl48G3E
+X-Received: by 2002:a05:6830:15c2:: with SMTP id j2mr26008323otr.367.1622660455933;
+        Wed, 02 Jun 2021 12:00:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx/5Q90CWT9NIdQ1XwO+Gtz3HwUCNmtONxlvq8I6Bn9cXQgzMIAVDQ/kll8JXgHVYLqh2a7KA==
+X-Received: by 2002:a05:6830:15c2:: with SMTP id j2mr26008303otr.367.1622660455621;
+        Wed, 02 Jun 2021 12:00:55 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id q5sm163159oia.31.2021.06.02.12.00.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jun 2021 12:00:54 -0700 (PDT)
+Date:   Wed, 2 Jun 2021 13:00:53 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Robin Murphy <robin.murphy@arm.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jason Wang <jasowang@redhat.com>
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+Message-ID: <20210602130053.615db578.alex.williamson@redhat.com>
+In-Reply-To: <20210602180925.GH1002214@nvidia.com>
+References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
+        <20210528200311.GP1002214@nvidia.com>
+        <MWHPR11MB188685D57653827B566BF9B38C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
+        <20210601162225.259923bc.alex.williamson@redhat.com>
+        <MWHPR11MB1886E8454A58661DC2CDBA678C3D9@MWHPR11MB1886.namprd11.prod.outlook.com>
+        <20210602160140.GV1002214@nvidia.com>
+        <20210602111117.026d4a26.alex.williamson@redhat.com>
+        <20210602173510.GE1002214@nvidia.com>
+        <20210602120111.5e5bcf93.alex.williamson@redhat.com>
+        <20210602180925.GH1002214@nvidia.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20210531123806.23030-1-valeriy.vdovin@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Valeriy,
+On Wed, 2 Jun 2021 15:09:25 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-(Sorry for not looking earlier than v8)
+> On Wed, Jun 02, 2021 at 12:01:11PM -0600, Alex Williamson wrote:
+> > On Wed, 2 Jun 2021 14:35:10 -0300
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >   
+> > > On Wed, Jun 02, 2021 at 11:11:17AM -0600, Alex Williamson wrote:
+> > >   
+> > > > > > > present and be able to test if DMA for that device is cache
+> > > > > > > coherent.      
+> > > > > 
+> > > > > Why is this such a strong linkage to VFIO and not just a 'hey kvm
+> > > > > emulate wbinvd' flag from qemu?    
+> > > > 
+> > > > IIRC, wbinvd has host implications, a malicious user could tell KVM to
+> > > > emulate wbinvd then run the op in a loop and induce a disproportionate
+> > > > load on the system.  We therefore wanted a way that it would only be
+> > > > enabled when required.    
+> > > 
+> > > I think the non-coherentness is vfio_device specific? eg a specific
+> > > device will decide if it is coherent or not?  
+> > 
+> > No, this is specifically whether DMA is cache coherent to the
+> > processor, ie. in the case of wbinvd whether the processor needs to
+> > invalidate its cache in order to see data from DMA.  
+> 
+> I'm confused. This is x86, all DMA is cache coherent unless the device
+> is doing something special.
+> 
+> > > If yes I'd recast this to call kvm_arch_register_noncoherent_dma()
+> > > from the VFIO_GROUP_NOTIFY_SET_KVM in the struct vfio_device
+> > > implementation and not link it through the IOMMU.  
+> > 
+> > The IOMMU tells us if DMA is cache coherent, VFIO_DMA_CC_IOMMU maps to
+> > IOMMU_CAP_CACHE_COHERENCY for all domains within a container.  
+> 
+> And this special IOMMU mode is basically requested by the device
+> driver, right? Because if you use this mode you have to also use
+> special programming techniques.
+> 
+> This smells like all the "snoop bypass" stuff from PCIE (for GPUs
+> even) in a different guise - it is device triggered, not platform
+> triggered behavior.
 
-On 5/31/21 2:38 PM, Valeriy Vdovin wrote:
-> Introducing new qapi method 'query-kvm-cpuid'. This method can be used to
-> get virtualized cpu model info generated by QEMU during VM initialization in
-> the form of cpuid representation.
-> 
-> Diving into more details about virtual cpu generation: QEMU first parses '-cpu'
-> command line option. From there it takes the name of the model as the basis for
-> feature set of the new virtual cpu. After that it uses trailing '-cpu' options,
-> that state if additional cpu features should be present on the virtual cpu or
-> excluded from it (tokens '+'/'-' or '=on'/'=off').
-> After that QEMU checks if the host's cpu can actually support the derived
-> feature set and applies host limitations to it.
-> After this initialization procedure, virtual cpu has it's model and
-> vendor names, and a working feature set and is ready for identification
-> instructions such as CPUID.
-> 
-> Currently full output for this method is only supported for x86 cpus.
-> 
-> To learn exactly how virtual cpu is presented to the guest machine via CPUID
-> instruction, new qapi method can be used. By calling 'query-kvm-cpuid'
-> method, one can get a full listing of all CPUID leafs with subleafs which are
-> supported by the initialized virtual cpu.
-> 
-> Other than debug, the method is useful in cases when we would like to
-> utilize QEMU's virtual cpu initialization routines and put the retrieved
-> values into kernel CPUID overriding mechanics for more precise control
-> over how various processes perceive its underlying hardware with
-> container processes as a good example.
-> 
-> Output format:
-> The output is a plain list of leaf/subleaf agrument combinations, that
-> return 4 words in registers EAX, EBX, ECX, EDX.
-> 
-> Use example:
-> qmp_request: {
->   "execute": "query-kvm-cpuid"
-> }
-> 
-> qmp_response: [
->   {
->     "eax": 1073741825,
->     "edx": 77,
->     "in_eax": 1073741824,
->     "ecx": 1447775574,
->     "ebx": 1263359563,
->   },
->   {
->     "eax": 16777339,
->     "edx": 0,
->     "in_eax": 1073741825,
->     "ecx": 0,
->     "ebx": 0,
->   },
->   {
->     "eax": 13,
->     "edx": 1231384169,
->     "in_eax": 0,
->     "ecx": 1818588270,
->     "ebx": 1970169159,
->   },
->   {
->     "eax": 198354,
->     "edx": 126614527,
->   ....
-> 
-> Signed-off-by: Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+Right, the device can generate the no-snoop transactions, but it's the
+IOMMU that essentially determines whether those transactions are
+actually still cache coherent, AIUI.
 
----
+I did experiment with virtually hardwiring the Enable No-Snoop bit in
+the Device Control Register to zero, which would be generically allowed
+by the PCIe spec, but then we get into subtle dependencies in the device
+drivers and clearing the bit again after any sort of reset and the
+backdoor accesses to config space which exist mostly in the class of
+devices that might use no-snoop transactions (yes, GPUs suck).
 
-> 
-> v2: - Removed leaf/subleaf iterators.
->     - Modified cpu_x86_cpuid to return false in cases when count is
->       greater than supported subleaves.
-> v3: - Fixed structure name coding style.
->     - Added more comments
->     - Ensured buildability for non-x86 targets.
-> v4: - Fixed cpu_x86_cpuid return value logic and handling of 0xA leaf.
->     - Fixed comments.
->     - Removed target check in qmp_query_cpu_model_cpuid.
-> v5: - Added error handling code in qmp_query_cpu_model_cpuid
-> v6: - Fixed error handling code. Added method to query_error_class
-> v7: - Changed implementation in favor of cached cpuid_data for
->       KVM_SET_CPUID2
-> v8: - Renamed qmp method to query-kvm-cpuid and some fields in response.
->     - Modified documentation to qmp method
->     - Removed helper struct declaration
-> ---
+It was much easier and more robust to ignore the device setting and rely
+on the IOMMU behavior.  Yes, maybe we sometimes emulate wbinvd for VMs
+where the device doesn't support no-snoop, but it seemed like platforms
+were headed in this direction where no-snoop was ignored anyway.
+Thanks,
 
-^ Below this '---' go your comments.
-
->  qapi/machine-target.json   | 43 ++++++++++++++++++++++++++++++++++++++
->  target/i386/kvm/kvm.c      | 37 ++++++++++++++++++++++++++++++++
->  tests/qtest/qmp-cmd-test.c |  1 +
->  3 files changed, 81 insertions(+)
-> 
-> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
-> index e7811654b7..a83180dd24 100644
-> --- a/qapi/machine-target.json
-> +++ b/qapi/machine-target.json
-> @@ -329,3 +329,46 @@
->  ##
->  { 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
->    'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I386) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
-> +
-> +##
-> +# @CpuidEntry:
-> +#
-> +# A single entry of a CPUID response.
-> +#
-> +# One entry holds full set of information (leaf) returned to the guest in response
-> +# to it calling a CPUID instruction with eax, ecx used as the agruments to that
-> +# instruction. ecx is an optional argument as not all of the leaves support it.
-> +#
-> +# @in_eax: CPUID argument in eax
-> +# @in_ecx: CPUID argument in ecx
-> +# @eax: eax
-> +# @ebx: ebx
-> +# @ecx: ecx
-> +# @edx: edx
-> +#
-> +# Since: 6.1
-> +##
-> +{ 'struct': 'CpuidEntry',
-> +  'data': { 'in_eax' : 'uint32',
-> +            '*in_ecx' : 'uint32',
-> +            'eax' : 'uint32',
-> +            'ebx' : 'uint32',
-> +            'ecx' : 'uint32',
-> +            'edx' : 'uint32'
-> +          },
-> +  'if': 'defined(TARGET_I386) && defined(CONFIG_KVM)' }
-
-What about other accelerators?
-
-> +
-> +##
-> +# @query-kvm-cpuid:
-> +#
-> +# Returns raw data from the KVM CPUID table for the first VCPU.
-> +# The KVM CPUID table defines the response to the CPUID
-> +# instruction when executed by the guest operating system.
-
-What is specific to KVM here?
-
-What about 'query-accel-cpuid' or 'query-vm-cpu-id'?
-
-> +#
-> +# Returns: a list of CpuidEntry
-> +#
-> +# Since: 6.1
-> +##
-> +{ 'command': 'query-kvm-cpuid',
-> +  'returns': ['CpuidEntry'],
-> +  'if': 'defined(TARGET_I386) && defined(CONFIG_KVM)' }
-...
-> diff --git a/tests/qtest/qmp-cmd-test.c b/tests/qtest/qmp-cmd-test.c
-> index c98b78d033..48add3ada1 100644
-> --- a/tests/qtest/qmp-cmd-test.c
-> +++ b/tests/qtest/qmp-cmd-test.c
-> @@ -46,6 +46,7 @@ static int query_error_class(const char *cmd)
->          { "query-balloon", ERROR_CLASS_DEVICE_NOT_ACTIVE },
->          { "query-hotpluggable-cpus", ERROR_CLASS_GENERIC_ERROR },
->          { "query-vm-generation-id", ERROR_CLASS_GENERIC_ERROR },
-> +        { "query-kvm-cpuid", ERROR_CLASS_GENERIC_ERROR },
->          { NULL, -1 }
->      };
->      int i;
-> 
+Alex
 
