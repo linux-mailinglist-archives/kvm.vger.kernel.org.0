@@ -2,43 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 41854398CB2
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:25:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17125398CC0
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:30:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230157AbhFBO1X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 10:27:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38086 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229667AbhFBO1W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 10:27:22 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B16B8C061574;
-        Wed,  2 Jun 2021 07:25:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=FXtOoRkqKzh7kLJLNx1aUNoAKOt2OwhOUmVlEeFOV/k=; b=aRuCf7uzTZTu6Zoj/CNNkrWz2p
-        NiTO7Wp3c1qPbyOpXwrYp1PtzDWjm9lFd/a9yCbHrEoTHdjq7a3h6AyF0BhDXTQ3QxkDP57PRhMDO
-        zEAZMYNvsYz4QiZA1N4mjgb4wXj7bSBZgp8Pj/xrfNSCm3M3p7yfnXQJFAELoJtdR+E6Ao31ANWBK
-        327hKxLUv5HjbIqhiob98T4BjpKz+Vu+QWE82pAMH8ZWHQCaLUEhWPpOLHq5XbviYzak8e7g6jAgm
-        AiylRMwPRrr6GP8fi1UzCBGjGo3iWRRsemSjXVXxNvj6tuH5bjajvu6yIt+A7WLPb35t2K8sXA42g
-        5gfHi5dg==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1loRmn-00BCUs-DM; Wed, 02 Jun 2021 14:24:00 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id D1C23300269;
-        Wed,  2 Jun 2021 16:23:56 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id B6EF620223DA8; Wed,  2 Jun 2021 16:23:56 +0200 (CEST)
-Date:   Wed, 2 Jun 2021 16:23:56 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        id S230239AbhFBOcQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 10:32:16 -0400
+Received: from foss.arm.com ([217.140.110.172]:46366 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230074AbhFBOcP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 10:32:15 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 35C8D1042;
+        Wed,  2 Jun 2021 07:30:32 -0700 (PDT)
+Received: from C02TD0UTHF1T.local (unknown [10.57.31.212])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D16593F73D;
+        Wed,  2 Jun 2021 07:30:19 -0700 (PDT)
+Date:   Wed, 2 Jun 2021 15:30:16 +0100
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
         Juri Lelli <juri.lelli@redhat.com>,
         Vincent Guittot <vincent.guittot@linaro.org>,
@@ -59,7 +42,7 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Jason Wessel <jason.wessel@windriver.com>,
         Daniel Thompson <daniel.thompson@linaro.org>,
         Douglas Anderson <dianders@chromium.org>,
-        acme <acme@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+        acme <acme@kernel.org>,
         Alexander Shishkin <alexander.shishkin@linux.intel.com>,
         Jiri Olsa <jolsa@redhat.com>,
         Namhyung Kim <namhyung@kernel.org>,
@@ -87,40 +70,58 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         rcu <rcu@vger.kernel.org>, linux-mm <linux-mm@kvack.org>,
         KVM list <kvm@vger.kernel.org>
 Subject: Re: [PATCH 3/6] sched,perf,kvm: Fix preemption condition
-Message-ID: <YLeUfNEqKg27VwAB@hirez.programming.kicks-ass.net>
+Message-ID: <20210602143016.GE12753@C02TD0UTHF1T.local>
 References: <20210602131225.336600299@infradead.org>
  <20210602133040.398289363@infradead.org>
- <1524365960.5868.1622643316351.JavaMail.zimbra@efficios.com>
+ <1873020549.5854.1622642347895.JavaMail.zimbra@efficios.com>
+ <YLeRVQbXt2hCiO8f@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1524365960.5868.1622643316351.JavaMail.zimbra@efficios.com>
+In-Reply-To: <YLeRVQbXt2hCiO8f@hirez.programming.kicks-ass.net>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 02, 2021 at 10:15:16AM -0400, Mathieu Desnoyers wrote:
-> ----- On Jun 2, 2021, at 9:12 AM, Peter Zijlstra peterz@infradead.org wrote:
-> [...]
-> > --- a/kernel/events/core.c
-> > +++ b/kernel/events/core.c
-> > @@ -8568,13 +8568,12 @@ static void perf_event_switch(struct tas
-> > 		},
-> > 	};
+On Wed, Jun 02, 2021 at 04:10:29PM +0200, Peter Zijlstra wrote:
+> On Wed, Jun 02, 2021 at 09:59:07AM -0400, Mathieu Desnoyers wrote:
+> > ----- On Jun 2, 2021, at 9:12 AM, Peter Zijlstra peterz@infradead.org wrote:
 > > 
-> > -	if (!sched_in && task->state == TASK_RUNNING)
-> > +	if (!sched_in && current->on_rq) {
-> > 		switch_event.event_id.header.misc |=
-> > 				PERF_RECORD_MISC_SWITCH_OUT_PREEMPT;
-> > +	}
+> > > When ran from the sched-out path (preempt_notifier or perf_event),
+> > > p->state is irrelevant to determine preemption. You can get preempted
+> > > with !task_is_running() just fine.
+> > > 
+> > > The right indicator for preemption is if the task is still on the
+> > > runqueue in the sched-out path.
+> > > 
+> > > Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> > > ---
+> > > kernel/events/core.c |    7 +++----
+> > > virt/kvm/kvm_main.c  |    2 +-
+> > > 2 files changed, 4 insertions(+), 5 deletions(-)
+> > > 
+> > > --- a/kernel/events/core.c
+> > > +++ b/kernel/events/core.c
+> > > @@ -8568,13 +8568,12 @@ static void perf_event_switch(struct tas
+> > > 		},
+> > > 	};
+> > > 
+> > > -	if (!sched_in && task->state == TASK_RUNNING)
+> > > +	if (!sched_in && current->on_rq) {
 > > 
-> > -	perf_iterate_sb(perf_event_switch_output,
-> > -		       &switch_event,
-> > -		       NULL);
-> > +	perf_iterate_sb(perf_event_switch_output, &switch_event, NULL);
-> > }
+> > This changes from checking task->state to current->on_rq, but this change
+> > from "task" to "current" is not described in the commit message, which is odd.
+> > 
+> > Are we really sure that task == current here ?
 > 
-> There is a lot of code cleanup going on here which does not seem to belong
-> to a "Fix" patch.
+> Yeah, @task == @prev == current at this point, but yes, not sure why I
+> changed that... lemme change that back to task.
 
-Maybe, but I so hate whitespace only patches :-/
+FWIW, with that:
+
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+
+I have no strong feelings either way w.r.t. the whitespace cleanup. ;)
+
+Thanks,
+Mark
