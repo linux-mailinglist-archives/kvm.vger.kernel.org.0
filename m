@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CE7CC397E14
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 03:33:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA66C397E56
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 04:00:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230018AbhFBBfK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Jun 2021 21:35:10 -0400
-Received: from mga03.intel.com ([134.134.136.65]:7726 "EHLO mga03.intel.com"
+        id S230265AbhFBCCH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Jun 2021 22:02:07 -0400
+Received: from mga01.intel.com ([192.55.52.88]:19651 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229899AbhFBBfJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Jun 2021 21:35:09 -0400
-IronPort-SDR: 9FgI6QprtbTf7dO58UFkBTPsaj5QXCTP4nR5mAAuSt/ijBpkdahZiokrjvPLv9pcEUx5EpCFpZ
- h+LA3FnAzkIQ==
-X-IronPort-AV: E=McAfee;i="6200,9189,10002"; a="203711083"
+        id S230262AbhFBCCG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Jun 2021 22:02:06 -0400
+IronPort-SDR: 60Dg4R4Wo8Fw7/EcX5MVb7Ajcbibu5d7Tz2UKME1pvaxVUYOVltRfxQeVU+lOKRdVn24aZ8V6m
+ 0P20X4mZrGNg==
+X-IronPort-AV: E=McAfee;i="6200,9189,10002"; a="224966107"
 X-IronPort-AV: E=Sophos;i="5.83,241,1616482800"; 
-   d="scan'208";a="203711083"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2021 18:33:26 -0700
-IronPort-SDR: 7Vp8Y8wg9o9VI9oZ9X+TY4euu2d/Oe38rzn1R8Wok/Lte58oWklmxpuH9ZmRnwINmSfxyWdIlo
- 285XqGvX3JJA==
+   d="scan'208";a="224966107"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2021 19:00:21 -0700
+IronPort-SDR: 25+6Y7LXK47ISarLYi6xRSNGLRyZDrIpUmj0Va5L/K39MmT+HoTUi1rzZURnw17L2UOG4yXjFz
+ A9h0h54+CeVg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.83,241,1616482800"; 
-   d="scan'208";a="474453776"
-Received: from orsmsx604.amr.corp.intel.com ([10.22.229.17])
-  by FMSMGA003.fm.intel.com with ESMTP; 01 Jun 2021 18:33:25 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
+   d="scan'208";a="416688240"
+Received: from orsmsx606.amr.corp.intel.com ([10.22.229.19])
+  by orsmga002.jf.intel.com with ESMTP; 01 Jun 2021 19:00:21 -0700
+Received: from orsmsx608.amr.corp.intel.com (10.22.229.21) by
+ ORSMSX606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.4; Tue, 1 Jun 2021 18:33:24 -0700
+ 15.1.2242.4; Tue, 1 Jun 2021 19:00:21 -0700
 Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ orsmsx608.amr.corp.intel.com (10.22.229.21) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4
- via Frontend Transport; Tue, 1 Jun 2021 18:33:24 -0700
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.43) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ via Frontend Transport; Tue, 1 Jun 2021 19:00:21 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.4; Tue, 1 Jun 2021 18:33:24 -0700
+ 15.1.2242.4; Tue, 1 Jun 2021 19:00:21 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=l3yFYrGxFgwT/lOWouyxzSVmBiBZqefk+HhJQQIswi0Tou4g3yubK2pKefAfjPi+/OkA685RIcBBzhVWuLGlI6aWW/jOLaSrjBjHnRSrrPdJSULhe7+m2Z63dBU9IDhzNVpo/PanCFzZUNBSLn+jwb1H4iPbvoTScXQb5T205hWoEvZH4eTOYtYyBAsvihFJe5SI1v86lt6WdvPSrAQD5o/IyTid2npMizU8inF4dnn/LETDt0FXT17dP/ASGtiaZV/YxQJ4eJpTkA1vnobu4ULTyZP5EiTgWlFsvrWhf1De3laEmhudx8C/OnA5SCsBfep6vLK6w1OaiskRQ0z5/g==
+ b=FHv4QcdOaBm3FjNskRP6yPUkD9DxdQozs+l2ZiQDWydN1cvPyRgtrS0uzWpO3UP6eHJ/CUOvqUI8rLbEmZC2BQz7qvu5bnxmHVFYAPdoAPYoScB/wDtMauRnj5Le+0lUKKWxRUWbcRbnXUqwuGSpgIVg5Ni1eg8JTZu5Fte6G2JUrRmyoIxrdqv2GNjA9RAh1OXDEd461WBzsrmDXdg3mtebzVX4NZiU7C0xINtUl25qffoH8OGBzpLp4n1TAhOqQ7SUZWrPaDZfaK3sgskrgUQEbUpApuZxdCLgf43s9zjCsIvXlnRrjipN5cRuK3P0wlFQmP6QG3Bre+pWKzr84Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mH82U3yDPlUoLZqBE3Z1PKaRCqkYpgTLUOWPqGtlhnI=;
- b=llvGTQa2ftYV1ADcK9J8nkL3NVmoOGUs4ZkG4ARoSyXDxObCnW5T6GLb6rY56sHnkxVrYN5aIa5FdjeEGSXsIf+Z/LPHS70StjaCsXpXII+zzFw5TL6nTDdIvLOH7OVhlGbnQYveuGL9gEHm8rc+mUtBYTgQuVNXShEAZ7wLdkJHn9xtDVxRytzafj5wXjaD6gqKqlTi4WZTxswk+RoebGAjZY4ZvwvjgjJ3GH3zbJ5IO7z6jmS0N6qfmvstCVmogcfFQ5Q2kAdaIO9MT55oFW2ju0mOeXOvLpHFMa2vyxUV22pX0IvjKEfpySik8G+rQvCOrX9aOLaYISO/oVqSCw==
+ bh=YQpX802ARBgYunDY8oTHpKBWLmspJouGHpXDjn9YAb0=;
+ b=XQe2grOyi4yva4gsdow/qegTvsZTLhn3fp5BL6CiITaHWgjkzdn3lQ99Flx5Eu8kk4RUuYIKIxFDNBGiUyqfCJkjrYthJptKY5ckhI8e7lJSvei2i/PoGCNEe8o4m2R3QaF5GlD3Zm2pRTA5RMhVaz0ceB5g3miiLIbgq6vp6dl8t3Gl0QTAQw+k+EY9/Nft/sN5DD2feMy7xoBliYa1CxzE+YijCxJmQA/OCHXCFZHcCt4KOzH+3gF9TVNl+JgOZON0/Tk5J0KHCvprfCy1sppEzVyOXyxFdBqj5vyvvPB3wFTeZ35FUdqaQVn06UgqXbKlUUl8G6EhiIqsTrkPWg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
  s=selector2-intel-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mH82U3yDPlUoLZqBE3Z1PKaRCqkYpgTLUOWPqGtlhnI=;
- b=ZoCi2ZaCDdf3lHw5TBfF/UH6HilE47TWvUvR8+h1FFrdM6TadBI4fBPHxqhtQi6B9TyUvXRWSokdWs09MnDkN9gHj1JRG2/4LNnbJbyH9dRRutw2bv2pmBokLIRHWvyG4MccoILbzCbVTRoBIMyHXCiBtchoV5LPPjrba4IB+mY=
+ bh=YQpX802ARBgYunDY8oTHpKBWLmspJouGHpXDjn9YAb0=;
+ b=SVSpdU4hEcs36vuUNTBRE8kZLgDSVSj/+Z095eHPweKODmpaX7XPTL7/lmcZWAG/H6qkMGNB+vCFy1pKpvkPSU3VlSmCnCAukDFhuLJNP1sEYHhhBV5fpWN4tEPEO/UTXnVWJeHOQtHXP/d5TH4JCCJiUbljd8ZCINeADu5se6U=
 Received: from MWHPR11MB1886.namprd11.prod.outlook.com (2603:10b6:300:110::9)
- by MWHPR1101MB2301.namprd11.prod.outlook.com (2603:10b6:301:53::12) with
+ by MWHPR1101MB2336.namprd11.prod.outlook.com (2603:10b6:300:75::15) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.20; Wed, 2 Jun
- 2021 01:33:22 +0000
+ 2021 02:00:17 +0000
 Received: from MWHPR11MB1886.namprd11.prod.outlook.com
  ([fe80::6597:eb05:c507:c6c1]) by MWHPR11MB1886.namprd11.prod.outlook.com
  ([fe80::6597:eb05:c507:c6c1%12]) with mapi id 15.20.4173.030; Wed, 2 Jun 2021
- 01:33:22 +0000
+ 02:00:17 +0000
 From:   "Tian, Kevin" <kevin.tian@intel.com>
 To:     Jason Gunthorpe <jgg@nvidia.com>
 CC:     LKML <linux-kernel@vger.kernel.org>,
@@ -83,14 +83,14 @@ CC:     LKML <linux-kernel@vger.kernel.org>,
         "Robin Murphy" <robin.murphy@arm.com>
 Subject: RE: [RFC] /dev/ioasid uAPI proposal
 Thread-Topic: [RFC] /dev/ioasid uAPI proposal
-Thread-Index: AddSzQ970oLnVHLeQca/ysPD8zMJZwBGs/UAALTRUxAAFJZWgAAQLFRg
-Date:   Wed, 2 Jun 2021 01:33:22 +0000
-Message-ID: <MWHPR11MB1886283575628D7A2F4BFFAB8C3D9@MWHPR11MB1886.namprd11.prod.outlook.com>
+Thread-Index: AddSzQ970oLnVHLeQca/ysPD8zMJZwBLsqGAALCWeVAAFFHFgAAQEjDA
+Date:   Wed, 2 Jun 2021 02:00:17 +0000
+Message-ID: <MWHPR11MB1886DE76EDAA9D7FFDDC7FA28C3D9@MWHPR11MB1886.namprd11.prod.outlook.com>
 References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210528173538.GA3816344@nvidia.com>
- <MWHPR11MB18866C362840EA2D45A402188C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210601174229.GP1002214@nvidia.com>
-In-Reply-To: <20210601174229.GP1002214@nvidia.com>
+ <20210528195839.GO1002214@nvidia.com>
+ <MWHPR11MB1886A17F36CF744857C531148C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210601175643.GQ1002214@nvidia.com>
+In-Reply-To: <20210601175643.GQ1002214@nvidia.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -102,130 +102,155 @@ authentication-results: nvidia.com; dkim=none (message not signed)
  header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
 x-originating-ip: [192.198.143.24]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 18c7cf2c-67ab-4adc-c693-08d925666911
-x-ms-traffictypediagnostic: MWHPR1101MB2301:
+x-ms-office365-filtering-correlation-id: 68f6f446-1314-4cab-9abc-08d9256a2b48
+x-ms-traffictypediagnostic: MWHPR1101MB2336:
 x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR1101MB2301B88DA09678E70DD755428C3D9@MWHPR1101MB2301.namprd11.prod.outlook.com>
+x-microsoft-antispam-prvs: <MWHPR1101MB2336018566CEE7E6216CAA578C3D9@MWHPR1101MB2336.namprd11.prod.outlook.com>
 x-ms-oob-tlc-oobclassifiers: OLM:9508;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: WgsCWzilX66sI2TCn/Lid3c/Ear0BhUYPciMzC9jvNI850WIpuFHZQWslYXibtD14VEDwlnPNVpVvFhN4yadgQgx37hl2jAfYJ2DI71Aq5MnDFd3giNxqVn0D/j5fQw2bYxEMmrUS0YHVFIe+c9G1CImDdUQsbGt0xQS2MIviDf6sk3luoHYfFVdZ9OaMGI3dtmUkZnKURpNp6XPCpsETz6LwQAGPkfJpV1TYwdY1NYiTTF2/oDmLdqTC0pKXp4Gpn9PPpT+xjAqYh3SytdfNQQOPacZdGIRbeYUtR6Y7zsQKQHPNClZi+t81a4l9Mfa7OvxmjZD9qWmIFEAqoC09aSxMijPSAXbz868dUgEh3Sqclh+WWv6A8iVKK15SemJwSFTnIlTZcucUiZ6c4yWtx59YjYCVoKRwbi+G4nvBAtriYm3pq5LBkUIIYX16DPAGKXr9X4sWMxpOWAJAnBkdGc291d3hFwElw0pD4RrW0BpWA/G60vCSCJ7DirJeP55eRh2oONHq/BOORt3baoG1RmlYswE1rzLxka86Q03gKHA7T6JsE32HPG4Dnz4w62gRbji/U4tWqTBTkvbCJPDk92sOVrdpTJOyxbXdhfLkb8=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1886.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(366004)(136003)(376002)(346002)(396003)(6506007)(7696005)(316002)(54906003)(71200400001)(33656002)(2906002)(26005)(76116006)(122000001)(4326008)(55016002)(8676002)(7416002)(8936002)(9686003)(6916009)(38100700002)(86362001)(66946007)(186003)(83380400001)(52536014)(5660300002)(478600001)(66476007)(66556008)(66446008)(64756008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?hXbnnLs7mxGvMtrGNwRpCJ7CZehZgUqG3xNfCMl5G/B25A789bZmBHiSwkuM?=
- =?us-ascii?Q?koiB3X15HebKdNLXhMYgK+LHDSp7zqSPLOmSuBQrwnMhXQfw0q9NtgRf0vAM?=
- =?us-ascii?Q?63x9pkroK1zponuvfBkMhx/8VxawYarCBdiqJM1kkY9kj8QaevtHV+fIVZ9Y?=
- =?us-ascii?Q?VvsMJ9E+y/q4TG4NmsN+w5EeUZ2Cwjs9i13vkByncZXtgB5tQk2qBiJelV8o?=
- =?us-ascii?Q?4GSKw+7fjeNmBXiOUjsfdKF0gEX7OAYE5gTBbksR4Y+m8Z2GbjPNkAhwBbHj?=
- =?us-ascii?Q?q4UHxhSUCgJFaas5K4Ur9+Rck8tk/RXOV3/C5TwcYn9OJYwTAfrxaPW1URI2?=
- =?us-ascii?Q?1nNfrwIj/27Jwr9qRRq/3glH7spGlAT4BOMxa8X5qodld09gUFb/5HHsoo1s?=
- =?us-ascii?Q?8S1WCSboBnz/RTpTbwN66z5DHSj8UC5658mo3QXybAf43gun7Z+6i0+/O2xa?=
- =?us-ascii?Q?4fsBiKFV5uKbej7V+XdxGUuSrQcZfUbI674S9Bd9uzjMoNek1hMp5R630YBQ?=
- =?us-ascii?Q?dREzc7NimetYkCIcHxHqE6BgKGXj8dqjUzvjpGPAhe0Q63qKx6QeFnXYzOOD?=
- =?us-ascii?Q?ykeUx8rcXebl11KMjk3QwyNYwEKH7lVd7gZrlpFLKmgJlexPKqHppoz2uZM1?=
- =?us-ascii?Q?kyuHXwcHc18mNATlxX7DAmhmZbKwMp7sX09ug9VgtKavHWo3QUFFXpRwc+Op?=
- =?us-ascii?Q?RK2T4YEaoiSQ4dltMcnI2k8EJX1VZXutGskjlsqd9e2M/zkvejcCkPdOen8Z?=
- =?us-ascii?Q?ENOLI4yu3CGz3+ttqg0zOL7Uwodnvk/6w57+Mja9sDBEvlp6C32QwfE9T+wA?=
- =?us-ascii?Q?QSVPW7na77b24ogPL0IOy2B81IizPZLAWmQxz0kpfxzZyBjkOaP1kk5VxNXX?=
- =?us-ascii?Q?kFWhnDYU0kDIxL4obd4gH5pClaSxGmAMZ1hMrc6IonrsVB+U5gi70Bm/daol?=
- =?us-ascii?Q?tK3zyQsYqZUZ3oFah5qA5Ud2bzTWNhTB5WRePLUjvVPqyUxTonzEh44nZIQU?=
- =?us-ascii?Q?iphl6o/OEKa/rGZhtfmqiPdBpPpC3ResiugM5TsuxZIMdZXu6b6sGurjVQlT?=
- =?us-ascii?Q?oylFPmn3GZ2JtO+oMwClC8f5juglQP+c+YsfqGMlTGobEMkQdVrs2s/6/9aL?=
- =?us-ascii?Q?G7GFTmj6CXuxKX1BxHsYtS5laqUmn25y6adbf4zBB24FJI/pDE1GftX8SXE+?=
- =?us-ascii?Q?Y7XzwZ9KJX1KMEf9KMXYOH4+zH2OC5bs+iCVieowguxGurB2WNkOUwhVZik3?=
- =?us-ascii?Q?fZFFNRRdUFjLqxX0jrLs2INvUN1114/4g/q+/ar1b4R4an/9jrYmcL1Nn/Vy?=
- =?us-ascii?Q?YumXXoaUQoVwaD3q0TWWoJc9?=
+x-microsoft-antispam-message-info: W/KB65TPmvL+IDBn0DbpylaqkpSzMDggdjDz403jLxvWACNIUhb91rMNIUfOqtYN2nQpbbEsRtSnMMw8/2py4d2vtfg0TqgixO0oXLZDA2uIewsSFKFGp82mYRsO457HloDHPqRcluX4uLR4PgrpLycEUlRWtie8J75+9KKpCboVsSfs6bVDf+ltusLr6CI66T/ZIUriCDMi6vdOe6q9O9BC7r3wUxGxWNsExmGTZOvTBfGWyjDf8uv8N54r8WBAaq1D2pohVJ1+nIUpFXuvV8VKM084Qka8rd1l0EiSjjWe9sTr8ORmgl6QNCYBm1TpA+R8JOI+k+7dENxeGwFZ1oc2fCreZJ4NiXFhDqkxafOMN7dbGggKK/YCFs7bhVNj2FyCnKpagTJ1h3946zc2lEJAtB3krM+i8re/MgAbUHbLoJkZLOgVPjivRslmNpEiZfxVNALJhEiRN1ymX1wKamE8fKAyjiqa80bOIkoQ9JpP/sTTyd9+qwJ9LQcb153auOR4pB576xUacTGgw3y8R3zCph2xFxUd8DCDCbaFE5co74ohClDI59tiNa9mAWjKXr7z4DeNMmxWxX0Tg1Uw7Eu3l6bGuD4prFm0aNwGQnA=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1886.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(136003)(39860400002)(346002)(396003)(376002)(366004)(26005)(64756008)(52536014)(9686003)(83380400001)(8676002)(76116006)(86362001)(122000001)(5660300002)(7416002)(186003)(66446008)(71200400001)(2906002)(478600001)(4326008)(316002)(55016002)(6916009)(66946007)(7696005)(54906003)(66556008)(8936002)(66476007)(6506007)(38100700002)(33656002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?pSp2/x6Bh2RkIO+JNxSHvg7QNwp1ZSpJGEGFVZ7f4Kln1FYhg6p4CP4CWN9f?=
+ =?us-ascii?Q?BghYQ6IxW97O814kSuEKi90ifWE/uJgZ4Z0OzeCeCv2avJ88Xt0fBEdO/dW1?=
+ =?us-ascii?Q?8+MFyrX2ktktemDb7/qfzozTgbNOY+dfzyZrfAeU7aV63vZQNaf1PE05LuN4?=
+ =?us-ascii?Q?d3DIriDNG7K4ikGWSZ3Iv1g1rJeffVj2/sz61aCa6u7CUk8KejIHil6y+tlD?=
+ =?us-ascii?Q?gStsfjjcktdmzHTH4fs8Y2esdHJIBYjxqXth51Gi2fHKCP+DtSHSOaK3oxYu?=
+ =?us-ascii?Q?o/UD2IQ/efEVHVonQWySyaiXXN/pxhe46TWYOO4m+SoDPCCrdd7poSJZR7cw?=
+ =?us-ascii?Q?52qtMoi+wceCjNm9i/OVoRv+GJqz2u5iSYOVqM4zj361J5EKONdgxCNQHxVu?=
+ =?us-ascii?Q?kewOAeWg8BZchRtZ6s924lFTvvNuO5/0dl54L1KA6iZvL87ppP87FA/c0aNo?=
+ =?us-ascii?Q?AMtsRzlYRJ4NR+Pk9FgCZQecNgVBCyhu5T2rdL92A/CtKjRUhQ9HGXXtWy7s?=
+ =?us-ascii?Q?dSvSGdZ80FSrBQ65B5V+t1dEcaAGQdcrNfoP4BbrN1hQ/k1oA64B7yM881uD?=
+ =?us-ascii?Q?G/UXYX2pVr32JWXxP1dyGCJMemn0ZCFgWZebVXE/Ygi7purMaH8qXBLSTH36?=
+ =?us-ascii?Q?a5CL5j5pbRd1ObX1RNIW7ItMAKAJwg1+WQb3UZ558Y+2foqUesM2KLKSdW3Z?=
+ =?us-ascii?Q?XjFpI5Rvut8LGjlTtiNcFMbhDm/HPaO8S9Nt7QZx/CkEXq6XoBtJTgUmB65p?=
+ =?us-ascii?Q?0ShE4QXw/V4yk1AGjPpRpaUDRGCiX3mGiK7O9eXYI8F5Gh/4RWsdeRk7oq0j?=
+ =?us-ascii?Q?4Jv1K7Ne0Z3FIoybXnlQ/zUIgePv3+Hzu1rgUsqmhr8lCS/e8F1E19MmC5mZ?=
+ =?us-ascii?Q?VyzSBNpAb0mr4LxLJTq9FB084G++ds+wIYS9g+l+Z81eTwChTOjQh+vkkw6P?=
+ =?us-ascii?Q?eWejt2pyQO0Bl3muvQu/q+k4VhHLCJExWQ5wDnqxtYLlasjaOBkmQ4GuHJNo?=
+ =?us-ascii?Q?ATNQOzdF9fdWX3yr5vwjM+imQZCAvagY0DFCogereAoE819Puw9Gqaik/+pQ?=
+ =?us-ascii?Q?WzvMK75rwpZySB2GKZiQDXvSwEnYT8NWjKP5DhSA9x1tN5LPdhxaka756Ql5?=
+ =?us-ascii?Q?GDYXntrpPC29iOxUbC5yXVpKPRU6ST3l+CcSmvyQWZbeRRTz05Np9TkCu0WK?=
+ =?us-ascii?Q?ZZtjEBb/I5G+OxA6LSw2FNhoRs9N4wS1nWjaMi+Hb06/MHHTq1OXKl+7Ch2+?=
+ =?us-ascii?Q?KO+QXwxPkzBkUfUZCr47JurhSVQX4CW1qCQa1n7YuWdU7wdCG20R6jjzn02P?=
+ =?us-ascii?Q?tydJpFJxt2AIc9ZTUJZPDY3i?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1886.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 18c7cf2c-67ab-4adc-c693-08d925666911
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Jun 2021 01:33:22.7651
+X-MS-Exchange-CrossTenant-Network-Message-Id: 68f6f446-1314-4cab-9abc-08d9256a2b48
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Jun 2021 02:00:17.1765
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: BKD0UrNKYW7S7pmZ1FLRau/9FqMC+Ad7lCSk+c9LpejUIQmi6InTEIozDjB9kTcRnUpYIOOhJHLTcJCC7bNwwQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1101MB2301
+X-MS-Exchange-CrossTenant-userprincipalname: SOX1mjUX/hPNvseLjnf/iHj59y1Pu63v+J2mZYH/C1YHCG6PjUkSOMgRohbDifg5e72TX9IhKK+lhUZeON9jKg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1101MB2336
 X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 > From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Wednesday, June 2, 2021 1:42 AM
+> Sent: Wednesday, June 2, 2021 1:57 AM
 >=20
-> On Tue, Jun 01, 2021 at 08:10:14AM +0000, Tian, Kevin wrote:
+> On Tue, Jun 01, 2021 at 08:38:00AM +0000, Tian, Kevin wrote:
 > > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > Sent: Saturday, May 29, 2021 1:36 AM
+> > > Sent: Saturday, May 29, 2021 3:59 AM
 > > >
 > > > On Thu, May 27, 2021 at 07:58:12AM +0000, Tian, Kevin wrote:
+> > > >
+> > > > 5. Use Cases and Flows
+> > > >
+> > > > Here assume VFIO will support a new model where every bound device
+> > > > is explicitly listed under /dev/vfio thus a device fd can be acquir=
+ed w/o
+> > > > going through legacy container/group interface. For illustration pu=
+rpose
+> > > > those devices are just called dev[1...N]:
+> > > >
+> > > > 	device_fd[1...N] =3D open("/dev/vfio/devices/dev[1...N]", mode);
+> > > >
+> > > > As explained earlier, one IOASID fd is sufficient for all intended =
+use
+> cases:
+> > > >
+> > > > 	ioasid_fd =3D open("/dev/ioasid", mode);
+> > > >
+> > > > For simplicity below examples are all made for the virtualization s=
+tory.
+> > > > They are representative and could be easily adapted to a non-
+> virtualization
+> > > > scenario.
 > > >
-> > > > IOASID nesting can be implemented in two ways: hardware nesting and
-> > > > software nesting. With hardware support the child and parent I/O pa=
-ge
-> > > > tables are walked consecutively by the IOMMU to form a nested
-> translation.
-> > > > When it's implemented in software, the ioasid driver is responsible=
- for
-> > > > merging the two-level mappings into a single-level shadow I/O page
-> table.
-> > > > Software nesting requires both child/parent page tables operated
-> through
-> > > > the dma mapping protocol, so any change in either level can be
-> captured
-> > > > by the kernel to update the corresponding shadow mapping.
-> > >
-> > > Why? A SW emulation could do this synchronization during invalidation
-> > > processing if invalidation contained an IOVA range.
+> > > For others, I don't think this is *strictly* necessary, we can
+> > > probably still get to the device_fd using the group_fd and fit in
+> > > /dev/ioasid. It does make the rest of this more readable though.
 > >
-> > In this proposal we differentiate between host-managed and user-
-> > managed I/O page tables. If host-managed, the user is expected to use
-> > map/unmap cmd explicitly upon any change required on the page table.
-> > If user-managed, the user first binds its page table to the IOMMU and
-> > then use invalidation cmd to flush iotlb when necessary (e.g. typically
-> > not required when changing a PTE from non-present to present).
-> >
-> > We expect user to use map+unmap and bind+invalidate respectively
-> > instead of mixing them together. Following this policy, map+unmap
-> > must be used in both levels for software nesting, so changes in either
-> > level are captured timely to synchronize the shadow mapping.
+> > Jason, want to confirm here. Per earlier discussion we remain an
+> > impression that you want VFIO to be a pure device driver thus
+> > container/group are used only for legacy application.
 >=20
-> map+unmap or bind+invalidate is a policy of the IOASID itself set when
-> it is created. If you put two different types in a tree then each IOASID
-> must continue to use its own operation mode.
+> Let me call this a "nice wish".
 >=20
-> I don't see a reason to force all IOASIDs in a tree to be consistent??
-
-only for software nesting. With hardware support the parent uses map
-while the child uses bind.
-
-Yes, the policy is specified per IOASID. But if the policy violates the
-requirement in a specific nesting mode, then nesting should fail.
-
+> If you get to a point where you hard need this, then identify the hard
+> requirement and let's do it, but I wouldn't bloat this already large
+> project unnecessarily.
 >=20
-> A software emulated two level page table where the leaf level is a
-> bound page table in guest memory should continue to use
-> bind/invalidate to maintain the guest page table IOASID even though it
-> is a SW construct.
 
-with software nesting the leaf should be a host-managed page table
-(or metadata). A bind/invalidate protocol doesn't require the user
-to notify the kernel of every page table change. But for software nesting
-the kernel must know every change to timely update the shadow/merged=20
-mapping, otherwise DMA may hit stale mapping.
+OK, got your point. So let's start by keeping this room. For new
+sub-systems like vDPA,  they don't need inventing group fd uAPI
+and just leave to their user to meet the group limitation. For existing
+sub-system i.e. VFIO, it could keep a stronger group enforcement
+uAPI like today. One day, we may revisit it if the simple policy works
+well for all other new sub-systems.
+
+> Similarly I wouldn't depend on the group fd existing in this design
+> so it could be changed later.
+
+Yes, this is guaranteed. /dev/ioasid uAPI has no group concept.
 
 >=20
-> The GPA level should use map/unmap because it is a kernel owned page
-> table
+> > From this comment are you suggesting that VFIO can still keep
+> > container/ group concepts and user just deprecates the use of vfio
+> > iommu uAPI (e.g. VFIO_SET_IOMMU) by using /dev/ioasid (which has a
+> > simple policy that an IOASID will reject cmd if partially-attached
+> > group exists)?
+>=20
+> I would say no on the container. /dev/ioasid =3D=3D the container, having
+> two competing objects at once in a single process is just a mess.
+>=20
+> If the group fd can be kept requires charting a path through the
+> ioctls where the container is not used and /dev/ioasid is sub'd in
+> using the same device FD specific IOCTLs you show here.
 
-yes, this is always true.
+yes
 
 >=20
-> Though how to efficiently mix map/unmap on the GPA when there are SW
-> nested levels below it looks to be quite challenging.
+> I didn't try to chart this out carefully.
 >=20
+> Also, ultimately, something need to be done about compatability with
+> the vfio container fd. It looks clear enough to me that the the VFIO
+> container FD is just a single IOASID using a special ioctl interface
+> so it would be quite rasonable to harmonize these somehow.
+
+Possibly multiple IOASIDs as VFIO container cay hold incompatible devices
+today. Suppose helper functions will be provided for VFIO container to
+create IOASID and then use map/unmap to manage its I/O page table.
+This is the shim iommu driver concept in previous discussion between
+you and Alex.
+
+This can be done at a later stage. Let's focus on /dev/ioasid uAPI, and
+bear some code duplication between it and vfio type1 for now.=20
+
+>=20
+> But that is too complicated and far out for me at least to guess on at
+> this point..
+
+We're working on a prototype in parallel with this discussion. Based on
+this work we'll figure out what's the best way to start with.
 
 Thanks
 Kevin
