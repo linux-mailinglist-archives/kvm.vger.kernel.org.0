@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 792A2398C1C
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:13:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F07BB398C2A
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:13:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231952AbhFBOO5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 10:14:57 -0400
-Received: from mail-bn8nam11on2062.outbound.protection.outlook.com ([40.107.236.62]:57888
+        id S231663AbhFBOP3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 10:15:29 -0400
+Received: from mail-bn8nam11on2088.outbound.protection.outlook.com ([40.107.236.88]:32416
         "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230339AbhFBOOF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 10:14:05 -0400
+        id S231627AbhFBOOK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 10:14:10 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MZgYXN/Lj0XALBG3S+65bj987vTg+T2kKTwysMB2Kvr3xabymAxe400zq415VAoXnnHfO+vh9BOH/9JYPOISWOUK/bEaEbCwsLG47fpxuemLIf//cMhhvtwAxY6rI6KoYIKdDgt5WUJAmWTOnX9j5vafqHYP33+RMpaHdIm+qRfkqodRMh/JqDaMwf2K2GMd+TykAhkj4LqUxrUiNihTRrhpMljXpVE0trpruDkIqlvVuOtjeaW57qp7wAzk0QzQAz20aUXBDexJxZp3L9Jl2c9+e5Zi3t9pbdJNY1/FZpwATkWRmBzOQWv1lRrWwPt3F5cdQ8kW/uqtEVIA2S7tKQ==
+ b=cqtacyGbzahgZkDEbHsOWNePCQGPBYmqrsekjXTYgwgf2fkfTFoJxGM4JYYv4tip1fYN5ceIgG4DciBr4XUML4ETdoxjwVoM9aOhcFRzgxyyaZXguNu0M0zGE4siwcwCJrNJutEL8eh6BDKzY5vX/E11gu1QReq89he1kCh369q0L6B+mEjk1nHTLzqPvDlHwWH6nsZzLp0PmfQNdpzF4OpgrPikoS1369wFcoJuEV+IkkAR83yiqwUOZ++T+RAeAdNGMocnN6k/rAMI+XM3G5nWHbmWLp9X1W6j8bYfmGSCjQa/FjKdhFNLRPnE6+znDcM3yAbJVi169Jo1HvtBlw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9IpMdpyuUJv/iUkp9gcvE2Lk8D0OpiJS+R9aTNr+fEg=;
- b=jB7787Hz3nC1fXqM/37ZPu+Ro1snPMbA3ksFDKGZqfJL+wz8RS0UOT2T5argJM9NBlM7HPQRmllVaq2lUpjhdj35YCiLg0ElD+VPfQqyrZYgGjpJW3SUK9SrPqH4xybkJ+BWE6OX+mGLAGM27uAGpz0eRgmMZXmjEmSi6RbSPgfTV/3ZcKIb9dpj5J2aob5ImHiDftkwGTrei85gbNNpd+2JAeQQnaIbaFwpx1d50jJU85emSgIKoJeDo26Jon60WCwixqXCDtRsLA2z11w/nK+wsphcYdc0WnQtve+azrWNP//ZoIwe7JyOaHuC72dG7nZEBR9G/TsyZCEpzrX8Tg==
+ bh=UgzOEPHPOpw/L+40HOMnWYeNM0P9/hPteowwlWxGbZc=;
+ b=ihReDO2C69FHIWSqoSRF9+8qqrWGn8RCsYzq5W+OB3ILPkdJi+VyCmn6962vn8hCL4NJv9wpfyBNewpfVqEgo9+l4W+cxkeg1KkEH0YIA6PL30UdBVsr/4/MBr4AECHVKZ+tDiwI2Gnbkc8LiTBpY/7Ra03bTLP2/B8tev9Z/cZb+CiCcyYkDJELURmEN/uFV7onbo83JDPpwdNRONs2sfI50V6JqStNgKlTKgFKM6KiDZK0CfZTCTvPD94qrb/hJOCl4Qoj/PYoZQovQyYwm+G8hif9cJn9882iOSbChkZj2k2yke7W3RGeDy4P/1g1B66/w6wn7IUv7NgXkBCcUQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9IpMdpyuUJv/iUkp9gcvE2Lk8D0OpiJS+R9aTNr+fEg=;
- b=RlX/SHk5OkmUhbExDlGOt01JC6/U8XU8awjQRRcFZfBh5Uz1fxJALPG/p+RcN/Ohlznxq8td7Pjf3ROS5n/ZTa71OnOfeB5YE2ZWHIz/6/dFsVJs0sCJc1wfYRkJQlieqFKETkiMxIQEdaF5PE87tzQuUmL9pTPp6gAmP2ZqeYQ=
+ bh=UgzOEPHPOpw/L+40HOMnWYeNM0P9/hPteowwlWxGbZc=;
+ b=DUwO0SuYKBIZ8mKCmUbmbrMpJiKWweWgFVNGov66S6f7VZtL/p03fP/wFmdc0NXE+RTGyzGKATZkuO6tfX/VPT8WloWRwPRc7aGgbqy2JC9ALVSuU/y1ZPrAH22C0qUhnv+IaxAntTeHjHALraichMuirzFAZtYSJJR+J/p5T1M=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
  by SN1PR12MB2368.namprd12.prod.outlook.com (2603:10b6:802:32::23) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20; Wed, 2 Jun
- 2021 14:11:38 +0000
+ 2021 14:11:39 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4173.030; Wed, 2 Jun 2021
- 14:11:38 +0000
+ 14:11:39 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
@@ -58,9 +58,9 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         David Rientjes <rientjes@google.com>, tony.luck@intel.com,
         npmccallum@redhat.com, Borislav Petkov <bp@suse.de>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH Part2 RFC v3 08/37] x86/traps: Define RMP violation #PF error code
-Date:   Wed,  2 Jun 2021 09:10:28 -0500
-Message-Id: <20210602141057.27107-9-brijesh.singh@amd.com>
+Subject: [PATCH Part2 RFC v3 09/37] x86/fault: Add support to dump RMP entry on fault
+Date:   Wed,  2 Jun 2021 09:10:29 -0500
+Message-Id: <20210602141057.27107-10-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210602141057.27107-1-brijesh.singh@amd.com>
 References: <20210602141057.27107-1-brijesh.singh@amd.com>
@@ -71,116 +71,167 @@ X-ClientProxiedBy: SA0PR11CA0056.namprd11.prod.outlook.com
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0056.namprd11.prod.outlook.com (2603:10b6:806:d0::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20 via Frontend Transport; Wed, 2 Jun 2021 14:11:37 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0056.namprd11.prod.outlook.com (2603:10b6:806:d0::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20 via Frontend Transport; Wed, 2 Jun 2021 14:11:38 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8dffd91c-765d-484c-c5dd-08d925d05640
+X-MS-Office365-Filtering-Correlation-Id: 6fa51aa9-0fb4-4e27-95f7-08d925d056fb
 X-MS-TrafficTypeDiagnostic: SN1PR12MB2368:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2368FEABD29B455D2856D900E53D9@SN1PR12MB2368.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-Microsoft-Antispam-PRVS: <SN1PR12MB236838A6D6AA6320683D6D2FE53D9@SN1PR12MB2368.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sQKtCYhTiSge3QVvuuqTx1HlCjHuZsIjtZ/qyPtMbDZqjfv8KCjKfb0aad+4PkyHuNINvuurhm7hO7GgpxqjuyW+ctvnv78YELLMztCSl7GxtV7ZH1E+8FKV/g5WO7IuRvx4AVAB4sWTfMamWBBZ+iOImU1JKJDnhzPxOVTBxZ+E2R+AgcW1h+p7K3FWzYpG9nN4Blr9zT64OERFbr7AYYPtfq9FSpwD7TI4i3Ld2h3ZENEUgHJtncgOVGto507lSY7MuDJAaSJjujEkfhE/u5B+QbTjWlSHX0iXUKAl8sgCFlRES+JWVvc2v8e/i/c9m5M1H2Ty4IPQ9p8YVwLN5sTeqy5JueKVF2QszkCV8Tx8DLPoZQxwAU0YPEwEVkd0khwlkj4JJ6dHKCwSB7sw53R0HuIK5wJegHTDctAsEGP/vNjOiN0iDDCP7qZb6PJZ72OqVqHtCxLtfAZMXmxdIpfv87X3RmsTUtb3R7GuCE+ZurjZXX2wQMKO6vIJCvnWyWC/Shy9f/dyRVRj1+DuPKt2vBLLb1UMYm7LGf/NmOLolNnWwuJDFcOeEk82n6QJ8HRFRtfZonTQ6EtA5slct7l3ZElHa74gZFXC+OgkiQxyPq8fAkENiHt+cWynXiWGiQWF2OTBT/nhVRGF4A3vZw==
+X-Microsoft-Antispam-Message-Info: tXdiSR3M74oQUNaaro04ssXRaaJmXPui4fYtThq8mkCpeQEBosxzKl41ZVYJaQ5EzJjag65dos+HaZE+AusJh7KkaGAppWBa/k/OX+trzd22PkhuPUVnZhfMUBxfxGjcPorbzXoIy4SUCAGNr1LYdL95AokOzEF16v+QBr1vHhKqIaK/mCzLXhfsH0pDw1auukM/r2NXo7DOqgVmr+hCcbfTSbsFbaKbX/6sX9KQfveUff3Ml5R0+3TJTXXdTkMblqpSo06N3sWzQ0G0Q+XiUFey0K+4VJsBoSitFWduOt4+N2sBbu3qZYc/97sO5AYaH+blrR7YM5bf3VNWSKohJbPRsJvvGuJZ+SwydY/FDYomSCBGSgBvCc2YyewGpPuNMfxDVhOTNzOPl941YMmYLN/pbUXT+oreimAGH03odVWVK+QSDhrt1mn93g9QB7TxQ6fvfjI6T9YwdcS2ADp20BUwp6PdK1FQ32rkr4tvsMRJQcz47j5genpI2LoT1pIGGy3AojCYgsZeI4Q7h8Nw3gFdxvb7WiQJ4niw/NtY79E/1tL0eHu4GxocJMj4XWywlp9+cUFdJ2QVgPqwG0HqAtC20EmZR4mHvfxESyEhjb0xy1zn0klm1V1FaBYgqUc6N3flbMFBo0aOQycVBv/57w==
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(396003)(376002)(366004)(346002)(39860400002)(5660300002)(86362001)(6486002)(52116002)(7696005)(44832011)(38350700002)(38100700002)(956004)(2616005)(1076003)(8676002)(7416002)(8936002)(478600001)(186003)(316002)(4326008)(16526019)(26005)(66556008)(66476007)(2906002)(36756003)(54906003)(83380400001)(6666004)(66946007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?i2Or2EdAogM0p5gpcI8lSGF8lcivZdtk5vouUt4/fYBXVZg0EwP5PgTU3Xul?=
- =?us-ascii?Q?SQgvkDMFU4d95MTrVF8DqfZqJ+96Gf9vdt3FbM4ppCZx4FpZ60qY5twf61J/?=
- =?us-ascii?Q?p4WutOY8KzXgLsYoWGqLLcGSXPXplAaEJawsE6dGfIOUClYf38skhp4skEpT?=
- =?us-ascii?Q?IWM7kKooaJ1nV25QLBFrCeaKHZ3/lLXskRfKQ1NYbTPlpRwGjH9f7daoL684?=
- =?us-ascii?Q?F4og8aGQGVWPuoVQmMqMiJGWVJWBEgCSLYyWpGj0lyY4rVBztZAXT8Gaq+aR?=
- =?us-ascii?Q?5bAYxEO+W/a677cEeGr3+3C0U0EMgniEl07Ia2pOVmlXRSlkOT0IaCqnEcGP?=
- =?us-ascii?Q?zLsPUwGa7lWKZ8rt6pXIV4ObSyh7WjY53b5QFUBp+TvQcJmAv90neZG/KZBz?=
- =?us-ascii?Q?QjnIhDSeRxDMYFLsMUafqzPH9cYtCbBrGhMmHX1WicN8GpHTDnLYwYomVMxZ?=
- =?us-ascii?Q?Ngc6YLjQmdZAY0iAxZJz9clA5daKG4NlzrOdyw9+uwQjXmwJuaCmuqwjxaks?=
- =?us-ascii?Q?phYov3cuL4z4v/A28z9nKAKoAEzO6F1mTRMZHORN6v1caapaoXQRUcv/TSJG?=
- =?us-ascii?Q?XtAB3vaPy/dAe0oGGRqXbVsKQBl+afCAhUVjSybGQeMOXf/lrHcumWDITl4Z?=
- =?us-ascii?Q?qd+uSVV/ye2WiOQwPOTAgOyeyFEJgYu8TUkfK0ZhdcxibsQu4TjDymjzXEn4?=
- =?us-ascii?Q?B+HYhX3EoMPN3T7pZYxC+DtrmreP73PyN+uAtwhECBMXjWGE/7FYO1GhY3vc?=
- =?us-ascii?Q?icGyFG/aWAQ/5xCyfeSSdX+YwajF/UwBXxTgR1m5kpC5E3SVdNSb0WUA645q?=
- =?us-ascii?Q?dtkbLQj9ea1ru/uuvIeXzdLDCxxof6dL1c6+v2Wie0aGEBF2WdWvNU/0R6zP?=
- =?us-ascii?Q?qdq8WH+VHvB20T4/yQJTp2Oo4M2kcL9XOtdciRtKGum+CfXNKgHtyn8NVZ1P?=
- =?us-ascii?Q?eZKeXEZcTqAE5n7eRNkqpP+XZZ2NdL864cQdGnP4EK7/nH8WiJDDHPoRF5kJ?=
- =?us-ascii?Q?NXQrkTV33TX2VHo4N0jNG16js81f0NTdCZlQdUypWByLXH2v0nf/ifW4CTRu?=
- =?us-ascii?Q?K8FjQoHi6GNoNgUGnYBPOLqrUg1T8Tj9hqzYen0eZw5Frj7wHOJZsYYGvd/W?=
- =?us-ascii?Q?B4XUU+kmwzLjugRsrciOWo9u8wcla0r9Pe6rE/ZFsiiFHpBlTLxSX9wpY3Km?=
- =?us-ascii?Q?1W9R9drECWgEgYxp0io1ei07G3WpJWH85SsTblfYn4F49Von61Z13aY5sZsl?=
- =?us-ascii?Q?ynMyxTZlHsEZW1jVpdCuH3+v2TJNupIgiiKjxcnycFdT2LVO7QJQUJn1Jjcw?=
- =?us-ascii?Q?gTHSJVc4CcBFFashLwOLF/xX?=
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?XpRjVdqJRwyGFuvgLvDxejMzPo6YifoEpjHuk/3SZqtOXGtqmUiiArZUc0lj?=
+ =?us-ascii?Q?YMbuwM2iHX1VOVcL7FvQXMELojZmshw2gGZQCWr48tuu5J6a3C2VH/SRhW9i?=
+ =?us-ascii?Q?7bwfHUd9emOBJLpzCZ9OjfDfV/FsQBIpGI5raVKHXla+9dOSc3noZkDVHbQ7?=
+ =?us-ascii?Q?NVUzqq6D56ZnClngSCxfCpXPh+5Zz6Du0I1hNNhGMzm3aW3TYVS3CmBfY2le?=
+ =?us-ascii?Q?38wddPqkKC5IXBzecqwyOsAbmDz5yu2ZT3Oh9TYDt8FHSRcCMKTOiwyK1n18?=
+ =?us-ascii?Q?kjr08S2hH8/XWSaZKifbzmSO8qWwDo4/S6943xn1y0ZyCar5UnGcLQgYhJnY?=
+ =?us-ascii?Q?mgyuepV3RQajAW0aVpU6Of8WaS5eT4NFVXy83nNiEkgiRecIVk+n7Dy4tmOB?=
+ =?us-ascii?Q?0LY5qIZ8tMhoegrNMBIksoingHDJxW4+NZp5VHaFGzJaVkLqX9ZI2vxN/cY1?=
+ =?us-ascii?Q?jPgkAYszXvpge20BiUVdk+0oS+9PqF2rgt+Hhz6HpGkucacRRF2S5C8juozz?=
+ =?us-ascii?Q?5EdOf8g1hsGnqGSGJU3CJsbr+7l0ipZpnDUhScNP1+8Z+AqDUp0hNDOuNPy1?=
+ =?us-ascii?Q?tGEEw/hWkNPb7q8ToS56PcjSxJHm2nCnDMGr9bz1OopYplia9h0o+vuJKmeD?=
+ =?us-ascii?Q?WzLrOHWZd0eOZtqy3ypjhFqhUfTPHV05UF4adKTlUQRSkG3a4FVX4FmI4449?=
+ =?us-ascii?Q?aioYMbfXetqjIFCXHRDFjp6FUDi8GnE8yT5+RzWkgBa+GgrwoH6GNyjGonI9?=
+ =?us-ascii?Q?ZQGkg9nrS7XvCPVOUfY4mBL3ETNQauByaAdVfG0ICU4PTLLK/N7h055SszwI?=
+ =?us-ascii?Q?X+G8JoDkKccpkDBheN1HgCd5oYm5RuQ/4pd4S8QFPZU735mu+Qk2Z1GkCc20?=
+ =?us-ascii?Q?oh1TO9fYxtw/Lh6IuJDudCiwF54rb2yLi4gZuUFkisG+8YgUgM6ITyA0yhBb?=
+ =?us-ascii?Q?Pw6WrHtrGuKXk7K3qnkcjuuzGoywLD8Jr7s8xdayi6+8ncaW1vUmmL0udYn0?=
+ =?us-ascii?Q?Yz2nQMbt2ILgWJwjV8Mn2+qPK8qeVetWSpuINwKluJc8xM0WkjAoUC7k9EvH?=
+ =?us-ascii?Q?PFRLLsHh4AarkG8x3bWRln4xZVgf8oi1l8flkwqx7bPiPGyQKqvxuyM+bZx7?=
+ =?us-ascii?Q?fidKJSIpLLAwKDAnoo4YkkfDuzqBoh/eyl1AFEH2D+zXl3jH0XYkJa0ZGyUc?=
+ =?us-ascii?Q?0tdqtWKP5vamyycYBhzjo6Sh1+fuV3dLFwFlxdqXQYDfFNSX9+Wd6rQgU0qd?=
+ =?us-ascii?Q?tzMDNIWneEdAzIFEqlNH19JiwgDIKPy3WOQ8RPQQ8bTxLD9i5ri/Gs2ahaAp?=
+ =?us-ascii?Q?CVYUx/T61QeyvGAnhIcNA4rO?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8dffd91c-765d-484c-c5dd-08d925d05640
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6fa51aa9-0fb4-4e27-95f7-08d925d056fb
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2021 14:11:38.2485
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2021 14:11:39.4818
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xhLtxmARJ9QMoF6boZyr5Bt/x4BlsmHXcLqQEB9M0udihBlLeXN1QEWJMRspvtzvKENnXzomwJbtIotFECgozA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: +pqCGAhLWOaNIeqS1H6qN6ccUctjYWphwHCf2/ikk7K05q3PoM6ELa8diHX/4h/1GLJM6i00eVsUH9saUEc6cQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2368
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Bit 31 in the page fault-error bit will be set when processor encounters
-an RMP violation.
-
-While at it, use the BIT() macro.
+When SEV-SNP is enabled globally, a write from the host goes through the
+RMP check. If the hardware encounters the check failure, then it raises
+the #PF (with RMP set). Dump the RMP table to help the debug.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/include/asm/trap_pf.h | 18 +++++++++++-------
- arch/x86/mm/fault.c            |  1 +
- 2 files changed, 12 insertions(+), 7 deletions(-)
+ arch/x86/mm/fault.c | 78 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 78 insertions(+)
 
-diff --git a/arch/x86/include/asm/trap_pf.h b/arch/x86/include/asm/trap_pf.h
-index 10b1de500ab1..29f678701753 100644
---- a/arch/x86/include/asm/trap_pf.h
-+++ b/arch/x86/include/asm/trap_pf.h
-@@ -2,6 +2,8 @@
- #ifndef _ASM_X86_TRAP_PF_H
- #define _ASM_X86_TRAP_PF_H
- 
-+#include <vdso/bits.h>  /* BIT() macro */
-+
- /*
-  * Page fault error code bits:
-  *
-@@ -12,15 +14,17 @@
-  *   bit 4 ==				1: fault was an instruction fetch
-  *   bit 5 ==				1: protection keys block access
-  *   bit 15 ==				1: SGX MMU page-fault
-+ *   bit 31 ==				1: fault was an RMP violation
-  */
- enum x86_pf_error_code {
--	X86_PF_PROT	=		1 << 0,
--	X86_PF_WRITE	=		1 << 1,
--	X86_PF_USER	=		1 << 2,
--	X86_PF_RSVD	=		1 << 3,
--	X86_PF_INSTR	=		1 << 4,
--	X86_PF_PK	=		1 << 5,
--	X86_PF_SGX	=		1 << 15,
-+	X86_PF_PROT	=		BIT(0),
-+	X86_PF_WRITE	=		BIT(1),
-+	X86_PF_USER	=		BIT(2),
-+	X86_PF_RSVD	=		BIT(3),
-+	X86_PF_INSTR	=		BIT(4),
-+	X86_PF_PK	=		BIT(5),
-+	X86_PF_SGX	=		BIT(15),
-+	X86_PF_RMP	=		BIT(31),
- };
- 
- #endif /* _ASM_X86_TRAP_PF_H */
 diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
-index 1c548ad00752..2715240c757e 100644
+index 2715240c757e..e6deedf27d78 100644
 --- a/arch/x86/mm/fault.c
 +++ b/arch/x86/mm/fault.c
-@@ -545,6 +545,7 @@ show_fault_oops(struct pt_regs *regs, unsigned long error_code, unsigned long ad
- 		 !(error_code & X86_PF_PROT) ? "not-present page" :
- 		 (error_code & X86_PF_RSVD)  ? "reserved bit violation" :
- 		 (error_code & X86_PF_PK)    ? "protection keys violation" :
-+		 (error_code & X86_PF_RMP)   ? "rmp violation" :
- 					       "permissions violation");
+@@ -19,6 +19,7 @@
+ #include <linux/uaccess.h>		/* faulthandler_disabled()	*/
+ #include <linux/efi.h>			/* efi_crash_gracefully_on_page_fault()*/
+ #include <linux/mm_types.h>
++#include <linux/sev.h>			/* snp_lookup_page_in_rmptable() */
  
- 	if (!(error_code & X86_PF_USER) && user_mode(regs)) {
+ #include <asm/cpufeature.h>		/* boot_cpu_has, ...		*/
+ #include <asm/traps.h>			/* dotraplinkage, ...		*/
+@@ -502,6 +503,80 @@ static void show_ldttss(const struct desc_ptr *gdt, const char *name, u16 index)
+ 		 name, index, addr, (desc.limit0 | (desc.limit1 << 16)));
+ }
+ 
++static void dump_rmpentry(unsigned long address)
++{
++	struct rmpentry *e;
++	unsigned long pfn;
++	pgd_t *pgd;
++	pte_t *pte;
++	int level;
++
++	pgd = __va(read_cr3_pa());
++	pgd += pgd_index(address);
++
++	pte = lookup_address_in_pgd(pgd, address, &level);
++	if (unlikely(!pte))
++		return;
++
++	switch (level) {
++	case PG_LEVEL_4K: {
++		pfn = pte_pfn(*pte);
++		break;
++	}
++	case PG_LEVEL_2M: {
++		pfn = pmd_pfn(*(pmd_t *)pte);
++		break;
++	}
++	case PG_LEVEL_1G: {
++		pfn = pud_pfn(*(pud_t *)pte);
++		break;
++	}
++	case PG_LEVEL_512G: {
++		pfn = p4d_pfn(*(p4d_t *)pte);
++		break;
++	}
++	default:
++		return;
++	}
++
++	e = snp_lookup_page_in_rmptable(pfn_to_page(pfn), &level);
++	if (unlikely(!e))
++		return;
++
++	/*
++	 * If the RMP entry at the faulting address was not assigned, then dump may
++	 * not provide any useful debug information. Iterate through the entire 2MB
++	 * region, and dump the RMP entries if one of the bit in the RMP entry is set.
++	 */
++	if (rmpentry_assigned(e)) {
++		pr_alert("RMPEntry paddr 0x%lx [assigned=%d immutable=%d pagesize=%d gpa=0x%lx"
++			" asid=%d vmsa=%d validated=%d]\n", pfn << PAGE_SHIFT,
++			rmpentry_assigned(e), rmpentry_immutable(e), rmpentry_pagesize(e),
++			rmpentry_gpa(e), rmpentry_asid(e), rmpentry_vmsa(e),
++			rmpentry_validated(e));
++
++		pr_alert("RMPEntry paddr 0x%lx %016llx %016llx\n", pfn << PAGE_SHIFT,
++			e->high, e->low);
++	} else {
++		unsigned long pfn_end;
++
++		pfn = pfn & ~0x1ff;
++		pfn_end = pfn + PTRS_PER_PMD;
++
++		while (pfn < pfn_end) {
++			e = snp_lookup_page_in_rmptable(pfn_to_page(pfn), &level);
++
++			if (unlikely(!e))
++				return;
++
++			if (e->low || e->high)
++				pr_alert("RMPEntry paddr 0x%lx: %016llx %016llx\n",
++					pfn << PAGE_SHIFT, e->high, e->low);
++			pfn++;
++		}
++	}
++}
++
+ static void
+ show_fault_oops(struct pt_regs *regs, unsigned long error_code, unsigned long address)
+ {
+@@ -578,6 +653,9 @@ show_fault_oops(struct pt_regs *regs, unsigned long error_code, unsigned long ad
+ 	}
+ 
+ 	dump_pagetable(address);
++
++	if (error_code & X86_PF_RMP)
++		dump_rmpentry(address);
+ }
+ 
+ static noinline void
 -- 
 2.17.1
 
