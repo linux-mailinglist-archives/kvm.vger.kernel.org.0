@@ -2,152 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CBE539930D
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 21:01:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 245563993BA
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 21:44:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229685AbhFBTCl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 15:02:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43534 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229650AbhFBTCl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Jun 2021 15:02:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622660457;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MXz63wHFCtBChG1iHvZvXLJp7K/v2y7oMTVIZRydq2I=;
-        b=b2X2uSLOiD2nTJfjhPhwh6TPwda/5s3DBuavmbeqah5Z+vB5hs2pS0bqsUlF4UQd+styPE
-        ZBvVWOMn0t7RD+qhvJqXukltV6MBimHPL+QMKaGI5L9K1+Akn/FVjHTSvX68/TvJZiWsFz
-        ni+smoPMiJ0/tScx+PkOaF6QD2cYWU4=
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
- [209.85.167.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-361-8E7u3yulNV6fM1AbeBJOnQ-1; Wed, 02 Jun 2021 15:00:56 -0400
-X-MC-Unique: 8E7u3yulNV6fM1AbeBJOnQ-1
-Received: by mail-oi1-f200.google.com with SMTP id i6-20020a5440860000b02901f1ccd87497so970446oii.10
-        for <kvm@vger.kernel.org>; Wed, 02 Jun 2021 12:00:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=MXz63wHFCtBChG1iHvZvXLJp7K/v2y7oMTVIZRydq2I=;
-        b=AGGFqzh6Nrhx7+FaqN4Wl3ljugvSD0APPGAa9Lo+uMxWwI+Z58WXKDo2F3On1EEW4q
-         EKa45wk+YJIq3IOIikgSJiieF3uGGwmRwSEjuvf8/FuaOQrz5r41NzDpO9AW/bObod3y
-         ps1RjWiqkgVDONjy29pCnbhpYYQuGiS/s8qPyXafLYtR9bnvItMz8tA17OAevRYJoQ9d
-         brFF7JMhH3iCpO+FXhA4LxGC1YdjRJWZPjve3nMenxeZN/BsM0RBnGsCBDyAS91PYwO7
-         Vyao5SNSREvKtA98lns5sX1YQVSh25ci39GthHGF+OphBREvibinTt16fENU4wXGnvh3
-         Qnig==
-X-Gm-Message-State: AOAM533A8doP6FJEdcsyIAUlwh5BOVpG8o3mg7e72ytolfkVsUUGgvyh
-        Y/p2hhho5fTmvoUwdcB8/9J0M0Y4EmfNQgKXcoWIX5NXujvAC7KLadl9MFrN6cRMz/y7A/2aK8l
-        zq8KuYJl48G3E
-X-Received: by 2002:a05:6830:15c2:: with SMTP id j2mr26008323otr.367.1622660455933;
-        Wed, 02 Jun 2021 12:00:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx/5Q90CWT9NIdQ1XwO+Gtz3HwUCNmtONxlvq8I6Bn9cXQgzMIAVDQ/kll8JXgHVYLqh2a7KA==
-X-Received: by 2002:a05:6830:15c2:: with SMTP id j2mr26008303otr.367.1622660455621;
-        Wed, 02 Jun 2021 12:00:55 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id q5sm163159oia.31.2021.06.02.12.00.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jun 2021 12:00:54 -0700 (PDT)
-Date:   Wed, 2 Jun 2021 13:00:53 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Robin Murphy <robin.murphy@arm.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jason Wang <jasowang@redhat.com>
-Subject: Re: [RFC] /dev/ioasid uAPI proposal
-Message-ID: <20210602130053.615db578.alex.williamson@redhat.com>
-In-Reply-To: <20210602180925.GH1002214@nvidia.com>
-References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
-        <20210528200311.GP1002214@nvidia.com>
-        <MWHPR11MB188685D57653827B566BF9B38C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
-        <20210601162225.259923bc.alex.williamson@redhat.com>
-        <MWHPR11MB1886E8454A58661DC2CDBA678C3D9@MWHPR11MB1886.namprd11.prod.outlook.com>
-        <20210602160140.GV1002214@nvidia.com>
-        <20210602111117.026d4a26.alex.williamson@redhat.com>
-        <20210602173510.GE1002214@nvidia.com>
-        <20210602120111.5e5bcf93.alex.williamson@redhat.com>
-        <20210602180925.GH1002214@nvidia.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S229775AbhFBTqC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 15:46:02 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:56130 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229558AbhFBTqC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 15:46:02 -0400
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 01DE3219C1;
+        Wed,  2 Jun 2021 19:44:17 +0000 (UTC)
+Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        by imap.suse.de (Postfix) with ESMTP id E98D2118DD;
+        Wed,  2 Jun 2021 19:44:04 +0000 (UTC)
+Received: from director2.suse.de ([192.168.254.72])
+        by imap3-int with ESMTPSA
+        id 2jzcLITft2B5CwAALh3uQQ
+        (envelope-from <dave@stgolabs.net>); Wed, 02 Jun 2021 19:44:04 +0000
+Date:   Wed, 2 Jun 2021 12:43:59 -0700
+From:   Davidlohr Bueso <dave@stgolabs.net>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Jens Axboe <axboe@kernel.dk>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Felipe Balbi <balbi@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jason Wessel <jason.wessel@windriver.com>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, Will Deacon <will@kernel.org>,
+        Waiman Long <longman@redhat.com>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Oleg Nesterov <oleg@redhat.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, cgroups@vger.kernel.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        linux-perf-users@vger.kernel.org, linux-pm@vger.kernel.org,
+        rcu@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 1/6] sched: Unbreak wakeups
+Message-ID: <20210602194359.pxujd4rx4lxv2ldm@offworld>
+Mail-Followup-To: Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Jens Axboe <axboe@kernel.dk>,
+        Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
+        dm-devel@redhat.com, "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Felipe Balbi <balbi@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>, Tejun Heo <tj@kernel.org>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jason Wessel <jason.wessel@windriver.com>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>, Namhyung Kim <namhyung@kernel.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, Will Deacon <will@kernel.org>,
+        Waiman Long <longman@redhat.com>, Boqun Feng <boqun.feng@gmail.com>,
+        Oleg Nesterov <oleg@redhat.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        cgroups@vger.kernel.org, kgdb-bugreport@lists.sourceforge.net,
+        linux-perf-users@vger.kernel.org, linux-pm@vger.kernel.org,
+        rcu@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org
+References: <20210602131225.336600299@infradead.org>
+ <20210602133040.271625424@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210602133040.271625424@infradead.org>
+User-Agent: NeoMutt/20201120
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2 Jun 2021 15:09:25 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Wed, 02 Jun 2021, Peter Zijlstra wrote:
 
-> On Wed, Jun 02, 2021 at 12:01:11PM -0600, Alex Williamson wrote:
-> > On Wed, 2 Jun 2021 14:35:10 -0300
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > On Wed, Jun 02, 2021 at 11:11:17AM -0600, Alex Williamson wrote:
-> > >   
-> > > > > > > present and be able to test if DMA for that device is cache
-> > > > > > > coherent.      
-> > > > > 
-> > > > > Why is this such a strong linkage to VFIO and not just a 'hey kvm
-> > > > > emulate wbinvd' flag from qemu?    
-> > > > 
-> > > > IIRC, wbinvd has host implications, a malicious user could tell KVM to
-> > > > emulate wbinvd then run the op in a loop and induce a disproportionate
-> > > > load on the system.  We therefore wanted a way that it would only be
-> > > > enabled when required.    
-> > > 
-> > > I think the non-coherentness is vfio_device specific? eg a specific
-> > > device will decide if it is coherent or not?  
-> > 
-> > No, this is specifically whether DMA is cache coherent to the
-> > processor, ie. in the case of wbinvd whether the processor needs to
-> > invalidate its cache in order to see data from DMA.  
-> 
-> I'm confused. This is x86, all DMA is cache coherent unless the device
-> is doing something special.
-> 
-> > > If yes I'd recast this to call kvm_arch_register_noncoherent_dma()
-> > > from the VFIO_GROUP_NOTIFY_SET_KVM in the struct vfio_device
-> > > implementation and not link it through the IOMMU.  
-> > 
-> > The IOMMU tells us if DMA is cache coherent, VFIO_DMA_CC_IOMMU maps to
-> > IOMMU_CAP_CACHE_COHERENCY for all domains within a container.  
-> 
-> And this special IOMMU mode is basically requested by the device
-> driver, right? Because if you use this mode you have to also use
-> special programming techniques.
-> 
-> This smells like all the "snoop bypass" stuff from PCIE (for GPUs
-> even) in a different guise - it is device triggered, not platform
-> triggered behavior.
+>Remove broken task->state references and let wake_up_process() DTRT.
+>
+>The anti-pattern in these patches breaks the ordering of ->state vs
+>COND as described in the comment near set_current_state() and can lead
+>to missed wakeups:
+>
+>	(OoO load, observes RUNNING)<-.
+>	for (;;) {                    |
+>	  t->state = UNINTERRUPTIBLE; |
+>	  smp_mb();          ,-----> ,' (OoO load, observed !COND)
+>                             |       |
+>	                     |       |	COND = 1;
+>			     |	     `- if (t->state != RUNNING)
+>                             |		  wake_up_process(t); // not done
+>	  if (COND) ---------'
+>	    break;
+>	  schedule(); // forever waiting
+>	}
+>	t->state = TASK_RUNNING;
+>
+>Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 
-Right, the device can generate the no-snoop transactions, but it's the
-IOMMU that essentially determines whether those transactions are
-actually still cache coherent, AIUI.
-
-I did experiment with virtually hardwiring the Enable No-Snoop bit in
-the Device Control Register to zero, which would be generically allowed
-by the PCIe spec, but then we get into subtle dependencies in the device
-drivers and clearing the bit again after any sort of reset and the
-backdoor accesses to config space which exist mostly in the class of
-devices that might use no-snoop transactions (yes, GPUs suck).
-
-It was much easier and more robust to ignore the device setting and rely
-on the IOMMU behavior.  Yes, maybe we sometimes emulate wbinvd for VMs
-where the device doesn't support no-snoop, but it seemed like platforms
-were headed in this direction where no-snoop was ignored anyway.
-Thanks,
-
-Alex
-
+Reviewed-by: Davidlohr Bueso <dbueso@suse.de>
