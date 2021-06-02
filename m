@@ -2,198 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FADF39965C
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 01:28:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFE16399656
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 01:27:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229849AbhFBX3o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 19:29:44 -0400
-Received: from mail-pg1-f179.google.com ([209.85.215.179]:46952 "EHLO
-        mail-pg1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229626AbhFBX3n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 19:29:43 -0400
-Received: by mail-pg1-f179.google.com with SMTP id n12so3579678pgs.13
-        for <kvm@vger.kernel.org>; Wed, 02 Jun 2021 16:27:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=qVLg4Q35iCp+LlhdPI9P9bXpg6OFtieobQceA0Gb/Xk=;
-        b=htyn0vTZfw8IfuHoWZd5HiZ+suevAlDWCSkhs+BOEVeTFRufexfOiwfuxvpNaCtwuZ
-         byqWD32hXz49RAK9QxzCF8WjQevSGmkmcx8I10QW2eyIk96oJsKZ5D7z76hRfo3wz7HI
-         1Yo8K0oN+IJPB28T8p7kpxiDEcdwfLlP/N5xC+zMro9P9pJRH4AyRfuveOjPvdH33XGG
-         Z3FZB8AkluzJC0xivxo5TRqN9GTxqlSH6FuHnkNLIc2xFhTenZo4+dimh+OJsvJ0dm1h
-         z9XTytYXbExNzWv0Gb56M4irnma4K6JjGsy9CCnYV8FMpiEPcYfR2kMB2ObPujM1hiJc
-         D9Mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=qVLg4Q35iCp+LlhdPI9P9bXpg6OFtieobQceA0Gb/Xk=;
-        b=p0rjNW803KMtvmjdmC2R/ZFohg+jKaK70zhOjUGKxbjluZrg0o5LQfJTNUiUM7YoAS
-         69QvQdiNZGJDWYQbVvT86pZ71Gr6GrglNc3GsPgsYVnrYhVyWRZI5UY4nFXx0N74xD4p
-         sTZTfHGjeCaUFJgZbZC6dPsaasB5Zexu2infPOdJ+whBu3bwv8rPt5ftk57o9xsG+xnh
-         JiQlzBIlT4QPBPm+7kjJR8OqIrjBuj0/2Ln2QmWWKaPSffKk39neDITpRkdiL3nOStsh
-         awn5fmSnvfXJvNYeAbJbxd4qUnvTZRyROWGNwyXDEgVKeN/TzbTXXbi4/cQIlx6JvN6k
-         zPbg==
-X-Gm-Message-State: AOAM532R7SnUXZAIoQWOmhlerpaeopqZ+DjSbB1Z+8cqUsDS2ts6dTbd
-        cHP3j/+Gw6JpHDF7GySt4StG0g==
-X-Google-Smtp-Source: ABdhPJyFKVnJ0duxYPD4Y/Doon1B87bwqj4O5vlJHiiZBYmVCJxx+kLmIYEwIt97YKOsGmDPZN6lMA==
-X-Received: by 2002:a63:f815:: with SMTP id n21mr37018823pgh.2.1622676415852;
-        Wed, 02 Jun 2021 16:26:55 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id o10sm536969pfh.67.2021.06.02.16.26.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jun 2021 16:26:55 -0700 (PDT)
-Date:   Wed, 2 Jun 2021 16:26:51 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org,
-        eric.auger@redhat.com, alexandru.elisei@arm.com,
-        pbonzini@redhat.com
-Subject: Re: [PATCH v3 5/5] KVM: arm64: selftests: get-reg-list: Split base
- and pmu registers
-Message-ID: <YLgTu4EEnwfrtHSo@google.com>
-References: <20210531103344.29325-1-drjones@redhat.com>
- <20210531103344.29325-6-drjones@redhat.com>
-MIME-Version: 1.0
+        id S229755AbhFBX2r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 19:28:47 -0400
+Received: from mail-dm6nam08on2052.outbound.protection.outlook.com ([40.107.102.52]:64801
+        "EHLO NAM04-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229626AbhFBX2q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 19:28:46 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QKEgSYvXpOi61AsBJqkLSKaaFOLSdkvv01HfrR2b4N4t4H0bSuaoJn47pU5BZCezYoxoqMH5VydY9hFwhZNJeZBWhAEMboBoKtCvF1JFjsmMpg4u3Uyt0X2RstS7MibJjQJNsKgTosK5mpPFLYUyzaPXR4pknZuZYQmbbOp3jm6doyKPf2vVFhxMBVlpVCjy7hpF756wZqArQv8qe3KNbmg+N7FM5DPgzwy91sccsukiHpIUMbi1IrQSbhcqmOm2POM1kkUOUjobNONWH5QtuQyhxabKmW8VELLme+HqohHdC1Ec1KE5czHlin46BM7VYiGRjKJWzujRK/KpNqscog==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gZrdkgWbonFUe8/oj+jZZUaM12ytKCO0DBycev9Q0gc=;
+ b=OE1fInDttkV6bOZ3tjbN+FFyCp22BPI6F0SKUhCIPAU18A2dBTzCAz6nD8nRghPRyp/KmgEUnQN3rfzO/ruLTWFBOkPl2MMNzuj95KIJB+TFJRZ/FG7Zy2VbBXZe6v3V3zU2IsFHvMqxbc4Bs9JBFwgf3yNr2CcFyJ3o8AL34y7lQMneMB422OcwQRedAUzWHBx1Dq4Mq1A4vZ6wRXqJoigvQjc330ahhjl+x1GlwyesB0QBe9rU9hz3km0yMyfRCXLhoHoYuVsYT4yHXW1BVbQKHcrx04920fezN4xCudgR3qsTce6bCd8a7KONwtzNWtQKFzkMAgUR9VAi6G/T6w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gZrdkgWbonFUe8/oj+jZZUaM12ytKCO0DBycev9Q0gc=;
+ b=CR37NUVp0gaqpNCLOWYUZaUfW/9AojzRairE2G0Zh6oLCtn74+WOdn36C9tcpTc3Q9floWLsrQzJAkAoY4MoN2WmV9CkmkSEuiqeWJMtsmWLCDfyDnjCI6NJbX1DmUdn4PH0KeVibV2rUkvXApsXoUmmtdWJcWuH/hYmEp54dk3OmENVcgNqhr7hO6ir5fHPXJfN5Uacu8Mx5ChEfLejEZ2w9AT4TI2T+1kAMw1bOHbXEc8iJiARYtufUGCH8Wk4oTTAY8RVgHSFVU9mfXwbAo1xfneoCpwceNa8M72yEpCfImIsKUgfU/XuLTrV5r2quNvftoagkUipvr3gbhdY9g==
+Authentication-Results: intel.com; dkim=none (message not signed)
+ header.d=none;intel.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5304.namprd12.prod.outlook.com (2603:10b6:208:314::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.22; Wed, 2 Jun
+ 2021 23:27:01 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e%6]) with mapi id 15.20.4195.020; Wed, 2 Jun 2021
+ 23:27:01 +0000
+Date:   Wed, 2 Jun 2021 20:27:00 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Alex Williamson (alex.williamson@redhat.com)" 
+        <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Robin Murphy <robin.murphy@arm.com>
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+Message-ID: <20210602232700.GM1002214@nvidia.com>
+References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210528200311.GP1002214@nvidia.com>
+ <MWHPR11MB188685D57653827B566BF9B38C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210601202834.GR1002214@nvidia.com>
+ <MWHPR11MB1886172080807517E92A8EF68C3D9@MWHPR11MB1886.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210531103344.29325-6-drjones@redhat.com>
+In-Reply-To: <MWHPR11MB1886172080807517E92A8EF68C3D9@MWHPR11MB1886.namprd11.prod.outlook.com>
+X-Originating-IP: [47.55.113.94]
+X-ClientProxiedBy: BL0PR02CA0095.namprd02.prod.outlook.com
+ (2603:10b6:208:51::36) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (47.55.113.94) by BL0PR02CA0095.namprd02.prod.outlook.com (2603:10b6:208:51::36) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.21 via Frontend Transport; Wed, 2 Jun 2021 23:27:01 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1loaGK-000nU2-Hc; Wed, 02 Jun 2021 20:27:00 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 8b5c0518-58d7-453e-5a8d-08d9261dec7e
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5304:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB53044CAB1A098B718433038BC23D9@BL1PR12MB5304.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3968;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: BU+zRYD9FkNGtHPmrbSKimdwhgH/MiQCyly4PIiEn3M6REBqA4Fw4lkl2k9R8Y+N/DPZuM29GtsdmXvFMWvJgjukFA1aG1i1g/IV2GnzMb/tj5OaJnrzp+EYtpEOO6AHhMJBmR8WQXoxxun1IomkwIDTvGADI7gtSfp4jI1T6kmvZCiFntHhd21I7A367dyrjUIjKi4QdDxbAOfXX6s7YxXJ8TNQE3PXQ5CeWsZcywCtWZKrd/zOkheM+nXTN202T7outfx/jHK4TgPVyMySAr8uT2oFvUIUycmhg5niwlL7oIs2Sett64+TNLgmlW6YB4xeCVqAYj6jpvdvLjjTNFNLgO5jHAygSJJklDJGqvMnLL4JEiuV10iXXI40mHYqTGtZrCd3ziXSR4p5BVIbBSXXo5t3nliEbcgSSU9MwfXSJ4/QF7N5k/8xc9WyjX30EjQgox30fsx/DI0olbVRrFLpB7w3LSn02rctTb6IhNhF8oyjue2nwUJIIWXN7/q1OJRtRIayFayHWpNWoinGNU9iz7epZoJJq5j5iO9t/G2fkR2TzvbUwxNRLpA05PBV5S0AIY1aDAYLRiCM8e0SEEYiihuMwBD4jqp1JQnLoB0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(136003)(39860400002)(376002)(346002)(396003)(6916009)(9786002)(9746002)(8936002)(186003)(4326008)(1076003)(478600001)(2906002)(54906003)(66476007)(7416002)(66556008)(316002)(86362001)(66946007)(426003)(4744005)(26005)(5660300002)(36756003)(2616005)(8676002)(38100700002)(33656002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?/vtsiPMw8z7P9wAKGhALEjONbN/3Xl2uwCbIojOkXzpmml5sKGAxF2jonxmo?=
+ =?us-ascii?Q?V8Cvk7ZhnWbuU3ehnSxFJ19xkTLqZsiIvG7VgMevrqct8v1/hItQKBsbjDfe?=
+ =?us-ascii?Q?G5zCqZ3HOJ64CyIwZyjt8GB9qWhIXNjzpPkgAQNPVKk92bBEn9NiEWeJVjeF?=
+ =?us-ascii?Q?uDqYVNxNg0cYTWjdVIdg3B/fLPyyvsBZXdZU+UdzrNr4ZnGWr+Bj2/rRb3Ko?=
+ =?us-ascii?Q?gVZpdTI+U6/OutpbzK+uMBTCUNLwsbJRmIkqbP6i09uYxRPMik+P7GNcpOGi?=
+ =?us-ascii?Q?Xb3h4qLYyY7Z2lWIzfd1GQBCq04WVQ1mR8Ds9xAZLieW00QkU0qo0cC3Oo61?=
+ =?us-ascii?Q?pAjsofYylzM36kbtRekS582j+dGFIFEzGEAkQgIiD3nb4bRDcm3KHRNFQpi/?=
+ =?us-ascii?Q?ept2HwN6jcwnXtdNJEDRN6+V4KYQt0+EyNcShdEKIhLrnOCKOuAHz8cVWOMr?=
+ =?us-ascii?Q?lwvUwWpqwULDwT3V55/oO/D54u8uHKgW0dQ/hG7dbIiU6TeYFadx+hb/k61e?=
+ =?us-ascii?Q?WSa/mpl0rD7RmJoan2WU4WyoqjGflvZzXU351NHxKd2qLH2Hwk5/pf/0KyQN?=
+ =?us-ascii?Q?6ZwW4CzQF34H7rXFomLMhwELmzZbhsm8onn/2AzixCAtTo1JiiiBYrcRnrXI?=
+ =?us-ascii?Q?ZV0OSJmY1EhLNugoZcHWuXi1LW2MJ5rcSlp8sfHK4tncDVXcDZL37l7FU9qb?=
+ =?us-ascii?Q?xwgiylVybznwAUa8Re9gnO5TVvY4tqsTN6zEM72pkFeVFzq6x2nOjJ5XTaCP?=
+ =?us-ascii?Q?aflboy2lpMNBZSutk7TW0loHG4eoi/WNVwK0i7FUWoKOxG3uGRIPjq+V8bSK?=
+ =?us-ascii?Q?foDMy1W4fk7MYpsfk5H/Ij/L6lNzYfwDPhMw9u+fboRyt6mb53tYLS4jrYoI?=
+ =?us-ascii?Q?aMkPZ8YGsSfb8kF3+lG+wF6MC+bldMhq1GthJF8wu7jWuvKv0Q815KzNzeh0?=
+ =?us-ascii?Q?9dbDMHipQgE0HW5D3dSB5nQw5eClxl0Z5fr+XHxqGaQVbO8ylrg+IW99ZWak?=
+ =?us-ascii?Q?p8WGeCB2ci7lxW8/N2gY2NbS24wj688MjGoXIloYHO6LOrS4hkS6G/hIX6WB?=
+ =?us-ascii?Q?sDK5k05EZcsosxsIOoqn17P81ekoKLUhPVq5j7A0PgqpSFhkPcrrX0C+RzNT?=
+ =?us-ascii?Q?62tBW2ShRM7v29warqWOAIFAk76pzOXFaGN6ZlijCpbuF8PeDKOw/4GrT+V0?=
+ =?us-ascii?Q?v3/m3DGzj1nD2zlc+4WGy6e5gIeWQyYq/Y5jhRP6A4Max9RH1+0Jn3NuQt5+?=
+ =?us-ascii?Q?1+/n619HuKFMhBz84xSUKdZv2bEOWB9xErllXB7fN+Y+hqIiZABz68wuDlwW?=
+ =?us-ascii?Q?x2DAokWsgf3qttqNjK3BIc9E?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b5c0518-58d7-453e-5a8d-08d9261dec7e
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2021 23:27:01.5138
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: P60kZnQMNKds2LGRYCQmsz8iS26mIQ+fZAPmGRDf12JIFxjNPTUBIhRDkJsojO6m
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5304
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 31, 2021 at 12:33:44PM +0200, Andrew Jones wrote:
-> Since KVM commit 11663111cd49 ("KVM: arm64: Hide PMU registers from
-> userspace when not available") the get-reg-list* tests have been
-> failing with
-> 
->   ...
->   ... There are 74 missing registers.
->   The following lines are missing registers:
->   ...
-> 
-> where the 74 missing registers are all PMU registers. This isn't a
-> bug in KVM that the selftest found, even though it's true that a
-> KVM userspace that wasn't setting the KVM_ARM_VCPU_PMU_V3 VCPU
-> flag, but still expecting the PMU registers to be in the reg-list,
-> would suddenly no longer have their expectations met. In that case,
-> the expectations were wrong, though, so that KVM userspace needs to
-> be fixed, and so does this selftest. The fix for this selftest is to
-> pull the PMU registers out of the base register sublist into their
-> own sublist and then create new, pmu-enabled vcpu configs which can
-> be tested.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
+On Wed, Jun 02, 2021 at 01:25:00AM +0000, Tian, Kevin wrote:
 
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
+> OK, this implies that if one user inadvertently creates intended parent/
+> child via different fd's then the operation will simply fail.
 
-> ---
->  .../selftests/kvm/aarch64/get-reg-list.c      | 39 +++++++++++++++----
->  1 file changed, 31 insertions(+), 8 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> index b46b8a1fdc0c..a16c8f05366c 100644
-> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> @@ -637,7 +637,7 @@ int main(int ac, char **av)
->   * The current blessed list was primed with the output of kernel version
->   * v4.15 with --core-reg-fixup and then later updated with new registers.
->   *
-> - * The blessed list is up to date with kernel version v5.10-rc5
-> + * The blessed list is up to date with kernel version v5.13-rc3
->   */
->  static __u64 base_regs[] = {
->  	KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(regs.regs[0]),
-> @@ -829,8 +829,6 @@ static __u64 base_regs[] = {
->  	ARM64_SYS_REG(3, 0, 5, 2, 0),	/* ESR_EL1 */
->  	ARM64_SYS_REG(3, 0, 6, 0, 0),	/* FAR_EL1 */
->  	ARM64_SYS_REG(3, 0, 7, 4, 0),	/* PAR_EL1 */
-> -	ARM64_SYS_REG(3, 0, 9, 14, 1),	/* PMINTENSET_EL1 */
-> -	ARM64_SYS_REG(3, 0, 9, 14, 2),	/* PMINTENCLR_EL1 */
->  	ARM64_SYS_REG(3, 0, 10, 2, 0),	/* MAIR_EL1 */
->  	ARM64_SYS_REG(3, 0, 10, 3, 0),	/* AMAIR_EL1 */
->  	ARM64_SYS_REG(3, 0, 12, 0, 0),	/* VBAR_EL1 */
-> @@ -839,6 +837,16 @@ static __u64 base_regs[] = {
->  	ARM64_SYS_REG(3, 0, 13, 0, 4),	/* TPIDR_EL1 */
->  	ARM64_SYS_REG(3, 0, 14, 1, 0),	/* CNTKCTL_EL1 */
->  	ARM64_SYS_REG(3, 2, 0, 0, 0),	/* CSSELR_EL1 */
-> +	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
-> +	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
-> +	ARM64_SYS_REG(3, 4, 3, 0, 0),	/* DACR32_EL2 */
-> +	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
-> +	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
-> +};
-> +
-> +static __u64 pmu_regs[] = {
-> +	ARM64_SYS_REG(3, 0, 9, 14, 1),	/* PMINTENSET_EL1 */
-> +	ARM64_SYS_REG(3, 0, 9, 14, 2),	/* PMINTENCLR_EL1 */
->  	ARM64_SYS_REG(3, 3, 9, 12, 0),	/* PMCR_EL0 */
->  	ARM64_SYS_REG(3, 3, 9, 12, 1),	/* PMCNTENSET_EL0 */
->  	ARM64_SYS_REG(3, 3, 9, 12, 2),	/* PMCNTENCLR_EL0 */
-> @@ -848,8 +856,6 @@ static __u64 base_regs[] = {
->  	ARM64_SYS_REG(3, 3, 9, 13, 0),	/* PMCCNTR_EL0 */
->  	ARM64_SYS_REG(3, 3, 9, 14, 0),	/* PMUSERENR_EL0 */
->  	ARM64_SYS_REG(3, 3, 9, 14, 3),	/* PMOVSSET_EL0 */
-> -	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
-> -	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
->  	ARM64_SYS_REG(3, 3, 14, 8, 0),
->  	ARM64_SYS_REG(3, 3, 14, 8, 1),
->  	ARM64_SYS_REG(3, 3, 14, 8, 2),
-> @@ -913,9 +919,6 @@ static __u64 base_regs[] = {
->  	ARM64_SYS_REG(3, 3, 14, 15, 5),
->  	ARM64_SYS_REG(3, 3, 14, 15, 6),
->  	ARM64_SYS_REG(3, 3, 14, 15, 7),	/* PMCCFILTR_EL0 */
-> -	ARM64_SYS_REG(3, 4, 3, 0, 0),	/* DACR32_EL2 */
-> -	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
-> -	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
->  };
->  
->  static __u64 vregs[] = {
-> @@ -1015,6 +1018,8 @@ static __u64 sve_rejects_set[] = {
->  	{ "base", .regs = base_regs, .regs_n = ARRAY_SIZE(base_regs), }
->  #define VREGS_SUBLIST \
->  	{ "vregs", .regs = vregs, .regs_n = ARRAY_SIZE(vregs), }
-> +#define PMU_SUBLIST \
-> +	{ "pmu", .regs = pmu_regs, .regs_n = ARRAY_SIZE(pmu_regs), }
->  #define SVE_SUBLIST \
->  	{ "sve", .capability = KVM_CAP_ARM_SVE, .feature = KVM_ARM_VCPU_SVE, .finalize = true, \
->  	  .regs = sve_regs, .regs_n = ARRAY_SIZE(sve_regs), \
-> @@ -1027,6 +1032,14 @@ static struct vcpu_config vregs_config = {
->  	{0},
->  	},
->  };
-> +static struct vcpu_config vregs_pmu_config = {
-> +	.sublists = {
-> +	BASE_SUBLIST,
-> +	VREGS_SUBLIST,
-> +	PMU_SUBLIST,
-> +	{0},
-> +	},
-> +};
->  static struct vcpu_config sve_config = {
->  	.sublists = {
->  	BASE_SUBLIST,
-> @@ -1034,9 +1047,19 @@ static struct vcpu_config sve_config = {
->  	{0},
->  	},
->  };
-> +static struct vcpu_config sve_pmu_config = {
-> +	.sublists = {
-> +	BASE_SUBLIST,
-> +	SVE_SUBLIST,
-> +	PMU_SUBLIST,
-> +	{0},
-> +	},
-> +};
->  
->  static struct vcpu_config *vcpu_configs[] = {
->  	&vregs_config,
-> +	&vregs_pmu_config,
->  	&sve_config,
-> +	&sve_pmu_config,
->  };
->  static int vcpu_configs_n = ARRAY_SIZE(vcpu_configs);
-> -- 
-> 2.31.1
-> 
+Remember the number space to refer to the ioasid's inside the FD is
+local to that instance of the FD. Each FD should have its own xarray
+
+You can't actually accidently refer to an IOASID in FD A from FD B
+because the xarray lookup in FD B will not return 'IOASID A'.
+
+Jason
