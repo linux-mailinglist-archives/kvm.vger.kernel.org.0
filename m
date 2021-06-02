@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C69B398C9A
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:21:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41854398CB2
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:25:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230257AbhFBOXO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 10:23:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37078 "EHLO
+        id S230157AbhFBO1X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 10:27:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231539AbhFBOXA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 10:23:00 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C98DDC061756;
-        Wed,  2 Jun 2021 07:21:16 -0700 (PDT)
+        with ESMTP id S229667AbhFBO1W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 10:27:22 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B16B8C061574;
+        Wed,  2 Jun 2021 07:25:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=jwYPkOxp8bIiCCDES8Qxb1QGLyBu3SVZdBROZyNFfA0=; b=Xxv615xncdZQEFrr1bHRLMMu2U
-        OqaCFWc54sHFbTJW13AtDPYewqZ8YcVTPwpd9Qc5OnoRpWsz8cfAQ9eSQ5KwoRC3/+EzjpcSDWh0H
-        7W8reQPpnsPRXAwnvQmGxgENdJISBUxRfQv5GPB1VAMjsjLbgKsStP7MzLEasOohCJxysGOkYECMg
-        Gwxo27rOG3a3S55yEdquv7sYRJNKvPMn8Kfz+MsY9z6svoP1ekd/je9c+Jaqi8y/arGNfbGhikW+b
-        mNh4hH1eic9Rqr3hoPm+9JiRu5HuJ/MAdfZebjLsT7iBJPHGKrZ9jTKO2FPHmhESyUiqFe2yraAZt
-        seVktLsg==;
+        bh=FXtOoRkqKzh7kLJLNx1aUNoAKOt2OwhOUmVlEeFOV/k=; b=aRuCf7uzTZTu6Zoj/CNNkrWz2p
+        NiTO7Wp3c1qPbyOpXwrYp1PtzDWjm9lFd/a9yCbHrEoTHdjq7a3h6AyF0BhDXTQ3QxkDP57PRhMDO
+        zEAZMYNvsYz4QiZA1N4mjgb4wXj7bSBZgp8Pj/xrfNSCm3M3p7yfnXQJFAELoJtdR+E6Ao31ANWBK
+        327hKxLUv5HjbIqhiob98T4BjpKz+Vu+QWE82pAMH8ZWHQCaLUEhWPpOLHq5XbviYzak8e7g6jAgm
+        AiylRMwPRrr6GP8fi1UzCBGjGo3iWRRsemSjXVXxNvj6tuH5bjajvu6yIt+A7WLPb35t2K8sXA42g
+        5gfHi5dg==;
 Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1loRjL-002ucj-FS; Wed, 02 Jun 2021 14:20:30 +0000
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1loRmn-00BCUs-DM; Wed, 02 Jun 2021 14:24:00 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 09CFB300269;
-        Wed,  2 Jun 2021 16:20:29 +0200 (CEST)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id D1C23300269;
+        Wed,  2 Jun 2021 16:23:56 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id EBF7120223DBF; Wed,  2 Jun 2021 16:20:28 +0200 (CEST)
-Date:   Wed, 2 Jun 2021 16:20:28 +0200
+        id B6EF620223DA8; Wed,  2 Jun 2021 16:23:56 +0200 (CEST)
+Date:   Wed, 2 Jun 2021 16:23:56 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
 Cc:     Thomas Gleixner <tglx@linutronix.de>,
@@ -48,8 +48,7 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Borislav Petkov <bp@alien8.de>, x86 <x86@kernel.org>,
         "H. Peter Anvin" <hpa@zytor.com>, Jens Axboe <axboe@kernel.dk>,
         Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        dm-devel <dm-devel@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Felipe Balbi <balbi@kernel.org>,
@@ -79,46 +78,49 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Andrew Morton <akpm@linux-foundation.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>,
-        linux-usb <linux-usb@vger.kernel.org>,
+        linux-block@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+        linux-usb@vger.kernel.org,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         cgroups <cgroups@vger.kernel.org>,
-        kgdb-bugreport <kgdb-bugreport@lists.sourceforge.net>,
-        linux-perf-users <linux-perf-users@vger.kernel.org>,
-        linux-pm <linux-pm@vger.kernel.org>, rcu <rcu@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>, KVM list <kvm@vger.kernel.org>
-Subject: Re: [PATCH 6/6] sched: Change task_struct::state
-Message-ID: <YLeTrNDgBnAMMwEX@hirez.programming.kicks-ass.net>
+        kgdb-bugreport@lists.sourceforge.net,
+        linux-perf-users@vger.kernel.org, linux-pm@vger.kernel.org,
+        rcu <rcu@vger.kernel.org>, linux-mm <linux-mm@kvack.org>,
+        KVM list <kvm@vger.kernel.org>
+Subject: Re: [PATCH 3/6] sched,perf,kvm: Fix preemption condition
+Message-ID: <YLeUfNEqKg27VwAB@hirez.programming.kicks-ass.net>
 References: <20210602131225.336600299@infradead.org>
- <20210602133040.587042016@infradead.org>
- <896642516.5866.1622642818225.JavaMail.zimbra@efficios.com>
+ <20210602133040.398289363@infradead.org>
+ <1524365960.5868.1622643316351.JavaMail.zimbra@efficios.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <896642516.5866.1622642818225.JavaMail.zimbra@efficios.com>
+In-Reply-To: <1524365960.5868.1622643316351.JavaMail.zimbra@efficios.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 02, 2021 at 10:06:58AM -0400, Mathieu Desnoyers wrote:
+On Wed, Jun 02, 2021 at 10:15:16AM -0400, Mathieu Desnoyers wrote:
 > ----- On Jun 2, 2021, at 9:12 AM, Peter Zijlstra peterz@infradead.org wrote:
-
-> > @@ -134,14 +134,14 @@ struct task_group;
-> > 	do {							\
-> > 		WARN_ON_ONCE(is_special_task_state(state_value));\
-> > 		current->task_state_change = _THIS_IP_;		\
-> > -		current->state = (state_value);			\
-> > +		WRITE_ONCE(current->__state, (state_value));	\
-> > 	} while (0)
+> [...]
+> > --- a/kernel/events/core.c
+> > +++ b/kernel/events/core.c
+> > @@ -8568,13 +8568,12 @@ static void perf_event_switch(struct tas
+> > 		},
+> > 	};
+> > 
+> > -	if (!sched_in && task->state == TASK_RUNNING)
+> > +	if (!sched_in && current->on_rq) {
+> > 		switch_event.event_id.header.misc |=
+> > 				PERF_RECORD_MISC_SWITCH_OUT_PREEMPT;
+> > +	}
+> > 
+> > -	perf_iterate_sb(perf_event_switch_output,
+> > -		       &switch_event,
+> > -		       NULL);
+> > +	perf_iterate_sb(perf_event_switch_output, &switch_event, NULL);
+> > }
 > 
-> Why not introduce set_task_state(p) and get_task_state(p) rather than sprinkle
-> READ_ONCE() and WRITE_ONCE() all over the kernel ?
+> There is a lot of code cleanup going on here which does not seem to belong
+> to a "Fix" patch.
 
-set_task_state() is fundamentally unsound, there's very few sites that
-_set_ state on anything other than current, and those sites are super
-tricky, eg. ptrace.
-
-Having get_task_state() would seem to suggest it's actually a sane thing
-to do, it's not really. Inspecting remote state is full of races, and
-some of that really wants cleaning up, but that's for another day.
+Maybe, but I so hate whitespace only patches :-/
