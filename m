@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B957398C63
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:16:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 87570398C79
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:18:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232532AbhFBOSA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 10:18:00 -0400
-Received: from mail-dm3nam07on2052.outbound.protection.outlook.com ([40.107.95.52]:43296
+        id S231843AbhFBOSl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 10:18:41 -0400
+Received: from mail-dm3nam07on2052.outbound.protection.outlook.com ([40.107.95.52]:27104
         "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232200AbhFBOQF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 10:16:05 -0400
+        id S230428AbhFBOQj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 10:16:39 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DXrreSyN4URmVXvj9DNKWnuq2WyrOcDM49TajfnGkwZW4KO52xnhlyZnyKKdkbYh8bxb+BDPa84MvGRpJiX6Np3NTwOqs9pHFREuvvEG0kfkjSo4O5TQNWUAWWnJp93oVOG0fN//pPv4MWSC7txSgmKXX/yNHIw5QsBxGQzB1HjoJRPV+TQlRflmeVvCyCnpJqHEDiijLKMLhvOBWeJQXJuFIvd9+IDl1MQ784fx8GAYOzV82ew6RbtK5IjZD6hCXEoW6235FKWBLWF8fChJcyT/nRYU7rXa610Eh4IBD0zpQDJJu4SH4fazxicZ8ptZgV87rnikQpKp004Bp4Fn8w==
+ b=Hi05moGjJF7sjNfbuyqOfxQs97Fmnnxy1C0vVqYLDLW5GTO69BnJ4vjDiYk81Gi/paoVsWYQoL27DTAGGZZgp2sO77tCd9ks2ach1fo8geNt1HFWpY2EgbIjlzlz5ro+lgIDOsz8uZcSSz9dVh+5YGrSCHoaoU6Wsy6GnITzPNNpVr7R0waRgINgqD7oXvgUSNVMxPiurrucu5pGjmyqi4pUMcSc/zw66U1q6xpe+znh8G1EnqqM5DkrVIMja9IPpsnsLuBO/vnKCo8PQCJzvoEZuqOM3lJ0Vi+IvAkDtUI1ZJtW8rhdJXCyqm+TeLZJFjTbxmef8X3hRh73QJ8T0g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xLJXcd9y5+Qgm0yIvuFvVVGuI40kkmVzZ3F9gN7qF84=;
- b=iWspw2xKm6by2HQrvVLM94fRuxFneLOImUtFOvxqaEicOErEYC/C67eOEPxrkNt3L5wRBQOx5r52v290jYyTBc93qvleA3XWbrTHbb4IdEgwdxByxuQ46IjFuWkmtfxNjbV4OhNgalluufmbFNWA1rw67gk6190yoWVKIKR0TcjEobAWjYT8CGMO9JW2/9XyGzF0mss8CR+J/SDmungnhL1l9LkGwQTO/X2JRPNMZwTLyIK4zm8SIcBYy4J5rryI7XYBbbR8D4EVKIijzaqJD/43N6ot4DeLDfcjtH9i5SPH5EJQT1UwCJLJ3gPe2Q/6MF5TZqzffvitE7M/uGEQNA==
+ bh=bPIvRwnNwHdEha3n72i7CJC71O88LkOUXxlGm7zAFkQ=;
+ b=mGge8w/zGpQVRUkjzknnVZFYKu+uT/sUdti/8eBRhn0qjgbobiIW1oXKbPaDh4NRdZy/Hl85ZCJ2GAcZjZt/2zCxrwJ6SalKfRfZVI0hYDNNVVKJxIMKLFSOROoQdVV28zAzPBaiWSdPhPSQYOBLacyaQGkJZjhD9oKa4s606UKAox9ddcam2CEHP8vcEMdDdR+BqRlTJpdimCnGIbFbBOy1aQeGqm/CeXA6CW0l9Lg08NF1evg3n0uqFteRCJCpuEXTXb0DtdbCcNTyV6iV6yboXZTvYEmdYHVRl1tHZwtat0UkReDxr3rO/+kNnzw64eAQTIlcwkEnUESP8XscQw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xLJXcd9y5+Qgm0yIvuFvVVGuI40kkmVzZ3F9gN7qF84=;
- b=z9RbPumaTMn4LClVk1AliefdRZ2pVc5iZu280GENkSojr9XT44exgFU7TCl6EJOAh70O9AZJ5FWprJ3CErj6v1Xjl7sl8TLFvInkijxpZFp4L+rmGA5pPoIXBMDBsKNNteGUjrY2TTPq5eKHs5YK9FL4i4zdQ7v41Wb59CgcK1k=
+ bh=bPIvRwnNwHdEha3n72i7CJC71O88LkOUXxlGm7zAFkQ=;
+ b=YdP0bwDJbYf9WOaM9VRVtd/1Lt6IhbrslL5syRtmUDU/CmBaMZ/4Bj5Nn055hTlAUp6YaMz581/ndLGfJvvMKeTueeENNat5rS7zfjk98NVQLXItR8XNisIvcS/mDK9EjhXQuJH4fLzuR9wpT8qagcAsV+ZadV4uqBoRDKpyr30=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
  by SA0PR12MB4574.namprd12.prod.outlook.com (2603:10b6:806:94::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.20; Wed, 2 Jun
- 2021 14:12:40 +0000
+ 2021 14:12:41 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4173.030; Wed, 2 Jun 2021
- 14:12:40 +0000
+ 14:12:41 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
@@ -56,11 +56,10 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Peter Zijlstra <peterz@infradead.org>,
         Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
         David Rientjes <rientjes@google.com>, tony.luck@intel.com,
-        npmccallum@redhat.com, Borislav Petkov <bp@suse.de>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH Part2 RFC v3 35/37] KVM: SVM: Provide support for SNP_GUEST_REQUEST NAE event
-Date:   Wed,  2 Jun 2021 09:10:55 -0500
-Message-Id: <20210602141057.27107-36-brijesh.singh@amd.com>
+        npmccallum@redhat.com, Borislav Petkov <bp@suse.de>
+Subject: [PATCH Part2 RFC v3 36/37] KVM: SVM: Use a VMSA physical address variable for populating VMCB
+Date:   Wed,  2 Jun 2021 09:10:56 -0500
+Message-Id: <20210602141057.27107-37-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210602141057.27107-1-brijesh.singh@amd.com>
 References: <20210602141057.27107-1-brijesh.singh@amd.com>
@@ -71,279 +70,120 @@ X-ClientProxiedBy: SA0PR11CA0056.namprd11.prod.outlook.com
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0056.namprd11.prod.outlook.com (2603:10b6:806:d0::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20 via Frontend Transport; Wed, 2 Jun 2021 14:12:13 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0056.namprd11.prod.outlook.com (2603:10b6:806:d0::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20 via Frontend Transport; Wed, 2 Jun 2021 14:12:14 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 928cb5a8-7659-4746-8e08-08d925d06b8f
+X-MS-Office365-Filtering-Correlation-Id: 094a8188-f328-48c7-f338-08d925d06c33
 X-MS-TrafficTypeDiagnostic: SA0PR12MB4574:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB45745DD21269CDC7E4F62626E53D9@SA0PR12MB4574.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4574A2D7197F8F69874F6BABE53D9@SA0PR12MB4574.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: FtdBakzDA1pUtHqZVpLs+lr/pSi5dXWot5UvBHOZGNjzAo7l+OS4wTzs/KKg/qX7X8Zm0hnjn6r6tXSgFBrkwcmAWtHfm1DfyW6gcW27Kk/hgPBFLtJkXsj9tMMHamHS2lSIr2NQ/4iDu9AiDr+FlC/Rg23pe0aJTPK2qQlvTm5QB+uh9s8obPWRMDX0qzm41xRx6RQTySuds0kr9nntJBia3HuS7wNla86mCeth46XcSMukguWfe1Exl2QXsItx122E+qpKJvM0NgXwEt5DA3Sxl3ZCVgikNcrtTfajLCOeHrJdflt10Yvrbc5tqrDv3RiL1+22iCjIwNqbx7V7nfaVW6cHFLSjD7AueWL3/h6wETHnf/kQF1O2iutCrGuhdaT4Grupt5l48t0bVd/Y0XO7MB+FULP1lGIIQatC96BnfiyWgP/bs5vn2rVoVY6hUYaQ8492qIstKas4A0RAWOCJetdRFnZrOJ/lzleeD8oLBwLfehPa9XnIZ3+maK/ArFu3B7gxrrOHmbFCGCzhQCyz0l9jCPu/oeP7Fl5bxGL53gbYTjXT1yjXr9VssIjak1MG9PH28IjTyBrL/zGsxVM6qomxH4dsSc5euAK0T3jQRObq/5RdFU+6MGS0jol+GDy/MAtjU+O3pTaquBu8Kg==
+X-Microsoft-Antispam-Message-Info: W+Y3OI4oA2E4uIZQPKG8+w8L7TE6scjBXj0uZkKba3jyGTU81j+2ZC9dvTKCF70l3wVCSU29KAtWi/2VwA7nLjMxEsQIJuWAI7TjFtxq7oyJgDeV/ExvY+N0wIigu0hzSVlb1jvqwNyexHkwDvgE/33KY/8OeuyBQxBPEyA5uKhFWflm5qLXdO2kM7gisjIh0jO8aOMmpTBwHCGdH0a5/fD9pU/ispRLvjARdKu1aPEXBKn3YNN1QAg29kiMbGk4IezVY0tCh9uZAEkeh8vDquR343VInqdL4dv+NzD2z57G1nZ/Yoa4DbpqW3+9Ab5Y0up9n4o1X2rdmL/pYfthDMzQjGBniWvacqgkkAgl455Fxni3jnqDpiBFu7+//LZe/xJ2lAi4QsEtzfhMhcY7EIUaTPsYHcxeHcQNrKUWy+TJTlnpGGiM8YVl0Odd2hhbxF+E4sCVETzFgbY3bV4/AyYFt2kkCRpFOmg6aWGCobwkwS5M4anY3KfERZExthao6X1CHjo0/R7kEikLI/qJ1WYJBGiT7uUa+jrg8X2LT42TAwBD0f8QLcSctsmLqAsk18jGw9+Fhl7WJp5sn4aC07Wq1nHPmsdr2f5jBxQ7tQgHB+eBdgT6ENTNpUH+j+JoQDNyieAPh2VngthfJH4fww==
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(366004)(376002)(396003)(136003)(39860400002)(86362001)(8936002)(7696005)(52116002)(956004)(478600001)(2616005)(66476007)(66946007)(2906002)(26005)(186003)(16526019)(7416002)(4326008)(1076003)(316002)(6666004)(38100700002)(38350700002)(66556008)(44832011)(83380400001)(8676002)(5660300002)(6486002)(54906003)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?zFxqQVm1BkrAHCAkdibcy/pT1hcZPIeg8dVph93YC5ONL5fZnJ7UUMGgmTfv?=
- =?us-ascii?Q?2U+5Fhq2WXTTKSQXhNlb+nNOAaEn9X2EuN0HnUeFociqrEEHEqjwc9cNtUB7?=
- =?us-ascii?Q?BuZOaC56PG058sfn7g8SAF75qZY99o8h+RFXw0w/+mBBiFi2gbyO6BqTaZmg?=
- =?us-ascii?Q?8h7hHni4mRSku1Tfm+XKZB/jSHMiB085zQZLIWf6z6S9iua+FEH0IUZOOIvZ?=
- =?us-ascii?Q?p1T7nMuM1OBnAlT0kvbtJ3GcKGOSHqha1Hqn9SU1OEUlCZsa0Bt8bmYoTODO?=
- =?us-ascii?Q?N0ooWOKDKdOseqK1oPeuaPUm2Zg7syCgfI9OHyarkNtuUKyn09oXWWj5b1Ti?=
- =?us-ascii?Q?N7tim/A1Y/WBcGkMG/OHRKdjxPw0GLkAd6HCTYiRRkAuXKeg50RzptEkF9mI?=
- =?us-ascii?Q?QJsB65s9HCBCn8TSN8lE4RaUL/qEds9NuOWysMBSRZNpIRBy3o2f543lC7sk?=
- =?us-ascii?Q?NtKo4aVj1zLx+haOku7qUcYqqgmkxv712dOMf51R/cKwgrDCoZgS/zDvxcRK?=
- =?us-ascii?Q?GdssK/WwsMjaFLmO4xvjYWDqpS4UPUbHND/f+TujAgkfpHATuphqFISxQvsx?=
- =?us-ascii?Q?R8MJliQ/4pz/aihZTvg3q8q/SQgFjcBKnvSLOzomm9gn3zt7WSeXw3md6mM3?=
- =?us-ascii?Q?q5XSrBKVPLazyX0iQkffcyK0ezXwvehlf3+eYS2TjQNnfPxa8YX48TQUiLjv?=
- =?us-ascii?Q?YKnHenvE7AsM4P5YY1D166y1gUMDupKN9BJTFt7SDaCd6F9KP99gf1bte+23?=
- =?us-ascii?Q?Mrn0/N+a7Iv/0V7g4YdK7+UWdfecoPRPgcysBaOK3wBDjppRNK6D+XeRq30V?=
- =?us-ascii?Q?hxjDnYBGU4z+X59HSjEhT+R8EN1QqYJ7kicbi9IC/TB8SDpkAbb04vdcEZf8?=
- =?us-ascii?Q?4Bs4RkHU+kfqsNnZ2vyhL2PrS70V+oBadVWusXzq+G5E6TxNIIfAWFC2bmqT?=
- =?us-ascii?Q?ivvJyd9TXniCGcUpb6n2Nb5wMog6/2LvyaHnjAh0szlMG6DRvfX5l4QufqXm?=
- =?us-ascii?Q?fTQT2qdxQbxjvLDcb7qNnoqyyLYmHV6pQQ8PXAK0h//JHWLXkZkwYWDbtl/a?=
- =?us-ascii?Q?VUKWuI21nH6668WDnPJqSw2BkNJ6BuCvVQXfo5MnQyaDaPk6FeMf0Y58Lfoe?=
- =?us-ascii?Q?GCPvdRjZnxNxxy6tufYHJ5zSifsor6kTviJfHbmuIgaEGRz6X3Q5aW3j2tVa?=
- =?us-ascii?Q?FaKTDGq9ukXusWw0vL4OcFa/1X+fgdhiyVjB12etILupb7LFdfurcjzYJQb0?=
- =?us-ascii?Q?pJecGEK7jwyxiPaH0s+eCk/H/SN6B6qxbnxfmQRgYe/FouDA2pDxEVUpxU8r?=
- =?us-ascii?Q?0XumfaBUJZzWzgk591HqPhkm?=
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?XoneEl81jzW+xpqfSMvmQc9NPyrCIyx8WIvgnK/4JiVXPMrMYJwp3r5+Epbu?=
+ =?us-ascii?Q?PrbReS7UZ0jLcIobAWEBpy21Q+qgabhW/RahZp6XF4q0Hg3nZZRbbtOvCpYZ?=
+ =?us-ascii?Q?S3UZSGmA99NeO61cqQ9rPjZTDt0U00hBM4pZOfXGce2GsenEYx5GMpjizrH3?=
+ =?us-ascii?Q?YQcV2uF1j7eNZ59OWilyW3zyqYvLQD/eBM/uOzfcWuVS1De2vqbm6vQI6Qr0?=
+ =?us-ascii?Q?j3bpZdQTHlQLUCrshvTGhyh/CvXUz4ask2qFXdFviSWCGok+XO9KoOAVgQXA?=
+ =?us-ascii?Q?bmI9HRrFbjPmWuZNtrsAlWg81YVb1AtQc+SyX2A8YAr3aY0p4elO+edhkvH/?=
+ =?us-ascii?Q?wLpuTu10G+1X08hfVMLassIyGSy2QLVWIXz8oer3mk61pn4Qki3p1gNt04n3?=
+ =?us-ascii?Q?+LbzmUBnAxVh1r1xwpTKLh4g75hTBF4cDyIFlKYJNfcDJVhCWd50AIjEjLri?=
+ =?us-ascii?Q?W4VrUgei3u67IuOQvhw6F4Eof6cSaTUae/aE7bxtkUCLzg2lKr3G6HQX7YlV?=
+ =?us-ascii?Q?9CwcKDOkUvWTBd6Cg71jvNGOde0cz/cJd0uDkYiMu2RDE/8hy/5+us7Vd/dl?=
+ =?us-ascii?Q?nDF7lL/BukQu0inHxbJ/gxrR2eqjT0zhjW/HLGY1EbiqC5HTQ0cwHXzFWBI4?=
+ =?us-ascii?Q?1EotoLPH3w+ULTWrFBEiySVO1hFLuGNcqfhuNvQ30rOV0LqWZl9mrElJrp4D?=
+ =?us-ascii?Q?vgzBP+IeB43CzImK5iqGKceym022xNaCg+lfI2IMy81/t5IZU4iM4S8YadG7?=
+ =?us-ascii?Q?bm0fLiMMLXcgz0sK6I3RfVcXIkLfqlLFiHkZhNcwLcxQBa42V/LBnVIzNCd1?=
+ =?us-ascii?Q?xOG31cVXUecJ170otAHuQpRnYlbMpAF2tpObjUuA415v8uudcU/QfvAQ2zha?=
+ =?us-ascii?Q?QsmnemNWNAc21Ojyha4oQAYsQwwHbtnPLXprnmdTNdEsXbe2UN6KzgiG/cE+?=
+ =?us-ascii?Q?zL19C1NMjv1r/bOJcVsSHBqkOCE4CmPTH8IZ84xFmaVd1Luim6kM+WQ8ycfL?=
+ =?us-ascii?Q?e2fesmB7EwTUVa8FHjzgyquIHVsPE+F2t6pDol10qxOHVm7bu2UN6XELTwZd?=
+ =?us-ascii?Q?bDy79OzOdhSsPgUZ+/N9N27yXOab2lmb+n09lZ/613EowZgnz/lxYYJ2GZQU?=
+ =?us-ascii?Q?Tp3f4QUUJpq5Ln8FVYC8xpq0/DEnrieo5mr40ULAjNUUviLsNbYRzdYQZp69?=
+ =?us-ascii?Q?fB6ueEivyZYp0ikeT3i3bUVf1gs7fTs4xJKrTgOTaddcbFGiwXlBll4YCMS4?=
+ =?us-ascii?Q?Nbz+He3J3X03QdviGTUVxG6WeoyNgkBEOp0G1du2VYZMWC9hJG8XCvdmrXR6?=
+ =?us-ascii?Q?2nm92z00LwadxcvKwyBmrZ9W?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 928cb5a8-7659-4746-8e08-08d925d06b8f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 094a8188-f328-48c7-f338-08d925d06c33
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2021 14:12:13.9680
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2021 14:12:15.0763
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cMWXx808hVBKwjNY11hwaFNvsGOqJoAzVbooWegpHFAcjgnp5t3ufeDVtINsolMlO8103O7o1DNS+6kIclhZ1g==
+X-MS-Exchange-CrossTenant-UserPrincipalName: jzjZDUR2BUltO9e6yHECiWCVLRpdQv7uZ4VkH/M/4qUiAEITyY+RJt2y1jTCS45jwzi8/+97XMTmHq36VlXswQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4574
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Version 2 of GHCB specification added the support SNP Guest Request Message
-NAE event. The event allows for an SEV-SNP guest to make request to the
-SEV-SNP firmware through hypervisor using the SNP_GUEST_REQUEST API define
-in the SEV-SNP firmware specification.
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-The SNP_GUEST_REQUEST requires two unique pages, one page for the request
-and one page for the response. The response page need to be in the firmware
-state. The GHCB specification says that both the pages need to be in the
-hypervisor state but before executing the SEV-SNP command the response page
-need to be in the firmware state.
+In preparation to support SEV-SNP AP Creation, use a variable that holds
+the VMSA physical address rather than converting the virtual address.
+This will allow SEV-SNP AP Creation to set the new physical address that
+will be used should the vCPU reset path be taken.
 
-In order to minimize the page state transition during the command handling,
-pre-allocate a firmware page on guest creation. Use the pre-allocated
-firmware page to complete the command execution and copy the result in the
-guest response page.
-
-Ratelimit the handling of SNP_GUEST_REQUEST NAE to avoid the possibility
-of a guest creating a denial of service attack aginst the SNP firmware.
-
-Now that KVM supports all the VMGEXIT NAEs required for the base SEV-SNP
-feature, set the hypervisor feature to advertise it.
-
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- arch/x86/kvm/svm/sev.c | 101 +++++++++++++++++++++++++++++++++++++++--
- arch/x86/kvm/svm/svm.h |   5 +-
- 2 files changed, 102 insertions(+), 4 deletions(-)
+ arch/x86/kvm/svm/sev.c | 5 ++---
+ arch/x86/kvm/svm/svm.c | 9 ++++++++-
+ arch/x86/kvm/svm/svm.h | 1 +
+ 3 files changed, 11 insertions(+), 4 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 5b033d4c3b92..5718e2e07788 100644
+index 5718e2e07788..047f4dbde99b 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -18,6 +18,7 @@
- #include <linux/processor.h>
- #include <linux/trace_events.h>
- #include <linux/sev.h>
-+#include <linux/kvm_host.h>
- #include <asm/fpu/internal.h>
+@@ -3409,10 +3409,9 @@ void sev_es_init_vmcb(struct vcpu_svm *svm)
  
- #include <asm/trapnr.h>
-@@ -1515,6 +1516,7 @@ static int sev_receive_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	/*
+ 	 * An SEV-ES guest requires a VMSA area that is a separate from the
+-	 * VMCB page. Do not include the encryption mask on the VMSA physical
+-	 * address since hardware will access it using the guest key.
++	 * VMCB page.
+ 	 */
+-	svm->vmcb->control.vmsa_pa = __pa(svm->vmsa);
++	svm->vmcb->control.vmsa_pa = svm->vmsa_pa;
  
- static void *snp_context_create(struct kvm *kvm, struct kvm_sev_cmd *argp)
- {
-+	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
- 	struct sev_data_snp_gctx_create data = {};
- 	void *context;
- 	int rc;
-@@ -1524,14 +1526,24 @@ static void *snp_context_create(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	if (!context)
- 		return NULL;
+ 	/* Can't intercept CR register access, HV can't modify CR registers */
+ 	svm_clr_intercept(svm, INTERCEPT_CR0_READ);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 32e35d396508..74bc635c9608 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1379,9 +1379,16 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+ 	svm->vmcb01.ptr = page_address(vmcb01_page);
+ 	svm->vmcb01.pa = __sme_set(page_to_pfn(vmcb01_page) << PAGE_SHIFT);
  
--	data.gctx_paddr = __psp_pa(context);
--	rc = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_GCTX_CREATE, &data, &argp->error);
--	if (rc) {
-+	/* Allocate a firmware buffer used during the guest command handling. */
-+	sev->snp_resp_page = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT);
-+	if (!sev->snp_resp_page) {
- 		snp_free_firmware_page(context);
- 		return NULL;
- 	}
+-	if (vmsa_page)
++	if (vmsa_page) {
+ 		svm->vmsa = page_address(vmsa_page);
  
-+	data.gctx_paddr = __psp_pa(context);
-+	rc = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_GCTX_CREATE, &data, &argp->error);
-+	if (rc)
-+		goto e_free;
-+
- 	return context;
-+
-+e_free:
-+	snp_free_firmware_page(context);
-+	snp_free_firmware_page(sev->snp_resp_page);
-+	return NULL;
- }
- 
- static int snp_bind_asid(struct kvm *kvm, int *error)
-@@ -1599,6 +1611,9 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	if (rc)
- 		goto e_free_context;
- 
-+	/* Used for rate limiting SNP guest message request, use the default settings */
-+	ratelimit_default_init(&sev->snp_guest_msg_rs);
-+
- 	return 0;
- 
- e_free_context:
-@@ -2196,6 +2211,9 @@ static int snp_decommission_context(struct kvm *kvm)
- 	snp_free_firmware_page(sev->snp_context);
- 	sev->snp_context = NULL;
- 
-+	/* Free the response page. */
-+	snp_free_firmware_page(sev->snp_resp_page);
-+
- 	return 0;
- }
- 
-@@ -2641,6 +2659,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
- 	case SVM_VMGEXIT_HV_FT:
- 	case SVM_VMGEXIT_PSC:
-+	case SVM_VMGEXIT_GUEST_REQUEST:
- 		break;
- 	default:
- 		goto vmgexit_err;
-@@ -3031,6 +3050,76 @@ static unsigned long snp_handle_page_state_change(struct vcpu_svm *svm, struct g
- 	return rc ? map_to_psc_vmgexit_code(rc) : 0;
- }
- 
-+static void snp_handle_guest_request(struct vcpu_svm *svm, struct ghcb *ghcb,
-+				    gpa_t req_gpa, gpa_t resp_gpa)
-+{
-+	struct sev_data_snp_guest_request data = {};
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
-+	struct kvm *kvm = vcpu->kvm;
-+	kvm_pfn_t req_pfn, resp_pfn;
-+	struct kvm_sev_info *sev;
-+	int rc, err = 0;
-+
-+	if (!sev_snp_guest(vcpu->kvm)) {
-+		rc = -ENODEV;
-+		goto e_fail;
++		/*
++		 * Do not include the encryption mask on the VMSA physical
++		 * address since hardware will access it using the guest key.
++		 */
++		svm->vmsa_pa = __pa(svm->vmsa);
 +	}
 +
-+	sev = &to_kvm_svm(kvm)->sev_info;
-+
-+	if (!__ratelimit(&sev->snp_guest_msg_rs)) {
-+		pr_info_ratelimited("svm: too many guest message requests\n");
-+		rc = -EAGAIN;
-+		goto e_fail;
-+	}
-+
-+	if (!IS_ALIGNED(req_gpa, PAGE_SIZE) || !IS_ALIGNED(resp_gpa, PAGE_SIZE)) {
-+		pr_err_ratelimited("svm: guest request (%#llx) or response (%#llx) is not page aligned\n",
-+			req_gpa, resp_gpa);
-+		rc = -EINVAL;
-+		goto e_fail;
-+	}
-+
-+	req_pfn = gfn_to_pfn(kvm, gpa_to_gfn(req_gpa));
-+	if (is_error_noslot_pfn(req_pfn)) {
-+		pr_err_ratelimited("svm: guest request invalid gpa=%#llx\n", req_gpa);
-+		rc = -EINVAL;
-+		goto e_fail;
-+	}
-+
-+	resp_pfn = gfn_to_pfn(kvm, gpa_to_gfn(resp_gpa));
-+	if (is_error_noslot_pfn(resp_pfn)) {
-+		pr_err_ratelimited("svm: guest response invalid gpa=%#llx\n", resp_gpa);
-+		rc = -EINVAL;
-+		goto e_fail;
-+	}
-+
-+	data.gctx_paddr = __psp_pa(sev->snp_context);
-+	data.req_paddr = __sme_set(req_pfn << PAGE_SHIFT);
-+	data.res_paddr = __psp_pa(sev->snp_resp_page);
-+
-+	mutex_lock(&kvm->lock);
-+
-+	rc = sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &data, &err);
-+	if (rc) {
-+		mutex_unlock(&kvm->lock);
-+
-+		/* If we have a firmware error code then use it. */
-+		if (err)
-+			rc = err;
-+
-+		goto e_fail;
-+	}
-+
-+	/* Copy the response after the firmware returns success. */
-+	rc = kvm_write_guest(kvm, resp_gpa, sev->snp_resp_page, PAGE_SIZE);
-+
-+	mutex_unlock(&kvm->lock);
-+
-+e_fail:
-+	ghcb_set_sw_exit_info_2(ghcb, rc);
-+}
-+
- static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- {
- 	struct vmcb_control_area *control = &svm->vmcb->control;
-@@ -3284,6 +3373,12 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 		ghcb_set_sw_exit_info_2(ghcb, rc);
- 		break;
- 	}
-+	case SVM_VMGEXIT_GUEST_REQUEST: {
-+		snp_handle_guest_request(svm, ghcb, control->exit_info_1, control->exit_info_2);
-+
-+		ret = 1;
-+		break;
-+	}
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
- 		vcpu_unimpl(vcpu,
- 			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
+ 	svm->guest_state_loaded = false;
+ 
+ 	svm_switch_vmcb(svm, &svm->vmcb01);
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index ccdaaa4e1fb1..d4efcda3070d 100644
+index d4efcda3070d..52fd3cf30ad9 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
-@@ -18,6 +18,7 @@
- #include <linux/kvm_types.h>
- #include <linux/kvm_host.h>
- #include <linux/bits.h>
-+#include <linux/ratelimit.h>
+@@ -176,6 +176,7 @@ struct vcpu_svm {
  
- #include <asm/svm.h>
- #include <asm/sev-common.h>
-@@ -68,6 +69,8 @@ struct kvm_sev_info {
- 	struct kvm *enc_context_owner; /* Owner of copied encryption context */
- 	struct misc_cg *misc_cg; /* For misc cgroup accounting */
- 	void *snp_context;      /* SNP guest context page */
-+	void *snp_resp_page;	/* SNP guest response page */
-+	struct ratelimit_state snp_guest_msg_rs; /* Rate limit the SNP guest message */
- };
- 
- struct kvm_svm {
-@@ -550,7 +553,7 @@ void svm_vcpu_unblocking(struct kvm_vcpu *vcpu);
- #define GHCB_VERSION_MAX	2ULL
- #define GHCB_VERSION_MIN	1ULL
- 
--#define GHCB_HV_FT_SUPPORTED	0
-+#define GHCB_HV_FT_SUPPORTED	GHCB_HV_FT_SNP
- 
- extern unsigned int max_sev_asid;
- 
+ 	/* SEV-ES support */
+ 	struct sev_es_save_area *vmsa;
++	hpa_t vmsa_pa;
+ 	struct ghcb *ghcb;
+ 	struct kvm_host_map ghcb_map;
+ 	bool received_first_sipi;
 -- 
 2.17.1
 
