@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D4674398C0C
-	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:13:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78EFC398C05
+	for <lists+kvm@lfdr.de>; Wed,  2 Jun 2021 16:12:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230313AbhFBOOi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 10:14:38 -0400
-Received: from mail-dm3nam07on2058.outbound.protection.outlook.com ([40.107.95.58]:30496
+        id S230475AbhFBOOE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 10:14:04 -0400
+Received: from mail-dm3nam07on2077.outbound.protection.outlook.com ([40.107.95.77]:45953
         "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230157AbhFBONi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 10:13:38 -0400
+        id S230204AbhFBONe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 10:13:34 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oAEzduR2eAxmRR+52fUwnw8reUTUWvsMd75YAbMBsIj85wXxAd3sXczVpxqiJLVX3Ip8AQK5UPxFDKizjK1AoTbrhRVBbblZ401uRrOb/y3+n444yFoxjRR21pJsN7VNgm0LoAkEJCEPN9LcsO/k41B2oMP+3sy9pxwcZJFDf23Z5hOMVcR5veD+b40TJpDFWQ2TdJ2KgifGIEZ4HlYaOaRuR1LZQ3l3iRrmGVDm7jxi3OCVBTz3d1fZwY+Mech5hsJaAXU0P2NZ+1liHMY9Bonhc2GSRCndh9A8Bf/MFX2p0DZViVF1wa1FKPuG9eCsUwv4c45SXs7L8kaYgw+V2Q==
+ b=KzKrpe5TwxP4JQFyBdcBGGvDvsIoYvalSN7uOgfv5XYzeCau+cX3t86HvSoAcO3vI/nQfCMBSR22VZL85/jT5EDDQ7VuJWV3sXDHM+XfslmpFUpcdI+Wi/1bCzSmEvxYi7D2ed3onKd6J8Sg31ClLMnPHOFkZ42VwjLJUGI7QYnqf5Q45ZFol4kOkfBgFk1i+kkAYoOJERosnir1sDnd6sm2npeO5AN4fQyekXRPHt+uq8y1hHQoInMwjaIJc56L5Wr6kXBWowPlWu8MP1dURg+LQL8ZGpvD5MK38LmNwl0l0S4fxYa1TifcsRt/XnEM43/UPG5FHbhWX+I1O8bDAg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HpeuEpV9xu1z2yLvaeOD1qK8FIR0AyraxNbDCRzDvrA=;
- b=DL/PgjfFAg3get7erWphPWgeOxU12nwI+4rIEj4GB/uaQNGPs9GDX19sXjXds8ayYPb527ITYUTygUsBiDeKOX/bckpnnCIPtfVz/8DjHD8ruQIMpnkXwyWEYotAHy/xRehLMfdoHgpeAM6FxjEvYemGVM6czlqNLMvp7lRzUCI9ktQ1dAbQmynmbTI0hptn4L2YUFj3LqDv4dUsxVbvlbjfecBEmG3QSDlEmwALah6knupZIsn8HI9cw4gjBYMNGlhTxQx/pVotKAinXY5pTDnSEswGD4d+P5dYlxaa3U/+Iti6LO1xfGcIJPWsIYSXu/PMQWzt8WQwBPHWZjpwfw==
+ bh=vA9Y7FTLsl3X3KXsPSydxPwo+ZSKbBDJMa3NZmmwxmI=;
+ b=kwCY2Km1qEOpqGmLAySR+S0N5EZWD6CfN4XN6jmWs0g75ytdnZgtpbtaYkhI0fT3e/bMAxb83YUDU3Wyu6jWPPh23AAUiafLqeZQd+By3wHqPLo2Q5iEl7e+Y2QnSN3qmRQuARdr+ZtiUVav2P79stQBKcLNB+J3IGasXau1/OwAfzZ33bzFD84GUKdayxY3kTtzkPEVCJSyw4XRVPUNG829yCW933T4Q3j6Lgj1nox2H/y6LXRMeCtrO+R/sJSAYF7Lv17qenFLfy10BUycX6fK56Ncz49oIUxkwkkOENh+QGzZM414H4M2T9lAGLwz3i7rYK1VFiFZ9Q6Eh1AD2g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HpeuEpV9xu1z2yLvaeOD1qK8FIR0AyraxNbDCRzDvrA=;
- b=nELCPpPUD2MainJFB8DQu07udwZb528z6Jx9n4VuEahQqVHHh6RSP9KRuppuJm6rZWQFlESzUcv76SIenYLccBly6CxyCJrWLkwREYL1DJqttlfiguL1kETZLtDfl7BoUtoMBFdSvKUy9Vpc7RD4+2L57i0IblpcvYaQFwKhkiU=
+ bh=vA9Y7FTLsl3X3KXsPSydxPwo+ZSKbBDJMa3NZmmwxmI=;
+ b=2GouCPbDU5yVrZUytDaADmGSJOcD6v00kCxjh5zLr+EIg+lDZNe5kcNGIVV+7mkQOuo2hG5xOOOK4VEHiFQGjV1NFj7fygCfoPHM7y3M6D8Ni67qDSjGWCjQxkrUW4TqubqDrzc4jsXZbEjQOhq/2GzhI3q18U7y7eCca6Y1lpA=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
  by SA0PR12MB4495.namprd12.prod.outlook.com (2603:10b6:806:70::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20; Wed, 2 Jun
- 2021 14:11:29 +0000
+ 2021 14:11:30 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4173.030; Wed, 2 Jun 2021
- 14:11:29 +0000
+ 14:11:30 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
@@ -58,10 +58,12 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         David Rientjes <rientjes@google.com>, tony.luck@intel.com,
         npmccallum@redhat.com, Borislav Petkov <bp@suse.de>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH Part2 RFC v3 00/37] Add AMD Secure Nested Paging (SEV-SNP) Hypervisor Support
-Date:   Wed,  2 Jun 2021 09:10:20 -0500
-Message-Id: <20210602141057.27107-1-brijesh.singh@amd.com>
+Subject: [PATCH Part2 RFC v3 01/37] KVM: SVM: Add support to handle AP reset MSR protocol
+Date:   Wed,  2 Jun 2021 09:10:21 -0500
+Message-Id: <20210602141057.27107-2-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20210602141057.27107-1-brijesh.singh@amd.com>
+References: <20210602141057.27107-1-brijesh.singh@amd.com>
 Content-Type: text/plain
 X-Originating-IP: [165.204.77.1]
 X-ClientProxiedBy: SA0PR11CA0056.namprd11.prod.outlook.com
@@ -69,197 +71,191 @@ X-ClientProxiedBy: SA0PR11CA0056.namprd11.prod.outlook.com
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0056.namprd11.prod.outlook.com (2603:10b6:806:d0::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20 via Frontend Transport; Wed, 2 Jun 2021 14:11:27 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0056.namprd11.prod.outlook.com (2603:10b6:806:d0::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20 via Frontend Transport; Wed, 2 Jun 2021 14:11:29 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3a749c7b-5671-4f6f-cb04-08d925d050b1
+X-MS-Office365-Filtering-Correlation-Id: 47b0fc7a-3848-4e22-0bbc-08d925d0516f
 X-MS-TrafficTypeDiagnostic: SA0PR12MB4495:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB449542785B9F6BEA6E7C0294E53D9@SA0PR12MB4495.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1751;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4495E47B235D26DF3D682650E53D9@SA0PR12MB4495.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: nQDU6XSVdYszdpTLU4ce4PQoFRrC8j2Ita7zHJKSDpR7IRXQbrebwM/8seUkJAjDB8kvHaXIjohW67sqi9+9yZ2RN/m3AIYbuVcq0vq4PEOuLHcPaKpDaUkN2A8g1Si27V6tCQ7k2j1o/Z9w4DY1IjUWT9ZwxSw9pCiY+ZDm7SFlT5GF9fNTofiqymw4pxL7JXeuJr9N/GfSSNwO5rHv63Ppq5RBd7W5bRnePR9Xq9hSNnv9fwkAnQbB14w96Dg/KJ3aXN5Q7B/gDxhs9vrbAHHr4jsZqoKB5O4yP5Oh8Drvetu3stXo6k8rMMAJcOI9pRf4B2JrPL1f32+dssKvy9ids6jfwiin9F3tyCTiDmWlmxmNGUHQ6EBm/NSVTZgERnN/srHIiGX8VCdqbMxje2uJACGFMHGYYdYDTmYfY+nt++lNq+WtyIG7ud/12GjUTzc1CcIxCBz5SG9bk7nzNoBTIwpqPjdpNj/hdGNSwSkddhojWgLHUIlgk75+6C6iFcNCpdwzswO7Dzhl/1TzvdL5xYLjtqUSQVncQd2dwCFgnaXKTfeK6pDzm7HLkGjIeTq+/ckDZODg2asPncDaWdTjXnL86mpm6siWpv94WQ9F5PsyhBwNGfqkGyCcjRi0TD3syzPGG+e3iIyTEmvUYNP1/6K6ZwIAeiXNg06ukSE=
+X-Microsoft-Antispam-Message-Info: HAdQCQYuW9bo+ta1Dw6hsrXKWyk1kMhpx2riMl7lVsdWaAH9Oy6hG3QiGDZTHYJ8o6u08b5Sc1IqfqbDfdDN5ok3MQ/RLirldHAdsfa/EQ0rJma68aIM5JLDXAm2OLBneWdBkukTNP1hDLwE8AI7MuEvBvAx+QZkF4zZ5a1qs930uxUuwW77vIhLVIWZZJ3h6R0kJYm5mSo8mH7CB3UY3ZGkeKk9BlGWeD1eFGSnOSQlNiycAxHJQxlum/hu0HxPZo9FB+meGNNUGv7ejQ8ZLRIsUOAGe3rvZMSBhADVUeWugIyzkKg46MJzFPlpONfNIWA5cpZQXBXZVe0+hJU4CHVXYo1/h+tLBWoPejo2n4Xiv60AjoyJoa1SLBFN4vBxuClYaP1WIGb2LyVhiygjes8VSjha8lXmYZ6RSup34kQKbjC+Lf/rmKTHM+vyZZDs2NEvcTwPQogQehKz/XTrnvbxWgT5qxIRhbb34CE/+/oz9zN8KB3JL1kepSbE6Wru3qklUSCeRA7Ns02Wn8SBGMOI9sxSp5JbczMtOXLg+P96oGwSxlBhTjq730csNcX6clN5mJTYRQkr7kb6qprAfztDOE5SCePw4FsUdRe1E32Zm6hqMQ4Pm0kEdKkIVO9eRY8NGo4D77EZ4Ct5zZgPUw==
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(396003)(346002)(366004)(39860400002)(1076003)(54906003)(44832011)(8676002)(2616005)(956004)(478600001)(6486002)(316002)(86362001)(4326008)(7416002)(6666004)(38100700002)(7696005)(38350700002)(52116002)(16526019)(26005)(186003)(2906002)(5660300002)(66946007)(8936002)(83380400001)(36756003)(66556008)(66476007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?dMvKT019mmGJmSJ3UFlQoofR1ZTvUpNQSUNhlOVK+gIklhHrgzl5x2Zd0/Jf?=
- =?us-ascii?Q?1rpjXC4OEZE1am1c+t8sCi/Ubi9PlED5ImNuhOMgZmcpKTxi7PjtUFiWobUQ?=
- =?us-ascii?Q?4Km6tI37ezQcTh/bhYjQH4/GJOl1ZRNjdYgupp2rLutiY73zwpV4negbx+5t?=
- =?us-ascii?Q?4C/SgfM9MJgtwTTpCJ4mST3UAjqjJHN5Gzayn3njNcQ03XhPQXKGFXhRba3t?=
- =?us-ascii?Q?kuHsbKUX79zpBTi87gQsGf+pD9xyQO3jEV/pUDaCj/qedI6kRr9Tbiygq0As?=
- =?us-ascii?Q?1wHw21PLG3nXx7CRglj+K2q7yuN+blFXwOAzLddh+UJXeeRuUJJDffHVv5fB?=
- =?us-ascii?Q?27wXn27R1f1jEDrs7h+TCM2ZWqDpt8kORAFgoIkWiJegD+l8mGmniQuMlhZY?=
- =?us-ascii?Q?rC7rGDsiFby7LmmKLZ4oVFT19QCkS5/9LZVa8j9xQ823Iupk8xj2M96cLXEA?=
- =?us-ascii?Q?39gfL5sdT4HZziXGAd3Pv5O5+3GFsopROi3tvLUMKWFDCSmWMJ/vUl7kJV3d?=
- =?us-ascii?Q?rdnNFdMoK49ab37t2UGeZr9zW8ACE4w5R+JrlATImxDG3DE3oKbhj4P6eXkX?=
- =?us-ascii?Q?GANOyFzymxSXU+u3u97VbidztZ03TRzzIWwpBeUYm9bQWbc07nmtcb3EEX8B?=
- =?us-ascii?Q?5Fp2hyVMWOj7cUPNKosjDXwjVRNNu1x7J+pVUji8yxIS/MZ5ulhJ3sZ49XZ8?=
- =?us-ascii?Q?1BPDcYdcDkoi+49KUd0XviM3Q37QHHARCg2NV06zOtwHIhHxD6yrfHu0eozh?=
- =?us-ascii?Q?BssyN5rbufxlQLEZHn8xigUjQCm2JZPRI1o6x/ewT6nZ4jQdJjK+OU11uymz?=
- =?us-ascii?Q?+XywFRcOR5BTEgp4NhyyBpCkrE6SFuS8A8V/Mmxixssp5I6yzcjcX/kDvpri?=
- =?us-ascii?Q?3RTxi4p5yVZJAtLczTRvaKvv6iFS/albXOt3A0DjDh1c7lPtQg+Qatt19Yyy?=
- =?us-ascii?Q?AL7VkbXCd4Aa0e8XQbtfrxtff1ovddfzHUAv1I0K6DEP1ja2NIIjFOdv6zPV?=
- =?us-ascii?Q?7Dv+6VRyhwMUwxqqca1MbXhTHsP6LmeNhIXQhM6lwfHFR/2E5wxPBjVO7wxu?=
- =?us-ascii?Q?KxxZbwZks6yLFlo15FWI8Wg0A1gok80A+Ryuc6zKZGPEjy27uLbzrNUZG49+?=
- =?us-ascii?Q?EjldMsYLSGzYbB/dKq1ugCf7a/B/2VI2cHGC5VYSvEV5QHtj0CzHrVZjhYxP?=
- =?us-ascii?Q?dfBfLnRBgo1kSulYlj0B9YGAa5waShj7LEjxRp9mOTTCrti4nspFDjCP1IwQ?=
- =?us-ascii?Q?q4+wOQg2eqUgvfB1Wbikeuu7pOqkelSnD9FoS1DDkGrkwPe/b3dLGHyV2qat?=
- =?us-ascii?Q?vE8X29a8RYRxAmlW3qNlaX0C?=
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?VOC/OmfkogO4b/NPmeECsMq6EP7hA04zC14KYZc6jaRwrAMfUQYyS3y9DyYk?=
+ =?us-ascii?Q?gGcy/abwkDD3jJ6Zy6+aVnQJvVs9Ky9QDbjrNUtfcqJi6R5hqtb7tBG3Dsxt?=
+ =?us-ascii?Q?DHIkOx1Efh+exn7+2qmHyMss8J0KEKB+y5pwEqqljEEpNdfuKkvrUoJf+5IJ?=
+ =?us-ascii?Q?+i1Smoj2kf9FOribUAxLGeBJjfKJGFIaUGfQ8BBQzVtYe7NvD+rDm4lJZqee?=
+ =?us-ascii?Q?CMU0Zf+TNYqQPSnGekjmhL2xVvLLYbhf7sMm/e4xlDyJ/E4sw8A/qXwuowsy?=
+ =?us-ascii?Q?+V0oaFCEfOI9M0ZRgWo2Jv1rxACuEaY+2ilp4piZV5ZBf1dy7Wk5cpusm+/a?=
+ =?us-ascii?Q?WEKW4ypjLXPD6Yc/cjq+bCxPBVy+yKipstHIb8vONA3bHUwvAKBChjTNCA07?=
+ =?us-ascii?Q?txIylLouVdIV23hjFho/iLWVmuCquBn1wwUJsTeSlWWmHkYvLmv9ErP85FQJ?=
+ =?us-ascii?Q?pfKk1AiA4f0JbTdwZ3jVz7jWhfeOj1z/tKawvWgieLUzl4NZXgE3gtZPWNPj?=
+ =?us-ascii?Q?PSQzh5EfzwpyDFiJigy451s1sssSVGcvHiyS/Yi4nov+6pTlPv9YWP/w3Mj7?=
+ =?us-ascii?Q?j3BTofYrqcPzZIqphwZYMMq22m1scOns501WXEPmuKK08rPoG+fQTo+uXoVU?=
+ =?us-ascii?Q?Fe/pHf8GeesBEYXKDF4WXQGCV2S94RKhZEZpO3BU3rPBsesxpXf3gPg0sDXL?=
+ =?us-ascii?Q?QAK36f8wcwQ1tU9WSVbtSjnxUAAbvPWmf1K+6TTeIzjgUZfwXOJlNCpMOQZB?=
+ =?us-ascii?Q?kspvkiMZAa6UKXwBBwlxGNlOVdMyVilxeVnIyfzIK4FYUfDiZN59vpnTz5R/?=
+ =?us-ascii?Q?cq4edXoIVr7xMXWmPPj7pV5wavxboOMJkRCcKSyjT7fe5PFx/Tek/7DXaZYs?=
+ =?us-ascii?Q?I1WSUjXKu7v8ba5lO5ufVdsw9VPmkbSC4IbWtefwtGWWqaEitcVpybK/umKT?=
+ =?us-ascii?Q?9N3qPhUQmo9/fJM63Wy4NlPynWY9nRLoUzKiQM/JHl5ToZiE543Ml+Rh770V?=
+ =?us-ascii?Q?oBAi+8cBl8TRf6IPgoB7Ltjf7WMdqXxDcv6S+Z8jSWPalCVy2+0FtBsZJ0dD?=
+ =?us-ascii?Q?edVsHdyXYl/RGYiOrNtB0p9IrO0fAY56vXzda1Vc1GBjshtblW5XB3qGTMWb?=
+ =?us-ascii?Q?c23TJEs2A3mCPPk5KH29I2UGq+aMHdqlT9MnTLUDizYmdlke/yh+DLyLYIi2?=
+ =?us-ascii?Q?jho1mTxMoE+hTx+CYg3KBrt6SawTcp8RzH/7mMMDS8mRbsbGA9mFSlZ+sThR?=
+ =?us-ascii?Q?QNGDzjzATQdpTTnwIwi40ZAO7dtYLc6bI+vnskRijyx4J5M2YUOeaIZHZhDH?=
+ =?us-ascii?Q?c4MIRtphpPpyaHHy7ri9ohTu?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3a749c7b-5671-4f6f-cb04-08d925d050b1
+X-MS-Exchange-CrossTenant-Network-Message-Id: 47b0fc7a-3848-4e22-0bbc-08d925d0516f
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2021 14:11:28.8729
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2021 14:11:30.0972
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Q16B7QdudCLqMhCnZtJJLC1xrvqQ9KJHcOk2fd1EqO6wHmM9d4wvJ40A1XWPdrTvTfRqDDhEW7BeYM5b/aqXzg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: I1Wfg8N+dm3UZe6n+jcIv3kRDM7hgWmaNaK014CFhnCE/NDd1yJLN3cjxhWRVt1G9MDOVISHyw3lAuHlnUNCwQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4495
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This part of the Secure Encrypted Paging (SEV-SNP) series focuses on the
-changes required in a host OS for SEV-SNP support. The series builds upon
-SEV-SNP Part-1.
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-This series provides the basic building blocks to support booting the SEV-SNP
-VMs, it does not cover all the security enhancement introduced by the SEV-SNP
-such as interrupt protection.
+Add support for AP Reset Hold being invoked using the GHCB MSR protocol,
+available in version 2 of the GHCB specification.
 
-The CCP driver is enhanced to provide new APIs that use the SEV-SNP
-specific commands defined in the SEV-SNP firmware specification. The KVM
-driver uses those APIs to create and managed the SEV-SNP guests.
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+---
+ arch/x86/include/asm/sev-common.h |  6 ++++
+ arch/x86/kvm/svm/sev.c            | 56 ++++++++++++++++++++++++++-----
+ arch/x86/kvm/svm/svm.h            |  1 +
+ 3 files changed, 55 insertions(+), 8 deletions(-)
 
-The GHCB specification version 2 introduces new set of NAE's that is
-used by the SEV-SNP guest to communicate with the hypervisor. The series
-provides support to handle the following new NAE events:
-- Register GHCB GPA
-- Page State Change Request
-- Hypevisor feature
-- Guest message request
-
-The RMP check is enforced as soon as SEV-SNP is enabled. Not every memory
-access requires an RMP check. In particular, the read accesses from the
-hypervisor do not require RMP checks because the data confidentiality is
-already protected via memory encryption. When hardware encounters an RMP
-checks failure, it raises a page-fault exception. If RMP check failure
-is due to the page-size mismatch, then split the large page to resolve
-the fault.
-
-The series does not provide support for the following SEV-SNP specific
-NAE's yet:
-
-* Extended guest request
-* Interrupt security
-
-The series is based on the commit:
- a4345a7cecfb (origin/queue, origin/next, next) Merge tag 'kvmarm-fixes-5.13-1' 
- 3bf0fcd75434 (tag: kvm-5.13-1, origin/next, next) KVM: selftests: Speed up set_memory_region_test
-
-Changes since v2:
- * Add AP creation support.
- * Drop the patch to handle the RMP fault for the kernel address.
- * Add functions to track the write access from the hypervisor.
- * Do not enable the SNP feature when IOMMU is disabled or is in passthrough mode.
- * Dump the RMP entry on RMP violation for the debug.
- * Shorten the GHCB macro names.
- * Start the SNP_INIT command id from 255 to give some gap for the legacy SEV.
- * Sync the header with the latest 0.9 SNP spec.
+diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+index 47aa57bf654a..97137f1a567b 100644
+--- a/arch/x86/include/asm/sev-common.h
++++ b/arch/x86/include/asm/sev-common.h
+@@ -45,6 +45,12 @@
+ 		(((unsigned long)reg & GHCB_MSR_CPUID_REG_MASK) << GHCB_MSR_CPUID_REG_POS) | \
+ 		(((unsigned long)fn) << GHCB_MSR_CPUID_FUNC_POS))
  
-Changes since v1:
- * Add AP reset MSR protocol VMGEXIT NAE.
- * Add Hypervisor features VMGEXIT NAE.
- * Move the RMP table initialization and RMPUPDATE/PSMASH helper in
-   arch/x86/kernel/sev.c.
- * Add support to map/unmap SEV legacy command buffer to firmware state when
-   SNP is active.
- * Enhance PSP driver to provide helper to allocate/free memory used for the
-   firmware context page.
- * Add support to handle RMP fault for the kernel address.
- * Add support to handle GUEST_REQUEST NAE event for attestation.
- * Rename RMP table lookup helper.
- * Drop typedef from rmpentry struct definition.
- * Drop SNP static key and use cpu_feature_enabled() to check whether SEV-SNP
-   is active.
- * Multiple cleanup/fixes to address Boris review feedback.
-
-Brijesh Singh (34):
-  KVM: SVM: Provide the Hypervisor Feature support VMGEXIT
-  x86/cpufeatures: Add SEV-SNP CPU feature
-  x86/sev: Add the host SEV-SNP initialization support
-  x86/sev: Add RMP entry lookup helpers
-  x86/sev: Add helper functions for RMPUPDATE and PSMASH instruction
-  x86/sev: Split the physmap when adding the page in RMP table
-  x86/traps: Define RMP violation #PF error code
-  x86/fault: Add support to dump RMP entry on fault
-  x86/fault: Add support to handle the RMP fault for user address
-  crypto:ccp: Define the SEV-SNP commands
-  crypto: ccp: Add support to initialize the AMD-SP for SEV-SNP
-  crypto: ccp: Shutdown SNP firmware on kexec
-  crypto:ccp: Provide APIs to issue SEV-SNP commands
-  crypto: ccp: Handle the legacy TMR allocation when SNP is enabled
-  crypto: ccp: Handle the legacy SEV command when SNP is enabled
-  KVM: SVM: make AVIC backing, VMSA and VMCB memory allocation SNP safe
-  KVM: SVM: Add initial SEV-SNP support
-  KVM: SVM: Add KVM_SNP_INIT command
-  KVM: SVM: Add KVM_SEV_SNP_LAUNCH_START command
-  KVM: SVM: Add KVM_SEV_SNP_LAUNCH_UPDATE command
-  KVM: SVM: Reclaim the guest pages when SEV-SNP VM terminates
-  KVM: SVM: Add KVM_SEV_SNP_LAUNCH_FINISH command
-  KVM: X86: Add kvm_x86_ops to get the max page level for the TDP
-  KVM: X86: Introduce kvm_mmu_map_tdp_page() for use by SEV
-  KVM: X86: Introduce kvm_mmu_get_tdp_walk() for SEV-SNP use
-  KVM: X86: Define new RMP check related #NPF error bits
-  KVM: X86: update page-fault trace to log the 64-bit error code
-  KVM: SVM: Add support to handle GHCB GPA register VMGEXIT
-  KVM: SVM: Add support to handle MSR based Page State Change VMGEXIT
-  KVM: SVM: Add support to handle Page State Change VMGEXIT
-  KVM: Add arch hooks to track the host write to guest memory
-  KVM: X86: Export the kvm_zap_gfn_range() for the SNP use
-  KVM: SVM: Add support to handle the RMP nested page fault
-  KVM: SVM: Provide support for SNP_GUEST_REQUEST NAE event
-
-Tom Lendacky (3):
-  KVM: SVM: Add support to handle AP reset MSR protocol
-  KVM: SVM: Use a VMSA physical address variable for populating VMCB
-  KVM: SVM: Support SEV-SNP AP Creation NAE event
-
- arch/x86/include/asm/cpufeatures.h       |    1 +
- arch/x86/include/asm/disabled-features.h |    8 +-
- arch/x86/include/asm/kvm_host.h          |   24 +
- arch/x86/include/asm/msr-index.h         |    6 +
- arch/x86/include/asm/sev-common.h        |   17 +
- arch/x86/include/asm/sev.h               |    4 +-
- arch/x86/include/asm/svm.h               |    8 +
- arch/x86/include/asm/trap_pf.h           |   18 +-
- arch/x86/include/uapi/asm/svm.h          |    2 +
- arch/x86/kernel/cpu/amd.c                |    3 +-
- arch/x86/kernel/sev.c                    |  189 ++++
- arch/x86/kvm/lapic.c                     |    5 +-
- arch/x86/kvm/mmu.h                       |    5 +-
- arch/x86/kvm/mmu/mmu.c                   |   76 +-
- arch/x86/kvm/svm/sev.c                   | 1162 +++++++++++++++++++++-
- arch/x86/kvm/svm/svm.c                   |   37 +-
- arch/x86/kvm/svm/svm.h                   |   39 +-
- arch/x86/kvm/trace.h                     |    6 +-
- arch/x86/kvm/vmx/vmx.c                   |    8 +
- arch/x86/kvm/x86.c                       |   89 +-
- arch/x86/mm/fault.c                      |  148 +++
- drivers/crypto/ccp/sev-dev.c             |  666 ++++++++++++-
- drivers/crypto/ccp/sev-dev.h             |   14 +
- drivers/crypto/ccp/sp-pci.c              |   12 +
- include/linux/kvm_host.h                 |    3 +
- include/linux/mm.h                       |    6 +-
- include/linux/psp-sev.h                  |  323 ++++++
- include/linux/sev.h                      |   76 ++
- include/uapi/linux/kvm.h                 |   43 +
- include/uapi/linux/psp-sev.h             |   44 +
- mm/memory.c                              |   13 +
- tools/arch/x86/include/asm/cpufeatures.h |    1 +
- virt/kvm/kvm_main.c                      |   21 +-
- 33 files changed, 2992 insertions(+), 85 deletions(-)
- create mode 100644 include/linux/sev.h
-
++/* AP Reset Hold */
++#define GHCB_MSR_AP_RESET_HOLD_REQ		0x006
++#define GHCB_MSR_AP_RESET_HOLD_RESP		0x007
++#define GHCB_MSR_AP_RESET_HOLD_RESULT_POS	12
++#define GHCB_MSR_AP_RESET_HOLD_RESULT_MASK	GENMASK_ULL(51, 0)
++
+ /* GHCB Hypervisor Feature Request */
+ #define GHCB_MSR_HV_FT_REQ	0x080
+ #define GHCB_MSR_HV_FT_RESP	0x081
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index d93a1c368b61..7d0b98dbe523 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -57,6 +57,10 @@ module_param_named(sev_es, sev_es_enabled, bool, 0444);
+ #define sev_es_enabled false
+ #endif /* CONFIG_KVM_AMD_SEV */
+ 
++#define AP_RESET_HOLD_NONE		0
++#define AP_RESET_HOLD_NAE_EVENT		1
++#define AP_RESET_HOLD_MSR_PROTO		2
++
+ static u8 sev_enc_bit;
+ static DECLARE_RWSEM(sev_deactivate_lock);
+ static DEFINE_MUTEX(sev_bitmap_lock);
+@@ -2199,6 +2203,9 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+ 
+ void sev_es_unmap_ghcb(struct vcpu_svm *svm)
+ {
++	/* Clear any indication that the vCPU is in a type of AP Reset Hold */
++	svm->ap_reset_hold_type = AP_RESET_HOLD_NONE;
++
+ 	if (!svm->ghcb)
+ 		return;
+ 
+@@ -2404,6 +2411,22 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ 				  GHCB_MSR_INFO_POS);
+ 		break;
+ 	}
++	case GHCB_MSR_AP_RESET_HOLD_REQ:
++		svm->ap_reset_hold_type = AP_RESET_HOLD_MSR_PROTO;
++		ret = kvm_emulate_ap_reset_hold(&svm->vcpu);
++
++		/*
++		 * Preset the result to a non-SIPI return and then only set
++		 * the result to non-zero when delivering a SIPI.
++		 */
++		set_ghcb_msr_bits(svm, 0,
++				  GHCB_MSR_AP_RESET_HOLD_RESULT_MASK,
++				  GHCB_MSR_AP_RESET_HOLD_RESULT_POS);
++
++		set_ghcb_msr_bits(svm, GHCB_MSR_AP_RESET_HOLD_RESP,
++				  GHCB_MSR_INFO_MASK,
++				  GHCB_MSR_INFO_POS);
++		break;
+ 	case GHCB_MSR_TERM_REQ: {
+ 		u64 reason_set, reason_code;
+ 
+@@ -2491,6 +2514,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 		ret = svm_invoke_exit_handler(vcpu, SVM_EXIT_IRET);
+ 		break;
+ 	case SVM_VMGEXIT_AP_HLT_LOOP:
++		svm->ap_reset_hold_type = AP_RESET_HOLD_NAE_EVENT;
+ 		ret = kvm_emulate_ap_reset_hold(vcpu);
+ 		break;
+ 	case SVM_VMGEXIT_AP_JUMP_TABLE: {
+@@ -2628,13 +2652,29 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+ 		return;
+ 	}
+ 
+-	/*
+-	 * Subsequent SIPI: Return from an AP Reset Hold VMGEXIT, where
+-	 * the guest will set the CS and RIP. Set SW_EXIT_INFO_2 to a
+-	 * non-zero value.
+-	 */
+-	if (!svm->ghcb)
+-		return;
++	/* Subsequent SIPI */
++	switch (svm->ap_reset_hold_type) {
++	case AP_RESET_HOLD_NAE_EVENT:
++		/*
++		 * Return from an AP Reset Hold VMGEXIT, where the guest will
++		 * set the CS and RIP. Set SW_EXIT_INFO_2 to a non-zero value.
++		 */
++		ghcb_set_sw_exit_info_2(svm->ghcb, 1);
++		break;
++	case AP_RESET_HOLD_MSR_PROTO:
++		/*
++		 * Return from an AP Reset Hold VMGEXIT, where the guest will
++		 * set the CS and RIP. Set GHCB data field to a non-zero value.
++		 */
++		set_ghcb_msr_bits(svm, 1,
++				  GHCB_MSR_AP_RESET_HOLD_RESULT_MASK,
++				  GHCB_MSR_AP_RESET_HOLD_RESULT_POS);
+ 
+-	ghcb_set_sw_exit_info_2(svm->ghcb, 1);
++		set_ghcb_msr_bits(svm, GHCB_MSR_AP_RESET_HOLD_RESP,
++				  GHCB_MSR_INFO_MASK,
++				  GHCB_MSR_INFO_POS);
++		break;
++	default:
++		break;
++	}
+ }
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 0b89aee51b74..ad12ca26b2d8 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -174,6 +174,7 @@ struct vcpu_svm {
+ 	struct ghcb *ghcb;
+ 	struct kvm_host_map ghcb_map;
+ 	bool received_first_sipi;
++	unsigned int ap_reset_hold_type;
+ 
+ 	/* SEV-ES scratch area support */
+ 	void *ghcb_sa;
 -- 
 2.17.1
 
