@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CED839983B
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 04:51:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B134399840
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 04:53:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229828AbhFCCwn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 22:52:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36547 "EHLO
+        id S229758AbhFCCyr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 22:54:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54393 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229568AbhFCCwm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Jun 2021 22:52:42 -0400
+        by vger.kernel.org with ESMTP id S229626AbhFCCyr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Jun 2021 22:54:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622688658;
+        s=mimecast20190719; t=1622688783;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=axWy42FNcYCinIuczFvW033N1IzY7BuvZJoBLU9MXh0=;
-        b=OVLMWkAXYX+qg00YoD1AdsaEtDazdaghsk6VdudM7htZ09G3foSFeeOkhrbhrhrWEU2SPZ
-        fxyJyDdKn+9Xf+vxtfEyK58aSTpGEnc3nb+YZ+bBAZARetTftDlI2oh7S7b2fLrW5v0p6w
-        fkOkGPgDeLDvNF8BLHVgFG6Erei5Qps=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-KrTFaE4mOcyB2h91IeHkng-1; Wed, 02 Jun 2021 22:50:57 -0400
-X-MC-Unique: KrTFaE4mOcyB2h91IeHkng-1
-Received: by mail-oi1-f199.google.com with SMTP id x10-20020a54400a0000b02901e9af7e39cbso2248770oie.22
-        for <kvm@vger.kernel.org>; Wed, 02 Jun 2021 19:50:57 -0700 (PDT)
+        bh=rml3snF+8HtrCauMNf32U0cEH6eDUnFGeUKsyp+NXXo=;
+        b=bGwpNjlDxNRsJUOPjoTby150mO/5w0rk/KbTtYlXTsLTsro9gfRtW/hMylBM0ldwDH0UOs
+        +EBwO235rrIPZnLtCO0V3OXJu02HLXn0gGzAbfhBIggvOboR4OFdAGV6L8naYQAsAnbN5g
+        JILGuV7Eb/moSDjmbatBHZYldQ1esl4=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-501-D96Uo4UAOBuh9UT5okRERQ-1; Wed, 02 Jun 2021 22:53:02 -0400
+X-MC-Unique: D96Uo4UAOBuh9UT5okRERQ-1
+Received: by mail-pj1-f71.google.com with SMTP id z3-20020a17090a4683b029015f6c19f126so2763792pjf.1
+        for <kvm@vger.kernel.org>; Wed, 02 Jun 2021 19:53:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=axWy42FNcYCinIuczFvW033N1IzY7BuvZJoBLU9MXh0=;
-        b=FBV+19738QfKaq8cO/FXMPrdAQ+o34fTp/RjTAy9PQ7Wkqe90vEmu7nJa1ru84nbIt
-         7ikqt0PVQMmuTSFioTdMJDdkiyQKznrmccW6V4VrPgpSYFWt488kia3JoDx8pSgj4oLP
-         qeix/hoGnDfQ8hUZWRoOqLxKxw3tv3FKIpgXW3KQNrtdg51pMlR3JnS3OH+SMGZLtYc2
-         Mit4egvxgow4rX2mJWZh3fT5wEdp65KanQihYZvoM5iQ3JplOKZivD/0sFNDkoNl9ghs
-         ytXuG19MyMWL03y52NyFmOBwXwl59ZYmg1TfGlng4eNMQPhT1ICF9vnDb00ChuGhBCHs
-         yQWQ==
-X-Gm-Message-State: AOAM531c8pjwBiHec7icjuViiXk/6+zseQTORTAxHAM5l+OJaD2PE/TX
-        qATRI5i82l9J2V06WFlnofd/K9Kakju7MN//+4kPzR/fR/UjBHMiIXqZ51HI6Prv+N3Qtts4Gr2
-        NNjU4N/FRqrDq
-X-Received: by 2002:a05:6830:1d0:: with SMTP id r16mr4027065ota.116.1622688656868;
-        Wed, 02 Jun 2021 19:50:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzuwJmm05loclZmkVCVWQVnwxKgIEoGf6EmbF0Iu9rFnz/PZ9y74D9ApsDmv+T7LVn7CtVHPQ==
-X-Received: by 2002:a05:6830:1d0:: with SMTP id r16mr4027052ota.116.1622688656589;
-        Wed, 02 Jun 2021 19:50:56 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id l1sm378451oos.37.2021.06.02.19.50.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jun 2021 19:50:56 -0700 (PDT)
-Date:   Wed, 2 Jun 2021 20:50:54 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=rml3snF+8HtrCauMNf32U0cEH6eDUnFGeUKsyp+NXXo=;
+        b=ZBQkg9vcztC4bwFYbGJg9urvAks2Y7bKhTU90CNrq4uua+plQt2tpULowCinKHtpif
+         fr88NguQJ+kebEkA6ZMEjdNfFkwvDVPprfeif0h94JDFZVTCoAnvYDlQW4YZ7OKSDwJE
+         0EmenuWzTaytLDhQgBSxUEcz+J3l4+zTtzuIYsD1aI0I0ZVE5opNAHup66A4bRyR9672
+         D6L5CKQCUIhYYmE1xc/uKKnY3hGE6PZiyE08z+QQG6TZkC8KFUo+FIcJXvmmuHuONW7y
+         eSSaUIukt244EqbptFM4FZN97TpnW5/bS7HOEc55zzlO4OVhD5RSSpboLT71/6QMZRLo
+         lYOA==
+X-Gm-Message-State: AOAM530Or12k/ygCj0j8bnBKSQGFXTO5YFQpLMw/iE9IVzFlUU2DDcQl
+        njACfb53uD6SwnfpwuB2ufkyYheMu8V+5THTHZeCVRFNFnDR1qnYu5HqDvLAZ0THZJhszqlUYeT
+        X6yXQhIBF/Wvr
+X-Received: by 2002:a17:902:e74d:b029:10d:9cd0:2c69 with SMTP id p13-20020a170902e74db029010d9cd02c69mr2020515plf.82.1622688780894;
+        Wed, 02 Jun 2021 19:53:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzGUUgfYG9dvW5sJE4TeEfDd6nGvhT7VXFCR8OU+oXimuG2T2IbG4AbopH90YZ4ENmXiBET0w==
+X-Received: by 2002:a17:902:e74d:b029:10d:9cd0:2c69 with SMTP id p13-20020a170902e74db029010d9cd02c69mr2020503plf.82.1622688780610;
+        Wed, 02 Jun 2021 19:53:00 -0700 (PDT)
+Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id ls13sm609152pjb.23.2021.06.02.19.52.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Jun 2021 19:53:00 -0700 (PDT)
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
 Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
         Jean-Philippe Brucker <jean-philippe@linaro.org>,
         "Jiang, Dave" <dave.jiang@intel.com>,
@@ -64,122 +65,104 @@ Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
         "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
         David Gibson <david@gibson.dropbear.id.au>,
         Kirti Wankhede <kwankhede@nvidia.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jason Wang <jasowang@redhat.com>
-Subject: Re: [RFC] /dev/ioasid uAPI proposal
-Message-ID: <20210602205054.3505c9c3.alex.williamson@redhat.com>
-In-Reply-To: <20210602224536.GJ1002214@nvidia.com>
-References: <20210601162225.259923bc.alex.williamson@redhat.com>
-        <MWHPR11MB1886E8454A58661DC2CDBA678C3D9@MWHPR11MB1886.namprd11.prod.outlook.com>
-        <20210602160140.GV1002214@nvidia.com>
-        <20210602111117.026d4a26.alex.williamson@redhat.com>
-        <20210602173510.GE1002214@nvidia.com>
-        <20210602120111.5e5bcf93.alex.williamson@redhat.com>
-        <20210602180925.GH1002214@nvidia.com>
-        <20210602130053.615db578.alex.williamson@redhat.com>
-        <20210602195404.GI1002214@nvidia.com>
-        <20210602143734.72fb4fa4.alex.williamson@redhat.com>
-        <20210602224536.GJ1002214@nvidia.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        David Woodhouse <dwmw2@infradead.org>
+References: <20210528200311.GP1002214@nvidia.com>
+ <MWHPR11MB188685D57653827B566BF9B38C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210601162225.259923bc.alex.williamson@redhat.com>
+ <MWHPR11MB1886E8454A58661DC2CDBA678C3D9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210602160140.GV1002214@nvidia.com>
+ <20210602111117.026d4a26.alex.williamson@redhat.com>
+ <20210602173510.GE1002214@nvidia.com>
+ <20210602120111.5e5bcf93.alex.williamson@redhat.com>
+ <20210602180925.GH1002214@nvidia.com>
+ <20210602130053.615db578.alex.williamson@redhat.com>
+ <20210602195404.GI1002214@nvidia.com>
+ <20210602143734.72fb4fa4.alex.williamson@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <6a9426d7-ed55-e006-9c4c-6b7c78142e39@redhat.com>
+Date:   Thu, 3 Jun 2021 10:52:51 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.10.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20210602143734.72fb4fa4.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2 Jun 2021 19:45:36 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-> On Wed, Jun 02, 2021 at 02:37:34PM -0600, Alex Williamson wrote:
-> 
-> > Right.  I don't follow where you're jumping to relaying DMA_PTE_SNP
-> > from the guest page table... what page table?    
-> 
-> I see my confusion now, the phrasing in your earlier remark led me
-> think this was about allowing the no-snoop performance enhancement in
-> some restricted way.
-> 
-> It is really about blocking no-snoop 100% of the time and then
-> disabling the dangerous wbinvd when the block is successful.
-> 
-> Didn't closely read the kvm code :\
-> 
-> If it was about allowing the optimization then I'd expect the guest to
-> enable no-snoopable regions via it's vIOMMU and realize them to the
-> hypervisor and plumb the whole thing through. Hence my remark about
-> the guest page tables..
-> 
-> So really the test is just 'were we able to block it' ?
+在 2021/6/3 上午4:37, Alex Williamson 写道:
+> On Wed, 2 Jun 2021 16:54:04 -0300
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>
+>> On Wed, Jun 02, 2021 at 01:00:53PM -0600, Alex Williamson wrote:
+>>> Right, the device can generate the no-snoop transactions, but it's the
+>>> IOMMU that essentially determines whether those transactions are
+>>> actually still cache coherent, AIUI.
+>> Wow, this is really confusing stuff in the code.
+>>
+>> At the PCI level there is a TLP bit called no-snoop that is platform
+>> specific. The general intention is to allow devices to selectively
+>> bypass the CPU caching for DMAs. GPUs like to use this feature for
+>> performance.
+> Yes
+>
+>> I assume there is some exciting security issues here. Looks like
+>> allowing cache bypass does something bad inside VMs? Looks like
+>> allowing the VM to use the cache clear instruction that is mandatory
+>> with cache bypass DMA causes some QOS issues? OK.
+> IIRC, largely a DoS issue if userspace gets to choose when to emulate
+> wbinvd rather than it being demanded for correct operation.
+>
+>> So how does it work?
+>>
+>> What I see in the intel/iommu.c is that some domains support "snoop
+>> control" or not, based on some HW flag. This indicates if the
+>> DMA_PTE_SNP bit is supported on a page by page basis or not.
+>>
+>> Since x86 always leans toward "DMA cache coherent" I'm reading some
+>> tea leaves here:
+>>
+>> 	IOMMU_CAP_CACHE_COHERENCY,	/* IOMMU can enforce cache coherent DMA
+>> 					   transactions */
+>>
+>> And guessing that IOMMUs that implement DMA_PTE_SNP will ignore the
+>> snoop bit in TLPs for IOVA's that have DMA_PTE_SNP set?
+> That's my understanding as well.
+>
+>> Further, I guess IOMMUs that don't support PTE_SNP, or have
+>> DMA_PTE_SNP clear will always honour the snoop bit. (backwards compat
+>> and all)
+> Yes.
+>
+>> So, IOMMU_CAP_CACHE_COHERENCY does not mean the IOMMU is DMA
+>> incoherent with the CPU caches, it just means that that snoop bit in
+>> the TLP cannot be enforced. ie the device *could* do no-shoop DMA
+>> if it wants. Devices that never do no-snoop remain DMA coherent on
+>> x86, as they always have been.
+> Yes, IOMMU_CAP_CACHE_COHERENCY=false means we cannot force the device
+> DMA to be coherent via the IOMMU.
+>
+>> IOMMU_CACHE does not mean the IOMMU is DMA cache coherent, it means
+>> the PCI device is blocked from using no-snoop in its TLPs.
+>>
+>> I wonder if ARM implemented this consistently? I see VDPA is
+>> confused..
 
-Yup.  Do we really still consider that there's some performance benefit
-to be had by enabling a device to use no-snoop?  This seems largely a
-legacy thing.
 
-> > This support existed before mdev, IIRC we needed it for direct
-> > assignment of NVIDIA GPUs.  
-> 
-> Probably because they ignored the disable no-snoop bits in the control
-> block, or reset them in some insane way to "fix" broken bioses and
-> kept using it even though by all rights qemu would have tried hard to
-> turn it off via the config space. Processing no-snoop without a
-> working wbinvd would be fatal. Yeesh
-> 
-> But Ok, back the /dev/ioasid. This answers a few lingering questions I
-> had..
-> 
-> 1) Mixing IOMMU_CAP_CACHE_COHERENCY and !IOMMU_CAP_CACHE_COHERENCY
->    domains.
-> 
->    This doesn't actually matter. If you mix them together then kvm
->    will turn on wbinvd anyhow, so we don't need to use the DMA_PTE_SNP
->    anywhere in this VM.
-> 
->    This if two IOMMU's are joined together into a single /dev/ioasid
->    then we can just make them both pretend to be
->    !IOMMU_CAP_CACHE_COHERENCY and both not set IOMMU_CACHE.
+Basically, we don't want to bother with pseudo KVM device like what VFIO 
+did. So for simplicity, we rules out the IOMMU that can't enforce 
+coherency in vhost-vDPA if the parent purely depends on the platform IOMMU:
 
-Yes and no.  Yes, if any domain is !IOMMU_CAP_CACHE_COHERENCY then we
-need to emulate wbinvd, but no we'll use IOMMU_CACHE any time it's
-available based on the per domain support available.  That gives us the
-most consistent behavior, ie. we don't have VMs emulating wbinvd
-because they used to have a device attached where the domain required
-it and we can't atomically remap with new flags to perform the same as
-a VM that never had that device attached in the first place.
 
-> 2) How to fit this part of kvm in some new /dev/ioasid world
-> 
->    What we want to do here is iterate over every ioasid associated
->    with the group fd that is passed into kvm.
+         if (!iommu_capable(bus, IOMMU_CAP_CACHE_COHERENCY))
+                 return -ENOTSUPP;
 
-Yeah, we need some better names, binding a device to an ioasid (fd) but
-then attaching a device to an allocated ioasid (non-fd)... I assume
-you're talking about the latter ioasid.
+For the parents that use its own translations logic, an implicit 
+assumption is that the hardware will always perform cache coherent DMA.
 
->    Today the group fd has a single container which specifies the
->    single ioasid so this is being done trivially.
-> 
->    To reorg we want to get the ioasid from the device not the
->    group (see my note to David about the groups vs device rational)
-> 
->    This is just iterating over each vfio_device in the group and
->    querying the ioasid it is using.
+Thanks
 
-The IOMMU API group interfaces is largely iommu_group_for_each_dev()
-anyway, we still need to account for all the RIDs and aliases of a
-group.
-
->    Or perhaps more directly: an op attaching the vfio_device to the
->    kvm and having some simple helper 
->          '(un)register ioasid with kvm (kvm, ioasid)'
->    that the vfio_device driver can call that just sorts this out.
-
-We could almost eliminate the device notion altogether here, use an
-ioasidfd_for_each_ioasid() but we really want a way to trigger on each
-change to the composition of the device set for the ioasid, which is
-why we currently do it on addition or removal of a group, where the
-group has a consistent set of IOMMU properties.  Register a notifier
-callback via the ioasidfd?  Thanks,
-
-Alex
 
