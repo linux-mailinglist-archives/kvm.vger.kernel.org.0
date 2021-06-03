@@ -2,125 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F26F39A7A0
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 19:11:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D565339A913
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 19:23:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232666AbhFCRMB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Jun 2021 13:12:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43268 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232402AbhFCRLO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Jun 2021 13:11:14 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B5D4561402;
-        Thu,  3 Jun 2021 17:09:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1622740168;
-        bh=3xtDotbavrRCbvGAjb8l1mvLytPd4v7OS/uUZsg0sAU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gG1N/sck136zsAdwAIFcRSlcEcOgY7J/YXKnHbRUsv+O1heH6Pk0evMla0cVALaFe
-         QShDUqL8frC7Un3c3u7cQDvXVR0L0vntaEfJemDTtZN6Xab+voz1mImYerPvAowiV9
-         lFjlhGt1kHddb9Ht6bSiLueXEM/UZPwTDFDUkj5Im9+d2R4hv6nwljBTlXajRY/+GY
-         5bAViO9U4JpvVJyo/SJu3rbml8blrFyTxPHh0JGr9iez5gfUsZoCec3gAdpHmjI44L
-         s4DrwmjuU61Z3ywQId5mFiH/2KSiQ7FaGQCLpMD7k/O6N/8SJ44BisV9VtOnwkORxi
-         vSd4CSDkc7jNg==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 07/31] vfio-ccw: Serialize FSM IDLE state with I/O completion
-Date:   Thu,  3 Jun 2021 13:08:55 -0400
-Message-Id: <20210603170919.3169112-7-sashal@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210603170919.3169112-1-sashal@kernel.org>
-References: <20210603170919.3169112-1-sashal@kernel.org>
+        id S229982AbhFCRYc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Jun 2021 13:24:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21124 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232267AbhFCRY0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 3 Jun 2021 13:24:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622740960;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=aHpBelIcGziVZRjX50HNqyKbhuaMC/JWW1ZKekLkz48=;
+        b=cFQgGKqeMq5N8yDh95Z9R0xHcpDQrIZMf5z/A8JagCX8RPGLqWwxgnZ8HBsmzstPS7EhLo
+        PIdlQMDsDb/8cvjy05XAGk3j45K/0jyVjUtaMppW3wWB0ijGOjHfOjhhVVfvNEcqVMbn7x
+        bN3iXvsCOrbn47PBj5PXIJ8qf4D3osQ=
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
+ [209.85.161.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-160-vBu7p3cyP6641y-Mw31L4g-1; Thu, 03 Jun 2021 13:22:39 -0400
+X-MC-Unique: vBu7p3cyP6641y-Mw31L4g-1
+Received: by mail-oo1-f70.google.com with SMTP id c25-20020a4ad7990000b029020e67cc1879so3924824oou.18
+        for <kvm@vger.kernel.org>; Thu, 03 Jun 2021 10:22:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-transfer-encoding;
+        bh=aHpBelIcGziVZRjX50HNqyKbhuaMC/JWW1ZKekLkz48=;
+        b=dMFC9Yl50EvHJi0MluDQy65gpFLC1/IU+O9AlUW8C6srojLF6n7A7vp4NV/1Vu99Lt
+         HG8eIrKNIitJfUKmpw117WmMAoCKz9twJF7B16qo8nBPxBp0a+ia09TlDRwIYUFNrb4B
+         8kQ+2dJ8EN6XyC3PQyIiksQC+ci3Yq8zypPluHg8PIX9u4wTFYiHK4jidJY4I8nMj+cf
+         OCNI3QU6DIZgtYAxSylyJ+SR+9/Qx9CkuWMA+Dz4awKl+Wu8EYZdmeLjxPNH6d1YbrrH
+         WV0Ie5RbW3WmQKDYX7iw9XqCnCunSgWG2+6+lIKzJtXCMqRc/O3d1GQaslIgJB1WhSGI
+         sO2A==
+X-Gm-Message-State: AOAM530jrd2pZCwiV2KsGGdpcFz00c16Rv4gMuCCMFqCE7yfyGEQdMm+
+        lFODJqglM2vKVN+i/HlGz8aa9cfWPrgmiTfzt6X6sUEuD+czNArllgOMkFBG6Wl8htvzUL1a4u+
+        66ukjT/D4KXR0
+X-Received: by 2002:a4a:55c1:: with SMTP id e184mr286055oob.74.1622740958679;
+        Thu, 03 Jun 2021 10:22:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzWIJ6FthiCRVzxgagPFmBEKINqHxxlflAKjGADOX+m7iPOMGXQLstOybZQVabNpnfI65ro3w==
+X-Received: by 2002:a4a:55c1:: with SMTP id e184mr286039oob.74.1622740958468;
+        Thu, 03 Jun 2021 10:22:38 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id p1sm847639otk.58.2021.06.03.10.22.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Jun 2021 10:22:38 -0700 (PDT)
+Date:   Thu, 3 Jun 2021 11:22:37 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: [GIT PULL] VFIO fixes for v5.13-rc5
+Message-ID: <20210603112237.42b620c1.alex.williamson@redhat.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Eric Farman <farman@linux.ibm.com>
+Hi Linus,
 
-[ Upstream commit 2af7a834a435460d546f0cf0a8b8e4d259f1d910 ]
+The following changes since commit d07f6ca923ea0927a1024dfccafc5b53b61cfecc:
 
-Today, the stacked call to vfio_ccw_sch_io_todo() does three things:
+  Linux 5.13-rc2 (2021-05-16 15:27:44 -0700)
 
-  1) Update a solicited IRB with CP information, and release the CP
-     if the interrupt was the end of a START operation.
-  2) Copy the IRB data into the io_region, under the protection of
-     the io_mutex
-  3) Reset the vfio-ccw FSM state to IDLE to acknowledge that
-     vfio-ccw can accept more work.
+are available in the Git repository at:
 
-The trouble is that step 3 is (A) invoked for both solicited and
-unsolicited interrupts, and (B) sitting after the mutex for step 2.
-This second piece becomes a problem if it processes an interrupt
-for a CLEAR SUBCHANNEL while another thread initiates a START,
-thus allowing the CP and FSM states to get out of sync. That is:
+  git://github.com/awilliam/linux-vfio.git tags/vfio-v5.13-rc5
 
-    CPU 1                           CPU 2
-    fsm_do_clear()
-    fsm_irq()
-                                    fsm_io_request()
-    vfio_ccw_sch_io_todo()
-                                    fsm_io_helper()
+for you to fetch changes up to dc51ff91cf2d1e9a2d941da483602f71d4a51472:
 
-Since the FSM state and CP should be kept in sync, let's make a
-note when the CP is released, and rely on that as an indication
-that the FSM should also be reset at the end of this routine and
-open up the device for more work.
+  vfio/platform: fix module_put call in error flow (2021-05-24 13:40:13 -0600)
 
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
-Acked-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20210511195631.3995081-4-farman@linux.ibm.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/s390/cio/vfio_ccw_drv.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+----------------------------------------------------------------
+VFIO fixes for v5.13-rc5
 
-diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-index 339a6bc0339b..fd590d1cffc1 100644
---- a/drivers/s390/cio/vfio_ccw_drv.c
-+++ b/drivers/s390/cio/vfio_ccw_drv.c
-@@ -83,6 +83,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
- 	struct vfio_ccw_private *private;
- 	struct irb *irb;
- 	bool is_final;
-+	bool cp_is_finished = false;
- 
- 	private = container_of(work, struct vfio_ccw_private, io_work);
- 	irb = &private->irb;
-@@ -91,14 +92,21 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
- 		     (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
- 	if (scsw_is_solicited(&irb->scsw)) {
- 		cp_update_scsw(&private->cp, &irb->scsw);
--		if (is_final && private->state == VFIO_CCW_STATE_CP_PENDING)
-+		if (is_final && private->state == VFIO_CCW_STATE_CP_PENDING) {
- 			cp_free(&private->cp);
-+			cp_is_finished = true;
-+		}
- 	}
- 	mutex_lock(&private->io_mutex);
- 	memcpy(private->io_region->irb_area, irb, sizeof(*irb));
- 	mutex_unlock(&private->io_mutex);
- 
--	if (private->mdev && is_final)
-+	/*
-+	 * Reset to IDLE only if processing of a channel program
-+	 * has finished. Do not overwrite a possible processing
-+	 * state if the final interrupt was for HSCH or CSCH.
-+	 */
-+	if (private->mdev && cp_is_finished)
- 		private->state = VFIO_CCW_STATE_IDLE;
- 
- 	if (private->io_trigger)
--- 
-2.30.2
+ - Fix error path return value (Zhen Lei)
+
+ - Add vfio-pci CONFIG_MMU dependency (Randy Dunlap)
+
+ - Replace open coding with struct_size() (Gustavo A. R. Silva)
+
+ - Fix sample driver error path (Wei Yongjun)
+
+ - Fix vfio-platform error path module_put() (Max Gurtovoy)
+
+----------------------------------------------------------------
+Gustavo A. R. Silva (1):
+      vfio/iommu_type1: Use struct_size() for kzalloc()
+
+Max Gurtovoy (1):
+      vfio/platform: fix module_put call in error flow
+
+Randy Dunlap (1):
+      vfio/pci: zap_vma_ptes() needs MMU
+
+Wei Yongjun (1):
+      samples: vfio-mdev: fix error handing in mdpy_fb_probe()
+
+Zhen Lei (1):
+      vfio/pci: Fix error return code in vfio_ecap_init()
+
+ drivers/vfio/pci/Kconfig                     |  1 +
+ drivers/vfio/pci/vfio_pci_config.c           |  2 +-
+ drivers/vfio/platform/vfio_platform_common.c |  2 +-
+ drivers/vfio/vfio_iommu_type1.c              |  2 +-
+ samples/vfio-mdev/mdpy-fb.c                  | 13 +++++++++----
+ 5 files changed, 13 insertions(+), 7 deletions(-)
 
