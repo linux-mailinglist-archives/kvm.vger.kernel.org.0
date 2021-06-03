@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5735439A4AA
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 17:35:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1757939A4BB
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 17:38:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229981AbhFCPgx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Jun 2021 11:36:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56506 "EHLO
+        id S229826AbhFCPjy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Jun 2021 11:39:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55459 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229925AbhFCPgw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 3 Jun 2021 11:36:52 -0400
+        by vger.kernel.org with ESMTP id S229809AbhFCPjy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 3 Jun 2021 11:39:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622734507;
+        s=mimecast20190719; t=1622734688;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=HHcM+IgNoZ1DlGmkHUu2OKnC00B3Yz63C0t0xp+6d/4=;
-        b=DdF0vWcGiUdmDTPoL9Zv/FvYlpMwaon6lGPgAaQJrkesNStC0gYajfaPOZfqbfw98/BfNr
-        qhlWtigtt/nVefUg1jHbAG8zY+mCkQh++wUSLu6WOW0B97mP+DK+c5T9bzwvbj1dCt2x+G
-        5hix03+/ZXUT77C2otGnXEXqGfNOAeI=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-562--dQX8ClHMYaejivzBMLXbQ-1; Thu, 03 Jun 2021 11:35:06 -0400
-X-MC-Unique: -dQX8ClHMYaejivzBMLXbQ-1
-Received: by mail-ej1-f72.google.com with SMTP id h18-20020a1709063992b02903d59b32b039so2106959eje.12
-        for <kvm@vger.kernel.org>; Thu, 03 Jun 2021 08:35:05 -0700 (PDT)
+        bh=MAfOCgAL+/4c+u2cKFnHe9PJR7//GbNGS7l7MR7qaKc=;
+        b=Vt0WcLCOaiemRoUncmv1MZTGgmuIdpKQ21SFnRn10IZ8+N1hRubwk9UZbM3IoXn1SaDyjI
+        DXCQknqP1u4rN4UWPAZOAiZO2+dNuBoeIZVjtVsK125rtQ1gHs59lIwQ74QMcAapc4y3p9
+        PGdDhniSbMxklxlH6N8OYU8m9/gBq8s=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-263-IEt0PNygPZmV-_GJfuz-0Q-1; Thu, 03 Jun 2021 11:38:07 -0400
+X-MC-Unique: IEt0PNygPZmV-_GJfuz-0Q-1
+Received: by mail-ej1-f70.google.com with SMTP id nd10-20020a170907628ab02903a324b229bfso2109423ejc.7
+        for <kvm@vger.kernel.org>; Thu, 03 Jun 2021 08:38:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=HHcM+IgNoZ1DlGmkHUu2OKnC00B3Yz63C0t0xp+6d/4=;
-        b=fTEroIlv5Km3myMmV6I9xD2pceWcP5BH4eRBkWnmmZGvlT/JyOQm4OHKjVvHd/yP2p
-         l2IgJ2NyzHfBwiahhzGHUwN4y771DtamXWd7inXdhYcbHSF/5fWtYp1d1mX0r58RvZms
-         LL1cpKGvCVXSwOMNHzg+DkTaLg2w8qsS8qq+uU11aIfnS0iAV89fQsrFMuu3JH6UJe+7
-         9655/B823CtuxMpfoLj1zXHXDtTkrfEPODkGzCouTwUYl541rj8KDeBnRuss5ViYGwk/
-         I1iLXyx0mlX3v7FAie/fRiHrUSZ9Fn2+NeVKtOpysc38NH+9rYxO8htdyJRifS9u17MQ
-         e5Ww==
-X-Gm-Message-State: AOAM533fkjkBj0bjlC9zWNZ+tVVLtB+guDSASYSpzvxRAxzwM8cIbLvf
-        Dq/DnOvk2VFIhUBJ/5ggwAL15GACID3Q5LjG6C9mcQH97OpvhRjAjd5GlBivALv6QJRk3VkhYD2
-        AZTKkuYIetVyF
-X-Received: by 2002:a05:6402:702:: with SMTP id w2mr66157edx.189.1622734504255;
-        Thu, 03 Jun 2021 08:35:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwqFolPWO7BwpcoKlZ9srf0hFGk5LbsUjrn2R3ivE3G00+T3IVZ522WwOzS0fxGTdmkJwWkVw==
-X-Received: by 2002:a05:6402:702:: with SMTP id w2mr66134edx.189.1622734504040;
-        Thu, 03 Jun 2021 08:35:04 -0700 (PDT)
+        bh=MAfOCgAL+/4c+u2cKFnHe9PJR7//GbNGS7l7MR7qaKc=;
+        b=KXVRnfPDLDS96J5jHkXOnv9IOdvHz+CazfNMMW9lOEtdH1MYWFaDw6dZJHctxFeTSa
+         NFLEq1iX+iDAC5p+uEhUt9DZTkXxcEi3/RslXeffeTMWXdB2vlWhe+uLpWgORHHsBsR+
+         /8v1/gNDh/c1x7o8sHaFEUTlolFY/cwyWTbFCT4qeifmfhvFEzX/XyHf29dCnRDMCPx4
+         5BkG4/FRxvElbaC+u6HNVxTVaTwg8OXv8ihT9mfP1lOtxqqMpLu3oAh4kGJG9bh4Lfxg
+         DX6uk7ITFMa7ETz2c4yeL+9jJMmHH81eLEtI+cKKvz+8Mw2xDeXxSJEJ5y6wzffBiyAp
+         3utg==
+X-Gm-Message-State: AOAM533JoziFv9gIFfwaO5tHG6zZqpACQlW7vKA6pQYQS1c5NgWQ+YEW
+        YUFzFejFFHJDyr1a6+cZwge4zUEgRDyQwJXMNBkLMhQXQcQWlNUDA8guhMJHexZMfn/IUhKMyb6
+        NPzzTWpgyoeFP
+X-Received: by 2002:a05:6402:b1a:: with SMTP id bm26mr61516edb.387.1622734686331;
+        Thu, 03 Jun 2021 08:38:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzCg4RiY3uWsOMEkG7pXj17Pm1AGWGs6kIw12MPkL7qvmBz82U9B68S6pavqH2tLMDPO5l1tw==
+X-Received: by 2002:a05:6402:b1a:: with SMTP id bm26mr61493edb.387.1622734686165;
+        Thu, 03 Jun 2021 08:38:06 -0700 (PDT)
 Received: from steredhat ([5.170.129.82])
-        by smtp.gmail.com with ESMTPSA id p13sm1920100edq.67.2021.06.03.08.35.01
+        by smtp.gmail.com with ESMTPSA id z20sm1641999ejd.18.2021.06.03.08.38.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jun 2021 08:35:03 -0700 (PDT)
-Date:   Thu, 3 Jun 2021 17:34:59 +0200
+        Thu, 03 Jun 2021 08:38:05 -0700 (PDT)
+Date:   Thu, 3 Jun 2021 17:38:01 +0200
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
 Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
@@ -59,174 +59,277 @@ Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Jorgen Hansen <jhansen@vmware.com>,
         Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>, kvm@vger.kernel.org,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Andra Paraschiv <andraprs@amazon.com>, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, oxffffaa@gmail.com
-Subject: Re: [PATCH v10 15/18] vhost/vsock: support SEQPACKET for transport
-Message-ID: <20210603153459.4qncp25nssuby4vp@steredhat>
+Subject: Re: [PATCH v10 17/18] vsock_test: add SOCK_SEQPACKET tests
+Message-ID: <20210603153801.xyew6p5d4x4orwka@steredhat>
 References: <20210520191357.1270473-1-arseny.krasnov@kaspersky.com>
- <20210520191916.1272540-1-arseny.krasnov@kaspersky.com>
+ <20210520191953.1272798-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20210520191916.1272540-1-arseny.krasnov@kaspersky.com>
+In-Reply-To: <20210520191953.1272798-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 20, 2021 at 10:19:13PM +0300, Arseny Krasnov wrote:
-
-Please describe better the changes included in this patch in the first 
-part of the commit message.
-
->As vhost places data in buffers of guest's rx queue, keep SEQ_EOR
->bit set only when last piece of data is copied. Otherwise we get
->sequence packets for one socket in guest's rx queue with SEQ_EOR bit
->set. Also remove ignore of non-stream type of packets, handle SEQPACKET
->feature bit.
+On Thu, May 20, 2021 at 10:19:50PM +0300, Arseny Krasnov wrote:
+>Implement two tests of SOCK_SEQPACKET socket: first sends data by
+>several 'write()'s and checks that number of 'read()' were same.
+>Second test checks MSG_TRUNC flag. Cases for connect(), bind(),
+>etc. are not tested, because it is same as for stream socket.
 >
 >Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
 >---
 > v9 -> v10:
-> 1) Move 'restore_flag' handling to 'payload_len' calculation
->    block.
->
-> drivers/vhost/vsock.c | 44 +++++++++++++++++++++++++++++++++++++++----
-> 1 file changed, 40 insertions(+), 4 deletions(-)
->
->diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->index 5e78fb719602..63d15beaad05 100644
->--- a/drivers/vhost/vsock.c
->+++ b/drivers/vhost/vsock.c
->@@ -31,7 +31,8 @@
->
-> enum {
-> 	VHOST_VSOCK_FEATURES = VHOST_FEATURES |
->-			       (1ULL << VIRTIO_F_ACCESS_PLATFORM)
->+			       (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
->+			       (1ULL << VIRTIO_VSOCK_F_SEQPACKET)
-> };
->
-> enum {
->@@ -56,6 +57,7 @@ struct vhost_vsock {
-> 	atomic_t queued_replies;
->
-> 	u32 guest_cid;
->+	bool seqpacket_allow;
-> };
->
-> static u32 vhost_transport_get_local_cid(void)
->@@ -112,6 +114,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 		size_t nbytes;
-> 		size_t iov_len, payload_len;
-> 		int head;
->+		bool restore_flag = false;
->
-> 		spin_lock_bh(&vsock->send_pkt_list_lock);
-> 		if (list_empty(&vsock->send_pkt_list)) {
->@@ -168,9 +171,15 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 		/* If the packet is greater than the space available in the
-> 		 * buffer, we split it using multiple buffers.
-> 		 */
->-		if (payload_len > iov_len - sizeof(pkt->hdr))
->+		if (payload_len > iov_len - sizeof(pkt->hdr)) {
-> 			payload_len = iov_len - sizeof(pkt->hdr);
->
+> 1) Commit message updated.
+> 2) Add second test for message bounds.
 
-Please, add a comment here to explain why we need this.
+This patch LGTM, but I'll review better with the next version, running 
+also the test suite on my VMs.
 
->+			if (le32_to_cpu(pkt->hdr.flags) & 
->VIRTIO_VSOCK_SEQ_EOR) {
->+				pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
->+				restore_flag = true;
->+			}
->+		}
->+
-> 		/* Set the correct length in the header */
-> 		pkt->hdr.len = cpu_to_le32(payload_len);
->
->@@ -181,6 +190,9 @@ vhost_transport_do_send_pkt(struct vhost_vsock 
->*vsock,
-> 			break;
-> 		}
->
->+		if (restore_flag)
->+			pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
->+
+Thanks,
+Stefano
 
-Maybe we can restore the flag only if we are queueing again the same 
-packet, I mean in the `if (pkt->off < pkt->len) {` branch below.
-
-What do you think?
-
-> 		nbytes = copy_to_iter(pkt->buf + pkt->off, payload_len,
-> 				      &iov_iter);
-> 		if (nbytes != payload_len) {
->@@ -354,8 +366,7 @@ vhost_vsock_alloc_pkt(struct vhost_virtqueue *vq,
-> 		return NULL;
-> 	}
 >
->-	if (le16_to_cpu(pkt->hdr.type) == VIRTIO_VSOCK_TYPE_STREAM)
->-		pkt->len = le32_to_cpu(pkt->hdr.len);
->+	pkt->len = le32_to_cpu(pkt->hdr.len);
+> tools/testing/vsock/util.c       |  32 +++++++--
+> tools/testing/vsock/util.h       |   3 +
+> tools/testing/vsock/vsock_test.c | 116 +++++++++++++++++++++++++++++++
+> 3 files changed, 146 insertions(+), 5 deletions(-)
 >
-> 	/* No payload */
-> 	if (!pkt->len)
->@@ -398,6 +409,8 @@ static bool vhost_vsock_more_replies(struct 
->vhost_vsock *vsock)
-> 	return val < vq->num;
+>diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+>index 93cbd6f603f9..2acbb7703c6a 100644
+>--- a/tools/testing/vsock/util.c
+>+++ b/tools/testing/vsock/util.c
+>@@ -84,7 +84,7 @@ void vsock_wait_remote_close(int fd)
 > }
 >
->+static bool vhost_transport_seqpacket_allow(u32 remote_cid);
->+
-> static struct virtio_transport vhost_transport = {
-> 	.transport = {
-> 		.module                   = THIS_MODULE,
->@@ -424,6 +437,10 @@ static struct virtio_transport vhost_transport = {
-> 		.stream_is_active         = virtio_transport_stream_is_active,
-> 		.stream_allow             = virtio_transport_stream_allow,
+> /* Connect to <cid, port> and return the file descriptor. */
+>-int vsock_stream_connect(unsigned int cid, unsigned int port)
+>+static int vsock_connect(unsigned int cid, unsigned int port, int type)
+> {
+> 	union {
+> 		struct sockaddr sa;
+>@@ -101,7 +101,7 @@ int vsock_stream_connect(unsigned int cid, unsigned int port)
 >
->+		.seqpacket_dequeue        = virtio_transport_seqpacket_dequeue,
->+		.seqpacket_enqueue        = virtio_transport_seqpacket_enqueue,
->+		.seqpacket_allow          = vhost_transport_seqpacket_allow,
->+
-> 		.notify_poll_in           = virtio_transport_notify_poll_in,
-> 		.notify_poll_out          = virtio_transport_notify_poll_out,
-> 		.notify_recv_init         = virtio_transport_notify_recv_init,
->@@ -441,6 +458,22 @@ static struct virtio_transport vhost_transport = {
-> 	.send_pkt = vhost_transport_send_pkt,
-> };
+> 	control_expectln("LISTENING");
 >
->+static bool vhost_transport_seqpacket_allow(u32 remote_cid)
+>-	fd = socket(AF_VSOCK, SOCK_STREAM, 0);
+>+	fd = socket(AF_VSOCK, type, 0);
+>
+> 	timeout_begin(TIMEOUT);
+> 	do {
+>@@ -120,11 +120,21 @@ int vsock_stream_connect(unsigned int cid, unsigned int port)
+> 	return fd;
+> }
+>
+>+int vsock_stream_connect(unsigned int cid, unsigned int port)
 >+{
->+	struct vhost_vsock *vsock;
->+	bool seqpacket_allow = false;
->+
->+	rcu_read_lock();
->+	vsock = vhost_vsock_get(remote_cid);
->+
->+	if (vsock)
->+		seqpacket_allow = vsock->seqpacket_allow;
->+
->+	rcu_read_unlock();
->+
->+	return seqpacket_allow;
+>+	return vsock_connect(cid, port, SOCK_STREAM);
 >+}
 >+
-> static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
-> {
-> 	struct vhost_virtqueue *vq = container_of(work, struct vhost_virtqueue,
->@@ -785,6 +818,9 @@ static int vhost_vsock_set_features(struct vhost_vsock *vsock, u64 features)
-> 			goto err;
-> 	}
->
->+	if (features & (1ULL << VIRTIO_VSOCK_F_SEQPACKET))
->+		vsock->seqpacket_allow = true;
+>+int vsock_seqpacket_connect(unsigned int cid, unsigned int port)
+>+{
+>+	return vsock_connect(cid, port, SOCK_SEQPACKET);
+>+}
 >+
-> 	for (i = 0; i < ARRAY_SIZE(vsock->vqs); i++) {
-> 		vq = &vsock->vqs[i];
-> 		mutex_lock(&vq->mutex);
+> /* Listen on <cid, port> and return the first incoming connection.  The remote
+>  * address is stored to clientaddrp.  clientaddrp may be NULL.
+>  */
+>-int vsock_stream_accept(unsigned int cid, unsigned int port,
+>-			struct sockaddr_vm *clientaddrp)
+>+static int vsock_accept(unsigned int cid, unsigned int port,
+>+			struct sockaddr_vm *clientaddrp, int type)
+> {
+> 	union {
+> 		struct sockaddr sa;
+>@@ -145,7 +155,7 @@ int vsock_stream_accept(unsigned int cid, unsigned int port,
+> 	int client_fd;
+> 	int old_errno;
+>
+>-	fd = socket(AF_VSOCK, SOCK_STREAM, 0);
+>+	fd = socket(AF_VSOCK, type, 0);
+>
+> 	if (bind(fd, &addr.sa, sizeof(addr.svm)) < 0) {
+> 		perror("bind");
+>@@ -189,6 +199,18 @@ int vsock_stream_accept(unsigned int cid, unsigned int port,
+> 	return client_fd;
+> }
+>
+>+int vsock_stream_accept(unsigned int cid, unsigned int port,
+>+			struct sockaddr_vm *clientaddrp)
+>+{
+>+	return vsock_accept(cid, port, clientaddrp, SOCK_STREAM);
+>+}
+>+
+>+int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
+>+			   struct sockaddr_vm *clientaddrp)
+>+{
+>+	return vsock_accept(cid, port, clientaddrp, SOCK_SEQPACKET);
+>+}
+>+
+> /* Transmit one byte and check the return value.
+>  *
+>  * expected_ret:
+>diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
+>index e53dd09d26d9..a3375ad2fb7f 100644
+>--- a/tools/testing/vsock/util.h
+>+++ b/tools/testing/vsock/util.h
+>@@ -36,8 +36,11 @@ struct test_case {
+> void init_signals(void);
+> unsigned int parse_cid(const char *str);
+> int vsock_stream_connect(unsigned int cid, unsigned int port);
+>+int vsock_seqpacket_connect(unsigned int cid, unsigned int port);
+> int vsock_stream_accept(unsigned int cid, unsigned int port,
+> 			struct sockaddr_vm *clientaddrp);
+>+int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
+>+			   struct sockaddr_vm *clientaddrp);
+> void vsock_wait_remote_close(int fd);
+> void send_byte(int fd, int expected_ret, int flags);
+> void recv_byte(int fd, int expected_ret, int flags);
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index 5a4fb80fa832..67766bfe176f 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -14,6 +14,8 @@
+> #include <errno.h>
+> #include <unistd.h>
+> #include <linux/kernel.h>
+>+#include <sys/types.h>
+>+#include <sys/socket.h>
+>
+> #include "timeout.h"
+> #include "control.h"
+>@@ -279,6 +281,110 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
+> 	close(fd);
+> }
+>
+>+#define MESSAGES_CNT 7
+>+static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+
+>+	fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
+>+	if (fd < 0) {
+>+		perror("connect");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	/* Send several messages, one with MSG_EOR flag */
+>+	for (int i = 0; i < MESSAGES_CNT; i++)
+>+		send_byte(fd, 1, 0);
+>+
+>+	control_writeln("SENDDONE");
+>+	close(fd);
+>+}
+>+
+>+static void test_seqpacket_msg_bounds_server(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+	char buf[16];
+>+	struct msghdr msg = {0};
+>+	struct iovec iov = {0};
+>+
+>+	fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
+>+	if (fd < 0) {
+>+		perror("accept");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	control_expectln("SENDDONE");
+>+	iov.iov_base = buf;
+>+	iov.iov_len = sizeof(buf);
+>+	msg.msg_iov = &iov;
+>+	msg.msg_iovlen = 1;
+>+
+>+	for (int i = 0; i < MESSAGES_CNT; i++) {
+>+		if (recvmsg(fd, &msg, 0) != 1) {
+>+			perror("message bound violated");
+>+			exit(EXIT_FAILURE);
+>+		}
+>+	}
+>+
+>+	close(fd);
+>+}
+>+
+>+#define MESSAGE_TRUNC_SZ 32
+>+static void test_seqpacket_msg_trunc_client(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+	char buf[MESSAGE_TRUNC_SZ];
+>+
+>+	fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
+>+	if (fd < 0) {
+>+		perror("connect");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	if (send(fd, buf, sizeof(buf), 0) != sizeof(buf)) {
+>+		perror("send failed");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	control_writeln("SENDDONE");
+>+	close(fd);
+>+}
+>+
+>+static void test_seqpacket_msg_trunc_server(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+	char buf[MESSAGE_TRUNC_SZ / 2];
+>+	struct msghdr msg = {0};
+>+	struct iovec iov = {0};
+>+
+>+	fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
+>+	if (fd < 0) {
+>+		perror("accept");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	control_expectln("SENDDONE");
+>+	iov.iov_base = buf;
+>+	iov.iov_len = sizeof(buf);
+>+	msg.msg_iov = &iov;
+>+	msg.msg_iovlen = 1;
+>+
+>+	ssize_t ret = recvmsg(fd, &msg, MSG_TRUNC);
+>+
+>+	if (ret != MESSAGE_TRUNC_SZ) {
+>+		printf("%zi\n", ret);
+>+		perror("MSG_TRUNC doesn't work");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	if (!(msg.msg_flags & MSG_TRUNC)) {
+>+		fprintf(stderr, "MSG_TRUNC expected\n");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	close(fd);
+>+}
+>+
+> static struct test_case test_cases[] = {
+> 	{
+> 		.name = "SOCK_STREAM connection reset",
+>@@ -309,6 +415,16 @@ static struct test_case test_cases[] = {
+> 		.run_client = test_stream_msg_peek_client,
+> 		.run_server = test_stream_msg_peek_server,
+> 	},
+>+	{
+>+		.name = "SOCK_SEQPACKET msg bounds",
+>+		.run_client = test_seqpacket_msg_bounds_client,
+>+		.run_server = test_seqpacket_msg_bounds_server,
+>+	},
+>+	{
+>+		.name = "SOCK_SEQPACKET MSG_TRUNC flag",
+>+		.run_client = test_seqpacket_msg_trunc_client,
+>+		.run_server = test_seqpacket_msg_trunc_server,
+>+	},
+> 	{},
+> };
+>
 >-- 
 >2.25.1
 >
