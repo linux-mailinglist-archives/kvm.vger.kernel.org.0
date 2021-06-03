@@ -2,172 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B425E39A470
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 17:22:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3220D39A4A6
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 17:34:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232065AbhFCPXz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Jun 2021 11:23:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28749 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231589AbhFCPXz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 3 Jun 2021 11:23:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622733730;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Tk288Zz+uIifCmQruWzx1HX+KXbfFOTwP0kxM+VMUEc=;
-        b=U8LwQwctwhWDGUPTzbAdEPnOu+DroSh7QMht5ehK558ivZu1syxHd+HELRIWnTeV+atK2x
-        2+8R8m9EIcaPLA5zHQ5CcxMvyjrUD759HOdDZRTTHW7cuS7obrO9B1UST53p/qzOYVaijv
-        cWgsyfgi8Q/LNNiX+O/6xA7GwADSO+o=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-595-MJtaeUMfOm6AYF6Yi2Oncw-1; Thu, 03 Jun 2021 11:22:08 -0400
-X-MC-Unique: MJtaeUMfOm6AYF6Yi2Oncw-1
-Received: by mail-ed1-f69.google.com with SMTP id f12-20020a056402150cb029038fdcfb6ea2so3430866edw.14
-        for <kvm@vger.kernel.org>; Thu, 03 Jun 2021 08:22:08 -0700 (PDT)
+        id S229952AbhFCPg0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Jun 2021 11:36:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58148 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229926AbhFCPgZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Jun 2021 11:36:25 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3DD9C061756
+        for <kvm@vger.kernel.org>; Thu,  3 Jun 2021 08:34:40 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id l23-20020a17090a0717b029016ae774f973so3452226pjl.1
+        for <kvm@vger.kernel.org>; Thu, 03 Jun 2021 08:34:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=dUPtvp2h+2uImUipkmU0sy9GVVBMJMgO0OxnHuqRqVI=;
+        b=jRdBKbs/w0rrXeQFwYPcKPEXipJtKT/D2Ljs/5Puaw2vZnaK2AjmiMj9MOtenqoZKM
+         E9MERsYKERGUTZh9ESvN1VM5v7icANR83t7N0kDfRPxV83HF4g+HDIaQOGP13YOFR8Kd
+         EhVplYS+XrTqilwKkmvEFPDVvLA68tnqfbbAzmkO9gT6TqCZaTDhYXRrJuIHukjIlWrY
+         j3aMy3WqppUcurHWoUn2tELrwyO0PW7JKa0Wgod9T1AXTlCtBBVe6udRge4c3ciULffd
+         4Ql0uZqkLC2zunewUq9SQc179WtHEN1FBOdnZiOi54kWVgiwY/jRfHqeeIBpjL3AB0wr
+         JD8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=Tk288Zz+uIifCmQruWzx1HX+KXbfFOTwP0kxM+VMUEc=;
-        b=iW7u7SAv7p5Cij/2YSMl7naUrbf2oG6/Si4pZPH/VkDVQb5Ub+RS9G2VUA3ggcJ2SE
-         kHIQQ355Fw4oqgxuRzpLRv/anhOeybUTXUShD2MxRXVy1+5+zC9Wm6x5l+VclQK1xLY5
-         n4+0cNBUlubvaLa7uaMV/2NOovjthmPXhLOYD6w4bYTRBB4ZKlTsHNkk0uTLOrmz9nz7
-         5gw5yxMz7vgoZeQ1+F0/NoBbDkXOO0VYszrBs6+fsPpVlf3O9ORhtOfRgKZffkWL3vUf
-         QpAGomgz5vDwiuL8CYtQAIE9bCQKsjuNHDCnZMRJ1ba9SYhp29UDj9/7RIBrdlfR7PNx
-         DtmA==
-X-Gm-Message-State: AOAM531U2eaAwNfywcSUB1TO9IuyMU/yJO+/cYiuTm8TUzwK8ISUlqPq
-        Od8dhbBqVVn0k+3LFG3//y9MAZL3NCSZ/eJJMb5Bo65P9kdoQPZ/7PzLOPyhpTgPjjDTtnOFfhq
-        gakkX9q+qO37M
-X-Received: by 2002:a17:906:6c88:: with SMTP id s8mr125417ejr.129.1622733727731;
-        Thu, 03 Jun 2021 08:22:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxoln++JLRLzRUvRIPFKCkhnzbJCumWsfqvvpdAzdKrFm/EKznU/MHMYhIJo8u5lC88unTUOw==
-X-Received: by 2002:a17:906:6c88:: with SMTP id s8mr125391ejr.129.1622733727545;
-        Thu, 03 Jun 2021 08:22:07 -0700 (PDT)
-Received: from steredhat ([5.170.129.82])
-        by smtp.gmail.com with ESMTPSA id z22sm1197140ejm.71.2021.06.03.08.22.05
+        bh=dUPtvp2h+2uImUipkmU0sy9GVVBMJMgO0OxnHuqRqVI=;
+        b=BFO1nSWbDePnDtcVXaGl+zHisukOS0JrsP7m11ejhJ+DZbnLamiOIXzaHVz94tK+4/
+         RPB4Zrh7p8riXgVSICSNUSNtn/9Rxv26E3b657X6x6IzNfQGTELoQlazYLwGThoQilZL
+         DFcOGX+mW2Oz2ZsumUWn5J0KWBU5iJbxUHG4lkI7AO+QUr9EkAHMAeMTVRpvt0N3547+
+         VTLtkttf7gDRGs03XJ2qj8p1Qzi/UaPF/URxMRBUSz+dsUp8O2aZdczFMbm/QlXn5ARc
+         WTh52RB2upxyEzOvNyPkgFlmAW448fBupBfXBk8EVzrtJ1uDqK9ffKTFwSOqh8FHG57w
+         f5kw==
+X-Gm-Message-State: AOAM531WVUkfjQpCNBpX+u3uqBeeGNuPlJdxLLE6ip1eNn5qRM3MtmVS
+        uDwEg7lnH2A5O186ErkCsjWYoA==
+X-Google-Smtp-Source: ABdhPJyeNrHA2kVj4qyFnh8E5UqsZtT7NDEnlBu4yJ/PIKwiPADFfe7imukPFXdTL5qfWRDwdeViEg==
+X-Received: by 2002:a17:902:7d92:b029:f5:72d4:c06a with SMTP id a18-20020a1709027d92b02900f572d4c06amr498570plm.33.1622734480153;
+        Thu, 03 Jun 2021 08:34:40 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id c15sm3233916pgt.68.2021.06.03.08.34.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jun 2021 08:22:07 -0700 (PDT)
-Date:   Thu, 3 Jun 2021 17:22:03 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, oxffffaa@gmail.com
-Subject: Re: [PATCH v10 14/18] virtio/vsock: enable SEQPACKET for transport
-Message-ID: <20210603152203.gezrjp2xiv53eqpm@steredhat>
-References: <20210520191357.1270473-1-arseny.krasnov@kaspersky.com>
- <20210520191901.1272423-1-arseny.krasnov@kaspersky.com>
+        Thu, 03 Jun 2021 08:34:39 -0700 (PDT)
+Date:   Thu, 3 Jun 2021 15:34:36 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Wanpeng Li <kernellwp@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH 2/2] KVM: LAPIC: reset TMCCT during vCPU reset
+Message-ID: <YLj2jDKMYZatdl3a@google.com>
+References: <1622710841-76604-1-git-send-email-wanpengli@tencent.com>
+ <1622710841-76604-2-git-send-email-wanpengli@tencent.com>
+ <CALMp9eSK-_xOp=WdRbOOHaHHMHuJkPhG+7h4M+_+=4d-GCNzwA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210520191901.1272423-1-arseny.krasnov@kaspersky.com>
+In-Reply-To: <CALMp9eSK-_xOp=WdRbOOHaHHMHuJkPhG+7h4M+_+=4d-GCNzwA@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 20, 2021 at 10:18:57PM +0300, Arseny Krasnov wrote:
->To make transport work with SOCK_SEQPACKET two updates were
->added:
+On Thu, Jun 03, 2021, Jim Mattson wrote:
+> On Thu, Jun 3, 2021 at 2:01 AM Wanpeng Li <kernellwp@gmail.com> wrote:
+> >
+> > From: Wanpeng Li <wanpengli@tencent.com>
+> >
+> > The value of current counter register after reset is 0 for both Intel
+> > and AMD, let's do it in kvm.
+> >
+> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> 
+> How did we miss that?
 
-Present is better, and you can also mention that we enable it only if 
-the feature is negotiated with the device.
+I suspect it's not actually a functional issue, and that writing '0' at reset is
+a glorified nop.  The TMCCT is always computed on-demand and never directly
+readable.
 
->1) SOCK_SEQPACKET ops for virtio transport and 'seqpacket_allow()'
->   callback.
->2) Handling of SEQPACKET bit: guest tries to negotiate it with vhost.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> v9 -> v10:
-> 1) Use 'virtio_has_feature()' to check feature bit.
-> 2) Move assignment to 'seqpacket_allow' before 'rcu_assign_pointer()'.
->
-> net/vmw_vsock/virtio_transport.c | 24 ++++++++++++++++++++++++
-> 1 file changed, 24 insertions(+)
->
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index 2700a63ab095..bc5ee8df723a 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -62,6 +62,7 @@ struct virtio_vsock {
-> 	struct virtio_vsock_event event_list[8];
->
-> 	u32 guest_cid;
->+	bool seqpacket_allow;
-> };
->
-> static u32 virtio_transport_get_local_cid(void)
->@@ -443,6 +444,8 @@ static void virtio_vsock_rx_done(struct virtqueue 
->*vq)
-> 	queue_work(virtio_vsock_workqueue, &vsock->rx_work);
-> }
->
->+static bool virtio_transport_seqpacket_allow(u32 remote_cid);
->+
-> static struct virtio_transport virtio_transport = {
-> 	.transport = {
-> 		.module                   = THIS_MODULE,
->@@ -469,6 +472,10 @@ static struct virtio_transport virtio_transport = {
-> 		.stream_is_active         = virtio_transport_stream_is_active,
-> 		.stream_allow             = virtio_transport_stream_allow,
->
->+		.seqpacket_dequeue        = 
->virtio_transport_seqpacket_dequeue,
->+		.seqpacket_enqueue        = virtio_transport_seqpacket_enqueue,
->+		.seqpacket_allow          = virtio_transport_seqpacket_allow,
->+
-> 		.notify_poll_in           = virtio_transport_notify_poll_in,
-> 		.notify_poll_out          = virtio_transport_notify_poll_out,
-> 		.notify_recv_init         = virtio_transport_notify_recv_init,
->@@ -485,6 +492,19 @@ static struct virtio_transport virtio_transport = {
-> 	.send_pkt = virtio_transport_send_pkt,
-> };
->
->+static bool virtio_transport_seqpacket_allow(u32 remote_cid)
->+{
->+	struct virtio_vsock *vsock;
->+	bool seqpacket_allow;
->+
->+	rcu_read_lock();
->+	vsock = rcu_dereference(the_virtio_vsock);
->+	seqpacket_allow = vsock->seqpacket_allow;
->+	rcu_read_unlock();
->+
->+	return seqpacket_allow;
->+}
->+
-> static void virtio_transport_rx_work(struct work_struct *work)
-> {
-> 	struct virtio_vsock *vsock =
->@@ -608,6 +628,9 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
-> 	vsock->event_run = true;
-> 	mutex_unlock(&vsock->event_lock);
->
->+	if (virtio_has_feature(vdev, VIRTIO_VSOCK_F_SEQPACKET))
->+		vsock->seqpacket_allow = true;
->+
-> 	vdev->priv = vsock;
-> 	rcu_assign_pointer(the_virtio_vsock, vsock);
->
->@@ -695,6 +718,7 @@ static struct virtio_device_id id_table[] = {
-> };
->
-> static unsigned int features[] = {
->+	VIRTIO_VSOCK_F_SEQPACKET
-> };
->
-> static struct virtio_driver virtio_vsock_driver = {
->-- 
->2.25.1
->
+Is there an observable bug being fixed?  If not, the changelog should state that
+this is a cosmetic change of sorts.
+
+static u32 __apic_read(struct kvm_lapic *apic, unsigned int offset)
+{
+	u32 val = 0;
+
+	if (offset >= LAPIC_MMIO_LENGTH)
+		return 0;
+
+	switch (offset) {
+	case APIC_ARBPRI:
+		break;
+
+	case APIC_TMCCT:	/* Timer CCR */
+		if (apic_lvtt_tscdeadline(apic))
+			return 0;
+
+		val = apic_get_tmcct(apic);
+		break;
+	...
+}
+
+
+static u32 apic_get_tmcct(struct kvm_lapic *apic)
+{
+	ktime_t remaining, now;
+	s64 ns;
+	u32 tmcct;
+
+	ASSERT(apic != NULL);
+
+	/* if initial count is 0, current count should also be 0 */
+	if (kvm_lapic_get_reg(apic, APIC_TMICT) == 0 ||  <------------
+		apic->lapic_timer.period == 0)
+		return 0;
+
+	now = ktime_get();
+	remaining = ktime_sub(apic->lapic_timer.target_expiration, now);
+	if (ktime_to_ns(remaining) < 0)
+		remaining = 0;
+
+	ns = mod_64(ktime_to_ns(remaining), apic->lapic_timer.period);
+	tmcct = div64_u64(ns,
+			 (APIC_BUS_CYCLE_NS * apic->divide_count));
+
+	return tmcct;
+}
+
+int kvm_apic_get_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
+{
+	memcpy(s->regs, vcpu->arch.apic->regs, sizeof(*s));
+
+	/*
+	 * Get calculated timer current count for remaining timer period (if
+	 * any) and store it in the returned register set.
+	 */
+	__kvm_lapic_set_reg(s->regs, APIC_TMCCT,
+			    __apic_read(vcpu->arch.apic, APIC_TMCCT));  <----
+
+	return kvm_apic_state_fixup(vcpu, s, false);
+}
+
+
 
