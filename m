@@ -2,126 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C88239A250
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 15:37:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFA2239A26D
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 15:43:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230129AbhFCNit (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Jun 2021 09:38:49 -0400
-Received: from mail-ot1-f43.google.com ([209.85.210.43]:41875 "EHLO
-        mail-ot1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229957AbhFCNis (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Jun 2021 09:38:48 -0400
-Received: by mail-ot1-f43.google.com with SMTP id 36-20020a9d0ba70000b02902e0a0a8fe36so5732274oth.8
-        for <kvm@vger.kernel.org>; Thu, 03 Jun 2021 06:36:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=SSOZn7NeOxtNAr4b0FWuz+EfX/KEGNf2pixj/JYi27A=;
-        b=b2ZiPMTMK0z2jIOFY2UNLrgwmt+7m8+y8A0XTLvoF9Z8GLkdoO4vh+/OkwfbxSPOa9
-         E+VjhvpG2v0CzpGPM+fdgsMfJOxK5Oiix3ApM55K0ZBCiD8LbTACd1XYnwgDVRhll0XT
-         m0UNRuKzJrIHCM1kVtG3vd+9/LMRZJmMAPnyjX2s2+JRUQWawHqxIkTEWxZn8cBzlWKw
-         dyYTaRwg6biI8J70RfcYIX0vqQ5VipfmLXwJ8ymiUxSM0bW6iE4lgfFaUmtd888BIc83
-         1bvMyhJZXdTr3nnBko1jytmqVKuMNm5N3jiREZuptB+HJ9yM8jb9TWlfxl6hagWc6rGb
-         rAog==
+        id S230342AbhFCNpI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Jun 2021 09:45:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36080 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230319AbhFCNpI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 3 Jun 2021 09:45:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622727803;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=g/YoXGStod1h/jERDJXuFzwuJE4tYR48fwiMDlbU5AI=;
+        b=d9mFFjZv3Clbr7nv+4Pq7XzJLSYV6CFMwMoa40dqftGFDMbrwqNjHyzEszwwwMGpnje5aH
+        GGnqrCNlIOWINurc7Fz9k678/3ku885swAkS6aQlrTri3k0GMsEDb1m/Vh1fsbAS4J/jtB
+        bdAYCjU0swnkrFLbyJqjuseqKOsUwpc=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-56-8CcrHv-vOSey5IcGa5Px_A-1; Thu, 03 Jun 2021 09:43:21 -0400
+X-MC-Unique: 8CcrHv-vOSey5IcGa5Px_A-1
+Received: by mail-ed1-f69.google.com with SMTP id x8-20020aa7d3880000b029038fe468f5f4so3266369edq.10
+        for <kvm@vger.kernel.org>; Thu, 03 Jun 2021 06:43:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=SSOZn7NeOxtNAr4b0FWuz+EfX/KEGNf2pixj/JYi27A=;
-        b=KjkF/xc7917NGR5uGH7VaEK1vUjrp7G63WX4cLclUBIzU0jiAARR9K0G4ZKCE1CCgc
-         MKidgNkApQOgHTB218j/CtpFQLusivQz9d1JGETW67PmEBd99HyehT79OKhUTrHPAJMK
-         2f+TIr46HYlAX95yXXnzcFnsxM0+SsaH1Yp0KsSFzZ9RrIAD1dJDYrCDy1ue6UI9zUEj
-         cdNBvaBYrpz0V52fiG3A8Aw8Oi7w/wdgD9DO4XpT7r9pHOY0py4DAskytD8C8RHPOWUa
-         v04AMHOxf6fRdA5s+XkK1Xag1IwdcPCSgV7CDuAmVMt9KwWcy1xV5YlIB2ZumkHiOomW
-         dolA==
-X-Gm-Message-State: AOAM531Q1V0BWV1biyW9UGL7aTMbNXWbt1zUfbjy46TtASOVxvRSexU6
-        PN/rJOjuuUcKOtXPVazCQX5y2io3+15JJtBDO1jL0g==
-X-Google-Smtp-Source: ABdhPJyyRDeU6xsWT9ff4ufDNsEg24ZcRpZFsQAYVpwmpMHnLCT8tvYOzrcQqm8NpZv/XYnKbtEH+GzQCJG5rno+WkQ=
-X-Received: by 2002:a9d:5786:: with SMTP id q6mr30221203oth.56.1622727351073;
- Thu, 03 Jun 2021 06:35:51 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210525051204.1480610-1-tao3.xu@intel.com> <871r9k36ds.fsf@vitty.brq.redhat.com>
- <660ceed2-7569-6ce6-627a-9a4e860b8aa9@intel.com>
-In-Reply-To: <660ceed2-7569-6ce6-627a-9a4e860b8aa9@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 3 Jun 2021 06:35:40 -0700
-Message-ID: <CALMp9eSVK_ZszVS83H6vPN1ZY3BqHwK0OKAn_Bj4mUBJBqO4Bw@mail.gmail.com>
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=g/YoXGStod1h/jERDJXuFzwuJE4tYR48fwiMDlbU5AI=;
+        b=O2X3/WWVOCjy20kQNf77NG1pZv2Y+dLknGPnotwYEGTWN/Kd0R/yqCjX49BR17LbXd
+         0vKqoSXvuOZhx4gNHs2JYuxUngQ4cadUBD1/Ey9GKCPc8SAsZQAGbcQ3nSuOUZPw+YBk
+         RWcO6FxWuhfShU8MRxuzgzIYta2UiZC8Hu2UH1Be9AExM7nkh363rzwR6QBswjTG+/iN
+         NrANb4yTM8eA0PZSuT4A+TrGyVBeKvhvFN+hg5nQZ0tLavt8lYdvcBlqhl8j7EsmxSj2
+         n6E8SybXDUU4wGYP3RgkAbf3kSKMKNU6z4uo36S6v57mRw7OG4LuEVY3vL9dczR7mCFs
+         jKbQ==
+X-Gm-Message-State: AOAM5316CvM5OPJdtZJbFtBfrJ9hku+lvLPG/wWRnWEMoTN0EYivnpEV
+        vW5+VJAqkvzOq7zDOUXJe514sj0tM17N9VPRNDdvml6yndinpYQKoGSkha4miw7ouN3+s5E4Yst
+        lCqQFP3dC3Ykd
+X-Received: by 2002:a17:906:c010:: with SMTP id e16mr39287396ejz.214.1622727800184;
+        Thu, 03 Jun 2021 06:43:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwkBAlTramcWK5Md2ZPw/anf2r6EF7CpGQ6+Wmz/53biaTbGsw8MFyAlqZyTTAGWiKmHbfy7Q==
+X-Received: by 2002:a17:906:c010:: with SMTP id e16mr39287382ejz.214.1622727799958;
+        Thu, 03 Jun 2021 06:43:19 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id cw10sm1099269ejb.62.2021.06.03.06.43.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Jun 2021 06:43:19 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Tao Xu <tao3.xu@intel.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Xiaoyao Li <xiaoyao.li@intel.com>, pbonzini@redhat.com,
+        seanjc@google.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com
 Subject: Re: [PATCH v2] KVM: VMX: Enable Notify VM exit
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, Tao Xu <tao3.xu@intel.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <12db5b88-a094-4fb0-eeac-e79396009f44@intel.com>
+References: <20210525051204.1480610-1-tao3.xu@intel.com>
+ <871r9k36ds.fsf@vitty.brq.redhat.com>
+ <12db5b88-a094-4fb0-eeac-e79396009f44@intel.com>
+Date:   Thu, 03 Jun 2021 15:43:17 +0200
+Message-ID: <87im2v12tm.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 2, 2021 at 6:25 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
->
-> On 6/2/2021 6:31 PM, Vitaly Kuznetsov wrote:
-> > Tao Xu <tao3.xu@intel.com> writes:
-> >
-> >> There are some cases that malicious virtual machines can cause CPU stuck
-> >> (event windows don't open up), e.g., infinite loop in microcode when
-> >> nested #AC (CVE-2015-5307). No event window obviously means no events,
-> >> e.g. NMIs, SMIs, and IRQs will all be blocked, may cause the related
-> >> hardware CPU can't be used by host or other VM.
-> >>
-> >> To resolve those cases, it can enable a notify VM exit if no event
-> >> window occur in VMX non-root mode for a specified amount of time
-> >> (notify window). Since CPU is first observed the risk of not causing
-> >> forward progress, after notify window time in a units of crystal clock,
-> >> Notify VM exit will happen. Notify VM exit can happen incident to delivery
-> >> of a vectored event.
-> >>
-> >> Expose a module param for configuring notify window, which is in unit of
-> >> crystal clock cycle.
-> >> - A negative value (e.g. -1) is to disable this feature.
-> >> - Make the default as 0. It is safe because an internal threshold is added
-> >> to notify window to ensure all the normal instructions being coverd.
-> >> - User can set it to a large value when they want to give more cycles to
-> >> wait for some reasons, e.g., silicon wrongly kill some normal instruction
-> >> due to internal threshold is too small.
-> >>
-> >> Notify VM exit is defined in latest Intel Architecture Instruction Set
-> >> Extensions Programming Reference, chapter 9.2.
-> >>
-> >> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> >> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> >> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> >> ---
-> >>
-> >> Changelog:
-> >> v2:
-> >>       Default set notify window to 0, less than 0 to disable.
-> >>       Add more description in commit message.
-> >
-> > Sorry if this was already discussed, but in case of nested
-> > virtualization and when L1 also enables
-> > SECONDARY_EXEC_NOTIFY_VM_EXITING, shouldn't we just reflect NOTIFY exits
-> > during L2 execution to L1 instead of crashing the whole L1?
-> >
->
-> yes. If we expose it to nested, it should reflect the Notify VM exit to
-> L1 when L1 enables it.
->
-> But regarding nested, there are more things need to be discussed. e.g.,
-> 1) It has dependence between L0 and L1, for security consideration. When
-> L0 enables it, it shouldn't be turned off during L2 VM is running.
->     a. Don't expose to L1 but enable for L1 when L2 VM is running.
->     b. expose it to L1 and force it enabled.
->
-> 2) When expose it to L1, vmcs02.notify_window needs to be
-> min(L0.notify_window, L1.nofity_window)
+Tao Xu <tao3.xu@intel.com> writes:
 
-I don't think this can be a simple 'min', since L1's clock may run at
-a different frequency from L0's clock.
+> On 6/2/21 6:31 PM, Vitaly Kuznetsov wrote:
+>> Tao Xu <tao3.xu@intel.com> writes:
+>> 
+>>> There are some cases that malicious virtual machines can cause CPU stuck
+>>> (event windows don't open up), e.g., infinite loop in microcode when
+>>> nested #AC (CVE-2015-5307). No event window obviously means no events,
+>>> e.g. NMIs, SMIs, and IRQs will all be blocked, may cause the related
+>>> hardware CPU can't be used by host or other VM.
+>>>
+>>> To resolve those cases, it can enable a notify VM exit if no event
+>>> window occur in VMX non-root mode for a specified amount of time
+>>> (notify window). Since CPU is first observed the risk of not causing
+>>> forward progress, after notify window time in a units of crystal clock,
+>>> Notify VM exit will happen. Notify VM exit can happen incident to delivery
+>>> of a vectored event.
+>>>
+>>> Expose a module param for configuring notify window, which is in unit of
+>>> crystal clock cycle.
+>>> - A negative value (e.g. -1) is to disable this feature.
+>>> - Make the default as 0. It is safe because an internal threshold is added
+>>> to notify window to ensure all the normal instructions being coverd.
+>>> - User can set it to a large value when they want to give more cycles to
+>>> wait for some reasons, e.g., silicon wrongly kill some normal instruction
+>>> due to internal threshold is too small.
+>>>
+>>> Notify VM exit is defined in latest Intel Architecture Instruction Set
+>>> Extensions Programming Reference, chapter 9.2.
+>>>
+>>> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+>>> ---
+>>>
+>>> Changelog:
+>>> v2:
+>>>       Default set notify window to 0, less than 0 to disable.
+>>>       Add more description in commit message.
+>> 
+>> Sorry if this was already discussed, but in case of nested
+>> virtualization and when L1 also enables
+>> SECONDARY_EXEC_NOTIFY_VM_EXITING, shouldn't we just reflect NOTIFY exits
+>> during L2 execution to L1 instead of crashing the whole L1?
+>> 
+> Notify VM Exit will not crash L1 guest if VM context valid in exit 
+> qualification. After VM exit, VMM can resume the guest normally.
+
+Wrong choice of words, sorry. Indeed, VMM is free to decide what to do
+upon such vmexit.
+
+-- 
+Vitaly
+
