@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DD7F39A42B
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 17:15:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E4B339A42F
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 17:15:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231977AbhFCPQl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Jun 2021 11:16:41 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:45686 "EHLO
+        id S232018AbhFCPQn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Jun 2021 11:16:43 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:45714 "EHLO
         linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231902AbhFCPQg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231376AbhFCPQg (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 3 Jun 2021 11:16:36 -0400
 Received: from viremana-dev.fwjladdvyuiujdukmejncen4mf.xx.internal.cloudapp.net (unknown [13.66.132.26])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 26B0620B800A;
+        by linux.microsoft.com (Postfix) with ESMTPSA id 4089220B800D;
         Thu,  3 Jun 2021 08:14:51 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 26B0620B800A
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4089220B800D
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
         s=default; t=1622733291;
-        bh=g/0CZ28TZXa8OiDU/5Sw5UhcxJAd5IpWviUtWRUE0dw=;
+        bh=m88SPusS66QEKDy6ebkhU/c6WvDP5/rom/acisdUES0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=d4kQHi4S8S/TTM/Ca/eeH3Ewa6E8DRda9ss2kS0SLMIsZCKKgG4tW6ifHlzxrUtcX
-         G4oXjLTdWtsXozC891gty9Wxo0QzPXp61GG35Mz9rZu5oFxk5yul/VqHfAXlqC85nQ
-         OLT28mkb0BjmLuebTqNuTOfA6zp2REln0OWqzcZw=
+        b=I/Qkg6dsFVxt7mBZFtL9QFVVx025JBxcPJtE40MJ+0XP4eZrCbNyHM9TAJYfDZjHg
+         A0w/3vqbr3ezhac03aeLmfyhh/Sq25nIj37eoD06tpDNc1TEHgqi0oTOmAjBRCLvcw
+         P6H5mgXMNfWRby3ofWR5P+90N9j2jQ3npXMyRtkw=
 From:   Vineeth Pillai <viremana@linux.microsoft.com>
 To:     Lan Tianyu <Tianyu.Lan@microsoft.com>,
         Michael Kelley <mikelley@microsoft.com>,
@@ -41,9 +41,9 @@ Cc:     Vineeth Pillai <viremana@linux.microsoft.com>,
         "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-hyperv@vger.kernel.org
-Subject: [PATCH v5 4/7] KVM: SVM: Software reserved fields
-Date:   Thu,  3 Jun 2021 15:14:37 +0000
-Message-Id: <a1f17a43a8e9e751a1a9cc0281649d71bdbf721b.1622730232.git.viremana@linux.microsoft.com>
+Subject: [PATCH v5 5/7] KVM: SVM: hyper-v: Remote TLB flush for SVM
+Date:   Thu,  3 Jun 2021 15:14:38 +0000
+Message-Id: <1ee364e397e142aed662d2920d198cd03772f1a5.1622730232.git.viremana@linux.microsoft.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1622730232.git.viremana@linux.microsoft.com>
 References: <cover.1622730232.git.viremana@linux.microsoft.com>
@@ -53,114 +53,128 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SVM added support for certain reserved fields to be used by
-software or hypervisor. Add the following reserved fields:
-  - VMCB offset 0x3e0 - 0x3ff
-  - Clean bit 31
-  - SVM intercept exit code 0xf0000000
-
-Later patches will make use of this for supporting Hyper-V
-nested virtualization enhancements.
+Enable remote TLB flush for SVM.
 
 Signed-off-by: Vineeth Pillai <viremana@linux.microsoft.com>
 ---
- arch/x86/include/asm/svm.h      |  9 +++++++--
- arch/x86/include/uapi/asm/svm.h |  3 +++
- arch/x86/kvm/svm/svm.h          | 17 +++++++++++++++--
- 3 files changed, 25 insertions(+), 4 deletions(-)
+ arch/x86/kvm/svm/svm.c          |  9 +++++
+ arch/x86/kvm/svm/svm_onhyperv.h | 66 +++++++++++++++++++++++++++++++++
+ 2 files changed, 75 insertions(+)
+ create mode 100644 arch/x86/kvm/svm/svm_onhyperv.h
 
-diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index 772e60efe243..e322676039f4 100644
---- a/arch/x86/include/asm/svm.h
-+++ b/arch/x86/include/asm/svm.h
-@@ -156,6 +156,12 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- 	u64 avic_physical_id;	/* Offset 0xf8 */
- 	u8 reserved_7[8];
- 	u64 vmsa_pa;		/* Used for an SEV-ES guest */
-+	u8 reserved_8[720];
-+	/*
-+	 * Offset 0x3e0, 32 bytes reserved
-+	 * for use by hypervisor/software.
-+	 */
-+	u8 reserved_sw[32];
- };
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index b649f92287a2..a39865dbc200 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -43,6 +43,9 @@
+ #include "svm.h"
+ #include "svm_ops.h"
  
- 
-@@ -314,7 +320,7 @@ struct ghcb {
- 
- 
- #define EXPECTED_VMCB_SAVE_AREA_SIZE		1032
--#define EXPECTED_VMCB_CONTROL_AREA_SIZE		272
-+#define EXPECTED_VMCB_CONTROL_AREA_SIZE		1024
- #define EXPECTED_GHCB_SIZE			PAGE_SIZE
- 
- static inline void __unused_size_checks(void)
-@@ -326,7 +332,6 @@ static inline void __unused_size_checks(void)
- 
- struct vmcb {
- 	struct vmcb_control_area control;
--	u8 reserved_control[1024 - sizeof(struct vmcb_control_area)];
- 	struct vmcb_save_area save;
- } __packed;
- 
-diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
-index 554f75fe013c..efa969325ede 100644
---- a/arch/x86/include/uapi/asm/svm.h
-+++ b/arch/x86/include/uapi/asm/svm.h
-@@ -110,6 +110,9 @@
- #define SVM_VMGEXIT_GET_AP_JUMP_TABLE		1
- #define SVM_VMGEXIT_UNSUPPORTED_EVENT		0x8000ffff
- 
-+/* Exit code reserved for hypervisor/software use */
-+#define SVM_EXIT_SW				0xf0000000
++#include "kvm_onhyperv.h"
++#include "svm_onhyperv.h"
 +
- #define SVM_EXIT_ERR           -1
+ #define __ex(x) __kvm_handle_fault_on_reboot(x)
  
- #define SVM_EXIT_REASONS \
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 84b3133c2251..eb4b91832912 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -31,6 +31,11 @@
- extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
- extern bool npt_enabled;
+ MODULE_AUTHOR("Qumranet");
+@@ -992,6 +995,8 @@ static __init int svm_hardware_setup(void)
+ 	/* Note, SEV setup consumes npt_enabled. */
+ 	sev_hardware_setup();
  
++	svm_hv_hardware_setup();
++
+ 	svm_adjust_mmio_mask();
+ 
+ 	for_each_possible_cpu(cpu) {
+@@ -1276,6 +1281,8 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+ 		}
+ 	}
+ 
++	svm_hv_init_vmcb(svm->vmcb);
++
+ 	vmcb_mark_all_dirty(svm->vmcb);
+ 
+ 	enable_gif(svm);
+@@ -3884,6 +3891,8 @@ static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+ 		svm->vmcb->control.nested_cr3 = __sme_set(root_hpa);
+ 		vmcb_mark_dirty(svm->vmcb, VMCB_NPT);
+ 
++		hv_track_root_tdp(vcpu, root_hpa);
++
+ 		/* Loading L2's CR3 is handled by enter_svm_guest_mode.  */
+ 		if (!test_bit(VCPU_EXREG_CR3, (ulong *)&vcpu->arch.regs_avail))
+ 			return;
+diff --git a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
+new file mode 100644
+index 000000000000..57291e222395
+--- /dev/null
++++ b/arch/x86/kvm/svm/svm_onhyperv.h
+@@ -0,0 +1,66 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
-+ * Clean bits in VMCB.
-+ * VMCB_ALL_CLEAN_MASK might also need to
-+ * be updated if this enum is modified.
++ * KVM L1 hypervisor optimizations on Hyper-V for SVM.
 + */
- enum {
- 	VMCB_INTERCEPTS, /* Intercept vectors, TSC offset,
- 			    pause filter count */
-@@ -48,9 +53,17 @@ enum {
- 			  * AVIC PHYSICAL_TABLE pointer,
- 			  * AVIC LOGICAL_TABLE pointer
- 			  */
--	VMCB_DIRTY_MAX,
-+	VMCB_SW = 31,    /* Reserved for hypervisor/software use */
- };
- 
-+#define VMCB_ALL_CLEAN_MASK (					\
-+	(1U << VMCB_INTERCEPTS) | (1U << VMCB_PERM_MAP) |	\
-+	(1U << VMCB_ASID) | (1U << VMCB_INTR) |			\
-+	(1U << VMCB_NPT) | (1U << VMCB_CR) | (1U << VMCB_DR) |	\
-+	(1U << VMCB_DT) | (1U << VMCB_SEG) | (1U << VMCB_CR2) |	\
-+	(1U << VMCB_LBR) | (1U << VMCB_AVIC) |			\
-+	(1U << VMCB_SW))
 +
- /* TPR and CR2 are always written before VMRUN */
- #define VMCB_ALWAYS_DIRTY_MASK	((1U << VMCB_INTR) | (1U << VMCB_CR2))
- 
-@@ -237,7 +250,7 @@ static inline void vmcb_mark_all_dirty(struct vmcb *vmcb)
- 
- static inline void vmcb_mark_all_clean(struct vmcb *vmcb)
- {
--	vmcb->control.clean = ((1 << VMCB_DIRTY_MAX) - 1)
-+	vmcb->control.clean = VMCB_ALL_CLEAN_MASK
- 			       & ~VMCB_ALWAYS_DIRTY_MASK;
- }
- 
++#ifndef __ARCH_X86_KVM_SVM_ONHYPERV_H__
++#define __ARCH_X86_KVM_SVM_ONHYPERV_H__
++
++#if IS_ENABLED(CONFIG_HYPERV)
++#include <asm/mshyperv.h>
++
++#include "hyperv.h"
++#include "kvm_onhyperv.h"
++
++static struct kvm_x86_ops svm_x86_ops;
++
++/*
++ * Hyper-V uses the software reserved 32 bytes in VMCB
++ * control area to expose SVM enlightenments to guests.
++ */
++struct hv_enlightenments {
++	struct __packed hv_enlightenments_control {
++		u32 nested_flush_hypercall:1;
++		u32 msr_bitmap:1;
++		u32 enlightened_npt_tlb: 1;
++		u32 reserved:29;
++	} __packed hv_enlightenments_control;
++	u32 hv_vp_id;
++	u64 hv_vm_id;
++	u64 partition_assist_page;
++	u64 reserved;
++} __packed;
++
++static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
++{
++	struct hv_enlightenments *hve =
++		(struct hv_enlightenments *)vmcb->control.reserved_sw;
++
++	if (npt_enabled &&
++	    ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB)
++		hve->hv_enlightenments_control.enlightened_npt_tlb = 1;
++}
++
++static inline void svm_hv_hardware_setup(void)
++{
++	if (npt_enabled &&
++	    ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB) {
++		pr_info("kvm: Hyper-V enlightened NPT TLB flush enabled\n");
++		svm_x86_ops.tlb_remote_flush = hv_remote_flush_tlb;
++		svm_x86_ops.tlb_remote_flush_with_range =
++				hv_remote_flush_tlb_with_range;
++	}
++}
++
++#else
++
++static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
++{
++}
++
++static inline void svm_hv_hardware_setup(void)
++{
++}
++#endif /* CONFIG_HYPERV */
++
++#endif /* __ARCH_X86_KVM_SVM_ONHYPERV_H__ */
 -- 
 2.25.1
 
