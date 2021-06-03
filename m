@@ -2,262 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B0DF39A3B1
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 16:51:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F36F39A394
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 16:45:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231773AbhFCOxe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Jun 2021 10:53:34 -0400
-Received: from mail-pg1-f174.google.com ([209.85.215.174]:40571 "EHLO
-        mail-pg1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231611AbhFCOxe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Jun 2021 10:53:34 -0400
-Received: by mail-pg1-f174.google.com with SMTP id j12so5315400pgh.7
-        for <kvm@vger.kernel.org>; Thu, 03 Jun 2021 07:51:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=mmRR4bhbKA03IJ4A9luFejN0yJcZ05ES8EbjfloeqbY=;
-        b=B5aCsNczIT/Scs/AAbN1XuSKs46B31w7cWcLa8/uyakfoMQAkkAw+mKBlDrBaNEsDP
-         vukwjFH8yLldUotF6LDv41FGxLJrqY8TnQKyNN74zdnyf6orD8QG/TJWZ/WlC4oYCkV5
-         fjG1Ol/A6Xk/1NLAuLDOVPuPKp0P1wKKY2h/1tCQdQ9b+ymdOhVdUlNXsyeEgGnqnd0s
-         fPuUitNKrhz+PRSLiebZ7PTzdPspEBAxcoQbvnBONmyWXGWhqSqwhVTrCPO+7bMgVVjD
-         7wA9njGauQ/exIu1Qyh5JP86tgQZhQqjlanqgYLvtgFi/aB8MveRHfUOcpn6+KJqC5u9
-         z9lQ==
+        id S231224AbhFCOrN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Jun 2021 10:47:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29703 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229744AbhFCOrN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 3 Jun 2021 10:47:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622731527;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YABTD2STAWQQlm5tg1g6NJ074ZuyxPbxn7absUYPnjc=;
+        b=Mi9+2JOFx8LWvH2uflgajWcrwnFORLvs4sy3e5rcWQYS6Gw3ckQ+78TtTNmynYX9fSM2z2
+        Wv/EZWtvF7HBUIqPLsRaEf+bD+yzN7oBeVJAAy3XltFOCpK+e81kNOV8YEvwAovExaJUo4
+        0O9VqEGp6hAXI2VJiVtF+6iapaBKqPM=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-517-0ZAV7_Q5OKm4Zg2xBq3dnQ-1; Thu, 03 Jun 2021 10:45:20 -0400
+X-MC-Unique: 0ZAV7_Q5OKm4Zg2xBq3dnQ-1
+Received: by mail-ed1-f69.google.com with SMTP id z16-20020aa7d4100000b029038feb83da57so3387758edq.4
+        for <kvm@vger.kernel.org>; Thu, 03 Jun 2021 07:45:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=mmRR4bhbKA03IJ4A9luFejN0yJcZ05ES8EbjfloeqbY=;
-        b=nYNR0XdeKzIocl9FjB1FYNv3DC+QHMGmSpqZTHG9XNHanDT/5ut9WqtLeAWgupoOe7
-         gnIYkSjOLgwp8p/p7nHLb8azilwRHQu/t96Xm2/8cuuKf7/iIRyeB26p7hU52I7sprfe
-         k+KFLMXNp2nd9Znqu5lkHXvzPu5J0PBBp+vX8+MKt7HPT2961Qe4/cy8GWvdxeiyNKRs
-         IZHg1WkWZnXdmdFe7Nh97nSeSo/YLhE6ALCBhWHEVhYKLMdS8sEu1jnMotS4S+bJEuaa
-         G+EO5U/BRA6bKRR7MBbfMHyegG6fhHXbFpQamhPLbLc3xUJxfHVvausd1WEl1FXPCA2S
-         l63w==
-X-Gm-Message-State: AOAM532DHOwUPFPiFAu77GxcUlGe14CM0yg8z8NOc1JXVSFZPdCsE2E+
-        TvwXSHhBg2FnZqJliDUakRzve6gsPX4=
-X-Google-Smtp-Source: ABdhPJyqzAFlcsr4c/T6kdOz4IiahznA7TuidiSa6FhrmNI9gg/njXeiJegDgPKm7pMsfBpySS3WZQ==
-X-Received: by 2002:aa7:92da:0:b029:2e0:461f:2808 with SMTP id k26-20020aa792da0000b02902e0461f2808mr213283pfa.25.1622731833060;
-        Thu, 03 Jun 2021 07:50:33 -0700 (PDT)
-Received: from localhost ([47.251.4.198])
-        by smtp.gmail.com with ESMTPSA id k20sm3067624pgl.72.2021.06.03.07.50.31
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 03 Jun 2021 07:50:32 -0700 (PDT)
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Hou Wenlong <houwenlong.hwl@antgroup.com>,
-        Lai Jiangshan <laijs@linux.alibaba.com>
-Subject: [kvm-unit-tests PATCH] x86: test combined access
-Date:   Thu,  3 Jun 2021 13:05:37 +0800
-Message-Id: <20210603050537.19605-1-jiangshanlai@gmail.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=YABTD2STAWQQlm5tg1g6NJ074ZuyxPbxn7absUYPnjc=;
+        b=bE2OFsdXYOAL3n4t+LfLA6qoRDjFpuFFDamHFqiMtZFUBDE1UeoJJSje1kiWBL5cj0
+         Pe6hdd2wUJo+ujAEaYRFSQXcGRTBCUawwWZBPXq0w0BOKpNdyya4ptRoTVmjGgso+Orn
+         cRBVpIsnY2ecbDKcTfKtgpMmRoybDOrI1BN32XhD1HLq4IwYaT6qhMl+AtfAtNLz1TAG
+         WXGt0qXvMcNgviomTUY7fyxnIiE1xjEpoLbxNx+eeC/0EDdIcM3nEF7w6/iuFPPUcr8z
+         ALCeLVpbhc7epBpCermQMLOJ5IMaywfkpZwSu5anau85NQ2PyVHR/6tC5U02qdmzHA+4
+         QvUw==
+X-Gm-Message-State: AOAM5305G4OUctzqOLRzm7CtaZIy1zVJQAtXFfuM5NvIn2bvyFrDFJH2
+        IS65lhU5oHS8bP0B4r351NRJVyHJFv9kpT5g3LXraUxJ0cZz73aYbxbSY2xNR6lKvHsiIyAA5Ao
+        1AkMqsUW/rIVt
+X-Received: by 2002:a50:afe4:: with SMTP id h91mr203591edd.28.1622731518862;
+        Thu, 03 Jun 2021 07:45:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyJXKlXoitE1mjpn8GN6FD+0N7T0+mjhG0D3VTzD5XyuA6+OeMMiJZX3H1kZB9DlLneqf+VlA==
+X-Received: by 2002:a50:afe4:: with SMTP id h91mr203573edd.28.1622731518678;
+        Thu, 03 Jun 2021 07:45:18 -0700 (PDT)
+Received: from steredhat ([5.170.129.82])
+        by smtp.gmail.com with ESMTPSA id bh3sm1622721ejb.19.2021.06.03.07.45.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Jun 2021 07:45:17 -0700 (PDT)
+Date:   Thu, 3 Jun 2021 16:45:13 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Colin Ian King <colin.king@canonical.com>,
+        Andra Paraschiv <andraprs@amazon.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, oxffffaa@gmail.com
+Subject: Re: [PATCH v10 11/18] virtio/vsock: dequeue callback for
+ SOCK_SEQPACKET
+Message-ID: <20210603144513.ryjzauq7abnjogu3@steredhat>
+References: <20210520191357.1270473-1-arseny.krasnov@kaspersky.com>
+ <20210520191801.1272027-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210520191801.1272027-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lai Jiangshan <laijs@linux.alibaba.com>
+On Thu, May 20, 2021 at 10:17:58PM +0300, Arseny Krasnov wrote:
+>Callback fetches RW packets from rx queue of socket until whole record
+>is copied(if user's buffer is full, user is not woken up). This is done
+>to not stall sender, because if we wake up user and it leaves syscall,
+>nobody will send credit update for rest of record, and sender will wait
+>for next enter of read syscall at receiver's side. So if user buffer is
+>full, we just send credit update and drop data.
+>
+>Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>---
+> v9 -> v10:
+> 1) Number of dequeued bytes incremented even in case when
+>    user's buffer is full.
+> 2) Use 'msg_data_left()' instead of direct access to 'msg_hdr'.
+> 3) Rename variable 'err' to 'dequeued_len', in case of error
+>    it has negative value.
+>
+> include/linux/virtio_vsock.h            |  5 ++
+> net/vmw_vsock/virtio_transport_common.c | 65 +++++++++++++++++++++++++
+> 2 files changed, 70 insertions(+)
+>
+>diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>index dc636b727179..02acf6e9ae04 100644
+>--- a/include/linux/virtio_vsock.h
+>+++ b/include/linux/virtio_vsock.h
+>@@ -80,6 +80,11 @@ virtio_transport_dgram_dequeue(struct vsock_sock *vsk,
+> 			       struct msghdr *msg,
+> 			       size_t len, int flags);
+>
+>+ssize_t
+>+virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
+>+				   struct msghdr *msg,
+>+				   int flags,
+>+				   bool *msg_ready);
+> s64 virtio_transport_stream_has_data(struct vsock_sock *vsk);
+> s64 virtio_transport_stream_has_space(struct vsock_sock *vsk);
+>
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index ad0d34d41444..61349b2ea7fe 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -393,6 +393,59 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+> 	return err;
+> }
+>
+>+static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
+>+						 struct msghdr *msg,
+>+						 int flags,
+>+						 bool *msg_ready)
+>+{
+>+	struct virtio_vsock_sock *vvs = vsk->trans;
+>+	struct virtio_vsock_pkt *pkt;
+>+	int dequeued_len = 0;
+>+	size_t user_buf_len = msg_data_left(msg);
+>+
+>+	*msg_ready = false;
+>+	spin_lock_bh(&vvs->rx_lock);
+>+
+>+	while (!*msg_ready && !list_empty(&vvs->rx_queue) && dequeued_len >= 0) {
 
-Check combined access when guest shares pagetables.
+I'
 
-For example, here is a shared pagetable:
-   pgd[]   pud[]        pmd[]            virtual address pointers
-                     /->pmd1(u--)->pte1(uw-)->page1 <- ptr1 (u--)
-        /->pud1(uw-)--->pmd2(uw-)->pte2(uw-)->page2 <- ptr2 (uw-)
-   pgd-|           (shared pmd[] as above)
-        \->pud2(u--)--->pmd1(u--)->pte1(uw-)->page1 <- ptr3 (u--)
-                     \->pmd2(uw-)->pte2(uw-)->page2 <- ptr4 (u--)
-  pud1 and pud2 point to the same pmd table
+>+		size_t bytes_to_copy;
+>+		size_t pkt_len;
+>+
+>+		pkt = list_first_entry(&vvs->rx_queue, struct virtio_vsock_pkt, list);
+>+		pkt_len = (size_t)le32_to_cpu(pkt->hdr.len);
+>+		bytes_to_copy = min(user_buf_len, pkt_len);
+>+
+>+		if (bytes_to_copy) {
+>+			/* sk_lock is held by caller so no one else can dequeue.
+>+			 * Unlock rx_lock since memcpy_to_msg() may sleep.
+>+			 */
+>+			spin_unlock_bh(&vvs->rx_lock);
+>+
+>+			if (memcpy_to_msg(msg, pkt->buf, bytes_to_copy))
+>+				dequeued_len = -EINVAL;
 
-The test is usefull when TDP is not enabled.
+I think here is better to return the error returned by memcpy_to_msg(), 
+as we do in the other place where we use memcpy_to_msg().
 
-Co-Developed-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
-Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
----
- x86/access.c | 99 ++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 93 insertions(+), 6 deletions(-)
+I mean something like this:
+			err = memcpy_to_msgmsg, pkt->buf, bytes_to_copy);
+			if (err)
+				dequeued_len = err;
 
-diff --git a/x86/access.c b/x86/access.c
-index 7dc9eb6..6dbe6e5 100644
---- a/x86/access.c
-+++ b/x86/access.c
-@@ -60,6 +60,8 @@ enum {
-     AC_PDE_BIT36_BIT,
-     AC_PDE_BIT13_BIT,
- 
-+    AC_PUDE_NO_WRITABLE_BIT, // special test case to disable write bit on PUD entry
-+
-     AC_PKU_AD_BIT,
-     AC_PKU_WD_BIT,
-     AC_PKU_PKEY_BIT,
-@@ -97,6 +99,8 @@ enum {
- #define AC_PDE_BIT36_MASK     (1 << AC_PDE_BIT36_BIT)
- #define AC_PDE_BIT13_MASK     (1 << AC_PDE_BIT13_BIT)
- 
-+#define AC_PUDE_NO_WRITABLE_MASK  (1 << AC_PUDE_NO_WRITABLE_BIT)
-+
- #define AC_PKU_AD_MASK        (1 << AC_PKU_AD_BIT)
- #define AC_PKU_WD_MASK        (1 << AC_PKU_WD_BIT)
- #define AC_PKU_PKEY_MASK      (1 << AC_PKU_PKEY_BIT)
-@@ -326,6 +330,7 @@ static pt_element_t ac_test_alloc_pt(ac_pool_t *pool)
- {
-     pt_element_t ret = pool->pt_pool + pool->pt_pool_current;
-     pool->pt_pool_current += PAGE_SIZE;
-+    memset(va(ret), 0, PAGE_SIZE);
-     return ret;
- }
- 
-@@ -408,7 +413,8 @@ static void ac_emulate_access(ac_test_t *at, unsigned flags)
- 	goto fault;
-     }
- 
--    writable = F(AC_PDE_WRITABLE);
-+    writable = !F(AC_PUDE_NO_WRITABLE);
-+    writable &= F(AC_PDE_WRITABLE);
-     user = F(AC_PDE_USER);
-     executable = !F(AC_PDE_NX);
- 
-@@ -471,7 +477,7 @@ static void ac_set_expected_status(ac_test_t *at)
-     ac_emulate_access(at, at->flags);
- }
- 
--static void __ac_setup_specific_pages(ac_test_t *at, ac_pool_t *pool,
-+static void __ac_setup_specific_pages(ac_test_t *at, ac_pool_t *pool, bool reuse,
- 				      u64 pd_page, u64 pt_page)
- 
- {
-@@ -496,13 +502,26 @@ static void __ac_setup_specific_pages(ac_test_t *at, ac_pool_t *pool,
- 	    goto next;
- 	}
- 	skip = false;
-+	if (reuse && vroot[index]) {
-+	    switch (i) {
-+	    case 2:
-+		at->pdep = &vroot[index];
-+		break;
-+	    case 1:
-+		at->ptep = &vroot[index];
-+		break;
-+	    }
-+	    goto next;
-+	}
- 
- 	switch (i) {
- 	case 5:
- 	case 4:
- 	case 3:
--	    pte = pd_page ? pd_page : ac_test_alloc_pt(pool);
-+	    pte = (i==3 && pd_page) ? pd_page : ac_test_alloc_pt(pool);
- 	    pte |= PT_PRESENT_MASK | PT_WRITABLE_MASK | PT_USER_MASK;
-+	    if (F(AC_PUDE_NO_WRITABLE))
-+		pte &= ~PT_WRITABLE_MASK;
- 	    break;
- 	case 2:
- 	    if (!F(AC_PDE_PSE)) {
-@@ -568,13 +587,13 @@ static void __ac_setup_specific_pages(ac_test_t *at, ac_pool_t *pool,
- 
- static void ac_test_setup_pte(ac_test_t *at, ac_pool_t *pool)
- {
--	__ac_setup_specific_pages(at, pool, 0, 0);
-+	__ac_setup_specific_pages(at, pool, false, 0, 0);
- }
- 
- static void ac_setup_specific_pages(ac_test_t *at, ac_pool_t *pool,
- 				    u64 pd_page, u64 pt_page)
- {
--	return __ac_setup_specific_pages(at, pool, pd_page, pt_page);
-+	return __ac_setup_specific_pages(at, pool, false, pd_page, pt_page);
- }
- 
- static void dump_mapping(ac_test_t *at)
-@@ -930,6 +949,73 @@ err:
- 	return 0;
- }
- 
-+static int check_combined_protection(ac_pool_t *pool)
-+{
-+	ac_test_t at1, at2, at3, at4;
-+	int err_read_at1, err_write_at2;
-+	int err_read_at3, err_write_at4;
-+	pt_element_t pmd = ac_test_alloc_pt(pool);
-+	unsigned long ptr1 = 0x123480000000;
-+	unsigned long ptr2 = ptr1 + 2 * 1024 * 1024;
-+	unsigned long ptr3 = ptr1 + 1 * 1024 * 1024 * 1024;
-+	unsigned long ptr4 = ptr3 + 2 * 1024 * 1024;
-+
-+	/*
-+	 * pgd[]   pud[]        pmd[]            virtual address pointers
-+	 *                   /->pmd1(u--)->pte1(uw-)->page1 <- ptr1 (u--)
-+	 *      /->pud1(uw-)--->pmd2(uw-)->pte2(uw-)->page2 <- ptr2 (uw-)
-+	 * pgd-|           (shared pmd[] as above)
-+	 *      \->pud2(u--)--->pmd1(u--)->pte1(uw-)->page1 <- ptr3 (u--)
-+	 *                   \->pmd2(uw-)->pte2(uw-)->page2 <- ptr4 (u--)
-+	 * pud1 and pud2 point to the same pmd page.
-+	 */
-+
-+	ac_test_init(&at1, (void *)(ptr1));
-+	at1.flags = AC_PDE_PRESENT_MASK | AC_PTE_PRESENT_MASK |
-+		    AC_PDE_USER_MASK | AC_PTE_USER_MASK |
-+		    AC_PDE_ACCESSED_MASK | AC_PTE_ACCESSED_MASK |
-+		    AC_PTE_WRITABLE_MASK | AC_ACCESS_USER_MASK;
-+	__ac_setup_specific_pages(&at1, pool, false, pmd, 0);
-+
-+	ac_test_init(&at2, (void *)(ptr2));
-+	at2.flags = at1.flags | AC_PDE_WRITABLE_MASK | AC_PTE_DIRTY_MASK | AC_ACCESS_WRITE_MASK;
-+	__ac_setup_specific_pages(&at2, pool, true, pmd, 0);
-+
-+	ac_test_init(&at3, (void *)(ptr3));
-+	at3.flags = AC_PUDE_NO_WRITABLE_MASK | at1.flags;
-+	__ac_setup_specific_pages(&at3, pool, true, pmd, 0);
-+
-+	ac_test_init(&at4, (void *)(ptr4));
-+	at4.flags = AC_PUDE_NO_WRITABLE_MASK | at2.flags;
-+	__ac_setup_specific_pages(&at4, pool, true, pmd, 0);
-+
-+	err_read_at1 = ac_test_do_access(&at1);
-+	if (!err_read_at1) {
-+		printf("%s: read access at1 fail\n", __FUNCTION__);
-+		return 0;
-+	}
-+
-+	err_write_at2 = ac_test_do_access(&at2);
-+	if (!err_write_at2) {
-+		printf("%s: write access at2 fail\n", __FUNCTION__);
-+		return 0;
-+	}
-+
-+	err_read_at3 = ac_test_do_access(&at3);
-+	if (!err_read_at3) {
-+		printf("%s: read access at3 fail\n", __FUNCTION__);
-+		return 0;
-+	}
-+
-+	err_write_at4 = ac_test_do_access(&at4);
-+	if (!err_write_at4) {
-+		printf("%s: write access at4 should fail\n", __FUNCTION__);
-+		return 0;
-+	}
-+
-+	return 1;
-+}
-+
- static int ac_test_exec(ac_test_t *at, ac_pool_t *pool)
- {
-     int r;
-@@ -948,7 +1034,8 @@ const ac_test_fn ac_test_cases[] =
- 	corrupt_hugepage_triger,
- 	check_pfec_on_prefetch_pte,
- 	check_large_pte_dirty_for_nowp,
--	check_smep_andnot_wp
-+	check_smep_andnot_wp,
-+	check_combined_protection
- };
- 
- static int ac_test_run(void)
--- 
-2.19.1.6.gb485710b
+>+			else
+>+				user_buf_len -= bytes_to_copy;
+>+
+>+			spin_lock_bh(&vvs->rx_lock);
+>+		}
+>+
+
+Maybe here we can simply break the cycle if we have an error:
+		if (dequeued_len < 0)
+			break;
+
+Or we can refactor a bit, simplifying the while() condition and also the 
+code in this way (not tested):
+
+	while (!*msg_ready && !list_empty(&vvs->rx_queue)) {
+		...
+
+		if (bytes_to_copy) {
+			int err;
+
+			/* ...
+			*/
+			spin_unlock_bh(&vvs->rx_lock);
+			err = memcpy_to_msgmsg, pkt->buf, bytes_to_copy);
+			if (err) {
+				dequeued_len = err;
+				goto out;
+			}
+			spin_lock_bh(&vvs->rx_lock);
+
+			user_buf_len -= bytes_to_copy;
+		}
+
+		dequeued_len += pkt_len;
+
+		if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOR)
+			*msg_ready = true;
+
+		virtio_transport_dec_rx_pkt(vvs, pkt);
+		list_del(&pkt->list);
+		virtio_transport_free_pkt(pkt);
+	}
+
+out:
+	spin_unlock_bh(&vvs->rx_lock);
+
+	virtio_transport_send_credit_update(vsk);
+
+	return dequeued_len;
+}
 
