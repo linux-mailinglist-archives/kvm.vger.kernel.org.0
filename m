@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3130B39A78A
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 19:11:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F26F39A7A0
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 19:11:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232586AbhFCRLk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Jun 2021 13:11:40 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42178 "EHLO mail.kernel.org"
+        id S232666AbhFCRMB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Jun 2021 13:12:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43268 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231977AbhFCRKd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Jun 2021 13:10:33 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 402966140A;
-        Thu,  3 Jun 2021 17:08:44 +0000 (UTC)
+        id S232402AbhFCRLO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Jun 2021 13:11:14 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B5D4561402;
+        Thu,  3 Jun 2021 17:09:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1622740125;
-        bh=2lVh5NkMWKcDdgRJf5gWZI/lLSeNE7nfG/pCe+/EixQ=;
+        s=k20201202; t=1622740168;
+        bh=3xtDotbavrRCbvGAjb8l1mvLytPd4v7OS/uUZsg0sAU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jm9yiZjeBacfa1NEtRAllUV94FUJhaCz+hhPsx8QkNoawOyWEtFYtPU2jscKSlPNN
-         pAUFFJm23Qpd8WPid4+oxJZXyAuETH4gO5iSdkuwTTVt3011tiEON/DkCooLFfzJ9o
-         HFVi+4Srl7MIVlTGwAE2I3YjB9dUL3L05cTlKRLAa4IHwqubRTXFhWqfxRG5Apt4Yv
-         dUpY3kYNGSfmf3XnZvcMe3sknBoi5ws3h1KVZm3m7smHoPNe88QB77atr0gxR9w/s5
-         YZ8X0z7ntCC1+QF+BTcqdRnAH268MX+uFtcuADpKKjx3bdrORK8EkuDmjh4PTYeIQ7
-         LKMzoEmZSg2Jw==
+        b=gG1N/sck136zsAdwAIFcRSlcEcOgY7J/YXKnHbRUsv+O1heH6Pk0evMla0cVALaFe
+         QShDUqL8frC7Un3c3u7cQDvXVR0L0vntaEfJemDTtZN6Xab+voz1mImYerPvAowiV9
+         lFjlhGt1kHddb9Ht6bSiLueXEM/UZPwTDFDUkj5Im9+d2R4hv6nwljBTlXajRY/+GY
+         5bAViO9U4JpvVJyo/SJu3rbml8blrFyTxPHh0JGr9iez5gfUsZoCec3gAdpHmjI44L
+         s4DrwmjuU61Z3ywQId5mFiH/2KSiQ7FaGQCLpMD7k/O6N/8SJ44BisV9VtOnwkORxi
+         vSd4CSDkc7jNg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Eric Farman <farman@linux.ibm.com>,
@@ -30,12 +30,12 @@ Cc:     Eric Farman <farman@linux.ibm.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Sasha Levin <sashal@kernel.org>, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 12/39] vfio-ccw: Serialize FSM IDLE state with I/O completion
-Date:   Thu,  3 Jun 2021 13:08:02 -0400
-Message-Id: <20210603170829.3168708-12-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 07/31] vfio-ccw: Serialize FSM IDLE state with I/O completion
+Date:   Thu,  3 Jun 2021 13:08:55 -0400
+Message-Id: <20210603170919.3169112-7-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210603170829.3168708-1-sashal@kernel.org>
-References: <20210603170829.3168708-1-sashal@kernel.org>
+In-Reply-To: <20210603170919.3169112-1-sashal@kernel.org>
+References: <20210603170919.3169112-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -86,10 +86,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-index 8c625b530035..9b61e9b131ad 100644
+index 339a6bc0339b..fd590d1cffc1 100644
 --- a/drivers/s390/cio/vfio_ccw_drv.c
 +++ b/drivers/s390/cio/vfio_ccw_drv.c
-@@ -86,6 +86,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
+@@ -83,6 +83,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
  	struct vfio_ccw_private *private;
  	struct irb *irb;
  	bool is_final;
@@ -97,7 +97,7 @@ index 8c625b530035..9b61e9b131ad 100644
  
  	private = container_of(work, struct vfio_ccw_private, io_work);
  	irb = &private->irb;
-@@ -94,14 +95,21 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
+@@ -91,14 +92,21 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
  		     (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
  	if (scsw_is_solicited(&irb->scsw)) {
  		cp_update_scsw(&private->cp, &irb->scsw);
