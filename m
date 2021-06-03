@@ -2,298 +2,301 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 890B339A9A7
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 20:02:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86D7B39A9DD
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 20:16:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230033AbhFCSDm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Jun 2021 14:03:42 -0400
-Received: from mail-pl1-f179.google.com ([209.85.214.179]:41924 "EHLO
-        mail-pl1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229922AbhFCSDl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Jun 2021 14:03:41 -0400
-Received: by mail-pl1-f179.google.com with SMTP id e8so2458585plh.8
-        for <kvm@vger.kernel.org>; Thu, 03 Jun 2021 11:01:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=Z5kNm+LNrwmVEe8fXLD1P6L9e9YhdVUhcQol6wGk2ls=;
-        b=Aad59Cr3pmAr49rU5h93PBjojoKRjJE8i4uDG9qQHowDS4UnFAJn+E/YjeQ7AzY2NN
-         lWD1VzHfgSvXyUmvExmsamj2DdN4ipqRR0eZV6l1Huy87Kgm1HULSVa339hK/cSJQDZ7
-         AYUEmRvWMc9AKKJnWswh9r2uDLeolkC08O16IqOlu03nXgRKy3dzl6YH3MCOfJM/XNP9
-         Jtv3thiDJz2B1YXZ41/YEmFSNwT6MKs3Bbd4OR0OOejlAjx8XyQVZaN3WNY70vuVoxSj
-         8SK4reoN3Z9UxBHiewm104kNNN1rIlUVeOuKVkzAI318CACRXlJqefTj+119+SBrL7+H
-         +fJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=Z5kNm+LNrwmVEe8fXLD1P6L9e9YhdVUhcQol6wGk2ls=;
-        b=ia1br7sTV1p68OcMUAwWXzSn1bqfGuotRmPN9ZIJBLVWjTK8ol/Dl4mEn57pRMqnca
-         qyFlfAvgbuKWxJnf9aPIPpVmzGtd8N7WR4+3qlqIgjwGTfWQJ2cPHuCayLki6REzzmGw
-         W7s0+t9ymxVfmcMMK1kW6aiO4SAef2q+9FdtHjDzHwzFAIwfZk4nY368UWfmDnw6rZ8z
-         TtEujUul/JFe5HR8rUZ+NHNM+C9WmYmLXGnrCD/ib6KDLW8CoGrNS2wSefP34hz6eSrP
-         j68sGEQ4KnbcfHvxXrpgPM2PWme8SHFM8Qqrxi5cweBycXbi92qugG+h47DrqL4oehwS
-         OYZA==
-X-Gm-Message-State: AOAM5319R11eWKS9IowLt2ssLe/FZRiqEwz1Cxrcn6IpJOPjUmwImW6a
-        nsbhlX/0BywiYynZ4x03KhXKQA==
-X-Google-Smtp-Source: ABdhPJy00t26VSZEdy83QHmGt/IYwwC2E61BljJuqq6AgazLNf8wlYl14icS3LFIGOAcPd0ZCsUZOw==
-X-Received: by 2002:a17:90a:3484:: with SMTP id p4mr480992pjb.2.1622743190176;
-        Thu, 03 Jun 2021 10:59:50 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id d15sm3259838pgu.84.2021.06.03.10.59.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jun 2021 10:59:49 -0700 (PDT)
-Date:   Thu, 3 Jun 2021 17:59:45 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Lai Jiangshan <laijs@linux.alibaba.com>,
+        id S229820AbhFCSSD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Jun 2021 14:18:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37861 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229576AbhFCSSC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 3 Jun 2021 14:18:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622744177;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=F9aNdWsrwlPZSK06QZlCcZWXqZ1HGwC8C0/DQHxyJrA=;
+        b=ZU/IhD2cqSTbNnfhtkZeh4ogyEZyhnTUQWwDDAHU4MHU8EGMcB6jWJ4fp5uF6kEF0wb6qu
+        xOhJWM85yJtPdfcveMaNqCcJO0qMPpcAfGcPym9RnF4vo1TDMiPgRmD3BcLEkmGXJJV0g5
+        EHKFi8MPLHOKwPu/W2RjYT/+u5N+ofs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-505-AxcEc5lnPOO2hIeP3Ya3DQ-1; Thu, 03 Jun 2021 14:16:14 -0400
+X-MC-Unique: AxcEc5lnPOO2hIeP3Ya3DQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58C63800D62;
+        Thu,  3 Jun 2021 18:16:12 +0000 (UTC)
+Received: from localhost (ovpn-120-94.rdu2.redhat.com [10.10.120.94])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 08F5F60657;
+        Thu,  3 Jun 2021 18:16:05 +0000 (UTC)
+Date:   Thu, 3 Jun 2021 14:16:05 -0400
+From:   Eduardo Habkost <ehabkost@redhat.com>
+To:     Claudio Fontana <cfontana@suse.de>
+Cc:     Peter Maydell <peter.maydell@linaro.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH V2] KVM: X86: MMU: Use the correct inherited permissions
- to get shadow page
-Message-ID: <YLkYkcn+1MJhQYMf@google.com>
-References: <20201120095517.19211-1-jiangshanlai@gmail.com>
- <20210603052455.21023-1-jiangshanlai@gmail.com>
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Cameron Esfahani <dirty@apple.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>, qemu-devel@nongnu.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH 1/2] i386: reorder call to cpu_exec_realizefn in
+ x86_cpu_realizefn
+Message-ID: <20210603181605.apobefhv3ywbxlgj@habkost.net>
+References: <20210529091313.16708-1-cfontana@suse.de>
+ <20210529091313.16708-2-cfontana@suse.de>
+ <20210601184832.teij5fkz6dvyctrp@habkost.net>
+ <dade01d5-071e-75f7-481f-01f6d2ba907c@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210603052455.21023-1-jiangshanlai@gmail.com>
+In-Reply-To: <dade01d5-071e-75f7-481f-01f6d2ba907c@suse.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 03, 2021, Lai Jiangshan wrote:
-> From: Lai Jiangshan <laijs@linux.alibaba.com>
+On Thu, Jun 03, 2021 at 10:13:30AM +0200, Claudio Fontana wrote:
+> On 6/1/21 8:48 PM, Eduardo Habkost wrote:
+> > +Vitaly
+> > 
+> > On Sat, May 29, 2021 at 11:13:12AM +0200, Claudio Fontana wrote:
+> >> we need to expand features first, before we attempt to check them
+> >> in the accel realizefn code called by cpu_exec_realizefn().
+> >>
+> >> At the same time we need checks for code_urev and host_cpuid_required,
+> >> and modifications to cpu->mwait to happen after the initial setting
+> >> of them inside the accel realizefn code.
+> > 
+> > I miss an explanation why those 3 steps need to happen after
+> > accel realizefn.
+> > 
+> > I'm worried by the fragility of the ordering.  If there are
+> > specific things that must be done before/after
+> > cpu_exec_realizefn(), this needs to be clear in the code.
 > 
-> Commit 41074d07c78b ("KVM: MMU: Fix inherited permissions for emulated
-> guest pte updates") said role.access is common access permissions for
-> all ptes in this shadow page, which is the inherited permissions from
-> the parent ptes, and should not from any children pte.
+> Hi Eduardo,
 > 
-> But the commit did not enforce this definition when kvm_mmu_get_page()
-> is called in FNAME(fetch). Rather, it uses a whole combined access of
-
-Nit: I'd like to avoid "combined access" as "combined" has a specific meaning
-in Intel's EPT terminology.
-
-> the first accessing vitual address except the ternimating pte. And the
-                      ^^^^^^                    ^^^^^^^^^^^
-		      virtual                   terminating
-
-> permissions won't be checked again in next FNAME(fetch) since the spte
-> is present. It might fail to meet guest's expectation when guest uses
-> shared pagetables.
-
-Alternatively, I'd be completely ok not even mentioning commit 41074d07c78b.
-It's definitely a similar bug, but not directly related. 
-
-> For example, here is a shared pagetable:
->    pgd[]   pud[]        pmd[]            virtual address pointers
->                      /->pmd1(u--)->pte1(uw-)->page1 <- ptr1 (u--)
->         /->pud1(uw-)--->pmd2(uw-)->pte2(uw-)->page2 <- ptr2 (uw-)
->    pgd-|           (shared pmd[] as above)
->         \->pud2(u--)--->pmd1(u--)->pte1(uw-)->page1 <- ptr3 (u--)
->                      \->pmd2(uw-)->pte2(uw-)->page2 <- ptr4 (u--)
->   pud1 and pud2 point to the same pmd table, so:
->   ptr1 and ptr3 points to the same page.
->   ptr2 and ptr4 points to the same page.
+> indeed the initialization and realization code for x86 appears to be very sensitive to ordering.
+> This continues to be the case after the fix.
 > 
-> (pud1 and pud2 here are pud entries, not pud pagtable pointer
->  pmd1 and pmd2 here are pmd entries, not pmd pagtable pointer)
+> cpu_exec_realizefn
 > 
->   The guess read-accesses to ptr1 first. So the hypervisor gets the
-> shadow page table with role.access=u-- for ptr1's pud1 and ptr1's pmd1.
-> (Note: current pt->access is the combined access of pgd, pud1 and
-> pmd1, so it is "u--".  But the current code uses this pt->access to
-> get pagetable for pud1 which violate the definition in the comment
-> which should be the combined access of pgd, pud1, a.k.a "uw-".)
 > 
->   And then the guest write-accesses to ptr2, and the hypervisor
-> set up shadow page for ptr2.
-> (Note: current pt->access=uw-, but pud1 points to a shadow pmd
-> table with role.access=u--.  Since pud1 is present, the hypervisor
-> silencely accepts it without recheck the access in FNAME(fetch))
 > 
->   After that, the guess read-accesses to ptr3, the hypervisor
-> reused the same shadow pmd page table for pud2 as ptr1.
-> (Note: because current pt->access=u--, which is the access of pgd, pud2
-> and pmd1)
+> > 
+> >>
+> >> Partial Fix.
+> >>
+> >> Fixes: 48afe6e4eabf ("i386: split cpu accelerators from cpu.c, using AccelCPUClass")
+> > 
+> > Shouldn't this be
+> >   f5cc5a5c1686 ("i386: split cpu accelerators from cpu.c, using AccelCPUClass")
+> > ?
+> > 
+> > Also, it looks like part of the ordering change was made in
+> > commit 30565f10e907 ("cpu: call AccelCPUClass::cpu_realizefn in
+> > cpu_exec_realizefn").
+> > 
+> > 
+> > 
+> >> Signed-off-by: Claudio Fontana <cfontana@suse.de>
+> >> ---
+> >>  target/i386/cpu.c | 56 +++++++++++++++++++++++------------------------
+> >>  1 file changed, 28 insertions(+), 28 deletions(-)
+> >>
+> >> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> >> index 9e211ac2ce..6bcb7dbc2c 100644
+> >> --- a/target/i386/cpu.c
+> >> +++ b/target/i386/cpu.c
+> >> @@ -6133,34 +6133,6 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+> >>      Error *local_err = NULL;
+> >>      static bool ht_warned;
+> >>  
+> >> -    /* Process Hyper-V enlightenments */
+> >> -    x86_cpu_hyperv_realize(cpu);
+> > 
+> > Vitaly, is this reordering going to affect the Hyper-V cleanup
+> > work you are doing?  It seems harmless and it makes sense to keep
+> > the "realize" functions close together, but I'd like to confirm.
+> > 
+> >> -
+> >> -    cpu_exec_realizefn(cs, &local_err);
+> >> -    if (local_err != NULL) {
+> >> -        error_propagate(errp, local_err);
+> >> -        return;
+> >> -    }
+> >> -
+> >> -    if (xcc->host_cpuid_required && !accel_uses_host_cpuid()) {
+> >> -        g_autofree char *name = x86_cpu_class_get_model_name(xcc);
+> >> -        error_setg(&local_err, "CPU model '%s' requires KVM or HVF", name);
+> >> -        goto out;
+> >> -    }
+> >> -
+> >> -    if (cpu->ucode_rev == 0) {
+> >> -        /* The default is the same as KVM's.  */
+> >> -        if (IS_AMD_CPU(env)) {
+> >> -            cpu->ucode_rev = 0x01000065;
+> >> -        } else {
+> >> -            cpu->ucode_rev = 0x100000000ULL;
+> >> -        }
+> >> -    }
+> >> -
+> >> -    /* mwait extended info: needed for Core compatibility */
+> >> -    /* We always wake on interrupt even if host does not have the capability */
+> >> -    cpu->mwait.ecx |= CPUID_MWAIT_EMX | CPUID_MWAIT_IBE;
+> >> -
+> >>      if (cpu->apic_id == UNASSIGNED_APIC_ID) {
+> >>          error_setg(errp, "apic-id property was not initialized properly");
+> >>          return;
+> >> @@ -6190,6 +6162,34 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+> >>             & CPUID_EXT2_AMD_ALIASES);
+> >>      }
+> >>  
+> >> +    /* Process Hyper-V enlightenments */
+> >> +    x86_cpu_hyperv_realize(cpu);
+> >> +
+> >> +    cpu_exec_realizefn(cs, &local_err);
+> > 
+> > I'm worried by the reordering of cpu_exec_realizefn().  That
+> > function does a lot, and reordering it might have even more
+> > unwanted side effects.
+> > 
+> > I wonder if it wouldn't be easier to revert commit 30565f10e907
+> > ("cpu: call AccelCPUClass::cpu_realizefn in cpu_exec_realizefn").
 > 
->   At last, the guest writes to ptr4 without vmexit nor pagefault.
-> Which should cause pagefault as the guest expects.
+> the part that is wrong in that commit does not I think have to do with where the accel_cpu::cpu_realizefn() is called, but rather
+> the move of the call to cpu_exec_realizefn (now including the accel_cpu::cpu_realizefn) to the very beginning of the function.
+
+Oh, I didn't notice commit 30565f10e907 also moved the
+cpu_exec_realizefn() call to the beginning of the function.  So
+moving it back (like you do her) actually seems to be a good
+idea.
+
 > 
-> Any kind of shared pagetable might have the similar problem when in
-> virtual machine without TDP enabled if the permissions are different
-> from different ancestors.
+> This was done due to the fact that the accel-specific code needs to be called before the code:
 > 
-> In order to fix the problem, we change pt->access to be an array, and
-> any access in it will not combind accesses from child ptes.
-                            ^^^^^^^
-			    combine
-
-This typo aside, can we rewrite this paragraph and hoist it to the top?  I love
-the in-depth analysis, but the downside is that describing the change after the
-analysis makes it difficult to understand the actual code change.
-
-I'd also like to provide a more detailed explanation of why the fix works, which
-ties in a bit with the first two paragraphs.
-
-Maybe drop the first two paragraphs and combine the info into something like this?
-
-  When computing the access permissions of a shadow page, use the effective
-  permissions of the walk up to that point, i.e. the logic AND of its parents'
-  permissions.  Two guest PxE entries that point at the same table gfn need to
-  be shadowed with different shadow pages if their parents' permissions are
-  different.  KVM currently uses the effective permissions of the last
-  non-leaf entry for all non-leaf entries, which can lead to incorrectly
-  reusing a shadow page if a lower-level entry has more restrictve permissions,
-  and eventually result in a missing guest protection page fault.
-
-> The test code is: https://lore.kernel.org/kvm/20210603050537.19605-1-jiangshanlai@gmail.com/ 
-> Remember to test it with TDP disabled.
+> * if (cpu->ucode_rev == 0) {
 > 
-> The problem had existed long before the commit 41074d07c78b ("KVM: MMU:
-> Fix inherited permissions for emulated guest pte updates"), and it
-> is hard to find which is the culprit.  So there is no fixes tag here.
+> (meaning "use default if nothing accelerator specific has been set"), as this could be set by accel-specific code,
+> 
+> * cpu->mwait.ecx |= CPUID_MWAIT_EMX | CPUID_MWAIT_IBE;
+> 
+> (as the mwait is written to by cpu "host" kvm/hvf-specific code when enabling cpu pm),
+> 
+> * if (cpu->phys_bits && ...
+> 
+> (as the phys bits can be set by calling the host CPUID)
+> 
+> But I missed there that we cannot move the call before the expansion of cpu features,
+> as the accel realize code checks and enables additional features assuming expansion has already happened.
+> 
+> This was what was breaking the cpu "host" phys bits, even after correcting the cpu instance initialization order,
+> as the KVM/HVF -specific code would do the adjustment of phys bits to match the host only if:
+> 
+> * if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_LM) {
+> 
+> 
+> 
+> > 
+> > 
+> >> +    if (local_err != NULL) {
+> >> +        error_propagate(errp, local_err);
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    if (xcc->host_cpuid_required && !accel_uses_host_cpuid()) {
+> >> +        g_autofree char *name = x86_cpu_class_get_model_name(xcc);
+> >> +        error_setg(&local_err, "CPU model '%s' requires KVM or HVF", name);
+> >> +        goto out;
+> >> +    }
+> >> +
+> >> +    if (cpu->ucode_rev == 0) {
+> >> +        /* The default is the same as KVM's.  */
+> >> +        if (IS_AMD_CPU(env)) {
+> >> +            cpu->ucode_rev = 0x01000065;
+> >> +        } else {
+> >> +            cpu->ucode_rev = 0x100000000ULL;
+> >> +        }
+> >> +    }
+> >> +
+> >> +    /* mwait extended info: needed for Core compatibility */
+> >> +    /* We always wake on interrupt even if host does not have the capability */
+> >> +    cpu->mwait.ecx |= CPUID_MWAIT_EMX | CPUID_MWAIT_IBE;
+> >> +
+> > 
+> > The dependency between those lines and cpu_exec_realizefn() is
+> > completely unclear here.  What can we do to make this clearer and
+> > less fragile?
+> 
+> Should I add something similar to my comment above?
+> 
+> There _is_ something already in the patch that I added as I detected these dependencies,
+> but I notably did not mention the mwait one, and missed completely the cpu expansion issue.
+> 
+> It's in kvm-cpu.c:
+> 
+> static bool kvm_cpu_realizefn(CPUState *cs, Error **errp)
+> {
+>     /*                                                                                                                                      
+>      * The realize order is important, since x86_cpu_realize() checks if                                                                    
+>      * nothing else has been set by the user (or by accelerators) in                                                                        
+>      * cpu->ucode_rev and cpu->phys_bits.                                                                                                   
+>      *                                                                                                                                      
+>      * realize order:                                                                                                                       
+>      * kvm_cpu -> host_cpu -> x86_cpu                                                                                                       
+>      */
+> 
+> Maybe there is a better place to document this, where we could also describe in more detail the other dependencies?
 
-We definitely want a Fixes or manual Cc: stable@.  I think this is appropriate:
+I would describe it in (at least) two places:
 
-  Fixes: cea0f0e7ea54 ("[PATCH] KVM: MMU: Shadow page table caching")
+1. Documentation of AccelCPUClass.cpu_realizefn() should indicate
+   what is allowed and not allowed for people implementing
+   accelerators.
+2. Comments at x86_cpu_realizefn() indicating the dependencies
+   and why ordering is important.
 
-AFAICT, KVM didn't reuse shadow pages for PxEs with different parents.
+> 
+> On my side the main question would be: did I miss some other order dependency?
+> 
+> Knowing exactly what the current code assumptions are, and where those dependencies lie
+> would be preferable I think compared with reverting the commits.
 
-> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
-> ---
-> Changed from V1:
-> 	Update changelog only
+Absolutely.  I was just trying to figure out what's the simplest
+and most trivial fix possible for the issue.
 
+> 
+> Something able to cover this with reliable tests would be a good way to feel more confident with the resolution,
+> to make sure that something else is not hiding in there..
 
-Apologies for neglecting to respond to your questions many months ago.  
+Yes, this kind of bug should have been caught by automated test
+cases somehow.
 
-On Mon, Nov 30, 2020 at 5:31 PM Lai Jiangshan <jiangshanlai@gmail.com> wrote:
->
-> On Tue, Dec 1, 2020 at 1:41 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> > Hmm, yes, KVM would incorrectly handle this scenario.  But, the proposed patch
-> > would not address the issue as KVM always maps non-leaf shadow pages with full
-> > access permissions.
-> >
->
-> Is it possible to exactly copy the access permissions from the guest
-> for non-leaf shadow pages?
+> 
+> > 
+> > Note that this is not a comment on this fix, specifically, but on
+> > how the initialization ordering is easy to break here.
+> > 
+> > 
+> >>      /* For 64bit systems think about the number of physical bits to present.
+> >>       * ideally this should be the same as the host; anything other than matching
+> >>       * the host can cause incorrect guest behaviour.
+> >> -- 
+> >> 2.26.2
+> >>
+> > 
+> 
+> Thanks,
+> 
+> Claudio
+> 
 
-The answer is: my analysis was wrong.  KVM does map non-leaf shadow pages with
-full permissions, but changing the shadow page's access permissions causes KVM
-to use a different shadow page, which is key.  Using a different shadow page
-means that KVM creates a completely different tree and thus a different leaf
-SPTE (with more restricted permissions), even though the guest PTEs are one and
-the same.
+-- 
+Eduardo
 
-> Any protection from hypervisor (such as dirty track, rmap_write_protect) can
-> only play on the leaf shadow ptes.
->
-> > Can we have a testcase in kvm-unit-tests?  It's okay of course if it
-> > only fails with ept=0.
->
-> Yes, it may have a flaw with ept=0. I don't get what "It's okay of course"
-> means. Is it related to kvm-unit-tests? Or no cloud provider uses
-> ept=0?
-
-Paolo was saying that it's okay if the unit test relies on legacy shadow paging,
-as opposed to setting up nested EPT or neset NPT.
-
-> @@ -418,13 +418,15 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
->  		}
->  
->  		walker->ptes[walker->level - 1] = pte;
-> +
-> +		/* Convert to ACC_*_MASK flags for struct guest_walker.  */
-
-I'd drop the comment about converting the mask, that's mostly self-explanatory
-given the rest of the code.  What I'd like to do instead is explain why
-walker->pt_access[] needs to compute the parent permissiona and only the parent
-permissions.
-
-> +		walker->pt_access[walker->level - 1] = FNAME(gpte_access)(pt_access ^ walk_nx_mask);
-
-I think it makes sense to hoist this up to where table_gfn is set.  There's no
-harm in filling pt_access[] on a fault, e.g. if this point isn't reached because
-the pte is not-present.
-
-That will allow dropping pt_access, associate pt_access more closely with
-table_gfn, and make it more difficult to incorrectly incorporate the pte's
-permission in the pt_access, e.g. if someone in the future thinks using pt_access
-instead of pte_access is a typo.
-
-E.g. for the comment and dropping of pt_access;
-
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 823a5919f9fa..cefbaa917ad8 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -316,7 +316,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
-        pt_element_t pte;
-        pt_element_t __user *ptep_user;
-        gfn_t table_gfn;
--       u64 pt_access, pte_access;
-+       u64 pte_access;
-        unsigned index, accessed_dirty, pte_pkey;
-        unsigned nested_access;
-        gpa_t pte_gpa;
-@@ -362,7 +362,6 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
-        do {
-                unsigned long host_addr;
- 
--               pt_access = pte_access;
-                --walker->level;
- 
-                index = PT_INDEX(addr, walker->level);
-@@ -374,6 +373,17 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
-                walker->table_gfn[walker->level - 1] = table_gfn;
-                walker->pte_gpa[walker->level - 1] = pte_gpa;
- 
-+               /*
-+                * The access permissions of the table are the logical AND of
-+                * its parent's permissions, i.e. everything that's been
-+                * collected so far.  The PxE's pt_access is combined with its
-+                * its table_gfn (and other data) to generate the tag/key for
-+                * the cache of shadow pages.  Two guest PxEs that point at the
-+                * same table_gfn but have different parent permissions must
-+                * use different shadow pages.
-+                */
-+               walker->pt_access[walker->level - 1] = FNAME(gpte_access)(pte_access ^ walk_nx_mask);
-+
-                real_gpa = mmu->translate_gpa(vcpu, gfn_to_gpa(table_gfn),
-                                              nested_access,
-                                              &walker->fault);
-@@ -407,7 +417,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
-                 * Inverting the NX it lets us AND it like other
-                 * permission bits.
-                 */
--               pte_access = pt_access & (pte ^ walk_nx_mask);
-+               pte_access &= (pte ^ walk_nx_mask);
- 
-                if (unlikely(!FNAME(is_present_gpte)(pte)))
-                        goto error;
-@@ -418,9 +428,6 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
-                }
- 
-                walker->ptes[walker->level - 1] = pte;
--
--               /* Convert to ACC_*_MASK flags for struct guest_walker.  */
--               walker->pt_access[walker->level - 1] = FNAME(gpte_access)(pt_access ^ walk_nx_mask);
-        } while (!is_last_gpte(mmu, walker->level, pte));
- 
-        pte_pkey = FNAME(gpte_pkeys)(vcpu, pte);
