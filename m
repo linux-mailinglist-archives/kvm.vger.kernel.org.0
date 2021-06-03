@@ -2,210 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88D9339A134
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 14:38:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DBACA39A142
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 14:40:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230205AbhFCMju (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Jun 2021 08:39:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57297 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229994AbhFCMjt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 3 Jun 2021 08:39:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622723884;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6k5ciUK+sIaydjgCr/sudyzMRQeRQr7DMKnBdxTkkZE=;
-        b=BH5ZnRJ19k9yQN/KajHlq+lwhdHN4rbmWI9hTbEoCcqo9I8TWVN0/D23rJPZlJFKfKvW04
-        70L0NM6k/OUijMa7iew90WSSnDWVmtwGL8GPrtO7s/snTfHwSDggxbJZ6TeDTBMwwIDlm+
-        P/j74fTIpHpX0bH3l070CTCjkSQ6R8c=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-210-sb95rwDGOraIAPhEN80vPQ-1; Thu, 03 Jun 2021 08:38:03 -0400
-X-MC-Unique: sb95rwDGOraIAPhEN80vPQ-1
-Received: by mail-wm1-f72.google.com with SMTP id n127-20020a1c27850000b02901717a27c785so3387948wmn.9
-        for <kvm@vger.kernel.org>; Thu, 03 Jun 2021 05:38:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=6k5ciUK+sIaydjgCr/sudyzMRQeRQr7DMKnBdxTkkZE=;
-        b=rqSwo3qAC0K0S0gJnid0BSKRLp5Y72MO62Zv/KScubeFT5C8pRKDpsbnY91l67RgYq
-         cgNQfHPiORH+aNYQr6LLZG56SC0y1dU+8bJzSF6WpHt/kPgmgxFHdWwpibQFSRNlFQaB
-         vYkDAwMtUgcHqraYx5FWsBytrVPApLp0WNIUQrRp04huI0DnoBhkVSCh6flAQDaReDSj
-         gGros5H4Zw9Dhksz+rBdx2QpL3o/3cLfScMEWSdkCpagVFz/CVgWqswpKGZorLIPkXY3
-         0v1ULCeMZNHkrVoPohsnS6brRjva6NIpNhl9wRRQZJgkhk8FLREKozv1nbc363AnrSM2
-         mNrQ==
-X-Gm-Message-State: AOAM533QIwmksv0+JEXQ7bVX3BTkc9Oeu9CXQ7L0oiHtrdpX7lV/3/dn
-        9FLyugU/wB1OY67jpxPDbwcw/Tc3E9+IpY/BmtXySJS3EA6OkQtwHQjgSH+bbvQmpZQfK+xzlp6
-        0ZRQL/ADmfuzf
-X-Received: by 2002:a5d:4287:: with SMTP id k7mr25571964wrq.98.1622723882437;
-        Thu, 03 Jun 2021 05:38:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxM5Eysmn7AfpvK4TGIsHHlar7/8HnQegM1qMM4zo5AgkevEN94wjMw62F9oOehTj6OT0PCOA==
-X-Received: by 2002:a5d:4287:: with SMTP id k7mr25571955wrq.98.1622723882264;
-        Thu, 03 Jun 2021 05:38:02 -0700 (PDT)
-Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id c7sm5445129wml.33.2021.06.03.05.38.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jun 2021 05:38:01 -0700 (PDT)
-Date:   Thu, 3 Jun 2021 14:37:59 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Cc:     "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH] selftests: kvm: fix overlapping addresses in
- memslot_perf_test
-Message-ID: <20210603123759.ovlgws3ycnem4t3d@gator.home>
-References: <20210528191134.3740950-1-pbonzini@redhat.com>
- <285623f6-52e4-7f8d-fab6-0476a00af68b@oracle.com>
- <fc41bfc4-949f-03c5-3b20-2c1563ad7f62@redhat.com>
- <73511f2e-7b5d-0d29-b8dc-9cb16675afb3@oracle.com>
- <68bda0ef-b58f-c335-a0c7-96186cbad535@oracle.com>
- <DM8PR11MB5670B1AA392BF7502501D43B923C9@DM8PR11MB5670.namprd11.prod.outlook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+        id S230390AbhFCMmY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Jun 2021 08:42:24 -0400
+Received: from mail-dm6nam12on2060.outbound.protection.outlook.com ([40.107.243.60]:25568
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229994AbhFCMmX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Jun 2021 08:42:23 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UApN7oxGEEJGmC4xxKHwKq4WTOFCobrK+/zPmknmyfEZTbLbAccRIipuufaOoCcNFmagpa/nfQAZNwbErrGSdKe9YO8HTujLd+Q4LO026/w5L0DOctb1khxo26fJn1NMUjn+EHGp7k4s9j3GOKZB2sxl7OgTxl2Bqhib+sJQUAqmwPXNoZyg4k5dX06n6nyjhOuqWqrf/bbhkXOvveEKm7siuQ16FDzzu6OZtZQPnronR6OSQioTwChL3EXwL4U/nHFGsPHvIzd7ajEcjiiviwXgs38JrV81HLS44J1lJiXq1n6GT8bbty7kE7axYQKQVnnGLreUBZMrGv6iZYyemA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GArRFvb6qxrZlIgtI7dfHbOzQ1FaWL7a/m3kBuy5g2k=;
+ b=Qomy/BCNVnVizieSDJ3JBdKDOwIMl/8zP42sORJZBHW/JMuhAsP7w+wvj31HZQbRxSfWxNZyhYnvaxswoIrlIqHcgpdwLsmB4VFMkf/PLRjjb5kyCBgRr6K+GtVRCxkVlNZFcZlSQSp2B4lYHEld9f9mErgut48AZ34FJqFJVHIv1Y9CCywbJz2WRcau6GtA6VyryJGm3E4XcAFgl8aWNZGIeEz8zf66u5RDpxodZDeo+gc5wdN2hxKzsceFOjHm+6q63fFc86AZgHr9W+kjKYgq//Zgg9BUckPL8BfLZdpZsjF/uSWLpEkh3u8RGXYNSvbRr+Hd6c60Ql7FoO1x/Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GArRFvb6qxrZlIgtI7dfHbOzQ1FaWL7a/m3kBuy5g2k=;
+ b=OZhlczRXKNc7ELke5rC/ktaaN5WTOJ+M0wRRR9UKM9JxjWvy7vI9+lKJ1kL+DQdQaKRZ3nt69I/mDlE+vZfMM3iW8GnIxzD7CbalHxjv+UqfKnPcmwQLg+pIApC8dRF+72Yho519DEUU9BpNTxMWmxOldlNwJGD/qQJLQKmc+1/LfovevIbLo+7OI13UNn8VcZskAunQzKRWrF3If6O8vDY5dvUmJX46PnboBMXDerTMiWcLkypdbFk94ooKlLGCMmFtqzPtNcNawoGwvNzQ15k/i211sa77Lpu9A/NrUnHJ878f6Rvzz/Xlc5WDeXqjdDLPPrwUkyODWfwsmfzsuA==
+Authentication-Results: intel.com; dkim=none (message not signed)
+ header.d=none;intel.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5363.namprd12.prod.outlook.com (2603:10b6:208:317::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20; Thu, 3 Jun
+ 2021 12:40:37 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e%6]) with mapi id 15.20.4195.024; Thu, 3 Jun 2021
+ 12:40:37 +0000
+Date:   Thu, 3 Jun 2021 09:40:36 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Robin Murphy <robin.murphy@arm.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jason Wang <jasowang@redhat.com>
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+Message-ID: <20210603124036.GU1002214@nvidia.com>
+References: <20210602111117.026d4a26.alex.williamson@redhat.com>
+ <20210602173510.GE1002214@nvidia.com>
+ <20210602120111.5e5bcf93.alex.williamson@redhat.com>
+ <20210602180925.GH1002214@nvidia.com>
+ <20210602130053.615db578.alex.williamson@redhat.com>
+ <20210602195404.GI1002214@nvidia.com>
+ <20210602143734.72fb4fa4.alex.williamson@redhat.com>
+ <20210602224536.GJ1002214@nvidia.com>
+ <20210602205054.3505c9c3.alex.williamson@redhat.com>
+ <MWHPR11MB1886DC8ECF5D56FE485D13D58C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <DM8PR11MB5670B1AA392BF7502501D43B923C9@DM8PR11MB5670.namprd11.prod.outlook.com>
+In-Reply-To: <MWHPR11MB1886DC8ECF5D56FE485D13D58C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
+X-Originating-IP: [47.55.113.94]
+X-ClientProxiedBy: BL0PR02CA0037.namprd02.prod.outlook.com
+ (2603:10b6:207:3d::14) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (47.55.113.94) by BL0PR02CA0037.namprd02.prod.outlook.com (2603:10b6:207:3d::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.15 via Frontend Transport; Thu, 3 Jun 2021 12:40:37 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lomeK-0014tg-EE; Thu, 03 Jun 2021 09:40:36 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 30114161-4256-4950-b911-08d9268cc9c3
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5363:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB536324CE1F3FA6E154DB9BB5C23C9@BL1PR12MB5363.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: RVOKB+VvJY2a/8Zf/1vW8b032/AaGmd4HUmsjKlly6FX95KT8RNb5Iub3V975KizfnCxvoOzQseoaFcWI2JUkjnktm48dXMHXiueAJF4HIAEUH79FPHvpXd3LNgIgRnoSTjpq7UZkI0uYcZ+Y9ATiVz9qw9H+vrpIEYSxxUsl7Ch8jvFKuLOtAm++0nJsicG8nfBvMTWUwRhDxfuLWlJbjH7fxxZOPVvitscIS7bzPT5wsQvAsJrXxbmIToaVa36hvZFE7fwlSBsP+SC0YKuvB82L45fmMQoQfpBhBCyfR2puIKoB7ZYXOKaPTaJ4qb++yQpBvd2HB+mzhY7ZF7O6UBw/t6mpiXWIhNaeuwKH57nrT1zdp+F5r8fPe3Xxi1Qk0FLMj5qo7Y474L1FCjAvdZvozAz8bOk4msOUcvGC5ex6cAUHLZjgxCasDjixEdkLDghRMCOAW4xacTiKhuqsUGnSLiVfTlkz4HVBFNLayvn0haUEDbaDwmRH04fqOAb6y600bH29jlIM2lv0ZKGDek/6s0WP3hPIrfGdTdJPkO/dYRFJhVNanFDnEckxkxeAbGozxBebdbJD5CHCdl+Cgy/aO8Hsr3u22diEnI7D9E=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39850400004)(366004)(136003)(346002)(396003)(9746002)(8676002)(8936002)(9786002)(66476007)(36756003)(66946007)(2616005)(6916009)(426003)(86362001)(5660300002)(83380400001)(66556008)(478600001)(4326008)(1076003)(2906002)(38100700002)(33656002)(186003)(26005)(7416002)(316002)(54906003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?YZdnZq8Xpi4btXc9KAfyLyuoyV1XX7dAa9OVECaUV8r8yXLcz6bgw0Cc3hkC?=
+ =?us-ascii?Q?ypT/JISRfugP9NO6mmScWUXlu1YBE51czRc0/ETQIT8KZJS0erIlyoxHtxjC?=
+ =?us-ascii?Q?V3s3B0oHJnjX76TNNbEyJziP5fG47AEzx7+p7k+BLo5yqz64yqTBIBUB5CmE?=
+ =?us-ascii?Q?95eNZCWJxSw96VyaCD26wHyj5vk40lWscYkDy6bX0dJ040wkYhWYMAAJDDt7?=
+ =?us-ascii?Q?OHCf0hstVOBf0INic+R4aUYxIwnua9TMxS2SKvcyd106uQbGk92fJr9aiSB7?=
+ =?us-ascii?Q?i74QNyp9/HckbFotb6GBV8OP9Dm0SjyhrjCz6iuXlZAPuegnFGrUHSArgAFg?=
+ =?us-ascii?Q?n5g/u1bKt1HXTS5YVs4rYU1dRiABh1wx3BCf4cGuCGgJ/UFzCGTGeQ7toMXX?=
+ =?us-ascii?Q?axoXHZVMEvCA7dgVa/aYmlSVy2+36lnQOghbqoCFoZbDDURcR6VgXtk2XWU3?=
+ =?us-ascii?Q?pPmLNS7LL3a/Vc+PoxlTcwaTjgEnWrxirvdpXkkb9cYqTvhB5RFqR/VHWLF3?=
+ =?us-ascii?Q?jo0Av+mL8sZm+JUpOeSOlLL3IOkCzV8W95aGytS+KNIGFHX6/a6sBU9jH4qK?=
+ =?us-ascii?Q?3vugSzMQSCIRXpwBVuwkMVKXIR9zuI6HDYzRiDEd8wSPsb1Zm9hODR5LJHTj?=
+ =?us-ascii?Q?F3zpUVomxKNNPTddbc5BZpwlJTCInda2nRUjnt+ejCkESjfH8YDpyosL/Ryu?=
+ =?us-ascii?Q?kKm5hwYI+7LmLhRUg+jtmq5d1uhU/DulFb2Z11sEw9nqAanbMXTCcp3xFMk+?=
+ =?us-ascii?Q?mhjzSwxNbjCg3ZPPCNicb4z5BOHRUSeyYqrGRBOEfK94oiM+WguMcC5T5tx/?=
+ =?us-ascii?Q?Rql7GAJVFfCl5MCXcncZkO9qNEuSjasM6oXxi16106drWer4w3eADi9dEaDm?=
+ =?us-ascii?Q?wteeA4iRgclNxl9JKAqAZtig8N9kR6yN/OBB4dcbqWQmTWcoI1195jvugJuv?=
+ =?us-ascii?Q?vhviRgA9IL2KxYpgEj9jcoL/ako08KXR9vBxyd7fe2L6MqwdvXfck2JU35xw?=
+ =?us-ascii?Q?MAFZo2sPLUW3vF4VWB0Y5RYJ/mJqDZKFYWddRFCMB6fk78T2muoWN14ySsvU?=
+ =?us-ascii?Q?OBjkytbY52u5cSxNRU+bKdid7Q/vKdZg6ZpN7CyETvVU641ItuFk5h1IMqJo?=
+ =?us-ascii?Q?YGkSB+tlwCf7FDwxytjITOxbPG5ctXz5R1zjHG4E/pIMHmB4icV4OUoLAVIR?=
+ =?us-ascii?Q?Dyky6Ee050CL363p7BDbxKWO5qNB6WWRXRxxRTG6GgQxh3qnaPcNzxAiodIN?=
+ =?us-ascii?Q?yLlRN6/HeIQjdK4MR6gUQXpAtz2bVrGRaJ4G+nTMJg6bcdfYqiu0GGTq5qgC?=
+ =?us-ascii?Q?zoX3UWhgxFKhYw10jMRtr6SY?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 30114161-4256-4950-b911-08d9268cc9c3
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2021 12:40:37.3154
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jY9GE5IAfmndnKsZTxi/if4ATFQjXMQISOgpciP/UcO6rany+/0GbaBplSIZqXQt
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5363
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 03, 2021 at 05:26:33AM +0000, Duan, Zhenzhong wrote:
-> > -----Original Message-----
-> > From: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-> > Sent: Thursday, June 3, 2021 7:07 AM
-> > To: Paolo Bonzini <pbonzini@redhat.com>; Duan, Zhenzhong
-> > <zhenzhong.duan@intel.com>
-> > Cc: linux-kernel@vger.kernel.org; kvm@vger.kernel.org; Andrew Jones
-> > <drjones@redhat.com>
-> > Subject: Re: [PATCH] selftests: kvm: fix overlapping addresses in
-> > memslot_perf_test
+On Thu, Jun 03, 2021 at 03:22:27AM +0000, Tian, Kevin wrote:
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Thursday, June 3, 2021 10:51 AM
 > > 
-> > On 30.05.2021 01:13, Maciej S. Szmigiero wrote:
-> > > On 29.05.2021 12:20, Paolo Bonzini wrote:
-> > >> On 28/05/21 21:51, Maciej S. Szmigiero wrote:
-> > >>> On 28.05.2021 21:11, Paolo Bonzini wrote:
-> > >>>> The memory that is allocated in vm_create is already mapped close
-> > >>>> to GPA 0, because test_execute passes the requested memory to
-> > >>>> prepare_vm.  This causes overlapping memory regions and the test
-> > >>>> crashes.  For simplicity just move MEM_GPA higher.
-> > >>>>
-> > >>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > >>>
-> > >>> I am not sure that I understand the issue correctly, is
-> > >>> vm_create_default() already reserving low GPAs (around 0x10000000)
-> > >>> on some arches or run environments?
-> > >>
-> > >> It maps the number of pages you pass in the second argument, see
-> > >> vm_create.
-> > >>
-> > >>    if (phy_pages != 0)
-> > >>      vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-> > >>                                  0, 0, phy_pages, 0);
-> > >>
-> > >> In this case:
-> > >>
-> > >>    data->vm = vm_create_default(VCPU_ID, mempages, guest_code);
-> > >>
-> > >> called here:
-> > >>
-> > >>    if (!prepare_vm(data, nslots, maxslots, tdata->guest_code,
-> > >>                    mem_size, slot_runtime)) {
-> > >>
-> > >> where mempages is mem_size, which is declared as:
-> > >>
-> > >>          uint64_t mem_size = tdata->mem_size ? : MEM_SIZE_PAGES;
-> > >>
-> > >> but actually a better fix is just to pass a small fixed value (e.g.
-> > >> 1024) to vm_create_default, since all other regions are added by hand
+> > On Wed, 2 Jun 2021 19:45:36 -0300
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > 
+> > > On Wed, Jun 02, 2021 at 02:37:34PM -0600, Alex Williamson wrote:
 > > >
-> > > Yes, but the argument that is passed to vm_create_default() (mem_size
-> > > in the case of the test) is not passed as phy_pages to vm_create().
-> > > Rather, vm_create_with_vcpus() calculates some upper bound of extra
-> > > memory that is needed to cover that much guest memory (including for
-> > > its page tables).
+> > > > Right.  I don't follow where you're jumping to relaying DMA_PTE_SNP
+> > > > from the guest page table... what page table?
 > > >
-> > > The biggest possible mem_size from memslot_perf_test is 512 MiB + 1
-> > > page, according to my calculations this results in phy_pages of 1029
-> > > (~4 MiB) in the x86-64 case and around 1540 (~6 MiB) in the s390x case
-> > > (here I am not sure about the exact number, since s390x has some
-> > > additional alignment requirements).
+> > > I see my confusion now, the phrasing in your earlier remark led me
+> > > think this was about allowing the no-snoop performance enhancement in
+> > > some restricted way.
 > > >
-> > > Both values are well below 256 MiB (0x10000000UL), so I was wondering
-> > > what kind of circumstances can make these allocations collide (maybe I
-> > > am missing something in my analysis).
+> > > It is really about blocking no-snoop 100% of the time and then
+> > > disabling the dangerous wbinvd when the block is successful.
+> > >
+> > > Didn't closely read the kvm code :\
+> > >
+> > > If it was about allowing the optimization then I'd expect the guest to
+> > > enable no-snoopable regions via it's vIOMMU and realize them to the
+> > > hypervisor and plumb the whole thing through. Hence my remark about
+> > > the guest page tables..
+> > >
+> > > So really the test is just 'were we able to block it' ?
 > > 
-> > I see now that there has been a patch merged last week called
-> > "selftests: kvm: make allocation of extra memory take effect" by Zhenzhong
-> > that now allocates also the whole memory size passed to
-> > vm_create_default() (instead of just page tables for that much memory).
-> > 
-> > The commit message of this patch says that "perf_test_util and
-> > kvm_page_table_test use it to alloc extra memory currently", however both
-> > kvm_page_table_test and lib/perf_test_util framework explicitly add the
-> > required memory allocation by doing a vm_userspace_mem_region_add()
-> > call for the same memory size that they pass to vm_create_default().
-> > 
-> > So now they allocate this memory twice.
-> > 
-> > @Zhenzhong: did you notice improper operation of either
-> > kvm_page_table_test or perf_test_util-based tests (demand_paging_test,
-> > dirty_log_perf_test,
-> > memslot_modification_stress_test) before your patch?
-> No
+> > Yup.  Do we really still consider that there's some performance benefit
+> > to be had by enabling a device to use no-snoop?  This seems largely a
+> > legacy thing.
 > 
-> > 
-> > They seem to work fine for me without the patch (and I guess other people
-> > would have noticed earlier, too, if they were broken).
-> > 
-> > After this patch not only these tests allocate their memory twice but it is
-> > harder to make vm_create_default() allocate the right amount of memory for
-> > the page tables in cases where the test needs to explicitly use
-> > vm_userspace_mem_region_add() for its allocations (because it wants the
-> > allocation placed at a specific GPA or in a specific memslot).
-> > 
-> > One has to basically open-code the page table size calculations from
-> > vm_create_with_vcpus() in the particular test then, taking also into account
-> > that vm_create_with_vcpus() will not only allocate the passed memory size
-> > (calculated page tables size) but also behave like it was allocating space for
-> > page tables for these page tables (even though the passed memory size itself
-> > is supposed to cover them).
-> Looks we have different understanding to the parameter extra_mem_pages of vm_create_default().
-> 
-> In your usage, extra_mem_pages is only used for page table calculations, real extra memory allocation
-> happens in the extra call of vm_userspace_mem_region_add().
+> Yes, there is indeed performance benefit for device to use no-snoop,
+> e.g. 8K display and some imaging processing path, etc. The problem is
+> that the IOMMU for such devices is typically a different one from the
+> default IOMMU for most devices. This special IOMMU may not have
+> the ability of enforcing snoop on no-snoop PCI traffic then this fact
+> must be understood by KVM to do proper mtrr/pat/wbinvd virtualization 
+> for such devices to work correctly.
 
-Yes, this is the meaning that kvm selftests has always had for
-extra_mem_pages of vm_create_default(). If we'd rather have a different
-meaning, that's fine, but we need to change all the callers of the
-function as well.
+Or stated another way:
 
-If we decide to leave vm_create_default() the way it was by reverting this
-patch, then maybe we should consider renaming the parameter and/or
-documenting the function.
+We in Linux don't have a way to control if the VFIO IO page table will
+be snoop or no snoop from userspace so Intel has forced the platform's
+IOMMU path for the integrated GPU to be unable to enforce snoop, thus
+"solving" the problem.
 
-Thanks,
-drew
+I don't think that is sustainable in the oveall ecosystem though.
 
-> 
-> In my understanding, extra_mem_pages is used for a VM who wants a custom memory size in slot0, 
-> rather than the default DEFAULT_GUEST_PHY_PAGES size.
-> 
-> I understood your comments and do agree that my patch bring some trouble to your code, sorry for that.
-> I'm fine to revert that patch and I think it's better to let the maintainers to decide what extra_mem_pages
-> Is used for.
-> 
-> Thanks
-> Zhenzhong
-> > 
-> > Due to the above, I suspect the previous behavior was, in fact, correct.
-> > 
-> > Thanks,
-> > Maciej
+'qemu --allow-no-snoop' makes more sense to me
 
+> When discussing I/O page fault support in another thread, the consensus
+> is that an device handle will be registered (by user) or allocated (return
+> to user) in /dev/ioasid when binding the device to ioasid fd. From this 
+> angle we can register {ioasid_fd, device_handle} to KVM and then call 
+> something like ioasidfd_device_is_coherent() to get the property. 
+> Anyway the coherency is a per-device property which is not changed 
+> by how many I/O page tables are attached to it.
+
+It is not device specific, it is driver specific
+
+As I said before, the question is if the IOASID itself can enforce
+snoop, or not. AND if the device will issue no-snoop or not.
+
+Devices that are hard wired to never issue no-snoop are safe even with
+an IOASID that cannot enforce snoop. AFAIK really only GPUs use this
+feature. Eg I would be comfortable to say mlx5 never uses the no-snoop
+TLP flag.
+
+Only the vfio_driver could know this.
+
+Jason
