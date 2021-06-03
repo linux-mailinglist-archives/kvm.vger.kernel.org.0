@@ -2,93 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05D2B39A22D
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 15:27:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C88239A250
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 15:37:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230127AbhFCN3m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Jun 2021 09:29:42 -0400
-Received: from smtp-fw-80006.amazon.com ([99.78.197.217]:5151 "EHLO
-        smtp-fw-80006.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230059AbhFCN3l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Jun 2021 09:29:41 -0400
+        id S230129AbhFCNit (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Jun 2021 09:38:49 -0400
+Received: from mail-ot1-f43.google.com ([209.85.210.43]:41875 "EHLO
+        mail-ot1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229957AbhFCNis (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Jun 2021 09:38:48 -0400
+Received: by mail-ot1-f43.google.com with SMTP id 36-20020a9d0ba70000b02902e0a0a8fe36so5732274oth.8
+        for <kvm@vger.kernel.org>; Thu, 03 Jun 2021 06:36:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1622726877; x=1654262877;
-  h=from:to:cc:subject:date:message-id:mime-version;
-  bh=mhdX3ValGWDxD19fMXddG/g8FPmralooTe7o3wFMNuw=;
-  b=WmIQva4yowCcEsAF1g4knywDRR54JfwPtaHqnmzhYU+GPEK40hZJIUuf
-   OUD8G/Vcer8spO82b1yAROmloxAvgP88qrf/E/zsFQGgHAVS6rLP2Fh4b
-   oO2wPKLFFfpvJGhFdwOTIqTdCoDRgeufWSGvVth0Hblnagc4vD8+Zn6y6
-   k=;
-X-IronPort-AV: E=Sophos;i="5.83,246,1616457600"; 
-   d="scan'208";a="4731771"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-1a-7d76a15f.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP; 03 Jun 2021 13:27:49 +0000
-Received: from EX13D28EUC003.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1a-7d76a15f.us-east-1.amazon.com (Postfix) with ESMTPS id 69B0BA2086;
-        Thu,  3 Jun 2021 13:27:45 +0000 (UTC)
-Received: from uc8bbc9586ea454.ant.amazon.com (10.43.161.201) by
- EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
- id 15.0.1497.18; Thu, 3 Jun 2021 13:27:39 +0000
-From:   Siddharth Chandrasekaran <sidcha@amazon.de>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SSOZn7NeOxtNAr4b0FWuz+EfX/KEGNf2pixj/JYi27A=;
+        b=b2ZiPMTMK0z2jIOFY2UNLrgwmt+7m8+y8A0XTLvoF9Z8GLkdoO4vh+/OkwfbxSPOa9
+         E+VjhvpG2v0CzpGPM+fdgsMfJOxK5Oiix3ApM55K0ZBCiD8LbTACd1XYnwgDVRhll0XT
+         m0UNRuKzJrIHCM1kVtG3vd+9/LMRZJmMAPnyjX2s2+JRUQWawHqxIkTEWxZn8cBzlWKw
+         dyYTaRwg6biI8J70RfcYIX0vqQ5VipfmLXwJ8ymiUxSM0bW6iE4lgfFaUmtd888BIc83
+         1bvMyhJZXdTr3nnBko1jytmqVKuMNm5N3jiREZuptB+HJ9yM8jb9TWlfxl6hagWc6rGb
+         rAog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SSOZn7NeOxtNAr4b0FWuz+EfX/KEGNf2pixj/JYi27A=;
+        b=KjkF/xc7917NGR5uGH7VaEK1vUjrp7G63WX4cLclUBIzU0jiAARR9K0G4ZKCE1CCgc
+         MKidgNkApQOgHTB218j/CtpFQLusivQz9d1JGETW67PmEBd99HyehT79OKhUTrHPAJMK
+         2f+TIr46HYlAX95yXXnzcFnsxM0+SsaH1Yp0KsSFzZ9RrIAD1dJDYrCDy1ue6UI9zUEj
+         cdNBvaBYrpz0V52fiG3A8Aw8Oi7w/wdgD9DO4XpT7r9pHOY0py4DAskytD8C8RHPOWUa
+         v04AMHOxf6fRdA5s+XkK1Xag1IwdcPCSgV7CDuAmVMt9KwWcy1xV5YlIB2ZumkHiOomW
+         dolA==
+X-Gm-Message-State: AOAM531Q1V0BWV1biyW9UGL7aTMbNXWbt1zUfbjy46TtASOVxvRSexU6
+        PN/rJOjuuUcKOtXPVazCQX5y2io3+15JJtBDO1jL0g==
+X-Google-Smtp-Source: ABdhPJyyRDeU6xsWT9ff4ufDNsEg24ZcRpZFsQAYVpwmpMHnLCT8tvYOzrcQqm8NpZv/XYnKbtEH+GzQCJG5rno+WkQ=
+X-Received: by 2002:a9d:5786:: with SMTP id q6mr30221203oth.56.1622727351073;
+ Thu, 03 Jun 2021 06:35:51 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210525051204.1480610-1-tao3.xu@intel.com> <871r9k36ds.fsf@vitty.brq.redhat.com>
+ <660ceed2-7569-6ce6-627a-9a4e860b8aa9@intel.com>
+In-Reply-To: <660ceed2-7569-6ce6-627a-9a4e860b8aa9@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 3 Jun 2021 06:35:40 -0700
+Message-ID: <CALMp9eSVK_ZszVS83H6vPN1ZY3BqHwK0OKAn_Bj4mUBJBqO4Bw@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: VMX: Enable Notify VM exit
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, Tao Xu <tao3.xu@intel.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>
-CC:     Siddharth Chandrasekaran <sidcha@amazon.de>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH] KVM: hyper-v: housekeeping: Remove unnecessary type cast
-Date:   Thu, 3 Jun 2021 15:27:12 +0200
-Message-ID: <20210603132712.518-1-sidcha@amazon.de>
-X-Mailer: git-send-email 2.17.1
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.43.161.201]
-X-ClientProxiedBy: EX13D38UWC004.ant.amazon.com (10.43.162.204) To
- EX13D28EUC003.ant.amazon.com (10.43.164.43)
+        "H . Peter Anvin" <hpa@zytor.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove unnecessary type cast of 'u8 instructions[]' to
-'unsigned char *'.
+On Wed, Jun 2, 2021 at 6:25 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+>
+> On 6/2/2021 6:31 PM, Vitaly Kuznetsov wrote:
+> > Tao Xu <tao3.xu@intel.com> writes:
+> >
+> >> There are some cases that malicious virtual machines can cause CPU stuck
+> >> (event windows don't open up), e.g., infinite loop in microcode when
+> >> nested #AC (CVE-2015-5307). No event window obviously means no events,
+> >> e.g. NMIs, SMIs, and IRQs will all be blocked, may cause the related
+> >> hardware CPU can't be used by host or other VM.
+> >>
+> >> To resolve those cases, it can enable a notify VM exit if no event
+> >> window occur in VMX non-root mode for a specified amount of time
+> >> (notify window). Since CPU is first observed the risk of not causing
+> >> forward progress, after notify window time in a units of crystal clock,
+> >> Notify VM exit will happen. Notify VM exit can happen incident to delivery
+> >> of a vectored event.
+> >>
+> >> Expose a module param for configuring notify window, which is in unit of
+> >> crystal clock cycle.
+> >> - A negative value (e.g. -1) is to disable this feature.
+> >> - Make the default as 0. It is safe because an internal threshold is added
+> >> to notify window to ensure all the normal instructions being coverd.
+> >> - User can set it to a large value when they want to give more cycles to
+> >> wait for some reasons, e.g., silicon wrongly kill some normal instruction
+> >> due to internal threshold is too small.
+> >>
+> >> Notify VM exit is defined in latest Intel Architecture Instruction Set
+> >> Extensions Programming Reference, chapter 9.2.
+> >>
+> >> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> >> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> >> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> >> ---
+> >>
+> >> Changelog:
+> >> v2:
+> >>       Default set notify window to 0, less than 0 to disable.
+> >>       Add more description in commit message.
+> >
+> > Sorry if this was already discussed, but in case of nested
+> > virtualization and when L1 also enables
+> > SECONDARY_EXEC_NOTIFY_VM_EXITING, shouldn't we just reflect NOTIFY exits
+> > during L2 execution to L1 instead of crashing the whole L1?
+> >
+>
+> yes. If we expose it to nested, it should reflect the Notify VM exit to
+> L1 when L1 enables it.
+>
+> But regarding nested, there are more things need to be discussed. e.g.,
+> 1) It has dependence between L0 and L1, for security consideration. When
+> L0 enables it, it shouldn't be turned off during L2 VM is running.
+>     a. Don't expose to L1 but enable for L1 when L2 VM is running.
+>     b. expose it to L1 and force it enabled.
+>
+> 2) When expose it to L1, vmcs02.notify_window needs to be
+> min(L0.notify_window, L1.nofity_window)
 
-Signed-off-by: Siddharth Chandrasekaran <sidcha@amazon.de>
----
- arch/x86/kvm/hyperv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index f00830e5202f..7d9eb13174b6 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1252,7 +1252,7 @@ static int kvm_hv_set_msr_pw(struct kvm_vcpu *vcpu, u32 msr, u64 data,
- 		i += 3;
- 
- 		/* ret */
--		((unsigned char *)instructions)[i++] = 0xc3;
-+		instructions[i++] = 0xc3;
- 
- 		addr = data & HV_X64_MSR_HYPERCALL_PAGE_ADDRESS_MASK;
- 		if (kvm_vcpu_write_guest(vcpu, addr, instructions, i))
--- 
-2.17.1
-
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
-
+I don't think this can be a simple 'min', since L1's clock may run at
+a different frequency from L0's clock.
