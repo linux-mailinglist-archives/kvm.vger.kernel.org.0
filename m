@@ -2,203 +2,293 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 54C71399766
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 03:11:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAC63399774
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 03:24:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229810AbhFCBNl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Jun 2021 21:13:41 -0400
-Received: from mga12.intel.com ([192.55.52.136]:40211 "EHLO mga12.intel.com"
+        id S229629AbhFCBZx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Jun 2021 21:25:53 -0400
+Received: from mga07.intel.com ([134.134.136.100]:47161 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229568AbhFCBNk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Jun 2021 21:13:40 -0400
-IronPort-SDR: lZYfBjrYYvgLHZaSrKaiOsd/ae1WHAWTyCDGS5/4a3BdqJoghOYvUbHXSDOZ4Pv464ZtZDEq3S
- rqxxQ3PI9Gzw==
-X-IronPort-AV: E=McAfee;i="6200,9189,10003"; a="183616418"
+        id S229553AbhFCBZw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Jun 2021 21:25:52 -0400
+IronPort-SDR: 0ycyX6+wmu39oa6olVysq4wAuekpktNeYMsnTHYZJjfxWebsxTPlw64WxdNo/qxZ9EofZiRGZH
+ xXB4UfOQJSdQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,10003"; a="267807568"
 X-IronPort-AV: E=Sophos;i="5.83,244,1616482800"; 
-   d="scan'208";a="183616418"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2021 18:11:56 -0700
-IronPort-SDR: mq3rksswdiogvmlpGd6brqV/0DrPQTIn2yEMIOuatX18nc/8Vgo/Pjl5NXIKLERBMdztc2hsUH
- MJRbq0XHxnxQ==
+   d="scan'208";a="267807568"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2021 18:24:07 -0700
+IronPort-SDR: qA9qUjBvb+5TD/Nks0AU68u+53SP3RG6LcdoEotwk7ipkjAj3EXku/FszvlXqvaXEdeSvsiKQh
+ 4s70yptSPkcg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.83,244,1616482800"; 
-   d="scan'208";a="417146598"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orsmga002.jf.intel.com with ESMTP; 02 Jun 2021 18:11:55 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.4; Wed, 2 Jun 2021 18:11:54 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4
- via Frontend Transport; Wed, 2 Jun 2021 18:11:54 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.176)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.4; Wed, 2 Jun 2021 18:11:54 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R+11ocAvKT8qldUWYABe6s75CNPtCEpj99tvoLqbimL/dEy670E7Bg2H4ea/Cyb6aA4ESjYqpmUY8/crrMp2pytCMkbmoRNTsutkN6QCEqcO/3AsQEMC7B71dVCAwM8VCsrN5qK0cUOaoXFt92zHSJgUcV84AewbkbHs03DlCtRFprKAR829hWkFWjePTka1fgYh8qhTBNoBaf34R10Qdg/MOxUewsBdBcPtJQBjIHM+oTLZYHnwi3jckoSlMoVzboUWyiZ968PCUaphqw7W4Ch2671Xhx9I/SLWtfPgf8YcaePXxIVzoa6zq3YcbXbY6qkR0UhJqS4+pHfyf2lkBw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wPwW51P//vMq6YsQswokpGQYC9fQvJZHpKBlLz2vf8I=;
- b=La2mlitWxXs91S7rj9uZc+3qLvB+xbF4ZV1/Tr9XvjvNAVtLSwlYWKR1WdhCbpjjjZ78OLCIvvIL3hla2a/mvf7QFpRYWm5HDCUAitZj1cQYvW0FUKgltANp2UVSuGMowjGxuvm2Q9NqdGu+8uVp72k8PGxicmHg15wn7OgGlejKZkoB/ZQo0oEJ6yTkIHY9XoSpxc9cJNsABno/2uIit7rJ5oYvFZIMI4L4V7THSkG9+w6Mw3Gu6xXlOYwMzen9llYG5qkk5MnxRnzOYS3115ohPLcIzxWs6y+WJDm0g5QDTFkjr0/S2a38TVLSU21J1wDsOsWsU1ilaQcJr5WUag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wPwW51P//vMq6YsQswokpGQYC9fQvJZHpKBlLz2vf8I=;
- b=ndF043+fBfIP6dq220yJeu6COcBB8Y8aKGb08WhA+V+qP18597MBDVBT3lwRA1EkMKTVtTxDJakgWghoHQ+c68L1/xh0XHHQk87cgUacgnM3FYScrwftL4EGeBubuLiM1Wg0Yddj161zHDg++Tx0Lve1dJOdKvwmNHH3mtsCxUY=
-Received: from MWHPR11MB1886.namprd11.prod.outlook.com (2603:10b6:300:110::9)
- by MWHPR11MB1614.namprd11.prod.outlook.com (2603:10b6:301:11::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.20; Thu, 3 Jun
- 2021 01:11:37 +0000
-Received: from MWHPR11MB1886.namprd11.prod.outlook.com
- ([fe80::6597:eb05:c507:c6c1]) by MWHPR11MB1886.namprd11.prod.outlook.com
- ([fe80::6597:eb05:c507:c6c1%12]) with mapi id 15.20.4173.030; Thu, 3 Jun 2021
- 01:11:37 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "vkoul@kernel.org" <vkoul@kernel.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Dey, Megha" <megha.dey@intel.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [PATCH v6 00/20] Add VFIO mediated device support and DEV-MSI
- support for the idxd driver
-Thread-Topic: [PATCH v6 00/20] Add VFIO mediated device support and DEV-MSI
- support for the idxd driver
-Thread-Index: AQHXTqAZRXZQVBJp50eOXR3CymY0rKrxt7OAgA82YYCAAH+rgIAAHwJQ
-Date:   Thu, 3 Jun 2021 01:11:37 +0000
-Message-ID: <MWHPR11MB188664D9E7CA60782B75AC718C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
-References: <162164243591.261970.3439987543338120797.stgit@djiang5-desk3.ch.intel.com>
- <20210523232219.GG1002214@nvidia.com>
- <86cde154-37c7-c00d-b0c6-06b15b50dbf7@intel.com>
- <20210602231747.GK1002214@nvidia.com>
-In-Reply-To: <20210602231747.GK1002214@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-version: 11.5.1.3
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-authentication-results: nvidia.com; dkim=none (message not signed)
- header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [192.198.142.24]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 961dedea-6d8f-4ef1-130a-08d9262c897d
-x-ms-traffictypediagnostic: MWHPR11MB1614:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr,ExtFwd
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR11MB1614BAF43F4BE239D623DCA48C3C9@MWHPR11MB1614.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6430;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: KX6kUGh7yh6rCZDFdBpyIQO9CidwoERRiyGL1ti9m7PiSy/CGGzIS7IjPOwHgm23qomdSrVISxCaxRWO0azv7VJhGHG2+5DTPC2WxgHYz9Zr5mB4jkCfYrrdfMIOeulwEZ28b1JSvRAOikHYufgkSzBC2nfk6I/uqR05mXGmD8S9DnIFJ2FRwTxQCtJhVk+XQQFwH0L6F5ULARsmMFw/Hk6c33p5cGrLPMtAjSRWfhbd5j69MfJEzQRkU++WbQEoE6hI28+yOxPbCw8xRNQUi+AY0Npkr2EtN9sLSB2UvAYO9N0eqPBnefBoxjnIVCbzByKD6PeENrgXitHFNqdEFeUCKXpv3Z2Py4FJWpEElY+o1hOb/QhuXj9CVw7xcZQCUKeic14mnxxfVNaX1E9exwO0HoceoXtLKGGXOZaSWEacXPho8zWGcqCvzArz+nG5RSDANHW6U+vymW+LO+gAmp1uNBGzaadwpd0A4HF/ULE9pn97bbfzQTS0hRYJ2vxND/Z7rZBef7o8EZ4e6+LA9XBRY19W7GZdOtUy0t8YplCxG2dc9lclEiK6T6GYW0S9af+t9DApOrJaoqvN9jILb9HBqFurNU5HvS6FQTbenVM=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1886.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(136003)(396003)(346002)(39860400002)(376002)(52536014)(5660300002)(76116006)(186003)(55016002)(66446008)(64756008)(478600001)(66556008)(66476007)(66946007)(122000001)(2906002)(33656002)(26005)(110136005)(316002)(54906003)(6506007)(53546011)(7696005)(71200400001)(4326008)(7416002)(6636002)(8676002)(86362001)(9686003)(38100700002)(8936002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?utf-8?B?SnpDRllqc0tGeU53SW84WitGamV1bGh3NWQvUXVHRXBBUHN1QmFoemorcE02?=
- =?utf-8?B?SGtyRHB6RW9yQlJ2MjFyVll5YVFMendUNEdlSTlhQ3pJMXBjajJTWURGNjNF?=
- =?utf-8?B?NEZCc3JFTk5ZSUlVRTExdkJMVlJldXovMS91VVVSZ0dlQUh6eHA2RHhxTE1p?=
- =?utf-8?B?VnpGVFhFQitXTEZTUnJPUmJZek5hYXNmWnhCaHhvbVUrL2Y2eUR6UWlDckIr?=
- =?utf-8?B?SHcxU2tNUjJ1NUtnOFB0NytleVdQdkhBWk95YzVhL1VYRElFN24zaE5hSFNV?=
- =?utf-8?B?MUhoU0V0RW5zd1B0bmdZckJDSFRObUkxb2NpbEFVNzdJTmtSVG5Mek82a3Bo?=
- =?utf-8?B?bndhSXdsVURsdFFJOEJseDd3cFBrM1JEOUtDdmRYbUFoL0lJNkFLU3JBZ3lQ?=
- =?utf-8?B?ZGtzNHhrb2d2QklDS0REeGhHSUs0V25PeGVpR3lCYW1vM0l6elRsamdTeWpq?=
- =?utf-8?B?UzdETDJRblY5NFVRTDdwdWhNTEJGbWdnVGdXY0dmb05BdkltNlZqODk3VWJx?=
- =?utf-8?B?c0szZnZBV0V4anJiak9scEwwcWR4aUtneXZYNnU0RFRhSEJlcVY4Q1J6a2x2?=
- =?utf-8?B?R3lQZ2haR3ZQS2ZtaU41ZXVZcnR6N0FvNHNmOHM0azdpbytjRjZUUE9mODNO?=
- =?utf-8?B?U2ZWVHIxbVVoZ2FONytOd2tKdUJDbGg0WFVNalZ2K1ducVJXTzZWMjJvT0ZZ?=
- =?utf-8?B?ZHZtQWhNQjJOemNGd3F2WStEbFQ2dzJUMUQxb3pDWjRhRC9DakpyRmZSaGlE?=
- =?utf-8?B?K2JBcVcvbG45cTFYQTEvZ2NZM3hpcUZPOVlGWFlSRG1adiswMlBwS1BSejBv?=
- =?utf-8?B?anRZdzNSYVZjdS9CMkRjZXNsL2pGUzJQSlpwRXh4SlVsZ2FFUTFWdnQyK244?=
- =?utf-8?B?WTdCaDhHLzBSUGJhYWFkL0dSMlhZOEJwaU85K21TZENHTkNscklYblZMeDYz?=
- =?utf-8?B?NzZWbHU5cXR2UUtxM3MvRzBWdzFMU21kTm9pcnY1NlQwcklDRXQ3a3BwUmtQ?=
- =?utf-8?B?S0tHRE5QWFl0SFBDSkhZZzNkMDB2d2RlUjRmaXYrR3ArQTAwRXNoOVl0cWw3?=
- =?utf-8?B?MmRtMEZaY1BacmJNeXEwQllsRDluNUdjWHo1NVZCZmlPWENxamdvbWFtellS?=
- =?utf-8?B?TGpnMXB1cU0yMUxsN1k3cXByYjFMNVMzeWFFajhTMFBRajY1Z1hpVmRhZEpQ?=
- =?utf-8?B?MmRRWStEVmk2N2ZXclZTNWJ1ck1YN0dsQk43RUFFSWc0aE1Ea1JhY3pvR2l6?=
- =?utf-8?B?UEVFUkFRUUg3amtQZ256cE93c3dnL2tSME1PcTJNaHMrcnNLUEl0N3VVaEVz?=
- =?utf-8?B?SmdyaVBTQkNzQTQ1ekY3aE1aZHd2S2d2RDZZYVYrSUg4TFhvTlpTRzZBazcv?=
- =?utf-8?B?YkRPNlRVa1QwZ2RUeUNVSVdqT3ZldHhJN0FSK21hcVVWeDRtOFZqWlY3NUhM?=
- =?utf-8?B?U3k0OHg1a3Y4b0hybmJVUUI3TG1yL1l5ZStHclFoeUtnSFZubFE4MVdJMVNl?=
- =?utf-8?B?dWJxOW00M2FTZVJNaEZsLzlTdUVQR2ZZZCtsdi9uUCs2L25idFhySi9jaG9n?=
- =?utf-8?B?Nll1N0F6MDFQUTE1eE8wRHR0ZW4yWmlUZlltWloxeGZlYWQrOTVDWkdhMjFl?=
- =?utf-8?B?MXE2Rzc1b01YT2VjaGViZ2FsSmFiamxnZ3pzQWFTd09jb292SmlGajZMLzBk?=
- =?utf-8?B?Ync0WnY5UWw2RXhGUHN5Vy8wVVN6VFJnZTQrcUxhWEIxbUh6QW9relN5Zlds?=
- =?utf-8?Q?4JVIKZP66Jb3IvfAyV8IJCL0rMkbHA2Oyow9Bty?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+   d="scan'208";a="483262006"
+Received: from shzintpr03.sh.intel.com (HELO [0.0.0.0]) ([10.239.4.100])
+  by fmsmga002.fm.intel.com with ESMTP; 02 Jun 2021 18:23:59 -0700
+Subject: Re: [PATCH v2] KVM: VMX: Enable Notify VM exit
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Xiaoyao Li <xiaoyao.li@intel.com>, pbonzini@redhat.com,
+        seanjc@google.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com
+References: <20210525051204.1480610-1-tao3.xu@intel.com>
+ <871r9k36ds.fsf@vitty.brq.redhat.com>
+From:   Tao Xu <tao3.xu@intel.com>
+Message-ID: <12db5b88-a094-4fb0-eeac-e79396009f44@intel.com>
+Date:   Thu, 3 Jun 2021 09:23:58 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1886.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 961dedea-6d8f-4ef1-130a-08d9262c897d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jun 2021 01:11:37.3289
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: HqEG/zVFTEwZCM/7AKnqLeOfUNJATnRtTOuXr090qX3Do4Te0F2c43Fm0L1xdf/TlyXTiq5/dJEhhXADdbSt4w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1614
-X-OriginatorOrg: intel.com
+In-Reply-To: <871r9k36ds.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBKYXNvbiBHdW50aG9ycGUgPGpnZ0BudmlkaWEuY29tPg0KPiBTZW50OiBUaHVyc2Rh
-eSwgSnVuZSAzLCAyMDIxIDc6MTggQU0NCj4gDQo+IE9uIFdlZCwgSnVuIDAyLCAyMDIxIGF0IDA4
-OjQwOjUxQU0gLTA3MDAsIERhdmUgSmlhbmcgd3JvdGU6DQo+ID4NCj4gPiBPbiA1LzIzLzIwMjEg
-NDoyMiBQTSwgSmFzb24gR3VudGhvcnBlIHdyb3RlOg0KPiA+ID4gT24gRnJpLCBNYXkgMjEsIDIw
-MjEgYXQgMDU6MTk6MDVQTSAtMDcwMCwgRGF2ZSBKaWFuZyB3cm90ZToNCj4gPiA+ID4gSW50cm9k
-dWNpbmcgbWRldiB0eXBlcyDigJwxZHdxLXYx4oCdIHR5cGUuIFRoaXMgbWRldiB0eXBlIGFsbG93
-cw0KPiA+ID4gPiBhbGxvY2F0aW9uIG9mIGEgc2luZ2xlIGRlZGljYXRlZCB3cSBmcm9tIGF2YWls
-YWJsZSBkZWRpY2F0ZWQgd3FzLiBBZnRlcg0KPiA+ID4gPiBhIHdvcmtxdWV1ZSAod3EpIGlzIGVu
-YWJsZWQsIHRoZSB1c2VyIHdpbGwgZ2VuZXJhdGUgYW4gdXVpZC4gT24gbWRldg0KPiA+ID4gPiBj
-cmVhdGlvbiwgdGhlIG1kZXYgZHJpdmVyIGNvZGUgd2lsbCBmaW5kIGEgZHdxIGRlcGVuZGluZyBv
-biB0aGUgbWRldg0KPiA+ID4gPiB0eXBlLiBXaGVuIHRoZSBjcmVhdGUgb3BlcmF0aW9uIGlzIHN1
-Y2Nlc3NmdWwsIHRoZSB1c2VyIGdlbmVyYXRlZCB1dWlkDQo+ID4gPiA+IGNhbiBiZSBwYXNzZWQg
-dG8gcWVtdS4gV2hlbiB0aGUgZ3Vlc3QgYm9vdHMgdXAsIGl0IHNob3VsZCBkaXNjb3ZlciBhDQo+
-ID4gPiA+IERTQSBkZXZpY2Ugd2hlbiBkb2luZyBQQ0kgZGlzY292ZXJ5Lg0KPiA+ID4gPg0KPiA+
-ID4gPiBGb3IgZXhhbXBsZSBvZiDigJwxZHdxLXYx4oCdIHR5cGU6DQo+ID4gPiA+IDEuIEVuYWJs
-ZSB3cSB3aXRoIOKAnG1kZXbigJ0gd3EgdHlwZQ0KPiA+ID4gPiAyLiBBIHVzZXIgZ2VuZXJhdGVk
-IHV1aWQuDQo+ID4gPiA+IDMuIFRoZSB1dWlkIGlzIHdyaXR0ZW4gdG8gdGhlIG1kZXYgY2xhc3Mg
-c3lzZnMgcGF0aDoNCj4gPiA+ID4gZWNobyAkVVVJRCA+DQo+IC9zeXMvY2xhc3MvbWRldl9idXMv
-MDAwMFw6MDBcOjBhLjAvbWRldl9zdXBwb3J0ZWRfdHlwZXMvaWR4ZC0xZHdxLQ0KPiB2MS9jcmVh
-dGUNCj4gPiA+ID4gNC4gUGFzcyB0aGUgZm9sbG93aW5nIHBhcmFtZXRlciB0byBxZW11Og0KPiA+
-ID4gPiAiLWRldmljZSB2ZmlvLXBjaSxzeXNmc2Rldj0vc3lzL2J1cy9wY2kvZGV2aWNlcy8wMDAw
-OjAwOjBhLjAvJFVVSUQiDQo+ID4gPiBTbyB0aGUgaWR4ZCBjb3JlIGRyaXZlciBrbm93cyB0byBj
-cmVhdGUgYSAidmZpbyIgd3Egd2l0aCBpdHMgb3duIG11Y2gNCj4gPiA+IG1hY2hpbmVyeSBidXQg
-eW91IHN0aWxsIHdhbnQgdG8gaW52b2x2ZSB0aGUgaG9ycmlibGUgbWRldiBndWlkIHN0dWZmPw0K
-PiA+ID4NCj4gPiA+IFdoeT8/DQo+ID4NCj4gPiBBcmUgeW91IHJlZmVycmluZyB0byBjYWxsaW5n
-IG1kZXZfZGV2aWNlX2NyZWF0ZSgpIGRpcmVjdGx5IGluIHRoZSBtZGV2DQo+ID4gaWR4ZF9kcml2
-ZXIgcHJvYmU/DQo+IA0KPiBObywganVzdCBjYWxsIHZmaW9fcmVnaXN0ZXJfZ3JvdXBfZGV2IGFu
-ZCBmb3JnZXQgYWJvdXQgbWRldi4NCj4gDQo+ID4gSSB0aGluayB0aGlzIHdvdWxkIHdvcmsgd2l0
-aCBvdXIgZGVkaWNhdGVkIHdxIHdoZXJlIGEgc2luZ2xlIG1kZXYNCj4gPiBjYW4gYmUgYXNzaWdu
-ZWQgdG8gYSB3cS4NCj4gDQo+IE9rLCBzb3VuZHMgZ3JlYXQNCj4gDQo+ID4gSG93ZXZlciwgbGF0
-ZXIgb24gd2hlbiB3ZSBuZWVkIHRvIHN1cHBvcnQgc2hhcmVkIHdxIHdoZXJlIHdlIGNhbg0KPiA+
-IGNyZWF0ZSBtdWx0aXBsZSBtZGV2IHBlciB3cSwgd2UnbGwgbmVlZCBhbiBlbnRyeSBwb2ludCB0
-byBkbyBzby4gSW4NCj4gPiB0aGUgbmFtZSBvZiBtYWtpbmcgdGhpbmdzIGNvbnNpc3RlbnQgZnJv
-bSB1c2VyIHBlcnNwZWN0aXZlLCBnb2luZw0KPiA+IHRocm91Z2ggc3lzZnMgc2VlbXMgdGhlIHdh
-eSB0byBkbyBpdC4NCj4gDQo+IFdoeSBub3QgdXNlIHlvdXIgYWxyZWFkeSB2ZXJ5IGNvbXBsaWNh
-dGVkIGlkeGQgc3lzZnMgdG8gZG8gdGhpcz8NCj4gDQoNCkphc29uLCBjYW4geW91IGNsYXJpZnkg
-eW91ciBhdHRpdHVkZSBvbiBtZGV2IGd1aWQgc3R1ZmY/IEFyZSB5b3UgDQpjb21wbGV0ZWx5IGFn
-YWluc3QgaXQgb3IgY2FzZS1ieS1jYXNlPyBJZiB0aGUgZm9ybWVyLCB0aGlzIGlzIGEgYmlnDQpk
-ZWNpc2lvbiB0aHVzIGl0J3MgYmV0dGVyIHRvIGhhdmUgY29uc2Vuc3VzIHdpdGggQWxleC9LaXJ0
-aS4gSWYgdGhlDQpsYXR0ZXIsIHdvdWxkIGxpa2UgdG8gaGVhciB5b3VyIGNyaXRlcmlhIGZvciB3
-aGVuIGl0IGNhbiBiZSB1c2VkDQphbmQgd2hlbiBub3QuLi4NCg0KVGhhbmtzDQpLZXZpbg0K
+
+On 6/2/21 6:31 PM, Vitaly Kuznetsov wrote:
+> Tao Xu <tao3.xu@intel.com> writes:
+> 
+>> There are some cases that malicious virtual machines can cause CPU stuck
+>> (event windows don't open up), e.g., infinite loop in microcode when
+>> nested #AC (CVE-2015-5307). No event window obviously means no events,
+>> e.g. NMIs, SMIs, and IRQs will all be blocked, may cause the related
+>> hardware CPU can't be used by host or other VM.
+>>
+>> To resolve those cases, it can enable a notify VM exit if no event
+>> window occur in VMX non-root mode for a specified amount of time
+>> (notify window). Since CPU is first observed the risk of not causing
+>> forward progress, after notify window time in a units of crystal clock,
+>> Notify VM exit will happen. Notify VM exit can happen incident to delivery
+>> of a vectored event.
+>>
+>> Expose a module param for configuring notify window, which is in unit of
+>> crystal clock cycle.
+>> - A negative value (e.g. -1) is to disable this feature.
+>> - Make the default as 0. It is safe because an internal threshold is added
+>> to notify window to ensure all the normal instructions being coverd.
+>> - User can set it to a large value when they want to give more cycles to
+>> wait for some reasons, e.g., silicon wrongly kill some normal instruction
+>> due to internal threshold is too small.
+>>
+>> Notify VM exit is defined in latest Intel Architecture Instruction Set
+>> Extensions Programming Reference, chapter 9.2.
+>>
+>> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+>> ---
+>>
+>> Changelog:
+>> v2:
+>>       Default set notify window to 0, less than 0 to disable.
+>>       Add more description in commit message.
+> 
+> Sorry if this was already discussed, but in case of nested
+> virtualization and when L1 also enables
+> SECONDARY_EXEC_NOTIFY_VM_EXITING, shouldn't we just reflect NOTIFY exits
+> during L2 execution to L1 instead of crashing the whole L1?
+> 
+Notify VM Exit will not crash L1 guest if VM context valid in exit 
+qualification. After VM exit, VMM can resume the guest normally.
+>> ---
+>>   arch/x86/include/asm/vmx.h         |  7 +++++
+>>   arch/x86/include/asm/vmxfeatures.h |  1 +
+>>   arch/x86/include/uapi/asm/vmx.h    |  4 ++-
+>>   arch/x86/kvm/vmx/capabilities.h    |  6 +++++
+>>   arch/x86/kvm/vmx/vmx.c             | 42 ++++++++++++++++++++++++++++--
+>>   include/uapi/linux/kvm.h           |  2 ++
+>>   6 files changed, 59 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+>> index 0ffaa3156a4e..9104c85a973f 100644
+>> --- a/arch/x86/include/asm/vmx.h
+>> +++ b/arch/x86/include/asm/vmx.h
+>> @@ -74,6 +74,7 @@
+>>   #define SECONDARY_EXEC_TSC_SCALING              VMCS_CONTROL_BIT(TSC_SCALING)
+>>   #define SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE	VMCS_CONTROL_BIT(USR_WAIT_PAUSE)
+>>   #define SECONDARY_EXEC_BUS_LOCK_DETECTION	VMCS_CONTROL_BIT(BUS_LOCK_DETECTION)
+>> +#define SECONDARY_EXEC_NOTIFY_VM_EXITING	VMCS_CONTROL_BIT(NOTIFY_VM_EXITING)
+>>   
+>>   #define PIN_BASED_EXT_INTR_MASK                 VMCS_CONTROL_BIT(INTR_EXITING)
+>>   #define PIN_BASED_NMI_EXITING                   VMCS_CONTROL_BIT(NMI_EXITING)
+>> @@ -269,6 +270,7 @@ enum vmcs_field {
+>>   	SECONDARY_VM_EXEC_CONTROL       = 0x0000401e,
+>>   	PLE_GAP                         = 0x00004020,
+>>   	PLE_WINDOW                      = 0x00004022,
+>> +	NOTIFY_WINDOW                   = 0x00004024,
+>>   	VM_INSTRUCTION_ERROR            = 0x00004400,
+>>   	VM_EXIT_REASON                  = 0x00004402,
+>>   	VM_EXIT_INTR_INFO               = 0x00004404,
+>> @@ -555,6 +557,11 @@ enum vm_entry_failure_code {
+>>   #define EPT_VIOLATION_EXECUTABLE	(1 << EPT_VIOLATION_EXECUTABLE_BIT)
+>>   #define EPT_VIOLATION_GVA_TRANSLATED	(1 << EPT_VIOLATION_GVA_TRANSLATED_BIT)
+>>   
+>> +/*
+>> + * Exit Qualifications for NOTIFY VM EXIT
+>> + */
+>> +#define NOTIFY_VM_CONTEXT_INVALID     BIT(0)
+>> +
+>>   /*
+>>    * VM-instruction error numbers
+>>    */
+>> diff --git a/arch/x86/include/asm/vmxfeatures.h b/arch/x86/include/asm/vmxfeatures.h
+>> index d9a74681a77d..15f0f2ab4f95 100644
+>> --- a/arch/x86/include/asm/vmxfeatures.h
+>> +++ b/arch/x86/include/asm/vmxfeatures.h
+>> @@ -84,5 +84,6 @@
+>>   #define VMX_FEATURE_USR_WAIT_PAUSE	( 2*32+ 26) /* Enable TPAUSE, UMONITOR, UMWAIT in guest */
+>>   #define VMX_FEATURE_ENCLV_EXITING	( 2*32+ 28) /* "" VM-Exit on ENCLV (leaf dependent) */
+>>   #define VMX_FEATURE_BUS_LOCK_DETECTION	( 2*32+ 30) /* "" VM-Exit when bus lock caused */
+>> +#define VMX_FEATURE_NOTIFY_VM_EXITING	( 2*32+ 31) /* VM-Exit when no event windows after notify window */
+>>   
+>>   #endif /* _ASM_X86_VMXFEATURES_H */
+>> diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
+>> index 946d761adbd3..ef4c80f6553e 100644
+>> --- a/arch/x86/include/uapi/asm/vmx.h
+>> +++ b/arch/x86/include/uapi/asm/vmx.h
+>> @@ -91,6 +91,7 @@
+>>   #define EXIT_REASON_UMWAIT              67
+>>   #define EXIT_REASON_TPAUSE              68
+>>   #define EXIT_REASON_BUS_LOCK            74
+>> +#define EXIT_REASON_NOTIFY              75
+>>   
+>>   #define VMX_EXIT_REASONS \
+>>   	{ EXIT_REASON_EXCEPTION_NMI,         "EXCEPTION_NMI" }, \
+>> @@ -153,7 +154,8 @@
+>>   	{ EXIT_REASON_XRSTORS,               "XRSTORS" }, \
+>>   	{ EXIT_REASON_UMWAIT,                "UMWAIT" }, \
+>>   	{ EXIT_REASON_TPAUSE,                "TPAUSE" }, \
+>> -	{ EXIT_REASON_BUS_LOCK,              "BUS_LOCK" }
+>> +	{ EXIT_REASON_BUS_LOCK,              "BUS_LOCK" }, \
+>> +	{ EXIT_REASON_NOTIFY,                "NOTIFY"}
+>>   
+>>   #define VMX_EXIT_REASON_FLAGS \
+>>   	{ VMX_EXIT_REASONS_FAILED_VMENTRY,	"FAILED_VMENTRY" }
+>> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+>> index 8dee8a5fbc17..8527f34a84ac 100644
+>> --- a/arch/x86/kvm/vmx/capabilities.h
+>> +++ b/arch/x86/kvm/vmx/capabilities.h
+>> @@ -407,4 +407,10 @@ static inline u64 vmx_supported_debugctl(void)
+>>   	return debugctl;
+>>   }
+>>   
+>> +static inline bool cpu_has_notify_vm_exiting(void)
+>> +{
+>> +	return vmcs_config.cpu_based_2nd_exec_ctrl &
+>> +		SECONDARY_EXEC_NOTIFY_VM_EXITING;
+>> +}
+>> +
+>>   #endif /* __KVM_X86_VMX_CAPS_H */
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 4bceb5ca3a89..c0ad01c88dac 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -205,6 +205,10 @@ module_param(ple_window_max, uint, 0444);
+>>   int __read_mostly pt_mode = PT_MODE_SYSTEM;
+>>   module_param(pt_mode, int, S_IRUGO);
+>>   
+>> +/* Default is 0, less than 0 (for example, -1) disables notify window. */
+>> +static int __read_mostly notify_window;
+>> +module_param(notify_window, int, 0644);
+>> +
+>>   static DEFINE_STATIC_KEY_FALSE(vmx_l1d_should_flush);
+>>   static DEFINE_STATIC_KEY_FALSE(vmx_l1d_flush_cond);
+>>   static DEFINE_MUTEX(vmx_l1d_flush_mutex);
+>> @@ -2539,7 +2543,8 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>>   			SECONDARY_EXEC_PT_USE_GPA |
+>>   			SECONDARY_EXEC_PT_CONCEAL_VMX |
+>>   			SECONDARY_EXEC_ENABLE_VMFUNC |
+>> -			SECONDARY_EXEC_BUS_LOCK_DETECTION;
+>> +			SECONDARY_EXEC_BUS_LOCK_DETECTION |
+>> +			SECONDARY_EXEC_NOTIFY_VM_EXITING;
+>>   		if (cpu_has_sgx())
+>>   			opt2 |= SECONDARY_EXEC_ENCLS_EXITING;
+>>   		if (adjust_vmx_controls(min2, opt2,
+>> @@ -4376,6 +4381,9 @@ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
+>>   	if (!vcpu->kvm->arch.bus_lock_detection_enabled)
+>>   		exec_control &= ~SECONDARY_EXEC_BUS_LOCK_DETECTION;
+>>   
+>> +	if (cpu_has_notify_vm_exiting() && notify_window < 0)
+>> +		exec_control &= ~SECONDARY_EXEC_NOTIFY_VM_EXITING;
+>> +
+>>   	vmx->secondary_exec_control = exec_control;
+>>   }
+>>   
+>> @@ -4423,6 +4431,9 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>>   		vmx->ple_window_dirty = true;
+>>   	}
+>>   
+>> +	if (cpu_has_notify_vm_exiting() && notify_window >= 0)
+>> +		vmcs_write32(NOTIFY_WINDOW, notify_window);
+>> +
+>>   	vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, 0);
+>>   	vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, 0);
+>>   	vmcs_write32(CR3_TARGET_COUNT, 0);           /* 22.2.1 */
+>> @@ -5642,6 +5653,31 @@ static int handle_bus_lock_vmexit(struct kvm_vcpu *vcpu)
+>>   	return 0;
+>>   }
+>>   
+>> +static int handle_notify(struct kvm_vcpu *vcpu)
+>> +{
+>> +	unsigned long exit_qual = vmx_get_exit_qual(vcpu);
+>> +
+>> +	if (!(exit_qual & NOTIFY_VM_CONTEXT_INVALID)) {
+>> +		/*
+>> +		 * Notify VM exit happened while executing iret from NMI,
+>> +		 * "blocked by NMI" bit has to be set before next VM entry.
+>> +		 */
+>> +		if (enable_vnmi &&
+>> +		    (exit_qual & INTR_INFO_UNBLOCK_NMI))
+>> +			vmcs_set_bits(GUEST_INTERRUPTIBILITY_INFO,
+>> +				      GUEST_INTR_STATE_NMI);
+>> +
+>> +		return 1;
+>> +	}
+>> +
+>> +	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+>> +	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_NO_EVENT_WINDOW;
+>> +	vcpu->run->internal.ndata = 1;
+>> +	vcpu->run->internal.data[0] = exit_qual;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>   /*
+>>    * The exit handlers return 1 if the exit was handled fully and guest execution
+>>    * may resume.  Otherwise they set the kvm_run parameter to indicate what needs
+>> @@ -5699,6 +5735,7 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
+>>   	[EXIT_REASON_PREEMPTION_TIMER]	      = handle_preemption_timer,
+>>   	[EXIT_REASON_ENCLS]		      = handle_encls,
+>>   	[EXIT_REASON_BUS_LOCK]                = handle_bus_lock_vmexit,
+>> +	[EXIT_REASON_NOTIFY]		      = handle_notify,
+>>   };
+>>   
+>>   static const int kvm_vmx_max_exit_handlers =
+>> @@ -6042,7 +6079,8 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+>>   	     exit_reason.basic != EXIT_REASON_EPT_VIOLATION &&
+>>   	     exit_reason.basic != EXIT_REASON_PML_FULL &&
+>>   	     exit_reason.basic != EXIT_REASON_APIC_ACCESS &&
+>> -	     exit_reason.basic != EXIT_REASON_TASK_SWITCH)) {
+>> +	     exit_reason.basic != EXIT_REASON_TASK_SWITCH &&
+>> +	     exit_reason.basic != EXIT_REASON_NOTIFY)) {
+>>   		int ndata = 3;
+>>   
+>>   		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index 3fd9a7e9d90c..bb3b49b1fb0d 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -278,6 +278,8 @@ struct kvm_xen_exit {
+>>   #define KVM_INTERNAL_ERROR_DELIVERY_EV	3
+>>   /* Encounter unexpected vm-exit reason */
+>>   #define KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON	4
+>> +/* Encounter notify vm-exit */
+>> +#define KVM_INTERNAL_ERROR_NO_EVENT_WINDOW   5
+>>   
+>>   /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
+>>   struct kvm_run {
+> 
