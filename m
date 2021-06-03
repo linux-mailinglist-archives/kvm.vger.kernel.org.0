@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C58839AA0E
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 20:34:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F147939AA12
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 20:34:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229906AbhFCSfq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Jun 2021 14:35:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51172 "EHLO mail.kernel.org"
+        id S229955AbhFCSfs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Jun 2021 14:35:48 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51224 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229817AbhFCSfo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Jun 2021 14:35:44 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9B51D613DC;
-        Thu,  3 Jun 2021 18:33:57 +0000 (UTC)
+        id S229902AbhFCSfr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Jun 2021 14:35:47 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 7F2C8613B8;
+        Thu,  3 Jun 2021 18:34:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1622745240;
-        bh=8rzvn6RTUZ+Fwle5zCQTw7SSxwCeA8VzLr8wda4TNzA=;
+        s=k20201202; t=1622745242;
+        bh=osyrOd8rLcVCMiPHAeJKLzTGdMUBbbPPNLLfrYOVNtE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=knMwvqEDfg1TqKq+8mJzto8ZkP9NHA83kO8aFVRApvuOlPy9xFn72QrTIAgylo6Ma
-         3v6ZqrpoCULuBEn8DmxDjf1InP1TggNgxD1zfvlh8Om1ATNdLqijRLa+F4MVdQsQEC
-         d1Dud6Nte9sawAg+6/fFb37Y2xITBxlb7HbBFoZi/ouDnQglK6DIiH4fs2oAmIFIQ4
-         KYlAhqnNYpCVRKpKMJrwt0K02poML1UyEJASdpEsCJe5m9sdWJiY9UcOl5iaJn3U/d
-         899ah8ctyb0RvqKAFoXKS0tbkSuiTzr+JVK4q7wbodfJ+ZkAetwAykwg9/9knRGtUK
-         8alKJHF/yy/2A==
+        b=fOt+VKmNu2qb7NlmlC8F8f7NZks31mqaTKoFAcQTxTnnIZsP99bm4KVUW3Fy5BRvN
+         k2jFjdJeC1Ex6aXIlzQTS6Z+2nmuqbXQ5BCBEDUFJ2hXtvBa2kF4PGG8m6Ug2xCo0Q
+         2mkPnUbq1g9fcBSTNR1e0d8gzL2CvA8qU1mdCLwmONsEdMYiX9MBJPQUtdKpSzTkEr
+         ei3Ud1mbQSStGuUhg7+ec20zSiVnEUYt0Fyd7Ylz0JXyoDEzLq6C2N7S8fN7v4J9dy
+         l0CBMMnNmYEK9oOkkz2xWN2Ub6RyqV+ey0y9/m+fBqIL12YAOOv7nPK2CygTSFZayc
+         TwB4LD/lrL5yg==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
@@ -37,9 +37,9 @@ Cc:     Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
         Sean Christopherson <seanjc@google.com>,
         David Brazdil <dbrazdil@google.com>, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 1/4] KVM: arm64: Ignore 'kvm-arm.mode=protected' when using VHE
-Date:   Thu,  3 Jun 2021 19:33:44 +0100
-Message-Id: <20210603183347.1695-2-will@kernel.org>
+Subject: [PATCH 2/4] KVM: arm64: Extend comment in has_vhe()
+Date:   Thu,  3 Jun 2021 19:33:45 +0100
+Message-Id: <20210603183347.1695-3-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20210603183347.1695-1-will@kernel.org>
 References: <20210603183347.1695-1-will@kernel.org>
@@ -49,67 +49,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ignore 'kvm-arm.mode=protected' when using VHE so that kvm_get_mode()
-only returns KVM_MODE_PROTECTED on systems where the feature is available.
+has_vhe() expands to a compile-time constant when evaluated from the VHE
+or nVHE code, alternatively checking a static key when called from
+elsewhere in the kernel. On face value, this looks like a case of
+premature optimization, but in fact this allows symbol references on
+VHE-specific code paths to be dropped from the nVHE object.
+
+Expand the comment in has_vhe() to make this clearer, hopefully
+discouraging anybody from simplifying the code.
 
 Cc: David Brazdil <dbrazdil@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- Documentation/admin-guide/kernel-parameters.txt |  1 -
- arch/arm64/kernel/cpufeature.c                  | 10 +---------
- arch/arm64/kvm/arm.c                            |  6 +++++-
- 3 files changed, 6 insertions(+), 11 deletions(-)
+ arch/arm64/include/asm/virt.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index cb89dbdedc46..e85dbdf1ee8e 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2300,7 +2300,6 @@
- 
- 			protected: nVHE-based mode with support for guests whose
- 				   state is kept private from the host.
--				   Not valid if the kernel is running in EL2.
- 
- 			Defaults to VHE/nVHE based on hardware support.
- 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index efed2830d141..dc1f2e747828 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -1773,15 +1773,7 @@ static void cpu_enable_mte(struct arm64_cpu_capabilities const *cap)
- #ifdef CONFIG_KVM
- static bool is_kvm_protected_mode(const struct arm64_cpu_capabilities *entry, int __unused)
- {
--	if (kvm_get_mode() != KVM_MODE_PROTECTED)
--		return false;
--
--	if (is_kernel_in_hyp_mode()) {
--		pr_warn("Protected KVM not available with VHE\n");
--		return false;
--	}
--
--	return true;
-+	return kvm_get_mode() == KVM_MODE_PROTECTED;
- }
- #endif /* CONFIG_KVM */
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 1cb39c0803a4..8d5e23198dfd 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2121,7 +2121,11 @@ static int __init early_kvm_mode_cfg(char *arg)
- 		return -EINVAL;
- 
- 	if (strcmp(arg, "protected") == 0) {
--		kvm_mode = KVM_MODE_PROTECTED;
-+		if (!is_kernel_in_hyp_mode())
-+			kvm_mode = KVM_MODE_PROTECTED;
-+		else
-+			pr_warn_once("Protected KVM not available with VHE\n");
-+
- 		return 0;
- 	}
- 
+diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+index 7379f35ae2c6..3218ca17f819 100644
+--- a/arch/arm64/include/asm/virt.h
++++ b/arch/arm64/include/asm/virt.h
+@@ -111,6 +111,9 @@ static __always_inline bool has_vhe(void)
+ 	/*
+ 	 * Code only run in VHE/NVHE hyp context can assume VHE is present or
+ 	 * absent. Otherwise fall back to caps.
++	 * This allows the compiler to discard VHE-specific code from the
++	 * nVHE object, reducing the number of external symbol references
++	 * needed to link.
+ 	 */
+ 	if (is_vhe_hyp_code())
+ 		return true;
 -- 
 2.32.0.rc0.204.g9fa02ecfa5-goog
 
