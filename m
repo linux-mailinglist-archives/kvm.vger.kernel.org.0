@@ -2,169 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD39639A419
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 17:14:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D33F39A41F
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 17:15:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231784AbhFCPQa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Jun 2021 11:16:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49831 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231639AbhFCPQ3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 3 Jun 2021 11:16:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622733284;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/TbnjPejbYwVan9HkOykuBL+tAV4BzyESSrfqanFgRE=;
-        b=G8G+/20/tkQbMnXpvX8HFRinXvufLQ3bNOoduXVp/EJc1DCTRGJnyB7LDuEcpXEMI1LZiM
-        Ph0PSJrX/4dorCOqQDsjK/IDHS5jlsRxoZqIvyeBtzMf75BffYVhHmvzus8cmPdzkBtgEZ
-        GFXLUyaiBKMOk6hkz9A2eDues5yEudE=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-l0wTPX26MvOi9eoKSvbS-w-1; Thu, 03 Jun 2021 11:14:43 -0400
-X-MC-Unique: l0wTPX26MvOi9eoKSvbS-w-1
-Received: by mail-ed1-f71.google.com with SMTP id c13-20020a50f60d0000b02903900105f127so3406196edn.22
-        for <kvm@vger.kernel.org>; Thu, 03 Jun 2021 08:14:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=/TbnjPejbYwVan9HkOykuBL+tAV4BzyESSrfqanFgRE=;
-        b=Ml5Su4P4LrrbME6n0G4RpV6fJFXWZhwBeTur39XpTAUThTqrr64rDIXDtnFkaQdYxp
-         JVXMFJfNibqByOCj6uuG2bPpChm84knk/l7THJD5uG9+b6lNUjjA64h3Xkv/QphACnv7
-         EO4Cb+5jKcWl0rdTqAwC0EzWciLJzGa5SdFEibxR2ZM7HYQ3tEWOu6B0Bx44rZ/TRd3k
-         lhxDhJExnhckGYzq8KvqvEfKu5IqY/Md/b/gk0bq/o2ZBudhfOfvj0/LefhXyRZIw94w
-         cWlapJxF8xYXhg1023wIkZilrrkLd8SBccCWMalJEmwzp/DHixVp372Sk16Vsq9tZiXp
-         vCBg==
-X-Gm-Message-State: AOAM5338YGE2457HcS8zBHBdrSVZyaGW4nQZRRE81eW8CWE9lU6yL2cb
-        FRAjvMrjPZHecMynKYdwxE7+624ht5jSFlKQPEP05lDbvEs9evnTsD7uvtsahFOVICfuhSHyXOY
-        prbE1zoY6Qj8C
-X-Received: by 2002:a17:906:15c2:: with SMTP id l2mr102917ejd.348.1622733281808;
-        Thu, 03 Jun 2021 08:14:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx0x5W1f0mRcMdebhikIGS3xszHMVLQeFtJfQT5T5MgWSrP7f8pNxRu7aXb5Lg9wKUHaELxKA==
-X-Received: by 2002:a17:906:15c2:: with SMTP id l2mr102880ejd.348.1622733281491;
-        Thu, 03 Jun 2021 08:14:41 -0700 (PDT)
-Received: from steredhat ([5.170.129.82])
-        by smtp.gmail.com with ESMTPSA id v21sm1894572edt.48.2021.06.03.08.14.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jun 2021 08:14:40 -0700 (PDT)
-Date:   Thu, 3 Jun 2021 17:14:33 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Norbert Slusarek <nslusarek@gmx.net>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, oxffffaa@gmail.com
-Subject: Re: [PATCH v10 13/18] virtio/vsock: rest of SOCK_SEQPACKET support
-Message-ID: <20210603151433.3tbiibmcfacpcjt2@steredhat>
-References: <20210520191357.1270473-1-arseny.krasnov@kaspersky.com>
- <20210520191840.1272290-1-arseny.krasnov@kaspersky.com>
+        id S231926AbhFCPQg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Jun 2021 11:16:36 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:45612 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231898AbhFCPQf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Jun 2021 11:16:35 -0400
+Received: from viremana-dev.fwjladdvyuiujdukmejncen4mf.xx.internal.cloudapp.net (unknown [13.66.132.26])
+        by linux.microsoft.com (Postfix) with ESMTPSA id B3BF420B7178;
+        Thu,  3 Jun 2021 08:14:50 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B3BF420B7178
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1622733290;
+        bh=DEyo5xvG+1x+OremPDmGcOgrzcnN/Vfy+U+eJe72wNg=;
+        h=From:To:Cc:Subject:Date:From;
+        b=dxgHlMf4qfmbKGzOPJq3vN9MURpZ687Pbgsg5xhIiHhE/bzG6Zio0ptVUnTPLGwfu
+         /Y+36CZLtvI2WupJR3xb4zQzWjUfdVjRqed4myBrRvlPQ//E9jQNGEWwLsbg8+B0OH
+         W9Qg3xUPChQixJEBgKIjWYu2jBA2aEjUOB0xVyCU=
+From:   Vineeth Pillai <viremana@linux.microsoft.com>
+To:     Lan Tianyu <Tianyu.Lan@microsoft.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Wei Liu <wei.liu@kernel.org>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>
+Cc:     Vineeth Pillai <viremana@linux.microsoft.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hyperv@vger.kernel.org
+Subject: [PATCH v5 0/7] Hyper-V nested virt enlightenments for SVM
+Date:   Thu,  3 Jun 2021 15:14:33 +0000
+Message-Id: <cover.1622730232.git.viremana@linux.microsoft.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210520191840.1272290-1-arseny.krasnov@kaspersky.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 20, 2021 at 10:18:37PM +0300, Arseny Krasnov wrote:
->Small updates to make SOCK_SEQPACKET work:
->1) Send SHUTDOWN on socket close for SEQPACKET type.
->2) Set SEQPACKET packet type during send.
->3) Set 'VIRTIO_VSOCK_SEQ_EOR' bit in flags for last
->   packet of message.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> v9 -> v10:
-> 1) Use 'msg_data_left()' instead of direct access to 'msg_hdr'.
-> 2) Commit message updated.
-> 3) Add check for socket type when setting SEQ_EOR bit.
->
-> include/linux/virtio_vsock.h            |  4 ++++
-> net/vmw_vsock/virtio_transport_common.c | 18 ++++++++++++++++--
-> 2 files changed, 20 insertions(+), 2 deletions(-)
->
->diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
->index 02acf6e9ae04..7360ab7ea0af 100644
->--- a/include/linux/virtio_vsock.h
->+++ b/include/linux/virtio_vsock.h
->@@ -80,6 +80,10 @@ virtio_transport_dgram_dequeue(struct vsock_sock *vsk,
-> 			       struct msghdr *msg,
-> 			       size_t len, int flags);
->
->+int
->+virtio_transport_seqpacket_enqueue(struct vsock_sock *vsk,
->+				   struct msghdr *msg,
->+				   size_t len);
-> ssize_t
-> virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
-> 				   struct msghdr *msg,
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index a6f8b0f39775..f7a3281b3eab 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -74,6 +74,11 @@ virtio_transport_alloc_pkt(struct virtio_vsock_pkt_info *info,
-> 		err = memcpy_from_msg(pkt->buf, info->msg, len);
-> 		if (err)
-> 			goto out;
->+
->+		if (msg_data_left(info->msg) == 0 &&
->+		    info->type == VIRTIO_VSOCK_TYPE_SEQPACKET)
->+			pkt->hdr.flags = cpu_to_le32(info->flags |
->+						VIRTIO_VSOCK_SEQ_EOR);
+This patch series enables the nested virtualization enlightenments for
+SVM. This is very similar to the enlightenments for VMX except for the
+fact that there is no enlightened VMCS. For SVM, VMCB is already an
+architectural in-memory data structure.
 
-`pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR)` should be enough, 
-no?
+Note: v5 is just a rebase on hyperv-next(5.13-rc1) and needed a rework
+based on the patch series: (KVM: VMX: Clean up Hyper-V PV TLB flush)
+https://lore.kernel.org/lkml/20210305183123.3978098-1-seanjc@google.com/
 
-Stefano
+The supported enlightenments are:
 
-> 	}
->
-> 	trace_virtio_transport_alloc_pkt(src_cid, src_port,
->@@ -187,7 +192,7 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
-> 	struct virtio_vsock_pkt *pkt;
-> 	u32 pkt_len = info->pkt_len;
->
->-	info->type = VIRTIO_VSOCK_TYPE_STREAM;
->+	info->type = virtio_transport_get_type(sk_vsock(vsk));
->
-> 	t_ops = virtio_transport_get_ops(vsk);
-> 	if (unlikely(!t_ops))
->@@ -478,6 +483,15 @@ virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
-> }
-> EXPORT_SYMBOL_GPL(virtio_transport_seqpacket_dequeue);
->
->+int
->+virtio_transport_seqpacket_enqueue(struct vsock_sock *vsk,
->+				   struct msghdr *msg,
->+				   size_t len)
->+{
->+	return virtio_transport_stream_enqueue(vsk, msg, len);
->+}
->+EXPORT_SYMBOL_GPL(virtio_transport_seqpacket_enqueue);
->+
-> int
-> virtio_transport_dgram_dequeue(struct vsock_sock *vsk,
-> 			       struct msghdr *msg,
->@@ -912,7 +926,7 @@ void virtio_transport_release(struct vsock_sock *vsk)
-> 	struct sock *sk = &vsk->sk;
-> 	bool remove_sock = true;
->
->-	if (sk->sk_type == SOCK_STREAM)
->+	if (sk->sk_type == SOCK_STREAM || sk->sk_type == SOCK_SEQPACKET)
-> 		remove_sock = virtio_transport_close(vsk);
->
-> 	if (remove_sock) {
->-- 
->2.25.1
->
+Enlightened TLB Flush: If this is enabled, ASID invalidations invalidate
+only gva -> hpa entries. To flush entries derived from NPT, hyper-v
+provided hypercalls (HvFlushGuestPhysicalAddressSpace or
+HvFlushGuestPhysicalAddressList) should be used.
+
+Enlightened MSR bitmap(TLFS 16.5.3): "When enabled, L0 hypervisor does
+not monitor the MSR bitmaps for changes. Instead, the L1 hypervisor must
+invalidate the corresponding clean field after making changes to one of
+the MSR bitmaps."
+
+Direct Virtual Flush(TLFS 16.8): The hypervisor exposes hypercalls
+(HvFlushVirtualAddressSpace, HvFlushVirtualAddressSpaceEx,
+HvFlushVirtualAddressList, and HvFlushVirtualAddressListEx) that allow
+operating systems to more efficiently manage the virtual TLB. The L1
+hypervisor can choose to allow its guest to use those hypercalls and
+delegate the responsibility to handle them to the L0 hypervisor. This
+requires the use of a partition assist page."
+
+L2 Windows boot time was measured with and without the patch. Time was
+measured from power on to the login screen and was averaged over a
+consecutive 5 trials:
+  Without the patch: 42 seconds
+  With the patch: 29 seconds
+--
+
+Changes from v4
+- Rebased on top of 5.13-rc1 and reworked based on the changes in the
+  patch series: (KVM: VMX: Clean up Hyper-V PV TLB flush)
+  
+Changes from v3
+- Included definitions for software/hypervisor reserved fields in SVM
+  architectural data structures.
+- Consolidated Hyper-V specific code into svm_onhyperv.[ch] to reduce
+  the "ifdefs". This change applies only to SVM, VMX is not touched and
+  is not in the scope of this patch series.
+
+Changes from v2:
+- Refactored the Remote TLB Flush logic into separate hyperv specific
+  source files (kvm_onhyperv.[ch]).
+- Reverted the VMCB Clean bits macro changes as it is no longer needed.
+
+Changes from v1:
+- Move the remote TLB flush related fields from kvm_vcpu_hv and kvm_hv
+  to kvm_vcpu_arch and kvm_arch.
+- Modify the VMCB clean mask runtime based on whether L1 hypervisor
+  is running on Hyper-V or not.
+- Detect Hyper-V nested enlightenments based on
+  HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS.
+- Address other minor review comments.
+---
+
+Vineeth Pillai (7):
+  hyperv: Detect Nested virtualization support for SVM
+  hyperv: SVM enlightened TLB flush support flag
+  KVM: x86: hyper-v: Move the remote TLB flush logic out of vmx
+  KVM: SVM: Software reserved fields
+  KVM: SVM: hyper-v: Remote TLB flush for SVM
+  KVM: SVM: hyper-v: Enlightened MSR-Bitmap support
+  KVM: SVM: hyper-v: Direct Virtual Flush support
+
+ arch/x86/include/asm/hyperv-tlfs.h |   9 ++
+ arch/x86/include/asm/kvm_host.h    |   9 ++
+ arch/x86/include/asm/svm.h         |   9 +-
+ arch/x86/include/uapi/asm/svm.h    |   3 +
+ arch/x86/kernel/cpu/mshyperv.c     |  10 ++-
+ arch/x86/kvm/Makefile              |   9 ++
+ arch/x86/kvm/kvm_onhyperv.c        |  93 +++++++++++++++++++++
+ arch/x86/kvm/kvm_onhyperv.h        |  32 +++++++
+ arch/x86/kvm/svm/svm.c             |  14 ++++
+ arch/x86/kvm/svm/svm.h             |  22 ++++-
+ arch/x86/kvm/svm/svm_onhyperv.c    |  41 +++++++++
+ arch/x86/kvm/svm/svm_onhyperv.h    | 129 +++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/vmx.c             | 105 +----------------------
+ arch/x86/kvm/vmx/vmx.h             |   9 --
+ arch/x86/kvm/x86.c                 |   9 ++
+ 15 files changed, 384 insertions(+), 119 deletions(-)
+ create mode 100644 arch/x86/kvm/kvm_onhyperv.c
+ create mode 100644 arch/x86/kvm/kvm_onhyperv.h
+ create mode 100644 arch/x86/kvm/svm/svm_onhyperv.c
+ create mode 100644 arch/x86/kvm/svm/svm_onhyperv.h
+
+-- 
+2.25.1
 
