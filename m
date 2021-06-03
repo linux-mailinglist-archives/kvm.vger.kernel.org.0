@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0834539A568
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 18:09:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B8EA39A56C
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 18:09:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230331AbhFCQK6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Jun 2021 12:10:58 -0400
-Received: from mail-dm3nam07on2061.outbound.protection.outlook.com ([40.107.95.61]:64481
-        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
+        id S230351AbhFCQLD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Jun 2021 12:11:03 -0400
+Received: from mail-dm6nam11on2070.outbound.protection.outlook.com ([40.107.223.70]:21888
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230284AbhFCQK4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Jun 2021 12:10:56 -0400
+        id S230048AbhFCQLC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Jun 2021 12:11:02 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Y1H6xWbGcuoDDMIYB77OgKgWkbvZNUGqneWchR+xyP+LyeFfZsXCiArg9N3h4GhImJviCBFbYxlGgaadaQTuAb2yhk9jlhZhY5Chu2a/KmLfwV6S2yUHl9YfGtAfA2a9UqUN8dumOAYxPzMqj9aWgMHjSHSeIAzqtWKE+FAPu4DPDwn/R1m/5UEm6m2/BfRZgUxV+22HkeGNa0hMWyjjMQv7/SEssvr4PVo9xnt+fgJDQURrgh50SLIYYekWHbhGCr4/22cfjUkbjUHG4wkqS9FkIfchYRzjInBlMcNDtfB17gLL9K10TbtKo+SWU/qvx9NjIepxcEcZNmjjqgsaiw==
+ b=AAry6ZJRz2+T58CUqWKFW9e9GRNbtPSLNZ9qsyF9YljRaOzIcnXIUs4btXS7Vx+CNMSYPJ82qbPz9wXeQRbfjyfnGk6UqZtKU/qghHp12vctmxJyFZI880wuFYqQ00kyfwfBQ1nz5/7B0HqALzyp3U+GEi1q6UziPGrtXufgjEo6csmV3wXLWowPAeZGd+ClU2cUbN37UdUlauNvGwpdvSm9EHcEvvJPg6fg4OgVg7tyM0+ii/5qrqsu1nRzgGj+fJWtuLU1/vSWFkmnnqUWDn/WRHilZFD9wefBXZIQ78y59j08tHrjDkeWsmRjFblM0CA0I3/FChY/6nMa6fEAsg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lyIz480FSUC4OW/wskj6QchUea2/SO/0meplgDdTlto=;
- b=VaTg81EgJAe8meGDGDNVUv3zjNaZh/Fr2oPeESQO987wciS5fwDkZ9Zov07yn5X1fjj27uzyViU5zGIwsEfdQ7ihYESps/ec3DtGiPNezfE4kOnhp9djH45fhF5//bw6sF3j57cAhRUh8eRuPjCo00NH3hAiQ0IreXCfzkB21adnd64kdAWYMqx2L17cyNb0raM66B24RqmbyM4fcDPppa8uGEr0rMz+eqL9BH3FA1MRemyFDHK634YTU4K6aeLWVpSMLfgdM68sDMTuVyECDQyKntmuotZGJpsgezCcJMm0kQgfHLregSr11jNgJCmH+cO/N//q16gI2Ze69uTjTg==
+ bh=ubKKbABrpeG97j71RniAQ+2O6fSno18o9dpWL7ZMEF8=;
+ b=Y/SU1QG09flVWyyOzVQTOvzm7SyLufDZuH+YRKaMyYDEhGLCzbOTjV7g/DzmzkBY9m4U1i7kPdKi6Pln8bEZ7DKLVqpqqX1APYuq/3ZttvSfhYGz3uWbzdz+yMjVl4zRFcdRGi8cvnw/npEdbAgQqfkexOEsC0SVl5vAOL3NSBpkpsuor/5Zu6Yy7xIzzB9qJQhAB/5H1oBJ4+iIQa+vLjw5Kc8MLoWcXNKhZJXyevnxLTSIA/IA1AwpZcMN0EmFC2uzzyXpVy/K8JZxIP2v7p4lKCcsBG/hRuyVnkTpLijWir4kCC7h27qbTpy50MQuyK3Qs31yVfAx/mnxEhCgnA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.112.32) smtp.rcpttodomain=huawei.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
@@ -26,18 +26,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lyIz480FSUC4OW/wskj6QchUea2/SO/0meplgDdTlto=;
- b=OJMpWTj6Ov+5vdds981jZXuaImef304PDmFaOSPrhSipNBm40l4F1dijRBork4uhLJ32L7J0iC8iB6GSGIkn4Xi/oNaCwXr6fniuo6nyiSTY/5/DZVqX7MJxmzIRDWVWW9I4p4jhY6fnJjFQB9HQx6ItMCTpXYedPgEs0nGNy0jfZN7W22Xz9S8QgSWbDGU1iLw4fQ+cb+JWJ0St6Ks4oYF8nfSurdDRlkVSwtRKmZ6eKh9JFTFFqutcio/1QbrGUE1bvY3pGZoN81fcqFwMhanZHkJ/GSlAG2j4wu3CXrTvSxjmToEkr0gZzXFmoF2j3cyxotpYLfgtAuhbXE4O8A==
-Received: from BN6PR21CA0024.namprd21.prod.outlook.com (2603:10b6:404:8e::34)
- by BN6PR12MB1844.namprd12.prod.outlook.com (2603:10b6:404:fc::23) with
+ bh=ubKKbABrpeG97j71RniAQ+2O6fSno18o9dpWL7ZMEF8=;
+ b=L61lvj0+W83/nAIGnEkv2su9w2+fgRdCMyz0pE05RmfhMuYSOouVf3tBoY8DIT4i7Ntu19caIXZXjIujl/eZpuC4lpZlyOOAjUx3dNB85UDpd31FMW2GQqEwA8gm8Bepc9S2l0M0sCz1s4rgJ29h8bikOWvNMwLHfNUmGaKcXrcfXiD2wUj2nXOPByjSg60zG/PEfU2Ay46cSNyV5e8eWVHeuWD6LNtC33wT62r51vtZ5JSNTsu5TwX9sTHKkxuU8dwHd8kIRL94R5fY1Er9mOebxTqfV7xphjnsAt6sDYqmvowi4AD3PJzsN6IfmLJmRGLmjdTEZG+6nad92TJnKg==
+Received: from BN6PR21CA0018.namprd21.prod.outlook.com (2603:10b6:404:8e::28)
+ by SN6PR12MB4751.namprd12.prod.outlook.com (2603:10b6:805:df::33) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.21; Thu, 3 Jun
- 2021 16:09:09 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.24; Thu, 3 Jun
+ 2021 16:09:15 +0000
 Received: from BN8NAM11FT007.eop-nam11.prod.protection.outlook.com
- (2603:10b6:404:8e:cafe::ab) by BN6PR21CA0024.outlook.office365.com
- (2603:10b6:404:8e::34) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:404:8e:cafe::a8) by BN6PR21CA0018.outlook.office365.com
+ (2603:10b6:404:8e::28) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.3 via Frontend
- Transport; Thu, 3 Jun 2021 16:09:09 +0000
+ Transport; Thu, 3 Jun 2021 16:09:15 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.32)
  smtp.mailfrom=nvidia.com; huawei.com; dkim=none (message not signed)
  header.d=none;huawei.com; dmarc=pass action=none header.from=nvidia.com;
@@ -47,13 +47,13 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
 Received: from mail.nvidia.com (216.228.112.32) by
  BN8NAM11FT007.mail.protection.outlook.com (10.13.177.109) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4195.22 via Frontend Transport; Thu, 3 Jun 2021 16:09:09 +0000
+ 15.20.4195.22 via Frontend Transport; Thu, 3 Jun 2021 16:09:15 +0000
 Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL109.nvidia.com
  (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 3 Jun
- 2021 09:09:07 -0700
+ 2021 09:09:12 -0700
 Received: from r-arch-stor02.mtr.labs.mlnx (172.20.187.5) by mail.nvidia.com
  (172.20.187.18) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Thu, 3 Jun 2021 16:09:02 +0000
+ Transport; Thu, 3 Jun 2021 16:09:08 +0000
 From:   Max Gurtovoy <mgurtovoy@nvidia.com>
 To:     <alex.williamson@redhat.com>, <cohuck@redhat.com>,
         <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
@@ -64,9 +64,9 @@ CC:     <aviadye@nvidia.com>, <oren@nvidia.com>, <shahafs@nvidia.com>,
         <kevin.tian@intel.com>, <hch@infradead.org>, <targupta@nvidia.com>,
         <shameerali.kolothum.thodi@huawei.com>, <liulongfang@huawei.com>,
         <yan.y.zhao@intel.com>, Max Gurtovoy <mgurtovoy@nvidia.com>
-Subject: [PATCH 10/11] vfio-pci: introduce vfio_pci_core subsystem driver
-Date:   Thu, 3 Jun 2021 19:08:08 +0300
-Message-ID: <20210603160809.15845-11-mgurtovoy@nvidia.com>
+Subject: [PATCH 11/11] mlx5-vfio-pci: add new vfio_pci driver for mlx5 devices
+Date:   Thu, 3 Jun 2021 19:08:09 +0300
+Message-ID: <20210603160809.15845-12-mgurtovoy@nvidia.com>
 X-Mailer: git-send-email 2.18.1
 In-Reply-To: <20210603160809.15845-1-mgurtovoy@nvidia.com>
 References: <20210603160809.15845-1-mgurtovoy@nvidia.com>
@@ -74,487 +74,218 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7c2788eb-feb3-476f-60ba-08d926a9ebb2
-X-MS-TrafficTypeDiagnostic: BN6PR12MB1844:
-X-Microsoft-Antispam-PRVS: <BN6PR12MB184484A0A18124EA756971CDDE3C9@BN6PR12MB1844.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2803;
+X-MS-Office365-Filtering-Correlation-Id: 91c72f39-a076-4633-4bdd-08d926a9ef7a
+X-MS-TrafficTypeDiagnostic: SN6PR12MB4751:
+X-Microsoft-Antispam-PRVS: <SN6PR12MB4751068BB2DC5E094F51BDDDDE3C9@SN6PR12MB4751.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Agg1b8PnBJEDoIVFn5066QZsTPGSH+0vsEhyLEKQh/3zWpOirdpWjC1NFJmyFN0ypQy0Z9B7ipkPZJdPCrHl5sfR/wEhBS7H5jaFYiFqjs+CG635+KrRvjvlVlANVjBG/7A+ir+XkyIdMILbYudqhSd31vPQJEHbJWrT+kGVM3lthhE46xuzCQPzRT4AyuoZ9ToEhC9iOIFfiHh3LtUx6I5Nc/4cH9eV1BSjAVkdqECCisR614AS/pZdxtASpLsgPI7djuKBJvhYgWrntT/vFq59hL9vkrk5Urx1dG6nCwLurHO32/9MVKmoLg9aV45EKpxKdpsgCxk0YaSs96zDfykLF38WIchmBHLfskQNnUIfj4lCMcV0Xyp4Zjl7mjSY6jDI2WBIUFvRCRelAMZoVQUpyAiEvlCsN373gz5vIyBWJNqExURu8jZFLgAnO69ndApIh9MI2TarWGMsgdcrdz2EvQzydpHLkAr0pRTx0KRzWxtkBdkG9WR7DOR0GzqZp70s4ge7D4diIGQFqbYNHGuxygrCS8TbIG4hcZBQovwc0B1acA1fpXHNbAcg+j6HqhkDLqtsLkwiCIwMw8Tjm8Br2stbAR4EKMlVvkCrwePgMwC1ZeW5kl5HCmPDabHG4kdEwfhNhRdm/1otidoYYA3d2hIZStr/3Hakt7ZvLwc=
-X-Forefront-Antispam-Report: CIP:216.228.112.32;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid01.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(36756003)(1076003)(30864003)(5660300002)(4326008)(7636003)(6636002)(356005)(86362001)(8936002)(8676002)(107886003)(498600001)(70586007)(47076005)(186003)(36860700001)(2616005)(2906002)(70206006)(26005)(82310400003)(426003)(336012)(83380400001)(110136005)(54906003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: +gKxEFzRogquxedIutc1BPA0hQFxO7hEWYtRYclzAI15OS84vEh7ASOBowqYZTT9+qLc5SlcWgxUIelL687w2AlYtl2kTqfxTf/c4DjsOrD9f29kz9kv+4SxqF+SXMRxVcZl2v6UaKKvjDl7lmbDbTgw4PZ4KQ5bv/ArRS6J24+Mdm84PiATAaBZTcn8ajMslwLce5N0rmVPRxhrOiC/EofbW0jasWAzq6z260S3+jVj20vkfUgKgYjSN9J5c8IQ4lVZ40WrjgHJ4F5CyPq7TiP4zMb9y0SNgyyol+tYI29hawFXDVt7CX6ZWZL7qika66aw+IXqIgLeu/H18YrCE+vn6hxmRjWlOU+fs2NYyeOEkv437aHUT42deI2J6j2wz4Wn8UzIuuwGGwJRu+GDXmMV1bjoiiAdPPAo7tUwEm4xQhNm2Ap/gcuVky2BAj1U9KFMu5ToUCFs7a6RsIRQQ7u80YMIME/cxgvXeEP+nNzwcya2IMfabjoSimiRDGVASSC/oNE7ZtW8OXiFCnp5k2HTNk9VR8grDEfY6T3RxnVBQVygC0RXmKI9pQwF9jsZ89iKSZE41Uu8yPXHtWgAhkdlej04EQWPuKevlha5COgXmnJHwF1orG85it77tDb8vMLyE3N7AbX5lFqgIifTj8Kv9OPMHmSMoI3cW5Z7TSw=
+X-Forefront-Antispam-Report: CIP:216.228.112.32;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid01.nvidia.com;CAT:NONE;SFS:(4636009)(39860400002)(396003)(136003)(376002)(346002)(36840700001)(46966006)(2906002)(107886003)(478600001)(36860700001)(110136005)(83380400001)(54906003)(82310400003)(26005)(316002)(4326008)(36756003)(86362001)(47076005)(426003)(82740400003)(7636003)(1076003)(8936002)(6636002)(356005)(8676002)(70586007)(2616005)(186003)(5660300002)(70206006)(336012);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2021 16:09:09.3401
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2021 16:09:15.6894
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7c2788eb-feb3-476f-60ba-08d926a9ebb2
+X-MS-Exchange-CrossTenant-Network-Message-Id: 91c72f39-a076-4633-4bdd-08d926a9ef7a
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.32];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT007.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR12MB1844
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB4751
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that vfio_pci has been split into two source modules, one focusing
-on the "struct pci_driver" (vfio_pci.c) and a toolbox library of code
-(vfio_pci_core.c), complete the split and move them into two different
-modules.
+This is the initial step for adding vendor specific vfio_pci driver for
+mlx5 devices. mlx5_vfio_pci use vfio_pci_core to register to the VFIO
+subsystem and also to implement the basic functionality of a pci device.
 
-As before vfio_pci.ko continues to present the same interface under
-sysfs and this change will have no functional impact.
+It will also extend this basic functionality and add mlx5 specific logic
+for various features (such as live migration, for example).
 
-Below is an example for adding new driver that will use vfio pci
-subsystem:
-
-	+---------------------------------------------------+
-	|                                                   |
-	|                     VFIO                          |
-	|                                                   |
-	+---------------------------------------------------+
-
-	+---------------------------------------------------+
-	|                                                   |
-	|                  VFIO_PCI_CORE                    |
-	|                                                   |
-	+---------------------------------------------------+
-
-	+----------+ +---------------+ +--------------------+
-	|          | |               | |                    |
-	| VFIO_PCI | | MLX5_VFIO_PCI | | HISILICON_VFIO_PCI |
-	|          | |               | |                    |
-	+----------+ +---------------+ +--------------------+
-
-Splitting into another module and adding exports allows creating new HW
-specific vfio_pci drivers that can implement device specific
-functionality, such as VFIO migration interfaces or specialized device
-requirements.
+Note: Although we've created the mlx5-vfio-pci.ko, the binding to
+vfio-pci.ko will still work as before. It's fully backward compatible.
+Of course, the extended vendor functionality will not exist in case one
+will bind the device to the generic vfio_pci.ko.
 
 Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
 ---
- drivers/vfio/pci/Kconfig                      | 18 ++++++---
- drivers/vfio/pci/Makefile                     | 11 +++--
- drivers/vfio/pci/vfio_pci.c                   | 14 ++-----
- drivers/vfio/pci/vfio_pci_config.c            |  2 +-
- drivers/vfio/pci/vfio_pci_core.c              | 40 ++++++++++++++++---
- drivers/vfio/pci/vfio_pci_igd.c               |  2 +-
- drivers/vfio/pci/vfio_pci_intrs.c             |  2 +-
- drivers/vfio/pci/vfio_pci_rdwr.c              |  2 +-
- drivers/vfio/pci/vfio_pci_zdev.c              |  2 +-
- .../pci => include/linux}/vfio_pci_core.h     | 10 ++---
- 10 files changed, 66 insertions(+), 37 deletions(-)
- rename {drivers/vfio/pci => include/linux}/vfio_pci_core.h (96%)
+ drivers/vfio/pci/Kconfig         |   9 +++
+ drivers/vfio/pci/Makefile        |   3 +
+ drivers/vfio/pci/mlx5_vfio_pci.c | 130 +++++++++++++++++++++++++++++++
+ 3 files changed, 142 insertions(+)
+ create mode 100644 drivers/vfio/pci/mlx5_vfio_pci.c
 
 diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-index 5e2e1b9a9fd3..384d06661f30 100644
+index 384d06661f30..9cdef46dd299 100644
 --- a/drivers/vfio/pci/Kconfig
 +++ b/drivers/vfio/pci/Kconfig
-@@ -1,6 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
--config VFIO_PCI
--	tristate "VFIO support for PCI devices"
-+config VFIO_PCI_CORE
-+	tristate "VFIO core support for PCI devices"
- 	depends on VFIO && PCI && EVENTFD
- 	depends on MMU
- 	select VFIO_VIRQFD
-@@ -11,9 +11,17 @@ config VFIO_PCI
+@@ -48,3 +48,12 @@ config VFIO_PCI_IGD
+ 	  and LPC bridge config space.
  
- 	  If you don't know what to do here, say N.
- 
-+config VFIO_PCI
-+	tristate "VFIO support for PCI devices"
-+	depends on VFIO_PCI_CORE
+ 	  To enable Intel IGD assignment through vfio-pci, say Y.
++
++config MLX5_VFIO_PCI
++	tristate "VFIO support for MLX5 PCI devices"
++	depends on VFIO_PCI_CORE && MLX5_CORE
 +	help
-+	  This provides a generic PCI support using the VFIO framework.
++	  This provides a generic PCI support for MLX5 devices using the VFIO
++	  framework.
 +
 +	  If you don't know what to do here, say N.
-+
- config VFIO_PCI_VGA
- 	bool "VFIO PCI support for VGA devices"
--	depends on VFIO_PCI && X86 && VGA_ARB
-+	depends on VFIO_PCI_CORE && X86 && VGA_ARB
- 	help
- 	  Support for VGA extension to VFIO PCI.  This exposes an additional
- 	  region on VGA devices for accessing legacy VGA addresses used by
-@@ -22,11 +30,11 @@ config VFIO_PCI_VGA
- 	  If you don't know what to do here, say N.
- 
- config VFIO_PCI_MMAP
--	depends on VFIO_PCI
-+	depends on VFIO_PCI_CORE
- 	def_bool y if !S390
- 
- config VFIO_PCI_INTX
--	depends on VFIO_PCI
-+	depends on VFIO_PCI_CORE
- 	def_bool y if !S390
- 
- config VFIO_PCI_IGD
 diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
-index 8aa517b4b671..ddba4759cde7 100644
+index ddba4759cde7..a0df9c2a4bd9 100644
 --- a/drivers/vfio/pci/Makefile
 +++ b/drivers/vfio/pci/Makefile
-@@ -1,7 +1,10 @@
- # SPDX-License-Identifier: GPL-2.0-only
+@@ -2,9 +2,12 @@
  
--vfio-pci-y := vfio_pci.o vfio_pci_core.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o
--vfio-pci-$(CONFIG_VFIO_PCI_IGD) += vfio_pci_igd.o
--vfio-pci-$(CONFIG_S390) += vfio_pci_zdev.o
--
-+obj-$(CONFIG_VFIO_PCI_CORE) += vfio-pci-core.o
+ obj-$(CONFIG_VFIO_PCI_CORE) += vfio-pci-core.o
  obj-$(CONFIG_VFIO_PCI) += vfio-pci.o
++obj-$(CONFIG_MLX5_VFIO_PCI) += mlx5-vfio-pci.o
+ 
+ vfio-pci-core-y := vfio_pci_core.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o
+ vfio-pci-core-$(CONFIG_S390) += vfio_pci_zdev.o
+ 
+ vfio-pci-y := vfio_pci.o
+ vfio-pci-$(CONFIG_VFIO_PCI_IGD) += vfio_pci_igd.o
 +
-+vfio-pci-core-y := vfio_pci_core.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o
-+vfio-pci-core-$(CONFIG_S390) += vfio_pci_zdev.o
++mlx5-vfio-pci-y := mlx5_vfio_pci.o
+diff --git a/drivers/vfio/pci/mlx5_vfio_pci.c b/drivers/vfio/pci/mlx5_vfio_pci.c
+new file mode 100644
+index 000000000000..0153682a3d3f
+--- /dev/null
++++ b/drivers/vfio/pci/mlx5_vfio_pci.c
+@@ -0,0 +1,130 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (c) 2021, Mellanox Technologies. All rights reserved.
++ *     Author: Max Gurtovoy <mgurtovoy@nvidia.com>
++ */
 +
-+vfio-pci-y := vfio_pci.o
-+vfio-pci-$(CONFIG_VFIO_PCI_IGD) += vfio_pci_igd.o
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 9beb4b841945..56870a6540d7 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -25,7 +25,7 @@
- #include <linux/types.h>
- #include <linux/uaccess.h>
- 
--#include "vfio_pci_core.h"
-+#include <linux/vfio_pci_core.h>
- 
- #define DRIVER_VERSION  "0.2"
- #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
-@@ -141,6 +141,7 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	if (ret)
- 		goto out_free;
- 
-+	dev_set_drvdata(&pdev->dev, vdev);
- 	return 0;
- 
- out_free:
-@@ -185,7 +186,6 @@ static struct pci_driver vfio_pci_driver = {
- static void __exit vfio_pci_cleanup(void)
- {
- 	pci_unregister_driver(&vfio_pci_driver);
--	vfio_pci_core_cleanup();
- }
- 
- static void __init vfio_pci_fill_ids(void)
-@@ -233,14 +233,10 @@ static int __init vfio_pci_init(void)
- {
- 	int ret;
- 
--	ret = vfio_pci_core_init();
--	if (ret)
--		return ret;
--
- 	/* Register and scan for devices */
- 	ret = pci_register_driver(&vfio_pci_driver);
- 	if (ret)
--		goto out;
-+		return ret;
- 
- 	vfio_pci_fill_ids();
- 
-@@ -248,10 +244,6 @@ static int __init vfio_pci_init(void)
- 		pr_warn("device denylist disabled.\n");
- 
- 	return 0;
--
--out:
--	vfio_pci_core_cleanup();
--	return ret;
- }
- 
- module_init(vfio_pci_init);
-diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-index 1f034f768a27..6e58b4bf7a60 100644
---- a/drivers/vfio/pci/vfio_pci_config.c
-+++ b/drivers/vfio/pci/vfio_pci_config.c
-@@ -26,7 +26,7 @@
- #include <linux/vfio.h>
- #include <linux/slab.h>
- 
--#include "vfio_pci_core.h"
-+#include <linux/vfio_pci_core.h>
- 
- /* Fake capability ID for standard config space */
- #define PCI_CAP_ID_BASIC	0
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 39a3f18bbc08..a1ce79160f6f 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -8,6 +8,8 @@
-  * Author: Tom Lyon, pugs@cisco.com
-  */
- 
 +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +
- #include <linux/device.h>
- #include <linux/eventfd.h>
- #include <linux/file.h>
-@@ -25,7 +27,11 @@
- #include <linux/nospec.h>
- #include <linux/sched/mm.h>
- 
--#include "vfio_pci_core.h"
++#include <linux/device.h>
++#include <linux/eventfd.h>
++#include <linux/file.h>
++#include <linux/interrupt.h>
++#include <linux/iommu.h>
++#include <linux/module.h>
++#include <linux/mutex.h>
++#include <linux/notifier.h>
++#include <linux/pci.h>
++#include <linux/pm_runtime.h>
++#include <linux/types.h>
++#include <linux/uaccess.h>
++#include <linux/vfio.h>
++#include <linux/sched/mm.h>
++#include <linux/mlx5/driver.h>
++
 +#include <linux/vfio_pci_core.h>
 +
-+#define DRIVER_VERSION  "0.2"
-+#define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
-+#define DRIVER_DESC "core driver for VFIO based PCI devices"
- 
- static bool nointxmask;
- module_param_named(nointxmask, nointxmask, bool, S_IRUGO | S_IWUSR);
-@@ -316,6 +322,7 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_enable);
- 
- void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
- {
-@@ -415,6 +422,7 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
- 	if (!disable_idle_d3)
- 		vfio_pci_set_power_state(vdev, PCI_D3hot);
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_disable);
- 
- static struct vfio_pci_core_device *get_pf_vdev(struct vfio_pci_core_device *vdev)
- {
-@@ -473,6 +481,7 @@ void vfio_pci_core_release(struct vfio_device *core_vdev)
- 	}
- 	mutex_unlock(&vdev->igate);
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_release);
- 
- void vfio_pci_core_finish_enable(struct vfio_pci_core_device *vdev)
- {
-@@ -480,6 +489,7 @@ void vfio_pci_core_finish_enable(struct vfio_pci_core_device *vdev)
- 	vfio_spapr_pci_eeh_open(vdev->pdev);
- 	vfio_pci_vf_token_user_add(vdev, 1);
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_finish_enable);
- 
- int vfio_pci_core_open(struct vfio_device *core_vdev)
- {
-@@ -497,6 +507,7 @@ int vfio_pci_core_open(struct vfio_device *core_vdev)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_open);
- 
- static int vfio_pci_get_irq_count(struct vfio_pci_core_device *vdev, int irq_type)
- {
-@@ -681,6 +692,7 @@ int vfio_pci_register_dev_region(struct vfio_pci_core_device *vdev,
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_register_dev_region);
- 
- struct vfio_devices {
- 	struct vfio_pci_core_device **devices;
-@@ -1287,6 +1299,7 @@ long vfio_pci_core_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
- 
- 	return -ENOTTY;
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_ioctl);
- 
- static ssize_t vfio_pci_rw(struct vfio_pci_core_device *vdev, char __user *buf,
- 			   size_t count, loff_t *ppos, bool iswrite)
-@@ -1330,6 +1343,7 @@ ssize_t vfio_pci_core_read(struct vfio_device *core_vdev, char __user *buf,
- 
- 	return vfio_pci_rw(vdev, buf, count, ppos, false);
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_read);
- 
- ssize_t vfio_pci_core_write(struct vfio_device *core_vdev, const char __user *buf,
- 		size_t count, loff_t *ppos)
-@@ -1342,6 +1356,7 @@ ssize_t vfio_pci_core_write(struct vfio_device *core_vdev, const char __user *bu
- 
- 	return vfio_pci_rw(vdev, (char __user *)buf, count, ppos, true);
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_write);
- 
- /* Return 1 on zap and vma_lock acquired, 0 on contention (only with @try) */
- static int vfio_pci_zap_and_vma_lock(struct vfio_pci_core_device *vdev, bool try)
-@@ -1607,6 +1622,7 @@ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_mmap);
- 
- void vfio_pci_core_request(struct vfio_device *core_vdev, unsigned int count)
- {
-@@ -1629,6 +1645,7 @@ void vfio_pci_core_request(struct vfio_device *core_vdev, unsigned int count)
- 
- 	mutex_unlock(&vdev->igate);
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_request);
- 
- static int vfio_pci_validate_vf_token(struct vfio_pci_core_device *vdev,
- 				      bool vf_token, uuid_t *uuid)
-@@ -1773,6 +1790,7 @@ int vfio_pci_core_match(struct vfio_device *core_vdev, char *buf)
- 
- 	return 1; /* Match */
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_match);
- 
- static int vfio_pci_reflck_find(struct pci_dev *pdev, void *data)
- {
-@@ -1814,6 +1832,7 @@ int vfio_pci_core_reflck_attach(struct vfio_device *core_vdev)
- 
- 	return PTR_ERR_OR_ZERO(core_vdev->reflck);
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_reflck_attach);
- 
- static int vfio_pci_bus_notifier(struct notifier_block *nb,
- 				 unsigned long action, void *data)
-@@ -1972,7 +1991,6 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev,
- 	ret = vfio_register_group_dev(&vdev->vdev);
- 	if (ret)
- 		goto out_power;
--	dev_set_drvdata(&pdev->dev, vdev);
- 	return 0;
- 
- out_power:
-@@ -1987,6 +2005,7 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev,
- 	vfio_iommu_group_put(group, &pdev->dev);
- 	return ret;
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_register_device);
- 
- void vfio_pci_core_unregister_device(struct vfio_pci_core_device *vdev)
- {
-@@ -2009,6 +2028,7 @@ void vfio_pci_core_unregister_device(struct vfio_pci_core_device *vdev)
- 	kfree(vdev->region);
- 	kfree(vdev->pm_save);
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_unregister_device);
- 
- static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
- 						  pci_channel_state_t state)
-@@ -2054,10 +2074,12 @@ int vfio_pci_core_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
- 
- 	return ret < 0 ? ret : nr_virtfn;
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_sriov_configure);
- 
- const struct pci_error_handlers vfio_pci_core_err_handlers = {
- 	.error_detected = vfio_pci_aer_err_detected,
- };
-+EXPORT_SYMBOL_GPL(vfio_pci_core_err_handlers);
- 
- static int vfio_pci_get_unused_devs(struct pci_dev *pdev, void *data)
- {
-@@ -2197,15 +2219,21 @@ static void vfio_pci_try_bus_reset(struct vfio_pci_core_device *vdev)
- 	kfree(devs.devices);
- }
- 
--/* This will become the __exit function of vfio_pci_core.ko */
--void vfio_pci_core_cleanup(void)
-+static void vfio_pci_core_cleanup(void)
- {
- 	vfio_pci_uninit_perm_bits();
- }
- 
--/* This will become the __init function of vfio_pci_core.ko */
--int __init vfio_pci_core_init(void)
-+static int __init vfio_pci_core_init(void)
- {
- 	/* Allocate shared config space permission data used by all devices */
- 	return vfio_pci_init_perm_bits();
- }
++static int mlx5_vfio_pci_open(struct vfio_device *core_vdev)
++{
++	struct vfio_pci_core_device *vdev =
++		container_of(core_vdev, struct vfio_pci_core_device, vdev);
++	int ret;
 +
-+module_init(vfio_pci_core_init);
-+module_exit(vfio_pci_core_cleanup);
++	lockdep_assert_held(&core_vdev->reflck->lock);
 +
-+MODULE_VERSION(DRIVER_VERSION);
++	ret = vfio_pci_core_enable(vdev);
++	if (ret)
++		return ret;
++
++	/* TODO: register migration region here for capable devices */
++
++	vfio_pci_core_finish_enable(vdev);
++
++	return 0;
++}
++
++static const struct vfio_device_ops mlx5_vfio_pci_ops = {
++	.name		= "mlx5-vfio-pci",
++	.open		= mlx5_vfio_pci_open,
++	.release	= vfio_pci_core_release,
++	.ioctl		= vfio_pci_core_ioctl,
++	.read		= vfio_pci_core_read,
++	.write		= vfio_pci_core_write,
++	.mmap		= vfio_pci_core_mmap,
++	.request	= vfio_pci_core_request,
++	.match		= vfio_pci_core_match,
++	.reflck_attach	= vfio_pci_core_reflck_attach,
++};
++
++static int mlx5_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
++{
++	struct vfio_pci_core_device *vdev;
++	int ret;
++
++	vdev = kzalloc(sizeof(*vdev), GFP_KERNEL);
++	if (!vdev)
++		return -ENOMEM;
++
++	ret = vfio_pci_core_register_device(vdev, pdev, &mlx5_vfio_pci_ops);
++	if (ret)
++		goto out_free;
++
++	dev_set_drvdata(&pdev->dev, vdev);
++	return 0;
++
++out_free:
++	kfree(vdev);
++	return ret;
++}
++
++static void mlx5_vfio_pci_remove(struct pci_dev *pdev)
++{
++	struct vfio_pci_core_device *vdev = dev_get_drvdata(&pdev->dev);
++
++	vfio_pci_core_unregister_device(vdev);
++	kfree(vdev);
++}
++
++static const struct pci_device_id mlx5_vfio_pci_table[] = {
++	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_MELLANOX, 0x101b) }, /* ConnectX-6 */
++	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_MELLANOX, 0x101c) }, /* ConnectX-6 VF */
++	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_MELLANOX, 0x101d) }, /* ConnectX-6 Dx */
++	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_MELLANOX, 0x101e) }, /* ConnectX Family mlx5Gen Virtual Function */
++	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_MELLANOX, 0x101f) }, /* ConnectX-6 LX */
++	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_MELLANOX, 0x1021) }, /* ConnectX-7 */
++	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_MELLANOX, 0xa2d2) }, /* BlueField integrated ConnectX-5 network controller */
++	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_MELLANOX, 0xa2d3) }, /* BlueField integrated ConnectX-5 network controller VF */
++	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_MELLANOX, 0xa2d6) }, /* BlueField-2 integrated ConnectX-6 Dx network controller */
++	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_MELLANOX, 0xa2dc) }, /* BlueField-3 integrated ConnectX-7 network controller */
++	{ 0, }
++};
++
++MODULE_DEVICE_TABLE(pci, mlx5_vfio_pci_table);
++
++static struct pci_driver mlx5_vfio_pci_driver = {
++	.name			= "mlx5-vfio-pci",
++	.id_table		= mlx5_vfio_pci_table,
++	.probe			= mlx5_vfio_pci_probe,
++	.remove			= mlx5_vfio_pci_remove,
++#ifdef CONFIG_PCI_IOV
++	.sriov_configure	= vfio_pci_core_sriov_configure,
++#endif
++	.err_handler		= &vfio_pci_core_err_handlers,
++};
++
++static void __exit mlx5_vfio_pci_cleanup(void)
++{
++	pci_unregister_driver(&mlx5_vfio_pci_driver);
++}
++
++static int __init mlx5_vfio_pci_init(void)
++{
++	return pci_register_driver(&mlx5_vfio_pci_driver);
++}
++
++module_init(mlx5_vfio_pci_init);
++module_exit(mlx5_vfio_pci_cleanup);
++
 +MODULE_LICENSE("GPL v2");
-+MODULE_AUTHOR(DRIVER_AUTHOR);
-+MODULE_DESCRIPTION(DRIVER_DESC);
-diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/vfio_pci_igd.c
-index 2295eaac4bc9..f04774cd3a7f 100644
---- a/drivers/vfio/pci/vfio_pci_igd.c
-+++ b/drivers/vfio/pci/vfio_pci_igd.c
-@@ -15,7 +15,7 @@
- #include <linux/uaccess.h>
- #include <linux/vfio.h>
- 
--#include "vfio_pci_core.h"
-+#include <linux/vfio_pci_core.h>
- 
- #define OPREGION_SIGNATURE	"IntelGraphicsMem"
- #define OPREGION_SIZE		(8 * 1024)
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index 945ddbdf4d11..6069a11fb51a 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -20,7 +20,7 @@
- #include <linux/wait.h>
- #include <linux/slab.h>
- 
--#include "vfio_pci_core.h"
-+#include <linux/vfio_pci_core.h>
- 
- /*
-  * INTx
-diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
-index 8fff4689dd44..57d3b2cbbd8e 100644
---- a/drivers/vfio/pci/vfio_pci_rdwr.c
-+++ b/drivers/vfio/pci/vfio_pci_rdwr.c
-@@ -17,7 +17,7 @@
- #include <linux/vfio.h>
- #include <linux/vgaarb.h>
- 
--#include "vfio_pci_core.h"
-+#include <linux/vfio_pci_core.h>
- 
- #ifdef __LITTLE_ENDIAN
- #define vfio_ioread64	ioread64
-diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
-index 2ffbdc11f089..fe4def9ffffb 100644
---- a/drivers/vfio/pci/vfio_pci_zdev.c
-+++ b/drivers/vfio/pci/vfio_pci_zdev.c
-@@ -19,7 +19,7 @@
- #include <asm/pci_clp.h>
- #include <asm/pci_io.h>
- 
--#include "vfio_pci_core.h"
-+#include <linux/vfio_pci_core.h>
- 
- /*
-  * Add the Base PCI Function information to the device info region.
-diff --git a/drivers/vfio/pci/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-similarity index 96%
-rename from drivers/vfio/pci/vfio_pci_core.h
-rename to include/linux/vfio_pci_core.h
-index 406e934e23b2..5a48c3c552b1 100644
---- a/drivers/vfio/pci/vfio_pci_core.h
-+++ b/include/linux/vfio_pci_core.h
-@@ -171,10 +171,10 @@ extern void vfio_pci_uninit_perm_bits(void);
- extern int vfio_config_init(struct vfio_pci_core_device *vdev);
- extern void vfio_config_free(struct vfio_pci_core_device *vdev);
- 
--extern int vfio_pci_register_dev_region(struct vfio_pci_core_device *vdev,
--					unsigned int type, unsigned int subtype,
--					const struct vfio_pci_regops *ops,
--					size_t size, u32 flags, void *data);
-+int vfio_pci_register_dev_region(struct vfio_pci_core_device *vdev,
-+		unsigned int type, unsigned int subtype,
-+		const struct vfio_pci_regops *ops,
-+		size_t size, u32 flags, void *data);
- 
- extern int vfio_pci_set_power_state(struct vfio_pci_core_device *vdev,
- 				    pci_power_t state);
-@@ -207,8 +207,6 @@ static inline int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
- #endif
- 
- /* Will be exported for vfio pci drivers usage */
--void vfio_pci_core_cleanup(void);
--int vfio_pci_core_init(void);
- void vfio_pci_core_release(struct vfio_device *core_vdev);
- int vfio_pci_core_open(struct vfio_device *core_vdev);
- int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev,
++MODULE_AUTHOR("Max Gurtovoy <mgurtovoy@nvidia.com>");
++MODULE_DESCRIPTION("MLX5 VFIO PCI - User Level meta-driver for MLX5 device family");
 -- 
 2.21.0
 
