@@ -2,187 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D232D39A3C0
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 16:56:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5571039A403
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 17:10:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231845AbhFCO6Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Jun 2021 10:58:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20010 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231713AbhFCO6Q (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 3 Jun 2021 10:58:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622732191;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=goc0S/3BnSXgINaDm4Ycz9KOeQAXHuNP6jsSEIzAQsg=;
-        b=VuI2UnpciToZjwiw9QLX14fQ8WDoTnhgKu3aFB4jD5fw2Cgz9SuYpAbkRF5HsZRF+wR5U/
-        Xdg3Lpu3irfQWUlMag8ObI6zg1CH3DcWzP+/NoHLwqsU8ohp0WzO2o0459isggAkCORGT/
-        ywCO4QgyDxKt1z6ScD0HTqIwDKqMSZk=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-kJ91P1XpMoie-wDtTVgzzQ-1; Thu, 03 Jun 2021 10:56:29 -0400
-X-MC-Unique: kJ91P1XpMoie-wDtTVgzzQ-1
-Received: by mail-ej1-f70.google.com with SMTP id jy19-20020a1709077633b02903eb7acdb38cso2035989ejc.14
-        for <kvm@vger.kernel.org>; Thu, 03 Jun 2021 07:56:29 -0700 (PDT)
+        id S231579AbhFCPMh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Jun 2021 11:12:37 -0400
+Received: from mail-pl1-f171.google.com ([209.85.214.171]:43903 "EHLO
+        mail-pl1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230396AbhFCPMh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Jun 2021 11:12:37 -0400
+Received: by mail-pl1-f171.google.com with SMTP id v12so3023172plo.10;
+        Thu, 03 Jun 2021 08:10:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=0ytX/7qNN3WwyQK0LAIrxn42NeJriMqbyp9OIcjvkW4=;
+        b=Ie42/OY9JQj6C5gqGcEO3N8IUZ47sNLu7b/37YWU9nTBfZhNYKiNX0sdbz/pA5Au/c
+         tMWGf7LWBDNe8Y6ur2rbxKiUTricsCq6ysD+SmBE7iPjvqD7RpXs0C1GT5hjQ6MmqAPf
+         gHx7a9buVV6mbwqO8tvuwZ4W6VT4C2h1+R/Z1xEwHfTCKxzIKmhsPCyAatIvxyYbL3ib
+         qV+dWMYQ5OtXkUjaEhMAnnLKIaQ5cyvN8FOR+P20vUsNgL7tnjTH9Ymx/nGDpAf0GXTy
+         6IISXn6xpiIpUJKPUDtmNh2wb8cOEJae/DyUO7iAisa51SbnUxomokFL3J+62FvCo2lK
+         J7xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=goc0S/3BnSXgINaDm4Ycz9KOeQAXHuNP6jsSEIzAQsg=;
-        b=G5KBwKn90KCJkC1TXrhBzWR0SngRQ+YUYAjoAtgf+5c89VBRD8JMidKRhTh7XzO3SV
-         eM8dF/mjyKlOq28yToldZa5fybK3DYKjrpz2jnOm7dTE7RKE/sdwi5/Ko9hlboSOBYAj
-         4bsQY8ygIW+ng9hIDpqQ+Mux00w7idmIPxWpv05jsq5E+PxHLFBe5atX+Oq3qeJE0Kbe
-         jtKhUiCR5KzabceqIU/Q8Tp0xMJNAgbX3OJWs6JGb4loDr3k7QYnWSiT3UfLWzxqrJXd
-         lKlt07shGT863dErpMSjVnn+AclsdyZ6O9L8RlehcAz6Yc0lu5JRWmzSnbGyUX4R6upj
-         YYyg==
-X-Gm-Message-State: AOAM531fOD8QRZBjNi3HrwNrMcSo+q0KQa1kwsm3PJFHOyM9lvSw3i4a
-        FCeyTTCopwScH5Qa5/9J4Bl5BXLj/2v8unqe5GQyIaXm9C/MN87dUEhTLdQ0NrkG0rS0geOmqsO
-        vaulAS2CPQ7F2
-X-Received: by 2002:aa7:c594:: with SMTP id g20mr171117edq.193.1622732188105;
-        Thu, 03 Jun 2021 07:56:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxNs8fBb3HJWsNPx4vbS0w6t0xdKecgcrrzazaCK6WjM8HGlFblxyZ501bs6But06wi3tedQQ==
-X-Received: by 2002:aa7:c594:: with SMTP id g20mr171099edq.193.1622732187957;
-        Thu, 03 Jun 2021 07:56:27 -0700 (PDT)
-Received: from steredhat ([5.170.129.82])
-        by smtp.gmail.com with ESMTPSA id h2sm1391024edr.50.2021.06.03.07.56.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jun 2021 07:56:27 -0700 (PDT)
-Date:   Thu, 3 Jun 2021 16:56:23 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Norbert Slusarek <nslusarek@gmx.net>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, oxffffaa@gmail.com
-Subject: Re: [PATCH v10 12/18] virtio/vsock: add SEQPACKET receive logic
-Message-ID: <20210603145623.cv7cmf2zfjsx4w2t@steredhat>
-References: <20210520191357.1270473-1-arseny.krasnov@kaspersky.com>
- <20210520191824.1272172-1-arseny.krasnov@kaspersky.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=0ytX/7qNN3WwyQK0LAIrxn42NeJriMqbyp9OIcjvkW4=;
+        b=E49bv5ml9ekMlvD2gXLA8usK2rWVxI0l+QpNKSTj2kmG7/ic1+WKXBWd17AJ+3oxbu
+         GMgmlarjKknEgDTQ4029PUDPGOEW3MpwD2x5o79yJ0vTXGVc5CDWtBxN35ncnpngJ0gN
+         IjDgyJlq8D27dJKdzJg1TPoDiXWThapGlFmQhrG5RnWk3XVOAwhRP9hVuI57SNnv7Nf0
+         kjbXmruPFYT/4rf4eW+Y8Zc1KEb6k6OBbOhXqlYnaWt1M9vvlhzCUZLUjaIsg0wGUrgu
+         8ao7COCP9LMaWb9DIyXAYTM8RwlCzrvCg9ATXIqVPh8M5qWLOsror7p1AKm5c4KJdaq/
+         CSmA==
+X-Gm-Message-State: AOAM531+ekqQ4BxOoc/+R3p59tU3fDn3FpqLGK9aYxjh4hGkDgrZrRt1
+        isjtw0BjREFuKiW4lLPvEOKIoPmAFSA=
+X-Google-Smtp-Source: ABdhPJyDjceDUJjIgTwEDxoIaUx371wwpPCNRO3iIruRpb5xntwB7viN3eDmhb5Hp4L5NdOmds5JJg==
+X-Received: by 2002:a17:902:27:b029:10b:dd63:2d3a with SMTP id 36-20020a1709020027b029010bdd632d3amr130819pla.77.1622732992058;
+        Thu, 03 Jun 2021 08:09:52 -0700 (PDT)
+Received: from localhost ([47.251.4.198])
+        by smtp.gmail.com with ESMTPSA id x3sm3177706pgx.8.2021.06.03.08.09.50
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 03 Jun 2021 08:09:51 -0700 (PDT)
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: [PATCH V2] KVM: X86: MMU: Use the correct inherited permissions to get shadow page
+Date:   Thu,  3 Jun 2021 13:24:55 +0800
+Message-Id: <20210603052455.21023-1-jiangshanlai@gmail.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
+In-Reply-To: <20201120095517.19211-1-jiangshanlai@gmail.com>
+References: <20201120095517.19211-1-jiangshanlai@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210520191824.1272172-1-arseny.krasnov@kaspersky.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 20, 2021 at 10:18:21PM +0300, Arseny Krasnov wrote:
->Update current receive logic for SEQPACKET support: performs
->check for packet and socket types on receive(if mismatch, then
->reset connection).
+From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-We also copy the flags. Please check better your commit messages.
+Commit 41074d07c78b ("KVM: MMU: Fix inherited permissions for emulated
+guest pte updates") said role.access is common access permissions for
+all ptes in this shadow page, which is the inherited permissions from
+the parent ptes, and should not from any children pte.
 
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> v9 -> v10:
-> 1) Commit message updated.
-> 2) Comment updated.
-> 3) Updated way to to set 'last_pkt' flags.
->
-> net/vmw_vsock/virtio_transport_common.c | 30 ++++++++++++++++++++++---
-> 1 file changed, 27 insertions(+), 3 deletions(-)
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index 61349b2ea7fe..a6f8b0f39775 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -165,6 +165,14 @@ void virtio_transport_deliver_tap_pkt(struct virtio_vsock_pkt *pkt)
-> }
-> EXPORT_SYMBOL_GPL(virtio_transport_deliver_tap_pkt);
->
->+static u16 virtio_transport_get_type(struct sock *sk)
->+{
->+	if (sk->sk_type == SOCK_STREAM)
->+		return VIRTIO_VSOCK_TYPE_STREAM;
->+	else
->+		return VIRTIO_VSOCK_TYPE_SEQPACKET;
->+}
->+
-> /* This function can only be used on connecting/connected sockets,
->  * since a socket assigned to a transport is required.
->  *
->@@ -979,13 +987,17 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
-> 					   struct virtio_vsock_pkt, list);
->
-> 		/* If there is space in the last packet queued, we copy the
->-		 * new packet in its buffer.
->+		 * new packet in its buffer(except SEQPACKET case, when we
->+		 * also check that last packet is not last packet of previous
->+		 * record).
+But the commit did not enforce this definition when kvm_mmu_get_page()
+is called in FNAME(fetch). Rather, it uses a whole combined access of
+the first accessing vitual address except the ternimating pte. And the
+permissions won't be checked again in next FNAME(fetch) since the spte
+is present. It might fail to meet guest's expectation when guest uses
+shared pagetables.
 
-Is better to explain why we don't do this for SEQPACKET, something like this:
+For example, here is a shared pagetable:
+   pgd[]   pud[]        pmd[]            virtual address pointers
+                     /->pmd1(u--)->pte1(uw-)->page1 <- ptr1 (u--)
+        /->pud1(uw-)--->pmd2(uw-)->pte2(uw-)->page2 <- ptr2 (uw-)
+   pgd-|           (shared pmd[] as above)
+        \->pud2(u--)--->pmd1(u--)->pte1(uw-)->page1 <- ptr3 (u--)
+                     \->pmd2(uw-)->pte2(uw-)->page2 <- ptr4 (u--)
+  pud1 and pud2 point to the same pmd table, so:
+  ptr1 and ptr3 points to the same page.
+  ptr2 and ptr4 points to the same page.
 
-		/* If there is space in the last packet queued, we copy the
-		 * new packet in its buffer.
-		 * We avoid this if the last packet queued has
-		 * VIRTIO_VSOCK_SEQ_EOR set, because it is the delimiter
-		 * of SEQPACKET record, so `pkt` is the first packet
-		 * of a new record.
-		 */
+(pud1 and pud2 here are pud entries, not pud pagtable pointer
+ pmd1 and pmd2 here are pmd entries, not pmd pagtable pointer)
 
-> 		 */
->-		if (pkt->len <= last_pkt->buf_len - last_pkt->len) {
->+		if ((pkt->len <= last_pkt->buf_len - last_pkt->len) &&
->+		    !(le32_to_cpu(last_pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOR)) {
-> 			memcpy(last_pkt->buf + last_pkt->len, pkt->buf,
-> 			       pkt->len);
-> 			last_pkt->len += pkt->len;
-> 			free_pkt = true;
->+			last_pkt->hdr.flags |= pkt->hdr.flags;
-> 			goto out;
-> 		}
-> 	}
->@@ -1151,6 +1163,12 @@ virtio_transport_recv_listen(struct sock *sk, struct virtio_vsock_pkt *pkt,
-> 	return 0;
-> }
->
->+static bool virtio_transport_valid_type(u16 type)
->+{
->+	return (type == VIRTIO_VSOCK_TYPE_STREAM) ||
->+	       (type == VIRTIO_VSOCK_TYPE_SEQPACKET);
->+}
->+
-> /* We are under the virtio-vsock's vsock->rx_lock or vhost-vsock's vq->mutex
->  * lock.
->  */
->@@ -1176,7 +1194,7 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
-> 					le32_to_cpu(pkt->hdr.buf_alloc),
-> 					le32_to_cpu(pkt->hdr.fwd_cnt));
->
->-	if (le16_to_cpu(pkt->hdr.type) != VIRTIO_VSOCK_TYPE_STREAM) {
->+	if (!virtio_transport_valid_type(le16_to_cpu(pkt->hdr.type))) {
-> 		(void)virtio_transport_reset_no_sock(t, pkt);
-> 		goto free_pkt;
-> 	}
->@@ -1193,6 +1211,12 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
-> 		}
-> 	}
->
->+	if (virtio_transport_get_type(sk) != le16_to_cpu(pkt->hdr.type)) {
->+		(void)virtio_transport_reset_no_sock(t, pkt);
->+		sock_put(sk);
->+		goto free_pkt;
->+	}
->+
-> 	vsk = vsock_sk(sk);
->
-> 	lock_sock(sk);
->-- 
->2.25.1
->
+  The guess read-accesses to ptr1 first. So the hypervisor gets the
+shadow page table with role.access=u-- for ptr1's pud1 and ptr1's pmd1.
+(Note: current pt->access is the combined access of pgd, pud1 and
+pmd1, so it is "u--".  But the current code uses this pt->access to
+get pagetable for pud1 which violate the definition in the comment
+which should be the combined access of pgd, pud1, a.k.a "uw-".)
 
-The rest LGTM.
+  And then the guest write-accesses to ptr2, and the hypervisor
+set up shadow page for ptr2.
+(Note: current pt->access=uw-, but pud1 points to a shadow pmd
+table with role.access=u--.  Since pud1 is present, the hypervisor
+silencely accepts it without recheck the access in FNAME(fetch))
 
-Stefano
+  After that, the guess read-accesses to ptr3, the hypervisor
+reused the same shadow pmd page table for pud2 as ptr1.
+(Note: because current pt->access=u--, which is the access of pgd, pud2
+and pmd1)
+
+  At last, the guest writes to ptr4 without vmexit nor pagefault.
+Which should cause pagefault as the guest expects.
+
+Any kind of shared pagetable might have the similar problem when in
+virtual machine without TDP enabled if the permissions are different
+from different ancestors.
+
+In order to fix the problem, we change pt->access to be an array, and
+any access in it will not combind accesses from child ptes.
+
+The test code is: https://lore.kernel.org/kvm/20210603050537.19605-1-jiangshanlai@gmail.com/ 
+Remember to test it with TDP disabled.
+
+The problem had existed long before the commit 41074d07c78b ("KVM: MMU:
+Fix inherited permissions for emulated guest pte updates"), and it
+is hard to find which is the culprit.  So there is no fixes tag here.
+
+Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+---
+Changed from V1:
+	Update changelog only
+
+ Documentation/virt/kvm/mmu.rst |  4 ++--
+ arch/x86/kvm/mmu/paging_tmpl.h | 14 +++++++++-----
+ 2 files changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/Documentation/virt/kvm/mmu.rst b/Documentation/virt/kvm/mmu.rst
+index 5bfe28b0728e..20d85daed395 100644
+--- a/Documentation/virt/kvm/mmu.rst
++++ b/Documentation/virt/kvm/mmu.rst
+@@ -171,8 +171,8 @@ Shadow pages contain the following information:
+     shadow pages) so role.quadrant takes values in the range 0..3.  Each
+     quadrant maps 1GB virtual address space.
+   role.access:
+-    Inherited guest access permissions in the form uwx.  Note execute
+-    permission is positive, not negative.
++    Inherited guest access permissions from the parent ptes in the form uwx.
++    Note execute permission is positive, not negative.
+   role.invalid:
+     The page is invalid and should not be used.  It is a root page that is
+     currently pinned (by a cpu hardware register pointing to it); once it is
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 70b7e44e3035..823a5919f9fa 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -90,8 +90,8 @@ struct guest_walker {
+ 	gpa_t pte_gpa[PT_MAX_FULL_LEVELS];
+ 	pt_element_t __user *ptep_user[PT_MAX_FULL_LEVELS];
+ 	bool pte_writable[PT_MAX_FULL_LEVELS];
+-	unsigned pt_access;
+-	unsigned pte_access;
++	unsigned int pt_access[PT_MAX_FULL_LEVELS];
++	unsigned int pte_access;
+ 	gfn_t gfn;
+ 	struct x86_exception fault;
+ };
+@@ -418,13 +418,15 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+ 		}
+ 
+ 		walker->ptes[walker->level - 1] = pte;
++
++		/* Convert to ACC_*_MASK flags for struct guest_walker.  */
++		walker->pt_access[walker->level - 1] = FNAME(gpte_access)(pt_access ^ walk_nx_mask);
+ 	} while (!is_last_gpte(mmu, walker->level, pte));
+ 
+ 	pte_pkey = FNAME(gpte_pkeys)(vcpu, pte);
+ 	accessed_dirty = have_ad ? pte_access & PT_GUEST_ACCESSED_MASK : 0;
+ 
+ 	/* Convert to ACC_*_MASK flags for struct guest_walker.  */
+-	walker->pt_access = FNAME(gpte_access)(pt_access ^ walk_nx_mask);
+ 	walker->pte_access = FNAME(gpte_access)(pte_access ^ walk_nx_mask);
+ 	errcode = permission_fault(vcpu, mmu, walker->pte_access, pte_pkey, access);
+ 	if (unlikely(errcode))
+@@ -463,7 +465,8 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+ 	}
+ 
+ 	pgprintk("%s: pte %llx pte_access %x pt_access %x\n",
+-		 __func__, (u64)pte, walker->pte_access, walker->pt_access);
++		 __func__, (u64)pte, walker->pte_access,
++		 walker->pt_access[walker->level - 1]);
+ 	return 1;
+ 
+ error:
+@@ -643,7 +646,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, gpa_t addr,
+ 	bool huge_page_disallowed = exec && nx_huge_page_workaround_enabled;
+ 	struct kvm_mmu_page *sp = NULL;
+ 	struct kvm_shadow_walk_iterator it;
+-	unsigned direct_access, access = gw->pt_access;
++	unsigned int direct_access, access;
+ 	int top_level, level, req_level, ret;
+ 	gfn_t base_gfn = gw->gfn;
+ 
+@@ -675,6 +678,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, gpa_t addr,
+ 		sp = NULL;
+ 		if (!is_shadow_present_pte(*it.sptep)) {
+ 			table_gfn = gw->table_gfn[it.level - 2];
++			access = gw->pt_access[it.level - 2];
+ 			sp = kvm_mmu_get_page(vcpu, table_gfn, addr, it.level-1,
+ 					      false, access);
+ 		}
+-- 
+2.19.1.6.gb485710b
 
