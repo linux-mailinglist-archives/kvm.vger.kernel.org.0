@@ -2,384 +2,246 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C87B39AA17
-	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 20:34:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C04139AA31
+	for <lists+kvm@lfdr.de>; Thu,  3 Jun 2021 20:39:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230004AbhFCSfy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Jun 2021 14:35:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51340 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229963AbhFCSfx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Jun 2021 14:35:53 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3FE1A613F3;
-        Thu,  3 Jun 2021 18:34:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1622745248;
-        bh=xvTd7Eh6umCswsc6DntHBSUyT9ZXtV7p9wb3U520Nms=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=YbmolTxsINqDJRKpXnKvaan3EZOi0N0pFb/5O+IK+bS73V05Bny1/Oy1f4uLzaRGN
-         gX3ndoG3PLWnw5aASPq+xY02dNNUUvnFuW7rZ9i8w3qbucWQjA6SNS5uoXBEJg5g1r
-         nJP6CqdgpJ8bLv2Yv9PSDZnapB/wUyMB9zZxkHOFWe/TOM5+gS+VudZqbZ/orjfy8t
-         vKFkxnkTN6UvSFHdocjTCsdb+aVoAcscwyw/Dmrw9QJXxEPiBDoVpPMBEL1VABSoQL
-         2zheck0pvOUTlJH8SEiZenpBfdAOk7o0Qgi/X5/Q/dZJ7rLdHFC+GOOvKpG6EiD44C
-         GS0QqYVWvXrKg==
-From:   Will Deacon <will@kernel.org>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Fuad Tabba <tabba@google.com>,
-        Quentin Perret <qperret@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        David Brazdil <dbrazdil@google.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: [RFC PATCH 4/4] KVM: arm64: Introduce KVM_CAP_ARM_PROTECTED_VM
-Date:   Thu,  3 Jun 2021 19:33:47 +0100
-Message-Id: <20210603183347.1695-5-will@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20210603183347.1695-1-will@kernel.org>
-References: <20210603183347.1695-1-will@kernel.org>
+        id S229800AbhFCSl2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Jun 2021 14:41:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42352 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229576AbhFCSl1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Jun 2021 14:41:27 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4F3CC06174A
+        for <kvm@vger.kernel.org>; Thu,  3 Jun 2021 11:39:30 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id l23-20020a17090a0717b029016ae774f973so3777205pjl.1
+        for <kvm@vger.kernel.org>; Thu, 03 Jun 2021 11:39:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=G1RdXss9gIKUo2p6Za1cqFOjPkitJ5C8gIseJUxnP+E=;
+        b=LDCp2GtwYEyBVq5SBnSd/F9Y094QBr7Zd77ImJQeeDAsWmSqzqmAqqGK4LfM/K774+
+         XJZmnbx9YHUapr8jogIRcK4tFfGWvRWFPR9EufaUXaFGDtgho3NTAeszD8o9FsYadE2E
+         oFitDmMUAeVfUst0Ax/VCJJ/X2/sylzO5KuXf6d9Tm2Ym/AaY9249ATEc9tpuSlSHxlM
+         L0zz5AkagCAnsvDDyOyOVrXvxlIhUzAj2VDhfNptxbn9l8WjQFBPFlMZH8v9rVLpfY4S
+         iyCktEzgzFTj1TfF3qiDZSvJzNhTxE0G6xALKlKPvJgiJCD0eNc9rpAsJpvhmfhALTu7
+         KAjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=G1RdXss9gIKUo2p6Za1cqFOjPkitJ5C8gIseJUxnP+E=;
+        b=nh3nxujFLsI9T/QTWqR6WtwlRXlrzYyf+0oOPLtuwtbHHdBe73YUej4P2l8x24DHdk
+         burttWCTzPIbpRKEMVohGhaYsVy+Nbg211VWNbCA/2UeBG0ISrcCesQqb8FkPBKY7L89
+         VKpX89RIIwL+QXCCBjQPFA6GkmIbPNnZdQn/aAbVyoQi5erAMuTezljX29N40tZ+tl+2
+         5cJK0N5hyniiABOkIfuc1eJqVlrfKa5nahaZ0iCELLeOYbvZjSjXidP6MSbda0DwOBmZ
+         3ID5+76disG1KUBTzbZlXd9NSBHTB5Aygw8/Wycs81JcxbaUaXfCC7reIHA1FH5/HXe5
+         m6RQ==
+X-Gm-Message-State: AOAM533wv6aAOs9uUKQ6GrFReK40FKJ2LGgRWFookVP7VUClf677DtgJ
+        tVuBeLRtlmA6xsJh5/SWLP/ivg==
+X-Google-Smtp-Source: ABdhPJwFvjGj+P7qpvo0esBmOMIZI5qE35WwfYBbVtQvgEaTSPGPA1h0F3jcrDZ69+bLBGm5aFzcqw==
+X-Received: by 2002:a17:902:bcc3:b029:ed:4637:fb2f with SMTP id o3-20020a170902bcc3b02900ed4637fb2fmr463929pls.72.1622745570091;
+        Thu, 03 Jun 2021 11:39:30 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id j5sm2815786pfj.185.2021.06.03.11.39.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Jun 2021 11:39:29 -0700 (PDT)
+Date:   Thu, 3 Jun 2021 18:39:25 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Hou Wenlong <houwenlong.hwl@antgroup.com>,
+        Lai Jiangshan <laijs@linux.alibaba.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: test combined access
+Message-ID: <YLkh3bQ106M9nV3k@google.com>
+References: <20210603050537.19605-1-jiangshanlai@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210603050537.19605-1-jiangshanlai@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce a new VM capability, KVM_CAP_ARM_PROTECTED_VM, which can be
-used to isolate guest memory from the host. For now, the EL2 portion is
-missing, so this documents and exposes the user ABI for the host.
+On Thu, Jun 03, 2021, Lai Jiangshan wrote:
+> From: Lai Jiangshan <laijs@linux.alibaba.com>
+> 
+> Check combined access when guest shares pagetables.
 
-Signed-off-by: Will Deacon <will@kernel.org>
----
- Documentation/virt/kvm/api.rst    |  69 ++++++++++++++++++++
- arch/arm64/include/asm/kvm_host.h |  10 +++
- arch/arm64/include/uapi/asm/kvm.h |   9 +++
- arch/arm64/kvm/arm.c              |  18 +++---
- arch/arm64/kvm/mmu.c              |   3 +
- arch/arm64/kvm/pkvm.c             | 104 ++++++++++++++++++++++++++++++
- include/uapi/linux/kvm.h          |   1 +
- 7 files changed, 205 insertions(+), 9 deletions(-)
+Can we avoid "combined"?  Purely because of Intel using "combined" to refer to
+the full IA32+EPT translation.  It'd also be helpful to provide a bit more
+detail.  E.g. 
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 7fcb2fd38f42..dfbaf905c435 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6362,6 +6362,75 @@ default.
- 
- See Documentation/x86/sgx/2.Kernel-internals.rst for more details.
- 
-+7.26 KVM_CAP_ARM_PROTECTED_VM
-+-----------------------------
-+
-+:Architectures: arm64
-+:Target: VM
-+:Parameters: flags is a single KVM_CAP_ARM_PROTECTED_VM_FLAGS_* value
-+
-+The presence of this capability indicates that KVM supports running in a
-+configuration where the host Linux kernel does not have access to guest memory.
-+On such a system, a small hypervisor layer at EL2 can configure the stage-2
-+page tables for both the CPU and any DMA-capable devices to protect guest
-+memory pages so that they are inaccessible to the host unless access is granted
-+explicitly by the guest.
-+
-+The 'flags' parameter is defined as follows:
-+
-+7.26.1 KVM_CAP_ARM_PROTECTED_VM_FLAGS_ENABLE
-+--------------------------------------------
-+
-+:Capability: 'flag' parameter to KVM_CAP_ARM_PROTECTED_VM
-+:Architectures: arm64
-+:Target: VM
-+:Parameters: args[0] contains memory slot ID to hold guest firmware
-+:Returns: 0 on success; negative error code on failure
-+
-+Enabling this capability causes all memory slots of the specified VM to be
-+unmapped from the host system and put into a state where they are no longer
-+configurable. The memory slot corresponding to the ID passed in args[0] is
-+populated with the guest firmware image provided by the host firmware.
-+
-+The first vCPU to enter the guest is defined to be the primary vCPU. All other
-+vCPUs belonging to the VM are secondary vCPUs.
-+
-+All vCPUs belonging to a VM with this capability enabled are initialised to a
-+pre-determined reset state irrespective of any prior configuration according to
-+the KVM_ARM_VCPU_INIT ioctl, with the following exceptions for the primary
-+vCPU:
-+
-+	===========	===========
-+	Register(s)	Reset value
-+	===========	===========
-+	X0-X14:		Preserved (see KVM_SET_ONE_REG)
-+	X15:		Boot protocol version (0)
-+	X16-X30:	Reserved (0)
-+	PC:		IPA base of firmware memory slot
-+	SP:		IPA end of firmware memory slot
-+	===========	===========
-+
-+Secondary vCPUs belonging to a VM with this capability enabled will return
-+-EPERM in response to a KVM_RUN ioctl() if the vCPU was not initialised with
-+the KVM_ARM_VCPU_POWER_OFF feature.
-+
-+There is no support for AArch32 at any exception level.
-+
-+It is an error to enable this capability on a VM after issuing a KVM_RUN
-+ioctl() on one of its vCPUs.
-+
-+7.26.2 KVM_CAP_ARM_PROTECTED_VM_FLAGS_INFO
-+------------------------------------------
-+
-+:Capability: 'flag' parameter to KVM_CAP_ARM_PROTECTED_VM
-+:Architectures: arm64
-+:Target: VM
-+:Parameters: args[0] contains pointer to 'struct kvm_protected_vm_info'
-+:Returns: 0 on success; negative error code on failure
-+
-+Populates the 'struct kvm_protected_vm_info' pointed to by args[0] with
-+information about the protected environment for the VM.
-+
- 8. Other capabilities.
- ======================
- 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7cd7d5c8c4bc..5645af2a1431 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -100,6 +100,11 @@ struct kvm_s2_mmu {
- struct kvm_arch_memory_slot {
- };
- 
-+struct kvm_protected_vm {
-+	bool enabled;
-+	struct kvm_memory_slot *firmware_slot;
-+};
-+
- struct kvm_arch {
- 	struct kvm_s2_mmu mmu;
- 
-@@ -132,6 +137,8 @@ struct kvm_arch {
- 
- 	u8 pfr0_csv2;
- 	u8 pfr0_csv3;
-+
-+	struct kvm_protected_vm pkvm;
- };
- 
- struct kvm_vcpu_fault_info {
-@@ -763,6 +770,9 @@ void kvm_arch_free_vm(struct kvm *kvm);
- 
- int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
- 
-+int kvm_arm_vm_ioctl_pkvm(struct kvm *kvm, struct kvm_enable_cap *cap);
-+#define kvm_vm_is_protected(kvm) (kvm->arch.pkvm.enabled)
-+
- int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
- bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
- 
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 24223adae150..cdb3298ba8ae 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -402,6 +402,15 @@ struct kvm_vcpu_events {
- #define KVM_PSCI_RET_INVAL		PSCI_RET_INVALID_PARAMS
- #define KVM_PSCI_RET_DENIED		PSCI_RET_DENIED
- 
-+/* Protected KVM */
-+#define KVM_CAP_ARM_PROTECTED_VM_FLAGS_ENABLE	0
-+#define KVM_CAP_ARM_PROTECTED_VM_FLAGS_INFO	1
-+
-+struct kvm_protected_vm_info {
-+	__u64 firmware_size;
-+	__u64 __reserved[7];
-+};
-+
- #endif
- 
- #endif /* __ARM_KVM_H__ */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 8d5e23198dfd..186a0adf6391 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -83,22 +83,19 @@ int kvm_arch_check_processor_compat(void *opaque)
- int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 			    struct kvm_enable_cap *cap)
- {
--	int r;
--
--	if (cap->flags)
--		return -EINVAL;
--
- 	switch (cap->cap) {
- 	case KVM_CAP_ARM_NISV_TO_USER:
--		r = 0;
-+		if (cap->flags)
-+			return -EINVAL;
- 		kvm->arch.return_nisv_io_abort_to_user = true;
- 		break;
-+	case KVM_CAP_ARM_PROTECTED_VM:
-+		return kvm_arm_vm_ioctl_pkvm(kvm, cap);
- 	default:
--		r = -EINVAL;
--		break;
-+		return -EINVAL;
- 	}
- 
--	return r;
-+	return 0;
- }
- 
- static int kvm_arm_default_max_vcpus(void)
-@@ -265,6 +262,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_PTRAUTH_GENERIC:
- 		r = system_has_full_ptr_auth();
- 		break;
-+	case KVM_CAP_ARM_PROTECTED_VM:
-+		r = is_protected_kvm_enabled();
-+		break;
- 	default:
- 		r = 0;
- 	}
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index c5d1f3c87dbd..e1d4a87d18e4 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1349,6 +1349,9 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 	bool writable = !(mem->flags & KVM_MEM_READONLY);
- 	int ret = 0;
- 
-+	if (kvm_vm_is_protected(kvm))
-+		return -EPERM;
-+
- 	if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
- 			change != KVM_MR_FLAGS_ONLY)
- 		return 0;
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 7af5d03a3941..cf624350fb27 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -50,3 +50,107 @@ static int __init pkvm_firmware_rmem_init(struct reserved_mem *rmem)
- }
- RESERVEDMEM_OF_DECLARE(pkvm_firmware, "linux,pkvm-guest-firmware-memory",
- 		       pkvm_firmware_rmem_init);
-+
-+static int pkvm_init_el2_context(struct kvm *kvm)
-+{
-+	kvm_pr_unimpl("Stage-2 protection is not yet implemented\n");
-+	return -EINVAL;
-+}
-+
-+static int pkvm_init_firmware_slot(struct kvm *kvm, u64 slotid)
-+{
-+	struct kvm_memslots *slots;
-+	struct kvm_memory_slot *slot;
-+
-+	if (slotid >= KVM_MEM_SLOTS_NUM || !pkvm_firmware_mem)
-+		return -EINVAL;
-+
-+	slots = kvm_memslots(kvm);
-+	if (!slots)
-+		return -ENOENT;
-+
-+	slot = id_to_memslot(slots, slotid);
-+	if (!slot)
-+		return -ENOENT;
-+
-+	if (slot->flags)
-+		return -EINVAL;
-+
-+	if ((slot->npages << PAGE_SHIFT) < pkvm_firmware_mem->size)
-+		return -ENOMEM;
-+
-+	kvm->arch.pkvm.firmware_slot = slot;
-+	return 0;
-+}
-+
-+static void pkvm_teardown_firmware_slot(struct kvm *kvm)
-+{
-+	kvm->arch.pkvm.firmware_slot = NULL;
-+}
-+
-+static int pkvm_enable(struct kvm *kvm, u64 slotid)
-+{
-+	int ret;
-+
-+	ret = pkvm_init_firmware_slot(kvm, slotid);
-+	if (ret)
-+		return ret;
-+
-+	ret = pkvm_init_el2_context(kvm);
-+	if (ret)
-+		pkvm_teardown_firmware_slot(kvm);
-+
-+	return ret;
-+}
-+
-+static int pkvm_vm_ioctl_enable(struct kvm *kvm, u64 slotid)
-+{
-+	int ret = 0;
-+
-+	mutex_lock(&kvm->lock);
-+	if (kvm_vm_is_protected(kvm)) {
-+		ret = -EPERM;
-+		goto out_kvm_unlock;
-+	}
-+
-+	mutex_lock(&kvm->slots_lock);
-+	ret = pkvm_enable(kvm, slotid);
-+	if (ret)
-+		goto out_slots_unlock;
-+
-+	kvm->arch.pkvm.enabled = true;
-+out_slots_unlock:
-+	mutex_unlock(&kvm->slots_lock);
-+out_kvm_unlock:
-+	mutex_unlock(&kvm->lock);
-+	return ret;
-+}
-+
-+static int pkvm_vm_ioctl_info(struct kvm *kvm,
-+			      struct kvm_protected_vm_info __user *info)
-+{
-+	struct kvm_protected_vm_info kinfo = {
-+		.firmware_size = pkvm_firmware_mem ?
-+				 pkvm_firmware_mem->size :
-+				 0,
-+	};
-+
-+	return copy_to_user(info, &kinfo, sizeof(kinfo)) ? -EFAULT : 0;
-+}
-+
-+int kvm_arm_vm_ioctl_pkvm(struct kvm *kvm, struct kvm_enable_cap *cap)
-+{
-+	if (cap->args[1] || cap->args[2] || cap->args[3])
-+		return -EINVAL;
-+
-+	switch (cap->flags) {
-+	case KVM_CAP_ARM_PROTECTED_VM_FLAGS_ENABLE:
-+		return pkvm_vm_ioctl_enable(kvm, cap->args[0]);
-+	case KVM_CAP_ARM_PROTECTED_VM_FLAGS_INFO:
-+		return pkvm_vm_ioctl_info(kvm, (void __user *)cap->args[0]);
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 3fd9a7e9d90c..58ab8508be5e 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1082,6 +1082,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_SGX_ATTRIBUTE 196
- #define KVM_CAP_VM_COPY_ENC_CONTEXT_FROM 197
- #define KVM_CAP_PTP_KVM 198
-+#define KVM_CAP_ARM_PROTECTED_VM 199
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.32.0.rc0.204.g9fa02ecfa5-goog
+  Add a test to verify that KVM correctly handles the case where two or more
+  non-leaf page table entries point at the same table gfn, but with different
+  parent access permissions.
+
+> For example, here is a shared pagetable:
+>    pgd[]   pud[]        pmd[]            virtual address pointers
+>                      /->pmd1(u--)->pte1(uw-)->page1 <- ptr1 (u--)
+>         /->pud1(uw-)--->pmd2(uw-)->pte2(uw-)->page2 <- ptr2 (uw-)
+>    pgd-|           (shared pmd[] as above)
+>         \->pud2(u--)--->pmd1(u--)->pte1(uw-)->page1 <- ptr3 (u--)
+>                      \->pmd2(uw-)->pte2(uw-)->page2 <- ptr4 (u--)
+>   pud1 and pud2 point to the same pmd table
+> 
+> The test is usefull when TDP is not enabled.
+              ^^^^^^^
+	      useful
+
+> Co-Developed-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
+
+Co-developed-by, and this needs Hou Wenlong's SoB as well.
+
+> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+> ---
+>  x86/access.c | 99 ++++++++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 93 insertions(+), 6 deletions(-)
+> 
+> diff --git a/x86/access.c b/x86/access.c
+> index 7dc9eb6..6dbe6e5 100644
+> --- a/x86/access.c
+> +++ b/x86/access.c
+> @@ -60,6 +60,8 @@ enum {
+>      AC_PDE_BIT36_BIT,
+>      AC_PDE_BIT13_BIT,
+>  
+> +    AC_PUDE_NO_WRITABLE_BIT, // special test case to disable write bit on PUD entry
+
+Part of me thinks we should use AC_PDPTE_WRITABLE_BIT to be consistent with the
+PDE and PTE bits, but I think I agree that special casing this one-off tests is
+cleaner overall.
+
+For better or worse, this test uses x86 legacy paging terminology for the entry
+bits, not Linux's generic PTE/PMD/PUD/PGD.  I.e. for consistency, I think it
+makes sense to use AC_PDPTE_NO_WRITABLE_BIT.
+
+This new bit also needs an entry in ac_names[], otherwise it'll print garbage on
+failure.  I'm thinking:
+
+@@ -134,6 +134,7 @@ const char *ac_names[] = {
+     [AC_PDE_BIT51_BIT] = "pde.51",
+     [AC_PDE_BIT36_BIT] = "pde.36",
+     [AC_PDE_BIT13_BIT] = "pde.13",
++    [AC_PDPTE_NO_WRITABLE_BIT] = "pdpte.ro",
+     [AC_PKU_AD_BIT] = "pkru.ad",
+     [AC_PKU_WD_BIT] = "pkru.wd",
+     [AC_PKU_PKEY_BIT] = "pkey=1",
+
+
+> +
+>      AC_PKU_AD_BIT,
+>      AC_PKU_WD_BIT,
+>      AC_PKU_PKEY_BIT,
+> @@ -97,6 +99,8 @@ enum {
+>  #define AC_PDE_BIT36_MASK     (1 << AC_PDE_BIT36_BIT)
+>  #define AC_PDE_BIT13_MASK     (1 << AC_PDE_BIT13_BIT)
+>  
+> +#define AC_PUDE_NO_WRITABLE_MASK  (1 << AC_PUDE_NO_WRITABLE_BIT)
+> +
+>  #define AC_PKU_AD_MASK        (1 << AC_PKU_AD_BIT)
+>  #define AC_PKU_WD_MASK        (1 << AC_PKU_WD_BIT)
+>  #define AC_PKU_PKEY_MASK      (1 << AC_PKU_PKEY_BIT)
+> @@ -326,6 +330,7 @@ static pt_element_t ac_test_alloc_pt(ac_pool_t *pool)
+>  {
+>      pt_element_t ret = pool->pt_pool + pool->pt_pool_current;
+>      pool->pt_pool_current += PAGE_SIZE;
+> +    memset(va(ret), 0, PAGE_SIZE);
+>      return ret;
+>  }
+>  
+> @@ -408,7 +413,8 @@ static void ac_emulate_access(ac_test_t *at, unsigned flags)
+>  	goto fault;
+>      }
+>  
+> -    writable = F(AC_PDE_WRITABLE);
+> +    writable = !F(AC_PUDE_NO_WRITABLE);
+> +    writable &= F(AC_PDE_WRITABLE);
+
+These can be combined, e.g.
+
+       writable = !F(AC_PDPTE_NO_WRITABLE) && F(AC_PDE_WRITABLE);
+
+>      user = F(AC_PDE_USER);
+>      executable = !F(AC_PDE_NX);
+>  
+> @@ -471,7 +477,7 @@ static void ac_set_expected_status(ac_test_t *at)
+>      ac_emulate_access(at, at->flags);
+>  }
+>  
+> -static void __ac_setup_specific_pages(ac_test_t *at, ac_pool_t *pool,
+> +static void __ac_setup_specific_pages(ac_test_t *at, ac_pool_t *pool, bool reuse,
+>  				      u64 pd_page, u64 pt_page)
+>  
+>  {
+> @@ -496,13 +502,26 @@ static void __ac_setup_specific_pages(ac_test_t *at, ac_pool_t *pool,
+>  	    goto next;
+>  	}
+>  	skip = false;
+> +	if (reuse && vroot[index]) {
+> +	    switch (i) {
+> +	    case 2:
+> +		at->pdep = &vroot[index];
+> +		break;
+> +	    case 1:
+> +		at->ptep = &vroot[index];
+> +		break;
+> +	    }
+> +	    goto next;
+> +	}
+>  
+>  	switch (i) {
+>  	case 5:
+>  	case 4:
+>  	case 3:
+> -	    pte = pd_page ? pd_page : ac_test_alloc_pt(pool);
+> +	    pte = (i==3 && pd_page) ? pd_page : ac_test_alloc_pt(pool);
+>  	    pte |= PT_PRESENT_MASK | PT_WRITABLE_MASK | PT_USER_MASK;
+> +	    if (F(AC_PUDE_NO_WRITABLE))
+> +		pte &= ~PT_WRITABLE_MASK
+
+This will seemingly clear the WRITABLE bit for PML4 and PML5, but due to reuse
+behavior, that may not be reflected in the actual page tables depending on
+whether or not the first test clears the writable bit.
+
+For robustness and clarity, I think it'd be better to do:
+
+        case 5:
+        case 4:
+            pte = ac_test_alloc_pt(pool);
+            pte |= PT_PRESENT_MASK | PT_WRITABLE_MASK | PT_USER_MASK;
+            break;
+        case 3:
+            pte = pd_page ? pd_page : ac_test_alloc_pt(pool);
+            pte |= PT_PRESENT_MASK | PT_USER_MASK;
+            if (!F(AC_PDPTE_NO_WRITABLE))
+                pte |= PT_WRITABLE_MASK;
+            break;
+
+>  	case 2:
+>  	    if (!F(AC_PDE_PSE)) {
+> @@ -568,13 +587,13 @@ static void __ac_setup_specific_pages(ac_test_t *at, ac_pool_t *pool,
+>  
+>  static void ac_test_setup_pte(ac_test_t *at, ac_pool_t *pool)
+>  {
+> -	__ac_setup_specific_pages(at, pool, 0, 0);
+> +	__ac_setup_specific_pages(at, pool, false, 0, 0);
+>  }
+>  
+>  static void ac_setup_specific_pages(ac_test_t *at, ac_pool_t *pool,
+>  				    u64 pd_page, u64 pt_page)
+>  {
+> -	return __ac_setup_specific_pages(at, pool, pd_page, pt_page);
+> +	return __ac_setup_specific_pages(at, pool, false, pd_page, pt_page);
+>  }
+>  
+>  static void dump_mapping(ac_test_t *at)
+> @@ -930,6 +949,73 @@ err:
+>  	return 0;
+>  }
+>  
+> +static int check_combined_protection(ac_pool_t *pool)
+
+To avoid the "combined" verbiage, how about check_effective_sp_permissions()?
 
