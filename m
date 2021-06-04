@@ -2,54 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7858639BEB3
-	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 19:27:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6E8039BEA5
+	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 19:26:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230321AbhFDR3S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Jun 2021 13:29:18 -0400
-Received: from mail-yb1-f201.google.com ([209.85.219.201]:41541 "EHLO
-        mail-yb1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229958AbhFDR3R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Jun 2021 13:29:17 -0400
-Received: by mail-yb1-f201.google.com with SMTP id j7-20020a258b870000b029052360b1e3e2so12649135ybl.8
-        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 10:27:31 -0700 (PDT)
+        id S230445AbhFDR2e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Jun 2021 13:28:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58602 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230411AbhFDR2d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Jun 2021 13:28:33 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC2CDC061766
+        for <kvm@vger.kernel.org>; Fri,  4 Jun 2021 10:26:32 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id n22-20020a6372160000b0290220c022078cso2695624pgc.17
+        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 10:26:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=HULabYlXk0tW3Y4DYJCJlDwv7KKOGlzX9lsq/vIfMJQ=;
-        b=DpMAqgReqQDxRs5hKv1q9sPsnWBtRmQvXpHpvUo6jHi0jTJ9FIe+Ig1v9akWL1pQu4
-         Sjw4N0HoVGxj5HAhJRyPVaGgVDfwJv0ViHPtrITkSAUw3iOF3IC10mx/ts7siU2f6VpT
-         BU0459Ay6aSGyc4RKGbFJAD60le9XqUFbrTpg4s+rN8SR6dLzYBXQjgYXVPBV+tpWCfg
-         ZX+DD/d/XACzFVT+L+yRVaGcJfe3wW933H3ySz7DUFeSar977NGLfLrOqggtJCUD+YOV
-         LN3DXHwSNChWaDZm4cuknbvEpXqigf+c8y8m1fuByn0qowHb8ArRd1EjWRwJMbgnDcdj
-         JU5g==
+        bh=FX10PQdLzDz16GdUbiM5sgnv+3jGZM7Tq2+dVV1y+FU=;
+        b=oITuushgDMrGVmDQZkWx+majdGJ85wT6icbDWQMZtklgfjfrXrlUjCZBbRlFL2BTPa
+         pcDmjrI6mgQIiLcl9OYKh5Jd6LRs4rIqI1xXAyBumiCLhP4AUGNU9qOGvnfqgTMVFW54
+         QdLWKynUHl11q2IZTrKp3OEkBe2v+LNn1LvoZ1ht0whNUzYxzAwknRWv1gGiBt0ad1ct
+         tkf3E9Xz1Oa4VMWkO+fNu3xCMAFnaHXdMdm2aT9h1YcgMxgSo2XgFj8a7UzImaAF2NTj
+         cyuVPUZVZHtO4zeKD98AyS97iQiCQJcbD5bg4WKe98Zjnz64mEq2RWd+1bGVj3Mg0Tby
+         IV2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=HULabYlXk0tW3Y4DYJCJlDwv7KKOGlzX9lsq/vIfMJQ=;
-        b=sTDfP/+4EwSJgKAV3PsyRgYSw5vx/2cBFAZGwKwbPq8IrzOG0aggdL4iFR14/tYEPE
-         5MfmKXuiVebQsib17PL7+uUZPr2yz2UaVOkj3lJ1Aw7yfYPaDyrIDab6MsmFt6eidRPe
-         p/FcxygfrrXn7ft+xJQx2YbFKbqqg9/WSVKD/AxYOmLeHW4YeSFDN0+b/+glayAXDrPi
-         44iUYvwMiF00/eoTLQ1eiScqmggHXO2HDNdRYEJRvOYF5jApOo0ZvtQDyYFJwekShAmP
-         kT0LRkW18m/ihBlbTUwxoYmCaHfxoFm9VCg0bNCgilWz5eiRR3nEfSjw30kpIBZFR03I
-         bQZQ==
-X-Gm-Message-State: AOAM532buQMEN1xSq2qA27Oca3+J9h5uN+mP3gaNPtC8UL3p7ShKmQYj
-        k0de+6YzTqomy0lBUGxmI5Z+x5qsWeMNnStltcouZw0n1acW0k0u2lVSHlOAoMTuOH57iEYRTyC
-        6EZfPzYywB3xZv4mOIRMOjDhQDrSqEq0aZtDUij8wMej+C2Jg29uXX0uN2YNIqFU=
-X-Google-Smtp-Source: ABdhPJxBYVuPepeePEQ/83cwzxTgXNNW7XmRqVaFSG6wB5hxB33E9sepRngJimlf4PnS32cDuV5Op9icVdGpkA==
+        bh=FX10PQdLzDz16GdUbiM5sgnv+3jGZM7Tq2+dVV1y+FU=;
+        b=hdpA4gZsrxwoYZiNcgh9wc01gowICmE4VMjHpJr0y0oHOm5C74Hzv9eGnUqPfZCYNd
+         bHhV8xXunmemTzffiGKCUc7WGxb8VnLAVkq1DpkKWo2qJXqmiWmU4XuQr5XNgmEUIB4U
+         Ji6wi4OUlR+lJpBmvAX7zuh+AvXXtUu05ZSFw30O01is7mvzC+OLWunebVexMBm3ZIsm
+         y7xkd0HDZwUeZHIFHVplNQ0Tw1dDGPNAfXnKLKXFkXgAmknJEJDGZAl1EpCgT5741F+o
+         YqvhJ6JHk9+ayN69pxrHEbuouMmCPmK2EVQRk9dRFn+vhmBEdzd+sf72hcxwmqK7m3DH
+         kbNw==
+X-Gm-Message-State: AOAM5339jThSolqLD4ldpCAxx3P6GbxfoO3rbX8bUQJv6tAmVedf+vDe
+        sUaib7CggmVvL7FkGk9+u16jct4AE2YhW9SDkj7iy7qBvMzmGq2ygNH1aBlJhzjwtQMsjADfZx+
+        QxnZ/cAY2mw+pw58sJhj5h+92tjfS5xe1JlTC/bXNwuo7CKSpXtxrpObi66NPJqQ=
+X-Google-Smtp-Source: ABdhPJwbGFq+vz1fxQkZjZ+qO5HhG/X/iQzGnGVVoEcSDTC2l+UiSXMm2sQH/frmb72TndXlY/wsY6Q13gOR0w==
 X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1a0d])
- (user=jmattson job=sendgmr) by 2002:a25:c547:: with SMTP id
- v68mr6706528ybe.361.1622827590598; Fri, 04 Jun 2021 10:26:30 -0700 (PDT)
-Date:   Fri,  4 Jun 2021 10:26:01 -0700
+ (user=jmattson job=sendgmr) by 2002:a62:1a49:0:b029:2eb:6de0:9890 with SMTP
+ id a70-20020a621a490000b02902eb6de09890mr5394966pfa.39.1622827592354; Fri, 04
+ Jun 2021 10:26:32 -0700 (PDT)
+Date:   Fri,  4 Jun 2021 10:26:02 -0700
 In-Reply-To: <20210604172611.281819-1-jmattson@google.com>
-Message-Id: <20210604172611.281819-3-jmattson@google.com>
+Message-Id: <20210604172611.281819-4-jmattson@google.com>
 Mime-Version: 1.0
 References: <20210604172611.281819-1-jmattson@google.com>
 X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
-Subject: [PATCH v2 02/12] KVM: x86: Wake up a vCPU when kvm_check_nested_events
- fails
+Subject: [PATCH v2 03/12] KVM: nVMX: Add a return code to vmx_complete_nested_posted_interrupt
 From:   Jim Mattson <jmattson@google.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com
 Cc:     Jim Mattson <jmattson@google.com>, Oliver Upton <oupton@google.com>
@@ -58,35 +61,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-At present, there are two reasons why kvm_check_nested_events may
-return a non-zero value:
-
-1) we just emulated a shutdown VM-exit from L2 to L1.
-2) we need to perform an immediate VM-exit from vmcs02.
-
-In either case, transition the vCPU to "running."
+No functional change intended.
 
 Signed-off-by: Jim Mattson <jmattson@google.com>
 Reviewed-by: Oliver Upton <oupton@google.com>
 ---
- arch/x86/kvm/x86.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 882457e92679..83bc0a5b1aab 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9471,8 +9471,8 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 6058a65a6ede..7646e6e561ad 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -3682,7 +3682,7 @@ void nested_mark_vmcs12_pages_dirty(struct kvm_vcpu *vcpu)
+ 	}
+ }
  
- static inline bool kvm_vcpu_running(struct kvm_vcpu *vcpu)
+-static void vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
++static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
  {
--	if (is_guest_mode(vcpu))
--		kvm_check_nested_events(vcpu);
-+	if (is_guest_mode(vcpu) && kvm_check_nested_events(vcpu))
-+		return true;
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	int max_irr;
+@@ -3690,17 +3690,17 @@ static void vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
+ 	u16 status;
  
- 	return (vcpu->arch.mp_state == KVM_MP_STATE_RUNNABLE &&
- 		!vcpu->arch.apf.halted);
+ 	if (!vmx->nested.pi_desc || !vmx->nested.pi_pending)
+-		return;
++		return 0;
+ 
+ 	vmx->nested.pi_pending = false;
+ 	if (!pi_test_and_clear_on(vmx->nested.pi_desc))
+-		return;
++		return 0;
+ 
+ 	max_irr = find_last_bit((unsigned long *)vmx->nested.pi_desc->pir, 256);
+ 	if (max_irr != 256) {
+ 		vapic_page = vmx->nested.virtual_apic_map.hva;
+ 		if (!vapic_page)
+-			return;
++			return 0;
+ 
+ 		__kvm_apic_update_irr(vmx->nested.pi_desc->pir,
+ 			vapic_page, &max_irr);
+@@ -3713,6 +3713,7 @@ static void vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	nested_mark_vmcs12_pages_dirty(vcpu);
++	return 0;
+ }
+ 
+ static void nested_vmx_inject_exception_vmexit(struct kvm_vcpu *vcpu,
+@@ -3887,8 +3888,7 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ no_vmexit:
+-	vmx_complete_nested_posted_interrupt(vcpu);
+-	return 0;
++	return vmx_complete_nested_posted_interrupt(vcpu);
+ }
+ 
+ static u32 vmx_get_preemption_timer_value(struct kvm_vcpu *vcpu)
 -- 
 2.32.0.rc1.229.g3e70b5a671-goog
 
