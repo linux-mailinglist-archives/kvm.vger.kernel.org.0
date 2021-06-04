@@ -2,99 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E55A39BC3D
-	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 17:50:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2659A39BC5C
+	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 17:57:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229924AbhFDPw2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Jun 2021 11:52:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37304 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229809AbhFDPw2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Jun 2021 11:52:28 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2A63C061766
-        for <kvm@vger.kernel.org>; Fri,  4 Jun 2021 08:50:25 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id z3-20020a17090a3983b029016bc232e40bso2698383pjb.4
-        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 08:50:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Rhqoy6MY7EfOz8skYLjiR46KThNMAlNLitSfpvspEOE=;
-        b=VWs4Ft09ePRlQVMbF6OkH6QZIrxW4iolcEcZ+Nt6BAwiWfEMw4rx8ZKo3nYOouKJeH
-         4o8U0ijASb+UsRT+zm68+uVMfTzT3QsDFS/ShNHG2xFNSieE8lWf2eYqNyN6VCw26v4+
-         8MHrpa5LQ3uQTGpO62eoi09ZWVAvP0xfhjgS3Oe9EgJpabsxf6BDDAVZ8eBhT+ApLeof
-         6jwefViyOj1YC13Q6gykLk97nE0D9desp7yRtE8USN3FPwXWJSu1jiQj72/0z2CkJU/U
-         0Cf229B+b41ZRV/5sqn2LWTXZ+cZj2FYJ6/SSt4IEP7QVUk0hq2cgL7+N38aSPeKa/fX
-         358w==
+        id S230105AbhFDP7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Jun 2021 11:59:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46216 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231347AbhFDP7L (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 4 Jun 2021 11:59:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622822244;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4VeXpVaVm3Sgm4ExODkCf4+TTdsJEk4SxRvRR3xCWPQ=;
+        b=UYQ9C9jupD4UXP/KA1trOe4ynHhNVxkTynCMl+wIZmtmhKGG1N8jWSdPU5cJY/EYWaf/IY
+        lAvL4kv0922yMaKRo9PeIjiK5EkCTdvFbCcazo3sPgS7lXKbsfFsOxC3LKJhRC+Qz12F/T
+        xsESKvHOR21vSu7LshFh9csRDCv+tU8=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-597-Wa7DuwAANhOO0TqOvZMxxw-1; Fri, 04 Jun 2021 11:57:23 -0400
+X-MC-Unique: Wa7DuwAANhOO0TqOvZMxxw-1
+Received: by mail-ej1-f71.google.com with SMTP id eb10-20020a170907280ab02903d65bd14481so3569677ejc.21
+        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 08:57:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Rhqoy6MY7EfOz8skYLjiR46KThNMAlNLitSfpvspEOE=;
-        b=p38SX7nPeMrdi//mhefZu1pdJshGoIQyFrKeJBotl7zjxI0dR//w2W6n9C95ak+B8b
-         njE/Gep1gtJfToLIcAfn70uuwJD71rU7c03XlwZm6ItZbk1a4XQTWSj3kmvzAXxKb0Hs
-         KVD7NHKEfGMP6LxKRgWBiHeOGd7bCwMPrlyjNumSi/fHuV119Xs9QtDcexxwFOTZEQBI
-         RajUuOWwQxEKiIPK5M2w39swLJBI/b74d/oa3geqRrGYKCVaSf6NA8BAW+cCbfl4KB9D
-         pxogcEjjw2dCvNS/fIG7ILwu+V9Cm5IiZav387LhjukyoSGprAxq8l6eQkZ2ppHaSdQE
-         GD9Q==
-X-Gm-Message-State: AOAM5320IBh0Z01jxL8XYg9a0ZUwu8xaSOZHxDA4GXe4yL7of5adOqH1
-        YqVfvWsrEDFE2uhWV0ltp/jcIQ==
-X-Google-Smtp-Source: ABdhPJxwDvhE1O00g2lojLJgHXNo1TIt6Pbg8B0Q99pRi6w4FlIw45etfKPCelL6vgMTkTwN5cYq4A==
-X-Received: by 2002:a17:90a:460d:: with SMTP id w13mr5656251pjg.35.1622821825138;
-        Fri, 04 Jun 2021 08:50:25 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id w26sm2529767pgl.50.2021.06.04.08.50.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Jun 2021 08:50:24 -0700 (PDT)
-Date:   Fri, 4 Jun 2021 15:50:20 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Yang Shi <yang.shi@linux.alibaba.com>,
-        Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>
-Subject: Re: PageTransCompoundMap confusion
-Message-ID: <YLpLvFPXrIp8nAK4@google.com>
-References: <YLo9egOQUiGo7CBO@casper.infradead.org>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=4VeXpVaVm3Sgm4ExODkCf4+TTdsJEk4SxRvRR3xCWPQ=;
+        b=N55VHCcC9OAqDf5PZCIPwbnnhsXBz0BdEcCmuOk0Nm3vGfg79i60Xnna1ZtqHXps4l
+         iYC8R87mGkfohf5IsyMZWepJXQpQULKmWusGfcC6Vt/vCA4dk5iVEmEbSdf33hC/7o3+
+         m7cBkv8rlJ9zC2pPff3bUXzLjF2ddnqStCY4LWgBpPUsgyFjbvFtQZgHTQwc+xHJytyw
+         6KO0ff9FXTTx/Q7Fa2xY1EL3JF0cwou2WCXTcRD73cMUBZN0S9b32MeBjQkneV8oAn1G
+         c+YI2YLQ133Yb04YOzX5OWa6z5frKm9FGD3v2Exzg21PRKvJ4JjhK8IgXQ2ENbnH6ZXq
+         Xy+g==
+X-Gm-Message-State: AOAM532AqpDk6OUGsoqa1vsg3w4Mje2ZIijumQXfU3KbzOVqVYbKx9pQ
+        I/jmzHnP1fPm25mpJ3eC43+VA9wDlkj6V28EAeRlxU0dVKY7KjKjfuwYhdJqcvOhFMysIyXb+O5
+        y8J/d1EHDN0FU
+X-Received: by 2002:a17:907:1b11:: with SMTP id mp17mr4825433ejc.1.1622822242028;
+        Fri, 04 Jun 2021 08:57:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxPRjcRc6XoOVz7KqxGJ8Jr4Ru7H/KBEWYfYYsX/zRmiAg3G+v0VaBWdVmTVXEoxLZyb0lcDw==
+X-Received: by 2002:a17:907:1b11:: with SMTP id mp17mr4825416ejc.1.1622822241873;
+        Fri, 04 Jun 2021 08:57:21 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id p13sm2917846ejr.87.2021.06.04.08.57.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Jun 2021 08:57:21 -0700 (PDT)
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Robin Murphy <robin.murphy@arm.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jason Wang <jasowang@redhat.com>
+References: <20210602224536.GJ1002214@nvidia.com>
+ <20210602205054.3505c9c3.alex.williamson@redhat.com>
+ <20210603123401.GT1002214@nvidia.com>
+ <20210603140146.5ce4f08a.alex.williamson@redhat.com>
+ <20210603201018.GF1002214@nvidia.com>
+ <20210603154407.6fe33880.alex.williamson@redhat.com>
+ <MWHPR11MB1886469C0136C6523AB158B68C3B9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210604122830.GK1002214@nvidia.com>
+ <20210604092620.16aaf5db.alex.williamson@redhat.com>
+ <815fd392-0870-f410-cbac-859070df1b83@redhat.com>
+ <20210604155016.GR1002214@nvidia.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <30e5c597-b31c-56de-c75e-950c91947d8f@redhat.com>
+Date:   Fri, 4 Jun 2021 17:57:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YLo9egOQUiGo7CBO@casper.infradead.org>
+In-Reply-To: <20210604155016.GR1002214@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Will and Marc
+On 04/06/21 17:50, Jason Gunthorpe wrote:
+>> Extending the scenarios where WBINVD is not a nop is not a problem for me.
+>> If possible I wouldn't mind keeping the existing kvm-vfio connection via the
+>> device, if only because then the decision remains in the VFIO camp (whose
+>> judgment I trust more than mine on this kind of issue).
+> Really the question to answer is what "security proof" do you want
+> before the wbinvd can be enabled
 
-On Fri, Jun 04, 2021, Matthew Wilcox wrote:
-> I'm a bit confused about what PageTransCompoundMap() is supposed to do.
-> What it actually does is check that the specific page (which may or
-> may not be a head page) is not mapped by a PTE.  I don't understand why
-> you'd care how some (other?) process does or does not have it mapped.
-> What I _think_ you want to know is "Can I map this page with a PMD entry
-> in the guest".  And the answer to that is simply:
+I don't want a security proof myself; I want to trust VFIO to make the 
+right judgment and I'm happy to defer to it (via the KVM-VFIO device).
+
+Given how KVM is just a device driver inside Linux, VMs should be a 
+slightly more roundabout way to do stuff that is accessible to bare 
+metal; not a way to gain extra privilege.
+
+Paolo
+
+>   1) User has access to a device that can issue no-snoop TLPS
+>   2) User has access to an IOMMU that can not block no-snoop (today)
+>   3) Require CAP_SYS_RAW_IO
+>   4) Anyone
 > 
-> bool kvm_is_transparent_hugepage(kvm_pfn_t pfn)
-> {
-> 	struct page *head = compound_head(pfn_to_page(pfn));
-> 	return compound_order(head) >= HPAGE_PMD_ORDER;
-> }
+> #1 is an improvement because it allows userspace to enable wbinvd and
+> no-snoop optimizations based on user choice
 > 
-> but maybe there's some reason you don't want to map hugetlbfs or other
-> sufficiently large compound pages with PMDs?
+> #2 is where we are today and wbinvd effectively becomes a fixed
+> platform choice. Userspace has no say
 > 
-> Looking at the one caller of kvm_is_transparent_hugepage(), I'd be
-> tempted to inline the above into transparent_hugepage_adjust()
-> and call get_page() directly instead of indirecting through
-> kvm_get_pfn().
+> #3 is "there is a problem, but not so serious, root is powerful
+>     enough to override"
 
-arm64 is the only remaining user of kvm_is_transparent_hugepage().
-
-x86 purged its usage a while back, and instead looks at the host PTEs via
-lookup_address_in_mm() to get the current mapping level.  The motivation was to
-consolidate the hugepage logic for THP, HugeTLBFS, and DAX, and to naturally
-support both 2mb and 1gb for all flavors of hugepages.
-
-Could arm64 do something similar and kill off kvm_is_transparent_hugepage()
-entirely?
