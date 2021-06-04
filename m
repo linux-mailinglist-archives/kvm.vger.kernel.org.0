@@ -2,245 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9708139C3A0
-	for <lists+kvm@lfdr.de>; Sat,  5 Jun 2021 01:01:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1422B39C3BD
+	for <lists+kvm@lfdr.de>; Sat,  5 Jun 2021 01:11:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231706AbhFDXC6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Jun 2021 19:02:58 -0400
-Received: from mail-co1nam11on2062.outbound.protection.outlook.com ([40.107.220.62]:12706
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229853AbhFDXC5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Jun 2021 19:02:57 -0400
+        id S229853AbhFDXNa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Jun 2021 19:13:30 -0400
+Received: from mga18.intel.com ([134.134.136.126]:53504 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231707AbhFDXN3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Jun 2021 19:13:29 -0400
+IronPort-SDR: wvV0B1Z4WHb4+A1SKXxUsXYB4UE7//Puuyz3DcZ8hwhIu0Byro24Zryb7mghrIkyY2rlWszZbO
+ gTGMjPmKUuRQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,10005"; a="191720050"
+X-IronPort-AV: E=Sophos;i="5.83,249,1616482800"; 
+   d="scan'208";a="191720050"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2021 16:11:41 -0700
+IronPort-SDR: ma44dKrYh2QJP/wo0Q/u386sU/oWzUrr7wr1Rq8WdIHTfL7Wp9fztbdcWvZvpksBnPOE573iHY
+ iKd1oxPEafnw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.83,249,1616482800"; 
+   d="scan'208";a="417898526"
+Received: from fmsmsx605.amr.corp.intel.com ([10.18.126.85])
+  by orsmga002.jf.intel.com with ESMTP; 04 Jun 2021 16:11:40 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.4; Fri, 4 Jun 2021 16:11:40 -0700
+Received: from fmsmsx607.amr.corp.intel.com (10.18.126.87) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.4; Fri, 4 Jun 2021 16:11:40 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx607.amr.corp.intel.com (10.18.126.87) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4
+ via Frontend Transport; Fri, 4 Jun 2021 16:11:40 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.108)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2242.4; Fri, 4 Jun 2021 16:11:27 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B1jy2p1g+RJHk7Hlp3zcnnm4vIs/jcTd9V58jeio0XoIHbvPxgMtxShiIHStlc1gFnmTB7xMnWWl2BKfbTpK8ixlxqsjEI002+EVBuDqtrDMi30GT/ti/3U31sszuxnYQpQMsK/xP26g/25SyNR54Wrr4Dg0Gpw1ceak2i024zXyiNy2jc/0JEUqPaFAMBicdaqKjI7Lnx5+6FX9EnGz2Axg6yIR9RX03Zex74Nw5bP4+jnV6eRImzcXPwVozbotx6XPQWjjdDcbsR/SctdWfnCVqh8CqKf9tBzZghHg576ngmtb5mGqYToDDBWDqNMnJxxyuTVG2nuH3WyIE1F7fQ==
+ b=dZKV+jUztoTHyO5vT+JfO1F2OHtM8QJuEV6pRFZZxH2EH6pVTJ8VlGQEIA3L+hP93ohk3BeI1HBEqcAl5FxfUUJRpz7QZXxol0YUI4vqgqyZ31R6jCAa/astXHIgd8a6xX6xHWto9PtRJkKoDyjqHgGxO4t8wTK3QZq0jq2mMfefedB+usPbI9r29BZLr+42+fLg4h/5+Np+fXpmwNyGmn6yIzVC8Va7Hi1+GUlOPD/TFCySONbErqm75WahDFPP41eL3ahh2+7cEpqn2hZkGPpf2kGAdZ75ylD72pKrM8aarY5fxjUrSuMSKDW+nSS2mZpByZLbDW1ct5iKEue6HA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4fASiwXOMy0+Ki9g5yOtr++3eD9GR3Oh7W1EhjgjLXM=;
- b=junJQmqHWLZHdQRP8L9MLA5RyPS/JalSop7RhUIEWaqNe7bZ9eaTVcJFghtME9sGGXw6/hwMZhOC7wUcG8JSnWEosfeiyfTh+/LkdGXgJDjLufDYyir8ESk76RAu8l6NycsTnv3FZ/KsTa4R7E0IA9Z7vWj4WqT4R6B8LbVrWK5Y53tY/bKw9iWUTtOB5xPsCn1E9J6GJIS5finwmfw8BTxrwG82pOiE0SqgIxBv7fEUv2Y6atG9EqkLuX+zB2yA1vhLEQY0rRELDYql9QXAL2O8jDC41GsM4UG2lpIv5NWJoGmJhyAt8TNwIUJwTfYoFWD1h5bBPaMCNJDwnvMncw==
+ bh=EEFrWVYjY6b2fAUM1CiFjj8gpWJVAterNPGNJjAt2BQ=;
+ b=D/eXScAGQ+o5l7kwQzXZx3m6z0d5hhj7OHWYehPZRSHOtoew9hqEivnx5uvTcCbbEHk05zeyWNo1VjUTFalxTujXw3JAhVV9Gdj5CJjKt18WHlPPTy5d/RbR7sAc8VML3WyUbKifjLVaNQ4dZHAF/PhJsBp7Pd2O25rZL8GMEkLcNZEI8tPtSBpzVAico8TfhSGaNqnoQr/zuCQV9Qd3q5ceXO67fgF9Lb2bISmjgujYIOV/nGdHnlnmmLd+tcFjHN9zh55G7Z/ex/AzkMDvUZqvWMLGFrXZ0UPvP8/Plgca4vbCBt742WS6W1W35mIUqcht/ciie7sKDHK7wprxOw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4fASiwXOMy0+Ki9g5yOtr++3eD9GR3Oh7W1EhjgjLXM=;
- b=s6DHmAIjauYSBVCdUICB96Ih1mhWEC47HV2pqalQQh6Le1z4cjEruGp0a+UcZA8dZSArXfcmOcNcRGvd68byaPNpCd3jeFwPNDGAFhOT2AhjzXQgo9cbwAOibMjgyzau5MCyhaX0c9VGlHhGvRLQjNfYIRIkCq/QL5+JhcG+scemnrp2X5QxLAXi2GlyoXplHnELk9gXbyaTEzv63lhRy5jH223pLG85QWGZ9NfYawQmMy89V8GW3rdlUaX7MpTShOJ6WZDK17Cj+Dy2DR/W7EkxTKEGfKeX4UhWHq6RkZkR5R2HvXYIra7jfBnVJsz8WVADLarZr6lojXjMwjsSZA==
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL0PR12MB5539.namprd12.prod.outlook.com (2603:10b6:208:1c3::15) with
+ bh=EEFrWVYjY6b2fAUM1CiFjj8gpWJVAterNPGNJjAt2BQ=;
+ b=dfBSKA/wDVxAltYeNkh7v9XwHCw43LwpM8Mk4a7/EF4kB7GGXskDml/Almqd/TszuSPePu3Ts3VckcxAlN8AQf0yNyyqrYFedz6cJw3vtb1hB2IkvGtFfWnm97tEoitF8M0TdlU7wyY43tU95sU+rDU8cWEb8T84LayzTYi44s4=
+Received: from MWHPR11MB1886.namprd11.prod.outlook.com (2603:10b6:300:110::9)
+ by MWHPR11MB1773.namprd11.prod.outlook.com (2603:10b6:300:10f::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20; Fri, 4 Jun
- 2021 23:01:09 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::3d51:a3b9:8611:684e]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::3d51:a3b9:8611:684e%6]) with mapi id 15.20.4195.024; Fri, 4 Jun 2021
- 23:01:09 +0000
-Date:   Fri, 4 Jun 2021 20:01:08 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.22; Fri, 4 Jun
+ 2021 23:10:53 +0000
+Received: from MWHPR11MB1886.namprd11.prod.outlook.com
+ ([fe80::6597:eb05:c507:c6c1]) by MWHPR11MB1886.namprd11.prod.outlook.com
+ ([fe80::6597:eb05:c507:c6c1%12]) with mapi id 15.20.4195.023; Fri, 4 Jun 2021
+ 23:10:53 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Alex Williamson (alex.williamson@redhat.com)" 
+        <alex.williamson@redhat.com>, "Raj, Ashok" <ashok.raj@intel.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
+        "Jonathan Corbet" <corbet@lwn.net>,
         Robin Murphy <robin.murphy@arm.com>,
         LKML <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
         Kirti Wankhede <kwankhede@nvidia.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "David Gibson" <david@gibson.dropbear.id.au>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
         David Woodhouse <dwmw2@infradead.org>,
         Jason Wang <jasowang@redhat.com>
-Subject: Re: [RFC] /dev/ioasid uAPI proposal
-Message-ID: <20210604230108.GB1002214@nvidia.com>
-References: <MWHPR11MB1886469C0136C6523AB158B68C3B9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210604122830.GK1002214@nvidia.com>
- <20210604092620.16aaf5db.alex.williamson@redhat.com>
- <815fd392-0870-f410-cbac-859070df1b83@redhat.com>
- <20210604155016.GR1002214@nvidia.com>
- <30e5c597-b31c-56de-c75e-950c91947d8f@redhat.com>
- <20210604160336.GA414156@nvidia.com>
- <2c62b5c7-582a-c710-0436-4ac5e8fd8b39@redhat.com>
- <20210604172207.GT1002214@nvidia.com>
- <20210604152918.57d0d369.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210604152918.57d0d369.alex.williamson@redhat.com>
-X-Originating-IP: [47.55.113.94]
-X-ClientProxiedBy: BL1PR13CA0432.namprd13.prod.outlook.com
- (2603:10b6:208:2c3::17) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+Subject: RE: [RFC] /dev/ioasid uAPI proposal
+Thread-Topic: [RFC] /dev/ioasid uAPI proposal
+Thread-Index: AddSzQ970oLnVHLeQca/ysPD8zMJZwBTUTCAAQiuDaAADwOFgAAkifcgAAvJlIAAFvXwwA==
+Date:   Fri, 4 Jun 2021 23:10:53 +0000
+Message-ID: <MWHPR11MB18863B2D785138E12193983A8C3B9@MWHPR11MB1886.namprd11.prod.outlook.com>
+References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210528233649.GB3816344@nvidia.com>
+ <MWHPR11MB188621A9D1181A414D5491198C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210603130519.GY1002214@nvidia.com>
+ <MWHPR11MB1886B04D5A3D212B5623EB978C3B9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210604120903.GI1002214@nvidia.com>
+In-Reply-To: <20210604120903.GI1002214@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: nvidia.com; dkim=none (message not signed)
+ header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [101.80.65.46]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6dbed59d-3ca8-4821-ae4f-08d927ae005f
+x-ms-traffictypediagnostic: MWHPR11MB1773:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MWHPR11MB1773F84DCE7B8CCDA05817E28C3B9@MWHPR11MB1773.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: t5IpDpvUwhRoZuIu63WkO3O10Yzjy34k9emUwto/oikkre/OzTKMMaziaUo+39kj3HHbGPQnsGNhhQQqYwxAZnsOhyvJaneq12yX2nwj8LJeUJn1iYQB5AmWvvP73+Zlokpli9Nv/jov4QiGYQy+DEoX/+ZpDY4EODnONQwTx+Ae7dhU9QLefOlFPYmRlveuPXVAMeMvdGoETxkGCz3a4dzF1oGgmenHC0fhVmd94P0dSNYnyn/eBrGnJUmllee2mylITlgTrbA3W5xpmx95kCj/zU0nW6ZmCjmN9ELiLtumIGrrdUIKu9E36+VNBdPCubsX8gVI8fRnHtpHWAdChivYi1DbQtxOoV6rHcx8yWoBSlIiIceqkAdtxzj2mOyjWMbymJ5szCesmiCFjkkAMYi6BeTmGEFzZp5DjpzLUQt7XC3oWREaT9MZvfyjUaMeWRPXja8w4X1+9jdRfYEKgiuDZ/0nYJO71cJnNYgt5pZjskSKBfbxPWHautI/pnsq2QCm1saiLlz5q6YkEbSy+62WfCFYub5XjLLtWCMT/xGhI3mGhJG6n+r4ZcSCftr9FlsOkltLegfOyh1ATMhhDpcMSCz7JVj3wYzY07CIsu8=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1886.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(136003)(376002)(346002)(396003)(366004)(39860400002)(8676002)(38100700002)(122000001)(2906002)(8936002)(86362001)(83380400001)(71200400001)(55016002)(9686003)(33656002)(76116006)(66446008)(6506007)(26005)(186003)(52536014)(66476007)(4326008)(66946007)(64756008)(66556008)(478600001)(6916009)(7416002)(7696005)(5660300002)(54906003)(316002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?XrJMHm/4un68yJkdFGnNhwq6RNsmNsp6KyYrxXvLYDHavuZbTETyqG+OF7VC?=
+ =?us-ascii?Q?3wVKU3v4/GVt6fAP52/Gidhp9vVeN/f7YX1+CYDJuV22mnBnlzc/W3RSYXur?=
+ =?us-ascii?Q?39EmS67NfGjBhjnSS4Qa5T7qATfMqg4YbIDEZU1K9noh9edAp666DmWYcp7X?=
+ =?us-ascii?Q?REXdH//f/2GDEGSsPDcuEl4yjxNxuWtsaI2gnDXujfDcY/a/P/heHxomsPCz?=
+ =?us-ascii?Q?GJgbLGaK4StBoEu5NBNSP+2Die8oLcBOQhienZmzI42pJ1wc4wu8sDJUsr7m?=
+ =?us-ascii?Q?2hO0yd1SYvezLhnVQHPoJeJuFJYAxFNxr+fAIhd2Z4c4uj3Jn9Ej8BDm2gvS?=
+ =?us-ascii?Q?BunH4FXZUm0Pz4NoroSZgbGJ6EQ7CPYXsEGiJE3INYueFzCzjHN5VtQFQxM/?=
+ =?us-ascii?Q?Bo0Cn4qKjaGvFbSHBJ+rPmvo7W0OBjlqBc9EyYjHnsfDhKrHcoT3nVvO1xD9?=
+ =?us-ascii?Q?wRmwEs36H+XUk01aAAusYX1wwoOij9rB/KN3OBsQRQKoz+NZ9Nh4pfmvhnGI?=
+ =?us-ascii?Q?b39OwzOCMEnWLOcOVvEeEH59rv+CTE4/YTUZr3h0LQcyAmTvNhG/O7MM3xDW?=
+ =?us-ascii?Q?XNJRFqCKkY7zJ7/EJ19mTvrvG3PihEkI7i04e/OdrpC04J/tCAHPJrb3qOu/?=
+ =?us-ascii?Q?b2+z6zcUu7kt5h6HLIeeRURI5aTONgpjmgzCrq3chQX6MJiEndNljOUuiScK?=
+ =?us-ascii?Q?fVsjY+AKIMqmgfaH1XD6y9zQmIq88DLec64LbLg/z6r8Bz+k5q8Yfs9KK1Cl?=
+ =?us-ascii?Q?3j6n6PtYn3xbnRBQNRkntKWLHy8f8JaBiLVy/8xE0ag5N5PSaHSdYSWqQpqv?=
+ =?us-ascii?Q?wh2IWs+z14tbyg0ywO9TPHkzT6jCrxgeqL5HCG5Qkv7ME566OlVpjWfmnURy?=
+ =?us-ascii?Q?TmCz4mzzNcBK5IVct26BcDllmTzLAuhajNs98tY0tYS3PQMo+VMpWlpRzk9y?=
+ =?us-ascii?Q?K2kEDypWjZ6lWSOzlzqFbe6gqKvoAouLYiWNjus2IvLTOEKS38x3kncgLulg?=
+ =?us-ascii?Q?Dw94kLb5HkD5RPctJVEhWyPMv+CuRwOn1mPJThfRarj7A1XqvtgxHXHQcsE/?=
+ =?us-ascii?Q?DMeRZvBhbX8LTIs+I3kqX23LC8OoSmAzqigQeEib2RrzLqnMI00PZFO4OaRR?=
+ =?us-ascii?Q?qpxLeoz+/s6kTSiF8pFbXKMW2gzPjh+jOO6pB/IxJZWN6p19al7W32qMafTJ?=
+ =?us-ascii?Q?Y6/l/rDHnSQkKdzpQWoBxAje2hLTmfXyt/qNgKvqjPbux28j2okH6T6NzTMP?=
+ =?us-ascii?Q?e7zDwTKhrHV+Hl//DbzqdplmpaRAVAZanlGtwhZr241Bc7RwH70XFqkq8ij1?=
+ =?us-ascii?Q?X/KnRSs67vHfNKRK35Qyhpft?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (47.55.113.94) by BL1PR13CA0432.namprd13.prod.outlook.com (2603:10b6:208:2c3::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.12 via Frontend Transport; Fri, 4 Jun 2021 23:01:09 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lpIoO-002Ga6-9s; Fri, 04 Jun 2021 20:01:08 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 9c693f1b-0324-4f44-779a-08d927aca41f
-X-MS-TrafficTypeDiagnostic: BL0PR12MB5539:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL0PR12MB553983AAD65C59D64FCB237EC23B9@BL0PR12MB5539.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: g/fmGEs6YVVqLsEQNhqRct7A1fKnJc5sGqi8EcIpBf5chsaCt/rsljX+2z6JMvPoKG+KTRmzxzhHiKiG8pL262ZNDsi5DHLCQle+McF/d2W6K3uXMAxX+P1GVN/8uMJYmGCOd5Mdws0bILDLcysd2Sk3ciUHwdLwCSt5klKnWc+xbBu9wn277qBoNlsSRouHWadJsagLFScf29O3yWE9DiJ5fO6rYVGfh//r3GnMdsij+ZJJfH7tveq9RIuppMZ48UUCx/LnU+vx7KHSbA9i4qiHVu9Nm5UxsXQV75s8yIuz/T9k6cp7MqUF1hw1qy2Nn/lBiMAwRu9MYVCZ2fiqi5pREkNPKZWpgGe8C99q5JajqydEum0r6PyrInktODTorSBZrTWNfgfZt41m0Nm7/m9ikcKjcIoe6izf4Xaq+1Gnlj8HjpzV2w22sJHgRDb4xbWGUiEzpbpzBOgFBO251XrtwCf1hVrQR8h/hCSE0WEOzMsB14KquPoIqZKt4o/fOfadNQ779II48SRHrsvagZMt0L61ocnzAEOkyo/QRmKxO0XVK7qMUO7tAZBXHLMQsn8Ir7DDTafJF7l832LLMRqG7X+g4s4ctvqtvY+30fI=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(346002)(376002)(396003)(366004)(136003)(426003)(38100700002)(2616005)(1076003)(86362001)(83380400001)(66946007)(66556008)(36756003)(5660300002)(8676002)(66476007)(54906003)(8936002)(26005)(316002)(9786002)(186003)(33656002)(7416002)(53546011)(6916009)(2906002)(478600001)(9746002)(4326008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?uhjqEedV+lXfOXS3NOHNYpYO6gsxg9Tu98SU/2jMTRBh3TPSuLzKJQZ+tHH9?=
- =?us-ascii?Q?uYsqhVfyjvQsUY4dQn6ehTAyBaTUJFxlX5moFr+3V1/XBsc9Pd87vyU/g0kO?=
- =?us-ascii?Q?nvEeehmGgpnAQYIqcwT0UQkdp4vfL3zKvJ38+cYx8egbVcmg50rzXYfedPHT?=
- =?us-ascii?Q?XRSYKt2cafqmLSMJMsgjmELJudpX8aNqyun/EM8t6wJbeXIOxHjA3+uWr1Il?=
- =?us-ascii?Q?Yvf4vYiBlLBunwKbcIYjkQvp5+oumZt/2sQu8ZulKRiUgBDjma3RKBUdx/vr?=
- =?us-ascii?Q?7vDbokFD2FmQrfCqhSQRX7WusKREf4m72AGeiIkbIo/e+CLYg+Jt6iEjyATt?=
- =?us-ascii?Q?iQa91GCgOIPmpJjvkUuwm0Q0BLHbumQ0oeYNV22b329iGNCNRmUd29JeHNgY?=
- =?us-ascii?Q?54kU/5bUthJUU0aX6+8zNYBdIFBDWAGLU1JUe/aTWEYKIsFeFWgPk4c0n7xc?=
- =?us-ascii?Q?u2TGDG6kkZ+KLs0tMxqUwR8kUkt+fPpnP+FJAWWijSs4KVjy2NCzrgKn0hSP?=
- =?us-ascii?Q?4SNjSJGyeI0GryDdh2vOLJ7A5hwx0kgoRABjXBzNTIE/3U0uEDPzpECIrMNQ?=
- =?us-ascii?Q?otTj97oWWTjMB9OEJLwA6AUaF3JFN4P6kGXa+wG0HfQ0LNKzHAyQH9uoVj1O?=
- =?us-ascii?Q?JIlNd8Ey0hRfwJ64iGNl2CjpWrw86ScNJruBw38IfxzR5KsglupnR1pf4V6F?=
- =?us-ascii?Q?uzOAqEMkj8g/2j8m7wMcUMA6N+Jp8rAQ+Y506vG7YkJw2OSlhTyd5+efkE64?=
- =?us-ascii?Q?Tj7Db8wrj5ZCKJFDjLJsdnxSiAN+M5kgnpIFHmoQJc+gHlfy0Cw4yyeBcdzt?=
- =?us-ascii?Q?UlRJYmQRhfp7CZUdW56iEMz7lKd2zL9nKBOVqCG8YN10TxQuhDLGLO8N0X5j?=
- =?us-ascii?Q?+BHI1ZgqaUwmq9CfgOCTtJUptiN4uansPP+NPnb7yNqsx6ibfZXK6yDswXOz?=
- =?us-ascii?Q?aDrYR8SDntDT0BrL5NXhEa+416fgsPQ3t7Zdj3dv+pNI9DsgzjEEpg24cbJ4?=
- =?us-ascii?Q?/WQAdy74I+SEgCOxfwUwSkzGmhwKQx4xB3+3k5mdkQOkYERkAOjTmZLIC/6X?=
- =?us-ascii?Q?HhSQgGrjJ9DUOkd5IOoGBwdfEwxKHXZNrsB1zsjQJY0mj/eiZaXwpz+yUbk4?=
- =?us-ascii?Q?ZPF+9Qdyoyk9Me5K168XpGcxRYpd95Q9GMi0fx65U0NDjVjMg0mJ27PRY7Uf?=
- =?us-ascii?Q?zvVST5pG3TZdRor/MLKQFG9t+04zsy50toDU66v56Rpu4NVxDjm1sBUHQTCV?=
- =?us-ascii?Q?UNgynLziEyhCgmCqQ28VJonroDLBKJLRdG3bZyYrxhMKQ/bUszAVgak2ALcZ?=
- =?us-ascii?Q?07X2WN26pvSkTHiJx0xCUjME?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9c693f1b-0324-4f44-779a-08d927aca41f
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2021 23:01:09.2632
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1886.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6dbed59d-3ca8-4821-ae4f-08d927ae005f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jun 2021 23:10:53.2629
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CR8pmzjgzV4s4FzNZrx4trzTCvUuM9EkeVIWVEXDg9cJekJ6bSds1sZ3U+X/Vazx
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB5539
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 9CHjyUbwZx+RxjaWLHOSpwZHzmN63NNaFWLVumQR8l5S811sprqOtRe52I3ZB5ghcj47xUJxfMhG9MXg6cv4wA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1773
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 04, 2021 at 03:29:18PM -0600, Alex Williamson wrote:
-> On Fri, 4 Jun 2021 14:22:07 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > On Fri, Jun 04, 2021 at 06:10:51PM +0200, Paolo Bonzini wrote:
-> > > On 04/06/21 18:03, Jason Gunthorpe wrote:  
-> > > > On Fri, Jun 04, 2021 at 05:57:19PM +0200, Paolo Bonzini wrote:  
-> > > > > I don't want a security proof myself; I want to trust VFIO to make the right
-> > > > > judgment and I'm happy to defer to it (via the KVM-VFIO device).
-> > > > > 
-> > > > > Given how KVM is just a device driver inside Linux, VMs should be a slightly
-> > > > > more roundabout way to do stuff that is accessible to bare metal; not a way
-> > > > > to gain extra privilege.  
-> > > > 
-> > > > Okay, fine, lets turn the question on its head then.
-> > > > 
-> > > > VFIO should provide a IOCTL VFIO_EXECUTE_WBINVD so that userspace VFIO
-> > > > application can make use of no-snoop optimizations. The ability of KVM
-> > > > to execute wbinvd should be tied to the ability of that IOCTL to run
-> > > > in a normal process context.
-> > > > 
-> > > > So, under what conditions do we want to allow VFIO to giave a process
-> > > > elevated access to the CPU:  
-> > > 
-> > > Ok, I would definitely not want to tie it *only* to CAP_SYS_RAWIO (i.e.
-> > > #2+#3 would be worse than what we have today), but IIUC the proposal (was it
-> > > yours or Kevin's?) was to keep #2 and add #1 with an enable/disable ioctl,
-> > > which then would be on VFIO and not on KVM.    
-> > 
-> > At the end of the day we need an ioctl with two arguments:
-> >  - The 'security proof' FD (ie /dev/vfio/XX, or /dev/ioasid, or whatever)
-> >  - The KVM FD to control wbinvd support on
-> > 
-> > Philosophically it doesn't matter too much which subsystem that ioctl
-> > lives, but we have these obnoxious cross module dependencies to
-> > consider.. 
-> > 
-> > Framing the question, as you have, to be about the process, I think
-> > explains why KVM doesn't really care what is decided, so long as the
-> > process and the VM have equivalent rights.
-> > 
-> > Alex, how about a more fleshed out suggestion:
-> > 
-> >  1) When the device is attached to the IOASID via VFIO_ATTACH_IOASID
-> >     it communicates its no-snoop configuration:
-> 
-> Communicates to whom?
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Friday, June 4, 2021 8:09 PM
+>=20
+> On Fri, Jun 04, 2021 at 06:37:26AM +0000, Tian, Kevin wrote:
+> > > From: Jason Gunthorpe
+> > > Sent: Thursday, June 3, 2021 9:05 PM
+> > >
+> > > > >
+> > > > > 3) Device accepts any PASIDs from the guest. No
+> > > > >    vPASID/pPASID translation is possible. (classic vfio_pci)
+> > > > > 4) Device accepts any PASID from the guest and has an
+> > > > >    internal vPASID/pPASID translation (enhanced vfio_pci)
+> > > >
+> > > > what is enhanced vfio_pci? In my writing this is for mdev
+> > > > which doesn't support ENQCMD
+> > >
+> > > This is a vfio_pci that mediates some element of the device interface
+> > > to communicate the vPASID/pPASID table to the device, using Max's
+> > > series for vfio_pci drivers to inject itself into VFIO.
+> > >
+> > > For instance a device might send a message through the PF that the VF
+> > > has a certain vPASID/pPASID translation table. This would be useful
+> > > for devices that cannot use ENQCMD but still want to support migratio=
+n
+> > > and thus need vPASID.
+> >
+> > I still don't quite get. If it's a PCI device why is PASID translation =
+required?
+> > Just delegate the per-RID PASID space to user as type-3 then migrating =
+the
+> > vPASID space is just straightforward.
+>=20
+> This is only possible if we get rid of the global pPASID allocation
+> (honestly is my preference as it makes the HW a lot simpler)
+>=20
 
-To the /dev/iommu FD which will have to maintain a list of devices
-attached to it internally.
+In this proposal global vs. per-RID allocation is a per-device policy.
+for vfio-pci it can always use per-RID (regardless of whether the
+device is partially mediated or not) and no vPASID/pPASID conversion.=20
+Even for mdev if no ENQCMD we can still do per-RID conversion.
+only for mdev which has ENQCMD we need global pPASID allocation.
 
-> >      - 0 enable, allow WBINVD
-> >      - 1 automatic disable, block WBINVD if the platform
-> >        IOMMU can police it (what we do today)
-> >      - 2 force disable, do not allow BINVD ever
-> 
-> The only thing we know about the device is whether or not Enable
-> No-snoop is hard wired to zero, ie. it either can't generate no-snoop
-> TLPs ("coherent-only") or it might ("assumed non-coherent").  
+I think this is the motivation you explained earlier that it's not good
+to have one global PASID allocator in the kernel. per-RID vs. global
+should be selected per device.
 
-Here I am outlining the choice an also imagining we might want an
-admin knob to select the three.
-
-> If we're putting the policy decision in the hands of userspace they
-> should have access to wbinvd if they own a device that is assumed
-> non-coherent AND it's attached to an IOMMU (page table) that is not
-> blocking no-snoop (a "non-coherent IOASID").
-
-There are two parts here, like Paolo was leading too. If the process
-has access to WBINVD and then if such an allowed process tells KVM to
-turn on WBINVD in the guest.
-
-If the process has a device and it has a way to create a non-coherent
-IOASID, then that process has access to WBINVD.
-
-For security it doesn't matter if the process actually creates the
-non-coherent IOASID or not. An attacker will simply do the steps that
-give access to WBINVD.
-
-The important detail is that access to WBINVD does not compell the
-process to tell KVM to turn on WBINVD. So a qemu with access to WBINVD
-can still choose to create a secure guest by always using IOMMU_CACHE
-in its page tables and not asking KVM to enable WBINVD.
-
-This propsal shifts this policy decision from the kernel to userspace.
-qemu is responsible to determine if KVM should enable wbinvd or not
-based on if it was able to create IOASID's with IOMMU_CACHE.
-
-> Conversely, a user could create a non-coherent IOASID and attach any
-> device to it, regardless of IOMMU backing capabilities.  Only if an
-> assumed non-coherent device is attached would the wbinvd be allowed.
-
-Right, this is exactly the point. Since the user gets to pick if the
-IOASID is coherent or not then an attacker can always reach WBINVD
-using only the device FD. Additional checks don't add to the security
-of the process.
-
-The additional checks you are describing add to the security of the
-guest, however qemu is capable of doing them without more help from the
-kernel.
-
-It is the strenth of Paolo's model that KVM should not be able to do
-optionally less, not more than the process itself can do.
-
-> > It is pretty simple from a /dev/ioasid perpsective, covers todays
-> > compat requirement, gives some future option to allow the no-snoop
-> > optimization, and gives a new option for qemu to totally block wbinvd
-> > no matter what.
-> 
-> What do you imagine is the use case for totally blocking wbinvd? 
-
-If wbinvd is really security important then an operator should endevor
-to turn it off. It can be safely turned off if the operator
-understands the SRIOV devices they are using. ie if you are only using
-mlx5 or a nvme then force it off and be secure, regardless of the
-platform capability.
-
-Jason
+Thanks
+Kevin
