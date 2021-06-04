@@ -2,314 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BA7539BD9B
-	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 18:49:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93A6A39BE3D
+	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 19:12:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229690AbhFDQvM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Jun 2021 12:51:12 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:54134 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230271AbhFDQvL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Jun 2021 12:51:11 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 154Gi6rT105323;
-        Fri, 4 Jun 2021 16:49:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : subject : to :
- cc : references : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=NqplpJX7bQoiRI0Mw7vbdx3oy3DueL3Lt5kMEdsimUA=;
- b=FC3xPaGp3x+/R9QSEEOU7I6xOXn83D/pJ4PGB5K8RB38uAHa7xXHH+2htJwHhPzfls3M
- pUMMG8ym6Uumj59zP7biwAAbbvCIEaLSUzg2jmXHCyG7DoY2qShkvneNiky11yka/P2e
- CFRTkJZrRiaxj2Az4Iy8SCJ0MFrJJ7p1JiIAeU5wGd6a4Nq3W/pO1sgIT5DIv/1ITZzc
- 7z16QAHGPxE/5a4m+avCGjSs/fqUJdDuQrp+bJZbmSyaDcFQGnJvyceFOBPFoDqrYAly
- br6yE2C4yZb/zq3+OfdQyaemgZ9uq+vlbvUpKPw5UMwWSeL6iTHPsCvdnaZIDj2Bp0nM Ww== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 38ud1spdvu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 04 Jun 2021 16:49:20 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 154GkeWq173168;
-        Fri, 4 Jun 2021 16:49:20 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3030.oracle.com with ESMTP id 38ubnfu3jv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 04 Jun 2021 16:49:19 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 154GnIsO021497;
-        Fri, 4 Jun 2021 16:49:18 GMT
-Received: from [10.175.182.238] (/10.175.182.238)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 04 Jun 2021 09:49:18 -0700
-From:   "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-Subject: selftests: kvm: allocating extra mem in slot 0 (Was: Re: [PATCH]
- selftests: kvm: fix overlapping addresses in memslot_perf_test)
-To:     "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Andrew Jones <drjones@redhat.com>
-References: <20210528191134.3740950-1-pbonzini@redhat.com>
- <285623f6-52e4-7f8d-fab6-0476a00af68b@oracle.com>
- <fc41bfc4-949f-03c5-3b20-2c1563ad7f62@redhat.com>
- <73511f2e-7b5d-0d29-b8dc-9cb16675afb3@oracle.com>
- <68bda0ef-b58f-c335-a0c7-96186cbad535@oracle.com>
- <DM8PR11MB5670B1AA392BF7502501D43B923C9@DM8PR11MB5670.namprd11.prod.outlook.com>
- <20210603123759.ovlgws3ycnem4t3d@gator.home>
- <8800fc7a-4501-12f7-ed15-26ea5db41df8@oracle.com>
- <DM8PR11MB5670CF4237FE0DF804C3AA8D923B9@DM8PR11MB5670.namprd11.prod.outlook.com>
-Message-ID: <a598cd40-31af-158f-d879-b302de7a44d3@oracle.com>
-Date:   Fri, 4 Jun 2021 18:49:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        id S230343AbhFDRO3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Jun 2021 13:14:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55534 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229864AbhFDRO2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Jun 2021 13:14:28 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BDB2C061766
+        for <kvm@vger.kernel.org>; Fri,  4 Jun 2021 10:12:42 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id a11so8145854wrt.13
+        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 10:12:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=0qK3PtK1ZJ0cptr2WVdMdlRn0V00pOzTguQ/XpJv0Nw=;
+        b=WOjKAbtaYFNBmEFh1M3XN+TY7WR2aqCgcVLpDVHxXUhaCzd27M2HH848aV1XyL/XDW
+         AmHZMagjIFUZuz0nT9LTUVm5OLZDWiUV4m/qDk2ReDfP6yFVsPqypVLIZmjfTKOSbnvC
+         2+Rl7ubJHcfF1U34Ess78woUEKrPogtxwFHAhd3kX8/BMJdE+qilgxav1+lcYWRs84db
+         vRUYg3+oHhotH3p5gvle/B7MhlVYtupYPliOVC4zrydyHGnBO11QRYR3cXPYXnYarYQN
+         N2bNXmGWbLXnquDq1TsG61jB08krHwffBEH4w4NJLmz15bWihIXTU4+IefOa1q/OlTQe
+         4cVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=0qK3PtK1ZJ0cptr2WVdMdlRn0V00pOzTguQ/XpJv0Nw=;
+        b=kTiR/lDQN27rNz3NSIPC+4Yp3U7qsU0GCmy9JhQs0TabVMwHdT94cKmIhOP+/JsE5W
+         Etxrl2aOk+qH8MtrylpfXtkdXbXD4sA58MazahG5xH1cPWDaCKtOlwQLgBB0W5Z5YqK9
+         OWB51k11gJ6lp1VAYMLU2JCKN00erDZ7DijTjhLT5/9oCFJ09M314r5qUkfDUvAr37fz
+         H/9A0P0TbDtUzTApnTn9znFLKpuH46csA45dY1H8/tiGCGXTwAKUFmVDnx6sAutLE/J3
+         3q0O7ZlkfMoqhyJRSy3zkLOgLNWJbV45PBdNgHded1fw8l6kMbMVeQAMIhYrm2Zu+2tf
+         71ZQ==
+X-Gm-Message-State: AOAM5320WAjynF4CbPblOiKlg4WL+YOEg5YRJmAx5+1hYc5ZHO5Pgoy/
+        qvXDcpeR/JKOuavtQ/soFFmleA==
+X-Google-Smtp-Source: ABdhPJzSOvopO0cd+MEhvR1zsEEWKzvT9HTOJinmq+Ys5Nkqor5ZEJ8qjUqDXMhSsQjnv8zbDmSbRA==
+X-Received: by 2002:adf:f78d:: with SMTP id q13mr4878148wrp.191.1622826760625;
+        Fri, 04 Jun 2021 10:12:40 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+        by smtp.gmail.com with ESMTPSA id q3sm7211868wrr.43.2021.06.04.10.12.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Jun 2021 10:12:38 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id C96491FF9D;
+        Fri,  4 Jun 2021 16:53:13 +0100 (BST)
+From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     qemu-devel@nongnu.org
+Cc:     qemu-arm@nongnu.org, Claudio Fontana <cfontana@suse.de>,
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        kvm@vger.kernel.org (open list:X86 KVM CPUs)
+Subject: [PATCH  v16 14/99] accel: add cpu_reset
+Date:   Fri,  4 Jun 2021 16:51:47 +0100
+Message-Id: <20210604155312.15902-15-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20210604155312.15902-1-alex.bennee@linaro.org>
+References: <20210604155312.15902-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <DM8PR11MB5670CF4237FE0DF804C3AA8D923B9@DM8PR11MB5670.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10005 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 phishscore=0
- spamscore=0 malwarescore=0 mlxscore=0 mlxlogscore=999 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2106040120
-X-Proofpoint-ORIG-GUID: 17_ooyqT7YjOBbIjZZsF19aXgYxw5E2d
-X-Proofpoint-GUID: 17_ooyqT7YjOBbIjZZsF19aXgYxw5E2d
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10005 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 priorityscore=1501
- suspectscore=0 phishscore=0 lowpriorityscore=0 mlxlogscore=999
- malwarescore=0 clxscore=1015 spamscore=0 impostorscore=0 adultscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106040120
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04.06.2021 05:35, Duan, Zhenzhong wrote:
->> -----Original Message-----
->> From: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
->> Sent: Thursday, June 3, 2021 9:06 PM
->> To: Andrew Jones <drjones@redhat.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>; linux-kernel@vger.kernel.org;
->> kvm@vger.kernel.org; Duan, Zhenzhong <zhenzhong.duan@intel.com>
->> Subject: Re: [PATCH] selftests: kvm: fix overlapping addresses in
->> memslot_perf_test
->>
->> On 03.06.2021 14:37, Andrew Jones wrote:
->>> On Thu, Jun 03, 2021 at 05:26:33AM +0000, Duan, Zhenzhong wrote:
->>>>> -----Original Message-----
->>>>> From: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
->>>>> Sent: Thursday, June 3, 2021 7:07 AM
->>>>> To: Paolo Bonzini <pbonzini@redhat.com>; Duan, Zhenzhong
->>>>> <zhenzhong.duan@intel.com>
->>>>> Cc: linux-kernel@vger.kernel.org; kvm@vger.kernel.org; Andrew Jones
->>>>> <drjones@redhat.com>
->>>>> Subject: Re: [PATCH] selftests: kvm: fix overlapping addresses in
->>>>> memslot_perf_test
->>>>>
->>>>> On 30.05.2021 01:13, Maciej S. Szmigiero wrote:
->>>>>> On 29.05.2021 12:20, Paolo Bonzini wrote:
->>>>>>> On 28/05/21 21:51, Maciej S. Szmigiero wrote:
->>>>>>>> On 28.05.2021 21:11, Paolo Bonzini wrote:
->>>>>>>>> The memory that is allocated in vm_create is already mapped
->>>>>>>>> close to GPA 0, because test_execute passes the requested memory
->>>>>>>>> to prepare_vm.  This causes overlapping memory regions and the
->>>>>>>>> test crashes.  For simplicity just move MEM_GPA higher.
->>>>>>>>>
->>>>>>>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>>>>>>>
->>>>>>>> I am not sure that I understand the issue correctly, is
->>>>>>>> vm_create_default() already reserving low GPAs (around
->>>>>>>> 0x10000000) on some arches or run environments?
->>>>>>>
->>>>>>> It maps the number of pages you pass in the second argument, see
->>>>>>> vm_create.
->>>>>>>
->>>>>>>      if (phy_pages != 0)
->>>>>>>        vm_userspace_mem_region_add(vm,
->> VM_MEM_SRC_ANONYMOUS,
->>>>>>>                                    0, 0, phy_pages, 0);
->>>>>>>
->>>>>>> In this case:
->>>>>>>
->>>>>>>      data->vm = vm_create_default(VCPU_ID, mempages, guest_code);
->>>>>>>
->>>>>>> called here:
->>>>>>>
->>>>>>>      if (!prepare_vm(data, nslots, maxslots, tdata->guest_code,
->>>>>>>                      mem_size, slot_runtime)) {
->>>>>>>
->>>>>>> where mempages is mem_size, which is declared as:
->>>>>>>
->>>>>>>            uint64_t mem_size = tdata->mem_size ? : MEM_SIZE_PAGES;
->>>>>>>
->>>>>>> but actually a better fix is just to pass a small fixed value (e.g.
->>>>>>> 1024) to vm_create_default, since all other regions are added by
->>>>>>> hand
->>>>>>
->>>>>> Yes, but the argument that is passed to vm_create_default()
->>>>>> (mem_size in the case of the test) is not passed as phy_pages to
->> vm_create().
->>>>>> Rather, vm_create_with_vcpus() calculates some upper bound of extra
->>>>>> memory that is needed to cover that much guest memory (including
->>>>>> for its page tables).
->>>>>>
->>>>>> The biggest possible mem_size from memslot_perf_test is 512 MiB + 1
->>>>>> page, according to my calculations this results in phy_pages of
->>>>>> 1029
->>>>>> (~4 MiB) in the x86-64 case and around 1540 (~6 MiB) in the s390x
->>>>>> case (here I am not sure about the exact number, since s390x has
->>>>>> some additional alignment requirements).
->>>>>>
->>>>>> Both values are well below 256 MiB (0x10000000UL), so I was
->>>>>> wondering what kind of circumstances can make these allocations
->>>>>> collide (maybe I am missing something in my analysis).
->>>>>
->>>>> I see now that there has been a patch merged last week called
->>>>> "selftests: kvm: make allocation of extra memory take effect" by
->>>>> Zhenzhong that now allocates also the whole memory size passed to
->>>>> vm_create_default() (instead of just page tables for that much memory).
->>>>>
->>>>> The commit message of this patch says that "perf_test_util and
->>>>> kvm_page_table_test use it to alloc extra memory currently", however
->>>>> both kvm_page_table_test and lib/perf_test_util framework explicitly
->>>>> add the required memory allocation by doing a
->>>>> vm_userspace_mem_region_add() call for the same memory size that
->> they pass to vm_create_default().
->>>>>
->>>>> So now they allocate this memory twice.
->>>>>
->>>>> @Zhenzhong: did you notice improper operation of either
->>>>> kvm_page_table_test or perf_test_util-based tests
->>>>> (demand_paging_test, dirty_log_perf_test,
->>>>> memslot_modification_stress_test) before your patch?
->>>> No
->>>>
->>>>>
->>>>> They seem to work fine for me without the patch (and I guess other
->>>>> people would have noticed earlier, too, if they were broken).
->>>>>
->>>>> After this patch not only these tests allocate their memory twice
->>>>> but it is harder to make vm_create_default() allocate the right
->>>>> amount of memory for the page tables in cases where the test needs
->>>>> to explicitly use
->>>>> vm_userspace_mem_region_add() for its allocations (because it wants
->>>>> the allocation placed at a specific GPA or in a specific memslot).
->>>>>
->>>>> One has to basically open-code the page table size calculations from
->>>>> vm_create_with_vcpus() in the particular test then, taking also into
->>>>> account that vm_create_with_vcpus() will not only allocate the
->>>>> passed memory size (calculated page tables size) but also behave
->>>>> like it was allocating space for page tables for these page tables
->>>>> (even though the passed memory size itself is supposed to cover them).
->>>> Looks we have different understanding to the parameter
->> extra_mem_pages of vm_create_default().
->>>>
->>>> In your usage, extra_mem_pages is only used for page table
->>>> calculations, real extra memory allocation happens in the extra call of
->> vm_userspace_mem_region_add().
->>>
->>> Yes, this is the meaning that kvm selftests has always had for
->>> extra_mem_pages of vm_create_default(). If we'd rather have a
->>> different meaning, that's fine, but we need to change all the callers
->>> of the function as well.
->>
->> If we change the meaning of extra_mem_pages (keep the patch) it would be
->> good to still have an additional parameter to vm_create_with_vcpus() for
->> tests that have to allocate their memory on their own via
->> vm_userspace_mem_region_add() for vm_create_with_vcpus() to just
->> allocate the page tables for these manual allocations.
->> Or a helper to calculate the required extra_mem_pages for them.
->>
->>> If we decide to leave vm_create_default() the way it was by reverting
->>> this patch, then maybe we should consider renaming the parameter
->>> and/or documenting the function.
->>
->> Adding a descriptive comment (and possibly renaming the parameter) seems
->> like a much simpler solution to me that adapting these tests (and possibly
->> adding the parameter or helper described above for them).
-> 
-> Agree, I prefer the simpler way.
-> 
-> I also think of an idea for custom slot0 memory, keep extra_mem_pages the original way, adding a global slot0_pages for custom slot0 memory. Maybe not a good choice as it's not thread safe, just for discussion. That is:
-> 1. revert "selftests: kvm: make allocation of extra memory take effect"
-> 2. add below patch
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -280,6 +280,9 @@ vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
->   struct kvm_vm *vm_create_default(uint32_t vcpuid, uint64_t extra_mem_pages,
->                                   void *guest_code);
-> 
-> +struct kvm_vm *vm_create_slot0(uint32_t vcpuid, uint64_t slot0_mem_pages,
-> +                              uint64_t extra_mem_pages, void *guest_code);
-> +
->   /* Same as vm_create_default, but can be used for more than one vcpu */
->   struct kvm_vm *vm_create_default_with_vcpus(uint32_t nr_vcpus, uint64_t extra_mem_pages,
->                                              uint32_t num_percpu_pages, void *guest_code,
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 63418df921f0..56b1225865d5 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -196,6 +196,7 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
->   _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
->                 "Missing new mode params?");
-> 
-> +uint64_t slot0_pages = DEFAULT_GUEST_PHY_PAGES;
->   /*
->    * VM Create
->    *
-> @@ -319,8 +320,8 @@ struct kvm_vm *vm_create_with_vcpus(enum vm_guest_mode mode, uint32_t nr_vcpus,
->           * than N/x*2.
->           */
->          uint64_t vcpu_pages = (DEFAULT_STACK_PGS + num_percpu_pages) * nr_vcpus;
-> -       uint64_t extra_pg_pages = (extra_mem_pages + vcpu_pages) / PTES_PER_MIN_PAGE * 2;
-> -       uint64_t pages = DEFAULT_GUEST_PHY_PAGES + vcpu_pages + extra_pg_pages;
-> +       uint64_t extra_pg_pages = (slot0_pages + extra_mem_pages + vcpu_pages) / PTES_PER_MIN_PAGE * 2;
-> +       uint64_t pages = slot0_pages + vcpu_pages + extra_pg_pages;
->          struct kvm_vm *vm;
->          int i;
-> 
-> @@ -358,9 +359,18 @@ struct kvm_vm *vm_create_default_with_vcpus(uint32_t nr_vcpus, uint64_t extra_me
->                                      num_percpu_pages, guest_code, vcpuids);
->   }
-> 
-> +struct kvm_vm *vm_create_slot0(uint32_t vcpuid, uint64_t slot0_mem_pages,
-> +                                      uint64_t extra_mem_pages, void *guest_code)
-> +{
-> +       slot0_pages = slot0_mem_pages;
-> +       return vm_create_default_with_vcpus(1, extra_mem_pages, 0, guest_code,
-> +                                           (uint32_t []){ vcpuid });
-> +}
-> +
->   struct kvm_vm *vm_create_default(uint32_t vcpuid, uint64_t extra_mem_pages,
->                                   void *guest_code)
->   {
-> +       slot0_pages = DEFAULT_GUEST_PHY_PAGES;
->          return vm_create_default_with_vcpus(1, extra_mem_pages, 0, guest_code,
->                                              (uint32_t []){ vcpuid });
->   }
-> @@ -626,6 +636,9 @@ void kvm_vm_free(struct kvm_vm *vmp)
-> 
->          /* Free the structure describing the VM. */
->          free(vmp);
-> +
-> +       /* Restore slot0 memory to default size for next VM creation */
-> +       slot0_pages = DEFAULT_GUEST_PHY_PAGES;
->   }
-> 
->   /*
+From: Claudio Fontana <cfontana@suse.de>
 
-In terms of thread safety a quick glance at current tests seems to
-suggest that none of them create VMs from anything but their main
-threads (although s90x diag318 handler for sync_regs_test does some
-suspicious stuff).
+in cpu_reset(), implemented in the common cpu.c,
+add a call to a new accel_cpu_reset(), which ensures that the CPU accel
+interface is also reset when the CPU is reset.
 
-But I think a better solution than adding a global variable as an implicit
-parameter to vm_create_with_vcpus() is to simply add an extra explicit
-parameter to this function - it has just 3 callers that need to be
-(trivially) adapted then.
+Use this first for x86/kvm, simply moving the kvm_arch_reset_vcpu() call.
 
-> Thanks
-> Zhenzhong
-> 
+Signed-off-by: Claudio Fontana <cfontana@suse.de>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ include/hw/core/accel-cpu.h | 2 ++
+ include/qemu/accel.h        | 6 ++++++
+ accel/accel-common.c        | 9 +++++++++
+ hw/core/cpu-common.c        | 3 ++-
+ target/i386/cpu.c           | 4 ----
+ target/i386/kvm/kvm-cpu.c   | 6 ++++++
+ 6 files changed, 25 insertions(+), 5 deletions(-)
 
-Thanks,
-Maciej
+diff --git a/include/hw/core/accel-cpu.h b/include/hw/core/accel-cpu.h
+index 5dbfd79955..700a5bd266 100644
+--- a/include/hw/core/accel-cpu.h
++++ b/include/hw/core/accel-cpu.h
+@@ -33,6 +33,8 @@ typedef struct AccelCPUClass {
+     void (*cpu_class_init)(CPUClass *cc);
+     void (*cpu_instance_init)(CPUState *cpu);
+     bool (*cpu_realizefn)(CPUState *cpu, Error **errp);
++    void (*cpu_reset)(CPUState *cpu);
++
+ } AccelCPUClass;
+ 
+ #endif /* ACCEL_CPU_H */
+diff --git a/include/qemu/accel.h b/include/qemu/accel.h
+index 4f4c283f6f..8d3a15b916 100644
+--- a/include/qemu/accel.h
++++ b/include/qemu/accel.h
+@@ -91,4 +91,10 @@ void accel_cpu_instance_init(CPUState *cpu);
+  */
+ bool accel_cpu_realizefn(CPUState *cpu, Error **errp);
+ 
++/**
++ * accel_cpu_reset:
++ * @cpu: The CPU that needs to call accel-specific reset.
++ */
++void accel_cpu_reset(CPUState *cpu);
++
+ #endif /* QEMU_ACCEL_H */
+diff --git a/accel/accel-common.c b/accel/accel-common.c
+index cf07f78421..3331a9dcfd 100644
+--- a/accel/accel-common.c
++++ b/accel/accel-common.c
+@@ -121,6 +121,15 @@ bool accel_cpu_realizefn(CPUState *cpu, Error **errp)
+     return true;
+ }
+ 
++void accel_cpu_reset(CPUState *cpu)
++{
++    CPUClass *cc = CPU_GET_CLASS(cpu);
++
++    if (cc->accel_cpu && cc->accel_cpu->cpu_reset) {
++        cc->accel_cpu->cpu_reset(cpu);
++    }
++}
++
+ static const TypeInfo accel_cpu_type = {
+     .name = TYPE_ACCEL_CPU,
+     .parent = TYPE_OBJECT,
+diff --git a/hw/core/cpu-common.c b/hw/core/cpu-common.c
+index e2f5a64604..ab258ad4f2 100644
+--- a/hw/core/cpu-common.c
++++ b/hw/core/cpu-common.c
+@@ -34,6 +34,7 @@
+ #include "hw/qdev-properties.h"
+ #include "trace/trace-root.h"
+ #include "qemu/plugin.h"
++#include "qemu/accel.h"
+ 
+ CPUState *cpu_by_arch_id(int64_t id)
+ {
+@@ -112,7 +113,7 @@ void cpu_dump_state(CPUState *cpu, FILE *f, int flags)
+ void cpu_reset(CPUState *cpu)
+ {
+     device_cold_reset(DEVICE(cpu));
+-
++    accel_cpu_reset(cpu);
+     trace_guest_cpu_reset(cpu);
+ }
+ 
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index e0ba36cc23..0c22324daf 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5749,10 +5749,6 @@ static void x86_cpu_reset(DeviceState *dev)
+     apic_designate_bsp(cpu->apic_state, s->cpu_index == 0);
+ 
+     s->halted = !cpu_is_bsp(cpu);
+-
+-    if (kvm_enabled()) {
+-        kvm_arch_reset_vcpu(cpu);
+-    }
+ #endif
+ }
+ 
+diff --git a/target/i386/kvm/kvm-cpu.c b/target/i386/kvm/kvm-cpu.c
+index 5235bce8dc..63410d3f18 100644
+--- a/target/i386/kvm/kvm-cpu.c
++++ b/target/i386/kvm/kvm-cpu.c
+@@ -135,12 +135,18 @@ static void kvm_cpu_instance_init(CPUState *cs)
+     }
+ }
+ 
++static void kvm_cpu_reset(CPUState *cpu)
++{
++    kvm_arch_reset_vcpu(X86_CPU(cpu));
++}
++
+ static void kvm_cpu_accel_class_init(ObjectClass *oc, void *data)
+ {
+     AccelCPUClass *acc = ACCEL_CPU_CLASS(oc);
+ 
+     acc->cpu_realizefn = kvm_cpu_realizefn;
+     acc->cpu_instance_init = kvm_cpu_instance_init;
++    acc->cpu_reset = kvm_cpu_reset;
+ }
+ static const TypeInfo kvm_cpu_accel_type_info = {
+     .name = ACCEL_CPU_NAME("kvm"),
+-- 
+2.20.1
+
