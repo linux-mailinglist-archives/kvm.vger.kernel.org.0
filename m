@@ -2,271 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FFA339BD3C
-	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 18:33:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1ED3F39BD8A
+	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 18:46:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230029AbhFDQfc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Jun 2021 12:35:32 -0400
-Received: from mail-wr1-f53.google.com ([209.85.221.53]:40717 "EHLO
-        mail-wr1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229755AbhFDQfc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Jun 2021 12:35:32 -0400
-Received: by mail-wr1-f53.google.com with SMTP id y7so5277649wrh.7
-        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 09:33:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=PhGU2QFq4twF/mv+HlJpA4XPpT43a+FIEkesYvvyBBs=;
-        b=h9SfbPu3XAsH6gTS4+glqg4BVSYXE3ystjWl5UfeVBGIR7c0nvlHUXLPBR58jRfz4G
-         9ydX21jUr+FtU/Bmpyn2DhonFzPpKhvyOzi5UqpFDsU+54nzoDLzfOInMdSAWIWYsWXZ
-         2U5/3D3Osjpia3iFEQuNNC/yvlwGeYaRrwPKIhTPfjzsVA91xop7f/4VkypNSlSj+Y0a
-         mdQkMBP2Y9oCnqsdhNBuUiP8LqntVRLCBO2issiELmxV1HNwxgPiZ7xgq/NqBfkY7gZ+
-         xcJ8RqAFZHpyk9Cksv1lRGmklHilMXwFhxNlaYokwWQpxhQWa6lJ5Cp9wSMKw7x8wk5i
-         7/4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=PhGU2QFq4twF/mv+HlJpA4XPpT43a+FIEkesYvvyBBs=;
-        b=dGzC6+9mUltBEwpr9IUc2fSWBBz+nCyG/DA8o/Dwsr/vaHu6PTubdzKfkYcg77fbFR
-         j07mEDGKWuwq5rzHHrjHaSqx/0x8Xj1JhWq1LPrsq3vl0o0nzc+NYDw78sI/AhPVEa9C
-         XVcEf5+RarQ+BUoWRwSaJSZ33PPq1Gh68iYilXoub7/EY1u40HpxOU/VL+X8xMYaXqeL
-         WpNhfToggTUA2m3q5z+oBj94BHZxUVQCPCIX19je26m47duIy0jdgk1lb1t7lN0cTPjI
-         IJyQRJjXjktIANLX/Ub5PvEvh1a3qUpJ6ivRt5atm/onQy15IIIwL9GayJ9Y6TZyeP+I
-         MXlA==
-X-Gm-Message-State: AOAM530/wBnKoWC78qExYa781Z9tTQbOk8W9LFHQ/SBsORx3moLvmrw1
-        7FxZJBFjKT7kmNg5noKLSZn1cQ==
-X-Google-Smtp-Source: ABdhPJyAPNd40ouHkfmsLaYOhJcoMcXHosmRWbUmwQLxSIIGk+lntH54mAtX58C4+ZvrYx/zMsblpg==
-X-Received: by 2002:adf:f1c3:: with SMTP id z3mr4647776wro.375.1622824364849;
-        Fri, 04 Jun 2021 09:32:44 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
-        by smtp.gmail.com with ESMTPSA id k8sm4338274wrp.3.2021.06.04.09.32.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Jun 2021 09:32:43 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id AEA5F1FFB5;
-        Fri,  4 Jun 2021 16:53:16 +0100 (BST)
-From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To:     qemu-devel@nongnu.org
-Cc:     qemu-arm@nongnu.org, Claudio Fontana <cfontana@suse.de>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm@vger.kernel.org (open list:Overall KVM CPUs)
-Subject: [PATCH  v16 30/99] target/arm: only perform TCG cpu and machine inits if TCG enabled
-Date:   Fri,  4 Jun 2021 16:52:03 +0100
-Message-Id: <20210604155312.15902-31-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20210604155312.15902-1-alex.bennee@linaro.org>
-References: <20210604155312.15902-1-alex.bennee@linaro.org>
+        id S230468AbhFDQrs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Jun 2021 12:47:48 -0400
+Received: from foss.arm.com ([217.140.110.172]:43104 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229864AbhFDQrs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Jun 2021 12:47:48 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5A5D51063;
+        Fri,  4 Jun 2021 09:46:01 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7A59D3F73D;
+        Fri,  4 Jun 2021 09:46:00 -0700 (PDT)
+Subject: Re: [PATCH v3 kvmtool 32/32] arm/arm64: Add PCI Express 1.1 support
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>,
+        kvm@vger.kernel.org
+Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
+        sami.mujawar@arm.com, lorenzo.pieralisi@arm.com
+References: <20200326152438.6218-1-alexandru.elisei@arm.com>
+ <20200326152438.6218-33-alexandru.elisei@arm.com>
+ <2b963524-3153-fc95-7bf2-b60852ea2f22@arm.com>
+ <f1e6746f-6196-a687-f3c5-78a08df31205@arm.com>
+ <d1e018e7-f443-2710-a00d-e570652d569a@arm.com>
+ <4f8dfda1-4a64-e2fb-4e93-3979e037599d@arm.com>
+ <87575228-33b0-96cf-13d6-3499ce107020@arm.com>
+ <51a2c089-28fd-2371-14ae-1f3dd024aa5a@arm.com>
+Message-ID: <41a1ad1e-49d2-ed3a-e2c5-1caf89a3a258@arm.com>
+Date:   Fri, 4 Jun 2021 17:46:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <51a2c089-28fd-2371-14ae-1f3dd024aa5a@arm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Claudio Fontana <cfontana@suse.de>
+Hi Andre,
 
-of note, cpreg lists were previously initialized by TCG first,
-and then thrown away and replaced with the data coming from KVM.
+On 5/13/20 3:42 PM, Alexandru Elisei wrote:
+> Hi,
+>
+> On 5/13/20 9:17 AM, André Przywara wrote:
+>> On 12/05/2020 16:44, Alexandru Elisei wrote:
+>>
+>> Hi,
+>>
+>>> On 5/12/20 3:17 PM, André Przywara wrote:
+>>>> On 06/05/2020 14:51, Alexandru Elisei wrote:
+>>>>
+>>>> Hi,
+>>>>
+>>>>> On 4/6/20 3:06 PM, André Przywara wrote:
+>>>>> [..]
+>>>>>> Actually, looking closer: why do we need this in the first place? I
+>>>>>> removed this and struct pm_cap, and it still compiles.
+>>>>>> So can we lose those two structures at all? And move the discussion and
+>>>>>> implementation (for VirtIO 1.0?) to a later series?
+>>>>> I've answered both points in v2 of the series [1].
+>>>>>
+>>>>> [1] https://www.spinics.net/lists/kvm/msg209601.html:
+>>>> From there:
+>>>>>> But more importantly: Do we actually need those definitions? We
+>>>>>> don't seem to use them, do we?
+>>>>>> And the u8 __pad[PCI_DEV_CFG_SIZE] below should provide the extended
+>>>>>> storage space a guest would expect?
+>>>>> Yes, we don't use them for the reasons I explained in the commit
+>>>>> message. I would rather keep them, because they are required by the
+>>>>> PCIE spec.
+>>>> I don't get the point of adding code / data structures that we don't
+>>>> need, especially if it has issues. I understand it's mandatory as per
+>>>> the spec, but just adding a struct here doesn't fix this or makes this
+>>>> better.
+>>> Sure, I can remove the unused structs, especially if they have issues. But I don't
+>>> see what issues they have, would you mind expanding on that?
+>> The best code is the one not written. ;-)
+> Truer words were never spoken.
+>
+> That settles it then, I'll remove the unused structs.
 
-Now we just initialize once, either for TCG or for KVM.
+Coming back to this. Without the PCIE capability, Linux will incorrectly set the
+size of the PCI configuration space for a device to the legacy PCI size (256 bytes
+instead of 4096). This is done in drivers/pci/probe.c::pci_setup_device, where
+dev->cfg_size = pci_cfg_size(dev). And pci_cfg_size() is:
 
-Signed-off-by: Claudio Fontana <cfontana@suse.de>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- target/arm/cpu.c     | 32 ++++++++++++++++++--------------
- target/arm/kvm.c     | 18 +++++++++---------
- target/arm/machine.c | 20 +++++++++++++-------
- 3 files changed, 40 insertions(+), 30 deletions(-)
+int pci_cfg_space_size(struct pci_dev *dev)
+{
+    int pos;
+    u32 status;
+    u16 class;
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 9e616a15e1..7bb406efd2 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -435,9 +435,11 @@ static void arm_cpu_reset(DeviceState *dev)
-     }
- #endif
- 
--    hw_breakpoint_update_all(cpu);
--    hw_watchpoint_update_all(cpu);
--    arm_rebuild_hflags(env);
-+    if (tcg_enabled()) {
-+        hw_breakpoint_update_all(cpu);
-+        hw_watchpoint_update_all(cpu);
-+        arm_rebuild_hflags(env);
-+    }
- }
- 
- static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
-@@ -1318,6 +1320,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-         }
-     }
- 
-+#ifdef CONFIG_TCG
-     {
-         uint64_t scale;
- 
-@@ -1343,7 +1346,8 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-         cpu->gt_timer[GTIMER_HYPVIRT] = timer_new(QEMU_CLOCK_VIRTUAL, scale,
-                                                   arm_gt_hvtimer_cb, cpu);
-     }
--#endif
-+#endif /* CONFIG_TCG */
-+#endif /* !CONFIG_USER_ONLY */
- 
-     cpu_exec_realizefn(cs, &local_err);
-     if (local_err != NULL) {
-@@ -1646,17 +1650,16 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-         unset_feature(env, ARM_FEATURE_PMU);
-     }
-     if (arm_feature(env, ARM_FEATURE_PMU)) {
--        pmu_init(cpu);
--
--        if (!kvm_enabled()) {
-+        if (tcg_enabled()) {
-+            pmu_init(cpu);
-             arm_register_pre_el_change_hook(cpu, &pmu_pre_el_change, 0);
-             arm_register_el_change_hook(cpu, &pmu_post_el_change, 0);
--        }
- 
- #ifndef CONFIG_USER_ONLY
--        cpu->pmu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, arm_pmu_timer_cb,
--                cpu);
-+            cpu->pmu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, arm_pmu_timer_cb,
-+                                          cpu);
- #endif
-+        }
-     } else {
-         cpu->isar.id_aa64dfr0 =
-             FIELD_DP64(cpu->isar.id_aa64dfr0, ID_AA64DFR0, PMUVER, 0);
-@@ -1739,10 +1742,11 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-         set_feature(env, ARM_FEATURE_VBAR);
-     }
- 
--    register_cp_regs_for_features(cpu);
--    arm_cpu_register_gdb_regs_for_features(cpu);
--
--    init_cpreg_list(cpu);
-+    if (tcg_enabled()) {
-+        register_cp_regs_for_features(cpu);
-+        arm_cpu_register_gdb_regs_for_features(cpu);
-+        init_cpreg_list(cpu);
-+    }
- 
- #ifndef CONFIG_USER_ONLY
-     MachineState *ms = MACHINE(qdev_get_machine());
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index d8381ba224..1b093cc52f 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -431,9 +431,11 @@ static uint64_t *kvm_arm_get_cpreg_ptr(ARMCPU *cpu, uint64_t regidx)
-     return &cpu->cpreg_values[res - cpu->cpreg_indexes];
- }
- 
--/* Initialize the ARMCPU cpreg list according to the kernel's
-- * definition of what CPU registers it knows about (and throw away
-- * the previous TCG-created cpreg list).
-+/*
-+ * Initialize the ARMCPU cpreg list according to the kernel's
-+ * definition of what CPU registers it knows about.
-+ *
-+ * The parallel for TCG is init_cpreg_list() in tcg/
-  */
- int kvm_arm_init_cpreg_list(ARMCPU *cpu)
- {
-@@ -475,12 +477,10 @@ int kvm_arm_init_cpreg_list(ARMCPU *cpu)
-         arraylen++;
-     }
- 
--    cpu->cpreg_indexes = g_renew(uint64_t, cpu->cpreg_indexes, arraylen);
--    cpu->cpreg_values = g_renew(uint64_t, cpu->cpreg_values, arraylen);
--    cpu->cpreg_vmstate_indexes = g_renew(uint64_t, cpu->cpreg_vmstate_indexes,
--                                         arraylen);
--    cpu->cpreg_vmstate_values = g_renew(uint64_t, cpu->cpreg_vmstate_values,
--                                        arraylen);
-+    cpu->cpreg_indexes = g_new(uint64_t, arraylen);
-+    cpu->cpreg_values = g_new(uint64_t, arraylen);
-+    cpu->cpreg_vmstate_indexes = g_new(uint64_t, arraylen);
-+    cpu->cpreg_vmstate_values = g_new(uint64_t, arraylen);
-     cpu->cpreg_array_len = arraylen;
-     cpu->cpreg_vmstate_array_len = arraylen;
- 
-diff --git a/target/arm/machine.c b/target/arm/machine.c
-index e568662cca..2982e8d7f4 100644
---- a/target/arm/machine.c
-+++ b/target/arm/machine.c
-@@ -2,6 +2,7 @@
- #include "cpu.h"
- #include "qemu/error-report.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/tcg.h"
- #include "kvm_arm.h"
- #include "internals.h"
- #include "migration/cpu.h"
-@@ -635,7 +636,7 @@ static int cpu_pre_save(void *opaque)
- {
-     ARMCPU *cpu = opaque;
- 
--    if (!kvm_enabled()) {
-+    if (tcg_enabled()) {
-         pmu_op_start(&cpu->env);
-     }
- 
-@@ -670,7 +671,7 @@ static int cpu_post_save(void *opaque)
- {
-     ARMCPU *cpu = opaque;
- 
--    if (!kvm_enabled()) {
-+    if (tcg_enabled()) {
-         pmu_op_finish(&cpu->env);
-     }
- 
-@@ -689,7 +690,7 @@ static int cpu_pre_load(void *opaque)
-      */
-     env->irq_line_state = UINT32_MAX;
- 
--    if (!kvm_enabled()) {
-+    if (tcg_enabled()) {
-         pmu_op_start(&cpu->env);
-     }
- 
-@@ -759,13 +760,13 @@ static int cpu_post_load(void *opaque, int version_id)
-         }
-     }
- 
--    hw_breakpoint_update_all(cpu);
--    hw_watchpoint_update_all(cpu);
-+    if (tcg_enabled()) {
-+        hw_breakpoint_update_all(cpu);
-+        hw_watchpoint_update_all(cpu);
- 
--    if (!kvm_enabled()) {
-         pmu_op_finish(&cpu->env);
-+        arm_rebuild_hflags(&cpu->env);
-     }
--    arm_rebuild_hflags(&cpu->env);
- 
-     return 0;
- }
-@@ -815,8 +816,13 @@ const VMStateDescription vmstate_arm_cpu = {
-         VMSTATE_UINT32(env.exception.syndrome, ARMCPU),
-         VMSTATE_UINT32(env.exception.fsr, ARMCPU),
-         VMSTATE_UINT64(env.exception.vaddress, ARMCPU),
-+#ifdef CONFIG_TCG
-         VMSTATE_TIMER_PTR(gt_timer[GTIMER_PHYS], ARMCPU),
-         VMSTATE_TIMER_PTR(gt_timer[GTIMER_VIRT], ARMCPU),
-+#else
-+        VMSTATE_UNUSED(sizeof(QEMUTimer *)),
-+        VMSTATE_UNUSED(sizeof(QEMUTimer *)),
-+#endif /* CONFIG_TCG */
-         {
-             .name = "power_state",
-             .version_id = 0,
--- 
-2.20.1
+#ifdef CONFIG_PCI_IOV
+    /*
+     * Per the SR-IOV specification (rev 1.1, sec 3.5), VFs are required to
+     * implement a PCIe capability and therefore must implement extended
+     * config space.  We can skip the NO_EXTCFG test below and the
+     * reachability/aliasing test in pci_cfg_space_size_ext() by virtue of
+     * the fact that the SR-IOV capability on the PF resides in extended
+     * config space and must be accessible and non-aliased to have enabled
+     * support for this VF.  This is a micro performance optimization for
+     * systems supporting many VFs.
+     */
+    if (dev->is_virtfn)
+        return PCI_CFG_SPACE_EXP_SIZE;
+#endif
+
+    if (dev->bus->bus_flags & PCI_BUS_FLAGS_NO_EXTCFG)
+        return PCI_CFG_SPACE_SIZE;
+
+    class = dev->class >> 8;
+    if (class == PCI_CLASS_BRIDGE_HOST)
+        return pci_cfg_space_size_ext(dev);
+
+    if (pci_is_pcie(dev))
+        return pci_cfg_space_size_ext(dev);
+
+    pos = pci_find_capability(dev, PCI_CAP_ID_PCIX);
+    if (!pos)
+        return PCI_CFG_SPACE_SIZE;
+
+    pci_read_config_dword(dev, pos + PCI_X_STATUS, &status);
+    if (status & (PCI_X_STATUS_266MHZ | PCI_X_STATUS_533MHZ))
+        return pci_cfg_space_size_ext(dev);
+
+    return PCI_CFG_SPACE_SIZE;
+}
+
+And pci_is_pcie(dev) returns true if the device has a valid PCIE capability.
+
+Why do we care? The RTL8168 driver checks if the NIC is PCIE capable, and if not
+it prints the error message below and falls back to another (proprietary?) method
+of device configuration (in
+drivers/net/ethernet/realtek/r8169_main.c::rtl_csi_access_enable):
+
+[    1.490530] r8169 0000:00:00.0 enp0s0: No native access to PCI extended config
+space, falling back to CSI
+[    1.500201] r8169 0000:00:00.0 enp0s0: Link is Down
+
+I'll keep the PCIE cap and drop the power management cap.
+
+Thanks,
+
+Alex
 
