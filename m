@@ -2,285 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BDB7C39BB8C
-	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 17:18:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CFA339BBCB
+	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 17:26:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230320AbhFDPTs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Jun 2021 11:19:48 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:46106 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229692AbhFDPTq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Jun 2021 11:19:46 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 154FFhg1118927;
-        Fri, 4 Jun 2021 15:17:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2020-01-29;
- bh=lkdmvMJ0L79F4fBteLVyjOkCyOTa9DFq93wn9vo2NQw=;
- b=atmPTtnGVqca3OzUIAYDIwHdaJlVvXS0ujseLq6jYYZfgHnOmToxenPNp1wJDDRRd0i9
- AYZrlxX7fb4Wk5qca+pWFwckbc1o+QT4vZufBQohvsfwDh/RviY7YyO1QbBFpL/eKheC
- gxMGQcNnAH/MmGkCQycUdR5BVYH9j8Jrf7CdOeUIg1IOd8qkUZXevufr9ZSl7xL/4Z43
- 3jWiCKWPrTpeLb6KcVYU6FOabl3W4J6qNoINFYhYCSap4MNsWomY7LzIHlKPfOEkV3dl
- E2QdrxIqZxf9wK46W0jFps8qW0XesytDtGPt7mNWkaCzEhewjhOELF7CN+hiJr7BXx7q Nw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 38udjmx82b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 04 Jun 2021 15:17:29 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 154FFelU022346;
-        Fri, 4 Jun 2021 15:17:29 GMT
-Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2108.outbound.protection.outlook.com [104.47.58.108])
-        by aserp3020.oracle.com with ESMTP id 38xyn3uxn2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 04 Jun 2021 15:17:28 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AU6QKuORwFicpWZzYar2VtN/c19QCBPa3sq6EgJteHWvlkgozJlc420NEIzZAgSVmhwFf9PkpWtrt6PtGSwe5x8yG2jyoU75gyZp48YT/e3w0t0lx48rb2NY5CqAsNUZXznjSXX+Xk5OysaT8L6/3IySssGOVsge/7Wil+jJOKlIpkIa5qWZYfACOuOFe12zjtHIXD5B6h2/Alp8XJKiTF3ibyoQ92gMAHKYFGn/WZehJIh1EXhUPy6JKlioqYMOkfxUqZE6sH/xACRIVDbbh/haCg6lt/8aJ+gHmiLWfQaup9TneyjETQYHoEvz6cbI1x2dCiQOafJAe8XkEx6jig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lkdmvMJ0L79F4fBteLVyjOkCyOTa9DFq93wn9vo2NQw=;
- b=k9ymQy5yPKDLwF8QQlpxSlcHpwPeY1mX3JQ1zXll0UVBbt3XMrQhplw041NCh0YRXN+GQrF7NqbdvRmeLInEwQ6tYA7X8xJ1QJDt4d0kZSBN+9nY2FqM8UjxdkNkyXH61KSViurNQYaUs+A5DdLNGmw065Va6Xrp1DprYsZgj4keY2evS38ipoedRBbTbP4bamI8Dk5E6PVfQUj9uQC+l/To8Vk5xgMpqy3huNV/fGoaIAVQ4QrAiBnvJkzUXuCkYx6/5CB8lpbaa0cRgFtWgJKjxgC3/D46U63BZUSWxrCSwSGy/+M2NahXUbgbiwM8WTq/t8e3W0JjQRSZa4GXmQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lkdmvMJ0L79F4fBteLVyjOkCyOTa9DFq93wn9vo2NQw=;
- b=cf/5aAY9XWDc52kUyoJpJztwIIrT8IvXVsSMoRDUU6XCnUdGfOqO9kA/K0+29uxg5WBkdMGTpEKGw868aCdjKlUmzC7ZquB4raN7/R5MBgaxvAudmUgwDOcqNZlwgX7yw4/w6Un2VNrwzC4w5jQL1lcmreLT/CaSNF9ifmaYl0Q=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=oracle.com;
-Received: from BYAPR10MB2999.namprd10.prod.outlook.com (2603:10b6:a03:85::27)
- by BY5PR10MB3971.namprd10.prod.outlook.com (2603:10b6:a03:1f6::30) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4173.22; Fri, 4 Jun
- 2021 15:17:26 +0000
-Received: from BYAPR10MB2999.namprd10.prod.outlook.com
- ([fe80::8111:d8f1:c262:808d]) by BYAPR10MB2999.namprd10.prod.outlook.com
- ([fe80::8111:d8f1:c262:808d%6]) with mapi id 15.20.4173.027; Fri, 4 Jun 2021
- 15:17:26 +0000
-Subject: Re: [RFC PATCH 0/7] Untrusted device support for virtio
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, xieyongji@bytedance.com,
-        stefanha@redhat.com, file@sect.tu-berlin.de, ashish.kalra@amd.com,
-        martin.radev@aisec.fraunhofer.de, kvm@vger.kernel.org
-References: <20210421032117.5177-1-jasowang@redhat.com>
- <YInOQt1l/59zzPJK@Konrads-MacBook-Pro.local>
- <9b089e3b-7d7a-b9d6-a4a1-81a6eff2e425@redhat.com>
-From:   Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Message-ID: <e8a35789-5001-3e17-1546-80fa9daa5ab1@oracle.com>
-Date:   Fri, 4 Jun 2021 11:17:13 -0400
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.2
-In-Reply-To: <9b089e3b-7d7a-b9d6-a4a1-81a6eff2e425@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [160.34.113.159]
-X-ClientProxiedBy: BY5PR13CA0008.namprd13.prod.outlook.com
- (2603:10b6:a03:180::21) To BYAPR10MB2999.namprd10.prod.outlook.com
- (2603:10b6:a03:85::27)
+        id S230436AbhFDP2L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Jun 2021 11:28:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59296 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229675AbhFDP2L (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 4 Jun 2021 11:28:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622820384;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Cnlp4NT59C1lbKlOOtPNARWk0nt3/Bc4USIsMgJ3F/s=;
+        b=YA+RFoWG02sSDtuZJ2b6wq1JJsTfXazRH8KBUwT8JCVr89r4I94/8BjymtIg0Pf/OJJzff
+        7JPg6TduQvXRysSDp5z2jAFr2P+DhmwHpCxWEb7oX55ELd8d9WHVHSw/LxRSdoYe58QSYn
+        CjrMNdOOVfty5MJwCMtWmcqUS4C5Lho=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-170-H-1pn-6bNUaNJQeNGkHHRA-1; Fri, 04 Jun 2021 11:26:22 -0400
+X-MC-Unique: H-1pn-6bNUaNJQeNGkHHRA-1
+Received: by mail-il1-f198.google.com with SMTP id 15-20020a920d0f0000b02901c54acae19eso6681329iln.23
+        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 08:26:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=Cnlp4NT59C1lbKlOOtPNARWk0nt3/Bc4USIsMgJ3F/s=;
+        b=jHNaAYWbz/hMo01OUwSil7gQee1/DJdVmHBKr6HjekMia1B/t8pJdjjRsrTli7x1j3
+         4iwkdTQiIXkE0cd9pq1UFWI2wVjz49TF6Qlcd7JjMHWDLsc2+eSSuQdZu2p/zVGm0YGf
+         rxBf1+jenIbvv4tFOgMBKZDX+5DhWO03kgzFjgDKb0ErFuRxU8w7rd5H+AWbQNYvsl/L
+         yVvCnCzk15ym/SU35XID+ckG0V/t0sEtf4/X9VfoTXPaQICWuwaWbIiDSN67Xg6/u6Uh
+         8svlLJhNnIFHb7CzjgvqCwwONgrbKJCXFRWwsfGYf3fql2qD0+VZ48pUsbcuZr9GFGtR
+         V1Rg==
+X-Gm-Message-State: AOAM5336xdVCGtlbmz899sTNNfTovF6O2xhtwj9g2cPckEDaHfaLJPbt
+        3ePQA+Dy8PRRzy0fBRoWsyZRlvR6532YdZS9jRbRzACEC+QzIMQ/pUAlBiFVdWfCJyrxhizSykK
+        BqB9HMBjgFCHR
+X-Received: by 2002:a92:1901:: with SMTP id 1mr4431841ilz.237.1622820382123;
+        Fri, 04 Jun 2021 08:26:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJytV7IHrrQ9TrO5WGLSgtz4HPoOXVeF1qXN+c3eDfItb7Gtmxe5A63obJpbAcW06e9tden5Rg==
+X-Received: by 2002:a92:1901:: with SMTP id 1mr4431821ilz.237.1622820381869;
+        Fri, 04 Jun 2021 08:26:21 -0700 (PDT)
+Received: from redhat.com (c-73-14-100-188.hsd1.co.comcast.net. [73.14.100.188])
+        by smtp.gmail.com with ESMTPSA id l13sm59605ilc.53.2021.06.04.08.26.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Jun 2021 08:26:21 -0700 (PDT)
+Date:   Fri, 4 Jun 2021 09:26:20 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Robin Murphy <robin.murphy@arm.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jason Wang <jasowang@redhat.com>,
+        "Bonzini, Paolo" <pbonzini@redhat.com>
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+Message-ID: <20210604092620.16aaf5db.alex.williamson@redhat.com>
+In-Reply-To: <20210604122830.GK1002214@nvidia.com>
+References: <20210602130053.615db578.alex.williamson@redhat.com>
+        <20210602195404.GI1002214@nvidia.com>
+        <20210602143734.72fb4fa4.alex.williamson@redhat.com>
+        <20210602224536.GJ1002214@nvidia.com>
+        <20210602205054.3505c9c3.alex.williamson@redhat.com>
+        <20210603123401.GT1002214@nvidia.com>
+        <20210603140146.5ce4f08a.alex.williamson@redhat.com>
+        <20210603201018.GF1002214@nvidia.com>
+        <20210603154407.6fe33880.alex.williamson@redhat.com>
+        <MWHPR11MB1886469C0136C6523AB158B68C3B9@MWHPR11MB1886.namprd11.prod.outlook.com>
+        <20210604122830.GK1002214@nvidia.com>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Konrads-MacBook-Pro.local (160.34.113.159) by BY5PR13CA0008.namprd13.prod.outlook.com (2603:10b6:a03:180::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.9 via Frontend Transport; Fri, 4 Jun 2021 15:17:20 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e7f79873-eb85-4c83-3471-08d9276bdc55
-X-MS-TrafficTypeDiagnostic: BY5PR10MB3971:
-X-Microsoft-Antispam-PRVS: <BY5PR10MB39710CECDF621A624DD82309893B9@BY5PR10MB3971.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: De4mhXAwhA6hIeBmz+F6y4Jad/A95QDjh3NruzXUpHqI2BnKN/SvJLjexWjUEJ9/8Fsna43rghRsaEcqT+BqAcS+Im3n6pLQOwGCqmxYsNKruJXMNIS0EbDn5mhlXnkr/Ipw91XrQHHNTc7X6KPY64u2I0IdWXP3grWPLDMwvhmaJt45nmdUzOld/5nTtXpnmK7qTb56EBfUGv+ZH8fbyikqbmJFIjX/oE476ZvbRkN6gWTaEoODeJ3Vll7W+Gky9AJ5yr+v8mk/07JZ0X/HYwXRWOd3IIiyzm3lk8PmusBJJhEhCILcnkqrb5R+pSqOcJrwhHgVrJx+I+/b6wZcrS2kytbr1oSy7FgT94BELW1LeSr7oI5seFuzhXJrM8wVnwLiAHuGuZu2RI/znK+Uc+ZJ+A9MXRcaQwCAyvNTMml+3GlCceOKuVQu0tvosfXC6uxzji06+KS+oHnyxQ0xzSJe5JGtPKFkQs/ZEA6swlxkOZfvuIcR5IwYMe7WVkSnOcIq/W+S4OeYfVCI9TxAnrUDkoTYVUvuLr23Lz/tyJIj6lxO0nyGEvFBJDm117HgtC36L98BgeRQT0wigYtOoibVC1nbBpiNep0JNQMHhRgCq/nW/JR6IFq+JZBxn8WmtQFlDDwtddws+BkB9ZmI0euwZYl1rWHZLqv1QHOPgch5ycew4b+IN5GCsrhDPaa6zEtYjCtHWDi+f1Erdb+gw9aC3KmR9eQ2cGqMgMuJR7SFM/JZlJtXBf8YhIFxLqcZkFPGLnReJiPK/TwLos7qksVZrUGMIy7dtO40U/JwaBo=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2999.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(39860400002)(376002)(396003)(346002)(136003)(6666004)(6916009)(5660300002)(6486002)(31686004)(6512007)(38100700002)(83380400001)(36756003)(53546011)(86362001)(31696002)(6506007)(956004)(966005)(2616005)(7416002)(4326008)(316002)(2906002)(26005)(66946007)(66476007)(8936002)(16526019)(478600001)(8676002)(66556008)(186003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?Nk0yVTJycjlRSFhSN0N4TTNHcGNNcXF6Z0xXV040NFR3S2x6UGJYWktGdGdZ?=
- =?utf-8?B?VDhxd2lLajFLanozUzlrR3JTZjBCWUNGSS95NEhKU21wNjRSU0IwaW5oK2Vt?=
- =?utf-8?B?b2RIVk4rSlh5MTU1Q2dEQW92TmdXY2FjQkhqRHdISTdFYW5zZWdlSjdnL3Jz?=
- =?utf-8?B?NDg1ZUJWYUFUaEhOYm9ZMnVqSHhSRVY0VUpjaHpjQVlQV2JhcFFMYlppcmlo?=
- =?utf-8?B?Yy9QdHVSZTEvcHM1ZmNBODVrVkppRngyNE1KVk16YU5LQnpSNU9NbCtUNjIz?=
- =?utf-8?B?c1dnVmVaQlJPNTZyK2Q2V3RiR080RGJJWmUrNHZHK3piYlZZYi9WZ2R2SEpK?=
- =?utf-8?B?Qno3UU5jVkJLSDUzM2x0UE9LazFEUk11dittSUMxZlRNMTdxbGY1UlM2L3lD?=
- =?utf-8?B?UVBOOTd1WGVRdUdFcWpLM1hWaFN5NkgxSjk3a29kTHdXblVYZEUxTjl5eUJj?=
- =?utf-8?B?dDZvSE9ldUNjOERVWDk2MHhXcnArcE9yaWRCTUtmcDQ4NUxyaEJJRFg3MFdp?=
- =?utf-8?B?SHBzbENLWllhSzdnV1dqZlU0Y1JqS1NlWjFQZUdKQWlHeDYxbmVuS2Y1ZjV5?=
- =?utf-8?B?dm5rYXRIbzh2dC9tWnNqWHllMGhaNzhKK0d4Q1hoMEZ3NyswVmxtNXhtUHlQ?=
- =?utf-8?B?QXN4ZURUQnV5Vzc0QTVzc3NGdXBhWFprTHNuK2JZZ0tUQk1KZ3lIU1EyUDJB?=
- =?utf-8?B?bXc1ekN5UnkvT2hFY04wdXNTUkVsMmRnLzBmeDNUUFMzMnJrWWx3VFhxQkc4?=
- =?utf-8?B?QUQvUmhlNFUyaW9wcFV4VC9zaXlQUUloT3RCUm9hOFMxNFBFRE51MmZOQW1a?=
- =?utf-8?B?OUxqd1dieFhtTHBFNmlFZ2dHWnFvZXMwT1RkcDJOSzg5VU80amhRZE5jZm5O?=
- =?utf-8?B?d2FUbFc5L3A0T2JobklVMDNTVVppTmNqMEtWTEovWjA0WVNYTENueVo5dkcv?=
- =?utf-8?B?VWgvUG1WTnFidW1qUTdGZXRrYkNNdUZNbCthNEtGenV3TUpta0RPSnQreXlp?=
- =?utf-8?B?TjQ1NTFwSG1QQ3FPU25WNTVoTlpKbVp4SlpSZjJWQThnWWFROVdPZDFBNy9C?=
- =?utf-8?B?eDlidnJVWml1SkZXekZDQ1Bjd0VIb1FpQ2FqRDVEbnc2a0ttVGNQaHFEQTZ0?=
- =?utf-8?B?RFlnUXlyRzdWeTkrS0V2cndGWWhLSVFrMXNvQndRT05SWkNiajBmOVZ5MVJ2?=
- =?utf-8?B?MFBBVnNiSmVmcmVRU3VZU0QyclNvZ3VUWTdHUW9wUllPeVpOZFhyOGJnUFlQ?=
- =?utf-8?B?Z0FUSU9zVlo1bURaKzQyNkdVQ1RybE5IYU5Xek5vSFRUODdJN3k4bHNIYWpz?=
- =?utf-8?B?WkV0VFo4V0oyUVFEUEkyamQxNDloR0Z4ZjR1V3czYjA1aXdQZmdtOWM5RXp5?=
- =?utf-8?B?V2RZQ2Z0VXk0SmwySTRZd3VwYUp2S3crbGdMMDRhZmxmTGpNZUVoSUxscjVJ?=
- =?utf-8?B?clprSnpaY1VaMTIrS1VtQ0J3VUZ0bGVLMTlGWUhhN3ZhVzU0bjhyY0M5NG5i?=
- =?utf-8?B?ZHdRQWltNHhVRVIzRlRNSVVqTXBBVERNclBzVjYzSDFnclNnSTdSb0JmZWNl?=
- =?utf-8?B?d2ZnUStKWGMxMmY3bkdRVkgyT3QrSWsyMUtzK00xNm5hZjRNci9OWjYxQzN3?=
- =?utf-8?B?UHpseUxrMUFBeXFPVkZNQUFGNXFCRXF1WnhBeHFLQWZLbXZJQzU1eHpQUDlW?=
- =?utf-8?B?a29FaERiT0RyOGhJSk5vNzRBT3loMWh3cXBvamUzV1B2OUpxR1d5K1FQL29x?=
- =?utf-8?Q?jlOvWABn+Lfe2VdRN7s//PxydUsQnzG+/wtCMUy?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e7f79873-eb85-4c83-3471-08d9276bdc55
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2999.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2021 15:17:26.2030
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xnVh+4zYFtARLnDHhx+QAGcO7utjOBStIVlyQVSPOes/Gl3vQU7m8moNmK/7PJNiWLhjvS+ejEDL0uHAjjVVew==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR10MB3971
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10005 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
- bulkscore=0 suspectscore=0 mlxscore=0 malwarescore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106040113
-X-Proofpoint-GUID: xWAyF49LS7lSjX8NkiqydekofsMfSr0B
-X-Proofpoint-ORIG-GUID: xWAyF49LS7lSjX8NkiqydekofsMfSr0B
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10005 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 impostorscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 adultscore=0 spamscore=0
- suspectscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=999 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2106040113
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/29/21 12:16 AM, Jason Wang wrote:
-> 
-> 在 2021/4/29 上午5:06, Konrad Rzeszutek Wilk 写道:
->> On Wed, Apr 21, 2021 at 11:21:10AM +0800, Jason Wang wrote:
->>> Hi All:
->>>
->>> Sometimes, the driver doesn't trust the device. This is usually
->>> happens for the encrtpyed VM or VDUSE[1]. In both cases, technology
->>> like swiotlb is used to prevent the poking/mangling of memory from the
->>> device. But this is not sufficient since current virtio driver may
->>> trust what is stored in the descriptor table (coherent mapping) for
->>> performing the DMA operations like unmap and bounce so the device may
->>> choose to utilize the behaviour of swiotlb to perform attacks[2].
->> We fixed it in the SWIOTLB. That is it saves the expected length
->> of the DMA operation. See
->>
->> commit daf9514fd5eb098d7d6f3a1247cb8cc48fc94155
->> Author: Martin Radev <martin.b.radev@gmail.com>
->> Date:   Tue Jan 12 16:07:29 2021 +0100
->>
->>      swiotlb: Validate bounce size in the sync/unmap path
->>      The size of the buffer being bounced is not checked if it happens
->>      to be larger than the size of the mapped buffer. Because the size
->>      can be controlled by a device, as it's the case with virtio devices,
->>      this can lead to memory corruption.
-> 
-> 
-> Good to know this, but this series tries to protect at different level. 
-> And I believe such protection needs to be done at both levels.
-> 
+[Cc +Paolo]
 
-My apologies for taking so long to respond, somehow this disappeared in 
-one of the folders.
+On Fri, 4 Jun 2021 09:28:30 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Fri, Jun 04, 2021 at 08:38:26AM +0000, Tian, Kevin wrote:
+> > > I think more to drive the replacement design; if we can't figure out
+> > > how to do something other than backwards compatibility trickery in the
+> > > kernel, it's probably going to bite us.  Thanks,  
+> > 
+> > I'm a bit lost on the desired flow in your minds. Here is one flow based
+> > on my understanding of this discussion. Please comment whether it
+> > matches your thinking:
+> > 
+> > 0) ioasid_fd is created and registered to KVM via KVM_ADD_IOASID_FD;
+> > 
+> > 1) Qemu binds dev1 to ioasid_fd;
+> > 
+> > 2) Qemu calls IOASID_GET_DEV_INFO for dev1. This will carry IOMMU_
+> >      CACHE info i.e. whether underlying IOMMU can enforce snoop;
+> > 
+> > 3) Qemu plans to create a gpa_ioasid, and attach dev1 to it. Here Qemu
+> >     needs to figure out whether dev1 wants to do no-snoop. This might
+> >     be based a fixed vendor/class list or specified by user;
+> > 
+> > 4) gpa_ioasid = ioctl(ioasid_fd, IOASID_ALLOC); At this point a 'snoop'
+> >      flag is specified to decide the page table format, which is supposed
+> >      to match dev1;  
 > 
->>> For double insurance, to protect from a malicous device, when DMA API
->>> is used for the device, this series store and use the descriptor
->>> metadata in an auxiliay structure which can not be accessed via
->>> swiotlb instead of the ones in the descriptor table. Actually, we've
->> Sorry for being dense here, but how wold SWIOTLB be utilized for
->> this attack?
+> > 5) Qemu attaches dev1 to gpa_ioasid via VFIO_ATTACH_IOASID. At this 
+> >      point, specify snoop/no-snoop again. If not supported by related 
+> >      iommu or different from what gpa_ioasid has, attach fails.  
 > 
+> Why do we need to specify it again?
+
+My thought as well.
+
+> If the IOASID was created with the "block no-snoop" flag then it is
+> blocked in that IOASID, and that blocking sets the page table format.
 > 
-> So we still behaviors that is triggered by device that is not trusted. 
-> Such behavior is what the series tries to avoid. We've learnt a lot of 
-> lessons to eliminate the potential attacks via this. And it would be too 
-> late to fix if we found another issue of SWIOTLB.
+> The only question is if we can successfully attach a device to the
+> page table, or not.
 > 
-> Proving "the unexpected device triggered behavior is safe" is very hard 
-> (or even impossible) than "eliminating the unexpected device triggered 
-> behavior totally".
+> The KVM interface is a bit tricky because Alex said this is partially
+> security, wbinvd is only enabled if someone has a FD to a device that
+> can support no-snoop. 
 > 
-> E.g I wonder whether something like this can happen: Consider the DMA 
-> direction of unmap is under the control of device. The device can cheat 
-> the SWIOTLB by changing the flag to modify the device read only buffer. 
-
-<blinks> Why would you want to expose that to the device? And wouldn't 
-that be specific to Linux devices - because surely Windows DMA APIs are 
-different and this 'flag' seems very Linux-kernel specific?
-
-> If yes, it is really safe?
-
-Well no? But neither is rm -Rf / but we still allow folks to do that.
+> Personally I think this got way too complicated, the KVM interface
+> should simply be
 > 
-> The above patch only log the bounce size but it doesn't log the flag. 
-
-It logs and panics the system.
-
-> Even if it logs the flag, SWIOTLB still doesn't know how each buffer is 
-> used and when it's the appropriate(safe) time to unmap the buffer, only 
-> the driver that is using the SWIOTLB know them.
-
-Fair enough. Is the intent to do the same thing for all the other 
-drivers that could be running in an encrypted guest and would require 
-SWIOTLB.
-
-Like legacy devices that KVM can expose (floppy driver?, SVGA driver)?
-
+> ioctl(KVM_ALLOW_INCOHERENT_DMA, ioasidfd, device_label)
+> ioctl(KVM_DISALLOW_INCOHERENT_DMA, ioasidfd, device_label)
 > 
-> So I think we need to consolidate on both layers instead of solely 
-> depending on the SWIOTLB.
-
-Please make sure that this explanation is in part of the cover letter
-or in the commit/Kconfig.
-
-Also, are you aware of the patchset than Andi been working on that tries 
-to make the DMA code to have extra bells and whistles for this purpose?
-
-Thank you.
-> Thanks
+> and let qemu sort it out based on command flags, detection, whatever.
 > 
+> 'ioasidfd, device_label' is the security proof that Alex asked
+> for. This needs to be some device in the ioasidfd that declares it is
+> capabale of no-snoop. Eg vfio_pci would always declare it is capable
+> of no-snoop.
 > 
->>
->>> almost achieved that through packed virtqueue and we just need to fix
->>> a corner case of handling mapping errors. For split virtqueue we just
->>> follow what's done in the packed.
->>>
->>> Note that we don't duplicate descriptor medata for indirect
->>> descriptors since it uses stream mapping which is read only so it's
->>> safe if the metadata of non-indirect descriptors are correct.
->>>
->>> The behaivor for non DMA API is kept for minimizing the performance
->>> impact.
->>>
->>> Slightly tested with packed on/off, iommu on/of, swiotlb force/off in
->>> the guest.
->>>
->>> Please review.
->>>
->>> [1] 
->>> https://lore.kernel.org/netdev/fab615ce-5e13-a3b3-3715-a4203b4ab010@redhat.com/T/ 
->>>
->>> [2] 
->>> https://yhbt.net/lore/all/c3629a27-3590-1d9f-211b-c0b7be152b32@redhat.com/T/#mc6b6e2343cbeffca68ca7a97e0f473aaa871c95b 
->>>
->>>
->>> Jason Wang (7):
->>>    virtio-ring: maintain next in extra state for packed virtqueue
->>>    virtio_ring: rename vring_desc_extra_packed
->>>    virtio-ring: factor out desc_extra allocation
->>>    virtio_ring: secure handling of mapping errors
->>>    virtio_ring: introduce virtqueue_desc_add_split()
->>>    virtio: use err label in __vring_new_virtqueue()
->>>    virtio-ring: store DMA metadata in desc_extra for split virtqueue
->>>
->>>   drivers/virtio/virtio_ring.c | 189 ++++++++++++++++++++++++++---------
->>>   1 file changed, 141 insertions(+), 48 deletions(-)
->>>
->>> -- 
->>> 2.25.1
->>>
+> No kernel call backs, no kernel auto-sync/etc. If qemu mismatches the
+> IOASID block no-snoop flag with the KVM_x_INCOHERENT_DMA state then it
+> is just a kernel-harmless uerspace bug.
 > 
+> Then user space can decide which of the various axis's it wants to
+> optimize for.
+
+Let's make sure the KVM folks are part of this decision; a re-cap for
+them, KVM currently automatically enables wbinvd emulation when
+potentially non-coherent devices are present which is determined solely
+based on the IOMMU's (or platform's, as exposed via the IOMMU) ability
+to essentially force no-snoop transactions from a device to be cache
+coherent.  This synchronization is triggered via the kvm-vfio device,
+where QEMU creates the device and adds/removes vfio group fd
+descriptors as an additionally layer to prevent the user from enabling
+wbinvd emulation on a whim.
+
+IIRC, this latter association was considered a security/DoS issue to
+prevent a malicious guest/userspace from creating a disproportionate
+system load.
+
+Where would KVM stand on allowing more direct userspace control of
+wbinvd behavior?  Would arbitrary control be acceptable or should we
+continue to require it only in association to a device requiring it for
+correct operation.
+
+A wrinkle in "correct operation" is that while the IOMMU may be able to
+force no-snoop transactions to be coherent, in the scenario described
+in the previous reply, the user may intend to use non-coherent DMA
+regardless of the IOMMU capabilities due to their own optimization
+policy.  There's a whole spectrum here, including aspects we can't
+determine around the device driver's intentions to use non-coherent
+transactions, the user's policy in trading hypervisor overhead for
+cache coherence overhead, etc.  Thanks,
+
+Alex
 
