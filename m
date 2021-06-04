@@ -2,310 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B5FE39C25C
-	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 23:28:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 50DC839C267
+	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 23:29:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231169AbhFDV3w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Jun 2021 17:29:52 -0400
-Received: from mail-pj1-f51.google.com ([209.85.216.51]:43917 "EHLO
-        mail-pj1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231148AbhFDV3q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Jun 2021 17:29:46 -0400
-Received: by mail-pj1-f51.google.com with SMTP id l10-20020a17090a150ab0290162974722f2so6618823pja.2
-        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 14:27:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=KdxZDkEntGS0nA5o93T1CW9hGc+4zm0nz/HKMuSuGpg=;
-        b=U5Jns4RTTA8K1CnPOyIi6KCIfFcFhB2QnO0MiSYgvaltz7OU7gZQPC7oPqfb04uGph
-         z1sPLgJyHxFmPu43OePS6sFlBOidnE/VQvQTjspdVCX331ZefrA7cL5JjVopDH5ziYDY
-         4wjbjx3ROlI3qXcH9TDsUnCraq/oOvsrKzY0Bqg1345pcOpR+9t1L2iG5PuJgH+xrtfO
-         fJav0dVabf7wwmva/9Ur13lbKgVWHg/zCffNsT9COCmJwwu10IvxWeCzujJq7fC1llst
-         NXFFY6OyPM/goRC5LR0eIsj9eyX1pXTdi06fjtl8wD1UpYOSf9YVkNhNeVVqQsTg1BLu
-         QEpg==
+        id S230177AbhFDVbL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Jun 2021 17:31:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27157 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229755AbhFDVbK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 4 Jun 2021 17:31:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622842163;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xEuogiJFrluRPqjpF+9tD/0FxZaF2LJJRCJA/TNp9Oc=;
+        b=RiAVPoVyHvqkzshv+fJqQA0Lzs5XO8gGvSANxKHDqPbtqoHwmGzBiNCaJAT/3HsQvqOUnl
+        reFJkEqkaanupddH91lNf3Nr9cw2oLMJh95iZSENpFFWkTG+p3/Pe3ubH3xHA4vVS5Rs4X
+        Bt1tDlleG76Sqspj891PF+91uHjCDSQ=
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
+ [209.85.167.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-459-WmeSQ8FqOhWjCq-eyokO5A-1; Fri, 04 Jun 2021 17:29:22 -0400
+X-MC-Unique: WmeSQ8FqOhWjCq-eyokO5A-1
+Received: by mail-oi1-f197.google.com with SMTP id a29-20020a544e1d0000b02901eef9e4a58cso5261420oiy.3
+        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 14:29:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=KdxZDkEntGS0nA5o93T1CW9hGc+4zm0nz/HKMuSuGpg=;
-        b=YF/8FATUzHhPXVn5hJAu2ccJtnl1JK+9B5IHmA8iPu5dAddqBD1zNhJK61F/H68eqe
-         podo5DQCOUZeQqftyDmxgOpdgA44wC3gOLzWQGCAvrRSsY7BNcH7GjL9LJNEwf1bIy8n
-         KZyyCAC3T/i8TSuQUdY/JslQW/k12p3I38aPk4DmVQs8SpKDIG8p1kOSO9wKWEAKg3KX
-         qzM9UTVgonbWTUFSycICB0WIO8L7dDqXJ+nal8DOl61En0z/lx11PGFeWkqepwwAVA4x
-         oPRLb8Zw69MHIYEMasloadBZQj8ZFz6iWskN6RgZiDlsr83g0nB9J8TRvM48efiWUl2l
-         FytQ==
-X-Gm-Message-State: AOAM531iSWQp/DsSd/agrgcnXFStJRl4gF9yT68ZS/unxySt6tZKva5a
-        l0kk15D/jsH6rds6TGa14+ZaSA==
-X-Google-Smtp-Source: ABdhPJwwyaNlt+dV//igiWvw6mNBax9yV5Ayyt3CnAE93mtTqXOrQ3np37iux+pWfuB/2XJJq5dReg==
-X-Received: by 2002:a17:90a:b94c:: with SMTP id f12mr6658726pjw.32.1622842019070;
-        Fri, 04 Jun 2021 14:26:59 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id ga23sm3809986pjb.0.2021.06.04.14.26.58
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=xEuogiJFrluRPqjpF+9tD/0FxZaF2LJJRCJA/TNp9Oc=;
+        b=Z5Be/jxk/GYebhc/THbAWyJyJzvfkNorIODnghbQGQz3CIcmE/KUTOT09nR4/LfTLM
+         6xRUs4x9sN0h18Zj5CRqpvP/+R49jLldGUHAZ4sMGy6YAf0pKajwkhAhht/RuDBDUHw3
+         WLzdRBrT6Np0iRwz2p+U+0IqitqqqHoryPP1yQgFLmi4Dr8B38N8vJ0nRfcfRr+zxQyC
+         hDkAdYLKFOJal3i6gwBwljz8VYtqv7wL5/Sv+CYZ2IoPoAy7HJWu5ojl+ulrG4Lniuzh
+         w4IKOeEqt7HMQuVB2fwHUD6pa+rC0GD/CukP9eW3HeQOmXmrQZOVElstOy4zMWPU+SzO
+         o+RA==
+X-Gm-Message-State: AOAM533bPoryl8BS83irc/u3VZHbD0YtGLUqreBcVnludgt/IXwmvdzE
+        Su6gd18MjMqA6YQWCx0CUJi7ogn/fvAtD2NvelyoMxNKjNHb+Eu8a4JIU9BmzuznqcCRnoIcpeM
+        l4GULzFwTrPrC
+X-Received: by 2002:aca:d18:: with SMTP id 24mr11829320oin.56.1622842161093;
+        Fri, 04 Jun 2021 14:29:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwD3fykksZ3P7cEsyJ8xzxTeqnpMVAfeCDorrF3MYeu8L7chpRaGp1o7UgXlt9aMuAsw4nMkQ==
+X-Received: by 2002:aca:d18:: with SMTP id 24mr11829303oin.56.1622842160801;
+        Fri, 04 Jun 2021 14:29:20 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id w6sm726669otj.5.2021.06.04.14.29.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Jun 2021 14:26:58 -0700 (PDT)
-Date:   Fri, 4 Jun 2021 21:26:54 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, maz@kernel.org,
-        pbonzini@redhat.com, drjones@redhat.com, eric.auger@redhat.com,
-        kernel test robot <oliver.sang@intel.com>
-Subject: Re: [PATCH] KVM: selftests: Rename vm_handle_exception in evmcs test
-Message-ID: <YLqanpE8tdiNeoaN@google.com>
-References: <20210604181833.1769900-1-ricarkol@google.com>
+        Fri, 04 Jun 2021 14:29:20 -0700 (PDT)
+Date:   Fri, 4 Jun 2021 15:29:18 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Robin Murphy <robin.murphy@arm.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jason Wang <jasowang@redhat.com>
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+Message-ID: <20210604152918.57d0d369.alex.williamson@redhat.com>
+In-Reply-To: <20210604172207.GT1002214@nvidia.com>
+References: <20210603201018.GF1002214@nvidia.com>
+        <20210603154407.6fe33880.alex.williamson@redhat.com>
+        <MWHPR11MB1886469C0136C6523AB158B68C3B9@MWHPR11MB1886.namprd11.prod.outlook.com>
+        <20210604122830.GK1002214@nvidia.com>
+        <20210604092620.16aaf5db.alex.williamson@redhat.com>
+        <815fd392-0870-f410-cbac-859070df1b83@redhat.com>
+        <20210604155016.GR1002214@nvidia.com>
+        <30e5c597-b31c-56de-c75e-950c91947d8f@redhat.com>
+        <20210604160336.GA414156@nvidia.com>
+        <2c62b5c7-582a-c710-0436-4ac5e8fd8b39@redhat.com>
+        <20210604172207.GT1002214@nvidia.com>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210604181833.1769900-1-ricarkol@google.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 04, 2021, Ricardo Koller wrote:
-> Kernel test robot reports this:
+On Fri, 4 Jun 2021 14:22:07 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Fri, Jun 04, 2021 at 06:10:51PM +0200, Paolo Bonzini wrote:
+> > On 04/06/21 18:03, Jason Gunthorpe wrote:  
+> > > On Fri, Jun 04, 2021 at 05:57:19PM +0200, Paolo Bonzini wrote:  
+> > > > I don't want a security proof myself; I want to trust VFIO to make the right
+> > > > judgment and I'm happy to defer to it (via the KVM-VFIO device).
+> > > > 
+> > > > Given how KVM is just a device driver inside Linux, VMs should be a slightly
+> > > > more roundabout way to do stuff that is accessible to bare metal; not a way
+> > > > to gain extra privilege.  
+> > > 
+> > > Okay, fine, lets turn the question on its head then.
+> > > 
+> > > VFIO should provide a IOCTL VFIO_EXECUTE_WBINVD so that userspace VFIO
+> > > application can make use of no-snoop optimizations. The ability of KVM
+> > > to execute wbinvd should be tied to the ability of that IOCTL to run
+> > > in a normal process context.
+> > > 
+> > > So, under what conditions do we want to allow VFIO to giave a process
+> > > elevated access to the CPU:  
+> > 
+> > Ok, I would definitely not want to tie it *only* to CAP_SYS_RAWIO (i.e.
+> > #2+#3 would be worse than what we have today), but IIUC the proposal (was it
+> > yours or Kevin's?) was to keep #2 and add #1 with an enable/disable ioctl,
+> > which then would be on VFIO and not on KVM.    
 > 
-> > /usr/bin/ld: tools/testing/selftests/kvm/x86_64/evmcs_test.c:157: undefined reference to `vm_handle_exception'
-> > /usr/bin/ld: tools/testing/selftests/kvm/x86_64/evmcs_test.c:158: undefined reference to `vm_handle_exception'
-> > collect2: error: ld returned 1 exit status
+> At the end of the day we need an ioctl with two arguments:
+>  - The 'security proof' FD (ie /dev/vfio/XX, or /dev/ioasid, or whatever)
+>  - The KVM FD to control wbinvd support on
 > 
-> Fix it by renaming vm_handle_exception to vm_install_vector_handler in
-> evmcs_test.c.
+> Philosophically it doesn't matter too much which subsystem that ioctl
+> lives, but we have these obnoxious cross module dependencies to
+> consider.. 
 > 
-> Fixes: a2bad6a990a4 ("KVM: selftests: Rename vm_handle_exception")
+> Framing the question, as you have, to be about the process, I think
+> explains why KVM doesn't really care what is decided, so long as the
+> process and the VM have equivalent rights.
+> 
+> Alex, how about a more fleshed out suggestion:
+> 
+>  1) When the device is attached to the IOASID via VFIO_ATTACH_IOASID
+>     it communicates its no-snoop configuration:
 
-Belated code review... Can we rename the helper to vm_install_exception_handler()?
+Communicates to whom?
 
-In x86, "vector" is the number of the exception and "vectoring" is the process
-of determining the resulting vector that gets delivered to software (e.g. when
-dealing with contributory faults like #GP->#PF->#DF), but the thing that's being
-handled is an exception.
+>      - 0 enable, allow WBINVD
+>      - 1 automatic disable, block WBINVD if the platform
+>        IOMMU can police it (what we do today)
+>      - 2 force disable, do not allow BINVD ever
 
-arm appears to have similar terminology.  And looking at the arm code, it's very
-confusing to have a helper vm_install_vector_handler() install into
-exception_handlers, _not_ into vector_handlers.  Calling the vector_handlers
-"default" handlers is also confusing, as "default" usually implies the thing can
-be overwritten.  But in this case, the "default" handler is just another layer
-in the routing.
+The only thing we know about the device is whether or not Enable
+No-snoop is hard wired to zero, ie. it either can't generate no-snoop
+TLPs ("coherent-only") or it might ("assumed non-coherent").  If
+we're putting the policy decision in the hands of userspace they should
+have access to wbinvd if they own a device that is assumed
+non-coherent AND it's attached to an IOMMU (page table) that is not
+blocking no-snoop (a "non-coherent IOASID").
 
-The multiple layers of routing is also confusing and a bit hard to wade through
-for the uninitiated.  The whole thing can be made more straightfoward by doing
-away with the intermediate routing, whacking ~50 lines of code in the process.
-E.g. (definitely not functional code):
+I think that means that the IOASID needs to be created (IOASID_ALLOC)
+with a flag that specifies whether this address space is coherent
+(IOASID_GET_INFO probably needs a flag/cap to expose if the system
+supports this).  All mappings in this IOASID would use IOMMU_CACHE and
+and devices attached to it would be required to be backed by an IOMMU
+capable of IOMMU_CAP_CACHE_COHERENCY (attach fails otherwise).  If only
+these IOASIDs exist, access to wbinvd would not be provided.  (How does
+a user provided page table work? - reserved bit set, user error?)
 
-diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-index 51c42ac24dca..c784e4b770cf 100644
---- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-+++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-@@ -212,15 +212,15 @@ int main(int argc, char *argv[])
-                exit(KSFT_SKIP);
-        }
+Conversely, a user could create a non-coherent IOASID and attach any
+device to it, regardless of IOMMU backing capabilities.  Only if an
+assumed non-coherent device is attached would the wbinvd be allowed.
+
+I think that means that an EXECUTE_WBINVD ioctl lives on the IOASIDFD
+and the IOASID world needs to understand the device's ability to
+generate non-coherent DMA.  This wbinvd ioctl would be a no-op (or
+some known errno) unless a non-coherent IOASID exists with a potentially
+non-coherent device attached.
  
--       vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
-+       vm_install_exception_handler_ec(vm, VECTOR_SYNC_CURRENT,
-                                ESR_EC_BRK_INS, guest_sw_bp_handler);
--       vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
-+       vm_install_exception_handler_ec(vm, VECTOR_SYNC_CURRENT,
-                                ESR_EC_HW_BP_CURRENT, guest_hw_bp_handler);
--       vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
-+       vm_install_exception_handler_ec(vm, VECTOR_SYNC_CURRENT,
-                                ESR_EC_WP_CURRENT, guest_wp_handler);
--       vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
-+       vm_install_exception_handler_ec(vm, VECTOR_SYNC_CURRENT,
-                                ESR_EC_SSTEP_CURRENT, guest_ss_handler);
--       vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
-+       vm_install_exception_handler_ec(vm, VECTOR_SYNC_CURRENT,
-                                ESR_EC_SVC64, guest_svc_handler);
+>     vfio_pci may want to take this from an admin configuration knob
+>     someplace. It allows the admin to customize if they want.
+> 
+>     If we can figure out a way to autodetect 2 from vfio_pci, all the
+>     better
+> 
+>  2) There is some IOMMU_EXECUTE_WBINVD IOCTL that allows userspace
+>     to access wbinvd so it can make use of the no snoop optimization.
+> 
+>     wbinvd is allowed when:
+>       - A device is joined with mode #0
+>       - A device is joined with mode #1 and the IOMMU cannot block
+>         no-snoop (today)
+> 
+>  3) The IOASID's don't care about this at all. If IOMMU_EXECUTE_WBINVD
+>     is blocked and userspace doesn't request to block no-snoop in the
+>     IOASID then it is a userspace error.
+
+In my model above, the IOASID is central to this.
  
-        for (stage = 0; stage < 7; stage++) {
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index 1a3abe1037b0..211cb684577a 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -110,10 +110,10 @@ void vm_init_descriptor_tables(struct kvm_vm *vm);
- void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid);
+>  4) The KVM interface is the very simple enable/disable WBINVD.
+>     Possessing a FD that can do IOMMU_EXECUTE_WBINVD is required
+>     to enable WBINVD at KVM.
+
+Right, and in the new world order, vfio is only a device driver, the
+IOASID manages the device's DMA.  wbinvd is only necessary relative to
+non-coherent DMA, which seems like QEMU needs to bump KVM with an
+ioasidfd.
  
- typedef void(*handler_fn)(struct ex_regs *);
--void vm_install_exception_handler(struct kvm_vm *vm,
--               int vector, int ec, handler_fn handler);
--void vm_install_vector_handler(struct kvm_vm *vm,
--               int vector, handler_fn handler);
-+void vm_install_exception_handler_ec(struct kvm_vm *vm, int vector, int ec,
-+                                    handler_fn handler);
-+void vm_install_exception_handler(struct kvm_vm *vm, int vector,
-+                                 handler_fn handler);
- 
- #define write_sysreg(reg, val)                                           \
- ({                                                                       \
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/handlers.S b/tools/testing/selftests/kvm/lib/aarch64/handlers.S
-index 49bf8827c6ab..fee0c3155ec7 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/handlers.S
-+++ b/tools/testing/selftests/kvm/lib/aarch64/handlers.S
-@@ -93,7 +93,8 @@ handler_\label:
- .balign 0x80
- /* This will abort so no need to save and restore registers. */
-        mov     x0, #vector
--       b       kvm_exit_unexpected_vector
-+       <sean doesn't know what goes here>
-+       b       kvm_exit_unexpected_exception
- .popsection
- 
- .set   vector, vector + 1
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index 03ce507d49d2..ff63e66e2c5d 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -337,16 +337,9 @@ void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
-        va_end(ap);
- }
- 
--void kvm_exit_unexpected_vector(int vector)
-+void kvm_exit_unexpected_exception(int vector, uint64_t ec, bool valid_ec)
- {
--       ucall(UCALL_UNHANDLED, 3, vector, 0, false /* !valid_ec */);
--       while (1)
--               ;
--}
--
--static void kvm_exit_unexpected_exception(int vector, uint64_t ec)
--{
--       ucall(UCALL_UNHANDLED, 3, vector, ec, true /* valid_ec */);
-+       ucall(UCALL_UNHANDLED, 3, vector, ec, valid_ec);
-        while (1)
-                ;
- }
-@@ -369,18 +362,7 @@ void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid)
-        }
- }
- 
--/*
-- * This exception handling code was heavily inspired on kvm-unit-tests. There
-- * is a set of default vector handlers stored in vector_handlers. These default
-- * vector handlers call user-installed handlers stored in exception_handlers.
-- * Synchronous handlers are indexed by (vector, ec), and irq handlers by
-- * (vector, ec=0).
-- */
--
--typedef void(*vector_fn)(struct ex_regs *, int vector);
--
- struct handlers {
--       vector_fn vector_handlers[VECTOR_NUM];
-        handler_fn exception_handlers[VECTOR_NUM][ESR_EC_NUM];
- };
- 
-@@ -391,80 +373,56 @@ void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid)
-        set_reg(vm, vcpuid, ARM64_SYS_REG(VBAR_EL1), (uint64_t)&vectors);
- }
- 
--static void default_sync_handler(struct ex_regs *regs, int vector)
--{
--       struct handlers *handlers = (struct handlers *)exception_handlers;
--       uint64_t esr = read_sysreg(esr_el1);
--       uint64_t ec = (esr >> ESR_EC_SHIFT) & ESR_EC_MASK;
--
--       GUEST_ASSERT(VECTOR_IS_SYNC(vector));
--
--       if (handlers && handlers->exception_handlers[vector][ec])
--               handlers->exception_handlers[vector][ec](regs);
--       else
--               kvm_exit_unexpected_exception(vector, ec);
--}
--
--static void default_handler(struct ex_regs *regs, int vector)
--{
--       struct handlers *handlers = (struct handlers *)exception_handlers;
--
--       GUEST_ASSERT(!VECTOR_IS_SYNC(vector));
--
--       if (handlers && handlers->exception_handlers[vector][0])
--               handlers->exception_handlers[vector][0](regs);
--       else
--               kvm_exit_unexpected_vector(vector);
--}
--
- void route_exception(struct ex_regs *regs, int vector)
- {
--       struct handlers *handlers = (struct handlers *)exception_handlers;
-+       struct handler_fn *handlers = exception_handlers;
-+       bool valid_ec;
-+       int ec;
- 
--       if (handlers && handlers->vector_handlers[vector])
--               handlers->vector_handlers[vector](regs, vector);
--       else
--               kvm_exit_unexpected_vector(vector);
-+       switch (vector) {
-+       case VECTOR_SYNC_CURRENT:
-+       case VECTOR_SYNC_LOWER_64:
-+               ec = (read_sysreg(esr_el1) >> ESR_EC_SHIFT) & ESR_EC_MASK;
-+               valid_ec = true;
-+               break;
-+       case VECTOR_IRQ_CURRENT:
-+       case VECTOR_IRQ_LOWER_64:
-+       case VECTOR_FIQ_CURRENT:
-+       case VECTOR_FIQ_LOWER_64:
-+       case VECTOR_ERROR_CURRENT:
-+       case VECTOR_ERROR_LOWER_64:
-+               ec = 0;
-+               valid_ec = false;
-+               break;
-+       default:
-+               goto unexpected_exception;
-+       }
-+
-+       if (handlers && handlers[vector][ec])
-+               return handlers[vector][ec](regs);
-+
-+unexpected_exception:
-+       kvm_exit_unexpected_exception(vector, ec, valid_ec);
- }
- 
- void vm_init_descriptor_tables(struct kvm_vm *vm)
- {
--       struct handlers *handlers;
--
--       vm->handlers = vm_vaddr_alloc(vm, sizeof(struct handlers),
--                       vm->page_size, 0, 0);
--
--       handlers = (struct handlers *)addr_gva2hva(vm, vm->handlers);
--       handlers->vector_handlers[VECTOR_SYNC_CURRENT] = default_sync_handler;
--       handlers->vector_handlers[VECTOR_IRQ_CURRENT] = default_handler;
--       handlers->vector_handlers[VECTOR_FIQ_CURRENT] = default_handler;
--       handlers->vector_handlers[VECTOR_ERROR_CURRENT] = default_handler;
--
--       handlers->vector_handlers[VECTOR_SYNC_LOWER_64] = default_sync_handler;
--       handlers->vector_handlers[VECTOR_IRQ_LOWER_64] = default_handler;
--       handlers->vector_handlers[VECTOR_FIQ_LOWER_64] = default_handler;
--       handlers->vector_handlers[VECTOR_ERROR_LOWER_64] = default_handler;
--
--       *(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
-+       *(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = __exception_handlers;
- }
- 
--void vm_install_exception_handler(struct kvm_vm *vm, int vector, int ec,
--                        void (*handler)(struct ex_regs *))
-+void vm_install_exception_handler_ec(struct kvm_vm *vm, int vector, int ec,
-+                                    void (*handler)(struct ex_regs *))
- {
--       struct handlers *handlers = (struct handlers *)addr_gva2hva(vm, vm->handlers);
-+       struct handlers *handlers = addr_gva2hva(vm, vm->handlers);
- 
--       assert(VECTOR_IS_SYNC(vector));
-+       assert(!ec == !VECTOR_IS_SYNC(vector));
-        assert(vector < VECTOR_NUM);
-        assert(ec < ESR_EC_NUM);
--       handlers->exception_handlers[vector][ec] = handler;
-+       exception_handlers[vector][ec] = handler;
- }
- 
--void vm_install_vector_handler(struct kvm_vm *vm, int vector,
--                        void (*handler)(struct ex_regs *))
-+void vm_install_exception_handler(struct kvm_vm *vm, int vector,
-+                                 void (*handler)(struct ex_regs *))
- {
--       struct handlers *handlers = (struct handlers *)addr_gva2hva(vm, vm->handlers);
--
--       assert(!VECTOR_IS_SYNC(vector));
--       assert(vector < VECTOR_NUM);
--       handlers->exception_handlers[vector][0] = handler;
-+       vm_install_exception_handler_ec(vm, vector, 0, handler);
- }
+> It is pretty simple from a /dev/ioasid perpsective, covers todays
+> compat requirement, gives some future option to allow the no-snoop
+> optimization, and gives a new option for qemu to totally block wbinvd
+> no matter what.
+
+What do you imagine is the use case for totally blocking wbinvd?  In
+the model I describe, wbinvd would always be a no-op/known-errno when
+the IOASIDs are all allocated as coherent or a non-coherent IOASID has
+only coherent-only devices attached.  Does userspace need a way to
+prevent itself from scenarios where wbvind is not a no-op?
+
+In general I'm having trouble wrapping my brain around the semantics of
+the enable/automatic/force-disable wbinvd specific proposal, sorry.
+Thanks,
+
+Alex
+
