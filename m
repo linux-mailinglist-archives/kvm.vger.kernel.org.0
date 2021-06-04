@@ -2,54 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B60CB39BEB6
-	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 19:27:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4476E39BEA9
+	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 19:26:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231208AbhFDR3Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Jun 2021 13:29:24 -0400
-Received: from mail-pj1-f74.google.com ([209.85.216.74]:51033 "EHLO
-        mail-pj1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230314AbhFDR3Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Jun 2021 13:29:24 -0400
-Received: by mail-pj1-f74.google.com with SMTP id s5-20020a17090a7645b029016d923cccbeso664304pjl.0
-        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 10:27:37 -0700 (PDT)
+        id S230411AbhFDR2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Jun 2021 13:28:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58628 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231197AbhFDR2h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Jun 2021 13:28:37 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6A2FC061767
+        for <kvm@vger.kernel.org>; Fri,  4 Jun 2021 10:26:39 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id jw3-20020a17090b4643b029016606f04954so6306287pjb.9
+        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 10:26:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=hPqg2zEw8xWDxZPbY6MJzuzKRTdbGJVq1JFdi5WkfCk=;
-        b=OhJpnQ64jlGrRhwDsKiuMuzPBsFqtfKAZefM5r1f5A6dQVyzU/xQRqqIoE+giSHCDq
-         8QVISi1tQF9uWXLZWGaYNd/vwtYR6XPX2y/jbb6n9Ij3UfR2aDFFfuVQDdF87JbvY26v
-         YkYzEoNN+GyelnjBzV8xyXrxn+K6eeVgWdmvBRwNW4SI/ADUO1YLGz4ok2gw2uKWB7s6
-         un8XWPTlNOo2EgaQkoQh54mhkPdRN+Ul0ZqaLsFdUaBnZJJDHapFp2o77YvNbyW5anix
-         FPLKbF2Qo6NwfqO3tqkZUJMQ3i7YjCrBm9OdXty4H2w94EiSiyqpv8L/g6qrRPihsX6t
-         yAJw==
+        bh=rDhx1/I3uVd50WQu8s0ajnL0RFAgeDpmkbIdgj9rtVE=;
+        b=i1V18uA4nxcgCUA6QIyUCnyBNwreGmHFm9Uh3Kr3ubb42mWqdXI1y1UtndN5VbACgh
+         reRN+FsaRJEYUQkGJbnNVsWJmMs6gJqshJZPJJxYVJcQhjN7lrw+vADNHMgsOeRf6mvP
+         MK+BKwjRHTA28pN1qSgOIGRBT/pXuLnuox38GOj6XaECX4qBwGU8w5++mnVPpNAWZEAE
+         3RJ9WGzx11vRZyhkHdGj3HrL4OvfpdL8wX9OUWcUbsDvLQRo7QEaSnKKFOUbkMhrvyfR
+         b2MIGkAO47oYJVHWLPKSNxAU5XH788zqbJCyckC+UvIjq9w6T5aAPGpLiDJN+iMyTdHB
+         g6pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=hPqg2zEw8xWDxZPbY6MJzuzKRTdbGJVq1JFdi5WkfCk=;
-        b=iphON5ayPsUJ9NsOI6RyE45no7kxxE8w8p3auuQpuwbdJeYhDxgct+vAPqNnS5hT0G
-         wGdtF/6H+wd+HAkuVHR40ARdbHX3ibxjS+5Wx1YILkXHWmc3AuTbc7zohNrUY6djyew+
-         Lv9juZbMeDO4bdkp/hmDtbxXGJkIUiDtjDOzPGMFvc6N5/Vj+/bVpzXiNlzhet+7JOGm
-         5mDMQlmTi89CdaUMIJD5dqc32pFYpZn1uQQVY3ul0gzPlPTGjxlYo4zuoBx/VgRK/RO7
-         ur5Q4iB6QIJRFustrerRuoatGL3/Mz63fn84VPyprkTAgh8x1ODGmTpyKOkaegF4CvUq
-         iuVg==
-X-Gm-Message-State: AOAM533a9Gfk2A007WyJo/2VQu6VFhBtIms9qM+tY3neWkC5RfNO03Wp
-        LtW0ICW7wl8woHoRDzSzvBlxnm752dTnCRsOhxsu3lTF9m1kRG6FOR9YRnle7TOz2E4gOyiyxzY
-        uB4NohO5RVhHQw/qaKgbTmPchf7Sfis0+OaL6VcQ3/RvXWhAqIq3KQ3CYVkigdg8=
-X-Google-Smtp-Source: ABdhPJwyzqPV8+hSeY9vyX5P/zbx6JKJG+QpCLyVuNOjGanv0TwxWmx4830vzff8SWcl92nvzbsNPsOGgvYmTA==
+        bh=rDhx1/I3uVd50WQu8s0ajnL0RFAgeDpmkbIdgj9rtVE=;
+        b=EA4TUys1+a+tLv6PiDodF7AsUeFzWlM7PSUNKE2ZPX2l1KSANhzNvO9GHBzDZDGc2j
+         4LQEELm9xSb0Zn69viQszvR6iTJ/YAx3fV/3T4JK8el3ovAMd1W91w29/MWMw4N+TJqX
+         6HYvzqbYXV0ewbTJ3Hm6xJetbD2WPlEJstOLcT4ElJ4NfCLESW2PnzYP1cAUDcfubX1N
+         S1nL710HSiSw9LlDbbY5g3yMza+lgwwdjlEAQPZcwjIi1j+PdRRvUxHtXX1Yh7GTxdOo
+         pg7Yvk7FSwK/W9fH5ZOFzM4uhQJ+nM0U97gRcm3cAPDJCs9Dd6a9CBs7L5DfUeeysU15
+         TM+A==
+X-Gm-Message-State: AOAM5301ddg9MfSYNEnIng8d9YJVUnRnsc6iN0W3GsG4oeHhLVamidgl
+        rJv0elFHBzdy6nIZuijIo+TBDm7FsBgieHrtL8hE0g+6NEsbOp/kwnQkkklsyjMavTv4aKqTjNU
+        eefAzDvCVUWDsF/Ee6QvBvy6LKCrN5e97hc0uy0OcQHDPmSbMgFnMIdJVWKcfPqU=
+X-Google-Smtp-Source: ABdhPJxpw06jOL/HSpoJoRz7FAh9kXbS1RFfsPh5kL1fb8L77jMaESKysGIrHb9an5g0uiriHFgrY3kE8IiWBA==
 X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1a0d])
- (user=jmattson job=sendgmr) by 2002:a17:902:ce84:b029:10f:a857:1e73 with SMTP
- id f4-20020a170902ce84b029010fa8571e73mr2654870plg.72.1622827597477; Fri, 04
- Jun 2021 10:26:37 -0700 (PDT)
-Date:   Fri,  4 Jun 2021 10:26:05 -0700
+ (user=jmattson job=sendgmr) by 2002:a17:90b:4504:: with SMTP id
+ iu4mr6096631pjb.110.1622827599139; Fri, 04 Jun 2021 10:26:39 -0700 (PDT)
+Date:   Fri,  4 Jun 2021 10:26:06 -0700
 In-Reply-To: <20210604172611.281819-1-jmattson@google.com>
-Message-Id: <20210604172611.281819-7-jmattson@google.com>
+Message-Id: <20210604172611.281819-8-jmattson@google.com>
 Mime-Version: 1.0
 References: <20210604172611.281819-1-jmattson@google.com>
 X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
-Subject: [PATCH v2 06/12] KVM: nVMX: Fail on MMIO completion for nested posted interrupts
+Subject: [PATCH v2 07/12] KVM: nVMX: Disable vmcs02 posted interrupts if
+ vmcs12 PID isn't mappable
 From:   Jim Mattson <jmattson@google.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com
 Cc:     Jim Mattson <jmattson@google.com>
@@ -58,48 +61,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When the kernel has no mapping for the vmcs02 virtual APIC page,
-userspace MMIO completion is necessary to process nested posted
-interrupts. This is not a configuration that KVM supports. Rather than
-silently ignoring the problem, try to exit to userspace with
-KVM_INTERNAL_ERROR.
+Don't allow posted interrupts to modify a stale posted interrupt
+descriptor (including the initial value of 0).
 
-Note that the event that triggers this error is consumed as a
-side-effect of a call to kvm_check_nested_events. On some paths
-(notably through kvm_vcpu_check_block), the error is dropped. In any
-case, this is an incremental improvement over always ignoring the
-error.
+Empirical tests on real hardware reveal that a posted interrupt
+descriptor referencing an unbacked address has PCI bus error semantics
+(reads as all 1's; writes are ignored). However, kvm can't distinguish
+unbacked addresses from device-backed (MMIO) addresses, so it should
+really ask userspace for an MMIO completion. That's overly
+complicated, so just punt with KVM_INTERNAL_ERROR.
 
+Don't return the error until the posted interrupt descriptor is
+actually accessed. We don't want to break the existing kvm-unit-tests
+that assume they can launch an L2 VM with a posted interrupt
+descriptor that references MMIO space in L1.
+
+Fixes: 6beb7bd52e48 ("kvm: nVMX: Refactor nested_get_vmcs12_pages()")
 Signed-off-by: Jim Mattson <jmattson@google.com>
-
 ---
- arch/x86/kvm/vmx/nested.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/nested.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 7646e6e561ad..706c31821362 100644
+index 706c31821362..632f0abfe154 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -3700,7 +3700,7 @@ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
- 	if (max_irr != 256) {
- 		vapic_page = vmx->nested.virtual_apic_map.hva;
- 		if (!vapic_page)
--			return 0;
-+			goto mmio_needed;
+@@ -3175,6 +3175,15 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 				offset_in_page(vmcs12->posted_intr_desc_addr));
+ 			vmcs_write64(POSTED_INTR_DESC_ADDR,
+ 				     pfn_to_hpa(map->pfn) + offset_in_page(vmcs12->posted_intr_desc_addr));
++		} else {
++			/*
++			 * Defer the KVM_INTERNAL_EXIT until KVM tries to
++			 * access the contents of the VMCS12 posted interrupt
++			 * descriptor. (Note that KVM may do this when it
++			 * should not, per the architectural specification.)
++			 */
++			vmx->nested.pi_desc = NULL;
++			pin_controls_clearbit(vmx, PIN_BASED_POSTED_INTR);
+ 		}
+ 	}
+ 	if (nested_vmx_prepare_msr_bitmap(vcpu, vmcs12))
+@@ -3689,10 +3698,14 @@ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
+ 	void *vapic_page;
+ 	u16 status;
  
- 		__kvm_apic_update_irr(vmx->nested.pi_desc->pir,
- 			vapic_page, &max_irr);
-@@ -3714,6 +3714,10 @@ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
+-	if (!vmx->nested.pi_desc || !vmx->nested.pi_pending)
++	if (!vmx->nested.pi_pending)
+ 		return 0;
  
- 	nested_mark_vmcs12_pages_dirty(vcpu);
- 	return 0;
++	if (!vmx->nested.pi_desc)
++		goto mmio_needed;
 +
-+mmio_needed:
-+	kvm_handle_memory_failure(vcpu, X86EMUL_IO_NEEDED, NULL);
-+	return -ENXIO;
- }
+ 	vmx->nested.pi_pending = false;
++
+ 	if (!pi_test_and_clear_on(vmx->nested.pi_desc))
+ 		return 0;
  
- static void nested_vmx_inject_exception_vmexit(struct kvm_vcpu *vcpu,
 -- 
 2.32.0.rc1.229.g3e70b5a671-goog
 
