@@ -2,203 +2,338 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1422B39C3BD
-	for <lists+kvm@lfdr.de>; Sat,  5 Jun 2021 01:11:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A60B39C3C2
+	for <lists+kvm@lfdr.de>; Sat,  5 Jun 2021 01:12:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229853AbhFDXNa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Jun 2021 19:13:30 -0400
-Received: from mga18.intel.com ([134.134.136.126]:53504 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231707AbhFDXN3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Jun 2021 19:13:29 -0400
-IronPort-SDR: wvV0B1Z4WHb4+A1SKXxUsXYB4UE7//Puuyz3DcZ8hwhIu0Byro24Zryb7mghrIkyY2rlWszZbO
- gTGMjPmKUuRQ==
-X-IronPort-AV: E=McAfee;i="6200,9189,10005"; a="191720050"
-X-IronPort-AV: E=Sophos;i="5.83,249,1616482800"; 
-   d="scan'208";a="191720050"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2021 16:11:41 -0700
-IronPort-SDR: ma44dKrYh2QJP/wo0Q/u386sU/oWzUrr7wr1Rq8WdIHTfL7Wp9fztbdcWvZvpksBnPOE573iHY
- iKd1oxPEafnw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.83,249,1616482800"; 
-   d="scan'208";a="417898526"
-Received: from fmsmsx605.amr.corp.intel.com ([10.18.126.85])
-  by orsmga002.jf.intel.com with ESMTP; 04 Jun 2021 16:11:40 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.4; Fri, 4 Jun 2021 16:11:40 -0700
-Received: from fmsmsx607.amr.corp.intel.com (10.18.126.87) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.4; Fri, 4 Jun 2021 16:11:40 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx607.amr.corp.intel.com (10.18.126.87) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4
- via Frontend Transport; Fri, 4 Jun 2021 16:11:40 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.108)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.4; Fri, 4 Jun 2021 16:11:27 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dZKV+jUztoTHyO5vT+JfO1F2OHtM8QJuEV6pRFZZxH2EH6pVTJ8VlGQEIA3L+hP93ohk3BeI1HBEqcAl5FxfUUJRpz7QZXxol0YUI4vqgqyZ31R6jCAa/astXHIgd8a6xX6xHWto9PtRJkKoDyjqHgGxO4t8wTK3QZq0jq2mMfefedB+usPbI9r29BZLr+42+fLg4h/5+Np+fXpmwNyGmn6yIzVC8Va7Hi1+GUlOPD/TFCySONbErqm75WahDFPP41eL3ahh2+7cEpqn2hZkGPpf2kGAdZ75ylD72pKrM8aarY5fxjUrSuMSKDW+nSS2mZpByZLbDW1ct5iKEue6HA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EEFrWVYjY6b2fAUM1CiFjj8gpWJVAterNPGNJjAt2BQ=;
- b=D/eXScAGQ+o5l7kwQzXZx3m6z0d5hhj7OHWYehPZRSHOtoew9hqEivnx5uvTcCbbEHk05zeyWNo1VjUTFalxTujXw3JAhVV9Gdj5CJjKt18WHlPPTy5d/RbR7sAc8VML3WyUbKifjLVaNQ4dZHAF/PhJsBp7Pd2O25rZL8GMEkLcNZEI8tPtSBpzVAico8TfhSGaNqnoQr/zuCQV9Qd3q5ceXO67fgF9Lb2bISmjgujYIOV/nGdHnlnmmLd+tcFjHN9zh55G7Z/ex/AzkMDvUZqvWMLGFrXZ0UPvP8/Plgca4vbCBt742WS6W1W35mIUqcht/ciie7sKDHK7wprxOw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EEFrWVYjY6b2fAUM1CiFjj8gpWJVAterNPGNJjAt2BQ=;
- b=dfBSKA/wDVxAltYeNkh7v9XwHCw43LwpM8Mk4a7/EF4kB7GGXskDml/Almqd/TszuSPePu3Ts3VckcxAlN8AQf0yNyyqrYFedz6cJw3vtb1hB2IkvGtFfWnm97tEoitF8M0TdlU7wyY43tU95sU+rDU8cWEb8T84LayzTYi44s4=
-Received: from MWHPR11MB1886.namprd11.prod.outlook.com (2603:10b6:300:110::9)
- by MWHPR11MB1773.namprd11.prod.outlook.com (2603:10b6:300:10f::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.22; Fri, 4 Jun
- 2021 23:10:53 +0000
-Received: from MWHPR11MB1886.namprd11.prod.outlook.com
- ([fe80::6597:eb05:c507:c6c1]) by MWHPR11MB1886.namprd11.prod.outlook.com
- ([fe80::6597:eb05:c507:c6c1%12]) with mapi id 15.20.4195.023; Fri, 4 Jun 2021
- 23:10:53 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Alex Williamson (alex.williamson@redhat.com)" 
-        <alex.williamson@redhat.com>, "Raj, Ashok" <ashok.raj@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Jonathan Corbet" <corbet@lwn.net>,
-        Robin Murphy <robin.murphy@arm.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "David Gibson" <david@gibson.dropbear.id.au>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jason Wang <jasowang@redhat.com>
-Subject: RE: [RFC] /dev/ioasid uAPI proposal
-Thread-Topic: [RFC] /dev/ioasid uAPI proposal
-Thread-Index: AddSzQ970oLnVHLeQca/ysPD8zMJZwBTUTCAAQiuDaAADwOFgAAkifcgAAvJlIAAFvXwwA==
-Date:   Fri, 4 Jun 2021 23:10:53 +0000
-Message-ID: <MWHPR11MB18863B2D785138E12193983A8C3B9@MWHPR11MB1886.namprd11.prod.outlook.com>
-References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210528233649.GB3816344@nvidia.com>
- <MWHPR11MB188621A9D1181A414D5491198C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210603130519.GY1002214@nvidia.com>
- <MWHPR11MB1886B04D5A3D212B5623EB978C3B9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210604120903.GI1002214@nvidia.com>
-In-Reply-To: <20210604120903.GI1002214@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-version: 11.5.1.3
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-authentication-results: nvidia.com; dkim=none (message not signed)
- header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [101.80.65.46]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 6dbed59d-3ca8-4821-ae4f-08d927ae005f
-x-ms-traffictypediagnostic: MWHPR11MB1773:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR11MB1773F84DCE7B8CCDA05817E28C3B9@MWHPR11MB1773.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: t5IpDpvUwhRoZuIu63WkO3O10Yzjy34k9emUwto/oikkre/OzTKMMaziaUo+39kj3HHbGPQnsGNhhQQqYwxAZnsOhyvJaneq12yX2nwj8LJeUJn1iYQB5AmWvvP73+Zlokpli9Nv/jov4QiGYQy+DEoX/+ZpDY4EODnONQwTx+Ae7dhU9QLefOlFPYmRlveuPXVAMeMvdGoETxkGCz3a4dzF1oGgmenHC0fhVmd94P0dSNYnyn/eBrGnJUmllee2mylITlgTrbA3W5xpmx95kCj/zU0nW6ZmCjmN9ELiLtumIGrrdUIKu9E36+VNBdPCubsX8gVI8fRnHtpHWAdChivYi1DbQtxOoV6rHcx8yWoBSlIiIceqkAdtxzj2mOyjWMbymJ5szCesmiCFjkkAMYi6BeTmGEFzZp5DjpzLUQt7XC3oWREaT9MZvfyjUaMeWRPXja8w4X1+9jdRfYEKgiuDZ/0nYJO71cJnNYgt5pZjskSKBfbxPWHautI/pnsq2QCm1saiLlz5q6YkEbSy+62WfCFYub5XjLLtWCMT/xGhI3mGhJG6n+r4ZcSCftr9FlsOkltLegfOyh1ATMhhDpcMSCz7JVj3wYzY07CIsu8=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1886.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(136003)(376002)(346002)(396003)(366004)(39860400002)(8676002)(38100700002)(122000001)(2906002)(8936002)(86362001)(83380400001)(71200400001)(55016002)(9686003)(33656002)(76116006)(66446008)(6506007)(26005)(186003)(52536014)(66476007)(4326008)(66946007)(64756008)(66556008)(478600001)(6916009)(7416002)(7696005)(5660300002)(54906003)(316002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?XrJMHm/4un68yJkdFGnNhwq6RNsmNsp6KyYrxXvLYDHavuZbTETyqG+OF7VC?=
- =?us-ascii?Q?3wVKU3v4/GVt6fAP52/Gidhp9vVeN/f7YX1+CYDJuV22mnBnlzc/W3RSYXur?=
- =?us-ascii?Q?39EmS67NfGjBhjnSS4Qa5T7qATfMqg4YbIDEZU1K9noh9edAp666DmWYcp7X?=
- =?us-ascii?Q?REXdH//f/2GDEGSsPDcuEl4yjxNxuWtsaI2gnDXujfDcY/a/P/heHxomsPCz?=
- =?us-ascii?Q?GJgbLGaK4StBoEu5NBNSP+2Die8oLcBOQhienZmzI42pJ1wc4wu8sDJUsr7m?=
- =?us-ascii?Q?2hO0yd1SYvezLhnVQHPoJeJuFJYAxFNxr+fAIhd2Z4c4uj3Jn9Ej8BDm2gvS?=
- =?us-ascii?Q?BunH4FXZUm0Pz4NoroSZgbGJ6EQ7CPYXsEGiJE3INYueFzCzjHN5VtQFQxM/?=
- =?us-ascii?Q?Bo0Cn4qKjaGvFbSHBJ+rPmvo7W0OBjlqBc9EyYjHnsfDhKrHcoT3nVvO1xD9?=
- =?us-ascii?Q?wRmwEs36H+XUk01aAAusYX1wwoOij9rB/KN3OBsQRQKoz+NZ9Nh4pfmvhnGI?=
- =?us-ascii?Q?b39OwzOCMEnWLOcOVvEeEH59rv+CTE4/YTUZr3h0LQcyAmTvNhG/O7MM3xDW?=
- =?us-ascii?Q?XNJRFqCKkY7zJ7/EJ19mTvrvG3PihEkI7i04e/OdrpC04J/tCAHPJrb3qOu/?=
- =?us-ascii?Q?b2+z6zcUu7kt5h6HLIeeRURI5aTONgpjmgzCrq3chQX6MJiEndNljOUuiScK?=
- =?us-ascii?Q?fVsjY+AKIMqmgfaH1XD6y9zQmIq88DLec64LbLg/z6r8Bz+k5q8Yfs9KK1Cl?=
- =?us-ascii?Q?3j6n6PtYn3xbnRBQNRkntKWLHy8f8JaBiLVy/8xE0ag5N5PSaHSdYSWqQpqv?=
- =?us-ascii?Q?wh2IWs+z14tbyg0ywO9TPHkzT6jCrxgeqL5HCG5Qkv7ME566OlVpjWfmnURy?=
- =?us-ascii?Q?TmCz4mzzNcBK5IVct26BcDllmTzLAuhajNs98tY0tYS3PQMo+VMpWlpRzk9y?=
- =?us-ascii?Q?K2kEDypWjZ6lWSOzlzqFbe6gqKvoAouLYiWNjus2IvLTOEKS38x3kncgLulg?=
- =?us-ascii?Q?Dw94kLb5HkD5RPctJVEhWyPMv+CuRwOn1mPJThfRarj7A1XqvtgxHXHQcsE/?=
- =?us-ascii?Q?DMeRZvBhbX8LTIs+I3kqX23LC8OoSmAzqigQeEib2RrzLqnMI00PZFO4OaRR?=
- =?us-ascii?Q?qpxLeoz+/s6kTSiF8pFbXKMW2gzPjh+jOO6pB/IxJZWN6p19al7W32qMafTJ?=
- =?us-ascii?Q?Y6/l/rDHnSQkKdzpQWoBxAje2hLTmfXyt/qNgKvqjPbux28j2okH6T6NzTMP?=
- =?us-ascii?Q?e7zDwTKhrHV+Hl//DbzqdplmpaRAVAZanlGtwhZr241Bc7RwH70XFqkq8ij1?=
- =?us-ascii?Q?X/KnRSs67vHfNKRK35Qyhpft?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S231806AbhFDXOg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Jun 2021 19:14:36 -0400
+Received: from mail-pf1-f173.google.com ([209.85.210.173]:46998 "EHLO
+        mail-pf1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229929AbhFDXOf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Jun 2021 19:14:35 -0400
+Received: by mail-pf1-f173.google.com with SMTP id u126so4528548pfu.13
+        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 16:12:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ATRWu2D9kH7W3L+bZaBDyqCSkaJBA2d55B4dB8fY3ls=;
+        b=KnfBcM/NqXdc7LdP3HotDGuZ2fJbOsYg314aRqfe5kmsiAO1Zo2W7sFCBTH7S36rk8
+         ow3btpXivqa+2+ZSLeOdwYSL1WEb2+XaeCTacmmer0W/g+L2Kwc6zcRg46vOcLo74fOH
+         7xS+yQSagwZd8mYDFLehQeid1W21VTbw8SVILy1YIGcw01YW2CqlT2E7/Z8bHHjvLN9W
+         1Ct8J2STgF+S1wAk125MNODt6r9mmvHWzcxxMe+HL52sXKyMbm6FAjp/aa2siiGFbkW1
+         YZseQ3PmqBs6O7qAL71aOUcA/zG/qWH7E6P082HBWOQm35am1JFWrPKcY0YLa00e8Y5y
+         QBxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ATRWu2D9kH7W3L+bZaBDyqCSkaJBA2d55B4dB8fY3ls=;
+        b=lRooASjkjb6ZH2JLxi+R4m84TTGO2CS82/BfLIixEBj4BJR/rvGeYrBIDabguvC0Yv
+         4EdAvjuuEPUBtQxyENwK444UWoJQwdv2NqMOn6DIQZDozKsi7XgtZKjPTf43U9ijOTvq
+         xgHg8xSVqc6yaQcZCWe3VlEDyw7/hIV3Q+RBQU64ChGsgwutZu8vMnDo4OI5j0K1XVZN
+         w+oj2aRO0Z+wmuTtmuR95qrDwloGu8AhYOLLTrLgdrgacPBJrrqutV0X0nQ0fv+7L6gX
+         OwCfQ7vsOMfgZsnTLe38kfbIdx4dWzobCakQMRXsqegZFiHzdtlPcDzQtx/PmyKdBJQH
+         4Vow==
+X-Gm-Message-State: AOAM5302jjks5ISIlKoe/KPILV1Ep/lW0jo+t804SNv7VbYQfm60bau7
+        VSL3IoJJ59Wk8o7XRE9DSHlLEQ==
+X-Google-Smtp-Source: ABdhPJzIb9TRqhpkjxMXAo8PoP5g+gVvFQq6GVLN7mmGFrfGbPbFsNuQEs4zk2598y+gtpClhaAFIA==
+X-Received: by 2002:a63:4760:: with SMTP id w32mr7149483pgk.383.1622848295881;
+        Fri, 04 Jun 2021 16:11:35 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id q31sm2937532pgm.36.2021.06.04.16.11.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Jun 2021 16:11:35 -0700 (PDT)
+Date:   Fri, 4 Jun 2021 16:11:31 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, maz@kernel.org,
+        pbonzini@redhat.com, drjones@redhat.com, eric.auger@redhat.com,
+        kernel test robot <oliver.sang@intel.com>
+Subject: Re: [PATCH] KVM: selftests: Rename vm_handle_exception in evmcs test
+Message-ID: <YLqzI9THXBX2dWDE@google.com>
+References: <20210604181833.1769900-1-ricarkol@google.com>
+ <YLqanpE8tdiNeoaN@google.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1886.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6dbed59d-3ca8-4821-ae4f-08d927ae005f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jun 2021 23:10:53.2629
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 9CHjyUbwZx+RxjaWLHOSpwZHzmN63NNaFWLVumQR8l5S811sprqOtRe52I3ZB5ghcj47xUJxfMhG9MXg6cv4wA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1773
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YLqanpE8tdiNeoaN@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Friday, June 4, 2021 8:09 PM
->=20
-> On Fri, Jun 04, 2021 at 06:37:26AM +0000, Tian, Kevin wrote:
-> > > From: Jason Gunthorpe
-> > > Sent: Thursday, June 3, 2021 9:05 PM
-> > >
-> > > > >
-> > > > > 3) Device accepts any PASIDs from the guest. No
-> > > > >    vPASID/pPASID translation is possible. (classic vfio_pci)
-> > > > > 4) Device accepts any PASID from the guest and has an
-> > > > >    internal vPASID/pPASID translation (enhanced vfio_pci)
-> > > >
-> > > > what is enhanced vfio_pci? In my writing this is for mdev
-> > > > which doesn't support ENQCMD
-> > >
-> > > This is a vfio_pci that mediates some element of the device interface
-> > > to communicate the vPASID/pPASID table to the device, using Max's
-> > > series for vfio_pci drivers to inject itself into VFIO.
-> > >
-> > > For instance a device might send a message through the PF that the VF
-> > > has a certain vPASID/pPASID translation table. This would be useful
-> > > for devices that cannot use ENQCMD but still want to support migratio=
-n
-> > > and thus need vPASID.
-> >
-> > I still don't quite get. If it's a PCI device why is PASID translation =
-required?
-> > Just delegate the per-RID PASID space to user as type-3 then migrating =
-the
-> > vPASID space is just straightforward.
->=20
-> This is only possible if we get rid of the global pPASID allocation
-> (honestly is my preference as it makes the HW a lot simpler)
->=20
+On Fri, Jun 04, 2021 at 09:26:54PM +0000, Sean Christopherson wrote:
+> On Fri, Jun 04, 2021, Ricardo Koller wrote:
+> > Kernel test robot reports this:
+> > 
+> > > /usr/bin/ld: tools/testing/selftests/kvm/x86_64/evmcs_test.c:157: undefined reference to `vm_handle_exception'
+> > > /usr/bin/ld: tools/testing/selftests/kvm/x86_64/evmcs_test.c:158: undefined reference to `vm_handle_exception'
+> > > collect2: error: ld returned 1 exit status
+> > 
+> > Fix it by renaming vm_handle_exception to vm_install_vector_handler in
+> > evmcs_test.c.
+> > 
+> > Fixes: a2bad6a990a4 ("KVM: selftests: Rename vm_handle_exception")
+> 
+> Belated code review...
 
-In this proposal global vs. per-RID allocation is a per-device policy.
-for vfio-pci it can always use per-RID (regardless of whether the
-device is partially mediated or not) and no vPASID/pPASID conversion.=20
-Even for mdev if no ENQCMD we can still do per-RID conversion.
-only for mdev which has ENQCMD we need global pPASID allocation.
+Thanks for the review.
 
-I think this is the motivation you explained earlier that it's not good
-to have one global PASID allocator in the kernel. per-RID vs. global
-should be selected per device.
+> Can we rename the helper to vm_install_exception_handler()?
+> 
+> In x86, "vector" is the number of the exception and "vectoring" is the process
+> of determining the resulting vector that gets delivered to software (e.g. when
+> dealing with contributory faults like #GP->#PF->#DF), but the thing that's being
+> handled is an exception.
 
-Thanks
-Kevin
+Got it. What about this renaming:
+
+  vm_handle_exception(vec) 		-> vm_install_exception_handler(vec)
+  vm_install_exception_handler(vec, ec)	-> vm_install_sync_handler(vec, ec)
+
+> 
+> arm appears to have similar terminology.  And looking at the arm code, it's very
+> confusing to have a helper vm_install_vector_handler() install into
+> exception_handlers, _not_ into vector_handlers.  Calling the vector_handlers
+> "default" handlers is also confusing, as "default" usually implies the thing can
+> be overwritten.  But in this case, the "default" handler is just another layer
+> in the routing.
+> 
+> The multiple layers of routing is also confusing and a bit hard to wade through
+> for the uninitiated.  The whole thing can be made more straightfoward by doing
+> away with the intermediate routing, whacking ~50 lines of code in the process.
+> E.g. (definitely not functional code):
+
+I think that works and it does remove a bunch of code. Just need to play
+with the idea and check that it can cover all cases.
+
+For now, given that the build is broken, what about this series of
+patches:
+
+1. keep this patch to fix x86 kvm selftests
+2. rename both arm and x86 to vm_install_exception_handler and vm_install_sync_handler
+3. restructure the internals of exception handling in arm
+
+Alternatively, I can send 1+2 together and then 3. What do you think?
+
+Thanks,
+Ricardo
+
+> 
+> diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> index 51c42ac24dca..c784e4b770cf 100644
+> --- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> +++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> @@ -212,15 +212,15 @@ int main(int argc, char *argv[])
+>                 exit(KSFT_SKIP);
+>         }
+>  
+> -       vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
+> +       vm_install_exception_handler_ec(vm, VECTOR_SYNC_CURRENT,
+>                                 ESR_EC_BRK_INS, guest_sw_bp_handler);
+> -       vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
+> +       vm_install_exception_handler_ec(vm, VECTOR_SYNC_CURRENT,
+>                                 ESR_EC_HW_BP_CURRENT, guest_hw_bp_handler);
+> -       vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
+> +       vm_install_exception_handler_ec(vm, VECTOR_SYNC_CURRENT,
+>                                 ESR_EC_WP_CURRENT, guest_wp_handler);
+> -       vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
+> +       vm_install_exception_handler_ec(vm, VECTOR_SYNC_CURRENT,
+>                                 ESR_EC_SSTEP_CURRENT, guest_ss_handler);
+> -       vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
+> +       vm_install_exception_handler_ec(vm, VECTOR_SYNC_CURRENT,
+>                                 ESR_EC_SVC64, guest_svc_handler);
+>  
+>         for (stage = 0; stage < 7; stage++) {
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> index 1a3abe1037b0..211cb684577a 100644
+> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> @@ -110,10 +110,10 @@ void vm_init_descriptor_tables(struct kvm_vm *vm);
+>  void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid);
+>  
+>  typedef void(*handler_fn)(struct ex_regs *);
+> -void vm_install_exception_handler(struct kvm_vm *vm,
+> -               int vector, int ec, handler_fn handler);
+> -void vm_install_vector_handler(struct kvm_vm *vm,
+> -               int vector, handler_fn handler);
+> +void vm_install_exception_handler_ec(struct kvm_vm *vm, int vector, int ec,
+> +                                    handler_fn handler);
+> +void vm_install_exception_handler(struct kvm_vm *vm, int vector,
+> +                                 handler_fn handler);
+>  
+>  #define write_sysreg(reg, val)                                           \
+>  ({                                                                       \
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/handlers.S b/tools/testing/selftests/kvm/lib/aarch64/handlers.S
+> index 49bf8827c6ab..fee0c3155ec7 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/handlers.S
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/handlers.S
+> @@ -93,7 +93,8 @@ handler_\label:
+>  .balign 0x80
+>  /* This will abort so no need to save and restore registers. */
+>         mov     x0, #vector
+> -       b       kvm_exit_unexpected_vector
+> +       <sean doesn't know what goes here>
+> +       b       kvm_exit_unexpected_exception
+>  .popsection
+>  
+>  .set   vector, vector + 1
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> index 03ce507d49d2..ff63e66e2c5d 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> @@ -337,16 +337,9 @@ void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
+>         va_end(ap);
+>  }
+>  
+> -void kvm_exit_unexpected_vector(int vector)
+> +void kvm_exit_unexpected_exception(int vector, uint64_t ec, bool valid_ec)
+>  {
+> -       ucall(UCALL_UNHANDLED, 3, vector, 0, false /* !valid_ec */);
+> -       while (1)
+> -               ;
+> -}
+> -
+> -static void kvm_exit_unexpected_exception(int vector, uint64_t ec)
+> -{
+> -       ucall(UCALL_UNHANDLED, 3, vector, ec, true /* valid_ec */);
+> +       ucall(UCALL_UNHANDLED, 3, vector, ec, valid_ec);
+>         while (1)
+>                 ;
+>  }
+> @@ -369,18 +362,7 @@ void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid)
+>         }
+>  }
+>  
+> -/*
+> - * This exception handling code was heavily inspired on kvm-unit-tests. There
+> - * is a set of default vector handlers stored in vector_handlers. These default
+> - * vector handlers call user-installed handlers stored in exception_handlers.
+> - * Synchronous handlers are indexed by (vector, ec), and irq handlers by
+> - * (vector, ec=0).
+> - */
+> -
+> -typedef void(*vector_fn)(struct ex_regs *, int vector);
+> -
+>  struct handlers {
+> -       vector_fn vector_handlers[VECTOR_NUM];
+>         handler_fn exception_handlers[VECTOR_NUM][ESR_EC_NUM];
+>  };
+>  
+> @@ -391,80 +373,56 @@ void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid)
+>         set_reg(vm, vcpuid, ARM64_SYS_REG(VBAR_EL1), (uint64_t)&vectors);
+>  }
+>  
+> -static void default_sync_handler(struct ex_regs *regs, int vector)
+> -{
+> -       struct handlers *handlers = (struct handlers *)exception_handlers;
+> -       uint64_t esr = read_sysreg(esr_el1);
+> -       uint64_t ec = (esr >> ESR_EC_SHIFT) & ESR_EC_MASK;
+> -
+> -       GUEST_ASSERT(VECTOR_IS_SYNC(vector));
+> -
+> -       if (handlers && handlers->exception_handlers[vector][ec])
+> -               handlers->exception_handlers[vector][ec](regs);
+> -       else
+> -               kvm_exit_unexpected_exception(vector, ec);
+> -}
+> -
+> -static void default_handler(struct ex_regs *regs, int vector)
+> -{
+> -       struct handlers *handlers = (struct handlers *)exception_handlers;
+> -
+> -       GUEST_ASSERT(!VECTOR_IS_SYNC(vector));
+> -
+> -       if (handlers && handlers->exception_handlers[vector][0])
+> -               handlers->exception_handlers[vector][0](regs);
+> -       else
+> -               kvm_exit_unexpected_vector(vector);
+> -}
+> -
+>  void route_exception(struct ex_regs *regs, int vector)
+>  {
+> -       struct handlers *handlers = (struct handlers *)exception_handlers;
+> +       struct handler_fn *handlers = exception_handlers;
+> +       bool valid_ec;
+> +       int ec;
+>  
+> -       if (handlers && handlers->vector_handlers[vector])
+> -               handlers->vector_handlers[vector](regs, vector);
+> -       else
+> -               kvm_exit_unexpected_vector(vector);
+> +       switch (vector) {
+> +       case VECTOR_SYNC_CURRENT:
+> +       case VECTOR_SYNC_LOWER_64:
+> +               ec = (read_sysreg(esr_el1) >> ESR_EC_SHIFT) & ESR_EC_MASK;
+> +               valid_ec = true;
+> +               break;
+> +       case VECTOR_IRQ_CURRENT:
+> +       case VECTOR_IRQ_LOWER_64:
+> +       case VECTOR_FIQ_CURRENT:
+> +       case VECTOR_FIQ_LOWER_64:
+> +       case VECTOR_ERROR_CURRENT:
+> +       case VECTOR_ERROR_LOWER_64:
+> +               ec = 0;
+> +               valid_ec = false;
+> +               break;
+> +       default:
+> +               goto unexpected_exception;
+> +       }
+> +
+> +       if (handlers && handlers[vector][ec])
+> +               return handlers[vector][ec](regs);
+> +
+> +unexpected_exception:
+> +       kvm_exit_unexpected_exception(vector, ec, valid_ec);
+>  }
+>  
+>  void vm_init_descriptor_tables(struct kvm_vm *vm)
+>  {
+> -       struct handlers *handlers;
+> -
+> -       vm->handlers = vm_vaddr_alloc(vm, sizeof(struct handlers),
+> -                       vm->page_size, 0, 0);
+> -
+> -       handlers = (struct handlers *)addr_gva2hva(vm, vm->handlers);
+> -       handlers->vector_handlers[VECTOR_SYNC_CURRENT] = default_sync_handler;
+> -       handlers->vector_handlers[VECTOR_IRQ_CURRENT] = default_handler;
+> -       handlers->vector_handlers[VECTOR_FIQ_CURRENT] = default_handler;
+> -       handlers->vector_handlers[VECTOR_ERROR_CURRENT] = default_handler;
+> -
+> -       handlers->vector_handlers[VECTOR_SYNC_LOWER_64] = default_sync_handler;
+> -       handlers->vector_handlers[VECTOR_IRQ_LOWER_64] = default_handler;
+> -       handlers->vector_handlers[VECTOR_FIQ_LOWER_64] = default_handler;
+> -       handlers->vector_handlers[VECTOR_ERROR_LOWER_64] = default_handler;
+> -
+> -       *(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
+> +       *(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = __exception_handlers;
+>  }
+>  
+> -void vm_install_exception_handler(struct kvm_vm *vm, int vector, int ec,
+> -                        void (*handler)(struct ex_regs *))
+> +void vm_install_exception_handler_ec(struct kvm_vm *vm, int vector, int ec,
+> +                                    void (*handler)(struct ex_regs *))
+>  {
+> -       struct handlers *handlers = (struct handlers *)addr_gva2hva(vm, vm->handlers);
+> +       struct handlers *handlers = addr_gva2hva(vm, vm->handlers);
+>  
+> -       assert(VECTOR_IS_SYNC(vector));
+> +       assert(!ec == !VECTOR_IS_SYNC(vector));
+>         assert(vector < VECTOR_NUM);
+>         assert(ec < ESR_EC_NUM);
+> -       handlers->exception_handlers[vector][ec] = handler;
+> +       exception_handlers[vector][ec] = handler;
+>  }
+>  
+> -void vm_install_vector_handler(struct kvm_vm *vm, int vector,
+> -                        void (*handler)(struct ex_regs *))
+> +void vm_install_exception_handler(struct kvm_vm *vm, int vector,
+> +                                 void (*handler)(struct ex_regs *))
+>  {
+> -       struct handlers *handlers = (struct handlers *)addr_gva2hva(vm, vm->handlers);
+> -
+> -       assert(!VECTOR_IS_SYNC(vector));
+> -       assert(vector < VECTOR_NUM);
+> -       handlers->exception_handlers[vector][0] = handler;
+> +       vm_install_exception_handler_ec(vm, vector, 0, handler);
+>  }
