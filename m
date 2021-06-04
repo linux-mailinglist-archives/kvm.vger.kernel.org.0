@@ -2,127 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA40D39B083
-	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 04:39:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B670739B0B5
+	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 05:06:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230034AbhFDCku (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Jun 2021 22:40:50 -0400
-Received: from m12-15.163.com ([220.181.12.15]:33881 "EHLO m12-15.163.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229576AbhFDCku (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Jun 2021 22:40:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=VGlqc
-        ZU+EgTyA61L0sJmTUeCgixcOEkwANqPM5BiVPQ=; b=cqKAbi72b8cMXRWC0CZWc
-        OmEbkWpnsCdzu8dsfwF0n2NcZB9KZ7IMRzAt5F3h45GmtcxpgGph2qTQrvSaPV4p
-        bhBAnqKDXM+bnLG1peGJsRvO6hJ/IVjlRJsSnmU1Np/3/y6tbo8CL4jd+Dj3WLTf
-        4zAZPvggkd7JehB2avWqOY=
-Received: from ubuntu.localdomain (unknown [218.17.89.92])
-        by smtp11 (Coremail) with SMTP id D8CowADHG+Y7krlghxvWDg--.0S2;
-        Fri, 04 Jun 2021 10:39:01 +0800 (CST)
-From:   13145886936@163.com
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        gushengxian <gushengxian@yulong.com>
-Subject: [PATCH] KVM: Revised the use of space and tabs
-Date:   Thu,  3 Jun 2021 19:38:48 -0700
-Message-Id: <20210604023848.10549-1-13145886936@163.com>
-X-Mailer: git-send-email 2.25.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: D8CowADHG+Y7krlghxvWDg--.0S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxCr1DCr47JFyrWw48Zw4fKrg_yoW5Ar4rpF
-        yrGwsrWrWfJr4j9r97JrWq9343Kws7Ka17ArZ7Z3yFvwnrKrn8Ja1kGFW8Zry5J348ZF1S
-        ya4FqFyUC3yvyaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07bOiSdUUUUU=
-X-Originating-IP: [218.17.89.92]
-X-CM-SenderInfo: 5zrdx5xxdq6xppld0qqrwthudrp/xtbBzgWng1QHMxhcugAAsx
+        id S229751AbhFDDIC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Jun 2021 23:08:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39854 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229695AbhFDDIB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Jun 2021 23:08:01 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 272A6C06174A
+        for <kvm@vger.kernel.org>; Thu,  3 Jun 2021 20:06:10 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id r1so6704987pgk.8
+        for <kvm@vger.kernel.org>; Thu, 03 Jun 2021 20:06:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=pFoJDXCcwtiraqeuMDPU4cxFPAA0BggiQ26De9dZdOg=;
+        b=atlaYC8JWePjkUnrFPU7myy5AMKAtjjHhkN9JucKtFVeEDUizcoYN52+6yHUEXHCtS
+         NybbbHuGTMJdpgIVbOehWi8MqSxrkh3jWuTmkCaQs5EP6vZ13oUrYeol+GUpie3zqTdt
+         dAt0r0LnLDJqh+jcyNzbdXalA+XdVNDBAe0aSO8trXeGfpzaGfX7Plv7P2eTKVlbeOo9
+         6Z16Czgu6BmyWL+ZKIS1n+5NE59zNSPCU0J5qNhoh1T4bwRGEF+I7wLT2hMBm9qf1CXx
+         gygfXkgmABdmggzzGYo32AL/SloMsIrhl0AUk3hZq5NddGqg3W3aJSh9Xb7M+f1Ih2oY
+         3wMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=pFoJDXCcwtiraqeuMDPU4cxFPAA0BggiQ26De9dZdOg=;
+        b=dlbRTtriCrxDw2oQnUjDKVZqtf7w0IyQ4rD/+VdMC+wHcZ6dJCAqjutq/X+xoPPWMh
+         q+WzzHeuHTDJJOAN6fiq12+ct6mOAZcsudYZlnQ0kjjhzqFpuCUF7piDsccce4loL/1X
+         S3u2rWUq7FV3+5JIuSRX5eKTDNAzaGLnvMmsDQLq8fAzFze58jkEcQVZLZ5vKX1Mu3IQ
+         UlU86cx9VNjNkHf5OCJGgX3HAkXw/qKzCnbmsOS4WDRee3P30PzbtIjzLZ6fADRFVsi2
+         BlXKAe8GohB1L3bbO0yIs7S+ZZkrauiVluibn1x9YZekP7dXjy4rICuxu/X5r78v3QAK
+         tt/Q==
+X-Gm-Message-State: AOAM533NaKcbWXg/W8pzBXb09xPmIiM8IRg8Jmgovn8kuK398n5tG3ZQ
+        bLQmXNfCyN/nCkaUlvbZkzbhfVqALtwihQ==
+X-Google-Smtp-Source: ABdhPJxlIoBDqSE6/w7zJB0azeKnNeEu2VWNWBSpw+APrfjc1z3RyHf4EDyvtuaywc3ToYHuhhfUIg==
+X-Received: by 2002:a65:5bc6:: with SMTP id o6mr2662787pgr.364.1622775969432;
+        Thu, 03 Jun 2021 20:06:09 -0700 (PDT)
+Received: from smtpclient.apple (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
+        by smtp.gmail.com with ESMTPSA id a12sm388830pfg.102.2021.06.03.20.06.08
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 03 Jun 2021 20:06:08 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
+Subject: Re: [kvm-unit-tests PATCH 2/2] x86: Create ISO images according to
+ unittests.cfg
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <20210604023453.905512-2-yi.sun@intel.com>
+Date:   Thu, 3 Jun 2021 20:06:07 -0700
+Cc:     kvm@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <30FA4AAE-DBC9-4DB7-8742-079F2B3067C3@gmail.com>
+References: <20210604023453.905512-1-yi.sun@intel.com>
+ <20210604023453.905512-2-yi.sun@intel.com>
+To:     Yi Sun <yi.sun@intel.com>
+X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: gushengxian <gushengxian@yulong.com>
 
-Revised the use of space and tabs.
 
-Signed-off-by: gushengxian <gushengxian@yulong.com>
----
- virt/kvm/kvm_main.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+> On Jun 3, 2021, at 7:34 PM, Yi Sun <yi.sun@intel.com> wrote:
+>=20
+> Create ISO image according to the configure file unittests.cfg,
+> where describes the parameters of each test case.
+>=20
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index eb440eb1225a..4cec505af62b 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -132,7 +132,9 @@ static long kvm_vcpu_compat_ioctl(struct file *file, unsigned int ioctl,
-  *   passed to a compat task, let the ioctls fail.
-  */
- static long kvm_no_compat_ioctl(struct file *file, unsigned int ioctl,
--				unsigned long arg) { return -EINVAL; }
-+				unsigned long arg) {
-+				return -EINVAL;
-+				}
- 
- static int kvm_no_compat_open(struct inode *inode, struct file *file)
- {
-@@ -2104,7 +2106,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
- 	 * Whoever called remap_pfn_range is also going to call e.g.
- 	 * unmap_mapping_range before the underlying pages are freed,
- 	 * causing a call to our MMU notifier.
--	 */ 
-+	 */
- 	kvm_get_pfn(pfn);
- 
- out:
-@@ -2417,7 +2419,7 @@ static void __kvm_unmap_gfn(struct kvm *kvm,
- 	map->page = NULL;
- }
- 
--int kvm_unmap_gfn(struct kvm_vcpu *vcpu, struct kvm_host_map *map, 
-+int kvm_unmap_gfn(struct kvm_vcpu *vcpu, struct kvm_host_map *map,
- 		  struct gfn_to_pfn_cache *cache, bool dirty, bool atomic)
- {
- 	__kvm_unmap_gfn(vcpu->kvm, gfn_to_memslot(vcpu->kvm, map->gfn), map,
-@@ -2576,7 +2578,7 @@ int kvm_vcpu_read_guest(struct kvm_vcpu *vcpu, gpa_t gpa, void *data, unsigned l
- EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest);
- 
- static int __kvm_read_guest_atomic(struct kvm_memory_slot *slot, gfn_t gfn,
--			           void *data, int offset, unsigned long len)
-+				void *data, int offset, unsigned long len)
- {
- 	int r;
- 	unsigned long addr;
-@@ -2604,8 +2606,8 @@ int kvm_vcpu_read_guest_atomic(struct kvm_vcpu *vcpu, gpa_t gpa,
- EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_atomic);
- 
- static int __kvm_write_guest_page(struct kvm *kvm,
--				  struct kvm_memory_slot *memslot, gfn_t gfn,
--			          const void *data, int offset, int len)
-+				 struct kvm_memory_slot *memslot, gfn_t gfn,
-+				 const void *data, int offset, int len)
- {
- 	int r;
- 	unsigned long addr;
-@@ -2660,7 +2662,7 @@ int kvm_write_guest(struct kvm *kvm, gpa_t gpa, const void *data,
- EXPORT_SYMBOL_GPL(kvm_write_guest);
- 
- int kvm_vcpu_write_guest(struct kvm_vcpu *vcpu, gpa_t gpa, const void *data,
--		         unsigned long len)
-+			 unsigned long len)
- {
- 	gfn_t gfn = gpa >> PAGE_SHIFT;
- 	int seg;
-@@ -2823,8 +2825,8 @@ int kvm_clear_guest(struct kvm *kvm, gpa_t gpa, unsigned long len)
- EXPORT_SYMBOL_GPL(kvm_clear_guest);
- 
- void mark_page_dirty_in_slot(struct kvm *kvm,
--			     struct kvm_memory_slot *memslot,
--		 	     gfn_t gfn)
-+			 struct kvm_memory_slot *memslot,
-+			 gfn_t gfn)
- {
- 	if (memslot && kvm_slot_dirty_track_enabled(memslot)) {
- 		unsigned long rel_gfn = gfn - memslot->base_gfn;
--- 
-2.25.1
+Looks cool!
+
+> diff --git a/x86/create_iso.sh b/x86/create_iso.sh
+> new file mode 100755
+> index 0000000..8486be7
+> --- /dev/null
+> +++ b/x86/create_iso.sh
+> @@ -0,0 +1,71 @@
+> +#!/bin/bash
+> +set -e
+> +config_file=3D$1
+> +
+> +opts=3D
+> +extra_params=3D
+> +kernel=3D
+> +smp=3D
+> +testname=3D
+> +
+> +
+> +grub_cfg() {
+> +
+> +	kernel_elf=3D$1
+> +	kernel_para=3D$2
+> +
+> +	cat << EOF
+> +set timeout=3D0
+> +set default=3D0
+> +
+> +
+> +menuentry "${kernel_elf}" {
+> +    multiboot /boot/${kernel_elf} ${kernel_para}
+
+Any chance you can add an optional =E2=80=9Cmodule=E2=80=9D command =
+here, that
+would be configurable as a parameter to create_iso.sh?
+
+I use such a command to provide parameters that kvm-unit-tests
+usually gets from the =E2=80=9Cfirmware" (and therefore are not =
+available
+in certain environments).=20
+
+The =E2=80=9Cmodule=E2=80=9D can look something like:
+	NR_CPUS=3D56
+	MEMSIZE=3D4096
+	TEST_DEVICE=3D0
+	BOOTLOADER=3D1=20
+
+(kvm-unit-tests already knows to use these values)
+
+This =E2=80=9Cmodule" would need to be copied into build/isofiles/boot =
+as
+well.
 
