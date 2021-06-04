@@ -2,94 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 348BA39BC13
-	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 17:38:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F22739BC10
+	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 17:38:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231312AbhFDPkI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Jun 2021 11:40:08 -0400
-Received: from mail-pj1-f52.google.com ([209.85.216.52]:43532 "EHLO
-        mail-pj1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230105AbhFDPkG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Jun 2021 11:40:06 -0400
-Received: by mail-pj1-f52.google.com with SMTP id l10-20020a17090a150ab0290162974722f2so6100124pja.2
-        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 08:38:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=LS+pVGO6lepWheguoL9jNQS5bAjZn1OmNQofMIhLGLs=;
-        b=dMutLh5fistVaDLzLU1mFkRhUBWIPLb//w/PNNl7WxFCXB2Vdbm14D0/ITQsvyYl1k
-         VKQzxaWLpzLVkUxn+Eo6i1Cd1fo6dhonC9q98hriiNob6Yy9RnjZ5/iZvTYTgR13zBJW
-         IUX1vA8zJAAQrpTbfTbDpHqSRqxtvTwponEL3WNiQMbQYQDR8VKnRLEFpEQZ6dHeN2X3
-         plkqygYxnu8mii23D9UJzCzeqf5qZVKhDeH2GmBiSvhQMiFZGAr53a2bJixttQr5oW4w
-         p2vT/2x3gVdw6GfVFR1YvOjz/xUyT7p1N31cjrjBMoKiglMySuSZKHse90tVPJ3ELqFR
-         GLdA==
+        id S230440AbhFDPjp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Jun 2021 11:39:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42117 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230034AbhFDPjp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 4 Jun 2021 11:39:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622821078;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pHiBAl8+vXrofNAjjOJ84eNcT7KcR0jKQ6aIcGHntvY=;
+        b=C5Ko4dYu8z8LJKyyBGKChosP5gsdkhbehNnMIUD8EIobIwfLn1MkzvIEy9VgWkDRB8XU+D
+        KtzBLQY9e2qpzuTS/WA5Tvli2/57w07i6za8xhBpFM5bEoZCGTn61yDybvWIDlGzwSi+Pv
+        Klxzx1+5VR7t9nQyLLxhKalNtznZxdI=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-543-BZhL65_XMdW84IlZ--0kjw-1; Fri, 04 Jun 2021 11:37:57 -0400
+X-MC-Unique: BZhL65_XMdW84IlZ--0kjw-1
+Received: by mail-il1-f199.google.com with SMTP id g14-20020a926b0e0000b02901bb2deb9d71so6740463ilc.6
+        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 08:37:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=LS+pVGO6lepWheguoL9jNQS5bAjZn1OmNQofMIhLGLs=;
-        b=VSQKpCnaTWOGMprsraP4bao3S7HLanlgzfg3EBh+mOoB7w6+YRzm72PVntZ4sBFCpR
-         1fGNJ9vhi4UutpMSGn8EWIUZt9vUCPeEhFAisysZVbAYsP4pH+DzP6blhcPu/quHRMpz
-         n06gFJTdZ+Tq55bUoOBOGIHig8JTd37xvbcBo/CoTYh5PeBmLDutJrqi3a6Q7bK0r7K3
-         PRdD0gFT9dwus2oX+6LzMbo3FiRyzbmskADslxMrMT7cItYUGFcn23sCc6mzcqQgoErg
-         J1XKSOuObSYUxHu+L03FrkG+rbC7/Tqj9jfW2trj3AxAZWEiL5BCjrhvI/Z0PJ1++gT2
-         lDlw==
-X-Gm-Message-State: AOAM533L8n5bkXsMMgpaD7hltUVuFyO6MvSclgNhVMSU23mFZulZ4YfG
-        87EvJeA58N1VDeXpzh9OtYK6FA==
-X-Google-Smtp-Source: ABdhPJzXCnn/exCbTxMz3psca2pXzg5HIQbkYkMNVsSI2w7AR3aChmi4WGl7T+1P8T3i7qGXXFuAug==
-X-Received: by 2002:a17:90a:5507:: with SMTP id b7mr17218278pji.27.1622821027043;
-        Fri, 04 Jun 2021 08:37:07 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id m5sm2406492pgl.75.2021.06.04.08.37.06
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=pHiBAl8+vXrofNAjjOJ84eNcT7KcR0jKQ6aIcGHntvY=;
+        b=q4ukwDaEZW4wuBNw4mhOe+gyajM1Wux+sVpQbOoVcmCCvu/decvG9Ya8+STgmQy8hd
+         XjyXEIDnUf/RZvn92UCGgZcNzBgkyY3XcMSYdoheXiSUTFvedyZrtYgj1vg2i9g2pHlR
+         h8ePjqXrTZHBxs7x2IVwukhhrroUkkCneXMVYQZ1AlPgzHEkX7+MlVfwWA425zQ2t7WI
+         qwEBKCtITBKLj9sDNuieWpkOY17hytM34ZZTQageZu2WoPe7zMLEwPj5AAM3zIYi+maI
+         gD2f/PA+uuc7rY54EOJyS91/YPX9hXpR1Iu5OEfHozYnw9uhu7SFjfw2bK6IvgZrukKi
+         fGAg==
+X-Gm-Message-State: AOAM531nljdmmvFBI/zkWII/qXtsDaXwBDGEtDTaUDPRskuxlletacSC
+        kDFKI/Lx45FsW6q5O0nM8aPtsLCZp9B8iT1bXGWiCcdZ5LCT6AAs6VJMDSoBbFLRrSC80blGIGA
+        qfjbdE0vSCWkL
+X-Received: by 2002:a05:6638:183:: with SMTP id a3mr4732207jaq.47.1622821076890;
+        Fri, 04 Jun 2021 08:37:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwQxo+zfw3yLheApkfMNT19Kxv+RF4mWzeBkwzbgyKeWykIJlgSP3F1B+dw6s35/Bocj5BfPQ==
+X-Received: by 2002:a05:6638:183:: with SMTP id a3mr4732182jaq.47.1622821076638;
+        Fri, 04 Jun 2021 08:37:56 -0700 (PDT)
+Received: from redhat.com (c-73-14-100-188.hsd1.co.comcast.net. [73.14.100.188])
+        by smtp.gmail.com with ESMTPSA id d2sm3775869ilu.60.2021.06.04.08.37.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Jun 2021 08:37:06 -0700 (PDT)
-Date:   Fri, 4 Jun 2021 15:37:02 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH 1/2] KVM: LAPIC: write 0 to TMICT should also cancel
- vmx-preemption timer
-Message-ID: <YLpIni1VKYYfUE8D@google.com>
-References: <1622710841-76604-1-git-send-email-wanpengli@tencent.com>
- <YLjzJ59HPqGfhhvm@google.com>
- <CANRm+CxSAD9+050j-1e1_f3g1QEwrSaee6=2cB6qseBXfDkgPA@mail.gmail.com>
+        Fri, 04 Jun 2021 08:37:56 -0700 (PDT)
+Date:   Fri, 4 Jun 2021 09:37:55 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Robin Murphy <robin.murphy@arm.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "David Woodhouse" <dwmw2@infradead.org>,
+        Jason Wang <jasowang@redhat.com>
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+Message-ID: <20210604093755.1d660a47.alex.williamson@redhat.com>
+In-Reply-To: <MWHPR11MB1886C4BC352DDE03B44070C08C3B9@MWHPR11MB1886.namprd11.prod.outlook.com>
+References: <20210602111117.026d4a26.alex.williamson@redhat.com>
+        <20210602173510.GE1002214@nvidia.com>
+        <20210602120111.5e5bcf93.alex.williamson@redhat.com>
+        <20210602180925.GH1002214@nvidia.com>
+        <20210602130053.615db578.alex.williamson@redhat.com>
+        <20210602195404.GI1002214@nvidia.com>
+        <20210602143734.72fb4fa4.alex.williamson@redhat.com>
+        <20210602224536.GJ1002214@nvidia.com>
+        <20210602205054.3505c9c3.alex.williamson@redhat.com>
+        <MWHPR11MB1886DC8ECF5D56FE485D13D58C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
+        <20210603124036.GU1002214@nvidia.com>
+        <20210603144136.2b68c5c5.alex.williamson@redhat.com>
+        <MWHPR11MB1886C4BC352DDE03B44070C08C3B9@MWHPR11MB1886.namprd11.prod.outlook.com>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANRm+CxSAD9+050j-1e1_f3g1QEwrSaee6=2cB6qseBXfDkgPA@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 04, 2021, Wanpeng Li wrote:
-> On Thu, 3 Jun 2021 at 23:20, Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Thu, Jun 03, 2021, Wanpeng Li wrote:
-> > > From: Wanpeng Li <wanpengli@tencent.com>
-> > >
-> > > According to the SDM 10.5.4.1:
-> > >
-> > >   A write of 0 to the initial-count register effectively stops the local
-> > >   APIC timer, in both one-shot and periodic mode.
-> > >
-> > > The lapic timer oneshot/periodic mode which is emulated by vmx-preemption
-> > > timer doesn't stop since vmx->hv_deadline_tsc is still set.
-> >
-> > But the VMX preemption timer is only used for deadline, never for oneshot or
-> > periodic.  Am I missing something?
+On Fri, 4 Jun 2021 09:19:50 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
+
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Friday, June 4, 2021 4:42 AM
+> >   
+> > > 'qemu --allow-no-snoop' makes more sense to me  
+> > 
+> > I'd be tempted to attach it to the -device vfio-pci option, it's
+> > specific drivers for specific devices that are going to want this and
+> > those devices may not be permanently attached to the VM.  But I see in
+> > the other thread you're trying to optimize IOMMU page table sharing.
+> > 
+> > There's a usability question in either case though and I'm not sure how
+> > to get around it other than QEMU or the kernel knowing a list of
+> > devices (explicit IDs or vendor+class) to select per device defaults.
+> >   
 > 
-> Yes, it is upstream.
+> "-device vfio-pci" is a per-device option, which implies that the
+> no-snoop choice is given to the admin then no need to maintain 
+> a fixed device list in Qemu?
 
-Huh.  I always thought 'tscdeadline' alluded to the timer being in deadline mode
-and never looked closely at the arming code.  Thanks!
+I think we want to look at where we put it to have the best default
+user experience.  For example the QEMU vfio-pci device option could use
+on/off/auto semantics where auto is the default and QEMU maintains a
+list of IDs or vendor/class configurations where we've determined the
+"optimal" auto configuration.  Management tools could provide an
+override, but we're imposing some pretty technical requirements for a
+management tool to be able to come up with good per device defaults.
+Seems like we should consolidate that technical decision in one place.
+Thanks,
 
-Maybe name the new helper cancel_apic_timer() to align with start_apic_timer()
-and restart_apic_timer()?  With that:
+Alex
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
