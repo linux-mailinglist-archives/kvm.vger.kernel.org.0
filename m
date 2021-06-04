@@ -2,166 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F18F39BE3F
-	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 19:13:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 658F039BE50
+	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 19:16:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230010AbhFDRPL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Jun 2021 13:15:11 -0400
-Received: from mga06.intel.com ([134.134.136.31]:38540 "EHLO mga06.intel.com"
+        id S230103AbhFDRSh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Jun 2021 13:18:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48858 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229878AbhFDRPK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Jun 2021 13:15:10 -0400
-IronPort-SDR: volUmOhRy81lQwtCOZGrJBa+nA90Azf7QgwJ8cgW2V4NK1aEZFgmV7b4b1iwHPnmZ6pHtdIofd
- sRamOWHThIuw==
-X-IronPort-AV: E=McAfee;i="6200,9189,10005"; a="265494668"
-X-IronPort-AV: E=Sophos;i="5.83,248,1616482800"; 
-   d="scan'208";a="265494668"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2021 10:13:23 -0700
-IronPort-SDR: PHnkbewFBrjDEKnN2uCBzIvSvVqi9BvKEpuoekpht5NFY+1auyPIxiX98T7pF5K2Hr6ElQe0Tg
- CMOoawqqrMvQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.83,248,1616482800"; 
-   d="scan'208";a="412427912"
-Received: from orsmsx604.amr.corp.intel.com ([10.22.229.17])
-  by fmsmga007.fm.intel.com with ESMTP; 04 Jun 2021 10:13:22 -0700
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.4; Fri, 4 Jun 2021 10:13:22 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4
- via Frontend Transport; Fri, 4 Jun 2021 10:13:22 -0700
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.41) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.4; Fri, 4 Jun 2021 10:13:22 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SFHCh/tVRYZczAQ2C6IRtTByYClpYEdZkzdoDzc/euCn+CaFH3zzmzEEHgtLaVVWfhn9Da6cu+BxTNSiLBrGP9avyS5zRWTINtW9/I5hq5VzoGxdemhPYCQpQM3qdhHPicrgrSzTA+jphD/ullb7W1VVSziMgAvpOpciEiAq44cR6AGT1wunoFd3Ty8xEgs1Fioz6nleL1FOqRv/K7FAgxMA5yKEJoiwLKrCbK7Uyi2odhwWPm5NwEpEmbsi+eZ6ptxzxx+By7mLW2unQuquh/+7JHUqpGWWDi4eyGhdo04Qh2b92bA/JiaCNC+PIK6o5G7qhLtIGpqPFI9gcuxsXg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=j54s/3tekphM5o7VZLfxjIP2sft80d6CH53CsbXBVAU=;
- b=iuhnydJ86TbzkV0JxIFFjt1tLGsLR+CWCTFl+Wj16gszYDZ3v5fjz2uXrDYHTEJqX3UWIdhA1f/tPpCFMGwOQZeVReQ+WY+wiVXW3tRhoojtE1bnlk6tvXFWE+R3V6a1BZZ+Mdd53Y8UStbckAcpotu/BxQYqrz8VyQncL8/m3/2rkGRmbp8bX50b/i+KDl/UCvRIwxUiD3b5OSqxBf9ywvH6Btjt5kIRLmc466WJOWL8FOAep2+3TO9Pk1hROgN7D5+QDSu/g/31+f2K2oJu/kiDbUwcvV2yJBwuTpcVZ75Np09u3w2hyF6o+eZUsTMdXSSwQWkCFRNTV1gByVUog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=j54s/3tekphM5o7VZLfxjIP2sft80d6CH53CsbXBVAU=;
- b=rx6YP631f5aykDVcxhBYYkhHu5VwpBch3JMr16oI8usZOnTvbBnlCoRVOr90ROQMGMJ9guefDmHzQYYmfn6Eu90wGIplGsMTHNTJWR7DeIVbC/1xBmV8Vs471l8O+Vv2vZZCV0lKyg8ykuTt8tEhsC5WPvoUpn1HQLj6Ron0IDI=
-Received: from DM6PR11MB3115.namprd11.prod.outlook.com (2603:10b6:5:66::33) by
- DM6PR11MB4658.namprd11.prod.outlook.com (2603:10b6:5:28f::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4195.24; Fri, 4 Jun 2021 17:13:20 +0000
-Received: from DM6PR11MB3115.namprd11.prod.outlook.com
- ([fe80::6d2f:50ab:cdf0:3465]) by DM6PR11MB3115.namprd11.prod.outlook.com
- ([fe80::6d2f:50ab:cdf0:3465%7]) with mapi id 15.20.4173.030; Fri, 4 Jun 2021
- 17:13:20 +0000
-From:   "Sun, Yi" <yi.sun@intel.com>
-To:     Nadav Amit <nadav.amit@gmail.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [kvm-unit-tests PATCH 2/2] x86: Create ISO images according to
- unittests.cfg
-Thread-Topic: [kvm-unit-tests PATCH 2/2] x86: Create ISO images according to
- unittests.cfg
-Thread-Index: AQHXWOo86XUHYgZSU0qrii8ea7woGasDK0uAgACXPHCAAFRBAIAAAEwg
-Date:   Fri, 4 Jun 2021 17:13:20 +0000
-Message-ID: <DM6PR11MB31155CEFF09D4EAF3990DBB1993B9@DM6PR11MB3115.namprd11.prod.outlook.com>
-References: <20210604023453.905512-1-yi.sun@intel.com>
- <20210604023453.905512-2-yi.sun@intel.com>
- <30FA4AAE-DBC9-4DB7-8742-079F2B3067C3@gmail.com>
- <DM6PR11MB311557D8C203529903BEFB2F993B9@DM6PR11MB3115.namprd11.prod.outlook.com>
- <2516617A-CFDE-4EEF-89D9-896951A9C68D@gmail.com>
-In-Reply-To: <2516617A-CFDE-4EEF-89D9-896951A9C68D@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-version: 11.5.1.3
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-authentication-results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [192.198.142.26]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 226bf24b-6d9a-4de1-b07f-08d9277c0da9
-x-ms-traffictypediagnostic: DM6PR11MB4658:
-x-microsoft-antispam-prvs: <DM6PR11MB465805A0BE00A2B291DDCACA993B9@DM6PR11MB4658.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 7jevMoB9MlYvyCOOu5SusCv7FEUovv1ikwfK3rr5KmurLLEA/LYulMVdYIlMCF+/g1OSnmZRVH0xVd2BlHkpntiGGqtMwoaoEwkw+sU2g+2uiCjITv3rd5JYoBinHIf8TGrMut2GC4EqFDnLxRRC0dev2WaTyrI7sdWOZqvGjE4dWaVqRXAznBH6SLuF4O3O/HK3uGCH3+BvhAka4CzXVd606NlVN5wPX75kkDUvmIb3FdQW5lQXuH2s5tsTlUf3zB/M6N8ZNSJkVxGwky7nlgJnbjFFhcfc8RoE9JqNv7/DJQ1T1fJn7+4AUQxOvjdS8/Qur86+WsCjzUUR57VVRM7wcAvO70KFGM/ZfsRj8aZyh3/vSkA/uY8qXvqegy6LMIZnBAx3fls0ZiGyCifnWMlP9i5EWN8e1vTrps2JguTBkxy2f4X9/UiQ/LbGR9zQ6kGR0em7EJf3b6C0CkKCFSiuRSzAic9MhlMYLAoW/es+6yzSxXWbUZgdJnXNplkcIor6CQFV7rSGXY1hNamjeyObzh5Oiyf+AfG57Hauy7kbdAXe+gY0tqcsR6WW4M3wzaceFdLXPr+zYzhARhoUn3DOq9CSuocz3aPh1yP9+9U=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3115.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(346002)(376002)(39860400002)(366004)(136003)(6916009)(26005)(5660300002)(186003)(2906002)(83380400001)(86362001)(66946007)(33656002)(71200400001)(76116006)(4326008)(66446008)(478600001)(52536014)(38100700002)(64756008)(9686003)(66476007)(66556008)(316002)(55016002)(7696005)(8676002)(122000001)(6506007)(53546011)(8936002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?utf-8?B?OUcxSHNJN01XL1RwSnNJMVkyZWQzeWd0WEtCbDYzWThyM24zcDVUamJWaWFm?=
- =?utf-8?B?aVBWbnFwajNqMEIvTUhJb2hDRkRLZmNFL1ZZZFlOdDg1WjRLZ3diMm45bHp0?=
- =?utf-8?B?T05XLzQyRTF6ZlpOTFUzRFQwSk53U2hobTliMkNjYU4xWWI4elRCbERrazZk?=
- =?utf-8?B?QVRsZWZCaTcwTnRxT3BwTzVBc2ZzcTRibkUzSHJOVTRUUG5HTyt4NG9jV2Rx?=
- =?utf-8?B?dDZGcThnVXJHcGdTdk85SW9vNTRMOEFja2RtblNWOWtVNGUwNTVXUmlSMXFo?=
- =?utf-8?B?OWRYUGlFbHE1b0lFM1daNHErTTBoWXFWLzJyYmQzS3FtQ0paaDkvbjVwQ1hO?=
- =?utf-8?B?S3p4bkFLamtkejF3SGlEUjhHY051VFdRUzdyWUtNM2RFaTB3ZXpNdkdmbFNz?=
- =?utf-8?B?RkdtUzhHR2l2SHhLVDBLaFNUNS9IVzkzd0E3Yi9jak13L2JzVnJxcHpJam5k?=
- =?utf-8?B?MjQ3VlFaSjVzOXBJU1BmVFBrTUNnZDViWlN5K2ZqejdkVFRaVmFNN3NvdTda?=
- =?utf-8?B?RytyMWVWMEdyVlpQbU4vYTlBdktFNTI5bkhhTjBLcUcrek1TbzV2ZnZvUkk2?=
- =?utf-8?B?a2lIQ2lUNW1rTVh0VE9oZ1JMVFJKVlFkQzBGRi9yQVhRc1JwdmhOaFZLbW53?=
- =?utf-8?B?Umk3SDY4UlhsbDJQdFlvN0diMkRPUUkzQkp0MHdSb3UzWDRwZVEzRnh6K2VI?=
- =?utf-8?B?Y2lsSVFUVmJCMGx3bkNCSE12RlA3RlMwRElCeG15N0lCbDNGRDdhMlBPbGds?=
- =?utf-8?B?NDFMM05WR1ZyWmtyMzFVS0FUTlFIam1OTStJR0lGelp0MDZqR2ZVL2VPSnlH?=
- =?utf-8?B?eTQrM0phanBMb1V2bWIrL1B0RDlLa0RubndzYlF3c0pLUm8zTWpONkZDVm9S?=
- =?utf-8?B?SFRlLy9VQndzb1JKY0FVYUdmUDRXbllneHpGWnk0L0FkcUp1bTVKcmhyZmJ5?=
- =?utf-8?B?U0Q0dXRiNWg5dlVNUHhrMlhjbWtacUt6Q2JlN0oreWJPUVdaSGlYc2pBRjRx?=
- =?utf-8?B?R3EwSFBzYk9TcEVkTjFtQk9UdC8xNnFZNUxZR0ZoSS9mdWNjMmFLeC9sUDhV?=
- =?utf-8?B?UGp5SlNBNzZER3FiUllEQ2N1YUZWaEFEWDJEbzRqQXhockdWK01hVGg3MEhs?=
- =?utf-8?B?MnJjSHh2VG5TSmZ3NExrS1F2V1BzOU5zUEJMVVVSejFURTdTY1lxcTMwVkxF?=
- =?utf-8?B?djZQellIa2JnN05uZEZQbCtMVW5NcDhnZXdPU1ZkNGN2c04vYjRRZTljVkNQ?=
- =?utf-8?B?TU1laXpzOGk2NXVXck9GZ0hPN1hJeWUvdEFxNDk5WU5lWEVSKzJWMCtaZld3?=
- =?utf-8?B?by9lTHo2eU9BbmNCcllNeDRIR2h6bGRuMzJ4L0w2NUlwRlhVYTU2VHZ6M1Zz?=
- =?utf-8?B?dXhKbndidEs2aFRYZisxQWk5NysxUlhMNkg1Z0NmSHA5NzdBY2llSlVjMGpO?=
- =?utf-8?B?QWc5d0VsbFJZMFJ3cEpRRzUxaGcycDBVNUZsZTloNTN2NTNEeHV1TkYxOHN5?=
- =?utf-8?B?S1ZZNFRjWGZUbXlpYWVXQWRVMGR5ZVFDT0IzV0JUcEpiOFZvSUN6S0dXakNH?=
- =?utf-8?B?Z0FxN2Vxcko0SGY4SFJBYUg4aUJlRlA0NjljQTNqVnVrVU12YVNUNEdxT0Vh?=
- =?utf-8?B?NzZ5R2tBRHRIN2hOODRvQUJGS1pBMGtXM1gyeVNiUFZaR2txSkJvTVBSbmZk?=
- =?utf-8?B?cFRYL1R4U05nd1I5RCtqN29PWkxHV2Q3Zkl2N3BNLzZZV0FualF5bHFiSTJJ?=
- =?utf-8?Q?c5UAlICsc6mWkyfC7sqUKkyjaV0Is12StO4Bxaf?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S229675AbhFDRSg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Jun 2021 13:18:36 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A7D0F613F9;
+        Fri,  4 Jun 2021 17:16:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1622827010;
+        bh=xwMM+2G/mmCpLqX14QgttleAlbZ6mPunUvzw1rIgCFY=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=bARl4IhZVIFB42SHv69WoBjsmdnDpkVNDrAOuTC72KTseADE8m0I8viIsrFpkJqFH
+         eu55Lww2tBSmnjWAwa8ZQ+qj981URrrG6A1NrLW4mIPRtFeDOP2tiIKNTH4WkU4/iR
+         6FerihuNYfudlF66fz/QJDI8jezs1roZ1gHPyi69QZFfikyFYIyVGwFnZvnbJSwXrX
+         zzpbL6b644Dl7gtMAeFSSL7Xl7Z5dO8Q5YHlM7V/n9El8e+ckckVqELGhB2HX2/KLY
+         I8TBeX0VEaq/hy5ZTfnNlP1Bcl2Z9bhaYhTN+5RYdszw2qaWRPvB++gDDksbb8d6X7
+         4NYltEWJ7mvcQ==
+Subject: Re: [RFCv2 13/13] KVM: unmap guest memory using poisoned pages
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jim Mattson <jmattson@google.com>,
+        David Rientjes <rientjes@google.com>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Steve Rutherford <srutherford@google.com>,
+        Peter Gonda <pgonda@google.com>,
+        David Hildenbrand <david@redhat.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+References: <20210416154106.23721-14-kirill.shutemov@linux.intel.com>
+ <YHnJtvXdrZE+AfM3@google.com>
+ <20210419142602.khjbzktk5tk5l6lk@box.shutemov.name>
+ <YH2pam5b837wFM3z@google.com>
+ <20210419164027.dqiptkebhdt5cfmy@box.shutemov.name>
+ <YH3HWeOXFiCTZN4y@google.com> <20210419185354.v3rgandtrel7bzjj@box>
+ <YH3jaf5ThzLZdY4K@google.com>
+ <20210419225755.nsrtjfvfcqscyb6m@box.shutemov.name>
+ <YH8L0ihIzL6UB6qD@google.com> <20210521123148.a3t4uh4iezm6ax47@box>
+From:   Andy Lutomirski <luto@kernel.org>
+Message-ID: <b367e721-d613-c171-20e7-fe9ea096e411@kernel.org>
+Date:   Fri, 4 Jun 2021 10:16:49 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3115.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 226bf24b-6d9a-4de1-b07f-08d9277c0da9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jun 2021 17:13:20.6929
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: av8R80OUKSpkDExwbQB4HakpEycDgH3/bfuSR9A5qMFpqQ/9Rme4Ps6r5mvYtnryD6N4WRDTp/hNVflHgwU6lQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4658
-X-OriginatorOrg: intel.com
+In-Reply-To: <20210521123148.a3t4uh4iezm6ax47@box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T2ssIGdldCBpdCBub3cuIFNlbmQgeW91IHRoZSBzZWNvbmQgdmVyc2lvbiBzb29uLg0KDQpUaGFu
-a3MNCiAgICAtLVN1biwgWWkNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9t
-OiBOYWRhdiBBbWl0IDxuYWRhdi5hbWl0QGdtYWlsLmNvbT4NCj4gU2VudDogU2F0dXJkYXksIEp1
-bmUgNSwgMjAyMSAwMTowOQ0KPiBUbzogU3VuLCBZaSA8eWkuc3VuQGludGVsLmNvbT4NCj4gQ2M6
-IGt2bUB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IFtrdm0tdW5pdC10ZXN0cyBQQVRD
-SCAyLzJdIHg4NjogQ3JlYXRlIElTTyBpbWFnZXMgYWNjb3JkaW5nIHRvDQo+IHVuaXR0ZXN0cy5j
-ZmcNCj4gDQo+IA0KPiANCj4gPiBPbiBKdW4gNCwgMjAyMSwgYXQgNTozMiBBTSwgU3VuLCBZaSA8
-eWkuc3VuQGludGVsLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiBIaSBOYWRhdiwNCj4gPg0KPiA+IExl
-dCBtZSBjb25maXJtIGlmICBJIGdvdCB3aGF0IHlvdSBtZWFudC4gRG8geW91IHdhbnQgdGhlIGdy
-dWIgZW50cnkgbG9vaw0KPiBsaWtlIGZvbGxvd2luZz8NCj4gPiBUYWtlIGNhc2UgbWVtb3J5IGFz
-IGFuIGV4YW1wbGU6DQo+ID4gQWRkIG1vZHVsZSBjb21tYW5kIGxpbmUgdGFraW5nICcvYm9vdC9t
-b2R1bGUnIGFzIGl0cyBwYXJhbWV0ZXIsDQo+IG1lYW53aGlsZSBwYWNrYWdlIHRoZSBmaWxlICdt
-b2R1bGUnIGluIHRoZSBmb2xkZXI/DQo+ID4NCj4gPiBtZW51ZW50cnkgIm1lbW9yeS5lbGYiIHsN
-Cj4gPiAgICBtdWx0aWJvb3QgL2Jvb3QvbWVtb3J5LmVsZiAgdHNjZGVhZGxpbmVfaW1tZWQNCj4g
-PiAgICBtb2R1bGUgICAvYm9vdC9tb2R1bGUgICAgIyBBZGQgb25lIGxpbmUgbGlrZSB0aGlzID8N
-Cj4gPiB9DQo+IA0KPiBZZXMuIFRoZSBlbnRyeSBzaG91bGQgbG9vayBleGFjdGx5IGxpa2UgdGhh
-dC4NCj4gDQo+IEp1c3QgdG8gbWFrZSBzdXJlIHdlIGFyZSBvbiB0aGUgc2FtZSBwYWdlLCB0aGUg
-4oCcbW9kdWxl4oCdIHNob3VsZCBiZQ0KPiBwcm92aWRlZCBhcyBhIHNlY29uZCBwYXJhbWV0ZXIg
-Zm9yIHRoZSBzY3JpcHQuIFRoZSBhZGRpdGlvbmFsIOKAnG1vZHVsZeKAnSBlbnRyeQ0KPiBzaG91
-bGQgb25seSBiZSBhZGRlZCBpZiBhIHNlY29uZCBwYXJhbWV0ZXIgaXMgcHJvdmlkZWQuDQo+IA0K
-PiBUaGFua3MsDQo+IE5hZGF2DQo=
+On 5/21/21 5:31 AM, Kirill A. Shutemov wrote:
+> Hi Sean,
+> 
+> The core patch of the approach we've discussed before is below. It
+> introduce a new page type with the required semantics.
+> 
+> The full patchset can be found here:
+> 
+>  git://git.kernel.org/pub/scm/linux/kernel/git/kas/linux.git kvm-unmapped-guest-only
+> 
+> but only the patch below is relevant for TDX. QEMU patch is attached.
+> 
+> CONFIG_HAVE_KVM_PROTECTED_MEMORY has to be changed to what is appropriate
+> for TDX and FOLL_GUEST has to be used in hva_to_pfn_slow() when running
+> TDX guest.
+> 
+> When page get inserted into private sept we must make sure it is
+> PageGuest() or SIGBUS otherwise. Inserting PageGuest() into shared is
+> fine, but the page will not be accessible from userspace.
+
+I may have missed a detail, and I think Sean almost said this, but:
+
+I don't think that a single bit like this is sufficient.  A KVM host can
+contain more than one TDX guest, and, to reliably avoid machine checks,
+I think we need to make sure that secure pages are only ever mapped into
+the guest to which they belong, as well as to the right GPA.  If a KVM
+user host process creates a PageGuest page, what stops it from being
+mapped into two different guests?  The refcount?
+
+After contemplating this a bit, I have a somewhat different suggestion,
+at least for TDX.  In TDX, a guest logically has two entirely separate
+physical address spaces: the secure address space and the shared address
+space.  They are managed separately, they have different contents, etc.
+Normally one would expect a given numerical address (with the secure
+selector bit masked off) to only exist in one of the two spaces, but
+nothing in the architecture fundamentally requires this.  And switching
+a page between the secure and shared states is a heavyweight operation.
+
+So what if KVM actually treated them completely separately?  The secure
+address space doesn't have any of the complex properties that the shared
+address space has.  There are no paravirt pages there, no KSM pages
+there, no forked pages there, no MAP_ANONYMOUS pages there, no MMIO
+pages there, etc.  There could be a KVM API to allocate and deallocate a
+secure page, and that would be it.
+
+This could be inefficient if a guest does a bunch of MapGPA calls and
+makes the shared address space highly sparse.  That could potentially be
+mitigated by allowing a (shared) user memory region to come with a
+bitmap of which pages are actually mapped.  Pages in the unmapped areas
+are holes, and KVM won't look through to the QEMU page tables.
+
+Does this make any sense?  It would completely eliminate all this
+PageGuest stuff -- a secure page would be backed by a *kernel*
+allocation (potentially a pageable allocation a la tmpfs if TDX ever
+learns how to swap, but that's no currently possible nor would it be
+user visible), so the kernel can straightforwardly guarantee that user
+pagetables will not contain references to secure pages and that GUP will
+not be called on them.
+
+I'm not sure how this would map to SEV.  Certainly, with some degree of
+host vs guest cooperation, SEV could work the same way, and the
+migration support is pushing SEV in that direction.
