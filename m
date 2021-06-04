@@ -2,124 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2659A39BC5C
-	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 17:57:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 40CB339BC6C
+	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 17:59:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230105AbhFDP7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Jun 2021 11:59:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46216 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231347AbhFDP7L (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 4 Jun 2021 11:59:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1622822244;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4VeXpVaVm3Sgm4ExODkCf4+TTdsJEk4SxRvRR3xCWPQ=;
-        b=UYQ9C9jupD4UXP/KA1trOe4ynHhNVxkTynCMl+wIZmtmhKGG1N8jWSdPU5cJY/EYWaf/IY
-        lAvL4kv0922yMaKRo9PeIjiK5EkCTdvFbCcazo3sPgS7lXKbsfFsOxC3LKJhRC+Qz12F/T
-        xsESKvHOR21vSu7LshFh9csRDCv+tU8=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-597-Wa7DuwAANhOO0TqOvZMxxw-1; Fri, 04 Jun 2021 11:57:23 -0400
-X-MC-Unique: Wa7DuwAANhOO0TqOvZMxxw-1
-Received: by mail-ej1-f71.google.com with SMTP id eb10-20020a170907280ab02903d65bd14481so3569677ejc.21
-        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 08:57:23 -0700 (PDT)
+        id S230361AbhFDQBV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Jun 2021 12:01:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39330 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229809AbhFDQBV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Jun 2021 12:01:21 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6E95C061766
+        for <kvm@vger.kernel.org>; Fri,  4 Jun 2021 08:59:34 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id e11so12165876ljn.13
+        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 08:59:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=r5ECTwCt3X6K4WKVYIKXRgYYaU+9MK7ZbJf7rcjA4iE=;
+        b=HifdVuTQnhR4+K80b68InFXLYze8Xu/FLGPgzoOlov/poDI9RGW3f0NtS2mRiM640q
+         3m6hg0mrebX83/d49puBNJv+Zzd90qPogr212hDxehGRWMzXu2A7M7XGqYwqmfrQs4Vf
+         yM4bDnf6Th9uPG+j3xC8f4UKuWuHI7Q/CYIFr4lq1ZNfKjpidx3/ZbLwBLZYTP+0byoZ
+         7K3YTifcfDoNdH6jzFNczQEf3UVKjrdcMLVVrIV88IXfjpxGUrZJ/vwBc27jk/T2Xdmt
+         /zPgNR8KwCqu00YVx6cy9hEI2CT4Nb5fpLV0nv83Dvl4dGxAyRY4eEp8KeUw4zMcw6i8
+         7yNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=4VeXpVaVm3Sgm4ExODkCf4+TTdsJEk4SxRvRR3xCWPQ=;
-        b=N55VHCcC9OAqDf5PZCIPwbnnhsXBz0BdEcCmuOk0Nm3vGfg79i60Xnna1ZtqHXps4l
-         iYC8R87mGkfohf5IsyMZWepJXQpQULKmWusGfcC6Vt/vCA4dk5iVEmEbSdf33hC/7o3+
-         m7cBkv8rlJ9zC2pPff3bUXzLjF2ddnqStCY4LWgBpPUsgyFjbvFtQZgHTQwc+xHJytyw
-         6KO0ff9FXTTx/Q7Fa2xY1EL3JF0cwou2WCXTcRD73cMUBZN0S9b32MeBjQkneV8oAn1G
-         c+YI2YLQ133Yb04YOzX5OWa6z5frKm9FGD3v2Exzg21PRKvJ4JjhK8IgXQ2ENbnH6ZXq
-         Xy+g==
-X-Gm-Message-State: AOAM532AqpDk6OUGsoqa1vsg3w4Mje2ZIijumQXfU3KbzOVqVYbKx9pQ
-        I/jmzHnP1fPm25mpJ3eC43+VA9wDlkj6V28EAeRlxU0dVKY7KjKjfuwYhdJqcvOhFMysIyXb+O5
-        y8J/d1EHDN0FU
-X-Received: by 2002:a17:907:1b11:: with SMTP id mp17mr4825433ejc.1.1622822242028;
-        Fri, 04 Jun 2021 08:57:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxPRjcRc6XoOVz7KqxGJ8Jr4Ru7H/KBEWYfYYsX/zRmiAg3G+v0VaBWdVmTVXEoxLZyb0lcDw==
-X-Received: by 2002:a17:907:1b11:: with SMTP id mp17mr4825416ejc.1.1622822241873;
-        Fri, 04 Jun 2021 08:57:21 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id p13sm2917846ejr.87.2021.06.04.08.57.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Jun 2021 08:57:21 -0700 (PDT)
-Subject: Re: [RFC] /dev/ioasid uAPI proposal
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Robin Murphy <robin.murphy@arm.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jason Wang <jasowang@redhat.com>
-References: <20210602224536.GJ1002214@nvidia.com>
- <20210602205054.3505c9c3.alex.williamson@redhat.com>
- <20210603123401.GT1002214@nvidia.com>
- <20210603140146.5ce4f08a.alex.williamson@redhat.com>
- <20210603201018.GF1002214@nvidia.com>
- <20210603154407.6fe33880.alex.williamson@redhat.com>
- <MWHPR11MB1886469C0136C6523AB158B68C3B9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210604122830.GK1002214@nvidia.com>
- <20210604092620.16aaf5db.alex.williamson@redhat.com>
- <815fd392-0870-f410-cbac-859070df1b83@redhat.com>
- <20210604155016.GR1002214@nvidia.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <30e5c597-b31c-56de-c75e-950c91947d8f@redhat.com>
-Date:   Fri, 4 Jun 2021 17:57:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=r5ECTwCt3X6K4WKVYIKXRgYYaU+9MK7ZbJf7rcjA4iE=;
+        b=pvEMcOyeiEqnydtVGhEOxNt5g2+nMkQ6FrFp57s+F9FEI446xVxthCFtOJudoCuEqL
+         pMnF/ie8wMbRQeeIRyU7G4dVoUIenFnZFS/1x5bMZuowe4pVKSZcDR7RdeW00EP6XXfY
+         pb9hOfNg49lt4vbZGldASNzKpCCEDhIipysRkrlP+VPXuy0Zx4UREVDfI2vNsvCF7XoU
+         4AIaFuWTY2UC7EDZel0MgNQPILmNekqR0tjgeuoiGJgbKJj3vWw05SGM0kPs4BTmsyKT
+         Ko7uVB8Dy9BkD1Q4H37F55ZV+I+gsTDDxf6X3FwUt4K3qGp8vMFETnQosABvCt4yeEio
+         Z6BQ==
+X-Gm-Message-State: AOAM533qeA/XHdoFPpEEJeKs/hOet0+iqBVHtHvnKEN4Eq4PTlRRU+bc
+        cFfCKmsJdjRa6qimA09TB+/jFAPjg0JR0AAVu/ZcVx8DVNeayQ==
+X-Google-Smtp-Source: ABdhPJxZRTQjjun0mX2hIiYgdxaWogxrDk5FFPDWCFH0EbYYSXBYPWgC70xlfG/bYz+n7/Dle+sdvu65fdkchFecl9c=
+X-Received: by 2002:a2e:bc06:: with SMTP id b6mr3980338ljf.342.1622822372908;
+ Fri, 04 Jun 2021 08:59:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210604155016.GR1002214@nvidia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <1622710841-76604-1-git-send-email-wanpengli@tencent.com>
+ <CALzav=e9pbkk0=Yz9s1b+53MEy7yuo_otoFM75fNeoJGCQjqCg@mail.gmail.com> <CANRm+CzNeGzJyisK659h1kdgcQQ+Y7OwW+tiXPnZ9gmiGB1qUA@mail.gmail.com>
+In-Reply-To: <CANRm+CzNeGzJyisK659h1kdgcQQ+Y7OwW+tiXPnZ9gmiGB1qUA@mail.gmail.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Fri, 4 Jun 2021 08:59:06 -0700
+Message-ID: <CALzav=fiTnr3ms7+P16YgmY9mtWFWwuBF_4SMXPVMZwizz_4OA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: LAPIC: write 0 to TMICT should also cancel
+ vmx-preemption timer
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/06/21 17:50, Jason Gunthorpe wrote:
->> Extending the scenarios where WBINVD is not a nop is not a problem for me.
->> If possible I wouldn't mind keeping the existing kvm-vfio connection via the
->> device, if only because then the decision remains in the VFIO camp (whose
->> judgment I trust more than mine on this kind of issue).
-> Really the question to answer is what "security proof" do you want
-> before the wbinvd can be enabled
+On Thu, Jun 3, 2021 at 5:33 PM Wanpeng Li <kernellwp@gmail.com> wrote:
+>
+> On Fri, 4 Jun 2021 at 07:02, David Matlack <dmatlack@google.com> wrote:
+> >
+> > On Thu, Jun 3, 2021 at 2:04 AM Wanpeng Li <kernellwp@gmail.com> wrote:
+> > >
+> > > From: Wanpeng Li <wanpengli@tencent.com>
+> > >
+> > > According to the SDM 10.5.4.1:
+> > >
+> > >   A write of 0 to the initial-count register effectively stops the local
+> > >   APIC timer, in both one-shot and periodic mode.
+> >
+> > If KVM is not correctly emulating this behavior then could you also
+> > add a kvm-unit-test to test for the correct behavior?
+>
+> A simple test here, the test will hang after the patch since it will
+> not receive the spurious interrupt any more.
 
-I don't want a security proof myself; I want to trust VFIO to make the 
-right judgment and I'm happy to defer to it (via the KVM-VFIO device).
-
-Given how KVM is just a device driver inside Linux, VMs should be a 
-slightly more roundabout way to do stuff that is accessible to bare 
-metal; not a way to gain extra privilege.
-
-Paolo
-
->   1) User has access to a device that can issue no-snoop TLPS
->   2) User has access to an IOMMU that can not block no-snoop (today)
->   3) Require CAP_SYS_RAW_IO
->   4) Anyone
-> 
-> #1 is an improvement because it allows userspace to enable wbinvd and
-> no-snoop optimizations based on user choice
-> 
-> #2 is where we are today and wbinvd effectively becomes a fixed
-> platform choice. Userspace has no say
-> 
-> #3 is "there is a problem, but not so serious, root is powerful
->     enough to override"
-
+Thanks. Can you send this as a [PATCH]? I think it would be worthwhile
+so have a regression test for this bug.
+>
+> diff --git a/x86/apic.c b/x86/apic.c
+> index a7681fe..947d018 100644
+> --- a/x86/apic.c
+> +++ b/x86/apic.c
+> @@ -488,6 +488,14 @@ static void test_apic_timer_one_shot(void)
+>       */
+>      report((lvtt_counter == 1) && (tsc2 - tsc1 >= interval),
+>             "APIC LVT timer one shot");
+> +
+> +    lvtt_counter = 0;
+> +    apic_write(APIC_TMICT, interval);
+> +    apic_write(APIC_TMICT, 0);
+> +    while (!lvtt_counter);
+> +
+> +    report((lvtt_counter == 1),
+> +          "APIC LVT timer one shot spurious interrupt");
+>  }
