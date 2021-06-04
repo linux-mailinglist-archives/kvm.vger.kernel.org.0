@@ -2,291 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 355BE39BF49
-	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 20:03:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4EB139BF44
+	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 20:03:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231164AbhFDSFS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Jun 2021 14:05:18 -0400
-Received: from mx13.kaspersky-labs.com ([91.103.66.164]:20617 "EHLO
-        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229823AbhFDSFR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Jun 2021 14:05:17 -0400
-Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay13.kaspersky-labs.com (Postfix) with ESMTP id 7EA20520D20;
-        Fri,  4 Jun 2021 21:03:28 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail202102; t=1622829808;
-        bh=LS3nmf5kkonilBHXcYQKchvFm7Dwc3WtjhdxFzsooQM=;
-        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
-        b=ZNwmAehaTFmXwFCxQ7Md5UBcLH6M+PfHZh1Ba0b6/w463tdZiJmqk4+qO1dxKWfAS
-         ysTlzc3gjAtlSw8VdifeY6y+Qlznq0dX/PYBuJdUGB1MNkcQr+jdNGWxK2021urLo0
-         dINC1eSMd5fkI7PZYCbIhwCXHmwSc7xmfIcmGaJOQSFYZk/kDqbAUNigQ60jGZEaCY
-         gb/+mn7WT50V5+pZ03ap0DqOx9EBkA3dLchM/2zgZ/q/97MUTQe+u71FE3duFIzu+R
-         DsVwsaqKVu+z4P5Zg712a1ZCL7pPt02t7pOQRXR8EGY/kZs3O/3B5HHOUMH0b8U8Nk
-         iAc4L6VBW39Hw==
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id B53CD520D1E;
-        Fri,  4 Jun 2021 21:03:27 +0300 (MSK)
-Received: from [10.16.171.77] (10.64.68.129) by hqmailmbx3.avp.ru
- (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.14; Fri, 4
- Jun 2021 21:03:27 +0300
-Subject: Re: [PATCH v10 11/18] virtio/vsock: dequeue callback for
- SOCK_SEQPACKET
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
+        id S230414AbhFDSEx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Jun 2021 14:04:53 -0400
+Received: from mga02.intel.com ([134.134.136.20]:34015 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230254AbhFDSEx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Jun 2021 14:04:53 -0400
+IronPort-SDR: JUBX1t0ImtMmd05/sxkSjR7aBdOVVZz855pq8Dw/hLZJhCcjDIENNPkZJkQeI1hU8e6L/l24pc
+ nj0rAlJ/ogeA==
+X-IronPort-AV: E=McAfee;i="6200,9189,10005"; a="191450655"
+X-IronPort-AV: E=Sophos;i="5.83,248,1616482800"; 
+   d="scan'208";a="191450655"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2021 11:03:06 -0700
+IronPort-SDR: BdAVPp7uqcrplg6o63MK5a9r3KtzhxadSqzeiSmXahtASlrILQNHhYH7dc8lWoYEFI10n+IoI8
+ cbpPKxXHH9zg==
+X-IronPort-AV: E=Sophos;i="5.83,248,1616482800"; 
+   d="scan'208";a="439267249"
+Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.7.199.155])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2021 11:03:06 -0700
+Date:   Fri, 4 Jun 2021 11:05:44 -0700
+From:   Jacob Pan <jacob.jun.pan@linux.intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        Shenming Lu <lushenming@huawei.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
-References: <20210520191357.1270473-1-arseny.krasnov@kaspersky.com>
- <20210520191801.1272027-1-arseny.krasnov@kaspersky.com>
- <20210603144513.ryjzauq7abnjogu3@steredhat>
- <6b833ccf-ea93-db6a-4743-463ac1cfe817@kaspersky.com>
- <20210604150324.winiikx5h3p6gsyy@steredhat>
-From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Message-ID: <a81ae3cb-439f-7621-4ae6-bccd2c25b7e4@kaspersky.com>
-Date:   Fri, 4 Jun 2021 21:03:26 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        "Alex Williamson (alex.williamson@redhat.com)" 
+        <alex.williamson@redhat.com>, Eric Auger <eric.auger@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>,
+        jacob.jun.pan@linux.intel.com
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+Message-ID: <20210604110544.31e6d255@jacob-builder>
+In-Reply-To: <20210604162200.GA415775@nvidia.com>
+References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
+        <c9c066ae-2a25-0799-51a7-0ca47fff41a1@huawei.com>
+        <aa1624bf-e472-2b66-1d20-54ca23c19fd2@linux.intel.com>
+        <ed4f6e57-4847-3ed2-75de-cea80b2fbdb8@huawei.com>
+        <01fe5034-42c8-6923-32f1-e287cc36bccc@linux.intel.com>
+        <20210601173323.GN1002214@nvidia.com>
+        <23a482f9-b88a-da98-3800-f3fd9ea85fbd@huawei.com>
+        <20210603111914.653c4f61@jacob-builder>
+        <1175ebd5-9d8e-2000-6d05-baa93e960915@redhat.com>
+        <20210604092243.245bd0f4@jacob-builder>
+        <20210604162200.GA415775@nvidia.com>
+Organization: OTC
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20210604150324.winiikx5h3p6gsyy@steredhat>
-Content-Type: text/plain; charset="windows-1252"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.64.68.129]
-X-ClientProxiedBy: hqmailmbx3.avp.ru (10.64.67.243) To hqmailmbx3.avp.ru
- (10.64.67.243)
-X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 06/04/2021 17:51:02
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 164135 [Jun 04 2021]
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
-X-KSE-AntiSpam-Info: LuaCore: 448 448 71fb1b37213ce9a885768d4012c46ac449c77b17
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: kaspersky.com:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 06/04/2021 17:53:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 04.06.2021 14:19:00
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KLMS-Rule-ID: 52
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2021/06/04 17:28:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/06/04 14:19:00 #16700241
-X-KLMS-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Jason,
 
-On 04.06.2021 18:03, Stefano Garzarella wrote:
-> On Fri, Jun 04, 2021 at 04:12:23PM +0300, Arseny Krasnov wrote:
->> On 03.06.2021 17:45, Stefano Garzarella wrote:
->>> On Thu, May 20, 2021 at 10:17:58PM +0300, Arseny Krasnov wrote:
->>>> Callback fetches RW packets from rx queue of socket until whole record
->>>> is copied(if user's buffer is full, user is not woken up). This is done
->>>> to not stall sender, because if we wake up user and it leaves syscall,
->>>> nobody will send credit update for rest of record, and sender will wait
->>>> for next enter of read syscall at receiver's side. So if user buffer is
->>>> full, we just send credit update and drop data.
->>>>
->>>> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->>>> ---
->>>> v9 -> v10:
->>>> 1) Number of dequeued bytes incremented even in case when
->>>>    user's buffer is full.
->>>> 2) Use 'msg_data_left()' instead of direct access to 'msg_hdr'.
->>>> 3) Rename variable 'err' to 'dequeued_len', in case of error
->>>>    it has negative value.
->>>>
->>>> include/linux/virtio_vsock.h            |  5 ++
->>>> net/vmw_vsock/virtio_transport_common.c | 65 +++++++++++++++++++++++++
->>>> 2 files changed, 70 insertions(+)
->>>>
->>>> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
->>>> index dc636b727179..02acf6e9ae04 100644
->>>> --- a/include/linux/virtio_vsock.h
->>>> +++ b/include/linux/virtio_vsock.h
->>>> @@ -80,6 +80,11 @@ virtio_transport_dgram_dequeue(struct vsock_sock *vsk,
->>>> 			       struct msghdr *msg,
->>>> 			       size_t len, int flags);
->>>>
->>>> +ssize_t
->>>> +virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
->>>> +				   struct msghdr *msg,
->>>> +				   int flags,
->>>> +				   bool *msg_ready);
->>>> s64 virtio_transport_stream_has_data(struct vsock_sock *vsk);
->>>> s64 virtio_transport_stream_has_space(struct vsock_sock *vsk);
->>>>
->>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->>>> index ad0d34d41444..61349b2ea7fe 100644
->>>> --- a/net/vmw_vsock/virtio_transport_common.c
->>>> +++ b/net/vmw_vsock/virtio_transport_common.c
->>>> @@ -393,6 +393,59 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
->>>> 	return err;
->>>> }
->>>>
->>>> +static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
->>>> +						 struct msghdr *msg,
->>>> +						 int flags,
->>>> +						 bool *msg_ready)
->>>> +{
->>>> +	struct virtio_vsock_sock *vvs = vsk->trans;
->>>> +	struct virtio_vsock_pkt *pkt;
->>>> +	int dequeued_len = 0;
->>>> +	size_t user_buf_len = msg_data_left(msg);
->>>> +
->>>> +	*msg_ready = false;
->>>> +	spin_lock_bh(&vvs->rx_lock);
->>>> +
->>>> +	while (!*msg_ready && !list_empty(&vvs->rx_queue) && dequeued_len >= 0) {
->>> I'
->>>
->>>> +		size_t bytes_to_copy;
->>>> +		size_t pkt_len;
->>>> +
->>>> +		pkt = list_first_entry(&vvs->rx_queue, struct virtio_vsock_pkt, list);
->>>> +		pkt_len = (size_t)le32_to_cpu(pkt->hdr.len);
->>>> +		bytes_to_copy = min(user_buf_len, pkt_len);
->>>> +
->>>> +		if (bytes_to_copy) {
->>>> +			/* sk_lock is held by caller so no one else can dequeue.
->>>> +			 * Unlock rx_lock since memcpy_to_msg() may sleep.
->>>> +			 */
->>>> +			spin_unlock_bh(&vvs->rx_lock);
->>>> +
->>>> +			if (memcpy_to_msg(msg, pkt->buf, bytes_to_copy))
->>>> +				dequeued_len = -EINVAL;
->>> I think here is better to return the error returned by memcpy_to_msg(),
->>> as we do in the other place where we use memcpy_to_msg().
->>>
->>> I mean something like this:
->>> 			err = memcpy_to_msgmsg, pkt->buf, bytes_to_copy);
->>> 			if (err)
->>> 				dequeued_len = err;
->> Ack
->>>> +			else
->>>> +				user_buf_len -= bytes_to_copy;
->>>> +
->>>> +			spin_lock_bh(&vvs->rx_lock);
->>>> +		}
->>>> +
->>> Maybe here we can simply break the cycle if we have an error:
->>> 		if (dequeued_len < 0)
->>> 			break;
->>>
->>> Or we can refactor a bit, simplifying the while() condition and also the
->>> code in this way (not tested):
->>>
->>> 	while (!*msg_ready && !list_empty(&vvs->rx_queue)) {
->>> 		...
->>>
->>> 		if (bytes_to_copy) {
->>> 			int err;
->>>
->>> 			/* ...
->>> 			*/
->>> 			spin_unlock_bh(&vvs->rx_lock);
->>> 			err = memcpy_to_msgmsg, pkt->buf, bytes_to_copy);
->>> 			if (err) {
->>> 				dequeued_len = err;
->>> 				goto out;
->>> 			}
->>> 			spin_lock_bh(&vvs->rx_lock);
->>>
->>> 			user_buf_len -= bytes_to_copy;
->>> 		}
->>>
->>> 		dequeued_len += pkt_len;
->>>
->>> 		if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOR)
->>> 			*msg_ready = true;
->>>
->>> 		virtio_transport_dec_rx_pkt(vvs, pkt);
->>> 		list_del(&pkt->list);
->>> 		virtio_transport_free_pkt(pkt);
->>> 	}
->>>
->>> out:
->>> 	spin_unlock_bh(&vvs->rx_lock);
->>>
->>> 	virtio_transport_send_credit_update(vsk);
->>>
->>> 	return dequeued_len;
->>> }
->> I think we can't do 'goto out' or break, because in case of error, we still need
->> to free packet.
-> Didn't we have code that remove packets from a previous message?
-> I don't see it anymore.
->
-> For example if we have 10 packets queued for a message (the 10th packet 
-> has the EOR flag) and the memcpy_to_msg() fails on the 2nd packet, with 
-> you proposal we are freeing only the first 2 packets, the rest is there 
-> and should be freed when reading the next message, but I don't see that 
-> code.
->
-> The same can happen if the recvmsg syscall is interrupted. In that case 
-> we report that nothing was copied, but we freed the first N packets, so 
-> they are lost but the other packets are still in the queue.
->
-> Please check also the patch where we implemented 
-> __vsock_seqpacket_recvmsg().
->
-> I thinks we should free packets only when we are sure we copied them to 
-> the user space.
+On Fri, 4 Jun 2021 13:22:00 -0300, Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Hm, yes, this is problem. To solve it i can restore previous approach
+> > 
+> > Yes, in that case we should support both. Give the device driver a
+> > chance to handle the IOPF if it can.  
+> 
+> Huh?
+> 
+> The device driver does not "handle the IOPF" the device driver might
+> inject the IOPF.
+You are right, I got confused with the native case where device drivers can
+handle the fault, or do something about it.
 
-with seqbegin/seqend. In that case i can detect unfinished record and
+Thanks,
 
-drop it's packets. Seems seqbegin will be a bit like VIRTIO_VSOCK_SEQ_EOR in flags
-
-field of header(e.g. VIRTIO_VSOCK_SEQ_BEGIN). Message id and length are unneeded,
-
-as channel considedered lossless. What do You think?
-
-
-Thank You
-
->
->> It is possible to do something like this:
->>
->> 		virtio_transport_dec_rx_pkt(vvs, pkt);
->> 		list_del(&pkt->list);
->> 		virtio_transport_free_pkt(pkt);
->>
->> 		if (dequeued_len < 0)
->> 			break;
->>
->>>
->
+Jacob
