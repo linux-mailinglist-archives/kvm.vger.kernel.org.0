@@ -2,88 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCF4D39C2A4
-	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 23:40:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9593839C2CC
+	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 23:45:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231522AbhFDVmD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Jun 2021 17:42:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58028 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230424AbhFDVl7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Jun 2021 17:41:59 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6738C061767
-        for <kvm@vger.kernel.org>; Fri,  4 Jun 2021 14:40:12 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id u18so8365235pfk.11
-        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 14:40:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Apz9kADdS6tO9dIKRnFDk6v5kyO/H66ieysUGAxyWHU=;
-        b=owVZHgOfWuJ+odAefuXoSXdTWiMsc30DXpTmzfwjNRy/J+Z0bRSeXBD0/FmlSa4HtH
-         W3x6+0RdLTtJRjV3mUXAt7TP+z7mWMlkYF2Nv4HTZeLIX2T+ifeoHLB4/zL9FOxL/Plh
-         BK3oq30Gy/V7LLxMEXQGUwxyzffAZnY17Mx+q3y8i5ey2URI3u6TtnoBx73XX/+LHuoU
-         D74aa36AIyWXzSTndHqglW5T4tWTCQhMMjj6AjVwOYkzaCV30h9jHDhPckrQMK0fznZk
-         pDnRSm25nF1le61VWpRb9Pebsv3z86pTazl9Vs8ds8qHFJkSTXXbv2aBhJcJcRMc7xTv
-         AnsA==
+        id S231542AbhFDVrD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Jun 2021 17:47:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50070 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230175AbhFDVrC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 4 Jun 2021 17:47:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622843114;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zSr4NtU9kRyTYI9vJXKuouCcXbXTwJvBiHy5x/6JVcU=;
+        b=LLi9NUx5i5PV0eugR563YdKkRUW8ey6iBXaUXXuO+JES7uyifQCdpKqiI/fmQ52aQTOEFF
+        JLkheET0X8bwIX5gLuKt6iHl5PwuISTp4cZc7jQabOteXMMZUDF3DYPGCPNe4qvOhVGK/z
+        Ao8d0qi8dfyV1v5GDSOC6BS9d/3enBU=
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
+ [209.85.161.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-453-KFl41s1wNKuDPZVTfheG9w-1; Fri, 04 Jun 2021 17:45:13 -0400
+X-MC-Unique: KFl41s1wNKuDPZVTfheG9w-1
+Received: by mail-oo1-f71.google.com with SMTP id m22-20020a0568200356b0290248e4270f00so3641193ooe.14
+        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 14:45:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Apz9kADdS6tO9dIKRnFDk6v5kyO/H66ieysUGAxyWHU=;
-        b=R1jVjY+91uyiEoCZ75ETqlLcAXiUzRCZFhfynyqgq7Bw/v/OWICtgQlcmW3os/zpJ2
-         ITuxFJhOPn+jelMOut7h2oKgLYwWV5WGldVgQAo6MLAKDBnaNx/AwY/pZHB6d95ecL15
-         aFdP9X3GEyHgMT2N+g81MLkIQetoVgPHr7DnYVpl3xtwlQgRPPqciThwE1WzTwckWyFZ
-         YsnQIhLNjNWywv05WFp/qT9yem1xP6VAYIb7sTqEhfoclJ6PH7IMyBStLeQkMbXZ2mKm
-         i4cEnZ4nFEE9TJBDsm/tMz/s1by+KsAjhNZw818v+Ha/EjvfM5GG+UScY68d04crO9gD
-         NWQw==
-X-Gm-Message-State: AOAM533V45AVhB55vW37VH2TR3xyBtSD2zSSpW/+epvRW8CH2LSELuTc
-        CsnLtCoX5R9mNK1xXTYMwoCgWFeNWjvBqQ==
-X-Google-Smtp-Source: ABdhPJz/LsdYhFPkB/Il9Z8Ij1iw0sNIyu7LcJdxvHUcoFG67Qi3mg+g9kqJJm/ctmZtYmPZXlZ3LA==
-X-Received: by 2002:a65:4948:: with SMTP id q8mr6900890pgs.375.1622842812142;
-        Fri, 04 Jun 2021 14:40:12 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id t17sm5097309pji.9.2021.06.04.14.40.11
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=zSr4NtU9kRyTYI9vJXKuouCcXbXTwJvBiHy5x/6JVcU=;
+        b=cEZyOv8P248Ei5VUsUKM0d+UVNa5xV44N37OVev1YjMNFsCTlJDSJMkD89R94wLxUj
+         1/ppO83WFu8Iqm/IUuo+bOu5HI/9BvBfW2BgCkXqe3ly7NypS5uypbCZKsE6SnvJpmmY
+         UG5eAKwaGXB53EBJ6+czZKr1CE4kqWKo6K54qL23++mFR/BFwEqwpztDKwvdi5XDQQdq
+         12v2S/QspxTXKNqUpfVRhGg5vZes9HtrOiLaG6PNLnEtao/NNkh+zSKVlh89Rli1jW2I
+         nstanrcL5yH9Jhejh1sfxo198XfLPTHHNwTRnUEC1al/WUrIELzqQjb1bm2masnJYsB9
+         msYA==
+X-Gm-Message-State: AOAM530qjOR3pg2PNFpOLBd2DOMLAZlbX5yymn1HKzqVcS0NT3Wt8nrE
+        l+B0vc0Q3Gr4cgm2x6Q43Py3xyRanulXodmHf+5qzoIp3X8bMLMoVJ8z1y+ZZKd+cu5r2damHQ9
+        z52E5dtKnhRj2
+X-Received: by 2002:a4a:b544:: with SMTP id s4mr5214641ooo.62.1622843113070;
+        Fri, 04 Jun 2021 14:45:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyXMJF5jgtVADecJNiiiu5bWXOc0GxXvl+uaj344NIz3ZPmM3VepTqHL8yFOEd8Ck092h+X+Q==
+X-Received: by 2002:a4a:b544:: with SMTP id s4mr5214626ooo.62.1622843112930;
+        Fri, 04 Jun 2021 14:45:12 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id l10sm752196ots.32.2021.06.04.14.45.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Jun 2021 14:40:11 -0700 (PDT)
-Date:   Fri, 4 Jun 2021 21:40:07 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Hou Wenlong <houwenlong.hwl@antgroup.com>,
-        Lai Jiangshan <laijs@linux.alibaba.com>
-Subject: Re: [kvm-unit-tests PATCH V2] x86: Add a test to check effective
- permissions
-Message-ID: <YLqdt11W6R4FgoIY@google.com>
-References: <YLkh3bQ106M9nV3k@google.com>
- <20210603225851.26621-1-jiangshanlai@gmail.com>
+        Fri, 04 Jun 2021 14:45:12 -0700 (PDT)
+Date:   Fri, 4 Jun 2021 15:45:11 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Robin Murphy <robin.murphy@arm.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jason Wang <jasowang@redhat.com>
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+Message-ID: <20210604154511.2bcb48dc.alex.williamson@redhat.com>
+In-Reply-To: <20210604121337.GJ1002214@nvidia.com>
+References: <20210602120111.5e5bcf93.alex.williamson@redhat.com>
+        <20210602180925.GH1002214@nvidia.com>
+        <20210602130053.615db578.alex.williamson@redhat.com>
+        <20210602195404.GI1002214@nvidia.com>
+        <20210602143734.72fb4fa4.alex.williamson@redhat.com>
+        <20210602224536.GJ1002214@nvidia.com>
+        <20210602205054.3505c9c3.alex.williamson@redhat.com>
+        <MWHPR11MB1886DC8ECF5D56FE485D13D58C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
+        <20210603124036.GU1002214@nvidia.com>
+        <20210603144136.2b68c5c5.alex.williamson@redhat.com>
+        <20210604121337.GJ1002214@nvidia.com>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210603225851.26621-1-jiangshanlai@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 04, 2021, Lai Jiangshan wrote:
-> @@ -326,6 +335,7 @@ static pt_element_t ac_test_alloc_pt(ac_pool_t *pool)
->  {
->      pt_element_t ret = pool->pt_pool + pool->pt_pool_current;
->      pool->pt_pool_current += PAGE_SIZE;
-> +    memset(va(ret), 0, PAGE_SIZE);
+On Fri, 4 Jun 2021 09:13:37 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Should this go in a separate patch?  This seems like a bug fix.
+> On Thu, Jun 03, 2021 at 02:41:36PM -0600, Alex Williamson wrote:
+> 
+> > Could you clarify "vfio_driver"?    
+> 
+> This is the thing providing the vfio_device_ops function pointers.
+> 
+> So vfio-pci can't know anything about this (although your no-snoop
+> control probing idea makes sense to me)
+> 
+> But vfio_mlx5_pci can know
+> 
+> So can mdev_idxd
+> 
+> And kvmgt
 
->      return ret;
->  }
->  
-> +static int check_effective_sp_permissions(ac_pool_t *pool)
-> +{
-> +	unsigned long ptr1 = 0x123480000000;
-> +	unsigned long ptr2 = ptr1 + 2 * 1024 * 1024;
-> +	unsigned long ptr3 = ptr1 + 1 * 1024 * 1024 * 1024;
-> +	unsigned long ptr4 = ptr3 + 2 * 1024 * 1024;
+A capability on VFIO_DEVICE_GET_INFO could provide a hint to userspace.
+Stock vfio-pci could fill it out to the extent advertising if the
+device is capable of non-coherent DMA based on the Enable No-snoop
+probing, the device specific vfio_drivers could set it based on
+knowledge of the device behavior.  Another bit might indicate a
+preference to not suppress non-coherent DMA at the IOMMU.  Thanks,
 
-I belatedly remembered we have SZ_2M and SZ_1G, I think we can use those here
-instead of open coding the math.
+Alex
+
