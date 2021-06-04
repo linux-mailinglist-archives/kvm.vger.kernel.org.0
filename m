@@ -2,91 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A4EB139BF44
-	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 20:03:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54F6539BF75
+	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 20:18:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230414AbhFDSEx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Jun 2021 14:04:53 -0400
-Received: from mga02.intel.com ([134.134.136.20]:34015 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230254AbhFDSEx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Jun 2021 14:04:53 -0400
-IronPort-SDR: JUBX1t0ImtMmd05/sxkSjR7aBdOVVZz855pq8Dw/hLZJhCcjDIENNPkZJkQeI1hU8e6L/l24pc
- nj0rAlJ/ogeA==
-X-IronPort-AV: E=McAfee;i="6200,9189,10005"; a="191450655"
-X-IronPort-AV: E=Sophos;i="5.83,248,1616482800"; 
-   d="scan'208";a="191450655"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2021 11:03:06 -0700
-IronPort-SDR: BdAVPp7uqcrplg6o63MK5a9r3KtzhxadSqzeiSmXahtASlrILQNHhYH7dc8lWoYEFI10n+IoI8
- cbpPKxXHH9zg==
-X-IronPort-AV: E=Sophos;i="5.83,248,1616482800"; 
-   d="scan'208";a="439267249"
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.7.199.155])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2021 11:03:06 -0700
-Date:   Fri, 4 Jun 2021 11:05:44 -0700
-From:   Jacob Pan <jacob.jun.pan@linux.intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Shenming Lu <lushenming@huawei.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Alex Williamson (alex.williamson@redhat.com)" 
-        <alex.williamson@redhat.com>, Eric Auger <eric.auger@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>,
-        jacob.jun.pan@linux.intel.com
-Subject: Re: [RFC] /dev/ioasid uAPI proposal
-Message-ID: <20210604110544.31e6d255@jacob-builder>
-In-Reply-To: <20210604162200.GA415775@nvidia.com>
-References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
-        <c9c066ae-2a25-0799-51a7-0ca47fff41a1@huawei.com>
-        <aa1624bf-e472-2b66-1d20-54ca23c19fd2@linux.intel.com>
-        <ed4f6e57-4847-3ed2-75de-cea80b2fbdb8@huawei.com>
-        <01fe5034-42c8-6923-32f1-e287cc36bccc@linux.intel.com>
-        <20210601173323.GN1002214@nvidia.com>
-        <23a482f9-b88a-da98-3800-f3fd9ea85fbd@huawei.com>
-        <20210603111914.653c4f61@jacob-builder>
-        <1175ebd5-9d8e-2000-6d05-baa93e960915@redhat.com>
-        <20210604092243.245bd0f4@jacob-builder>
-        <20210604162200.GA415775@nvidia.com>
-Organization: OTC
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S229995AbhFDSUg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Jun 2021 14:20:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41898 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229823AbhFDSUg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Jun 2021 14:20:36 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3CF4C061766
+        for <kvm@vger.kernel.org>; Fri,  4 Jun 2021 11:18:39 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id 15-20020a17090a0f0fb029016ad0f32fd0so5337231pjy.6
+        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 11:18:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=OURJ6TzGdfX+C5aElOfrvLYLXIEwqt+64W7DY078FOs=;
+        b=DoohwkvXjAFEjB702S1RR85vweNK+i/nJ9ySyGXZL7k7ooN4RLk2j6KK0JpK4KBp0W
+         BUCiT5U1dWIDDUHEwVM7l41dmz4VGvpZC68yGABSBExHHEVCcyStRIbAUKmecH0d3lw0
+         WAeJhuBJ4/auMLn3lWtehD0nD9R4kYgREzE0Un51yljJ0Kkkn40uZeXLGZHBrDMZFbku
+         B4nAxYWuyr1KCo72Kw/gia2f9dqgfXPC3SsCi2vYLkGHhOf+aK2m8i9J8dOwiGL36dXM
+         NUkgGWEj9O1cTJKdJc7xeWZ9KBsejArXk3bHK3N01RJcAJDiym53uZ99msNDGxs+7R97
+         YEMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=OURJ6TzGdfX+C5aElOfrvLYLXIEwqt+64W7DY078FOs=;
+        b=jBltyJ3KmWZ7uAG5+sHFgZqSMOs2zrWxjlgPPCyp+vgV2ORLa+DUWVlD5uZD9IXKpw
+         awbcR6taJzb5/naYVgso2TpilL+CyKQedAIDKQpM93rBLcqUFjNeBusHaRAkUMIOTSIV
+         9sytTzi/HV+KVVFd/gKdPN1haZZ8Q7W70H+WWuHQSLfgIDGlr/bxNt6DcD7Ag1r5KiI7
+         h6f03pgeCI/MV45mHfgUXzuFveFSXeXhsiokJ/Jsl+JuxNH+8MTkEmCT3sv3OPT4sfj/
+         YHcVhZkSHAtHFjK6p3joniH7XxKOWxCdDS2kA94YooHvbPP1IO2edKpAFMGaySZiJbwZ
+         kraA==
+X-Gm-Message-State: AOAM531tVU2nysCxiH1MMH84QjrFsa8dl3Xi3wG8y8JCbNaqcLj4ZWhF
+        Akn2L//4NJLsSoazKGFT7xwGjbmjQiWGnA==
+X-Google-Smtp-Source: ABdhPJy9PKCQtJIEuOUg8w1qPNwviZRTxC7lSkcVhvhRw5bRINA/J7AJOwPEGcjkcY9tf+d4n0aJ6rlK3EBbhQ==
+X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:62fe])
+ (user=ricarkol job=sendgmr) by 2002:a17:90a:c68a:: with SMTP id
+ n10mr18432159pjt.32.1622830719294; Fri, 04 Jun 2021 11:18:39 -0700 (PDT)
+Date:   Fri,  4 Jun 2021 11:18:33 -0700
+Message-Id: <20210604181833.1769900-1-ricarkol@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
+Subject: [PATCH] KVM: selftests: Rename vm_handle_exception in evmcs test
+From:   Ricardo Koller <ricarkol@google.com>
+To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc:     maz@kernel.org, pbonzini@redhat.com, drjones@redhat.com,
+        eric.auger@redhat.com, Ricardo Koller <ricarkol@google.com>,
+        kernel test robot <oliver.sang@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jason,
+Kernel test robot reports this:
 
-On Fri, 4 Jun 2021 13:22:00 -0300, Jason Gunthorpe <jgg@nvidia.com> wrote:
+> /usr/bin/ld: tools/testing/selftests/kvm/x86_64/evmcs_test.c:157: undefined reference to `vm_handle_exception'
+> /usr/bin/ld: tools/testing/selftests/kvm/x86_64/evmcs_test.c:158: undefined reference to `vm_handle_exception'
+> collect2: error: ld returned 1 exit status
 
-> > 
-> > Yes, in that case we should support both. Give the device driver a
-> > chance to handle the IOPF if it can.  
-> 
-> Huh?
-> 
-> The device driver does not "handle the IOPF" the device driver might
-> inject the IOPF.
-You are right, I got confused with the native case where device drivers can
-handle the fault, or do something about it.
+Fix it by renaming vm_handle_exception to vm_install_vector_handler in
+evmcs_test.c.
 
-Thanks,
+Fixes: a2bad6a990a4 ("KVM: selftests: Rename vm_handle_exception")
+Reported-by: kernel test robot <oliver.sang@intel.com>
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+---
+ tools/testing/selftests/kvm/x86_64/evmcs_test.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Jacob
+diff --git a/tools/testing/selftests/kvm/x86_64/evmcs_test.c b/tools/testing/selftests/kvm/x86_64/evmcs_test.c
+index 63096cea26c6..278711723f4b 100644
+--- a/tools/testing/selftests/kvm/x86_64/evmcs_test.c
++++ b/tools/testing/selftests/kvm/x86_64/evmcs_test.c
+@@ -154,8 +154,8 @@ int main(int argc, char *argv[])
+ 
+ 	vm_init_descriptor_tables(vm);
+ 	vcpu_init_descriptor_tables(vm, VCPU_ID);
+-	vm_handle_exception(vm, UD_VECTOR, guest_ud_handler);
+-	vm_handle_exception(vm, NMI_VECTOR, guest_nmi_handler);
++	vm_install_vector_handler(vm, UD_VECTOR, guest_ud_handler);
++	vm_install_vector_handler(vm, NMI_VECTOR, guest_nmi_handler);
+ 
+ 	pr_info("Running L1 which uses EVMCS to run L2\n");
+ 
+-- 
+2.32.0.rc1.229.g3e70b5a671-goog
+
