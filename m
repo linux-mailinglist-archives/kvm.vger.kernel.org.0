@@ -2,53 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E19139BEBA
-	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 19:27:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B60CB39BEB6
+	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 19:27:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230465AbhFDR3h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Jun 2021 13:29:37 -0400
-Received: from mail-qt1-f201.google.com ([209.85.160.201]:54083 "EHLO
-        mail-qt1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229892AbhFDR3g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Jun 2021 13:29:36 -0400
-Received: by mail-qt1-f201.google.com with SMTP id i12-20020ac860cc0000b02901cb6d022744so5586433qtm.20
-        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 10:27:36 -0700 (PDT)
+        id S231208AbhFDR3Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Jun 2021 13:29:24 -0400
+Received: from mail-pj1-f74.google.com ([209.85.216.74]:51033 "EHLO
+        mail-pj1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230314AbhFDR3Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Jun 2021 13:29:24 -0400
+Received: by mail-pj1-f74.google.com with SMTP id s5-20020a17090a7645b029016d923cccbeso664304pjl.0
+        for <kvm@vger.kernel.org>; Fri, 04 Jun 2021 10:27:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=XlUk4pd7ZXaHcyBXLC2fZswqyhx828J/Q4tmnaU+kr4=;
-        b=sFU9tmBV/um9g06KK4DLM6sqpMu9jDxyML/HjlJ4fM2DPDpXFLIRY0qBGKvXj50O6T
-         VON3PaDO3sIm7k92Aiqj2y4PGphPSpftp0PdRfAY0VEbmfrWEb0IPye5vmX8nOj3XOKV
-         WpeyDNp5SXQy9cpL4792sSRVJ00I+uJHrWyz4033zKERuYrrVqv7akZy82rsYKUpaHl5
-         1L1WpWPK6rJlWr1PXD/HEAAkmOfkieMWtaKq71av9+Mbg4YqIo33Sg4kexbsJCDq3DO7
-         U5osZ2KoO44H5B8d0ghshSmGxi8n+hdMX8i535aABDMUlDfxCsdNZmRvWrxtoV3OMjNH
-         F1yg==
+        bh=hPqg2zEw8xWDxZPbY6MJzuzKRTdbGJVq1JFdi5WkfCk=;
+        b=OhJpnQ64jlGrRhwDsKiuMuzPBsFqtfKAZefM5r1f5A6dQVyzU/xQRqqIoE+giSHCDq
+         8QVISi1tQF9uWXLZWGaYNd/vwtYR6XPX2y/jbb6n9Ij3UfR2aDFFfuVQDdF87JbvY26v
+         YkYzEoNN+GyelnjBzV8xyXrxn+K6eeVgWdmvBRwNW4SI/ADUO1YLGz4ok2gw2uKWB7s6
+         un8XWPTlNOo2EgaQkoQh54mhkPdRN+Ul0ZqaLsFdUaBnZJJDHapFp2o77YvNbyW5anix
+         FPLKbF2Qo6NwfqO3tqkZUJMQ3i7YjCrBm9OdXty4H2w94EiSiyqpv8L/g6qrRPihsX6t
+         yAJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=XlUk4pd7ZXaHcyBXLC2fZswqyhx828J/Q4tmnaU+kr4=;
-        b=m1e3n/T/+28JztflN8Kp+dO2ZlyMKCqlVyHXaEZQwUoUH07YIsLQfuXDULO7CkroH+
-         1AsE9jfffd3VTTx599xbq59lYW3r82KWSd155J8a0pu6NAPeFBU+Ap1BLi6X+KGd8obE
-         4yta7eXkjlJ30T15nway2UZYTq/MdoANZG15y23H8UAB9tJkMwa2juD1BpzJENbphZNI
-         a7yeVwoXBY7A8l20bwkEq+gpD56sNGG+/89WgGairhASgTYi1DyUDTb/OZS3u6Rhowzr
-         nEfogsaWkRF1HWkW6YvtRhcG1US/YFogS3SNG8miMBZI3yoNTay4EYuoMJTrLE+alAXR
-         X7iQ==
-X-Gm-Message-State: AOAM532t96g0/ATEw5WqaJRpaCfroJnSgiigrw7UAaQU+1hzt2E7IQHQ
-        37N+iv2rw3V+ThJ9HkvrGs3iWLglZ3dKVh5wBVB/AAXhsozvwZ4chAdRHt2T4IM85zfa8mFwrI1
-        rt5wquLZgchVxmfv8SoWYw7AVbxqJNihWJMICPLBo7Kp1QvTT+87Gd5PYNmPoE+o=
-X-Google-Smtp-Source: ABdhPJx3vuhC/RFsamaEmoMfknzBiNbGM73yxM8nJL/uu/cx/b/u6xaS5tiPJgvphwrEzWf9nRjlzrxxYGdA5w==
+        bh=hPqg2zEw8xWDxZPbY6MJzuzKRTdbGJVq1JFdi5WkfCk=;
+        b=iphON5ayPsUJ9NsOI6RyE45no7kxxE8w8p3auuQpuwbdJeYhDxgct+vAPqNnS5hT0G
+         wGdtF/6H+wd+HAkuVHR40ARdbHX3ibxjS+5Wx1YILkXHWmc3AuTbc7zohNrUY6djyew+
+         Lv9juZbMeDO4bdkp/hmDtbxXGJkIUiDtjDOzPGMFvc6N5/Vj+/bVpzXiNlzhet+7JOGm
+         5mDMQlmTi89CdaUMIJD5dqc32pFYpZn1uQQVY3ul0gzPlPTGjxlYo4zuoBx/VgRK/RO7
+         ur5Q4iB6QIJRFustrerRuoatGL3/Mz63fn84VPyprkTAgh8x1ODGmTpyKOkaegF4CvUq
+         iuVg==
+X-Gm-Message-State: AOAM533a9Gfk2A007WyJo/2VQu6VFhBtIms9qM+tY3neWkC5RfNO03Wp
+        LtW0ICW7wl8woHoRDzSzvBlxnm752dTnCRsOhxsu3lTF9m1kRG6FOR9YRnle7TOz2E4gOyiyxzY
+        uB4NohO5RVhHQw/qaKgbTmPchf7Sfis0+OaL6VcQ3/RvXWhAqIq3KQ3CYVkigdg8=
+X-Google-Smtp-Source: ABdhPJwyzqPV8+hSeY9vyX5P/zbx6JKJG+QpCLyVuNOjGanv0TwxWmx4830vzff8SWcl92nvzbsNPsOGgvYmTA==
 X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1a0d])
- (user=jmattson job=sendgmr) by 2002:ad4:4e2e:: with SMTP id
- dm14mr5916921qvb.33.1622827595917; Fri, 04 Jun 2021 10:26:35 -0700 (PDT)
-Date:   Fri,  4 Jun 2021 10:26:04 -0700
+ (user=jmattson job=sendgmr) by 2002:a17:902:ce84:b029:10f:a857:1e73 with SMTP
+ id f4-20020a170902ce84b029010fa8571e73mr2654870plg.72.1622827597477; Fri, 04
+ Jun 2021 10:26:37 -0700 (PDT)
+Date:   Fri,  4 Jun 2021 10:26:05 -0700
 In-Reply-To: <20210604172611.281819-1-jmattson@google.com>
-Message-Id: <20210604172611.281819-6-jmattson@google.com>
+Message-Id: <20210604172611.281819-7-jmattson@google.com>
 Mime-Version: 1.0
 References: <20210604172611.281819-1-jmattson@google.com>
 X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
-Subject: [PATCH v2 05/12] KVM: x86: Add a return code to kvm_apic_accept_events
+Subject: [PATCH v2 06/12] KVM: nVMX: Fail on MMIO completion for nested posted interrupts
 From:   Jim Mattson <jmattson@google.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com
 Cc:     Jim Mattson <jmattson@google.com>
@@ -57,154 +58,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-No functional change intended. At present, the only negative value
-returned by kvm_check_nested_events is -EBUSY.
+When the kernel has no mapping for the vmcs02 virtual APIC page,
+userspace MMIO completion is necessary to process nested posted
+interrupts. This is not a configuration that KVM supports. Rather than
+silently ignoring the problem, try to exit to userspace with
+KVM_INTERNAL_ERROR.
+
+Note that the event that triggers this error is consumed as a
+side-effect of a call to kvm_check_nested_events. On some paths
+(notably through kvm_vcpu_check_block), the error is dropped. In any
+case, this is an incremental improvement over always ignoring the
+error.
 
 Signed-off-by: Jim Mattson <jmattson@google.com>
----
- arch/x86/kvm/lapic.c | 11 ++++++-----
- arch/x86/kvm/lapic.h |  2 +-
- arch/x86/kvm/x86.c   | 25 ++++++++++++++++++++-----
- 3 files changed, 27 insertions(+), 11 deletions(-)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 8120e8614b92..6a315ade6c41 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2864,7 +2864,7 @@ int kvm_lapic_enable_pv_eoi(struct kvm_vcpu *vcpu, u64 data, unsigned long len)
- 	return kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, addr, new_len);
- }
+---
+ arch/x86/kvm/vmx/nested.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 7646e6e561ad..706c31821362 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -3700,7 +3700,7 @@ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
+ 	if (max_irr != 256) {
+ 		vapic_page = vmx->nested.virtual_apic_map.hva;
+ 		if (!vapic_page)
+-			return 0;
++			goto mmio_needed;
  
--void kvm_apic_accept_events(struct kvm_vcpu *vcpu)
-+int kvm_apic_accept_events(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_lapic *apic = vcpu->arch.apic;
- 	u8 sipi_vector;
-@@ -2872,7 +2872,7 @@ void kvm_apic_accept_events(struct kvm_vcpu *vcpu)
- 	unsigned long pe;
+ 		__kvm_apic_update_irr(vmx->nested.pi_desc->pir,
+ 			vapic_page, &max_irr);
+@@ -3714,6 +3714,10 @@ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
  
- 	if (!lapic_in_kernel(vcpu))
--		return;
-+		return 0;
- 
- 	/*
- 	 * Read pending events before calling the check_events
-@@ -2880,12 +2880,12 @@ void kvm_apic_accept_events(struct kvm_vcpu *vcpu)
- 	 */
- 	pe = smp_load_acquire(&apic->pending_events);
- 	if (!pe)
--		return;
-+		return 0;
- 
- 	if (is_guest_mode(vcpu)) {
- 		r = kvm_check_nested_events(vcpu);
- 		if (r < 0)
--			return;
-+			return r == -EBUSY ? 0 : r;
- 		/*
- 		 * If an event has happened and caused a vmexit,
- 		 * we know INITs are latched and therefore
-@@ -2906,7 +2906,7 @@ void kvm_apic_accept_events(struct kvm_vcpu *vcpu)
- 		WARN_ON_ONCE(vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED);
- 		if (test_bit(KVM_APIC_SIPI, &pe))
- 			clear_bit(KVM_APIC_SIPI, &apic->pending_events);
--		return;
-+		return 0;
- 	}
- 
- 	if (test_bit(KVM_APIC_INIT, &pe)) {
-@@ -2927,6 +2927,7 @@ void kvm_apic_accept_events(struct kvm_vcpu *vcpu)
- 			vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
- 		}
- 	}
-+	return 0;
- }
- 
- void kvm_lapic_exit(void)
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index 997c45a5963a..d7c25d0c1354 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -76,7 +76,7 @@ void kvm_free_lapic(struct kvm_vcpu *vcpu);
- int kvm_apic_has_interrupt(struct kvm_vcpu *vcpu);
- int kvm_apic_accept_pic_intr(struct kvm_vcpu *vcpu);
- int kvm_get_apic_interrupt(struct kvm_vcpu *vcpu);
--void kvm_apic_accept_events(struct kvm_vcpu *vcpu);
-+int kvm_apic_accept_events(struct kvm_vcpu *vcpu);
- void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event);
- u64 kvm_lapic_get_cr8(struct kvm_vcpu *vcpu);
- void kvm_lapic_set_tpr(struct kvm_vcpu *vcpu, unsigned long cr8);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f9b3ea916344..51d3b9ff4d96 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9245,7 +9245,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win ||
- 	    kvm_xen_has_interrupt(vcpu)) {
- 		++vcpu->stat.req_event;
--		kvm_apic_accept_events(vcpu);
-+		r = kvm_apic_accept_events(vcpu);
-+		if (r < 0) {
-+			r = 0;
-+			goto out;
-+		}
- 		if (vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED) {
- 			r = 1;
- 			goto out;
-@@ -9457,7 +9461,8 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
- 			return 1;
- 	}
- 
--	kvm_apic_accept_events(vcpu);
-+	if (kvm_apic_accept_events(vcpu) < 0)
-+		return 0;
- 	switch(vcpu->arch.mp_state) {
- 	case KVM_MP_STATE_HALTED:
- 	case KVM_MP_STATE_AP_RESET_HOLD:
-@@ -9681,7 +9686,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 			goto out;
- 		}
- 		kvm_vcpu_block(vcpu);
--		kvm_apic_accept_events(vcpu);
-+		if (kvm_apic_accept_events(vcpu) < 0) {
-+			r = 0;
-+			goto out;
-+		}
- 		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
- 		r = -EAGAIN;
- 		if (signal_pending(current)) {
-@@ -9883,11 +9891,17 @@ int kvm_arch_vcpu_ioctl_get_sregs(struct kvm_vcpu *vcpu,
- int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
- 				    struct kvm_mp_state *mp_state)
- {
-+	int r;
+ 	nested_mark_vmcs12_pages_dirty(vcpu);
+ 	return 0;
 +
- 	vcpu_load(vcpu);
- 	if (kvm_mpx_supported())
- 		kvm_load_guest_fpu(vcpu);
- 
--	kvm_apic_accept_events(vcpu);
-+	r = kvm_apic_accept_events(vcpu);
-+	if (r < 0)
-+		goto out;
-+	r = 0;
-+
- 	if ((vcpu->arch.mp_state == KVM_MP_STATE_HALTED ||
- 	     vcpu->arch.mp_state == KVM_MP_STATE_AP_RESET_HOLD) &&
- 	    vcpu->arch.pv.pv_unhalted)
-@@ -9895,10 +9909,11 @@ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
- 	else
- 		mp_state->mp_state = vcpu->arch.mp_state;
- 
-+out:
- 	if (kvm_mpx_supported())
- 		kvm_put_guest_fpu(vcpu);
- 	vcpu_put(vcpu);
--	return 0;
-+	return r;
++mmio_needed:
++	kvm_handle_memory_failure(vcpu, X86EMUL_IO_NEEDED, NULL);
++	return -ENXIO;
  }
  
- int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+ static void nested_vmx_inject_exception_vmexit(struct kvm_vcpu *vcpu,
 -- 
 2.32.0.rc1.229.g3e70b5a671-goog
 
