@@ -2,123 +2,263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6363A39B74E
-	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 12:45:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 437CE39B7E6
+	for <lists+kvm@lfdr.de>; Fri,  4 Jun 2021 13:28:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230085AbhFDKqs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Jun 2021 06:46:48 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:37741 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229625AbhFDKqr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Jun 2021 06:46:47 -0400
-Received: from [192.168.1.155] ([77.9.34.20]) by mrelayeu.kundenserver.de
- (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis) id
- 1MXH3e-1lrzgc1R4Y-00YmfZ; Fri, 04 Jun 2021 12:44:32 +0200
-Subject: Re: [RFC] /dev/ioasid uAPI proposal
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Alex Williamson (alex.williamson@redhat.com)" 
-        <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>
-References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
- <bb6846bf-bd3c-3802-e0d7-226ec9b33384@metux.net>
- <20210602172424.GD1002214@nvidia.com>
-From:   "Enrico Weigelt, metux IT consult" <lkml@metux.net>
-Message-ID: <bd0f485c-5f70-b087-2a5a-d2fe6e16817d@metux.net>
-Date:   Fri, 4 Jun 2021 12:44:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        id S229958AbhFDLab (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Jun 2021 07:30:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56871 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230010AbhFDLab (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 4 Jun 2021 07:30:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622806124;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9JlDk2HXRpq+0Yz9Nhh2pEWG9N+2ttsSNHw0y4E3f+k=;
+        b=StAYpnSTpvoEnSKIG1lOqMJ85yzNK6fE7ZLgHP6UYMFmxni1Ig+EVfz3s3zki2urlerFjg
+        wHJissy7tjzLIk+KEehRoG7OcXss98nobPtUereTWNRl+nUhSkE0KB3Xfq/fb1H0ZkCKn9
+        1CZQBwngcL8RkBnOHMcIpl25nL8LS7k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-47-N8QlJu15MRiiMx2LncVKfQ-1; Fri, 04 Jun 2021 07:28:42 -0400
+X-MC-Unique: N8QlJu15MRiiMx2LncVKfQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 078BE1083E94;
+        Fri,  4 Jun 2021 11:28:39 +0000 (UTC)
+Received: from localhost (unknown [10.33.37.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0209960C17;
+        Fri,  4 Jun 2021 11:28:34 +0000 (UTC)
+Date:   Fri, 4 Jun 2021 13:28:33 +0200
+From:   Sergio Lopez <slp@redhat.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 21/22] x86/sev: Register SNP guest request
+ platform device
+Message-ID: <20210604112833.poejnvqchjtp4wns@mhamilton>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-22-brijesh.singh@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20210602172424.GD1002214@nvidia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: tl
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:EoukDPcc2J/QT1D3boJAqDV3J9p3cqCtFNu4BEvhSOo+pu9OZsX
- DwBwLSc9+AiWMjMqEkc8DgpMYjdaXZ3udFjKV/t35j93kOSrcJS2O5rSy8bS4O9YWqrwJah
- eQ3aEeFMxZainqV/DPiuIeWIiAAeeoQNexILCOmEFhLNHZ/NUZBkuwfo46oactlC0K7Fada
- vDtxNQu+o6eAn++Bv+/eQ==
-X-Spam-Flag: NO
-X-UI-Out-Filterresults: notjunk:1;V03:K0:QKgPDva5+wg=:eeMux13sB16S9C4PhjuoZD
- CtwoD8dWEh81W5fy1QPhYLQUS15Eyu4lv3ZTs3TJ1ftGLpHB2oin7q+5F1zibM1WVSzfdeScd
- uU0679MJoje4xsogtaueiuTQtRcF9QzF0/XvHjQzfWg0g+KGNEw58XxmgZulfIvcirFRfd0JS
- bDRA6Bz3nIU+Vhb20syeejdhTusBXSk3fj0k0p07MLmf3Aw9Su2r8ncxiz9zoFX04+i2yPQ4O
- 9xQpYJA09Bamh3J5+sDfaH3BuXCmI5Uj1YN1YFPi1/3l9FGCN95CEX+PvIhQAQ3/MmkdZIvJG
- AGR70wW8AgrmjraQNoKhqd0CX0w1JHDhv1rd0feIIp/1VWd0xxSHnqyle4T2JlOBmNHY5PuWH
- /mT93AOHNqxmXXtc2D3+VCmGUYySMWbv1MyW00of6y0T07yKv3XmCL948iDJae4WYI826EjvO
- sSSSZUyu1ujzfih9pcDYtclYWtmKmNXkn3y9dqmlywTwqoL7hphFkBhxYGsE9vU/fGfUNaH3H
- PElzz4R4ACzW4c8fgPPEko=
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="taqeb7q6ydrmwa3u"
+Content-Disposition: inline
+In-Reply-To: <20210602140416.23573-22-brijesh.singh@amd.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02.06.21 19:24, Jason Gunthorpe wrote:
 
-Hi,
+--taqeb7q6ydrmwa3u
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- >> If I understand this correctly, /dev/ioasid is a kind of "common 
-supplier"
- >> to other APIs / devices. Why can't the fd be acquired by the
- >> consumer APIs (eg. kvm, vfio, etc) ?
- >
- > /dev/ioasid would be similar to /dev/vfio, and everything already
- > deals with exposing /dev/vfio and /dev/vfio/N together
- >
- > I don't see it as a problem, just more work.
+On Wed, Jun 02, 2021 at 09:04:15AM -0500, Brijesh Singh wrote:
+> Version 2 of GHCB specification provides NAEs that can be used by the SNP
+> guest to communicate with the PSP without risk from a malicious hypervisor
+> who wishes to read, alter, drop or replay the messages sent.
+>=20
+> The hypervisor uses the SNP_GUEST_REQUEST command interface provided by
+> the SEV-SNP firmware to forward the guest messages to the PSP.
+>=20
+> In order to communicate with the PSP, the guest need to locate the secrets
+> page inserted by the hypervisor during the SEV-SNP guest launch. The
+> secrets page contains the communication keys used to send and receive the
+> encrypted messages between the guest and the PSP.
+>=20
+> The secrets page is located either through the setup_data cc_blob_address
+> or EFI configuration table.
+>=20
+> Create a platform device that the SNP guest driver can bind to get the
+> platform resources. The SNP guest driver can provide userspace interface
+> to get the attestation report, key derivation etc.
+>=20
+> The helper snp_issue_guest_request() will be used by the drivers to
+> send the guest message request to the hypervisor. The guest message header
+> contains a message count. The message count is used in the IV. The
+> firmware increments the message count by 1, and expects that next message
+> will be using the incremented count.
+>=20
+> The helper snp_msg_seqno() will be used by driver to get and message
+> sequence counter, and it will be automatically incremented by the
+> snp_issue_guest_request(). The incremented value is be saved in the
+> secrets page so that the kexec'ed kernel knows from where to begin.
+>=20
+> See SEV-SNP and GHCB spec for more details.
+>=20
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/include/asm/sev.h      |  12 +++
+>  arch/x86/include/uapi/asm/svm.h |   2 +
+>  arch/x86/kernel/sev.c           | 176 ++++++++++++++++++++++++++++++++
+>  arch/x86/platform/efi/efi.c     |   2 +
+>  include/linux/efi.h             |   1 +
+>  include/linux/sev-guest.h       |  76 ++++++++++++++
+>  6 files changed, 269 insertions(+)
+>  create mode 100644 include/linux/sev-guest.h
+>=20
+> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+> index 640108402ae9..da2f757cd9bc 100644
+> --- a/arch/x86/include/asm/sev.h
+> +++ b/arch/x86/include/asm/sev.h
+> @@ -59,6 +59,18 @@ extern void vc_no_ghcb(void);
+>  extern void vc_boot_ghcb(void);
+>  extern bool handle_vc_boot_ghcb(struct pt_regs *regs);
+> =20
+> +/* AMD SEV Confidential computing blob structure */
+> +#define CC_BLOB_SEV_HDR_MAGIC	0x45444d41
+> +struct cc_blob_sev_info {
+> +	u32 magic;
+> +	u16 version;
+> +	u16 reserved;
+> +	u64 secrets_phys;
+> +	u32 secrets_len;
+> +	u64 cpuid_phys;
+> +	u32 cpuid_len;
+> +};
+> +
+>  /* Software defined (when rFlags.CF =3D 1) */
+>  #define PVALIDATE_FAIL_NOUPDATE		255
+> =20
+> diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/=
+svm.h
+> index c0152186a008..bd64f2b98ac7 100644
+> --- a/arch/x86/include/uapi/asm/svm.h
+> +++ b/arch/x86/include/uapi/asm/svm.h
+> @@ -109,6 +109,7 @@
+>  #define SVM_VMGEXIT_SET_AP_JUMP_TABLE		0
+>  #define SVM_VMGEXIT_GET_AP_JUMP_TABLE		1
+>  #define SVM_VMGEXIT_PSC				0x80000010
+> +#define SVM_VMGEXIT_GUEST_REQUEST		0x80000011
+>  #define SVM_VMGEXIT_AP_CREATION			0x80000013
+>  #define SVM_VMGEXIT_AP_CREATE_ON_INIT		0
+>  #define SVM_VMGEXIT_AP_CREATE			1
+> @@ -222,6 +223,7 @@
+>  	{ SVM_VMGEXIT_AP_JUMP_TABLE,	"vmgexit_ap_jump_table" }, \
+>  	{ SVM_VMGEXIT_PSC,		"vmgexit_page_state_change" }, \
+>  	{ SVM_VMGEXIT_AP_CREATION,	"vmgexit_ap_creation" }, \
+> +	{ SVM_VMGEXIT_GUEST_REQUEST,	"vmgexit_guest_request" }, \
+>  	{ SVM_EXIT_ERR,         "invalid_guest_state" }
+> =20
+> =20
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index 8f7ef35a25ef..8aae1166f52e 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -9,6 +9,7 @@
+> =20
+>  #define pr_fmt(fmt)	"SEV-ES: " fmt
+> =20
+> +#include <linux/platform_device.h>
+>  #include <linux/sched/debug.h>	/* For show_regs() */
+>  #include <linux/percpu-defs.h>
+>  #include <linux/mem_encrypt.h>
+> @@ -16,10 +17,13 @@
+>  #include <linux/printk.h>
+>  #include <linux/mm_types.h>
+>  #include <linux/set_memory.h>
+> +#include <linux/sev-guest.h>
+>  #include <linux/memblock.h>
+>  #include <linux/kernel.h>
+> +#include <linux/efi.h>
+>  #include <linux/mm.h>
+>  #include <linux/cpumask.h>
+> +#include <linux/io.h>
+> =20
+>  #include <asm/cpu_entry_area.h>
+>  #include <asm/stacktrace.h>
+> @@ -33,6 +37,7 @@
+>  #include <asm/smp.h>
+>  #include <asm/cpu.h>
+>  #include <asm/apic.h>
+> +#include <asm/setup.h>		/* For struct boot_params */
+> =20
+>  #include "sev-internal.h"
+> =20
+> @@ -47,6 +52,8 @@ static struct ghcb boot_ghcb_page __bss_decrypted __ali=
+gned(PAGE_SIZE);
+>   */
+>  static struct ghcb __initdata *boot_ghcb;
+> =20
+> +static unsigned long snp_secrets_phys;
+> +
+>  /* #VC handler runtime per-CPU data */
+>  struct sev_es_runtime_data {
+>  	struct ghcb ghcb_page;
+> @@ -105,6 +112,10 @@ struct ghcb_state {
+>  	struct ghcb *ghcb;
+>  };
+> =20
+> +#ifdef CONFIG_EFI
+> +extern unsigned long cc_blob_phys;
+> +#endif
+> +
+>  static DEFINE_PER_CPU(struct sev_es_runtime_data*, runtime_data);
+>  DEFINE_STATIC_KEY_FALSE(sev_es_enable_key);
+> =20
+> @@ -1909,3 +1920,168 @@ bool __init handle_vc_boot_ghcb(struct pt_regs *r=
+egs)
+>  	while (true)
+>  		halt();
+>  }
+> +
+> +static struct resource guest_req_res[0];
+> +static struct platform_device guest_req_device =3D {
+> +	.name		=3D "snp-guest",
+> +	.id		=3D -1,
+> +	.resource	=3D guest_req_res,
+> +	.num_resources	=3D 1,
+> +};
 
-One of the problems I'm seeing is in container environments: when
-passing in an vfio device, we now also need to pass in /dev/ioasid,
-thus increasing the complexity in container setup (or orchestration).
+Perhaps I'm missing something, but I can't find where the memory for
+"guest_req_res" is allocated. In my tests I had to turn this
+zero-length array into a single struct to prevent the kernel from
+crashing.
 
-And in such scenarios you usually want to pass in one specific device,
-not all of the same class, and usually orchestration shall pick the
-next free one.
+Thanks,
+Sergio.
 
-Can we make sure that a process having full access to /dev/ioasid
-while only supposed to have to specific consumer devices, can't do
-any harm (eg. influencing other containers that might use a different
-consumer device) ?
+--taqeb7q6ydrmwa3u
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Note that we don't have device namespaces yet (device isolation still
-has to be done w/ complicated bpf magic). I'm already working on that,
-but even "simple" things like loopdev allocation turns out to be not
-entirely easy.
+-----BEGIN PGP SIGNATURE-----
 
- > Having FDs spawn other FDs is pretty ugly, it defeats the "everything
- > is a file" model of UNIX.
+iQIzBAABCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAmC6DmEACgkQ9GknjS8M
+AjUFoA/+IrYKJWSfbZbq0p0d37bRCDQdxKuwCA5d4z9spAkWPRBo9rTbVpR7w9o+
+qr3PHMb920L4ZDtppUk8cqazsG52OXd6Jb0pugiGbYWbO8dmLC1STKuLqnQzVdS+
+1QwBeRpgjVOxpf8oh9NdpI3J7XVpJsAdTCwrp/HFNpjZRd0lW/kE2nLMUqzmO6bi
+cNIWdk73I/spC8GL3VZFf/JkbRk14eT9LGxYcqghBuClk90FPUYAbvF6Y7bBxy2U
+7KLBgpcOZs+iSLWSPwRnehLLLrncvk2HqvSHwCLj3d7e1jhUiFF6xJL0wTj1gS/Z
+F+dyvZD/BX/iDIehtGZr+U2kr5gD2mEF9/epJV2FL8jBcOkAxrFoG2udtIqji+pi
+OkvQvpytNR46M6OWPh0axet83xb6OO3YR7Ongr6jONkEArQoS8xthEtNBZTCFKAU
++kMPsq5nvaQ2s12u0zpFqOlSCZFkcKVziPARHMdgpE/K7t7i+H8a5ykMiDlbZzGK
+l4H6jW2L0fjcf/8lXXXH5AsizfSNnHcWca/CqoKgPcRAsUI/YSGdgWnEhwUEFNht
+3DOaPdpOAOVD4Q0G0QNRnT3Cuh1LPEPWUARPD8UsFaN1ZPlW1g1qrp4VXsJDkww+
+Aw2F9NZvRsy8hqnc8BDF+Tr1rqwl+skd+h0bG5fIDa3zlMjVwrg=
+=3qjK
+-----END PGP SIGNATURE-----
 
-Unfortunately, this is already defeated in many other places :(
-(I'd even claim that ioctls already break it :p)
+--taqeb7q6ydrmwa3u--
 
-It seems your approach also breaks this, since we now need to open two
-files in order to talk to one device.
-
-By the way: my idea does keep the "everything's a file" concept - we
-just have a file that allows opening "sub-files". Well, it would be
-better if devices could also have directory semantics.
-
-
---mtx
-
----
-Hinweis: unverschlüsselte E-Mails können leicht abgehört und manipuliert
-werden ! Für eine vertrauliche Kommunikation senden Sie bitte ihren
-GPG/PGP-Schlüssel zu.
----
-Enrico Weigelt, metux IT consult
-Free software and Linux embedded engineering
-info@metux.net -- +49-151-27565287
