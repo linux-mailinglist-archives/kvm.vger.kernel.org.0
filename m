@@ -2,83 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 09FAC39C786
-	for <lists+kvm@lfdr.de>; Sat,  5 Jun 2021 12:49:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 814D939C791
+	for <lists+kvm@lfdr.de>; Sat,  5 Jun 2021 12:53:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229980AbhFEKvk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 5 Jun 2021 06:51:40 -0400
-Received: from mail-pj1-f42.google.com ([209.85.216.42]:41777 "EHLO
-        mail-pj1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229924AbhFEKvj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 5 Jun 2021 06:51:39 -0400
-Received: by mail-pj1-f42.google.com with SMTP id b15-20020a17090a550fb029015dad75163dso7352205pji.0
-        for <kvm@vger.kernel.org>; Sat, 05 Jun 2021 03:49:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=puvKdnbjMWRss9Xc+jeycrE74wvzwgdG7JS/tm3IR6Q=;
-        b=VNMp6zMbH6Ai/UggoxUb8JogjuT4S/q2uuPY4DIP7HPKXrHzIX+KooI9HZ1UZn30yB
-         H8WrYZ4q+lcp6WyeRq/rpgSCfcJ87MRwrTwNBg8KG1YkvIKF6Pbxi6QpOQ07BZ9r3c7M
-         5pM8UM2Uy6rb8+7j+Y4sKGgi6L1lhdvEuurmo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=puvKdnbjMWRss9Xc+jeycrE74wvzwgdG7JS/tm3IR6Q=;
-        b=ecWK4wI25UOHvY1idtabSBIifc37+b3MAqR7P08eF0vOgLvP069fTnhO5OPDCQ0jxa
-         X71IF/R6cFPMLYNpzvPUr3RSSuVEzlu5Hq9uo5fgSHliFuC7HQOrdIkb2Qugl2VsmQWo
-         VqhWlogEPTLiO8pXY++GlEOxTzCFd53ncOXYcetQp72tXQPdbfIngqXq4/rZRdyanxCI
-         uTrAlj7G1LeQc0qpTkJYVzLfSUAfbJ+01FjwV+8tCAR1z949l5AXYgxRYjnJRTyendeb
-         4wB6jMqnWivk8bx955EshR1zx5IctFG3P1tTFQF6VOovt/bCo14n/ebqc3x2xVPy7fKS
-         zLNQ==
-X-Gm-Message-State: AOAM533ATu347l1HWxbasNWetopMX/RtSGLcCBeZD++iYYFCKxG9IUB3
-        9inrnacswi857XTF8bmOeg9owQ==
-X-Google-Smtp-Source: ABdhPJxQenHO0csxkientjHPUyIKwoWUMZs3GjdceB3pQigyjUSVLp9kfLlM4L4bqXVJH20LFqMqyQ==
-X-Received: by 2002:a17:902:e04e:b029:10f:133f:87c8 with SMTP id x14-20020a170902e04eb029010f133f87c8mr8260590plx.70.1622890131931;
-        Sat, 05 Jun 2021 03:48:51 -0700 (PDT)
-Received: from google.com ([2409:10:2e40:5100:5981:261e:350c:bb45])
-        by smtp.gmail.com with ESMTPSA id j12sm3921984pgj.14.2021.06.05.03.48.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Jun 2021 03:48:51 -0700 (PDT)
-Date:   Sat, 5 Jun 2021 19:48:46 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
+        id S230177AbhFEKy7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 5 Jun 2021 06:54:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60332 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229924AbhFEKy7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 5 Jun 2021 06:54:59 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F69BC061766;
+        Sat,  5 Jun 2021 03:53:11 -0700 (PDT)
+Received: from zn.tnic (p4fed32f0.dip0.t-ipconnect.de [79.237.50.240])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C2FC41EC01A2;
+        Sat,  5 Jun 2021 12:53:09 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1622890389;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=m4WFNDMn/F2hBFMtOb5KcbkKEA5fPujaJDdSpXTf3yI=;
+        b=b9euwxNWNDPFTyr/DO+tkH5SKsRbrIAcUy0+u+Jvmj/u6fbpiZz9u3lFXvXcgwIemAcufI
+        NyCxlLalL3M1NPfNHFgQhUWN/nBA/Vh8556EE5bzxFiKvpEO+aa9S/C6oi3V7LKg6VQ6eu
+        Z/KRkDNbfBU2ttfxGH9aWiVrTQ//cn8=
+Date:   Sat, 5 Jun 2021 12:50:53 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        Suleiman Souhlal <suleiman@google.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv2 2/2] kvm: x86: implement KVM PM-notifier
-Message-ID: <YLtWjiFb62RFLWzA@google.com>
-References: <20210605023042.543341-1-senozhatsky@chromium.org>
- <20210605023042.543341-2-senozhatsky@chromium.org>
- <87k0n8u1nk.wl-maz@kernel.org>
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 04/22] x86/mm: Add sev_feature_enabled()
+ helper
+Message-ID: <YLtXDQHWnAvCl99M@zn.tnic>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-5-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <87k0n8u1nk.wl-maz@kernel.org>
+In-Reply-To: <20210602140416.23573-5-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On (21/06/05 10:00), Marc Zyngier wrote:
-> > +static int kvm_arch_suspend_notifier(struct kvm *kvm)
-> > +{
-> > +	struct kvm_vcpu *vcpu;
-> > +	int i, ret;
-> > +
-> > +	mutex_lock(&kvm->lock);
-> > +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> > +		ret = kvm_set_guest_paused(vcpu);
-> > +		if (ret) {
-> > +			pr_err("Failed to pause guest VCPU%d: %d\n",
-> > +			       vcpu->vcpu_id, ret);
-> 
-> how useful the pr_err() is, given that it contains no information
-> that would help identifying which guest failed to pause.
+On Wed, Jun 02, 2021 at 09:03:58AM -0500, Brijesh Singh wrote:
+> @@ -78,6 +85,7 @@ static inline void sev_es_init_vc_handling(void) { }
+>  static inline bool sme_active(void) { return false; }
+>  static inline bool sev_active(void) { return false; }
+>  static inline bool sev_es_active(void) { return false; }
+> +static inline bool sev_snp_active(void) { return false; }
 
-Do other printk-s contain such info? All I can see so far is
-`#define pr_fmt(fmt) "kvm-guest: " fmt` which doesn't point
-at any particular VM.
+Leftover from the previous version, can go.
+
+> +bool sev_feature_enabled(unsigned int type)
+> +{
+> +	switch (type) {
+> +	case SEV: return sev_status & MSR_AMD64_SEV_ENABLED;
+> +	case SEV_ES: return sev_status & MSR_AMD64_SEV_ES_ENABLED;
+> +	case SEV_SNP: return sev_status & MSR_AMD64_SEV_SNP_ENABLED;
+> +	default: return false;
+> +	}
+> +}
+
+Yeah, btw, we might even do a generic one, see:
+
+https://lkml.kernel.org/r/YLkcIuL2qvo0hviU@zn.tnic
+
+and the following mail.
+
+But that doesn't matter as sev_feature_enabled()'s body can go into
+sev_protected_guest_has() or whatever we end up calling it.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
