@@ -2,125 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3C5539CE8A
-	for <lists+kvm@lfdr.de>; Sun,  6 Jun 2021 12:10:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78AB839CF55
+	for <lists+kvm@lfdr.de>; Sun,  6 Jun 2021 15:30:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230128AbhFFKMl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 6 Jun 2021 06:12:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44188 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229465AbhFFKMk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 6 Jun 2021 06:12:40 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AB58760FEE;
-        Sun,  6 Jun 2021 10:10:51 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1lppk1-005kDE-KN; Sun, 06 Jun 2021 11:10:49 +0100
+        id S230106AbhFFNcO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 6 Jun 2021 09:32:14 -0400
+Received: from mail-pj1-f46.google.com ([209.85.216.46]:46963 "EHLO
+        mail-pj1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229878AbhFFNcN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 6 Jun 2021 09:32:13 -0400
+Received: by mail-pj1-f46.google.com with SMTP id pi6-20020a17090b1e46b029015cec51d7cdso8682335pjb.5;
+        Sun, 06 Jun 2021 06:30:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hYcKAmYrkT12yrCkZCPxBOfTA321ZJWoXkYrMXfOxJ0=;
+        b=WQueEqbo2NBlKjvZ6KO/rLFnz5TpCCSTcmQMDcf8qtQHRJyp6tjkvQqjMDDvRWNvg/
+         ojY8msMKfjue0x9xNFLV3t9l/kCCZeo4JZAtzeTrJkJn3SFMywdU2rbl7Bd9WakOBlRt
+         YAkrkqMw8+KgLDVnCzFAlNQ2pzF9dRv5CMtiVoVq1m4MkFGfG+VbcraT09mYoB0nW95S
+         S4POp00X3jRUtpk/R9SiR0aACf9o8cOZZo8DgNZhtn9cFN5sK4dLesBr9cQ176nXSfwd
+         miSgxm/3GlEik79UCHguP4u3DWg9W5kiYmjWSfiZLY9AHLffbf2fsBGYawntp6VsMINT
+         VOvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hYcKAmYrkT12yrCkZCPxBOfTA321ZJWoXkYrMXfOxJ0=;
+        b=Fc+X3mdYqrZusJ5JqQ6vxTRjVjSbrXfZ9vCyDwjXNfyYdCw1GSU3FBZYxqa7AjVYIY
+         76z5Hyw6D5qVsVDpO5u/07TVjXw3XQf1z/uEjdmttdn7LpyGY1lfib7eUmXxP9pmhucV
+         ETUswCyka919Sm9v17lFixL0qfa9Li5XpQuauHhBOp80Ktx+YLsA1mdE4kTE710ihaX9
+         PqhpLvwSvYZ4yDXRITlNjDLD+2v3HnNrbugKXAmnbUmNK+D/LuMZMJh6eIXGJq9jvUOL
+         qnVOpZkjQb6fdtmNDvxOv0WfqGNhyk576Es5URPpBfsz31NyLuedLL1mEYneQNU33/Nw
+         9CLA==
+X-Gm-Message-State: AOAM531Z9HhHOLcRu2UjwWJjJetLN/mOvMpE6mYXI5Jy8d69HC/Bl7DB
+        KR5v2hp5fUmjCUmpw7tUpy8=
+X-Google-Smtp-Source: ABdhPJyj2di16bPb/HKfLXkHVUGrsIbLZuBW9vI9YNQDT8Dz2RXLca9RdoJpECF8q1i5AX0DFaPRow==
+X-Received: by 2002:a17:90b:4504:: with SMTP id iu4mr15678423pjb.110.1622986150087;
+        Sun, 06 Jun 2021 06:29:10 -0700 (PDT)
+Received: from ndr730u.nd.solarflarecom.com ([182.71.24.30])
+        by smtp.googlemail.com with ESMTPSA id bv3sm8252826pjb.1.2021.06.06.06.29.06
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 06 Jun 2021 06:29:09 -0700 (PDT)
+From:   Gautam Dawar <gdawar.xilinx@gmail.com>
+Cc:     martinh@xilinx.com, hanand@xilinx.com, gdawar@xilinx.com,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] vhost-vdpa: log warning message if vhost_vdpa_remove gets blocked
+Date:   Sun,  6 Jun 2021 18:59:09 +0530
+Message-Id: <20210606132909.177640-1-gdawar.xilinx@gmail.com>
+X-Mailer: git-send-email 2.30.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Sun, 06 Jun 2021 11:10:49 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        pbonzini@redhat.com, drjones@redhat.com, eric.auger@redhat.com,
-        kernel test robot <oliver.sang@intel.com>
-Subject: Re: [PATCH] KVM: selftests: Rename vm_handle_exception in evmcs test
-In-Reply-To: <YLqzI9THXBX2dWDE@google.com>
-References: <20210604181833.1769900-1-ricarkol@google.com>
- <YLqanpE8tdiNeoaN@google.com> <YLqzI9THXBX2dWDE@google.com>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <6d1f569a5260612eb0704e31655d168d@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: ricarkol@google.com, seanjc@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com, eric.auger@redhat.com, oliver.sang@intel.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021-06-05 00:11, Ricardo Koller wrote:
-> On Fri, Jun 04, 2021 at 09:26:54PM +0000, Sean Christopherson wrote:
->> On Fri, Jun 04, 2021, Ricardo Koller wrote:
->> > Kernel test robot reports this:
->> >
->> > > /usr/bin/ld: tools/testing/selftests/kvm/x86_64/evmcs_test.c:157: undefined reference to `vm_handle_exception'
->> > > /usr/bin/ld: tools/testing/selftests/kvm/x86_64/evmcs_test.c:158: undefined reference to `vm_handle_exception'
->> > > collect2: error: ld returned 1 exit status
->> >
->> > Fix it by renaming vm_handle_exception to vm_install_vector_handler in
->> > evmcs_test.c.
->> >
->> > Fixes: a2bad6a990a4 ("KVM: selftests: Rename vm_handle_exception")
->> 
->> Belated code review...
-> 
-> Thanks for the review.
-> 
->> Can we rename the helper to vm_install_exception_handler()?
->> 
->> In x86, "vector" is the number of the exception and "vectoring" is the 
->> process
->> of determining the resulting vector that gets delivered to software 
->> (e.g. when
->> dealing with contributory faults like #GP->#PF->#DF), but the thing 
->> that's being
->> handled is an exception.
-> 
-> Got it. What about this renaming:
-> 
->   vm_handle_exception(vec) 		-> vm_install_exception_handler(vec)
->   vm_install_exception_handler(vec, ec)	-> vm_install_sync_handler(vec, 
-> ec)
-> 
->> 
->> arm appears to have similar terminology.  And looking at the arm code, 
->> it's very
->> confusing to have a helper vm_install_vector_handler() install into
->> exception_handlers, _not_ into vector_handlers.  Calling the 
->> vector_handlers
->> "default" handlers is also confusing, as "default" usually implies the 
->> thing can
->> be overwritten.  But in this case, the "default" handler is just 
->> another layer
->> in the routing.
->> 
->> The multiple layers of routing is also confusing and a bit hard to 
->> wade through
->> for the uninitiated.  The whole thing can be made more straightfoward 
->> by doing
->> away with the intermediate routing, whacking ~50 lines of code in the 
->> process.
->> E.g. (definitely not functional code):
-> 
-> I think that works and it does remove a bunch of code. Just need to 
-> play
-> with the idea and check that it can cover all cases.
-> 
-> For now, given that the build is broken, what about this series of
-> patches:
-> 
-> 1. keep this patch to fix x86 kvm selftests
-> 2. rename both arm and x86 to vm_install_exception_handler and
-> vm_install_sync_handler
-> 3. restructure the internals of exception handling in arm
-> 
-> Alternatively, I can send 1+2 together and then 3. What do you think?
+From: Gautam Dawar <gdawar@xilinx.com>
 
-This is becoming a bit messy. I'd rather drop the whole series from
--next, and get something that doesn't break in the middle. Please
-resend the series tested on top of -rc4.
+If some module invokes vdpa_device_unregister (usually in the module
+unload function) when the userspace app (eg. QEMU) which had opened
+the vhost-vdpa character device is still running, vhost_vdpa_remove()
+function will block indefinitely in call to wait_for_completion().
 
-Thanks,
+This causes the vdpa_device_unregister caller to hang and with a
+usual side-effect of rmmod command not returning when this call
+is in the module_exit function.
 
-         M.
+This patch converts the wait_for_completion call to its timeout based
+counterpart (wait_for_completion_timeout) and also adds a warning
+message to alert the user/administrator about this hang situation.
+
+To eventually fix this problem, a mechanism will be required to let
+vhost-vdpa module inform the userspace of this situation and
+userspace will close the descriptor of vhost-vdpa char device.
+This will enable vhost-vdpa to continue with graceful clean-up.
+
+Signed-off-by: Gautam Dawar <gdawar@xilinx.com>
+---
+ drivers/vhost/vdpa.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index bfa4c6ef554e..572b64d09b06 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -1091,7 +1091,11 @@ static void vhost_vdpa_remove(struct vdpa_device *vdpa)
+ 		opened = atomic_cmpxchg(&v->opened, 0, 1);
+ 		if (!opened)
+ 			break;
+-		wait_for_completion(&v->completion);
++		wait_for_completion_timeout(&v->completion,
++					    msecs_to_jiffies(1000));
++		dev_warn_ratelimited(&v->dev,
++				     "%s waiting for /dev/%s to be closed\n",
++				     __func__, dev_name(&v->dev));
+ 	} while (1);
+ 
+ 	put_device(&v->dev);
 -- 
-Jazz is not dead. It just smells funny...
+2.30.1
+
