@@ -2,264 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8619539E109
-	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 17:43:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B00C439E163
+	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 18:03:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230226AbhFGPns (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Jun 2021 11:43:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26183 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230453AbhFGPno (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Jun 2021 11:43:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623080512;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4A1ZmmoADOeXeNhTZ74YAKcHNecX4lcp36tJa9lAB8U=;
-        b=LCta4Wpjk0Hm8zF2i9O4sbCQYDbsTAS0a6AUImeKy1I5VA443GzDSVIeeYveZbao6us2Mh
-        lgvBb2Mve1ig0lOJ/dCSBk5NWHrgTBLiecI+BcTDTmOp35PTM0KHRq+wsXKTRWZzg5PuxN
-        TUPmEO/g6Rk7YV5JHb5KglwFC159Ryw=
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
- [209.85.210.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-476-qNjwjSw0NYqIeBcPS0rYAQ-1; Mon, 07 Jun 2021 11:41:51 -0400
-X-MC-Unique: qNjwjSw0NYqIeBcPS0rYAQ-1
-Received: by mail-ot1-f72.google.com with SMTP id k7-20020a9d4b870000b02902a5bfbbbd3bso11726538otf.18
-        for <kvm@vger.kernel.org>; Mon, 07 Jun 2021 08:41:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=4A1ZmmoADOeXeNhTZ74YAKcHNecX4lcp36tJa9lAB8U=;
-        b=o9X/QT7ZqlC0KggCArnUVSzf6Ji4l7ElgPtN5avroq8xSVpL7D4iRLysl5ROZgzbQq
-         eNqbI02okGleRZOoI/eJ7h+ofUT5Q8qVpleLWqnSjF1vsvhJnlPRloRFiCjjNeRFsGCb
-         VDrFqZ0GNmfFVFIxYjF/1z2iFntKtyfyZHVjizvsdJfHyLByBuqQvARWZwlob/e+Ot1L
-         7HcDRvDQgMdscUfhvubvSaG+TI5HQb4g1TPih1WFzwmxr1tdC5GXI7pI+2hgGDeipHUy
-         GF6fDI2etUVjg0IVITM5zqBnpHT1ugwGOpBury6lrQ3VYJl5AJHXyprtmsretMckBRlH
-         h3lQ==
-X-Gm-Message-State: AOAM533mt/gTQbrHEEn+QNa4fUsZsd56sxg+93FIzOwrnne5CkslUmlI
-        +/5YuRDclFKJ8cnOHu2YlG+93uPpVyK2UtZAHKwJ9T2n+qv1qSQRCus0xlaD7qQgueypO8inrZ6
-        nitLQb7nryKGu
-X-Received: by 2002:a05:6830:2472:: with SMTP id x50mr14281121otr.277.1623080510429;
-        Mon, 07 Jun 2021 08:41:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz/RofL2Q+8xiXeUnngaY/JJcX9WjaL0+G657PUCf43sOCgIlYvMmiGQ+4O43ZMMQuPVTHGYg==
-X-Received: by 2002:a05:6830:2472:: with SMTP id x50mr14281089otr.277.1623080510058;
-        Mon, 07 Jun 2021 08:41:50 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id t21sm2412663otd.35.2021.06.07.08.41.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Jun 2021 08:41:49 -0700 (PDT)
-Date:   Mon, 7 Jun 2021 09:41:48 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Robin Murphy <robin.murphy@arm.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jason Wang <jasowang@redhat.com>
-Subject: Re: [RFC] /dev/ioasid uAPI proposal
-Message-ID: <20210607094148.7e2341fc.alex.williamson@redhat.com>
-In-Reply-To: <20210604230108.GB1002214@nvidia.com>
-References: <MWHPR11MB1886469C0136C6523AB158B68C3B9@MWHPR11MB1886.namprd11.prod.outlook.com>
-        <20210604122830.GK1002214@nvidia.com>
-        <20210604092620.16aaf5db.alex.williamson@redhat.com>
-        <815fd392-0870-f410-cbac-859070df1b83@redhat.com>
-        <20210604155016.GR1002214@nvidia.com>
-        <30e5c597-b31c-56de-c75e-950c91947d8f@redhat.com>
-        <20210604160336.GA414156@nvidia.com>
-        <2c62b5c7-582a-c710-0436-4ac5e8fd8b39@redhat.com>
-        <20210604172207.GT1002214@nvidia.com>
-        <20210604152918.57d0d369.alex.williamson@redhat.com>
-        <20210604230108.GB1002214@nvidia.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        id S231228AbhFGQDa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Jun 2021 12:03:30 -0400
+Received: from mail-bn7nam10on2073.outbound.protection.outlook.com ([40.107.92.73]:28033
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230197AbhFGQD3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Jun 2021 12:03:29 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jgWGeNsElcdOFKUX29Bd7fj9glMF2xmCcVvk8gIciUE5nMBRwT8ABZkvhzDmePLCeLg/6a3q96uteylJzKP0MA70gNHqyCB6knye31aBJWy1jI9cBGez2Ja3hDrd068zlYKgD7k6wGV7HJrSLQaHEArAjJnRLvMJKHd1KO+0LMbEjm89hQJDE6da4puuHGstHYShC1o+E8oaMnFZijpqT4qL5ez8IO8umA/lKuqr9zzVIcBTTlOvax55o04GMVdAX3wYlZWprEtBVMNb1rkhu7uLKO7NEVBSMhPlimJdN2uwGgfqu/t571oLttHNRg+AjtNcSfkPEWRuXKhnsLPMZQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nigzNm5cyzQaoGM5+FMvArHv7x9fVEDrN6XpO3PS1Dw=;
+ b=nMHCbZgcj3tfvR3Ch6FfIzgtSbjlPZH+YK7NDw/Mk3NZCu30nmonorg49tHbtVqkRN49Ti67juAoVcx7Npcw1Zt9xKQVl14NzO3UF2ZJ9mqYt7VOWOqpTgOpTzwpSnmeNQvOuYRnvtcLNuGUMNGVmmR+poR+Rxmwfm2IokBn8noSGl3n32rKJG7+K1Mx9dZ0zLwDak488pUPrsi5BVyGYUkEkoWSB6vHmeTUrxo3T+WgJ8rgGgv00TF+wWbIxg5+iu0vtv/9Qp0ki0HvDPU62sct9DbjsgfgdnMyhzFIZPw5GZ/Krk0Iw1pgxU5cpOb3M3fpSHyy2ssP0qo6TGnaoA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nigzNm5cyzQaoGM5+FMvArHv7x9fVEDrN6XpO3PS1Dw=;
+ b=bN5+j2K6rKhjl+eMCK89s8rHtRwh4xBeIIA1nYmp4HPi1sJTsh9jOUUrjHJZpeYvFEso42lLPz7q+ObD1K1+G+qhB3Cstw7KwPL8PpO/5V4eLHuaysCNzjmtJrTtT7BHtLXnaaBqjFv3j5ysNO9tSgYwXcfgsjEJQTAmZOYAUZo=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SA0PR12MB4557.namprd12.prod.outlook.com (2603:10b6:806:9d::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.22; Mon, 7 Jun
+ 2021 16:01:35 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4195.030; Mon, 7 Jun 2021
+ 16:01:35 +0000
+Cc:     brijesh.singh@amd.com, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 06/22] x86/sev: check SEV-SNP features
+ support
+To:     Borislav Petkov <bp@alien8.de>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-7-brijesh.singh@amd.com> <YL4zJT1v6OuH+tvI@zn.tnic>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <57fce362-ba9a-2f04-6958-870fd4f8be5c@amd.com>
+Date:   Mon, 7 Jun 2021 11:01:32 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.10.2
+In-Reply-To: <YL4zJT1v6OuH+tvI@zn.tnic>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [70.112.153.56]
+X-ClientProxiedBy: SA9PR13CA0028.namprd13.prod.outlook.com
+ (2603:10b6:806:21::33) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SA9PR13CA0028.namprd13.prod.outlook.com (2603:10b6:806:21::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.9 via Frontend Transport; Mon, 7 Jun 2021 16:01:33 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 8de45b26-7110-4410-599f-08d929cd8640
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4557:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4557F7BACE3B9364C191CF6AE5389@SA0PR12MB4557.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2331;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9dzT5SYogq8ajn0HIED7Pa8DS3+NX2MyK7E2cPoVIbWQI3oaSo+j/OmgoiAAHwiTGgEfgT9FRtO9+CeSvtxaZ0dlqx+uQtjpVSgT0wLCMR+pfdeCizJyL29UZIL2hw9QXFwON5O0PaI0fi1iiQsddMtbZfZuPFubBvPNwLlOYQMnMNovB0u8CFElS1/mX+4SM/Q7EIribqeSSIU2jLM761iM5ZLRquaxkw0ogi25g6v5pDTaZ/w3rVtQpBaB8N+H/tVMP50w/y5MUog1E/sCKh2Fi06X0xdWB3yIUAQQ2/mUDxuxe4nKxIReIbQkk8PDMOeBmbByEWHCKTMV4AfqzYg8VWepUSwAIQ9XS65/B4ZiT+hcToL6gt2kBakQZ+4y8K+WEe9c9rwka51Tn6+74fe0SnlBLZQNbWi9Pw98pmK77JfyCBZGo4cOgFvgfKh5KuyG9ZqAfZaKyj6MR2FAi/fBfcW9B6+Bff42NhGNmV3H1pp5wIU8NSG1BCJZhyMgamW0SDkLqD4Otx6ikCJN7oY9QBOEhEPSSQsPjlqeaggUWGh+JBoL8qp585eMaVbVJ4++HyobVisfhX1tmgSFXS/aL2Uji97TLv8tNJJEsWceGO9pRQ075EUIA15zK1CseR8LEVUGxw5alrcYVuvJp2OAKLV9qYc5kgPvXnrnPXLf9u/ra0LnVifaJkNmhXQifaikl+CeWEgzB56DB/VW0kRhFC7OmK4g5AInL9Ne+vs=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(366004)(376002)(136003)(39860400002)(6512007)(53546011)(6506007)(52116002)(4744005)(8676002)(956004)(2906002)(8936002)(44832011)(316002)(26005)(5660300002)(66556008)(66946007)(36756003)(478600001)(7416002)(31686004)(38100700002)(38350700002)(86362001)(4326008)(31696002)(186003)(54906003)(6486002)(16526019)(66476007)(2616005)(6916009)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?b1hsVU5GQVBSeUtLUHZObGpzTlBWMDlYUEIyekZpUDI1b0pJNWhsUUNRdld1?=
+ =?utf-8?B?SWh2OEpBYXNPOU5hWTRHdWlwTi9KOGRzL2ZIMlZLNmpDeGVXQW14VEU1SCto?=
+ =?utf-8?B?cUM3K1kzTDF5VWFnTksyV0tFazdQMGZPRFd5WHF4SHpoSUI3UFhpWHU1YWVu?=
+ =?utf-8?B?cWIzUHJMSkh1RDBCR2c0TGN4elNWT3RIUHBSL0Q0NkpLcXZPTlhrbm5BSzI4?=
+ =?utf-8?B?UlR6a2hIU1E3OWVJY1VzaEJCRmFTNE91SXFKMmp5djFVb2g5SkYyMEdHcjhY?=
+ =?utf-8?B?WkN0cmk4dWlySDl1MUU1alRNMjVZaEhJRFVXb1diR3BWVW9NYjAvRTdickwx?=
+ =?utf-8?B?ZlArYk1XRzhjVCtkeVkvaVVKQ094b2dQUVpKcmc5YjRySUpjbzZrQ3Q2dVE5?=
+ =?utf-8?B?dTNLQStYTitLMG51aWVmUG1TVC82cTR4RFRJYnMva0JFYUFNNXpzanpVeXFG?=
+ =?utf-8?B?NTg0c3NyNGhDYSswYlJsMWJXbkpPSCswbVd1c0ZhWnVhUEZCaCtCT2xWaDBm?=
+ =?utf-8?B?Sjl2d3AvZWpySzlMdHp3eXVOZTFJVWI0ZjVRbGxkeDJxODFmMGQ2NExyZC9h?=
+ =?utf-8?B?RiszYVY4Z3JETG1xMGJwcmEzZ2xUMCtZYVZUYWlOYThjMGhWMmluQ1l2ZUZ3?=
+ =?utf-8?B?MzM0SUdDU1c0bFVZYWNOQ3dqZDl3VWI4ZlFFbEJObEpCNUFtRjNnM0FyVTdT?=
+ =?utf-8?B?ZlhSS1Jma3B6QUlrMFdScGZiei9wQVg0RTl0OElhR1kxYkxUWHpVSW10N0xz?=
+ =?utf-8?B?NWVxQmZnc3ladWlFRnM5eVFnWU9adjlUU1dNL0R5a3U3STN2cG1SRFkzRmJT?=
+ =?utf-8?B?N1ZCdjA0TWlVY0dVZGV1NjNWNjMvbUFHNHkvcVVUN1dpUTRsOXJYT3JzWHZv?=
+ =?utf-8?B?QStMKzlQRGlHREZZeWZxamI0eklVTllrQ2E0MmcrYmZtcXNlU2VZL3hBYnRz?=
+ =?utf-8?B?NUFNOGJRSzVycUtZcS9DTVFIZGRoQjVET29aNnhZNlNCMTdJRG5RWjJDUTlV?=
+ =?utf-8?B?b1djK0xKcVpVTjFZbGRhbThiU1NiQTUvaFV5dE5EOStDc2l4M2FzclVaTDJX?=
+ =?utf-8?B?Z3NXeXdvVVBlbnBDZVFmL1VRMmxTeHdMZnczZHlHT1ozNFJRNHZGb0NlTnVU?=
+ =?utf-8?B?ZG92R3k0SFJXU0RpY2lLWWI5UThGNFhNckp2WXJnZWRQM05wRk1OODdCRys0?=
+ =?utf-8?B?ZXpGZ01xUnVTYjhLOGlGZHF2eHZqQkNzVStCcnYvSG5aSFJlQnRWQzBuaEtW?=
+ =?utf-8?B?MENkM1Vsd2hFVU9FNW5JYkk5NWwrWjQwcWRibTNzWE4vVEtydWU0MEdFN1pz?=
+ =?utf-8?B?bzUydDNjcEZ2bGtBSWR2UVJHRTlpNDlkMDhyVHZPY1FGUG5sdnB0dUY4UWFo?=
+ =?utf-8?B?STJMNktFRU1xY0pMdVF5Vmp5YXJxUmFMY2dLTnBGYzdVSnMzS1BIblNiOHlT?=
+ =?utf-8?B?UHpZbk9QMWpNWXRHZVAvVE51bW1VbS9FTmxNeDJ2UEtaU2RxcnlMenk2MkU0?=
+ =?utf-8?B?a2NKWUdiaktvN1c2czQwcUtnVCtwaEJWeGxRWCthVzZROUNDa2k3SlZET20v?=
+ =?utf-8?B?aW9Na3k2UW96OVgzbGtOTTBlZ1NKTlJSa1ZuekZGTUFzT3RHOC9EZVBnSlVs?=
+ =?utf-8?B?c3FpcmhpYTFNUGVCd0VSeXdzWFI5dDZIYlFkcEhVclpWY2QzZzZzbHdMYzlG?=
+ =?utf-8?B?M29tRm8yVFcrdG81bHp1RmxSbTd5Mnd2YVE2bU9FT05wcDlTK281QjJITUti?=
+ =?utf-8?Q?IpkXkasbjkTudfmxQ1UsEVThI6/mre5Iiy7AFjH?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8de45b26-7110-4410-599f-08d929cd8640
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jun 2021 16:01:35.1092
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6ycDPXuIoDI+tl/vZWaxIe0n5Q7EYAUNMv/DTJgNoFc+/qrMgej2zxvRf/J71K0RX84Tqx4pwVoD7Oqy1/N2kw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4557
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 4 Jun 2021 20:01:08 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-> On Fri, Jun 04, 2021 at 03:29:18PM -0600, Alex Williamson wrote:
-> > On Fri, 4 Jun 2021 14:22:07 -0300
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > On Fri, Jun 04, 2021 at 06:10:51PM +0200, Paolo Bonzini wrote:  
-> > > > On 04/06/21 18:03, Jason Gunthorpe wrote:    
-> > > > > On Fri, Jun 04, 2021 at 05:57:19PM +0200, Paolo Bonzini wrote:    
-> > > > > > I don't want a security proof myself; I want to trust VFIO to make the right
-> > > > > > judgment and I'm happy to defer to it (via the KVM-VFIO device).
-> > > > > > 
-> > > > > > Given how KVM is just a device driver inside Linux, VMs should be a slightly
-> > > > > > more roundabout way to do stuff that is accessible to bare metal; not a way
-> > > > > > to gain extra privilege.    
-> > > > > 
-> > > > > Okay, fine, lets turn the question on its head then.
-> > > > > 
-> > > > > VFIO should provide a IOCTL VFIO_EXECUTE_WBINVD so that userspace VFIO
-> > > > > application can make use of no-snoop optimizations. The ability of KVM
-> > > > > to execute wbinvd should be tied to the ability of that IOCTL to run
-> > > > > in a normal process context.
-> > > > > 
-> > > > > So, under what conditions do we want to allow VFIO to giave a process
-> > > > > elevated access to the CPU:    
-> > > > 
-> > > > Ok, I would definitely not want to tie it *only* to CAP_SYS_RAWIO (i.e.
-> > > > #2+#3 would be worse than what we have today), but IIUC the proposal (was it
-> > > > yours or Kevin's?) was to keep #2 and add #1 with an enable/disable ioctl,
-> > > > which then would be on VFIO and not on KVM.      
-> > > 
-> > > At the end of the day we need an ioctl with two arguments:
-> > >  - The 'security proof' FD (ie /dev/vfio/XX, or /dev/ioasid, or whatever)
-> > >  - The KVM FD to control wbinvd support on
-> > > 
-> > > Philosophically it doesn't matter too much which subsystem that ioctl
-> > > lives, but we have these obnoxious cross module dependencies to
-> > > consider.. 
-> > > 
-> > > Framing the question, as you have, to be about the process, I think
-> > > explains why KVM doesn't really care what is decided, so long as the
-> > > process and the VM have equivalent rights.
-> > > 
-> > > Alex, how about a more fleshed out suggestion:
-> > > 
-> > >  1) When the device is attached to the IOASID via VFIO_ATTACH_IOASID
-> > >     it communicates its no-snoop configuration:  
-> > 
-> > Communicates to whom?  
-> 
-> To the /dev/iommu FD which will have to maintain a list of devices
-> attached to it internally.
-> 
-> > >      - 0 enable, allow WBINVD
-> > >      - 1 automatic disable, block WBINVD if the platform
-> > >        IOMMU can police it (what we do today)
-> > >      - 2 force disable, do not allow BINVD ever  
-> > 
-> > The only thing we know about the device is whether or not Enable
-> > No-snoop is hard wired to zero, ie. it either can't generate no-snoop
-> > TLPs ("coherent-only") or it might ("assumed non-coherent").    
-> 
-> Here I am outlining the choice an also imagining we might want an
-> admin knob to select the three.
+On 6/7/21 9:54 AM, Borislav Petkov wrote:
+> On Wed, Jun 02, 2021 at 09:04:00AM -0500, Brijesh Singh wrote:
+>>  static bool early_setup_sev_es(void)
+> This function is doing SNP init now too, so it should be called
+> something generic like
+>
+> 	do_early_sev_setup()
+>
+> or so.
 
-You're calling this an admin knob, which to me suggests a global module
-option, so are you trying to implement both an administrator and a user
-policy?  ie. the user can create scenarios where access to wbinvd might
-be justified by hardware/IOMMU configuration, but can be limited by the
-admin?
+Okay, noted.
 
-For example I proposed that the ioasidfd would bear the responsibility
-of a wbinvd ioctl and therefore validate the user's access to enable
-wbinvd emulation w/ KVM, so I'm assuming this module option lives
-there.  I essentially described the "enable" behavior in my previous
-reply, user has access to wbinvd if owning a non-coherent capable
-device managed in a non-coherent IOASID.  Yes, the user IOASID
-configuration controls the latter half of this.
 
-What then is "automatic" mode?  The user cannot create a non-coherent
-IOASID with a non-coherent device if the IOMMU supports no-snoop
-blocking?  Do they get a failure?  Does it get silently promoted to
-coherent?
+>>  #define GHCB_SEV_ES_GEN_REQ		0
+>>  #define GHCB_SEV_ES_PROT_UNSUPPORTED	1
+>> +#define GHCB_SEV_ES_SNP_UNSUPPORTED	2
+> GHCB_SNP_UNSUPPORTED
 
-In "disable" mode, I think we're just narrowing the restriction
-further, a non-coherent capable device cannot be used except in a
-forced coherent IOASID.
+Noted.
 
-> > If we're putting the policy decision in the hands of userspace they
-> > should have access to wbinvd if they own a device that is assumed
-> > non-coherent AND it's attached to an IOMMU (page table) that is not
-> > blocking no-snoop (a "non-coherent IOASID").  
-> 
-> There are two parts here, like Paolo was leading too. If the process
-> has access to WBINVD and then if such an allowed process tells KVM to
-> turn on WBINVD in the guest.
-> 
-> If the process has a device and it has a way to create a non-coherent
-> IOASID, then that process has access to WBINVD.
-> 
-> For security it doesn't matter if the process actually creates the
-> non-coherent IOASID or not. An attacker will simply do the steps that
-> give access to WBINVD.
 
-Yes, at this point the user has the ability to create a configuration
-where they could have access to wbinvd, but if they haven't created
-such a configuration, is the wbinvd a no-op?
+>
+>> +static bool __init sev_snp_check_hypervisor_features(void)
+> check_hv_features()
+>
+> is nice and short.
 
-> The important detail is that access to WBINVD does not compell the
-> process to tell KVM to turn on WBINVD. So a qemu with access to WBINVD
-> can still choose to create a secure guest by always using IOMMU_CACHE
-> in its page tables and not asking KVM to enable WBINVD.
+Noted.
 
-Of course.
 
-> This propsal shifts this policy decision from the kernel to userspace.
-> qemu is responsible to determine if KVM should enable wbinvd or not
-> based on if it was able to create IOASID's with IOMMU_CACHE.
+>> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+>> index 77a754365ba9..9b70b7332614 100644
+>> --- a/arch/x86/kernel/sev.c
+>> +++ b/arch/x86/kernel/sev.c
+>> @@ -609,6 +609,10 @@ static bool __init sev_es_setup_ghcb(void)
+> Ditto for this one: setup_ghcb()
 
-QEMU is responsible for making sure the VM is consistent; if
-non-coherent DMA can occur, wbinvd is emulated.  But it's still the
-KVM/IOASID connection that validates that access.
+Noted.
 
-> > Conversely, a user could create a non-coherent IOASID and attach any
-> > device to it, regardless of IOMMU backing capabilities.  Only if an
-> > assumed non-coherent device is attached would the wbinvd be allowed.  
-> 
-> Right, this is exactly the point. Since the user gets to pick if the
-> IOASID is coherent or not then an attacker can always reach WBINVD
-> using only the device FD. Additional checks don't add to the security
-> of the process.
-> 
-> The additional checks you are describing add to the security of the
-> guest, however qemu is capable of doing them without more help from the
-> kernel.
-> 
-> It is the strenth of Paolo's model that KVM should not be able to do
-> optionally less, not more than the process itself can do.
 
-I think my previous reply was working towards those guidelines.  I feel
-like we're mostly in agreement, but perhaps reading past each other.
-Nothing here convinced me against my previous proposal that the
-ioasidfd bears responsibility for managing access to a wbinvd ioctl,
-and therefore the equivalent KVM access.  Whether wbinvd is allowed or
-no-op'd when the use has access to a non-coherent device in a
-configuration where the IOMMU prevents non-coherent DMA is maybe still
-a matter of personal preference.
-
-> > > It is pretty simple from a /dev/ioasid perpsective, covers todays
-> > > compat requirement, gives some future option to allow the no-snoop
-> > > optimization, and gives a new option for qemu to totally block wbinvd
-> > > no matter what.  
-> > 
-> > What do you imagine is the use case for totally blocking wbinvd?   
-> 
-> If wbinvd is really security important then an operator should endevor
-> to turn it off. It can be safely turned off if the operator
-> understands the SRIOV devices they are using. ie if you are only using
-> mlx5 or a nvme then force it off and be secure, regardless of the
-> platform capability.
-
-Ok, I'm not opposed to something like a module option that restricts to
-only coherent DMA, but we need to work through how that's exposed and
-the userspace behavior.  The most obvious would be that a GET_INFO
-ioctl on the ioasidfd indicates the restrictions, a flag on the IOASID
-alloc indicates the coherency of the IOASID, and we fail any cases
-where the admin policy or hardware support doesn't match (ie. alloc if
-it's incompatible with policy, attach if the device/IOMMU backing
-violates policy).  This is all a compatible layer with what I described
-previously.  Thanks,
-
-Alex
-
+>
+> Thx.
+>
