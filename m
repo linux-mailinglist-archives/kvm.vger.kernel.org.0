@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 183FA39D819
-	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 11:02:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 565AA39D81C
+	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 11:02:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230366AbhFGJEL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Jun 2021 05:04:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51034 "EHLO
+        id S230155AbhFGJEW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Jun 2021 05:04:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27578 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230320AbhFGJEK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Jun 2021 05:04:10 -0400
+        by vger.kernel.org with ESMTP id S230378AbhFGJEW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Jun 2021 05:04:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623056539;
+        s=mimecast20190719; t=1623056551;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=RFvXIxYex7L7BTPL6RujzTgA4ognaCL/Fmf1PDhW6bQ=;
-        b=iiwtGoqKIfy7dhizAMOX2u3oMU/Cj9Xotu91GgAzgfVEEnOjHJ1VaLrNqk44Nh/+9saD1n
-        q3/hSyfXl5WnU1Vqwl4wiW4oeuJZ0uFvDyFeCAQU9o4NQNvZHxdE2TCuGW72GrR4K5O/3F
-        kvWPoo1eZ8CaVVPS59DNMkS2SIyixG4=
+        bh=fmrIcGLs7DyMsD0MtJVPsZQmrmAQW6jU1PhZZbdgL9w=;
+        b=AtHMuDKJQXxv6aSi5hWl1cxnsXfkA9qMQrLb0b1kfe6YElalxykBWhiTM7XR0+DEzemtO5
+        zI8YyihEALfEWPhbKRy3HvIl4QpljsL5+TN2e3F6NkLhYCIYqStEa5o5M5n3gB+aGDW94W
+        +B+S6+eFrFO9eyWiQLEtUnAl4w63JfI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-451-CTm1a-LcN8eDvMggvBm5sw-1; Mon, 07 Jun 2021 05:02:17 -0400
-X-MC-Unique: CTm1a-LcN8eDvMggvBm5sw-1
+ us-mta-585-eQRzzmb4POK9jp13obnUmQ-1; Mon, 07 Jun 2021 05:02:29 -0400
+X-MC-Unique: eQRzzmb4POK9jp13obnUmQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62826193578C;
-        Mon,  7 Jun 2021 09:02:15 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80C391020C2E;
+        Mon,  7 Jun 2021 09:02:27 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.40.194.6])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 020101037EA4;
-        Mon,  7 Jun 2021 09:02:10 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D15AA1037EA5;
+        Mon,  7 Jun 2021 09:02:15 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -49,9 +49,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jonathan Corbet <corbet@lwn.net>,
         "H. Peter Anvin" <hpa@zytor.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v3 1/8] KVM: nVMX: Drop obsolete (and pointless) pdptrs_changed() check
-Date:   Mon,  7 Jun 2021 12:01:56 +0300
-Message-Id: <20210607090203.133058-2-mlevitsk@redhat.com>
+Subject: [PATCH v3 2/8] KVM: nSVM: Drop pointless pdptrs_changed() check on nested transition
+Date:   Mon,  7 Jun 2021 12:01:57 +0300
+Message-Id: <20210607090203.133058-3-mlevitsk@redhat.com>
 In-Reply-To: <20210607090203.133058-1-mlevitsk@redhat.com>
 References: <20210607090203.133058-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -63,37 +63,33 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <seanjc@google.com>
 
-Remove the pdptrs_changed() check when loading L2's CR3.  The set of
-available registers is always reset when switching VMCSes (see commit
-e5d03de5937e, "KVM: nVMX: Reset register cache (available and dirty
-masks) on VMCS switch"), thus the "are PDPTRs available" check will
-always fail.  And even if it didn't fail, reading guest memory to check
-the PDPTRs is just as expensive as reading guest memory to load 'em.
+Remove the "PDPTRs unchanged" check to skip PDPTR loading during nested
+SVM transitions as it's not at all an optimization.  Reading guest memory
+to get the PDPTRs isn't magically cheaper by doing it in pdptrs_changed(),
+and if the PDPTRs did change, KVM will end up doing the read twice.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/nested.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ arch/x86/kvm/svm/nested.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 6058a65a6ede..c45189898a64 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -1118,11 +1118,9 @@ static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3, bool ne
- 	 * must not be dereferenced.
- 	 */
- 	if (!nested_ept && is_pae_paging(vcpu) &&
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 5e8d8443154e..8f5dbc80f57f 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -391,10 +391,8 @@ static int nested_svm_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3,
+ 		return -EINVAL;
+ 
+ 	if (!nested_npt && is_pae_paging(vcpu) &&
 -	    (cr3 != kvm_read_cr3(vcpu) || pdptrs_changed(vcpu))) {
--		if (CC(!load_pdptrs(vcpu, vcpu->arch.walk_mmu, cr3))) {
--			*entry_failure_code = ENTRY_FAIL_PDPTE;
+-		if (CC(!load_pdptrs(vcpu, vcpu->arch.walk_mmu, cr3)))
 -			return -EINVAL;
--		}
-+	    CC(!load_pdptrs(vcpu, vcpu->arch.walk_mmu, cr3))) {
-+		*entry_failure_code = ENTRY_FAIL_PDPTE;
+-	}
++	    CC(!load_pdptrs(vcpu, vcpu->arch.walk_mmu, cr3)))
 +		return -EINVAL;
- 	}
  
  	/*
+ 	 * TODO: optimize unconditional TLB flush/MMU sync here and in
 -- 
 2.26.3
 
