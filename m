@@ -2,269 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AB4C639D31A
-	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 04:47:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09F4339D333
+	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 04:58:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230178AbhFGCtC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 6 Jun 2021 22:49:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46302 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230127AbhFGCtC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 6 Jun 2021 22:49:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623034031;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Mr3tocRxWL7KHdg8awV/zpzMwDBrih+hXjg05z6CBzk=;
-        b=drLTDpCuX5HGGbbaJJem9ZCgnDXVJXNuOmofwoVhczaoeIpXU09WuDGpuEyFPUnId0zNPA
-        CLrmiSOaFCdcMk6n/O+MfWQC3rhxdMgNhLp0P6gpSNk1fVLDCybr8fMgpmVnK69N9YqteS
-        qwtV5UxlHsDDUqGdq9OUhcsfsa9Fq78=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-u0HpMP14NY2JN35BD1OY2A-1; Sun, 06 Jun 2021 22:47:10 -0400
-X-MC-Unique: u0HpMP14NY2JN35BD1OY2A-1
-Received: by mail-pl1-f198.google.com with SMTP id z10-20020a170903018ab02901108a797206so2235404plg.16
-        for <kvm@vger.kernel.org>; Sun, 06 Jun 2021 19:47:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=Mr3tocRxWL7KHdg8awV/zpzMwDBrih+hXjg05z6CBzk=;
-        b=Ugymfyz34itXy7X2kJFXvk6uoB17DoJh/sAO8Hpixf3lmQhDrGyFwNZRbWvZ8SLBVq
-         A4IU3BFMHuyV9jPJ31Od7au1/l5L6EU4LiZ9JfzpXVkTqC9a5A/dDX0y51HtA0xZuOaJ
-         ayMeUKqSxCTmjEbSWljW5j0J6mArCBkyv4gNvKGy0fhgwtHCLYYO5yb0RLJRtMLxhyXY
-         e4fgtP3owwl4YvWfbu9/5jMLhaIIxxgzbDH3EDqw5vE4/Z2rSnVUhWpLZD7y2d/uwgHM
-         RnBqhL1c6AjLD6B0vDOUOboLvnbzS64yrfWnw3QjXaJTisb+9uKnkN/FH5taCN0ei0p8
-         oygA==
-X-Gm-Message-State: AOAM532Ipz8squcdI8aAMGAk6JSQ/jPsIlmlR+e0rRd0FB5ibf5LlDgb
-        XbiUF0ugTgjqowpK+ndUTsmOLdghfFLnQEdRheyoVpr1IfnRsNTBvKVwIly7Nz/k4+ygtU3KWQq
-        wFJYnyvMHTOB+hBXMwqAu8JxLxgM8YLTliF/HXnZEZPGrNUw16klo66whSJq1AgC2
-X-Received: by 2002:a17:90a:a512:: with SMTP id a18mr10789102pjq.215.1623034028520;
-        Sun, 06 Jun 2021 19:47:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxp6+IFTDaA+xiekaXr4IMEzKNt6UmxaapTPVHbpvF501mj9bOPvGKBHxi8b6knZswIY52v0A==
-X-Received: by 2002:a17:90a:a512:: with SMTP id a18mr10789078pjq.215.1623034028146;
-        Sun, 06 Jun 2021 19:47:08 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id z134sm6704296pfc.209.2021.06.06.19.47.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 06 Jun 2021 19:47:07 -0700 (PDT)
-Subject: Re: [RFC PATCH 0/7] Untrusted device support for virtio
-To:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, xieyongji@bytedance.com,
-        stefanha@redhat.com, file@sect.tu-berlin.de, ashish.kalra@amd.com,
-        martin.radev@aisec.fraunhofer.de, kvm@vger.kernel.org
-References: <20210421032117.5177-1-jasowang@redhat.com>
- <YInOQt1l/59zzPJK@Konrads-MacBook-Pro.local>
- <9b089e3b-7d7a-b9d6-a4a1-81a6eff2e425@redhat.com>
- <e8a35789-5001-3e17-1546-80fa9daa5ab1@oracle.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <b4f25e0e-5115-2d58-e433-1839651d747f@redhat.com>
-Date:   Mon, 7 Jun 2021 10:46:59 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <e8a35789-5001-3e17-1546-80fa9daa5ab1@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        id S230194AbhFGDAS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 6 Jun 2021 23:00:18 -0400
+Received: from mga17.intel.com ([192.55.52.151]:22261 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230147AbhFGDAR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 6 Jun 2021 23:00:17 -0400
+IronPort-SDR: 3b1QHOvsMmYJn5mOOexMW56PPOOUkPHucWXRYwid7EYdq6eWYa+sQi3Bb2NGNlalAz8lCWPUIw
+ rhWGC8tuKaBA==
+X-IronPort-AV: E=McAfee;i="6200,9189,10007"; a="184923568"
+X-IronPort-AV: E=Sophos;i="5.83,254,1616482800"; 
+   d="scan'208";a="184923568"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2021 19:58:25 -0700
+IronPort-SDR: ZtusT+LbjUh3T7aLJ0BJzDneXMJBVk6Py9g05B8GDXhwqs263nx5UkX9LeBP8T0mqPgWJOW1xI
+ qwnmL6hT126Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.83,254,1616482800"; 
+   d="scan'208";a="481359150"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga001.jf.intel.com with ESMTP; 06 Jun 2021 19:58:25 -0700
+Received: from orsmsx608.amr.corp.intel.com (10.22.229.21) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.4; Sun, 6 Jun 2021 19:58:24 -0700
+Received: from orsmsx605.amr.corp.intel.com (10.22.229.18) by
+ ORSMSX608.amr.corp.intel.com (10.22.229.21) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.4; Sun, 6 Jun 2021 19:58:24 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4
+ via Frontend Transport; Sun, 6 Jun 2021 19:58:24 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.104)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2242.4; Sun, 6 Jun 2021 19:58:24 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=feUTDzdUTN6zYxLSjo52Lt65JB0gms3IlBL/UkPG5nvEX1CmJtfLt2rudo5woO3uHTkf7sqSCXLAPu1PJJQKgKOkaZP/7VTs1bg0pfISN7nSXf30FqJ5YOJWdyR4JgpHU6AVUgYPGr4ADDFITruuIUOdDyPwfZ0UTPUxc7vgkclFhuPl+K4fzSjy3FWJy3TSJhUKSBt5K0tqxMJ2enHugM7WDuw0mRcfLJQUWGFytEiDUriTk7ZUCfdbjEHHec/2rsrYl4Zc3nV+p+iRAHe8l3QFFW1K7g4AaB4Z2Z06Zzxv0honu1oFQCl5v/KFp/9t5f2uxrCybbt9Fzzc6qKh4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mPgwOJR3ggSZ1LaYcT5aVkaSDZp5iD19DSjadb3NqBk=;
+ b=BxdCGyAmgG1hqTJvXSDBQNSTIgkM8aMY25/mU3raFKyFCdzCKZQFIYmM80w8stwIRQXwgfTTQb0ADaBREjphJKigM11yKHt7jCgooyL7FoKAEGb3MgNbObwIZsBBDzSDzlgNw4PzbQ35XzQFJYnGA0K6dnFXvMfLUwq4rJdIYrP0iE6tdibo2/kOY9jxSXQvsrTCzbyKTNAXavZn6LicAaU+Potc1KHMj0KQ+Xdm0WOOPfT0Cuhd4/M/LOAt84hqHlASPakTODfYPnussZHZH5OhnWdG82mhT0ADrww1TgQ5ojEwzdJ6nFRhmXADx1vHGhhznogvi7Mogi9wPEPyIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mPgwOJR3ggSZ1LaYcT5aVkaSDZp5iD19DSjadb3NqBk=;
+ b=MzPgpyXVb4BUHnavHdqZyhiNf+ADNvj4GbZqB9jyJGliEtHayqEE8JsT7TyS9ZglohLjRFlABBwBd9RcR50ihiAuFLJVsfDeM7OSep7jn//MqD96FzpDTges1w+3w8/yLrqPKvnQf7SLYAcr68meYWj+/NCX6whNTYn7XXhVbPM=
+Received: from MWHPR11MB1886.namprd11.prod.outlook.com (2603:10b6:300:110::9)
+ by CO1PR11MB4882.namprd11.prod.outlook.com (2603:10b6:303:97::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.23; Mon, 7 Jun
+ 2021 02:58:19 +0000
+Received: from MWHPR11MB1886.namprd11.prod.outlook.com
+ ([fe80::6597:eb05:c507:c6c1]) by MWHPR11MB1886.namprd11.prod.outlook.com
+ ([fe80::6597:eb05:c507:c6c1%12]) with mapi id 15.20.4195.030; Mon, 7 Jun 2021
+ 02:58:19 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        "Alex Williamson (alex.williamson@redhat.com)" 
+        <alex.williamson@redhat.com>,
+        "Jean-Philippe Brucker" <jean-philippe@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Jason Wang <jasowang@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shenming Lu <lushenming@huawei.com>
+CC:     Eric Auger <eric.auger@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "Kirti Wankhede" <kwankhede@nvidia.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "David Woodhouse" <dwmw2@infradead.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>
+Subject: Plan for /dev/ioasid RFC v2
+Thread-Topic: Plan for /dev/ioasid RFC v2
+Thread-Index: AddbO/WEUAFl3MPnRsG8exiH8bwEag==
+Date:   Mon, 7 Jun 2021 02:58:18 +0000
+Message-ID: <MWHPR11MB188699D0B9C10EB51686C4138C389@MWHPR11MB1886.namprd11.prod.outlook.com>
+Accept-Language: en-US
 Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: nvidia.com; dkim=none (message not signed)
+ header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [101.80.65.46]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 8b2d35cc-7b9e-4d1a-1c2e-08d929601ae2
+x-ms-traffictypediagnostic: CO1PR11MB4882:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <CO1PR11MB48820CF4879F2B822C5BD1518C389@CO1PR11MB4882.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: y+APzMm+XfgCVSc4sqjF9Us/lHNePpak3R0/S3u2PpFmqeW0PIsJkM9Lb+TC/YX1vBguuraGSXQRN992ygPWNUf5sYiforOiyWMjluz7jTyDcm+NhCira4K4qXQdYsrgDlJN8shO/n3I4J2dmJUvrLBPNUyylJzHtyoWpB02rOaIfY8v0M2M7ncRHrS2YHLt/f5o/UtHor2hOPOGw1lmuy63Sh5z+WEucLlcTcpKPUuiCEet8+8qYBRQMQrDJnldzP7CUsAUpFryhPrkvrxCnGwRp3jclZHD/HihQGubsLvmHwBfOKPBZS6+wnquF6lx6EoBcaO+t8Ox//vhm06zmdO/n4ZHOsLo75m4lS3TCq/V0hNns54ikoSR5xigxMq9ERRW5xW0YQDZGRRrH8+FxznVxC5CrJZ8WJ8Jqn/TIdldyAxkr4FTb6+bHeoiCL3bSY/xh/MbQj3SJLr5Za3VZKETofmeJb2NXPtCT0j80gT8A8gYjNII2DlupuJXH99rC5S4LpYtni90xwVBWsIk42dvc2y4ZGmK18rFHXyjw8IAbN97Zs02Mlf7iFr1UUk3/3z+eTTRQ1e+XB1n/HsST47PobyrmbLWqH/fvGCp5OYj8F5IPVXMUE+rhiPFs1QoPn0Tvf9tirwZ4UOCE0iicNES2I5vR5z+NM3+IJo0d0E=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1886.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(346002)(366004)(376002)(136003)(396003)(8676002)(8936002)(478600001)(52536014)(83380400001)(55016002)(9686003)(4326008)(71200400001)(5660300002)(921005)(122000001)(186003)(7416002)(26005)(86362001)(66446008)(316002)(64756008)(66476007)(7696005)(33656002)(76116006)(110136005)(6506007)(54906003)(66946007)(66556008)(2906002)(38100700002)(21314003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?YzLaWbwZmhYm+gKPV9kX8fdXuIkpKZlASoiKSkfGbhpr84PD4R5Dj1Abgp7G?=
+ =?us-ascii?Q?SoBpQM7uqp2+EKk2RFQGhaDhwr+TlrlSKx0st1xgg4pCNWYraCHwXo6aJoCp?=
+ =?us-ascii?Q?fwmiq/iS2iJ8LTPKslaUp8PgdfVZS+Si8EW6QeiBBvlGmSrOJRuQdbsSWm//?=
+ =?us-ascii?Q?u4/tkLP95Vcgiyou27bAxmJ9DP70tsB+AR0v+Y+QnFxJgyVdVechpdqHL+x4?=
+ =?us-ascii?Q?huZMxV2/OaPxW3wOdYduRJyNx6WJk1PQOE61VQuldhzEGxH+GOVfRZW0m/T+?=
+ =?us-ascii?Q?slXS8la+0u3bVZ/OcI/hlLPIt6F7UkoTHUEp3rBdPSmJuKrckhvJXs6a99W/?=
+ =?us-ascii?Q?QCW6KD0L8nFA/74oIRNLZWpCOS6mBs6huGRK0dYY2ElqPLfMtkdE+pf+4cM2?=
+ =?us-ascii?Q?qLAI8bOnY9uyLHnywNy9WgN8NzFNkfCWk9P5Huh2LKy41fv8hUfJxHb1hjyO?=
+ =?us-ascii?Q?NPDKOlVyFuWWBmRsFP+sR7m1X/7rRaSucKuvtrteG69WzjTjpGVF8Nb3xmXL?=
+ =?us-ascii?Q?4DqCqRQKV4E5frZysmq/R+Hjrnse1QMXZvHbtAdS858Dim6I4VvwrETqSuXR?=
+ =?us-ascii?Q?LCT0jIkFD58aItR/2iHi8T3FSBzhnNsDNBXABeJ66LVq1sFBnqKpAJyxQPiB?=
+ =?us-ascii?Q?7Q5MBxtomADjPCRBAV2bAernJfIjE/WrVaQr4/31fPNqCSxs7xK7YJK6LRWR?=
+ =?us-ascii?Q?aazxLJXxbJeEGcyLQOmMI+wYVAWGjSgmCcQrKjavU6UWyhVoBOFU7qleubX7?=
+ =?us-ascii?Q?rUO1vt64tYnQLrdA0RK/7NrYRkfahreV3Q/RPPEyLfi/l/ArUlBTGEv+P1Hp?=
+ =?us-ascii?Q?J3c+5yyeiQc1FRrycN5bv6XQbIGNLUV3dtVUme6MGvwi4sP5Y43AS+rY+iG5?=
+ =?us-ascii?Q?tL/1SBYEfOI0NCHp1zELmAmPV7jvMkKaeHk+CqQX13E/MfGzKc/5+p0NEcB6?=
+ =?us-ascii?Q?DH9kmCkqpBjDZLdZViRjksy17Ma4xI32QqmteGN0IiW+RK9XIpYgidHhnfhz?=
+ =?us-ascii?Q?5pH0oqCcC/Ny5fdnRF1cBEspJxNb93sOQKxGVkeXF12r1UqgWoL6uWRsNDuB?=
+ =?us-ascii?Q?H07hBGb0Q6dq/g7u8IO5y9Uev7eUybjBmIRGdQFtDD+I3ROVSJRXIVgIUPnF?=
+ =?us-ascii?Q?KQNZkYd03JjPcDue67WNpmadMWpJq6ksAOO+pHxn260+jd8C6J9SAHx0f8Sf?=
+ =?us-ascii?Q?LxiFsV1SMBkhH8umbhY8ixKUTfK2zJ24OkoQCc9I+Fdx91OABSMQoPwAPEXh?=
+ =?us-ascii?Q?QAiGg1Nr9+kWMAevEK+pme4ZL+MD6z0U0o3bkgzgF4/DsLr02K2aT/fZU3QC?=
+ =?us-ascii?Q?EOk=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1886.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b2d35cc-7b9e-4d1a-1c2e-08d929601ae2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jun 2021 02:58:18.6874
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: f7pNzEYkRZIAON0mIkVjxbiyV7Ye89bTuUw1X8cJfe6vorTukPmzgt2g5CiGSb4Qq3LMvNk+7zplGuF/ygRmDA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4882
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi, all,
 
-在 2021/6/4 下午11:17, Konrad Rzeszutek Wilk 写道:
-> On 4/29/21 12:16 AM, Jason Wang wrote:
->>
->> 在 2021/4/29 上午5:06, Konrad Rzeszutek Wilk 写道:
->>> On Wed, Apr 21, 2021 at 11:21:10AM +0800, Jason Wang wrote:
->>>> Hi All:
->>>>
->>>> Sometimes, the driver doesn't trust the device. This is usually
->>>> happens for the encrtpyed VM or VDUSE[1]. In both cases, technology
->>>> like swiotlb is used to prevent the poking/mangling of memory from the
->>>> device. But this is not sufficient since current virtio driver may
->>>> trust what is stored in the descriptor table (coherent mapping) for
->>>> performing the DMA operations like unmap and bounce so the device may
->>>> choose to utilize the behaviour of swiotlb to perform attacks[2].
->>> We fixed it in the SWIOTLB. That is it saves the expected length
->>> of the DMA operation. See
->>>
->>> commit daf9514fd5eb098d7d6f3a1247cb8cc48fc94155
->>> Author: Martin Radev <martin.b.radev@gmail.com>
->>> Date:   Tue Jan 12 16:07:29 2021 +0100
->>>
->>>      swiotlb: Validate bounce size in the sync/unmap path
->>>      The size of the buffer being bounced is not checked if it happens
->>>      to be larger than the size of the mapped buffer. Because the size
->>>      can be controlled by a device, as it's the case with virtio 
->>> devices,
->>>      this can lead to memory corruption.
->>
->>
->> Good to know this, but this series tries to protect at different 
->> level. And I believe such protection needs to be done at both levels.
->>
->
-> My apologies for taking so long to respond, somehow this disappeared 
-> in one of the folders.
+We plan to work on v2 now, given many good comments already received
+and substantial changes envisioned. This is a very complex topic with
+many sub-threads being discussed. To ensure that I didn't miss valuable=20
+suggestions (and also keep everyone on the same page), here I'd like to=20
+provide a list of planned changes in my mind. Please let me know if=20
+anything important is lost.  :)
 
+--
 
-No problem.
+(Remaining opens in v1)
 
+-   Protocol between kvm/vfio/ioasid for wbinvd/no-snoop. I'll see how
+    much can be refined based on discussion progress when v2 is out;
 
->>
->>>> For double insurance, to protect from a malicous device, when DMA API
->>>> is used for the device, this series store and use the descriptor
->>>> metadata in an auxiliay structure which can not be accessed via
->>>> swiotlb instead of the ones in the descriptor table. Actually, we've
->>> Sorry for being dense here, but how wold SWIOTLB be utilized for
->>> this attack?
->>
->>
->> So we still behaviors that is triggered by device that is not 
->> trusted. Such behavior is what the series tries to avoid. We've 
->> learnt a lot of lessons to eliminate the potential attacks via this. 
->> And it would be too late to fix if we found another issue of SWIOTLB.
->>
->> Proving "the unexpected device triggered behavior is safe" is very 
->> hard (or even impossible) than "eliminating the unexpected device 
->> triggered behavior totally".
->>
->> E.g I wonder whether something like this can happen: Consider the DMA 
->> direction of unmap is under the control of device. The device can 
->> cheat the SWIOTLB by changing the flag to modify the device read only 
->> buffer. 
->
-> <blinks> Why would you want to expose that to the device? And wouldn't 
-> that be specific to Linux devices - because surely Windows DMA APIs 
-> are different and this 'flag' seems very Linux-kernel specific?
+-   Device-centric (Jason) vs. group-centric (David) uAPI. David is not ful=
+ly
+    convinced yet. Based on discussion v2 will continue to have ioasid uAPI
+    being device-centric (but it's fine for vfio to be group-centric). A ne=
+w
+    section will be added to elaborate this part;
 
+-   PASID virtualization (section 4) has not been thoroughly discussed yet.=
+=20
+    Jason gave some suggestion on how to categorize intended usages.=20
+    I will rephrase this section and hope more discussions can be held for=
+=20
+    it in v2;
 
-Just to make sure we are in the same page. The "flag" I actually mean 
-the virtio descriptor flag which could be modified by the device. And 
-driver deduce the DMA API flag from the descriptor flag.
+(Adopted suggestions)
 
+-   (Jason) Rename /dev/ioasid to /dev/iommu (so does uAPI e.g. IOASID
+    _XXX to IOMMU_XXX). One suggestion (Jason) was to also rename=20
+    RID+PASID to SID+SSID. But given the familiarity of the former, I will=
+=20
+    still use RID+PASID in v2 to ease the discussoin;
 
->
->> If yes, it is really safe?
->
-> Well no? But neither is rm -Rf / but we still allow folks to do that.
->>
->> The above patch only log the bounce size but it doesn't log the flag. 
->
-> It logs and panics the system.
+-   (Jason) v1 prevents one device from binding to multiple ioasid_fd's. Th=
+is=20
+    will be fixed in v2;
 
+-   (Jean/Jason) No need to track guest I/O page tables on ARM/AMD. When=20
+    a pasid table is bound, it becomes a container for all guest I/O page t=
+ables;
 
-Good to know that.
+-   (Jean/Jason) Accordingly a device label is required so iotlb invalidati=
+on=20
+    and fault handling can both support per-device operation. Per Jean's=20
+    suggestion, this label will come from userspace (when VFIO_BIND_
+    IOASID_FD);
 
+-   (Jason) Addition of device label allows per-device capability/format=20
+    check before IOASIDs are created. This leads to another major uAPI=20
+    change in v2 - specify format info when creating an IOASID (mapping=20
+    protocol, nesting, coherent, etc.). User is expected to check per-devic=
+e=20
+    format and then set proper format for IOASID upon to-be-attached=20
+    device;
 
->
->> Even if it logs the flag, SWIOTLB still doesn't know how each buffer 
->> is used and when it's the appropriate(safe) time to unmap the buffer, 
->> only the driver that is using the SWIOTLB know them.
->
-> Fair enough. Is the intent to do the same thing for all the other 
-> drivers that could be running in an encrypted guest and would require 
-> SWIOTLB.
->
-> Like legacy devices that KVM can expose (floppy driver?, SVGA driver)?
+-   (Jason/David) No restriction on map/unmap vs. bind/invalidate. They
+    can be used in either parent or child;
 
+-   (David) Change IOASID_GET_INFO to report permitted range instead of
+    reserved IOVA ranges. This works better for PPC;
 
-My understanding is that we shouldn't enable the legacy devices at all 
-in this case.
+-   (Jason) For helper functions, expect to have explicit bus-type wrappers
+    e.g. ioasid_pci_device_attach;
 
-Note that virtio has been extended to various types of devices (we can 
-boot qemu without PCI and legacy devices (e.g the micro VM))
+(Not adopted)
 
-- virtio input
-- virtio gpu
-- virtio sound
-...
-
-I'm not sure whether we need floppy, but it's not hard to have a 
-virtio-floppy if necessary
-
-So it would be sufficient for us to audit/harden the virtio drivers.
-
-
->
->>
->> So I think we need to consolidate on both layers instead of solely 
->> depending on the SWIOTLB.
->
-> Please make sure that this explanation is in part of the cover letter
-> or in the commit/Kconfig.
-
-
-I will do that if the series needs a respin.
-
-
->
-> Also, are you aware of the patchset than Andi been working on that 
-> tries to make the DMA code to have extra bells and whistles for this 
-> purpose?
-
-
-Yes, but as described above they are not duplicated. Protection at both 
-levels would be optimal.
-
-Another note is that this series is not only for DMA/swiotlb stuffs, it 
-eliminate all the possible attacks via the descriptor ring.
-
-(One example is the attack via descriptor.next)
+-   (Parav) Make page pinning a syscall;
+-   (Jason. W/Enrico) one I/O page table per fd;
+-   (David) Replace IOASID_REGISTER_MEMORY through another ioasid
+    nesting (sort of passthrough mode). Need more thinking. v2 will not=20
+    change this part;
 
 Thanks
-
-
->
-> Thank you.
->> Thanks
->>
->>
->>>
->>>> almost achieved that through packed virtqueue and we just need to fix
->>>> a corner case of handling mapping errors. For split virtqueue we just
->>>> follow what's done in the packed.
->>>>
->>>> Note that we don't duplicate descriptor medata for indirect
->>>> descriptors since it uses stream mapping which is read only so it's
->>>> safe if the metadata of non-indirect descriptors are correct.
->>>>
->>>> The behaivor for non DMA API is kept for minimizing the performance
->>>> impact.
->>>>
->>>> Slightly tested with packed on/off, iommu on/of, swiotlb force/off in
->>>> the guest.
->>>>
->>>> Please review.
->>>>
->>>> [1] 
->>>> https://lore.kernel.org/netdev/fab615ce-5e13-a3b3-3715-a4203b4ab010@redhat.com/T/ 
->>>>
->>>> [2] 
->>>> https://yhbt.net/lore/all/c3629a27-3590-1d9f-211b-c0b7be152b32@redhat.com/T/#mc6b6e2343cbeffca68ca7a97e0f473aaa871c95b 
->>>>
->>>>
->>>> Jason Wang (7):
->>>>    virtio-ring: maintain next in extra state for packed virtqueue
->>>>    virtio_ring: rename vring_desc_extra_packed
->>>>    virtio-ring: factor out desc_extra allocation
->>>>    virtio_ring: secure handling of mapping errors
->>>>    virtio_ring: introduce virtqueue_desc_add_split()
->>>>    virtio: use err label in __vring_new_virtqueue()
->>>>    virtio-ring: store DMA metadata in desc_extra for split virtqueue
->>>>
->>>>   drivers/virtio/virtio_ring.c | 189 
->>>> ++++++++++++++++++++++++++---------
->>>>   1 file changed, 141 insertions(+), 48 deletions(-)
->>>>
->>>> -- 
->>>> 2.25.1
->>>>
->>
->
-
+Kevin
