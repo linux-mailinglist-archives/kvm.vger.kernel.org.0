@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F5BF39D5DF
-	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 09:22:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 889B439D5DB
+	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 09:21:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230251AbhFGHXs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Jun 2021 03:23:48 -0400
-Received: from mail-pl1-f175.google.com ([209.85.214.175]:45929 "EHLO
-        mail-pl1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230241AbhFGHXr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Jun 2021 03:23:47 -0400
-Received: by mail-pl1-f175.google.com with SMTP id 11so8118811plk.12;
-        Mon, 07 Jun 2021 00:21:40 -0700 (PDT)
+        id S230207AbhFGHXe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Jun 2021 03:23:34 -0400
+Received: from mail-pj1-f41.google.com ([209.85.216.41]:46914 "EHLO
+        mail-pj1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229545AbhFGHXd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Jun 2021 03:23:33 -0400
+Received: by mail-pj1-f41.google.com with SMTP id pi6-20020a17090b1e46b029015cec51d7cdso9801264pjb.5;
+        Mon, 07 Jun 2021 00:21:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=JlYRWlvh6yimKDHghpsT5yQcW80e6PQ1qpgXZSEcu00=;
-        b=SuMgAOHZp76X857sJzJcNiqw/cdz/fnKJzIepU6ZLQ+95HLwH2mw+pgKNabPqUd1F9
-         uTfbIznknW6JhnPxC1AWwOO1H/pNm3/2xayiWPKKegAXEpDpN7c8voyGKaUcYmcOVDa9
-         bHPQCJPslQkqNvKfwyLGVHndtetoUtlewlY95Z81A62NcKhzesWXvAQImnqr2ibU3aOQ
-         oe63rn9XDaPCGvBTU2Pv9geQrDgaRZfZJiDK93iIiFQo8KxocsajevbdpmCsRxKR6N+c
-         H9aV8M2Ag6eK/bq49ECvAVR9xvrt/j1JSkk2TSAxQdTa06B9SWyTdiMaOdtKm138GOa8
-         lSxw==
+        bh=OC8PsyFHXhJlNVBTSitgcnGkSPQg05VER4L54PiarWk=;
+        b=BLP7nIx2+RA4xMdb1wch9+kPqtJFTu84QDLM0/dfVOMXRlqFrkRDib2cx5EjAi/g8f
+         8wdzgri55tcmCApEUYacPNAq0TbIFZ6L6CiQX21McBJS5GhtMqu0/g6taKYdnmuXldNt
+         Ik0TC3HUG0xSVO6Frr8EW54sX/6qy1+t9cNnTozV9pi1+Dfm9tE6Mf8fsqL1xaDNvjrO
+         YVNQs+AyKodHIvYH0vXPxTY84Bw2fvpdR9u8Uy74fhWDo/nvwvif3jQbSccHzQRhULQC
+         7T/NhA9f+mTXx1m2dTGATNhK3MjIHJCb4iSPa3xhVi2Eu2PcZTbDgc+vbXNvAaaKw6hk
+         q6bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=JlYRWlvh6yimKDHghpsT5yQcW80e6PQ1qpgXZSEcu00=;
-        b=oojvVQgiEV4i06kEixxnQrLxt0k9ZS+GxCs/2wIghbhU6i7t2wINS9fKAT/f2A/ZBW
-         y9PjmClsqN4KLKD8RG/L3Ox7ISKcYjmu7jTtnZ46fGhTWZE8PWu8yzEIUKh8nCKh3Qk6
-         5ISihnWYhXJh7ilODGmDPJ6JsMikzB9xt7MTzbdf/DYtdUmz5fIkiONTN2LxXeMC3SCU
-         1dDTkPiemmSZ7gVZhSsaXMGNSVgChdl23wohPPkkVvCESdp1rMhNQPis3J8H3Ud0Ndu3
-         FP96F7gEGxzajDDhI4DpK7ug0KCNFWXFueSeZIxIZKexjB/HME+MCDLmmHzzC300nngf
-         yD/A==
-X-Gm-Message-State: AOAM530DLVgMmOyjjwZMkd82VIu9aqP16PBQA8J1ovTmVQvLVT+4s3oe
-        53DBLZZu/ziIi5iAihCWD4tPbazac0k=
-X-Google-Smtp-Source: ABdhPJwOi+0Czpk9oqjZ4RSqN0WhlFSW4KTQxw8WwDA3Rkxf4IhmuPlZar+Bzs1iKEbvGMBR4YSEhQ==
-X-Received: by 2002:a17:90b:4ad2:: with SMTP id mh18mr18317159pjb.148.1623050440048;
-        Mon, 07 Jun 2021 00:20:40 -0700 (PDT)
+        bh=OC8PsyFHXhJlNVBTSitgcnGkSPQg05VER4L54PiarWk=;
+        b=tgoaWUGetv/gaqDtIGqQ8pYe4iJjjCjJ/4sO5v3ofbbG6HTBF0Cq6mQIzGnJ7XWk4H
+         1XPqSMBTupUhuj88e0hM2XEWmix2mJpNiuYB5mzmho6bXzvTLymbVLlqWLp3s/tM9Ngj
+         L7xRnY/lNqEslVN5qw71L5YBb4W53z+3Oh/kyEA0qe86B+I6e/7wZVD2k0mnu60E4qdv
+         4rwXsg4TqM8K0o4iGobGgG+Uz+ZMlGpYduuehW3s88Nw7+xiphEKvucWlTh2k0YPwNLv
+         WjhnDLmhRm1wRGH4w1pwYLXZqBXHdXqBqfQRkCXufsk+OmlLrCwuHxoITbvGsGu1xigl
+         zQ4Q==
+X-Gm-Message-State: AOAM533BwGjNdG5KORUB+irDYpJBJl+6IzjmsumcpHiwUTUja+Rg5v7c
+        cJat4oaVt4zvctDCfsYKnxd4gEx2yUo=
+X-Google-Smtp-Source: ABdhPJyIlTGgSn22HgWeistANnthzANP1Oh7++Qhyctx5nVh0iy1oHkXz0LitYEqNHvxrdqjAlNypQ==
+X-Received: by 2002:a17:902:c404:b029:10e:21e8:759c with SMTP id k4-20020a170902c404b029010e21e8759cmr16807097plk.44.1623050442846;
+        Mon, 07 Jun 2021 00:20:42 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.61])
-        by smtp.googlemail.com with ESMTPSA id f3sm10797137pjo.3.2021.06.07.00.20.37
+        by smtp.googlemail.com with ESMTPSA id f3sm10797137pjo.3.2021.06.07.00.20.40
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 07 Jun 2021 00:20:39 -0700 (PDT)
+        Mon, 07 Jun 2021 00:20:42 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
@@ -52,9 +52,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH v2 2/3] KVM: LAPIC: Reset TMCCT during vCPU reset
-Date:   Mon,  7 Jun 2021 00:19:44 -0700
-Message-Id: <1623050385-100988-2-git-send-email-wanpengli@tencent.com>
+Subject: [PATCH v2 3/3] KVM: X86: Let's harden the ipi fastpath condition edge-trigger mode
+Date:   Mon,  7 Jun 2021 00:19:45 -0700
+Message-Id: <1623050385-100988-3-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1623050385-100988-1-git-send-email-wanpengli@tencent.com>
 References: <1623050385-100988-1-git-send-email-wanpengli@tencent.com>
@@ -64,31 +64,25 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-The value of the current counter register after reset is 0 for both 
-Intel and AMD, let's do it in kvm, though, the TMCCT is always computed
-on-demand and never directly readable.
+Let's harden the ipi fastpath condition edge-trigger mode.
 
-Reviewed-by: Jim Mattson <jmattson@google.com>
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
-v1 -> v2:
- * update patch description
-
- arch/x86/kvm/lapic.c | 1 +
+ arch/x86/kvm/x86.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 6d72d8f..cbfdecd 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2352,6 +2352,7 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	kvm_lapic_set_reg(apic, APIC_ICR2, 0);
- 	kvm_lapic_set_reg(apic, APIC_TDCR, 0);
- 	kvm_lapic_set_reg(apic, APIC_TMICT, 0);
-+	kvm_lapic_set_reg(apic, APIC_TMCCT, 0);
- 	for (i = 0; i < 8; i++) {
- 		kvm_lapic_set_reg(apic, APIC_IRR + 0x10 * i, 0);
- 		kvm_lapic_set_reg(apic, APIC_ISR + 0x10 * i, 0);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b594275..dbd3e9d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1922,6 +1922,7 @@ static int handle_fastpath_set_x2apic_icr_irqoff(struct kvm_vcpu *vcpu, u64 data
+ 		return 1;
+ 
+ 	if (((data & APIC_SHORT_MASK) == APIC_DEST_NOSHORT) &&
++		((data & APIC_INT_LEVELTRIG) == 0) &&
+ 		((data & APIC_DEST_MASK) == APIC_DEST_PHYSICAL) &&
+ 		((data & APIC_MODE_MASK) == APIC_DM_FIXED) &&
+ 		((u32)(data >> 32) != X2APIC_BROADCAST)) {
 -- 
 2.7.4
 
