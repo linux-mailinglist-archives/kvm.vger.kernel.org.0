@@ -2,107 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5214C39D92E
-	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 11:57:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D07B539D933
+	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 11:59:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230226AbhFGJ7h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Jun 2021 05:59:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26459 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230173AbhFGJ7h (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Jun 2021 05:59:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623059866;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7awUZSmtwE73YaPk78D/jTjtxkiUtYiFGv2HHuxraCI=;
-        b=c3CDToi3Jjx1MF7xeLRSUIt+9gg38lAKjsx7/WwiR9A5zTnWT51kPV2oP6xWy0t4gxfwsh
-        ITrCst9Ixxmt9bJV8m9MK1nC5LABlIePfFT87Cm8JujUEBmiZd6aiCtWem2+1gvj/On16j
-        yhgxtYtEYFXx8HTi7DHNxkSbBYbgI8U=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-37-EHM5eWyVN22sQVZIJ8c7hw-1; Mon, 07 Jun 2021 05:57:44 -0400
-X-MC-Unique: EHM5eWyVN22sQVZIJ8c7hw-1
-Received: by mail-wm1-f69.google.com with SMTP id v20-20020a05600c2154b029019a6368bfe4so3916445wml.2
-        for <kvm@vger.kernel.org>; Mon, 07 Jun 2021 02:57:44 -0700 (PDT)
+        id S230193AbhFGKBm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Jun 2021 06:01:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49614 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230127AbhFGKBl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Jun 2021 06:01:41 -0400
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7975AC061766
+        for <kvm@vger.kernel.org>; Mon,  7 Jun 2021 02:59:50 -0700 (PDT)
+Received: by mail-wr1-x42d.google.com with SMTP id a20so16925239wrc.0
+        for <kvm@vger.kernel.org>; Mon, 07 Jun 2021 02:59:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=nuviainc-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=p4DLt66lUCYjaFVIOgZH75INGuDN8geDg/llZgnm7Ic=;
+        b=v+wDKQVWu9yMRQlxnrjcHW+YzayMQw8AKbw0Sotye6dq6Mi/XirZdCp+SVNLSNDUH6
+         KnVPIi7G03WsdOSYqvHd5Qc9rE6Ecr2yquz0U/t1CxhCeMVmY7pHgQqo5UUuKnuv66yD
+         3IxkiD8fgYT76I/fGm3OO6dyf8hVmZ6JUEsAxDr7wQvkbldYEDC6/ZiW9h/QUlHXjuSa
+         KiSH4xUr3mQtUm9S97PATjYfHMsIZyny5eSguSytWJD1hwTV5gcNLx1Y6MeiDRiSzYLh
+         /YYeUsrPtK7KK1ZWQdQmufTNGSlm2eQtRfG/TZ0qs/majukVbye/OQcd6qlqhLBo0z3g
+         ySSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:organization
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=7awUZSmtwE73YaPk78D/jTjtxkiUtYiFGv2HHuxraCI=;
-        b=Xqppfd/d0Z5k8ql7aqB3CS0gi5uDxxxMuMOjZ3Fbm89pUBNbmqIom00QORFlOlX+T3
-         VVWVITIyc4YY0q1S2z3aoOd7SZ3j1bRa+uNbKhHmZI78ksSeDy/nzCwVQcB1CiZicF8I
-         ZoZSCFkkyPCKtC8WJsIXp7+A3pjYVMl4BC1Nc8+AFiQWqCGusn9lLQLJVtf1RMqZ/Cvm
-         shbl1E3QLddYry63gPPC2ZalVFNWYQxRoCz+qfI43h4fjFIpuqb6+hKhdgMe3FWDee9u
-         H0HxYnHRqSwlI3ST8SaDQYqV52EWAtfIErdBNgvmPEZMT9GSZ7h+sjV8apslMuP0dRja
-         BC7w==
-X-Gm-Message-State: AOAM5328XITXQmdTVlomfEzJC/pt/2rIl9air73jHsgH4vdZ1/IhgKI+
-        tFzhP244gVdqY7fhLJbFsIi71wjXKLqSeIqD6Gz6vik0I2A/67kgOfy51VWeovHSMIGvLdBH3Dv
-        8sRqyoGX4wLeb
-X-Received: by 2002:adf:dcc3:: with SMTP id x3mr15684193wrm.177.1623059863449;
-        Mon, 07 Jun 2021 02:57:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwy2JnuXPJlE8N8A5u5bpZ8cxRMhkZNB+GZy39rztvdiscVnZi0dfP0L8nuFzQIscu15FLhTw==
-X-Received: by 2002:adf:dcc3:: with SMTP id x3mr15684181wrm.177.1623059863324;
-        Mon, 07 Jun 2021 02:57:43 -0700 (PDT)
-Received: from [192.168.3.132] (p5b0c6188.dip0.t-ipconnect.de. [91.12.97.136])
-        by smtp.gmail.com with ESMTPSA id l2sm15023010wrp.21.2021.06.07.02.57.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Jun 2021 02:57:43 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH 3/3] s390x: run: Skip PV tests when tcg is
- the accelerator
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     cohuck@redhat.com, linux-s390@vger.kernel.org
-References: <20210318125015.45502-1-frankja@linux.ibm.com>
- <20210318125015.45502-4-frankja@linux.ibm.com>
- <92be69b9-227a-d01c-6877-738a4482b8c6@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Message-ID: <656f9301-70ec-a1e1-2d24-48ede0b07aca@redhat.com>
-Date:   Mon, 7 Jun 2021 11:57:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=p4DLt66lUCYjaFVIOgZH75INGuDN8geDg/llZgnm7Ic=;
+        b=EHreSsbu0lnx+pdNc25UvMrgc7ar3ydpFYlH4l0ifk8iPBuh7bf7BSKsM9t0xMCMXO
+         mDUtnCv/mlUqEghRFWdYOVSJqTGw0lIOn1kPz1eSy7dDp6c2OerVKIb0m5OmkJ/kBa9c
+         v3Agk0IzCAgdNpu0MmryjEiownksqbgGLWouReAaizBDP2XA+AX1FkWQV4JPPPkTGbub
+         9H1ms7jjcmCbD/MUx0z9XzJFwdnfffxUCbEGfGG9xf49VsXo6WNxt+hTJcx0oHcRRcci
+         jZpbU2niHIcQ9B7KtC+buUzXE89fQsklvCjZ23wTD1IPd6jMMbzzSofmdFce2MScxRkF
+         FD1Q==
+X-Gm-Message-State: AOAM532h65lkvVo5D943wc26sGU82YtWXiY+eU23I1vkyWvTDC96Wd3p
+        H6AHUrKnQjVbIBjXHD6kf87gzw==
+X-Google-Smtp-Source: ABdhPJxqSJVg78qWie75iU0nfkVmt/mrlTFme0qOfok5xe8IqNIFyAUXePcJPqifJe8VM+aT7yJP6g==
+X-Received: by 2002:adf:fa88:: with SMTP id h8mr16381574wrr.364.1623059986701;
+        Mon, 07 Jun 2021 02:59:46 -0700 (PDT)
+Received: from localhost ([82.44.17.50])
+        by smtp.gmail.com with ESMTPSA id 89sm16240879wri.94.2021.06.07.02.59.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Jun 2021 02:59:46 -0700 (PDT)
+Date:   Mon, 7 Jun 2021 10:59:45 +0100
+From:   Jamie Iles <jamie@nuviainc.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Jamie Iles <jamie@nuviainc.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Haibo Xu <haibo.xu@linaro.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v4 00/66] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
+ support
+Message-ID: <YL3uEToHum2xgyOz@hazel>
+References: <20210510165920.1913477-1-maz@kernel.org>
+ <YLh/qsmKDJ86n75w@hazel>
+ <87zgw7z6j6.wl-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <92be69b9-227a-d01c-6877-738a4482b8c6@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87zgw7z6j6.wl-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07.06.21 11:54, Thomas Huth wrote:
-> On 18/03/2021 13.50, Janosch Frank wrote:
->> TCG doesn't support PV.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>    s390x/run | 5 +++++
->>    1 file changed, 5 insertions(+)
->>
->> diff --git a/s390x/run b/s390x/run
->> index df7ef5ca..82922701 100755
->> --- a/s390x/run
->> +++ b/s390x/run
->> @@ -19,6 +19,11 @@ else
->>        ACCEL=$DEF_ACCEL
->>    fi
->>    
->> +if [ "${1: -7}" == ".pv.bin" ] || [ "${TESTNAME: -3}" == "_PV" ] && [ $ACCEL == "tcg" ]; then
+On Thu, Jun 03, 2021 at 09:39:09AM +0100, Marc Zyngier wrote:
+> Hi Jamie,
 > 
-> Put $ACCEL in quotes?
+> Funny, your email has a "Mail-Followup-To:" field that contains
+> everyone but you... Not ideal! ;-)
+
+Oops, new mutt config, thanks.
+
+> On Thu, 03 Jun 2021 08:07:22 +0100,
+> Jamie Iles <jamie@nuviainc.com> wrote:
+> > 
+> > Hi Marc,
+> > 
+> > On Mon, May 10, 2021 at 05:58:14PM +0100, Marc Zyngier wrote:
+> > > Here the bi-annual drop of the KVM/arm64 NV support code.
+> > > 
+> > > Not a lot has changed since [1], except for a discovery mechanism for
+> > > the EL2 support, some tidying up in the idreg emulation, dropping RMR
+> > > support, and a rebase on top of 5.13-rc1.
+> > > 
+> > > As usual, blame me for any bug, and nobody else.
+> > > 
+> > > It is still massively painful to run on the FVP, but if you have a
+> > > Neoverse V1 or N2 system that is collecting dust, I have the right
+> > > stuff to keep it busy!
+> > 
+> > I've been testing this series on FVP and get a crash when returning from 
+> > __kvm_vcpu_run_vhe because the autiasp is failing.
 > 
-> With that nit fixed:
+> Ah, the joy of testing with older guests. I guess i should upgrade by
+> test rig and play with some newer guests at L1.
 > 
+> > 
+> > The problem is when the L1 boots and during EL2 setup sets hcr_el2 to 
+> > HCR_HOST_NVHE_FLAGS and so enables HCR_APK|HCR_API.  Then the guest 
+> > enter+exit logic in L0 starts performing the key save restore, but as we 
+> > didn't go through __hyp_handle_ptrauth, we haven't saved the host keys 
+> > and invoked vcpu_ptrauth_enable() so restore the host keys back to 0.
+> > 
+> > I wonder if the pointer auth keys should be saved+restored 
+> > unconditionally for a guest when running nested rather than the lazy 
+> > faulting that we have today?
+> 
+> I'd like to try and avoid that in order to keep the basic logic as
+> simple as possible for the time being, and as close to the tried and
+> trusted flow we have today.
+> 
+> > Alternatively we would need to duplicate
+> > the lazy logic for hcr_el2 writes.  A quick hack of saving the host keys 
+> > in __kvm_vcpu_run_vhe before sysreg_save_host_state_vhe is enough to 
+> > allow me to boot an L1 with --nested and then an L2.
+> >
+> > Do we also need to filter out HCR_APK|HCR_API for hcr_el2 writes when 
+> > pointer authentication hasn't been exposed to the guest?  I haven't yet 
+> > tried making ptrauth visible to the L1.
+> 
+> I think this is the real thing. We should never propagate trap bits
+> for features we don't want to support in guests. The L1 kernel sets
+> these bits unconditionally, despite PtrAuth never being advertised,
+> which trips the host code.
+> 
+> Could you try the untested hack below?
 
-Should these "==" be "=" ? Bash string comparisons always mess with my mind.
+That fixes the issue that I was seeing, lgtm.
 
+Thanks Marc!
 
--- 
-Thanks,
-
-David / dhildenb
-
+Jamie
