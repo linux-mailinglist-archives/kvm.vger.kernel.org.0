@@ -2,87 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 889B439D5DB
-	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 09:21:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9508E39D619
+	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 09:34:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230207AbhFGHXe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Jun 2021 03:23:34 -0400
-Received: from mail-pj1-f41.google.com ([209.85.216.41]:46914 "EHLO
-        mail-pj1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229545AbhFGHXd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Jun 2021 03:23:33 -0400
-Received: by mail-pj1-f41.google.com with SMTP id pi6-20020a17090b1e46b029015cec51d7cdso9801264pjb.5;
-        Mon, 07 Jun 2021 00:21:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=OC8PsyFHXhJlNVBTSitgcnGkSPQg05VER4L54PiarWk=;
-        b=BLP7nIx2+RA4xMdb1wch9+kPqtJFTu84QDLM0/dfVOMXRlqFrkRDib2cx5EjAi/g8f
-         8wdzgri55tcmCApEUYacPNAq0TbIFZ6L6CiQX21McBJS5GhtMqu0/g6taKYdnmuXldNt
-         Ik0TC3HUG0xSVO6Frr8EW54sX/6qy1+t9cNnTozV9pi1+Dfm9tE6Mf8fsqL1xaDNvjrO
-         YVNQs+AyKodHIvYH0vXPxTY84Bw2fvpdR9u8Uy74fhWDo/nvwvif3jQbSccHzQRhULQC
-         7T/NhA9f+mTXx1m2dTGATNhK3MjIHJCb4iSPa3xhVi2Eu2PcZTbDgc+vbXNvAaaKw6hk
-         q6bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=OC8PsyFHXhJlNVBTSitgcnGkSPQg05VER4L54PiarWk=;
-        b=tgoaWUGetv/gaqDtIGqQ8pYe4iJjjCjJ/4sO5v3ofbbG6HTBF0Cq6mQIzGnJ7XWk4H
-         1XPqSMBTupUhuj88e0hM2XEWmix2mJpNiuYB5mzmho6bXzvTLymbVLlqWLp3s/tM9Ngj
-         L7xRnY/lNqEslVN5qw71L5YBb4W53z+3Oh/kyEA0qe86B+I6e/7wZVD2k0mnu60E4qdv
-         4rwXsg4TqM8K0o4iGobGgG+Uz+ZMlGpYduuehW3s88Nw7+xiphEKvucWlTh2k0YPwNLv
-         WjhnDLmhRm1wRGH4w1pwYLXZqBXHdXqBqfQRkCXufsk+OmlLrCwuHxoITbvGsGu1xigl
-         zQ4Q==
-X-Gm-Message-State: AOAM533BwGjNdG5KORUB+irDYpJBJl+6IzjmsumcpHiwUTUja+Rg5v7c
-        cJat4oaVt4zvctDCfsYKnxd4gEx2yUo=
-X-Google-Smtp-Source: ABdhPJyIlTGgSn22HgWeistANnthzANP1Oh7++Qhyctx5nVh0iy1oHkXz0LitYEqNHvxrdqjAlNypQ==
-X-Received: by 2002:a17:902:c404:b029:10e:21e8:759c with SMTP id k4-20020a170902c404b029010e21e8759cmr16807097plk.44.1623050442846;
-        Mon, 07 Jun 2021 00:20:42 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.61])
-        by smtp.googlemail.com with ESMTPSA id f3sm10797137pjo.3.2021.06.07.00.20.40
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 07 Jun 2021 00:20:42 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH v2 3/3] KVM: X86: Let's harden the ipi fastpath condition edge-trigger mode
-Date:   Mon,  7 Jun 2021 00:19:45 -0700
-Message-Id: <1623050385-100988-3-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1623050385-100988-1-git-send-email-wanpengli@tencent.com>
-References: <1623050385-100988-1-git-send-email-wanpengli@tencent.com>
+        id S230247AbhFGHgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Jun 2021 03:36:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49074 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230231AbhFGHgU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Jun 2021 03:36:20 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 29FEA60720;
+        Mon,  7 Jun 2021 07:34:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1623051269;
+        bh=0ypPpkJHDs3edXD5bDeKaiim7X/xfBueG4AuE8+Qj+U=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=MCZa/wfgoJSof9wCVVOv/LrdFcXdwY1vCJuTly8zaeAIwTuRDtC8rzfgyHA9r6/+g
+         NW2tP3feh93C/5Dxty7jg+vScZHZGMhUEyWQ5FgxO8vpWG7sfVd2/FVm9kFVWmNyKF
+         EQBYWqrXHDSSXIu/AIkm5+Ioyl/4Y8qqVlITSp7EP1AHAdF2gq6+t5N/EukG8nlrD5
+         /Z/7kCrp6V3McL/0xD3Opj9oSYMVR4OQwEiMuDlxNhhxICUhrFF3xy6Xf7sAtNEHPC
+         UZ6EjZnr6psnuld6cX9JYfcpHnFwEGAKkBcwq4fn3pJEE/OA/DfL7AgTqkUjjnfOU7
+         t/jaztuq+MVCA==
+Date:   Mon, 7 Jun 2021 09:34:22 +0200
+From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To:     "=?UTF-8?B?TsOtY29sYXM=?= F. R. A. Prado" <n@nfraprado.net>
+Cc:     Jonathan Corbet <corbet@lwn.net>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+        coresight@lists.linaro.org, devicetree@vger.kernel.org,
+        kunit-dev@googlegroups.com, kvm@vger.kernel.org,
+        linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-gpio@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-security-module@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH 00/34] docs: avoid using ReST :doc:`foo` tag
+Message-ID: <20210607093422.0a369909@coco.lan>
+In-Reply-To: <20210606225225.fz4dsyz6im4bqena@notapiano>
+References: <cover.1622898327.git.mchehab+huawei@kernel.org>
+        <20210605151109.axm3wzbcstsyxczp@notapiano>
+        <20210605210836.540577d4@coco.lan>
+        <20210606225225.fz4dsyz6im4bqena@notapiano>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+Em Sun, 6 Jun 2021 19:52:25 -0300
+N=C3=ADcolas F. R. A. Prado <n@nfraprado.net> escreveu:
 
-Let's harden the ipi fastpath condition edge-trigger mode.
+> On Sat, Jun 05, 2021 at 09:08:36PM +0200, Mauro Carvalho Chehab wrote:
+> > Em Sat, 5 Jun 2021 12:11:09 -0300
+> > N=C3=ADcolas F. R. A. Prado <n@nfraprado.net> escreveu:
+> >  =20
+> > > Hi Mauro,
+> > >=20
+> > > On Sat, Jun 05, 2021 at 03:17:59PM +0200, Mauro Carvalho Chehab wrote=
+: =20
+> > > > As discussed at:
+> > > > 	https://lore.kernel.org/linux-doc/871r9k6rmy.fsf@meer.lwn.net/
+> > > >=20
+> > > > It is better to avoid using :doc:`foo` to refer to Documentation/fo=
+o.rst, as the
+> > > > automarkup.py extension should handle it automatically, on most cas=
+es.
+> > > >=20
+> > > > There are a couple of exceptions to this rule:
+> > > >=20
+> > > > 1. when :doc:  tag is used to point to a kernel-doc DOC: markup;
+> > > > 2. when it is used with a named tag, e. g. :doc:`some name <foo>`;
+> > > >=20
+> > > > It should also be noticed that automarkup.py has currently an issue:
+> > > > if one use a markup like:
+> > > >=20
+> > > > 	Documentation/dev-tools/kunit/api/test.rst
+> > > > 	  - documents all of the standard testing API excluding mocking
+> > > > 	    or mocking related features.
+> > > >=20
+> > > > or, even:
+> > > >=20
+> > > > 	Documentation/dev-tools/kunit/api/test.rst
+> > > > 	    documents all of the standard testing API excluding mocking
+> > > > 	    or mocking related features.
+> > > > =09
+> > > > The automarkup.py will simply ignore it. Not sure why. This patch s=
+eries
+> > > > avoid the above patterns (which is present only on 4 files), but it=
+ would be
+> > > > nice to have a followup patch fixing the issue at automarkup.py.   =
+=20
+> > >=20
+> > > What I think is happening here is that we're using rST's syntax for d=
+efinition
+> > > lists [1]. automarkup.py ignores literal nodes, and perhaps a definit=
+ion is
+> > > considered a literal by Sphinx. Adding a blank line after the Documen=
+tation/...
+> > > or removing the additional indentation makes it work, like you did in=
+ your
+> > > 2nd and 3rd patch, since then it's not a definition anymore, although=
+ then the
+> > > visual output is different as well. =20
+> >=20
+> > A literal has a different output. I think that this is not the case, bu=
+t I=20
+> > didn't check the python code from docutils/Sphinx. =20
+>=20
+> Okay, I went in deeper to understand the issue and indeed it wasn't what I
+> thought. The reason definitions are ignored by automarkup.py is because t=
+he main
+> loop iterates only over nodes that are of type paragraph:
+>=20
+>     for para in doctree.traverse(nodes.paragraph):
+>         for node in para.traverse(nodes.Text):
+>             if not isinstance(node.parent, nodes.literal):
+>                 node.parent.replace(node, markup_refs(name, app, node))
+>=20
+> And inspecting the HTML output from your example, the definition name is =
+inside
+> a <dt> tag, and it doesn't have a <p> inside. So in summary, automarkup.p=
+y will
+> only work on elements which are inside a <p> in the output.
 
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/x86.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b594275..dbd3e9d 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1922,6 +1922,7 @@ static int handle_fastpath_set_x2apic_icr_irqoff(struct kvm_vcpu *vcpu, u64 data
- 		return 1;
- 
- 	if (((data & APIC_SHORT_MASK) == APIC_DEST_NOSHORT) &&
-+		((data & APIC_INT_LEVELTRIG) == 0) &&
- 		((data & APIC_DEST_MASK) == APIC_DEST_PHYSICAL) &&
- 		((data & APIC_MODE_MASK) == APIC_DM_FIXED) &&
- 		((u32)(data >> 32) != X2APIC_BROADCAST)) {
--- 
-2.7.4
+Yeah, that's what I was suspecting, based on the comments.
 
+Maybe something similar to the above could be done also for some
+non-paragraph data. By looking at:
+
+	https://docutils.sourceforge.io/docs/ref/doctree.html
+
+It says that the body elements are:
+
+	admonition, attention, block_quote, bullet_list, caution, citation,=20
+	comment, compound, container, danger, definition_list, doctest_block,=20
+	enumerated_list, error, field_list, figure, footnote, hint, image,=20
+	important, line_block, literal_block, note, option_list, paragraph,=20
+	pending, raw, rubric, substitution_definition, system_message,=20
+	table, target, tip, warning
+
+So, perhaps a similar loop for definition_list would do the trick,
+but maybe automarkup should also look at other types, like enum lists,
+notes (and their variants, like error/warning) and footnotes.
+
+No idea how this would affect the docs build time, though.
+
+> Only applying the automarkup inside paragraphs seems like a good decision=
+ (which
+> covers text in lists and tables as well), so unless there are other types=
+ of
+> elements without paragraphs where automarkup should work, I think we shou=
+ld just
+> avoid using definition lists pointing to documents like that.
+
+Checking the code or doing some tests are needed for us to be sure about wh=
+at
+of the above types docutils don't consider a paragraph.
+
+Thanks,
+Mauro
