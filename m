@@ -2,166 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9508E39D619
-	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 09:34:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C56BC39D823
+	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 11:03:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230247AbhFGHgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Jun 2021 03:36:23 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49074 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230231AbhFGHgU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Jun 2021 03:36:20 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 29FEA60720;
-        Mon,  7 Jun 2021 07:34:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1623051269;
-        bh=0ypPpkJHDs3edXD5bDeKaiim7X/xfBueG4AuE8+Qj+U=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=MCZa/wfgoJSof9wCVVOv/LrdFcXdwY1vCJuTly8zaeAIwTuRDtC8rzfgyHA9r6/+g
-         NW2tP3feh93C/5Dxty7jg+vScZHZGMhUEyWQ5FgxO8vpWG7sfVd2/FVm9kFVWmNyKF
-         EQBYWqrXHDSSXIu/AIkm5+Ioyl/4Y8qqVlITSp7EP1AHAdF2gq6+t5N/EukG8nlrD5
-         /Z/7kCrp6V3McL/0xD3Opj9oSYMVR4OQwEiMuDlxNhhxICUhrFF3xy6Xf7sAtNEHPC
-         UZ6EjZnr6psnuld6cX9JYfcpHnFwEGAKkBcwq4fn3pJEE/OA/DfL7AgTqkUjjnfOU7
-         t/jaztuq+MVCA==
-Date:   Mon, 7 Jun 2021 09:34:22 +0200
-From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To:     "=?UTF-8?B?TsOtY29sYXM=?= F. R. A. Prado" <n@nfraprado.net>
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-        coresight@lists.linaro.org, devicetree@vger.kernel.org,
-        kunit-dev@googlegroups.com, kvm@vger.kernel.org,
-        linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-gpio@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-security-module@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH 00/34] docs: avoid using ReST :doc:`foo` tag
-Message-ID: <20210607093422.0a369909@coco.lan>
-In-Reply-To: <20210606225225.fz4dsyz6im4bqena@notapiano>
-References: <cover.1622898327.git.mchehab+huawei@kernel.org>
-        <20210605151109.axm3wzbcstsyxczp@notapiano>
-        <20210605210836.540577d4@coco.lan>
-        <20210606225225.fz4dsyz6im4bqena@notapiano>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S230287AbhFGJEF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Jun 2021 05:04:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32397 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230193AbhFGJEE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Jun 2021 05:04:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623056533;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=6y4bPXafko5+G4PApCVrwklZB5xWMqNeD2Kae54wrKI=;
+        b=PLCCIBLhcR2rk0NYJtRku3VYFcLDMuCoxNzB+jlInHC2TJqf8vAFHeGQksCIInTU2tYLxu
+        YN4fXxA0ZBC66v2pQ/K1tgZzzs96xS2N4S2Fonc4/OzGZqZkqqRep0eAPQPX5SpBoOAtgD
+        Pp6vaJTGnvia2heGLZ9whJICX9rzLYk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-514-WBdQ5GvgOuSHR_s4xZ_7ig-1; Mon, 07 Jun 2021 05:02:12 -0400
+X-MC-Unique: WBdQ5GvgOuSHR_s4xZ_7ig-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87E1E101371F;
+        Mon,  7 Jun 2021 09:02:10 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.40.194.6])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6F8551037EA4;
+        Mon,  7 Jun 2021 09:02:05 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org (open list),
+        linux-doc@vger.kernel.org (open list:DOCUMENTATION),
+        Wanpeng Li <wanpengli@tencent.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Sean Christopherson <seanjc@google.com>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+        Jim Mattson <jmattson@google.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH v3 0/8] Introduce KVM_{GET|SET}_SREGS2 and fix PDPTR migration
+Date:   Mon,  7 Jun 2021 12:01:55 +0300
+Message-Id: <20210607090203.133058-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Em Sun, 6 Jun 2021 19:52:25 -0300
-N=C3=ADcolas F. R. A. Prado <n@nfraprado.net> escreveu:
+This patch set aims to fix few flaws that were discovered=0D
+in KVM_{GET|SET}_SREGS on x86:=0D
+=0D
+* There is no support for reading/writing PDPTRs although=0D
+  these are considered to be part of the guest state.=0D
+=0D
+* There is useless interrupt bitmap which isn't needed=0D
+=0D
+* No support for future extensions (via flags and such)=0D
+=0D
+Also if the user doesn't use the new SREG2 api, the PDPTR=0D
+load after migration is now done on KVM_REQ_GET_NESTED_STATE_PAGES=0D
+to at least read them correctly in cases when guest memory=0D
+map is not up to date when nested state is loaded.=0D
+=0D
+This patch series was tested by doing nested migration test=0D
+of 32 bit PAE L1 + 32 bit PAE L2 on AMD and Intel and by=0D
+nested migration test of 64 bit L1 + 32 bit PAE L2 on AMD.=0D
+The later test currently fails on Intel (regardless of my patches).=0D
+=0D
+Changes from V2:=0D
+  - I took in the patch series from Sean Christopherson that=0D
+    removes the pdptrs_changed function and rebased my code=0D
+    on top of it.=0D
+  - I updated the SET_SREGS2 ioctl to load PDPTRS from memory=0D
+    when user haven't given PDPTRS.=0D
+  - Minor refactoring all over the place.=0D
+=0D
+Changes from V1:=0D
+  - move only PDPTRS load to KVM_REQ_GET_NESTED_STATE_PAGES on VMX=0D
+  - rebase on top of kvm/queue=0D
+  - improve the KVM_GET_SREGS2 to have flag for PDPTRS=0D
+    and remove padding=0D
+=0D
+Patches to qemu to enable this feature were sent as well.=0D
+=0D
+Maxim Levitsky (5):=0D
+  KVM: nSVM: refactor the CR3 reload on migration=0D
+  KVM: nVMX: delay loading of PDPTRs to KVM_REQ_GET_NESTED_STATE_PAGES=0D
+  KVM: x86: introduce kvm_register_clear_available=0D
+  KVM: x86: Introduce KVM_GET_SREGS2 / KVM_SET_SREGS2=0D
+  KVM: x86: avoid loading PDPTRs after migration when possible=0D
+=0D
+Sean Christopherson (3):=0D
+  KVM: nVMX: Drop obsolete (and pointless) pdptrs_changed() check=0D
+  KVM: nSVM: Drop pointless pdptrs_changed() check on nested transition=0D
+  KVM: x86: Always load PDPTRs on CR3 load for SVM w/o NPT and a PAE=0D
+    guest=0D
+=0D
+ Documentation/virt/kvm/api.rst  |  48 +++++++++=0D
+ arch/x86/include/asm/kvm_host.h |   7 +-=0D
+ arch/x86/include/uapi/asm/kvm.h |  13 +++=0D
+ arch/x86/kvm/kvm_cache_regs.h   |  12 +++=0D
+ arch/x86/kvm/svm/nested.c       |  39 +++++--=0D
+ arch/x86/kvm/svm/svm.c          |   6 +-=0D
+ arch/x86/kvm/vmx/nested.c       |  32 ++++--=0D
+ arch/x86/kvm/x86.c              | 176 +++++++++++++++++++++-----------=0D
+ include/uapi/linux/kvm.h        |   4 +=0D
+ 9 files changed, 253 insertions(+), 84 deletions(-)=0D
+=0D
+-- =0D
+2.26.3=0D
+=0D
 
-> On Sat, Jun 05, 2021 at 09:08:36PM +0200, Mauro Carvalho Chehab wrote:
-> > Em Sat, 5 Jun 2021 12:11:09 -0300
-> > N=C3=ADcolas F. R. A. Prado <n@nfraprado.net> escreveu:
-> >  =20
-> > > Hi Mauro,
-> > >=20
-> > > On Sat, Jun 05, 2021 at 03:17:59PM +0200, Mauro Carvalho Chehab wrote=
-: =20
-> > > > As discussed at:
-> > > > 	https://lore.kernel.org/linux-doc/871r9k6rmy.fsf@meer.lwn.net/
-> > > >=20
-> > > > It is better to avoid using :doc:`foo` to refer to Documentation/fo=
-o.rst, as the
-> > > > automarkup.py extension should handle it automatically, on most cas=
-es.
-> > > >=20
-> > > > There are a couple of exceptions to this rule:
-> > > >=20
-> > > > 1. when :doc:  tag is used to point to a kernel-doc DOC: markup;
-> > > > 2. when it is used with a named tag, e. g. :doc:`some name <foo>`;
-> > > >=20
-> > > > It should also be noticed that automarkup.py has currently an issue:
-> > > > if one use a markup like:
-> > > >=20
-> > > > 	Documentation/dev-tools/kunit/api/test.rst
-> > > > 	  - documents all of the standard testing API excluding mocking
-> > > > 	    or mocking related features.
-> > > >=20
-> > > > or, even:
-> > > >=20
-> > > > 	Documentation/dev-tools/kunit/api/test.rst
-> > > > 	    documents all of the standard testing API excluding mocking
-> > > > 	    or mocking related features.
-> > > > =09
-> > > > The automarkup.py will simply ignore it. Not sure why. This patch s=
-eries
-> > > > avoid the above patterns (which is present only on 4 files), but it=
- would be
-> > > > nice to have a followup patch fixing the issue at automarkup.py.   =
-=20
-> > >=20
-> > > What I think is happening here is that we're using rST's syntax for d=
-efinition
-> > > lists [1]. automarkup.py ignores literal nodes, and perhaps a definit=
-ion is
-> > > considered a literal by Sphinx. Adding a blank line after the Documen=
-tation/...
-> > > or removing the additional indentation makes it work, like you did in=
- your
-> > > 2nd and 3rd patch, since then it's not a definition anymore, although=
- then the
-> > > visual output is different as well. =20
-> >=20
-> > A literal has a different output. I think that this is not the case, bu=
-t I=20
-> > didn't check the python code from docutils/Sphinx. =20
->=20
-> Okay, I went in deeper to understand the issue and indeed it wasn't what I
-> thought. The reason definitions are ignored by automarkup.py is because t=
-he main
-> loop iterates only over nodes that are of type paragraph:
->=20
->     for para in doctree.traverse(nodes.paragraph):
->         for node in para.traverse(nodes.Text):
->             if not isinstance(node.parent, nodes.literal):
->                 node.parent.replace(node, markup_refs(name, app, node))
->=20
-> And inspecting the HTML output from your example, the definition name is =
-inside
-> a <dt> tag, and it doesn't have a <p> inside. So in summary, automarkup.p=
-y will
-> only work on elements which are inside a <p> in the output.
-
-
-Yeah, that's what I was suspecting, based on the comments.
-
-Maybe something similar to the above could be done also for some
-non-paragraph data. By looking at:
-
-	https://docutils.sourceforge.io/docs/ref/doctree.html
-
-It says that the body elements are:
-
-	admonition, attention, block_quote, bullet_list, caution, citation,=20
-	comment, compound, container, danger, definition_list, doctest_block,=20
-	enumerated_list, error, field_list, figure, footnote, hint, image,=20
-	important, line_block, literal_block, note, option_list, paragraph,=20
-	pending, raw, rubric, substitution_definition, system_message,=20
-	table, target, tip, warning
-
-So, perhaps a similar loop for definition_list would do the trick,
-but maybe automarkup should also look at other types, like enum lists,
-notes (and their variants, like error/warning) and footnotes.
-
-No idea how this would affect the docs build time, though.
-
-> Only applying the automarkup inside paragraphs seems like a good decision=
- (which
-> covers text in lists and tables as well), so unless there are other types=
- of
-> elements without paragraphs where automarkup should work, I think we shou=
-ld just
-> avoid using definition lists pointing to documents like that.
-
-Checking the code or doing some tests are needed for us to be sure about wh=
-at
-of the above types docutils don't consider a paragraph.
-
-Thanks,
-Mauro
