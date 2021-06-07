@@ -2,196 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D96C39DC5E
-	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 14:28:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F50E39DD08
+	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 14:54:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230370AbhFGMaP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Jun 2021 08:30:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52758 "EHLO
+        id S230217AbhFGM4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Jun 2021 08:56:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48022 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230193AbhFGMaO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Jun 2021 08:30:14 -0400
+        by vger.kernel.org with ESMTP id S230193AbhFGM4i (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Jun 2021 08:56:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623068901;
+        s=mimecast20190719; t=1623070486;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=WRij78svS0dl3UZRgR9Pu6WvQlaTV51Ty644G95OgJI=;
-        b=eR6flIbvnj3sO4ochHjg/fePwLVhSr6DxSYa+s9jrRrZJuFemf5RlL47WGBRjeo91mIyId
-        z1rRL5rtFUO7T9Mf8qZDfC4bIxGTxK594/OnUzBmBVx6piJRgfJiqXIvI5H+vud0Xy3C/1
-        wg0RbjpO/etg7ord2dajNhlsIw89Rjk=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-529-83VnMCjyMKm8sX8PgdyiHg-1; Mon, 07 Jun 2021 08:28:20 -0400
-X-MC-Unique: 83VnMCjyMKm8sX8PgdyiHg-1
-Received: by mail-ej1-f69.google.com with SMTP id o5-20020a1709068605b02904034c0d7648so3483388ejx.8
-        for <kvm@vger.kernel.org>; Mon, 07 Jun 2021 05:28:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=WRij78svS0dl3UZRgR9Pu6WvQlaTV51Ty644G95OgJI=;
-        b=dVRjcwwJSKx5EhVb9QlJBbCyQYjdpkVMGeADcRVJ52UReXA76uqhxiIK/map8ziYqv
-         HcSu7ZkNS2FuDm2Rg+y9uAxulI7Z1iS8H8GWqe1zht2E969/rImjwER8MuPfF6nKoVen
-         P6N6eBFvgKXJZ2r3HbmeWDeADRcr/LDzI+a6763JzFk7hGooJrnkv1S2bzC6sM5rSv5V
-         3ChTdP/992KEVOn+E4w8RRD0ZeLcWOGLxaVmBO86zgf2wiWHXuzZYXcGuaGhNMJjfZ1g
-         MMHEyAel+t21YwAxf5VUOKwmIPOu6vt3CuZfiZENiu1eS2uIXkZV/MEQxZb2D5t+R2uv
-         agYg==
-X-Gm-Message-State: AOAM531AeJPPhd/m4rkFtWVSTM3YkZbKcd4f19dy1bAS7oL1mxNjX9aF
-        eXgIqGbnko/CeC3dGjYoXU0NgHSdkjEB3nQe6sCxZZQP4kLX21qT9f5xfDJmUw7ABqvz8La4Msd
-        1u0OhYu+Rf2NS
-X-Received: by 2002:a05:6402:1e8b:: with SMTP id f11mr6855813edf.86.1623068898989;
-        Mon, 07 Jun 2021 05:28:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzZ3ZxofwfGfhWVCp8PwP02oyvfbjO8HkBIsUJnHl308aHgTzkad+lmJfEl7kmAywsPe/MTtA==
-X-Received: by 2002:a05:6402:1e8b:: with SMTP id f11mr6855790edf.86.1623068898787;
-        Mon, 07 Jun 2021 05:28:18 -0700 (PDT)
-Received: from steredhat (host-79-18-148-79.retail.telecomitalia.it. [79.18.148.79])
-        by smtp.gmail.com with ESMTPSA id w1sm6577646eds.37.2021.06.07.05.28.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Jun 2021 05:28:18 -0700 (PDT)
-Date:   Mon, 7 Jun 2021 14:28:16 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
-Subject: Re: [MASSMAIL KLMS] Re: [PATCH v10 04/18] af_vsock: implement
- SEQPACKET receive loop
-Message-ID: <20210607122816.yas4fpfmtvlrbfku@steredhat>
-References: <20210520191357.1270473-1-arseny.krasnov@kaspersky.com>
- <20210520191611.1271204-1-arseny.krasnov@kaspersky.com>
- <20210604150638.rmx262k4wjmp2zob@steredhat>
- <93254e99-1cf9-3135-f1c8-d60336bf41b5@kaspersky.com>
- <20210607104816.fgudxa5a6pldkqts@steredhat>
- <95a11b19-8266-7fc0-9426-edccd4512a2d@kaspersky.com>
+        bh=k8SsabsUZynWfNUAOHQvP42MWVxlVeq8xWJkSvPvldk=;
+        b=Bo2FTRJIxf3m1RpLpFPUE23H0JAAmQHFkAXJ0j9ciXmasuBmOVEcYlSCvnFTvQSE/kWwwy
+        LuB2/HFlIebMde785KuyBSXs6q/xMJrl3aEmBWKntH6J6O10iKMJZS9NiqWK0NdR93CDaW
+        wyOX+/HZgOCFWlN3Ei8nPF1FBqMkPTo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-556-RCO4hQnqMEyBcKOd3h_O_w-1; Mon, 07 Jun 2021 08:54:45 -0400
+X-MC-Unique: RCO4hQnqMEyBcKOd3h_O_w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 756A4106BB3B;
+        Mon,  7 Jun 2021 12:54:44 +0000 (UTC)
+Received: from starship (unknown [10.40.194.6])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C6D1E60CCF;
+        Mon,  7 Jun 2021 12:54:41 +0000 (UTC)
+Message-ID: <fe13fe734a01bb54f47fea06624c617beb062fdd.camel@redhat.com>
+Subject: Re: [PATCHv3 2/2] kvm: x86: implement KVM PM-notifier
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Suleiman Souhlal <suleiman@google.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Mon, 07 Jun 2021 15:54:40 +0300
+In-Reply-To: <20210606021045.14159-2-senozhatsky@chromium.org>
+References: <20210606021045.14159-1-senozhatsky@chromium.org>
+         <20210606021045.14159-2-senozhatsky@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <95a11b19-8266-7fc0-9426-edccd4512a2d@kaspersky.com>
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 07, 2021 at 02:29:28PM +0300, Arseny Krasnov wrote:
->
->On 07.06.2021 13:48, Stefano Garzarella wrote:
->> On Fri, Jun 04, 2021 at 09:00:14PM +0300, Arseny Krasnov wrote:
->>> On 04.06.2021 18:06, Stefano Garzarella wrote:
->>>> On Thu, May 20, 2021 at 10:16:08PM +0300, Arseny Krasnov wrote:
->>>>> Add receive loop for SEQPACKET. It looks like receive loop for
->>>>> STREAM, but there are differences:
->>>>> 1) It doesn't call notify callbacks.
->>>>> 2) It doesn't care about 'SO_SNDLOWAT' and 'SO_RCVLOWAT' values, because
->>>>>   there is no sense for these values in SEQPACKET case.
->>>>> 3) It waits until whole record is received or error is found during
->>>>>   receiving.
->>>>> 4) It processes and sets 'MSG_TRUNC' flag.
->>>>>
->>>>> So to avoid extra conditions for two types of socket inside one loop, two
->>>>> independent functions were created.
->>>>>
->>>>> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->>>>> ---
->>>>> v9 -> v10:
->>>>> 1) Use 'msg_data_left()' instead of direct access to 'msg_hdr'.
->>>>>
->>>>> include/net/af_vsock.h   |  4 +++
->>>>> net/vmw_vsock/af_vsock.c | 72 +++++++++++++++++++++++++++++++++++++++-
->>>>> 2 files changed, 75 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->>>>> index b1c717286993..5175f5a52ce1 100644
->>>>> --- a/include/net/af_vsock.h
->>>>> +++ b/include/net/af_vsock.h
->>>>> @@ -135,6 +135,10 @@ struct vsock_transport {
->>>>> 	bool (*stream_is_active)(struct vsock_sock *);
->>>>> 	bool (*stream_allow)(u32 cid, u32 port);
->>>>>
->>>>> +	/* SEQ_PACKET. */
->>>>> +	ssize_t (*seqpacket_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
->>>>> +				     int flags, bool *msg_ready);
->>>>> +
->>>>> 	/* Notification. */
->>>>> 	int (*notify_poll_in)(struct vsock_sock *, size_t, bool *);
->>>>> 	int (*notify_poll_out)(struct vsock_sock *, size_t, bool *);
->>>>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->>>>> index c4f6bfa1e381..aede474343d1 100644
->>>>> --- a/net/vmw_vsock/af_vsock.c
->>>>> +++ b/net/vmw_vsock/af_vsock.c
->>>>> @@ -1974,6 +1974,73 @@ static int __vsock_stream_recvmsg(struct sock *sk, struct msghdr *msg,
->>>>> 	return err;
->>>>> }
->>>>>
->>>>> +static int __vsock_seqpacket_recvmsg(struct sock *sk, struct msghdr *msg,
->>>>> +				     size_t len, int flags)
->>>>> +{
->>>>> +	const struct vsock_transport *transport;
->>>>> +	bool msg_ready;
->>>>> +	struct vsock_sock *vsk;
->>>>> +	ssize_t record_len;
->>>>> +	long timeout;
->>>>> +	int err = 0;
->>>>> +	DEFINE_WAIT(wait);
->>>>> +
->>>>> +	vsk = vsock_sk(sk);
->>>>> +	transport = vsk->transport;
->>>>> +
->>>>> +	timeout = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
->>>>> +	msg_ready = false;
->>>>> +	record_len = 0;
->>>>> +
->>>>> +	while (1) {
->>>>> +		ssize_t fragment_len;
->>>>> +
->>>>> +		if (vsock_wait_data(sk, &wait, timeout, NULL, 0) <= 0) {
->>>>> +			/* In case of any loop break(timeout, signal
->>>>> +			 * interrupt or shutdown), we report user that
->>>>> +			 * nothing was copied.
->>>>> +			 */
->>>>> +			err = 0;
->>>> Why we report that nothing was copied?
->>>>
->>>> What happen to the bytes already copied in `msg`?
->>> Seems i need to return result of vsock_wait_data()...
->> I'm not sure.
->>
->> My biggest concern is if we reach timeout or get a signal while waiting
->> for the other pieces of a message.
->> I believe that we should not start copying a message if we have not
->> received all the fragments. Otherwise we have this problem.
->>
->> When we are sure that we have all the pieces, then we should copy them
->> without interrupting.
->>
->> IIRC this was done in previous versions.
->
->As i remember, previous versions also returned 0, because i thought,
->that for interrupted read we can copy piece of data to user's buffer,
->but we must return that nothing copied or error. In this way user
+On Sun, 2021-06-06 at 11:10 +0900, Sergey Senozhatsky wrote:
+> Implement PM hibernation/suspend prepare notifiers so that KVM
+> can reliably set PVCLOCK_GUEST_STOPPED on VCPUs and properly
+> suspend VMs.
+> 
+> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+> ---
+>  arch/x86/kvm/Kconfig |  1 +
+>  arch/x86/kvm/x86.c   | 36 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 37 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index fb8efb387aff..ac69894eab88 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -43,6 +43,7 @@ config KVM
+>  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+>  	select KVM_VFIO
+>  	select SRCU
+> +	select HAVE_KVM_PM_NOTIFIER if PM
+>  	help
+>  	  Support hosting fully virtualized guest machines using hardware
+>  	  virtualization extensions.  You will need a fairly recent
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index b594275d49b5..af1ab527a0cb 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -58,6 +58,7 @@
+>  #include <linux/sched/isolation.h>
+>  #include <linux/mem_encrypt.h>
+>  #include <linux/entry-kvm.h>
+> +#include <linux/suspend.h>
+>  
+>  #include <trace/events/kvm.h>
+>  
+> @@ -5615,6 +5616,41 @@ static int kvm_vm_ioctl_set_msr_filter(struct kvm *kvm, void __user *argp)
+>  	return 0;
+>  }
+>  
+> +#ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
+> +static int kvm_arch_suspend_notifier(struct kvm *kvm)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	int i, ret = 0;
+> +
+> +	mutex_lock(&kvm->lock);
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		if (!vcpu->arch.pv_time_enabled)
+> +			continue;
+> +
+> +		ret = kvm_set_guest_paused(vcpu);
+> +		if (ret) {
+> +			kvm_err("Failed to pause guest VCPU%d: %d\n",
+> +				vcpu->vcpu_id, ret);
+> +			break;
+> +		}
+> +	}
+> +	mutex_unlock(&kvm->lock);
+> +
+> +	return ret ? NOTIFY_BAD : NOTIFY_DONE;
+> +}
+> +
+> +int kvm_arch_pm_notifier(struct kvm *kvm, unsigned long state)
+> +{
+> +	switch (state) {
+> +	case PM_HIBERNATION_PREPARE:
+> +	case PM_SUSPEND_PREPARE:
+> +		return kvm_arch_suspend_notifier(kvm);
+> +	}
+> +
+> +	return NOTIFY_DONE;
+> +}
+> +#endif /* CONFIG_HAVE_KVM_PM_NOTIFIER */
+> +
+>  long kvm_arch_vm_ioctl(struct file *filp,
+>  		       unsigned int ioctl, unsigned long arg)
+>  {
 
-This can also be fine, but we should remove packet form the rx_queue 
-only when we are sure that we delivered the entire message.
+Overall this looks OK to me.
+ 
+Do you have a test case in which this patch helps to make the guest behave better after
+the host suspend though? I tested this and I don't see any significant change.
+(guest works after host suspend before and after, and I still have clocksource
+watchdogs firing in the guest)
+ 
+ 
+Also I would like to add my .02 cents on my observations on what happens when I suspend my system
+with guests running, which I do once in a while.
+I haven't dug deep into it yet as host suspend with VM running wasn't high on my priority list.
+ 
+First of all after a host suspend/resume cycle (and that is true on all 3 machines I own),
+the host TSC is reset to 0 on all CPUs, thus while it is still synchronized, it jumps backward.
+ 
+Host kernel has no issues coping with this.
+ 
+Guests however complain about clocksource watchdog and mark the tsc clocksource as unstable,
+at least when invtsc is used (regardless of this patch, I wasn't able to notice a difference
+with and without it yet).
+ 
+ 
+[  287.515864] clocksource: timekeeping watchdog on CPU0: Marking clocksource 'tsc' as unstable because the skew is too large:
+[  287.516926] clocksource:                       'kvm-clock' wd_now: 4437767926 wd_last: 429c3c42f5 mask: ffffffffffffffff
+[  287.527100] clocksource:                       'tsc' cs_now: c33f6ce157 cs_last: c1be2ad19f mask: ffffffffffffffff
+[  287.528493] tsc: Marking TSC unstable due to clocksource watchdog
+[  287.556640] clocksource: Switched to clocksource kvm-clock
+ 
+ 
+This is from Intel system with stable TSC, but I have seen this on my AMD systems as well,
+but these have other issues which might affect this (see below).
+ 
+AFAIK, we have code in kvm_arch_hardware_enable for this exact case but it might not work
+correctly or be not enough to deal with this.
+ 
+Also I notice that this code sets kvm->arch.backwards_tsc_observed = true which 
+in turn disables the master clock which is not good as well.
+ 
+I haven't yet allocated time to investigate this.
+ 
+ 
+Another bit of information which I didn't start a discussion (but I think I should), 
+which is relevant to AMD systems, is in 'unsynchronized_tsc' function.
 
->
->won't read part of message, because syscall returned that there is
->nothing to copy. So as i understand, it is not enough - user's buffer
->must be touched only when whole message is copied?
+On AMD guest it will mark the TSC as unstable in the guest as long as invtsc is not used.
+I patched that code out for myself, that is why I am mentioning it.
 
-The important thing is to not remove packets from the rx_queue unless we 
-are sure that everything went well and we are returning the entire 
-message to the user.
+Best regards,
+	Maxim Levitsky
 
-Stefano
 
