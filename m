@@ -2,105 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B2D539D9BF
-	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 12:35:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5F8739D9F3
+	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 12:45:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230450AbhFGKgh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Jun 2021 06:36:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57272 "EHLO
+        id S230178AbhFGKq4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Jun 2021 06:46:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230289AbhFGKge (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Jun 2021 06:36:34 -0400
-Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE1B1C0617A6
-        for <kvm@vger.kernel.org>; Mon,  7 Jun 2021 03:34:43 -0700 (PDT)
-Received: by mail-qk1-x732.google.com with SMTP id j189so16125758qkf.2
-        for <kvm@vger.kernel.org>; Mon, 07 Jun 2021 03:34:43 -0700 (PDT)
+        with ESMTP id S230139AbhFGKq4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Jun 2021 06:46:56 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C122C061766
+        for <kvm@vger.kernel.org>; Mon,  7 Jun 2021 03:45:05 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id r9so329113wrz.10
+        for <kvm@vger.kernel.org>; Mon, 07 Jun 2021 03:45:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=W1Z9gEhrO+dFGwff9bZiaB/Edk6g694l5FTvX8TnmqE=;
-        b=iTtdkG5oAQc1PJs6q76R+08BA/t3w7Wq0B5q0H3ufJUid+AhdIEg3Y7fEh5tvg+XdW
-         59gjhb2UQezoRRcs6jsnQry+7KjS/8g6IMni8HGD16dE51trmOBjXRtipOnNlpsv21H/
-         4gB311yqb4F57DW8p98BkOuLBxbWB/QMW/ct8ycdrOesNpXpOqGaHtOf//MeCDDjrH5q
-         uF0ze7KA5EuIxV5OEmz2vTKb7IYQSVhse9ZIsA0utfTlmx1u3ZfETfQW9jpk4VhCu02/
-         unJalB4bnrHV3OiWEs7dCHEm4b8l0JftUBB4lDcwiHZZ79ZbMqv7OGCPzQTCU5xdEPmM
-         dSig==
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=aqlB3nweefXMBd+1n3TfVg5Imk7mqG7GGko5Cn1Ypjk=;
+        b=fokBrG+2G1fkq/XmZlW8Qn8gNsGVee/kxIBq16SYHHcihUEHhxAiLiYioDzjZCKPWV
+         9QEZOxcXx7fkFSqzCPab9ejYwiSWHFrBFKIvS4T83XVPbmSdXZpWw/7QLttpVgGupn7M
+         FoWs2xbakjWUMbWyKY9toPvBiRJY2NSMoomhdLwJgft1TVJGXI1KGV/tNqHpK+0t4K/c
+         ssThtjIQ5Gd6U2Vgt07NOm/v5UajEDZu6QDpCKD4dz0UaryRPm6OwVwk+zBYdDwhZepP
+         9jCgvqxA0rUhD0TtVGl/Sk+NMb0qRwm6JS3LOkQ+swNNoK5wt0XeTzNUgGulkw29L99w
+         ZQaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=W1Z9gEhrO+dFGwff9bZiaB/Edk6g694l5FTvX8TnmqE=;
-        b=MfCReK8Nl10eRjwb0Ve6QytF09V7q6mmpPN41SqmLKtkcpgDqMNfXhb4FSqh2g2flW
-         zl6tuavXwD0nwelDoUXbhFc7nqV9q6EBRVSKxUmz9INJDiZ3Cq8R7ActwGVhdK2PQDZj
-         9UOT6gOfReBt8bXjkqTq7M5zNgMLTqyNBsBveun0ZwjhC4sriZigQn/c4hAbk8tLPS34
-         Kyf9oeN+vRFvRNTim3cLgEsevXbbO04gaoDDrGkiqszzKf8tjcZSAzA2sXxX5oeo3B8o
-         sB9TDxeTInEQ6YqBCogR+vvEFBkdj6ANoS1JIk1EEU7cEzYhV1JJj122s1JwgYT34e8O
-         +Lcg==
-X-Gm-Message-State: AOAM5318I06GpYjFO5fPS9m5EoJNExYb9pM+l/VjNEVPFy+qAihhxu/p
-        NRpH8mFz2vea3rEJOK1G3XUxMmv9y/kY0m0OWwjQzg==
-X-Google-Smtp-Source: ABdhPJzTaPg9Os78/lByEqsfjEnL/w2wMnrVZ00vCZM9WGJQ9q3qi9YoIFwEozZ90r1enDNg908KqoHmNpKV1LanaKs=
-X-Received: by 2002:a37:4694:: with SMTP id t142mr16089543qka.265.1623062081807;
- Mon, 07 Jun 2021 03:34:41 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=aqlB3nweefXMBd+1n3TfVg5Imk7mqG7GGko5Cn1Ypjk=;
+        b=MZMfhTFe1kJVgFvOLWg2t1/d/Hgou/nCSo4gZAWlTWTr6UG7qtLtQwmHXtbi2RIfEn
+         LhFFlONb8BUqEmuHVCrUrW5hnbX7zaEqtiPUsGWxKfLnvvmvtVP2aW+z6ssKYb0Jvx+H
+         BgtvOaUXvY1j2pIbV2d2jsiyi2AAPpSEPohS6plNl+958WBMaJisZZCIIQ6Lsvs17wtc
+         z7TqM+QpdU/zUPw0X4NOFuZQYyFRR081Rc/SjwCbCKBF9KiD4Z0p4q8KvWDBR8S87vK+
+         9wJb9IUJKwFWrccw7CoHZ5bH2PbwQSV0HR7fjL5eU5mUqXpTfc+oXc45+kblrloYTJ8C
+         BokA==
+X-Gm-Message-State: AOAM533xjvPhSHonrLspY9V4RREUC2mlT/CxIKdeJTSu1Y5iH1m/LM4F
+        oVBgwrFdG9TESwUEgkXHT1cWRQ==
+X-Google-Smtp-Source: ABdhPJwqNBSGH0k0cJir/i3kAe7gRK7bFBO/b5hmcAfd7Z+SvyV8tZwYe+ey/npaVItqY9949tYt3w==
+X-Received: by 2002:a05:6000:1563:: with SMTP id 3mr16068224wrz.59.1623062703694;
+        Mon, 07 Jun 2021 03:45:03 -0700 (PDT)
+Received: from maple.lan (cpc141216-aztw34-2-0-cust174.18-1.cable.virginm.net. [80.7.220.175])
+        by smtp.gmail.com with ESMTPSA id p16sm16000678wrs.52.2021.06.07.03.45.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Jun 2021 03:45:03 -0700 (PDT)
+Date:   Mon, 7 Jun 2021 11:45:00 +0100
+From:   Daniel Thompson <daniel.thompson@linaro.org>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Jens Axboe <axboe@kernel.dk>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Felipe Balbi <balbi@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jason Wessel <jason.wessel@windriver.com>,
+        Douglas Anderson <dianders@chromium.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, Will Deacon <will@kernel.org>,
+        Waiman Long <longman@redhat.com>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Oleg Nesterov <oleg@redhat.com>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, cgroups@vger.kernel.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        linux-perf-users@vger.kernel.org, linux-pm@vger.kernel.org,
+        rcu@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 6/6] sched: Change task_struct::state
+Message-ID: <20210607104500.sopvslejuoxwzhrs@maple.lan>
+References: <20210602131225.336600299@infradead.org>
+ <20210602133040.587042016@infradead.org>
 MIME-Version: 1.0
-References: <000000000000f3fc9305c2e24311@google.com> <87v9737pt8.ffs@nanos.tec.linutronix.de>
- <0f6e6423-f93a-5d96-f452-4e08dbad9b23@redhat.com> <87sg277muh.ffs@nanos.tec.linutronix.de>
- <CANRm+CxaJ2Wu-f0Ys-1Fi7mo4FY9YBXNymdt142poSuND-K36A@mail.gmail.com>
-In-Reply-To: <CANRm+CxaJ2Wu-f0Ys-1Fi7mo4FY9YBXNymdt142poSuND-K36A@mail.gmail.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Mon, 7 Jun 2021 12:34:30 +0200
-Message-ID: <CACT4Y+YDtBf1GebeAA=twsfuv9e0HN+w7Lt5ZqDJhMJ5-PWYXQ@mail.gmail.com>
-Subject: Re: [syzbot] WARNING in x86_emulate_instruction
-To:     Wanpeng Li <kernellwp@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        syzkaller <syzkaller@googlegroups.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        syzbot <syzbot+71271244f206d17f6441@syzkaller.appspotmail.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, jarkko@kernel.org,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kan.liang@linux.intel.com,
-        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-        linux-sgx@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <seanjc@google.com>, steve.wahl@hpe.com,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210602133040.587042016@infradead.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 28, 2021 at 2:34 AM Wanpeng Li <kernellwp@gmail.com> wrote:
->
-> On Fri, 28 May 2021 at 08:31, Thomas Gleixner <tglx@linutronix.de> wrote:
-> >
-> > On Fri, May 28 2021 at 01:21, Paolo Bonzini wrote:
-> > > On 28/05/21 00:52, Thomas Gleixner wrote:
-> > >>
-> > >> So this is stale for a week now. It's fully reproducible and nobody
-> > >> can't be bothered to look at that?
-> > >>
-> > >> What's wrong with you people?
-> > >
-> > > Actually there's a patch on list ("KVM: X86: Fix warning caused by stale
-> > > emulation context").  Take care.
-> >
-> > That's useful, but does not change the fact that nobody bothered to
-> > reply to this report ...
->
-> Will do it next time. Have a nice evening, guys!
+On Wed, Jun 02, 2021 at 03:12:31PM +0200, Peter Zijlstra wrote:
+> Change the type and name of task_struct::state. Drop the volatile and
+> shrink it to an 'unsigned int'. Rename it in order to find all uses
+> such that we can use READ_ONCE/WRITE_ONCE as appropriate.
+> 
+> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> ---
+>  ...
+>  kernel/debug/kdb/kdb_support.c |   18 +++++++------
+>  ...
+> --- a/kernel/debug/kdb/kdb_support.c
+> +++ b/kernel/debug/kdb/kdb_support.c
+> @@ -609,23 +609,25 @@ unsigned long kdb_task_state_string(cons
+>   */
+>  char kdb_task_state_char (const struct task_struct *p)
+>  {
+> -	int cpu;
+> -	char state;
+> +	unsigned int p_state;
+>  	unsigned long tmp;
+> +	char state;
+> +	int cpu;
+>  
+>  	if (!p ||
+>  	    copy_from_kernel_nofault(&tmp, (char *)p, sizeof(unsigned long)))
+>  		return 'E';
+>  
+>  	cpu = kdb_process_cpu(p);
+> -	state = (p->state == 0) ? 'R' :
+> -		(p->state < 0) ? 'U' :
+> -		(p->state & TASK_UNINTERRUPTIBLE) ? 'D' :
+> -		(p->state & TASK_STOPPED) ? 'T' :
+> -		(p->state & TASK_TRACED) ? 'C' :
+> +	p_state = READ_ONCE(p->__state);
+> +	state = (p_state == 0) ? 'R' :
+> +		(p_state < 0) ? 'U' :
 
-There was an idea to do this automatically by syzbot:
+Looks like the U here stands for Unreachable since this patch makes it
+more obvious that this clause is (and previously was) exactly that!
 
-dashboard/app: notify bug report about fix patches
-https://github.com/google/syzkaller/issues/1574
+Dropping the U state would be good since I guess this will show up as a
+"new" warning in some tools. However it was a preexisting problem so with
+or without this cleaned up:
+Acked-by: Daniel Thompson <daniel.thompson@linaro.org>
 
-Namely: if syzbot discovers a fix anywhere (by the hash), it could
-send a notification email to the bug report email thread.
-The downside is that the robot sends even more emails, so I am not
-sure how it will be accepted. Any opinions?
+
+Daniel.
+
+> +		(p_state & TASK_UNINTERRUPTIBLE) ? 'D' :
+> +		(p_state & TASK_STOPPED) ? 'T' :
+> +		(p_state & TASK_TRACED) ? 'C' :
+>  		(p->exit_state & EXIT_ZOMBIE) ? 'Z' :
+>  		(p->exit_state & EXIT_DEAD) ? 'E' :
+> -		(p->state & TASK_INTERRUPTIBLE) ? 'S' : '?';
+> +		(p_state & TASK_INTERRUPTIBLE) ? 'S' : '?';
+>  	if (is_idle_task(p)) {
+>  		/* Idle task.  Is it really idle, apart from the kdb
+>  		 * interrupt? */
