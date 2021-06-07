@@ -2,218 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF30E39E644
-	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 20:13:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 668BD39E65C
+	for <lists+kvm@lfdr.de>; Mon,  7 Jun 2021 20:19:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230363AbhFGSPA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Jun 2021 14:15:00 -0400
-Received: from mga06.intel.com ([134.134.136.31]:42931 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230212AbhFGSPA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Jun 2021 14:15:00 -0400
-IronPort-SDR: kbd/gQAzlRg1JA/4B2nWs+C93cFgZUw5RcWdh+diQdRM8Y2xs8bHtYnxMwusLpu487wtyXPOJP
- K9d90jD2LRRg==
-X-IronPort-AV: E=McAfee;i="6200,9189,10008"; a="265829732"
-X-IronPort-AV: E=Sophos;i="5.83,255,1616482800"; 
-   d="scan'208";a="265829732"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2021 11:13:07 -0700
-IronPort-SDR: wtR2fYWE5JseIRz4cHWWznciS2BtWxi0Wg6Q1fbUHif2u2USJlGDbkh9vPeuypSZcakMIzA4xS
- mRrVcl+Yi5uQ==
-X-IronPort-AV: E=Sophos;i="5.83,255,1616482800"; 
-   d="scan'208";a="440146197"
-Received: from djiang5-mobl1.amr.corp.intel.com (HELO [10.213.188.150]) ([10.213.188.150])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2021 11:13:05 -0700
-Subject: Re: [PATCH v6 00/20] Add VFIO mediated device support and DEV-MSI
- support for the idxd driver
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "vkoul@kernel.org" <vkoul@kernel.org>,
+        id S230366AbhFGSUy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Jun 2021 14:20:54 -0400
+Received: from mail-bn7nam10on2074.outbound.protection.outlook.com ([40.107.92.74]:9210
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230333AbhFGSUw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Jun 2021 14:20:52 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SWv/O9YcqvNDC3pxa/ql8q4+H1lJGy3Gd1/Scb5e8fc5PIYAK6GwRl/b/+8sLUFRwyCq5Synhu+rgxqXwc6wp9CvQGdPNfk820OhGZRYBQAGwPTbsnRP2zki5tlfhgnPlZ5w9zz/zwhqikDHvld+p8q1IvzUJ96EAELRn2+OTXDfr2PiBDoY2iJPr/jorbk845wBuBFb1tv9ClYkeZiePIUNoDs9rEdp0qPwdc6BulLpuLvA/YzyCzEWoy/SNfOFUC8NIsVWXFRRTjG/G2CT5+oqzXmatuv6rm++a9eBI0uZocpjyXn55hkdFg+oVEipfplGKT5M76QO/c1WHLLYpA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LbTWaJFdCdrDzSdSi5XGrgtZ9SdqmktpsJXAXF0LPzk=;
+ b=VQZ9VZYttomKSD4iJr93895vZrUCfTet1jo1Xd5Xu+NOz9mDX7gGI5LVi+7TJv/vaVbEZdOqsfRp1pRdL9nqVtlu/YMNfrkQkOtMWEGhg6/QsJjDgiTtDmo6xt4uR59pK6wN1QYuPoVA1EYXULBzSf+XHpxh2VvgL00NnGdBal9dMyb48w/Hox+njscrZUh+hbA78ES5A28GMpnpGAZvJHGxRqJdMLINhnbCD3tprWrGIENqeAHkcBDav74CFXzzjHTBguQE8o0nTyqxFskXmbjuBrjNlYHoiZ+mwb5D8/sBJlLgZXas0TWRD21bmmmo6G2bMGWHX/W5cTThOvXbJQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LbTWaJFdCdrDzSdSi5XGrgtZ9SdqmktpsJXAXF0LPzk=;
+ b=B5zxUSQ7eOdY0hXjuJ1AsLSFUthPqYrnzHqAMR7tvxv6lrWLh97b7w6qBRie+rwRmtwGvL5qObr+SAV8aM5vr+LfMiipLUdzTAlTAsA1RU53DA3fhokcf5QX2yv/JK80OJW9QojGazMTQgSmmOd3IKnkD0PsXEgp+0T+erZa3HnEWmmN0otUMKE4VcXzFya2VByYBjUvJf7Uy4nI8Rsjmi5yIaRMsIFNoseJKCCXsz0gAEd1H5PDeH5a6jAI488FD7jMGNdmnuOoTqhEUrq4xS4LHYDCxNX2tBjuN3Cy39gEX9rDo3Hn6Tnxxhsp9CMLcOSzWI5kYzWzNszJqfDdDA==
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5349.namprd12.prod.outlook.com (2603:10b6:208:31f::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.23; Mon, 7 Jun
+ 2021 18:19:00 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e%6]) with mapi id 15.20.4195.030; Mon, 7 Jun 2021
+ 18:19:00 +0000
+Date:   Mon, 7 Jun 2021 15:18:58 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
         "Raj, Ashok" <ashok.raj@intel.com>,
-        "Dey, Megha" <megha.dey@intel.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <162164243591.261970.3439987543338120797.stgit@djiang5-desk3.ch.intel.com>
- <20210523232219.GG1002214@nvidia.com>
- <86cde154-37c7-c00d-b0c6-06b15b50dbf7@intel.com>
- <20210602231747.GK1002214@nvidia.com>
- <MWHPR11MB188664D9E7CA60782B75AC718C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210603014932.GN1002214@nvidia.com>
- <MWHPR11MB1886D613948986530E9B61CB8C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210603214009.68fac0c4.alex.williamson@redhat.com>
- <MWHPR11MB18861FBE62D10E1FC77AB6208C389@MWHPR11MB1886.namprd11.prod.outlook.com>
-From:   Dave Jiang <dave.jiang@intel.com>
-Message-ID: <168ee05a-faf4-3fce-e278-d783104fc442@intel.com>
-Date:   Mon, 7 Jun 2021 11:13:04 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Robin Murphy <robin.murphy@arm.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jason Wang <jasowang@redhat.com>
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+Message-ID: <20210607181858.GM1002214@nvidia.com>
+References: <20210604092620.16aaf5db.alex.williamson@redhat.com>
+ <815fd392-0870-f410-cbac-859070df1b83@redhat.com>
+ <20210604155016.GR1002214@nvidia.com>
+ <30e5c597-b31c-56de-c75e-950c91947d8f@redhat.com>
+ <20210604160336.GA414156@nvidia.com>
+ <2c62b5c7-582a-c710-0436-4ac5e8fd8b39@redhat.com>
+ <20210604172207.GT1002214@nvidia.com>
+ <20210604152918.57d0d369.alex.williamson@redhat.com>
+ <20210604230108.GB1002214@nvidia.com>
+ <20210607094148.7e2341fc.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210607094148.7e2341fc.alex.williamson@redhat.com>
+X-Originating-IP: [47.55.113.94]
+X-ClientProxiedBy: BL1PR13CA0161.namprd13.prod.outlook.com
+ (2603:10b6:208:2bd::16) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-In-Reply-To: <MWHPR11MB18861FBE62D10E1FC77AB6208C389@MWHPR11MB1886.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (47.55.113.94) by BL1PR13CA0161.namprd13.prod.outlook.com (2603:10b6:208:2bd::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.9 via Frontend Transport; Mon, 7 Jun 2021 18:18:59 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lqJpy-003P4L-UY; Mon, 07 Jun 2021 15:18:58 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e23fd459-eb3f-4af1-7632-08d929e0b8ab
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5349:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB53493D1524D5257E1114ED96C2389@BL1PR12MB5349.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 7hXVdHRIbLFC8ofd8TSAcUkJNuLtZpAD+3U9nAPDw/jw6W25/ohvNTE8hezodYY7wa0F/cc1sP1ftzQKICL3GmlEV5foDC7yvSdB1ZMHNxFYn8AYt9IzJdGiTMklCw9jAiX4S2EXGSyqVZRsxWjK0+SkIlc6BlnCa9MZM03Un7aWqHiCiIswjKi8KxIRM09BAOkSJ6rpayHiwmnlc7Zuakt+AYy/+qxUCOEFqA0vh9XRWdjTQfMb+vzHiEOYDIilqKwBulfxP4Mf4Im+Pq/S+r1CHjoD1ziu39hHES09cRIDtMfQt7p3uoJ2fhcev9QQ2L/Sf/24bUxb6s5w25xPdfDfe9Dj77UNd01qZ/jm3AW1iRyncrYzSVOnvxHZtb0HTuHFSB1yPH31TzqhSh50oKMPVKTdAmaZzp2AzhMSvOUvMEiRYYd3XaV3EycZX/hdrzkQ/+7owmcsdgVsy0tQ0mHyuVe3M2JgM7O6d1uuJq3Dt+yYSxySRNoEuVVM35P2tJNRZK2XdxcYy7NMV0kLXdcAHPntJn6B5YTCODyCP/Exo0lbrYT/In8WwG+UC8PhDA+08+tO+GL5Pea3t+UXi/n/NL14bLg4Nr5EHt0hquY=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(346002)(396003)(366004)(376002)(39860400002)(5660300002)(54906003)(66946007)(426003)(38100700002)(186003)(4326008)(83380400001)(7416002)(9746002)(9786002)(6916009)(478600001)(1076003)(66476007)(8676002)(33656002)(66556008)(2616005)(36756003)(2906002)(316002)(26005)(8936002)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?1ZOEP7ZGeYL7hEkU747jLciE16cntiUFGSMi2bgnFiTyFrc3gkHzx7CBQLrf?=
+ =?us-ascii?Q?dziRipP1ugIIAa42uXYQ1GrSLd909Mzu6w3Cvb4ycOo67No5484UMVNudawZ?=
+ =?us-ascii?Q?Bu/Y9e6dXdWdD8ODgORsSn3iErCQoSLqAZuKCrv/d4gpIDz3C7s0nwIjrFpj?=
+ =?us-ascii?Q?cjJuEkSqYiQw5oIjqMl7ljcNV2RiKBlUXJkypd8//5OpdcaLMbclrI8nOJz/?=
+ =?us-ascii?Q?OqKiax/5xqwgSy4+3EZsMYPMChw9DQiqqqGgilHUVl7qDF0Utf7Vj25BEiTu?=
+ =?us-ascii?Q?G9UjCdYNPaFd2DbBAi2SIaRITLoNxLHxhHWcalEHr7ecYF2YXugv56YcObpd?=
+ =?us-ascii?Q?L9RHiyPfDj9UqCqhltiDoZwzIwPjzkCHOfo27qyjuDq9vookBj7ogdoQvtd5?=
+ =?us-ascii?Q?imovBVQZ/5FlHCBOL4Ozw32S+1gyTJ0bs5jTtRC6wBAXTnVBL3BFjNjVNAzt?=
+ =?us-ascii?Q?sKwxRvKN3r3pxrqWWnBUQNxp5929UVGaO1iJbPHh8ACkfKuklNa7vPquP5VD?=
+ =?us-ascii?Q?Cgjqctg+5j44Iq7UzNfPH5kCyU18RZpPAdhBJtjbm6ma5GDBzMyBdY/9q+JA?=
+ =?us-ascii?Q?DoPMbmtmxrNUNm7/7Mz3YOq/Ew7mkbGFEJYUWiNE0Yi+YFv11zo99BpMrLIU?=
+ =?us-ascii?Q?Spt/Lsp96n1X/TpPnFI4/YDhbCVZKhHJn0HOE9M1eMef/U3t6VZ9c0mbw9PB?=
+ =?us-ascii?Q?IH8RFGcRu/JpuXr/NtwgS34aLngoqZyddisWsMfN6rwmEZfIbJ9y5IOCgQS9?=
+ =?us-ascii?Q?BBLuWlfmKdvOj8U/PRzs51V9GS9XWt79phJupT/qstAmHMWQcA+MsOnorkup?=
+ =?us-ascii?Q?5qpoDsrdQGz6IkdaU5UIzzX6zOawxco70X9G3Ant+gl8PvZveaXUpVah+/hy?=
+ =?us-ascii?Q?6JfORbsgm1oPeuJ9O3zbH6mYwTRKYnUG3EVde8i2NLkRK6I6GmIJ7Ac4eOo/?=
+ =?us-ascii?Q?ii4x8ryMeAHe0Xu+kim02iBOHST2FFkCW5M0xVvMMjAZ8rXsrlCcn9L3+kyx?=
+ =?us-ascii?Q?NrWVi45C1DBeR9A3tba6Z+5/ywNzdCPmFJZlSYPPFetSs2CMgu7U5pS/qIrK?=
+ =?us-ascii?Q?KdlL2CTu6tr9sJsBbPXUZWBF0kYkKZvRV7l1KBs5acZOZ11zseisUrfgesVk?=
+ =?us-ascii?Q?aDMN7Ye2XVPIs2zVjl07Wj2YSout4ykykSFcxI2naNOOmAZrNe/1WtAJLgB/?=
+ =?us-ascii?Q?Pk0faHGJ7veKvjiXP1tKZJiHlnda2aW7fsvgymg8BSCIGkAa5LjbEOQaFjlT?=
+ =?us-ascii?Q?Ni7p8KOBhUdDNyH9I2TXBr4K2p0XtzsU+HvqzTuV0g4TbQquTLSTZvCVgJlr?=
+ =?us-ascii?Q?YDKmg521lNQHuOmIHutTBCuR?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e23fd459-eb3f-4af1-7632-08d929e0b8ab
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jun 2021 18:18:59.8587
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: u3FpG7oByYXjbNpc3ApYjDC6ke8XeXMHgBL2Gc9ZeKpm1J4vSIm0bcKwDOpiN5gW
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5349
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Jun 07, 2021 at 09:41:48AM -0600, Alex Williamson wrote:
+> You're calling this an admin knob, which to me suggests a global module
+> option, so are you trying to implement both an administrator and a user
+> policy?  ie. the user can create scenarios where access to wbinvd might
+> be justified by hardware/IOMMU configuration, but can be limited by the
+> admin?
 
-On 6/6/2021 11:22 PM, Tian, Kevin wrote:
-> Hi, Alex,
->
-> Thanks for sharing your thoughts.
->
->> From: Alex Williamson <alex.williamson@redhat.com>
->> Sent: Friday, June 4, 2021 11:40 AM
->>
->> On Thu, 3 Jun 2021 05:52:58 +0000
->> "Tian, Kevin" <kevin.tian@intel.com> wrote:
->>
->>>> From: Jason Gunthorpe <jgg@nvidia.com>
->>>> Sent: Thursday, June 3, 2021 9:50 AM
->>>>
->>>> On Thu, Jun 03, 2021 at 01:11:37AM +0000, Tian, Kevin wrote:
->>>>
->>>>> Jason, can you clarify your attitude on mdev guid stuff? Are you
->>>>> completely against it or case-by-case? If the former, this is a big
->>>>> decision thus it's better to have consensus with Alex/Kirti. If the
->>>>> latter, would like to hear your criteria for when it can be used
->>>>> and when not...
->>>> I dislike it generally, but it exists so <shrug>. I know others feel
->>>> more strongly about it being un-kernely and the wrong way to use sysfs.
->>>>
->>>> Here I was remarking how the example in the cover letter made the mdev
->>>> part seem totally pointless. If it is pointless then don't do it.
->>> Is your point about that as long as a mdev requires pre-config
->>> through driver specific sysfs then it doesn't make sense to use
->>> mdev guid interface anymore?
->> Can you describe exactly what step 1. is doing in this case from the
->> original cover letter ("Enable wq with "mdev" wq type")?  That does
->> sound a bit like configuring something to use mdev then separately
->> going to the trouble of creating the mdev.  As Jason suggests, if a wq
->> is tagged for mdev/vfio, it could just register itself as a vfio bus
->> driver.
-> I'll leave to Dave to explain the exact detail in step 1.
+Could be a per-device sysfs too. I'm not really sure what is useful
+here.
 
-So in step 1, we 'tag' the wq to be dedicated to guest usage and put the 
-hardware wq into enable state. For a dedicated mode wq, we can 
-definitely just register directly and skip the mdev step. For a shared 
-wq mode, we can have multiple mdev running on top of a single wq. So we 
-need some way to create more mdevs. We can either go with the existing 
-established creation path by mdev, or invent something custom for the 
-driver as Jason suggested to accomodate additional virtual devices for 
-guests. We implemented the mdev path originally with consideration of 
-mdev is established and has a known interface already.
+> For example I proposed that the ioasidfd would bear the responsibility
+> of a wbinvd ioctl and therefore validate the user's access to enable
+> wbinvd emulation w/ KVM, so I'm assuming this module option lives
+> there.  
 
->
->> But if we want to use mdev, why doesn't available_instances for your
->> mdev type simply report all unassigned wq and the `echo $UUID > create`
->> grabs a wq for mdev?  That would remove this pre-config contention,
->> right?
-> This way could also work. It sort of changes pre-config to post-config,
-> i.e. after an unassigned wq is grabbed for mdev, the admin then
-> configures additional vendor specific parameters (not initialized by
-> parent driver) before this mdev is assigned to a VM. Looks this is also
-> what NVIDIA is doing for their vGPU, with a cmdline tool (nvidia-smi)
-> and nvidia sysfs node for setting plugin parameters:
->
->          https://docs.nvidia.com/grid/latest/pdf/grid-vgpu-user-guide.pdf
->
-> But I'll leave to Dave again as there must be a reason why they choose
-> pre-config in the first place.
+Right, this is what I was thinking
 
-I think things become more complicated when we go from a dedicated wq to 
-shared wq where the relationship of wq : mdev is 1 : 1 goes to 1 : N. 
-Also needing to keep a consistent user config experience is desired, 
-especially we already have such behavior since kernel 5.6 for host 
-usages. So we really need try to avoid doing wq configuration 
-differently just for "mdev" wqs. In the case suggested above, we 
-basically just flipped the configuration steps. Mdev is first created 
-through mdev sysfs interface. And then the device paramters are 
-configured. Where for us, we configure the device parameter first, and 
-then create the mdev. But in the end, it's still the hybrid mdev setup 
-right?
+> What then is "automatic" mode?  The user cannot create a non-coherent
+> IOASID with a non-coherent device if the IOMMU supports no-snoop
+> blocking?  Do they get a failure?  Does it get silently promoted to
+> coherent?
 
+"automatic" was just a way to keep the API the same as today. Today if
+the IOMMU can block no-snoop then vfio disables wbinvd. To get the
+same level of security automatic mode would detect that vfio would
+have blocked wbinvd because the IOMMU can do it, and then always block
+it.
 
->>> The value of mdev guid interface is providing a vendor-agnostic
->>> interface for mdev life-cycle management which allows one-
->>> enable-fit-all in upper management stack. Requiring vendor
->>> specific pre-config does blur the boundary here.
->> We need to be careful about using work-avoidance in the upper
->> management stack as a primary use case for an interface though.
-> ok
->
->>> Alex/Kirt/Cornelia, what about your opinion here? It's better
->>> we can have an consensus on when and where the existing
->>> mdev sysfs could be used, as this will affect every new mdev
->>> implementation from now on.
->> I have a hard time defining some fixed criteria for using mdev.  It's
->> essentially always been true that vendors could write their own vfio
->> "bus driver", like vfio-pci or vfio-platform, specific to their device.
->> Mdevs were meant to be a way for the (non-vfio) driver of a device to
->> expose portions of the device through mediation for use with vfio.  It
->> seems like that's largely being done here.
->>
->> What I think has changed recently is this desire to make it easier to
->> create those vendor drivers and some promise of making module binding
->> work to avoid the messiness around picking a driver for the device.  In
->> the auxiliary bus case that I think Jason is working on, it sounds like
->> the main device driver exposes portions of itself on an auxiliary bus
->> where drivers on that bus can integrate into the vfio subsystem.  It
->> starts to get pretty fuzzy with what mdev already does, but it's also a
->> more versatile interface.  Is it right for everyone?  Probably not.
-> idxd is also moving toward this model per Jason's suggestion. Although
-> auxiliar bus is not directly used, idxd driver has its own bus for exposing
-> portion of its resources. From this angle, all the motivation around mdev
-> bus does get fuzzy...
->
->> Is the pre-configuration issue here really a push vs pull problem?  I
->> can see the requirement in step 1. is dedicating some resources to an
->> mdev use case, so at that point it seems like the argument is whether we
->> should just create aux bus devices that get automatically bound to a
->> vendor vfio-pci variant and we avoid the mdev lifecycle, which is both
->> convenient and ugly.  On the other hand, mdev has more of a pull
->> interface, ie. here are a bunch of device types and how many of each we
->> can support, use create to pull what you need.
-> I see your point. Looks what idxd is toward now is a mixed model. The
-> parent driver uses a push interface to initialize a pool of instances
-> which are then managed through mdev in a pull mode.
->
->>>> Remember we have stripped away the actual special need to use
->>>> mdev. You don't *have* to use mdev anymore to use vfio. That is a
->>>> significant ideology change even from a few months ago.
->>>>
->>> Yes, "don't have to" but if there is value of doing so  it's
->>> not necessary to blocking it? One point in my mind is that if
->>> we should minimize vendor-specific contracts for user to
->>> manage mdev or subdevice...
->> Again, this in itself is not a great justification for using mdev,
->> we're creating vendor specific device types with vendor specific
->> additional features, that could all be done via some sort of netlink
->> interface too.  The thing that pushes this more towards mdev for me is
->> that I don't think each of these wqs appear as devices to the host,
->> they're internal resources of the parent device and we want to compose
->> them in ways that are slightly more amenable to traditional mdevs... I
->> think.  Thanks,
->>
-> Yes, this is one reason going toward mdev.
->
-> btw I'm not clear what the netlink interface will finally be, especially
-> about whether any generic cmd should be defined cross devices given
-> that subdevice management still has large generality. Jason, do you have
-> an example somewhere which we can take a look regarding to mlx
-> netlink design?
->
-> Thanks
-> Kevin
+It makes sense if there is an admin knob, as the admin could then move
+to an explict enable/disable to get functionality they can't get
+today.
+
+> In "disable" mode, I think we're just narrowing the restriction
+> further, a non-coherent capable device cannot be used except in a
+> forced coherent IOASID.
+
+I wouldn't say "cannot be used" - just you can't get access to
+wbinvd. 
+
+It is up to qemu if it wants to proceed or not. There is no issue with
+allowing the use of no-snoop and blocking wbinvd, other than some
+drivers may malfunction. If the user is certain they don't have
+malfunctioning drivers then no issue to go ahead.
+
+The current vfio arrangement (automatic) maximized compatability. The
+enable/disable options provide for max performance and max security as
+alternative targets.
+
+> > It is the strenth of Paolo's model that KVM should not be able to do
+> > optionally less, not more than the process itself can do.
+> 
+> I think my previous reply was working towards those guidelines.  I feel
+> like we're mostly in agreement, but perhaps reading past each other.
+
+Yes, I think I said we were agreeing :)
+
+> Nothing here convinced me against my previous proposal that the
+> ioasidfd bears responsibility for managing access to a wbinvd ioctl,
+> and therefore the equivalent KVM access.  Whether wbinvd is allowed or
+> no-op'd when the use has access to a non-coherent device in a
+> configuration where the IOMMU prevents non-coherent DMA is maybe still
+> a matter of personal preference.
+
+I think it makes the software design much simpler if the security
+check is very simple. Possessing a suitable device in an ioasid fd
+container is enough to flip on the feature and we don't need to track
+changes from that point on. We don't need to revoke wbinvd if the
+ioasid fd changes, for instance. Better to keep the kernel very simple
+in this regard.
+
+Seems agreeable enough that there is something here to explore in
+patches when the time comes
+
+Jason
