@@ -2,404 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD82239E966
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 00:14:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B085339E9B0
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 00:38:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231214AbhFGWQL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Jun 2021 18:16:11 -0400
-Received: from mail-lj1-f175.google.com ([209.85.208.175]:37427 "EHLO
-        mail-lj1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231160AbhFGWQJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Jun 2021 18:16:09 -0400
-Received: by mail-lj1-f175.google.com with SMTP id e2so24306557ljk.4
-        for <kvm@vger.kernel.org>; Mon, 07 Jun 2021 15:14:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ofoN2n9wD0dgNk8OiPa/nD07kpzlkV/bFCxgo7deAmk=;
-        b=d0lYkzsmvl6gUh9AAcK69MkrG+bGRLzskP5qLEPf8WSsFxhZ1CbKXU5YUyFiKaYNBg
-         +AA+R2lQ5GPKI5mCCclNP7JpuvvxcvI7TYvZ7fAWQGmG3splLaRXZeTTFioYAfHBJZrv
-         g+6AWfoF87Y0QIy18pxpb1JMnn2q8NSc6x1qeUUU6aAZk73B4vES5o6w5oEnvprWh3GL
-         Nbxdx/SYfwO5DwvAJRLFM9FaTFH0rJk/awRqd3yG0qr/wo7qI+lE+S384VmSxjPmDemJ
-         IAhZHf/i3MQtXFcTlWNabvwUUYIhwmk8UvgyjWqOcCryHEi0PSFziVzwtmuYQwmQGiYB
-         dSIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ofoN2n9wD0dgNk8OiPa/nD07kpzlkV/bFCxgo7deAmk=;
-        b=ceV7zlDukvdBjBxEB5tWH4Q2OMA/lejm/BfCXU8JsPG85dHmMDOwHNlF1zVg1MT1Sc
-         WaYn4SpObgLHMuKhyIaJAhr89UGiXen9qYJoWScWSc8cmKSCAeicyk1RsO+ERa2/1WaI
-         5pAmT9Y0K/Su04lryteY4QAQ+sgvMawFS7xR/bIP97MjtqqtQ4UfhW2TYnWCnwXIPxe8
-         7BQ8EgMPWgqxvzipLeuRqsYMCjtgZhXXM+6u0V1+j7QSQ2Xx1YBp7MZuxIsi2MB2tF2p
-         jhv5BzNHOlbQEFHd5nqBVNuf4aECMlwRqJltelfKzdj+MQrIWccUCTL32BGD7zCXl3jq
-         zk6g==
-X-Gm-Message-State: AOAM530P5/bO7MSHSlNbMngDSDH5hBVThIDNO4M3sWwTLnf/M3sGvGUo
-        reefpM1gY2XtvYnDhZhaGAnc1Exzw+wubZ8lcjfWsw==
-X-Google-Smtp-Source: ABdhPJxl/WVWgCJ4qBjCXWD/JUEcu6cAXOAt9RQUSrwqg/SEoYLZ8MwXCWH1PkqjAIa/ycgLpyWTuGurvxTKELDV7oU=
-X-Received: by 2002:a05:651c:10b9:: with SMTP id k25mr6560744ljn.256.1623103985122;
- Mon, 07 Jun 2021 15:13:05 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210603211426.790093-1-jingzhangos@google.com>
- <20210603211426.790093-5-jingzhangos@google.com> <122adf1f-1cb8-8cc4-d52f-8e434ab6c95b@oracle.com>
-In-Reply-To: <122adf1f-1cb8-8cc4-d52f-8e434ab6c95b@oracle.com>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Mon, 7 Jun 2021 17:12:52 -0500
-Message-ID: <CAAdAUtipEraJZMXq1m8L-QRjn3Kyp6jR2yh9nsoUkn92gQnwuw@mail.gmail.com>
-Subject: Re: [PATCH v7 4/4] KVM: selftests: Add selftest for KVM statistics
- data binary interface
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        LinuxS390 <linux-s390@vger.kernel.org>,
-        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        id S230319AbhFGWkb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Jun 2021 18:40:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49696 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230237AbhFGWka (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Jun 2021 18:40:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623105518;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MItQuezXOveybUnPSAV4SZWP+k+EdoOi4OaV+jJO8Pw=;
+        b=Txv0gX4/wREM4lkXqdQz5S1OIxdcTdsWjbDGXBL+NbBn7DHHl06cUOgszzyBBNcX7n+Y27
+        mIDYi2pXUb/9tYVt8kT7hMKJ+e5F0IY3ZxoxZOo8VmY6mcss+ET1KymGkkLAhSi8Rozxb0
+        tvBhgdHtebxzg5u39hsXkYpIw/hZCc8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-29-q3b-BoHbN5S6zix-zVc8kw-1; Mon, 07 Jun 2021 18:38:37 -0400
+X-MC-Unique: q3b-BoHbN5S6zix-zVc8kw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 346BB801106;
+        Mon,  7 Jun 2021 22:38:35 +0000 (UTC)
+Received: from starship (unknown [10.40.194.6])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E243B19C66;
+        Mon,  7 Jun 2021 22:38:30 +0000 (UTC)
+Message-ID: <9d457b982c3fcd6e7413065350b9f860d45a6e47.camel@redhat.com>
+Subject: Re: [PATCH V2] KVM: X86: fix tlb_flush_guest()
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org
+Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+Date:   Tue, 08 Jun 2021 01:38:29 +0300
+In-Reply-To: <20210531172256.2908-1-jiangshanlai@gmail.com>
+References: <4c3ef411ba68ca726531a379fb6c9d16178c8513.camel@redhat.com>
+         <20210531172256.2908-1-jiangshanlai@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 7, 2021 at 2:23 PM Krish Sadhukhan
-<krish.sadhukhan@oracle.com> wrote:
->
->
-> On 6/3/21 2:14 PM, Jing Zhang wrote:
-> > Add selftest to check KVM stats descriptors validity.
-> >
-> > Reviewed-by: David Matlack <dmatlack@google.com>
-> > Reviewed-by: Ricardo Koller <ricarkol@google.com>
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >   tools/testing/selftests/kvm/.gitignore        |   1 +
-> >   tools/testing/selftests/kvm/Makefile          |   3 +
-> >   .../testing/selftests/kvm/include/kvm_util.h  |   3 +
-> >   .../selftests/kvm/kvm_binary_stats_test.c     | 215 ++++++++++++++++++
-> >   tools/testing/selftests/kvm/lib/kvm_util.c    |  12 +
-> >   5 files changed, 234 insertions(+)
-> >   create mode 100644 tools/testing/selftests/kvm/kvm_binary_stats_test.c
-> >
-> > diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> > index bd83158e0e0b..d1c3ee7d3e41 100644
-> > --- a/tools/testing/selftests/kvm/.gitignore
-> > +++ b/tools/testing/selftests/kvm/.gitignore
-> > @@ -43,3 +43,4 @@
-> >   /memslot_modification_stress_test
-> >   /set_memory_region_test
-> >   /steal_time
-> > +/kvm_binary_stats_test
-> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> > index e439d027939d..0cd46d6d1e15 100644
-> > --- a/tools/testing/selftests/kvm/Makefile
-> > +++ b/tools/testing/selftests/kvm/Makefile
-> > @@ -76,6 +76,7 @@ TEST_GEN_PROGS_x86_64 += kvm_page_table_test
-> >   TEST_GEN_PROGS_x86_64 += memslot_modification_stress_test
-> >   TEST_GEN_PROGS_x86_64 += set_memory_region_test
-> >   TEST_GEN_PROGS_x86_64 += steal_time
-> > +TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
-> >
-> >   TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
-> >   TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list-sve
-> > @@ -87,6 +88,7 @@ TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
-> >   TEST_GEN_PROGS_aarch64 += kvm_page_table_test
-> >   TEST_GEN_PROGS_aarch64 += set_memory_region_test
-> >   TEST_GEN_PROGS_aarch64 += steal_time
-> > +TEST_GEN_PROGS_aarch64 += kvm_binary_stats_test
-> >
-> >   TEST_GEN_PROGS_s390x = s390x/memop
-> >   TEST_GEN_PROGS_s390x += s390x/resets
-> > @@ -96,6 +98,7 @@ TEST_GEN_PROGS_s390x += dirty_log_test
-> >   TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
-> >   TEST_GEN_PROGS_s390x += kvm_page_table_test
-> >   TEST_GEN_PROGS_s390x += set_memory_region_test
-> > +TEST_GEN_PROGS_s390x += kvm_binary_stats_test
-> >
-> >   TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
-> >   LIBKVM += $(LIBKVM_$(UNAME_M))
-> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> > index a8f022794ce3..96d15da3d72e 100644
-> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> > @@ -387,4 +387,7 @@ uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc);
-> >   #define GUEST_ASSERT_4(_condition, arg1, arg2, arg3, arg4) \
-> >       __GUEST_ASSERT((_condition), 4, (arg1), (arg2), (arg3), (arg4))
-> >
-> > +int vm_get_stats_fd(struct kvm_vm *vm);
-> > +int vcpu_get_stats_fd(struct kvm_vm *vm, uint32_t vcpuid);
-> > +
-> >   #endif /* SELFTEST_KVM_UTIL_H */
-> > diff --git a/tools/testing/selftests/kvm/kvm_binary_stats_test.c b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-> > new file mode 100644
-> > index 000000000000..081983110dc5
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-> > @@ -0,0 +1,215 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/*
-> > + * kvm_binary_stats_test
-> > + *
-> > + * Copyright (C) 2021, Google LLC.
-> > + *
-> > + * Test the fd-based interface for KVM statistics.
-> > + */
-> > +
-> > +#define _GNU_SOURCE /* for program_invocation_short_name */
-> > +#include <fcntl.h>
-> > +#include <stdio.h>
-> > +#include <stdlib.h>
-> > +#include <string.h>
-> > +#include <errno.h>
-> > +
-> > +#include "test_util.h"
-> > +
-> > +#include "kvm_util.h"
-> > +#include "asm/kvm.h"
-> > +#include "linux/kvm.h"
-> > +
-> > +void stats_test(int stats_fd, int size_stat)
-> > +{
-> > +     ssize_t ret;
-> > +     int i;
-> > +     size_t size_desc, size_data = 0;
-> > +     struct kvm_stats_header header;
-> > +     struct kvm_stats_desc *stats_desc, *pdesc;
-> > +     void *stats_data;
-> > +
-> > +     /* Read kvm stats header */
-> > +     ret = read(stats_fd, &header, sizeof(header));
-> > +     TEST_ASSERT(ret == sizeof(header), "Read stats header");
-> > +     size_desc = sizeof(*stats_desc) + header.name_size;
-> > +
-> > +     /* Check id string in header, that should start with "kvm" */
-> > +     TEST_ASSERT(!strncmp(header.id, "kvm", 3) &&
-> > +                     strlen(header.id) < KVM_STATS_ID_MAXLEN,
-> > +                     "Invalid KVM stats type");
-> > +
-> > +     /* Sanity check for other fields in header */
-> > +     if (header.count == 0) {
-> > +             printf("No KVM stats defined!");
-> > +             return;
-> > +     }
-> > +     /* Check overlap */
-> > +     TEST_ASSERT(header.desc_offset > 0 && header.data_offset > 0
-> > +                     && header.desc_offset >= sizeof(header)
-> > +                     && header.data_offset >= sizeof(header),
-> > +                     "Invalid offset fields in header");
-> > +     TEST_ASSERT(header.desc_offset > header.data_offset
-> > +                     || (header.desc_offset + size_desc * header.count <=
-> > +                             header.data_offset),
-> > +                     "Descriptor block is overlapped with data block");
-> > +
-> > +     /* Allocate memory for stats descriptors */
-> > +     stats_desc = calloc(header.count, size_desc);
-> > +     TEST_ASSERT(stats_desc, "Allocate memory for stats descriptors");
-> > +     /* Read kvm stats descriptors */
-> > +     ret = pread(stats_fd, stats_desc,
-> > +                     size_desc * header.count, header.desc_offset);
-> > +     TEST_ASSERT(ret == size_desc * header.count,
-> > +                     "Read KVM stats descriptors");
-> > +
-> > +     /* Sanity check for fields in descriptors */
-> > +     for (i = 0; i < header.count; ++i) {
-> > +             pdesc = (void *)stats_desc + i * size_desc;
-> > +             /* Check type,unit,base boundaries */
-> > +             TEST_ASSERT((pdesc->flags & KVM_STATS_TYPE_MASK)
-> > +                             <= KVM_STATS_TYPE_MAX, "Unknown KVM stats type");
-> > +             TEST_ASSERT((pdesc->flags & KVM_STATS_UNIT_MASK)
-> > +                             <= KVM_STATS_UNIT_MAX, "Unknown KVM stats unit");
-> > +             TEST_ASSERT((pdesc->flags & KVM_STATS_BASE_MASK)
-> > +                             <= KVM_STATS_BASE_MAX, "Unknown KVM stats base");
-> > +             /* Check exponent for stats unit
-> > +              * Exponent for counter should be greater than or equal to 0
-> > +              * Exponent for unit bytes should be greater than or equal to 0
-> > +              * Exponent for unit seconds should be less than or equal to 0
-> > +              * Exponent for unit clock cycles should be greater than or
-> > +              * equal to 0
-> > +              */
-> > +             switch (pdesc->flags & KVM_STATS_UNIT_MASK) {
-> > +             case KVM_STATS_UNIT_NONE:
-> > +             case KVM_STATS_UNIT_BYTES:
-> > +             case KVM_STATS_UNIT_CYCLES:
-> > +                     TEST_ASSERT(pdesc->exponent >= 0,
-> > +                                     "Unsupported KVM stats unit");
-> > +                     break;
-> > +             case KVM_STATS_UNIT_SECONDS:
-> > +                     TEST_ASSERT(pdesc->exponent <= 0,
-> > +                                     "Unsupported KVM stats unit");
-> > +                     break;
-> > +             }
-> > +             /* Check name string */
-> > +             TEST_ASSERT(strlen(pdesc->name) < header.name_size,
-> > +                             "KVM stats name(%s) too long", pdesc->name);
-> > +             /* Check size field, which should not be zero */
-> > +             TEST_ASSERT(pdesc->size, "KVM descriptor(%s) with size of 0",
-> > +                             pdesc->name);
-> > +             size_data += pdesc->size * size_stat;
-> > +     }
-> > +     /* Check overlap */
-> > +     TEST_ASSERT(header.data_offset >= header.desc_offset
-> > +                     || header.data_offset + size_data <= header.desc_offset,
-> > +                     "Data block is overlapped with Descriptor block");
-> > +     /* Check validity of all stats data size */
-> > +     TEST_ASSERT(size_data >= header.count * size_stat,
-> > +                     "Data size is not correct");
-> > +
-> > +     /* Allocate memory for stats data */
-> > +     stats_data = malloc(size_data);
-> > +     TEST_ASSERT(stats_data, "Allocate memory for stats data");
-> > +     /* Read kvm stats data as a bulk */
-> > +     ret = pread(stats_fd, stats_data, size_data, header.data_offset);
-> > +     TEST_ASSERT(ret == size_data, "Read KVM stats data");
-> > +     /* Read kvm stats data one by one */
-> > +     size_data = 0;
-> > +     for (i = 0; i < header.count; ++i) {
-> > +             pdesc = (void *)stats_desc + i * size_desc;
-> > +             ret = pread(stats_fd, stats_data, pdesc->size * size_stat,
-> > +                             header.data_offset + size_data);
-> > +             TEST_ASSERT(ret == pdesc->size * size_stat,
-> > +                             "Read data of KVM stats: %s", pdesc->name);
-> > +             size_data += pdesc->size * size_stat;
-> > +     }
-> > +
-> > +     free(stats_data);
-> > +     free(stats_desc);
-> > +}
-> > +
-> > +
-> > +void vm_stats_test(struct kvm_vm *vm)
-> > +{
-> > +     int stats_fd;
-> > +     struct kvm_vm_stats_data *stats_data;
-> > +
-> > +     /* Get fd for VM stats */
-> > +     stats_fd = vm_get_stats_fd(vm);
-> > +     TEST_ASSERT(stats_fd >= 0, "Get VM stats fd");
-> > +
-> > +     stats_test(stats_fd, sizeof(stats_data->value[0]));
-> > +     close(stats_fd);
-> > +     TEST_ASSERT(fcntl(stats_fd, F_GETFD) == -1, "Stats fd not freed");
-> > +}
-> > +
-> > +void vcpu_stats_test(struct kvm_vm *vm, int vcpu_id)
-> > +{
-> > +     int stats_fd;
-> > +     struct kvm_vcpu_stats_data *stats_data;
-> > +
-> > +     /* Get fd for VCPU stats */
-> > +     stats_fd = vcpu_get_stats_fd(vm, vcpu_id);
-> > +     TEST_ASSERT(stats_fd >= 0, "Get VCPU stats fd");
-> > +
-> > +     stats_test(stats_fd, sizeof(stats_data->value[0]));
-> > +     close(stats_fd);
-> > +     TEST_ASSERT(fcntl(stats_fd, F_GETFD) == -1, "Stats fd not freed");
-> > +}
-> > +
-> > +#define DEFAULT_NUM_VM               4
-> > +#define DEFAULT_NUM_VCPU     4
-> > +
-> > +/*
-> > + * Usage: kvm_bin_form_stats [#vm] [#vcpu]
-> > + * The first parameter #vm set the number of VMs being created.
-> > + * The second parameter #vcpu set the number of VCPUs being created.
-> > + * By default, DEFAULT_NUM_VM VM and DEFAULT_NUM_VCPU VCPU for the VM would be
-> > + * created for testing.
-> > + */
-> > +
-> > +int main(int argc, char *argv[])
-> > +{
-> > +     int max_vm = DEFAULT_NUM_VM, max_vcpu = DEFAULT_NUM_VCPU, ret, i, j;
-> > +     struct kvm_vm **vms;
-> > +
-> > +     /* Get the number of VMs and VCPUs that would be created for testing. */
-> > +     if (argc > 1) {
-> > +             max_vm = strtol(argv[1], NULL, 0);
-> > +             if (max_vm <= 0)
-> > +                     max_vm = DEFAULT_NUM_VM;
-> > +     }
-> > +     if (argc > 2) {
-> > +             max_vcpu = strtol(argv[2], NULL, 0);
-> > +             if (max_vcpu <= 0)
-> > +                     max_vcpu = DEFAULT_NUM_VCPU;
-> > +     }
-> > +
-> > +     /* Check the extension for binary stats */
-> > +     ret = kvm_check_cap(KVM_CAP_STATS_BINARY_FD);
-> > +     TEST_ASSERT(ret >= 0,
-> > +                     "Binary form statistics interface is not supported");
-> > +
-> > +     /* Create VMs and VCPUs */
-> > +     vms = malloc(sizeof(vms[0]) * max_vm);
-> > +     TEST_ASSERT(vms, "Allocate memory for storing VM pointers");
-> > +     for (i = 0; i < max_vm; ++i) {
-> > +             vms[i] = vm_create(VM_MODE_DEFAULT,
-> > +                             DEFAULT_GUEST_PHY_PAGES, O_RDWR);
-> > +             for (j = 0; j < max_vcpu; ++j)
-> > +                     vm_vcpu_add(vms[i], j);
-> > +     }
-> > +
-> > +     /* Check stats read for every VM and VCPU */
-> > +     for (i = 0; i < max_vm; ++i) {
-> > +             vm_stats_test(vms[i]);
-> > +             for (j = 0; j < max_vcpu; ++j)
-> > +                     vcpu_stats_test(vms[i], j);
-> > +     }
-> > +
-> > +     for (i = 0; i < max_vm; ++i)
-> > +             kvm_vm_free(vms[i]);
-> > +     free(vms);
-> > +     return 0;
-> > +}
-> > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > index fc83f6c5902d..10385b76fe11 100644
-> > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > @@ -2090,3 +2090,15 @@ unsigned int vm_calc_num_guest_pages(enum vm_guest_mode mode, size_t size)
-> >       n = DIV_ROUND_UP(size, vm_guest_mode_params[mode].page_size);
-> >       return vm_adjust_num_guest_pages(mode, n);
-> >   }
-> > +
-> > +int vm_get_stats_fd(struct kvm_vm *vm)
-> > +{
-> > +     return ioctl(vm->fd, KVM_GET_STATS_FD, NULL);
-> > +}
-> > +
-> > +int vcpu_get_stats_fd(struct kvm_vm *vm, uint32_t vcpuid)
-> > +{
-> > +     struct vcpu *vcpu = vcpu_find(vm, vcpuid);
-> > +
-> > +     return ioctl(vcpu->fd, KVM_GET_STATS_FD, NULL);
-> > +}
->
-> We don't want to add a test case for testing the fd interface on a
-> deleted VM and a deleted VCPU ?
->
-> Anyway, for the current content,
->
-> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
->
-Thanks Krish, those invalid fd tests are added at the end of
-vm_stats_test and vcpu_stats_test.
+On Tue, 2021-06-01 at 01:22 +0800, Lai Jiangshan wrote:
+> From: Lai Jiangshan <laijs@linux.alibaba.com>
+> 
+> For KVM_VCPU_FLUSH_TLB used in kvm_flush_tlb_multi(), the guest expects
+> the hypervisor do the operation that equals to native_flush_tlb_global()
+> or invpcid_flush_all() in the specified guest CPU.
+> 
+> When TDP is enabled, there is no problem to just flush the hardware
+> TLB of the specified guest CPU.
+> 
+> But when using shadowpaging, the hypervisor should have to sync the
+> shadow pagetable at first before flushing the hardware TLB so that
+> it can truely emulate the operation of invpcid_flush_all() in guest.
+> 
+> The problem exists since the first implementation of KVM_VCPU_FLUSH_TLB
+> in commit f38a7b75267f ("KVM: X86: support paravirtualized help for TLB
+> shootdowns").  But I don't think it would be a real world problem that
+> time since the local CPU's tlb is flushed at first in guest before queuing
+> KVM_VCPU_FLUSH_TLB to other CPUs.  It means that the hypervisor syncs the
+> shadow pagetable before seeing the corresponding KVM_VCPU_FLUSH_TLBs.
+> 
+> After commit 4ce94eabac16 ("x86/mm/tlb: Flush remote and local TLBs
+> concurrently"), the guest doesn't flush local CPU's tlb at first and
+> the hypervisor can handle other VCPU's KVM_VCPU_FLUSH_TLB earlier than
+> local VCPU's tlb flush and might flush the hardware tlb without syncing
+> the shadow pagetable beforehand.
+> 
+> Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> Fixes: f38a7b75267f ("KVM: X86: support paravirtualized help for TLB shootdowns")
+> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+> ---
+> Changed from V1
+> 	Use kvm_mmu_unload() instead of KVM_REQ_MMU_RELOAD to avoid
+> 	causing unneeded iteration of vcpu_enter_guest().
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index bbc4e04e67ad..27248e330767 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3072,6 +3072,22 @@ static void kvm_vcpu_flush_tlb_all(struct kvm_vcpu *vcpu)
+>  static void kvm_vcpu_flush_tlb_guest(struct kvm_vcpu *vcpu)
+>  {
+>  	++vcpu->stat.tlb_flush;
+> +
+> +	if (!tdp_enabled) {
+> +		/*
+> +		 * When two dimensional paging is not enabled, the
+> +		 * operation should equal to native_flush_tlb_global()
+> +		 * or invpcid_flush_all() on the guest's behalf via
+> +		 * synchronzing shadow pagetable and flushing.
+> +		 *
+> +		 * kvm_mmu_unload() results consequent kvm_mmu_load()
+> +		 * before entering guest which will do the required
+> +		 * pagetable synchronzing and TLB flushing.
+> +		 */
+> +		kvm_mmu_unload(vcpu);
+> +		return;
+> +	}
+> +
+>  	static_call(kvm_x86_tlb_flush_guest)(vcpu);
+>  }
+>  
+Hi!
+ 
+So this patch *does* fix the windows boot without TDP!
+ 
+However it feels like either I was extremely unlucky or
+something else was fixed recently since:
+ 
+1. I am sure I did test the window VM without any hyperv enlightenments
+(I think with -hypervisor even). I always suspect the HV code to cause
+trouble so I disable it.
+ 
+2. When running with single vcpu, even with 'hv-tlbflush' windows doesn't 
+use the PV TLB flush much. It uses it but rarely. 
+ 
+As I see now without this patch (which makes the windows boot always), 
+with a single vCPU I can boot a VM without EPT, and I am sure I tested this.
+without NPT I still can't boot on AMD, as windows seems to use PV TLB flush
+more often on AMD, even with a single vCPU.
+ 
+I do remember testing with single vCPU on both Intel and AMD, and I never had
+gotten either of them to boot without TDP.
+ 
+But anyway with this patch the bug is gone for good.
+Thank you very very much for fixing this, you saved me lot of time which
+I would have put it into this bug eventually.
+ 
+Tested-by: Maxim Levitsky <mlevitsk@redhat.com>
+ 
+As for the patch itself, it also looks fine in its current form
+(It can't probably be optimized but this can be done later)
+So
+ 
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+ 
+
+More notes from the testing I just did:
+ 
+1. On AMD with npt=0, the windows VM boots very slowly, and then in the task manager
+I see that it booted with 1 CPU, although I configured it for 3-28 vCPUs (doesn't matter how many)
+I tested this with several win10 VMs, same pattern repeats.
+ 
+2. The windows nag screen about "we beg you to open a microsoft account" makes the VM enter a live lock.
+I see about half million at least VM exits per second due to page faults and it is stuck in 'please wait' screen
+while with NPT=1 it shows up instantly. The VM has 12 GB of ram so I don't think RAM is an issue.
+ 
+It's likely that those are just result of unoptimized code in regard to TLB flushes,
+and timeouts in windows.
+On my Intel laptop, the VM is way faster with EPT=0 and it boots with 3 vCPUs just fine
+(the laptop has just dual core CPU, so I can't really give more that 3 vCPU to the VM)
+
+
+
+Best regards,
+	Maxim Levitsky
+
+
+
+
