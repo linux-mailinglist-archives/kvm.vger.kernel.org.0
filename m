@@ -2,147 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59D4639FCB5
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 18:41:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC3AD39FCC5
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 18:46:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232572AbhFHQnr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 12:43:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60780 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231278AbhFHQnq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Jun 2021 12:43:46 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F6FFC061574
-        for <kvm@vger.kernel.org>; Tue,  8 Jun 2021 09:41:42 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id h16so12262768pjv.2
-        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 09:41:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=b/MZpiR66ewTSim1WwCgmLNKDwnWD3pufYpqwYfLPKU=;
-        b=eppItGX1DgZiHMFm/WaH4b6ozdA44efGectWI1T2JKxSAAS0Osf16y7A2zCxg4TQBg
-         K9YrCHhg6ZQuXCXLl+5ZWKAIJ4uWKQKGATy79/XnCMTwppi1cXc8Z/R9UUKJhLR4k4mm
-         7V7ULWc/F2ufJoOGyi1vMLbpWgQZ985RF//a5Bi1Cd21z3jyKj9VjnjMmTblL0dXsQw5
-         sWnQ8Sd+kvZCBiuDQPwB9heuWIc3dM4BH3XfdhVugKP8YyV0zxwOHvRT14pieUjJasps
-         m05wg7SkpadjM8e5a4CDBQEFETfiSA8B855xkvVGqH0qzJ8D4X9wKcy4GkztAs3MPicV
-         SY2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=b/MZpiR66ewTSim1WwCgmLNKDwnWD3pufYpqwYfLPKU=;
-        b=l206PDioOY0E11za2hICrN9Mvol3TodiQ1Bl1gcczwnTDysQ22r2VcAPUx2l6+dDpT
-         j33rTCD16bWuTN+nF1wDfj0lx1wt2/V0Ff7fWRg2f5s+0l233YUxD/WjUuoHSzyhCze4
-         OT0TiZajqV1RWvWzmFjiP7vcnfuIV1GTn1F0DZC/SzzLLvM3PLjzp8JjNnjUebWDWz7V
-         yebfxlzAEBRSVfaaklZmQzQ/zcqdS6TSkxAsWjLtTK1riQmOqwt0wn5ozMESSF4eugfa
-         yJQV/OBuIFK6MIqdjZNPtdLUPRnxwE8WmNbMClTecsUEc83E3FnU0ACNZML9tpY1L0MB
-         vRyw==
-X-Gm-Message-State: AOAM532ZY/yoQzbCxM+KNe50A62IYLk5n4Lq1ppSRxULizrTZqwWXHFu
-        n6svyFvDB5yyQJCbSxyot17ivQ==
-X-Google-Smtp-Source: ABdhPJyLX/erWPaMyVyNgXSpSeNvJjb8Ds8CeGzeCnkGsW/Qodl00uQSPBRqaRwMmuoqc4szSEv3FA==
-X-Received: by 2002:a17:902:d88e:b029:10e:601e:d779 with SMTP id b14-20020a170902d88eb029010e601ed779mr853444plz.82.1623170500557;
-        Tue, 08 Jun 2021 09:41:40 -0700 (PDT)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id b20sm14218333pjh.11.2021.06.08.09.41.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jun 2021 09:41:39 -0700 (PDT)
-Date:   Tue, 8 Jun 2021 16:41:36 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     pbonzini@redhat.com, bgardon@google.com, drjones@redhat.com,
-        frankja@linux.ibm.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, peterx@redhat.com,
-        venkateshs@chromium.org
-Subject: Re: [PATCH v2] KVM: selftests: introduce P47V64 for s390x
-Message-ID: <YL+dwGhYheOiliZG@google.com>
-References: <4d6513f3-d921-dff0-d883-51c6dbdcbe39@de.ibm.com>
- <20210608123954.10991-1-borntraeger@de.ibm.com>
+        id S233399AbhFHQso (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 12:48:44 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:54634 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230440AbhFHQsn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Jun 2021 12:48:43 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 158GiAdW079559;
+        Tue, 8 Jun 2021 16:46:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : subject : to :
+ cc : references : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=3MCNTxtibR4QUjCnqfXQaGQ4eGeXuS5SVA3/0ceyeUw=;
+ b=kfFz+Jm65WcTnvatLmIPLfo1BGKBZvWFAmfr/o6EkzKRU1Ka4kscIowMRiv/8xTs55Nx
+ qILJhIo8s0xISN50yK2fbK5QsUV2xoZM9L+csvtD1gDJWxgq6ZvhNKBH3J+QrKMdQPM8
+ cLXrv08sxEbzI13ZQt4tGSh0uFezk7vzE/lvF5PUUV7v8GjbPNFIB5a2VE4RRk6XbyUr
+ 9NCnpNTtuA+4C7nTE+g8i2UXzbBD8vkAUQuvy1N2Tdgd53XftDoSLtyDSJipuuEgc4ye
+ mMZaHNHL9FkMg/tB0j829BaOHUTyDj8uHle9WVa3h6S6FdB4xVGN2XqPsWoowzO9ZLs5 kQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 3914qun7pq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 08 Jun 2021 16:46:45 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 158Gj3iY167990;
+        Tue, 8 Jun 2021 16:46:44 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 390k1r59gy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 08 Jun 2021 16:46:44 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 158Gkh1T001132;
+        Tue, 8 Jun 2021 16:46:43 GMT
+Received: from [10.175.210.6] (/10.175.210.6)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 08 Jun 2021 09:46:42 -0700
+From:   "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+Subject: Re: [PATCH 0/3] Restore extra_mem_pages and add slot0_mem_pages
+To:     Zhenzhong Duan <zhenzhong.duan@intel.com>
+Cc:     linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
+        drjones@redhat.com, pbonzini@redhat.com, shuah@kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20210608233816.423958-1-zhenzhong.duan@intel.com>
+Message-ID: <aee3888c-92c4-57b0-1cb4-1b15b60edda9@oracle.com>
+Date:   Tue, 8 Jun 2021 18:46:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210608123954.10991-1-borntraeger@de.ibm.com>
+In-Reply-To: <20210608233816.423958-1-zhenzhong.duan@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10009 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 adultscore=0
+ malwarescore=0 phishscore=0 mlxlogscore=999 suspectscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
+ definitions=main-2106080107
+X-Proofpoint-ORIG-GUID: 54XHZbqfw9IzNlIwPx7ogwKqGUmPKvHB
+X-Proofpoint-GUID: 54XHZbqfw9IzNlIwPx7ogwKqGUmPKvHB
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10009 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0 phishscore=0
+ spamscore=0 malwarescore=0 clxscore=1011 lowpriorityscore=0
+ priorityscore=1501 adultscore=0 mlxscore=0 mlxlogscore=999 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106080107
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 08, 2021 at 02:39:54PM +0200, Christian Borntraeger wrote:
-> s390x can have up to 47bits of physical guest and 64bits of virtual
-> address  bits. Add a new address mode to avoid errors of testcases
-> going beyond 47bits.
-
-Thanks for the fix. My apologies for breaking s390.
-
-The patch "KVM: selftests: Fix 32-bit truncation of vm_get_max_gfn()"
-has already been added to stable so you may want to add the following:
-
-Fixes: ef4c9f4f6546 ("KVM: selftests: Fix 32-bit truncation of vm_get_max_gfn()")
-Cc: stable@vger.kernel.org
-
+On 09.06.2021 01:38, Zhenzhong Duan wrote:
+> (39fe2fc96694 "selftests: kvm: make allocation of extra memory take effect")
+> changed the meaning of extra_mem_pages and treated it as slot0 memory size.
 > 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-Reviewed-by: David Matlack <dmatlack@google.com>
-
-> ---
-> v1->v2:
-> - remove wrong comment
-> - use 5 levels of page tables
->  tools/testing/selftests/kvm/include/kvm_util.h | 3 ++-
->  tools/testing/selftests/kvm/lib/kvm_util.c     | 5 +++++
->  2 files changed, 7 insertions(+), 1 deletion(-)
+> In fact extra_mem_pages is used for non-slot0 memory size, there is no custom
+> slot0 memory size support. See discuss in https://urldefense.com/v3/__https://lkml.org/lkml/2021/6/3/551__;!!GqivPVa7Brio!K2FcwkE2nzlPAWgBHh6o6jtaWe66RMlfkb-b_8mAtVa5d8ez_sArupY-EqIquuCj2sorww$
+> for more details.
 > 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index fcd8e3855111..b602552b1ed0 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -43,6 +43,7 @@ enum vm_guest_mode {
->  	VM_MODE_P40V48_4K,
->  	VM_MODE_P40V48_64K,
->  	VM_MODE_PXXV48_4K,	/* For 48bits VA but ANY bits PA */
-> +	VM_MODE_P47V64_4K,
->  	NUM_VM_MODES,
->  };
->  
-> @@ -60,7 +61,7 @@ enum vm_guest_mode {
->  
->  #elif defined(__s390x__)
->  
-> -#define VM_MODE_DEFAULT			VM_MODE_P52V48_4K
-> +#define VM_MODE_DEFAULT			VM_MODE_P47V64_4K
->  #define MIN_PAGE_SHIFT			12U
->  #define ptes_per_page(page_size)	((page_size) / 16)
->  
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 28e528c19d28..b126fab6c4e1 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -175,6 +175,7 @@ const char *vm_guest_mode_string(uint32_t i)
->  		[VM_MODE_P40V48_4K]	= "PA-bits:40,  VA-bits:48,  4K pages",
->  		[VM_MODE_P40V48_64K]	= "PA-bits:40,  VA-bits:48, 64K pages",
->  		[VM_MODE_PXXV48_4K]	= "PA-bits:ANY, VA-bits:48,  4K pages",
-> +		[VM_MODE_P47V64_4K]	= "PA-bits:47,  VA-bits:64,  4K pages",
->  	};
->  	_Static_assert(sizeof(strings)/sizeof(char *) == NUM_VM_MODES,
->  		       "Missing new mode strings?");
-> @@ -192,6 +193,7 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
->  	{ 40, 48,  0x1000, 12 },
->  	{ 40, 48, 0x10000, 16 },
->  	{  0,  0,  0x1000, 12 },
-> +	{ 47, 64,  0x1000, 12 },
->  };
->  _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
->  	       "Missing new mode params?");
-> @@ -277,6 +279,9 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
->  		TEST_FAIL("VM_MODE_PXXV48_4K not supported on non-x86 platforms");
->  #endif
->  		break;
-> +	case VM_MODE_P47V64_4K:
-> +		vm->pgtable_levels = 5;
-> +		break;
->  	default:
->  		TEST_FAIL("Unknown guest mode, mode: 0x%x", mode);
->  	}
-> -- 
-> 2.31.1
+> This patchset restores extra_mem_pages's original meaning and adds support for
+> custom slot0 memory with a new parameter slot0_mem_pages.
 > 
+> Run below command, all 39 tests passed.
+> # make -C tools/testing/selftests/ TARGETS=kvm run_tests
+> 
+> Zhenzhong Duan (3):
+>    Revert "selftests: kvm: make allocation of extra memory take effect"
+>    Revert "selftests: kvm: fix overlapping addresses in
+>      memslot_perf_test"
+>    selftests: kvm: Add support for customized slot0 memory size
+> 
+>   .../testing/selftests/kvm/include/kvm_util.h  |  7 +--
+>   .../selftests/kvm/kvm_page_table_test.c       |  2 +-
+>   tools/testing/selftests/kvm/lib/kvm_util.c    | 47 +++++++++++++++----
+>   .../selftests/kvm/lib/perf_test_util.c        |  2 +-
+>   .../testing/selftests/kvm/memslot_perf_test.c |  2 +-
+>   5 files changed, 45 insertions(+), 15 deletions(-)
+> 
+
+Looks good to me, thanks!
+
+For the whole series:
+Reviewed-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+
+BTW: It looks like there was something wrong with the clock (or time zone
+setup) of the machine this series was posted from since the "Date:"
+headers on these four messages say they were sent Jun 8, 23:38 UTC
+(while the time right now is Jun 8, 16:45 UTC).
+
+Maciej
