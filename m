@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 31E8C39EF0D
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 08:54:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4D5C39EF0B
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 08:54:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230293AbhFHG4g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 02:56:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43254 "EHLO
+        id S230389AbhFHG4e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 02:56:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230323AbhFHG43 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230324AbhFHG43 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 8 Jun 2021 02:56:29 -0400
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E131BC06178B;
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED341C061795;
         Mon,  7 Jun 2021 23:54:36 -0700 (PDT)
 Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4Fzgvs0xfSz9sW6; Tue,  8 Jun 2021 16:54:33 +1000 (AEST)
+        id 4Fzgvs1lpfz9s5R; Tue,  8 Jun 2021 16:54:33 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
         d=gibson.dropbear.id.au; s=201602; t=1623135273;
-        bh=6XrXYPDJzXROOAXXdd8a889l8o4k0qJLMeKixWa/h/0=;
+        bh=l+542s68FYtLIf55CdSwqHV1l4dLW1vCSkh7RGkVPCs=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=QnUcTxkPj0P8bQn4t4lMXMTlpj+BS6+QLHtSAxmuZckPqPajgMMpSFAX5Z2hoqHtw
-         4Hxfli9VuKXYkZOJQZUHmpaUHjJD+toFoqGOdSK8Z9aT52LyvySbGtqGvjPjREBsla
-         BEwUIpcVDf7x+PabPrjj8X7f3dvdgGyyjUyZ0/04=
-Date:   Tue, 8 Jun 2021 15:49:25 +1000
+        b=JXtAOc30bFKcr5H8BAuJnug2WX/xvOI7rzD80il7H1427ZIB2iszE43P8Yooi6ONY
+         ek5ZNSmqe9TGTe/ngcMV5XWcUYrVKL4BxOzJTE4xdx+FBaG6ejPvUT/gidM+2t+AoV
+         xrpbEPd/b1LOq+06nJ4knPGJkNIc6GjalFHkGAOg=
+Date:   Tue, 8 Jun 2021 16:04:26 +1000
 From:   David Gibson <david@gibson.dropbear.id.au>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
         Joerg Roedel <joro@8bytes.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
         Lu Baolu <baolu.lu@linux.intel.com>,
         David Woodhouse <dwmw2@infradead.org>,
         "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
@@ -45,208 +45,155 @@ Cc:     LKML <linux-kernel@vger.kernel.org>,
         Kirti Wankhede <kwankhede@nvidia.com>,
         Robin Murphy <robin.murphy@arm.com>
 Subject: Re: [RFC] /dev/ioasid uAPI proposal
-Message-ID: <YL8E5UoT0tndJZfh@yekko>
+Message-ID: <YL8Iam4+cog7oVDa@yekko>
 References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
- <YLch6zbbYqV4PyVf@yekko>
- <MWHPR11MB1886081DE676B0130D3D19258C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210528195839.GO1002214@nvidia.com>
+ <MWHPR11MB1886A17F36CF744857C531148C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210601175643.GQ1002214@nvidia.com>
+ <YLcr8B7EPDCejlWZ@yekko>
+ <20210602163753.GZ1002214@nvidia.com>
+ <YLhnRbJJqPUBiRwa@yekko>
+ <20210603122832.GS1002214@nvidia.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="0m5ZmT5muBxt/Zml"
+        protocol="application/pgp-signature"; boundary="4VGf9ivCxwiJX0fs"
 Content-Disposition: inline
-In-Reply-To: <MWHPR11MB1886081DE676B0130D3D19258C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
+In-Reply-To: <20210603122832.GS1002214@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---0m5ZmT5muBxt/Zml
+--4VGf9ivCxwiJX0fs
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 03, 2021 at 07:17:23AM +0000, Tian, Kevin wrote:
-> > From: David Gibson <david@gibson.dropbear.id.au>
-> > Sent: Wednesday, June 2, 2021 2:15 PM
+On Thu, Jun 03, 2021 at 09:28:32AM -0300, Jason Gunthorpe wrote:
+> On Thu, Jun 03, 2021 at 03:23:17PM +1000, David Gibson wrote:
+> > On Wed, Jun 02, 2021 at 01:37:53PM -0300, Jason Gunthorpe wrote:
+> > > On Wed, Jun 02, 2021 at 04:57:52PM +1000, David Gibson wrote:
+> > >=20
+> > > > I don't think presence or absence of a group fd makes a lot of
+> > > > difference to this design.  Having a group fd just means we attach
+> > > > groups to the ioasid instead of individual devices, and we no longer
+> > > > need the bookkeeping of "partial" devices.
+> > >=20
+> > > Oh, I think we really don't want to attach the group to an ioasid, or
+> > > at least not as a first-class idea.
+> > >=20
+> > > The fundamental problem that got us here is we now live in a world
+> > > where there are many ways to attach a device to an IOASID:
 > >=20
-> [...]=20
-> > > An I/O address space takes effect in the IOMMU only after it is attac=
-hed
-> > > to a device. The device in the /dev/ioasid context always refers to a
-> > > physical one or 'pdev' (PF or VF).
+> > I'm not seeing that that's necessarily a problem.
 > >=20
-> > What you mean by "physical" device here isn't really clear - VFs
-> > aren't really physical devices, and the PF/VF terminology also doesn't
-> > extent to non-PCI devices (which I think we want to consider for the
-> > API, even if we're not implemenenting it any time soon).
->=20
-> Yes, it's not very clear, and more in PCI context to simplify the=20
-> description. A "physical" one here means an PCI endpoint function
-> which has a unique RID. It's more to differentiate with later mdev/
-> subdevice which uses both RID+PASID. Naming is always a hard
-> exercise to me... Possibly I'll just use device vs. subdevice in future
-> versions.
->=20
+> > >  - A RID binding
+> > >  - A RID,PASID binding
+> > >  - A RID,PASID binding for ENQCMD
 > >=20
-> > Now, it's clear that we can't program things into the IOMMU before
-> > attaching a device - we might not even know which IOMMU to use.
+> > I have to admit I haven't fully grasped the differences between these
+> > modes.  I'm hoping we can consolidate at least some of them into the
+> > same sort of binding onto different IOASIDs (which may be linked in
+> > parent/child relationships).
 >=20
-> yes
->=20
-> > However, I'm not sure if its wise to automatically make the AS "real"
-> > as soon as we attach a device:
-> >=20
-> >  * If we're going to attach a whole bunch of devices, could we (for at
-> >    least some IOMMU models) end up doing a lot of work which then has
-> >    to be re-done for each extra device we attach?
->=20
-> which extra work did you specifically refer to? each attach just implies
-> writing the base address of the I/O page table to the IOMMU structure
-> corresponding to this device (either being a per-device entry, or per
-> device+PASID entry).
->=20
-> and generally device attach should not be in a hot path.
->=20
-> >=20
-> >  * With kernel managed IO page tables could attaching a second device
-> >    (at least on some IOMMU models) require some operation which would
-> >    require discarding those tables?  e.g. if the second device somehow
-> >    forces a different IO page size
->=20
-> Then the attach should fail and the user should create another IOASID
-> for the second device.
+> What I would like is that the /dev/iommu side managing the IOASID
+> doesn't really care much, but the device driver has to tell
+> drivers/iommu what it is going to do when it attaches.
 
-Couldn't this make things weirdly order dependent though?  If device A
-has strictly more capabilities than device B, then attaching A then B
-will be fine, but B then A will trigger a new ioasid fd.
+By the device driver, do you mean the userspace or guest device
+driver?  Or do you mean the vfio_pci or mdev "shim" device driver"?
 
-> > For that reason I wonder if we want some sort of explicit enable or
-> > activate call.  Device attaches would only be valid before, map or
-> > attach pagetable calls would only be valid after.
+> It makes sense, in PCI terms, only the driver knows what TLPs the
+> device will generate. The IOMMU needs to know what TLPs it will
+> recieve to configure properly.
 >=20
-> I'm interested in learning a real example requiring explicit enable...
+> PASID or not is major device specific variation, as is the ENQCMD/etc
 >=20
-> >=20
-> > > One I/O address space could be attached to multiple devices. In this =
-case,
-> > > /dev/ioasid uAPI applies to all attached devices under the specified =
-IOASID.
-> > >
-> > > Based on the underlying IOMMU capability one device might be allowed
-> > > to attach to multiple I/O address spaces, with DMAs accessing them by
-> > > carrying different routing information. One of them is the default I/O
-> > > address space routed by PCI Requestor ID (RID) or ARM Stream ID. The
-> > > remaining are routed by RID + Process Address Space ID (PASID) or
-> > > Stream+Substream ID. For simplicity the following context uses RID and
-> > > PASID when talking about the routing information for I/O address spac=
-es.
-> >=20
-> > I'm not really clear on how this interacts with nested ioasids.  Would
-> > you generally expect the RID+PASID IOASes to be children of the base
-> > RID IOAS, or not?
->=20
-> No. With Intel SIOV both parent/children could be RID+PASID, e.g.
-> when one enables vSVA on a mdev.
+> Having the device be explicit when it tells the IOMMU what it is going
+> to be sending is a major plus to me. I actually don't want to see this
+> part of the interface be made less strong.
 
-Hm, ok.  I really haven't understood how the PASIDs fit into this
-then.  I'll try again on v2.
+Ok, if I'm understanding this right a PASID capable IOMMU will be able
+to process *both* transactions with just a RID and transactions with a
+RID+PASID.
 
-> > If the PASID ASes are children of the RID AS, can we consider this not
-> > as the device explicitly attaching to multiple IOASIDs, but instead
-> > attaching to the parent IOASID with awareness of the child ones?
-> >=20
-> > > Device attachment is initiated through passthrough framework uAPI (use
-> > > VFIO for simplicity in following context). VFIO is responsible for id=
-entifying
-> > > the routing information and registering it to the ioasid driver when =
-calling
-> > > ioasid attach helper function. It could be RID if the assigned device=
- is
-> > > pdev (PF/VF) or RID+PASID if the device is mediated (mdev). In additi=
-on,
-> > > user might also provide its view of virtual routing information (vPAS=
-ID) in
-> > > the attach call, e.g. when multiple user-managed I/O address spaces a=
-re
-> > > attached to the vfio_device. In this case VFIO must figure out whether
-> > > vPASID should be directly used (for pdev) or converted to a kernel-
-> > > allocated one (pPASID, for mdev) for physical routing (see section 4).
-> > >
-> > > Device must be bound to an IOASID FD before attach operation can be
-> > > conducted. This is also through VFIO uAPI. In this proposal one device
-> > > should not be bound to multiple FD's. Not sure about the gain of
-> > > allowing it except adding unnecessary complexity. But if others have
-> > > different view we can further discuss.
-> > >
-> > > VFIO must ensure its device composes DMAs with the routing information
-> > > attached to the IOASID. For pdev it naturally happens since vPASID is
-> > > directly programmed to the device by guest software. For mdev this
-> > > implies any guest operation carrying a vPASID on this device must be
-> > > trapped into VFIO and then converted to pPASID before sent to the
-> > > device. A detail explanation about PASID virtualization policies can =
-be
-> > > found in section 4.
-> > >
-> > > Modern devices may support a scalable workload submission interface
-> > > based on PCI DMWr capability, allowing a single work queue to access
-> > > multiple I/O address spaces. One example is Intel ENQCMD, having
-> > > PASID saved in the CPU MSR and carried in the instruction payload
-> > > when sent out to the device. Then a single work queue shared by
-> > > multiple processes can compose DMAs carrying different PASIDs.
-> >=20
-> > Is the assumption here that the processes share the IOASID FD
-> > instance, but not memory?
->=20
-> I didn't get this question
+So if we're thinking of this notional 84ish-bit address space, then
+that includes "no PASID" as well as all the possible PASID values.
+Yes?  Or am I confused?
 
-Ok, stepping back, what exactly do you mean by "processes" above?  Do
-you mean Linux processes, or something else?
-
-> > > When executing ENQCMD in the guest, the CPU MSR includes a vPASID
-> > > which, if targeting a mdev, must be converted to pPASID before sent
-> > > to the wire. Intel CPU provides a hardware PASID translation capabili=
-ty
-> > > for auto-conversion in the fast path. The user is expected to setup t=
-he
-> > > PASID mapping through KVM uAPI, with information about {vpasid,
-> > > ioasid_fd, ioasid}. The ioasid driver provides helper function for KVM
-> > > to figure out the actual pPASID given an IOASID.
-> > >
-> > > With above design /dev/ioasid uAPI is all about I/O address spaces.
-> > > It doesn't include any device routing information, which is only
-> > > indirectly registered to the ioasid driver through VFIO uAPI. For
-> > > example, I/O page fault is always reported to userspace per IOASID,
-> > > although it's physically reported per device (RID+PASID). If there is=
- a
-> > > need of further relaying this fault into the guest, the user is respo=
-nsible
-> > > of identifying the device attached to this IOASID (randomly pick one =
-if
-> > > multiple attached devices) and then generates a per-device virtual I/O
-> > > page fault into guest. Similarly the iotlb invalidation uAPI describe=
-s the
-> > > granularity in the I/O address space (all, or a range), different fro=
-m the
-> > > underlying IOMMU semantics (domain-wide, PASID-wide, range-based).
-> > >
-> > > I/O page tables routed through PASID are installed in a per-RID PASID
-> > > table structure. Some platforms implement the PASID table in the guest
-> > > physical space (GPA), expecting it managed by the guest. The guest
-> > > PASID table is bound to the IOMMU also by attaching to an IOASID,
-> > > representing the per-RID vPASID space.
+>=20
+> > > The selection of which mode to use is based on the specific
+> > > driver/device operation. Ie the thing that implements the 'struct
+> > > vfio_device' is the thing that has to select the binding mode.
 > >=20
-> > Do we need to consider two management modes here, much as we have for
-> > the pagetables themsleves: either kernel managed, in which we have
-> > explicit calls to bind a vPASID to a parent PASID, or user managed in
-> > which case we register a table in some format.
+> > I thought userspace selected the binding mode - although not all modes
+> > will be possible for all devices.
 >=20
-> yes, this is related to PASID virtualization in section 4. And based on=
-=20
-> suggestion from Jason, the vPASID requirement will be reported to
-> user space via the per-device reporting interface.
+> /dev/iommu is concerned with setting up the IOAS and filling the IO
+> page tables with information
 >=20
-> Thanks
-> Kevin
+> The driver behind "struct vfio_device" is responsible to "route" its
+> HW into that IOAS.
 >=20
+> They are two halfs of the problem, one is only the io page table, and one
+> the is connection of a PCI TLP to a specific io page table.
+>=20
+> Only the driver knows what format of TLPs the device will generate so
+> only the driver can specify the "route"
+
+Ok.  I'd really like if we can encode this in a way that doesn't build
+PCI-specific structure into the API, though.
+
+> =20
+> > > eg if two PCI devices are in a group then it is perfectly fine that
+> > > one device uses RID binding and the other device uses RID,PASID
+> > > binding.
+> >=20
+> > Uhhhh... I don't see how that can be.  They could well be in the same
+> > group because their RIDs cannot be distinguished from each other.
+>=20
+> Inability to match the RID is rare, certainly I would expect any IOMMU
+> HW that can do PCIEe PASID matching can also do RID matching.
+
+It's not just up to the IOMMU.  The obvious case is a PCIe-to-PCI
+bridge.  All transactions show the RID of the bridge, because vanilla
+PCI doesn't have them.  Same situation with a buggy multifunction
+device which uses function 0's RID for all functions.
+
+It may be rare, but we still have to deal with it one way or another.
+
+I really don't think we want to support multiple binding types for a
+single group.
+
+> With
+> such HW the above is perfectly fine - the group may not be secure
+> between members (eg !ACS), but the TLPs still carry valid RIDs and
+> PASID and the IOMMU can still discriminate.
+
+They carry RIDs, whether they're valid depends on how buggy your
+hardware is.
+
+> I think you are talking about really old IOMMU's that could only
+> isolate based on ingress port or something.. I suppose modern PCIe has
+> some cases like this in the NTB stuff too.
+
+Depends what you mean by really old.  They may seem really old to
+those working on new fancy IOMMU technology.  But I hit problems in
+practice not long ago with awkwardly multi-device groups because it
+was on a particular Dell server without ACS implementation.  Likewise
+I strongly suspect non-PASID IOMMUs will remain common on low end
+hardware (like peoples' laptops) for some time.
+
+> Oh, I hadn't spent time thinking about any of those.. It is messy but
+> it can still be forced to work, I guess. A device centric model means
+> all the devices using the same routing ID have to be connected to the
+> same IOASID by userspace. So some of the connections will be NOPs.
+
+See, that's exactly what I thought the group checks were enforcing.
+I'm really hoping we don't need two levels of granularity here: groups
+of devices that can't be identified from each other, and then groups
+of those that can't be isolated from each other.  That introduces a
+huge amount of extra conceptual complexity.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -254,24 +201,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---0m5ZmT5muBxt/Zml
+--4VGf9ivCxwiJX0fs
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmC/BOMACgkQbDjKyiDZ
-s5LK5BAAs3fDG9X4n5k72QI9E302AvlcHhqDEV+QO9FVrJIBUNIGWtArJ3QpaMo9
-YsRdjSzjUe4K2FixvHk+vhrIL0UgsEpKME/3wnAcTdcLRlmuiYOxnoNmay2FSBvz
-+agr6JKxIPqKlIaweXV+ZgPE+UslAGwB+Y0WYZpAU/AgjHrv1WqDWKBdUdndhnKk
-tqqXFUhAPV/SiRNFx1kZf5b8UKpGJtAQPmoE8lwpE+9PQSNPeDNX9gXgNkPpCu6E
-86Yci0bFwMyb+DMgzmZn4iIiE4wIRT5C96dQ3obnW8bKsQm36HZmNB9pEjnjvBiM
-GLG452DaoWg1eFxg8lEMyxsbo/eiEwC3QMzvXA8PlDsbptqxsRaE9GazeXKM97Vz
-YBOQ1kbBzfa0FzNl62c0JiXiksCG7hZk/HvUKkycKW/919eYSqEyh505caHGDY2f
-7hbCyXSoHxk3SUYo3tF8pUKAesWi+9DUJHEcWMygcwyM+W5CEjnsE3MUjnJWeWk/
-e92lErcq27pLOYi0nWWZJVTvDWHBGMdzm5QQjjCh3s8a5iD5s+Q8fOr2ersQtDyO
-/F+CcUqV+/E5auEHonn/6AKBcVapffQfoPCPQrsiuAEAOSoNYctoBcHAXX3BCHi1
-gu8QAvrPQrUbLwXaqL2cgayEOif9QcKT/li/J7FAOA5xlqNPvzI=
-=qPF8
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmC/CGgACgkQbDjKyiDZ
+s5JMCBAAlYAbFNYbeY8IPBsKKj4Jp7ze0Qfle6wVzSAXKBio81llZffxvTZe012f
+sJ9/N4tEJn6VpxG3bKMJXhAa6msKbF+OLHGLOqxOQB+nnNORZ/RCTNIV5llr13dI
+wCs4Kvl9CbbYY9omogJz4P8WqJNunLBAr+Nngy5FEDZ3zV8ujWM7kMjlGWsl6Jxx
+wz2YDQSz2yZ1z9kSdmqMt0hvPdj/msyh6KmbcdQIboKeMphvL7OXMuQGnbLCdTKS
+RMUUh0Ui4RMJ857fGfk8tm+5Ctnb1lHOW7/FhSgRMCtBdT8w2cKq7Y8wMn0RmSk7
+HMhyEYsYbYVyOmGUAXduvmBxkn0WhG7YpP6ktVB1kfaTXOKJ1lU+NkZdWQNuual0
+zeNMZHg3JUNIYvKVy2KgkwLIdnNhMHa6AaaYgqhv9B+ihFNWQLXHhCW48om/2LN1
+UG51A1eruOE7m4D7lIW3DdxaqcIxeFbUs9hAzT1hvK9pq+CcoFHjkgP0r0jCKZB8
+0fVq7HMjUeaOu8ygDOH30go/vIFJ9QvCnOqVwxAgP0zh1mFp/cpWSaTzw+WCBSwt
+p5r9LpFcZLQHwtJ8nJvDoz6jlaw2apzt8KPSNVxlHlPcRrRrsY5sZuW2z41yIiSC
+5I3VOlaDy86+6sVsxMf1oucPg+IddFD5GnMGbD0ILlzXjdTKOwI=
+=o2DZ
 -----END PGP SIGNATURE-----
 
---0m5ZmT5muBxt/Zml--
+--4VGf9ivCxwiJX0fs--
