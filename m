@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B31173A02AF
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 21:22:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 282703A01C1
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 21:18:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234143AbhFHTHo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 15:07:44 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48942 "EHLO mail.kernel.org"
+        id S236160AbhFHS4J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 14:56:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48898 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237847AbhFHTFq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Jun 2021 15:05:46 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id CDEEC6124B;
-        Tue,  8 Jun 2021 18:46:39 +0000 (UTC)
+        id S235536AbhFHSxg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Jun 2021 14:53:36 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id ABA8E61483;
+        Tue,  8 Jun 2021 18:40:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1623178000;
-        bh=7dn+YmoNYsIfFsYwgBhxUoZFQvV/6OMZdEEDuMU8WJA=;
+        s=korg; t=1623177636;
+        bh=jTaVlNLcB7p+1qeKRSry2AX+8F0Yy4SjR0IfEuAeplY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qFZskPisAwuM3qleNyM2IbEupvEJe5aU5F8JeoqLDnvcUe64IQk4Vc+4uHCAMkrd5
-         tPnAe3A8n4rIfBfmjFRqi1PZl5Knm9F9ITYav+57kAlOqYqAu5Pnrka08WeRFBbkhs
-         4TvzZthwGzYlpYtq5U0oSDuk7yerDh0v1ikM9/Vk=
+        b=rey/q6aVSXom71SaTjZ0NMxeAB6MNPJscq53IV7RI8KMA9DaiwHYVgIJDrqDZ7y7c
+         l+4S07A0+86ls4R0ZZJBOlasNwCsboxUhbbwGbaZU4+hX697ThZT/UJs8mS+9+irtB
+         VRkeZ7ttvGoKFAwQibpdKEN5S6olk8sSYt3FTcS0=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -30,12 +30,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Jason Gunthorpe <jgg@nvidia.com>,
         Eric Auger <eric.auger@redhat.com>,
         Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.12 012/161] vfio/pci: zap_vma_ptes() needs MMU
-Date:   Tue,  8 Jun 2021 20:25:42 +0200
-Message-Id: <20210608175945.881604780@linuxfoundation.org>
+Subject: [PATCH 5.10 011/137] vfio/pci: zap_vma_ptes() needs MMU
+Date:   Tue,  8 Jun 2021 20:25:51 +0200
+Message-Id: <20210608175942.764442650@linuxfoundation.org>
 X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20210608175945.476074951@linuxfoundation.org>
-References: <20210608175945.476074951@linuxfoundation.org>
+In-Reply-To: <20210608175942.377073879@linuxfoundation.org>
+References: <20210608175942.377073879@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -73,7 +73,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-index 4abddbebd4b2..c691127bc805 100644
+index 0f28bf99efeb..4e1107767e29 100644
 --- a/drivers/vfio/pci/Kconfig
 +++ b/drivers/vfio/pci/Kconfig
 @@ -2,6 +2,7 @@
