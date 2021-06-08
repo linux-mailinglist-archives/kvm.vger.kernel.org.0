@@ -2,149 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AC5B139F640
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 14:18:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 044C439F668
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 14:22:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232488AbhFHMUW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 08:20:22 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37710 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S232211AbhFHMUV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 8 Jun 2021 08:20:21 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 158C3CM6063447;
-        Tue, 8 Jun 2021 08:18:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Opf4Ctek6JihCniOnw0YkjAsjK8FjoVK5qhyv2Cctas=;
- b=KAuYf9YSuXZsLBcNw3pJIByiGwnvtS5puX3C8TDeRFOwQv0Rob/Ou7fln2RfGVLRqp/B
- 18kQvV5QaWKyej0EqtPyLXy6dVZQQpAf+RvBaU2XxZNvkgJ/wfBKtLoFWyxwF514c7cK
- 0xTlVKfmtBNlUAYVasPrCfb8gIFX4mTc0Dw1mD8Ry+EfPHaxrEKo0cTA2ULvRNaXuHj2
- 0H9O0mLi4O66TyXaDuLkNOg1zGP1KfGRKb5goIk+fy3KeS0LlwxariMGlAGR4iQkhx8n
- Scpivqljlct7T3EGuKF9J3x5To9KO+gV2o/wmInVGdYYt8uk6Z4dECBUhLAuxAFqx0yv Tg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3927r91cvy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Jun 2021 08:18:27 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 158C3FRj063782;
-        Tue, 8 Jun 2021 08:18:27 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3927r91cv7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Jun 2021 08:18:27 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 158CC3Ff018715;
-        Tue, 8 Jun 2021 12:18:25 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 3900w89gue-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Jun 2021 12:18:25 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 158CIMm613959630
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 8 Jun 2021 12:18:22 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4FCBCA405F;
-        Tue,  8 Jun 2021 12:18:22 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D4D7CA407B;
-        Tue,  8 Jun 2021 12:18:21 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.171.36.114])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  8 Jun 2021 12:18:21 +0000 (GMT)
-Subject: Re: [PATCH] KVM: selftests: introduce P47V64 for s390x
-To:     pbonzini@redhat.com
-Cc:     bgardon@google.com, dmatlack@google.com, drjones@redhat.com,
-        frankja@linux.ibm.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, peterx@redhat.com,
-        venkateshs@chromium.org
-References: <4d6513f3-d921-dff0-d883-51c6dbdcbe39@de.ibm.com>
- <20210608114546.6419-1-borntraeger@de.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <264e8e21-059b-d869-28bb-3d8f33b8459c@de.ibm.com>
-Date:   Tue, 8 Jun 2021 14:18:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        id S232452AbhFHMXz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 08:23:55 -0400
+Received: from mail-dm6nam10on2084.outbound.protection.outlook.com ([40.107.93.84]:46781
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232498AbhFHMXy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Jun 2021 08:23:54 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JRKl/+TO3NDtxMPAu2xLpjyLBJFIgKMbN9fm2KpAVGTCV7Rt0QP0ReCvRnqTQtuHP9zFQu+ZsMYkgGlj0hHoOcwfNaQ5Hk/dHutPIBS/b5iy29fiJmtzyrA/eKo6Q7iPLLpF1GcGTIWIRty7HlFftP1HMtMjRhxTuzPj5ZsY+xNcdy5gO4btwGdXfVT/lgM4pjz4dsrP2k9fYDDLcTSdMgpXVfkCw3smlHxh5rENQ59GMrykq8PspTxNe10vawATdQKDtiFcGnJMTbOqbNaUuMBDvxbvLSMtycEY7iggs3R96PaczM/AYI+BaCDXkZ0/SZ1IvJvJlf2wKXCcYVlIbw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0wB7QcmZPTnDvKr1UbsHbvnLDbGCEWe7JlalQvN8anQ=;
+ b=nRXW/oXQlsPXmJGN//xjiQr0kTzVQdpoJvD2OWgcC8YghITSwEeDhJQB9Unq2kyawFLTPv6qjnY1yS6MEuNEEXPk136x1gGQHiJ3JFjlqq1TeIJUi+2dxuBgscMTMVVQJ0jJPUwrXyx+dprnrc70G4Q3xtgJRB3vcubA55KWfeFEpz3UX2YodqeUZVit52EIsYDU7fyHSANz4wYHeMu7CeUIAdEL4kfBTbDB8vFIwoNpmRsYfy0kvDZ7Si2fmCGtTEW2R9cRYisVN/iiH7h5cRzKgMAsDfU+QSVxYELwmYE7vdGC6dORLsN8HZfm5uI0zhQCnm015ofbfwJI1LqZ4A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0wB7QcmZPTnDvKr1UbsHbvnLDbGCEWe7JlalQvN8anQ=;
+ b=le9zy5j0uMlME23Cs0jE+UgNxWLnU61HH2nBUWVOfiKU/NWCvN33wKB31iULPb7WPlmKlgK4TgVCtzDMpOJ38pCLRyhZehwW+wNpvGCMdnGYebnNlYU/9T3BcgdIVofsjEcD9iDkDzEfvLDyCZbRiimFCW1Tc5yprUWzY4Oz6osaNdbkg0wMqUYcpYTCZmB9EiF971gAyl1jJhJriBfm+BSu28G1rsfVQPtBDRl8qyAL6djVJiWL37Qnx1d8MnC7SIDn2pkVpg9PGrOZXi8yufZuji8ltT8z+qOcx0/CmOmtjLe73QvlsYGpAbU27NsVngVfbnbfsVHHotD8vcdPzw==
+Authentication-Results: infradead.org; dkim=none (message not signed)
+ header.d=none;infradead.org; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5286.namprd12.prod.outlook.com (2603:10b6:208:31d::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.20; Tue, 8 Jun
+ 2021 12:22:00 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e%7]) with mapi id 15.20.4219.021; Tue, 8 Jun 2021
+ 12:22:00 +0000
+Date:   Tue, 8 Jun 2021 09:21:58 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        kvm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>
+Subject: Re: [PATCH 02/10] driver core: Pull required checks into
+ driver_probe_device()
+Message-ID: <20210608122158.GZ1002214@nvidia.com>
+References: <0-v1-324b2038f212+1041f1-vfio3a_jgg@nvidia.com>
+ <2-v1-324b2038f212+1041f1-vfio3a_jgg@nvidia.com>
+ <YL8HLhJNFgIGfEQm@infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YL8HLhJNFgIGfEQm@infradead.org>
+X-Originating-IP: [47.55.113.94]
+X-ClientProxiedBy: BL1PR13CA0369.namprd13.prod.outlook.com
+ (2603:10b6:208:2c0::14) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-In-Reply-To: <20210608114546.6419-1-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: -PPwLt4uR16sQwAynogWlhZ_64EmetN2
-X-Proofpoint-GUID: HKeuFq2TvGJPbIM0HWA-6L9lCCUCfUmm
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-06-08_09:2021-06-04,2021-06-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
- lowpriorityscore=0 impostorscore=0 priorityscore=1501 adultscore=0
- spamscore=0 clxscore=1015 mlxlogscore=999 suspectscore=0 malwarescore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106080081
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (47.55.113.94) by BL1PR13CA0369.namprd13.prod.outlook.com (2603:10b6:208:2c0::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.10 via Frontend Transport; Tue, 8 Jun 2021 12:22:00 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lqak2-003pGU-Vi; Tue, 08 Jun 2021 09:21:58 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1011475a-c670-42fb-5f7d-08d92a7803f0
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5286:
+X-Microsoft-Antispam-PRVS: <BL1PR12MB52864EB07D4356DA8D54B855C2379@BL1PR12MB5286.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ps/wh5nQb0dyD/2c4RoruYuPiBCE44iIaQgrDZrKRKk6UFbpGON/B+knVSFE3UjqEp0HAZ2K6wK+MK6+j1yt5UwAWh+NXUIspflxYBycYlLZsEWLp42Wd9xeo7ORoF1yIQLaQrjut6/9vCCz5+yPSJ3oy8uOYZketA/7LSD5E0FHHOdiJh7agAkegnr5ucEZNiYIt3CWV9UmjCuEvWo5QyDYYVLjlZa1R4RtZXie8F1s5UwSswhHzxHL/rD4c5jp7UWrbyqCvGmP1vZtHUHMu6LkDXq/SEokxtxo8nKkSpE29sqWL+HUuOtLO6Flffjt5CufvvMMAOxdUtfRopdvd+02gqoHjEox/ulI9lYItgCRRl9vYKso7mp1jZJ5nbQOaLYz+A0DVRXZgNzpQPZvLzuDsXxuqnzfdE6ftOwHEl2lK8cdli+1QwX2/5S25voB6uhX8YaFe+T2IBfYXnVjHd2Wk0rD/Dpu/a5ya0yEjRHUvIClJutmJTve5hMloINu/gs9k9sbTe44VInlu7kPFZIn3WHEjRUAMHhUi34Cq109UlvqMnBCyHTwNFrPSNKOzJz8g11ZVY6aEquC6tbEg/+UFsj41zBiuJvbFFkE3PM=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(136003)(396003)(39860400002)(376002)(346002)(8676002)(33656002)(26005)(9746002)(66556008)(54906003)(186003)(5660300002)(36756003)(6916009)(426003)(38100700002)(2616005)(478600001)(4326008)(83380400001)(1076003)(8936002)(66476007)(86362001)(2906002)(66946007)(9786002)(316002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tGF84BTJKLqIWWC/opMJXi5puy9KUBSS3W56YV+uhUAN0ET1ilVAl/k5nP0Y?=
+ =?us-ascii?Q?NdzFQu1FddHvSXz4uQ3pmXJcv2iqRiFnvxnmToFKZjtsRi3NewAVBJszNRe8?=
+ =?us-ascii?Q?LobNlt93sLegX9G1dx4HbkbrLMrkFFxcdtBQaWJ2R8lNF04dw5jjVVWYc2OT?=
+ =?us-ascii?Q?zfuBPW7sICW+fg2vMOey0RbNf3CUKs4tK8XIDkRl9XaGmZoltFU4lXnBtE2m?=
+ =?us-ascii?Q?xUpXi0aI4l2QcKXFX2kfSHV5kyiqldNeVegelRU4Tr/Ow8eW2B1NfmntIdjh?=
+ =?us-ascii?Q?KrdXIyKxYzB0agn4JdUN2HeGm5R+uLlA1Ul6HFQ5gbNsuF9XwnE3NUHLr0Mh?=
+ =?us-ascii?Q?Xn/G2bDnFRtEMc+9LaO0NesLDjnCcXqiPS/VFEqCoFEmaPTRWQgaGZzYzIuH?=
+ =?us-ascii?Q?2dkGvChe19Iv2D7E9D+ytiOEr8gjxZEwNJS/D9JZ/UskQ1GvFyS56k7N0ME7?=
+ =?us-ascii?Q?gLq+ZJJd00jrzxJ5UIHORWy8ny7CbrA77oJ5JEpTbdxceZGzGks/rBZz1FmF?=
+ =?us-ascii?Q?62aVgWNzR1ZMTXd07LhdRKMkFxq7P9TA7rswXAneCQNkLu2N1j+EfYO11T3+?=
+ =?us-ascii?Q?U2O0sJpMNGPR96V4eika2vptE3Y0lB+t5r4pOZ5HmrR6VlUREt7Dyx6hD4Vt?=
+ =?us-ascii?Q?QAQpeTnBT2xGo18xSGHdxBL3vqiCqMnZfUAmoHaTyuGUdOobhTAzPFX8tvGU?=
+ =?us-ascii?Q?Je/QIp1+BFdHNfRSElGBMvqAMLo45qfO2ko/7JBsYHwcESlyJcOHo4jhu35g?=
+ =?us-ascii?Q?eN26RdIZj5lsefKM/ON/GCG4PR0v/8k6x/J4oiRE+QWQktFCFBV9f4mqrSIl?=
+ =?us-ascii?Q?hkYfjKZKIQGk+EjYDnj3Y+ZphGx6tFaQNIS48VGux/J5vLD4wkhU8f6/Wgdu?=
+ =?us-ascii?Q?U11PWzjOYDopQatXQ3f0v7eC8kHq/9D5zdL3mMu/qtSYFB1GiRKO2sa+Yto6?=
+ =?us-ascii?Q?tSv4XrBolYejT3V91/Wf6MDspC+DHVBZzmOEsIEo3le8PKB2TEgSbjXk6UcV?=
+ =?us-ascii?Q?g2AvvFsB4vlGtr8Khb0ltXimbZEVgH+UN7T/lbRdcHDyNJm5duLjbBj2cUfT?=
+ =?us-ascii?Q?D+dMjk8yNvau6MRtmJat4T3WzNQ+qxcu0tr3frvx4NNgK9BK9gSV1LVg/EWv?=
+ =?us-ascii?Q?Gdm3pIN88SC1J0DKmwC1qHR/3QnJP0FeG20GEZ6sXtY6x0xnOsSeGsuv0vZK?=
+ =?us-ascii?Q?Rg1kqTrrNhe5HGRPZgD5XZ2Rs/EI/kG3jTOvRVQVHZA8i7Sz2BsrW/ipVZtx?=
+ =?us-ascii?Q?i+zFjCbAuelA2xQUh3kOKLTGNA5w6itqbhCjr+KydpbVwwOwoXm2CMHb4zYJ?=
+ =?us-ascii?Q?wojMfjvlS5YpoMfI6t4sduMK?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1011475a-c670-42fb-5f7d-08d92a7803f0
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2021 12:22:00.1218
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gn9esFO5HmLUnJTlZWxBjWyMLWjgtmKdN0rd5Smd3rfG4wvNIf5A9Phnx69AULGT
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5286
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 08.06.21 13:45, Christian Borntraeger wrote:
-> s390x can have up to 47bits of physical guest and 64bits of virtual
-> address  bits. Add a new address mode to avoid errors of testcases
-> going beyond 47bits.
+On Tue, Jun 08, 2021 at 06:59:10AM +0100, Christoph Hellwig wrote:
+> This looks good as-is, but a suggestions for incremental improvements
+> below:
 > 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->   tools/testing/selftests/kvm/include/kvm_util.h | 3 ++-
->   tools/testing/selftests/kvm/lib/kvm_util.c     | 5 +++++
->   2 files changed, 7 insertions(+), 1 deletion(-)
+> > @@ -1032,10 +1035,10 @@ int device_driver_attach(struct device_driver *drv, struct device *dev)
+> >  	__device_driver_lock(dev, dev->parent);
+> >  
+> >  	/*
+> > -	 * If device has been removed or someone has already successfully
+> > -	 * bound a driver before us just skip the driver probe call.
+> > +	 * If device someone has already successfully bound a driver before us
+> > +	 * just skip the driver probe call.
+> >  	 */
+> > -	if (!dev->p->dead && !dev->driver)
+> > +	if (!dev->driver)
+> >  		ret = driver_probe_device(drv, dev);
+> >  
+> >  	__device_driver_unlock(dev, dev->parent);
 > 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index fcd8e3855111..6d3f71822976 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -43,6 +43,7 @@ enum vm_guest_mode {
->   	VM_MODE_P40V48_4K,
->   	VM_MODE_P40V48_64K,
->   	VM_MODE_PXXV48_4K,	/* For 48bits VA but ANY bits PA */
-> +	VM_MODE_P47V64_4K,	/* For 48bits VA but ANY bits PA */
->   	NUM_VM_MODES,
->   };
->   
-> @@ -60,7 +61,7 @@ enum vm_guest_mode {
->   
->   #elif defined(__s390x__)
->   
-> -#define VM_MODE_DEFAULT			VM_MODE_P52V48_4K
-> +#define VM_MODE_DEFAULT			VM_MODE_P47V64_4K
->   #define MIN_PAGE_SHIFT			12U
->   #define ptes_per_page(page_size)	((page_size) / 16)
->   
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 28e528c19d28..d61ad15b1979 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -175,6 +175,7 @@ const char *vm_guest_mode_string(uint32_t i)
->   		[VM_MODE_P40V48_4K]	= "PA-bits:40,  VA-bits:48,  4K pages",
->   		[VM_MODE_P40V48_64K]	= "PA-bits:40,  VA-bits:48, 64K pages",
->   		[VM_MODE_PXXV48_4K]	= "PA-bits:ANY, VA-bits:48,  4K pages",
-> +		[VM_MODE_P47V64_4K]	= "PA-bits:47,  VA-bits:64,  4K pages",
->   	};
->   	_Static_assert(sizeof(strings)/sizeof(char *) == NUM_VM_MODES,
->   		       "Missing new mode strings?");
-> @@ -192,6 +193,7 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
->   	{ 40, 48,  0x1000, 12 },
->   	{ 40, 48, 0x10000, 16 },
->   	{  0,  0,  0x1000, 12 },
-> +	{ 47, 64,  0x1000, 12 },
->   };
->   _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
->   	       "Missing new mode params?");
-> @@ -277,6 +279,9 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
->   		TEST_FAIL("VM_MODE_PXXV48_4K not supported on non-x86 platforms");
->   #endif
->   		break;
-> +	case VM_MODE_P47V64_4K:
-> +		vm->pgtable_levels = 4;
+> It is kinda silly to keep the ->driver check here given that one caller
+> completely ignores the return value, and the other turns a 0 return into
+> -ENODEV anyway. 
 
-I will change that to 5 as well.
+Later patches revise this though, I think you noticed it
+
+> So I think this check can go away, turning device_driver_attach into
+> a trivial wrapper for driver_probe_device that adds locking, which
+> might be useful to reflect in the naming.
+
+I was scared to change this because "0 on already bound" is uAPI in
+sysfs at this point.
+
+And what you noticed in bind_store:
+
+       dev = bus_find_device_by_name(bus, NULL, buf);
+       if (dev && dev->driver == NULL && driver_match_device(drv, dev)) {
+               err = device_driver_attach(drv, dev);
+
+Seems troublesome as the driver_lock isn't held for that dev->driver
+read.
+
+So I'm inclined to delete the above, keep the check in
+device_driver_attach and not change the uAPI?
+
+Or the APIs need to be more complicated to support locked and unlocked
+callers/etc
+
+Jason
