@@ -2,207 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB74D39EACB
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 02:35:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C688C39EAF2
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 02:45:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230516AbhFHAhq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Jun 2021 20:37:46 -0400
-Received: from relay3-d.mail.gandi.net ([217.70.183.195]:38513 "EHLO
-        relay3-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230266AbhFHAhp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Jun 2021 20:37:45 -0400
-Received: (Authenticated sender: n@nfraprado.net)
-        by relay3-d.mail.gandi.net (Postfix) with ESMTPSA id 8FFC460006;
-        Tue,  8 Jun 2021 00:35:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nfraprado.net;
-        s=gm1; t=1623112550;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MgIRy6Q6KMGL5hWxoGPNnPkNfCR3aLlJDfZGUzWbz/E=;
-        b=P9jivunjlN1sJ9eOlTMDyLjCEywxVya2Ftqz+hEdSkSw0/elvz6gS8kWLVyXaJ6oaaoyx0
-        qIDIGMwtUglmC/Vgb2Ie9iI6I0cHBdlTTnMy0oKmq/2UNRiAziWlj8Gnr6eAAD4ELzFqsD
-        mHk+x34HxuC0DbsYokBCWzuGfyBXhTfAMoYOS4Pq4ppxQdlPzzlEBRkzLLaXWwWCR9C72i
-        Dqrf/Tb06aPjdbgxtbg/24TPHZncci0Ry+4s1AiNAxQNYtnBdo+YvtUor3hzZf1RWlrLDP
-        UyqtEZ8lSyOFbJLN0PVHDwww5JkrI1RST7HtFLradWY3jd3nAcizBoEu2ztOUQ==
-Date:   Mon, 7 Jun 2021 21:34:58 -0300
-From:   =?utf-8?B?TsOtY29sYXMgRi4gUi4gQS4=?= Prado <n@nfraprado.net>
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-        coresight@lists.linaro.org, devicetree@vger.kernel.org,
-        kunit-dev@googlegroups.com, kvm@vger.kernel.org,
-        linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-gpio@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-security-module@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH 00/34] docs: avoid using ReST :doc:`foo` tag
-Message-ID: <20210608003458.kwhbn6mraekcutlt@notapiano>
-References: <cover.1622898327.git.mchehab+huawei@kernel.org>
- <20210605151109.axm3wzbcstsyxczp@notapiano>
- <20210605210836.540577d4@coco.lan>
- <20210606225225.fz4dsyz6im4bqena@notapiano>
- <20210607093422.0a369909@coco.lan>
+        id S230450AbhFHArt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Jun 2021 20:47:49 -0400
+Received: from mail-pl1-f177.google.com ([209.85.214.177]:45603 "EHLO
+        mail-pl1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230209AbhFHArs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Jun 2021 20:47:48 -0400
+Received: by mail-pl1-f177.google.com with SMTP id 11so9668393plk.12
+        for <kvm@vger.kernel.org>; Mon, 07 Jun 2021 17:45:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=TkL1IBMNyy9LCho9RG5yvgyLt1iIVTJx8MHgf8Y6U3Q=;
+        b=NnvpGsbQtNYBBeTeM6yzv5NrHus0ByzFMz20705XPCu1/dSzypTKxHlFJW43TR2PR3
+         0obMNKXskwYtyXSeiadXUVm3o5qobDG6N6AtuqD2394l492Fq3cR2nzKvvuz+ewY0suQ
+         z7bWYCd3lC1ughiUCrM+LIy7CroaG02VEwtwA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=TkL1IBMNyy9LCho9RG5yvgyLt1iIVTJx8MHgf8Y6U3Q=;
+        b=qFf8v9DSa8GM1yj4AFmTMCSgLAyGdIae16HXHtb0zHOSWAG4Zphkz5ovGKHKprcxr0
+         ckOCL+IkO31Bj+VYYdfZXLsiXkiuEpcCyxfepzAtOwm0BiO4jjo+odelml3EjbNoh1vn
+         4wHMrFG76Bjz6A9Qc4ntO8gJMI1MhNj6hszYRJCUJh+rww9xC+6K1TM6UsqGC4YFHpRg
+         qVCEeahfRR0yzeW9KBu3Wmhx3XqCSqa4sZgPpBMDt8sPU2HlTNVkDmLhI2FHsmEJj7aV
+         fXXuCfxMUhbi2crz/vcPPCNXV5ofw1mljR7pSH94dJ3niS7mpvAtcuUzBNHMicpovZsF
+         9XYg==
+X-Gm-Message-State: AOAM530moLbBNEIu7B/mX7wBDW+sekpza8cj+SdslN0aAcqDGib1Fm68
+        Iz8sVLSDWv1hCNNaBSIKV7eGAg==
+X-Google-Smtp-Source: ABdhPJyApYLIqMYQ7LGTK2gmVHqQ5rm0+vYcRttlyB+830rpLYbWYZEJuWO+4t5lsTF787gTN6Uhng==
+X-Received: by 2002:a17:90a:4dc1:: with SMTP id r1mr23121759pjl.192.1623113096781;
+        Mon, 07 Jun 2021 17:44:56 -0700 (PDT)
+Received: from google.com ([2409:10:2e40:5100:1193:5ba8:74e4:8b6e])
+        by smtp.gmail.com with ESMTPSA id r9sm9311391pfq.158.2021.06.07.17.44.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Jun 2021 17:44:56 -0700 (PDT)
+Date:   Tue, 8 Jun 2021 09:44:51 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Suleiman Souhlal <suleiman@google.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv3 2/2] kvm: x86: implement KVM PM-notifier
+Message-ID: <YL69g007MKqxiZG/@google.com>
+References: <20210606021045.14159-1-senozhatsky@chromium.org>
+ <20210606021045.14159-2-senozhatsky@chromium.org>
+ <fe13fe734a01bb54f47fea06624c617beb062fdd.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210607093422.0a369909@coco.lan>
+In-Reply-To: <fe13fe734a01bb54f47fea06624c617beb062fdd.camel@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Mauro,
-
-On Mon, Jun 07, 2021 at 09:34:22AM +0200, Mauro Carvalho Chehab wrote:
-> Em Sun, 6 Jun 2021 19:52:25 -0300
-> Nícolas F. R. A. Prado <n@nfraprado.net> escreveu:
+On (21/06/07 15:54), Maxim Levitsky wrote:
 > 
-> > On Sat, Jun 05, 2021 at 09:08:36PM +0200, Mauro Carvalho Chehab wrote:
-> > > Em Sat, 5 Jun 2021 12:11:09 -0300
-> > > Nícolas F. R. A. Prado <n@nfraprado.net> escreveu:
-> > >   
-> > > > Hi Mauro,
-> > > > 
-> > > > On Sat, Jun 05, 2021 at 03:17:59PM +0200, Mauro Carvalho Chehab wrote:  
-> > > > > As discussed at:
-> > > > > 	https://lore.kernel.org/linux-doc/871r9k6rmy.fsf@meer.lwn.net/
-> > > > > 
-> > > > > It is better to avoid using :doc:`foo` to refer to Documentation/foo.rst, as the
-> > > > > automarkup.py extension should handle it automatically, on most cases.
-> > > > > 
-> > > > > There are a couple of exceptions to this rule:
-> > > > > 
-> > > > > 1. when :doc:  tag is used to point to a kernel-doc DOC: markup;
-> > > > > 2. when it is used with a named tag, e. g. :doc:`some name <foo>`;
-> > > > > 
-> > > > > It should also be noticed that automarkup.py has currently an issue:
-> > > > > if one use a markup like:
-> > > > > 
-> > > > > 	Documentation/dev-tools/kunit/api/test.rst
-> > > > > 	  - documents all of the standard testing API excluding mocking
-> > > > > 	    or mocking related features.
-> > > > > 
-> > > > > or, even:
-> > > > > 
-> > > > > 	Documentation/dev-tools/kunit/api/test.rst
-> > > > > 	    documents all of the standard testing API excluding mocking
-> > > > > 	    or mocking related features.
-> > > > > 	
-> > > > > The automarkup.py will simply ignore it. Not sure why. This patch series
-> > > > > avoid the above patterns (which is present only on 4 files), but it would be
-> > > > > nice to have a followup patch fixing the issue at automarkup.py.    
-> > > > 
-> > > > What I think is happening here is that we're using rST's syntax for definition
-> > > > lists [1]. automarkup.py ignores literal nodes, and perhaps a definition is
-> > > > considered a literal by Sphinx. Adding a blank line after the Documentation/...
-> > > > or removing the additional indentation makes it work, like you did in your
-> > > > 2nd and 3rd patch, since then it's not a definition anymore, although then the
-> > > > visual output is different as well.  
-> > > 
-> > > A literal has a different output. I think that this is not the case, but I 
-> > > didn't check the python code from docutils/Sphinx.  
-> > 
-> > Okay, I went in deeper to understand the issue and indeed it wasn't what I
-> > thought. The reason definitions are ignored by automarkup.py is because the main
-> > loop iterates only over nodes that are of type paragraph:
-> > 
-> >     for para in doctree.traverse(nodes.paragraph):
-> >         for node in para.traverse(nodes.Text):
-> >             if not isinstance(node.parent, nodes.literal):
-> >                 node.parent.replace(node, markup_refs(name, app, node))
-> > 
-> > And inspecting the HTML output from your example, the definition name is inside
-> > a <dt> tag, and it doesn't have a <p> inside. So in summary, automarkup.py will
-> > only work on elements which are inside a <p> in the output.
-> 
-> 
-> Yeah, that's what I was suspecting, based on the comments.
-> 
-> Maybe something similar to the above could be done also for some
-> non-paragraph data. By looking at:
-> 
-> 	https://docutils.sourceforge.io/docs/ref/doctree.html
-> 
-> It says that the body elements are:
-> 
-> 	admonition, attention, block_quote, bullet_list, caution, citation, 
-> 	comment, compound, container, danger, definition_list, doctest_block, 
-> 	enumerated_list, error, field_list, figure, footnote, hint, image, 
-> 	important, line_block, literal_block, note, option_list, paragraph, 
-> 	pending, raw, rubric, substitution_definition, system_message, 
-> 	table, target, tip, warning
+> Overall this looks OK to me.
+>  
+> Do you have a test case in which this patch helps to make the guest behave better after
+> the host suspend though? I tested this and I don't see any significant change.
+> (guest works after host suspend before and after, and I still have clocksource
+> watchdogs firing in the guest)
 
-Ok, I went through each one by searching the term on [1] and inspecting the
-element to see if it contained a <p> or not. The vast majority did. These are
-the ones I didn't find there or didn't make sense:
-
-	comment
-	container
-	image
-	pending
-	raw
-	substitution_definition
-	system_message
-	target
-
-We can safely ignore them. And these are the ones that matter and don't have
-paragraphs:
-
-	1. literal_block
-	2. doctest_block
-	3. definition_list
-	4. field_list
-	5. option_list
-	6. line_block
-
-1 and 2 are literals, so we don't care about them.
-
-3 is the one you noticed the issue with. It's worth mentioning that the
-definition term doesn't have a paragraph, but its definition does (as can be
-checked by inspecting [2]).
-
-4 is basically the same as 3, the rst syntax is different but the output is the
-same. That said, I believe we only use those to set options at the top of the
-file, like in translations, and I can't see automarkup being useful in there.
-
-5 is similar to 3 and 4, but the term is formatted using <kbd>, so it's like a
-literal and therefore not relevant.
-
-6 is useful just to preserve indentation, and I'm pretty sure we don't use it in
-the docs.
-
-So in the end, I think the only contenders to be added to automarkup are
-definition lists, and even then I still think we should just substitute those
-definition lists with alternatives like you did in your patches. Personally I
-don't see much gain in using definitions instead of a simple paragraph. But if
-you really think it's an improvement in some way, it could probably be added to
-automarkup in the way you described.
-
-Thanks,
-Nícolas
-
-[1] https://sphinx-rtd-theme.readthedocs.io/en/stable/index.html
-[2] https://sphinx-rtd-theme.readthedocs.io/en/stable/demo/lists_tables.html?highlight=definition%20list#definition-lists
-
-> 
-> So, perhaps a similar loop for definition_list would do the trick,
-> but maybe automarkup should also look at other types, like enum lists,
-> notes (and their variants, like error/warning) and footnotes.
-> 
-> No idea how this would affect the docs build time, though.
-> 
-> > Only applying the automarkup inside paragraphs seems like a good decision (which
-> > covers text in lists and tables as well), so unless there are other types of
-> > elements without paragraphs where automarkup should work, I think we should just
-> > avoid using definition lists pointing to documents like that.
-> 
-> Checking the code or doing some tests are needed for us to be sure about what
-> of the above types docutils don't consider a paragraph.
-> 
-> Thanks,
-> Mauro
+Yes, we have automated suspend-resume tests. What happens for us is that,
+when not properly paused, guests, upon host resume, discover jiffies spikes
+and trigger all sort of watchdogs.
