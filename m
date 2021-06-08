@@ -2,154 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 41E6D39EAB5
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 02:31:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01D8139EAC0
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 02:34:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231175AbhFHAdU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Jun 2021 20:33:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44426 "EHLO
+        id S230475AbhFHAgK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Jun 2021 20:36:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230266AbhFHAdU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Jun 2021 20:33:20 -0400
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B38BC061574;
-        Mon,  7 Jun 2021 17:31:15 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id z3so19897115oib.5;
-        Mon, 07 Jun 2021 17:31:15 -0700 (PDT)
+        with ESMTP id S230266AbhFHAgJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Jun 2021 20:36:09 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AD23C061574
+        for <kvm@vger.kernel.org>; Mon,  7 Jun 2021 17:34:02 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id 69so9663459plc.5
+        for <kvm@vger.kernel.org>; Mon, 07 Jun 2021 17:34:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=CiokwtvRl2HBPdNl53NI3K1ZgCp8ltKDAJs4OYeIhlU=;
-        b=emPOWu/4e/j9lQEtlNMQipiXjQWsGZLaQZe8+oS8bKJQ0DQs7kZ96iC4FiYNPym+hf
-         poMEvWZZEu3Yrj1alNKYIwIhpKVwjb8vul5c9Hck/XTASiwUUZbDpDmnmsAoX8nWvWEj
-         neO/RYdZnysRkQf+naq8htn99mY1vUkqFmxN7TgyDowencfEV1h8/KZ/kmB/lfWHMlkU
-         uohtPJs7DBBco7XkZ5CHvM494sQdb4mUdDx2n/NfRHEyKZwPl18ATkhmWAs/NtQFefp9
-         zn/jrILP6U+S3GFkek1YKl/rMxznTDl7Je0HIqnUpHCrdPMe2+zB15sm4dz1IZjlpKzP
-         mBbA==
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=VjYZkdAh6XPRWdRICkFVqrEq2Tj+cpaidhfkOKHJ4Ys=;
+        b=VxDpUN2YqnA3P9FRBWtKzfkmPb7dN1ye0DLknStv0JLAD0lfAYJiloty4u2A2nLkC2
+         pGtWItn3Gvk4OP+7W0gKfvq98YmCnreZ6G/AZanLijfQNUOgVlrZ57WL8DFZXizrrFVy
+         pmUSWL5JCCSY4etvrLNznIf4K9hXQGkpCBFTVTI4XOMiUB/Joal4/q8VPtGA9Ih4BiOS
+         EGSFYbQ82tzTIw30T6l7qvgwYlkqNJqFbJ27IJ0ytbAqLkt0vhbwxiEl8wqEmw5Lt4U0
+         wUXZq1UWdi9HNXQISzwxdhUUp292917s71LULkIm/re9u/Z/7gCBLrDa+fqdIoRIgynB
+         K5fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=CiokwtvRl2HBPdNl53NI3K1ZgCp8ltKDAJs4OYeIhlU=;
-        b=PBWpq41bwA2QxE/v50gz1H6KP6SdM1zWnS8zv/btJ+bbe2NZaAgCdSTjeXL8WuQ8zH
-         aif0H0J71beGxwunE+QWK3PSownNbUTMcktSeuW4YzSV8HfAaNs3DaX8JcQ7sjTi6eOS
-         mZCmkuaRGA8SI+pPMmd5t850jei8fUztdljQI9xFNoHwM3kNT+efBRG5O13togb4O8ar
-         G5M9M4V0p3RaOJv2HKHyhOQ0GGyyHnjKHrOTFqdq71nq+yYblHiq/RMvtqO3Xq/MgsHW
-         RCSZ5os6EvufikeNQxR94eUAv8UJOVrcLwXKQ0wgkeNdNIaEL9YVmbdMGVokkEooB1fh
-         wqFg==
-X-Gm-Message-State: AOAM532Ajl6nrZpD8pUcr0eDIWTKK3NsZ4KUNu8VLWpPTLa7Im1htlIx
-        GknTW/tuaJnS1V6GRYo9WKz1uIVO0alF8o6BNHJcGcSE
-X-Google-Smtp-Source: ABdhPJzKcRi6ZVfDPEFp7dypwoMSgGajiC5slspj1cMe2AzLuL5IJf15onIow9Jch5OT36BeKzAeHnsYij6CVmHcyYE=
-X-Received: by 2002:a05:6808:c3:: with SMTP id t3mr1025182oic.5.1623112273961;
- Mon, 07 Jun 2021 17:31:13 -0700 (PDT)
-MIME-Version: 1.0
-References: <1622710841-76604-1-git-send-email-wanpengli@tencent.com>
- <1622710841-76604-2-git-send-email-wanpengli@tencent.com> <CALMp9eSK-_xOp=WdRbOOHaHHMHuJkPhG+7h4M+_+=4d-GCNzwA@mail.gmail.com>
- <YLj2jDKMYZatdl3a@google.com>
-In-Reply-To: <YLj2jDKMYZatdl3a@google.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 8 Jun 2021 08:31:02 +0800
-Message-ID: <CANRm+CxQc+fiO5jBDif9M5jUKRCU-mHtb5yMaPsbRpWR+v2hYQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: LAPIC: reset TMCCT during vCPU reset
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Jim Mattson <jmattson@google.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=VjYZkdAh6XPRWdRICkFVqrEq2Tj+cpaidhfkOKHJ4Ys=;
+        b=jd3uNuwX3xJz86j+Jdk5ezseVP+H6S+uiGs2CuAmSMflUbcU+h/+snYTudqQJrMjyM
+         34Wzv0730sCC0XUPswrSXk5a2wV//2iuwxwxsGTuhuv6PDKZY5mBNm45v1Y89EJ3Am6+
+         VNJ1LiIVBEvo23OEqTgWwLv8zBCWGO+DS1GzOKjKTmJSZDn0L/SENCChYNj1sHcqV+Tp
+         JnW6aNHV4X9GcMsxuFn7NOH0xgte/FUxc6nsDV2PFGtezmpzxfsjjLl/VCcX6e5M5ftl
+         DBfqR3XOzqoXMqNOG5sVBYvA1Or2oo7tJgKFjMYUB356VzI8jZ3E6nL6yt75YmB0xyXi
+         I6UQ==
+X-Gm-Message-State: AOAM533/aKYi8a+Ni1a8KSu0ejmWB3R0Jl5IjldZOyfTCd1BzJkEpYsB
+        2lVQNwvsuqIv3HcSgchsNjsfVA==
+X-Google-Smtp-Source: ABdhPJxnA3XzhRo8+VYT28itEv6F2Z/s5O1sM7tVTLKsRNjAihqVyM93md4xbDZEh+bPzrNNoLjm1Q==
+X-Received: by 2002:a17:90a:7f85:: with SMTP id m5mr23359411pjl.128.1623112438897;
+        Mon, 07 Jun 2021 17:33:58 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id t19sm490189pjq.44.2021.06.07.17.33.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Jun 2021 17:33:58 -0700 (PDT)
+Date:   Tue, 8 Jun 2021 00:33:54 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Lai Jiangshan <laijs@linux.alibaba.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: X86: reset and read st->preempted in atomic way
+Message-ID: <YL668lnelAVNlLWx@google.com>
+References: <CANRm+CypKbrhwFR-jLCuUruXwApq4Tb62U_KP_4H-_=7yX1VQg@mail.gmail.com>
+ <20210531174628.10265-1-jiangshanlai@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210531174628.10265-1-jiangshanlai@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 3 Jun 2021 at 23:34, Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Jun 03, 2021, Jim Mattson wrote:
-> > On Thu, Jun 3, 2021 at 2:01 AM Wanpeng Li <kernellwp@gmail.com> wrote:
-> > >
-> > > From: Wanpeng Li <wanpengli@tencent.com>
-> > >
-> > > The value of current counter register after reset is 0 for both Intel
-> > > and AMD, let's do it in kvm.
-> > >
-> > > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > How did we miss that?
->
-> I suspect it's not actually a functional issue, and that writing '0' at reset is
-> a glorified nop.  The TMCCT is always computed on-demand and never directly
-> readable.
+Nit: the shortlog is somewhat inaccurate now, maybe just:
 
-Update the patch description in v2, thanks.
+  KVM: x86: Ensure PV TLB flush tracepoint reflects KVM behavior
 
-    Wanpeng
+or something along those lines.  Not sure what the best wording is :-/
 
->
-> Is there an observable bug being fixed?  If not, the changelog should state that
-> this is a cosmetic change of sorts.
->
-> static u32 __apic_read(struct kvm_lapic *apic, unsigned int offset)
-> {
->         u32 val = 0;
->
->         if (offset >= LAPIC_MMIO_LENGTH)
->                 return 0;
->
->         switch (offset) {
->         case APIC_ARBPRI:
->                 break;
->
->         case APIC_TMCCT:        /* Timer CCR */
->                 if (apic_lvtt_tscdeadline(apic))
->                         return 0;
->
->                 val = apic_get_tmcct(apic);
->                 break;
->         ...
-> }
->
->
-> static u32 apic_get_tmcct(struct kvm_lapic *apic)
-> {
->         ktime_t remaining, now;
->         s64 ns;
->         u32 tmcct;
->
->         ASSERT(apic != NULL);
->
->         /* if initial count is 0, current count should also be 0 */
->         if (kvm_lapic_get_reg(apic, APIC_TMICT) == 0 ||  <------------
->                 apic->lapic_timer.period == 0)
->                 return 0;
->
->         now = ktime_get();
->         remaining = ktime_sub(apic->lapic_timer.target_expiration, now);
->         if (ktime_to_ns(remaining) < 0)
->                 remaining = 0;
->
->         ns = mod_64(ktime_to_ns(remaining), apic->lapic_timer.period);
->         tmcct = div64_u64(ns,
->                          (APIC_BUS_CYCLE_NS * apic->divide_count));
->
->         return tmcct;
-> }
->
-> int kvm_apic_get_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
-> {
->         memcpy(s->regs, vcpu->arch.apic->regs, sizeof(*s));
->
->         /*
->          * Get calculated timer current count for remaining timer period (if
->          * any) and store it in the returned register set.
->          */
->         __kvm_lapic_set_reg(s->regs, APIC_TMCCT,
->                             __apic_read(vcpu->arch.apic, APIC_TMCCT));  <----
->
->         return kvm_apic_state_fixup(vcpu, s, false);
-> }
->
->
->
+On Tue, Jun 01, 2021, Lai Jiangshan wrote:
+> From: Lai Jiangshan <laijs@linux.alibaba.com>
+> 
+> In record_steal_time(), st->preempted is read twice, and
+> trace_kvm_pv_tlb_flush() might output result inconsistent if
+> kvm_vcpu_flush_tlb_guest() see a different st->preempted later.
+> 
+> It is a very trivial problem and hardly has actual harm and can be
+> avoided by reseting and reading st->preempted in atomic way via xchg().
+> 
+> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+
+I saw this quirk too, but couldn't quite bring myself to care enought to test a
+patch :-)
+
+Reviewed-by: Sean Christopherson <seanjc@google.com> 
