@@ -2,219 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E5A839F4F4
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 13:28:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B932E39F578
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 13:45:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231901AbhFHLan (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 07:30:43 -0400
-Received: from mail-bn8nam11on2066.outbound.protection.outlook.com ([40.107.236.66]:53248
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231661AbhFHLan (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Jun 2021 07:30:43 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SqbC9oVp5Jodd74kzUvFgdPl0Ons+U310GGWe3AiNCWxCwbwlRRNgp/xDIAWAOxK8pbmWl71id5Nb6IHQvP9uXoWmKTr7ikiyXAJq2hHDlNhlb9jhGzDxgNXPQQ2ys1DCxxN1ktBUQBcNs4iM7Il+iLu3krOe+JaswTo+4A2LTguSXwYk+A2lpy3r5uZFMkr4/Q4HH2LCxg/PDRhnXW4mL7ccsz2GBwvvzphYW1xJyBbhFTzsVFyrqXYsdh7ea7odIhXypsJrDBUv9UbIE/ZGtTzwazQR8GZUrX9SrBy9FfKhT9EP4P1e5sa7swG0CEsmtq34laC9oLUGyuZYNoTBw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3e9vJwVyVc3d2esNTfwKqxwgJYzB7efGTYefNWBa3vM=;
- b=XEUpb4/WGfDGd3wl9TmKMsOt1OroggFDDA9qXAK3v2Y3RSQoXtXP0/hL2CFC3PVa5L8U8XGhjUc0xyz7Ql5ze35BLf9Wjb+8479zL2n/ZdHmJSX7ww6a47bhDkaIjpMOPXK55gAEI2q/vzOqcu3qppmh7OzGhR+Idg3RPec1W61KS+/PW3reVNmHGJYvLAmhwzkwzQq03t39t23UuFbvO+MsgfqrgkGk0XbNUJNi2m5U1xtNcfJjqv7zIXsE7iJAhCcsZhnq0Xle5YU6dVkj/02BicO6UQeQ9h7uOhTDtOxC2REfZf7abKoDqzlV5qhBhHCY2cF3z2GX2mgMA6WlgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3e9vJwVyVc3d2esNTfwKqxwgJYzB7efGTYefNWBa3vM=;
- b=QBpNg/eAKBAB5SbtiHGwwZLdA+efCILjyHhdKOaiaYcpTEbTG0RLT9p+H+tSGQlXY87nsA0byiteCKBBq2eL7ZtIvO75FT6H5OIpP6u1RKpbnL1vvfAZJSr8mcpRe1j+TjePsdA7kcTPxXS+n/unC6csKiQN255FumCtXrkwNivGr74G9hqe5N/BlOzWKU9bQ1thg2Kmoz0dGKLz4O2wUHuVHYxonNrgOE/eCbJuNMFKXfjbwvRV5HVs/uGhApC5XqwI1l7VRfJNlK9h+2/o03z0pZd431pYMhe8gEFrZ1MHSOX9sQoauXSv4BHiSWYf8iGKgf3m7DQcouW6LYS5Zw==
-Received: from MW4PR04CA0177.namprd04.prod.outlook.com (2603:10b6:303:85::32)
- by BL0PR12MB4738.namprd12.prod.outlook.com (2603:10b6:208:8e::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20; Tue, 8 Jun
- 2021 11:28:49 +0000
-Received: from CO1NAM11FT041.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:85:cafe::28) by MW4PR04CA0177.outlook.office365.com
- (2603:10b6:303:85::32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.20 via Frontend
- Transport; Tue, 8 Jun 2021 11:28:49 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
- smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.34; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.34) by
- CO1NAM11FT041.mail.protection.outlook.com (10.13.174.217) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4195.22 via Frontend Transport; Tue, 8 Jun 2021 11:28:48 +0000
-Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 8 Jun
- 2021 11:28:48 +0000
-Received: from r-arch-stor02.mtr.labs.mlnx (172.20.187.5) by mail.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Tue, 8 Jun 2021 11:28:46 +0000
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-To:     <alex.williamson@redhat.com>, <cohuck@redhat.com>,
-        <kvm@vger.kernel.org>
-CC:     <kwankhede@nvidia.com>, Max Gurtovoy <mgurtovoy@nvidia.com>
-Subject: [PATCH 1/1] vfio/iommu_type1: rename vfio_group struck to vfio_iommu_group
-Date:   Tue, 8 Jun 2021 14:28:41 +0300
-Message-ID: <20210608112841.51897-1-mgurtovoy@nvidia.com>
-X-Mailer: git-send-email 2.18.1
+        id S232163AbhFHLrr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 07:47:47 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:63322 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S232100AbhFHLrq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Jun 2021 07:47:46 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 158BYo1e140595;
+        Tue, 8 Jun 2021 07:45:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=sS0JANVLyfIxxMl7EcBYqF4lbrq79PHW9PMhxynRU7g=;
+ b=a4d3aIg47RrkZXpHObuJEFAOh/4qBhMMMPdm5/oaqpTFR0GOQl+udn/5GrsMKVaW3S+1
+ npai+gS6IiqZ/rDUn/rnkwUfM9DtzKH/5XQcPwxhpHzyWLiIP95rkw1aF+LHYtrXiBwK
+ UPh02Wt21HvjGk6ZfAIPlveg8EwgEIuBc7FnTW0pHQfh2bX0i8+aGw9rdKgyROvERwHa
+ JN/Ju4NcK2dqDoqwmZg2VjHvbAWm2Snu6BfPUYJ7hcMb1Q7nn1TiO3VQLni+qzxQpUym
+ yo0VdA2dGHfPOa1bPOZs9GBdELSgv3F0sOrNgsHof0jM8r+VkgS3TIj3b16Sfe28yBa8 ew== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3926q3a373-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Jun 2021 07:45:53 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 158BZ6rZ141742;
+        Tue, 8 Jun 2021 07:45:52 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3926q3a36g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Jun 2021 07:45:52 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 158Bi5L5014314;
+        Tue, 8 Jun 2021 11:45:50 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 3900w8hfqd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Jun 2021 11:45:50 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 158BjlfX32309696
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 8 Jun 2021 11:45:47 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 704974C046;
+        Tue,  8 Jun 2021 11:45:47 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5D2594C044;
+        Tue,  8 Jun 2021 11:45:47 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue,  8 Jun 2021 11:45:47 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id 18D97E014D; Tue,  8 Jun 2021 13:45:47 +0200 (CEST)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     pbonzini@redhat.com
+Cc:     borntraeger@de.ibm.com, bgardon@google.com, dmatlack@google.com,
+        drjones@redhat.com, frankja@linux.ibm.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, peterx@redhat.com,
+        venkateshs@chromium.org
+Subject: [PATCH] KVM: selftests: introduce P47V64 for s390x
+Date:   Tue,  8 Jun 2021 13:45:46 +0200
+Message-Id: <20210608114546.6419-1-borntraeger@de.ibm.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <4d6513f3-d921-dff0-d883-51c6dbdcbe39@de.ibm.com>
+References: <4d6513f3-d921-dff0-d883-51c6dbdcbe39@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 5dc594ac-fff1-4d05-018d-08d92a7095fd
-X-MS-TrafficTypeDiagnostic: BL0PR12MB4738:
-X-Microsoft-Antispam-PRVS: <BL0PR12MB4738F58D448EC9EA613FA842DE379@BL0PR12MB4738.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:159;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: j409YXyYzgW4D1ATa+7Fn+z8o7wA1icwkmXJFqPPF2cBzuobdttmF/szW7UhMKfkoFE0RK6Dhvqa4hoFdzzqCRhNUSsXU5CNXj0N64Xb13p2K0qJyfnHQPNwsJEskzU738lMfzdLwoxwREY+FbaN0tRpErhHMtb0jNWYxJ9vDZRrBsiCRwFkJBNcZ+GVlk25GqA27YNHCV2SJWkkzHdRBmKWLh5q6Xe052lV7Lc8U36M0iFDIrxVuE3v/PXpDMNo5OguTm/5u+lpPb+vH8XfycY2KGiSHUzFENZ593ypYI/0J0ZDrWbIgzeLJCIzfdH9pozePM3gOuqjd3DLB21l6LOrN8okCdnkfWVmTVCPg/ivYaoecYdnNZNlXtCaQ6aAfk3FTNhaANXdotj+mO86tnYW7ID9M06WpVzKPXnbtLUhrmvImjwSxrqxNv+LeFmQ5xNEliJ7rOnwy6SNwGkBFiwJNtfO3xdcJIAMFxEWK6ZtS3kiOD6ARRTtayf0aqFZt7SFeXFERLplAZRVcQfUJk9y4HVtzrnyOVd4XAiroCzJlVGHw88TgqBzDwgtdLZGqS6laOpyfS2+Ou6AdHBKQ75Ya+oUVhUlMnljtvk5yMqQ4hp8HHUopB4Y+lFyD5pGtTZzyNUUuZhWs0KzqegPew==
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(136003)(376002)(346002)(39860400002)(396003)(36840700001)(46966006)(83380400001)(36860700001)(478600001)(70206006)(82740400003)(7636003)(8936002)(186003)(70586007)(6666004)(36756003)(86362001)(107886003)(356005)(8676002)(4326008)(110136005)(316002)(5660300002)(2906002)(1076003)(26005)(36906005)(82310400003)(2616005)(426003)(54906003)(336012)(47076005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2021 11:28:48.9647
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5dc594ac-fff1-4d05-018d-08d92a7095fd
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT041.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB4738
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 5UbgigelJQShbkPpi6Gj-WUgN8AUd3z4
+X-Proofpoint-ORIG-GUID: _6orvKeGM5APhuZOs2UBO6z5itzD10Mb
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-06-08_09:2021-06-04,2021-06-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ priorityscore=1501 lowpriorityscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 mlxlogscore=956 adultscore=0 phishscore=0 mlxscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106080077
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The vfio_group structure is already defined in vfio module so in order
-to improve code readability and for simplicity, rename the vfio_group
-structure in vfio_iommu_type1 module to vfio_iommu_group.
+s390x can have up to 47bits of physical guest and 64bits of virtual
+address  bits. Add a new address mode to avoid errors of testcases
+going beyond 47bits.
 
-Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 34 +++++++++++++++++----------------
- 1 file changed, 18 insertions(+), 16 deletions(-)
+ tools/testing/selftests/kvm/include/kvm_util.h | 3 ++-
+ tools/testing/selftests/kvm/lib/kvm_util.c     | 5 +++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index a3e925a41b0d..830beb920a14 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -110,7 +110,7 @@ struct vfio_batch {
- 	int			offset;		/* of next entry in pages */
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index fcd8e3855111..6d3f71822976 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -43,6 +43,7 @@ enum vm_guest_mode {
+ 	VM_MODE_P40V48_4K,
+ 	VM_MODE_P40V48_64K,
+ 	VM_MODE_PXXV48_4K,	/* For 48bits VA but ANY bits PA */
++	VM_MODE_P47V64_4K,	/* For 48bits VA but ANY bits PA */
+ 	NUM_VM_MODES,
  };
  
--struct vfio_group {
-+struct vfio_iommu_group {
- 	struct iommu_group	*iommu_group;
- 	struct list_head	next;
- 	bool			mdev_group;	/* An mdev group */
-@@ -160,8 +160,9 @@ struct vfio_regions {
+@@ -60,7 +61,7 @@ enum vm_guest_mode {
  
- static int put_pfn(unsigned long pfn, int prot);
+ #elif defined(__s390x__)
  
--static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
--					       struct iommu_group *iommu_group);
-+static struct vfio_iommu_group*
-+vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
-+			    struct iommu_group *iommu_group);
+-#define VM_MODE_DEFAULT			VM_MODE_P52V48_4K
++#define VM_MODE_DEFAULT			VM_MODE_P47V64_4K
+ #define MIN_PAGE_SHIFT			12U
+ #define ptes_per_page(page_size)	((page_size) / 16)
  
- /*
-  * This code handles mapping and unmapping of user data buffers
-@@ -836,7 +837,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
- 				      unsigned long *phys_pfn)
- {
- 	struct vfio_iommu *iommu = iommu_data;
--	struct vfio_group *group;
-+	struct vfio_iommu_group *group;
- 	int i, j, ret;
- 	unsigned long remote_vaddr;
- 	struct vfio_dma *dma;
-@@ -1875,10 +1876,10 @@ static void vfio_test_domain_fgsp(struct vfio_domain *domain)
- 	__free_pages(pages, order);
- }
- 
--static struct vfio_group *find_iommu_group(struct vfio_domain *domain,
--					   struct iommu_group *iommu_group)
-+static struct vfio_iommu_group *find_iommu_group(struct vfio_domain *domain,
-+						 struct iommu_group *iommu_group)
- {
--	struct vfio_group *g;
-+	struct vfio_iommu_group *g;
- 
- 	list_for_each_entry(g, &domain->group_list, next) {
- 		if (g->iommu_group == iommu_group)
-@@ -1888,11 +1889,12 @@ static struct vfio_group *find_iommu_group(struct vfio_domain *domain,
- 	return NULL;
- }
- 
--static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
--					       struct iommu_group *iommu_group)
-+static struct vfio_iommu_group*
-+vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
-+			    struct iommu_group *iommu_group)
- {
- 	struct vfio_domain *domain;
--	struct vfio_group *group = NULL;
-+	struct vfio_iommu_group *group = NULL;
- 
- 	list_for_each_entry(domain, &iommu->domain_list, next) {
- 		group = find_iommu_group(domain, iommu_group);
-@@ -1967,7 +1969,7 @@ static int vfio_mdev_detach_domain(struct device *dev, void *data)
- }
- 
- static int vfio_iommu_attach_group(struct vfio_domain *domain,
--				   struct vfio_group *group)
-+				   struct vfio_iommu_group *group)
- {
- 	if (group->mdev_group)
- 		return iommu_group_for_each_dev(group->iommu_group,
-@@ -1978,7 +1980,7 @@ static int vfio_iommu_attach_group(struct vfio_domain *domain,
- }
- 
- static void vfio_iommu_detach_group(struct vfio_domain *domain,
--				    struct vfio_group *group)
-+				    struct vfio_iommu_group *group)
- {
- 	if (group->mdev_group)
- 		iommu_group_for_each_dev(group->iommu_group, domain->domain,
-@@ -2242,7 +2244,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 					 struct iommu_group *iommu_group)
- {
- 	struct vfio_iommu *iommu = iommu_data;
--	struct vfio_group *group;
-+	struct vfio_iommu_group *group;
- 	struct vfio_domain *domain, *d;
- 	struct bus_type *bus = NULL;
- 	int ret;
-@@ -2518,7 +2520,7 @@ static int vfio_iommu_resv_refresh(struct vfio_iommu *iommu,
- 				   struct list_head *iova_copy)
- {
- 	struct vfio_domain *d;
--	struct vfio_group *g;
-+	struct vfio_iommu_group *g;
- 	struct vfio_iova *node;
- 	dma_addr_t start, end;
- 	LIST_HEAD(resv_regions);
-@@ -2560,7 +2562,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- {
- 	struct vfio_iommu *iommu = iommu_data;
- 	struct vfio_domain *domain;
--	struct vfio_group *group;
-+	struct vfio_iommu_group *group;
- 	bool update_dirty_scope = false;
- 	LIST_HEAD(iova_copy);
- 
-@@ -2681,7 +2683,7 @@ static void *vfio_iommu_type1_open(unsigned long arg)
- 
- static void vfio_release_domain(struct vfio_domain *domain, bool external)
- {
--	struct vfio_group *group, *group_tmp;
-+	struct vfio_iommu_group *group, *group_tmp;
- 
- 	list_for_each_entry_safe(group, group_tmp,
- 				 &domain->group_list, next) {
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 28e528c19d28..d61ad15b1979 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -175,6 +175,7 @@ const char *vm_guest_mode_string(uint32_t i)
+ 		[VM_MODE_P40V48_4K]	= "PA-bits:40,  VA-bits:48,  4K pages",
+ 		[VM_MODE_P40V48_64K]	= "PA-bits:40,  VA-bits:48, 64K pages",
+ 		[VM_MODE_PXXV48_4K]	= "PA-bits:ANY, VA-bits:48,  4K pages",
++		[VM_MODE_P47V64_4K]	= "PA-bits:47,  VA-bits:64,  4K pages",
+ 	};
+ 	_Static_assert(sizeof(strings)/sizeof(char *) == NUM_VM_MODES,
+ 		       "Missing new mode strings?");
+@@ -192,6 +193,7 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
+ 	{ 40, 48,  0x1000, 12 },
+ 	{ 40, 48, 0x10000, 16 },
+ 	{  0,  0,  0x1000, 12 },
++	{ 47, 64,  0x1000, 12 },
+ };
+ _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
+ 	       "Missing new mode params?");
+@@ -277,6 +279,9 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
+ 		TEST_FAIL("VM_MODE_PXXV48_4K not supported on non-x86 platforms");
+ #endif
+ 		break;
++	case VM_MODE_P47V64_4K:
++		vm->pgtable_levels = 4;
++		break;
+ 	default:
+ 		TEST_FAIL("Unknown guest mode, mode: 0x%x", mode);
+ 	}
 -- 
-2.18.1
+2.31.1
 
