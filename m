@@ -2,200 +2,296 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 39B593A0154
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 21:17:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B9203A0186
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 21:17:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235339AbhFHSu6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 14:50:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21967 "EHLO
+        id S236240AbhFHSxg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 14:53:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43813 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235739AbhFHSs6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 8 Jun 2021 14:48:58 -0400
+        by vger.kernel.org with ESMTP id S235609AbhFHSvb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Jun 2021 14:51:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623178024;
+        s=mimecast20190719; t=1623178177;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pggYjn7HE949Eh1AF224q4uHAjKMVRVQ+Yp3GK12w3I=;
-        b=edKWUDwWFj2YSp0aVES1AheyWNX3eft6ZQjAIsMhYFbJEPoB0fAdRL2Rjuzh30XSfPzG8S
-        ZkmaJOwjTFkpv48oLm4x2s3QmS+BMyRBRtp1JCJcOjid3dYCsQ2y1t3SJBzZG9ZSdDS8MH
-        xJXZzNWa7J2BlRcp951lZAzLKxfWje8=
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
- [209.85.161.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-511-qNWurAIGNeumvN41OCymaQ-1; Tue, 08 Jun 2021 14:47:03 -0400
-X-MC-Unique: qNWurAIGNeumvN41OCymaQ-1
-Received: by mail-oo1-f70.google.com with SMTP id n16-20020a0568200550b029020b438b2591so13863558ooj.19
-        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 11:47:03 -0700 (PDT)
+        bh=LoFPYgnqMyhO0Yj8C3Yvp32ZataCAS/eqdcV2HTCHSE=;
+        b=LplkMVyUawg2t4lqg2EKqlIW4dO4taOptgawyURiLQBSB4dA/PA8KmisohjjyuCfaIAoqE
+        Wk8xshB6p76Hb7Ews3n7nb8lXmd5Bo35EdGIn5pLUFeRp46znd4hfvLpqSfSciMavNOaiq
+        jnV0jFRsk9jhKsXAAdqT9lo2+/XvcA4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-416-Fz4d2DCTPBe13RDWSo6PAw-1; Tue, 08 Jun 2021 14:49:36 -0400
+X-MC-Unique: Fz4d2DCTPBe13RDWSo6PAw-1
+Received: by mail-wr1-f70.google.com with SMTP id e11-20020a056000178bb0290119c11bd29eso4917409wrg.2
+        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 11:49:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=pggYjn7HE949Eh1AF224q4uHAjKMVRVQ+Yp3GK12w3I=;
-        b=L5txluTUf56RY2vahVqube+66+cSxvyL0B9Tx2yYgjFSHcxBR71C04s7YPa7rgEw48
-         LXdGW6hcVzVwI1BZwkesfEHVhQxbIjnR6N8lnnokFkqoeufy5i1g8QvDJgqSmhv1HYf6
-         J3T4Md/JjoV4A4abIoYIxhCagFrfd22COU1TN88KgDtl5H42zlecAI4eDCdGW1KgrKBH
-         0ht1k/1LAjFz/IiGnwQZfQC5a9Mlz1ikkQ1QRMRy15ZIRZ4z1TnrWf9jBsyFXcj42nib
-         J0x1CybrKfrab+rhhPFbygM8p8rwzPyy0Ypyl4pvy6FgrarXfAPis3WlWlJ8iznaz1eP
-         ffiQ==
-X-Gm-Message-State: AOAM533zscrcpW/kzAMTRrnF3CTjjcsbvRe20jIPFUVLsSZo9dWfCmcU
-        wgv+n6kvEyp0IIFTfCdZG7ceuix+l2zHosGjiMZCIo2PAWht1kMtOGB/Q+VynEV+6MZCA8r9LhS
-        507OamYYzLe3Z
-X-Received: by 2002:aca:4cc3:: with SMTP id z186mr3803984oia.73.1623178022609;
-        Tue, 08 Jun 2021 11:47:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzZf1O0f0pw+40XtUuaOyogPurrGiPr1ylVHW3rYzYXfGQXFHlVRWz1CKnFUzJnCqpweUhXgA==
-X-Received: by 2002:aca:4cc3:: with SMTP id z186mr3803972oia.73.1623178022326;
-        Tue, 08 Jun 2021 11:47:02 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id 3sm336679oob.1.2021.06.08.11.47.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jun 2021 11:47:02 -0700 (PDT)
-Date:   Tue, 8 Jun 2021 12:47:00 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Robin Murphy <robin.murphy@arm.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jason Wang <jasowang@redhat.com>
-Subject: Re: [RFC] /dev/ioasid uAPI proposal
-Message-ID: <20210608124700.7b9aa5a6.alex.williamson@redhat.com>
-In-Reply-To: <89d30977-119c-49f3-3bf6-d3f7104e07d8@redhat.com>
-References: <20210604092620.16aaf5db.alex.williamson@redhat.com>
-        <815fd392-0870-f410-cbac-859070df1b83@redhat.com>
-        <20210604155016.GR1002214@nvidia.com>
-        <30e5c597-b31c-56de-c75e-950c91947d8f@redhat.com>
-        <20210604160336.GA414156@nvidia.com>
-        <2c62b5c7-582a-c710-0436-4ac5e8fd8b39@redhat.com>
-        <20210604172207.GT1002214@nvidia.com>
-        <2d1ad075-bec6-bfb9-ce71-ed873795e973@redhat.com>
-        <20210607175926.GJ1002214@nvidia.com>
-        <fdb2f38c-da1f-9c12-af44-22df039fcfea@redhat.com>
-        <20210608131547.GE1002214@nvidia.com>
-        <89d30977-119c-49f3-3bf6-d3f7104e07d8@redhat.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=LoFPYgnqMyhO0Yj8C3Yvp32ZataCAS/eqdcV2HTCHSE=;
+        b=FGynaG7L4uKhTNgJBm9mgfHwgpsvjhp8FgsueU/6k37vsYS3Vp/EErUKjptJr9nQc5
+         Oc03JbJtUBTs+t5J9DdjBAi98gvVp4cxg5huIp9CStIpO3/Ucs7b+yp7fk7TIAWiTBob
+         vQ6l8Y97ADaYEPC72ZvjRlScHxD66sdl5iHBHl+jmOu93zmqLFfpgXGgByshsvnFQ8xS
+         bviIdsuYig4FOE1O+/cKfEMKOzoBmoz83yhf6PbNBjMbAp3R122Aw1F6zJS1RK/g4W6p
+         hddcnEUccNypE8IDAJ6ed7ajUIOeMpu0cm2NZtQ3VEN0MHhvO2vkYcft8qzF7Ax8R7PG
+         6xMw==
+X-Gm-Message-State: AOAM532PtzZ+qxe71s71eMU0PPyJrZrhh5TdNP3EAZqh84o0P7kymw0P
+        Wwlfsl1SObAw9R1oXtvjRUqf2xNXau4EIxCSub5ke1zvtXXRC6l0OMtZ9g3uWkQVdIUVG7TTtQz
+        7U0qIxOVgC5cs
+X-Received: by 2002:a1c:6209:: with SMTP id w9mr23392159wmb.27.1623178174613;
+        Tue, 08 Jun 2021 11:49:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw3+TYMvL7MTOdcK65ZOwaAtc1zOMAovr43eMyB3gQg838fgLXHhy2jg/rdZnO7Mz8SKkSkYA==
+X-Received: by 2002:a1c:6209:: with SMTP id w9mr23392145wmb.27.1623178174353;
+        Tue, 08 Jun 2021 11:49:34 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id y26sm11641365wma.33.2021.06.08.11.49.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Jun 2021 11:49:33 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH V3] x86: Add a test to check effective
+ permissions
+To:     Lai Jiangshan <jiangshanlai@gmail.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Hou Wenlong <houwenlong.hwl@antgroup.com>,
+        Lai Jiangshan <laijs@linux.alibaba.com>
+References: <6c87d221-8b6c-56a7-e8d1-31ad8a8379e3@linux.alibaba.com>
+ <20210605174901.157556-1-jiangshanlai@gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4ea8682d-b602-807e-d7b9-6c8b828ccadf@redhat.com>
+Date:   Tue, 8 Jun 2021 20:49:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20210605174901.157556-1-jiangshanlai@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 8 Jun 2021 15:44:26 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
-
-> On 08/06/21 15:15, Jason Gunthorpe wrote:
-> > On Tue, Jun 08, 2021 at 09:56:09AM +0200, Paolo Bonzini wrote:
-> >   
-> >>>> Alternatively you can add a KVM_DEV_IOASID_{ADD,DEL} pair of ioctls. But it
-> >>>> seems useless complication compared to just using what we have now, at least
-> >>>> while VMs only use IOASIDs via VFIO.  
-> >>>
-> >>> The simplest is KVM_ENABLE_WBINVD(<fd security proof>) and be done
-> >>> with it.  
-
-Even if we were to relax wbinvd access to any device (capable of
-no-snoop or not) in any IOMMU configuration (blocking no-snoop or not),
-I think as soon as we say "proof" is required to gain this access then
-that proof should be ongoing for the life of the access.
-
-That alone makes this more than a "I want this feature, here's my
-proof", one-shot ioctl.  Like the groupfd enabling a path for KVM to
-ask if that group is non-coherent and holding a group reference to
-prevent the group from being used to authorize multiple KVM instances,
-the ioasidfd proof would need to minimally validate that devices are
-present and provide some reference to enforce that model as ongoing, or
-notifier to indicate an end of that authorization.  I don't think we
-can simplify that out of the equation or we've essentially invalidated
-that the proof is really required.
-
-> >>
-> >> The simplest one is KVM_DEV_VFIO_GROUP_ADD/DEL, that already exists and also
-> >> covers hot-unplug.  The second simplest one is KVM_DEV_IOASID_ADD/DEL.  
-> > 
-> > This isn't the same thing, this is back to trying to have the kernel
-> > set policy for userspace.  
+On 05/06/21 19:49, Lai Jiangshan wrote:
+> From: Lai Jiangshan <laijs@linux.alibaba.com>
 > 
-> If you want a userspace policy then there would be three states:
+> Add a test to verify that KVM correctly handles the case where two or
+> more non-leaf page table entries point at the same table gfn, but with
+> different parent access permissions.
 > 
-> * WBINVD enabled because a WBINVD-enabled VFIO device is attached.
+> For example, here is a shared pagetable:
+>     pgd[]   pud[]        pmd[]            virtual address pointers
+>                       /->pmd1(u--)->pte1(uw-)->page1 <- ptr1 (u--)
+>          /->pud1(uw-)--->pmd2(uw-)->pte2(uw-)->page2 <- ptr2 (uw-)
+>     pgd-|           (shared pmd[] as above)
+>          \->pud2(u--)--->pmd1(u--)->pte1(uw-)->page1 <- ptr3 (u--)
+>                       \->pmd2(uw-)->pte2(uw-)->page2 <- ptr4 (u--)
+>    pud1 and pud2 point to the same pmd table
 > 
-> * WBINVD potentially enabled but no WBINVD-enabled VFIO device attached
+> The test is useful when TDP is not enabled.
 > 
-> * WBINVD forcefully disabled
+> Co-Developed-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
+> Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
+> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+> ---
+>   x86/access.c | 106 ++++++++++++++++++++++++++++++++++++++++++++++++---
+>   1 file changed, 100 insertions(+), 6 deletions(-)
 > 
-> KVM_DEV_VFIO_GROUP_ADD/DEL can still be used to distinguish the first 
-> two.  Due to backwards compatibility, those two describe the default 
-> behavior; disabling wbinvd can be done easily with a new sub-ioctl of 
-> KVM_ENABLE_CAP and doesn't require any security proof.
+> diff --git a/x86/access.c b/x86/access.c
+> index 7dc9eb6..0ad677e 100644
+> --- a/x86/access.c
+> +++ b/x86/access.c
+> @@ -60,6 +60,12 @@ enum {
+>       AC_PDE_BIT36_BIT,
+>       AC_PDE_BIT13_BIT,
+>   
+> +    /*
+> +     *  special test case to DISABLE writable bit on page directory
+> +     *  pointer table entry.
+> +     */
+> +    AC_PDPTE_NO_WRITABLE_BIT,
+> +
+>       AC_PKU_AD_BIT,
+>       AC_PKU_WD_BIT,
+>       AC_PKU_PKEY_BIT,
+> @@ -97,6 +103,8 @@ enum {
+>   #define AC_PDE_BIT36_MASK     (1 << AC_PDE_BIT36_BIT)
+>   #define AC_PDE_BIT13_MASK     (1 << AC_PDE_BIT13_BIT)
+>   
+> +#define AC_PDPTE_NO_WRITABLE_MASK  (1 << AC_PDPTE_NO_WRITABLE_BIT)
+> +
+>   #define AC_PKU_AD_MASK        (1 << AC_PKU_AD_BIT)
+>   #define AC_PKU_WD_MASK        (1 << AC_PKU_WD_BIT)
+>   #define AC_PKU_PKEY_MASK      (1 << AC_PKU_PKEY_BIT)
+> @@ -130,6 +138,7 @@ const char *ac_names[] = {
+>       [AC_PDE_BIT51_BIT] = "pde.51",
+>       [AC_PDE_BIT36_BIT] = "pde.36",
+>       [AC_PDE_BIT13_BIT] = "pde.13",
+> +    [AC_PDPTE_NO_WRITABLE_BIT] = "pdpte.ro",
+>       [AC_PKU_AD_BIT] = "pkru.ad",
+>       [AC_PKU_WD_BIT] = "pkru.wd",
+>       [AC_PKU_PKEY_BIT] = "pkey=1",
+> @@ -326,6 +335,7 @@ static pt_element_t ac_test_alloc_pt(ac_pool_t *pool)
+>   {
+>       pt_element_t ret = pool->pt_pool + pool->pt_pool_current;
+>       pool->pt_pool_current += PAGE_SIZE;
+> +    memset(va(ret), 0, PAGE_SIZE);
+>       return ret;
+>   }
+>   
+> @@ -408,7 +418,7 @@ static void ac_emulate_access(ac_test_t *at, unsigned flags)
+>   	goto fault;
+>       }
+>   
+> -    writable = F(AC_PDE_WRITABLE);
+> +    writable = !F(AC_PDPTE_NO_WRITABLE) && F(AC_PDE_WRITABLE);
+>       user = F(AC_PDE_USER);
+>       executable = !F(AC_PDE_NX);
+>   
+> @@ -471,7 +481,7 @@ static void ac_set_expected_status(ac_test_t *at)
+>       ac_emulate_access(at, at->flags);
+>   }
+>   
+> -static void __ac_setup_specific_pages(ac_test_t *at, ac_pool_t *pool,
+> +static void __ac_setup_specific_pages(ac_test_t *at, ac_pool_t *pool, bool reuse,
+>   				      u64 pd_page, u64 pt_page)
+>   
+>   {
+> @@ -496,13 +506,29 @@ static void __ac_setup_specific_pages(ac_test_t *at, ac_pool_t *pool,
+>   	    goto next;
+>   	}
+>   	skip = false;
+> +	if (reuse && vroot[index]) {
+> +	    switch (i) {
+> +	    case 2:
+> +		at->pdep = &vroot[index];
+> +		break;
+> +	    case 1:
+> +		at->ptep = &vroot[index];
+> +		break;
+> +	    }
+> +	    goto next;
+> +	}
+>   
+>   	switch (i) {
+>   	case 5:
+>   	case 4:
+> +	    pte = ac_test_alloc_pt(pool);
+> +	    pte |= PT_PRESENT_MASK | PT_WRITABLE_MASK | PT_USER_MASK;
+> +	    break;
+>   	case 3:
+>   	    pte = pd_page ? pd_page : ac_test_alloc_pt(pool);
+> -	    pte |= PT_PRESENT_MASK | PT_WRITABLE_MASK | PT_USER_MASK;
+> +	    pte |= PT_PRESENT_MASK | PT_USER_MASK;
+> +	    if (!F(AC_PDPTE_NO_WRITABLE))
+> +		pte |= PT_WRITABLE_MASK;
+>   	    break;
+>   	case 2:
+>   	    if (!F(AC_PDE_PSE)) {
+> @@ -568,13 +594,13 @@ static void __ac_setup_specific_pages(ac_test_t *at, ac_pool_t *pool,
+>   
+>   static void ac_test_setup_pte(ac_test_t *at, ac_pool_t *pool)
+>   {
+> -	__ac_setup_specific_pages(at, pool, 0, 0);
+> +	__ac_setup_specific_pages(at, pool, false, 0, 0);
+>   }
+>   
+>   static void ac_setup_specific_pages(ac_test_t *at, ac_pool_t *pool,
+>   				    u64 pd_page, u64 pt_page)
+>   {
+> -	return __ac_setup_specific_pages(at, pool, pd_page, pt_page);
+> +	return __ac_setup_specific_pages(at, pool, false, pd_page, pt_page);
+>   }
+>   
+>   static void dump_mapping(ac_test_t *at)
+> @@ -930,6 +956,73 @@ err:
+>   	return 0;
+>   }
+>   
+> +static int check_effective_sp_permissions(ac_pool_t *pool)
+> +{
+> +	unsigned long ptr1 = 0x123480000000;
+> +	unsigned long ptr2 = ptr1 + SZ_2M;
+> +	unsigned long ptr3 = ptr1 + SZ_1G;
+> +	unsigned long ptr4 = ptr3 + SZ_2M;
+> +	pt_element_t pmd = ac_test_alloc_pt(pool);
+> +	ac_test_t at1, at2, at3, at4;
+> +	int err_read_at1, err_write_at2;
+> +	int err_read_at3, err_write_at4;
+> +
+> +	/*
+> +	 * pgd[]   pud[]        pmd[]            virtual address pointers
+> +	 *                   /->pmd1(u--)->pte1(uw-)->page1 <- ptr1 (u--)
+> +	 *      /->pud1(uw-)--->pmd2(uw-)->pte2(uw-)->page2 <- ptr2 (uw-)
+> +	 * pgd-|           (shared pmd[] as above)
+> +	 *      \->pud2(u--)--->pmd1(u--)->pte1(uw-)->page1 <- ptr3 (u--)
+> +	 *                   \->pmd2(uw-)->pte2(uw-)->page2 <- ptr4 (u--)
+> +	 * pud1 and pud2 point to the same pmd page.
+> +	 */
+> +
+> +	ac_test_init(&at1, (void *)(ptr1));
+> +	at1.flags = AC_PDE_PRESENT_MASK | AC_PTE_PRESENT_MASK |
+> +		    AC_PDE_USER_MASK | AC_PTE_USER_MASK |
+> +		    AC_PDE_ACCESSED_MASK | AC_PTE_ACCESSED_MASK |
+> +		    AC_PTE_WRITABLE_MASK | AC_ACCESS_USER_MASK;
+> +	__ac_setup_specific_pages(&at1, pool, false, pmd, 0);
+> +
+> +	ac_test_init(&at2, (void *)(ptr2));
+> +	at2.flags = at1.flags | AC_PDE_WRITABLE_MASK | AC_PTE_DIRTY_MASK | AC_ACCESS_WRITE_MASK;
+> +	__ac_setup_specific_pages(&at2, pool, true, pmd, 0);
+> +
+> +	ac_test_init(&at3, (void *)(ptr3));
+> +	at3.flags = AC_PDPTE_NO_WRITABLE_MASK | at1.flags;
+> +	__ac_setup_specific_pages(&at3, pool, true, pmd, 0);
+> +
+> +	ac_test_init(&at4, (void *)(ptr4));
+> +	at4.flags = AC_PDPTE_NO_WRITABLE_MASK | at2.flags;
+> +	__ac_setup_specific_pages(&at4, pool, true, pmd, 0);
+> +
+> +	err_read_at1 = ac_test_do_access(&at1);
+> +	if (!err_read_at1) {
+> +		printf("%s: read access at1 fail\n", __FUNCTION__);
+> +		return 0;
+> +	}
+> +
+> +	err_write_at2 = ac_test_do_access(&at2);
+> +	if (!err_write_at2) {
+> +		printf("%s: write access at2 fail\n", __FUNCTION__);
+> +		return 0;
+> +	}
+> +
+> +	err_read_at3 = ac_test_do_access(&at3);
+> +	if (!err_read_at3) {
+> +		printf("%s: read access at3 fail\n", __FUNCTION__);
+> +		return 0;
+> +	}
+> +
+> +	err_write_at4 = ac_test_do_access(&at4);
+> +	if (!err_write_at4) {
+> +		printf("%s: write access at4 should fail\n", __FUNCTION__);
+> +		return 0;
+> +	}
+> +
+> +	return 1;
+> +}
+> +
+>   static int ac_test_exec(ac_test_t *at, ac_pool_t *pool)
+>   {
+>       int r;
+> @@ -948,7 +1041,8 @@ const ac_test_fn ac_test_cases[] =
+>   	corrupt_hugepage_triger,
+>   	check_pfec_on_prefetch_pte,
+>   	check_large_pte_dirty_for_nowp,
+> -	check_smep_andnot_wp
+> +	check_smep_andnot_wp,
+> +	check_effective_sp_permissions,
+>   };
+>   
+>   static int ac_test_run(void)
+> 
 
-That seems like a good model, use the kvm-vfio device for the default
-behavior and extend an existing KVM ioctl if QEMU still needs a way to
-tell KVM to assume all DMA is coherent, regardless of what the kvm-vfio
-device reports.
+Applied, thanks.
 
-If feels like we should be able to support a backwards compatibility
-mode using the vfio group, but I expect long term we'll want to
-transition the kvm-vfio device from a groupfd to an ioasidfd.
-
-> The meaning of WBINVD-enabled is "won't return -ENXIO for the wbinvd 
-> ioctl", nothing more nothing less.  If all VFIO devices are going to be 
-> WBINVD-enabled, then that will reflect on KVM as well, and I won't have 
-> anything to object if there's consensus on the device assignment side of 
-> things that the wbinvd ioctl won't ever fail.
-
-If we create the IOMMU vs device coherency matrix:
-
-            \ Device supports
-IOMMU blocks \   no-snoop
-  no-snoop    \  yes | no  |
----------------+-----+-----+
-           yes |  1  |  2  |
----------------+-----+-----+
-           no  |  3  |  4  |
----------------+-----+-----+
-
-DMA is always coherent in boxes {1,2,4} (wbinvd emulation is not
-needed).  VFIO will currently always configure the IOMMU for {1,2} when
-the feature is supported.  Boxes {3,4} are where we'll currently
-emulate wbinvd.  The best we could do, not knowing the guest or
-insights into the guest driver would be to only emulate wbinvd for {3}.
-
-The majority of devices appear to report no-snoop support {1,3}, but
-the claim is that it's mostly unused outside of GPUs, effectively {2,4}.
-I'll speculate that most IOMMUs support enforcing coherency (amd, arm,
-fsl unconditionally, intel conditionally) {1,2}.
-
-I think that means we're currently operating primarily in Box {1},
-which does not seem to lean towards unconditional wbinvd access with
-device ownership.
-
-I think we have a desire with IOASID to allow user policy to operate
-certain devices in {3} and I think the argument there is that a
-specific software enforced coherence sync is more efficient on the bus
-than the constant coherence enforcement by the IOMMU.
-
-I think that the disable mode Jason proposed is essentially just a way
-to move a device from {3} to {4}, ie. the IOASID support or
-configuration does not block no-snoop and the device claims to support
-no-snoop, but doesn't use it.  How we'd determine this to be true for
-a device without a crystal ball of driver development or hardware
-errata that no-snoop transactions are not possible regardless of the
-behavior of the enable bit, I'm not sure.  If we're operating a device
-in {3}, but the device does not generate no-snoop transactions, then
-presumably the guest driver isn't generating wbinvd instructions for us
-to emulate, so where are the wbinvd instructions that this feature
-would prevent being emulated coming from?  Thanks,
-
-Alex
+Paolo
 
