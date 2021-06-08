@@ -2,113 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EC3AD39FCC5
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 18:46:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F73039FCCA
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 18:48:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233399AbhFHQso (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 12:48:44 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:54634 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230440AbhFHQsn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Jun 2021 12:48:43 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 158GiAdW079559;
-        Tue, 8 Jun 2021 16:46:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : subject : to :
- cc : references : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=3MCNTxtibR4QUjCnqfXQaGQ4eGeXuS5SVA3/0ceyeUw=;
- b=kfFz+Jm65WcTnvatLmIPLfo1BGKBZvWFAmfr/o6EkzKRU1Ka4kscIowMRiv/8xTs55Nx
- qILJhIo8s0xISN50yK2fbK5QsUV2xoZM9L+csvtD1gDJWxgq6ZvhNKBH3J+QrKMdQPM8
- cLXrv08sxEbzI13ZQt4tGSh0uFezk7vzE/lvF5PUUV7v8GjbPNFIB5a2VE4RRk6XbyUr
- 9NCnpNTtuA+4C7nTE+g8i2UXzbBD8vkAUQuvy1N2Tdgd53XftDoSLtyDSJipuuEgc4ye
- mMZaHNHL9FkMg/tB0j829BaOHUTyDj8uHle9WVa3h6S6FdB4xVGN2XqPsWoowzO9ZLs5 kQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 3914qun7pq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 08 Jun 2021 16:46:45 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 158Gj3iY167990;
-        Tue, 8 Jun 2021 16:46:44 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 390k1r59gy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 08 Jun 2021 16:46:44 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 158Gkh1T001132;
-        Tue, 8 Jun 2021 16:46:43 GMT
-Received: from [10.175.210.6] (/10.175.210.6)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 08 Jun 2021 09:46:42 -0700
-From:   "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-Subject: Re: [PATCH 0/3] Restore extra_mem_pages and add slot0_mem_pages
-To:     Zhenzhong Duan <zhenzhong.duan@intel.com>
-Cc:     linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
-        drjones@redhat.com, pbonzini@redhat.com, shuah@kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210608233816.423958-1-zhenzhong.duan@intel.com>
-Message-ID: <aee3888c-92c4-57b0-1cb4-1b15b60edda9@oracle.com>
-Date:   Tue, 8 Jun 2021 18:46:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        id S232572AbhFHQuO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 12:50:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34030 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230410AbhFHQuO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Jun 2021 12:50:14 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED468C061574
+        for <kvm@vger.kernel.org>; Tue,  8 Jun 2021 09:48:20 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id y15so16135231pfl.4
+        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 09:48:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=y5ojMFkZcdug4Csq8mqm5JhvVrMpQqOorJMDrZfK3L0=;
+        b=lh+DaKzUePslpvnoIkaJyz/zvSdSmE4QNC6I7Am/QQxbSrt6onCmZEg1XIqC423D/K
+         5Qg/dmDRrkcF8iFS3p7pOjbpJNxZOWLM1H+4ZsYsftIOlttG6YWO2zjGqrNSxpP5e61V
+         p6la1cPf/LPBLOeic7SXWnPpUTYLXQI5sbUAOv4+tFbJ/3M3qQV1WyncuEB/lhidDR8q
+         I2LyGwk73EhoKhCabaDxoiZBE/L4/I//5hkUZRqCy1F/jIkF3R+gNEq/WXP1gPuhWvwR
+         Lx46/SOijBtQSdOK3KQMoit6/qj8D+Azsj2CTeFLqMIj6TPtX+s5cNSnSH2ygrxU/nbC
+         tjzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=y5ojMFkZcdug4Csq8mqm5JhvVrMpQqOorJMDrZfK3L0=;
+        b=Aa3cgXIVHJnwI7Fl2Bj7JzywBi3aHOErPX8XQfo5Kf1F7qIw4zrTikdCBOVM23FBu1
+         jPzAMWpu+BykDUm9YNPP5pqvw3sOY/FUXV/ApB5LB7D+5nouPi66sDQJ0BHGiABJihh/
+         vlBL73fzH+xkp4mtZJAvclwZWbSq2cJ67AdEeYcOfy35Zb6TFNdzsacWMySEv2UaMl8E
+         slMLBZNjw+S9XD+lcES8fXpyjK+rzi+Jru5i5Ml8QJMlNZTrrty9ei83ffKYThDBSo/y
+         F6OjF07YZwu+qYPfD115nPr7CUlEM6v6yNN1AWR4dhumRMYNMk/d6MnaGA5N/3QWQZfs
+         g+vw==
+X-Gm-Message-State: AOAM533Mer5GoQLl6PatCn0IU8T0CAZ6LqG6m8zJK5/NUThAE09D4ER/
+        RhsXE0CFbmB0aR+eE6gsg2SSvw==
+X-Google-Smtp-Source: ABdhPJzG9sGuu05boZhU/9/aFHSUEkhfmiCLMIWQHg5uuxbvLJFY8PYIrlRuihBcLlz48X6Igk4SIg==
+X-Received: by 2002:a65:6118:: with SMTP id z24mr23346109pgu.325.1623170900258;
+        Tue, 08 Jun 2021 09:48:20 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id u24sm638650pfm.200.2021.06.08.09.48.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Jun 2021 09:48:19 -0700 (PDT)
+Date:   Tue, 8 Jun 2021 16:48:15 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     syzbot <syzbot+fb0b6a7e8713aeb0319c@syzkaller.appspotmail.com>
+Cc:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        x86@kernel.org
+Subject: Re: [syzbot] general protection fault in gfn_to_rmap (2)
+Message-ID: <YL+fTwfphU1Al3d8@google.com>
+References: <0000000000006ac02a05c44397fb@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210608233816.423958-1-zhenzhong.duan@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10009 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 adultscore=0
- malwarescore=0 phishscore=0 mlxlogscore=999 suspectscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2106080107
-X-Proofpoint-ORIG-GUID: 54XHZbqfw9IzNlIwPx7ogwKqGUmPKvHB
-X-Proofpoint-GUID: 54XHZbqfw9IzNlIwPx7ogwKqGUmPKvHB
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10009 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0 phishscore=0
- spamscore=0 malwarescore=0 clxscore=1011 lowpriorityscore=0
- priorityscore=1501 adultscore=0 mlxscore=0 mlxlogscore=999 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106080107
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0000000000006ac02a05c44397fb@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09.06.2021 01:38, Zhenzhong Duan wrote:
-> (39fe2fc96694 "selftests: kvm: make allocation of extra memory take effect")
-> changed the meaning of extra_mem_pages and treated it as slot0 memory size.
+On Tue, Jun 08, 2021, syzbot wrote:
+> Hello,
 > 
-> In fact extra_mem_pages is used for non-slot0 memory size, there is no custom
-> slot0 memory size support. See discuss in https://urldefense.com/v3/__https://lkml.org/lkml/2021/6/3/551__;!!GqivPVa7Brio!K2FcwkE2nzlPAWgBHh6o6jtaWe66RMlfkb-b_8mAtVa5d8ez_sArupY-EqIquuCj2sorww$
-> for more details.
+> syzbot found the following issue on:
 > 
-> This patchset restores extra_mem_pages's original meaning and adds support for
-> custom slot0 memory with a new parameter slot0_mem_pages.
+> HEAD commit:    614124be Linux 5.13-rc5
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=14a62298300000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=547a5e42ca601229
+> dashboard link: https://syzkaller.appspot.com/bug?extid=fb0b6a7e8713aeb0319c
+> compiler:       Debian clang version 11.0.1-2
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11395057d00000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12d2b797d00000
 > 
-> Run below command, all 39 tests passed.
-> # make -C tools/testing/selftests/ TARGETS=kvm run_tests
+> The issue was bisected to:
 > 
-> Zhenzhong Duan (3):
->    Revert "selftests: kvm: make allocation of extra memory take effect"
->    Revert "selftests: kvm: fix overlapping addresses in
->      memslot_perf_test"
->    selftests: kvm: Add support for customized slot0 memory size
+> commit 9ec19493fb86d6d5fbf9286b94ff21e56ef66376
+> Author: Sean Christopherson <sean.j.christopherson@intel.com>
+> Date:   Tue Apr 2 15:03:11 2019 +0000
 > 
->   .../testing/selftests/kvm/include/kvm_util.h  |  7 +--
->   .../selftests/kvm/kvm_page_table_test.c       |  2 +-
->   tools/testing/selftests/kvm/lib/kvm_util.c    | 47 +++++++++++++++----
->   .../selftests/kvm/lib/perf_test_util.c        |  2 +-
->   .../testing/selftests/kvm/memslot_perf_test.c |  2 +-
->   5 files changed, 45 insertions(+), 15 deletions(-)
+>     KVM: x86: clear SMM flags before loading state while leaving SMM
 > 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1437f9bbd00000
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=1637f9bbd00000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=1237f9bbd00000
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+fb0b6a7e8713aeb0319c@syzkaller.appspotmail.com
+> Fixes: 9ec19493fb86 ("KVM: x86: clear SMM flags before loading state while leaving SMM")
+> 
+> L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.
+> general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
+> KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+> CPU: 1 PID: 8410 Comm: syz-executor382 Not tainted 5.13.0-rc5-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+> RIP: 0010:__gfn_to_rmap arch/x86/kvm/mmu/mmu.c:935 [inline]
 
-Looks good to me, thanks!
-
-For the whole series:
-Reviewed-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-
-BTW: It looks like there was something wrong with the clock (or time zone
-setup) of the machine this series was posted from since the "Date:"
-headers on these four messages say they were sent Jun 8, 23:38 UTC
-(while the time right now is Jun 8, 16:45 UTC).
-
-Maciej
+Oh joy.  SMM, rmaps, and memslots.  I'll take this one...
