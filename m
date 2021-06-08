@@ -2,98 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C26DD39EAB3
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 02:30:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E717E39EAB0
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 02:30:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230525AbhFHAco (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Jun 2021 20:32:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44290 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230266AbhFHAcn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Jun 2021 20:32:43 -0400
-Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C72BC061574;
-        Mon,  7 Jun 2021 17:30:40 -0700 (PDT)
-Received: by mail-ot1-x32f.google.com with SMTP id i12-20020a05683033ecb02903346fa0f74dso18601779otu.10;
-        Mon, 07 Jun 2021 17:30:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xoUB7E0rhgyrtTh314wlLP8BH8N4shqndYrHMc1LScU=;
-        b=TodGq3kIFaqpAdnU4+17cEAcmbkUPEqr1PWEaFpZ4e5/weQugF0btp8HLBMHvH1U81
-         EU4/v8F6wcU6D2O9gMd4jK5julVDBQ8VMaUtobU0TegqfbwM9pt25nl2TCfUiXKYb39E
-         nCp67OGd1ic7vVxIyYPE4FTM6h2MZ5KNC18H+kWwQxUxRNdCOeFhj3MGL2xZHJ0nTPMo
-         QLTvs/9gMHq8ZFBIR39DEf/uWrWLphdy8nP4WLP69ijlCDxz6M77XuCkbmEnN7dVuDed
-         X9ndo+V6rjqsqyy410ItCSogRXearJHVDF1EHLbOR1PUPwC+v5nhswPxiloYpTV/aCNB
-         NVUw==
+        id S230365AbhFHAcc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Jun 2021 20:32:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56765 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230239AbhFHAcb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Jun 2021 20:32:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623112238;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qRFthXhnfNdpVeZQpXUHrCiK/YuVLkK7snUpJsmtFSw=;
+        b=AODVBWLIU8SqUOmYeYAWMNjNOHFsJvwnFFIRA7cPz6FN0p97yr181PqFXBU7chp8ReQkk0
+        T6n0hAlixA8bpNz6OSA+QcPbhxwr5OwnpWj2dqnvUsiT5Iw2HNrJVvKJfG3bO1iw6lefEW
+        8UX/wzxH0JwL7EmF2cspFsK/UcZuvrQ=
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
+ [209.85.210.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-229-lxng7ca_MR265Nw9-JHWiQ-1; Mon, 07 Jun 2021 20:30:37 -0400
+X-MC-Unique: lxng7ca_MR265Nw9-JHWiQ-1
+Received: by mail-ot1-f69.google.com with SMTP id z18-20020a0568301292b02902dc88381e4dso12696858otp.1
+        for <kvm@vger.kernel.org>; Mon, 07 Jun 2021 17:30:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xoUB7E0rhgyrtTh314wlLP8BH8N4shqndYrHMc1LScU=;
-        b=C4hCsTIXbSd/UIwXT4ViriIC8kk0+6OsYeoAvn3UI9vUp65zHqC11cZdjvQvW10Qfg
-         7qcVJf4SPLIYcyqgQALWig+Qz3MLekBiQGI9dR8cOvYzrd5bGDqpfq/evPfKnsvz2yzj
-         a5mXd6cty3HFDfe7qUV+6wD4afwTLygJPeseN2UAD5b98i+3Jc0UhyKYctzb6nCpcKCC
-         7l4r27MGWwJrVmls2CI/F4QGUA/mbi0Luy0eyOzDXGtd8VLkUayjsrrgtO6c4L3j+KPx
-         sRNVhyHwl+KOdeBHTBz+hKTN7GSvNEvJUQ6q2NA2ZboeIdPCeW8DXotPHUNFp8j5ap2y
-         ZVmA==
-X-Gm-Message-State: AOAM533ngrH/o6ulT2yEml89Baq7H4FtRDlya9qLMdUNEtqgJc0yYUGC
-        ErQQ6NkmRG1mj4jQebBzZpxR29eqh/DHp7fvMNE=
-X-Google-Smtp-Source: ABdhPJz4YiQfYwm25QPzKlI8Xy6ZhDG9CiScXQ4LY3iZOx9/l0+5MibPrQICrOkR3K3anfhpHy0V6s7vObi7M7tgGh0=
-X-Received: by 2002:a9d:5786:: with SMTP id q6mr15748398oth.56.1623112239557;
- Mon, 07 Jun 2021 17:30:39 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=qRFthXhnfNdpVeZQpXUHrCiK/YuVLkK7snUpJsmtFSw=;
+        b=SfjCi9lbDaB9S+ETT6X5/iStUILSM/jVyZUmnQ2F8SpzAdCUBdaBTosXsF+8E2ayLM
+         zP+Vi6b+jH02PnYlqEz/S4ebwqtsOIW8OelLazoGcVBL24Ts6UV3qZhAW5faMhZUtRzk
+         tuzoWM81twnFAZdhHxac4proxuTsEayiN0MndO10fdEteC9L4SsFeh4We4JhloDpaJhB
+         woRLRFAk6aiR5QxLTH2YBo5EfwzBpeNECB9ItYHj7rngNF/uv+0vMjaVt8JfPr8Y64Kc
+         uS04g2ZBmTpOFyAU1tnDN44zOtDQ0Xg51qcczJyUey1UzzocxaE53f2CkCtX/2a99+4Z
+         4tFw==
+X-Gm-Message-State: AOAM5313FmN/LKiFDVpSq35qP0/JcsweOQpJdY7QvMIecOInYSn3p+Sb
+        Pt5sc6tnNPy40BM4mgCQrv9ViAhwnk8xyccNeFxA7m7ZMneBl9+16cYExC1DvU0IgjWzLK90U4h
+        /tR05jNWG19Jt
+X-Received: by 2002:a4a:d4c7:: with SMTP id r7mr15458006oos.85.1623112236846;
+        Mon, 07 Jun 2021 17:30:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz4eei97hBgAKcdGsumzHAwD9jcuRq8Dyz7XrNXw9xxI85L9wd4TC3u+DkEQiYQaWLvp82kXg==
+X-Received: by 2002:a4a:d4c7:: with SMTP id r7mr15457984oos.85.1623112236604;
+        Mon, 07 Jun 2021 17:30:36 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id v22sm2561303oic.37.2021.06.07.17.30.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Jun 2021 17:30:36 -0700 (PDT)
+Date:   Mon, 7 Jun 2021 18:30:34 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Robin Murphy <robin.murphy@arm.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jason Wang <jasowang@redhat.com>
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+Message-ID: <20210607183034.7665cf02.alex.williamson@redhat.com>
+In-Reply-To: <20210607230353.GR1002214@nvidia.com>
+References: <20210604160336.GA414156@nvidia.com>
+        <2c62b5c7-582a-c710-0436-4ac5e8fd8b39@redhat.com>
+        <20210604172207.GT1002214@nvidia.com>
+        <20210604152918.57d0d369.alex.williamson@redhat.com>
+        <20210604230108.GB1002214@nvidia.com>
+        <20210607094148.7e2341fc.alex.williamson@redhat.com>
+        <20210607181858.GM1002214@nvidia.com>
+        <20210607125946.056aafa2.alex.williamson@redhat.com>
+        <20210607190802.GO1002214@nvidia.com>
+        <20210607134128.58c2ea31.alex.williamson@redhat.com>
+        <20210607230353.GR1002214@nvidia.com>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <1622710841-76604-1-git-send-email-wanpengli@tencent.com>
- <YLjzJ59HPqGfhhvm@google.com> <CANRm+CxSAD9+050j-1e1_f3g1QEwrSaee6=2cB6qseBXfDkgPA@mail.gmail.com>
- <YLpIni1VKYYfUE8D@google.com>
-In-Reply-To: <YLpIni1VKYYfUE8D@google.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 8 Jun 2021 08:30:27 +0800
-Message-ID: <CANRm+CzMNctK1nWfTf10ch2TDB-6Trh4JSOGqONm4zjnctoP-g@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: LAPIC: write 0 to TMICT should also cancel
- vmx-preemption timer
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 4 Jun 2021 at 23:37, Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Jun 04, 2021, Wanpeng Li wrote:
-> > On Thu, 3 Jun 2021 at 23:20, Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > On Thu, Jun 03, 2021, Wanpeng Li wrote:
-> > > > From: Wanpeng Li <wanpengli@tencent.com>
-> > > >
-> > > > According to the SDM 10.5.4.1:
-> > > >
-> > > >   A write of 0 to the initial-count register effectively stops the local
-> > > >   APIC timer, in both one-shot and periodic mode.
-> > > >
-> > > > The lapic timer oneshot/periodic mode which is emulated by vmx-preemption
-> > > > timer doesn't stop since vmx->hv_deadline_tsc is still set.
-> > >
-> > > But the VMX preemption timer is only used for deadline, never for oneshot or
-> > > periodic.  Am I missing something?
-> >
-> > Yes, it is upstream.
->
-> Huh.  I always thought 'tscdeadline' alluded to the timer being in deadline mode
-> and never looked closely at the arming code.  Thanks!
->
-> Maybe name the new helper cancel_apic_timer() to align with start_apic_timer()
-> and restart_apic_timer()?  With that:
->
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
+On Mon, 7 Jun 2021 20:03:53 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Do it in v2, thanks.
+> On Mon, Jun 07, 2021 at 01:41:28PM -0600, Alex Williamson wrote:
+> 
+> > > Compatibility is important, but when I look in the kernel code I see
+> > > very few places that call wbinvd(). Basically all DRM for something
+> > > relavent to qemu.
+> > > 
+> > > That tells me that the vast majority of PCI devices do not generate
+> > > no-snoop traffic.  
+> > 
+> > Unfortunately, even just looking at devices across a couple laptops
+> > most devices do support and have NoSnoop+ set by default.    
+> 
+> Yes, mine too, but that doesn't mean the device is issuing nosnoop
+> transactions, it just means the OS is allowing it to do so if it wants.
+> 
+> As I said, without driver support the feature cannot be used, and
+> there is no driver support in Linux outside DRM, unless it is
+> hidden.. Certainly I've never run into it..
+> 
+> Even mlx5 is setting the nosnoop bit, but I have a fairly high
+> confidence that we don't set the TLP bit for anything Linux does.
+> 
+> > It's not safe for QEMU to make an assumption that only GPUs will
+> > actually make use of it.  
+> 
+> Not 100% safe, but if you know you are running Linux OS in the VM you
+> can look at the drivers the devices need and make a determination.
 
-    Wanpeng
+QEMU doesn't know what guest it's running or what driver the guest is
+using.  QEMU can only create safe configurations by default, the same
+as done now using vfio.  Anything outside of that scope would require
+experimental opt-in support by the user or a guarantee from the device
+vendor that the device cannot ever (not just for the existing drivers)
+create non-coherent TLPs. Thanks,
+
+Alex
+
+> > Yes, QEMU can reject a hot-unplug event, but then QEMU retains the
+> > privilege that the device grants it.  Releasing the device and
+> > retaining the privileged gained by it seems wrong.  Thanks,  
+> 
+> It is not completely ideal, but it is such a simplification, and I
+> can't really see a drawback..
+> 
+> Jason
+> 
+
