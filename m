@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1ECEA39F2FA
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 11:54:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03AB339F2FC
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 11:54:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231237AbhFHJ4n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 05:56:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54992 "EHLO
+        id S231467AbhFHJ4q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 05:56:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231371AbhFHJ4l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231380AbhFHJ4l (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 8 Jun 2021 05:56:41 -0400
 Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D031CC061574;
-        Tue,  8 Jun 2021 02:54:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04A39C061787;
+        Tue,  8 Jun 2021 02:54:49 -0700 (PDT)
 Received: from cap.home.8bytes.org (p4ff2ba7c.dip0.t-ipconnect.de [79.242.186.124])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 504BD465;
+        by theia.8bytes.org (Postfix) with ESMTPSA id E2B2648E;
         Tue,  8 Jun 2021 11:54:46 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
@@ -40,9 +40,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Arvind Sankar <nivedita@alum.mit.edu>,
         linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: [PATCH v3 4/7] x86/sev-es: Run #VC handler in plain IRQ state
-Date:   Tue,  8 Jun 2021 11:54:36 +0200
-Message-Id: <20210608095439.12668-5-joro@8bytes.org>
+Subject: [PATCH v3 5/7] x86/insn-eval: Make 0 a valid RIP for insn_get_effective_ip()
+Date:   Tue,  8 Jun 2021 11:54:37 +0200
+Message-Id: <20210608095439.12668-6-joro@8bytes.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210608095439.12668-1-joro@8bytes.org>
 References: <20210608095439.12668-1-joro@8bytes.org>
@@ -54,43 +54,62 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Use irqentry_enter() and irqentry_exit() to track the runtime state of
-the #VC handler. The reason it ran in NMI mode was solely to make sure
-nothing interrupts the handler while the GHCB is in use.
+In theory 0 is a valid value for the instruction pointer, so don't use
+it as the error return value from insn_get_effective_ip().
 
-This is handled now in sev_es_get/put_ghcb() directly, so there is no
-reason the #VC handler can not run in normal IRQ mode and enjoy the
-benefits like being able to send signals.
-
-Fixes: 62441a1fb532 ("x86/sev-es: Correctly track IRQ states in runtime #VC handler")
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/kernel/sev.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ arch/x86/lib/insn-eval.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-index 2a922d1b03c8..b563fb747aed 100644
---- a/arch/x86/kernel/sev.c
-+++ b/arch/x86/kernel/sev.c
-@@ -1354,8 +1354,7 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
- 		return;
+diff --git a/arch/x86/lib/insn-eval.c b/arch/x86/lib/insn-eval.c
+index a67afd74232c..4eecb9c7c6a0 100644
+--- a/arch/x86/lib/insn-eval.c
++++ b/arch/x86/lib/insn-eval.c
+@@ -1417,7 +1417,7 @@ void __user *insn_get_addr_ref(struct insn *insn, struct pt_regs *regs)
+ 	}
+ }
+ 
+-static unsigned long insn_get_effective_ip(struct pt_regs *regs)
++static int insn_get_effective_ip(struct pt_regs *regs, unsigned long *ip)
+ {
+ 	unsigned long seg_base = 0;
+ 
+@@ -1430,10 +1430,12 @@ static unsigned long insn_get_effective_ip(struct pt_regs *regs)
+ 	if (!user_64bit_mode(regs)) {
+ 		seg_base = insn_get_seg_base(regs, INAT_SEG_REG_CS);
+ 		if (seg_base == -1L)
+-			return 0;
++			return -EINVAL;
  	}
  
--	irq_state = irqentry_nmi_enter(regs);
--	lockdep_assert_irqs_disabled();
-+	irq_state = irqentry_enter(regs);
- 	instrumentation_begin();
+-	return seg_base + regs->ip;
++	*ip = seg_base + regs->ip;
++
++	return 0;
+ }
  
- 	/*
-@@ -1408,7 +1407,7 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
+ /**
+@@ -1455,8 +1457,7 @@ int insn_fetch_from_user(struct pt_regs *regs, unsigned char buf[MAX_INSN_SIZE])
+ 	unsigned long ip;
+ 	int not_copied;
  
- out:
- 	instrumentation_end();
--	irqentry_nmi_exit(regs, irq_state);
-+	irqentry_exit(regs, irq_state);
+-	ip = insn_get_effective_ip(regs);
+-	if (!ip)
++	if (insn_get_effective_ip(regs, &ip))
+ 		return 0;
  
- 	return;
+ 	not_copied = copy_from_user(buf, (void __user *)ip, MAX_INSN_SIZE);
+@@ -1484,8 +1485,7 @@ int insn_fetch_from_user_inatomic(struct pt_regs *regs, unsigned char buf[MAX_IN
+ 	unsigned long ip;
+ 	int not_copied;
  
+-	ip = insn_get_effective_ip(regs);
+-	if (!ip)
++	if (insn_get_effective_ip(regs, &ip))
+ 		return 0;
+ 
+ 	not_copied = __copy_from_user_inatomic(buf, (void __user *)ip, MAX_INSN_SIZE);
 -- 
 2.31.1
 
