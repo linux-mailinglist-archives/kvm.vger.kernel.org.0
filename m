@@ -2,112 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 73B5E3A05FD
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 23:27:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A29693A0611
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 23:31:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234254AbhFHV25 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 17:28:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50718 "EHLO
+        id S234230AbhFHVdm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 17:33:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36817 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231760AbhFHV2z (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 8 Jun 2021 17:28:55 -0400
+        by vger.kernel.org with ESMTP id S234110AbhFHVdk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Jun 2021 17:33:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623187622;
+        s=mimecast20190719; t=1623187907;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ANhdFVJMgOPlVeqKKH+dsmD0siNPfDTKlYNgvOQ5R3o=;
-        b=iNtVZs9FUpi1ae3CShJl5CKLiHXeRv1KyAPR8p3JMcnbptJUdGMjsC0h/l6BUHFBuL5G93
-        xqVIASxrxcyAs5l1zdZFn+thli19pxBhJx708HhcRah4m07Y+jh885/GVOxO7lYGIt4NVj
-        bZd6UJjNvkODVgz45ScA6ViI2whRIVo=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-lTULs2kCNl2C0elZSKei-A-1; Tue, 08 Jun 2021 17:26:58 -0400
-X-MC-Unique: lTULs2kCNl2C0elZSKei-A-1
-Received: by mail-ot1-f70.google.com with SMTP id f7-20020a9d5e870000b02902f479dba730so14763005otl.21
-        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 14:26:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=ANhdFVJMgOPlVeqKKH+dsmD0siNPfDTKlYNgvOQ5R3o=;
-        b=n1qzg+OfYzMRenPym8TddUF7B9JgOecH8+4P5mBOf/Vk8/eWbTLr1WtLCp8Sk4hbjn
-         8mu54rUnoAf67lIBGoYEluNzMmkfjRUHY8t0lqSKonddLfcJzRQcBRPdHc6/h5uMh1Qv
-         ZIHVLPIU5jV/g3kAJG+JhEsDhu9Twyn+WCdFpFtXYKQjJe1eq4AvfUxG1qOhwMNIrrXI
-         IXSeSsAIh/d/aB5YlBR3DyWSdYe/rH57SGKg8Gy//IJprcF/lAheih7j0YohjGfe8B7V
-         ycyiYFdK7tS9gl4J+EGBkJ1IK0Fo62qESJ1JfXMXTe65eY1soyIR27ZTNjgu9IzHWqkN
-         bcUg==
-X-Gm-Message-State: AOAM5331fQE1L489/pNXSLEAchMRjOgt+lUgwStlW1pzijQ0nG+wNnFJ
-        GydpJCBpnceQF2XMkxoFYDX34t4+qWgUmsVhLqXeqy1jWpEHr01AMQy+9VnB1tiU70O772PC75Q
-        2c48eoZVUmgFw
-X-Received: by 2002:a05:6808:13cb:: with SMTP id d11mr4168938oiw.138.1623187618240;
-        Tue, 08 Jun 2021 14:26:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwRvvGc6tdMNzZeUwij7tWuvUu215rQbuWwhep+IMzXG4f8s5RDIMcZh3VVPI9xldH1Y0wBIw==
-X-Received: by 2002:a05:6808:13cb:: with SMTP id d11mr4168914oiw.138.1623187618064;
-        Tue, 08 Jun 2021 14:26:58 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id w8sm2086647otk.16.2021.06.08.14.26.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jun 2021 14:26:57 -0700 (PDT)
-Date:   Tue, 8 Jun 2021 15:26:56 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <jgg@nvidia.com>,
-        <aviadye@nvidia.com>, <oren@nvidia.com>, <shahafs@nvidia.com>,
-        <parav@nvidia.com>, <artemp@nvidia.com>, <kwankhede@nvidia.com>,
-        <ACurrid@nvidia.com>, <cjia@nvidia.com>, <yishaih@nvidia.com>,
-        <kevin.tian@intel.com>, <hch@infradead.org>, <targupta@nvidia.com>,
-        <shameerali.kolothum.thodi@huawei.com>, <liulongfang@huawei.com>,
-        <yan.y.zhao@intel.com>
-Subject: Re: [PATCH 10/11] vfio-pci: introduce vfio_pci_core subsystem
- driver
-Message-ID: <20210608152656.5aa4cfa3.alex.williamson@redhat.com>
-In-Reply-To: <20210603160809.15845-11-mgurtovoy@nvidia.com>
-References: <20210603160809.15845-1-mgurtovoy@nvidia.com>
-        <20210603160809.15845-11-mgurtovoy@nvidia.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        bh=CvrEi2GE2Atbb4rbk+xVX4b+a6jCFTVxrl2QJI/S3oA=;
+        b=XkAF8nDIhprZk5Cb5FciqN9TTvl1Zo/mJBIUlZJe43Fe4nrqKJ8MosORxduUKc43BbrEC8
+        tRVRXcworUV7c40WDozZFZhUOwaNuOU1s7kyr5uExmqteaCniNKvtIxKfQ39chAAiBfp2R
+        fftxZuveNmAJeGkeS3h2g+H+KZs8pTw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-367-lXWMaEruOr2w0-fOhiPbsw-1; Tue, 08 Jun 2021 17:31:43 -0400
+X-MC-Unique: lXWMaEruOr2w0-fOhiPbsw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 814376D246;
+        Tue,  8 Jun 2021 21:31:41 +0000 (UTC)
+Received: from starship (unknown [10.40.194.6])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E692060C04;
+        Tue,  8 Jun 2021 21:31:36 +0000 (UTC)
+Message-ID: <e68ca103927cc376b5132ea42ceb43420e2b93a0.camel@redhat.com>
+Subject: Re: [PATCH V2] KVM: X86: fix tlb_flush_guest()
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org,
+        Lai Jiangshan <laijs@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+Date:   Wed, 09 Jun 2021 00:31:35 +0300
+In-Reply-To: <YL6z5sv7cnsbZhvT@google.com>
+References: <4c3ef411ba68ca726531a379fb6c9d16178c8513.camel@redhat.com>
+         <20210531172256.2908-1-jiangshanlai@gmail.com>
+         <9d457b982c3fcd6e7413065350b9f860d45a6e47.camel@redhat.com>
+         <YL6z5sv7cnsbZhvT@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 3 Jun 2021 19:08:08 +0300
-Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
-> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-> index 5e2e1b9a9fd3..384d06661f30 100644
-> --- a/drivers/vfio/pci/Kconfig
-> +++ b/drivers/vfio/pci/Kconfig
-> @@ -1,6 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0-only
-> -config VFIO_PCI
-> -	tristate "VFIO support for PCI devices"
-> +config VFIO_PCI_CORE
-> +	tristate "VFIO core support for PCI devices"
->  	depends on VFIO && PCI && EVENTFD
->  	depends on MMU
->  	select VFIO_VIRQFD
-> @@ -11,9 +11,17 @@ config VFIO_PCI
->  
->  	  If you don't know what to do here, say N.
->  
-> +config VFIO_PCI
-> +	tristate "VFIO support for PCI devices"
-> +	depends on VFIO_PCI_CORE
-> +	help
-> +	  This provides a generic PCI support using the VFIO framework.
+On Tue, 2021-06-08 at 00:03 +0000, Sean Christopherson wrote:
+> On Tue, Jun 08, 2021, Maxim Levitsky wrote:
+> > So this patch *does* fix the windows boot without TDP!
+> 
+> Woot!
+> 
+> > Tested-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> 
+> Lai,
+> 
+> I have a reworded version of your patch sitting in a branch that leverages this
+> path to fix similar bugs and do additional cleanup.  Any objection to me gathering
+> Maxim's tags and posting the version below?  I'm more than happy to hold off if
+> you'd prefer to send your own version, but I don't want to send my own series
+> without this fix as doing so would introduce bugs.
+> 
+> Thanks!
+> 
+> Author: Lai Jiangshan <laijs@linux.alibaba.com>
+> Date:   Tue Jun 1 01:22:56 2021 +0800
+> 
+>     KVM: x86: Unload MMU on guest TLB flush if TDP disabled to force MMU sync
+>     
+>     When using shadow paging, unload the guest MMU when emulating a guest TLB
+>     flush to all roots are synchronized.  From the guest's perspective,
+>     flushing the TLB ensures any and all modifications to its PTEs will be
+>     recognized by the CPU.
+>     
+>     Note, unloading the MMU is overkill, but is done to mirror KVM's existing
+>     handling of INVPCID(all) and ensure the bug is squashed.  Future cleanup
+>     can be done to more precisely synchronize roots when servicing a guest
+>     TLB flush.
+>     
+>     If TDP is enabled, synchronizing the MMU is unnecessary even if nested
+>     TDP is in play, as a "legacy" TLB flush from L1 does not invalidate L1's
+>     TDP mappgins.  For EPT, an explicit INVEPT is required to invalidate
+>     guest-physical mappings.  For NPT, guest mappings are always tagged with
+>     an ASID and thus can only be invalidated via the VMCB's ASID control.
+>     
+>     This bug has existed since the introduction of KVM_VCPU_FLUSH_TLB, but
+>     was only recently exposed after Linux guests stopped flushing the local
+>     CPU's TLB prior to flushing remote TLBs (see commit 4ce94eabac16,
+>     "x86/mm/tlb: Flush remote and local TLBs concurrently").
+>     
+>     Tested-by: Maxim Levitsky <mlevitsk@redhat.com>
+>     Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+>     Fixes: f38a7b75267f ("KVM: X86: support paravirtualized help for TLB shootdowns")
+>     Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+>     [sean: massaged comment and changelog]
+>     Signed-off-by: Sean Christopherson <seanjc@google.com>
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 1cd6d4685932..3b02528d5ee8 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3072,6 +3072,18 @@ static void kvm_vcpu_flush_tlb_all(struct kvm_vcpu *vcpu)
+>  static void kvm_vcpu_flush_tlb_guest(struct kvm_vcpu *vcpu)
+>  {
+>         ++vcpu->stat.tlb_flush;
 > +
-> +	  If you don't know what to do here, say N.
+> +       if (!tdp_enabled) {
+> +               /*
+> +                * Unload the entire MMU to force a sync of the shadow page
+> +                * tables.  A TLB flush on behalf of the guest is equivalent
+> +                * to INVPCID(all), toggling CR4.PGE, etc...  Note, loading the
+> +                * MMU will also do an actual TLB flush.
+> +                */
+> +               kvm_mmu_unload(vcpu);
+> +               return;
+> +       }
 > +
+>         static_call(kvm_x86_tlb_flush_guest)(vcpu);
+>  }
+>  
+> 
+> > More notes from the testing I just did:
+> >  
+> > 1. On AMD with npt=0, the windows VM boots very slowly, and then in the task manager
+> > I see that it booted with 1 CPU, although I configured it for 3-28 vCPUs (doesn't matter how many)
+> > I tested this with several win10 VMs, same pattern repeats.
+> 
+> That's very odd.  Maybe it's so slow that the guest gives up on the AP and marks
+> it as dead?  That seems unlikely though, I can't imagine waking APs would be
+> _that_ slow.
 
-I think it's going to generate a lot of user and distro frustration to
-hide VFIO_PCI behind a new VFIO_PCI_CORE option.  The core should be a
-dependency *selected* by the drivers, not a prerequisite for the
-driver.  Thanks,
+I also can't say that it is that slow, but it is possible that a live lock like situation
+similar to what I see with the nag screen causes an AP bootup to timeout.
+I also see that using my old workaround to boot with NPT=0 which was to always keep shadow
+MMU in sync, also causes windows to see a single vCPU.
 
-Alex
+I will when I have some time for this to try to artificially slow windows down in some other way
+and see if it still fails to bring up more than one vCPU.
+
+
+> 
+> > 2. The windows nag screen about "we beg you to open a microsoft account" makes the VM enter a live lock.
+> > I see about half million at least VM exits per second due to page faults and it is stuck in 'please wait' screen
+> > while with NPT=1 it shows up instantly. The VM has 12 GB of ram so I don't think RAM is an issue.
+> >  
+> > It's likely that those are just result of unoptimized code in regard to TLB flushes,
+> > and timeouts in windows.
+> > On my Intel laptop, the VM is way faster with EPT=0 and it boots with 3 vCPUs just fine
+> > (the laptop has just dual core CPU, so I can't really give more that 3 vCPU to the VM)
+> 
+> Any chance your Intel CPU has PCID?  Although the all-contexts INVPCID emulation
+> nukes everything, the single-context INVPCID emulation in KVM is optimized to
+> (a) sync the current MMU (if necessary) instead of unloading it and (b) free
+> only roots with the matching PCID.  I believe all other forms of TLB flushing
+> that are likely to be used by the guest will lead to KVM unloading the entire
+> MMU and rebuilding it from scratch.
+
+Yes it has it. It is relatively recent Kabylake processor (i7-7600U),
+so this could be it. I'll try to disable it as well when I have some time for
+this.
+
+
+Finally about my testing of running HyperV nested. This patch can't fix it,
+since it only changes the non TDP code path, but we also have another patch on
+the list that is shadow paging related 
+"KVM: X86: MMU: Use the correct inherited permissions to get shadow page"
+
+Sadly the VM still did eventually bluescreen (with 'critical process died' after about 400
+migration cycles this time. No luck this time.
+
+Best regards,
+	Maxim Levitsky
+
+
 
