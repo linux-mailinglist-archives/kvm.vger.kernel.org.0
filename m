@@ -2,118 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 62C0239FD40
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 19:09:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97B8639FD6A
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 19:19:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231955AbhFHRLO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 13:11:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26161 "EHLO
+        id S231261AbhFHRVL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 13:21:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47380 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232185AbhFHRLN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 8 Jun 2021 13:11:13 -0400
+        by vger.kernel.org with ESMTP id S231278AbhFHRVJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Jun 2021 13:21:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623172160;
+        s=mimecast20190719; t=1623172755;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=4aTv++9v+jHosRvyRVghjaKt2DPiDkrKt5JmZVhhooA=;
-        b=YaTjoCpb1dIqcJaCpQy8MKTD3/xGjf66VnnGSlxzJpCJse0Swd7NI3bSLCxwPp0TwfOlAG
-        cdpeukHgo1OPrHrayb7Q1OYnjN8LcTlbsMmMITtdw7RfPncnRZvLnbyrBDQ7FQbaKmkmBe
-        pHaMR1ItC648BSeu3T8Tle4XRtozlps=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-189-n4taijigPueArmB3S09vIQ-1; Tue, 08 Jun 2021 13:09:18 -0400
-X-MC-Unique: n4taijigPueArmB3S09vIQ-1
-Received: by mail-wr1-f72.google.com with SMTP id u5-20020adf9e050000b029010df603f280so9694650wre.18
-        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 10:09:18 -0700 (PDT)
+        bh=Q37WuaMm0t5GY7ci6kK43xp6wy9rrv5jWDUeFr8BX58=;
+        b=HZaph1iayMfxXgaC6SnfW28TZmvO6JdJBtF3Y+PetZo01qwPZ03l92v8P0tcO3mM/zGMRq
+        iXuHg8Ve51c4NvHaSdPdpnQADVDZJcAMnBQBcTeE92WnVUFLHLdH/AIcNW9uSMlnThcQid
+        clYWM5rur7Kr9zaiQEFLYywYVUi5PIY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-11-jRt9_811Op2RzelJGe3HLg-1; Tue, 08 Jun 2021 13:19:14 -0400
+X-MC-Unique: jRt9_811Op2RzelJGe3HLg-1
+Received: by mail-wm1-f70.google.com with SMTP id n127-20020a1c27850000b02901717a27c785so1424325wmn.9
+        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 10:19:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=4aTv++9v+jHosRvyRVghjaKt2DPiDkrKt5JmZVhhooA=;
-        b=lBqFJlyg+zhc039kpv2+w08NJypNdRSUvD7i9QnCQkpoUaMYa8N9cB3S5vwCtGafnk
-         RulCDXiNaYdTyCJ04BW6lushACagHLWvhzR+9VffdCebtrV1fFkWUv6GM1OWYoYfIiyn
-         IGCq5ks7Ufv4IhUTzIieLcGtL3dX58P5mVWBWgAyxaEIapTJyp/QDAItvxAK0aBOO+iX
-         kwR2SWn5kSbeOM+4JxMlmknjkzHM6XikuLeKDoKZH77zfXYDBPjE7SS1HjAf2/Dwcrxw
-         9cRvY6OTyfXtS4uC59uSxr/icVe04WNjD+b7sqcIE9iTLTzYWLu+UVjo5nWu5Lhq49+f
-         adMw==
-X-Gm-Message-State: AOAM533KiYj69Xsb6UAWlWqMy4kEzo2pK1GbjBXPqRMf2bUogc21O1td
-        QJ29bjUvz6Ty1n8t7GGiqkZS2cuvKgcv3DIjwwb1Ht4qnUf8Brlvo0lb/xB2zHK/8qQZNCBShz8
-        NIQgix4pMKTzX
-X-Received: by 2002:adf:fc0e:: with SMTP id i14mr23914023wrr.71.1623172157756;
-        Tue, 08 Jun 2021 10:09:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzg3pijJDkOWV1K1StKFPv9eD9m5caNakqtBsOQvOJiqGjJiVCeQ1fY7daMvHMOukzBkfCpdA==
-X-Received: by 2002:adf:fc0e:: with SMTP id i14mr23914001wrr.71.1623172157576;
-        Tue, 08 Jun 2021 10:09:17 -0700 (PDT)
+        bh=Q37WuaMm0t5GY7ci6kK43xp6wy9rrv5jWDUeFr8BX58=;
+        b=fDKjUUdvSEhcyo0TfPbS8unNWrQ1cL5zVMVR/rpg04KtMgXFSgYg309Psb7XIZFPG9
+         zcjGOO7m1xADoAINkDbVrY7zopiqCXtdC4Rje7Ve/Qc89pH2dVTMcgA3Fijm7kFyST2d
+         deaLcAkFqajwSwE2KAgIVV+AobARYqjOqg2IgDQSwkjZLTaWUM/WWDHOQcc7XdvyB8pF
+         b0wMzuxhCnClb1EaTbhcfm7A2BRu/CZR2zBmP0so/hQsd0T8eh1LoLkCMO2Ac4juNSM2
+         9rcY6072FO+habMB5OzhTAv0gnac8YwNKBNpX7CIjSBZ5TqBNri1hIc39wGDaiIqfnIT
+         K47A==
+X-Gm-Message-State: AOAM531gXo7tzsD9oWd3XhdiSEVn23HojaGESERJmyWpXz40UQ4O0iYy
+        ra0zXg+6ygg30ZofBWyea5Q7dAYm6Zr67dkx+vANRlmLXwufPa2w4VIAMOkQEEPB67VqTNbVKXb
+        MlgzgOa9lfZsa
+X-Received: by 2002:a5d:4984:: with SMTP id r4mr23378626wrq.152.1623172753133;
+        Tue, 08 Jun 2021 10:19:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzmj4FqLI7Hl07c/hm40gQk0oiqQ2Kqht7RwmxNMtqkm+JIoKEXMqQlJVoko7IZo8dAbaAwCQ==
+X-Received: by 2002:a5d:4984:: with SMTP id r4mr23378608wrq.152.1623172752912;
+        Tue, 08 Jun 2021 10:19:12 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id u20sm13394042wmq.24.2021.06.08.10.09.16
+        by smtp.gmail.com with ESMTPSA id q3sm21120231wrz.71.2021.06.08.10.19.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Jun 2021 10:09:16 -0700 (PDT)
-To:     Sean Christopherson <seanjc@google.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Lai Jiangshan <laijs@linux.alibaba.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org, linux-doc@vger.kernel.org
-References: <20201120095517.19211-1-jiangshanlai@gmail.com>
- <20210603052455.21023-1-jiangshanlai@gmail.com> <YLkYkcn+1MJhQYMf@google.com>
+        Tue, 08 Jun 2021 10:19:12 -0700 (PDT)
+Subject: Re: [PATCH v2] KVM: selftests: introduce P47V64 for s390x
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     bgardon@google.com, dmatlack@google.com, drjones@redhat.com,
+        frankja@linux.ibm.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, peterx@redhat.com,
+        venkateshs@chromium.org
+References: <4d6513f3-d921-dff0-d883-51c6dbdcbe39@de.ibm.com>
+ <20210608123954.10991-1-borntraeger@de.ibm.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH V2] KVM: X86: MMU: Use the correct inherited permissions
- to get shadow page
-Message-ID: <cbbb803b-a16d-48f5-97d0-916d0eba6a04@redhat.com>
-Date:   Tue, 8 Jun 2021 19:09:15 +0200
+Message-ID: <a32486ec-f34d-3cdb-2dd4-19e28e7f3948@redhat.com>
+Date:   Tue, 8 Jun 2021 19:19:11 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <YLkYkcn+1MJhQYMf@google.com>
+In-Reply-To: <20210608123954.10991-1-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/06/21 19:59, Sean Christopherson wrote:
-> Maybe drop the first two paragraphs and combine the info into something like this?
+On 08/06/21 14:39, Christian Borntraeger wrote:
+> s390x can have up to 47bits of physical guest and 64bits of virtual
+> address  bits. Add a new address mode to avoid errors of testcases
+> going beyond 47bits.
 > 
->    When computing the access permissions of a shadow page, use the effective
->    permissions of the walk up to that point, i.e. the logic AND of its parents'
->    permissions.  Two guest PxE entries that point at the same table gfn need to
->    be shadowed with different shadow pages if their parents' permissions are
->    different.  KVM currently uses the effective permissions of the last
->    non-leaf entry for all non-leaf entries, which can lead to incorrectly
->    reusing a shadow page if a lower-level entry has more restrictve permissions,
->    and eventually result in a missing guest protection page fault.
-
-And also a rewritten description of the sequence leading to the bug:
-
-- First, the guest reads from ptr1 first and KVM prepares a shadow
-   page table with role.access=u--, from ptr1's pud1 and ptr1's pmd1.
-   "u--" comes from the effective permissions of pgd, pud1 and
-   pmd1, which are stored in pt->access.  "u--" is used also to get
-   the pagetable for pud1, instead of "uw-".
-
-- Then the guest writes to ptr2 and KVM reuses pud1 which is present.
-   The hypervisor set up a shadow page for ptr2 with pt->access is "uw-".
-   However the pud1 pmdthe pud1 pmd (because of the incorrect argument to
-   kvm_mmu_get_page in the previous step) has role.access="u--".
-
-- Then the guest reads from ptr3.  The hypervisor reuses pud1's
-   shadow pmd for pud2, because both use "u--" for their permissions.
-   Thus, the shadow pmd already includes entries for both pmd1 and pmd2.
-
-- At last, the guest writes to ptr4.  This causes no vmexit or pagefault,
-   because pud1's shadow page structures included an "uw-" page even though
-   its role.access was "u--".
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+> v1->v2:
+> - remove wrong comment
+> - use 5 levels of page tables
+>   tools/testing/selftests/kvm/include/kvm_util.h | 3 ++-
+>   tools/testing/selftests/kvm/lib/kvm_util.c     | 5 +++++
+>   2 files changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index fcd8e3855111..b602552b1ed0 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -43,6 +43,7 @@ enum vm_guest_mode {
+>   	VM_MODE_P40V48_4K,
+>   	VM_MODE_P40V48_64K,
+>   	VM_MODE_PXXV48_4K,	/* For 48bits VA but ANY bits PA */
+> +	VM_MODE_P47V64_4K,
+>   	NUM_VM_MODES,
+>   };
+>   
+> @@ -60,7 +61,7 @@ enum vm_guest_mode {
+>   
+>   #elif defined(__s390x__)
+>   
+> -#define VM_MODE_DEFAULT			VM_MODE_P52V48_4K
+> +#define VM_MODE_DEFAULT			VM_MODE_P47V64_4K
+>   #define MIN_PAGE_SHIFT			12U
+>   #define ptes_per_page(page_size)	((page_size) / 16)
+>   
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 28e528c19d28..b126fab6c4e1 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -175,6 +175,7 @@ const char *vm_guest_mode_string(uint32_t i)
+>   		[VM_MODE_P40V48_4K]	= "PA-bits:40,  VA-bits:48,  4K pages",
+>   		[VM_MODE_P40V48_64K]	= "PA-bits:40,  VA-bits:48, 64K pages",
+>   		[VM_MODE_PXXV48_4K]	= "PA-bits:ANY, VA-bits:48,  4K pages",
+> +		[VM_MODE_P47V64_4K]	= "PA-bits:47,  VA-bits:64,  4K pages",
+>   	};
+>   	_Static_assert(sizeof(strings)/sizeof(char *) == NUM_VM_MODES,
+>   		       "Missing new mode strings?");
+> @@ -192,6 +193,7 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
+>   	{ 40, 48,  0x1000, 12 },
+>   	{ 40, 48, 0x10000, 16 },
+>   	{  0,  0,  0x1000, 12 },
+> +	{ 47, 64,  0x1000, 12 },
+>   };
+>   _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
+>   	       "Missing new mode params?");
+> @@ -277,6 +279,9 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
+>   		TEST_FAIL("VM_MODE_PXXV48_4K not supported on non-x86 platforms");
+>   #endif
+>   		break;
+> +	case VM_MODE_P47V64_4K:
+> +		vm->pgtable_levels = 5;
+> +		break;
+>   	default:
+>   		TEST_FAIL("Unknown guest mode, mode: 0x%x", mode);
+>   	}
+> 
 
 Queued, thanks.
 
