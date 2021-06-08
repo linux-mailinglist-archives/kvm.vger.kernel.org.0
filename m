@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 817AE39EB1E
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 02:56:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E43E839EB1C
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 02:56:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231338AbhFHA5y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Jun 2021 20:57:54 -0400
+        id S231321AbhFHA5w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Jun 2021 20:57:52 -0400
 Received: from mail-bn8nam12on2067.outbound.protection.outlook.com ([40.107.237.67]:45339
         "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231295AbhFHA5v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Jun 2021 20:57:51 -0400
+        id S231283AbhFHA5t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Jun 2021 20:57:49 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ljuUipffp4LeVbQGCJ7sq6yptLpboKdO72Hi82ggs2Q4pg5SDFE09ykigRYswAK8t2Ur53BWfuUk4H6sgsFnirgQMuHXqXVmVxzrSBASg/jg6j8XVuNXAYASuU+wrH6YngHF9hZX4Fngu9EDb0ovo3nQipNNb46Ex7FpYp6W7jryjaC9lA7DSWFZcVM+y3r1tZzcLPqGTaeCApXoux0VhAsg2N0rw2+IeWUh9uonXWUMEkeIRw/YGtfhNZTLIdXJY5ljppWKfYhX2vPFAy3ncPpw92TIpBLyqRBU1azthzdoUZ2SOqqKkITggcu68lh61g9ji372KLYb1BO8NmOuXg==
+ b=CE/4gVUC8HXSzhwNOc0k1ASMLaUpPBxdX//IeF1/oc2ImOBfwBdCW6QL0s/HMWKcNe5LS3dAue/aCmHjMKwHg2J+7cs8ozS1CBnYny2RcVMkUJYCVdK5BK4UHjJYPLYu6NKWloLjrBUDGSt6m9J6u5JzTQXpOx++HGL4aJsbbD6Fum8/WwIGqIjxSt5EcgpmKQmPTV3OJSEzkaauuByxb/+JI+297Bb10epJMkwAAIzKrmSAxJIuxjho1lfl+D7lQAH0EgU0Q3IT7zgOSaRRWF+D2Dmbgg/qUH5FClB1nxk+iN6NH0GdZBFayroo6uge1IKd11MwiKbfr2cmnDY3/g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bJ8tRREbXzciCpeaClAgBQMttdC4ihdILwMxB1U0lM8=;
- b=edfucHWQFMjWcXhJpOWR5VJnUzea1IxvDAXe/UmwDXyIBOan7UeT+lZ1NMY5UJ0QBpI9dQtv5erRmc21t+91RfWbkd+kp4kXix9FM8msafJsD+ZfsiCKIYzIdoT7rqQ47sh2lDC2Igb2cLu6WMMeASVWcaQxqEpQGtZMqJPOpiNeOCdw3ME334Sq3ZHruikpk5aXZRMmTWxk6Hld0bjNhm02drRfX0qz0+0vBgq/IRvcf0jK/Vu/pxiw5MpCDjYA7PrIXTL+X7ysElJ3LG0B4QgNWl5SodE6m98Kci2h/Tw207xzekFAgw9jtGvNLww4Sq8OkMb5sbgo5Mi7I9aiIA==
+ bh=0Ix+R4jEwhvzrwBmdWPBSZUKcnvnwI9m1C6x8Q1R8Xk=;
+ b=BCW6QdSkFgDRmhG5NGq6QBLfHGmGr+/xUxFH+JlY97E7kzXLRNLV3wI9DYpIHdNH3bG4Y6WTNqHiFB/7RnFTlrl2Rcb8ojhknafLka5wjvwlSnp9ae5/j6B/A2V+6MmPSm+qybXbW/AZeZlTLcr9xzE8ylucfMH+bjoOaGj1e0Z8q99pyNOw7el5z0nSktz61MI46IFcxzCcHcg5TBwb6GbyNM+4cuy9P0fJteECxH+ZY0ooJhJx+xumBoY55PU/9XWiHmk19ViQQVqeLWPGO+m0zJpKfxCBv7XBOQoQsVvCWSMQQFVoUdJdHiKK59b4l2Spv6W+y99XVvEz9Th8BA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bJ8tRREbXzciCpeaClAgBQMttdC4ihdILwMxB1U0lM8=;
- b=XLvdfGIL7F1D/zYUeSPlNGlYnb8s76q+CBw5rw4bErs5FhX2Kz41/jfqe445cVsT+p6VaJJP9ZkTXoJCCfjstsO7OXPeSgt7pDlOV8cpugyUzmi7ggsWHZXZF2rvmbkTYTWGa3OiPId1UoymWc0yGNlc2E9bhcI7dv+Fw+qiIVVzfLWdsH1+9eAJps0Ro5W36C/ic7cAzMkkzV1EAudcj2QyPqer8bPZwRiUo3lCKgkK+c6RGpSab/Z0xY8OHlqTIXjtziobeuR60nDsXwC3j7kWtNA0dWrGxpJ/z3rfT2zz9jx/NAxAqbMx9NzIrYlKLi+clLGgaPPqHqDKOlXEqg==
+ bh=0Ix+R4jEwhvzrwBmdWPBSZUKcnvnwI9m1C6x8Q1R8Xk=;
+ b=RCn2+n9Dmc6OxEoAHeLYXP/Kkc312KbuWICVuE72hUa2gVRA/+pD+Yvz7csf5b6ZIyS8QbqC8JelR0bNbyNwu1VF07F6e/2eupGTku7q8yw1Ltqj4WD+6868XBGUhf6VDdb05ETvp5sXUpYCP36YkdfRslv4wg3DQrkVGLBKGHG4CG7JiB3KeTEskQzSfp286mGFgMKNzfsLiW9CuUJxJII9EAShjj5Zsa7BU60Kjc9i6cGtrdV832Y1jwyfMT9NnXTmw19J8pgAbaKgPw8w6P3X3gkggLWTVwHji6um/1ueQCSUz8gUYRBgrgtYBFI++xGkmpMa2v1T/fEe5tr/Ig==
 Authentication-Results: linuxfoundation.org; dkim=none (message not signed)
  header.d=none;linuxfoundation.org; dmarc=none action=none
  header.from=nvidia.com;
@@ -42,204 +42,143 @@ Received: from BL0PR12MB5506.namprd12.prod.outlook.com
 From:   Jason Gunthorpe <jgg@nvidia.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         kvm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>
-Subject: [PATCH 04/10] driver core: Don't return EPROBE_DEFER to userspace during sysfs bind
-Date:   Mon,  7 Jun 2021 21:55:46 -0300
-Message-Id: <4-v1-324b2038f212+1041f1-vfio3a_jgg@nvidia.com>
+Subject: [PATCH 05/10] driver core: Export device_driver_attach()
+Date:   Mon,  7 Jun 2021 21:55:47 -0300
+Message-Id: <5-v1-324b2038f212+1041f1-vfio3a_jgg@nvidia.com>
 In-Reply-To: <0-v1-324b2038f212+1041f1-vfio3a_jgg@nvidia.com>
 References: 
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [47.55.113.94]
-X-ClientProxiedBy: BL1PR13CA0252.namprd13.prod.outlook.com
- (2603:10b6:208:2ba::17) To BL0PR12MB5506.namprd12.prod.outlook.com
+X-ClientProxiedBy: BL1PR13CA0259.namprd13.prod.outlook.com
+ (2603:10b6:208:2ba::24) To BL0PR12MB5506.namprd12.prod.outlook.com
  (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (47.55.113.94) by BL1PR13CA0252.namprd13.prod.outlook.com (2603:10b6:208:2ba::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.12 via Frontend Transport; Tue, 8 Jun 2021 00:55:54 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lqQ24-003eKW-H5; Mon, 07 Jun 2021 21:55:52 -0300
+Received: from mlx.ziepe.ca (47.55.113.94) by BL1PR13CA0259.namprd13.prod.outlook.com (2603:10b6:208:2ba::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.11 via Frontend Transport; Tue, 8 Jun 2021 00:55:54 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lqQ24-003eKa-IM; Mon, 07 Jun 2021 21:55:52 -0300
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7d3d86a3-815d-4f0e-e3a9-08d92a182b21
+X-MS-Office365-Filtering-Correlation-Id: d62b007d-91ea-4c67-00bd-08d92a182b1f
 X-MS-TrafficTypeDiagnostic: BL0PR12MB5539:
-X-Microsoft-Antispam-PRVS: <BL0PR12MB553904797C3B856247034A92C2379@BL0PR12MB5539.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:972;
+X-Microsoft-Antispam-PRVS: <BL0PR12MB553991799B729BACC72A1C7FC2379@BL0PR12MB5539.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: TzH+9m6RLUz+cd5Vbvqj3/iwnsm9o/U4gCmbxC/XORCiC8SGyHfbv5WV6ryeBwtyC0VVH67ucOivj/2igYQjjc7j7He5TzonBD5n1TOISZlHwkWo1IHO7VYM0oI29eZhChk/iquVFDtAZYQLN8Hq8Uy8PywKLbZqd1i/zrxQzKsgM7aHbOvfCvZ6D2AxPq5Pi1E+JsskQM4cWuKPbOOs8A0Ob5wGlfP4wErhUoneamsY8CYE4MucKSjkAqk+jvyJyrG1OEdapotUAytOyGOTB1NkkGSKTue3QgerZzxPVbjkshxxwDtvR+3XbH90X35kn3G7kHBfrNx+XAylYYPHTNAua+213vNPGCDfE9TvriaIMu+OZn0wy/3punVlHqN31iIIXYud1AdbZJRKKtgfj3V7nGpA3PsUvIYv3BnydrXKbCLlaYj7C3nKonNNVHG0wN/HYQTvfYEoOKYfajUH1beIP5QpGIcbcoxnJS11E7AYa4qRmOxN6m/4SEDyixG/f1sd0hazs2ZlGaFav+JtA5IKp8okzmOPWCT0y7v2XDGgHANvlZKx0GtWpP3b79wj6xSH7TlwOe3BDHBJe+R7+R/gDvScP1uJX73u1JKyrG83R4dI8fX+L0LboDiN/0SuiptIAqtNinMoAY03mmDnGQ==
+X-Microsoft-Antispam-Message-Info: RzdSBAmRk88MUGHREpp1vZy3Th05Z1vMAULe2500BAbTJnlzFb2D3SdAoGIWZoQuPIUVchimNa0idOEwkOexuajYVp8mfQmVkxBAIRGfKWtlFio1mmVzapq/idofwVIwZaTY3XtZyJs7JFUWI1WgbITYwmkNqDfyYABm7pdRW/1P4MqQSFrjfNclhZWJ4dBBj6wW6gLbPcLT3caH+PNSbcgDMZ6SYpjmO/6Lx4zJditZZumsqHbctk6VPmk5zu59MNO8Rls6Nk2/dfk5lk5THeWPoY4qqUR+Tn5LHkz7nwhjmR+Iqr1dwWg+rk2/cAu7wf6b9oODZNQm2fPzobTZqrt9RjbKCX3YgQT44rHVWiqOWC62VUzQa31t7Jx0sZEQN4HOpwgR25Yl8/O0zT6N1D3nuglN16/u+WD6o/0agweB0ltibe3akCNKofUj2gozTRkzLIHviitftqOwtKFQbfJDAwE7I5uXxjmVpinAn/u1Ub14wQI+6U8Bj4RgzFfrXwPfN1xJwt2R2072xQDiceBliiWrTO/3EDkr0h1AnYF+xnh8ajwDMpvtnGz58tJacrg1gskP1yiJ1WWWcZ2N3n/Ch6cDdj6WnEQjOvZQW/mqHBZ33rGNil14duBTDwZtuIDGTMlogopZkykvoKHrWg==
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(366004)(396003)(39860400002)(346002)(376002)(9786002)(186003)(26005)(36756003)(316002)(110136005)(8936002)(478600001)(9746002)(2906002)(6666004)(86362001)(83380400001)(66946007)(426003)(38100700002)(2616005)(5660300002)(8676002)(66476007)(66556008)(4216001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?p7ybQ9PyDWdaFK525m0ZmP7cJiuFp0q1hY5M4DTY4JxSg8Z86wv1mLMxzK0d?=
- =?us-ascii?Q?0rftVcFFhsgahedzTGFW/r6gv6tSdzAhEKL1oHHPuFCcOMllqRbc2jYslcD5?=
- =?us-ascii?Q?t3eK+MiYZEZdlwxzQyEp2kEwbz7JfhifKznpSASEr0nCGCEJTTHiDe2uM6w/?=
- =?us-ascii?Q?Sdm0YPmT0aHhRXKJ94ImGg9dIFylzcMID0w/zgbAXAFCpoXtM9gKFSvB1bqc?=
- =?us-ascii?Q?9xY6iJWh7aufLYaIvFSrRgiOp1M+1PJt4V/DCXYiz54ydLkR1clsNrCokpns?=
- =?us-ascii?Q?UXAk4ra2bXpvbKH8Xh7ZH8eaAdP++WPbtI/PYbJCgZOWC/0XWK68uuW0Gp9I?=
- =?us-ascii?Q?7jOiD/DKMkeNN3hJ3kaJDvJHIh+7JpIILN9PQ9sj1tgK0sDbPGCfFeCPkvqD?=
- =?us-ascii?Q?07DtJJGIfDMBTyaUi6jAviQ3pGHrpgSVuCz2qLnj7zOqo77hwj/7hDZ2CNiC?=
- =?us-ascii?Q?y6BVHZHCpH6BGB4oYVPr/l49B7Eo8bcoI/jKaWeaWOmsnDOcw6TkKYRuMPE9?=
- =?us-ascii?Q?JkSPmRIZ9/YjjJiyRZ2DdxieqZiZ8PSHMtw+xfwbZGFHzqV3N7t+5n5PtBgW?=
- =?us-ascii?Q?w+aWhbkjB+yIm37tTk2gQ/VJJ0Yv5zQasorltYGVNtQeBiJPaoyMYjrCnJIl?=
- =?us-ascii?Q?Bsu3bQmg3YVy6XVwWM8MrMGYHsrSG9u0JAxUMwlPnNBV5W4BxbvwL1wgVzEL?=
- =?us-ascii?Q?E+wP369897t9U99JVW17Zqkd7ZsasH6y4vupaP7FnT2JaDWyERwjz71fI3ig?=
- =?us-ascii?Q?+z8sW35huxW+i1LaP/M53r1G2p2iFVzjXu8q1QBIyvrlGdCuIZQIxy5l4Ssg?=
- =?us-ascii?Q?Gur5xI1UMlTzjHRM/cmgXVWgMKDS4/B6DNpUpuEhGiODNhkY8kIaaM843Hql?=
- =?us-ascii?Q?V1VeEnqVxCqEtADBd/daNmdcZT/RCTJL3D6Zkfhtwwv+LGAM8ZkQ/dsUwuur?=
- =?us-ascii?Q?RiNmh16McPEi9XX9VYoUNN36kz1U9vQq7FHjHnoQ3SBdxmqLamq1f0f1yfBg?=
- =?us-ascii?Q?Bj8atuJjiAVYS+WxdnKicKy/EwdEN+MT2iBZhKcFjc0SvtPv5pspSY/43Zwq?=
- =?us-ascii?Q?P6d+EkOnLkbR4tmjWlFES4OnOhKhBWaPoBE1j5ta544yhl7mTudnjVR3oMre?=
- =?us-ascii?Q?6xD7hnDBZ/EqJWmEagf6ivKJ0wZlwhA5g5s/qkg9jd27+yBwaf71ljFh2Iav?=
- =?us-ascii?Q?3+jUtyV+BJyJVROGflZg9kOIr2MiJi57E0JEVKCaVUDVVbT+E6hI9jcBVTwk?=
- =?us-ascii?Q?cpje5mkCMFszr/DguAZ8pnENkZiOQlOFy59hWCZfE+xDDWRylvtAPzuz1m+q?=
- =?us-ascii?Q?2O9N+zsz2LSzPV2kpnlLj0F/?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?srDRx+WmPss1c55RBAO/xotQMOfBYeB5DeBcFgME2rbW/dduuFosDQTqTcwc?=
+ =?us-ascii?Q?HoHUqiB+YZ5RYO3FKTWy2Sq4tHVxbu4Vi1AQV8lL9GbwaZX8VnSDngYr38s/?=
+ =?us-ascii?Q?EiIcXpY96WyPUcrgE2R2uyx908czokHXlaVLzmGS4NfdXVFMieH0WopMZ+MH?=
+ =?us-ascii?Q?Z4HkvuIzDTonjCxXMz12ADHZjVgQrXtw6Cu7VKSKIXlzzWrp0Bc/2GmEVn7X?=
+ =?us-ascii?Q?zaS3D27utH7cajcnG5uXXYGJfboXbXIBJqFpSOxsmcP6X1+u/rIY2Jfmxb2i?=
+ =?us-ascii?Q?D1TgjTfUHjTQhfJSCVj+vYydpUnXrW5RJF2+FbiK43T06lKFEcJWpLiw2DiK?=
+ =?us-ascii?Q?387kyYwXhrx5WAkKYrYz5f6TB/foB5ZrqNJ6YuIgkxoO4RLZwrTdjXFE4nXM?=
+ =?us-ascii?Q?eviu+fGt/wK0Qp/nQ2LEAOBTwQVS+YXiqjwWDFYSueIU/cH8s7+IAo1nASIx?=
+ =?us-ascii?Q?t93INmQu90o4EyWIfYmBVSGCeffMJTrPrOGG8PY9y9rHHcU+JwIgokEHFgc/?=
+ =?us-ascii?Q?ltNwhs14rvOw67Fs6gvnBWboYW+5kowF7sRm3BfN8f0laMH/EH+KXvk/cVoM?=
+ =?us-ascii?Q?JjDT2rwab0hzbr6jE/BspFA8WDK5+wDLawOo3iKnb81xmOgRFkpPh1OTallo?=
+ =?us-ascii?Q?IZIOW62lbyHezDKFzhaXRiYNpMu0Eepx1kLVzKVptQw6Dz81oEBTyEZ16Kr4?=
+ =?us-ascii?Q?PvFPzNWy0yvzyzmdEbmwI0okpkQzfFNBO+BC7/Aoxx4f1Gn2QCcvIEemahzh?=
+ =?us-ascii?Q?X0xuAf+BZ6qyFCKA9EEFYXYGdV76jDdKibvd+NH25PE8wFVm5PV8W/T2Iari?=
+ =?us-ascii?Q?2+wgYDx9rvUni1U5ks8ejsH8rN9ZOvv8UL0ZckRY8QTJWyEQ+fCMv9Mtw0Ov?=
+ =?us-ascii?Q?hR0unjRBfOCuAn9RyOojCd5NPkWWEcyw5IBqAQ9EbCXMgPXggkh2qbHkXdIs?=
+ =?us-ascii?Q?vN/HCwn2Yeg2tkMkSyU7YYAeEcUqHCIyXnqn7VEw6p01r3+bpPS1HPL+PmgO?=
+ =?us-ascii?Q?ea/z/MAH9Z6kR+jsax88q5nZeA6LcyVRjhVIMO5YF8a6n/ouOPBXooRY6Ldo?=
+ =?us-ascii?Q?MnbO1Wjr7pfq3VTRZ4FFAXYeLYEzqJD71m/CgRZrfLLFrsAXcMPFo0ynJuv1?=
+ =?us-ascii?Q?H0XCobF+9CQkKTEskJAB167cWujLjol8NPOTesH9DMq/wvezN5YWEW5II4w6?=
+ =?us-ascii?Q?gFF5ft/jBKJE4LEGtwNQoRyfZzKXXvwyupKnmrBMMJ0qI5YhTdO5GYoNxAHJ?=
+ =?us-ascii?Q?0wpTHSPRyqvd5e3iGbQ9r//ehw5w/jQCEovm0rxQ0NNxmGuAq7CKtQC6xKlL?=
+ =?us-ascii?Q?sCkJdsV60RDEBVxqKGd5dtwD?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7d3d86a3-815d-4f0e-e3a9-08d92a182b21
+X-MS-Exchange-CrossTenant-Network-Message-Id: d62b007d-91ea-4c67-00bd-08d92a182b1f
 X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2021 00:55:54.3098
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2021 00:55:54.2182
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /By7hb9n+YM7byv1iXwLXmmJYXzFKlIlHzN/U2Yueo1MX9WO1oGSzYtbIHw+CwJ2
+X-MS-Exchange-CrossTenant-UserPrincipalName: LrUR60jv2/cEZa1ZYBkhlamV5eMrR1VZZGtVzDO5cwVCA1o8cInrmSqy9F6P06Rd
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB5539
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-EPROBE_DEFER is an internal kernel error code and it should not be leaked
-to userspace via the bind_store() sysfs. Userspace doesn't have this
-constant and cannot understand it.
+This is intended as a replacement API for device_bind_driver(). It has at
+least the following benefits:
 
-Further, it doesn't really make sense to have userspace trigger a deferred
-probe via bind_store(), which could eventually succeed, while
-simultaneously returning an error back.
+- Internal locking. Few of the users of device_bind_driver() follow the
+  locking rules
 
-Resolve this by preventing EPROBE_DEFER from triggering a deferred probe
-and simply relay the whole situation back to userspace as a normal -EAGAIN
-code.
+- Calls device driver probe() internally. Notably this means that devm
+  support for probe works correctly as probe() error will call
+  devres_release_all()
 
-Put this in the device_driver_attach() so the EPROBE_DEFER remains
-contained to dd.c and the probe() implementations.
+- struct device_driver -> dev_groups is supported
+
+- Simplified calling convention, no need to manually call probe().
+
+The general usage is for situations that already know what driver to bind
+and need to ensure the bind is synchronized with other logic. Call
+device_driver_attach() after device_add().
+
+If probe() returns a failure then this will be preserved up through to the
+error return of device_driver_attach().
 
 Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 ---
- drivers/base/dd.c | 39 ++++++++++++++++++++++++++++-----------
- 1 file changed, 28 insertions(+), 11 deletions(-)
+ drivers/base/base.h    | 1 -
+ drivers/base/dd.c      | 3 +++
+ include/linux/device.h | 2 ++
+ 3 files changed, 5 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/base/base.h b/drivers/base/base.h
+index e5f9b7e656c34b..404db83ee5ecb5 100644
+--- a/drivers/base/base.h
++++ b/drivers/base/base.h
+@@ -152,7 +152,6 @@ extern int driver_add_groups(struct device_driver *drv,
+ 			     const struct attribute_group **groups);
+ extern void driver_remove_groups(struct device_driver *drv,
+ 				 const struct attribute_group **groups);
+-int device_driver_attach(struct device_driver *drv, struct device *dev);
+ void device_driver_detach(struct device *dev);
+ 
+ extern char *make_class_name(const char *name, struct kobject *kobj);
 diff --git a/drivers/base/dd.c b/drivers/base/dd.c
-index 7fb58e6219b255..edda7aad43a3f7 100644
+index edda7aad43a3f7..9a5792527326b7 100644
 --- a/drivers/base/dd.c
 +++ b/drivers/base/dd.c
-@@ -516,12 +516,17 @@ static DEVICE_ATTR_RO(state_synced);
- enum {
- 	/* Set on output if the -ERR has come from a probe() function */
- 	PROBEF_DRV_FAILED = 1 << 0,
-+	/*
-+	 * Set on input to call driver_deferred_probe_add() if -EPROBE_DEFER
-+	 * is returned
-+	 */
-+	PROBEF_SCHEDULE_DEFER = 1 << 1,
- };
- 
- static int really_probe(struct device *dev, struct device_driver *drv,
- 			unsigned int *flags)
- {
--	int ret = -EPROBE_DEFER;
-+	int ret;
- 	int local_trigger_count = atomic_read(&deferred_trigger_count);
- 	bool test_remove = IS_ENABLED(CONFIG_DEBUG_TEST_DRIVER_REMOVE) &&
- 			   !drv->suppress_bind_attrs;
-@@ -533,15 +538,18 @@ static int really_probe(struct device *dev, struct device_driver *drv,
- 		 * wait_for_device_probe() right after that to avoid any races.
- 		 */
- 		dev_dbg(dev, "Driver %s force probe deferral\n", drv->name);
--		driver_deferred_probe_add(dev);
--		return ret;
-+		if (*flags & PROBEF_SCHEDULE_DEFER)
-+			driver_deferred_probe_add(dev);
-+		return -EPROBE_DEFER;
- 	}
- 
- 	ret = device_links_check_suppliers(dev);
--	if (ret == -EPROBE_DEFER)
--		driver_deferred_probe_add_trigger(dev, local_trigger_count);
--	if (ret)
-+	if (ret) {
-+		if (ret == -EPROBE_DEFER && *flags & PROBEF_SCHEDULE_DEFER)
-+			driver_deferred_probe_add_trigger(dev,
-+							  local_trigger_count);
- 		return ret;
-+	}
- 
- 	atomic_inc(&probe_count);
- 	pr_debug("bus: '%s': %s: probing driver %s with device %s\n",
-@@ -664,7 +672,9 @@ static int really_probe(struct device *dev, struct device_driver *drv,
- 	case -EPROBE_DEFER:
- 		/* Driver requested deferred probing */
- 		dev_dbg(dev, "Driver %s requests probe deferral\n", drv->name);
--		driver_deferred_probe_add_trigger(dev, local_trigger_count);
-+		if (*flags & PROBEF_SCHEDULE_DEFER)
-+			driver_deferred_probe_add_trigger(dev,
-+							  local_trigger_count);
- 		break;
- 	case -ENODEV:
- 	case -ENXIO:
-@@ -853,7 +863,7 @@ static int __device_attach_driver(struct device_driver *drv, void *_data)
- 	struct device_attach_data *data = _data;
- 	struct device *dev = data->dev;
- 	bool async_allowed;
--	int flags = 0;
-+	int flags = PROBEF_SCHEDULE_DEFER;
- 	int ret;
- 
- 	ret = driver_match_device(drv, dev);
-@@ -1043,7 +1053,9 @@ static void __device_driver_unlock(struct device *dev, struct device *parent)
-  * @dev: Device to attach it to
+@@ -471,6 +471,8 @@ static void driver_sysfs_remove(struct device *dev)
+  * (It is ok to call with no other effort from a driver's probe() method.)
   *
-  * Manually attach driver to a device. Will acquire both @dev lock and
-- * @dev->parent lock if needed. Returns 0 on success, -ERR on failure.
-+ * @dev->parent lock if needed. Returns 0 on success, -ERR on failure. If
-+ * EPROBE_DEFER is returned from probe() then no background probe is scheduled
-+ * and -EAGAIN will be returned.
+  * This function must be called with the device lock held.
++ *
++ * Callers should prefer to use device_driver_attach() instead.
   */
- int device_driver_attach(struct device_driver *drv, struct device *dev)
+ int device_bind_driver(struct device *dev)
  {
-@@ -1061,6 +1073,8 @@ int device_driver_attach(struct device_driver *drv, struct device *dev)
- 
- 	__device_driver_unlock(dev, dev->parent);
- 
-+	if (ret == -EPROBE_DEFER)
-+		return -EAGAIN;
+@@ -1077,6 +1079,7 @@ int device_driver_attach(struct device_driver *drv, struct device *dev)
+ 		return -EAGAIN;
  	return ret;
  }
++EXPORT_SYMBOL_GPL(device_driver_attach);
  
-@@ -1068,7 +1082,7 @@ static void __driver_attach_async_helper(void *_dev, async_cookie_t cookie)
+ static void __driver_attach_async_helper(void *_dev, async_cookie_t cookie)
  {
- 	struct device *dev = _dev;
- 	struct device_driver *drv;
--	unsigned int flags = 0;
-+	unsigned int flags = PROBEF_SCHEDULE_DEFER;
- 	int ret;
- 
- 	__device_driver_lock(dev, dev->parent);
-@@ -1083,6 +1097,7 @@ static void __driver_attach_async_helper(void *_dev, async_cookie_t cookie)
- 
- static int __driver_attach(struct device *dev, void *data)
- {
-+	unsigned int flags = PROBEF_SCHEDULE_DEFER;
- 	struct device_driver *drv = data;
- 	int ret;
- 
-@@ -1128,7 +1143,9 @@ static int __driver_attach(struct device *dev, void *data)
- 		return 0;
- 	}
- 
--	device_driver_attach(drv, dev);
-+	__device_driver_lock(dev, dev->parent);
-+	driver_probe_device(drv, dev, &flags);
-+	__device_driver_unlock(dev, dev->parent);
- 
- 	return 0;
- }
+diff --git a/include/linux/device.h b/include/linux/device.h
+index 38a2071cf77685..d03544f04aa9ee 100644
+--- a/include/linux/device.h
++++ b/include/linux/device.h
+@@ -847,6 +847,8 @@ static inline void *dev_get_platdata(const struct device *dev)
+  * Manual binding of a device to driver. See drivers/base/bus.c
+  * for information on use.
+  */
++int __must_check device_driver_attach(struct device_driver *drv,
++				      struct device *dev);
+ int __must_check device_bind_driver(struct device *dev);
+ void device_release_driver(struct device *dev);
+ int  __must_check device_attach(struct device *dev);
 -- 
 2.31.1
 
