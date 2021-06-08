@@ -2,130 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C75D939F80A
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 15:44:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B02E39F82C
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 15:53:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232984AbhFHNqZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 09:46:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34861 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233049AbhFHNqY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 8 Jun 2021 09:46:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623159871;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=A5paOCX7lF4w7/DDN73q8qlAZey0BD12yaLQLY3fG8Y=;
-        b=HvMw9IuGh0vc7C/c703ESVOZF4j+SHKn48EEmlSBuaz0ssRmH9w5Io+Y6iU40OIPAB6WJ+
-        uUyWgyRLUh8A2lbzc/4IUC0uewx58RxNl9niW1fkY2kAHhPD/VNkXv5KIB+jFaHsacLaYb
-        VeW4SXSpDACTU62OYEREA9fhw2ORhAY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-550-cW6FuMHGN_y8g2-Pvunv9g-1; Tue, 08 Jun 2021 09:44:29 -0400
-X-MC-Unique: cW6FuMHGN_y8g2-Pvunv9g-1
-Received: by mail-wr1-f70.google.com with SMTP id z3-20020adfdf830000b02901198337bc39so8890097wrl.0
-        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 06:44:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=A5paOCX7lF4w7/DDN73q8qlAZey0BD12yaLQLY3fG8Y=;
-        b=BqxfS1ZooJuSD8aH3/rJTNLVkAaXwVvBKJFB88k3/NdPz1DPXHFP6ZShYyWbkr/tiO
-         jSBo8amfdXrIvKpuUKWhGar7It1GPTuSWQ1A51Pb7hvj4p1YfUZvSkqOZ4NH+pcSDSah
-         lxcgRxVykKJrpsCC+5KBr24SDT5jJRnEWlRb6BFVIL58zVabejzaesHYL9P22IoPyOmb
-         AtRvh9j6lLRnpguRZbweVFq8QsIfWzl9tulruVJkzgdzbt0We91eW9D54mWita+SAYYT
-         /Fi1fbJNHSv08k6Sqpr+zz7lUx02VK/vOIqqNLJauexLi3esKdUW4ZMBDcoKRPzl88p0
-         cnLA==
-X-Gm-Message-State: AOAM530NVs+W2//f18M7+55eg5xc6Eeg3OS1y6c0zSgFg1l5XBpCU3ex
-        18FsoKuyawKSJ52OBuBk6Lzz2rLFteVm6UlfekIj55c9foc0Zq0hvF2MkPqK0xNYC/Jm+dKfqig
-        IRzprCm0O7qT2
-X-Received: by 2002:a1c:770b:: with SMTP id t11mr4365992wmi.79.1623159868319;
-        Tue, 08 Jun 2021 06:44:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzQ4k7LKRkmCCY0f1XvUXyPaQaBTTeWBOUxIheggqPU28l8+khIBLNZhCQK0mJgXqCT2XApuw==
-X-Received: by 2002:a1c:770b:: with SMTP id t11mr4365974wmi.79.1623159868149;
-        Tue, 08 Jun 2021 06:44:28 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id o17sm19012181wrp.47.2021.06.08.06.44.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Jun 2021 06:44:27 -0700 (PDT)
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Robin Murphy <robin.murphy@arm.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jason Wang <jasowang@redhat.com>
-References: <20210604092620.16aaf5db.alex.williamson@redhat.com>
- <815fd392-0870-f410-cbac-859070df1b83@redhat.com>
- <20210604155016.GR1002214@nvidia.com>
- <30e5c597-b31c-56de-c75e-950c91947d8f@redhat.com>
- <20210604160336.GA414156@nvidia.com>
- <2c62b5c7-582a-c710-0436-4ac5e8fd8b39@redhat.com>
- <20210604172207.GT1002214@nvidia.com>
- <2d1ad075-bec6-bfb9-ce71-ed873795e973@redhat.com>
- <20210607175926.GJ1002214@nvidia.com>
- <fdb2f38c-da1f-9c12-af44-22df039fcfea@redhat.com>
- <20210608131547.GE1002214@nvidia.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC] /dev/ioasid uAPI proposal
-Message-ID: <89d30977-119c-49f3-3bf6-d3f7104e07d8@redhat.com>
-Date:   Tue, 8 Jun 2021 15:44:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S233097AbhFHNz2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 09:55:28 -0400
+Received: from mail-dm6nam10on2072.outbound.protection.outlook.com ([40.107.93.72]:25184
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232841AbhFHNz1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Jun 2021 09:55:27 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mGLoHSb0QkkPn25S7yLoRWL7lRDQdR/vTiLxEdSA4u+xzYiMHQ7IRUQuIlSCkJf8gQ+HUJeC8Yva/rxjCEhhSze/G6Gdy9EB2/vWC3hZ1NVMohH7KBc04dt1bELAK5UR23+Luv3zTJ2Kkj6TwFXevOa/dO0ocf73HhF5O8upS9LRo8vWQiX7Fcj7Zt36TxlCGZpEp9D7Xmn2Mkn9cQGiHZy2WY4wGFn4XDWLVq4a/Ldm9wDphpdmjBSSat2Zq0+e4EXEP/ycvX+JVhiads5jnrZ+QXll6n63q/jDCbd0QRLLL1wSKXlsogP9OCm2qXWXXsjt3uF59QU9+xIyZe+GaA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TGcBAU2GjUHaUydc1bPNe/KDMObj7ynwPIkUZBmbLbM=;
+ b=gAVIWK/gt7m3ij74y0g58Hux8u5uvkgnupUquO3YmwSTAzd3VQZKfeldah4LsrrsZeuVcQ+AGdl/rKurrWfemHGjO4kJUfwk7c9m8asJa/IrnKKjZLP85YcV0SPSUXJ6+gBQ9MGs3HZLChJEKfmCDFjVklXuRZpN5q9w9BdLXRaBYeFygvNuyNPg2MdDpheBzJLEFio+meVLN8dSesLbtDaRjwgCOvO+DuqijZBViV+hs46k9Yy9JOcICUt38H/trORPT36xjrUCrQ+AbwY91S4MHbMps6I45Iy4hWM+pOs7z2N8oYtHUv3XbXSIEjXyqjOCO40Ck3AcGMSTqhfYgQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TGcBAU2GjUHaUydc1bPNe/KDMObj7ynwPIkUZBmbLbM=;
+ b=sffq3olZHhKsxTOmZ0kl7EVHO7NfwK25DXfTGm0aPQKyUojCjao4P/0E7fxvyl5VLOIRmiwbbglv3M5s4qtubRcfD1HPQbmBxHnLH9TpWytFXzATaMPAVo2V+XMT9Zh1DA8+z+lpiLmxxMlgG82hvg+24g3AF0e8Kw95Sz3x18WCIcCsrNr3Oyiu72d65u8K65Xi061y07yWB5vinMxe2mxXWJyqfqhKoAr5LrTLfgGGNpbJbxQl7BS2W14NrF+jRttEtKiB5SZTVR2wgU0F6TDTn585zPFDLkMnxQZTe+m65Sagb3mh79TvvTANi5Lc94TfF6PO8T24EmgrM3enQA==
+Authentication-Results: linuxfoundation.org; dkim=none (message not signed)
+ header.d=none;linuxfoundation.org; dmarc=none action=none
+ header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL0PR12MB5523.namprd12.prod.outlook.com (2603:10b6:208:1ce::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.23; Tue, 8 Jun
+ 2021 13:53:33 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e%7]) with mapi id 15.20.4219.021; Tue, 8 Jun 2021
+ 13:53:33 +0000
+Date:   Tue, 8 Jun 2021 10:53:31 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     kvm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>
+Subject: Re: [PATCH 01/10] driver core: Do not continue searching for drivers
+ if deferred probe is used
+Message-ID: <20210608135331.GH1002214@nvidia.com>
+References: <0-v1-324b2038f212+1041f1-vfio3a_jgg@nvidia.com>
+ <1-v1-324b2038f212+1041f1-vfio3a_jgg@nvidia.com>
+ <YL8RxPEMCDTXnPDg@kroah.com>
+ <20210608121654.GX1002214@nvidia.com>
+ <YL9tAdxK+RMhwPFi@kroah.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YL9tAdxK+RMhwPFi@kroah.com>
+X-Originating-IP: [47.55.113.94]
+X-ClientProxiedBy: MN2PR07CA0004.namprd07.prod.outlook.com
+ (2603:10b6:208:1a0::14) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-In-Reply-To: <20210608131547.GE1002214@nvidia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (47.55.113.94) by MN2PR07CA0004.namprd07.prod.outlook.com (2603:10b6:208:1a0::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.21 via Frontend Transport; Tue, 8 Jun 2021 13:53:33 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lqcAd-003s2d-Ss; Tue, 08 Jun 2021 10:53:31 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d1e94b18-8448-4b2f-8ac2-08d92a84ce15
+X-MS-TrafficTypeDiagnostic: BL0PR12MB5523:
+X-Microsoft-Antispam-PRVS: <BL0PR12MB552394A3785B0897A29C7B46C2379@BL0PR12MB5523.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: iJVlw8OqkMDpNw2zSVA4W4pJAxvaYezxp4ovflzhYzjbGzEWHcMR6pwmYJbGqEUBeGmNKNI5WWc04dHiEWgoFXpGOrbVkQnsMWkEEh+JbJRCacLrfCcH5O9Ikvt42WQiIucS3ljuLbMZApEROEGANG+XSkMDgZR92TKfThCr3r9OHMau8j7SerqtlTGpoU+Kjum+N6pBnqkJt8jr4Wr0my8+H/jFPzYdXFXSXTkkcxdQsXMUVRiaWjSQCQVCXE/GFz2FOgkW+54fC/dPl4/wRGm8Aqh6ba1OX2knFRZN4C43FGVvF2FauEySgeYN3svZ6eXU2jr26rtjlvTz369D4zHDgQLFSqytmjN5kQKgUdBEvWLC3rxwTyxzyWPHTVKFUZUKjTcpyuKOjDMMF/42OZpJ1hzjVeFt0MFoISy4wDNBc2U2wQQ+zQFwZaqVsbH0+dMMuwLyFdZlHkqvCMPRCxZh1iqQYIBSImQbC2fALGixJhsJhUQN2LpwUg9s1zuNVYfBnDNBrHebD2jd+/UtwCAeX2x/sbmwap3ZRw2tcQ+EPaVI9MA6r1toNBEn/2rRH6H16+kg+bhDNTz8I31swkQ6OW/EuqHCPqUo25htTr7SvikfJ6Gn3zNnMHi+XDEbTv6uvuWRufDn3pxKp8kc2g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(8936002)(8676002)(6916009)(498600001)(4326008)(426003)(5660300002)(1076003)(38100700002)(86362001)(66476007)(186003)(36756003)(26005)(33656002)(66946007)(66556008)(9786002)(2906002)(9746002)(2616005)(51383001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?EUZO4YyEugAKH4OzeVS3dwfIpsHMxL9ntu3MSeozAYCBcNYm4bBKaVgzX9of?=
+ =?us-ascii?Q?HxJDTxsT7U24DKLQRD5ms7cdBVpGxTLlGPGcbULMXssKnz/+Bf+NO2bmJOUQ?=
+ =?us-ascii?Q?CK1RHCj1G6wawEVxYwQ2R/fML+HAo+QBcqncupyHAZV1Akcjnkju++1P3eJz?=
+ =?us-ascii?Q?9NUWY+iUdACIjZDox3KFH3Fxzp8uWd9oskGdsF3rhJTUO43jlFzC3bwxlgYQ?=
+ =?us-ascii?Q?ZEsXX/2VwMXQLVFSXr9kdUft1OuYvQiV5pwEFt6D3sAW2/AVTNZIypfwx+h6?=
+ =?us-ascii?Q?+ksUO4QAn48ZHkJPYc1+Uf2caN1oAyDR/gVLv68xSlYhlo/DHXal244ETakC?=
+ =?us-ascii?Q?g+w408TzBQCVytb2S1kHSqVGLm4ltQeTkQtPer0QRmQwS3RtRjk04KNu9Y4F?=
+ =?us-ascii?Q?VHy8u4DqFoq9OezMW0OfBPVfN8ZSb+snAZBRLhXFt2PR/qKYiodsxR4Yk8oC?=
+ =?us-ascii?Q?Iarwsr4JcbojmtL7XX8R1fCg3KYh1KMl9TBD1dY/hpYn4Z4pG/jj0wl1jdHC?=
+ =?us-ascii?Q?+nf1q3PvFn9XcGsAGyZP+Gy7KZq4hgObjsm1nYMa8N+CzBmlZ0h9ubwZ51KS?=
+ =?us-ascii?Q?twlIRqYKoFLstwTweGp5UKQpziEqEIrv8V29aJYchVchSyqUw88DV3qVfPDq?=
+ =?us-ascii?Q?nMQJNvayByCaORbkOPD+oVvXNVjpKwvIfnPaRofDevHY3r31TjHjw+0sFe2/?=
+ =?us-ascii?Q?a7H0R+AGSrDzKhH5hZWVTRx0i7ZyFaLKfIXuMTlTP+cIwdggntdDmhs5uUbF?=
+ =?us-ascii?Q?D/yki6/IuYmv9dPxh9AvEHpi2keI6fChkOoel9cn15+k/S4QyB5fXLcLkW2m?=
+ =?us-ascii?Q?94JwUaLUYq0R9HxzaTbj+c6NpDEe2dkUqxGvo9R6pT09I59gHWuBj2xn1o7f?=
+ =?us-ascii?Q?kNQdIVQfZNZG7PjZl49XSzVi5w2qsdll6yVUZwpES/P7QJPp7CprvGQDk09H?=
+ =?us-ascii?Q?KxCdZpYQMdGXY7TERayORnRUCGYwGAs1baOYqZln88MiAuKiCCMTs/K/ir2K?=
+ =?us-ascii?Q?pPBCmd9U1OuO0tlOyOlBdpAkJIr7eRETE0BrJ5El2D1CweQi6XB+cRbCg9/b?=
+ =?us-ascii?Q?FmpKY+gXbc38eJYNR9m1Vg+KOEYBnbKD0bsa9ZEKQV0LWWInpMqcedZPl70E?=
+ =?us-ascii?Q?INF375AQe16KTk1EsdSknXYM8d+H0ZCNWuq/+WgL0fatG4fjkenlvVhgZ+ud?=
+ =?us-ascii?Q?c9M3z/P7QOeYBeezYdBMdPqKbAvLldj0l0MZeKZgj37BkUj/nm/+B2zexLyT?=
+ =?us-ascii?Q?srwgN1m3D7ULlBT0vzXS3U60okjRHcZ64BnY/aXamjfkgurR5GSmxlNoJM27?=
+ =?us-ascii?Q?rpVRv5X8YDiSiOYtyNIh/a4s?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d1e94b18-8448-4b2f-8ac2-08d92a84ce15
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2021 13:53:33.2468
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EKM1M9s4/OJSIUmS8Uul1xXOH3KAOKwSruDYxfy3uIAp/5U6BSXyWYy0yTV9xSg2
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB5523
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/06/21 15:15, Jason Gunthorpe wrote:
-> On Tue, Jun 08, 2021 at 09:56:09AM +0200, Paolo Bonzini wrote:
+On Tue, Jun 08, 2021 at 03:13:37PM +0200, Greg Kroah-Hartman wrote:
+
+> > If multiple drivers are matchable what creates determinism in which
+> > will bind?
 > 
->>>> Alternatively you can add a KVM_DEV_IOASID_{ADD,DEL} pair of ioctls. But it
->>>> seems useless complication compared to just using what we have now, at least
->>>> while VMs only use IOASIDs via VFIO.
->>>
->>> The simplest is KVM_ENABLE_WBINVD(<fd security proof>) and be done
->>> with it.
->>
->> The simplest one is KVM_DEV_VFIO_GROUP_ADD/DEL, that already exists and also
->> covers hot-unplug.  The second simplest one is KVM_DEV_IOASID_ADD/DEL.
-> 
-> This isn't the same thing, this is back to trying to have the kernel
-> set policy for userspace.
+> Magic :)
 
-If you want a userspace policy then there would be three states:
+I suppose you mean something like this code:
 
-* WBINVD enabled because a WBINVD-enabled VFIO device is attached.
+        /* Probe the USB device with the driver in hand, but only
+         * defer to a generic driver in case the current USB
+         * device driver has an id_table or a match function; i.e.,
+         * when the device driver was explicitly matched against
+         * a device.
+         *
+         * If the device driver does not have either of these,
+         * then we assume that it can bind to any device and is
+         * not truly a more specialized/non-generic driver, so a
+         * return value of -ENODEV should not force the device
+         * to be handled by the generic USB driver, as there
+         * can still be another, more specialized, device driver.
+         *
+         * This accommodates the usbip driver.
+         *
+         * TODO: What if, in the future, there are multiple
+         * specialized USB device drivers for a particular device?
+         * In such cases, there is a need to try all matching
+         * specialised device drivers prior to setting the
+         * use_generic_driver bit.
+         */
+        error = udriver->probe(udev);
+        if (error == -ENODEV && udriver != &usb_generic_driver &&
+            (udriver->id_table || udriver->match)) {
+                udev->use_generic_driver = 1;
+                return -EPROBE_DEFER;
+        }
 
-* WBINVD potentially enabled but no WBINVD-enabled VFIO device attached
+So it does use EPROBE_DEFER to recycle through another attempt at
+driver binding. Yikes. Why didn't it return -ENODEV I wonder?
 
-* WBINVD forcefully disabled
+But OK, I can think of no way to find all the cases like this to even
+try to do something else at this point, so this has to be
+preserved. I'll try to do that, maybe add a comment or two.
 
-KVM_DEV_VFIO_GROUP_ADD/DEL can still be used to distinguish the first 
-two.  Due to backwards compatibility, those two describe the default 
-behavior; disabling wbinvd can be done easily with a new sub-ioctl of 
-KVM_ENABLE_CAP and doesn't require any security proof.
-
-The meaning of WBINVD-enabled is "won't return -ENXIO for the wbinvd 
-ioctl", nothing more nothing less.  If all VFIO devices are going to be 
-WBINVD-enabled, then that will reflect on KVM as well, and I won't have 
-anything to object if there's consensus on the device assignment side of 
-things that the wbinvd ioctl won't ever fail.
-
-Paolo
-
+Jason
