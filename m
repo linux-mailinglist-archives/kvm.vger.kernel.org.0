@@ -2,93 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A8B439EAAA
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 02:24:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C26DD39EAB3
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 02:30:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230282AbhFHA0m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Jun 2021 20:26:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42936 "EHLO
+        id S230525AbhFHAco (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Jun 2021 20:32:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230209AbhFHA0m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Jun 2021 20:26:42 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00F04C061574
-        for <kvm@vger.kernel.org>; Mon,  7 Jun 2021 17:24:35 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id x73so14364448pfc.8
-        for <kvm@vger.kernel.org>; Mon, 07 Jun 2021 17:24:35 -0700 (PDT)
+        with ESMTP id S230266AbhFHAcn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Jun 2021 20:32:43 -0400
+Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C72BC061574;
+        Mon,  7 Jun 2021 17:30:40 -0700 (PDT)
+Received: by mail-ot1-x32f.google.com with SMTP id i12-20020a05683033ecb02903346fa0f74dso18601779otu.10;
+        Mon, 07 Jun 2021 17:30:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=TolwmxxCwECy0smx+kbv10pYUmgnzqDOVNxYM1QT1F0=;
-        b=A/n/bnZtrmuheCMwGi0R73jFYpb0hfmrajekvBgNje1VVmeFNbTlzMhtRlaQ3GXDOa
-         CcBxQIfze8Y/iwVoaCIdLAGySPhv9d5RD8uBASy7bFdf9zZv6RaL/DgKNWLabq/zqDQT
-         V+RBHuKz2wVPQQEzTVkk6R4iI7rHgDGppiGpvqys5h5jniTuFykkT3X8fPk1HrR5QsLC
-         qF0DQbJi38Dpk++g9Zb3ilDaDXF6qCXJqo98Hyce4NETdM4mjZZ5Ig5Crd2GFQLgR7CO
-         LuwXSC26QT0IwlWF+6l9w+f350ggAoulEPkztYbV8GX/0b3zHJAoOArdXSK7ljfWflLX
-         gcKA==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xoUB7E0rhgyrtTh314wlLP8BH8N4shqndYrHMc1LScU=;
+        b=TodGq3kIFaqpAdnU4+17cEAcmbkUPEqr1PWEaFpZ4e5/weQugF0btp8HLBMHvH1U81
+         EU4/v8F6wcU6D2O9gMd4jK5julVDBQ8VMaUtobU0TegqfbwM9pt25nl2TCfUiXKYb39E
+         nCp67OGd1ic7vVxIyYPE4FTM6h2MZ5KNC18H+kWwQxUxRNdCOeFhj3MGL2xZHJ0nTPMo
+         QLTvs/9gMHq8ZFBIR39DEf/uWrWLphdy8nP4WLP69ijlCDxz6M77XuCkbmEnN7dVuDed
+         X9ndo+V6rjqsqyy410ItCSogRXearJHVDF1EHLbOR1PUPwC+v5nhswPxiloYpTV/aCNB
+         NVUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=TolwmxxCwECy0smx+kbv10pYUmgnzqDOVNxYM1QT1F0=;
-        b=bhJpkef0krAGe29y30mm0i1s7U7FdRnkc2vxtV8jr/E3DS2psaRFL6U/ymkyb0vC0L
-         lYlOGBrE7bHo9Mxox9aolhXQ6fYmgl4bq8y+s0CTz4jQitTOugWFbsXLewuGG75VYOjK
-         v7UZ6P+AUPY8yU4CLkPvVWhXggHBxO3mYtQ+Ir6vBKc+J/owrh8lcwKoo3O3JdBDRzs9
-         GEIdo1sH4d//QmsXiPZjbiTZf/urPrMaVdVVqG9fnXkOP4eztp28BtUI52c5LQFp2F75
-         /KNvHinOjNm1QvvcDm3h7W4D3HtkMpMh7sJ3Ei60+M8eRx5lAsqmhEvY6kx6SRBN5Vfe
-         BvOw==
-X-Gm-Message-State: AOAM5339NKJcaKgKJ0xtyRMr8zhh/I50tCoT1sP10apxyUE9j5UxoOpR
-        E53RJgU67MqkaOitFO46l9WOZQ==
-X-Google-Smtp-Source: ABdhPJxy1YkNVNbvvp6EY6KPyEDFSSwdlBsdAEG1LLiPdkRjPiUYe018f8t+SdsXVohBgRb65v82uA==
-X-Received: by 2002:a63:aa48:: with SMTP id x8mr20008889pgo.359.1623111875257;
-        Mon, 07 Jun 2021 17:24:35 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id p24sm7228678pfh.17.2021.06.07.17.24.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Jun 2021 17:24:34 -0700 (PDT)
-Date:   Tue, 8 Jun 2021 00:24:30 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Hou Wenlong <houwenlong.hwl@antgroup.com>,
-        Lai Jiangshan <laijs@linux.alibaba.com>
-Subject: Re: [kvm-unit-tests PATCH V3] x86: Add a test to check effective
- permissions
-Message-ID: <YL64voHPNZofL/s+@google.com>
-References: <6c87d221-8b6c-56a7-e8d1-31ad8a8379e3@linux.alibaba.com>
- <20210605174901.157556-1-jiangshanlai@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xoUB7E0rhgyrtTh314wlLP8BH8N4shqndYrHMc1LScU=;
+        b=C4hCsTIXbSd/UIwXT4ViriIC8kk0+6OsYeoAvn3UI9vUp65zHqC11cZdjvQvW10Qfg
+         7qcVJf4SPLIYcyqgQALWig+Qz3MLekBiQGI9dR8cOvYzrd5bGDqpfq/evPfKnsvz2yzj
+         a5mXd6cty3HFDfe7qUV+6wD4afwTLygJPeseN2UAD5b98i+3Jc0UhyKYctzb6nCpcKCC
+         7l4r27MGWwJrVmls2CI/F4QGUA/mbi0Luy0eyOzDXGtd8VLkUayjsrrgtO6c4L3j+KPx
+         sRNVhyHwl+KOdeBHTBz+hKTN7GSvNEvJUQ6q2NA2ZboeIdPCeW8DXotPHUNFp8j5ap2y
+         ZVmA==
+X-Gm-Message-State: AOAM533ngrH/o6ulT2yEml89Baq7H4FtRDlya9qLMdUNEtqgJc0yYUGC
+        ErQQ6NkmRG1mj4jQebBzZpxR29eqh/DHp7fvMNE=
+X-Google-Smtp-Source: ABdhPJz4YiQfYwm25QPzKlI8Xy6ZhDG9CiScXQ4LY3iZOx9/l0+5MibPrQICrOkR3K3anfhpHy0V6s7vObi7M7tgGh0=
+X-Received: by 2002:a9d:5786:: with SMTP id q6mr15748398oth.56.1623112239557;
+ Mon, 07 Jun 2021 17:30:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210605174901.157556-1-jiangshanlai@gmail.com>
+References: <1622710841-76604-1-git-send-email-wanpengli@tencent.com>
+ <YLjzJ59HPqGfhhvm@google.com> <CANRm+CxSAD9+050j-1e1_f3g1QEwrSaee6=2cB6qseBXfDkgPA@mail.gmail.com>
+ <YLpIni1VKYYfUE8D@google.com>
+In-Reply-To: <YLpIni1VKYYfUE8D@google.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 8 Jun 2021 08:30:27 +0800
+Message-ID: <CANRm+CzMNctK1nWfTf10ch2TDB-6Trh4JSOGqONm4zjnctoP-g@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: LAPIC: write 0 to TMICT should also cancel
+ vmx-preemption timer
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jun 06, 2021, Lai Jiangshan wrote:
-> From: Lai Jiangshan <laijs@linux.alibaba.com>
-> 
-> Add a test to verify that KVM correctly handles the case where two or
-> more non-leaf page table entries point at the same table gfn, but with
-> different parent access permissions.
-> 
-> For example, here is a shared pagetable:
->    pgd[]   pud[]        pmd[]            virtual address pointers
->                      /->pmd1(u--)->pte1(uw-)->page1 <- ptr1 (u--)
->         /->pud1(uw-)--->pmd2(uw-)->pte2(uw-)->page2 <- ptr2 (uw-)
->    pgd-|           (shared pmd[] as above)
->         \->pud2(u--)--->pmd1(u--)->pte1(uw-)->page1 <- ptr3 (u--)
->                      \->pmd2(uw-)->pte2(uw-)->page2 <- ptr4 (u--)
->   pud1 and pud2 point to the same pmd table
-> 
-> The test is useful when TDP is not enabled.
-> 
-> Co-Developed-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
-> Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
-> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
-> ---
+On Fri, 4 Jun 2021 at 23:37, Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Fri, Jun 04, 2021, Wanpeng Li wrote:
+> > On Thu, 3 Jun 2021 at 23:20, Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Thu, Jun 03, 2021, Wanpeng Li wrote:
+> > > > From: Wanpeng Li <wanpengli@tencent.com>
+> > > >
+> > > > According to the SDM 10.5.4.1:
+> > > >
+> > > >   A write of 0 to the initial-count register effectively stops the local
+> > > >   APIC timer, in both one-shot and periodic mode.
+> > > >
+> > > > The lapic timer oneshot/periodic mode which is emulated by vmx-preemption
+> > > > timer doesn't stop since vmx->hv_deadline_tsc is still set.
+> > >
+> > > But the VMX preemption timer is only used for deadline, never for oneshot or
+> > > periodic.  Am I missing something?
+> >
+> > Yes, it is upstream.
+>
+> Huh.  I always thought 'tscdeadline' alluded to the timer being in deadline mode
+> and never looked closely at the arming code.  Thanks!
+>
+> Maybe name the new helper cancel_apic_timer() to align with start_apic_timer()
+> and restart_apic_timer()?  With that:
+>
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
 
-Awesome, thanks!
+Do it in v2, thanks.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+    Wanpeng
