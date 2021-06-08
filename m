@@ -2,51 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 47D3B39FB43
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 17:54:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1081139FB4D
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 17:56:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232487AbhFHP4A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 11:56:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50092 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232269AbhFHPz7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Jun 2021 11:55:59 -0400
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F40BC06178B
-        for <kvm@vger.kernel.org>; Tue,  8 Jun 2021 08:54:06 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id c5so22091542wrq.9
-        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 08:54:06 -0700 (PDT)
+        id S233142AbhFHP5O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 11:57:14 -0400
+Received: from mail-wr1-f43.google.com ([209.85.221.43]:39799 "EHLO
+        mail-wr1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231548AbhFHP5N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Jun 2021 11:57:13 -0400
+Received: by mail-wr1-f43.google.com with SMTP id l2so22166002wrw.6
+        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 08:55:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=vY60FWlLV1xpe2gtDWbEapubpchtwsNSBFFHT7yOxe0=;
-        b=qfSlHca66UxSFszZIYf1Ho34VW7NdqKkuU+Pc8aTRoFu2WAU8C7R5vlR511TO3aKYr
-         kroybsX+yhcmbjt2IlLgNnQyKw0ZOnCws+R1zr3ywgOUz849ROejIKxhybmKnv35DELZ
-         RfP8PTeca+tIUXQI0EWgp8V2dYYsKqx3T9LOmH/cg0FmJ+Hu53AIaZ19HmoIEvkat938
-         DQiEIaOKoBAAGW3iJRpIigw7h6Y6v0/rxv/yzhJE1hUuY96aGWcRtfcaZfTX6QbW/wuT
-         vDqpUUDN/7RRZTZxr/NgRPEWBhBw+zaNf4KTdybDBajcKU32apwOlG3cP00Yvu3r9GpF
-         09Lw==
+        bh=KHEWXTvaTgGt1BVLxIfWQF63jGSa3hhv5Aeen36ISYE=;
+        b=JFN/xiy0BsolYRMuvUu/vBBp8n6h7jDdIzTqFsPh8onZqCMTUkEyfq6+dShb/4jooa
+         4BfzwPmDLIIGk+APV232oFKjNH8TwCxOn945UJ6HhpeB4bqxxI4sANfxPmyky5JN68ci
+         /AeQ6D6u41JuYGXQIHDrsSjX9YypR07kCATFqSrHzVd6Hna45k6evaAFB/Ta/+knrIbg
+         E9OfDY92p3KvHMlQALtdInffDDrQ4cNn9DMFrpOICKsXVojgNB0T664irg2FH/xP1tkt
+         nFMHjilT2SK06OxmVp0ISWLldj3mSlNHtriZZyZOaHWdkzaZHNlefhrr6r7IKTaPn8iE
+         1tsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=vY60FWlLV1xpe2gtDWbEapubpchtwsNSBFFHT7yOxe0=;
-        b=QMPBnq4gmwjr0qwQx2YeJ8HMpYc1FJm/uPUquzJQM3CVx04ULqfX0diUhtqtifY4Q6
-         2tLl6RC2UBm75JwZsKM8T+d6e5FOoiIjqL9Or+yen1Dl0pd+4wPqfBTH9fvgm3zTPJ2Y
-         Zl1LBqGwYIxLFsKvPyot8aXTBASpyEmUbvw9iM39r/dQjKucwbYH2yyy/IO/RAoasIPr
-         qQih6nfCsHhXPgwT6/gY8PT2e9G56Bqhrm0/NPH7ghj6Kb0vlOCOVfchPBPTdfBCxhub
-         yHo0LEUHVHHAKqTSRcobjdULuNlIeh/M0RTqyGgLoVQlquF7Xuz5kiNtGhMy0yx2h3tA
-         AL4w==
-X-Gm-Message-State: AOAM531sI9geohwYJlLcP0zTmGtRtzIBUbAIURBYvjw6mp6o6Lp4xzIU
-        tAUv4aU5cat6Z+k9jNMHF7MkaA==
-X-Google-Smtp-Source: ABdhPJyKyuA8FB6TyDgi8X2Ffbrwu7e7pRxSFAZugb7LawFRVBOmbO7jA2vBPjlJibJuploId8Mjkw==
-X-Received: by 2002:a5d:6b81:: with SMTP id n1mr23036101wrx.144.1623167644621;
-        Tue, 08 Jun 2021 08:54:04 -0700 (PDT)
+        bh=KHEWXTvaTgGt1BVLxIfWQF63jGSa3hhv5Aeen36ISYE=;
+        b=lzCiDSCtQFk73t75jpjLQjSErokc/6U1+mnb1Mr/5GnTaoLW1c21aUM9EfEJ7jzCvz
+         ID7XDzjkvWn0DEjLxd8sUE6qTGJrkCNEf1PNLeR+3NC2NfPiHunwHCTRudEJ9WpuwMZp
+         nh2wIomVWQPxoxOYEAOsWif4QhAdirVDGBC7TT41lK8mdbWI5RI3XqmNYkNdAAdLyOrq
+         vQasaTXUoSUttkNhuC4f3oipHz+v5rviRZ2mIGHJRR8sAxZsnJxKeHe+ex1V76onwP3N
+         aIwV4Gs4DLgaXSIdeq7I3WlO1cavqG1n3Hh1Gjs4L/+KqdoJ6+lrRA8mo2fm6f0Jlq04
+         1YyA==
+X-Gm-Message-State: AOAM533ZUfpslWLR3e29v+y/B77UaZ+UXt+0VySOhqsoKj6omI6XO7br
+        6RJ232HkYB7GXosg1cT+izJiRQ==
+X-Google-Smtp-Source: ABdhPJxIqvImjc8EYF1I8fYhJ8WzhBv5pnbK6ynBNA3UWFEPYAyfdGSMfbYuZieceMItwHj8Wy0EPA==
+X-Received: by 2002:adf:f94c:: with SMTP id q12mr6581214wrr.417.1623167646586;
+        Tue, 08 Jun 2021 08:54:06 -0700 (PDT)
 Received: from localhost.localdomain (adsl-84-226-111-173.adslplus.ch. [84.226.111.173])
-        by smtp.gmail.com with ESMTPSA id l31sm3314180wms.16.2021.06.08.08.54.03
+        by smtp.gmail.com with ESMTPSA id l31sm3314180wms.16.2021.06.08.08.54.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jun 2021 08:54:04 -0700 (PDT)
+        Tue, 08 Jun 2021 08:54:05 -0700 (PDT)
 From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
 To:     maz@kernel.org
 Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
@@ -57,9 +54,9 @@ Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         lorenzo.pieralisi@arm.com, salil.mehta@huawei.com,
         shameerali.kolothum.thodi@huawei.com, jonathan.cameron@huawei.com,
         Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [RFC PATCH 4/5] KVM: arm64: Pass hypercalls to userspace
-Date:   Tue,  8 Jun 2021 17:48:05 +0200
-Message-Id: <20210608154805.216869-5-jean-philippe@linaro.org>
+Subject: [RFC PATCH 5/5] KVM: arm64: Pass PSCI calls to userspace
+Date:   Tue,  8 Jun 2021 17:48:06 +0200
+Message-Id: <20210608154805.216869-6-jean-philippe@linaro.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210608154805.216869-1-jean-philippe@linaro.org>
 References: <20210608154805.216869-1-jean-philippe@linaro.org>
@@ -69,203 +66,183 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let userspace request to handle all hypercalls that aren't handled by
-KVM, by setting the KVM_CAP_ARM_HVC_TO_USER capability.
+Let userspace request to handle PSCI calls, by setting the new
+KVM_CAP_ARM_PSCI_TO_USER capability.
 
-With the help of another capability, this will allow userspace to handle
-PSCI calls.
+SMCCC probe requires PSCI v1.x. If userspace only implements PSCI v0.2,
+the guest won't query SMCCC support through PSCI and won't use the
+spectre workarounds. We could hijack PSCI_VERSION and pretend to support
+v1.0 if userspace does not, then handle all v1.0 calls ourselves
+(including guessing the PSCI feature set implemented by the guest), but
+that seems unnecessary. After all the API already allows userspace to
+force a version lower than v1.0 using the firmware pseudo-registers.
+
+The KVM_REG_ARM_PSCI_VERSION pseudo-register currently resets to either
+v0.1 if userspace doesn't set KVM_ARM_VCPU_PSCI_0_2, or
+KVM_ARM_PSCI_LATEST (1.0).
 
 Suggested-by: James Morse <james.morse@arm.com>
 Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 ---
-
-Notes on this implementation:
-
-* A similar mechanism was proposed for SDEI some time ago [1]. This RFC
-  generalizes the idea to all hypercalls, since that was suggested on
-  the list [2, 3].
-
-* We're reusing kvm_run.hypercall. I copied x0-x5 into
-  kvm_run.hypercall.args[] to help userspace but I'm tempted to remove
-  this, because:
-  - Most user handlers will need to write results back into the
-    registers (x0-x3 for SMCCC), so if we keep this shortcut we should
-    go all the way and synchronize them on return to kernel.
-  - QEMU doesn't care about this shortcut, it pulls all vcpu regs before
-    handling the call.
-  - SMCCC uses x0-x16 for parameters.
-  x0 does contain the SMCCC function ID and may be useful for fast
-  dispatch, we could keep that plus the immediate number.
-
-* Should we add a flag in the kvm_run.hypercall telling whether this is
-  HVC or SMC?  Can be added later in those bottom longmode and pad
-  fields.
-
-* On top of this we could share with userspace which HVC ranges are
-  available and which ones are handled by KVM. That can actually be
-  added independently, through a vCPU/VM device attribute (which doesn't
-  consume a new ioctl):
-  - userspace issues HAS_ATTR ioctl on the VM fd to query whether this
-    feature is available.
-  - userspace queries the number N of HVC ranges using one GET_ATTR.
-  - userspace passes an array of N ranges using another GET_ATTR.
-    The array is filled and returned by KVM.
-
-* Untested for AArch32 guests.
-
-[1] https://lore.kernel.org/linux-arm-kernel/20170808164616.25949-12-james.morse@arm.com/
-[2] https://lore.kernel.org/linux-arm-kernel/bf7e83f1-c58e-8d65-edd0-d08f27b8b766@arm.com/
-[3] https://lore.kernel.org/linux-arm-kernel/f56cf420-affc-35f0-2355-801a924b8a35@arm.com/
----
- Documentation/virt/kvm/api.rst    | 17 +++++++++++++++--
- arch/arm64/include/asm/kvm_host.h |  1 +
- include/kvm/arm_psci.h            |  4 ++++
- include/uapi/linux/kvm.h          |  1 +
- arch/arm64/kvm/arm.c              |  5 +++++
- arch/arm64/kvm/hypercalls.c       | 28 +++++++++++++++++++++++++++-
- 6 files changed, 53 insertions(+), 3 deletions(-)
+ Documentation/virt/kvm/api.rst      | 14 ++++++++++++++
+ Documentation/virt/kvm/arm/psci.rst |  1 +
+ arch/arm64/include/asm/kvm_host.h   |  1 +
+ include/kvm/arm_hypercalls.h        |  1 +
+ include/uapi/linux/kvm.h            |  1 +
+ arch/arm64/kvm/arm.c                | 10 +++++++---
+ arch/arm64/kvm/hypercalls.c         |  2 +-
+ arch/arm64/kvm/psci.c               | 13 +++++++++++++
+ 8 files changed, 39 insertions(+), 4 deletions(-)
 
 diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index e4fe7fb60d5d..3d8c1661e7b2 100644
+index 3d8c1661e7b2..f24eb70e575d 100644
 --- a/Documentation/virt/kvm/api.rst
 +++ b/Documentation/virt/kvm/api.rst
-@@ -5228,8 +5228,12 @@ to the byte array.
- 			__u32 pad;
- 		} hypercall;
+@@ -6907,3 +6907,17 @@ available to the guest on migration.
+ This capability indicates that KVM can pass unhandled hypercalls to userspace,
+ if the VMM enables it. Hypercalls are passed with KVM_EXIT_HYPERCALL in
+ kvm_run::hypercall.
++
++8.34 KVM_CAP_ARM_PSCI_TO_USER
++-----------------------------
++
++:Architectures: arm64
++
++When the VMM enables this capability, all PSCI calls are passed to userspace
++instead of being handled by KVM. Capability KVM_CAP_ARM_HVC_TO_USER must be
++enabled first.
++
++Userspace should support at least PSCI v1.0. Otherwise SMCCC features won't be
++available to the guest. Userspace does not need to handle the SMCCC_VERSION
++parameter for the PSCI_FEATURES function. The KVM_ARM_VCPU_PSCI_0_2 vCPU
++feature should be set even if this capability is enabled.
+diff --git a/Documentation/virt/kvm/arm/psci.rst b/Documentation/virt/kvm/arm/psci.rst
+index d52c2e83b5b8..110011d1fa3f 100644
+--- a/Documentation/virt/kvm/arm/psci.rst
++++ b/Documentation/virt/kvm/arm/psci.rst
+@@ -34,6 +34,7 @@ The following register is defined:
+   - Allows any PSCI version implemented by KVM and compatible with
+     v0.2 to be set with SET_ONE_REG
+   - Affects the whole VM (even if the register view is per-vcpu)
++  - Defaults to PSCI 1.0 if userspace enables KVM_CAP_ARM_PSCI_TO_USER.
  
--Unused.  This was once used for 'hypercall to userspace'.  To implement
--such functionality, use KVM_EXIT_IO (x86) or KVM_EXIT_MMIO (all except s390).
-+On x86 this was once used for 'hypercall to userspace'.  To implement such
-+functionality, use KVM_EXIT_IO (x86) or KVM_EXIT_MMIO (all except s390).
-+
-+On arm64 it is used for hypercalls, when the KVM_CAP_ARM_HVC_TO_USER capability
-+is enabled. 'nr' contains the HVC or SMC immediate. 'args' contains registers
-+x0 - x5. The other parameters are unused.
- 
- .. note:: KVM_EXIT_IO is significantly faster than KVM_EXIT_MMIO.
- 
-@@ -6894,3 +6898,12 @@ This capability is always enabled.
- This capability indicates that the KVM virtual PTP service is
- supported in the host. A VMM can check whether the service is
- available to the guest on migration.
-+
-+8.33 KVM_CAP_ARM_HVC_TO_USER
-+----------------------------
-+
-+:Architecture: arm64
-+
-+This capability indicates that KVM can pass unhandled hypercalls to userspace,
-+if the VMM enables it. Hypercalls are passed with KVM_EXIT_HYPERCALL in
-+kvm_run::hypercall.
+ * KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
+     Holds the state of the firmware support to mitigate CVE-2017-5715, as
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 3ca732feb9a5..25554ce97045 100644
+index 25554ce97045..5d74b769c16d 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -123,6 +123,7 @@ struct kvm_arch {
- 	 * supported.
+@@ -124,6 +124,7 @@ struct kvm_arch {
  	 */
  	bool return_nisv_io_abort_to_user;
-+	bool hvc_to_user;
+ 	bool hvc_to_user;
++	bool psci_to_user;
  
  	/*
  	 * VM-wide PMU filter, implemented as a bitmap and big enough for
-diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-index 5b58bd2fe088..d6b71a48fbb1 100644
---- a/include/kvm/arm_psci.h
-+++ b/include/kvm/arm_psci.h
-@@ -16,6 +16,10 @@
+diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
+index 0e2509d27910..b66c6a000ef3 100644
+--- a/include/kvm/arm_hypercalls.h
++++ b/include/kvm/arm_hypercalls.h
+@@ -6,6 +6,7 @@
  
- #define KVM_ARM_PSCI_LATEST	KVM_ARM_PSCI_1_0
+ #include <asm/kvm_emulate.h>
  
-+#define KVM_PSCI_FN_LAST	KVM_PSCI_FN(3)
-+#define PSCI_0_2_FN_LAST	PSCI_0_2_FN(0x3f)
-+#define PSCI_0_2_FN64_LAST	PSCI_0_2_FN64(0x3f)
-+
- /*
-  * We need the KVM pointer independently from the vcpu as we can call
-  * this from HYP, and need to apply kern_hyp_va on it...
++int kvm_hvc_user(struct kvm_vcpu *vcpu);
+ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
+ 
+ static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
 diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 06ba64c49737..aa831986a399 100644
+index aa831986a399..2b8e55aa7e1e 100644
 --- a/include/uapi/linux/kvm.h
 +++ b/include/uapi/linux/kvm.h
-@@ -1084,6 +1084,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_VM_COPY_ENC_CONTEXT_FROM 197
+@@ -1085,6 +1085,7 @@ struct kvm_ppc_resize_hpt {
  #define KVM_CAP_PTP_KVM 198
  #define KVM_CAP_ARM_MP_HALTED 199
-+#define KVM_CAP_ARM_HVC_TO_USER 200
+ #define KVM_CAP_ARM_HVC_TO_USER 200
++#define KVM_CAP_ARM_PSCI_TO_USER 201
  
  #ifdef KVM_CAP_IRQ_ROUTING
  
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index d6ad977fea5f..074197721e97 100644
+index 074197721e97..bc3e63b0b3ad 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -93,6 +93,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+@@ -83,7 +83,7 @@ int kvm_arch_check_processor_compat(void *opaque)
+ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 			    struct kvm_enable_cap *cap)
+ {
+-	int r;
++	int r = -EINVAL;
+ 
+ 	if (cap->flags)
+ 		return -EINVAL;
+@@ -97,8 +97,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
  		r = 0;
- 		kvm->arch.return_nisv_io_abort_to_user = true;
+ 		kvm->arch.hvc_to_user = true;
  		break;
-+	case KVM_CAP_ARM_HVC_TO_USER:
-+		r = 0;
-+		kvm->arch.hvc_to_user = true;
-+		break;
- 	default:
- 		r = -EINVAL;
+-	default:
+-		r = -EINVAL;
++	case KVM_CAP_ARM_PSCI_TO_USER:
++		if (kvm->arch.hvc_to_user) {
++			r = 0;
++			kvm->arch.psci_to_user = true;
++		}
  		break;
-@@ -208,6 +212,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VCPU_ATTRIBUTES:
+ 	}
+ 
+@@ -213,6 +216,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
  	case KVM_CAP_PTP_KVM:
  	case KVM_CAP_ARM_MP_HALTED:
-+	case KVM_CAP_ARM_HVC_TO_USER:
+ 	case KVM_CAP_ARM_HVC_TO_USER:
++	case KVM_CAP_ARM_PSCI_TO_USER:
  		r = 1;
  		break;
  	case KVM_CAP_SET_GUEST_DEBUG2:
 diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index 30da78f72b3b..ccc2015eddf9 100644
+index ccc2015eddf9..621d5a5b7e48 100644
 --- a/arch/arm64/kvm/hypercalls.c
 +++ b/arch/arm64/kvm/hypercalls.c
-@@ -58,6 +58,28 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
+@@ -58,7 +58,7 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
  	val[3] = lower_32_bits(cycles);
  }
  
-+static int kvm_hvc_user(struct kvm_vcpu *vcpu)
+-static int kvm_hvc_user(struct kvm_vcpu *vcpu)
++int kvm_hvc_user(struct kvm_vcpu *vcpu)
+ {
+ 	int i;
+ 	struct kvm_run *run = vcpu->run;
+diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+index 42a307ceb95f..7f44ee527966 100644
+--- a/arch/arm64/kvm/psci.c
++++ b/arch/arm64/kvm/psci.c
+@@ -353,6 +353,16 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+ 	return 1;
+ }
+ 
++static bool kvm_psci_call_is_user(struct kvm_vcpu *vcpu)
 +{
-+	int i;
-+	struct kvm_run *run = vcpu->run;
++	/* Handle the special case of SMCCC probe through PSCI */
++	if (smccc_get_function(vcpu) == PSCI_1_0_FN_PSCI_FEATURES &&
++	    smccc_get_arg1(vcpu) == ARM_SMCCC_VERSION_FUNC_ID)
++		return false;
 +
-+	if (!vcpu->kvm->arch.hvc_to_user) {
-+		smccc_set_retval(vcpu, SMCCC_RET_NOT_SUPPORTED, 0, 0, 0);
-+		return 1;
-+	}
-+
-+	run->exit_reason = KVM_EXIT_HYPERCALL;
-+	run->hypercall.nr = kvm_vcpu_hvc_get_imm(vcpu);
-+	/* Copy the first parameters for fast access */
-+	for (i = 0; i < 6; i++)
-+		run->hypercall.args[i] = vcpu_get_reg(vcpu, i);
-+	run->hypercall.ret = 0;
-+	run->hypercall.longmode = 0;
-+	run->hypercall.pad = 0;
-+
-+	return 0;
++	return vcpu->kvm->arch.psci_to_user;
 +}
 +
- int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ /**
+  * kvm_psci_call - handle PSCI call if r0 value is in range
+  * @vcpu: Pointer to the VCPU struct
+@@ -369,6 +379,9 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+  */
+ int kvm_psci_call(struct kvm_vcpu *vcpu)
  {
- 	u32 func_id = smccc_get_function(vcpu);
-@@ -139,8 +161,12 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
- 	case ARM_SMCCC_TRNG_RND32:
- 	case ARM_SMCCC_TRNG_RND64:
- 		return kvm_trng_call(vcpu);
--	default:
-+	case KVM_PSCI_FN_BASE...KVM_PSCI_FN_LAST:
-+	case PSCI_0_2_FN_BASE...PSCI_0_2_FN_LAST:
-+	case PSCI_0_2_FN64_BASE...PSCI_0_2_FN64_LAST:
- 		return kvm_psci_call(vcpu);
-+	default:
++	if (kvm_psci_call_is_user(vcpu))
 +		return kvm_hvc_user(vcpu);
- 	}
- 
- 	smccc_set_retval(vcpu, val[0], val[1], val[2], val[3]);
++
+ 	switch (kvm_psci_version(vcpu, vcpu->kvm)) {
+ 	case KVM_ARM_PSCI_1_0:
+ 		return kvm_psci_1_0_call(vcpu);
 -- 
 2.31.1
 
