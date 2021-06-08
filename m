@@ -2,108 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 470AC39FBA1
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 18:03:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1A2F39FC48
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 18:22:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233683AbhFHQE5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 12:04:57 -0400
-Received: from mga02.intel.com ([134.134.136.20]:17023 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233622AbhFHQEz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Jun 2021 12:04:55 -0400
-IronPort-SDR: UHCdbKtlyzn3buLIOFpjiMite/E6YmGfQSrTuAX3WrHcW8fKHYlE5ST5LBak4pbGyJ6PCcrl2W
- TIb14BK3Lbpg==
-X-IronPort-AV: E=McAfee;i="6200,9189,10009"; a="191983999"
-X-IronPort-AV: E=Sophos;i="5.83,258,1616482800"; 
-   d="scan'208";a="191983999"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2021 09:03:00 -0700
-IronPort-SDR: 3Hkk1m8f8AkixH/gVJ42Gf9agNRzt/9wcUiKjw6Zx6w4TBo3blVm+7zkpmi4pC5MWmUIocTLNv
- 2QHbM8wlTNuA==
-X-IronPort-AV: E=Sophos;i="5.83,258,1616482800"; 
-   d="scan'208";a="449574835"
-Received: from djiang5-mobl1.amr.corp.intel.com (HELO [10.254.189.206]) ([10.254.189.206])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2021 09:02:59 -0700
-Subject: Re: [PATCH v6 00/20] Add VFIO mediated device support and DEV-MSI
- support for the idxd driver
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "vkoul@kernel.org" <vkoul@kernel.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Dey, Megha" <megha.dey@intel.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <162164243591.261970.3439987543338120797.stgit@djiang5-desk3.ch.intel.com>
- <20210523232219.GG1002214@nvidia.com>
- <86cde154-37c7-c00d-b0c6-06b15b50dbf7@intel.com>
- <20210602231747.GK1002214@nvidia.com>
- <MWHPR11MB188664D9E7CA60782B75AC718C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210603014932.GN1002214@nvidia.com>
- <MWHPR11MB1886D613948986530E9B61CB8C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210603214009.68fac0c4.alex.williamson@redhat.com>
- <MWHPR11MB18861FBE62D10E1FC77AB6208C389@MWHPR11MB1886.namprd11.prod.outlook.com>
- <168ee05a-faf4-3fce-e278-d783104fc442@intel.com>
- <20210607191126.GP1002214@nvidia.com>
-From:   Dave Jiang <dave.jiang@intel.com>
-Message-ID: <bb39b5d4-093b-ded4-8ff1-73bbd472d905@intel.com>
-Date:   Tue, 8 Jun 2021 09:02:58 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+        id S232214AbhFHQYO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 12:24:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41354 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232131AbhFHQYN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Jun 2021 12:24:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623169340;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ok+shLqzyv78HhrCPatk5ZH7xd0vr4GnUta6jGlDoJI=;
+        b=ZTBElWHdKFDeNvMqB/fFsjks5zChFYGuoEz1Ld18kr2UQVIzdG8N3MtswtYRd8Ex0tayb1
+        jRTCB7i5Loat0bn4T2z6y0X1qEKz++NhZUSwqJUIenLjlQZs+aJglYt0eoMugU4iqfeypS
+        sHE/tNG0fudLqD8NlHSje9HHsjICJNo=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-66-e4zFz3BvMKum2blsfwzaCQ-1; Tue, 08 Jun 2021 12:22:18 -0400
+X-MC-Unique: e4zFz3BvMKum2blsfwzaCQ-1
+Received: by mail-wm1-f70.google.com with SMTP id 128-20020a1c04860000b0290196f3c0a927so1440929wme.3
+        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 09:22:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Ok+shLqzyv78HhrCPatk5ZH7xd0vr4GnUta6jGlDoJI=;
+        b=VyDW4CLTizFUcOrw0wCsofEQUsSENAlj0HbsDxQh9j/FZ6a2RXP7bvxvq3z2daVH5O
+         Oj7Ai71Wj/qay9g4Oxrz5Ft3D1JyGrRWsCfDDTPmib3fsB+OriYLJYsIVR+VzkgNIh6r
+         NJkiVJW8tl7ZBZ4099FmufQzSIMaOEdmYIZe7zQXTxyd5v/huzOZ0V2f7Cc9FKqoQHul
+         wiEHrgs2zIuZ6oqMVWF5bVLUEkCaPt81SvUL+YqtCqlnvcBAiqGGlNOI6h4QELWa3XsL
+         S5LcPpZNXBvf552F/65tZQOIsdlBh9gXY083lkJCJsXbyunkMDYsC2pUBw57yIWs2hxf
+         Xiaw==
+X-Gm-Message-State: AOAM531Pxjw7VBGgrM/8IIij8aMhIf+8YvdC+DPVIJRH0VqEAqZ/VNyN
+        xgIh7Hk2MvK5MhNq/6PpH1n+nTYMQPZCoMs++ynXfCh5/k5g1E/m14QoqSIHmtv9gvE7HFSoy54
+        RGB+gDuN1HWom
+X-Received: by 2002:a7b:c24e:: with SMTP id b14mr23234182wmj.6.1623169337670;
+        Tue, 08 Jun 2021 09:22:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyC+n56dPzuybrrNseY5pZzjjxr0lZ8vs61haw6SjQYimAX5KUEeUYyWF6ViTudX4GdbHx1ag==
+X-Received: by 2002:a7b:c24e:: with SMTP id b14mr23234160wmj.6.1623169337454;
+        Tue, 08 Jun 2021 09:22:17 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id y8sm2812916wmi.45.2021.06.08.09.22.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Jun 2021 09:22:16 -0700 (PDT)
+Subject: Re: [PATCH] KVM: SVM: Fix SEV SEND_START session length &
+ SEND_UPDATE_DATA query length after commit 238eca821cee
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     seanjc@google.com, tglx@linutronix.de, bp@alien8.de,
+        mingo@redhat.com, hpa@zytor.com, joro@8bytes.org,
+        Thomas.Lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, srutherford@google.com,
+        brijesh.singh@amd.com
+References: <20210607061532.27459-1-Ashish.Kalra@amd.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c579735c-31c3-eed5-576f-b07177231790@redhat.com>
+Date:   Tue, 8 Jun 2021 18:22:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20210607191126.GP1002214@nvidia.com>
+In-Reply-To: <20210607061532.27459-1-Ashish.Kalra@amd.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 07/06/21 08:15, Ashish Kalra wrote:
+> From: Ashish Kalra <ashish.kalra@amd.com>
+> 
+> Commit 238eca821cee ("KVM: SVM: Allocate SEV command structures on local stack")
+> uses the local stack to allocate the structures used to communicate with the PSP,
+> which were earlier being kzalloced. This breaks SEV live migration for
+> computing the SEND_START session length and SEND_UPDATE_DATA query length as
+> session_len and trans_len and hdr_len fields are not zeroed respectively for
+> the above commands before issuing the SEV Firmware API call, hence the
+> firmware returns incorrect session length and update data header or trans length.
+> 
+> Also the SEV Firmware API returns SEV_RET_INVALID_LEN firmware error
+> for these length query API calls, and the return value and the
+> firmware error needs to be passed to the userspace as it is, so
+> need to remove the return check in the KVM code.
+> 
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>   arch/x86/kvm/svm/sev.c | 6 ++----
+>   1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 5bc887e9a986..e0ce5da97fc2 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -1103,10 +1103,9 @@ __sev_send_start_query_session_length(struct kvm *kvm, struct kvm_sev_cmd *argp,
+>   	struct sev_data_send_start data;
+>   	int ret;
+>   
+> +	memset(&data, 0, sizeof(data));
+>   	data.handle = sev->handle;
+>   	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_START, &data, &argp->error);
+> -	if (ret < 0)
+> -		return ret;
+>   
+>   	params->session_len = data.session_len;
+>   	if (copy_to_user((void __user *)(uintptr_t)argp->data, params,
+> @@ -1215,10 +1214,9 @@ __sev_send_update_data_query_lengths(struct kvm *kvm, struct kvm_sev_cmd *argp,
+>   	struct sev_data_send_update_data data;
+>   	int ret;
+>   
+> +	memset(&data, 0, sizeof(data));
+>   	data.handle = sev->handle;
+>   	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_UPDATE_DATA, &data, &argp->error);
+> -	if (ret < 0)
+> -		return ret;
+>   
+>   	params->hdr_len = data.hdr_len;
+>   	params->trans_len = data.trans_len;
+> 
 
-On 6/7/2021 12:11 PM, Jason Gunthorpe wrote:
-> On Mon, Jun 07, 2021 at 11:13:04AM -0700, Dave Jiang wrote:
->
->> So in step 1, we 'tag' the wq to be dedicated to guest usage and put the
->> hardware wq into enable state. For a dedicated mode wq, we can definitely
->> just register directly and skip the mdev step. For a shared wq mode, we can
->> have multiple mdev running on top of a single wq. So we need some way to
->> create more mdevs. We can either go with the existing established creation
->> path by mdev, or invent something custom for the driver as Jason suggested
->> to accomodate additional virtual devices for guests. We implemented the mdev
->> path originally with consideration of mdev is established and has a known
->> interface already.
-> It sounds like you could just as easially have a 'create new vfio'
-> file under the idxd sysfs.. Especially since you already have a bus
-> and dynamic vfio specific things being created on this bus.
+Queued, thanks.
 
-Will explore this and using of 'struct vfio_device' without mdev.
+Paolo
 
-
-
->
-> Have you gone over this with Dan?
->
->> I think things become more complicated when we go from a dedicated wq to
->> shared wq where the relationship of wq : mdev is 1 : 1 goes to 1 : N. Also
->> needing to keep a consistent user config experience is desired, especially
->> we already have such behavior since kernel 5.6 for host usages. So we really
->> need try to avoid doing wq configuration differently just for "mdev" wqs. In
->> the case suggested above, we basically just flipped the configuration steps.
->> Mdev is first created through mdev sysfs interface. And then the device
->> paramters are configured. Where for us, we configure the device parameter
->> first, and then create the mdev. But in the end, it's still the hybrid mdev
->> setup right?
-> So you don't even use mdev to configure anything? Yuk.
->
-> Jason
