@@ -2,80 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DCB039FDD3
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 19:36:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1904939FDE9
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 19:41:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232773AbhFHRiJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 13:38:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21367 "EHLO
+        id S233184AbhFHRmv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 13:42:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56208 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231416AbhFHRiI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 8 Jun 2021 13:38:08 -0400
+        by vger.kernel.org with ESMTP id S232376AbhFHRmu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Jun 2021 13:42:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623173775;
+        s=mimecast20190719; t=1623174056;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+D/IqEBsmrawx3z+g1IRuMOSYaHEvwjh/bfd9sGokww=;
-        b=hk2Hz6FMsBOWHKKA+eBoZdcY8nzmmnHRBb2YpmSPbrGPEVLTFRvmDbNkITVKCwfWvtiGe5
-        Sp/9DN8r28NThQJDYHgFea/ZtliOeKc+JD0dShuoZrTpVqnuDOLqruOnbIwKP4FeaYRs01
-        DB8dZtkc+593bi1kRjqu59yImkuwdGc=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-2-LQ37uJpNMma6xVUZeYMQvQ-1; Tue, 08 Jun 2021 13:36:14 -0400
-X-MC-Unique: LQ37uJpNMma6xVUZeYMQvQ-1
-Received: by mail-wm1-f72.google.com with SMTP id f186-20020a1c1fc30000b02901aaa08ad8f4so1449395wmf.8
-        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 10:36:13 -0700 (PDT)
+        bh=uuTEXUh2y4+eVpi9BE2NLF0/TYZeOk1VrPvZH9w4Lo0=;
+        b=caqhqDjdM4brGLMnQ8lduf+VnfYCCJ8K7t5auFexx9AD63HP7GeHEQVcj55Hj7OwzhBkdV
+        K7Y7W1A+602INe2GntPMzm/eZg1S5bGPpXksnqXuaSqsptZt9le2sU8nrRu6JHcyUF81GN
+        1vVAmQtxGT8mYkXfE2YUDyZ5GFJs/yw=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-62-MI4Zwb8INmOvBBF2KMhdlQ-1; Tue, 08 Jun 2021 13:40:55 -0400
+X-MC-Unique: MI4Zwb8INmOvBBF2KMhdlQ-1
+Received: by mail-wr1-f69.google.com with SMTP id q15-20020adfc50f0000b0290111f48b865cso9721008wrf.4
+        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 10:40:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=+D/IqEBsmrawx3z+g1IRuMOSYaHEvwjh/bfd9sGokww=;
-        b=ox2kfmIFIQCX/YxF+67bjE/albVbjMl50U160BTbFqiffhWFhIeHN0HCV4T7aOPdO/
-         Wh2zKe4R0Dj1ah3vGXvDSjtxlsSYxy632Ip1LKLUmFl5my+x7eJ5ilMj86ESkWSFn39O
-         ylIlP8zXz3OBb5b8zgNff0+t/NMrqtiAlrydSJxvlhdqXiPHHl3RgPABhRNl57u92rmW
-         RtVa1xp5lwGyNPpTPwIV84FGYjPeUIhzVrQQmlloOVRU5AWhlXcBKgL5xiXU0xRD6T/4
-         QXZSoI5Q8g3DSZZwsrwonsWD7rwtoIopuw9mBcKVqex/RxNviGdYPFMhJ4NI5zmgBrVA
-         SLrA==
-X-Gm-Message-State: AOAM532yY0N+HH5TJv+m0nLrBWVpuLoV+0D0F8fjiBu+nVrdG3Dt3N/f
-        Od2nc3VrNBy3qg73d8g8VYA7M/+Qi9mbZL6kzDZJesVmRwOrQMHAPFDLw6r1SlgbxFXgtlYl/Eo
-        L7tvUo2MQkManJPy8lflKA6t7Uu/cWZ/BiLN/cCGLox7QPNpHX6kHiXxQNQgwg5j0
-X-Received: by 2002:a1c:1bd8:: with SMTP id b207mr22569588wmb.80.1623173772399;
-        Tue, 08 Jun 2021 10:36:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzDbooef8Nxz/02uzZD+uV6aRsn4tVHqWL+SbZDSTSIy/yJ8iFHb7fZZEnCYEe/Q8oUnz/c7Q==
-X-Received: by 2002:a1c:1bd8:: with SMTP id b207mr22569541wmb.80.1623173772118;
-        Tue, 08 Jun 2021 10:36:12 -0700 (PDT)
+        bh=uuTEXUh2y4+eVpi9BE2NLF0/TYZeOk1VrPvZH9w4Lo0=;
+        b=t3pWkH1EApApm9HMzJGprwbCd/EB6pgknCqGxTU9Q5KV51aZGTgEMRREOvD+ousNJp
+         trgpxF8hVN5cMmiDsi6cx8G5Jh5hmIADzhDvIwdscR5k2tVkH4w4z6JfwX4pKV4MOUmV
+         6dZgdcRo3duECwetpt9hT2gwg/1J8TY2Qaw/X9ExXrTdOc1RpNFVWn1VqAmk3lSslLJY
+         ox4/h+M7wAP8IlYNkDAr7U6WaiglzUO+xe1lGfaEPdbbfHj1U1tSktlhKAkdU1rfL8Xk
+         WjhKO6nlEMMNTPF7VJPtZqqo2VTujl8MEko5mTPWP20ntZRzdsy0FQ1/k9EiSX7/pxiU
+         LLbg==
+X-Gm-Message-State: AOAM532T2KVjrGbA+7qrZs4sN7ecZR7QuslhPea2JcM7t0ZgJMpJ/0Qs
+        2CtyA5B3027dHAkzqO2r6XQdBdmpOzwJua8HQp7lZ93eq2mKZZIWHlgSU5l0P78J2KynX39YFb0
+        7N/Yp1ghl9HOk
+X-Received: by 2002:a1c:9804:: with SMTP id a4mr23765708wme.34.1623174054279;
+        Tue, 08 Jun 2021 10:40:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxCg/4Dg2XjHEakG0Gnd75nQyKD/Y6nxzDDphWNa3SRKmaQxg54dFAsRxFHIsqIoOwPd/74gA==
+X-Received: by 2002:a1c:9804:: with SMTP id a4mr23765690wme.34.1623174054086;
+        Tue, 08 Jun 2021 10:40:54 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id f14sm20185607wry.40.2021.06.08.10.36.10
+        by smtp.gmail.com with ESMTPSA id o26sm7824493wms.27.2021.06.08.10.40.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Jun 2021 10:36:11 -0700 (PDT)
-Subject: Re: [PATCH V2] KVM: X86: fix tlb_flush_guest()
+        Tue, 08 Jun 2021 10:40:53 -0700 (PDT)
+Subject: Re: [PATCH v2 3/3] KVM: X86: Let's harden the ipi fastpath condition
+ edge-trigger mode
 To:     Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Lai Jiangshan <jiangshanlai@gmail.com>,
-        linux-kernel@vger.kernel.org,
-        Lai Jiangshan <laijs@linux.alibaba.com>,
+        Wanpeng Li <kernellwp@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org
-References: <4c3ef411ba68ca726531a379fb6c9d16178c8513.camel@redhat.com>
- <20210531172256.2908-1-jiangshanlai@gmail.com>
- <9d457b982c3fcd6e7413065350b9f860d45a6e47.camel@redhat.com>
- <YL6z5sv7cnsbZhvT@google.com>
+        Joerg Roedel <joro@8bytes.org>
+References: <1623050385-100988-1-git-send-email-wanpengli@tencent.com>
+ <1623050385-100988-3-git-send-email-wanpengli@tencent.com>
+ <YL+cX8K3r7EWrk33@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3c09b70e-a3fe-8739-98e4-cba1760507e9@redhat.com>
-Date:   Tue, 8 Jun 2021 19:36:10 +0200
+Message-ID: <2a643f94-d159-c1ac-6bd2-cc6b45372630@redhat.com>
+Date:   Tue, 8 Jun 2021 19:40:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <YL6z5sv7cnsbZhvT@google.com>
+In-Reply-To: <YL+cX8K3r7EWrk33@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -83,86 +77,17 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/06/21 02:03, Sean Christopherson wrote:
-> On Tue, Jun 08, 2021, Maxim Levitsky wrote:
->> So this patch *does* fix the windows boot without TDP!
-> 
-> Woot!
-> 
->> Tested-by: Maxim Levitsky <mlevitsk@redhat.com>
->> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> 
-> Lai,
-> 
-> I have a reworded version of your patch sitting in a branch that leverages this
-> path to fix similar bugs and do additional cleanup.  Any objection to me gathering
-> Maxim's tags and posting the version below?  I'm more than happy to hold off if
-> you'd prefer to send your own version, but I don't want to send my own series
-> without this fix as doing so would introduce bugs.
-> 
-> Thanks!
-> 
-> Author: Lai Jiangshan <laijs@linux.alibaba.com>
-> Date:   Tue Jun 1 01:22:56 2021 +0800
-> 
->      KVM: x86: Unload MMU on guest TLB flush if TDP disabled to force MMU sync
->      
->      When using shadow paging, unload the guest MMU when emulating a guest TLB
->      flush to all roots are synchronized.  From the guest's perspective,
->      flushing the TLB ensures any and all modifications to its PTEs will be
->      recognized by the CPU.
->      
->      Note, unloading the MMU is overkill, but is done to mirror KVM's existing
->      handling of INVPCID(all) and ensure the bug is squashed.  Future cleanup
->      can be done to more precisely synchronize roots when servicing a guest
->      TLB flush.
->      
->      If TDP is enabled, synchronizing the MMU is unnecessary even if nested
->      TDP is in play, as a "legacy" TLB flush from L1 does not invalidate L1's
->      TDP mappgins.  For EPT, an explicit INVEPT is required to invalidate
->      guest-physical mappings.  For NPT, guest mappings are always tagged with
->      an ASID and thus can only be invalidated via the VMCB's ASID control.
->      
->      This bug has existed since the introduction of KVM_VCPU_FLUSH_TLB, but
->      was only recently exposed after Linux guests stopped flushing the local
->      CPU's TLB prior to flushing remote TLBs (see commit 4ce94eabac16,
->      "x86/mm/tlb: Flush remote and local TLBs concurrently").
->      
->      Tested-by: Maxim Levitsky <mlevitsk@redhat.com>
->      Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
->      Fixes: f38a7b75267f ("KVM: X86: support paravirtualized help for TLB shootdowns")
->      Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
->      [sean: massaged comment and changelog]
->      Signed-off-by: Sean Christopherson <seanjc@google.com>
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 1cd6d4685932..3b02528d5ee8 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3072,6 +3072,18 @@ static void kvm_vcpu_flush_tlb_all(struct kvm_vcpu *vcpu)
->   static void kvm_vcpu_flush_tlb_guest(struct kvm_vcpu *vcpu)
->   {
->          ++vcpu->stat.tlb_flush;
-> +
-> +       if (!tdp_enabled) {
-> +               /*
-> +                * Unload the entire MMU to force a sync of the shadow page
-> +                * tables.  A TLB flush on behalf of the guest is equivalent
-> +                * to INVPCID(all), toggling CR4.PGE, etc...  Note, loading the
-> +                * MMU will also do an actual TLB flush.
-> +                */
+On 08/06/21 18:35, Sean Christopherson wrote:
+> Related side topic, anyone happen to know if KVM (and Qemu's) emulation of IPIs
+> intentionally follows AMD instead of Intel?  I suspect it's unintentional,
+> especially since KVM's initial xAPIC emulation came from Intel.  Not that it's
+> likely to matter, but allowing level-triggered IPIs is bizarre, e.g. getting an
+> EOI sent to the right I/O APIC at the right time via a level-triggered IPI seems
+> extremely convoluted.
 
-I slightly prefer it in the opposite order (first why, then how):
-
-                /*
-                 * A TLB flush on behalf of the guest is equivalent to
-                 * INVPCID(all), toggling CR4.PGE, etc., which requires
-                 * a forced sync of the shadow page tables.  Unload the
-                 * entire MMU here and the subsequent load will sync the
-                 * shadow page tables, and also flush the TLB.
-                 */
-
-Queued, thanks all!  It's great that this fixes an actual bug.
+QEMU traditionally followed AMD a bit more than Intel for historical 
+reasons.  Probably the code went QEMU->Xen->KVM even though it was 
+contributed by Intel.
 
 Paolo
 
