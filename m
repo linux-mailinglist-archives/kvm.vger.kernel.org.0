@@ -2,105 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 63C9639EB18
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 02:56:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95B3939EB21
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 02:56:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231289AbhFHA5v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Jun 2021 20:57:51 -0400
-Received: from mail-bn8nam12on2067.outbound.protection.outlook.com ([40.107.237.67]:45339
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        id S231352AbhFHA5z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Jun 2021 20:57:55 -0400
+Received: from mail-mw2nam10on2041.outbound.protection.outlook.com ([40.107.94.41]:6904
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230382AbhFHA5s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Jun 2021 20:57:48 -0400
+        id S231326AbhFHA5x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Jun 2021 20:57:53 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=axB0rpglgF1w5W0X1hDmb/V6QI9pvbLcHCM7BPNwifmBnSqklAoesUGPibK3nw25Egeh/Q97XvBEbWLUrYreL1JqE/PFbxtu3LG/Zb2O9mLT1HnP8SV8i8PHmc+1GxVsJEPQb/Gy+L0xmLWuSyENsG3FE8OFW5IWj7xdkfvnvTD7RkIIws359LlQatV8StWkeQqhJ0HbVsxtYmgdk0P051ljIZMZoHnLY/6GvRBsD4pRzzZKp/33w4sbHnQYY0/uErNmDCv+/ll8VnU4cqDv6PNsEnG6Rw5P64Xiw9s7ZXlxvh3p7SBjLZ5llE0FLNDIyWMgMboOT0SS4azC3jXcrw==
+ b=bkI9xYpmhR14Fbt3hmvdWUvo2aIDNci0wqAnzMceWpizpvcL6sR1E1KsFeVpCjtUJ7aH8HEiDZeU8jzvrsqfX6LkZtyNEvNOpI5nlbFjdp+OoP5XaeGAXYZ05H50yMXDjyrCeg/wA8rlfV830nT77yQZzEasvQrWWGmMeX3C5nR7mvMkKQNYr4kWBgEHVZljvWHkJrJP2QbFNnp5EIdYr8Z3WBxgwZpk7mZJJ4nGrIqWdZXbaoP4Lzw1DkDlK8JKxfudW/tNWWPbdBRqSecthQWJhANnEt8DY3apc60PrI8wQY6ijG3sw2PTWZMNf2z55XK5gwTXoFKsFLmTjPHA/g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ubxl09Oh9RRiYUvs16zc906Eu8pK4TldYGiGc+CiB1Q=;
- b=Mudej4q5/GJg3OAY9NmiLWSD94UptJI/CdqOve4xBaVGdOTMQ7zy0BKBjWtXUB11V04jZoUyaWPwrIKLESotDoP0cVfn9fPxEr7jtLytPUSris3+ZCs8Kb0TCsVTgAzqQEq1B/B6GI3vzezo7UqeIBdpqeibjG4Pwjz4XNgd3Ej+ZyGLi0RKFWbE1uFTZaaEPPUKk4rCmWcb1/X3Gt6r3jkSq/eZP18b+t41oiGlKCYAF6+XIr96K8p5FMJ20MmUViW+DU9SPPiMB1hpSck9tXLNkMu/FKMRHu6KA2IwUtv0kBGaG2i97m0maeyttIIPp0TOwX1ggtCU5sWRCQbW6g==
+ bh=QZhPBpz/6THlXJs8mcNWgMUSX5lyq896uZnrk4Padc8=;
+ b=WiMS+XMluw6HJjZw6odIVy91Kt0MsXYeYFVNqh/ChPDQ2YKMwWfxT035MDYPnyHgSwb5iO8quuBlKMw+ZC+SqYEDKedz2ErtOkKjnJ+o43JDeCgVkKD6bHWzzMqU/nG2evZJCmXEqy0zEj9vDH8Kpv+BZK7XjyR2cADtDjfVPldfLzRjzv6RQHkFdQRecEfx0aNsiqY3ZBQUMNqUchFRT8gfsANBAw8Ts1vM/Pnivu/SJ0qq9yDsaUmQ14M+BTy5yeAbQ8vf536RKxUSNu+3jJhtZnlv5RoR2IxDGUouiysd+0jOJRbrjCfvDgQHOXp0LHp2bfpdZnbMTpLG2v2iRQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ubxl09Oh9RRiYUvs16zc906Eu8pK4TldYGiGc+CiB1Q=;
- b=IITJyky4KtflY7ApeKPCEP/+Fmi6fO40om0zouBSMy4Q7Su2w8VSI5es9MGzGnWRSocKLqHp2wxzNhcsxuhHgUEpPqv5FvogBuBexxljoRRnwLoTHhIjtER24A5/VmbSv+Nr4qF0v+h5HTgwFOrSYNA/PWg2/u42I8+xUiNg7U2b6181OADEOI1y4ITgTTtv7XW+nqyBpUsTX5HUww2mK6enDxRS7/8TGDWgC+GWqE81nyhB/pEvq95hre8qYLfvhlGuFwlskNCFKa1PcP1eUneG+wJyfk8RCALHet7kz311JdmrRXGlVaGytIXw1fVSjg5y08oau3G3kJnX5ff3gA==
+ bh=QZhPBpz/6THlXJs8mcNWgMUSX5lyq896uZnrk4Padc8=;
+ b=Cdssu2m2rHgLBv6Vep691ToyeQcObRRWAbnhIaSBhfxwjnoOaTv2Ri8jCRKj26pgmmpWTGs/sNfq/6PHlGF5FNAU83mN30Tic6jRbO5mBymNdHHpdg41QWanB2907ojTMySbJ6H0JTAVJkX+4RRv7q4HhkbspGouM1hOydHhplB2Tc1YX8QG8Ljk1jLiwcPAUTIes7JAPq0qKv8OKxyYwqvwKOzq+usi5M7tDs/6T5pSajSmuAKe6rmbFoOFptZxNc9eiUuCdqYBnwTzr9TqcdHNDnD7JR7jA626LkrVyrqbVadamCigD/X/Y8JQK+5VZ5nZDh07FoTWlNFLTu8D6g==
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=nvidia.com;
 Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL0PR12MB5539.namprd12.prod.outlook.com (2603:10b6:208:1c3::15) with
+ by BL1PR12MB5095.namprd12.prod.outlook.com (2603:10b6:208:31b::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20; Tue, 8 Jun
- 2021 00:55:54 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.24; Tue, 8 Jun
+ 2021 00:55:57 +0000
 Received: from BL0PR12MB5506.namprd12.prod.outlook.com
  ([fe80::3d51:a3b9:8611:684e]) by BL0PR12MB5506.namprd12.prod.outlook.com
  ([fe80::3d51:a3b9:8611:684e%6]) with mapi id 15.20.4195.030; Tue, 8 Jun 2021
- 00:55:54 +0000
+ 00:55:57 +0000
 From:   Jason Gunthorpe <jgg@nvidia.com>
 To:     kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>
 Cc:     Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 09/10] vfio/mdpy: Convert to use vfio_register_group_dev()
-Date:   Mon,  7 Jun 2021 21:55:51 -0300
-Message-Id: <9-v1-324b2038f212+1041f1-vfio3a_jgg@nvidia.com>
+Subject: [PATCH 10/10] vfio/mbochs: Convert to use vfio_register_group_dev()
+Date:   Mon,  7 Jun 2021 21:55:52 -0300
+Message-Id: <10-v1-324b2038f212+1041f1-vfio3a_jgg@nvidia.com>
 In-Reply-To: <0-v1-324b2038f212+1041f1-vfio3a_jgg@nvidia.com>
 References: 
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [47.55.113.94]
-X-ClientProxiedBy: MN2PR12CA0028.namprd12.prod.outlook.com
- (2603:10b6:208:a8::41) To BL0PR12MB5506.namprd12.prod.outlook.com
+X-ClientProxiedBy: MN2PR13CA0029.namprd13.prod.outlook.com
+ (2603:10b6:208:160::42) To BL0PR12MB5506.namprd12.prod.outlook.com
  (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (47.55.113.94) by MN2PR12CA0028.namprd12.prod.outlook.com (2603:10b6:208:a8::41) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20 via Frontend Transport; Tue, 8 Jun 2021 00:55:53 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lqQ24-003eKr-N8; Mon, 07 Jun 2021 21:55:52 -0300
+Received: from mlx.ziepe.ca (47.55.113.94) by MN2PR13CA0029.namprd13.prod.outlook.com (2603:10b6:208:160::42) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.9 via Frontend Transport; Tue, 8 Jun 2021 00:55:55 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lqQ24-003eKv-OJ; Mon, 07 Jun 2021 21:55:52 -0300
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 36d26fbc-cf28-49fe-0f9d-08d92a182afc
-X-MS-TrafficTypeDiagnostic: BL0PR12MB5539:
+X-MS-Office365-Filtering-Correlation-Id: ca815663-d4ba-42f3-697e-08d92a182be5
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5095:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL0PR12MB5539627BD1EC880B945A310CC2379@BL0PR12MB5539.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:126;
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5095BEF48AEFD4C29B16AFC0C2379@BL1PR12MB5095.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:198;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: UGp4lPOe37JHot7q3IBEv97spkw6aNHkEN9ktvCrVKzCSzBTQS0JFDw3WDvLBWw3ZwGGSUnJ27cubQL+N+WqQ/MDWDlHZO0o17iYSwf2F1dZ4whPViJ9iASBzFJiw9TYVoAqIaDVNMkmB+HMQCLtJj7ugGqNG9r94NsMSy91T8DDAocPBkQa/hKXBsDd/ec2bx06JqbE7XA91q22HwP5lMZcp8ACgG/0UBl/m0W2BJJe/dQY44tUFHTNIY8Bqb/mvhCA87WlEdnUa/ZRAYgDGq+Tn+FudKfBcS6poE+ldHpliTiwH30mJWQMeKuh3GSZTVQ74ABPwGU4A8Jxi7SM4A4LValMV7GQ0wrpEsqWEumBotx3r+WEY8lcGU5gU9WHkU4ahzAkcMrq/9ow31FRML9yTzP3n6d9FgMcwAl4O/mixTaNmnvhu/XQU68yTSNgJbdOH2Rn+tKFloNzd+cWFZThLyfJXj9mym94ltX4JdL7EYwco/V2qZ0PN/XgitBARQ8SNkKPYAI+DvBpA4uBA14RJFrSsFvJkugVRcm5aWiFmGZuX/49rSXwDHHUK6J/fbZRz7cMNDJ6ZU+1S7zfJj9gsa1FtIkx2Vs10DRbHS/DKTfPBNdBzqIR5oUmDOXD7SEWUTPB3C5zxJWv+ELrFg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(366004)(396003)(39860400002)(346002)(376002)(9786002)(186003)(26005)(6862004)(36756003)(37006003)(316002)(8936002)(478600001)(4326008)(9746002)(2906002)(6636002)(86362001)(83380400001)(66946007)(426003)(38100700002)(2616005)(5660300002)(8676002)(66476007)(30864003)(66556008)(4216001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: MwD5eiJGoYYvVsZXEfyi/M7iyhQmVrkHZxbEw4EnWBGGNgqSriTIhbLuYsRrgkipL9ejsL2wfM5fbVUnUyY88OXNdxUOus+3c16WI3w+81lw4yEWFH4p041v5q5XoatJDZVOD3zvVhQuN3kx80bUGO0hZrsEohfvny0EnPwk5Tf9oheXcvEJJGqhkAPlhdAxvH0Ox8reNzVI9hr5CiXwHG68yq/woWWIcbM2ApHrpCFXpNV+cjM9NF1rtwNictWVAYCaa5IOXYWV4Dfp6nks+3pP8niIo6zsdU+bvLGKkBrAQs5LbnkoOaJhPNsmemm0eHPmoEVBqAOkZRlpAHja6WPle3sytAJGYfvc8504vW4nOU3YbMBL8dXH4SNXpY5O0VfXADwaU3zKJiksFjSHBrMTbpIK/jaXJV211GdMWbRRWs6iW80W/bbUTp7zibgz97AgYwneonkSuMXpqFeoN0CUW+KpCEU6MrryzI1F/8xrVKj57Nz7heInsLpgTm8U3HE4zSxfhRA+W8lr3A0L/ty8ZhpFYtlXcrvP9rq5Cf1JXnsydmdPIu+YgCpqrCYDgzn2nrwP1Mdi3njYEPn55Q9ceiuCITsATnVryj3Dlbw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(376002)(136003)(346002)(366004)(396003)(2616005)(86362001)(9746002)(6862004)(66556008)(2906002)(37006003)(30864003)(36756003)(186003)(9786002)(4326008)(478600001)(426003)(6636002)(66476007)(83380400001)(8936002)(8676002)(26005)(66946007)(5660300002)(316002)(38100700002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?AreQYkTmCxHH2IC2edjRttFFG8VyrHlnANXHzYs1ydfnnqHkoY+ZgNlhoFuu?=
- =?us-ascii?Q?ew7uqoEcjcjPMsvNtIP1JrYudKJADutmm40oqvJyTA49uWJ1icCM48+aQthd?=
- =?us-ascii?Q?ww1H+hSF5RiXtjSRop0uVXljRrwCUyxZjwWSN4HoA5+Zc4Yco3ptMJ3yy2cG?=
- =?us-ascii?Q?JYh5/Oa8aY2N6Ac6DOvvy94OANTB/63NNlP1njOntaQiYuv8qZjQMqyFJDWN?=
- =?us-ascii?Q?j/Y29fs9Ivtoc6U4on7Nty2gDq5w9TAjouICL1K0nABI755c2r8+yCZEkHVB?=
- =?us-ascii?Q?7oIv7M7SlVhk+CD9RJ4VQ00e8+MP5TJWAK4tFZ1IWRV9hFF+gBjtmm4SKOmG?=
- =?us-ascii?Q?bSo0qYMjEJoR6X9+dyi1wARP0H7FWYKXfvv6Eg1ykNHYjZD4FGUNtBQ8J7px?=
- =?us-ascii?Q?mGlmxHcT5vYcYkvoFMgjP4ASf8WBHyGOMkAgUZtJzMTW9mYm9c4tDJX29ONq?=
- =?us-ascii?Q?Pwwyyz0q7cp30Tght2PXbxKJQC0R74VedthuiWhN6MiyLR0vramWWT+MaRdN?=
- =?us-ascii?Q?DC/0SEw8Yf3WxBzLoO7BO9OZS9+18XXDjIIA7jX5++RNUX4vhix5kpSjmQ/g?=
- =?us-ascii?Q?G4fc6IrRJcVQ8DT2xMmMZVgBdk4hbKZD5Q9Ri6E83AOzg0ehZofe+qRKYqpu?=
- =?us-ascii?Q?FjFSFm1X92UEQ2N/qDJgFfT9wyHtPfOhLem6iPzK7D5/tsht0/1NPrp0qHqz?=
- =?us-ascii?Q?8Q7dTMskTyjvXmXRA9pRL0cH0ksmCMtWxVc+R7bLpF41YgDQYHh2P2C43xA7?=
- =?us-ascii?Q?j/oRKm1CJOD9JbJHyhScTBClCJAlBl0bwqKZRCG80qWE1tcj4qtpokA3PX8C?=
- =?us-ascii?Q?xPzD+GLF+hMZwbIUbawd7d3KhvR0KPZpY0z9xq8eEtMDU4ZtF6CftNLUWyvB?=
- =?us-ascii?Q?NCjCdPTTtHKWaowpxdVIN11xNDi6OS4Ea2XnHe2WYs4YX5Gv8voZ0/XmMUjf?=
- =?us-ascii?Q?SWTxV/IzjYwCKiRM4795G/hR3cHpA8teuKPufVHnpaTgbdr1OeUEHRfGhY14?=
- =?us-ascii?Q?F+z5kUxNRueiy07k0J3CVPSU7al+eDZt5GRczdxtU8/vTRoFmp4nAgs7f8LQ?=
- =?us-ascii?Q?jdPnCMVnK7jAxKRJjpzAuyu3CtJyE4okbrgk/HLi3EPZiEFYG6u4MY77pn1h?=
- =?us-ascii?Q?D4lKrmIy+wbtMp3umZ9oh6BwS6vNom96RpXVc9GTiviwXCqy8LVx661nhNWQ?=
- =?us-ascii?Q?HTk2wSnFFfpuAFRy65ou/O+VaGXT5XMrnykXJpy9EbANu5l8MHnflX8lkWBZ?=
- =?us-ascii?Q?sZxmC66COq1peG0zqRIJpDSexTdUHrLwTndj+yXWPa9cEGGSFb5torVcQZ5m?=
- =?us-ascii?Q?KNr69RS25hBDwJ+fXTKl8aHO?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?lROJEOwxqtXBhYz7DCu3ZH0+hR3LNjNMuAiAA1s5PTR4lVo3PzhsjH5X2YPL?=
+ =?us-ascii?Q?P4ZycL03eHoPOdYd1B2KfICd84ZQReGPrWrLLu/mQfdGAPHr56SgezWhiIlK?=
+ =?us-ascii?Q?ehywaGRcq4o125RkdreZB6hW0u1EPhdTTefGaDxhhKaSxKvRTOq0P4hOJZG0?=
+ =?us-ascii?Q?7QmE/888ZRjqYVGmwUzICJnzGIiG963xnqQXF8IAmAvTigrEXv3JOVMnokPq?=
+ =?us-ascii?Q?VEaLuGtLjk1pzwjZ+2rf9AeULykB2wsSHxgkNfqHe5ls7qiS+3oh5i2a7uwk?=
+ =?us-ascii?Q?S/9cn6vdtCVKiPcFT9fnXp1QKd0vsDbhoR9Gd5+0Ju0PF1R259ahBlDNMM6M?=
+ =?us-ascii?Q?z/idhAQTMU42ICUmLBCYVJf/C49Vmmlv4NNgy1bmNlGz/HYbpqvxIbuBpJyZ?=
+ =?us-ascii?Q?v4W7k4w+OqOe/WO+N6n9748g3jiD9e3nP2rpM9XYdpjp3TFXP1ReEC0YJCuT?=
+ =?us-ascii?Q?YHqRNHVqZIpNMQ0tkDZINTPJlDuIlw96/fCUfVyV9zSH+lO1QL47I1SN1bFv?=
+ =?us-ascii?Q?b97j1F2JApTym9qLuTluG0DkZipGD2dMORdNhPmuSFqzJPHY//vhsut/dlAE?=
+ =?us-ascii?Q?6jtMJ9DTAOJPXWZlqR7T20kUe0BmfQov7UuB3ClG2c0SftodfSzeb4Uh0X9d?=
+ =?us-ascii?Q?avOv2aqWkf/MjQj08pZ6wIcKmzb7QnMgwlxSIMs1DpJFYVV4KQhR1JMN3L+X?=
+ =?us-ascii?Q?zjeS2JXdpakJU059tVsVn9H+IOXYIfKV34PCMKPYYHGXA0UZ115oDhIzuL3V?=
+ =?us-ascii?Q?ZEbQ+iLYjdt1DYAJjyM6Ix6prPUYPpJNIvg8Tw3ba9J1dfnHRistnPSuDDLW?=
+ =?us-ascii?Q?8EES+SeP+YY6XCoLZ357sbzhtGyuuusACaxh9jLI4rkeOZDJSPz396nrO8M7?=
+ =?us-ascii?Q?oYzITsL65KpkIWrFGepJGD1Nb63DzHLX/oLHwNk0e0BlC538ub3jFXyl+L2C?=
+ =?us-ascii?Q?81KnsEov31DNZrddO1x1SZdLADInHO9VfE/PMVZjOwibgHXJvOw5QCu+dkON?=
+ =?us-ascii?Q?2aFxcwAqufshbnBKYQ0Ej+ZoC8Zfu7Hb/iySNvTKw1fbL9BfCiO+LujLRdT2?=
+ =?us-ascii?Q?PBvgwfusohcJQxYsfajLuKFWS9Wfg6HTTJpEmV7AQkxoLEguSwZO053xmnMB?=
+ =?us-ascii?Q?S61qVwLRLqKhQ8wuGieoYbSRfZKXmbJAkjjf1xOvHz/r8fSLhpUdeEkhl/bc?=
+ =?us-ascii?Q?hVMKCVY2q/+no4m0B7Nph+QQp2+4aQdXH0Sh5WaJAcH5R7WK1631NjCwLUWv?=
+ =?us-ascii?Q?nbk/Z1vPUPxS5MaXNgxolUHRLQKUAI1m+vhDDeERdFvCjGX6WwjtQpzwtk8D?=
+ =?us-ascii?Q?ajp4ycMAScwieNZhJOPEeGAI?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 36d26fbc-cf28-49fe-0f9d-08d92a182afc
+X-MS-Exchange-CrossTenant-Network-Message-Id: ca815663-d4ba-42f3-697e-08d92a182be5
 X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2021 00:55:54.0301
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2021 00:55:55.5693
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FsnViTCb/bDmfFbTpCzJLShCHSc7WZF4ApbDOsTE1jzymvxYwXkL4HIijqhmPcbU
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB5539
+X-MS-Exchange-CrossTenant-UserPrincipalName: DfIccK6ABdjI9SECoYbImHA6yKjRlu3tvsUdJr1TgRPBYQvXZ8Kbr2vStcpkPeMW
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5095
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
@@ -112,27 +112,31 @@ wonky dead code with a simple container_of().
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 ---
- samples/vfio-mdev/mdpy.c | 159 ++++++++++++++++++++++-----------------
- 1 file changed, 88 insertions(+), 71 deletions(-)
+ samples/vfio-mdev/mbochs.c | 163 +++++++++++++++++++++----------------
+ 1 file changed, 91 insertions(+), 72 deletions(-)
 
-diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
-index e889c1cf8fd1cd..7e9c9df0f05bac 100644
---- a/samples/vfio-mdev/mdpy.c
-+++ b/samples/vfio-mdev/mdpy.c
-@@ -85,9 +85,11 @@ static struct class	*mdpy_class;
- static struct cdev	mdpy_cdev;
- static struct device	mdpy_dev;
- static u32		mdpy_count;
-+static const struct vfio_device_ops mdpy_dev_ops;
+diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+index 881ef9a7296f23..6c0f229db36a1a 100644
+--- a/samples/vfio-mdev/mbochs.c
++++ b/samples/vfio-mdev/mbochs.c
+@@ -130,6 +130,7 @@ static struct class	*mbochs_class;
+ static struct cdev	mbochs_cdev;
+ static struct device	mbochs_dev;
+ static int		mbochs_used_mbytes;
++static const struct vfio_device_ops mbochs_dev_ops;
+ 
+ struct vfio_region_info_ext {
+ 	struct vfio_region_info          base;
+@@ -160,6 +161,7 @@ struct mbochs_dmabuf {
  
  /* State of each mdev device */
  struct mdev_state {
 +	struct vfio_device vdev;
  	u8 *vconfig;
- 	u32 bar_mask;
- 	struct mutex ops_lock;
-@@ -162,11 +164,9 @@ static void handle_pci_cfg_write(struct mdev_state *mdev_state, u16 offset,
- 	}
+ 	u64 bar_mask[3];
+ 	u32 memory_bar_mask;
+@@ -425,11 +427,9 @@ static void handle_edid_blob(struct mdev_state *mdev_state, u16 offset,
+ 		memcpy(buf, mdev_state->edid_blob + offset, count);
  }
  
 -static ssize_t mdev_access(struct mdev_device *mdev, char *buf, size_t count,
@@ -142,120 +146,116 @@ index e889c1cf8fd1cd..7e9c9df0f05bac 100644
  {
 -	struct mdev_state *mdev_state = mdev_get_drvdata(mdev);
 -	struct device *dev = mdev_dev(mdev);
- 	int ret = 0;
- 
- 	mutex_lock(&mdev_state->ops_lock);
-@@ -187,8 +187,9 @@ static ssize_t mdev_access(struct mdev_device *mdev, char *buf, size_t count,
- 			memcpy(buf, mdev_state->memblk, count);
+ 	struct page *pg;
+ 	loff_t poff;
+ 	char *map;
+@@ -478,7 +478,7 @@ static ssize_t mdev_access(struct mdev_device *mdev, char *buf, size_t count,
+ 		put_page(pg);
  
  	} else {
--		dev_info(dev, "%s: %s @0x%llx (unhandled)\n",
--			 __func__, is_write ? "WR" : "RD", pos);
-+		dev_info(mdev_state->vdev.dev,
-+			 "%s: %s @0x%llx (unhandled)\n", __func__,
-+			 is_write ? "WR" : "RD", pos);
+-		dev_dbg(dev, "%s: %s @0x%llx (unhandled)\n",
++		dev_dbg(mdev_state->vdev.dev, "%s: %s @0x%llx (unhandled)\n",
+ 			__func__, is_write ? "WR" : "RD", pos);
  		ret = -1;
  		goto accessfailed;
- 	}
-@@ -202,9 +203,8 @@ static ssize_t mdev_access(struct mdev_device *mdev, char *buf, size_t count,
+@@ -493,9 +493,8 @@ static ssize_t mdev_access(struct mdev_device *mdev, char *buf, size_t count,
  	return ret;
  }
  
--static int mdpy_reset(struct mdev_device *mdev)
-+static int mdpy_reset(struct mdev_state *mdev_state)
+-static int mbochs_reset(struct mdev_device *mdev)
++static int mbochs_reset(struct mdev_state *mdev_state)
  {
 -	struct mdev_state *mdev_state = mdev_get_drvdata(mdev);
- 	u32 stride, i;
+ 	u32 size64k = mdev_state->memsize / (64 * 1024);
+ 	int i;
  
- 	/* initialize with gray gradient */
-@@ -216,13 +216,14 @@ static int mdpy_reset(struct mdev_device *mdev)
+@@ -506,12 +505,13 @@ static int mbochs_reset(struct mdev_device *mdev)
  	return 0;
  }
  
--static int mdpy_create(struct mdev_device *mdev)
-+static int mdpy_probe(struct mdev_device *mdev)
+-static int mbochs_create(struct mdev_device *mdev)
++static int mbochs_probe(struct mdev_device *mdev)
  {
- 	const struct mdpy_type *type =
- 		&mdpy_types[mdev_get_type_group_id(mdev)];
+ 	const struct mbochs_type *type =
+ 		&mbochs_types[mdev_get_type_group_id(mdev)];
  	struct device *dev = mdev_dev(mdev);
  	struct mdev_state *mdev_state;
- 	u32 fbsize;
-+	int ret;
++	int ret = -ENOMEM;
  
- 	if (mdpy_count >= max_devices)
+ 	if (type->mbytes + mbochs_used_mbytes > max_mbytes)
  		return -ENOMEM;
-@@ -230,6 +231,7 @@ static int mdpy_create(struct mdev_device *mdev)
+@@ -519,6 +519,7 @@ static int mbochs_create(struct mdev_device *mdev)
  	mdev_state = kzalloc(sizeof(struct mdev_state), GFP_KERNEL);
  	if (mdev_state == NULL)
  		return -ENOMEM;
-+	vfio_init_group_dev(&mdev_state->vdev, &mdev->dev, &mdpy_dev_ops);
++	vfio_init_group_dev(&mdev_state->vdev, &mdev->dev, &mbochs_dev_ops);
  
- 	mdev_state->vconfig = kzalloc(MDPY_CONFIG_SPACE_SIZE, GFP_KERNEL);
- 	if (mdev_state->vconfig == NULL) {
-@@ -250,36 +252,41 @@ static int mdpy_create(struct mdev_device *mdev)
+ 	mdev_state->vconfig = kzalloc(MBOCHS_CONFIG_SPACE_SIZE, GFP_KERNEL);
+ 	if (mdev_state->vconfig == NULL)
+@@ -537,7 +538,6 @@ static int mbochs_create(struct mdev_device *mdev)
  
  	mutex_init(&mdev_state->ops_lock);
  	mdev_state->mdev = mdev;
 -	mdev_set_drvdata(mdev, mdev_state);
--
- 	mdev_state->type    = type;
- 	mdev_state->memsize = fbsize;
- 	mdpy_create_config_space(mdev_state);
--	mdpy_reset(mdev);
-+	mdpy_reset(mdev_state);
+ 	INIT_LIST_HEAD(&mdev_state->dmabufs);
+ 	mdev_state->next_id = 1;
  
- 	mdpy_count++;
+@@ -547,32 +547,38 @@ static int mbochs_create(struct mdev_device *mdev)
+ 	mdev_state->edid_regs.edid_offset = MBOCHS_EDID_BLOB_OFFSET;
+ 	mdev_state->edid_regs.edid_max_size = sizeof(mdev_state->edid_blob);
+ 	mbochs_create_config_space(mdev_state);
+-	mbochs_reset(mdev);
++	mbochs_reset(mdev_state);
+ 
+ 	mbochs_used_mbytes += type->mbytes;
 +
 +	ret = vfio_register_group_dev(&mdev_state->vdev);
-+	if (ret) {
-+		kfree(mdev_state);
-+		return ret;
-+	}
++	if (ret)
++		goto err_mem;
 +	dev_set_drvdata(&mdev->dev, mdev_state);
  	return 0;
- }
  
--static int mdpy_remove(struct mdev_device *mdev)
-+static void mdpy_remove(struct mdev_device *mdev)
- {
--	struct mdev_state *mdev_state = mdev_get_drvdata(mdev);
--	struct device *dev = mdev_dev(mdev);
-+	struct mdev_state *mdev_state = dev_get_drvdata(&mdev->dev);
- 
--	dev_info(dev, "%s\n", __func__);
-+	dev_info(&mdev->dev, "%s\n", __func__);
- 
--	mdev_set_drvdata(mdev, NULL);
-+	vfio_unregister_group_dev(&mdev_state->vdev);
- 	vfree(mdev_state->memblk);
+ err_mem:
  	kfree(mdev_state->vconfig);
  	kfree(mdev_state);
+-	return -ENOMEM;
++	return ret;
+ }
  
- 	mdpy_count--;
+-static int mbochs_remove(struct mdev_device *mdev)
++static void mbochs_remove(struct mdev_device *mdev)
+ {
+-	struct mdev_state *mdev_state = mdev_get_drvdata(mdev);
++	struct mdev_state *mdev_state = dev_get_drvdata(&mdev->dev);
+ 
+ 	mbochs_used_mbytes -= mdev_state->type->mbytes;
+-	mdev_set_drvdata(mdev, NULL);
++	vfio_unregister_group_dev(&mdev_state->vdev);
+ 	kfree(mdev_state->pages);
+ 	kfree(mdev_state->vconfig);
+ 	kfree(mdev_state);
 -	return 0;
  }
  
--static ssize_t mdpy_read(struct mdev_device *mdev, char __user *buf,
-+static ssize_t mdpy_read(struct vfio_device *vdev, char __user *buf,
- 			 size_t count, loff_t *ppos)
+-static ssize_t mbochs_read(struct mdev_device *mdev, char __user *buf,
++static ssize_t mbochs_read(struct vfio_device *vdev, char __user *buf,
+ 			   size_t count, loff_t *ppos)
  {
 +	struct mdev_state *mdev_state =
 +		container_of(vdev, struct mdev_state, vdev);
  	unsigned int done = 0;
  	int ret;
  
-@@ -289,8 +296,8 @@ static ssize_t mdpy_read(struct mdev_device *mdev, char __user *buf,
+@@ -582,7 +588,7 @@ static ssize_t mbochs_read(struct mdev_device *mdev, char __user *buf,
  		if (count >= 4 && !(*ppos % 4)) {
  			u32 val;
  
 -			ret =  mdev_access(mdev, (char *)&val, sizeof(val),
--					   *ppos, false);
-+			ret = mdev_access(mdev_state, (char *)&val, sizeof(val),
-+					  *ppos, false);
++			ret =  mdev_access(mdev_state, (char *)&val, sizeof(val),
+ 					   *ppos, false);
  			if (ret <= 0)
  				goto read_err;
- 
-@@ -301,7 +308,7 @@ static ssize_t mdpy_read(struct mdev_device *mdev, char __user *buf,
+@@ -594,7 +600,7 @@ static ssize_t mbochs_read(struct mdev_device *mdev, char __user *buf,
  		} else if (count >= 2 && !(*ppos % 2)) {
  			u16 val;
  
@@ -264,7 +264,7 @@ index e889c1cf8fd1cd..7e9c9df0f05bac 100644
  					  *ppos, false);
  			if (ret <= 0)
  				goto read_err;
-@@ -313,7 +320,7 @@ static ssize_t mdpy_read(struct mdev_device *mdev, char __user *buf,
+@@ -606,7 +612,7 @@ static ssize_t mbochs_read(struct mdev_device *mdev, char __user *buf,
  		} else {
  			u8 val;
  
@@ -273,20 +273,20 @@ index e889c1cf8fd1cd..7e9c9df0f05bac 100644
  					  *ppos, false);
  			if (ret <= 0)
  				goto read_err;
-@@ -336,9 +343,11 @@ static ssize_t mdpy_read(struct mdev_device *mdev, char __user *buf,
+@@ -629,9 +635,11 @@ static ssize_t mbochs_read(struct mdev_device *mdev, char __user *buf,
  	return -EFAULT;
  }
  
--static ssize_t mdpy_write(struct mdev_device *mdev, const char __user *buf,
-+static ssize_t mdpy_write(struct vfio_device *vdev, const char __user *buf,
- 			  size_t count, loff_t *ppos)
+-static ssize_t mbochs_write(struct mdev_device *mdev, const char __user *buf,
++static ssize_t mbochs_write(struct vfio_device *vdev, const char __user *buf,
+ 			    size_t count, loff_t *ppos)
  {
 +	struct mdev_state *mdev_state =
 +		container_of(vdev, struct mdev_state, vdev);
  	unsigned int done = 0;
  	int ret;
  
-@@ -351,7 +360,7 @@ static ssize_t mdpy_write(struct mdev_device *mdev, const char __user *buf,
+@@ -644,7 +652,7 @@ static ssize_t mbochs_write(struct mdev_device *mdev, const char __user *buf,
  			if (copy_from_user(&val, buf, sizeof(val)))
  				goto write_err;
  
@@ -295,7 +295,7 @@ index e889c1cf8fd1cd..7e9c9df0f05bac 100644
  					  *ppos, true);
  			if (ret <= 0)
  				goto write_err;
-@@ -363,7 +372,7 @@ static ssize_t mdpy_write(struct mdev_device *mdev, const char __user *buf,
+@@ -656,7 +664,7 @@ static ssize_t mbochs_write(struct mdev_device *mdev, const char __user *buf,
  			if (copy_from_user(&val, buf, sizeof(val)))
  				goto write_err;
  
@@ -304,7 +304,7 @@ index e889c1cf8fd1cd..7e9c9df0f05bac 100644
  					  *ppos, true);
  			if (ret <= 0)
  				goto write_err;
-@@ -375,7 +384,7 @@ static ssize_t mdpy_write(struct mdev_device *mdev, const char __user *buf,
+@@ -668,7 +676,7 @@ static ssize_t mbochs_write(struct mdev_device *mdev, const char __user *buf,
  			if (copy_from_user(&val, buf, sizeof(val)))
  				goto write_err;
  
@@ -313,221 +313,259 @@ index e889c1cf8fd1cd..7e9c9df0f05bac 100644
  					  *ppos, true);
  			if (ret <= 0)
  				goto write_err;
-@@ -393,9 +402,10 @@ static ssize_t mdpy_write(struct mdev_device *mdev, const char __user *buf,
- 	return -EFAULT;
- }
+@@ -754,9 +762,10 @@ static const struct vm_operations_struct mbochs_region_vm_ops = {
+ 	.fault = mbochs_region_vm_fault,
+ };
  
--static int mdpy_mmap(struct mdev_device *mdev, struct vm_area_struct *vma)
-+static int mdpy_mmap(struct vfio_device *vdev, struct vm_area_struct *vma)
+-static int mbochs_mmap(struct mdev_device *mdev, struct vm_area_struct *vma)
++static int mbochs_mmap(struct vfio_device *vdev, struct vm_area_struct *vma)
  {
 -	struct mdev_state *mdev_state = mdev_get_drvdata(mdev);
 +	struct mdev_state *mdev_state =
 +		container_of(vdev, struct mdev_state, vdev);
  
- 	if (vma->vm_pgoff != MDPY_MEMORY_BAR_OFFSET >> PAGE_SHIFT)
+ 	if (vma->vm_pgoff != MBOCHS_MEMORY_BAR_OFFSET >> PAGE_SHIFT)
  		return -EINVAL;
-@@ -409,16 +419,10 @@ static int mdpy_mmap(struct mdev_device *mdev, struct vm_area_struct *vma)
- 	return remap_vmalloc_range(vma, mdev_state->memblk, 0);
+@@ -963,7 +972,7 @@ mbochs_dmabuf_find_by_id(struct mdev_state *mdev_state, u32 id)
+ static int mbochs_dmabuf_export(struct mbochs_dmabuf *dmabuf)
+ {
+ 	struct mdev_state *mdev_state = dmabuf->mdev_state;
+-	struct device *dev = mdev_dev(mdev_state->mdev);
++	struct device *dev = mdev_state->vdev.dev;
+ 	DEFINE_DMA_BUF_EXPORT_INFO(exp_info);
+ 	struct dma_buf *buf;
+ 
+@@ -991,15 +1000,10 @@ static int mbochs_dmabuf_export(struct mbochs_dmabuf *dmabuf)
+ 	return 0;
  }
  
--static int mdpy_get_region_info(struct mdev_device *mdev,
-+static int mdpy_get_region_info(struct mdev_state *mdev_state,
- 				struct vfio_region_info *region_info,
- 				u16 *cap_type_id, void **cap_type)
+-static int mbochs_get_region_info(struct mdev_device *mdev,
++static int mbochs_get_region_info(struct mdev_state *mdev_state,
+ 				  struct vfio_region_info_ext *ext)
  {
+ 	struct vfio_region_info *region_info = &ext->base;
 -	struct mdev_state *mdev_state;
 -
 -	mdev_state = mdev_get_drvdata(mdev);
 -	if (!mdev_state)
 -		return -EINVAL;
--
- 	if (region_info->index >= VFIO_PCI_NUM_REGIONS &&
- 	    region_info->index != MDPY_DISPLAY_REGION)
+ 
+ 	if (region_info->index >= MBOCHS_NUM_REGIONS)
  		return -EINVAL;
-@@ -447,15 +451,13 @@ static int mdpy_get_region_info(struct mdev_device *mdev,
+@@ -1047,15 +1051,13 @@ static int mbochs_get_region_info(struct mdev_device *mdev,
  	return 0;
  }
  
--static int mdpy_get_irq_info(struct mdev_device *mdev,
--			     struct vfio_irq_info *irq_info)
-+static int mdpy_get_irq_info(struct vfio_irq_info *irq_info)
+-static int mbochs_get_irq_info(struct mdev_device *mdev,
+-			       struct vfio_irq_info *irq_info)
++static int mbochs_get_irq_info(struct vfio_irq_info *irq_info)
  {
  	irq_info->count = 0;
  	return 0;
  }
  
--static int mdpy_get_device_info(struct mdev_device *mdev,
--				struct vfio_device_info *dev_info)
-+static int mdpy_get_device_info(struct vfio_device_info *dev_info)
+-static int mbochs_get_device_info(struct mdev_device *mdev,
+-				  struct vfio_device_info *dev_info)
++static int mbochs_get_device_info(struct vfio_device_info *dev_info)
  {
  	dev_info->flags = VFIO_DEVICE_FLAGS_PCI;
- 	dev_info->num_regions = VFIO_PCI_NUM_REGIONS;
-@@ -463,11 +465,9 @@ static int mdpy_get_device_info(struct mdev_device *mdev,
+ 	dev_info->num_regions = MBOCHS_NUM_REGIONS;
+@@ -1063,11 +1065,9 @@ static int mbochs_get_device_info(struct mdev_device *mdev,
  	return 0;
  }
  
--static int mdpy_query_gfx_plane(struct mdev_device *mdev,
-+static int mdpy_query_gfx_plane(struct mdev_state *mdev_state,
- 				struct vfio_device_gfx_plane_info *plane)
+-static int mbochs_query_gfx_plane(struct mdev_device *mdev,
++static int mbochs_query_gfx_plane(struct mdev_state *mdev_state,
+ 				  struct vfio_device_gfx_plane_info *plane)
  {
 -	struct mdev_state *mdev_state = mdev_get_drvdata(mdev);
--
- 	if (plane->flags & VFIO_GFX_PLANE_TYPE_PROBE) {
- 		if (plane->flags == (VFIO_GFX_PLANE_TYPE_PROBE |
- 				     VFIO_GFX_PLANE_TYPE_REGION))
-@@ -496,14 +496,13 @@ static int mdpy_query_gfx_plane(struct mdev_device *mdev,
+-	struct device *dev = mdev_dev(mdev);
+ 	struct mbochs_dmabuf *dmabuf;
+ 	struct mbochs_mode mode;
+ 	int ret;
+@@ -1121,18 +1121,16 @@ static int mbochs_query_gfx_plane(struct mdev_device *mdev,
+ done:
+ 	if (plane->drm_plane_type == DRM_PLANE_TYPE_PRIMARY &&
+ 	    mdev_state->active_id != plane->dmabuf_id) {
+-		dev_dbg(dev, "%s: primary: %d => %d\n", __func__,
+-			mdev_state->active_id, plane->dmabuf_id);
++		dev_dbg(mdev_state->vdev.dev, "%s: primary: %d => %d\n",
++			__func__, mdev_state->active_id, plane->dmabuf_id);
+ 		mdev_state->active_id = plane->dmabuf_id;
+ 	}
+ 	mutex_unlock(&mdev_state->ops_lock);
  	return 0;
  }
  
--static long mdpy_ioctl(struct mdev_device *mdev, unsigned int cmd,
-+static long mdpy_ioctl(struct vfio_device *vdev, unsigned int cmd,
- 		       unsigned long arg)
+-static int mbochs_get_gfx_dmabuf(struct mdev_device *mdev,
+-				 u32 id)
++static int mbochs_get_gfx_dmabuf(struct mdev_state *mdev_state, u32 id)
  {
- 	int ret = 0;
- 	unsigned long minsz;
--	struct mdev_state *mdev_state;
--
--	mdev_state = mdev_get_drvdata(mdev);
+-	struct mdev_state *mdev_state = mdev_get_drvdata(mdev);
+ 	struct mbochs_dmabuf *dmabuf;
+ 
+ 	mutex_lock(&mdev_state->ops_lock);
+@@ -1154,9 +1152,11 @@ static int mbochs_get_gfx_dmabuf(struct mdev_device *mdev,
+ 	return dma_buf_fd(dmabuf->buf, 0);
+ }
+ 
+-static long mbochs_ioctl(struct mdev_device *mdev, unsigned int cmd,
+-			unsigned long arg)
++static long mbochs_ioctl(struct vfio_device *vdev, unsigned int cmd,
++			 unsigned long arg)
+ {
 +	struct mdev_state *mdev_state =
 +		container_of(vdev, struct mdev_state, vdev);
+ 	int ret = 0;
+ 	unsigned long minsz, outsz;
  
- 	switch (cmd) {
- 	case VFIO_DEVICE_GET_INFO:
-@@ -518,7 +517,7 @@ static long mdpy_ioctl(struct mdev_device *mdev, unsigned int cmd,
+@@ -1173,7 +1173,7 @@ static long mbochs_ioctl(struct mdev_device *mdev, unsigned int cmd,
  		if (info.argsz < minsz)
  			return -EINVAL;
  
--		ret = mdpy_get_device_info(mdev, &info);
-+		ret = mdpy_get_device_info(&info);
+-		ret = mbochs_get_device_info(mdev, &info);
++		ret = mbochs_get_device_info(&info);
  		if (ret)
  			return ret;
  
-@@ -543,7 +542,7 @@ static long mdpy_ioctl(struct mdev_device *mdev, unsigned int cmd,
- 		if (info.argsz < minsz)
+@@ -1197,7 +1197,7 @@ static long mbochs_ioctl(struct mdev_device *mdev, unsigned int cmd,
+ 		if (outsz > sizeof(info))
  			return -EINVAL;
  
--		ret = mdpy_get_region_info(mdev, &info, &cap_type_id,
-+		ret = mdpy_get_region_info(mdev_state, &info, &cap_type_id,
- 					   &cap_type);
+-		ret = mbochs_get_region_info(mdev, &info);
++		ret = mbochs_get_region_info(mdev_state, &info);
  		if (ret)
  			return ret;
-@@ -567,7 +566,7 @@ static long mdpy_ioctl(struct mdev_device *mdev, unsigned int cmd,
- 		    (info.index >= mdev_state->dev_info.num_irqs))
+ 
+@@ -1220,7 +1220,7 @@ static long mbochs_ioctl(struct mdev_device *mdev, unsigned int cmd,
+ 		    (info.index >= VFIO_PCI_NUM_IRQS))
  			return -EINVAL;
  
--		ret = mdpy_get_irq_info(mdev, &info);
-+		ret = mdpy_get_irq_info(&info);
+-		ret = mbochs_get_irq_info(mdev, &info);
++		ret = mbochs_get_irq_info(&info);
  		if (ret)
  			return ret;
  
-@@ -590,7 +589,7 @@ static long mdpy_ioctl(struct mdev_device *mdev, unsigned int cmd,
+@@ -1243,7 +1243,7 @@ static long mbochs_ioctl(struct mdev_device *mdev, unsigned int cmd,
  		if (plane.argsz < minsz)
  			return -EINVAL;
  
--		ret = mdpy_query_gfx_plane(mdev, &plane);
-+		ret = mdpy_query_gfx_plane(mdev_state, &plane);
+-		ret = mbochs_query_gfx_plane(mdev, &plane);
++		ret = mbochs_query_gfx_plane(mdev_state, &plane);
  		if (ret)
  			return ret;
  
-@@ -604,12 +603,12 @@ static long mdpy_ioctl(struct mdev_device *mdev, unsigned int cmd,
+@@ -1260,19 +1260,19 @@ static long mbochs_ioctl(struct mdev_device *mdev, unsigned int cmd,
+ 		if (get_user(dmabuf_id, (__u32 __user *)arg))
+ 			return -EFAULT;
+ 
+-		return mbochs_get_gfx_dmabuf(mdev, dmabuf_id);
++		return mbochs_get_gfx_dmabuf(mdev_state, dmabuf_id);
+ 	}
+ 
+ 	case VFIO_DEVICE_SET_IRQS:
  		return -EINVAL;
  
  	case VFIO_DEVICE_RESET:
--		return mdpy_reset(mdev);
-+		return mdpy_reset(mdev_state);
+-		return mbochs_reset(mdev);
++		return mbochs_reset(mdev_state);
  	}
  	return -ENOTTY;
  }
  
--static int mdpy_open(struct mdev_device *mdev)
-+static int mdpy_open(struct vfio_device *vdev)
+-static int mbochs_open(struct mdev_device *mdev)
++static int mbochs_open(struct vfio_device *vdev)
  {
  	if (!try_module_get(THIS_MODULE))
  		return -ENODEV;
-@@ -617,7 +616,7 @@ static int mdpy_open(struct mdev_device *mdev)
+@@ -1280,9 +1280,10 @@ static int mbochs_open(struct mdev_device *mdev)
  	return 0;
  }
  
--static void mdpy_close(struct mdev_device *mdev)
-+static void mdpy_close(struct vfio_device *vdev)
+-static void mbochs_close(struct mdev_device *mdev)
++static void mbochs_close(struct vfio_device *vdev)
  {
- 	module_put(THIS_MODULE);
- }
-@@ -626,8 +625,7 @@ static ssize_t
- resolution_show(struct device *dev, struct device_attribute *attr,
- 		char *buf)
+-	struct mdev_state *mdev_state = mdev_get_drvdata(mdev);
++	struct mdev_state *mdev_state =
++		container_of(vdev, struct mdev_state, vdev);
+ 	struct mbochs_dmabuf *dmabuf, *tmp;
+ 
+ 	mutex_lock(&mdev_state->ops_lock);
+@@ -1306,8 +1307,7 @@ static ssize_t
+ memory_show(struct device *dev, struct device_attribute *attr,
+ 	    char *buf)
  {
 -	struct mdev_device *mdev = mdev_from_dev(dev);
 -	struct mdev_state *mdev_state = mdev_get_drvdata(mdev);
 +	struct mdev_state *mdev_state = dev_get_drvdata(dev);
  
- 	return sprintf(buf, "%dx%d\n",
- 		       mdev_state->type->width,
-@@ -716,18 +714,30 @@ static struct attribute_group *mdev_type_groups[] = {
+ 	return sprintf(buf, "%d MB\n", mdev_state->type->mbytes);
+ }
+@@ -1398,18 +1398,30 @@ static struct attribute_group *mdev_type_groups[] = {
  	NULL,
  };
  
-+static const struct vfio_device_ops mdpy_dev_ops = {
-+	.open = mdpy_open,
-+	.release = mdpy_close,
-+	.read = mdpy_read,
-+	.write = mdpy_write,
-+	.ioctl = mdpy_ioctl,
-+	.mmap = mdpy_mmap,
++static const struct vfio_device_ops mbochs_dev_ops = {
++	.open = mbochs_open,
++	.release = mbochs_close,
++	.read = mbochs_read,
++	.write = mbochs_write,
++	.ioctl = mbochs_ioctl,
++	.mmap = mbochs_mmap,
 +};
 +
-+static struct mdev_driver mdpy_driver = {
++static struct mdev_driver mbochs_driver = {
 +	.driver = {
-+		.name = "mdpy",
++		.name = "mbochs",
 +		.owner = THIS_MODULE,
 +		.mod_name = KBUILD_MODNAME,
 +		.dev_groups = mdev_dev_groups,
 +	},
-+	.probe = mdpy_probe,
-+	.remove	= mdpy_remove,
++	.probe = mbochs_probe,
++	.remove	= mbochs_remove,
 +};
 +
  static const struct mdev_parent_ops mdev_fops = {
  	.owner			= THIS_MODULE,
 -	.mdev_attr_groups	= mdev_dev_groups,
-+	.device_driver          = &mdpy_driver,
++	.device_driver		= &mbochs_driver,
  	.supported_type_groups	= mdev_type_groups,
--	.create			= mdpy_create,
--	.remove			= mdpy_remove,
--	.open			= mdpy_open,
--	.release		= mdpy_close,
--	.read			= mdpy_read,
--	.write			= mdpy_write,
--	.ioctl			= mdpy_ioctl,
--	.mmap			= mdpy_mmap,
+-	.create			= mbochs_create,
+-	.remove			= mbochs_remove,
+-	.open			= mbochs_open,
+-	.release		= mbochs_close,
+-	.read			= mbochs_read,
+-	.write			= mbochs_write,
+-	.ioctl			= mbochs_ioctl,
+-	.mmap			= mbochs_mmap,
  };
  
  static const struct file_operations vd_fops = {
-@@ -752,11 +762,15 @@ static int __init mdpy_dev_init(void)
- 	cdev_add(&mdpy_cdev, mdpy_devt, MINORMASK + 1);
- 	pr_info("%s: major %d\n", __func__, MAJOR(mdpy_devt));
+@@ -1434,11 +1446,15 @@ static int __init mbochs_dev_init(void)
+ 	cdev_add(&mbochs_cdev, mbochs_devt, MINORMASK + 1);
+ 	pr_info("%s: major %d\n", __func__, MAJOR(mbochs_devt));
  
-+	ret = mdev_register_driver(&mdpy_driver);
++	ret = mdev_register_driver(&mbochs_driver);
 +	if (ret)
 +		goto err_cdev;
 +
- 	mdpy_class = class_create(THIS_MODULE, MDPY_CLASS_NAME);
- 	if (IS_ERR(mdpy_class)) {
- 		pr_err("Error: failed to register mdpy_dev class\n");
- 		ret = PTR_ERR(mdpy_class);
+ 	mbochs_class = class_create(THIS_MODULE, MBOCHS_CLASS_NAME);
+ 	if (IS_ERR(mbochs_class)) {
+ 		pr_err("Error: failed to register mbochs_dev class\n");
+ 		ret = PTR_ERR(mbochs_class);
 -		goto failed1;
 +		goto err_driver;
  	}
- 	mdpy_dev.class = mdpy_class;
- 	mdpy_dev.release = mdpy_device_release;
-@@ -764,19 +778,21 @@ static int __init mdpy_dev_init(void)
+ 	mbochs_dev.class = mbochs_class;
+ 	mbochs_dev.release = mbochs_device_release;
+@@ -1446,19 +1462,21 @@ static int __init mbochs_dev_init(void)
  
- 	ret = device_register(&mdpy_dev);
+ 	ret = device_register(&mbochs_dev);
  	if (ret)
 -		goto failed2;
 +		goto err_class;
  
- 	ret = mdev_register_device(&mdpy_dev, &mdev_fops);
+ 	ret = mdev_register_device(&mbochs_dev, &mdev_fops);
  	if (ret)
 -		goto failed3;
 +		goto err_device;
@@ -536,25 +574,25 @@ index e889c1cf8fd1cd..7e9c9df0f05bac 100644
  
 -failed3:
 +err_device:
- 	device_unregister(&mdpy_dev);
+ 	device_unregister(&mbochs_dev);
 -failed2:
 +err_class:
- 	class_destroy(mdpy_class);
+ 	class_destroy(mbochs_class);
 -failed1:
 +err_driver:
-+	mdev_unregister_driver(&mdpy_driver);
++	mdev_unregister_driver(&mbochs_driver);
 +err_cdev:
- 	cdev_del(&mdpy_cdev);
- 	unregister_chrdev_region(mdpy_devt, MINORMASK + 1);
+ 	cdev_del(&mbochs_cdev);
+ 	unregister_chrdev_region(mbochs_devt, MINORMASK + 1);
  	return ret;
-@@ -788,6 +804,7 @@ static void __exit mdpy_dev_exit(void)
- 	mdev_unregister_device(&mdpy_dev);
+@@ -1470,6 +1488,7 @@ static void __exit mbochs_dev_exit(void)
+ 	mdev_unregister_device(&mbochs_dev);
  
- 	device_unregister(&mdpy_dev);
-+	mdev_unregister_driver(&mdpy_driver);
- 	cdev_del(&mdpy_cdev);
- 	unregister_chrdev_region(mdpy_devt, MINORMASK + 1);
- 	class_destroy(mdpy_class);
+ 	device_unregister(&mbochs_dev);
++	mdev_unregister_driver(&mbochs_driver);
+ 	cdev_del(&mbochs_cdev);
+ 	unregister_chrdev_region(mbochs_devt, MINORMASK + 1);
+ 	class_destroy(mbochs_class);
 -- 
 2.31.1
 
