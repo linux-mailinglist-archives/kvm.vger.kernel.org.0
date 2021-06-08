@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A28793A02B5
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 21:22:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1444E3A041A
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 21:25:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236069AbhFHTHz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 15:07:55 -0400
-Received: from mail-mw2nam10on2042.outbound.protection.outlook.com ([40.107.94.42]:29665
+        id S236786AbhFHT1d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 15:27:33 -0400
+Received: from mail-mw2nam10on2082.outbound.protection.outlook.com ([40.107.94.82]:30916
         "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S237879AbhFHTGE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Jun 2021 15:06:04 -0400
+        id S239806AbhFHTZ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Jun 2021 15:25:29 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ki/the97YEjDhmRnD07J+e8DvDJLszW9GIxche50Ic4iwkYm/o1OB0q5wdqkQzzpOLFSoScOoT1C0/ibCBfjG7Jd95rcm+X1Sb93SEBZKHDLKmgZTQNK6S2uUumKbaf3IVebitUBUNr0gs4Q1g/BIhaTk9CzkxR41vYB130IjdoWw7bjpcGHJipIRtfZdDBQ3Tl90RYUse64nX50zcWcixYxh5XUIsKzyFSHoXe0LjHtSbiNicLHK3vAC5qzFUA0GefOd17Soh1NKpNWF4DU5NMjqR7iA9pUsSds+3pL4Fkrg+jxCFfrbooDBwXcPE1C3G7N8yXqw4a1EnVd9stlxA==
+ b=QQEPZ1+Mm3JSjZpU4DttiKm4v26iwUu2XXfe04+7Uao8pLpINvEIET8tppZKK9FJ45FKHbzYhvtGZkf1A0YSohgQA4MsRUYkyBvvVXZgwnfC0BYBFWXH8iJBR5MrQRAbSKmRIuVXwHmQDcRDJdmL87NBW8jrbkyPGtxsmK3RgNFEAN78W7VBfOi9MB76cjLL/tPPHBaZupM8pwo0V5b9TwbiPKPV/V/8M7rDV6KrwqQW9aN6c9B8HhAQfd3/rt2VmybW5I3A4n0H6qqn52DCT/prOGOAgzrq5zE6ftwJmQiZ+vySm1nKWhrF7++GxPjFUCexkTv5SLwd7S4TAieReg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iaRJrejWbXp1V7Owx6wLj+WWWTWLRq2muZfFSIGBTsE=;
- b=DceweHBhs3Cj2jEctIXROEV/gbx7nsjXN/LpVV6tYh6iHXrv8dgPuXu2XPrxoDcz4k3DVeVt167BiQOYMz2C9HPN5d5jhjae+iswVjkVHHS+VIJYGXeBsFUvhNdGL4ck2P9ar2XgO/b/HDxIsPCPYillZ5hLqQReKn7vdEQ0uwrj7iHYAuPq3jADB0H87l/1Xv0CDsbK02FpTNSjgPtzgRGk+5DnQ7PhKMMrB1a1qWaFA49ZXRTekQtmAlbS1iWq2QkkHDZ0VSj5rpNC8ogk4yC1OptzTSqGlF/+23NVQ/f+7Mio3yjt+Mob7qzxSjSm0mCraLwaj6pcdJjVacEMHw==
+ bh=DayybFusWT9CghUN7Q5EzYozSZIJmFEtcHdYt3of4fw=;
+ b=XHBC1/FbVEEKcQSajF0fWJYplW/50VO4rhEtDU6hABma6aFSKIcgQ/NHGbFHq22Ivg/eMgLAg5M85E9n8CNCR692LqiX2uC/cUSo1CCFnyuK6tnTvze6LLhQo6YF8e0K1bOauifVpzuOfyuRA2oWb4qwv18zxfvjrD6TJBPZM4umlTaExuVY0sHjziejH3KZbLVf9JLTE0rHzqeM5LwbI0gMNTNatqeept9Et63h5G1yB062ztm4SyDVYZwq3lHHw/98u2xZ1VpJtRLZNzdDDvRWrPQUQ7Ku4FaQmCL2N+f9gN/DxJUHurMVAHyTpDcsp0qtY2HYZfm162K9YDb0Ww==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iaRJrejWbXp1V7Owx6wLj+WWWTWLRq2muZfFSIGBTsE=;
- b=bXPB3U6kPVzU95ed1sWunPEbwUrt8Sm3yG3JyAtD1vtKaxVI5qvRJdqX01uL5LUc49LioWBQxr9jb8HBY0yppeQ4maZ9xFPJ5Yhxob96Ikeww9HfdP8c5LYc7iiHKVrgAfGwa+iT6wzVQBZDGs8rfMwf4OiAZiQv7Dal+QSsvJ42Clp7mqg3Fod3MfzPn2KCxTFGu1xwSTCoeva1tG7tP4nFrqw0fLXuRBKZ0zgSwIFNpLzEkZ9JxScCpXbuSk3TVjwlkC5Jwg9HB4fJhwp9v/YjEugQaX47DB/pWZae8i/iRs5jLTzHGONeeBkgDpBI4tELlhMkZfD9bHulgYNiIg==
+ bh=DayybFusWT9CghUN7Q5EzYozSZIJmFEtcHdYt3of4fw=;
+ b=A5Ca5RQ//y5avBB7Zwd9Qlzcp55NJlI5RX5W7/s57jHLBCNl6L7FKn65vTJfE6ZxzaHOa5o2sMGoZuLjDbS94P0hURtunmlWwNImWnObjc3xgeqnrgeoD4TPyGuAF677l8B+EmEf3XNl/dino9TLkIJ4qGZxjI1J1RVdu3aE+SKUOgRxN5sEj/TESrnC2zFt3iZqVPFo6W4C8IJPAKhy+cnUFkPM/LYHnTBPkeimt30ue2Ypa9L61Hqvi8l6JPBjvunsv66w7xy9PaQVECLmbTiS1ZX/tqUcck74mMpwNgFJ8fCrUVgGx+55+lp1syl6ectUQKNCXx81H1nmX8ZxUg==
 Authentication-Results: gibson.dropbear.id.au; dkim=none (message not signed)
  header.d=none;gibson.dropbear.id.au; dmarc=none action=none
  header.from=nvidia.com;
 Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL0PR12MB5522.namprd12.prod.outlook.com (2603:10b6:208:17d::13) with
+ by BL0PR12MB5554.namprd12.prod.outlook.com (2603:10b6:208:1cd::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20; Tue, 8 Jun
- 2021 19:04:08 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.24; Tue, 8 Jun
+ 2021 19:23:34 +0000
 Received: from BL0PR12MB5506.namprd12.prod.outlook.com
  ([fe80::3d51:a3b9:8611:684e]) by BL0PR12MB5506.namprd12.prod.outlook.com
  ([fe80::3d51:a3b9:8611:684e%7]) with mapi id 15.20.4219.021; Tue, 8 Jun 2021
- 19:04:08 +0000
-Date:   Tue, 8 Jun 2021 16:04:06 -0300
+ 19:23:34 +0000
+Date:   Tue, 8 Jun 2021 16:23:32 -0300
 From:   Jason Gunthorpe <jgg@nvidia.com>
 To:     David Gibson <david@gibson.dropbear.id.au>
 Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
@@ -61,110 +61,168 @@ Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
         Kirti Wankhede <kwankhede@nvidia.com>,
         Robin Murphy <robin.murphy@arm.com>
 Subject: Re: [RFC] /dev/ioasid uAPI proposal
-Message-ID: <20210608190406.GN1002214@nvidia.com>
+Message-ID: <20210608192332.GO1002214@nvidia.com>
 References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210528173538.GA3816344@nvidia.com>
- <YLcl+zaK6Y0gB54a@yekko>
- <20210602161648.GY1002214@nvidia.com>
- <YLhlCINGPGob4Nld@yekko>
- <20210603115224.GQ1002214@nvidia.com>
- <YL6/bjHyuHJTn4Rd@yekko>
+ <20210528195839.GO1002214@nvidia.com>
+ <MWHPR11MB1886A17F36CF744857C531148C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210601175643.GQ1002214@nvidia.com>
+ <YLcr8B7EPDCejlWZ@yekko>
+ <20210602163753.GZ1002214@nvidia.com>
+ <YLhnRbJJqPUBiRwa@yekko>
+ <20210603122832.GS1002214@nvidia.com>
+ <YL8Iam4+cog7oVDa@yekko>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YL6/bjHyuHJTn4Rd@yekko>
+In-Reply-To: <YL8Iam4+cog7oVDa@yekko>
 X-Originating-IP: [47.55.113.94]
-X-ClientProxiedBy: MN2PR20CA0056.namprd20.prod.outlook.com
- (2603:10b6:208:235::25) To BL0PR12MB5506.namprd12.prod.outlook.com
+X-ClientProxiedBy: BLAPR03CA0061.namprd03.prod.outlook.com
+ (2603:10b6:208:329::6) To BL0PR12MB5506.namprd12.prod.outlook.com
  (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (47.55.113.94) by MN2PR20CA0056.namprd20.prod.outlook.com (2603:10b6:208:235::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.21 via Frontend Transport; Tue, 8 Jun 2021 19:04:07 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lqh1C-0048fX-Lv; Tue, 08 Jun 2021 16:04:06 -0300
+Received: from mlx.ziepe.ca (47.55.113.94) by BLAPR03CA0061.namprd03.prod.outlook.com (2603:10b6:208:329::6) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.20 via Frontend Transport; Tue, 8 Jun 2021 19:23:33 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lqhK0-0048y4-H2; Tue, 08 Jun 2021 16:23:32 -0300
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 704ecc31-7e5f-4f5e-1415-08d92ab03132
-X-MS-TrafficTypeDiagnostic: BL0PR12MB5522:
+X-MS-Office365-Filtering-Correlation-Id: 93731080-8333-455e-61cf-08d92ab2e808
+X-MS-TrafficTypeDiagnostic: BL0PR12MB5554:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL0PR12MB5522B51116DC002EAB61614EC2379@BL0PR12MB5522.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Microsoft-Antispam-PRVS: <BL0PR12MB555452AC3B515FDC801DF6FDC2379@BL0PR12MB5554.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: EcV0+XadaKWdpp//KiCs3ZXERq45FECPssCOt77biouvpoM0VRcdhRwbLDYxwt8m2MdCd3GLkuyruZs9nMzwRNRAvHP2eE75Q9OqZEGNxudSh9gkvNcZhFGyHdUingihy6L4Bwh+j6F8VpVHonxUc5VaXdhtza/lEDpmluPf0xlWk/VAx5I4i+aFV/WitKdXJDgxAgaPYfznTJ8MXw/pQOQuRHwcepzp2plvlkP5Pv+KEDSFoovsrhnDzpLQvYmeaqDX1EUulDiXUbYRlw7LHWR2YskcIh6b4imYFXilOrvNliWqXeWdyKGqjuqpz+Zvfbevzm3wReI9ZsU/I3+HVy8oNJ9fYCB235eCtC5x0OfQ61zWE6V/taFNLZ65N0jwS9LE4QYFkcGCQE0uGY2V2qwwGXT2g13UFFQpY+tzaYtR3N1JM07yQMD9u6Ea2HPwTTSNkOAMMDlegxc+7CVxl9NEnSYp7MKugMenbzNf+7RhlAHpX/hDn6m6j4bbqLixBuqxLqIu3Y7hHmXCFoer09EBvFM8cMryNRiBB1+PdJU4sgREHlOUYDHyC0/sOuy8Jx03SdRkWNgC1ackdWZ/5OpdxpqcGracVJD0wKXBTmY=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(366004)(136003)(39860400002)(396003)(376002)(8676002)(316002)(86362001)(2906002)(36756003)(38100700002)(33656002)(1076003)(8936002)(186003)(6916009)(54906003)(9746002)(9786002)(2616005)(478600001)(7416002)(426003)(66946007)(66476007)(5660300002)(26005)(66556008)(4326008)(83380400001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: GqhgsOuZwr9LbJJJVRgjyog+Xu3QwmfXRGZTTaCYILekRhxqqlAlcprjSJLCR5ZW4Z7wP43jBKdZW40MQsHzu3e/0XQ6atHrsZDrOeZgwasSXk0fvKkITKIP4LiX+ukRp4gzsQ0KX0TgZnNxHgX+ITvn6t5zLv5yizXZx7nu0aSgVoz8GA6oLznaj2f0lBtsCy5QXKoo1f/7rBnxA4SdGcnqF/v9MvmLEwTjakLRqEho52Ck3eqMJK6f6m0y9ps4IxteLa84jyIKITAli4TJHHvOMwJ6/5/7VWJGgsc5TlCExYPrBUpbBt5Sz5pa8ERiYNhSO/9L9dUdDDysWgLQpeCd94/d0uZ5DCCE1x34Hrr9f9HQ11ut/hyJ50TBwkoopHIZirqOpPjrzX6VwHynlNODDtqgSqwGrvfWarr8NBQDewtbK5pxqDRiunBBZb/97+94Iwira/vnRrPV7jnjWjLmxgsr6C9rChqOioXc877/Q3QAMS4Me77yfrzlzNFx6owK21wfOFtycvbMJMU1pvcoTblpyb1FnO72PZTbLbp9xFkAJr6Ex6WigXta0unS5CzCmxcpbr74IGvPjjzE0EeZcVj4uTNt9mAofgygMOk=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(2616005)(33656002)(426003)(8676002)(8936002)(86362001)(83380400001)(498600001)(2906002)(54906003)(5660300002)(4326008)(7416002)(26005)(66476007)(186003)(1076003)(6916009)(9786002)(36756003)(9746002)(66946007)(66556008)(38100700002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2VVbYXngpJbBN3w0g/3DJ/8gZvaQJoU2Rrh0JS7qxmVxZztwPTi/I3siHBuV?=
- =?us-ascii?Q?ySFNWryNrh5v2g4e/JGQNar5ulysZSLHILxBMmcAE0fP1ox0BbpHJwuwjK6L?=
- =?us-ascii?Q?oNr28/ah1Z5Gj6jQwY495mlJYpa2vox0belg5/qvUmvBF7jjxghSdU3sys/Y?=
- =?us-ascii?Q?MvUnXBjVPoQ0PbhWYn9Z09mt5eZl73C6g1EO66rlfbBihkOBWL19xW85Vqtv?=
- =?us-ascii?Q?1qfZa2crOzafhv9cXlv631vbJHvTODApTAY4nqXliXoNJjj2t5ogT4tIa9rQ?=
- =?us-ascii?Q?p2oB68RQCxbszpAEOW2RBLfnnEO8RSANyjVryIen0MEVlcYp7ZYntjakGjOY?=
- =?us-ascii?Q?RE01DLj0BleNO9clNft23w/PzXOdZyefVhQfjmMYosIE2+2PVyb4Kkc3J8iK?=
- =?us-ascii?Q?ZDxHZeqY7ODHXaZzEa59uQib85pzkxVM5+ApXg/DHJfhzGNMEdGa12Y9FC4j?=
- =?us-ascii?Q?ou5OyknimuixgGJ5yqGgV5n8w5irnLofHXQabwzD/Fm9v4mZxD9nVTn3lfNu?=
- =?us-ascii?Q?FcWElBxUtbGTAOVNk+GrYQirvye9BohikWdw7Kdv0K1l7ZquDcC/uEe5gzrR?=
- =?us-ascii?Q?1hqblcQHxGDxBnmT3j0dtwwEKIigRCCphbUyZwQcnSb94Afa3BxWweicGKT1?=
- =?us-ascii?Q?PoxbeXM3hXJaU2sGXERaaY8xUpZlQ4psNJmq4glV2y/6RFRsc1plKWgbaqMt?=
- =?us-ascii?Q?agA+/KE/CO8mUkjhHgifx8fsG0Vq981Tl2G4sgfUSHeQIa8MF74VChvQa0tZ?=
- =?us-ascii?Q?e942b/mS5fY8AoQnKF+hYiMzW01M/zcVmWEZZl8TMzCgkl/bqiw9YTi/pQwc?=
- =?us-ascii?Q?UXyVq1L/AJXct8jRm1cps7eUmCyuSXFQfskD4yzpx1r7sWYm/9UJfAhFFMCw?=
- =?us-ascii?Q?Fd7F5MJV6KghxE25UA8gYsPtm1OzcF5oRX1MZ9LjcRQf80yV4/IjhKfQMlQd?=
- =?us-ascii?Q?cOZ4UTTZG9HSSKRe+49uRAQWhN8bD25+ct1Hu/5Rb+NlDqtBuCHUtRfkqewL?=
- =?us-ascii?Q?grs5ZnX6jE2u0qtKIOgTPopYElpFVfcdL6DNvNR58cGP+jdekhESFVZTbjKs?=
- =?us-ascii?Q?KCU+JSUJb8GHlNf+sJUzr1+c5FLOFHo1jfejKqT1HUYFG6fg1aHRErQgNmxE?=
- =?us-ascii?Q?eS/OsQI+8/DdrCZz8ba3CfJSb8vExRjCSnVQZAgiVbLkQVcCfUomQ7CNa2WJ?=
- =?us-ascii?Q?ih1meTCdOTMyUt1gpKeAwwd64uzuPCzWL+o55f7hhzLkzviQe8wV0NvtOisj?=
- =?us-ascii?Q?wP2fUQv7Onv4oMHNk89AoH+TaF5IQW5Gsk8NxdQXcisSK2aliwzfeEuRsiiE?=
- =?us-ascii?Q?+eZ4hrcLcQ3bZAJbkt5bQMLE?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?TEa1SwfVVkxJVgynFgnLuxYu3I7SN/AmG37LNnPaIFjmEuGHk173B3/HZpVw?=
+ =?us-ascii?Q?vfHR7CPdvJpmrK5NVddIg15YtBQvQHApY+WcpNwPE26csWRvvcZAc9hCS3lH?=
+ =?us-ascii?Q?8IvTDvzuaAiA+g/r+CjJXOGdV4a76epMBHim10xS4hlOkU0j4RlMyiQx6XST?=
+ =?us-ascii?Q?fRJRV4gbRS7kqkl3klZfyuuYiPGul2s3Xbf75nxA71C8q0G5BgxjzNg1F0OX?=
+ =?us-ascii?Q?RsQsVqCkfeodo3UXg2j3AwKPr1qv7yj8dLXS4UXOkVZTPWMC49WLgKCyoCvA?=
+ =?us-ascii?Q?NSp4Dl1dbpvV/18fOlkeWQGCsvM6StExIM6m8jDtmdnQNJfrIsErf5iKX5gk?=
+ =?us-ascii?Q?VJJEA4Lugtlaba1+U3vn86AjIKrHjQc56HsRjjoPQh8mzM61VanTyw7oDfqm?=
+ =?us-ascii?Q?NGDhiVnFagIetN6g4g2+M+53hr7s4apPl7ngrm062kpjVyFszuzKbugaO054?=
+ =?us-ascii?Q?4tysUELIopDfEdsGCwekIeZFEgjpnAWDemkD6GNjTXzRvFrTrNyyTQPHOEg7?=
+ =?us-ascii?Q?PoVVzR+6Z4HHiLP52oRDRJ0Ygw5D1QaQlHL4Vj10aKQ5U8nX58fJF9ANYIL3?=
+ =?us-ascii?Q?1OWzifcgTTkkBR5PxERffi1OEb940LDz2ue7XccmuysfsmI8IU7yHZVsYZnz?=
+ =?us-ascii?Q?2haOHl4UzrpwoDFevgGEu4LE4fIFbVUNFLmJl7nDqoNlXAy/7ujpas/seMNT?=
+ =?us-ascii?Q?n6jgxc5RiDWuSbLCIv6VkLlS0SaLal+GtP5PFH7CDFF+4IdsFyn8Ze5RauJH?=
+ =?us-ascii?Q?NsE+4FhDTecMg/UQ+ROnKQx8spFJMwFvfC7ZRslO3KQDFzhm7tiapZfEWtNI?=
+ =?us-ascii?Q?QB4QSBpfjo7cPdVN7XjTpzxl+IU6/xX+KTiiqFxqYQyg4gCjygTEbOA/Bp3v?=
+ =?us-ascii?Q?Fe9eCyOmdy7bAen0SxhmhC4ZqONXlc6m+gX9nCX6q0+nRxYykH/lvyeoP6Js?=
+ =?us-ascii?Q?JaMq8Qw39OUrVhwVXYdH5HmAPQFWtHBX3C5Q76ulGoCbPxOuN5kowMQEFA9N?=
+ =?us-ascii?Q?M3siw219ZR3DIJRBHDM9Sl0z23zaLjtz4+pDbO/jHdKjtyzIaccZ8R37eH5b?=
+ =?us-ascii?Q?gGZS7ZeY/DUIhSDMbrWi/o6ujMNGUqOSUaIqKIdAym0VC6RfKxhtLVq2Ic3z?=
+ =?us-ascii?Q?lu4mIIWwREf84vF8Hx35iFxpvUvaRVhrn8Y5Vzyix72LrSYQoqPyDSAW8Xud?=
+ =?us-ascii?Q?W9aAxi2fOCQa0fEnaYt6uL9/HtUbhCay6MI4eDgjz+Myq3rr7FzmZJfB7zc9?=
+ =?us-ascii?Q?wxXmpX39wJivTb2IDa7pp9wBIclYEtXD6dOzajSpKA4tgiAvDJXz1OJW4dQ9?=
+ =?us-ascii?Q?zbI1ToJmwCS2kyiAFiT9fhjZ?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 704ecc31-7e5f-4f5e-1415-08d92ab03132
+X-MS-Exchange-CrossTenant-Network-Message-Id: 93731080-8333-455e-61cf-08d92ab2e808
 X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2021 19:04:07.9981
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2021 19:23:33.9136
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ecwlEwl6mc5xvFGyYcZ0B0mVHqCS7BFWqeg4Yd1Tm3FZGnv0Ft1sfsoe4Ktdrq1q
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB5522
+X-MS-Exchange-CrossTenant-UserPrincipalName: 843dkmpheot/xBq3rXxWrTzU4nnuUN2MEQz2PSsMqjksXz6/s+aWBY1Zj7szU54e
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB5554
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 08, 2021 at 10:53:02AM +1000, David Gibson wrote:
-> On Thu, Jun 03, 2021 at 08:52:24AM -0300, Jason Gunthorpe wrote:
-> > On Thu, Jun 03, 2021 at 03:13:44PM +1000, David Gibson wrote:
-> > 
-> > > > We can still consider it a single "address space" from the IOMMU
-> > > > perspective. What has happened is that the address table is not just a
-> > > > 64 bit IOVA, but an extended ~80 bit IOVA formed by "PASID, IOVA".
-> > > 
-> > > True.  This does complexify how we represent what IOVA ranges are
-> > > valid, though.  I'll bet you most implementations don't actually
-> > > implement a full 64-bit IOVA, which means we effectively have a large
-> > > number of windows from (0..max IOVA) for each valid pasid.  This adds
-> > > another reason I don't think my concept of IOVA windows is just a
-> > > power specific thing.
-> > 
-> > Yes
-> > 
-> > Things rapidly get into weird hardware specific stuff though, the
-> > request will be for things like:
-> >   "ARM PASID&IO page table format from SMMU IP block vXX"
+On Tue, Jun 08, 2021 at 04:04:26PM +1000, David Gibson wrote:
+
+> > What I would like is that the /dev/iommu side managing the IOASID
+> > doesn't really care much, but the device driver has to tell
+> > drivers/iommu what it is going to do when it attaches.
 > 
-> So, I'm happy enough for picking a user-managed pagetable format to
-> imply the set of valid IOVA ranges (though a query might be nice).
+> By the device driver, do you mean the userspace or guest device
+> driver?  Or do you mean the vfio_pci or mdev "shim" device driver"?
 
-I think a query is mandatory, and optionally asking for ranges seems
-generally useful as a HW property.
+I mean vfio_pci, mdev "shim", vdpa, etc. Some kernel driver that is
+allowing qemu access to a HW resource.
 
-The danger is things can get really tricky as the app can ask for
-ranges some HW needs but other HW can't provide. 
+> > It makes sense, in PCI terms, only the driver knows what TLPs the
+> > device will generate. The IOMMU needs to know what TLPs it will
+> > recieve to configure properly.
+> > 
+> > PASID or not is major device specific variation, as is the ENQCMD/etc
+> > 
+> > Having the device be explicit when it tells the IOMMU what it is going
+> > to be sending is a major plus to me. I actually don't want to see this
+> > part of the interface be made less strong.
+> 
+> Ok, if I'm understanding this right a PASID capable IOMMU will be able
+> to process *both* transactions with just a RID and transactions with a
+> RID+PASID.
 
-I would encourage a flow where "generic" apps like DPDK can somehow
-just ignore this, or at least be very, very simplified "I want around
-XX GB of IOVA space"
+Yes
 
-dpdk type apps vs qemu apps are really quite different and we should
-be carefully that the needs of HW accelerated vIOMMU emulation do not
-trump the needs of simple universal control over a DMA map.
+> So if we're thinking of this notional 84ish-bit address space, then
+> that includes "no PASID" as well as all the possible PASID values.
+> Yes?  Or am I confused?
+
+Right, though I expect how to model 'no pasid' vs all the pasids is
+some micro-detail someone would need to work on a real vIOMMU
+implemetnation to decide..
+ 
+> > /dev/iommu is concerned with setting up the IOAS and filling the IO
+> > page tables with information
+> > 
+> > The driver behind "struct vfio_device" is responsible to "route" its
+> > HW into that IOAS.
+> > 
+> > They are two halfs of the problem, one is only the io page table, and one
+> > the is connection of a PCI TLP to a specific io page table.
+> > 
+> > Only the driver knows what format of TLPs the device will generate so
+> > only the driver can specify the "route"
+> 
+> Ok.  I'd really like if we can encode this in a way that doesn't build
+> PCI-specific structure into the API, though.
+
+I think we should at least have bus specific "convenience" APIs for
+the popular cases. It is complicated enough already, trying to force
+people to figure out the kernel synonym for a PCI standard name gets
+pretty rough... Plus the RID is inherently a hardware specific
+concept.
+
+> > Inability to match the RID is rare, certainly I would expect any IOMMU
+> > HW that can do PCIEe PASID matching can also do RID matching.
+> 
+> It's not just up to the IOMMU.  The obvious case is a PCIe-to-PCI
+> bridge.  
+
+Yes.. but PCI is *really* old at this point. Even PCI-X sustains the
+originating RID.
+
+The general case here is that each device can route to its own
+IOAS. The specialty case is that only one IOAS in a group can be
+used. We should make room in the API for the special case without
+destroying the general case.
+
+> > Oh, I hadn't spent time thinking about any of those.. It is messy but
+> > it can still be forced to work, I guess. A device centric model means
+> > all the devices using the same routing ID have to be connected to the
+> > same IOASID by userspace. So some of the connections will be NOPs.
+> 
+> See, that's exactly what I thought the group checks were enforcing.
+> I'm really hoping we don't need two levels of granularity here: groups
+> of devices that can't be identified from each other, and then groups
+> of those that can't be isolated from each other.  That introduces a
+> huge amount of extra conceptual complexity.
+
+We've got this far with groups that mean all those things together, I
+wouldn't propose to do a bunch of kernel work to change that
+significantly.
+
+I just want to have a device centric uAPI so we are not trapped
+forever in groups being 1:1 with an IOASID model, which is clearly not
+accurately modeling what today's systems are actually able to do,
+especially with PASID.
+
+We can report some fixed info to user space 'all these devices share
+one ioasid' and leave it for now/ever
 
 Jason
