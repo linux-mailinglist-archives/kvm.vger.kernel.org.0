@@ -2,328 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E92D739F3C0
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 12:40:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E94A39F3DF
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 12:44:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231425AbhFHKl6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 06:41:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56224 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230438AbhFHKl5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 8 Jun 2021 06:41:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623148804;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nYNCs3JrvkX8VAnIEcTWaVkYHbhrJx9YKWDfXBQ1+cM=;
-        b=TWPwvKYSGixwMeu/0zRoWV7tV8HTU52Q2W7PIswov44LJ4lwmIQgeMXAJtzOmHqkqnomlF
-        2MHvjmDm5IwX/oZWIMgN12wtJZbJwBXsoWtRnYGK+pxXf8De0ML2i2z96VT3lUy5mjZPgo
-        YspubmuInlbt3OD51mPhDGkqP2uK+WA=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-UCfl-h-1PCyLON1ozP8oMw-1; Tue, 08 Jun 2021 06:40:03 -0400
-X-MC-Unique: UCfl-h-1PCyLON1ozP8oMw-1
-Received: by mail-ej1-f72.google.com with SMTP id o5-20020a1709068605b02904034c0d7648so4863688ejx.8
-        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 03:40:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=nYNCs3JrvkX8VAnIEcTWaVkYHbhrJx9YKWDfXBQ1+cM=;
-        b=hysZX0pa1xoWVg/UuHuHOuAG3DH3j49YTRzhUC3Opngd3TGvfosAjzwmk3kcnmhzEg
-         Eey6AP+N5jwoqMr55o82X9fXvVURldWBIaIy0/rtOvCOVJrv/2whz4XPK2qeaJdmuYdW
-         aP0Kc0PwhMYmRK2zCr/Ub9+2bPfHIrQBxWJDnxl2M+6Iy3LK5erqKu0Cl5v+ZxnGcWB4
-         4zkF2LPiXOH1Qr4LsmdMDYLMC6yDzn6/QEm5WljUdIvxYyiq07ldlzZw09h6cOfmhnLq
-         udKtVgvo8cAH4oI/9zQHsT47H/p7OrTcUl3/HeE1prGpeX3NqrsN9CSlbEv2IDXTblSc
-         3afA==
-X-Gm-Message-State: AOAM5335RTvb84szRlo5Czxz8PTKtATJEc3lqbHrvuwfi0TIICFLZd3Q
-        spqUuiy66JrFHx1+exMY158K8dA0XhTcOnWFbCeE/hO4VLxSL+eg5ywfhoOz0Cs9K+OuJpvrgrT
-        XHvT3XfvvM5XG
-X-Received: by 2002:aa7:d590:: with SMTP id r16mr25088239edq.355.1623148801778;
-        Tue, 08 Jun 2021 03:40:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwlQjlTOLOUv+CTcpQo85ShyVO8Hm6Jf6YQcKP01+YfXsWs3sS1DIB86mFlcYsubeJp29IuCA==
-X-Received: by 2002:aa7:d590:: with SMTP id r16mr25088212edq.355.1623148801544;
-        Tue, 08 Jun 2021 03:40:01 -0700 (PDT)
-Received: from steredhat (host-79-18-148-79.retail.telecomitalia.it. [79.18.148.79])
-        by smtp.gmail.com with ESMTPSA id g11sm8789689edt.85.2021.06.08.03.40.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jun 2021 03:40:01 -0700 (PDT)
-Date:   Tue, 8 Jun 2021 12:39:58 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
+        id S231601AbhFHKqD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 06:46:03 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:34329 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231262AbhFHKqC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Jun 2021 06:46:02 -0400
+Received: from [192.168.1.155] ([77.7.0.189]) by mrelayeu.kundenserver.de
+ (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1MnJdC-1l7e5D1hvo-00jJJM; Tue, 08 Jun 2021 12:43:43 +0200
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
-Subject: Re: [PATCH v10 11/18] virtio/vsock: dequeue callback for
- SOCK_SEQPACKET
-Message-ID: <20210608103958.5oqkqr2ydanfxx2s@steredhat>
-References: <20210603144513.ryjzauq7abnjogu3@steredhat>
- <6b833ccf-ea93-db6a-4743-463ac1cfe817@kaspersky.com>
- <20210604150324.winiikx5h3p6gsyy@steredhat>
- <a81ae3cb-439f-7621-4ae6-bccd2c25b7e4@kaspersky.com>
- <20210607110421.wkx4dj7wipwsqztj@steredhat>
- <8e2eb802-7c5d-70b0-82b5-ec8de4fdc046@kaspersky.com>
- <20210608082320.vs2tzgpxgr2dhxye@steredhat>
- <3c35f04a-8406-d26f-27d0-becbd3c43c1b@kaspersky.com>
- <20210608101952.6meiasy7zqp474sf@steredhat>
- <8ca7fe68-81b7-8984-bf0f-db2384985988@kaspersky.com>
+        "Alex Williamson (alex.williamson@redhat.com)" 
+        <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Robin Murphy <robin.murphy@arm.com>
+References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <bb6846bf-bd3c-3802-e0d7-226ec9b33384@metux.net>
+ <20210602172424.GD1002214@nvidia.com>
+ <bd0f485c-5f70-b087-2a5a-d2fe6e16817d@metux.net>
+ <20210604123054.GL1002214@nvidia.com>
+From:   "Enrico Weigelt, metux IT consult" <lkml@metux.net>
+Message-ID: <329fcd72-605a-fc10-1a8d-c3f2ac3be9a1@metux.net>
+Date:   Tue, 8 Jun 2021 12:43:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
+In-Reply-To: <20210604123054.GL1002214@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: tl
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <8ca7fe68-81b7-8984-bf0f-db2384985988@kaspersky.com>
+X-Provags-ID: V03:K1:kQlbcYVyqh7Kv3mxj3JGjk3dxcaEReaRMO1wJlQyxPkwqc3rlNB
+ ty1P4s3Q1U8YMBl+PAGTd/B9xN3luktYAJUvcIm8MxNrn5Ufw3QW/pOSLFBXCidANQm2vOL
+ Kf0ipNSyGmyjvOYlXaOs+iavgR+8to7ozNqxLBThWjyjeMPtyrDyKl4eF6lXS34Ejofrm6p
+ wfyAMKuEHX4+5ky7Fwr4A==
+X-Spam-Flag: NO
+X-UI-Out-Filterresults: notjunk:1;V03:K0:nhyYPjt/oTs=:181063X6GaNOTval4U+P8Y
+ cwsH0SmjAvrMHg8eLaYi+NgNCkjBaK49pcjziRRbc2+BTBWboMP1G/J6UGA1JZO4o0rkgiJRu
+ js1Wg22BcB3fVTdJ8XE8KwKizdDPS/mUiTNloNqCDjgMVH0vBodTGeko3MzQ+1K2pbo4PxVqY
+ pacCRkNxVyN4T88mjozcEpKiSYPcf4I29DPsjgKlvb+2dX1w01/bpnmZYZoApd7H9elPk1jYf
+ FA/7iRSaojlhbDSqWViQX0cY6iufNvofS2ydC4paMpcH7mUXEPmNaKzxdw+io8RzhbL8pO+3K
+ 4TRWLInFEwbidBxYATrioZTqZ0N4hpCp/SvYDIfcNHiZjug8V0s7MpVr/6AdAPnHjSUXxAwHU
+ f3BBAibd9lz3HbL12eZR4kIAFZDAYovq6GU08s1DtCbTzhUJirHdNHyixNjMC0yr7JmjWVv4k
+ EkfU+sMCbj+4vxIa7lW+wuha41v3jnKCkDRiUIah6CNkFHkFkHddfO1LO8xkBbrN0KGw7hQZb
+ pc4pd+imbUHacOaBdIOXCQ=
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 08, 2021 at 01:24:58PM +0300, Arseny Krasnov wrote:
->
->On 08.06.2021 13:19, Stefano Garzarella wrote:
->> On Tue, Jun 08, 2021 at 12:40:39PM +0300, Arseny Krasnov wrote:
->>> On 08.06.2021 11:23, Stefano Garzarella wrote:
->>>> On Mon, Jun 07, 2021 at 04:18:38PM +0300, Arseny Krasnov wrote:
->>>>> On 07.06.2021 14:04, Stefano Garzarella wrote:
->>>>>> On Fri, Jun 04, 2021 at 09:03:26PM +0300, Arseny Krasnov wrote:
->>>>>>> On 04.06.2021 18:03, Stefano Garzarella wrote:
->>>>>>>> On Fri, Jun 04, 2021 at 04:12:23PM +0300, Arseny Krasnov wrote:
->>>>>>>>> On 03.06.2021 17:45, Stefano Garzarella wrote:
->>>>>>>>>> On Thu, May 20, 2021 at 10:17:58PM +0300, Arseny Krasnov wrote:
->>>>>>>>>>> Callback fetches RW packets from rx queue of socket until whole record
->>>>>>>>>>> is copied(if user's buffer is full, user is not woken up). This is done
->>>>>>>>>>> to not stall sender, because if we wake up user and it leaves syscall,
->>>>>>>>>>> nobody will send credit update for rest of record, and sender will wait
->>>>>>>>>>> for next enter of read syscall at receiver's side. So if user buffer is
->>>>>>>>>>> full, we just send credit update and drop data.
->>>>>>>>>>>
->>>>>>>>>>> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->>>>>>>>>>> ---
->>>>>>>>>>> v9 -> v10:
->>>>>>>>>>> 1) Number of dequeued bytes incremented even in case when
->>>>>>>>>>>    user's buffer is full.
->>>>>>>>>>> 2) Use 'msg_data_left()' instead of direct access to 'msg_hdr'.
->>>>>>>>>>> 3) Rename variable 'err' to 'dequeued_len', in case of error
->>>>>>>>>>>    it has negative value.
->>>>>>>>>>>
->>>>>>>>>>> include/linux/virtio_vsock.h            |  5 ++
->>>>>>>>>>> net/vmw_vsock/virtio_transport_common.c | 65 +++++++++++++++++++++++++
->>>>>>>>>>> 2 files changed, 70 insertions(+)
->>>>>>>>>>>
->>>>>>>>>>> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
->>>>>>>>>>> index dc636b727179..02acf6e9ae04 100644
->>>>>>>>>>> --- a/include/linux/virtio_vsock.h
->>>>>>>>>>> +++ b/include/linux/virtio_vsock.h
->>>>>>>>>>> @@ -80,6 +80,11 @@ virtio_transport_dgram_dequeue(struct vsock_sock *vsk,
->>>>>>>>>>> 			       struct msghdr *msg,
->>>>>>>>>>> 			       size_t len, int flags);
->>>>>>>>>>>
->>>>>>>>>>> +ssize_t
->>>>>>>>>>> +virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
->>>>>>>>>>> +				   struct msghdr *msg,
->>>>>>>>>>> +				   int flags,
->>>>>>>>>>> +				   bool *msg_ready);
->>>>>>>>>>> s64 virtio_transport_stream_has_data(struct vsock_sock *vsk);
->>>>>>>>>>> s64 virtio_transport_stream_has_space(struct vsock_sock *vsk);
->>>>>>>>>>>
->>>>>>>>>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->>>>>>>>>>> index ad0d34d41444..61349b2ea7fe 100644
->>>>>>>>>>> --- a/net/vmw_vsock/virtio_transport_common.c
->>>>>>>>>>> +++ b/net/vmw_vsock/virtio_transport_common.c
->>>>>>>>>>> @@ -393,6 +393,59 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
->>>>>>>>>>> 	return err;
->>>>>>>>>>> }
->>>>>>>>>>>
->>>>>>>>>>> +static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
->>>>>>>>>>> +						 struct msghdr *msg,
->>>>>>>>>>> +						 int flags,
->>>>>>>>>>> +						 bool *msg_ready)
->>>>>>>>>>> +{
->>>>>>>>>>> +	struct virtio_vsock_sock *vvs = vsk->trans;
->>>>>>>>>>> +	struct virtio_vsock_pkt *pkt;
->>>>>>>>>>> +	int dequeued_len = 0;
->>>>>>>>>>> +	size_t user_buf_len = msg_data_left(msg);
->>>>>>>>>>> +
->>>>>>>>>>> +	*msg_ready = false;
->>>>>>>>>>> +	spin_lock_bh(&vvs->rx_lock);
->>>>>>>>>>> +
->>>>>>>>>>> +	while (!*msg_ready && !list_empty(&vvs->rx_queue) && dequeued_len >= 0) {
->>>>>>>>>> I'
->>>>>>>>>>
->>>>>>>>>>> +		size_t bytes_to_copy;
->>>>>>>>>>> +		size_t pkt_len;
->>>>>>>>>>> +
->>>>>>>>>>> +		pkt = list_first_entry(&vvs->rx_queue, struct virtio_vsock_pkt, list);
->>>>>>>>>>> +		pkt_len = (size_t)le32_to_cpu(pkt->hdr.len);
->>>>>>>>>>> +		bytes_to_copy = min(user_buf_len, pkt_len);
->>>>>>>>>>> +
->>>>>>>>>>> +		if (bytes_to_copy) {
->>>>>>>>>>> +			/* sk_lock is held by caller so no one else can dequeue.
->>>>>>>>>>> +			 * Unlock rx_lock since memcpy_to_msg() may sleep.
->>>>>>>>>>> +			 */
->>>>>>>>>>> +			spin_unlock_bh(&vvs->rx_lock);
->>>>>>>>>>> +
->>>>>>>>>>> +			if (memcpy_to_msg(msg, pkt->buf, bytes_to_copy))
->>>>>>>>>>> +				dequeued_len = -EINVAL;
->>>>>>>>>> I think here is better to return the error returned by memcpy_to_msg(),
->>>>>>>>>> as we do in the other place where we use memcpy_to_msg().
->>>>>>>>>>
->>>>>>>>>> I mean something like this:
->>>>>>>>>> 			err = memcpy_to_msgmsg, pkt->buf, bytes_to_copy);
->>>>>>>>>> 			if (err)
->>>>>>>>>> 				dequeued_len = err;
->>>>>>>>> Ack
->>>>>>>>>>> +			else
->>>>>>>>>>> +				user_buf_len -= bytes_to_copy;
->>>>>>>>>>> +
->>>>>>>>>>> +			spin_lock_bh(&vvs->rx_lock);
->>>>>>>>>>> +		}
->>>>>>>>>>> +
->>>>>>>>>> Maybe here we can simply break the cycle if we have an error:
->>>>>>>>>> 		if (dequeued_len < 0)
->>>>>>>>>> 			break;
->>>>>>>>>>
->>>>>>>>>> Or we can refactor a bit, simplifying the while() condition and also the
->>>>>>>>>> code in this way (not tested):
->>>>>>>>>>
->>>>>>>>>> 	while (!*msg_ready && !list_empty(&vvs->rx_queue)) {
->>>>>>>>>> 		...
->>>>>>>>>>
->>>>>>>>>> 		if (bytes_to_copy) {
->>>>>>>>>> 			int err;
->>>>>>>>>>
->>>>>>>>>> 			/* ...
->>>>>>>>>> 			*/
->>>>>>>>>> 			spin_unlock_bh(&vvs->rx_lock);
->>>>>>>>>> 			err = memcpy_to_msgmsg, pkt->buf, bytes_to_copy);
->>>>>>>>>> 			if (err) {
->>>>>>>>>> 				dequeued_len = err;
->>>>>>>>>> 				goto out;
->>>>>>>>>> 			}
->>>>>>>>>> 			spin_lock_bh(&vvs->rx_lock);
->>>>>>>>>>
->>>>>>>>>> 			user_buf_len -= bytes_to_copy;
->>>>>>>>>> 		}
->>>>>>>>>>
->>>>>>>>>> 		dequeued_len += pkt_len;
->>>>>>>>>>
->>>>>>>>>> 		if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOR)
->>>>>>>>>> 			*msg_ready = true;
->>>>>>>>>>
->>>>>>>>>> 		virtio_transport_dec_rx_pkt(vvs, pkt);
->>>>>>>>>> 		list_del(&pkt->list);
->>>>>>>>>> 		virtio_transport_free_pkt(pkt);
->>>>>>>>>> 	}
->>>>>>>>>>
->>>>>>>>>> out:
->>>>>>>>>> 	spin_unlock_bh(&vvs->rx_lock);
->>>>>>>>>>
->>>>>>>>>> 	virtio_transport_send_credit_update(vsk);
->>>>>>>>>>
->>>>>>>>>> 	return dequeued_len;
->>>>>>>>>> }
->>>>>>>>> I think we can't do 'goto out' or break, because in case of error,
->>>>>>>>> we still need
->>>>>>>>> to free packet.
->>>>>>>> Didn't we have code that remove packets from a previous message?
->>>>>>>> I don't see it anymore.
->>>>>>>>
->>>>>>>> For example if we have 10 packets queued for a message (the 10th
->>>>>>>> packet
->>>>>>>> has the EOR flag) and the memcpy_to_msg() fails on the 2nd packet, with
->>>>>>>> you proposal we are freeing only the first 2 packets, the rest is there
->>>>>>>> and should be freed when reading the next message, but I don't see that
->>>>>>>> code.
->>>>>>>>
->>>>>>>> The same can happen if the recvmsg syscall is interrupted. In that case
->>>>>>>> we report that nothing was copied, but we freed the first N packets, so
->>>>>>>> they are lost but the other packets are still in the queue.
->>>>>>>>
->>>>>>>> Please check also the patch where we implemented
->>>>>>>> __vsock_seqpacket_recvmsg().
->>>>>>>>
->>>>>>>> I thinks we should free packets only when we are sure we copied them to
->>>>>>>> the user space.
->>>>>>> Hm, yes, this is problem. To solve it i can restore previous approach
->>>>>>> with seqbegin/seqend. In that case i can detect unfinished record and
->>>>>>> drop it's packets. Seems seqbegin will be a bit like
->>>>>>> VIRTIO_VSOCK_SEQ_EOR in flags
->>>>>>> field of header(e.g. VIRTIO_VSOCK_SEQ_BEGIN). Message id and length are
->>>>>>> unneeded,
->>>>>>> as channel considedered lossless. What do You think?
->>>>>>>
->>>>>> I think VIRTIO_VSOCK_SEQ_BEGIN is redundant, using only EOR should be
->>>>>> fine.
->>>>>>
->>>>>> When we receive EOR we know that this is the last packet on this message
->>>>>> and the next packet will be the first of a new message.
->>>>>>
->>>>>> What we should do is check that we have all the fragments of a packet
->>>>>> and return them all together, otherwise we have to say we have nothing.
->>>>>>
->>>>>> For example as we process packets from the vitqueue and queue them in
->>>>>> the rx_queue we could use a counter of how many EORs are in the
->>>>>> rx_queue, which we decrease in virtio_transport_seqpacket_do_dequeue()
->>>>>> when we copied all the fragments.
->>>>>>
->>>>>> If the counter is 0, we don't remove anything from the queue and
->>>>>> virtio_transport_seqpacket_do_dequeue() returns 0.
->>>>>>
->>>>>> So .seqpacket_dequeue should return 0 if there is not at least one
->>>>>> complete message, or return the entire message. A partial message should
->>>>>> never return.
->>>>>>
->>>>>> What do you think?
->>>>> I like it, i've implemented this approach in some early pre v1 versions.
->>>>>
->>>>> But in this case, credit update logic will be changed - in current implementation
->>>>>
->>>>> (both seqpacket and stream) credit update reply is sent when data is copied
->>>>>
->>>>> to user's buffer(e.g. we copy data somewhere, free packet and ready to process
->>>>>
->>>>> new packet). But if we don't touch user's buffer and keeping incoming packet in rx queue
->>>>>
->>>>> until whole record is ready, when to send credit update?
->>>> I think the best approach could be to send credit updates when we remove
->>>> them from the rx_queue.
->>> In that case, it will be impossible to send message bigger than size of rx buffer
->>>
->>> (e.g. credit allowed size), because packet will be queued without credit update
->>>
->>> reply until credit allowed reach 0.
->>>
->> Yep, but I think it is a reasonable limit for a datagram socket.
+On 04.06.21 14:30, Jason Gunthorpe wrote:
+
+Hi,
+
+> Containers already needed to do this today. Container orchestration is
+> hard.
+
+Yes, but I hate to see even more work upcoming here.
+
+> Yes, /dev/ioasid shouldn't do anything unless you have a device to
+> connect it with. In this way it is probably safe to stuff it into
+> every container.
+
+Okay, if we can guarantee that, I'm completely fine.
+
+>>> Having FDs spawn other FDs is pretty ugly, it defeats the "everything
+>>> is a file" model of UNIX.
 >>
->> Maybe we can add a check on the TX side, since we know this value and
->> return an error to the user.
->
->E.g., to before sending message� using SEQPACKET socket,
->
->i need to call setsockopt with SO_VM_SOCKETS_BUFFER_MAX_SIZE/
->
->SO_VM_SOCKETS_BUFFER_SIZE params to setup maximum message size,
->
->if user tries to send message bigger than it, return -EMSGSIZE ?
->
+>> Unfortunately, this is already defeated in many other places :(
+>> (I'd even claim that ioctls already break it :p)
+> 
+> I think you are reaching a bit :)
+> 
+>> It seems your approach also breaks this, since we now need to open two
+>> files in order to talk to one device.
+> 
+> It is two devices, thus two files.
 
-Yep, I mean the receiver side must set it (IIRC default is 256K).
+Two separate real (hardware) devices or just two logical device nodes ?
 
-In the transmitter side we can check it using `vvs->peer_buf_alloc` and 
-return the error.
 
-Stefano
+--mtx
 
+-- 
+---
+Hinweis: unverschlüsselte E-Mails können leicht abgehört und manipuliert
+werden ! Für eine vertrauliche Kommunikation senden Sie bitte ihren
+GPG/PGP-Schlüssel zu.
+---
+Enrico Weigelt, metux IT consult
+Free software and Linux embedded engineering
+info@metux.net -- +49-151-27565287
