@@ -2,152 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BDF1F39F6F3
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 14:40:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31DFB39F719
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 14:52:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232663AbhFHMlz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 08:41:55 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32480 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S232529AbhFHMly (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 8 Jun 2021 08:41:54 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 158CYaR1017242;
-        Tue, 8 Jun 2021 08:40:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=dde8jdUZxgUWIBFYKAHf8IUHpkwFAR1SGhJH84IOhus=;
- b=WyQ/7ySMeBVaTEpQ+diS5ytlHHlaEi5vLeyywiH7byz1rdq+GJF9QM14UOOR/uBcIMQu
- FOkaWdqjQjG8bB4FmJV4a3rvZbIpyZjCyQQarvL0eORZUElCkDTljS0mdlwglJHVoCUH
- bOfPl/jp9Nj1l4Al7Hj3zduHkhluUBPT2yCEqTuJgEIFaxGvy/IVLMHk3cYpHW+OKig5
- dJ2CXlbO5yzj3JzPXa8U/ibcYU2qNX71Vq0oUE1DCVRwBQYMxFM32JyK8CRRuMjMry/q
- 1H5t9+Yics6HmtJZpsgKIa4a40tZX1khFg5l3HhDzl35FfvX8jiDcNJeTolpOhIGYire 0g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3926q3bk77-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Jun 2021 08:40:01 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 158CZfF3024572;
-        Tue, 8 Jun 2021 08:40:00 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3926q3bk5u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Jun 2021 08:40:00 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 158CXXLK010329;
-        Tue, 8 Jun 2021 12:39:58 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04fra.de.ibm.com with ESMTP id 3900w88uh0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Jun 2021 12:39:58 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 158CdtHJ31588846
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 8 Jun 2021 12:39:55 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6E13F4C05A;
-        Tue,  8 Jun 2021 12:39:55 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 59C0D4C050;
-        Tue,  8 Jun 2021 12:39:55 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Tue,  8 Jun 2021 12:39:55 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id E27F8E014D; Tue,  8 Jun 2021 14:39:54 +0200 (CEST)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     pbonzini@redhat.com
-Cc:     borntraeger@de.ibm.com, bgardon@google.com, dmatlack@google.com,
-        drjones@redhat.com, frankja@linux.ibm.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, peterx@redhat.com,
-        venkateshs@chromium.org
-Subject: [PATCH v2] KVM: selftests: introduce P47V64 for s390x
-Date:   Tue,  8 Jun 2021 14:39:54 +0200
-Message-Id: <20210608123954.10991-1-borntraeger@de.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <4d6513f3-d921-dff0-d883-51c6dbdcbe39@de.ibm.com>
-References: <4d6513f3-d921-dff0-d883-51c6dbdcbe39@de.ibm.com>
+        id S232527AbhFHMx5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 08:53:57 -0400
+Received: from mail-bn7nam10on2081.outbound.protection.outlook.com ([40.107.92.81]:26208
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232299AbhFHMx4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Jun 2021 08:53:56 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PqD3k+eWyYZOujXMn7IbdJSnlM6tPeZJ5LyA/rn8XjlRJvB6Xl6ztIT6nCwTkKlfQRxuOuZUp7uQNUKbw4jD43CmudLCgpXwf6vyDf1MBqgeMgDNfPxBw+i9BDSyXA8bALijzoWDmVoVCqLV5iLp9EsnAr1lzf1iHrWGZZ7HL7G0Faw834aZgOZ9y43NMQ5NXr1t4Qcz0MYR78MXWzUJh9dxPU3jvHIX0rY9VRR6dDKAeN7rSrfGNzoKMnBPd4mKh/UUYA06U0MzMcLUO9u3w+AwoWKjEzUIxTvJ+XwklLZ3oBoC3X5BVKRzTDSu/3WwL0W2SpIwAhwRC1Os4DDgYQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Xz7m66TaMomX/GUdvjQm01q4W+8F/FOy+n0RcbkZ8Rw=;
+ b=jz+T7EyvQtkmFt6nKQXHpmTJQRYCjvtFd1MW5dMei/MtpYU8NopqjWdoE9epq2wY8UogSn6a0znMkor0JnkkoToVazXZZ99hU8fAmMZdcXcO1rKN4qn2G+bQ0FUDUhXlIv/sL1qpw+fEeOu5RRXFL6ebWcQpDpfedhFzV2qu2LcajNXM9jTbsCvE1vkqqvEQ/JHt8TtCZ0yKiTrPMGC7yXwDxqEo9HbJ5KxjoN/+24Cb8G96qZZ914+82vNBkg0WhTJp13kwuC4+aQrdYZOtuzXn5CkiqXOS76dWvxvFZ5yEI1Xh1vDDb/EPVL8mAoA3+WNLEDwsTaTYaS6bbSqvcQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Xz7m66TaMomX/GUdvjQm01q4W+8F/FOy+n0RcbkZ8Rw=;
+ b=g1tvG+624DWUyX9yX5vcz7q/m63mRCcSmXDIJJqi6Nhpi2dzXziHwGEffPTabvY6QQPvO2IwG7AwVuzFzCyYig5UBmMVJkntX/azytnLEsbp/VwVy5x3YpefI+8f4Mwo9HA3SG1nTVw+Jnt9mzCv9bZ1sHeqQbGC3LUaL/iftIZU8wOFqhHkBBD9S1AmDwJ14zf9opHFqRvPZxM341EG1183pi7hLtmrYc1hOig20dgKJI1Wefhv+PPWi8FSRAFXdlpSteytS/RZNZPfyYGGwjFSz5rlkfv2IJVyIuGRk7iC7gRFcEMBejTnciMK4sa2tpwV8NbHI5/h8haKVQc8Vg==
+Authentication-Results: metux.net; dkim=none (message not signed)
+ header.d=none;metux.net; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5078.namprd12.prod.outlook.com (2603:10b6:208:313::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.24; Tue, 8 Jun
+ 2021 12:52:02 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e%7]) with mapi id 15.20.4219.021; Tue, 8 Jun 2021
+ 12:52:02 +0000
+Date:   Tue, 8 Jun 2021 09:52:01 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Enrico Weigelt, metux IT consult" <lkml@metux.net>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Robin Murphy <robin.murphy@arm.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+Message-ID: <20210608125201.GC1002214@nvidia.com>
+References: <20210602195404.GI1002214@nvidia.com>
+ <20210602143734.72fb4fa4.alex.williamson@redhat.com>
+ <6a9426d7-ed55-e006-9c4c-6b7c78142e39@redhat.com>
+ <20210603130927.GZ1002214@nvidia.com>
+ <65614634-1db4-7119-1a90-64ba5c6e9042@redhat.com>
+ <20210604115805.GG1002214@nvidia.com>
+ <895671cc-5ef8-bc1a-734c-e9e2fdf03652@redhat.com>
+ <20210607141424.GF1002214@nvidia.com>
+ <1cf9651a-b8ee-11f1-1f70-db3492a76400@redhat.com>
+ <9a5b6675-e21a-cf62-6ea1-66c07e73e3ae@metux.net>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9a5b6675-e21a-cf62-6ea1-66c07e73e3ae@metux.net>
+X-Originating-IP: [47.55.113.94]
+X-ClientProxiedBy: MN2PR13CA0003.namprd13.prod.outlook.com
+ (2603:10b6:208:160::16) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ZdzJW7DTl0BPwpPi4RDy6q7bayCcz98d
-X-Proofpoint-ORIG-GUID: _mRzglErmW20Yqs7XnXUlI6wlnxbF1LP
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-06-08_09:2021-06-04,2021-06-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
- priorityscore=1501 lowpriorityscore=0 bulkscore=0 spamscore=0
- malwarescore=0 mlxlogscore=932 adultscore=0 phishscore=0 mlxscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106080083
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (47.55.113.94) by MN2PR13CA0003.namprd13.prod.outlook.com (2603:10b6:208:160::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.9 via Frontend Transport; Tue, 8 Jun 2021 12:52:01 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lqbD7-003ppZ-0x; Tue, 08 Jun 2021 09:52:01 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b6d409bb-7fea-4be2-e857-08d92a7c35d7
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5078:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB507848866B3D5BD93C1E89CEC2379@BL1PR12MB5078.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: JCFTWaWDfJMtJrnfWlbwYFwRviHASQD4viHMg+USR2G9GE4qxdpWl8nJZ9rZp0zNlAlURRcmOdvfe4fVNr+z1ly5bCUTFFe2ixSfRa0dsT2Tq7jFpwGJ1WE5JfWPYy+WFK7u43HKddy1okBlz6koMz3kOZuf8j8v/J12Ll9TobMX80nSE++DgdD5+3q8ka3PGfCFy8oU6nro79jDuqTKp3FGbB4bUi1TGRonUzwkYTf6Jvu4Rd4pgyv6lFcEgV4PpKp8w0z82Nir1JyuobFlgXcxtfMsmXv3LrAFZLjTxN9LQ9dASa4JeKi8bPBgh5J2uvEVr7zj74WfcV1Mn+jdxz0kYfdXkAcT79Azgtd9XIy6wJmvE6AitA7qh/PaW3SoDe3IC/ONC9X/NJBkDcPJvdn7YQoxU+htvKsbiJniEkFZadIckzez2O8GNWynQI2AK33bMsDDHoMI5M2+ZvA4atTErf6ltAdSNfhVKbdyv6veXjLnu6+bvhQkYXxa1/bOjS6YJTEjmXuJJHO1IA4xh3zV3EYvjpmX/5h578Jk9sdrkOIbMl+u89zsXoOIPUhL36Xv7Sq3h3X5VTMV3mNd0kFUgdbD/e/qFcNlYkSXJSY=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(39860400002)(366004)(136003)(396003)(376002)(66476007)(5660300002)(66556008)(38100700002)(66946007)(2906002)(8936002)(36756003)(7416002)(54906003)(186003)(6916009)(4744005)(316002)(33656002)(426003)(86362001)(9786002)(478600001)(9746002)(26005)(4326008)(83380400001)(2616005)(1076003)(8676002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?nQ4q6H52DyRkLCKNY/KXfnl5EP2zwhJ6jH32DI9Nj/ZVwpQLuChgvK1gY/fC?=
+ =?us-ascii?Q?edJ0mSWL52Pj86TBA+UdIiUfQoXm/AOD7G7hCrqLtseEwNsQENgthTki67lh?=
+ =?us-ascii?Q?XEGyslY3B0MFioPwCLEsRkTm+xA5m/UmjNvpfp+2STe4Q9gLEK0Ze+Ptl+JX?=
+ =?us-ascii?Q?6SufwppBBYMImgP53bzUn1qA2x1NdUVBY+x07i9bJ6feT/1U+toh3rHDIPn9?=
+ =?us-ascii?Q?F6+JThzTWyEXcb0cPg1Zq3mqmMoT4bfQMHnz359DmSEYr+c7Xm7xYRyhAeAg?=
+ =?us-ascii?Q?NXZ/snfacJEPFzsyvgYr42ZT/zYRH0D+SpME6Y4KLkmTQDJ79rBCdpx9EGF+?=
+ =?us-ascii?Q?GrHJyxRe5QK6IG7SM564QM+b2yS4P3l6gJZ9cv57uuwJLax6/WPiF4lqoRYQ?=
+ =?us-ascii?Q?PB+VekmKjgoZzbV7c19WE6BvjBhIBJNRVmRzNpGj4tF/ekgSBWOnGG3r10Gf?=
+ =?us-ascii?Q?/DhZfVqDLxIPmP43Y/AsgQjrrffElqqDOGE8GU4wbsy/PnB/DdeYus16nNas?=
+ =?us-ascii?Q?br5j1ranKngmNw4ObjqWcJqYv3PvgDc+rMuZjLGjlQYWcPddt/zPbxqNEqmp?=
+ =?us-ascii?Q?9dBNkc24EMgpiyPijUlv2sm8Ns3ed4G47mJPxwB7nFKHN63nySk3TempbFQg?=
+ =?us-ascii?Q?oArrRDJyoiulxfsPVZkz0wheLR58GU01g/QoaRJasD0wlBgU0+hn4SPDizu/?=
+ =?us-ascii?Q?zxaZ6+Zg90vsKtK2yEcZ1zYgluFjFqRMon3/tb+uywuxjOqDW2J43AVscbKa?=
+ =?us-ascii?Q?1S/QQaE/CWnaykAPsPTuVV2vN4PyBIeryrrTyrgl01Gzj6KJc+tLiZ67NiyF?=
+ =?us-ascii?Q?upOj4W6FhYZwMpAKRoygfVoIt+gTvwhBGa84MCxOf9YIV0J4EZtTMa/GCEt4?=
+ =?us-ascii?Q?FsDjg5da3OBlU2DxnywORgaFQovqfOzozZgMrRgsbaLQu6/tdJbRcCTetzue?=
+ =?us-ascii?Q?EwWA3qIExaRf+/vLykUajJgE3lLG4coysHF7IQhenUW7/l5lNwp5dy6+JXBu?=
+ =?us-ascii?Q?Y/CYdLME3bSPr1Audgvhc9nKYEJcZbbjJeWs5p8I16R/G+/QzR8dq/fwg9eB?=
+ =?us-ascii?Q?vKlJrJpPkyScOydW9wknE4gU7SN33kqLE5jPGc8mVSmVIGJzQyXAP9xcaGFa?=
+ =?us-ascii?Q?/NB8A6FCCjwwTxbebRYG+nB8bHi9MF2009XOnaPKvXxjsgiISUL80lRrpx1+?=
+ =?us-ascii?Q?FkMK4bax2d14kFsu0yBrW8CRQ8lm0e67C5klQ0dFC9rRvFADufyU0q4KcoPo?=
+ =?us-ascii?Q?3OvcOzjHchqPP/Eupf20OiA9612FlyKQlPISx8oxpePfEbr5/cW7buSujE3s?=
+ =?us-ascii?Q?kBtmR7x5GMk8xc+CLJbyPvjO?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b6d409bb-7fea-4be2-e857-08d92a7c35d7
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2021 12:52:01.8762
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XZtksV2SvZfOICVCA8oUIfSpCmSiS7vwuxjpJ2dfxAkWw51Ompmn+5Vh88Vj/mfz
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5078
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-s390x can have up to 47bits of physical guest and 64bits of virtual
-address  bits. Add a new address mode to avoid errors of testcases
-going beyond 47bits.
+On Tue, Jun 08, 2021 at 10:54:59AM +0200, Enrico Weigelt, metux IT consult wrote:
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
-v1->v2:
-- remove wrong comment
-- use 5 levels of page tables
- tools/testing/selftests/kvm/include/kvm_util.h | 3 ++-
- tools/testing/selftests/kvm/lib/kvm_util.c     | 5 +++++
- 2 files changed, 7 insertions(+), 1 deletion(-)
+> Maybe the device as well as the transport could announce their
+> capability (which IMHO should go via the virtio protocol), and if both
+> are capable, the (guest's) virtio subsys tells the driver whether it's
+> usable for a specific device. Perhaps we should also have a mechanism
+> to tell the device that it's actually used.
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index fcd8e3855111..b602552b1ed0 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -43,6 +43,7 @@ enum vm_guest_mode {
- 	VM_MODE_P40V48_4K,
- 	VM_MODE_P40V48_64K,
- 	VM_MODE_PXXV48_4K,	/* For 48bits VA but ANY bits PA */
-+	VM_MODE_P47V64_4K,
- 	NUM_VM_MODES,
- };
- 
-@@ -60,7 +61,7 @@ enum vm_guest_mode {
- 
- #elif defined(__s390x__)
- 
--#define VM_MODE_DEFAULT			VM_MODE_P52V48_4K
-+#define VM_MODE_DEFAULT			VM_MODE_P47V64_4K
- #define MIN_PAGE_SHIFT			12U
- #define ptes_per_page(page_size)	((page_size) / 16)
- 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 28e528c19d28..b126fab6c4e1 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -175,6 +175,7 @@ const char *vm_guest_mode_string(uint32_t i)
- 		[VM_MODE_P40V48_4K]	= "PA-bits:40,  VA-bits:48,  4K pages",
- 		[VM_MODE_P40V48_64K]	= "PA-bits:40,  VA-bits:48, 64K pages",
- 		[VM_MODE_PXXV48_4K]	= "PA-bits:ANY, VA-bits:48,  4K pages",
-+		[VM_MODE_P47V64_4K]	= "PA-bits:47,  VA-bits:64,  4K pages",
- 	};
- 	_Static_assert(sizeof(strings)/sizeof(char *) == NUM_VM_MODES,
- 		       "Missing new mode strings?");
-@@ -192,6 +193,7 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
- 	{ 40, 48,  0x1000, 12 },
- 	{ 40, 48, 0x10000, 16 },
- 	{  0,  0,  0x1000, 12 },
-+	{ 47, 64,  0x1000, 12 },
- };
- _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
- 	       "Missing new mode params?");
-@@ -277,6 +279,9 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
- 		TEST_FAIL("VM_MODE_PXXV48_4K not supported on non-x86 platforms");
- #endif
- 		break;
-+	case VM_MODE_P47V64_4K:
-+		vm->pgtable_levels = 5;
-+		break;
- 	default:
- 		TEST_FAIL("Unknown guest mode, mode: 0x%x", mode);
- 	}
--- 
-2.31.1
+The usage should be extremely narrow, like 
 
+"If the driver issues a GPU command with flag X then the resulting
+DMAs will be no-snoop and the driver must re-establish coherency at
+the right moment"
+
+It is not a general idea, but something baked directly into the device
+protocol that virtio carries.
+
+The general notion of no-nsoop should ideally be carried in the PCIe
+extended config space flag. If 0 then no-snoop should never be issued,
+expected, or requested.
+
+Jason
