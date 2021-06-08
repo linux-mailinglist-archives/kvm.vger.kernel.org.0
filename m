@@ -2,20 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B6CB39F2F9
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 11:54:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1ECEA39F2FA
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 11:54:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231396AbhFHJ4m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 05:56:42 -0400
-Received: from 8bytes.org ([81.169.241.247]:42880 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231296AbhFHJ4k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Jun 2021 05:56:40 -0400
+        id S231237AbhFHJ4n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 05:56:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54992 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231371AbhFHJ4l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Jun 2021 05:56:41 -0400
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D031CC061574;
+        Tue,  8 Jun 2021 02:54:48 -0700 (PDT)
 Received: from cap.home.8bytes.org (p4ff2ba7c.dip0.t-ipconnect.de [79.242.186.124])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id AE20C434;
-        Tue,  8 Jun 2021 11:54:45 +0200 (CEST)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 504BD465;
+        Tue,  8 Jun 2021 11:54:46 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
@@ -37,9 +40,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Arvind Sankar <nivedita@alum.mit.edu>,
         linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: [PATCH v3 3/7] x86/sev-es: Disable IRQs while GHCB is active
-Date:   Tue,  8 Jun 2021 11:54:35 +0200
-Message-Id: <20210608095439.12668-4-joro@8bytes.org>
+Subject: [PATCH v3 4/7] x86/sev-es: Run #VC handler in plain IRQ state
+Date:   Tue,  8 Jun 2021 11:54:36 +0200
+Message-Id: <20210608095439.12668-5-joro@8bytes.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210608095439.12668-1-joro@8bytes.org>
 References: <20210608095439.12668-1-joro@8bytes.org>
@@ -51,156 +54,43 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-The #VC handler only cares about IRQs being disabled while the GHCB is
-active, as it must not be interrupted by something which could cause
-another #VC while it holds the GHCB (NMI is the exception for which the
-backup GHCB is there).
+Use irqentry_enter() and irqentry_exit() to track the runtime state of
+the #VC handler. The reason it ran in NMI mode was solely to make sure
+nothing interrupts the handler while the GHCB is in use.
 
-Make sure nothing interrupts the code path while the GHCB is active by
-disabling IRQs in sev_es_get_ghcb() and restoring the previous irq state
-in sev_es_put_ghcb().
+This is handled now in sev_es_get/put_ghcb() directly, so there is no
+reason the #VC handler can not run in normal IRQ mode and enjoy the
+benefits like being able to send signals.
 
+Fixes: 62441a1fb532 ("x86/sev-es: Correctly track IRQ states in runtime #VC handler")
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/kernel/sev.c | 39 +++++++++++++++++++++++++--------------
- 1 file changed, 25 insertions(+), 14 deletions(-)
+ arch/x86/kernel/sev.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-index 4fd997bbf059..2a922d1b03c8 100644
+index 2a922d1b03c8..b563fb747aed 100644
 --- a/arch/x86/kernel/sev.c
 +++ b/arch/x86/kernel/sev.c
-@@ -192,14 +192,23 @@ void noinstr __sev_es_ist_exit(void)
- 	this_cpu_write(cpu_tss_rw.x86_tss.ist[IST_INDEX_VC], *(unsigned long *)ist);
- }
- 
--static __always_inline struct ghcb *sev_es_get_ghcb(struct ghcb_state *state)
-+static __always_inline struct ghcb *sev_es_get_ghcb(struct ghcb_state *state,
-+						    unsigned long *flags)
- {
- 	struct sev_es_runtime_data *data;
- 	struct ghcb *ghcb;
- 
-+	/*
-+	 * Nothing shall interrupt this code path while holding the per-cpu
-+	 * GHCB. The backup GHCB is only for NMIs interrupting this path.
-+	 */
-+	local_irq_save(*flags);
-+
- 	data = this_cpu_read(runtime_data);
- 	ghcb = &data->ghcb_page;
- 
-+
-+
- 	if (unlikely(data->ghcb_active)) {
- 		/* GHCB is already in use - save its contents */
- 
-@@ -479,7 +488,8 @@ static enum es_result vc_slow_virt_to_phys(struct ghcb *ghcb, struct es_em_ctxt
- /* Include code shared with pre-decompression boot stage */
- #include "sev-shared.c"
- 
--static __always_inline void sev_es_put_ghcb(struct ghcb_state *state)
-+static __always_inline void sev_es_put_ghcb(struct ghcb_state *state,
-+					    unsigned long flags)
- {
- 	struct sev_es_runtime_data *data;
- 	struct ghcb *ghcb;
-@@ -500,14 +510,17 @@ static __always_inline void sev_es_put_ghcb(struct ghcb_state *state)
- 		vc_ghcb_invalidate(ghcb);
- 		data->ghcb_active = false;
- 	}
-+
-+	local_irq_restore(flags);
- }
- 
- void noinstr __sev_es_nmi_complete(void)
- {
- 	struct ghcb_state state;
-+	unsigned long flags;
- 	struct ghcb *ghcb;
- 
--	ghcb = sev_es_get_ghcb(&state);
-+	ghcb = sev_es_get_ghcb(&state, &flags);
- 
- 	vc_ghcb_invalidate(ghcb);
- 	ghcb_set_sw_exit_code(ghcb, SVM_VMGEXIT_NMI_COMPLETE);
-@@ -517,7 +530,7 @@ void noinstr __sev_es_nmi_complete(void)
- 	sev_es_wr_ghcb_msr(__pa_nodebug(ghcb));
- 	VMGEXIT();
- 
--	sev_es_put_ghcb(&state);
-+	sev_es_put_ghcb(&state, flags);
- }
- 
- static u64 get_jump_table_addr(void)
-@@ -527,9 +540,7 @@ static u64 get_jump_table_addr(void)
- 	struct ghcb *ghcb;
- 	u64 ret = 0;
- 
--	local_irq_save(flags);
--
--	ghcb = sev_es_get_ghcb(&state);
-+	ghcb = sev_es_get_ghcb(&state, &flags);
- 
- 	vc_ghcb_invalidate(ghcb);
- 	ghcb_set_sw_exit_code(ghcb, SVM_VMGEXIT_AP_JUMP_TABLE);
-@@ -543,9 +554,7 @@ static u64 get_jump_table_addr(void)
- 	    ghcb_sw_exit_info_2_is_valid(ghcb))
- 		ret = ghcb->save.sw_exit_info_2;
- 
--	sev_es_put_ghcb(&state);
--
--	local_irq_restore(flags);
-+	sev_es_put_ghcb(&state, flags);
- 
- 	return ret;
- }
-@@ -666,9 +675,10 @@ static bool __init sev_es_setup_ghcb(void)
- static void sev_es_ap_hlt_loop(void)
- {
- 	struct ghcb_state state;
-+	unsigned long flags;
- 	struct ghcb *ghcb;
- 
--	ghcb = sev_es_get_ghcb(&state);
-+	ghcb = sev_es_get_ghcb(&state, &flags);
- 
- 	while (true) {
- 		vc_ghcb_invalidate(ghcb);
-@@ -685,7 +695,7 @@ static void sev_es_ap_hlt_loop(void)
- 			break;
+@@ -1354,8 +1354,7 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
+ 		return;
  	}
  
--	sev_es_put_ghcb(&state);
-+	sev_es_put_ghcb(&state, flags);
- }
- 
- /*
-@@ -1333,6 +1343,7 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
- 	struct ghcb_state state;
- 	struct es_em_ctxt ctxt;
- 	enum es_result result;
-+	unsigned long flags;
- 	struct ghcb *ghcb;
+-	irq_state = irqentry_nmi_enter(regs);
+-	lockdep_assert_irqs_disabled();
++	irq_state = irqentry_enter(regs);
+ 	instrumentation_begin();
  
  	/*
-@@ -1353,7 +1364,7 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
- 	 * keep the IRQs disabled to protect us against concurrent TLB flushes.
- 	 */
+@@ -1408,7 +1407,7 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
  
--	ghcb = sev_es_get_ghcb(&state);
-+	ghcb = sev_es_get_ghcb(&state, &flags);
+ out:
+ 	instrumentation_end();
+-	irqentry_nmi_exit(regs, irq_state);
++	irqentry_exit(regs, irq_state);
  
- 	vc_ghcb_invalidate(ghcb);
- 	result = vc_init_em_ctxt(&ctxt, regs, error_code);
-@@ -1361,7 +1372,7 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
- 	if (result == ES_OK)
- 		result = vc_handle_exitcode(&ctxt, ghcb, error_code);
+ 	return;
  
--	sev_es_put_ghcb(&state);
-+	sev_es_put_ghcb(&state, flags);
- 
- 	/* Done - now check the result */
- 	switch (result) {
 -- 
 2.31.1
 
