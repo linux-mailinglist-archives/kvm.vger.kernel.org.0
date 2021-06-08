@@ -2,52 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D3FF939F8B0
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 16:13:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A97DE39F898
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 16:12:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233269AbhFHOPA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 10:15:00 -0400
-Received: from mail-ej1-f74.google.com ([209.85.218.74]:39566 "EHLO
-        mail-ej1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232874AbhFHOO7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Jun 2021 10:14:59 -0400
-Received: by mail-ej1-f74.google.com with SMTP id e11-20020a170906080bb02903f9c27ad9f5so6813214ejd.6
-        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 07:13:06 -0700 (PDT)
+        id S233185AbhFHOOE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 10:14:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55660 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233172AbhFHOOD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Jun 2021 10:14:03 -0400
+Received: from mail-wr1-x449.google.com (mail-wr1-x449.google.com [IPv6:2a00:1450:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 027DAC061787
+        for <kvm@vger.kernel.org>; Tue,  8 Jun 2021 07:12:10 -0700 (PDT)
+Received: by mail-wr1-x449.google.com with SMTP id u5-20020adf9e050000b029010df603f280so9497462wre.18
+        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 07:12:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=v43My/fh29dQ89VkLemp8JE4rmjkcJppnIwoByZrgds=;
-        b=BEcD2PghOJEFU2oMhSGxgZHmAQsOMZoS8FuEDW7kwr3rf7WZqcDNBj0yUCDuKnmRxB
-         j3MVM8q3slM0Y/Yzva3xon2zKck/Y5iyW1Y/apk76zR18o/FfmDXGyjg1uyn7pkYbDuO
-         QqWXGxMSzrN2GLJoZMdre8Ytq5aI6JYKUCofX8vhb625OmDUg5zeJ2f6jXzGKWhEyaWT
-         vRAF48B27WM0JiqifHSQnXRahuUylLR1LbCreV86TpS8sU6h8/xTlL+2xpxRe8EFWRX/
-         ZMD5NyzAaA3VNCF73eRjDwaHrR8MVzEL79Ek0bJxFvCLpoNPJDakq3EfWkU/blL4BDFZ
-         W3hQ==
+        bh=jp6fv0GP5OZMvO++5rX+YJvw+QWeN06SDMdZ+IsoUG0=;
+        b=OPGc9RaxdbE4jC3Nv//QuI2Jsufzx1NecG16pksOv0KGZFsu+jQWG8OJ+DQZ/2CDb7
+         LFyBKgXQSD1jXRXJSE9x5NaKjdXiIm+GtBtKKFt25YFO9mA79s+SF4YpGXZt1H15X2bx
+         2mFt2oQz5XWvE06MsNy05geVWsUOMK7e0gvwzyMUMRKcY1GxXVSD6ET7BGv21Oo48p9W
+         0QAvnB+NR2k52p+qiGx5aDr2ji0pztzmJJSg2gFz9Pxhn4VuD9KJA1FYmyETBfmJXzGS
+         5o7NPPmVj1Nr/w/77PeoiO4acbt0s0rishsN36LfTVHRZVejvma+yDt8LCXCv2Q7Its8
+         oHwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=v43My/fh29dQ89VkLemp8JE4rmjkcJppnIwoByZrgds=;
-        b=Zx2jW9tQFEYL8Bxvu1PwHAfluMlkq8JGCUX89tTWDzvzmidgPtWIer+R4PDJXcDT1a
-         POYwNvyvEvNecbDCIdmLEmKouq97Bd9p3nbwbHimxyiakyC+SIVQz4kQvf2QAiz+T+Xi
-         BO6LzfpdXW9xstOyg/gjYLnnwdEnnGrFRhU26Gg39qBBZFvKSIeD1wNqvXNVDoYe5H+M
-         TLiNiQHfULpDo5VEDwefqtXnoRbOOckIemoAiCE+aSZbwLKuCswtWZxsXn+l7JG0kzAZ
-         RWL2nFEPdfP6+I2H0wFIJw+N3s2HC37HjsanutATZaRf2VcbKSImCUh94scXr/Ti4Wen
-         JEXQ==
-X-Gm-Message-State: AOAM531A/r/D4AG3lUeWYHsUyHvEO6VSntrGfYIjROmb+HnsKRwRJUYE
-        tGePzlfK4kTyPy89cxe6vIpdWkiecA==
-X-Google-Smtp-Source: ABdhPJzHyTAOoCriJLa65Ddn1L9CwZMBcN5UfqwlNYVC38pGMtIMGkU9U+lIMCG6yJr3TTUuIsp+bFjoKA==
-X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a05:6402:188:: with SMTP id
- r8mr25681479edv.75.1623161525939; Tue, 08 Jun 2021 07:12:05 -0700 (PDT)
-Date:   Tue,  8 Jun 2021 15:11:39 +0100
+        bh=jp6fv0GP5OZMvO++5rX+YJvw+QWeN06SDMdZ+IsoUG0=;
+        b=KdysrBn+xCnReZ+Uy1WeBdckR3eAEX3tQlolUTNN9EqmKpB1a2hWfeOU4wn4SPZGV4
+         iv8pgiHu0UVsTcPkADi272wMKMsYXxMtty34TVL+B+f7s6pVYdUZW+PAssvZqB9YOGW3
+         9b3X1i5VURfNO1v1TqnKCuPI2DAgq2BKcw0i3TzXCBu0cEGoaILjkDbCuKYdjZN0Z8dM
+         z0Qgr7uzf9AOO2Xi7jRxEIv/BEuUrQI/orbeWUMANGVtN4Jsr76njgErYQSY84n61/N/
+         qvdBrCTpMvfO1h4oCEE+rovrxhFE32IAccPsLGNa90mqzc9hOjr7GKd2dXHyrnNjmaGy
+         zolg==
+X-Gm-Message-State: AOAM533/0XuMAVjmCIh6MpVYWp6Q6qEf7ZsDZyhzkmq270pZfidiYEXb
+        tE+Pcsn4UOAIO0FrQfQNvnx39Hm77A==
+X-Google-Smtp-Source: ABdhPJyHhizcjmweSCmSoFGB2PMDem+2OK12rFn1TS9WE8cTt6h356mgLMjU2sM0rpQ3SM5oD2nnES3tfw==
+X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
+ (user=tabba job=sendgmr) by 2002:a7b:cc8f:: with SMTP id p15mr4535235wma.111.1623161528421;
+ Tue, 08 Jun 2021 07:12:08 -0700 (PDT)
+Date:   Tue,  8 Jun 2021 15:11:40 +0100
 In-Reply-To: <20210608141141.997398-1-tabba@google.com>
-Message-Id: <20210608141141.997398-12-tabba@google.com>
+Message-Id: <20210608141141.997398-13-tabba@google.com>
 Mime-Version: 1.0
 References: <20210608141141.997398-1-tabba@google.com>
 X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
-Subject: [PATCH v1 11/13] KVM: arm64: Trap access to pVM restricted features
+Subject: [PATCH v1 12/13] KVM: arm64: Handle protected guests at 32 bits
 From:   Fuad Tabba <tabba@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     maz@kernel.org, will@kernel.org, james.morse@arm.com,
@@ -61,179 +64,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Trap accesses to restricted features for VMs running in protected
-mode.
+Protected KVM does not support protected AArch32 guests. However,
+it is possible for the guest to force run AArch32, potentially
+causing problems. Add an extra check so that if the hypervisor
+catches the guest doing that, it can prevent the guest from
+running again by resetting vcpu->arch.target and returning
+ARM_EXCEPTION_IL.
 
-Access to feature registers are emulated, and only supported
-features are exposed to protected VMs.
-
-Accesses to restricted registers as well as restricted
-instructions are trapped, and an undefined exception is injected
-into the protected guest.
-
-Only affects the functionality of protected VMs. Otherwise,
-should not affect non-protected VMs when KVM is running in
-protected mode.
+Adapted from commit 22f553842b14 ("KVM: arm64: Handle Asymmetric
+AArch32 systems")
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h |   3 +
- arch/arm64/kvm/hyp/nvhe/switch.c        | 105 ++++++++++++++++++++----
- 2 files changed, 94 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
 diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index f5d3d1da0aec..d9f087ed6e02 100644
+index d9f087ed6e02..672801f79579 100644
 --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
 +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -33,6 +33,9 @@
- extern struct exception_table_entry __start___kvm_ex_table;
- extern struct exception_table_entry __stop___kvm_ex_table;
+@@ -447,6 +447,26 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 			write_sysreg_el2(read_sysreg_el2(SYS_ELR) - 4, SYS_ELR);
+ 	}
  
-+int kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu);
-+int kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu);
++	/*
++	 * Protected VMs are not allowed to run in AArch32. The check below is
++	 * based on the one in kvm_arch_vcpu_ioctl_run().
++	 * The ARMv8 architecture doesn't give the hypervisor a mechanism to
++	 * prevent a guest from dropping to AArch32 EL0 if implemented by the
++	 * CPU. If the hypervisor spots a guest in such a state ensure it is
++	 * handled, and don't trust the host to spot or fix it.
++	 */
++	if (unlikely(is_nvhe_hyp_code() &&
++		     kvm_vm_is_protected(kern_hyp_va(vcpu->kvm)) &&
++		     vcpu_mode_is_32bit(vcpu))) {
++		/*
++		 * As we have caught the guest red-handed, decide that it isn't
++		 * fit for purpose anymore by making the vcpu invalid.
++		 */
++		vcpu->arch.target = -1;
++		*exit_code = ARM_EXCEPTION_IL;
++		goto exit;
++	}
 +
- /* Check whether the FP regs were dirtied while in the host-side run loop: */
- static inline bool update_fp_enabled(struct kvm_vcpu *vcpu)
- {
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 967a3ad74fbd..48d5f780fe64 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -34,12 +34,63 @@ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
- DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
- DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
- 
-+/*
-+ * Set EL2 configuration registers to trap restricted register accesses and
-+ * instructions for protected VMs.
-+ *
-+ * Should be called right before vcpu entry to restrict its impact only to the
-+ * protected guest.
-+ */
-+static void __activate_traps_pvm(struct kvm_vcpu *vcpu)
-+{
-+	u64 mdcr;
-+	u64 hcr;
-+	u64 cptr;
-+
-+	if (!kvm_vm_is_protected(kern_hyp_va(vcpu->kvm)))
-+		return;
-+
-+	mdcr = read_sysreg(mdcr_el2);
-+	hcr = read_sysreg(hcr_el2);
-+	cptr = read_sysreg(cptr_el2);
-+
-+	hcr |= HCR_TID3 |			/* Feature Registers */
-+	       HCR_TLOR |			/* LOR */
-+	       HCR_RW |				/* AArch64 EL1 only */
-+	       HCR_TERR |			/* RAS */
-+	       HCR_ATA | HCR_TID5 |		/* Memory Tagging */
-+	       HCR_TACR | HCR_TIDCP | HCR_TID1; /* Implementation defined */
-+
-+	hcr &= ~(HCR_DCT |	/* Memory Tagging */
-+		 HCR_FIEN |	/* RAS */
-+		 HCR_AMVOFFEN);	/* Disables AMU registers virtualization */
-+
-+	/* Debug and Trace */
-+	mdcr |= MDCR_EL2_TDRA | MDCR_EL2_TDA | MDCR_EL2_TDE |
-+		MDCR_EL2_TDOSA | MDCR_EL2_TDCC | MDCR_EL2_TTRF |
-+		MDCR_EL2_TPM | MDCR_EL2_TPMCR |
-+		MDCR_EL2_TPMS; /* SPE */
-+
-+	mdcr &= ~(MDCR_EL2_HPME | MDCR_EL2_MTPME |		/* PMU */
-+		  (MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT)); /* SPE */
-+
-+	cptr |= CPTR_EL2_TTA |	/* Trace */
-+		CPTR_EL2_TAM |	/* AMU */
-+		CPTR_EL2_TZ;	/* SVE */
-+
-+	/*  __deactivate_traps() restores these registers. */
-+	write_sysreg(mdcr, mdcr_el2);
-+	write_sysreg(hcr, hcr_el2);
-+	write_sysreg(cptr, cptr_el2);
-+}
-+
- static void __activate_traps(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
- 
- 	___activate_traps(vcpu);
- 	__activate_traps_common(vcpu);
-+	__activate_traps_pvm(vcpu);
- 
- 	val = CPTR_EL2_DEFAULT;
- 	val |= CPTR_EL2_TTA | CPTR_EL2_TAM;
-@@ -165,30 +216,56 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
- 		write_sysreg(pmu->events_host, pmcntenset_el0);
- }
- 
-+/**
-+ * Handle system register accesses for protected VMs.
-+ *
-+ * Return 1 if handled, or 0 if not.
-+ */
-+static int handle_pvm_sys64(struct kvm_vcpu *vcpu)
-+{
-+	if (kvm_vm_is_protected(kern_hyp_va(vcpu->kvm)))
-+		return kvm_handle_pvm_sys64(vcpu);
-+	else
-+		return 0;
-+}
-+
-+/**
-+ * Handle restricted feature accesses for protected VMs.
-+ *
-+ * Return 1 if handled, or 0 if not.
-+ */
-+static int handle_pvm_restricted(struct kvm_vcpu *vcpu)
-+{
-+	if (kvm_vm_is_protected(kern_hyp_va(vcpu->kvm)))
-+		return kvm_handle_pvm_restricted(vcpu);
-+	else
-+		return 0;
-+}
-+
- typedef int (*exit_handle_fn)(struct kvm_vcpu *);
- 
- static exit_handle_fn hyp_exit_handlers[] = {
--	[0 ... ESR_ELx_EC_MAX]		= NULL,
-+	[0 ... ESR_ELx_EC_MAX]		= handle_pvm_restricted,
- 	[ESR_ELx_EC_WFx]		= NULL,
--	[ESR_ELx_EC_CP15_32]		= NULL,
--	[ESR_ELx_EC_CP15_64]		= NULL,
--	[ESR_ELx_EC_CP14_MR]		= NULL,
--	[ESR_ELx_EC_CP14_LS]		= NULL,
--	[ESR_ELx_EC_CP14_64]		= NULL,
-+	[ESR_ELx_EC_CP15_32]		= handle_pvm_restricted,
-+	[ESR_ELx_EC_CP15_64]		= handle_pvm_restricted,
-+	[ESR_ELx_EC_CP14_MR]		= handle_pvm_restricted,
-+	[ESR_ELx_EC_CP14_LS]		= handle_pvm_restricted,
-+	[ESR_ELx_EC_CP14_64]		= handle_pvm_restricted,
- 	[ESR_ELx_EC_HVC32]		= NULL,
- 	[ESR_ELx_EC_SMC32]		= NULL,
- 	[ESR_ELx_EC_HVC64]		= NULL,
- 	[ESR_ELx_EC_SMC64]		= NULL,
--	[ESR_ELx_EC_SYS64]		= NULL,
--	[ESR_ELx_EC_SVE]		= NULL,
-+	[ESR_ELx_EC_SYS64]		= handle_pvm_sys64,
-+	[ESR_ELx_EC_SVE]		= handle_pvm_restricted,
- 	[ESR_ELx_EC_IABT_LOW]		= NULL,
- 	[ESR_ELx_EC_DABT_LOW]		= NULL,
--	[ESR_ELx_EC_SOFTSTP_LOW]	= NULL,
--	[ESR_ELx_EC_WATCHPT_LOW]	= NULL,
--	[ESR_ELx_EC_BREAKPT_LOW]	= NULL,
--	[ESR_ELx_EC_BKPT32]		= NULL,
--	[ESR_ELx_EC_BRK64]		= NULL,
--	[ESR_ELx_EC_FP_ASIMD]		= NULL,
-+	[ESR_ELx_EC_SOFTSTP_LOW]	= handle_pvm_restricted,
-+	[ESR_ELx_EC_WATCHPT_LOW]	= handle_pvm_restricted,
-+	[ESR_ELx_EC_BREAKPT_LOW]	= handle_pvm_restricted,
-+	[ESR_ELx_EC_BKPT32]		= handle_pvm_restricted,
-+	[ESR_ELx_EC_BRK64]		= handle_pvm_restricted,
-+	[ESR_ELx_EC_FP_ASIMD]		= handle_pvm_restricted,
- 	[ESR_ELx_EC_PAC]		= NULL,
- };
- 
+ 	/*
+ 	 * We're using the raw exception code in order to only process
+ 	 * the trap if no SError is pending. We will come back to the
 -- 
 2.32.0.rc1.229.g3e70b5a671-goog
 
