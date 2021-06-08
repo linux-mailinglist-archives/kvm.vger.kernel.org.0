@@ -2,106 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F73039FCCA
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 18:48:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 449D739FCDB
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 18:51:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232572AbhFHQuO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 12:50:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34030 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230410AbhFHQuO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Jun 2021 12:50:14 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED468C061574
-        for <kvm@vger.kernel.org>; Tue,  8 Jun 2021 09:48:20 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id y15so16135231pfl.4
-        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 09:48:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=y5ojMFkZcdug4Csq8mqm5JhvVrMpQqOorJMDrZfK3L0=;
-        b=lh+DaKzUePslpvnoIkaJyz/zvSdSmE4QNC6I7Am/QQxbSrt6onCmZEg1XIqC423D/K
-         5Qg/dmDRrkcF8iFS3p7pOjbpJNxZOWLM1H+4ZsYsftIOlttG6YWO2zjGqrNSxpP5e61V
-         p6la1cPf/LPBLOeic7SXWnPpUTYLXQI5sbUAOv4+tFbJ/3M3qQV1WyncuEB/lhidDR8q
-         I2LyGwk73EhoKhCabaDxoiZBE/L4/I//5hkUZRqCy1F/jIkF3R+gNEq/WXP1gPuhWvwR
-         Lx46/SOijBtQSdOK3KQMoit6/qj8D+Azsj2CTeFLqMIj6TPtX+s5cNSnSH2ygrxU/nbC
-         tjzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=y5ojMFkZcdug4Csq8mqm5JhvVrMpQqOorJMDrZfK3L0=;
-        b=Aa3cgXIVHJnwI7Fl2Bj7JzywBi3aHOErPX8XQfo5Kf1F7qIw4zrTikdCBOVM23FBu1
-         jPzAMWpu+BykDUm9YNPP5pqvw3sOY/FUXV/ApB5LB7D+5nouPi66sDQJ0BHGiABJihh/
-         vlBL73fzH+xkp4mtZJAvclwZWbSq2cJ67AdEeYcOfy35Zb6TFNdzsacWMySEv2UaMl8E
-         slMLBZNjw+S9XD+lcES8fXpyjK+rzi+Jru5i5Ml8QJMlNZTrrty9ei83ffKYThDBSo/y
-         F6OjF07YZwu+qYPfD115nPr7CUlEM6v6yNN1AWR4dhumRMYNMk/d6MnaGA5N/3QWQZfs
-         g+vw==
-X-Gm-Message-State: AOAM533Mer5GoQLl6PatCn0IU8T0CAZ6LqG6m8zJK5/NUThAE09D4ER/
-        RhsXE0CFbmB0aR+eE6gsg2SSvw==
-X-Google-Smtp-Source: ABdhPJzG9sGuu05boZhU/9/aFHSUEkhfmiCLMIWQHg5uuxbvLJFY8PYIrlRuihBcLlz48X6Igk4SIg==
-X-Received: by 2002:a65:6118:: with SMTP id z24mr23346109pgu.325.1623170900258;
-        Tue, 08 Jun 2021 09:48:20 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id u24sm638650pfm.200.2021.06.08.09.48.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jun 2021 09:48:19 -0700 (PDT)
-Date:   Tue, 8 Jun 2021 16:48:15 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     syzbot <syzbot+fb0b6a7e8713aeb0319c@syzkaller.appspotmail.com>
-Cc:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
-        x86@kernel.org
-Subject: Re: [syzbot] general protection fault in gfn_to_rmap (2)
-Message-ID: <YL+fTwfphU1Al3d8@google.com>
-References: <0000000000006ac02a05c44397fb@google.com>
+        id S233010AbhFHQxU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 12:53:20 -0400
+Received: from mail-bn8nam12on2060.outbound.protection.outlook.com ([40.107.237.60]:17696
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232931AbhFHQxQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Jun 2021 12:53:16 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ErnRPYHqZ+RPknkUcUXzARFm17mUIunsPMHeGq2b2TmgTPAKkzSzn4ncE1eJEh00Ygn91YmoZ285Hk10isHUzL6OIQ12ubKKR8mHide4F5IxEtq6dSllzAGbrfaD2DR37A3GAzFZTgYvhGnrYFHHWw4Y2bJr2NOgrB3MydoG28/ODlzAc/iRnX7d5gr3eX5p15ssPnzZ6mHn3MKZwuPWXmJMeYW4LMnS7RVKDRfFNxcmGrPJ4wB+MVG8qmWHnlnGtu8layZRZo2LL/9yGl3ea281fJ2bRf82bnnKoI5hPTBaPn3D8jqI6SaDEnkGZxz/8eZIUwfBHrH2rFTjGNFYNw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T7IDNK1jtqIzrXmy6vW4OPkdz+Fx/L68eLZTWTPen5E=;
+ b=MoCtazqwzDHGbXauC/rfbilCqAp5Gw5aC8+CLNJooxhC+KQOMU+BN1E+xs2/9ofHLZptwA4uL505FYtooOl8elXKJtlsyF9JCxN2G8lWLLmJ9fsiyN3jY7hPkNzLC5GIdA62/Zxk4cXZJvxAEw5t/Bbm8K6/QTbWbZHUQ+K8Wu7mG+rHRqgkydTABPr8WVUn6rBtDT+8b9znuBeH+j88eJSE0EeMGSy00O2qCyirInAI4TLmEdLnUpiFFvsEHiWNWz/SbQPcIa8GKfhcDOSw5ODNj1bsg/jFbprWlBdH/j8LNfO8I1cdIrhkhYc/FsUs9j8Yq0BUzbOpawNB/BJJvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T7IDNK1jtqIzrXmy6vW4OPkdz+Fx/L68eLZTWTPen5E=;
+ b=IUpFW9A5z+KkaVYWI+xYGQSf2o+W6rFGm3klrHl3GZtlvMw1afCiFz1ham+nv0IgnRmKtpUigFmVXoy1CdlcUvX+KaJu15cZcoQ1L0qagCIIvi9NIi1VfV2uVbiR3GpqjLYVU4MHkA0YitPRrF9lLBdXfvmqAf2K/9NXbXQ3Omg=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SA0PR12MB4509.namprd12.prod.outlook.com (2603:10b6:806:9e::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.24; Tue, 8 Jun
+ 2021 16:51:21 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4219.021; Tue, 8 Jun 2021
+ 16:51:21 +0000
+Cc:     brijesh.singh@amd.com, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 02/22] x86/sev: Define the Linux specific
+ guest termination reasons
+To:     Venu Busireddy <venu.busireddy@oracle.com>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-3-brijesh.singh@amd.com> <YL+T7X/417sQAUUA@dt>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <919c9acc-2d83-be24-d0d3-4d54851ff049@amd.com>
+Date:   Tue, 8 Jun 2021 11:51:18 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.11.0
+In-Reply-To: <YL+T7X/417sQAUUA@dt>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [70.112.153.56]
+X-ClientProxiedBy: SN7PR04CA0215.namprd04.prod.outlook.com
+ (2603:10b6:806:127::10) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0000000000006ac02a05c44397fb@google.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SN7PR04CA0215.namprd04.prod.outlook.com (2603:10b6:806:127::10) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.20 via Frontend Transport; Tue, 8 Jun 2021 16:51:19 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 18b81ab5-d6eb-4e3f-280e-08d92a9da4a2
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4509:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4509BA865EC4D958A106410EE5379@SA0PR12MB4509.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2657;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: weS0vFzZN4qDV15Vsyq5Co6G14Ux+eOnGVpbl3VGEsoRB2VJXQo6dItTZGUopdh3u4wtSwKK5Mr8bY7ZnpSbNbw/ueo2tCqTJrSx9jS88pDNifAxZai3NCMwzvq2CeOjiJJHTNFJJpo9I+QuiFAL/mSFjMzJ4TQg4oeyFH9k4T/9sGiM7w4Z4VDIxttOo0MAsSlTT+CmnjXX2oHwb3mqcz4bjhbWbg3vp9b2ZDhtPDk3ZpRd/VH9t2jOC1ZhUlclNTtlWxfV43u6/VxznMUoIvuAXbjCSPbcWjVLoFc5rACJxfEzcP/BjntNuePcdHDXfiselKQOlu2SvwT/CwG1G0syuGrUQHMzsvOE+b9E/8lsBlcLXExAC+nHcSnD0laRGpqiPyQAS5zqsGUI5gehUUHFsjnsb9+NP0teOTz+G/2H4Mj1QG97UexX2OqZmF2jFODI3RWHUF5aqkz1Rn+E8z8V1JkkDrmAPQfO9bR7Jg4whUfvXvbMaQZ0HxFkaAkWbM+vVA13iqDVdVPeVp3MyVAy2dp7VXi2GOYrKSRJyxtQRzFq1tnGZqFMFIfRpw+8hYuWrce10wnow8Nd5ro/Dw6sfhwUK3oDJwYIUaV2hc9b7REIZYTm44b9lOqzvMUpG9BBhUPqCpSnYlgKYLIgxfDv3/9fKrN2o4iW0m6p441NkxXozo8JL7JPGwzlKOXYdT57fT7dGySSaD/y0puQLRaSjO4B7L2o9AUl7LJm+mc=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(39860400002)(366004)(136003)(396003)(83380400001)(31686004)(36756003)(5660300002)(6486002)(86362001)(8936002)(52116002)(53546011)(31696002)(6512007)(186003)(38350700002)(38100700002)(6916009)(2616005)(66556008)(66946007)(66476007)(44832011)(956004)(26005)(54906003)(7416002)(316002)(4744005)(2906002)(8676002)(16526019)(478600001)(6506007)(4326008)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dmJUZ0owR2xCdWhmaTJRRE1XZlFKaThQak44bUlCMUZRU0l1Yy9rZ1RPSVBa?=
+ =?utf-8?B?WVU0ZlFzYTR5OXB0TVJxQ1c4UDZzbXZ4NEdPTWZsR0VOb05wNGduU25UTFlw?=
+ =?utf-8?B?T2NvUUs5U0lQeDFFTHlyMUtmZzlVZ0J4V1cxNWg0Wjg0YzVRWjdWT3ZrcEVL?=
+ =?utf-8?B?M1pOcE4rbjJwVFlLMmVuOFlTaXFlUnoyNGVGaDlYYWlJcHhucWhRams2RWcw?=
+ =?utf-8?B?WDRoSFBSVzBPNk9DZkdQV3JENVVuNE5LNnluZGo3Mm16UkVIdjJKZ3pldkRz?=
+ =?utf-8?B?NGNaMmVRcVMyRG1hNkF4WXB3U3l0dllnbzRhZnRIeTcxbGZ5TEtlcnlENStH?=
+ =?utf-8?B?MzAwWXVJa3JjS1Jla0x5bkdzRmZ4dDBCYjJxV2RvaGV5SGRqWE95M2pnT3k3?=
+ =?utf-8?B?RjNYWVZVT2k2eWthVUdGekxNSUw2Zm5XbFpjM3FKakpPMWRWQ3JWNVhMU1FP?=
+ =?utf-8?B?VFBCT3d6V0pYdGFVdDNlWGpIZHBzSWF1NERmQlFMQ3F3V0tsK2o1SGlvRE1O?=
+ =?utf-8?B?SktFV1ppWWlhR1VIV3ZoSjhmU0tJQmdIQVFLOHErdDlZUWMrRCtreE5DSGth?=
+ =?utf-8?B?Qm84eFRqY2JFanpNMzhEY2VUcmlnY1BMQ1pscEtlVk03WHJmYnpDUEFEK1Z1?=
+ =?utf-8?B?VWp3RGpMZUJISTJQTGNiOXg3RXlyM3Nodk13VktXN1plLytrQWhSZGxyYXBk?=
+ =?utf-8?B?L1dtR3liU3UvUy92Z1U3Ymh1dUxlbHMvU2twTEpCblBxeHpyRWZwOXhXSmNj?=
+ =?utf-8?B?VzBmMzVxU0tNaGN3cURUclMyK2RPblBBRFNLTkYrOEtlMXdyeXBlUjlxVUJ5?=
+ =?utf-8?B?N2VUeDZKaFR0eVpZT0JnOHBhNkFXbkFJSmRpaFEwY1VxNmo1VndnVEw3VkVn?=
+ =?utf-8?B?aWsxNmxBR0VtdWtpRkcrTlZYSitwQ3lyNFU5UzBiMjFaZVREWTVJUm8wWHpV?=
+ =?utf-8?B?V3JCdnhIRGp6S2EzQ3Vna2tQVnVleGZIRkpjaTR1Qk9xa05NZ3NqWXFsRnV4?=
+ =?utf-8?B?amU4QWpKejFyYURQMEI4WHUxRnFHMTBINUR3dlIrV0xBYm15QVp0NDV0c0hw?=
+ =?utf-8?B?RHVLbTJncFpCZE1BTDhBdHJ4Y0c4Z2RmU292SGt1MkhSLzV2YlNOa25jRWdu?=
+ =?utf-8?B?cTN3UE1BMXpmSE5TS3R1UWJRbG1Hc1dZN0ZRa1hqZW84djVSRUhvK1ZMZW8w?=
+ =?utf-8?B?a1pRRWpsUUJxUG5CWDhaUHgyL3MyWkNtdDNmQld1Q3FsNG9xUGE0eE5zdFl4?=
+ =?utf-8?B?ZWFCVWsxR0hVTmN1UE1XaWh4Vm82cWtWaklKVTAxWmlXL3RvMmV6QzRNM0hO?=
+ =?utf-8?B?aDcxdVIwN293VjFFVVVlclBGVXJqQkFWNVFONDlPMEx4M2FtbTZCcGNPaEN6?=
+ =?utf-8?B?Y2JzalVHOGthWjlKQ3QxR3hVbWlxb2d3ekZGVXd0Y2p3MlkwYzA0VnFTeUov?=
+ =?utf-8?B?RTliaTVkb1dGcmNxYmFjclNFSGMzK0FhM2NtVTlqWDk5bTMyZ0g1TStwcUZs?=
+ =?utf-8?B?OFVxd0txdGRZSE1YQ29VS3piZCtKOHRVZGxEOHVvMzNqeDdOQk41RGRKYUxi?=
+ =?utf-8?B?N0dVVC9pajBkZzA1SXF1aENNa3hkdmJlOTRlWFRGVDhxOXFYZDZhQ0hJemxK?=
+ =?utf-8?B?NFJBVzl0Mjg1WjBSMFkwdFJ1aHhFN3R4c2N1WlhjbzN5enlDRGxUNjV1N2Z5?=
+ =?utf-8?B?VHBTa2szeng2YnZJczZkWnh0VHcyazdiNWU3SnhvSjY0b2ViaEx3RFlmc0wy?=
+ =?utf-8?Q?DlbzbMdnY+jlRSjEBq0q22Evayt4MgYfIhB0NSW?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 18b81ab5-d6eb-4e3f-280e-08d92a9da4a2
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2021 16:51:21.1777
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VjRC+Ila+V98iGETVvF/z7jjVuUhnlfc501NwELf2s6rEQGgmjMhZYM8302PNskanoVwmfEMjoiEMNtefDPXrQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4509
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 08, 2021, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    614124be Linux 5.13-rc5
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=14a62298300000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=547a5e42ca601229
-> dashboard link: https://syzkaller.appspot.com/bug?extid=fb0b6a7e8713aeb0319c
-> compiler:       Debian clang version 11.0.1-2
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11395057d00000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12d2b797d00000
-> 
-> The issue was bisected to:
-> 
-> commit 9ec19493fb86d6d5fbf9286b94ff21e56ef66376
-> Author: Sean Christopherson <sean.j.christopherson@intel.com>
-> Date:   Tue Apr 2 15:03:11 2019 +0000
-> 
->     KVM: x86: clear SMM flags before loading state while leaving SMM
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1437f9bbd00000
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=1637f9bbd00000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=1237f9bbd00000
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+fb0b6a7e8713aeb0319c@syzkaller.appspotmail.com
-> Fixes: 9ec19493fb86 ("KVM: x86: clear SMM flags before loading state while leaving SMM")
-> 
-> L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.
-> general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
-> KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-> CPU: 1 PID: 8410 Comm: syz-executor382 Not tainted 5.13.0-rc5-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-> RIP: 0010:__gfn_to_rmap arch/x86/kvm/mmu/mmu.c:935 [inline]
 
-Oh joy.  SMM, rmaps, and memslots.  I'll take this one...
+On 6/8/21 10:59 AM, Venu Busireddy wrote:
+>
+>>  {
+>>  	u64 val = GHCB_MSR_TERM_REQ;
+>>  
+>> @@ -32,7 +32,7 @@ static void __noreturn sev_es_terminate(unsigned int reason)
+>>  	 * Tell the hypervisor what went wrong - only reason-set 0 is
+>>  	 * currently supported.
+>>  	 */
+> Since reason set 0 is not the only set supported anymore, maybe the part
+> about reason set 0 should be removed from the above comment?
+
+Sure, I will update the comment. thanks
+
+
