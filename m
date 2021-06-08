@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 650553A0664
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 23:48:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C39363A0665
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 23:48:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234643AbhFHVuY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 17:50:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44102 "EHLO
+        id S234628AbhFHVuk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 17:50:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234625AbhFHVuY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Jun 2021 17:50:24 -0400
-Received: from mail-il1-x14a.google.com (mail-il1-x14a.google.com [IPv6:2607:f8b0:4864:20::14a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95B5EC061787
-        for <kvm@vger.kernel.org>; Tue,  8 Jun 2021 14:48:30 -0700 (PDT)
-Received: by mail-il1-x14a.google.com with SMTP id q4-20020a056e020784b02901e2ee9a8333so15585500ils.20
-        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 14:48:30 -0700 (PDT)
+        with ESMTP id S234364AbhFHVuk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Jun 2021 17:50:40 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7113CC061574
+        for <kvm@vger.kernel.org>; Tue,  8 Jun 2021 14:48:36 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id y135-20020a25dc8d0000b029054716974cceso8534691ybe.12
+        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 14:48:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=V441yi9NFbr1zLEPRX6rZzogwZk2O2NHoTW1SdrwQz0=;
-        b=RrEhuyAGvy7n4Z230SQn5erzHDHZV14ZiRzmyU7qS7EtGyzBvorh9yADusm1lCinf/
-         WVcuWVkzvDNwzqZAfWXDokqI5lAT+Qs7Y0+ft7CRYbGTxH/xvSrOlvlekCxl20Uz0STp
-         QSOnuZuirGHWp1OGH03LM2g5MCiLL5AcwOTW+vd81Ldcs7Xmo/AQ4+CBbBXK72Ld9jux
-         R5MNTEX7cgzJP3n1Vdics1aqGJIC+TH/pxKzYVW5KlTSaWYqAxcFQjRqL56CblAapIZA
-         UwicB9ZHCZb0o8lAB5BOgkXwbCmtd4X/TdMZmml6vemqAthBn+741qYe/AxuYycR2/v8
-         5Cnw==
+        bh=9ZoMqiE2Ix8XEX2FQzL2zr/Zx9M+aXu+vadqrJ/vnTw=;
+        b=XxSvqxLou4MF4BxFLH0qp6z9iCNGB8fRfuEiXIEK/ImcP+Dl6aGVZQ5neE5XszmYpf
+         Z57i2uiMF8yel+7eV37wtdnG8M+hdfascVdwEH1WYmGcPN8QoNJiDlaG+FyzYMr3kiqO
+         c0Nb/Gu8xmsdxc91iXouuzftZF2YxXLyjsItZH3CM8YiZpDmOD7FdrE2CcLHgywd+ly3
+         dH9dHva14YiQp5i7HqLJYokKiSnxup62jn0HPgQ2I3DLB7MmCHTahF3hAEDiu21v8BYK
+         Oo1o3VM6/vOCNcYUphNsg+YXWJ87ZEzGQBl1ty+19uEJbmOyslLtCfALWev7VrQCxOZa
+         /xgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=V441yi9NFbr1zLEPRX6rZzogwZk2O2NHoTW1SdrwQz0=;
-        b=OWHcmq3y8suI3BTNu+3E3iwZ0Fuk9WPPlCSob2fd+kP3Rpb+dRFdOKbb58dAEUuuhn
-         GaeJ+153f5UcxLpsbdj6C8V8Klct5ShvPKqCDvSGl3tdgKb5zDdkdBRVnAT83gusQXPt
-         VSHoY1TfyWxGJCbdo0+rKGqafz91HbhAoO6ayhVH+zd4Huw1vULc4ltkwu47mSM8ZQ1g
-         VMcgt5e14vzwUnToCnOKRUTuOmcZZXvQpHLkC9dBxbvJJ8/FhoRfrgSD7tE+IjAz3gbc
-         XKXNLuzrt5JeM7zq06bTB1k2WPyUGUyPSdNxsluhCKq7qfeQ5/0/2bWxOiR/UzKoGbsU
-         K1IQ==
-X-Gm-Message-State: AOAM531tTxjv0kefxh/CdKdmFGwhxD4iwCqg4zoUW/cg3V2UwPT5AlVm
-        P3ifqu22oNjdDoJu0Nsz5AlnIE/pzDS06XAa0+4ch83+EdWmqVhTSiWByXXQfnEKVllp7HBAVVu
-        y3Az6PkEH80geBkVxemeBEEGN/XC3/XhF0T9aLDHp0adze5dBvGw6qzYe/g==
-X-Google-Smtp-Source: ABdhPJx2UsCEL2axJZTGIvmQZ2dIVVT3dzGmnONSw4l/0DJG9Hp/Proa7NFVaaB024/4wdx+UhYYYjniirQ=
+        bh=9ZoMqiE2Ix8XEX2FQzL2zr/Zx9M+aXu+vadqrJ/vnTw=;
+        b=h96kaMecugq0PfFfDRnclzWFcRRlZx/ztnb2VanNZ9orgyCFntdB1K6+HTWKf3xLeE
+         l/3ELwDUbDtQrmDlWGLZIsbo6fxlZy98Ab+zsnc7GhnU+i8WrDegGYaYX54HqTDucotp
+         F/zRwBWIj3C662vFBfC2t1WGWonOmfxgXUTku5AdZt8nnOMR0/DgiiHzqWOA8gfPfOo5
+         tkUlzZeZHgkq5ePC3boodR0LZnQorgXWHs6nSDCp5zorQXFfQtjthrPnack0CaGDLAvG
+         MND8nm5sZx9iyL/7juXeYZ/FE+TefBWdqJ3kpvQEDEWBgW+XAYUFCWP9h9KxcIMQ06CT
+         r0wQ==
+X-Gm-Message-State: AOAM530VungHg6wyBYEJnYLszSE99sifY7u+LLAFXvAOlmPC9c9ZLyPN
+        CsnFxJzIBMyipFgmn1qmUl+rRXyT5Qz8xx3UOuXCBqkUJGo1Qc8Mev0UuD+W6Wvhd4qoCCC8+PR
+        dh6luGrgKlFkuhf5hSLYE+LO1M25UdImlzp2Bpn8P3FfZtNL8ribmJDNN8Q==
+X-Google-Smtp-Source: ABdhPJxLd52vbcGMLWWE2gQyW873IX70SEaG+rVIXWmdXwk5b+dvVT+6qrinH7iDe569lig2y1MvZyvExDc=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:10:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6638:16d6:: with SMTP id
- g22mr12795895jat.142.1623188909951; Tue, 08 Jun 2021 14:48:29 -0700 (PDT)
-Date:   Tue,  8 Jun 2021 21:47:39 +0000
+ (user=oupton job=sendgmr) by 2002:a25:dbc4:: with SMTP id g187mr35049365ybf.142.1623188915485;
+ Tue, 08 Jun 2021 14:48:35 -0700 (PDT)
+Date:   Tue,  8 Jun 2021 21:47:40 +0000
 In-Reply-To: <20210608214742.1897483-1-oupton@google.com>
-Message-Id: <20210608214742.1897483-8-oupton@google.com>
+Message-Id: <20210608214742.1897483-9-oupton@google.com>
 Mime-Version: 1.0
 References: <20210608214742.1897483-1-oupton@google.com>
 X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
-Subject: [PATCH 07/10] KVM: x86: Refactor tsc synchronization code
+Subject: [PATCH 08/10] KVM: x86: Implement KVM_CAP_SYSTEM_COUNTER_STATE
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -68,183 +68,166 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Refactor kvm_synchronize_tsc to make a new function that allows callers
-to specify TSC parameters (offset, value, nanoseconds, etc.) explicitly
-for the sake of participating in TSC synchronization.
+To date, VMM-directed TSC synchronization and migration has been messy.
+KVM has some baked-in heuristics around TSC writes to infer if the VMM
+is attempting to synchronize. This is problematic, as it depends on the
+host writing to the guest's TSC within 1 second of the last write.
 
-This changes the locking semantics around TSC writes. Writes to the TSC
-will now take the pvclock gtod lock while holding the tsc write lock,
-whereas before these locks were disjoint.
+A much cleaner approach to configuring the guest's views of the TSC is
+to simply migrate the TSC offset for every vCPU. Offsets are idempotent,
+and thus are not subject to change depending on when the VMM actually
+reads the values from KVM. The VMM can then read the TSC once to
+capture the instant at which the guest's TSCs are paused.
+
+Implement the KVM_{GET,SET}_SYSTEM_COUNTER_STATE ioctls and advertise
+KVM_CAP_SYSTEM_COUNTER_STATE to userspace.
 
 Reviewed-by: David Matlack <dmatlack@google.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- Documentation/virt/kvm/locking.rst |  11 +++
- arch/x86/kvm/x86.c                 | 106 +++++++++++++++++------------
- 2 files changed, 74 insertions(+), 43 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/include/uapi/asm/kvm.h |  8 ++++
+ arch/x86/kvm/x86.c              | 70 +++++++++++++++++++++++++++++++++
+ 3 files changed, 79 insertions(+)
 
-diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
-index 1fc860c007a3..d21e0e480d63 100644
---- a/Documentation/virt/kvm/locking.rst
-+++ b/Documentation/virt/kvm/locking.rst
-@@ -25,6 +25,9 @@ On x86:
-   holding kvm->arch.mmu_lock (typically with ``read_lock``, otherwise
-   there's no need to take kvm->arch.tdp_mmu_pages_lock at all).
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 55efbacfc244..8768173f614c 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1018,6 +1018,7 @@ struct kvm_arch {
+ 	u64 last_tsc_nsec;
+ 	u64 last_tsc_write;
+ 	u32 last_tsc_khz;
++	u64 last_tsc_offset;
+ 	u64 cur_tsc_nsec;
+ 	u64 cur_tsc_write;
+ 	u64 cur_tsc_offset;
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 0662f644aad9..60ad6b9ebcd6 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -490,4 +490,12 @@ struct kvm_pmu_event_filter {
+ #define KVM_PMU_EVENT_ALLOW 0
+ #define KVM_PMU_EVENT_DENY 1
  
-+- kvm->arch.tsc_write_lock is taken outside
-+  kvm->arch.pvclock_gtod_sync_lock
++/* for KVM_CAP_SYSTEM_COUNTER_STATE */
++struct kvm_system_counter_state {
++	__u32 flags;
++	__u32 pad;
++	__u64 tsc_offset;
++	__u64 rsvd[6];
++};
 +
- Everything else is a leaf: no other lock is taken inside the critical
- sections.
- 
-@@ -211,6 +214,14 @@ time it will be set using the Dirty tracking mechanism described above.
- :Comment:	'raw' because hardware enabling/disabling must be atomic /wrt
- 		migration.
- 
-+:Name:		kvm_arch::pvclock_gtod_sync_lock
-+:Type:		raw_spinlock_t
-+:Arch:		x86
-+:Protects:	kvm_arch::{cur_tsc_generation,cur_tsc_nsec,cur_tsc_write,
-+			cur_tsc_offset,nr_vcpus_matched_tsc}
-+:Comment:	'raw' because updating the kvm master clock must not be
-+		preempted.
-+
- :Name:		kvm_arch::tsc_write_lock
- :Type:		raw_spinlock
- :Arch:		x86
+ #endif /* _ASM_X86_KVM_H */
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9b6bca616929..61069995a592 100644
+index 61069995a592..bb3ecb5cd548 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -2351,13 +2351,73 @@ static inline bool kvm_check_tsc_unstable(void)
- 	return check_tsc_unstable();
+@@ -2332,6 +2332,11 @@ u64 kvm_read_l1_tsc(struct kvm_vcpu *vcpu, u64 host_tsc)
  }
+ EXPORT_SYMBOL_GPL(kvm_read_l1_tsc);
  
-+/*
-+ * Infers attempts to synchronize the guest's tsc from host writes. Sets the
-+ * offset for the vcpu and tracks the TSC matching generation that the vcpu
-+ * participates in.
-+ *
-+ * Must hold kvm->arch.tsc_write_lock to call this function.
-+ */
-+static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 offset, u64 tsc,
-+				  u64 ns, bool matched)
++static u64 kvm_vcpu_read_tsc_offset(struct kvm_vcpu *vcpu)
 +{
-+	struct kvm *kvm = vcpu->kvm;
-+	bool already_matched;
-+	unsigned long flags;
-+
-+	lockdep_assert_held(&kvm->arch.tsc_write_lock);
-+
-+	already_matched =
-+	       (vcpu->arch.this_tsc_generation == kvm->arch.cur_tsc_generation);
-+
-+	/*
-+	 * We track the most recent recorded KHZ, write and time to
-+	 * allow the matching interval to be extended at each write.
-+	 */
-+	kvm->arch.last_tsc_nsec = ns;
-+	kvm->arch.last_tsc_write = tsc;
-+	kvm->arch.last_tsc_khz = vcpu->arch.virtual_tsc_khz;
-+
-+	vcpu->arch.last_guest_tsc = tsc;
-+
-+	/* Keep track of which generation this VCPU has synchronized to */
-+	vcpu->arch.this_tsc_generation = kvm->arch.cur_tsc_generation;
-+	vcpu->arch.this_tsc_nsec = kvm->arch.cur_tsc_nsec;
-+	vcpu->arch.this_tsc_write = kvm->arch.cur_tsc_write;
-+
-+	kvm_vcpu_write_tsc_offset(vcpu, offset);
-+
-+	spin_lock_irqsave(&kvm->arch.pvclock_gtod_sync_lock, flags);
-+	if (!matched) {
-+		/*
-+		 * We split periods of matched TSC writes into generations.
-+		 * For each generation, we track the original measured
-+		 * nanosecond time, offset, and write, so if TSCs are in
-+		 * sync, we can match exact offset, and if not, we can match
-+		 * exact software computation in compute_guest_tsc()
-+		 *
-+		 * These values are tracked in kvm->arch.cur_xxx variables.
-+		 */
-+		kvm->arch.nr_vcpus_matched_tsc = 0;
-+		kvm->arch.cur_tsc_generation++;
-+		kvm->arch.cur_tsc_nsec = ns;
-+		kvm->arch.cur_tsc_write = tsc;
-+		kvm->arch.cur_tsc_offset = offset;
-+		matched = false;
-+	} else if (!already_matched) {
-+		kvm->arch.nr_vcpus_matched_tsc++;
-+	}
-+
-+	kvm_track_tsc_matching(vcpu);
-+	spin_unlock_irqrestore(&kvm->arch.pvclock_gtod_sync_lock, flags);
++	return vcpu->arch.l1_tsc_offset;
 +}
 +
- static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
+ static void kvm_vcpu_write_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
  {
- 	struct kvm *kvm = vcpu->kvm;
- 	u64 offset, ns, elapsed;
- 	unsigned long flags;
--	bool matched;
--	bool already_matched;
-+	bool matched = false;
- 	bool synchronizing = false;
+ 	vcpu->arch.l1_tsc_offset = offset;
+@@ -2377,6 +2382,7 @@ static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 offset, u64 tsc,
+ 	kvm->arch.last_tsc_nsec = ns;
+ 	kvm->arch.last_tsc_write = tsc;
+ 	kvm->arch.last_tsc_khz = vcpu->arch.virtual_tsc_khz;
++	kvm->arch.last_tsc_offset = offset;
  
- 	raw_spin_lock_irqsave(&kvm->arch.tsc_write_lock, flags);
-@@ -2403,51 +2463,11 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
- 			offset = kvm_compute_tsc_offset(vcpu, data);
- 		}
- 		matched = true;
--		already_matched = (vcpu->arch.this_tsc_generation == kvm->arch.cur_tsc_generation);
--	} else {
--		/*
--		 * We split periods of matched TSC writes into generations.
--		 * For each generation, we track the original measured
--		 * nanosecond time, offset, and write, so if TSCs are in
--		 * sync, we can match exact offset, and if not, we can match
--		 * exact software computation in compute_guest_tsc()
--		 *
--		 * These values are tracked in kvm->arch.cur_xxx variables.
--		 */
--		kvm->arch.cur_tsc_generation++;
--		kvm->arch.cur_tsc_nsec = ns;
--		kvm->arch.cur_tsc_write = data;
--		kvm->arch.cur_tsc_offset = offset;
--		matched = false;
- 	}
+ 	vcpu->arch.last_guest_tsc = tsc;
  
--	/*
--	 * We also track th most recent recorded KHZ, write and time to
--	 * allow the matching interval to be extended at each write.
--	 */
--	kvm->arch.last_tsc_nsec = ns;
--	kvm->arch.last_tsc_write = data;
--	kvm->arch.last_tsc_khz = vcpu->arch.virtual_tsc_khz;
--
--	vcpu->arch.last_guest_tsc = data;
-+	__kvm_synchronize_tsc(vcpu, offset, data, ns, matched);
- 
--	/* Keep track of which generation this VCPU has synchronized to */
--	vcpu->arch.this_tsc_generation = kvm->arch.cur_tsc_generation;
--	vcpu->arch.this_tsc_nsec = kvm->arch.cur_tsc_nsec;
--	vcpu->arch.this_tsc_write = kvm->arch.cur_tsc_write;
--
--	kvm_vcpu_write_tsc_offset(vcpu, offset);
- 	raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
--
--	spin_lock_irqsave(&kvm->arch.pvclock_gtod_sync_lock, flags);
--	if (!matched) {
--		kvm->arch.nr_vcpus_matched_tsc = 0;
--	} else if (!already_matched) {
--		kvm->arch.nr_vcpus_matched_tsc++;
--	}
--
--	kvm_track_tsc_matching(vcpu);
--	spin_unlock_irqrestore(&kvm->arch.pvclock_gtod_sync_lock, flags);
+@@ -2485,6 +2491,44 @@ static inline void adjust_tsc_offset_host(struct kvm_vcpu *vcpu, s64 adjustment)
+ 	adjust_tsc_offset_guest(vcpu, adjustment);
  }
  
- static inline void adjust_tsc_offset_guest(struct kvm_vcpu *vcpu,
++static int kvm_vcpu_get_system_counter_state(struct kvm_vcpu *vcpu,
++					     struct kvm_system_counter_state *state)
++{
++	if (state->flags)
++		return -EINVAL;
++
++	state->tsc_offset = kvm_vcpu_read_tsc_offset(vcpu);
++	return 0;
++}
++
++static int kvm_vcpu_set_system_counter_state(struct kvm_vcpu *vcpu,
++					     struct kvm_system_counter_state *state)
++{
++	struct kvm *kvm = vcpu->kvm;
++	u64 offset, tsc, ns;
++	unsigned long flags;
++	bool matched;
++
++	if (state->flags)
++		return -EINVAL;
++
++	offset = state->tsc_offset;
++
++	raw_spin_lock_irqsave(&kvm->arch.tsc_write_lock, flags);
++
++	matched = (vcpu->arch.virtual_tsc_khz &&
++		   kvm->arch.last_tsc_khz == vcpu->arch.virtual_tsc_khz &&
++		   kvm->arch.last_tsc_offset == offset);
++
++	tsc = kvm_scale_tsc(vcpu, rdtsc()) + offset;
++	ns = get_kvmclock_base_ns();
++
++	__kvm_synchronize_tsc(vcpu, offset, tsc, ns, matched);
++	raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
++
++	return 0;
++}
++
+ #ifdef CONFIG_X86_64
+ 
+ static u64 read_tsc(void)
+@@ -3912,6 +3956,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_SGX_ATTRIBUTE:
+ #endif
+ 	case KVM_CAP_VM_COPY_ENC_CONTEXT_FROM:
++	case KVM_CAP_SYSTEM_COUNTER_STATE:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG2:
+@@ -5200,6 +5245,31 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 		break;
+ 	}
+ #endif
++	case KVM_GET_SYSTEM_COUNTER_STATE: {
++		struct kvm_system_counter_state state;
++
++		r = -EFAULT;
++		if (copy_from_user(&state, argp, sizeof(state)))
++			goto out;
++
++		r = kvm_vcpu_get_system_counter_state(vcpu, &state);
++		if (r)
++			goto out;
++		if (copy_to_user(argp, &state, sizeof(state)))
++			r = -EFAULT;
++
++		break;
++	}
++	case KVM_SET_SYSTEM_COUNTER_STATE: {
++		struct kvm_system_counter_state state;
++
++		r = -EFAULT;
++		if (copy_from_user(&state, argp, sizeof(state)))
++			goto out;
++
++		r = kvm_vcpu_set_system_counter_state(vcpu, &state);
++		break;
++	}
+ 	default:
+ 		r = -EINVAL;
+ 	}
 -- 
 2.32.0.rc1.229.g3e70b5a671-goog
 
