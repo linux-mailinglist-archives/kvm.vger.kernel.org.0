@@ -2,44 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 115F239EEBE
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 08:30:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31E8C39EF0D
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 08:54:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230324AbhFHGcY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 02:32:24 -0400
-Received: from mail-dm6nam12on2062.outbound.protection.outlook.com ([40.107.243.62]:56788
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229512AbhFHGcY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Jun 2021 02:32:24 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gw2At+9wF/E0Ul+lYoh3QoZo2lNzXeyrto75fAUWBmPEMMeGfBa354zQCSD91LDHZqYbLX8ufwfZZs+MOBGFT+STPpS67TqcqtPRzihZlcFcrw9X9gwnjwjGirNcQqrBAgfGSbuvFQuhxrn2/UhZ9EuKvkiLpATujX+7D8o/XttMyt2bQ4jDwLx40NBQXfYangU+rTjBbW/mNEiSJChYT2uhkbrPeDLpC48JMvyheT5s5TIQu4K9Cd05u5TIKN4dY0XKtbfooDIw2C5Iy1dgfuIeqCgknAHrohWB0+rBuA7ESiYt2hPBSAFis2H52P92n/D4Tir+5nmWROOh0JSTNA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iCzQpf97kTLFF8LOwsakeLyGEjiGOHcv9gyOs8lqeIs=;
- b=a2/HmS3IdQvGUNfBebnLtzS/kEiCWhlQeGt72yKoKCbTmPVF/ayzDrVPSQ7sunjslYlHVDMbSaGi/unbjbllPH4K2WRuWsBzdOxbjzkmwE3XJmkgPzryCHsC9wOWKS/4zKQLkF0XiZ6XhvldaRBoS5kLx6kmwIN0trp2Uve/1700kLHAtk/ZKIfcIeKv3hNHjm9buAuS71dErLB6++ZiR+/VxZIn18gH0UhPGcJh4nXNGWwxNWP9jpnSjxalXoUMwAkG6qbp0g51lHx45unNXB9d1sM3oIazRbBNn2OySQ/xPKJ3CDVTi15davJALlLE5oZSrgFIhxgZOyJo7QPrgg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iCzQpf97kTLFF8LOwsakeLyGEjiGOHcv9gyOs8lqeIs=;
- b=pa5LiE3wJjoznM4cQBeEPmLCOvetzfag6hxbIAWR3xT79NUyC8oUqqBDlJZuE0UFHZH4eWG8tl5UwylfJBO7z3Eh/4w89qjPLLKFl4qXLc28CCv/gDVvPfwGOgzMW0NVTf3K4BxVp4aVuSB/tPJXyP/+kk0WwnFJD1UaRIVSZ7wSSKyHd3wYwLvcgiP9lkBSOtMH/h2L2sNL4szkmu5LmUV4ycgxBH4XgMoekvDR+QqF+QuYMfykJSTs8WTMTaI8K8Fsmjhfjuo/MczEEXAXc+jaMpW8UJ5jsZ8UKVhjskIzPNAKKZlbha9SlHS6pRen352rhBWM2GORz+FLUpsUzQ==
-Received: from PH0PR12MB5481.namprd12.prod.outlook.com (2603:10b6:510:d4::15)
- by PH0PR12MB5418.namprd12.prod.outlook.com (2603:10b6:510:e5::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20; Tue, 8 Jun
- 2021 06:30:30 +0000
-Received: from PH0PR12MB5481.namprd12.prod.outlook.com
- ([fe80::b0d9:bff5:2fbf:b344]) by PH0PR12MB5481.namprd12.prod.outlook.com
- ([fe80::b0d9:bff5:2fbf:b344%6]) with mapi id 15.20.4195.030; Tue, 8 Jun 2021
- 06:30:30 +0000
-From:   Parav Pandit <parav@nvidia.com>
-To:     Jacob Pan <jacob.jun.pan@linux.intel.com>
-CC:     "Tian, Kevin" <kevin.tian@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
+        id S230293AbhFHG4g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 02:56:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43254 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230323AbhFHG43 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Jun 2021 02:56:29 -0400
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E131BC06178B;
+        Mon,  7 Jun 2021 23:54:36 -0700 (PDT)
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4Fzgvs0xfSz9sW6; Tue,  8 Jun 2021 16:54:33 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1623135273;
+        bh=6XrXYPDJzXROOAXXdd8a889l8o4k0qJLMeKixWa/h/0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=QnUcTxkPj0P8bQn4t4lMXMTlpj+BS6+QLHtSAxmuZckPqPajgMMpSFAX5Z2hoqHtw
+         4Hxfli9VuKXYkZOJQZUHmpaUHjJD+toFoqGOdSK8Z9aT52LyvySbGtqGvjPjREBsla
+         BEwUIpcVDf7x+PabPrjj8X7f3dvdgGyyjUyZ0/04=
+Date:   Tue, 8 Jun 2021 15:49:25 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
         Joerg Roedel <joro@8bytes.org>,
         Jason Gunthorpe <jgg@nvidia.com>,
         Lu Baolu <baolu.lu@linux.intel.com>,
@@ -53,211 +40,238 @@ CC:     "Tian, Kevin" <kevin.tian@intel.com>,
         "Raj, Ashok" <ashok.raj@intel.com>,
         "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
         "Jiang, Dave" <dave.jiang@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
         Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
         Kirti Wankhede <kwankhede@nvidia.com>,
         Robin Murphy <robin.murphy@arm.com>
-Subject: RE: [RFC] /dev/ioasid uAPI proposal
-Thread-Topic: [RFC] /dev/ioasid uAPI proposal
-Thread-Index: AddSzQ970oLnVHLeQca/ysPD8zMJZwEO8mWgAGyTh4AA2+cZ0A==
-Date:   Tue, 8 Jun 2021 06:30:30 +0000
-Message-ID: <PH0PR12MB5481DA4780B0EAE420B3ABF4DC379@PH0PR12MB5481.namprd12.prod.outlook.com>
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+Message-ID: <YL8E5UoT0tndJZfh@yekko>
 References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
-        <PH0PR12MB54811863B392C644E5365446DC3E9@PH0PR12MB5481.namprd12.prod.outlook.com>
- <20210603135807.40684468@jacob-builder>
-In-Reply-To: <20210603135807.40684468@jacob-builder>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: linux.intel.com; dkim=none (message not signed)
- header.d=none;linux.intel.com; dmarc=none action=none header.from=nvidia.com;
-x-originating-ip: [49.207.202.149]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: caca337a-0d92-4123-a76d-08d92a46e99d
-x-ms-traffictypediagnostic: PH0PR12MB5418:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <PH0PR12MB5418D4EB29613314AB27FB9BDC379@PH0PR12MB5418.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ODL9HoRLbEYD9pSAsi4bZz3GZllaW8q7/BHXS9UGPAZtS8Y8GQn9arqjnwF/IADZZC/N87+eePmwlTBeWI1dq7rQMVxFkIle//mCt+MARSpo0DcwO/Wr4R5jwMfl4zBctgBC4iCn9AYfru+bsX7lxV2oxs6bp8n0gOBfZR0l2boId84C+60nSNQJzj6V34BEB0TAKlVPJRTHvjf0sdOszIr1gmsdn1RRbdqrarByYPU6zamvUnUPt5Ri2p1EmqKDSLJgZdsUyDkp2M4D8xGgHJG2hdmicgO+iuWRQlAW4JRTHtn+9BRBMDBVlvxdl8l8b5kUgUg89nWEG0LaPfXBlRPONRt8j9KHfTZeN/T6+kDbDi8eIis6XVuab4bGA4Vp8k03YniH9yFyyLYx+Lg3Lozm5e1p0y61ruUxiA4g3gGZ9f/9HXpwpC5il12s8Q1iI5S3JMm8lWZmUhqgkCe+e4K//6Ke0ws3zJiz/0XJbKLSUSTOE/zLWxrV3j7gsIgG281c1UTelPBQoc3QJbnqVORnzB4nESt1KxsbZfc/ve3Epi0uZyULNVd0h/4oUE5Ul53CW+R28ujjFdLxysMh4z8x/yQomYdfd3v5S+J3Em8=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB5481.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(136003)(39860400002)(366004)(396003)(9686003)(26005)(5660300002)(2906002)(55236004)(316002)(66946007)(66556008)(66446008)(52536014)(6506007)(64756008)(86362001)(66476007)(55016002)(54906003)(33656002)(186003)(8936002)(7696005)(38100700002)(76116006)(478600001)(122000001)(83380400001)(6916009)(71200400001)(8676002)(4326008)(7416002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?qGedYqpHvo7cUYWz9l18qd7LQpKw83Foeb+NHs0geLhWIBFYbyBMi96ugHk7?=
- =?us-ascii?Q?rt/wloPrgjtFKvIInONiyhRQ+JMlTNXdWFNu58YUguHbZcrptd2M7O5EiHuB?=
- =?us-ascii?Q?BoQYk2jglZ6hMebBaBpSc/AWEp7DC+OdqW8DAgWnSQmr1m9Lq5wXtrqDYkU5?=
- =?us-ascii?Q?DG83s/Ez+Xl4jY531MBGGfvOFMqCJUVmeUi1E3W/2q0E5gf1VGFnc0hWcsaQ?=
- =?us-ascii?Q?cyuK3tRaYLJCRA+uLdqBqOnkIp9uetRSJYnF4ozw2MGLLHhEHR2kPAuBiGFP?=
- =?us-ascii?Q?4t659h0vGgQbLqYVVqBME0+F60y//sCHD5bikN+FGS4Ksdn82Vc1G/XUE+bE?=
- =?us-ascii?Q?G8Qm/UndTBy3xGgPnUzxiddapMe1ANGMCy/3mtYnzd7NJkLBSQOEfA84PmXL?=
- =?us-ascii?Q?MTnpwYWTLAwGm41ZoHCWIvNvKoDPoe9NTEZRYGBo16GW07WzEahTpRiVu6pU?=
- =?us-ascii?Q?5pprLu19IBUHtpM932xe/GNI5K2sSjtbPjavjZNK2Vp2wy50nvcLxBfwNO2O?=
- =?us-ascii?Q?EmE7+9qV8D1ZX4QnjuquqnAixZZVqTxI9NzaEuCAaXOVRSNxkWTWESzjWYTv?=
- =?us-ascii?Q?NR27P3wdVTCcrqs0fs5R7Mg7vfxnFgtjOkkuM+4c7euCpfZm5yxTeH0B7Efp?=
- =?us-ascii?Q?OEikBhLGyPaI+NTlfI/6cvjtyN/3aQQ2m0wvq0lyEX1pl8SXOXVMxNcUl9yu?=
- =?us-ascii?Q?5SIYXOuq9TthvrISHu5uAuPZcKdfaHaFEB7KmEaqFdqI7s0gWVGMBJEudZYu?=
- =?us-ascii?Q?e/UOCmir/mN/+yCMOx3Lnq7L4E0j+toiAnfr5AqI/Pxb6tHr3fa++Bm60vn6?=
- =?us-ascii?Q?VYy/E6osy7ZcP1XWZ3cwCmwFQP38UJ5aYGAxnZ/c3ipLhvJa0rwda9QtwPum?=
- =?us-ascii?Q?YpsIblJZCHFn8dvRzch1wqeFwuhbqbW2YV6dlVJsQ5YEix2PLxU4oIhyKWZy?=
- =?us-ascii?Q?xToCQEav+6eIROd82XdQcB0CXh4PUj1YOmvgwP+TyJ3dB8BcLYEU9lAzgFDC?=
- =?us-ascii?Q?Omk7yXivfSTY56644uBdzKNMUachusbSRGyumtVoHpjobynOGWra2Gei7bbr?=
- =?us-ascii?Q?rqU691cYlL7jjUZ4iw7mL2kF2/LDkf5Wi7B5Asv6mHub6iD2lrt5xYVIIEzy?=
- =?us-ascii?Q?7KbZUDhQXgcmCFwF9+vFoT34MENUPAzXFPixhLqRmL8QXRxp6jQJ+Zn0zW3F?=
- =?us-ascii?Q?P1kMYXSYwNyyVucc9qu/XhwqtDTbcs7WM/mTRIhDvIeLh/GieMI4zxBpRhUP?=
- =?us-ascii?Q?bFXHJdryYldt5x2ePlfdt7/4zyT0DQrlXMRzkgnoI/RTCUT+h+3fAyqOBfI7?=
- =?us-ascii?Q?CCdLAXuxWLndcihOgAxcy72J?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ <YLch6zbbYqV4PyVf@yekko>
+ <MWHPR11MB1886081DE676B0130D3D19258C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB5481.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: caca337a-0d92-4123-a76d-08d92a46e99d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jun 2021 06:30:30.4101
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: tOxoPTNPwEZHkurlusqdrKqtlEtrJSkB0ZaCp/2sCePHJkL0COf4mX/7ToyUY2jIocoq6s4AcM58UVvmbCiXnA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5418
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="0m5ZmT5muBxt/Zml"
+Content-Disposition: inline
+In-Reply-To: <MWHPR11MB1886081DE676B0130D3D19258C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jaocb,
 
-Sorry for the late response. Was on PTO on Friday last week.
-Please see comments below.
+--0m5ZmT5muBxt/Zml
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Sent: Friday, June 4, 2021 2:28 AM
+On Thu, Jun 03, 2021 at 07:17:23AM +0000, Tian, Kevin wrote:
+> > From: David Gibson <david@gibson.dropbear.id.au>
+> > Sent: Wednesday, June 2, 2021 2:15 PM
+> >=20
+> [...]=20
+> > > An I/O address space takes effect in the IOMMU only after it is attac=
+hed
+> > > to a device. The device in the /dev/ioasid context always refers to a
+> > > physical one or 'pdev' (PF or VF).
+> >=20
+> > What you mean by "physical" device here isn't really clear - VFs
+> > aren't really physical devices, and the PF/VF terminology also doesn't
+> > extent to non-PCI devices (which I think we want to consider for the
+> > API, even if we're not implemenenting it any time soon).
 >=20
-> Hi Parav,
+> Yes, it's not very clear, and more in PCI context to simplify the=20
+> description. A "physical" one here means an PCI endpoint function
+> which has a unique RID. It's more to differentiate with later mdev/
+> subdevice which uses both RID+PASID. Naming is always a hard
+> exercise to me... Possibly I'll just use device vs. subdevice in future
+> versions.
 >=20
-> On Tue, 1 Jun 2021 17:30:51 +0000, Parav Pandit <parav@nvidia.com> wrote:
+> >=20
+> > Now, it's clear that we can't program things into the IOMMU before
+> > attaching a device - we might not even know which IOMMU to use.
 >=20
-> > > From: Tian, Kevin <kevin.tian@intel.com>
-> > > Sent: Thursday, May 27, 2021 1:28 PM
-> >
-> > > 5.6. I/O page fault
-> > > +++++++++++++++
-> > >
-> > > (uAPI is TBD. Here is just about the high-level flow from host IOMMU
-> > > driver to guest IOMMU driver and backwards).
-> > >
-> > > -   Host IOMMU driver receives a page request with raw fault_data {ri=
-d,
-> > >     pasid, addr};
-> > >
-> > > -   Host IOMMU driver identifies the faulting I/O page table accordin=
-g
-> > > to information registered by IOASID fault handler;
-> > >
-> > > -   IOASID fault handler is called with raw fault_data (rid, pasid,
-> > > addr), which is saved in ioasid_data->fault_data (used for
-> > > response);
-> > >
-> > > -   IOASID fault handler generates an user fault_data (ioasid, addr),
-> > > links it to the shared ring buffer and triggers eventfd to
-> > > userspace;
-> > >
-> > > -   Upon received event, Qemu needs to find the virtual routing
-> > > information (v_rid + v_pasid) of the device attached to the faulting
-> > > ioasid. If there are multiple, pick a random one. This should be
-> > > fine since the purpose is to fix the I/O page table on the guest;
-> > >
-> > > -   Qemu generates a virtual I/O page fault through vIOMMU into guest=
-,
-> > >     carrying the virtual fault data (v_rid, v_pasid, addr);
-> > >
-> > Why does it have to be through vIOMMU?
-> I think this flow is for fully emulated IOMMU, the same IOMMU and device
-> drivers run in the host and guest. Page request interrupt is reported by =
-the
-> IOMMU, thus reporting to vIOMMU in the guest.
-In non-emulated case, how will the page fault of guest will be handled?
-If I take Intel example, I thought FL page table entry still need to be han=
-dled by guest, which in turn fills up 2nd level page table entries.
-No?
-
+> yes
 >=20
-> > For a VFIO PCI device, have you considered to reuse the same PRI
-> > interface to inject page fault in the guest? This eliminates any new
-> > v_rid. It will also route the page fault request and response through
-> > the right vfio device.
-> >
-> I am curious how would PCI PRI can be used to inject fault. Are you talki=
-ng
-> about PCI config PRI extended capability structure?=20
-PCI PRI capability is only to expose page fault support.
-Page fault injection/response cannot happen through the pci cap anyway.
-This requires a side channel.
-I was suggesting to emulate pci_endpoint->rc->iommu->iommu_irq path of hype=
-rvisor, as
-
-vmm->guest_emuated_pri_device->pri_req/rsp queue(s).
-
-
-> The control is very
-> limited, only enable and reset. Can you explain how would page fault
-> handled in generic PCI cap?
-Not via pci cap.
-Through more generic interface without attaching to viommu.
-
-> Some devices may have device specific way to handle page faults, but I gu=
-ess
-> this is not the PCI PRI method you are referring to?
-This was my next question that if page fault reporting and response interfa=
-ce is generic, it will be more scalable given that PCI PRI is limited to si=
-ngle page requests.
-And additionally VT-d seems to funnel all the page fault interrupts via sin=
-gle IRQ.
-And 3rdly, its requirement to always come through the hypervisor intermedia=
-tory.
-
-Having a generic mechanism, will help to overcome above limitations as Jean=
- already pointed out that page fault is a hot path.
-
+> > However, I'm not sure if its wise to automatically make the AS "real"
+> > as soon as we attach a device:
+> >=20
+> >  * If we're going to attach a whole bunch of devices, could we (for at
+> >    least some IOMMU models) end up doing a lot of work which then has
+> >    to be re-done for each extra device we attach?
 >=20
-> > > -   Guest IOMMU driver fixes up the fault, updates the I/O page table=
-,
-> > > and then sends a page response with virtual completion data (v_rid,
-> > > v_pasid, response_code) to vIOMMU;
+> which extra work did you specifically refer to? each attach just implies
+> writing the base address of the I/O page table to the IOMMU structure
+> corresponding to this device (either being a per-device entry, or per
+> device+PASID entry).
+>=20
+> and generally device attach should not be in a hot path.
+>=20
+> >=20
+> >  * With kernel managed IO page tables could attaching a second device
+> >    (at least on some IOMMU models) require some operation which would
+> >    require discarding those tables?  e.g. if the second device somehow
+> >    forces a different IO page size
+>=20
+> Then the attach should fail and the user should create another IOASID
+> for the second device.
+
+Couldn't this make things weirdly order dependent though?  If device A
+has strictly more capabilities than device B, then attaching A then B
+will be fine, but B then A will trigger a new ioasid fd.
+
+> > For that reason I wonder if we want some sort of explicit enable or
+> > activate call.  Device attaches would only be valid before, map or
+> > attach pagetable calls would only be valid after.
+>=20
+> I'm interested in learning a real example requiring explicit enable...
+>=20
+> >=20
+> > > One I/O address space could be attached to multiple devices. In this =
+case,
+> > > /dev/ioasid uAPI applies to all attached devices under the specified =
+IOASID.
 > > >
-> > What about fixing up the fault for mmu page table as well in guest?
-> > Or you meant both when above you said "updates the I/O page table"?
-> >
-> > It is unclear to me that if there is single nested page table
-> > maintained or two (one for cr3 references and other for iommu). Can
-> > you please clarify?
-> >
-> I think it is just one, at least for VT-d, guest cr3 in GPA is stored in =
-the host
-> iommu. Guest iommu driver calls handle_mm_fault to fix the mmu page
-> tables which is shared by the iommu.
+> > > Based on the underlying IOMMU capability one device might be allowed
+> > > to attach to multiple I/O address spaces, with DMAs accessing them by
+> > > carrying different routing information. One of them is the default I/O
+> > > address space routed by PCI Requestor ID (RID) or ARM Stream ID. The
+> > > remaining are routed by RID + Process Address Space ID (PASID) or
+> > > Stream+Substream ID. For simplicity the following context uses RID and
+> > > PASID when talking about the routing information for I/O address spac=
+es.
+> >=20
+> > I'm not really clear on how this interacts with nested ioasids.  Would
+> > you generally expect the RID+PASID IOASes to be children of the base
+> > RID IOAS, or not?
 >=20
-So if guest has touched the page data, FL and SL entries of mmu should be p=
-opulated and IOMMU side should not even reach a point of raising the PRI.
-(ATS should be enough).
-Because IOMMU side share the same FL and SL table entries referred by the s=
-calable-mode PASID-table entry format described in Section 9.6.
-Is that correct?
+> No. With Intel SIOV both parent/children could be RID+PASID, e.g.
+> when one enables vSVA on a mdev.
 
-> > > -   Qemu finds the pending fault event, converts virtual completion d=
-ata
-> > >     into (ioasid, response_code), and then calls a /dev/ioasid ioctl =
-to
-> > >     complete the pending fault;
+Hm, ok.  I really haven't understood how the PASIDs fit into this
+then.  I'll try again on v2.
+
+> > If the PASID ASes are children of the RID AS, can we consider this not
+> > as the device explicitly attaching to multiple IOASIDs, but instead
+> > attaching to the parent IOASID with awareness of the child ones?
+> >=20
+> > > Device attachment is initiated through passthrough framework uAPI (use
+> > > VFIO for simplicity in following context). VFIO is responsible for id=
+entifying
+> > > the routing information and registering it to the ioasid driver when =
+calling
+> > > ioasid attach helper function. It could be RID if the assigned device=
+ is
+> > > pdev (PF/VF) or RID+PASID if the device is mediated (mdev). In additi=
+on,
+> > > user might also provide its view of virtual routing information (vPAS=
+ID) in
+> > > the attach call, e.g. when multiple user-managed I/O address spaces a=
+re
+> > > attached to the vfio_device. In this case VFIO must figure out whether
+> > > vPASID should be directly used (for pdev) or converted to a kernel-
+> > > allocated one (pPASID, for mdev) for physical routing (see section 4).
 > > >
-> > For VFIO PCI device a virtual PRI request response interface is done,
-> > it can be generic interface among multiple vIOMMUs.
-> >
-> same question above, not sure how this works in terms of interrupts and
-> response queuing etc.
+> > > Device must be bound to an IOASID FD before attach operation can be
+> > > conducted. This is also through VFIO uAPI. In this proposal one device
+> > > should not be bound to multiple FD's. Not sure about the gain of
+> > > allowing it except adding unnecessary complexity. But if others have
+> > > different view we can further discuss.
+> > >
+> > > VFIO must ensure its device composes DMAs with the routing information
+> > > attached to the IOASID. For pdev it naturally happens since vPASID is
+> > > directly programmed to the device by guest software. For mdev this
+> > > implies any guest operation carrying a vPASID on this device must be
+> > > trapped into VFIO and then converted to pPASID before sent to the
+> > > device. A detail explanation about PASID virtualization policies can =
+be
+> > > found in section 4.
+> > >
+> > > Modern devices may support a scalable workload submission interface
+> > > based on PCI DMWr capability, allowing a single work queue to access
+> > > multiple I/O address spaces. One example is Intel ENQCMD, having
+> > > PASID saved in the CPU MSR and carried in the instruction payload
+> > > when sent out to the device. Then a single work queue shared by
+> > > multiple processes can compose DMAs carrying different PASIDs.
+> >=20
+> > Is the assumption here that the processes share the IOASID FD
+> > instance, but not memory?
 >=20
-Citing "VFIO PCI device" was wrong on my part.
-Was considering a generic page fault device to expose in guest that has req=
-uest/response queues.
-This way it is not attached to specific viommu driver and having other bene=
-fits explained above.
+> I didn't get this question
+
+Ok, stepping back, what exactly do you mean by "processes" above?  Do
+you mean Linux processes, or something else?
+
+> > > When executing ENQCMD in the guest, the CPU MSR includes a vPASID
+> > > which, if targeting a mdev, must be converted to pPASID before sent
+> > > to the wire. Intel CPU provides a hardware PASID translation capabili=
+ty
+> > > for auto-conversion in the fast path. The user is expected to setup t=
+he
+> > > PASID mapping through KVM uAPI, with information about {vpasid,
+> > > ioasid_fd, ioasid}. The ioasid driver provides helper function for KVM
+> > > to figure out the actual pPASID given an IOASID.
+> > >
+> > > With above design /dev/ioasid uAPI is all about I/O address spaces.
+> > > It doesn't include any device routing information, which is only
+> > > indirectly registered to the ioasid driver through VFIO uAPI. For
+> > > example, I/O page fault is always reported to userspace per IOASID,
+> > > although it's physically reported per device (RID+PASID). If there is=
+ a
+> > > need of further relaying this fault into the guest, the user is respo=
+nsible
+> > > of identifying the device attached to this IOASID (randomly pick one =
+if
+> > > multiple attached devices) and then generates a per-device virtual I/O
+> > > page fault into guest. Similarly the iotlb invalidation uAPI describe=
+s the
+> > > granularity in the I/O address space (all, or a range), different fro=
+m the
+> > > underlying IOMMU semantics (domain-wide, PASID-wide, range-based).
+> > >
+> > > I/O page tables routed through PASID are installed in a per-RID PASID
+> > > table structure. Some platforms implement the PASID table in the guest
+> > > physical space (GPA), expecting it managed by the guest. The guest
+> > > PASID table is bound to the IOMMU also by attaching to an IOASID,
+> > > representing the per-RID vPASID space.
+> >=20
+> > Do we need to consider two management modes here, much as we have for
+> > the pagetables themsleves: either kernel managed, in which we have
+> > explicit calls to bind a vPASID to a parent PASID, or user managed in
+> > which case we register a table in some format.
+>=20
+> yes, this is related to PASID virtualization in section 4. And based on=
+=20
+> suggestion from Jason, the vPASID requirement will be reported to
+> user space via the per-device reporting interface.
+>=20
+> Thanks
+> Kevin
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--0m5ZmT5muBxt/Zml
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmC/BOMACgkQbDjKyiDZ
+s5LK5BAAs3fDG9X4n5k72QI9E302AvlcHhqDEV+QO9FVrJIBUNIGWtArJ3QpaMo9
+YsRdjSzjUe4K2FixvHk+vhrIL0UgsEpKME/3wnAcTdcLRlmuiYOxnoNmay2FSBvz
++agr6JKxIPqKlIaweXV+ZgPE+UslAGwB+Y0WYZpAU/AgjHrv1WqDWKBdUdndhnKk
+tqqXFUhAPV/SiRNFx1kZf5b8UKpGJtAQPmoE8lwpE+9PQSNPeDNX9gXgNkPpCu6E
+86Yci0bFwMyb+DMgzmZn4iIiE4wIRT5C96dQ3obnW8bKsQm36HZmNB9pEjnjvBiM
+GLG452DaoWg1eFxg8lEMyxsbo/eiEwC3QMzvXA8PlDsbptqxsRaE9GazeXKM97Vz
+YBOQ1kbBzfa0FzNl62c0JiXiksCG7hZk/HvUKkycKW/919eYSqEyh505caHGDY2f
+7hbCyXSoHxk3SUYo3tF8pUKAesWi+9DUJHEcWMygcwyM+W5CEjnsE3MUjnJWeWk/
+e92lErcq27pLOYi0nWWZJVTvDWHBGMdzm5QQjjCh3s8a5iD5s+Q8fOr2ersQtDyO
+/F+CcUqV+/E5auEHonn/6AKBcVapffQfoPCPQrsiuAEAOSoNYctoBcHAXX3BCHi1
+gu8QAvrPQrUbLwXaqL2cgayEOif9QcKT/li/J7FAOA5xlqNPvzI=
+=qPF8
+-----END PGP SIGNATURE-----
+
+--0m5ZmT5muBxt/Zml--
