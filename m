@@ -2,112 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 967EB39EBE9
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 04:25:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A7FE39EBF3
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 04:26:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231481AbhFHC1m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Jun 2021 22:27:42 -0400
-Received: from ozlabs.org ([203.11.71.1]:48075 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230233AbhFHC1m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Jun 2021 22:27:42 -0400
+        id S230233AbhFHC1t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Jun 2021 22:27:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41210 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231524AbhFHC1s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Jun 2021 22:27:48 -0400
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B982EC061574;
+        Mon,  7 Jun 2021 19:25:56 -0700 (PDT)
 Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4FzYxm5n40z9sRK; Tue,  8 Jun 2021 12:25:48 +1000 (AEST)
+        id 4FzYxm6L3yz9sW8; Tue,  8 Jun 2021 12:25:48 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
         d=gibson.dropbear.id.au; s=201602; t=1623119148;
-        bh=rxA81Y8neKOEB5Cc9kisefM4q1thUTdt4CWm4Nfc2Yw=;
+        bh=lncYIbxArPowV0MRkDFVxKOswtaRzRtG9W2xdghAx6E=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=mqQDfQu00RfVzGtfTX4DNhpOwyKEuh4+3BuPpAuEQaaigEfRHJ0YKZiEb2L4JHZMU
-         nGSyWMI8ikc0MPFbpLIgRTgvQMmRcbl0oY3uYleB8E9LY/GqNVJTxo89kv87GuZa0a
-         8u7Qv1p3rtwRcQVht4Y38pf1IFltqs0Vtjlz0v3I=
-Date:   Tue, 8 Jun 2021 10:49:56 +1000
+        b=Fl9N/rY051u/vXA8Hw32d6pExmLKI3N41TquwdbFFNmvj4ancl24Wkx4HSWiolM+/
+         pT1F2q/2VhF59OyNxNlXSpAEqFIyRsYMFMf4P3aALG2JOQUSOwl3st8G4JX8vKfRtM
+         3qtkRUSTv9gMnqY1vA6bx6Z+lDdwhUTBcM8bIE8I=
+Date:   Tue, 8 Jun 2021 10:53:02 +1000
 From:   David Gibson <david@gibson.dropbear.id.au>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jason Wang <jasowang@redhat.com>,
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
         LKML <linux-kernel@vger.kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "Alex Williamson (alex.williamson@redhat.com)" 
-        <alex.williamson@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        David Woodhouse <dwmw2@infradead.org>,
         "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Alex Williamson (alex.williamson@redhat.com)" 
+        <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
         Robin Murphy <robin.murphy@arm.com>
 Subject: Re: [RFC] /dev/ioasid uAPI proposal
-Message-ID: <YL6+tBc+Xq7pgb/z@yekko>
+Message-ID: <YL6/bjHyuHJTn4Rd@yekko>
 References: <MWHPR11MB1886422D4839B372C6AB245F8C239@MWHPR11MB1886.namprd11.prod.outlook.com>
  <20210528173538.GA3816344@nvidia.com>
- <MWHPR11MB18866C362840EA2D45A402188C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210601174229.GP1002214@nvidia.com>
- <MWHPR11MB1886283575628D7A2F4BFFAB8C3D9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210602160914.GX1002214@nvidia.com>
- <MWHPR11MB18861FA1636BFB66E5E563508C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <YLhj9mi9J/f+rqkP@yekko>
- <MWHPR11MB1886E929BD1414817E9247898C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <YLcl+zaK6Y0gB54a@yekko>
+ <20210602161648.GY1002214@nvidia.com>
+ <YLhlCINGPGob4Nld@yekko>
+ <20210603115224.GQ1002214@nvidia.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="lVmKxZwYU6H/NYU5"
+        protocol="application/pgp-signature"; boundary="g5xwcfR2A+2YrJL6"
 Content-Disposition: inline
-In-Reply-To: <MWHPR11MB1886E929BD1414817E9247898C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
+In-Reply-To: <20210603115224.GQ1002214@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---lVmKxZwYU6H/NYU5
+--g5xwcfR2A+2YrJL6
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 03, 2021 at 06:49:20AM +0000, Tian, Kevin wrote:
-> > From: David Gibson
-> > Sent: Thursday, June 3, 2021 1:09 PM
-> [...]
-> > > > In this way the SW mode is the same as a HW mode with an infinite
-> > > > cache.
-> > > >
-> > > > The collaposed shadow page table is really just a cache.
-> > > >
-> > >
-> > > OK. One additional thing is that we may need a 'caching_mode"
-> > > thing reported by /dev/ioasid, indicating whether invalidation is
-> > > required when changing non-present to present. For hardware
-> > > nesting it's not reported as the hardware IOMMU will walk the
-> > > guest page table in cases of iotlb miss. For software nesting
-> > > caching_mode is reported so the user must issue invalidation
-> > > upon any change in guest page table so the kernel can update
-> > > the shadow page table timely.
-> >=20
-> > For the fist cut, I'd have the API assume that invalidates are
-> > *always* required.  Some bypass to avoid them in cases where they're
-> > not needed can be an additional extension.
-> >=20
+On Thu, Jun 03, 2021 at 08:52:24AM -0300, Jason Gunthorpe wrote:
+> On Thu, Jun 03, 2021 at 03:13:44PM +1000, David Gibson wrote:
 >=20
-> Isn't a typical TLB semantics is that non-present entries are not
-> cached thus invalidation is not required when making non-present
-> to present?
+> > > We can still consider it a single "address space" from the IOMMU
+> > > perspective. What has happened is that the address table is not just a
+> > > 64 bit IOVA, but an extended ~80 bit IOVA formed by "PASID, IOVA".
+> >=20
+> > True.  This does complexify how we represent what IOVA ranges are
+> > valid, though.  I'll bet you most implementations don't actually
+> > implement a full 64-bit IOVA, which means we effectively have a large
+> > number of windows from (0..max IOVA) for each valid pasid.  This adds
+> > another reason I don't think my concept of IOVA windows is just a
+> > power specific thing.
+>=20
+> Yes
+>=20
+> Things rapidly get into weird hardware specific stuff though, the
+> request will be for things like:
+>   "ARM PASID&IO page table format from SMMU IP block vXX"
 
-Usually, but not necessarily.
+So, I'm happy enough for picking a user-managed pagetable format to
+imply the set of valid IOVA ranges (though a query might be nice).
 
-> It's true to both CPU TLB and IOMMU TLB.
+I'm mostly thinking of representing (and/or choosing) valid IOVA
+ranges as something for the kernel-managed pagetable style
+(MAP/UNMAP).
 
-I don't think it's entirely true of the CPU TLB on all ppc MMU models
-(of which there are far too many).
-
-> In reality
-> I feel there are more usages built on hardware nesting than software
-> nesting thus making default following hardware TLB behavior makes
-> more sense...
-
-I'm arguing for always-require-invalidate because it's strictly more
-general.  Requiring the invalidate will support models that don't
-require it in all cases; we just make the invalidate a no-op.  The
-reverse is not true, so we should tackle the general case first, then
-optimize.
+> Which may have a bunch of (possibly very weird!) format specific data
+> to describe and/or configure it.
+>=20
+> The uAPI needs to be suitably general here. :(
+>=20
+> > > If we are already going in the direction of having the IOASID specify
+> > > the page table format and other details, specifying that the page
+> > > tabnle format is the 80 bit "PASID, IOVA" format is a fairly small
+> > > step.
+> >=20
+> > Well, rather I think userspace needs to request what page table format
+> > it wants and the kernel tells it whether it can oblige or not.
+>=20
+> Yes, this is what I ment.
+>=20
+> Jason
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -115,24 +118,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---lVmKxZwYU6H/NYU5
+--g5xwcfR2A+2YrJL6
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmC+vrQACgkQbDjKyiDZ
-s5IOTQ/+OnKcpdjvyqxaSbBDFwAu0SI4Q+ls/bus20IbeYmALM5ylflnO9Xrgryx
-Ph3tOOhR7CrHdjhQ/WzsFmemr1rn3ICex6ZLjiRvEI4EYuWtNkYtwA0R579Vzp3t
-11E4tYgyL+my7ti4Z5iHhIeQNtxptI9CAVuAe3RGmvEijy5XBCH3Uz2po9dpoZ58
-pgNxE71ugfDasnP1JGvXlNYQHVJ5QDuvDcmRDIK+VoOQbnHDo8aL6KwGfBST0cvi
-ZfFj4L5xaLFaAeo4lKxe2inPpdAoHNJEbseKBLauVRI47VZ10SWhk3UHdbd1CBjI
-qMWo8S+XUkfFL5WHHYfWu8GU5W57EiP8r/ipNDp/kBvtuRvVE8nzOFkrN+6R57XR
-DvtV0rxxzzA3K4lZbfRwx71TPHfuVGC5pdhyppKk47HQcXloAGTXYA8TviXDG7hp
-Ff7GnUzDcu4z3L2dl70KbX8vn19DdLF6lgsC2xt0OTI77AetybIzAauu5yq1LocD
-EuNwCaJy889iZpquHihGoXjmwPph766/JMECSwJh3Uhg0Yiup6XPhOqg8H7lweBK
-6ayA51i4GfukYOPdY3dNDTeh4km8PKl8bxhwHI+uqPf1xWjbUG319+oWLVT0oYSn
-EzZrA0KOdA9yGoB5IYD7WfXqIkIUoJBu7PoS+RaC91XPuD5id+w=
-=5vgw
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmC+v24ACgkQbDjKyiDZ
+s5Khrg/+O8Zfek3/FbN5ebI8tszXAHZwV5BjxM1PNWD6PIjlBfD/7OG7REO2l9w9
+6idpUCjPhg6/3wuCDpPfqgD5xvhKwyW05VrcVUWhKbmMNXZ47iBRkOpeBY99JoIl
+IVJeoRMXRwtdHGem7WKJfrg2KZl7uoFDMB5oxswwukVPfVCema7SGEsjnXXCaeQU
+oUnl8usFPedPUgf04GUlN4mMOQccOiLcg3B6SxytX/yWY+aal0M3XGcWVIT61vOS
+2FEcYxwn1qcZOYMcmqyanLxaAo+8fQ7fSeacF6c5mPG1JJWfdn4J3PCn3Ot8Jz3x
+GPvUm2V79AEu8OyEYLGbGnnEY44TaYho40gaoW67Oq3c5vw/jfxKiTDHQ0sZGcE5
+/Zx7zjw3XbSDogbyG2EYmZK0peVNPcu1UhWXRYMnC6C2KFWDZnxrJLO8/qNNpIHd
+CQXpnEVj8LX5aU4bpg3bTWiidYQ2Ifb+VEyDrJ6NouWwPySDO5Dwv/JySPz8gHbl
+4tmiWz1ZdHoTEY1pSrirzPI1S0OY+5n0S5xXFeRayOFdE+3PZ4a5Mn+FEIIh4ynE
+SYygZh5LM5KuCjLbT1LO7/bUsCWpNBe9yP0C4kTi6rUVvh4nWq7vO9qpxtMeoVyv
+Cd809jz15Cs2A89v65hLgF4MsgFKLxApFx/yXUkp6b27l6gw8Hc=
+=2eQJ
 -----END PGP SIGNATURE-----
 
---lVmKxZwYU6H/NYU5--
+--g5xwcfR2A+2YrJL6--
