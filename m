@@ -2,68 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3DFB39FDB0
-	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 19:30:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A783A39FDB6
+	for <lists+kvm@lfdr.de>; Tue,  8 Jun 2021 19:31:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233583AbhFHRcI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Jun 2021 13:32:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38450 "EHLO
+        id S233094AbhFHRc5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Jun 2021 13:32:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23466 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233094AbhFHRcH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 8 Jun 2021 13:32:07 -0400
+        by vger.kernel.org with ESMTP id S231840AbhFHRc4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Jun 2021 13:32:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623173413;
+        s=mimecast20190719; t=1623173463;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ZADhY34QxbAWeVPZSSTJzfEf/Pqd0pAVw+/FdLcIyQU=;
-        b=cs1PK9mqSKO7YVnSxXQuK25lRxcnE31QbXJMDRpxQ7Zv9uAVHY+q1OQF1cmNoeQQkFrvRX
-        45WlcLPRZ6jDfHvLp4DVCGyQzkpcbXzBYc58nbMvT/MDM0zswKkNjODM+pvWx+yJKHN1gp
-        QcAdOXl/Qnkb/TvxfmedcI67dQ8NgC4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-499-WAamKAvVN4m4N4g5k3PPIA-1; Tue, 08 Jun 2021 13:30:12 -0400
-X-MC-Unique: WAamKAvVN4m4N4g5k3PPIA-1
-Received: by mail-wr1-f69.google.com with SMTP id d5-20020a0560001865b0290119bba6e1c7so5753124wri.20
-        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 10:30:11 -0700 (PDT)
+        bh=TF/rgM77L/d/lAEQM9kap4CMSSjJDs34aSUsZ8Lqw00=;
+        b=DCFOz/zz67WnbM4TiFLWgmxjsO+R8gkhoYzHHQGLEBl/w7rC7BuEkfJyvkqFghxIHPkh5+
+        o29G2k698cCEmykm29PPioOQZHxJSWZulLuwiichcj3ScoMAhDKB55G94rX2n7gW+VsITp
+        VXH0ARMw4jbiHmO1qbaN/9mJIPFonLw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-458-EymG11kVPHCMDYAikOcqtg-1; Tue, 08 Jun 2021 13:31:02 -0400
+X-MC-Unique: EymG11kVPHCMDYAikOcqtg-1
+Received: by mail-wr1-f71.google.com with SMTP id h104-20020adf90710000b029010de8455a3aso9733688wrh.12
+        for <kvm@vger.kernel.org>; Tue, 08 Jun 2021 10:31:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=ZADhY34QxbAWeVPZSSTJzfEf/Pqd0pAVw+/FdLcIyQU=;
-        b=rOUNXhsvnCNBBYjkRsq1bVqgeRtGzSvGPHrlwxDNLxN//Z6Gw38HHxn2aFC7HGgUsr
-         YjdMLDs9p0xxOwy3V9nJyH/jLJFOhS8bnTp2q5ZC8YZDnfGWmZkwwzIbrPdUppySp6i7
-         83VRhx9PZW2QGisolnH/JjPPZ/LOtCkBTxAzv8NHdw/vJr9U9hHbU6+to5MY6iSHd3RA
-         iuV4BsvQrdd1RzPsOwq6Jgju1DW7bu0hxGQOQilHQlSm8birQH+1fNh8jzVM28hvbMQC
-         Ywzue3vw2eFkKWSaRhPAMiAAoJwQINwknERTL7yZ1qCrmNVIB9g/0hiJ1M3ItyTuDRNG
-         BtrA==
-X-Gm-Message-State: AOAM53066bMmdyqhusJm6yT0SXgD1j0+vZzs/EBiYFpPaXgndkYU/Rnx
-        Q3cWJhG55pDEFsJZDFNa0ddwebV5tbmXcGivNIy8sLdX00u8WCfiEg015KKCUKYEDbdBr6nZCpp
-        0JpiA9+PMPGtj
-X-Received: by 2002:a5d:5987:: with SMTP id n7mr23701559wri.293.1623173410944;
-        Tue, 08 Jun 2021 10:30:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz40mbd8fjVHRDKS+HMzx5jGfFR8kWG56bZIuciz3ZdDkAg81UwMsWueng2sQtHOd4/13M5eQ==
-X-Received: by 2002:a5d:5987:: with SMTP id n7mr23701539wri.293.1623173410780;
-        Tue, 08 Jun 2021 10:30:10 -0700 (PDT)
+        bh=TF/rgM77L/d/lAEQM9kap4CMSSjJDs34aSUsZ8Lqw00=;
+        b=gmiQvS020K4e7UWLsnbzglDxRx1CVlkFRrZeI4ZuWRxg8iBdcs8+Nqj4aZsfSsN0k9
+         ceUer0fphiO6xHkXhXNlsOcxgVSzJ/A1JIgB0hrnQadWFVQFY22nwy+WwK8+oKZp/WWq
+         fepuS/ADyqIbcleD1g/qZlY+G0J16zf3iuGeTf0+lyaUvhcAV1oi5dwPn+HM/f2wSk5a
+         FuTVjTkDuPsNC2Abyh34d9ZbembieGCQdamzrvRsNBCzVKYJh7LMEj5cPP7m7+JGuDMg
+         iP7IXnFumBdb9Z+8tFxLveScPr4fK7N2HtCAhc3jYu5dqzdS5r+6zZTHE0ljWHh+GcN4
+         3+ug==
+X-Gm-Message-State: AOAM532MMta6oBzZM2+b+UM0UjiscX3aNmuK6r9dYTvCXR4r9VlEMes8
+        h55mQEzS9jfIfr0EtWP/61vMNxrKRNZ0P4wgLlQzP9U4i9lJhPB/UJUjtKCTsOeoFaGZ8NyPRnp
+        zSUY2qZ8Uptcp
+X-Received: by 2002:a5d:47a5:: with SMTP id 5mr11742381wrb.259.1623173460821;
+        Tue, 08 Jun 2021 10:31:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw+hXpQkKsF/MtCk0rB04qnJ0G728xRvxcrbK0SQ7l7/wkfmJ3psnPl5j+OrSjI7gH0UMjC5A==
+X-Received: by 2002:a5d:47a5:: with SMTP id 5mr11742365wrb.259.1623173460657;
+        Tue, 08 Jun 2021 10:31:00 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id p5sm21535583wrd.25.2021.06.08.10.30.09
+        by smtp.gmail.com with ESMTPSA id a4sm18989559wme.45.2021.06.08.10.30.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Jun 2021 10:30:10 -0700 (PDT)
-Subject: Re: [PATCH 0/3] Restore extra_mem_pages and add slot0_mem_pages
-To:     Zhenzhong Duan <zhenzhong.duan@intel.com>,
+        Tue, 08 Jun 2021 10:31:00 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86: Ensure liveliness of nested VM-Enter fail
+ tracepoint message
+To:     Steven Rostedt <rostedt@goodmis.org>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Cc:     linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
-        maciej.szmigiero@oracle.com, drjones@redhat.com, shuah@kernel.org
-References: <20210608233816.423958-1-zhenzhong.duan@intel.com>
+References: <20210607175748.674002-1-seanjc@google.com>
+ <20210607144845.74a893d6@oasis.local.home>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <356f17eb-8357-9863-6655-d1a737e587fd@redhat.com>
-Date:   Tue, 8 Jun 2021 19:30:09 +0200
+Message-ID: <89ea681f-bbfc-422c-c654-d81b5e83a734@redhat.com>
+Date:   Tue, 8 Jun 2021 19:30:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20210608233816.423958-1-zhenzhong.duan@intel.com>
+In-Reply-To: <20210607144845.74a893d6@oasis.local.home>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -71,58 +76,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/06/21 01:38, Zhenzhong Duan wrote:
-> (39fe2fc96694 "selftests: kvm: make allocation of extra memory take effect")
-> changed the meaning of extra_mem_pages and treated it as slot0 memory size.
+On 07/06/21 20:48, Steven Rostedt wrote:
+> On Mon,  7 Jun 2021 10:57:48 -0700
+> Sean Christopherson <seanjc@google.com> wrote:
 > 
-> In fact extra_mem_pages is used for non-slot0 memory size, there is no custom
-> slot0 memory size support. See discuss in https://lkml.org/lkml/2021/6/3/551
-> for more details.
+>> Use the __string() machinery provided by the tracing subystem to make a
+>> copy of the string literals consumed by the "nested VM-Enter failed"
+>> tracepoint.  A complete copy is necessary to ensure that the tracepoint
+>> can't outlive the data/memory it consumes and deference stale memory.
+>>
+>> Because the tracepoint itself is defined by kvm, if kvm-intel and/or
+>> kvm-amd are built as modules, the memory holding the string literals
+>> defined by the vendor modules will be freed when the module is unloaded,
+>> whereas the tracepoint and its data in the ring buffer will live until
+>> kvm is unloaded (or "indefinitely" if kvm is built-in).
+>>
+>> This bug has existed since the tracepoint was added, but was recently
+>> exposed by a new check in tracing to detect exactly this type of bug.
+>>
+>>    fmt: '%s%s
+>>    ' current_buffer: ' vmx_dirty_log_t-140127  [003] ....  kvm_nested_vmenter_failed: '
+>>    WARNING: CPU: 3 PID: 140134 at kernel/trace/trace.c:3759 trace_check_vprintf+0x3be/0x3e0
+>>    CPU: 3 PID: 140134 Comm: less Not tainted 5.13.0-rc1-ce2e73ce600a-req #184
+>>    Hardware name: ASUS Q87M-E/Q87M-E, BIOS 1102 03/03/2014
+>>    RIP: 0010:trace_check_vprintf+0x3be/0x3e0
+>>    Code: <0f> 0b 44 8b 4c 24 1c e9 a9 fe ff ff c6 44 02 ff 00 49 8b 97 b0 20
+>>    RSP: 0018:ffffa895cc37bcb0 EFLAGS: 00010282
+>>    RAX: 0000000000000000 RBX: ffffa895cc37bd08 RCX: 0000000000000027
+>>    RDX: 0000000000000027 RSI: 00000000ffffdfff RDI: ffff9766cfad74f8
+>>    RBP: ffffffffc0a041d4 R08: ffff9766cfad74f0 R09: ffffa895cc37bad8
+>>    R10: 0000000000000001 R11: 0000000000000001 R12: ffffffffc0a041d4
+>>    R13: ffffffffc0f4dba8 R14: 0000000000000000 R15: ffff976409f2c000
+>>    FS:  00007f92fa200740(0000) GS:ffff9766cfac0000(0000) knlGS:0000000000000000
+>>    CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>    CR2: 0000559bd11b0000 CR3: 000000019fbaa002 CR4: 00000000001726e0
+>>    Call Trace:
+>>     trace_event_printf+0x5e/0x80
+>>     trace_raw_output_kvm_nested_vmenter_failed+0x3a/0x60 [kvm]
+>>     print_trace_line+0x1dd/0x4e0
+>>     s_show+0x45/0x150
+>>     seq_read_iter+0x2d5/0x4c0
+>>     seq_read+0x106/0x150
+>>     vfs_read+0x98/0x180
+>>     ksys_read+0x5f/0xe0
+>>     do_syscall_64+0x40/0xb0
+>>     entry_SYSCALL_64_after_hwframe+0x44/0xae
+>>
+>> Cc: Steven Rostedt <rostedt@goodmis.org>
+>> Fixes: 380e0055bc7e ("KVM: nVMX: trace nested VM-Enter failures detected by H/W")
+>> Signed-off-by: Sean Christopherson <seanjc@google.com>
+>> ---
+>>
 > 
-> This patchset restores extra_mem_pages's original meaning and adds support for
-> custom slot0 memory with a new parameter slot0_mem_pages.
+> Reviewed-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+> 
+> -- Steve
+> 
 
-Because the two reverts are so small, I squashed everything in a single 
-patch with the following message:
-
-     Until commit 39fe2fc96694 ("selftests: kvm: make allocation of extra
-     memory take effect", 2021-05-27), parameter extra_mem_pages was used
-     only to calculate the page table size for all the memory chunks,
-     because real memory allocation happened with calls of
-     vm_userspace_mem_region_add() after vm_create_default().
-
-     Commit 39fe2fc96694 however changed the meaning of extra_mem_pages to
-     the size of memory slot 0.  This makes the memory allocation more
-     flexible, but makes it harder to account for the number of
-     pages needed for the page tables.  For example, memslot_perf_test
-     has a small amount of memory in slot 0 but a lot in other slots,
-     and adding that memory twice (both in slot 0 and with later
-     calls to vm_userspace_mem_region_add()) causes an error that
-     was fixed in commit 000ac4295339 ("selftests: kvm: fix overlapping
-     addresses in memslot_perf_test", 2021-05-29)
-
-     Since both uses are sensible, add a new parameter slot0_mem_pages
-     to vm_create_with_vcpus() and some comments to clarify the meaning of
-     slot0_mem_pages and extra_mem_pages.  With this change,
-     memslot_perf_test can go back to passing the number of memory
-     pages as extra_mem_pages.
+Queued, thanks.
 
 Paolo
-
-> Run below command, all 39 tests passed.
-> # make -C tools/testing/selftests/ TARGETS=kvm run_tests
-> 
-> Zhenzhong Duan (3):
->    Revert "selftests: kvm: make allocation of extra memory take effect"
->    Revert "selftests: kvm: fix overlapping addresses in
->      memslot_perf_test"
->    selftests: kvm: Add support for customized slot0 memory size
-> 
->   .../testing/selftests/kvm/include/kvm_util.h  |  7 +--
->   .../selftests/kvm/kvm_page_table_test.c       |  2 +-
->   tools/testing/selftests/kvm/lib/kvm_util.c    | 47 +++++++++++++++----
->   .../selftests/kvm/lib/perf_test_util.c        |  2 +-
->   .../testing/selftests/kvm/memslot_perf_test.c |  2 +-
->   5 files changed, 45 insertions(+), 15 deletions(-)
-> 
 
