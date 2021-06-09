@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C05513A1CC2
-	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 20:30:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F5583A1CC3
+	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 20:30:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229957AbhFIScC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 14:32:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35820 "EHLO
+        id S230000AbhFIScF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 14:32:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229941AbhFISb6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Jun 2021 14:31:58 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CAB2C06175F
-        for <kvm@vger.kernel.org>; Wed,  9 Jun 2021 11:30:03 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id h12-20020a17090aa88cb029016400fd8ad8so1980323pjq.3
-        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 11:30:03 -0700 (PDT)
+        with ESMTP id S229989AbhFIScC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Jun 2021 14:32:02 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 470E1C061574
+        for <kvm@vger.kernel.org>; Wed,  9 Jun 2021 11:30:07 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id k7so1929773pjf.5
+        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 11:30:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=rcASrBBC54ippeJc8KQOcZ4tnnIbc6w6h2SU/3e0h2I=;
-        b=knMT4cbOHYlSHse6UAmWVOaYbM8xq3gLYxzLz3PhirgBHMh+54RL1PmSjEnBfFYcFl
-         VewzMyf5W0ZTNFTeZGVjqs+TObyvBvRclk2yUh3A22b5mraCUT1kZhfgD0SnwOTCZ6Cc
-         1nHpxC/4TPwqBPhtV0Ld1+4Gau2VbADNpei2Hk3m0CwrrboPUegm8Z3RIXcR9uY7tnCy
-         tcMQkMKbcL1F+KJJ0Gh5LOFs3Vcx09MHqv7QBB0Ob0e7Hk0HX0OWxNRxWAcqzB5UO7L9
-         kEwh8FrJsW47pHZ2yg3RBH/zAxTyywkNx43a++sGmpRZut3nnj1W0mJWgYruihZ0PObh
-         NDvw==
+        bh=FW0T0ND5ZzgzZJ+335NwDRgPl16vtHkayOF5PS62cMM=;
+        b=gJ4hLWnIy9FVJ5FqNIYoVVqxRUOpjTKtSB71S/da2wKcACCWx0YlU2J4JRHkfDzbjj
+         f6aoMVcr4Bh/eh7PebCje5MajUMQXlHyTNoFFw3RM5jA7l508HmvhdCEaubCLG0nhum0
+         m+rAMVdjr1C3r4lQ2SjParTM5g7w8ndAkbD4JeCyBJXKDUXO9JsYZJ5CkWCGj7XKNssg
+         a0PaWfXTlXIXT5aGujxjx7BT/1n221u6s+LVwWBFU7uC+ukj59g5aPb96BY9bXDL0Ze/
+         olX9vzGyvMOkIiitK45dU3HCvE8dkQNqBzVYvDIxlsODmExypvuP9c2es112lKhR2nxo
+         pg1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=rcASrBBC54ippeJc8KQOcZ4tnnIbc6w6h2SU/3e0h2I=;
-        b=ghIfd36sRl+Jck9SffcussSn60t8kwn7UDKpgDQF1vXmM7BKG8XLR3tm2tIE7q+2z3
-         1WjGI2DqbuTe3s5/zmaVnXTyMCB5pK+xafn6hu3WTEcGnj4hp+O+uRcahbMe3dO9nqMf
-         OvGf1zj3NrueeJPzTluoEAyToSlVegYtlBkUeJ4ygbUpJOHXXgboDC2JZfePHsQxSmnv
-         0UvXH1fBSi1z8gBVkrgByO+UQ6wx+nQThKNT5b1QTZ5dsYs5GLuDy5yZw51o3oOZleD7
-         H05NL5OtucZkZtk64Pve0uMZhjlFllanOAR3RH2uh6+SExsb9pULXjGFLCx37NjF4wSq
-         pFoA==
-X-Gm-Message-State: AOAM533J24DTMBeGwR9/eEmISFDTrMRFhe1k0UsYqYH93V/1hHSHjDwA
-        luZOg02b9otrM7lLgbPDdA8=
-X-Google-Smtp-Source: ABdhPJxmD/zw+2oejK7wLrGIrC5fZYF0PVIMAi72mx/jXtU0Qllvt+3xCFmGU97b8zt+jBzkrQpb0w==
-X-Received: by 2002:a17:90a:24a:: with SMTP id t10mr911144pje.178.1623263402862;
-        Wed, 09 Jun 2021 11:30:02 -0700 (PDT)
+        bh=FW0T0ND5ZzgzZJ+335NwDRgPl16vtHkayOF5PS62cMM=;
+        b=BdPcoJ5ScMz1o2MCXMevjNJ8Uoq8phZCTpwC27348SzxrVmN8J3l70X4WjMQigbF1C
+         ESQUHDzDTMOa17HpRhsAouMPtQUd1lYyUkIFdmtbgiFNhjF5EbiYke2RBTjx8WfldKSP
+         MptzO/56SxxSybKahjuVVwTY0Ro0jD2GwGdQWiqVFFCb49pvdybxrLj5xGSBlgaNm4Qq
+         zjQfDRqex1K14A/j+1itzRcJ88lahfN9TRRZdAN6NHpRKRaaKtXDlDhiAhgohTrCAmc1
+         qMPN2Fh9dhzuaGCkzF7Ct0sL/xuWDdNr/+SiQ9rzOG/JbeEwwtltkZn+WscqN7td5r2A
+         5Qzw==
+X-Gm-Message-State: AOAM532tWpfHpeuO1lwxoz50fTnUuhauAxdq0dA+/2qRaPrWRxTQajpC
+        dghsEPupcWh09Zz/mIFyiAM=
+X-Google-Smtp-Source: ABdhPJxlvYu1zgPo3DjwSzBDk66UxwwBW/ASW170aSKSCt6Obv+phiSCxPoLh1l7aDv83Y5OhYHEsg==
+X-Received: by 2002:a17:902:c613:b029:107:ce4:f7b9 with SMTP id r19-20020a170902c613b02901070ce4f7b9mr893132plr.11.1623263406649;
+        Wed, 09 Jun 2021 11:30:06 -0700 (PDT)
 Received: from ubuntu-server-2004.vmware.com (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
-        by smtp.gmail.com with ESMTPSA id y34sm249092pfa.181.2021.06.09.11.30.01
+        by smtp.gmail.com with ESMTPSA id y34sm249092pfa.181.2021.06.09.11.30.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Jun 2021 11:30:02 -0700 (PDT)
+        Wed, 09 Jun 2021 11:30:06 -0700 (PDT)
 From:   Nadav Amit <nadav.amit@gmail.com>
 X-Google-Original-From: Nadav Amit
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>
-Subject: [kvm-unit-tests PATCH 5/8] x86/hyperv: skip hyperv-clock test if unsupported by host
-Date:   Wed,  9 Jun 2021 18:29:42 +0000
-Message-Id: <20210609182945.36849-6-nadav.amit@gmail.com>
+Subject: [kvm-unit-tests PATCH 8/8] x86/vmx: skip error-code delivery tests for #CP
+Date:   Wed,  9 Jun 2021 18:29:45 +0000
+Message-Id: <20210609182945.36849-9-nadav.amit@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210609182945.36849-1-nadav.amit@gmail.com>
 References: <20210609182945.36849-1-nadav.amit@gmail.com>
@@ -65,31 +65,46 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Nadav Amit <nadav.amit@gmail.com>
 
-Skip the hyperv-clock tests if time reference counter is unsupported by
-the host, similarly to the way other hyperv tests first check support of
-the host.
+Old Intel CPUs, which do not support control protection exception, do
+not expect an error code for #CP, while new ones expect an error-code.
+
+Intel SDM does not say that the delivery of an error-code for #CP is
+conditional on anything, not even CPU support of CET. So it appears that
+the correct testing is just to skip the error-code delivery test for
+the #CP exception.
 
 Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
 ---
- x86/hyperv_clock.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ lib/x86/processor.h | 1 +
+ x86/vmx_tests.c     | 3 +++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/x86/hyperv_clock.c b/x86/hyperv_clock.c
-index b4cfc9f..f1e7204 100644
---- a/x86/hyperv_clock.c
-+++ b/x86/hyperv_clock.c
-@@ -150,6 +150,11 @@ int main(int ac, char **av)
- 	uint64_t tsc1, t1, tsc2, t2;
- 	uint64_t ref1, ref2;
+diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+index 517ee70..53e71fc 100644
+--- a/lib/x86/processor.h
++++ b/lib/x86/processor.h
+@@ -28,6 +28,7 @@
+ #define GP_VECTOR 13
+ #define PF_VECTOR 14
+ #define AC_VECTOR 17
++#define CP_VECTOR 21
  
-+	if (!hv_time_ref_counter_supported()) {
-+		report_skip("time reference counter is unsupported");
-+		return report_summary();
-+	}
-+
- 	setup_vm();
+ #define X86_CR0_PE	0x00000001
+ #define X86_CR0_MP	0x00000002
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 179a55b..5b9faa2 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -4413,6 +4413,9 @@ skip_unrestricted_guest:
+ 		case PF_VECTOR:
+ 		case AC_VECTOR:
+ 			has_error_code = true;
++		case CP_VECTOR:
++			/* Some CPUs have error code and some do not, skip */
++			continue;
+ 		}
  
- 	ncpus = cpu_count();
+ 		/* Negative case */
 -- 
 2.25.1
 
