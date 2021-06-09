@@ -2,127 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1969A3A17DE
-	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 16:50:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BE913A17F4
+	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 16:52:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238249AbhFIOwb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 10:52:31 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:42626 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238229AbhFIOw0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Jun 2021 10:52:26 -0400
-Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 7475D1FD5F;
-        Wed,  9 Jun 2021 14:50:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1623250230; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bfjFCPehMo1dyNPOnDLbyFFsGSL83cnl+X5eXtIrdMo=;
-        b=BmwR7ybJEQTIkO2dHxeC8RucevhwFNqF5glMJdWb8NS5t4xsTPaoMlrYtvQQQvLgiosSzU
-        vKY81XNPyQpFno1hE62xVlkHiGpCSmopP5c3wioB9niwn6i0djX/lZHy7+HWwBkld7I6DT
-        ZZoO5rVE/JZDsZe3zs8etR7QSDhQ1Yk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1623250230;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bfjFCPehMo1dyNPOnDLbyFFsGSL83cnl+X5eXtIrdMo=;
-        b=DZbZ5Blb/fF29l+3M+5ErblsWt+rGhhgXR/PRrYnbG6Q5YGQCEXoNrOaBbyWA90Cas+Fs1
-        miO/AthFhYrHk1Aw==
-Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id 34138118DD;
-        Wed,  9 Jun 2021 14:50:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1623250230; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bfjFCPehMo1dyNPOnDLbyFFsGSL83cnl+X5eXtIrdMo=;
-        b=BmwR7ybJEQTIkO2dHxeC8RucevhwFNqF5glMJdWb8NS5t4xsTPaoMlrYtvQQQvLgiosSzU
-        vKY81XNPyQpFno1hE62xVlkHiGpCSmopP5c3wioB9niwn6i0djX/lZHy7+HWwBkld7I6DT
-        ZZoO5rVE/JZDsZe3zs8etR7QSDhQ1Yk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1623250230;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bfjFCPehMo1dyNPOnDLbyFFsGSL83cnl+X5eXtIrdMo=;
-        b=DZbZ5Blb/fF29l+3M+5ErblsWt+rGhhgXR/PRrYnbG6Q5YGQCEXoNrOaBbyWA90Cas+Fs1
-        miO/AthFhYrHk1Aw==
-Received: from director2.suse.de ([192.168.254.72])
-        by imap3-int with ESMTPSA
-        id yJIXCzbVwGBcXAAALh3uQQ
-        (envelope-from <jroedel@suse.de>); Wed, 09 Jun 2021 14:50:30 +0000
-Date:   Wed, 9 Jun 2021 16:50:28 +0200
-From:   Joerg Roedel <jroedel@suse.de>
-To:     Varad Gautam <varadgautam@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, Varad Gautam <varad.gautam@suse.com>,
-        kvm@vger.kernel.org, x86@kernel.org,
-        Borislav Petkov <bp@alien8.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v3] x86: Add a test for AMD SEV-ES guest #VC handling
-Message-ID: <YMDVNHh9KHsha4a+@suse.de>
-References: <20210531125035.21105-1-varad.gautam@suse.com>
- <20210602141447.18629-1-varadgautam@gmail.com>
+        id S238364AbhFIOyO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 10:54:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43822 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237146AbhFIOyO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Jun 2021 10:54:14 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FA08C061574
+        for <kvm@vger.kernel.org>; Wed,  9 Jun 2021 07:52:05 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id e2so192388ljk.4
+        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 07:52:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=J4uqZat43uXQvNOJTycrnSDnl08RIvJWttyNK5Ek/y8=;
+        b=CnZXh4kHjTx7xzwkiaOAmy6w5zVWdF9I7OMYc2MeamT4FBJcxWhk4ZxsvP3iAKRd0E
+         JIim2I1xEV4q0gsNORNvPQPjaCwf2dieYPoj7voiuY4/U4lF7Z88RVSwIt4TUs/6bG6h
+         5uHWDdj1Y/Nlsi8oG6ivfWIsZEUNED8MLbfV8tM/D6Om9ZUNjkn3snaoYrJr4uIiLT5G
+         UqA37LNR0HHSABqmq/Eo7QAVW7989ErxHRajxq7SJhhjRz2a/Li+mhfj2tSaT3Xwg4/a
+         ya/gBgN+q+aVYEcz3wkNQO06NZZl8WCAvdSuRnFLdV9ZYBxuwbBro+0uEmyfD6QTVWvx
+         jgTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=J4uqZat43uXQvNOJTycrnSDnl08RIvJWttyNK5Ek/y8=;
+        b=TgqoVWGEhFM86wB0WJZbydfXFId6OC10DHKQ6ACy9aMciSDKa4GG+ZI0JPCpRgEhF2
+         5CXSAeNdfl57mwfTzHqSVqG3yUfh2hMFM8SLToQ55qORScnWot8t9q8SY3fOHMi6bKYF
+         9d9TqLL+t3olREAmqXSqDtOYOvEQBZJTP1t68JCj4PVnFwrPoqh+aKo0ZkctNWrf3OJT
+         Yv9ZajrfxSU4zVYHkcRpSAHcCjqky9M/zFnhagXVg82ipAAoH4kWEXTW5LOVxx3jI04N
+         ll2kPm+Tcf19BVvrSuXoqSbY5eQ0JsrvXitneHMyywunNQj5Iw1IOMSf44YcLZytaLji
+         bJVQ==
+X-Gm-Message-State: AOAM531MjvulU5jL4n9Nv+4x3BrU1so/ITKgCwN8HQlxGeJwpX2rfhi1
+        bt+rLGdqG8gu5icb1FJL4kPwziaMDDVrc4fju/kasQ==
+X-Google-Smtp-Source: ABdhPJwtEy715cts9tm9X8JTlBt0diCbht9bovQ7EqpFFv+TmmL+DAqN6jgcAGII2MOGq/hEEtGudbEoe7Zf41meHZw=
+X-Received: by 2002:a05:651c:304:: with SMTP id a4mr251806ljp.331.1623250322933;
+ Wed, 09 Jun 2021 07:52:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210602141447.18629-1-varadgautam@gmail.com>
+References: <20210608214742.1897483-1-oupton@google.com> <20210608214742.1897483-3-oupton@google.com>
+ <877dj3z68p.wl-maz@kernel.org>
+In-Reply-To: <877dj3z68p.wl-maz@kernel.org>
+From:   Oliver Upton <oupton@google.com>
+Date:   Wed, 9 Jun 2021 09:51:51 -0500
+Message-ID: <CAOQ_QsgobctkqS5SQdqGaM-vjH7685zGPdDXZpcOCS8xWJxegA@mail.gmail.com>
+Subject: Re: [PATCH 02/10] KVM: arm64: Implement initial support for KVM_CAP_SYSTEM_COUNTER_STATE
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm list <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 02, 2021 at 04:14:47PM +0200, Varad Gautam wrote:
-> From: Varad Gautam <varad.gautam@suse.com>
-> 
-> Some vmexits on a SEV-ES guest need special handling within the guest
-> before exiting to the hypervisor. This must happen within the guest's
-> \#VC exception handler, triggered on every non automatic exit.
-> 
-> Add a KUnit based test to validate Linux's VC handling. The test:
-> 1. installs a kretprobe on the #VC handler (sev_es_ghcb_hv_call, to
->    access GHCB before/after the resulting VMGEXIT).
-> 2. tiggers an NAE.
-> 3. checks that the kretprobe was hit with the right exit_code available
->    in GHCB.
-> 
-> Since relying on kprobes, the test does not cover NMI contexts.
-> 
-> Signed-off-by: Varad Gautam <varad.gautam@suse.com>
-> ---
->  arch/x86/Kconfig                 |   9 ++
->  arch/x86/kernel/Makefile         |   8 ++
->  arch/x86/kernel/sev-es-test-vc.c | 155 +++++++++++++++++++++++++++++++
+On Wed, Jun 9, 2021 at 5:23 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Hi Oliver,
+>
+> Please Cc the KVM/arm64 reviewers (now added). Also, please consider
+> subscribing to the kvmarm mailing list so that I don't have to
+> manually approve your posts ;-).
 
-This looks good to me except for the small comment below, thanks Varad.
-I ran it in an SEV-ES guest and I am seeing the test results in dmesg.
-Only thing I am missing is a 'rep movs' test for MMIO, but that can be
-added later, so
+/facepalm
 
-Tested-by: Joerg Roedel <jroedel@suse.de>
+Thought I had done this already. Re-requested to join kvmarm@. Seems
+that gmail politely decided the mailing list was spam, so no
+confirmation email came through.
 
-Btw, should we create a separate directory for such tests like
-/arch/x86/tests/ or something along those lines?
+> On Tue, 08 Jun 2021 22:47:34 +0100,
+> Oliver Upton <oupton@google.com> wrote:
+> >
+> > ARMv8 provides for a virtual counter-timer offset that is added to guest
+> > views of the virtual counter-timer (CNTVOFF_EL2). To date, KVM has not
+> > provided userspace with any perception of this, and instead affords a
+> > value-based scheme of migrating the virtual counter-timer by directly
+> > reading/writing the guest's CNTVCT_EL0. This is problematic because
+> > counters continue to elapse while the register is being written, meaning
+> > it is possible for drift to sneak in to the guest's time scale. This is
+> > exacerbated by the fact that KVM will calculate an appropriate
+> > CNTVOFF_EL2 every time the register is written, which will be broadcast
+> > to all virtual CPUs. The only possible way to avoid causing guest time
+> > to drift is to restore counter-timers by offset.
+>
+> Well, the current method has one huge advantage: time can never go
+> backward from the guest PoV if you restore what you have saved. Yes,
+> time can elapse, but you don't even need to migrate to observe that.
+>
+> >
+> > Implement initial support for KVM_{GET,SET}_SYSTEM_COUNTER_STATE ioctls
+> > to migrate the value of CNTVOFF_EL2. These ioctls yield precise control
+> > of the virtual counter-timers to userspace, allowing it to define its
+> > own heuristics for managing vCPU offsets.
+>
+> I'm not really in favour of inventing a completely new API, for
+> multiple reasons:
+>
+> - CNTVOFF is an EL2 concept. I'd rather not expose it as such as it
+>   becomes really confusing with NV (which does expose its own CNTVOFF
+>   via the ONE_REG interface)
 
-> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-> index 0045e1b441902..85b8ac450ba56 100644
-> --- a/arch/x86/Kconfig
-> +++ b/arch/x86/Kconfig
-> @@ -1543,6 +1543,15 @@ config AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT
->  	  If set to N, then the encryption of system memory can be
->  	  activated with the mem_encrypt=on command line option.
->  
-> +config AMD_SEV_ES_TEST_VC
-> +	bool "Test for AMD SEV-ES VC exception handling."
-> +	depends on AMD_MEM_ENCRYPT
-> +	select FUNCTION_TRACER
-> +	select KPROBES
-> +	select KUNIT
-> +	help
-> +	  Enable KUnit-based testing for AMD SEV-ES #VC exception handling.
-> +
+Very true. At least on x86, there's a fair bit of plumbing to handle
+the KVM-owned L0 offset reg and the guest-owned L1 offset reg.
 
-I think this should be in arch/x86/Kconfig.debug.
+> - You seem to allow each vcpu to get its own offset. I don't think
+>   that's right. The architecture defines that all PEs have the same
+>   view of the counters, and an EL1 guest should be given that
+>   illusion.
 
+Agreed. I would have preferred a VM-wide ioctl to do this, but since
+x86 explicitly allows for drifted TSCs that can't be the case in a
+generic ioctl. I can do the same broadcasting as we do in the case of
+a VMM write to CNTVCT_EL0.
+
+> - by having a parallel save/restore interface, you make it harder to
+>   reason about what happens with concurrent calls to both interfaces
+>
+> - the userspace API is already horribly bloated, and I'm not overly
+>   keen on adding more if we can avoid it.
+
+Pssh. My ioctl numbers aren't _too_ close to the limit ;-)
+
+>
+> I'd rather you extend the current ONE_REG interface and make it modal,
+> either allowing the restore of an absolute value or an offset for
+> CNTVCT_EL0. This would also keep a consistent behaviour when restoring
+> vcpus. The same logic would apply to the physical offset.
+>
+> As for how to make it modal, we have plenty of bits left in the
+> ONE_REG encoding. Pick one, and make that a "relative" attribute. This
+> will result in some minor surgery in the get/set code paths, but at
+> least no entirely new mechanism.
+
+Yeah, it'd be good to do it w/o adding new plumbing. The only reason
+I'd considered it is because x86 might necessitate it. Not wanting to
+apply bad convention to other arches, but keeping at least a somewhat
+consistent UAPI would be nice.
+
+> One question though: how do you plan to reliably compute the offset?
+> As far as I can see, it is subject to the same issues you described
+> above (while the guest is being restored, time flies), and you have
+> the added risk of exposing a counter going backward from a guest
+> perspective.
+
+Indeed, we do have the risk of time going backwards, but I'd say that
+the VMM shares in the responsibility to provide a consistent view of
+the counter too.
+
+Here's how I envisioned it working:
+
+Record the time, cycles, and offset (T0, C0, Off0) when saving the
+counter state. Record time and cycles (T1, C1) again when trying to
+restore counter state. Compute the new offset:
+
+Off1 = Off0 - (T1-T0) * CNTFRQ - (C0 - C1).
+
+The primary concern here is idempotence. Once Off1 is calculated, it
+doesn't matter how much time elapses between the calculation and the
+call into KVM, it will always produce the intended result. If instead
+we restore the counters by-value (whilst trying to account for elapsed
+time), my impression is that we'd do the following: Record time and
+guest counter (T0, G0) when saving counter state. Record time again
+when trying to restore counter state.
+
+In userspace, compute the time elapsed and fold it into the guest counter (G1):
+
+G1 = G0 + (T1-T0) * CNTFRQ
+
+And then in the kernel:
+
+CNTVOFF = G1 - CNTPCT
+
+Any number of things can happen in between the kernel and userspace
+portions of this operation, causing some drift of the VM's counter.
+Fundamentally I suppose the issue we have is that we sample the host
+counter twice (T1, G1), when really we'd want to only do so once.
+
+So, open to any suggestions where we avoid the issue of causing the
+guest counter to drift, offsets only seemed to be the easiest thing
+given that they ought to be constant for the lifetime of a VM on a
+host and is the backing state used by hardware.
+
+--
+Thanks,
+Oliver
+
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
