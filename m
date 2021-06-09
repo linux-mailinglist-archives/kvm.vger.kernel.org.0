@@ -2,91 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CE823A1673
-	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 16:03:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD8F93A171C
+	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 16:23:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237264AbhFIOEu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 10:04:50 -0400
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:40488 "EHLO
-        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232628AbhFIOEt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Jun 2021 10:04:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1623247375; x=1654783375;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version;
-  bh=4oVrdW8RDdZZG7Xoq+7Ll5kvYL7d/7s+RMKz8VYriJU=;
-  b=qbE1gX5MVo9g2iAUfHUcwDPPETWp1t02Ob4rlrIjCKJkObr5ae4lmmU1
-   JSDrucw08B8kIxhdTRbiIE8+Q9SIHxVfRuMDKQtRsFIjTiNiZ6rVYUMch
-   JWZpYyCxtJZ1uChcXm+FQ3+GRArs41NF/S55Fy/UchV5RHYOal1Lkgxsh
-   c=;
-X-IronPort-AV: E=Sophos;i="5.83,261,1616457600"; 
-   d="scan'208";a="114733056"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2a-22cc717f.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP; 09 Jun 2021 14:02:51 +0000
-Received: from EX13D28EUC003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-2a-22cc717f.us-west-2.amazon.com (Postfix) with ESMTPS id 7B9DAA1883;
-        Wed,  9 Jun 2021 14:02:50 +0000 (UTC)
-Received: from uc8bbc9586ea454.ant.amazon.com (10.43.160.17) by
- EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
- id 15.0.1497.18; Wed, 9 Jun 2021 14:02:46 +0000
-From:   Siddharth Chandrasekaran <sidcha@amazon.de>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-CC:     Siddharth Chandrasekaran <sidcha.dev@gmail.com>,
+        id S237927AbhFIOZk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 10:25:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44852 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237368AbhFIOZj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Jun 2021 10:25:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623248624;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jjZF3gCf4qvAes2x1coFKY5Z3ioj6l3K4a2iOJudRcA=;
+        b=K8JXWAC9y6xNSqPnoHV1hm056LS+IdcUwFr9WALdS/TgBl/GoES+ofbXz6D2EfP2HIij0X
+        nBVo5KY19d/riBWYYsmpvfG7Z8IypMra95VTRds8u8hhVj9uA2AXkVr7hcg23JUPJSIMSI
+        Xot/vc5tdnkBN+zBZ8QU1MS3ny0R3Nc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-503-3n5un0gkMbKqLEiB--eBSg-1; Wed, 09 Jun 2021 10:23:40 -0400
+X-MC-Unique: 3n5un0gkMbKqLEiB--eBSg-1
+Received: by mail-wm1-f72.google.com with SMTP id h206-20020a1cb7d70000b0290198e478dfeaso876505wmf.3
+        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 07:23:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jjZF3gCf4qvAes2x1coFKY5Z3ioj6l3K4a2iOJudRcA=;
+        b=sj0cZoR/otrgGzl91xROiHstyaVovzXa5uym+cRA9svUpQZb0B+BW/Jp7vkQJcsxvP
+         +xLF7Uk3PL9yqxVhofSMwirHyUnJSI99WJwqZ9Ndp9HJE5AhW7omEllNmr0uUghWR4bo
+         dEn+hLdJAC286afxDw96hs5icgE+pwEKt6zycwZQSxW6yvibwXKSsQ8VN1sbYFfDXD8U
+         fcHBATVkPjfZRTg4v5u8dJyPS79kKOOQsykV4P4tfEj5/rAz4nuQDFCfh1KPlW82JOBl
+         QukrhYmC8Gh+K/nNI73RmYCRFyG6Jq7mfUt2r4AiMbKnqAMSmU5H4oW1qq1lBUKWyJoP
+         hnVQ==
+X-Gm-Message-State: AOAM530ESId6HDczPGwv1klQEIdlDJPaZDqkitfuBx8kIJvC+hCcmy4a
+        9uKmcboDFWjo45YzEIy1qOvPpqW3pBleWlK41oZ7+XJLCggjhnJB4gUJWC09TlnXA5VFdZXTtu3
+        oo64wVOXKRih5JBI8AngvK2wXY4hVtDQzIIs4pK2EWohJkEehaMJuqkclU6/6N63y
+X-Received: by 2002:a05:6000:1543:: with SMTP id 3mr68751wry.342.1623248618762;
+        Wed, 09 Jun 2021 07:23:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzKVDODYpGPSF4I0Joj7Aziu8oSwAjqxFwTUyZheDKV4Mo/PQJ8eZhOqVsAEPzm5iFWLwOBXQ==
+X-Received: by 2002:a05:6000:1543:: with SMTP id 3mr68730wry.342.1623248618590;
+        Wed, 09 Jun 2021 07:23:38 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id r6sm97888wrt.21.2021.06.09.07.23.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Jun 2021 07:23:37 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] gitignore: Add tags file to .gitignore
+To:     Siddharth Chandrasekaran <sidcha@amazon.de>
+Cc:     Siddharth Chandrasekaran <sidcha.dev@gmail.com>,
         Evgeny Iakovlev <eyakovl@amazon.de>,
         Liran Alon <liran@amazon.com>,
-        Ioannis Aslanidis <iaslan@amazon.de>, <kvm@vger.kernel.org>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>
-Subject: [kvm-unit-tests PATCH] x86: Fix misspelled KVM parameter in error message
-Date:   Wed, 9 Jun 2021 16:02:17 +0200
-Message-ID: <20210609140217.1514-3-sidcha@amazon.de>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20210609140217.1514-1-sidcha@amazon.de>
+        Ioannis Aslanidis <iaslan@amazon.de>, kvm@vger.kernel.org
 References: <20210609140217.1514-1-sidcha@amazon.de>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <28e911ae-b5c5-58f1-7ded-0836ca4889ef@redhat.com>
+Date:   Wed, 9 Jun 2021 16:23:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.43.160.17]
-X-ClientProxiedBy: EX13D23UWC003.ant.amazon.com (10.43.162.81) To
- EX13D28EUC003.ant.amazon.com (10.43.164.43)
+In-Reply-To: <20210609140217.1514-1-sidcha@amazon.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM module parameter force_emulation_prefix is misspelled with a
-"forced"; fix it.
+On 09/06/21 16:02, Siddharth Chandrasekaran wrote:
+> Add ctags tags file to .gitignore so they don't get checked-in
+> accidentally.
+> 
+> Signed-off-by: Siddharth Chandrasekaran <sidcha@amazon.de>
+> ---
+>   .gitignore | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/.gitignore b/.gitignore
+> index 784cb2d..8534fb7 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -1,3 +1,4 @@
+> +tags
+>   .gdbinit
+>   *.a
+>   *.d
+> 
 
-Signed-off-by: Siddharth Chandrasekaran <sidcha@amazon.de>
----
- x86/emulator.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+If you're using them, you might consider adding the Makefile rules to 
+create the files.  Alternatively, you can add "tags" to your global 
+~/.git/info/exclude.
 
-diff --git a/x86/emulator.c b/x86/emulator.c
-index 6100b6d..97f28ba 100644
---- a/x86/emulator.c
-+++ b/x86/emulator.c
-@@ -1124,7 +1124,7 @@ int main(void)
- 		test_mov_dr(mem);
- 	} else {
- 		report_skip("skipping register-only tests, "
--			    "use kvm.forced_emulation_prefix=1 to enable");
-+			    "use kvm.force_emulation_prefix=1 to enable");
- 	}
- 
- 	test_push16(mem);
--- 
-2.17.1
-
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
+Having the file but not the rules feels like the worst of both worlds...
 
