@@ -2,90 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 27D983A1C53
-	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 19:47:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF7FA3A1C5A
+	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 19:48:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231785AbhFIRtA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 13:49:00 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:43442 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231670AbhFIRs7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Jun 2021 13:48:59 -0400
-Received: from zn.tnic (p200300ec2f0cf6007c78e5fe5429f9b4.dip0.t-ipconnect.de [IPv6:2003:ec:2f0c:f600:7c78:e5fe:5429:f9b4])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1E6531EC0570;
-        Wed,  9 Jun 2021 19:47:03 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1623260823;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=wSATXOOyGt9i64iSiH+y4PdoutUxKH/Ox+6Sp2p3E6I=;
-        b=OhU591mPW3/AXQerpYOAsiWAncFI3bpSWloN5ZmmzLW/XQj8K6WqVZrg415AJ4V78a3RaH
-        ChWB6TW6rGbokkHZ787rQUOFcjBM6xeABnr82utwiuyzMnpTga0VJe8odXUKUr80pNY/HV
-        pItHvwa38FQL5ylBZ/Rb1GVajBKE8Ds=
-Date:   Wed, 9 Jun 2021 19:47:02 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
-        npmccallum@redhat.com
-Subject: Re: [PATCH Part1 RFC v3 09/22] x86/compressed: Register GHCB memory
- when SEV-SNP is active
-Message-ID: <YMD+lpyZfYgekRsj@zn.tnic>
-References: <20210602140416.23573-1-brijesh.singh@amd.com>
- <20210602140416.23573-10-brijesh.singh@amd.com>
+        id S231842AbhFIRuF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 13:50:05 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58670 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231810AbhFIRuE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Jun 2021 13:50:04 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 159HXPwH166986;
+        Wed, 9 Jun 2021 13:47:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Qq7VXFeevVpStHRWsXVOehxcpO+2RgWaMg7rO3uTjhk=;
+ b=GyE176ThP/s+gHa/G/nLJWTZRbP3sFQepOwOmSFxbAt+h5iqDkJXdVz6jETuZI24pVlO
+ 8pZkI4t+JMkGatQ9GdFY0AzqdCZHfAfEhxC/12WB1gqY09OzzSl1b013Dya1bJw4WFqA
+ kLl2F39iwSZFOFjkuJ0+LwAR2As0zWdhp+ye8j1nB6HRBC+kvTglhCoyODSyS8KBe8KX
+ D9ArHgCgkWzbtjQ5OsgEfI8tbeIo44f1xmwY6JIPhdNYaCM4DGrlotOtMaFFebx7Kbgv
+ XTDORSD2izCW38oNeiPodNEespc+pRlMLscWjRoFWgJ+hXWSdhJkAY7xGpo+xMI6ECCH ew== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3930r1k7vg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Jun 2021 13:47:50 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 159HZc8v173764;
+        Wed, 9 Jun 2021 13:47:50 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3930r1k7v1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Jun 2021 13:47:49 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 159HldaD005888;
+        Wed, 9 Jun 2021 17:47:48 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma05fra.de.ibm.com with ESMTP id 3900w89a21-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Jun 2021 17:47:48 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 159Hlj4Z32309716
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 9 Jun 2021 17:47:45 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 19C62AE051;
+        Wed,  9 Jun 2021 17:47:45 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2E95EAE045;
+        Wed,  9 Jun 2021 17:47:44 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.13.5])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  9 Jun 2021 17:47:44 +0000 (GMT)
+Subject: Re: [PATCH v2 1/2] mm/vmalloc: export __vmalloc_node_range
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        cohuck@redhat.com, david@redhat.com, linux-mm@kvack.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Uladzislau Rezki <urezki@gmail.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        David Rientjes <rientjes@google.com>
+References: <20210608180618.477766-1-imbrenda@linux.ibm.com>
+ <20210608180618.477766-2-imbrenda@linux.ibm.com>
+ <YMDlVdB8m62AhbB7@infradead.org> <20210609182809.7ae07aad@ibm-vm>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <6bf6fb06-0930-8cae-3e2b-8cb3237a6197@de.ibm.com>
+Date:   Wed, 9 Jun 2021 19:47:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210602140416.23573-10-brijesh.singh@amd.com>
+In-Reply-To: <20210609182809.7ae07aad@ibm-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ZsdyWAcx_73hJwtXE9Sp0Mco4mrsan6t
+X-Proofpoint-GUID: qH6CxK9epqyjYop4gXKwm76Ys42u_HKD
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-06-09_04:2021-06-04,2021-06-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 lowpriorityscore=0 mlxlogscore=999 adultscore=0
+ clxscore=1011 bulkscore=0 phishscore=0 spamscore=0 suspectscore=0
+ malwarescore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106090087
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 02, 2021 at 09:04:03AM -0500, Brijesh Singh wrote:
-> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-> index 1424b8ffde0b..ae99a8a756fe 100644
-> --- a/arch/x86/include/asm/sev-common.h
-> +++ b/arch/x86/include/asm/sev-common.h
-> @@ -75,6 +75,17 @@
->  #define GHCB_MSR_PSC_ERROR_POS		32
->  #define GHCB_MSR_PSC_RESP_VAL(val)	((val) >> GHCB_MSR_PSC_ERROR_POS)
->  
-> +/* GHCB GPA Register */
-> +#define GHCB_MSR_GPA_REG_REQ		0x012
-> +#define GHCB_MSR_GPA_REG_VALUE_POS	12
-> +#define GHCB_MSR_GPA_REG_GFN_MASK	GENMASK_ULL(51, 0)
-> +#define GHCB_MSR_GPA_REQ_GFN_VAL(v)		\
-> +	(((unsigned long)((v) & GHCB_MSR_GPA_REG_GFN_MASK) << GHCB_MSR_GPA_REG_VALUE_POS)| \
-> +	GHCB_MSR_GPA_REG_REQ)
-> +
-> +#define GHCB_MSR_GPA_REG_RESP		0x013
-> +#define GHCB_MSR_GPA_REG_RESP_VAL(v)	((v) >> GHCB_MSR_GPA_REG_VALUE_POS)
-> +
+On 09.06.21 18:28, Claudio Imbrenda wrote:
+> On Wed, 9 Jun 2021 16:59:17 +0100
+> Christoph Hellwig <hch@infradead.org> wrote:
+> 
+>> On Tue, Jun 08, 2021 at 08:06:17PM +0200, Claudio Imbrenda wrote:
+>>> The recent patches to add support for hugepage vmalloc mappings
+>>> added a flag for __vmalloc_node_range to allow to request small
+>>> pages. This flag is not accessible when calling vmalloc, the only
+>>> option is to call directly __vmalloc_node_range, which is not
+>>> exported.
+>>>
+>>> This means that a module can't vmalloc memory with small pages.
+>>>
+>>> Case in point: KVM on s390x needs to vmalloc a large area, and it
+>>> needs to be mapped with small pages, because of a hardware
+>>> limitation.
+>>>
+>>> This patch exports __vmalloc_node_range so it can be used in modules
+>>> too.
+>>
+>> No.  I spent a lot of effort to mak sure such a low-level API is
+>> not exported.
+> 
+> ok, but then how can we vmalloc memory with small pages from KVM?
 
-Can we pls pay attention to having those REQuests sorted by their
-number, like in the GHCB spec, for faster finding?
+An alternative would be to provide a vmalloc_no_huge function in generic
+code  (similar to  vmalloc_32) (or if preferred in s390 base architecture code)
+Something like
 
--- 
-Regards/Gruss,
-    Boris.
+void *vmalloc_no_huge(unsigned long size)
+{
+         return __vmalloc_node_flags(size, NUMA_NO_NODE,VM_NO_HUGE_VMAP |
+                                 GFP_KERNEL | __GFP_ZERO);
+}
+EXPORT_SYMBOL(vmalloc_no_huge);
 
-https://people.kernel.org/tglx/notes-about-netiquette
+or a similar vzalloc variant.
