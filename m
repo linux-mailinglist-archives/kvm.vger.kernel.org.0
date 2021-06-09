@@ -2,50 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A6193A20F9
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 01:44:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CB633A20E3
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 01:43:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230317AbhFIXpv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 19:45:51 -0400
-Received: from mail-qv1-f73.google.com ([209.85.219.73]:56106 "EHLO
-        mail-qv1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230291AbhFIXpu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Jun 2021 19:45:50 -0400
-Received: by mail-qv1-f73.google.com with SMTP id c9-20020a0562140049b02902246fb9601eso5832235qvr.22
-        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 16:43:42 -0700 (PDT)
+        id S229865AbhFIXo7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 19:44:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48332 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229507AbhFIXo4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Jun 2021 19:44:56 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45FE8C061574
+        for <kvm@vger.kernel.org>; Wed,  9 Jun 2021 16:42:45 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id u7-20020a259b470000b02904dca50820c2so33538153ybo.11
+        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 16:42:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=cf+PBcjDUxGIj9/295s6zdiSNXtJ4G7lf26HTPdRo1w=;
-        b=mhkfykEavDETnLV1exgNtC8oTqdPqkz0tNNvjSdH5vzC1QNrtNBY7s5bz7cEGhE/0R
-         6ejGo7I0eok6GJpWXeyfQrrX7s2VViTJswmrGlo46hXOEahmQ7JstM8n2SSUQrGfoPvh
-         tM694Lwis3A/w/pc91jCupX6eX+LY3mdciUfXiYrozOQojBK1FU5pXpl0jp2RKqFU4LT
-         mlHR9Omqc5n1geG4Y0+2dhlLQqjS7hmfE11GsABUTKGYTDd7o8eul/qz54VnwRQczImb
-         Tzp0dylveVSaCrDxLQ4xJL7RiLnsfqCq3fwZf0IkwUFUe6ZehyoXtaF+P81f//aky7vw
-         jD2Q==
+        h=reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:to:cc;
+        bh=VEMIxquREMiHOnk/Jwp5zKxKYIE/fmUnZrtCHKTS9JE=;
+        b=cbLQOldlrEJpcz3ehwNa0GO97G4YQJTH0mM5y5ltEc8E+CH1uqML8Bj64K0EVu30JJ
+         lQin+4Y57CJR9RBI/i6RMN2srl3OySvH7RVzRiYUXSqYZJ7/2rUS7VBGCUFDX6eVOGGV
+         gorWsAPUaEBxLAmCAr0nMY/SJik9PG7v4ogEteRbF+T+iq3TpHt0ifU6AY2Hd+2QSAtr
+         wwmzNLmP+dWZqu/w6oaNsUN8maJbimA0pnE8qGCoDj6PUjz5CWqnR2UuqdRQqXhH+UWi
+         9Wzi29AG3Yrug992Nbg8VDpxOjSnIoR00AXzvMuZg4FabugdtEYLObZEeBtqjJbh5MmE
+         HGew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=cf+PBcjDUxGIj9/295s6zdiSNXtJ4G7lf26HTPdRo1w=;
-        b=F3T7vpXewEIA1O1Rgmw4J+vI3zX6CjHZlVmRUYJMFfUHt7NNLeBZYeimZ6AcxOJA2F
-         g5VTV02uauL7wmeTa5suFggMpFNasr9Tw2LYqtqSr772bN17hCv3AwfvpiTvSBedZTkc
-         crI4gi26c1MB7U1Pu//YnVOLREvkVtFFF5R9Wq2i3JGwxDmwmfQSBZaGlHQHF2yXGBq0
-         vJ0xfkSAFAKsUyQwygKYyy7dGZ85cpp/T5TgCS2NnFfXXK1kRU7Qn6W6ow1yiTwcmvWH
-         Zi5S2Dn8gstIvRItzwAQ1J8IIFyXcsV9gwGqAAT/EX6McaGBDT6kRxQaU4H75hQqC8d4
-         v7mg==
-X-Gm-Message-State: AOAM530sriYDjXLMCpn/0yTs757Wxxu4q4JFD4TPFAq7H/UGakDBILfA
-        ltgXeP7pUiXuUP63EyOuI0GmVdQm/rc=
-X-Google-Smtp-Source: ABdhPJzxktU7xI8kCHat1pp07oRXofxpQoacAe1AI2rYFxp4Kd55MFLRKm+bfhWImgiHJH0K4LEuOAoO2dQ=
+        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:to:cc;
+        bh=VEMIxquREMiHOnk/Jwp5zKxKYIE/fmUnZrtCHKTS9JE=;
+        b=N+A43LTnqGJHU8nQ0eoAeRyeGNHcxGsmXUHNgfJpjThoplLG8vBMgI694KZd6ZiJro
+         0bDkW+4czr6xNyZTQSUyAZzW4AZv0iuOSM5tga6z+0Xs6VU4LhKWwA5pD/jqkIs/4RwI
+         D0Y/xysJWQjaXCHAiE6Nk9eUEHVaFZx5JioSthTdNIkbfOwNNWmFxzVnFuxPcp37Ipfr
+         Fj49CKiURXjVdcIJeqYj6hKXR35k/EUhQsPfGCpg+AgiL9+dspACUl/NVfJQDWJfjuG3
+         st4QgpvJMDN6/Vv7wpD1GXKH76LRdQ4e5h66rKndswa+iqeIMkhV8ifcxtVTAisr6o4t
+         tUTQ==
+X-Gm-Message-State: AOAM530NL6Gi6RhXjmtSZIPDJsfz8C81aLz5bGVHcYqnlod6c1eVEk9k
+        PPQZiA5yUX6zS/ke7QdgT2wOhnR8fmc=
+X-Google-Smtp-Source: ABdhPJzQvihd2dKUwtYo1j9tsKMwkQ02mHyj3HmBM1skP2T35iB6n8uIriD5vHGZbWoTiEXqps95CbyFTp8=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:8daf:e5e:ae50:4f28])
- (user=seanjc job=sendgmr) by 2002:ad4:55ac:: with SMTP id f12mr2563463qvx.39.1623282162273;
- Wed, 09 Jun 2021 16:42:42 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:4fc4:: with SMTP id d187mr3417113ybb.245.1623282164446;
+ Wed, 09 Jun 2021 16:42:44 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  9 Jun 2021 16:42:20 -0700
-Message-Id: <20210609234235.1244004-1-seanjc@google.com>
+Date:   Wed,  9 Jun 2021 16:42:21 -0700
+In-Reply-To: <20210609234235.1244004-1-seanjc@google.com>
+Message-Id: <20210609234235.1244004-2-seanjc@google.com>
 Mime-Version: 1.0
+References: <20210609234235.1244004-1-seanjc@google.com>
 X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
-Subject: [PATCH 00/15] KVM: x86/mmu: TLB fixes and related cleanups
+Subject: [PATCH 01/15] KVM: nVMX: Sync all PGDs on nested transition with
+ shadow paging
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -61,78 +68,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fixes for two (very) theoretical TLB flushing bugs (patches 1 and 4),
-and clean ups on top to (hopefully) consolidate and simplifiy the TLB
-flushing logic.
+Trigger a full TLB flush on behalf of the guest on nested VM-Enter and
+VM-Exit when VPID is disabled for L2.  kvm_mmu_new_pgd() syncs only the
+current PGD, which can theoretically leave stale, unsync'd entries in a
+previous guest PGD, which could be consumed if L2 is allowed to load CR3
+with PCID_NOFLUSH=1.
 
-The basic gist of the TLB flush and MMU sync code shuffling  is to stop
-relying on the logic in __kvm_mmu_new_pgd() (but keep it for forced
-flushing), and instead handle the flush+sync logic in the caller
-independent from whether or not the "fast" switch occurs.
+Rename KVM_REQ_HV_TLB_FLUSH to KVM_REQ_TLB_FLUSH_GUEST so that it can
+be utilized for its obvious purpose of emulating a guest TLB flush.
 
-I spent a fair bit of time trying to shove the necessary logic down into
-__kvm_mmu_new_pgd(), but it always ended up a complete mess because the
-requirements and contextual information is always different.  The rules
-for MOV CR3 are different from nVMX transitions (and those vary based on
-EPT+VPID), and nSVM will be different still (once it adds proper TLB
-handling).  In particular, I like that nVMX no longer has special code
-for synchronizing the MMU when using shadowing paging and instead relies
-on the common rules for TLB flushing.
+Note, there is no change the actual TLB flush executed by KVM, even
+though the fast PGD switch uses KVM_REQ_TLB_FLUSH_CURRENT.  When VPID is
+disabled for L2, vpid02 is guaranteed to be '0', and thus
+nested_get_vpid02() will return the VPID that is shared by L1 and L2.
 
-Note, this series (indirectly) relies heavily on commit b53e84eed08b
-("KVM: x86: Unload MMU on guest TLB flush if TDP disabled to force MMU
-sync"), as it uses KVM_REQ_TLB_FLUSH_GUEST (was KVM_REQ_HV_TLB_FLUSH)
-to do the TLB flush _and_ the MMU sync in non-PV code.
+Generate the request outside of kvm_mmu_new_pgd(), as getting the common
+helper to correctly identify which requested is needed is quite painful.
+E.g. using KVM_REQ_TLB_FLUSH_GUEST when nested EPT is in play is wrong as
+a TLB flush from the L1 kernel's perspective does not invalidate EPT
+mappings.  And, by using KVM_REQ_TLB_FLUSH_GUEST, nVMX can do future
+simplification by moving the logic into nested_vmx_transition_tlb_flush().
 
-Tested all combinations for i386, EPT, NPT, and shadow paging. I think...
+Fixes: 41fab65e7c44 ("KVM: nVMX: Skip MMU sync on nested VMX transition when possible")
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/kvm_host.h |  2 +-
+ arch/x86/kvm/hyperv.c           |  2 +-
+ arch/x86/kvm/vmx/nested.c       | 17 ++++++++++++-----
+ arch/x86/kvm/x86.c              |  2 +-
+ 4 files changed, 15 insertions(+), 8 deletions(-)
 
-The EPTP switching and INVPCID single-context changes in particular lack
-meaningful coverage in kvm-unit-tests+Linux.  Long term it's on my todo
-list to remedy that, but realistically I doubt I'll get it done anytime
-soon.
-
-To test EPTP switching, I hacked L1 to set up a duplicate top-level EPT
-table, copy the "real" table to the duplicate table on EPT violation,
-populate VMFUNC.EPTP_LIST with the two EPTPs, expose  VMFUNC.EPTP_SWITCH
-to L2.  I then hacked L2 to do an EPTP switch to a random (valid) EPTP
-index on every task switch.
-
-To test INVPCID single-context I modified L1 to iterate over all possible
-PCIDs using INVPCID single-context in native_flush_tlb_global().  I also
-verified that the guest crashed if it didn't do any INVPCID at all
-(interestingly, the guest made it through boot without the flushes when
-EPT was enabled, which implies the missing MMU sync on INVPCID was the
-source of the crash, not a stale TLB entry).
-
-Sean Christopherson (15):
-  KVM: nVMX: Sync all PGDs on nested transition with shadow paging
-  KVM: nVMX: Ensure 64-bit shift when checking VMFUNC bitmap
-  KVM: nVMX: Don't clobber nested MMU's A/D status on EPTP switch
-  KVM: x86: Invalidate all PGDs for the current PCID on MOV CR3 w/ flush
-  KVM: x86: Uncondtionally skip MMU sync/TLB flush in MOV CR3's PGD
-    switch
-  KVM: nSVM: Move TLB flushing logic (or lack thereof) to dedicated
-    helper
-  KVM: x86: Drop skip MMU sync and TLB flush params from "new PGD"
-    helpers
-  KVM: nVMX: Consolidate VM-Enter/VM-Exit TLB flush and MMU sync logic
-  KVM: nVMX: Free only guest_mode (L2) roots on INVVPID w/o EPT
-  KVM: x86: Use KVM_REQ_TLB_FLUSH_GUEST to handle INVPCID(ALL) emulation
-  KVM: nVMX: Use fast PGD switch when emulating VMFUNC[EPTP_SWITCH]
-  KVM: x86: Defer MMU sync on PCID invalidation
-  KVM: x86: Drop pointless @reset_roots from kvm_init_mmu()
-  KVM: nVMX: WARN if subtly-impossible VMFUNC conditions occur
-  KVM: nVMX: Drop redundant checks on vmcs12 in EPTP switching emulation
-
- arch/x86/include/asm/kvm_host.h |   6 +-
- arch/x86/kvm/hyperv.c           |   2 +-
- arch/x86/kvm/mmu.h              |   2 +-
- arch/x86/kvm/mmu/mmu.c          |  57 ++++++++-----
- arch/x86/kvm/svm/nested.c       |  40 ++++++---
- arch/x86/kvm/vmx/nested.c       | 139 ++++++++++++--------------------
- arch/x86/kvm/x86.c              |  75 ++++++++++-------
- 7 files changed, 169 insertions(+), 152 deletions(-)
-
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 9c7ced0e3171..6652e51a86fd 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -85,7 +85,7 @@
+ #define KVM_REQ_APICV_UPDATE \
+ 	KVM_ARCH_REQ_FLAGS(25, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_TLB_FLUSH_CURRENT	KVM_ARCH_REQ(26)
+-#define KVM_REQ_HV_TLB_FLUSH \
++#define KVM_REQ_TLB_FLUSH_GUEST \
+ 	KVM_ARCH_REQ_FLAGS(27, KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_APF_READY		KVM_ARCH_REQ(28)
+ #define KVM_REQ_MSR_FILTER_CHANGED	KVM_ARCH_REQ(29)
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index f00830e5202f..fdd1eca717fd 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -1704,7 +1704,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, u64 ingpa, u16 rep_cnt, bool
+ 	 * vcpu->arch.cr3 may not be up-to-date for running vCPUs so we can't
+ 	 * analyze it here, flush TLB regardless of the specified address space.
+ 	 */
+-	kvm_make_vcpus_request_mask(kvm, KVM_REQ_HV_TLB_FLUSH,
++	kvm_make_vcpus_request_mask(kvm, KVM_REQ_TLB_FLUSH_GUEST,
+ 				    NULL, vcpu_mask, &hv_vcpu->tlb_flush);
+ 
+ ret_success:
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 6058a65a6ede..1c243758dd2c 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -1127,12 +1127,19 @@ static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3, bool ne
+ 
+ 	/*
+ 	 * Unconditionally skip the TLB flush on fast CR3 switch, all TLB
+-	 * flushes are handled by nested_vmx_transition_tlb_flush().  See
+-	 * nested_vmx_transition_mmu_sync for details on skipping the MMU sync.
++	 * flushes are handled by nested_vmx_transition_tlb_flush().
+ 	 */
+-	if (!nested_ept)
+-		kvm_mmu_new_pgd(vcpu, cr3, true,
+-				!nested_vmx_transition_mmu_sync(vcpu));
++	if (!nested_ept) {
++		kvm_mmu_new_pgd(vcpu, cr3, true, true);
++
++		/*
++		 * A TLB flush on VM-Enter/VM-Exit flushes all linear mappings
++		 * across all PCIDs, i.e. all PGDs need to be synchronized.
++		 * See nested_vmx_transition_mmu_sync() for more details.
++		 */
++		if (nested_vmx_transition_mmu_sync(vcpu))
++			kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
++	}
+ 
+ 	vcpu->arch.cr3 = cr3;
+ 	kvm_register_mark_available(vcpu, VCPU_EXREG_CR3);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 9dd23bdfc6cc..905de6854efa 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9167,7 +9167,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 		}
+ 		if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
+ 			kvm_vcpu_flush_tlb_current(vcpu);
+-		if (kvm_check_request(KVM_REQ_HV_TLB_FLUSH, vcpu))
++		if (kvm_check_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu))
+ 			kvm_vcpu_flush_tlb_guest(vcpu);
+ 
+ 		if (kvm_check_request(KVM_REQ_REPORT_TPR_ACCESS, vcpu)) {
 -- 
 2.32.0.rc1.229.g3e70b5a671-goog
 
