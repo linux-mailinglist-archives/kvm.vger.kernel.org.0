@@ -2,170 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D58743A1ADE
-	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 18:27:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C18F93A1AE7
+	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 18:28:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233695AbhFIQ3Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 12:29:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38440 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233160AbhFIQ3Y (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 9 Jun 2021 12:29:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623256047;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=SZmKOdk4Od3jn4SVquGsGKOyAGFLzN67LcgeiA2x0Kc=;
-        b=FZRYYkrvtGyOy487abI61TT9J+0cV2t3c7ARwP7QrLx01opaQrh1ix64ucF+6nwdP/ab9e
-        Dq1fjjmGfzc6dUO6mwPTXCbdd3MBmdNJ0mnppmw28bJ1jLpJJoltsetpHyUMLrQPJYt2vH
-        R9HXj5EErhyp13pVn0zxbGv0SR4bb44=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-105-VkJdi1a1M-6NLFuTkHsv9Q-1; Wed, 09 Jun 2021 12:27:25 -0400
-X-MC-Unique: VkJdi1a1M-6NLFuTkHsv9Q-1
-Received: by mail-oi1-f199.google.com with SMTP id w12-20020aca490c0000b02901f1fdc1435aso7241828oia.14
-        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 09:27:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=SZmKOdk4Od3jn4SVquGsGKOyAGFLzN67LcgeiA2x0Kc=;
-        b=XAUMsuz5Xlz2wDQY7fnjAY4p94qoib/mLzkuWD8r23Y3pSiV86Ug7ClzPXDt8B0vTu
-         TXd7ptLQts03z/s4M9ZdGajj0s5HU8eJiM+0aTtslN9LjI7LiszqYNIVikGh4zk8t05N
-         U7mZUwsBa1nK3aVlu/sEVFUNf6lAeq+tgf/xbKDNZOBCceahkiU7XQSRyT/vGqTvZDbA
-         tX5k2zuSkLiYLDkodgdIGPVejcusdro989xooWmZmVNpJZy7B40ugh8zBe4Kjor7ELYi
-         csuNDRUW2hXuOSSqsq9jZ2Tw4FfScutIE0b4uznYhTGBVmlHJWJnX0ivKod9A7WuT5aQ
-         DkPA==
-X-Gm-Message-State: AOAM530tgjSPZlev5QhnbMGkHTp0wWrfLPBairfKSpVLr1pXnBReQoC6
-        +lMgAiIsTa8Rh1SN8aey44OsMm0ak81THqaODtFERlzTFS/nXtdBzd3JpcqR2QKR6otrPg/1MCJ
-        105HZ1+53kuDW
-X-Received: by 2002:a9d:644f:: with SMTP id m15mr203685otl.99.1623256045149;
-        Wed, 09 Jun 2021 09:27:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyls9CRqHQRN2lz1JTkQRoKdFKA3gQz+ygXAEoLRrKCCHElCQ12ZF10acta6h10L5/i170uqg==
-X-Received: by 2002:a9d:644f:: with SMTP id m15mr203657otl.99.1623256044914;
-        Wed, 09 Jun 2021 09:27:24 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id s28sm58975oij.12.2021.06.09.09.27.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Jun 2021 09:27:24 -0700 (PDT)
-Date:   Wed, 9 Jun 2021 10:27:22 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Jason Wang <jasowang@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shenming Lu <lushenming@huawei.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>
-Subject: Re: Plan for /dev/ioasid RFC v2
-Message-ID: <20210609102722.5abf62e1.alex.williamson@redhat.com>
-In-Reply-To: <20210609101532.452851eb.alex.williamson@redhat.com>
-References: <MWHPR11MB188699D0B9C10EB51686C4138C389@MWHPR11MB1886.namprd11.prod.outlook.com>
-        <YMCy48Xnt/aphfh3@8bytes.org>
-        <20210609123919.GA1002214@nvidia.com>
-        <YMDC8tOMvw4FtSek@8bytes.org>
-        <20210609150009.GE1002214@nvidia.com>
-        <YMDjfmJKUDSrbZbo@8bytes.org>
-        <20210609101532.452851eb.alex.williamson@redhat.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S233417AbhFIQap (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 12:30:45 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:19456 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S232474AbhFIQao (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Jun 2021 12:30:44 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 159G4B9s046522;
+        Wed, 9 Jun 2021 12:28:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=WnAx0fQzqs+a/N+N8UuC7PQXx5fIqDRSZaznkAB0PzM=;
+ b=S9mJ8mi8dhsF1tXg9hoT3miyLaieTfVe9+sWU1zvQ3i/Z5AUu/kG6uRJM8QNn4fO+v1t
+ 8WEl1vPJGv2Un/OrpY2OriIxPIe3M/z9eeEAj2cEjpqQdoqJEkJGnp29r35Y5aVoCRSo
+ TUdj+SGyInqoT8hjeMeZs779ZOjlxHH1uYF3IQfd1uM57eRDS11PCA/GcUmxvdX4VjxX
+ gB8bG8PF3m001lv0XY+I8S/b9Iceh5EpXKUKiPFUK4/0i5uObBqY9vQ3vLFZuCxY6Hn+
+ 3nvvQzXcVC+0yVvi+DTf4nDrXSkhrzyRaITDB+9F4cWfIFpbSrXT6gM/SGMFi1mo3cKH lg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 392y3amqu8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Jun 2021 12:28:17 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 159G4GDk047015;
+        Wed, 9 Jun 2021 12:28:16 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 392y3amqt5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Jun 2021 12:28:16 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 159GSEYX027110;
+        Wed, 9 Jun 2021 16:28:14 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 3900hhta66-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Jun 2021 16:28:14 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 159GSBw915335822
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 9 Jun 2021 16:28:11 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8E0BFA405F;
+        Wed,  9 Jun 2021 16:28:11 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E091EA4067;
+        Wed,  9 Jun 2021 16:28:10 +0000 (GMT)
+Received: from ibm-vm (unknown [9.145.5.240])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  9 Jun 2021 16:28:10 +0000 (GMT)
+Date:   Wed, 9 Jun 2021 18:28:09 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com,
+        linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Uladzislau Rezki <urezki@gmail.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        David Rientjes <rientjes@google.com>
+Subject: Re: [PATCH v2 1/2] mm/vmalloc: export __vmalloc_node_range
+Message-ID: <20210609182809.7ae07aad@ibm-vm>
+In-Reply-To: <YMDlVdB8m62AhbB7@infradead.org>
+References: <20210608180618.477766-1-imbrenda@linux.ibm.com>
+        <20210608180618.477766-2-imbrenda@linux.ibm.com>
+        <YMDlVdB8m62AhbB7@infradead.org>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 4dArTF9SgWQ2jROyRmRWPKChc48Cpmr7
+X-Proofpoint-GUID: cxkj1UJfSeHbYCvHTev4n6QkkZuxq53h
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-06-09_04:2021-06-04,2021-06-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
+ adultscore=0 bulkscore=0 priorityscore=1501 impostorscore=0
+ mlxlogscore=999 lowpriorityscore=0 malwarescore=0 clxscore=1015
+ suspectscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106090078
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 9 Jun 2021 10:15:32 -0600
-Alex Williamson <alex.williamson@redhat.com> wrote:
+On Wed, 9 Jun 2021 16:59:17 +0100
+Christoph Hellwig <hch@infradead.org> wrote:
 
-> On Wed, 9 Jun 2021 17:51:26 +0200
-> Joerg Roedel <joro@8bytes.org> wrote:
+> On Tue, Jun 08, 2021 at 08:06:17PM +0200, Claudio Imbrenda wrote:
+> > The recent patches to add support for hugepage vmalloc mappings
+> > added a flag for __vmalloc_node_range to allow to request small
+> > pages. This flag is not accessible when calling vmalloc, the only
+> > option is to call directly __vmalloc_node_range, which is not
+> > exported.
+> > 
+> > This means that a module can't vmalloc memory with small pages.
+> > 
+> > Case in point: KVM on s390x needs to vmalloc a large area, and it
+> > needs to be mapped with small pages, because of a hardware
+> > limitation.
+> > 
+> > This patch exports __vmalloc_node_range so it can be used in modules
+> > too.  
 > 
-> > On Wed, Jun 09, 2021 at 12:00:09PM -0300, Jason Gunthorpe wrote:  
-> > > Only *drivers* know what the actual device is going to do, devices do
-> > > not. Since the group doesn't have drivers it is the wrong layer to be
-> > > making choices about how to configure the IOMMU.    
-> > 
-> > Groups don't carry how to configure IOMMUs, that information is
-> > mostly in the IOMMU domains. And those (or an abstraction of them) is
-> > configured through /dev/ioasid. So not sure what you wanted to say with
-> > the above.
-> > 
-> > All a group carries is information about which devices are not
-> > sufficiently isolated from each other and thus need to always be in the
-> > same domain.
-> >   
-> > > The device centric approach is my attempt at this, and it is pretty
-> > > clean, I think.    
-> > 
-> > Clean, but still insecure.
-> >   
-> > > All ACS does is prevent P2P operations, if you assign all the group
-> > > devices into the same /dev/iommu then you may not care about that
-> > > security isolation property. At the very least it is policy for user
-> > > to decide, not kernel.    
-> > 
-> > It is a kernel decision, because a fundamental task of the kernel is to
-> > ensure isolation between user-space tasks as good as it can. And if a
-> > device assigned to one task can interfer with a device of another task
-> > (e.g. by sending P2P messages), then the promise of isolation is broken.  
-> 
-> AIUI, the IOASID model will still enforce IOMMU groups, but it's not an
-> explicit part of the interface like it is for vfio.  For example the
-> IOASID model allows attaching individual devices such that we have
-> granularity to create per device IOASIDs, but all devices within an
-> IOMMU group are required to be attached to an IOASID before they can be
-> used.  It's not entirely clear to me yet how that last bit gets
-> implemented though, ie. what barrier is in place to prevent device
-> usage prior to reaching this viable state.
-> 
-> > > Groups should be primarily about isolation security, not about IOASID
-> > > matching.    
-> > 
-> > That doesn't make any sense, what do you mean by 'IOASID matching'?  
-> 
-> One of the problems with the vfio interface use of groups is that we
-> conflate the IOMMU group for both isolation and granularity.  I think
-> what Jason is referring to here is that we still want groups to be the
-> basis of isolation, but we don't want a uAPI that presumes all devices
-> within the group must use the same IOASID.  For example, if a user owns
-> an IOMMU group consisting of non-isolated functions of a multi-function
-> device, they should be able to create a vIOMMU VM where each of those
-> functions has its own address space.  That can't be done today, the
-> entire group would need to be attached to the VM under a PCIe-to-PCI
-> bridge to reflect the address space limitation imposed by the vfio
-> group uAPI model.  Thanks,
+> No.  I spent a lot of effort to mak sure such a low-level API is
+> not exported.
 
-Hmm, likely discussed previously in these threads, but I can't come up
-with the argument that prevents us from making the BIND interface
-at the group level but the ATTACH interface at the device level?  For
-example:
-
- - VFIO_GROUP_BIND_IOASID_FD
- - VFIO_DEVICE_ATTACH_IOASID
-
-AFAICT that makes the group ownership more explicit but still allows
-the device level IOASID granularity.  Logically this is just an
-internal iommu_group_for_each_dev() in the BIND ioctl.  Thanks,
-
-Alex
-
+ok, but then how can we vmalloc memory with small pages from KVM?
