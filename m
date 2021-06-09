@@ -2,144 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E645E3A1CDC
-	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 20:37:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BCAF3A1CDF
+	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 20:39:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229472AbhFISjh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 14:39:37 -0400
-Received: from foss.arm.com ([217.140.110.172]:39818 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229705AbhFISjf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Jun 2021 14:39:35 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7AC9D106F;
-        Wed,  9 Jun 2021 11:37:40 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4A7F23F719;
-        Wed,  9 Jun 2021 11:37:38 -0700 (PDT)
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org
-Cc:     andre.przywara@arm.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com, maz@kernel.org
-Subject: [PATCH kvmtool 4/4] arm/arm64: vfio: Add PCI Express Capability Structure
-Date:   Wed,  9 Jun 2021 19:38:12 +0100
-Message-Id: <20210609183812.29596-5-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20210609183812.29596-1-alexandru.elisei@arm.com>
-References: <20210609183812.29596-1-alexandru.elisei@arm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S229773AbhFISlm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 14:41:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38002 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229504AbhFISll (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Jun 2021 14:41:41 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9E8AC061574
+        for <kvm@vger.kernel.org>; Wed,  9 Jun 2021 11:39:46 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id t9so20303553pgn.4
+        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 11:39:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=dyisCbJs5UMiev0t7mRkkDpb8xBSDaqx6kusLdKkM7g=;
+        b=Q9tv3eigee2r4gtIZWDaDmPO+gvJSjVMa0F5/MKY8bvyQcTYpjUn7JFROI9xO14Tnp
+         V57oi4j1tsScLOR+RFCLFyVmpTae/zXG4yO2zjc+haoN6f+LUgrg1WdFfJeWkYgmQ10A
+         rikm37cqaLq++c5v+7SavzGgytVGpDP4WHZc8KcNCnTSLRpM8hO4/YI/GzY7jOgUMfYp
+         pAYSqq4wOj47ceQ/0ZfRDZHQkg4p1wugiFELL98qJD5z11XLmqfmydrjSNVngr9PMSpG
+         wljMxR9XeUyrPZdOutB/cgBrA2DlN7+nIEJGXuUglThRnJpGpKKTyPecl2zvOEkg64IR
+         ogqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=dyisCbJs5UMiev0t7mRkkDpb8xBSDaqx6kusLdKkM7g=;
+        b=kVgsl+PGUt/6ZecFoaBMEaFwTvL+Xj1ZyvzPDkmAKpQNpPSUSMGQE2k90eMiUrQJqU
+         tG0bLmqgH+IqrifzRZ5iY1jY51p12ANgfEgY+Hk+K1fR4xtP5VLz8zEz7WvFHt+95v/G
+         /Fud0Tx6L8S/YwfXtBOzkVd9kydpUO1OHYGHsnBICcyJJFBEabmUUpjPHkuT5kC8laFl
+         KogRnoD/zjzstpL49CixXwqXJk8HoTR1dzSG6Ql+C+zKgkulMuzMx5qNSXzPPJiVV6De
+         WGoAwN6Dm1Z0moWHNOYiaxx6g7f5cI34LSzC8hkCCFavR6ihtf3GQe72FFlSvHcbBKDC
+         QoEQ==
+X-Gm-Message-State: AOAM530SBOUQ69m0Yqh+27hVfQC7wbD9G4EUr0YzFU0IqxNfPjC5F4eK
+        FFEIlrLO5YpKNvcVMtsHt1nSo2vKUuYJVQ==
+X-Google-Smtp-Source: ABdhPJxk+EkT+3z4ZwJMZOIFpb3sTUbFHYcQVScHlA4MbIjUeyTA/mY6e9zqYs1VnpXWlnvP7fgLXA==
+X-Received: by 2002:a65:584d:: with SMTP id s13mr1034077pgr.77.1623263986278;
+        Wed, 09 Jun 2021 11:39:46 -0700 (PDT)
+Received: from smtpclient.apple (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
+        by smtp.gmail.com with ESMTPSA id z7sm449010pgr.28.2021.06.09.11.39.45
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 09 Jun 2021 11:39:45 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
+Subject: Re: [kvm-unit-tests PATCH 4/8] x86/hypercall: enable the test on
+ non-KVM environment
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <CALMp9eReO7-L0hcMuMs8N6Aeb+JrfOcsNck95cc40f1Bj1Nvkg@mail.gmail.com>
+Date:   Wed, 9 Jun 2021 11:39:44 -0700
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm list <kvm@vger.kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <DC124CA3-FF2E-416E-A0F3-993CDF1AA3F5@gmail.com>
+References: <20210609182945.36849-1-nadav.amit@gmail.com>
+ <20210609182945.36849-5-nadav.amit@gmail.com>
+ <CALMp9eReO7-L0hcMuMs8N6Aeb+JrfOcsNck95cc40f1Bj1Nvkg@mail.gmail.com>
+To:     Jim Mattson <jmattson@google.com>
+X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It turns out that some Linux drivers (like Realtek R8169) fall back to a
-device-specific configuration method if the device is not PCI Express
-capable:
 
-[    1.433825] r8169 0000:00:00.0 enp0s0: No native access to PCI extended config space, falling back to CSI
 
-Add the PCI Express Capability Structure and populate it for assigned
-devices, as this is how the Linux PCI driver determines if a device is PCI
-Express capable.
+> On Jun 9, 2021, at 11:37 AM, Jim Mattson <jmattson@google.com> wrote:
+>=20
+> On Wed, Jun 9, 2021 at 11:32 AM Nadav Amit <nadav.amit@gmail.com> =
+wrote:
+>>=20
+>> From: Nadav Amit <nadav.amit@gmail.com>
+>>=20
+>> KVM knows to emulate both vmcall and vmmcall regardless of the
+>> actual architecture. Native hardware does not behave this way. Based =
+on
+>> the availability of test-device, figure out that the test is run on
+>> non-KVM environment, and if so, run vmcall/vmmcall based on the =
+actual
+>> architecture.
+>>=20
+>> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+>> ---
+>> lib/x86/processor.h |  8 ++++++++
+>> x86/hypercall.c     | 31 +++++++++++++++++++++++--------
+>> 2 files changed, 31 insertions(+), 8 deletions(-)
+>>=20
+>> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+>> index abc04b0..517ee70 100644
+>> --- a/lib/x86/processor.h
+>> +++ b/lib/x86/processor.h
+>> @@ -118,6 +118,14 @@ static inline u8 cpuid_maxphyaddr(void)
+>>     return raw_cpuid(0x80000008, 0).a & 0xff;
+>> }
+>>=20
+>> +static inline bool is_intel(void)
+>> +{
+>> +       struct cpuid c =3D cpuid(0);
+>> +       u32 name[4] =3D {c.b, c.d, c.c };
+>> +
+>> +       return strcmp((char *)name, "GenuineIntel") =3D=3D 0;
+>> +}
+>> +
+> Don't VIA CPUs also require vmcall, since they implement VMX rather =
+than SVM?
 
-Because we don't emulate a PCI Express link, a root complex or any slot
-related properties, the PCI Express capability is kept as small as possible
-by ignoring those fields.
-
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- include/kvm/pci.h | 24 ++++++++++++++++++++++++
- vfio/pci.c        | 13 +++++++++++++
- 2 files changed, 37 insertions(+)
-
-diff --git a/include/kvm/pci.h b/include/kvm/pci.h
-index 42d9e1c5645f..0f2d5bbabdc3 100644
---- a/include/kvm/pci.h
-+++ b/include/kvm/pci.h
-@@ -46,6 +46,8 @@ struct kvm;
- #define PCI_DEV_CFG_SIZE_EXTENDED 	4096
- 
- #ifdef ARCH_HAS_PCI_EXP
-+#define arch_has_pci_exp()	(true)
-+
- #define PCI_CFG_SIZE		PCI_CFG_SIZE_EXTENDED
- #define PCI_DEV_CFG_SIZE	PCI_DEV_CFG_SIZE_EXTENDED
- 
-@@ -73,6 +75,8 @@ union pci_config_address {
- };
- 
- #else
-+#define arch_has_pci_exp()	(false)
-+
- #define PCI_CFG_SIZE		PCI_CFG_SIZE_LEGACY
- #define PCI_DEV_CFG_SIZE	PCI_DEV_CFG_SIZE_LEGACY
- 
-@@ -143,6 +147,24 @@ struct pci_cap_hdr {
- 	u8	next;
- };
- 
-+struct pci_exp_cap {
-+	u8 cap;
-+	u8 next;
-+	u16 cap_reg;
-+	u32 dev_cap;
-+	u16 dev_ctrl;
-+	u16 dev_status;
-+	u32 link_cap;
-+	u16 link_ctrl;
-+	u16 link_status;
-+	u32 slot_cap;
-+	u16 slot_ctrl;
-+	u16 slot_status;
-+	u16 root_ctrl;
-+	u16 root_cap;
-+	u32 root_status;
-+};
-+
- struct pci_device_header;
- 
- typedef int (*bar_activate_fn_t)(struct kvm *kvm,
-@@ -188,6 +210,8 @@ struct pci_device_header {
- 			u8		min_gnt;
- 			u8		max_lat;
- 			struct msix_cap msix;
-+			/* Used only by architectures which support PCIE */
-+			struct pci_exp_cap pci_exp;
- 		} __attribute__((packed));
- 		/* Pad to PCI config space size */
- 		u8	__pad[PCI_DEV_CFG_SIZE];
-diff --git a/vfio/pci.c b/vfio/pci.c
-index 6a4204634e71..5c9bec6db710 100644
---- a/vfio/pci.c
-+++ b/vfio/pci.c
-@@ -623,6 +623,12 @@ static ssize_t vfio_pci_cap_size(struct pci_cap_hdr *cap_hdr)
- 		return PCI_CAP_MSIX_SIZEOF;
- 	case PCI_CAP_ID_MSI:
- 		return vfio_pci_msi_cap_size((void *)cap_hdr);
-+	case PCI_CAP_ID_EXP:
-+		/*
-+		 * We don't emulate any of the link, slot and root complex
-+		 * properties, so ignore them.
-+		 */
-+		return PCI_CAP_EXP_RC_ENDPOINT_SIZEOF_V1;
- 	default:
- 		pr_err("unknown PCI capability 0x%x", cap_hdr->type);
- 		return 0;
-@@ -696,6 +702,13 @@ static int vfio_pci_parse_caps(struct vfio_device *vdev)
- 			pdev->msi.pos = pos;
- 			pdev->irq_modes |= VFIO_PCI_IRQ_MODE_MSI;
- 			break;
-+		case PCI_CAP_ID_EXP:
-+			if (!arch_has_pci_exp())
-+				continue;
-+			ret = vfio_pci_add_cap(vdev, virt_hdr, cap, pos);
-+			if (ret)
-+				return ret;
-+			break;
- 		}
- 	}
- 
--- 
-2.32.0
+I would add VIA for the sake of correctness, although I presume it does =
+not really matter in real-life.
 
