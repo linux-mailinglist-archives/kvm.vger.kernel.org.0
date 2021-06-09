@@ -2,175 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AA80D3A10EC
-	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 12:49:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8CC13A10FB
+	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 12:49:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236657AbhFIKQt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 06:16:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39206 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232972AbhFIKQs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 9 Jun 2021 06:16:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623233694;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UGhpFhVlOYIC5kowMMVAYHo7k0EKPg3F6ebOQuwUO2Q=;
-        b=Hr7h2vMJP5MFiqu8dsvSwpBzdSIUviOr/30iuUvRzBPNfToCP+OgqBE9lEbuY1NbvqtVCp
-        lTRfDIf+CJxl0c0CbgEXmREhxnlp93ptDgVnaisTczuQGA2H3dKsZkBvgrP4axb/yhHJui
-        xWLNo5EvRhsYKgTC8JyfCaQ3gcZkOK0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-582-0LSBqE8RPPiw94B434Zybw-1; Wed, 09 Jun 2021 06:14:52 -0400
-X-MC-Unique: 0LSBqE8RPPiw94B434Zybw-1
-Received: by mail-wr1-f69.google.com with SMTP id e11-20020a056000178bb0290119c11bd29eso5693558wrg.2
-        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 03:14:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:subject:to:cc:references:from
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-transfer-encoding:content-language;
-        bh=UGhpFhVlOYIC5kowMMVAYHo7k0EKPg3F6ebOQuwUO2Q=;
-        b=tyaC3JAK8RSHI3yqoTmOmuPxrB6SdW5VlGW1mH1iVEtDo3yG5RmXR2v9wjTsiYDAHG
-         ypNLPcx8Lytg53O50cwFatBB+tcHYCQH/tVhAxP3V54UMjgJT15PYLHWua8f5hh4Nksm
-         /jOcqz/anGkINlP8d9Mp57T+XTOHsy/nY5QOU6Z6nuURAQBwdzHNREPxwGjQO9KFhyJc
-         ni+dVujaHvb1P2/vboFs5xHzWbi1OIxahEsSQDj4qMzpkTf1VRh1LVcvnpuh1/4uaLPg
-         iBWogdAhJslw/feuiYOLqgQwzgRKIbkKjCZy1pr02nZhDFl1cjHHUhqmfH7xv3E+NJHn
-         LzVA==
-X-Gm-Message-State: AOAM530tF6ZwFQw+pIsGg5jHMc2ZMJ5j+x/YrAJO65odyEnJSb09zo3u
-        pP5GjrS0h5aQuL/YMIU7KfKAyv5cQE0bW6ztX9eTWvgPva2QmWPWFdx3+R7X+RBvr3Or49ffuqG
-        qVNGsXdZMRtFp
-X-Received: by 2002:a05:600c:1d1b:: with SMTP id l27mr15988808wms.62.1623233691356;
-        Wed, 09 Jun 2021 03:14:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwPzb12xOqzJBjs300yp5Am4sprlPGLIaJs+P2xzrS5KjO/tgbq9Rys/XuEfnxApGxtTlyRzQ==
-X-Received: by 2002:a05:600c:1d1b:: with SMTP id l27mr15988778wms.62.1623233691155;
-        Wed, 09 Jun 2021 03:14:51 -0700 (PDT)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id r3sm4058615wmq.8.2021.06.09.03.14.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Jun 2021 03:14:50 -0700 (PDT)
-Reply-To: eric.auger@redhat.com
-Subject: Re: Plan for /dev/ioasid RFC v2
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        "Alex Williamson (alex.williamson@redhat.com)" 
-        <alex.williamson@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Jason Wang <jasowang@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
+        id S236050AbhFIKZc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 06:25:32 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37356 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234964AbhFIKZb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Jun 2021 06:25:31 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id ABF1F611BD;
+        Wed,  9 Jun 2021 10:23:37 +0000 (UTC)
+Received: from 82-132-234-177.dab.02.net ([82.132.234.177] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1lqvN1-006SFR-K6; Wed, 09 Jun 2021 11:23:35 +0100
+Date:   Wed, 09 Jun 2021 11:23:34 +0100
+Message-ID: <877dj3z68p.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Shenming Lu <lushenming@huawei.com>
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>
-References: <MWHPR11MB188699D0B9C10EB51686C4138C389@MWHPR11MB1886.namprd11.prod.outlook.com>
- <b1bb72b5-cb98-7739-8788-01e36ec415a8@redhat.com>
- <MWHPR11MB1886FEFB5C8358EB65DBEA1A8C369@MWHPR11MB1886.namprd11.prod.outlook.com>
-From:   Eric Auger <eric.auger@redhat.com>
-Message-ID: <8a3f2bc6-79b7-5dfb-492a-21c0af7b9c2c@redhat.com>
-Date:   Wed, 9 Jun 2021 12:14:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
-MIME-Version: 1.0
-In-Reply-To: <MWHPR11MB1886FEFB5C8358EB65DBEA1A8C369@MWHPR11MB1886.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH 02/10] KVM: arm64: Implement initial support for KVM_CAP_SYSTEM_COUNTER_STATE
+In-Reply-To: <20210608214742.1897483-3-oupton@google.com>
+References: <20210608214742.1897483-1-oupton@google.com>
+        <20210608214742.1897483-3-oupton@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.234.177
+X-SA-Exim-Rcpt-To: oupton@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, seanjc@google.com, pshier@google.com, jmattson@google.com, dmatlack@google.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, Alexandru.Elisei@arm.com, james.morse@arm.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Kevin,
+Hi Oliver,
 
-On 6/9/21 11:37 AM, Tian, Kevin wrote:
->> From: Eric Auger <eric.auger@redhat.com>
->> Sent: Wednesday, June 9, 2021 4:15 PM
->>
->> Hi Kevin,
->>
->> On 6/7/21 4:58 AM, Tian, Kevin wrote:
->>> Hi, all,
->>>
->>> We plan to work on v2 now, given many good comments already received
->>> and substantial changes envisioned. This is a very complex topic with
->>> many sub-threads being discussed. To ensure that I didn't miss valuable
->>> suggestions (and also keep everyone on the same page), here I'd like to
->>> provide a list of planned changes in my mind. Please let me know if
->>> anything important is lost.  :)
->>>
->>> --
->>>
->>> (Remaining opens in v1)
->>>
->>> -   Protocol between kvm/vfio/ioasid for wbinvd/no-snoop. I'll see how
->>>     much can be refined based on discussion progress when v2 is out;
->>>
->>> -   Device-centric (Jason) vs. group-centric (David) uAPI. David is not fully
->>>     convinced yet. Based on discussion v2 will continue to have ioasid uAPI
->>>     being device-centric (but it's fine for vfio to be group-centric). A new
->>>     section will be added to elaborate this part;
->>>
->>> -   PASID virtualization (section 4) has not been thoroughly discussed yet.
->>>     Jason gave some suggestion on how to categorize intended usages.
->>>     I will rephrase this section and hope more discussions can be held for
->>>     it in v2;
->>>
->>> (Adopted suggestions)
->>>
->>> -   (Jason) Rename /dev/ioasid to /dev/iommu (so does uAPI e.g. IOASID
->>>     _XXX to IOMMU_XXX). One suggestion (Jason) was to also rename
->>>     RID+PASID to SID+SSID. But given the familiarity of the former, I will
->>>     still use RID+PASID in v2 to ease the discussoin;
->>>
->>> -   (Jason) v1 prevents one device from binding to multiple ioasid_fd's. This
->>>     will be fixed in v2;
->>>
->>> -   (Jean/Jason) No need to track guest I/O page tables on ARM/AMD.
->> When
->>>     a pasid table is bound, it becomes a container for all guest I/O page
->> tables;
->> while I am totally in line with that change, I guess we need to revisit
->> the invalidate ioctl
->> to support PASID table invalidation.
-> Yes, this is planned when doing this change.
-OK
+Please Cc the KVM/arm64 reviewers (now added). Also, please consider
+subscribing to the kvmarm mailing list so that I don't have to
+manually approve your posts ;-).
+
+On Tue, 08 Jun 2021 22:47:34 +0100,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> ARMv8 provides for a virtual counter-timer offset that is added to guest
+> views of the virtual counter-timer (CNTVOFF_EL2). To date, KVM has not
+> provided userspace with any perception of this, and instead affords a
+> value-based scheme of migrating the virtual counter-timer by directly
+> reading/writing the guest's CNTVCT_EL0. This is problematic because
+> counters continue to elapse while the register is being written, meaning
+> it is possible for drift to sneak in to the guest's time scale. This is
+> exacerbated by the fact that KVM will calculate an appropriate
+> CNTVOFF_EL2 every time the register is written, which will be broadcast
+> to all virtual CPUs. The only possible way to avoid causing guest time
+> to drift is to restore counter-timers by offset.
+
+Well, the current method has one huge advantage: time can never go
+backward from the guest PoV if you restore what you have saved. Yes,
+time can elapse, but you don't even need to migrate to observe that.
+
 >
->>> -   (Jean/Jason) Accordingly a device label is required so iotlb invalidation
->>>     and fault handling can both support per-device operation. Per Jean's
->>>     suggestion, this label will come from userspace (when VFIO_BIND_
->>>     IOASID_FD);
->> what is not totally clear to me is the correspondance between this label
->> and the SID/SSID tuple.
->> My understanding is it rather maps to the SID because you can attach
->> several ioasids to the device.
->> So it is not clear to me how you reconstruct the SSID info
->>
-> Yes, device handle maps to SID. The fault data reported to userspace
-> will include {device_label, ioasid, vendor_fault_data}. In your case
-> I believe SSID will be included in vendor_fault_data thus no reconstruct
-> required. For Intel the user could figure out vPASID according to device_
-> label and ioasid, i.e. no need to include PASID info in vendor_fault_data.
-OK that works.
+> Implement initial support for KVM_{GET,SET}_SYSTEM_COUNTER_STATE ioctls
+> to migrate the value of CNTVOFF_EL2. These ioctls yield precise control
+> of the virtual counter-timers to userspace, allowing it to define its
+> own heuristics for managing vCPU offsets.
 
-Thanks
+I'm not really in favour of inventing a completely new API, for
+multiple reasons:
 
-Eric
->
-> Thanks
-> Kevin
+- CNTVOFF is an EL2 concept. I'd rather not expose it as such as it
+  becomes really confusing with NV (which does expose its own CNTVOFF
+  via the ONE_REG interface)
 
+- You seem to allow each vcpu to get its own offset. I don't think
+  that's right. The architecture defines that all PEs have the same
+  view of the counters, and an EL1 guest should be given that
+  illusion.
+
+- by having a parallel save/restore interface, you make it harder to
+  reason about what happens with concurrent calls to both interfaces
+
+- the userspace API is already horribly bloated, and I'm not overly
+  keen on adding more if we can avoid it.
+
+I'd rather you extend the current ONE_REG interface and make it modal,
+either allowing the restore of an absolute value or an offset for
+CNTVCT_EL0. This would also keep a consistent behaviour when restoring
+vcpus. The same logic would apply to the physical offset.
+
+As for how to make it modal, we have plenty of bits left in the
+ONE_REG encoding. Pick one, and make that a "relative" attribute. This
+will result in some minor surgery in the get/set code paths, but at
+least no entirely new mechanism.
+
+One question though: how do you plan to reliably compute the offset?
+As far as I can see, it is subject to the same issues you described
+above (while the guest is being restored, time flies), and you have
+the added risk of exposing a counter going backward from a guest
+perspective.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
