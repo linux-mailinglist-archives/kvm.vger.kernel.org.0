@@ -2,53 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D564E3A2100
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 01:45:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EEF373A20F3
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 01:43:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230409AbhFIXqP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 19:46:15 -0400
-Received: from mail-yb1-f202.google.com ([209.85.219.202]:41720 "EHLO
-        mail-yb1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230017AbhFIXqI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Jun 2021 19:46:08 -0400
-Received: by mail-yb1-f202.google.com with SMTP id j7-20020a258b870000b029052360b1e3e2so33425455ybl.8
-        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 16:44:13 -0700 (PDT)
+        id S230239AbhFIXpb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 19:45:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48478 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230169AbhFIXpX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Jun 2021 19:45:23 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA2DDC0613A4
+        for <kvm@vger.kernel.org>; Wed,  9 Jun 2021 16:43:15 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id k12-20020a0cfd6c0000b029020df9543019so16756157qvs.14
+        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 16:43:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=nHEr3fDpE6Im0i88yYJ1tQIvyNGCyZi5EB4ETLvhbfY=;
-        b=ea22XXYvukJm5qYdUPMhFg2EwDHUYSLhllnrvu6LWOdE4ige4l3f5SSF7zSTUtjFZ0
-         k7V92WLCSNLDNx4JiPgFUIYt6oq3lorgTCYxAU7INZZv0Q7UO7o0r8eyI3WXESUulGyA
-         JMRa8YmO6EUqcxlp5sDD4ejzd836NR1zRmC60Q8bmKx7cH61K330+GujZHcXCPobaqZ3
-         S4BWkCbgItpkoT/xDTKrR+va7IZVWsr8l6YKXj4f7Do85enlEGckmVfgWscxr34tiCYc
-         UwY5M/SPB2uZwhYpZgAZXDUfk333JhV24AFJ6a8yg4CLmTaR4gdarmffZ2Wpu9BAnAnR
-         0Kag==
+        bh=AvlzpSEIa9aM5YGGjLq2zoHFMvduDK875CtYDd8dUL4=;
+        b=ifbBgdC2nQ37DNJxiu2U2mgYs0uHPbXMIH2n+cwuFFAH3iKBe0qhAO5/HRlTdd/4gs
+         weRLHdWGD9UbIn2pAQUz8rHljyeUxKHvtCbS+xVYvJCSnDe3dxpRkMXraJCLh/gyvhm5
+         5yrTTOtc7Mny/qg/Gj7Vg4/nOw02qcWhgnsgPkIwueGb2ZabKjxzssvPCtXkp60CfKFE
+         PmoQ45l64W4zQkJrONpN53AUoSBmF7Je3yLzxcZ5RUwEZrYHZLNwDeyGtEeFMYv0WR6g
+         HNk4IRb6Qsrddzx8dVSpTL71KipzEdzcFYuM1HCXzJ5Hg6kSObAN4k3pBurFUMN3geqe
+         de7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=nHEr3fDpE6Im0i88yYJ1tQIvyNGCyZi5EB4ETLvhbfY=;
-        b=GFnvgJr+IVcfviR60yfpspZE8E/giuWFMC3D4JHXV+HqVOMENZGe/xssouhJKQJ9KD
-         Q6na/xpNI0rVszSdDqk8qO+XCfFYwWjv2mezeuq8ldqblY71JfmadLhC41Cl6Tk47PAS
-         E+z9vYW/XqG30pLp0m3rw0XmkbMYpnbW4eO4QZJPAAflUM2QOkfrJZL/Su8Rol32LF++
-         XnSfPC1oV0xVQ8z2Z66IP7WqnjHhH7bb1xd6IkIju8KGfrxUlTSt0LGXhpC13mKDzuf/
-         wpCK8WtcyVTCrgPLsKLzj6E1pp6f6jzwEm9ddzGnIRBts1ge6MBWLkOvsB5TQ75BhY+g
-         /JIQ==
-X-Gm-Message-State: AOAM533XLMJLgfciDdrjSbgAiffKJHimm0tBeEm5/aEGcIj7N7AKdqkP
-        jDuPsP4A27pby4HgWXgt3EMPg/LhB8g=
-X-Google-Smtp-Source: ABdhPJysM8J+3gM4vv0/ZiTCwqxEs/+tlef/R/iat1CDlz/ELLXR0cKWvayn0RNoduTPVcuYXNlNvduHaNQ=
+        bh=AvlzpSEIa9aM5YGGjLq2zoHFMvduDK875CtYDd8dUL4=;
+        b=IZhovDBABZMcgmcTDeDeJ0+3MB+qrRLKoJxD9W0T3H6ISq5cRQYkz/5rLYBUGjIr5q
+         wVVOgI+LBWuIVo6ujl/h+F0F2Ljpv01r+QgzGGyLogRScpCgwchjld5ZkRwq3fB/O6q2
+         1/GHqgnUk5hreL3tqreimy6Bgbd25Bn3b3ZETzVZbKde32b5g50xeFM9Wynicby9HTIT
+         AeBaG46Z4Ep+fjKrk6Sf20k2ekcXMMUg7k7O5ky45V+vdwLp8PEiV0XpYZHi58UtGL81
+         +1Ug/vcViWJpnbZNpmtFTNVefNajkKbvqFjNRvMsKSVebrBSTdgESHcBLG2yGag3BghL
+         QGaw==
+X-Gm-Message-State: AOAM530L4583VKHMroWCuLmw5SZy9TgTfS/BLjLQYsbIcj9VE71ZD7GG
+        SL3/5Z+oLV6sdMwNmnz4XASXMmUMqNs=
+X-Google-Smtp-Source: ABdhPJx232hNBWou88XddItzp4JVduww7ZRV8rUjKiIgDLbiXVcQWPYtOjEGIKR1VhkY6bLEHvW6mLXOC/U=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:8daf:e5e:ae50:4f28])
- (user=seanjc job=sendgmr) by 2002:a5b:d0e:: with SMTP id y14mr3691106ybp.207.1623282192818;
- Wed, 09 Jun 2021 16:43:12 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:ad4:576e:: with SMTP id r14mr2569384qvx.61.1623282195011;
+ Wed, 09 Jun 2021 16:43:15 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  9 Jun 2021 16:42:33 -0700
+Date:   Wed,  9 Jun 2021 16:42:34 -0700
 In-Reply-To: <20210609234235.1244004-1-seanjc@google.com>
-Message-Id: <20210609234235.1244004-14-seanjc@google.com>
+Message-Id: <20210609234235.1244004-15-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210609234235.1244004-1-seanjc@google.com>
 X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
-Subject: [PATCH 13/15] KVM: x86: Drop pointless @reset_roots from kvm_init_mmu()
+Subject: [PATCH 14/15] KVM: nVMX: WARN if subtly-impossible VMFUNC conditions occur
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -64,105 +67,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove the @reset_roots param from kvm_init_mmu(), the one user,
-kvm_mmu_reset_context() has already unloaded the MMU and thus freed and
-invalidated all roots.  This also happens to be why the reset_roots=true
-paths doesn't leak roots; they're already invalid.
-
-No functional change intended.
+WARN and inject #UD when emulating VMFUNC for L2 if the function is
+out-of-bounds or if VMFUNC is not enabled in vmcs12.  Neither condition
+should occur in practice, as the CPU is supposed to prioritize the #UD
+over VM-Exit for out-of-bounds input and KVM is supposed to enable
+VMFUNC in vmcs02 if and only if it's enabled in vmcs12, but neither of
+those dependencies is obvious.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu.h        |  2 +-
- arch/x86/kvm/mmu/mmu.c    | 13 ++-----------
- arch/x86/kvm/svm/nested.c |  2 +-
- arch/x86/kvm/vmx/nested.c |  2 +-
- arch/x86/kvm/x86.c        |  2 +-
- 5 files changed, 6 insertions(+), 15 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 88d0ed5225a4..63b49725fb24 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -65,7 +65,7 @@ void kvm_mmu_set_ept_masks(bool has_ad_bits, bool has_exec_only);
- void
- reset_shadow_zero_bits_mask(struct kvm_vcpu *vcpu, struct kvm_mmu *context);
- 
--void kvm_init_mmu(struct kvm_vcpu *vcpu, bool reset_roots);
-+void kvm_init_mmu(struct kvm_vcpu *vcpu);
- void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, u32 cr0, u32 cr4, u32 efer,
- 			     gpa_t nested_cr3);
- void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index f987f2ea4a01..b4fa8ec8afce 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4817,17 +4817,8 @@ static void init_kvm_nested_mmu(struct kvm_vcpu *vcpu)
- 	update_last_nonleaf_level(vcpu, g_context);
- }
- 
--void kvm_init_mmu(struct kvm_vcpu *vcpu, bool reset_roots)
-+void kvm_init_mmu(struct kvm_vcpu *vcpu)
- {
--	if (reset_roots) {
--		uint i;
--
--		vcpu->arch.mmu->root_hpa = INVALID_PAGE;
--
--		for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
--			vcpu->arch.mmu->prev_roots[i] = KVM_MMU_ROOT_INFO_INVALID;
--	}
--
- 	if (mmu_is_nested(vcpu))
- 		init_kvm_nested_mmu(vcpu);
- 	else if (tdp_enabled)
-@@ -4853,7 +4844,7 @@ kvm_mmu_calc_root_page_role(struct kvm_vcpu *vcpu)
- void kvm_mmu_reset_context(struct kvm_vcpu *vcpu)
- {
- 	kvm_mmu_unload(vcpu);
--	kvm_init_mmu(vcpu, true);
-+	kvm_init_mmu(vcpu);
- }
- EXPORT_SYMBOL_GPL(kvm_mmu_reset_context);
- 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index ccd90ea93acd..8a4276d8753d 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -421,7 +421,7 @@ static int nested_svm_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3,
- 	vcpu->arch.cr3 = cr3;
- 	kvm_register_mark_available(vcpu, VCPU_EXREG_CR3);
- 
--	kvm_init_mmu(vcpu, false);
-+	kvm_init_mmu(vcpu);
- 
- 	return 0;
- }
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 4b8f5dca49ac..f686618d9ede 100644
+index f686618d9ede..0075d3f0f8fa 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -1094,7 +1094,7 @@ static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3, bool ne
- 	vcpu->arch.cr3 = cr3;
- 	kvm_register_mark_available(vcpu, VCPU_EXREG_CR3);
+@@ -5494,6 +5494,16 @@ static int handle_vmfunc(struct kvm_vcpu *vcpu)
+ 	}
  
--	kvm_init_mmu(vcpu, false);
-+	kvm_init_mmu(vcpu);
- 
- 	return 0;
- }
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index d3a2a3375541..32e93492273f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10409,7 +10409,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	kvm_vcpu_mtrr_init(vcpu);
- 	vcpu_load(vcpu);
- 	kvm_vcpu_reset(vcpu, false);
--	kvm_init_mmu(vcpu, false);
-+	kvm_init_mmu(vcpu);
- 	vcpu_put(vcpu);
- 	return 0;
+ 	vmcs12 = get_vmcs12(vcpu);
++
++	/*
++	 * #UD on out-of-bounds function has priority over VM-Exit, and VMFUNC
++	 * is enabled in vmcs02 if and only if it's enabled in vmcs12.
++	 */
++	if (WARN_ON_ONCE((function > 63) || !nested_cpu_has_vmfunc(vmcs12))) {
++		kvm_queue_exception(vcpu, UD_VECTOR);
++		return 1;
++	}
++
+ 	if (!(vmcs12->vm_function_control & BIT_ULL(function)))
+ 		goto fail;
  
 -- 
 2.32.0.rc1.229.g3e70b5a671-goog
