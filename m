@@ -2,89 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 840BF3A0D92
-	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 09:18:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8A0D3A0D99
+	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 09:19:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237200AbhFIHUb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 03:20:31 -0400
-Received: from mail-pj1-f49.google.com ([209.85.216.49]:38636 "EHLO
-        mail-pj1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237197AbhFIHU2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Jun 2021 03:20:28 -0400
-Received: by mail-pj1-f49.google.com with SMTP id m13-20020a17090b068db02901656cc93a75so845809pjz.3;
-        Wed, 09 Jun 2021 00:18:34 -0700 (PDT)
+        id S235509AbhFIHVZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 03:21:25 -0400
+Received: from mail-oo1-f43.google.com ([209.85.161.43]:45959 "EHLO
+        mail-oo1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235215AbhFIHVX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Jun 2021 03:21:23 -0400
+Received: by mail-oo1-f43.google.com with SMTP id q20-20020a4a6c140000b029024915d1bd7cso4004717ooc.12;
+        Wed, 09 Jun 2021 00:19:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=Cg8vN4m4UjDYZPCyoLn0Hc8/uX8h0VnIt9oJ71bSkSk=;
-        b=PyFiwFEXAeWf/cZs/QHDibXj7WavIhu/OCxlEGKGRh3LgHI01/KUm62Xe1UnUxH+6M
-         qV+99/MOpJWv2ZICrb+M89GJvXtCFVOV6ctwLxDXznw/8dEXXQNH+qSYvsMMRB4K+OW6
-         UapyxrHpqilch+Z6JdGblAgC7jXxjduJ3UdIYxU09pTdVQSoar4xgISv/F2rTozwIrIe
-         vAMYbHj7tJTksZ73x6Kxoh/ZuPlJ5uo1vVPX6jLR2yULVAU5dMgS3P5Vuk8cIGSGO1Hn
-         igez93xQvxL91ceBlzkx82WCYlbL3kqFejNxLRTlRewy2pnIz7m+BjP90yNBoCTnhZ7a
-         Cfag==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+BHctJq4G6Xr6Ip6lTcKa8uU4EOvZqV3z9gMl+bgMSg=;
+        b=AZjhMfyznzZ7CaqdWdCG1QVYM8DchQO91O9YCnOQ22DTupG7gBaWvkgN5F5pV1/mtO
+         ssvHbO8v1zBqieFvkEOYrXKHZdLdNZC9hu1fAuG0fSxmjcmb+ic6+11KimbpQNC72Ygo
+         tglaeubOwmMx8+pCizToZXKypqRfv6ziy/X6VGNh1piyzjvNxQuUnubfcijJAXK1td0J
+         lDVYO/0Q76/RYVnh0imbHX+0N0ED/IbYafx4JaMIsbuC5m7odr5tuKDsjt33OADXQjDg
+         MMv5bPbxXuawwfn0IvVgD9lgQcNQnQv0v64tjygA2BSi8VDfD03s0gokdjfEiR4GYdMG
+         qSCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=Cg8vN4m4UjDYZPCyoLn0Hc8/uX8h0VnIt9oJ71bSkSk=;
-        b=N/1QrkqiBgLvlNmORa2Igr/DivC5iBTKZJAGspqGzQF9w10rXvRIYMlYyKOKFScD7p
-         eohtIDptpBiVkuZRTwUc9f2Sd6UMoReMSL71kflzI1SLNw7+uIMLWRSIS5C/4ASeP1bc
-         03aaNEhNbNoCgmfYxLlEvSa99Px8ElR/Ho7VTZUXQ/aod/piYpj+qu2b3gYoYs2ZX3e+
-         /wOW8q2EnzCmfWFjZcfb3RsXGbeqGFTEDfblcSfTRbmdhl60txOqDtFDHvLyBqMz7Zcl
-         ARu9akmaJXhSR1YdeLs/a2qCiGrck/7HlChJpRwLRE486ICH6cCg1OMgxg5eFpQIc672
-         /k7w==
-X-Gm-Message-State: AOAM531tQ067UoKNvIFnUwaNvIOlI80EyacZ1gdn8j93kWfZ3IBt4M0a
-        dZ8fKdurV2VV//VMsyn6cL+Qo0c3wLY=
-X-Google-Smtp-Source: ABdhPJzcvHNVPC/gC3L8Jq+mvlNTCYpq82tOlS8SPuA+5xOrsUZTgjl2c2THbqsftoS/QqTWO9Hvrw==
-X-Received: by 2002:a17:902:e04f:b029:eb:66b0:6d08 with SMTP id x15-20020a170902e04fb02900eb66b06d08mr3794454plx.50.1623223054027;
-        Wed, 09 Jun 2021 00:17:34 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.40])
-        by smtp.googlemail.com with ESMTPSA id c15sm13836164pgt.68.2021.06.09.00.17.31
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 09 Jun 2021 00:17:33 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+BHctJq4G6Xr6Ip6lTcKa8uU4EOvZqV3z9gMl+bgMSg=;
+        b=JyQ9lZSsdhAlqoldSjl0DRMvOeSrztb/44PjwIWCiyhf5jBFmfBGgCZkaRED5YWdm5
+         0Is4VzvwhRcarKPLOTCKqqAlpzK3HLdLkWg3/ZTXCYrbQKlGwi6rY2DF5iRJv0UgisL6
+         t+SWdW0IRbVAdMc5bbNnsWT+Hkn7xr2St6yqkLIUY1i46jORUpErD6vHpw7ote/xS9s0
+         V3MwpOx2IA9NbXJcpgWR6p6cBHph290LKeGQEXiEhmFyNtkFbaHld+5eoJwlF2It432L
+         0q/Rk9eeyNcZvpvtthQUfl2oXesyxTASNCTh0P5lvg91B7h5iGIigtcl3CBm/WuYKI8m
+         RZfA==
+X-Gm-Message-State: AOAM531ltPB6tTZCtKkLtb2ZzgugkbKdHhk3b3tEeVdtf9oBEdmsBwI/
+        LW6Tbab8KlLPRK34EaNorEKXtsysPxKdbvOsdYk=
+X-Google-Smtp-Source: ABdhPJxUDcZdETlsFOkn0jYTarWVUL7yd4g/Xnj4LvTZZro2P5NNGaH6xuCLD0g0sQbJtP5WE1Z8ASiQqPQEseD1k5g=
+X-Received: by 2002:a4a:e9fb:: with SMTP id w27mr111006ooc.41.1623223109273;
+ Wed, 09 Jun 2021 00:18:29 -0700 (PDT)
+MIME-Version: 1.0
+References: <1623050385-100988-1-git-send-email-wanpengli@tencent.com>
+ <1623050385-100988-2-git-send-email-wanpengli@tencent.com>
+ <0584d79d-9f2c-52dd-5dcc-beffd18f265b@redhat.com> <CANRm+Cx3LpnMwWHAvJoTErAdWoceO9DBPqY0UkbQHW-ZUHw5=g@mail.gmail.com>
+ <f8c80e8a-0749-eb5b-d5ab-162f504c9d33@redhat.com>
+In-Reply-To: <f8c80e8a-0749-eb5b-d5ab-162f504c9d33@redhat.com>
 From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+Date:   Wed, 9 Jun 2021 15:18:18 +0800
+Message-ID: <CANRm+Cwee=zwanKQZ1zWA2warRJdp4LVMTn+=uBoWT7-+xm3nQ@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] KVM: LAPIC: Reset TMCCT during vCPU reset
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH v3] KVM: LAPIC: Keep stored TMCCT register value 0 after KVM_SET_LAPIC
-Date:   Wed,  9 Jun 2021 00:16:40 -0700
-Message-Id: <1623223000-18116-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Wed, 9 Jun 2021 at 13:52, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 09/06/21 04:15, Wanpeng Li wrote:
+> > On Wed, 9 Jun 2021 at 00:27, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > [...]
+> >> Perhaps instead set TMCCT to 0 in kvm_apic_set_state, instead of keeping
+> >> the value that was filled in by KVM_GET_LAPIC?
+> >
+> > Keeping the value that was filled in by KVM_GET_LAPIC is introduced by
+> > commit 24647e0a39b6 (KVM: x86: Return updated timer current count
+> > register from KVM_GET_LAPIC), could you elaborate more? :)
+>
+> KVM_GET_LAPIC stores the current value of TMCCT and KVM_SET_LAPIC's
+> memcpy stores it in vcpu->arch.apic->regs.  KVM_SET_LAPIC perhaps could
+> store zero in vcpu->arch.apic->regs after it uses it, and then the
+> stored value would always be zero.
 
-KVM_GET_LAPIC stores the current value of TMCCT and KVM_SET_LAPIC's memcpy 
-stores it in vcpu->arch.apic->regs, KVM_SET_LAPIC could store zero in 
-vcpu->arch.apic->regs after it uses it, and then the stored value would 
-always be zero. In addition, the TMCCT is always computed on-demand and 
-never directly readable.
+Just do it in a new version, thanks. :)
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/lapic.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 6d72d8f43310..9bd29b3ca790 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2628,6 +2628,7 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
- 	apic_manage_nmi_watchdog(apic, kvm_lapic_get_reg(apic, APIC_LVT0));
- 	update_divide_count(apic);
- 	__start_apic_timer(apic, APIC_TMCCT);
-+	kvm_lapic_set_reg(apic, APIC_TMCCT, 0);
- 	kvm_apic_update_apicv(vcpu);
- 	apic->highest_isr_cache = -1;
- 	if (vcpu->arch.apicv_active) {
--- 
-2.25.1
-
+   Wanpeng
