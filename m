@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 827113A1D4A
-	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 20:57:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78ACD3A1D4C
+	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 20:57:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230106AbhFIS7d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 14:59:33 -0400
-Received: from mail-yb1-f201.google.com ([209.85.219.201]:35476 "EHLO
-        mail-yb1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229535AbhFIS7d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Jun 2021 14:59:33 -0400
-Received: by mail-yb1-f201.google.com with SMTP id u48-20020a25ab330000b029053982019c2dso32372056ybi.2
-        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 11:57:38 -0700 (PDT)
+        id S230162AbhFIS7g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 14:59:36 -0400
+Received: from mail-yb1-f202.google.com ([209.85.219.202]:54240 "EHLO
+        mail-yb1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230146AbhFIS7f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Jun 2021 14:59:35 -0400
+Received: by mail-yb1-f202.google.com with SMTP id s186-20020a2577c30000b02905353e16ab17so32860670ybc.20
+        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 11:57:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=0CaB8MiFn1kbTM2jLhslSZkeic630/6bzBLYSPn7JDs=;
-        b=aBTzOzCR6Oq43l5XvTdJmBFXgY47Qi/ffDzY8Pyz0jZbWgxZxU2+KJvCAe8JRQWvO/
-         U8Jh4WQLPeJ6ZY2h9X0ZTszPnweQ/lhdK9unoecYdcsKf/yrgzlltXQ4By2lzgzKHoAT
-         ofxl4qiA1Sq/M979kgmGXdXMnX4PI1FQVuySSYDx8V55+Q2/ECdKxji2UE0sGndebxvo
-         LKhfVjzABvEZ0ksfgbxVMljDriRzdwlmYEu2rJITl7szLkV3qDoYG6MPMsRibiYZSRrQ
-         eWG7pBAGzcPnR7HeDYz2/JFUpi7Qcg9zNDqlCVzu184sgxOt5LivDS3SJ6+1+fkbtpOW
-         NWoA==
+        bh=qmBiYG2Q8fhlMt9vEycHJMHDLIYJ0FuvQVOhlHRcPKQ=;
+        b=F75V2on7xGSHGc3PiOmR0dqrBKE8LlmZ30KRE72p0ddy5YdgfqhYt+i0zs4ZUNwcmf
+         Ic8hgyG0bUOOGX6vUeCJbREq+QRz2mF9t6Ka3+vgrw+w/BawtxU7+wQFymMjd9jVzaEL
+         Yf/br30ykbskmsFk3HZ2fGe9ojBKceFlyZmb1RW4WMNK/REP6Hqr/ZncYOdRPmtl2abU
+         1cMIpqh6DNK4WUnSpXDSf171FBx2A8L47LZ5eligF0Qs0xoWuY0Xvh4x8eSV5oLnpHHD
+         ukBIdhI75DJUQctT9oMnHibXgoZUCAjPTuzGGQNF5jlMr8j7E3ZzJRRaJRKRVZXb5mpZ
+         7AUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=0CaB8MiFn1kbTM2jLhslSZkeic630/6bzBLYSPn7JDs=;
-        b=UxCkGO/+bubjmFQv34c2pJCogo7B7GP/xcRsSesqWL/Rt5ffp/iNsCaNLMo0qKuPij
-         w1Nfx9FNKqDHkMP0dYbVeEMk9QmOZU+FGPrBiEPsnCV+z3bETyyE0Vmsrr/Hu0vpsrG8
-         oNqBzYJDCXzzLz2gmeYfRnw2GPa5RKwqz5Ri3wRkQBYHDHWKOIq5SdOTPVVN3oGu9Kb+
-         i3tJofWK1c4jkuazuWhyU8HPMsRScZ07BLa31qUSFJ38GIIn6fJDVbWAYG6zK1UGgW/U
-         u4g6eO+bryZazCnZBISrwqQUFTSdWuFZhAcFjzZCcqy9oS8ccRxAss6mUq1qyPzSmT1t
-         /F+Q==
-X-Gm-Message-State: AOAM533O0Uuy8EuAlAXipaHA+410PRpxyB7vgtGl8iF7CkN3U4YFmDpl
-        a2osHyKrITuRVtVvJE64ibc1uEntaWo=
-X-Google-Smtp-Source: ABdhPJzrrwcaWqtP07pU3eXQdo9RBOLggQuxPbSeiJNkQDSvdUZkTrJKPd7JrakU0wDoDxxRqN7xXQhGo4Q=
+        bh=qmBiYG2Q8fhlMt9vEycHJMHDLIYJ0FuvQVOhlHRcPKQ=;
+        b=FoM5tRnymKd/kb2mrQFsxObdce0eiyMT1ei7ge0zU4Dg9nF22kfRANZxrbgOZphgE2
+         7pNgsRLSPPRLFZa4dHp+qdcZsRiJbwfGAhRdM1uFJ4/XGnkE07rJN6wESci9B3FLLU7u
+         4G/oh+D2tr0FRO42LKrvG9KGKArYsZ018YZOQVlD+sIa2xoejGR/RE3AobqdXdMBL6Ac
+         Ic2QbZb94HV71Ezhy5vdmIvSUtKBqvTyrw21Z2ND9V34VXOE/YA02HLg01IDke0dMNH5
+         cIsw0M4IRcs6gDnDUW8FTVdfHdUYV0EFhyd101Do+1F6w2ptRxMLxBfX5E1fGjKuK6E+
+         HpEw==
+X-Gm-Message-State: AOAM532SrbJ4ESgbHO080XG6ASU+usJYT22ZyI1ge5PEwRHAcnotg/NG
+        lzvxH6cteygvwsO/xOXEqnrC2jkXVvU=
+X-Google-Smtp-Source: ABdhPJy6xwXMm+i4eNVeH/U3OwdKvm3UqsFRa8RnRqIkX7DUC1cJfhlxygZ9lkhXeGaIXtMknGHuNUZ89qc=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:bfdc:c2e5:77b1:8ef3])
- (user=seanjc job=sendgmr) by 2002:a25:b8c:: with SMTP id 134mr2120266ybl.332.1623264997995;
- Wed, 09 Jun 2021 11:56:37 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:4a2:: with SMTP id
+ r2mr1955589ybs.286.1623265000119; Wed, 09 Jun 2021 11:56:40 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  9 Jun 2021 11:56:13 -0700
+Date:   Wed,  9 Jun 2021 11:56:14 -0700
 In-Reply-To: <20210609185619.992058-1-seanjc@google.com>
-Message-Id: <20210609185619.992058-4-seanjc@google.com>
+Message-Id: <20210609185619.992058-5-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210609185619.992058-1-seanjc@google.com>
 X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
-Subject: [PATCH 3/9] KVM: x86: Replace .set_hflags() with dedicated
- .exiting_smm() helper
+Subject: [PATCH 4/9] KVM: x86: Invoke kvm_smm_changed() immediately after
+ clearing SMM flag
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -64,74 +64,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Replace the .set_hflags() emulator hook with a dedicated .exiting_smm(),
-moving the SMM and SMM_INSIDE_NMI flag handling out of the emulator in
-the process.  This is a step towards consolidating much of the logic in
-kvm_smm_changed(), including the SMM hflags updates.
+Move RSM emulation's call to kvm_smm_changed() from .post_leave_smm() to
+.exiting_smm(), leaving behind the MMU context reset.  The primary
+motivation is to allow for future cleanup, but this also fixes a bug of
+sorts by queueing KVM_REQ_EVENT even if RSM causes shutdown, e.g. to let
+an INIT wake the vCPU from shutdown.  Of course, KVM doesn't properly
+emulate a shutdown state, e.g. KVM doesn't block SMIs after shutdown, and
+immediately exits to userspace, so the event request is a moot point in
+practice.
 
-No functional change intended.
+Moving kvm_smm_changed() also moves the RSM tracepoint.  This isn't
+strictly necessary, but will allow consolidating the SMI and RSM
+tracepoints in a future commit (by also moving the SMI tracepoint).
+Invoking the tracepoint before loading SMRAM state also means the SMBASE
+that reported in the tracepoint will point that the state that will be
+used for RSM, as opposed to the SMBASE _after_ RSM completes, which is
+arguably a good thing if the tracepoint is being used to debug a RSM/SMM
+issue.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/emulate.c     | 3 +--
- arch/x86/kvm/kvm_emulate.h | 2 +-
- arch/x86/kvm/x86.c         | 6 +++---
- 3 files changed, 5 insertions(+), 6 deletions(-)
+ arch/x86/kvm/x86.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 0603a2c79093..9e0d5900c011 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -2638,8 +2638,7 @@ static int em_rsm(struct x86_emulate_ctxt *ctxt)
- 	if ((ctxt->ops->get_hflags(ctxt) & X86EMUL_SMM_INSIDE_NMI_MASK) == 0)
- 		ctxt->ops->set_nmi_mask(ctxt, false);
- 
--	ctxt->ops->set_hflags(ctxt, ctxt->ops->get_hflags(ctxt) &
--		~(X86EMUL_SMM_INSIDE_NMI_MASK | X86EMUL_SMM_MASK));
-+	ctxt->ops->exiting_smm(ctxt);
- 
- 	/*
- 	 * Get back to real mode, to prepare a safe state in which to load
-diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index 9c34aa60e45f..b620782c1fb5 100644
---- a/arch/x86/kvm/kvm_emulate.h
-+++ b/arch/x86/kvm/kvm_emulate.h
-@@ -229,7 +229,7 @@ struct x86_emulate_ops {
- 	void (*set_nmi_mask)(struct x86_emulate_ctxt *ctxt, bool masked);
- 
- 	unsigned (*get_hflags)(struct x86_emulate_ctxt *ctxt);
--	void (*set_hflags)(struct x86_emulate_ctxt *ctxt, unsigned hflags);
-+	void (*exiting_smm)(struct x86_emulate_ctxt *ctxt);
- 	int (*pre_leave_smm)(struct x86_emulate_ctxt *ctxt,
- 			     const char *smstate);
- 	void (*post_leave_smm)(struct x86_emulate_ctxt *ctxt);
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index cda148cf06fa..69a71c5019c1 100644
+index 69a71c5019c1..76ba28865824 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -7104,11 +7104,11 @@ static unsigned emulator_get_hflags(struct x86_emulate_ctxt *ctxt)
- 	return emul_to_vcpu(ctxt)->arch.hflags;
- }
- 
--static void emulator_set_hflags(struct x86_emulate_ctxt *ctxt, unsigned emul_flags)
-+static void emulator_exiting_smm(struct x86_emulate_ctxt *ctxt)
- {
+@@ -7109,7 +7109,7 @@ static void emulator_exiting_smm(struct x86_emulate_ctxt *ctxt)
  	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
  
--	vcpu->arch.hflags = emul_flags;
-+	vcpu->arch.hflags &= ~(HF_SMM_MASK | HF_SMM_INSIDE_NMI_MASK);
- 	kvm_mmu_reset_context(vcpu);
+ 	vcpu->arch.hflags &= ~(HF_SMM_MASK | HF_SMM_INSIDE_NMI_MASK);
+-	kvm_mmu_reset_context(vcpu);
++	kvm_smm_changed(vcpu);
  }
  
-@@ -7174,7 +7174,7 @@ static const struct x86_emulate_ops emulate_ops = {
- 	.guest_has_fxsr      = emulator_guest_has_fxsr,
- 	.set_nmi_mask        = emulator_set_nmi_mask,
- 	.get_hflags          = emulator_get_hflags,
--	.set_hflags          = emulator_set_hflags,
-+	.exiting_smm         = emulator_exiting_smm,
- 	.pre_leave_smm       = emulator_pre_leave_smm,
- 	.post_leave_smm      = emulator_post_leave_smm,
- 	.triple_fault        = emulator_triple_fault,
+ static int emulator_pre_leave_smm(struct x86_emulate_ctxt *ctxt,
+@@ -7120,7 +7120,7 @@ static int emulator_pre_leave_smm(struct x86_emulate_ctxt *ctxt,
+ 
+ static void emulator_post_leave_smm(struct x86_emulate_ctxt *ctxt)
+ {
+-	kvm_smm_changed(emul_to_vcpu(ctxt));
++	kvm_mmu_reset_context(emul_to_vcpu(ctxt));
+ }
+ 
+ static void emulator_triple_fault(struct x86_emulate_ctxt *ctxt)
 -- 
 2.32.0.rc1.229.g3e70b5a671-goog
 
