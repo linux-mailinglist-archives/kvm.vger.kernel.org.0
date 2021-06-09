@@ -2,100 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 276A73A1A2F
-	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 17:51:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 239043A1A55
+	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 17:59:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237186AbhFIPxY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 11:53:24 -0400
-Received: from 8bytes.org ([81.169.241.247]:43546 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237156AbhFIPxX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Jun 2021 11:53:23 -0400
-Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 9B3CD434; Wed,  9 Jun 2021 17:51:27 +0200 (CEST)
-Date:   Wed, 9 Jun 2021 17:51:26 +0200
-From:   Joerg Roedel <joro@8bytes.org>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "Alex Williamson (alex.williamson@redhat.com)" 
-        <alex.williamson@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Jason Wang <jasowang@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shenming Lu <lushenming@huawei.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>
-Subject: Re: Plan for /dev/ioasid RFC v2
-Message-ID: <YMDjfmJKUDSrbZbo@8bytes.org>
-References: <MWHPR11MB188699D0B9C10EB51686C4138C389@MWHPR11MB1886.namprd11.prod.outlook.com>
- <YMCy48Xnt/aphfh3@8bytes.org>
- <20210609123919.GA1002214@nvidia.com>
- <YMDC8tOMvw4FtSek@8bytes.org>
- <20210609150009.GE1002214@nvidia.com>
+        id S236170AbhFIQBo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 12:01:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59206 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232332AbhFIQBo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Jun 2021 12:01:44 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C44FC061574;
+        Wed,  9 Jun 2021 08:59:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=QFACyy0y7HrUHjJ9cPsUOZAld6dTw9TIGvy3FNUUEgI=; b=ez+gR39/yIG6DsvQX0y7KALGqu
+        OMULMPUpfNufKUvUdlEHN9s2LEkIYgMxMfPfQeyQyt1wGMKGeUjcrWNkr7BLGGvaSSV7rC4R0cTtA
+        byA46TmoajpBqD9QCw0smhbVGAyfuECZ9PZXPoFgfdwS4ZDlew+syrpxouv9W9pOhFcEi2ZVOfCpM
+        Zvg1XsScqRW6Vnr1UcQMDERu1VKEejBJYgg0tsaBFC8rNIbU/TJIQvAxrAXuro5+TzC2mFXbiLv0X
+        89qLCoy/65c33llcaRR67OL30Tz3FXndfAlaBhPMJkPK+YIF5ltu0md10TfhTvsXYyvRXKKutc8Mq
+        +/s34mJA==;
+Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1lr0bt-000fa4-Ku; Wed, 09 Jun 2021 15:59:26 +0000
+Date:   Wed, 9 Jun 2021 16:59:17 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com,
+        linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Uladzislau Rezki <urezki@gmail.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        David Rientjes <rientjes@google.com>
+Subject: Re: [PATCH v2 1/2] mm/vmalloc: export __vmalloc_node_range
+Message-ID: <YMDlVdB8m62AhbB7@infradead.org>
+References: <20210608180618.477766-1-imbrenda@linux.ibm.com>
+ <20210608180618.477766-2-imbrenda@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210609150009.GE1002214@nvidia.com>
+In-Reply-To: <20210608180618.477766-2-imbrenda@linux.ibm.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 09, 2021 at 12:00:09PM -0300, Jason Gunthorpe wrote:
-> Only *drivers* know what the actual device is going to do, devices do
-> not. Since the group doesn't have drivers it is the wrong layer to be
-> making choices about how to configure the IOMMU.
+On Tue, Jun 08, 2021 at 08:06:17PM +0200, Claudio Imbrenda wrote:
+> The recent patches to add support for hugepage vmalloc mappings added a
+> flag for __vmalloc_node_range to allow to request small pages.
+> This flag is not accessible when calling vmalloc, the only option is to
+> call directly __vmalloc_node_range, which is not exported.
+> 
+> This means that a module can't vmalloc memory with small pages.
+> 
+> Case in point: KVM on s390x needs to vmalloc a large area, and it needs
+> to be mapped with small pages, because of a hardware limitation.
+> 
+> This patch exports __vmalloc_node_range so it can be used in modules
+> too.
 
-Groups don't carry how to configure IOMMUs, that information is
-mostly in the IOMMU domains. And those (or an abstraction of them) is
-configured through /dev/ioasid. So not sure what you wanted to say with
-the above.
-
-All a group carries is information about which devices are not
-sufficiently isolated from each other and thus need to always be in the
-same domain.
-
-> The device centric approach is my attempt at this, and it is pretty
-> clean, I think.
-
-Clean, but still insecure.
-
-> All ACS does is prevent P2P operations, if you assign all the group
-> devices into the same /dev/iommu then you may not care about that
-> security isolation property. At the very least it is policy for user
-> to decide, not kernel.
-
-It is a kernel decision, because a fundamental task of the kernel is to
-ensure isolation between user-space tasks as good as it can. And if a
-device assigned to one task can interfer with a device of another task
-(e.g. by sending P2P messages), then the promise of isolation is broken.
-
-> Groups should be primarily about isolation security, not about IOASID
-> matching.
-
-That doesn't make any sense, what do you mean by 'IOASID matching'?
-
-> Blocking this forever in the new uAPI just because group = IOASID is
-> some historical convenience makes no sense to me.
-
-I think it is safe to assume that devices supporting PASID will most
-often be the only ones in their group. But for the non-PASID IOASID
-use-cases like plain old device assignment to a VM it needs to be
-group-centric.
-
-Regards,
-
-	Joerg
+No.  I spent a lot of effort to mak sure such a low-level API is
+not exported.
