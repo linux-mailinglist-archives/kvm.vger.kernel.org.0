@@ -2,91 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D55203A1CCD
-	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 20:31:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 64F613A1CDD
+	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 20:38:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230080AbhFISdD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 14:33:03 -0400
-Received: from mail-pf1-f172.google.com ([209.85.210.172]:37479 "EHLO
-        mail-pf1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229993AbhFISdA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Jun 2021 14:33:00 -0400
-Received: by mail-pf1-f172.google.com with SMTP id y15so19094152pfl.4
-        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 11:31:06 -0700 (PDT)
+        id S229705AbhFISkn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 14:40:43 -0400
+Received: from mail-oi1-f169.google.com ([209.85.167.169]:37383 "EHLO
+        mail-oi1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229634AbhFISkm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Jun 2021 14:40:42 -0400
+Received: by mail-oi1-f169.google.com with SMTP id h9so26098358oih.4
+        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 11:38:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=e605rO9eXbp6+XPpwf5ABUO3O8rlYpURPQTC+TX/w0s=;
-        b=IGVixWajBtsbcN/8qB3HlkxHqyBV7pl8aEpuQbUKdjSbp995hsDWp7IMixLdpxGCkN
-         zi3iSg8BU19gRArqnsbmRreHJKfw82ek3PSg9jmy0kI40pUfzzhFbnRFngy8ZE/Y5KB8
-         0rFRNJKyBDJ9Xt7I2yP8aG+shhCaUrB7rjEOyylDkcX7/RNRK62UCZdAtTclx9FvPwKV
-         yh61R6CMJhqIsGHL5D5Vg/HRJe/OENhr1kuziBMlzYJ5raqV3ft3P5fA8n58MxqaXQa6
-         xMJmu5BUfOXce2525/+yj/qrafFVf/dwfuhVDUchcnvoo9DEDB1Z1MycvOykPBK9kgC2
-         f3EA==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=sX7wBd0tcUErr5NyZUazI6LPTb09pVgnoeRW+BfmGYI=;
+        b=avfG5tzdz08jyqTK+qZMxFF65pFDli0RYiCBjVHT5gLd9yQ9paVQ+TWNivCgZDkONC
+         maeLuhgTx3Mpo6peg3zg/cEH61ALUle5/NC5MgWH7XSozZJbO+49CQy5hFueYisXjE+T
+         3F9L8paheujWKuXZEqbJs8ZrF6tzeaK1SdYIqKJEBDtKdctIk2rNUqBpnIXVjD13HoYB
+         KlW3jhY/UZDik4QzreV46KtbHkVwaqH//pLHld1tWgqvD1yyuo12FU++UjJ0cJeEXrHR
+         n+kDkfJMZgddtDwgW+OskxtBaIS796xcMTs6ViOnQcIMj4OwY/Lu+uN8Iu6hw+kWVspN
+         12BQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=e605rO9eXbp6+XPpwf5ABUO3O8rlYpURPQTC+TX/w0s=;
-        b=V5vY5OSIXrCmqaAWaADRTdUpWo5Uxt/pgwWMIXeSud81h/2sMdR0KKLKDoxHKgz6hA
-         7A2I72DsBj8HBty73sRmti+/PDo8OchxTX/y7Gk8DEG+1wGkp7sFn/f0Vqolbcj15lPH
-         /DrcMVW71AQMIYu8j339WXXU2U/lKag8AZNFsImFTBXcSDhqrC3KPSeZ5AO0YPF8cP5P
-         Nr3/fLYS/n6AMtgSouglSmifdxE5WYLCB6ccV5QWt38Me5Dta0176vjvWdUDl6USwHyC
-         jzbPWdfYePnpS7Uyf34g7LvY4FtgGDA7iDfMTtloNEKP/4Luw6qLYt6cgFsvikLuRQS4
-         3Ydw==
-X-Gm-Message-State: AOAM5300nW55SLx+RVXyK0DKhk3IhzKRPUzCrsij4o5zpm+HnNV8y21R
-        GLzeWCUOeDme0hWpGVePhbc/+86NGDBZeQ==
-X-Google-Smtp-Source: ABdhPJypWjYXZG3X3DMZGHgqF2v0RIp8grzR5r9baR7GjIZy1nom3HMJDfqxIVBhttAdbkuw3EL/Eg==
-X-Received: by 2002:a05:6a00:18a7:b029:2f2:b099:7b1a with SMTP id x39-20020a056a0018a7b02902f2b0997b1amr1083551pfh.59.1623263405468;
-        Wed, 09 Jun 2021 11:30:05 -0700 (PDT)
-Received: from ubuntu-server-2004.vmware.com (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
-        by smtp.gmail.com with ESMTPSA id y34sm249092pfa.181.2021.06.09.11.30.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Jun 2021 11:30:05 -0700 (PDT)
-From:   Nadav Amit <nadav.amit@gmail.com>
-X-Google-Original-From: Nadav Amit
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>
-Subject: [kvm-unit-tests PATCH 7/8] x86/pmu: Skip the tests on PMU version 1
-Date:   Wed,  9 Jun 2021 18:29:44 +0000
-Message-Id: <20210609182945.36849-8-nadav.amit@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210609182945.36849-1-nadav.amit@gmail.com>
-References: <20210609182945.36849-1-nadav.amit@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=sX7wBd0tcUErr5NyZUazI6LPTb09pVgnoeRW+BfmGYI=;
+        b=Ul3fi7zJF8VfQew5ouZ90HObbES527jL/49glRuoPBcpu4/3f4YZ5mZT6V4OzWaRRf
+         1dRMdGOnVm1L1BKWGRiKGqdAfO1bGqn6pjyOSsqNd/c0ShTZ1Poq3SayBQxVAFMaIrO/
+         lRaGCg2fmFsOijWaAQclTLIDJshPrQ4WG7OhWie4DYnfyMMOWyzxMIJTi9MGQk7+ElLV
+         ogunnJTyagB9s/l9ebY1FBC6YeoLGSrz/KsU4oYh/Tdnjps3y/oTbOgSRtj9xhXBRe6X
+         N/bBUva0U38koBesCj9w1HCCXvBhKCXJlDsFUAyPGzI1QO5wMEXLlL0HpEm2IEORvT4Z
+         mlCA==
+X-Gm-Message-State: AOAM533CYprmGOe4i1fzsPaSzp1iGdw1tXJJ9jga12Nay46vntBqTo02
+        yveAhLsoACQEJZumW0GQ10ViSCj+GjOoAFzt1th0TA==
+X-Google-Smtp-Source: ABdhPJyjZ5o7VqyiyzCNG5zCUA9Gg2wQ7vCU2SdaS0qdpbLCh2daLzQYiO/prm7DuPWRVIzr27Hvp/qaSpkmZ88BaNw=
+X-Received: by 2002:aca:1201:: with SMTP id 1mr7308734ois.6.1623263857802;
+ Wed, 09 Jun 2021 11:37:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210609182945.36849-1-nadav.amit@gmail.com> <20210609182945.36849-5-nadav.amit@gmail.com>
+In-Reply-To: <20210609182945.36849-5-nadav.amit@gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 9 Jun 2021 11:37:26 -0700
+Message-ID: <CALMp9eReO7-L0hcMuMs8N6Aeb+JrfOcsNck95cc40f1Bj1Nvkg@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 4/8] x86/hypercall: enable the test on
+ non-KVM environment
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Nadav Amit <nadav.amit@gmail.com>
-
-x86's PMU tests are not compatible with version 1. Instead of finding
-how to adapt them, just skip them if the PMU version is too old.
-
-Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
----
- x86/pmu.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/x86/pmu.c b/x86/pmu.c
-index 5a3d55b..ec61ac9 100644
---- a/x86/pmu.c
-+++ b/x86/pmu.c
-@@ -544,6 +544,12 @@ int main(int ac, char **av)
- 		printf("No pmu is detected!\n");
- 		return report_summary();
- 	}
-+
-+	if (eax.split.version_id == 1) {
-+		printf("PMU version 1 is not supported\n");
-+		return report_summary();
-+	}
-+
- 	printf("PMU version:         %d\n", eax.split.version_id);
- 	printf("GP counters:         %d\n", eax.split.num_counters);
- 	printf("GP counter width:    %d\n", eax.split.bit_width);
--- 
-2.25.1
-
+On Wed, Jun 9, 2021 at 11:32 AM Nadav Amit <nadav.amit@gmail.com> wrote:
+>
+> From: Nadav Amit <nadav.amit@gmail.com>
+>
+> KVM knows to emulate both vmcall and vmmcall regardless of the
+> actual architecture. Native hardware does not behave this way. Based on
+> the availability of test-device, figure out that the test is run on
+> non-KVM environment, and if so, run vmcall/vmmcall based on the actual
+> architecture.
+>
+> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+> ---
+>  lib/x86/processor.h |  8 ++++++++
+>  x86/hypercall.c     | 31 +++++++++++++++++++++++--------
+>  2 files changed, 31 insertions(+), 8 deletions(-)
+>
+> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+> index abc04b0..517ee70 100644
+> --- a/lib/x86/processor.h
+> +++ b/lib/x86/processor.h
+> @@ -118,6 +118,14 @@ static inline u8 cpuid_maxphyaddr(void)
+>      return raw_cpuid(0x80000008, 0).a & 0xff;
+>  }
+>
+> +static inline bool is_intel(void)
+> +{
+> +       struct cpuid c = cpuid(0);
+> +       u32 name[4] = {c.b, c.d, c.c };
+> +
+> +       return strcmp((char *)name, "GenuineIntel") == 0;
+> +}
+> +
+Don't VIA CPUs also require vmcall, since they implement VMX rather than SVM?
