@@ -2,57 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ABE813A20EC
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 01:43:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED4AA3A20FB
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 01:44:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230118AbhFIXpT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 19:45:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48406 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230130AbhFIXpJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Jun 2021 19:45:09 -0400
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00BEAC0617AF
-        for <kvm@vger.kernel.org>; Wed,  9 Jun 2021 16:42:56 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id m18-20020a05622a1192b0290247a89f63bcso5938214qtk.20
-        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 16:42:56 -0700 (PDT)
+        id S230136AbhFIXp6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 19:45:58 -0400
+Received: from mail-qt1-f201.google.com ([209.85.160.201]:53039 "EHLO
+        mail-qt1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230329AbhFIXpy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Jun 2021 19:45:54 -0400
+Received: by mail-qt1-f201.google.com with SMTP id z17-20020ac86b910000b0290244cba55754so9535964qts.19
+        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 16:43:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=IaHvriPR1ilnz00LgSKYZNDwy+t0L+MzDKmguXPVTIU=;
-        b=MHgOPpSpKZ+onNecVS/T1TDwOCedi+KOQmXbTeAm/KuGD3YTLADXeur6XvPWjGKp9a
-         0DALtfjZ94/elE2wLmLX8UfS7MtgLC39VFTYx3b4DL5EcMhpeCENrvOGnc6hwVtgDB8t
-         8bMwaCu28N7N9SulkZtEe459ldZZPgoIrh3m/e6kzaCjZHHPahFgJjHpjhdHFzGwoC6V
-         htNM/xWI2HlYCcZ85s1ynnDjTTBqfsIbV6clg9oBvpjB/ecGnft6AneNKDN27HaE/hNx
-         ASu+EalLdUJu6ZmxbFS/QUtd1wQ/tknQeXvj4PGYlex4+uq6/LCQ+j/f+MuxLXAjI5Di
-         B6rQ==
+        bh=K2ifrSGaCEQ+14CO+xHrLrRJvzgN5omyn9Y8rpPGs5U=;
+        b=vBSSvL3SzM5RYdD8hznFl+2Av5Oh0maOv15Y8aCTl9T/9vVBRBd+QE0GfOUzE7OkQA
+         1Pxidjlh5ytQSdf9DP3nFulJ/Tl2evzv5DXArI+cZGg8KxZvMEB+vvydaSXCHdglTSt9
+         w4CE2swL95FjJyZXfXFhw5XfyTt/vgSzozO5UyyZU/8A83fxHR7NdSXyMx9y5SvIayu+
+         Bj/ybC9GKy856/X4iHGQ0Ho8o5BxuozB42MmWa14cnO3nDfIyu7DcZFz345EEjxa6bVk
+         kk/ktEY4SWLwrKPzqLFBvsUOlpY5GV22g570kcNlPzBzQajKik6IcanQI0V86yCdXAP2
+         yvMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=IaHvriPR1ilnz00LgSKYZNDwy+t0L+MzDKmguXPVTIU=;
-        b=R1LMJM42zsJFKpTEnZaTK8VWf/rLGBCaPC6IVPIFzu8YU1yvmlikeDbAyGRdz1VY4L
-         LrR1O4OxuQBuNgN0LjwPrc2QShRVijlz1qA/qUWPclFD25ScPnuOfImSGr1vUpU/wGre
-         VhmTLZenNAhk5Yi7WBuht084Ebjzb0/QTgm3Tg0p29SUi8r4wRgmUYjS92aehi4D1ckS
-         pYha1Jc4V8byCb04lNtN1QX2oWsIuC5T8oFw0tw88+kaJ6zh+Kn/3Z9pa+9nkljnuzyW
-         vTL3KXmzo7r89jZFnhAGd56JTq1gw3UJGN3tzdM6Jo8ryRGRzv0OVpnSboFaC2/555ru
-         1Nvw==
-X-Gm-Message-State: AOAM533F8qRO0oDG0vSwN0sL5VWOQjv0RgojanZuisI2+8MFbf0QwYN2
-        ie/AHNVF1beDWF2cblnJLO2wywTy8e4=
-X-Google-Smtp-Source: ABdhPJz+QZrNtj4Rku4gjD033qxRenTviSAlZ1fQ8xlfDY3NGP6a/NZJNOML9KwqS+Vleoo+POLZt8kZENs=
+        bh=K2ifrSGaCEQ+14CO+xHrLrRJvzgN5omyn9Y8rpPGs5U=;
+        b=LGancHcpS0kIdyUYtcW7UA9tXO2N/fhADoue4jq14325coDO34tdwQ0ZdBIcJPO/80
+         j8nW3gquqEJ6ey5U2iZbLrQ/KfFZoOpnyCBP7d+sX6CUjk2HVSZE3O5Xl8uIFYWDAiwS
+         kxpeqDawxNqjimVzElMf7Ai0fc/P0ci5hEFVk5UFjfgC7k2cGAK9s7P7zQnBiZpyO0Xg
+         t4OGr8VeMTdRfZtvwDbt9f3Esvop8SnZbUuZ3IjKwFSxHACni7bbZb9dK5CeG/JTHuzO
+         h4nvqWDUNidF+bkJqqpxCmom6hD+8Ll++4s0iI8fI7b27Ldqxb+mcNCUqzpJo52s0evt
+         5jUw==
+X-Gm-Message-State: AOAM532+zcbcAAl8FzvBZBF/C0ugENlvMekfBwbGdCreKm08L2+gz9jw
+        KBerCnQ6UnhZMgBw1XJZPyz5Rym7CSA=
+X-Google-Smtp-Source: ABdhPJwXRZ4esdSqe6zj+H+ek2FyB5tVwuNcFmAOeZ9qQ6Ek9sDSd6Y17SrCPhl137vn3P4uPM1Rw/8+XDc=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:8daf:e5e:ae50:4f28])
- (user=seanjc job=sendgmr) by 2002:a0c:f582:: with SMTP id k2mr2424200qvm.51.1623282176141;
- Wed, 09 Jun 2021 16:42:56 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:ad4:4b71:: with SMTP id m17mr2374885qvx.45.1623282178456;
+ Wed, 09 Jun 2021 16:42:58 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  9 Jun 2021 16:42:26 -0700
+Date:   Wed,  9 Jun 2021 16:42:27 -0700
 In-Reply-To: <20210609234235.1244004-1-seanjc@google.com>
-Message-Id: <20210609234235.1244004-7-seanjc@google.com>
+Message-Id: <20210609234235.1244004-8-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210609234235.1244004-1-seanjc@google.com>
 X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
-Subject: [PATCH 06/15] KVM: nSVM: Move TLB flushing logic (or lack thereof) to
- dedicated helper
+Subject: [PATCH 07/15] KVM: x86: Drop skip MMU sync and TLB flush params from
+ "new PGD" helpers
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -68,124 +65,137 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce nested_svm_transition_tlb_flush() and use it force an MMU sync
-and TLB flush on nSVM VM-Enter and VM-Exit instead of sneaking the logic
-into the __kvm_mmu_new_pgd() call sites.  Add a partial todo list to
-document issues that need to be addressed before the unconditional sync
-and flush can be modified to look more like nVMX's logic.
+Drop skip_mmu_sync and skip_tlb_flush from __kvm_mmu_new_pgd() now that
+all call sites unconditionally skip both the sync and flush.
 
-In addition to making nSVM's forced flushing more overt (guess who keeps
-losing track of it), the new helper brings further convergence between
-nSVM and nVMX, and also sets the stage for dropping the "skip" params
-from __kvm_mmu_new_pgd().
+No functional change intended.
 
-Cc: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c    |  2 +-
- arch/x86/kvm/svm/nested.c | 38 +++++++++++++++++++++++++++++---------
- 2 files changed, 30 insertions(+), 10 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  3 +--
+ arch/x86/kvm/mmu/mmu.c          | 17 +++++++----------
+ arch/x86/kvm/svm/nested.c       |  2 +-
+ arch/x86/kvm/vmx/nested.c       |  6 +-----
+ arch/x86/kvm/x86.c              |  2 +-
+ 5 files changed, 11 insertions(+), 19 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 6652e51a86fd..c05448d3beff 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1675,8 +1675,7 @@ void kvm_mmu_invlpg(struct kvm_vcpu *vcpu, gva_t gva);
+ void kvm_mmu_invalidate_gva(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+ 			    gva_t gva, hpa_t root_hpa);
+ void kvm_mmu_invpcid_gva(struct kvm_vcpu *vcpu, gva_t gva, unsigned long pcid);
+-void kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd, bool skip_tlb_flush,
+-		     bool skip_mmu_sync);
++void kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd);
+ 
+ void kvm_configure_mmu(bool enable_tdp, int tdp_max_root_level,
+ 		       int tdp_huge_page_level);
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 0144c40d09c7..d7f29bf94ca3 100644
+index d7f29bf94ca3..a832e0fedf32 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4648,7 +4648,7 @@ void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, u32 cr0, u32 cr4, u32 efer,
+@@ -3913,8 +3913,7 @@ static bool fast_pgd_switch(struct kvm_vcpu *vcpu, gpa_t new_pgd,
+ }
+ 
+ static void __kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd,
+-			      union kvm_mmu_page_role new_role,
+-			      bool skip_tlb_flush, bool skip_mmu_sync)
++			      union kvm_mmu_page_role new_role)
+ {
+ 	if (!fast_pgd_switch(vcpu, new_pgd, new_role)) {
+ 		kvm_mmu_free_roots(vcpu, vcpu->arch.mmu, KVM_MMU_ROOT_CURRENT);
+@@ -3929,10 +3928,10 @@ static void __kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd,
+ 	 */
+ 	kvm_make_request(KVM_REQ_LOAD_MMU_PGD, vcpu);
+ 
+-	if (!skip_mmu_sync || force_flush_and_sync_on_reuse)
++	if (force_flush_and_sync_on_reuse) {
+ 		kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
+-	if (!skip_tlb_flush || force_flush_and_sync_on_reuse)
+ 		kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
++	}
+ 
+ 	/*
+ 	 * The last MMIO access's GVA and GPA are cached in the VCPU. When
+@@ -3951,11 +3950,9 @@ static void __kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd,
+ 				to_shadow_page(vcpu->arch.mmu->root_hpa));
+ }
+ 
+-void kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd, bool skip_tlb_flush,
+-		     bool skip_mmu_sync)
++void kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd)
+ {
+-	__kvm_mmu_new_pgd(vcpu, new_pgd, kvm_mmu_calc_root_page_role(vcpu),
+-			  skip_tlb_flush, skip_mmu_sync);
++	__kvm_mmu_new_pgd(vcpu, new_pgd, kvm_mmu_calc_root_page_role(vcpu));
+ }
+ EXPORT_SYMBOL_GPL(kvm_mmu_new_pgd);
+ 
+@@ -4648,7 +4645,7 @@ void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, u32 cr0, u32 cr4, u32 efer,
  	struct kvm_mmu *context = &vcpu->arch.guest_mmu;
  	union kvm_mmu_role new_role = kvm_calc_shadow_npt_root_page_role(vcpu);
  
--	__kvm_mmu_new_pgd(vcpu, nested_cr3, new_role.base, false, false);
-+	__kvm_mmu_new_pgd(vcpu, nested_cr3, new_role.base, true, true);
+-	__kvm_mmu_new_pgd(vcpu, nested_cr3, new_role.base, true, true);
++	__kvm_mmu_new_pgd(vcpu, nested_cr3, new_role.base);
  
  	if (new_role.as_u64 != context->mmu_role.as_u64) {
  		shadow_mmu_init_context(vcpu, context, cr0, cr4, efer, new_role);
+@@ -4700,7 +4697,7 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
+ 		kvm_calc_shadow_ept_root_page_role(vcpu, accessed_dirty,
+ 						   execonly, level);
+ 
+-	__kvm_mmu_new_pgd(vcpu, new_eptp, new_role.base, true, true);
++	__kvm_mmu_new_pgd(vcpu, new_eptp, new_role.base);
+ 
+ 	if (new_role.as_u64 == context->mmu_role.as_u64)
+ 		return;
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 5e8d8443154e..fe2705557960 100644
+index fe2705557960..ccd90ea93acd 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -380,6 +380,25 @@ static inline bool nested_npt_enabled(struct vcpu_svm *svm)
- 	return svm->nested.ctl.nested_ctl & SVM_NESTED_CTL_NP_ENABLE;
- }
- 
-+static void nested_svm_transition_tlb_flush(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * TODO: optimize unconditional TLB flush/MMU sync.  A partial list of
-+	 * things to fix before this can be conditional:
-+	 *
-+	 *  - Flush TLBs for both L1 and L2 remote TLB flush
-+	 *  - Honor L1's request to flush an ASID on nested VMRUN
-+	 *  - Sync nested NPT MMU on VMRUN that flushes L2's ASID[*]
-+	 *  - Don't crush a pending TLB flush in vmcb02 on nested VMRUN
-+	 *  - Flush L1's ASID on KVM_REQ_TLB_FLUSH_GUEST
-+	 *
-+	 * [*] Unlike nested EPT, SVM's ASID management can invalidate nested
-+	 *     NPT guest-physical mappings on VMRUN.
-+	 */
-+	kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
-+	kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
-+}
-+
- /*
-  * Load guest's/host's cr3 on nested vmentry or vmexit. @nested_npt is true
-  * if we are emulating VM-Entry into a guest with NPT enabled.
-@@ -396,12 +415,8 @@ static int nested_svm_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3,
- 			return -EINVAL;
+@@ -416,7 +416,7 @@ static int nested_svm_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3,
  	}
  
--	/*
--	 * TODO: optimize unconditional TLB flush/MMU sync here and in
--	 * kvm_init_shadow_npt_mmu().
--	 */
  	if (!nested_npt)
--		kvm_mmu_new_pgd(vcpu, cr3, false, false);
-+		kvm_mmu_new_pgd(vcpu, cr3, true, true);
+-		kvm_mmu_new_pgd(vcpu, cr3, true, true);
++		kvm_mmu_new_pgd(vcpu, cr3);
  
  	vcpu->arch.cr3 = cr3;
  	kvm_register_mark_available(vcpu, VCPU_EXREG_CR3);
-@@ -481,6 +496,7 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
- static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
- {
- 	const u32 mask = V_INTR_MASKING_MASK | V_GIF_ENABLE_MASK | V_GIF_MASK;
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index e102a5c10a83..3fb87e5aead4 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -1125,12 +1125,8 @@ static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3, bool ne
+ 		}
+ 	}
  
- 	/*
- 	 * Filled at exit: exit_code, exit_code_hi, exit_info_1, exit_info_2,
-@@ -505,10 +521,10 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
+-	/*
+-	 * Unconditionally skip the TLB flush on fast CR3 switch, all TLB
+-	 * flushes are handled by nested_vmx_transition_tlb_flush().
+-	 */
+ 	if (!nested_ept) {
+-		kvm_mmu_new_pgd(vcpu, cr3, true, true);
++		kvm_mmu_new_pgd(vcpu, cr3);
  
- 	/* nested_cr3.  */
- 	if (nested_npt_enabled(svm))
--		nested_svm_init_mmu_context(&svm->vcpu);
-+		nested_svm_init_mmu_context(vcpu);
+ 		/*
+ 		 * A TLB flush on VM-Enter/VM-Exit flushes all linear mappings
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 02ceb1f606f4..117acfbc7ba9 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1136,7 +1136,7 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+ 		return 1;
  
--	svm->vmcb->control.tsc_offset = svm->vcpu.arch.tsc_offset =
--		svm->vcpu.arch.l1_tsc_offset + svm->nested.ctl.tsc_offset;
-+	svm->vmcb->control.tsc_offset = vcpu->arch.tsc_offset =
-+		vcpu->arch.l1_tsc_offset + svm->nested.ctl.tsc_offset;
+ 	if (cr3 != kvm_read_cr3(vcpu))
+-		kvm_mmu_new_pgd(vcpu, cr3, true, true);
++		kvm_mmu_new_pgd(vcpu, cr3);
  
- 	svm->vmcb->control.int_ctl             =
- 		(svm->nested.ctl.int_ctl & ~mask) |
-@@ -523,8 +539,10 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
- 	svm->vmcb->control.pause_filter_count  = svm->nested.ctl.pause_filter_count;
- 	svm->vmcb->control.pause_filter_thresh = svm->nested.ctl.pause_filter_thresh;
- 
-+	nested_svm_transition_tlb_flush(vcpu);
-+
- 	/* Enter Guest-Mode */
--	enter_guest_mode(&svm->vcpu);
-+	enter_guest_mode(vcpu);
- 
- 	/*
- 	 * Merge guest and host intercepts - must be called with vcpu in
-@@ -803,6 +821,8 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
- 
- 	kvm_vcpu_unmap(vcpu, &map, true);
- 
-+	nested_svm_transition_tlb_flush(vcpu);
-+
- 	nested_svm_uninit_mmu_context(vcpu);
- 
- 	rc = nested_svm_load_cr3(vcpu, svm->vmcb->save.cr3, false);
+ 	vcpu->arch.cr3 = cr3;
+ 	kvm_register_mark_available(vcpu, VCPU_EXREG_CR3);
 -- 
 2.32.0.rc1.229.g3e70b5a671-goog
 
