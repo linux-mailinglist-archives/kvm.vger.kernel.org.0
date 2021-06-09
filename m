@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 268053A18E3
-	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 17:14:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 912893A18ED
+	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 17:15:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232675AbhFIPP6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 11:15:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48449 "EHLO
+        id S232251AbhFIPRZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 11:17:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22041 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229770AbhFIPP5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 9 Jun 2021 11:15:57 -0400
+        by vger.kernel.org with ESMTP id S229517AbhFIPRV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Jun 2021 11:17:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623251642;
+        s=mimecast20190719; t=1623251726;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=c/K7Lb66sqKExnO65jP5KpqY/atLTY2xOiqgK1khPHE=;
-        b=PDyy/U+/q+MsETkQOuZCF+CjhHzQ5z4AfjYVeLQu9iZmH7hm7ftdtSaqVqt7qmTvNfnsGo
-        FynswIZem4HMAuJcD8T1LR653MiLnvIj4P5UIzknz1Ea6JbWWv3Lp12ay7TbZX0SKS32gL
-        7HvQpo/js54eSKKZTioWVEv8qyMLv7g=
+        bh=YoyJlzd3DZII0wVHUo0HEeGrTKL6o7G0YweYY2FMpM8=;
+        b=dx1mKvQZphQ6j16UXQyaBGlVBeBespToOw+TEurS/jXlBlNkerIu96DdtR4S/E7xilwPK1
+        KJo8aCZ7SkLY64gmd2QCqvbmNHkIhxYA+gcBId9Le1SFEiaIaKfXgeFvcyJw3icz6VIyLf
+        r/0XrY1Th9AnIunOB3KrSYHvkpH4g3U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-AIS5kmEbMCmpZyNZmT_tvg-1; Wed, 09 Jun 2021 11:14:01 -0400
-X-MC-Unique: AIS5kmEbMCmpZyNZmT_tvg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-338-_fT5BZ2gPw-qzAPUfJvDUg-1; Wed, 09 Jun 2021 11:15:25 -0400
+X-MC-Unique: _fT5BZ2gPw-qzAPUfJvDUg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4C51107ACF6;
-        Wed,  9 Jun 2021 15:14:00 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 50962802690;
+        Wed,  9 Jun 2021 15:15:24 +0000 (UTC)
 Received: from [10.36.112.148] (ovpn-112-148.ams2.redhat.com [10.36.112.148])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C2D3863B8C;
-        Wed,  9 Jun 2021 15:13:54 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 2/7] lib: unify header guards
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E66B560C04;
+        Wed,  9 Jun 2021 15:15:18 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 3/7] asm-generic: unify header guards
 To:     Cornelia Huck <cohuck@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Huth <thuth@redhat.com>,
@@ -44,162 +44,88 @@ Cc:     kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
         kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org,
         linux-s390@vger.kernel.org
 References: <20210609143712.60933-1-cohuck@redhat.com>
- <20210609143712.60933-3-cohuck@redhat.com>
+ <20210609143712.60933-4-cohuck@redhat.com>
 From:   Laurent Vivier <lvivier@redhat.com>
-Message-ID: <f20b32d0-9272-66d5-e106-a0af4340b95a@redhat.com>
-Date:   Wed, 9 Jun 2021 17:13:53 +0200
+Message-ID: <c58b6fce-b7a5-9aec-dfe4-fec2ad7f6f50@redhat.com>
+Date:   Wed, 9 Jun 2021 17:15:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20210609143712.60933-3-cohuck@redhat.com>
+In-Reply-To: <20210609143712.60933-4-cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 09/06/2021 16:37, Cornelia Huck wrote:
-> Standardize header guards to _LIB_HEADER_H_.
+> Standardize header guards to _ASM_GENERIC_HEADER_H_.
 > 
 > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  lib/alloc_page.h       | 4 ++--
->  lib/libcflat.h         | 4 ++--
->  lib/list.h             | 4 ++--
->  lib/pci-edu.h          | 4 ++--
->  lib/pci-host-generic.h | 4 ++--
->  lib/setjmp.h           | 4 ++--
->  lib/string.h           | 6 +++---
->  lib/vmalloc.h          | 4 ++--
->  8 files changed, 17 insertions(+), 17 deletions(-)
-
-What about lib/argv.h and lib/pci.h?
-
-And there is also this instance of CONFIG_H in lib/config.h generated by configure.
-
-Thanks,
-Laurent
-
-
+>  lib/asm-generic/atomic.h          | 4 ++--
+>  lib/asm-generic/barrier.h         | 6 +++---
+>  lib/asm-generic/memory_areas.h    | 4 ++--
+>  lib/asm-generic/pci-host-bridge.h | 4 ++--
+>  4 files changed, 9 insertions(+), 9 deletions(-)
 > 
-> diff --git a/lib/alloc_page.h b/lib/alloc_page.h
-> index 1af1419d49b6..eed2ba06eeaf 100644
-> --- a/lib/alloc_page.h
-> +++ b/lib/alloc_page.h
-> @@ -5,8 +5,8 @@
->   * with byte granularity.
->   */
->  
-> -#ifndef ALLOC_PAGE_H
-> -#define ALLOC_PAGE_H 1
-> +#ifndef _ALLOC_PAGE_H_
-> +#define _ALLOC_PAGE_H_
->  
->  #include <stdbool.h>
->  #include <asm/memory_areas.h>
-> diff --git a/lib/libcflat.h b/lib/libcflat.h
-> index 460a1234ea6a..f40b431d1550 100644
-> --- a/lib/libcflat.h
-> +++ b/lib/libcflat.h
-> @@ -17,8 +17,8 @@
->   * Authors: Hollis Blanchard <hollisb@us.ibm.com>
->   */
->  
-> -#ifndef __LIBCFLAT_H
-> -#define __LIBCFLAT_H
-> +#ifndef _LIBCFLAT_H_
-> +#define _LIBCFLAT_H_
->  
->  #ifndef __ASSEMBLY__
->  
-> diff --git a/lib/list.h b/lib/list.h
-> index 7f9717ef6258..ed3e52b40075 100644
-> --- a/lib/list.h
-> +++ b/lib/list.h
+> diff --git a/lib/asm-generic/atomic.h b/lib/asm-generic/atomic.h
+> index 26b645a7cc18..b09ce95053e7 100644
+> --- a/lib/asm-generic/atomic.h
+> +++ b/lib/asm-generic/atomic.h
 > @@ -1,5 +1,5 @@
-> -#ifndef LIST_H
-> -#define LIST_H
-> +#ifndef _LIST_H_
-> +#define _LIST_H_
+> -#ifndef __ASM_GENERIC_ATOMIC_H__
+> -#define __ASM_GENERIC_ATOMIC_H__
+> +#ifndef _ASM_GENERIC_ATOMIC_H_
+> +#define _ASM_GENERIC_ATOMIC_H_
 >  
->  #include <stdbool.h>
->  
-> diff --git a/lib/pci-edu.h b/lib/pci-edu.h
-> index 44b4ba168768..9db94aec0bc7 100644
-> --- a/lib/pci-edu.h
-> +++ b/lib/pci-edu.h
-> @@ -12,8 +12,8 @@
->   * Edu device is a virtualized device in QEMU. Please refer to
->   * docs/specs/edu.txt in QEMU repository for EDU device manual.
->   */
-> -#ifndef __PCI_EDU_H__
-> -#define __PCI_EDU_H__
-> +#ifndef _PCI_EDU_H_
-> +#define _PCI_EDU_H_
->  
->  #include "pci.h"
->  #include "asm/io.h"
-> diff --git a/lib/pci-host-generic.h b/lib/pci-host-generic.h
-> index 0ffe6380ec8f..3020ee22c837 100644
-> --- a/lib/pci-host-generic.h
-> +++ b/lib/pci-host-generic.h
+>  /* From QEMU include/qemu/atomic.h */
+>  #define atomic_fetch_inc(ptr)  __sync_fetch_and_add(ptr, 1)
+> diff --git a/lib/asm-generic/barrier.h b/lib/asm-generic/barrier.h
+> index 6a990ff8d5a5..5499a5664d4d 100644
+> --- a/lib/asm-generic/barrier.h
+> +++ b/lib/asm-generic/barrier.h
 > @@ -1,5 +1,5 @@
-> -#ifndef PCI_HOST_GENERIC_H
-> -#define PCI_HOST_GENERIC_H
-> +#ifndef _PCI_HOST_GENERIC_H_
-> +#define _PCI_HOST_GENERIC_H_
+> -#ifndef _ASM_BARRIER_H_
+> -#define _ASM_BARRIER_H_
+> +#ifndef _ASM_GENERIC_BARRIER_H_
+> +#define _ASM_GENERIC_BARRIER_H_
 >  /*
->   * PCI host bridge supporting structures and constants
+>   * asm-generic/barrier.h
 >   *
-> diff --git a/lib/setjmp.h b/lib/setjmp.h
-> index 2c56b4c68aaa..6afdf665681a 100644
-> --- a/lib/setjmp.h
-> +++ b/lib/setjmp.h
-> @@ -4,8 +4,8 @@
->   * This code is free software; you can redistribute it and/or modify it
->   * under the terms of the GNU Library General Public License version 2.
->   */
-> -#ifndef LIBCFLAT_SETJMP_H
-> -#define LIBCFLAT_SETJMP_H 1
-> +#ifndef _LIBCFLAT_SETJMP_H_
-> +#define _LIBCFLAT_SETJMP_H_
+> @@ -32,4 +32,4 @@
+>  #define cpu_relax()	asm volatile ("":::"memory")
+>  #endif
 >  
->  typedef struct jmp_buf_tag {
->  	long int regs[8];
-> diff --git a/lib/string.h b/lib/string.h
-> index e1febfed7fb2..b07763eaef10 100644
-> --- a/lib/string.h
-> +++ b/lib/string.h
-> @@ -4,8 +4,8 @@
->   * This code is free software; you can redistribute it and/or modify it
->   * under the terms of the GNU Library General Public License version 2.
->   */
-> -#ifndef __STRING_H
-> -#define __STRING_H
-> +#ifndef _STRING_H_
-> +#define _STRING_H_
->  
->  extern size_t strlen(const char *buf);
->  extern size_t strnlen(const char *buf, size_t maxlen);
-> @@ -23,4 +23,4 @@ extern int memcmp(const void *s1, const void *s2, size_t n);
->  extern void *memmove(void *dest, const void *src, size_t n);
->  extern void *memchr(const void *s, int c, size_t n);
->  
-> -#endif /* _STRING_H */
-> +#endif /* _STRING_H_ */
-> diff --git a/lib/vmalloc.h b/lib/vmalloc.h
-> index 8b158f591d75..346f94f198c5 100644
-> --- a/lib/vmalloc.h
-> +++ b/lib/vmalloc.h
+> -#endif /* _ASM_BARRIER_H_ */
+> +#endif /* _ASM_GENERIC_BARRIER_H_ */
+> diff --git a/lib/asm-generic/memory_areas.h b/lib/asm-generic/memory_areas.h
+> index 3074afe23393..c86db255ecee 100644
+> --- a/lib/asm-generic/memory_areas.h
+> +++ b/lib/asm-generic/memory_areas.h
 > @@ -1,5 +1,5 @@
-> -#ifndef VMALLOC_H
-> -#define VMALLOC_H 1
-> +#ifndef _VMALLOC_H_
-> +#define _VMALLOC_H_
+> -#ifndef __ASM_GENERIC_MEMORY_AREAS_H__
+> -#define __ASM_GENERIC_MEMORY_AREAS_H__
+> +#ifndef _ASM_GENERIC_MEMORY_AREAS_H_
+> +#define _ASM_GENERIC_MEMORY_AREAS_H_
 >  
->  #include <asm/page.h>
->  
+>  #define AREA_NORMAL_PFN 0
+>  #define AREA_NORMAL_NUMBER 0
+> diff --git a/lib/asm-generic/pci-host-bridge.h b/lib/asm-generic/pci-host-bridge.h
+> index 9e91499b9446..174ff341dd0d 100644
+> --- a/lib/asm-generic/pci-host-bridge.h
+> +++ b/lib/asm-generic/pci-host-bridge.h
+> @@ -1,5 +1,5 @@
+> -#ifndef _ASM_PCI_HOST_BRIDGE_H_
+> -#define _ASM_PCI_HOST_BRIDGE_H_
+> +#ifndef _ASM_GENERIC_PCI_HOST_BRIDGE_H_
+> +#define _ASM_GENERIC_PCI_HOST_BRIDGE_H_
+>  /*
+>   * Copyright (C) 2016, Red Hat Inc, Alexander Gordeev <agordeev@redhat.com>
+>   *
 > 
+
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 
