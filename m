@@ -2,54 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AA2973A1D48
-	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 20:57:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E4F3B3A1D40
+	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 20:56:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230077AbhFIS73 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 14:59:29 -0400
-Received: from mail-qk1-f201.google.com ([209.85.222.201]:35778 "EHLO
-        mail-qk1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229638AbhFIS72 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Jun 2021 14:59:28 -0400
-Received: by mail-qk1-f201.google.com with SMTP id y5-20020a37af050000b02903a9c3f8b89fso17579649qke.2
-        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 11:57:33 -0700 (PDT)
+        id S229634AbhFIS6e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 14:58:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41806 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229659AbhFIS6d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Jun 2021 14:58:33 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7B81C061574
+        for <kvm@vger.kernel.org>; Wed,  9 Jun 2021 11:56:38 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id x64-20020a25a0460000b02905394c6727easo690080ybh.13
+        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 11:56:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=rQ5QXuNkqyOb24PESLtpS9Q1lHik0mMAFrhtFbd/4EI=;
-        b=GJdCw4u45mqHEYf1omOhAERu4Utd9+Bb3FRKHQ9Xkp7T7uGPEBiqdFWc1oQA0Ki2Uu
-         VL7hN0+ThJ2b6ABn77qSNdpUL8gig6xUmcYgLO7+75rsZkJDXotot27t8Re4zM1Beqg4
-         M+d1EFZ6UDipyz0V4cAbNYdxje4dlmqm8m/Coio5LjXqrERfNvfCkj2P4r2MBkd8+SMX
-         PgXIIhIEj6PtL+1JVYS0xrZwa/p5BVPJtjUzT/UiyVBuFDyeOeSW3LUVQ9+2bgD1PYdC
-         V4S/hgcCBfQtkiKltV3q3VYl/0IFzVDR/cc/ox9/Ww+fx0UMu2J9ta6cXQeHK99bj+77
-         tNVQ==
+        bh=KTEpwu4bqR1p8wvp17ZxzJ840iYXPnqSGeeyMtkh558=;
+        b=BK37mY3b/vCaVFAmjS3+wuKg+njrSO95JI/u5Tmp2gBMuXkMK9UePml6M/e2waTOGV
+         q1ePkup2RYO/3Xp8jdd97rVfkeQVb2oa4QAiY4HjRWriW8b0LcY6fRZBI/IGVB2jYkbx
+         ZE8044mUAylUMmAk9DiaP7LpLv8aQnuRa+ZDSuP61gdYF5uO8r+a63in32D8vSirQfsX
+         DoDyuvcxpDI1Cq981uPRA0lKmV1lBgs+um4ncXuhK8oa4wgC6UjQevxPhuU92WINF4YG
+         T7U1HAUaD7YooMoaZ9tJzlk6mCPL4HcAnwmPqPjwZM4kupUBtT1FH2VyxXS5imOk49zn
+         n9mA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=rQ5QXuNkqyOb24PESLtpS9Q1lHik0mMAFrhtFbd/4EI=;
-        b=MvPaml/3fw357zBXR1SXAinoQa+v9nqfcnt/hNgT68qg66Ven8d5VxkQSo//498+IK
-         Eho74Lppl2jtKRBP0zKYgAq72s0BNRidRc2xOdjVVcJoXemv0ula1Su2FseV6+9E1hHR
-         IW6LZq4dRn3ghDOgARrr/dUFqtApc8vfmTIgazt8Myw+7ZcVY07SGUzT/ziLvdcpjljG
-         ZGfi1qGMAjKyjDLqWV/kcZ6igLMvjaRV9PZIvgeHoMQPl54THglSAS/+oU+xdXTHr6+C
-         oDfkPlNiAoVf75KDY0Muws2qFP2V1gBwtJKJ1gxhx51IimMygTOf0cn/GOxyBkfBPXPm
-         neLQ==
-X-Gm-Message-State: AOAM533OW+LtyTB8aZKMvgyzrbg4fteEmqGFfmnAYXJft+Cgi8y23elh
-        5AG9Tm3Ss0IARL4gNSavWOZ+HKQdMtI=
-X-Google-Smtp-Source: ABdhPJzcGB5CqmRJoALcEAf/0vpr4XTL5dfme2lD3KQnk+Al5NEwikoLClTIgVmu/XaxLx/fXK2Vsgwr5UQ=
+        bh=KTEpwu4bqR1p8wvp17ZxzJ840iYXPnqSGeeyMtkh558=;
+        b=k3kb6Y3dk/GCjz7kItbnoLJRSmePxe9+geA3gDDPaMyYhI2iUJSVK29GoIeYr53z31
+         bpT2DjNy7+AuYTwqdVnnBmLi/a+B4I4VCpkVcFzQqwlPNiZgHjvDwRC4+JjrJRQ5SxGB
+         cZbZsZnjtHHOMiR7mwqc2R2t9PWWK2NZBKBk7cuHErZr1U3bXmtQB4TrmzIIbAr/LiEl
+         AoJyMsoXdF7ua+ILd1Sjf7yzF4Zx5vvQ+oBa7emS21xTlipblnkJcCIX/5mdT/UGFIB4
+         ReQdGlQh0l2wmLdC3m3BgGs2OZ9Y0EmMMXMw/hfZesxtu7R+SkUKGrFbOnMNDRUKsZbn
+         QVFg==
+X-Gm-Message-State: AOAM5312mngMWtn8WCB+0M44ZhB4dViRT7FoZmugMVE9EHYJa9fREOoH
+        XHgkQyjmmEHLmObuLkaOAD8Wgc0xL5A=
+X-Google-Smtp-Source: ABdhPJzBND09fjq/4DJeyZJ8vtjMoRARyd8cdN848SzR7XyYO/SOd+9sBcakKdjiuGFh3pagdwckmcfVoCU=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:bfdc:c2e5:77b1:8ef3])
- (user=seanjc job=sendgmr) by 2002:a0c:c68d:: with SMTP id d13mr1513817qvj.60.1623264993311;
- Wed, 09 Jun 2021 11:56:33 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:e097:: with SMTP id x145mr2112944ybg.226.1623264995557;
+ Wed, 09 Jun 2021 11:56:35 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  9 Jun 2021 11:56:11 -0700
+Date:   Wed,  9 Jun 2021 11:56:12 -0700
 In-Reply-To: <20210609185619.992058-1-seanjc@google.com>
-Message-Id: <20210609185619.992058-2-seanjc@google.com>
+Message-Id: <20210609185619.992058-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210609185619.992058-1-seanjc@google.com>
 X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
-Subject: [PATCH 1/9] KVM: x86: Immediately reset the MMU context when the SMM
- flag is cleared
+Subject: [PATCH 2/9] KVM: x86: Emulate triple fault shutdown if RSM emulation fails
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -64,78 +66,136 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Immediately reset the MMU context when the vCPU's SMM flag is cleared so
-that the SMM flag in the MMU role is always synchronized with the vCPU's
-flag.  If RSM fails (which isn't correctly emulated), KVM will bail
-without calling post_leave_smm() and leave the MMU in a bad state.
+Use the recently introduced KVM_REQ_TRIPLE_FAULT to properly emulate
+shutdown if RSM from SMM fails.
 
-The bad MMU role can lead to a NULL pointer dereference when grabbing a
-shadow page's rmap for a page fault as the initial lookups for the gfn
-will happen with the vCPU's SMM flag (=0), whereas the rmap lookup will
-use the shadow page's SMM flag, which comes from the MMU (=1).  SMM has
-an entirely different set of memslots, and so the initial lookup can find
-a memslot (SMM=0) and then explode on the rmap memslot lookup (SMM=1).
+Note, entering shutdown after clearing the SMM flag and restoring NMI
+blocking is architecturally correct with respect to AMD's APM, which KVM
+also uses for SMRAM layout and RSM NMI blocking behavior.  The APM says:
 
-  general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
-  KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-  CPU: 1 PID: 8410 Comm: syz-executor382 Not tainted 5.13.0-rc5-syzkaller #0
-  Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-  RIP: 0010:__gfn_to_rmap arch/x86/kvm/mmu/mmu.c:935 [inline]
-  RIP: 0010:gfn_to_rmap+0x2b0/0x4d0 arch/x86/kvm/mmu/mmu.c:947
-  Code: <42> 80 3c 20 00 74 08 4c 89 ff e8 f1 79 a9 00 4c 89 fb 4d 8b 37 44
-  RSP: 0018:ffffc90000ffef98 EFLAGS: 00010246
-  RAX: 0000000000000000 RBX: ffff888015b9f414 RCX: ffff888019669c40
-  RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000001
-  RBP: 0000000000000001 R08: ffffffff811d9cdb R09: ffffed10065a6002
-  R10: ffffed10065a6002 R11: 0000000000000000 R12: dffffc0000000000
-  R13: 0000000000000003 R14: 0000000000000001 R15: 0000000000000000
-  FS:  000000000124b300(0000) GS:ffff8880b9b00000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 0000000000000000 CR3: 0000000028e31000 CR4: 00000000001526e0
-  DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-  DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-  Call Trace:
-   rmap_add arch/x86/kvm/mmu/mmu.c:965 [inline]
-   mmu_set_spte+0x862/0xe60 arch/x86/kvm/mmu/mmu.c:2604
-   __direct_map arch/x86/kvm/mmu/mmu.c:2862 [inline]
-   direct_page_fault+0x1f74/0x2b70 arch/x86/kvm/mmu/mmu.c:3769
-   kvm_mmu_do_page_fault arch/x86/kvm/mmu.h:124 [inline]
-   kvm_mmu_page_fault+0x199/0x1440 arch/x86/kvm/mmu/mmu.c:5065
-   vmx_handle_exit+0x26/0x160 arch/x86/kvm/vmx/vmx.c:6122
-   vcpu_enter_guest+0x3bdd/0x9630 arch/x86/kvm/x86.c:9428
-   vcpu_run+0x416/0xc20 arch/x86/kvm/x86.c:9494
-   kvm_arch_vcpu_ioctl_run+0x4e8/0xa40 arch/x86/kvm/x86.c:9722
-   kvm_vcpu_ioctl+0x70f/0xbb0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3460
-   vfs_ioctl fs/ioctl.c:51 [inline]
-   __do_sys_ioctl fs/ioctl.c:1069 [inline]
-   __se_sys_ioctl+0xfb/0x170 fs/ioctl.c:1055
-   do_syscall_64+0x3f/0xb0 arch/x86/entry/common.c:47
-   entry_SYSCALL_64_after_hwframe+0x44/0xae
-  RIP: 0033:0x440ce9
+  An RSM causes a processor shutdown if an invalid-state condition is
+  found in the SMRAM state-save area. Only an external reset, external
+  processor-initialization, or non-maskable external interrupt (NMI) can
+  cause the processor to leave the shutdown state.
 
-Reported-by: syzbot+fb0b6a7e8713aeb0319c@syzkaller.appspotmail.com
-Fixes: 9ec19493fb86 ("KVM: x86: clear SMM flags before loading state while leaving SMM")
+Of note is processor-initialization (INIT) as a valid shutdown wake
+event, as INIT is blocked by SMM, implying that entering shutdown also
+forces the CPU out of SMM.
+
+For recent Intel CPUs, restoring NMI blocking is technically wrong, but
+so is restoring NMI blocking in the first place, and Intel's RSM
+"architecture" is such a mess that just about anything is allowed and can
+be justified as micro-architectural behavior.
+
+Per the SDM:
+
+  On Pentium 4 and later processors, shutdown will inhibit INTR and A20M
+  but will not change any of the other inhibits. On these processors,
+  NMIs will be inhibited if no action is taken in the SMI handler to
+  uninhibit them (see Section 34.8).
+
+where Section 34.8 says:
+
+  When the processor enters SMM while executing an NMI handler, the
+  processor saves the SMRAM state save map but does not save the
+  attribute to keep NMI interrupts disabled. Potentially, an NMI could be
+  latched (while in SMM or upon exit) and serviced upon exit of SMM even
+  though the previous NMI handler has still not completed.
+
+I.e. RSM unconditionally unblocks NMI, but shutdown on RSM does not,
+which is in direct contradiction of KVM's behavior.  But, as mentioned
+above, KVM follows AMD architecture and restores NMI blocking on RSM, so
+that micro-architectural detail is already lost.
+
+And for Pentium era CPUs, SMI# can break shutdown, meaning that at least
+some Intel CPUs fully leave SMM when entering shutdown:
+
+  In the shutdown state, Intel processors stop executing instructions
+  until a RESET#, INIT# or NMI# is asserted.  While Pentium family
+  processors recognize the SMI# signal in shutdown state, P6 family and
+  Intel486 processors do not.
+
+In other words, the fact that Intel CPUs have implemented the two
+extremes gives KVM carte blanche when it comes to honoring Intel's
+architecture for handling shutdown during RSM.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ arch/x86/kvm/emulate.c     | 12 +++++++-----
+ arch/x86/kvm/kvm_emulate.h |  1 +
+ arch/x86/kvm/x86.c         |  6 ++++++
+ 3 files changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9dd23bdfc6cc..54d212fe9b15 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7106,7 +7106,10 @@ static unsigned emulator_get_hflags(struct x86_emulate_ctxt *ctxt)
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 5e5de05a8fbf..0603a2c79093 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -2683,7 +2683,7 @@ static int em_rsm(struct x86_emulate_ctxt *ctxt)
+ 	 * state-save area.
+ 	 */
+ 	if (ctxt->ops->pre_leave_smm(ctxt, buf))
+-		return X86EMUL_UNHANDLEABLE;
++		goto emulate_shutdown;
  
- static void emulator_set_hflags(struct x86_emulate_ctxt *ctxt, unsigned emul_flags)
- {
--	emul_to_vcpu(ctxt)->arch.hflags = emul_flags;
-+	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
+ #ifdef CONFIG_X86_64
+ 	if (emulator_has_longmode(ctxt))
+@@ -2692,14 +2692,16 @@ static int em_rsm(struct x86_emulate_ctxt *ctxt)
+ #endif
+ 		ret = rsm_load_state_32(ctxt, buf);
+ 
+-	if (ret != X86EMUL_CONTINUE) {
+-		/* FIXME: should triple fault */
+-		return X86EMUL_UNHANDLEABLE;
+-	}
++	if (ret != X86EMUL_CONTINUE)
++		goto emulate_shutdown;
+ 
+ 	ctxt->ops->post_leave_smm(ctxt);
+ 
+ 	return X86EMUL_CONTINUE;
 +
-+	vcpu->arch.hflags = emul_flags;
-+	kvm_mmu_reset_context(vcpu);
++emulate_shutdown:
++	ctxt->ops->triple_fault(ctxt);
++	return X86EMUL_UNHANDLEABLE;
  }
  
- static int emulator_pre_leave_smm(struct x86_emulate_ctxt *ctxt,
+ static void
+diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+index 3e870bf9ca4d..9c34aa60e45f 100644
+--- a/arch/x86/kvm/kvm_emulate.h
++++ b/arch/x86/kvm/kvm_emulate.h
+@@ -233,6 +233,7 @@ struct x86_emulate_ops {
+ 	int (*pre_leave_smm)(struct x86_emulate_ctxt *ctxt,
+ 			     const char *smstate);
+ 	void (*post_leave_smm)(struct x86_emulate_ctxt *ctxt);
++	void (*triple_fault)(struct x86_emulate_ctxt *ctxt);
+ 	int (*set_xcr)(struct x86_emulate_ctxt *ctxt, u32 index, u64 xcr);
+ };
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 54d212fe9b15..cda148cf06fa 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7123,6 +7123,11 @@ static void emulator_post_leave_smm(struct x86_emulate_ctxt *ctxt)
+ 	kvm_smm_changed(emul_to_vcpu(ctxt));
+ }
+ 
++static void emulator_triple_fault(struct x86_emulate_ctxt *ctxt)
++{
++	kvm_make_request(KVM_REQ_TRIPLE_FAULT, emul_to_vcpu(ctxt));
++}
++
+ static int emulator_set_xcr(struct x86_emulate_ctxt *ctxt, u32 index, u64 xcr)
+ {
+ 	return __kvm_set_xcr(emul_to_vcpu(ctxt), index, xcr);
+@@ -7172,6 +7177,7 @@ static const struct x86_emulate_ops emulate_ops = {
+ 	.set_hflags          = emulator_set_hflags,
+ 	.pre_leave_smm       = emulator_pre_leave_smm,
+ 	.post_leave_smm      = emulator_post_leave_smm,
++	.triple_fault        = emulator_triple_fault,
+ 	.set_xcr             = emulator_set_xcr,
+ };
+ 
 -- 
 2.32.0.rc1.229.g3e70b5a671-goog
 
