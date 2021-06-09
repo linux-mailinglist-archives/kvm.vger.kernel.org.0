@@ -2,151 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 082403A20CC
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 01:29:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A6193A20F9
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 01:44:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230295AbhFIXbL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 19:31:11 -0400
-Received: from mail-pf1-f177.google.com ([209.85.210.177]:39666 "EHLO
-        mail-pf1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230255AbhFIXa7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Jun 2021 19:30:59 -0400
-Received: by mail-pf1-f177.google.com with SMTP id k15so38147pfp.6
-        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 16:28:53 -0700 (PDT)
+        id S230317AbhFIXpv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 19:45:51 -0400
+Received: from mail-qv1-f73.google.com ([209.85.219.73]:56106 "EHLO
+        mail-qv1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230291AbhFIXpu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Jun 2021 19:45:50 -0400
+Received: by mail-qv1-f73.google.com with SMTP id c9-20020a0562140049b02902246fb9601eso5832235qvr.22
+        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 16:43:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=XAzb3VkfUYxU1teKArHCgpj6NOb9ejMO6tAx0JjUIoQ=;
-        b=O88kABLyJToxtXQQFFjKPeMLrJ6YesZtMujpSNeGlQr4FiygAaEUmju5bI0djjtyMO
-         fmcAoWXx+PQjavZKTMLpBmCljJ1id5ISpmeoUMvTwVllZ38QED5U5oIuNgaW/8FJouyL
-         OiLP0c9ZxGG9OOuD6Jj5yFH8xh1WJo4xhhiJnI4Ewx6elUoDWibQFNeKjkHo6Q41BgVZ
-         6OhFZ6U33EpgC9MKiUFgd9OVoT0548QMf4OzuoRrZcGp5QgdYh/+iS6Pzfu0KaDlqjjv
-         FBKDBtgmajPmIt/ZcOzKSapooa1CDhL0tp2kafx6jHLIeKGMC1KlffQdYwljAhBcx5Rl
-         UFjg==
+        d=google.com; s=20161025;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=cf+PBcjDUxGIj9/295s6zdiSNXtJ4G7lf26HTPdRo1w=;
+        b=mhkfykEavDETnLV1exgNtC8oTqdPqkz0tNNvjSdH5vzC1QNrtNBY7s5bz7cEGhE/0R
+         6ejGo7I0eok6GJpWXeyfQrrX7s2VViTJswmrGlo46hXOEahmQ7JstM8n2SSUQrGfoPvh
+         tM694Lwis3A/w/pc91jCupX6eX+LY3mdciUfXiYrozOQojBK1FU5pXpl0jp2RKqFU4LT
+         mlHR9Omqc5n1geG4Y0+2dhlLQqjS7hmfE11GsABUTKGYTDd7o8eul/qz54VnwRQczImb
+         Tzp0dylveVSaCrDxLQ4xJL7RiLnsfqCq3fwZf0IkwUFUe6ZehyoXtaF+P81f//aky7vw
+         jD2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=XAzb3VkfUYxU1teKArHCgpj6NOb9ejMO6tAx0JjUIoQ=;
-        b=qvCACbhs8SD1fHuAaRyyIXNrU7KbmmGiQ3Aw4qQv0gTxs/giqsHutaG5Wq5VgXPkAa
-         y+FCx0kkcurSYsUsrjWmY4iwlfxX/QxPm4LpIbymubBPhs03Y1xGcK66uKgg+VAtJavU
-         Tfb8gt6QjadNyTD7PHN94sStA5LAA9jZ+sUL/xGx9VPoI1rog3rkN3IQp6uHph95wql3
-         CdVuRhzZM7m+dNzqKZ5J/4QihAtW/Dun1dB4IBFovfsDqTbZ5RPIX36pqathCKgt24TH
-         pvSsTUhW0M5rMEBYNS+S5E3mhV1Rnmiayk3GMiMPAoIAojZwRxxZLKl5oR0yCfAcNJ2a
-         3Agg==
-X-Gm-Message-State: AOAM532UL34eRCfFaSJQCmZ0w9+rntDzMbAzhypYueRbKSg9H01Xoe0l
-        GZ+dIeKAJDPiAevEi8wRyQ8pVQ==
-X-Google-Smtp-Source: ABdhPJxf83Qcv5sMhiGgL1PwI1FYFWMLIxV5hrXF/xSHNmKBquW4gmSwSNNe2aOfHo5UenCXytSasw==
-X-Received: by 2002:a63:de02:: with SMTP id f2mr2100758pgg.32.1623281273711;
-        Wed, 09 Jun 2021 16:27:53 -0700 (PDT)
-Received: from n124-121-013.byted.org (ec2-54-241-92-238.us-west-1.compute.amazonaws.com. [54.241.92.238])
-        by smtp.gmail.com with ESMTPSA id k1sm526783pfa.30.2021.06.09.16.27.52
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 09 Jun 2021 16:27:53 -0700 (PDT)
-From:   Jiang Wang <jiang.wang@bytedance.com>
-To:     sgarzare@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, stefanha@redhat.com,
-        mst@redhat.com, arseny.krasnov@kaspersky.com,
-        jhansen@vmware.comments, cong.wang@bytedance.com,
-        duanxiongchun@bytedance.com, xieyongji@bytedance.com,
-        chaiwen.cc@bytedance.com, Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Lu Wei <luwei32@huawei.com>,
-        Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC v1 6/6] virtio/vsock: add sysfs for rx buf len for dgram
-Date:   Wed,  9 Jun 2021 23:24:58 +0000
-Message-Id: <20210609232501.171257-7-jiang.wang@bytedance.com>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20210609232501.171257-1-jiang.wang@bytedance.com>
-References: <20210609232501.171257-1-jiang.wang@bytedance.com>
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=cf+PBcjDUxGIj9/295s6zdiSNXtJ4G7lf26HTPdRo1w=;
+        b=F3T7vpXewEIA1O1Rgmw4J+vI3zX6CjHZlVmRUYJMFfUHt7NNLeBZYeimZ6AcxOJA2F
+         g5VTV02uauL7wmeTa5suFggMpFNasr9Tw2LYqtqSr772bN17hCv3AwfvpiTvSBedZTkc
+         crI4gi26c1MB7U1Pu//YnVOLREvkVtFFF5R9Wq2i3JGwxDmwmfQSBZaGlHQHF2yXGBq0
+         vJ0xfkSAFAKsUyQwygKYyy7dGZ85cpp/T5TgCS2NnFfXXK1kRU7Qn6W6ow1yiTwcmvWH
+         Zi5S2Dn8gstIvRItzwAQ1J8IIFyXcsV9gwGqAAT/EX6McaGBDT6kRxQaU4H75hQqC8d4
+         v7mg==
+X-Gm-Message-State: AOAM530sriYDjXLMCpn/0yTs757Wxxu4q4JFD4TPFAq7H/UGakDBILfA
+        ltgXeP7pUiXuUP63EyOuI0GmVdQm/rc=
+X-Google-Smtp-Source: ABdhPJzxktU7xI8kCHat1pp07oRXofxpQoacAe1AI2rYFxp4Kd55MFLRKm+bfhWImgiHJH0K4LEuOAoO2dQ=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:8daf:e5e:ae50:4f28])
+ (user=seanjc job=sendgmr) by 2002:ad4:55ac:: with SMTP id f12mr2563463qvx.39.1623282162273;
+ Wed, 09 Jun 2021 16:42:42 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed,  9 Jun 2021 16:42:20 -0700
+Message-Id: <20210609234235.1244004-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
+Subject: [PATCH 00/15] KVM: x86/mmu: TLB fixes and related cleanups
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Junaid Shahid <junaids@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Lai Jiangshan <laijs@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make rx buf len configurable via sysfs
+Fixes for two (very) theoretical TLB flushing bugs (patches 1 and 4),
+and clean ups on top to (hopefully) consolidate and simplifiy the TLB
+flushing logic.
 
-Signed-off-by: Jiang Wang <jiang.wang@bytedance.com>
----
- net/vmw_vsock/virtio_transport.c | 37 +++++++++++++++++++++++++++++++++++--
- 1 file changed, 35 insertions(+), 2 deletions(-)
+The basic gist of the TLB flush and MMU sync code shuffling  is to stop
+relying on the logic in __kvm_mmu_new_pgd() (but keep it for forced
+flushing), and instead handle the flush+sync logic in the caller
+independent from whether or not the "fast" switch occurs.
 
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index cf47aadb0c34..2e4dd9c48472 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -29,6 +29,14 @@ static struct virtio_vsock __rcu *the_virtio_vsock;
- static struct virtio_vsock *the_virtio_vsock_dgram;
- static DEFINE_MUTEX(the_virtio_vsock_mutex); /* protects the_virtio_vsock */
- 
-+static int rx_buf_len = VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE;
-+static struct kobject *kobj_ref;
-+static ssize_t  sysfs_show(struct kobject *kobj,
-+			struct kobj_attribute *attr, char *buf);
-+static ssize_t  sysfs_store(struct kobject *kobj,
-+			struct kobj_attribute *attr, const char *buf, size_t count);
-+static struct kobj_attribute rxbuf_attr = __ATTR(rx_buf_value, 0660, sysfs_show, sysfs_store);
-+
- struct virtio_vsock {
- 	struct virtio_device *vdev;
- 	struct virtqueue **vqs;
-@@ -360,7 +368,7 @@ virtio_transport_cancel_pkt(struct vsock_sock *vsk)
- 
- static void virtio_vsock_rx_fill(struct virtio_vsock *vsock, bool is_dgram)
- {
--	int buf_len = VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE;
-+	int buf_len = rx_buf_len;
- 	struct virtio_vsock_pkt *pkt;
- 	struct scatterlist hdr, buf, *sgs[2];
- 	struct virtqueue *vq;
-@@ -1003,6 +1011,22 @@ static struct virtio_driver virtio_vsock_driver = {
- 	.remove = virtio_vsock_remove,
- };
- 
-+static ssize_t sysfs_show(struct kobject *kobj,
-+		struct kobj_attribute *attr, char *buf)
-+{
-+	return sprintf(buf, "%d", rx_buf_len);
-+}
-+
-+static ssize_t sysfs_store(struct kobject *kobj,
-+		struct kobj_attribute *attr, const char *buf, size_t count)
-+{
-+	if (kstrtou32(buf, 0, &rx_buf_len) < 0)
-+		return -EINVAL;
-+	if (rx_buf_len < 1024)
-+		rx_buf_len = 1024;
-+	return count;
-+}
-+
- static int __init virtio_vsock_init(void)
- {
- 	int ret;
-@@ -1020,8 +1044,17 @@ static int __init virtio_vsock_init(void)
- 	if (ret)
- 		goto out_vci;
- 
--	return 0;
-+	kobj_ref = kobject_create_and_add("vsock", kernel_kobj);
- 
-+	/*Creating sysfs file for etx_value*/
-+	ret = sysfs_create_file(kobj_ref, &rxbuf_attr.attr);
-+	if (ret)
-+		goto out_sysfs;
-+
-+	return 0;
-+out_sysfs:
-+	kobject_put(kobj_ref);
-+	sysfs_remove_file(kernel_kobj, &rxbuf_attr.attr);
- out_vci:
- 	vsock_core_unregister(&virtio_transport.transport);
- out_wq:
+I spent a fair bit of time trying to shove the necessary logic down into
+__kvm_mmu_new_pgd(), but it always ended up a complete mess because the
+requirements and contextual information is always different.  The rules
+for MOV CR3 are different from nVMX transitions (and those vary based on
+EPT+VPID), and nSVM will be different still (once it adds proper TLB
+handling).  In particular, I like that nVMX no longer has special code
+for synchronizing the MMU when using shadowing paging and instead relies
+on the common rules for TLB flushing.
+
+Note, this series (indirectly) relies heavily on commit b53e84eed08b
+("KVM: x86: Unload MMU on guest TLB flush if TDP disabled to force MMU
+sync"), as it uses KVM_REQ_TLB_FLUSH_GUEST (was KVM_REQ_HV_TLB_FLUSH)
+to do the TLB flush _and_ the MMU sync in non-PV code.
+
+Tested all combinations for i386, EPT, NPT, and shadow paging. I think...
+
+The EPTP switching and INVPCID single-context changes in particular lack
+meaningful coverage in kvm-unit-tests+Linux.  Long term it's on my todo
+list to remedy that, but realistically I doubt I'll get it done anytime
+soon.
+
+To test EPTP switching, I hacked L1 to set up a duplicate top-level EPT
+table, copy the "real" table to the duplicate table on EPT violation,
+populate VMFUNC.EPTP_LIST with the two EPTPs, expose  VMFUNC.EPTP_SWITCH
+to L2.  I then hacked L2 to do an EPTP switch to a random (valid) EPTP
+index on every task switch.
+
+To test INVPCID single-context I modified L1 to iterate over all possible
+PCIDs using INVPCID single-context in native_flush_tlb_global().  I also
+verified that the guest crashed if it didn't do any INVPCID at all
+(interestingly, the guest made it through boot without the flushes when
+EPT was enabled, which implies the missing MMU sync on INVPCID was the
+source of the crash, not a stale TLB entry).
+
+Sean Christopherson (15):
+  KVM: nVMX: Sync all PGDs on nested transition with shadow paging
+  KVM: nVMX: Ensure 64-bit shift when checking VMFUNC bitmap
+  KVM: nVMX: Don't clobber nested MMU's A/D status on EPTP switch
+  KVM: x86: Invalidate all PGDs for the current PCID on MOV CR3 w/ flush
+  KVM: x86: Uncondtionally skip MMU sync/TLB flush in MOV CR3's PGD
+    switch
+  KVM: nSVM: Move TLB flushing logic (or lack thereof) to dedicated
+    helper
+  KVM: x86: Drop skip MMU sync and TLB flush params from "new PGD"
+    helpers
+  KVM: nVMX: Consolidate VM-Enter/VM-Exit TLB flush and MMU sync logic
+  KVM: nVMX: Free only guest_mode (L2) roots on INVVPID w/o EPT
+  KVM: x86: Use KVM_REQ_TLB_FLUSH_GUEST to handle INVPCID(ALL) emulation
+  KVM: nVMX: Use fast PGD switch when emulating VMFUNC[EPTP_SWITCH]
+  KVM: x86: Defer MMU sync on PCID invalidation
+  KVM: x86: Drop pointless @reset_roots from kvm_init_mmu()
+  KVM: nVMX: WARN if subtly-impossible VMFUNC conditions occur
+  KVM: nVMX: Drop redundant checks on vmcs12 in EPTP switching emulation
+
+ arch/x86/include/asm/kvm_host.h |   6 +-
+ arch/x86/kvm/hyperv.c           |   2 +-
+ arch/x86/kvm/mmu.h              |   2 +-
+ arch/x86/kvm/mmu/mmu.c          |  57 ++++++++-----
+ arch/x86/kvm/svm/nested.c       |  40 ++++++---
+ arch/x86/kvm/vmx/nested.c       | 139 ++++++++++++--------------------
+ arch/x86/kvm/x86.c              |  75 ++++++++++-------
+ 7 files changed, 169 insertions(+), 152 deletions(-)
+
 -- 
-2.11.0
+2.32.0.rc1.229.g3e70b5a671-goog
 
