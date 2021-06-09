@@ -2,182 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 06B1E3A0E94
-	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 10:14:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E41CC3A0EFD
+	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 10:52:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237445AbhFIIQt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 04:16:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34335 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237229AbhFIIQs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 9 Jun 2021 04:16:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623226494;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BJdAIhBhaJHDTxxgy9Ey5Eqpozz7WMzGVnuX/u268J8=;
-        b=B4WmiwIXLq2Ut0hykR2DN0UkrBmgsPK5hpC+3poG+rM862icUCA9wstjy9hCS3h2Q54xO1
-        QdkRxFl79toWPX4aQGat22StmDt/KTnmNgQsNxTlqCxDEWSdCZ3mC8vmw8RheGybJgIMxx
-        bDfwFU6qPJ3YijwXt/h2LULkTCbzamQ=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-503-gQ1ZxNFJMZO8o-KTJa3aYg-1; Wed, 09 Jun 2021 04:14:52 -0400
-X-MC-Unique: gQ1ZxNFJMZO8o-KTJa3aYg-1
-Received: by mail-wm1-f69.google.com with SMTP id j6-20020a05600c1906b029019e9c982271so2305832wmq.0
-        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 01:14:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:subject:to:cc:references:from
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-transfer-encoding:content-language;
-        bh=BJdAIhBhaJHDTxxgy9Ey5Eqpozz7WMzGVnuX/u268J8=;
-        b=YILtA/5La9OMpaWlz7m3NCK6hlnXpX/39j+BNepvAkParFZkUyHnJr6yLUFdxAyHYW
-         MJfvswRMMsrR5a4UHk0rLwFoGzSY6/tmEiVjtyaopHCZOiR63+oRp5QuJQj1y4eQYjP/
-         nurbj2pTdyIB0Jo3Dtf1VYa9Ix5Q8q4VUQ0U8TBw2JJQWiTlEijnUV68t8qHG8Ws2VR1
-         gXHsLZ+l5EO9A20wGKepRlT+5UWVLJdydnCUB8VJQoPP1rf8WzSJmXczpYM1v56F/P0Y
-         exBEJ9lS/LLofxsR6W2Vy5LYxLEU6U39J/jFluAEn/wnyvs2OsgHeQkxvAIEVWr9bnym
-         dUlg==
-X-Gm-Message-State: AOAM533ioJCJhZUxsJ19R7c6lk9pYUvOsyTa0DuPK1YFGxpUoszvX8Du
-        VuV15Om2PaQc5mYa+z1QaJf+ImwoSBqDBb4fQxW8+jdEnyE61ND9/XcIMCZPlBMNBaxSFVik3If
-        +KkYmxMgJox2w
-X-Received: by 2002:a1c:5452:: with SMTP id p18mr25986468wmi.176.1623226491775;
-        Wed, 09 Jun 2021 01:14:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwHztkUAyI+BmnE5wcOSMiNwdss3hfpHeT1nOccAa3B1HkID/3sYMZnDdskmY46CLurO/tQVA==
-X-Received: by 2002:a1c:5452:: with SMTP id p18mr25986454wmi.176.1623226491547;
-        Wed, 09 Jun 2021 01:14:51 -0700 (PDT)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id w13sm24559323wrc.31.2021.06.09.01.14.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Jun 2021 01:14:50 -0700 (PDT)
-Reply-To: eric.auger@redhat.com
-Subject: Re: Plan for /dev/ioasid RFC v2
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        "Alex Williamson (alex.williamson@redhat.com)" 
-        <alex.williamson@redhat.com>,
+        id S237794AbhFIIyQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 04:54:16 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:44127 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237793AbhFIIyQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Jun 2021 04:54:16 -0400
+Received: from [192.168.1.155] ([77.9.120.3]) by mrelayeu.kundenserver.de
+ (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1MaIGB-1lo04d0Q0D-00WDfS; Wed, 09 Jun 2021 10:51:54 +0200
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
         Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Jason Wang <jasowang@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shenming Lu <lushenming@huawei.com>
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
         "Jiang, Dave" <dave.jiang@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Joerg Roedel <joro@8bytes.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Robin Murphy <robin.murphy@arm.com>,
         LKML <linux-kernel@vger.kernel.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>
-References: <MWHPR11MB188699D0B9C10EB51686C4138C389@MWHPR11MB1886.namprd11.prod.outlook.com>
-From:   Eric Auger <eric.auger@redhat.com>
-Message-ID: <b1bb72b5-cb98-7739-8788-01e36ec415a8@redhat.com>
-Date:   Wed, 9 Jun 2021 10:14:48 +0200
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jason Wang <jasowang@redhat.com>
+References: <30e5c597-b31c-56de-c75e-950c91947d8f@redhat.com>
+ <20210604160336.GA414156@nvidia.com>
+ <2c62b5c7-582a-c710-0436-4ac5e8fd8b39@redhat.com>
+ <20210604172207.GT1002214@nvidia.com>
+ <2d1ad075-bec6-bfb9-ce71-ed873795e973@redhat.com>
+ <20210607175926.GJ1002214@nvidia.com>
+ <fdb2f38c-da1f-9c12-af44-22df039fcfea@redhat.com>
+ <20210608131547.GE1002214@nvidia.com>
+ <89d30977-119c-49f3-3bf6-d3f7104e07d8@redhat.com>
+ <20210608124700.7b9aa5a6.alex.williamson@redhat.com>
+ <20210608190022.GM1002214@nvidia.com>
+From:   "Enrico Weigelt, metux IT consult" <lkml@metux.net>
+Message-ID: <ec0b1ef9-ae2f-d6c7-99b7-4699ced146e4@metux.net>
+Date:   Wed, 9 Jun 2021 10:51:49 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-In-Reply-To: <MWHPR11MB188699D0B9C10EB51686C4138C389@MWHPR11MB1886.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+In-Reply-To: <20210608190022.GM1002214@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: tl
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:129gpDF0BUiljAKLG/lQM9gOvQsLJNYv6mn4lsTL3Y6scaycnu6
+ FPVYBAyrjnF1UY5uwjcf4oFw4beloQnySFsPKYbawZfN6tAapAsVHo2QgL4R4yFkhCoiQly
+ iyPTJnWT8Mwi7XapNxHe64Lv15irUjL5dqbROpopaoobxzsl59SG2wsiJeu+82nnrgqc/7a
+ JUvZonTmpEByKtCFMeFWw==
+X-Spam-Flag: NO
+X-UI-Out-Filterresults: notjunk:1;V03:K0:POLH6n9P4zc=:r5TZcQVPFRF4PjIFhtEtsc
+ dD3FDxLNBDMLgWG/MNRgaoxxjZoeGAnDFNrL5n572RnYavwM9FfniMfqfMegke/Kgg+e/KzJa
+ 9LT9KniwqqSJEplpR6p60i0ubJxhUj61aitZlsxUKoHu1+cYuoLonSFnlHgOXXC3zFb7sKL/l
+ 5+N8urVp3aD+42CMom3DQmR/OhngLKKh+hlZaij3jykJCSIz47lO9KJuXFI+YhvVENVR+ioig
+ WZT63ZCSIX6xP1GiD1irLtO7PWirac5YLkWT77v6fAqAq7TwBbrQ5aSJndaBXoRp894v5mq+A
+ hxHvxDh5Ac4N20dRUBxzHcjupjmrO/qFNOsUIZXrvj6wkMw2LhuGnb9V7NHPk8ut4K8TtSMzz
+ NftmcBDo+y4gl+xa7jJC9dAZA2MJKxdMtOURjbYeDGaoHWYoYYUAaW9hKpmQVqPUOVzVXdpKb
+ BnL/wbMl256p27IIfNXK9nADHPcn4funqrbusWTku0lTWHysNztTXM0dDN+uqFCyfGjMB/61y
+ SDR8IC7P1tGKRZkANhzhfE=
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Kevin,
+On 08.06.21 21:00, Jason Gunthorpe wrote:
 
-On 6/7/21 4:58 AM, Tian, Kevin wrote:
-> Hi, all,
->
-> We plan to work on v2 now, given many good comments already received
-> and substantial changes envisioned. This is a very complex topic with
-> many sub-threads being discussed. To ensure that I didn't miss valuable 
-> suggestions (and also keep everyone on the same page), here I'd like to 
-> provide a list of planned changes in my mind. Please let me know if 
-> anything important is lost.  :)
->
-> --
->
-> (Remaining opens in v1)
->
-> -   Protocol between kvm/vfio/ioasid for wbinvd/no-snoop. I'll see how
->     much can be refined based on discussion progress when v2 is out;
->
-> -   Device-centric (Jason) vs. group-centric (David) uAPI. David is not fully
->     convinced yet. Based on discussion v2 will continue to have ioasid uAPI
->     being device-centric (but it's fine for vfio to be group-centric). A new
->     section will be added to elaborate this part;
->
-> -   PASID virtualization (section 4) has not been thoroughly discussed yet. 
->     Jason gave some suggestion on how to categorize intended usages. 
->     I will rephrase this section and hope more discussions can be held for 
->     it in v2;
->
-> (Adopted suggestions)
->
-> -   (Jason) Rename /dev/ioasid to /dev/iommu (so does uAPI e.g. IOASID
->     _XXX to IOMMU_XXX). One suggestion (Jason) was to also rename 
->     RID+PASID to SID+SSID. But given the familiarity of the former, I will 
->     still use RID+PASID in v2 to ease the discussoin;
->
-> -   (Jason) v1 prevents one device from binding to multiple ioasid_fd's. This 
->     will be fixed in v2;
->
-> -   (Jean/Jason) No need to track guest I/O page tables on ARM/AMD. When 
->     a pasid table is bound, it becomes a container for all guest I/O page tables;
-while I am totally in line with that change, I guess we need to revisit
-the invalidate ioctl
-to support PASID table invalidation.
->
-> -   (Jean/Jason) Accordingly a device label is required so iotlb invalidation 
->     and fault handling can both support per-device operation. Per Jean's 
->     suggestion, this label will come from userspace (when VFIO_BIND_
->     IOASID_FD);
+> Eg I can do open() on a file and I get to keep that FD. I get to keep
+> that FD even if someone later does chmod() on that file so I can't
+> open it again.
+> 
+> There are lots of examples where a one time access control check
+> provides continuing access to a resource. I feel the ongoing proof is
+> the rarity in Unix.. 'revoke' is an uncommon concept in Unix..
 
-what is not totally clear to me is the correspondance between this label
-and the SID/SSID tuple.
-My understanding is it rather maps to the SID because you can attach
-several ioasids to the device.
-So it is not clear to me how you reconstruct the SSID info
+Yes, it's even possible that somebody w/ privileges opens an fd and
+hands it over to somebody unprivileged (eg. via unix socket). This is
+a very basic unix concept. If some (already opened) fd now suddenly
+behaves differently based on the current caller, that would be a break
+with traditional unix semantics.
 
-Thanks
 
-Eric
->
-> -   (Jason) Addition of device label allows per-device capability/format 
->     check before IOASIDs are created. This leads to another major uAPI 
->     change in v2 - specify format info when creating an IOASID (mapping 
->     protocol, nesting, coherent, etc.). User is expected to check per-device 
->     format and then set proper format for IOASID upon to-be-attached 
->     device;
+--mtx
 
-> -   (Jason/David) No restriction on map/unmap vs. bind/invalidate. They
->     can be used in either parent or child;
->
-> -   (David) Change IOASID_GET_INFO to report permitted range instead of
->     reserved IOVA ranges. This works better for PPC;
->
-> -   (Jason) For helper functions, expect to have explicit bus-type wrappers
->     e.g. ioasid_pci_device_attach;
->
-> (Not adopted)
->
-> -   (Parav) Make page pinning a syscall;
-> -   (Jason. W/Enrico) one I/O page table per fd;
-> -   (David) Replace IOASID_REGISTER_MEMORY through another ioasid
->     nesting (sort of passthrough mode). Need more thinking. v2 will not 
->     change this part;
->
-> Thanks
-> Kevin
->
-
+-- 
+---
+Hinweis: unverschlüsselte E-Mails können leicht abgehört und manipuliert
+werden ! Für eine vertrauliche Kommunikation senden Sie bitte ihren
+GPG/PGP-Schlüssel zu.
+---
+Enrico Weigelt, metux IT consult
+Free software and Linux embedded engineering
+info@metux.net -- +49-151-27565287
