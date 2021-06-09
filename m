@@ -2,106 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2ADC73A1B90
-	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 19:13:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 27D983A1C53
+	for <lists+kvm@lfdr.de>; Wed,  9 Jun 2021 19:47:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231231AbhFIRPM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 13:15:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22919 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230152AbhFIRPL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 9 Jun 2021 13:15:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623258796;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=0PU3D9xng4HWsSgSCmW5Y5xsfidNOi9bqS36Xaxp+Ao=;
-        b=hoza770gbFwRrFPOSkK7mfxhoEBc54hlf/cAommOqNqxhKDVyPUqcotvRzi/RY0hKHjjaw
-        QHyZbrCLkR6laL/JmO6EvQtgQUV+er5G+qGsHEpD8kabJW770Ayyw3gxNDsJwIVl7dF8Xp
-        H1pe4hZ4JGcurhiN46PIsX7OixBxU5s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-221-RhFjz5RlNOGogXcS6nSMMQ-1; Wed, 09 Jun 2021 13:13:15 -0400
-X-MC-Unique: RhFjz5RlNOGogXcS6nSMMQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S231785AbhFIRtA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 13:49:00 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:43442 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231670AbhFIRs7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Jun 2021 13:48:59 -0400
+Received: from zn.tnic (p200300ec2f0cf6007c78e5fe5429f9b4.dip0.t-ipconnect.de [IPv6:2003:ec:2f0c:f600:7c78:e5fe:5429:f9b4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F178B10C1ADC;
-        Wed,  9 Jun 2021 17:13:13 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A16D15D9C6;
-        Wed,  9 Jun 2021 17:13:13 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL v2] KVM fixes for 5.13-rc6
-Date:   Wed,  9 Jun 2021 13:13:13 -0400
-Message-Id: <20210609171313.150207-1-pbonzini@redhat.com>
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1E6531EC0570;
+        Wed,  9 Jun 2021 19:47:03 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1623260823;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=wSATXOOyGt9i64iSiH+y4PdoutUxKH/Ox+6Sp2p3E6I=;
+        b=OhU591mPW3/AXQerpYOAsiWAncFI3bpSWloN5ZmmzLW/XQj8K6WqVZrg415AJ4V78a3RaH
+        ChWB6TW6rGbokkHZ787rQUOFcjBM6xeABnr82utwiuyzMnpTga0VJe8odXUKUr80pNY/HV
+        pItHvwa38FQL5ylBZ/Rb1GVajBKE8Ds=
+Date:   Wed, 9 Jun 2021 19:47:02 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 09/22] x86/compressed: Register GHCB memory
+ when SEV-SNP is active
+Message-ID: <YMD+lpyZfYgekRsj@zn.tnic>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-10-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210602140416.23573-10-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On Wed, Jun 02, 2021 at 09:04:03AM -0500, Brijesh Singh wrote:
+> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+> index 1424b8ffde0b..ae99a8a756fe 100644
+> --- a/arch/x86/include/asm/sev-common.h
+> +++ b/arch/x86/include/asm/sev-common.h
+> @@ -75,6 +75,17 @@
+>  #define GHCB_MSR_PSC_ERROR_POS		32
+>  #define GHCB_MSR_PSC_RESP_VAL(val)	((val) >> GHCB_MSR_PSC_ERROR_POS)
+>  
+> +/* GHCB GPA Register */
+> +#define GHCB_MSR_GPA_REG_REQ		0x012
+> +#define GHCB_MSR_GPA_REG_VALUE_POS	12
+> +#define GHCB_MSR_GPA_REG_GFN_MASK	GENMASK_ULL(51, 0)
+> +#define GHCB_MSR_GPA_REQ_GFN_VAL(v)		\
+> +	(((unsigned long)((v) & GHCB_MSR_GPA_REG_GFN_MASK) << GHCB_MSR_GPA_REG_VALUE_POS)| \
+> +	GHCB_MSR_GPA_REG_REQ)
+> +
+> +#define GHCB_MSR_GPA_REG_RESP		0x013
+> +#define GHCB_MSR_GPA_REG_RESP_VAL(v)	((v) >> GHCB_MSR_GPA_REG_VALUE_POS)
+> +
 
-The following changes since commit 000ac42953395a4f0a63d5db640c5e4c88a548c5:
+Can we pls pay attention to having those REQuests sorted by their
+number, like in the GHCB spec, for faster finding?
 
-  selftests: kvm: fix overlapping addresses in memslot_perf_test (2021-05-29 06:28:06 -0400)
+-- 
+Regards/Gruss,
+    Boris.
 
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to 4422829e8053068e0225e4d0ef42dc41ea7c9ef5:
-
-  kvm: fix previous commit for 32-bit builds (2021-06-09 01:49:13 -0400)
-
-32-bit builds had a warning with v1 of the pull request.  I have added a
-patch that fixes it.
-
-----------------------------------------------------------------
-Bugfixes, including a TLB flush fix that affects processors
-without nested page tables.
-
-----------------------------------------------------------------
-Ashish Kalra (1):
-      KVM: SVM: Fix SEV SEND_START session length & SEND_UPDATE_DATA query length after commit 238eca821cee
-
-Christian Borntraeger (1):
-      KVM: selftests: introduce P47V64 for s390x
-
-Lai Jiangshan (3):
-      KVM: X86: MMU: Use the correct inherited permissions to get shadow page
-      KVM: x86: Ensure PV TLB flush tracepoint reflects KVM behavior
-      KVM: x86: Unload MMU on guest TLB flush if TDP disabled to force MMU sync
-
-Paolo Bonzini (2):
-      kvm: avoid speculation-based attacks from out-of-range memslot accesses
-      kvm: fix previous commit for 32-bit builds
-
-Sean Christopherson (1):
-      KVM: x86: Ensure liveliness of nested VM-Enter fail tracepoint message
-
-Wanpeng Li (1):
-      KVM: LAPIC: Write 0 to TMICT should also cancel vmx-preemption timer
-
-Zhenzhong Duan (1):
-      selftests: kvm: Add support for customized slot0 memory size
-
- Documentation/virt/kvm/mmu.rst                    |  4 +-
- arch/x86/kvm/lapic.c                              | 17 +++++---
- arch/x86/kvm/mmu/paging_tmpl.h                    | 14 +++---
- arch/x86/kvm/svm/sev.c                            |  6 +--
- arch/x86/kvm/trace.h                              |  6 +--
- arch/x86/kvm/x86.c                                | 19 ++++++++-
- include/linux/kvm_host.h                          | 10 ++++-
- tools/testing/selftests/kvm/include/kvm_util.h    | 10 +++--
- tools/testing/selftests/kvm/kvm_page_table_test.c |  2 +-
- tools/testing/selftests/kvm/lib/kvm_util.c        | 52 +++++++++++++++++++----
- tools/testing/selftests/kvm/lib/perf_test_util.c  |  2 +-
- tools/testing/selftests/kvm/memslot_perf_test.c   |  2 +-
- 12 files changed, 105 insertions(+), 39 deletions(-)
-
+https://people.kernel.org/tglx/notes-about-netiquette
