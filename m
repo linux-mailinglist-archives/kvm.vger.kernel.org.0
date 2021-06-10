@@ -2,100 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4106A3A21F4
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 03:48:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0537B3A21FB
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 03:51:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229655AbhFJBuk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 21:50:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47626 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229507AbhFJBuj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Jun 2021 21:50:39 -0400
-Received: from mail-oo1-xc2c.google.com (mail-oo1-xc2c.google.com [IPv6:2607:f8b0:4864:20::c2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41E64C061574
-        for <kvm@vger.kernel.org>; Wed,  9 Jun 2021 18:48:33 -0700 (PDT)
-Received: by mail-oo1-xc2c.google.com with SMTP id d27-20020a4a3c1b0000b029024983ef66dbso3613723ooa.3
-        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 18:48:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qOgzX+vvff/WfwDfOUS6M3hW69U6U8fwCjsw9gDHFBk=;
-        b=lASjid/vRKWJUu+KCmsmjN6e0QZ+PxtqUXHIKN5R5fzpGoafsmGAGKOHTvBds97MzJ
-         d/hloKaMh30wOvk9fGdsVeMcDOcS6yTHcXtR/d3TFg8CqWefdfE1A4C64nRbFIVGzU7O
-         v3SC9ngzO5eoQrm5tZJvUSIvH0BqbSkENvb7ZeTYPLrFFxI2+a17229VsTN0aPIxu2jP
-         rtIFw455GK3+w8z1aG1W/FGdmx9X7nJKmXT0UilWJzogE1sWDVfaU5RHD+J3ncc0R0nL
-         43fDteJFXAJVGiFppfDaSg69Q58sRpbRhEEly2cTFDGLJCiBsovONNDAaXNFq3iJ0jP3
-         nPxg==
+        id S229951AbhFJBxL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 21:53:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31474 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229655AbhFJBxK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Jun 2021 21:53:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623289874;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Vz0jGs3iC3Z2zxb/bDk+em2UI3NrnLgN9D+cOWfKhFk=;
+        b=S5RXg8X8YXq66Z3WPSv9xSPaTMmfkX3cosCtttdM9Jqb3JICVGeF9wR2ms3l22ca3WVGSb
+        XAu2KmOQHjd+t9MStM/AL8pg8RVqhp825wrPkwJOn57lZzHTLS3XK1ocBTAFExR0DgzKWF
+        zHBvNfgAcUb82EYR/S0gnwzKC8h94V4=
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
+ [209.85.210.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-425-J-HCG-OpNESkFXrzI6l0QQ-1; Wed, 09 Jun 2021 21:51:11 -0400
+X-MC-Unique: J-HCG-OpNESkFXrzI6l0QQ-1
+Received: by mail-pf1-f198.google.com with SMTP id e17-20020aa798110000b02902f12fffef4eso276060pfl.7
+        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 18:51:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qOgzX+vvff/WfwDfOUS6M3hW69U6U8fwCjsw9gDHFBk=;
-        b=TNlFOKgDJ0SCePz4eS/RXHiJ0yLe0wMC+8h0L52rg5guWPvTKlyzkKkeGc4vAeyL6J
-         sgAk33+UinDyZWJZh8z5Su/0Rw8yUyLub1OhFLHdiG6ZXMrQD0w6zwAcYO9sCoir4I9S
-         aGkB72lTcGObgy8tdCewGdvA7HYOs9flZNaLByeHNOZOpg5Kv1sKX10mWFV/VhpZvyqe
-         zvInLCDta0Qk0nccQkzz4/Nkott0i9cl2T4pA5E57FqdvjzjybvMYGcRBhH8Tid8rBEV
-         LqogTwnT+W6ijPpezY3rvaEekTfQ7sQ+PvGc/VRLJX2SIrCv/KR2kCr1b2vF6EkfN21T
-         FN+g==
-X-Gm-Message-State: AOAM530jWNLGSRM3/VWCuI5grFeR5jpw303AnFpShQ4tol+7pY2s3J/t
-        3swyeUGdEljQ5mlGEiDUjJjLfXNaLlEXMvsz2+5gxA==
-X-Google-Smtp-Source: ABdhPJz9DcEMgenZufoWS5PWYxRAghn7GT7oaKHskyQNYxWXbLE+jDW+NM05TmEr2vXpsay08UP76v5O5lhUd6qwkTo=
-X-Received: by 2002:a4a:e4c1:: with SMTP id w1mr465761oov.81.1623289710436;
- Wed, 09 Jun 2021 18:48:30 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=Vz0jGs3iC3Z2zxb/bDk+em2UI3NrnLgN9D+cOWfKhFk=;
+        b=b6rZdu7GLW/Ip2QTgNyOZLBlJizwvxp1Alc4GDTzCGCbAVuWk8ddGFH51ybu6UFVoP
+         UZLD3CxQpxQvv0/eIjhSWQSnBu9NL+1PzZsuFVuEZStSHUeqWI3Xoufpncbhv2FuWaWD
+         SNPTTRw59Nh90M0/6K4FqJq4dnVyJDT5758VTPjjF8kVarPs7bRB4KZ5hXMTazd5h3q4
+         GTn7Us6SQEvBG7r10XiwYHwhjpQWM5+AFO460nI0NFbfvA+55WIgyKNa0ojJXIWZF+NP
+         BYWgZu4cA3m5LkZy6IDM8gbof0b7TGap51vM4HUonTWAIfZljIHH7jK5VPpEaU59756F
+         FDCQ==
+X-Gm-Message-State: AOAM530QVA1ha1PljE0Om+9fldsp7d2GPI9iWzePwD/kIhnRfwC0XXFI
+        f9y/Clnk4b9BjCN2zgVhbgg2cEvYfcFI/eQE9U9VsVDqypAXDFxATG6XMKThgz6RhlmuGxjnX1N
+        NU8arxBKmDsGF
+X-Received: by 2002:a63:1f57:: with SMTP id q23mr2540928pgm.398.1623289869841;
+        Wed, 09 Jun 2021 18:51:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwTPUVSAZdPB8Qre6f3DbTbUGZcOx/a9zlBz8i8IQXThi6iMQgKG/iGcFooiYctC9c43+Gg/Q==
+X-Received: by 2002:a63:1f57:: with SMTP id q23mr2540893pgm.398.1623289869521;
+        Wed, 09 Jun 2021 18:51:09 -0700 (PDT)
+Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id l3sm846806pgb.77.2021.06.09.18.51.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Jun 2021 18:51:09 -0700 (PDT)
+Subject: Re: [RFC v1 0/6] virtio/vsock: introduce SOCK_DGRAM support
+To:     Jiang Wang <jiang.wang@bytedance.com>, sgarzare@redhat.com
+Cc:     virtualization@lists.linux-foundation.org, stefanha@redhat.com,
+        mst@redhat.com, arseny.krasnov@kaspersky.com,
+        jhansen@vmware.comments, cong.wang@bytedance.com,
+        duanxiongchun@bytedance.com, xieyongji@bytedance.com,
+        chaiwen.cc@bytedance.com, "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Lu Wei <luwei32@huawei.com>,
+        Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210609232501.171257-1-jiang.wang@bytedance.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <da90f17a-1c24-b475-76ef-f6a7fc2bcdd5@redhat.com>
+Date:   Thu, 10 Jun 2021 09:50:56 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.11.0
 MIME-Version: 1.0
-References: <20210609215111.4142972-1-jmattson@google.com> <8b4bbc8e-ee42-4577-39b1-44fb615c080a@oracle.com>
-In-Reply-To: <8b4bbc8e-ee42-4577-39b1-44fb615c080a@oracle.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 9 Jun 2021 18:48:19 -0700
-Message-ID: <CALMp9eRvOFAnSCmXR9DWdWv9hzpOFjMXoo6a2Sd-bRBO3wnd-Q@mail.gmail.com>
-Subject: Re: [PATCH] kvm: LAPIC: Restore guard to prevent illegal APIC
- register access
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     kvm list <kvm@vger.kernel.org>, syzbot <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210609232501.171257-1-jiang.wang@bytedance.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 9, 2021 at 5:45 PM Krish Sadhukhan
-<krish.sadhukhan@oracle.com> wrote:
->
->
-> On 6/9/21 2:51 PM, Jim Mattson wrote:
-> > Per the SDM, "any access that touches bytes 4 through 15 of an APIC
-> > register may cause undefined behavior and must not be executed."
-> > Worse, such an access in kvm_lapic_reg_read can result in a leak of
-> > kernel stack contents. Prior to commit 01402cf81051 ("kvm: LAPIC:
-> > write down valid APIC registers"), such an access was explicitly
-> > disallowed. Restore the guard that was removed in that commit.
-> >
-> > Fixes: 01402cf81051 ("kvm: LAPIC: write down valid APIC registers")
-> > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > Reported-by: syzbot <syzkaller@googlegroups.com>
-> > ---
-> >   arch/x86/kvm/lapic.c | 3 +++
-> >   1 file changed, 3 insertions(+)
-> >
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index c0ebef560bd1..32fb82bbd63f 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -1410,6 +1410,9 @@ int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
-> >       if (!apic_x2apic_mode(apic))
-> >               valid_reg_mask |= APIC_REG_MASK(APIC_ARBPRI);
-> >
-> > +     if (alignment + len > 4)
->
-> It will be useful for debugging if the apic_debug() call is added back in.
 
-Are you suggesting that I should revert commit 0d88800d5472 ("kvm:
-x86: ioapic and apic debug macros cleanup")?
-
-> > +             return 1;
-> > +
-> >       if (offset > 0x3f0 || !(valid_reg_mask & APIC_REG_MASK(offset)))
-> >               return 1;
-> >
+在 2021/6/10 上午7:24, Jiang Wang 写道:
+> This patchset implements support of SOCK_DGRAM for virtio
+> transport.
 >
-> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> Datagram sockets are connectionless and unreliable. To avoid unfair contention
+> with stream and other sockets, add two more virtqueues and
+> a new feature bit to indicate if those two new queues exist or not.
+>
+> Dgram does not use the existing credit update mechanism for
+> stream sockets. When sending from the guest/driver, sending packets
+> synchronously, so the sender will get an error when the virtqueue is full.
+> When sending from the host/device, send packets asynchronously
+> because the descriptor memory belongs to the corresponding QEMU
+> process.
+
+
+What's the use case for the datagram vsock?
+
+
+>
+> The virtio spec patch is here:
+> https://www.spinics.net/lists/linux-virtualization/msg50027.html
+
+
+Have a quick glance, I suggest to split mergeable rx buffer into an 
+separate patch.
+
+But I think it's time to revisit the idea of unifying the virtio-net and 
+virtio-vsock. Otherwise we're duplicating features and bugs.
+
+Thanks
+
+
+>
+> For those who prefer git repo, here is the link for the linux kernel：
+> https://github.com/Jiang1155/linux/tree/vsock-dgram-v1
+>
+> qemu patch link:
+> https://github.com/Jiang1155/qemu/tree/vsock-dgram-v1
+>
+>
+> To do:
+> 1. use skb when receiving packets
+> 2. support multiple transport
+> 3. support mergeable rx buffer
+>
+>
+> Jiang Wang (6):
+>    virtio/vsock: add VIRTIO_VSOCK_F_DGRAM feature bit
+>    virtio/vsock: add support for virtio datagram
+>    vhost/vsock: add support for vhost dgram.
+>    vsock_test: add tests for vsock dgram
+>    vhost/vsock: add kconfig for vhost dgram support
+>    virtio/vsock: add sysfs for rx buf len for dgram
+>
+>   drivers/vhost/Kconfig                              |   8 +
+>   drivers/vhost/vsock.c                              | 207 ++++++++--
+>   include/linux/virtio_vsock.h                       |   9 +
+>   include/net/af_vsock.h                             |   1 +
+>   .../trace/events/vsock_virtio_transport_common.h   |   5 +-
+>   include/uapi/linux/virtio_vsock.h                  |   4 +
+>   net/vmw_vsock/af_vsock.c                           |  12 +
+>   net/vmw_vsock/virtio_transport.c                   | 433 ++++++++++++++++++---
+>   net/vmw_vsock/virtio_transport_common.c            | 184 ++++++++-
+>   tools/testing/vsock/util.c                         | 105 +++++
+>   tools/testing/vsock/util.h                         |   4 +
+>   tools/testing/vsock/vsock_test.c                   | 195 ++++++++++
+>   12 files changed, 1070 insertions(+), 97 deletions(-)
+>
+
