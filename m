@@ -2,235 +2,255 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DA2BE3A25C4
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 09:47:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 911743A26F8
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 10:26:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230117AbhFJHtJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 03:49:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42892 "EHLO
+        id S230291AbhFJI2U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 04:28:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46622 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229778AbhFJHtJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 03:49:09 -0400
+        by vger.kernel.org with ESMTP id S229942AbhFJI2S (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 04:28:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623311233;
+        s=mimecast20190719; t=1623313581;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=loF5cb29gw2Qr4WX1KQpGHzr7ki9z/ToQpTxS3i6VWU=;
-        b=M5ctXOVP1oSvIgYF1KSfIBTTIh0uBkrT+p/jqdsYlgXdrwh1ezgU2Awc2zzhsO0xh4tBWV
-        6dJQZftu44rpYVA/gQqKEZ0jGzaAXpA0ovndTX8+jeuyJGgqJyXauJveV3TYsRecqckz3/
-        TTgc0OPT7JX4v2htHtZ0t9Cb31ORo1s=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-558-EF9iA_tVPYO00_yJmL2K6A-1; Thu, 10 Jun 2021 03:47:11 -0400
-X-MC-Unique: EF9iA_tVPYO00_yJmL2K6A-1
-Received: by mail-pf1-f198.google.com with SMTP id g19-20020a62e3130000b02902effdaa4a3eso808156pfh.4
-        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 00:47:11 -0700 (PDT)
+        bh=IxDiLLKbBP7VVWgtaIeDaWWb6I6XeS9OjppFccyzfog=;
+        b=GyvllgCeKBdWp0E696/MsEswPevKbNSgPXZkxyyYO433GlLJcGXWxENrsQzxEhL8rfxGtN
+        H7Ut9Xa0hYHuvjuwimgmvaQka0Q0vtKPTPKahrZsnIi83cPCcetmlKZB6GxvOHvrF3Ze6E
+        bAvfuB3x3F4va51C197Vvs4t/khbddo=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-120-_3J16DQ8OfyyWExKhdzcOQ-1; Thu, 10 Jun 2021 04:26:19 -0400
+X-MC-Unique: _3J16DQ8OfyyWExKhdzcOQ-1
+Received: by mail-wm1-f69.google.com with SMTP id v25-20020a1cf7190000b0290197a4be97b7so2761052wmh.9
+        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 01:26:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=loF5cb29gw2Qr4WX1KQpGHzr7ki9z/ToQpTxS3i6VWU=;
-        b=oK1OkikldqXGhIHgI8FowgdpjtBtVlCcbP6ch0MT4fij8f5/ctczD6XwYFiYJGCxcH
-         qp9sGAfv7CDAQFeQmWPF6Y8cXORwlj4JRcikIB7BPZc+VPcklE+i+M96xE1M9xKMtUfX
-         jRN9x1bK0H6yS630hZtP+cpqpGzXTfhcr5uc0v7JZ5HnU49dMvXRdUJ8X3DkbyuBlksi
-         SKpP+KzH2YbjS/WfIgP/eY0lrreoZiBZOFqq1t7WrDp5hlMu9/w41wF3I9kQib+mvaFL
-         g2mWVbGUS8lYAxQ1eKX216hBW1KjKwrLF/MnckNZG2diARmWjAe38kZTM15LI7Ptw2kY
-         4ltw==
-X-Gm-Message-State: AOAM5323mhKNzTx86XP+PuXi1xs/ZEaOQOl7D+1hNkN0fI9A2JICsFt4
-        TeL4JcfO9rA1qZddj9pGqMIe1RNT73HYAWEXnD8ZA18+WlwAoPfWy65y9WDZzThUCOA1h/5Xdr3
-        jukmwSBDk3bMh
-X-Received: by 2002:a62:6805:0:b029:2e9:a7c9:2503 with SMTP id d5-20020a6268050000b02902e9a7c92503mr1763809pfc.26.1623311230729;
-        Thu, 10 Jun 2021 00:47:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyqrvDw/tkXuYDtQELqf02BdCoSYQh21xwSXFSnN/JVfuMs/MqAAlU+YEIkeQA3no0RJlH3gQ==
-X-Received: by 2002:a62:6805:0:b029:2e9:a7c9:2503 with SMTP id d5-20020a6268050000b02902e9a7c92503mr1763775pfc.26.1623311230441;
-        Thu, 10 Jun 2021 00:47:10 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id n37sm1570183pfv.47.2021.06.10.00.47.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Jun 2021 00:47:09 -0700 (PDT)
-Subject: Re: [RFC v1 0/6] virtio/vsock: introduce SOCK_DGRAM support
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     "Jiang Wang ." <jiang.wang@bytedance.com>,
-        virtualization@lists.linux-foundation.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Arseny Krasnov <arseny.krasnov@kaspersky.com>,
-        jhansen@vmware.comments, cong.wang@bytedance.com,
-        Xiongchun Duan <duanxiongchun@bytedance.com>,
-        Yongji Xie <xieyongji@bytedance.com>,
-        =?UTF-8?B?5p+056iz?= <chaiwen.cc@bytedance.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Lu Wei <luwei32@huawei.com>,
-        Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
-        Networking <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
-References: <20210609232501.171257-1-jiang.wang@bytedance.com>
- <da90f17a-1c24-b475-76ef-f6a7fc2bcdd5@redhat.com>
- <CAP_N_Z_VDd+JUJ_Y-peOEc7FgwNGB8O3uZpVumQT_DbW62Jpjw@mail.gmail.com>
- <ac0c241c-1013-1304-036f-504d0edc5fd7@redhat.com>
- <20210610072358.3fuvsahxec2sht4y@steredhat>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <47ce307b-f95e-25c7-ed58-9cd1cbff5b57@redhat.com>
-Date:   Thu, 10 Jun 2021 15:46:55 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=IxDiLLKbBP7VVWgtaIeDaWWb6I6XeS9OjppFccyzfog=;
+        b=OLGih2pT7Q5lDpi3RTR+U0OXyhNoQHpYtSrB1vEal8h7d3A+z/F6fO1xfJN+LgJLdx
+         BA4YvVBQfRJj/hhDFY1MfHzXLrLvEHvlf3/T8y+mXVMIu4PkV3G1/dVGPrkCyBp4yDtB
+         aIlu21c5g+FsGDQHCadrxrQhux5CCzy8BgiVQTWDZBBCE46NUjQetXDPyCqOa4NqPItc
+         2yT3jwR0Eer7tZtoCaR3/+stms6fPqlA7foIMin8nP3giF7cu2x3PxdjBS7FlSSsS/BM
+         st4id71nsaq+KLTZVfmAqvrPS6mtMs/W1j7veMEe4Y7FrOzn4e6daQWtQBqf957OMQ+C
+         HCiQ==
+X-Gm-Message-State: AOAM53336OICC9w/4L01UOeeDqEeKl/CvlepYvrPIW3/zEjU5BPbK0GZ
+        DMqRcWzZLZerPYRakm3Qy4qki0luhaYs98jEP4swK3cqxkjwnLKdg43LtkJ6upmR9WKnKIQ6/iC
+        xVthjXWTdRMHy
+X-Received: by 2002:a1c:a484:: with SMTP id n126mr13928939wme.34.1623313578633;
+        Thu, 10 Jun 2021 01:26:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz4mp8AEpvc2ZmmFyARIcMXmgGfN8Rf5IGJjfKAPH7g/9Kk7QuOX4mU92zI6A+N6A5GmzQ2vg==
+X-Received: by 2002:a1c:a484:: with SMTP id n126mr13928922wme.34.1623313578440;
+        Thu, 10 Jun 2021 01:26:18 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id m23sm2159738wmc.29.2021.06.10.01.26.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Jun 2021 01:26:17 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+fb0b6a7e8713aeb0319c@syzkaller.appspotmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 2/9] KVM: x86: Emulate triple fault shutdown if RSM
+ emulation fails
+In-Reply-To: <20210609185619.992058-3-seanjc@google.com>
+References: <20210609185619.992058-1-seanjc@google.com>
+ <20210609185619.992058-3-seanjc@google.com>
+Date:   Thu, 10 Jun 2021 10:26:16 +0200
+Message-ID: <87eedayvkn.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210610072358.3fuvsahxec2sht4y@steredhat>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Sean Christopherson <seanjc@google.com> writes:
 
-在 2021/6/10 下午3:23, Stefano Garzarella 写道:
-> On Thu, Jun 10, 2021 at 12:02:35PM +0800, Jason Wang wrote:
->>
->> 在 2021/6/10 上午11:43, Jiang Wang . 写道:
->>> On Wed, Jun 9, 2021 at 6:51 PM Jason Wang <jasowang@redhat.com> wrote:
->>>>
->>>> 在 2021/6/10 上午7:24, Jiang Wang 写道:
->>>>> This patchset implements support of SOCK_DGRAM for virtio
->>>>> transport.
->>>>>
->>>>> Datagram sockets are connectionless and unreliable. To avoid 
->>>>> unfair contention
->>>>> with stream and other sockets, add two more virtqueues and
->>>>> a new feature bit to indicate if those two new queues exist or not.
->>>>>
->>>>> Dgram does not use the existing credit update mechanism for
->>>>> stream sockets. When sending from the guest/driver, sending packets
->>>>> synchronously, so the sender will get an error when the virtqueue 
->>>>> is full.
->>>>> When sending from the host/device, send packets asynchronously
->>>>> because the descriptor memory belongs to the corresponding QEMU
->>>>> process.
->>>>
->>>> What's the use case for the datagram vsock?
->>>>
->>> One use case is for non critical info logging from the guest
->>> to the host, such as the performance data of some applications.
->>
->>
->> Anything that prevents you from using the stream socket?
->>
->>
->>>
->>> It can also be used to replace UDP communications between
->>> the guest and the host.
->>
->>
->> Any advantage for VSOCK in this case? Is it for performance (I guess 
->> not since I don't exepct vsock will be faster).
+> Use the recently introduced KVM_REQ_TRIPLE_FAULT to properly emulate
+> shutdown if RSM from SMM fails.
 >
-> I think the general advantage to using vsock are for the guest agents 
-> that potentially don't need any configuration.
-
-
-Right, I wonder if we really need datagram consider the host to guest 
-communication is reliable.
-
-(Note that I don't object it since vsock has already supported that, 
-just wonder its use cases)
-
-
+> Note, entering shutdown after clearing the SMM flag and restoring NMI
+> blocking is architecturally correct with respect to AMD's APM, which KVM
+> also uses for SMRAM layout and RSM NMI blocking behavior.  The APM says:
 >
->>
->> An obvious drawback is that it breaks the migration. Using UDP you 
->> can have a very rich features support from the kernel where vsock can't.
->>
+>   An RSM causes a processor shutdown if an invalid-state condition is
+>   found in the SMRAM state-save area. Only an external reset, external
+>   processor-initialization, or non-maskable external interrupt (NMI) can
+>   cause the processor to leave the shutdown state.
 >
-> Thanks for bringing this up!
-> What features does UDP support and datagram on vsock could not support?
-
-
-E.g the sendpage() and busy polling. And using UDP means qdiscs and eBPF 
-can work.
-
-
+> Of note is processor-initialization (INIT) as a valid shutdown wake
+> event, as INIT is blocked by SMM, implying that entering shutdown also
+> forces the CPU out of SMM.
 >
->>
->>>
->>>>> The virtio spec patch is here:
->>>>> https://www.spinics.net/lists/linux-virtualization/msg50027.html
->>>>
->>>> Have a quick glance, I suggest to split mergeable rx buffer into an
->>>> separate patch.
->>> Sure.
->>>
->>>> But I think it's time to revisit the idea of unifying the 
->>>> virtio-net and
->>>> virtio-vsock. Otherwise we're duplicating features and bugs.
->>> For mergeable rxbuf related code, I think a set of common helper
->>> functions can be used by both virtio-net and virtio-vsock. For other
->>> parts, that may not be very beneficial. I will think about more.
->>>
->>> If there is a previous email discussion about this topic, could you 
->>> send me
->>> some links? I did a quick web search but did not find any related
->>> info. Thanks.
->>
->>
->> We had a lot:
->>
->> [1] 
->> https://patchwork.kernel.org/project/kvm/patch/5BDFF537.3050806@huawei.com/
->> [2] 
->> https://lists.linuxfoundation.org/pipermail/virtualization/2018-November/039798.html
->> [3] https://www.lkml.org/lkml/2020/1/16/2043
->>
+> For recent Intel CPUs, restoring NMI blocking is technically wrong, but
+> so is restoring NMI blocking in the first place, and Intel's RSM
+> "architecture" is such a mess that just about anything is allowed and can
+> be justified as micro-architectural behavior.
 >
-> When I tried it, the biggest problem that blocked me were all the 
-> features strictly related to TCP/IP stack and ethernet devices that 
-> vsock device doesn't know how to handle: TSO, GSO, checksums, MAC, 
-> napi, xdp, min ethernet frame size, MTU, etc.
-
-
-It depends on which level we want to share:
-
-1) sharing codes
-2) sharing devices
-3) make vsock a protocol that is understood by the network core
-
-We can start from 1), the low level tx/rx logic can be shared at both 
-virtio-net and vhost-net. For 2) we probably need some work on the spec, 
-probably with a new feature bit to demonstrate that it's a vsock device 
-not a ethernet device. Then if it is probed as a vsock device we won't 
-let packet to be delivered in the TCP/IP stack. For 3), it would be even 
-harder and I'm not sure it's worth to do that.
-
-
+> Per the SDM:
 >
-> So in my opinion to unify them is not so simple, because vsock is not 
-> really an ethernet device, but simply a socket.
-
-
-We can start from sharing codes.
-
-
+>   On Pentium 4 and later processors, shutdown will inhibit INTR and A20M
+>   but will not change any of the other inhibits. On these processors,
+>   NMIs will be inhibited if no action is taken in the SMI handler to
+>   uninhibit them (see Section 34.8).
 >
-> But I fully agree that we shouldn't duplicate functionality and code, 
-> so maybe we could find those common parts and create helpers to be 
-> used by both.
-
-
-Yes.
-
-Thanks
-
-
+> where Section 34.8 says:
 >
-> Thanks,
-> Stefano
+>   When the processor enters SMM while executing an NMI handler, the
+>   processor saves the SMRAM state save map but does not save the
+>   attribute to keep NMI interrupts disabled. Potentially, an NMI could be
+>   latched (while in SMM or upon exit) and serviced upon exit of SMM even
+>   though the previous NMI handler has still not completed.
 >
+> I.e. RSM unconditionally unblocks NMI, but shutdown on RSM does not,
+> which is in direct contradiction of KVM's behavior.  But, as mentioned
+> above, KVM follows AMD architecture and restores NMI blocking on RSM, so
+> that micro-architectural detail is already lost.
+>
+> And for Pentium era CPUs, SMI# can break shutdown, meaning that at least
+> some Intel CPUs fully leave SMM when entering shutdown:
+>
+>   In the shutdown state, Intel processors stop executing instructions
+>   until a RESET#, INIT# or NMI# is asserted.  While Pentium family
+>   processors recognize the SMI# signal in shutdown state, P6 family and
+>   Intel486 processors do not.
+>
+> In other words, the fact that Intel CPUs have implemented the two
+> extremes gives KVM carte blanche when it comes to honoring Intel's
+> architecture for handling shutdown during RSM.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/emulate.c     | 12 +++++++-----
+>  arch/x86/kvm/kvm_emulate.h |  1 +
+>  arch/x86/kvm/x86.c         |  6 ++++++
+>  3 files changed, 14 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index 5e5de05a8fbf..0603a2c79093 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -2683,7 +2683,7 @@ static int em_rsm(struct x86_emulate_ctxt *ctxt)
+>  	 * state-save area.
+>  	 */
+>  	if (ctxt->ops->pre_leave_smm(ctxt, buf))
+> -		return X86EMUL_UNHANDLEABLE;
+> +		goto emulate_shutdown;
+>  
+>  #ifdef CONFIG_X86_64
+>  	if (emulator_has_longmode(ctxt))
+> @@ -2692,14 +2692,16 @@ static int em_rsm(struct x86_emulate_ctxt *ctxt)
+>  #endif
+>  		ret = rsm_load_state_32(ctxt, buf);
+>  
+> -	if (ret != X86EMUL_CONTINUE) {
+> -		/* FIXME: should triple fault */
+> -		return X86EMUL_UNHANDLEABLE;
+> -	}
+> +	if (ret != X86EMUL_CONTINUE)
+> +		goto emulate_shutdown;
+>  
+>  	ctxt->ops->post_leave_smm(ctxt);
+>  
+>  	return X86EMUL_CONTINUE;
+> +
+> +emulate_shutdown:
+> +	ctxt->ops->triple_fault(ctxt);
+> +	return X86EMUL_UNHANDLEABLE;
+
+I'm probably missing something, but what's the desired effect of both
+raising KVM_REQ_TRIPLE_FAULT and returning X86EMUL_UNHANDLEABLE here?
+
+I've modified smm selftest to see what's happening:
+
+diff --git a/tools/testing/selftests/kvm/x86_64/smm_test.c b/tools/testing/selftests/kvm/x86_64/smm_test.c
+index 613c42c5a9b8..cf215cd2c6e2 100644
+--- a/tools/testing/selftests/kvm/x86_64/smm_test.c
++++ b/tools/testing/selftests/kvm/x86_64/smm_test.c
+@@ -147,6 +147,11 @@ int main(int argc, char *argv[])
+                            "Unexpected stage: #%x, got %x",
+                            stage, stage_reported);
+ 
++               if (stage_reported == SMRAM_STAGE) {
++                       /* corrupt smram */
++                       memset(addr_gpa2hva(vm, SMRAM_GPA) + 0xfe00, 0xff, 512);
++               }
++
+                state = vcpu_save_state(vm, VCPU_ID);
+                kvm_vm_release(vm);
+                kvm_vm_restart(vm, O_RDWR);
+
+What I see is:
+
+        smm_test-7600  [002]  4497.073918: kvm_exit:             reason EXIT_RSM rip 0x8004 info 0 0
+        smm_test-7600  [002]  4497.073921: kvm_emulate_insn:     1000000:8004: 0f aa
+        smm_test-7600  [002]  4497.073924: kvm_smm_transition:   vcpu 1: leaving SMM, smbase 0x1000000
+        smm_test-7600  [002]  4497.073928: kvm_emulate_insn:     0:8004: 0f aa FAIL
+        smm_test-7600  [002]  4497.073929: kvm_fpu:              unload
+        smm_test-7600  [002]  4497.073930: kvm_userspace_exit:   reason KVM_EXIT_INTERNAL_ERROR (17)
+
+If I change X86EMUL_UNHANDLEABLE to X86EMUL_CONTINUE tripple fault is
+happening indeed (why don't we have triple fault printed in trace by
+default BTW???):
+
+        smm_test-16810 [006]  5117.007220: kvm_exit:             reason EXIT_RSM rip 0x8004 info 0 0
+        smm_test-16810 [006]  5117.007222: kvm_emulate_insn:     1000000:8004: 0f aa
+        smm_test-16810 [006]  5117.007225: kvm_smm_transition:   vcpu 1: leaving SMM, smbase 0x1000000
+        smm_test-16810 [006]  5117.007229: bputs:                vcpu_enter_guest: KVM_REQ_TRIPLE_FAULT
+        smm_test-16810 [006]  5117.007230: kvm_fpu:              unload
+        smm_test-16810 [006]  5117.007230: kvm_userspace_exit:   reason KVM_EXIT_SHUTDOWN (8)
+
+So should we actually have X86EMUL_CONTINUE when we queue
+KVM_REQ_TRIPLE_FAULT here?
+
+(Initially, my comment was supposed to be 'why don't you add
+TRIPLE_FAULT to smm selftest?' but the above overshadows it)
+
+>  }
+>  
+>  static void
+> diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+> index 3e870bf9ca4d..9c34aa60e45f 100644
+> --- a/arch/x86/kvm/kvm_emulate.h
+> +++ b/arch/x86/kvm/kvm_emulate.h
+> @@ -233,6 +233,7 @@ struct x86_emulate_ops {
+>  	int (*pre_leave_smm)(struct x86_emulate_ctxt *ctxt,
+>  			     const char *smstate);
+>  	void (*post_leave_smm)(struct x86_emulate_ctxt *ctxt);
+> +	void (*triple_fault)(struct x86_emulate_ctxt *ctxt);
+>  	int (*set_xcr)(struct x86_emulate_ctxt *ctxt, u32 index, u64 xcr);
+>  };
+>  
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 54d212fe9b15..cda148cf06fa 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7123,6 +7123,11 @@ static void emulator_post_leave_smm(struct x86_emulate_ctxt *ctxt)
+>  	kvm_smm_changed(emul_to_vcpu(ctxt));
+>  }
+>  
+> +static void emulator_triple_fault(struct x86_emulate_ctxt *ctxt)
+> +{
+> +	kvm_make_request(KVM_REQ_TRIPLE_FAULT, emul_to_vcpu(ctxt));
+> +}
+> +
+>  static int emulator_set_xcr(struct x86_emulate_ctxt *ctxt, u32 index, u64 xcr)
+>  {
+>  	return __kvm_set_xcr(emul_to_vcpu(ctxt), index, xcr);
+> @@ -7172,6 +7177,7 @@ static const struct x86_emulate_ops emulate_ops = {
+>  	.set_hflags          = emulator_set_hflags,
+>  	.pre_leave_smm       = emulator_pre_leave_smm,
+>  	.post_leave_smm      = emulator_post_leave_smm,
+> +	.triple_fault        = emulator_triple_fault,
+>  	.set_xcr             = emulator_set_xcr,
+>  };
+
+-- 
+Vitaly
 
