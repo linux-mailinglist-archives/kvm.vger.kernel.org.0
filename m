@@ -2,98 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C7CCF3A31A0
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 19:01:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8494C3A31DE
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 19:16:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230166AbhFJRDo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 13:03:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24093 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229802AbhFJRDo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 13:03:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623344507;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=smhh7ChUWNyvRIjQ4a5pk+uwg2wXey4b0vnBlZ2UvTQ=;
-        b=COUsfX7fScesjyy7TKaaVoxZwMekFCRMa2yztXoxtU3XcAIYJbpScs94F6+Hto7IogOuy1
-        ABpWpPi8sc1GDBiMR1XKXJQppVTgGT/ITJoEAopUoYBLOpgxXchuYVkQBlcDJuTOevePR4
-        dQz/+vY+0w70M2glcUnOZ3mCo+4j3dA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-522-Bel9RfUNN_Kb-09DeU9MfQ-1; Thu, 10 Jun 2021 13:01:46 -0400
-X-MC-Unique: Bel9RfUNN_Kb-09DeU9MfQ-1
-Received: by mail-wm1-f69.google.com with SMTP id f22-20020a1c6a160000b029018f49a7efb7so4188663wmc.1
-        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 10:01:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=smhh7ChUWNyvRIjQ4a5pk+uwg2wXey4b0vnBlZ2UvTQ=;
-        b=SedsO5dO4X3p6Ei8+QhxqISdPFU7ha7tQRLaPtj2bZW3b1ircIu7AVOfqDCiKJdBdg
-         0aHL2SMcevDHY9LEndCAOgelXRBnFHqlVRL5dBfyDYW9/RnlmoATcOIdtpvOYucpMq9O
-         vSPJcVVw4ewoddbhqUvny2wqQ6Pkj0Sb/dajf38lhBZwvPzKfjM0Rlyl8S4umwzgDjSz
-         9Jnt3ZJkHeXKuWlA03cGSGoJY4kNuZBQBUY1a0gQ4ok/qu440rqs4r/O06qdGkQKVrIQ
-         kl28cClQm9E3GDf1f+sXhlB5jyfO0PtcFgpwDS25YwhNpmR+Gk+vgu6quxaxpfz3G+gO
-         sRrg==
-X-Gm-Message-State: AOAM530a/hG2h0iHfy0z7EDxYKMihPXSXC8pOX6jK3D0UoJDbzDu++gs
-        qFvNtUbValLmWXoAUGzQdLRoMGxF2R5Be2PrCrx1ZMla6Qu4SLRCvw7WPKd3oEC3V8HBZTmWfN/
-        mAqdr71+sl2fBtyXEXvjA3D6Lke5o6S5MvPnqMPjpc76HoKkGisbRo6o87SOuHteh
-X-Received: by 2002:adf:fe8c:: with SMTP id l12mr6692207wrr.26.1623344504680;
-        Thu, 10 Jun 2021 10:01:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxK3ioxgNVvZqZY1dkLjaAiOo8mgXFLdlLVKxCLyt2FANj+H0mozxBCv3ovjRTACPHSKuCwWw==
-X-Received: by 2002:adf:fe8c:: with SMTP id l12mr6692188wrr.26.1623344504504;
-        Thu, 10 Jun 2021 10:01:44 -0700 (PDT)
-Received: from ?IPv6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.gmail.com with ESMTPSA id p12sm9238540wme.43.2021.06.10.10.01.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Jun 2021 10:01:43 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH 0/2] x86: hyper-v: expose hv_hypercall()
- from hyperv.h
-To:     Siddharth Chandrasekaran <sidcha@amazon.de>
-Cc:     Siddharth Chandrasekaran <sidcha.dev@gmail.com>,
-        Evgeny Iakovlev <eyakovl@amazon.de>,
-        Liran Alon <liran@amazon.com>,
-        Ioannis Aslanidis <iaslan@amazon.de>, kvm@vger.kernel.org
-References: <cover.1623330462.git.sidcha@amazon.de>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6f306598-62ed-f158-4644-59ce664b5926@redhat.com>
-Date:   Thu, 10 Jun 2021 19:01:42 +0200
+        id S230220AbhFJRSb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 13:18:31 -0400
+Received: from foss.arm.com ([217.140.110.172]:37410 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230179AbhFJRSa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Jun 2021 13:18:30 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4AB1F1396;
+        Thu, 10 Jun 2021 10:16:33 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4A48C3F719;
+        Thu, 10 Jun 2021 10:16:32 -0700 (PDT)
+Subject: Re: [PATCH kvmtool 4/4] arm/arm64: vfio: Add PCI Express Capability
+ Structure
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
+        kvm@vger.kernel.org, sami.mujawar@arm.com,
+        lorenzo.pieralisi@arm.com, maz@kernel.org
+References: <20210609183812.29596-1-alexandru.elisei@arm.com>
+ <20210609183812.29596-5-alexandru.elisei@arm.com>
+ <20210610171427.09ee5108@slackpad.fritz.box>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <b5744cd1-bc07-1da4-26b8-ac0c57a7b1bd@arm.com>
+Date:   Thu, 10 Jun 2021 18:17:24 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <cover.1623330462.git.sidcha@amazon.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <20210610171427.09ee5108@slackpad.fritz.box>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/06/21 15:12, Siddharth Chandrasekaran wrote:
-> Couple of minor patches that promote hyperv.h to lib/x86 and expose
-> hv_hypercall() from there so other tests can use do hypercalls too.
-> 
-> ~ Sid.
-> 
-> Siddharth Chandrasekaran (2):
->    x86: Move hyperv helpers into libs/x86
->    x86: Move hyper-v hypercall related methods to lib/x86/
-> 
->   x86/Makefile.common       |  9 +-----
->   {x86 => lib/x86}/hyperv.h |  3 ++
->   {x86 => lib/x86}/hyperv.c | 52 +++++++++++++++++++++++++++++++++
->   x86/hyperv_connections.c  | 60 ++++-----------------------------------
->   4 files changed, 61 insertions(+), 63 deletions(-)
->   rename {x86 => lib/x86}/hyperv.h (98%)
->   rename {x86 => lib/x86}/hyperv.c (63%)
-> 
+Hi Andre,
 
-Please base the overlay test on this patch instead of the other way 
-round, thanks!  (You can send them in a single series).
+On 6/10/21 5:14 PM, Andre Przywara wrote:
+> On Wed,  9 Jun 2021 19:38:12 +0100
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>
+>> It turns out that some Linux drivers (like Realtek R8169) fall back to a
+>> device-specific configuration method if the device is not PCI Express
+>> capable:
+>>
+>> [    1.433825] r8169 0000:00:00.0 enp0s0: No native access to PCI extended config space, falling back to CSI
+>>
+> Nice discovery, thanks!
+>
+>> Add the PCI Express Capability Structure and populate it for assigned
+>> devices, as this is how the Linux PCI driver determines if a device is PCI
+>> Express capable.
+>>
+>> Because we don't emulate a PCI Express link, a root complex or any slot
+>> related properties, the PCI Express capability is kept as small as possible
+>> by ignoring those fields.
+>>
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> ---
+>>  include/kvm/pci.h | 24 ++++++++++++++++++++++++
+>>  vfio/pci.c        | 13 +++++++++++++
+>>  2 files changed, 37 insertions(+)
+>>
+>> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
+>> index 42d9e1c5645f..0f2d5bbabdc3 100644
+>> --- a/include/kvm/pci.h
+>> +++ b/include/kvm/pci.h
+>> @@ -46,6 +46,8 @@ struct kvm;
+>>  #define PCI_DEV_CFG_SIZE_EXTENDED 	4096
+>>  
+>>  #ifdef ARCH_HAS_PCI_EXP
+>> +#define arch_has_pci_exp()	(true)
+>> +
+>>  #define PCI_CFG_SIZE		PCI_CFG_SIZE_EXTENDED
+>>  #define PCI_DEV_CFG_SIZE	PCI_DEV_CFG_SIZE_EXTENDED
+>>  
+>> @@ -73,6 +75,8 @@ union pci_config_address {
+>>  };
+>>  
+>>  #else
+>> +#define arch_has_pci_exp()	(false)
+>> +
+>>  #define PCI_CFG_SIZE		PCI_CFG_SIZE_LEGACY
+>>  #define PCI_DEV_CFG_SIZE	PCI_DEV_CFG_SIZE_LEGACY
+>>  
+>> @@ -143,6 +147,24 @@ struct pci_cap_hdr {
+>>  	u8	next;
+>>  };
+>>  
+>> +struct pci_exp_cap {
+>> +	u8 cap;
+>> +	u8 next;
+>> +	u16 cap_reg;
+>> +	u32 dev_cap;
+>> +	u16 dev_ctrl;
+>> +	u16 dev_status;
+>> +	u32 link_cap;
+>> +	u16 link_ctrl;
+>> +	u16 link_status;
+>> +	u32 slot_cap;
+>> +	u16 slot_ctrl;
+>> +	u16 slot_status;
+>> +	u16 root_ctrl;
+>> +	u16 root_cap;
+>> +	u32 root_status;
+>> +};
+>> +
+>>  struct pci_device_header;
+>>  
+>>  typedef int (*bar_activate_fn_t)(struct kvm *kvm,
+>> @@ -188,6 +210,8 @@ struct pci_device_header {
+>>  			u8		min_gnt;
+>>  			u8		max_lat;
+>>  			struct msix_cap msix;
+>> +			/* Used only by architectures which support PCIE */
+>> +			struct pci_exp_cap pci_exp;
+>>  		} __attribute__((packed));
+>>  		/* Pad to PCI config space size */
+>>  		u8	__pad[PCI_DEV_CFG_SIZE];
+>> diff --git a/vfio/pci.c b/vfio/pci.c
+>> index 6a4204634e71..5c9bec6db710 100644
+>> --- a/vfio/pci.c
+>> +++ b/vfio/pci.c
+>> @@ -623,6 +623,12 @@ static ssize_t vfio_pci_cap_size(struct pci_cap_hdr *cap_hdr)
+>>  		return PCI_CAP_MSIX_SIZEOF;
+>>  	case PCI_CAP_ID_MSI:
+>>  		return vfio_pci_msi_cap_size((void *)cap_hdr);
+>> +	case PCI_CAP_ID_EXP:
+>> +		/*
+>> +		 * We don't emulate any of the link, slot and root complex
+>> +		 * properties, so ignore them.
+>> +		 */
+>> +		return PCI_CAP_EXP_RC_ENDPOINT_SIZEOF_V1;
+> My (admittedly) older distro kernel headers don't carry this symbol.
+> Can we have a "#ifndef ... #define ... #endif" at the beginning of
+> this file?
 
-Paolo
+Good catch, we'll fix in the next iteration.
 
+Thanks,
+
+Alex
+
+> If "Slackware" isn't convincing enough, RHEL 7.4 doesn't include it
+> either. And this issue hits x86 as well, even though we don't use PCIe
+> there. Also we do something similar in patch 3/4.
+>
+> Rest looks alright.
+>
+> Cheers,
+> Andre
+>
+>>  	default:
+>>  		pr_err("unknown PCI capability 0x%x", cap_hdr->type);
+>>  		return 0;
+>> @@ -696,6 +702,13 @@ static int vfio_pci_parse_caps(struct vfio_device *vdev)
+>>  			pdev->msi.pos = pos;
+>>  			pdev->irq_modes |= VFIO_PCI_IRQ_MODE_MSI;
+>>  			break;
+>> +		case PCI_CAP_ID_EXP:
+>> +			if (!arch_has_pci_exp())
+>> +				continue;
+>> +			ret = vfio_pci_add_cap(vdev, virt_hdr, cap, pos);
+>> +			if (ret)
+>> +				return ret;
+>> +			break;
+>>  		}
+>>  	}
+>>  
