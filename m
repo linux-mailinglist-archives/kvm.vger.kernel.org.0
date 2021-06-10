@@ -2,330 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 320113A3129
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 18:43:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71A753A313A
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 18:45:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231401AbhFJQp0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 12:45:26 -0400
-Received: from foss.arm.com ([217.140.110.172]:36544 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231747AbhFJQpG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Jun 2021 12:45:06 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8ABDDED1;
-        Thu, 10 Jun 2021 09:43:09 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8EC833F719;
-        Thu, 10 Jun 2021 09:43:08 -0700 (PDT)
-Subject: Re: [PATCH kvmtool 3/4] arm/arm64: Add PCI Express 1.1 support
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
-        kvm@vger.kernel.org, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com, maz@kernel.org
-References: <20210609183812.29596-1-alexandru.elisei@arm.com>
- <20210609183812.29596-4-alexandru.elisei@arm.com>
- <20210610171414.6006a963@slackpad.fritz.box>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <e659c617-7e85-a048-9d5c-258d3b3a9b4a@arm.com>
-Date:   Thu, 10 Jun 2021 17:44:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S231316AbhFJQrp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 12:47:45 -0400
+Received: from mail-ot1-f50.google.com ([209.85.210.50]:46051 "EHLO
+        mail-ot1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231423AbhFJQro (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Jun 2021 12:47:44 -0400
+Received: by mail-ot1-f50.google.com with SMTP id 6-20020a9d07860000b02903e83bf8f8fcso282640oto.12
+        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 09:45:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=g8tVa/tKF1Z1CFOTKrCMtVkTz0WRgBPyaTEt7gz3464=;
+        b=W1+d+fDE8NSQkxbRbfU7zYcFBjCkx/2su5gXnqeg4CLRMyq2bz8jAz/745Fm/ABMiE
+         g2JgptK7cOjALXDUq9nxVJg3FpvkS20L3IRxTQONFGFNt27nfkwUUVlXgV1DsvvzTn0X
+         OqEZ7Huloj8M/ZorHEkpoDbk4NE0IjYfU3040AtiyYJh9QRAr9YuwfjloRqge4dXayq2
+         VMY1bi5fnuQCxbJcbZoT/USdC4LvjjX+8LmLui/XyBjn4pBkdJ4wxVE69YC/7l8f9XdE
+         2RWjczc/NJLLLksutLckOMeJS23epSZ1ywSt33bO4g6igszI7OAXVuHXq/JU/RR2cGbr
+         5VnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=g8tVa/tKF1Z1CFOTKrCMtVkTz0WRgBPyaTEt7gz3464=;
+        b=qdwvDzSJksTqOEnzWnXNAzRfy2orHs0MlTL2M25aQ6eH+6Bt8JyLOF4VEkM0L/vZwc
+         rMHnLaiQI0/5NMQoC5MMTMVMnW3oTD8+gd13Uz+jcSp6cWvwWyJ0rkZG7bd9QU5omAXj
+         5C7b32m5YrwtAEtYUuHNi37sL9UK+7zatImoyXS1FBCbaE7ty5ondFaEi5q3oUuhuCxY
+         QiFbsWku0KCi6l/v2a+5rjJ9jr2ryWs7beDHhl3qXCqMnSLecGtO/VexP2474o0FaibO
+         s1IK9PGhQKrV83bv/n/+fp41mKk2e6L8agrKejAi0jI6zIpEWsb06BomTYI+IRJw6P36
+         3gBg==
+X-Gm-Message-State: AOAM530RARTNzOwjYuybCTcr1AephoM0JwrfvmCuyeKAxsDVB2mFYoox
+        Nn5/cm2az2A4x91l4U7HFlWyec/NgovB+0dCKEPBQw==
+X-Google-Smtp-Source: ABdhPJynSuOt7MYRmCjZvAc5B4VmBGBKyZsPveniHvv9WSF0sbxlVWyakjj9xBT1MIK+WtKSHQrs2p3/PxCc3y/Cw4o=
+X-Received: by 2002:a05:6830:2117:: with SMTP id i23mr3087102otc.279.1623343473082;
+ Thu, 10 Jun 2021 09:44:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210610171414.6006a963@slackpad.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+References: <20210609232501.171257-1-jiang.wang@bytedance.com>
+ <da90f17a-1c24-b475-76ef-f6a7fc2bcdd5@redhat.com> <CAP_N_Z_VDd+JUJ_Y-peOEc7FgwNGB8O3uZpVumQT_DbW62Jpjw@mail.gmail.com>
+ <ac0c241c-1013-1304-036f-504d0edc5fd7@redhat.com> <20210610072358.3fuvsahxec2sht4y@steredhat>
+ <47ce307b-f95e-25c7-ed58-9cd1cbff5b57@redhat.com> <20210610095151.2cpyny56kbotzppp@steredhat>
+In-Reply-To: <20210610095151.2cpyny56kbotzppp@steredhat>
+From:   "Jiang Wang ." <jiang.wang@bytedance.com>
+Date:   Thu, 10 Jun 2021 09:44:22 -0700
+Message-ID: <CAP_N_Z8u5U2yxMWG2bNgp1cbRcVqv4gEHA_i-4=r9h1HFFGYOA@mail.gmail.com>
+Subject: Re: Re: [RFC v1 0/6] virtio/vsock: introduce SOCK_DGRAM support
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Arseny Krasnov <arseny.krasnov@kaspersky.com>,
+        cong.wang@bytedance.com,
+        Xiongchun Duan <duanxiongchun@bytedance.com>,
+        Yongji Xie <xieyongji@bytedance.com>,
+        =?UTF-8?B?5p+056iz?= <chaiwen.cc@bytedance.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Lu Wei <luwei32@huawei.com>,
+        Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
+        Networking <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+On Thu, Jun 10, 2021 at 2:52 AM Stefano Garzarella <sgarzare@redhat.com> wr=
+ote:
+>
+> On Thu, Jun 10, 2021 at 03:46:55PM +0800, Jason Wang wrote:
+> >
+> >=E5=9C=A8 2021/6/10 =E4=B8=8B=E5=8D=883:23, Stefano Garzarella =E5=86=99=
+=E9=81=93:
+> >>On Thu, Jun 10, 2021 at 12:02:35PM +0800, Jason Wang wrote:
+> >>>
+> >>>=E5=9C=A8 2021/6/10 =E4=B8=8A=E5=8D=8811:43, Jiang Wang . =E5=86=99=E9=
+=81=93:
+> >>>>On Wed, Jun 9, 2021 at 6:51 PM Jason Wang <jasowang@redhat.com> wrote=
+:
+> >>>>>
+> >>>>>=E5=9C=A8 2021/6/10 =E4=B8=8A=E5=8D=887:24, Jiang Wang =E5=86=99=E9=
+=81=93:
+> >>>>>>This patchset implements support of SOCK_DGRAM for virtio
+> >>>>>>transport.
+> >>>>>>
+> >>>>>>Datagram sockets are connectionless and unreliable. To avoid
+> >>>>>>unfair contention
+> >>>>>>with stream and other sockets, add two more virtqueues and
+> >>>>>>a new feature bit to indicate if those two new queues exist or not.
+> >>>>>>
+> >>>>>>Dgram does not use the existing credit update mechanism for
+> >>>>>>stream sockets. When sending from the guest/driver, sending packets
+> >>>>>>synchronously, so the sender will get an error when the
+> >>>>>>virtqueue is full.
+> >>>>>>When sending from the host/device, send packets asynchronously
+> >>>>>>because the descriptor memory belongs to the corresponding QEMU
+> >>>>>>process.
+> >>>>>
+> >>>>>What's the use case for the datagram vsock?
+> >>>>>
+> >>>>One use case is for non critical info logging from the guest
+> >>>>to the host, such as the performance data of some applications.
+> >>>
+> >>>
+> >>>Anything that prevents you from using the stream socket?
+> >>>
+> >>>
+> >>>>
+> >>>>It can also be used to replace UDP communications between
+> >>>>the guest and the host.
+> >>>
+> >>>
+> >>>Any advantage for VSOCK in this case? Is it for performance (I
+> >>>guess not since I don't exepct vsock will be faster).
+> >>
+> >>I think the general advantage to using vsock are for the guest
+> >>agents that potentially don't need any configuration.
+> >
+> >
+> >Right, I wonder if we really need datagram consider the host to guest
+> >communication is reliable.
+> >
+> >(Note that I don't object it since vsock has already supported that,
+> >just wonder its use cases)
+>
+> Yep, it was the same concern I had :-)
+> Also because we're now adding SEQPACKET, which provides reliable
+> datagram support.
+>
+> But IIUC the use case is the logging where you don't need a reliable
+> communication and you want to avoid to keep more open connections with
+> different guests.
+>
+> So the server in the host can be pretty simple and doesn't have to
+> handle connections. It just waits for datagrams on a port.
 
-On 6/10/21 5:14 PM, Andre Przywara wrote:
-> On Wed,  9 Jun 2021 19:38:11 +0100
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->
-> Hi,
->
->> PCI Express comes with an extended addressing scheme, which directly
->> translated into a bigger device configuration space (256->4096 bytes)
->> and bigger PCI configuration space (16->256 MB), as well as mandatory
->> capabilities (power management [1] and PCI Express capability [2]).
->>
->> However, our virtio PCI implementation implements version 0.9 of the
->> protocol and it still uses transitional PCI device ID's, so we have
->> opted to omit the mandatory PCI Express capabilities. For VFIO, the power
->> management and PCI Express capability are left for a subsequent patch.
->>
->> [1] PCI Express Base Specification Revision 1.1, section 7.6
->> [2] PCI Express Base Specification Revision 1.1, section 7.8
->>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->>  arm/include/arm-common/kvm-arch.h |  4 ++-
->>  arm/pci.c                         |  2 +-
->>  include/kvm/pci.h                 | 51 ++++++++++++++++++++++++++++---
->>  pci.c                             |  5 +--
->>  vfio/pci.c                        | 26 ++++++++++------
->>  5 files changed, 70 insertions(+), 18 deletions(-)
->>
->> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
->> index 436b67b843fc..c645ac001bca 100644
->> --- a/arm/include/arm-common/kvm-arch.h
->> +++ b/arm/include/arm-common/kvm-arch.h
->> @@ -49,7 +49,7 @@
->>  
->>  
->>  #define KVM_PCI_CFG_AREA	ARM_AXI_AREA
->> -#define ARM_PCI_CFG_SIZE	(1ULL << 24)
->> +#define ARM_PCI_CFG_SIZE	(1ULL << 28)
->>  #define KVM_PCI_MMIO_AREA	(KVM_PCI_CFG_AREA + ARM_PCI_CFG_SIZE)
->>  #define ARM_PCI_MMIO_SIZE	(ARM_MEMORY_AREA - \
->>  				(ARM_AXI_AREA + ARM_PCI_CFG_SIZE))
->> @@ -77,6 +77,8 @@
->>  
->>  #define VIRTIO_RING_ENDIAN	(VIRTIO_ENDIAN_LE | VIRTIO_ENDIAN_BE)
->>  
->> +#define ARCH_HAS_PCI_EXP	1
->> +
->>  static inline bool arm_addr_in_ioport_region(u64 phys_addr)
->>  {
->>  	u64 limit = KVM_IOPORT_AREA + ARM_IOPORT_SIZE;
->> diff --git a/arm/pci.c b/arm/pci.c
->> index ed325fa4a811..2251f627d8b5 100644
->> --- a/arm/pci.c
->> +++ b/arm/pci.c
->> @@ -62,7 +62,7 @@ void pci__generate_fdt_nodes(void *fdt)
->>  	_FDT(fdt_property_cell(fdt, "#address-cells", 0x3));
->>  	_FDT(fdt_property_cell(fdt, "#size-cells", 0x2));
->>  	_FDT(fdt_property_cell(fdt, "#interrupt-cells", 0x1));
->> -	_FDT(fdt_property_string(fdt, "compatible", "pci-host-cam-generic"));
->> +	_FDT(fdt_property_string(fdt, "compatible", "pci-host-ecam-generic"));
->>  	_FDT(fdt_property(fdt, "dma-coherent", NULL, 0));
->>  
->>  	_FDT(fdt_property(fdt, "bus-range", bus_range, sizeof(bus_range)));
->> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
->> index bf81323d83b7..42d9e1c5645f 100644
->> --- a/include/kvm/pci.h
->> +++ b/include/kvm/pci.h
->> @@ -10,6 +10,7 @@
->>  #include "kvm/devices.h"
->>  #include "kvm/msi.h"
->>  #include "kvm/fdt.h"
->> +#include "kvm/kvm-arch.h"
->>  
->>  #define pci_dev_err(pci_hdr, fmt, ...) \
->>  	pr_err("[%04x:%04x] " fmt, pci_hdr->vendor_id, pci_hdr->device_id, ##__VA_ARGS__)
->> @@ -32,10 +33,49 @@
->>  #define PCI_CONFIG_BUS_FORWARD	0xcfa
->>  #define PCI_IO_SIZE		0x100
->>  #define PCI_IOPORT_START	0x6200
->> -#define PCI_CFG_SIZE		(1ULL << 24)
->>  
->>  struct kvm;
->>  
->> +/*
->> + * On some distributions, pci_regs.h doesn't define PCI_CFG_SPACE_SIZE and
->> + * PCI_CFG_SPACE_EXP_SIZE, so we define our own.
->> + */
->> +#define PCI_CFG_SIZE_LEGACY		(1ULL << 24)
->> +#define PCI_DEV_CFG_SIZE_LEGACY		256
->> +#define PCI_CFG_SIZE_EXTENDED		(1ULL << 28)
->> +#define PCI_DEV_CFG_SIZE_EXTENDED 	4096
-> Do we need the size right now? If not, we can use
-> #define PCI_DEV_CFG_SIZE  (PCI_CFG_SIZE << 16) down below?
-> To make it more obvious where this comes from?
+Yes. With datagram sockets, the application code is simpler than the stream
+sockets. Also, it will be easier to port existing applications written
+for dgram,
+such as UDP or unix domain socket with datagram types to the vsock
+dgram sockets.
 
-I put it there because we need PCI_DEV_CFG_SIZE_LEGACY in the vfio code, and it
-looked strangely asymmetrical to have the legacy size but not the extended size.
-Unless there's something I'm misinterpreting about your comment.
+Compared to UDP, the vsock dgram has a minimum configuration. When
+sending data from the guest to the host, the client in the guest knows
+the host CID will always be 2. For UDP, the host IP may change depending
+on the configuration.
 
-Thanks,
+The advantage over UNIX domain sockets is more obvious. We
+have some applications talking to each other with UNIX domain sockets,
+but now the applications are running inside VMs, so we will need to
+use vsock and those applications use datagram types, so it is natural
+and simpler if vsock has datagram types too.
 
-Alex
+And we can also run applications for vmware vsock dgram on
+the QEMU directly.
 
+btw, SEQPACKET also supports datagram, but the application code
+logic is similar to stream sockets and the server needs to maintain
+connections.
+
+> >
+> >
+> >>
+> >>>
+> >>>An obvious drawback is that it breaks the migration. Using UDP you
+> >>>can have a very rich features support from the kernel where vsock
+> >>>can't.
+> >>>
+> >>
+> >>Thanks for bringing this up!
+> >>What features does UDP support and datagram on vsock could not support?
+> >
+> >
+> >E.g the sendpage() and busy polling. And using UDP means qdiscs and
+> >eBPF can work.
 >
-> The rest looks alright, thanks for addressing the comments from last
-> year ;-)
+> Thanks, I see!
 >
-> Cheers,
-> Andre
+> >
+> >
+> >>
+> >>>
+> >>>>
+> >>>>>>The virtio spec patch is here:
+> >>>>>>https://www.spinics.net/lists/linux-virtualization/msg50027.html
+> >>>>>
+> >>>>>Have a quick glance, I suggest to split mergeable rx buffer into an
+> >>>>>separate patch.
+> >>>>Sure.
+> >>>>
+> >>>>>But I think it's time to revisit the idea of unifying the
+> >>>>>virtio-net and
+> >>>>>virtio-vsock. Otherwise we're duplicating features and bugs.
+> >>>>For mergeable rxbuf related code, I think a set of common helper
+> >>>>functions can be used by both virtio-net and virtio-vsock. For other
+> >>>>parts, that may not be very beneficial. I will think about more.
+> >>>>
+> >>>>If there is a previous email discussion about this topic, could
+> >>>>you send me
+> >>>>some links? I did a quick web search but did not find any related
+> >>>>info. Thanks.
+> >>>
+> >>>
+> >>>We had a lot:
+> >>>
+> >>>[1] https://patchwork.kernel.org/project/kvm/patch/5BDFF537.3050806@hu=
+awei.com/
+> >>>[2] https://lists.linuxfoundation.org/pipermail/virtualization/2018-No=
+vember/039798.html
+> >>>[3] https://www.lkml.org/lkml/2020/1/16/2043
+> >>>
+Got it. I will check, thanks.
+
+> >>When I tried it, the biggest problem that blocked me were all the
+> >>features strictly related to TCP/IP stack and ethernet devices that
+> >>vsock device doesn't know how to handle: TSO, GSO, checksums, MAC,
+> >>napi, xdp, min ethernet frame size, MTU, etc.
+> >
+> >
+> >It depends on which level we want to share:
+> >
+> >1) sharing codes
+> >2) sharing devices
+> >3) make vsock a protocol that is understood by the network core
+> >
+> >We can start from 1), the low level tx/rx logic can be shared at both
+> >virtio-net and vhost-net. For 2) we probably need some work on the
+> >spec, probably with a new feature bit to demonstrate that it's a vsock
+> >device not a ethernet device. Then if it is probed as a vsock device we
+> >won't let packet to be delivered in the TCP/IP stack. For 3), it would
+> >be even harder and I'm not sure it's worth to do that.
+> >
+> >
+> >>
+> >>So in my opinion to unify them is not so simple, because vsock is not
+> >>really an ethernet device, but simply a socket.
+> >
+> >
+> >We can start from sharing codes.
 >
+> Yep, I agree, and maybe the mergeable buffer is a good starting point to
+> share code!
 >
->> +
->> +#ifdef ARCH_HAS_PCI_EXP
->> +#define PCI_CFG_SIZE		PCI_CFG_SIZE_EXTENDED
->> +#define PCI_DEV_CFG_SIZE	PCI_DEV_CFG_SIZE_EXTENDED
->> +
->> +union pci_config_address {
->> +	struct {
->> +#if __BYTE_ORDER == __LITTLE_ENDIAN
->> +		unsigned	reg_offset	: 2;		/* 1  .. 0  */
->> +		unsigned	register_number	: 10;		/* 11 .. 2  */
->> +		unsigned	function_number	: 3;		/* 14 .. 12 */
->> +		unsigned	device_number	: 5;		/* 19 .. 15 */
->> +		unsigned	bus_number	: 8;		/* 27 .. 20 */
->> +		unsigned	reserved	: 3;		/* 30 .. 28 */
->> +		unsigned	enable_bit	: 1;		/* 31       */
->> +#else
->> +		unsigned	enable_bit	: 1;		/* 31       */
->> +		unsigned	reserved	: 3;		/* 30 .. 28 */
->> +		unsigned	bus_number	: 8;		/* 27 .. 20 */
->> +		unsigned	device_number	: 5;		/* 19 .. 15 */
->> +		unsigned	function_number	: 3;		/* 14 .. 12 */
->> +		unsigned	register_number	: 10;		/* 11 .. 2  */
->> +		unsigned	reg_offset	: 2;		/* 1  .. 0  */
->> +#endif
->> +	};
->> +	u32 w;
->> +};
->> +
->> +#else
->> +#define PCI_CFG_SIZE		PCI_CFG_SIZE_LEGACY
->> +#define PCI_DEV_CFG_SIZE	PCI_DEV_CFG_SIZE_LEGACY
->> +
->>  union pci_config_address {
->>  	struct {
->>  #if __BYTE_ORDER == __LITTLE_ENDIAN
->> @@ -58,6 +98,9 @@ union pci_config_address {
->>  	};
->>  	u32 w;
->>  };
->> +#endif /* ARCH_HAS_PCI_EXP */
->> +
->> +#define PCI_DEV_CFG_MASK	(PCI_DEV_CFG_SIZE - 1)
->>  
->>  struct msix_table {
->>  	struct msi_msg msg;
->> @@ -110,14 +153,12 @@ typedef int (*bar_deactivate_fn_t)(struct kvm *kvm,
->>  				   int bar_num, void *data);
->>  
->>  #define PCI_BAR_OFFSET(b)	(offsetof(struct pci_device_header, bar[b]))
->> -#define PCI_DEV_CFG_SIZE	256
->> -#define PCI_DEV_CFG_MASK	(PCI_DEV_CFG_SIZE - 1)
->>  
->>  struct pci_config_operations {
->>  	void (*write)(struct kvm *kvm, struct pci_device_header *pci_hdr,
->> -		      u8 offset, void *data, int sz);
->> +		      u16 offset, void *data, int sz);
->>  	void (*read)(struct kvm *kvm, struct pci_device_header *pci_hdr,
->> -		     u8 offset, void *data, int sz);
->> +		     u16 offset, void *data, int sz);
->>  };
->>  
->>  struct pci_device_header {
->> diff --git a/pci.c b/pci.c
->> index d6da79e0a56a..e593033164c1 100644
->> --- a/pci.c
->> +++ b/pci.c
->> @@ -353,7 +353,8 @@ static void pci_config_bar_wr(struct kvm *kvm,
->>  void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data, int size)
->>  {
->>  	void *base;
->> -	u8 bar, offset;
->> +	u8 bar;
->> +	u16 offset;
->>  	struct pci_device_header *pci_hdr;
->>  	u8 dev_num = addr.device_number;
->>  	u32 value = 0;
->> @@ -392,7 +393,7 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
->>  
->>  void pci__config_rd(struct kvm *kvm, union pci_config_address addr, void *data, int size)
->>  {
->> -	u8 offset;
->> +	u16 offset;
->>  	struct pci_device_header *pci_hdr;
->>  	u8 dev_num = addr.device_number;
->>  
->> diff --git a/vfio/pci.c b/vfio/pci.c
->> index 49ecd12a38cd..6a4204634e71 100644
->> --- a/vfio/pci.c
->> +++ b/vfio/pci.c
->> @@ -313,7 +313,7 @@ out_unlock:
->>  }
->>  
->>  static void vfio_pci_msix_cap_write(struct kvm *kvm,
->> -				    struct vfio_device *vdev, u8 off,
->> +				    struct vfio_device *vdev, u16 off,
->>  				    void *data, int sz)
->>  {
->>  	struct vfio_pci_device *pdev = &vdev->pci;
->> @@ -345,7 +345,7 @@ static void vfio_pci_msix_cap_write(struct kvm *kvm,
->>  }
->>  
->>  static int vfio_pci_msi_vector_write(struct kvm *kvm, struct vfio_device *vdev,
->> -				     u8 off, u8 *data, u32 sz)
->> +				     u16 off, u8 *data, u32 sz)
->>  {
->>  	size_t i;
->>  	u32 mask = 0;
->> @@ -393,7 +393,7 @@ static int vfio_pci_msi_vector_write(struct kvm *kvm, struct vfio_device *vdev,
->>  }
->>  
->>  static void vfio_pci_msi_cap_write(struct kvm *kvm, struct vfio_device *vdev,
->> -				   u8 off, u8 *data, u32 sz)
->> +				   u16 off, u8 *data, u32 sz)
->>  {
->>  	u8 ctrl;
->>  	struct msi_msg msg;
->> @@ -553,7 +553,7 @@ out:
->>  }
->>  
->>  static void vfio_pci_cfg_read(struct kvm *kvm, struct pci_device_header *pci_hdr,
->> -			      u8 offset, void *data, int sz)
->> +			      u16 offset, void *data, int sz)
->>  {
->>  	struct vfio_region_info *info;
->>  	struct vfio_pci_device *pdev;
->> @@ -571,7 +571,7 @@ static void vfio_pci_cfg_read(struct kvm *kvm, struct pci_device_header *pci_hdr
->>  }
->>  
->>  static void vfio_pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hdr,
->> -			       u8 offset, void *data, int sz)
->> +			       u16 offset, void *data, int sz)
->>  {
->>  	struct vfio_region_info *info;
->>  	struct vfio_pci_device *pdev;
->> @@ -658,15 +658,17 @@ static int vfio_pci_parse_caps(struct vfio_device *vdev)
->>  {
->>  	int ret;
->>  	size_t size;
->> -	u8 pos, next;
->> +	u16 pos, next;
->>  	struct pci_cap_hdr *cap;
->> -	u8 virt_hdr[PCI_DEV_CFG_SIZE];
->> +	u8 *virt_hdr;
->>  	struct vfio_pci_device *pdev = &vdev->pci;
->>  
->>  	if (!(pdev->hdr.status & PCI_STATUS_CAP_LIST))
->>  		return 0;
->>  
->> -	memset(virt_hdr, 0, PCI_DEV_CFG_SIZE);
->> +	virt_hdr = calloc(1, PCI_DEV_CFG_SIZE);
->> +	if (!virt_hdr)
->> +		return -ENOMEM;
->>  
->>  	pos = pdev->hdr.capabilities & ~3;
->>  
->> @@ -702,6 +704,8 @@ static int vfio_pci_parse_caps(struct vfio_device *vdev)
->>  	size = PCI_DEV_CFG_SIZE - PCI_STD_HEADER_SIZEOF;
->>  	memcpy((void *)&pdev->hdr + pos, virt_hdr + pos, size);
->>  
->> +	free(virt_hdr);
->> +
->>  	return 0;
->>  }
->>  
->> @@ -812,7 +816,11 @@ static int vfio_pci_fixup_cfg_space(struct vfio_device *vdev)
->>  
->>  	/* Install our fake Configuration Space */
->>  	info = &vdev->regions[VFIO_PCI_CONFIG_REGION_INDEX].info;
->> -	hdr_sz = PCI_DEV_CFG_SIZE;
->> +	/*
->> +	 * We don't touch the extended configuration space, let's be cautious
->> +	 * and not overwrite it all with zeros, or bad things might happen.
->> +	 */
->> +	hdr_sz = PCI_DEV_CFG_SIZE_LEGACY;
->>  	if (pwrite(vdev->fd, &pdev->hdr, hdr_sz, info->offset) != hdr_sz) {
->>  		vfio_dev_err(vdev, "failed to write %zd bytes to Config Space",
->>  			     hdr_sz);
+> @Jiang, do you want to take a look of this possibility?
+
+Yes. I already read code about mergeable buffer in virtio-net, which I thin=
+k
+is the only place so far to use it. I will check how to share the code.
+
+Thanks for all the comments.
+
+> Thanks,
+> Stefano
+>
