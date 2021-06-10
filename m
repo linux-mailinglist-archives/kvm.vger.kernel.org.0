@@ -2,97 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 610D93A21D4
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 03:24:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4106A3A21F4
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 03:48:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229692AbhFJB0S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 21:26:18 -0400
-Received: from mail-lj1-f172.google.com ([209.85.208.172]:35659 "EHLO
-        mail-lj1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229507AbhFJB0P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Jun 2021 21:26:15 -0400
-Received: by mail-lj1-f172.google.com with SMTP id n17so2393446ljg.2
-        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 18:24:05 -0700 (PDT)
+        id S229655AbhFJBuk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 21:50:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47626 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229507AbhFJBuj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Jun 2021 21:50:39 -0400
+Received: from mail-oo1-xc2c.google.com (mail-oo1-xc2c.google.com [IPv6:2607:f8b0:4864:20::c2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41E64C061574
+        for <kvm@vger.kernel.org>; Wed,  9 Jun 2021 18:48:33 -0700 (PDT)
+Received: by mail-oo1-xc2c.google.com with SMTP id d27-20020a4a3c1b0000b029024983ef66dbso3613723ooa.3
+        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 18:48:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=RMzSuCgOEYIzd573kQ1OWYO+8EI6xppe3qhTmc0uAk8=;
-        b=GTgFXw+Q7H4OHIZH0Qqiv1guDzMzyqLqhq8Au3YKfAPWCHHsBlZ+YOmEVkzuT92DS2
-         txltkNfX/dLP94AUxInHKdb4SPt/QmbaCChg9X7UqlfDwdDL0s/T4MEokU6e1W/y9vay
-         6Mmcekuto86odomlUiJMza+VeqyYiThe8J7WQ3gx2rVjqUCtYo53NWkVGXChmjy0qgyH
-         Fj9kvho3tA/J+704p1kw5QDF/exzzztFlZ2iJ1za8ZFoIKlZDMyXMTG8wC2Jj+WNg1Bf
-         R1KLqN1VZlwTtFs6OJEMVyHQ1ZFnZW87EBBG7QHohu8kZlD5Y9/OD8pnUIYs7qm2RpB6
-         ATwA==
+         :cc;
+        bh=qOgzX+vvff/WfwDfOUS6M3hW69U6U8fwCjsw9gDHFBk=;
+        b=lASjid/vRKWJUu+KCmsmjN6e0QZ+PxtqUXHIKN5R5fzpGoafsmGAGKOHTvBds97MzJ
+         d/hloKaMh30wOvk9fGdsVeMcDOcS6yTHcXtR/d3TFg8CqWefdfE1A4C64nRbFIVGzU7O
+         v3SC9ngzO5eoQrm5tZJvUSIvH0BqbSkENvb7ZeTYPLrFFxI2+a17229VsTN0aPIxu2jP
+         rtIFw455GK3+w8z1aG1W/FGdmx9X7nJKmXT0UilWJzogE1sWDVfaU5RHD+J3ncc0R0nL
+         43fDteJFXAJVGiFppfDaSg69Q58sRpbRhEEly2cTFDGLJCiBsovONNDAaXNFq3iJ0jP3
+         nPxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=RMzSuCgOEYIzd573kQ1OWYO+8EI6xppe3qhTmc0uAk8=;
-        b=Bxz7ivUitS2HAVTWHq1kQqEkqvFLsDiecWmo+sLVVWT0nEZvRNR+DewNfnesBan5Kj
-         6wLYQ+Lq45MqbTeLS5K5sc7lIKs+nwjpqHcxi7C4UP/VAk17u+uUkfZW1IZt9ha6WZKf
-         pIZWb9RjKGV0DLtFEoAf8dqQ0iFNSRHh/G6bMMRHwBP7H+klmQe3zAOuoaknOmGR0AKO
-         BOpaME8Fltwm6i3rAo2eeisxJ5IYFGw7cFF/o72OGi1rSuD4ekSZHt6s1bkd2zzrF/72
-         6tHS9JZ2uCcgV6laHu0W2e2Aq7I6A8/7DpRxBOWxc9WLgBKlUnL9xrFU/jvytdl+BImo
-         rrzg==
-X-Gm-Message-State: AOAM5312ca+RxgFH3YhQK2bnnxbM1yHqNR9v3yL7D4TXYkvxDDkpoJmP
-        gwiit3bN38lepJvA3c1Yf2jl/sQOya/cA11HjKE=
-X-Google-Smtp-Source: ABdhPJy4UR+CBwndZVq3L6YU7kKhddJo3vK2tXJQS7lSWA0UPiV/XEdX5KPUeFj75EK8IPqU2mxrA0z/HWjzqv2niRo=
-X-Received: by 2002:a2e:8e90:: with SMTP id z16mr296238ljk.508.1623288184506;
- Wed, 09 Jun 2021 18:23:04 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=qOgzX+vvff/WfwDfOUS6M3hW69U6U8fwCjsw9gDHFBk=;
+        b=TNlFOKgDJ0SCePz4eS/RXHiJ0yLe0wMC+8h0L52rg5guWPvTKlyzkKkeGc4vAeyL6J
+         sgAk33+UinDyZWJZh8z5Su/0Rw8yUyLub1OhFLHdiG6ZXMrQD0w6zwAcYO9sCoir4I9S
+         aGkB72lTcGObgy8tdCewGdvA7HYOs9flZNaLByeHNOZOpg5Kv1sKX10mWFV/VhpZvyqe
+         zvInLCDta0Qk0nccQkzz4/Nkott0i9cl2T4pA5E57FqdvjzjybvMYGcRBhH8Tid8rBEV
+         LqogTwnT+W6ijPpezY3rvaEekTfQ7sQ+PvGc/VRLJX2SIrCv/KR2kCr1b2vF6EkfN21T
+         FN+g==
+X-Gm-Message-State: AOAM530jWNLGSRM3/VWCuI5grFeR5jpw303AnFpShQ4tol+7pY2s3J/t
+        3swyeUGdEljQ5mlGEiDUjJjLfXNaLlEXMvsz2+5gxA==
+X-Google-Smtp-Source: ABdhPJz9DcEMgenZufoWS5PWYxRAghn7GT7oaKHskyQNYxWXbLE+jDW+NM05TmEr2vXpsay08UP76v5O5lhUd6qwkTo=
+X-Received: by 2002:a4a:e4c1:: with SMTP id w1mr465761oov.81.1623289710436;
+ Wed, 09 Jun 2021 18:48:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210609182945.36849-1-nadav.amit@gmail.com> <20210609182945.36849-8-nadav.amit@gmail.com>
-In-Reply-To: <20210609182945.36849-8-nadav.amit@gmail.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Date:   Thu, 10 Jun 2021 09:22:48 +0800
-Message-ID: <CAA3+yLd4AML_eEtUwzFrd1-KKiiZ4W9Uy0gTdrEMC2YXVayJRQ@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH 7/8] x86/pmu: Skip the tests on PMU version 1
-To:     Nadav Amit <nadav.amit@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+References: <20210609215111.4142972-1-jmattson@google.com> <8b4bbc8e-ee42-4577-39b1-44fb615c080a@oracle.com>
+In-Reply-To: <8b4bbc8e-ee42-4577-39b1-44fb615c080a@oracle.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 9 Jun 2021 18:48:19 -0700
+Message-ID: <CALMp9eRvOFAnSCmXR9DWdWv9hzpOFjMXoo6a2Sd-bRBO3wnd-Q@mail.gmail.com>
+Subject: Re: [PATCH] kvm: LAPIC: Restore guard to prevent illegal APIC
+ register access
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm list <kvm@vger.kernel.org>, syzbot <syzkaller@googlegroups.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Nadav,
+On Wed, Jun 9, 2021 at 5:45 PM Krish Sadhukhan
+<krish.sadhukhan@oracle.com> wrote:
+>
+>
+> On 6/9/21 2:51 PM, Jim Mattson wrote:
+> > Per the SDM, "any access that touches bytes 4 through 15 of an APIC
+> > register may cause undefined behavior and must not be executed."
+> > Worse, such an access in kvm_lapic_reg_read can result in a leak of
+> > kernel stack contents. Prior to commit 01402cf81051 ("kvm: LAPIC:
+> > write down valid APIC registers"), such an access was explicitly
+> > disallowed. Restore the guard that was removed in that commit.
+> >
+> > Fixes: 01402cf81051 ("kvm: LAPIC: write down valid APIC registers")
+> > Signed-off-by: Jim Mattson <jmattson@google.com>
+> > Reported-by: syzbot <syzkaller@googlegroups.com>
+> > ---
+> >   arch/x86/kvm/lapic.c | 3 +++
+> >   1 file changed, 3 insertions(+)
+> >
+> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > index c0ebef560bd1..32fb82bbd63f 100644
+> > --- a/arch/x86/kvm/lapic.c
+> > +++ b/arch/x86/kvm/lapic.c
+> > @@ -1410,6 +1410,9 @@ int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
+> >       if (!apic_x2apic_mode(apic))
+> >               valid_reg_mask |= APIC_REG_MASK(APIC_ARBPRI);
+> >
+> > +     if (alignment + len > 4)
+>
+> It will be useful for debugging if the apic_debug() call is added back in.
 
-Nadav Amit <nadav.amit@gmail.com> =E4=BA=8E2021=E5=B9=B46=E6=9C=8810=E6=97=
-=A5=E5=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=882:33=E5=86=99=E9=81=93=EF=BC=9A
->
-> From: Nadav Amit <nadav.amit@gmail.com>
->
-> x86's PMU tests are not compatible with version 1. Instead of finding
-> how to adapt them, just skip them if the PMU version is too old.
+Are you suggesting that I should revert commit 0d88800d5472 ("kvm:
+x86: ioapic and apic debug macros cleanup")?
 
-Instead of skipping pmu.v1, it would be better to just skip the tests
-of fixed counters.
-But considering this version is really too old, this change looks fine to m=
-e.
-
+> > +             return 1;
+> > +
+> >       if (offset > 0x3f0 || !(valid_reg_mask & APIC_REG_MASK(offset)))
+> >               return 1;
+> >
 >
-> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
-> ---
->  x86/pmu.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/x86/pmu.c b/x86/pmu.c
-> index 5a3d55b..ec61ac9 100644
-> --- a/x86/pmu.c
-> +++ b/x86/pmu.c
-> @@ -544,6 +544,12 @@ int main(int ac, char **av)
->                 printf("No pmu is detected!\n");
->                 return report_summary();
->         }
-> +
-> +       if (eax.split.version_id =3D=3D 1) {
-> +               printf("PMU version 1 is not supported\n");
-> +               return report_summary();
-> +       }
-> +
->         printf("PMU version:         %d\n", eax.split.version_id);
->         printf("GP counters:         %d\n", eax.split.num_counters);
->         printf("GP counter width:    %d\n", eax.split.bit_width);
-> --
-> 2.25.1
->
+> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
