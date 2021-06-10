@@ -2,156 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F7F73A2E29
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 16:29:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC5373A2E2E
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 16:29:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230329AbhFJObM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 10:31:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23292 "EHLO
+        id S231415AbhFJObk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 10:31:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57936 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230153AbhFJObM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 10:31:12 -0400
+        by vger.kernel.org with ESMTP id S230488AbhFJObj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 10:31:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623335355;
+        s=mimecast20190719; t=1623335382;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=t1hQMrijpRgHftZ417h7zHkFgo5qZsUpu+n36cFGj2Y=;
-        b=fhpA6MqeEFN1H1bCjuCo9M1D8/KR/fI4hwewUqV6BK2qfsrDFimxlnk06jkvVE2o973Lkh
-        uENoVBwN5M3uhP+xl+4AcUaPqno4nBvUIS6KvPngdNoiW1Ee/ikPgXaYKwn1auYbg0tpn7
-        hA/X1Y5/oBXk/oD6vLUeYfqT/3CC20M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-353-OpRGnpxMP-mfn_AENiZ1wA-1; Thu, 10 Jun 2021 10:29:14 -0400
-X-MC-Unique: OpRGnpxMP-mfn_AENiZ1wA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F8CCCC625
-        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 14:29:13 +0000 (UTC)
-Received: from [10.36.114.17] (ovpn-114-17.ams2.redhat.com [10.36.114.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2E9B360C04;
-        Thu, 10 Jun 2021 14:29:12 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 1/2] header guards: clean up some
- stragglers
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org
-References: <20210610135937.94375-1-cohuck@redhat.com>
- <20210610135937.94375-2-cohuck@redhat.com>
-From:   Laurent Vivier <lvivier@redhat.com>
-Message-ID: <a172c7d1-4de7-619f-95ee-c8d507f7b812@redhat.com>
-Date:   Thu, 10 Jun 2021 16:29:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        bh=CXjwm022f1btPWZxExQD9Wi6mGGZrQ0Sf9jZNJK7BTY=;
+        b=NRVXmT5LXdQpqhjvCVu9ihCKsOe4H5q5z/gzpcVUfqMjS8ppsiC2ierBukZ8MS5tLbKYgT
+        635ckQgzfydlKVsHypaN2DOmCRBnD8d0o+/n40dxXZe8pL9ZTLuHtvxoOJrT+Vt1SGx5Ly
+        rWe+K6whjFdFLHHqJawjbIzweq9jXMY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-413-UyekpUsNORGTcxh1qRieMg-1; Thu, 10 Jun 2021 10:29:40 -0400
+X-MC-Unique: UyekpUsNORGTcxh1qRieMg-1
+Received: by mail-wm1-f69.google.com with SMTP id j6-20020a05600c1906b029019e9c982271so3945391wmq.0
+        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 07:29:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=CXjwm022f1btPWZxExQD9Wi6mGGZrQ0Sf9jZNJK7BTY=;
+        b=Xqa0kyKFDBlYHfwFs5QxllkQtg9Ohe3fgX35jasr7JF0YcuE01UDFfNfUh6a0zTDHa
+         BbfQyx2cf1zwghf7Y+t1T6h8Z0fXScdSt2/+ptVIN0fh3R9WzvArm413OnHeMsREP+1U
+         bztLZCnvwGNmt1leQDAgyYcrcl1I+YP45pm+CIr6g4sOnT6sdWnPwu9tCqy90WxUytsN
+         I6gMMqXKfkps1Z34O8Ii9o+h1A1tUJGH4KzkeZWWpxz0a8DN0wRHv5RHLINR8hXuvV9Y
+         oDmwqv8MPRbBXSzH/vR2+h2x64I8CmJ5kVT98X+g3/8WQQJ3lFFsPU33W3+kLbZiZIjX
+         KRTg==
+X-Gm-Message-State: AOAM5309k6W9amHzBzj1RgvgPr9mslIRNOdi9G+P8Bct4SToInVH2Rke
+        ocl2dU3lO3bUlN7d7A1IlbQChT2SeJujLvXT+s4MtB/Z2I9dQV7aWvOougchl40qU+bvp+FS1+3
+        S+MB/FSPIVVnI1LPgObOaU0WcaORH0h9/EM2vle8AXzw/GQh1IPXBUDefP2tF/eYx
+X-Received: by 2002:a1c:cc02:: with SMTP id h2mr2923741wmb.39.1623335379146;
+        Thu, 10 Jun 2021 07:29:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz5YKmQhpdePLhcFwXesjKPtPyXVB/I64T17TPcEfyOuMlHO8/sT0DjK7es33C6b3nxHNYgxg==
+X-Received: by 2002:a1c:cc02:: with SMTP id h2mr2923721wmb.39.1623335378876;
+        Thu, 10 Jun 2021 07:29:38 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id w8sm4235981wre.70.2021.06.10.07.29.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Jun 2021 07:29:38 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 00/11] KVM: nVMX: Fixes for nested state migration
+ when eVMCS is in use
+In-Reply-To: <20210526132026.270394-1-vkuznets@redhat.com>
+References: <20210526132026.270394-1-vkuznets@redhat.com>
+Date:   Thu, 10 Jun 2021 16:29:37 +0200
+Message-ID: <87mtrxyer2.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210610135937.94375-2-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/06/2021 15:59, Cornelia Huck wrote:
-> Some headers had been missed during the initial header guard
-> standardization.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  configure             | 4 ++--
->  lib/arm/asm/mmu-api.h | 4 ++--
->  lib/arm/asm/mmu.h     | 6 +++---
->  lib/arm64/asm/mmu.h   | 6 +++---
->  lib/pci.h             | 6 +++---
->  5 files changed, 13 insertions(+), 13 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index 4ad5a4bcd782..b8442d61fb60 100755
-> --- a/configure
-> +++ b/configure
-> @@ -332,8 +332,8 @@ if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
->  fi
->  
->  cat <<EOF > lib/config.h
-> -#ifndef CONFIG_H
-> -#define CONFIG_H 1
-> +#ifndef _CONFIG_H_
-> +#define _CONFIG_H_
->  /*
->   * Generated file. DO NOT MODIFY.
->   *
-> diff --git a/lib/arm/asm/mmu-api.h b/lib/arm/asm/mmu-api.h
-> index 05fc12b5afb8..3d77cbfd8b24 100644
-> --- a/lib/arm/asm/mmu-api.h
-> +++ b/lib/arm/asm/mmu-api.h
-> @@ -1,5 +1,5 @@
-> -#ifndef __ASMARM_MMU_API_H_
-> -#define __ASMARM_MMU_API_H_
-> +#ifndef _ASMARM_MMU_API_H_
-> +#define _ASMARM_MMU_API_H_
->  
->  #include <asm/page.h>
->  #include <stdbool.h>
-> diff --git a/lib/arm/asm/mmu.h b/lib/arm/asm/mmu.h
-> index 94e70f0a84bf..b24b97e554e2 100644
-> --- a/lib/arm/asm/mmu.h
-> +++ b/lib/arm/asm/mmu.h
-> @@ -1,5 +1,5 @@
-> -#ifndef __ASMARM_MMU_H_
-> -#define __ASMARM_MMU_H_
-> +#ifndef _ASMARM_MMU_H_
-> +#define _ASMARM_MMU_H_
->  /*
->   * Copyright (C) 2014, Red Hat Inc, Andrew Jones <drjones@redhat.com>
->   *
-> @@ -53,4 +53,4 @@ static inline void flush_dcache_addr(unsigned long vaddr)
->  
->  #include <asm/mmu-api.h>
->  
-> -#endif /* __ASMARM_MMU_H_ */
-> +#endif /* _ASMARM_MMU_H_ */
-> diff --git a/lib/arm64/asm/mmu.h b/lib/arm64/asm/mmu.h
-> index 72371b2d9fe3..5c27edb24d2e 100644
-> --- a/lib/arm64/asm/mmu.h
-> +++ b/lib/arm64/asm/mmu.h
-> @@ -1,5 +1,5 @@
-> -#ifndef __ASMARM64_MMU_H_
-> -#define __ASMARM64_MMU_H_
-> +#ifndef _ASMARM64_MMU_H_
-> +#define _ASMARM64_MMU_H_
->  /*
->   * Copyright (C) 2014, Red Hat Inc, Andrew Jones <drjones@redhat.com>
->   *
-> @@ -35,4 +35,4 @@ static inline void flush_dcache_addr(unsigned long vaddr)
->  
->  #include <asm/mmu-api.h>
->  
-> -#endif /* __ASMARM64_MMU_H_ */
-> +#endif /* _ASMARM64_MMU_H_ */
-> diff --git a/lib/pci.h b/lib/pci.h
-> index 689f03ca7647..e201711dfe18 100644
-> --- a/lib/pci.h
-> +++ b/lib/pci.h
-> @@ -1,5 +1,5 @@
-> -#ifndef PCI_H
-> -#define PCI_H
-> +#ifndef _PCI_H_
-> +#define _PCI_H_
->  /*
->   * API for scanning a PCI bus for a given device, as well to access
->   * BAR registers.
-> @@ -102,4 +102,4 @@ struct pci_test_dev_hdr {
->  
->  #define  PCI_HEADER_TYPE_MASK		0x7f
->  
-> -#endif /* PCI_H */
-> +#endif /* _PCI_H_ */
-> 
+Vitaly Kuznetsov <vkuznets@redhat.com> writes:
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> Changes since v2:
+> - 'KVM: nVMX: Use '-1' in 'hv_evmcs_vmptr' to indicate that eVMCS is not in
+>  use'/ 'KVM: nVMX: Introduce 'EVMPTR_MAP_PENDING' post-migration state'
+>  patches instead of 'KVM: nVMX: Introduce nested_evmcs_is_used()' [Paolo]
+> - 'KVM: nVMX: Don't set 'dirty_vmcs12' flag on enlightened VMPTRLD' patch
+>  added [Max]
+> - 'KVM: nVMX: Release eVMCS when enlightened VMENTRY was disabled' patch
+>   added.
+> - 'KVM: nVMX: Make copy_vmcs12_to_enlightened()/copy_enlightened_to_vmcs12()
+>  return 'void'' patch added [Paolo]
+> - R-b tags added [Max]
+>
+> Original description:
+>
+> Commit f5c7e8425f18 ("KVM: nVMX: Always make an attempt to map eVMCS after
+> migration") fixed the most obvious reason why Hyper-V on KVM (e.g. Win10
+>  + WSL2) was crashing immediately after migration. It was also reported
+> that we have more issues to fix as, while the failure rate was lowered 
+> signifincatly, it was still possible to observe crashes after several
+> dozens of migration. Turns out, the issue arises when we manage to issue
+> KVM_GET_NESTED_STATE right after L2->L2 VMEXIT but before L1 gets a chance
+> to run. This state is tracked with 'need_vmcs12_to_shadow_sync' flag but
+> the flag itself is not part of saved nested state. A few other less 
+> significant issues are fixed along the way.
+>
+> While there's no proof this series fixes all eVMCS related problems,
+> Win10+WSL2 was able to survive 3333 (thanks, Max!) migrations without
+> crashing in testing.
+>
+> Patches are based on the current kvm/next tree.
+
+Paolo, Max,
+
+Just to double-check: are we good here? I know there are more
+improvements/ideas to explore but I'd like to treat this patchset as a
+set of fixes, it would be unfortunate if we miss 5.14.
+
+-- 
+Vitaly
 
