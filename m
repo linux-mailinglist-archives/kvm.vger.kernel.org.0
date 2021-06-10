@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3118D3A27E7
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 11:12:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DF203A27EB
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 11:12:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230311AbhFJJNz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 05:13:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59924 "EHLO
+        id S230364AbhFJJN5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 05:13:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230080AbhFJJNx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230033AbhFJJNx (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 10 Jun 2021 05:13:53 -0400
 Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18FF4C061574;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 191C3C061760;
         Thu, 10 Jun 2021 02:11:58 -0700 (PDT)
 Received: from cap.home.8bytes.org (p4ff2ba7c.dip0.t-ipconnect.de [79.242.186.124])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id E88EF17C;
-        Thu, 10 Jun 2021 11:11:54 +0200 (CEST)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 7F96F2FB;
+        Thu, 10 Jun 2021 11:11:55 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
@@ -40,10 +40,12 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Arvind Sankar <nivedita@alum.mit.edu>,
         linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: [PATCH v4 0/6] x86/sev-es: Fixes for SEV-ES Guest Support
-Date:   Thu, 10 Jun 2021 11:11:35 +0200
-Message-Id: <20210610091141.30322-1-joro@8bytes.org>
+Subject: [PATCH v4 1/6] x86/sev-es: Fix error message in runtime #VC handler
+Date:   Thu, 10 Jun 2021 11:11:36 +0200
+Message-Id: <20210610091141.30322-2-joro@8bytes.org>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20210610091141.30322-1-joro@8bytes.org>
+References: <20210610091141.30322-1-joro@8bytes.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -52,39 +54,27 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Hi,
+The runtime #VC handler is not "early" anymore. Fix the copy&paste error
+and remove that word from the error message.
 
-here is the next revision of my pending fixes for Linux' SEV-ES
-support. Changes to the previous version are:
+Signed-off-by: Joerg Roedel <jroedel@suse.de>
+---
+ arch/x86/kernel/sev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-	- Removed first patch which is now in tip/x86/urgent already
-	- Removed patch "x86/sev-es: Run #VC handler in plain IRQ state"
-	  and replaced it with
-	  "x86/sev-es: Split up runtime #VC handler for correct state tracking"
-	  as per suggestion from PeterZ
-
-Changes are based on tip/x86/urgent. Please review.
-
-Thanks,
-
-	Joerg
-
-Joerg Roedel (6):
-  x86/sev-es: Fix error message in runtime #VC handler
-  x86/sev-es: Disable IRQs while GHCB is active
-  x86/sev-es: Split up runtime #VC handler for correct state tracking
-  x86/insn-eval: Make 0 a valid RIP for insn_get_effective_ip()
-  x86/insn: Extend error reporting from
-    insn_fetch_from_user[_inatomic]()
-  x86/sev-es: Propagate #GP if getting linear instruction address failed
-
- arch/x86/kernel/sev.c    | 174 +++++++++++++++++++++++----------------
- arch/x86/kernel/umip.c   |  10 +--
- arch/x86/lib/insn-eval.c |  22 +++--
- 3 files changed, 122 insertions(+), 84 deletions(-)
-
-
-base-commit: efa165504943f2128d50f63de0c02faf6dcceb0d
+diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+index 651b81cd648e..4fd997bbf059 100644
+--- a/arch/x86/kernel/sev.c
++++ b/arch/x86/kernel/sev.c
+@@ -1369,7 +1369,7 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
+ 		vc_finish_insn(&ctxt);
+ 		break;
+ 	case ES_UNSUPPORTED:
+-		pr_err_ratelimited("Unsupported exit-code 0x%02lx in early #VC exception (IP: 0x%lx)\n",
++		pr_err_ratelimited("Unsupported exit-code 0x%02lx in #VC exception (IP: 0x%lx)\n",
+ 				   error_code, regs->ip);
+ 		goto fail;
+ 	case ES_VMM_ERROR:
 -- 
 2.31.1
 
