@@ -2,142 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DA0D3A2DF3
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 16:20:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6787C3A2E18
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 16:25:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231332AbhFJOWD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 10:22:03 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6549 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230084AbhFJOWC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 10:22:02 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15AE3bhv096619;
-        Thu, 10 Jun 2021 10:20:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=hjL552Ig2sktrHftFzN1dDJ1btbi/msqXjCaJCTaUIQ=;
- b=Ukp0UTxMXqBOYKnaXXXqpLz2w0a2DxKbOmxuPWKgBKIzpfXtzHLOHy0VseCAtHkOnHDs
- +DHO/wXH/WeioiqEfz0mxJbhn5dSU3wvlULMqSJhJOI6coFFlPYtIAvszNxwFsmnSEj7
- shFWpD6t2gXX+WT3rE7sFtSDAHxNYwz9B2KDY53sVYAFlbhwHq5p/iWRvtT/Ep3hgPB+
- HeSv/3PBbyvf6DU+9NmbzXZsIeVgjttzswuDDRRX54+yA3lv25YcWBBaATDs0rD4qd3c
- iJdiLBkQvyVjFa5AVZWaoKGdj5eJnZhka7R4aiyUtuTp54Lwr3s0tvWeX6o3oARuQERE iw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 393kksj2xy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Jun 2021 10:20:05 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15AE4OwE103549;
-        Thu, 10 Jun 2021 10:20:04 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 393kksj2x4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Jun 2021 10:20:04 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15AEGURK003473;
-        Thu, 10 Jun 2021 14:20:03 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04fra.de.ibm.com with ESMTP id 3900w89kmm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Jun 2021 14:20:02 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15AEJ9LS26542396
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Jun 2021 14:19:10 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 389ACA405B;
-        Thu, 10 Jun 2021 14:20:00 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 91BF9A408A;
-        Thu, 10 Jun 2021 14:19:59 +0000 (GMT)
-Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 10 Jun 2021 14:19:59 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, cohuck@redhat.com
-Subject: [kvm-unit-tests PATCH v2] s390x: selftest: Add prefixes to fix report output (was "s390x: selftest: Fix report output")
-Date:   Thu, 10 Jun 2021 14:19:13 +0000
-Message-Id: <20210610141913.61553-1-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.30.2
+        id S230153AbhFJO1u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 10:27:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23809 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231354AbhFJO1t (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 10:27:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623335153;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jlw8yJtkAFcrBDUeJnOt7el2ElQfmLOcg/GBGss2Lyk=;
+        b=SDDUj14boFUJXqdGKO6X+0FbcisaKgyOJWxGV2lG8D5VvN/N2Jzo+sYd445Z22/u0hfDn0
+        JiXNyQuJabnhVhGOXV+RKDU7Ewxmvy29iR2UPr/hwPB+k6+IIo63SJv4kcySrzC+PkLE7Y
+        5i4vB/6eMrWBvmTgDKBxEGNhmrCMnRc=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-558-wR7flJ4bOPeUWeR5t8plQw-1; Thu, 10 Jun 2021 10:25:49 -0400
+X-MC-Unique: wR7flJ4bOPeUWeR5t8plQw-1
+Received: by mail-wm1-f69.google.com with SMTP id j6-20020a05600c1906b029019e9c982271so3941687wmq.0
+        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 07:25:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jlw8yJtkAFcrBDUeJnOt7el2ElQfmLOcg/GBGss2Lyk=;
+        b=Ne6RqilHtORWci12fCqQRjnIBeMjivAv81Wm/0TEddewbP5aDsg4xRCOY1HtKclzec
+         TBzV96AlXumorX46bUkUyaD0IkbkcuUIbnV9llrPavU1bsN1MuoHpC3sXzbPeZEm2PIm
+         GY+k/3HgySXJ/bPoqnAAue4nwgLM6J4AudXXyytxoRSvGamox7TQGjVW+lrJ96KNv1Rt
+         dmBmtEFcI0dNg+Vx0hPpo/bAZZk76Hcqtkfo+s5hKEkbHjWTyxNd58wt3Zvpeo1chOdV
+         D0qqEPER5QWH6uJM1tGRBXUy/ICLiutFt9UR2IcR4XaqjxFmw/fopZsqohrLSNUIuteS
+         n0Jw==
+X-Gm-Message-State: AOAM532r0drM/QPXPTMHKPEUOukFJpIZONNb9y53ryq2iUsA19YvvUqB
+        lwTsqm4CI8C1eiBvPdl1XcgD+oueh7vXGQcDIoWnIS3WMz0Y+Pnw+KVwNGlNkqZoDJcSAQSE1zG
+        EHsM0xu/RUnjZ
+X-Received: by 2002:a1c:ed03:: with SMTP id l3mr5502717wmh.130.1623335148580;
+        Thu, 10 Jun 2021 07:25:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyJQjpOnEFDdWC9UjEeMGFejKfVxJvxj9bK0/M/4owCzVRyZDDory4hyxiohIvwHFzw1zdYiA==
+X-Received: by 2002:a1c:ed03:: with SMTP id l3mr5502706wmh.130.1623335148408;
+        Thu, 10 Jun 2021 07:25:48 -0700 (PDT)
+Received: from ?IPv6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
+        by smtp.gmail.com with ESMTPSA id b62sm3062861wmh.47.2021.06.10.07.25.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Jun 2021 07:25:47 -0700 (PDT)
+Subject: Re: [PATCH 1/3 v4] KVM: nVMX: nSVM: 'nested_run' should count
+ guest-entry attempts that make it to guest code
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
+Cc:     jmattson@google.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, joro@8bytes.org
+References: <20210609180340.104248-1-krish.sadhukhan@oracle.com>
+ <20210609180340.104248-2-krish.sadhukhan@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <60ea2bd0-ad4a-b979-9d80-080e7fafe534@redhat.com>
+Date:   Thu, 10 Jun 2021 16:25:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: C6rwW3NCkBONvO-pC4k9vfKA5SFVDmND
-X-Proofpoint-GUID: _EpD5b9Kdty1uYTtrpS1K6yL3TWEmzyU
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-06-10_07:2021-06-10,2021-06-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
- bulkscore=0 spamscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0
- priorityscore=1501 clxscore=1015 lowpriorityscore=0 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106100091
+In-Reply-To: <20210609180340.104248-2-krish.sadhukhan@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To make our TAP parser (and me) happy we don't want to have two reports
-with exactly the same wording so I added in two new prefix pushes.
+On 09/06/21 20:03, Krish Sadhukhan wrote:
+> Currently, the 'nested_run' statistic counts all guest-entry attempts,
+> including those that fail during vmentry checks on Intel and during
+> consistency checks on AMD. Convert this statistic to count only those
+> guest-entries that make it past these state checks and make it to guest
+> code. This will tell us the number of guest-entries that actually executed
+> or tried to execute guest code.
+> 
+> Also, rename this statistic to 'nested_runs' since it is a count.
 
-Also moving the code inside of the region of a prefix will give us
-more data when a problem arises.
+Applied, but other statistics are also singular (l1d_flush, 
+directed_yield_attempted) so I removed the renaming.
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- s390x/selftest.c | 26 ++++++++++++++++++--------
- 1 file changed, 18 insertions(+), 8 deletions(-)
-
-diff --git a/s390x/selftest.c b/s390x/selftest.c
-index b2fe2e7b..0f099ca0 100644
---- a/s390x/selftest.c
-+++ b/s390x/selftest.c
-@@ -40,19 +40,28 @@ static void test_pgm_int(void)
- 
- static void test_malloc(void)
- {
--	int *tmp = malloc(sizeof(int));
--	int *tmp2 = malloc(sizeof(int));
-+	int *tmp, *tmp2;
- 
-+	report_prefix_push("malloc");
-+
-+	report_prefix_push("ptr_0");
-+	tmp = malloc(sizeof(int));
-+	report((uintptr_t)tmp & 0xf000000000000000ul, "allocated memory");
- 	*tmp = 123456789;
-+	mb();
-+	report(*tmp == 123456789, "wrote allocated memory");
-+	report_prefix_pop();
-+
-+	report_prefix_push("ptr_1");
-+	tmp2 = malloc(sizeof(int));
-+	report((uintptr_t)tmp2 & 0xf000000000000000ul,
-+	       "allocated memory");
- 	*tmp2 = 123456789;
- 	mb();
-+	report((*tmp2 == 123456789), "wrote allocated memory");
-+	report_prefix_pop();
- 
--	report((uintptr_t)tmp & 0xf000000000000000ul, "malloc: got vaddr");
--	report(*tmp == 123456789, "malloc: access works");
--	report((uintptr_t)tmp2 & 0xf000000000000000ul,
--	       "malloc: got 2nd vaddr");
--	report((*tmp2 == 123456789), "malloc: access works");
--	report(tmp != tmp2, "malloc: addresses differ");
-+	report(tmp != tmp2, "allocated memory addresses differ");
- 
- 	expect_pgm_int();
- 	configure_dat(0);
-@@ -62,6 +71,7 @@ static void test_malloc(void)
- 
- 	free(tmp);
- 	free(tmp2);
-+	report_prefix_pop();
- }
- 
- int main(int argc, char**argv)
--- 
-2.30.2
+Paolo
 
