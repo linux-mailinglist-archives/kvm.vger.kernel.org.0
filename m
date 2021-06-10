@@ -2,34 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7ECE23A3241
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 19:37:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AABF3A3242
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 19:37:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231389AbhFJRjO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 13:39:14 -0400
+        id S231417AbhFJRjP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 13:39:15 -0400
 Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:11118 "EHLO
         smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230294AbhFJRjN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Jun 2021 13:39:13 -0400
+        with ESMTP id S231368AbhFJRjO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Jun 2021 13:39:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
   t=1623346638; x=1654882638;
-  h=from:to:cc:subject:date:message-id:mime-version;
-  bh=5wBhl2kvo60tkZMH0L5EwPQTyWrw5edXYhFJvQFTPCk=;
-  b=eHSNkk2I7kR8xJX1nWtut51qUpy0PQDthCBCFa7MgtMJUVK52V9ycE7t
-   v3nfzLlGD0Ri3OGQOsdKZ4/Fk6N05raZl4LK1/bpRa2C278/5GdTIglUO
-   I8jpgCadxp78IHxgfbo6xhoeLiFm4+JHdh2LBTJRfkJp3cVQuCgEgrUHI
-   E=;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version;
+  bh=qTWpLN7fasm/e+sl6efpA58R8TzJua9uLtnVDM0PKhU=;
+  b=jjmdpFQugYfSz7gkboySstm9fd5vx6SEQdb9zxo9j4TxSB0/EsvxdNXJ
+   s+51IK19T/gMUIVzXoNDz10AM1kNrcNJO1LuYv3jAc8YYKfxDRHJkDBYU
+   22SDZpJ1bw7PtWFRk8O+I4YWJzkTRQ7VfB5nr8QcwdW0SEDOn7yvaS1tD
+   Y=;
 X-IronPort-AV: E=Sophos;i="5.83,264,1616457600"; 
-   d="scan'208";a="115049420"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1a-67b371d8.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP; 10 Jun 2021 17:37:11 +0000
-Received: from EX13D28EUC003.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1a-67b371d8.us-east-1.amazon.com (Postfix) with ESMTPS id F0AEAA184A;
-        Thu, 10 Jun 2021 17:37:09 +0000 (UTC)
+   d="scan'208";a="115049433"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1a-7d76a15f.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP; 10 Jun 2021 17:37:14 +0000
+Received: from EX13D28EUC003.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1a-7d76a15f.us-east-1.amazon.com (Postfix) with ESMTPS id 36654A06C4;
+        Thu, 10 Jun 2021 17:37:13 +0000 (UTC)
 Received: from uc8bbc9586ea454.ant.amazon.com (10.43.160.55) by
  EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
- id 15.0.1497.18; Thu, 10 Jun 2021 17:37:06 +0000
+ id 15.0.1497.18; Thu, 10 Jun 2021 17:37:09 +0000
 From:   Siddharth Chandrasekaran <sidcha@amazon.de>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 CC:     Siddharth Chandrasekaran <sidcha@amazon.de>,
@@ -37,10 +38,12 @@ CC:     Siddharth Chandrasekaran <sidcha@amazon.de>,
         Evgeny Iakovlev <eyakovl@amazon.de>,
         Liran Alon <liran@amazon.com>,
         Ioannis Aslanidis <iaslan@amazon.de>, <kvm@vger.kernel.org>
-Subject: [kvm-unit-tests PATCH 0/3] x86: hyper-v: Add overlay page tests
-Date:   Thu, 10 Jun 2021 19:36:47 +0200
-Message-ID: <cover.1623346319.git.sidcha@amazon.de>
+Subject: [kvm-unit-tests PATCH 1/3] x86: Move hyperv helpers into libs/x86
+Date:   Thu, 10 Jun 2021 19:36:48 +0200
+Message-ID: <153c7f54e6e620ebaf4ca0610ecbbf11ecae50b2.1623346319.git.sidcha@amazon.de>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <cover.1623346319.git.sidcha@amazon.de>
+References: <cover.1623346319.git.sidcha@amazon.de>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.43.160.55]
@@ -50,36 +53,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Patch series [1] starts treating hypercall code page as an overlay page
-(along with the existing synic event and message pages). Add KVM unit
-tests to make sure the underlying page contents are intact with various
-overlay workflows.
+Move hyperv.c and hyperv.h into into libs/x86/ as it appears to be a
+better place for them.
 
-While at it, promote hyperv.h to lib/x86 and expose hv_hypercall() from
-there so future tests can use it to do hypercalls.
+Signed-off-by: Siddharth Chandrasekaran <sidcha@amazon.de>
+---
+ x86/Makefile.common       | 7 +------
+ {x86 => lib/x86}/hyperv.h | 1 -
+ {x86 => lib/x86}/hyperv.c | 0
+ 3 files changed, 1 insertion(+), 7 deletions(-)
+ rename {x86 => lib/x86}/hyperv.h (99%)
+ rename {x86 => lib/x86}/hyperv.c (100%)
 
-[1]: https://www.spinics.net/lists/kvm/msg244569.html
-
-~ Sid.
-
-Siddharth Chandrasekaran (3):
-  x86: Move hyperv helpers into libs/x86
-  x86: Move hyper-v hypercall related methods to lib/x86/
-  x86: Add hyper-v overlay page tests
-
- x86/Makefile.common       |  8 +---
- {x86 => lib/x86}/hyperv.h |  4 ++
- {x86 => lib/x86}/hyperv.c | 51 +++++++++++++++++++++
- x86/hyperv_connections.c  | 60 ++----------------------
- x86/hyperv_overlay.c      | 96 +++++++++++++++++++++++++++++++++++++++
- x86/unittests.cfg         |  5 ++
- 6 files changed, 163 insertions(+), 61 deletions(-)
- rename {x86 => lib/x86}/hyperv.h (97%)
- rename {x86 => lib/x86}/hyperv.c (63%)
- create mode 100644 x86/hyperv_overlay.c
-
+diff --git a/x86/Makefile.common b/x86/Makefile.common
+index 52bb7aa..802f8c1 100644
+--- a/x86/Makefile.common
++++ b/x86/Makefile.common
+@@ -22,6 +22,7 @@ cflatobjs += lib/x86/acpi.o
+ cflatobjs += lib/x86/stack.o
+ cflatobjs += lib/x86/fault_test.o
+ cflatobjs += lib/x86/delay.o
++cflatobjs += lib/x86/hyperv.o
+ 
+ OBJDIRS += lib/x86
+ 
+@@ -74,12 +75,6 @@ $(TEST_DIR)/realmode.o: bits = $(if $(call cc-option,-m16,""),16,32)
+ 
+ $(TEST_DIR)/kvmclock_test.elf: $(TEST_DIR)/kvmclock.o
+ 
+-$(TEST_DIR)/hyperv_synic.elf: $(TEST_DIR)/hyperv.o
+-
+-$(TEST_DIR)/hyperv_stimer.elf: $(TEST_DIR)/hyperv.o
+-
+-$(TEST_DIR)/hyperv_connections.elf: $(TEST_DIR)/hyperv.o
+-
+ arch_clean:
+ 	$(RM) $(TEST_DIR)/*.o $(TEST_DIR)/*.flat $(TEST_DIR)/*.elf \
+ 	$(TEST_DIR)/.*.d lib/x86/.*.d \
+diff --git a/x86/hyperv.h b/lib/x86/hyperv.h
+similarity index 99%
+rename from x86/hyperv.h
+rename to lib/x86/hyperv.h
+index e3803e0..38de0d2 100644
+--- a/x86/hyperv.h
++++ b/lib/x86/hyperv.h
+@@ -213,5 +213,4 @@ struct hv_reference_tsc_page {
+         int64_t tsc_offset;
+ };
+ 
+-
+ #endif
+diff --git a/x86/hyperv.c b/lib/x86/hyperv.c
+similarity index 100%
+rename from x86/hyperv.c
+rename to lib/x86/hyperv.c
 -- 
 2.17.1
+
 
 
 
