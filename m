@@ -2,55 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 192193A22EE
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 05:43:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58D343A2304
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 06:03:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229778AbhFJDpU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 23:45:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44308 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229655AbhFJDpT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Jun 2021 23:45:19 -0400
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BC3AC061574
-        for <kvm@vger.kernel.org>; Wed,  9 Jun 2021 20:43:13 -0700 (PDT)
-Received: by mail-ot1-x336.google.com with SMTP id v27-20020a056830091bb02903cd67d40070so23081387ott.1
-        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 20:43:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=d/HsOChtoCYv2fZLAnHj+L8OfimOjEe4YM7F//2V4UM=;
-        b=Xh67DyPE6Dr/kBZT1T6WHVHNDgnklob0hvRge79XgS3dUfpC+iqe3geJA0EJxO4kzK
-         Ot37b8Pulgxw5XN5Fa6KGf7GYNhkyGy+9RcqdrLjnpbSuIDFQPEbKb0Xf44MrNP1zLm2
-         WrWY3RAEWZtR0mQ87N4jnbpzkvSxN3+BHFZgazaGKzsNdaOKZFiEScjc0GExA2l5UsJ4
-         F0wFDYmOkxIRvWpAt2j18370FgzP+3AndnwDqjm1R/xH7PG3XDpFClhwRA5bo5+vnqTl
-         HWjnxbrNmbjoFG/D0xBPsqZ+n+UakseIticWoF9S9UcgMHc0R+YVxkD8cqlRd/7fe3CB
-         Zt2g==
+        id S229865AbhFJEEt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 00:04:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51639 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229484AbhFJEEr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 00:04:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623297771;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=SXvZ6tuoPkEIoxHMDeEeqKamN/QqFwtdpQS3VL200LM=;
+        b=anlLlpn7xbZZyoP5l93owSI0ZdMFSAvPB9zG3OQycsRkmQg7KkFew0MDl02L5qOpnQxM/x
+        UpANjbfZiLW23LECy4DOKaDFE4pdOJCJAb5kYuFvAYpfpws3hmH7IqC9RCbW/fWoQPnfzn
+        f+me0GUjJQgt2ZgVqHWemOMjoWQo4zk=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-100-yfmjVtu6MPesFqcnbBOsVA-1; Thu, 10 Jun 2021 00:02:49 -0400
+X-MC-Unique: yfmjVtu6MPesFqcnbBOsVA-1
+Received: by mail-pl1-f200.google.com with SMTP id e19-20020a170902ed93b0290110a7ccff51so319724plj.20
+        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 21:02:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=d/HsOChtoCYv2fZLAnHj+L8OfimOjEe4YM7F//2V4UM=;
-        b=DrU54z1Nzh/lKAzpfNJO/DdoaKcQ9gG4Vm2rUew/asonrxY5fv06jQOyzoP2CRKPQI
-         7v1o+Q8+7oaCOLtXR2Ijcu1xx631vxB0fN8ivgDcMJVj7o8RJxHPHXCIPMoD1LBKZAr+
-         E5Onv2JrsrHd6EflFD2uYDMuB1A5+8faAHb0A+5ZCTX7R3OfSRLSd5lYUjpfYuC90XH+
-         D03A9sEB60l/brpjfQdZMXWgorkJchZPnwp2pR/DIfkSJ+iVjEdadwC5KrC2lsW/SFBG
-         mLsWdQQP9wfgRFCTBKGcpyBdU5lEYK0cvTu0bbB+H+zXMLlYq7FEj4K/guO4m/JxDfOr
-         nFDw==
-X-Gm-Message-State: AOAM5329uR69lRigFfaYCvkjcVNIivMihmeT30ASlGcy/8T/9G3rF92s
-        zc2WaSeyrHK82WY5eBHD3SLSAvF22zJgw499TuJxKg==
-X-Google-Smtp-Source: ABdhPJwaI7pY5h+Lp2iauvfmhJT8Zg+jqsNfguAo720I85KWBapKSLe5j38W7lEBj40rsZP877aszFSAKUNQM7jHv0A=
-X-Received: by 2002:a9d:711c:: with SMTP id n28mr704194otj.180.1623296592541;
- Wed, 09 Jun 2021 20:43:12 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210609232501.171257-1-jiang.wang@bytedance.com> <da90f17a-1c24-b475-76ef-f6a7fc2bcdd5@redhat.com>
-In-Reply-To: <da90f17a-1c24-b475-76ef-f6a7fc2bcdd5@redhat.com>
-From:   "Jiang Wang ." <jiang.wang@bytedance.com>
-Date:   Wed, 9 Jun 2021 20:43:01 -0700
-Message-ID: <CAP_N_Z_VDd+JUJ_Y-peOEc7FgwNGB8O3uZpVumQT_DbW62Jpjw@mail.gmail.com>
-Subject: Re: Re: [RFC v1 0/6] virtio/vsock: introduce SOCK_DGRAM support
-To:     Jason Wang <jasowang@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=SXvZ6tuoPkEIoxHMDeEeqKamN/QqFwtdpQS3VL200LM=;
+        b=kWzxFodzg9AoTTf+txnzKf8sZjFKHyhZq/sBQMRR5OOq3+I2vjW1RRUr3TyeQNCrsm
+         0Z+YOPCEorXWVsKnF7WigYUtZ7hvkKkw/x+Vej8NjNGjDb74iIEFKU4HrcU9A6py6B/R
+         gZkJNWzPvDqLywEzbXtvYStD/ipKHSaoIoqZ8nvSydAKF1C4pm9QLtFd4ln1hv5d9gMp
+         qnzUImKQTF0xh/uUZZxZ6QUyA7xLiBPnS0d3wA4XIs6LGcaQRbESJb47onW4shGuCmQ1
+         +JZD+ENHjQABZ44LwDA25AuZUWXEVx0ZWiCYsfwWNgDGfLHMCWjhLRy6Y1l3EFmv757N
+         P1PQ==
+X-Gm-Message-State: AOAM5301dUUVqC8hBloATQlCv6pBx6fsvKX/bcA25Mh2z2jE3hVdrF5/
+        +9Syjc+DxMPkAVZxhq4jEgRdvyUjaRn2zUlWBN9jdS9+y2cA2ywDLOw2cYk9SR9JmgyEPIOYNrQ
+        4Wu20d910ZN9s
+X-Received: by 2002:a62:30c2:0:b029:289:116c:ec81 with SMTP id w185-20020a6230c20000b0290289116cec81mr1068654pfw.42.1623297768717;
+        Wed, 09 Jun 2021 21:02:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwVU961zRB+Y9SorZKkIgfJPcbM10PZ2K2e5HZSOxfr9z+jedPA7qXZVldVdXfDjt/JlhuXbA==
+X-Received: by 2002:a62:30c2:0:b029:289:116c:ec81 with SMTP id w185-20020a6230c20000b0290289116cec81mr1068621pfw.42.1623297768474;
+        Wed, 09 Jun 2021 21:02:48 -0700 (PDT)
+Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id j7sm6490106pjf.0.2021.06.09.21.02.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Jun 2021 21:02:48 -0700 (PDT)
+Subject: Re: [RFC v1 0/6] virtio/vsock: introduce SOCK_DGRAM support
+To:     "Jiang Wang ." <jiang.wang@bytedance.com>
 Cc:     Stefano Garzarella <sgarzare@redhat.com>,
         virtualization@lists.linux-foundation.org,
         Stefan Hajnoczi <stefanha@redhat.com>,
@@ -71,102 +73,129 @@ Cc:     Stefano Garzarella <sgarzare@redhat.com>,
         Lu Wei <luwei32@huawei.com>,
         Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
         Networking <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <20210609232501.171257-1-jiang.wang@bytedance.com>
+ <da90f17a-1c24-b475-76ef-f6a7fc2bcdd5@redhat.com>
+ <CAP_N_Z_VDd+JUJ_Y-peOEc7FgwNGB8O3uZpVumQT_DbW62Jpjw@mail.gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <ac0c241c-1013-1304-036f-504d0edc5fd7@redhat.com>
+Date:   Thu, 10 Jun 2021 12:02:35 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <CAP_N_Z_VDd+JUJ_Y-peOEc7FgwNGB8O3uZpVumQT_DbW62Jpjw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 9, 2021 at 6:51 PM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> =E5=9C=A8 2021/6/10 =E4=B8=8A=E5=8D=887:24, Jiang Wang =E5=86=99=E9=81=93=
-:
-> > This patchset implements support of SOCK_DGRAM for virtio
-> > transport.
-> >
-> > Datagram sockets are connectionless and unreliable. To avoid unfair con=
-tention
-> > with stream and other sockets, add two more virtqueues and
-> > a new feature bit to indicate if those two new queues exist or not.
-> >
-> > Dgram does not use the existing credit update mechanism for
-> > stream sockets. When sending from the guest/driver, sending packets
-> > synchronously, so the sender will get an error when the virtqueue is fu=
-ll.
-> > When sending from the host/device, send packets asynchronously
-> > because the descriptor memory belongs to the corresponding QEMU
-> > process.
->
->
-> What's the use case for the datagram vsock?
->
-One use case is for non critical info logging from the guest
-to the host, such as the performance data of some applications.
 
-It can also be used to replace UDP communications between
-the guest and the host.
+在 2021/6/10 上午11:43, Jiang Wang . 写道:
+> On Wed, Jun 9, 2021 at 6:51 PM Jason Wang <jasowang@redhat.com> wrote:
+>>
+>> 在 2021/6/10 上午7:24, Jiang Wang 写道:
+>>> This patchset implements support of SOCK_DGRAM for virtio
+>>> transport.
+>>>
+>>> Datagram sockets are connectionless and unreliable. To avoid unfair contention
+>>> with stream and other sockets, add two more virtqueues and
+>>> a new feature bit to indicate if those two new queues exist or not.
+>>>
+>>> Dgram does not use the existing credit update mechanism for
+>>> stream sockets. When sending from the guest/driver, sending packets
+>>> synchronously, so the sender will get an error when the virtqueue is full.
+>>> When sending from the host/device, send packets asynchronously
+>>> because the descriptor memory belongs to the corresponding QEMU
+>>> process.
+>>
+>> What's the use case for the datagram vsock?
+>>
+> One use case is for non critical info logging from the guest
+> to the host, such as the performance data of some applications.
 
-> >
-> > The virtio spec patch is here:
-> > https://www.spinics.net/lists/linux-virtualization/msg50027.html
+
+Anything that prevents you from using the stream socket?
+
+
 >
+> It can also be used to replace UDP communications between
+> the guest and the host.
+
+
+Any advantage for VSOCK in this case? Is it for performance (I guess not 
+since I don't exepct vsock will be faster).
+
+An obvious drawback is that it breaks the migration. Using UDP you can 
+have a very rich features support from the kernel where vsock can't.
+
+
 >
-> Have a quick glance, I suggest to split mergeable rx buffer into an
-> separate patch.
-
-Sure.
-
-> But I think it's time to revisit the idea of unifying the virtio-net and
-> virtio-vsock. Otherwise we're duplicating features and bugs.
-
-For mergeable rxbuf related code, I think a set of common helper
-functions can be used by both virtio-net and virtio-vsock. For other
-parts, that may not be very beneficial. I will think about more.
-
-If there is a previous email discussion about this topic, could you send me
-some links? I did a quick web search but did not find any related
-info. Thanks.
-
-> Thanks
+>>> The virtio spec patch is here:
+>>> https://www.spinics.net/lists/linux-virtualization/msg50027.html
+>>
+>> Have a quick glance, I suggest to split mergeable rx buffer into an
+>> separate patch.
+> Sure.
 >
+>> But I think it's time to revisit the idea of unifying the virtio-net and
+>> virtio-vsock. Otherwise we're duplicating features and bugs.
+> For mergeable rxbuf related code, I think a set of common helper
+> functions can be used by both virtio-net and virtio-vsock. For other
+> parts, that may not be very beneficial. I will think about more.
 >
-> >
-> > For those who prefer git repo, here is the link for the linux kernel=EF=
-=BC=9A
-> > https://github.com/Jiang1155/linux/tree/vsock-dgram-v1
-> >
-> > qemu patch link:
-> > https://github.com/Jiang1155/qemu/tree/vsock-dgram-v1
-> >
-> >
-> > To do:
-> > 1. use skb when receiving packets
-> > 2. support multiple transport
-> > 3. support mergeable rx buffer
-> >
-> >
-> > Jiang Wang (6):
-> >    virtio/vsock: add VIRTIO_VSOCK_F_DGRAM feature bit
-> >    virtio/vsock: add support for virtio datagram
-> >    vhost/vsock: add support for vhost dgram.
-> >    vsock_test: add tests for vsock dgram
-> >    vhost/vsock: add kconfig for vhost dgram support
-> >    virtio/vsock: add sysfs for rx buf len for dgram
-> >
-> >   drivers/vhost/Kconfig                              |   8 +
-> >   drivers/vhost/vsock.c                              | 207 ++++++++--
-> >   include/linux/virtio_vsock.h                       |   9 +
-> >   include/net/af_vsock.h                             |   1 +
-> >   .../trace/events/vsock_virtio_transport_common.h   |   5 +-
-> >   include/uapi/linux/virtio_vsock.h                  |   4 +
-> >   net/vmw_vsock/af_vsock.c                           |  12 +
-> >   net/vmw_vsock/virtio_transport.c                   | 433 ++++++++++++=
-++++++---
-> >   net/vmw_vsock/virtio_transport_common.c            | 184 ++++++++-
-> >   tools/testing/vsock/util.c                         | 105 +++++
-> >   tools/testing/vsock/util.h                         |   4 +
-> >   tools/testing/vsock/vsock_test.c                   | 195 ++++++++++
-> >   12 files changed, 1070 insertions(+), 97 deletions(-)
-> >
+> If there is a previous email discussion about this topic, could you send me
+> some links? I did a quick web search but did not find any related
+> info. Thanks.
+
+
+We had a lot:
+
+[1] 
+https://patchwork.kernel.org/project/kvm/patch/5BDFF537.3050806@huawei.com/
+[2] 
+https://lists.linuxfoundation.org/pipermail/virtualization/2018-November/039798.html
+[3] https://www.lkml.org/lkml/2020/1/16/2043
+
+Thanks
+
 >
+>> Thanks
+>>
+>>
+>>> For those who prefer git repo, here is the link for the linux kernel：
+>>> https://github.com/Jiang1155/linux/tree/vsock-dgram-v1
+>>>
+>>> qemu patch link:
+>>> https://github.com/Jiang1155/qemu/tree/vsock-dgram-v1
+>>>
+>>>
+>>> To do:
+>>> 1. use skb when receiving packets
+>>> 2. support multiple transport
+>>> 3. support mergeable rx buffer
+>>>
+>>>
+>>> Jiang Wang (6):
+>>>     virtio/vsock: add VIRTIO_VSOCK_F_DGRAM feature bit
+>>>     virtio/vsock: add support for virtio datagram
+>>>     vhost/vsock: add support for vhost dgram.
+>>>     vsock_test: add tests for vsock dgram
+>>>     vhost/vsock: add kconfig for vhost dgram support
+>>>     virtio/vsock: add sysfs for rx buf len for dgram
+>>>
+>>>    drivers/vhost/Kconfig                              |   8 +
+>>>    drivers/vhost/vsock.c                              | 207 ++++++++--
+>>>    include/linux/virtio_vsock.h                       |   9 +
+>>>    include/net/af_vsock.h                             |   1 +
+>>>    .../trace/events/vsock_virtio_transport_common.h   |   5 +-
+>>>    include/uapi/linux/virtio_vsock.h                  |   4 +
+>>>    net/vmw_vsock/af_vsock.c                           |  12 +
+>>>    net/vmw_vsock/virtio_transport.c                   | 433 ++++++++++++++++++---
+>>>    net/vmw_vsock/virtio_transport_common.c            | 184 ++++++++-
+>>>    tools/testing/vsock/util.c                         | 105 +++++
+>>>    tools/testing/vsock/util.h                         |   4 +
+>>>    tools/testing/vsock/vsock_test.c                   | 195 ++++++++++
+>>>    12 files changed, 1070 insertions(+), 97 deletions(-)
+>>>
+
