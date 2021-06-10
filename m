@@ -2,185 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A45C3A2567
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 09:24:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FBFE3A25BC
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 09:45:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230497AbhFJH0M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 03:26:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39247 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230490AbhFJHZ7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 03:25:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623309843;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5tlPw+fNQnyyXsv0Z5PViUY/ZrTm7CI6pUHe7QloYKE=;
-        b=Oxu8BGK1M/8+HlDYuQpVcZx9J6zD1i8um11kaR3Laz14HzgtUhGJBncULf6OcbDgSiKjLM
-        193CCd+i9ZhLsCg29Cw8TT3eHz9SpBN9IWyxt55UPGeq1G2ACx0gyQLy2chaPj9JyeFXOr
-        OwQtap0TthOsj69V0t93pTdsgwwUthw=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-287-gk1fG6m_PbyRh9kUOLHVBg-1; Thu, 10 Jun 2021 03:24:02 -0400
-X-MC-Unique: gk1fG6m_PbyRh9kUOLHVBg-1
-Received: by mail-ed1-f72.google.com with SMTP id ch5-20020a0564021bc5b029039389929f28so5931841edb.16
-        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 00:24:02 -0700 (PDT)
+        id S230203AbhFJHrs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 03:47:48 -0400
+Received: from mail-pj1-f47.google.com ([209.85.216.47]:33455 "EHLO
+        mail-pj1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229634AbhFJHrr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Jun 2021 03:47:47 -0400
+Received: by mail-pj1-f47.google.com with SMTP id k22-20020a17090aef16b0290163512accedso5045660pjz.0
+        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 00:45:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=U6ksZAob7TKdDLpcxJzavIEY63fSiSQXgK1vK7E4l0U=;
+        b=fTquTMEv1aQiMNb3O7aFgwacm10ndcsC6WnOPKVdkOfNa9YeA0V8YRcIB5UpMtKbMc
+         jXZsglfyWxaLIoO4HNi/50b1wHmLONhjSKW7xFbJ5ZmG8L3pW+HEBKwdH9LUHIexogcC
+         EHq4BAd1Pvy2VaHvsQNkCOZ3jyX2IS32RLCNY/M2RdE5acEr1hrU7+0pd0ie3U953sJy
+         Zaj8UsjI5mqzJfXtrmk+Qkbp7K88HupPAsPcjzAvUFDhwHYZFhQ6nGcQW4NXfvfB0vTm
+         zGB5ekWKXD5M94cF2YWDZj/Pee5kuTw4kQiSd4iIsQ5Nd83+T3frk1VJk7by2HWBMmAr
+         /1Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=5tlPw+fNQnyyXsv0Z5PViUY/ZrTm7CI6pUHe7QloYKE=;
-        b=FD0RvPztEhXRoFNZKjtXWxgxUAL9aqfeRRv6thz6iwBv1s7BDK0WMA5vDR+3+gG7a7
-         QGWG0wQdPeRIJSAB+yzWWr/4/Fc18CMeWqZUTkCFqzA7V7nmtJSte7woaZ3eVZ/GSJgU
-         WOoQ88VR7jY9hQYXd+SYxhpRIAvVfeU1Vn2AiRdjC2GMYO1NQ4ZfPoY7iKxEcsLy5As2
-         J6L+P8USTFKQGTC37plQmdgv5DcqspsjBWue6iOgtsTwgA1NLXemJKeEl0u8tbCyEGTB
-         Moph6+ID2oa1CCnGCoN6KLLaSw6QDfr0f3246unuyryfQLuSkHf3UFZBgnqIqUWGuGaD
-         aWdw==
-X-Gm-Message-State: AOAM5332mMB7W40yuyC3vPxxtL0rT/YjL/mjZ+8nn0LyFytGZJB9tVo2
-        G+Yl0f26cE8OxdeVTcxL4VB5PVCbNCfO9F19YpeuO+aNZrnFs/AGCEI1lUoWHcX7HN+IoYfNYWv
-        6SjmD0vuBZu4R
-X-Received: by 2002:a05:6402:31a2:: with SMTP id dj2mr3327559edb.206.1623309841253;
-        Thu, 10 Jun 2021 00:24:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxQjjBWn2tn5Hz5WlWbOxelGasgbyypBGGNi74+KR/G3TdCo5Fjc4YzbciAEeQef5nBrmemKQ==
-X-Received: by 2002:a05:6402:31a2:: with SMTP id dj2mr3327543edb.206.1623309841108;
-        Thu, 10 Jun 2021 00:24:01 -0700 (PDT)
-Received: from steredhat (host-79-18-148-79.retail.telecomitalia.it. [79.18.148.79])
-        by smtp.gmail.com with ESMTPSA id o21sm651992ejg.49.2021.06.10.00.23.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Jun 2021 00:24:00 -0700 (PDT)
-Date:   Thu, 10 Jun 2021 09:23:58 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Jiang Wang ." <jiang.wang@bytedance.com>,
-        virtualization@lists.linux-foundation.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Arseny Krasnov <arseny.krasnov@kaspersky.com>,
-        jhansen@vmware.comments, cong.wang@bytedance.com,
-        Xiongchun Duan <duanxiongchun@bytedance.com>,
-        Yongji Xie <xieyongji@bytedance.com>,
-        =?utf-8?B?5p+056iz?= <chaiwen.cc@bytedance.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Lu Wei <luwei32@huawei.com>,
-        Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
-        Networking <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [RFC v1 0/6] virtio/vsock: introduce SOCK_DGRAM support
-Message-ID: <20210610072358.3fuvsahxec2sht4y@steredhat>
-References: <20210609232501.171257-1-jiang.wang@bytedance.com>
- <da90f17a-1c24-b475-76ef-f6a7fc2bcdd5@redhat.com>
- <CAP_N_Z_VDd+JUJ_Y-peOEc7FgwNGB8O3uZpVumQT_DbW62Jpjw@mail.gmail.com>
- <ac0c241c-1013-1304-036f-504d0edc5fd7@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ac0c241c-1013-1304-036f-504d0edc5fd7@redhat.com>
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=U6ksZAob7TKdDLpcxJzavIEY63fSiSQXgK1vK7E4l0U=;
+        b=pdyRQQ0gryhYTAHNCVOHIC7D9kjJUEYOTrQX59mE1L8w1lsJIhn+U/48kXEFZ7Rbmp
+         SGAr+Vlf36bQx/Qa2PJP+dZ5x5ESsTX9VjIV7oY2iKn+tNCw5mNgaQBV4vlduKIooOCI
+         N7MBO/V3wvaM0McSDKSRsIJ8gv+tKHMRMU2VoBoU1O9SD6hppjQUvpji21KCcFBETRcd
+         o+Xnpw9uhgyDVDfcc4Bkp3qqcurVdsEHuAGkj3MIqNDcvtBna+E/ZwOgukSA4pq2N2H9
+         uJbgOYjL++JoCWUYu0JSuXf8hZWR2wuiNP/ZTQwcC+DP8Zog4KCxpl286YYHSJTHPxuf
+         H54g==
+X-Gm-Message-State: AOAM533fXi7OtMvIQWbmmdRXOZntw3vLJaLSBg1zxUf43e6XimYcq9N2
+        dil6YRmJTE9PZBrRpY1D2Go=
+X-Google-Smtp-Source: ABdhPJz+uGwPFzTT/6+7puUrUBRt1A5HkP4qS/Y54u8OTcONLXRetxezLfO3ULAqv7AczttuVBei2w==
+X-Received: by 2002:a17:90a:ec10:: with SMTP id l16mr2051282pjy.142.1623311078414;
+        Thu, 10 Jun 2021 00:44:38 -0700 (PDT)
+Received: from smtpclient.apple (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
+        by smtp.gmail.com with ESMTPSA id o20sm1707997pjq.4.2021.06.10.00.44.37
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 10 Jun 2021 00:44:37 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
+Subject: Re: [kvm-unit-tests PATCH 7/8] x86/pmu: Skip the tests on PMU version
+ 1
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <CAA3+yLd4AML_eEtUwzFrd1-KKiiZ4W9Uy0gTdrEMC2YXVayJRQ@mail.gmail.com>
+Date:   Thu, 10 Jun 2021 00:44:35 -0700
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <E2E14CA1-FAD4-47B7-BCAA-3D9012FC7391@gmail.com>
+References: <20210609182945.36849-1-nadav.amit@gmail.com>
+ <20210609182945.36849-8-nadav.amit@gmail.com>
+ <CAA3+yLd4AML_eEtUwzFrd1-KKiiZ4W9Uy0gTdrEMC2YXVayJRQ@mail.gmail.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 10, 2021 at 12:02:35PM +0800, Jason Wang wrote:
->
->在 2021/6/10 上午11:43, Jiang Wang . 写道:
->>On Wed, Jun 9, 2021 at 6:51 PM Jason Wang <jasowang@redhat.com> wrote:
->>>
->>>在 2021/6/10 上午7:24, Jiang Wang 写道:
->>>>This patchset implements support of SOCK_DGRAM for virtio
->>>>transport.
->>>>
->>>>Datagram sockets are connectionless and unreliable. To avoid unfair contention
->>>>with stream and other sockets, add two more virtqueues and
->>>>a new feature bit to indicate if those two new queues exist or not.
->>>>
->>>>Dgram does not use the existing credit update mechanism for
->>>>stream sockets. When sending from the guest/driver, sending packets
->>>>synchronously, so the sender will get an error when the virtqueue is 
->>>>full.
->>>>When sending from the host/device, send packets asynchronously
->>>>because the descriptor memory belongs to the corresponding QEMU
->>>>process.
->>>
->>>What's the use case for the datagram vsock?
->>>
->>One use case is for non critical info logging from the guest
->>to the host, such as the performance data of some applications.
->
->
->Anything that prevents you from using the stream socket?
->
->
->>
->>It can also be used to replace UDP communications between
->>the guest and the host.
->
->
->Any advantage for VSOCK in this case? Is it for performance (I guess 
->not since I don't exepct vsock will be faster).
 
-I think the general advantage to using vsock are for the guest agents 
-that potentially don't need any configuration.
 
->
->An obvious drawback is that it breaks the migration. Using UDP you can 
->have a very rich features support from the kernel where vsock can't.
->
+> On Jun 9, 2021, at 6:22 PM, Like Xu <like.xu.linux@gmail.com> wrote:
+>=20
+> Hi Nadav,
+>=20
+> Nadav Amit <nadav.amit@gmail.com> =E4=BA=8E2021=E5=B9=B46=E6=9C=8810=E6=97=
+=A5=E5=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=882:33=E5=86=99=E9=81=93=EF=BC=9A
+>>=20
+>> From: Nadav Amit <nadav.amit@gmail.com>
+>>=20
+>> x86's PMU tests are not compatible with version 1. Instead of finding
+>> how to adapt them, just skip them if the PMU version is too old.
+>=20
+> Instead of skipping pmu.v1, it would be better to just skip the tests
+> of fixed counters.
+> But considering this version is really too old, this change looks fine =
+to me.
 
-Thanks for bringing this up!
-What features does UDP support and datagram on vsock could not support?
+If it were that simple, I would have done it.
 
->
->>
->>>>The virtio spec patch is here:
->>>>https://www.spinics.net/lists/linux-virtualization/msg50027.html
->>>
->>>Have a quick glance, I suggest to split mergeable rx buffer into an
->>>separate patch.
->>Sure.
->>
->>>But I think it's time to revisit the idea of unifying the virtio-net 
->>>and
->>>virtio-vsock. Otherwise we're duplicating features and bugs.
->>For mergeable rxbuf related code, I think a set of common helper
->>functions can be used by both virtio-net and virtio-vsock. For other
->>parts, that may not be very beneficial. I will think about more.
->>
->>If there is a previous email discussion about this topic, could you 
->>send me
->>some links? I did a quick web search but did not find any related
->>info. Thanks.
->
->
->We had a lot:
->
->[1] 
->https://patchwork.kernel.org/project/kvm/patch/5BDFF537.3050806@huawei.com/
->[2] 
->https://lists.linuxfoundation.org/pipermail/virtualization/2018-November/039798.html
->[3] https://www.lkml.org/lkml/2020/1/16/2043
->
-
-When I tried it, the biggest problem that blocked me were all the 
-features strictly related to TCP/IP stack and ethernet devices that 
-vsock device doesn't know how to handle: TSO, GSO, checksums, MAC, napi, 
-xdp, min ethernet frame size, MTU, etc.
-
-So in my opinion to unify them is not so simple, because vsock is not 
-really an ethernet device, but simply a socket.
-
-But I fully agree that we shouldn't duplicate functionality and code, so 
-maybe we could find those common parts and create helpers to be used by 
-both.
-
-Thanks,
-Stefano
+v1 does not support MSR_CORE_PERF_GLOBAL_OVF_CTRL,
+MSR_CORE_PERF_GLOBAL_STATUS and MSR_CORE_PERF_GLOBAL_CTRL, which are
+being used all over the code. These MSRs were only introduced on
+version 2 (Intel SDM, section 18.2.2 "Architectural Performance
+Monitoring Version 2=E2=80=9D).
 
