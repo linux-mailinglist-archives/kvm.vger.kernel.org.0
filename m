@@ -2,87 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FA1F3A2B49
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 14:17:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7775F3A2B9B
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 14:30:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230313AbhFJMTZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 08:19:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31828 "EHLO
+        id S230294AbhFJMcb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 08:32:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32622 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230255AbhFJMTY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 08:19:24 -0400
+        by vger.kernel.org with ESMTP id S230130AbhFJMc3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 08:32:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623327448;
+        s=mimecast20190719; t=1623328233;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Uv0xs33ewLzq+ryxudIHULBGFCkV88+uHAen7THruNI=;
-        b=S73SkCAggSd7OwHoMUfLKqFS3n2mH/P+QgRNF1aWi/VnY8dt8Qo1kr11TIB/xEht3nMGSJ
-        8qhmtOsnY8vTtPe2TmPgDNyTzk94gSLI6sv/vLhvrATKx5LgFiB0mDjotXudFmFtCJEXkT
-        KkKVSGW45b2GZK7Zg2i1t1FuAR9d4iw=
+        bh=EVoiHxqAd6aQAtB+HJlB46eioLbZAvstwtt/eGYsy6Y=;
+        b=XBVAr81BHml3o0ljtKrVafHpjMpqXgmyLV8UzRJZtJ3BOGMqJNrZJlTwIhI3giEZ9V7bZy
+        b6kbhcakFCZrwaKFWaTfh7bK/BcFaUi179WVCPsn5P8xl2/QpTazgiLC08vQcWLGJyprMS
+        yfSEVHEcJuYDCSkbGbvBHYS2Zfm/JOo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-446-C_LD9CEhMAKT2zbl-a5lDw-1; Thu, 10 Jun 2021 08:17:25 -0400
-X-MC-Unique: C_LD9CEhMAKT2zbl-a5lDw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-389-at8l7rlRNbOhD-p7nALrgA-1; Thu, 10 Jun 2021 08:30:32 -0400
+X-MC-Unique: at8l7rlRNbOhD-p7nALrgA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5EDAB8042B7;
-        Thu, 10 Jun 2021 12:17:24 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C1E41015C8F;
+        Thu, 10 Jun 2021 12:30:30 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9EEFC18B42;
-        Thu, 10 Jun 2021 12:17:19 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1798A60FC2;
+        Thu, 10 Jun 2021 12:30:30 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     Laurent Vivier <lvivier@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
-        kvm-ppc@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2 0/7] unify header guards
-Date:   Thu, 10 Jun 2021 08:17:19 -0400
-Message-Id: <162332742682.173232.8556399043091141939.b4-ty@redhat.com>
-In-Reply-To: <20210609143712.60933-1-cohuck@redhat.com>
-References: <20210609143712.60933-1-cohuck@redhat.com>
+To:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 0/8] x86: non-KVM improvements
+Date:   Thu, 10 Jun 2021 08:30:29 -0400
+Message-Id: <162332821539.174323.14090781989794920220.b4-ty@redhat.com>
+In-Reply-To: <20210609182945.36849-1-nadav.amit@gmail.com>
+References: <20210609182945.36849-1-nadav.amit@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 9 Jun 2021 16:37:05 +0200, Cornelia Huck wrote:
-> This is an extension of "s390x: unify header guards" to the rest
-> of kvm-unit-tests. I tried to choose a pattern that minimizes the
-> changes; most of them are for s390x and x86.
+On Wed, 9 Jun 2021 18:29:37 +0000, Nadav Amit wrote:
+> This set includes various fixes and improvements, mostly for non-KVM
+> environments.
 > 
-> v1->v2:
-> - change the patterns and document them
-> - change other architectures and architecture-independent code as well
+> The purpose of the patches are: easier to parse test results, skipping
+> tests that are unsupported and few fixes to tests.
+> 
+> Nadav Amit (8):
+>   lib/x86: report result through serial console when no test device
+>   x86/tsx-ctrl: report skipping tests correctly
+>   x86/smptest: handle non-consecutive APIC IDs
+>   x86/hypercall: enable the test on non-KVM environment
+>   x86/hyperv: skip hyperv-clock test if unsupported by host
+>   x86/syscall: skip TF-test if running neither on KVM nor AMD
+>   x86/pmu: Skip the tests on PMU version 1
+>   x86/vmx: skip error-code delivery tests for #CP
 > 
 > [...]
 
 Applied, thanks!
 
-[1/7] README.md: add guideline for header guards format
-      commit: 844669a9631d78a54b47f6667c9a2750b65d101c
-[2/7] lib: unify header guards
-      commit: 9f0ae3012430ed7072d04247fb674125c616a6b4
-[3/7] asm-generic: unify header guards
-      commit: 951e6299b30016bf04a343973296c4274e87f0e2
-[4/7] arm: unify header guards
-      commit: 16f52ec9a4763e62e35453497e4f077031abcbfb
-[5/7] powerpc: unify header guards
-      commit: 040ee6d9aee563b2b1f28e810c5e36fbbcc17bd9
-[6/7] s390x: unify header guards
-      commit: eb5a1bbab00619256b76177e7a88cfe05834b026
-[7/7] x86: unify header guards
-      commit: c865f654ffe4c5955038aaf74f702ba62f3eb014
+[1/8] lib/x86: report result through serial console when no test device
+      commit: 5747945371b47c51cb16187a26111d06f58f06b2
+[2/8] x86/tsx-ctrl: report skipping tests correctly
+      commit: c8312cbd25df6bf350a9654b6c0364b213ba406c
+[3/8] x86/smptest: handle non-consecutive APIC IDs
+      commit: 90ab30c22dbb18b6d9804421ef3f160cfef031b8
+[4/8] x86/hypercall: enable the test on non-KVM environment
+      commit: 22abdd3999b7c17ba976d31706852b92fb45cd5a
+[5/8] x86/hyperv: skip hyperv-clock test if unsupported by host
+      commit: 5067df40755d6f3a3363c99a1054b6de21a556e1
+[6/8] x86/syscall: skip TF-test if running neither on KVM nor AMD
+      commit: c1e64e2fe08cecc9dcac5b2f72488c74c5134d34
+[7/8] x86/pmu: Skip the tests on PMU version 1
+      commit: 70972e212ee4af14b603131fc27c67a0cf29d458
+[8/8] x86/vmx: skip error-code delivery tests for #CP
+      commit: c986dbe8670535e4f88871b1e8b8480bdc256ded
 
 Best regards,
 -- 
