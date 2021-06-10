@@ -2,100 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C24E13A229C
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 05:14:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 192193A22EE
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 05:43:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230017AbhFJDQY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 23:16:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55398 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229943AbhFJDQR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 9 Jun 2021 23:16:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623294785;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AaHF8TleW9y2yJFtUkdVSK3jH8Hx5NwN6hAUVAUFzZY=;
-        b=HafUCfxIZRhMpbyiKxaQGp+nzGk+XR6MEeQPAJv12rXxm7/Cw0k2zGPBVitqht5qdx1Sy5
-        b7i/CWD7O3GXrPVPAU9QNQmtr2/BiIxn8bxZ6gICWiULPxeQrW38F2FYIXfxQBmJS9t9Ol
-        1X1OMbmYGg2B1dOPf4DxmgUoPrAnG/o=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-435-qNmeUHEhNfCj7SYaD2KcOw-1; Wed, 09 Jun 2021 23:13:04 -0400
-X-MC-Unique: qNmeUHEhNfCj7SYaD2KcOw-1
-Received: by mail-pf1-f199.google.com with SMTP id b63-20020a6234420000b02902eef086465dso401903pfa.5
-        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 20:13:03 -0700 (PDT)
+        id S229778AbhFJDpU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 23:45:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44308 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229655AbhFJDpT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Jun 2021 23:45:19 -0400
+Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BC3AC061574
+        for <kvm@vger.kernel.org>; Wed,  9 Jun 2021 20:43:13 -0700 (PDT)
+Received: by mail-ot1-x336.google.com with SMTP id v27-20020a056830091bb02903cd67d40070so23081387ott.1
+        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 20:43:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=d/HsOChtoCYv2fZLAnHj+L8OfimOjEe4YM7F//2V4UM=;
+        b=Xh67DyPE6Dr/kBZT1T6WHVHNDgnklob0hvRge79XgS3dUfpC+iqe3geJA0EJxO4kzK
+         Ot37b8Pulgxw5XN5Fa6KGf7GYNhkyGy+9RcqdrLjnpbSuIDFQPEbKb0Xf44MrNP1zLm2
+         WrWY3RAEWZtR0mQ87N4jnbpzkvSxN3+BHFZgazaGKzsNdaOKZFiEScjc0GExA2l5UsJ4
+         F0wFDYmOkxIRvWpAt2j18370FgzP+3AndnwDqjm1R/xH7PG3XDpFClhwRA5bo5+vnqTl
+         HWjnxbrNmbjoFG/D0xBPsqZ+n+UakseIticWoF9S9UcgMHc0R+YVxkD8cqlRd/7fe3CB
+         Zt2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=AaHF8TleW9y2yJFtUkdVSK3jH8Hx5NwN6hAUVAUFzZY=;
-        b=kHsJHsJ+BOaUzc9rIuLQu0+EE16renP4u9T5lfCKI+fmQnTHrZxHapVfnYUwbP/fFg
-         mSk9umLtXSbynJZX4ezhjEqi6bGBlT25pc7TbvYHnPfZjgwZEzlTB1lFFt9yfXnGu6cd
-         GpkMRiJpC3mTuUI9g+WTt9in0l0oXBInluCh2InwuPZBroZ83GtzuD7rI28g/izfonI7
-         Qzx29WzyRr93Z2E94a/K/dEpdNMBPKyhXBf/AQjKtqqmgU7l17okVEG/qNcQYeNOU/GS
-         BxkO0kWtwZNKGKLForJ2J7O6VspfN5x2YFhkOYzgt8uyX2yw+i1XP4/DEvIGK84MvdQR
-         ZTXQ==
-X-Gm-Message-State: AOAM530g+0n+ZJ/pPeOYngoNPaxkB1vh4+men8V90eDgLUQfGSrrSGHD
-        /o7MMV8GdaSGRFY+ZqItLjff37BgnDjXcD7BZ+1ixXGl6+PTikIzpJflGIwGB8/+J3tP+E82A6j
-        vHVGnPoNMURYb
-X-Received: by 2002:a05:6a00:ac9:b029:2de:a06d:a52f with SMTP id c9-20020a056a000ac9b02902dea06da52fmr921566pfl.4.1623294783018;
-        Wed, 09 Jun 2021 20:13:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz/pAIMyn/a062PTQnxMgMFen4R6oZntNzUJIuTOG/VZwhA+MB6v0irLu8mJOnFgruZrZj5dw==
-X-Received: by 2002:a05:6a00:ac9:b029:2de:a06d:a52f with SMTP id c9-20020a056a000ac9b02902dea06da52fmr921554pfl.4.1623294782797;
-        Wed, 09 Jun 2021 20:13:02 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id o16sm767460pfu.75.2021.06.09.20.12.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Jun 2021 20:13:02 -0700 (PDT)
-Subject: Re: [PATCH 0/7] Do not read from descriptor ring
-To:     Andy Lutomirski <luto@kernel.org>, mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, xieyongji@bytedance.com,
-        stefanha@redhat.com, file@sect.tu-berlin.de, ashish.kalra@amd.com,
-        konrad.wilk@oracle.com, kvm@vger.kernel.org, hch@infradead.org,
-        ak@linux.intel.com
-References: <20210604055350.58753-1-jasowang@redhat.com>
- <1c079daa-f73d-cb1a-15ef-d8f57f9813b8@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <633377e3-98d2-2917-3111-2c9c08b5da4f@redhat.com>
-Date:   Thu, 10 Jun 2021 11:12:56 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=d/HsOChtoCYv2fZLAnHj+L8OfimOjEe4YM7F//2V4UM=;
+        b=DrU54z1Nzh/lKAzpfNJO/DdoaKcQ9gG4Vm2rUew/asonrxY5fv06jQOyzoP2CRKPQI
+         7v1o+Q8+7oaCOLtXR2Ijcu1xx631vxB0fN8ivgDcMJVj7o8RJxHPHXCIPMoD1LBKZAr+
+         E5Onv2JrsrHd6EflFD2uYDMuB1A5+8faAHb0A+5ZCTX7R3OfSRLSd5lYUjpfYuC90XH+
+         D03A9sEB60l/brpjfQdZMXWgorkJchZPnwp2pR/DIfkSJ+iVjEdadwC5KrC2lsW/SFBG
+         mLsWdQQP9wfgRFCTBKGcpyBdU5lEYK0cvTu0bbB+H+zXMLlYq7FEj4K/guO4m/JxDfOr
+         nFDw==
+X-Gm-Message-State: AOAM5329uR69lRigFfaYCvkjcVNIivMihmeT30ASlGcy/8T/9G3rF92s
+        zc2WaSeyrHK82WY5eBHD3SLSAvF22zJgw499TuJxKg==
+X-Google-Smtp-Source: ABdhPJwaI7pY5h+Lp2iauvfmhJT8Zg+jqsNfguAo720I85KWBapKSLe5j38W7lEBj40rsZP877aszFSAKUNQM7jHv0A=
+X-Received: by 2002:a9d:711c:: with SMTP id n28mr704194otj.180.1623296592541;
+ Wed, 09 Jun 2021 20:43:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1c079daa-f73d-cb1a-15ef-d8f57f9813b8@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+References: <20210609232501.171257-1-jiang.wang@bytedance.com> <da90f17a-1c24-b475-76ef-f6a7fc2bcdd5@redhat.com>
+In-Reply-To: <da90f17a-1c24-b475-76ef-f6a7fc2bcdd5@redhat.com>
+From:   "Jiang Wang ." <jiang.wang@bytedance.com>
+Date:   Wed, 9 Jun 2021 20:43:01 -0700
+Message-ID: <CAP_N_Z_VDd+JUJ_Y-peOEc7FgwNGB8O3uZpVumQT_DbW62Jpjw@mail.gmail.com>
+Subject: Re: Re: [RFC v1 0/6] virtio/vsock: introduce SOCK_DGRAM support
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Stefano Garzarella <sgarzare@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Arseny Krasnov <arseny.krasnov@kaspersky.com>,
+        jhansen@vmware.comments, cong.wang@bytedance.com,
+        Xiongchun Duan <duanxiongchun@bytedance.com>,
+        Yongji Xie <xieyongji@bytedance.com>,
+        =?UTF-8?B?5p+056iz?= <chaiwen.cc@bytedance.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Lu Wei <luwei32@huawei.com>,
+        Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
+        Networking <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-在 2021/6/9 上午12:24, Andy Lutomirski 写道:
-> On 6/3/21 10:53 PM, Jason Wang wrote:
->> Hi:
->>
->> The virtio driver should not trust the device. This beame more urgent
->> for the case of encrtpyed VM or VDUSE[1]. In both cases, technology
->> like swiotlb/IOMMU is used to prevent the poking/mangling of memory
->> from the device. But this is not sufficient since current virtio
->> driver may trust what is stored in the descriptor table (coherent
->> mapping) for performing the DMA operations like unmap and bounce so
->> the device may choose to utilize the behaviour of swiotlb to perform
->> attacks[2].
-> Based on a quick skim, this looks entirely reasonable to me.
+On Wed, Jun 9, 2021 at 6:51 PM Jason Wang <jasowang@redhat.com> wrote:
 >
-> (I'm not a virtio maintainer or expert.  I got my hands very dirty with
-> virtio once dealing with the DMA mess, but that's about it.)
 >
-> --Andy
+> =E5=9C=A8 2021/6/10 =E4=B8=8A=E5=8D=887:24, Jiang Wang =E5=86=99=E9=81=93=
+:
+> > This patchset implements support of SOCK_DGRAM for virtio
+> > transport.
+> >
+> > Datagram sockets are connectionless and unreliable. To avoid unfair con=
+tention
+> > with stream and other sockets, add two more virtqueues and
+> > a new feature bit to indicate if those two new queues exist or not.
+> >
+> > Dgram does not use the existing credit update mechanism for
+> > stream sockets. When sending from the guest/driver, sending packets
+> > synchronously, so the sender will get an error when the virtqueue is fu=
+ll.
+> > When sending from the host/device, send packets asynchronously
+> > because the descriptor memory belongs to the corresponding QEMU
+> > process.
+>
+>
+> What's the use case for the datagram vsock?
+>
+One use case is for non critical info logging from the guest
+to the host, such as the performance data of some applications.
 
+It can also be used to replace UDP communications between
+the guest and the host.
 
-Good to know that :)
+> >
+> > The virtio spec patch is here:
+> > https://www.spinics.net/lists/linux-virtualization/msg50027.html
+>
+>
+> Have a quick glance, I suggest to split mergeable rx buffer into an
+> separate patch.
 
-Thanks
+Sure.
 
+> But I think it's time to revisit the idea of unifying the virtio-net and
+> virtio-vsock. Otherwise we're duplicating features and bugs.
+
+For mergeable rxbuf related code, I think a set of common helper
+functions can be used by both virtio-net and virtio-vsock. For other
+parts, that may not be very beneficial. I will think about more.
+
+If there is a previous email discussion about this topic, could you send me
+some links? I did a quick web search but did not find any related
+info. Thanks.
+
+> Thanks
+>
+>
+> >
+> > For those who prefer git repo, here is the link for the linux kernel=EF=
+=BC=9A
+> > https://github.com/Jiang1155/linux/tree/vsock-dgram-v1
+> >
+> > qemu patch link:
+> > https://github.com/Jiang1155/qemu/tree/vsock-dgram-v1
+> >
+> >
+> > To do:
+> > 1. use skb when receiving packets
+> > 2. support multiple transport
+> > 3. support mergeable rx buffer
+> >
+> >
+> > Jiang Wang (6):
+> >    virtio/vsock: add VIRTIO_VSOCK_F_DGRAM feature bit
+> >    virtio/vsock: add support for virtio datagram
+> >    vhost/vsock: add support for vhost dgram.
+> >    vsock_test: add tests for vsock dgram
+> >    vhost/vsock: add kconfig for vhost dgram support
+> >    virtio/vsock: add sysfs for rx buf len for dgram
+> >
+> >   drivers/vhost/Kconfig                              |   8 +
+> >   drivers/vhost/vsock.c                              | 207 ++++++++--
+> >   include/linux/virtio_vsock.h                       |   9 +
+> >   include/net/af_vsock.h                             |   1 +
+> >   .../trace/events/vsock_virtio_transport_common.h   |   5 +-
+> >   include/uapi/linux/virtio_vsock.h                  |   4 +
+> >   net/vmw_vsock/af_vsock.c                           |  12 +
+> >   net/vmw_vsock/virtio_transport.c                   | 433 ++++++++++++=
+++++++---
+> >   net/vmw_vsock/virtio_transport_common.c            | 184 ++++++++-
+> >   tools/testing/vsock/util.c                         | 105 +++++
+> >   tools/testing/vsock/util.h                         |   4 +
+> >   tools/testing/vsock/vsock_test.c                   | 195 ++++++++++
+> >   12 files changed, 1070 insertions(+), 97 deletions(-)
+> >
+>
