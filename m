@@ -2,168 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 507453A277B
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 10:54:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3118D3A27E7
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 11:12:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229941AbhFJI43 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 04:56:29 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:5321 "EHLO
-        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229715AbhFJI42 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Jun 2021 04:56:28 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.55])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4G0yMj0Mnnz1BJgm;
-        Thu, 10 Jun 2021 16:49:37 +0800 (CST)
-Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Thu, 10 Jun 2021 16:54:21 +0800
-Received: from DESKTOP-TMVL5KK.china.huawei.com (10.174.187.128) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Thu, 10 Jun 2021 16:54:20 +0800
-From:   Yanan Wang <wangyanan55@huawei.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Andrew Jones <drjones@redhat.com>
-CC:     <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yuzenghui@huawei.com>,
-        <wanghaibin.wang@huawei.com>, Yanan Wang <wangyanan55@huawei.com>
-Subject: [PATCH] KVM: selftests: Fix compiling errors when initializing the static structure
-Date:   Thu, 10 Jun 2021 16:54:18 +0800
-Message-ID: <20210610085418.35544-1-wangyanan55@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
+        id S230311AbhFJJNz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 05:13:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59924 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230080AbhFJJNx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Jun 2021 05:13:53 -0400
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18FF4C061574;
+        Thu, 10 Jun 2021 02:11:58 -0700 (PDT)
+Received: from cap.home.8bytes.org (p4ff2ba7c.dip0.t-ipconnect.de [79.242.186.124])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (No client certificate requested)
+        by theia.8bytes.org (Postfix) with ESMTPSA id E88EF17C;
+        Thu, 10 Jun 2021 11:11:54 +0200 (CEST)
+From:   Joerg Roedel <joro@8bytes.org>
+To:     x86@kernel.org
+Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
+        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: [PATCH v4 0/6] x86/sev-es: Fixes for SEV-ES Guest Support
+Date:   Thu, 10 Jun 2021 11:11:35 +0200
+Message-Id: <20210610091141.30322-1-joro@8bytes.org>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemm500023.china.huawei.com (7.185.36.83)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Errors like below were produced from test_util.c when compiling the KVM
-selftests on my local platform.
+From: Joerg Roedel <jroedel@suse.de>
 
-lib/test_util.c: In function 'vm_mem_backing_src_alias':
-lib/test_util.c:177:12: error: initializer element is not constant
-    .flag = anon_flags,
-            ^~~~~~~~~~
-lib/test_util.c:177:12: note: (near initialization for 'aliases[0].flag')
+Hi,
 
-The reason is that we are using non-const expressions to initialize the
-static structure, which will probably trigger a compiling error/warning
-on stricter GCC versions. Fix it by converting the two const variables
-"anon_flags" and "anon_huge_flags" into more stable macros.
+here is the next revision of my pending fixes for Linux' SEV-ES
+support. Changes to the previous version are:
 
-Fixes: b3784bc28ccc0 ("KVM: selftests: refactor vm_mem_backing_src_type flags")
-Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
----
- tools/testing/selftests/kvm/lib/test_util.c | 38 ++++++++++-----------
- 1 file changed, 19 insertions(+), 19 deletions(-)
+	- Removed first patch which is now in tip/x86/urgent already
+	- Removed patch "x86/sev-es: Run #VC handler in plain IRQ state"
+	  and replaced it with
+	  "x86/sev-es: Split up runtime #VC handler for correct state tracking"
+	  as per suggestion from PeterZ
 
-diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
-index 6ad6c8276b2e..af1031fed97f 100644
---- a/tools/testing/selftests/kvm/lib/test_util.c
-+++ b/tools/testing/selftests/kvm/lib/test_util.c
-@@ -166,75 +166,75 @@ size_t get_def_hugetlb_pagesz(void)
- 	return 0;
- }
- 
-+#define ANON_FLAGS	(MAP_PRIVATE | MAP_ANONYMOUS)
-+#define ANON_HUGE_FLAGS	(ANON_FLAGS | MAP_HUGETLB)
-+
- const struct vm_mem_backing_src_alias *vm_mem_backing_src_alias(uint32_t i)
- {
--	static const int anon_flags = MAP_PRIVATE | MAP_ANONYMOUS;
--	static const int anon_huge_flags = anon_flags | MAP_HUGETLB;
--
- 	static const struct vm_mem_backing_src_alias aliases[] = {
- 		[VM_MEM_SRC_ANONYMOUS] = {
- 			.name = "anonymous",
--			.flag = anon_flags,
-+			.flag = ANON_FLAGS,
- 		},
- 		[VM_MEM_SRC_ANONYMOUS_THP] = {
- 			.name = "anonymous_thp",
--			.flag = anon_flags,
-+			.flag = ANON_FLAGS,
- 		},
- 		[VM_MEM_SRC_ANONYMOUS_HUGETLB] = {
- 			.name = "anonymous_hugetlb",
--			.flag = anon_huge_flags,
-+			.flag = ANON_HUGE_FLAGS,
- 		},
- 		[VM_MEM_SRC_ANONYMOUS_HUGETLB_16KB] = {
- 			.name = "anonymous_hugetlb_16kb",
--			.flag = anon_huge_flags | MAP_HUGE_16KB,
-+			.flag = ANON_HUGE_FLAGS | MAP_HUGE_16KB,
- 		},
- 		[VM_MEM_SRC_ANONYMOUS_HUGETLB_64KB] = {
- 			.name = "anonymous_hugetlb_64kb",
--			.flag = anon_huge_flags | MAP_HUGE_64KB,
-+			.flag = ANON_HUGE_FLAGS | MAP_HUGE_64KB,
- 		},
- 		[VM_MEM_SRC_ANONYMOUS_HUGETLB_512KB] = {
- 			.name = "anonymous_hugetlb_512kb",
--			.flag = anon_huge_flags | MAP_HUGE_512KB,
-+			.flag = ANON_HUGE_FLAGS | MAP_HUGE_512KB,
- 		},
- 		[VM_MEM_SRC_ANONYMOUS_HUGETLB_1MB] = {
- 			.name = "anonymous_hugetlb_1mb",
--			.flag = anon_huge_flags | MAP_HUGE_1MB,
-+			.flag = ANON_HUGE_FLAGS | MAP_HUGE_1MB,
- 		},
- 		[VM_MEM_SRC_ANONYMOUS_HUGETLB_2MB] = {
- 			.name = "anonymous_hugetlb_2mb",
--			.flag = anon_huge_flags | MAP_HUGE_2MB,
-+			.flag = ANON_HUGE_FLAGS | MAP_HUGE_2MB,
- 		},
- 		[VM_MEM_SRC_ANONYMOUS_HUGETLB_8MB] = {
- 			.name = "anonymous_hugetlb_8mb",
--			.flag = anon_huge_flags | MAP_HUGE_8MB,
-+			.flag = ANON_HUGE_FLAGS | MAP_HUGE_8MB,
- 		},
- 		[VM_MEM_SRC_ANONYMOUS_HUGETLB_16MB] = {
- 			.name = "anonymous_hugetlb_16mb",
--			.flag = anon_huge_flags | MAP_HUGE_16MB,
-+			.flag = ANON_HUGE_FLAGS | MAP_HUGE_16MB,
- 		},
- 		[VM_MEM_SRC_ANONYMOUS_HUGETLB_32MB] = {
- 			.name = "anonymous_hugetlb_32mb",
--			.flag = anon_huge_flags | MAP_HUGE_32MB,
-+			.flag = ANON_HUGE_FLAGS | MAP_HUGE_32MB,
- 		},
- 		[VM_MEM_SRC_ANONYMOUS_HUGETLB_256MB] = {
- 			.name = "anonymous_hugetlb_256mb",
--			.flag = anon_huge_flags | MAP_HUGE_256MB,
-+			.flag = ANON_HUGE_FLAGS | MAP_HUGE_256MB,
- 		},
- 		[VM_MEM_SRC_ANONYMOUS_HUGETLB_512MB] = {
- 			.name = "anonymous_hugetlb_512mb",
--			.flag = anon_huge_flags | MAP_HUGE_512MB,
-+			.flag = ANON_HUGE_FLAGS | MAP_HUGE_512MB,
- 		},
- 		[VM_MEM_SRC_ANONYMOUS_HUGETLB_1GB] = {
- 			.name = "anonymous_hugetlb_1gb",
--			.flag = anon_huge_flags | MAP_HUGE_1GB,
-+			.flag = ANON_HUGE_FLAGS | MAP_HUGE_1GB,
- 		},
- 		[VM_MEM_SRC_ANONYMOUS_HUGETLB_2GB] = {
- 			.name = "anonymous_hugetlb_2gb",
--			.flag = anon_huge_flags | MAP_HUGE_2GB,
-+			.flag = ANON_HUGE_FLAGS | MAP_HUGE_2GB,
- 		},
- 		[VM_MEM_SRC_ANONYMOUS_HUGETLB_16GB] = {
- 			.name = "anonymous_hugetlb_16gb",
--			.flag = anon_huge_flags | MAP_HUGE_16GB,
-+			.flag = ANON_HUGE_FLAGS | MAP_HUGE_16GB,
- 		},
- 		[VM_MEM_SRC_SHMEM] = {
- 			.name = "shmem",
+Changes are based on tip/x86/urgent. Please review.
+
+Thanks,
+
+	Joerg
+
+Joerg Roedel (6):
+  x86/sev-es: Fix error message in runtime #VC handler
+  x86/sev-es: Disable IRQs while GHCB is active
+  x86/sev-es: Split up runtime #VC handler for correct state tracking
+  x86/insn-eval: Make 0 a valid RIP for insn_get_effective_ip()
+  x86/insn: Extend error reporting from
+    insn_fetch_from_user[_inatomic]()
+  x86/sev-es: Propagate #GP if getting linear instruction address failed
+
+ arch/x86/kernel/sev.c    | 174 +++++++++++++++++++++++----------------
+ arch/x86/kernel/umip.c   |  10 +--
+ arch/x86/lib/insn-eval.c |  22 +++--
+ 3 files changed, 122 insertions(+), 84 deletions(-)
+
+
+base-commit: efa165504943f2128d50f63de0c02faf6dcceb0d
 -- 
-2.23.0
+2.31.1
 
