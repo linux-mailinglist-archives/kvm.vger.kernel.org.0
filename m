@@ -2,110 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CD193A2D9F
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 15:59:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DA0D3A2DF3
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 16:20:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231249AbhFJOBr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 10:01:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35535 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230311AbhFJOBq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 10:01:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623333590;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fx4P1AWcI/t4nEynqEC+OGfVQRnoQFxSkbz5Bk3lO2c=;
-        b=NAtOYdj81c9Y3xAINdReUryNPpEkEYrrv2gOsaWomkK+iJmQ6P+teXnHLg3uC8q89PmvgM
-        pLWYZRtZP4VVBnPwN2L3L2zENSrvnGfeNxBatDcOqHGwzQOP4Mh0e/wWTN2eFN3fsNn9s9
-        3cJhV4k3czt5i71+tGW9zgUBtdj/CaU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-566-Y8cDpc9yOja_cRezyBrgPA-1; Thu, 10 Jun 2021 09:59:48 -0400
-X-MC-Unique: Y8cDpc9yOja_cRezyBrgPA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B9A580364C
-        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 13:59:47 +0000 (UTC)
-Received: from gondolin.fritz.box (ovpn-113-107.ams2.redhat.com [10.36.113.107])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 29973100238C;
-        Thu, 10 Jun 2021 13:59:43 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: [kvm-unit-tests PATCH 2/2] add header guards for non-trivial headers
-Date:   Thu, 10 Jun 2021 15:59:37 +0200
-Message-Id: <20210610135937.94375-3-cohuck@redhat.com>
-In-Reply-To: <20210610135937.94375-1-cohuck@redhat.com>
-References: <20210610135937.94375-1-cohuck@redhat.com>
+        id S231332AbhFJOWD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 10:22:03 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6549 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230084AbhFJOWC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 10:22:02 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15AE3bhv096619;
+        Thu, 10 Jun 2021 10:20:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=hjL552Ig2sktrHftFzN1dDJ1btbi/msqXjCaJCTaUIQ=;
+ b=Ukp0UTxMXqBOYKnaXXXqpLz2w0a2DxKbOmxuPWKgBKIzpfXtzHLOHy0VseCAtHkOnHDs
+ +DHO/wXH/WeioiqEfz0mxJbhn5dSU3wvlULMqSJhJOI6coFFlPYtIAvszNxwFsmnSEj7
+ shFWpD6t2gXX+WT3rE7sFtSDAHxNYwz9B2KDY53sVYAFlbhwHq5p/iWRvtT/Ep3hgPB+
+ HeSv/3PBbyvf6DU+9NmbzXZsIeVgjttzswuDDRRX54+yA3lv25YcWBBaATDs0rD4qd3c
+ iJdiLBkQvyVjFa5AVZWaoKGdj5eJnZhka7R4aiyUtuTp54Lwr3s0tvWeX6o3oARuQERE iw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 393kksj2xy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Jun 2021 10:20:05 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15AE4OwE103549;
+        Thu, 10 Jun 2021 10:20:04 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 393kksj2x4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Jun 2021 10:20:04 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15AEGURK003473;
+        Thu, 10 Jun 2021 14:20:03 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04fra.de.ibm.com with ESMTP id 3900w89kmm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Jun 2021 14:20:02 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15AEJ9LS26542396
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 10 Jun 2021 14:19:10 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 389ACA405B;
+        Thu, 10 Jun 2021 14:20:00 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 91BF9A408A;
+        Thu, 10 Jun 2021 14:19:59 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 10 Jun 2021 14:19:59 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com, cohuck@redhat.com
+Subject: [kvm-unit-tests PATCH v2] s390x: selftest: Add prefixes to fix report output (was "s390x: selftest: Fix report output")
+Date:   Thu, 10 Jun 2021 14:19:13 +0000
+Message-Id: <20210610141913.61553-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: C6rwW3NCkBONvO-pC4k9vfKA5SFVDmND
+X-Proofpoint-GUID: _EpD5b9Kdty1uYTtrpS1K6yL3TWEmzyU
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-06-10_07:2021-06-10,2021-06-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
+ bulkscore=0 spamscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0
+ priorityscore=1501 clxscore=1015 lowpriorityscore=0 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106100091
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add header guards to headers that do not simply include another one.
+To make our TAP parser (and me) happy we don't want to have two reports
+with exactly the same wording so I added in two new prefix pushes.
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Also moving the code inside of the region of a prefix will give us
+more data when a problem arises.
+
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 ---
- lib/argv.h       | 5 +++++
- lib/arm/io.h     | 5 +++++
- lib/powerpc/io.h | 5 +++++
- 3 files changed, 15 insertions(+)
+ s390x/selftest.c | 26 ++++++++++++++++++--------
+ 1 file changed, 18 insertions(+), 8 deletions(-)
 
-diff --git a/lib/argv.h b/lib/argv.h
-index e5fcf8482ca8..1fd746dc2177 100644
---- a/lib/argv.h
-+++ b/lib/argv.h
-@@ -5,7 +5,12 @@
-  * under the terms of the GNU Library General Public License version 2.
-  */
+diff --git a/s390x/selftest.c b/s390x/selftest.c
+index b2fe2e7b..0f099ca0 100644
+--- a/s390x/selftest.c
++++ b/s390x/selftest.c
+@@ -40,19 +40,28 @@ static void test_pgm_int(void)
  
-+#ifndef _ARGV_H_
-+#define _ARGV_H_
-+
- extern void __setup_args(void);
- extern void setup_args_progname(const char *args);
- extern void setup_env(char *env, int size);
- extern void add_setup_arg(const char *arg);
-+
-+#endif
-diff --git a/lib/arm/io.h b/lib/arm/io.h
-index 2746d72e8280..183479c899a9 100644
---- a/lib/arm/io.h
-+++ b/lib/arm/io.h
-@@ -4,4 +4,9 @@
-  * This work is licensed under the terms of the GNU GPL, version 2.
-  */
+ static void test_malloc(void)
+ {
+-	int *tmp = malloc(sizeof(int));
+-	int *tmp2 = malloc(sizeof(int));
++	int *tmp, *tmp2;
  
-+#ifndef _ARM_IO_H_
-+#define _ARM_IO_H_
++	report_prefix_push("malloc");
 +
- extern void io_init(void);
++	report_prefix_push("ptr_0");
++	tmp = malloc(sizeof(int));
++	report((uintptr_t)tmp & 0xf000000000000000ul, "allocated memory");
+ 	*tmp = 123456789;
++	mb();
++	report(*tmp == 123456789, "wrote allocated memory");
++	report_prefix_pop();
 +
-+#endif
-diff --git a/lib/powerpc/io.h b/lib/powerpc/io.h
-index 1f5a7bd6d745..d4f21ba15a54 100644
---- a/lib/powerpc/io.h
-+++ b/lib/powerpc/io.h
-@@ -4,5 +4,10 @@
-  * This work is licensed under the terms of the GNU GPL, version 2.
-  */
++	report_prefix_push("ptr_1");
++	tmp2 = malloc(sizeof(int));
++	report((uintptr_t)tmp2 & 0xf000000000000000ul,
++	       "allocated memory");
+ 	*tmp2 = 123456789;
+ 	mb();
++	report((*tmp2 == 123456789), "wrote allocated memory");
++	report_prefix_pop();
  
-+#ifndef _POWERPC_IO_H_
-+#define _POWERPC_IO_H_
-+
- extern void io_init(void);
- extern void putchar(int c);
-+
-+#endif
+-	report((uintptr_t)tmp & 0xf000000000000000ul, "malloc: got vaddr");
+-	report(*tmp == 123456789, "malloc: access works");
+-	report((uintptr_t)tmp2 & 0xf000000000000000ul,
+-	       "malloc: got 2nd vaddr");
+-	report((*tmp2 == 123456789), "malloc: access works");
+-	report(tmp != tmp2, "malloc: addresses differ");
++	report(tmp != tmp2, "allocated memory addresses differ");
+ 
+ 	expect_pgm_int();
+ 	configure_dat(0);
+@@ -62,6 +71,7 @@ static void test_malloc(void)
+ 
+ 	free(tmp);
+ 	free(tmp2);
++	report_prefix_pop();
+ }
+ 
+ int main(int argc, char**argv)
 -- 
-2.31.1
+2.30.2
 
