@@ -2,99 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 61DF53A24D2
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 08:55:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A45C3A2567
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 09:24:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229823AbhFJG46 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 02:56:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60363 "EHLO
+        id S230497AbhFJH0M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 03:26:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39247 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229692AbhFJG45 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 02:56:57 -0400
+        by vger.kernel.org with ESMTP id S230490AbhFJHZ7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 03:25:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623308101;
+        s=mimecast20190719; t=1623309843;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/GOWHlANnDBXMOgWQ7qYUSqp48aMNk3hEFsxwtf6GI4=;
-        b=TO8jILrxWW5ZGj/hlrnDofkeMp9hHJch6CSji+/btUu+SAqNYwdL1qea6RTHEOLC9E9RL0
-        ay2TyInr75okGqI9hOSOoM6DqhzycBnsQu7N6W2txFmflg5/3k9nICUSN+ko/kP/UCfqbI
-        M7/fjBwQxR3fCy1OcHNCZQP2q5FmOEI=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-379-gJw4L1oJPz-zn9kA4T73Hg-1; Thu, 10 Jun 2021 02:54:59 -0400
-X-MC-Unique: gJw4L1oJPz-zn9kA4T73Hg-1
-Received: by mail-wr1-f70.google.com with SMTP id d5-20020a0560001865b0290119bba6e1c7so416502wri.20
-        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 23:54:59 -0700 (PDT)
+        bh=5tlPw+fNQnyyXsv0Z5PViUY/ZrTm7CI6pUHe7QloYKE=;
+        b=Oxu8BGK1M/8+HlDYuQpVcZx9J6zD1i8um11kaR3Laz14HzgtUhGJBncULf6OcbDgSiKjLM
+        193CCd+i9ZhLsCg29Cw8TT3eHz9SpBN9IWyxt55UPGeq1G2ACx0gyQLy2chaPj9JyeFXOr
+        OwQtap0TthOsj69V0t93pTdsgwwUthw=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-287-gk1fG6m_PbyRh9kUOLHVBg-1; Thu, 10 Jun 2021 03:24:02 -0400
+X-MC-Unique: gk1fG6m_PbyRh9kUOLHVBg-1
+Received: by mail-ed1-f72.google.com with SMTP id ch5-20020a0564021bc5b029039389929f28so5931841edb.16
+        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 00:24:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/GOWHlANnDBXMOgWQ7qYUSqp48aMNk3hEFsxwtf6GI4=;
-        b=TrR6KjN70u3HuCzr3yTypv0/gC46NPN6VLkcGYHq00wSC/Hpu/fQRqXql8r8XEWM6U
-         HhBxUISToPkdUX7zU8WqOaNTE7h/o76UDEPgdF1fC9qyKA9PXnPQIGTNH86y3q3odOgM
-         ulsnBDKuKri7pPfwZSMJv3k2OunAc58twTdQNxicLIyqf4UOlcvGg8BG2+Yr+jc+iVas
-         9K9Tkh3iSa9ixlSCri/pc7Qe7v7T6wRyfCQyZsNSOEEYjaRsmgikK1nF+WB6jB/x2Hif
-         zMtLi4b1e+lDeUbndMvMXYZkVr6WtA37Rtt7Q8feRsBfFJfzmCHlcFlK0+PKyeJApe9h
-         6yVA==
-X-Gm-Message-State: AOAM532QStbx8ztbrf5fjGjFcR8OmPXjBqlk85/c+3oOOJSbiwAfwyJQ
-        DGjqDVAnhQ9c5TSIKjUdV3dlAc8GzOAv+vAZGqy3CA+VVFMT5GPhlImTs+mHzeJ+7pc/bQUnZQA
-        RnmbEKsEKqr/N
-X-Received: by 2002:a5d:64c7:: with SMTP id f7mr3541369wri.36.1623308098544;
-        Wed, 09 Jun 2021 23:54:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwHulzoaGG46GCG3Zz8U85n2skBqB8M0q5MPNAlPWi9ft6Enx/RPu1WvPDXG/UOusNXSWsxiQ==
-X-Received: by 2002:a5d:64c7:: with SMTP id f7mr3541358wri.36.1623308098404;
-        Wed, 09 Jun 2021 23:54:58 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id l3sm2026815wmh.2.2021.06.09.23.54.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Jun 2021 23:54:57 -0700 (PDT)
-Subject: Re: [PATCH 02/10] KVM: arm64: Implement initial support for
- KVM_CAP_SYSTEM_COUNTER_STATE
-To:     Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>
-Cc:     kvm list <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-References: <20210608214742.1897483-1-oupton@google.com>
- <20210608214742.1897483-3-oupton@google.com> <877dj3z68p.wl-maz@kernel.org>
- <CAOQ_QsgobctkqS5SQdqGaM-vjH7685zGPdDXZpcOCS8xWJxegA@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <624ab379-b7f1-9753-81f7-d813faa25978@redhat.com>
-Date:   Thu, 10 Jun 2021 08:54:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=5tlPw+fNQnyyXsv0Z5PViUY/ZrTm7CI6pUHe7QloYKE=;
+        b=FD0RvPztEhXRoFNZKjtXWxgxUAL9aqfeRRv6thz6iwBv1s7BDK0WMA5vDR+3+gG7a7
+         QGWG0wQdPeRIJSAB+yzWWr/4/Fc18CMeWqZUTkCFqzA7V7nmtJSte7woaZ3eVZ/GSJgU
+         WOoQ88VR7jY9hQYXd+SYxhpRIAvVfeU1Vn2AiRdjC2GMYO1NQ4ZfPoY7iKxEcsLy5As2
+         J6L+P8USTFKQGTC37plQmdgv5DcqspsjBWue6iOgtsTwgA1NLXemJKeEl0u8tbCyEGTB
+         Moph6+ID2oa1CCnGCoN6KLLaSw6QDfr0f3246unuyryfQLuSkHf3UFZBgnqIqUWGuGaD
+         aWdw==
+X-Gm-Message-State: AOAM5332mMB7W40yuyC3vPxxtL0rT/YjL/mjZ+8nn0LyFytGZJB9tVo2
+        G+Yl0f26cE8OxdeVTcxL4VB5PVCbNCfO9F19YpeuO+aNZrnFs/AGCEI1lUoWHcX7HN+IoYfNYWv
+        6SjmD0vuBZu4R
+X-Received: by 2002:a05:6402:31a2:: with SMTP id dj2mr3327559edb.206.1623309841253;
+        Thu, 10 Jun 2021 00:24:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxQjjBWn2tn5Hz5WlWbOxelGasgbyypBGGNi74+KR/G3TdCo5Fjc4YzbciAEeQef5nBrmemKQ==
+X-Received: by 2002:a05:6402:31a2:: with SMTP id dj2mr3327543edb.206.1623309841108;
+        Thu, 10 Jun 2021 00:24:01 -0700 (PDT)
+Received: from steredhat (host-79-18-148-79.retail.telecomitalia.it. [79.18.148.79])
+        by smtp.gmail.com with ESMTPSA id o21sm651992ejg.49.2021.06.10.00.23.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Jun 2021 00:24:00 -0700 (PDT)
+Date:   Thu, 10 Jun 2021 09:23:58 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Jiang Wang ." <jiang.wang@bytedance.com>,
+        virtualization@lists.linux-foundation.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Arseny Krasnov <arseny.krasnov@kaspersky.com>,
+        jhansen@vmware.comments, cong.wang@bytedance.com,
+        Xiongchun Duan <duanxiongchun@bytedance.com>,
+        Yongji Xie <xieyongji@bytedance.com>,
+        =?utf-8?B?5p+056iz?= <chaiwen.cc@bytedance.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Lu Wei <luwei32@huawei.com>,
+        Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
+        Networking <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [RFC v1 0/6] virtio/vsock: introduce SOCK_DGRAM support
+Message-ID: <20210610072358.3fuvsahxec2sht4y@steredhat>
+References: <20210609232501.171257-1-jiang.wang@bytedance.com>
+ <da90f17a-1c24-b475-76ef-f6a7fc2bcdd5@redhat.com>
+ <CAP_N_Z_VDd+JUJ_Y-peOEc7FgwNGB8O3uZpVumQT_DbW62Jpjw@mail.gmail.com>
+ <ac0c241c-1013-1304-036f-504d0edc5fd7@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAOQ_QsgobctkqS5SQdqGaM-vjH7685zGPdDXZpcOCS8xWJxegA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ac0c241c-1013-1304-036f-504d0edc5fd7@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/06/21 16:51, Oliver Upton wrote:
->> - You seem to allow each vcpu to get its own offset. I don't think
->>    that's right. The architecture defines that all PEs have the same
->>    view of the counters, and an EL1 guest should be given that
->>    illusion.
-> Agreed. I would have preferred a VM-wide ioctl to do this, but since
-> x86 explicitly allows for drifted TSCs that can't be the case in a
-> generic ioctl. I can do the same broadcasting as we do in the case of
-> a VMM write to CNTVCT_EL0.
-> 
+On Thu, Jun 10, 2021 at 12:02:35PM +0800, Jason Wang wrote:
+>
+>在 2021/6/10 上午11:43, Jiang Wang . 写道:
+>>On Wed, Jun 9, 2021 at 6:51 PM Jason Wang <jasowang@redhat.com> wrote:
+>>>
+>>>在 2021/6/10 上午7:24, Jiang Wang 写道:
+>>>>This patchset implements support of SOCK_DGRAM for virtio
+>>>>transport.
+>>>>
+>>>>Datagram sockets are connectionless and unreliable. To avoid unfair contention
+>>>>with stream and other sockets, add two more virtqueues and
+>>>>a new feature bit to indicate if those two new queues exist or not.
+>>>>
+>>>>Dgram does not use the existing credit update mechanism for
+>>>>stream sockets. When sending from the guest/driver, sending packets
+>>>>synchronously, so the sender will get an error when the virtqueue is 
+>>>>full.
+>>>>When sending from the host/device, send packets asynchronously
+>>>>because the descriptor memory belongs to the corresponding QEMU
+>>>>process.
+>>>
+>>>What's the use case for the datagram vsock?
+>>>
+>>One use case is for non critical info logging from the guest
+>>to the host, such as the performance data of some applications.
+>
+>
+>Anything that prevents you from using the stream socket?
+>
+>
+>>
+>>It can also be used to replace UDP communications between
+>>the guest and the host.
+>
+>
+>Any advantage for VSOCK in this case? Is it for performance (I guess 
+>not since I don't exepct vsock will be faster).
 
-If you use VM-wide GET/SET_DEVICE_ATTR, please make it retrieve the host 
-CLOCK_REALTIME and counter at the same time.
+I think the general advantage to using vsock are for the guest agents 
+that potentially don't need any configuration.
 
-Paolo
+>
+>An obvious drawback is that it breaks the migration. Using UDP you can 
+>have a very rich features support from the kernel where vsock can't.
+>
+
+Thanks for bringing this up!
+What features does UDP support and datagram on vsock could not support?
+
+>
+>>
+>>>>The virtio spec patch is here:
+>>>>https://www.spinics.net/lists/linux-virtualization/msg50027.html
+>>>
+>>>Have a quick glance, I suggest to split mergeable rx buffer into an
+>>>separate patch.
+>>Sure.
+>>
+>>>But I think it's time to revisit the idea of unifying the virtio-net 
+>>>and
+>>>virtio-vsock. Otherwise we're duplicating features and bugs.
+>>For mergeable rxbuf related code, I think a set of common helper
+>>functions can be used by both virtio-net and virtio-vsock. For other
+>>parts, that may not be very beneficial. I will think about more.
+>>
+>>If there is a previous email discussion about this topic, could you 
+>>send me
+>>some links? I did a quick web search but did not find any related
+>>info. Thanks.
+>
+>
+>We had a lot:
+>
+>[1] 
+>https://patchwork.kernel.org/project/kvm/patch/5BDFF537.3050806@huawei.com/
+>[2] 
+>https://lists.linuxfoundation.org/pipermail/virtualization/2018-November/039798.html
+>[3] https://www.lkml.org/lkml/2020/1/16/2043
+>
+
+When I tried it, the biggest problem that blocked me were all the 
+features strictly related to TCP/IP stack and ethernet devices that 
+vsock device doesn't know how to handle: TSO, GSO, checksums, MAC, napi, 
+xdp, min ethernet frame size, MTU, etc.
+
+So in my opinion to unify them is not so simple, because vsock is not 
+really an ethernet device, but simply a socket.
+
+But I fully agree that we shouldn't duplicate functionality and code, so 
+maybe we could find those common parts and create helpers to be used by 
+both.
+
+Thanks,
+Stefano
 
