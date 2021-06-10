@@ -2,77 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E7F913A34F8
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 22:39:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 275DD3A3572
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 23:09:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230083AbhFJUlZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 16:41:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43478 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229941AbhFJUlY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Jun 2021 16:41:24 -0400
-Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63535C061574
-        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 13:39:28 -0700 (PDT)
-Received: by mail-ot1-x330.google.com with SMTP id h24-20020a9d64180000b029036edcf8f9a6so1015932otl.3
-        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 13:39:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=ck7H0hz6o0YhV91Txi7wpOJIaqu4RijViLYlRdIhLfM=;
-        b=By+NnpKGJuanFoeLYeT24kdQmKVTzcBSAxXmtf6j8dEQXv2QKv0JRz8NGNQDUR5Vri
-         YUukEDPtppsh+UCHr54/dFztxlzEkHHdp5e2PtCh8Yb3Z0eX8BQw2eEt10YLFj1gp/x+
-         /NOQ9Mdy4xgmiC3vwJff9lLLKSrlC6LJ3Tz4CaDTti73oPpF2ZKlEi96/uAC2HHfXWa/
-         JR93BBJrxCfAwXdWsiEkJUcAcC/frNbRoSotCKPcvgsvwNe3QlMNrHqCR5StNBvS+ss9
-         /3lFdSix4TqRmT6ib7MvoiDgLrAI0dtvFNmiVweKFQAEsFqxSGWUS4h/dPfT04W+oUhv
-         Lc7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=ck7H0hz6o0YhV91Txi7wpOJIaqu4RijViLYlRdIhLfM=;
-        b=l7HcT90942f/Ca9ZLuGHujO1dopAqNeVZo3iIBw3tEerfTpw7cx74HAF4lx00qNg7d
-         4sMxCllZh07yhVTrurUvn3iEcnMRHEZm0QPF83IxAkDgL5oYl3FuSfBiZuvlo0Czgi9c
-         Iln+CB4Fym77zM492Ypb4OoQ19h0uyszf8aW3Xenyo+Uqzha3TXiNOM/XDLgwV7qUQ9U
-         09Q+N4ZfN7SbIrkmKRMrioUKvSyEPpc6+3sKvsdPmCCkdG5s3uhtJ05VZfWlC04NkkEL
-         H8UjCZCj305Ln/wCF9Cg0DSX/DlKuwSmIBusAb8O2pXkeiC4BV+WYA3bGft0nStB2P0T
-         oXuw==
-X-Gm-Message-State: AOAM530vh3Tpi48kmL23f8AkVCN/GghVhjVG6OKmaS8b2/QWb8yYUEX+
-        T4zIh9tJiIuc7+y9tS8kJW4QE85BKd4eVJgeqmu90dpP1ySa6Q==
-X-Google-Smtp-Source: ABdhPJx5HQOFcgWVEOSLY6jmStUiPjWsmx6Zr8GjewGImpCvsFQXE4t4CXSYlyLDoJN+Bi7y4Ipn011Y2NqEOxS2H8o=
-X-Received: by 2002:a9d:2c9:: with SMTP id 67mr217030otl.56.1623357566868;
- Thu, 10 Jun 2021 13:39:26 -0700 (PDT)
-MIME-Version: 1.0
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 10 Jun 2021 13:39:15 -0700
-Message-ID: <CALMp9eRWBJQJBE2bxME6FzjhDOadNJW8wty7Gb=QJO8=ndaaEw@mail.gmail.com>
-Subject: [RFC] x86: Eliminate VM state changes during KVM_GET_MP_STATE
-To:     kvm list <kvm@vger.kernel.org>
-Cc:     Jan Kiszka <jan.kiszka@siemens.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S230340AbhFJVLR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 17:11:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46534 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230281AbhFJVLQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Jun 2021 17:11:16 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8D00C6100A;
+        Thu, 10 Jun 2021 21:09:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+        s=korg; t=1623359350;
+        bh=3uaKX4KWu0Y7+XQgx32jwGfnVzT9DzauJXLAk/77HMY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=blEMPalfjEBPfhZPnkH5BgzoTabj85Ajnb0HACnx80mKy/nwDMJVwclzrSSJ+mamY
+         KAg2/DZHZ7f6ykjRUkB+dhEvC1nsbaZpCbJrGels74TVComEKM8CuLFy8nzsRCGlvn
+         bkCKZ+P94YHb5pT5FSjO9QuAfeHeE8G91zY1Jeus=
+Date:   Thu, 10 Jun 2021 14:09:09 -0700
+From:   Andrew Morton <akpm@linux-foundation.org>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com,
+        linux-mm@kvack.org, Nicholas Piggin <npiggin@gmail.com>,
+        Uladzislau Rezki <urezki@gmail.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        David Rientjes <rientjes@google.com>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v3 1/2] mm/vmalloc: add vmalloc_no_huge
+Message-Id: <20210610140909.781959d063608710e24e70c9@linux-foundation.org>
+In-Reply-To: <20210610154220.529122-2-imbrenda@linux.ibm.com>
+References: <20210610154220.529122-1-imbrenda@linux.ibm.com>
+        <20210610154220.529122-2-imbrenda@linux.ibm.com>
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The call to kvm_apic_accept_events(vcpu) from
-kvm_arch_vcpu_ioctl_get_mpstate() is just, oh, so wrong. First, it can
-change all kinds of vCPU state, which imposes undocumented
-dependencies on reliable orderings of the KVM_GET_* family of ioctls
-for serializing VM state. But, even worse, it can modify guest memory,
-even while all vCPU threads are stopped! Just follow the call chain
-down to vmx_complete_nested_posted_interrupt(). That path wasn't there
-when the call to kvm_apic_accept_events(vcpu) was added to
-kvm_arch_vcpu_ioctl_get_mpstate() back in 2013, but it's there now.
+On Thu, 10 Jun 2021 17:42:19 +0200 Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
 
-I'm not entirely sure why this call was added in the first place. Was
-this simply to avoid serializing the two new bits in
-apic->pending_events? It seems that we now *do* serialize
-KVM_APIC_INIT in the kvm_vcpu_events struct. Strangely, we call it
-smi.latched_init, but it looks like we put the pending_events bit in
-there all the time, regardless of what's happening with SMM.
+> The recent patches to add support for hugepage vmalloc mappings added a
+> flag for __vmalloc_node_range to allow to request small pages.
+> This flag is not accessible when calling vmalloc, the only option is to
+> call directly __vmalloc_node_range, which is not exported.
 
-Would anyone object to serializing KVM_APIC_SIPI in the
-kvm_vcpu_events struct as well? Or would it be better to resurrect
-KVM_MP_STATE_SIPI_RECEIVED? In any event, the call to
-kvm_apic_accept_events(vcpu) from kvm_arch_vcpu_ioctl_get_mpstate()
-has to go.
+I can find no patch which adds such a flag to __vmalloc_node_range(). 
+I assume you're referring to "mm/vmalloc: switch to bulk allocator in
+__vmalloc_area_node()"?
+
+Please be quite specific when identifying patches.  More specific than
+"the recent patches"!
+
+Also, it appears from the discussion at
+https://lkml.kernel.org/r/YKUWKFyLdqTYliwu@infradead.org that we'll be
+seeing a new version of "mm/vmalloc: switch to bulk allocator in
+__vmalloc_area_node()".  Would it be better to build these s390 fixes into
+the next version of that patch series rather than as a separate
+followup thing?
+
