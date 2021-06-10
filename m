@@ -2,91 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E793C3A2EE8
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 17:02:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C12D33A2F02
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 17:06:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231580AbhFJPEG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 11:04:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45282 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231451AbhFJPEC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Jun 2021 11:04:02 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6D475613E9;
-        Thu, 10 Jun 2021 15:02:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1623337326;
-        bh=p+H8s0egdv3BGUJk4DbOgLzpOhw4FBnL6dPXfrgDCc0=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=cq8/V0Fpo8XOlZkPj+d/rVs3in/wDRFomFDz6ZeoQWR6G4Ok3yX5uSFkxuNU02eBb
-         PZwLF0VzB7opk+RJs51k4s1BH47qvnTYO9CHvm6w/IK63s/ugXRl3kdBR72Ej5gd3d
-         uhQXpRTdpuIdSbWl8rydlMOWYvGtl97ngU7HfU6yfm3Xr4xoEpalr5jrEzD9YVCqB9
-         5J50D2D20P37Ki3WNZDt/eGXVpE9z9hzzNZQJpT/l3lILuqoJBUhhLkp2qM4jecyDA
-         IC4Cav5iNZzrMdBwAcpIOJnWguN+7OdshvXSaJ2rpmbzk/gRS4XJvrMIA086TQTw4X
-         SlLpfIciQZ1ow==
-Received: by mail-oi1-f175.google.com with SMTP id z3so2420686oib.5;
-        Thu, 10 Jun 2021 08:02:06 -0700 (PDT)
-X-Gm-Message-State: AOAM533LnU/FxMm4phO3JehjJfAGkZPPq2juz10fK7/LIlRDV3wG21Vi
-        uQkSFmYBJiCIJoPjHw1kAZD3ejKYq8TonKyN80A=
-X-Google-Smtp-Source: ABdhPJzwc9dtTqV4JuYFW4MyFIjIJUhIi1DCsWgsdHf5pQ3cE8Zc4m+2QBQ9n5BXeIej8L3/LPhxI861X/0qqbQMsWI=
-X-Received: by 2002:a54:460a:: with SMTP id p10mr10583973oip.47.1623337325826;
- Thu, 10 Jun 2021 08:02:05 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1623174621.git.ashish.kalra@amd.com> <13d4bdd5fc0cf9aa0ad81d43da975deb37f0d39c.1623174621.git.ashish.kalra@amd.com>
-In-Reply-To: <13d4bdd5fc0cf9aa0ad81d43da975deb37f0d39c.1623174621.git.ashish.kalra@amd.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 10 Jun 2021 17:01:54 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGOaTR6bCHYtdapgM4wfzNTFQ5f-n5Jf0q28JEmsKimZw@mail.gmail.com>
-Message-ID: <CAMj1kXGOaTR6bCHYtdapgM4wfzNTFQ5f-n5Jf0q28JEmsKimZw@mail.gmail.com>
-Subject: Re: [PATCH v3 4/5] EFI: Introduce the new AMD Memory Encryption GUID.
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        id S231591AbhFJPIH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 11:08:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45454 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231420AbhFJPIF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 11:08:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623337569;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ed14xuc5GLdj1NrbGE3OdC+GrAhtNU/6LCzI+jZmJEs=;
+        b=aW7kIPNAJgu0194i8vVJvhJ7wap+iPm6lCM4QPedbhEtn4wOvIZK5onFf4MqUWE2FaAFo8
+        29MK6TfMUilVTl2S4Nc6BL8fMbHxjJrsGqMnxEgFCUGT8ANr1d0ysDfFdbkbYQN1uwUp7R
+        PR6Su2V2MCHPIWICpGo6xIbWmdiI2WA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-395-bmivwXy5OEyJq99yftYH4w-1; Thu, 10 Jun 2021 11:06:07 -0400
+X-MC-Unique: bmivwXy5OEyJq99yftYH4w-1
+Received: by mail-wm1-f69.google.com with SMTP id a19-20020a1c98130000b02901960b3b5621so1240430wme.8
+        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 08:06:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Ed14xuc5GLdj1NrbGE3OdC+GrAhtNU/6LCzI+jZmJEs=;
+        b=FsZU/saX0dG+OOB2grdPgR+hayf4gd+8Nim61JJ6rVNdZgKvBSd4fLhi6HBxPUSoIb
+         I80nTjb6KCm7PXETCxtyZJtbYwBepYhwzVkqeIM++Dw22FD6/SAZftSzPlBwJ1iFqap3
+         MW12syqzhsuAkWM7y70kFn/R3eIIdiiuLB4uHj82DUntX2G1TpZU09H5NsW5vLFF4aLW
+         RUmkUHOmjkikMDeQ49rNTRJfJtAGr5le8wqqPbipICP1FYXpNseI8eajQLYXfG4UAMDU
+         GqDa52chM+MZ45zlb74cJhenvnGVG3RLjGUZp84zi2NMdvuPUS9pdgs+I8UtPPOi9Kce
+         sgFg==
+X-Gm-Message-State: AOAM533lfxzHpHfSq7Dm/JnuaX8Mqqa1Ey3oF9pbZt88SjgA7SoGdOT6
+        KgoxvdwnhTlY8wFph9PyPuSRz3W5K6ivIXV7lmbvqgBkx3yVkrcDUZ4+S6TYyqEMFLR2tG2eYcE
+        Uc4xJ7+70Dfks
+X-Received: by 2002:a7b:c098:: with SMTP id r24mr15327314wmh.35.1623337566503;
+        Thu, 10 Jun 2021 08:06:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyHf4OlESk6cmnALRE3mUEXEeyjVHsEEQZzI40uQXGVsfJoMugcGZk20BYFlr8EDnNLDWIA9w==
+X-Received: by 2002:a7b:c098:: with SMTP id r24mr15327292wmh.35.1623337566335;
+        Thu, 10 Jun 2021 08:06:06 -0700 (PDT)
+Received: from ?IPv6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
+        by smtp.gmail.com with ESMTPSA id u15sm8514366wmq.1.2021.06.10.08.06.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Jun 2021 08:06:05 -0700 (PDT)
+Subject: Re: [PATCH v3 7/8] KVM: x86: Introduce KVM_GET_SREGS2 /
+ KVM_SET_SREGS2
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc:     open list <linux-kernel@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        X86 ML <x86@kernel.org>, kvm@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Steve Rutherford <srutherford@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        linux-efi <linux-efi@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Sean Christopherson <seanjc@google.com>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Jim Mattson <jmattson@google.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "H. Peter Anvin" <hpa@zytor.com>
+References: <20210607090203.133058-1-mlevitsk@redhat.com>
+ <20210607090203.133058-8-mlevitsk@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f6a0aed8-2cfe-0af3-dd6f-26e4f203be9e@redhat.com>
+Date:   Thu, 10 Jun 2021 17:06:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
+MIME-Version: 1.0
+In-Reply-To: <20210607090203.133058-8-mlevitsk@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 8 Jun 2021 at 20:07, Ashish Kalra <Ashish.Kalra@amd.com> wrote:
->
-> From: Ashish Kalra <ashish.kalra@amd.com>
->
-> Introduce a new AMD Memory Encryption GUID which is currently
-> used for defining a new UEFI environment variable which indicates
-> UEFI/OVMF support for the SEV live migration feature. This variable
-> is setup when UEFI/OVMF detects host/hypervisor support for SEV
-> live migration and later this variable is read by the kernel using
-> EFI runtime services to verify if OVMF supports the live migration
-> feature.
->
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+On 07/06/21 11:02, Maxim Levitsky wrote:
+> +static int __set_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2)
+> +{
+> +	int mmu_reset_needed = 0;
+> +	bool valid_pdptrs = sregs2->flags & KVM_SREGS2_FLAGS_PDPTRS_VALID;
+> +	int i, ret;
+>   
+> +	if (sregs2->flags & ~KVM_SREGS2_FLAGS_PDPTRS_VALID)
+> +		return -EINVAL;
+> +
+> +	ret = __set_sregs_common(vcpu, (struct kvm_sregs *)sregs2,
+> +				 &mmu_reset_needed, !valid_pdptrs);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (valid_pdptrs) {
+> +		if (!is_pae_paging(vcpu))
+> +			return -EINVAL;
+> +		if (vcpu->arch.guest_state_protected)
+> +			return -EINVAL;
+> +		for (i = 0 ; i < 4 ; i++)
+> +			kvm_pdptr_write(vcpu, i, sregs2->pdptrs[i]);
+> +
+> +		kvm_register_mark_dirty(vcpu, VCPU_EXREG_PDPTR);
+> +		mmu_reset_needed = 1;
+> +	}
+> +	if (mmu_reset_needed)
+> +		kvm_mmu_reset_context(vcpu);
+> +	return 0;
+>   }
 
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
+It's a bit nicer if the checks are done early:
 
-> ---
->  include/linux/efi.h | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/include/linux/efi.h b/include/linux/efi.h
-> index 6b5d36babfcc..dbd39b20e034 100644
-> --- a/include/linux/efi.h
-> +++ b/include/linux/efi.h
-> @@ -362,6 +362,7 @@ void efi_native_runtime_setup(void);
->
->  /* OEM GUIDs */
->  #define DELLEMC_EFI_RCI2_TABLE_GUID            EFI_GUID(0x2d9f28a2, 0xa886, 0x456a,  0x97, 0xa8, 0xf1, 0x1e, 0xf2, 0x4f, 0xf4, 0x55)
-> +#define AMD_SEV_MEM_ENCRYPT_GUID               EFI_GUID(0x0cf29b71, 0x9e51, 0x433a,  0xa3, 0xb7, 0x81, 0xf3, 0xab, 0x16, 0xb8, 0x75)
->
->  typedef struct {
->         efi_guid_t guid;
-> --
-> 2.17.1
->
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index f20c7c06bd4a..c6f8fec78c53 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10248,22 +10248,23 @@ static int __set_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2)
+  {
+         int mmu_reset_needed = 0;
+         bool valid_pdptrs = sregs2->flags & KVM_SREGS2_FLAGS_PDPTRS_VALID;
++       bool pae = (sregs2->cr0 & X86_CR0_PG) && (sregs2->cr4 & X86_CR4_PAE) &&
++               !(sregs2->efer & EFER_LMA);
+         int i, ret;
+  
+         if (sregs2->flags & ~KVM_SREGS2_FLAGS_PDPTRS_VALID)
+                 return -EINVAL;
+  
++       if (valid_pdptrs && (!pae || vcpu->arch.guest_state_protected))
++               return -EINVAL;
++
+         ret = __set_sregs_common(vcpu, (struct kvm_sregs *)sregs2,
+                                  &mmu_reset_needed, !valid_pdptrs);
+         if (ret)
+                 return ret;
+  
+         if (valid_pdptrs) {
+-               if (!is_pae_paging(vcpu))
+-                       return -EINVAL;
+-               if (vcpu->arch.guest_state_protected)
+-                       return -EINVAL;
+-               for (i = 0 ; i < 4 ; i++)
++               for (i = 0; i < 4 ; i++)
+                         kvm_pdptr_write(vcpu, i, sregs2->pdptrs[i]);
+  
+                 kvm_register_mark_dirty(vcpu, VCPU_EXREG_PDPTR);
+
+Paolo
+
