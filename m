@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B61AE3A2200
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 04:01:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 565743A2234
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 04:16:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229753AbhFJCCH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Jun 2021 22:02:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45283 "EHLO
+        id S229792AbhFJCS3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Jun 2021 22:18:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25582 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229634AbhFJCCG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 9 Jun 2021 22:02:06 -0400
+        by vger.kernel.org with ESMTP id S229557AbhFJCS1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Jun 2021 22:18:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623290410;
+        s=mimecast20190719; t=1623291391;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+xQmp7fuwVh279E0Cth1KC9j6h3TM0sEtu/caMbRU18=;
-        b=a5+CDxhG0+JHuvNib3mWW+zJ/qdjIWa+q9d+Rzw3uOOnUR5fhwZm31ZrvawGxyIjKcpc1q
-        Ysx7FvqPcC8sGd8QZYqjVDi+1UVcNfeQ2V+eS7L74WbDxFkvYPW9gp7PUD7y6bjiPUHOd9
-        se3AzCL84qRvihJctxIXTDpLv3GbNxg=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-106-WPeW1RiBOmWRwloNRRvFZg-1; Wed, 09 Jun 2021 22:00:08 -0400
-X-MC-Unique: WPeW1RiBOmWRwloNRRvFZg-1
-Received: by mail-pf1-f200.google.com with SMTP id l145-20020a6288970000b02902e9f6a5c2c3so294427pfd.3
-        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 19:00:08 -0700 (PDT)
+        bh=NnaUokRoNM6Q2FbT2TvIPzJXqmr5yWwj9gPCdPyZQmw=;
+        b=acHl2IrkP8FXvHOBYUSrLuFY4278K3gD+L939k2a2VK8+9TzC6WP/9KgOulVW0TtqDY/mh
+        8qtuGU/kJ2uCLj6xSbVS3854lk0yWJns5tqYnQGi9jNdKE92/Fnkls1OlVVNWt1NmuHQlL
+        DFkZCo/lLLZ3zxyCc7KvcZs8jruxzm0=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-315-X0ve6lS8PPuwlmlaP3fiAw-1; Wed, 09 Jun 2021 22:16:30 -0400
+X-MC-Unique: X0ve6lS8PPuwlmlaP3fiAw-1
+Received: by mail-pj1-f69.google.com with SMTP id w12-20020a17090a528cb029015d7f990752so2873094pjh.0
+        for <kvm@vger.kernel.org>; Wed, 09 Jun 2021 19:16:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-transfer-encoding
          :content-language;
-        bh=+xQmp7fuwVh279E0Cth1KC9j6h3TM0sEtu/caMbRU18=;
-        b=ZBpEPdN33tELsZFtlfouhpuM+Sr72lsc3KSbYAR/P+f2fTcMZOvZj4hUbp7xBiZie+
-         FPDAeMFHZ1Xogzs4i/10jaYyxDPqf+v9lr6rmeTvR4DF/bfLcxXuplBZwEPwCzqdVmPL
-         bTkWl4Ao8V70Tj4GSEvYK3+AUz6wpXJ+YleYq2Ym84QKeA++bQ46t/AXS1kxg5naZycN
-         Mh9OYzK2/ZpkDcZvh6mQETF2nqtDxa6rqAJcHl7qOWnp9bA5akZVRGANjYgHw/WDdQ9h
-         nCK+nH/zBF10E8x6BgPqmJXAt1Kvhuy0zVSv+seCkRAUkmJ86rJVmig//10X7cKNCAYa
-         9SNg==
-X-Gm-Message-State: AOAM531M/70DYnn9yz9WVEHBL5Tem2EkfmgZnoEe3rqvNid/1vsaqpVn
-        T863Pi4g0Y92du2qFZTya6Hj9uRYx+ZNocHfQCgb+kL9lFOaaGB0rhZmzdqwSothzYaT8RizFbz
-        zntvgq790omuL
-X-Received: by 2002:a17:90a:2f22:: with SMTP id s31mr743835pjd.62.1623290407727;
-        Wed, 09 Jun 2021 19:00:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw65n4JwUpdZlyhZQm9k41Hm7KYINbBHKELAjIO4WceQeGIBYZlAZLwBtr5XPeJivWvj8g7kQ==
-X-Received: by 2002:a17:90a:2f22:: with SMTP id s31mr743805pjd.62.1623290407512;
-        Wed, 09 Jun 2021 19:00:07 -0700 (PDT)
+        bh=NnaUokRoNM6Q2FbT2TvIPzJXqmr5yWwj9gPCdPyZQmw=;
+        b=KB/2fFKQqESLfijlyy1H7g5/521w/L2KD5HMfp/skwokoSz78uHwUID3CCiWRWYnv2
+         WGhPZUNBQC7/t0m8Uofnz7bNsyzUzocmbTvhzPxC7gRwA+iO3vlQx6vERbJbtSblT/CS
+         CStR8aySbVHS4IfEtL7wEBfnsR1O/rOEzQG99T0JWU9fsJpVftVAsNsnkeNeC0VAqjoI
+         /so3Dr4egVy/JQ+SUYTU51Z/JkyatupvjLBULGh9PqSg0IImjKwiajLUMz3y70M63Hrx
+         GLPevq7IUi92JrqohURslgSdyMsgCzo0eP6cbQfLF/wjctcVuqi/Gx8Hso9fP+P2gMJv
+         jz4A==
+X-Gm-Message-State: AOAM532bfm/R8R4Seo4bDQjM6gFMlwB2Cc/fs5xzv9bXuYjoMPL5qIAJ
+        Jb9TYAF2sskFkMZs+mbe4ICIm5w3JZlenUkjF929JVZxnzBdnUmMIS45JLyO98l/VYequ48C9Y2
+        rN0gIQ75Ydjf+
+X-Received: by 2002:a63:4814:: with SMTP id v20mr2691503pga.8.1623291389544;
+        Wed, 09 Jun 2021 19:16:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwGFH3+Zi1qg8fLvGeVh2H1tnJw2kTEQ1WuxGNYkVj+kLoxCEbUmdaVO29Ee6FLnMdfVVUCXA==
+X-Received: by 2002:a63:4814:: with SMTP id v20mr2691486pga.8.1623291389293;
+        Wed, 09 Jun 2021 19:16:29 -0700 (PDT)
 Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id 11sm884327pge.57.2021.06.09.19.00.03
+        by smtp.gmail.com with ESMTPSA id b14sm889674pgl.52.2021.06.09.19.16.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Jun 2021 19:00:06 -0700 (PDT)
+        Wed, 09 Jun 2021 19:16:28 -0700 (PDT)
 Subject: Re: [RFC] /dev/ioasid uAPI proposal
-To:     Jason Gunthorpe <jgg@nvidia.com>
+To:     "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
+        Jason Gunthorpe <jgg@nvidia.com>
 Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
         Lu Baolu <baolu.lu@linux.intel.com>,
         Liu Yi L <yi.l.liu@linux.intel.com>,
@@ -71,16 +72,17 @@ References: <64898584-a482-e6ac-fd71-23549368c508@linux.intel.com>
  <20210601173138.GM1002214@nvidia.com>
  <f69137e3-0f60-4f73-a0ff-8e57c79675d5@redhat.com>
  <20210602172154.GC1002214@nvidia.com>
- <c84787ec-9d8f-3198-e800-fe0dc8eb53c7@redhat.com>
- <20210608132039.GG1002214@nvidia.com>
+ <51e060a3-fc59-0a13-5955-71692b14eed8@metux.net>
+ <20210607180144.GL1002214@nvidia.com>
+ <633b00c1-b388-856a-db71-8d74e52c2702@metux.net>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <f4d70f28-4bd6-5315-d7c7-0a509e4f1d1d@redhat.com>
-Date:   Thu, 10 Jun 2021 10:00:01 +0800
+Message-ID: <0f9224eb-2158-4769-f709-6e8f56c24bd3@redhat.com>
+Date:   Thu, 10 Jun 2021 10:16:17 +0800
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
  Gecko/20100101 Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210608132039.GG1002214@nvidia.com>
-Content-Type: text/plain; charset=gbk; format=flowed
+In-Reply-To: <633b00c1-b388-856a-db71-8d74e52c2702@metux.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
 Precedence: bulk
@@ -88,31 +90,29 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-ÔÚ 2021/6/8 ÏÂÎç9:20, Jason Gunthorpe Ð´µÀ:
-> On Tue, Jun 08, 2021 at 09:10:42AM +0800, Jason Wang wrote:
+åœ¨ 2021/6/8 ä¸‹åˆ6:45, Enrico Weigelt, metux IT consult å†™é“:
+> On 07.06.21 20:01, Jason Gunthorpe wrote:
+>> <shrug> it is what it is, select has a fixed size bitmap of FD #s and
+>> a hard upper bound on that size as part of the glibc ABI - can't be
+>> fixed.
 >
->> Well, this sounds like a re-invention of io_uring which has already worked
->> for multifds.
-> How so? io_uring is about sending work to the kernel, not getting
-> structued events back?
-
-
-Actually it can. Userspace can poll multiple fds via preparing multiple 
-sqes with IORING_OP_ADD flag.
-
-
+> in glibc ABI ? Uuuuh!
 >
-> It is more like one of the perf rings
 
+Note that dealing with select() or try to overcome the limitation via 
+epoll() directly via the application is not a good practice (or it's not 
+portable).
 
-This means another ring and we need introduce ioctl() to add or remove 
-ioasids from the poll. And it still need a kind of fallback like a list 
-if the ring is full.
+It's suggested to use building blocks provided by glib, e.g the main 
+event loop[1]. That is how Qemu solve the issues of dealing with a lot 
+of file descriptors.
 
 Thanks
 
+[1] https://developer.gnome.org/glib/stable/glib-The-Main-Event-Loop.html
+
 
 >
-> Jason
+> --mtx
 >
 
