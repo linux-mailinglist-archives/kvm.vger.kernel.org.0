@@ -2,120 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C4EB3A2B0A
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 14:06:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1F653A2B20
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 14:08:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230363AbhFJMIX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 08:08:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25874 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230329AbhFJMIR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 08:08:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623326780;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jCEz8RgLSF0ncN4Sv60FkG386Ouly8dnvDH4i1L6AKo=;
-        b=jPgpp62MnzCao4CCHcCGRKUGgouX8SZtCI0JgReMErQi7DnJwCpPk0XBQdiBVG/GVaOxaw
-        m5r1nuOKzou9MmfeSjbFbJVNj2UfWTdKxEsV5CJ58NTlJIq/vqYshv1U1KBv0ZStPCxO0p
-        rTVoFOKTPRmx0ALrpeb1DZA5KKb25T0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-fepzxj1tNIyBtnw4HYxziw-1; Thu, 10 Jun 2021 08:06:18 -0400
-X-MC-Unique: fepzxj1tNIyBtnw4HYxziw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF9768015F8;
-        Thu, 10 Jun 2021 12:06:17 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8FE3D19C45;
-        Thu, 10 Jun 2021 12:06:17 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     seanjc@google.com, bgardon@google.com
-Subject: [PATCH 2/2] KVM: Don't take mmu_lock for range invalidation unless necessary
-Date:   Thu, 10 Jun 2021 08:06:15 -0400
-Message-Id: <20210610120615.172224-3-pbonzini@redhat.com>
-In-Reply-To: <20210610120615.172224-1-pbonzini@redhat.com>
-References: <20210610120615.172224-1-pbonzini@redhat.com>
+        id S230267AbhFJMKp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 08:10:45 -0400
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:58116 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230113AbhFJMKo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 08:10:44 -0400
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15AC7nn3032110;
+        Thu, 10 Jun 2021 12:08:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : subject : to :
+ cc : references : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=R5gIkfYOSlyle2Ew7mpz5qlfjYV2KAyBhHNWTShZO74=;
+ b=c43PC1hU8JRYaDrPBQY5LQocJX0187FwIjTNPnVlqQ5bku5BWN8krS4HuvKiZCUbokmV
+ muRIqQPPQNJ1XifpE6yvVPR4cZssAelzDmPmx6N54MGFBqLsNvQ84xx0sqjbgro6AOjz
+ SvKlI6DJsBQab3j8/cHnNGLYF2DDtuyspuevsLDtsxOkorlyPoCqAbYXLFyydNs4s6hQ
+ xuXrk1xohgw31U6qpivQwHw828yjcT7aREWy+TW32Vj33Q9q5Yu3CNfXg7bd7Ee8WtvU
+ Iqc3cKQU0eetW5OTxXeGeolaWgtYdIzC2sZVnDlEcKzgOumM2ywx6Nxo0GdQmQtwPc7v 3g== 
+Received: from oracle.com (userp3020.oracle.com [156.151.31.79])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3930d50c0c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 10 Jun 2021 12:08:44 +0000
+Received: from userp3020.oracle.com (userp3020.oracle.com [127.0.0.1])
+        by pps.podrdrct (8.16.0.36/8.16.0.36) with SMTP id 15AC3WW8037943;
+        Thu, 10 Jun 2021 12:08:42 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 390k1sxmqk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 10 Jun 2021 12:08:42 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 15AC8eve020233;
+        Thu, 10 Jun 2021 12:08:40 GMT
+Received: from [10.175.195.97] (/10.175.195.97)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 10 Jun 2021 05:08:40 -0700
+From:   "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+Subject: __gfn_to_hva_memslot Spectre patch for stable (Was: Re: [GIT PULL]
+ KVM fixes for 5.13-rc6)
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Artemiy Margaritov <artemiy.margaritov@gmail.com>
+References: <20210609000743.126676-1-pbonzini@redhat.com>
+Message-ID: <341559af-911e-d85f-f966-2bbc88a72114@oracle.com>
+Date:   Thu, 10 Jun 2021 14:08:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20210609000743.126676-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10010 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 adultscore=0
+ malwarescore=0 phishscore=0 mlxlogscore=999 suspectscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
+ definitions=main-2106100079
+X-Proofpoint-ORIG-GUID: UCcEalI8v6TgT1kDdx1_1ueW_X78sQEW
+X-Proofpoint-GUID: UCcEalI8v6TgT1kDdx1_1ueW_X78sQEW
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com>
+On 09.06.2021 02:07, Paolo Bonzini wrote:
+(..)
+> Paolo Bonzini (1):
+>        kvm: avoid speculation-based attacks from out-of-range memslot accesses
+> 
 
-Avoid taking mmu_lock for .invalidate_range_{start,end}() notifications
-that are unrelated to KVM.  This is possible now that memslot updates are
-blocked from range_start() to range_end(); that ensures that lock elision
-happens in both or none, and therefore that mmu_notifier_count updates
-(which must occur while holding mmu_lock for write) are always paired
-across start->end.
+That commit looks like something that stable kernels might benefit from, too -
+any plans to submit it for stable?
 
-Based on patches originally written by Ben Gardon.
+Responding to the pull request since I can't find that patch posted on
+a mailing list.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- virt/kvm/kvm_main.c | 20 +++++++-------------
- 1 file changed, 7 insertions(+), 13 deletions(-)
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 0dc0726c8d18..2e73edfcc8db 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -496,17 +496,6 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
- 
- 	idx = srcu_read_lock(&kvm->srcu);
- 
--	/* The on_lock() path does not yet support lock elision. */
--	if (!IS_KVM_NULL_FN(range->on_lock)) {
--		locked = true;
--		KVM_MMU_LOCK(kvm);
--
--		range->on_lock(kvm, range->start, range->end);
--
--		if (IS_KVM_NULL_FN(range->handler))
--			goto out_unlock;
--	}
--
- 	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
- 		slots = __kvm_memslots(kvm, i);
- 		kvm_for_each_memslot(slot, slots) {
-@@ -538,6 +527,10 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
- 			if (!locked) {
- 				locked = true;
- 				KVM_MMU_LOCK(kvm);
-+				if (!IS_KVM_NULL_FN(range->on_lock))
-+					range->on_lock(kvm, range->start, range->end);
-+				if (IS_KVM_NULL_FN(range->handler))
-+					break;
- 			}
- 			ret |= range->handler(kvm, &gfn_range);
- 		}
-@@ -546,7 +540,6 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
- 	if (range->flush_on_ret && (ret || kvm->tlbs_dirty))
- 		kvm_flush_remote_tlbs(kvm);
- 
--out_unlock:
- 	if (locked)
- 		KVM_MMU_UNLOCK(kvm);
- 
-@@ -1324,7 +1317,8 @@ static struct kvm_memslots *install_new_memslots(struct kvm *kvm,
- 
- 	/*
- 	 * Do not store the new memslots while there are invalidations in
--	 * progress (preparatory change for the next commit).
-+	 * progress, otherwise the locking in invalidate_range_start and
-+	 * invalidate_range_end will be unbalanced.
- 	 */
- 	spin_lock(&kvm->mn_invalidate_lock);
- 	prepare_to_rcuwait(&kvm->mn_memslots_update_rcuwait);
--- 
-2.27.0
-
+Thanks,
+Maciej
