@@ -2,162 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD9783A2C52
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 15:00:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89A303A2C60
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 15:03:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230506AbhFJNCn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 09:02:43 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:60958 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230035AbhFJNCn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Jun 2021 09:02:43 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1623330045;
+        id S230345AbhFJNFv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 09:05:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53321 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230230AbhFJNFu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 09:05:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623330234;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ZzkRlz8+MqeOaaHBWpHKuxVmWTuasJwPOdO8ljJCk0g=;
-        b=exzVZMomiEpuYg1EmWtXdGSQv+zn10DAb7E6jodHrTleeODF2amKk5FLbTEiF66yVOOJyD
-        WXIL5+kq6f12dAdqv+RC4Lt52VA+efoRwdPxyvpnMirXNDrKor6UZZZHkq353eBa4e0HKV
-        omX9LkNotO+gELDGRcAhxmbZrF0kkykzJl1cLiaLOOeIACuHg8lbUzqJ8zfdElGwPvnXq0
-        SgMtJjRAKbjU1N4pRZeylRBysTlBBT5oZwVe6JYI0+UDGRj3yIOrhRfGOEyVAhP1kiUn+B
-        cew5dblrcvOLUplFvlD6RWdeEcjfDYc2fulWZPiShNxs5SfxbwhOthzv9h5mwA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1623330045;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZzkRlz8+MqeOaaHBWpHKuxVmWTuasJwPOdO8ljJCk0g=;
-        b=21A3bT6ApPeJPmtO1SMUzY3kZTuGNpEQmJEvJ7TdEoOcsMxt67F5KSMo+6LHLHexpPtbSL
-        H8VM9BXRoWxeWPAA==
-To:     Dave Jiang <dave.jiang@intel.com>, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, vkoul@kernel.org, jgg@mellanox.com
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, megha.dey@intel.com,
-        jacob.jun.pan@intel.com, ashok.raj@intel.com, yi.l.liu@intel.com,
-        baolu.lu@intel.com, kevin.tian@intel.com, sanjay.k.kumar@intel.com,
-        tony.luck@intel.com, dan.j.williams@intel.com,
-        eric.auger@redhat.com, pbonzini@redhat.com,
-        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v6 05/20] vfio: mdev: common lib code for setting up Interrupt Message Store
-In-Reply-To: <febc19ac-4105-fb83-709a-5d1fa5871b7e@intel.com>
-References: <162164243591.261970.3439987543338120797.stgit@djiang5-desk3.ch.intel.com> <162164277624.261970.7989190254803052804.stgit@djiang5-desk3.ch.intel.com> <87pmx73tfw.ffs@nanos.tec.linutronix.de> <febc19ac-4105-fb83-709a-5d1fa5871b7e@intel.com>
-Date:   Thu, 10 Jun 2021 15:00:45 +0200
-Message-ID: <87im2lyiv6.ffs@nanos.tec.linutronix.de>
+        bh=w1yRG9vI4ont0xlQTDfWQBvjqAZg/7xjdkXXrg1Zl+M=;
+        b=WjzeOjJFr2D4llpTZaYez/OMil270b+h7wDPMX/8SVktCogmt/PvUJ3HsHWoCKwicjaoB/
+        0KoivJJFE4d1TzRx548V88z3w5jqsWpfIEBf9SUOjXY0UzxaTLQz0LkRSFO6SreFBRbmAL
+        AEXdUhz3kvYKghhqQtGxtXUn9Pey790=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-211-2Zzpl9QmNe-i8YEvI8cx5A-1; Thu, 10 Jun 2021 09:03:51 -0400
+X-MC-Unique: 2Zzpl9QmNe-i8YEvI8cx5A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95914100C624;
+        Thu, 10 Jun 2021 13:03:47 +0000 (UTC)
+Received: from work-vm (ovpn-114-240.ams2.redhat.com [10.36.114.240])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 552845C1D1;
+        Thu, 10 Jun 2021 13:03:30 +0000 (UTC)
+Date:   Thu, 10 Jun 2021 14:03:27 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com, Borislav Petkov <bp@suse.de>
+Subject: Re: [PATCH Part2 RFC v3 06/37] x86/sev: Add helper functions for
+ RMPUPDATE and PSMASH instruction
+Message-ID: <YMINnxkDVzRZ8gCQ@work-vm>
+References: <20210602141057.27107-1-brijesh.singh@amd.com>
+ <20210602141057.27107-7-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210602141057.27107-7-brijesh.singh@amd.com>
+User-Agent: Mutt/2.0.7 (2021-05-04)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 08 2021 at 08:57, Dave Jiang wrote:
-> On 5/31/2021 6:48 AM, Thomas Gleixner wrote:
->> What's unclear to me is under which circumstances does the IMS interrupt
->> require a PASID.
->>
->>     1) Always
->>     2) Use case dependent
->>
-> Thomas, thank you for the review. I'll try to provide a summary below
-> with what's going on with IMS after taking in yours and Jason's
-> comments.
+* Brijesh Singh (brijesh.singh@amd.com) wrote:
+> The RMPUPDATE instruction writes a new RMP entry in the RMP Table. The
+> hypervisor will use the instruction to add pages to the RMP table. See
+> APM3 for details on the instruction operations.
+> 
+> The PSMASH instruction expands a 2MB RMP entry into a corresponding set of
+> contiguous 4KB-Page RMP entries. The hypervisor will use this instruction
+> to adjust the RMP entry without invalidating the previous RMP entry.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/kernel/sev.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+>  include/linux/sev.h   | 20 ++++++++++++++++++++
+>  2 files changed, 62 insertions(+)
+> 
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index 51676ab1a321..9727df945fb1 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -2226,3 +2226,45 @@ struct rmpentry *snp_lookup_page_in_rmptable(struct page *page, int *level)
+>  	return entry;
+>  }
+>  EXPORT_SYMBOL_GPL(snp_lookup_page_in_rmptable);
+> +
+> +int psmash(struct page *page)
+> +{
+> +	unsigned long spa = page_to_pfn(page) << PAGE_SHIFT;
+> +	int ret;
+> +
+> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> +		return -ENXIO;
+> +
+> +	/* Retry if another processor is modifying the RMP entry. */
+> +	do {
+> +		/* Binutils version 2.36 supports the PSMASH mnemonic. */
+> +		asm volatile(".byte 0xF3, 0x0F, 0x01, 0xFF"
+> +			      : "=a"(ret)
+> +			      : "a"(spa)
+> +			      : "memory", "cc");
+> +	} while (ret == FAIL_INUSE);
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(psmash);
+> +
+> +int rmpupdate(struct page *page, struct rmpupdate *val)
+> +{
+> +	unsigned long spa = page_to_pfn(page) << PAGE_SHIFT;
+> +	int ret;
+> +
+> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> +		return -ENXIO;
+> +
+> +	/* Retry if another processor is modifying the RMP entry. */
+> +	do {
+> +		/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
+> +		asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
+> +			     : "=a"(ret)
+> +			     : "a"(spa), "c"((unsigned long)val)
+> +			     : "memory", "cc");
+> +	} while (ret == FAIL_INUSE);
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(rmpupdate);
+> diff --git a/include/linux/sev.h b/include/linux/sev.h
+> index 83c89e999999..bcd4d75d87c8 100644
+> --- a/include/linux/sev.h
+> +++ b/include/linux/sev.h
+> @@ -39,13 +39,33 @@ struct __packed rmpentry {
+>  
+>  #define RMP_TO_X86_PG_LEVEL(level)	(((level) == RMP_PG_SIZE_4K) ? PG_LEVEL_4K : PG_LEVEL_2M)
+>  
+> +struct rmpupdate {
+> +	u64 gpa;
+> +	u8 assigned;
+> +	u8 pagesize;
+> +	u8 immutable;
+> +	u8 rsvd;
+> +	u32 asid;
+> +} __packed;
+> +
+> +
+> +/*
+> + * The psmash() and rmpupdate() returns FAIL_INUSE when another processor is
+> + * modifying the RMP entry.
+> + */
+> +#define FAIL_INUSE              3
 
-<snip>
+Perhaps SEV_FAIL_INUSE ?
 
-No need to paste the manuals into mail.
+(Given that there are a whole buunch of FAIL_* macros already in
+general)
 
-</snip>
+Dave
 
-> DSA provides a way to skip PASID validation for IMS handles. This can
-> be used if host kernel is the *only* agent generating work. Host
-> usages without IOMMU scalable mode are not currently implemented.
+>  #ifdef CONFIG_AMD_MEM_ENCRYPT
+>  struct rmpentry *snp_lookup_page_in_rmptable(struct page *page, int *level);
+> +int psmash(struct page *page);
+> +int rmpupdate(struct page *page, struct rmpupdate *e);
+>  #else
+>  static inline struct rmpentry *snp_lookup_page_in_rmptable(struct page *page, int *level)
+>  {
+>  	return NULL;
+>  }
+> +static inline int psmash(struct page *page) { return -ENXIO; }
+> +static inline int rmpupdate(struct page *page, struct rmpupdate *e) { return -ENXIO; }
+>  
+>  #endif /* CONFIG_AMD_MEM_ENCRYPT */
+>  #endif /* __LINUX_SEV_H */
+> -- 
+> 2.17.1
+> 
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-So the IMS irq chip driver can do:
-
-ims_array_alloc_msi_store(domain, dev)
-{
-        struct msi_domain_info *info =3D domain->host_data;
-        struct ims_array_data *ims =3D info->data;
-
-        if (ims->flags & VALIDATE_PASID) {
-        	if (!valid_pasid(dev))
-                	return -EINVAL;
-        }
-
-or something like that.
-
-> The following is the call flow for mdev without vSVM support:
-> 1.=C2=A0=C2=A0=C2=A0 idxd host driver sets PASID from iommu_aux_get_pasid=
-() to =E2=80=98struct device=E2=80=99
-
-Why needs every driver to implement that?
-
-That should be part of the iommu management to store that.
-
-> 2.=C2=A0=C2=A0=C2=A0 idxd guest driver calls request_irq()
-> 3.=C2=A0=C2=A0=C2=A0 VFIO calls VFIO_DEVICE_SET_IRQS ioctl
-
-How does the guest driver request_irq() end up in the VFIO ioctl on the
-host?
-
-> 4.=C2=A0=C2=A0=C2=A0 idxd host driver calls vfio_set_ims_trigger() (newly=
- created common helper function)
-> 	a.=C2=A0=C2=A0=C2=A0 VFIO calls msi_domain_alloc_irqs() and programs val=
-id 'struct device' PASID as auxdata to IMS entry
-
-VFIO does not program anything into the IMS entry.
-
-The IMS irq chip driver retrieves PASID from struct device and does
-that. That can be part of the domain allocation function, but there is
-no requirement to do so. It can be done later, e.g. when the interrupt
-is started up.
-
-> 	b.=C2=A0=C2=A0=C2=A0 Host driver calls request_irq() for IMS interrupts
->
-> With a default pasid programmed to 'struct device', for this use case
-> above we shouldn't have the need of programming pasid outside of
-> irqchip.
-
-s/shouldn't/do not/
-
-> The following is the call flow for mdev with vSVM support:
-> 1. idxd host driver sets PASID to mdev =E2=80=98struct device=E2=80=99 vi=
-a iommu_aux_get_PASID()
-> 2. idxd guest driver binds supervisor pasid
-> 3. idxd guest driver calls request_irq()
-> 4. VFIO calls VFIO_DEVICE_SET_IRQS ioctl
-> 5. idxd host driver calls vfio_set_ims_trigger()
->    a. VFIO calls msi_domain_alloc_irqs() and programs PASID as auxdata to=
- IMS entry
->    b. Host driver calls request_irq() for IMS interrupts
-> 6. idxd guest driver programs virtual device MSIX permission table with g=
-uest PASID.
-> 7. Host driver mdev MMIO emulation retrieves guest PASID from vdev
->    MSIXPERM table and matches to host PASID via ioasid_find_by_spid().
->    a. Host driver calls irq_set_auxdata() to change to the new PASID
->       for IMS entry.
-
-What enforces this ordering? Certainly not the hardware.
-
-The guest driver knows the guest PASID _before_ interrupts are allocated
-or requested for the device. So it can store the guest PASID _before_ it
-triggers the mechanism which makes vfio/host initialize the interrupts.
-
-So no. It's not needed at all. It's pretty much the same as the host
-side driver except for the that MSIXPERM stuff.
-
-And just for the record. Setting MSIXPERM _after_ request_irq()
-completed is just wrong because if an interrupt is raised _before_ that
-MSIXPERM muck is set up, then it will fire with the host PASID and not
-with the guest's.
-
-This whole IDXD stuff has been a monstrous layering violation from the
-very beginning and unfortunately this hasn't changed much since then.
-
-Thanks,
-
-        tglx
