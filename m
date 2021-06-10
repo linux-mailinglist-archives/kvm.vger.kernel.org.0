@@ -2,166 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A1A263A304E
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 18:14:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52B903A3051
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 18:15:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230272AbhFJQQc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 12:16:32 -0400
-Received: from foss.arm.com ([217.140.110.172]:35876 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230196AbhFJQQb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Jun 2021 12:16:31 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EC9F7ED1;
-        Thu, 10 Jun 2021 09:14:34 -0700 (PDT)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C498B3F719;
-        Thu, 10 Jun 2021 09:14:33 -0700 (PDT)
-Date:   Thu, 10 Jun 2021 17:14:27 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
-        kvm@vger.kernel.org, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com, maz@kernel.org
-Subject: Re: [PATCH kvmtool 4/4] arm/arm64: vfio: Add PCI Express Capability
- Structure
-Message-ID: <20210610171427.09ee5108@slackpad.fritz.box>
-In-Reply-To: <20210609183812.29596-5-alexandru.elisei@arm.com>
-References: <20210609183812.29596-1-alexandru.elisei@arm.com>
-        <20210609183812.29596-5-alexandru.elisei@arm.com>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+        id S230196AbhFJQRw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 12:17:52 -0400
+Received: from mail-lj1-f178.google.com ([209.85.208.178]:37820 "EHLO
+        mail-lj1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230026AbhFJQRw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Jun 2021 12:17:52 -0400
+Received: by mail-lj1-f178.google.com with SMTP id e2so5688276ljk.4
+        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 09:15:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=T1W3xL4t/99LxynShZQSfyPqwxQEAUk8Mb6ODp2DP7s=;
+        b=iUk9VuHToDosZMzBMlQkcAv1a4CQroRs+V7Vwj73XYMDtBXecIBGbOszwhM+EjFydZ
+         jMdnw24wH0dBeFcOPf/uTFNfhzB5zE7rMe0iL4N/Vs0w+SaGB/pqLTB80RNrfYCVCW3h
+         z6gdJVRY6hTcDdGwUBVOrP0z64NWDCvJ7Y1u1wQUMu3/usgfcKkFSdilbzNNmCioLerq
+         7juwcm2n6v0D9YBMMIsr3kJd6JD1RQRdg86sxZykFX23HjJBq/XKu/ekzJqExojqnEVl
+         4q6mRNH6VYzSp6iV4LN4Q/uzL6sCEh8ohyAHKKKFUsZsWv5rUoXlc7K2/T1+5+xpgunz
+         xyiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=T1W3xL4t/99LxynShZQSfyPqwxQEAUk8Mb6ODp2DP7s=;
+        b=eOQMk2CnR0kNdvAS0e5ASshVgYDJdPVC7PE0u0ertNmW09zeNmY3UUNtWuclT7pSx9
+         9wpaxBiH6gli2tPvcOdMzLcENapmHZOH5NSexFcHYzvQ605KQjFoncjG6fFPf9FEXhq/
+         5fZi+AHjbk4PeNQYKyx+rpReCmrhEDi1id9QPjapJLozs9PretMjzeRmUGSpUK/J5JtK
+         BQqsNdt9uuirNmLPqFkKXt3EJ/AmS9k893aHUPk48ds1skkgKkUq6AzEatZ+Jwj1ItLX
+         5B+YIFaNQtEnPbI5MkV8roTg84vgnI1N51HFpOvCOzOJbzvPRZYjDc4O2UwGrD7pLQMy
+         FayA==
+X-Gm-Message-State: AOAM533ZSnXZc/8+EplaMlWDCxJlKWeTOAHI3/f/31XHLLj3DBQqReBv
+        NFvxMvU0jnkJTaHZ2fNleXidZixZm/d0LlJdhqx5kJXb/2YHUw==
+X-Google-Smtp-Source: ABdhPJxe5obT5Vd/XBA1MBuq313MdQYvgAXyzbH1C0NCXHqQtVTBbK7Myxs3/88M1HbVGTqtxT73g+h8ZQmqzcs9z6w=
+X-Received: by 2002:a05:651c:383:: with SMTP id e3mr2898119ljp.220.1623341684809;
+ Thu, 10 Jun 2021 09:14:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20210511015016.815461-1-jacobhxu@google.com>
+In-Reply-To: <20210511015016.815461-1-jacobhxu@google.com>
+From:   Jacob Xu <jacobhxu@google.com>
+Date:   Thu, 10 Jun 2021 09:14:33 -0700
+Message-ID: <CAJ5mJ6jUvHN5Mh_hVR5rArvA6aFNdhDCinQd1ZjLg=ht=J4ijw@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 1/2] x86: Do not assign values to unaligned
+ pointer to 128 bits
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed,  9 Jun 2021 19:38:12 +0100
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+ping (previous ping just now contained html subpart, oops).
 
-> It turns out that some Linux drivers (like Realtek R8169) fall back to a
-> device-specific configuration method if the device is not PCI Express
-> capable:
-> 
-> [    1.433825] r8169 0000:00:00.0 enp0s0: No native access to PCI extended config space, falling back to CSI
-> 
 
-Nice discovery, thanks!
-
-> Add the PCI Express Capability Structure and populate it for assigned
-> devices, as this is how the Linux PCI driver determines if a device is PCI
-> Express capable.
-> 
-> Because we don't emulate a PCI Express link, a root complex or any slot
-> related properties, the PCI Express capability is kept as small as possible
-> by ignoring those fields.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+On Mon, May 10, 2021 at 6:50 PM Jacob Xu <jacobhxu@google.com> wrote:
+>
+> When compiled with clang, the following statement gets converted into a
+> movaps instructions.
+> mem->u[0] = 5; mem->u[1] = 6; mem->u[2] = 7; mem->u[3] = 8;
+>
+> Since mem is an unaligned pointer to sse_union, we get a GP when
+> running. Let's avoid using a pointer to sse_union at all, since doing so
+> implies that the pointer is aligned to 128 bits.
+>
+> Fixes: e5e76263b5 ("x86: add additional test cases for sse exceptions to
+> emulator.c")
+>
+> Signed-off-by: Jacob Xu <jacobhxu@google.com>
 > ---
->  include/kvm/pci.h | 24 ++++++++++++++++++++++++
->  vfio/pci.c        | 13 +++++++++++++
->  2 files changed, 37 insertions(+)
-> 
-> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
-> index 42d9e1c5645f..0f2d5bbabdc3 100644
-> --- a/include/kvm/pci.h
-> +++ b/include/kvm/pci.h
-> @@ -46,6 +46,8 @@ struct kvm;
->  #define PCI_DEV_CFG_SIZE_EXTENDED 	4096
->  
->  #ifdef ARCH_HAS_PCI_EXP
-> +#define arch_has_pci_exp()	(true)
+>  x86/emulator.c | 67 +++++++++++++++++++++++++-------------------------
+>  1 file changed, 33 insertions(+), 34 deletions(-)
+>
+> diff --git a/x86/emulator.c b/x86/emulator.c
+> index 9705073..1d5c172 100644
+> --- a/x86/emulator.c
+> +++ b/x86/emulator.c
+> @@ -645,37 +645,34 @@ static void test_muldiv(long *mem)
+>
+>  typedef unsigned __attribute__((vector_size(16))) sse128;
+>
+> -typedef union {
+> -    sse128 sse;
+> -    unsigned u[4];
+> -} sse_union;
+> -
+> -static bool sseeq(sse_union *v1, sse_union *v2)
+> +static bool sseeq(uint32_t *v1, uint32_t *v2)
+>  {
+>      bool ok = true;
+>      int i;
+>
+>      for (i = 0; i < 4; ++i) {
+> -       ok &= v1->u[i] == v2->u[i];
+> +       ok &= v1[i] == v2[i];
+>      }
+>
+>      return ok;
+>  }
+>
+> -static __attribute__((target("sse2"))) void test_sse(sse_union *mem)
+> +static __attribute__((target("sse2"))) void test_sse(uint32_t *mem)
+>  {
+> -       sse_union v;
+> +       sse128 vv;
+> +       uint32_t *v = (uint32_t *)&vv;
+>
+>         write_cr0(read_cr0() & ~6); /* EM, TS */
+>         write_cr4(read_cr4() | 0x200); /* OSFXSR */
+> +       memset(&vv, 0, sizeof(vv));
+>
+>  #define TEST_RW_SSE(insn) do { \
+> -               v.u[0] = 1; v.u[1] = 2; v.u[2] = 3; v.u[3] = 4; \
+> -               asm(insn " %1, %0" : "=m"(*mem) : "x"(v.sse)); \
+> -               report(sseeq(&v, mem), insn " (read)"); \
+> -               mem->u[0] = 5; mem->u[1] = 6; mem->u[2] = 7; mem->u[3] = 8; \
+> -               asm(insn " %1, %0" : "=x"(v.sse) : "m"(*mem)); \
+> -               report(sseeq(&v, mem), insn " (write)"); \
+> +               v[0] = 1; v[1] = 2; v[2] = 3; v[3] = 4; \
+> +               asm(insn " %1, %0" : "=m"(*mem) : "x"(vv) : "memory"); \
+> +               report(sseeq(v, mem), insn " (read)"); \
+> +               mem[0] = 5; mem[1] = 6; mem[2] = 7; mem[3] = 8; \
+> +               asm(insn " %1, %0" : "=x"(vv) : "m"(*mem) : "memory"); \
+> +               report(sseeq(v, mem), insn " (write)"); \
+>  } while (0)
+>
+>         TEST_RW_SSE("movdqu");
+> @@ -704,40 +701,41 @@ static void cross_movups_handler(struct ex_regs *regs)
+>
+>  static __attribute__((target("sse2"))) void test_sse_exceptions(void *cross_mem)
+>  {
+> -       sse_union v;
+> -       sse_union *mem;
+> +       sse128 vv;
+> +       uint32_t *v = (uint32_t *)&vv;
+> +       uint32_t *mem;
+>         uint8_t *bytes = cross_mem; // aligned on PAGE_SIZE*2
+>         void *page2 = (void *)(&bytes[4096]);
+>         struct pte_search search;
+>         pteval_t orig_pte;
+>
+>         // setup memory for unaligned access
+> -       mem = (sse_union *)(&bytes[8]);
+> +       mem = (uint32_t *)(&bytes[8]);
+>
+>         // test unaligned access for movups, movupd and movaps
+> -       v.u[0] = 1; v.u[1] = 2; v.u[2] = 3; v.u[3] = 4;
+> -       mem->u[0] = 5; mem->u[1] = 6; mem->u[2] = 7; mem->u[3] = 8;
+> -       asm("movups %1, %0" : "=m"(*mem) : "x"(v.sse));
+> -       report(sseeq(&v, mem), "movups unaligned");
+> -
+> -       v.u[0] = 1; v.u[1] = 2; v.u[2] = 3; v.u[3] = 4;
+> -       mem->u[0] = 5; mem->u[1] = 6; mem->u[2] = 7; mem->u[3] = 8;
+> -       asm("movupd %1, %0" : "=m"(*mem) : "x"(v.sse));
+> -       report(sseeq(&v, mem), "movupd unaligned");
+> +       v[0] = 1; v[1] = 2; v[2] = 3; v[3] = 4;
+> +       mem[0] = 5; mem[1] = 6; mem[2] = 8; mem[3] = 9;
+> +       asm("movups %1, %0" : "=m"(*mem) : "x"(vv) : "memory");
+> +       report(sseeq(v, mem), "movups unaligned");
 > +
->  #define PCI_CFG_SIZE		PCI_CFG_SIZE_EXTENDED
->  #define PCI_DEV_CFG_SIZE	PCI_DEV_CFG_SIZE_EXTENDED
->  
-> @@ -73,6 +75,8 @@ union pci_config_address {
->  };
->  
->  #else
-> +#define arch_has_pci_exp()	(false)
-> +
->  #define PCI_CFG_SIZE		PCI_CFG_SIZE_LEGACY
->  #define PCI_DEV_CFG_SIZE	PCI_DEV_CFG_SIZE_LEGACY
->  
-> @@ -143,6 +147,24 @@ struct pci_cap_hdr {
->  	u8	next;
->  };
->  
-> +struct pci_exp_cap {
-> +	u8 cap;
-> +	u8 next;
-> +	u16 cap_reg;
-> +	u32 dev_cap;
-> +	u16 dev_ctrl;
-> +	u16 dev_status;
-> +	u32 link_cap;
-> +	u16 link_ctrl;
-> +	u16 link_status;
-> +	u32 slot_cap;
-> +	u16 slot_ctrl;
-> +	u16 slot_status;
-> +	u16 root_ctrl;
-> +	u16 root_cap;
-> +	u32 root_status;
-> +};
-> +
->  struct pci_device_header;
->  
->  typedef int (*bar_activate_fn_t)(struct kvm *kvm,
-> @@ -188,6 +210,8 @@ struct pci_device_header {
->  			u8		min_gnt;
->  			u8		max_lat;
->  			struct msix_cap msix;
-> +			/* Used only by architectures which support PCIE */
-> +			struct pci_exp_cap pci_exp;
->  		} __attribute__((packed));
->  		/* Pad to PCI config space size */
->  		u8	__pad[PCI_DEV_CFG_SIZE];
-> diff --git a/vfio/pci.c b/vfio/pci.c
-> index 6a4204634e71..5c9bec6db710 100644
-> --- a/vfio/pci.c
-> +++ b/vfio/pci.c
-> @@ -623,6 +623,12 @@ static ssize_t vfio_pci_cap_size(struct pci_cap_hdr *cap_hdr)
->  		return PCI_CAP_MSIX_SIZEOF;
->  	case PCI_CAP_ID_MSI:
->  		return vfio_pci_msi_cap_size((void *)cap_hdr);
-> +	case PCI_CAP_ID_EXP:
-> +		/*
-> +		 * We don't emulate any of the link, slot and root complex
-> +		 * properties, so ignore them.
-> +		 */
-> +		return PCI_CAP_EXP_RC_ENDPOINT_SIZEOF_V1;
-
-My (admittedly) older distro kernel headers don't carry this symbol.
-Can we have a "#ifndef ... #define ... #endif" at the beginning of
-this file?
-If "Slackware" isn't convincing enough, RHEL 7.4 doesn't include it
-either. And this issue hits x86 as well, even though we don't use PCIe
-there. Also we do something similar in patch 3/4.
-
-Rest looks alright.
-
-Cheers,
-Andre
-
->  	default:
->  		pr_err("unknown PCI capability 0x%x", cap_hdr->type);
->  		return 0;
-> @@ -696,6 +702,13 @@ static int vfio_pci_parse_caps(struct vfio_device *vdev)
->  			pdev->msi.pos = pos;
->  			pdev->irq_modes |= VFIO_PCI_IRQ_MODE_MSI;
->  			break;
-> +		case PCI_CAP_ID_EXP:
-> +			if (!arch_has_pci_exp())
-> +				continue;
-> +			ret = vfio_pci_add_cap(vdev, virt_hdr, cap, pos);
-> +			if (ret)
-> +				return ret;
-> +			break;
->  		}
->  	}
->  
-
+> +       v[0] = 1; v[1] = 2; v[2] = 3; v[3] = 4;
+> +       mem[0] = 5; mem[1] = 6; mem[2] = 7; mem[3] = 8;
+> +       asm("movupd %1, %0" : "=m"(*mem) : "x"(vv) : "memory");
+> +       report(sseeq(v, mem), "movupd unaligned");
+>         exceptions = 0;
+>         handle_exception(GP_VECTOR, unaligned_movaps_handler);
+>         asm("movaps %1, %0\n\t unaligned_movaps_cont:"
+> -                       : "=m"(*mem) : "x"(v.sse));
+> +                       : "=m"(*mem) : "x"(vv));
+>         handle_exception(GP_VECTOR, 0);
+>         report(exceptions == 1, "unaligned movaps exception");
+>
+>         // setup memory for cross page access
+> -       mem = (sse_union *)(&bytes[4096-8]);
+> -       v.u[0] = 1; v.u[1] = 2; v.u[2] = 3; v.u[3] = 4;
+> -       mem->u[0] = 5; mem->u[1] = 6; mem->u[2] = 7; mem->u[3] = 8;
+> +       mem = (uint32_t *)(&bytes[4096-8]);
+> +       v[0] = 1; v[1] = 2; v[2] = 3; v[3] = 4;
+> +       mem[0] = 5; mem[1] = 6; mem[2] = 7; mem[3] = 8;
+>
+> -       asm("movups %1, %0" : "=m"(*mem) : "x"(v.sse));
+> -       report(sseeq(&v, mem), "movups unaligned crosspage");
+> +       asm("movups %1, %0" : "=m"(*mem) : "x"(vv) : "memory");
+> +       report(sseeq(v, mem), "movups unaligned crosspage");
+>
+>         // invalidate second page
+>         search = find_pte_level(current_page_table(), page2, 1);
+> @@ -747,7 +745,8 @@ static __attribute__((target("sse2"))) void test_sse_exceptions(void *cross_mem)
+>
+>         exceptions = 0;
+>         handle_exception(PF_VECTOR, cross_movups_handler);
+> -       asm("movups %1, %0\n\t cross_movups_cont:" : "=m"(*mem) : "x"(v.sse));
+> +       asm("movups %1, %0\n\t cross_movups_cont:" : "=m"(*mem) : "x"(vv) :
+> +                       "memory");
+>         handle_exception(PF_VECTOR, 0);
+>         report(exceptions == 1, "movups crosspage exception");
+>
+> --
+> 2.31.1.607.g51e8a6a459-goog
+>
