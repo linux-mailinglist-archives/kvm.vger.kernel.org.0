@@ -2,148 +2,260 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 50AAB3A2F04
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 17:06:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46C263A2F0D
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 17:08:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231599AbhFJPIT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 11:08:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38370 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231600AbhFJPIQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 11:08:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623337578;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Cf6hot6ZLRcduczNi4lA10wsSd7+V1kWMUGJekCYcy4=;
-        b=M0sLMnTlc4Ie7wZppxKZ+LaJ4snj/S3diBVUDJiMDd0YFa/zMOWJoHxHJp8A3PgW64zz2K
-        ZoldcxuQFYhQkURshjrFJ1J/hLMGy70ouXd9YsH1m2+SpvXWLuN4Cm4wAOEDZWcRA0ipvj
-        Fg18dL7KYIRwX8N2HqNO1AhBkPTP+YM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-549-NTWdlxZlOsu5s_8DnRi5dA-1; Thu, 10 Jun 2021 11:06:16 -0400
-X-MC-Unique: NTWdlxZlOsu5s_8DnRi5dA-1
-Received: by mail-wr1-f69.google.com with SMTP id x9-20020adfffc90000b02901178add5f60so1028132wrs.5
-        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 08:06:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Cf6hot6ZLRcduczNi4lA10wsSd7+V1kWMUGJekCYcy4=;
-        b=ldjXrtMKPiaVYC/KU0rna039iz5B4hITHH0wY8iWu4tqur7EQXzEcYtgzj1t0f5T1i
-         Hyxrya0tplgE83N+l5FdF7muvMj7uq6hFUZMlVrQcsX0jPidGX5JukKiMLu6qZ0yXZ4u
-         waXZys7UCRfU5QdQH+uwZlk547zHruf8Mj8F4Bl6GodKJzCpxO/Lva45tp4KEiXuZkgU
-         eCins3SlExEVF2Azx4Kw22+kuscKkPnog3DzV3syJREHMEeMZNXhgb+NwWDElI77y4zK
-         qaDZXoecyUZFNMbiDY1TmS8uhwIqw4pRO07E7ciHRbw8EZb0lJeBNi68lUcFgwrRECV2
-         BUyg==
-X-Gm-Message-State: AOAM531pyDqxIR1wc+gsXNhjHbrPwKvGSTUbHeCRaG3PACjkhk5zX8fh
-        12QlDXsKZfp3DvWNCLXmzjpE3M7z+XBk4Fq1Ykz7Ybz3tArW19JimX9u5lOHzWU8SS3lVgBfP9r
-        V1sTx/3oDl1Ow
-X-Received: by 2002:a1c:2507:: with SMTP id l7mr5529088wml.188.1623337575751;
-        Thu, 10 Jun 2021 08:06:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw3c6aC4X4il2k5fq/qtSdT+15bADFk4BGyt6elhfFXTSPG/U5yVnl1Y004HOWePu0JJfDfUA==
-X-Received: by 2002:a1c:2507:: with SMTP id l7mr5529068wml.188.1623337575587;
-        Thu, 10 Jun 2021 08:06:15 -0700 (PDT)
-Received: from ?IPv6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.gmail.com with ESMTPSA id m23sm3214631wmc.29.2021.06.10.08.06.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Jun 2021 08:06:13 -0700 (PDT)
-Subject: Re: [PATCH v3 0/8] Introduce KVM_{GET|SET}_SREGS2 and fix PDPTR
- migration
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     open list <linux-kernel@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Jim Mattson <jmattson@google.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "H. Peter Anvin" <hpa@zytor.com>
-References: <20210607090203.133058-1-mlevitsk@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <90393d4d-2057-b8d1-6867-275ba99efe3f@redhat.com>
-Date:   Thu, 10 Jun 2021 17:06:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S231482AbhFJPKT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 11:10:19 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3202 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230322AbhFJPKO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Jun 2021 11:10:14 -0400
+Received: from fraeml711-chm.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4G16Yn5pqWz6L6GR;
+        Thu, 10 Jun 2021 22:58:53 +0800 (CST)
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ fraeml711-chm.china.huawei.com (10.206.15.60) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 10 Jun 2021 17:08:16 +0200
+Received: from localhost (10.52.126.112) by lhreml710-chm.china.huawei.com
+ (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Thu, 10 Jun
+ 2021 16:08:15 +0100
+Date:   Thu, 10 Jun 2021 16:08:12 +0100
+From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
+CC:     <maz@kernel.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <pbonzini@redhat.com>,
+        <corbet@lwn.net>, <james.morse@arm.com>,
+        <alexandru.elisei@arm.com>, <suzuki.poulose@arm.com>,
+        <catalin.marinas@arm.com>, <will@kernel.org>,
+        <lorenzo.pieralisi@arm.com>, <salil.mehta@huawei.com>,
+        <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [RFC PATCH 1/5] KVM: arm64: Replace power_off with mp_state in
+ struct kvm_vcpu_arch
+Message-ID: <20210610160812.0000679b@Huawei.com>
+In-Reply-To: <20210608154805.216869-2-jean-philippe@linaro.org>
+References: <20210608154805.216869-1-jean-philippe@linaro.org>
+        <20210608154805.216869-2-jean-philippe@linaro.org>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; i686-w64-mingw32)
 MIME-Version: 1.0
-In-Reply-To: <20210607090203.133058-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.52.126.112]
+X-ClientProxiedBy: lhreml728-chm.china.huawei.com (10.201.108.79) To
+ lhreml710-chm.china.huawei.com (10.201.108.61)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/06/21 11:01, Maxim Levitsky wrote:
-> This patch set aims to fix few flaws that were discovered
-> in KVM_{GET|SET}_SREGS on x86:
-> 
-> * There is no support for reading/writing PDPTRs although
->    these are considered to be part of the guest state.
-> 
-> * There is useless interrupt bitmap which isn't needed
-> 
-> * No support for future extensions (via flags and such)
-> 
-> Also if the user doesn't use the new SREG2 api, the PDPTR
-> load after migration is now done on KVM_REQ_GET_NESTED_STATE_PAGES
-> to at least read them correctly in cases when guest memory
-> map is not up to date when nested state is loaded.
-> 
-> This patch series was tested by doing nested migration test
-> of 32 bit PAE L1 + 32 bit PAE L2 on AMD and Intel and by
-> nested migration test of 64 bit L1 + 32 bit PAE L2 on AMD.
-> The later test currently fails on Intel (regardless of my patches).
-> 
-> Changes from V2:
->    - I took in the patch series from Sean Christopherson that
->      removes the pdptrs_changed function and rebased my code
->      on top of it.
->    - I updated the SET_SREGS2 ioctl to load PDPTRS from memory
->      when user haven't given PDPTRS.
->    - Minor refactoring all over the place.
-> 
-> Changes from V1:
->    - move only PDPTRS load to KVM_REQ_GET_NESTED_STATE_PAGES on VMX
->    - rebase on top of kvm/queue
->    - improve the KVM_GET_SREGS2 to have flag for PDPTRS
->      and remove padding
-> 
-> Patches to qemu to enable this feature were sent as well.
-> 
-> Maxim Levitsky (5):
->    KVM: nSVM: refactor the CR3 reload on migration
->    KVM: nVMX: delay loading of PDPTRs to KVM_REQ_GET_NESTED_STATE_PAGES
->    KVM: x86: introduce kvm_register_clear_available
->    KVM: x86: Introduce KVM_GET_SREGS2 / KVM_SET_SREGS2
->    KVM: x86: avoid loading PDPTRs after migration when possible
-> 
-> Sean Christopherson (3):
->    KVM: nVMX: Drop obsolete (and pointless) pdptrs_changed() check
->    KVM: nSVM: Drop pointless pdptrs_changed() check on nested transition
->    KVM: x86: Always load PDPTRs on CR3 load for SVM w/o NPT and a PAE
->      guest
-> 
->   Documentation/virt/kvm/api.rst  |  48 +++++++++
->   arch/x86/include/asm/kvm_host.h |   7 +-
->   arch/x86/include/uapi/asm/kvm.h |  13 +++
->   arch/x86/kvm/kvm_cache_regs.h   |  12 +++
->   arch/x86/kvm/svm/nested.c       |  39 +++++--
->   arch/x86/kvm/svm/svm.c          |   6 +-
->   arch/x86/kvm/vmx/nested.c       |  32 ++++--
->   arch/x86/kvm/x86.c              | 176 +++++++++++++++++++++-----------
->   include/uapi/linux/kvm.h        |   4 +
->   9 files changed, 253 insertions(+), 84 deletions(-)
-> 
+On Tue,  8 Jun 2021 17:48:02 +0200
+Jean-Philippe Brucker <jean-philippe@linaro.org> wrote:
 
-Queued, thanks.
+> In order to add a new "suspend" power state, replace power_off with
+> mp_state in struct kvm_vcpu_arch. Factor the vcpu_off() function while
+> we're here.
 
-Paolo
+Hi Jean-Phillipe,
+
+2 changes, so if you do end up doing a v2 I'd prefer the
+factor out of kvm_arm_vcpu_power_off() + possibly introduced
+kvm_arm_vcpu_is_off() using the old boolean.
+Then the change in how you track the state will be a bit easier to
+pick out.
+
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  6 ++++--
+>  arch/arm64/kvm/arm.c              | 29 +++++++++++++++--------------
+>  arch/arm64/kvm/psci.c             | 19 ++++++-------------
+>  3 files changed, 25 insertions(+), 29 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7cd7d5c8c4bc..55a04f4d5919 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -340,8 +340,8 @@ struct kvm_vcpu_arch {
+>  		u32	mdscr_el1;
+>  	} guest_debug_preserved;
+>  
+> -	/* vcpu power-off state */
+> -	bool power_off;
+> +	/* vcpu power state (runnable, stopped, halted) */
+> +	u32 mp_state;
+>  
+>  	/* Don't run the guest (internal implementation need) */
+>  	bool pause;
+> @@ -720,6 +720,8 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+>  			       struct kvm_device_attr *attr);
+>  int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>  			       struct kvm_device_attr *attr);
+> +void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
+> +bool kvm_arm_vcpu_is_off(struct kvm_vcpu *vcpu);
+>  
+>  /* Guest/host FPSIMD coordination helpers */
+>  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index e720148232a0..bcc24adb9c0a 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -435,21 +435,22 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  	vcpu->cpu = -1;
+>  }
+>  
+> -static void vcpu_power_off(struct kvm_vcpu *vcpu)
+> +void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+>  {
+> -	vcpu->arch.power_off = true;
+> +	vcpu->arch.mp_state = KVM_MP_STATE_STOPPED;
+>  	kvm_make_request(KVM_REQ_SLEEP, vcpu);
+>  	kvm_vcpu_kick(vcpu);
+>  }
+>  
+> +bool kvm_arm_vcpu_is_off(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->arch.mp_state == KVM_MP_STATE_STOPPED;
+> +}
+> +
+>  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+>  				    struct kvm_mp_state *mp_state)
+>  {
+> -	if (vcpu->arch.power_off)
+> -		mp_state->mp_state = KVM_MP_STATE_STOPPED;
+> -	else
+> -		mp_state->mp_state = KVM_MP_STATE_RUNNABLE;
+> -
+> +	mp_state->mp_state = vcpu->arch.mp_state;
+
+Nice to have a blank line here.
+
+>  	return 0;
+>  }
+>  
+> @@ -460,10 +461,10 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>  
+>  	switch (mp_state->mp_state) {
+>  	case KVM_MP_STATE_RUNNABLE:
+> -		vcpu->arch.power_off = false;
+> +		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+>  		break;
+>  	case KVM_MP_STATE_STOPPED:
+> -		vcpu_power_off(vcpu);
+> +		kvm_arm_vcpu_power_off(vcpu);
+>  		break;
+>  	default:
+>  		ret = -EINVAL;
+> @@ -483,7 +484,7 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
+>  {
+>  	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF);
+>  	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
+> -		&& !v->arch.power_off && !v->arch.pause);
+> +		&& !kvm_arm_vcpu_is_off(v) && !v->arch.pause);
+>  }
+>  
+>  bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+> @@ -643,10 +644,10 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
+>  	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
+>  
+>  	rcuwait_wait_event(wait,
+> -			   (!vcpu->arch.power_off) &&(!vcpu->arch.pause),
+> +			   !kvm_arm_vcpu_is_off(vcpu) && !vcpu->arch.pause,
+>  			   TASK_INTERRUPTIBLE);
+>  
+> -	if (vcpu->arch.power_off || vcpu->arch.pause) {
+> +	if (kvm_arm_vcpu_is_off(vcpu) || vcpu->arch.pause) {
+>  		/* Awaken to handle a signal, request we sleep again later. */
+>  		kvm_make_request(KVM_REQ_SLEEP, vcpu);
+>  	}
+> @@ -1087,9 +1088,9 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>  	 * Handle the "start in power-off" case.
+>  	 */
+>  	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
+> -		vcpu_power_off(vcpu);
+> +		kvm_arm_vcpu_power_off(vcpu);
+>  	else
+> -		vcpu->arch.power_off = false;
+> +		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+>  
+>  	return 0;
+>  }
+> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> index db4056ecccfd..24b4a2265dbd 100644
+> --- a/arch/arm64/kvm/psci.c
+> +++ b/arch/arm64/kvm/psci.c
+> @@ -52,13 +52,6 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
+>  	return PSCI_RET_SUCCESS;
+>  }
+>  
+> -static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
+> -{
+> -	vcpu->arch.power_off = true;
+> -	kvm_make_request(KVM_REQ_SLEEP, vcpu);
+> -	kvm_vcpu_kick(vcpu);
+> -}
+> -
+>  static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  {
+>  	struct vcpu_reset_state *reset_state;
+> @@ -78,7 +71,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	 */
+>  	if (!vcpu)
+>  		return PSCI_RET_INVALID_PARAMS;
+> -	if (!vcpu->arch.power_off) {
+> +	if (!kvm_arm_vcpu_is_off(vcpu)) {
+>  		if (kvm_psci_version(source_vcpu, kvm) != KVM_ARM_PSCI_0_1)
+>  			return PSCI_RET_ALREADY_ON;
+>  		else
+> @@ -107,7 +100,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	 */
+>  	smp_wmb();
+>  
+> -	vcpu->arch.power_off = false;
+> +	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+>  	kvm_vcpu_wake_up(vcpu);
+>  
+>  	return PSCI_RET_SUCCESS;
+> @@ -142,7 +135,7 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+>  		mpidr = kvm_vcpu_get_mpidr_aff(tmp);
+>  		if ((mpidr & target_affinity_mask) == target_affinity) {
+>  			matching_cpus++;
+> -			if (!tmp->arch.power_off)
+> +			if (!kvm_arm_vcpu_is_off(tmp))
+>  				return PSCI_0_2_AFFINITY_LEVEL_ON;
+>  		}
+>  	}
+> @@ -168,7 +161,7 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
+>  	 * re-initialized.
+>  	 */
+>  	kvm_for_each_vcpu(i, tmp, vcpu->kvm)
+> -		tmp->arch.power_off = true;
+> +		tmp->arch.mp_state = KVM_MP_STATE_STOPPED;
+>  	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
+>  
+>  	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
+> @@ -237,7 +230,7 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+>  		val = kvm_psci_vcpu_suspend(vcpu);
+>  		break;
+>  	case PSCI_0_2_FN_CPU_OFF:
+> -		kvm_psci_vcpu_off(vcpu);
+> +		kvm_arm_vcpu_power_off(vcpu);
+>  		val = PSCI_RET_SUCCESS;
+>  		break;
+>  	case PSCI_0_2_FN_CPU_ON:
+> @@ -350,7 +343,7 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+>  
+>  	switch (psci_fn) {
+>  	case KVM_PSCI_FN_CPU_OFF:
+> -		kvm_psci_vcpu_off(vcpu);
+> +		kvm_arm_vcpu_power_off(vcpu);
+>  		val = PSCI_RET_SUCCESS;
+>  		break;
+>  	case KVM_PSCI_FN_CPU_ON:
 
