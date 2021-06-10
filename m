@@ -2,240 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 68AB83A28BE
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 11:52:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 40CB13A2944
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 12:21:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230212AbhFJJxx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 05:53:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60217 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229966AbhFJJxx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 05:53:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623318717;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=oTD4X05DmvXZmZ+nk5ppfERwzEcj05YeBZi3dJeI59Y=;
-        b=dwN0DjL7WDETRz5J28mxzglzhx/S/CgI1gn4PFDTvpCqgC6j8AlGP6aulF/YP4h4hzpVmK
-        WLeJ6sRhLY31QEF9UgRfxvX51pRfpg9dOAdzGMcDYML48cpqfjKhmimTVg9u4T1GwY48XC
-        AlPb9x50mRsETCDyGGus4eQT6E84xaQ=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-iXLfwEEnN6Ksui0uq2pqmw-1; Thu, 10 Jun 2021 05:51:56 -0400
-X-MC-Unique: iXLfwEEnN6Ksui0uq2pqmw-1
-Received: by mail-ej1-f71.google.com with SMTP id am5-20020a1709065685b02903eef334e563so8809683ejc.2
-        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 02:51:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=oTD4X05DmvXZmZ+nk5ppfERwzEcj05YeBZi3dJeI59Y=;
-        b=UCvj3sqpcu79AiMOV472gyc6NdXSzqKJGHkN7uw+ZaJ7oTY7ztDLsVl9WUA1OrztSg
-         0rPQzmZWnNgW9+ffhqjl5DWiTAYExejOrrWhELKWWRSce3hK9oXToThFJzGDcJ8alPkS
-         Qvsx+19WLLxGp5vFBc58ZeHjDkIgoZ6TQP1t9iOBLsGqhngXcg4NVirgEPEFkhTdHG4Z
-         WVeFqAd1QnyZkDifGWpaWrUn9izlK9su0D1aoSIwVkH/MYwCTTkFlOC91vVJ3NEWOCQY
-         F+tolrcodK983HIB1D2k7/aAaGjRbU8eGO2jnrSki7ouTcdTyDjQW9MsOS1/2yxYZpGl
-         jxNA==
-X-Gm-Message-State: AOAM530CAA2eNBB+Zeo4P5M27ljS2pSiBsD2/M/ZD5wTo+AqJEDnd1gy
-        Zl29SzQWoH7BruwYKfdGM1x8zJN1cCjtzI2uMdrXNb5DJ5hlDdLoeYleuPFkdguxgNhno1YLY9l
-        Mm8Q/kFV+Qnkd
-X-Received: by 2002:a17:906:546:: with SMTP id k6mr3667876eja.53.1623318714862;
-        Thu, 10 Jun 2021 02:51:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxAt+GEShJ3nyodJQl9prURDNMT3FZNtNtpzfzWl5Wsj4as49iUo+FaYaGvMJnyLT6U5H9b0g==
-X-Received: by 2002:a17:906:546:: with SMTP id k6mr3667844eja.53.1623318714647;
-        Thu, 10 Jun 2021 02:51:54 -0700 (PDT)
-Received: from steredhat (host-79-18-148-79.retail.telecomitalia.it. [79.18.148.79])
-        by smtp.gmail.com with ESMTPSA id h19sm804248ejy.82.2021.06.10.02.51.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Jun 2021 02:51:54 -0700 (PDT)
-Date:   Thu, 10 Jun 2021 11:51:51 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>,
-        "Jiang Wang ." <jiang.wang@bytedance.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Arseny Krasnov <arseny.krasnov@kaspersky.com>,
-        jhansen@vmware.comments, cong.wang@bytedance.com,
-        Xiongchun Duan <duanxiongchun@bytedance.com>,
-        Yongji Xie <xieyongji@bytedance.com>,
-        =?utf-8?B?5p+056iz?= <chaiwen.cc@bytedance.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Lu Wei <luwei32@huawei.com>,
-        Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
-        Networking <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [RFC v1 0/6] virtio/vsock: introduce SOCK_DGRAM support
-Message-ID: <20210610095151.2cpyny56kbotzppp@steredhat>
-References: <20210609232501.171257-1-jiang.wang@bytedance.com>
- <da90f17a-1c24-b475-76ef-f6a7fc2bcdd5@redhat.com>
- <CAP_N_Z_VDd+JUJ_Y-peOEc7FgwNGB8O3uZpVumQT_DbW62Jpjw@mail.gmail.com>
- <ac0c241c-1013-1304-036f-504d0edc5fd7@redhat.com>
- <20210610072358.3fuvsahxec2sht4y@steredhat>
- <47ce307b-f95e-25c7-ed58-9cd1cbff5b57@redhat.com>
+        id S230236AbhFJKXI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 06:23:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47076 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229961AbhFJKXH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Jun 2021 06:23:07 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CC18C061574;
+        Thu, 10 Jun 2021 03:21:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=h/muEhpxVB/fiLZzxDtNWLmprGe33vvGrnl4EIsyiME=; b=C9711rfL7VWAOpk6sJJ9J7J/I1
+        zaCKOfBhOnlG98lP2S47uOkx7vj7XIY74Syna8t0J7A1iYuJdd5jZhyvArBg8tCPqpHoWNsbbwVGt
+        6mpY4+CRaLfOMN2C51RUHQPX7MV8AdfqjOf65GQVVg5gXj1lgemfVVOS86BOXJvFafieSbfH8S/bu
+        uU96SaHMvaBDL5GEwfMIpu6IuPe2p6GPGLwwriTEo/pobY5OPGk0ZcuPxTcePBSm1p+CeuSgqS2k9
+        lGVGbKGFQ34etlCs0UaYdXjTcacWG1COJwp9YBMrI9vNveIAm78LmGJGideBbJIcU/37qrHKKYLp6
+        GoVRv4AQ==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lrHmr-001UFJ-SK; Thu, 10 Jun 2021 10:19:49 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id BC91B300258;
+        Thu, 10 Jun 2021 12:19:43 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id AB1BB20811810; Thu, 10 Jun 2021 12:19:43 +0200 (CEST)
+Date:   Thu, 10 Jun 2021 12:19:43 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v4 3/6] x86/sev-es: Split up runtime #VC handler for
+ correct state tracking
+Message-ID: <YMHnP1qgvznyYazv@hirez.programming.kicks-ass.net>
+References: <20210610091141.30322-1-joro@8bytes.org>
+ <20210610091141.30322-4-joro@8bytes.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <47ce307b-f95e-25c7-ed58-9cd1cbff5b57@redhat.com>
+In-Reply-To: <20210610091141.30322-4-joro@8bytes.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 10, 2021 at 03:46:55PM +0800, Jason Wang wrote:
->
->在 2021/6/10 下午3:23, Stefano Garzarella 写道:
->>On Thu, Jun 10, 2021 at 12:02:35PM +0800, Jason Wang wrote:
->>>
->>>在 2021/6/10 上午11:43, Jiang Wang . 写道:
->>>>On Wed, Jun 9, 2021 at 6:51 PM Jason Wang <jasowang@redhat.com> wrote:
->>>>>
->>>>>在 2021/6/10 上午7:24, Jiang Wang 写道:
->>>>>>This patchset implements support of SOCK_DGRAM for virtio
->>>>>>transport.
->>>>>>
->>>>>>Datagram sockets are connectionless and unreliable. To avoid 
->>>>>>unfair contention
->>>>>>with stream and other sockets, add two more virtqueues and
->>>>>>a new feature bit to indicate if those two new queues exist or not.
->>>>>>
->>>>>>Dgram does not use the existing credit update mechanism for
->>>>>>stream sockets. When sending from the guest/driver, sending packets
->>>>>>synchronously, so the sender will get an error when the 
->>>>>>virtqueue is full.
->>>>>>When sending from the host/device, send packets asynchronously
->>>>>>because the descriptor memory belongs to the corresponding QEMU
->>>>>>process.
->>>>>
->>>>>What's the use case for the datagram vsock?
->>>>>
->>>>One use case is for non critical info logging from the guest
->>>>to the host, such as the performance data of some applications.
->>>
->>>
->>>Anything that prevents you from using the stream socket?
->>>
->>>
->>>>
->>>>It can also be used to replace UDP communications between
->>>>the guest and the host.
->>>
->>>
->>>Any advantage for VSOCK in this case? Is it for performance (I 
->>>guess not since I don't exepct vsock will be faster).
->>
->>I think the general advantage to using vsock are for the guest 
->>agents that potentially don't need any configuration.
->
->
->Right, I wonder if we really need datagram consider the host to guest 
->communication is reliable.
->
->(Note that I don't object it since vsock has already supported that, 
->just wonder its use cases)
 
-Yep, it was the same concern I had :-)
-Also because we're now adding SEQPACKET, which provides reliable 
-datagram support.
+Bah, I suppose the trouble is that this SEV crap requires PARAVIRT?
 
-But IIUC the use case is the logging where you don't need a reliable 
-communication and you want to avoid to keep more open connections with 
-different guests.
+I should really get around to fixing noinstr validation with PARAVIRT on
+:-(
 
-So the server in the host can be pretty simple and doesn't have to 
-handle connections. It just waits for datagrams on a port.
+On Thu, Jun 10, 2021 at 11:11:38AM +0200, Joerg Roedel wrote:
 
->
->
->>
->>>
->>>An obvious drawback is that it breaks the migration. Using UDP you 
->>>can have a very rich features support from the kernel where vsock 
->>>can't.
->>>
->>
->>Thanks for bringing this up!
->>What features does UDP support and datagram on vsock could not support?
->
->
->E.g the sendpage() and busy polling. And using UDP means qdiscs and 
->eBPF can work.
+> +static void vc_handle_from_kernel(struct pt_regs *regs, unsigned long error_code)
 
-Thanks, I see!
+static noinstr ...
 
->
->
->>
->>>
->>>>
->>>>>>The virtio spec patch is here:
->>>>>>https://www.spinics.net/lists/linux-virtualization/msg50027.html
->>>>>
->>>>>Have a quick glance, I suggest to split mergeable rx buffer into an
->>>>>separate patch.
->>>>Sure.
->>>>
->>>>>But I think it's time to revisit the idea of unifying the 
->>>>>virtio-net and
->>>>>virtio-vsock. Otherwise we're duplicating features and bugs.
->>>>For mergeable rxbuf related code, I think a set of common helper
->>>>functions can be used by both virtio-net and virtio-vsock. For other
->>>>parts, that may not be very beneficial. I will think about more.
->>>>
->>>>If there is a previous email discussion about this topic, could 
->>>>you send me
->>>>some links? I did a quick web search but did not find any related
->>>>info. Thanks.
->>>
->>>
->>>We had a lot:
->>>
->>>[1] https://patchwork.kernel.org/project/kvm/patch/5BDFF537.3050806@huawei.com/
->>>[2] https://lists.linuxfoundation.org/pipermail/virtualization/2018-November/039798.html
->>>[3] https://www.lkml.org/lkml/2020/1/16/2043
->>>
->>
->>When I tried it, the biggest problem that blocked me were all the 
->>features strictly related to TCP/IP stack and ethernet devices that 
->>vsock device doesn't know how to handle: TSO, GSO, checksums, MAC, 
->>napi, xdp, min ethernet frame size, MTU, etc.
->
->
->It depends on which level we want to share:
->
->1) sharing codes
->2) sharing devices
->3) make vsock a protocol that is understood by the network core
->
->We can start from 1), the low level tx/rx logic can be shared at both 
->virtio-net and vhost-net. For 2) we probably need some work on the 
->spec, probably with a new feature bit to demonstrate that it's a vsock 
->device not a ethernet device. Then if it is probed as a vsock device we 
->won't let packet to be delivered in the TCP/IP stack. For 3), it would 
->be even harder and I'm not sure it's worth to do that.
->
->
->>
->>So in my opinion to unify them is not so simple, because vsock is not 
->>really an ethernet device, but simply a socket.
->
->
->We can start from sharing codes.
+> +{
+> +	irqentry_state_t irq_state = irqentry_nmi_enter(regs);
+>  
+> +	instrumentation_begin();
+>  
+> +	if (!vc_raw_handle_exception(regs, error_code)) {
+>  		/* Show some debug info */
+>  		show_regs(regs);
+>  
+> @@ -1434,7 +1400,59 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
+>  		panic("Returned from Terminate-Request to Hypervisor\n");
+>  	}
+>  
+> +	instrumentation_end();
+> +	irqentry_nmi_exit(regs, irq_state);
+> +}
+> +
+> +static void vc_handle_from_user(struct pt_regs *regs, unsigned long error_code)
 
-Yep, I agree, and maybe the mergeable buffer is a good starting point to 
-share code!
+static noinstr ...
 
-@Jiang, do you want to take a look of this possibility?
+> +{
+> +	irqentry_state_t irq_state = irqentry_enter(regs);
+> +
+> +	instrumentation_begin();
+> +
+> +	if (!vc_raw_handle_exception(regs, error_code)) {
+> +		/*
+> +		 * Do not kill the machine if user-space triggered the
+> +		 * exception. Send SIGBUS instead and let user-space deal with
+> +		 * it.
+> +		 */
+> +		force_sig_fault(SIGBUS, BUS_OBJERR, (void __user *)0);
+> +	}
+> +
+> +	instrumentation_end();
+> +	irqentry_exit(regs, irq_state);
+> +}
 
-Thanks,
-Stefano
++ linebreak
 
+> +/*
+> + * Main #VC exception handler. It is called when the entry code was able to
+> + * switch off the IST to a safe kernel stack.
+> + *
+> + * With the current implementation it is always possible to switch to a safe
+> + * stack because #VC exceptions only happen at known places, like intercepted
+> + * instructions or accesses to MMIO areas/IO ports. They can also happen with
+> + * code instrumentation when the hypervisor intercepts #DB, but the critical
+> + * paths are forbidden to be instrumented, so #DB exceptions currently also
+> + * only happen in safe places.
+> + */
+> +DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
+> +{
+> +	/*
+> +	 * Handle #DB before calling into !noinstr code to avoid recursive #DB.
+> +	 */
+> +	if (error_code == SVM_EXIT_EXCP_BASE + X86_TRAP_DB) {
+> +		vc_handle_trap_db(regs);
+> +		return;
+> +	}
+> +
+> +	/*
+> +	 * This is invoked through an interrupt gate, so IRQs are disabled. The
+> +	 * code below might walk page-tables for user or kernel addresses, so
+> +	 * keep the IRQs disabled to protect us against concurrent TLB flushes.
+> +	 */
+> +
+> +	if (user_mode(regs))
+> +		vc_handle_from_user(regs, error_code);
+> +	else
+> +		vc_handle_from_kernel(regs, error_code);
+>  }
+
+#DB and MCE use idtentry_mce_db and split out in asm. When I look at
+idtentry_vc, it appears to me that VC_SAFE_STACK already implies
+from-user, or am I reading that wrong?
+
+Ah, it appears you're muddling things up again by then also calling
+safe_stack_ from exc_.
+
+How about you don't do that and have exc_ call your new from_kernel
+function, then we know that safe_stack_ is always from-user. Then also
+maybe do:
+
+	s/VS_SAFE_STACK/VC_USER/
+	s/safe_stack_/noist_/
+
+to match all the others (#DB/MCE).
+
+Also, AFAICT, you don't actually need DEFINE_IDTENTRY_VC_IST, it doesn't
+have an ASM counterpart.
+
+So then you end up with something like:
+
+DEFINE_IDTENTRY_VC(exc_vc)
+{
+	if (unlikely(on_vc_fallback_stack(regs))) {
+		instrumentation_begin();
+		panic("boohooo\n");
+		instrumentation_end();
+	}
+
+	vc_from_kernel();
+}
+
+DEFINE_IDTENTRY_VC_USER(exc_vc)
+{
+	vc_from_user();
+}
+
+Which is, I'm thinking, much simpler, no?
