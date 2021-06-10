@@ -2,266 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 71A753A313A
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 18:45:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 43D6F3A3146
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 18:46:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231316AbhFJQrp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 12:47:45 -0400
-Received: from mail-ot1-f50.google.com ([209.85.210.50]:46051 "EHLO
-        mail-ot1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231423AbhFJQro (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Jun 2021 12:47:44 -0400
-Received: by mail-ot1-f50.google.com with SMTP id 6-20020a9d07860000b02903e83bf8f8fcso282640oto.12
-        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 09:45:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=g8tVa/tKF1Z1CFOTKrCMtVkTz0WRgBPyaTEt7gz3464=;
-        b=W1+d+fDE8NSQkxbRbfU7zYcFBjCkx/2su5gXnqeg4CLRMyq2bz8jAz/745Fm/ABMiE
-         g2JgptK7cOjALXDUq9nxVJg3FpvkS20L3IRxTQONFGFNt27nfkwUUVlXgV1DsvvzTn0X
-         OqEZ7Huloj8M/ZorHEkpoDbk4NE0IjYfU3040AtiyYJh9QRAr9YuwfjloRqge4dXayq2
-         VMY1bi5fnuQCxbJcbZoT/USdC4LvjjX+8LmLui/XyBjn4pBkdJ4wxVE69YC/7l8f9XdE
-         2RWjczc/NJLLLksutLckOMeJS23epSZ1ywSt33bO4g6igszI7OAXVuHXq/JU/RR2cGbr
-         5VnA==
+        id S231365AbhFJQsM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 12:48:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24873 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231484AbhFJQsK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 12:48:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623343574;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pmjeoZP2Zk9cpGLWV8EkH2NTyjrRS5zlwXdTRFtjA7s=;
+        b=BddZSZm+RypfUdxixOenAmsgn5VEsyCrySA43CWkVkYRd+0b0vwKDUMRLRqqiCy+4gvuOX
+        +sMLiutE9f9QRUZnZPKDR/k5wuLqdpmjSuz498mjhe8yeUVRsPsp7cI6HA6y8czTsJm1dA
+        mKtWhGDywG1is1wp+tsMZ2hPAtWG3ok=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-34-qwJevFKEMY6qXR-vOwrc3Q-1; Thu, 10 Jun 2021 12:46:12 -0400
+X-MC-Unique: qwJevFKEMY6qXR-vOwrc3Q-1
+Received: by mail-wm1-f69.google.com with SMTP id m23-20020a05600c3b17b02901b3e8a9db8eso1394282wms.6
+        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 09:46:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=g8tVa/tKF1Z1CFOTKrCMtVkTz0WRgBPyaTEt7gz3464=;
-        b=qdwvDzSJksTqOEnzWnXNAzRfy2orHs0MlTL2M25aQ6eH+6Bt8JyLOF4VEkM0L/vZwc
-         rMHnLaiQI0/5NMQoC5MMTMVMnW3oTD8+gd13Uz+jcSp6cWvwWyJ0rkZG7bd9QU5omAXj
-         5C7b32m5YrwtAEtYUuHNi37sL9UK+7zatImoyXS1FBCbaE7ty5ondFaEi5q3oUuhuCxY
-         QiFbsWku0KCi6l/v2a+5rjJ9jr2ryWs7beDHhl3qXCqMnSLecGtO/VexP2474o0FaibO
-         s1IK9PGhQKrV83bv/n/+fp41mKk2e6L8agrKejAi0jI6zIpEWsb06BomTYI+IRJw6P36
-         3gBg==
-X-Gm-Message-State: AOAM530RARTNzOwjYuybCTcr1AephoM0JwrfvmCuyeKAxsDVB2mFYoox
-        Nn5/cm2az2A4x91l4U7HFlWyec/NgovB+0dCKEPBQw==
-X-Google-Smtp-Source: ABdhPJynSuOt7MYRmCjZvAc5B4VmBGBKyZsPveniHvv9WSF0sbxlVWyakjj9xBT1MIK+WtKSHQrs2p3/PxCc3y/Cw4o=
-X-Received: by 2002:a05:6830:2117:: with SMTP id i23mr3087102otc.279.1623343473082;
- Thu, 10 Jun 2021 09:44:33 -0700 (PDT)
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=pmjeoZP2Zk9cpGLWV8EkH2NTyjrRS5zlwXdTRFtjA7s=;
+        b=QQ66UxcOCea860bvCxUU7cqMS98kiFOEA3VLeKqtxnOX0e2EDw8TnEZDvHHZu7y+fT
+         XNr1hDVG2ViS+U9FZeTSuojwyhQWsVZ9sYjJe+7YGWcB0EqhpnD9DiXmU/+O9o4XtwVa
+         8vjEqEukoXe5a9AkgYfudU5WeBkM/bTmGcIVHRHPEv3pzG2cKIcyB1pthBmPeHGRLyH+
+         ZIu+GBE9nBtpSHDu2VkbDv3tx4dJbzxWShdMZ4A9dvNLhgEdHLJg1zTMwKQ+Xo0aZhpL
+         hBqhqKqER8EaTTVvw0lSFq18X1HCCvAULRWeBwtKOi6pJYfCvw4Oge0RlUcs6wSqCYeJ
+         2SQw==
+X-Gm-Message-State: AOAM533cr3CDW3BB151ZqKeDpiTpW1T7jgA+AlMOGMk2wboaUP32/IT7
+        SFod1/tesaVnxw5aQxz7V2xUPepJajXPS5fTTIskz/PhEEYxc05H8aXY1VrZxWP+mp+QPUFGsnC
+        to3kPKMpeZjUO
+X-Received: by 2002:adf:f1cb:: with SMTP id z11mr6611947wro.2.1623343571740;
+        Thu, 10 Jun 2021 09:46:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyUfMy73RUGQtVL6eMZ0HpF2pAlTGaxCKpwYBu5GL/GZakJJNUaPWWZRvrLtTVMobB7MLHKLQ==
+X-Received: by 2002:adf:f1cb:: with SMTP id z11mr6611916wro.2.1623343571544;
+        Thu, 10 Jun 2021 09:46:11 -0700 (PDT)
+Received: from ?IPv6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
+        by smtp.gmail.com with ESMTPSA id p6sm4266126wrf.51.2021.06.10.09.46.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Jun 2021 09:46:11 -0700 (PDT)
+Subject: Re: [PATCH v7 0/4] KVM statistics data fd-based binary interface
+To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+References: <20210603211426.790093-1-jingzhangos@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <873a0398-09fc-0278-3f0c-884b73dad3aa@redhat.com>
+Date:   Thu, 10 Jun 2021 18:46:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-References: <20210609232501.171257-1-jiang.wang@bytedance.com>
- <da90f17a-1c24-b475-76ef-f6a7fc2bcdd5@redhat.com> <CAP_N_Z_VDd+JUJ_Y-peOEc7FgwNGB8O3uZpVumQT_DbW62Jpjw@mail.gmail.com>
- <ac0c241c-1013-1304-036f-504d0edc5fd7@redhat.com> <20210610072358.3fuvsahxec2sht4y@steredhat>
- <47ce307b-f95e-25c7-ed58-9cd1cbff5b57@redhat.com> <20210610095151.2cpyny56kbotzppp@steredhat>
-In-Reply-To: <20210610095151.2cpyny56kbotzppp@steredhat>
-From:   "Jiang Wang ." <jiang.wang@bytedance.com>
-Date:   Thu, 10 Jun 2021 09:44:22 -0700
-Message-ID: <CAP_N_Z8u5U2yxMWG2bNgp1cbRcVqv4gEHA_i-4=r9h1HFFGYOA@mail.gmail.com>
-Subject: Re: Re: [RFC v1 0/6] virtio/vsock: introduce SOCK_DGRAM support
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        virtualization@lists.linux-foundation.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Arseny Krasnov <arseny.krasnov@kaspersky.com>,
-        cong.wang@bytedance.com,
-        Xiongchun Duan <duanxiongchun@bytedance.com>,
-        Yongji Xie <xieyongji@bytedance.com>,
-        =?UTF-8?B?5p+056iz?= <chaiwen.cc@bytedance.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Lu Wei <luwei32@huawei.com>,
-        Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
-        Networking <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20210603211426.790093-1-jingzhangos@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 10, 2021 at 2:52 AM Stefano Garzarella <sgarzare@redhat.com> wr=
-ote:
->
-> On Thu, Jun 10, 2021 at 03:46:55PM +0800, Jason Wang wrote:
-> >
-> >=E5=9C=A8 2021/6/10 =E4=B8=8B=E5=8D=883:23, Stefano Garzarella =E5=86=99=
-=E9=81=93:
-> >>On Thu, Jun 10, 2021 at 12:02:35PM +0800, Jason Wang wrote:
-> >>>
-> >>>=E5=9C=A8 2021/6/10 =E4=B8=8A=E5=8D=8811:43, Jiang Wang . =E5=86=99=E9=
-=81=93:
-> >>>>On Wed, Jun 9, 2021 at 6:51 PM Jason Wang <jasowang@redhat.com> wrote=
-:
-> >>>>>
-> >>>>>=E5=9C=A8 2021/6/10 =E4=B8=8A=E5=8D=887:24, Jiang Wang =E5=86=99=E9=
-=81=93:
-> >>>>>>This patchset implements support of SOCK_DGRAM for virtio
-> >>>>>>transport.
-> >>>>>>
-> >>>>>>Datagram sockets are connectionless and unreliable. To avoid
-> >>>>>>unfair contention
-> >>>>>>with stream and other sockets, add two more virtqueues and
-> >>>>>>a new feature bit to indicate if those two new queues exist or not.
-> >>>>>>
-> >>>>>>Dgram does not use the existing credit update mechanism for
-> >>>>>>stream sockets. When sending from the guest/driver, sending packets
-> >>>>>>synchronously, so the sender will get an error when the
-> >>>>>>virtqueue is full.
-> >>>>>>When sending from the host/device, send packets asynchronously
-> >>>>>>because the descriptor memory belongs to the corresponding QEMU
-> >>>>>>process.
-> >>>>>
-> >>>>>What's the use case for the datagram vsock?
-> >>>>>
-> >>>>One use case is for non critical info logging from the guest
-> >>>>to the host, such as the performance data of some applications.
-> >>>
-> >>>
-> >>>Anything that prevents you from using the stream socket?
-> >>>
-> >>>
-> >>>>
-> >>>>It can also be used to replace UDP communications between
-> >>>>the guest and the host.
-> >>>
-> >>>
-> >>>Any advantage for VSOCK in this case? Is it for performance (I
-> >>>guess not since I don't exepct vsock will be faster).
-> >>
-> >>I think the general advantage to using vsock are for the guest
-> >>agents that potentially don't need any configuration.
-> >
-> >
-> >Right, I wonder if we really need datagram consider the host to guest
-> >communication is reliable.
-> >
-> >(Note that I don't object it since vsock has already supported that,
-> >just wonder its use cases)
->
-> Yep, it was the same concern I had :-)
-> Also because we're now adding SEQPACKET, which provides reliable
-> datagram support.
->
-> But IIUC the use case is the logging where you don't need a reliable
-> communication and you want to avoid to keep more open connections with
-> different guests.
->
-> So the server in the host can be pretty simple and doesn't have to
-> handle connections. It just waits for datagrams on a port.
+On 03/06/21 23:14, Jing Zhang wrote:
+> This patchset provides a file descriptor for every VM and VCPU to read
+> KVM statistics data in binary format.
+> It is meant to provide a lightweight, flexible, scalable and efficient
+> lock-free solution for user space telemetry applications to pull the
+> statistics data periodically for large scale systems. The pulling
+> frequency could be as high as a few times per second.
+> In this patchset, every statistics data are treated to have some
+> attributes as below:
+>    * architecture dependent or generic
+>    * VM statistics data or VCPU statistics data
+>    * type: cumulative, instantaneous,
+>    * unit: none for simple counter, nanosecond, microsecond,
+>      millisecond, second, Byte, KiByte, MiByte, GiByte. Clock Cycles
+> Since no lock/synchronization is used, the consistency between all
+> the statistics data is not guaranteed. That means not all statistics
+> data are read out at the exact same time, since the statistics date
+> are still being updated by KVM subsystems while they are read out.
+> 
+> ---
+> 
+> * v6 -> v7
+>    - Improve file descriptor allocation function by Krish suggestion
+>    - Use "generic stats" instead of "common stats" as Krish suggested
+>    - Addressed some other nits from Krish and David Matlack
+> 
+> * v5 -> v6
+>    - Use designated initializers for STATS_DESC
+>    - Change KVM_STATS_SCALE... to KVM_STATS_BASE...
+>    - Use a common function for kvm_[vm|vcpu]_stats_read
+>    - Fix some documentation errors/missings
+>    - Use TEST_ASSERT in selftest
+>    - Use a common function for [vm|vcpu]_stats_test in selftest
+> 
+> * v4 -> v5
+>    - Rebase to kvm/queue, commit a4345a7cecfb ("Merge tag
+>      'kvmarm-fixes-5.13-1'")
+>    - Change maximum stats name length to 48
+>    - Replace VM_STATS_COMMON/VCPU_STATS_COMMON macros with stats
+>      descriptor definition macros.
+>    - Fixed some errors/warnings reported by checkpatch.pl
+> 
+> * v3 -> v4
+>    - Rebase to kvm/queue, commit 9f242010c3b4 ("KVM: avoid "deadlock"
+>      between install_new_memslots and MMU notifier")
+>    - Use C-stype comments in the whole patch
+>    - Fix wrong count for x86 VCPU stats descriptors
+>    - Fix KVM stats data size counting and validity check in selftest
+> 
+> * v2 -> v3
+>    - Rebase to kvm/queue, commit edf408f5257b ("KVM: avoid "deadlock"
+>      between install_new_memslots and MMU notifier")
+>    - Resolve some nitpicks about format
+> 
+> * v1 -> v2
+>    - Use ARRAY_SIZE to count the number of stats descriptors
+>    - Fix missing `size` field initialization in macro STATS_DESC
+> 
+> [1] https://lore.kernel.org/kvm/20210402224359.2297157-1-jingzhangos@google.com
+> [2] https://lore.kernel.org/kvm/20210415151741.1607806-1-jingzhangos@google.com
+> [3] https://lore.kernel.org/kvm/20210423181727.596466-1-jingzhangos@google.com
+> [4] https://lore.kernel.org/kvm/20210429203740.1935629-1-jingzhangos@google.com
+> [5] https://lore.kernel.org/kvm/20210517145314.157626-1-jingzhangos@google.com
+> [6] https://lore.kernel.org/kvm/20210524151828.4113777-1-jingzhangos@google.com
+> 
+> ---
+> 
+> Jing Zhang (4):
+>    KVM: stats: Separate generic stats from architecture specific ones
+>    KVM: stats: Add fd-based API to read binary stats data
+>    KVM: stats: Add documentation for statistics data binary interface
+>    KVM: selftests: Add selftest for KVM statistics data binary interface
+> 
+>   Documentation/virt/kvm/api.rst                | 180 +++++++++++++++
+>   arch/arm64/include/asm/kvm_host.h             |   9 +-
+>   arch/arm64/kvm/guest.c                        |  38 +++-
+>   arch/mips/include/asm/kvm_host.h              |   9 +-
+>   arch/mips/kvm/mips.c                          |  64 +++++-
+>   arch/powerpc/include/asm/kvm_host.h           |   9 +-
+>   arch/powerpc/kvm/book3s.c                     |  64 +++++-
+>   arch/powerpc/kvm/book3s_hv.c                  |  12 +-
+>   arch/powerpc/kvm/book3s_pr.c                  |   2 +-
+>   arch/powerpc/kvm/book3s_pr_papr.c             |   2 +-
+>   arch/powerpc/kvm/booke.c                      |  59 ++++-
+>   arch/s390/include/asm/kvm_host.h              |   9 +-
+>   arch/s390/kvm/kvm-s390.c                      | 129 ++++++++++-
+>   arch/x86/include/asm/kvm_host.h               |   9 +-
+>   arch/x86/kvm/x86.c                            |  67 +++++-
+>   include/linux/kvm_host.h                      | 141 +++++++++++-
+>   include/linux/kvm_types.h                     |  12 +
+>   include/uapi/linux/kvm.h                      |  50 ++++
+>   tools/testing/selftests/kvm/.gitignore        |   1 +
+>   tools/testing/selftests/kvm/Makefile          |   3 +
+>   .../testing/selftests/kvm/include/kvm_util.h  |   3 +
+>   .../selftests/kvm/kvm_binary_stats_test.c     | 215 ++++++++++++++++++
+>   tools/testing/selftests/kvm/lib/kvm_util.c    |  12 +
+>   virt/kvm/kvm_main.c                           | 169 +++++++++++++-
+>   24 files changed, 1178 insertions(+), 90 deletions(-)
+>   create mode 100644 tools/testing/selftests/kvm/kvm_binary_stats_test.c
+> 
+> 
+> base-commit: a4345a7cecfb91ae78cd43d26b0c6a956420761a
+> 
 
-Yes. With datagram sockets, the application code is simpler than the stream
-sockets. Also, it will be easier to port existing applications written
-for dgram,
-such as UDP or unix domain socket with datagram types to the vsock
-dgram sockets.
+I had a few remarks, but it looks very nice overall.
 
-Compared to UDP, the vsock dgram has a minimum configuration. When
-sending data from the guest to the host, the client in the guest knows
-the host CID will always be 2. For UDP, the host IP may change depending
-on the configuration.
+Thanks!
 
-The advantage over UNIX domain sockets is more obvious. We
-have some applications talking to each other with UNIX domain sockets,
-but now the applications are running inside VMs, so we will need to
-use vsock and those applications use datagram types, so it is natural
-and simpler if vsock has datagram types too.
+Paolo
 
-And we can also run applications for vmware vsock dgram on
-the QEMU directly.
-
-btw, SEQPACKET also supports datagram, but the application code
-logic is similar to stream sockets and the server needs to maintain
-connections.
-
-> >
-> >
-> >>
-> >>>
-> >>>An obvious drawback is that it breaks the migration. Using UDP you
-> >>>can have a very rich features support from the kernel where vsock
-> >>>can't.
-> >>>
-> >>
-> >>Thanks for bringing this up!
-> >>What features does UDP support and datagram on vsock could not support?
-> >
-> >
-> >E.g the sendpage() and busy polling. And using UDP means qdiscs and
-> >eBPF can work.
->
-> Thanks, I see!
->
-> >
-> >
-> >>
-> >>>
-> >>>>
-> >>>>>>The virtio spec patch is here:
-> >>>>>>https://www.spinics.net/lists/linux-virtualization/msg50027.html
-> >>>>>
-> >>>>>Have a quick glance, I suggest to split mergeable rx buffer into an
-> >>>>>separate patch.
-> >>>>Sure.
-> >>>>
-> >>>>>But I think it's time to revisit the idea of unifying the
-> >>>>>virtio-net and
-> >>>>>virtio-vsock. Otherwise we're duplicating features and bugs.
-> >>>>For mergeable rxbuf related code, I think a set of common helper
-> >>>>functions can be used by both virtio-net and virtio-vsock. For other
-> >>>>parts, that may not be very beneficial. I will think about more.
-> >>>>
-> >>>>If there is a previous email discussion about this topic, could
-> >>>>you send me
-> >>>>some links? I did a quick web search but did not find any related
-> >>>>info. Thanks.
-> >>>
-> >>>
-> >>>We had a lot:
-> >>>
-> >>>[1] https://patchwork.kernel.org/project/kvm/patch/5BDFF537.3050806@hu=
-awei.com/
-> >>>[2] https://lists.linuxfoundation.org/pipermail/virtualization/2018-No=
-vember/039798.html
-> >>>[3] https://www.lkml.org/lkml/2020/1/16/2043
-> >>>
-Got it. I will check, thanks.
-
-> >>When I tried it, the biggest problem that blocked me were all the
-> >>features strictly related to TCP/IP stack and ethernet devices that
-> >>vsock device doesn't know how to handle: TSO, GSO, checksums, MAC,
-> >>napi, xdp, min ethernet frame size, MTU, etc.
-> >
-> >
-> >It depends on which level we want to share:
-> >
-> >1) sharing codes
-> >2) sharing devices
-> >3) make vsock a protocol that is understood by the network core
-> >
-> >We can start from 1), the low level tx/rx logic can be shared at both
-> >virtio-net and vhost-net. For 2) we probably need some work on the
-> >spec, probably with a new feature bit to demonstrate that it's a vsock
-> >device not a ethernet device. Then if it is probed as a vsock device we
-> >won't let packet to be delivered in the TCP/IP stack. For 3), it would
-> >be even harder and I'm not sure it's worth to do that.
-> >
-> >
-> >>
-> >>So in my opinion to unify them is not so simple, because vsock is not
-> >>really an ethernet device, but simply a socket.
-> >
-> >
-> >We can start from sharing codes.
->
-> Yep, I agree, and maybe the mergeable buffer is a good starting point to
-> share code!
->
-> @Jiang, do you want to take a look of this possibility?
-
-Yes. I already read code about mergeable buffer in virtio-net, which I thin=
-k
-is the only place so far to use it. I will check how to share the code.
-
-Thanks for all the comments.
-
-> Thanks,
-> Stefano
->
