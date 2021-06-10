@@ -2,205 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ADF333A321D
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 19:30:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7ECE23A3241
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 19:37:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231153AbhFJRcX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 13:32:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58116 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230304AbhFJRcX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Jun 2021 13:32:23 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C200C0617A6
-        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 10:30:26 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id p17so4471588lfc.6
-        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 10:30:26 -0700 (PDT)
+        id S231389AbhFJRjO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 13:39:14 -0400
+Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:11118 "EHLO
+        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230294AbhFJRjN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Jun 2021 13:39:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ioyoetTgICcLM1co3hfV64SuUDGjPwWrOEhUg6YRdzA=;
-        b=sB636TtZaglUv0NqmI1HpIzfYrhUSTp9FixNWI9fognuH/4ofXLUg+MSlnb2BDSSyN
-         bgnFZfMxacXrj0hNr6tDOdoml3bY+2lbyLUAyEKLvnLWT7tJSaxJLC0mgWCmXMvMnyAQ
-         bMs2u4sRM1T3OLRa51TrmGDRFH7Vf5Wiy85zTz2MqnpRupCEb/JjKxMw1Agfj3wZFoPK
-         ooNOedia0wjF8Pc4yXynatPRf2IlXw+bcRHe4XFCZF+nbbTf6RpzpD5vzpDgsG9SDJZY
-         OEHcYcSHBHpXfdz2wuVM6nBemDB70pPK+Ah47MF4RTTc4GV8pH3D2tehvv7lI3OgNyw+
-         8cQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ioyoetTgICcLM1co3hfV64SuUDGjPwWrOEhUg6YRdzA=;
-        b=NOaNUwlEZr8SG3Tnj2axbCEv+eKCf2KQwkPGHab0FuYZvUEHK1n7rMT1TaMOc7XZ75
-         WGku05QZENWNHRRnVhGcMhegDJSmUUlZMqkIjntueo7/I4+1YZ9xGsUmjf0zhIq9JHWh
-         r6YbXc9yvr2huw9ik58Cs/LA7kSTgHqU9kfuN6+47J8CxoyYmbMvylg0IIk2WRfPoT8y
-         Et2jbsJuazwxvK8ViRInS9127SbjHVm/5FShAZ56qXbLos7m7byKPGYWCESTLYzeg0IK
-         bZTJC6oBKyzieKoPpPflE5gm6Kl4YgUlfZqtUfmwA/+tlyLb/+dibAuPYXfTMYRFZfq7
-         36xg==
-X-Gm-Message-State: AOAM533jHPBYEVK7pCRT6DwGtw6EvT+2qI881M87feVWwITCtHBEV+PC
-        vBS/FziTpI9DjUzJzcj2jZX5JCDa3lmrC0BDZiZjWg==
-X-Google-Smtp-Source: ABdhPJwPGuxT6GUgLlFj7a9bOlaihGu3nNRoyK0hl7HhJBQt4QwWOrlUmuo32S6AzGUwSWFJG1S+/nJgxpSqyKrjqNw=
-X-Received: by 2002:a05:6512:3ea:: with SMTP id n10mr2590829lfq.178.1623346224387;
- Thu, 10 Jun 2021 10:30:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210603211426.790093-1-jingzhangos@google.com> <873a0398-09fc-0278-3f0c-884b73dad3aa@redhat.com>
-In-Reply-To: <873a0398-09fc-0278-3f0c-884b73dad3aa@redhat.com>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Thu, 10 Jun 2021 12:30:12 -0500
-Message-ID: <CAAdAUtiVDqFdq-ckcBqcj6DZjt+g0uhqNoWsVn_axDVi0+n9Fw@mail.gmail.com>
-Subject: Re: [PATCH v7 0/4] KVM statistics data fd-based binary interface
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1623346638; x=1654882638;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=5wBhl2kvo60tkZMH0L5EwPQTyWrw5edXYhFJvQFTPCk=;
+  b=eHSNkk2I7kR8xJX1nWtut51qUpy0PQDthCBCFa7MgtMJUVK52V9ycE7t
+   v3nfzLlGD0Ri3OGQOsdKZ4/Fk6N05raZl4LK1/bpRa2C278/5GdTIglUO
+   I8jpgCadxp78IHxgfbo6xhoeLiFm4+JHdh2LBTJRfkJp3cVQuCgEgrUHI
+   E=;
+X-IronPort-AV: E=Sophos;i="5.83,264,1616457600"; 
+   d="scan'208";a="115049420"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1a-67b371d8.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP; 10 Jun 2021 17:37:11 +0000
+Received: from EX13D28EUC003.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-1a-67b371d8.us-east-1.amazon.com (Postfix) with ESMTPS id F0AEAA184A;
+        Thu, 10 Jun 2021 17:37:09 +0000 (UTC)
+Received: from uc8bbc9586ea454.ant.amazon.com (10.43.160.55) by
+ EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.18; Thu, 10 Jun 2021 17:37:06 +0000
+From:   Siddharth Chandrasekaran <sidcha@amazon.de>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        LinuxS390 <linux-s390@vger.kernel.org>,
-        Linuxkselftest <linux-kselftest@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+CC:     Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Siddharth Chandrasekaran <sidcha.dev@gmail.com>,
+        Evgeny Iakovlev <eyakovl@amazon.de>,
+        Liran Alon <liran@amazon.com>,
+        Ioannis Aslanidis <iaslan@amazon.de>, <kvm@vger.kernel.org>
+Subject: [kvm-unit-tests PATCH 0/3] x86: hyper-v: Add overlay page tests
+Date:   Thu, 10 Jun 2021 19:36:47 +0200
+Message-ID: <cover.1623346319.git.sidcha@amazon.de>
+X-Mailer: git-send-email 2.17.1
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.43.160.55]
+X-ClientProxiedBy: EX13D36UWA001.ant.amazon.com (10.43.160.71) To
+ EX13D28EUC003.ant.amazon.com (10.43.164.43)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+Patch series [1] starts treating hypercall code page as an overlay page
+(along with the existing synic event and message pages). Add KVM unit
+tests to make sure the underlying page contents are intact with various
+overlay workflows.
 
-On Thu, Jun 10, 2021 at 11:46 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 03/06/21 23:14, Jing Zhang wrote:
-> > This patchset provides a file descriptor for every VM and VCPU to read
-> > KVM statistics data in binary format.
-> > It is meant to provide a lightweight, flexible, scalable and efficient
-> > lock-free solution for user space telemetry applications to pull the
-> > statistics data periodically for large scale systems. The pulling
-> > frequency could be as high as a few times per second.
-> > In this patchset, every statistics data are treated to have some
-> > attributes as below:
-> >    * architecture dependent or generic
-> >    * VM statistics data or VCPU statistics data
-> >    * type: cumulative, instantaneous,
-> >    * unit: none for simple counter, nanosecond, microsecond,
-> >      millisecond, second, Byte, KiByte, MiByte, GiByte. Clock Cycles
-> > Since no lock/synchronization is used, the consistency between all
-> > the statistics data is not guaranteed. That means not all statistics
-> > data are read out at the exact same time, since the statistics date
-> > are still being updated by KVM subsystems while they are read out.
-> >
-> > ---
-> >
-> > * v6 -> v7
-> >    - Improve file descriptor allocation function by Krish suggestion
-> >    - Use "generic stats" instead of "common stats" as Krish suggested
-> >    - Addressed some other nits from Krish and David Matlack
-> >
-> > * v5 -> v6
-> >    - Use designated initializers for STATS_DESC
-> >    - Change KVM_STATS_SCALE... to KVM_STATS_BASE...
-> >    - Use a common function for kvm_[vm|vcpu]_stats_read
-> >    - Fix some documentation errors/missings
-> >    - Use TEST_ASSERT in selftest
-> >    - Use a common function for [vm|vcpu]_stats_test in selftest
-> >
-> > * v4 -> v5
-> >    - Rebase to kvm/queue, commit a4345a7cecfb ("Merge tag
-> >      'kvmarm-fixes-5.13-1'")
-> >    - Change maximum stats name length to 48
-> >    - Replace VM_STATS_COMMON/VCPU_STATS_COMMON macros with stats
-> >      descriptor definition macros.
-> >    - Fixed some errors/warnings reported by checkpatch.pl
-> >
-> > * v3 -> v4
-> >    - Rebase to kvm/queue, commit 9f242010c3b4 ("KVM: avoid "deadlock"
-> >      between install_new_memslots and MMU notifier")
-> >    - Use C-stype comments in the whole patch
-> >    - Fix wrong count for x86 VCPU stats descriptors
-> >    - Fix KVM stats data size counting and validity check in selftest
-> >
-> > * v2 -> v3
-> >    - Rebase to kvm/queue, commit edf408f5257b ("KVM: avoid "deadlock"
-> >      between install_new_memslots and MMU notifier")
-> >    - Resolve some nitpicks about format
-> >
-> > * v1 -> v2
-> >    - Use ARRAY_SIZE to count the number of stats descriptors
-> >    - Fix missing `size` field initialization in macro STATS_DESC
-> >
-> > [1] https://lore.kernel.org/kvm/20210402224359.2297157-1-jingzhangos@google.com
-> > [2] https://lore.kernel.org/kvm/20210415151741.1607806-1-jingzhangos@google.com
-> > [3] https://lore.kernel.org/kvm/20210423181727.596466-1-jingzhangos@google.com
-> > [4] https://lore.kernel.org/kvm/20210429203740.1935629-1-jingzhangos@google.com
-> > [5] https://lore.kernel.org/kvm/20210517145314.157626-1-jingzhangos@google.com
-> > [6] https://lore.kernel.org/kvm/20210524151828.4113777-1-jingzhangos@google.com
-> >
-> > ---
-> >
-> > Jing Zhang (4):
-> >    KVM: stats: Separate generic stats from architecture specific ones
-> >    KVM: stats: Add fd-based API to read binary stats data
-> >    KVM: stats: Add documentation for statistics data binary interface
-> >    KVM: selftests: Add selftest for KVM statistics data binary interface
-> >
-> >   Documentation/virt/kvm/api.rst                | 180 +++++++++++++++
-> >   arch/arm64/include/asm/kvm_host.h             |   9 +-
-> >   arch/arm64/kvm/guest.c                        |  38 +++-
-> >   arch/mips/include/asm/kvm_host.h              |   9 +-
-> >   arch/mips/kvm/mips.c                          |  64 +++++-
-> >   arch/powerpc/include/asm/kvm_host.h           |   9 +-
-> >   arch/powerpc/kvm/book3s.c                     |  64 +++++-
-> >   arch/powerpc/kvm/book3s_hv.c                  |  12 +-
-> >   arch/powerpc/kvm/book3s_pr.c                  |   2 +-
-> >   arch/powerpc/kvm/book3s_pr_papr.c             |   2 +-
-> >   arch/powerpc/kvm/booke.c                      |  59 ++++-
-> >   arch/s390/include/asm/kvm_host.h              |   9 +-
-> >   arch/s390/kvm/kvm-s390.c                      | 129 ++++++++++-
-> >   arch/x86/include/asm/kvm_host.h               |   9 +-
-> >   arch/x86/kvm/x86.c                            |  67 +++++-
-> >   include/linux/kvm_host.h                      | 141 +++++++++++-
-> >   include/linux/kvm_types.h                     |  12 +
-> >   include/uapi/linux/kvm.h                      |  50 ++++
-> >   tools/testing/selftests/kvm/.gitignore        |   1 +
-> >   tools/testing/selftests/kvm/Makefile          |   3 +
-> >   .../testing/selftests/kvm/include/kvm_util.h  |   3 +
-> >   .../selftests/kvm/kvm_binary_stats_test.c     | 215 ++++++++++++++++++
-> >   tools/testing/selftests/kvm/lib/kvm_util.c    |  12 +
-> >   virt/kvm/kvm_main.c                           | 169 +++++++++++++-
-> >   24 files changed, 1178 insertions(+), 90 deletions(-)
-> >   create mode 100644 tools/testing/selftests/kvm/kvm_binary_stats_test.c
-> >
-> >
-> > base-commit: a4345a7cecfb91ae78cd43d26b0c6a956420761a
-> >
->
-> I had a few remarks, but it looks very nice overall.
->
-> Thanks!
->
-> Paolo
->
-Happy to see per-VM stats use u64 too.
-Will send out another patchset based on your remarks.
+While at it, promote hyperv.h to lib/x86 and expose hv_hypercall() from
+there so future tests can use it to do hypercalls.
 
-Thanks,
-Jing
+[1]: https://www.spinics.net/lists/kvm/msg244569.html
+
+~ Sid.
+
+Siddharth Chandrasekaran (3):
+  x86: Move hyperv helpers into libs/x86
+  x86: Move hyper-v hypercall related methods to lib/x86/
+  x86: Add hyper-v overlay page tests
+
+ x86/Makefile.common       |  8 +---
+ {x86 => lib/x86}/hyperv.h |  4 ++
+ {x86 => lib/x86}/hyperv.c | 51 +++++++++++++++++++++
+ x86/hyperv_connections.c  | 60 ++----------------------
+ x86/hyperv_overlay.c      | 96 +++++++++++++++++++++++++++++++++++++++
+ x86/unittests.cfg         |  5 ++
+ 6 files changed, 163 insertions(+), 61 deletions(-)
+ rename {x86 => lib/x86}/hyperv.h (97%)
+ rename {x86 => lib/x86}/hyperv.c (63%)
+ create mode 100644 x86/hyperv_overlay.c
+
+-- 
+2.17.1
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
+
