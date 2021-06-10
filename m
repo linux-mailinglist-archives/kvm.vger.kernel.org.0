@@ -2,175 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8494C3A31DE
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 19:16:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B8433A3203
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 19:26:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230220AbhFJRSb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 13:18:31 -0400
-Received: from foss.arm.com ([217.140.110.172]:37410 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230179AbhFJRSa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Jun 2021 13:18:30 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4AB1F1396;
-        Thu, 10 Jun 2021 10:16:33 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4A48C3F719;
-        Thu, 10 Jun 2021 10:16:32 -0700 (PDT)
-Subject: Re: [PATCH kvmtool 4/4] arm/arm64: vfio: Add PCI Express Capability
- Structure
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
-        kvm@vger.kernel.org, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com, maz@kernel.org
-References: <20210609183812.29596-1-alexandru.elisei@arm.com>
- <20210609183812.29596-5-alexandru.elisei@arm.com>
- <20210610171427.09ee5108@slackpad.fritz.box>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <b5744cd1-bc07-1da4-26b8-ac0c57a7b1bd@arm.com>
-Date:   Thu, 10 Jun 2021 18:17:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S230473AbhFJR2b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 13:28:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57166 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230086AbhFJR22 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Jun 2021 13:28:28 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B8F4C061574
+        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 10:26:15 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id a1so4413804lfr.12
+        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 10:26:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=onW47ZbFH5e5HdlUoVPNuscSOQqX/2SrpfD9q95JllY=;
+        b=b6hzP0YccRsWRRzU9ACpHmsFQnmYuaVTbX3pLJrVClZpmJ8BdQEY4NyzcB+e9HkDWy
+         NC09VOvmFwa0/XSiTVEsk5yJuCNs+bQIW3AIZ02R9sahMKur9D08Bgr3lJ/OhJRtLD1o
+         BlYEX0xLTOySTV9lBOztJD3qJAdsp/6IHVAqlgN264WrwRKJy5jiyfY2YODTbTv50eZm
+         HagnQMsvfTQIbob7ncuANB6LsQf7XAFdg0eqOnkqhq7Zz2bDCxMdB+xv1sthskhngNbZ
+         UBLuUJ4UMHWPJP6okHwkretFYjIcBoI+l5AuDgK1Gl+KtZaAOhvO85V10T2j4GFhFYmw
+         bEDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=onW47ZbFH5e5HdlUoVPNuscSOQqX/2SrpfD9q95JllY=;
+        b=WdnmEHru8LIqvdPL9998UBnMiE5g2IMa6mkPCeNjDLPSSynOyl//rPN650SWQJ+JtY
+         RAKLwXZ5XlIaldMcoE7/74QM6NVBCTK6KHP9gqHaxKQalLWF/2J7plJ6PebVlsGwPWR9
+         Q9yUyP2f+fEZBQZFC2g8DTYKmfO/XMvYQLVHY3qRQAmqURGAAERa7ceM1HLWKuRAzil4
+         wCKDN0hfXl/ispN9vrdYMNDxseSlZ4rCLYD8hXGDyfUcPsd0+0UdYtraCbII78vDtWsj
+         67KeOEvUFG4TApEW6OLCzQupPYUDQRK1lR47VV0IrgheQ0Ao+2tk0GWOY3rkzAqp5MzH
+         lxVg==
+X-Gm-Message-State: AOAM5300rg/3cJUSz/tK3sVKrjD11A+HJk5I0CvEjOnVBWc985GkrVdm
+        yP78W3sG3w3v7lHM1fgqVxp9Eu8Ct6ITKWZNcA3Xxg==
+X-Google-Smtp-Source: ABdhPJz8EC2IEZhB34cW1A4E6Lqer1JPVsXnD5iNMnq9sh79Ry5VJrolXUt5s8cOLAUMW6xiM1HrMzx1A5MFg25P0eQ=
+X-Received: by 2002:a05:6512:3ea:: with SMTP id n10mr2582051lfq.178.1623345973683;
+ Thu, 10 Jun 2021 10:26:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210610171427.09ee5108@slackpad.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+References: <20210603211426.790093-1-jingzhangos@google.com>
+ <20210603211426.790093-3-jingzhangos@google.com> <e3b2b3ab-88a2-827c-7775-10be63158ff3@redhat.com>
+In-Reply-To: <e3b2b3ab-88a2-827c-7775-10be63158ff3@redhat.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Thu, 10 Jun 2021 12:26:01 -0500
+Message-ID: <CAAdAUtg638Fk9QVAdZ0Xt96YS311KCfeJqNiP5FycCMafZ3R0A@mail.gmail.com>
+Subject: Re: [PATCH v7 2/4] KVM: stats: Add fd-based API to read binary stats data
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+Hi Paolo,
 
-On 6/10/21 5:14 PM, Andre Przywara wrote:
-> On Wed,  9 Jun 2021 19:38:12 +0100
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Thu, Jun 10, 2021 at 11:23 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
->> It turns out that some Linux drivers (like Realtek R8169) fall back to a
->> device-specific configuration method if the device is not PCI Express
->> capable:
->>
->> [    1.433825] r8169 0000:00:00.0 enp0s0: No native access to PCI extended config space, falling back to CSI
->>
-> Nice discovery, thanks!
+> On 03/06/21 23:14, Jing Zhang wrote:
+> > +#define DEFINE_VM_STATS_DESC(...) {                                         \
+> > +     STATS_DESC_COUNTER("remote_tlb_flush"),                                \
+> > +     ## __VA_ARGS__                                                         \
+> > +}
+> > +
+> > +#define DEFINE_VCPU_STATS_DESC(...) {                                               \
+> > +     STATS_DESC_COUNTER("halt_successful_poll"),                            \
+> > +     STATS_DESC_COUNTER("halt_attempted_poll"),                             \
+> > +     STATS_DESC_COUNTER("halt_poll_invalid"),                               \
+> > +     STATS_DESC_COUNTER("halt_wakeup"),                                     \
+> > +     STATS_DESC_TIME_NSEC("halt_poll_success_ns"),                          \
+> > +     STATS_DESC_TIME_NSEC("halt_poll_fail_ns"),                             \
+> > +     ## __VA_ARGS__                                                         \
 >
->> Add the PCI Express Capability Structure and populate it for assigned
->> devices, as this is how the Linux PCI driver determines if a device is PCI
->> Express capable.
->>
->> Because we don't emulate a PCI Express link, a root complex or any slot
->> related properties, the PCI Express capability is kept as small as possible
->> by ignoring those fields.
->>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->>  include/kvm/pci.h | 24 ++++++++++++++++++++++++
->>  vfio/pci.c        | 13 +++++++++++++
->>  2 files changed, 37 insertions(+)
->>
->> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
->> index 42d9e1c5645f..0f2d5bbabdc3 100644
->> --- a/include/kvm/pci.h
->> +++ b/include/kvm/pci.h
->> @@ -46,6 +46,8 @@ struct kvm;
->>  #define PCI_DEV_CFG_SIZE_EXTENDED 	4096
->>  
->>  #ifdef ARCH_HAS_PCI_EXP
->> +#define arch_has_pci_exp()	(true)
->> +
->>  #define PCI_CFG_SIZE		PCI_CFG_SIZE_EXTENDED
->>  #define PCI_DEV_CFG_SIZE	PCI_DEV_CFG_SIZE_EXTENDED
->>  
->> @@ -73,6 +75,8 @@ union pci_config_address {
->>  };
->>  
->>  #else
->> +#define arch_has_pci_exp()	(false)
->> +
->>  #define PCI_CFG_SIZE		PCI_CFG_SIZE_LEGACY
->>  #define PCI_DEV_CFG_SIZE	PCI_DEV_CFG_SIZE_LEGACY
->>  
->> @@ -143,6 +147,24 @@ struct pci_cap_hdr {
->>  	u8	next;
->>  };
->>  
->> +struct pci_exp_cap {
->> +	u8 cap;
->> +	u8 next;
->> +	u16 cap_reg;
->> +	u32 dev_cap;
->> +	u16 dev_ctrl;
->> +	u16 dev_status;
->> +	u32 link_cap;
->> +	u16 link_ctrl;
->> +	u16 link_status;
->> +	u32 slot_cap;
->> +	u16 slot_ctrl;
->> +	u16 slot_status;
->> +	u16 root_ctrl;
->> +	u16 root_cap;
->> +	u32 root_status;
->> +};
->> +
->>  struct pci_device_header;
->>  
->>  typedef int (*bar_activate_fn_t)(struct kvm *kvm,
->> @@ -188,6 +210,8 @@ struct pci_device_header {
->>  			u8		min_gnt;
->>  			u8		max_lat;
->>  			struct msix_cap msix;
->> +			/* Used only by architectures which support PCIE */
->> +			struct pci_exp_cap pci_exp;
->>  		} __attribute__((packed));
->>  		/* Pad to PCI config space size */
->>  		u8	__pad[PCI_DEV_CFG_SIZE];
->> diff --git a/vfio/pci.c b/vfio/pci.c
->> index 6a4204634e71..5c9bec6db710 100644
->> --- a/vfio/pci.c
->> +++ b/vfio/pci.c
->> @@ -623,6 +623,12 @@ static ssize_t vfio_pci_cap_size(struct pci_cap_hdr *cap_hdr)
->>  		return PCI_CAP_MSIX_SIZEOF;
->>  	case PCI_CAP_ID_MSI:
->>  		return vfio_pci_msi_cap_size((void *)cap_hdr);
->> +	case PCI_CAP_ID_EXP:
->> +		/*
->> +		 * We don't emulate any of the link, slot and root complex
->> +		 * properties, so ignore them.
->> +		 */
->> +		return PCI_CAP_EXP_RC_ENDPOINT_SIZEOF_V1;
-> My (admittedly) older distro kernel headers don't carry this symbol.
-> Can we have a "#ifndef ... #define ... #endif" at the beginning of
-> this file?
+> Let's instead put this (note it's without braces) in macros like these
+>
+> #define KVM_GENERIC_VM_STATS()                                                  \
+>         STATS_DESC_COUNTER("remote_tlb_flush"),
+>
+> #define KVM_GENERIC_VCPU_STATS(...)                                             \
+>         STATS_DESC_COUNTER("halt_successful_poll"),                             \
+>         STATS_DESC_COUNTER("halt_attempted_poll"),                              \
+>         STATS_DESC_COUNTER("halt_poll_invalid"),                                \
+>         STATS_DESC_COUNTER("halt_wakeup"),                                      \
+>         STATS_DESC_TIME_NSEC("halt_poll_success_ns"),                           \
+>         STATS_DESC_TIME_NSEC("halt_poll_fail_ns"),
+>
+> and it can be used in the arch files.  In fact it can even be added in patch 1 and
+> switched to STATS_DESC_* here.
+>
+> Paolo
+>
+Sure, will do.
 
-Good catch, we'll fix in the next iteration.
-
-Thanks,
-
-Alex
-
-> If "Slackware" isn't convincing enough, RHEL 7.4 doesn't include it
-> either. And this issue hits x86 as well, even though we don't use PCIe
-> there. Also we do something similar in patch 3/4.
->
-> Rest looks alright.
->
-> Cheers,
-> Andre
->
->>  	default:
->>  		pr_err("unknown PCI capability 0x%x", cap_hdr->type);
->>  		return 0;
->> @@ -696,6 +702,13 @@ static int vfio_pci_parse_caps(struct vfio_device *vdev)
->>  			pdev->msi.pos = pos;
->>  			pdev->irq_modes |= VFIO_PCI_IRQ_MODE_MSI;
->>  			break;
->> +		case PCI_CAP_ID_EXP:
->> +			if (!arch_has_pci_exp())
->> +				continue;
->> +			ret = vfio_pci_add_cap(vdev, virt_hdr, cap, pos);
->> +			if (ret)
->> +				return ret;
->> +			break;
->>  		}
->>  	}
->>  
+Thank,s
+Jing
