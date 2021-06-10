@@ -2,54 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B8433A3203
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 19:26:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11B233A3212
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 19:29:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230473AbhFJR2b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 13:28:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57166 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230086AbhFJR22 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Jun 2021 13:28:28 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B8F4C061574
-        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 10:26:15 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id a1so4413804lfr.12
-        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 10:26:15 -0700 (PDT)
+        id S230444AbhFJRbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 13:31:05 -0400
+Received: from mail-lf1-f45.google.com ([209.85.167.45]:37814 "EHLO
+        mail-lf1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230356AbhFJRbF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Jun 2021 13:31:05 -0400
+Received: by mail-lf1-f45.google.com with SMTP id p7so4469314lfg.4
+        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 10:28:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=onW47ZbFH5e5HdlUoVPNuscSOQqX/2SrpfD9q95JllY=;
-        b=b6hzP0YccRsWRRzU9ACpHmsFQnmYuaVTbX3pLJrVClZpmJ8BdQEY4NyzcB+e9HkDWy
-         NC09VOvmFwa0/XSiTVEsk5yJuCNs+bQIW3AIZ02R9sahMKur9D08Bgr3lJ/OhJRtLD1o
-         BlYEX0xLTOySTV9lBOztJD3qJAdsp/6IHVAqlgN264WrwRKJy5jiyfY2YODTbTv50eZm
-         HagnQMsvfTQIbob7ncuANB6LsQf7XAFdg0eqOnkqhq7Zz2bDCxMdB+xv1sthskhngNbZ
-         UBLuUJ4UMHWPJP6okHwkretFYjIcBoI+l5AuDgK1Gl+KtZaAOhvO85V10T2j4GFhFYmw
-         bEDw==
+        bh=FLnQvFD4x7DNDj+NEJ3O+AkctP1r/V6a1b3Mdx886HU=;
+        b=rYFqapPgHlrCQ4YV5UAaF9vTXxJW71bDJszf6XXAAypmGGRdGy7rfe1/NkQ88jkidv
+         zj0sX27ZlwVd1QclSX13XE640t7tzrvWWWb1G2tctffoctIf1fhooZ7Z71CevX/0YxEF
+         tuOvnyEYg0UtYKXQV9KQGDQGVcEUJKGE2o7Ere77VbhsmdIPiI7RPZHMj8zFUV6O58ia
+         ZHRxLj73Uxg2A+dJQSroGT/BW6I99RPB91M1y0pZsGyl/MLduTCcimMeMfbZQU+j52PK
+         73cqjjeLjcblTMTYG4JtB0oQ0j/azuNLDIYH6CGSA+Lzz/w3wgp0j+picMdZdSjO0idh
+         bqlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=onW47ZbFH5e5HdlUoVPNuscSOQqX/2SrpfD9q95JllY=;
-        b=WdnmEHru8LIqvdPL9998UBnMiE5g2IMa6mkPCeNjDLPSSynOyl//rPN650SWQJ+JtY
-         RAKLwXZ5XlIaldMcoE7/74QM6NVBCTK6KHP9gqHaxKQalLWF/2J7plJ6PebVlsGwPWR9
-         Q9yUyP2f+fEZBQZFC2g8DTYKmfO/XMvYQLVHY3qRQAmqURGAAERa7ceM1HLWKuRAzil4
-         wCKDN0hfXl/ispN9vrdYMNDxseSlZ4rCLYD8hXGDyfUcPsd0+0UdYtraCbII78vDtWsj
-         67KeOEvUFG4TApEW6OLCzQupPYUDQRK1lR47VV0IrgheQ0Ao+2tk0GWOY3rkzAqp5MzH
-         lxVg==
-X-Gm-Message-State: AOAM5300rg/3cJUSz/tK3sVKrjD11A+HJk5I0CvEjOnVBWc985GkrVdm
-        yP78W3sG3w3v7lHM1fgqVxp9Eu8Ct6ITKWZNcA3Xxg==
-X-Google-Smtp-Source: ABdhPJz8EC2IEZhB34cW1A4E6Lqer1JPVsXnD5iNMnq9sh79Ry5VJrolXUt5s8cOLAUMW6xiM1HrMzx1A5MFg25P0eQ=
-X-Received: by 2002:a05:6512:3ea:: with SMTP id n10mr2582051lfq.178.1623345973683;
- Thu, 10 Jun 2021 10:26:13 -0700 (PDT)
+        bh=FLnQvFD4x7DNDj+NEJ3O+AkctP1r/V6a1b3Mdx886HU=;
+        b=fDSKV0xIF7QKkKyNT1UvPABudKOKJXLu/EIUan4z1TI8DDb6VA5+Z+TbcIQVIhTRKr
+         HSJcyZJJZJRrjh+ve8qAUYaE9/biAzfQZMIEwPbMcd4nHmzgOUAqLtECCsL3rNfAUpIc
+         cjdRHEJnPg/t38+WaDNfDSF2CXR3a5ausgcoGTxWHIny5J0WrA6SWaDwVCYmDzQZAQfR
+         hqiY9++EOcILSgbHh9m+7QLBUlwKisqe3xeHdONQYvGTgP+imIvKbYizO6xPwPYYmcbV
+         xg66tld5AHj7bWkSqS0aVlUxYL7w1jB1aAOuX8XalXSEpcALwkKWVFbvuQldWKMpDMsR
+         bAZQ==
+X-Gm-Message-State: AOAM531TUJQdkk4gV8rLxcNLZeBE8cC2f/c5keQD12MXccDXMbaFGtCe
+        QaFCF232TvrbkP+57yTHbnnSwpEEemUpqvAL8SVpNg==
+X-Google-Smtp-Source: ABdhPJxMYyFCrOdc3qDmqDYkOsRd9Ou7KT5iYSlyqMweabXy+tFPPqYLyS4hzfuDF71PLN1Lon73E77keupLBsrNlto=
+X-Received: by 2002:a05:6512:33c4:: with SMTP id d4mr2754345lfg.536.1623346073785;
+ Thu, 10 Jun 2021 10:27:53 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210603211426.790093-1-jingzhangos@google.com>
- <20210603211426.790093-3-jingzhangos@google.com> <e3b2b3ab-88a2-827c-7775-10be63158ff3@redhat.com>
-In-Reply-To: <e3b2b3ab-88a2-827c-7775-10be63158ff3@redhat.com>
+ <20210603211426.790093-3-jingzhangos@google.com> <345170fd-636c-f1be-7dc3-69467e51d872@redhat.com>
+In-Reply-To: <345170fd-636c-f1be-7dc3-69467e51d872@redhat.com>
 From:   Jing Zhang <jingzhangos@google.com>
-Date:   Thu, 10 Jun 2021 12:26:01 -0500
-Message-ID: <CAAdAUtg638Fk9QVAdZ0Xt96YS311KCfeJqNiP5FycCMafZ3R0A@mail.gmail.com>
+Date:   Thu, 10 Jun 2021 12:27:41 -0500
+Message-ID: <CAAdAUthr+An=SWZLDfWQ1nfnAr-PdAJgSuBmK2iypa1a3+Ay5g@mail.gmail.com>
 Subject: Re: [PATCH v7 2/4] KVM: stats: Add fd-based API to read binary stats data
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
@@ -88,42 +85,56 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Paolo,
 
-On Thu, Jun 10, 2021 at 11:23 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Thu, Jun 10, 2021 at 11:42 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
 > On 03/06/21 23:14, Jing Zhang wrote:
-> > +#define DEFINE_VM_STATS_DESC(...) {                                         \
-> > +     STATS_DESC_COUNTER("remote_tlb_flush"),                                \
-> > +     ## __VA_ARGS__                                                         \
-> > +}
+> > +struct _kvm_stats_header {
+> > +     __u32 name_size;
+> > +     __u32 count;
+> > +     __u32 desc_offset;
+> > +     __u32 data_offset;
+> > +};
 > > +
-> > +#define DEFINE_VCPU_STATS_DESC(...) {                                               \
-> > +     STATS_DESC_COUNTER("halt_successful_poll"),                            \
-> > +     STATS_DESC_COUNTER("halt_attempted_poll"),                             \
-> > +     STATS_DESC_COUNTER("halt_poll_invalid"),                               \
-> > +     STATS_DESC_COUNTER("halt_wakeup"),                                     \
-> > +     STATS_DESC_TIME_NSEC("halt_poll_success_ns"),                          \
-> > +     STATS_DESC_TIME_NSEC("halt_poll_fail_ns"),                             \
-> > +     ## __VA_ARGS__                                                         \
 >
-> Let's instead put this (note it's without braces) in macros like these
+> Keeping this struct in sync with kvm_stats_header is a bit messy.  If
+> you move the id at the end of the header, however, you can use the same
+> trick with the zero-sized array that you used for _kvm_stats_desc.
 >
-> #define KVM_GENERIC_VM_STATS()                                                  \
->         STATS_DESC_COUNTER("remote_tlb_flush"),
+Good point. Will do.
+> > +struct kvm_vm_stats_data {
+> > +     unsigned long value[0];
+> > +};
+> > +
 >
-> #define KVM_GENERIC_VCPU_STATS(...)                                             \
->         STATS_DESC_COUNTER("halt_successful_poll"),                             \
->         STATS_DESC_COUNTER("halt_attempted_poll"),                              \
->         STATS_DESC_COUNTER("halt_poll_invalid"),                                \
->         STATS_DESC_COUNTER("halt_wakeup"),                                      \
->         STATS_DESC_TIME_NSEC("halt_poll_success_ns"),                           \
->         STATS_DESC_TIME_NSEC("halt_poll_fail_ns"),
+> I posted the patch to switch the VM statistics to 64-bit; you can rebase
+> on top of it.
+Cool!
 >
-> and it can be used in the arch files.  In fact it can even be added in patch 1 and
-> switched to STATS_DESC_* here.
+> > +#define KVM_GET_STATS_FD  _IOR(KVMIO,  0xcc, struct kvm_stats_header)
+>
+> This should be _IO(KVMIO, 0xcc) since it does not have an argument.
+>
+Will correct it.
+> > +#define STATS_DESC(stat, type, unit, scale, exp)                            \
+> > +     {                                                                      \
+> > +             {                                                              \
+> > +                     .flags = type | unit | scale,                          \
+> > +                     .exponent = exp,                                       \
+> > +                     .size = 1                                              \
+> > +             },                                                             \
+> > +             .name = stat,                                                  \
+>
+> Here you can use
+>
+>         type | BUILD_BUG_ON_ZERO(type & ~KVM_STATS_TYPE_MASK) |
+>         unit | BUILD_BUG_ON_ZERO(unit & ~KVM_STATS_UNIT_MASK) |
+>         scale | BUILD_BUG_ON_ZERO(scale & ~KVM_STATS_SCALE_MASK) |
+>
+> to get a little bit of type checking.
+Sure, will do.
 >
 > Paolo
 >
-Sure, will do.
 
-Thank,s
+Thanks,
 Jing
