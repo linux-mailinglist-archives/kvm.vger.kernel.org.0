@@ -2,70 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C3F53A2A8B
-	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 13:44:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BF423A2A94
+	for <lists+kvm@lfdr.de>; Thu, 10 Jun 2021 13:46:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230130AbhFJLq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Jun 2021 07:46:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28329 "EHLO
+        id S230215AbhFJLs3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Jun 2021 07:48:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48286 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229895AbhFJLq2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 07:46:28 -0400
+        by vger.kernel.org with ESMTP id S229895AbhFJLs1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Jun 2021 07:48:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623325472;
+        s=mimecast20190719; t=1623325591;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DLP7A6CuLbvbdTjbJvOEkDk3V+FmEdn/cupIcH3ks2s=;
-        b=OGLcLQE6OZ1vD8yZ7/0kb99PMkxZ/Rzm7NJwAlV5hTD9vWiiyiBjyYRnRirT4SEtczCufu
-        bSpjJMafUELr2oCrJElzXxouWuGJAqpbKYP/+iLidFLveNr8AqWRXB081oVNdER4qJWC5o
-        GXADmbrATf7/pKiVwcVbxb4OrJcCHjo=
+        bh=I/8j+wnWnTfb6LCWk89bGRuT4Gfnv7Lqnj2YgU0Psg0=;
+        b=gxihVAZCwsSLdpifmb2EVMLUuCYfHtYznmgyH0PwTBSUvNuRG8UG1AQg2zWWUbmF+rYTK5
+        OCmNDo+Bx7BQ6oLKLmALXTxlHd6wV4scKVFzcRFhD4fBstjcvaHWOWzbWAZDk76uHPMiGp
+        KipevKOZDnw4dejnCQSxg4DGQkBHERU=
 Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
  [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-oQiK4tSIMQm7hUD9nWIcJg-1; Thu, 10 Jun 2021 07:44:30 -0400
-X-MC-Unique: oQiK4tSIMQm7hUD9nWIcJg-1
-Received: by mail-wm1-f71.google.com with SMTP id g14-20020a05600c4eceb02901b609849650so3255989wmq.6
-        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 04:44:30 -0700 (PDT)
+ us-mta-228-7V_2l-uCOqSOAgwoQpGlBA-1; Thu, 10 Jun 2021 07:46:30 -0400
+X-MC-Unique: 7V_2l-uCOqSOAgwoQpGlBA-1
+Received: by mail-wm1-f71.google.com with SMTP id u17-20020a05600c19d1b02901af4c4deac5so2920798wmq.7
+        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 04:46:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=DLP7A6CuLbvbdTjbJvOEkDk3V+FmEdn/cupIcH3ks2s=;
-        b=M8Afsnww0P48Ph0ZbThKOYWcLSAhqkaifJ9veWqraV73WR6K1FuCFss08220xtJZib
-         n0LTkkmqTY1YdCP+Ay26bPUmy6TcTwag0EG7RCe4YngqLNEF8y5VWtSDDUGJcG1TnWts
-         37UfTbAHeKi6LNvi8JsJShoDBkdzxEXPgDCYqVDEMQ9nSviFHj9DyKC5cfMKBZhZ2Z8R
-         p/nPd790pShoMjGDIUdkRHsyuuADIbW7pAanBQYev7AYPSi4lDavJLMdrkeo5VgayD8u
-         LAxAs9gLDD/ErnNW2lugyVK9RlvLc0h4Z7eSXEmqofnvvaMDBYs4D4hN9nV1P3M56uOy
-         qDXA==
-X-Gm-Message-State: AOAM530q0VWF9EmK5zl5NlTPuhZluAtN1Ny/xXF6NfzBozbsVC32qd/N
-        SxEzlYgNP3jt1iDJg3Ooe0eXH4wGjDxn0zkkfW14eilY20iTES7kwkaCneFdOlKioBDddF2cQ6H
-        68nfYpDSEKRe83JFeJ++xMDEQgvGGpKCd+EWtVcBo5O4ePzTmob7mo0UJENmlzNF1
-X-Received: by 2002:a05:600c:3650:: with SMTP id y16mr4638603wmq.92.1623325469133;
-        Thu, 10 Jun 2021 04:44:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx1lmFvAsZ9dR3FveYn+Jg9WbESvuVq28eec500iykHmPAXI+zuvFJmaCD4cOM+dNYVTZMVUw==
-X-Received: by 2002:a05:600c:3650:: with SMTP id y16mr4638575wmq.92.1623325468844;
-        Thu, 10 Jun 2021 04:44:28 -0700 (PDT)
+        bh=I/8j+wnWnTfb6LCWk89bGRuT4Gfnv7Lqnj2YgU0Psg0=;
+        b=AjJooGnbX6dJzGAvzXEBh1ETvXfv++a/apCBPv0fpLyUBg6KEvqe4ISihAEl0hibxJ
+         8sgCUIskbdSYOpWGjLKm9FUypffdaZuPPGYL6GPQsEoWehv2gclsMSo3o3aC6Lmo7C9l
+         95hCEGJR8FAOHyQvs6dU8DIAAhQ2kvwGTJYSBJxnpFf5Z0iWbhQdY8TX6A/0b+43M9lp
+         08w1NOnPbf/kDh5ptzjf+nADkPXnDP4dMbTQ5RpchEvSVOeZpa+iNOwkGA3BIsTZw1Aj
+         Y24la1s92ZwmH8zAjJtbERmHHSJhQTRkq4McUk7+nR74weGXNZnLvjsapz5lNrQWx5py
+         ZKSQ==
+X-Gm-Message-State: AOAM533ncnCquWNGZATBhmvlUS/doSCJxpcUGcPc1myTY9cjCaweegSU
+        U9LCt8Sh90ekyPYsYC5eTZSZ5U/z696JlDW6cSUEnuz7HQoxOupSSvbySsLnTx9TUYdoYSyO8iL
+        2Bl55oTDdapNX
+X-Received: by 2002:a5d:48c6:: with SMTP id p6mr4963281wrs.45.1623325589182;
+        Thu, 10 Jun 2021 04:46:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzAY/peyXscV9r/3ZUt4QDtJlFNFailIfzbp8EjaoRTUVSlJrRv2T10doUS2XUyySbuumKZAg==
+X-Received: by 2002:a5d:48c6:: with SMTP id p6mr4963260wrs.45.1623325588983;
+        Thu, 10 Jun 2021 04:46:28 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id d131sm9213775wmd.4.2021.06.10.04.44.27
+        by smtp.gmail.com with ESMTPSA id w23sm9281904wmi.0.2021.06.10.04.46.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Jun 2021 04:44:28 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH] make: Add tags target and gitignore the
- tags file
-To:     Siddharth Chandrasekaran <sidcha@amazon.de>
-Cc:     Siddharth Chandrasekaran <sidcha.dev@gmail.com>,
-        Evgeny Iakovlev <eyakovl@amazon.de>,
-        Liran Alon <liran@amazon.com>,
-        Ioannis Aslanidis <iaslan@amazon.de>, kvm@vger.kernel.org
-References: <20210610113128.5418-1-sidcha@amazon.de>
+        Thu, 10 Jun 2021 04:46:28 -0700 (PDT)
+Subject: Re: [PATCH] KVM: selftests: Fix compiling errors when initializing
+ the static structure
+To:     Yanan Wang <wangyanan55@huawei.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yuzenghui@huawei.com,
+        wanghaibin.wang@huawei.com
+References: <20210610085418.35544-1-wangyanan55@huawei.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ea7d753a-33cd-6626-7afc-955f8ff06bd7@redhat.com>
-Date:   Thu, 10 Jun 2021 13:44:27 +0200
+Message-ID: <43c197da-0ff7-5b95-0778-e5b19fa4f942@redhat.com>
+Date:   Thu, 10 Jun 2021 13:46:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20210610113128.5418-1-sidcha@amazon.de>
+In-Reply-To: <20210610085418.35544-1-wangyanan55@huawei.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -73,36 +75,127 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/06/21 13:31, Siddharth Chandrasekaran wrote:
-> Add make target to generate ctags tags file and add it to .gitignore.
+On 10/06/21 10:54, Yanan Wang wrote:
+> Errors like below were produced from test_util.c when compiling the KVM
+> selftests on my local platform.
 > 
-> Signed-off-by: Siddharth Chandrasekaran <sidcha@amazon.de>
+> lib/test_util.c: In function 'vm_mem_backing_src_alias':
+> lib/test_util.c:177:12: error: initializer element is not constant
+>      .flag = anon_flags,
+>              ^~~~~~~~~~
+> lib/test_util.c:177:12: note: (near initialization for 'aliases[0].flag')
+> 
+> The reason is that we are using non-const expressions to initialize the
+> static structure, which will probably trigger a compiling error/warning
+> on stricter GCC versions. Fix it by converting the two const variables
+> "anon_flags" and "anon_huge_flags" into more stable macros.
+> 
+> Fixes: b3784bc28ccc0 ("KVM: selftests: refactor vm_mem_backing_src_type flags")
+> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
 > ---
->   Makefile   | 4 ++++
->   .gitignore | 1 +
->   2 files changed, 5 insertions(+)
+>   tools/testing/selftests/kvm/lib/test_util.c | 38 ++++++++++-----------
+>   1 file changed, 19 insertions(+), 19 deletions(-)
 > 
-> diff --git a/Makefile b/Makefile
-> index e0828fe..017e7d8 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -128,3 +128,7 @@ cscope:
->   	find -L $(cscope_dirs) -maxdepth 1 \
->   		-name '*.[chsS]' -exec realpath --relative-base=$(PWD) {} \; | sort -u > ./cscope.files
->   	cscope -bk
+> diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
+> index 6ad6c8276b2e..af1031fed97f 100644
+> --- a/tools/testing/selftests/kvm/lib/test_util.c
+> +++ b/tools/testing/selftests/kvm/lib/test_util.c
+> @@ -166,75 +166,75 @@ size_t get_def_hugetlb_pagesz(void)
+>   	return 0;
+>   }
+>   
+> +#define ANON_FLAGS	(MAP_PRIVATE | MAP_ANONYMOUS)
+> +#define ANON_HUGE_FLAGS	(ANON_FLAGS | MAP_HUGETLB)
 > +
-> +.PHONY: tags
-> +tags:
-> +	ctags -R
-> diff --git a/.gitignore b/.gitignore
-> index 784cb2d..8534fb7 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -1,3 +1,4 @@
-> +tags
->   .gdbinit
->   *.a
->   *.d
+>   const struct vm_mem_backing_src_alias *vm_mem_backing_src_alias(uint32_t i)
+>   {
+> -	static const int anon_flags = MAP_PRIVATE | MAP_ANONYMOUS;
+> -	static const int anon_huge_flags = anon_flags | MAP_HUGETLB;
+> -
+>   	static const struct vm_mem_backing_src_alias aliases[] = {
+>   		[VM_MEM_SRC_ANONYMOUS] = {
+>   			.name = "anonymous",
+> -			.flag = anon_flags,
+> +			.flag = ANON_FLAGS,
+>   		},
+>   		[VM_MEM_SRC_ANONYMOUS_THP] = {
+>   			.name = "anonymous_thp",
+> -			.flag = anon_flags,
+> +			.flag = ANON_FLAGS,
+>   		},
+>   		[VM_MEM_SRC_ANONYMOUS_HUGETLB] = {
+>   			.name = "anonymous_hugetlb",
+> -			.flag = anon_huge_flags,
+> +			.flag = ANON_HUGE_FLAGS,
+>   		},
+>   		[VM_MEM_SRC_ANONYMOUS_HUGETLB_16KB] = {
+>   			.name = "anonymous_hugetlb_16kb",
+> -			.flag = anon_huge_flags | MAP_HUGE_16KB,
+> +			.flag = ANON_HUGE_FLAGS | MAP_HUGE_16KB,
+>   		},
+>   		[VM_MEM_SRC_ANONYMOUS_HUGETLB_64KB] = {
+>   			.name = "anonymous_hugetlb_64kb",
+> -			.flag = anon_huge_flags | MAP_HUGE_64KB,
+> +			.flag = ANON_HUGE_FLAGS | MAP_HUGE_64KB,
+>   		},
+>   		[VM_MEM_SRC_ANONYMOUS_HUGETLB_512KB] = {
+>   			.name = "anonymous_hugetlb_512kb",
+> -			.flag = anon_huge_flags | MAP_HUGE_512KB,
+> +			.flag = ANON_HUGE_FLAGS | MAP_HUGE_512KB,
+>   		},
+>   		[VM_MEM_SRC_ANONYMOUS_HUGETLB_1MB] = {
+>   			.name = "anonymous_hugetlb_1mb",
+> -			.flag = anon_huge_flags | MAP_HUGE_1MB,
+> +			.flag = ANON_HUGE_FLAGS | MAP_HUGE_1MB,
+>   		},
+>   		[VM_MEM_SRC_ANONYMOUS_HUGETLB_2MB] = {
+>   			.name = "anonymous_hugetlb_2mb",
+> -			.flag = anon_huge_flags | MAP_HUGE_2MB,
+> +			.flag = ANON_HUGE_FLAGS | MAP_HUGE_2MB,
+>   		},
+>   		[VM_MEM_SRC_ANONYMOUS_HUGETLB_8MB] = {
+>   			.name = "anonymous_hugetlb_8mb",
+> -			.flag = anon_huge_flags | MAP_HUGE_8MB,
+> +			.flag = ANON_HUGE_FLAGS | MAP_HUGE_8MB,
+>   		},
+>   		[VM_MEM_SRC_ANONYMOUS_HUGETLB_16MB] = {
+>   			.name = "anonymous_hugetlb_16mb",
+> -			.flag = anon_huge_flags | MAP_HUGE_16MB,
+> +			.flag = ANON_HUGE_FLAGS | MAP_HUGE_16MB,
+>   		},
+>   		[VM_MEM_SRC_ANONYMOUS_HUGETLB_32MB] = {
+>   			.name = "anonymous_hugetlb_32mb",
+> -			.flag = anon_huge_flags | MAP_HUGE_32MB,
+> +			.flag = ANON_HUGE_FLAGS | MAP_HUGE_32MB,
+>   		},
+>   		[VM_MEM_SRC_ANONYMOUS_HUGETLB_256MB] = {
+>   			.name = "anonymous_hugetlb_256mb",
+> -			.flag = anon_huge_flags | MAP_HUGE_256MB,
+> +			.flag = ANON_HUGE_FLAGS | MAP_HUGE_256MB,
+>   		},
+>   		[VM_MEM_SRC_ANONYMOUS_HUGETLB_512MB] = {
+>   			.name = "anonymous_hugetlb_512mb",
+> -			.flag = anon_huge_flags | MAP_HUGE_512MB,
+> +			.flag = ANON_HUGE_FLAGS | MAP_HUGE_512MB,
+>   		},
+>   		[VM_MEM_SRC_ANONYMOUS_HUGETLB_1GB] = {
+>   			.name = "anonymous_hugetlb_1gb",
+> -			.flag = anon_huge_flags | MAP_HUGE_1GB,
+> +			.flag = ANON_HUGE_FLAGS | MAP_HUGE_1GB,
+>   		},
+>   		[VM_MEM_SRC_ANONYMOUS_HUGETLB_2GB] = {
+>   			.name = "anonymous_hugetlb_2gb",
+> -			.flag = anon_huge_flags | MAP_HUGE_2GB,
+> +			.flag = ANON_HUGE_FLAGS | MAP_HUGE_2GB,
+>   		},
+>   		[VM_MEM_SRC_ANONYMOUS_HUGETLB_16GB] = {
+>   			.name = "anonymous_hugetlb_16gb",
+> -			.flag = anon_huge_flags | MAP_HUGE_16GB,
+> +			.flag = ANON_HUGE_FLAGS | MAP_HUGE_16GB,
+>   		},
+>   		[VM_MEM_SRC_SHMEM] = {
+>   			.name = "shmem",
 > 
 
 Queued, thanks.
