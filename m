@@ -2,89 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF3EE3A4163
-	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 13:42:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E29733A4197
+	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 14:01:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231308AbhFKLoe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Jun 2021 07:44:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54751 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230370AbhFKLoa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Jun 2021 07:44:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623411751;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4xah37CV668UR0em2wUSE7B5M6OMw4FnlNzQxdYrv7E=;
-        b=eMm1h9LpYXtNkcadRelZZsHHPkcxoNtrjFiin5A7MQKsSG2dyFwcbkcElSVpa+BzyFT9De
-        msOdciUrHDDU7izS8QA8wAc9pzUDhDDA/E21gfwXsE358WP2B1ysvgwJbnbe+qW9Z3AXRy
-        yAX1MmNEc9k6qCGHwlkrqKXfh56mbO0=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-106-bbtxLkgkOPO9M6m3EPfVlg-1; Fri, 11 Jun 2021 07:42:30 -0400
-X-MC-Unique: bbtxLkgkOPO9M6m3EPfVlg-1
-Received: by mail-ej1-f69.google.com with SMTP id q7-20020a1709063607b02903f57f85ac45so1031555ejb.15
-        for <kvm@vger.kernel.org>; Fri, 11 Jun 2021 04:42:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=4xah37CV668UR0em2wUSE7B5M6OMw4FnlNzQxdYrv7E=;
-        b=aixB3a8wHEcHl0S2DbEenVCKtEyxF/VXzeXFJjDA8rOZZwRk12WATSrnIadyWDRX7G
-         rtuiMVxJY8AEiTVMlYUygJXNVm5MHZsDl9M7V2P3qLjoSNce6v9Zrh6vTdKftUPv71Y2
-         dXdXqQA84BNij1FwGhdgSWZ1EqXlejHZ1yXMzNa26baBSekJLMOylTT8LIQaaHlsNjSf
-         1qzluRwqeib4xuIJId1G28oBUYOIvCt8bwCtNLpu/IunMBEFUeFgBnU0QX0bCma4cdnL
-         DgZnVAzSL4yWMHvhb6B12/rjf/nRSnsjhG5Hw2sOuARCYONoBPhiPDLOET6Nhmz6eUu4
-         040g==
-X-Gm-Message-State: AOAM532VfDaiwzPS6FQ6Kdm5jTDk5f+GBu5pZHsz6FOKhBXjNA9owf7K
-        p+4TaqAgUJ7l+sIfRiXlBju31ZnqTeG5gmqedVPkj9KTOkPXbKwViXU1kCnonzHpK7hAb/KVmVk
-        ARAvxxHQPgQf+
-X-Received: by 2002:a17:906:3e8d:: with SMTP id a13mr3246978ejj.463.1623411749387;
-        Fri, 11 Jun 2021 04:42:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwzpnfhFNJxmsIpwiSgKIVCCo4PjW32uUUv+jwS/hcRej2ErguKmAdKdmBv+wsKECZ/MFw2rA==
-X-Received: by 2002:a17:906:3e8d:: with SMTP id a13mr3246970ejj.463.1623411749224;
-        Fri, 11 Jun 2021 04:42:29 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id kx3sm1992622ejc.44.2021.06.11.04.42.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Jun 2021 04:42:28 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        id S231530AbhFKMDe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Jun 2021 08:03:34 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60564 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231489AbhFKMDd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Jun 2021 08:03:33 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15BBXDPL101354;
+        Fri, 11 Jun 2021 08:00:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=mbHNpsEeNzEvHddb7n05jQiVtEGHVhDGgdGI3qgT5cU=;
+ b=iRzgFIYvoDbpwIwZ8cf1+4qafFIBZ9IK4gVOJb6pb5MQzNjfOOE5Gx2p4dnRA1vKGWuk
+ shAH/zG7A4YfT5imRMBvl53mhjzVQcjBSWzJtiuGWzQMco0Ye5Kid1aA2hpvVlPpKw3Y
+ WahmxjtU7CRu+Sk0I/Z4QrCTH7onWjUNGoTzt6JGVfpR4jJ+oVUTOiwjwwxAcSFnlnpA
+ 7bsgG1gqqP27txRSYkNO5BthxoWenMfHL4Hpv8wIrYQzxyI2K2QWJF8ohTpIWmM8qVNj
+ PDdPjmfSfukd0Q2GBk3IXye1DgD8Rm9INMC3SGzjPbCYxFlsnomUwwUUPfqxldRmXFOv Og== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39457f40xc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Jun 2021 08:00:55 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15BBYTaO105704;
+        Fri, 11 Jun 2021 08:00:55 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39457f40r7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Jun 2021 08:00:54 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15BBxCWJ008598;
+        Fri, 11 Jun 2021 12:00:48 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3900w8bdjh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Jun 2021 12:00:48 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15BBxoUV33489284
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 11 Jun 2021 11:59:50 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9C87AAE065;
+        Fri, 11 Jun 2021 12:00:45 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4546CAE057;
+        Fri, 11 Jun 2021 12:00:44 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.35.90])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 11 Jun 2021 12:00:44 +0000 (GMT)
+Subject: Re: [PATCH v7 1/4] KVM: stats: Separate generic stats from
+ architecture specific ones
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        syzbot+fb0b6a7e8713aeb0319c@syzkaller.appspotmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 2/9] KVM: x86: Emulate triple fault shutdown if RSM
- emulation fails
-In-Reply-To: <YMIwF/so0I+w60kt@google.com>
-References: <20210609185619.992058-1-seanjc@google.com>
- <20210609185619.992058-3-seanjc@google.com>
- <87eedayvkn.fsf@vitty.brq.redhat.com> <YMIwF/so0I+w60kt@google.com>
-Date:   Fri, 11 Jun 2021 13:42:27 +0200
-Message-ID: <874ke4y6e4.fsf@vitty.brq.redhat.com>
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+References: <20210603211426.790093-1-jingzhangos@google.com>
+ <20210603211426.790093-2-jingzhangos@google.com>
+ <03f3fa03-6f61-7864-4867-3dc332a9d6f3@de.ibm.com>
+ <bdd315f7-0615-af69-90c3-1e5646f3e259@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <c0173386-0c37-73c0-736a-e904636b6c94@de.ibm.com>
+Date:   Fri, 11 Jun 2021 14:00:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <bdd315f7-0615-af69-90c3-1e5646f3e259@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 8MP2ezwEt9170vbChq_FRz0xBregGrk3
+X-Proofpoint-ORIG-GUID: GqhBvqOjrdf5YHNLJ4FCXl4R-mUl-zgg
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-06-11_05:2021-06-11,2021-06-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 bulkscore=0 phishscore=0 spamscore=0 lowpriorityscore=0
+ mlxlogscore=999 priorityscore=1501 clxscore=1015 suspectscore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106110073
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
 
-> On Thu, Jun 10, 2021, Vitaly Kuznetsov wrote:
->> why don't we have triple fault printed in trace by default BTW???
->
-> Or maybe trace_kvm_make_request()?
 
-... or maybe just trace_kvm_check_request()? 
+On 11.06.21 12:51, Paolo Bonzini wrote:
+> On 11/06/21 08:57, Christian Borntraeger wrote:
+>>> @@ -755,12 +750,12 @@ struct kvm_vcpu_arch {
+>>>   };
+>>>   struct kvm_vm_stat {
+>>> +    struct kvm_vm_stat_generic generic;
+>>
+>> s390 does not have remote_tlb_flush. I guess this does not hurt?
+> 
+> It would have to be accounted in gmap_flush_tlb, but there is no struct kvm in there.  A slightly hackish possibility would be to include the gmap by value (instead of by pointer) in struct kvm, and then use container_of.
 
-$ git grep  'kvm_make_request(' arch/x86/kvm/ | wc -l
-115
-$ git grep  'kvm_check_request(' arch/x86/kvm/ | wc -l
-41
+What is the semantics of remote_tlb_flush?
+For the host:
+We usually do not do remote TLB flushes in the "IPI with a flush executed on the remote CPU" sense.
+We do have instructions that invalidates table entries and it will take care of remote TLBs as well (IPTE and IDTE and CRDTE).
+This is nice, but on the other side an operating system MUST use these instruction if the page table might be in use by any CPU. If not, you can get a delayed access exception machine check if the hardware detect a TLB/page table incosistency.
+Only if you can guarantee that nobody has this page table attached you can also use a normal store + tlb flush instruction.
 
--- 
-Vitaly
+For the guest (and I guess thats what we care about here?) TLB flushes are almost completely handled by hardware. There is only the set prefix instruction that is handled by KVM and this flushes the cpu local cache.
+> 
+> This reminds me that I have never asked you why the gmap code is not in arch/s390/kvm, 
+
+Because we share the last level of the page tables with userspace so the KVM address space is somewhat tied to the user address space.
+This is partly because Martin wanted to have control over this due to some oddities about our page tables and partly because of the rule from above. Using a IPTE of such a page table entry will take care of the TLB entries for both (user and guest) mappings in an atomic fashion when the page table changes.
+
+
+and also that there is no code in QEMU that uses KVM_VM_S390_UCONTROL or KVM_S390_VCPU_FAULT.  It would be nice to have some testcases for that, and also for KVM_S390_VCPU_FAULT with regular virtual machines... or to remove the code if it's unused.
+
+This is used by an internal firmware test tool that uses KVM to speed up simulation of hardware instructions.
+Search for CECSIM to get an idea (the existing papers still talk about the same approach using z/VM).
+I will check what we can do regarding regression tests.
 
