@@ -2,84 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D1F03A465B
-	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 18:19:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E131A3A469D
+	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 18:37:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229548AbhFKQVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Jun 2021 12:21:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59259 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229584AbhFKQVQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Jun 2021 12:21:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623428358;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RDL7ttxouIIhaHWr6IKTrlhJt0/pNbx4H3jjDvgIxo4=;
-        b=jK+/J8cFNERIaDG016UYBy8EJplYBKx/f4UcDNZg0ezwuncU9U8KRmtrOLho9PCFze/70o
-        vX8xoPWMphAbf+/sPefV2bTPJ0CXT6/zQFxQL8J0VH4XfeJn2q6oJLqW4lgfW9JMsz96ZO
-        FV1wiCufGtgJwdfZoARkUwZA9QMeSQE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-OcIpOjSIMJ-f6ITbmm0khA-1; Fri, 11 Jun 2021 12:19:16 -0400
-X-MC-Unique: OcIpOjSIMJ-f6ITbmm0khA-1
-Received: by mail-wr1-f71.google.com with SMTP id e9-20020a5d6d090000b0290119e91be97dso2879524wrq.1
-        for <kvm@vger.kernel.org>; Fri, 11 Jun 2021 09:19:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=RDL7ttxouIIhaHWr6IKTrlhJt0/pNbx4H3jjDvgIxo4=;
-        b=D49/lKTUAJbI9mOQF2gfs5/S1rsDc+GtpdkYdEI2l8iY11avux6yxtv0xmjZKGkkbV
-         sAnT2+ZxgxyG9eyJ1zR/tRbhfTk3RW9PJ86V7uVal9aCTTNwzKvzlmWYRoTxb0Z8y8HC
-         qk3Z1hF9lnV/5VF0Y+trY9/s47ip5ofAsTcXxxpT+ffZBvJUJbskKD/1jceNnL0eHzsu
-         inCKl1Z/0Es9purido+FpYr12aW394BC+FT1fwBy7AbnWtn4QGhTjEZXzMEb2LJSeFNq
-         /H8HPWPnSlgbOrxxbWaPU/Amoqjs+CL8GjgnxQeAbQJ6IpjIcF2llZZsk/jHLwXDFJnE
-         Z2Ow==
-X-Gm-Message-State: AOAM530sZQ32RrYXVlml3sp8qUmbClPAuvV9rGNOiF9norV5yEaCJ7Wl
-        WTK8YGmzOMWcmpJ/FbRssPvPTizlKBqxvqfRUM720NnXyCRfSd8X4Bv7/HX3w2eMC5Vgvx/63O3
-        vMtBtAJhphFi+
-X-Received: by 2002:a7b:c1c5:: with SMTP id a5mr4852383wmj.134.1623428355026;
-        Fri, 11 Jun 2021 09:19:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyINgCDbOBo9OC8UrfvxSwKA7rBXMHFGZv2HIog3Y74jrQqfeuhH0vfLgmiy1dyQd4XDq/0HQ==
-X-Received: by 2002:a7b:c1c5:: with SMTP id a5mr4852366wmj.134.1623428354871;
-        Fri, 11 Jun 2021 09:19:14 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id o18sm13192206wmh.38.2021.06.11.09.19.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Jun 2021 09:19:14 -0700 (PDT)
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210610220026.1364486-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Calculate and check "full" mmu_role for
- nested MMU
-Message-ID: <b2084f55-3ce5-57c4-f580-d6a2de6ce612@redhat.com>
-Date:   Fri, 11 Jun 2021 18:19:13 +0200
+        id S229685AbhFKQjl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Jun 2021 12:39:41 -0400
+Received: from foss.arm.com ([217.140.110.172]:34758 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229517AbhFKQjl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Jun 2021 12:39:41 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CAE61D6E;
+        Fri, 11 Jun 2021 09:37:42 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6145B3F719;
+        Fri, 11 Jun 2021 09:37:41 -0700 (PDT)
+Subject: Re: [PATCH v4 3/9] KVM: arm64: vgic: Be tolerant to the lack of
+ maintenance interrupt masking
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Hector Martin <marcan@marcan.st>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, kernel-team@android.com
+References: <20210601104005.81332-1-maz@kernel.org>
+ <20210601104005.81332-4-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <a02e67c6-fceb-ed6a-fc73-8649d8d18dd8@arm.com>
+Date:   Fri, 11 Jun 2021 17:38:33 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210610220026.1364486-1-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20210601104005.81332-4-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/06/21 00:00, Sean Christopherson wrote:
-> things like the number of levels in the guest's page tables are
-> surprisingly important when walking the guest page tables
+Hi Marc,
 
-Along which path though?  I would have naively expected those to be 
-driven only by the context->root_level.
+On 6/1/21 11:39 AM, Marc Zyngier wrote:
+> As it turns out, not all the interrupt controllers are able to
+> expose a vGIC maintenance interrupt that can be independently
+> enabled/disabled.
+>
+> And to be fair, it doesn't really matter as all we require is
+> for the interrupt to kick us out of guest mode out way or another.
+>
+> To that effect, add gic_kvm_info.no_maint_irq_mask for an interrupt
+> controller to advertise the lack of masking.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/vgic/vgic-init.c       | 8 +++++++-
+>  include/linux/irqchip/arm-vgic-info.h | 2 ++
+>  2 files changed, 9 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index 2fdb65529594..6752d084934d 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -519,12 +519,15 @@ void kvm_vgic_init_cpu_hardware(void)
+>   */
+>  int kvm_vgic_hyp_init(void)
+>  {
+> +	bool has_mask;
+>  	int ret;
+>  
+>  	if (!gic_kvm_info)
+>  		return -ENODEV;
+>  
+> -	if (!gic_kvm_info->maint_irq) {
+> +	has_mask = !gic_kvm_info->no_maint_irq_mask;
 
-Paolo
+This double negative is pretty awkward, I suppose this was done to avoid changes
+to the gic drivers, because the default value is 0 (false). Just an idea, maybe
+renaming it to maint_irq_unmaskable would be more readable?
 
+Other than that, the patch looks good:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+
+Alex
+
+> +
+> +	if (has_mask && !gic_kvm_info->maint_irq) {
+>  		kvm_err("No vgic maintenance irq\n");
+>  		return -ENXIO;
+>  	}
+> @@ -552,6 +555,9 @@ int kvm_vgic_hyp_init(void)
+>  	if (ret)
+>  		return ret;
+>  
+> +	if (!has_mask)
+> +		return 0;
+> +
+>  	ret = request_percpu_irq(kvm_vgic_global_state.maint_irq,
+>  				 vgic_maintenance_handler,
+>  				 "vgic", kvm_get_running_vcpus());
+> diff --git a/include/linux/irqchip/arm-vgic-info.h b/include/linux/irqchip/arm-vgic-info.h
+> index a25d4da5697d..7c0d08ebb82c 100644
+> --- a/include/linux/irqchip/arm-vgic-info.h
+> +++ b/include/linux/irqchip/arm-vgic-info.h
+> @@ -24,6 +24,8 @@ struct gic_kvm_info {
+>  	struct resource vcpu;
+>  	/* Interrupt number */
+>  	unsigned int	maint_irq;
+> +	/* No interrupt mask, no need to use the above field */
+> +	bool		no_maint_irq_mask;
+>  	/* Virtual control interface */
+>  	struct resource vctrl;
+>  	/* vlpi support */
