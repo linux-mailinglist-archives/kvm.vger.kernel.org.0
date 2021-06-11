@@ -2,130 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C12A23A42FD
-	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 15:24:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25F993A431C
+	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 15:35:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231703AbhFKN00 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Jun 2021 09:26:26 -0400
-Received: from foss.arm.com ([217.140.110.172]:58272 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229633AbhFKN0W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Jun 2021 09:26:22 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8B1EAD6E;
-        Fri, 11 Jun 2021 06:24:23 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B86953F73D;
-        Fri, 11 Jun 2021 06:24:21 -0700 (PDT)
-Subject: Re: [RFC PATCH 4/4] KVM: arm64: Introduce KVM_CAP_ARM_PROTECTED_VM
-To:     Will Deacon <will@kernel.org>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
+        id S230349AbhFKNhB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Jun 2021 09:37:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27276 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229517AbhFKNhA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Jun 2021 09:37:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623418502;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zlTvKdwzw5MkeEEEC9I9PiSc9XRaRFcAGdPS/4M7/T4=;
+        b=FRqFKLZsbjoyQruyeiFbH0viF18e7E3266p2IR93NUzAS3/Hn2icFRVHyulwND6ae0khkQ
+        Nt9ab2cu9LOa1e+JaNUyg86a5s4sfEMN0XKllXUjrYmulByi5lWUDFp+TDDyohKbM5x93F
+        YYtMruKjkOc0KMfeE9PCiSE+Zsf3fto=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-524-U81UOtwcMJ25yFIARdF6Ig-1; Fri, 11 Jun 2021 09:35:00 -0400
+X-MC-Unique: U81UOtwcMJ25yFIARdF6Ig-1
+Received: by mail-wr1-f69.google.com with SMTP id k11-20020adfe3cb0000b0290115c29d165cso2643592wrm.14
+        for <kvm@vger.kernel.org>; Fri, 11 Jun 2021 06:35:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=zlTvKdwzw5MkeEEEC9I9PiSc9XRaRFcAGdPS/4M7/T4=;
+        b=jUrEXhv3n4HzwxbxGfBmf4zuWUbj5a0EGd41n+3EsagtTX3CMq6UuLrsUyeIx/+UVK
+         z+AO5qbvUv6ZLzAeJT0DdZGgkW5XQqLVr/cHSP8NUD39udkoqcoYXS+vAxhgjfImxg6z
+         7D1gfdULTpnQUlmK0WVq5FFGT14pBKLKcwsy2QvARkXuz9JRjbXtudTGVyzJ3oITcZHE
+         4VnWC5KkL1AiDJ3RBMRcYVq5YPLLV5I2NXtxuPlNJLWDJDDgkBR2drsChnccIuPn++FJ
+         bxvzqB7N5rwwIOsw6pHZGwY/dTY+YNoXzoDd22iWfjFEl4PKScKyW5pMW3Wl+hf7HqDi
+         iRJg==
+X-Gm-Message-State: AOAM531MWpvvAIdbF0X/2y9ztKadrCauveR/2mcoZFt8F0S36DzcIgn5
+        B6e/2MhtPqbdzgJbVLTvzHvNq04zTfQM3zIRXDFsEC4m1PS0qR2VUtwctgPkBnXMW0C1Gtupx6Y
+        L8IT1XMkfO/k+
+X-Received: by 2002:a5d:59a9:: with SMTP id p9mr4118992wrr.86.1623418499453;
+        Fri, 11 Jun 2021 06:34:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyQM71M7BxbgLxkAQ6Zmo10Dt54e39XGmZG2f98CnpQkRKj9ZJdrEctz2F/sjq+A79DdtQBVQ==
+X-Received: by 2002:a5d:59a9:: with SMTP id p9mr4118955wrr.86.1623418499200;
+        Fri, 11 Jun 2021 06:34:59 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id t4sm7169792wru.53.2021.06.11.06.34.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Jun 2021 06:34:58 -0700 (PDT)
+To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
         James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Fuad Tabba <tabba@google.com>,
-        Quentin Perret <qperret@google.com>,
-        David Brazdil <dbrazdil@google.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-References: <20210603183347.1695-1-will@kernel.org>
- <20210603183347.1695-5-will@kernel.org> <YLk4e4hark3Zhi3f@google.com>
- <20210608120815.GE10174@willie-the-truck>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <64dd2c13-defd-f01c-f06d-13b2d9d3a88a@arm.com>
-Date:   Fri, 11 Jun 2021 14:25:18 +0100
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+References: <20210611124624.1404010-1-jingzhangos@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v8 0/4] KVM statistics data fd-based binary interface
+Message-ID: <d9d440f0-ac2d-5a90-4e90-5eaa365f422e@redhat.com>
+Date:   Fri, 11 Jun 2021 15:34:56 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20210608120815.GE10174@willie-the-truck>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20210611124624.1404010-1-jingzhangos@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Will,
+On 11/06/21 14:46, Jing Zhang wrote:
+> This patchset provides a file descriptor for every VM and VCPU to read
+> KVM statistics data in binary format.
+> It is meant to provide a lightweight, flexible, scalable and efficient
+> lock-free solution for user space telemetry applications to pull the
+> statistics data periodically for large scale systems. The pulling
+> frequency could be as high as a few times per second.
+> In this patchset, every statistics data are treated to have some
+> attributes as below:
+>    * architecture dependent or generic
+>    * VM statistics data or VCPU statistics data
+>    * type: cumulative, instantaneous,
+>    * unit: none for simple counter, nanosecond, microsecond,
+>      millisecond, second, Byte, KiByte, MiByte, GiByte. Clock Cycles
+> Since no lock/synchronization is used, the consistency between all
+> the statistics data is not guaranteed. That means not all statistics
+> data are read out at the exact same time, since the statistics date
+> are still being updated by KVM subsystems while they are read out.
 
-On 6/8/21 1:08 PM, Will Deacon wrote:
-> Hi Sean,
->
-> Thanks for having a look.
->
-> On Thu, Jun 03, 2021 at 08:15:55PM +0000, Sean Christopherson wrote:
->> On Thu, Jun 03, 2021, Will Deacon wrote:
->>> [..]
->>
->>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->>> index 3fd9a7e9d90c..58ab8508be5e 100644
->>> --- a/include/uapi/linux/kvm.h
->>> +++ b/include/uapi/linux/kvm.h
->>> @@ -1082,6 +1082,7 @@ struct kvm_ppc_resize_hpt {
->>>  #define KVM_CAP_SGX_ATTRIBUTE 196
->>>  #define KVM_CAP_VM_COPY_ENC_CONTEXT_FROM 197
->>>  #define KVM_CAP_PTP_KVM 198
->>> +#define KVM_CAP_ARM_PROTECTED_VM 199
->> Rather than a dedicated (and arm-only) capability for protected VMs, what about
->> adding a capability to retrieve the supported VM types?  And obviously make
->> protected VMs a different type that must be specified at VM creation (there's
->> already plumbing for this).  Even if there's no current need to know at creation
->> time that a VM will be protected, it's also unlikely to be a burden on userspace
->> and could be nice to have down the road.  The late "activation" ioctl() can still
->> be supported, e.g. to start disallowing memslot updates.
->>
->> x86 with TDX would look like:
->>
->>         case KVM_CAP_VM_TYPES:
->>                 r = BIT(KVM_X86_LEGACY_VM);
->>                 if (kvm_x86_ops.is_vm_type_supported(KVM_X86_TDX_VM))
->>                         r |= BIT(KVM_X86_TDX_VM);
->>                 break;
->>
->> and arm64 would look like?
->>
->> 	case KVM_CAP_VM_TYPES:
->> 		r = BIT(KVM_ARM64_LEGACY_VM);
->> 		if (kvm_get_mode() == KVM_MODE_PROTECTED)
->> 			r |= BIT(KVM_ARM64_PROTECTED_VM);
->> 		break;
-> You're not the first person to mention this, so I'll look into it. We'll
-> still need the cap, not just for deferring activation, but also for querying
-> the firmware parameters.
-
-I had a look at the series that rejects unsupported VCPU features from a protected
-VM [1], and it got me thinking. With this ABI in mind, it will be permitted for an
-userspace VMM to do the following:
-
-1. Create a VM -> success.
-
-2. Check the KVM_CAP_ARM_PMU_V3 (cap chosen randomly) on the **VM fd** -> it's
-available.
-
-3. Set the VCPU feature and create the VCPU -> success.
-
-4. <do other initialization stuff>
-
-5. Turn the VM into a protected VM -> failure, because KVM_ARM_VCPU_PMU_V3 was
-part of the VCPU features.
-
-To me, that looks a bit strange. On the other hand, if KVM knew right from VM
-creation time that the VM is protected, KVM could have told userspace that that
-VCPU feature is not supported **for this particular type of VM**. I think that
-makes for a much cleaner userspace API. Yes, it would still be possible to check
-the cap on the KVM fd and get success, but we could make the argument that those
-capabilities represent the capabilities that KVM supports for any type of VM, not
-this particular type.
-
-This can also be used for discovering new features added to pKVM. How do you
-intend to do that with the current ABI? By adding a version field to struct
-kvm_protected_vm_info, where each version comes with a fixed set of features that
-are supported?
-
-[1] https://www.spinics.net/lists/kvm/msg245882.html
+The binary interface itself looks good.  Can you do a follow-up patch to 
+remove struct kvm_stats_debugfs_item and avoid the duplication?  I'd 
+rather have that too before committing the code.
 
 Thanks,
 
-Alex
+Paolo
 
