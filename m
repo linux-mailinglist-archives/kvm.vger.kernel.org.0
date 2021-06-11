@@ -2,505 +2,395 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DCC683A43CC
-	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 16:07:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF37E3A43CB
+	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 16:07:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231877AbhFKOJS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Jun 2021 10:09:18 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33238 "EHLO
+        id S231882AbhFKOJR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Jun 2021 10:09:17 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54844 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231843AbhFKOJN (ORCPT
+        by vger.kernel.org with ESMTP id S231669AbhFKOJN (ORCPT
         <rfc822;kvm@vger.kernel.org>); Fri, 11 Jun 2021 10:09:13 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15BE4uMd013910;
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15BE5XUX008693;
         Fri, 11 Jun 2021 10:07:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=RZGh+o4fzEhTRuErEDKuSG1g20//VIJ88JX7cc320lo=;
- b=ZLREy0eucw1Ciu9i5co7LvZzklvnpya6Bih9nl3zE540QpiNUKT0EkvGZ/g8T1cqdzH/
- iKm16TI8YlmiTeptRiVpWQMQjrH0FN95yorb3jTNsXKvrDmSmRNfHOTh2rtXKoUim+9g
- 53EDfsgQtqGw9uLL5XimlA0syD8Q8QByt9oW4pT1k60X2HBxRLCfMx+oYX6ltf3BtL9k
- mqTzZlAPAwv0fb5fWMF9Mx5dXTMe+nz2NuYmzcisFnD/hHHaoXOeOawZKAXd4Nq0Mzo8
- lOpGw4+i3Pi3lTicpoD8dei/znDpLnK5mkGzRJeT2CYl6kA6gk2PTSraIAbYclTlqUMz ag== 
+ bh=efRVXAJ7WV8uoy7P5TIHzPDUQBNjpCNMTgUiNW8m+wk=;
+ b=d/VExNrLEHC3hPpd5RDm3NQnQvU3dUxvbVL1IqAvHbyL6kntpEGtYwNRC9pZAXGzdkse
+ naHjp86w8SVTfpQxuMShnu57ZoyzPNoBGLwD4nl3inY1AIjEeSrFORuFlm2iu7t33Uhk
+ Iz+kXaL5d+YDiPKj80DgMcCa0SNlWOxrncL9Rprp8ZY2ESKkEH4V6TJsVvi5jXCeRx+w
+ y7b3IwRgKj9HF/9/BO0xnwplISSJtU0uCVHXKwnUuLgbUJy7fzI/6pBLHUVJmYfh94ag
+ TiGlgwxeCs2VefP69CJuMewuNRN7nYTqrq3DQjUxsjYQGQ8jA6z8t+LWPcbqlyI4ENFk ig== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3948cn28w8-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3948yp8pp6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 11 Jun 2021 10:07:15 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15BE6kht024522;
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15BE6VoE013005;
         Fri, 11 Jun 2021 10:07:15 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3948cn28v1-1
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3948yp8pn6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 11 Jun 2021 10:07:15 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15BDww3g009751;
-        Fri, 11 Jun 2021 14:07:12 GMT
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15BDwGRe008430;
+        Fri, 11 Jun 2021 14:07:13 GMT
 Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04fra.de.ibm.com with ESMTP id 3900w89xf4-1
+        by ppma01fra.de.ibm.com with ESMTP id 3936ns0jvs-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Jun 2021 14:07:12 +0000
+        Fri, 11 Jun 2021 14:07:13 +0000
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15BE6D1o30147010
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15BE6DuS30147012
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 11 Jun 2021 14:06:13 GMT
+        Fri, 11 Jun 2021 14:06:14 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 545605204F;
+        by IMSVA (Postfix) with ESMTP id A989F5205F;
         Fri, 11 Jun 2021 14:07:08 +0000 (GMT)
 Received: from ibm-vm.ibmuc.com (unknown [9.145.5.240])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 080A65205F;
-        Fri, 11 Jun 2021 14:07:07 +0000 (GMT)
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 5B1B55205A;
+        Fri, 11 Jun 2021 14:07:08 +0000 (GMT)
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
         frankja@linux.ibm.com, cohuck@redhat.com
-Subject: [kvm-unit-tests PATCH v5 6/7] s390x: mmu: add support for large pages
-Date:   Fri, 11 Jun 2021 16:07:04 +0200
-Message-Id: <20210611140705.553307-7-imbrenda@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v5 7/7] s390x: edat test
+Date:   Fri, 11 Jun 2021 16:07:05 +0200
+Message-Id: <20210611140705.553307-8-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210611140705.553307-1-imbrenda@linux.ibm.com>
 References: <20210611140705.553307-1-imbrenda@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: QzzjeaIJlKPsOfeXhVK8SBcN1WT9LSb1
-X-Proofpoint-ORIG-GUID: BfODx10JdJg5DmYq_nTCOZbxlFUyXYlW
+X-Proofpoint-GUID: l4wHXaYEZDDIq0Zd75Hg69Fw5cZM6Tzu
+X-Proofpoint-ORIG-GUID: fOxeCeJbIS2BKO-y9dtvWJMV8EeUnaL7
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
  definitions=2021-06-11_05:2021-06-11,2021-06-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 bulkscore=0 lowpriorityscore=0 mlxscore=0 mlxlogscore=999
- suspectscore=0 spamscore=0 phishscore=0 priorityscore=1501 clxscore=1015
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ suspectscore=0 clxscore=1015 adultscore=0 impostorscore=0
+ priorityscore=1501 mlxlogscore=999 spamscore=0 phishscore=0 bulkscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2104190000 definitions=main-2106110090
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add support for 1M and 2G pages.
+Simple EDAT test.
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Acked-by Janosch Frank <frankja@linux.ibm.com>
 ---
- lib/s390x/mmu.h |  84 +++++++++++++++-
- lib/s390x/mmu.c | 262 +++++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 320 insertions(+), 26 deletions(-)
+ s390x/Makefile      |   1 +
+ s390x/edat.c        | 274 ++++++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg |   3 +
+ 3 files changed, 278 insertions(+)
+ create mode 100644 s390x/edat.c
 
-diff --git a/lib/s390x/mmu.h b/lib/s390x/mmu.h
-index b995f85b..ab35d782 100644
---- a/lib/s390x/mmu.h
-+++ b/lib/s390x/mmu.h
-@@ -10,9 +10,89 @@
- #ifndef _S390X_MMU_H_
- #define _S390X_MMU_H_
+diff --git a/s390x/Makefile b/s390x/Makefile
+index 8de926ab..8820e998 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -22,6 +22,7 @@ tests += $(TEST_DIR)/uv-guest.elf
+ tests += $(TEST_DIR)/sie.elf
+ tests += $(TEST_DIR)/mvpg.elf
+ tests += $(TEST_DIR)/uv-host.elf
++tests += $(TEST_DIR)/edat.elf
  
--void protect_page(void *vaddr, unsigned long prot);
-+enum pgt_level {
-+	pgtable_level_pgd = 1,
-+	pgtable_level_p4d,
-+	pgtable_level_pud,
-+	pgtable_level_pmd,
-+	pgtable_level_pte,
-+};
-+
+ tests_binary = $(patsubst %.elf,%.bin,$(tests))
+ ifneq ($(HOST_KEY_DOCUMENT),)
+diff --git a/s390x/edat.c b/s390x/edat.c
+new file mode 100644
+index 00000000..c3bee0c8
+--- /dev/null
++++ b/s390x/edat.c
+@@ -0,0 +1,274 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
-+ * Splits the pagetables down to the given DAT tables level.
-+ * Returns a pointer to the DAT table entry of the given level.
-+ * @pgtable root of the page table tree
-+ * @vaddr address whose page tables are to split
-+ * @level 3 (for 2GB pud), 4 (for 1 MB pmd) or 5 (for 4KB pages)
-+ */
-+void *split_page(pgd_t *pgtable, void *vaddr, enum pgt_level level);
-+
-+/*
-+ * Applies the given protection bits to the given DAT tables level,
-+ * splitting if necessary.
-+ * @pgtable root of the page table tree
-+ * @vaddr address whose protection bits are to be changed
-+ * @prot the protection bits to set
-+ * @level 3 (for 2GB pud), 4 (for 1MB pmd) or 5 (for 4KB pages)
-+ */
-+void protect_dat_entry(void *vaddr, unsigned long prot, enum pgt_level level);
-+
-+/*
-+ * Clears the given protection bits from the given DAT tables level,
-+ * splitting if necessary.
-+ * @pgtable root of the page table tree
-+ * @vaddr address whose protection bits are to be changed
-+ * @prot the protection bits to clear
-+ * @level 3 (for 2GB pud), 4 (for 1MB pmd) or 5 (for 4kB pages)
-+ */
-+void unprotect_dat_entry(void *vaddr, unsigned long prot, enum pgt_level level);
-+
-+/*
-+ * Applies the given protection bits to the given 4kB pages range,
-+ * splitting if necessary.
-+ * @start starting address whose protection bits are to be changed
-+ * @len size in bytes
-+ * @prot the protection bits to set
-+ */
- void protect_range(void *start, unsigned long len, unsigned long prot);
--void unprotect_page(void *vaddr, unsigned long prot);
-+
-+/*
-+ * Clears the given protection bits from the given 4kB pages range,
-+ * splitting if necessary.
-+ * @start starting address whose protection bits are to be changed
-+ * @len size in bytes
-+ * @prot the protection bits to set
-+ */
- void unprotect_range(void *start, unsigned long len, unsigned long prot);
- 
-+/* Similar to install_page, maps the virtual address to the physical address
-+ * for the given page tables, using 1MB large pages.
-+ * Returns a pointer to the DAT table entry.
-+ * @pgtable root of the page table tree
-+ * @phys physical address to map, must be 1MB aligned!
-+ * @vaddr virtual address to map, must be 1MB aligned!
-+ */
-+pmdval_t *install_large_page(pgd_t *pgtable, phys_addr_t phys, void *vaddr);
-+
-+/* Similar to install_page, maps the virtual address to the physical address
-+ * for the given page tables, using 2GB huge pages.
-+ * Returns a pointer to the DAT table entry.
-+ * @pgtable root of the page table tree
-+ * @phys physical address to map, must be 2GB aligned!
-+ * @vaddr virtual address to map, must be 2GB aligned!
-+ */
-+pudval_t *install_huge_page(pgd_t *pgtable, phys_addr_t phys, void *vaddr);
-+
-+static inline void protect_page(void *vaddr, unsigned long prot)
-+{
-+	protect_dat_entry(vaddr, prot, pgtable_level_pte);
-+}
-+
-+static inline void unprotect_page(void *vaddr, unsigned long prot)
-+{
-+	unprotect_dat_entry(vaddr, prot, pgtable_level_pte);
-+}
-+
-+void *get_dat_entry(pgd_t *pgtable, void *vaddr, unsigned int level);
-+
- #endif /* _ASMS390X_MMU_H_ */
-diff --git a/lib/s390x/mmu.c b/lib/s390x/mmu.c
-index 5c517366..c973443b 100644
---- a/lib/s390x/mmu.c
-+++ b/lib/s390x/mmu.c
-@@ -15,6 +15,18 @@
- #include <vmalloc.h>
- #include "mmu.h"
- 
-+/*
-+ * The naming convention used here is the same as used in the Linux kernel;
-+ * this is the correspondence between the s390x architectural names and the
-+ * Linux ones:
++ * EDAT test.
 + *
-+ * pgd - region 1 table entry
-+ * p4d - region 2 table entry
-+ * pud - region 3 table entry
-+ * pmd - segment table entry
-+ * pte - page table entry
++ * Copyright (c) 2021 IBM Corp
++ *
++ * Authors:
++ *	Claudio Imbrenda <imbrenda@linux.ibm.com>
 + */
++#include <libcflat.h>
++#include <vmalloc.h>
++#include <asm/facility.h>
++#include <asm/interrupt.h>
++#include <mmu.h>
++#include <asm/pgtable.h>
++#include <asm-generic/barrier.h>
 +
- static pgd_t *table_root;
- 
- void configure_dat(int enable)
-@@ -46,54 +58,256 @@ static void mmu_enable(pgd_t *pgtable)
- 	lc->pgm_new_psw.mask |= PSW_MASK_DAT;
- }
- 
--static pteval_t *get_pte(pgd_t *pgtable, uintptr_t vaddr)
-+/*
-+ * Get the pud (region 3) DAT table entry for the given address and root,
-+ * allocating it if necessary
-+ */
-+static inline pud_t *get_pud(pgd_t *pgtable, uintptr_t vaddr)
- {
- 	pgd_t *pgd = pgd_offset(pgtable, vaddr);
- 	p4d_t *p4d = p4d_alloc(pgd, vaddr);
- 	pud_t *pud = pud_alloc(p4d, vaddr);
--	pmd_t *pmd = pmd_alloc(pud, vaddr);
--	pte_t *pte = pte_alloc(pmd, vaddr);
- 
--	return &pte_val(*pte);
-+	return pud;
-+}
++#define PGD_PAGE_SHIFT (REGION1_SHIFT - PAGE_SHIFT)
++
++#define LC_SIZE	(2 * PAGE_SIZE)
++#define VIRT(x)	((void *)((unsigned long)(x) + (unsigned long)mem))
++
++static uint8_t prefix_buf[LC_SIZE] __attribute__((aligned(LC_SIZE)));
++static unsigned int tmp[1024] __attribute__((aligned(PAGE_SIZE)));
++static void *root, *mem, *m;
++static struct lowcore *lc;
++volatile unsigned int *p;
 +
 +/*
-+ * Get the pmd (segment) DAT table entry for the given address and pud,
-+ * allocating it if necessary.
-+ * The pud must not be huge.
++ * Check if a non-access-list protection exception happened for the given
++ * address, in the primary address space.
 + */
-+static inline pmd_t *get_pmd(pud_t *pud, uintptr_t vaddr)
++static bool check_pgm_prot(void *ptr)
 +{
-+	pmd_t *pmd;
++	union teid teid;
 +
-+	assert(!pud_huge(*pud));
-+	pmd = pmd_alloc(pud, vaddr);
-+	return pmd;
++	if (lc->pgm_int_code != PGM_INT_CODE_PROTECTION)
++		return false;
++
++	teid.val = lc->trans_exc_id;
++
++	/*
++	 * depending on the presence of the ESOP feature, the rest of the
++	 * field might or might not be meaningful when the m field is 0.
++	 */
++	if (!teid.m)
++		return true;
++	return (!teid.acc_list_prot && !teid.asce_id &&
++		(teid.addr == ((unsigned long)ptr >> PAGE_SHIFT)));
 +}
 +
-+/*
-+ * Get the pte (page) DAT table entry for the given address and pmd,
-+ * allocating it if necessary.
-+ * The pmd must not be large.
-+ */
-+static inline pte_t *get_pte(pmd_t *pmd, uintptr_t vaddr)
++static void test_dat(void)
 +{
-+	pte_t *pte;
++	report_prefix_push("edat off");
++	/* disable EDAT */
++	ctl_clear_bit(0, CTL0_EDAT);
 +
-+	assert(!pmd_large(*pmd));
-+	pte = pte_alloc(pmd, vaddr);
-+	return pte;
++	/* Check some basics */
++	p[0] = 42;
++	report(p[0] == 42, "pte, r/w");
++	p[0] = 0;
++
++	/* Write protect the page and try to write, expect a fault */
++	protect_page(m, PAGE_ENTRY_P);
++	expect_pgm_int();
++	p[0] = 42;
++	unprotect_page(m, PAGE_ENTRY_P);
++	report(!p[0] && check_pgm_prot(m), "pte, ro");
++
++	/*
++	 * The FC bit (for large pages) should be ignored because EDAT is
++	 * off. We set a value and then we try to read it back again after
++	 * setting the FC bit. This way we can check if large pages were
++	 * erroneously enabled despite EDAT being off.
++	 */
++	p[0] = 42;
++	protect_dat_entry(m, SEGMENT_ENTRY_FC, pgtable_level_pmd);
++	report(p[0] == 42, "pmd, fc=1, r/w");
++	unprotect_dat_entry(m, SEGMENT_ENTRY_FC, pgtable_level_pmd);
++	p[0] = 0;
++
++	/*
++	 * Segment protection should work even with EDAT off, try to write
++	 * anyway and expect a fault
++	 */
++	protect_dat_entry(m, SEGMENT_ENTRY_P, pgtable_level_pmd);
++	expect_pgm_int();
++	p[0] = 42;
++	report(!p[0] && check_pgm_prot(m), "pmd, ro");
++	unprotect_dat_entry(m, SEGMENT_ENTRY_P, pgtable_level_pmd);
++
++	/* The FC bit should be ignored because EDAT is off, like above */
++	p[0] = 42;
++	protect_dat_entry(m, REGION3_ENTRY_FC, pgtable_level_pud);
++	report(p[0] == 42, "pud, fc=1, r/w");
++	unprotect_dat_entry(m, REGION3_ENTRY_FC, pgtable_level_pud);
++	p[0] = 0;
++
++	/*
++	 * Region1/2/3 protection should not work, because EDAT is off.
++	 * Protect the various region1/2/3 entries and write, expect the
++	 * write to be successful.
++	 */
++	protect_dat_entry(m, REGION_ENTRY_P, pgtable_level_pud);
++	p[0] = 42;
++	report(p[0] == 42, "pud, ro");
++	unprotect_dat_entry(m, REGION_ENTRY_P, pgtable_level_pud);
++	p[0] = 0;
++
++	protect_dat_entry(m, REGION_ENTRY_P, pgtable_level_p4d);
++	p[0] = 42;
++	report(p[0] == 42, "p4d, ro");
++	unprotect_dat_entry(m, REGION_ENTRY_P, pgtable_level_p4d);
++	p[0] = 0;
++
++	protect_dat_entry(m, REGION_ENTRY_P, pgtable_level_pgd);
++	p[0] = 42;
++	report(p[0] == 42, "pgd, ro");
++	unprotect_dat_entry(m, REGION_ENTRY_P, pgtable_level_pgd);
++	p[0] = 0;
++
++	report_prefix_pop();
 +}
 +
-+/*
-+ * Splits a large pmd (segment) DAT table entry into equivalent 4kB small
-+ * pages.
-+ * @pmd The pmd to split, it must be large.
-+ * @va the virtual address corresponding to this pmd.
-+ */
-+static void split_pmd(pmd_t *pmd, uintptr_t va)
++static void test_edat1(void)
 +{
-+	phys_addr_t pa = pmd_val(*pmd) & SEGMENT_ENTRY_SFAA;
-+	unsigned long i, prot;
-+	pte_t *pte;
++	report_prefix_push("edat1");
++	/* Enable EDAT */
++	ctl_set_bit(0, CTL0_EDAT);
++	p[0] = 0;
 +
-+	assert(pmd_large(*pmd));
-+	pte = alloc_pages(PAGE_TABLE_ORDER);
-+	prot = pmd_val(*pmd) & (SEGMENT_ENTRY_IEP | SEGMENT_ENTRY_P);
-+	for (i = 0; i < PAGE_TABLE_ENTRIES; i++)
-+		pte_val(pte[i]) =  pa | PAGE_SIZE * i | prot;
-+	idte_pmdp(va, &pmd_val(*pmd));
-+	pmd_val(*pmd) = __pa(pte) | SEGMENT_ENTRY_TT_SEGMENT;
++	/*
++	 * Segment protection should work normally, try to write and expect
++	 * a fault.
++	 */
++	expect_pgm_int();
++	protect_dat_entry(m, SEGMENT_ENTRY_P, pgtable_level_pmd);
++	p[0] = 42;
++	report(!p[0] && check_pgm_prot(m), "pmd, ro");
++	unprotect_dat_entry(m, SEGMENT_ENTRY_P, pgtable_level_pmd);
 +
++	/*
++	 * Region1/2/3 protection should work now, because EDAT is on. Try
++	 * to write anyway and expect a fault.
++	 */
++	expect_pgm_int();
++	protect_dat_entry(m, REGION_ENTRY_P, pgtable_level_pud);
++	p[0] = 42;
++	report(!p[0] && check_pgm_prot(m), "pud, ro");
++	unprotect_dat_entry(m, REGION_ENTRY_P, pgtable_level_pud);
++
++	expect_pgm_int();
++	protect_dat_entry(m, REGION_ENTRY_P, pgtable_level_p4d);
++	p[0] = 42;
++	report(!p[0] && check_pgm_prot(m), "p4d, ro");
++	unprotect_dat_entry(m, REGION_ENTRY_P, pgtable_level_p4d);
++
++	expect_pgm_int();
++	protect_dat_entry(m, REGION_ENTRY_P, pgtable_level_pgd);
++	p[0] = 42;
++	report(!p[0] && check_pgm_prot(m), "pgd, ro");
++	unprotect_dat_entry(m, REGION_ENTRY_P, pgtable_level_pgd);
++
++	/* Large pages should work */
++	p[0] = 42;
++	install_large_page(root, 0, mem);
++	report(p[0] == 42, "pmd, large");
++
++	/*
++	 * Prefixing should not work with large pages. Since the lower
++	 * addresses are mapped with small pages, which are subject to
++	 * prefixing, and the pages mapped with large pages are not subject
++	 * to prefixing, this is the resulting scenario:
++	 *
++	 * virtual 0 = real 0 -> absolute prefix_buf
++	 * virtual prefix_buf = real prefix_buf -> absolute 0
++	 * VIRT(0) -> absolute 0
++	 * VIRT(prefix_buf) -> absolute prefix_buf
++	 *
++	 * The testcase checks if the memory at virtual 0 has the same
++	 * content as the memory at VIRT(prefix_buf) and the memory at
++	 * VIRT(0) has the same content as the memory at virtual prefix_buf.
++	 * If prefixing is erroneously applied for large pages, the testcase
++	 * will therefore fail.
++	 */
++	report(!memcmp(0, VIRT(prefix_buf), LC_SIZE) &&
++		!memcmp(prefix_buf, VIRT(0), LC_SIZE),
++		"pmd, large, prefixing");
++
++	report_prefix_pop();
 +}
 +
-+/*
-+ * Splits a huge pud (region 3) DAT table entry into equivalent 1MB large
-+ * pages.
-+ * @pud The pud to split, it must be huge.
-+ * @va the virtual address corresponding to this pud.
-+ */
-+static void split_pud(pud_t *pud, uintptr_t va)
++static void test_edat2(void)
 +{
-+	phys_addr_t pa = pud_val(*pud) & REGION3_ENTRY_RFAA;
-+	unsigned long i, prot;
-+	pmd_t *pmd;
++	report_prefix_push("edat2");
++	p[0] = 42;
 +
-+	assert(pud_huge(*pud));
-+	pmd = alloc_pages(SEGMENT_TABLE_ORDER);
-+	prot = pud_val(*pud) & (REGION3_ENTRY_IEP | REGION_ENTRY_P);
-+	for (i = 0; i < SEGMENT_TABLE_ENTRIES; i++)
-+		pmd_val(pmd[i]) =  pa | SZ_1M * i | prot | SEGMENT_ENTRY_FC | SEGMENT_ENTRY_TT_SEGMENT;
-+	idte_pudp(va, &pud_val(*pud));
-+	pud_val(*pud) = __pa(pmd) | REGION_ENTRY_TT_REGION3 | REGION_TABLE_LENGTH;
++	/* Huge pages should work */
++	install_huge_page(root, 0, mem);
++	report(p[0] == 42, "pud, huge");
++
++	/* Prefixing should not work with huge pages, just like large pages */
++	report(!memcmp(0, VIRT(prefix_buf), LC_SIZE) &&
++		!memcmp(prefix_buf, VIRT(0), LC_SIZE),
++		"pmd, large, prefixing");
++
++	report_prefix_pop();
 +}
 +
-+void *get_dat_entry(pgd_t *pgtable, void *vaddr, enum pgt_level level)
++static unsigned int setup(void)
 +{
-+	uintptr_t va = (uintptr_t)vaddr;
-+	pgd_t *pgd;
-+	p4d_t *p4d;
-+	pud_t *pud;
-+	pmd_t *pmd;
++	bool has_edat1 = test_facility(8);
++	bool has_edat2 = test_facility(78);
++	unsigned long pa, va;
 +
-+	assert(level && (level <= 5));
-+	pgd = pgd_offset(pgtable, va);
-+	if (level == pgtable_level_pgd)
-+		return pgd;
-+	p4d = p4d_alloc(pgd, va);
-+	if (level == pgtable_level_p4d)
-+		return p4d;
-+	pud = pud_alloc(p4d, va);
++	if (has_edat2 && !has_edat1)
++		report_abort("EDAT2 available, but EDAT1 not available");
 +
-+	if (level == pgtable_level_pud)
-+		return pud;
-+	if (!pud_none(*pud) && pud_huge(*pud))
-+		split_pud(pud, va);
-+	pmd = get_pmd(pud, va);
-+	if (level == pgtable_level_pmd)
-+		return pmd;
-+	if (!pmd_none(*pmd) && pmd_large(*pmd))
-+		split_pmd(pmd, va);
-+	return get_pte(pmd, va);
++	/* Setup DAT 1:1 mapping and memory management */
++	setup_vm();
++	root = (void *)(stctg(1) & PAGE_MASK);
++
++	/*
++	 * Get a pgd worth of virtual memory, so we can test things later
++	 * without interfering with the test code or the interrupt handler
++	 */
++	mem = alloc_vpages_aligned(BIT_ULL(PGD_PAGE_SHIFT), PGD_PAGE_SHIFT);
++	assert(mem);
++	va = (unsigned long)mem;
++
++	/* Map the first 1GB of real memory */
++	for (pa = 0; pa < SZ_1G; pa += PAGE_SIZE, va += PAGE_SIZE)
++		install_page(root, pa, (void *)va);
++
++	/*
++	 * Move the lowcore to a known non-zero location. This is needed
++	 * later to check whether prefixing is working with large pages.
++	 */
++	assert((unsigned long)&prefix_buf < SZ_2G);
++	memcpy(prefix_buf, 0, LC_SIZE);
++	set_prefix((uint32_t)(uintptr_t)prefix_buf);
++	/* Clear the old copy */
++	memset(prefix_buf, 0, LC_SIZE);
++
++	/* m will point to tmp through the new virtual mapping */
++	m = VIRT(&tmp);
++	/* p is the same as m but volatile */
++	p = (volatile unsigned int *)m;
++
++	return has_edat1 + has_edat2;
 +}
 +
-+void *split_page(pgd_t *pgtable, void *vaddr, enum pgt_level level)
++int main(void)
 +{
-+	assert((level >= 3) && (level <= 5));
-+	return get_dat_entry(pgtable ? pgtable : table_root, vaddr, level);
- }
- 
- phys_addr_t virt_to_pte_phys(pgd_t *pgtable, void *vaddr)
- {
--	return (*get_pte(pgtable, (uintptr_t)vaddr) & PAGE_MASK) +
--	       ((unsigned long)vaddr & ~PAGE_MASK);
-+	uintptr_t va = (uintptr_t)vaddr;
-+	pud_t *pud;
-+	pmd_t *pmd;
-+	pte_t *pte;
++	unsigned int edat;
 +
-+	pud = get_pud(pgtable, va);
-+	if (pud_huge(*pud))
-+		return (pud_val(*pud) & REGION3_ENTRY_RFAA) | (va & ~REGION3_ENTRY_RFAA);
-+	pmd = get_pmd(pud, va);
-+	if (pmd_large(*pmd))
-+		return (pmd_val(*pmd) & SEGMENT_ENTRY_SFAA) | (va & ~SEGMENT_ENTRY_SFAA);
-+	pte = get_pte(pmd, va);
-+	return (pte_val(*pte) & PAGE_MASK) | (va & ~PAGE_MASK);
++	report_prefix_push("edat");
++	edat = setup();
++
++	test_dat();
++
++	if (edat)
++		test_edat1();
++	else
++		report_skip("EDAT not available");
++
++	if (edat >= 2)
++		test_edat2();
++	else
++		report_skip("EDAT2 not available");
++
++	report_prefix_pop();
++	return report_summary();
 +}
+diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+index 9f81a608..a0ec8864 100644
+--- a/s390x/unittests.cfg
++++ b/s390x/unittests.cfg
+@@ -103,3 +103,6 @@ file = sie.elf
+ [mvpg]
+ file = mvpg.elf
+ timeout = 10
 +
-+/*
-+ * Get the DAT table entry of the given level for the given address,
-+ * splitting if necessary. If the entry was not invalid, invalidate it, and
-+ * return the pointer to the entry and, if requested, its old value.
-+ * @pgtable root of the page tables
-+ * @vaddr virtual address
-+ * @level 3 (for 2GB pud), 4 (for 1MB pmd) or 5 (for 4kB pages)
-+ * @old if not NULL, will be written with the old value of the DAT table
-+ * entry before invalidation
-+ */
-+static void *dat_get_and_invalidate(pgd_t *pgtable, void *vaddr, enum pgt_level level, unsigned long *old)
-+{
-+	unsigned long va = (unsigned long)vaddr;
-+	void *ptr;
-+
-+	ptr = get_dat_entry(pgtable, vaddr, level);
-+	if (old)
-+		*old = *(unsigned long *)ptr;
-+	if ((level == pgtable_level_pgd) && !pgd_none(*(pgd_t *)ptr))
-+		idte_pgdp(va, ptr);
-+	else if ((level == pgtable_level_p4d) && !p4d_none(*(p4d_t *)ptr))
-+		idte_p4dp(va, ptr);
-+	else if ((level == pgtable_level_pud) && !pud_none(*(pud_t *)ptr))
-+		idte_pudp(va, ptr);
-+	else if ((level == pgtable_level_pmd) && !pmd_none(*(pmd_t *)ptr))
-+		idte_pmdp(va, ptr);
-+	else if (!pte_none(*(pte_t *)ptr))
-+		ipte(va, ptr);
-+	return ptr;
- }
- 
--static pteval_t *set_pte(pgd_t *pgtable, pteval_t val, void *vaddr)
-+static void cleanup_pmd(pmd_t *pmd)
- {
--	pteval_t *p_pte = get_pte(pgtable, (uintptr_t)vaddr);
-+	/* was invalid or large, nothing to do */
-+	if (pmd_none(*pmd) || pmd_large(*pmd))
-+		return;
-+	/* was not large, free the corresponding page table */
-+	free_pages((void *)(pmd_val(*pmd) & PAGE_MASK));
-+}
- 
--	/* first flush the old entry (if we're replacing anything) */
--	if (!(*p_pte & PAGE_ENTRY_I))
--		ipte((uintptr_t)vaddr, p_pte);
-+static void cleanup_pud(pud_t *pud)
-+{
-+	unsigned long i;
-+	pmd_t *pmd;
- 
--	*p_pte = val;
--	return p_pte;
-+	/* was invalid or large, nothing to do */
-+	if (pud_none(*pud) || pud_huge(*pud))
-+		return;
-+	/* recursively clean up all pmds if needed */
-+	pmd = (pmd_t *)(pud_val(*pud) & PAGE_MASK);
-+	for (i = 0; i < SEGMENT_TABLE_ENTRIES; i++)
-+		cleanup_pmd(pmd + i);
-+	/* free the corresponding segment table */
-+	free_pages(pmd);
-+}
-+
-+/*
-+ * Set the DAT entry for the given level of the given virtual address. If a
-+ * mapping already existed, it is overwritten. If an existing mapping with
-+ * smaller pages existed, all the lower tables are freed.
-+ * Returns the pointer to the DAT table entry.
-+ * @pgtable root of the page tables
-+ * @val the new value for the DAT table entry
-+ * @vaddr the virtual address
-+ * @level 3 for pud (region 3), 4 for pmd (segment) and 5 for pte (pages)
-+ */
-+static void *set_dat_entry(pgd_t *pgtable, unsigned long val, void *vaddr, enum pgt_level level)
-+{
-+	unsigned long old, *res;
-+
-+	res = dat_get_and_invalidate(pgtable, vaddr, level, &old);
-+	if (level == pgtable_level_pmd)
-+		cleanup_pmd((pmd_t *)&old);
-+	if (level == pgtable_level_pud)
-+		cleanup_pud((pud_t *)&old);
-+	*res = val;
-+	return res;
- }
- 
- pteval_t *install_page(pgd_t *pgtable, phys_addr_t phys, void *vaddr)
- {
--	return set_pte(pgtable, __pa(phys), vaddr);
-+	assert(IS_ALIGNED(phys, PAGE_SIZE));
-+	assert(IS_ALIGNED((uintptr_t)vaddr, PAGE_SIZE));
-+	return set_dat_entry(pgtable, phys, vaddr, pgtable_level_pte);
-+}
-+
-+pmdval_t *install_large_page(pgd_t *pgtable, phys_addr_t phys, void *vaddr)
-+{
-+	assert(IS_ALIGNED(phys, SZ_1M));
-+	assert(IS_ALIGNED((uintptr_t)vaddr, SZ_1M));
-+	return set_dat_entry(pgtable, phys | SEGMENT_ENTRY_FC, vaddr, pgtable_level_pmd);
-+}
-+
-+pudval_t *install_huge_page(pgd_t *pgtable, phys_addr_t phys, void *vaddr)
-+{
-+	assert(IS_ALIGNED(phys, SZ_2G));
-+	assert(IS_ALIGNED((uintptr_t)vaddr, SZ_2G));
-+	return set_dat_entry(pgtable, phys | REGION3_ENTRY_FC | REGION_ENTRY_TT_REGION3, vaddr, pgtable_level_pud);
- }
- 
--void protect_page(void *vaddr, unsigned long prot)
-+void protect_dat_entry(void *vaddr, unsigned long prot, enum pgt_level level)
- {
--	pteval_t *p_pte = get_pte(table_root, (uintptr_t)vaddr);
--	pteval_t n_pte = *p_pte | prot;
-+	unsigned long old, *ptr;
- 
--	set_pte(table_root, n_pte, vaddr);
-+	ptr = dat_get_and_invalidate(table_root, vaddr, level, &old);
-+	*ptr = old | prot;
- }
- 
--void unprotect_page(void *vaddr, unsigned long prot)
-+void unprotect_dat_entry(void *vaddr, unsigned long prot, enum pgt_level level)
- {
--	pteval_t *p_pte = get_pte(table_root, (uintptr_t)vaddr);
--	pteval_t n_pte = *p_pte & ~prot;
-+	unsigned long old, *ptr;
- 
--	set_pte(table_root, n_pte, vaddr);
-+	ptr = dat_get_and_invalidate(table_root, vaddr, level, &old);
-+	*ptr = old & ~prot;
- }
- 
- void protect_range(void *start, unsigned long len, unsigned long prot)
-@@ -102,7 +316,7 @@ void protect_range(void *start, unsigned long len, unsigned long prot)
- 
- 	len &= PAGE_MASK;
- 	for (; len; len -= PAGE_SIZE, curr += PAGE_SIZE)
--		protect_page((void *)curr, prot);
-+		protect_dat_entry((void *)curr, prot, 5);
- }
- 
- void unprotect_range(void *start, unsigned long len, unsigned long prot)
-@@ -111,7 +325,7 @@ void unprotect_range(void *start, unsigned long len, unsigned long prot)
- 
- 	len &= PAGE_MASK;
- 	for (; len; len -= PAGE_SIZE, curr += PAGE_SIZE)
--		unprotect_page((void *)curr, prot);
-+		unprotect_dat_entry((void *)curr, prot, 5);
- }
- 
- static void setup_identity(pgd_t *pgtable, phys_addr_t start_addr,
++[edat]
++file = edat.elf
 -- 
 2.31.1
 
