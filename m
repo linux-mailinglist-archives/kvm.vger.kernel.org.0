@@ -2,126 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D5D23A41CE
-	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 14:14:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9F063A41EC
+	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 14:25:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230467AbhFKMQO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Jun 2021 08:16:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32370 "EHLO
+        id S231582AbhFKM1h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Jun 2021 08:27:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59444 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230465AbhFKMQN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Jun 2021 08:16:13 -0400
+        by vger.kernel.org with ESMTP id S230346AbhFKM1g (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Jun 2021 08:27:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623413655;
+        s=mimecast20190719; t=1623414338;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=tshLc4zdYGgPabfNvrWwtgUPpGh1iSBRoaKHJCb/8hw=;
-        b=PMI2b6zBnWHuxdj543hlg7h0EXf0fTk0tnlT6pTbIzGd0QQG09ZoMII4o0VpoVLgUFTViD
-        3MojeNqYmPqNFj8TGJvxxazwWXBzZ86l5Cwf2Q7x/2SB39QRhjJm/FleCl2NuEixi9+3NK
-        sBFcpACCHILfCb2QetHonb5Dg5bJjAg=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-kgzWkUi_PTmatpxJTtEWzA-1; Fri, 11 Jun 2021 08:14:13 -0400
-X-MC-Unique: kgzWkUi_PTmatpxJTtEWzA-1
-Received: by mail-wm1-f69.google.com with SMTP id n2-20020a05600c3b82b02901aeb7a4ac06so5317911wms.5
-        for <kvm@vger.kernel.org>; Fri, 11 Jun 2021 05:14:13 -0700 (PDT)
+        bh=+saQX1pFifHAMfA75K26b9IDNQxzW3sh1B/T8sEy8xE=;
+        b=P7fQO0LHTp9kcgF1zZ03nFMXrCEGkvVSqBQ2+eQeadktk4YT+AXvOV3Jn0iWv6h0Aq+Fey
+        +czm6UqcoV0B0xZ6fiiq9bW/sq/EUfXyyQKvHS/4djoiJs5vc2PHd0UZ+9reC+weuNF4wm
+        Xaq8QI2ow7pO6ACiZDmJSHCAcCrcaAQ=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-300-_dFV1uQdPga9hbzQiFwD8g-1; Fri, 11 Jun 2021 08:25:37 -0400
+X-MC-Unique: _dFV1uQdPga9hbzQiFwD8g-1
+Received: by mail-ej1-f72.google.com with SMTP id n8-20020a1709067b48b02904171dc68f87so1058074ejo.21
+        for <kvm@vger.kernel.org>; Fri, 11 Jun 2021 05:25:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tshLc4zdYGgPabfNvrWwtgUPpGh1iSBRoaKHJCb/8hw=;
-        b=Lrq09NrkGjnsWvHmlgx8swl8qKxQL476hm7IbCa4VPuyevWpJ/SoVv4mFp0OE/VHJo
-         b6yUpyE/Spw8chu5SLVvpLz1Zh1YikyfzyRMzHHuMHiKK+PGerQiZOtSW067FS9fZXpx
-         FFhqjv1fV1/KfV+vyM8YFkQqee7uK0f2Y4FuxTyM2x539fnhD9IoWOLilXXUiiTA+I2F
-         nRJzjG4cxakvi7VwsLqGhZnBW87PGnuVyYb7U6iTUA0uiPerYR9d/E55NPuYS+M+wZ/x
-         Sj3FzMAFBFVgD1jVMNo4liAeNpC8qZN69q/UFUdMX2Kol2o/0mpnkU2bDAfXUKPJOMIn
-         ygBQ==
-X-Gm-Message-State: AOAM5327FWmS2m+qYVXrKayWZoYfEFfCMjbTHVshBZYLtBvy1Ch5/6M6
-        LDJVt3e8EvQjKBGCSew1FBMwL+m2UU5QLeGyNkzIe/eQRqzIzaTvkqzi8ORgfaycgDjBEfTw8gk
-        qnSj2VT+WpFGN
-X-Received: by 2002:a05:600c:3650:: with SMTP id y16mr3677453wmq.92.1623413652697;
-        Fri, 11 Jun 2021 05:14:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzekCA0/z805DZlMHydl4+u+pU/IhlWHIqCvhI6IwFtHm385E+SV0tWtc3pGZK67eFkb8/Udw==
-X-Received: by 2002:a05:600c:3650:: with SMTP id y16mr3677424wmq.92.1623413652485;
-        Fri, 11 Jun 2021 05:14:12 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id r18sm6837910wro.62.2021.06.11.05.14.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Jun 2021 05:14:11 -0700 (PDT)
-Subject: Re: [PATCH v7 1/4] KVM: stats: Separate generic stats from
- architecture specific ones
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        LinuxS390 <linux-s390@vger.kernel.org>,
-        Linuxkselftest <linux-kselftest@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-References: <20210603211426.790093-1-jingzhangos@google.com>
- <20210603211426.790093-2-jingzhangos@google.com>
- <03f3fa03-6f61-7864-4867-3dc332a9d6f3@de.ibm.com>
- <bdd315f7-0615-af69-90c3-1e5646f3e259@redhat.com>
- <c0173386-0c37-73c0-736a-e904636b6c94@de.ibm.com>
- <c5199e63-762d-a731-7ef2-c2af3a8cb0c3@redhat.com>
- <050e9d8e-278d-278c-13f7-ea0b39d13fbe@de.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8dd7259c-d0f6-6816-178f-ab0f0b486955@redhat.com>
-Date:   Fri, 11 Jun 2021 14:14:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=+saQX1pFifHAMfA75K26b9IDNQxzW3sh1B/T8sEy8xE=;
+        b=Sm/h2V5cDkbvkPViwNFPua1Hef61+2i4MgKfPx5fKiRq6gQreBC7S8p1M6yog9tGon
+         t8lhGeZ74Mic/+VMgZyS4mkWpgXv0LyPNPj/dMIV4yp/5lcpbiOwgzP1tbNnFJ5kU22u
+         25WerNrD4r2To2gOkOsJpyNVkr96RqLSvBY3LvsHHhWQaR0DT3Z1E9JLVITTi2XhrfKC
+         lmSZrwh4fQ7ZIoOjmVyieTpxIRtWu1ubLx8t9jKtJDDE/8NeIH232FTseKoDL16JHVSy
+         uy5KS6vzYjEFGdLfniwh6/s4UGK+rEAKQzOXnvACsydvTUMrPRXYA6SuscWG2fSLVJdo
+         VR5g==
+X-Gm-Message-State: AOAM531R93FhFDDJpgt0eLA/tuI2uWZW9qHeMEdyGmMhe5WSnf9qyS2I
+        A07LlaiTt/EpZG/lm46RpwFPzxdiddyn03KJOQs5YuIyW2fyl5EFukXNxs2V100oLxBqSRGKigQ
+        QpD+1fb0edbM2
+X-Received: by 2002:a17:906:2b04:: with SMTP id a4mr3391590ejg.6.1623414336108;
+        Fri, 11 Jun 2021 05:25:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyPbmShTD8/mzWY6bPdx7L57uktKQ4wfEOyzzKRXT1hmYodewrqYPlF9qdrHraWuNSTa7EpDQ==
+X-Received: by 2002:a17:906:2b04:: with SMTP id a4mr3391574ejg.6.1623414335924;
+        Fri, 11 Jun 2021 05:25:35 -0700 (PDT)
+Received: from steredhat (host-79-18-148-79.retail.telecomitalia.it. [79.18.148.79])
+        by smtp.gmail.com with ESMTPSA id x15sm2111520edd.6.2021.06.11.05.25.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Jun 2021 05:25:35 -0700 (PDT)
+Date:   Fri, 11 Jun 2021 14:25:33 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Colin Ian King <colin.king@canonical.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+Subject: Re: [PATCH v11 00/18] virtio/vsock: introduce SOCK_SEQPACKET support
+Message-ID: <20210611122533.cy4jce4vxhhou5ms@steredhat>
+References: <20210611110744.3650456-1-arseny.krasnov@kaspersky.com>
+ <59b720a8-154f-ad29-e7a9-b86b69408078@kaspersky.com>
 MIME-Version: 1.0
-In-Reply-To: <050e9d8e-278d-278c-13f7-ea0b39d13fbe@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <59b720a8-154f-ad29-e7a9-b86b69408078@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/06/21 14:08, Christian Borntraeger wrote:
+Hi Arseny,
+
+On Fri, Jun 11, 2021 at 02:17:00PM +0300, Arseny Krasnov wrote:
+>
+>On 11.06.2021 14:07, Arseny Krasnov wrote:
+>> 	This patchset implements support of SOCK_SEQPACKET for virtio
+>> transport.
+>> 	As SOCK_SEQPACKET guarantees to save record boundaries, so to
+>> do it, new bit for field 'flags' was added: SEQ_EOR. This bit is
+>> set to 1 in last RW packet of message.
+>> 	Now as  packets of one socket are not reordered neither on vsock
+>> nor on vhost transport layers, such bit allows to restore original
+>> message on receiver's side. If user's buffer is smaller than message
+>> length, when all out of size data is dropped.
+>> 	Maximum length of datagram is limited by 'peer_buf_alloc' value.
+>> 	Implementation also supports 'MSG_TRUNC' flags.
+>> 	Tests also implemented.
 >>
->> I always interpreted it as "number of times the KVM page table 
->> management code needed other CPUs to learn about new page tables". 
->> Whether the broadcast is done in software or hardware shouldn't 
->> matter; either way I suppose there is still some traffic on the bus 
->> involved.
-> 
-> 
-> My point is that KVM page table management on s390x completely 
-> piggy-backs on the qemu address space page table management from common 
-> code for the last level.
-> And due to the way we handle page tables we also do not teach "other 
-> CPUs". We always teach the whole system with things like IPTE.
+>> 	Thanks to stsp2@yandex.ru for encouragements and initial design
+>> recommendations.
+>>
+>>  Arseny Krasnov (18):
+>>   af_vsock: update functions for connectible socket
+>>   af_vsock: separate wait data loop
+>>   af_vsock: separate receive data loop
+>>   af_vsock: implement SEQPACKET receive loop
+>>   af_vsock: implement send logic for SEQPACKET
+>>   af_vsock: rest of SEQPACKET support
+>>   af_vsock: update comments for stream sockets
+>>   virtio/vsock: set packet's type in virtio_transport_send_pkt_info()
+>>   virtio/vsock: simplify credit update function API
+>>   virtio/vsock: defines and constants for SEQPACKET
+>>   virtio/vsock: dequeue callback for SOCK_SEQPACKET
+>>   virtio/vsock: add SEQPACKET receive logic
+>>   virtio/vsock: rest of SOCK_SEQPACKET support
+>>   virtio/vsock: enable SEQPACKET for transport
+>>   vhost/vsock: enable SEQPACKET for transport
+>>   vsock/loopback: enable SEQPACKET for transport
+>>   vsock_test: add SOCK_SEQPACKET tests
+>>   virtio/vsock: update trace event for SEQPACKET
+>>
+>>  drivers/vhost/vsock.c                              |  56 ++-
+>>  include/linux/virtio_vsock.h                       |  10 +
+>>  include/net/af_vsock.h                             |   8 +
+>>  .../trace/events/vsock_virtio_transport_common.h   |   5 +-
+>>  include/uapi/linux/virtio_vsock.h                  |   9 +
+>>  net/vmw_vsock/af_vsock.c                           | 464 ++++++++++++------
+>>  net/vmw_vsock/virtio_transport.c                   |  26 ++
+>>  net/vmw_vsock/virtio_transport_common.c            | 179 +++++++-
+>>  net/vmw_vsock/vsock_loopback.c                     |  12 +
+>>  tools/testing/vsock/util.c                         |  32 +-
+>>  tools/testing/vsock/util.h                         |   3 +
+>>  tools/testing/vsock/vsock_test.c                   | 116 ++++++
+>>  12 files changed, 730 insertions(+), 190 deletions(-)
+>>
+>>  v10 -> v11:
+>>  General changelog:
+>>   - now data is copied to user's buffer only when
+>>     whole message is received.
+>>   - reader is woken up when EOR packet is received.
+>>   - if read syscall was interrupted by signal or
+>>     timeout, error is returned(not 0).
+>>
+>>  Per patch changelog:
+>>   see every patch after '---' line.
+>So here is new version for review with updates discussed earlier :)
 
-But that just means that you'll have fewer KVM-exclusive and thus nicer 
-numbers than x86 or ARM. :)  It still makes sense to count 
-gmap_flush_tlb calls.
+Thanks, I'll review next week, but I suggest you again to split in two 
+series, since patchwork (and netdev maintainers) are not happy with a 
+series of 18 patches.
 
-Paolo
+If you still prefer to keep them together during development, then 
+please use the RFC tag.
+
+Also did you take a look at the FAQ for netdev that I linked last time?
+I don't see the net-next tag...
+
+Thanks,
+Stefano
 
