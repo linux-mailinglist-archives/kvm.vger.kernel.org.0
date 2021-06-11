@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F6253A4B83
-	for <lists+kvm@lfdr.de>; Sat, 12 Jun 2021 01:58:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BABAC3A4B8D
+	for <lists+kvm@lfdr.de>; Sat, 12 Jun 2021 02:00:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230443AbhFLAAg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Jun 2021 20:00:36 -0400
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:33705 "EHLO
-        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230349AbhFLAAe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Jun 2021 20:00:34 -0400
-Received: by mail-pf1-f202.google.com with SMTP id i13-20020aa78b4d0000b02902ea019ef670so4113523pfd.0
-        for <kvm@vger.kernel.org>; Fri, 11 Jun 2021 16:58:32 -0700 (PDT)
+        id S230319AbhFLACH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Jun 2021 20:02:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39002 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230060AbhFLACG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Jun 2021 20:02:06 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6925C061574
+        for <kvm@vger.kernel.org>; Fri, 11 Jun 2021 16:59:54 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id p17so10982548lfc.6
+        for <kvm@vger.kernel.org>; Fri, 11 Jun 2021 16:59:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=DcsPY5Lu0+b3afx6g2ezWU+d2rrcbU3Zjbgj10xg5/I=;
-        b=ObvEN3IQkOFY2+ySBaczorNsCHZKTj7p+HDcc6Ke1inPbf+4DobbKthT1PbfoRzBUf
-         Wh25WDBaqgGAzdkkQqi7/7++n5PwlMwPXb3qUP+90LStE1aSkLG93FxEdHe3dDbEtEJ5
-         KTm6dsx7BEW+w68PT7H6yzBlLpmQlZF0fGBVEYcB+bIwA9no1WWV1AA/HF9TkyNR93KI
-         2uLtCfQNQtwapQxvRSN9s9n1WYqn5rO2kMaNNakn085zJmlYm2TlUt9pQoByHGsXGV+i
-         NaqwN+9/cBfXd1MAQKpW5XeAaJ7yPZFeLI71YiQJIlP9EOBMhlB8Uo3OkDnIflojGMVn
-         8Mpg==
+        bh=ytt5xYKl94zIIkqy42AXMp1VMwXPiefUtmJxA2Rtf8k=;
+        b=vAHZqwb45wlOuFw3DzujMES7THPL2YCNiah5vTHw+w28ZteYZAIUxeK2HAyO8NF9XG
+         rX0ktOv9gXBdVxGZQEIcmCuUlYkid98c9hjyJhV4/U2yz59Hj6EAzFhszX9R0bMFKbuL
+         0qrabF7vX6BsRZK8av/rKOEXELgCynVL9axysLKQumzFdMsNP7OwIbAJqxB4qaMG+YYW
+         FWOwlYNs6avpJ9tnZ/5UuIDb1MAd4L1gNh/Do0FpoktP9ElFqzFH396tcsxpSxzCp2mX
+         h89dRXNmIFm+uNwVZ3orJdYeKCBOKddrOT2cn/IoIWxwdudy0nSM0VRufGUl/RUPAz7c
+         tF4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=DcsPY5Lu0+b3afx6g2ezWU+d2rrcbU3Zjbgj10xg5/I=;
-        b=sQV8af/oAwt6YXY5jyU675cXqskUhPuJzNqhZLTEOtFQtTL2MQPHn4lE2NVpj68iFR
-         y8RKIt+crSHkuuDYfJ5FJU7KbNlq2EZ8/Nur7TdVnbWU7gUF4PJsm+SwqY97Z+QVrHnN
-         Ny6PxzaiUdGSwl8yWVne8VAgmH4T6kpRtJWJTx5qayqwCv9uvDLZQoeijZrQ4IDS3kOC
-         wttlM6uSKsr5qNLCrm9k+Jz6gJbfakVdy7OcGTwTf5Rds0uABsbSJ8hyCRiKSOCFb95N
-         U36II+gXjReJlQprn7V9/Qj8rfpRIj7+ZezZqJgIiwFGLjmNmHp+9ZICSCJKLsP115y1
-         BrEQ==
-X-Gm-Message-State: AOAM531wzmSLXuKxRO0zuxOMtrAxK5eCz4dpn86sG96lYUMpjli4rO6g
-        wEozv9A7ahPrEDKLsMB54J/9xX94HT1lsWcVs6qzqd/eQ9NfktWJd3XOKIJlz6wVjPc+MAfbWWa
-        3nLPjBk0VglWTTItx6G6O/GA31ctcXvBwq8o9Ocym+sw6vGxtdI+1DH3ixjzoVm8=
-X-Google-Smtp-Source: ABdhPJyIqzY3AvLczlhlpMOdifjhUaurzlXQIGZxe56+Ptg+DaHVNr0CZv053XKolBiN4ae1KxUXSfrxLN68kw==
-X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:90b:3a8c:: with SMTP id
- om12mr6961326pjb.103.1623455851970; Fri, 11 Jun 2021 16:57:31 -0700 (PDT)
-Date:   Fri, 11 Jun 2021 23:57:01 +0000
-In-Reply-To: <20210611235701.3941724-1-dmatlack@google.com>
-Message-Id: <20210611235701.3941724-9-dmatlack@google.com>
-Mime-Version: 1.0
-References: <20210611235701.3941724-1-dmatlack@google.com>
-X-Mailer: git-send-email 2.32.0.272.g935e593368-goog
-Subject: [PATCH 8/8] KVM: selftests: Introduce access_tracking_perf_test
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ytt5xYKl94zIIkqy42AXMp1VMwXPiefUtmJxA2Rtf8k=;
+        b=G0dy2sX+Y/m2jzURV7LTo9G/Jh+JQV9aUHTcZx71zZxs1ZVgULGaWUFsAXu5VwbQK/
+         n26YCQCA+yuzEafFN1CGPY6Y95ux/Bj+Jk+ZFvq9ae/8QjufCXpSQfrMWrR1w8IJZcyo
+         IlXd8KgsZBUn15eB25tqJyYbRFou/NsufyqRGH3+qNGN2hOzHVkL+fOySpPTeg+jtq0J
+         ZJbm/Xv44CgSyQs4C4QmqNAwFHk4Ag+mSsmQbrRw2oW7DNrg/X4DyRXFwOp5M5MtohLv
+         aodClLVIIAglMbXk+M0ZEPb5aoeiQkexh4DPArrFgIdecAUO8BQAk+2VLY4lLwu+Q7xX
+         JZFg==
+X-Gm-Message-State: AOAM531HLRaVQj8swiwOsLOiFkXmHPvSwOG+gXr+EhMFFdc2PcXAWymD
+        bvqQgyqwYtxFh2U2WjcRHxPH71/35b6nSm6bFRvDQpA/z2xM2Q==
+X-Google-Smtp-Source: ABdhPJyVGctbUsfaQfcIBG8AjLSG02qFhtXBGqXqT5h2Tx8E8j6+TEUlvZkI3Qr5sMDXJryQ18DakqRnJk4JruDF83s=
+X-Received: by 2002:a05:6512:3f8d:: with SMTP id x13mr4309012lfa.278.1623455992491;
+ Fri, 11 Jun 2021 16:59:52 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210611235701.3941724-1-dmatlack@google.com> <20210611235701.3941724-7-dmatlack@google.com>
+In-Reply-To: <20210611235701.3941724-7-dmatlack@google.com>
 From:   David Matlack <dmatlack@google.com>
-To:     kvm@vger.kernel.org
+Date:   Fri, 11 Jun 2021 16:59:26 -0700
+Message-ID: <CALzav=embwx9PoZrMSS3XkQsFjnAu4UyG8VBY=3yj8uqzKBgRg@mail.gmail.com>
+Subject: Re: [PATCH 6/8] KVM: x86/mmu: fast_page_fault support for the TDP MMU
+To:     kvm list <kvm@vger.kernel.org>
 Cc:     Ben Gardon <bgardon@google.com>, Joerg Roedel <joro@8bytes.org>,
         Jim Mattson <jmattson@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
@@ -58,516 +58,161 @@ Cc:     Ben Gardon <bgardon@google.com>, Joerg Roedel <joro@8bytes.org>,
         Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Junaid Shahid <junaids@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        David Matlack <dmatlack@google.com>
+        Andrew Jones <drjones@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This test measures the performance effects of KVM's access tracking.
-Access tracking is driven by the MMU notifiers test_young, clear_young,
-and clear_flush_young. These notifiers do not have a direct userspace
-API, however the clear_young notifier can be triggered by marking a
-pages as idle in /sys/kernel/mm/page_idle/bitmap. This test leverages
-that mechanism to enable access tracking on guest memory.
+On Fri, Jun 11, 2021 at 4:57 PM David Matlack <dmatlack@google.com> wrote:
+>
+> This commit enables the fast_page_fault handler to work when the TDP MMU
+> is enabled by leveraging the new walk_shadow_page_lockless* API to
+> collect page walks independent of the TDP MMU.
+>
+> fast_page_fault was already using
+> walk_shadow_page_lockless_{begin,end}(), we just have to change the
+> actual walk to use walk_shadow_page_lockless() which does the right
+> thing if the TDP MMU is in use.
+>
+> Signed-off-by: David Matlack <dmatlack@google.com>
 
-To measure performance this test runs a VM with a configurable number of
-vCPUs that each touch every page in disjoint regions of memory.
-Performance is measured in the time it takes all vCPUs to finish
-touching their predefined region.
+Adding this feature was suggested by Ben Gardon:
 
-Example invocation:
+Suggested-by: Ben Gardon <bgardon@google.com>
 
-  $ ./access_tracking_perf_test -v 8
-  Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
-  guest physical test memory offset: 0xffdfffff000
-
-  Populating memory             : 1.337752570s
-  Writing to populated memory   : 0.010177640s
-  Reading from populated memory : 0.009548239s
-  Mark memory idle              : 23.973131748s
-  Writing to idle memory        : 0.063584496s
-  Mark memory idle              : 24.924652964s
-  Reading from idle memory      : 0.062042814s
-
-Breaking down the results:
-
- * "Populating memory": The time it takes for all vCPUs to perform the
-   first write to every page in their region.
-
- * "Writing to populated memory" / "Reading from populated memory": The
-   time it takes for all vCPUs to write and read to every page in their
-   region after it has been populated. This serves as a control for the
-   later results.
-
- * "Mark memory idle": The time it takes for every vCPU to mark every
-   page in their region as idle through page_idle.
-
- * "Writing to idle memory" / "Reading from idle memory": The time it
-   takes for all vCPUs to write and read to every page in their region
-   after it has been marked idle.
-
-This test should be portable across architectures but it is only enabled
-for x86_64 since that's all I have tested.
-
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/access_tracking_perf_test.c | 419 ++++++++++++++++++
- 3 files changed, 421 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/access_tracking_perf_test.c
-
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index bd83158e0e0b..32a362d71e05 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -34,6 +34,7 @@
- /x86_64/xen_vmcall_test
- /x86_64/xss_msr_test
- /x86_64/vmx_pmu_msrs_test
-+/access_tracking_perf_test
- /demand_paging_test
- /dirty_log_test
- /dirty_log_perf_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index e439d027939d..9f1b478da92b 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -67,6 +67,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/tsc_msrs_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_pmu_msrs_test
- TEST_GEN_PROGS_x86_64 += x86_64/xen_shinfo_test
- TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
-+TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
- TEST_GEN_PROGS_x86_64 += demand_paging_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
- TEST_GEN_PROGS_x86_64 += dirty_log_perf_test
-diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-new file mode 100644
-index 000000000000..60828f2d780f
---- /dev/null
-+++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-@@ -0,0 +1,419 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * access_tracking_test
-+ *
-+ * Copyright (C) 2021, Google, Inc.
-+ *
-+ * This test measures the performance effects of KVM's access tracking.
-+ * Access tracking is driven by the MMU notifiers test_young, clear_young, and
-+ * clear_flush_young. These notifiers do not have a direct userspace API,
-+ * however the clear_young notifier can be triggered by marking a pages as idle
-+ * in /sys/kernel/mm/page_idle/bitmap. This test leverages that mechanism to
-+ * enable access tracking on guest memory.
-+ *
-+ * To measure performance this test runs a VM with a configurable number of
-+ * vCPUs that each touch every page in disjoint regions of memory. Performance
-+ * is measured in the time it takes all vCPUs to finish touching their
-+ * predefined region.
-+ *
-+ * Note that a deterministic correctness test of access tracking is not possible
-+ * by using page_idle as it exists today. This is for a few reasons:
-+ *
-+ * 1. page_idle only issues clear_young notifiers, which lack a TLB flush. This
-+ *    means subsequent guest accesses are not guaranteed to see page table
-+ *    updates made by KVM until some time in the future.
-+ *
-+ * 2. page_idle only operates on LRU pages. Newly allocated pages are not
-+ *    immediately allocated to LRU lists. Instead they are held in a "pagevec",
-+ *    which is drained to LRU lists some time in the future. There is no
-+ *    userspace API to force this drain to occur.
-+ *
-+ * These limitations are worked around in this test by using a large enough
-+ * region of memory for each vCPU such that the number of translations cached in
-+ * the TLB and the number of pages held in pagevecs are a small fraction of the
-+ * overall workload. And if either of those conditions are not true this test
-+ * will fail rather than silently passing.
-+ */
-+#include <inttypes.h>
-+#include <limits.h>
-+#include <pthread.h>
-+#include <sys/mman.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+
-+#include "kvm_util.h"
-+#include "test_util.h"
-+#include "perf_test_util.h"
-+#include "guest_modes.h"
-+
-+/* Global variable used to synchronize all of the vCPU threads. */
-+static int iteration = -1;
-+
-+/* Defines what vCPU threads should do during a given iteration. */
-+static enum {
-+	/* Run the vCPU to access all its memory. */
-+	ITERATION_ACCESS_MEMORY,
-+	/* Mark the vCPU's memory idle in page_idle. */
-+	ITERATION_MARK_IDLE,
-+} iteration_work;
-+
-+/* Set to true when vCPU threads should exit. */
-+static bool done;
-+
-+/* The iteration that was last completed by each vCPU. */
-+static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
-+
-+/* Whether to overlap the regions of memory vCPUs access. */
-+static bool overlap_memory_access;
-+
-+struct test_params {
-+	/* The backing source for the region of memory. */
-+	enum vm_mem_backing_src_type backing_src;
-+
-+	/* The amount of memory to allocate for each vCPU. */
-+	uint64_t vcpu_memory_bytes;
-+
-+	/* The number of vCPUs to create in the VM. */
-+	int vcpus;
-+};
-+
-+static uint64_t pread_uint64(int fd, const char *filename, uint64_t index)
-+{
-+	uint64_t value;
-+	off_t offset = index * sizeof(value);
-+
-+	TEST_ASSERT(pread(fd, &value, sizeof(value), offset) == sizeof(value),
-+		    "pread from %s offset 0x%" PRIx64 " failed!",
-+		    filename, offset);
-+
-+	return value;
-+
-+}
-+
-+static uint64_t lookup_pfn(int pagemap_fd, struct kvm_vm *vm, uint64_t gva)
-+{
-+	uint64_t hva = (uint64_t) addr_gva2hva(vm, gva);
-+	uint64_t entry;
-+
-+	entry = pread_uint64(pagemap_fd, "pagemap", hva / getpagesize());
-+	if (!(entry & (1ULL << 63)))
-+		return 0;
-+
-+	return (entry & ((1ULL << 55) - 1));
-+}
-+
-+static bool is_page_idle(int page_idle_fd, uint64_t pfn)
-+{
-+	uint64_t bits = pread_uint64(page_idle_fd, "page_idle", pfn / 64);
-+
-+	return !!((bits >> (pfn % 64)) & 1);
-+}
-+
-+static void mark_page_idle(int page_idle_fd, uint64_t pfn)
-+{
-+	uint64_t bits = 1ULL << (pfn % 64);
-+
-+	TEST_ASSERT(pwrite(page_idle_fd, &bits, 8, 8 * (pfn / 64)) == 8,
-+		    "Set page_idle bits for PFN 0x%" PRIx64, pfn);
-+}
-+
-+static void mark_vcpu_memory_idle(struct kvm_vm *vm, int vcpu_id)
-+{
-+	uint64_t base_gva = perf_test_args.vcpu_args[vcpu_id].gva;
-+	uint64_t pages = perf_test_args.vcpu_args[vcpu_id].pages;
-+	uint64_t page;
-+	uint64_t still_idle = 0;
-+	uint64_t no_pfn = 0;
-+	int page_idle_fd;
-+	int pagemap_fd;
-+
-+	/* If vCPUs are using an overlapping region, let vCPU 0 mark it idle. */
-+	if (overlap_memory_access && vcpu_id)
-+		return;
-+
-+	page_idle_fd = open("/sys/kernel/mm/page_idle/bitmap", O_RDWR);
-+	TEST_ASSERT(page_idle_fd > 0, "Failed to open page_idle.");
-+
-+	pagemap_fd = open("/proc/self/pagemap", O_RDONLY);
-+	TEST_ASSERT(pagemap_fd > 0, "Failed to open pagemap.");
-+
-+	for (page = 0; page < pages; page++) {
-+		uint64_t gva = base_gva + page * perf_test_args.guest_page_size;
-+		uint64_t pfn = lookup_pfn(pagemap_fd, vm, gva);
-+
-+		if (!pfn) {
-+			no_pfn++;
-+			continue;
-+		}
-+
-+		if (is_page_idle(page_idle_fd, pfn)) {
-+			still_idle++;
-+			continue;
-+		}
-+
-+		mark_page_idle(page_idle_fd, pfn);
-+	}
-+
-+	/*
-+	 * Assumption: Less than 1% of pages are going to be swapped out from
-+	 * under us during this test.
-+	 */
-+	TEST_ASSERT(no_pfn < pages / 100,
-+		    "vCPU %d: No PFN for %" PRIu64 " out of %" PRIu64 " pages.",
-+		    vcpu_id, no_pfn, pages);
-+
-+	/*
-+	 * Test that at least 90% of memory has been marked idle (the rest might
-+	 * not be marked idle because the pages have not yet made it to an LRU
-+	 * list or the translations are still cached in the TLB). 90% is
-+	 * arbitrary; high enough that we ensure most memory access went through
-+	 * access tracking but low enough as to not make the test too brittle
-+	 * over time and across architectures.
-+	 */
-+	TEST_ASSERT(still_idle < pages / 10,
-+		    "vCPU%d: Too many pages still idle (%"PRIu64 " out of %"
-+		    PRIu64 ").\n",
-+		    vcpu_id, still_idle, pages);
-+
-+	close(page_idle_fd);
-+	close(pagemap_fd);
-+}
-+
-+static void assert_ucall(struct kvm_vm *vm, uint32_t vcpu_id,
-+			 uint64_t expected_ucall)
-+{
-+	struct ucall uc;
-+	uint64_t actual_ucall = get_ucall(vm, vcpu_id, &uc);
-+
-+	TEST_ASSERT(expected_ucall == actual_ucall,
-+		    "Guest exited unexpectedly (expected ucall %" PRIu64
-+		    ", got %" PRIu64 ")",
-+		    expected_ucall, actual_ucall);
-+}
-+
-+static bool spin_wait_for_next_iteration(int *current_iteration)
-+{
-+	int last_iteration = *current_iteration;
-+
-+	do {
-+		if (READ_ONCE(done))
-+			return false;
-+
-+		*current_iteration = READ_ONCE(iteration);
-+	} while (last_iteration == *current_iteration);
-+
-+	return true;
-+}
-+
-+static void *vcpu_thread_main(void *arg)
-+{
-+	struct perf_test_vcpu_args *vcpu_args = arg;
-+	struct kvm_vm *vm = perf_test_args.vm;
-+	int vcpu_id = vcpu_args->vcpu_id;
-+	int current_iteration = -1;
-+
-+	vcpu_args_set(vm, vcpu_id, 1, vcpu_id);
-+
-+	while (spin_wait_for_next_iteration(&current_iteration)) {
-+		switch (READ_ONCE(iteration_work)) {
-+		case ITERATION_ACCESS_MEMORY:
-+			vcpu_run(vm, vcpu_id);
-+			assert_ucall(vm, vcpu_id, UCALL_SYNC);
-+			break;
-+		case ITERATION_MARK_IDLE:
-+			mark_vcpu_memory_idle(vm, vcpu_id);
-+			break;
-+		};
-+
-+		vcpu_last_completed_iteration[vcpu_id] = current_iteration;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void spin_wait_for_vcpu(int vcpu_id, int target_iteration)
-+{
-+	while (READ_ONCE(vcpu_last_completed_iteration[vcpu_id]) !=
-+	       target_iteration) {
-+		continue;
-+	}
-+}
-+
-+/* The type of memory accesses to perform in the VM. */
-+enum access_type {
-+	ACCESS_READ,
-+	ACCESS_WRITE,
-+};
-+
-+static void run_iteration(struct kvm_vm *vm, int vcpus, const char *description)
-+{
-+	struct timespec ts_start;
-+	struct timespec ts_elapsed;
-+	int next_iteration;
-+	int vcpu_id;
-+
-+	/* Kick off the vCPUs by incrementing iteration. */
-+	next_iteration = ++iteration;
-+
-+	clock_gettime(CLOCK_MONOTONIC, &ts_start);
-+
-+	/* Wait for all vCPUs to finish the iteration. */
-+	for (vcpu_id = 0; vcpu_id < vcpus; vcpu_id++)
-+		spin_wait_for_vcpu(vcpu_id, next_iteration);
-+
-+	ts_elapsed = timespec_elapsed(ts_start);
-+	pr_info("%-30s: %ld.%09lds\n",
-+		description, ts_elapsed.tv_sec, ts_elapsed.tv_nsec);
-+}
-+
-+static void access_memory(struct kvm_vm *vm, int vcpus, enum access_type access,
-+			  const char *description)
-+{
-+	perf_test_args.wr_fract = (access == ACCESS_READ) ? INT_MAX : 1;
-+	sync_global_to_guest(vm, perf_test_args);
-+	iteration_work = ITERATION_ACCESS_MEMORY;
-+	run_iteration(vm, vcpus, description);
-+}
-+
-+static void mark_memory_idle(struct kvm_vm *vm, int vcpus)
-+{
-+	/*
-+	 * Even though this parallelizes the work across vCPUs, this is still a
-+	 * very slow operation because page_idle forces the test to mark one pfn
-+	 * at a time and the clear_young notifier serializes on the KVM MMU
-+	 * lock.
-+	 */
-+	pr_debug("Marking VM memory idle (slow)...\n");
-+	iteration_work = ITERATION_MARK_IDLE;
-+	run_iteration(vm, vcpus, "Mark memory idle");
-+}
-+
-+static pthread_t *create_vcpu_threads(int vcpus)
-+{
-+	pthread_t *vcpu_threads;
-+	int i;
-+
-+	vcpu_threads = malloc(vcpus * sizeof(vcpu_threads[0]));
-+	TEST_ASSERT(vcpu_threads, "Failed to allocate vcpu_threads.");
-+
-+	for (i = 0; i < vcpus; i++) {
-+		vcpu_last_completed_iteration[i] = iteration;
-+		pthread_create(&vcpu_threads[i], NULL, vcpu_thread_main,
-+			       &perf_test_args.vcpu_args[i]);
-+	}
-+
-+	return vcpu_threads;
-+}
-+
-+static void terminate_vcpu_threads(pthread_t *vcpu_threads, int vcpus)
-+{
-+	int i;
-+
-+	/* Set done to signal the vCPU threads to exit */
-+	done = true;
-+
-+	for (i = 0; i < vcpus; i++)
-+		pthread_join(vcpu_threads[i], NULL);
-+}
-+
-+static void run_test(enum vm_guest_mode mode, void *arg)
-+{
-+	struct test_params *params = arg;
-+	struct kvm_vm *vm;
-+	pthread_t *vcpu_threads;
-+	int vcpus = params->vcpus;
-+
-+	vm = perf_test_create_vm(mode, vcpus, params->vcpu_memory_bytes,
-+				 params->backing_src);
-+
-+	perf_test_setup_vcpus(vm, vcpus, params->vcpu_memory_bytes,
-+			      !overlap_memory_access);
-+
-+	vcpu_threads = create_vcpu_threads(vcpus);
-+
-+	pr_info("\n");
-+	access_memory(vm, vcpus, ACCESS_WRITE, "Populating memory");
-+
-+	/* As a control, read and write to the populated memory first. */
-+	access_memory(vm, vcpus, ACCESS_WRITE, "Writing to populated memory");
-+	access_memory(vm, vcpus, ACCESS_READ, "Reading from populated memory");
-+
-+	/* Repeat on memory that has been marked as idle. */
-+	mark_memory_idle(vm, vcpus);
-+	access_memory(vm, vcpus, ACCESS_WRITE, "Writing to idle memory");
-+	mark_memory_idle(vm, vcpus);
-+	access_memory(vm, vcpus, ACCESS_READ, "Reading from idle memory");
-+
-+	terminate_vcpu_threads(vcpu_threads, vcpus);
-+	free(vcpu_threads);
-+	perf_test_destroy_vm(vm);
-+}
-+
-+static void help(char *name)
-+{
-+	puts("");
-+	printf("usage: %s [-h] [-m mode] [-b vcpu_bytes] [-v vcpus] [-o]  [-s mem_type]\n",
-+	       name);
-+	puts("");
-+	printf(" -h: Display this help message.");
-+	guest_modes_help();
-+	printf(" -b: specify the size of the memory region which should be\n"
-+	       "     dirtied by each vCPU. e.g. 10M or 3G.\n"
-+	       "     (default: 1G)\n");
-+	printf(" -v: specify the number of vCPUs to run.\n");
-+	printf(" -o: Overlap guest memory accesses instead of partitioning\n"
-+	       "     them into a separate region of memory for each vCPU.\n");
-+	printf(" -s: specify the type of memory that should be used to\n"
-+	       "     back the guest data region.\n\n");
-+	backing_src_help();
-+	puts("");
-+	exit(0);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct test_params params = {
-+		.backing_src = VM_MEM_SRC_ANONYMOUS,
-+		.vcpu_memory_bytes = DEFAULT_PER_VCPU_MEM_SIZE,
-+		.vcpus = 1,
-+	};
-+	int page_idle_fd;
-+	int opt;
-+
-+	guest_modes_append_default();
-+
-+	while ((opt = getopt(argc, argv, "hm:b:v:os:")) != -1) {
-+		switch (opt) {
-+		case 'm':
-+			guest_modes_cmdline(optarg);
-+			break;
-+		case 'b':
-+			params.vcpu_memory_bytes = parse_size(optarg);
-+			break;
-+		case 'v':
-+			params.vcpus = atoi(optarg);
-+			break;
-+		case 'o':
-+			overlap_memory_access = true;
-+			break;
-+		case 's':
-+			params.backing_src = parse_backing_src_type(optarg);
-+			break;
-+		case 'h':
-+		default:
-+			help(argv[0]);
-+			break;
-+		}
-+	}
-+
-+	page_idle_fd = open("/sys/kernel/mm/page_idle/bitmap", O_RDWR);
-+	if (page_idle_fd < 0) {
-+		print_skip("CONFIG_IDLE_PAGE_TRACKING is not enabled");
-+		exit(KSFT_SKIP);
-+	}
-+	close(page_idle_fd);
-+
-+	for_each_guest_mode(run_test, &params);
-+
-+	return 0;
-+}
--- 
-2.32.0.272.g935e593368-goog
-
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 52 +++++++++++++++++-------------------------
+>  1 file changed, 21 insertions(+), 31 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 765f5b01768d..5562727c3699 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -657,6 +657,9 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
+>         local_irq_enable();
+>  }
+>
+> +static bool walk_shadow_page_lockless(struct kvm_vcpu *vcpu, u64 addr,
+> +                                     struct shadow_page_walk *walk);
+> +
+>  static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
+>  {
+>         int r;
+> @@ -2967,14 +2970,9 @@ static bool page_fault_can_be_fast(u32 error_code)
+>   * Returns true if the SPTE was fixed successfully. Otherwise,
+>   * someone else modified the SPTE from its original value.
+>   */
+> -static bool
+> -fast_pf_fix_direct_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+> -                       u64 *sptep, u64 old_spte, u64 new_spte)
+> +static bool fast_pf_fix_direct_spte(struct kvm_vcpu *vcpu, gpa_t gpa,
+> +                                   u64 *sptep, u64 old_spte, u64 new_spte)
+>  {
+> -       gfn_t gfn;
+> -
+> -       WARN_ON(!sp->role.direct);
+> -
+>         /*
+>          * Theoretically we could also set dirty bit (and flush TLB) here in
+>          * order to eliminate unnecessary PML logging. See comments in
+> @@ -2990,14 +2988,8 @@ fast_pf_fix_direct_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+>         if (cmpxchg64(sptep, old_spte, new_spte) != old_spte)
+>                 return false;
+>
+> -       if (is_writable_pte(new_spte) && !is_writable_pte(old_spte)) {
+> -               /*
+> -                * The gfn of direct spte is stable since it is
+> -                * calculated by sp->gfn.
+> -                */
+> -               gfn = kvm_mmu_page_get_gfn(sp, sptep - sp->spt);
+> -               kvm_vcpu_mark_page_dirty(vcpu, gfn);
+> -       }
+> +       if (is_writable_pte(new_spte) && !is_writable_pte(old_spte))
+> +               kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
+>
+>         return true;
+>  }
+> @@ -3019,10 +3011,9 @@ static bool is_access_allowed(u32 fault_err_code, u64 spte)
+>   */
+>  static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code)
+>  {
+> -       struct kvm_shadow_walk_iterator iterator;
+> -       struct kvm_mmu_page *sp;
+>         int ret = RET_PF_INVALID;
+>         u64 spte = 0ull;
+> +       u64 *sptep = NULL;
+>         uint retry_count = 0;
+>
+>         if (!page_fault_can_be_fast(error_code))
+> @@ -3031,17 +3022,19 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code)
+>         walk_shadow_page_lockless_begin(vcpu);
+>
+>         do {
+> +               struct shadow_page_walk walk;
+>                 u64 new_spte;
+>
+> -               for_each_shadow_entry_lockless(vcpu, gpa, iterator, spte)
+> -                       if (!is_shadow_present_pte(spte))
+> -                               break;
+> +               if (!walk_shadow_page_lockless(vcpu, gpa, &walk))
+> +                       break;
+> +
+> +               spte = walk.sptes[walk.last_level];
+> +               sptep = walk.spteps[walk.last_level];
+>
+>                 if (!is_shadow_present_pte(spte))
+>                         break;
+>
+> -               sp = sptep_to_sp(iterator.sptep);
+> -               if (!is_last_spte(spte, sp->role.level))
+> +               if (!is_last_spte(spte, walk.last_level))
+>                         break;
+>
+>                 /*
+> @@ -3084,7 +3077,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code)
+>                          *
+>                          * See the comments in kvm_arch_commit_memory_region().
+>                          */
+> -                       if (sp->role.level > PG_LEVEL_4K)
+> +                       if (walk.last_level > PG_LEVEL_4K)
+>                                 break;
+>                 }
+>
+> @@ -3098,8 +3091,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code)
+>                  * since the gfn is not stable for indirect shadow page. See
+>                  * Documentation/virt/kvm/locking.rst to get more detail.
+>                  */
+> -               if (fast_pf_fix_direct_spte(vcpu, sp, iterator.sptep, spte,
+> -                                           new_spte)) {
+> +               if (fast_pf_fix_direct_spte(vcpu, gpa, sptep, spte, new_spte)) {
+>                         ret = RET_PF_FIXED;
+>                         break;
+>                 }
+> @@ -3112,7 +3104,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code)
+>
+>         } while (true);
+>
+> -       trace_fast_page_fault(vcpu, gpa, error_code, iterator.sptep, spte, ret);
+> +       trace_fast_page_fault(vcpu, gpa, error_code, sptep, spte, ret);
+>         walk_shadow_page_lockless_end(vcpu);
+>
+>         return ret;
+> @@ -3748,11 +3740,9 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>         if (page_fault_handle_page_track(vcpu, error_code, gfn))
+>                 return RET_PF_EMULATE;
+>
+> -       if (!is_vcpu_using_tdp_mmu(vcpu)) {
+> -               r = fast_page_fault(vcpu, gpa, error_code);
+> -               if (r != RET_PF_INVALID)
+> -                       return r;
+> -       }
+> +       r = fast_page_fault(vcpu, gpa, error_code);
+> +       if (r != RET_PF_INVALID)
+> +               return r;
+>
+>         r = mmu_topup_memory_caches(vcpu, false);
+>         if (r)
+> --
+> 2.32.0.272.g935e593368-goog
+>
