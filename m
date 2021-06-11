@@ -2,100 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C67D03A4704
-	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 18:50:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3052F3A4735
+	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 18:58:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230344AbhFKQw2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Jun 2021 12:52:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56268 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230136AbhFKQw1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Jun 2021 12:52:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623430229;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NUXh46A0h7qJaIjW8suCksiqunmp4+htb+hRkA5j//Q=;
-        b=KKgdvRNQ3W+5xAG/W/RhKsYcS4zzgzoQYU0CW7XppN8yMR+eVMN//rPtazRomhNBanV8br
-        fE3hzPBQgRd5iKr3f40rZAy7hgTt2F+nyzjaqJRtyV2HPuQ3BaaoDrpPOLhgv0yiXLNdR3
-        jxKcvpWbuOYJEQ9v/elDPDfzlLpGsoM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-383-R3AXkPThONexW8TXUDSMAQ-1; Fri, 11 Jun 2021 12:50:28 -0400
-X-MC-Unique: R3AXkPThONexW8TXUDSMAQ-1
-Received: by mail-wr1-f69.google.com with SMTP id g14-20020a5d698e0000b0290117735bd4d3so2865785wru.13
-        for <kvm@vger.kernel.org>; Fri, 11 Jun 2021 09:50:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=NUXh46A0h7qJaIjW8suCksiqunmp4+htb+hRkA5j//Q=;
-        b=mqo2czvFw+xYJWPp3PerXt9/9gRgXcwEgPzzJGOzti89Q1I3FLsiTeJfXwZhpsgFYW
-         reRBInsuIsG9JCM7ZuVK3QxDSHdzFuBAxyYB5Q8XUwroRQm6jADPWn3F4KB2swwMXu8h
-         Nlf2qo+Wk8msmcLyHnE/EFIX9lIT9GAdVI9UvxN6cUR05wfyf/io1hb/UlerI1xfGIfu
-         wpSeWrYF9gqFbraUQ4xCFClFURuizIfegpDT9ZJ9C5IXoxQveGggImN20vsrJj1giO+T
-         UcbmtZk6dYxLwcizIUKY3UYt4KA75Ow7BPsxzM7OdwDNCcRJxmInahBIHp0Ffg2/exy8
-         O7GQ==
-X-Gm-Message-State: AOAM533wXm7LNn9Phio3Dd7ImLihIcMRXd5dXrfs6dGR7A8Ks/yZFN43
-        koTpWPl8crZlVbbEbSNCcq4LDbAkSTaA4XlmGs4U3OebKtrWQXPVXxv0aTHC5PDhxD6/cpkY0Hm
-        EI5wQkWGLDGeX
-X-Received: by 2002:adf:b64a:: with SMTP id i10mr5132689wre.169.1623430226944;
-        Fri, 11 Jun 2021 09:50:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz6zRcQeuuMtwyv2neqXVjF8SplY1Jwqd6ObDXG0vNraRMJmFoKk/XSTVs4MuV2/BFxKCCsGw==
-X-Received: by 2002:adf:b64a:: with SMTP id i10mr5132666wre.169.1623430226727;
-        Fri, 11 Jun 2021 09:50:26 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id z5sm7979188wrv.67.2021.06.11.09.50.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Jun 2021 09:50:26 -0700 (PDT)
-Subject: Re: [PATCH v5 0/7] Hyper-V nested virt enlightenments for SVM
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Vineeth Pillai <viremana@linux.microsoft.com>,
-        Lan Tianyu <Tianyu.Lan@microsoft.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Wei Liu <wei.liu@kernel.org>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>
-Cc:     "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hyperv@vger.kernel.org
-References: <cover.1622730232.git.viremana@linux.microsoft.com>
- <5af1ccce-a07d-5a13-107b-fc4c4553dd4d@redhat.com>
- <683fa50765b29f203cb4b0953542dc43226a7a2f.camel@redhat.com>
- <878s3gybuk.fsf@vitty.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <50dea657-ef03-4bde-b9c7-75d9e18157ea@redhat.com>
-Date:   Fri, 11 Jun 2021 18:50:24 +0200
+        id S230197AbhFKRAb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Jun 2021 13:00:31 -0400
+Received: from foss.arm.com ([217.140.110.172]:35412 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229540AbhFKRAa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Jun 2021 13:00:30 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F31CFD6E;
+        Fri, 11 Jun 2021 09:58:31 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 81E6B3F719;
+        Fri, 11 Jun 2021 09:58:30 -0700 (PDT)
+Subject: Re: [PATCH v4 3/9] KVM: arm64: vgic: Be tolerant to the lack of
+ maintenance interrupt masking
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Hector Martin <marcan@marcan.st>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, kernel-team@android.com
+References: <20210601104005.81332-1-maz@kernel.org>
+ <20210601104005.81332-4-maz@kernel.org>
+ <a02e67c6-fceb-ed6a-fc73-8649d8d18dd8@arm.com>
+Message-ID: <b0b941ae-cd22-4454-a987-04baf5473c5e@arm.com>
+Date:   Fri, 11 Jun 2021 17:59:26 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <878s3gybuk.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <a02e67c6-fceb-ed6a-fc73-8649d8d18dd8@arm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/06/21 11:44, Vitaly Kuznetsov wrote:
-> Yea, reported already:
-> 
-> https://lore.kernel.org/kvm/683fa50765b29f203cb4b0953542dc43226a7a2f.camel@redhat.com/T/#mf732ba9567923d800329f896761e4ee104475894
+Hi Marc,
 
-And that's how I learnt that 1) IS_ENABLED != #ifdef for modules 2) 
-CONFIG_HYPERV=m is possible.  Sorry Vineeth for clobbering your 
-perfectly fine patch!
+On 6/11/21 5:38 PM, Alexandru Elisei wrote:
+> Hi Marc,
+>
+> On 6/1/21 11:39 AM, Marc Zyngier wrote:
+>> As it turns out, not all the interrupt controllers are able to
+>> expose a vGIC maintenance interrupt that can be independently
+>> enabled/disabled.
+>>
+>> And to be fair, it doesn't really matter as all we require is
+>> for the interrupt to kick us out of guest mode out way or another.
+>>
+>> To that effect, add gic_kvm_info.no_maint_irq_mask for an interrupt
+>> controller to advertise the lack of masking.
+>>
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>  arch/arm64/kvm/vgic/vgic-init.c       | 8 +++++++-
+>>  include/linux/irqchip/arm-vgic-info.h | 2 ++
+>>  2 files changed, 9 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+>> index 2fdb65529594..6752d084934d 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-init.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+>> @@ -519,12 +519,15 @@ void kvm_vgic_init_cpu_hardware(void)
+>>   */
+>>  int kvm_vgic_hyp_init(void)
+>>  {
+>> +	bool has_mask;
+>>  	int ret;
+>>  
+>>  	if (!gic_kvm_info)
+>>  		return -ENODEV;
+>>  
+>> -	if (!gic_kvm_info->maint_irq) {
+>> +	has_mask = !gic_kvm_info->no_maint_irq_mask;
+> This double negative is pretty awkward, I suppose this was done to avoid changes
+> to the gic drivers, because the default value is 0 (false). Just an idea, maybe
+> renaming it to maint_irq_unmaskable would be more readable?
 
-Paolo
+Actually, after another look, the current name stopped looking awkward to me.
+
+Thanks,
+
+Alex
 
