@@ -2,95 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A57C3A3B37
-	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 07:01:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F54B3A3B74
+	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 07:44:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230349AbhFKFDi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Jun 2021 01:03:38 -0400
-Received: from mail-pg1-f175.google.com ([209.85.215.175]:36490 "EHLO
-        mail-pg1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229562AbhFKFDh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Jun 2021 01:03:37 -0400
-Received: by mail-pg1-f175.google.com with SMTP id 27so1507848pgy.3;
-        Thu, 10 Jun 2021 22:01:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=7YpOakzhHdRE44ZlZax8n9BZSeUcpRWNnc5DgZyi2aQ=;
-        b=J01O4ZHKpOQkfEHRWcjAK6KInyZN8PAxMLqqHDyZunQCvi/NSJtNCjIicFVOIuQlAb
-         yylrt3EefWnNHdnNg+hQB5MnT/eSofSaA/GKFtttlvZA28ee8ONE1iF0sCyo1rAxhkFb
-         bzAISUZN0D8uQGCEencnqvr70ZcdEtkjPlfeo2XPstQpNfwZE5CIPZOtUs5aiYwqJQiu
-         R6p6hlk6Wkf6+hMtFRg6DkrcNmUEgowDtRlnCAS5Wr4/dYUkaI8b7XlwbvmQjh6STZDA
-         0M4xa6u9F6yLEet6fYlZAiepzMZHuuUfOfh0DN3jEr8rxa+4dOusir3SUiojIVCA0V32
-         ilsQ==
+        id S230526AbhFKFqJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Jun 2021 01:46:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51971 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230370AbhFKFqI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Jun 2021 01:46:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623390250;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5nlidzY7vVox2ieeNTmLbeG44JwkLPe3MMhpIq19x6g=;
+        b=LOiTUDx60R9wOz9sP1ZGZtlwFXZen6zjRQvWMitayuXLMNIcTLGlDvaUF3WVODXI8I35q7
+        iC5GJros2ztPy4IZuHHeOWvIAZPoIshMuJIs4cISIPcMr8QCZIZeoMxJ19vNCCOGDXS0aU
+        rlpnURci5sjJN8MvfCzJQE+fbqDvKZ0=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-517-_AqdL-B3P-KDqQAaR0ll4g-1; Fri, 11 Jun 2021 01:44:09 -0400
+X-MC-Unique: _AqdL-B3P-KDqQAaR0ll4g-1
+Received: by mail-pg1-f200.google.com with SMTP id 17-20020a630b110000b029022064e7cdcfso1103245pgl.10
+        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 22:44:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=7YpOakzhHdRE44ZlZax8n9BZSeUcpRWNnc5DgZyi2aQ=;
-        b=SaldA/9NxlwouphArBZZ4w791Bz2Dh7OV88iOdzl7lXc45GmCYJvhZ9BHKqjFkIQ/m
-         0tEKvt4EZv8PLeHSSqme48Al4OTCGuLD8afbtjrMr6BRWIbFr5d3mbpI7A705pW64Fpa
-         rW1sOqmv8x6NZ9RWy67rElezBrTh39teVsDhlPdqgzcWsKiklS6yQ1pVWVNkMDyuL8rj
-         PEA9EYXejMb0ARuPWUW/v8lboSQqRJVgYy66PJ+g9PEnQM57DYLh+NaS2nb+hKUBG9Qv
-         YTd36PqK2JASXZiSlt8s0N5YvEeXAk4ckIDReB8i86KmRrio7xq2+dmFQbMUAFR4Ut6g
-         4k4g==
-X-Gm-Message-State: AOAM530SxC9MsKldM8NTZia7Iys8MvjF16lp5YyC/oMjYs0h8drD95+q
-        /fkjKjYrcfwZHuE7Rpz35UZPAAMseIQ=
-X-Google-Smtp-Source: ABdhPJwqMBSXKGr0vVVHXULaBAxNCD4YKTjfRAPJYckXUrqZuIqE6Y/4FhNpnplJ3weQZEZZabVjQA==
-X-Received: by 2002:a63:62c2:: with SMTP id w185mr1856319pgb.76.1623387624747;
-        Thu, 10 Jun 2021 22:00:24 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.40])
-        by smtp.googlemail.com with ESMTPSA id w27sm4075825pfq.117.2021.06.10.22.00.21
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 10 Jun 2021 22:00:23 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, stable@vger.kernel.org
-Subject: [PATCH] KVM: X86: Fix x86_emulator slab cache leak
-Date:   Thu, 10 Jun 2021 21:59:33 -0700
-Message-Id: <1623387573-5969-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=5nlidzY7vVox2ieeNTmLbeG44JwkLPe3MMhpIq19x6g=;
+        b=Ng473mkjMXgqgHeAq3m0UvkhPezDOvkUZxLuaLjyfAzoAYkXcnkV/VLHYo/ekACkVR
+         NqYU2U49qPNdX8UEZMy2C3/CmQjLaUsUINgKo1f0SpForKgJWNrm5knuqgOf1Ze8xfTu
+         /puVnm7YSdP4iJrP84gcYODRnci9FjH2IWRQ8qD8+SHPO2mzTwZnPB4wWpG1HfxgnOQb
+         zsFm76jnNhhoD7/u057G9fre2ZL/Iluzb13wgWr9WZR109je1X1SuNbfrPHWhOlsEfuL
+         Cu91EjjJDKVvqVCj3obIoZYicbDVpfbcFI2g6N/RnIi+F7fzG8FcHGK1nx68Kp7IoPeP
+         1/1w==
+X-Gm-Message-State: AOAM531kmhBsNg/xqI4AOoF6xVAxK3CFcc5hkk7tjVS1Eiu4ZJHRcIFM
+        plgz7HC5CjR7IC9WKa1/+rPTpVH0XqVyjPQQCTbpRmCAc6uyZsdT8yNvsy2wTGPi6jgjg2xhNEB
+        2BbAjsmEeTh1i
+X-Received: by 2002:a63:6547:: with SMTP id z68mr1935902pgb.341.1623390248323;
+        Thu, 10 Jun 2021 22:44:08 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyKB65M93ciDtRjp4dLL7boO1gINllpJ4guVwZKP5dhsZp4Ljb4TFphg7Htp0BodlrU9JnK0w==
+X-Received: by 2002:a63:6547:: with SMTP id z68mr1935883pgb.341.1623390248048;
+        Thu, 10 Jun 2021 22:44:08 -0700 (PDT)
+Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id d8sm4085729pfq.198.2021.06.10.22.44.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Jun 2021 22:44:07 -0700 (PDT)
+Subject: Re: [RFC] /dev/ioasid uAPI proposal
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Liu Yi L <yi.l.liu@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "Alex Williamson (alex.williamson@redhat.com)\"\"" 
+        <alex.williamson@redhat.com>, David Woodhouse <dwmw2@infradead.org>
+References: <MWHPR11MB1886FC7A46837588254794048C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <05d7f790-870d-5551-1ced-86926a0aa1a6@redhat.com>
+ <MWHPR11MB1886269E2B3DE471F1A9A7618C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <42a71462-1abc-0404-156c-60a7ee1ad333@redhat.com>
+ <20210601173138.GM1002214@nvidia.com>
+ <f69137e3-0f60-4f73-a0ff-8e57c79675d5@redhat.com>
+ <20210602172154.GC1002214@nvidia.com>
+ <c84787ec-9d8f-3198-e800-fe0dc8eb53c7@redhat.com>
+ <20210608132039.GG1002214@nvidia.com>
+ <f4d70f28-4bd6-5315-d7c7-0a509e4f1d1d@redhat.com>
+ <20210610114751.GK1002214@nvidia.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <d2193dbd-0d55-7315-4e76-eea7f8cc8f5b@redhat.com>
+Date:   Fri, 11 Jun 2021 13:43:59 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <20210610114751.GK1002214@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
 
-Commit c9b8b07cded58 (KVM: x86: Dynamically allocate per-vCPU emulation context) 
-tries to allocate per-vCPU emulation context dynamically, however, the
-x86_emulator slab cache is still exiting after the kvm module is unload
-as below after destroying the VM and unloading the kvm module.
+在 2021/6/10 下午7:47, Jason Gunthorpe 写道:
+> On Thu, Jun 10, 2021 at 10:00:01AM +0800, Jason Wang wrote:
+>> 在 2021/6/8 下午9:20, Jason Gunthorpe 写道:
+>>> On Tue, Jun 08, 2021 at 09:10:42AM +0800, Jason Wang wrote:
+>>>
+>>>> Well, this sounds like a re-invention of io_uring which has already worked
+>>>> for multifds.
+>>> How so? io_uring is about sending work to the kernel, not getting
+>>> structued events back?
+>>
+>> Actually it can. Userspace can poll multiple fds via preparing multiple sqes
+>> with IORING_OP_ADD flag.
+> Poll is only a part of what is needed here, the main issue is
+> transfering the PRI events to userspace quickly.
 
-grep x86_emulator /proc/slabinfo
-x86_emulator          36     36   2672   12    8 : tunables    0    0    0 : slabdata      3      3      0
 
-This patch fixes this slab cache leak by destroying the x86_emulator slab cache 
-when the kvm module is unloaded.
+Do we really care e.g at most one more syscall in this case? I think the 
+time spent on demand paging is much more than transferring #PF to 
+userspace. What's more, a well designed vIOMMU capable IOMMU hardware 
+should have the ability to inject such event directly to guest if #PF 
+happens on L1.
 
-Fixes: c9b8b07cded58 (KVM: x86: Dynamically allocate per-vCPU emulation context)
-Cc: stable@vger.kernel.org
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/x86.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 6d3955a6a763..fe26f33e8782 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8258,6 +8258,7 @@ void kvm_arch_exit(void)
- 	kvm_x86_ops.hardware_enable = NULL;
- 	kvm_mmu_module_exit();
- 	free_percpu(user_return_msrs);
-+	kmem_cache_destroy(x86_emulator_cache);
- 	kmem_cache_destroy(x86_fpu_cache);
- #ifdef CONFIG_KVM_XEN
- 	static_key_deferred_flush(&kvm_xen_enabled);
--- 
-2.25.1
+>
+>> This means another ring and we need introduce ioctl() to add or remove
+>> ioasids from the poll. And it still need a kind of fallback like a list if
+>> the ring is full.
+> The max size of the ring should be determinable based on the PRI
+> concurrance of each device and the number of devices sharing the ring
+
+
+This has at least one assumption, #PF event is the only event for the 
+ring, I'm not sure this is the case.
+
+Thanks
+
+
+>
+> In any event, I'm not entirely convinced eliding the PRI user/kernel
+> copy is the main issue here.. If we want this to be low latency I
+> think it ends up with some kernel driver component assisting the
+> vIOMMU emulation and avoiding the round trip to userspace
+>
+> Jason
+>
 
