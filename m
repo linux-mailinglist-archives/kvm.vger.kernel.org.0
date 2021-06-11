@@ -2,135 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F54B3A3B74
-	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 07:44:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D35BC3A3C75
+	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 08:58:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230526AbhFKFqJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Jun 2021 01:46:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51971 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230370AbhFKFqI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Jun 2021 01:46:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623390250;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5nlidzY7vVox2ieeNTmLbeG44JwkLPe3MMhpIq19x6g=;
-        b=LOiTUDx60R9wOz9sP1ZGZtlwFXZen6zjRQvWMitayuXLMNIcTLGlDvaUF3WVODXI8I35q7
-        iC5GJros2ztPy4IZuHHeOWvIAZPoIshMuJIs4cISIPcMr8QCZIZeoMxJ19vNCCOGDXS0aU
-        rlpnURci5sjJN8MvfCzJQE+fbqDvKZ0=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-517-_AqdL-B3P-KDqQAaR0ll4g-1; Fri, 11 Jun 2021 01:44:09 -0400
-X-MC-Unique: _AqdL-B3P-KDqQAaR0ll4g-1
-Received: by mail-pg1-f200.google.com with SMTP id 17-20020a630b110000b029022064e7cdcfso1103245pgl.10
-        for <kvm@vger.kernel.org>; Thu, 10 Jun 2021 22:44:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=5nlidzY7vVox2ieeNTmLbeG44JwkLPe3MMhpIq19x6g=;
-        b=Ng473mkjMXgqgHeAq3m0UvkhPezDOvkUZxLuaLjyfAzoAYkXcnkV/VLHYo/ekACkVR
-         NqYU2U49qPNdX8UEZMy2C3/CmQjLaUsUINgKo1f0SpForKgJWNrm5knuqgOf1Ze8xfTu
-         /puVnm7YSdP4iJrP84gcYODRnci9FjH2IWRQ8qD8+SHPO2mzTwZnPB4wWpG1HfxgnOQb
-         zsFm76jnNhhoD7/u057G9fre2ZL/Iluzb13wgWr9WZR109je1X1SuNbfrPHWhOlsEfuL
-         Cu91EjjJDKVvqVCj3obIoZYicbDVpfbcFI2g6N/RnIi+F7fzG8FcHGK1nx68Kp7IoPeP
-         1/1w==
-X-Gm-Message-State: AOAM531kmhBsNg/xqI4AOoF6xVAxK3CFcc5hkk7tjVS1Eiu4ZJHRcIFM
-        plgz7HC5CjR7IC9WKa1/+rPTpVH0XqVyjPQQCTbpRmCAc6uyZsdT8yNvsy2wTGPi6jgjg2xhNEB
-        2BbAjsmEeTh1i
-X-Received: by 2002:a63:6547:: with SMTP id z68mr1935902pgb.341.1623390248323;
-        Thu, 10 Jun 2021 22:44:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyKB65M93ciDtRjp4dLL7boO1gINllpJ4guVwZKP5dhsZp4Ljb4TFphg7Htp0BodlrU9JnK0w==
-X-Received: by 2002:a63:6547:: with SMTP id z68mr1935883pgb.341.1623390248048;
-        Thu, 10 Jun 2021 22:44:08 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id d8sm4085729pfq.198.2021.06.10.22.44.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Jun 2021 22:44:07 -0700 (PDT)
-Subject: Re: [RFC] /dev/ioasid uAPI proposal
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Liu Yi L <yi.l.liu@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "Alex Williamson (alex.williamson@redhat.com)\"\"" 
-        <alex.williamson@redhat.com>, David Woodhouse <dwmw2@infradead.org>
-References: <MWHPR11MB1886FC7A46837588254794048C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <05d7f790-870d-5551-1ced-86926a0aa1a6@redhat.com>
- <MWHPR11MB1886269E2B3DE471F1A9A7618C3E9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <42a71462-1abc-0404-156c-60a7ee1ad333@redhat.com>
- <20210601173138.GM1002214@nvidia.com>
- <f69137e3-0f60-4f73-a0ff-8e57c79675d5@redhat.com>
- <20210602172154.GC1002214@nvidia.com>
- <c84787ec-9d8f-3198-e800-fe0dc8eb53c7@redhat.com>
- <20210608132039.GG1002214@nvidia.com>
- <f4d70f28-4bd6-5315-d7c7-0a509e4f1d1d@redhat.com>
- <20210610114751.GK1002214@nvidia.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <d2193dbd-0d55-7315-4e76-eea7f8cc8f5b@redhat.com>
-Date:   Fri, 11 Jun 2021 13:43:59 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        id S231301AbhFKHAD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Jun 2021 03:00:03 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1164 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229530AbhFKHAC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Jun 2021 03:00:02 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15B6YtBQ080598;
+        Fri, 11 Jun 2021 02:57:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=x2xZ8XW9WOlZgpL4aLbZYg/Ju2cVBYzwiLpywQISssA=;
+ b=Jao9RDxibOOCkpgwk1W1fIzhpbkPyTfHJB5ql7F0L6x0KgEKJsNocQWwtFvh3m27qYxr
+ gtdyCo/2HTMz1nCv3MgEvN728epbiu71Dv9OcZL4HMCSm5tU6vlm0emUm0TO2l2DKllO
+ 0ZKKkbV2N2IFoDLSxaYnbCe8Vl7n+4RzPBnYtdyBVEUIWzjPf0PApJJ8QPvvwXWfSmMd
+ gjG/8ectYTd2wcYUJjs2Wd9ZrIIICyfzFTdptBUoQvu4b+g6IlvkWyRT5Hk6sUPNc/no
+ h1/idS3znYORahlfyCRQf/tMpVwNtalshpNp5gvo1NaI93JFDLPLbImKuhOS5Zt9jHr3 5Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3942ch92v4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Jun 2021 02:57:27 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15B6lIHj122714;
+        Fri, 11 Jun 2021 02:57:26 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3942ch92tm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Jun 2021 02:57:26 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15B6qTPE007568;
+        Fri, 11 Jun 2021 06:57:22 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma02fra.de.ibm.com with ESMTP id 392e798uvh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Jun 2021 06:57:22 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15B6vJBO12517788
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 11 Jun 2021 06:57:19 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3EB2E42063;
+        Fri, 11 Jun 2021 06:57:19 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EEABD4205F;
+        Fri, 11 Jun 2021 06:57:17 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.35.90])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 11 Jun 2021 06:57:17 +0000 (GMT)
+Subject: Re: [PATCH v7 1/4] KVM: stats: Separate generic stats from
+ architecture specific ones
+To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+References: <20210603211426.790093-1-jingzhangos@google.com>
+ <20210603211426.790093-2-jingzhangos@google.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <03f3fa03-6f61-7864-4867-3dc332a9d6f3@de.ibm.com>
+Date:   Fri, 11 Jun 2021 08:57:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210610114751.GK1002214@nvidia.com>
+In-Reply-To: <20210603211426.790093-2-jingzhangos@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: d3UCT33oCNg1P-mCe7sviD_VHD-SZPdw
+X-Proofpoint-GUID: MYLFLX6kyCj9CQSWdCtzS3DAmN7ceq-J
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-06-11_01:2021-06-11,2021-06-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 mlxscore=0 adultscore=0 malwarescore=0 spamscore=0
+ bulkscore=0 clxscore=1011 lowpriorityscore=0 suspectscore=0
+ impostorscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2104190000 definitions=main-2106110042
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-在 2021/6/10 下午7:47, Jason Gunthorpe 写道:
-> On Thu, Jun 10, 2021 at 10:00:01AM +0800, Jason Wang wrote:
->> 在 2021/6/8 下午9:20, Jason Gunthorpe 写道:
->>> On Tue, Jun 08, 2021 at 09:10:42AM +0800, Jason Wang wrote:
->>>
->>>> Well, this sounds like a re-invention of io_uring which has already worked
->>>> for multifds.
->>> How so? io_uring is about sending work to the kernel, not getting
->>> structued events back?
->>
->> Actually it can. Userspace can poll multiple fds via preparing multiple sqes
->> with IORING_OP_ADD flag.
-> Poll is only a part of what is needed here, the main issue is
-> transfering the PRI events to userspace quickly.
 
+On 03.06.21 23:14, Jing Zhang wrote:
+> Put all generic statistics in a separate structure to ease
+> statistics handling for the incoming new statistics API.
+> 
+> No functional change intended.
+> 
+> Reviewed-by: David Matlack <dmatlack@google.com>
+> Reviewed-by: Ricardo Koller <ricarkol@google.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+[...]
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index 8925f3969478..9b4473f76e56 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+[...]
+> @@ -755,12 +750,12 @@ struct kvm_vcpu_arch {
+>   };
+>   
+>   struct kvm_vm_stat {
+> +	struct kvm_vm_stat_generic generic;
 
-Do we really care e.g at most one more syscall in this case? I think the 
-time spent on demand paging is much more than transferring #PF to 
-userspace. What's more, a well designed vIOMMU capable IOMMU hardware 
-should have the ability to inject such event directly to guest if #PF 
-happens on L1.
+s390 does not have remote_tlb_flush. I guess this does not hurt?
 
-
->
->> This means another ring and we need introduce ioctl() to add or remove
->> ioasids from the poll. And it still need a kind of fallback like a list if
->> the ring is full.
-> The max size of the ring should be determinable based on the PRI
-> concurrance of each device and the number of devices sharing the ring
-
-
-This has at least one assumption, #PF event is the only event for the 
-ring, I'm not sure this is the case.
-
-Thanks
-
-
->
-> In any event, I'm not entirely convinced eliding the PRI user/kernel
-> copy is the main issue here.. If we want this to be low latency I
-> think it ends up with some kernel driver component assisting the
-> vIOMMU emulation and avoiding the round trip to userspace
->
-> Jason
->
-
+>   	u64 inject_io;
+>   	u64 inject_float_mchk;
+>   	u64 inject_pfault_done;
+>   	u64 inject_service_signal;
+>   	u64 inject_virtio;
+> -	u64 remote_tlb_flush;
+>   };
+[...]
+> +struct kvm_vm_stat_generic {
+> +	ulong remote_tlb_flush;
+> +};
