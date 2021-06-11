@@ -2,112 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DCDAA3A43B5
-	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 16:05:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75FDF3A43BF
+	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 16:07:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231528AbhFKOHX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Jun 2021 10:07:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49176 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230028AbhFKOHW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Jun 2021 10:07:22 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3722C061574;
-        Fri, 11 Jun 2021 07:05:24 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0aec00c954d2edeb094cfc.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:ec00:c954:d2ed:eb09:4cfc])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 17BCC1EC053C;
-        Fri, 11 Jun 2021 16:05:23 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1623420323;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=jjSbtHxfmAfGqMirhGR6ZtzrOk/6dDWM66vpfU14tVE=;
-        b=H7E8yAP84yciTlUXqurgT+uzQ8Jh3nsdJ2rmPMVBRLA8UcEs3g67Rg3SeS7mW5IaAAYxuH
-        Dzedmq7mXio6AZo7zjHw3oneDcZRubs3Q0xDV7FdVLYDDwwVVSHiUALCmvPluchMv2uh0N
-        sqBFsV1ziNuq79mr3wsF1RgQRHNE3OA=
-Date:   Fri, 11 Jun 2021 16:05:15 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v4 2/6] x86/sev-es: Disable IRQs while GHCB is active
-Message-ID: <YMNtmz6W1apXL5q+@zn.tnic>
-References: <20210610091141.30322-1-joro@8bytes.org>
- <20210610091141.30322-3-joro@8bytes.org>
+        id S231844AbhFKOJN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Jun 2021 10:09:13 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19648 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231691AbhFKOJJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Jun 2021 10:09:09 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15BE5RZn184155;
+        Fri, 11 Jun 2021 10:07:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=I9yqvrZ5ZI+S7ULnvlkthskQx5MPaTLNCKHYlQUFvIg=;
+ b=nFrn846SlqJ42Q523Ht++BlydAGCgCaNpSGtaqcBh+Kn3LteZYbN8mTrljtRUw7vnr/c
+ wPq+1ADiMIMkTbziQ439iYtD3hO7/dv3moKxaLwIu6dq4PjAaQiEDXQNF+WDgzT2xX2h
+ EQyccQB9pmV4mkMedIuAo4gL6RVjHogjnock86gxJAzdvIBaIS29FXOCthqWFVIOKfJZ
+ zxdTmszpgVMblSyJyDEKw9HCBGFaovUnHPD6dksU6SuWO/u+ZwBn/0494SaZzr7uruLy
+ 0x62ockJHNIdaFZDPjd2IJ6saeDSrJsp0Ey8tt0Fl39UzGxXs4qmGcQgN6m9lXF89Z6i LA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39492r0grw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Jun 2021 10:07:11 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15BE6D0o187334;
+        Fri, 11 Jun 2021 10:07:10 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39492r0gqv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Jun 2021 10:07:10 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15BDveuj028240;
+        Fri, 11 Jun 2021 14:07:08 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03ams.nl.ibm.com with ESMTP id 3900w8kg0j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Jun 2021 14:07:08 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15BE76nL34210160
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 11 Jun 2021 14:07:06 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2C4B652067;
+        Fri, 11 Jun 2021 14:07:06 +0000 (GMT)
+Received: from ibm-vm.ibmuc.com (unknown [9.145.5.240])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id D2B5352050;
+        Fri, 11 Jun 2021 14:07:05 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
+        frankja@linux.ibm.com, cohuck@redhat.com
+Subject: [kvm-unit-tests PATCH v5 0/7] s390: Add support for large pages
+Date:   Fri, 11 Jun 2021 16:06:58 +0200
+Message-Id: <20210611140705.553307-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210610091141.30322-3-joro@8bytes.org>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 80n3r-NN01Uen5vifg0ieVloncKrrBv2
+X-Proofpoint-GUID: mPGk62vQE5slG2Z7vHUb7CoAOGi5XaT5
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-06-11_05:2021-06-11,2021-06-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 bulkscore=0 spamscore=0 priorityscore=1501
+ malwarescore=0 adultscore=0 suspectscore=0 mlxscore=0 mlxlogscore=999
+ phishscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106110090
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 10, 2021 at 11:11:37AM +0200, Joerg Roedel wrote:
-> From: Joerg Roedel <jroedel@suse.de>
-> 
-> The #VC handler only cares about IRQs being disabled while the GHCB is
-> active, as it must not be interrupted by something which could cause
-> another #VC while it holds the GHCB (NMI is the exception for which the
-> backup GHCB is there).
-> 
-> Make sure nothing interrupts the code path while the GHCB is active by
-> disabling IRQs in sev_es_get_ghcb() and restoring the previous irq state
-> in sev_es_put_ghcb().
+Introduce support for large (1M) and huge (2G) pages.
 
-Why this unnecessarily complicated passing of flags back and forth?
+Add a simple testcase for EDAT1 and EDAT2.
 
-Why not simply "sandwich" them:
+v4->v5
+* fixed some typos and comment style issues
+* introduced enum pgt_level, switched all functions to use it
 
-	local_irq_save()
-	sev_es_get_ghcb()
+v3->v4
+* replace macros in patch 5 with a union representing TEID fields
+* clear the teid in expect_pgm_int and clear_pgm_int
+* update testcase to use expect_pgm_int, remove expect_dat_fault
+* update testcase to use teid union
 
-	...blablabla
+v2->v3
+* Add proper macros for control register bits
+* Improved patch titles and descriptions
+* Moved definition of TEID bits to library
+* Rebased on the lastest upstream branch
 
-	sev_es_put_ghcb()
-	local_irq_restore();
+v1->v2
 
-in every call site?
+* split patch 2 -> new patch 2 and new patch 3
+* patch 2: fixes pgtable.h, also fixes wrong usage of REGION_TABLE_LENGTH
+  instead of SEGMENT_TABLE_LENGTH
+* patch 3: introduces new macros and functions for large pages
+* patch 4: remove erroneous double call to pte_alloc in get_pte
+* patch 4: added comment in mmu.c to bridge the s390x architecural names
+  with the Linux ones used in the kvm-unit-tests
+* patch 5: added and fixed lots of comments to explain what's going on
+* patch 5: set FC for region 3 after writing the canary, like for segments
+* patch 5: use uintptr_t instead of intptr_t for set_prefix
+* patch 5: introduce new macro PGD_PAGE_SHIFT instead of using magic value 41
+* patch 5: use VIRT(0) instead of mem to make it more clear what we are
+  doing, even though VIRT(0) expands to mem
 
-What's the difference in passing *flags in and have the
-get_ghcb/put_ghcb save/restore flags instead of the callers?
 
-> -static __always_inline struct ghcb *sev_es_get_ghcb(struct ghcb_state *state)
-> +static __always_inline struct ghcb *sev_es_get_ghcb(struct ghcb_state *state,
-> +						    unsigned long *flags)
->  {
->  	struct sev_es_runtime_data *data;
->  	struct ghcb *ghcb;
->  
-> +	/*
-> +	 * Nothing shall interrupt this code path while holding the per-cpu
-> +	 * GHCB. The backup GHCB is only for NMIs interrupting this path.
+Claudio Imbrenda (7):
+  s390x: lib: add and use macros for control register bits
+  libcflat: add SZ_1M and SZ_2G
+  s390x: lib: fix pgtable.h
+  s390x: lib: Add idte and other huge pages functions/macros
+  s390x: lib: add teid union and clear teid from lowcore
+  s390x: mmu: add support for large pages
+  s390x: edat test
 
-Hmm, so why aren't you accessing/setting data->ghcb_active and
-data->backup_ghcb_active safely using cmpxchg() if this path can be
-interrupted by an NMI?
+ s390x/Makefile            |   1 +
+ lib/s390x/asm/arch_def.h  |  12 ++
+ lib/s390x/asm/float.h     |   4 +-
+ lib/s390x/asm/interrupt.h |  28 +++-
+ lib/s390x/asm/pgtable.h   |  44 +++++-
+ lib/libcflat.h            |   2 +
+ lib/s390x/mmu.h           |  84 +++++++++++-
+ lib/s390x/interrupt.c     |   2 +
+ lib/s390x/mmu.c           | 262 ++++++++++++++++++++++++++++++++----
+ lib/s390x/sclp.c          |   4 +-
+ s390x/diag288.c           |   2 +-
+ s390x/edat.c              | 274 ++++++++++++++++++++++++++++++++++++++
+ s390x/gs.c                |   2 +-
+ s390x/iep.c               |   4 +-
+ s390x/skrf.c              |   2 +-
+ s390x/smp.c               |   8 +-
+ s390x/vector.c            |   2 +-
+ s390x/unittests.cfg       |   3 +
+ 18 files changed, 691 insertions(+), 49 deletions(-)
+ create mode 100644 s390x/edat.c
 
 -- 
-Regards/Gruss,
-    Boris.
+2.31.1
 
-https://people.kernel.org/tglx/notes-about-netiquette
