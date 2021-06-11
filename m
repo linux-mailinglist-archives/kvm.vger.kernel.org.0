@@ -2,190 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F1ED3A3CE9
-	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 09:20:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF4023A3DF5
+	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 10:24:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231357AbhFKHWQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Jun 2021 03:22:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46660 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231255AbhFKHWP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Jun 2021 03:22:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623396017;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gYjg/yEV7PUq2GYWP2SW746eR9Kq3NCgJS7G1o1Lc6A=;
-        b=ev14qAtnULFtl91jy8TroTNm+kgS3wZjhQZhxo1Xs/UgfluVSDzW7C6NWXKO24Gcqa7PLL
-        C3Y35EnBGD1EEhDF4cmN4JnVM0Obc/OD42RtKZcfUnDCLIcasJHY53uKYVX9VTFCi/0nco
-        2GeG28VNXUW7rGvLY5k36DUkHOOb+AY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7-ta6QhxIrPDuD7I33xlcXhg-1; Fri, 11 Jun 2021 03:20:15 -0400
-X-MC-Unique: ta6QhxIrPDuD7I33xlcXhg-1
-Received: by mail-wm1-f69.google.com with SMTP id k8-20020a05600c1c88b02901b7134fb829so1478631wms.5
-        for <kvm@vger.kernel.org>; Fri, 11 Jun 2021 00:20:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version:content-transfer-encoding;
-        bh=gYjg/yEV7PUq2GYWP2SW746eR9Kq3NCgJS7G1o1Lc6A=;
-        b=C1XNHvA3mdGKdM+DHyK47R74QQcsgWA5tvCXW2qGQIQtI+VHIhWSAef6mk13hHj8Vg
-         ml8IqRVfttn4Orb1mcNxs7dmgs2GjK7631P2AfRLw5+Rry2gzfeTh/VJ7YRJRqDf/8Zt
-         UQ2UVo7/B1ZD6FjWNmLU7DANFa16TtOyr6NBDtyPSN1NdSPPrIW1i+3Vp04YrY0cXOux
-         3PXN376tXoef3gknKMfF3oaR7IcTaLp966kURYRiUu8BRPws1UhDjVWNBWE9j0h5AWe4
-         lG8WkwWoY5dyuPuMebIyl4jFcjiD907c74AY6jkDMeeo3ncENXBcbt7cSwt2qCrz+IDk
-         rrYg==
-X-Gm-Message-State: AOAM5329vAu3BqT14d0wXh8zfHkrNUiFCwP7/PDeNj/xJC3izhqJnJ3N
-        +zhSLCm4v521yQc64sGIzenPn+bvk79qSj+Si6F+tzwz//5TGmEGhi0D3DOZp1HXsIufcRj9qUX
-        Gahhn071xwSS2
-X-Received: by 2002:a05:600c:1d1b:: with SMTP id l27mr2490771wms.62.1623396014364;
-        Fri, 11 Jun 2021 00:20:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxxHECOXihNxXks5FPLEuvHTTQDpLVvf1IgC3Th2TxpBzLVOMuJTQ6q1LPQpSSDkIJn2XS3GA==
-X-Received: by 2002:a05:600c:1d1b:: with SMTP id l27mr2490733wms.62.1623396014106;
-        Fri, 11 Jun 2021 00:20:14 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id m7sm6299020wrv.35.2021.06.11.00.20.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Jun 2021 00:20:13 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vineeth Pillai <viremana@linux.microsoft.com>
-Cc:     "H. Peter Anvin" <hpa@zytor.com>,
+        id S231217AbhFKI0A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Jun 2021 04:26:00 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53506 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231180AbhFKIZ6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Jun 2021 04:25:58 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15B83O4M150107;
+        Fri, 11 Jun 2021 04:23:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=83Vmmdclr1Jg/D+7BzdpWoc8MKMZeu3kYzCb2+tqcDQ=;
+ b=GxDy2KBmMgJgcDbb+O5fNnPSGUON8xCMrDvVf6uoDQ1RlQU3bKGni9edx3dGEb47Y9h6
+ Wr8CZlbSRmvuSlRGrHmo83KyssJw0cWTCUVVN2oLVOJUibMuEfyfbQg4i9KceJfg6QIs
+ UF5zBC6BJJiyPlo2geWIbzNIr7W21XJDf1/uB2O8cHzY2NsRGwwmnOMnHvic2oPBNFom
+ EfWBQVYmrol7ZXutn8CRZFazL3FVGXYq+H3mAI2YG/a7FXLvCfhrg+UfIDDE+kR2JUbl
+ Nw8I6l+cGGCk5gJvYLBdScg1ZEHvSfaZRSOjVh1Gk+1TVgyGXnCdzk8EVTlpbfJRnKPd xg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3943ys8ggp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Jun 2021 04:23:42 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15B83jY4151018;
+        Fri, 11 Jun 2021 04:23:41 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3943ys8gft-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Jun 2021 04:23:41 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15B8FhQL008759;
+        Fri, 11 Jun 2021 08:23:39 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma02fra.de.ibm.com with ESMTP id 392e798vnk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Jun 2021 08:23:39 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15B8McLC31457698
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 11 Jun 2021 08:22:38 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 112AE5205F;
+        Fri, 11 Jun 2021 08:23:33 +0000 (GMT)
+Received: from ibm-vm (unknown [9.145.5.240])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 5E6E352057;
+        Fri, 11 Jun 2021 08:23:32 +0000 (GMT)
+Date:   Fri, 11 Jun 2021 10:23:30 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com,
+        linux-mm@kvack.org, Nicholas Piggin <npiggin@gmail.com>,
+        Uladzislau Rezki <urezki@gmail.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hyperv@vger.kernel.org,
-        Lan Tianyu <Tianyu.Lan@microsoft.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Wei Liu <wei.liu@kernel.org>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>
-Subject: Re: [PATCH v5 3/7] KVM: x86: hyper-v: Move the remote TLB flush
- logic out of vmx
-In-Reply-To: <3b74b538-0b28-7a00-0b26-0f926cd8f37e@redhat.com>
-References: <cover.1622730232.git.viremana@linux.microsoft.com>
- <4f4e4ca19778437dae502f44363a38e99e3ef5d1.1622730232.git.viremana@linux.microsoft.com>
- <87y2bix8y1.fsf@vitty.brq.redhat.com>
- <3b74b538-0b28-7a00-0b26-0f926cd8f37e@redhat.com>
-Date:   Fri, 11 Jun 2021 09:20:12 +0200
-Message-ID: <87k0n0yij7.fsf@vitty.brq.redhat.com>
+        Ingo Molnar <mingo@redhat.com>,
+        David Rientjes <rientjes@google.com>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v3 1/2] mm/vmalloc: add vmalloc_no_huge
+Message-ID: <20210611102330.17701bad@ibm-vm>
+In-Reply-To: <20210610140909.781959d063608710e24e70c9@linux-foundation.org>
+References: <20210610154220.529122-1-imbrenda@linux.ibm.com>
+        <20210610154220.529122-2-imbrenda@linux.ibm.com>
+        <20210610140909.781959d063608710e24e70c9@linux-foundation.org>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+Content-Type: text/plain; charset=US-ASCII
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: RlvbrGdC0VlhrvDxDD-SdLs5JOvmRIdv
+X-Proofpoint-GUID: W-7tZ1fiYAyc8Fu1j3OYcXEnLXp1kKu0
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-06-11_01:2021-06-11,2021-06-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ mlxscore=0 phishscore=0 priorityscore=1501 mlxlogscore=999
+ lowpriorityscore=0 suspectscore=0 clxscore=1015 adultscore=0
+ malwarescore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106110052
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On Thu, 10 Jun 2021 14:09:09 -0700
+Andrew Morton <akpm@linux-foundation.org> wrote:
 
-> On 10/06/21 13:20, Vitaly Kuznetsov wrote:
->
->>> +static inline void hv_track_root_tdp(struct kvm_vcpu *vcpu, hpa_t root=
-_tdp)
->>> +{
->>> +	struct kvm_arch *kvm_arch =3D &vcpu->kvm->arch;
->>> +
->>> +	if (kvm_x86_ops.tlb_remote_flush =3D=3D hv_remote_flush_tlb) {
->>> +		spin_lock(&kvm_arch->hv_root_tdp_lock);
->>> +		vcpu->arch.hv_root_tdp =3D root_tdp;
->>> +		if (root_tdp !=3D kvm_arch->hv_root_tdp)
->>> +			kvm_arch->hv_root_tdp =3D INVALID_PAGE;
->>> +		spin_unlock(&kvm_arch->hv_root_tdp_lock);
->>> +	}
->>> +}
->>> +#else
->>> +static inline void hv_track_root_tdp(struct kvm_vcpu *vcpu, hpa_t root=
-_tdp)
->>> +{
->>> +}
->>> +#endif
->>> +#endif
->>=20
->> Super-nitpick: I'd suggest adding /* __ARCH_X86_KVM_KVM_ONHYPERV_H__ */
->> to the second '#endif' and /* IS_ENABLED(CONFIG_HYPERV) */ to '#else'
->> and the first one: files/functions tend to grow and it becomes hard to
->> see where the particular '#endif/#else' belongs.
->
-> Done, thanks.  I've also changed the #if to just "#ifdef CONFIG_HYPERV",=
-=20
-> since IS_ENABLED is only needed in C statements.
+> On Thu, 10 Jun 2021 17:42:19 +0200 Claudio Imbrenda
+> <imbrenda@linux.ibm.com> wrote:
+> 
+> > The recent patches to add support for hugepage vmalloc mappings
 
-kvm/queue fails to compile and I blame this change:
+I will put the proper commit ID here
 
-In file included from arch/x86/kvm/svm/svm_onhyperv.c:16:
-arch/x86/kvm/svm/svm_onhyperv.h: In function =E2=80=98svm_hv_hardware_setup=
-=E2=80=99:
-arch/x86/kvm/svm/svm_onhyperv.h:56:34: error: =E2=80=98hv_remote_flush_tlb=
-=E2=80=99 undeclared (first use in this function); did you mean =E2=80=98sv=
-m_flush_tlb=E2=80=99?
-   56 |   svm_x86_ops.tlb_remote_flush =3D hv_remote_flush_tlb;
-      |                                  ^~~~~~~~~~~~~~~~~~~
-      |                                  svm_flush_tlb
-arch/x86/kvm/svm/svm_onhyperv.h:56:34: note: each undeclared identifier is =
-reported only once for each function it appears in
-arch/x86/kvm/svm/svm_onhyperv.h:58:5: error: =E2=80=98hv_remote_flush_tlb_w=
-ith_range=E2=80=99 undeclared (first use in this function)
-   58 |     hv_remote_flush_tlb_with_range;
-      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-make[2]: *** [scripts/Makefile.build:272: arch/x86/kvm/svm/svm_onhyperv.o] =
-Error 1
-make[2]: *** Waiting for unfinished jobs....
-In file included from arch/x86/kvm/svm/svm.c:47:
-arch/x86/kvm/svm/svm_onhyperv.h: In function =E2=80=98svm_hv_hardware_setup=
-=E2=80=99:
-arch/x86/kvm/svm/svm_onhyperv.h:56:34: error: =E2=80=98hv_remote_flush_tlb=
-=E2=80=99 undeclared (first use in this function); did you mean =E2=80=98sv=
-m_flush_tlb=E2=80=99?
-   56 |   svm_x86_ops.tlb_remote_flush =3D hv_remote_flush_tlb;
-      |                                  ^~~~~~~~~~~~~~~~~~~
-      |                                  svm_flush_tlb
-arch/x86/kvm/svm/svm_onhyperv.h:56:34: note: each undeclared identifier is =
-reported only once for each function it appears in
-arch/x86/kvm/svm/svm_onhyperv.h:58:5: error: =E2=80=98hv_remote_flush_tlb_w=
-ith_range=E2=80=99 undeclared (first use in this function)
-   58 |     hv_remote_flush_tlb_with_range;
-      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-make[2]: *** [scripts/Makefile.build:272: arch/x86/kvm/svm/svm.o] Error 1
-arch/x86/kvm/vmx/vmx.c: In function =E2=80=98hardware_setup=E2=80=99:
-arch/x86/kvm/vmx/vmx.c:7752:34: error: =E2=80=98hv_remote_flush_tlb=E2=80=
-=99 undeclared (first use in this function)
- 7752 |   vmx_x86_ops.tlb_remote_flush =3D hv_remote_flush_tlb;
-      |                                  ^~~~~~~~~~~~~~~~~~~
-arch/x86/kvm/vmx/vmx.c:7752:34: note: each undeclared identifier is reporte=
-d only once for each function it appears in
-arch/x86/kvm/vmx/vmx.c:7754:5: error: =E2=80=98hv_remote_flush_tlb_with_ran=
-ge=E2=80=99 undeclared (first use in this function)
- 7754 |     hv_remote_flush_tlb_with_range;
-      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > added a flag for __vmalloc_node_range to allow to request small
 
+and the name of the flag here
 
-(Note: CONFIG_HYPERV can be 'm'.)
+> > pages. This flag is not accessible when calling vmalloc, the only
 
-The following:
+and improve the wording in general ("order-0 pages" instead of "small
+pages")
 
-index 96da53edfe83..1c67abf2eba9 100644
---- a/arch/x86/kvm/kvm_onhyperv.h
-+++ b/arch/x86/kvm/kvm_onhyperv.h
-@@ -6,7 +6,7 @@
- #ifndef __ARCH_X86_KVM_KVM_ONHYPERV_H__
- #define __ARCH_X86_KVM_KVM_ONHYPERV_H__
-=20
--#ifdef CONFIG_HYPERV
-+#if IS_ENABLED(CONFIG_HYPERV)
- int hv_remote_flush_tlb_with_range(struct kvm *kvm,
-                struct kvm_tlb_range *range);
- int hv_remote_flush_tlb(struct kvm *kvm);
+> > option is to call directly __vmalloc_node_range, which is not
+> > exported.  
+> 
+> I can find no patch which adds such a flag to __vmalloc_node_range(). 
+> I assume you're referring to "mm/vmalloc: switch to bulk allocator in
+> __vmalloc_area_node()"?
+> 
+> Please be quite specific when identifying patches.  More specific than
+> "the recent patches"!
 
-saves the day for me.
+sorry!
 
---=20
-Vitaly
+I was referring to this one: 
+121e6f3258fe393e22c36f61a ("mm/vmalloc: hugepage vmalloc mappings")
+
+which introduces the flag VM_NO_HUGE_VMAP
+
+I will reword the commit to be more specific
+
+> Also, it appears from the discussion at
+> https://lkml.kernel.org/r/YKUWKFyLdqTYliwu@infradead.org that we'll be
+> seeing a new version of "mm/vmalloc: switch to bulk allocator in
+> __vmalloc_area_node()".  Would it be better to build these s390 fixes
+> into the next version of that patch series rather than as a separate
+> followup thing?
+> 
 
