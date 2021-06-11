@@ -2,236 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 879103A3F4F
-	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 11:44:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EEED43A402E
+	for <lists+kvm@lfdr.de>; Fri, 11 Jun 2021 12:31:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231550AbhFKJqi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Jun 2021 05:46:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33836 "EHLO
+        id S230365AbhFKKdW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Jun 2021 06:33:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46416 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230356AbhFKJqi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Jun 2021 05:46:38 -0400
+        by vger.kernel.org with ESMTP id S229480AbhFKKdV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Jun 2021 06:33:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623404680;
+        s=mimecast20190719; t=1623407478;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NMYoozdWQK4JS5PWCOrmwHkHgIFc9V+TLEIJ1okexV8=;
-        b=MS2O/HvdalX/1S2wldtHO3fW5y0o3Za5RdccyyvjnH5m2M5O/12/pqbRLLZgKPXz//cpZR
-        jnuIWzN46WavVUvui5esVwwuMrBcxQWGpGlTnXyRcu34dhmPqR5I8B7Etg6lA1p/CHeCeU
-        Xud8SNraz/qxcIemIkaXJFAdnPbWJDs=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28-XbMNVEKwMAOY8_EL9oWrCg-1; Fri, 11 Jun 2021 05:44:38 -0400
-X-MC-Unique: XbMNVEKwMAOY8_EL9oWrCg-1
-Received: by mail-wm1-f69.google.com with SMTP id v2-20020a7bcb420000b0290146b609814dso4247134wmj.0
-        for <kvm@vger.kernel.org>; Fri, 11 Jun 2021 02:44:38 -0700 (PDT)
+        bh=2ABgescNKFLTBVcW3cvCAFrSrlDuItxLFj5+UfkoHSk=;
+        b=YVpO+VjgTGKg0yhY+xXdLoSyiNNQ0vChxHNHcReBUshrcwZylwfrbRkgundGsy1axhbnee
+        wIqN1vo2K+Sp+iJTpGUtSQjMwKW1nEMriZQ5Yxi7y/uuvayo8WKdlxgmBCwdMZGvXkv1CO
+        yROUVr+mQNapUBgy86y0/znl97dMjFY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-57-X5uNZmKtM92dUAxI9ZHvXQ-1; Fri, 11 Jun 2021 06:31:17 -0400
+X-MC-Unique: X5uNZmKtM92dUAxI9ZHvXQ-1
+Received: by mail-wm1-f72.google.com with SMTP id y129-20020a1c32870000b029016920cc7087so1948250wmy.4
+        for <kvm@vger.kernel.org>; Fri, 11 Jun 2021 03:31:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version:content-transfer-encoding;
-        bh=NMYoozdWQK4JS5PWCOrmwHkHgIFc9V+TLEIJ1okexV8=;
-        b=qYSnWdte70yQ+t7pQltBpPW0euHKyqUcVXO9V71WhpSYB8FSJsOJ811TxzqzzdxsZC
-         lYxVAZB7y2H1x7DZeNdlxx9He4Yh0x5lX45fj9itzx4RY2O1af3cxOoK4JCgT/udis4n
-         Wt8/HoMWjylmufFMTJ645QenL6sF2GcjxvCd49uKtazYmA7kSmzMqlv+UsKKqk+4URN4
-         8acJ1joHI/cQmt561j9mnJoEdipvED7gtwtMM/SXutTlE/eiWQyICd8V3Aka1cCKjnvI
-         yA9KnPy3oOq1L3V6zsrcO/D49iZkhJNeoo2KXWZaiONj7eXwd+6QBk+RJB4WFgiwdmPz
-         m6IA==
-X-Gm-Message-State: AOAM531G1lVX+qjwxiK1gM7w3ZONzIdWTRqJuEmWsmE0gSKKvIq8ajXT
-        xqCmz1RR5YsVvcnz6m6ogug6NZOts54O0jpsHnDF3PK6UYfORKRcOefDclcBPousZQ8xUThdiUY
-        33rSA8XxFDBj0
-X-Received: by 2002:a05:6000:2c4:: with SMTP id o4mr3022541wry.267.1623404677690;
-        Fri, 11 Jun 2021 02:44:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwF7t6FkjQ+uHMri4EB7+VpKoiqBIYBM/hLoewJameHohV7ZDP+tkBEdZpbP3/QlCLr8Q0qdA==
-X-Received: by 2002:a05:6000:2c4:: with SMTP id o4mr3022530wry.267.1623404677478;
-        Fri, 11 Jun 2021 02:44:37 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id w13sm7073285wrc.31.2021.06.11.02.44.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Jun 2021 02:44:37 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vineeth Pillai <viremana@linux.microsoft.com>,
-        Lan Tianyu <Tianyu.Lan@microsoft.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Wei Liu <wei.liu@kernel.org>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>
-Cc:     "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH v5 0/7] Hyper-V nested virt enlightenments for SVM
-In-Reply-To: <683fa50765b29f203cb4b0953542dc43226a7a2f.camel@redhat.com>
-References: <cover.1622730232.git.viremana@linux.microsoft.com>
- <5af1ccce-a07d-5a13-107b-fc4c4553dd4d@redhat.com>
- <683fa50765b29f203cb4b0953542dc43226a7a2f.camel@redhat.com>
-Date:   Fri, 11 Jun 2021 11:44:35 +0200
-Message-ID: <878s3gybuk.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2ABgescNKFLTBVcW3cvCAFrSrlDuItxLFj5+UfkoHSk=;
+        b=T+2XySiF2ZER8JFiCZxTZBElJ+s5xvyusU5PnrBfjUFY2xPvZQNF41kUYmXD/G47MX
+         UzWJ4BiTH8jSXSSJhXYlQ5bc4xL7kH5cord3WoQYYdjkV3YqBBqrCmfwQ+yNoPTW+KXm
+         c1KPfJyJi5sI0gcw6jFXWozZ4nb1Mw3X+ea4NaL/7awXkFXD8jJuNlIteybQLwNJ1a/+
+         pq172NZkIhPjukzHlMPBacwPddpxTBq+n78g06OI3eKRgaoZv0/ZekwOcOhy2aqtAD5j
+         15SQhpUXseGXFzsCdI/l8w/6HNJa5+KFnvGUVmXec41OoINaN6uzhUEJfZB/FIZ/1T5Y
+         bPXg==
+X-Gm-Message-State: AOAM530OrYilh/ay2sjVkPK3UdrU4sKCuRF2fyWxNDuDD3i5cNlybH8E
+        d7pt436d/kCtGqCw/U01U2RJx7QW+kF3b2sTgN2u2uoKJSM49xDHk1jvYVmJhd/9R2F0+b5VzYR
+        iYvVqqePWQTmz
+X-Received: by 2002:a5d:61d0:: with SMTP id q16mr3154832wrv.175.1623407475772;
+        Fri, 11 Jun 2021 03:31:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyMgSDtnK9WI6jMA0Oetnq9UmN7D3xZyZ43D7ke1iDbEWyx9Sgep0ZkRuog2Qcn2ws3fWaLCA==
+X-Received: by 2002:a5d:61d0:: with SMTP id q16mr3154801wrv.175.1623407475491;
+        Fri, 11 Jun 2021 03:31:15 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id m65sm5510434wmm.19.2021.06.11.03.31.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Jun 2021 03:31:14 -0700 (PDT)
+To:     Jim Mattson <jmattson@google.com>, kvm list <kvm@vger.kernel.org>
+Cc:     Jan Kiszka <jan.kiszka@siemens.com>
+References: <CALMp9eRWBJQJBE2bxME6FzjhDOadNJW8wty7Gb=QJO8=ndaaEw@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [RFC] x86: Eliminate VM state changes during KVM_GET_MP_STATE
+Message-ID: <50c5d8c2-4849-2517-79c8-bd4e03fd36ad@redhat.com>
+Date:   Fri, 11 Jun 2021 12:31:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CALMp9eRWBJQJBE2bxME6FzjhDOadNJW8wty7Gb=QJO8=ndaaEw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Maxim Levitsky <mlevitsk@redhat.com> writes:
+On 10/06/21 22:39, Jim Mattson wrote:
+> But, even worse, it can modify guest memory,
+> even while all vCPU threads are stopped!
 
-> On Thu, 2021-06-10 at 17:17 +0200, Paolo Bonzini wrote:
->> On 03/06/21 17:14, Vineeth Pillai wrote:
->> > This patch series enables the nested virtualization enlightenments for
->> > SVM. This is very similar to the enlightenments for VMX except for the
->> > fact that there is no enlightened VMCS. For SVM, VMCB is already an
->> > architectural in-memory data structure.
->> >=20
->> > Note: v5 is just a rebase on hyperv-next(5.13-rc1) and needed a rework
->> > based on the patch series: (KVM: VMX: Clean up Hyper-V PV TLB flush)
->> > https://lore.kernel.org/lkml/20210305183123.3978098-1-seanjc@google.co=
-m/
->> >=20
->> > The supported enlightenments are:
->> >=20
->> > Enlightened TLB Flush: If this is enabled, ASID invalidations invalida=
-te
->> > only gva -> hpa entries. To flush entries derived from NPT, hyper-v
->> > provided hypercalls (HvFlushGuestPhysicalAddressSpace or
->> > HvFlushGuestPhysicalAddressList) should be used.
->> >=20
->> > Enlightened MSR bitmap(TLFS 16.5.3): "When enabled, L0 hypervisor does
->> > not monitor the MSR bitmaps for changes. Instead, the L1 hypervisor mu=
-st
->> > invalidate the corresponding clean field after making changes to one of
->> > the MSR bitmaps."
->> >=20
->> > Direct Virtual Flush(TLFS 16.8): The hypervisor exposes hypercalls
->> > (HvFlushVirtualAddressSpace, HvFlushVirtualAddressSpaceEx,
->> > HvFlushVirtualAddressList, and HvFlushVirtualAddressListEx) that allow
->> > operating systems to more efficiently manage the virtual TLB. The L1
->> > hypervisor can choose to allow its guest to use those hypercalls and
->> > delegate the responsibility to handle them to the L0 hypervisor. This
->> > requires the use of a partition assist page."
->> >=20
->> > L2 Windows boot time was measured with and without the patch. Time was
->> > measured from power on to the login screen and was averaged over a
->> > consecutive 5 trials:
->> >    Without the patch: 42 seconds
->> >    With the patch: 29 seconds
->> > --
->> >=20
->> > Changes from v4
->> > - Rebased on top of 5.13-rc1 and reworked based on the changes in the
->> >    patch series: (KVM: VMX: Clean up Hyper-V PV TLB flush)
->> >=20=20=20=20
->> > Changes from v3
->> > - Included definitions for software/hypervisor reserved fields in SVM
->> >    architectural data structures.
->> > - Consolidated Hyper-V specific code into svm_onhyperv.[ch] to reduce
->> >    the "ifdefs". This change applies only to SVM, VMX is not touched a=
-nd
->> >    is not in the scope of this patch series.
->> >=20
->> > Changes from v2:
->> > - Refactored the Remote TLB Flush logic into separate hyperv specific
->> >    source files (kvm_onhyperv.[ch]).
->> > - Reverted the VMCB Clean bits macro changes as it is no longer needed.
->> >=20
->> > Changes from v1:
->> > - Move the remote TLB flush related fields from kvm_vcpu_hv and kvm_hv
->> >    to kvm_vcpu_arch and kvm_arch.
->> > - Modify the VMCB clean mask runtime based on whether L1 hypervisor
->> >    is running on Hyper-V or not.
->> > - Detect Hyper-V nested enlightenments based on
->> >    HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS.
->> > - Address other minor review comments.
->> > ---
->> >=20
->> > Vineeth Pillai (7):
->> >    hyperv: Detect Nested virtualization support for SVM
->> >    hyperv: SVM enlightened TLB flush support flag
->> >    KVM: x86: hyper-v: Move the remote TLB flush logic out of vmx
->> >    KVM: SVM: Software reserved fields
->> >    KVM: SVM: hyper-v: Remote TLB flush for SVM
->> >    KVM: SVM: hyper-v: Enlightened MSR-Bitmap support
->> >    KVM: SVM: hyper-v: Direct Virtual Flush support
->> >=20
->> >   arch/x86/include/asm/hyperv-tlfs.h |   9 ++
->> >   arch/x86/include/asm/kvm_host.h    |   9 ++
->> >   arch/x86/include/asm/svm.h         |   9 +-
->> >   arch/x86/include/uapi/asm/svm.h    |   3 +
->> >   arch/x86/kernel/cpu/mshyperv.c     |  10 ++-
->> >   arch/x86/kvm/Makefile              |   9 ++
->> >   arch/x86/kvm/kvm_onhyperv.c        |  93 +++++++++++++++++++++
->> >   arch/x86/kvm/kvm_onhyperv.h        |  32 +++++++
->> >   arch/x86/kvm/svm/svm.c             |  14 ++++
->> >   arch/x86/kvm/svm/svm.h             |  22 ++++-
->> >   arch/x86/kvm/svm/svm_onhyperv.c    |  41 +++++++++
->> >   arch/x86/kvm/svm/svm_onhyperv.h    | 129 +++++++++++++++++++++++++++=
-++
->> >   arch/x86/kvm/vmx/vmx.c             | 105 +----------------------
->> >   arch/x86/kvm/vmx/vmx.h             |   9 --
->> >   arch/x86/kvm/x86.c                 |   9 ++
->> >   15 files changed, 384 insertions(+), 119 deletions(-)
->> >   create mode 100644 arch/x86/kvm/kvm_onhyperv.c
->> >   create mode 100644 arch/x86/kvm/kvm_onhyperv.h
->> >   create mode 100644 arch/x86/kvm/svm/svm_onhyperv.c
->> >   create mode 100644 arch/x86/kvm/svm/svm_onhyperv.h
->> >=20
->>=20
->> Queued, thanks.
->>=20
->> Paolo
->>=20
->
-> Hi!
->
-> This patch series causes a build failure here:
->
-> arch/x86/kvm/vmx/vmx.c: In function =E2=80=98hardware_setup=E2=80=99:
-> arch/x86/kvm/vmx/vmx.c:7752:34: error: =E2=80=98hv_remote_flush_tlb=E2=80=
-=99 undeclared (first use in this function)
->  7752 |   vmx_x86_ops.tlb_remote_flush =3D hv_remote_flush_tlb;
->       |                                  ^~~~~~~~~~~~~~~~~~~
-> arch/x86/kvm/vmx/vmx.c:7752:34: note: each undeclared identifier is repor=
-ted only once for each function it appears in
-> arch/x86/kvm/vmx/vmx.c:7754:5: error: =E2=80=98hv_remote_flush_tlb_with_r=
-ange=E2=80=99 undeclared (first use in this function)
->  7754 |     hv_remote_flush_tlb_with_range;
->       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->
->
-> Also this:
->
-> arch/x86/kvm/vmx/vmx.c: In function =E2=80=98hardware_setup=E2=80=99:
-> arch/x86/kvm/vmx/vmx.c:7752:34: error: =E2=80=98hv_remote_flush_tlb=E2=80=
-=99 undeclared (first use in this function)
->  7752 |   vmx_x86_ops.tlb_remote_flush =3D hv_remote_flush_tlb;
->       |                                  ^~~~~~~~~~~~~~~~~~~
-> arch/x86/kvm/vmx/vmx.c:7752:34: note: each undeclared identifier is repor=
-ted only once for each function it appears in
-> arch/x86/kvm/vmx/vmx.c:7754:5: error: =E2=80=98hv_remote_flush_tlb_with_r=
-ange=E2=80=99 undeclared (first use in this function)
->  7754 |     hv_remote_flush_tlb_with_range;
->       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->=20=20
+To some extent this is a userspace issue---they could declare vCPU 
+threads stopped only after KVM_GET_MPSTATE is done, and only start the 
+downtime phase of migration after that.  But it is nevertheless a pretty 
+bad excuse.
 
-Yea, reported already:
+> Was this simply to avoid serializing the two new bits in 
+> apic->pending_events?
 
-https://lore.kernel.org/kvm/683fa50765b29f203cb4b0953542dc43226a7a2f.camel@=
-redhat.com/T/#mf732ba9567923d800329f896761e4ee104475894
+Yes, and more precisely to allow some interoperability between old and 
+new kernels.
 
->
-> Best regards,
-> 	Maxim Levitsky
->
+> Would anyone object to serializing KVM_APIC_SIPI in the 
+> kvm_vcpu_events struct as well? Or would it be better to resurrect 
+> KVM_MP_STATE_SIPI_RECEIVED?
 
---=20
-Vitaly
+Reusing KVM_VCPUEVENT_VALID_SIPI_VECTOR to mean KVM_APIC_SIPI is set 
+would be nice, but it would break new->old migration (because old 
+kernels only set KVM_APIC_SIPI if they see KVM_MP_STATE_SIPI_RECEIVED). 
+  Can we decide this migration corner case is not something we care about?
+
+Using KVM_MP_STATE_SIPI_RECEIVED solves interoperability issues because 
+we never deleted the pre-2013 code, on the other hand 
+KVM_MP_STATE_SIPI_RECEIVED assumes the existing mpstate is 
+KVM_MP_STATE_INIT_RECEIVED; it does not account very well for the case 
+of INIT+SIPI both being pending.  Unlike real hardware, KVM will queue a 
+SIPI if it comes before the INIT has been processed, so that even in 
+overcommit scenarios it is not possible to fail the INIT-SIPI; dropping 
+kvm_apic_accept_events altogether would break this "tweak" across 
+migration, which might cause failure to bring up APs.
+
+If we start with just removing guest memory writes, there is an easy way 
+out: the tweak does not work in guest mode, where INIT causes a vmexit 
+and a pre-queued SIPI will never be delivered.  So, if in guest mode, we 
+can ignore the case of pending INIT+SIPI, and only do a minimal version 
+of kvm_apic_accept_events() that delays the larger side effects to the 
+next KVM_RUN.
+
+For a first improvement, the logic becomes the following:
+
+* if in guest mode and both INIT and SIPI are set, clear KVM_APIC_SIPI 
+and exit.  KVM_GET_VCPU_EVENTS will set latched_init.
+
+* if in guest mode and SIPI is set, KVM_APIC_SIPI is transmitted to 
+userspace via KVM_MP_STATE_SIPI_RECEIVED and 
+KVM_VCPUEVENT_VALID_SIPI_VECTOR.
+
+* if not in guest mode, run kvm_apic_accept_events.  Later this can be 
+changed to drop KVM_APIC_SIPI if it's deemed preferrable.
+
+I'll post a few RFC patches.  Selftests would be needed too.
+
+Paolo
 
