@@ -2,67 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 964143A5852
-	for <lists+kvm@lfdr.de>; Sun, 13 Jun 2021 14:44:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B55443A5853
+	for <lists+kvm@lfdr.de>; Sun, 13 Jun 2021 14:47:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231760AbhFMMqW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Jun 2021 08:46:22 -0400
-Received: from forward105p.mail.yandex.net ([77.88.28.108]:53007 "EHLO
-        forward105p.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231733AbhFMMqV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 13 Jun 2021 08:46:21 -0400
-X-Greylist: delayed 450 seconds by postgrey-1.27 at vger.kernel.org; Sun, 13 Jun 2021 08:46:21 EDT
-Received: from myt5-95f184467838.qloud-c.yandex.net (myt5-95f184467838.qloud-c.yandex.net [IPv6:2a02:6b8:c12:5981:0:640:95f1:8446])
-        by forward105p.mail.yandex.net (Yandex) with ESMTP id BCAC04D41219
-        for <kvm@vger.kernel.org>; Sun, 13 Jun 2021 15:36:48 +0300 (MSK)
-Received: from myt6-efff10c3476a.qloud-c.yandex.net (myt6-efff10c3476a.qloud-c.yandex.net [2a02:6b8:c12:13a3:0:640:efff:10c3])
-        by myt5-95f184467838.qloud-c.yandex.net (mxback/Yandex) with ESMTP id KOGJbXhgh6-amI0bcQr;
-        Sun, 13 Jun 2021 15:36:48 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1623587808;
-        bh=40GLmJMHLXoOqUixsdtFsGY+AQQlYxAe2PcEAtt58NE=;
-        h=In-Reply-To:Date:References:To:From:Subject:Message-ID;
-        b=gRk5CAZcJdLJa/V4sc1He6rS54tRnKCAKSvSN7xzNIikrO+7EUMQVv6yKWGyrHwsh
-         eWxnbRdBT8iwQMQ++0OibgZ7hRkLZt4EKwcXbXGYTAIEMgSckktdM2QRhJCpOLzr+3
-         WwGFMtxpJyn5/iDBhrRwXS7uW/IxQBa5C9UpQuu0=
-Authentication-Results: myt5-95f184467838.qloud-c.yandex.net; dkim=pass header.i=@yandex.ru
-Received: by myt6-efff10c3476a.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id hCj3MKLKEI-am2GrMS1;
-        Sun, 13 Jun 2021 15:36:48 +0300
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (Client certificate not present)
-Subject: Re: guest/host mem out of sync on core2duo?
-From:   stsp <stsp2@yandex.ru>
-To:     kvm@vger.kernel.org
-References: <bd4a2d30-5fb4-3612-c855-946d97068b9a@yandex.ru>
-Message-ID: <87035d8e-ad35-5cbb-a547-ee7c353221d4@yandex.ru>
-Date:   Sun, 13 Jun 2021 15:36:48 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S231774AbhFMMtk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Jun 2021 08:49:40 -0400
+Received: from mga01.intel.com ([192.55.52.88]:40833 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231733AbhFMMtj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Jun 2021 08:49:39 -0400
+IronPort-SDR: q8C3C6gdMFXQERFFN2eTntN+/9ubt5Unbh5F1QnXFjdimfFxLjPvqyEX52KQMIpR7Gnl+rENez
+ Ws5x/tpoKGbg==
+X-IronPort-AV: E=McAfee;i="6200,9189,10013"; a="227158357"
+X-IronPort-AV: E=Sophos;i="5.83,271,1616482800"; 
+   d="scan'208";a="227158357"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2021 05:47:38 -0700
+IronPort-SDR: Iho/OtFheBiI/TyskV5pyURKpqkc0UdJmuoFy9pzwGLLqGpfFya8ngigiKRAN6gy4MOqp9vLBx
+ FpgUAlq2zjwA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.83,271,1616482800"; 
+   d="scan'208";a="487109867"
+Received: from sunyi-u2010.sh.intel.com ([10.239.48.3])
+  by fmsmga002.fm.intel.com with ESMTP; 13 Jun 2021 05:47:36 -0700
+From:   Yi Sun <yi.sun@intel.com>
+To:     nadav.amit@gmail.com, yi.sun@intel.com, kvm@vger.kernel.org
+Cc:     gordon.jin@intel.com
+Subject: [PATCH v3 0/2] Wrap EFL binaries into ISO images 
+Date:   Sun, 13 Jun 2021 20:47:22 +0800
+Message-Id: <20210613124724.1850051-1-yi.sun@intel.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-In-Reply-To: <bd4a2d30-5fb4-3612-c855-946d97068b9a@yandex.ru>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-13.06.2021 01:49, stsp пишет:
-> I've found that the one needs to
-> check KVM_CAP_SYNC_MMU to
-> safely write to the guest memory,
-> but it doesn't seem to be documented
-> well.
-In fact, I wonder if its description in
-the kernel doc is even correct:
----
+This patch set make use of tool 'grub-mkrescue' to wrap ELF binaries 
+into bootable ISO images.
 
-When the KVM_CAP_SYNC_MMU capability is available, changes in the backing of
-the memory region are automatically reflected into the guest.
----
+Cases in kvm-unit-tests can be run with QEMU. But the problem is that
+some newer VMMs such as Crosvm/Cloud-hyperviosr does NOT support 
+multiboot protocol with which QEMU loads and executes those testing 
+binaries correctly. This patch set can wrap each kvm-unit-tests EFL 
+binaries into a bootable ISO image aiming to adapt it to more usage 
+scenarios. As we know, all PC BIOSes and vBIOSes know how to boot 
+from a ISO from CD-ROM drive, hence it can extend the KVM-unit-tests 
+a lot.
 
-But, after looking into the patches
-that introduce that capability, I've
-got an impression that it is only needed
-if you mmap() something else to the
-guest-shared region.
+The patch set provides two approaches to create ISO. One is via 
+"make iso". It wrap each ELF in foler x86 into a ISO without any 
+parameters passed to the test cases.  The other is via script 
+create_iso.sh. The script wraps the ELF according to the configure
+file unittests.cfg which descripes various parameters for each testing.
+
+Patch History:
+V1: Initial version.
+V2: Add the second parament to the script create_iso.sh, that could 
+pass environment variables into test cases via the file.
+V3: Add some failure handle.
+
+ lib/grub/grub.cfg   |   7 +++
+ x86/Makefile.common |  18 +++++++-
+ x86/create_iso.sh   | 110 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 134 insertions(+), 1 deletion(-)
+ create mode 100644 lib/grub/grub.cfg
+ create mode 100755 x86/create_iso.sh
+
+-- 
+2.27.0
 
