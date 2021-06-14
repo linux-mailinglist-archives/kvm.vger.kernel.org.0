@@ -2,125 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE0D13A6D3F
-	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 19:32:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCA7A3A6DD6
+	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 19:57:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234261AbhFNRe7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Jun 2021 13:34:59 -0400
-Received: from forward105j.mail.yandex.net ([5.45.198.248]:60944 "EHLO
-        forward105j.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231499AbhFNRe7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 14 Jun 2021 13:34:59 -0400
-X-Greylist: delayed 153818 seconds by postgrey-1.27 at vger.kernel.org; Mon, 14 Jun 2021 13:34:58 EDT
-Received: from sas1-934f36a1872d.qloud-c.yandex.net (sas1-934f36a1872d.qloud-c.yandex.net [IPv6:2a02:6b8:c14:492:0:640:934f:36a1])
-        by forward105j.mail.yandex.net (Yandex) with ESMTP id 52F62B20236;
-        Mon, 14 Jun 2021 20:32:54 +0300 (MSK)
-Received: from sas2-e7f6fb703652.qloud-c.yandex.net (sas2-e7f6fb703652.qloud-c.yandex.net [2a02:6b8:c14:4fa6:0:640:e7f6:fb70])
-        by sas1-934f36a1872d.qloud-c.yandex.net (mxback/Yandex) with ESMTP id qSr9ps8flI-WsI4R7Mm;
-        Mon, 14 Jun 2021 20:32:54 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1623691974;
-        bh=gKax/7yFW+n4qLtEkltgr/65J+eqokYz3P+0zs3qglc=;
-        h=In-Reply-To:From:Date:References:To:Subject:Message-ID:Cc;
-        b=CrHAm6H6dWFQEwwrd/31C94zKyTzpR8AC9v7OdHExUBb9JvMX2zaqut7q+qCvbYB0
-         MWE8FuLgQDTbQvTXebtO9dE057x7wNOaOtrDWHZbZOOh0TZpRXpusJBRB8ska8+Mb4
-         N0/8Eqzuh2epeVZcFrzTghLsgrACNCRuyaBNc+Co=
-Authentication-Results: sas1-934f36a1872d.qloud-c.yandex.net; dkim=pass header.i=@yandex.ru
-Received: by sas2-e7f6fb703652.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id apm47wmcip-WrPuFTDE;
-        Mon, 14 Jun 2021 20:32:53 +0300
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (Client certificate not present)
-Subject: Re: guest/host mem out of sync on core2duo?
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <bd4a2d30-5fb4-3612-c855-946d97068b9a@yandex.ru>
- <YMeMov42fihXptQm@google.com>
-From:   stsp <stsp2@yandex.ru>
-Message-ID: <73f1f90e-f952-45a4-184e-1aafb3e4a8fd@yandex.ru>
-Date:   Mon, 14 Jun 2021 20:32:53 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S234138AbhFNR7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Jun 2021 13:59:41 -0400
+Received: from mail-il1-f181.google.com ([209.85.166.181]:41497 "EHLO
+        mail-il1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233358AbhFNR7k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Jun 2021 13:59:40 -0400
+Received: by mail-il1-f181.google.com with SMTP id t6so12969683iln.8
+        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 10:57:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8hwJD3UWQ6lI2sgeCQ36GJevuaMVqWZvq9du12z5FsM=;
+        b=K51X6GOFYooWYNV0FMfIyF9OJE21Z8MEoSyZXjnc7xTuPcsdaDKgumyKctDw6QdeOe
+         LKILhgsIJub73E9dQjg6k8gSeyBdaJXA5/W8cYk7mOzq7qW3Dz6Be+ILotPpTyrQwe+P
+         +hnsfRMEDHPOMrf6y60GWnIHnFA2up/WksRXC4zr8O6IsPDNA/rwsm1NvE7mRSbB7Xv4
+         EBwdBmuCSD3IM6ZW/63wxhEOQeBqh2KVCfDRSi8r2UQoc0BArRkUUHxAAL0P9VJUjbg/
+         PnaXjEw8qMx443Ocx5axrTycTRFOV8W4KY5w+jTWSG+1UI4TE4xi0aIE1mU+DZhn3ntx
+         5PmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8hwJD3UWQ6lI2sgeCQ36GJevuaMVqWZvq9du12z5FsM=;
+        b=fpL2WbkSjw8VjBU9/aFWZqJLYYsStdk0uWHJXXGqD/RIIe9hKMIT5DxxywzZ7Rig3q
+         Di0pBE/7vBlj1O+6QVAHgpqnmh7hHQoQnQrOJ51VxsVjGV8BNPvAgAEpPQ2TjbV5xFOG
+         M993gcqV4hCHs2gAamVUmaXGYucHc3MMtcCFncCPGGuHjGwCvUW2S74rLZgRh4eHMOci
+         7D62Dn+506QCX0cpoRNT5gAHH8Ihj3P8WzhVQHvCgQCShDT+CtR83zWUPW8s3ibz2A32
+         NkSrcfWAQIZaQ32zVSVzvRgyTYED7ugqvKFKTWbSvD5ADHR/4gw0ekrwgsTEa36SlFWC
+         JJJA==
+X-Gm-Message-State: AOAM533aVSYxthDhybfUDT6mwdD9qRPoALyP7tvW4kcmRRagGZiCgvjx
+        uwoLtaQL8bpxkzFW8SspSeMdMNUzBlqDN2K3Nrvj8A==
+X-Google-Smtp-Source: ABdhPJzq8f6ek0ktHrrdoNwdYj6I4v4V+vyfQqCQCB8MSuSzt/oIMJiof0W1UrwfAw2Ouf9CrNLzlCOKVyde6HI2zLM=
+X-Received: by 2002:a92:b10:: with SMTP id b16mr14832874ilf.154.1623693396587;
+ Mon, 14 Jun 2021 10:56:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <YMeMov42fihXptQm@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+References: <20210611235701.3941724-1-dmatlack@google.com> <20210611235701.3941724-2-dmatlack@google.com>
+In-Reply-To: <20210611235701.3941724-2-dmatlack@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Mon, 14 Jun 2021 10:56:25 -0700
+Message-ID: <CANgfPd86b95ZCOFs89eqbcvmkiNz08WT+yuWdR-jZ-YjSeWArA@mail.gmail.com>
+Subject: Re: [PATCH 1/8] KVM: x86/mmu: Refactor is_tdp_mmu_root()
+To:     David Matlack <dmatlack@google.com>
+Cc:     kvm <kvm@vger.kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Junaid Shahid <junaids@google.com>,
+        Andrew Jones <drjones@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-14.06.2021 20:06, Sean Christopherson пишет:
-> On Sun, Jun 13, 2021, stsp wrote:
->> Hi kvm developers.
->>
->> I am having the strange problem that can only be reproduced on a core2duo CPU
->> but not AMD FX or Intel Core I7.
->>
->> My code has 2 ways of setting the guest registers: one is the guest's ring0
->> stub that just pops all regs from stack and does iret to ring3.  That works
->> fine.  But sometimes I use KVM_SET_SREGS and resume the VM directly to ring3.
->> That randomly results in either a good run or invalid guest state return, or
->> a page fault in guest.
-> Hmm, a core2duo failure is more than likely due to lack of unrestricted guest.
-> You verify this by loading kvm_intel on the Core i7 with unrestricted_guest=0.
+On Fri, Jun 11, 2021 at 4:57 PM David Matlack <dmatlack@google.com> wrote:
+>
+> Refactor is_tdp_mmu_root() into is_vcpu_using_tdp_mmu() to reduce
+> duplicated code at call sites and make the code more readable.
+>
+> Signed-off-by: David Matlack <dmatlack@google.com>
 
-Wow, excellent shot!
-Indeed, the problem then starts
-reproducing also there!
-So at least I now have a problematic
-setup myself, rather than needing
-to ask for ssh from everyone involved. :)
+Nice cleanup!
 
-What does this mean to us, though?
-That its completely unrelated to any
-memory synchronization?
+Reviewed-by: Ben Gardon <bgardon@google.com>
 
 
->> I tried to analyze when either of the above happens exactly, and I have a
->> very strong suspection that the problem is in a way I update LDT. LDT is
->> shared between guest and host with KVM_SET_USER_MEMORY_REGION, and I modify
->> it on host.  So it seems like if I just allocated the new LDT entry, there is
->> a risk of invalid guest state, as if the guest's LDT still doesn't have it.
->> If I modified some LDT entry, there can be a page fault in guest, as if the
->> entry is still old.
-> IIUC, you are updating the LDT itself, e.g. an FS/GS descriptor in the LDT, as
-> opposed to updating the LDT descriptor in the GDT?
-
-I am updating the LDT itself,
-not modifying its descriptor
-in gdt. And with the same
-KVM_SET_SREGS call I also
-update the segregs to the new
-values, if needed.
-
-
-> Either way, do you also update all relevant segments via KVM_SET_SREGS after
-> modifying memory?
-
-Yes, if this is needed.
-Sometimes its not needed, and
-when not - it seems page fault is
-more likely. If I also update segregs -
-then invalid guest state.
-But these are just the statistical
-guesses so far.
-
-
->     Best guess is that KVM doesn't detect that the VM has state
-> that needs to be emulated, or that KVM's internal register state and what's in
-> memory are not consistent.
-
-Hope you know what parts are
-emulated w/o unrestricted guest,
-in which case we can advance. :)
-
-
-> Anyways, I highly doubt this is a memory synchronization issue, a corner case
-> related to lack of unrestricted guest is much more likely.
-
-Just to be sure I tried the CD bit
-in CR0 to rule out the caching
-issues, and that changes nothing.
-So...
-What to do next?
-
+> ---
+>  arch/x86/kvm/mmu/mmu.c     | 10 +++++-----
+>  arch/x86/kvm/mmu/tdp_mmu.c |  2 +-
+>  arch/x86/kvm/mmu/tdp_mmu.h |  8 +++++---
+>  3 files changed, 11 insertions(+), 9 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 0144c40d09c7..eccd889d20a5 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3545,7 +3545,7 @@ static bool get_mmio_spte(struct kvm_vcpu *vcpu, u64 addr, u64 *sptep)
+>                 return reserved;
+>         }
+>
+> -       if (is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa))
+> +       if (is_vcpu_using_tdp_mmu(vcpu))
+>                 leaf = kvm_tdp_mmu_get_walk(vcpu, addr, sptes, &root);
+>         else
+>                 leaf = get_walk(vcpu, addr, sptes, &root);
+> @@ -3729,7 +3729,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>         if (page_fault_handle_page_track(vcpu, error_code, gfn))
+>                 return RET_PF_EMULATE;
+>
+> -       if (!is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa)) {
+> +       if (!is_vcpu_using_tdp_mmu(vcpu)) {
+>                 r = fast_page_fault(vcpu, gpa, error_code);
+>                 if (r != RET_PF_INVALID)
+>                         return r;
+> @@ -3751,7 +3751,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>
+>         r = RET_PF_RETRY;
+>
+> -       if (is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa))
+> +       if (is_vcpu_using_tdp_mmu(vcpu))
+>                 read_lock(&vcpu->kvm->mmu_lock);
+>         else
+>                 write_lock(&vcpu->kvm->mmu_lock);
+> @@ -3762,7 +3762,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>         if (r)
+>                 goto out_unlock;
+>
+> -       if (is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa))
+> +       if (is_vcpu_using_tdp_mmu(vcpu))
+>                 r = kvm_tdp_mmu_map(vcpu, gpa, error_code, map_writable, max_level,
+>                                     pfn, prefault);
+>         else
+> @@ -3770,7 +3770,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>                                  prefault, is_tdp);
+>
+>  out_unlock:
+> -       if (is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa))
+> +       if (is_vcpu_using_tdp_mmu(vcpu))
+>                 read_unlock(&vcpu->kvm->mmu_lock);
+>         else
+>                 write_unlock(&vcpu->kvm->mmu_lock);
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 237317b1eddd..f4cc79dabeae 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -979,7 +979,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>
+>         if (WARN_ON(!VALID_PAGE(vcpu->arch.mmu->root_hpa)))
+>                 return RET_PF_RETRY;
+> -       if (WARN_ON(!is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa)))
+> +       if (WARN_ON(!is_vcpu_using_tdp_mmu(vcpu)))
+>                 return RET_PF_RETRY;
+>
+>         level = kvm_mmu_hugepage_adjust(vcpu, gfn, max_level, &pfn,
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+> index 5fdf63090451..c8cf12809fcf 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.h
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.h
+> @@ -91,16 +91,18 @@ static inline bool is_tdp_mmu_enabled(struct kvm *kvm) { return false; }
+>  static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp) { return false; }
+>  #endif
+>
+> -static inline bool is_tdp_mmu_root(struct kvm *kvm, hpa_t hpa)
+> +static inline bool is_vcpu_using_tdp_mmu(struct kvm_vcpu *vcpu)
+>  {
+> +       struct kvm *kvm = vcpu->kvm;
+>         struct kvm_mmu_page *sp;
+> +       hpa_t root_hpa = vcpu->arch.mmu->root_hpa;
+>
+>         if (!is_tdp_mmu_enabled(kvm))
+>                 return false;
+> -       if (WARN_ON(!VALID_PAGE(hpa)))
+> +       if (WARN_ON(!VALID_PAGE(root_hpa)))
+>                 return false;
+>
+> -       sp = to_shadow_page(hpa);
+> +       sp = to_shadow_page(root_hpa);
+>         if (WARN_ON(!sp))
+>                 return false;
+>
+> --
+> 2.32.0.272.g935e593368-goog
+>
