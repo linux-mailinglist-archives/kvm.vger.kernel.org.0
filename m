@@ -2,260 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 269FA3A7214
-	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 00:35:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84E993A7230
+	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 00:43:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229981AbhFNWhF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Jun 2021 18:37:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50210 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229829AbhFNWhE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Jun 2021 18:37:04 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA0C2C061574
-        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 15:34:47 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id w31so7345210pga.6
-        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 15:34:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=gDlYxVLTJVN+IzDe5ZymRop7HLbPaP8fyb3bx0VwOwg=;
-        b=UdTI+64LznBBfRmLrc9RDAaskYZBeALSv4udd1LsyIZe1T2/r2ABa8+IIIp+1ekO/R
-         wmOXhYDHn7jqslaNAUn8G/Zcu/q1KuAoK6Ur/kffEqADNz68aCL1tvzBMmC5sAH6TjMR
-         CGe0FBVeGm/b+iN+cCFGEzv6NEPq2qkgAfQUS/gYaakQlLHtUBU/imAcw11mWBLZQVLj
-         Z8hzJwOSlKQSdG2FR1Pz3Smbqm3kFshwZ4Izi8gpmLFQdxcPzT2tgqQajxCVc/G9Hz/G
-         ZVcVA6uhBKpId7wxlgqa4bgH+Qja5GgXFNFqdNEkuRbh2uXEWyoyfhqVA+RK0NyLrnOs
-         vi+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gDlYxVLTJVN+IzDe5ZymRop7HLbPaP8fyb3bx0VwOwg=;
-        b=mf1ASL4t7l2GZGbLJtIBYEioRGNogghBNaR0/cEQt3rx62EGz6lrzsImqcXgXixVDo
-         3RaevnwJlgQph5dePH6jdOoRpcoRvp6NVxKRtf+fMId4O+yURbcJuuFcCkeI4z1ZltNA
-         hvZUDS65571Jnhp9biRzUi9wvnMPcnS4Py6ReWuasgPJ2mCqeQFIoY/7mh2nv254VBUj
-         +9IoOtT5XtdbTBNA+lqFBSRSkmRDsKdi+9aGpnjwlRnwTpDxKVAGabhvQGTGojiGMsKu
-         6BvzJKgJngfNYCERJuniYipJ66whXo9u/4YqhH/eTSOGVW+1MphOIexPDpDS2tlfD6gR
-         4AXQ==
-X-Gm-Message-State: AOAM5303i1+sUrUpNDlnf8X/hhX6BewDBfinqZRCoUKTorNsB+tpnNhl
-        NAMqGO6TJLIGqddcC/QW6pdlPg==
-X-Google-Smtp-Source: ABdhPJzo4Vo5Zo4Dz/L38yPl5qzNYWFdughWH3lj8AGFhIBLSiGym6s5xGZl6gB1fhtRq6VXK7j8Qw==
-X-Received: by 2002:a63:a80b:: with SMTP id o11mr19434797pgf.53.1623710087197;
-        Mon, 14 Jun 2021 15:34:47 -0700 (PDT)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id t39sm13047961pfg.147.2021.06.14.15.34.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jun 2021 15:34:46 -0700 (PDT)
-Date:   Mon, 14 Jun 2021 22:34:42 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Junaid Shahid <junaids@google.com>,
-        Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 6/8] KVM: x86/mmu: fast_page_fault support for the TDP MMU
-Message-ID: <YMfZgufRGaW//gKE@google.com>
-References: <20210611235701.3941724-1-dmatlack@google.com>
- <20210611235701.3941724-7-dmatlack@google.com>
- <CALzav=embwx9PoZrMSS3XkQsFjnAu4UyG8VBY=3yj8uqzKBgRg@mail.gmail.com>
- <CANgfPd97iUUduRi-faL4i3fMov7f67iU_LheeJzYoW=QnaHXLg@mail.gmail.com>
-MIME-Version: 1.0
+        id S231614AbhFNWpI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Jun 2021 18:45:08 -0400
+Received: from mail-dm6nam10on2073.outbound.protection.outlook.com ([40.107.93.73]:55265
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229760AbhFNWpH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Jun 2021 18:45:07 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HYEwP63ahiyBU0PF/ShkFa/wseyI/sYKdcE3eN/9xXu1NxMlVKimTJqtzTPj1/iIsYQb7E30ottLdGSYliwzZzHpSz+OpzAbOipGuH1uJe38qmH69jVv1Hq7acVHY7peURm1hawEHK+vofom+ebQwQrxTMf1I6C8K/N0olJWc7VH/EBVmwxdsnhGNomEdaAwqsD1wOOrjzwVb1cxSesm6eOkWaTFHLzIf7F9obhwHP9jq4/WUqL++5qLdVi25QwHMYMUEPDYBlRnE2MzBNl3HbwAbx/Fuk0JRIUaxaY4ZZPcmybe5EQraVS06zxcVLIEiPmnK4YMjNMUiBgn6GJIPw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tzjBnJjgpYhyA3oDnyYY08XhT2AAzWICrTNboJTc1EA=;
+ b=a81zQMQJafvSPyXN5RWLxC/iyDqiAlnZc07PlebsQan1JEpCif7rzLmCneYYbI1G2NIDUJTU9BsOiO7iclIOe9gFwGTUXGffBGv7NJF5ghiyLdHoNqEG36ZlS2oQFfwfwgrIx5zAc7VkxRBFPpzSBXz+lxtSlNAtzACdP0jDMptSLYStHNNr5shjjNkeM6yLHz9VQXvFfvKXhaGuSlFK5ZoD3+GnoSSDkfQiYeHqLokxV9K9NMNgSyka90RH1Ae1YM+vE9HDMS9NfYSfesMoByi9qFJGZfyiMeBleNuziMgxcLfwa93FDXLqFwpWniaFQhMVU2K8YRbKS5sYZ3UMkw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tzjBnJjgpYhyA3oDnyYY08XhT2AAzWICrTNboJTc1EA=;
+ b=svWo3CR2W43AoxWhUfdTAZReNm6KICodpUOPfJgjDVzSxDv1bElJGQ9OxIGsQz/2tWyW78YweeTYCkPiCJz+qVTDWg6yATQ5Tq/G27nFU19PiWhjf4f6ClpTI8gkAY4o6U3z2jD8dlrNBRRKa7tP5OuyaZ/LMnnO0vYHJpj4sDfRTwYB9F8xdg4Xx58Z7ecn/p8GT4dNcQjw9lnS4MySQ+Jxo3YFjQlnS7e+LKnIHNbdkdgy+1AiPEnwtl/CCPkJzAWkDRi1ioPVtKIvoAWC0rnjk2q+eAYipMZrAW59r7M4fhfw3yxJp4n0o+uvtELL47jB+Pd2ML080GXM5Llphw==
+Authentication-Results: lst.de; dkim=none (message not signed)
+ header.d=none;lst.de; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5335.namprd12.prod.outlook.com (2603:10b6:208:317::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.24; Mon, 14 Jun
+ 2021 22:43:02 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e%7]) with mapi id 15.20.4219.025; Mon, 14 Jun 2021
+ 22:43:02 +0000
+Date:   Mon, 14 Jun 2021 19:43:01 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org, Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>
+Subject: Re: [PATCH 04/10] driver core: Don't return EPROBE_DEFER to
+ userspace during sysfs bind
+Message-ID: <20210614224301.GO1002214@nvidia.com>
+References: <20210614150846.4111871-1-hch@lst.de>
+ <20210614150846.4111871-5-hch@lst.de>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANgfPd97iUUduRi-faL4i3fMov7f67iU_LheeJzYoW=QnaHXLg@mail.gmail.com>
+In-Reply-To: <20210614150846.4111871-5-hch@lst.de>
+X-Originating-IP: [47.55.113.94]
+X-ClientProxiedBy: MN2PR16CA0029.namprd16.prod.outlook.com
+ (2603:10b6:208:134::42) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (47.55.113.94) by MN2PR16CA0029.namprd16.prod.outlook.com (2603:10b6:208:134::42) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.20 via Frontend Transport; Mon, 14 Jun 2021 22:43:02 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lsvIL-006wHi-Em; Mon, 14 Jun 2021 19:43:01 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a2727cf1-2caf-49d5-16d2-08d92f85c46d
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5335:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5335EC72983E71C00E266CF1C2319@BL1PR12MB5335.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: jcC13W/pwuWQ2eodOB3lekMDfCecV+8oPefbaKKKpQJ2rhNDEjBKsAncBis+R4pnguhyFl5Kfy3b8wsh8ZJtB0Fj9er2oQX5PqzxRkxY9ytmhC+crwuBE8FrZdQoPSsmBKwBckBmzANCVFZjlS6e6/nQmIYiydTRRzZ2dPXsjX4RLfBGTV3JGARcydEOspAWarZKKNdjTfjTK3Tz+8r81REnZyC21SEgovCXm+IJe8w4zft8p/hC8TWCsQHVPIJ5KxYP4MGBdS0ujWs03f5Oi+7HK9QnqOgRT7vJnliObqLpUksmcl32V6D49MSqYOLURNbopmd8K9EhM8HsLrU5vJTXVkAGPRQpUM0kR5IhDUi49HA0jPshAU+rKOlxwo/5T8PwbEir7UVmrEd778Bd+qUErSJ61TjVz+YQtTb2X0JlNVRmI+x+meze5pK9sRAxeDm/ARXZyhHL1cXIYth3CIAjlT6m1S5RX3K6szSqJq1vPXH9UzGe26pWz9XgZApMG/ocd1bOdf6FV7hgB48GOclw2+DVp5ST5VVmAX0g7WLDc7q6ARrCQoBZkfAYyLwOcgv2Xqv4T8DgzfD4EiNqDtfulTiIXLprQCDdMwkS940=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(396003)(136003)(376002)(366004)(39860400002)(186003)(2616005)(54906003)(66556008)(66946007)(38100700002)(8676002)(66476007)(426003)(9746002)(86362001)(5660300002)(478600001)(6916009)(7416002)(9786002)(316002)(8936002)(26005)(83380400001)(33656002)(4326008)(2906002)(36756003)(1076003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?VBwY7q4oXK3uAw2kHfN7PcGRaQXsTN2TwxFTCKhMMXqshQN4YOSPQtaf6DAs?=
+ =?us-ascii?Q?nP/2midPIjTYGwdQB0BZnStSBxfa9YQIeGXAfAG4JWhgGGOwEM5Iz5rmh7oh?=
+ =?us-ascii?Q?f4HrCcXV5k02uAtYul8Ylwi/wsZIetE+kb1E3s16gB+asAZuNyG9UqbK2Jzk?=
+ =?us-ascii?Q?S8Y9r9S+TjpEWpY8cEeJhiaa1LaECAAmyNEZyeChqXLD2F1yo51ESFMs4x/b?=
+ =?us-ascii?Q?4W6iKg7Ktt9npyVPhPGdHpnjhbImWsLH6KG7Ds0MncoBizWDGE8+qtCfIwGD?=
+ =?us-ascii?Q?vDAP2hhA1Nx4wvoez+HkeztD0ZaXFOYyCNyFZVcAqotN9DEG50+9gv4jfSm5?=
+ =?us-ascii?Q?hPvoFLgNWcmR8xaVFdRO7GsDuUGachsDbrewd9bZBQcPkxCuBg0ZNy3ZwwK/?=
+ =?us-ascii?Q?rtTkK89HIHi/ZVe8m6GnuB2MZpEpV3wjpW0fT/a4qqn3ignJfQenOsaNZPeW?=
+ =?us-ascii?Q?dr9I2mgMGVEktpUQBjCuKWH+QXGj2IwBoZmwWZxPwPUH6DEx9M+SFfIf5Spo?=
+ =?us-ascii?Q?r2xo3naLxooEUsoUF6I2D817a2dD767XC3dsOVTfky9sU9chbi31vJV2TGJ4?=
+ =?us-ascii?Q?beh83/w0swN5dfiV1zeyFEBIep723ux/eb9DpGs24wpw6F0YKvXn6yarVQYQ?=
+ =?us-ascii?Q?O55OaFC7E5sueimm9usOxMbP5kFnFg46DjN2rtjnOtLImLN3vfRqiH7soGld?=
+ =?us-ascii?Q?GA/3ub5UHwvf/jFfemh11aM+MRQAwfd5VbEo+HAKeXLfAoPn20MugYvmM8+2?=
+ =?us-ascii?Q?x25nW5MGSNYGfNPg1bSnwbA5fyKFtwoxUKLzkmd+ztbPbfMFNACgdhrwDm9e?=
+ =?us-ascii?Q?hrcEMCoIW8id1G+B2i2vqhFnnzpoJ1JLfP/BV09SklG65KO46H+1QNS566Ks?=
+ =?us-ascii?Q?P7a8RhBLiC2iU41exzvgGejQHoNL0CwpU+sqoTj16ebi0lzBf81Bt8QB4D4E?=
+ =?us-ascii?Q?dJT/XQ/eox077RdSNvNEN+HLuWU3+QnQnhawXucy4yhaLN1UDkNVEnvpgKBL?=
+ =?us-ascii?Q?R3VKneiZC8i8IOLQ4cP90Ee6u9XqPzPmfusm3zTJ5cvQ/6Tz1AjrVIRbmNgM?=
+ =?us-ascii?Q?62ayQwwoWf5Q9x7hMwtSGdb7JjfwcqQmfzdgh5s1ZNvfJJ6qcd3dVyjFQbLy?=
+ =?us-ascii?Q?RHrCNjk1ikfXpoed7Mo9mZkR01czbfGpyy5JWJtB1xCq2+/700K7KcQDjbFP?=
+ =?us-ascii?Q?xGHDpaHxc9UlL+UR0gJh8esorcDkglnqxzjqph7k7QVyHxUesRoscBUXsArG?=
+ =?us-ascii?Q?PM0iaMdTDCLd/abdS2/JQWBSfDQswho+hTLkOeXuHMW35hg3s2VDw0P5MZ48?=
+ =?us-ascii?Q?kUFq4EWL/M0Hbi8bNygvgtLs?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a2727cf1-2caf-49d5-16d2-08d92f85c46d
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2021 22:43:02.4724
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1ySwJT/HgXM62VSa20op3M+hHIzIqi56AwisqFqEUKDL94M+vi7NGZsPa82+tx49
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5335
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 14, 2021 at 10:56:47AM -0700, Ben Gardon wrote:
-> On Fri, Jun 11, 2021 at 4:59 PM David Matlack <dmatlack@google.com> wrote:
-> >
-> > On Fri, Jun 11, 2021 at 4:57 PM David Matlack <dmatlack@google.com> wrote:
-> > >
-> > > This commit enables the fast_page_fault handler to work when the TDP MMU
-> > > is enabled by leveraging the new walk_shadow_page_lockless* API to
-> > > collect page walks independent of the TDP MMU.
-> > >
-> > > fast_page_fault was already using
-> > > walk_shadow_page_lockless_{begin,end}(), we just have to change the
-> > > actual walk to use walk_shadow_page_lockless() which does the right
-> > > thing if the TDP MMU is in use.
-> > >
-> > > Signed-off-by: David Matlack <dmatlack@google.com>
-> >
-> > Adding this feature was suggested by Ben Gardon:
-> >
-> > Suggested-by: Ben Gardon <bgardon@google.com>
-> 
-> Reviewed-by: Ben Gardon <bgardon@google.com>
-> 
-> >
-> > > ---
-> > >  arch/x86/kvm/mmu/mmu.c | 52 +++++++++++++++++-------------------------
-> > >  1 file changed, 21 insertions(+), 31 deletions(-)
-> > >
-> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > index 765f5b01768d..5562727c3699 100644
-> > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > @@ -657,6 +657,9 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
-> > >         local_irq_enable();
-> > >  }
-> > >
-> > > +static bool walk_shadow_page_lockless(struct kvm_vcpu *vcpu, u64 addr,
-> > > +                                     struct shadow_page_walk *walk);
-> > > +
-> > >  static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
-> > >  {
-> > >         int r;
-> > > @@ -2967,14 +2970,9 @@ static bool page_fault_can_be_fast(u32 error_code)
-> > >   * Returns true if the SPTE was fixed successfully. Otherwise,
-> > >   * someone else modified the SPTE from its original value.
-> > >   */
-> > > -static bool
-> > > -fast_pf_fix_direct_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
-> > > -                       u64 *sptep, u64 old_spte, u64 new_spte)
-> > > +static bool fast_pf_fix_direct_spte(struct kvm_vcpu *vcpu, gpa_t gpa,
-> > > +                                   u64 *sptep, u64 old_spte, u64 new_spte)
-> > >  {
-> > > -       gfn_t gfn;
-> > > -
-> > > -       WARN_ON(!sp->role.direct);
-> > > -
-> > >         /*
-> > >          * Theoretically we could also set dirty bit (and flush TLB) here in
-> > >          * order to eliminate unnecessary PML logging. See comments in
-> > > @@ -2990,14 +2988,8 @@ fast_pf_fix_direct_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
-> > >         if (cmpxchg64(sptep, old_spte, new_spte) != old_spte)
-> > >                 return false;
-> > >
-> > > -       if (is_writable_pte(new_spte) && !is_writable_pte(old_spte)) {
-> > > -               /*
-> > > -                * The gfn of direct spte is stable since it is
-> > > -                * calculated by sp->gfn.
-> > > -                */
-> > > -               gfn = kvm_mmu_page_get_gfn(sp, sptep - sp->spt);
-> > > -               kvm_vcpu_mark_page_dirty(vcpu, gfn);
-> > > -       }
-> > > +       if (is_writable_pte(new_spte) && !is_writable_pte(old_spte))
-> > > +               kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
-> 
-> I love how cleanly you've implemented TDP MMU fast PF support here
-> with so little code duplication. I think this approach will work well.
-> 
-> My only reservation is that this links the way we locklessly change
-> (and handle changes to) SPTEs between the TDP and legacy MMUs.
-> 
-> fast_pf_fix_direct_spte is certainly a much simpler function than
-> tdp_mmu_set_spte_atomic, but it might be worth adding a comment
-> explaining that the function can modify SPTEs in a TDP MMU paging
-> structure. Alternatively, fast_page_fault could call
-> tdp_mmu_set_spte_atomic, but I don't know if that would carry a
-> performance penalty. On the other hand, the handling for this
-> particular type of SPTE modification is unlikely to change, so it
-> might not matter.
+On Mon, Jun 14, 2021 at 05:08:40PM +0200, Christoph Hellwig wrote:
 
-I'm open to delegating the cmpxchg64 to separate functions for the TDP
-and legacy MMU, but didn't see any reason why it would be necessary.
-That combined with the fact that it would require a bunch of new code
-and helper functions in the TDP MMU (e.g. tdp_mmu_set_spte_atomic has to
-be split up further so it doesn't do the lockdep check) led me to just
-re-use fast_pf_fix_direct_spte.
+> @@ -679,8 +666,6 @@ static int really_probe(struct device *dev, struct device_driver *drv)
+>  		dev->pm_domain->dismiss(dev);
+>  	pm_runtime_reinit(dev);
+>  	dev_pm_set_driver_flags(dev, 0);
+> -	if (probe_ret == -EPROBE_DEFER)
+> -		driver_deferred_probe_add_trigger(dev, local_trigger_count);
+>  done:
 
-I can add a comment though in v2 in fast_pf_fix_direct_spte and another
-in tdp_mmu_set_spte_atomic explaining how the two interact.
+I like the new arrangement - however I'm looking at the ordering
+relative to this:
 
-> 
-> 
-> 
-> > >
-> > >         return true;
-> > >  }
-> > > @@ -3019,10 +3011,9 @@ static bool is_access_allowed(u32 fault_err_code, u64 spte)
-> > >   */
-> > >  static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code)
-> > >  {
-> > > -       struct kvm_shadow_walk_iterator iterator;
-> > > -       struct kvm_mmu_page *sp;
-> > >         int ret = RET_PF_INVALID;
-> > >         u64 spte = 0ull;
-> > > +       u64 *sptep = NULL;
-> > >         uint retry_count = 0;
-> > >
-> > >         if (!page_fault_can_be_fast(error_code))
-> > > @@ -3031,17 +3022,19 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code)
-> > >         walk_shadow_page_lockless_begin(vcpu);
-> > >
-> > >         do {
-> > > +               struct shadow_page_walk walk;
-> > >                 u64 new_spte;
-> > >
-> > > -               for_each_shadow_entry_lockless(vcpu, gpa, iterator, spte)
-> > > -                       if (!is_shadow_present_pte(spte))
-> > > -                               break;
-> > > +               if (!walk_shadow_page_lockless(vcpu, gpa, &walk))
-> > > +                       break;
-> > > +
-> > > +               spte = walk.sptes[walk.last_level];
-> > > +               sptep = walk.spteps[walk.last_level];
-> > >
-> > >                 if (!is_shadow_present_pte(spte))
-> > >                         break;
-> > >
-> > > -               sp = sptep_to_sp(iterator.sptep);
-> > > -               if (!is_last_spte(spte, sp->role.level))
-> > > +               if (!is_last_spte(spte, walk.last_level))
-> > >                         break;
-> > >
-> > >                 /*
-> > > @@ -3084,7 +3077,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code)
-> > >                          *
-> > >                          * See the comments in kvm_arch_commit_memory_region().
-> > >                          */
-> > > -                       if (sp->role.level > PG_LEVEL_4K)
-> > > +                       if (walk.last_level > PG_LEVEL_4K)
-> > >                                 break;
-> > >                 }
-> > >
-> > > @@ -3098,8 +3091,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code)
-> > >                  * since the gfn is not stable for indirect shadow page. See
-> > >                  * Documentation/virt/kvm/locking.rst to get more detail.
-> > >                  */
-> > > -               if (fast_pf_fix_direct_spte(vcpu, sp, iterator.sptep, spte,
-> > > -                                           new_spte)) {
-> > > +               if (fast_pf_fix_direct_spte(vcpu, gpa, sptep, spte, new_spte)) {
-> > >                         ret = RET_PF_FIXED;
-> > >                         break;
-> > >                 }
-> > > @@ -3112,7 +3104,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code)
-> > >
-> > >         } while (true);
-> > >
-> > > -       trace_fast_page_fault(vcpu, gpa, error_code, iterator.sptep, spte, ret);
-> > > +       trace_fast_page_fault(vcpu, gpa, error_code, sptep, spte, ret);
-> > >         walk_shadow_page_lockless_end(vcpu);
-> > >
-> > >         return ret;
-> > > @@ -3748,11 +3740,9 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
-> > >         if (page_fault_handle_page_track(vcpu, error_code, gfn))
-> > >                 return RET_PF_EMULATE;
-> > >
-> > > -       if (!is_vcpu_using_tdp_mmu(vcpu)) {
-> > > -               r = fast_page_fault(vcpu, gpa, error_code);
-> > > -               if (r != RET_PF_INVALID)
-> > > -                       return r;
-> > > -       }
-> > > +       r = fast_page_fault(vcpu, gpa, error_code);
-> > > +       if (r != RET_PF_INVALID)
-> > > +               return r;
-> > >
-> > >         r = mmu_topup_memory_caches(vcpu, false);
-> > >         if (r)
-> > > --
-> > > 2.32.0.272.g935e593368-goog
-> > >
+>  	atomic_dec(&probe_count);
+>  	wake_up_all(&probe_waitqueue);
+
+And wondering if the idea is that driver_deferred_probe_add_trigger()
+is supposed to be enclosed by the atomic, so that the
+device_block_probing() / wait_for_device_probe() sequence is actually
+a fence against queuing new work?
+
+Which is suggesting that the other driver_deferred_probe_add_trigger()
+at the top of really_probe is already ordered wrong?
+
+Although, if that is the idea the wait_for_device_probe() doesn't look
+entirely sequenced right..
+
+It looks easy enough to fix by moving the probe_count up:
+
+> +static int driver_probe_device(struct device_driver *drv, struct device *dev)
+> +{
+> +	int trigger_count = atomic_read(&deferred_trigger_count);
+> +	int ret;
+> +
+> +	ret = __driver_probe_device(drv, dev);
+> +	if (ret == -EPROBE_DEFER || ret == EPROBE_DEFER) {
+> +		driver_deferred_probe_add(dev);
+> +
+> +		/*
+> +		 * Did a trigger occur while probing? Need to re-trigger if yes
+> +		 */
+> +		if (trigger_count != atomic_read(&deferred_trigger_count) &&
+> +		    !defer_all_probes)
+> +			driver_deferred_probe_trigger();
+> +	}
+
+into here?
+
+I didn't see a reason why it couldn't enclose the pm stuff too..
+
+Jason
