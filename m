@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 24D593A71EC
-	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 00:28:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 269FA3A7214
+	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 00:35:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231286AbhFNWaP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Jun 2021 18:30:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48722 "EHLO
+        id S229981AbhFNWhF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Jun 2021 18:37:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230247AbhFNWaO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Jun 2021 18:30:14 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A74C4C061574
-        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 15:27:55 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id k7so10609262pjf.5
-        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 15:27:55 -0700 (PDT)
+        with ESMTP id S229829AbhFNWhE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Jun 2021 18:37:04 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA0C2C061574
+        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 15:34:47 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id w31so7345210pga.6
+        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 15:34:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=4OmGnzWSQFupy7cZPXTGR7Cx6p3oef2S1yGq1a+RnO8=;
-        b=fPWtmg1LykQeiLmGl8cZBGm2/l6Tm+I13KK5uuXr3MNInm/vntg4pInglDr9nT2Bbc
-         Xep3yRRYZJ9zl7Qa2LSJlsJAcOu23sXlbqTRqy5wPaFOE4uowm0t+9aOtRKwsfv+Y1dU
-         uxw+Ig5RSg7AkvrWOfiFzYyLD9dR1OGbbU8o9UEV2q5jhbz3tlGt1NxE0dSJd+2DVVhv
-         WNZXYwIzRZynI4Mk1LwavlQtT1PbrW9lAwSNqUPPuGKYTKhGlOylC7JVn05rho6LRPsp
-         jpCFxLiVOW0a0SXZ3g57WCGmD5fLJsRpF0k9NgREm11pVeGJnQWalzJ78uyD5q6ugeXi
-         KYUw==
+        bh=gDlYxVLTJVN+IzDe5ZymRop7HLbPaP8fyb3bx0VwOwg=;
+        b=UdTI+64LznBBfRmLrc9RDAaskYZBeALSv4udd1LsyIZe1T2/r2ABa8+IIIp+1ekO/R
+         wmOXhYDHn7jqslaNAUn8G/Zcu/q1KuAoK6Ur/kffEqADNz68aCL1tvzBMmC5sAH6TjMR
+         CGe0FBVeGm/b+iN+cCFGEzv6NEPq2qkgAfQUS/gYaakQlLHtUBU/imAcw11mWBLZQVLj
+         Z8hzJwOSlKQSdG2FR1Pz3Smbqm3kFshwZ4Izi8gpmLFQdxcPzT2tgqQajxCVc/G9Hz/G
+         ZVcVA6uhBKpId7wxlgqa4bgH+Qja5GgXFNFqdNEkuRbh2uXEWyoyfhqVA+RK0NyLrnOs
+         vi+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=4OmGnzWSQFupy7cZPXTGR7Cx6p3oef2S1yGq1a+RnO8=;
-        b=CE8ndLwCAhq+U7kBXDW/8x1ZJnYvFS/VGK6V1NIjzIwjIxLbFrYL3+23ZGp2lQCZyZ
-         uQI9fOPAeceS5voDl/ARUAUDctj3nyt8pcNn8F7ELFV0nr/pqkq05G/LzM3ZbG3bOwSz
-         DC+JVMocsAsv9i9dTzeIAg/oIdDTyvT7aebuU3WJLJnYRoNx26ksgYUfXiOux3YennN2
-         o7ecjVKMMy/hYHWqNO2Gw2aAgS8u3V9zHkCSG6sV0UhfO6a83107to2mWSq5T9XkGA6Z
-         40Ej79YNLMaWTbin77IKskYTZpY4OZ8GtnzOj4AbU0L/MEwkGFNUP4ZQPEcZNlheyi+s
-         q1og==
-X-Gm-Message-State: AOAM532PAxFqs5Dkd4UIf38G6Bq1C8P1bydF1urYLiCROlJgHU9pKfB+
-        ay9sGyhbvwldSRqZD+7VJVJFHbXglLJiqw==
-X-Google-Smtp-Source: ABdhPJyULL1SJNZw97g0yPWxdgCszVguhctAQQ9a3b+dfy10H2yHYh0x0mr1KfRW/WTxceEvC0/OWA==
-X-Received: by 2002:a17:90a:f303:: with SMTP id ca3mr425648pjb.120.1623709674340;
-        Mon, 14 Jun 2021 15:27:54 -0700 (PDT)
+        bh=gDlYxVLTJVN+IzDe5ZymRop7HLbPaP8fyb3bx0VwOwg=;
+        b=mf1ASL4t7l2GZGbLJtIBYEioRGNogghBNaR0/cEQt3rx62EGz6lrzsImqcXgXixVDo
+         3RaevnwJlgQph5dePH6jdOoRpcoRvp6NVxKRtf+fMId4O+yURbcJuuFcCkeI4z1ZltNA
+         hvZUDS65571Jnhp9biRzUi9wvnMPcnS4Py6ReWuasgPJ2mCqeQFIoY/7mh2nv254VBUj
+         +9IoOtT5XtdbTBNA+lqFBSRSkmRDsKdi+9aGpnjwlRnwTpDxKVAGabhvQGTGojiGMsKu
+         6BvzJKgJngfNYCERJuniYipJ66whXo9u/4YqhH/eTSOGVW+1MphOIexPDpDS2tlfD6gR
+         4AXQ==
+X-Gm-Message-State: AOAM5303i1+sUrUpNDlnf8X/hhX6BewDBfinqZRCoUKTorNsB+tpnNhl
+        NAMqGO6TJLIGqddcC/QW6pdlPg==
+X-Google-Smtp-Source: ABdhPJzo4Vo5Zo4Dz/L38yPl5qzNYWFdughWH3lj8AGFhIBLSiGym6s5xGZl6gB1fhtRq6VXK7j8Qw==
+X-Received: by 2002:a63:a80b:: with SMTP id o11mr19434797pgf.53.1623710087197;
+        Mon, 14 Jun 2021 15:34:47 -0700 (PDT)
 Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id ls13sm12318212pjb.23.2021.06.14.15.27.53
+        by smtp.gmail.com with ESMTPSA id t39sm13047961pfg.147.2021.06.14.15.34.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jun 2021 15:27:53 -0700 (PDT)
-Date:   Mon, 14 Jun 2021 22:27:49 +0000
+        Mon, 14 Jun 2021 15:34:46 -0700 (PDT)
+Date:   Mon, 14 Jun 2021 22:34:42 +0000
 From:   David Matlack <dmatlack@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Ben Gardon <bgardon@google.com>, Joerg Roedel <joro@8bytes.org>,
+To:     Ben Gardon <bgardon@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Joerg Roedel <joro@8bytes.org>,
         Jim Mattson <jmattson@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -58,74 +58,204 @@ Cc:     Ben Gardon <bgardon@google.com>, Joerg Roedel <joro@8bytes.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Junaid Shahid <junaids@google.com>,
         Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 5/8] KVM: x86/mmu: Also record spteps in shadow_page_walk
-Message-ID: <YMfX5QyBQ44cAkiJ@google.com>
+Subject: Re: [PATCH 6/8] KVM: x86/mmu: fast_page_fault support for the TDP MMU
+Message-ID: <YMfZgufRGaW//gKE@google.com>
 References: <20210611235701.3941724-1-dmatlack@google.com>
- <20210611235701.3941724-6-dmatlack@google.com>
+ <20210611235701.3941724-7-dmatlack@google.com>
+ <CALzav=embwx9PoZrMSS3XkQsFjnAu4UyG8VBY=3yj8uqzKBgRg@mail.gmail.com>
+ <CANgfPd97iUUduRi-faL4i3fMov7f67iU_LheeJzYoW=QnaHXLg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210611235701.3941724-6-dmatlack@google.com>
+In-Reply-To: <CANgfPd97iUUduRi-faL4i3fMov7f67iU_LheeJzYoW=QnaHXLg@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 11, 2021 at 11:56:58PM +0000, David Matlack wrote:
-> In order to use walk_shadow_page_lockless() in fast_page_fault() we need
-> to also record the spteps.
+On Mon, Jun 14, 2021 at 10:56:47AM -0700, Ben Gardon wrote:
+> On Fri, Jun 11, 2021 at 4:59 PM David Matlack <dmatlack@google.com> wrote:
+> >
+> > On Fri, Jun 11, 2021 at 4:57 PM David Matlack <dmatlack@google.com> wrote:
+> > >
+> > > This commit enables the fast_page_fault handler to work when the TDP MMU
+> > > is enabled by leveraging the new walk_shadow_page_lockless* API to
+> > > collect page walks independent of the TDP MMU.
+> > >
+> > > fast_page_fault was already using
+> > > walk_shadow_page_lockless_{begin,end}(), we just have to change the
+> > > actual walk to use walk_shadow_page_lockless() which does the right
+> > > thing if the TDP MMU is in use.
+> > >
+> > > Signed-off-by: David Matlack <dmatlack@google.com>
+> >
+> > Adding this feature was suggested by Ben Gardon:
+> >
+> > Suggested-by: Ben Gardon <bgardon@google.com>
 > 
-> No functional change intended.
+> Reviewed-by: Ben Gardon <bgardon@google.com>
 > 
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c          | 1 +
->  arch/x86/kvm/mmu/mmu_internal.h | 3 +++
->  arch/x86/kvm/mmu/tdp_mmu.c      | 1 +
->  3 files changed, 5 insertions(+)
+> >
+> > > ---
+> > >  arch/x86/kvm/mmu/mmu.c | 52 +++++++++++++++++-------------------------
+> > >  1 file changed, 21 insertions(+), 31 deletions(-)
+> > >
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index 765f5b01768d..5562727c3699 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -657,6 +657,9 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
+> > >         local_irq_enable();
+> > >  }
+> > >
+> > > +static bool walk_shadow_page_lockless(struct kvm_vcpu *vcpu, u64 addr,
+> > > +                                     struct shadow_page_walk *walk);
+> > > +
+> > >  static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
+> > >  {
+> > >         int r;
+> > > @@ -2967,14 +2970,9 @@ static bool page_fault_can_be_fast(u32 error_code)
+> > >   * Returns true if the SPTE was fixed successfully. Otherwise,
+> > >   * someone else modified the SPTE from its original value.
+> > >   */
+> > > -static bool
+> > > -fast_pf_fix_direct_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+> > > -                       u64 *sptep, u64 old_spte, u64 new_spte)
+> > > +static bool fast_pf_fix_direct_spte(struct kvm_vcpu *vcpu, gpa_t gpa,
+> > > +                                   u64 *sptep, u64 old_spte, u64 new_spte)
+> > >  {
+> > > -       gfn_t gfn;
+> > > -
+> > > -       WARN_ON(!sp->role.direct);
+> > > -
+> > >         /*
+> > >          * Theoretically we could also set dirty bit (and flush TLB) here in
+> > >          * order to eliminate unnecessary PML logging. See comments in
+> > > @@ -2990,14 +2988,8 @@ fast_pf_fix_direct_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+> > >         if (cmpxchg64(sptep, old_spte, new_spte) != old_spte)
+> > >                 return false;
+> > >
+> > > -       if (is_writable_pte(new_spte) && !is_writable_pte(old_spte)) {
+> > > -               /*
+> > > -                * The gfn of direct spte is stable since it is
+> > > -                * calculated by sp->gfn.
+> > > -                */
+> > > -               gfn = kvm_mmu_page_get_gfn(sp, sptep - sp->spt);
+> > > -               kvm_vcpu_mark_page_dirty(vcpu, gfn);
+> > > -       }
+> > > +       if (is_writable_pte(new_spte) && !is_writable_pte(old_spte))
+> > > +               kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
 > 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 8140c262f4d3..765f5b01768d 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3538,6 +3538,7 @@ static bool walk_shadow_page_lockless(struct kvm_vcpu *vcpu, u64 addr,
->  		spte = mmu_spte_get_lockless(it.sptep);
->  		walk->last_level = it.level;
->  		walk->sptes[it.level] = spte;
-> +		walk->spteps[it.level] = it.sptep;
->  
->  		if (!is_shadow_present_pte(spte))
->  			break;
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index 26da6ca30fbf..0fefbd5d6c95 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -178,6 +178,9 @@ struct shadow_page_walk {
->  
->  	/* The spte value at each level. */
->  	u64 sptes[PT64_ROOT_MAX_LEVEL + 1];
-> +
-> +	/* The spte pointers at each level. */
-> +	u64 *spteps[PT64_ROOT_MAX_LEVEL + 1];
->  };
->  
->  #endif /* __KVM_X86_MMU_INTERNAL_H */
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 36f4844a5f95..7279d17817a1 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1529,6 +1529,7 @@ bool kvm_tdp_mmu_walk_lockless(struct kvm_vcpu *vcpu, u64 addr,
->  
->  		walk->last_level = iter.level;
->  		walk->sptes[iter.level] = iter.old_spte;
-> +		walk->spteps[iter.level] = iter.sptep;
+> I love how cleanly you've implemented TDP MMU fast PF support here
+> with so little code duplication. I think this approach will work well.
+> 
+> My only reservation is that this links the way we locklessly change
+> (and handle changes to) SPTEs between the TDP and legacy MMUs.
+> 
+> fast_pf_fix_direct_spte is certainly a much simpler function than
+> tdp_mmu_set_spte_atomic, but it might be worth adding a comment
+> explaining that the function can modify SPTEs in a TDP MMU paging
+> structure. Alternatively, fast_page_fault could call
+> tdp_mmu_set_spte_atomic, but I don't know if that would carry a
+> performance penalty. On the other hand, the handling for this
+> particular type of SPTE modification is unlikely to change, so it
+> might not matter.
 
-I think this should technically be:
+I'm open to delegating the cmpxchg64 to separate functions for the TDP
+and legacy MMU, but didn't see any reason why it would be necessary.
+That combined with the fact that it would require a bunch of new code
+and helper functions in the TDP MMU (e.g. tdp_mmu_set_spte_atomic has to
+be split up further so it doesn't do the lockdep check) led me to just
+re-use fast_pf_fix_direct_spte.
 
-		walk->spteps[iter.level] = rcu_dereference(iter.sptep);
+I can add a comment though in v2 in fast_pf_fix_direct_spte and another
+in tdp_mmu_set_spte_atomic explaining how the two interact.
 
->  	}
->  
->  	return walk_ok;
-> -- 
-> 2.32.0.272.g935e593368-goog
 > 
+> 
+> 
+> > >
+> > >         return true;
+> > >  }
+> > > @@ -3019,10 +3011,9 @@ static bool is_access_allowed(u32 fault_err_code, u64 spte)
+> > >   */
+> > >  static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code)
+> > >  {
+> > > -       struct kvm_shadow_walk_iterator iterator;
+> > > -       struct kvm_mmu_page *sp;
+> > >         int ret = RET_PF_INVALID;
+> > >         u64 spte = 0ull;
+> > > +       u64 *sptep = NULL;
+> > >         uint retry_count = 0;
+> > >
+> > >         if (!page_fault_can_be_fast(error_code))
+> > > @@ -3031,17 +3022,19 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code)
+> > >         walk_shadow_page_lockless_begin(vcpu);
+> > >
+> > >         do {
+> > > +               struct shadow_page_walk walk;
+> > >                 u64 new_spte;
+> > >
+> > > -               for_each_shadow_entry_lockless(vcpu, gpa, iterator, spte)
+> > > -                       if (!is_shadow_present_pte(spte))
+> > > -                               break;
+> > > +               if (!walk_shadow_page_lockless(vcpu, gpa, &walk))
+> > > +                       break;
+> > > +
+> > > +               spte = walk.sptes[walk.last_level];
+> > > +               sptep = walk.spteps[walk.last_level];
+> > >
+> > >                 if (!is_shadow_present_pte(spte))
+> > >                         break;
+> > >
+> > > -               sp = sptep_to_sp(iterator.sptep);
+> > > -               if (!is_last_spte(spte, sp->role.level))
+> > > +               if (!is_last_spte(spte, walk.last_level))
+> > >                         break;
+> > >
+> > >                 /*
+> > > @@ -3084,7 +3077,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code)
+> > >                          *
+> > >                          * See the comments in kvm_arch_commit_memory_region().
+> > >                          */
+> > > -                       if (sp->role.level > PG_LEVEL_4K)
+> > > +                       if (walk.last_level > PG_LEVEL_4K)
+> > >                                 break;
+> > >                 }
+> > >
+> > > @@ -3098,8 +3091,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code)
+> > >                  * since the gfn is not stable for indirect shadow page. See
+> > >                  * Documentation/virt/kvm/locking.rst to get more detail.
+> > >                  */
+> > > -               if (fast_pf_fix_direct_spte(vcpu, sp, iterator.sptep, spte,
+> > > -                                           new_spte)) {
+> > > +               if (fast_pf_fix_direct_spte(vcpu, gpa, sptep, spte, new_spte)) {
+> > >                         ret = RET_PF_FIXED;
+> > >                         break;
+> > >                 }
+> > > @@ -3112,7 +3104,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code)
+> > >
+> > >         } while (true);
+> > >
+> > > -       trace_fast_page_fault(vcpu, gpa, error_code, iterator.sptep, spte, ret);
+> > > +       trace_fast_page_fault(vcpu, gpa, error_code, sptep, spte, ret);
+> > >         walk_shadow_page_lockless_end(vcpu);
+> > >
+> > >         return ret;
+> > > @@ -3748,11 +3740,9 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+> > >         if (page_fault_handle_page_track(vcpu, error_code, gfn))
+> > >                 return RET_PF_EMULATE;
+> > >
+> > > -       if (!is_vcpu_using_tdp_mmu(vcpu)) {
+> > > -               r = fast_page_fault(vcpu, gpa, error_code);
+> > > -               if (r != RET_PF_INVALID)
+> > > -                       return r;
+> > > -       }
+> > > +       r = fast_page_fault(vcpu, gpa, error_code);
+> > > +       if (r != RET_PF_INVALID)
+> > > +               return r;
+> > >
+> > >         r = mmu_topup_memory_caches(vcpu, false);
+> > >         if (r)
+> > > --
+> > > 2.32.0.272.g935e593368-goog
+> > >
