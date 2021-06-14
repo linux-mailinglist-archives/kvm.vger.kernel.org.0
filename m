@@ -2,54 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EEDC3A691D
-	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 16:36:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CE1F3A69A6
+	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 17:09:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232858AbhFNOiV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Jun 2021 10:38:21 -0400
-Received: from mail-mw2nam08on2082.outbound.protection.outlook.com ([40.107.101.82]:8097
-        "EHLO NAM04-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232770AbhFNOiU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Jun 2021 10:38:20 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UbIUG9yMZp2WjnkL/hJ1oFRxJYFZFLxhYKr4hxbjxmiOBVNqm/aRsSMfcne3STVRz+ThiLzjkvfwnhG++QAQH7WdYa5TJXsJYSupbSSHgjTpG9QxCnNnkxq899YjdwjmY0jn+blyYVT55MmRDLG13mAAucaAHtIipr9/xhFjdWDIxhDFA+L/S9Fx55/yBXTLcSfgNJYjIFXuL32whKtPi/rFd74tLUJtd54lWJ+Xm9mBFXPq6QL7OjgSfz6OpO8EjzoEeTZPwoKT8qKUtuUmVgDe6CEpTAjhJDVIc+6tb7dHE74UagTbRcGOGuanHa8FGNIzJ6jdE1aB+71A/TuA+A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Pmh/ynZcS28kerLpItdVblA/RnCZ93xnhhAw6DZbs4o=;
- b=hV8Y4S9V1QxzhlnOKz371YEuZafC+stOzhvlz+1+4l4E9DC7QlWxcgkCjjdoK7+4AmYGAO3qPIEr4fXy+oo0lZEsZzW9x+HRJImhDc5sivozRr70FepyhpOqc5ta+54S5fh6Jhj1YjrajhkjnAROJII81GEn6FQG6I75IrU9ZZO7rcrZCFSiRb2cCW0gcmCsV/8lPYhpsf1g/xDhaDoW67/RZCmkp5OCi7pQdT6NEhKqMVwiFeCpesXJSGLygPRtmMq3hty6tMtwN52R2c5oCTjChadNXP0gCoB15ifcEJ+ldzue5mBI60pRjXNc8rp+P2g/Kpqd3hcmoGlf8HyaqQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Pmh/ynZcS28kerLpItdVblA/RnCZ93xnhhAw6DZbs4o=;
- b=bfSKVu5wNHZINQhcWuGEq/Ve9DBxrD5KYdvvpeZSTrRx9V1PEu8nCvBO5r5wcXKw+weDckFmKvQuyLU0kJZbyW5TG1kdlY9SRJK1d58VA/brTr/oU7uben9DaWj7mYKPw1wIyg78Jj5DQg50BxvzYWxVj8ZH6xSnlVC5Q5Ic6mt1qUlIls1vsR54dlL7arJfcM2ScST9ec2LMY05Bd/dOdXqGp/Qd2ZUWonTdK9EQCTm37ON/dawtm2s/p6mwHJgM/ZB764Q+j7LlOOxJMqnptRvK/1D54tey0PH9P90Zqwzo6Fbnx61DNVzhPCjP0GYYflNO/7PUhIMFgMIki9v+w==
-Authentication-Results: nvidia.com; dkim=none (message not signed)
- header.d=none;nvidia.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5352.namprd12.prod.outlook.com (2603:10b6:208:314::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.21; Mon, 14 Jun
- 2021 14:36:15 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::3d51:a3b9:8611:684e]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::3d51:a3b9:8611:684e%7]) with mapi id 15.20.4219.025; Mon, 14 Jun 2021
- 14:36:15 +0000
-Date:   Mon, 14 Jun 2021 11:36:13 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Kirti Wankhede <kwankhede@nvidia.com>
+        id S233222AbhFNPLI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Jun 2021 11:11:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36742 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233048AbhFNPLH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Jun 2021 11:11:07 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A92BC061574;
+        Mon, 14 Jun 2021 08:09:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=T+/oxM+z1BUuHd3fgDap8qJ+RDgIJZUJGDdgz0iT8y8=; b=UD2xKWxDFJgEJoUuqCUKG+J+4x
+        gWq3kpq6cAriv1lFqug/uPQKNwU636xe2RJsSlIjmgH5EsOqowCCn1KnUyy9Dqdytpvtz8ZlOtx4c
+        dla2Igc7SYrWhvA5WDHmx2lVMATlN9H4QsjBu5jwOuMlTWJPknvXszcbiShKY+0Fs60rDr1WH7R6+
+        kwIkowdIqD/ZOX0U+NAbD04elyzTIx62jHbPQlZBXusqjf06Qz+dZm4lbySmocb5f9a5MM167pay0
+        QyS5037QYkhEQyMmQ9f1uqehXUsWY+f7S3/9llmEdo2w09JYVySoa1jiVyqyAtDsvdtfOQpHwFupm
+        I+4A1btQ==;
+Received: from [2001:4bb8:19b:fdce:4b1a:b4aa:22d8:1629] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1lsoCn-00EfeW-7E; Mon, 14 Jun 2021 15:08:49 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>
 Cc:     David Airlie <airlied@linux.ie>,
         Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Jonathan Corbet <corbet@lwn.net>,
         Daniel Vetter <daniel@ffwll.ch>,
         dri-devel@lists.freedesktop.org, Vasily Gorbik <gor@linux.ibm.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Heiko Carstens <hca@linux.ibm.com>,
         intel-gfx@lists.freedesktop.org,
         Jani Nikula <jani.nikula@linux.intel.com>,
@@ -58,84 +47,45 @@ Cc:     David Airlie <airlied@linux.ie>,
         kvm@vger.kernel.org, linux-doc@vger.kernel.org,
         linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
         "Rafael J. Wysocki" <rafael@kernel.org>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 00/10] Allow mdev drivers to directly create the
- vfio_device
-Message-ID: <20210614143613.GJ1002214@nvidia.com>
-References: <0-v1-324b2038f212+1041f1-vfio3a_jgg@nvidia.com>
- <e6cecaed-3257-e636-52c2-abf7af2cdffa@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e6cecaed-3257-e636-52c2-abf7af2cdffa@nvidia.com>
-X-Originating-IP: [47.55.113.94]
-X-ClientProxiedBy: MN2PR04CA0025.namprd04.prod.outlook.com
- (2603:10b6:208:d4::38) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        Rodrigo Vivi <rodrigo.vivi@intel.com>
+Subject: Allow mdev drivers to directly create the vfio_device (v2 / alternative)
+Date:   Mon, 14 Jun 2021 17:08:36 +0200
+Message-Id: <20210614150846.4111871-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (47.55.113.94) by MN2PR04CA0025.namprd04.prod.outlook.com (2603:10b6:208:d4::38) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.21 via Frontend Transport; Mon, 14 Jun 2021 14:36:15 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lsnhF-006ivO-WF; Mon, 14 Jun 2021 11:36:14 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7be63fd1-ae80-4309-810d-08d92f41c3ad
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5352:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5352E73F20ABA8B4BE060EF4C2319@BL1PR12MB5352.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tXh+1xKz0Di3t+6AsrtfBMpz7+NQT+okG9g2pTc9vuAqIy0orsW6z85dOTQEKruDUyaDdJNLQaJJyheDZZlTtq1aqOOGes1f9xmffEEoaM+tpVsWakw1npWRUXIYUAyNW2MkFZdedWcJCz7g7DdTkEDqQ97QKpVZAEifietm1Oaf4rnmyhgd08g7GrSou7Ds98AJ/YrcHtR/U3Yla+p9avqbL7cq+GG12d28URuWGZs+alDy+/wPLAc4SsgaqjK+zGNxRohEGgkBscZZrPKEyTwm5iDkyhY/rWH8HUAn5KVjI0cD8xDxoFTYOI31XG11cYFedXot5M6L7sO3J1kTarbyfe8jxr5JPqQgyaOhKnD82jtKy5X4KG/T6U3dKCyda/Ymuu2oYsf9sqgVnK6Gf4ExHqfBel+kAjfbZ6oVG0CKutWDGgBBRvfw6BhTJseHyn8B57NZDJWdzjzP3xsedSa5q9MmRcZyR7BLFEq7iB/0G7SW8AGDSsnspM200S9ULucLtH+zg5e7qHBFv0Zp8VAWKufq4hmkenppctbaC71tybACcqY7sw7JkpPoSzrKn1fJxUL8cjnIBx6sX/qBcpk43lFW6kwClNAQPu8PfMo=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(396003)(376002)(39860400002)(366004)(136003)(8936002)(66946007)(4326008)(1076003)(426003)(26005)(7416002)(66556008)(66476007)(6862004)(6636002)(33656002)(9746002)(9786002)(186003)(2616005)(316002)(2906002)(86362001)(5660300002)(54906003)(478600001)(8676002)(36756003)(38100700002)(4744005)(37006003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9qOlQrf9C6XyV/OwQ93c+4QHvTa8vOsbxTadM628pw1FsgD+C/Vpzu8tDCFZ?=
- =?us-ascii?Q?sSX4JkJoaW5oXzrSoYwOFcy+HWYkJoJGbiECkp9bXwPDxM0vtOfMazTVlDok?=
- =?us-ascii?Q?O2CA7aUpD9f/FKeIZgN2efZUr7FDNhza+vtkrJqDyFHPUUcpVCUkI26P2/15?=
- =?us-ascii?Q?2z2XCqB/ktbgoEbvKZELbS3U9bwQWOUCMaWVd2idr5OvZVpA9XhlawR7J/0w?=
- =?us-ascii?Q?kdlE4SCUtMC3QOu64eHwUjuDmc/1+G++UR56okwfZ2PnPFkvDabho7qwci3y?=
- =?us-ascii?Q?KBVPxIRqa8bRd9e05WjxV6uJcW1K/1oJFyQYanIUFuwIv4KYKTYeeAVIbaYm?=
- =?us-ascii?Q?eYdLUuDRKULPteukbBvy0UwlE6jIPvNoUMIaUUBwbSu18xd5QpQUjxu1CuSD?=
- =?us-ascii?Q?4pUN4uki0oe/GFgcuoQHlgORMHuMmpiDvxA0SAkxdErco+kgihwwbQuwQngX?=
- =?us-ascii?Q?FLyQ/Gu6vxBTlfqaVtqzPGEb8XPcGDr4RuqVDV9jn0Lt8AqEtJ6uTQp+OHTh?=
- =?us-ascii?Q?Fwsx5HmSFMg0A4LsDUSnJkfsRse+8keOsau0iQ5exC2A87jQsPhi/4c4wOBf?=
- =?us-ascii?Q?SXY8TOm54MIFlQScPB6pre01lcTV7pgndMJQCrM+exbauyJg4LKplFxWf9jD?=
- =?us-ascii?Q?dinUVEnd5mokC60bDy0lGvpbpCmxfkv0A2iwtxrh4phyW5h8JH7TJnBO4OVP?=
- =?us-ascii?Q?kDccNN1yd0otL1NFM09LFiQkcnACGkybWpCvlXHe9rcwffiZyycZHhK5f8yH?=
- =?us-ascii?Q?uImQia+wvXrJB93jaQYAegJcW/28dX7klcxGCfaQWBXNtB7WR5iZBsSs6jfq?=
- =?us-ascii?Q?/1C9nS2SY932Xm7emZVr+1JyMncznw6BkxtjHAJpuJR8MhAIjzew6CFPSEMN?=
- =?us-ascii?Q?vOWFXy/OJQMSOo15IY45+9JwdcvXh4/w24b/PFRy/nmfM3c1vjdPEQSyCymK?=
- =?us-ascii?Q?3D8QV66z82Rn8kxanej2i6WZp8GC4Re6b7uuquKhe3XzC5+YKW+NR48xqG8L?=
- =?us-ascii?Q?bTk4ouVQJ+BuxR/EyYMMA0oaDRK1WISM2hk9Z7GFzfGiIXIo/oePCMGDMGnC?=
- =?us-ascii?Q?YpEDkgLw8mnk+mBtjauCGAz8OFSXjfszlaT/rUGun0qgB4AnQ4zbdUqNohYZ?=
- =?us-ascii?Q?3iZMoc5H9GFNUyscvD7kCi4l5ODzR/qSfzXuFWnqkKK/zY5FwjbJFw89TdHp?=
- =?us-ascii?Q?qmsKRoca+VF7kcmp5CTvlNxHU1VUIXCEyWAKk7GyFL29BEmH0iGZXuWaaEav?=
- =?us-ascii?Q?pQr6fq3/mHKVL9/q0jJ4QXEsn8yRiI/RtWjXExsP1u6qfpFYaHfmfEO4ROBJ?=
- =?us-ascii?Q?vB/cO2CcvB5ngG9/r4+T/PkA?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7be63fd1-ae80-4309-810d-08d92f41c3ad
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2021 14:36:15.3596
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HwOiGo38SGRWCwcPGleZ8v1T7p7wxHHW3OjXub/PssmAf/mzpi4zBR7fKvT+Y7ad
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5352
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 14, 2021 at 08:04:03PM +0530, Kirti Wankhede wrote:
-> Jason,
-> 
-> I couldn't find patch 1,2,4 and 5 of these series. Can you please keep
-> kvm@vger.kernel.org cc for all patches?
+This is my alternative take on this series from Jason:
 
-It is an error, sorry
+https://lore.kernel.org/dri-devel/87czsszi9i.fsf@redhat.com/T/
 
-> Also it will be helpful if you can add version prefix, eg. 'v3' for this
-> series, in subject line.
+The mdev/vfio parts are exactly the same, but this solves the driver core
+changes for the direct probing without the in/out flag that Greg hated,
+which cause a little more work, but probably make the result better.
 
-This is not v3, it is a different but related series
+Original decription from Jason below:
 
-Jason
+The mdev bus's core part for managing the lifecycle of devices is mostly
+as one would expect for a driver core bus subsystem.
+
+However instead of having a normal 'struct device_driver' and binding the
+actual mdev drivers through the standard driver core mechanisms it open
+codes this with the struct mdev_parent_ops and provides a single driver
+that shims between the VFIO core's struct vfio_device and the actual
+device driver.
+
+Instead, allow mdev drivers implement an actual struct mdev_driver and
+directly call vfio_register_group_dev() in the probe() function for the
+mdev. Arrange to bind the created mdev_device to the mdev_driver that is
+provided by the end driver.
+
+The actual execution flow doesn't change much, eg what was
+parent_ops->create is now device_driver->probe and it is called at almost
+the exact same time - except under the normal control of the driver core.
+
+Ultimately converting all the drivers unlocks a fair number of additional
+VFIO simplifications and cleanups.
