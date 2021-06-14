@@ -2,106 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC69F3A6CC0
-	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 19:08:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FB423A6CE0
+	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 19:15:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235265AbhFNRKF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Jun 2021 13:10:05 -0400
-Received: from mail-pf1-f177.google.com ([209.85.210.177]:37521 "EHLO
-        mail-pf1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235185AbhFNRKD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Jun 2021 13:10:03 -0400
-Received: by mail-pf1-f177.google.com with SMTP id y15so11010316pfl.4
-        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 10:07:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=OZWnLuTCvqyuWhQlLGlTTWiLo7OZl6SsOJr1Z5NIDwU=;
-        b=ChNj5omZ4CwqHhyQM0jYHL1k63O8Ck8nElq9ZzoSyMrM0buXbOFs1YNkfsLa53XWsU
-         ZD6kcH/T9cYetAVhAKOm+qibmGX/o82nbWljn+eX591R7AU0cVT+EE5j0Ha0z1KM48iY
-         SZUSO2t1k5eoL7RXw5Q2YqLCNV8hnGXSo+KjsOlWEm3kYihN0kRf+AitX4+O40KxE1We
-         tK1OVyuPnhu01afCquAaz3VBxMAL3Vd6TgzvzUwMZHmtZxNad9pxCCEJ9jRwimG16qH2
-         yRbI/R3yoJwA4GL4wRrWXlPJO56g2BCsA/vnhFfxWqVzyz7UZ29JE4QQ4PU1jmsTolaZ
-         UyHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=OZWnLuTCvqyuWhQlLGlTTWiLo7OZl6SsOJr1Z5NIDwU=;
-        b=DU+lxBUvcnqHD636O355kri1pPpnMsyheKla066WQKLQSEYV4HHCw8ijGMPEmj/L25
-         kcqTCxj17YcXcgBGHuNgrW88gy9yHn7kZGDEKfgQfwTyMcZ0aoj2DSpfYsMbtM2gHQfd
-         BaAyULgDVWT97ervsdQV18sJAMeTphEzSp4jt55oRxp3679x0AZjaI/bIa91KkfcaX01
-         5j2qYPK7oR28MA6PPZ5ksdglg19Fq5WMAfsTwAE836jjFAPMPyUPoFJpLugjtUktKjdJ
-         Dptke1vw/8s0P3WI+9E3bXEGndIdc2qu56h3QiWQY3/QtPmCZS5j9hpAQ4Zir3ScuCT5
-         HL6A==
-X-Gm-Message-State: AOAM531NVyMlpSotNdkPy04bptx7cn5yu+PjOthp5cUC0jkPowofuGFs
-        0cXptd2baXm9xtX1GNdZOo2VNQ==
-X-Google-Smtp-Source: ABdhPJyXa1kkuWkkh+PhRNm0K+7GGEb0LqnzP2+8Gc+1g5C1mQopC9bt2dmtf0lwe6NvAiNi8HNgsw==
-X-Received: by 2002:a63:6e87:: with SMTP id j129mr18338809pgc.45.1623690406904;
-        Mon, 14 Jun 2021 10:06:46 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k15sm46837pjf.32.2021.06.14.10.06.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jun 2021 10:06:46 -0700 (PDT)
-Date:   Mon, 14 Jun 2021 17:06:42 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     stsp <stsp2@yandex.ru>
-Cc:     kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: guest/host mem out of sync on core2duo?
-Message-ID: <YMeMov42fihXptQm@google.com>
-References: <bd4a2d30-5fb4-3612-c855-946d97068b9a@yandex.ru>
+        id S233206AbhFNRRd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Jun 2021 13:17:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28207 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233639AbhFNRRb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 14 Jun 2021 13:17:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623690928;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=G+gTijY/9FvVzLFpGxKknxMCcEc6fcclmIjEJe/DmWM=;
+        b=FuwBkXghpLyr9SurAclkuH87CBK6vTM+BaF+Y0iujdvdv6GQGdI/Jmf0VY9XqZJax4879t
+        5QNpd0BnMANx9J58DeI+biUd5jzIbK927UTb4lfrkhki6vMMKA7jAYWOAVw7pZ+bri8n6s
+        l7usIXE51wMKY28BySZPOkirb2lR7vs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-371-8P8sYQ2cMfCzk8w2c626Cg-1; Mon, 14 Jun 2021 13:15:26 -0400
+X-MC-Unique: 8P8sYQ2cMfCzk8w2c626Cg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56E498015A4;
+        Mon, 14 Jun 2021 17:15:23 +0000 (UTC)
+Received: from work-vm (ovpn-114-158.ams2.redhat.com [10.36.114.158])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 398B95D9CA;
+        Mon, 14 Jun 2021 17:15:11 +0000 (UTC)
+Date:   Mon, 14 Jun 2021 18:15:08 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 21/22] x86/sev: Register SNP guest request
+ platform device
+Message-ID: <YMeOnO4PBnvxEQEv@work-vm>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-22-brijesh.singh@amd.com>
+ <YMEVedGOrYgI1Klc@work-vm>
+ <8a598020-7d89-b399-efb9-735b2a6da8a9@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bd4a2d30-5fb4-3612-c855-946d97068b9a@yandex.ru>
+In-Reply-To: <8a598020-7d89-b399-efb9-735b2a6da8a9@amd.com>
+User-Agent: Mutt/2.0.7 (2021-05-04)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jun 13, 2021, stsp wrote:
-> Hi kvm developers.
+* Tom Lendacky (thomas.lendacky@amd.com) wrote:
+> On 6/9/21 2:24 PM, Dr. David Alan Gilbert wrote:
+> > * Brijesh Singh (brijesh.singh@amd.com) wrote:
+> >> Version 2 of GHCB specification provides NAEs that can be used by the SNP
+> >> guest to communicate with the PSP without risk from a malicious hypervisor
+> >> who wishes to read, alter, drop or replay the messages sent.
+> >>
+> >> The hypervisor uses the SNP_GUEST_REQUEST command interface provided by
+> >> the SEV-SNP firmware to forward the guest messages to the PSP.
+> >>
+> >> In order to communicate with the PSP, the guest need to locate the secrets
+> >> page inserted by the hypervisor during the SEV-SNP guest launch. The
+> >> secrets page contains the communication keys used to send and receive the
+> >> encrypted messages between the guest and the PSP.
+> >>
+> >> The secrets page is located either through the setup_data cc_blob_address
+> >> or EFI configuration table.
+> >>
+> >> Create a platform device that the SNP guest driver can bind to get the
+> >> platform resources. The SNP guest driver can provide userspace interface
+> >> to get the attestation report, key derivation etc.
+> >>
+> >> The helper snp_issue_guest_request() will be used by the drivers to
+> >> send the guest message request to the hypervisor. The guest message header
+> >> contains a message count. The message count is used in the IV. The
+> >> firmware increments the message count by 1, and expects that next message
+> >> will be using the incremented count.
+> >>
+> >> The helper snp_msg_seqno() will be used by driver to get and message
+> >> sequence counter, and it will be automatically incremented by the
+> >> snp_issue_guest_request(). The incremented value is be saved in the
+> >> secrets page so that the kexec'ed kernel knows from where to begin.
+> >>
+> >> See SEV-SNP and GHCB spec for more details.
+> >>
+> >> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> >> ---
+> >>  arch/x86/include/asm/sev.h      |  12 +++
+> >>  arch/x86/include/uapi/asm/svm.h |   2 +
+> >>  arch/x86/kernel/sev.c           | 176 ++++++++++++++++++++++++++++++++
+> >>  arch/x86/platform/efi/efi.c     |   2 +
+> >>  include/linux/efi.h             |   1 +
+> >>  include/linux/sev-guest.h       |  76 ++++++++++++++
+> >>  6 files changed, 269 insertions(+)
+> >>  create mode 100644 include/linux/sev-guest.h
+> >>
 > 
-> I am having the strange problem that can only be reproduced on a core2duo CPU
-> but not AMD FX or Intel Core I7.
+> >> +u64 snp_msg_seqno(void)
+> >> +{
+> >> +	struct snp_secrets_page_layout *layout;
+> >> +	u64 count;
+> >> +
+> >> +	layout = snp_map_secrets_page();
+> >> +	if (layout == NULL)
+> >> +		return 0;
+> >> +
+> >> +	/* Read the current message sequence counter from secrets pages */
+> >> +	count = readl(&layout->os_area.msg_seqno_0);
+> > 
+> > Why is this seqno_0 - is that because it's the count of talking to the
+> > PSP?
 > 
-> My code has 2 ways of setting the guest registers: one is the guest's ring0
-> stub that just pops all regs from stack and does iret to ring3.  That works
-> fine.  But sometimes I use KVM_SET_SREGS and resume the VM directly to ring3.
-> That randomly results in either a good run or invalid guest state return, or
-> a page fault in guest.
+> Yes, the sequence number is an ever increasing value that is used in
+> communicating with the PSP. The PSP maintains the next expected sequence
+> number and will reject messages which have a sequence number that is not
+> in sync with the PSP. The 0 refers to the VMPL level. Each VMPL level has
+> its own sequence number.
 
-Hmm, a core2duo failure is more than likely due to lack of unrestricted guest.
-You verify this by loading kvm_intel on the Core i7 with unrestricted_guest=0.
+Can you just clarify; is that the VMPL of the caller or the destination?
+What I'm partially asking here is whether it matters which VMPL the
+kernel is running at (which I'm assuming could well be non-0)
 
-> I tried to analyze when either of the above happens exactly, and I have a
-> very strong suspection that the problem is in a way I update LDT. LDT is
-> shared between guest and host with KVM_SET_USER_MEMORY_REGION, and I modify
-> it on host.  So it seems like if I just allocated the new LDT entry, there is
-> a risk of invalid guest state, as if the guest's LDT still doesn't have it.
-> If I modified some LDT entry, there can be a page fault in guest, as if the
-> entry is still old.
+> > 
+> >> +	iounmap(layout);
+> >> +
+> >> +	/*
+> >> +	 * The message sequence counter for the SNP guest request is a 64-bit value
+> >> +	 * but the version 2 of GHCB specification defines the 32-bit storage for the
+> >> +	 * it.
+> >> +	 */
+> >> +	if ((count + 1) >= INT_MAX)
+> >> +		return 0;
+> > 
+> > Is that UINT_MAX?
+> > 
+> >> +
+> >> +	return count + 1;
+> >> +}
+> >> +EXPORT_SYMBOL_GPL(snp_msg_seqno);
+> >> +
+> >> +static void snp_gen_msg_seqno(void)
+> >> +{
+> >> +	struct snp_secrets_page_layout *layout;
+> >> +	u64 count;
+> >> +
+> >> +	layout = snp_map_secrets_page();
+> >> +	if (layout == NULL)
+> >> +		return;
+> >> +
+> >> +	/* Increment the sequence counter by 2 and save in secrets page. */
+> >> +	count = readl(&layout->os_area.msg_seqno_0);
+> >> +	count += 2;
+> > 
+> > Why 2 not 1 ?
+> 
+> The return message by the PSP also increments the sequence number, hence
+> the increment by 2 instead of 1 for the next message to be submitted.
 
-IIUC, you are updating the LDT itself, e.g. an FS/GS descriptor in the LDT, as
-opposed to updating the LDT descriptor in the GDT?
+OK
 
-Either way, do you also update all relevant segments via KVM_SET_SREGS after
-modifying memory?   Best guess is that KVM doesn't detect that the VM has state
-that needs to be emulated, or that KVM's internal register state and what's in
-memory are not consistent.
+Dave
 
-> I've found that the one needs to check KVM_CAP_SYNC_MMU to safely write to
-> the guest memory, but it doesn't seem to be documented well. Of course maybe
-> my problem has nothing to do with that, but I think it does.  So can it be
-> that even though I check for the KVM_CAP_SYNC_MMU, writing to the guest
-> memory from host is still unsafe? What is this KVM_CAP_SYNC_MMU actually all
-> about?
+> I'll let Brijesh address the other questions.
+> 
+> Thanks,
+> Tom
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-On x86, KVM_CAP_SYNC_MMU means that the primary MMU will notify KVM of any
-relevant changes.  As you surmised, this is needed if userspace is making changes
-via to mmap()/mprotect()/etc..., but is also used to react to PFN migration, NUMA
-balancing, etc...
-
-Anyways, I highly doubt this is a memory synchronization issue, a corner case
-related to lack of unrestricted guest is much more likely.
