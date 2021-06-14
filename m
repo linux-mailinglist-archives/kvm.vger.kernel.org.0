@@ -2,130 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5679E3A7102
-	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 23:09:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57B623A7121
+	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 23:21:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233360AbhFNVLj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Jun 2021 17:11:39 -0400
-Received: from mail-pj1-f46.google.com ([209.85.216.46]:39572 "EHLO
-        mail-pj1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229771AbhFNVLi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Jun 2021 17:11:38 -0400
-Received: by mail-pj1-f46.google.com with SMTP id o88-20020a17090a0a61b029016eeb2adf66so228946pjo.4
-        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 14:09:24 -0700 (PDT)
+        id S235263AbhFNVXH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Jun 2021 17:23:07 -0400
+Received: from mail-oi1-f173.google.com ([209.85.167.173]:36468 "EHLO
+        mail-oi1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235069AbhFNVXG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Jun 2021 17:23:06 -0400
+Received: by mail-oi1-f173.google.com with SMTP id r16so15469553oiw.3
+        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 14:21:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=qHRLPYRPZJBt8mpUhiZSqookm+IZFM9rc0LYgrH0esQ=;
-        b=T2CqVn/UQuDRIg2LFtKhhhOR8LNyvvCABg1khTCTYeUfNyyrD2MBL/P/bSpn3zi3YJ
-         EQniD+/jJeCj7lmTKPEgUNR/xz+K3MCts8cQl33zvmBAGH0SR1cLDL5kz0KL6mOIU43b
-         F5SCc/o5rpxogQm7RbFItILAQ7tQAlGQyOT6UvtDyCs/LyxIInu2YmiMh9iA0Ie6TMKL
-         OZNOBrbRzIUghzmFmDB/gJlk/VemybnfyUmYwUWvmZTLsmj5V27gHTPJiSc736NAHrLO
-         0kRELynvLE+PngkzvS0j4AenhrFblvaaYTek1cB/sQTl22epXJmePhWPtNDZH5J4EmGY
-         2e6w==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=fbXsJ3eOeCcBLeSFCAHEUsr96YUafQfXz2w1OefbdRA=;
+        b=KsMlempr8UdjV4tBNzzoYYZTu0ecnVXAT6CveqXkZepj8L2W2SLdKRH06h744uPaqL
+         dp+CRgnJq1PbUoKdY0fBbtFZKz0CpY1iheQfptn+Ylg5btTXQGgEU+IQxMWqD2ZUYCkc
+         FRgV+Df7OXHAhiaHKDf991UkYgEEh6MKdPz9vSIDcn6KK54IkP5ANlwFy7SaZnJWrFOi
+         ztXeRya8DfKyVa+apnmlC30PxIZEs9q7orTf0bFsvmqe1JsQyLFwSyJNUnzmXvzOWMBt
+         vLjQMcZSbTfwhjyxcqF4o6iiTFe5A/fYYupgcwYAeVSY2VrAOcvmv1obblMPDNLWmCXi
+         kegw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=qHRLPYRPZJBt8mpUhiZSqookm+IZFM9rc0LYgrH0esQ=;
-        b=TYLu0i0bC7+x4uE+YLH71G8tph5/Plfm/2Mm23wITGLA6CKwPWn8X5gjeVeKAC8UWh
-         zVqcSrmApZwRXXyZs9bvZaWyvF/1zkulbpI3kjGo11OVkgEhk5kEKdKgN2oOx/fIfHS6
-         ECWcCmYfxZnNfCugMS9lLW0J+j+D9W82WXR7CMg2zLBwgsAFooWCfmuySzYvJRTFa13M
-         zPpqO1mdzW3+0OhgevSSVyH1YPETX886ZOaxp2UhcWv+g8CUajE86yRVnw3czaRb5zlg
-         4wHieXHmcoebjH8mRoL7hzohQ4ydW/BIkDZp0iZ4vx3YL6OlIqN3imZg8QAW4+fjlSfD
-         rqNQ==
-X-Gm-Message-State: AOAM532WOrGKBmP4Jrm8EYOigbz3g47sOzs3sN+FrP5WBWEMy8cgB/Dp
-        LFyDt/Ymxj3KqOsdkkJZmMoEUKCdh6X1GA==
-X-Google-Smtp-Source: ABdhPJx5S05uAIpTjO2YTL8rji6MchXkQkdnHEDyRaM/RDTR0KLtABd5BW3vkAX07kwjpy8lLWQWPA==
-X-Received: by 2002:a17:90a:c210:: with SMTP id e16mr1132160pjt.234.1623704903655;
-        Mon, 14 Jun 2021 14:08:23 -0700 (PDT)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id a15sm13313024pff.128.2021.06.14.14.08.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jun 2021 14:08:22 -0700 (PDT)
-Date:   Mon, 14 Jun 2021 21:08:18 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 0/8] KVM: x86/mmu: Fast page fault support for the TDP MMU
-Message-ID: <YMfFQnfsq5AuUP2B@google.com>
-References: <20210611235701.3941724-1-dmatlack@google.com>
- <639c54a4-3d6b-8b28-8da7-e49f2f87e025@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=fbXsJ3eOeCcBLeSFCAHEUsr96YUafQfXz2w1OefbdRA=;
+        b=nK9DIVPPqY6duHGuyImv0qimBxS2En1ES7QgqpJd5CDSCNV3Fdb79PIFP7QT1nS1uj
+         5wb408z/46PPoehrhQwlaiDnGqlhGUVFtJpQHtOuLtSjqJyGAcm/3YIwPlrME/dN07Xj
+         jX5kGVJRV7z3zRZuZMLvGyNkI/TAQEIZhJ2j5ROg8krOkkrm/mPjWzwnEDHHArMkIp5a
+         /4kVNtHrKWMx8lY12VfVqtd8Rn/Y8ZOktZmtjdwHTDJbssyAQgt9cscbZ+O5XWM4w0kM
+         +u+TwE20EdI8Z7eM/PwcprjOxRQ1v9MKLxt3TQjM1Wf20KXjb71QM/9iMaqaVT4dgqFd
+         QaXw==
+X-Gm-Message-State: AOAM532HEtmS1rHd29vJ17KYyT05xdD9KC5Y0++sI/6T824EaPbSqRp9
+        J0KCPUlTGhNAaGZvRWL7Ehg9UjqGkEdYg+8cdDlCkuas/O4=
+X-Google-Smtp-Source: ABdhPJzgQ+WtAfMjO5Ih+flBlcvzrBy/UYUcTZzdRWWC9TeRj8iacJtLZepheLF8PbYsM/389Wwm6QXpf1pfHyejHkQ=
+X-Received: by 2002:aca:1e07:: with SMTP id m7mr11575758oic.28.1623705602859;
+ Mon, 14 Jun 2021 14:20:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <639c54a4-3d6b-8b28-8da7-e49f2f87e025@redhat.com>
+References: <CALMp9eRWBJQJBE2bxME6FzjhDOadNJW8wty7Gb=QJO8=ndaaEw@mail.gmail.com>
+ <50c5d8c2-4849-2517-79c8-bd4e03fd36ad@redhat.com>
+In-Reply-To: <50c5d8c2-4849-2517-79c8-bd4e03fd36ad@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 14 Jun 2021 14:19:51 -0700
+Message-ID: <CALMp9eRXrXo3HznH7OnwRyPg3NKuH2FK720HYGADNfbWApQeAA@mail.gmail.com>
+Subject: Re: [RFC] x86: Eliminate VM state changes during KVM_GET_MP_STATE
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Jan Kiszka <jan.kiszka@siemens.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 14, 2021 at 11:54:59AM +0200, Paolo Bonzini wrote:
-> On 12/06/21 01:56, David Matlack wrote:
-> > This patch series adds support for the TDP MMU in the fast_page_fault
-> > path, which enables certain write-protection and access tracking faults
-> > to be handled without taking the KVM MMU lock. This series brings the
-> > performance of these faults up to par with the legacy MMU.
-> 
-> Hi David,
-> 
-> I have one very basic question: is the speedup due to lock contention, or to
-> cacheline bouncing, or something else altogether? In other words, what do
-> the profiles look like before vs. after these patches?
+On Fri, Jun 11, 2021 at 3:31 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 10/06/21 22:39, Jim Mattson wrote:
+> > But, even worse, it can modify guest memory,
+> > even while all vCPU threads are stopped!
+>
+> To some extent this is a userspace issue---they could declare vCPU
+> threads stopped only after KVM_GET_MPSTATE is done, and only start the
+> downtime phase of migration after that.  But it is nevertheless a pretty
+> bad excuse.
 
-The speed up comes from a combination of:
- - Less time spent in kvm_vcpu_gfn_to_memslot.
- - Less lock contention on the MMU lock in read mode.
+I agree that this could be fixed by documenting the behavior. Since I
+don't think there's any existing documentation that says which ioctls
+can modify guest memory, such a documentation change wouldn't actually
+constitute an API breakage.
 
-Before:
+BTW, which ioctls can modify guest memory?
 
-  Overhead  Symbol
--   45.59%  [k] kvm_vcpu_gfn_to_memslot
-   - 45.57% kvm_vcpu_gfn_to_memslot
-      - 29.25% kvm_page_track_is_active
-         + 15.90% direct_page_fault
-         + 13.35% mmu_need_write_protect
-      + 9.10% kvm_mmu_hugepage_adjust
-      + 7.20% try_async_pf
-+   18.16%  [k] _raw_read_lock
-+   10.57%  [k] direct_page_fault
-+    8.77%  [k] handle_changed_spte_dirty_log
-+    4.65%  [k] mark_page_dirty_in_slot
-     1.62%  [.] run_test
-+    1.35%  [k] x86_virt_spec_ctrl
-+    1.18%  [k] try_grab_compound_head
-[...]
-
-After:
-
-  Overhead  Symbol
-+   26.23%  [k] x86_virt_spec_ctrl
-+   15.93%  [k] vmx_vmexit
-+    6.33%  [k] vmx_vcpu_run
-+    4.31%  [k] vcpu_enter_guest
-+    3.71%  [k] tdp_iter_next
-+    3.47%  [k] __vmx_vcpu_run
-+    2.92%  [k] kvm_vcpu_gfn_to_memslot
-+    2.71%  [k] vcpu_run
-+    2.71%  [k] fast_page_fault
-+    2.51%  [k] kvm_vcpu_mark_page_dirty
-
-(Both profiles were captured during "Iteration 2 dirty memory" of
-dirty_log_perf_test.)
-
-Related to the kvm_vcpu_gfn_to_memslot overhead: I actually have a set of
-patches from Ben I am planning to send soon that will reduce the number of
-redundant gfn-to-memslot lookups in the page fault path.
-
-> 
-> Thanks,
-> 
-> Paolo
-> 
+And, while we're at it, can we document the required orderings of the
+various _GET_ and _SET_ ioctls for save and restore?
