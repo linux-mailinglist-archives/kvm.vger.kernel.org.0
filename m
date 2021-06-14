@@ -2,219 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6073A3A6E4F
-	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 20:43:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BB503A6E60
+	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 20:48:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233424AbhFNSpA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Jun 2021 14:45:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37839 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232802AbhFNSo7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 14 Jun 2021 14:44:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623696175;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tYPULGJaxNrE7OW2+HTX1onKHypT59LT86+cAi5+zC8=;
-        b=AUXqUyDZogW9wHmRXEuCh0kzIFbX0tEjwuPKx3X9kTwg5Dy606/vEdjG2boaImrVMBGBTW
-        jI6jlLvpRKI8zDbAaS/lN2XxEUvMQAOotmrsXBiy+rZZU0Nc+VaXmHyh7revQ8BmA+XEnd
-        ZKXregDozc/Jwyj4fubvr9WLt3/F3/s=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-sMj9CFOZNyOgEOBR7OgWaA-1; Mon, 14 Jun 2021 14:42:54 -0400
-X-MC-Unique: sMj9CFOZNyOgEOBR7OgWaA-1
-Received: by mail-ot1-f69.google.com with SMTP id k11-20020a056830242bb0290400324955afso7806786ots.14
-        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 11:42:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=tYPULGJaxNrE7OW2+HTX1onKHypT59LT86+cAi5+zC8=;
-        b=lRHF85eGFcY7c53NaEZCW41t24unZ0PSwvQbLkiWLW8voXGEgZSXy45X3ywIPvFTct
-         YpXaLNSs2+ozMeLLQgmmFcGyaLZcoZVP6BT285EwBUCircLYtlEjjKZ+k6PvLODnp2N+
-         F3nwxmfQa2I9shs27vc19mF2zn8jFSqzKyu6v6ogtK8oi2sym1e/bEID7mLq8IyX+T2R
-         V4acVVfXtEZsvTiMpIO7y24epcc2sX8zhuxfg4l7EG9Hd6P4E4pmry884lLZ4KE2dk84
-         kw4CDQ9HPPlAycds9pATVjAUO8coDfd1dtoAp/InEgQWqQW1Mw0c1N0Fsu3JLLiuBkKU
-         V+sg==
-X-Gm-Message-State: AOAM532eINUTdWxUkXrTsRLimGPdzg9JOEB1jIPSqDpH6w6Qyboz9RS3
-        iM/rXbikhLVxxzW62DyQs5/NLYREG5kTpZaEdfukZ5LrwlfF0PBXZbYk0AmntLWe3jmvDH53IzL
-        yfq3u2aKJQm3J
-X-Received: by 2002:a05:6830:2476:: with SMTP id x54mr14672486otr.293.1623696173803;
-        Mon, 14 Jun 2021 11:42:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzySs6LU2JHVe6vycK52lrxMvVRLCBOGMepzyqQPlZ6Jiia1Sb3dldrBYFR/i4+kUid/t1iDA==
-X-Received: by 2002:a05:6830:2476:: with SMTP id x54mr14672464otr.293.1623696173516;
-        Mon, 14 Jun 2021 11:42:53 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id a7sm3265107ooo.9.2021.06.14.11.42.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jun 2021 11:42:53 -0700 (PDT)
-Date:   Mon, 14 Jun 2021 12:42:50 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, <cohuck@redhat.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <aviadye@nvidia.com>, <oren@nvidia.com>, <shahafs@nvidia.com>,
-        <parav@nvidia.com>, <artemp@nvidia.com>, <kwankhede@nvidia.com>,
-        <ACurrid@nvidia.com>, <cjia@nvidia.com>, <yishaih@nvidia.com>,
-        <kevin.tian@intel.com>, <hch@infradead.org>, <targupta@nvidia.com>,
-        <shameerali.kolothum.thodi@huawei.com>, <liulongfang@huawei.com>,
-        <yan.y.zhao@intel.com>
-Subject: Re: [PATCH 09/11] PCI: add matching checks for driver_override
- binding
-Message-ID: <20210614124250.0d32537c.alex.williamson@redhat.com>
-In-Reply-To: <117a5e68-d16e-c146-6d37-fcbfe49cb4f8@nvidia.com>
-References: <20210603160809.15845-1-mgurtovoy@nvidia.com>
-        <20210603160809.15845-10-mgurtovoy@nvidia.com>
-        <20210608152643.2d3400c1.alex.williamson@redhat.com>
-        <20210608224517.GQ1002214@nvidia.com>
-        <20210608192711.4956cda2.alex.williamson@redhat.com>
-        <117a5e68-d16e-c146-6d37-fcbfe49cb4f8@nvidia.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S233814AbhFNSuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Jun 2021 14:50:12 -0400
+Received: from mail-bn8nam11on2048.outbound.protection.outlook.com ([40.107.236.48]:57569
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S233071AbhFNSuJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Jun 2021 14:50:09 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kcjgQYyy2IACCBcAnG9Nmf4XJ/8xaX4aWE+3rGG6ulomd0wy8s3/GsPcxqUHMj8phZP5bXtFOAjmmRTJnjR7ilXLTx1wtLy/TrByJU04YJk3YrcWjytsoZ9A0HWhP8IRYELOftirrBv+HhFxzPTkWayWQTVJWb9HVc8muB2zu1dSOIdJyP9Bt3eZ+R1AzvsRXypu90p30+UE+D9dRSdz+NiqWpEaZCkq7LAlRHhMNFTV1K+MKHYd8c3N5ywo4NUk8kZvKGbiKHvTigy/Oun9WlYZg5/C5U6R8KdKdiZlAv0CCUQBaNdYEyv1xP9GFPyboi5M8PBu9Q6FWy3JfF2RPw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1lUtA7rG7IndFm1Q7eX+K2c1M6radf+0tc74Zcvy+7E=;
+ b=ex3HKgF3nB9A6XEujCa//x4Bfo4stJENvqA1T36yboVO7KIhtzvPUyfUQN4l1Cd/YuM3gXoUjQ42GZLket2WGK+zL0pYN7HGy1/Yy4stvcBtlyj3VpO+8lBFJ4+WM/ptNINfa4y3MNBOjOoMe7h+P+HdEPZnyiP3p/Dk7PijKwyal1WDHKlO8dPL9ccOzhngYk5Q44+w46tZm2KApc3I/y/ccYOrFE6AG1es8kL6zQK/LXzN65rN2/6iph/LZYsK1b4LAKo8PtyOZxQPmYQBcxF/PeFVGs4seYfQy4u53Z86FXEjbRyO8lDidOvx4PHXIV2+VFdMB259rDKPxxhpjw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=lwn.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1lUtA7rG7IndFm1Q7eX+K2c1M6radf+0tc74Zcvy+7E=;
+ b=OTeJ2dFMemKYY8MeHc9QCTsT/ch24mbjuZQZ8A4C9qxCuBBtzH3C4oM+g60DYYn5Avy1QBT/+fMkWtUR0bNettwgAKA+N1yU7YTg0KMFfjVKVfUD6dJzVtyNhCaG+dmcz7zq2jlrgC+2iEscZcIMjvxcZIAzCB7s42DjpBRbE8aQsOtuUwkkF/sJGGmuLxFOmXcy3tNVAtMLzkBtKsTjwmmZu40g9qsgZl5RZrkT+UUuGcSN4Qahy27jrYZLlv7yCz7xQCf/PItvpSXK9cvhjODRQwlfSanT4wIWLI70/ZRyIF5jgw20t8VMrsAfTnkSS6/o468Hr95Cy+5RU38C+g==
+Received: from BN6PR22CA0034.namprd22.prod.outlook.com (2603:10b6:404:37::20)
+ by SN6PR12MB4703.namprd12.prod.outlook.com (2603:10b6:805:ee::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.24; Mon, 14 Jun
+ 2021 18:48:04 +0000
+Received: from BN8NAM11FT047.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:404:37:cafe::19) by BN6PR22CA0034.outlook.office365.com
+ (2603:10b6:404:37::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.20 via Frontend
+ Transport; Mon, 14 Jun 2021 18:48:04 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; lwn.net; dkim=none (message not signed)
+ header.d=none;lwn.net; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ BN8NAM11FT047.mail.protection.outlook.com (10.13.177.220) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4219.21 via Frontend Transport; Mon, 14 Jun 2021 18:48:03 +0000
+Received: from [10.40.101.248] (172.20.187.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 14 Jun
+ 2021 18:47:56 +0000
+Subject: Re: [PATCH 02/10] driver core: Better distinguish probe errors in
+ really_probe
+To:     Christoph Hellwig <hch@lst.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        "Alex Williamson" <alex.williamson@redhat.com>
+CC:     David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        <dri-devel@lists.freedesktop.org>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        <intel-gfx@lists.freedesktop.org>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        <kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-s390@vger.kernel.org>, Halil Pasic <pasic@linux.ibm.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>
+References: <20210614150846.4111871-1-hch@lst.de>
+ <20210614150846.4111871-3-hch@lst.de>
+X-Nvconfidentiality: public
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <8002c963-ce48-ecf8-a209-58195818a160@nvidia.com>
+Date:   Tue, 15 Jun 2021 00:17:53 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20210614150846.4111871-3-hch@lst.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [172.20.187.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 7e4fb0ea-b64a-4fa1-de95-08d92f64f155
+X-MS-TrafficTypeDiagnostic: SN6PR12MB4703:
+X-Microsoft-Antispam-PRVS: <SN6PR12MB4703602F19E7BE3DC5DE804EDC319@SN6PR12MB4703.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1417;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: pd9FPgaDis/th8MdjU5hiYAvIBou/c73tBP/EubbPPDBoPapALl/KSYcDtj4kPOTgES2+Gdb7jrrJSXxdhgUeSVu69JfuOElL0ZV2/0PYZye5cNt8kNvFjLOG1ZQONJRsg9xracqwuzjm32r7ULCd2dIu4BjO9CNJFB+4tqGxXJCe4XJ2d+mFNfz1Tnb47iPsarHwRm+NKDYQa+dooJjEtN4xAYhhowaqREZmeG4jmzsMACkBkwueIcADsZjuRMlTaw6tRJo7jXSbHq94tKt9S998lNbI8nBDoV6ZvOrZc5vSU9cYm/xukbBxWGkuxD/DXQ9yrspgkvi0c7bcvVgCv/FlLwEw7nRlpozUS8nOjsUllUTR0PLMR/4ucpQ86yQYpSbg9GIy0ToPO5zNUBzrPyP/A/hHM9zJhJLKRRS/dOa41zH34MV4TQmgJnMKUXusrOdEQYhd/8zPLqcYjoGrCbxCurmnx66rK/uW4xYvvcX1hXI0sdrQ+gemcnAdoytYNFpmDuR+ldplJsykiI12obi9ercJ3m3Kp8D8hbw+TJitoiZTFxv0qAKnNwSliHfiIg0xCStoFdTPGJSnXSc/Ot+qzbuj2B08oY1wFdaTV9jmXgSqBsps7/iK+WceGVNk92+Qc2J5adzly7ahSZBzneZYLt6HXLLtFyaluImzjmeMLzp0T4OTLycxUSIjYC4
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(376002)(136003)(346002)(396003)(39860400002)(46966006)(36840700001)(16526019)(110136005)(54906003)(8676002)(478600001)(186003)(36756003)(7636003)(2616005)(5660300002)(86362001)(356005)(83380400001)(31696002)(4326008)(70586007)(82740400003)(316002)(8936002)(2906002)(16576012)(31686004)(7416002)(426003)(26005)(53546011)(82310400003)(36860700001)(6666004)(336012)(70206006)(36906005)(47076005)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2021 18:48:03.9998
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7e4fb0ea-b64a-4fa1-de95-08d92f64f155
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT047.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB4703
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 13 Jun 2021 11:19:46 +0300
-Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
 
-> On 6/9/2021 4:27 AM, Alex Williamson wrote:
-> > On Tue, 8 Jun 2021 19:45:17 -0300
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> > =20
-> >> On Tue, Jun 08, 2021 at 03:26:43PM -0600, Alex Williamson wrote: =20
-> >>>> drivers that specifically opt into this feature and the driver now h=
-as
-> >>>> the opportunity to provide a proper match table that indicates what =
-HW
-> >>>> it can properly support. vfio-pci continues to support everything. =
-=20
-> >>> In doing so, this also breaks the new_id method for vfio-pci. =20
-> >> Does it? How? The driver_override flag is per match entry not for the
-> >> entire device so new_id added things will work the same as before as
-> >> their new match entry's flags will be zero. =20
-> > Hmm, that might have been a testing issue; combining driverctl with
-> > manual new_id testing might have left a driver_override in place.
-> >    =20
-> >>> Sorry, with so many userspace regressions, crippling the
-> >>> driver_override interface with an assumption of such a narrow focus,
-> >>> creating a vfio specific match flag, I don't see where this can go.
-> >>> Thanks, =20
-> >> On the other hand it overcomes all the objections from the last go
-> >> round: how userspace figures out which driver to use with
-> >> driver_override and integrating the universal driver into the scheme.
-> >>
-> >> pci_stub could be delt with by marking it for driver_override like
-> >> vfio_pci. =20
-> > By marking it a "vfio driver override"? :-\
-> > =20
-> >> But driverctl as a general tool working with any module is not really
-> >> addressable.
-> >>
-> >> Is the only issue the blocking of the arbitary binding? That is not a
-> >> critical peice of this, IIRC =20
-> > We can't break userspace, which means new_id and driver_override need
-> > to work as they do now.  There are scads of driver binding scripts in
-> > the wild, for vfio-pci and other drivers.  We can't assume such a
-> > narrow scope.  Thanks, =20
->=20
-> what about the following code ?
->=20
-> @@ -152,12 +152,28 @@ static const struct pci_device_id=20
-> *pci_match_device(struct pci_driver *drv,
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 spin_unlock(&drv->dynids.lock=
-);
->=20
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!found_id)
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 found_id =3D pci_match_id(drv->id_table, dev);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (found_id)
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 return found_id;
 
-a) A dynamic ID match always works regardless of driver override...
+On 6/14/2021 8:38 PM, Christoph Hellwig wrote:
+> really_probe tries to special case errors from ->probe, but due to all
+> other initialization added to the function over time now a lot of
+> internal errors hit that code path as well.  Untangle that by adding
+> a new probe_err local variable and apply the special casing only to
+> that.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   drivers/base/dd.c | 72 +++++++++++++++++++++++++++--------------------
+>   1 file changed, 41 insertions(+), 31 deletions(-)
+> 
+> diff --git a/drivers/base/dd.c b/drivers/base/dd.c
+> index 7477d3322b3a..999bc737a8f0 100644
+> --- a/drivers/base/dd.c
+> +++ b/drivers/base/dd.c
+> @@ -513,12 +513,42 @@ static ssize_t state_synced_show(struct device *dev,
+>   }
+>   static DEVICE_ATTR_RO(state_synced);
+>   
+> +
+> +static int call_driver_probe(struct device *dev, struct device_driver *drv)
+> +{
+> +	int ret = 0;
+> +
+> +	if (dev->bus->probe)
+> +		ret = dev->bus->probe(dev);
+> +	else if (drv->probe)
+> +		ret = drv->probe(dev);
+> +
+> +	switch (ret) {
+> +	case -EPROBE_DEFER:
+> +		/* Driver requested deferred probing */
+> +		dev_dbg(dev, "Driver %s requests probe deferral\n", drv->name);
+> +		break;
+> +	case -ENODEV:
+> +	case -ENXIO:
+> +		pr_debug("%s: probe of %s rejects match %d\n",
+> +			 drv->name, dev_name(dev), ret);
+> +		break;
+> +	default:
+> +		/* driver matched but the probe failed */
+> +		pr_warn("%s: probe of %s failed with error %d\n",
+> +			drv->name, dev_name(dev), ret);
 
->=20
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* driver_override will always matc=
-h, send a dummy id */
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!found_id && dev->driver_overri=
-de)
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 found_id =3D pci_match_id(drv->id_t=
-able, dev);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (found_id) {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 /*
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 * if we found id in the static table, we must fulfill the
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 * matching flags (i.e. if PCI_ID_F_DRIVER_OVERRIDE flag =
-is
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 * set, driver_override should be provided).
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 */
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 bool is_driver_override =3D
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (found_id->fla=
-gs & PCI_ID_F_DRIVER_OVERRIDE) !=3D 0;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 if ((is_driver_override && !dev->driver_override) ||
+There should be case 0, that is, success case before default case as below:
++	case 0:
++		/* Driver returned success */
++		break;
 
-b) A static ID match fails if the driver provides an override flag and
-the device does not have an override set, or...=20
+Otherwise even in case of success, above warning would mislead that 
+probe has failed.
 
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (dev->driver_override && !is_driver_ov=
-erride))
-
-c) The device has an override set and the driver does not support the
-override flag.
-
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (dev->driver_override) {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 /*
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 * if we didn't find suitable id in the static table,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 * driver_override will still , send a dummy id
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 */
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 found_id =3D &pci_device_id_any;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return found_id;
->  =C2=A0}
->=20
->=20
-> dynamic ids (new_id) works as before.
->=20
-> Old driver_override works as before.
-
-This is deceptively complicated, but no, I don't believe it does.  By
-my understanding of c) an "old" driver can no longer use
-driver_override for binding a known device.  It seems that if we have a
-static ID match, then we cannot have a driver_override set for the
-device in such a case.  This is a userspace regression.
-
-> For "new" driver_override we must fulfill the new rules.
-
-For override'able drivers, the static table is almost useless other
-than using it for modules.alias support and potentially to provide
-driver_data.  As above, I find this all pretty confusing and I'd advise
-trying to write a concise set of rules outlining the behavior of
-driver_override vs dynamic IDs vs static IDs vs "override'able" driver
-flags.  I tried, I can't, it's convoluted and full of exceptions.
 Thanks,
+Kirti
 
-Alex
-
+> +		break;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+>   static int really_probe(struct device *dev, struct device_driver *drv)
+>   {
+> -	int ret = -EPROBE_DEFER;
+>   	int local_trigger_count = atomic_read(&deferred_trigger_count);
+>   	bool test_remove = IS_ENABLED(CONFIG_DEBUG_TEST_DRIVER_REMOVE) &&
+>   			   !drv->suppress_bind_attrs;
+> +	int ret = -EPROBE_DEFER, probe_ret = 0;
+>   
+>   	if (defer_all_probes) {
+>   		/*
+> @@ -572,15 +602,15 @@ static int really_probe(struct device *dev, struct device_driver *drv)
+>   			goto probe_failed;
+>   	}
+>   
+> -	if (dev->bus->probe) {
+> -		ret = dev->bus->probe(dev);
+> -		if (ret)
+> -			goto probe_failed;
+> -	} else if (drv->probe) {
+> -		ret = drv->probe(dev);
+> -		if (ret)
+> -			goto probe_failed;
+> -	}
+> +	probe_ret = call_driver_probe(dev, drv);
+> +	if (probe_ret) {
+> +		/*
+> +		 * Ignore errors returned by ->probe so that the next driver can
+> +		 * try its luck.
+> +		   */
+> +		ret = 0;
+> +		goto probe_failed;
+> +	}
+>   
+>   	if (device_add_groups(dev, drv->dev_groups)) {
+>   		dev_err(dev, "device_add_groups() failed\n");
+> @@ -650,28 +680,8 @@ static int really_probe(struct device *dev, struct device_driver *drv)
+>   		dev->pm_domain->dismiss(dev);
+>   	pm_runtime_reinit(dev);
+>   	dev_pm_set_driver_flags(dev, 0);
+> -
+> -	switch (ret) {
+> -	case -EPROBE_DEFER:
+> -		/* Driver requested deferred probing */
+> -		dev_dbg(dev, "Driver %s requests probe deferral\n", drv->name);
+> +	if (probe_ret == -EPROBE_DEFER)
+>   		driver_deferred_probe_add_trigger(dev, local_trigger_count);
+> -		break;
+> -	case -ENODEV:
+> -	case -ENXIO:
+> -		pr_debug("%s: probe of %s rejects match %d\n",
+> -			 drv->name, dev_name(dev), ret);
+> -		break;
+> -	default:
+> -		/* driver matched but the probe failed */
+> -		pr_warn("%s: probe of %s failed with error %d\n",
+> -			drv->name, dev_name(dev), ret);
+> -	}
+> -	/*
+> -	 * Ignore errors returned by ->probe so that the next driver can try
+> -	 * its luck.
+> -	 */
+> -	ret = 0;
+>   done:
+>   	atomic_dec(&probe_count);
+>   	wake_up_all(&probe_waitqueue);
+> 
