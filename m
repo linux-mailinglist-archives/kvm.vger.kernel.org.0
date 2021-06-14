@@ -2,70 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BFC683A5F85
-	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 11:53:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F41233A5F88
+	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 11:55:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232769AbhFNJzb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Jun 2021 05:55:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41041 "EHLO
+        id S232718AbhFNJ5I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Jun 2021 05:57:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21228 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232709AbhFNJza (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 14 Jun 2021 05:55:30 -0400
+        by vger.kernel.org with ESMTP id S232630AbhFNJ5H (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 14 Jun 2021 05:57:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623664407;
+        s=mimecast20190719; t=1623664504;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=4kx9Q3nsVnRINu0vIrWoo9nXjPPqt9AsqYqJM+8URyI=;
-        b=DmD/zzSyyUI6UUPShMbzTxNeTo/xOFNgRuLH8zvd5h0q5W3o9M/ziOX1UUGjGGaVMZ9WoP
-        mcGiC1AiHS2I1M558nxIrQ4oQGaB9g2+2zTL58I/xRc3avbhZVbBrTqAXkuF9jWouL478/
-        QU4KNwQ6Fyz3piVQwMfvIiZkExrV7so=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-86-5YiaZPLaOa-WLVtXIPxkvg-1; Mon, 14 Jun 2021 05:53:26 -0400
-X-MC-Unique: 5YiaZPLaOa-WLVtXIPxkvg-1
-Received: by mail-ed1-f69.google.com with SMTP id f12-20020a056402150cb029038fdcfb6ea2so19906776edw.14
-        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 02:53:25 -0700 (PDT)
+        bh=5GpSfzrx0xJrJtYkyiWQUMGDvrq/2BMaXO5677R7IKE=;
+        b=RYCcivvO4BsWm1hlYtv5UT9oPAFoNJHbSiIT/4mQiOeadFY/zbouTtu2f6hdFiSHkKlaoy
+        EnlTiAJlmt+gFXb54rJ2wgQ4pwqZ/tSDyBapD+CWzmK4vcae8QBJJNv8eyoN8dJh3tyPDI
+        wI0M2DFTsDNJQS1bLpa4ZIDX1Oe8Qcg=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-500-YFYzoSO8Nl6rDl_t26bo3w-1; Mon, 14 Jun 2021 05:55:03 -0400
+X-MC-Unique: YFYzoSO8Nl6rDl_t26bo3w-1
+Received: by mail-ed1-f70.google.com with SMTP id p24-20020aa7c8980000b0290393c37fdcb8so8795091eds.6
+        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 02:55:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=4kx9Q3nsVnRINu0vIrWoo9nXjPPqt9AsqYqJM+8URyI=;
-        b=Jpm1KsBMyIDOcsjYkN92SH0VZS01X+OW6A2WeS6t9+lnovznZl+aOFG4EJf9VqoqkY
-         /e1ShkOahZ9Qb6McrIdi7KNq6ccbqK3va99tT5vA6QTlNKW5349qQID8XPrJe5wzCh+D
-         UmlMkmTcKH4nmzh9Z1AZ/bD6d75lLXsDl+kQVrkPzEpHdm/L4lHmyuRWWtmyQx9hjVQY
-         xT25NdJuXsMEy+6DUxDhMf01VsTjIfJ3TrHvSzw5U0vRKmsaLI4pw1uzMoXfz2PZG3b2
-         GmdT5OznutzmyKTGa0gOTYEowj2tSwdJI0KL260VV0T0B14QJFKrV7jsmyo9/5t24CQK
-         s95Q==
-X-Gm-Message-State: AOAM531wFGyXzTsEjdyJuaeb8Ra0Lam3MD3GgoNQGO5cBY/5xcEsScCg
-        BzT2RczUn3eCnZikobrDhZ3fbSCoCbl5PSOQdMWT2RcLH/EdiMDatdz0lc61Suf+IC2UsYLNAT/
-        NQ+rxgeszvzcq
-X-Received: by 2002:aa7:dd1a:: with SMTP id i26mr16204803edv.358.1623664405038;
-        Mon, 14 Jun 2021 02:53:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxDkQ0JPU1g5M6jhW9DnavBLG6plfx7uGDLrqTbEtcjhKBQcyMeEBajFaPx2nWsm5OdUYvaJg==
-X-Received: by 2002:aa7:dd1a:: with SMTP id i26mr16204789edv.358.1623664404859;
-        Mon, 14 Jun 2021 02:53:24 -0700 (PDT)
+        bh=5GpSfzrx0xJrJtYkyiWQUMGDvrq/2BMaXO5677R7IKE=;
+        b=OUUnimE1Zoq+sv+VzcwhcFcUtRICcT/gZICb5UY9o3oSQK3nUaehIcfZw4COD4wblU
+         DAzAB0yfY19w3YC4raGsAMUU6GnUs7IGdXcEgNsdopnUlkFFlLmxq4zXTuFqkdgLFta1
+         MTNHj0CrFxBWnZ0CLn/qwRcJTAbsbee8Y6b7Z1HIIRDhaSrojAkAM6dt+MDppXGVXEju
+         zAy+dGU9sJwgR7Jmkq+SY//TOZJelv2MYLAzh2vM+IYtVCvs/+s/GDW2L2psAmIRKjL2
+         ptP1YlFkftxCOjgtOfOi83QpuUEpboN0RrGuCa04lYAgvEFgJIOSMWASa1HurMzyu6nP
+         rDYw==
+X-Gm-Message-State: AOAM532eXtagBhv29m8tqvMQixhXAwp7l5Bto72l8AAkTAYRFtQ8n/5z
+        CKySVG0C+w9kBtZz9WwWmqJyQSrXlQ7PPesIhvQF4906A/QACGkjc3BStihX7km7ZxZiglqfC1X
+        Utccwo2xfkMbG
+X-Received: by 2002:a17:906:c314:: with SMTP id s20mr14579796ejz.355.1623664501890;
+        Mon, 14 Jun 2021 02:55:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwWNeLkqs/C9K4xRGmFGyx+BAjVTd2ZevdqxiEUIYgVkivaKVYWkbSy2j655l8bktpDoPsDkA==
+X-Received: by 2002:a17:906:c314:: with SMTP id s20mr14579786ejz.355.1623664501756;
+        Mon, 14 Jun 2021 02:55:01 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id p10sm8486235edy.86.2021.06.14.02.53.23
+        by smtp.gmail.com with ESMTPSA id gw7sm6876865ejb.5.2021.06.14.02.55.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Jun 2021 02:53:24 -0700 (PDT)
-Subject: Re: [PATCH 0/4] Remove duplicated stats definitions for debugfs
-To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        LinuxS390 <linux-s390@vger.kernel.org>,
-        Fuad Tabba <tabba@google.com>
-References: <20210614025351.365284-1-jingzhangos@google.com>
+        Mon, 14 Jun 2021 02:55:01 -0700 (PDT)
+Subject: Re: [PATCH 0/8] KVM: x86/mmu: Fast page fault support for the TDP MMU
+To:     David Matlack <dmatlack@google.com>, kvm@vger.kernel.org
+Cc:     Ben Gardon <bgardon@google.com>, Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Andrew Jones <drjones@redhat.com>
+References: <20210611235701.3941724-1-dmatlack@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dc48637c-e683-a64a-b744-bd5fe2037f31@redhat.com>
-Date:   Mon, 14 Jun 2021 11:53:23 +0200
+Message-ID: <639c54a4-3d6b-8b28-8da7-e49f2f87e025@redhat.com>
+Date:   Mon, 14 Jun 2021 11:54:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20210614025351.365284-1-jingzhangos@google.com>
+In-Reply-To: <20210611235701.3941724-1-dmatlack@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -73,36 +75,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/06/21 04:53, Jing Zhang wrote:
-> This is a follow-up patchset to binary stats interface patchset as below:
-> https://lore.kernel.org/kvm/20210611124624.1404010-1-jingzhangos@google.com
-> 
-> This patchset contains a commit to fix some missing stats and add static
-> check to make sure we have the right number of stats descriptors and add an
-> 'offset' field in stats descriptor to make sure the or order of stats
-> descriptors is not relevant to the order of stats in vm/vcpu stats
-> structure. This will totally avoid the possibility of missing stats and
-> mismatched stats definitions.
-> 
-> The binary stats interface defines stats in another array of descriptors,
-> while the original stats debugfs interface uses array of kvm_stats_debugfs
-> item. To remove the duplicated stats definition, this patchset would
-> utilize only the stats descriptors to provide stats information to debugfs
-> interface. This patchset adds a 'mode' flag to support the read/write mode
-> of stats, which can be used to indicate the file permission of debugfs
-> stats files. It removes the usage of kvm_stats_debugfs_item and all the
-> debugfs_entries defined in all archs.
-> 
-> The patch also fixes an issue that read only stats could be cleared in
-> global level, though not permitted in VM level in the original debugfs
-> code.
+On 12/06/21 01:56, David Matlack wrote:
+> This patch series adds support for the TDP MMU in the fast_page_fault
+> path, which enables certain write-protection and access tracking faults
+> to be handled without taking the KVM MMU lock. This series brings the
+> performance of these faults up to par with the legacy MMU.
 
-Thanks for putting this together quickly.  I think we can drop the mode, 
-see the suggestion in patch 2.
+Hi David,
 
-It's probably best to fold the v8 for the stats functionality, these 
-patches (squashed appropriately) and Fuad's remars in a single posting. 
-  But I'm quite confident that it can make it in 5.14.
+I have one very basic question: is the speedup due to lock contention, 
+or to cacheline bouncing, or something else altogether? In other words, 
+what do the profiles look like before vs. after these patches?
+
+Thanks,
 
 Paolo
 
