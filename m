@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CD273A69C2
-	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 17:09:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00B103A69BE
+	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 17:09:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233464AbhFNPLZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Jun 2021 11:11:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36816 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233440AbhFNPLY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S233450AbhFNPLY (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Mon, 14 Jun 2021 11:11:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36814 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233048AbhFNPLX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Jun 2021 11:11:23 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B98EC061574;
-        Mon, 14 Jun 2021 08:09:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D69C5C061574;
+        Mon, 14 Jun 2021 08:09:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=biSLEExcQyfs5JwUr18Y2Ol3Go5SqvudQQgUU8kebvg=; b=C++ekE86qC10KCUGyxDe18MZNR
-        IRV/yNxtAdQSs34z818hbIKSsRPFqFPTcCK2/NtUSXypdMJspdTna/DbIw1+x192rYbZoMC0XLcw4
-        B8NVdAEl1bQB/icn6h4veqZy4oaSJWnYWnoSCk4gHcN9ftqBFQgSMhDQ6kRMHstvyr3Qzo7KhaoOV
-        ZtAyWHqFBAwCDH6qUsCVh6GydKp523EWSOc3+sjCTZ/FSPP6fkPxUTRI6oIiXwxpPU7F7dNF0hubd
-        yl0T/NYwUxnJxcqlN1HeLEHnrX9tnA6QfjfeVP7/fFn9LQpZNksVmMsZpOyCaP6PFOfF8kp6bW6ky
-        1IZy7a7w==;
+        bh=mK8kZxMmwpLFLvKSSecAo5yq1vW8IxoaNB0nNbcvV1U=; b=yr0m7Jr4p1aUsn7BUssbX4oHY2
+        qUU9y0N6s76eAqimmHkw5NlIkP/7mWfuIywU9DEBhC2kXVnFjkrzZdF6cQOyXIAt32zm6fYrVYUMm
+        Pgdo0fmC119vqo+nxX3IWSrUpJepNJ1zY07vfQvrPNczgWz3hkMAo/f6+FVz0HpfbKxGapMy2CwQS
+        h+78w4IP468qSWZq9oK965uP+Jqm+vI4K8aVu+T5ETZu8EQSi3zJepJfyMGVKfoDHBZE0yAnHah+J
+        XZWKpwRIjoAYBbzB0ObFg25j/iJYjiYJpWeCScekbq9T3pm96cCfCqXl2f+v+Wic/qjVq0nXIiQi8
+        TmYiwrLQ==;
 Received: from [2001:4bb8:19b:fdce:4b1a:b4aa:22d8:1629] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lsoD7-00EfkT-5a; Mon, 14 Jun 2021 15:09:09 +0000
+        id 1lsoDA-00Efmq-FH; Mon, 14 Jun 2021 15:09:13 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Jason Gunthorpe <jgg@nvidia.com>,
@@ -48,9 +48,9 @@ Cc:     David Airlie <airlied@linux.ie>,
         linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
         "Rafael J. Wysocki" <rafael@kernel.org>,
         Rodrigo Vivi <rodrigo.vivi@intel.com>
-Subject: [PATCH 06/10] vfio/mdev: Remove CONFIG_VFIO_MDEV_DEVICE
-Date:   Mon, 14 Jun 2021 17:08:42 +0200
-Message-Id: <20210614150846.4111871-7-hch@lst.de>
+Subject: [PATCH 07/10] vfio/mdev: Allow the mdev_parent_ops to specify the device driver to bind
+Date:   Mon, 14 Jun 2021 17:08:43 +0200
+Message-Id: <20210614150846.4111871-8-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210614150846.4111871-1-hch@lst.de>
 References: <20210614150846.4111871-1-hch@lst.de>
@@ -63,215 +63,143 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Jason Gunthorpe <jgg@nvidia.com>
 
-For some reason the vfio_mdev shim mdev_driver has its own module and
-kconfig. As the next patch requires access to it from mdev.ko merge the
-two modules together and remove VFIO_MDEV_DEVICE.
+This allows a mdev driver to opt out of using vfio_mdev.c, instead the
+driver will provide a 'struct mdev_driver' and register directly with the
+driver core.
 
-A later patch deletes this driver entirely.
+Much of mdev_parent_ops becomes unused in this mode:
+- create()/remove() are done via the mdev_driver probe()/remove()
+- mdev_attr_groups becomes mdev_driver driver.dev_groups
+- Wrapper function callbacks are replaced with the same ones from
+  struct vfio_device_ops
 
 Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- Documentation/s390/vfio-ap.rst   |  1 -
- arch/s390/Kconfig                |  2 +-
- drivers/gpu/drm/i915/Kconfig     |  2 +-
- drivers/vfio/mdev/Kconfig        |  7 -------
- drivers/vfio/mdev/Makefile       |  3 +--
- drivers/vfio/mdev/mdev_core.c    | 16 ++++++++++++++--
- drivers/vfio/mdev/mdev_private.h |  2 ++
- drivers/vfio/mdev/vfio_mdev.c    | 24 +-----------------------
- samples/Kconfig                  |  6 +++---
- 9 files changed, 23 insertions(+), 40 deletions(-)
+ drivers/vfio/mdev/mdev_core.c   | 30 ++++++++++++++++++++++--------
+ drivers/vfio/mdev/mdev_driver.c | 10 ++++++++++
+ include/linux/mdev.h            |  2 ++
+ 3 files changed, 34 insertions(+), 8 deletions(-)
 
-diff --git a/Documentation/s390/vfio-ap.rst b/Documentation/s390/vfio-ap.rst
-index e15436599086..f57ae621f33e 100644
---- a/Documentation/s390/vfio-ap.rst
-+++ b/Documentation/s390/vfio-ap.rst
-@@ -514,7 +514,6 @@ These are the steps:
-    * S390_AP_IOMMU
-    * VFIO
-    * VFIO_MDEV
--   * VFIO_MDEV_DEVICE
-    * KVM
- 
-    If using make menuconfig select the following to build the vfio_ap module::
-diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
-index b4c7c34069f8..ea63fd22e119 100644
---- a/arch/s390/Kconfig
-+++ b/arch/s390/Kconfig
-@@ -768,7 +768,7 @@ config VFIO_CCW
- config VFIO_AP
- 	def_tristate n
- 	prompt "VFIO support for AP devices"
--	depends on S390_AP_IOMMU && VFIO_MDEV_DEVICE && KVM
-+	depends on S390_AP_IOMMU && VFIO_MDEV && KVM
- 	depends on ZCRYPT
- 	help
- 		This driver grants access to Adjunct Processor (AP) devices
-diff --git a/drivers/gpu/drm/i915/Kconfig b/drivers/gpu/drm/i915/Kconfig
-index 1e1cb245fca7..53bc68631861 100644
---- a/drivers/gpu/drm/i915/Kconfig
-+++ b/drivers/gpu/drm/i915/Kconfig
-@@ -124,7 +124,7 @@ config DRM_I915_GVT_KVMGT
- 	tristate "Enable KVM/VFIO support for Intel GVT-g"
- 	depends on DRM_I915_GVT
- 	depends on KVM
--	depends on VFIO_MDEV && VFIO_MDEV_DEVICE
-+	depends on VFIO_MDEV
- 	default n
- 	help
- 	  Choose this option if you want to enable KVMGT support for
-diff --git a/drivers/vfio/mdev/Kconfig b/drivers/vfio/mdev/Kconfig
-index 5da27f2100f9..763c877a1318 100644
---- a/drivers/vfio/mdev/Kconfig
-+++ b/drivers/vfio/mdev/Kconfig
-@@ -9,10 +9,3 @@ config VFIO_MDEV
- 	  See Documentation/driver-api/vfio-mediated-device.rst for more details.
- 
- 	  If you don't know what do here, say N.
--
--config VFIO_MDEV_DEVICE
--	tristate "VFIO driver for Mediated devices"
--	depends on VFIO && VFIO_MDEV
--	default n
--	help
--	  VFIO based driver for Mediated devices.
-diff --git a/drivers/vfio/mdev/Makefile b/drivers/vfio/mdev/Makefile
-index 101516fdf375..ff9ecd802125 100644
---- a/drivers/vfio/mdev/Makefile
-+++ b/drivers/vfio/mdev/Makefile
-@@ -1,6 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0-only
- 
--mdev-y := mdev_core.o mdev_sysfs.o mdev_driver.o
-+mdev-y := mdev_core.o mdev_sysfs.o mdev_driver.o vfio_mdev.o
- 
- obj-$(CONFIG_VFIO_MDEV) += mdev.o
--obj-$(CONFIG_VFIO_MDEV_DEVICE) += vfio_mdev.o
 diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index 2a85d6fcb7dd..ff8c1a845166 100644
+index ff8c1a845166..e4581ec093a6 100644
 --- a/drivers/vfio/mdev/mdev_core.c
 +++ b/drivers/vfio/mdev/mdev_core.c
-@@ -360,11 +360,24 @@ int mdev_device_remove(struct mdev_device *mdev)
+@@ -94,9 +94,11 @@ static void mdev_device_remove_common(struct mdev_device *mdev)
+ 	mdev_remove_sysfs_files(mdev);
+ 	device_del(&mdev->dev);
+ 	lockdep_assert_held(&parent->unreg_sem);
+-	ret = parent->ops->remove(mdev);
+-	if (ret)
+-		dev_err(&mdev->dev, "Remove failed: err=%d\n", ret);
++	if (parent->ops->remove) {
++		ret = parent->ops->remove(mdev);
++		if (ret)
++			dev_err(&mdev->dev, "Remove failed: err=%d\n", ret);
++	}
  
- static int __init mdev_init(void)
- {
--	return mdev_bus_register();
-+	int rc;
+ 	/* Balances with device_initialize() */
+ 	put_device(&mdev->dev);
+@@ -127,7 +129,9 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+ 	char *envp[] = { env_string, NULL };
+ 
+ 	/* check for mandatory ops */
+-	if (!ops || !ops->create || !ops->remove || !ops->supported_type_groups)
++	if (!ops || !ops->supported_type_groups)
++		return -EINVAL;
++	if (!ops->device_driver && (!ops->create || !ops->remove))
+ 		return -EINVAL;
+ 
+ 	dev = get_device(dev);
+@@ -256,6 +260,7 @@ int mdev_device_create(struct mdev_type *type, const guid_t *uuid)
+ 	int ret;
+ 	struct mdev_device *mdev, *tmp;
+ 	struct mdev_parent *parent = type->parent;
++	struct mdev_driver *drv = parent->ops->device_driver;
+ 
+ 	mutex_lock(&mdev_list_lock);
+ 
+@@ -296,14 +301,22 @@ int mdev_device_create(struct mdev_type *type, const guid_t *uuid)
+ 		goto out_put_device;
+ 	}
+ 
+-	ret = parent->ops->create(mdev);
+-	if (ret)
+-		goto out_unlock;
++	if (parent->ops->create) {
++		ret = parent->ops->create(mdev);
++		if (ret)
++			goto out_unlock;
++	}
+ 
+ 	ret = device_add(&mdev->dev);
+ 	if (ret)
+ 		goto out_remove;
+ 
++	if (!drv)
++		drv = &vfio_mdev_driver;
++	ret = device_driver_attach(&drv->driver, &mdev->dev);
++	if (ret)
++		goto out_del;
 +
-+	rc = mdev_bus_register();
-+	if (rc)
-+		return rc;
-+	rc = mdev_register_driver(&vfio_mdev_driver);
-+	if (rc)
-+		goto err_bus;
+ 	ret = mdev_create_sysfs_files(mdev);
+ 	if (ret)
+ 		goto out_del;
+@@ -317,7 +330,8 @@ int mdev_device_create(struct mdev_type *type, const guid_t *uuid)
+ out_del:
+ 	device_del(&mdev->dev);
+ out_remove:
+-	parent->ops->remove(mdev);
++	if (parent->ops->remove)
++		parent->ops->remove(mdev);
+ out_unlock:
+ 	up_read(&parent->unreg_sem);
+ out_put_device:
+diff --git a/drivers/vfio/mdev/mdev_driver.c b/drivers/vfio/mdev/mdev_driver.c
+index 041699571b7e..c368ec824e2b 100644
+--- a/drivers/vfio/mdev/mdev_driver.c
++++ b/drivers/vfio/mdev/mdev_driver.c
+@@ -71,10 +71,20 @@ static int mdev_remove(struct device *dev)
+ 	return 0;
+ }
+ 
++static int mdev_match(struct device *dev, struct device_driver *drv)
++{
++	/*
++	 * No drivers automatically match. Drivers are only bound by explicit
++	 * device_driver_attach()
++	 */
 +	return 0;
-+err_bus:
-+	mdev_bus_unregister();
-+	return rc;
- }
- 
- static void __exit mdev_exit(void)
- {
-+	mdev_unregister_driver(&vfio_mdev_driver);
++}
 +
- 	if (mdev_bus_compat_class)
- 		class_compat_unregister(mdev_bus_compat_class);
- 
-@@ -378,4 +391,3 @@ MODULE_VERSION(DRIVER_VERSION);
- MODULE_LICENSE("GPL v2");
- MODULE_AUTHOR(DRIVER_AUTHOR);
- MODULE_DESCRIPTION(DRIVER_DESC);
--MODULE_SOFTDEP("post: vfio_mdev");
-diff --git a/drivers/vfio/mdev/mdev_private.h b/drivers/vfio/mdev/mdev_private.h
-index 6999c89db7b1..afbad7b0a14a 100644
---- a/drivers/vfio/mdev/mdev_private.h
-+++ b/drivers/vfio/mdev/mdev_private.h
-@@ -37,6 +37,8 @@ struct mdev_type {
- #define to_mdev_type(_kobj)		\
- 	container_of(_kobj, struct mdev_type, kobj)
- 
-+extern struct mdev_driver vfio_mdev_driver;
-+
- int  parent_create_sysfs_files(struct mdev_parent *parent);
- void parent_remove_sysfs_files(struct mdev_parent *parent);
- 
-diff --git a/drivers/vfio/mdev/vfio_mdev.c b/drivers/vfio/mdev/vfio_mdev.c
-index 922729071c5a..d5b4eede47c1 100644
---- a/drivers/vfio/mdev/vfio_mdev.c
-+++ b/drivers/vfio/mdev/vfio_mdev.c
-@@ -17,10 +17,6 @@
- 
- #include "mdev_private.h"
- 
--#define DRIVER_VERSION  "0.1"
--#define DRIVER_AUTHOR   "NVIDIA Corporation"
--#define DRIVER_DESC     "VFIO based driver for Mediated device"
--
- static int vfio_mdev_open(struct vfio_device *core_vdev)
- {
- 	struct mdev_device *mdev = to_mdev_device(core_vdev->dev);
-@@ -151,7 +147,7 @@ static void vfio_mdev_remove(struct mdev_device *mdev)
- 	kfree(vdev);
- }
- 
--static struct mdev_driver vfio_mdev_driver = {
-+struct mdev_driver vfio_mdev_driver = {
- 	.driver = {
- 		.name = "vfio_mdev",
- 		.owner = THIS_MODULE,
-@@ -160,21 +156,3 @@ static struct mdev_driver vfio_mdev_driver = {
- 	.probe	= vfio_mdev_probe,
- 	.remove	= vfio_mdev_remove,
+ struct bus_type mdev_bus_type = {
+ 	.name		= "mdev",
+ 	.probe		= mdev_probe,
+ 	.remove		= mdev_remove,
++	.match		= mdev_match,
  };
--
--static int __init vfio_mdev_init(void)
--{
--	return mdev_register_driver(&vfio_mdev_driver);
--}
--
--static void __exit vfio_mdev_exit(void)
--{
--	mdev_unregister_driver(&vfio_mdev_driver);
--}
--
--module_init(vfio_mdev_init)
--module_exit(vfio_mdev_exit)
--
--MODULE_VERSION(DRIVER_VERSION);
--MODULE_LICENSE("GPL v2");
--MODULE_AUTHOR(DRIVER_AUTHOR);
--MODULE_DESCRIPTION(DRIVER_DESC);
-diff --git a/samples/Kconfig b/samples/Kconfig
-index b5a1a7aa7e23..b0503ef058d3 100644
---- a/samples/Kconfig
-+++ b/samples/Kconfig
-@@ -154,14 +154,14 @@ config SAMPLE_UHID
+ EXPORT_SYMBOL_GPL(mdev_bus_type);
  
- config SAMPLE_VFIO_MDEV_MTTY
- 	tristate "Build VFIO mtty example mediated device sample code -- loadable modules only"
--	depends on VFIO_MDEV_DEVICE && m
-+	depends on VFIO_MDEV && m
- 	help
- 	  Build a virtual tty sample driver for use as a VFIO
- 	  mediated device
- 
- config SAMPLE_VFIO_MDEV_MDPY
- 	tristate "Build VFIO mdpy example mediated device sample code -- loadable modules only"
--	depends on VFIO_MDEV_DEVICE && m
-+	depends on VFIO_MDEV && m
- 	help
- 	  Build a virtual display sample driver for use as a VFIO
- 	  mediated device.  It is a simple framebuffer and supports
-@@ -178,7 +178,7 @@ config SAMPLE_VFIO_MDEV_MDPY_FB
- 
- config SAMPLE_VFIO_MDEV_MBOCHS
- 	tristate "Build VFIO mdpy example mediated device sample code -- loadable modules only"
--	depends on VFIO_MDEV_DEVICE && m
-+	depends on VFIO_MDEV && m
- 	select DMA_SHARED_BUFFER
- 	help
- 	  Build a virtual display sample driver for use as a VFIO
+diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+index 1fb34ea394ad..3a38598c2605 100644
+--- a/include/linux/mdev.h
++++ b/include/linux/mdev.h
+@@ -55,6 +55,7 @@ struct device *mtype_get_parent_dev(struct mdev_type *mtype);
+  * register the device to mdev module.
+  *
+  * @owner:		The module owner.
++ * @device_driver:	Which device driver to probe() on newly created devices
+  * @dev_attr_groups:	Attributes of the parent device.
+  * @mdev_attr_groups:	Attributes of the mediated device.
+  * @supported_type_groups: Attributes to define supported types. It is mandatory
+@@ -103,6 +104,7 @@ struct device *mtype_get_parent_dev(struct mdev_type *mtype);
+  **/
+ struct mdev_parent_ops {
+ 	struct module   *owner;
++	struct mdev_driver *device_driver;
+ 	const struct attribute_group **dev_attr_groups;
+ 	const struct attribute_group **mdev_attr_groups;
+ 	struct attribute_group **supported_type_groups;
 -- 
 2.30.2
 
