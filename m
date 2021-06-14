@@ -2,323 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 488FD3A679B
-	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 15:20:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D74303A67A0
+	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 15:20:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233621AbhFNNWT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Jun 2021 09:22:19 -0400
-Received: from mail-lj1-f179.google.com ([209.85.208.179]:39832 "EHLO
-        mail-lj1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233450AbhFNNWS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Jun 2021 09:22:18 -0400
-Received: by mail-lj1-f179.google.com with SMTP id c11so20156497ljd.6
-        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 06:20:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=SlrMZ4dwNYn/ZEK4g9WD4YfB6VDpQni4QzxQiKRf/5Q=;
-        b=gh7ZHmgp265oLvqqvEuLJMVmvQevoPFQYJEVz2YVfV5rF6AdX2tw6jbNEyS9oqKRSf
-         DAx+vZXJhN/8jPsH/6U6X1SHanCm+jfDrIeBc1o8E8aQQQSxVmU2xY3GPqZE4mmxuReZ
-         yoL53V/auJl3zr/qpV3vTIW1ZlJtBIo6klS3ENQmrCRyzcZ7DgtdViGDKol1+CCpGt5v
-         +QzHDIswq8gySkr9V0UTt8mJQGebnGJoBv6QtLSL310Z1WgMp4TVwXluXh+BImTXkE9r
-         a0esStXpOWg89hsIjzwLBFORuqbw9IbHNItbUfapkBY22xJK4iU0NZHsjoPgyf6WoLEG
-         4kXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=SlrMZ4dwNYn/ZEK4g9WD4YfB6VDpQni4QzxQiKRf/5Q=;
-        b=t4E1tnx8O3fVlI4uZd1ryG+dcxRsZbUlDnFYVLrsL8926iOIEDvd30yOv+xN1DfR+p
-         Uis3F+EizxxG/2M5z/rS1NRIJQnAn/CBbzFJFgfMh31PuOl0mCCSI7ATaJ7rn+XcVaoS
-         843q2z6TQiwagighyUbZ7dVMqf4Rdpn2QNH+yWAGncyX7r6lPBHYqFD6exsuusluAuV5
-         X0kkIaKmVtNWh8/VlLq0czs9/dlRKvnUlpUrvqORHzejO44XBW3nPmKj4StBCZVgmlcE
-         ViMZFc5/Je+O1Z4vevJsnDoaxTi1gOoAJrIuyavZN9L8B5wgC0PeHOso7LlD8NUszy1c
-         B0NA==
-X-Gm-Message-State: AOAM533ykGilkvVPlN9crAO/NilDa5JfiDx9xi6Lggn1oB2R0g86c5YI
-        WP+lXYVR35cdQO0Wf/CuaZZNrKAw93ZpP8FjbGL14w==
-X-Google-Smtp-Source: ABdhPJxLFgBwZYSWOFz+YE4WYc05v7MCMMRXGHJiA9VktBcIbsNdxJoFsu9oGwcnR++LD4Yxu0mR/mu0bpUhJ9OAcdA=
-X-Received: by 2002:a05:651c:d7:: with SMTP id 23mr13784560ljr.207.1623676754764;
- Mon, 14 Jun 2021 06:19:14 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210603211426.790093-1-jingzhangos@google.com>
- <20210603211426.790093-4-jingzhangos@google.com> <CA+EHjTxeZOAPA9w6UJe7rW+-UdznrEsNmomWodZDN3DLgLoJKA@mail.gmail.com>
-In-Reply-To: <CA+EHjTxeZOAPA9w6UJe7rW+-UdznrEsNmomWodZDN3DLgLoJKA@mail.gmail.com>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Mon, 14 Jun 2021 08:19:02 -0500
-Message-ID: <CAAdAUtiVcUqix3W7YZ5HU6VjWwkZEsgWFJ=4S2xeyWHLn8Q5zA@mail.gmail.com>
-Subject: Re: [PATCH v7 3/4] KVM: stats: Add documentation for statistics data
- binary interface
-To:     Fuad Tabba <tabba@google.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        LinuxS390 <linux-s390@vger.kernel.org>,
-        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        id S233770AbhFNNWZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Jun 2021 09:22:25 -0400
+Received: from mail-mw2nam12on2060.outbound.protection.outlook.com ([40.107.244.60]:48769
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S233717AbhFNNWY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Jun 2021 09:22:24 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ym4errBmsh1q8QoHhuI8a34qsFoGW3P3GMNQqK+aWsg7A2IxzOBGO5qVdxc5ffRwUjLHb5iUSTVl0jFj3NJoaVMZYirWfF88Tt13+4JEspe0y0qZBAW47meODO0YURndzDJ49Che4EOd6Z41/td8BveIFdRC9dTiPK+tDAUPW9tO/tHBeP+3EL+f3+2sZ5FiwiqQoiga1zJ3tO/hZLaJpUe9cny9g+CFwuZbtFdG178/DsTnlLFVnkxcToTywR7AVvD5AaNpL28KYnIRroj+YOh/EhsBcXRgmWPLw80amhpYkme0f8qq6ESHpNkjKsnQbq6TWWxP2JbAmr08U7/oMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AcUcqV9aPG5kS58MXcoYSVsLN/AKgmwv5nRDztm+r5Q=;
+ b=MjV7ye4X2j5ssZUKK3samWtplhv9IYB4mCrBvwf66p3yugL0k+IPOM5B7OfVLkdPSAKIsHt0Bcx2KUzLQxPnJtSB0zz4zZMjJ7iYhgvPBdNyY6AJfE59PLPekvNwQYkS3kBvevBTJgnnar4OoFG/nxRDWUWHKeseETlIxLVEiwDmRfNdVFURXvW8s/4WJdYfCM8PnRk0RhbqP3pEVq2kDXYUw3z1A6a3BShryESxIsfcgXMi8juMlygsprG3/URq0XV6U4ngWGHx/ot2IeKB3rmLTZlc62oXHT7lUpmPjY3x7gpxz/0mWa92BuOe1E3eDDemgRxXJeswXnSoTeQQjw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AcUcqV9aPG5kS58MXcoYSVsLN/AKgmwv5nRDztm+r5Q=;
+ b=29I/LKAADjrNEyB6WMRNZ+KYPFxjNVAkjda2r7rN8D/G54YLTFwN48IKymsaV1oSpHq4LtimphetHAvLqgEX8yGVTf1lk5U+ezQpuQYIzTZzDMPrlfLKci286cQ9b94deA5M9vGMDXAUulvwLm3MPdmjUzEJOUBly+C+/aIGeB4=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB2714.namprd12.prod.outlook.com (2603:10b6:5:42::18) by
+ DM6PR12MB4481.namprd12.prod.outlook.com (2603:10b6:5:2af::11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4219.24; Mon, 14 Jun 2021 13:20:20 +0000
+Received: from DM6PR12MB2714.namprd12.prod.outlook.com
+ ([fe80::7df8:b0cd:fe1b:ae7b]) by DM6PR12MB2714.namprd12.prod.outlook.com
+ ([fe80::7df8:b0cd:fe1b:ae7b%5]) with mapi id 15.20.4219.022; Mon, 14 Jun 2021
+ 13:20:20 +0000
+Cc:     brijesh.singh@amd.com, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 21/22] x86/sev: Register SNP guest request
+ platform device
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-22-brijesh.singh@amd.com> <YMEVedGOrYgI1Klc@work-vm>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <aef906ea-764d-0bbc-49c6-b3ecfc192214@amd.com>
+Date:   Mon, 14 Jun 2021 08:20:16 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.11.0
+In-Reply-To: <YMEVedGOrYgI1Klc@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [70.112.153.56]
+X-ClientProxiedBy: SN4PR0501CA0040.namprd05.prod.outlook.com
+ (2603:10b6:803:41::17) To DM6PR12MB2714.namprd12.prod.outlook.com
+ (2603:10b6:5:42::18)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SN4PR0501CA0040.namprd05.prod.outlook.com (2603:10b6:803:41::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4242.9 via Frontend Transport; Mon, 14 Jun 2021 13:20:17 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1be80567-86cc-4346-0d66-08d92f37287e
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4481:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB44816E1756B10FB213DF2629E5319@DM6PR12MB4481.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 3MycA8rCUQQe549oiulh6p9Odmx154VtRgPO1kpdnoaLMd5MaZiB5a3RuDXylSfnn9DqkBlAajqxAXKNd0BPy+ljURd49QUuCljZraycB3EK+dJMoYSghTeVmJgSy8amhhesemekhxa59gAwUkXf1NEKxAlSMCFnEovQkIiqFvX6A8avARYdsN02vVgRbn3qlhC1/+4WxDzBFtf3OheQuK0fljEoIHQ3jouyXTYAqVi167rJ7GeaA/mUCaHJJDehzOHN4fjOm5gTa5EaXc2HdNNKmrrn6pABFmqVDGwDXHSD67r1JxGRcBFmhFldbu433b+rvnJlFn6SD9oJhmp6S47OTloub9zFLgWqD+w8uf5eivNUmFvlhcw+giPeYfM2LuGZV6s2o6fUIpQK0ZaZNJBIs0mYKruuzE86aINoz1WT31x/PlElFME3d2gSCF6AweMvNhmCZPF8Giiv7ryLgyp7mRdUJROE9Ckn4AbkuWReUTawCZBTb1Ybb8GWKjnd3krEu0sou5p0iJB5gst/n971XNt7hojEq6h2tHW2SXElGnCrEXpmI8o0VfSTxqhMZigsiArNse8C6i4YJPAcihMsrb5omLWAnRws5QYe9uqMZALGzU2WbPeagg0OeRA0M0wot0H0zqKztltSfyE/O5chtzIdznL/Fg7m64dEZ3CvUD08RZC9MCp5R/I0H2pYi21YSjU9jF/MFJPK5SzNcw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2714.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(136003)(39860400002)(376002)(396003)(346002)(956004)(2616005)(478600001)(44832011)(8936002)(7416002)(2906002)(16526019)(186003)(54906003)(26005)(316002)(52116002)(6916009)(86362001)(4326008)(31686004)(53546011)(6506007)(8676002)(5660300002)(66476007)(83380400001)(38350700002)(36756003)(6486002)(66946007)(6512007)(66556008)(31696002)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NWM3VGF3YmhGODJNMkliQkZxRmRld3hyRnA3MDk2N2dUWThQRnBYTHpjQlFQ?=
+ =?utf-8?B?dCtZS3Bqc2JPS1IrQkQwdEwxQ2lqZkVmYmVIVVlqd0ErUVZjRjNlUnVja0cv?=
+ =?utf-8?B?eVpyWmdZRXg4eXNGZHdNSDVrdVNWbFFVOVFTQnJxelB0VXhscjZwdlZ1VjM2?=
+ =?utf-8?B?VmlFODFQMm85N0F5bmxiSDErOWRETnA0V21Uc3JtWks2d2p1VWpSaE4rTlRC?=
+ =?utf-8?B?SmVLNnNIMEdseW9Ca0lkQm4yUjAzRDF2QkN1RjlaM0h2U0V1RHh2SG1TeGtK?=
+ =?utf-8?B?U3RqMVBZeTdRUE5FTWovNzJnckF2Sk5QQTl1dDJmQ3VaeVJVd2Z0amFmT2RL?=
+ =?utf-8?B?WVcwaG9SeGg2c1hjMW1sdy9MaDdja2ltL0hnUjFRbE9LN1hzZTlhZmJudC9v?=
+ =?utf-8?B?UGs0ZUUzNkVuZmoxOHdPNkdaQzZmNjBKTVYzZTJUL0VrSUNPdmk2MzF5UEtO?=
+ =?utf-8?B?WXlLZUhWK3c2bTJFOVB2bjhwTEhSY2NLQ0U4Y0srd1o5UUFCWWwzSS9TNHY5?=
+ =?utf-8?B?M2dJOGtndHpjcFBLWXVTUEkzZEpvVkxXb0FWKzFxa294cVFoNXliQUFhMlN2?=
+ =?utf-8?B?MkhFRE9sNm1lMWw3T3BMNk9PV0V0OWlaWlZJODNOTHc3byswRlRMMlU0QStS?=
+ =?utf-8?B?ODVxWDhFSysyZmZ2N0JSdE1WTHJNTXFiZkkweVpoUkRsV0FnbHdDbDFQOW56?=
+ =?utf-8?B?Z1EzeW4xMzVxQmpvQmZoMVNMR2JGNjdUT3FhY2VCRXBTbFpEUldEYUNibmI4?=
+ =?utf-8?B?VFZsWThBQTlURzJJK1ptYVI3Ry9WT0tsWGlpRnk0dWQ5eHdUM2JyMzJZTEMr?=
+ =?utf-8?B?Mm1xbktzUUhuakpJTUdEYW1uOXNEVDdEb3VBUjUraElxN08xbm1nbnh1TDVJ?=
+ =?utf-8?B?ZWlwN09GQVo3dlhneWo4blhleUljOGtYSVE1ZEFKamdmMlRiV2x4bm91ZTVO?=
+ =?utf-8?B?RFZyT1FnRFNKTkJaNDlsWFUrc2sra2RGQlRHaDFxYnVpTjdkMWErYXJ3V1pi?=
+ =?utf-8?B?eTM0U00rSWxRbUFtaXBuQXhoaEZocHBMT2ZmQXJDUGdYOThpSWxhTHp2QVRt?=
+ =?utf-8?B?YUh0VEo1ZDlBRVdKVlZZKy9KMnlsTUZCYllabm1VUG56TGlmUmYvQVB1UzBj?=
+ =?utf-8?B?VHF1U2I1RlJjSmRnaUkvRVBldVBFeWtaWXM5UnJtS1Rrb0dHeDVoWkFWbmZB?=
+ =?utf-8?B?VVB0bkRXaThEMVZnRUFGL3dKUWt4WDUwelJhQ1V4dnlOSVJLZi9iRnZ4VWdh?=
+ =?utf-8?B?aTlDYnN0UEV6SnpmaUl2Nk11L2RPVTdqWjlXYVZFNENva2RFNnhscG1HN2li?=
+ =?utf-8?B?N2xxNFhEZVRhcHBVZStYZ2JvcUU1VUhLYXpRdVZDbnZzcGk0WWpSUlNKS0hU?=
+ =?utf-8?B?eXd3bHcxaDRrWDBGV0ZMMnpvZksvZWx5Rmdremc5a3dJQnh6cG03RzRsY3Zx?=
+ =?utf-8?B?WldFd3V6VENnZkY4dTJRRktrUGtaZ2xsT2N1cmVpQ0xxVkV2M1ZEYVBQdmF1?=
+ =?utf-8?B?eXc5a20zaDhFQVgwdmtDN2pwNE1qc3RYWThGWmwrNXhqM0FWZ3gyVjczUjNj?=
+ =?utf-8?B?d0hzN0RpMFdRT2dLSlpLWE8rbmJSLzB4RXdnc0pQUWdNMW9Ga3VWSzdiLzFW?=
+ =?utf-8?B?enFnUVM3VXB0ZFpuVGJ4aVBXaVdUVjlQT0lPcmJOcDNNZnB3eW9TdUtIanRL?=
+ =?utf-8?B?ZGRMT2pYQ2kwOW5tdWlEWk05NURIUTJwc3kxdnp1SklXT2tOc3F2dnhhd0ZG?=
+ =?utf-8?Q?G/EMgKmoIh2/Zdse9BnYQwH70rNvhqDfbqm4CAs?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1be80567-86cc-4346-0d66-08d92f37287e
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2714.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2021 13:20:20.1340
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IxcSqUlDwHIsPUUQ8AJhTg1zW6dEz12nMv1Y4352t/5Edz9BI1zKTxGhghU6sWU6ekQeFeXYumR4gnUQ5ttkog==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4481
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Fuad,
+I see that Tom answered few comments. I will cover others.
 
-On Mon, Jun 14, 2021 at 2:57 AM Fuad Tabba <tabba@google.com> wrote:
+
+On 6/9/21 2:24 PM, Dr. David Alan Gilbert wrote:
++ /*
+>> +	 * The message sequence counter for the SNP guest request is a 64-bit value
+>> +	 * but the version 2 of GHCB specification defines the 32-bit storage for the
+>> +	 * it.
+>> +	 */
+>> +	if ((count + 1) >= INT_MAX)
+>> +		return 0;
+> Is that UINT_MAX?
+
+Good catch. It should be UINT_MAX.
+
+
+> +	/*
+> +	 * The secret page contains the VM encryption key used for encrypting the
+> +	 * messages between the guest and the PSP. The secrets page location is
+> +	 * available either through the setup_data or EFI configuration table.
+> +	 */
+> +	if (hdr->cc_blob_address) {
+> +		paddr = hdr->cc_blob_address;
+> Can you trust the paddr the host has given you or do you need to do some
+> form of validation?
+The paddr is mapped encrypted. That means that data  in the paddr must
+be encrypted either through the guest or PSP. After locating the paddr,
+we perform a simply sanity check (32-bit magic string "AMDE"). See the
+verify header check below. Unfortunately the secrets page itself does
+not contain any magic key which we can use to ensure that
+hdr->secret_paddr is actually pointing to the secrets pages but all of
+these memory is accessed encrypted so its safe to access it. If VMM
+lying to us that basically means guest will not be able to communicate
+with the PSP and can't do the attestation etc.
+
 >
-> Hi Jing,
->
->
-> On Thu, Jun 3, 2021 at 10:14 PM Jing Zhang <jingzhangos@google.com> wrote:
-> >
-> > Update KVM API documentation for binary statistics.
-> >
-> > Reviewed-by: David Matlack <dmatlack@google.com>
-> > Reviewed-by: Ricardo Koller <ricarkol@google.com>
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  Documentation/virt/kvm/api.rst | 180 +++++++++++++++++++++++++++++++++
-> >  1 file changed, 180 insertions(+)
-> >
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index 7fcb2fd38f42..550bfbdf611b 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -5034,6 +5034,178 @@ see KVM_XEN_VCPU_SET_ATTR above.
-> >  The KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADJUST type may not be used
-> >  with the KVM_XEN_VCPU_GET_ATTR ioctl.
-> >
-> > +4.130 KVM_GET_STATS_FD
-> > +---------------------
->
-> nit: missing one - (to match the subtitle length)
->
-> > +
-> > +:Capability: KVM_CAP_STATS_BINARY_FD
-> > +:Architectures: all
-> > +:Type: vm ioctl, vcpu ioctl
-> > +:Parameters: none
-> > +:Returns: statistics file descriptor on success, < 0 on error
-> > +
-> > +Errors:
-> > +
-> > +  ======     ======================================================
-> > +  ENOMEM     if the fd could not be created due to lack of memory
-> > +  EMFILE     if the number of opened files exceeds the limit
-> > +  ======     ======================================================
-> > +
-> > +The file descriptor can be used to read VM/vCPU statistics data in binary
-> > +format. The file data is organized into three blocks as below:
-> > ++-------------+
-> > +|   Header    |
-> > ++-------------+
-> > +| Descriptors |
-> > ++-------------+
-> > +| Stats Data  |
-> > ++-------------+
-> > +
-> > +The Header block is always at the start of the file. It is only needed to be
-> > +read one time for the lifetime of the file descriptor.
-> > +It is in the form of ``struct kvm_stats_header`` as below::
-> > +
-> > +       #define KVM_STATS_ID_MAXLEN             64
-> > +
-> > +       struct kvm_stats_header {
-> > +               char id[KVM_STATS_ID_MAXLEN];
-> > +               __u32 name_size;
-> > +               __u32 count;
-> > +               __u32 desc_offset;
-> > +               __u32 data_offset;
-> > +       };
-> > +
-> > +The ``id`` field is identification for the corresponding KVM statistics. For
-> > +VM statistics, it is in the form of "kvm-{kvm pid}", like "kvm-12345". For
-> > +VCPU statistics, it is in the form of "kvm-{kvm pid}/vcpu-{vcpu id}", like
-> > +"kvm-12345/vcpu-12".
-> > +
-> > +The ``name_size`` field is the size (byte) of the statistics name string
-> > +(including trailing '\0') appended to the end of every statistics descriptor.
-> > +
-> > +The ``count`` field is the number of statistics.
-> > +
-> > +The ``desc_offset`` field is the offset of the Descriptors block from the start
-> > +of the file indicated by the file descriptor.
-> > +
-> > +The ``data_offset`` field is the offset of the Stats Data block from the start
-> > +of the file indicated by the file descriptor.
-> > +
-> > +The Descriptors block is only needed to be read once for the lifetime of the
-> > +file descriptor. It is an array of ``struct kvm_stats_desc`` as shown in
-> > +below code block::
-> > +
-> > +       #define KVM_STATS_TYPE_SHIFT            0
-> > +       #define KVM_STATS_TYPE_MASK             (0xF << KVM_STATS_TYPE_SHIFT)
-> > +       #define KVM_STATS_TYPE_CUMULATIVE       (0x0 << KVM_STATS_TYPE_SHIFT)
-> > +       #define KVM_STATS_TYPE_INSTANT          (0x1 << KVM_STATS_TYPE_SHIFT)
-> > +       #define KVM_STATS_TYPE_MAX              KVM_STATS_TYPE_INSTANT
-> > +
-> > +       #define KVM_STATS_UNIT_SHIFT            4
-> > +       #define KVM_STATS_UNIT_MASK             (0xF << KVM_STATS_UNIT_SHIFT)
-> > +       #define KVM_STATS_UNIT_NONE             (0x0 << KVM_STATS_UNIT_SHIFT)
-> > +       #define KVM_STATS_UNIT_BYTES            (0x1 << KVM_STATS_UNIT_SHIFT)
-> > +       #define KVM_STATS_UNIT_SECONDS          (0x2 << KVM_STATS_UNIT_SHIFT)
-> > +       #define KVM_STATS_UNIT_CYCLES           (0x3 << KVM_STATS_UNIT_SHIFT)
-> > +       #define KVM_STATS_UNIT_MAX              KVM_STATS_UNIT_CYCLES
-> > +
-> > +       #define KVM_STATS_BASE_SHIFT            8
-> > +       #define KVM_STATS_BASE_MASK             (0xF << KVM_STATS_BASE_SHIFT)
-> > +       #define KVM_STATS_BASE_POW10            (0x0 << KVM_STATS_BASE_SHIFT)
-> > +       #define KVM_STATS_BASE_POW2             (0x1 << KVM_STATS_BASE_SHIFT)
-> > +       #define KVM_STATS_BASE_MAX              KVM_STATS_BASE_POW2
-> > +
-> > +       struct kvm_stats_desc {
-> > +               __u32 flags;
-> > +               __s16 exponent;
-> > +               __u16 size;
-> > +               __u32 unused1;
-> > +               __u32 unused2;
-> > +               char name[0];
-> > +       };
-> > +
-> > +The ``flags`` field contains the type and unit of the statistics data described
-> > +by this descriptor. The following flags are supported:
-> > +
-> > +Bits 0-3 of ``flags`` encode the type:
-> > +  * ``KVM_STATS_TYPE_CUMULATIVE``
-> > +    The statistics data is cumulative. The value of data can only be increased.
-> > +    Most of the counters used in KVM are of this type.
-> > +    The corresponding ``count`` filed for this type is always 1.
->
-> filed -> field
->
-> > +  * ``KVM_STATS_TYPE_INSTANT``
-> > +    The statistics data is instantaneous. Its value can be increased or
-> > +    decreased. This type is usually used as a measurement of some resources,
-> > +    like the number of dirty pages, the number of large pages, etc.
-> > +    The corresponding ``count`` field for this type is always 1.
-> > +
-> > +Bits 4-7 of ``flags`` encode the unit:
-> > +  * ``KVM_STATS_UNIT_NONE``
-> > +    There is no unit for the value of statistics data. This usually means that
-> > +    the value is a simple counter of an event.
-> > +  * ``KVM_STATS_UNIT_BYTES``
-> > +    It indicates that the statistics data is used to measure memory size, in the
-> > +    unit of Byte, KiByte, MiByte, GiByte, etc. The unit of the data is
-> > +    determined by the ``exponent`` field in the descriptor. The
-> > +    ``KVM_STATS_BASE_POW2`` flag is valid in this case. The unit of the data is
-> > +    determined by ``pow(2, exponent)``. For example, if value is 10,
-> > +    ``exponent`` is 20, which means the unit of statistics data is MiByte, we
-> > +    can get the statistics data in the unit of Byte by
-> > +    ``value * pow(2, exponent) = 10 * pow(2, 20) = 10 MiByte`` which is
-> > +    10 * 1024 * 1024 Bytes.
-> > +  * ``KVM_STATS_UNIT_SECONDS``
-> > +    It indicates that the statistics data is used to measure time/latency, in
-> > +    the unit of nanosecond, microsecond, millisecond and second. The unit of the
-> > +    data is determined by the ``exponent`` field in the descriptor. The
-> > +    ``KVM_STATS_BASE_POW10`` flag is valid in this case. The unit of the data
-> > +    is determined by ``pow(10, exponent)``. For example, if value is 2000000,
-> > +    ``exponent`` is -6, which means the unit of statistics data is microsecond,
-> > +    we can get the statistics data in the unit of second by
-> > +    ``value * pow(10, exponent) = 2000000 * pow(10, -6) = 2 seconds``.
-> > +  * ``KVM_STATS_UNIT_CYCLES``
-> > +    It indicates that the statistics data is used to measure CPU clock cycles.
-> > +    The ``KVM_STATS_BASE_POW10`` flag is valid in this case. For example, if
-> > +    value is 200, ``exponent`` is 4, we can get the number of CPU clock cycles
-> > +    by ``value * pow(10, exponent) = 200 * pow(10, 4) = 2000000``.
-> > +
-> > +Bits 7-11 of ``flags`` encode the base:
->
-> Bits 8-11
->
-> > +  * ``KVM_STATS_BASE_POW10``
-> > +    The scale is based on power of 10. It is used for measurement of time and
-> > +    CPU clock cycles.
-> > +  * ``KVM_STATS_BASE_POW2``
-> > +    The scale is based on power of 2. It is used for measurement of memory size.
-> > +
-> > +The ``exponent`` field is the scale of corresponding statistics data. For
-> > +example, if the unit is ``KVM_STATS_UNIT_BYTES``, the base is
-> > +``KVM_STATS_BASE_POW2``, the ``exponent`` is 10, then we know that the real
-> > +unit of the statistics data is KBytes a.k.a pow(2, 10) = 1024 bytes.
-> > +
-> > +The ``size`` field is the number of values of this statistics data. It is in the
-> > +unit of ``unsigned long`` for VM or ``__u64`` for VCPU.
-> > +
-> > +The ``unused1`` and ``unused2`` fields are reserved for future
-> > +support for other types of statistics data, like log/linear histogram.
-> > +
-> > +The ``name`` field points to the name string of the statistics data. The name
-> > +string starts at the end of ``struct kvm_stats_desc``.
-> > +The maximum length (including trailing '\0') is indicated by ``name_size``
-> > +in ``struct kvm_stats_header``.
-> > +
-> > +The Stats Data block contains an array of data values of type ``struct
-> > +kvm_vm_stats_data`` or ``struct kvm_vcpu_stats_data``. It would be read by
-> > +user space periodically to pull statistics data.
-> > +The order of data value in Stats Data block is the same as the order of
-> > +descriptors in Descriptors block.
-> > +  * Statistics data for VM::
-> > +
-> > +       struct kvm_vm_stats_data {
-> > +               unsigned long value[0];
-> > +       };
-> > +
-> > +  * Statistics data for VCPU::
-> > +
-> > +       struct kvm_vcpu_stats_data {
-> > +               __u64 value[0];
-> > +       };
-> > +
-> >  5. The kvm_run structure
-> >  ========================
-> >
-> > @@ -6891,3 +7063,11 @@ This capability is always enabled.
-> >  This capability indicates that the KVM virtual PTP service is
-> >  supported in the host. A VMM can check whether the service is
-> >  available to the guest on migration.
-> > +
-> > +8.33 KVM_CAP_STATS_BINARY_FD
-> > +----------------------------
-> > +
-> > +:Architectures: all
-> > +
-> > +This capability indicates the feature that user space can create get a file
-> > +descriptor for every VM and VCPU to read statistics data in binary format.
->
-> nit: user space -> userspace (it's spelled that way throughout this document)
->
-> Cheers,
-> /fuad
->
-> > --
-> > 2.32.0.rc1.229.g3e70b5a671-goog
-> >
-> > _______________________________________________
-> > kvmarm mailing list
-> > kvmarm@lists.cs.columbia.edu
-> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-Thanks for the review!
-Jing
+> Dave
+> +	} else if (efi_enabled(EFI_CONFIG_TABLES)) {
+> +#ifdef CONFIG_EFI
+> +		paddr = cc_blob_phys;
+> +#else
+> +		return -ENODEV;
+> +#endif
+> +	} else {
+> +		return -ENODEV;
+> +	}
+> +
+> +	info = memremap(paddr, sizeof(*info), MEMREMAP_WB);
+> +	if (!info)
+> +		return -ENOMEM;
+> +
+> +	/* Verify the header that its a valid SEV_SNP CC header */
+> +	if ((info->magic == CC_BLOB_SEV_HDR_MAGIC) &&
+> +	    info->secrets_phys &&
+> +	    (info->secrets_len == PAGE_SIZE)) {
+> +		res->start = info->secrets_phys;
+> +		res->end = info->secrets_phys + info->secrets_len;
+> +		res->flags = IORESOURCE_MEM;
+> +		snp_secrets_phys = info->secrets_phys;
+> +		ret = 0;
+> +	}
+> +
+> +	memunmap(info);
+> +	return ret;
+> +}
+> +
