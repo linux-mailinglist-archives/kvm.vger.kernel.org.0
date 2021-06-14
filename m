@@ -2,163 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 371E53A6849
-	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 15:44:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CE0D3A6878
+	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 15:53:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233831AbhFNNq5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Jun 2021 09:46:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38396 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234020AbhFNNq4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 14 Jun 2021 09:46:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623678293;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WB47Pni+nWnZCpL3j99qdXOV/pBIAB8A+KnYUYN28RA=;
-        b=IA58C7pvf4dGyL9Vt89mklcGWVzHiP9PGQTAR7XSo5YmbgRe18d4N/MnEaN9iEX19EWT1v
-        /UGPcJqIF58MzIAfsFwsBngPM6wQ9Ji1sH6opxxcELRunrsteWucEvA5/2CEB9Mxo7Oc/g
-        TNjqolFNI0ru+vFh3YkUlfi50/uMuqI=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-157-h0fJ5BIsNlKWDifKvDdDVg-1; Mon, 14 Jun 2021 09:44:52 -0400
-X-MC-Unique: h0fJ5BIsNlKWDifKvDdDVg-1
-Received: by mail-wm1-f72.google.com with SMTP id v25-20020a1cf7190000b0290197a4be97b7so5700620wmh.9
-        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 06:44:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:organization
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=WB47Pni+nWnZCpL3j99qdXOV/pBIAB8A+KnYUYN28RA=;
-        b=rQ56ZwAcvLBC7Aihy+NPiR+qZG/HrZfKd/R72z0PdF1ka8GRZVAWiKCHxqA0PE6LLT
-         ySux7PrRh9uTULEVHjuiaqfYir6tiYVrrr15seWmbUr9ifYI9CosABSXVIE+EKACq+B5
-         kQz4+mj6YRsOKpWfevWLqsfhppzAuxeMvTeX+v9PLXynvZBXBDIJN8SFMGhA3afudDnO
-         ADNShZJV5lsbUSj0tgNo3mkw1DwJRve1cReDJKxEG9zfgOT2I3JryRdy7p22uaLUF138
-         Bdv0lPPk5vyzaerVv0YinTZpFlYGPooAukkE8mFUmP3iDrdv1914tEHBpG7pzHNhCXFg
-         MdEg==
-X-Gm-Message-State: AOAM533ZXfKP9/sWXJso9UElTNJ1ddNoewVzdRlskaKrBAL1PiuJS4d0
-        dhQRB65cI4Lt3oTY2CQlR6paJ5eJJDO63jFeWR5Yw7Zc/YD5mvq0qhoJGw8P5UrkOhv2mMd3UUM
-        J8bvNjHI+btdU
-X-Received: by 2002:a1c:4e12:: with SMTP id g18mr28719061wmh.101.1623678290830;
-        Mon, 14 Jun 2021 06:44:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzWpm7VHBHg5E8TavVz/PqtB9z7c94nrDgE5PFAe0bmP/4EluavDGqNCHfZLyv6MB54rYIebA==
-X-Received: by 2002:a1c:4e12:: with SMTP id g18mr28719035wmh.101.1623678290649;
-        Mon, 14 Jun 2021 06:44:50 -0700 (PDT)
-Received: from [192.168.3.132] (p5b0c66ca.dip0.t-ipconnect.de. [91.12.102.202])
-        by smtp.gmail.com with ESMTPSA id 125sm21656180wmb.34.2021.06.14.06.44.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Jun 2021 06:44:50 -0700 (PDT)
-Subject: Re: [PATCH v4 1/2] mm/vmalloc: add vmalloc_no_huge
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-kernel@vger.kernel.org
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        linux-mm@kvack.org, Uladzislau Rezki <urezki@gmail.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
+        id S234323AbhFNNzt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Jun 2021 09:55:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48464 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234301AbhFNNzt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Jun 2021 09:55:49 -0400
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63857C061766;
+        Mon, 14 Jun 2021 06:53:46 -0700 (PDT)
+Received: from cap.home.8bytes.org (p4ff2ba7c.dip0.t-ipconnect.de [79.242.186.124])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (No client certificate requested)
+        by theia.8bytes.org (Postfix) with ESMTPSA id D562937E;
+        Mon, 14 Jun 2021 15:53:41 +0200 (CEST)
+From:   Joerg Roedel <joro@8bytes.org>
+To:     x86@kernel.org
+Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
+        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
         David Rientjes <rientjes@google.com>,
-        Christoph Hellwig <hch@infradead.org>
-References: <20210614132357.10202-1-imbrenda@linux.ibm.com>
- <20210614132357.10202-2-imbrenda@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Message-ID: <8f24292e-e8c9-9b9b-0429-2ac984a01611@redhat.com>
-Date:   Mon, 14 Jun 2021 15:44:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: [PATCH v5 0/6] x86/sev-es: Fixes for SEV-ES Guest Support
+Date:   Mon, 14 Jun 2021 15:53:21 +0200
+Message-Id: <20210614135327.9921-1-joro@8bytes.org>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <20210614132357.10202-2-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14.06.21 15:23, Claudio Imbrenda wrote:
-> Commit 121e6f3258fe3 ("mm/vmalloc: hugepage vmalloc mappings") added
-> support for hugepage vmalloc mappings, it also added the flag
-> VM_NO_HUGE_VMAP for __vmalloc_node_range to request the allocation to
-> be performed with 0-order non-huge pages.  This flag is not accessible
-> when calling vmalloc, the only option is to call directly
-> __vmalloc_node_range, which is not exported.
-> 
-> This means that a module can't vmalloc memory with small pages.
-> 
-> Case in point: KVM on s390x needs to vmalloc a large area, and it needs
-> to be mapped with non-huge pages, because of a hardware limitation.
-> 
-> This patch adds the function vmalloc_no_huge, which works like vmalloc,
-> but it is guaranteed to always back the mapping using small pages. This
-> new function is exported, therefore it is usable by modules.
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Reviewed-by: Uladzislau Rezki (Sony) <urezki@gmail.com>
-> Acked-by: Nicholas Piggin <npiggin@gmail.com>
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Cc: Nicholas Piggin <npiggin@gmail.com>
-> Cc: Uladzislau Rezki (Sony) <urezki@gmail.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: David Rientjes <rientjes@google.com>
-> Cc: Christoph Hellwig <hch@infradead.org>
-> ---
->   include/linux/vmalloc.h |  1 +
->   mm/vmalloc.c            | 16 ++++++++++++++++
->   2 files changed, 17 insertions(+)
-> 
-> diff --git a/include/linux/vmalloc.h b/include/linux/vmalloc.h
-> index 4d668abb6391..bfaaf0b6fa76 100644
-> --- a/include/linux/vmalloc.h
-> +++ b/include/linux/vmalloc.h
-> @@ -135,6 +135,7 @@ extern void *__vmalloc_node_range(unsigned long size, unsigned long align,
->   			const void *caller);
->   void *__vmalloc_node(unsigned long size, unsigned long align, gfp_t gfp_mask,
->   		int node, const void *caller);
-> +void *vmalloc_no_huge(unsigned long size);
->   
->   extern void vfree(const void *addr);
->   extern void vfree_atomic(const void *addr);
-> diff --git a/mm/vmalloc.c b/mm/vmalloc.c
-> index a13ac524f6ff..296a2fcc3fbe 100644
-> --- a/mm/vmalloc.c
-> +++ b/mm/vmalloc.c
-> @@ -2998,6 +2998,22 @@ void *vmalloc(unsigned long size)
->   }
->   EXPORT_SYMBOL(vmalloc);
->   
-> +/**
-> + * vmalloc_no_huge - allocate virtually contiguous memory using small pages
-> + * @size:    allocation size
-> + *
-> + * Allocate enough non-huge pages to cover @size from the page level
-> + * allocator and map them into contiguous kernel virtual space.
-> + *
-> + * Return: pointer to the allocated memory or %NULL on error
-> + */
-> +void *vmalloc_no_huge(unsigned long size)
-> +{
-> +	return __vmalloc_node_range(size, 1, VMALLOC_START, VMALLOC_END, GFP_KERNEL, PAGE_KERNEL,
-> +				    VM_NO_HUGE_VMAP, NUMA_NO_NODE, __builtin_return_address(0));
-> +}
-> +EXPORT_SYMBOL(vmalloc_no_huge);
-> +
->   /**
->    * vzalloc - allocate virtually contiguous memory with zero fill
->    * @size:    allocation size
-> 
+From: Joerg Roedel <jroedel@suse.de>
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Hi,
 
--- 
+here is the next revision of my pending fixes for Linux' SEV-ES
+support. Changes to the previous version are:
+
+	- Updated patch 2 and implemented wrappers around
+	  sev_es_get/put_ghcb() which will disable/enable IRQs when
+	  needed.
+	- Updated patch 3 to now call the from_user and from_kernel
+	  functions of the VC handler directly from entry-asm.
+
+The previous version can be found here:
+
+	https://lore.kernel.org/lkml/20210610091141.30322-1-joro@8bytes.org/
+
+Changes are based on tip/x86/urgent. Please review.
+
 Thanks,
 
-David / dhildenb
+	Joerg
+
+
+Joerg Roedel (6):
+  x86/sev-es: Fix error message in runtime #VC handler
+  x86/sev-es: Make sure IRQs are disabled while GHCB is active
+  x86/sev-es: Split up runtime #VC handler for correct state tracking
+  x86/insn-eval: Make 0 a valid RIP for insn_get_effective_ip()
+  x86/insn: Extend error reporting from
+    insn_fetch_from_user[_inatomic]()
+  x86/sev-es: Propagate #GP if getting linear instruction address failed
+
+ arch/x86/entry/entry_64.S       |   4 +-
+ arch/x86/include/asm/idtentry.h |  29 ++---
+ arch/x86/kernel/sev.c           | 207 ++++++++++++++++++++------------
+ arch/x86/kernel/umip.c          |  10 +-
+ arch/x86/lib/insn-eval.c        |  22 ++--
+ 5 files changed, 156 insertions(+), 116 deletions(-)
+
+
+base-commit: efa165504943f2128d50f63de0c02faf6dcceb0d
+-- 
+2.31.1
 
