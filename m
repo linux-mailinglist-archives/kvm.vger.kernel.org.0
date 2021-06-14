@@ -2,152 +2,490 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7557E3A66B3
-	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 14:35:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F5C23A66DA
+	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 14:45:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233023AbhFNMh1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Jun 2021 08:37:27 -0400
-Received: from mail-mw2nam12on2067.outbound.protection.outlook.com ([40.107.244.67]:59352
+        id S233152AbhFNMrW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Jun 2021 08:47:22 -0400
+Received: from mail-mw2nam12on2068.outbound.protection.outlook.com ([40.107.244.68]:35968
         "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232775AbhFNMh1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Jun 2021 08:37:27 -0400
+        id S232764AbhFNMrV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Jun 2021 08:47:21 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PiRZiCpMSRvJlqTLr1cRWjDWGw47vtF6MjCaFw9MfpPqFxdYZM4p2dnH96pbDX5ZVssJXZh1Z02z7eRhhQKYhxaMQlPDxm/6rcSff4hzG8PC5PRdV9SjhRfqpL5Fwc52JNFYlneeCXQMRIKED2JDn9v1nA2PfZR9a4lCtg9PZ3gbxQOWWDemSkw4A21ayQ1ulr8eBHWj1SjyiYadDHmm/U2S9tH/LhMCb11YsuwdlfesgE4ur2uHWqRE3UHKlUlyFYI1bBQIW0QVAtxn5Ts+ct8pnhxy6x0qqLb4Ifp1Kc2IxqKBh7uAbvcpEoBpAAJsI3WNYuv3josfmyxPvCi7QQ==
+ b=DXX5LF9N+HdLb+0lIrcuvaarzQKki/UF3luyRiNl1ady/2QVlxMwPHVhsO5UkDN84zWowAPXX34DkqdILf8cfF+GDBfvJNFb3g2l3HDu3yPhx2vwxyZGaVFJP4VuPE2y19u1dtV4uaqBReK2So4V3IQz9aGXgwKWBlwfGC2dR5l8v9v/SHBMSAnDQv7uYGWlmmfz8XQXUNkkLjjBqRXCsZd3/6yWcSNV+Xs0ZezyY9A6WmtKO3hYVdGLqnkjgFVFaM48fkTYV6Ev7ppecHMqXWGiXUJYFHvHB+4dvkr0Ai7ZMPpSjeG1I9nt88iRGUmyxQg9hU0ij9q9SnemBnWf5w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vovSBIAn7YDUdNibZX/0zlm501S26NvUyJxE/ZzwU+I=;
- b=flsSXnvgI/E9xqPOeV01yidpo8y4ySBjAx4A89wfGgwl+syjChIhC9pUiz8mMBZlcAOGP0gwQKDwcCOk2n55SvTaApklY07wwo4oU2NbXuVVwqU4BQGWBNncYqOcz0rUqqYYfGBLg9OoLwVUIC4l+sDk2j+QObaeyeLKCmwuewSi2f2fI1J/a5OaCPg5KZa/FkUF6Mn2rGTVYz5EBT6y6CyRRHQwN4i5EuVOAM58QtWV6NQSnSNT1CT+TUf5T182Db81+QTa6/5KJe9lS4LDvL8TLsW4QriHqo8X7AGM1WuUNFHobXeL/mJ3a9gSN67ROUZgvyHY94RFqHuSaG4/Jw==
+ bh=y9dvZu/xE+SqMBNp7L4Fk504MaY8+hJPN7eOd1kjBLw=;
+ b=ROKSzc7lZ79XDszoUf5vuvY3PlcIGRNMc743pM++JJctG7WYWNfd2ydDsoFK3r2INdd5hlj+aaNuI6v3ewHMmePq+Yv7dHhgbK962yKcZuCDhRDyC4qHVzxNnttIcTrLgcWphwrXtVARM0IkpDiEppdZf6ra3JytZ/FIvF18yD/FgAUuqCisyIowcFKi8g1OvfAVEglwrbLr1XZJL547lebKhY+uII3SVULS+09cRc3osNAP5IBNtt5tAla3WaAhdBmsDnOU08qIZCQI4w1P/DTQEYsvW8DXL96qDxK4k9h5u9gv/oH7Xrgorkl8EazzJ13Y4rfrdJ8cJ26K33H6oA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vovSBIAn7YDUdNibZX/0zlm501S26NvUyJxE/ZzwU+I=;
- b=OspOGafCWmjnLI4mOgppf+pUGqVWTcGb4joVLsEH27IoktTw5grXcsc8h670pcXlxhJe8dff5NnZqwAAe3/FlF4A1iWBY3CiM1LyoCCff/6kgkrCC/L+IPJE4tcWFoLtXRC+h3/Tqr9FtdxWnEEtcmplHvjdq8TbCzsJQzK8nRyh1mArVL2dq8wrjQnIg80NjdWh+Kb7pzo+HRZF9udBI6VDDN7cHtwThJv61TUlGp7CSHPe29pfe9m/RVY07sgDbHXHWm/ApiC3ONWcwSV68SDIfI66OMkVCr1re52t/6tXOIyjLZazO2Mry5eejVKXbCdz7tUlQj2OGPgNwcTTDA==
+ bh=y9dvZu/xE+SqMBNp7L4Fk504MaY8+hJPN7eOd1kjBLw=;
+ b=EqDYluvhF1JdNpSMx1clqUAUufVMI07gtRe2M4uV2smxv9FykUEBKDF0EwEUvDF1fefCv4AJijK8ySOSJACmqg3KGrygubmFQnlT5J3aoz65SLy3Pfr9p/q+3jIaR8c815YfRux3/HDuFr8+io/LcMuWAsFiODRMJVwUu1ga1j0=
 Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5062.namprd12.prod.outlook.com (2603:10b6:208:313::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.22; Mon, 14 Jun
- 2021 12:35:20 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::3d51:a3b9:8611:684e]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::3d51:a3b9:8611:684e%7]) with mapi id 15.20.4219.025; Mon, 14 Jun 2021
- 12:35:20 +0000
-Date:   Mon, 14 Jun 2021 09:35:19 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org, Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>
-Subject: Re: [PATCH 06/10] vfio/mdev: Remove CONFIG_VFIO_MDEV_DEVICE
-Message-ID: <20210614123519.GF1002214@nvidia.com>
-References: <6-v1-324b2038f212+1041f1-vfio3a_jgg@nvidia.com>
- <87czsszi9i.fsf@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87czsszi9i.fsf@redhat.com>
-X-Originating-IP: [47.55.113.94]
-X-ClientProxiedBy: MN2PR11CA0018.namprd11.prod.outlook.com
- (2603:10b6:208:23b::23) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB2714.namprd12.prod.outlook.com (2603:10b6:5:42::18) by
+ DM5PR12MB1626.namprd12.prod.outlook.com (2603:10b6:4:d::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4219.21; Mon, 14 Jun 2021 12:45:15 +0000
+Received: from DM6PR12MB2714.namprd12.prod.outlook.com
+ ([fe80::7df8:b0cd:fe1b:ae7b]) by DM6PR12MB2714.namprd12.prod.outlook.com
+ ([fe80::7df8:b0cd:fe1b:ae7b%5]) with mapi id 15.20.4219.022; Mon, 14 Jun 2021
+ 12:45:15 +0000
+Cc:     brijesh.singh@amd.com, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 11/22] x86/sev: Add helper for validating
+ pages in early enc attribute changes
+To:     Borislav Petkov <bp@alien8.de>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-12-brijesh.singh@amd.com> <YMI02+k2zk9eazjQ@zn.tnic>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <d0759889-94df-73b0-4285-fa064eb187cd@amd.com>
+Date:   Mon, 14 Jun 2021 07:45:11 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.11.0
+In-Reply-To: <YMI02+k2zk9eazjQ@zn.tnic>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [70.112.153.56]
+X-ClientProxiedBy: SN7PR04CA0109.namprd04.prod.outlook.com
+ (2603:10b6:806:122::24) To DM6PR12MB2714.namprd12.prod.outlook.com
+ (2603:10b6:5:42::18)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (47.55.113.94) by MN2PR11CA0018.namprd11.prod.outlook.com (2603:10b6:208:23b::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.21 via Frontend Transport; Mon, 14 Jun 2021 12:35:20 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lsloF-006bV0-AN; Mon, 14 Jun 2021 09:35:19 -0300
+Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SN7PR04CA0109.namprd04.prod.outlook.com (2603:10b6:806:122::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.21 via Frontend Transport; Mon, 14 Jun 2021 12:45:13 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 440c66ce-493f-4a3b-b36d-08d92f30df63
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5062:
+X-MS-Office365-Filtering-Correlation-Id: f152b170-f079-4c1a-c1ad-08d92f32422e
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1626:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5062C7178F276E2D49DFEA52C2319@BL1PR12MB5062.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Microsoft-Antispam-PRVS: <DM5PR12MB1626E284FCDF0807E75D6891E5319@DM5PR12MB1626.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3513;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: pOBNgkY3H7TCi2Wf1Hc9OByZnup2/jHPIMUrYBedkFZuzSILp6qt7HOrrcBQM0B8sbURXCU+IGLiPtL8HDff6CZOlNWopdKEWpnAJ4wWhlCtgwSG+pMXyK1WKWOpP9mcZqkV0labkFaJ5u+iub4wt0JbYwjeZan8Hk9DgiPCJN4pOpnx+QJkOG2VpB7P2FrASt3PyiZv8TXIA+9vEbNtOYmpUAk0M0GBuIDjHrsUiYzZ/+FPDvj3ePC1nibv0uHj4uXCOkuQKQmpWkUwRXE17KOI/nwuA3rFVWmS9+b1T/9Pn0zPglNlyIR4WDQu062e6Rn/gxbm0/DzBC058c57xw/i5r6liSsz1lEBA3wpsX6iCiF6AoFO9U0qMsoda5lK0c3qrTi2WwoBTQsYnBqzpGL04/HyyaijnbYmX5zTCSW2WAB1v0ysmtd+AaedhE0+tz42JfH95FqQvCBGN01o5ah1UF9tgxNQ6nMc16B25GG/DlsriMB2wR35qJLngIlci80kQsy8OsCcl3jktmHsT21XlYQvHCoi4WYSikSJc7LvMv4oZ6KzlAtLCJedsagyZIcO4cL8b5EOpjmSpITeRC4fsk/+3/v8iBdWyKkZnkg=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(136003)(346002)(396003)(366004)(26005)(54906003)(38100700002)(7416002)(478600001)(1076003)(5660300002)(2906002)(186003)(110136005)(316002)(9746002)(9786002)(66946007)(86362001)(66556008)(66476007)(4326008)(2616005)(8936002)(8676002)(426003)(33656002)(36756003)(83380400001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: v0XSIhH1IaSRsjQ6tZBitrOIKK2+e1IM8kX9mxy4evS+GI0VfebHVUQyz9gfDvI6OqiGIB5VpbBzK8ssUT7VbB+R/RjZ/EtJQIGXfpK6ZRBNT+2eOD9roGx/2qLkwlPCnY7CI0owb2D0J40+s1IXGEdjb4pxUdz1EYVOtpuIXJY58g6RxjtQgOhi8n/zMY1lcgdYN7uWFU61i6kK3940Bztp+UFg07tQq54rI7QppkCbI/tjZVISKUaMCozDoXxKfBOSwG11gy4akWIt55POBJKMlxzGhUk09MPtij9Gsp6iVnXowJhia0SEp7iMmmlRC3UxiIUPtnrMIhJPx+b7YB0wMj/y9Ed6udsG5/9/LWTKFZNi8Aef+jPQ6E7MlAy9UrFCRPbBqtSCZaCT025DTu7ySYpIe9u6fx67ZVu3RIXKpAV1sxeCBndrGpSax+QZDN1jo3fhqy7s5A0tuhs9VdFLD4EXSqbGLL5rfO7IY7Aka4JI9gCkEnPYPZ1YasKzT8CT3Me1cph1U+iUUF42D2PhLA5zKiqGa3kMRASt7KgOf4N+hTIV5g+eJjZffagqzAPIzzj7azbWjk+XVbZ80xqs/nvQQIvmDpG9k3gGydTQsepaI61F32OTm2ZiVRcXfQN+QXMX2kib7nrbsjYBZXy6ypre4BrMiRaeAhgCh3dQIL0kwOTX5I5dKX6cMngxFm3XKv62wXtsH2y3JQNM8k9e8u8evz0QkQOdpx1ws+o=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2714.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(39860400002)(136003)(376002)(396003)(346002)(2906002)(86362001)(6512007)(83380400001)(316002)(956004)(30864003)(36756003)(6486002)(54906003)(5660300002)(38100700002)(478600001)(8676002)(53546011)(16526019)(44832011)(26005)(7416002)(8936002)(66946007)(4326008)(31696002)(38350700002)(6506007)(186003)(2616005)(52116002)(6916009)(66556008)(66476007)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?/EPXrdp5hIgF+IpWyc3+63FGVz7onYnAAcehTGg6TcpRRWdgzy6xbhbG1v9L?=
- =?us-ascii?Q?CizF/yxOOLIdTeXB+LXqGNarLJRGPBJTrUt/vs4ycmB0xr9R2lEM2oX4Y0yu?=
- =?us-ascii?Q?8o7FXkduvxKpqJUC7Cs4WQdsR26aoNeC9qdm9ebLUueLDz/BWBc4xpkcGYVh?=
- =?us-ascii?Q?C7xmjC4zQz+V/qd82wHRGuLLuNXV1HmJWin6U2s1Oh+FLsOnOiwENc3IYJq0?=
- =?us-ascii?Q?nZnGY2TGEp93bif+aor6GnCrEu8HV24xVsfdG8uvIB4w7z6DtpRieuEk3O1V?=
- =?us-ascii?Q?6nFx3tyrxLoE2TD55uvdNntIM3o5hMMv76FYOno0M6j9xuTdTqAAN2VI4h3+?=
- =?us-ascii?Q?2VuT0pzqu1Smf+mgaX1AU3pVBuSZxQ0oPq1Ol4N8pVWlLYRCdGWKSvYjcJBr?=
- =?us-ascii?Q?q1e1L04xGYT7vPe1So0VZZk5RfdDzacTNWR7BnKTM+8GY8cy3e1tgaPTs7Mz?=
- =?us-ascii?Q?JZ0jt2NixLAlhmpltDLI540UbJfyAhjc8PsBcI+rtkLO/tVJdJ03dlS45cyG?=
- =?us-ascii?Q?DmDeqiYgbNQWulH7fjMrH8VcQxqCweUWe59WyTzIg+8hzFGZa+UjjHXgltEe?=
- =?us-ascii?Q?MyYwVo2MBa72+ojBGahJj4vP46Gwtm3I+VrCRUsbKQyXKIOzDiyiOHaibQrh?=
- =?us-ascii?Q?1V4A+fheRxlbFzSTQtky9hojLz/mIqr6M4Q0SeO/VTSggzzqs6cO62jXHNFJ?=
- =?us-ascii?Q?ilkj3+tpSXT/9A+7bv14crzx+bx/UwOO+34VdTdMkaqh+Laov/njSrZQJ/6s?=
- =?us-ascii?Q?R6KUHdG12LkLilsC5nQsZ85F3ams7fRWKx9/qdGkHYMXsQm7fQi0jH45USDZ?=
- =?us-ascii?Q?xf6YtS/jfjs4AgHeWuwh+qulI3gGkmBoqO6txeaJV+VRJSjX5bwx+NPdDiPz?=
- =?us-ascii?Q?jLYhNAbyigoOWcAyu2pVWHCepWmp4FRJrPQUxPFd7KxICLbCHwRvV0xQ6uaL?=
- =?us-ascii?Q?S3FDZPMlG/HUZcOuT9ZPLMi2gCr8LxL7/C1vEqXM2T0xSv+fwxZPlk+hDfLE?=
- =?us-ascii?Q?1XfRAGR56nfiZt72J9U6haAvPrxZMqA/A8vaCqgcfbZws+6E8p9vr3mW+gtz?=
- =?us-ascii?Q?y9QPQ5fAVBcuzBciU4Aa3hiTUR4rm536hLHkSX/qBv8Rz+BceHi6KG2Y69qu?=
- =?us-ascii?Q?dqMtvxFJI3OBEOk05nVb5Kn0zL75vmxP1jhF095dbFYbLcpbXeAXTZuCz1tJ?=
- =?us-ascii?Q?WtS7rvqTMD/jJqDqiGbKA0CzQZwCA9TXRk7MRq6DFZav04f/Ttp0KzvxW4hE?=
- =?us-ascii?Q?brCFxyCTTg/OwWEUNLsF5UtaIzeirSXguO/5oGA8QjWmM9Rpe1qT4XYhv20j?=
- =?us-ascii?Q?xWSn4V3oNML2oLyIGfCbcoXo?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 440c66ce-493f-4a3b-b36d-08d92f30df63
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dGpaUmNCSmxYQ3dlSTQ1bGI0WlcrSjljUFo1SUo3SkZvVVV0U2hvT3Z6emZ3?=
+ =?utf-8?B?WGNyakRFUzNMakNyNjVWc0Q5eUFHQlE5am9qV0svN0JIQkNmTDYxYzJOVnhv?=
+ =?utf-8?B?Rm4vVXZaWHpQbFpVdTFXYkdIQ0pHR1Fod0xHS0FsVTV3dVZVcEY3dUIwdWhy?=
+ =?utf-8?B?M0VOVE0yV2R2c2dZS1FRZXJlMWJIUWh3QXlRM3hKNGozc0ROL0ZuREVrS0tQ?=
+ =?utf-8?B?TEJGdW4rZUxXRFdvSFBmTldDM1A5bHcvdkRvMzVCY1VqVG14LzRTRklpTHVv?=
+ =?utf-8?B?ZGpBTHdpQm9UVmtESDRkdGtzS1g5ZEtxcTVlMXlhSzZDU0dYRGl3cm5iQ21P?=
+ =?utf-8?B?SUpzMlJZdGo0VUhXcURhVE9CSmhHVDg0aHhnSGdld1ZVaEtKSGFyMTRuTDZm?=
+ =?utf-8?B?TjQ1WkgySGhGdkF2SHFRRUpjSHdQTk5odG5Ibk1HRVlESmZGU3IwTG9Va3h5?=
+ =?utf-8?B?VlBjTURhOHpMa3ViaGh6SkZxdTFaSUR1dkUxVnRndVpqSUR0UmcwMDNjVk9l?=
+ =?utf-8?B?WFJFY0U1Y1NpUlVybEVydS9IK2wzSFNQZnVOd0RYdEJpbnpnTEtUNXIxdUN6?=
+ =?utf-8?B?YVd0aGdES2l4dC9rRmJ1MUh5TERjUzcwZWtnK1JTdnYvZmowNnR1LzJrbFY4?=
+ =?utf-8?B?UmRmOFBSL2lINnRrRHVsRk90NDZtUlJnZjBIa2tqSXRxVDR5YjFzY0ppVzdH?=
+ =?utf-8?B?WGhkOG9xbmRIWXNsUXdlOXp1dGVEYllCOGFJOWwzc1YvU2w2OFJUbzlhUlhI?=
+ =?utf-8?B?QXk5U2VrS1FIOWFtYnlVK1JYcGJDZ0NUcmtja1paYzRsNDNGNHdIQUFKZUkz?=
+ =?utf-8?B?VDdVektQYUE5a3BManNVaTNyckV0c3BNTXBXMXlueUZ3VWlIbGVSMFVmbnhD?=
+ =?utf-8?B?VmlRejJnVDYyQzNUVE5uTVNWQmsyNW5SRUptSUJETVhCb1BXVlNQVFM4N0Vs?=
+ =?utf-8?B?eUR3RnRWNlZpc0Zacy85ajYvSTRVMDNIZWQySXovNjhGNjdzbWpKVjljUXJk?=
+ =?utf-8?B?TUQrb1Z6V3ZkRm80OVU5cHRydWZIeS9oWEZuNzgxL2k5UzgxMFpZbmlzVVB0?=
+ =?utf-8?B?WXdRZmFzdmFHQXd6emZUWllNMmwvMURvRFRPN1RWUUpoaEw5elkyeWtTbG1R?=
+ =?utf-8?B?RnRHK1FkMDAxRVppOUlVUm5wMFF1VUdQakthS2hGZGI1aW45cUdaQjZtMWVT?=
+ =?utf-8?B?K0xXdjc4L3RMTGd2ZkNaOGR3RzZkakNTWUdKR2ZpME01ZFpGaS9tWDRyY0sw?=
+ =?utf-8?B?MXBRZ2lJb3A1aGYwRTBQL3VLUHpUdFZUbzR5cWFObXVwYWpKdTJTK3JVb3RV?=
+ =?utf-8?B?UGM5S2VTQ1pVamZSR2JmdE84eE8wc0M4S0I4d2RrdkxYb0ZZeWlmNmFiZGZI?=
+ =?utf-8?B?N0pqRjVLeTk4dVEzd2lzTnhsQThEL0Y1UFVQYW9UVUVqN1IzMXJ1QUlvM1l5?=
+ =?utf-8?B?c25mSVFZWUxiemR4RjVjUzZLVStRMzhUZWFlV1llRFdlS2ptTUcwbkxzdkx6?=
+ =?utf-8?B?UkZ2Y2NVa2hMTHMvN2pBNDQyckhyNVFxODg1a2Z2bkFnM0F5SHJoc1FoVWNH?=
+ =?utf-8?B?Tzd3ZHZWNTcydW5JMloxTWpRNUkvcDF6Q0thSG51RzJvbk1ZUXF4VXZpQU9G?=
+ =?utf-8?B?dDR4SGcrTFpLaHlPU1RxV2EwTUdXQW1wc2NtVW5UMmt3RisrV01JazJid0Yx?=
+ =?utf-8?B?Ykx1UTMza01yWW11VFlqTnVER0l5U0haZE5pUzBBZHJpd3lQcVpYcnp4TjlR?=
+ =?utf-8?Q?V+5Mi4nhNdPQQgGLUZaeq2cLNVan7eZGDAnp94T?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f152b170-f079-4c1a-c1ad-08d92f32422e
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2714.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2021 12:35:20.4943
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2021 12:45:15.6865
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MkQEsu3mdmWXm+E1boqrHRoMOGTz8Om3AHM+y1zYKAY1VO78lLmeLHAjyAdkQP9+
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5062
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1Rwgu/7Dvb/kORSHlpFT+ELfKqR5ZCLyFToMy3IPxWyKX4v8F4wzmJNDT63B7HIqvYuWBDtSXrN+5FGs5fi5QA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1626
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 11, 2021 at 02:40:41PM +0200, Cornelia Huck wrote:
-> On Mon, Jun 07 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > For some reason the vfio_mdev shim mdev_driver has its own module and
-> > kconfig. As the next patch requires access to it from mdev.ko merge the
-> > two modules together and remove VFIO_MDEV_DEVICE.
-> >
-> > A later patch deletes this driver entirely.
-> >
-> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> >  Documentation/s390/vfio-ap.rst   |  1 -
-> >  arch/s390/Kconfig                |  2 +-
-> >  drivers/gpu/drm/i915/Kconfig     |  2 +-
-> >  drivers/vfio/mdev/Kconfig        |  7 -------
-> >  drivers/vfio/mdev/Makefile       |  3 +--
-> >  drivers/vfio/mdev/mdev_core.c    | 16 ++++++++++++++--
-> >  drivers/vfio/mdev/mdev_private.h |  2 ++
-> >  drivers/vfio/mdev/vfio_mdev.c    | 24 +-----------------------
-> >  samples/Kconfig                  |  6 +++---
-> >  9 files changed, 23 insertions(+), 40 deletions(-)
-> 
-> I think you missed my earlier
-> 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-Yes, my mistake, I didn't think there were any tags in the v1 posting
+On 6/10/21 10:50 AM, Borislav Petkov wrote:
+> On Wed, Jun 02, 2021 at 09:04:05AM -0500, Brijesh Singh wrote:
+>> @@ -65,6 +65,12 @@ extern bool handle_vc_boot_ghcb(struct pt_regs *regs);
+>>  /* RMP page size */
+>>  #define RMP_PG_SIZE_4K			0
+>>  
+>> +/* Memory opertion for snp_prep_memory() */
+>> +enum snp_mem_op {
+>> +	MEMORY_PRIVATE,
+>> +	MEMORY_SHARED
+> See below.
+>
+>> +};
+>> +
+>>  #ifdef CONFIG_AMD_MEM_ENCRYPT
+>>  extern struct static_key_false sev_es_enable_key;
+>>  extern void __sev_es_ist_enter(struct pt_regs *regs);
+>> @@ -103,6 +109,11 @@ static inline int pvalidate(unsigned long vaddr, bool rmp_psize, bool validate)
+>>  
+>>  	return rc;
+>>  }
+>> +void __init early_snp_set_memory_private(unsigned long vaddr, unsigned long paddr,
+>> +		unsigned int npages);
+>> +void __init early_snp_set_memory_shared(unsigned long vaddr, unsigned long paddr,
+>> +		unsigned int npages);
+> Align arguments on the opening brace.
 
-Thanks,
-Jason
+Noted.
+
+
+>
+>> +void __init snp_prep_memory(unsigned long paddr, unsigned int sz, int op);
+>>  #else
+>>  static inline void sev_es_ist_enter(struct pt_regs *regs) { }
+>>  static inline void sev_es_ist_exit(void) { }
+>> @@ -110,6 +121,15 @@ static inline int sev_es_setup_ap_jump_table(struct real_mode_header *rmh) { ret
+>>  static inline void sev_es_nmi_complete(void) { }
+>>  static inline int sev_es_efi_map_ghcbs(pgd_t *pgd) { return 0; }
+>>  static inline int pvalidate(unsigned long vaddr, bool rmp_psize, bool validate) { return 0; }
+>> +static inline void __init
+>> +early_snp_set_memory_private(unsigned long vaddr, unsigned long paddr, unsigned int npages)
+> Put those { } at the end of the line:
+>
+> early_snp_set_memory_private(unsigned long vaddr, unsigned long paddr, unsigned int npages) { }
+>
+> no need for separate lines. Ditto below.
+
+Noted.
+
+
+>
+>> +{
+>> +}
+>> +static inline void __init
+>> +early_snp_set_memory_shared(unsigned long vaddr, unsigned long paddr, unsigned int npages)
+>> +{
+>> +}
+>> +static inline void __init snp_prep_memory(unsigned long paddr, unsigned int sz, int op) { }
+>>  #endif
+>>  
+>>  #endif
+>> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+>> index 455c09a9b2c2..6e9b45bb38ab 100644
+>> --- a/arch/x86/kernel/sev.c
+>> +++ b/arch/x86/kernel/sev.c
+>> @@ -532,6 +532,111 @@ static u64 get_jump_table_addr(void)
+>>  	return ret;
+>>  }
+>>  
+>> +static void pvalidate_pages(unsigned long vaddr, unsigned int npages, bool validate)
+>> +{
+>> +	unsigned long vaddr_end;
+>> +	int rc;
+>> +
+>> +	vaddr = vaddr & PAGE_MASK;
+>> +	vaddr_end = vaddr + (npages << PAGE_SHIFT);
+>> +
+>> +	while (vaddr < vaddr_end) {
+>> +		rc = pvalidate(vaddr, RMP_PG_SIZE_4K, validate);
+>> +		if (WARN(rc, "Failed to validate address 0x%lx ret %d", vaddr, rc))
+>> +			sev_es_terminate(1, GHCB_TERM_PVALIDATE);
+> 					^^
+>
+> I guess that 1 should be a define too, if we have to be correct:
+>
+> 			sev_es_terminate(SEV_TERM_SET_LINUX, GHCB_TERM_PVALIDATE);
+>
+> or so. Ditto for all other calls of this.
+
+Sure, I will define a macro for it.
+
+
+>
+>> +
+>> +		vaddr = vaddr + PAGE_SIZE;
+>> +	}
+>> +}
+>> +
+>> +static void __init early_set_page_state(unsigned long paddr, unsigned int npages, int op)
+>> +{
+>> +	unsigned long paddr_end;
+>> +	u64 val;
+>> +
+>> +	paddr = paddr & PAGE_MASK;
+>> +	paddr_end = paddr + (npages << PAGE_SHIFT);
+>> +
+>> +	while (paddr < paddr_end) {
+>> +		/*
+>> +		 * Use the MSR protocol because this function can be called before the GHCB
+>> +		 * is established.
+>> +		 */
+>> +		sev_es_wr_ghcb_msr(GHCB_MSR_PSC_REQ_GFN(paddr >> PAGE_SHIFT, op));
+>> +		VMGEXIT();
+>> +
+>> +		val = sev_es_rd_ghcb_msr();
+>> +
+>> +		if (GHCB_RESP_CODE(val) != GHCB_MSR_PSC_RESP)
+> From a previous review:
+>
+> Does that one need a warning too or am I being too paranoid?
+
+IMO, there is no need to add a warning. This case should happen if its
+either a hypervisor bug or hypervisor does not follow the GHCB
+specification. I followed the SEV-ES vmgexit handling  and it does not
+warn if the hypervisor returns a wrong response code. We simply
+terminate the guest.
+
+
+>
+>> +			goto e_term;
+>> +
+>> +		if (WARN(GHCB_MSR_PSC_RESP_VAL(val),
+>> +			 "Failed to change page state to '%s' paddr 0x%lx error 0x%llx\n",
+>> +			 op == SNP_PAGE_STATE_PRIVATE ? "private" : "shared",
+>> +			 paddr, GHCB_MSR_PSC_RESP_VAL(val)))
+>> +			goto e_term;
+>> +
+>> +		paddr = paddr + PAGE_SIZE;
+>> +	}
+>> +
+>> +	return;
+>> +
+>> +e_term:
+>> +	sev_es_terminate(1, GHCB_TERM_PSC);
+>> +}
+>> +
+>> +void __init early_snp_set_memory_private(unsigned long vaddr, unsigned long paddr,
+>> +					 unsigned int npages)
+>> +{
+>> +	if (!sev_feature_enabled(SEV_SNP))
+>> +		return;
+>> +
+>> +	 /* Ask hypervisor to add the memory pages in RMP table as a 'private'. */
+> 	    Ask the hypervisor to mark the memory pages as private in the RMP table.
+
+Noted.
+
+
+>
+>> +	early_set_page_state(paddr, npages, SNP_PAGE_STATE_PRIVATE);
+>> +
+>> +	/* Validate the memory pages after they've been added in the RMP table. */
+>> +	pvalidate_pages(vaddr, npages, 1);
+>> +}
+>> +
+>> +void __init early_snp_set_memory_shared(unsigned long vaddr, unsigned long paddr,
+>> +					unsigned int npages)
+>> +{
+>> +	if (!sev_feature_enabled(SEV_SNP))
+>> +		return;
+>> +
+>> +	/*
+>> +	 * Invalidate the memory pages before they are marked shared in the
+>> +	 * RMP table.
+>> +	 */
+>> +	pvalidate_pages(vaddr, npages, 0);
+>> +
+>> +	 /* Ask hypervisor to make the memory pages shared in the RMP table. */
+> 			      mark
+
+Noted.
+
+
+>> +	early_set_page_state(paddr, npages, SNP_PAGE_STATE_SHARED);
+>> +}
+>> +
+>> +void __init snp_prep_memory(unsigned long paddr, unsigned int sz, int op)
+>> +{
+>> +	unsigned long vaddr, npages;
+>> +
+>> +	vaddr = (unsigned long)__va(paddr);
+>> +	npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
+>> +
+>> +	switch (op) {
+>> +	case MEMORY_PRIVATE: {
+>> +		early_snp_set_memory_private(vaddr, paddr, npages);
+>> +		return;
+>> +	}
+>> +	case MEMORY_SHARED: {
+>> +		early_snp_set_memory_shared(vaddr, paddr, npages);
+>> +		return;
+>> +	}
+>> +	default:
+>> +		break;
+>> +	}
+>> +
+>> +	WARN(1, "invalid memory op %d\n", op);
+> A lot easier, diff ontop of your patch:
+
+thanks. I will apply it.
+
+I did thought about reusing the VMGEXIT defined macro
+SNP_PAGE_STATE_{PRIVATE, SHARED} but I was not sure if you will be okay
+with that. Additionally now both the function name and macro name will
+include the "SNP". The call will look like this:
+
+snp_prep_memory(paddr, SNP_PAGE_STATE_PRIVATE)
+
+>
+> ---
+> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+> index 7c2cb5300e43..2ad4b5ab3f6c 100644
+> --- a/arch/x86/include/asm/sev.h
+> +++ b/arch/x86/include/asm/sev.h
+> @@ -65,12 +65,6 @@ extern bool handle_vc_boot_ghcb(struct pt_regs *regs);
+>  /* RMP page size */
+>  #define RMP_PG_SIZE_4K			0
+>  
+> -/* Memory opertion for snp_prep_memory() */
+> -enum snp_mem_op {
+> -	MEMORY_PRIVATE,
+> -	MEMORY_SHARED
+> -};
+> -
+>  #ifdef CONFIG_AMD_MEM_ENCRYPT
+>  extern struct static_key_false sev_es_enable_key;
+>  extern void __sev_es_ist_enter(struct pt_regs *regs);
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index 2a5dce42af35..991d7964cee9 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -662,20 +662,13 @@ void __init snp_prep_memory(unsigned long paddr, unsigned int sz, int op)
+>  	vaddr = (unsigned long)__va(paddr);
+>  	npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
+>  
+> -	switch (op) {
+> -	case MEMORY_PRIVATE: {
+> +	if (op == SNP_PAGE_STATE_PRIVATE)
+>  		early_snp_set_memory_private(vaddr, paddr, npages);
+> -		return;
+> -	}
+> -	case MEMORY_SHARED: {
+> +	else if (op == SNP_PAGE_STATE_SHARED)
+>  		early_snp_set_memory_shared(vaddr, paddr, npages);
+> -		return;
+> +	else {
+> +		WARN(1, "invalid memory page op %d\n", op);
+>  	}
+> -	default:
+> -		break;
+> -	}
+> -
+> -	WARN(1, "invalid memory op %d\n", op);
+>  }
+>  
+>  int sev_es_setup_ap_jump_table(struct real_mode_header *rmh)
+> ---
+>
+>>  static char sme_early_buffer[PAGE_SIZE] __initdata __aligned(PAGE_SIZE);
+>>  
+>> +/*
+>> + * When SNP is active, changes the page state from private to shared before
+> s/changes/change/
+
+Noted.
+
+
+>
+>> + * copying the data from the source to destination and restore after the copy.
+>> + * This is required because the source address is mapped as decrypted by the
+>> + * caller of the routine.
+>> + */
+>> +static inline void __init snp_memcpy(void *dst, void *src, size_t sz,
+>> +				     unsigned long paddr, bool decrypt)
+>> +{
+>> +	unsigned long npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
+>> +
+>> +	if (!sev_feature_enabled(SEV_SNP) || !decrypt) {
+>> +		memcpy(dst, src, sz);
+>> +		return;
+>> +	}
+>> +
+>> +	/*
+>> +	 * If the paddr needs to be accessed decrypted, mark the page
+> What do you mean "If" - this is the SNP version of memcpy. Just say:
+>
+> 	/*
+> 	 * With SNP, the page address needs to be ...
+> 	 */
+>
+>> +	 * shared in the RMP table before copying it.
+>> +	 */
+>> +	early_snp_set_memory_shared((unsigned long)__va(paddr), paddr, npages);
+>> +
+>> +	memcpy(dst, src, sz);
+>> +
+>> +	/* Restore the page state after the memcpy. */
+>> +	early_snp_set_memory_private((unsigned long)__va(paddr), paddr, npages);
+>> +}
+>> +
+>>  /*
+>>   * This routine does not change the underlying encryption setting of the
+>>   * page(s) that map this memory. It assumes that eventually the memory is
+>> @@ -96,8 +125,8 @@ static void __init __sme_early_enc_dec(resource_size_t paddr,
+>>  		 * Use a temporary buffer, of cache-line multiple size, to
+>>  		 * avoid data corruption as documented in the APM.
+>>  		 */
+>> -		memcpy(sme_early_buffer, src, len);
+>> -		memcpy(dst, sme_early_buffer, len);
+>> +		snp_memcpy(sme_early_buffer, src, len, paddr, enc);
+>> +		snp_memcpy(dst, sme_early_buffer, len, paddr, !enc);
+>>  
+>>  		early_memunmap(dst, len);
+>>  		early_memunmap(src, len);
+>> @@ -277,9 +306,23 @@ static void __init __set_clr_pte_enc(pte_t *kpte, int level, bool enc)
+>>  	else
+>>  		sme_early_decrypt(pa, size);
+>>  
+>> +	/*
+>> +	 * If page is getting mapped decrypted in the page table, then the page state
+>> +	 * change in the RMP table must happen before the page table updates.
+>> +	 */
+>> +	if (!enc)
+>> +		early_snp_set_memory_shared((unsigned long)__va(pa), pa, 1);
+> Merge the two branches:
+
+Noted.
+
+
+>
+> 	/* Encrypt/decrypt the contents in-place */
+>         if (enc) {
+>                 sme_early_encrypt(pa, size);
+>         } else {
+>                 sme_early_decrypt(pa, size);
+>
+>                 /*
+>                  * On SNP, the page state change in the RMP table must happen
+>                  * before the page table updates.
+>                  */
+>                 early_snp_set_memory_shared((unsigned long)__va(pa), pa, 1);
+>         }
+
+- Brijesh
+
