@@ -2,163 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 501803A5DD5
-	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 09:41:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C44F3A5DE1
+	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 09:48:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232533AbhFNHne (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Jun 2021 03:43:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35990 "EHLO
+        id S232524AbhFNHuI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Jun 2021 03:50:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60287 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232524AbhFNHnc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 14 Jun 2021 03:43:32 -0400
+        by vger.kernel.org with ESMTP id S232509AbhFNHuG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 14 Jun 2021 03:50:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623656489;
+        s=mimecast20190719; t=1623656883;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=3vluf07n1e9CMotPaBeCeLpe5If4SME3MyJJJYYovH4=;
-        b=Su5DrWN6fKgvGvkGWTQ6LhBB1hnkXLJ2T1ffBpO3uId9Anymk9nAwZLLLpL9tG7V8q12o3
-        SFZIlK3/XCyf4SOpKzVxvViUDl/WWodwNm/7H927iAPkrM8jQtGwoWm3hGiHd+yy33yAfE
-        25lvIUl1giBIbMA5UB56stVmsjct3zk=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-600-V-k4ltloMKSnRDveIQ1Irg-1; Mon, 14 Jun 2021 03:40:48 -0400
-X-MC-Unique: V-k4ltloMKSnRDveIQ1Irg-1
-Received: by mail-ed1-f71.google.com with SMTP id s25-20020aa7c5590000b0290392e051b029so14780828edr.11
-        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 00:40:48 -0700 (PDT)
+        bh=uVVQDAqE2mNu93zrjVnb7Wt06L1/09jtCkVYdV1XAfc=;
+        b=YkWQLAGs4500hMYddsrdqMOqX2wgsZO1Qbz7DTWm7u7/0mrEdXZ7NKBrFzhdX3isi5JD7r
+        uA1TKyZSpVPbfl66vUu8xMvW51gpYiLdI2xwpWC2leibv5I+oRUkZcvyPRaqbC089mnVlR
+        5dYYkepuyC1YAnLj9rRvXXsJAcGZJfo=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-428-0aOA1ysLOBey_51RwqJP9A-1; Mon, 14 Jun 2021 03:48:02 -0400
+X-MC-Unique: 0aOA1ysLOBey_51RwqJP9A-1
+Received: by mail-ej1-f69.google.com with SMTP id z6-20020a17090665c6b02903700252d1ccso2678339ejn.10
+        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 00:48:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=3vluf07n1e9CMotPaBeCeLpe5If4SME3MyJJJYYovH4=;
-        b=Rqc5X44dKsgl1qlapan7JcKZXKjmb+fdhRAaQjUwqmC/TcHQFNizYX3pc1tSXLUYGp
-         2wSq/SrNjELZSdMufQmWh1/mA2vTHfVttn0HQF8K9qsAQxn+B6jUDLRDiZeLfHv2FtvT
-         g1+eUb9JFd5ZKmF7rNPdcUsegkLF1SZWjTlBJxgVnGl19QPtXebf48QtKfVWY42YCRMm
-         PtpcCrjq8kZDWGwKVOqR5vV7BqeSiIotrnMtWBQBwIfOrYR57GUWSg9RdsfT3Bm5n+zj
-         KxAxu+E6ssHE/CPnzHXx5pb9CvjOkuJU55KAHsD6E1o7STUR9oCGhZ9wAVe7xikKgW+j
-         Cg/w==
-X-Gm-Message-State: AOAM531TveiOzHigidt0HmTpHYAcWtoqHIzwOtqRmL4/FXCp56PuDPxu
-        tDL4q9/ilQovMPkI3J63P7ywliN4I2FGqeiHv4LiTUthPynQyP2Hyihf6bkBYR0iet5JTxSB2u2
-        iVkoavD20KfCt
-X-Received: by 2002:a05:6402:4395:: with SMTP id o21mr15611031edc.163.1623656447220;
-        Mon, 14 Jun 2021 00:40:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyXFlZ+swOY5PozQnD2lwcOa9P4NfPBGblip0aRW2ve2FhR7KJrAMeV3SRvrOwFQafoV2qa0A==
-X-Received: by 2002:a05:6402:4395:: with SMTP id o21mr15611021edc.163.1623656447053;
-        Mon, 14 Jun 2021 00:40:47 -0700 (PDT)
-Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id c19sm7910388edw.10.2021.06.14.00.40.46
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=uVVQDAqE2mNu93zrjVnb7Wt06L1/09jtCkVYdV1XAfc=;
+        b=PCsBHN/WVsp148Gu/HlOooPkOr5IadI6Vdxwt2t2f+BUQZjlK7fFxrogppSKYAzgue
+         70VG+8Fz5jA+z3ZyVMlzZJNL0aqnsb/xp3lcNGxf66n7Gx/18tvHTRp/XLgvQTGwSm6N
+         8875oY+IvRgbDHpFg54YuKzO7ej+EOuN8fSYe76I41xXSmCVSOqnOmyuFbZowW9DxO3V
+         6NcO66E32X00PRwlUbNsExUUyKOEsuw7eE0ErGrrwKDeSv7YKtfheWX9FiG7yivlwkrX
+         Mbg5cAPqNs5yIFhzDac+wXEYffvgtvBruRXI6I2TdmtqfrXDkrg3M6b0Hc9TQdpG/yji
+         7Efw==
+X-Gm-Message-State: AOAM533r2S8qfgaLRjTBF/L+7Y4PI5lEyRv/zrJsMYG9Tgv81r/UaO5K
+        /LGNv1T2Ur2njs17f3zOLEUhayE0WbHmz7WB5ITqNo1CYasYZH4Z1vXF9cj+1Inj5C+5haq1n3v
+        wb7tp1EyXy3hy
+X-Received: by 2002:aa7:cb19:: with SMTP id s25mr15927089edt.194.1623656881435;
+        Mon, 14 Jun 2021 00:48:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzR5ViPXNZ/W1P6S7MeGqL1karb6GMvkiVX7a6Cj3XRWtU7Ght+0fiIaUQS7VaSMZPx0qyfEA==
+X-Received: by 2002:aa7:cb19:: with SMTP id s25mr15927063edt.194.1623656881266;
+        Mon, 14 Jun 2021 00:48:01 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id h8sm6839060ejj.22.2021.06.14.00.47.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jun 2021 00:40:46 -0700 (PDT)
-Date:   Mon, 14 Jun 2021 09:40:44 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        pbonzini@redhat.com, maz@kernel.org, alexandru.elisei@arm.com,
-        eric.auger@redhat.com, yuzenghui@huawei.com, vkuznets@redhat.com
-Subject: Re: [PATCH v4 0/6] KVM: selftests: arm64 exception handling and
- debug test
-Message-ID: <20210614074044.vntupqsiuqmqobsy@gator>
-References: <20210611011020.3420067-1-ricarkol@google.com>
+        Mon, 14 Jun 2021 00:48:00 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     "H. Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
+        Vineeth Pillai <viremana@linux.microsoft.com>,
+        Lan Tianyu <Tianyu.Lan@microsoft.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Wei Liu <wei.liu@kernel.org>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>
+Subject: Re: [PATCH v5 0/7] Hyper-V nested virt enlightenments for SVM
+In-Reply-To: <50dea657-ef03-4bde-b9c7-75d9e18157ea@redhat.com>
+References: <cover.1622730232.git.viremana@linux.microsoft.com>
+ <5af1ccce-a07d-5a13-107b-fc4c4553dd4d@redhat.com>
+ <683fa50765b29f203cb4b0953542dc43226a7a2f.camel@redhat.com>
+ <878s3gybuk.fsf@vitty.brq.redhat.com>
+ <50dea657-ef03-4bde-b9c7-75d9e18157ea@redhat.com>
+Date:   Mon, 14 Jun 2021 09:47:59 +0200
+Message-ID: <87wnqwx4y8.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210611011020.3420067-1-ricarkol@google.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 10, 2021 at 06:10:14PM -0700, Ricardo Koller wrote:
-> Hi,
-> 
-> These patches add a debug exception test in aarch64 KVM selftests while
-> also adding basic exception handling support.
-> 
-> The structure of the exception handling is based on its x86 counterpart.
-> Tests use the same calls to initialize exception handling and both
-> architectures allow tests to override the handler for a particular
-> vector, or (vector, ec) for synchronous exceptions in the arm64 case.
-> 
-> The debug test is similar to x86_64/debug_regs, except that the x86 one
-> controls the debugging from outside the VM. This proposed arm64 test
-> controls and handles debug exceptions from the inside.
-> 
-> Thanks,
-> Ricardo
-> 
-> v3 -> v4:
-> 
-> V3 was dropped because it was breaking x86 selftests builds (reported by
-> the kernel test robot).
-> - rename vm_handle_exception to vm_install_sync_handler instead of
->   vm_install_vector_handlers. [Sean]
-> - use a single level of routing for exception handling. [Sean]
-> - fix issue in x86_64/sync_regs_test when switching to ucalls for unhandled
->   exceptions reporting.
-> 
-> v2 -> v3:
-> 
-> Addressed comments from Andrew and Marc (thanks again). Also, many thanks for
-> the reviews and tests from Eric and Zenghui.
-> - add missing ISBs after writing into debug registers.
-> - not store/restore of sp_el0 on exceptions.
-> - add default handlers for Error and FIQ.
-> - change multiple TEST_ASSERT(false, ...) to TEST_FAIL.
-> - use Andrew's suggestion regarding __GUEST_ASSERT modifications
->   in order to easier implement GUEST_ASSERT_EQ (Thanks Andrew).
-> 
-> v1 -> v2:
-> 
-> Addressed comments from Andrew and Marc (thank you very much):
-> - rename vm_handle_exception in all tests.
-> - introduce UCALL_UNHANDLED in x86 first.
-> - move GUEST_ASSERT_EQ to common utils header.
-> - handle sync and other exceptions separately: use two tables (like
->   kvm-unit-tests).
-> - add two separate functions for installing sync versus other exceptions
-> - changes in handlers.S: use the same layout as user_pt_regs, treat the
->   EL1t vectors as invalid, refactor the vector table creation to not use
->   manual numbering, add comments, remove LR from the stored registers.
-> - changes in debug-exceptions.c: remove unused headers, use the common
->   GUEST_ASSERT_EQ, use vcpu_run instead of _vcpu_run.
-> - changes in processor.h: write_sysreg with support for xzr, replace EL1
->   with current in macro names, define ESR_EC_MASK as ESR_EC_NUM-1.
-> 
-> Ricardo Koller (6):
->   KVM: selftests: Rename vm_handle_exception
->   KVM: selftests: Complete x86_64/sync_regs_test ucall
->   KVM: selftests: Introduce UCALL_UNHANDLED for unhandled vector
->     reporting
->   KVM: selftests: Move GUEST_ASSERT_EQ to utils header
->   KVM: selftests: Add exception handling support for aarch64
->   KVM: selftests: Add aarch64/debug-exceptions test
-> 
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   3 +-
->  .../selftests/kvm/aarch64/debug-exceptions.c  | 250 ++++++++++++++++++
->  .../selftests/kvm/include/aarch64/processor.h |  83 +++++-
->  .../testing/selftests/kvm/include/kvm_util.h  |  23 +-
->  .../selftests/kvm/include/x86_64/processor.h  |   4 +-
->  .../selftests/kvm/lib/aarch64/handlers.S      | 126 +++++++++
->  .../selftests/kvm/lib/aarch64/processor.c     |  97 +++++++
->  .../selftests/kvm/lib/x86_64/processor.c      |  23 +-
->  .../testing/selftests/kvm/x86_64/evmcs_test.c |   4 +-
->  .../selftests/kvm/x86_64/kvm_pv_test.c        |   2 +-
->  .../selftests/kvm/x86_64/sync_regs_test.c     |   7 +-
->  .../selftests/kvm/x86_64/tsc_msrs_test.c      |   9 -
->  .../kvm/x86_64/userspace_msr_exit_test.c      |   8 +-
->  .../selftests/kvm/x86_64/xapic_ipi_test.c     |   2 +-
->  15 files changed, 592 insertions(+), 50 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/aarch64/debug-exceptions.c
->  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/handlers.S
-> 
-> -- 
-> 2.32.0.272.g935e593368-goog
->
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-For the series
+> CONFIG_HYPERV=m is possible.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+We've stubmled upon this multiple times already. Initially, the whole
+Hyper-V support code was a module (what's now in drivers/hv/) but then
+some core functionallity was moved out to arch/x86/ but we didn't add a
+new config back then. Still suffering :-)
 
-Thanks,
-drew
+Ideally, we would want to have 
+
+CONFIG_HYPERV_GUEST=y/n for what's in arch/x86/ (just like CONFIG_KVM_GUEST)
+CONFIG_HYPERV_VMBUS=y/n/m for what's in drivers/hv
+
+-- 
+Vitaly
 
