@@ -2,198 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2852E3A5F6A
-	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 11:51:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 877D63A5F6F
+	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 11:51:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232752AbhFNJxR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Jun 2021 05:53:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42877 "EHLO
+        id S232804AbhFNJxc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Jun 2021 05:53:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21238 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232776AbhFNJxN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 14 Jun 2021 05:53:13 -0400
+        by vger.kernel.org with ESMTP id S232798AbhFNJx3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 14 Jun 2021 05:53:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623664270;
+        s=mimecast20190719; t=1623664286;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pkbuA5hf8p6fEJiSHAXuHkzswzV57iOl5tZWDJ1RMuQ=;
-        b=BvGa2m+9TkD8iE9BJagPLEsncCFsYpOHjBvaqhfj3bXUVRycdIfASUmmpdtUT2AQkIgK5F
-        es8Hqzc/UZk9Ioa3AO6eBvjDjKjdKJ/w8GrBhjLG+QlB6itqdcMtyrwQD9fFPSF8Y9krOJ
-        1Z9x/kW6ceyTPBAk+bB0VS2xglKYR5s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-509-LuLRukLhPFesTH-wtx8tTw-1; Mon, 14 Jun 2021 05:51:07 -0400
-X-MC-Unique: LuLRukLhPFesTH-wtx8tTw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 397BB192296B;
-        Mon, 14 Jun 2021 09:51:06 +0000 (UTC)
-Received: from starship (unknown [10.40.194.6])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D381560938;
-        Mon, 14 Jun 2021 09:51:03 +0000 (UTC)
-Message-ID: <d175c6ee68f357280166464bbacf6a468c3d9a74.camel@redhat.com>
-Subject: Re: [PATCH v3 0/4] KVM: x86: hyper-v: Conditionally allow SynIC
- with APICv/AVIC
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Date:   Mon, 14 Jun 2021 12:51:02 +0300
-In-Reply-To: <87zgvsx5b1.fsf@vitty.brq.redhat.com>
-References: <20210609150911.1471882-1-vkuznets@redhat.com>
-         <f294faba4e5d25aba8773f36170d1309236edd3b.camel@redhat.com>
-         <87zgvsx5b1.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        bh=yVGqXIcKrLCK11mCl5CKOO3c7mK+et1d86zdU/of4sY=;
+        b=Jb5JdD8X/xF0x/6xn+VQj7HDjgkfSpyZXv+u8LxkZZRpkqK8QiJbszXNbbqmytvJUswjQs
+        Wnh3v1wG7WdNrqW3OaEz5NFOC+Kgg9a4MAO1oogYDNpFmeHbbOrpK2aN02aRyD1pBINXUw
+        dM7asWdPEOMhXzzu0G0sEYa0G83cYJ4=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-544-ar5NGtevOKu5rhSmf0uFRg-1; Mon, 14 Jun 2021 05:51:24 -0400
+X-MC-Unique: ar5NGtevOKu5rhSmf0uFRg-1
+Received: by mail-ed1-f69.google.com with SMTP id x8-20020aa7d3880000b029038fe468f5f4so19825343edq.10
+        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 02:51:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=yVGqXIcKrLCK11mCl5CKOO3c7mK+et1d86zdU/of4sY=;
+        b=dU5SsURKo+EEcMlqoOz7T5sDyOm2A3Uz573+/bcV6Wb2y4HJFjBgOvbImszPT3wVYx
+         jnqEKlFC09bAIHjHHPQLii8wRwDjnrxN2Qvp/iiav2QexTfJVLMLBwM8ltrKrtSWZpaK
+         5wrbNASva1U5xm9oKijRbUNz7Bufh0HzcBhOGIXxdghC6oBsWh7wtbgO1E6z8dewLfw0
+         SC0h3b91uxVj4xbCkb4jHbYtxCc+vgioyMCUEzk2JcgAgkMuxgoX7zupDswXlUN5QQxk
+         csQsW6piy1b6GcRsCePK5jzrZzSkIL5/1FpWtX7LT6c4Txk/xK0j6J4KQJAUMVqj4GL0
+         LuyQ==
+X-Gm-Message-State: AOAM532gzYmAnbJqKQMtg5ZzqtFbdur0bmDgvCDszCb5wIuv5TDkMEF0
+        BBjpOCOBERYvELnj5N1knjiGyvoalD62ANWnGK2ybmO9F8uKUm1+z9dbklP7gCo+WI7eQvPhRQS
+        pRWrvAiMC+qh6
+X-Received: by 2002:a17:906:606:: with SMTP id s6mr14277119ejb.206.1623664283795;
+        Mon, 14 Jun 2021 02:51:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzUGdB6YCrtVUeX6wpPs0U6HuF+wRnjGRZ9weZzhvjGvM0kMMRuORQ5jQGRt+viUDl0Dzm5nQ==
+X-Received: by 2002:a17:906:606:: with SMTP id s6mr14277110ejb.206.1623664283633;
+        Mon, 14 Jun 2021 02:51:23 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id y15sm8131933edd.55.2021.06.14.02.51.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Jun 2021 02:51:22 -0700 (PDT)
+Subject: Re: [PATCH 2/4] KVM: stats: Use binary stats descriptors for debugfs
+ interface
+To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Fuad Tabba <tabba@google.com>
+References: <20210614025351.365284-1-jingzhangos@google.com>
+ <20210614025351.365284-3-jingzhangos@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1b57502b-116a-9be5-fa2f-1e8f5b5fce2d@redhat.com>
+Date:   Mon, 14 Jun 2021 11:51:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20210614025351.365284-3-jingzhangos@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2021-06-14 at 09:40 +0200, Vitaly Kuznetsov wrote:
-> Maxim Levitsky <mlevitsk@redhat.com> writes:
-> 
-> > On Wed, 2021-06-09 at 17:09 +0200, Vitaly Kuznetsov wrote:
-> > > Changes since v2:
-> > > - First two patches got merged, rebase.
-> > > - Use 'enable_apicv = avic = ...' in PATCH1 [Paolo]
-> > > - Collect R-b tags for PATCH2 [Sean, Max]
-> > > - Use hv_apicv_update_work() to get out of SRCU lock [Max]
-> > > - "KVM: x86: Check for pending interrupts when APICv is getting disabled"
-> > >   added.
-> > > 
-> > > Original description:
-> > > 
-> > > APICV_INHIBIT_REASON_HYPERV is currently unconditionally forced upon
-> > > SynIC activation as SynIC's AutoEOI is incompatible with APICv/AVIC. It is,
-> > > however, possible to track whether the feature was actually used by the
-> > > guest and only inhibit APICv/AVIC when needed.
-> > > 
-> > > The series can be tested with the followin hack:
-> > > 
-> > > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > > index 9a48f138832d..65a9974f80d9 100644
-> > > --- a/arch/x86/kvm/cpuid.c
-> > > +++ b/arch/x86/kvm/cpuid.c
-> > > @@ -147,6 +147,13 @@ void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
-> > >                                            vcpu->arch.ia32_misc_enable_msr &
-> > >                                            MSR_IA32_MISC_ENABLE_MWAIT);
-> > >         }
-> > > +
-> > > +       /* Dirty hack: force HV_DEPRECATING_AEOI_RECOMMENDED. Not to be merged! */
-> > > +       best = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_ENLIGHTMENT_INFO, 0);
-> > > +       if (best) {
-> > > +               best->eax &= ~HV_X64_APIC_ACCESS_RECOMMENDED;
-> > > +               best->eax |= HV_DEPRECATING_AEOI_RECOMMENDED;
-> > > +       }
-> > >  }
-> > >  EXPORT_SYMBOL_GPL(kvm_update_cpuid_runtime);
-> > >  
-> > > Vitaly Kuznetsov (4):
-> > >   KVM: x86: Use common 'enable_apicv' variable for both APICv and AVIC
-> > >   KVM: x86: Drop vendor specific functions for APICv/AVIC enablement
-> > >   KVM: x86: Check for pending interrupts when APICv is getting disabled
-> > >   KVM: x86: hyper-v: Deactivate APICv only when AutoEOI feature is in
-> > >     use
-> > > 
-> > >  arch/x86/include/asm/kvm_host.h |  9 +++++-
-> > >  arch/x86/kvm/hyperv.c           | 51 +++++++++++++++++++++++++++++----
-> > >  arch/x86/kvm/svm/avic.c         | 14 ++++-----
-> > >  arch/x86/kvm/svm/svm.c          | 22 ++++++++------
-> > >  arch/x86/kvm/svm/svm.h          |  2 --
-> > >  arch/x86/kvm/vmx/capabilities.h |  1 -
-> > >  arch/x86/kvm/vmx/vmx.c          |  2 --
-> > >  arch/x86/kvm/x86.c              | 18 ++++++++++--
-> > >  8 files changed, 86 insertions(+), 33 deletions(-)
-> > > 
-> > 
-> > Hi!
-> > 
-> > I hate to say it, but at least one of my VMs doesn't boot amymore
-> > with avic=1, after the recent updates. I'll bisect this soon,
-> > but this is likely related to this series.
-> > 
-> > I will also review this series very soon.
-> > 
-> > When the VM fails, it hangs on the OVMF screen and I see this
-> > in qemu logs:
-> > 
-> > KVM: injection failed, MSI lost (Operation not permitted)
-> > KVM: injection failed, MSI lost (Operation not permitted)
-> > KVM: injection failed, MSI lost (Operation not permitted)
-> > KVM: injection failed, MSI lost (Operation not permitted)
-> > KVM: injection failed, MSI lost (Operation not permitted)
-> > KVM: injection failed, MSI lost (Operation not permitted)
-> > 
-> 
-> -EPERM?? Interesting... strace(1) may come handy...
+On 14/06/21 04:53, Jing Zhang wrote:
+> +	STATS_DESC_ICOUNTER_RONLY(VM, lpages),
+> +	STATS_DESC_ICOUNTER_RONLY(VM, nx_lpage_splits),
+>  	STATS_DESC_ICOUNTER(VM, max_mmu_page_hash_collisions)
 
+I think we're now adding too many macros.
 
-Hi Vitaly!
- 
-I spent all yesterday debugging this and I found out what is going on:
-(spoiler alert: hacks are bad)
+max_mmu_page_hash_collisions is the only remaining instant counter that 
+is not read-only.  In fact, in the statsfs prototype we made all instant 
+counters read-only.
 
-The call to kvm_request_apicv_update was moved to a delayed work which is fine at first glance 
-but turns out that we both don't notice that kvm doesn't allow to update the guest
-memory map from non vcpu thread which is what kvm_request_apicv_update does
-on AVIC.
- 
-The memslot update is to switch between regular r/w mapped dummy page
-which is not really used but doesn't hurt to be there, and between paging entry with
-reserved bits, used for MMIO, which AVIC sadly needs because it is written in the
-spec that AVIC's MMIO despite being redirected to the avic_vapic_bar, still needs a valid
-R/W mapping in the NPT, whose physical address is ignored.
+You could add a third type in addition to instant and cumulative, let's 
+call it "peak".  This essentially corresponds to the "max" aggregation 
+function in the statsfs prototype.  Then instant counters would be read 
+only, while cumulative and peak would be read-write.
 
-So, in avic_update_access_page we have this nice hack:
- 
-if ((kvm->arch.apic_access_page_done == activate) ||
-	    (kvm->mm != current->mm))
-		goto out;
- 
-So instead of crashing this function just does nothing.
-So AVIC MMIO is still mapped R/W to a dummy page, but the AVIC itself
-is disabled on all vCPUs by kvm_request_apicv_update (with 
-KVM_REQ_APICV_UPDATE request)
-
-So now all guest APIC writes just disappear to that dummy
-page, and we have a guest that seems to run but can't really
-continue. 
-
-The -EPERM in the error message I reported, is just -1, returned by 
-KVM_SIGNAL_MSI which is likely result of gross missmatch between
-state of the KVM's APIC registers and that dummy page which contains
-whatever the guest wrote there and what the guest thinks
-the APIC registers are.
-
-I am curently thinking on how to do the whole thing with
-KVM's requests, I'll try to prepare a patch today.
- 
-Best regards,
-	Maxim Levitsky
-
-> 
-> $ git grep EPERM kvm/queue arch/x86/kvm/ 
-> kvm/queue:arch/x86/kvm/x86.c:           ret = -KVM_EPERM;
-> (just this one)
-> 
-> kvm_emulate_hypercall():
-> ...
-> b3646477d458f arch/x86/kvm/x86.c (Jason Baron                2021-01-14 22:27:56 -0500  8433)   if (static_call(kvm_x86_get_cpl)(vcpu) != 0) {
-> 07708c4af1346 arch/x86/kvm/x86.c (Jan Kiszka                 2009-08-03 18:43:28 +0200  8434)           ret = -KVM_EPERM;
-> 696ca779a928d arch/x86/kvm/x86.c (Radim Krčmář               2018-05-24 17:50:56 +0200  8435)           goto out;
-> 07708c4af1346 arch/x86/kvm/x86.c (Jan Kiszka                 2009-08-03 18:43:28 +0200  8436)   }
-> ...
-> 
-> Doesn't seem we have any updates here, curious what your bisection will
-> point us to.
-> 
-
+Paolo
 
