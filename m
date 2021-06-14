@@ -2,341 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C94D43A676B
-	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 15:06:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D7E773A676D
+	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 15:08:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233803AbhFNNID (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Jun 2021 09:08:03 -0400
-Received: from mail-dm6nam11on2068.outbound.protection.outlook.com ([40.107.223.68]:49664
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233633AbhFNNIB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Jun 2021 09:08:01 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oVAO5uaWnkTSQMrw4bG9p41eRI36s9NhfFdqk5y0AL19MJWSrHt1rUL+0nzg/nn+eox39xIMrpaEOnsS0xqPBA6JKZI5E3piYA1cpgxGCZOG62FAY+bMagKTNw38LahTSKPMnM4l1gH1zV8JS5KPzM9JcW7VSKCBBiMDS1Rm0bvSreh3YYu5zsQ5HlZJtED9MuV+go7Ezc6yHKGOK/WEQycFaQkXF81kPaW2obedpqiqZU/UCZDuoHBUC948lYPQrAtKYHHb/+BboAcDOcc5AqivflDs2IoaJcr5JyDpQh67vEFLFUGsgo4yvpVvAExq4i5e0+oxmtb0yl80n8kWNQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TrU9uQTY4LccVRsyLSTQkJaFZGyuVzHq6kjmehqMyAM=;
- b=bVWNRocJICIRXP3VLqeFiocwFbJLPsQWivti9dwSITp4cUzslymiiDNv1pfi9mN0qsqKu2Nbtf/NU+xEmerC3ROCgEwCeT6YztpzBjRMw6V0x+trlilneubAXNnMyQTLdLbF7c1U2VhZQPHfi4dzricl6H7XOO3ysXOO8sUfdL5Y6P31N8p2GwKPR5UmdJLkgii8YpT0R/c+kZ0HkJaZGynlK2bfYbTAhXrYmK4DNA3ZiY4Z36do44dp6P79KBSIjOCN5ZdL9sYxFeOkx/nG1bSKk+qdeYIZyVIA5iI+qJIK3RgQZrG+Vfd3HqGJO44EzFq8WSrjHSJnc3E24000vA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TrU9uQTY4LccVRsyLSTQkJaFZGyuVzHq6kjmehqMyAM=;
- b=pWFSnknLht51+8mM9k5amyt6IY7FV2aIXDrzkahA7nCSGuH4/tVqRr1Lik3Sy9Ud0eq6txWaEw9i7ocOp/KMHaEwgC2blhQoZwEgstZUYyvUNUVhehEoJFIcl73AUBsSR3flGwWLA7BU+9F/zaBF/XkIpXOUMWZu5ReqorM8P/Y=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB2714.namprd12.prod.outlook.com (2603:10b6:5:42::18) by
- DM5PR1201MB0075.namprd12.prod.outlook.com (2603:10b6:4:54::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4219.22; Mon, 14 Jun 2021 13:05:56 +0000
-Received: from DM6PR12MB2714.namprd12.prod.outlook.com
- ([fe80::7df8:b0cd:fe1b:ae7b]) by DM6PR12MB2714.namprd12.prod.outlook.com
- ([fe80::7df8:b0cd:fe1b:ae7b%5]) with mapi id 15.20.4219.022; Mon, 14 Jun 2021
- 13:05:56 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        id S233234AbhFNNKi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Jun 2021 09:10:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60268 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232791AbhFNNKg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 14 Jun 2021 09:10:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623676113;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=F6VHDVVSaHbxavSBrHRbBLmC4qN56vv+UPm0zOPUbbA=;
+        b=ei8byQXxVd3fZ6EcpgWfpIZqVJnG0p4ytoElDAEgDcaFlB4DeJQ1VB+yXhQL0tzGIio83a
+        B1MtIkb4WWdVyhvpHmW3d/+T+aN3rCKhpEtJhQpLZ4u7GIEKEaGax3VT3Dr9IbJvrjQJ4h
+        cG5LJ9MCcFOcBpeOm8mmvKq4jGazWC8=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-mLAz1rgONC6-g3Xx9DU-TQ-1; Mon, 14 Jun 2021 09:08:32 -0400
+X-MC-Unique: mLAz1rgONC6-g3Xx9DU-TQ-1
+Received: by mail-ed1-f71.google.com with SMTP id z16-20020aa7d4100000b029038feb83da57so20168156edq.4
+        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 06:08:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=F6VHDVVSaHbxavSBrHRbBLmC4qN56vv+UPm0zOPUbbA=;
+        b=pW8GIclXXftNcKlRDpMQwAQ7cpz89Wc2uCjcsE/kMQus72jLPKj66ETF9U6Njiqykm
+         VJcow+bMk8hogH3IfBfp/swkXrmdnNVD+6T+6Oy5fwmOKa1SPcP71uTxd1lCG8Z9r/Vp
+         OzCA88WqwAz54z1UAjPz3CP1ug0ckenz63RJgahAANuWMm2MKcNOranwFNtqfoUf40hD
+         YXRQMQqnOPvYKeYPOahC9WNEaHIZ/vFsOdgpV0zbbj++KJnQtr88QvXYFWi7Wv7sbpBS
+         VTrSBB/GFCXLF4vAaO3Hs5TscCgcvUInVTzezAmbN75HN72AT1eNtwhnOWfQPkvON/hd
+         DXlA==
+X-Gm-Message-State: AOAM531thvvEuGh4E4zOyRkpPSH59GsFD3FRn2QCLQKJvVk/hpXS6c1l
+        Yqvo1WXSRL8wogmKeFAX93gloCIB8dzW7F0a5EjACNIH1kr5Klsl9i2PqvJ38eixNuwi25NC/p1
+        7Lw6QP3ycIvCiCxc1p8vGHinIUb1seNylkcIf6sc/NnyG+1ryIDELbJGbb0WCPXe0
+X-Received: by 2002:a17:907:9688:: with SMTP id hd8mr14722469ejc.314.1623676109560;
+        Mon, 14 Jun 2021 06:08:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxSuR5TvLWzrdc/KuigLP78IW6XFGRGmeZMVeaTSaRnuge2CljWyb3YxNbk7geVnp8TgtE+IQ==
+X-Received: by 2002:a17:907:9688:: with SMTP id hd8mr14722429ejc.314.1623676109241;
+        Mon, 14 Jun 2021 06:08:29 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id au11sm7520523ejc.88.2021.06.14.06.08.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Jun 2021 06:08:28 -0700 (PDT)
+Subject: Re: [PATCH v3 0/4] KVM: x86: hyper-v: Conditionally allow SynIC with
+ APICv/AVIC
+To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
-        npmccallum@redhat.com
-Subject: Re: [PATCH Part1 RFC v3 14/22] x86/mm: Add support to validate memory
- when changing C-bit
-To:     Borislav Petkov <bp@alien8.de>
-References: <20210602140416.23573-1-brijesh.singh@amd.com>
- <20210602140416.23573-15-brijesh.singh@amd.com> <YMMwdJRwbbsh1VVO@zn.tnic>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <267dc549-fcef-480e-891c-effd3d5b2058@amd.com>
-Date:   Mon, 14 Jun 2021 08:05:51 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
-In-Reply-To: <YMMwdJRwbbsh1VVO@zn.tnic>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [70.112.153.56]
-X-ClientProxiedBy: SN4PR0601CA0012.namprd06.prod.outlook.com
- (2603:10b6:803:2f::22) To DM6PR12MB2714.namprd12.prod.outlook.com
- (2603:10b6:5:42::18)
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20210609150911.1471882-1-vkuznets@redhat.com>
+ <f294faba4e5d25aba8773f36170d1309236edd3b.camel@redhat.com>
+ <87zgvsx5b1.fsf@vitty.brq.redhat.com>
+ <d175c6ee68f357280166464bbacf6a468c3d9a74.camel@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2f59a441-279c-d257-52ab-cdd3f2ee5704@redhat.com>
+Date:   Mon, 14 Jun 2021 15:08:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SN4PR0601CA0012.namprd06.prod.outlook.com (2603:10b6:803:2f::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.21 via Frontend Transport; Mon, 14 Jun 2021 13:05:53 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e599aa26-8018-4599-43e9-08d92f352572
-X-MS-TrafficTypeDiagnostic: DM5PR1201MB0075:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR1201MB0075692BED159011B849320CE5319@DM5PR1201MB0075.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: DkexGXIpvxQvo+/nijBu90sjew+QOdE/aAX6PCX5SM9GIYxDWeyfrIb1CtYcrlayU5KZnnpatVi+0u/Qo3pSgrPZzAYLJgHabgx8J9mRBj5KVJEpowykI90yt+oR+zqyJfwdEuRwVqondc8jpnH1ywBIQalg7XnHvZyPli04snsvvWlC87yeIzk8kriFH9lZKDODkPpGNQkjtd2e5VlRwyR+kp/f5sx4GHVknD3Wx47d5EmEULBtBT0J3n/mFqODM3FUaxV1j2b988THIZZK7zDR0GxC6cTK7e4gdz8uZFf8iQOtOqcqLyHVD1q6vgy01Ia6JEItlWouRYZnGn7ZYGQeedHY5z6c9Gtw4pB9xti7BekKz91P3zR6eygHDA234pJyccJnXvWAEgB4JnmjnO9DMzTwEc4TjQK6snnZT0lGVsHhTXcuDiE4Qw4n7NcX/Kwboz+a6qIcPHyeEvMvOMOh3anVWli2P0ijtCoUDnchL6/q6ggAqrd1dTeLuiso17k5qDjHUXSXHw3DMJZYTG/QG+uGQ0VU4KFTm1dxSHLhMryiR/w2olWKQZhJdzl6wdC+rauyD/QP/Nh3KSNrexTXa2dzvEAJbN5yYV0OqEankEZPYGSrg+XLJ2BeZUVVf9Udslq7LfjkpL/J75avOZii2bKZTTgt94NZGT3+sbuJ9oNwixTUObub6eHM8C0LMxocWt/3T1Dt+Oq95+G8rQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2714.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(366004)(376002)(346002)(39860400002)(136003)(31696002)(6512007)(38350700002)(186003)(478600001)(6916009)(316002)(54906003)(26005)(16526019)(86362001)(38100700002)(6486002)(8936002)(8676002)(6506007)(53546011)(52116002)(4326008)(36756003)(956004)(44832011)(2906002)(66476007)(66556008)(66946007)(7416002)(83380400001)(31686004)(2616005)(15650500001)(5660300002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K2g5eU1EMlRLRTZWdXpXWkE4VHRXWlUvU3FnTXdneXAzU0pMaDlsWEg4VnNX?=
- =?utf-8?B?VGNDS3YrZzNpc2VNL2RWWkxaaDdZZUYwaXRiZXQ5TUFvNUtidmdGNnhuclYw?=
- =?utf-8?B?QmFERWpnYzBBOWRSblJObGRTbktSemZuTUxvWWU2emxaSkY1ajVXR1hkRXVI?=
- =?utf-8?B?SU1oMmhqU0hLTWxpVGpucWQrMHYyc1RybTBSZXJOY1YzNTE2NEkxUE5SVE1z?=
- =?utf-8?B?MTh0QzZxckVBN05mSGJVcTc3Zkg5aTMwM0JidlllUVYvaitub2hGNjZRbVFx?=
- =?utf-8?B?ZnVNdXRkbmVacVNtc2VqR0tRYW9mK0FvUHJDNVFuaXhKaGJOMHhQRk9qaXVk?=
- =?utf-8?B?Uzg5LzhjQXlrdktTaXN0cllKV01QMXkyUk12NkE2NXVEZGhsdTVxK2pzRVZj?=
- =?utf-8?B?c00yQ3lZU0xjbTZsc3hpN0hJOEJadVVEZGJ1b090cnBxazN5cE5IcFBmWk5F?=
- =?utf-8?B?YTE3ZHRPQUxRWHp6MzVCZ2tFS0tlbFFQaHpqSFBONmpPeU4yU3Z0eitERTJZ?=
- =?utf-8?B?L25ZaXZaNWdYT29hWHFzRUNJWmdtV2I3dkJKbGtrMEwrWHo0djJtZDBESnFE?=
- =?utf-8?B?YnpleERONUZ0T1FkZFg3am1jZFpqeVk4eEFTb2w4UVpMZlJDcnlYb1BITmxZ?=
- =?utf-8?B?Y25veHV1a2czaCtIS0RjMmQraGFhRG0yc0d6WG5qV3RieXJiZE5rK2VaS09W?=
- =?utf-8?B?bm01b3RVUncvZ1FqcVVuVUEzajRlTlJyS1JaS1Z2VjdlRlNnR0xDRko4bWFQ?=
- =?utf-8?B?bDVlc0IvaFhXcjkxeVRLQ3M1eU9jYkpLSVpPRmErdUw2Y3NpOUNHQml0OGJ0?=
- =?utf-8?B?MVpwRzAreGREQk1PZm1RVFU5WDhmOEZzS25yRERrMGNjUzMvM3JkUTNMUDZP?=
- =?utf-8?B?RlF2OW5UNUZ0QTVXOXpFUFZUVTEwVnh0aUh1K05FY0JhTnErczMwcFlaeHAx?=
- =?utf-8?B?VFhQMS90YmMwNzVIN21LUlZHTzZrRUpJZjlGMXoyVVhYMEg4QldYS01zQ3lj?=
- =?utf-8?B?K29KNm02enlWeVJHMWRhdGtEajNsbEhpSHJIdmJnWjBYcHRmMW9qcGhoaDZ5?=
- =?utf-8?B?djV4Qko0eWxLN1dHb0pseUE4NXR4WWZDRHM4QmdoQUtMdWxkVzgvVWpyZEVY?=
- =?utf-8?B?eC9rWEE4cG1xZFM2TlN1QkNrNDhCQWNJSndQbU5NMk1reFp4UUlFeHM1WGtl?=
- =?utf-8?B?cFNCdXJ4YVZSM3lTZU91WC9idmUzMzJpVWxGcERNV3A1cTV5L0FWYW1DTXpL?=
- =?utf-8?B?OUpFU1c2SnI0U1F0UWZiYzEvQ2kvNEtlWjduUzVmcDZFOEVSR09UZExPOUZx?=
- =?utf-8?B?Q2l0bk9lK0JaVmdVVW52bVIvZ0pxMmRYRjlMcXltZDRLSWdlc1lab1VoOXhU?=
- =?utf-8?B?WjU0Yi82cDB0MDFhWjZZdHl0bHFEakpJZld4bHlqVEliVExzM0VUd3ZqME1N?=
- =?utf-8?B?dktiTHhUTlk4b2pITTJwTGkvVFJieTlJV0p5L0JMcDNUNXgyVEVGM3MrOFFD?=
- =?utf-8?B?S1VxaEp0VmR4L0ZkOUlIY0NqMGRaZlg0UGljdGs0b1JYVDNFRGZJQlNmU0pl?=
- =?utf-8?B?NU8zOGpraDc2YU5vYm1mZWhtNTQ5Y1FONVdMOVptNUxOOThMOURmb2d5MlNn?=
- =?utf-8?B?emxBdGo5OWw4WUM0OVBBdk9vN1R0MWQwVXV3U3lPd2ZiblJUOHpobGsyNHph?=
- =?utf-8?B?c0pjWmlLVGFBL3FnOG9HOVY5UmRBZWpXalQwa01FUHFWeVhSalFIS2Qyajl4?=
- =?utf-8?Q?s+u9/XCKOfud6JHX0zFrX2/VUfgile7ax0kNXza?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e599aa26-8018-4599-43e9-08d92f352572
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2714.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2021 13:05:55.9182
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JmlL+8Ycjl0SzlZH3rlOHBGp1+ksTU7Ae/dFu2TKAOTnzg/TiDivniYr00TixSuurBNr1IMKK1MgnkqJ/47fEw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1201MB0075
+In-Reply-To: <d175c6ee68f357280166464bbacf6a468c3d9a74.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 14/06/21 11:51, Maxim Levitsky wrote:
+> On Mon, 2021-06-14 at 09:40 +0200, Vitaly Kuznetsov wrote:
+>> Maxim Levitsky <mlevitsk@redhat.com> writes:
+>>
+>>> On Wed, 2021-06-09 at 17:09 +0200, Vitaly Kuznetsov wrote:
+>>>> Changes since v2:
+>>>> - First two patches got merged, rebase.
+>>>> - Use 'enable_apicv = avic = ...' in PATCH1 [Paolo]
+>>>> - Collect R-b tags for PATCH2 [Sean, Max]
+>>>> - Use hv_apicv_update_work() to get out of SRCU lock [Max]
+>>>> - "KVM: x86: Check for pending interrupts when APICv is getting disabled"
+>>>>    added.
+>>>>
+>>>> Original description:
+>>>>
+>>>> APICV_INHIBIT_REASON_HYPERV is currently unconditionally forced upon
+>>>> SynIC activation as SynIC's AutoEOI is incompatible with APICv/AVIC. It is,
+>>>> however, possible to track whether the feature was actually used by the
+>>>> guest and only inhibit APICv/AVIC when needed.
+>>>>
+>>>> The series can be tested with the followin hack:
+>>>>
+>>>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>>>> index 9a48f138832d..65a9974f80d9 100644
+>>>> --- a/arch/x86/kvm/cpuid.c
+>>>> +++ b/arch/x86/kvm/cpuid.c
+>>>> @@ -147,6 +147,13 @@ void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
+>>>>                                             vcpu->arch.ia32_misc_enable_msr &
+>>>>                                             MSR_IA32_MISC_ENABLE_MWAIT);
+>>>>          }
+>>>> +
+>>>> +       /* Dirty hack: force HV_DEPRECATING_AEOI_RECOMMENDED. Not to be merged! */
+>>>> +       best = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_ENLIGHTMENT_INFO, 0);
+>>>> +       if (best) {
+>>>> +               best->eax &= ~HV_X64_APIC_ACCESS_RECOMMENDED;
+>>>> +               best->eax |= HV_DEPRECATING_AEOI_RECOMMENDED;
+>>>> +       }
+>>>>   }
+>>>>   EXPORT_SYMBOL_GPL(kvm_update_cpuid_runtime);
+>>>>   
+>>>> Vitaly Kuznetsov (4):
+>>>>    KVM: x86: Use common 'enable_apicv' variable for both APICv and AVIC
+>>>>    KVM: x86: Drop vendor specific functions for APICv/AVIC enablement
+>>>>    KVM: x86: Check for pending interrupts when APICv is getting disabled
+>>>>    KVM: x86: hyper-v: Deactivate APICv only when AutoEOI feature is in
+>>>>      use
+>>>>
+>>>>   arch/x86/include/asm/kvm_host.h |  9 +++++-
+>>>>   arch/x86/kvm/hyperv.c           | 51 +++++++++++++++++++++++++++++----
+>>>>   arch/x86/kvm/svm/avic.c         | 14 ++++-----
+>>>>   arch/x86/kvm/svm/svm.c          | 22 ++++++++------
+>>>>   arch/x86/kvm/svm/svm.h          |  2 --
+>>>>   arch/x86/kvm/vmx/capabilities.h |  1 -
+>>>>   arch/x86/kvm/vmx/vmx.c          |  2 --
+>>>>   arch/x86/kvm/x86.c              | 18 ++++++++++--
+>>>>   8 files changed, 86 insertions(+), 33 deletions(-)
+>>>>
+>>>
+>>> Hi!
+>>>
+>>> I hate to say it, but at least one of my VMs doesn't boot amymore
+>>> with avic=1, after the recent updates. I'll bisect this soon,
+>>> but this is likely related to this series.
+>>>
+>>> I will also review this series very soon.
+>>>
+>>> When the VM fails, it hangs on the OVMF screen and I see this
+>>> in qemu logs:
+>>>
+>>> KVM: injection failed, MSI lost (Operation not permitted)
+>>> KVM: injection failed, MSI lost (Operation not permitted)
+>>> KVM: injection failed, MSI lost (Operation not permitted)
+>>> KVM: injection failed, MSI lost (Operation not permitted)
+>>> KVM: injection failed, MSI lost (Operation not permitted)
+>>> KVM: injection failed, MSI lost (Operation not permitted)
+>>>
+>>
+>> -EPERM?? Interesting... strace(1) may come handy...
+> 
+> 
+> Hi Vitaly!
+>   
+> I spent all yesterday debugging this and I found out what is going on:
+> (spoiler alert: hacks are bad)
+> 
+> The call to kvm_request_apicv_update was moved to a delayed work which is fine at first glance
+> but turns out that we both don't notice that kvm doesn't allow to update the guest
+> memory map from non vcpu thread which is what kvm_request_apicv_update does
+> on AVIC.
+>   
+> The memslot update is to switch between regular r/w mapped dummy page
+> which is not really used but doesn't hurt to be there, and between paging entry with
+> reserved bits, used for MMIO, which AVIC sadly needs because it is written in the
+> spec that AVIC's MMIO despite being redirected to the avic_vapic_bar, still needs a valid
+> R/W mapping in the NPT, whose physical address is ignored.
+> 
+> So, in avic_update_access_page we have this nice hack:
+>   
+> if ((kvm->arch.apic_access_page_done == activate) ||
+> 	    (kvm->mm != current->mm))
+> 		goto out;
+>   
+> So instead of crashing this function just does nothing.
+> So AVIC MMIO is still mapped R/W to a dummy page, but the AVIC itself
+> is disabled on all vCPUs by kvm_request_apicv_update (with
+> KVM_REQ_APICV_UPDATE request)
+> 
+> So now all guest APIC writes just disappear to that dummy
+> page, and we have a guest that seems to run but can't really
+> continue.
+> 
+> The -EPERM in the error message I reported, is just -1, returned by
+> KVM_SIGNAL_MSI which is likely result of gross missmatch between
+> state of the KVM's APIC registers and that dummy page which contains
+> whatever the guest wrote there and what the guest thinks
+> the APIC registers are.
+> 
+> I am curently thinking on how to do the whole thing with
+> KVM's requests, I'll try to prepare a patch today.
 
-On 6/11/21 4:44 AM, Borislav Petkov wrote:
-> On Wed, Jun 02, 2021 at 09:04:08AM -0500, Brijesh Singh wrote:
->> +/* SNP Page State Change NAE event */
->> +#define VMGEXIT_PSC_MAX_ENTRY		253
->> +
->> +struct __packed snp_page_state_header {
-> psc_hdr
+I'll drop the last two patches in the series.
 
-Noted.
+Paolo
 
-
->> +	u16 cur_entry;
->> +	u16 end_entry;
->> +	u32 reserved;
->> +};
->> +
->> +struct __packed snp_page_state_entry {
-> psc_entry
-
-Noted.
-
-
->
->> +	u64	cur_page	: 12,
->> +		gfn		: 40,
->> +		operation	: 4,
->> +		pagesize	: 1,
->> +		reserved	: 7;
->> +};
->> +
->> +struct __packed snp_page_state_change {
-> snp_psc_desc
->
-> or so.
-
-Noted.
-
-
->
->> +	struct snp_page_state_header header;
->> +	struct snp_page_state_entry entry[VMGEXIT_PSC_MAX_ENTRY];
->> +};
-> Which would make this struct a lot more readable:
->
-> struct __packed snp_psc_desc {
-> 	struct psc_hdr hdr;
-> 	struct psc_entry entries[VMGEXIT_PSC_MAX_ENTRY];
->
-Agreed.
-
-
->> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
->> index 6e9b45bb38ab..4847ac81cca3 100644
->> --- a/arch/x86/kernel/sev.c
->> +++ b/arch/x86/kernel/sev.c
->> @@ -637,6 +637,113 @@ void __init snp_prep_memory(unsigned long paddr, unsigned int sz, int op)
->>  	WARN(1, "invalid memory op %d\n", op);
->>  }
->>  
->> +static int page_state_vmgexit(struct ghcb *ghcb, struct snp_page_state_change *data)
-> vmgexit_psc
-
-Noted.
-
-
->> +{
->> +	struct snp_page_state_header *hdr;
->> +	int ret = 0;
->> +
->> +	hdr = &data->header;
-> Make sure to verify that snp_page_state_header.reserved field is always
-> 0 before working more on the header so that people don't put stuff in
-> there which you cannot change later because it becomes ABI or whatnot.
-> Ditto for the other reserved fields.
->
-Good point, let me go through both the hypervisor and guest to make sure
-that reserved fields are all zero (as defined by the GHCB spec).
-
-
->> +
->> +	/*
->> +	 * As per the GHCB specification, the hypervisor can resume the guest before
->> +	 * processing all the entries. The loop checks whether all the entries are
-> s/The loop checks/Check/
-
-Noted.
-
-
->
->> +	 * processed. If not, then keep retrying.
-> What guarantees that that loop will terminate eventually?
-
-Guest OS depend on the hypervisor to assist in this operation. The loop
-will terminate only after the hypervisor completes the requested
-operation. Guest is not protecting itself from DoS type of attack. A
-guest should not proceed until hypervisor performs the request page
-state change in the RMP table.
-
-
->> +	 */
->> +	while (hdr->cur_entry <= hdr->end_entry) {
-> I see that "[t]he hypervisor should ensure that cur_entry and end_entry
-> represent values within the limits of the GHCB Shared Buffer." but let's
-> sanity-check that HV here too. We don't trust it, remember? :)
-
-Let me understand, are you saying that hypervisor could trick us into
-believing that page state change completed without actually changing it ?
-
-
->> +
->> +		ghcb_set_sw_scratch(ghcb, (u64)__pa(data));
->> +
->> +		ret = sev_es_ghcb_hv_call(ghcb, NULL, SVM_VMGEXIT_PSC, 0, 0);
->> +
->> +		/* Page State Change VMGEXIT can pass error code through exit_info_2. */
->> +		if (WARN(ret || ghcb->save.sw_exit_info_2,
->> +			 "SEV-SNP: page state change failed ret=%d exit_info_2=%llx\n",
->> +			 ret, ghcb->save.sw_exit_info_2))
->> +			return 1;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static void set_page_state(unsigned long vaddr, unsigned int npages, int op)
->> +{
->> +	struct snp_page_state_change *data;
->> +	struct snp_page_state_header *hdr;
->> +	struct snp_page_state_entry *e;
->> +	unsigned long vaddr_end;
->> +	struct ghcb_state state;
->> +	struct ghcb *ghcb;
->> +	int idx;
->> +
->> +	vaddr = vaddr & PAGE_MASK;
->> +	vaddr_end = vaddr + (npages << PAGE_SHIFT);
-> Move those...
->
->> +
->> +	ghcb = sev_es_get_ghcb(&state);
->> +	if (unlikely(!ghcb))
->> +		panic("SEV-SNP: Failed to get GHCB\n");
-> <--- ... here.
-
-Noted.
-
-
->
->> +
->> +	data = (struct snp_page_state_change *)ghcb->shared_buffer;
->> +	hdr = &data->header;
->> +
->> +	while (vaddr < vaddr_end) {
->> +		e = data->entry;
->> +		memset(data, 0, sizeof(*data));
->> +
->> +		for (idx = 0; idx < VMGEXIT_PSC_MAX_ENTRY; idx++, e++) {
->> +			unsigned long pfn;
->> +
->> +			if (is_vmalloc_addr((void *)vaddr))
->> +				pfn = vmalloc_to_pfn((void *)vaddr);
->> +			else
->> +				pfn = __pa(vaddr) >> PAGE_SHIFT;
->> +
->> +			e->gfn = pfn;
->> +			e->operation = op;
->> +			hdr->end_entry = idx;
->> +
->> +			/*
->> +			 * The GHCB specification provides the flexibility to
->> +			 * use either 4K or 2MB page size in the RMP table.
->> +			 * The current SNP support does not keep track of the
->> +			 * page size used in the RMP table. To avoid the
->> +			 * overlap request, use the 4K page size in the RMP
->> +			 * table.
->> +			 */
->> +			e->pagesize = RMP_PG_SIZE_4K;
->> +			vaddr = vaddr + PAGE_SIZE;
-> Please put that
-> 			e++;
->
-> here.
->
-> It took me a while to find it hidden at the end of the loop and was
-> scratching my head as to why are we overwriting e-> everytime.
-
-Ah, sure I will do it.
-
-
->> +
->> +			if (vaddr >= vaddr_end)
->> +				break;
-> Instead of this silly check here, you can compute the range starting at
-> vaddr, VMGEXIT_PSC_MAX_ENTRY pages worth, carve out that second for-loop
-> in a helper called
->
-> __set_page_state()
->
-> which does the data preparation and does the vmgexit at the end.
->
-> Then the outer loop does only the computation and calls that helper.
-
-Okay, I will look into rearranging the code a bit more to address your
-feedback.
-
--Brijesh
