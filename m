@@ -2,131 +2,285 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AAF143A6B8B
-	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 18:21:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89B003A6B9D
+	for <lists+kvm@lfdr.de>; Mon, 14 Jun 2021 18:25:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234645AbhFNQXT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Jun 2021 12:23:19 -0400
-Received: from forward4-smtp.messagingengine.com ([66.111.4.238]:34539 "EHLO
-        forward4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234626AbhFNQXS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 14 Jun 2021 12:23:18 -0400
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailforward.nyi.internal (Postfix) with ESMTP id 420041940334;
-        Mon, 14 Jun 2021 12:21:15 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute5.internal (MEProxy); Mon, 14 Jun 2021 12:21:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=uKVU1s
-        66+0tQ8fTEmxuWUNwMS4pSH8TgLhqUisUlk/4=; b=XXFN97XLt6deaKHDtN/f5m
-        7YmJjgnpJA2kB8Xs8kMywB3nRipwqNHuDWuGt25KwjYRTFz9yrh6XQffv3+B6Htj
-        8j9A9/Qx+XaZ2kL6msMp5jmsMCQC20qA3YrxfyyAB/Epp6YUzLUFYiJ6up0KRbXQ
-        XSIcV6+vCeIgpspQrIx71AWJ/4pRRBL9NWxpvAaLwzl3aWTpY+UUGWdwh59L9glp
-        SPx3pGPsj7wMrZh1GMdD3m2SF7hLsDjvZDPauvLFGvaHPtlFSVzx8jGOam6YdLhy
-        miHc1MS2WIitVqhWGY6tgMBLXc7b1LRqWhw9rxzIRmWjBW2yNTGoG/ADeaC2IDDw
-        ==
-X-ME-Sender: <xms:-oHHYM_jyC3azcVzZOKkr41Jw5yLHnTiMHcpvK6AucTusjD0BL1O-Q>
-    <xme:-oHHYEsV_8cCYEd3vIDU2uWyHPfnWKHPNl5IykPtBngY-xo-tNhY1E2BcD6M1i8DD
-    TfGkGQr10uZWLXHNFQ>
-X-ME-Received: <xmr:-oHHYCDLQfd8tQfJvIhvte4UGQhDC7O-Gys8zvBqrvLfbrpmhqcpNPK91Ki5U5VgjjQkvc9PpY5pW8mUFCJW974DTrWsYTks7ciJWv1999g>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrfedvhedgleeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepvffujghfhfffkfggtgesthdtredttddttdenucfhrhhomhepffgrvhhiugcu
-    gfgumhhonhgushhonhcuoegumhgvsegumhgvrdhorhhgqeenucggtffrrghtthgvrhhnpe
-    fhkeeguedtvdegffffteehjedvjeeitefgfefgffdugeffffegudehgeetgeelkeenucev
-    lhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegumhgvsegumh
-    gvrdhorhhg
-X-ME-Proxy: <xmx:-oHHYMeo5akcnHl-tmAzrmjduREfDCpgTyRyNUURDGZa9jTlaxxfFw>
-    <xmx:-oHHYBNrIxL7dET8c3WuKrT4-aN60fLnCg3reZCf3PhiEWJZ7CeLJA>
-    <xmx:-oHHYGlFsjv0ZfDv01DoDM5ZI3lmqP14Wk9hoi-6R_3JMbR-pK2cvw>
-    <xmx:-4HHYEeIVH7uzNxhfReP9hB3uFugSnb8KjWW8urrusVfSyvr6C1Sdw>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 14 Jun 2021 12:21:13 -0400 (EDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 13ec9a44;
-        Mon, 14 Jun 2021 16:21:12 +0000 (UTC)
-To:     Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc:     kvm@vger.kernel.org, Eduardo Habkost <ehabkost@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Babu Moger <babu.moger@amd.com>
-Subject: Re: [RFC PATCH 0/7] Support protection keys in an AMD EPYC-Milan VM
-In-Reply-To: <330417d8-9e23-4c90-b825-24329d3e4c66@redhat.com>
-References: <20210520145647.3483809-1-david.edmondson@oracle.com>
- <330417d8-9e23-4c90-b825-24329d3e4c66@redhat.com>
-X-HGTTG: zarquon
-From:   David Edmondson <dme@dme.org>
-Date:   Mon, 14 Jun 2021 17:21:12 +0100
-Message-ID: <cuno8c81kp3.fsf@dme.org>
+        id S234655AbhFNQ1b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Jun 2021 12:27:31 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:50914 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233593AbhFNQ1a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Jun 2021 12:27:30 -0400
+Received: from zn.tnic (p200300ec2f09b900f41fb76786649a77.dip0.t-ipconnect.de [IPv6:2003:ec:2f09:b900:f41f:b767:8664:9a77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6540E1EC04AD;
+        Mon, 14 Jun 2021 18:25:26 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1623687926;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=SsxVz2r5oN4lnCyZbTvn/5Zz+6zt1F06cejR2VGMXJg=;
+        b=Vo00EAKNgD7AFNhgm49YEDwGuLn98ZSZ2j4ts2lt7+AjJGooEdju5hgyyfWHl+5RkB+ies
+        mAsS/wthE7dX6kaEIBjy5kLOKZGp78o+BTNok/EvMkb6G0Ct7BpVv3LyJC/49oT7fv2OlA
+        CR5GJZWqXsOypS7uRrIX879uLLHqvmc=
+Date:   Mon, 14 Jun 2021 18:25:18 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v5 2/6] x86/sev-es: Make sure IRQs are disabled while
+ GHCB is active
+Message-ID: <YMeC7vJxm0OVJJhr@zn.tnic>
+References: <20210614135327.9921-1-joro@8bytes.org>
+ <20210614135327.9921-3-joro@8bytes.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210614135327.9921-3-joro@8bytes.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Friday, 2021-06-11 at 18:01:55 +02, Paolo Bonzini wrote:
+On Mon, Jun 14, 2021 at 03:53:23PM +0200, Joerg Roedel wrote:
+> From: Joerg Roedel <jroedel@suse.de>
+> 
+> The #VC handler only cares about IRQs being disabled while the GHCB is
+> active, as it must not be interrupted by something which could cause
+> another #VC while it holds the GHCB (NMI is the exception for which the
+> backup GHCB exits).
+> 
+> Make sure nothing interrupts the code path while the GHCB is active by
+> disabling IRQs in sev_es_get_ghcb() and restoring the previous irq state
+> in sev_es_put_ghcb().
+> 
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> ---
+>  arch/x86/kernel/sev.c | 48 ++++++++++++++++++++++++++++++-------------
+>  1 file changed, 34 insertions(+), 14 deletions(-)
 
-> First of all, sorry for the delayed review.
->
-> On 20/05/21 16:56, David Edmondson wrote:
->> AMD EPYC-Milan CPUs introduced support for protection keys, previously
->> available only with Intel CPUs.
->> 
->> AMD chose to place the XSAVE state component for the protection keys
->> at a different offset in the XSAVE state area than that chosen by
->> Intel.
->> 
->> To accommodate this, modify QEMU to behave appropriately on AMD
->> systems, allowing a VM to properly take advantage of the new feature.
->
-> Uff, that sucks. :(
->
-> If I understand correctly, the problem is that the layout of 
-> KVM_GET_XSAVE/KVM_SET_XSAVE depends on the host CPUID, which in 
-> retrospect would be obvious.  Is that correct?
+Here's a diff ontop of yours with a couple of points:
 
-Yes.
+* I've named the low-level, interrupts-enabled workers
+__sev_get_ghcb()/__sev_put_ghcb() to mean a couple of things:
 
-> If so, it would make sense and might even be easier to drop all usage
-> of X86XSaveArea:
->
-> * update ext_save_areas based on CPUID information in kvm_cpu_instance_init
->
-> * make x86_cpu_xsave_all_areas and x86_cpu_xrstor_all_areas use the 
-> ext_save_areas offsets to build pointers to XSaveAVX, XSaveBNDREG, etc.
->
-> What do you think?
+** underscored to mean, that callers need to disable local locks. There's
+also a lockdep_assert_irqs_disabled() to make sure, both in the get and
+put function.
 
-I will produce a patch and send it out.
+** also only "sev" in the name because this code is not used for SEV-ES
+only anymore.
 
-> Paolo
->
->> Further, avoid manipulating XSAVE state components that are not
->> present on AMD systems.
->> 
->> The code in patch 6 that changes the CPUID 0x0d leaf is mostly dumped
->> somewhere that seemed to work - I'm not sure where it really belongs.
->> 
->> David Edmondson (7):
->>    target/i386: Declare constants for XSAVE offsets
->>    target/i386: Use constants for XSAVE offsets
->>    target/i386: Clarify the padding requirements of X86XSaveArea
->>    target/i386: Prepare for per-vendor X86XSaveArea layout
->>    target/i386: Introduce AMD X86XSaveArea sub-union
->>    target/i386: Adjust AMD XSAVE PKRU area offset in CPUID leaf 0xd
->>    target/i386: Manipulate only AMD XSAVE state on AMD
->> 
->>   target/i386/cpu.c            | 19 +++++----
->>   target/i386/cpu.h            | 80 ++++++++++++++++++++++++++++--------
->>   target/i386/kvm/kvm.c        | 57 +++++++++----------------
->>   target/i386/tcg/fpu_helper.c | 20 ++++++---
->>   target/i386/xsave_helper.c   | 70 +++++++++++++++++++------------
->>   5 files changed, 152 insertions(+), 94 deletions(-)
->> 
+* I've done it this way because you have a well-recognized code pattern
+where the caller disables interrupts, calls the low-level helpers and
+then enables interrupts again when done. VS passing a flags pointer back
+and forth which just looks weird.
 
-dme.
+And as to being easy to use - users can botch flags too, when passing
+around so they can just as well do proper interrupts toggling like a
+gazillion other places in the kernel.
+
+Also, you have places like exc_vmm_communication() where you have
+to artifically pass in flags - I'm looking at your previous version
+- even if you already make sure interrupts are disabled with the
+BUG_ON assertion on entry. So in those cases you can simply call the
+interrupt-enabled, __-variants.
+
+Btw, while we're on exc_vmm_communication, it has a:
+
+	BUG_ON(!irqs_disabled());
+
+on entry and then later
+
+	lockdep_assert_irqs_disabled();
+
+and that second assertion is not really needed, methinks. So a hunk
+below removes it.
+
+Thoughts?
+
+diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+index 7d70cddc38be..b85c4a2be9fa 100644
+--- a/arch/x86/kernel/sev.c
++++ b/arch/x86/kernel/sev.c
+@@ -192,11 +192,19 @@ void noinstr __sev_es_ist_exit(void)
+ 	this_cpu_write(cpu_tss_rw.x86_tss.ist[IST_INDEX_VC], *(unsigned long *)ist);
+ }
+ 
+-static __always_inline struct ghcb *__sev_es_get_ghcb(struct ghcb_state *state)
++/*
++ * Nothing shall interrupt this code path while holding the per-CPU
++ * GHCB. The backup GHCB is only for NMIs interrupting this path.
++ *
++ * Callers must disable local interrupts around it.
++ */
++static __always_inline struct ghcb *__sev_get_ghcb(struct ghcb_state *state)
+ {
+ 	struct sev_es_runtime_data *data;
+ 	struct ghcb *ghcb;
+ 
++	lockdep_assert_irqs_disabled();
++
+ 	data = this_cpu_read(runtime_data);
+ 	ghcb = &data->ghcb_page;
+ 
+@@ -231,18 +239,6 @@ static __always_inline struct ghcb *__sev_es_get_ghcb(struct ghcb_state *state)
+ 	return ghcb;
+ }
+ 
+-static __always_inline struct ghcb *sev_es_get_ghcb(struct ghcb_state *state,
+-						    unsigned long *flags)
+-{
+-	/*
+-	 * Nothing shall interrupt this code path while holding the per-cpu
+-	 * GHCB. The backup GHCB is only for NMIs interrupting this path.
+-	 */
+-	local_irq_save(*flags);
+-
+-	return __sev_es_get_ghcb(state);
+-}
+-
+ /* Needed in vc_early_forward_exception */
+ void do_early_exception(struct pt_regs *regs, int trapnr);
+ 
+@@ -491,11 +487,13 @@ static enum es_result vc_slow_virt_to_phys(struct ghcb *ghcb, struct es_em_ctxt
+ /* Include code shared with pre-decompression boot stage */
+ #include "sev-shared.c"
+ 
+-static __always_inline void __sev_es_put_ghcb(struct ghcb_state *state)
++static __always_inline void __sev_put_ghcb(struct ghcb_state *state)
+ {
+ 	struct sev_es_runtime_data *data;
+ 	struct ghcb *ghcb;
+ 
++	lockdep_assert_irqs_disabled();
++
+ 	data = this_cpu_read(runtime_data);
+ 	ghcb = &data->ghcb_page;
+ 
+@@ -514,13 +512,6 @@ static __always_inline void __sev_es_put_ghcb(struct ghcb_state *state)
+ 	}
+ }
+ 
+-static __always_inline void sev_es_put_ghcb(struct ghcb_state *state,
+-					    unsigned long flags)
+-{
+-	__sev_es_put_ghcb(state);
+-	local_irq_restore(flags);
+-}
+-
+ void noinstr __sev_es_nmi_complete(void)
+ {
+ 	struct ghcb_state state;
+@@ -528,7 +519,7 @@ void noinstr __sev_es_nmi_complete(void)
+ 
+ 	BUG_ON(!irqs_disabled());
+ 
+-	ghcb = __sev_es_get_ghcb(&state);
++	ghcb = __sev_get_ghcb(&state);
+ 
+ 	vc_ghcb_invalidate(ghcb);
+ 	ghcb_set_sw_exit_code(ghcb, SVM_VMGEXIT_NMI_COMPLETE);
+@@ -538,7 +529,7 @@ void noinstr __sev_es_nmi_complete(void)
+ 	sev_es_wr_ghcb_msr(__pa_nodebug(ghcb));
+ 	VMGEXIT();
+ 
+-	__sev_es_put_ghcb(&state);
++	__sev_put_ghcb(&state);
+ }
+ 
+ static u64 get_jump_table_addr(void)
+@@ -548,7 +539,9 @@ static u64 get_jump_table_addr(void)
+ 	struct ghcb *ghcb;
+ 	u64 ret = 0;
+ 
+-	ghcb = sev_es_get_ghcb(&state, &flags);
++	local_irq_save(flags);
++
++	ghcb = __sev_get_ghcb(&state);
+ 
+ 	vc_ghcb_invalidate(ghcb);
+ 	ghcb_set_sw_exit_code(ghcb, SVM_VMGEXIT_AP_JUMP_TABLE);
+@@ -562,7 +555,9 @@ static u64 get_jump_table_addr(void)
+ 	    ghcb_sw_exit_info_2_is_valid(ghcb))
+ 		ret = ghcb->save.sw_exit_info_2;
+ 
+-	sev_es_put_ghcb(&state, flags);
++	__sev_put_ghcb(&state);
++
++	local_irq_restore(flags);
+ 
+ 	return ret;
+ }
+@@ -686,7 +681,9 @@ static void sev_es_ap_hlt_loop(void)
+ 	unsigned long flags;
+ 	struct ghcb *ghcb;
+ 
+-	ghcb = sev_es_get_ghcb(&state, &flags);
++	local_irq_save(flags);
++
++	ghcb = __sev_get_ghcb(&state);
+ 
+ 	while (true) {
+ 		vc_ghcb_invalidate(ghcb);
+@@ -703,7 +700,9 @@ static void sev_es_ap_hlt_loop(void)
+ 			break;
+ 	}
+ 
+-	sev_es_put_ghcb(&state, flags);
++	__sev_put_ghcb(&state);
++
++	local_irq_restore(flags);
+ }
+ 
+ /*
+@@ -1364,7 +1363,6 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
+ 	}
+ 
+ 	irq_state = irqentry_nmi_enter(regs);
+-	lockdep_assert_irqs_disabled();
+ 	instrumentation_begin();
+ 
+ 	/*
+@@ -1373,7 +1371,7 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
+ 	 * keep the IRQs disabled to protect us against concurrent TLB flushes.
+ 	 */
+ 
+-	ghcb = __sev_es_get_ghcb(&state);
++	ghcb = __sev_get_ghcb(&state);
+ 
+ 	vc_ghcb_invalidate(ghcb);
+ 	result = vc_init_em_ctxt(&ctxt, regs, error_code);
+@@ -1381,7 +1379,7 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
+ 	if (result == ES_OK)
+ 		result = vc_handle_exitcode(&ctxt, ghcb, error_code);
+ 
+-	__sev_es_put_ghcb(&state);
++	__sev_put_ghcb(&state);
+ 
+ 	/* Done - now check the result */
+ 	switch (result) {
+
 -- 
-Oliver darling, call Mister Haney, I think our speakers are blown.
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
