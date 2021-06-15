@@ -2,55 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 722873A8BF0
-	for <lists+kvm@lfdr.de>; Wed, 16 Jun 2021 00:40:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 981793A8C22
+	for <lists+kvm@lfdr.de>; Wed, 16 Jun 2021 00:58:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230336AbhFOWmJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Jun 2021 18:42:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37582 "EHLO
+        id S231202AbhFOXAm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Jun 2021 19:00:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229937AbhFOWmJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Jun 2021 18:42:09 -0400
-Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28069C06175F
-        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 15:40:03 -0700 (PDT)
-Received: by mail-oi1-x22b.google.com with SMTP id t40so287565oiw.8
-        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 15:40:03 -0700 (PDT)
+        with ESMTP id S229898AbhFOXAm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Jun 2021 19:00:42 -0400
+Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 096DCC06175F
+        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 15:58:37 -0700 (PDT)
+Received: by mail-ot1-x32d.google.com with SMTP id h24-20020a9d64180000b029036edcf8f9a6so587875otl.3
+        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 15:58:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=FjTlkg9HTKYPNQ6rTdKTsbehN1/6cFTQ2pi4yksTAgk=;
-        b=XDz27kZZX+QjBrZPSqflKRb/wh1fcy/af2rHpxqucNV7a0VTYwcF5FRGpF7bqBHCZB
-         sUBG77qp5izO2Ya46JP6CSIKeYCebRQjdRrjpvOZihNo92WeXwqVKxA6Ip3Ph8511QnD
-         4yGldtUZNWep7+OIVBO9cNh9Zh1BFfJ9LGGDHIQuHg+ib3eJPoxTd7KufYnzzp8gUeTG
-         kYUtfG8S5Ht1H6Fyt6XBrC2XohPQlateJwA/kJ3lL2p0Er355HkG+Ahjih9Pt9i5rMYw
-         qTuj+uIHX8IPlF8wI6bn3EagKA3hUQnVydrGhrXJqFDD84PEBKNPpVzZX6oOHs6o87HX
-         LheQ==
+        bh=DdsbRF+igtWcAfktmVLmS7AoTeGY+LpkgKxtDyKQA18=;
+        b=RxO7+H2y57chX7xE9CD/8QeVtz0IqPqf+37XqP5GE/Omz4S/SXqBgAkoIKJBU9YF/w
+         oI8Cyy8/zvFHPInVl6i5yBa+o5P2w7pja1ki4zAiT5Z1e7IQwk3PTJRfF7H8W0+mWwkO
+         AfxuAZhSEcP42ziZTgXDMkkfF+2tE5GL2C4V0IBloO44nEdDNQucGvva3GPXt9WVYe5m
+         7VUTeyicPJVVGVhuaXL/pvMm/0LvyyGHocnZh9n4lEgw3ojn/d+9s4czOjKUsijzlI+X
+         h/zqigmTqXSEyB/klkLhzh6DtTLLCw2fAwDcVc2vzbQAts0AD4dXjjS1O8t6mQ8qJs4h
+         7zUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=FjTlkg9HTKYPNQ6rTdKTsbehN1/6cFTQ2pi4yksTAgk=;
-        b=lJMLyp0vYSD7eLzl6cC+buHd1VPSeT0LgM7AFI+wjY5hNS4IjHZ9atoIT7tmB3giz4
-         Q4yzl1MqwgdQcUC1wLpuTQjD9jNwUnriryx55d2ywuIR7ZOnJA1ETGdPQBqTuMNQz22i
-         VHeFizIZOvtKfItd+VHjY622u18GprNqAKu8Yu6QeNdSo8rv8ZWICmXd+U91sIlykLbR
-         7IX8gGSzcfk5ETBrEk3Q3K+/Th1kWE5jMali+BBmnJPFlHngJe2YUQuSMfrIw9bcVuue
-         iYCUBfVcqDT5WcwgQmT0E3SN+HDN+hv+qF1lrlreTyJ4wlHFiwZa5DpUyLGiQH1eqgUo
-         ojoQ==
-X-Gm-Message-State: AOAM530gQVnU4h5/TK0W/amnPSDJEFs9RBRwWrDTAhibLjk5pH2PnkDq
-        +CKlGVbW4rLCztFzpRt4ZEgxgCL7gjP+74hEm3eehA==
-X-Google-Smtp-Source: ABdhPJzT3bm/OStyazgk1zy8otTaykTz1x4356J5GCc8RRL7Ou/AqkZ60+dxhqdXV4LsdHJ+a/m9inZkb/jTvnPp+d0=
-X-Received: by 2002:aca:1201:: with SMTP id 1mr4781940ois.6.1623796802294;
- Tue, 15 Jun 2021 15:40:02 -0700 (PDT)
+        bh=DdsbRF+igtWcAfktmVLmS7AoTeGY+LpkgKxtDyKQA18=;
+        b=dVQ/wmoD6sChKMq9etKa16HRhY+dNgo0moUqdDqnfnE5WXpdF+y1Nlsrflwh25GAU5
+         UKrtV8EPgCS6ZwVHpymOBeKdQtW5QVKoNkBjm4lzYQDAyHFuoKZlUfjgRXxeEJAe3SNd
+         rp25xDykEnnUVLi/PdLIyJbkiLoVvaOsPCe1nln3M2jD59tYbG4B2zriq0IJ2C+3llpQ
+         kktuprCyVIlcMtfVQb3z1X3Ul+SkUQSQnFnGl/329QPwEk4Nd3e6BiDpeWebYpNda1Cl
+         40EtZaHB1FthVyXSX29+BfcsV6B79+fsAZ88iWyhS8+NqkZwGJwsIvAOvpwxA/z198WQ
+         SW4Q==
+X-Gm-Message-State: AOAM532hHlMZBgoJrkxOyUZAiKUfQyQ40ClnWqE/T2o7Jt2uN4B8MXcM
+        L6siSlDqLbpW6doGrC4fM64+qbggSi7w0diAclCpJg==
+X-Google-Smtp-Source: ABdhPJyeYfFE+LjwSSfGXSucCzMMQPaMYU67wh4iKu8ZySA0hR+D7ymQQOVXZ9t5DBEMoeu0/qiN4ZWY1jK5R2hF35o=
+X-Received: by 2002:a05:6830:2011:: with SMTP id e17mr1223753otp.295.1623797915922;
+ Tue, 15 Jun 2021 15:58:35 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210615164535.2146172-1-seanjc@google.com> <20210615164535.2146172-4-seanjc@google.com>
-In-Reply-To: <20210615164535.2146172-4-seanjc@google.com>
+References: <20210615164535.2146172-1-seanjc@google.com> <20210615164535.2146172-5-seanjc@google.com>
+In-Reply-To: <20210615164535.2146172-5-seanjc@google.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 15 Jun 2021 15:39:51 -0700
-Message-ID: <CALMp9eSkVaDfCJwW1eds=7H7yn2pKJPKoFVpc1GQcEqGD5S0Dg@mail.gmail.com>
-Subject: Re: [PATCH 3/4] KVM: x86: WARN and reject loading KVM if NX is
- supported but not enabled
+Date:   Tue, 15 Jun 2021 15:58:24 -0700
+Message-ID: <CALMp9eRGj_5+dZXQazVEkeKeDnc7GFm1Vnt2RS_V6akAR=rZsA@mail.gmail.com>
+Subject: Re: [PATCH 4/4] KVM: x86: Simplify logic to handle lack of host NX support
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -64,32 +63,55 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, Jun 15, 2021 at 9:45 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> WARN if NX is reported as supported but not enabled in EFER.  All flavors
-> of the kernel, including non-PAE 32-bit kernels, set EFER.NX=1 if NX is
-> supported, even if NX usage is disable via kernel command line.  KVM relies
-> on NX being enabled if it's supported, e.g. KVM will generate illegal NPT
-> entries if nx_huge_pages is enabled and NX is supported but not enabled.
+> Use boot_cpu_has() to check for NX support now that KVM requires
+> host_efer.NX=1 if NX is supported.  Opportunistically avoid the guest
+> CPUID lookup in cpuid_fix_nx_cap() if NX is supported, which is by far
+> the common case.
 >
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/kvm/x86.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  arch/x86/kvm/cpuid.c | 13 +++++--------
+>  1 file changed, 5 insertions(+), 8 deletions(-)
 >
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index acc28473dec7..1f6595df45de 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10981,6 +10981,9 @@ int kvm_arch_hardware_setup(void *opaque)
->         int r;
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index b4da665bb892..786f556302cd 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -208,16 +208,14 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>         kvm_mmu_reset_context(vcpu);
+>  }
 >
->         rdmsrl_safe(MSR_EFER, &host_efer);
-> +       if (WARN_ON_ONCE(boot_cpu_has(X86_FEATURE_NX) &&
-> +                        !(host_efer & EFER_NX)))
-> +               return -EIO;
+> -static int is_efer_nx(void)
+> -{
+> -       return host_efer & EFER_NX;
+> -}
+> -
+>  static void cpuid_fix_nx_cap(struct kvm_vcpu *vcpu)
+>  {
+>         int i;
+>         struct kvm_cpuid_entry2 *e, *entry;
+>
+> +       if (boot_cpu_has(X86_FEATURE_NX))
+> +               return;
+> +
+>         entry = NULL;
+>         for (i = 0; i < vcpu->arch.cpuid_nent; ++i) {
+>                 e = &vcpu->arch.cpuid_entries[i];
+> @@ -226,7 +224,7 @@ static void cpuid_fix_nx_cap(struct kvm_vcpu *vcpu)
+>                         break;
+>                 }
+>         }
+> -       if (entry && cpuid_entry_has(entry, X86_FEATURE_NX) && !is_efer_nx()) {
+> +       if (entry && cpuid_entry_has(entry, X86_FEATURE_NX)) {
+>                 cpuid_entry_clear(entry, X86_FEATURE_NX);
+>                 printk(KERN_INFO "kvm: guest NX capability removed\n");
+>         }
 
-Input/output error? Is that really the most appropriate error here?
-Why not, say, -ENOTSUP?
-
-I'm sure there's some arcane convention here that I'm not privy to. :-)
+It would be nice if we chose one consistent approach to dealing with
+invalid guest CPUID information and stuck with it. Silently modifying
+the table provided by userspace seems wrong to me. I much prefer the
+kvm_check_cpuid approach of telling userspace that the guest CPUID
+information is invalid. (Of course, once we return -EINVAL for more
+than one field, good luck figuring out which field is invalid!)
 
 Reviewed-by: Jim Mattson <jmattson@google.com>
