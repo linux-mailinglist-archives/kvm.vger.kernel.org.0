@@ -2,326 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C54C33A829B
-	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 16:20:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC6C33A82B5
+	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 16:25:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231876AbhFOOWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Jun 2021 10:22:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37882 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231357AbhFOOUQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Jun 2021 10:20:16 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BDB4C061A3F
-        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 07:14:41 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id n12so11542396pgs.13
-        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 07:14:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=muuPBKMMRoHsteALA0MSISB9nQhfFONjAplR9RQm2vE=;
-        b=sOKta2eTgQPAWv0wTtHmLqpmdwrIHlt5ZRIpdf04RP+ckeaFiWPpCYGIl/y/0nsYU3
-         FDsTtObzYTsw3GTNwD3WO1aTiXm5VYeftg9mPbAQITv2T8tQ3QLxQIvYqexXGb2w6+9A
-         NZW9l5yNozQ86OorZ6qzrHXuDdemEmEnd81prOOStAVU1IwEXtRoFXasd36qeq+YLllH
-         Ix9itpjpp2xoITDYSGEpr1MdVIB79PNjoI+xbeY2XQVtHUGRyoqbWd2fs0ffydnymirj
-         CWyfLjTYv9qOJIo4wtZuYQ64PYG08G+9YdX7i2OgKeCDRSFlBOQCieqUuHsreUWwtR+V
-         SFNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=muuPBKMMRoHsteALA0MSISB9nQhfFONjAplR9RQm2vE=;
-        b=KAAyDQVD/aiCT01Nwgz/kEpIFZiqUc1zs8GCDim5O3QcKZugg6915B8Qc5XSiqisX1
-         VX/UKJEgdkpDJHI6gxB/E+2mM7ur5lSypcpi9Xwk37IdHLiQpLT/RfuS1mwy1UtnWBy0
-         5xc9N8Yye+oevkqmVFcH6yLoI05S6SXNXgUxMIhIM4obqqSweh0I6Z068spXTHDbsAgA
-         i/SlxD8/MEDHt1xBgnmQi3cZN99r9lsy2haqY8/AtdFKhRgVs0E9jshDg6nJc14czPlV
-         dugU08HMq+XggBiwnxSURapDQbs+8VExrBahl+uOecEFhPzPy+aLCfdxKThSYllvpSjA
-         /l7g==
-X-Gm-Message-State: AOAM5328RsO/NA60nwWrgwkrXFPkf4Qshxw7/PIXosklUXWO05I5FIKe
-        O0mkyG/HxPwdm1KMdZJH+vX7
-X-Google-Smtp-Source: ABdhPJwe+4++061oAxP5Uk90bQPawN+eFuSh4VWexi1jhoK7flquuoVHZrE/zE0dabo+ZmoZKUoGVw==
-X-Received: by 2002:a63:4465:: with SMTP id t37mr8582231pgk.342.1623766480653;
-        Tue, 15 Jun 2021 07:14:40 -0700 (PDT)
-Received: from localhost ([139.177.225.241])
-        by smtp.gmail.com with ESMTPSA id t1sm14985152pjo.33.2021.06.15.07.14.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Jun 2021 07:14:40 -0700 (PDT)
-From:   Xie Yongji <xieyongji@bytedance.com>
-To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
-        sgarzare@redhat.com, parav@nvidia.com, hch@infradead.org,
-        christian.brauner@canonical.com, rdunlap@infradead.org,
-        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        bcrl@kvack.org, corbet@lwn.net, mika.penttila@nextfour.com,
-        dan.carpenter@oracle.com, joro@8bytes.org,
-        gregkh@linuxfoundation.org
-Cc:     songmuchun@bytedance.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v8 10/10] Documentation: Add documentation for VDUSE
-Date:   Tue, 15 Jun 2021 22:13:31 +0800
-Message-Id: <20210615141331.407-11-xieyongji@bytedance.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210615141331.407-1-xieyongji@bytedance.com>
-References: <20210615141331.407-1-xieyongji@bytedance.com>
+        id S231274AbhFOO1U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Jun 2021 10:27:20 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:43360 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231417AbhFOO0W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Jun 2021 10:26:22 -0400
+Received: from [192.168.86.35] (c-73-38-52-84.hsd1.vt.comcast.net [73.38.52.84])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 46E8720B6C50;
+        Tue, 15 Jun 2021 07:24:14 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 46E8720B6C50
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1623767057;
+        bh=cTHCck5KxKI/CP9LuHPjfsJBbv22Q8bxdprLpu918Iw=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=gVGORou0bGGK/tDWC+ScR4xEWsbnBBcs7/CdN1MOHGlJIH94UjEqOAvgBSDKHS35O
+         ceRtBHHCZbXj840On4Gh5lNTG9vo8IO0hh39xOjN8gOoSv2dGDgXnASaf84hDDoEPT
+         HtxukizWCqySB5fOlL+ii6Hx3XawlTf52rssJQWI=
+Subject: Re: [PATCH v5 7/7] KVM: SVM: hyper-v: Direct Virtual Flush support
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     "H. Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        Lan Tianyu <Tianyu.Lan@microsoft.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Wei Liu <wei.liu@kernel.org>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+References: <cover.1622730232.git.viremana@linux.microsoft.com>
+ <fc8d24d8eb7017266bb961e39a171b0caf298d7f.1622730232.git.viremana@linux.microsoft.com>
+ <878s3c65nr.fsf@vitty.brq.redhat.com>
+From:   Vineeth Pillai <viremana@linux.microsoft.com>
+Message-ID: <73508c14-3ca6-1d20-8f9e-14bd966c849a@linux.microsoft.com>
+Date:   Tue, 15 Jun 2021 10:24:14 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <878s3c65nr.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-VDUSE (vDPA Device in Userspace) is a framework to support
-implementing software-emulated vDPA devices in userspace. This
-document is intended to clarify the VDUSE design and usage.
+Hi Vitaly,
+>> +
+>> +static inline void svm_hv_update_vp_id(struct vmcb *vmcb,
+>> +		struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct hv_enlightenments *hve =
+>> +		(struct hv_enlightenments *)vmcb->control.reserved_sw;
+>> +
+>> +	if (hve->hv_vp_id != to_hv_vcpu(vcpu)->vp_index) {
+>> +		hve->hv_vp_id = to_hv_vcpu(vcpu)->vp_index;
+>> +		vmcb_mark_dirty(vmcb, VMCB_HV_NESTED_ENLIGHTENMENTS);
+>> +	}
+> This blows up in testing when no Hyper-V context was created on a vCPU,
+> e.g. when running KVM selftests (to_hv_vcpu(vcpu) is NULL when no
+> Hyper-V emulation features were requested on a vCPU but
+> svm_hv_update_vp_id() is called unconditionally by svm_vcpu_run()).
+>
+> I'll be sending a patch to fix the immediate issue but I was wondering
+> why we need to call svm_hv_update_vp_id() from svm_vcpu_run() as VP
+> index is unlikely to change; we can probably just call it from
+> kvm_hv_set_msr() instead.
+Thanks a lot for catching this.
 
-Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
----
- Documentation/userspace-api/index.rst |   1 +
- Documentation/userspace-api/vduse.rst | 222 ++++++++++++++++++++++++++++++++++
- 2 files changed, 223 insertions(+)
- create mode 100644 Documentation/userspace-api/vduse.rst
+I think you are right, updating at kvm_hv_set_msr() makes sense. I was
+following the vmx logic where it also sets the vp_id in vmx_vcpu_run. But it
+calls a wrapper "kvm_hv_get_vpindex" which actually checks if hv_vcpu is not
+null before the assignment. I should have used that instead, my mistake.
+I will look a bit more into it and send out a patch for vmx and svm 
+after little
+more investigation.
 
-diff --git a/Documentation/userspace-api/index.rst b/Documentation/userspace-api/index.rst
-index 0b5eefed027e..c432be070f67 100644
---- a/Documentation/userspace-api/index.rst
-+++ b/Documentation/userspace-api/index.rst
-@@ -27,6 +27,7 @@ place where this information is gathered.
-    iommu
-    media/index
-    sysfs-platform_profile
-+   vduse
- 
- .. only::  subproject and html
- 
-diff --git a/Documentation/userspace-api/vduse.rst b/Documentation/userspace-api/vduse.rst
-new file mode 100644
-index 000000000000..2f9cd1a4e530
---- /dev/null
-+++ b/Documentation/userspace-api/vduse.rst
-@@ -0,0 +1,222 @@
-+==================================
-+VDUSE - "vDPA Device in Userspace"
-+==================================
-+
-+vDPA (virtio data path acceleration) device is a device that uses a
-+datapath which complies with the virtio specifications with vendor
-+specific control path. vDPA devices can be both physically located on
-+the hardware or emulated by software. VDUSE is a framework that makes it
-+possible to implement software-emulated vDPA devices in userspace. And
-+to make it simple, the emulated vDPA device's control path is handled in
-+the kernel and only the data path is implemented in the userspace.
-+
-+Note that only virtio block device is supported by VDUSE framework now,
-+which can reduce security risks when the userspace process that implements
-+the data path is run by an unprivileged user. The Support for other device
-+types can be added after the security issue is clarified or fixed in the future.
-+
-+Start/Stop VDUSE devices
-+------------------------
-+
-+VDUSE devices are started as follows:
-+
-+1. Create a new VDUSE instance with ioctl(VDUSE_CREATE_DEV) on
-+   /dev/vduse/control.
-+
-+2. Begin processing VDUSE messages from /dev/vduse/$NAME. The first
-+   messages will arrive while attaching the VDUSE instance to vDPA bus.
-+
-+3. Send the VDPA_CMD_DEV_NEW netlink message to attach the VDUSE
-+   instance to vDPA bus.
-+
-+VDUSE devices are stopped as follows:
-+
-+1. Send the VDPA_CMD_DEV_DEL netlink message to detach the VDUSE
-+   instance from vDPA bus.
-+
-+2. Close the file descriptor referring to /dev/vduse/$NAME
-+
-+3. Destroy the VDUSE instance with ioctl(VDUSE_DESTROY_DEV) on
-+   /dev/vduse/control
-+
-+The netlink messages metioned above can be sent via vdpa tool in iproute2
-+or use the below sample codes:
-+
-+.. code-block:: c
-+
-+	static int netlink_add_vduse(const char *name, enum vdpa_command cmd)
-+	{
-+		struct nl_sock *nlsock;
-+		struct nl_msg *msg;
-+		int famid;
-+
-+		nlsock = nl_socket_alloc();
-+		if (!nlsock)
-+			return -ENOMEM;
-+
-+		if (genl_connect(nlsock))
-+			goto free_sock;
-+
-+		famid = genl_ctrl_resolve(nlsock, VDPA_GENL_NAME);
-+		if (famid < 0)
-+			goto close_sock;
-+
-+		msg = nlmsg_alloc();
-+		if (!msg)
-+			goto close_sock;
-+
-+		if (!genlmsg_put(msg, NL_AUTO_PORT, NL_AUTO_SEQ, famid, 0, 0, cmd, 0))
-+			goto nla_put_failure;
-+
-+		NLA_PUT_STRING(msg, VDPA_ATTR_DEV_NAME, name);
-+		if (cmd == VDPA_CMD_DEV_NEW)
-+			NLA_PUT_STRING(msg, VDPA_ATTR_MGMTDEV_DEV_NAME, "vduse");
-+
-+		if (nl_send_sync(nlsock, msg))
-+			goto close_sock;
-+
-+		nl_close(nlsock);
-+		nl_socket_free(nlsock);
-+
-+		return 0;
-+	nla_put_failure:
-+		nlmsg_free(msg);
-+	close_sock:
-+		nl_close(nlsock);
-+	free_sock:
-+		nl_socket_free(nlsock);
-+		return -1;
-+	}
-+
-+How VDUSE works
-+---------------
-+
-+Since the emuldated vDPA device's control path is handled in the kernel,
-+a message-based communication protocol and few types of control messages
-+are introduced by VDUSE framework to make userspace be aware of the data
-+path related changes:
-+
-+- VDUSE_GET_VQ_STATE: Get the state for virtqueue from userspace
-+
-+- VDUSE_START_DATAPLANE: Notify userspace to start the dataplane
-+
-+- VDUSE_STOP_DATAPLANE: Notify userspace to stop the dataplane
-+
-+- VDUSE_UPDATE_IOTLB: Notify userspace to update the memory mapping in device IOTLB
-+
-+Userspace needs to read()/write() on /dev/vduse/$NAME to receive/reply
-+those control messages from/to VDUSE kernel module as follows:
-+
-+.. code-block:: c
-+
-+	static int vduse_message_handler(int dev_fd)
-+	{
-+		int len;
-+		struct vduse_dev_request req;
-+		struct vduse_dev_response resp;
-+
-+		len = read(dev_fd, &req, sizeof(req));
-+		if (len != sizeof(req))
-+			return -1;
-+
-+		resp.request_id = req.request_id;
-+
-+		switch (req.type) {
-+
-+		/* handle different types of message */
-+
-+		}
-+
-+		if (req.flags & VDUSE_REQ_FLAGS_NO_REPLY)
-+			return 0;
-+
-+		len = write(dev_fd, &resp, sizeof(resp));
-+		if (len != sizeof(resp))
-+			return -1;
-+
-+		return 0;
-+	}
-+
-+After VDUSE_START_DATAPLANE messages is received, userspace should start the
-+dataplane processing with the help of some ioctls on /dev/vduse/$NAME:
-+
-+- VDUSE_IOTLB_GET_FD: get the file descriptor to the first overlapped iova region.
-+  Userspace can access this iova region by passing fd and corresponding size, offset,
-+  perm to mmap(). For example:
-+
-+.. code-block:: c
-+
-+	static int perm_to_prot(uint8_t perm)
-+	{
-+		int prot = 0;
-+
-+		switch (perm) {
-+		case VDUSE_ACCESS_WO:
-+			prot |= PROT_WRITE;
-+			break;
-+		case VDUSE_ACCESS_RO:
-+			prot |= PROT_READ;
-+			break;
-+		case VDUSE_ACCESS_RW:
-+			prot |= PROT_READ | PROT_WRITE;
-+			break;
-+		}
-+
-+		return prot;
-+	}
-+
-+	static void *iova_to_va(int dev_fd, uint64_t iova, uint64_t *len)
-+	{
-+		int fd;
-+		void *addr;
-+		size_t size;
-+		struct vduse_iotlb_entry entry;
-+
-+		entry.start = iova;
-+		entry.last = iova + 1;
-+		fd = ioctl(dev_fd, VDUSE_IOTLB_GET_FD, &entry);
-+		if (fd < 0)
-+			return NULL;
-+
-+		size = entry.last - entry.start + 1;
-+		*len = entry.last - iova + 1;
-+		addr = mmap(0, size, perm_to_prot(entry.perm), MAP_SHARED,
-+			    fd, entry.offset);
-+		close(fd);
-+		if (addr == MAP_FAILED)
-+			return NULL;
-+
-+		/* do something to cache this iova region */
-+
-+		return addr + iova - entry.start;
-+	}
-+
-+- VDUSE_DEV_GET_FEATURES: Get the negotiated features
-+
-+- VDUSE_DEV_UPDATE_CONFIG: Update the configuration space and inject a config interrupt
-+
-+- VDUSE_VQ_GET_INFO: Get the specified virtqueue's metadata
-+
-+- VDUSE_VQ_SETUP_KICKFD: set the kickfd for virtqueue, this eventfd is used
-+  by VDUSE kernel module to notify userspace to consume the vring.
-+
-+- VDUSE_INJECT_VQ_IRQ: inject an interrupt for specific virtqueue
-+
-+MMU-based IOMMU Driver
-+----------------------
-+
-+VDUSE framework implements an MMU-based on-chip IOMMU driver to support
-+mapping the kernel DMA buffer into the userspace iova region dynamically.
-+This is mainly designed for virtio-vdpa case (kernel virtio drivers).
-+
-+The basic idea behind this driver is treating MMU (VA->PA) as IOMMU (IOVA->PA).
-+The driver will set up MMU mapping instead of IOMMU mapping for the DMA transfer
-+so that the userspace process is able to use its virtual address to access
-+the DMA buffer in kernel.
-+
-+And to avoid security issue, a bounce-buffering mechanism is introduced to
-+prevent userspace accessing the original buffer directly which may contain other
-+kernel data. During the mapping, unmapping, the driver will copy the data from
-+the original buffer to the bounce buffer and back, depending on the direction of
-+the transfer. And the bounce-buffer addresses will be mapped into the user address
-+space instead of the original one.
--- 
-2.11.0
+Thanks,
+Vineeth
 
