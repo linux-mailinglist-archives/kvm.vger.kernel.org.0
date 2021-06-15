@@ -2,129 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC5733A86CE
-	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 18:45:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D9A523A86F4
+	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 18:56:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231324AbhFOQr4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Jun 2021 12:47:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43132 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230205AbhFOQrx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Jun 2021 12:47:53 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95113C061283
-        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 09:45:48 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id v184-20020a257ac10000b02904f84a5c5297so20776264ybc.16
-        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 09:45:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=XJacYOCj9BZGvWs61g7748RC1H4h4/tN+J594W0xPcg=;
-        b=T8v/HLtZvU81tX+n01GbDL/U0aO2OQ+BoapIR2tZ3hbBHS9DoFqeukZBnu9NEgy+y7
-         zS+E16VAsGkLv+8ZKU0s0oU4iEY87LIo/qszXU+1jtmAqBTncaWQXhER7+lOn6JHFEWz
-         EsOdZhs6b2ywtBt152/0M8XyVn1ikUIYxYYG0B8Ddrh3a1AO/UJ3NLn44dZoSGulUaaN
-         2camCjJgNk9N0o1+cNk+wZBPmjKj+RJSQGMh68FaF7YGfzBHtwcqb6+yuwwDCy4dtE4C
-         v9WYIKxZk9FyAJVtJdp9OztS9A0LVDpq6rVtjQDexRJv4DZRtMEfaKgQrRANMNMYBnim
-         1A/g==
+        id S230487AbhFOQ6N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Jun 2021 12:58:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53799 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229760AbhFOQ6L (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 15 Jun 2021 12:58:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623776166;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tZvxaMeoVcMZyEFg7QVxXPrZUcScONdAV0vv4yiFQ3I=;
+        b=QhSUVWA3Ao/GrAvtECBpz/ze/pVeI7s51bRVJ4DyXwEqMw8X2QlqWzOqCpmlEGqnsUghvu
+        cxvdmXNAQJUhEZ5tDUk90jwqttR1wphiALJ+sdJZHxBq0sla99qjNdZhlA1Mi+Sjr9g8YX
+        zJr1hBSSYK7hWk0siWUwad7/Oe3svoI=
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
+ [209.85.210.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-90-xamNGMIpMLiqR0aueUpoDA-1; Tue, 15 Jun 2021 12:56:05 -0400
+X-MC-Unique: xamNGMIpMLiqR0aueUpoDA-1
+Received: by mail-ot1-f69.google.com with SMTP id 59-20020a9d0dc10000b02902a57e382ca1so9822027ots.7
+        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 09:56:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=XJacYOCj9BZGvWs61g7748RC1H4h4/tN+J594W0xPcg=;
-        b=MwNHn8oEK5kcGiA3570xHkjiCMqIUE2/vPhtlfqYUl3UPhm5gVjFoTK2pqAg8J2JZP
-         J6uowlGpU2Y2UlYKP0QzWcfrvN5E1blI8enAqwz3GuqnFxXI5yWF6tQR2atGdthkF+9W
-         w/z2nDQ2+CYScf+ufCz9W17xq+RxtSiLIvRXx6MhWkRpw6IJ2kt2S5HI9DuRtp6j1rfR
-         bqM+v4ZKvgU6FwcLeUEX7YGzm4hzh588tiLdGe8xSeV88Ixx5u2Jvmdm3nGzi3iB+jkW
-         XuBWT782+JQKfkJmvnJd6c4LpgdE/QZmFrOBq43chMhjoed/qL/2Peb66WvheZaFrze7
-         +rDA==
-X-Gm-Message-State: AOAM531DK69VJNq61SjxqadNY5z940Rhenc4bt26HlbFBZpd4fgRuxxe
-        fTYVLFh4TINQ9U431wbJXuUFx+JviaI=
-X-Google-Smtp-Source: ABdhPJypTRjYIvyklZyabwZOPiUD8X5oGr7ScObtZ7Ya9rN8bbMDwVz84LxCjAoYj4FpMU1/HMGoGNFluxc=
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:13fc:a8bd:9d6b:e5])
- (user=seanjc job=sendgmr) by 2002:a25:aac7:: with SMTP id t65mr16428ybi.501.1623775547658;
- Tue, 15 Jun 2021 09:45:47 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 15 Jun 2021 09:45:35 -0700
-In-Reply-To: <20210615164535.2146172-1-seanjc@google.com>
-Message-Id: <20210615164535.2146172-5-seanjc@google.com>
-Mime-Version: 1.0
-References: <20210615164535.2146172-1-seanjc@google.com>
-X-Mailer: git-send-email 2.32.0.272.g935e593368-goog
-Subject: [PATCH 4/4] KVM: x86: Simplify logic to handle lack of host NX support
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=tZvxaMeoVcMZyEFg7QVxXPrZUcScONdAV0vv4yiFQ3I=;
+        b=e9F5+v0uPKfAtSDWYBM7l4OsdVQake5JOWnH7XpdBaj6EcjAdA79FB083shMh9G77U
+         stU2ZTN+GtBKRU64udHMc79PWpJYlc5HJSjImh9SOW4fuuJEEZNUDBnA8UKGarcKB10a
+         yK+zxswPPp1q7VG0qmY2JajxnSMdhAtOyjrWVqMek/cHvVJ5adKft1RHk2yC/9OwSs0q
+         GjxQLZHSGufmhkmOlKLhEKTCEMWpoj/mM3yIa9P4uCTh2kZ7vUtLSZIlBCZqzcv52cms
+         lt7LCbaYb+FY9tKxGJOaU3sZ+7isc/hc5jZjQnU6+jVRLHChUs5RI6Vjd8Fi0IM5uXOB
+         nwaA==
+X-Gm-Message-State: AOAM5307rUjgVkkpo6QcZVklcJ4X5WUlppjh+dNYMeWr5V0/UKXTongA
+        jVBntF5UjHmZTM0aH7zgLGVeYexdKMbGo5QztxBsSC7LDSdn9z69QRqf8wixBZgK9lrECWIN9in
+        f6cNzjPPY+JvY
+X-Received: by 2002:a05:6830:1643:: with SMTP id h3mr226886otr.76.1623776164386;
+        Tue, 15 Jun 2021 09:56:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJySTCQEIkpHgxR7ihbT8TXIfNDOtXfaAzp/M9djykvPAQhJp1svTbBP66qBFBmasifCO52RQA==
+X-Received: by 2002:a05:6830:1643:: with SMTP id h3mr226864otr.76.1623776164075;
+        Tue, 15 Jun 2021 09:56:04 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id n21sm1462475oig.18.2021.06.15.09.56.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Jun 2021 09:56:03 -0700 (PDT)
+Date:   Tue, 15 Jun 2021 10:56:01 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Robin Murphy <robin.murphy@arm.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Shenming Lu <lushenming@huawei.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>
+Subject: Re: Plan for /dev/ioasid RFC v2
+Message-ID: <20210615105601.4d7b8906.alex.williamson@redhat.com>
+In-Reply-To: <MWHPR11MB1886A6B3AC4AD249405E5B178C309@MWHPR11MB1886.namprd11.prod.outlook.com>
+References: <YMDC8tOMvw4FtSek@8bytes.org>
+        <20210609150009.GE1002214@nvidia.com>
+        <YMDjfmJKUDSrbZbo@8bytes.org>
+        <20210609101532.452851eb.alex.williamson@redhat.com>
+        <20210609102722.5abf62e1.alex.williamson@redhat.com>
+        <20210609184940.GH1002214@nvidia.com>
+        <20210610093842.6b9a4e5b.alex.williamson@redhat.com>
+        <BN6PR11MB187579A2F88C77ED2131CEF08C349@BN6PR11MB1875.namprd11.prod.outlook.com>
+        <20210611153850.7c402f0b.alex.williamson@redhat.com>
+        <MWHPR11MB1886C2A0A8AA3000EBD5F8E18C319@MWHPR11MB1886.namprd11.prod.outlook.com>
+        <20210614133819.GH1002214@nvidia.com>
+        <MWHPR11MB1886A6B3AC4AD249405E5B178C309@MWHPR11MB1886.namprd11.prod.outlook.com>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use boot_cpu_has() to check for NX support now that KVM requires
-host_efer.NX=1 if NX is supported.  Opportunistically avoid the guest
-CPUID lookup in cpuid_fix_nx_cap() if NX is supported, which is by far
-the common case.
+On Tue, 15 Jun 2021 01:21:35 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/cpuid.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Monday, June 14, 2021 9:38 PM
+> > 
+> > On Mon, Jun 14, 2021 at 03:09:31AM +0000, Tian, Kevin wrote:
+> >   
+> > > If a device can be always blocked from accessing memory in the IOMMU
+> > > before it's bound to a driver or more specifically before the driver
+> > > moves it to a new security context, then there is no need for VFIO
+> > > to track whether IOASIDfd has taken over ownership of the DMA
+> > > context for all devices within a group.  
+> > 
+> > I've been assuming we'd do something like this, where when a device is
+> > first turned into a VFIO it tells the IOMMU layer that this device
+> > should be DMA blocked unless an IOASID is attached to
+> > it. Disconnecting an IOASID returns it to blocked.  
+> 
+> Or just make sure a device is in block-DMA when it's unbound from a
+> driver or a security context. Then no need to explicitly tell IOMMU layer 
+> to do so when it's bound to a new driver.
+> 
+> Currently the default domain type applies even when a device is not
+> bound. This implies that if iommu=passthrough a device is always 
+> allowed to access arbitrary system memory with or without a driver.
+> I feel the current domain type (identity, dma, unmanged) should apply
+> only when a driver is loaded...
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index b4da665bb892..786f556302cd 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -208,16 +208,14 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	kvm_mmu_reset_context(vcpu);
- }
- 
--static int is_efer_nx(void)
--{
--	return host_efer & EFER_NX;
--}
--
- static void cpuid_fix_nx_cap(struct kvm_vcpu *vcpu)
- {
- 	int i;
- 	struct kvm_cpuid_entry2 *e, *entry;
- 
-+	if (boot_cpu_has(X86_FEATURE_NX))
-+		return;
-+
- 	entry = NULL;
- 	for (i = 0; i < vcpu->arch.cpuid_nent; ++i) {
- 		e = &vcpu->arch.cpuid_entries[i];
-@@ -226,7 +224,7 @@ static void cpuid_fix_nx_cap(struct kvm_vcpu *vcpu)
- 			break;
- 		}
- 	}
--	if (entry && cpuid_entry_has(entry, X86_FEATURE_NX) && !is_efer_nx()) {
-+	if (entry && cpuid_entry_has(entry, X86_FEATURE_NX)) {
- 		cpuid_entry_clear(entry, X86_FEATURE_NX);
- 		printk(KERN_INFO "kvm: guest NX capability removed\n");
- 	}
-@@ -401,7 +399,6 @@ static __always_inline void kvm_cpu_cap_mask(enum cpuid_leafs leaf, u32 mask)
- 
- void kvm_set_cpu_caps(void)
- {
--	unsigned int f_nx = is_efer_nx() ? F(NX) : 0;
- #ifdef CONFIG_X86_64
- 	unsigned int f_gbpages = F(GBPAGES);
- 	unsigned int f_lm = F(LM);
-@@ -515,7 +512,7 @@ void kvm_set_cpu_caps(void)
- 		F(CX8) | F(APIC) | 0 /* Reserved */ | F(SYSCALL) |
- 		F(MTRR) | F(PGE) | F(MCA) | F(CMOV) |
- 		F(PAT) | F(PSE36) | 0 /* Reserved */ |
--		f_nx | 0 /* Reserved */ | F(MMXEXT) | F(MMX) |
-+		F(NX) | 0 /* Reserved */ | F(MMXEXT) | F(MMX) |
- 		F(FXSR) | F(FXSR_OPT) | f_gbpages | F(RDTSCP) |
- 		0 /* Reserved */ | f_lm | F(3DNOWEXT) | F(3DNOW)
- 	);
--- 
-2.32.0.272.g935e593368-goog
+Note that vfio does not currently require all devices in the group to
+be bound to drivers.  Other devices within the group, those bound to
+vfio drivers, can be used in this configuration.  This is not
+necessarily recommended though as a non-vfio, non-stub driver binding
+to one of those devices can trigger a BUG_ON.
+
+> > > If this works I didn't see the need for vfio to keep the sequence.
+> > > VFIO still keeps group fd to claim ownership of all devices in a
+> > > group.  
+> > 
+> > As Alex says you still have to deal with the problem that device A in
+> > a group can gain control of device B in the same group.  
+> 
+> There is no isolation in the group then how could vfio prevent device
+> A from gaining control of device B? for example when both are attached
+> to the same GPA address space with device MMIO bar included, devA
+> can do p2p to devB. It's all user's policy how to deal with devices within
+> the group. 
+
+The latter is user policy, yes, but it's a system security issue that
+the user cannot use device A to control device B if the user doesn't
+have access to both devices, ie. doesn't own the group.  vfio would
+prevent this by not allowing access to device A while device B is
+insecure and would require that all devices within the group remain in
+a secure, user owned state for the extent of access to device A.
+
+> > This means device A and B can not be used from to two different
+> > security contexts.  
+> 
+> It depends on how the security context is defined. From iommu layer
+> p.o.v, an IOASID is a security context which isolates a device from
+> the rest of the system (but not the sibling in the same group). As you
+> suggested earlier, it's completely sane if an user wants to attach
+> devices in a group to different IOASIDs. Here I just talk about this fact.
+
+This is sane, yes, but that doesn't give us license to allow the user
+to access device A regardless of the state of device B.
+
+> > 
+> > If the /dev/iommu FD is the security context then the tracking is
+> > needed there.
+> >   
+> 
+> As I replied to Alex, my point is that VFIO doesn't need to know the
+> attaching status of each device in a group before it can allow user to
+> access a device. As long as a device in a group either in block DMA
+> or switch to a new address space created via /dev/iommu FD, there's
+> no problem to allow user accessing it. User cannot do harm to the
+> world outside of the group. User knows there is no isolation within
+> the group. that is it.
+
+This is self contradictory, "vfio doesn't need to know the attachment
+status"... "[a]s long as a device in a group either in block DMA or
+switch to a new address space".  So vfio does need to know the latter.
+How does it know that?  Thanks,
+
+Alex
 
