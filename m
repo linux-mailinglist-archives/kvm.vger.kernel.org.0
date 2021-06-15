@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1335B3A899B
-	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 21:35:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E48EF3A899F
+	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 21:36:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230188AbhFOTiA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Jun 2021 15:38:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35783 "EHLO
+        id S231171AbhFOTiM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Jun 2021 15:38:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38431 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229749AbhFOTh7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 15 Jun 2021 15:37:59 -0400
+        by vger.kernel.org with ESMTP id S229749AbhFOTiL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 15 Jun 2021 15:38:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623785753;
+        s=mimecast20190719; t=1623785766;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Lqcix6Bye8GfBWjf8v07rNQNvUDYKUaSMsD+NDsgZyo=;
-        b=JMMOE4WmopI849gXXRo7yobMXm1PfewgxoVrXV0KiSdz75dIdadA2wU1aFfwrvaaON+OwU
-        i9odu1ASH0h+hllzp1nqsIzfUrmBd6bZw09nLgpVOwBObI5mR8HtR930fEPmUN+4z2qyW4
-        YgBAe6RjuZO1RC0a+hWzGKRCtut8qFk=
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
- [209.85.161.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-p1KhAq7HMlqRGI6dztddiw-1; Tue, 15 Jun 2021 15:35:52 -0400
-X-MC-Unique: p1KhAq7HMlqRGI6dztddiw-1
-Received: by mail-oo1-f72.google.com with SMTP id l13-20020a4aa78d0000b0290245c8f11ac2so98978oom.11
-        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 12:35:52 -0700 (PDT)
+        bh=llnAE3X+Il5R8O881N30+k0POgEFanp8l+fSoeV24QM=;
+        b=AmAd4DXFZi99Gn8uMAsF7+V7TEz7YAW0UTslZNbEzvscCe80/wMcgiGdmaQZv2ohyJVfgs
+        ipy0meWow1aitj65B8plxvwd1ryAE/2IRufnnn4wCmbxMsPcGYmcFw3kSmGhSEVj1U1e/u
+        RtAZdKtPYClEf+bj7jAijYz/Noc6vZs=
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
+ [209.85.161.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-593-roXtTffQPrqYVjbdCWcm0g-1; Tue, 15 Jun 2021 15:36:05 -0400
+X-MC-Unique: roXtTffQPrqYVjbdCWcm0g-1
+Received: by mail-oo1-f71.google.com with SMTP id 185-20020a4a09c20000b029024ac8624e53so88292ooa.16
+        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 12:36:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
          :references:organization:mime-version:content-transfer-encoding;
-        bh=Lqcix6Bye8GfBWjf8v07rNQNvUDYKUaSMsD+NDsgZyo=;
-        b=tmm6iGXTVwS5Odq5oKqnlK3miRte3D96Yvj8Tt54SRb5YU76XDY+reDo1BY4PSbo/X
-         gnRA7UHpccZPf8CA4+zyP3udmwyN5Ws7muf+f+Jsa1ktSgSZ5JiU1D89Z5gLIaQJMwfv
-         MsTJQ+3zGyMkItOmKRTy+zANdjemt0jc4hpxO8y03aUuXyQfMtNjlnmx1/7qkagZRC1/
-         QQFmySEUJ3iscFQLKtmxOEVCFdCMjoFi25YTzqvnYgylquVy/+017SCgdybXfzr1dV29
-         f9r1x7/JrtH7k9po8pS/J2GnIAKwlNx9nK9RWbnW/fxyOOPTUocD7Z7txNDq4f3RqXim
-         i5MA==
-X-Gm-Message-State: AOAM531b4vERGf7iYnYMLzMOpZ8cicZ4spBM6xBfpTaJo+jOpPxp/Wbi
-        fZqPONZHU4iK1leBbBIF8U1Lco+yHJUwgBpgzZPu/27MeW/Sx33i7CHsnXKlMIazmHqiLnzlhXM
-        B7R6BYAKXQ0hi
-X-Received: by 2002:a4a:98b0:: with SMTP id a45mr683020ooj.22.1623785751932;
-        Tue, 15 Jun 2021 12:35:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxEy2LCOJugZ+XL95JhEOH9gPPqCgkIMQXc0Pb6WDjknNr5iRFNesGYK5OnEUNjOdehrK9BNQ==
-X-Received: by 2002:a4a:98b0:: with SMTP id a45mr682990ooj.22.1623785751738;
-        Tue, 15 Jun 2021 12:35:51 -0700 (PDT)
+        bh=llnAE3X+Il5R8O881N30+k0POgEFanp8l+fSoeV24QM=;
+        b=IZL3NAPl2YdR4cYa6Ca+SV7JzbEmXWi8C2N7gNSCoBq+SR6eC3egcgL3h4Wc9wPvAd
+         K/J5ikzeIrfjoIa2ZL8Kq0zcjRBNlhSyQ8+gMOyTCcH6eSw14QL5ZoMooiDge0jxnrUR
+         Eg07d01LR3AJUf7w9WRqPunty8F45bWJdJqqwCP3v/R50OaH20A/SDjauShaJD74m1L/
+         g+H9hy9uqOMGHdV5LIHXv8Hqh7E46a0q97p96Q45H4lvbbRCKhIT4mvqYTWxdl6+BCfK
+         qWfJPuidWy3nm7/CAP4lmKYBye1fjItTj1OZpYJd1HUt5A6Aik1hY9bzcMCh406YOcOl
+         HzEA==
+X-Gm-Message-State: AOAM531z42ENZpaz9OphS26iODGGO/2U/5C2zLjcWViFhX1l8BwKv/eg
+        lWCeb6ul61g5KKExayG5ugDKGU8z0h1uuhBFl2zkBrLvLKwSDqIayjw8meh143JiF0QN2QXsyqX
+        RY8yM93dKTpXu
+X-Received: by 2002:a05:6808:210:: with SMTP id l16mr500264oie.154.1623785764704;
+        Tue, 15 Jun 2021 12:36:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz8QXhsFTV+W1cxlEpGDuWEWDQP8JmMvkjeZyUYAqX7GqD4McjXkjMc2mNDLmE9O/Xu0RrqmA==
+X-Received: by 2002:a05:6808:210:: with SMTP id l16mr500251oie.154.1623785764560;
+        Tue, 15 Jun 2021 12:36:04 -0700 (PDT)
 Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id j3sm3894698oii.46.2021.06.15.12.35.50
+        by smtp.gmail.com with ESMTPSA id u1sm3965076ooo.18.2021.06.15.12.36.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Jun 2021 12:35:51 -0700 (PDT)
-Date:   Tue, 15 Jun 2021 13:35:49 -0600
+        Tue, 15 Jun 2021 12:36:04 -0700 (PDT)
+Date:   Tue, 15 Jun 2021 13:36:02 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -72,10 +72,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
         "Rafael J. Wysocki" <rafael@kernel.org>,
         Rodrigo Vivi <rodrigo.vivi@intel.com>
-Subject: Re: Allow mdev drivers to directly create the vfio_device (v3)
-Message-ID: <20210615133549.362e5a9e.alex.williamson@redhat.com>
-In-Reply-To: <20210615133519.754763-1-hch@lst.de>
+Subject: Re: [PATCH 04/10] driver core: Don't return EPROBE_DEFER to
+ userspace during sysfs bind
+Message-ID: <20210615133602.0699492d.alex.williamson@redhat.com>
+In-Reply-To: <20210615133519.754763-5-hch@lst.de>
 References: <20210615133519.754763-1-hch@lst.de>
+        <20210615133519.754763-5-hch@lst.de>
 Organization: Red Hat
 X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
@@ -85,48 +87,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 15 Jun 2021 15:35:09 +0200
+On Tue, 15 Jun 2021 15:35:13 +0200
 Christoph Hellwig <hch@lst.de> wrote:
 
-> This is my alternative take on this series from Jason:
-> 
-> https://lore.kernel.org/dri-devel/87czsszi9i.fsf@redhat.com/T/
-> 
-> The mdev/vfio parts are exactly the same, but this solves the driver core
-> changes for the direct probing without the in/out flag that Greg hated,
-> which cause a little more work, but probably make the result better.
-> 
-> Original decription from Jason below:
-> 
-> The mdev bus's core part for managing the lifecycle of devices is mostly
-> as one would expect for a driver core bus subsystem.
-> 
-> However instead of having a normal 'struct device_driver' and binding the
-> actual mdev drivers through the standard driver core mechanisms it open
-> codes this with the struct mdev_parent_ops and provides a single driver
-> that shims between the VFIO core's struct vfio_device and the actual
-> device driver.
-> 
-> Instead, allow mdev drivers implement an actual struct mdev_driver and
-> directly call vfio_register_group_dev() in the probe() function for the
-> mdev. Arrange to bind the created mdev_device to the mdev_driver that is
-> provided by the end driver.
-> 
-> The actual execution flow doesn't change much, eg what was
-> parent_ops->create is now device_driver->probe and it is called at almost
-> the exact same time - except under the normal control of the driver core.
-> 
-> Ultimately converting all the drivers unlocks a fair number of additional
-> VFIO simplifications and cleanups.
+> @@ -547,10 +538,9 @@ static int call_driver_probe(struct device *dev, struct device_driver *drv)
+>  
+>  static int really_probe(struct device *dev, struct device_driver *drv)
+>  {
+> -	int local_trigger_count = atomic_read(&deferred_trigger_count);
+>  	bool test_remove = IS_ENABLED(CONFIG_DEBUG_TEST_DRIVER_REMOVE) &&
+>  			   !drv->suppress_bind_attrs;
+> -	int ret = -EPROBE_DEFER, probe_ret = 0;
+> +	int ret, probe_ret = 0;
 
-Looks like we need an update to
-Documentation/driver-api/vfio-mediated-device.rst to go along with
-this.
+nit, probe_ret initialization could be removed with this patch too.
 
-Also, if we're preserving compatibility with the "legacy"
-mdev_parent_ops callbacks without deprecating them, does it really make
-sense to convert every one of the sample drivers to this new direct
-registration?  Thanks,
+>  
+>  	if (defer_all_probes) {
+>  		/*
+> @@ -559,17 +549,13 @@ static int really_probe(struct device *dev, struct device_driver *drv)
+>  		 * wait_for_device_probe() right after that to avoid any races.
+>  		 */
+>  		dev_dbg(dev, "Driver %s force probe deferral\n", drv->name);
+> -		driver_deferred_probe_add(dev);
+> -		return ret;
+> +		return -EPROBE_DEFER;
+>  	}
+>  
+>  	ret = device_links_check_suppliers(dev);
+> -	if (ret == -EPROBE_DEFER)
+> -		driver_deferred_probe_add_trigger(dev, local_trigger_count);
+>  	if (ret)
+>  		return ret;
+>  
+> -	atomic_inc(&probe_count);
+>  	pr_debug("bus: '%s': %s: probing driver %s with device %s\n",
+>  		 drv->bus->name, __func__, drv->name, dev_name(dev));
+>  	if (!list_empty(&dev->devres_head)) {
+> @@ -681,11 +667,7 @@ static int really_probe(struct device *dev, struct device_driver *drv)
+>  		dev->pm_domain->dismiss(dev);
+>  	pm_runtime_reinit(dev);
+>  	dev_pm_set_driver_flags(dev, 0);
+> -	if (probe_ret == -EPROBE_DEFER)
+> -		driver_deferred_probe_add_trigger(dev, local_trigger_count);
+
+This was the only possible uninitialized use case afaict.  Thanks,
 
 Alex
 
