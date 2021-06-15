@@ -2,218 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C9803A74CF
-	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 05:14:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E9DFC3A74FD
+	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 05:21:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231191AbhFODQK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Jun 2021 23:16:10 -0400
-Received: from mga03.intel.com ([134.134.136.65]:60769 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231152AbhFODQI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Jun 2021 23:16:08 -0400
-IronPort-SDR: 2Mg5vgv4iVilkb508N04kjL8snLUUPKAwS+I8ZFiiPg2cYVK1hAO6KGG2xIZvfSC16OX+9J3E8
- ZD9whw7uGTBw==
-X-IronPort-AV: E=McAfee;i="6200,9189,10015"; a="205943564"
-X-IronPort-AV: E=Sophos;i="5.83,273,1616482800"; 
-   d="scan'208";a="205943564"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2021 19:31:44 -0700
-IronPort-SDR: 0tyHDmzZcuHLidvMviFsCYJxTxzUKJuxGQt/wVeMtzl5gveCtG7ZILk28yInME8j6CLMmXdmr0
- +HxdcuqIMKAg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.83,273,1616482800"; 
-   d="scan'208";a="478567979"
-Received: from orsmsx605.amr.corp.intel.com ([10.22.229.18])
-  by FMSMGA003.fm.intel.com with ESMTP; 14 Jun 2021 19:31:44 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.4; Mon, 14 Jun 2021 19:31:43 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.4; Mon, 14 Jun 2021 19:31:43 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4
- via Frontend Transport; Mon, 14 Jun 2021 19:31:43 -0700
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.46) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.4; Mon, 14 Jun 2021 19:31:42 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=A1+wITW5N6YEvLRxkL3vS8r8MlSHrbjmEN0/hk5LqpetXHd5LaNVY/qwArKzdM6txas6Nms48vh1yfCrST4Qmm2cye9fClbzG7Z5Vpe+Q9fSvMtWDHggU6OIjjfA2EaUrRdCVaEmooxSSHv250fI+hf9IBwhYFGDHVHBDSqwuq3kFzZAKRi82IfBSBmhx20g9K2oM60V3xKTgugOGeNt6F/3ln4AExmNZEY1JDceWJBhEfJJAusb22IrK5tzIQuP56AXNlU+CJa1f+tqnSA/iNTMurZ0xNWYMBKbQ22iADwcY1LxSumq304DUW70ePfuwfS3w+jbAJ0Pt58tw+soMg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+X4OO+eN9CxK8eV/CeQTyjIi6UyXo9edHwyrC1x3Ad0=;
- b=Q70KCF3eEQAJr4GgXWuhuT5zgtTXZKHzFt2BXTLujbn223ZH1nu5QXNvyKaU+9Y2darkilt+ViT2niKNWLiqBFulaowmvqh80XKq6cxiOo1CZrNjyjmpU6hQnytkZOivkCPqOWx5t/JrYYg842fpdC2ND9rN7e6Z6FQOaZHoLfbgYfY2Aj2hgqwQ8yHbARaZnY45EcaDxxUPixmByZlzouXzyMeKiIj8TV+YbtCg2bX0qfsnM6e2tH2VGSSgV66tWm/1gaIetaqOXcfPXXMpuQ5FlprehA/9GrmJgJ8zt18nk598ZrF9PjP4BHRiDpXGwJe8AZqghyHrIoXHMxTVDw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+X4OO+eN9CxK8eV/CeQTyjIi6UyXo9edHwyrC1x3Ad0=;
- b=T0+UXvgqhlLlZ4wDXYzeP+ZBEG0mIsxMRJDVdEHbrW5CW4epwh6DHPzuqTo4jRhtFb5ws5lv0T25UfG9qBgzyLTLWDdOQXCCsgdS3a3DMhSnUWrnWfkS5Xci/gohOHVvNMEcR8lhfBD7yZlLbcterj9a5jvBZnQq4oW1kA24MrY=
-Received: from MWHPR11MB1886.namprd11.prod.outlook.com (2603:10b6:300:110::9)
- by MWHPR11MB1838.namprd11.prod.outlook.com (2603:10b6:300:10c::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.21; Tue, 15 Jun
- 2021 02:31:39 +0000
-Received: from MWHPR11MB1886.namprd11.prod.outlook.com
- ([fe80::6597:eb05:c507:c6c1]) by MWHPR11MB1886.namprd11.prod.outlook.com
- ([fe80::6597:eb05:c507:c6c1%12]) with mapi id 15.20.4219.025; Tue, 15 Jun
- 2021 02:31:39 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-CC:     Joerg Roedel <joro@8bytes.org>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        "Jason Wang" <jasowang@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shenming Lu <lushenming@huawei.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "Robin Murphy" <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "David Woodhouse" <dwmw2@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "Lu Baolu" <baolu.lu@linux.intel.com>
-Subject: RE: Plan for /dev/ioasid RFC v2
-Thread-Topic: Plan for /dev/ioasid RFC v2
-Thread-Index: AddbO/WEUAFl3MPnRsG8exiH8bwEagB7l+uAAACIfoAAAdwYAAADDw6AAAHKgwAAANd4AAAAacwAAAT4QwAAK587AAA0n7GAAAYKlwAADDvuAAAgbLGAAF6lSYAABO0WAAATSRtQ
-Date:   Tue, 15 Jun 2021 02:31:39 +0000
-Message-ID: <MWHPR11MB1886239C82D6B66A732830B88C309@MWHPR11MB1886.namprd11.prod.outlook.com>
-References: <20210609150009.GE1002214@nvidia.com>
-        <YMDjfmJKUDSrbZbo@8bytes.org>
-        <20210609101532.452851eb.alex.williamson@redhat.com>
-        <20210609102722.5abf62e1.alex.williamson@redhat.com>
-        <20210609184940.GH1002214@nvidia.com>
-        <20210610093842.6b9a4e5b.alex.williamson@redhat.com>
-        <20210611164529.GR1002214@nvidia.com>
-        <20210611133828.6c6e8b29.alex.williamson@redhat.com>
-        <20210612012846.GC1002214@nvidia.com>
-        <20210612105711.7ac68c83.alex.williamson@redhat.com>
-        <20210614140711.GI1002214@nvidia.com>
- <20210614102814.43ada8df.alex.williamson@redhat.com>
-In-Reply-To: <20210614102814.43ada8df.alex.williamson@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-version: 11.5.1.3
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [192.198.143.24]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 7c8e89a2-723d-421f-2003-08d92fa5b4b0
-x-ms-traffictypediagnostic: MWHPR11MB1838:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR11MB18381AEA0295EF5FBFE9DFF08C309@MWHPR11MB1838.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Pq6OyJBPj7fGeizWCWEH2lhwHWC2B+CtUMkbfuxzXu2pNJXwt8ymWGQNrGPDqQH93sJ6cAKBdeMg5i6unaRTQ3MG82oPCPtMFEW1E7WrKuFV4je9Emnd3pMooeJwTnzfV9EZzhLmARC5Qq5GdxVBQNzsfB4Ujm74s1q4rHYAsxrQjzs3DJf+5h3agorXukCczodsrVCQVcN0NPpB19YF67ggIj9+HcfyGKhFMZFRzOx23jEtpN5x9SuWOKK5AmDyPfs3CYXxrllk4rZ3OYNo7Le7Dr2VzaubGfR1XJy9yHy6ZR0qbW47KF42+REBHtwAW8NEGBSYdX2CuiHuQENCN0B6Zmkfxu+tyRhFZwdCNQoGYRs38i5+KSVL3SpTq1RvH2TRjIjU27DINJLqOM4opt/z3y3Oq2c9p93ub1FueetvgmCIo9URIfUOWwBA9Vxmy8NW91zQgleaDAjOuTzZReYLZXrEK4rRuD2ndBmfar1f485uT4DjRwJVMHNCRhsAC1kDZj5Y9zzbhkc1HCQ/V5btwlfog4Y+RNr+WX7Zs9t7zClFg8cMV52g5GQzWCzN5+fiQAxd92GMMZDEzNmg4EYDitAstW+r3fPmfKR8WxE=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1886.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(39860400002)(346002)(396003)(136003)(366004)(71200400001)(110136005)(316002)(86362001)(6506007)(7696005)(52536014)(54906003)(26005)(76116006)(66446008)(66476007)(64756008)(186003)(33656002)(5660300002)(66556008)(38100700002)(66946007)(122000001)(55016002)(9686003)(4326008)(478600001)(7416002)(83380400001)(2906002)(8936002)(8676002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?TjjgrrVHuEW+gGRi+SI9F5lxO0UWHkvzvegQkVVlbJhqnTom6V6WsnPXepQ3?=
- =?us-ascii?Q?7Zgc+QVBiA1UL7ZabluWuTlFXk18Lqt/6/jM2ScAr3dZU6d/22c3qnK1VkDs?=
- =?us-ascii?Q?UUQQT4Au+Qg+4cenrhiHtoBQOF2Gahv1RCLMlJwH0BsMKM3GeuLz/hyPxaaX?=
- =?us-ascii?Q?yQqKXtkhCU4ubDS/VaS0RI0vPrrJRDhl5VajvNcBiETfyWJYoYnHfWWTdTSN?=
- =?us-ascii?Q?j24gr0u0h7JGQL9htUWIBj7HJqYLuR+O0W4WPq/qIVtT16slS37wsioQqJX+?=
- =?us-ascii?Q?VhicNCWziWfwn6OM2w1uOiTpfbuOK7yoH+1GrQ2KagoYFmOGkylNZUm2zRRQ?=
- =?us-ascii?Q?52TbjzoQLZAhVlDFRVuK+UWWTTJXVoS3L1fnrIdF/vO/J96zMrg3z5PvhcyF?=
- =?us-ascii?Q?PSpJHC69tK3mvKaxOJ/aXUAzhNaUG+a/FUop9fhM9EMB1EaYpaH3g+sXcgzS?=
- =?us-ascii?Q?emH25JAat7gfniFnlJFbnHBzcpuIoSTP+/i3JQZ1dsWzez2KIiGGoyCeYEhB?=
- =?us-ascii?Q?TrNIEYKawE5DSP8EDUwUqA4cUqO0g3MSPPL7O2DlgV+IyExQX/x49utJ8zG3?=
- =?us-ascii?Q?QOTWyug/dXG/aZ1Gch4GGpZqSrpV6yayX/HuOd8aVgpGOWpL0omRsOtV/i/N?=
- =?us-ascii?Q?xP2+7b9vV22r4PIaEBS12FpZ4/nJgO8tORWWn+6PZ+IDDEizcnmo/3xlLZJW?=
- =?us-ascii?Q?cjZPmqChoGX98K18fF0xFobgoKiw9XWfJOzm5OHUwKrg/LATfhVlx4Z6E5hH?=
- =?us-ascii?Q?hWCakRpd2xV0crwK6TrroLHSMhS1fHCdtfIyt6nl0rNJyFGPJ7FuKpxGVpWe?=
- =?us-ascii?Q?Sw0REZjp0NsLmzck4QuTJJWts8gCGGZpdA56PaeRMRsB/VHMqRcdWm5Yh4Ix?=
- =?us-ascii?Q?G/v+qgokE5q91X37xJfX0v0z3NA5x+cEsJFApJX+XFBktkHQA40dfDB3pBQv?=
- =?us-ascii?Q?2Q4/zu7gLKM11SSoPsM7VfGxi85r1/ZLrNZoGl/tvEUgCTQx5dFi17ovb2ME?=
- =?us-ascii?Q?/OXUCLV5TbjJtCjxABgiHkDprGQGx6Tn8zYzSgbYp8ICo5fpP9EUh0FEJ5HL?=
- =?us-ascii?Q?AJeHu+pt6GbC3V+LosTH4A3SYcMmBNFyU6kI/9LHP5KPBVZ0rS9f1DzjegaE?=
- =?us-ascii?Q?Jqu2TbKaDPvuEGxWbh815OsxQu6aXFnEUiXdkTbPTEzB+O4pgYlT5FZAL+1+?=
- =?us-ascii?Q?riQehmjl3sEG4IG3XTo5gLh2M6/N8GwXYMNaZkb6Xnr1vKyO5yuW7qdqtnj5?=
- =?us-ascii?Q?S9+qOYIhwItDV1+SenlNSwWIWlUn4P/OOdfInvaW1wGuSVTTBPxNtgj+ynxz?=
- =?us-ascii?Q?SVWHPkfjlGY1C/wAhcn0Oa/r?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S231166AbhFODXf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Jun 2021 23:23:35 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:44432 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231239AbhFODXY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Jun 2021 23:23:24 -0400
+Received: from mail-pf1-f198.google.com ([209.85.210.198])
+        by youngberry.canonical.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <po-hsu.lin@canonical.com>)
+        id 1lszde-0006MA-QH
+        for kvm@vger.kernel.org; Tue, 15 Jun 2021 03:21:18 +0000
+Received: by mail-pf1-f198.google.com with SMTP id 9-20020a6217090000b02902ed4caf9377so9429930pfx.19
+        for <kvm@vger.kernel.org>; Mon, 14 Jun 2021 20:21:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Y27UbtFOQ8c39eVLx06R3uWLnW6dhZQzs0wPAm5K83o=;
+        b=PkqOCS6qH2Qo0P3Kqw2kdpKVan1oef78YTgF0WRWsDi8Y829v9n/m7fYr7i2RRczCt
+         AomZIUkiqoGXMyiPTsosxdxMM6VT6eZJkyx8H9iocptkIPO5G3Mc4sJXkgzvQJh0oDN9
+         e1oyKCy9ADNJvUwmDAuFH3ZU6MSxDyYlOd1GlYz5U0owsSHRjFzjFwuiKAHpVCg6XVxQ
+         Vj9uBrwhJJDiYjmwsmxcMEMfT+Xjy691muPnCJWunQ/qssMbAlUptAMtslPH0TQpKkxJ
+         5La67yTMeVLZib8OLeI11Wi+B3i+29ScyYA68IorwBBsncyOg0E7i+goHST2Hnjgzrm/
+         N18A==
+X-Gm-Message-State: AOAM530a91L87fJSbzrpPPzh5XU0gdXqAKwBlsXOXCuPLZgzZn8CpigR
+        P/kgHdKHhTsdskJsPuGRaTa8Vl2/hqXvSd3ji4n0r+QF06/l8KEwfPw0zRWlPSC9npD9fYXjxFi
+        nEp0U34zk337OLRJNcONLed8arqJfDP5f379xxKX7j3oS
+X-Received: by 2002:a62:3344:0:b029:25e:a0a8:1c51 with SMTP id z65-20020a6233440000b029025ea0a81c51mr2260511pfz.58.1623727277195;
+        Mon, 14 Jun 2021 20:21:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzexSvriwW6xx6lNJddJMvfRC0bGnFI1v9u8YQnjAImetW0yirOAeb6eRv6xa0GzZf8Zx3jXavguowXoco3M7U=
+X-Received: by 2002:a62:3344:0:b029:25e:a0a8:1c51 with SMTP id
+ z65-20020a6233440000b029025ea0a81c51mr2260481pfz.58.1623727276783; Mon, 14
+ Jun 2021 20:21:16 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1886.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7c8e89a2-723d-421f-2003-08d92fa5b4b0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jun 2021 02:31:39.4887
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dDsu29zAcB4D9C8Jqbh1u3z4QzzWs4N5RIj61b5fb2izhma/H0ZwZF3UCDwc/fIM+oulUwBUFbohPxDDuIHc4w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1838
-X-OriginatorOrg: intel.com
+References: <d18ab1d5-4eff-43e1-4a5b-5373b67e4286@arm.com> <20201120123414.bolwl6pym4iy3m6x@kamzik.brq.redhat.com>
+In-Reply-To: <20201120123414.bolwl6pym4iy3m6x@kamzik.brq.redhat.com>
+From:   Po-Hsu Lin <po-hsu.lin@canonical.com>
+Date:   Tue, 15 Jun 2021 11:21:05 +0800
+Message-ID: <CAMy_GT9Y1JNyh5GkZm31RQ6nX8Jv9qHFRN2KeOe01GOyk2ifQg@mail.gmail.com>
+Subject: Re: [kvm-unit-tests] its-migration segmentation fault
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        Auger Eric <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Alex Williamson <alex.williamson@redhat.com>
-> Sent: Tuesday, June 15, 2021 12:28 AM
->=20
-[...]
-> > IOASID. Today the group fd requires an IOASID before it hands out a
-> > device_fd. With iommu_fd the device_fd will not allow IOCTLs until it
-> > has a blocked DMA IOASID and is successefully joined to an iommu_fd.
->=20
-> Which is the root of my concern.  Who owns ioctls to the device fd?
-> It's my understanding this is a vfio provided file descriptor and it's
-> therefore vfio's responsibility.  A device-level IOASID interface
-> therefore requires that vfio manage the group aspect of device access.
-> AFAICT, that means that device access can therefore only begin when all
-> devices for a given group are attached to the IOASID and must halt for
-> all devices in the group if any device is ever detached from an IOASID,
-> even temporarily.  That suggests a lot more oversight of the IOASIDs by
-> vfio than I'd prefer.
->=20
+On Fri, Nov 20, 2020 at 8:35 PM Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Fri, Nov 20, 2020 at 12:02:10PM +0000, Alexandru Elisei wrote:
+> > When running all the tests with taskset -c 0-3 ./run_tests.sh on a rockpro64 (on
+> > the Cortex-a53 cores) the its-migration test hangs. In the log file I see:
+> >
+> > run_migration timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
+> > -nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
+> > virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd
+> > -device pci-testdev -display none -serial stdio -kernel arm/gic.flat -smp 6
+> > -machine gic-version=3 -append its-migration # -initrd /tmp/tmp.OrlQiorBpY
+> > ITS: MAPD devid=2 size = 0x8 itt=0x40420000 valid=1
+> > ITS: MAPD devid=7 size = 0x8 itt=0x40430000 valid=1
+> > MAPC col_id=3 target_addr = 0x30000 valid=1
+> > MAPC col_id=2 target_addr = 0x20000 valid=1
+> > INVALL col_id=2
+> > INVALL col_id=3
+> > MAPTI dev_id=2 event_id=20 -> phys_id=8195, col_id=3
+> > MAPTI dev_id=7 event_id=255 -> phys_id=8196, col_id=2
+> > Now migrate the VM, then press a key to continue...
+> > scripts/arch-run.bash: line 103: 48549 Done                    echo '{ "execute":
+> > "qmp_capabilities" }{ "execute":' "$2" '}'
+> >      48550 Segmentation fault      (core dumped) | ncat -U $1
+> > scripts/arch-run.bash: line 103: 48568 Done                    echo '{ "execute":
+> > "qmp_capabilities" }{ "execute":' "$2" '}'
+> >      48569 Segmentation fault      (core dumped) | ncat -U $1
+> > scripts/arch-run.bash: line 103: 48583 Done                    echo '{ "execute":
+> > "qmp_capabilities" }{ "execute":' "$2" '}'
+> >      48584 Segmentation fault      (core dumped) | ncat -U $1
+> > [..]
+> > scripts/arch-run.bash: line 103: 49414 Done                    echo '{ "execute":
+> > "qmp_capabilities" }{ "execute":' "$2" '}'
+> >      49415 Segmentation fault      (core dumped) | ncat -U $1
+> > qemu-system-aarch64: terminating on signal 15 from pid 48496 (timeout)
+> > qemu-system-aarch64: terminating on signal 15 from pid 48504 (timeout)
+> > scripts/arch-run.bash: line 103: 49430 Done                    echo '{ "execute":
+> > "qmp_capabilities" }{ "execute":' "$2" '}'
+> >      49431 Segmentation fault      (core dumped) | ncat -U $1
+> > scripts/arch-run.bash: line 103: 49445 Done                    echo '{ "execute":
+> > "qmp_capabilities" }{ "execute":' "$2" '}'
+> > [..]
+>
+> Is your ncat segfaulting? It looks like it from this output. Have you
+> tried running your ncat with a UNIX socket independently of this test?
+>
+> Is this the first time you've tried this test in this environment, or
+> is this a regression for you?
+>
+> >
+> > If I run the test manually:
+> >
+> > $ taskset -c 0-3 ./arm-run arm/gic.flat -smp 4 -machine gic-version=3 -append
+> > 'its-migration'
+>
+> This won't work because we need run_tests.sh to setup the run_migration()
+> call. The only ways to run migration tests separately are
+>
+>  $ ./run_tests.sh its-migration
+>
+> and
+>
+>  $ tests/its-migration
+>
+> For the second one you need to do 'make standalone' first.
+>
+>
+> >
+> > /usr/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host,accel=kvm
+> > -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev
+> > testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+> > arm/gic.flat -smp 4 -machine gic-version=3 -append its-migration # -initrd
+> > /tmp/tmp.OtsTj3QD4J
+> > ITS: MAPD devid=2 size = 0x8 itt=0x403a0000 valid=1
+> > ITS: MAPD devid=7 size = 0x8 itt=0x403b0000 valid=1
+> > MAPC col_id=3 target_addr = 0x30000 valid=1
+> > MAPC col_id=2 target_addr = 0x20000 valid=1
+> > INVALL col_id=2
+> > INVALL col_id=3
+> > MAPTI dev_id=2 event_id=20 -> phys_id=8195, col_id=3
+> > MAPTI dev_id=7 event_id=255 -> phys_id=8196, col_id=2
+> > Now migrate the VM, then press a key to continue...
+> >
+> > And the test hangs here after I press a key.
+>
+> The test doesn't get your input because of the '</dev/null' in run_qemu(),
+> which ./arm-run calls. So it's not hanging it's just waiting forever on
+> the key press.
+Hello Andrew,
+We have found this waiting for key press issue on our side as well
+[1], the test will fail with TIMEOUT, it looks like it's not getting
+my input like you mentioned here.
+I would like to ask what is the expected behaviour of these migration
+related tests (its-pending-migration / its-migration /
+its-migrate-unmapped-collection)? Should they pass right after the
+tester hit a key?
+Also, if these test would require user interaction, should they be
+moved to some special group like 'nodefault' to prevent it from
+failing with timeout in automated tests?
 
-This is possibly the point that is worthy of more clarification and
-alignment, as it sounds like the root of controversy here.
+I tried to remove '</dev/null' in 'errors=$("${@}" $INITRD </dev/null
+2> >(tee /dev/stderr) > /dev/fd/$stdout)' from script/arch-run.bash
+and run it again, and found out that if you wait to see that 'Now
+migrate the VM, then press a key to continue...' prompt, it's too late
+for the test to catch your key press. You will have to press any key
+right after the test started. However although the test will pass, it
+won't be terminated properly but keep complaining about "Ncat:
+Connection refused." until I hit ctrl + c. Not sure if this is
+expected?
 
-I feel the goal of vfio group management is more about ownership, i.e.=20
-all devices within a group must be assigned to a single user. Following
-the three rules defined by Jason, what we really care is whether a group
-of devices can be isolated from the rest of the world, i.e. no access to
-memory/device outside of its security context and no access to its=20
-security context from devices outside of this group. This can be achieved
-as long as every device in the group is either in block-DMA state when=20
-it's not attached to any security context or attached to an IOASID context=
-=20
-in IOMMU fd.
+$ uname -a
+Linux kuzzle 5.11.0-18-generic #19-Ubuntu SMP Fri May 7 14:21:20 UTC
+2021 aarch64 aarch64 aarch64 GNU/Linux
+$ sudo ./its-migration
+BUILD_HEAD=90a7d30e
+k (my key press)
+run_migration timeout -k 1s --foreground 90s
+/usr/bin/qemu-system-aarch64 -nodefaults -machine
+virt,gic-version=host,accel=kvm -cpu host -device virtio-serial-device
+-device virtconsole,chardev=ctd -chardev testdev,id=ctd -device
+pci-testdev -display none -serial stdio -kernel /tmp/tmp.HhCjbIcns7
+-smp 32 -machine gic-version=3 -append its-migration # -initrd
+/tmp/tmp.AyirrSboiF
+ITS: MAPD devid=2 size = 0x8 itt=0x408d0000 valid=1
+ITS: MAPD devid=7 size = 0x8 itt=0x408e0000 valid=1
+MAPC col_id=3 target_addr = 0x30000 valid=1
+MAPC col_id=2 target_addr = 0x20000 valid=1
+INVALL col_id=2
+INVALL col_id=3
+MAPTI dev_id=2 event_id=20 -> phys_id=8195, col_id=3
+MAPTI dev_id=7 event_id=255 -> phys_id=8196, col_id=2
+Now migrate the VM, then press a key to continue...
+INFO: gicv3: its-migration: Migration complete
+INT dev_id=2 event_id=20
+PASS: gicv3: its-migration: dev2/eventid=20 triggers LPI 8195 on PE #3
+after migration
+INT dev_id=7 event_id=255
+PASS: gicv3: its-migration: dev7/eventid=255 triggers LPI 8196 on PE
+#2 after migration
+SUMMARY: 2 tests
+Ncat: Connection refused.
+Ncat: Connection refused.
+Ncat: Connection refused.
 
-As long as group-level isolation is satisfied, how devices within a group=20
-are further managed is decided by the user (unattached, all attached to=20
-same IOASID, attached to different IOASIDs) as long as the user=20
-understands the implication of lacking of isolation within the group. This=
-=20
-is what a device-centric model comes to play. Misconfiguration just hurts=20
-the user itself.
+Ncat: Version 7.80
 
-If this rationale can be agreed, then I didn't see the point of having VFIO
-to mandate all devices in the group must be attached/detached in
-lockstep.=20
+Thanks!
+PHLin
 
-Thanks
-Kevin
+[1] https://bugs.launchpad.net/ubuntu-kernel-tests/+bug/1931680
+
+>
+> Thanks,
+> drew
+>
+> >
+> > Package versions:
+> >
+> > $ ncat --version
+> > Ncat: Version 7.91 ( https://nmap.org/ncat )
+> >
+> > $ /usr/bin/qemu-system-aarch64 --version
+> > QEMU emulator version 5.1.0
+> > Copyright (c) 2003-2020 Fabrice Bellard and the QEMU Project developers
+> >
+> > $ uname -a
+> > Linux rockpro 5.10.0-rc4 #33 SMP PREEMPT Thu Nov 19 15:58:57 GMT 2020 aarch64
+> > GNU/Linux
+> >
+> > Thanks,
+> >
+> > Alex
+> >
+>
