@@ -2,89 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AFB923A77CD
-	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 09:16:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C6893A788E
+	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 09:53:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229960AbhFOHSM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Jun 2021 03:18:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37689 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229488AbhFOHSK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 15 Jun 2021 03:18:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623741366;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=A0q6Xx4brx+c25Twsh66TttRM2bYGQLJmZoJQKNwuOw=;
-        b=QyBYmFPGP9J9PcUwzmqf51ug+KnLsUI5zWms4oOfindgA/hZRp9AYs5NDCTowdjJ6hUOYr
-        3SY87v6qxt+XNRhro/o69Bnan++jpUhC+GifWXHDNPkGcEXAsxEknvdhsFlt6DKasxb2ku
-        oEbzgXprEj/0N3QFw7lMnoTLaBzxLF0=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-334-2YnCQ55YO8GjUdImBv-Dgg-1; Tue, 15 Jun 2021 03:16:05 -0400
-X-MC-Unique: 2YnCQ55YO8GjUdImBv-Dgg-1
-Received: by mail-ej1-f71.google.com with SMTP id nd10-20020a170907628ab02903a324b229bfso4093188ejc.7
-        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 00:16:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=A0q6Xx4brx+c25Twsh66TttRM2bYGQLJmZoJQKNwuOw=;
-        b=QNoX3XQ1LCqnB3Knm55efR9FBgBXFQ+zH+2Ey32xzxodd+nyqUI5FPNhgL0V0zS2XR
-         Zfur3fq07snOBFic+d3GaMC+/nqq9iuiP5NNgopNgXtw9/v49ENLLNZYPl20EdevLpV3
-         OQetZFZgp+U/GCP0YO2/YfGfib+lXYPKdqo3jS2nSiemXr2tK7iww/+IHSPJSWqYjDsv
-         hfI8AMybPJMcnOIi4ykrdjBJ/33FSffQObCtzQwMcruoLKU9DNjSZmqCSK6uvQFCYS8b
-         YDZ13F2+eYQd89kIEup32UKUbq2Qf5rgnrqrLnISrjCljHMG9f6dTSf2IOKfOFo4PkME
-         J8vg==
-X-Gm-Message-State: AOAM532YW9cPG2yDXcP2b/eQ9WzzBijHFkANWaMQORCe/FxW5UhfiRcK
-        WdFWJLfJcC9Uaz7a2dwWKKbbdDOTitmugTkTyCA12mI1L9EX49AqPFkQh5h5tAitS+sAEP5Rw+S
-        fE3MqF/evzx8t
-X-Received: by 2002:a17:906:3b87:: with SMTP id u7mr19759544ejf.548.1623741363967;
-        Tue, 15 Jun 2021 00:16:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwX+jEZ595NIKvqTz9Kzb3Vztd3HmwdOrayLPAJCfJwOcxMUbqRFo4WvyYmyD+iNFrJDH5VSQ==
-X-Received: by 2002:a17:906:3b87:: with SMTP id u7mr19759530ejf.548.1623741363790;
-        Tue, 15 Jun 2021 00:16:03 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id q16sm10885819edt.26.2021.06.15.00.16.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Jun 2021 00:16:03 -0700 (PDT)
-Subject: Re: [PATCH 0/8] KVM: x86/mmu: Fast page fault support for the TDP MMU
-To:     David Matlack <dmatlack@google.com>
-Cc:     kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        id S230451AbhFOHzj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Jun 2021 03:55:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60000 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230196AbhFOHzi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Jun 2021 03:55:38 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4086B60E09;
+        Tue, 15 Jun 2021 07:53:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1623743613;
+        bh=vDFtBhlYLrwtZnXOmkUZxpC5WdGn3oEPAkfut4CQqlM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=k5TCBQVSBuiL6rRGP41YwOT3DJImXi6Z1ty8MpV5XWkPGRguUfc9uqH2nPdbuWVKF
+         nvKqUgp1gYQEozxBTNl+B8OwZn6E0A0Azee9sgNbBFp5f2BF9MrCeazfECaTgWqA9R
+         IbVaQdoTKURDMZqti9x/Eraat8P4E50XDSuVD+MuJCPgtp9VnY24fi2kAu85igKzhD
+         0A1BkJXNkIQZLCyCOJWVgqoq+ZvwfFA4F+e8cmCvtDh1bylcfCG/QNJysbdmDUL8NF
+         wKqmAxU0QdRufELcUgnOVFU0l12rQxTX29JTQBnJJY+L0yB5UefYMAD5OIhB88ScBU
+         CFl88in6YsOAw==
+Date:   Tue, 15 Jun 2021 10:53:30 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Sean Christopherson <seanjc@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Andrew Jones <drjones@redhat.com>
-References: <20210611235701.3941724-1-dmatlack@google.com>
- <639c54a4-3d6b-8b28-8da7-e49f2f87e025@redhat.com>
- <YMfFQnfsq5AuUP2B@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a13646ce-ee54-4555-909b-2d2977f65f59@redhat.com>
-Date:   Tue, 15 Jun 2021 09:16:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v9 0/5] KVM statistics data fd-based binary interface
+Message-ID: <YMhcek2cIu3Oz5Ek@unreal>
+References: <20210614212155.1670777-1-jingzhangos@google.com>
+ <YMg5xPbmK3myjIX8@unreal>
+ <15875c41-e1e7-3bf2-a85c-21384684d279@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <YMfFQnfsq5AuUP2B@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <15875c41-e1e7-3bf2-a85c-21384684d279@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/06/21 23:08, David Matlack wrote:
-> I actually have a set of
-> patches from Ben I am planning to send soon that will reduce the number of
-> redundant gfn-to-memslot lookups in the page fault path.
+On Tue, Jun 15, 2021 at 09:06:43AM +0200, Paolo Bonzini wrote:
+> On 15/06/21 07:25, Leon Romanovsky wrote:
+> > Sorry for my naive questions, but how does telemetry get statistics
+> > for hypervisors? Why is KVM different from hypervisors or NIC's statistics
+> > or any other high speed devices (RDMA) that generate tons of data?
+> 
+> Right now, the only way is debugfs but it's slow, and it's disabled when
+> using lockdown mode; this series is a way to fix this.
+> 
+> I sense that there is another question in there; are you wondering if
+> another mechanism should be used, for example netlink?  The main issue there
+> is how to identify a VM, since KVM file descriptors don't have a name.
+> Using a pid works (sort of) for debugfs, but pids are not appropriate for a
+> stable API.  Using a file descriptor as in this series requires
+> collaboration from the userspace program; howver, once the file descriptor
+> has been transmitted via SCM_RIGHTS, telemetry can read it forever without
+> further IPC, and there is proper privilege separation.
 
-That seems to be a possible 5.14 candidate, while this series is 
-probably a bit too much for now.
+Yeah, sorry for mixing different questions into one.
 
-Paolo
+So the answer to the question "why KVM is different" is that it doesn't
+have any stable identification except file descriptor. While hypervisors
+have stable names, NICs and RDMA devices have interface indexes e.t.c.
+Did I get it right?
 
+And this was second part of my question, the first part was my attempt to
+get on answer why current statistics like process info (/proc/xxx/*), NICs
+(netlink) and RDMA (sysfs) are not using binary format.
+
+Thanks
+
+> 
+> Paolo
+> 
