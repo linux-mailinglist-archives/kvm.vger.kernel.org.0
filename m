@@ -2,54 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 38E303A8BDA
-	for <lists+kvm@lfdr.de>; Wed, 16 Jun 2021 00:30:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 722873A8BF0
+	for <lists+kvm@lfdr.de>; Wed, 16 Jun 2021 00:40:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230027AbhFOWcw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Jun 2021 18:32:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35512 "EHLO
+        id S230336AbhFOWmJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Jun 2021 18:42:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229908AbhFOWcv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Jun 2021 18:32:51 -0400
-Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4B00C06175F
-        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 15:30:45 -0700 (PDT)
-Received: by mail-ot1-x32a.google.com with SMTP id i12-20020a05683033ecb02903346fa0f74dso485921otu.10
-        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 15:30:45 -0700 (PDT)
+        with ESMTP id S229937AbhFOWmJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Jun 2021 18:42:09 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28069C06175F
+        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 15:40:03 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id t40so287565oiw.8
+        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 15:40:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=YZakAu6vDnZNEmPvqktyn2oZMAH5BhmuwRP0pEeDFUA=;
-        b=jCY7GJXJiumTS0wWAuQQNTFjKplqBjVFn5buIpNjm5wqI4A+WpuvrapJtp7KIemCr1
-         ilDivDkTGRUrU7giBkX6lSYiPmOoc15w01fLye2zsTaDR58bMphtwzZDbHXUBx7i/MHq
-         +3fi7VdsRBbVX0BFYKIa0P7EeemGUMbadQ5cpHI2Hs0lGUJyxKeUvGflJr45yWAkGZSb
-         BE6S3o63B1gyBCepO8lcFAUu9ZgiZuNZBe8V25Dhu2JJNJPc5LUUXe5IhUQDXIlFLk/p
-         VauRSOl5CgYVqMZHQt/w7pgfPfGlMVrxZZPvLm4nAawjrpM0LcDEdwj6Wmg9OIl28zLG
-         dYlg==
+        bh=FjTlkg9HTKYPNQ6rTdKTsbehN1/6cFTQ2pi4yksTAgk=;
+        b=XDz27kZZX+QjBrZPSqflKRb/wh1fcy/af2rHpxqucNV7a0VTYwcF5FRGpF7bqBHCZB
+         sUBG77qp5izO2Ya46JP6CSIKeYCebRQjdRrjpvOZihNo92WeXwqVKxA6Ip3Ph8511QnD
+         4yGldtUZNWep7+OIVBO9cNh9Zh1BFfJ9LGGDHIQuHg+ib3eJPoxTd7KufYnzzp8gUeTG
+         kYUtfG8S5Ht1H6Fyt6XBrC2XohPQlateJwA/kJ3lL2p0Er355HkG+Ahjih9Pt9i5rMYw
+         qTuj+uIHX8IPlF8wI6bn3EagKA3hUQnVydrGhrXJqFDD84PEBKNPpVzZX6oOHs6o87HX
+         LheQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=YZakAu6vDnZNEmPvqktyn2oZMAH5BhmuwRP0pEeDFUA=;
-        b=OSX0P09Q5Ki81MGahhhvXff2jNVOjo050Hil1koIGDW9eP6Rz5F3T01w9TTbPxWcG+
-         l8Urf2r66A/VAY10A+mIlh8+p7S5Tn0zEF6fl4VMqH60Wa3ch5tu26QwsGKOZ8SSC4kA
-         aAbtpZd0RvWWAN9yqhSKLlZNLw8mY1HywdXZPzMlq4KFfjEDTtpXq4ChHCIydxaLh5PZ
-         UTy/E5+8bTQSVHbBbY0sfw2aCBGw3c2+j5PimRNKDtR65WQdlW54vGwYZJwLTfZxx/TA
-         dsnn3PWYjidnP2ZcujLRdL1eiVQzug2ok04XfJxGRv8UGFsE5mtZHPBAocUbXCjnwnSo
-         zt+Q==
-X-Gm-Message-State: AOAM532JdOUnPX3BbA+sIq4o6TzYKP8UntVP7DdCcxMz0a0DyyoOBnT6
-        /nY9sbqGzFaNyzcJ3q6s4YD2UyCC6GdgP0l0mG0alw==
-X-Google-Smtp-Source: ABdhPJw/Imo0I1H0GN748qZZF4Cxgl5NMwVkBTCnbMJblZ3I/aaEBWHp2gzzrASSJ8HmI4myycopyDKSEeTrK++4s/0=
-X-Received: by 2002:a05:6830:124d:: with SMTP id s13mr1175538otp.241.1623796244796;
- Tue, 15 Jun 2021 15:30:44 -0700 (PDT)
+        bh=FjTlkg9HTKYPNQ6rTdKTsbehN1/6cFTQ2pi4yksTAgk=;
+        b=lJMLyp0vYSD7eLzl6cC+buHd1VPSeT0LgM7AFI+wjY5hNS4IjHZ9atoIT7tmB3giz4
+         Q4yzl1MqwgdQcUC1wLpuTQjD9jNwUnriryx55d2ywuIR7ZOnJA1ETGdPQBqTuMNQz22i
+         VHeFizIZOvtKfItd+VHjY622u18GprNqAKu8Yu6QeNdSo8rv8ZWICmXd+U91sIlykLbR
+         7IX8gGSzcfk5ETBrEk3Q3K+/Th1kWE5jMali+BBmnJPFlHngJe2YUQuSMfrIw9bcVuue
+         iYCUBfVcqDT5WcwgQmT0E3SN+HDN+hv+qF1lrlreTyJ4wlHFiwZa5DpUyLGiQH1eqgUo
+         ojoQ==
+X-Gm-Message-State: AOAM530gQVnU4h5/TK0W/amnPSDJEFs9RBRwWrDTAhibLjk5pH2PnkDq
+        +CKlGVbW4rLCztFzpRt4ZEgxgCL7gjP+74hEm3eehA==
+X-Google-Smtp-Source: ABdhPJzT3bm/OStyazgk1zy8otTaykTz1x4356J5GCc8RRL7Ou/AqkZ60+dxhqdXV4LsdHJ+a/m9inZkb/jTvnPp+d0=
+X-Received: by 2002:aca:1201:: with SMTP id 1mr4781940ois.6.1623796802294;
+ Tue, 15 Jun 2021 15:40:02 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210615164535.2146172-1-seanjc@google.com> <20210615164535.2146172-3-seanjc@google.com>
-In-Reply-To: <20210615164535.2146172-3-seanjc@google.com>
+References: <20210615164535.2146172-1-seanjc@google.com> <20210615164535.2146172-4-seanjc@google.com>
+In-Reply-To: <20210615164535.2146172-4-seanjc@google.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 15 Jun 2021 15:30:33 -0700
-Message-ID: <CALMp9eRxA0zk9abXp-YwGJwO2QX-EvPfkS=CCCeLKFAcPx7soQ@mail.gmail.com>
-Subject: Re: [PATCH 2/4] KVM: SVM: Refuse to load kvm_amd if NX support is not available
+Date:   Tue, 15 Jun 2021 15:39:51 -0700
+Message-ID: <CALMp9eSkVaDfCJwW1eds=7H7yn2pKJPKoFVpc1GQcEqGD5S0Dg@mail.gmail.com>
+Subject: Re: [PATCH 3/4] KVM: x86: WARN and reject loading KVM if NX is
+ supported but not enabled
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -63,20 +64,32 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, Jun 15, 2021 at 9:45 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> Refuse to load KVM if NX support is not available.  Shadow paging has
-> assumed NX support since commit 9167ab799362 ("KVM: vmx, svm: always run
-> with EFER.NXE=1 when shadow paging is active"), and NPT has assumed NX
-> support since commit b8e8c8303ff2 ("kvm: mmu: ITLB_MULTIHIT mitigation").
-> While the NX huge pages mitigation should not be enabled by default for
-> AMD CPUs, it can be turned on by userspace at will.
+> WARN if NX is reported as supported but not enabled in EFER.  All flavors
+> of the kernel, including non-PAE 32-bit kernels, set EFER.NX=1 if NX is
+> supported, even if NX usage is disable via kernel command line.  KVM relies
+> on NX being enabled if it's supported, e.g. KVM will generate illegal NPT
+> entries if nx_huge_pages is enabled and NX is supported but not enabled.
 >
-> Unlike Intel CPUs, AMD does not provide a way for firmware to disable NX
-> support, and Linux always sets EFER.NX=1 if it is supported.  Given that
-> it's extremely unlikely that a CPU supports NPT but not NX, making NX a
-> formal requirement is far simpler than adding requirements to the
-> mitigation flow.
->
-> Fixes: 9167ab799362 ("KVM: vmx, svm: always run with EFER.NXE=1 when shadow paging is active")
-> Fixes: b8e8c8303ff2 ("kvm: mmu: ITLB_MULTIHIT mitigation")
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/x86.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index acc28473dec7..1f6595df45de 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10981,6 +10981,9 @@ int kvm_arch_hardware_setup(void *opaque)
+>         int r;
+>
+>         rdmsrl_safe(MSR_EFER, &host_efer);
+> +       if (WARN_ON_ONCE(boot_cpu_has(X86_FEATURE_NX) &&
+> +                        !(host_efer & EFER_NX)))
+> +               return -EIO;
+
+Input/output error? Is that really the most appropriate error here?
+Why not, say, -ENOTSUP?
+
+I'm sure there's some arcane convention here that I'm not privy to. :-)
+
 Reviewed-by: Jim Mattson <jmattson@google.com>
