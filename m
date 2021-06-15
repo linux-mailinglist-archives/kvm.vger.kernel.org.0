@@ -2,99 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 14D1A3A86FA
-	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 18:59:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1335B3A899B
+	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 21:35:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229734AbhFORBE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Jun 2021 13:01:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46154 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229493AbhFORBD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Jun 2021 13:01:03 -0400
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9A84C061574
-        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 09:58:58 -0700 (PDT)
-Received: by mail-ot1-x329.google.com with SMTP id 5-20020a9d01050000b02903c700c45721so14960682otu.6
-        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 09:58:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=UkGJXL+GTQkh7H3nrFB3tS+ygNeWaZvPpf0tnRNocaw=;
-        b=AohZER67WgtyGArH1Q7bwaR3sQ8nqyDPqgCtvJAXHVNSQzuTq6QdRIs0V23MxpwqvW
-         y5sLlhB+fDxtxXQldXJ96m+qOdJWI3tQzFjYRMH37zeZNt76Roshd9mpGWRm84Xx+VPK
-         YeqONMtoQT0XTUCsfANaGQwe+gCBRcvBEHsINU+3JGONnB2FBtHE0y5NOaTLTics2bYE
-         vCQvkAQqCW/lBQB0nFSr4tfDF0U7QBwGjiCcAA091HF818oc1Ns1ETU773Hh2/RNuOOV
-         hVKDWEx4w5Gtoyll6SlkiTpKuwXyKwDkZX6+lup42Ln11MMV2PmyMWU+7CAIGbQGaSca
-         P8/w==
+        id S230188AbhFOTiA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Jun 2021 15:38:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35783 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229749AbhFOTh7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 15 Jun 2021 15:37:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623785753;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Lqcix6Bye8GfBWjf8v07rNQNvUDYKUaSMsD+NDsgZyo=;
+        b=JMMOE4WmopI849gXXRo7yobMXm1PfewgxoVrXV0KiSdz75dIdadA2wU1aFfwrvaaON+OwU
+        i9odu1ASH0h+hllzp1nqsIzfUrmBd6bZw09nLgpVOwBObI5mR8HtR930fEPmUN+4z2qyW4
+        YgBAe6RjuZO1RC0a+hWzGKRCtut8qFk=
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
+ [209.85.161.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-234-p1KhAq7HMlqRGI6dztddiw-1; Tue, 15 Jun 2021 15:35:52 -0400
+X-MC-Unique: p1KhAq7HMlqRGI6dztddiw-1
+Received: by mail-oo1-f72.google.com with SMTP id l13-20020a4aa78d0000b0290245c8f11ac2so98978oom.11
+        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 12:35:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=UkGJXL+GTQkh7H3nrFB3tS+ygNeWaZvPpf0tnRNocaw=;
-        b=MpUWypu4ODa+ZZVT2M75nxEVbbWJy1rYg9N2FEHnAPrMBaKBbLWNm8f5lD70NHyL6k
-         AiSTOVjID1oX6R5cl4AYBpw3hWVOKVIbr+YzLpZWbx0ckIq7p91IynIWdJZNzrfSw2IP
-         2KgB4ePuINjhNwcHxXuWe8HEdSosLLGCcBqeZODZbVsPWEFKZzsSFMAe0oonsjoHSjrl
-         sIle+CYSie3wQmAHN9neo8NT4ud0jz6koO7b5LLHDd6uG6Sv0mbKgwqzyvm84MFU9dhu
-         2gsaaD2aZDW0driQZ61WiP6HkAGuVgpcs548ZxDAtj4+egAR27y/Lx8QUhUUE+HlOoXT
-         634w==
-X-Gm-Message-State: AOAM530stoTmxhSc50cTy+/TX1DUjuVfB1zPmExGrXT2nQ8gDqHYuTgU
-        5k9Y/7JxkjxPQmG9Ut1tCrjLWBbyAi4qt/M/ptH/Caes9Nk=
-X-Google-Smtp-Source: ABdhPJxtR2ssOCDDwx1yrdElVxu4R2O70EmnAsfBd0KbQmtX7Vq88D2HE/2840Jz67ULHsQH+cNQFezdIDSCLpvSyTU=
-X-Received: by 2002:a05:6830:124d:: with SMTP id s13mr176712otp.241.1623776337919;
- Tue, 15 Jun 2021 09:58:57 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=Lqcix6Bye8GfBWjf8v07rNQNvUDYKUaSMsD+NDsgZyo=;
+        b=tmm6iGXTVwS5Odq5oKqnlK3miRte3D96Yvj8Tt54SRb5YU76XDY+reDo1BY4PSbo/X
+         gnRA7UHpccZPf8CA4+zyP3udmwyN5Ws7muf+f+Jsa1ktSgSZ5JiU1D89Z5gLIaQJMwfv
+         MsTJQ+3zGyMkItOmKRTy+zANdjemt0jc4hpxO8y03aUuXyQfMtNjlnmx1/7qkagZRC1/
+         QQFmySEUJ3iscFQLKtmxOEVCFdCMjoFi25YTzqvnYgylquVy/+017SCgdybXfzr1dV29
+         f9r1x7/JrtH7k9po8pS/J2GnIAKwlNx9nK9RWbnW/fxyOOPTUocD7Z7txNDq4f3RqXim
+         i5MA==
+X-Gm-Message-State: AOAM531b4vERGf7iYnYMLzMOpZ8cicZ4spBM6xBfpTaJo+jOpPxp/Wbi
+        fZqPONZHU4iK1leBbBIF8U1Lco+yHJUwgBpgzZPu/27MeW/Sx33i7CHsnXKlMIazmHqiLnzlhXM
+        B7R6BYAKXQ0hi
+X-Received: by 2002:a4a:98b0:: with SMTP id a45mr683020ooj.22.1623785751932;
+        Tue, 15 Jun 2021 12:35:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxEy2LCOJugZ+XL95JhEOH9gPPqCgkIMQXc0Pb6WDjknNr5iRFNesGYK5OnEUNjOdehrK9BNQ==
+X-Received: by 2002:a4a:98b0:: with SMTP id a45mr682990ooj.22.1623785751738;
+        Tue, 15 Jun 2021 12:35:51 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id j3sm3894698oii.46.2021.06.15.12.35.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Jun 2021 12:35:51 -0700 (PDT)
+Date:   Tue, 15 Jun 2021 13:35:49 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org, Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>
+Subject: Re: Allow mdev drivers to directly create the vfio_device (v3)
+Message-ID: <20210615133549.362e5a9e.alex.williamson@redhat.com>
+In-Reply-To: <20210615133519.754763-1-hch@lst.de>
+References: <20210615133519.754763-1-hch@lst.de>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <DM4PR12MB52648CB3F874AC3B7C41A19DB1309@DM4PR12MB5264.namprd12.prod.outlook.com>
- <DM4PR12MB52646AE63A2FAEAD4DAE76D7B1309@DM4PR12MB5264.namprd12.prod.outlook.com>
-In-Reply-To: <DM4PR12MB52646AE63A2FAEAD4DAE76D7B1309@DM4PR12MB5264.namprd12.prod.outlook.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 15 Jun 2021 09:58:46 -0700
-Message-ID: <CALMp9eTOAzr7jCWD_h39uZe7_d6bozvS1YmrASptgcw1fwLN8Q@mail.gmail.com>
-Subject: Re: Controlling the guest TSC on x86
-To:     Stephan Tobies <Stephan.Tobies@synopsys.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 15, 2021 at 5:20 AM Stephan Tobies
-<Stephan.Tobies@synopsys.com> wrote:
->
-> Good afternoon!
->
-> We are looking at the use of KVM on x86 to emulate an x86 processor in a =
-Virtual Prototyping/SystemC context. The requirements are such that the gue=
-st OS should be ideally run unmodified (i.e., in this case ideally without =
-any drivers that know and exploit the fact that the guest is not running on=
- real HW but as a KVM guest).
->
-> For this, we also would like to control the TSC (as observed by the guest=
- via rdtsc and related instructions) in such a way that time is apparently =
-stopped whenever the guest is not actively executing in KVM_RUN.
->
-> I must admit that I am confused by the multitude of mechanism and MSRs th=
-at are available in this context. So, how would one best achieve to (approx=
-imately) stop the increment of the TSC when the guest is not running. If th=
-is is important, we are also not using the in-chip APIC but are using our o=
-wn SystemC models. Also, are there extra considerations when running multip=
-le virtual processors?
->
-> Any pointers would be greatly appreciated!
->
-> Thanks and best regards
->
-> Stephan Tobies
+On Tue, 15 Jun 2021 15:35:09 +0200
+Christoph Hellwig <hch@lst.de> wrote:
 
-You can use the VM-exit MSR-save list to save the value of the TSC on
-VM-exit, and then you can adjust the TSC offset field in the VMCS just
-before VM-entry to subtract any time the vCPU wasn't in VMX non-root
-operation. There will be some slop here, since the guest TSC will run
-during VM-entry and part of VM-exit. However, this is just the
-beginning of your troubles. It will be impossible to keep the TSCs
-synchronized across multiple vCPUs this way. Moreover, the TSC time
-domain will get out of sync with other time domains, such as the APIC
-time domain and the RTC time domain. Maybe it's enough to report to
-the guest that CPUID.80000007H:EDX.INVARIANT_TSC[bit 8] is zero, but I
-suspect you are in for a lot of headaches.
+> This is my alternative take on this series from Jason:
+> 
+> https://lore.kernel.org/dri-devel/87czsszi9i.fsf@redhat.com/T/
+> 
+> The mdev/vfio parts are exactly the same, but this solves the driver core
+> changes for the direct probing without the in/out flag that Greg hated,
+> which cause a little more work, but probably make the result better.
+> 
+> Original decription from Jason below:
+> 
+> The mdev bus's core part for managing the lifecycle of devices is mostly
+> as one would expect for a driver core bus subsystem.
+> 
+> However instead of having a normal 'struct device_driver' and binding the
+> actual mdev drivers through the standard driver core mechanisms it open
+> codes this with the struct mdev_parent_ops and provides a single driver
+> that shims between the VFIO core's struct vfio_device and the actual
+> device driver.
+> 
+> Instead, allow mdev drivers implement an actual struct mdev_driver and
+> directly call vfio_register_group_dev() in the probe() function for the
+> mdev. Arrange to bind the created mdev_device to the mdev_driver that is
+> provided by the end driver.
+> 
+> The actual execution flow doesn't change much, eg what was
+> parent_ops->create is now device_driver->probe and it is called at almost
+> the exact same time - except under the normal control of the driver core.
+> 
+> Ultimately converting all the drivers unlocks a fair number of additional
+> VFIO simplifications and cleanups.
+
+Looks like we need an update to
+Documentation/driver-api/vfio-mediated-device.rst to go along with
+this.
+
+Also, if we're preserving compatibility with the "legacy"
+mdev_parent_ops callbacks without deprecating them, does it really make
+sense to convert every one of the sample drivers to this new direct
+registration?  Thanks,
+
+Alex
+
