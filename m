@@ -2,107 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D6BAC3A802F
-	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 15:34:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29EB93A8069
+	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 15:38:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231400AbhFONgn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Jun 2021 09:36:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54082 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230410AbhFONgT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Jun 2021 09:36:19 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id AF8716146D;
-        Tue, 15 Jun 2021 13:34:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1623764049;
-        bh=REF7Zyu6cbgt3VHjuTrKDBWw8/fKKSkHr0brWCx1WDY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=tkUy3EPUFEC5VTgPlUyI6q6kNVNwNuv+cujwgXgPktfMgwoXCN95LVYvlr2Cxj5lz
-         l7GoBU3O5grP+tSvw2b+HZzeV4cPkqgacG9kci2/x8y4ZXP/qpEimP9hJZ0eyIvDWb
-         e5t98f1pDJrHOs1eMmm+HNMbbYx0y9UmuOFThQFo+VSYEuyk0VmOVUs27m7Z1XOQ8N
-         OzmOPwdzQMYJWZIAF/rw5OQU4jmobLkJjH62eDzX9vHVkkrAFKFk73DgtornGy6rzc
-         Q89kw18R9QHxO9McqK/4MPLseixa1r/dEtCbz2OYQIwQJI29SS6qjzYQ0ZfHpVymek
-         F4bBAvgv4qHbg==
-Date:   Tue, 15 Jun 2021 16:34:05 +0300
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        LinuxS390 <linux-s390@vger.kernel.org>,
-        Linuxkselftest <linux-kselftest@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
+        id S231332AbhFONk2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Jun 2021 09:40:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56602 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231734AbhFONjZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Jun 2021 09:39:25 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B04ABC0613A2;
+        Tue, 15 Jun 2021 06:37:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=mI75xfisA2eMrNnkzQmGAm9ghfLRUHzTyYzm/ehApDI=; b=besrEgYaPZ92StUm+27IrAqfh/
+        rpC9wbemLrXn0xSURWCmfRcNOEkq/tO9XItxN9YK2rgHhl1VlDrhWCgKw+zmjxN5FUQxwi/dhhL2D
+        reGHC2Mai4CiHoXCT+UCy6PWMaZw0QugYXs5bO4ytFAdcx5rC14GbFOx+r+lLqfjjZP1SkvQvwFGz
+        2TlMHEppRZUM9V9lpobJNXRii9ZvoRlwv4McWcdiAoKxLC53C8ms1Je9wYUehpSCzx9ljxo+jOiC8
+        qgM2boBu8ST8tOJZOYS1LkxYxAdCQzRO9j3TzcZa5nHLd6JAnb3kJeoO+lGfEfq1kDYGA8L7fJinp
+        S6/EDK4g==;
+Received: from [2001:4bb8:19b:fdce:9045:1e63:20f0:ca9] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1lt9Ds-006oxO-0m; Tue, 15 Jun 2021 13:35:47 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v9 0/5] KVM statistics data fd-based binary interface
-Message-ID: <YMisTWKdyNgPvdQV@unreal>
-References: <20210614212155.1670777-1-jingzhangos@google.com>
- <YMg5xPbmK3myjIX8@unreal>
- <15875c41-e1e7-3bf2-a85c-21384684d279@redhat.com>
- <YMhcek2cIu3Oz5Ek@unreal>
- <9df462c0-e0ea-8173-0705-369d6a81107c@redhat.com>
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org, Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>
+Subject: Allow mdev drivers to directly create the vfio_device (v3)
+Date:   Tue, 15 Jun 2021 15:35:09 +0200
+Message-Id: <20210615133519.754763-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9df462c0-e0ea-8173-0705-369d6a81107c@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 15, 2021 at 01:03:34PM +0200, Paolo Bonzini wrote:
-> On 15/06/21 09:53, Leon Romanovsky wrote:
-> > > Sorry for my naive questions, but how does telemetry get statistics
-> > > for hypervisors? Why is KVM different from hypervisors or NIC's statistics
-> > > or any other high speed devices (RDMA) that generate tons of data?
-> > 
-> > So the answer to the question "why KVM is different" is that it doesn't
-> > have any stable identification except file descriptor. While hypervisors
-> > have stable names, NICs and RDMA devices have interface indexes etc.
-> > Did I get it right?
-> 
-> Right.
-> 
-> > And this was second part of my question, the first part was my attempt to
-> > get on answer why current statistics like process info (/proc/xxx/*), NICs
-> > (netlink) and RDMA (sysfs) are not using binary format.
-> 
-> NICs are using binary format (partly in struct ethtool_stats, partly in an
-> array of u64).  For KVM we decided to put the schema and the stats in the
-> same file (though you can use pread to get only the stats) to have a single
-> interface and avoid ioctls, unlike having both ETH_GSTRINGS and ETH_GSTATS.
-> 
-> I wouldn't say processes are using any specific format.  There's a mix of
-> "one value per file" (e.g. cpuset), human-readable tabular format (e.g.
-> limits, sched), human- and machine-readable tabular format (e.g. status),
-> and files that are ASCII but not human-readable (e.g. stat).
+This is my alternative take on this series from Jason:
 
-I see, your explanation to Enrico cleared the mud.
+https://lore.kernel.org/dri-devel/87czsszi9i.fsf@redhat.com/T/
 
-Thanks
+The mdev/vfio parts are exactly the same, but this solves the driver core
+changes for the direct probing without the in/out flag that Greg hated,
+which cause a little more work, but probably make the result better.
 
-> 
-> Paolo
-> 
+Original decription from Jason below:
+
+The mdev bus's core part for managing the lifecycle of devices is mostly
+as one would expect for a driver core bus subsystem.
+
+However instead of having a normal 'struct device_driver' and binding the
+actual mdev drivers through the standard driver core mechanisms it open
+codes this with the struct mdev_parent_ops and provides a single driver
+that shims between the VFIO core's struct vfio_device and the actual
+device driver.
+
+Instead, allow mdev drivers implement an actual struct mdev_driver and
+directly call vfio_register_group_dev() in the probe() function for the
+mdev. Arrange to bind the created mdev_device to the mdev_driver that is
+provided by the end driver.
+
+The actual execution flow doesn't change much, eg what was
+parent_ops->create is now device_driver->probe and it is called at almost
+the exact same time - except under the normal control of the driver core.
+
+Ultimately converting all the drivers unlocks a fair number of additional
+VFIO simplifications and cleanups.
+
+Changes since v1:
+ - avoid warning spam for successful probes
+ - improve the probe_count protection
