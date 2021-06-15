@@ -2,144 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B80E3A792A
-	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 10:38:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B36163A7943
+	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 10:44:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231175AbhFOIkF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Jun 2021 04:40:05 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:44815 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230332AbhFOIkD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Jun 2021 04:40:03 -0400
-Received: from [192.168.1.155] ([95.115.9.120]) by mrelayeu.kundenserver.de
- (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis) id
- 1MYcy3-1lpPX61RGl-00VeCh; Tue, 15 Jun 2021 10:37:39 +0200
-Subject: Re: [PATCH v9 0/5] KVM statistics data fd-based binary interface
-To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        LinuxS390 <linux-s390@vger.kernel.org>,
-        Linuxkselftest <linux-kselftest@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Fuad Tabba <tabba@google.com>
-References: <20210614212155.1670777-1-jingzhangos@google.com>
-From:   "Enrico Weigelt, metux IT consult" <lkml@metux.net>
-Message-ID: <b86aa6df-5fd7-d705-1688-4d325df6f7d9@metux.net>
-Date:   Tue, 15 Jun 2021 10:37:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        id S230454AbhFOIql (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Jun 2021 04:46:41 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:63812 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230482AbhFOIqk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Jun 2021 04:46:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1623746677; x=1655282677;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=CRwcKW462aqnup9Wgun7j7A4f1r96joB5tUbtlSR6ys=;
+  b=q0IW98KqqsUUUk882KM/QD3mqhWOeUBJ9AswMB0nSRzaOpXRZAlHaLz/
+   JeLcB4vbdEDjSyiXR5IaKo7JHigIGMvyUYvCZ0WN0CXFodD18MZXnceO/
+   EZjs0qjUP0fwS3tTgipzrXvsmZFiB24v86ucXdweovZEOtcE4/lw09hlM
+   o=;
+X-IronPort-AV: E=Sophos;i="5.83,275,1616457600"; 
+   d="scan'208";a="140175126"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-1d-2c665b5d.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP; 15 Jun 2021 08:44:29 +0000
+Received: from EX13MTAUEE001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-1d-2c665b5d.us-east-1.amazon.com (Postfix) with ESMTPS id 57EF6A1F61;
+        Tue, 15 Jun 2021 08:44:25 +0000 (UTC)
+Received: from EX13D08UEB001.ant.amazon.com (10.43.60.245) by
+ EX13MTAUEE001.ant.amazon.com (10.43.62.226) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.18; Tue, 15 Jun 2021 08:44:18 +0000
+Received: from EX13D18EUA001.ant.amazon.com (10.43.165.58) by
+ EX13D08UEB001.ant.amazon.com (10.43.60.245) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.18; Tue, 15 Jun 2021 08:44:18 +0000
+Received: from EX13D18EUA001.ant.amazon.com ([10.43.165.58]) by
+ EX13D18EUA001.ant.amazon.com ([10.43.165.58]) with mapi id 15.00.1497.018;
+ Tue, 15 Jun 2021 08:44:17 +0000
+From:   "Stamatis, Ilias" <ilstam@amazon.com>
+To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+CC:     "jmattson@google.com" <jmattson@google.com>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "zamsden@gmail.com" <zamsden@gmail.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>
+Subject: Re: [PATCH v4 00/11] KVM: Implement nested TSC scaling
+Thread-Topic: [PATCH v4 00/11] KVM: Implement nested TSC scaling
+Thread-Index: AQHXUl9IK3DwWR2B+EmNcn/om5/gnKsU4FUA
+Date:   Tue, 15 Jun 2021 08:44:17 +0000
+Message-ID: <cbb1272d6fc5713b5d53972ae55c1220f903595f.camel@amazon.com>
+References: <20210526184418.28881-1-ilstam@amazon.com>
+In-Reply-To: <20210526184418.28881-1-ilstam@amazon.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.165.21]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3000B4B3338C8041B593659E7D3B4FD4@amazon.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20210614212155.1670777-1-jingzhangos@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: tl
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Vod45xLxHxZ5p8qYKvuWym3LEAiarmlv0Xbt34OpNBV9uy1sBdE
- IRftON+oudc8QVSK3OpycOl49aHJfySAgkANRqrTI39LcdQIXpjA7mxltjpeNzUcQSldpbN
- 9MatQnRvvRMJJ8elPHcd2BkxKXtnpLxALuiGllUwQeIJ/pSfjl/1Ju+2MmxGm86GlBu1W06
- ZMtU7WHK45h2IdXcp/e8g==
-X-Spam-Flag: NO
-X-UI-Out-Filterresults: notjunk:1;V03:K0:+53FXRRHLqc=:mz+uz7bhnpeydAZf0N2025
- PzwGuvUWyPVQfHIrPDNsiRUyENR8k8pU+IrQTGZS1wnh9dAW8iuHrnc1m2pJ3oMjaQSkDQfYE
- CitMcMEor434oAPJQjN+scqfRgySjAt2AMJpYyCkXEnjuNLL435UQVMezynLHSeRwuZ3mbYhv
- wwNIBxhtwjP7SVCR9sHWQMJzG+1zH/4+qxGxAb9sDf80fkBI07uRQz5xuvmLVq7WGoWF74/Us
- BQiBgnydw4wY4V1J5Y5yEAwuoKhnbDEyPZHgJvQT1w1FMWuELbaEz6VH6F+SXOPaAlywjQe7q
- WGTk8EjDeLtaCIS9fu2JoA0zWjjS4a4EEo684bMWJScBce+ezZ/9MV7YfgKmdb16Tr0FIJWya
- +bz0ZJ5j2y6JQlx5SiGGMEUCnQUBNS7Fm5VA0Sa3ZK1jXEY5/DPcdideck40Dn+2OPAZuXtU9
- ESR5huX3pYZYRU/wFSEiLE4jZIbf867UrKIgkQCDL+90WY3iyjt/tICjAmssa+jDfqp5+UZuZ
- 2L9tw9OzjAAntKVmcEinnI=
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14.06.21 23:21, Jing Zhang wrote:
-
-Hi,
-
-> This patchset provides a file descriptor for every VM and VCPU to read
-> KVM statistics data in binary format.
-
-I've missed the discussions of previous versions, so please forgive my
-stupid questions:
-
-* why is it binary instead of text ? is it so very high volume that
-   it really matters ?
-* how will possible future extensions of the telemetry packets work ?
-* aren't there other means to get this fd instead of an ioctl() on the
-   VM fd ? something more from the outside (eg. sysfs/procfs)
-* how will that relate to other hypervisors ?
-
-Some notes from the operating perspective:
-
-In typical datacenters we've got various monitoring tools that are able
-to catch up lots of data from different sources (especially files). If
-an operator e.g. is interested in something in happening in some file
-(e.g. in /proc of /sys), it's quite trivial - just configure yet another
-probe (maybe some regex for parsing) and done. Automatically fed in his
-$monitoring_solution (e.g. nagios, ELK, Splunk, whatsnot)
-
-With your approach, it's not that simple: now the operator needs to
-create (and deploy and manage) a separate agent that somehow receives
-that fd from the VMM, reads and parses that specific binary stream
-and finally pushes it into the monitoring infrastructure. Or the VMM
-writes it into some file, where some monitoring agent can pick it up.
-In any case, not actually trivial from ops perspective.
-
-In general I tend to like the fd approach (even though I don't like
-ioctls very much - I'd rather like to have it more Plan9-like ;-)).
-But it has the drawback of acquiring those fd's by separate processes
-isn't entirely easy and needs a lot of coordinated interaction.
-
-That issue would be much easier if we had the ability to publish
-existing fd's into the file system (like Plan9's srvfs does), but we
-don't have that yet. (actually, I've hacked up some srvfs for Linux,
-but ... well ... it's just a hack, nowhere near to production).
-
-Why not putting this into sysfs ?
-
-I see two options:
-
-a) if it's really kvm-specific (and no chance of using the same
-    interface for other hypervisors), we could put it under the
-    kvm device (/sys/class/misc/kvm).
-
-b) have a generic VMM stats interface that theroretically could work
-    with any hypervisor.
-
-
-
---mtx
-
--- 
----
-Hinweis: unverschlüsselte E-Mails können leicht abgehört und manipuliert
-werden ! Für eine vertrauliche Kommunikation senden Sie bitte ihren
-GPG/PGP-Schlüssel zu.
----
-Enrico Weigelt, metux IT consult
-Free software and Linux embedded engineering
-info@metux.net -- +49-151-27565287
+T24gV2VkLCAyMDIxLTA1LTI2IGF0IDE5OjQ0ICswMTAwLCBJbGlhcyBTdGFtYXRpcyB3cm90ZToN
+Cj4gS1ZNIGN1cnJlbnRseSBzdXBwb3J0cyBoYXJkd2FyZS1hc3Npc3RlZCBUU0Mgc2NhbGluZyBi
+dXQgb25seSBmb3IgTDE7DQo+IHRoZSBmZWF0dXJlIGlzIG5vdCBleHBvc2VkIHRvIG5lc3RlZCBn
+dWVzdHMuIFRoaXMgcGF0Y2ggc2VyaWVzIGFkZHMNCj4gc3VwcG9ydCBmb3IgbmVzdGVkIFRTQyBz
+Y2FsaW5nIGFuZCBhbGxvd3MgYm90aCBMMSBhbmQgTDIgdG8gYmUgc2NhbGVkDQo+IHdpdGggZGlm
+ZmVyZW50IHNjYWxpbmcgZmFjdG9ycy4gVGhhdCBpcyBhY2hpZXZlZCBieSAibWVyZ2luZyIgdGhl
+IDAxIGFuZA0KPiAwMiB2YWx1ZXMgdG9nZXRoZXIuDQo+IA0KPiBNb3N0IG9mIHRoZSBsb2dpYyBp
+biB0aGlzIHNlcmllcyBpcyBpbXBsZW1lbnRlZCBpbiBjb21tb24gY29kZSAoYnkgZG9pbmcNCj4g
+dGhlIG5lY2Vzc2FyeSByZXN0cnVjdHVyaW5ncyksIGhvd2V2ZXIgdGhlIHBhdGNoZXMgYWRkIHN1
+cHBvcnQgZm9yIFZNWA0KPiBvbmx5LiBBZGRpbmcgc3VwcG9ydCBmb3IgU1ZNIHNob3VsZCBiZSBl
+YXN5IGF0IHRoaXMgcG9pbnQgYW5kIE1heGltDQo+IExldml0c2t5IGhhcyB2b2x1bnRlZXJlZCB0
+byBkbyB0aGlzICh0aGFua3MhKS4NCj4gDQo+IENoYW5nZWxvZzoNCj4gDQo+IE9ubHkgcGF0Y2gg
+OSBuZWVkcyByZXZpZXdpbmcgYXQgdGhpcyBwb2ludCwgYnV0IEkgYW0gcmUtc2VuZGluZyB0aGUN
+Cj4gd2hvbGUgc2VyaWVzIGFzIEkgYWxzbyBhcHBsaWVkIG5pdHBpY2tzIHN1Z2dlc3RlZCB0byBz
+b21lIG9mIHRoZSBvdGhlcg0KPiBwYXRoY2VzLg0KPiANCj4gdjQ6DQo+ICAgLSBBZGRlZCB2ZW5k
+b3IgY2FsbGJhY2tzIGZvciB3cml0aW5nIHRoZSBUU0MgbXVsdGlwbGllcg0KPiAgIC0gTW92ZWQg
+dGhlIFZNQ1MgbXVsdGlwbGllciB3cml0ZXMgZnJvbSB0aGUgVk1DUyBsb2FkIHBhdGggdG8gY29t
+bW9uDQo+ICAgICBjb2RlIHRoYXQgb25seSBnZXRzIGNhbGxlZCBvbiBUU0MgcmF0aW8gY2hhbmdl
+cw0KPiAgIC0gTWVyZ2VkIHRvZ2V0aGVyIHBhdGNoZXMgMTAgYW5kIDExIG9mIHYzDQo+ICAgLSBB
+cHBsaWVkIGFsbCBuaXRwaWNrLWZlZWRiYWNrIG9mIHRoZSBwcmV2aW91cyB2ZXJzaW9ucw0KPiAN
+Cj4gdjM6DQo+ICAgLSBBcHBsaWVkIFNlYW4ncyBmZWVkYmFjaw0KPiAgIC0gUmVmYWN0b3JlZCBw
+YXRjaGVzIDcgdG8gMTANCj4gDQo+IHYyOg0KPiAgIC0gQXBwbGllZCBhbGwgb2YgTWF4aW0ncyBm
+ZWVkYmFjaw0KPiAgIC0gQWRkZWQgYSBtdWxfczY0X3U2NF9zaHIgZnVuY3Rpb24gaW4gbWF0aDY0
+LmgNCj4gICAtIEFkZGVkIGEgc2VwYXJhdGUga3ZtX3NjYWxlX3RzY19sMSBmdW5jdGlvbiBpbnN0
+ZWFkIG9mIHBhc3NpbmcgYW4NCj4gICAgIGFyZ3VtZW50IHRvIGt2bV9zY2FsZV90c2MNCj4gICAt
+IEltcGxlbWVudGVkIHRoZSAwMiBmaWVsZHMgY2FsY3VsYXRpb25zIGluIGNvbW1vbiBjb2RlDQo+
+ICAgLSBNb3ZlZCBhbGwgb2Ygd3JpdGVfbDFfdHNjX29mZnNldCdzIGxvZ2ljIHRvIGNvbW1vbiBj
+b2RlDQo+ICAgLSBBZGRlZCBhIGNoZWNrIGZvciB3aGV0aGVyIHRoZSBUU0MgaXMgc3RhYmxlIGlu
+IHBhdGNoIDEwDQo+ICAgLSBVc2VkIGEgcmFuZG9tIEwxIGZhY3RvciBhbmQgYSBuZWdhdGl2ZSBv
+ZmZzZXQgaW4gcGF0Y2ggMTANCj4gDQo+IElsaWFzIFN0YW1hdGlzICgxMSk6DQo+ICAgbWF0aDY0
+Lmg6IEFkZCBtdWxfczY0X3U2NF9zaHIoKQ0KPiAgIEtWTTogWDg2OiBTdG9yZSBMMSdzIFRTQyBz
+Y2FsaW5nIHJhdGlvIGluICdzdHJ1Y3Qga3ZtX3ZjcHVfYXJjaCcNCj4gICBLVk06IFg4NjogUmVu
+YW1lIGt2bV9jb21wdXRlX3RzY19vZmZzZXQoKSB0bw0KPiAgICAga3ZtX2NvbXB1dGVfbDFfdHNj
+X29mZnNldCgpDQo+ICAgS1ZNOiBYODY6IEFkZCBhIHJhdGlvIHBhcmFtZXRlciB0byBrdm1fc2Nh
+bGVfdHNjKCkNCj4gICBLVk06IG5WTVg6IEFkZCBhIFRTQyBtdWx0aXBsaWVyIGZpZWxkIGluIFZN
+Q1MxMg0KPiAgIEtWTTogWDg2OiBBZGQgZnVuY3Rpb25zIGZvciByZXRyaWV2aW5nIEwyIFRTQyBm
+aWVsZHMgZnJvbSBjb21tb24gY29kZQ0KPiAgIEtWTTogWDg2OiBBZGQgZnVuY3Rpb25zIHRoYXQg
+Y2FsY3VsYXRlIHRoZSBuZXN0ZWQgVFNDIGZpZWxkcw0KPiAgIEtWTTogWDg2OiBNb3ZlIHdyaXRl
+X2wxX3RzY19vZmZzZXQoKSBsb2dpYyB0byBjb21tb24gY29kZSBhbmQgcmVuYW1lDQo+ICAgICBp
+dA0KPiAgIEtWTTogWDg2OiBBZGQgdmVuZG9yIGNhbGxiYWNrcyBmb3Igd3JpdGluZyB0aGUgVFND
+IG11bHRpcGxpZXINCj4gICBLVk06IG5WTVg6IEVuYWJsZSBuZXN0ZWQgVFNDIHNjYWxpbmcNCj4g
+ICBLVk06IHNlbGZ0ZXN0czogeDg2OiBBZGQgdm14X25lc3RlZF90c2Nfc2NhbGluZ190ZXN0DQo+
+IA0KPiAgYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtLXg4Ni1vcHMuaCAgICAgICAgICAgIHwgICA1
+ICstDQo+ICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oICAgICAgICAgICAgICAgfCAg
+MTUgKy0NCj4gIGFyY2gveDg2L2t2bS9zdm0vc3ZtLmMgICAgICAgICAgICAgICAgICAgICAgICB8
+ICAzNSArKy0NCj4gIGFyY2gveDg2L2t2bS92bXgvbmVzdGVkLmMgICAgICAgICAgICAgICAgICAg
+ICB8ICAzMyArKy0NCj4gIGFyY2gveDg2L2t2bS92bXgvdm1jczEyLmMgICAgICAgICAgICAgICAg
+ICAgICB8ICAgMSArDQo+ICBhcmNoL3g4Ni9rdm0vdm14L3ZtY3MxMi5oICAgICAgICAgICAgICAg
+ICAgICAgfCAgIDQgKy0NCj4gIGFyY2gveDg2L2t2bS92bXgvdm14LmMgICAgICAgICAgICAgICAg
+ICAgICAgICB8ICA1NSArKy0tDQo+ICBhcmNoL3g4Ni9rdm0vdm14L3ZteC5oICAgICAgICAgICAg
+ICAgICAgICAgICAgfCAgMTEgKy0NCj4gIGFyY2gveDg2L2t2bS94ODYuYyAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICB8IDExNCArKysrKysrLS0NCj4gIGluY2x1ZGUvbGludXgvbWF0aDY0Lmgg
+ICAgICAgICAgICAgICAgICAgICAgICB8ICAxOSArKw0KPiAgdG9vbHMvdGVzdGluZy9zZWxmdGVz
+dHMva3ZtLy5naXRpZ25vcmUgICAgICAgIHwgICAxICsNCj4gIHRvb2xzL3Rlc3Rpbmcvc2VsZnRl
+c3RzL2t2bS9NYWtlZmlsZSAgICAgICAgICB8ICAgMSArDQo+ICAuLi4va3ZtL3g4Nl82NC92bXhf
+bmVzdGVkX3RzY19zY2FsaW5nX3Rlc3QuYyAgfCAyNDIgKysrKysrKysrKysrKysrKysrDQo+ICAx
+MyBmaWxlcyBjaGFuZ2VkLCA0NTEgaW5zZXJ0aW9ucygrKSwgODUgZGVsZXRpb25zKC0pDQo+ICBj
+cmVhdGUgbW9kZSAxMDA2NDQgdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL3g4Nl82NC92bXhf
+bmVzdGVkX3RzY19zY2FsaW5nX3Rlc3QuYw0KPiANCg0KSGVsbG8sDQoNCldoYXQgaXMgdGhlIHN0
+YXR1cyBvZiB0aGVzZT8gSSB0aGluayBhbGwgcGF0Y2hlcyBoYXZlIGJlZW4gcmV2aWV3ZWQgYW5k
+DQphcHByb3ZlZCBhdCB0aGlzIHBvaW50Lg0KDQooVGhlcmUncyBhIG5ldyByZXZpc2lvbiB2NiBv
+ZiBwYXRjaCA5IHRoYXQgaGFzIGJlZW4gcmV2aWV3ZWQgdG9vKQ0KDQpUaGFua3MsDQpJbGlhcw0K
