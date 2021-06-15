@@ -2,556 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17E7D3A813B
-	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 15:45:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC57B3A80E6
+	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 15:40:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231540AbhFONrQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Jun 2021 09:47:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57784 "EHLO
+        id S231871AbhFONmr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Jun 2021 09:42:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231301AbhFONqn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Jun 2021 09:46:43 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08411C0611F8;
-        Tue, 15 Jun 2021 06:44:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=tSo9Hpl+FIjggQ0Eg4B6IaldlQiHETlG3jF8lV9bDUk=; b=l4uvDIhYCG7pCZIy5U3UqHX518
-        QtJp/0NSBL2yPNSug1fxfWJcBVPVz8lSa/Jn3c7FkWJgCXy2U/hDCRnxQZZWgvZLzlMIs93wuvjhz
-        f8HSSJZR15UcqZ5jpNvMZnGYIJkwv54r1SwDQuYW5X5d4/pLuJDcte+az0/D1twiDNhfmrm7JpMds
-        R0pftPkQIQe/b9zHE853jFigwHg5htri3inCm1Ws7Ar+EEmfcdMDnhY/X4vPvETV88eBziaFyIxwF
-        jKkJF9TMwypT3xd2nG+6vMJ/yd7/Pn1cn9yZ4lkVg88Qar1TV4/1iaWxMR9RJwJ9Es+o67TSJztFU
-        wTudVB3g==;
-Received: from [2001:4bb8:19b:fdce:9045:1e63:20f0:ca9] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lt9Kk-006pdV-FE; Tue, 15 Jun 2021 13:42:35 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org, Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>
-Subject: [PATCH 10/10] vfio/mbochs: Convert to use vfio_register_group_dev()
-Date:   Tue, 15 Jun 2021 15:35:19 +0200
-Message-Id: <20210615133519.754763-11-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210615133519.754763-1-hch@lst.de>
-References: <20210615133519.754763-1-hch@lst.de>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+        with ESMTP id S231425AbhFONmV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Jun 2021 09:42:21 -0400
+Received: from mail-wr1-x449.google.com (mail-wr1-x449.google.com [IPv6:2a00:1450:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5649C0611FB
+        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 06:39:54 -0700 (PDT)
+Received: by mail-wr1-x449.google.com with SMTP id x9-20020a5d49090000b0290118d8746e06so8670954wrq.10
+        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 06:39:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=YqFGnAW4G80KFjLlYtbBihqs/VTfxdlv4UyDdFH0VNk=;
+        b=vW8UU2mcVqIU2mlyEisSMA6Kbql1ZGDyN4oKiLenSONa/dq2y5ObhezQJCRnWqR4AO
+         erXSeDx7mrF9iWHaFloBWd3gB1Jg7EDbnhltwV+e/cuI+nAZyTueEP+8VrykmXlgtgvr
+         hqJHvVphsBKr8tdiVgRFElzn7BTPLBPpJh6ZgIf+pQVbrMgindHsOy7UgX6M+6cLMe55
+         BiyAJNBd5HqG0NGyMs26s4ElIxBU1heAGJBYKK4CL/Xbk0f1sPw8BkIJs6i+Nkk8kBA2
+         KZpq7kpV/AsChjgK2s8H+SNgGPFGVgNycLE9SfCDkfChrjVz/FqXgG/yAGkBpwdMQgY2
+         aGSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=YqFGnAW4G80KFjLlYtbBihqs/VTfxdlv4UyDdFH0VNk=;
+        b=Uym8/TUmgkf5chFFYAlSlkliQR8f+Fu3Ki/H3qbsKDRN7kDuustQ0UTfa6nas5hfgK
+         pTcQC92X+8jtae03I0Ie44kewNeHQjdUwPzaSfXZIGbDq98korma88pjzyy5oDEG6KRs
+         syfa8FqpQGToKajp27FerSoVZYlOT/1kLF9rkFlWuJYBQFzCVIeZ6a5MTfSsTkL+D/fB
+         P3nQldbGDZHIJjINckZ5tBpW1vbAGeJrEr8kIAz824Q57fxqR0TrtP+JmDDEjCCRC0Zc
+         P3n3I3WPyK29mnQu7AS8II9MlFLJ8B0peNVuq4sKxysi/HDwHTLKT7yzB3NIDrUdazAr
+         IAlQ==
+X-Gm-Message-State: AOAM533/fIUyUG1c92h2ksOcZa3m6Fa5Tu3vrf4LRAuKKN3C+EXMhupZ
+        3qWn00E9MKNTMHbEJOVfPukiXHirIQ==
+X-Google-Smtp-Source: ABdhPJzBlOmstNMiFWInb2WeX1AQwhgtoVD7ZnXYUlVqpBpHhlkPQmt7vhX1oh7GW7BAoXIVaF7wKZIaJw==
+X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
+ (user=tabba job=sendgmr) by 2002:a7b:c24a:: with SMTP id b10mr11308wmj.1.1623764393022;
+ Tue, 15 Jun 2021 06:39:53 -0700 (PDT)
+Date:   Tue, 15 Jun 2021 14:39:37 +0100
+Message-Id: <20210615133950.693489-1-tabba@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.272.g935e593368-goog
+Subject: [PATCH v2 00/13] KVM: arm64: Fixed features for protected VMs
+From:   Fuad Tabba <tabba@google.com>
+To:     kvmarm@lists.cs.columbia.edu
+Cc:     maz@kernel.org, will@kernel.org, james.morse@arm.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        mark.rutland@arm.com, christoffer.dall@arm.com,
+        pbonzini@redhat.com, drjones@redhat.com, qperret@google.com,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kernel-team@android.com, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jason Gunthorpe <jgg@nvidia.com>
+Hi,
 
-This is straightforward conversion, the mdev_state is actually serving as
-the vfio_device and we can replace all the mdev_get_drvdata()'s and the
-wonky dead code with a simple container_of().
+Changes since v1 [0]:
+- Restrict protected VM features based on an allowed features rather than
+  rejected ones (Drew)
+- Add more background describing protected KVM to the cover letter (Alex)
+- Rebase on the latest kvmarm/next
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- samples/vfio-mdev/mbochs.c | 163 +++++++++++++++++++++----------------
- 1 file changed, 91 insertions(+), 72 deletions(-)
+This patch series adds support for restricting CPU features for protected VMs
+in KVM (pKVM) [1].
 
-diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
-index 881ef9a7296f..6c0f229db36a 100644
---- a/samples/vfio-mdev/mbochs.c
-+++ b/samples/vfio-mdev/mbochs.c
-@@ -130,6 +130,7 @@ static struct class	*mbochs_class;
- static struct cdev	mbochs_cdev;
- static struct device	mbochs_dev;
- static int		mbochs_used_mbytes;
-+static const struct vfio_device_ops mbochs_dev_ops;
- 
- struct vfio_region_info_ext {
- 	struct vfio_region_info          base;
-@@ -160,6 +161,7 @@ struct mbochs_dmabuf {
- 
- /* State of each mdev device */
- struct mdev_state {
-+	struct vfio_device vdev;
- 	u8 *vconfig;
- 	u64 bar_mask[3];
- 	u32 memory_bar_mask;
-@@ -425,11 +427,9 @@ static void handle_edid_blob(struct mdev_state *mdev_state, u16 offset,
- 		memcpy(buf, mdev_state->edid_blob + offset, count);
- }
- 
--static ssize_t mdev_access(struct mdev_device *mdev, char *buf, size_t count,
--			   loff_t pos, bool is_write)
-+static ssize_t mdev_access(struct mdev_state *mdev_state, char *buf,
-+			   size_t count, loff_t pos, bool is_write)
- {
--	struct mdev_state *mdev_state = mdev_get_drvdata(mdev);
--	struct device *dev = mdev_dev(mdev);
- 	struct page *pg;
- 	loff_t poff;
- 	char *map;
-@@ -478,7 +478,7 @@ static ssize_t mdev_access(struct mdev_device *mdev, char *buf, size_t count,
- 		put_page(pg);
- 
- 	} else {
--		dev_dbg(dev, "%s: %s @0x%llx (unhandled)\n",
-+		dev_dbg(mdev_state->vdev.dev, "%s: %s @0x%llx (unhandled)\n",
- 			__func__, is_write ? "WR" : "RD", pos);
- 		ret = -1;
- 		goto accessfailed;
-@@ -493,9 +493,8 @@ static ssize_t mdev_access(struct mdev_device *mdev, char *buf, size_t count,
- 	return ret;
- }
- 
--static int mbochs_reset(struct mdev_device *mdev)
-+static int mbochs_reset(struct mdev_state *mdev_state)
- {
--	struct mdev_state *mdev_state = mdev_get_drvdata(mdev);
- 	u32 size64k = mdev_state->memsize / (64 * 1024);
- 	int i;
- 
-@@ -506,12 +505,13 @@ static int mbochs_reset(struct mdev_device *mdev)
- 	return 0;
- }
- 
--static int mbochs_create(struct mdev_device *mdev)
-+static int mbochs_probe(struct mdev_device *mdev)
- {
- 	const struct mbochs_type *type =
- 		&mbochs_types[mdev_get_type_group_id(mdev)];
- 	struct device *dev = mdev_dev(mdev);
- 	struct mdev_state *mdev_state;
-+	int ret = -ENOMEM;
- 
- 	if (type->mbytes + mbochs_used_mbytes > max_mbytes)
- 		return -ENOMEM;
-@@ -519,6 +519,7 @@ static int mbochs_create(struct mdev_device *mdev)
- 	mdev_state = kzalloc(sizeof(struct mdev_state), GFP_KERNEL);
- 	if (mdev_state == NULL)
- 		return -ENOMEM;
-+	vfio_init_group_dev(&mdev_state->vdev, &mdev->dev, &mbochs_dev_ops);
- 
- 	mdev_state->vconfig = kzalloc(MBOCHS_CONFIG_SPACE_SIZE, GFP_KERNEL);
- 	if (mdev_state->vconfig == NULL)
-@@ -537,7 +538,6 @@ static int mbochs_create(struct mdev_device *mdev)
- 
- 	mutex_init(&mdev_state->ops_lock);
- 	mdev_state->mdev = mdev;
--	mdev_set_drvdata(mdev, mdev_state);
- 	INIT_LIST_HEAD(&mdev_state->dmabufs);
- 	mdev_state->next_id = 1;
- 
-@@ -547,32 +547,38 @@ static int mbochs_create(struct mdev_device *mdev)
- 	mdev_state->edid_regs.edid_offset = MBOCHS_EDID_BLOB_OFFSET;
- 	mdev_state->edid_regs.edid_max_size = sizeof(mdev_state->edid_blob);
- 	mbochs_create_config_space(mdev_state);
--	mbochs_reset(mdev);
-+	mbochs_reset(mdev_state);
- 
- 	mbochs_used_mbytes += type->mbytes;
-+
-+	ret = vfio_register_group_dev(&mdev_state->vdev);
-+	if (ret)
-+		goto err_mem;
-+	dev_set_drvdata(&mdev->dev, mdev_state);
- 	return 0;
- 
- err_mem:
- 	kfree(mdev_state->vconfig);
- 	kfree(mdev_state);
--	return -ENOMEM;
-+	return ret;
- }
- 
--static int mbochs_remove(struct mdev_device *mdev)
-+static void mbochs_remove(struct mdev_device *mdev)
- {
--	struct mdev_state *mdev_state = mdev_get_drvdata(mdev);
-+	struct mdev_state *mdev_state = dev_get_drvdata(&mdev->dev);
- 
- 	mbochs_used_mbytes -= mdev_state->type->mbytes;
--	mdev_set_drvdata(mdev, NULL);
-+	vfio_unregister_group_dev(&mdev_state->vdev);
- 	kfree(mdev_state->pages);
- 	kfree(mdev_state->vconfig);
- 	kfree(mdev_state);
--	return 0;
- }
- 
--static ssize_t mbochs_read(struct mdev_device *mdev, char __user *buf,
-+static ssize_t mbochs_read(struct vfio_device *vdev, char __user *buf,
- 			   size_t count, loff_t *ppos)
- {
-+	struct mdev_state *mdev_state =
-+		container_of(vdev, struct mdev_state, vdev);
- 	unsigned int done = 0;
- 	int ret;
- 
-@@ -582,7 +588,7 @@ static ssize_t mbochs_read(struct mdev_device *mdev, char __user *buf,
- 		if (count >= 4 && !(*ppos % 4)) {
- 			u32 val;
- 
--			ret =  mdev_access(mdev, (char *)&val, sizeof(val),
-+			ret =  mdev_access(mdev_state, (char *)&val, sizeof(val),
- 					   *ppos, false);
- 			if (ret <= 0)
- 				goto read_err;
-@@ -594,7 +600,7 @@ static ssize_t mbochs_read(struct mdev_device *mdev, char __user *buf,
- 		} else if (count >= 2 && !(*ppos % 2)) {
- 			u16 val;
- 
--			ret = mdev_access(mdev, (char *)&val, sizeof(val),
-+			ret = mdev_access(mdev_state, (char *)&val, sizeof(val),
- 					  *ppos, false);
- 			if (ret <= 0)
- 				goto read_err;
-@@ -606,7 +612,7 @@ static ssize_t mbochs_read(struct mdev_device *mdev, char __user *buf,
- 		} else {
- 			u8 val;
- 
--			ret = mdev_access(mdev, (char *)&val, sizeof(val),
-+			ret = mdev_access(mdev_state, (char *)&val, sizeof(val),
- 					  *ppos, false);
- 			if (ret <= 0)
- 				goto read_err;
-@@ -629,9 +635,11 @@ static ssize_t mbochs_read(struct mdev_device *mdev, char __user *buf,
- 	return -EFAULT;
- }
- 
--static ssize_t mbochs_write(struct mdev_device *mdev, const char __user *buf,
-+static ssize_t mbochs_write(struct vfio_device *vdev, const char __user *buf,
- 			    size_t count, loff_t *ppos)
- {
-+	struct mdev_state *mdev_state =
-+		container_of(vdev, struct mdev_state, vdev);
- 	unsigned int done = 0;
- 	int ret;
- 
-@@ -644,7 +652,7 @@ static ssize_t mbochs_write(struct mdev_device *mdev, const char __user *buf,
- 			if (copy_from_user(&val, buf, sizeof(val)))
- 				goto write_err;
- 
--			ret = mdev_access(mdev, (char *)&val, sizeof(val),
-+			ret = mdev_access(mdev_state, (char *)&val, sizeof(val),
- 					  *ppos, true);
- 			if (ret <= 0)
- 				goto write_err;
-@@ -656,7 +664,7 @@ static ssize_t mbochs_write(struct mdev_device *mdev, const char __user *buf,
- 			if (copy_from_user(&val, buf, sizeof(val)))
- 				goto write_err;
- 
--			ret = mdev_access(mdev, (char *)&val, sizeof(val),
-+			ret = mdev_access(mdev_state, (char *)&val, sizeof(val),
- 					  *ppos, true);
- 			if (ret <= 0)
- 				goto write_err;
-@@ -668,7 +676,7 @@ static ssize_t mbochs_write(struct mdev_device *mdev, const char __user *buf,
- 			if (copy_from_user(&val, buf, sizeof(val)))
- 				goto write_err;
- 
--			ret = mdev_access(mdev, (char *)&val, sizeof(val),
-+			ret = mdev_access(mdev_state, (char *)&val, sizeof(val),
- 					  *ppos, true);
- 			if (ret <= 0)
- 				goto write_err;
-@@ -754,9 +762,10 @@ static const struct vm_operations_struct mbochs_region_vm_ops = {
- 	.fault = mbochs_region_vm_fault,
- };
- 
--static int mbochs_mmap(struct mdev_device *mdev, struct vm_area_struct *vma)
-+static int mbochs_mmap(struct vfio_device *vdev, struct vm_area_struct *vma)
- {
--	struct mdev_state *mdev_state = mdev_get_drvdata(mdev);
-+	struct mdev_state *mdev_state =
-+		container_of(vdev, struct mdev_state, vdev);
- 
- 	if (vma->vm_pgoff != MBOCHS_MEMORY_BAR_OFFSET >> PAGE_SHIFT)
- 		return -EINVAL;
-@@ -963,7 +972,7 @@ mbochs_dmabuf_find_by_id(struct mdev_state *mdev_state, u32 id)
- static int mbochs_dmabuf_export(struct mbochs_dmabuf *dmabuf)
- {
- 	struct mdev_state *mdev_state = dmabuf->mdev_state;
--	struct device *dev = mdev_dev(mdev_state->mdev);
-+	struct device *dev = mdev_state->vdev.dev;
- 	DEFINE_DMA_BUF_EXPORT_INFO(exp_info);
- 	struct dma_buf *buf;
- 
-@@ -991,15 +1000,10 @@ static int mbochs_dmabuf_export(struct mbochs_dmabuf *dmabuf)
- 	return 0;
- }
- 
--static int mbochs_get_region_info(struct mdev_device *mdev,
-+static int mbochs_get_region_info(struct mdev_state *mdev_state,
- 				  struct vfio_region_info_ext *ext)
- {
- 	struct vfio_region_info *region_info = &ext->base;
--	struct mdev_state *mdev_state;
--
--	mdev_state = mdev_get_drvdata(mdev);
--	if (!mdev_state)
--		return -EINVAL;
- 
- 	if (region_info->index >= MBOCHS_NUM_REGIONS)
- 		return -EINVAL;
-@@ -1047,15 +1051,13 @@ static int mbochs_get_region_info(struct mdev_device *mdev,
- 	return 0;
- }
- 
--static int mbochs_get_irq_info(struct mdev_device *mdev,
--			       struct vfio_irq_info *irq_info)
-+static int mbochs_get_irq_info(struct vfio_irq_info *irq_info)
- {
- 	irq_info->count = 0;
- 	return 0;
- }
- 
--static int mbochs_get_device_info(struct mdev_device *mdev,
--				  struct vfio_device_info *dev_info)
-+static int mbochs_get_device_info(struct vfio_device_info *dev_info)
- {
- 	dev_info->flags = VFIO_DEVICE_FLAGS_PCI;
- 	dev_info->num_regions = MBOCHS_NUM_REGIONS;
-@@ -1063,11 +1065,9 @@ static int mbochs_get_device_info(struct mdev_device *mdev,
- 	return 0;
- }
- 
--static int mbochs_query_gfx_plane(struct mdev_device *mdev,
-+static int mbochs_query_gfx_plane(struct mdev_state *mdev_state,
- 				  struct vfio_device_gfx_plane_info *plane)
- {
--	struct mdev_state *mdev_state = mdev_get_drvdata(mdev);
--	struct device *dev = mdev_dev(mdev);
- 	struct mbochs_dmabuf *dmabuf;
- 	struct mbochs_mode mode;
- 	int ret;
-@@ -1121,18 +1121,16 @@ static int mbochs_query_gfx_plane(struct mdev_device *mdev,
- done:
- 	if (plane->drm_plane_type == DRM_PLANE_TYPE_PRIMARY &&
- 	    mdev_state->active_id != plane->dmabuf_id) {
--		dev_dbg(dev, "%s: primary: %d => %d\n", __func__,
--			mdev_state->active_id, plane->dmabuf_id);
-+		dev_dbg(mdev_state->vdev.dev, "%s: primary: %d => %d\n",
-+			__func__, mdev_state->active_id, plane->dmabuf_id);
- 		mdev_state->active_id = plane->dmabuf_id;
- 	}
- 	mutex_unlock(&mdev_state->ops_lock);
- 	return 0;
- }
- 
--static int mbochs_get_gfx_dmabuf(struct mdev_device *mdev,
--				 u32 id)
-+static int mbochs_get_gfx_dmabuf(struct mdev_state *mdev_state, u32 id)
- {
--	struct mdev_state *mdev_state = mdev_get_drvdata(mdev);
- 	struct mbochs_dmabuf *dmabuf;
- 
- 	mutex_lock(&mdev_state->ops_lock);
-@@ -1154,9 +1152,11 @@ static int mbochs_get_gfx_dmabuf(struct mdev_device *mdev,
- 	return dma_buf_fd(dmabuf->buf, 0);
- }
- 
--static long mbochs_ioctl(struct mdev_device *mdev, unsigned int cmd,
--			unsigned long arg)
-+static long mbochs_ioctl(struct vfio_device *vdev, unsigned int cmd,
-+			 unsigned long arg)
- {
-+	struct mdev_state *mdev_state =
-+		container_of(vdev, struct mdev_state, vdev);
- 	int ret = 0;
- 	unsigned long minsz, outsz;
- 
-@@ -1173,7 +1173,7 @@ static long mbochs_ioctl(struct mdev_device *mdev, unsigned int cmd,
- 		if (info.argsz < minsz)
- 			return -EINVAL;
- 
--		ret = mbochs_get_device_info(mdev, &info);
-+		ret = mbochs_get_device_info(&info);
- 		if (ret)
- 			return ret;
- 
-@@ -1197,7 +1197,7 @@ static long mbochs_ioctl(struct mdev_device *mdev, unsigned int cmd,
- 		if (outsz > sizeof(info))
- 			return -EINVAL;
- 
--		ret = mbochs_get_region_info(mdev, &info);
-+		ret = mbochs_get_region_info(mdev_state, &info);
- 		if (ret)
- 			return ret;
- 
-@@ -1220,7 +1220,7 @@ static long mbochs_ioctl(struct mdev_device *mdev, unsigned int cmd,
- 		    (info.index >= VFIO_PCI_NUM_IRQS))
- 			return -EINVAL;
- 
--		ret = mbochs_get_irq_info(mdev, &info);
-+		ret = mbochs_get_irq_info(&info);
- 		if (ret)
- 			return ret;
- 
-@@ -1243,7 +1243,7 @@ static long mbochs_ioctl(struct mdev_device *mdev, unsigned int cmd,
- 		if (plane.argsz < minsz)
- 			return -EINVAL;
- 
--		ret = mbochs_query_gfx_plane(mdev, &plane);
-+		ret = mbochs_query_gfx_plane(mdev_state, &plane);
- 		if (ret)
- 			return ret;
- 
-@@ -1260,19 +1260,19 @@ static long mbochs_ioctl(struct mdev_device *mdev, unsigned int cmd,
- 		if (get_user(dmabuf_id, (__u32 __user *)arg))
- 			return -EFAULT;
- 
--		return mbochs_get_gfx_dmabuf(mdev, dmabuf_id);
-+		return mbochs_get_gfx_dmabuf(mdev_state, dmabuf_id);
- 	}
- 
- 	case VFIO_DEVICE_SET_IRQS:
- 		return -EINVAL;
- 
- 	case VFIO_DEVICE_RESET:
--		return mbochs_reset(mdev);
-+		return mbochs_reset(mdev_state);
- 	}
- 	return -ENOTTY;
- }
- 
--static int mbochs_open(struct mdev_device *mdev)
-+static int mbochs_open(struct vfio_device *vdev)
- {
- 	if (!try_module_get(THIS_MODULE))
- 		return -ENODEV;
-@@ -1280,9 +1280,10 @@ static int mbochs_open(struct mdev_device *mdev)
- 	return 0;
- }
- 
--static void mbochs_close(struct mdev_device *mdev)
-+static void mbochs_close(struct vfio_device *vdev)
- {
--	struct mdev_state *mdev_state = mdev_get_drvdata(mdev);
-+	struct mdev_state *mdev_state =
-+		container_of(vdev, struct mdev_state, vdev);
- 	struct mbochs_dmabuf *dmabuf, *tmp;
- 
- 	mutex_lock(&mdev_state->ops_lock);
-@@ -1306,8 +1307,7 @@ static ssize_t
- memory_show(struct device *dev, struct device_attribute *attr,
- 	    char *buf)
- {
--	struct mdev_device *mdev = mdev_from_dev(dev);
--	struct mdev_state *mdev_state = mdev_get_drvdata(mdev);
-+	struct mdev_state *mdev_state = dev_get_drvdata(dev);
- 
- 	return sprintf(buf, "%d MB\n", mdev_state->type->mbytes);
- }
-@@ -1398,18 +1398,30 @@ static struct attribute_group *mdev_type_groups[] = {
- 	NULL,
- };
- 
-+static const struct vfio_device_ops mbochs_dev_ops = {
-+	.open = mbochs_open,
-+	.release = mbochs_close,
-+	.read = mbochs_read,
-+	.write = mbochs_write,
-+	.ioctl = mbochs_ioctl,
-+	.mmap = mbochs_mmap,
-+};
-+
-+static struct mdev_driver mbochs_driver = {
-+	.driver = {
-+		.name = "mbochs",
-+		.owner = THIS_MODULE,
-+		.mod_name = KBUILD_MODNAME,
-+		.dev_groups = mdev_dev_groups,
-+	},
-+	.probe = mbochs_probe,
-+	.remove	= mbochs_remove,
-+};
-+
- static const struct mdev_parent_ops mdev_fops = {
- 	.owner			= THIS_MODULE,
--	.mdev_attr_groups	= mdev_dev_groups,
-+	.device_driver		= &mbochs_driver,
- 	.supported_type_groups	= mdev_type_groups,
--	.create			= mbochs_create,
--	.remove			= mbochs_remove,
--	.open			= mbochs_open,
--	.release		= mbochs_close,
--	.read			= mbochs_read,
--	.write			= mbochs_write,
--	.ioctl			= mbochs_ioctl,
--	.mmap			= mbochs_mmap,
- };
- 
- static const struct file_operations vd_fops = {
-@@ -1434,11 +1446,15 @@ static int __init mbochs_dev_init(void)
- 	cdev_add(&mbochs_cdev, mbochs_devt, MINORMASK + 1);
- 	pr_info("%s: major %d\n", __func__, MAJOR(mbochs_devt));
- 
-+	ret = mdev_register_driver(&mbochs_driver);
-+	if (ret)
-+		goto err_cdev;
-+
- 	mbochs_class = class_create(THIS_MODULE, MBOCHS_CLASS_NAME);
- 	if (IS_ERR(mbochs_class)) {
- 		pr_err("Error: failed to register mbochs_dev class\n");
- 		ret = PTR_ERR(mbochs_class);
--		goto failed1;
-+		goto err_driver;
- 	}
- 	mbochs_dev.class = mbochs_class;
- 	mbochs_dev.release = mbochs_device_release;
-@@ -1446,19 +1462,21 @@ static int __init mbochs_dev_init(void)
- 
- 	ret = device_register(&mbochs_dev);
- 	if (ret)
--		goto failed2;
-+		goto err_class;
- 
- 	ret = mdev_register_device(&mbochs_dev, &mdev_fops);
- 	if (ret)
--		goto failed3;
-+		goto err_device;
- 
- 	return 0;
- 
--failed3:
-+err_device:
- 	device_unregister(&mbochs_dev);
--failed2:
-+err_class:
- 	class_destroy(mbochs_class);
--failed1:
-+err_driver:
-+	mdev_unregister_driver(&mbochs_driver);
-+err_cdev:
- 	cdev_del(&mbochs_cdev);
- 	unregister_chrdev_region(mbochs_devt, MINORMASK + 1);
- 	return ret;
-@@ -1470,6 +1488,7 @@ static void __exit mbochs_dev_exit(void)
- 	mdev_unregister_device(&mbochs_dev);
- 
- 	device_unregister(&mbochs_dev);
-+	mdev_unregister_driver(&mbochs_driver);
- 	cdev_del(&mbochs_cdev);
- 	unregister_chrdev_region(mbochs_devt, MINORMASK + 1);
- 	class_destroy(mbochs_class);
+Various feature configurations are allowed in KVM/arm64. Supporting all
+these features in pKVM is difficult, as it either involves moving much of
+the handling code to EL2, which adds bloat and results in a less verifiable
+trusted code base. Or it involves leaving the code handling at EL1, which
+risks having an untrusted host kernel feeding wrong information to the EL2
+and to the protected guests.
+
+This series attempts to mitigate this by reducing the configuration space,
+providing a reduced amount of feature support at EL2 with the least amount of
+compromise of protected guests' capabilities.
+
+This is done by restricting CPU features exposed to protected guests through
+feature registers. These restrictions are enforced by trapping register
+accesses as well as instructions associated with these features, and injecting
+an undefined exception into the guest if it attempts to use a restricted
+feature.
+
+The features being restricted (only for protected VMs in protected mode) are
+the following:
+- Debug, Trace, and DoubleLock
+- Performance Monitoring (PMU)
+- Statistical Profiling (SPE)
+- Scalable Vector Extension (SVE)
+- Memory Partitioning and Monitoring (MPAM)
+- Activity Monitoring (AMU)
+- Memory Tagging (MTE)
+- Limited Ordering Regions (LOR)
+- AArch32 State
+- Generic Interrupt Controller (GIC) (depending on rVIC support)
+- Nested Virtualization (NV)
+- Reliability, Availability, and Serviceability (RAS) above V1
+- Implementation-defined Features
+
+Remaining features currently supported by KVM are allowed. If new hardware
+features become supported by KVM, they would need to be explicitly allowed
+for protected VMs.
+
+This series is based on kvmarm/next and Will's patches for an Initial pKVM user
+ABI [2]. You can find the applied series here [3].
+
+Cheers,
+/fuad
+
+[0] https://lore.kernel.org/kvmarm/20210608141141.997398-1-tabba@google.com/
+
+[1] Once complete, protected KVM adds the ability to create protected VMs.
+These protected VMs are protected from the host Linux kernel (and from other
+VMs), where the host does not have access to guest memory,even if compromised.
+Normal (nVHE) guests can still be created and run in parallel with protected
+VMs. Their functionality should not be affected.
+
+For protected VMs, the host should not even have access to a protected guest's
+state or anything that would enable it to manipulate it (e.g., vcpu register
+context and el2 system registers); only hyp would have that access. If the host
+could access that state, then it might be able to get around the protection
+provided.  Therefore, anything that is sensitive and that would require such
+access needs to happen at hyp, hence the code in nvhe running only at hyp.
+
+For more details about pKVM, please refer to Will's talk at KVM Forum 2020:
+https://mirrors.edge.kernel.org/pub/linux/kernel/people/will/slides/kvmforum-2020-edited.pdf
+https://www.youtube.com/watch?v=edqJSzsDRxk
+
+[2] https://lore.kernel.org/kvmarm/20210603183347.1695-1-will@kernel.org/
+
+[3] https://android-kvm.googlesource.com/linux/+/refs/heads/tabba/el2_fixed_feature_v2
+
+Fuad Tabba (13):
+  KVM: arm64: Remove trailing whitespace in comments
+  KVM: arm64: MDCR_EL2 is a 64-bit register
+  KVM: arm64: Fix names of config register fields
+  KVM: arm64: Refactor sys_regs.h,c for nVHE reuse
+  KVM: arm64: Restore mdcr_el2 from vcpu
+  KVM: arm64: Add feature register flag definitions
+  KVM: arm64: Add config register bit definitions
+  KVM: arm64: Guest exit handlers for nVHE hyp
+  KVM: arm64: Add trap handlers for protected VMs
+  KVM: arm64: Move sanitized copies of CPU features
+  KVM: arm64: Trap access to pVM restricted features
+  KVM: arm64: Handle protected guests at 32 bits
+  KVM: arm64: Check vcpu features at pVM creation
+
+ arch/arm64/include/asm/kvm_arm.h        |  53 ++-
+ arch/arm64/include/asm/kvm_asm.h        |   2 +-
+ arch/arm64/include/asm/kvm_host.h       |   2 +-
+ arch/arm64/include/asm/kvm_hyp.h        |   3 +
+ arch/arm64/include/asm/sysreg.h         |   9 +
+ arch/arm64/kvm/arm.c                    |   3 +
+ arch/arm64/kvm/debug.c                  |   5 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  42 +++
+ arch/arm64/kvm/hyp/nvhe/Makefile        |   2 +-
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c      |   2 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c   |   6 -
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 125 ++++++-
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c      | 477 ++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/vhe/debug-sr.c       |   2 +-
+ arch/arm64/kvm/pkvm.c                   |  43 +++
+ arch/arm64/kvm/sys_regs.c               |  34 +-
+ arch/arm64/kvm/sys_regs.h               |  35 ++
+ 17 files changed, 784 insertions(+), 61 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/sys_regs.c
+
+
+base-commit: bc63d9369b320fd3c85ee13a029af9dc0ddac0ea
 -- 
-2.30.2
+2.32.0.272.g935e593368-goog
 
