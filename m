@@ -2,134 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 93A153A82BA
-	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 16:25:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE65D3A82F1
+	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 16:33:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231466AbhFOO1h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Jun 2021 10:27:37 -0400
-Received: from foss.arm.com ([217.140.110.172]:37076 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231384AbhFOO1T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Jun 2021 10:27:19 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4E12212FC;
-        Tue, 15 Jun 2021 07:25:14 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CD51A3F719;
-        Tue, 15 Jun 2021 07:25:12 -0700 (PDT)
-Subject: Re: [PATCH v4 4/9] KVM: arm64: vgic: Let an interrupt controller
- advertise lack of HW deactivation
-To:     Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Hector Martin <marcan@marcan.st>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>, kernel-team@android.com
-References: <20210601104005.81332-1-maz@kernel.org>
- <20210601104005.81332-5-maz@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <fa1fee85-04c6-d0a8-bd93-64d2ebc32e4a@arm.com>
-Date:   Tue, 15 Jun 2021 15:26:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S230352AbhFOOfi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Jun 2021 10:35:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49158 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230187AbhFOOfh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 15 Jun 2021 10:35:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623767612;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=C+PEwO1vuzVKwcAXZ/qn4zNQsNTC2ftksP1m6DzEJUg=;
+        b=WPCDRo+gnlueftnxlBp/ueDbIAzvn6+lZLtrYsWXTfagRuIyqXWpWRVbVmQfsAdlkXDwM8
+        9+y4muQ75OUi4ICqyipA0y/YTTaSO3B8n3jRp67ezIKx1ZHZSsfQt1yPZovGRKQ0Z0qpNv
+        F9lTvCqo8cGCJV5x/DBp3UWi3p/slN4=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-217-abBClKl-NAuEA6EGGsoT0w-1; Tue, 15 Jun 2021 10:33:31 -0400
+X-MC-Unique: abBClKl-NAuEA6EGGsoT0w-1
+Received: by mail-pf1-f199.google.com with SMTP id p17-20020a056a000b51b02902f9e70d70ecso3969533pfo.5
+        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 07:33:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=C+PEwO1vuzVKwcAXZ/qn4zNQsNTC2ftksP1m6DzEJUg=;
+        b=laCQMriSuM1DncFQrOM3Bhpn9bFUIEfozD5IblJ5/RF8KzdRREGBeLKnjpXolqtbTC
+         EVgYr2td7CYhzph7XBVZYG2838NKJPJR77J9ab0D3Kjf17nfwzdekEta6FCT0cpsrTpz
+         ljhVfaotK+xTY6xVZTFH+jxp0Vq1zadZBqwEEYrPZUfEe/HXWXiQbUhzSnJu1H2aveiv
+         9Z/c8xO0R+TdT25WLbeDrGttF6LpXKOt+sDMK2bM5ZqEwjvf9WHwYxG7v+Xgd49rSr3c
+         5ubQ1yvRnnpIrm+/CbQ6otN+d5dLTvtk9x4/fR9VWFfiZavCIO8xV2ddMRbbGhoaE9SS
+         nQPA==
+X-Gm-Message-State: AOAM532bjPwzC+9YyM42CAuJC3hHvNwO4oDU8LcclVLmRJe7gTGvgYBb
+        wMNAk+OXqOQYcBXlHSyCCjuyZqWXCMycV1NJTA3JE/24yIlU8aPwAmX9x9XMUe1fwCrlEzHUkMX
+        5QUZhRCHNMOp/
+X-Received: by 2002:a17:90a:6b42:: with SMTP id x2mr10714888pjl.16.1623767610586;
+        Tue, 15 Jun 2021 07:33:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzoLgAmk1b7+hVi09blQTTsivWllOjkeEFAcRwAwvRRMpCJnIURaBSkCjKYxfrUksdkBYUPgA==
+X-Received: by 2002:a17:90a:6b42:: with SMTP id x2mr10714866pjl.16.1623767610322;
+        Tue, 15 Jun 2021 07:33:30 -0700 (PDT)
+Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id o16sm13419988pfk.129.2021.06.15.07.33.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Jun 2021 07:33:29 -0700 (PDT)
+Subject: Re: [PATCH] vhost-vdpa: log warning message if vhost_vdpa_remove gets
+ blocked
+To:     Gautam Dawar <gdawar.xilinx@gmail.com>
+Cc:     martinh@xilinx.com, hanand@xilinx.com, gdawar@xilinx.com,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20210606132909.177640-1-gdawar.xilinx@gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <aa866c72-c3d9-9022-aa5b-b5a9fc9e946a@redhat.com>
+Date:   Tue, 15 Jun 2021 22:33:22 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210601104005.81332-5-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20210606132909.177640-1-gdawar.xilinx@gmail.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
 
-On 6/1/21 11:40 AM, Marc Zyngier wrote:
-> The vGIC, as architected by ARM, allows a virtual interrupt to
-> trigger the deactivation of a physical interrupt. This allows
-> the following interrupt to be delivered without requiring an exit.
+ÔÚ 2021/6/6 ÏÂÎç9:29, Gautam Dawar Ð´µÀ:
+> From: Gautam Dawar <gdawar@xilinx.com>
 >
-> However, some implementations have choosen not to implement this,
-> meaning that we will need some unsavoury workarounds to deal with this.
+> If some module invokes vdpa_device_unregister (usually in the module
+> unload function) when the userspace app (eg. QEMU) which had opened
+> the vhost-vdpa character device is still running, vhost_vdpa_remove()
+> function will block indefinitely in call to wait_for_completion().
 >
-> On detecting such a case, taint the kernel and spit a nastygram.
-> We'll deal with this in later patches.
+> This causes the vdpa_device_unregister caller to hang and with a
+> usual side-effect of rmmod command not returning when this call
+> is in the module_exit function.
 >
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> This patch converts the wait_for_completion call to its timeout based
+> counterpart (wait_for_completion_timeout) and also adds a warning
+> message to alert the user/administrator about this hang situation.
+>
+> To eventually fix this problem, a mechanism will be required to let
+> vhost-vdpa module inform the userspace of this situation and
+> userspace will close the descriptor of vhost-vdpa char device.
+> This will enable vhost-vdpa to continue with graceful clean-up.
+>
+> Signed-off-by: Gautam Dawar <gdawar@xilinx.com>
 > ---
->  arch/arm64/kvm/vgic/vgic-init.c       | 10 ++++++++++
->  include/kvm/arm_vgic.h                |  3 +++
->  include/linux/irqchip/arm-vgic-info.h |  2 ++
->  3 files changed, 15 insertions(+)
+>   drivers/vhost/vdpa.c | 6 +++++-
+>   1 file changed, 5 insertions(+), 1 deletion(-)
 >
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> index 6752d084934d..340c51d87677 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> @@ -532,6 +532,16 @@ int kvm_vgic_hyp_init(void)
->  		return -ENXIO;
->  	}
->  
-> +	/*
-> +	 * If we get one of these oddball non-GICs, taint the kernel,
-> +	 * as we have no idea of how they *really* behave.
-> +	 */
-> +	if (gic_kvm_info->no_hw_deactivation) {
-> +		kvm_info("Non-architectural vgic, tainting kernel\n");
-> +		add_taint(TAINT_CPU_OUT_OF_SPEC, LOCKDEP_STILL_OK);
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index bfa4c6ef554e..572b64d09b06 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -1091,7 +1091,11 @@ static void vhost_vdpa_remove(struct vdpa_device *vdpa)
+>   		opened = atomic_cmpxchg(&v->opened, 0, 1);
+>   		if (!opened)
+>   			break;
+> -		wait_for_completion(&v->completion);
+> +		wait_for_completion_timeout(&v->completion,
+> +					    msecs_to_jiffies(1000));
+> +		dev_warn_ratelimited(&v->dev,
+> +				     "%s waiting for /dev/%s to be closed\n",
+> +				     __func__, dev_name(&v->dev));
+>   	} while (1);
+>   
+>   	put_device(&v->dev);
 
-I'm trying to figure out what are the effects of tainting the kernel, besides
-those nasty messages. In Documentation/admin-guide/tainted-kernels.rst, I found
-this bit:
 
-[..] the information is mainly of interest once someone wants to investigate some
-problem, as its real cause might be the event that got the kernel tainted. That's
-why bug reports from tainted kernels will often be ignored by developers, hence
-try to reproduce problems with an untainted kernel.
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-The lack of HW deactivation affects only KVM, I was wondering if we could taint
-the kernel the first time a VM created. If the above doc is to go by, someone who
-is running Linux on an M1, but not using KVM, might stand a better chance to get
-support when something goes wrong in that case.
 
-What do you think?
-
-Thanks,
-
-Alex
-
-> +		kvm_vgic_global_state.no_hw_deactivation = true;
-> +	}
-> +
->  	switch (gic_kvm_info->type) {
->  	case GIC_V2:
->  		ret = vgic_v2_probe(gic_kvm_info);
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index ec621180ef09..e45b26e8d479 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -72,6 +72,9 @@ struct vgic_global {
->  	bool			has_gicv4;
->  	bool			has_gicv4_1;
->  
-> +	/* Pseudo GICv3 from outer space */
-> +	bool			no_hw_deactivation;
-> +
->  	/* GIC system register CPU interface */
->  	struct static_key_false gicv3_cpuif;
->  
-> diff --git a/include/linux/irqchip/arm-vgic-info.h b/include/linux/irqchip/arm-vgic-info.h
-> index 7c0d08ebb82c..a75b2c7de69d 100644
-> --- a/include/linux/irqchip/arm-vgic-info.h
-> +++ b/include/linux/irqchip/arm-vgic-info.h
-> @@ -32,6 +32,8 @@ struct gic_kvm_info {
->  	bool		has_v4;
->  	/* rvpeid support */
->  	bool		has_v4_1;
-> +	/* Deactivation impared, subpar stuff */
-> +	bool		no_hw_deactivation;
->  };
->  
->  #ifdef CONFIG_KVM
