@@ -2,92 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EC6C33A82B5
-	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 16:25:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93A153A82BA
+	for <lists+kvm@lfdr.de>; Tue, 15 Jun 2021 16:25:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231274AbhFOO1U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Jun 2021 10:27:20 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:43360 "EHLO
-        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231417AbhFOO0W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Jun 2021 10:26:22 -0400
-Received: from [192.168.86.35] (c-73-38-52-84.hsd1.vt.comcast.net [73.38.52.84])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 46E8720B6C50;
-        Tue, 15 Jun 2021 07:24:14 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 46E8720B6C50
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1623767057;
-        bh=cTHCck5KxKI/CP9LuHPjfsJBbv22Q8bxdprLpu918Iw=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=gVGORou0bGGK/tDWC+ScR4xEWsbnBBcs7/CdN1MOHGlJIH94UjEqOAvgBSDKHS35O
-         ceRtBHHCZbXj840On4Gh5lNTG9vo8IO0hh39xOjN8gOoSv2dGDgXnASaf84hDDoEPT
-         HtxukizWCqySB5fOlL+ii6Hx3XawlTf52rssJQWI=
-Subject: Re: [PATCH v5 7/7] KVM: SVM: hyper-v: Direct Virtual Flush support
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        Lan Tianyu <Tianyu.Lan@microsoft.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Wei Liu <wei.liu@kernel.org>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-References: <cover.1622730232.git.viremana@linux.microsoft.com>
- <fc8d24d8eb7017266bb961e39a171b0caf298d7f.1622730232.git.viremana@linux.microsoft.com>
- <878s3c65nr.fsf@vitty.brq.redhat.com>
-From:   Vineeth Pillai <viremana@linux.microsoft.com>
-Message-ID: <73508c14-3ca6-1d20-8f9e-14bd966c849a@linux.microsoft.com>
-Date:   Tue, 15 Jun 2021 10:24:14 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+        id S231466AbhFOO1h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Jun 2021 10:27:37 -0400
+Received: from foss.arm.com ([217.140.110.172]:37076 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231384AbhFOO1T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Jun 2021 10:27:19 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4E12212FC;
+        Tue, 15 Jun 2021 07:25:14 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CD51A3F719;
+        Tue, 15 Jun 2021 07:25:12 -0700 (PDT)
+Subject: Re: [PATCH v4 4/9] KVM: arm64: vgic: Let an interrupt controller
+ advertise lack of HW deactivation
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Hector Martin <marcan@marcan.st>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, kernel-team@android.com
+References: <20210601104005.81332-1-maz@kernel.org>
+ <20210601104005.81332-5-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <fa1fee85-04c6-d0a8-bd93-64d2ebc32e4a@arm.com>
+Date:   Tue, 15 Jun 2021 15:26:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <878s3c65nr.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20210601104005.81332-5-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Vitaly,
->> +
->> +static inline void svm_hv_update_vp_id(struct vmcb *vmcb,
->> +		struct kvm_vcpu *vcpu)
->> +{
->> +	struct hv_enlightenments *hve =
->> +		(struct hv_enlightenments *)vmcb->control.reserved_sw;
->> +
->> +	if (hve->hv_vp_id != to_hv_vcpu(vcpu)->vp_index) {
->> +		hve->hv_vp_id = to_hv_vcpu(vcpu)->vp_index;
->> +		vmcb_mark_dirty(vmcb, VMCB_HV_NESTED_ENLIGHTENMENTS);
->> +	}
-> This blows up in testing when no Hyper-V context was created on a vCPU,
-> e.g. when running KVM selftests (to_hv_vcpu(vcpu) is NULL when no
-> Hyper-V emulation features were requested on a vCPU but
-> svm_hv_update_vp_id() is called unconditionally by svm_vcpu_run()).
->
-> I'll be sending a patch to fix the immediate issue but I was wondering
-> why we need to call svm_hv_update_vp_id() from svm_vcpu_run() as VP
-> index is unlikely to change; we can probably just call it from
-> kvm_hv_set_msr() instead.
-Thanks a lot for catching this.
+Hi Marc,
 
-I think you are right, updating at kvm_hv_set_msr() makes sense. I was
-following the vmx logic where it also sets the vp_id in vmx_vcpu_run. But it
-calls a wrapper "kvm_hv_get_vpindex" which actually checks if hv_vcpu is not
-null before the assignment. I should have used that instead, my mistake.
-I will look a bit more into it and send out a patch for vmx and svm 
-after little
-more investigation.
+On 6/1/21 11:40 AM, Marc Zyngier wrote:
+> The vGIC, as architected by ARM, allows a virtual interrupt to
+> trigger the deactivation of a physical interrupt. This allows
+> the following interrupt to be delivered without requiring an exit.
+>
+> However, some implementations have choosen not to implement this,
+> meaning that we will need some unsavoury workarounds to deal with this.
+>
+> On detecting such a case, taint the kernel and spit a nastygram.
+> We'll deal with this in later patches.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/vgic/vgic-init.c       | 10 ++++++++++
+>  include/kvm/arm_vgic.h                |  3 +++
+>  include/linux/irqchip/arm-vgic-info.h |  2 ++
+>  3 files changed, 15 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index 6752d084934d..340c51d87677 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -532,6 +532,16 @@ int kvm_vgic_hyp_init(void)
+>  		return -ENXIO;
+>  	}
+>  
+> +	/*
+> +	 * If we get one of these oddball non-GICs, taint the kernel,
+> +	 * as we have no idea of how they *really* behave.
+> +	 */
+> +	if (gic_kvm_info->no_hw_deactivation) {
+> +		kvm_info("Non-architectural vgic, tainting kernel\n");
+> +		add_taint(TAINT_CPU_OUT_OF_SPEC, LOCKDEP_STILL_OK);
+
+I'm trying to figure out what are the effects of tainting the kernel, besides
+those nasty messages. In Documentation/admin-guide/tainted-kernels.rst, I found
+this bit:
+
+[..] the information is mainly of interest once someone wants to investigate some
+problem, as its real cause might be the event that got the kernel tainted. That's
+why bug reports from tainted kernels will often be ignored by developers, hence
+try to reproduce problems with an untainted kernel.
+
+The lack of HW deactivation affects only KVM, I was wondering if we could taint
+the kernel the first time a VM created. If the above doc is to go by, someone who
+is running Linux on an M1, but not using KVM, might stand a better chance to get
+support when something goes wrong in that case.
+
+What do you think?
 
 Thanks,
-Vineeth
 
+Alex
+
+> +		kvm_vgic_global_state.no_hw_deactivation = true;
+> +	}
+> +
+>  	switch (gic_kvm_info->type) {
+>  	case GIC_V2:
+>  		ret = vgic_v2_probe(gic_kvm_info);
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index ec621180ef09..e45b26e8d479 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -72,6 +72,9 @@ struct vgic_global {
+>  	bool			has_gicv4;
+>  	bool			has_gicv4_1;
+>  
+> +	/* Pseudo GICv3 from outer space */
+> +	bool			no_hw_deactivation;
+> +
+>  	/* GIC system register CPU interface */
+>  	struct static_key_false gicv3_cpuif;
+>  
+> diff --git a/include/linux/irqchip/arm-vgic-info.h b/include/linux/irqchip/arm-vgic-info.h
+> index 7c0d08ebb82c..a75b2c7de69d 100644
+> --- a/include/linux/irqchip/arm-vgic-info.h
+> +++ b/include/linux/irqchip/arm-vgic-info.h
+> @@ -32,6 +32,8 @@ struct gic_kvm_info {
+>  	bool		has_v4;
+>  	/* rvpeid support */
+>  	bool		has_v4_1;
+> +	/* Deactivation impared, subpar stuff */
+> +	bool		no_hw_deactivation;
+>  };
+>  
+>  #ifdef CONFIG_KVM
