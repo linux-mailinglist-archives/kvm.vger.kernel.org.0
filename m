@@ -2,212 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB35F3A8D25
-	for <lists+kvm@lfdr.de>; Wed, 16 Jun 2021 02:02:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE6D73A8D5B
+	for <lists+kvm@lfdr.de>; Wed, 16 Jun 2021 02:22:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231169AbhFPAFA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Jun 2021 20:05:00 -0400
-Received: from mga05.intel.com ([192.55.52.43]:16211 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229811AbhFPAFA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Jun 2021 20:05:00 -0400
-IronPort-SDR: xaNVv+osq1ONl1k/sn+JuVqALszLi/4otbkjLu9N1cjNKt2kn/ZYIK+tZujZIH+kwbPEXS187z
- om05wSvkxSAQ==
-X-IronPort-AV: E=McAfee;i="6200,9189,10016"; a="291720298"
-X-IronPort-AV: E=Sophos;i="5.83,276,1616482800"; 
-   d="scan'208";a="291720298"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2021 17:02:55 -0700
-IronPort-SDR: iG598vUl0++JcPL0AY6F7Wy4zxfWbG5QD/ePyblkkDHHMOFmfHmrEkYprxNEwtpNQQzs94ozXF
- zWJ2DiBK+y9Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.83,276,1616482800"; 
-   d="scan'208";a="637280631"
-Received: from fmsmsx604.amr.corp.intel.com ([10.18.126.84])
-  by fmsmga006.fm.intel.com with ESMTP; 15 Jun 2021 17:02:55 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.4; Tue, 15 Jun 2021 17:02:54 -0700
-Received: from fmsmsx606.amr.corp.intel.com (10.18.126.86) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.4; Tue, 15 Jun 2021 17:02:53 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4
- via Frontend Transport; Tue, 15 Jun 2021 17:02:53 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.109)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.4; Tue, 15 Jun 2021 17:02:53 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jo4Dc036XyV/hICLhecXCTb9jQzaAhSZCb7OpRt47qmZi3EqyfE3KpEVfB2NpxZg5D+AJ3c/SBA2/3km/3u920xi7i836B0Atvp1vCuOPR3Y+ONRCZt3ezFdCHkH9FK6Qt1/X+XsQJvTOSAHL20BIINA825EvvIDyR+uqn1d38HFfX0xUNI8GrVGmVJZ2xQ+TVbl+X2A9A0SYDp/h7xMvndDQF++vWMYzxKGWVlsDtJzeocEZYtfAykpVuL1njEVSVvY36mBfh1inznIzFtmzPNjjDdRTZqYF0/M31ScsYp0xF7d5jAYARZ+E9lgCS9IG15uucSulWDVEo04UMPcNw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=j68gUsh6pnpYP72F3/d0rfG91gYp2ftLCCIwUDeP790=;
- b=joLFUvUsbTutQXuQHZOWPrcDikD1PIJrF68d21Ydze6a6zYGuVfufluHD7+iPVOItM46uRx2moFY+44ssG+ccxzwlHqp5jWJUGwcM+GCpbY5flpY8Ccg/1yOvjIf/pf8BHpbwQhr9KUpexO074/qt8gp+FXD8j/m9Q0qt7ok5ag8DY406eY3n1O0yKJoL09SvMHd5wimfCEbzMxI+qSUjXVJJRIjUYekzD4toXJcTNhmb7ytNNF4inBJuVOO82rsplFu5gwl5ZT6dejGS/9nizGYWgsJXnOJKW7WKamKpl8i4uMcMFQ7KWR7BZjOmsrgocfaqmX5N0ALACCacamKEA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=j68gUsh6pnpYP72F3/d0rfG91gYp2ftLCCIwUDeP790=;
- b=gQflc6N/a1sGx0xRtDzhTduxkJjZvjbLZPgI/bH+8O2FXk2DQmmYChMD/T8OPHjVkv1ogZDN9kLI89qW3fzBRoKRzV5EpH2Lx6Z4HXeZct55i44hUVuUbOMSu8UzZN+BvHQoKYLIHWFRhIdoA8vmsfM0IxpuAZLDN/5VAOXM6TE=
-Received: from MWHPR11MB1886.namprd11.prod.outlook.com (2603:10b6:300:110::9)
- by MWHPR1101MB2128.namprd11.prod.outlook.com (2603:10b6:301:55::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.24; Wed, 16 Jun
- 2021 00:02:20 +0000
-Received: from MWHPR11MB1886.namprd11.prod.outlook.com
- ([fe80::6597:eb05:c507:c6c1]) by MWHPR11MB1886.namprd11.prod.outlook.com
- ([fe80::6597:eb05:c507:c6c1%12]) with mapi id 15.20.4219.025; Wed, 16 Jun
- 2021 00:02:19 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
+        id S231243AbhFPAY4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Jun 2021 20:24:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47206 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230265AbhFPAY4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 15 Jun 2021 20:24:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623802970;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=96W9ObeAa9W1zLErX3qE6onuuwnGd7cmFxO+aYCStiU=;
+        b=iTq7vf3JBcp+8PltTpMSQ2sVB+2eY2jkzQ2fRfpjpj1kd6YtIXTCysm7EYgpFHSK5IzAm9
+        BsiebksNUC2ovfYhUySyNwftQSj9X8EH5f3makU58s2PvePWGnx5NiYUwotFFgp7uqwhzN
+        Ux3yoTYS+OCidd1fn16Ga07VE/qLYQQ=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-149-YNYqGPiWMaGGonLD8ljXHg-1; Tue, 15 Jun 2021 20:22:49 -0400
+X-MC-Unique: YNYqGPiWMaGGonLD8ljXHg-1
+Received: by mail-ot1-f72.google.com with SMTP id e28-20020a9d491c0000b02903daf90867beso408833otf.11
+        for <kvm@vger.kernel.org>; Tue, 15 Jun 2021 17:22:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=96W9ObeAa9W1zLErX3qE6onuuwnGd7cmFxO+aYCStiU=;
+        b=IjOrgyVVKlFkvbSTUkmLI2Rvm1ax4ZUpuKuw21Tqs827TndyrYE/aCkfIzo4zF6bJt
+         TYqfs7ydTr3quUlWpkRbpsjo98SoSKBrZINuO5Vr5zZbtNOr7Wb+3DM7rfhC8HMryGpj
+         g4xFTE/N0Rrv/auqJIXF6b4LGOqmioffDLNtPzCgQIRpGYIEN+wIvFriaRvxVvRuXPdS
+         zlKI246ua7/EdWfW04O0Ryy0ilXJ5iSTK4CThd+LbBA5rtuqjFvjhsHJaDkD3hxKQpFP
+         NHNy0J2Vc+azQFWu65mmDuPQ6pmRk+PtxIqojwRbaLyFS066hdXM3s+DoYzhOXzRY+Ih
+         8IUw==
+X-Gm-Message-State: AOAM531FqIXOV7tBAMHUxt2yOpvTrd6W5wQvY7/72WXqGLR6/Nn3Xsqn
+        10dZ7LVUg2sAeUb4BPk99H7Fcc13CUSTaRYyRHWhvWQyg8+crMdIHgw0ivGcXF0zL32RnluGXwz
+        18vmHdCrj2C4L
+X-Received: by 2002:a9d:748e:: with SMTP id t14mr1480310otk.354.1623802969012;
+        Tue, 15 Jun 2021 17:22:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwUy1kGs8W5keA7171knm6ubxaHOrsyjoknw7ilTs6B57C9ucbR3SJSu0kyztVx1znGvA80VA==
+X-Received: by 2002:a9d:748e:: with SMTP id t14mr1480295otk.354.1623802968818;
+        Tue, 15 Jun 2021 17:22:48 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id l10sm135120otj.17.2021.06.15.17.22.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Jun 2021 17:22:48 -0700 (PDT)
+Date:   Tue, 15 Jun 2021 18:22:45 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Alex Williamson (alex.williamson@redhat.com)" 
-        <alex.williamson@redhat.com>, "Raj, Ashok" <ashok.raj@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Jonathan Corbet" <corbet@lwn.net>,
-        Robin Murphy <robin.murphy@arm.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "David Gibson" <david@gibson.dropbear.id.au>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jason Wang <jasowang@redhat.com>
-Subject: RE: [RFC] /dev/ioasid uAPI proposal
-Thread-Topic: [RFC] /dev/ioasid uAPI proposal
-Thread-Index: AddSzQ97BhCb3gd8AUyldaDZ6yOMNABTUTCAAQiuDaAADwOFgAJSmyVgAA0fjwAAEFKEEAAASwWAAAAgcXAAATmRgAAAC9RgAACZuQAAAAd+oA==
-Date:   Wed, 16 Jun 2021 00:02:19 +0000
-Message-ID: <MWHPR11MB1886298A9D202A966F1D4DA68C0F9@MWHPR11MB1886.namprd11.prod.outlook.com>
-References: <20210528233649.GB3816344@nvidia.com>
- <MWHPR11MB188621A9D1181A414D5491198C3C9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210603130519.GY1002214@nvidia.com>
- <MWHPR11MB1886BA2258AFD92D5249AC488C309@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210615150630.GS1002214@nvidia.com>
- <MWHPR11MB1886E9553A5054DF7D51F27D8C309@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210615230215.GA1002214@nvidia.com>
- <MWHPR11MB1886A0CAB3AFF424A4A090038C309@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210615234057.GC1002214@nvidia.com>
- <MWHPR11MB1886FD4121F754A6F7C2102A8C309@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210615235928.GD1002214@nvidia.com>
-In-Reply-To: <20210615235928.GD1002214@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-version: 11.5.1.3
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-authentication-results: nvidia.com; dkim=none (message not signed)
- header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [101.80.71.101]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2a6a79d6-ea2a-479e-d5a9-08d9305a026d
-x-ms-traffictypediagnostic: MWHPR1101MB2128:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR1101MB2128C9C44EE6559E58E613D08C0F9@MWHPR1101MB2128.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6430;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: nVNycm3PyjTJVKGWYmaqC77OJxHxTr+R1O174M4zZvA5KDOkipQ9VgMlgPNX2pddKW0k3yRBziNKMKbxkkxuDAs+wwqDZ5/A94hyd/Vlt6XnwYYq8oWbb4+Bh+iAwU8Trd1SVE4qP4KzToVb29YGDARyYf6Dldg+ni1pZI2tSCHxaee5PaRP9QnuDjLax0P6GuewoXmnL9sdbLYi/kkx/2uhSsEdWT4I6mEoyabFkxh9r1s8BLE7zlwtr4fllOa6ShrAgz/wDbdcEHOqt89euBYnA/WKKsA6UOJnQKgCihZXmAqx9vQWWJr9ooFBy5LJA5zyVk9pcMZpWFoDFCKwkrufDSrRhZN0ONcCdmtQpTu36KuzfJr3+tRWviEN+UOZZOrawrsUZYiqk/TvsLpCScb4N6ODNEwIhWMadLFXmsbhntUdx7q5TT18jV/53HVwo3n6FWA1SXd885IUtO5UYIcc7Q/Bcln4wEsysiUiJHsm3rp+Cek62Zi624CZKf3bxzE5Abi1qdpgDnMQ9bjudnUGrnzmbBzZ2gUgFG81nO7CkNXuHkJBLG2Kgo8mD0vylwcHzF0eHn0wZMX28FX4ps4eDJ5CD7b33IAZ36Rn8wA=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1886.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(366004)(396003)(39860400002)(136003)(376002)(5660300002)(52536014)(76116006)(9686003)(66946007)(66476007)(55016002)(478600001)(38100700002)(64756008)(122000001)(66556008)(66446008)(6506007)(316002)(2906002)(7696005)(4326008)(33656002)(26005)(8676002)(71200400001)(86362001)(6916009)(54906003)(7416002)(8936002)(186003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?x/JVhxiaCNFDsBzN3ZEjVHF7yjKJZ3iS42S/aDQLGwkkug/ymnvg/OOkM1Af?=
- =?us-ascii?Q?YmBDXtYofF0McXCXtTqhd/pcTnbI74lKnZmcso8bBVXY8lml4ECJOXdw9G9P?=
- =?us-ascii?Q?ppbjWJ+NnwMnOwF+PlBBrJCNLtOyQHhSu9kDx7W/VM/gqpuA2up4BTSu7Q5t?=
- =?us-ascii?Q?agS62DOhijXFEm9xB380j/Eu6pE6spJ95L1YryXsGPiXm0vTN9TADJiZ7gRE?=
- =?us-ascii?Q?CTsupo+r4Tjffy62sv+8v4zDG4oE0eICnKxOaMJ+1zl45xR0FLyVM0d5lZs+?=
- =?us-ascii?Q?wyjxZmZPYViWGBKjalcBU1Jv4FiJQ6rZ75DxrUy9qF7CK92k0HCW3KcaT5x/?=
- =?us-ascii?Q?8KxmzZKx07jSIn7/Bo+kMycOg+1bObVYHzsx/lOEzoMzJI9IFP0kpYZRzZLe?=
- =?us-ascii?Q?5t7VCUJJ8ywIXz9XkBfVCbsNJ/y2bbM7TBPgGAMPKGd6jDMG8MCREuNbbeDX?=
- =?us-ascii?Q?IZKk1HHeBCbrVjckau257f2QYnS2w5S1HUgxjQtChY0J4npWd1qtj8QlYMjy?=
- =?us-ascii?Q?WCuF4htgjc0qoZdyBWtriik0OtuyufxgyD9/BOaOVMvlO5pmqxTotJhPeXcL?=
- =?us-ascii?Q?OTZq12iciVUoypeCT+NZKXRRzebToNUhww36SerIxRyPyYXd9J91Y0qkJtGH?=
- =?us-ascii?Q?0fDoGv1dWGpXHwtf7GAR6ZlJVThiz01CR+l9A0f6YVXKPDAvDAJONv/xN8Eq?=
- =?us-ascii?Q?b8RmQz20LswefYBHkojstQ/FlzXLjRZJIho/U2EHGLiE1kMqTcTZn4jNfhQP?=
- =?us-ascii?Q?n963Lk1VqBbahYRmWVgnsvKQW70GZ/IcxMb2/oAi8zdyCqdHiMopX3DnScDh?=
- =?us-ascii?Q?adfRpNFXe4cNrIEV+nCq7+5ciRc4vPd9Xr+g2FPpcUpbrJdCFdD8pvkiEQ9J?=
- =?us-ascii?Q?51UzLqWZPYbeZtReJqXgmx8KIqKC8nqjFbjVnqlGZ8G9qBNiLKI+HjQGCN56?=
- =?us-ascii?Q?DT4Skf3b1a0Zl9qX3krPwVdf8DD2w0uY15fFj5XMgXlcvP/MsyelVOpjOVhD?=
- =?us-ascii?Q?zthUgrEQ6huoKPulEeLrC53XTVF4/bht2/UyLc/b5XapZHb3DDR2NDePM/Ro?=
- =?us-ascii?Q?H+bLBSJCdWh+6/FEvEwEdyiugznswF3PsGaTlYI5ivNPixnzTBF0XpVMj1HG?=
- =?us-ascii?Q?TKhz/rwremSnx47dUtHRqPP4VHidwrpP/TPRXZSZUOd/3POfvDhMPPN1D/sQ?=
- =?us-ascii?Q?J430hiBETkjHjd8eB06sW1J6bUQPi5VnFbUnUmwJzgFXCxO0cheoL+Jd+A3C?=
- =?us-ascii?Q?4MdEjRDvmH0oINUHaj2hEkOMnyTqT7UUw+IR4ukDqHzQDAnS6WIe2wl0bkud?=
- =?us-ascii?Q?0Dd6SspJhAI5RzbuiSdSHPFi?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>, cohuck@redhat.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        aviadye@nvidia.com, oren@nvidia.com, shahafs@nvidia.com,
+        parav@nvidia.com, artemp@nvidia.com, kwankhede@nvidia.com,
+        ACurrid@nvidia.com, cjia@nvidia.com, yishaih@nvidia.com,
+        kevin.tian@intel.com, hch@infradead.org, targupta@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, liulongfang@huawei.com,
+        yan.y.zhao@intel.com
+Subject: Re: [PATCH 09/11] PCI: add matching checks for driver_override
+ binding
+Message-ID: <20210615182245.54944509.alex.williamson@redhat.com>
+In-Reply-To: <20210615233257.GB1002214@nvidia.com>
+References: <117a5e68-d16e-c146-6d37-fcbfe49cb4f8@nvidia.com>
+        <20210614124250.0d32537c.alex.williamson@redhat.com>
+        <70a1b23f-764d-8b3e-91a4-bf5d67ac9f1f@nvidia.com>
+        <20210615090029.41849d7a.alex.williamson@redhat.com>
+        <20210615150458.GR1002214@nvidia.com>
+        <20210615102049.71a3c125.alex.williamson@redhat.com>
+        <20210615204216.GY1002214@nvidia.com>
+        <20210615155900.51f09c15.alex.williamson@redhat.com>
+        <20210615230017.GZ1002214@nvidia.com>
+        <20210615172242.4b2be854.alex.williamson@redhat.com>
+        <20210615233257.GB1002214@nvidia.com>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1886.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2a6a79d6-ea2a-479e-d5a9-08d9305a026d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jun 2021 00:02:19.5158
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: hH48+eHxUiYbhaAs583sUrS3ygZq+Ds6UhbmxjLyN5lUOWQLQaR4xVfQWobN/ihB4bzhyNefDEENyuJAZrtaIg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1101MB2128
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Wednesday, June 16, 2021 7:59 AM
->=20
-> On Tue, Jun 15, 2021 at 11:56:28PM +0000, Tian, Kevin wrote:
-> > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > Sent: Wednesday, June 16, 2021 7:41 AM
-> > >
-> > > On Tue, Jun 15, 2021 at 11:09:37PM +0000, Tian, Kevin wrote:
-> > >
-> > > > which information can you elaborate? This is the area which I'm not
-> > > > familiar with thus would appreciate if you can help explain how thi=
-s
-> > > > bus specific information is utilized within the attach function or
-> > > > sometime later.
-> > >
-> > > This is the idea that the device driver needs to specify which bus
-> > > specific protocol it uses to issue DMA's when it attaches itself to a=
-n
-> > > IOASID. For PCI:
-> >
-> > What about defining some general attributes instead of asking iommu
-> > fd to understand those bus specific detail?
->=20
-> I prefer the API be very clear and intent driven, otherwise things
-> just get confused.
->=20
-> The whole WBINVD/no-snoop discussion I think is proof of that :\
->=20
-> > from iommu p.o.v there is no difference from last one. In v2 the device
-> > driver just needs to communicate the PASID virtualization policy at
-> > device binding time,
->=20
-> I want it documented in the kernel source WTF is happening, because
-> otherwise we are going to be completely lost in a few years. And your
-> RFC did have device driver specific differences here
->=20
-> > > The device knows what it is going to do, we need to convey that to th=
-e
-> > > IOMMU layer so it is prepared properly.
-> >
-> > Yes, but it's not necessarily to have iommu fd understand bus specific
-> > attributes. In the end when /dev/iommu uAPI calls iommu layer interface=
-,
-> > it's all bus agnostic.
->=20
-> Why not? Just put some inline wrappers to translate the bus specific
-> language to your generic language if that is what makes the most
-> sense.
->=20
+On Tue, 15 Jun 2021 20:32:57 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-I can do this. Thanks
+> On Tue, Jun 15, 2021 at 05:22:42PM -0600, Alex Williamson wrote:
+> 
+> > > > b) alone is a functional, runtime difference.    
+> > > 
+> > > I would state b) differently:
+> > > 
+> > > b) Ignore the driver-override-only match entries in the ID table.  
+> > 
+> > No, pci_match_device() returns NULL if a match is found that is marked
+> > driver-override-only and a driver_override is not specified.  That's
+> > the same as no match at all.  We don't then go on to search past that
+> > match in the table, we fail to bind the driver.  That's effectively an
+> > anti-match when there's no driver_override on the device.  
+> 
+> anti-match isn't the intention. The deployment will have match tables
+> where all entires are either flags=0 or are driver-override-only.
+
+I'd expect pci-pf-stub to have one of each, an any-id with
+override-only flag and the one device ID currently in the table with
+no flag.
+
+> I would say that mixed match tables make driver-override-only into an
+> anti-match is actually a minor bug in the patch.
+> 
+> The series isn't about adding some new anti-match scheme.
+> 
+> > I understand that's not your intended use case, but I think this allows
+> > that and justifies handling a dynamic ID the same as a static ID.
+> > Adding a field to pci_device_id, which is otherwise able to be fully
+> > specified via new_id, except for this field, feels like a bug.  Thanks,  
+> 
+> Okay, I see what you are saying clearly now.
+> 
+> Your example usage seems legit to me, but I really don't want to
+> entangle it with this series. It is a seperate idea, it can go as a
+> seperate work that uses the new flags and an updated new_id and
+> related parts by someone who wants it.
+> 
+> I hope you'll understand that having NVIDIA Mellanox persue what you
+> describe above is just not going to work..
+
+I understand that use case might hit a nerve, but I don't particularly
+see why handling static and dynamic IDs consistently wrt to this new
+flags field is controversial.  Thanks,
+
+Alex
+
