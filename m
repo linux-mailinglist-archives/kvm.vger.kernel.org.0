@@ -2,134 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16C1F3A9B84
-	for <lists+kvm@lfdr.de>; Wed, 16 Jun 2021 15:07:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62ECF3A9B88
+	for <lists+kvm@lfdr.de>; Wed, 16 Jun 2021 15:07:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233209AbhFPNJH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Jun 2021 09:09:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58148 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232796AbhFPNJC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 16 Jun 2021 09:09:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623848816;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4FsZ+W5sZrXednhxFcSgtJDgo1UvbrnapydD3pMYxu0=;
-        b=SbnoJVFbPc5m3jCfd3MfFq2/voG3/eKBafj6zQrzQ2K0/I5sr24JLyXz7iYGKn79hrhPIP
-        F7vzhX9mVE5BUH25HHwyh1ihfYiAi/yLv/HwklIECiDwzSQ0C4xgJ3JM2X86NjuNwkKpn7
-        5SdknqJzhttPYRokwApNi9imHBNGmeA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-499-sU_-JDyPP9G0uvfGozhLNg-1; Wed, 16 Jun 2021 09:06:55 -0400
-X-MC-Unique: sU_-JDyPP9G0uvfGozhLNg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAC9E801B3E;
-        Wed, 16 Jun 2021 13:06:51 +0000 (UTC)
-Received: from work-vm (ovpn-115-42.ams2.redhat.com [10.36.115.42])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id EA5666062C;
-        Wed, 16 Jun 2021 13:06:44 +0000 (UTC)
-Date:   Wed, 16 Jun 2021 14:06:42 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
-        npmccallum@redhat.com
-Subject: Re: [PATCH Part1 RFC v3 11/22] x86/sev: Add helper for validating
- pages in early enc attribute changes
-Message-ID: <YMn3Yqp8Jq3TUhvv@work-vm>
-References: <20210602140416.23573-1-brijesh.singh@amd.com>
- <20210602140416.23573-12-brijesh.singh@amd.com>
- <YMI02+k2zk9eazjQ@zn.tnic>
- <d0759889-94df-73b0-4285-fa064eb187cd@amd.com>
- <YMen5wVqR31D/Q4z@zn.tnic>
- <70db789d-b1aa-c355-2d16-51ace4666b3f@amd.com>
- <YMnNYNBvEEAr5kqd@zn.tnic>
- <f7e70782-701c-13dd-43d2-67c92f8cf36f@amd.com>
- <YMnoeRcuMfAqX5Vf@zn.tnic>
- <9f012bcb-4756-600d-6fe8-b1db9b972f17@amd.com>
+        id S233201AbhFPNJJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Jun 2021 09:09:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33402 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233003AbhFPNJD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Jun 2021 09:09:03 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A880C61166;
+        Wed, 16 Jun 2021 13:06:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1623848817;
+        bh=l3BVCUTicXiNitfu26Uk7GtYcqn8uOw7hik+5CCmvhg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=DKdUNdduS++XEpc7PJqJX2aFVa6EIEVqQeGNKi15vCvZwTMCneifVqOvyMRTNHWWr
+         Zf+VxwATaut+GC8lSV94tAx0U8zTg16nkIBd5CNL1HxoUc6e0UvfsdUWy+gLoGQ9y3
+         fHcdn/YSuYLHNwJMhO0KjlY62eptk6e5/dQpwcpURcdO84Le0Iwb/hgACEznSGgOuk
+         tFl/46MKQEW+L/2II2sRdIMn5cYDscCeG0lOIKuC86bRoSWm88VSxU+EvMxpE99sl5
+         N/p8c6niqh8Nk8xF27xToAoWQR/caRJxmIqcYot/NEAb5PTaprAQ5x9+dCrWjzkhDs
+         GZSAdbq0/Gg4A==
+Date:   Wed, 16 Jun 2021 16:06:52 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Cai Huoqing <caihuoqing@baidu.com>
+Cc:     mst@redhat.com, jasowang@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH] vhost: add vhost_test to Kconfig & Makefile
+Message-ID: <YMn3bGIhrMEzguP7@unreal>
+References: <20210616120734.1050-1-caihuoqing@baidu.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9f012bcb-4756-600d-6fe8-b1db9b972f17@amd.com>
-User-Agent: Mutt/2.0.7 (2021-05-04)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20210616120734.1050-1-caihuoqing@baidu.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Brijesh Singh (brijesh.singh@amd.com) wrote:
+On Wed, Jun 16, 2021 at 08:07:34PM +0800, Cai Huoqing wrote:
+> When running vhost test, make it easier to config
 > 
-> On 6/16/21 7:03 AM, Borislav Petkov wrote:
-> > On Wed, Jun 16, 2021 at 06:00:09AM -0500, Brijesh Singh wrote:
-> >> I am trying to be consistent with previous VMGEXIT implementations. If
-> >> the command itself failed then use the command specific error code to
-> >> tell hypervisor why we terminated but if the hypervisor violated the
-> >> GHCB specification then use the "general request termination".
-> > I feel like we're running in circles here: I ask about debuggability
-> > and telling the user what exactly failed and you're giving me some
-> > explanation about what the error codes mean. I can see what they mean.
-> >
-> > So let me try again:
-> >
-> > Imagine you're a guest owner and you haven't written the SNP code and
-> > you don't know how it works.
-> >
-> > You start a guest in the public cloud and it fails because the
-> > hypervisor violates the GHCB protocol and all that guest prints before
-> > it dies is
-> >
-> > "general request termination"
+> Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
+> ---
+>  drivers/vhost/Kconfig  | 12 ++++++++++++
+>  drivers/vhost/Makefile |  3 +++
+>  2 files changed, 15 insertions(+)
 > 
-> 
-> The GHCB specification does not define a unique error code for every
-> possible condition. Now that we have reserved reason set 1 for the
-> Linux-specific error code, we could add a new error code to cover the
-> cases for the protocol violation. I was highlighting that we should not
-> overload the meaning of GHCB_TERM_PSC. In my mind, the GHCB_TERM_PSC
-> error code is used when the guest sees that the hypervisor failed to
-> change the state . The failure maybe because the guest provided a bogus
-> GPA or invalid operation code, or RMPUPDATE failure or HV does not
-> support SNP feature etc etc. But in this case, the failure was due to
-> the protocol error, and IMO we should not use the GHCB_TERM_PSC.
-> Additionally, we should also update CPUID and other VMGEXITs to use the
-> new error code instead of "general request termination" so that its
-> consistent.
-> 
-> 
-> If you still think that GHCB_TERM_PSC is valid here, then I am okay with it.
+> diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+> index 587fbae06182..c93c12843a6f 100644
+> --- a/drivers/vhost/Kconfig
+> +++ b/drivers/vhost/Kconfig
+> @@ -61,6 +61,18 @@ config VHOST_VSOCK
+>         To compile this driver as a module, choose M here: the module will be called
+>         vhost_vsock.
+>  
+> +config VHOST_TEST
+> +       tristate "vhost virtio-test driver"
+> +       depends on EVENTFD
+> +       select VHOST
+> +       default n
 
-I'd kind of agree with Borislav, the more hints we can have as to the
-actual failure reason the better - so if you've got multiple cases
-where the guest thinks the hypervisor has screwed up, find a way to give
-an error code to tell us which one.
+You don't need to write explicitly "default n". "No" is already default.
 
-Dave
+Thanks
 
-> -Brijesh
+> +       help
+> +       This kernel module can be loaded in the host kernel to test vhost function
+> +       with tools/virtio-test.
+> +
+> +       To compile this driver as a module, choose M here: the module will be called
+> +       vhost_test.
+> +
+>  config VHOST_VDPA
+>         tristate "Vhost driver for vDPA-based backend"
+>         depends on EVENTFD
+> diff --git a/drivers/vhost/Makefile b/drivers/vhost/Makefile
+> index f3e1897cce85..cf31c1f2652d 100644
+> --- a/drivers/vhost/Makefile
+> +++ b/drivers/vhost/Makefile
+> @@ -8,6 +8,9 @@ vhost_scsi-y := scsi.o
+>  obj-$(CONFIG_VHOST_VSOCK) += vhost_vsock.o
+>  vhost_vsock-y := vsock.o
+>  
+> +obj-$(CONFIG_VHOST_TEST) += vhost_test.o
+> +vhost_test-y := test.o
+> +
+>  obj-$(CONFIG_VHOST_RING) += vringh.o
+>  
+>  obj-$(CONFIG_VHOST_VDPA) += vhost_vdpa.o
+> -- 
+> 2.22.0
 > 
-> 
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
