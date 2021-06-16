@@ -2,98 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 54B473AA3B6
-	for <lists+kvm@lfdr.de>; Wed, 16 Jun 2021 21:02:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B30BA3AA451
+	for <lists+kvm@lfdr.de>; Wed, 16 Jun 2021 21:28:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232237AbhFPTEL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Jun 2021 15:04:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35592 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232025AbhFPTEK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 16 Jun 2021 15:04:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623870123;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RLkAGByXY0zUpu2RkDB2e3cU603Rpn9/oplrhU5cYHE=;
-        b=U9eNRiWEbU8g0Zo1CWBy0iYPc66re9S1YgM4UKlJiBvUUJ1eiJxtpvYcoUHYBtgd1SINmK
-        QQtjO//5Zhd6IL77mp1EpW8Uq0zZdLCBm3z2eIgrSw8l/1iufOOCKvbC6fJIDGj5R/+14Z
-        ZQdvD0I/I6uX1x0fy5wmje2++XNYPFo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-114-loLHccfmPXiQ0F_AJi5uew-1; Wed, 16 Jun 2021 15:02:02 -0400
-X-MC-Unique: loLHccfmPXiQ0F_AJi5uew-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3878580364C;
-        Wed, 16 Jun 2021 19:02:01 +0000 (UTC)
-Received: from starship (unknown [10.40.194.6])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D743F61145;
-        Wed, 16 Jun 2021 19:01:58 +0000 (UTC)
-Message-ID: <83be37371a61efa72c4364f1dc9a26d19750d8cc.camel@redhat.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Grab nx_lpage_splits as an unsigned long
- before division
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S232583AbhFPTaH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Jun 2021 15:30:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35966 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232357AbhFPTaG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Jun 2021 15:30:06 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 461D4C061574
+        for <kvm@vger.kernel.org>; Wed, 16 Jun 2021 12:28:00 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id k6so2980211pfk.12
+        for <kvm@vger.kernel.org>; Wed, 16 Jun 2021 12:28:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=HKHWGTrGy4FXlfxw+kBA8/G3Swt20UvMDMHWd03XfSI=;
+        b=MvpzMUsWPVTqOgUKRuNaLOxMgx7TX6OCIW6JKZu9OmkLTfXDulnStMcRc+PJB/DxvP
+         OsrgkLsF8YLFSPg2CSQ+SPR8zF9SP4BGYhrPH6xm+VoBC8un6uhgQKpjKfheJKbkyVwy
+         mt5YkpaOpdSOWIE4wMmoREOw2fi/3UGaIT7e37eUe9vxSMsUv2CUHNfud5OZX3kntvK4
+         9Bfd1MeAn3tdzcnEoMJh2crCqGqKI7fl1/zn0nUlu5IPJDBHJut53v5yR4ABQXAzQAoa
+         htOYxpIxJtVV4qorPBsdIOdrRj+WuqPTgpRcOgoQerUuYCmAaYxYiovGrKbUQWi2uOwE
+         k5sA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=HKHWGTrGy4FXlfxw+kBA8/G3Swt20UvMDMHWd03XfSI=;
+        b=PF2Vw2xSL4XF4buZfGVVKw6rlnrjrbboCXah39arCbMt2Ezwf1zJXSfWP2fbG7gLA4
+         IxloVz9k4lq8nUUN4sk1pSYz/Bwm/4dnb1b/WXQDltTOBhkqAZ3sFycmFucByhDlVWzM
+         XTIaFx0je/h9aDmQXjqUB5n8v2zbGAgUKKLOgtZ1wmffKXbJfI1ugT/hbEABZeLU7AX0
+         xmP9B3Qt/ejqeLL4xUxhkXynpya3j3oRUM1UmVe7kESv4gJH7yk3EEXowSt/c2NPswf4
+         SsnP8yPvgFM2cUPgBi4wbiaUVHckjgOe5mNEwC8xQ3MhY2ZZdAJ57EtEOQ24N8kdgvT2
+         WlKA==
+X-Gm-Message-State: AOAM530BkXAectFtGngcdh+V/Eg8eCsCGK5MsuXXQnz/2kpllwX3Rqwv
+        dDIu1faQdo7BUcPa/9tXwQ6JzA==
+X-Google-Smtp-Source: ABdhPJyYDhzBr9VTK75qx4jKJm5EI6bN9PO9QhEPhWadgapVhjPn7zrGPanO4gLnlMiZG7s0gcIqtw==
+X-Received: by 2002:a05:6a00:1404:b029:2eb:2f32:4ac2 with SMTP id l4-20020a056a001404b02902eb2f324ac2mr1341647pfu.22.1623871679357;
+        Wed, 16 Jun 2021 12:27:59 -0700 (PDT)
+Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
+        by smtp.gmail.com with ESMTPSA id k13sm2857886pfh.68.2021.06.16.12.27.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Jun 2021 12:27:58 -0700 (PDT)
+Date:   Wed, 16 Jun 2021 19:27:55 +0000
+From:   David Matlack <dmatlack@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 16 Jun 2021 22:01:57 +0300
-In-Reply-To: <20210615162905.2132937-1-seanjc@google.com>
-References: <20210615162905.2132937-1-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 0/8] KVM: x86/mmu: Fast page fault support for the TDP MMU
+Message-ID: <YMpQu6q1YViuLwhg@google.com>
+References: <20210611235701.3941724-1-dmatlack@google.com>
+ <639c54a4-3d6b-8b28-8da7-e49f2f87e025@redhat.com>
+ <YMfFQnfsq5AuUP2B@google.com>
+ <a13646ce-ee54-4555-909b-2d2977f65f59@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a13646ce-ee54-4555-909b-2d2977f65f59@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-06-15 at 09:29 -0700, Sean Christopherson wrote:
-> Snapshot kvm->stats.nx_lpage_splits into a local unsigned long to avoid
-> 64-bit division on 32-bit kernels.  Casting to an unsigned long is safe
-> because the maximum number of shadow pages, n_max_mmu_pages, is also an
-> unsigned long, i.e. KVM will start recycling shadow pages before the
-> number of splits can exceed a 32-bit value.
+On Tue, Jun 15, 2021 at 09:16:00AM +0200, Paolo Bonzini wrote:
+> On 14/06/21 23:08, David Matlack wrote:
+> > I actually have a set of
+> > patches from Ben I am planning to send soon that will reduce the number of
+> > redundant gfn-to-memslot lookups in the page fault path.
 > 
->   ERROR: modpost: "__udivdi3" [arch/x86/kvm/kvm.ko] undefined!
-> 
-> Fixes: 7ee093d4f3f5 ("KVM: switch per-VM stats to u64")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 720ceb0a1f5c..7d3e57678d34 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -6043,6 +6043,7 @@ static int set_nx_huge_pages_recovery_ratio(const char *val, const struct kernel
->  
->  static void kvm_recover_nx_lpages(struct kvm *kvm)
->  {
-> +	unsigned long nx_lpage_splits = kvm->stat.nx_lpage_splits;
->  	int rcu_idx;
->  	struct kvm_mmu_page *sp;
->  	unsigned int ratio;
-> @@ -6054,7 +6055,7 @@ static void kvm_recover_nx_lpages(struct kvm *kvm)
->  	write_lock(&kvm->mmu_lock);
->  
->  	ratio = READ_ONCE(nx_huge_pages_recovery_ratio);
-> -	to_zap = ratio ? DIV_ROUND_UP(kvm->stat.nx_lpage_splits, ratio) : 0;
-> +	to_zap = ratio ? DIV_ROUND_UP(nx_lpage_splits, ratio) : 0;
->  	for ( ; to_zap; --to_zap) {
->  		if (list_empty(&kvm->arch.lpage_disallowed_mmu_pages))
->  			break;
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> That seems to be a possible 5.14 candidate, while this series is probably a
+> bit too much for now.
 
-Best regards,
-	Maxim Levitsky
+Thanks for the feedback. I am not in a rush to get either series into
+5.14 so that sounds fine with me. Here is how I am planning to proceed:
 
+1. Send a new series with the cleanups to is_tdp_mmu_root Sean suggested
+   in patch 1/8 [1].
+2. Send v2 of the TDP MMU Fast Page Fault series without patch 1/8.
+3. Send out the memslot lookup optimization series.
+
+Does that sound reasonable to you? Do you have any reservations with
+taking (2) before (3)?
+
+[1] https://lore.kernel.org/kvm/YMepDK40DLkD4DSy@google.com/
+
+> 
+> Paolo
+> 
