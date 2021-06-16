@@ -2,139 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 491AA3AA232
-	for <lists+kvm@lfdr.de>; Wed, 16 Jun 2021 19:12:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DFA083AA29A
+	for <lists+kvm@lfdr.de>; Wed, 16 Jun 2021 19:45:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231310AbhFPROn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Jun 2021 13:14:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59338 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230490AbhFPROm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 16 Jun 2021 13:14:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623863555;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9dwXJG+e2J+zj861tULnfcQYsx7+UyssMsGTwpLEmFo=;
-        b=F9cKU2KFrGBw6EawNPfBo7T/xWCp4t7qiVVzKKLaFquZWs5IBFo8kMsseFKnLRqDqnTBH7
-        wEe1edPqJUnKytGn8hUQvFU9MsbW3CvsTrp/QzL90yTZ1gzG8awNRXo6iLMM069L4+eC+n
-        VsBzQVtgGgh7oiYMRnCHkh8lDA4gNp8=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-111-LJkUSZCTNRGMOU43VJoc0Q-1; Wed, 16 Jun 2021 13:12:23 -0400
-X-MC-Unique: LJkUSZCTNRGMOU43VJoc0Q-1
-Received: by mail-ej1-f70.google.com with SMTP id k1-20020a17090666c1b029041c273a883dso1239130ejp.3
-        for <kvm@vger.kernel.org>; Wed, 16 Jun 2021 10:12:23 -0700 (PDT)
+        id S231386AbhFPRrU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Jun 2021 13:47:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41176 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230350AbhFPRrT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Jun 2021 13:47:19 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CAAFC061574
+        for <kvm@vger.kernel.org>; Wed, 16 Jun 2021 10:45:13 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id e33so2609074pgm.3
+        for <kvm@vger.kernel.org>; Wed, 16 Jun 2021 10:45:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Yk03bFezodLyicEMs6IIQNwcwu9itLVuqYU49j8NtE8=;
+        b=GJOP5+28MCLf/q9C4Xlb9ADJEY5GzKYlhetf+lkXbGt78ntNkw1u0XllyNDlUamJlF
+         VpRky77ERNhTan4PVaUpePxBZUZbaqMT9vO6MwRJyPQuzUsdzJ/YNujTupQC2e0aTmP5
+         lLx58Bmk9be9e2w0vxWIJX/VCE3u52Xub597oP4U7gsLiiCAAmW1x9IvbpTT1aiYUPMv
+         o1v1qTOyUS6RTnLx/5Ww62+Otr1V1xRpGzEosr2ZTSRSkn+Rspe7lJUvRg7RiOHT9Z6+
+         87mNpqA+lVecTwmZIL3dzKYDN+xlAE2U/iIpnPSG1VpP3N5Pfv5hQry5gOhJ8P6WdJgW
+         HPCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=9dwXJG+e2J+zj861tULnfcQYsx7+UyssMsGTwpLEmFo=;
-        b=bprYeH9BGVfdwvb5pR/pxTuKC4DfsV7tlxNW9N5lt+sdlgGsa2tg862banI4exxHsF
-         ZTHsmFGengsx+VDjRcM3e8pbVO/hayAb0S1a9Nsk9/poLyhC8X4j+AULATUcXkXECiw9
-         US00yxoP1VcHDQwve7F7/pHCEyMQu1UdXx8JD7V0WJx42rwGZU/FGizPc4hXhjfBatxB
-         kjc+6arHKilE1FUEWClpNnojQSX0gaGY/WdxT6RykGTUBbP0vAeOzFqAmjc3MK+AkOp+
-         Rm+YxV5et5HUkD5kGEfp2P6YU1zXqqjugbUCHa5F0kQeJtm8nMNhy0hVNwdBhk1mm8zW
-         2CJg==
-X-Gm-Message-State: AOAM5313cQYBJFN4PlUT5ppX58qJ3Pxyd2NqKUptjSXuFmHbJtnlzaKP
-        XtUrHF3UDGuy2Qkczt1fVaJrztOl9GLu7e4t+xS2RAErsYQoAckQkVkKYtIAQDdpcDeLlwEXVae
-        eu623IsWGaBRJ
-X-Received: by 2002:a17:906:63d2:: with SMTP id u18mr605556ejk.186.1623863541221;
-        Wed, 16 Jun 2021 10:12:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzTKt1qnrMXcwrhxVgt67u44Y8CuaXLcDbu0P6sbQSAbP+DQ5wAsoiwPjVbuTt+umuJCe/+bA==
-X-Received: by 2002:a17:906:63d2:: with SMTP id u18mr604976ejk.186.1623863534799;
-        Wed, 16 Jun 2021 10:12:14 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id n2sm2261519edi.32.2021.06.16.10.12.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Jun 2021 10:12:13 -0700 (PDT)
-To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        LinuxS390 <linux-s390@vger.kernel.org>,
-        Linuxkselftest <linux-kselftest@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Fuad Tabba <tabba@google.com>
-References: <20210614212155.1670777-1-jingzhangos@google.com>
- <20210614212155.1670777-3-jingzhangos@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v9 2/5] KVM: stats: Add fd-based API to read binary stats
- data
-Message-ID: <60b0d569-e484-f424-722b-eb7ba415e19b@redhat.com>
-Date:   Wed, 16 Jun 2021 19:12:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
-MIME-Version: 1.0
-In-Reply-To: <20210614212155.1670777-3-jingzhangos@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Yk03bFezodLyicEMs6IIQNwcwu9itLVuqYU49j8NtE8=;
+        b=XiW/CZ/WRzfvUjmAYrjKkiRbvgjswQp/5txuyCeoEkBcf/APMpIt+5Y/1sNkFsFTze
+         BkVKXI3++wsNXaUlAHFApPtU6CZQsyyvT3pF5sXyrM8kc0E2x+c+85FsUfgsmudwVQLW
+         FQPZUH6rxeIoTXpfWY+ENej/R04y9+M6JTEsWp69HNi128FjqzwyrFopkHLHrZHQhDIZ
+         MUKxiEe5C0T9It5l41zuwEpYSEL3HqB54moDR25y7l5hDF0FTfE7pI7RX0I0M/G3M8m4
+         Qcg6HSNk8ElafmrStkVIukUwiWmu8jtISNQq4+Ard15j9AoJuy345DcEzzpLeIclBMRX
+         4IBA==
+X-Gm-Message-State: AOAM532Z9jvB8wGyvwConzxTHTigEd4PWKw2Raj0+kmjPowyoOdvm4dp
+        OibuTfD/ggXxLnPaLc84PFQ=
+X-Google-Smtp-Source: ABdhPJzcyBWfe84QuQ4ASRs4duPuqmeyb39M7fxcnH0SLoBSFOVh76to0gpISbs+eoZEAk97ulrMOQ==
+X-Received: by 2002:a63:180c:: with SMTP id y12mr794586pgl.180.1623865512556;
+        Wed, 16 Jun 2021 10:45:12 -0700 (PDT)
+Received: from smtpclient.apple (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
+        by smtp.gmail.com with ESMTPSA id o12sm2722061pgq.83.2021.06.16.10.45.11
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 16 Jun 2021 10:45:12 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
+Subject: Re: [PATCH v3 0/2] Wrap EFL binaries into ISO images
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <20210613124724.1850051-1-yi.sun@intel.com>
+Date:   Wed, 16 Jun 2021 10:45:10 -0700
+Cc:     kvm@vger.kernel.org, gordon.jin@intel.com
+Content-Transfer-Encoding: 7bit
+Message-Id: <068C06EE-8479-4DF1-BD38-D3621CD7809A@gmail.com>
+References: <20210613124724.1850051-1-yi.sun@intel.com>
+To:     Yi Sun <yi.sun@intel.com>
+X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/06/21 23:21, Jing Zhang wrote:
-> +	/* Copy kvm stats values */
-> +	copylen = header->header.data_offset + size_stats - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = stats + pos - header->header.data_offset;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
 
-Hi Jing,
 
-this code is causing usercopy warnings because the statistics are not 
-part of the vcpu slab's usercopy region.  You need to move struct 
-kvm_vcpu_stat next to struct kvm_vcpu_arch, and adjust the call to 
-kmem_cache_create_usercopy in kvm_init.
+> On Jun 13, 2021, at 5:47 AM, Yi Sun <yi.sun@intel.com> wrote:
+> 
+> This patch set make use of tool 'grub-mkrescue' to wrap ELF binaries 
+> into bootable ISO images.
+> 
+> Cases in kvm-unit-tests can be run with QEMU. But the problem is that
+> some newer VMMs such as Crosvm/Cloud-hyperviosr does NOT support 
+> multiboot protocol with which QEMU loads and executes those testing 
+> binaries correctly. This patch set can wrap each kvm-unit-tests EFL 
+> binaries into a bootable ISO image aiming to adapt it to more usage 
+> scenarios. As we know, all PC BIOSes and vBIOSes know how to boot 
+> from a ISO from CD-ROM drive, hence it can extend the KVM-unit-tests 
+> a lot.
+> 
+> The patch set provides two approaches to create ISO. One is via 
+> "make iso". It wrap each ELF in foler x86 into a ISO without any 
+> parameters passed to the test cases.  The other is via script 
+> create_iso.sh. The script wraps the ELF according to the configure
+> file unittests.cfg which descripes various parameters for each testing.
+> 
+> Patch History:
+> V1: Initial version.
+> V2: Add the second parament to the script create_iso.sh, that could 
+> pass environment variables into test cases via the file.
+> V3: Add some failure handle.
 
-Can you post a new version of the series, and while you are at it 
-explain the rationale for binary stats in the commit message for this 
-patch?  This should include:
+Thanks for doing that. I find your work very useful (at least for me).
 
-- the problem statement (e.g. frequency of the accesses)
+For what it worth in kvm-unit-tests, I should have gave before:
 
-- what are the benefits compared to debugfs
+Tested-by: Nadav Amit <nadav.amit@gmail.com>
 
-- why the schema is included in the file descriptor as well
-
-You can probably find a lot or all of the information in my emails from 
-the last couple days, but you might also have other breadcrumbs from 
-Google's internal implementation of binary stats.
 
 Thanks,
-
-Paolo
-
+Nadav
