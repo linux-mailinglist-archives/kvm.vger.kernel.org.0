@@ -2,163 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ADF353AB9EA
-	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 18:51:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E8C13ABA44
+	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 19:07:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230387AbhFQQxY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Jun 2021 12:53:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51151 "EHLO
+        id S231796AbhFQRJZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Jun 2021 13:09:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21799 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230083AbhFQQxX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Jun 2021 12:53:23 -0400
+        by vger.kernel.org with ESMTP id S231840AbhFQRJQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 17 Jun 2021 13:09:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623948675;
+        s=mimecast20190719; t=1623949628;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1vvX86S3j3zAQfNkZGYm1clMo3KBpNRUn/OAQTL0xeo=;
-        b=f9CNqfowxS1pn1vKAkXvbwqj5roCbqQedScFMuffS3nwJdSPS8b8XpwXXhfYXx5CDTL37a
-        Qsy8zFZ7JYO9g4jQ080qEKmgxOxGkeH1XruWmuq6k11ByirsxwLFgYIv3WKDnVa+Ae5Y1P
-        nYfcirqEf/Xv1+nxqxqDfgjKUn/OXw4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-552-s8peKZMRP6aYCu5WyfhHTA-1; Thu, 17 Jun 2021 12:51:14 -0400
-X-MC-Unique: s8peKZMRP6aYCu5WyfhHTA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C57E7101F7A1;
-        Thu, 17 Jun 2021 16:51:12 +0000 (UTC)
-Received: from localhost (unknown [10.22.9.101])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 63B7160875;
-        Thu, 17 Jun 2021 16:51:12 +0000 (UTC)
-Date:   Thu, 17 Jun 2021 12:51:11 -0400
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     Claudio Fontana <cfontana@suse.de>
-Cc:     Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-        kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Denis Lunev <den@openvz.org>, Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v9] qapi: introduce 'query-kvm-cpuid' action
-Message-ID: <20210617165111.eu3x2pvinpoedsqj@habkost.net>
-References: <20210603090753.11688-1-valeriy.vdovin@virtuozzo.com>
- <87im2d6p5v.fsf@dusky.pond.sub.org>
- <20210617074919.GA998232@dhcp-172-16-24-191.sw.ru>
- <87a6no3fzf.fsf@dusky.pond.sub.org>
- <790d22e1-5de9-ba20-6c03-415b62223d7d@suse.de>
- <877dis1sue.fsf@dusky.pond.sub.org>
- <20210617153949.GA357@dhcp-172-16-24-191.sw.ru>
- <e69ea2b4-21cc-8203-ad2d-10a0f4ffe34a@suse.de>
+        bh=P+a31S7my7GZ/Y4MvDMd+Xgr66kYGwopRSGlVKuP0z8=;
+        b=jLgWeGWJwOAyozNUDuUNzJKWOKPedAspOITB9A9gCSw/OiP5iNgd1qsbhw1MtNEwI1epUk
+        RLCqWXLgBn/si/Og60IHRC/nAimmXHOZtsTRgZ/rPl0HF5gAO2Pd1M41ESfOo46GsgbgdI
+        ZoZwRrl1+tKjDlIpZiEvO/srFe+4pbM=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-154-ADdwNc1GOh-62SIe3-LO-A-1; Thu, 17 Jun 2021 13:07:06 -0400
+X-MC-Unique: ADdwNc1GOh-62SIe3-LO-A-1
+Received: by mail-ed1-f71.google.com with SMTP id z5-20020a05640235c5b0290393974bcf7eso2044480edc.2
+        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 10:07:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=P+a31S7my7GZ/Y4MvDMd+Xgr66kYGwopRSGlVKuP0z8=;
+        b=Cs5XIMQPFKJEP3ZLLfhvDVhXIlbe7jIJSZ5ZYQZmjbQsMtmj8KUTHIJdT/K9G066GN
+         u8fdBUETZh+pP/ne0f8Ly1gzWnxNuGQ7ijWQKNYFWZNoUcNHlnWMYrXMAopj5j3wGTmw
+         6/zxJE3Tw2wSxaIdei+N0Rafux/0r45OsBaT93sQB4yPoLA0iAvNdl+n+VfN4Os6vb+m
+         qPqcSo5OTn10fIFM9HQ4wb75NnQCUZ4ToX2FFhBHTaCrCC4+CNkO1coKw9yjmmQw6sBu
+         izmvnuRYHOClweGBsFlw3xj2ctAHoTZGaeCy+eBVsPFt211iUjxl9Ao89hz0GKg2uOhx
+         Nsiw==
+X-Gm-Message-State: AOAM531njB62Zu5OQWvrNa1/2PGTQi7NgeCgYtH3gS8zR0VXynVt6mYH
+        5wU9ZpuVzinNHl/fpJeRfApi7rlofqDR3LFyS+0bsPr9A+/vraAAAbWH2g7DUgLW6Sv5sZB9N14
+        1Hl+ZypqplLJl
+X-Received: by 2002:a17:906:6b8a:: with SMTP id l10mr6272319ejr.125.1623949625731;
+        Thu, 17 Jun 2021 10:07:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxBQ1+tAZt7E3DGh3fI4tCCNq459QgOUf9lYOQCSk9FJgn1gHp6lSQqv0kJCv0hc/2D7vtieQ==
+X-Received: by 2002:a17:906:6b8a:: with SMTP id l10mr6272298ejr.125.1623949625560;
+        Thu, 17 Jun 2021 10:07:05 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id de24sm4121343ejc.78.2021.06.17.10.07.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Jun 2021 10:07:04 -0700 (PDT)
+Subject: Re: [PATCH] KVM: selftests: Fix kvm_check_cap() assertion
+To:     Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org
+Cc:     linux-kselftest@vger.kernel.org, shuah@kernel.org
+References: <20210615150443.1183365-1-tabba@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ea3ed990-5af2-6f1b-1e6f-eb45824b342b@redhat.com>
+Date:   Thu, 17 Jun 2021 19:07:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e69ea2b4-21cc-8203-ad2d-10a0f4ffe34a@suse.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20210615150443.1183365-1-tabba@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 17, 2021 at 05:53:11PM +0200, Claudio Fontana wrote:
-> On 6/17/21 5:39 PM, Valeriy Vdovin wrote:
-> > On Thu, Jun 17, 2021 at 04:14:17PM +0200, Markus Armbruster wrote:
-> >> Claudio Fontana <cfontana@suse.de> writes:
-> >>
-> >>> On 6/17/21 1:09 PM, Markus Armbruster wrote:
-> >>>> Valeriy Vdovin <valeriy.vdovin@virtuozzo.com> writes:
-> >>>>
-> >>>>> On Thu, Jun 17, 2021 at 07:22:36AM +0200, Markus Armbruster wrote:
-> >>>>>> Valeriy Vdovin <valeriy.vdovin@virtuozzo.com> writes:
-> >>>>>>
-> >>>>>>> Introducing new qapi method 'query-kvm-cpuid'. This method can be used to
-> >>>>>>
-> >>>>>> It's actually a QMP command.  There are no "qapi methods".
-> >>>>>>
-> >>>>>>> get virtualized cpu model info generated by QEMU during VM initialization in
-> >>>>>>> the form of cpuid representation.
-> >>>>>>>
-> >>>>>>> Diving into more details about virtual cpu generation: QEMU first parses '-cpu'
-> >>>>>>
-> >>>>>> virtual CPU
-> >>>>>>
-> >>>>>>> command line option. From there it takes the name of the model as the basis for
-> >>>>>>> feature set of the new virtual cpu. After that it uses trailing '-cpu' options,
-> >>>>>>> that state if additional cpu features should be present on the virtual cpu or
-> >>>>>>> excluded from it (tokens '+'/'-' or '=on'/'=off').
-> >>>>>>> After that QEMU checks if the host's cpu can actually support the derived
-> >>>>>>> feature set and applies host limitations to it.
-> >>>>>>> After this initialization procedure, virtual cpu has it's model and
-> >>>>>>> vendor names, and a working feature set and is ready for identification
-> >>>>>>> instructions such as CPUID.
-> >>>>>>>
-> >>>>>>> Currently full output for this method is only supported for x86 cpus.
-> >>>>>>
-> >>>>>> Not sure about "currently": the interface looks quite x86-specific to me.
-> >>>>>>
-> >>>>> Yes, at some point I was thinking this interface could become generic,
-> >>>>> but does not seem possible, so I'll remove this note.
-> >>>>>
-> >>>>>> The commit message doesn't mention KVM except in the command name.  The
-> >>>>>> schema provides the command only if defined(CONFIG_KVM).
-> >>>>>>
-> >>>>>> Can you explain why you need the restriction to CONFIG_KVM?
-> >>>>>>
-> >>>>> This CONFIG_KVM is used as a solution to a broken build if --disable-kvm
-> >>>>> flag is set. I was choosing between this and writing empty implementation into
-> >>>>> kvm-stub.c
-> >>>>
-> >>>> If the command only makes sense for KVM, then it's named correctly, but
-> >>>> the commit message lacks a (brief!) explanation why it only makes for
-> >>>> KVM.
-> >>>
-> >>>
-> >>> Is it meaningful for HVF?
-> >>
-> >> I can't see why it couldn't be.
-> > Should I also make some note about that in the commit message?
-> >>
-> >> Different tack: if KVM is compiled out entirely, the command isn't
-> >> there, and trying to use it fails like
-> >>
-> >>     {"error": {"class": "CommandNotFound", "desc": "The command query-kvm-cpuid has not been found"}}
-> >>
-> >> If KVM is compiled in, but disabled, e.g. with -machine accel=tcg, then
-> >> the command fails like
-> >>
-> >>     {"error": {"class": "GenericError", "desc": "VCPU was not initialized yet"}}
-> >>
-> >> This is misleading.  The VCPU is actually running, it's just the wrong
-> >> kind of VCPU.
-> >>
-> >>>> If it just isn't implemented for anything but KVM, then putting "kvm"
-> >>>> into the command name is a bad idea.  Also, the commit message should
-> >>>> briefly note the restriction to KVM.
-> >>
-> >> Perhaps this one is closer to reality.
-> >>
-> > I agree.
-> > What command name do you suggest?
+On 15/06/21 17:04, Fuad Tabba wrote:
+> KVM_CHECK_EXTENSION ioctl can return any negative value on error,
+> and not necessarily -1. Change the assertion to reflect that.
 > 
-> query-exposed-cpuid?
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>   tools/testing/selftests/kvm/lib/kvm_util.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 5c70596dd1b9..a2b732cf96ea 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -82,7 +82,7 @@ int kvm_check_cap(long cap)
+>   
+>   	kvm_fd = open_kvm_dev_path_or_exit();
+>   	ret = ioctl(kvm_fd, KVM_CHECK_EXTENSION, cap);
+> -	TEST_ASSERT(ret != -1, "KVM_CHECK_EXTENSION IOCTL failed,\n"
+> +	TEST_ASSERT(ret >= 0, "KVM_CHECK_EXTENSION IOCTL failed,\n"
+>   		"  rc: %i errno: %i", ret, errno);
+>   
+>   	close(kvm_fd);
+> 
 
-Pasting the reply I sent at [1]:
+Queued, thanks.
 
-  I don't really mind how the command is called, but I would prefer
-  to add a more complex abstraction only if maintainers of other
-  accelerators are interested and volunteer to provide similar
-  functionality.  I don't want to introduce complexity for use
-  cases that may not even exist.
-
-I'm expecting this to be just a debugging mechanism, not a stable
-API to be maintained and supported for decades.  (Maybe a "x-"
-prefix should be added to indicate that?)
-
-[1] https://lore.kernel.org/qemu-devel/20210602204604.crsxvqixkkll4ef4@habkost.net
-
--- 
-Eduardo
+Paolo
 
