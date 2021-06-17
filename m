@@ -2,27 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 07CC03AB2DE
-	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 13:43:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98D0A3AB2E9
+	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 13:46:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232390AbhFQLpG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Jun 2021 07:45:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59206 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231386AbhFQLpF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Jun 2021 07:45:05 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id AB03B613FE;
-        Thu, 17 Jun 2021 11:42:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1623930178;
-        bh=+rV2EQw4mSBWtxauWo8Ivv6JJIjCR1BlgSQtCti76T4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=fOsz88jdOjhZ6ScuC0eG149FufoNS0FvGcFvsN69ADiQV5mtHh1W87F+LbRS8yvVo
-         mbmy2yIjlKp44Se/pz59+wlrtaiRV/m81uwUJ0a6bMI1jGc8ExV0kvEn0W5446aUVQ
-         3NzuOTVD5WkCd7FwIPYkOZszEcVq8A8n4m8GhHS4=
-Date:   Thu, 17 Jun 2021 13:42:55 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+        id S231593AbhFQLsX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Jun 2021 07:48:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42676 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232172AbhFQLsV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 17 Jun 2021 07:48:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623930373;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ujv31ni+pedAzRqkqN94IhUeHH6igQoDkhQGmN9rbYg=;
+        b=M6L1mTafPswJKarRnC+9Rg9l27Jrnsm2dzFzftOWOU3J6x3FYItDzIioiE1I95G+3C9zZ5
+        QgGhMN/D5n7yalKArgMLAYiO3P2lac2c9pHsKyRJ9QV4Gu1fhEtLMibrOY4GjKDdKL8JeV
+        GuJyY2yx5BcwDSFHUYo6BGu/vLEkr6M=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-301-2hmfxm1vNaaM5Ihq1834wA-1; Thu, 17 Jun 2021 07:46:11 -0400
+X-MC-Unique: 2hmfxm1vNaaM5Ihq1834wA-1
+Received: by mail-ed1-f71.google.com with SMTP id y7-20020aa7ce870000b029038fd7cdcf3bso1335796edv.15
+        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 04:46:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Ujv31ni+pedAzRqkqN94IhUeHH6igQoDkhQGmN9rbYg=;
+        b=syPzWhCV2MvuYJyHv+Mxs4aBMHkkTKI7lO8Ad9+YRiFy6xoa0uyrKXTesWqsEHu5sE
+         dGa/nwCEkPNPDDEb9jiuQkpFPuts45LLaXrUuHreFEqhD23gXbLP6CaajfIVinYdV3g3
+         qhoGNvNafep93tRTWrpq8MUkXr7OpWI5p+zwYuh2SNUC4ab9FBuZHQ01mEj7XcShnhEc
+         JfVbqvpyJ9LsQceWd+UgmQ+8aR4AT2iXkXutwisdwdbBmwwxWPimXCvz9Sj1r7MvxS+X
+         wWYfL8jDgKf2EyvXODW21kGWJqNQ2ym92F5090IPEWF4Nhk5yo624eUQvTXnGQclspcw
+         reBw==
+X-Gm-Message-State: AOAM532/R8e5ToqPImqnYKWKT60/DQ5k5oZJhqQa8tBTdcGPzc/DoZXL
+        aEMSSkQbcf4vPjgdQoWOJrGDf6wz4FOyrWkexnQTehGyQ6hy3tQD6VTdEY8MoLDYE7Lu5z0el8p
+        b61B2+lKUrDxZ
+X-Received: by 2002:aa7:cf0d:: with SMTP id a13mr5826480edy.384.1623930370635;
+        Thu, 17 Jun 2021 04:46:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyGp0u6bbKTpBWAweRlzIakuy+NTS2L7DG9uaEaAYNed1OyNxc+QE79jbRlb3hr0uHlxKTUpw==
+X-Received: by 2002:aa7:cf0d:: with SMTP id a13mr5826434edy.384.1623930370434;
+        Thu, 17 Jun 2021 04:46:10 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id t14sm1472804edr.36.2021.06.17.04.46.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Jun 2021 04:46:09 -0700 (PDT)
+Subject: Re: [PATCH v10 3/5] KVM: stats: Add documentation for binary
+ statistics interface
+To:     Greg KH <gregkh@linuxfoundation.org>,
         "Gustavo A. R. Silva" <gustavoars@kernel.org>
 Cc:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
         KVMARM <kvmarm@lists.cs.columbia.edu>,
@@ -55,63 +86,50 @@ Cc:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
         Ricardo Koller <ricarkol@google.com>,
         Krish Sadhukhan <krish.sadhukhan@oracle.com>,
         Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v10 3/5] KVM: stats: Add documentation for binary
- statistics interface
-Message-ID: <YMs1Pwf+nSQsfVUW@kroah.com>
 References: <20210617044146.2667540-1-jingzhangos@google.com>
  <20210617044146.2667540-4-jingzhangos@google.com>
  <YMrkGZzPrt0jA1iP@kroah.com>
  <0d959828-da89-bceb-f7cc-35622a60c431@redhat.com>
+ <YMs1Pwf+nSQsfVUW@kroah.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <348aa108-076b-04dd-9fd2-e840a7a85f5d@redhat.com>
+Date:   Thu, 17 Jun 2021 13:46:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0d959828-da89-bceb-f7cc-35622a60c431@redhat.com>
+In-Reply-To: <YMs1Pwf+nSQsfVUW@kroah.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 17, 2021 at 01:29:22PM +0200, Paolo Bonzini wrote:
-> On 17/06/21 07:56, Greg KH wrote:
-> > On Thu, Jun 17, 2021 at 04:41:44AM +0000, Jing Zhang wrote:
-> > > +	struct kvm_stats_desc {
-> > > +		__u32 flags;
-> > > +		__s16 exponent;
-> > > +		__u16 size;
-> > > +		__u32 offset;
-> > > +		__u32 unused;
-> > > +		char name[0];
-> > > +	};
-> > 
-> > <snip>
-> > 
-> > > +The ``unused`` fields are reserved for future support for other types of
-> > > +statistics data, like log/linear histogram.
-> > 
-> > you HAVE to set unused to 0 for now, otherwise userspace does not know
-> > it is unused, right?
+On 17/06/21 13:42, Greg KH wrote:
+> On Thu, Jun 17, 2021 at 01:29:22PM +0200, Paolo Bonzini wrote:
+>> On 17/06/21 07:56, Greg KH wrote:
+>>> On Thu, Jun 17, 2021 at 04:41:44AM +0000, Jing Zhang wrote:
+>>>> +string starts at the end of ``struct kvm_stats_desc``.
+>>>> +The maximum length (including trailing '\0') is indicated by ``name_size``
+>>>> +in ``struct kvm_stats_header``.
+>>>
+>>> I thought we were replacing [0] arrays with [], are you sure you should
+>>> be declaring this as [0]?  Same for all structures in this document (and
+>>> code).
+>>
+>> In C code [0] is a bit more flexible than [].  I think in this particular
+>> case [] won't work due to how the structures are declared. In the
+>> documentation [] is certainly clearer.
 > 
-> Jing, I think you planned to use it with other flags that are unused for
-> now?  But please do check that it's zero in the testcase.
+> Look at all of the patches that Gustavo has been doing all over the tree
+> for this work, you do not want to make him do this again here.
 > 
-> > It is not a pointer, it is the data itself.
-> > 
-> > > +string starts at the end of ``struct kvm_stats_desc``.
-> > > +The maximum length (including trailing '\0') is indicated by ``name_size``
-> > > +in ``struct kvm_stats_header``.
-> > 
-> > I thought we were replacing [0] arrays with [], are you sure you should
-> > be declaring this as [0]?  Same for all structures in this document (and
-> > code).
-> 
-> In C code [0] is a bit more flexible than [].  I think in this particular
-> case [] won't work due to how the structures are declared. In the
-> documentation [] is certainly clearer.
+> Gustavo, is [0] ok for fields like these?
 
-Look at all of the patches that Gustavo has been doing all over the tree
-for this work, you do not want to make him do this again here.
+I should be able to get back to KVM stuff later today, I'll check myself 
+if [] can be applied and reply.  I had queued an early version of these 
+for my local build to play with them but I haven't been able to do a 
+complete review.
 
-Gustavo, is [0] ok for fields like these?
+Paolo
 
-thanks,
-
-greg k-h
