@@ -2,72 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 345BE3ABBC1
-	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 20:26:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81D973ABBCB
+	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 20:28:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232110AbhFQS2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Jun 2021 14:28:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30899 "EHLO
+        id S232606AbhFQSaJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Jun 2021 14:30:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29112 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232146AbhFQS22 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Jun 2021 14:28:28 -0400
+        by vger.kernel.org with ESMTP id S232345AbhFQSaI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 17 Jun 2021 14:30:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623954380;
+        s=mimecast20190719; t=1623954480;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XvRDiOu3L2aDPvixr4wW0PI+YISrBEUZXNM7z6Kd0Ug=;
-        b=A9MOAYskcWqQSre+6cq8wnuNwFPYM6ED5LYWLQ19t5PjlBirDRHIrzL5pVoElTz5AH9sIq
-        ml6ZlhumE2kr5wEqlBMmeCKNlcSwCb/HxAcs3IdEsNDt35X67rhOKpgCwyyMvBKmHYNboK
-        KveFczViWaqpD7aMC8PlTdpVu8uuxK4=
+        bh=r6ETG+pltWJSznK09vGdsqaT22gUDBs8M4SpJDfF/cM=;
+        b=h/6hz3mfC718iWJYon5FLVJhH0ybHzY2UvBXau/ZnxeZIlnt80gJwfgJzXik3C5BooXT6q
+        hAYoCLym0YRizwvbitAGPMr/EuaxUp4+Jm7SAWmjR2e/SFFj+cQpHb+kc5JntUx61WML52
+        0usX9vQ4tf/Z9m5WTIs3mXmtrZ5DH8s=
 Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
  [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-111-ZoBKr1WFPR65ZL76r-xccA-1; Thu, 17 Jun 2021 14:26:18 -0400
-X-MC-Unique: ZoBKr1WFPR65ZL76r-xccA-1
-Received: by mail-ej1-f71.google.com with SMTP id u4-20020a1709061244b02904648b302151so2776715eja.17
-        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 11:26:18 -0700 (PDT)
+ us-mta-68-6zxYPKGcMUCll01OHoO_qw-1; Thu, 17 Jun 2021 14:27:58 -0400
+X-MC-Unique: 6zxYPKGcMUCll01OHoO_qw-1
+Received: by mail-ej1-f71.google.com with SMTP id nd10-20020a170907628ab02903a324b229bfso2802368ejc.7
+        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 11:27:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=XvRDiOu3L2aDPvixr4wW0PI+YISrBEUZXNM7z6Kd0Ug=;
-        b=askxlr1aOg3+FztHg+xR84arijuDVjuIiekAvIInFuox4LVcBg6hZac1dtISl7eb9u
-         oyeCcNSIvkSfGqaso869w/ZBXVmxqe6vV0KyisFPjhJRF22Lp8UsqEcpFuxKDT/dAmYU
-         9n7L+NWBBFIQwzB8jgb92GtFJ0JMzcDHSU8ecFlCInSu+/TemJ0QhMfiMNS/MH2/bVLV
-         VKaxzh6X4rKylusYApl8oJMX3m2MYAFwQX23PYk08aRr0rFqZXGIhnQ0LgniXCFQ0CNg
-         6qN36Tu3nDd3GeCPzDpUsAmFLiMemoDieN2kLskUgFXiWM0SZccwnWK5QgyF3Yg16Oze
-         R0TA==
-X-Gm-Message-State: AOAM530d0z8vvoO0sK4pBE33mv4+lbABkpVVRBWz1cUvVQ4qwBReUenO
-        Zc/bq1/mT3P2a+SVw6U46ITkBSQ0VUSU2wyhp06XKzJuED2KyMcaECXglhFj2e0vNgGK52MAOjj
-        lKMBJRYwTBujO
-X-Received: by 2002:a05:6402:31f3:: with SMTP id dy19mr8407674edb.153.1623954377523;
-        Thu, 17 Jun 2021 11:26:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwHC/0zrifPDrAWmAlm02JHo9HIKYIOLCBfKF2EIzEF/aYCysomV9DjE4RzUEhNqpvTWbYIiA==
-X-Received: by 2002:a05:6402:31f3:: with SMTP id dy19mr8407653edb.153.1623954377328;
-        Thu, 17 Jun 2021 11:26:17 -0700 (PDT)
+        bh=r6ETG+pltWJSznK09vGdsqaT22gUDBs8M4SpJDfF/cM=;
+        b=Y7cpmeq6Ov4anf/9pB/lM0yEgvdAVdqH+XG23MnRzD+kX9b7tBaZQZnwGgPayZDW29
+         CwJ2DqDdbcRfBdSW4R+6iogNrRFuS16qJAP7J8rXzFabtEBR8NlCXTznlWNZ873dYrvR
+         PGtBtwwsW/ug0B7Ej2xAEFQXI8CdlSPfsx3YWRbMCHnbOGXpOMeWuG3fnNzNAIy/n7K/
+         ApILG8UhvrMrbhS8Y9+MdlXAuN5+NxTs2KTlErxxTi1ujGjAjthiU+dCTiFAAmYkOr1p
+         5fFQ3nG8OaAsw8JysV/snPNc8bDe+zKIHlSfiOsHoYx7fwdSyUXZN6xSa28nraZxjeWx
+         VLfg==
+X-Gm-Message-State: AOAM531fTQl3jjjwxXc4rL9m9iBUM0CQWe4mupudm37nRjR7bYp/PDux
+        u1lZ8aEAtrB4K9hDoYOKkAJsg+nOvdey5DZM3euouC0rnzyoel8+te/v8pw+gz8BVyv0ububjWG
+        i4HKbBYlTPMxv
+X-Received: by 2002:a05:6402:1ac9:: with SMTP id ba9mr8717036edb.250.1623954477664;
+        Thu, 17 Jun 2021 11:27:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxJHulM41GnpU3LPKV/FycrT2wYjnJWy7+ouilV2eeCjMFpGkWTkq0HwedVdZD3/XEJAw8sZg==
+X-Received: by 2002:a05:6402:1ac9:: with SMTP id ba9mr8717028edb.250.1623954477485;
+        Thu, 17 Jun 2021 11:27:57 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id u21sm4202016eja.59.2021.06.17.11.26.16
+        by smtp.gmail.com with ESMTPSA id w1sm4910349eds.37.2021.06.17.11.27.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Jun 2021 11:26:16 -0700 (PDT)
-Subject: Re: [PATCH v3] KVM: LAPIC: Keep stored TMCCT register value 0 after
- KVM_SET_LAPIC
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <1623223000-18116-1-git-send-email-wanpengli@tencent.com>
+        Thu, 17 Jun 2021 11:27:56 -0700 (PDT)
+Subject: Re: [PATCH v3 3/3] KVM: x86/mmu: Fix TDP MMU page table level
+To:     Kai Huang <kai.huang@intel.com>, kvm@vger.kernel.org
+Cc:     bgardon@google.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org
+References: <cover.1623717884.git.kai.huang@intel.com>
+ <bcb6569b6e96cb78aaa7b50640e6e6b53291a74e.1623717884.git.kai.huang@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <02391363-6713-1548-fa4b-70b70cc96f79@redhat.com>
-Date:   Thu, 17 Jun 2021 20:26:15 +0200
+Message-ID: <9e53a99c-b2ea-c49e-07d5-e401c1ca5340@redhat.com>
+Date:   Thu, 17 Jun 2021 20:27:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <1623223000-18116-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <bcb6569b6e96cb78aaa7b50640e6e6b53291a74e.1623717884.git.kai.huang@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,33 +71,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/06/21 09:16, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
+On 15/06/21 02:57, Kai Huang wrote:
+> TDP MMU iterator's level is identical to page table's actual level.  For
+> instance, for the last level page table (whose entry points to one 4K
+> page), iter->level is 1 (PG_LEVEL_4K), and in case of 5 level paging,
+> the iter->level is mmu->shadow_root_level, which is 5.  However, struct
+> kvm_mmu_page's level currently is not set correctly when it is allocated
+> in kvm_tdp_mmu_map().  When iterator hits non-present SPTE and needs to
+> allocate a new child page table, currently iter->level, which is the
+> level of the page table where the non-present SPTE belongs to, is used.
+> This results in struct kvm_mmu_page's level always having its parent's
+> level (excpet root table's level, which is initialized explicitly using
+> mmu->shadow_root_level).
 > 
-> KVM_GET_LAPIC stores the current value of TMCCT and KVM_SET_LAPIC's memcpy
-> stores it in vcpu->arch.apic->regs, KVM_SET_LAPIC could store zero in
-> vcpu->arch.apic->regs after it uses it, and then the stored value would
-> always be zero. In addition, the TMCCT is always computed on-demand and
-> never directly readable.
+> This is kinda wrong, and not consistent with existing non TDP MMU code.
+> Fortuantely sp->role.level is only used in handle_removed_tdp_mmu_page()
+> and kvm_tdp_mmu_zap_sp(), and they are already aware of this and behave
+> correctly.  However to make it consistent with legacy MMU code (and fix
+> the issue that both root page table and its child page table have
+> shadow_root_level), use iter->level - 1 in kvm_tdp_mmu_map(), and change
+> handle_removed_tdp_mmu_page() and kvm_tdp_mmu_zap_sp() accordingly.
 > 
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> Reviewed-by: Ben Gardon <bgardon@google.com>
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
 > ---
->   arch/x86/kvm/lapic.c | 1 +
->   1 file changed, 1 insertion(+)
+>   arch/x86/kvm/mmu/tdp_mmu.c | 8 ++++----
+>   arch/x86/kvm/mmu/tdp_mmu.h | 2 +-
+>   2 files changed, 5 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 6d72d8f43310..9bd29b3ca790 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -2628,6 +2628,7 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
->   	apic_manage_nmi_watchdog(apic, kvm_lapic_get_reg(apic, APIC_LVT0));
->   	update_divide_count(apic);
->   	__start_apic_timer(apic, APIC_TMCCT);
-> +	kvm_lapic_set_reg(apic, APIC_TMCCT, 0);
->   	kvm_apic_update_apicv(vcpu);
->   	apic->highest_isr_cache = -1;
->   	if (vcpu->arch.apicv_active) {
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index efb7503ed4d5..4d658882a4d8 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -337,7 +337,7 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
+>   
+>   	for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
+>   		sptep = rcu_dereference(pt) + i;
+> -		gfn = base_gfn + (i * KVM_PAGES_PER_HPAGE(level - 1));
+> +		gfn = base_gfn + i * KVM_PAGES_PER_HPAGE(level);
+>   
+>   		if (shared) {
+>   			/*
+> @@ -379,12 +379,12 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
+>   			WRITE_ONCE(*sptep, REMOVED_SPTE);
+>   		}
+>   		handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), gfn,
+> -				    old_child_spte, REMOVED_SPTE, level - 1,
+> +				    old_child_spte, REMOVED_SPTE, level,
+>   				    shared);
+>   	}
+>   
+>   	kvm_flush_remote_tlbs_with_address(kvm, gfn,
+> -					   KVM_PAGES_PER_HPAGE(level));
+> +					   KVM_PAGES_PER_HPAGE(level + 1));
+>   
+>   	call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
+>   }
+> @@ -1030,7 +1030,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>   			if (is_removed_spte(iter.old_spte))
+>   				break;
+>   
+> -			sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level);
+> +			sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level - 1);
+>   			child_pt = sp->spt;
+>   
+>   			new_spte = make_nonleaf_spte(child_pt,
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+> index f7a7990da11d..408aa49731d5 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.h
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.h
+> @@ -31,7 +31,7 @@ static inline bool kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, int as_id,
+>   }
+>   static inline bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+>   {
+> -	gfn_t end = sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level);
+> +	gfn_t end = sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level + 1);
+>   
+>   	/*
+>   	 * Don't allow yielding, as the caller may have a flush pending.  Note,
 > 
 
 Queued, thanks.
