@@ -2,99 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C52E93ABACE
-	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 19:45:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 345BE3ABBC1
+	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 20:26:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232590AbhFQRrT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Jun 2021 13:47:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52118 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231249AbhFQRrS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Jun 2021 13:47:18 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F2AC061574
-        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 10:45:10 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id s17-20020a17090a8811b029016e89654f93so6550652pjn.1
-        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 10:45:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=6ijVHXkKuXOHj7SiqwpiZuOlv0qDP3mfw8fxeQE0vuQ=;
-        b=jBlqQzBe1yDqTTYGiS0zBN/5XGfXSfcirNp81V4VIIktBOYHC1FiKN+QPQS1sj5ues
-         nX7CPdDj2gzDk++WlvgmhbWnpDKbQkcpFsQt/3x2FEXBjuVUvJp2KxLW69DC9UE5oWhp
-         QjBR+X6DwnEm4fxVJnXyWqmkzIUEI1kNNU9W/oSPOn2jec6YGhvUFBJwMpDl5+efbmZ6
-         uBhNrSpT0gVjgkPhgxy7c7xF91uVySAYGVMGBAJic+skdYoovgkRbG0A9OFs8GJcolwE
-         HqtoRBo3n8ekle0PlHT672ZNM1k4rKYwNl14EptTf2xnEhvo0xRasFBXDNorKjYzukcp
-         MBgQ==
+        id S232110AbhFQS2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Jun 2021 14:28:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30899 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232146AbhFQS22 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 17 Jun 2021 14:28:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623954380;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XvRDiOu3L2aDPvixr4wW0PI+YISrBEUZXNM7z6Kd0Ug=;
+        b=A9MOAYskcWqQSre+6cq8wnuNwFPYM6ED5LYWLQ19t5PjlBirDRHIrzL5pVoElTz5AH9sIq
+        ml6ZlhumE2kr5wEqlBMmeCKNlcSwCb/HxAcs3IdEsNDt35X67rhOKpgCwyyMvBKmHYNboK
+        KveFczViWaqpD7aMC8PlTdpVu8uuxK4=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-111-ZoBKr1WFPR65ZL76r-xccA-1; Thu, 17 Jun 2021 14:26:18 -0400
+X-MC-Unique: ZoBKr1WFPR65ZL76r-xccA-1
+Received: by mail-ej1-f71.google.com with SMTP id u4-20020a1709061244b02904648b302151so2776715eja.17
+        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 11:26:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=6ijVHXkKuXOHj7SiqwpiZuOlv0qDP3mfw8fxeQE0vuQ=;
-        b=pP7Qa7Ycn+gMxdml60C/7xGgX5FWkFQ6dEhT8a1cSjoPEMYHdMTANpliJQvfjH+fcw
-         nH66SI1/il4ipMak6LmWNOXYyIzVgJfFSRs0bNEt3ZApPb4zsRdXc8U78mn/j7kcGT7g
-         hXQ5vVhueJjr1hSU0rQZByThAWjPN0+7XdUIs4kgE5zOxCV8eSDhLr9edQn6oRn9qaRI
-         Lagu9z4FVQOzDvYTPjj7kf79Irk8FD5YgVOLEC1gHLd+Kw6HuSvLgFD6u6+612uNI8x2
-         +8mOPi2CBiNCYuX7i95PUG9uCk1+0GJdJVBrB+bDeo0ivb7MHyALlZ4WAc4o4dnTwxt8
-         yglw==
-X-Gm-Message-State: AOAM531TKUYGFWPtVVHPcpVkfz7YRqhvcxVr2V+QZvhWHz58VQeN+svG
-        W8dE3zbJdh2tEX+wPe7snd8=
-X-Google-Smtp-Source: ABdhPJwGaZFssP3LYSorSFhqtsz9ElZPwYYqvJcPVAbVcX3fcHn1gs841etPuQGMMTPpAXyDI1NRWA==
-X-Received: by 2002:a17:902:748c:b029:103:267f:a2b3 with SMTP id h12-20020a170902748cb0290103267fa2b3mr920930pll.23.1623951910236;
-        Thu, 17 Jun 2021 10:45:10 -0700 (PDT)
-Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id v7sm5834880pfi.187.2021.06.17.10.45.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Jun 2021 10:45:09 -0700 (PDT)
-From:   Nadav Amit <nadav.amit@gmail.com>
-X-Google-Original-From: Nadav Amit
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>
-Subject: [kvm-unit-tests PATCH] x86: Flush the TLB after setting user-bit
-Date:   Thu, 17 Jun 2021 03:15:43 -0700
-Message-Id: <20210617101543.180792-1-namit@vmware.com>
-X-Mailer: git-send-email 2.25.1
+        bh=XvRDiOu3L2aDPvixr4wW0PI+YISrBEUZXNM7z6Kd0Ug=;
+        b=askxlr1aOg3+FztHg+xR84arijuDVjuIiekAvIInFuox4LVcBg6hZac1dtISl7eb9u
+         oyeCcNSIvkSfGqaso869w/ZBXVmxqe6vV0KyisFPjhJRF22Lp8UsqEcpFuxKDT/dAmYU
+         9n7L+NWBBFIQwzB8jgb92GtFJ0JMzcDHSU8ecFlCInSu+/TemJ0QhMfiMNS/MH2/bVLV
+         VKaxzh6X4rKylusYApl8oJMX3m2MYAFwQX23PYk08aRr0rFqZXGIhnQ0LgniXCFQ0CNg
+         6qN36Tu3nDd3GeCPzDpUsAmFLiMemoDieN2kLskUgFXiWM0SZccwnWK5QgyF3Yg16Oze
+         R0TA==
+X-Gm-Message-State: AOAM530d0z8vvoO0sK4pBE33mv4+lbABkpVVRBWz1cUvVQ4qwBReUenO
+        Zc/bq1/mT3P2a+SVw6U46ITkBSQ0VUSU2wyhp06XKzJuED2KyMcaECXglhFj2e0vNgGK52MAOjj
+        lKMBJRYwTBujO
+X-Received: by 2002:a05:6402:31f3:: with SMTP id dy19mr8407674edb.153.1623954377523;
+        Thu, 17 Jun 2021 11:26:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwHC/0zrifPDrAWmAlm02JHo9HIKYIOLCBfKF2EIzEF/aYCysomV9DjE4RzUEhNqpvTWbYIiA==
+X-Received: by 2002:a05:6402:31f3:: with SMTP id dy19mr8407653edb.153.1623954377328;
+        Thu, 17 Jun 2021 11:26:17 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id u21sm4202016eja.59.2021.06.17.11.26.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Jun 2021 11:26:16 -0700 (PDT)
+Subject: Re: [PATCH v3] KVM: LAPIC: Keep stored TMCCT register value 0 after
+ KVM_SET_LAPIC
+To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+References: <1623223000-18116-1-git-send-email-wanpengli@tencent.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <02391363-6713-1548-fa4b-70b70cc96f79@redhat.com>
+Date:   Thu, 17 Jun 2021 20:26:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1623223000-18116-1-git-send-email-wanpengli@tencent.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Nadav Amit <nadav.amit@gmail.com>
+On 09/06/21 09:16, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+> 
+> KVM_GET_LAPIC stores the current value of TMCCT and KVM_SET_LAPIC's memcpy
+> stores it in vcpu->arch.apic->regs, KVM_SET_LAPIC could store zero in
+> vcpu->arch.apic->regs after it uses it, and then the stored value would
+> always be zero. In addition, the TMCCT is always computed on-demand and
+> never directly readable.
+> 
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>   arch/x86/kvm/lapic.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 6d72d8f43310..9bd29b3ca790 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2628,6 +2628,7 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
+>   	apic_manage_nmi_watchdog(apic, kvm_lapic_get_reg(apic, APIC_LVT0));
+>   	update_divide_count(apic);
+>   	__start_apic_timer(apic, APIC_TMCCT);
+> +	kvm_lapic_set_reg(apic, APIC_TMCCT, 0);
+>   	kvm_apic_update_apicv(vcpu);
+>   	apic->highest_isr_cache = -1;
+>   	if (vcpu->arch.apicv_active) {
+> 
 
-According to Intel SDM 4.10.4.3 "Optional Invalidation": "If CR4.SMEP =
-0 and a paging-structure entry is modified to change the U/S flag from 0
-to 1, failure to perform an invalidation may result in a "spurious"
-page-fault exception (e.g., in response to an attempted user-mode
-access) but no other adverse behavior."
+Queued, thanks.
 
-The access test actually causes in certain environments a spurious
-page-fault. So invalidate the relevant PTE after setting the user bit.
-
-Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
----
- x86/access.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/x86/access.c b/x86/access.c
-index 0ad677e..47807cc 100644
---- a/x86/access.c
-+++ b/x86/access.c
-@@ -216,8 +216,12 @@ static unsigned set_cr4_smep(int smep)
-     if (smep)
-         ptl2[2] &= ~PT_USER_MASK;
-     r = write_cr4_checking(cr4);
--    if (r || !smep)
-+    if (r || !smep) {
-         ptl2[2] |= PT_USER_MASK;
-+
-+	/* Flush to avoid spurious #PF */
-+	invlpg((void *)(2 << 21));
-+    }
-     if (!r)
-         shadow_cr4 = cr4;
-     return r;
--- 
-2.25.1
+Paolo
 
