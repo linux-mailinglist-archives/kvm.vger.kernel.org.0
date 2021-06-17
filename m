@@ -2,29 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 40A813AAD4D
-	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 09:22:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 734853AAD5C
+	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 09:22:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230167AbhFQHYS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Jun 2021 03:24:18 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:42809 "EHLO ozlabs.org"
+        id S230268AbhFQHYY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Jun 2021 03:24:24 -0400
+Received: from ozlabs.org ([203.11.71.1]:51963 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229805AbhFQHYQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Jun 2021 03:24:16 -0400
+        id S230152AbhFQHYS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Jun 2021 03:24:18 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4G5D5W6N8xz9sWM; Thu, 17 Jun 2021 17:22:07 +1000 (AEST)
+        id 4G5D5X1pwnz9sfG; Thu, 17 Jun 2021 17:22:07 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1623914527;
-        bh=nMIejQhBBbAiJzh1waEkmffz9zEoMKNNjdFKEBUdaAs=;
+        d=gibson.dropbear.id.au; s=201602; t=1623914528;
+        bh=STE+d2uTnkvdb42HamLd+MfBt9F8tUHB2UkclaEK7v8=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=LP2SrMyFZFM3lxnV0cfsJLLOZ8pFFXH4yyGOAuS/2XtiUfUx3XwCsddDp919mD57F
-         XzK/GtQd1OZxlkdHpfgxnFDEZ4UL8woMDvJ38I2R8RBvX/0nRdewdAjSGYOPSFnb9v
-         LpwehvlI98nioGHkuJ42banezN8EHq75C6WmjrFI=
-Date:   Thu, 17 Jun 2021 15:02:33 +1000
+        b=PNq/C0LPf1BgWwCaRdZtEEDQVl7d9At1bLkWjoJSrAw0T6UF3ViXg5+mvjNwQ+9jv
+         /wp0Y+Dn/tG5KfQf+IhgjPpwuW/selVgFMdz4WuREir4QoCn1+fymt+nnDNkpARVWN
+         IjcHbdRMrkybcDavtdz1q58To3+VDiUMf6jHogDU=
+Date:   Thu, 17 Jun 2021 15:22:53 +1000
 From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Joerg Roedel <joro@8bytes.org>, Jason Gunthorpe <jgg@nvidia.com>,
+To:     Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, Joerg Roedel <joro@8bytes.org>,
         "Tian, Kevin" <kevin.tian@intel.com>,
+        "Alex Williamson (alex.williamson@redhat.com)" 
+        <alex.williamson@redhat.com>,
         Jean-Philippe Brucker <jean-philippe@linaro.org>,
         Jason Wang <jasowang@redhat.com>,
         "parav@mellanox.com" <parav@mellanox.com>,
@@ -42,103 +44,112 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Jason Gunthorpe <jgg@nvidia.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
         David Woodhouse <dwmw2@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>
+        LKML <linux-kernel@vger.kernel.org>
 Subject: Re: Plan for /dev/ioasid RFC v2
-Message-ID: <YMrXaWfAyLBnI3eP@yekko>
+Message-ID: <YMrcLcTL+cUKd1a5@yekko>
 References: <MWHPR11MB188699D0B9C10EB51686C4138C389@MWHPR11MB1886.namprd11.prod.outlook.com>
  <YMCy48Xnt/aphfh3@8bytes.org>
  <20210609123919.GA1002214@nvidia.com>
- <YMDC8tOMvw4FtSek@8bytes.org>
- <20210609150009.GE1002214@nvidia.com>
- <YMDjfmJKUDSrbZbo@8bytes.org>
- <20210609101532.452851eb.alex.williamson@redhat.com>
+ <14d884a8-13bc-b2ba-7020-94b219e3e2d9@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="8PvddoXrk24w8n4P"
+        protocol="application/pgp-signature"; boundary="Qg4Qzsx5xFwMhlcX"
 Content-Disposition: inline
-In-Reply-To: <20210609101532.452851eb.alex.williamson@redhat.com>
+In-Reply-To: <14d884a8-13bc-b2ba-7020-94b219e3e2d9@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---8PvddoXrk24w8n4P
+--Qg4Qzsx5xFwMhlcX
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 09, 2021 at 10:15:32AM -0600, Alex Williamson wrote:
-> On Wed, 9 Jun 2021 17:51:26 +0200
-> Joerg Roedel <joro@8bytes.org> wrote:
+On Thu, Jun 10, 2021 at 01:50:22PM +0800, Lu Baolu wrote:
+> On 6/9/21 8:39 PM, Jason Gunthorpe wrote:
+> > On Wed, Jun 09, 2021 at 02:24:03PM +0200, Joerg Roedel wrote:
+> > > On Mon, Jun 07, 2021 at 02:58:18AM +0000, Tian, Kevin wrote:
+> > > > -   Device-centric (Jason) vs. group-centric (David) uAPI. David is=
+ not fully
+> > > >      convinced yet. Based on discussion v2 will continue to have io=
+asid uAPI
+> > > >      being device-centric (but it's fine for vfio to be group-centr=
+ic). A new
+> > > >      section will be added to elaborate this part;
+> > > I would vote for group-centric here. Or do the reasons for which VFIO=
+ is
+> > > group-centric not apply to IOASID? If so, why?
+> > VFIO being group centric has made it very ugly/difficult to inject
+> > device driver specific knowledge into the scheme.
+> >=20
+> > The device driver is the only thing that knows to ask:
+> >   - I need a SW table for this ioasid because I am like a mdev
+> >   - I will issue TLPs with PASID
+> >   - I need a IOASID linked to a PASID
+> >   - I am a devices that uses ENQCMD and vPASID
+> >   - etc in future
+> >=20
+> > The current approach has the group try to guess the device driver
+> > intention in the vfio type 1 code.
+> >=20
+> > I want to see this be clean and have the device driver directly tell
+> > the iommu layer what kind of DMA it plans to do, and thus how it needs
+> > the IOMMU and IOASID configured.
+> >=20
+> > This is the source of the ugly symbol_get and the very, very hacky 'if
+> > you are a mdev*and*  a iommu then you must want a single PASID' stuff
+> > in type1.
+> >=20
+> > The group is causing all this mess because the group knows nothing
+> > about what the device drivers contained in the group actually want.
+> >=20
+> > Further being group centric eliminates the possibility of working in
+> > cases like !ACS. How do I use PASID functionality of a device behind a
+> > !ACS switch if the uAPI forces all IOASID's to be linked to a group,
+> > not a device?
+> >=20
+> > Device centric with an report that "all devices in the group must use
+> > the same IOASID" covers all the new functionality, keep the old, and
+> > has a better chance to keep going as a uAPI into the future.
 >=20
-> > On Wed, Jun 09, 2021 at 12:00:09PM -0300, Jason Gunthorpe wrote:
-> > > Only *drivers* know what the actual device is going to do, devices do
-> > > not. Since the group doesn't have drivers it is the wrong layer to be
-> > > making choices about how to configure the IOMMU. =20
-> >=20
-> > Groups don't carry how to configure IOMMUs, that information is
-> > mostly in the IOMMU domains. And those (or an abstraction of them) is
-> > configured through /dev/ioasid. So not sure what you wanted to say with
-> > the above.
-> >=20
-> > All a group carries is information about which devices are not
-> > sufficiently isolated from each other and thus need to always be in the
-> > same domain.
-> >=20
-> > > The device centric approach is my attempt at this, and it is pretty
-> > > clean, I think. =20
-> >=20
-> > Clean, but still insecure.
-> >=20
-> > > All ACS does is prevent P2P operations, if you assign all the group
-> > > devices into the same /dev/iommu then you may not care about that
-> > > security isolation property. At the very least it is policy for user
-> > > to decide, not kernel. =20
-> >=20
-> > It is a kernel decision, because a fundamental task of the kernel is to
-> > ensure isolation between user-space tasks as good as it can. And if a
-> > device assigned to one task can interfer with a device of another task
-> > (e.g. by sending P2P messages), then the promise of isolation is broken.
+> The iommu_group can guarantee the isolation among different physical
+> devices (represented by RIDs). But when it comes to sub-devices (ex. mdev=
+ or
+> vDPA devices represented by RID + SSID), we have to rely on the
+> device driver for isolation. The devices which are able to generate sub-
+> devices should either use their own on-device mechanisms or use the
+> platform features like Intel Scalable IOV to isolate the sub-devices.
+
+This seems like a misunderstanding of groups.  Groups are not tied to
+any PCI meaning.  Groups are the smallest unit of isolation, no matter
+what is providing that isolation.
+
+If mdevs are isolated from each other by clever software, even though
+they're on the same PCI device they are in different groups from each
+other *by definition*.  They are also in a different group from their
+parent device (however the mdevs only exist when mdev driver is
+active, which implies that the parent device's group is owned by the
+kernel).
+
+> Under above conditions, different sub-device from a same RID device
+> could be able to use different IOASID. This seems to means that we can't
+> support mixed mode where, for example, two RIDs share an iommu_group and
+> one (or both) of them have sub-devices.
+
+That doesn't necessarily follow.  mdevs which can be successfully
+isolated by their mdev driver are in a different group from their
+parent device, and therefore need not be affected by whether the
+parent device shares a group with some other physical device.  They
+*might* be, but that's up to the mdev driver to determine based on
+what it can safely isolate.
+
+> AIUI, when we attach a "RID + SSID" to an IOASID, we should require that
+> the RID doesn't share the iommu_group with any other RID.
 >=20
-> AIUI, the IOASID model will still enforce IOMMU groups, but it's not an
-> explicit part of the interface like it is for vfio.  For example the
-> IOASID model allows attaching individual devices such that we have
-> granularity to create per device IOASIDs, but all devices within an
-> IOMMU group are required to be attached to an IOASID before they can be
-> used.  It's not entirely clear to me yet how that last bit gets
-> implemented though, ie. what barrier is in place to prevent device
-> usage prior to reaching this viable state.
->
-> > > Groups should be primarily about isolation security, not about IOASID
-> > > matching. =20
-> >=20
-> > That doesn't make any sense, what do you mean by 'IOASID matching'?
+> Best regards,
+> baolu
 >=20
-> One of the problems with the vfio interface use of groups is that we
-> conflate the IOMMU group for both isolation and granularity.  I think
-> what Jason is referring to here is that we still want groups to be the
-> basis of isolation, but we don't want a uAPI that presumes all devices
-> within the group must use the same IOASID.  For example, if a user owns
-> an IOMMU group consisting of non-isolated functions of a multi-function
-> device, they should be able to create a vIOMMU VM where each of those
-> functions has its own address space.  That can't be done today, the
-> entire group would need to be attached to the VM under a PCIe-to-PCI
-> bridge to reflect the address space limitation imposed by the vfio
-> group uAPI model.  Thanks,
-
-I'm fairly sceptical of the idea of allowing the "identifiable
-requestor" grouping to be different from the isolation grouping.
-Certainly it's possible in hardware, but I think it makes the
-interface horribly complex to understand without buying much.
-
-"Good" modern devices on modern systems will be both fully isolated
-and well identified, so for the uses cases that people seem to mostly
-care about here we'll still have identification group =3D=3D isolation
-group =3D=3D one device.
-
-In other words, do we really have use cases where we need to identify
-different devices IDs, even though we know they're not isolated.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -146,24 +157,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---8PvddoXrk24w8n4P
+--Qg4Qzsx5xFwMhlcX
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmDK12cACgkQbDjKyiDZ
-s5JIqw/+Le8InXvaXY8PJqs4GLnd0hYRw12Z0I/TLdJN/Tb0dn4/aCLKUwXDe2L0
-RmzpW/UurBMhJcndCukBTe5k9ylkhmifjAVHzDt+fjxc1hdwaaUWKblj8lQPzVkb
-TBSFQlj9hGJ1zVYZRq1lG2Oh8CbUveiM3UP7dfaV/N0M5KhBtqdMsq/+LrF9MW0s
-6d7ckET4i2UoOBVWVLO+UVx2HekQmZ6F0LJIUs45PkqusM0U5ruBsnmhCy8oNgcB
-HWoICR834W0u6r8ox8QXQCpe5vvIk6RzXGc0hgWEmQCT7QHIrg6J4QqspIalkp0O
-7Mm9HlgHXg/d9emXUA+kL5GvvtF84+iNjxMU9llCrCIsq24rvY1x2GhmzcyVly/9
-6Rzclsze/0I3DF7oHvwlW8x6fbQ6rKDryLfeIPBrGzoyEQQmTznTkVbo/MSbilUY
-q739RRgRjq9248MZJFZJ8UVYDsyfxgXglLB/8R1O/Y/q+z88W4EbX7p2tcHSQXMx
-wBkdYp0oQyhpvCHIbsqPnClnwM5Ox1w640jM0aq439IchMWcd+xkumiamm1uHcu7
-jkl9Gr+6qzPXAFZdpuSgKUV+HJhf3U7A/94rZlNoP75fhC9UrODKZFLmtmRymegG
-w+NjcLl2mH0z1r3r0L7BE1w7eafKYOAqQF1I6VWIXnoWojHHq5w=
-=CyOl
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmDK3CsACgkQbDjKyiDZ
+s5IlrBAAwxFTrL8LAB2uQXstokS55+p2jxYUo/fOIk5+cfRY6geiV+GbzkG/xTod
+k7QlN4g8dKSVLrHUnsqisNjAgO3y82Xedjs65Z1NzK2H+d1NUEZWvshZiraj/UkJ
+9oAiDT7Vjso/HVTChuBOG/XpKvWCLVw/hjUB50msuwGcujvyjC8Wjg55t4hEJ+rE
+2oV+hyxthPMIT3a/bxBbLegwXDJUCSZaDF7HzhHmbxUmMA6CxijfFHN3gJUE9NTk
+Ilknrr5hDeDZOxjWhs9Fe3eRiD3dI75X8t33HGbFX5WM1tlz+6AGauoWBDoRYqGW
+4LmrhHiNDLP2aS83/UKEoa2euTcjqS0vFzm0DhIpBBCrtX6W7mXOzJxBCBC6B8m/
+HuwNVtA1R3NWmKOojtBoYXPouAecAvyeRW1QFPXzzSnoiQ8QEQW/p7lnusfIKIM1
+2x2c4cL3pHpDspHY+juuDWK4Y7iM8RKRyvEHdfdXK2k1PDBhNsa8Jteo+gdXtIMO
+SqXGCZjHV4d6RWfMUplc+4BJbVIJVzU7QB5j3fSNd2DYUSRS4LTpbP4RaA2jESJ0
+aW9kXhCq1DazqnP6gTA5LDgRYWOT9VBOpCw51keQmQqehsvg/0v1mM6HV8IPnAf3
+UyurYxCaU3lApcGqNOxk+hLdU7Fcd9B0WVMgKl3eqgMLxHFbxaE=
+=X5QH
 -----END PGP SIGNATURE-----
 
---8PvddoXrk24w8n4P--
+--Qg4Qzsx5xFwMhlcX--
