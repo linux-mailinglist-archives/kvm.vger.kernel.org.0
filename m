@@ -2,256 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 69F4B3AAB02
-	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 07:22:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D7A6C3AAB70
+	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 07:52:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230001AbhFQFY5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Jun 2021 01:24:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53109 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229693AbhFQFYt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Jun 2021 01:24:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623907361;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZyyHSrmDn9lggOnRJXhd5UV4zz1gTs3y67TMBTj2nvg=;
-        b=ZE9ya2Na8p1j4gbTMsNbA8c3/YDKX9+u0sCx/sz7z31khnId999yGy08trVC5UiSMXq8br
-        gbUIbm5Se5JtvLV58OgVj1TM/rPXRsq6BEoCC4kVZmwYrwx+7KObTHzRpJop4xOtHi9aWE
-        G+ovWqg6sxxOo51p/8YIdx2a1I4iT1o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-343-_IZ2WPTAMJCW1bde_Kb3lA-1; Thu, 17 Jun 2021 01:22:40 -0400
-X-MC-Unique: _IZ2WPTAMJCW1bde_Kb3lA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 59AEE801B15;
-        Thu, 17 Jun 2021 05:22:38 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-104.ams2.redhat.com [10.36.112.104])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 96E265C1C5;
-        Thu, 17 Jun 2021 05:22:37 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-        id 2C266113865F; Thu, 17 Jun 2021 07:22:36 +0200 (CEST)
-From:   Markus Armbruster <armbru@redhat.com>
-To:     Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
-Cc:     qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Eric Blake <eblake@redhat.com>,
+        id S230027AbhFQFyz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Jun 2021 01:54:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45984 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229872AbhFQFyy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Jun 2021 01:54:54 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D64E2613B9;
+        Thu, 17 Jun 2021 05:52:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1623909165;
+        bh=9KBrT/ACir1e2NYW19fTACFyvfP46/nEtRjOwC4TLa4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=COom/knVjERjbeaSc0vj31xh3o+QfjpOZPlnEyVZZiSgaA48LCYLRHSJNDuspnqSm
+         OYdExBPFwSSgDLjQJU4SsiypobFhY6HpllEsKce76jnk7CA6aM1vqUkjLASrpLt0it
+         J+4u3QGq+mzIXOigYYBf5VO+NGVjNWZ7L62J3+DE=
+Date:   Thu, 17 Jun 2021 07:52:42 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
-        Denis Lunev <den@openvz.org>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v9] qapi: introduce 'query-kvm-cpuid' action
-References: <20210603090753.11688-1-valeriy.vdovin@virtuozzo.com>
-Date:   Thu, 17 Jun 2021 07:22:36 +0200
-In-Reply-To: <20210603090753.11688-1-valeriy.vdovin@virtuozzo.com> (Valeriy
-        Vdovin's message of "Thu, 3 Jun 2021 12:07:53 +0300")
-Message-ID: <87im2d6p5v.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v10 3/5] KVM: stats: Add documentation for binary
+ statistics interface
+Message-ID: <YMrjKhV8TNwmRtf6@kroah.com>
+References: <20210617044146.2667540-1-jingzhangos@google.com>
+ <20210617044146.2667540-4-jingzhangos@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210617044146.2667540-4-jingzhangos@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Valeriy Vdovin <valeriy.vdovin@virtuozzo.com> writes:
-
-> Introducing new qapi method 'query-kvm-cpuid'. This method can be used to
-
-It's actually a QMP command.  There are no "qapi methods".
-
-> get virtualized cpu model info generated by QEMU during VM initialization in
-> the form of cpuid representation.
->
-> Diving into more details about virtual cpu generation: QEMU first parses '-cpu'
-
-virtual CPU
-
-> command line option. From there it takes the name of the model as the basis for
-> feature set of the new virtual cpu. After that it uses trailing '-cpu' options,
-> that state if additional cpu features should be present on the virtual cpu or
-> excluded from it (tokens '+'/'-' or '=on'/'=off').
-> After that QEMU checks if the host's cpu can actually support the derived
-> feature set and applies host limitations to it.
-> After this initialization procedure, virtual cpu has it's model and
-> vendor names, and a working feature set and is ready for identification
-> instructions such as CPUID.
->
-> Currently full output for this method is only supported for x86 cpus.
-
-Not sure about "currently": the interface looks quite x86-specific to me.
-
-The commit message doesn't mention KVM except in the command name.  The
-schema provides the command only if defined(CONFIG_KVM).
-
-Can you explain why you need the restriction to CONFIG_KVM?
-
-> To learn exactly how virtual cpu is presented to the guest machine via CPUID
-> instruction, new qapi method can be used. By calling 'query-kvm-cpuid'
-
-QMP command again.
-
-> method, one can get a full listing of all CPUID leafs with subleafs which are
-> supported by the initialized virtual cpu.
->
-> Other than debug, the method is useful in cases when we would like to
-> utilize QEMU's virtual cpu initialization routines and put the retrieved
-> values into kernel CPUID overriding mechanics for more precise control
-> over how various processes perceive its underlying hardware with
-> container processes as a good example.
->
-> Output format:
-> The output is a plain list of leaf/subleaf agrument combinations, that
-
-Typo: argument
-
-> return 4 words in registers EAX, EBX, ECX, EDX.
->
-> Use example:
-> qmp_request: {
->   "execute": "query-kvm-cpuid"
-> }
->
-> qmp_response: {
->   "return": [
->     {
->       "eax": 1073741825,
->       "edx": 77,
->       "in-eax": 1073741824,
->       "ecx": 1447775574,
->       "ebx": 1263359563
->     },
->     {
->       "eax": 16777339,
->       "edx": 0,
->       "in-eax": 1073741825,
->       "ecx": 0,
->       "ebx": 0
->     },
->     {
->       "eax": 13,
->       "edx": 1231384169,
->       "in-eax": 0,
->       "ecx": 1818588270,
->       "ebx": 1970169159
->     },
->     {
->       "eax": 198354,
->       "edx": 126614527,
->       "in-eax": 1,
->       "ecx": 2176328193,
->       "ebx": 2048
->     },
->     ....
->     {
->       "eax": 12328,
->       "edx": 0,
->       "in-eax": 2147483656,
->       "ecx": 0,
->       "ebx": 0
->     }
->   ]
-> }
->
-> Signed-off-by: Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
-> ---
-> v2: - Removed leaf/subleaf iterators.
->     - Modified cpu_x86_cpuid to return false in cases when count is
->       greater than supported subleaves.
-> v3: - Fixed structure name coding style.
->     - Added more comments
->     - Ensured buildability for non-x86 targets.
-> v4: - Fixed cpu_x86_cpuid return value logic and handling of 0xA leaf.
->     - Fixed comments.
->     - Removed target check in qmp_query_cpu_model_cpuid.
-> v5: - Added error handling code in qmp_query_cpu_model_cpuid
-> v6: - Fixed error handling code. Added method to query_error_class
-> v7: - Changed implementation in favor of cached cpuid_data for
->       KVM_SET_CPUID2
-> v8: - Renamed qmp method to query-kvm-cpuid and some fields in response.
->     - Modified documentation to qmp method
->     - Removed helper struct declaration
-> v9: - Renamed 'in_eax' / 'in_ecx' fields to 'in-eax' / 'in-ecx'
->     - Pasted more complete response to commit message.
->
->  qapi/machine-target.json   | 43 ++++++++++++++++++++++++++++++++++++++
->  target/i386/kvm/kvm.c      | 37 ++++++++++++++++++++++++++++++++
->  tests/qtest/qmp-cmd-test.c |  1 +
->  3 files changed, 81 insertions(+)
->
-> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
-> index e7811654b7..1e591ba481 100644
-> --- a/qapi/machine-target.json
-> +++ b/qapi/machine-target.json
-> @@ -329,3 +329,46 @@
->  ##
->  { 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
->    'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I386) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
+On Thu, Jun 17, 2021 at 04:41:44AM +0000, Jing Zhang wrote:
+> +	struct kvm_stats_desc {
+> +		__u32 flags;
+> +		__s16 exponent;
+> +		__u16 size;
+> +		__u32 offset;
+> +		__u32 unused;
+> +		char name[0];
+> +	};
 > +
-> +##
-> +# @CpuidEntry:
-> +#
-> +# A single entry of a CPUID response.
-> +#
-> +# One entry holds full set of information (leaf) returned to the guest in response
-> +# to it calling a CPUID instruction with eax, ecx used as the agruments to that
-
-Typi: agruments
-
-> +# instruction. ecx is an optional argument as not all of the leaves support it.
-
-Please wrap doc comment lines around column 70.
-
-> +#
-> +# @in-eax: CPUID argument in eax
-> +# @in-ecx: CPUID argument in ecx
-> +# @eax: eax
-> +# @ebx: ebx
-> +# @ecx: ecx
-> +# @edx: edx
-
-Suggest
-
-   # @eax: CPUID result in eax
-
-and so forth.
-
-> +#
-> +# Since: 6.1
-> +##
-> +{ 'struct': 'CpuidEntry',
-> +  'data': { 'in-eax' : 'uint32',
-> +            '*in-ecx' : 'uint32',
-> +            'eax' : 'uint32',
-> +            'ebx' : 'uint32',
-> +            'ecx' : 'uint32',
-> +            'edx' : 'uint32'
-> +          },
-> +  'if': 'defined(TARGET_I386) && defined(CONFIG_KVM)' }
+> +The ``flags`` field contains the type and unit of the statistics data described
+> +by this descriptor. The following flags are supported:
 > +
-> +##
-> +# @query-kvm-cpuid:
-> +#
-> +# Returns raw data from the KVM CPUID table for the first VCPU.
-> +# The KVM CPUID table defines the response to the CPUID
-> +# instruction when executed by the guest operating system.
-> +#
-> +# Returns: a list of CpuidEntry
-> +#
-> +# Since: 6.1
-> +##
-> +{ 'command': 'query-kvm-cpuid',
-> +  'returns': ['CpuidEntry'],
-> +  'if': 'defined(TARGET_I386) && defined(CONFIG_KVM)' }
+> +Bits 0-3 of ``flags`` encode the type:
 
-Is this intended to be a stable interface?  Interfaces intended just for
-debugging usually aren't.
+<snip>
 
-[...]
+As flags is a bit field, what is the endian of it?  Native or LE or BE?
+I'm guessing "cpu native", but you should be explicit as userspace will
+have to deal with this somehow.
 
+thanks,
+
+greg k-h
