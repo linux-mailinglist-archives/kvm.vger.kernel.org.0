@@ -2,161 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EC1B43AAD60
-	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 09:22:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 282163AACEB
+	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 09:03:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229868AbhFQHYe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Jun 2021 03:24:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52616 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230330AbhFQHYY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Jun 2021 03:24:24 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BFE5C06175F;
-        Thu, 17 Jun 2021 00:22:16 -0700 (PDT)
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4G5D5X0Rcrz9sX1; Thu, 17 Jun 2021 17:22:08 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1623914528;
-        bh=cv9SO0hR36Zcr4ac50I3juTYJZKB4nHG5BIWoMEa7HU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=SrHIuOMI6KkBFE0XphoxAhqxIbSomglcOjfWzG2pRKq+fMlpdJGC7ht3vlkI4Aumk
-         T3GgdaSnI7DqFMrwNxLgFwaMIpVIjPuzAU3LeBt5H/nzAPIRviS3DvWX+z4EaAYsLY
-         4rsEDmf2kSgaaT5t4+LRse8bz6TuDynlENtHAgZo=
-Date:   Thu, 17 Jun 2021 15:29:30 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Jason Wang <jasowang@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
+        id S229741AbhFQHFz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Jun 2021 03:05:55 -0400
+Received: from new4-smtp.messagingengine.com ([66.111.4.230]:45215 "EHLO
+        new4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229580AbhFQHFy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 17 Jun 2021 03:05:54 -0400
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 477165804CA;
+        Thu, 17 Jun 2021 03:03:46 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute3.internal (MEProxy); Thu, 17 Jun 2021 03:03:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:in-reply-to; s=fm1; bh=bHJT5oI183t6jXiLX3QAsM6ZuOC
+        /RnAjhVkdaNoMjms=; b=tNE1qdbTe2Iwk79XEmxLKNQf/ULyBRs71UgcvFxUPws
+        /UOhvLwidIeXxlIssIen9uT+20PVORO+X+Xftl6QQsh/Qq03jAFW6CAhEUX05vv+
+        /2ktx/H0Q80COXId5hOFulpBxdXVCx+PiQZ5+Vv1VCCat9WNJpywo/v9MOgsQQrU
+        dp/bDGiT5lMYInMG1NPsEsKJe1bc95oYES8TsfSwAGWrwVXcgS2oO1Bg5C2olSxe
+        QncDeB9Xa0Z6uv38Q30vFFnWV9ps++M7v5mRgD328yjY/YB5nPLq/vrLaf7yMPnn
+        Fz+MfbFTfpjwp9koJfvdOt+DiElCaEtiomO8I+lq6bQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=bHJT5o
+        I183t6jXiLX3QAsM6ZuOC/RnAjhVkdaNoMjms=; b=AMnxMQ0MQLmH+F4tyjDGo5
+        tqoJYLL3+fnBDD8a3zA+iMmAOJQPH2s4vdbvcF2fntElefcnM1M1DCo1RQdwVqrr
+        noleuZOcVZpgQqJbPUy7u7Imsg3gggcEPGeC/RF0SJ0dhyiO9rEfGiiUQ7KOnJti
+        9XWRQDLK6LBzMdHPrrpr/ek7HEfydxfWW6mi+fFvQz3hLj7KSByizRYeRJg+9ptB
+        GKE223xx1moa/6rL98j4OOOk1xByNrVnPFYsaTkDhWrag4sU3fTwxPY0IbVmeOZe
+        6DfWnJXuyjNlqyKynjhusDUByZgytQMRAN0ZdJrej4wgj4xaptYP8vKpalfFpBuA
+        ==
+X-ME-Sender: <xms:0PPKYJb4cPZMmeNkJS6hNkBCYqaAXTY8FDRKVyAUWZfO9tFMGaxB4Q>
+    <xme:0PPKYAa4rvMOF7kvq4LAPcqOpUFWbZJkRgfeb2sfhJolxArQjeL1JixLjilzjBTbo
+    fuDVcX5epR6dA>
+X-ME-Received: <xmr:0PPKYL8WoovLaP38NszhOiKK_7Zqlk7gUkvybi-NzcLHKDu5v_tDTHlNxbbyZAoN5_el6eq44Qr1kHTADaDun43-iiwScCrJ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrfeeftddguddutdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghg
+    ucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepveeuhe
+    ejgfffgfeivddukedvkedtleelleeghfeljeeiueeggeevueduudekvdetnecuvehluhhs
+    thgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepghhrvghgsehkrhhorg
+    hhrdgtohhm
+X-ME-Proxy: <xmx:0PPKYHq1avN6BNEi8vANMkXkqGdQtWEjShfRtV0HMbZf6_OqzR_F1A>
+    <xmx:0PPKYEqlNtjyglw52nt_5dKHSTkxKGSQDE69euR7foPlqrSwmgIdMg>
+    <xmx:0PPKYNR44zTgO-kpi3UXJ09C5vcWGpVR0mD0YOBytqO5JzNHBAtFDg>
+    <xmx:0vPKYHAHy81HipZYNm0Q2g22K9_KDTebTao77ccsKsEu5mpjCw5S-Q>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 17 Jun 2021 03:03:44 -0400 (EDT)
+Date:   Thu, 17 Jun 2021 09:03:41 +0200
+From:   Greg KH <greg@kroah.com>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Shenming Lu <lushenming@huawei.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>
-Subject: Re: Plan for /dev/ioasid RFC v2
-Message-ID: <YMrduqZj970sMC12@yekko>
-References: <YMCy48Xnt/aphfh3@8bytes.org>
- <20210609123919.GA1002214@nvidia.com>
- <YMDC8tOMvw4FtSek@8bytes.org>
- <20210609150009.GE1002214@nvidia.com>
- <YMDjfmJKUDSrbZbo@8bytes.org>
- <20210609101532.452851eb.alex.williamson@redhat.com>
- <20210609102722.5abf62e1.alex.williamson@redhat.com>
- <20210609184940.GH1002214@nvidia.com>
- <20210610093842.6b9a4e5b.alex.williamson@redhat.com>
- <20210611164529.GR1002214@nvidia.com>
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v10 2/5] KVM: stats: Add fd-based API to read binary
+ stats data
+Message-ID: <YMrzzYEkDQNCpnP7@kroah.com>
+References: <20210617044146.2667540-1-jingzhangos@google.com>
+ <20210617044146.2667540-3-jingzhangos@google.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="6z+5/HR0ORsYRart"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210611164529.GR1002214@nvidia.com>
+In-Reply-To: <20210617044146.2667540-3-jingzhangos@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Jun 17, 2021 at 04:41:43AM +0000, Jing Zhang wrote:
+> Provides a file descriptor per VM to read VM stats info/data.
+> Provides a file descriptor per vCPU to read vCPU stats info/data.
+> 
+> The KVM stats now is only accessible by debugfs, which has some
+> shortcomings this change are supposed to fix:
+> 1. Debugfs is not a stable interface for production and it is
+>    disabled when kernel Lockdown mode is enabled.
 
---6z+5/HR0ORsYRart
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+debugfs _could_ be a stable interface if you want it to be and make that
+rule for your subsystem.  Disabling it for lockdown mode is a different
+issue, and that is a system-wide-policy-decision, not a debugfs-specific
+thing.
 
-On Fri, Jun 11, 2021 at 01:45:29PM -0300, Jason Gunthorpe wrote:
-> On Thu, Jun 10, 2021 at 09:38:42AM -0600, Alex Williamson wrote:
->=20
-> > Opening the group is not the extent of the security check currently
-> > required, the group must be added to a container and an IOMMU model
-> > configured for the container *before* the user can get a devicefd.
-> > Each devicefd creates a reference to this security context, therefore
-> > access to a device does not exist without such a context.
->=20
-> Okay, I missed that detail in the organization..
->=20
-> So, if we have an independent vfio device fd then it needs to be
-> kept disable until the user joins it to an ioasid that provides the
-> security proof to allow it to work?
->=20
-> > What happens on detach?  As we've discussed elsewhere in this thread,
-> > revoking access is more difficult than holding a reference to the
-> > secure context, but I'm under the impression that moving a device
-> > between IOASIDs could be standard practice in this new model.  A device
-> > that's detached from a secure context, even temporarily, is a
-> > problem.
->=20
-> This is why I think the single iommu FD is critical, it is the FD, not
-> the IOASID that has to authorize the security. You shouldn't move
-> devices between FDs, but you can move them between IOASIDs inside the
-> same FD.
->=20
-> > How to label a device seems like a relatively mundane issue relative to
-> > ownership and isolated contexts of groups and devices.  The label is
-> > essentially just creating an identifier to device mapping, where the
-> > identifier (label) will be used in the IOASID interface, right?=20
->=20
-> It looks that way
->=20
-> > As I note above, that makes it difficult for vfio to maintain that a
-> > user only accesses a device in a secure context.  This is exactly
-> > why vfio has the model of getting a devicefd from a groupfd only
-> > when that group is in a secure context and maintaining references to
-> > that secure context for each device.  Split ownership of the secure
-> > context in IOASID vs device access in vfio and exposing devicefds
-> > outside the group is still a big question mark for me.  Thanks,
->=20
-> I think the protection model becomes different once we allow
-> individual devices inside a group to be attached to different
-> IOASID's.
+> 2. Debugfs is organized as "one value per file", it is good for
+>    debugging, but not supposed to be used for production.
 
-I'm really wary of this.  They might be rare, but we still need to
-consider the case of devices which can't be distinguished on the bus,
-and therefore can't be attached to different IOASIDs.  That means that
-if we allow attaching devices within a group to different IOASIDs we
-effectively need to introduce two levels of "group-like" things.
-First the idenfication group, then the isolation group.
+debugfs IS NOT one-value-per-file, you can do whatever you want in
+there.  sysfs IS one-value-per-file, do not get the two confused there.
 
+> 3. Debugfs read/clear in KVM are protected by the global kvm_lock.
 
-You're using "group" for the isolation group, but then we have to
-somehow expose this concept of identification group.  That seems like
-a heap of complexity and confusion in the interface.
+That's your implementation issue, not a debugfs issue.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+The only "rule" in debugfs is:
+	There are no rules.
 
---6z+5/HR0ORsYRart
-Content-Type: application/pgp-signature; name="signature.asc"
+So while your subsystem might have issues with using debugfs for
+statistics like this, that's not debugfs's fault, that's how you want to
+use the debugfs files for your subsystem.
 
------BEGIN PGP SIGNATURE-----
+> Besides that, there are some other benefits with this change:
+> 1. All KVM VM/VCPU stats can be read out in a bulk by one copy
+>    to userspace.
+> 2. A schema is used to describe KVM statistics. From userspace's
+>    perspective, the KVM statistics are self-describing.
+> 3. Fd-based solution provides the possibility that a telemetry can
+>    read KVM stats in a less privileged situation.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmDK3boACgkQbDjKyiDZ
-s5I9kxAA0QukseY3jKTmf0dc22wGxjZPOcBjHPo0Q0kDkFXxDCKbE+OFmwIS/Udr
-lQ2sAThf1Oy9CRMarmqN12YOtr+a02CHa+L87P4//PYb3KxVSUnfk/67MUm4KBRI
-Amkn4QWgJEXeSZRp7GjftpDjZ9hoLURDUPJRPJnDb5j0zliw/eSI4IbhIVt31XLf
-4l0ADlAaPyvwPvMPVSQSF7uIvSRsVr3M/RRWZjj6MSgJPwIMqaA7RXv8GGqutzc3
-JFwVbI5X8AfUgDdNrRpj4HPwo32+hCvAu7g70/rKSruGjAzQM2k45b8GzfQOAXPF
-JjRcSVxenCzbNmP7XlB1ZcBNQanp5KhkVReMISh2GVins129nJ2drZvaCmHUcq2v
-92ppg1uqYxQgjeRQoccuwQDvJ0dTmtPldoPbCKVDm/0nauz6htcyThh5No4Kcsl8
-RLl7mDukYKEX5yYCiTt2gBIjDCkO6foBotyuRwSGmQkTlUMDuQ1xTodnbfWRvLCF
-87OvDiYomV+elvPx06+oOPZVqHlifFa+dFN61o/m1HiJQV7Gr3ZB8wkBsDp69WYe
-FjVbJE+gDtPdZXkbS36QVY98zNWhp9wX5c4Gtl7erAzEWwgmrlg8KoD0smPKN0SQ
-z9gTR1QD7S9KxWsPQF/bf76tdecS9CGOGHmch9JbstjJU3JO3pM=
-=+5am
------END PGP SIGNATURE-----
+"possiblity"?  Does this work or not?  Have you tested it?
 
---6z+5/HR0ORsYRart--
+> +static ssize_t kvm_vm_stats_read(struct file *file, char __user *user_buffer,
+> +			      size_t size, loff_t *offset)
+> +{
+> +	struct kvm *kvm = file->private_data;
+> +
+> +	snprintf(&kvm_vm_stats_header.id[0], sizeof(kvm_vm_stats_header.id),
+> +			"kvm-%d", task_pid_nr(current));
+
+Why do you write to this static variable for EVERY read?  Shouldn't you
+just do it once at open?  How can it change?
+
+Wait, it's a single shared variable, what happens when multiple tasks
+open this thing and read from it?  You race between writing to this
+variable here and then:
+
+> +	return kvm_stats_read(&kvm_vm_stats_header, &kvm_vm_stats_desc[0],
+> +		&kvm->stat, sizeof(kvm->stat), user_buffer, size, offset);
+
+Accessing it here.
+
+So how is this really working?
+
+thanks,
+
+greg k-h
