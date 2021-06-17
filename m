@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 328CA3AB6F8
-	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 17:09:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 226AF3AB750
+	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 17:20:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233159AbhFQPLu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Jun 2021 11:11:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45426 "EHLO
+        id S233130AbhFQPWv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Jun 2021 11:22:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233167AbhFQPLt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Jun 2021 11:11:49 -0400
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D85B1C061768
-        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 08:09:40 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id h4so11089769lfu.8
-        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 08:09:40 -0700 (PDT)
+        with ESMTP id S233131AbhFQPWu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Jun 2021 11:22:50 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D1C9C061767
+        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 08:20:41 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id f30so11197222lfj.1
+        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 08:20:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=xXZRhEcd2Cbrj/tVl2ryBxrcp7ZNIEiNaJWzDG2F5Kg=;
-        b=TqWgVeNXToRFcCgGFrlG52MtXOvoEpEgH+psGbhdraIxWdvhr8qhRpfWoVKcSxORjB
-         B831vy6R7RTZzs2nM/KQJ71iM9aVLCvGMf20DJUF4AiJWHbwKHIT31rxxZUeXh2p2oRt
-         XL4KPiTOT9hbUZgUJfDFuKG7oGbFDKYHU8SCBYWaX0RmwnVcF135fDTnUplDx6/kg56A
-         WtUBi4LRlBK+S9bbzajtt7FAUOTE3fofCi+CtbjwZsPln+zjbIngScXUpHx9H35LbAYv
-         yhbCZ2245i7w4fll7tlZ0JTQLXy7oTYwQOusiRyXIwwEXch8Jc2WjtK44ttM+hrJsoLv
-         Zk4w==
+        bh=5nxSzCxRIGKeYpvFJwHnokf+lsLXzTQKnVZehNuKBfY=;
+        b=v73zJk16lVzUG7QbbkRkacwK3TUPJGuBDYnlw6a7OPjaXiFoy/Tg1SF7o+pP2VkjgQ
+         GCw+WkjfIQ3l6iS90jFkDddYRWl54Fy+YMR/OLBaPnT1q7EH0oEDgCPwHFRf8oPp7gGh
+         W7Ec4TAFYCyuNTidERQalF9VJ9rhnKCIZeBncU5P/7WoHZpOenVDVwlRJezyVC2NtJ6Y
+         vboZ+Jh+7e1OhUpnKBfhBMPZL2co2cGDoDioEPRVmBRw4+jEILLh2FWrKa/OxCOxZ34S
+         /rw7UTqce3bTc65+uzu2YO9pLXUzTgYikYTMftRKjr074dSbh8dedXtXArBgTf7VXUpm
+         YOvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=xXZRhEcd2Cbrj/tVl2ryBxrcp7ZNIEiNaJWzDG2F5Kg=;
-        b=iFfdJH8v2dFwjgRW9WppkMQ/TMPnqb/YTsk5/s6wk49hB1ECGHSEWoOJWK37CTwznd
-         OQjQwnL2XSHQXMqn0gkDNGe34SEAzIT1cIrln2Jus473YTj8U0N7U7TUoo3Oy8olGQ1j
-         GPqfy2UYZ+7ZEXv/x7WW9fAHuERthmUTfNZv70HitBKJOkCHM/XGHg8zfMZ9oZOYsCQW
-         09200mpPtbbAv1C+mGsPUFkp2km7+aUOarvaVSgQiDwBMOyJ5Tp47YYvxmSuE8QhKOph
-         +ilkLT9duCd+HxdjpLPHrFldZjUsigOufLCfofaEGorNyFJrN1Luz3X5tDdxQfYZfCm0
-         zNhg==
-X-Gm-Message-State: AOAM5326HH6/PCSduO9rkklwrFetx8Nphr7bWYt/zuxuqIR4jp/pUXoS
-        GEJu7wkNlUxAyVUSViiHEwcz4qyU+wuMy7mHxThQWNDWYJY=
-X-Google-Smtp-Source: ABdhPJzAyrQsMnAqbBOEYMZVZQD5qO0SZlAXpM63+DpcX+GVx2elMNK7wl3R9skQOGetSMH5r+n7sJJM07csoEf6gTw=
-X-Received: by 2002:a05:6512:33c4:: with SMTP id d4mr4587741lfg.536.1623942578963;
- Thu, 17 Jun 2021 08:09:38 -0700 (PDT)
+        bh=5nxSzCxRIGKeYpvFJwHnokf+lsLXzTQKnVZehNuKBfY=;
+        b=ZMlMLuecDX1xshr437BjVgcOGu/lr30TzH9Qu2T7AqUQw0ze/ZMNkb+FY8WhgvwFWS
+         8H5zrNym6dbMasVCBQEexlEe5xqAuGCxAlDTDwRzMLirvksZKXmPBFQYK7a5DHu1234o
+         I8xNOwr5Ko+0Ao5trNBlez1QnaGf3CR7ZON6E1vC6Y+3QuJhvGf8PsYt7foaMI0ogqSD
+         ohjUk4fy/jHwH0ivRSOuwScmSJRIGXWFkS3KZd7YfqeugpXAjXOTE/7Brme+vAYo2APF
+         OZRETZzyoyfa2Wlez4+RH8Zr63SoGCi14WHAtrTm4t35xF/hxuRjmHwCKzejhKxqaKw6
+         pBAw==
+X-Gm-Message-State: AOAM532CE6TuC4JPPfKKvnjIg8b4faGvovK8wrMorXVVG7DUx9FovYvQ
+        nkCgasjjwFzUISiimsUmgvhTrTyyJUgZKj8JGjhniQ==
+X-Google-Smtp-Source: ABdhPJxKKizWi/fGNn+9wpt69Ewj2CzuOybJdiyg4e/t3EuxZUFb779j6T3WEp//mVN3Ae7BamP0hcGF5jtDYBl/+0Y=
+X-Received: by 2002:a05:6512:3ea:: with SMTP id n10mr4392667lfq.178.1623943239558;
+ Thu, 17 Jun 2021 08:20:39 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210617044146.2667540-1-jingzhangos@google.com>
- <20210617044146.2667540-4-jingzhangos@google.com> <YMrjKhV8TNwmRtf6@kroah.com>
-In-Reply-To: <YMrjKhV8TNwmRtf6@kroah.com>
+ <20210617044146.2667540-4-jingzhangos@google.com> <YMrkGZzPrt0jA1iP@kroah.com>
+In-Reply-To: <YMrkGZzPrt0jA1iP@kroah.com>
 From:   Jing Zhang <jingzhangos@google.com>
-Date:   Thu, 17 Jun 2021 10:09:27 -0500
-Message-ID: <CAAdAUtiySqu6VKpK2LDnG5S0m9tRKjrKSu5BWoFurkhWay4yCg@mail.gmail.com>
+Date:   Thu, 17 Jun 2021 10:20:27 -0500
+Message-ID: <CAAdAUtik0Yw+4=4Ld-DJSokNzvdpa-tsxkqAdBCAb-C=uS0-sA@mail.gmail.com>
 Subject: Re: [PATCH v10 3/5] KVM: stats: Add documentation for binary
  statistics interface
 To:     Greg KH <gregkh@linuxfoundation.org>
@@ -91,7 +91,7 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Greg,
 
-On Thu, Jun 17, 2021 at 12:52 AM Greg KH <gregkh@linuxfoundation.org> wrote:
+On Thu, Jun 17, 2021 at 12:56 AM Greg KH <gregkh@linuxfoundation.org> wrote:
 >
 > On Thu, Jun 17, 2021 at 04:41:44AM +0000, Jing Zhang wrote:
 > > +     struct kvm_stats_desc {
@@ -102,19 +102,39 @@ On Thu, Jun 17, 2021 at 12:52 AM Greg KH <gregkh@linuxfoundation.org> wrote:
 > > +             __u32 unused;
 > > +             char name[0];
 > > +     };
-> > +
-> > +The ``flags`` field contains the type and unit of the statistics data described
-> > +by this descriptor. The following flags are supported:
-> > +
-> > +Bits 0-3 of ``flags`` encode the type:
 >
 > <snip>
 >
-> As flags is a bit field, what is the endian of it?  Native or LE or BE?
-> I'm guessing "cpu native", but you should be explicit as userspace will
-> have to deal with this somehow.
-Sure, will add clarification for endianness.
+> > +The ``unused`` fields are reserved for future support for other types of
+> > +statistics data, like log/linear histogram.
 >
+> you HAVE to set unused to 0 for now, otherwise userspace does not know
+> it is unused, right?  And then, really it is "used", so why not just say
+> that now?  It's tricky, but you have to get this right now otherwise you
+> can never use it in the future.
+>
+Sure, will do that.
+> > +The ``name`` field points to the name string of the statistics data. The name
+>
+> It is not a pointer, it is the data itself.
+>
+Will fix it.
+> > +string starts at the end of ``struct kvm_stats_desc``.
+> > +The maximum length (including trailing '\0') is indicated by ``name_size``
+> > +in ``struct kvm_stats_header``.
+>
+> I thought we were replacing [0] arrays with [], are you sure you should
+> be declaring this as [0]?  Same for all structures in this document (and
+> code).
+>
+The reason to declare it as [0] is to have the flexibility to change the maximum
+length of KVM stats name. For now, the max len is  defined as 48, which can
+be read from the header. Then the userspace can get the length of descriptor by
+adding sizeof(struct_kvm_stats_desc) + 48. Whenever the max len is changed
+in KVM, the userspace would not have to update code to reflect that.
+However, if we are OK to restrict the maximum KVM stats' length to 48
+(or any other
+number), we can just declear it with [] instead of [0].
 > thanks,
 >
 > greg k-h
