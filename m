@@ -2,66 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D31773ABCE1
-	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 21:34:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B89F3ABD54
+	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 22:17:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233616AbhFQThF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Jun 2021 15:37:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48312 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233602AbhFQThA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Jun 2021 15:37:00 -0400
-Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A88C0C061760;
-        Thu, 17 Jun 2021 12:34:52 -0700 (PDT)
-Received: from localhost (unknown [IPv6:2601:281:8300:104d:444a:d152:279d:1dbb])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ms.lwn.net (Postfix) with ESMTPSA id 575109A9;
-        Thu, 17 Jun 2021 19:34:52 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 575109A9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-        t=1623958492; bh=+FDoO5Ud1J1Le00Bv1li2JtQlBXuIq31yl6Euxvq5DY=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=WFVCsFOWoCuezpcMYNJux/MpMipcxgURDCD8bYWZE9oLP+hr0mD3Xe38qE9GlyEG0
-         Gvrmx/6wpMEfLebKYi5ENC4W6D93n0xRBg4JlAiYuguUJCOVH/Sbcc177/pSJ8RwAv
-         E3cpiJ8f45knZ8aT0CWWOFnt77L2ugwWqu5L+OOgLyx51xHGn3IAS67BR8sCqbaa3c
-         mtDp3qgRj9rdXizONDhH6eODDD62j+YLkABCJo+Le9e7A3x1Cf3PulnTM6CCGerVdL
-         zkkQaP8VaQg+H9hspqZZVENcEXMVI3DpUgxhieXkAlC9hiz9xqv97/sk0QsDqKlaZS
-         9w1F6+Gt7q8cA==
-From:   Jonathan Corbet <corbet@lwn.net>
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-        coresight@lists.linaro.org, devicetree@vger.kernel.org,
-        kunit-dev@googlegroups.com, kvm@vger.kernel.org,
-        linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-security-module@vger.kernel.org,
-        netdev@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v2 00/29] docs: avoid using ReST :doc:`foo` tag
-In-Reply-To: <cover.1623824363.git.mchehab+huawei@kernel.org>
-References: <cover.1623824363.git.mchehab+huawei@kernel.org>
-Date:   Thu, 17 Jun 2021 13:34:51 -0600
-Message-ID: <87pmwkthd0.fsf@meer.lwn.net>
-MIME-Version: 1.0
-Content-Type: text/plain
+        id S232515AbhFQUTU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Jun 2021 16:19:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59400 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232037AbhFQUTT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Jun 2021 16:19:19 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 4A2D161026;
+        Thu, 17 Jun 2021 20:17:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1623961031;
+        bh=ni5L8ASMyGlatUBZrcCiRjK0h+RkTYYiREk49Aupy8Y=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=km/HCML1GlDPyJ98mi7zHhil0siGTwI0OXeHaC757HFlE5SdNajGe+kxI6TWxa1eR
+         7sFL/Kb9sgKUmwdXm5JfkA2QAWS9nnMc0Wg0oSF1WxMXN3lm8RlypTf2bCeSZAUVGx
+         iOZ3BLiR8Liq0QD6+SoDu2ht1JKDPP8N9CABtCTGPNGo5Q4/jmsr+A9oeFCMWyKAIG
+         t33F6C/PQtQnsPGYxGy9JXhevNExEEnMSYdItg0z6XvVREfwGnx9nsU5uc8efhH1YG
+         HPb705+3bBtIuJaGiPEdHpgFCMSJj9SNUeNq5swtek8MJcGbCjIepVPSPFb7YuACc7
+         yvYb7gBmKZ8UA==
+Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 36D83609EA;
+        Thu, 17 Jun 2021 20:17:11 +0000 (UTC)
+Subject: Re: [GIT PULL] KVM changes for 5.13-rc7
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20210617183603.844718-1-pbonzini@redhat.com>
+References: <20210617183603.844718-1-pbonzini@redhat.com>
+X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20210617183603.844718-1-pbonzini@redhat.com>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+X-PR-Tracked-Commit-Id: d8ac05ea13d789d5491a5920d70a05659015441d
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: fd0aa1a4567d0f09e1bfe367a950b004f99ac290
+Message-Id: <162396103116.22648.4631664208754684417.pr-tracker-bot@kernel.org>
+Date:   Thu, 17 Jun 2021 20:17:11 +0000
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
+The pull request you sent on Thu, 17 Jun 2021 14:36:03 -0400:
 
-> (Maintainers bcc, to avoid too many recipient troubles)
->
-> As discussed at:
-> 	https://lore.kernel.org/linux-doc/871r9k6rmy.fsf@meer.lwn.net/
->
-> It is better to avoid using :doc:`foo` to refer to Documentation/foo.rst, as the
-> automarkup.py extension should handle it automatically, on most cases.
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-I've applied the set, thanks.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/fd0aa1a4567d0f09e1bfe367a950b004f99ac290
 
-jon
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
