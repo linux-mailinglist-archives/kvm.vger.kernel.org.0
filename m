@@ -2,95 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2321A3AAA1F
-	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 06:33:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DFA4A3AAA4C
+	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 06:41:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229677AbhFQEfa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Jun 2021 00:35:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42972 "EHLO
+        id S229666AbhFQEn7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Jun 2021 00:43:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbhFQEf3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Jun 2021 00:35:29 -0400
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9068CC061574;
-        Wed, 16 Jun 2021 21:33:22 -0700 (PDT)
-Received: by mail-oi1-x22f.google.com with SMTP id s23so5052631oiw.9;
-        Wed, 16 Jun 2021 21:33:22 -0700 (PDT)
+        with ESMTP id S229580AbhFQEn5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Jun 2021 00:43:57 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D867CC061767
+        for <kvm@vger.kernel.org>; Wed, 16 Jun 2021 21:41:50 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id l132-20020a25258a0000b029054fc079d46eso4184965ybl.20
+        for <kvm@vger.kernel.org>; Wed, 16 Jun 2021 21:41:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=l93nAEQWQVGgYjPJ36XXH2GA9smqr9t+XyPLE0ZcqFU=;
-        b=WM4BIBJYAR9/GNqzGaAm7/afPEFOtfLVJylAR7UtTxDF4EtLlXlxo2FlUkpt3eunCR
-         kGlDhLJM2qDcy8mqvlWWmuqgPFBeT3nTZwv55IA1Qw4G1KvMg6iZvBa9yL2yr/d0lUpQ
-         UD0Qt/0MNDJqrBKIDVG22MJaOH5WedGeDRqPDsV030xoAUugJzeQ28Bi3dxUOfdfNE/8
-         n3hVYR20/20IVFUBI0HYKWpxXTNtXSNKX0gZ9vmU25Wva2QlYFiVRlGrieUNMcYGNJSv
-         xknDT9lUjdBPJVO3tc3ZYk3KbdrHWUNP+t8MXQ2AN2MmOTI67G+Ffqx0pLo1hrFi8J07
-         tIww==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=3s1eozoLTG+O62g1UQDRz9lp8lZhA9dilcFNCLVNrmc=;
+        b=db0YxvYVAksAIvRn8DzguGB76wytBIFVDrzngep7lWWXtMo8kZQa5rchHf2uteEu+K
+         HxS1Dw/r8AqDIq6UtA5zCFjMeBoLgyDHUXbdcvAFijzMFX66eyfRqi72Z8wBXua8HAx+
+         6NO8WoBZ/BWJoOv+5U3aOXqkawAw2myIX9n4COBU6wnRCFBcavbfvqPW2uqMrbnsNQeb
+         AscXOEU2JShseLT0EAKG5/FLqPqqnwaf2Pi/QlqymJX/z0OrhAfhQbsGHktJVGLCeWAZ
+         9VG7lh6B3+dyfQiHQQSV+Fp63MWKIunrezw9OfpZdsVZl/EoLoWDtsA2zqj0uaY65esP
+         /QNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=l93nAEQWQVGgYjPJ36XXH2GA9smqr9t+XyPLE0ZcqFU=;
-        b=VDuvfgylk5NfYC3WmRa3chirge6iNIuwKISNSOOZtfjCv4xfxAQ8soK5S7OLcKvCAs
-         xFP9WVTXo/Mo6F/IJP3cu71Xh1rggYcZ1yDK+x7UjevxDv3GOSwqIXHNfNKmzBDES5Ls
-         hrdMP3iZ/dyum80bIYmngVzzKkuY083sMQjZSNLL2jscPcUzDFg0kvCmOhlq9CpAa5eA
-         k9IEP8LraZCNHlHYaWjXlZjRFHhDYxeOqnfKyYzC8yHSxbPrNrWMxEEN3qKKevi2uqGf
-         YwtxsTOWdQsZTalbF/n5XgjBtNaJQnM9sr3FOL3B8smtTw1MNwtGsKMKbxIpEbpVhClR
-         QWWg==
-X-Gm-Message-State: AOAM5309zneZPt3ezZv0t8AfLsZnvxonnLYhW2vFJAuyI3E6C4KP1mvU
-        7E8Y0RJal/5b7fqYJWQ3FhtaTMuddptCRvSxWCcBN9wS
-X-Google-Smtp-Source: ABdhPJxz5W3otMY5FhU2TFi+zV2IjT4OV7DdapjsYvWvoLcbPMOsT0TtS8dft+AwmFb/YRe9EzwK3aHQpnxNOgDAzlY=
-X-Received: by 2002:aca:b609:: with SMTP id g9mr9310954oif.141.1623904401734;
- Wed, 16 Jun 2021 21:33:21 -0700 (PDT)
-MIME-Version: 1.0
-References: <1623223000-18116-1-git-send-email-wanpengli@tencent.com>
-In-Reply-To: <1623223000-18116-1-git-send-email-wanpengli@tencent.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 17 Jun 2021 12:33:09 +0800
-Message-ID: <CANRm+CyO9yQk8KsNa8hKyTA3V9XnB41=roPcK8Vn0dzR7Ywktg@mail.gmail.com>
-Subject: Re: [PATCH v3] KVM: LAPIC: Keep stored TMCCT register value 0 after KVM_SET_LAPIC
-To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=3s1eozoLTG+O62g1UQDRz9lp8lZhA9dilcFNCLVNrmc=;
+        b=LqeV7+mO6TVvY8G5YdpPwRbA97/H8DolKfGbAfj2YTfrxbHiWeOz2UrxJyY3b3vjFd
+         ZDSb0i1E8K0J/xFbGVZHN+T6zaw7GjtOR+xH61lLKVCpJ/9PxkU36T1/TR/I/nZd0967
+         xxwEPHMAX9Afmr8h+0vy/W/UY1Ax2AoYAB9Mil1sRA5brLnYq2iw3gCLtmK1BW61uLmX
+         PoBwVU4I9vazre6BGY0BpBGKdW0SUmpH7Hoa2F+yxj5jY3W3zXlz2wTtBGJFp/UD9oGE
+         V06Hx+I6BG5FxcZUKHgvcO4Pt2FIveKZi+v8Vsfg/pzSoPrH91OpH14EEnKm9QcWslZG
+         6D7w==
+X-Gm-Message-State: AOAM530PS7gKsliCxlWoI6oDoRgQsUNzJiNoqe5RY7KZM/3hM7WOw1An
+        LLMWSHLtOigQzR0rSAOWQGL7gq5MOHeKU9yateRQYSjoqoJvF6vFbsgYiAuGy0wiQTmMeqbYo1s
+        xA03ihZnYmyd7DVzDl9r1DTAhKf/1X2kNeNVBsLZ34N/7u+5TUV0GBf1Sv8eHjOrJuLUdTPY=
+X-Google-Smtp-Source: ABdhPJwOgJClowYYNO7/RLiARDkMAJNcFXI3q8kTYlz9mBs1EHYvPdFwazYpeod5q8BGxxGHGgHEjkMc4EAD1OxX+w==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a25:bb46:: with SMTP id
+ b6mr3371267ybk.346.1623904909931; Wed, 16 Jun 2021 21:41:49 -0700 (PDT)
+Date:   Thu, 17 Jun 2021 04:41:41 +0000
+Message-Id: <20210617044146.2667540-1-jingzhangos@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.272.g935e593368-goog
+Subject: [PATCH v10 0/5] KVM statistics data fd-based binary interface
+From:   Jing Zhang <jingzhangos@google.com>
+To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Fuad Tabba <tabba@google.com>
+Cc:     Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kindly ping, :)
-On Wed, 9 Jun 2021 at 15:17, Wanpeng Li <kernellwp@gmail.com> wrote:
->
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> KVM_GET_LAPIC stores the current value of TMCCT and KVM_SET_LAPIC's memcpy
-> stores it in vcpu->arch.apic->regs, KVM_SET_LAPIC could store zero in
-> vcpu->arch.apic->regs after it uses it, and then the stored value would
-> always be zero. In addition, the TMCCT is always computed on-demand and
-> never directly readable.
->
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kvm/lapic.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 6d72d8f43310..9bd29b3ca790 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -2628,6 +2628,7 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
->         apic_manage_nmi_watchdog(apic, kvm_lapic_get_reg(apic, APIC_LVT0));
->         update_divide_count(apic);
->         __start_apic_timer(apic, APIC_TMCCT);
-> +       kvm_lapic_set_reg(apic, APIC_TMCCT, 0);
->         kvm_apic_update_apicv(vcpu);
->         apic->highest_isr_cache = -1;
->         if (vcpu->arch.apicv_active) {
-> --
-> 2.25.1
->
+This patchset provides a file descriptor for every VM and VCPU to read
+KVM statistics data in binary format.
+It is meant to provide a lightweight, flexible, scalable and efficient
+lock-free solution for user space telemetry applications to pull the
+statistics data periodically for large scale systems. The pulling
+frequency could be as high as a few times per second.
+In this patchset, every statistics data are treated to have some
+attributes as below:
+  * architecture dependent or generic
+  * VM statistics data or VCPU statistics data
+  * type: cumulative, instantaneous, peak
+  * unit: none for simple counter, nanosecond, microsecond,
+    millisecond, second, Byte, KiByte, MiByte, GiByte, Clock Cycles
+Since no lock/synchronization is used, the consistency between all
+the statistics data is not guaranteed. That means not all statistics
+data are read out at the exact same time, since the statistics data
+are still being updated by KVM subsystems while they are read out.
+
+---
+
+* v9 -> v10
+  - Relocate vcpu stat in vcpu's slab's usercopy region
+  - Fix test issue for capability checking
+  - Update commit message to explain why/how we need to add this new
+    API for KVM statistics
+
+* v8 -> v9
+  - Rebase to commit 8331a2bc0898
+    (KVM: X86: Introduce KVM_HC_MAP_GPA_RANGE hypercall)
+  - Reduce code duplication between binary and debugfs interface
+  - Add field "offset" in stats descriptor to let us define stats
+    descriptors in any order (not necessary in the order of stats
+    defined in vm/vcpu stats structures)
+  - Add static check to make sure the number of stats descriptors
+    is the same as the number of stats defined in vm/vcpu stats
+    structures
+  - Fix missing/mismatched stats descriptor definition caused by
+    rebase
+
+* v7 -> v8
+  - Rebase to kvm/queue, commit c1dc20e254b4 ("KVM: switch per-VM
+  stats to u64")
+  - Revise code to reflect the per-VM stats type from ulong to u64
+  - Addressed some other nits
+
+* v6 -> v7
+  - Improve file descriptor allocation function by Krish suggestion
+  - Use "generic stats" instead of "common stats" as Krish suggested
+  - Addressed some other nits from Krish and David Matlack
+
+* v5 -> v6
+  - Use designated initializers for STATS_DESC
+  - Change KVM_STATS_SCALE... to KVM_STATS_BASE...
+  - Use a common function for kvm_[vm|vcpu]_stats_read
+  - Fix some documentation errors/missings
+  - Use TEST_ASSERT in selftest
+  - Use a common function for [vm|vcpu]_stats_test in selftest
+
+* v4 -> v5
+  - Rebase to kvm/queue, commit a4345a7cecfb ("Merge tag
+    'kvmarm-fixes-5.13-1'")
+  - Change maximum stats name length to 48
+  - Replace VM_STATS_COMMON/VCPU_STATS_COMMON macros with stats
+    descriptor definition macros.
+  - Fixed some errors/warnings reported by checkpatch.pl
+
+* v3 -> v4
+  - Rebase to kvm/queue, commit 9f242010c3b4 ("KVM: avoid "deadlock"
+    between install_new_memslots and MMU notifier")
+  - Use C-stype comments in the whole patch
+  - Fix wrong count for x86 VCPU stats descriptors
+  - Fix KVM stats data size counting and validity check in selftest
+
+* v2 -> v3
+  - Rebase to kvm/queue, commit edf408f5257b ("KVM: avoid "deadlock"
+    between install_new_memslots and MMU notifier")
+  - Resolve some nitpicks about format
+
+* v1 -> v2
+  - Use ARRAY_SIZE to count the number of stats descriptors
+  - Fix missing `size` field initialization in macro STATS_DESC
+
+[1] https://lore.kernel.org/kvm/20210402224359.2297157-1-jingzhangos@google.com
+[2] https://lore.kernel.org/kvm/20210415151741.1607806-1-jingzhangos@google.com
+[3] https://lore.kernel.org/kvm/20210423181727.596466-1-jingzhangos@google.com
+[4] https://lore.kernel.org/kvm/20210429203740.1935629-1-jingzhangos@google.com
+[5] https://lore.kernel.org/kvm/20210517145314.157626-1-jingzhangos@google.com
+[6] https://lore.kernel.org/kvm/20210524151828.4113777-1-jingzhangos@google.com
+[7] https://lore.kernel.org/kvm/20210603211426.790093-1-jingzhangos@google.com
+[8] https://lore.kernel.org/kvm/20210611124624.1404010-1-jingzhangos@google.com
+[9] https://lore.kernel.org/kvm/20210614212155.1670777-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (5):
+  KVM: stats: Separate generic stats from architecture specific ones
+  KVM: stats: Add fd-based API to read binary stats data
+  KVM: stats: Add documentation for binary statistics interface
+  KVM: selftests: Add selftest for KVM statistics data binary interface
+  KVM: stats: Remove code duplication for binary and debugfs stats
+
+ Documentation/virt/kvm/api.rst                | 177 +++++++++++-
+ arch/arm64/include/asm/kvm_host.h             |   9 +-
+ arch/arm64/kvm/guest.c                        |  50 +++-
+ arch/mips/include/asm/kvm_host.h              |   9 +-
+ arch/mips/kvm/mips.c                          |  92 +++---
+ arch/powerpc/include/asm/kvm_host.h           |   9 +-
+ arch/powerpc/kvm/book3s.c                     |  93 ++++--
+ arch/powerpc/kvm/book3s_hv.c                  |  12 +-
+ arch/powerpc/kvm/book3s_pr.c                  |   2 +-
+ arch/powerpc/kvm/book3s_pr_papr.c             |   2 +-
+ arch/powerpc/kvm/booke.c                      |  78 +++--
+ arch/s390/include/asm/kvm_host.h              |   9 +-
+ arch/s390/kvm/kvm-s390.c                      | 234 ++++++++-------
+ arch/x86/include/asm/kvm_host.h               |   9 +-
+ arch/x86/kvm/x86.c                            | 111 ++++---
+ include/linux/kvm_host.h                      | 180 +++++++++++-
+ include/linux/kvm_types.h                     |  12 +
+ include/uapi/linux/kvm.h                      |  48 ++++
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   3 +
+ .../selftests/kvm/kvm_binary_stats_test.c     | 225 +++++++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  12 +
+ virt/kvm/kvm_main.c                           | 270 +++++++++++++++---
+ 24 files changed, 1299 insertions(+), 351 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/kvm_binary_stats_test.c
+
+
+base-commit: 8331a2bc089881d7fd2fc9a6658f39780817e4e0
+-- 
+2.32.0.272.g935e593368-goog
+
