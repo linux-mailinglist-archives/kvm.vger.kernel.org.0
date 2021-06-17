@@ -2,114 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD7623AB786
-	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 17:29:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A0523AB7B0
+	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 17:39:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232444AbhFQPb3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Jun 2021 11:31:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30802 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232251AbhFQPb2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Jun 2021 11:31:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623943760;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pJAYrboxNY4R4lDYsyxGAHwG1E3b8kp8BFkfADBjg3E=;
-        b=D64Fv/b+luWfIGTjMAtzpsXERz8LnKDbLDnnyiWBAjL6sQc5VFtDkSqlZ4/XYxQ6PEb4LH
-        6WC0IDs/bxK0FDY2X6L+y0ixEX3QAxMjlPM9HFOKI2rNF3VPSZPpYCPP0R+tsG0xXyoEQ3
-        CtFRYfuZ1YO/E4rNewQYAWdaF11zj2I=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-109-WcuqejwGPl6od5o7uBFD0w-1; Thu, 17 Jun 2021 11:29:16 -0400
-X-MC-Unique: WcuqejwGPl6od5o7uBFD0w-1
-Received: by mail-ed1-f70.google.com with SMTP id i22-20020a05640242d6b0290392e051b029so1796847edc.11
-        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 08:29:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=pJAYrboxNY4R4lDYsyxGAHwG1E3b8kp8BFkfADBjg3E=;
-        b=BNQRlQJm2zMqq+C6w23VMf4V0tTDbN27WVc0dZrMiJ5uhxug8kfDRkaVYgoA/U7Cy+
-         +xlueUW8FggpwKpOq/IQ4710PvgPfDuxqr0pN2vsYtWNPoBL2y77afCkFdxXSbFJIdeJ
-         sqZbidZ67D1iZi5KjvdXCgWuNcteN/y62SCwbc7xLbLQz76A8z0om3OJssMAi89CJCE/
-         6vxC1/RkQqNcX+ZGT5PfZIxIqgTeOFd+Y+rQrA82KVM3jtCyvBA9zjRu8lytXvVMDp+b
-         oVIH027D9wiXppOCPs0mlYR07mliLOnqV7iDvKZdFqQ3CYlHLR2tMlBQCZN8JPd6RvKi
-         /1ZA==
-X-Gm-Message-State: AOAM533+2c2ngeJYV8M9oZ0YtMPO/JkBKLlbLtcEOzBmC7G4YolggBXx
-        c/Vr/mcn5bVBnkahPWKaCHVR2nT4M7X2IzKvtECYmboLFOiXdbqC2p5ybMBxaJwKsvap7JBOv2g
-        WeC6d+FRBhiH0
-X-Received: by 2002:a17:906:3c44:: with SMTP id i4mr5844958ejg.135.1623943755563;
-        Thu, 17 Jun 2021 08:29:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwguprspLdKxfz1gQFsWZ9pANB4xL5Og2GYXcQQiXXJdl05NURoTWq9llwpGLS30bGiJxoGJQ==
-X-Received: by 2002:a17:906:3c44:: with SMTP id i4mr5844929ejg.135.1623943755347;
-        Thu, 17 Jun 2021 08:29:15 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id z19sm4485528edc.90.2021.06.17.08.29.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Jun 2021 08:29:14 -0700 (PDT)
-Subject: Re: [PATCH v10 2/5] KVM: stats: Add fd-based API to read binary stats
- data
-To:     Jing Zhang <jingzhangos@google.com>,
-        Greg KH <gregkh@linuxfoundation.org>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        LinuxS390 <linux-s390@vger.kernel.org>,
-        Linuxkselftest <linux-kselftest@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
+        id S233328AbhFQPlw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Jun 2021 11:41:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52294 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231547AbhFQPlv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Jun 2021 11:41:51 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD165C061574;
+        Thu, 17 Jun 2021 08:39:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=G0Lvdln11fuzanH5JBFVlU89DGk/WHJ/h+sQJcOIMZU=; b=m7f6DrxmOSFDPVRUrGpIsGKH8Y
+        op5BLM2WKhd7ygxhD3X0aHUzETlJSrlwr7/P/yfoFKMdozL/0d5O397EfTc38tiyV36wDc/GrLItj
+        j3y4WNP8y7pzxl8QhhWTs1FFd/sOto1FhIztdYCLZmY8k/sx4Nt6xLZkJ4lBOvf7+1qGKUCqbmQuX
+        dQuOIJIfh7+G9FQaqZaDXTJr6uVHbSLpkVBn2xlK6EorB9xvM4kd2oAdIGlb+wlgI4iv2+IzypgQ9
+        U5kw22QCb9fbRG8m7MULJK+ojiB/vzmyc3YBVmmSmI7Vym47sFXo/ejWQV9DDb8WLDA2OHf+9U0dR
+        C2sscMfw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ltu6S-009I32-Dg; Thu, 17 Jun 2021 15:38:55 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id F0A95300252;
+        Thu, 17 Jun 2021 17:38:46 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id D9E1C234E5383; Thu, 17 Jun 2021 17:38:46 +0200 (CEST)
+Date:   Thu, 17 Jun 2021 17:38:46 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
         David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Fuad Tabba <tabba@google.com>
-References: <20210617044146.2667540-1-jingzhangos@google.com>
- <20210617044146.2667540-3-jingzhangos@google.com>
- <YMr4rArKvj3obDEM@kroah.com>
- <CAAdAUtiiQ0304vWR3Zm2XUKz374W4LY3=qdrFZCsQ27VkqMn9A@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5ae75b1b-4cba-d06f-625b-35b42f11ac03@redhat.com>
-Date:   Thu, 17 Jun 2021 17:29:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v6 1/2] x86/sev: Make sure IRQs are disabled while GHCB
+ is active
+Message-ID: <YMtshtgEbiQ993Zk@hirez.programming.kicks-ass.net>
+References: <20210616184913.13064-1-joro@8bytes.org>
+ <20210616184913.13064-2-joro@8bytes.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAdAUtiiQ0304vWR3Zm2XUKz374W4LY3=qdrFZCsQ27VkqMn9A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210616184913.13064-2-joro@8bytes.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/06/21 16:56, Jing Zhang wrote:
-> Actually, it is really not easy to separate this change into two patches even by
-> following Paolo's suggestion. And it would be a surprise to userspace to see
-> only VM stats, no VCPU stats.
 
-That does not matter.  Having two or three patches is useful because it 
-makes review easier; they will never appear separately in a release.
+On Wed, Jun 16, 2021 at 08:49:12PM +0200, Joerg Roedel wrote:
+> @@ -514,7 +523,7 @@ void noinstr __sev_es_nmi_complete(void)
+>  	struct ghcb_state state;
+>  	struct ghcb *ghcb;
+>  
+> -	ghcb = sev_es_get_ghcb(&state);
+> +	ghcb = __sev_get_ghcb(&state);
+>  
+>  	vc_ghcb_invalidate(ghcb);
+>  	ghcb_set_sw_exit_code(ghcb, SVM_VMGEXIT_NMI_COMPLETE);
+> @@ -524,7 +533,7 @@ void noinstr __sev_es_nmi_complete(void)
+>  	sev_es_wr_ghcb_msr(__pa_nodebug(ghcb));
+>  	VMGEXIT();
+>  
+> -	sev_es_put_ghcb(&state);
+> +	__sev_put_ghcb(&state);
+>  }
 
-Paolo
+I'm getting (with all of v6.1 applied):
+
+vmlinux.o: warning: objtool: __sev_es_nmi_complete()+0x1bf: call to panic() leaves .noinstr.text section
+
+$ ./scripts/faddr2line defconfig-build/vmlinux __sev_es_nmi_complete+0x1bf
+__sev_es_nmi_complete+0x1bf/0x1d0:
+__sev_get_ghcb at arch/x86/kernel/sev.c:223
+(inlined by) __sev_es_nmi_complete at arch/x86/kernel/sev.c:519
+
 
