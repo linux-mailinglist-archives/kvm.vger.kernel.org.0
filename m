@@ -2,102 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A38663ABBEA
-	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 20:36:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E5703ABBED
+	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 20:37:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232009AbhFQSiP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Jun 2021 14:38:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59622 "EHLO
+        id S231547AbhFQSjp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Jun 2021 14:39:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51743 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231289AbhFQSiP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Jun 2021 14:38:15 -0400
+        by vger.kernel.org with ESMTP id S230151AbhFQSjl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 17 Jun 2021 14:39:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623954966;
+        s=mimecast20190719; t=1623955052;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=N/27r8jjnxPGdpC0ykYj/q5IIkngOTZIKQLUhzWLbTA=;
-        b=EXDv/ROb9DubvUe7CcVY2zjCCs4o4hukIvwsl6J8N/XaY3N45fhuAioLN/d507H3CgYGG4
-        +HGazNf6DiF3AS3jsvh47Vkc8260bbV7fUykaT3f/j9zus1oX7Fcmwi+wBFOo9bs+2UfZK
-        6gAVVzlfov65xzgkahKPKEuoZE3hJoU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-162-SvJ4QTmCPgenZh_8kcQZAw-1; Thu, 17 Jun 2021 14:36:05 -0400
-X-MC-Unique: SvJ4QTmCPgenZh_8kcQZAw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44EAB818703;
-        Thu, 17 Jun 2021 18:36:04 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E7EBAF6EA;
-        Thu, 17 Jun 2021 18:36:03 +0000 (UTC)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=38MaJWJ06cbFFpdxNfvYHb//Q8oPQ4mle+cdo+ubdpE=;
+        b=GKC9ouvFQPGOdD9dPv7wmYq3rWaKBYxwvY4g2QGpTp+4/egnsE24T5CQbpweWEuj2YrVSB
+        wkLuehzw5K3JVraNoqWXcZ22ANJ10/S1UAFPdU73k4W3w6KN6EVVKMr5zOJ2RXkBIYNjv0
+        92T1k3rAuWXuAEIvLbcSB4kdjq1EVtk=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-530-DVFDQ9BOOTC_EwznObduDw-1; Thu, 17 Jun 2021 14:37:31 -0400
+X-MC-Unique: DVFDQ9BOOTC_EwznObduDw-1
+Received: by mail-ej1-f71.google.com with SMTP id 16-20020a1709063010b029037417ca2d43so2807526ejz.5
+        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 11:37:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=38MaJWJ06cbFFpdxNfvYHb//Q8oPQ4mle+cdo+ubdpE=;
+        b=ZVjRX8jBUcGCfm6H87ZtfbnRjJNodYVsP/OSiNaorUZoqG+XXKbVQaYcYydz7U+QXZ
+         SRZvoQV+GvflYl7YdJFUd3Xgm1jAVBjAazKv3u7/5lQY90B3zpU08lx+hp4wmZz2y51x
+         9fkMfyg29gYVADi/pFruRW7K48FOJr0dH6RLwgbP5EkDkPm3Rw6h0OMw8ZAsXMRp0D/X
+         k09V5S4Vn2G60aCt0l56Jutbaq08YRF2skBRsR4P9U4Ns4YlHtZaWlfxuRiMfPF2+MxU
+         9cI2xmECjxkIxjPn+/3Nmyf5OGVVsUAPLCHj/zajrNVRtWxEtckYEER17uG6+R0x4iyR
+         NfQw==
+X-Gm-Message-State: AOAM5338Fw5ErMaCcVyN4p9IFp4DwMH5h/AKwLd4M4cl8vs0Bdn0cc2w
+        TOQd6kZXeYCl2HGaFtvSnxahk74HftulLGVbkRdr2tiR+xxRKHoyrqjXXjjSU2voaQBFB2leLSS
+        EZkv3ZZsYEYxHesw0W6oDPBByz4MYyruE93EXcepwl/lr5Ze3j9Us+y9nPK4y3xZn
+X-Received: by 2002:a17:906:a296:: with SMTP id i22mr4516468ejz.520.1623955050172;
+        Thu, 17 Jun 2021 11:37:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwHjTTLjoGKfMSJ1nfvQ0psFNX1MDRLyKNAl5pxJTxmas2GBGI6EQSepWSPrO5YHb7VI/VQhA==
+X-Received: by 2002:a17:906:a296:: with SMTP id i22mr4516456ejz.520.1623955050027;
+        Thu, 17 Jun 2021 11:37:30 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id d25sm4947575edu.83.2021.06.17.11.37.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Jun 2021 11:37:29 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] x86: Flush the TLB after setting user-bit
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     kvm@vger.kernel.org
+References: <20210617101543.180792-1-namit@vmware.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM changes for 5.13-rc7
-Date:   Thu, 17 Jun 2021 14:36:03 -0400
-Message-Id: <20210617183603.844718-1-pbonzini@redhat.com>
+Message-ID: <3043f67d-4745-f1a4-0681-09b1f7d9efe5@redhat.com>
+Date:   Thu, 17 Jun 2021 20:37:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20210617101543.180792-1-namit@vmware.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On 17/06/21 12:15, Nadav Amit wrote:
+> From: Nadav Amit <nadav.amit@gmail.com>
+> 
+> According to Intel SDM 4.10.4.3 "Optional Invalidation": "If CR4.SMEP =
+> 0 and a paging-structure entry is modified to change the U/S flag from 0
+> to 1, failure to perform an invalidation may result in a "spurious"
+> page-fault exception (e.g., in response to an attempted user-mode
+> access) but no other adverse behavior."
+> 
+> The access test actually causes in certain environments a spurious
+> page-fault. So invalidate the relevant PTE after setting the user bit.
+> 
+> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+> ---
+>   x86/access.c | 6 +++++-
+>   1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/x86/access.c b/x86/access.c
+> index 0ad677e..47807cc 100644
+> --- a/x86/access.c
+> +++ b/x86/access.c
+> @@ -216,8 +216,12 @@ static unsigned set_cr4_smep(int smep)
+>       if (smep)
+>           ptl2[2] &= ~PT_USER_MASK;
+>       r = write_cr4_checking(cr4);
+> -    if (r || !smep)
+> +    if (r || !smep) {
+>           ptl2[2] |= PT_USER_MASK;
+> +
+> +	/* Flush to avoid spurious #PF */
+> +	invlpg((void *)(2 << 21));
+> +    }
+>       if (!r)
+>           shadow_cr4 = cr4;
+>       return r;
+> 
 
-The following changes since commit 4422829e8053068e0225e4d0ef42dc41ea7c9ef5:
+Queued, thanks.
 
-  kvm: fix previous commit for 32-bit builds (2021-06-09 01:49:13 -0400)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to d8ac05ea13d789d5491a5920d70a05659015441d:
-
-  KVM: selftests: Fix kvm_check_cap() assertion (2021-06-17 13:06:57 -0400)
-
-----------------------------------------------------------------
-Miscellaneous bugfixes.  The main interesting one is a NULL pointer dereference
-reported by syzkaller ("KVM: x86: Immediately reset the MMU context when the SMM
-flag is cleared").
-
-----------------------------------------------------------------
-Alper Gun (1):
-      KVM: SVM: Call SEV Guest Decommission if ASID binding fails
-
-ChenXiaoSong (1):
-      KVM: SVM: fix doc warnings
-
-Fuad Tabba (1):
-      KVM: selftests: Fix kvm_check_cap() assertion
-
-Gustavo A. R. Silva (1):
-      KVM: x86: Fix fall-through warnings for Clang
-
-Jim Mattson (1):
-      kvm: LAPIC: Restore guard to prevent illegal APIC register access
-
-Sean Christopherson (2):
-      KVM: x86: Immediately reset the MMU context when the SMM flag is cleared
-      KVM: x86/mmu: Calculate and check "full" mmu_role for nested MMU
-
-Wanpeng Li (1):
-      KVM: X86: Fix x86_emulator slab cache leak
-
-Yanan Wang (1):
-      KVM: selftests: Fix compiling errors when initializing the static structure
-
- arch/x86/kvm/cpuid.c                        |  1 +
- arch/x86/kvm/lapic.c                        |  3 +++
- arch/x86/kvm/mmu/mmu.c                      | 26 +++++++++++++++++++-
- arch/x86/kvm/svm/avic.c                     |  6 ++---
- arch/x86/kvm/svm/sev.c                      | 20 +++++++++++----
- arch/x86/kvm/vmx/vmx.c                      |  1 +
- arch/x86/kvm/x86.c                          |  6 ++++-
- tools/testing/selftests/kvm/lib/kvm_util.c  |  2 +-
- tools/testing/selftests/kvm/lib/test_util.c | 38 ++++++++++++++---------------
- 9 files changed, 73 insertions(+), 30 deletions(-)
+Paolo
 
