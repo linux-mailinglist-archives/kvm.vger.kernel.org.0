@@ -2,122 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C44B13AB7E6
-	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 17:51:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF5A63AB7ED
+	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 17:53:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233506AbhFQPxv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Jun 2021 11:53:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55056 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233371AbhFQPxu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Jun 2021 11:53:50 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A9B2C061760
-        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 08:51:42 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id i13so11292602lfc.7
-        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 08:51:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kvwd9EpkhUinpwzSVnooHeUgUpNvfxheNpkid5yzIx8=;
-        b=TxvTgcPI/Ra/tWUZA++LM92n/9N9cTc45nFEoGhah5rZzdxemGKBDvrRYYHnH4ElJt
-         yeZYKEj3Lqkp+BP0P4ZFMlqAtvCYjKX6t4G5pL+NGvO/8eHXkyErvHJikNhQ82xaQoTq
-         E4tiTMkcq1rkKtM7nLr4Upaq/GGoVKkfONVtDcs0f22HJaAYQy3Ug/8crI/5MUkmS78c
-         IwGqnKxMKmqptWtKPTUMbqXncfLP3Px4QgECquw11X7E+Y33meqrsX+9oDDbuFcIx+yl
-         gLr7fO7ADbTI7Co5iaDp6TxfEujoOq3bCRAkkK4lGCAoIfkQAfzZGLE2WYNQ+ctC+FK+
-         Bvfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kvwd9EpkhUinpwzSVnooHeUgUpNvfxheNpkid5yzIx8=;
-        b=WrlWGwf0WolyClePnBknhBNWWv9FMUry9iM/VEMhX9swzpeQhKgyfVs3kTrtDtYPpn
-         AXZyE/LwNN7jzEmPx2jkK49W6Njm1WHvyHad2NtfJgOVGb+Ij570aLAbExA1ZcOC1LN1
-         QtUJQPZYCykhejNTGBKxPdXqkq4lZNTW+looFGZ212cf1Hu6Gcu/mdpwAOB0Aetq+Umy
-         r3B90XiDrf3nXy2DPcLVEG6EsRskIvoURzFMV8J+381t3rziEMGjrZEVrchIuflp63Ue
-         LJhbD4Nykbf6Co7oC/jQngq6M2lQQfqzSAMRker4XTcbIOglpz0K6hkv+0xpsq0NKjGd
-         IFAw==
-X-Gm-Message-State: AOAM533gilSmq2QvVQBIgIwY9vpv8T3R5N9BStgveJJkyLoCeHZ3XMJ0
-        dEvMCo6RSDJpEuZBgiD40pOG3tq9aNZfpn/SMOUgPg==
-X-Google-Smtp-Source: ABdhPJyUT96ejYRqWFIHeQAvBlwr1aj1uzNjIHt1HENKbAjxRBM9g7oEN8mmzhRuuz1Vfgjz72FeQyENnMW8V6GZXWk=
-X-Received: by 2002:a05:6512:3ea:: with SMTP id n10mr4497632lfq.178.1623945100161;
- Thu, 17 Jun 2021 08:51:40 -0700 (PDT)
+        id S232648AbhFQPzV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Jun 2021 11:55:21 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:50360 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231641AbhFQPzU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Jun 2021 11:55:20 -0400
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 06BC91FD7D;
+        Thu, 17 Jun 2021 15:53:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1623945192; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ruX4fi2ifgkWNs4skOvM6TBKlu05fQ6TCdKDNmE57zM=;
+        b=YdeJkERcPZiS0AXoBC4HGNusCCR+/gPR1ZVC1/hQNJVUbHjT8HwZy+Ha2lWeigrdqQwmUA
+        3oK8O39XHlyE2uzja6Lrj2MUqg8rLiCUywiJ0haczLf7pejU9e/818pS4MIVBz3SgrQ1+K
+        4lc5vxfvFhpboO7pOmdQ1DhhG2IR14g=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1623945192;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ruX4fi2ifgkWNs4skOvM6TBKlu05fQ6TCdKDNmE57zM=;
+        b=4n6FTMznDCaugWVb6Cn0zF1zjMpqa8aUJdOLPqxNg/8O0VUiPXn3yPt53roHMTWXP6JXGd
+        4ab/m0ghDgf2aoAw==
+Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        by imap.suse.de (Postfix) with ESMTP id 87FC6118DD;
+        Thu, 17 Jun 2021 15:53:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1623945191; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ruX4fi2ifgkWNs4skOvM6TBKlu05fQ6TCdKDNmE57zM=;
+        b=Eujx27+Jfn6V1sP/76KzbSbuYbSyqz1Tyvnman4PxCD2wwWfMl9kr+g6L7PmnUxpR3OgMa
+        LwxnDJQaPeUf9h6h5Z7CkYe8e5I1K/BdlHO9nFJ8BBCLYjpe+kkk+Vnp/+UjcsAYQYeaKb
+        5SuLyZlMd9LqAmY1mGyKKwdJ56Ayrbg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1623945191;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ruX4fi2ifgkWNs4skOvM6TBKlu05fQ6TCdKDNmE57zM=;
+        b=s/MzHNF8Vy8W3kM/By4ln4PDTedpss/wFdrQpGQ6mKvxlQzQa8FNvIXJ773YVvetOS0+bi
+        iKfxyeah4leZcHDQ==
+Received: from director2.suse.de ([192.168.254.72])
+        by imap3-int with ESMTPSA
+        id 53m/Hudvy2ALFQAALh3uQQ
+        (envelope-from <cfontana@suse.de>); Thu, 17 Jun 2021 15:53:11 +0000
+Subject: Re: [PATCH v9] qapi: introduce 'query-kvm-cpuid' action
+To:     Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
+        Markus Armbruster <armbru@redhat.com>
+Cc:     Laurent Vivier <lvivier@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Denis Lunev <den@openvz.org>, Eric Blake <eblake@redhat.com>
+References: <20210603090753.11688-1-valeriy.vdovin@virtuozzo.com>
+ <87im2d6p5v.fsf@dusky.pond.sub.org>
+ <20210617074919.GA998232@dhcp-172-16-24-191.sw.ru>
+ <87a6no3fzf.fsf@dusky.pond.sub.org>
+ <790d22e1-5de9-ba20-6c03-415b62223d7d@suse.de>
+ <877dis1sue.fsf@dusky.pond.sub.org>
+ <20210617153949.GA357@dhcp-172-16-24-191.sw.ru>
+From:   Claudio Fontana <cfontana@suse.de>
+Message-ID: <e69ea2b4-21cc-8203-ad2d-10a0f4ffe34a@suse.de>
+Date:   Thu, 17 Jun 2021 17:53:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-References: <20210617044146.2667540-1-jingzhangos@google.com>
- <20210617044146.2667540-4-jingzhangos@google.com> <YMrmqOxDWJ2/8sfD@kroah.com>
- <be506135-5bc3-31bd-1b20-063f01f41df1@redhat.com> <YMszVQEK8LHiAT+9@kroah.com>
-In-Reply-To: <YMszVQEK8LHiAT+9@kroah.com>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Thu, 17 Jun 2021 10:51:27 -0500
-Message-ID: <CAAdAUth+osvNAzhGGY3u8fH4b2=PnLKQNFSfF6W92y--uYFOVg@mail.gmail.com>
-Subject: Re: [PATCH v10 3/5] KVM: stats: Add documentation for binary
- statistics interface
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        LinuxS390 <linux-s390@vger.kernel.org>,
-        Linuxkselftest <linux-kselftest@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Fuad Tabba <tabba@google.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210617153949.GA357@dhcp-172-16-24-191.sw.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 17, 2021 at 6:34 AM Greg KH <gregkh@linuxfoundation.org> wrote:
->
-> On Thu, Jun 17, 2021 at 01:19:50PM +0200, Paolo Bonzini wrote:
-> > On 17/06/21 08:07, Greg KH wrote:
-> > > > The statistics data itself could be read out by userspace telemetry
-> > > > periodically without any extra parsing or setup effort.
-> > > Do you have a pointer to userspace code that can do such a thing that
-> > > others can use?  We do not like adding apis to the kernel without at
-> > > least seeing the user of those apis, especially for complex things like
-> > > this.
-> > >
-> > > Ideally you would include some library code in the kernel tree itself
-> > > that everyone can use for this for their own programs.  You have
-> > > provided a test which is great, but how do we know it works for "real"
-> > > usages?
-> >
-> > I am pretty sure that Google is using this internally, but we are also going
-> > to work on QEMU and Libvirt support for this.
->
-> We need an "external user" for something as complex as this to be able
-> to see if it actually works or not.  Otherwise we have to just guess :(
-We have plans to add some library code in kernel selftests and also some
-simple tools to let everyone get a feeling of the new API.
+On 6/17/21 5:39 PM, Valeriy Vdovin wrote:
+> On Thu, Jun 17, 2021 at 04:14:17PM +0200, Markus Armbruster wrote:
+>> Claudio Fontana <cfontana@suse.de> writes:
+>>
+>>> On 6/17/21 1:09 PM, Markus Armbruster wrote:
+>>>> Valeriy Vdovin <valeriy.vdovin@virtuozzo.com> writes:
+>>>>
+>>>>> On Thu, Jun 17, 2021 at 07:22:36AM +0200, Markus Armbruster wrote:
+>>>>>> Valeriy Vdovin <valeriy.vdovin@virtuozzo.com> writes:
+>>>>>>
+>>>>>>> Introducing new qapi method 'query-kvm-cpuid'. This method can be used to
+>>>>>>
+>>>>>> It's actually a QMP command.  There are no "qapi methods".
+>>>>>>
+>>>>>>> get virtualized cpu model info generated by QEMU during VM initialization in
+>>>>>>> the form of cpuid representation.
+>>>>>>>
+>>>>>>> Diving into more details about virtual cpu generation: QEMU first parses '-cpu'
+>>>>>>
+>>>>>> virtual CPU
+>>>>>>
+>>>>>>> command line option. From there it takes the name of the model as the basis for
+>>>>>>> feature set of the new virtual cpu. After that it uses trailing '-cpu' options,
+>>>>>>> that state if additional cpu features should be present on the virtual cpu or
+>>>>>>> excluded from it (tokens '+'/'-' or '=on'/'=off').
+>>>>>>> After that QEMU checks if the host's cpu can actually support the derived
+>>>>>>> feature set and applies host limitations to it.
+>>>>>>> After this initialization procedure, virtual cpu has it's model and
+>>>>>>> vendor names, and a working feature set and is ready for identification
+>>>>>>> instructions such as CPUID.
+>>>>>>>
+>>>>>>> Currently full output for this method is only supported for x86 cpus.
+>>>>>>
+>>>>>> Not sure about "currently": the interface looks quite x86-specific to me.
+>>>>>>
+>>>>> Yes, at some point I was thinking this interface could become generic,
+>>>>> but does not seem possible, so I'll remove this note.
+>>>>>
+>>>>>> The commit message doesn't mention KVM except in the command name.  The
+>>>>>> schema provides the command only if defined(CONFIG_KVM).
+>>>>>>
+>>>>>> Can you explain why you need the restriction to CONFIG_KVM?
+>>>>>>
+>>>>> This CONFIG_KVM is used as a solution to a broken build if --disable-kvm
+>>>>> flag is set. I was choosing between this and writing empty implementation into
+>>>>> kvm-stub.c
+>>>>
+>>>> If the command only makes sense for KVM, then it's named correctly, but
+>>>> the commit message lacks a (brief!) explanation why it only makes for
+>>>> KVM.
+>>>
+>>>
+>>> Is it meaningful for HVF?
+>>
+>> I can't see why it couldn't be.
+> Should I also make some note about that in the commit message?
+>>
+>> Different tack: if KVM is compiled out entirely, the command isn't
+>> there, and trying to use it fails like
+>>
+>>     {"error": {"class": "CommandNotFound", "desc": "The command query-kvm-cpuid has not been found"}}
+>>
+>> If KVM is compiled in, but disabled, e.g. with -machine accel=tcg, then
+>> the command fails like
+>>
+>>     {"error": {"class": "GenericError", "desc": "VCPU was not initialized yet"}}
+>>
+>> This is misleading.  The VCPU is actually running, it's just the wrong
+>> kind of VCPU.
+>>
+>>>> If it just isn't implemented for anything but KVM, then putting "kvm"
+>>>> into the command name is a bad idea.  Also, the commit message should
+>>>> briefly note the restriction to KVM.
+>>
+>> Perhaps this one is closer to reality.
+>>
+> I agree.
+> What command name do you suggest?
 
->
-> thanks,
->
-> greg k-h
+query-exposed-cpuid?
 
-Thanks,
-Jing
+
+>>>> Pick one :)
+>>>>
+>>>> [...]
+>>
+
