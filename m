@@ -2,117 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B6B173AB1FB
-	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 13:09:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F7913AB27A
+	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 13:24:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232372AbhFQLL1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Jun 2021 07:11:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48049 "EHLO
+        id S232586AbhFQL0I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Jun 2021 07:26:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33367 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232361AbhFQLLY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Jun 2021 07:11:24 -0400
+        by vger.kernel.org with ESMTP id S232577AbhFQL0G (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 17 Jun 2021 07:26:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623928156;
+        s=mimecast20190719; t=1623929038;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7qWZzuA2Y1bo+JLlFd2CD8tH7SKYj99Hgs/TVPOjKEo=;
-        b=P/0vOQ1OFiu0q5gW14dJE/OJ/qzHlOPk0O/dssyfqMWwvr6okBHAVdiEzughrBnIndlb7m
-        J1bM1YjQWE4l+udkBuYbw9b12V6aKO6EIwbd6udTjl8EbWmQ44+hVmFFKCT7KwqrSfWhj/
-        K0Ovl6q/uMMAd6On2AwgdtRsqXfqWC4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-141-GDFr9j2-PsCsyLCXOTrHDQ-1; Thu, 17 Jun 2021 07:09:13 -0400
-X-MC-Unique: GDFr9j2-PsCsyLCXOTrHDQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A7C6100CF71;
-        Thu, 17 Jun 2021 11:09:11 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-104.ams2.redhat.com [10.36.112.104])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7A9271002D71;
-        Thu, 17 Jun 2021 11:09:10 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-        id F0E24113865F; Thu, 17 Jun 2021 13:09:08 +0200 (CEST)
-From:   Markus Armbruster <armbru@redhat.com>
-To:     Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
-Cc:     qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Eric Blake <eblake@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
-        Denis Lunev <den@openvz.org>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v9] qapi: introduce 'query-kvm-cpuid' action
-References: <20210603090753.11688-1-valeriy.vdovin@virtuozzo.com>
-        <87im2d6p5v.fsf@dusky.pond.sub.org>
-        <20210617074919.GA998232@dhcp-172-16-24-191.sw.ru>
-Date:   Thu, 17 Jun 2021 13:09:08 +0200
-In-Reply-To: <20210617074919.GA998232@dhcp-172-16-24-191.sw.ru> (Valeriy
-        Vdovin's message of "Thu, 17 Jun 2021 10:49:19 +0300")
-Message-ID: <87a6no3fzf.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
+        bh=QeoOEjtdTbZHikE6qVHZkIHtsqJ8oL1MWdn59al3yJU=;
+        b=QPOshvNSHaHMRlCs/JLASRIRzg6IzS1axSTawZFHWQ7I3VLm1+WbR/58jk9N1C/WgYw62I
+        g3k775BjI9nF5FtOg00KGs0MexHgVchuTcdmCD8iJ3S+pyGHquveDk19Pu4q/vLJlU1NKZ
+        oPM/u9o9xGnNDfWS0ViWibD/iN39T3U=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-283-R6I6JnwvNEKkTtg0MDXjIg-1; Thu, 17 Jun 2021 07:23:57 -0400
+X-MC-Unique: R6I6JnwvNEKkTtg0MDXjIg-1
+Received: by mail-ed1-f69.google.com with SMTP id g13-20020a056402090db02903935a4cb74fso1330717edz.1
+        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 04:23:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=QeoOEjtdTbZHikE6qVHZkIHtsqJ8oL1MWdn59al3yJU=;
+        b=N5zONty299TO9Z5o3l7eVzetg8lHZR+U1gJgeW8Fph54Yb9mpdCpNbwzbYusULum0C
+         kzyBr9JcbnNQHKsApHV4eOmI/0+5ML9MZgVZEB8gDpTtpc9+ySd1i+y1rLn9LN+cAxmA
+         zcalXLscXO3zsJIbLxq/Wn0PknGsuQ7cs9hYzwVe8eRJwU4kaWA5b4gjb3+VmZpUDkYD
+         YU39IijNSy3T5fv0VVkpe4NpLEY8d10Uw9gHaa0wMK3pTDpwWdoiMYmmoQTYHzA6qn0O
+         GIJJa707QJEoxqm31w6hSXQ42ZW4+EVZyan8a5Jwy+MWBOvOtYaGHxUSwGuhTH0Gd4ro
+         7pwg==
+X-Gm-Message-State: AOAM532ycnr3r8eAj9j5MIVnHnjANA+aHWx347OH8hFryzZ0cjy76K+1
+        93pn0Cm/la26B/HoovAKMBsBaiSk1HO88w0yetqsyM/YO2C7MzitFh2gopdbybw+vhElAW3Vlle
+        r+M4ABypHdxAp
+X-Received: by 2002:a05:6402:268f:: with SMTP id w15mr5799067edd.228.1623928793194;
+        Thu, 17 Jun 2021 04:19:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzc8lc8kbfFsQbKsVnuEADgPqEmYVAvmC/1IvjtxjrXOO4gKYpFUgt0NPkDolV15GoZuo9rTg==
+X-Received: by 2002:a05:6402:268f:: with SMTP id w15mr5799027edd.228.1623928793011;
+        Thu, 17 Jun 2021 04:19:53 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id e18sm3537900ejh.64.2021.06.17.04.19.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Jun 2021 04:19:52 -0700 (PDT)
+Subject: Re: [PATCH v10 3/5] KVM: stats: Add documentation for binary
+ statistics interface
+To:     Greg KH <gregkh@linuxfoundation.org>,
+        Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Fuad Tabba <tabba@google.com>
+References: <20210617044146.2667540-1-jingzhangos@google.com>
+ <20210617044146.2667540-4-jingzhangos@google.com>
+ <YMrmqOxDWJ2/8sfD@kroah.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <be506135-5bc3-31bd-1b20-063f01f41df1@redhat.com>
+Date:   Thu, 17 Jun 2021 13:19:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <YMrmqOxDWJ2/8sfD@kroah.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Valeriy Vdovin <valeriy.vdovin@virtuozzo.com> writes:
+On 17/06/21 08:07, Greg KH wrote:
+>> The statistics data itself could be read out by userspace telemetry
+>> periodically without any extra parsing or setup effort.
+> Do you have a pointer to userspace code that can do such a thing that
+> others can use?  We do not like adding apis to the kernel without at
+> least seeing the user of those apis, especially for complex things like
+> this.
+> 
+> Ideally you would include some library code in the kernel tree itself
+> that everyone can use for this for their own programs.  You have
+> provided a test which is great, but how do we know it works for "real"
+> usages?
 
-> On Thu, Jun 17, 2021 at 07:22:36AM +0200, Markus Armbruster wrote:
->> Valeriy Vdovin <valeriy.vdovin@virtuozzo.com> writes:
->> 
->> > Introducing new qapi method 'query-kvm-cpuid'. This method can be used to
->> 
->> It's actually a QMP command.  There are no "qapi methods".
->> 
->> > get virtualized cpu model info generated by QEMU during VM initialization in
->> > the form of cpuid representation.
->> >
->> > Diving into more details about virtual cpu generation: QEMU first parses '-cpu'
->> 
->> virtual CPU
->> 
->> > command line option. From there it takes the name of the model as the basis for
->> > feature set of the new virtual cpu. After that it uses trailing '-cpu' options,
->> > that state if additional cpu features should be present on the virtual cpu or
->> > excluded from it (tokens '+'/'-' or '=on'/'=off').
->> > After that QEMU checks if the host's cpu can actually support the derived
->> > feature set and applies host limitations to it.
->> > After this initialization procedure, virtual cpu has it's model and
->> > vendor names, and a working feature set and is ready for identification
->> > instructions such as CPUID.
->> >
->> > Currently full output for this method is only supported for x86 cpus.
->> 
->> Not sure about "currently": the interface looks quite x86-specific to me.
->> 
-> Yes, at some point I was thinking this interface could become generic,
-> but does not seem possible, so I'll remove this note.
->
->> The commit message doesn't mention KVM except in the command name.  The
->> schema provides the command only if defined(CONFIG_KVM).
->> 
->> Can you explain why you need the restriction to CONFIG_KVM?
->> 
-> This CONFIG_KVM is used as a solution to a broken build if --disable-kvm
-> flag is set. I was choosing between this and writing empty implementation into
-> kvm-stub.c
+I am pretty sure that Google is using this internally, but we are also 
+going to work on QEMU and Libvirt support for this.
 
-If the command only makes sense for KVM, then it's named correctly, but
-the commit message lacks a (brief!) explanation why it only makes for
-KVM.
+As for the rest, thanks for the review---I'll let Jing act on it and 
+only add my own remarks in a couple places.
 
-If it just isn't implemented for anything but KVM, then putting "kvm"
-into the command name is a bad idea.  Also, the commit message should
-briefly note the restriction to KVM.
-
-Pick one :)
-
-[...]
+Paolo
 
