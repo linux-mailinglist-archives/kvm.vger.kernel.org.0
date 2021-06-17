@@ -2,141 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D2903AB59C
-	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 16:14:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D640E3AB5B8
+	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 16:20:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231678AbhFQOQa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Jun 2021 10:16:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35994 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230137AbhFQOQa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Jun 2021 10:16:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623939262;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=3iDYzemEfvyBr5j053kFgUhvBAcaGUQWHEX3m7tez/E=;
-        b=hile8qPNcG7FLA6lxL6Jl9LaKiCU1Pjz1Yz+Usc650sm9IZgvFQw3IrDzs+N2fMyBWU5Yf
-        E/rQLaoW49sY3EDRY74hUdWUThuNcCVgQQiFEIRZ6AOyLj7AKphMVTGk5FJOTIAzvNYqQq
-        a5RfRPTt2R8j8gbLTK/tVYY6A7RNhFY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-bdVvo9HJMsm0JPyCCelcjw-1; Thu, 17 Jun 2021 10:14:20 -0400
-X-MC-Unique: bdVvo9HJMsm0JPyCCelcjw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S232013AbhFQOWh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Jun 2021 10:22:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44958 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231666AbhFQOWg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Jun 2021 10:22:36 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A4088015DB;
-        Thu, 17 Jun 2021 14:14:19 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-104.ams2.redhat.com [10.36.112.104])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E9FAD100164C;
-        Thu, 17 Jun 2021 14:14:18 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-        id 81863113865F; Thu, 17 Jun 2021 16:14:17 +0200 (CEST)
-From:   Markus Armbruster <armbru@redhat.com>
-To:     Claudio Fontana <cfontana@suse.de>
-Cc:     Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Denis Lunev <den@openvz.org>, Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v9] qapi: introduce 'query-kvm-cpuid' action
-References: <20210603090753.11688-1-valeriy.vdovin@virtuozzo.com>
-        <87im2d6p5v.fsf@dusky.pond.sub.org>
-        <20210617074919.GA998232@dhcp-172-16-24-191.sw.ru>
-        <87a6no3fzf.fsf@dusky.pond.sub.org>
-        <790d22e1-5de9-ba20-6c03-415b62223d7d@suse.de>
-Date:   Thu, 17 Jun 2021 16:14:17 +0200
-In-Reply-To: <790d22e1-5de9-ba20-6c03-415b62223d7d@suse.de> (Claudio Fontana's
-        message of "Thu, 17 Jun 2021 13:56:31 +0200")
-Message-ID: <877dis1sue.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+        by mail.kernel.org (Postfix) with ESMTPSA id 8279C6135C;
+        Thu, 17 Jun 2021 14:20:28 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1ltssc-008C7g-Jn; Thu, 17 Jun 2021 15:20:26 +0100
+Date:   Thu, 17 Jun 2021 15:20:26 +0100
+Message-ID: <87eed0d13p.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Will Deacon <will@kernel.org>
+Cc:     Yanan Wang <wangyanan55@huawei.com>,
+        Quentin Perret <qperret@google.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Gavin Shan <gshan@redhat.com>, wanghaibin.wang@huawei.com,
+        zhukeqian1@huawei.com, yuzenghui@huawei.com
+Subject: Re: [PATCH v7 1/4] KVM: arm64: Introduce two cache maintenance callbacks
+In-Reply-To: <20210617123837.GA24457@willie-the-truck>
+References: <20210617105824.31752-1-wangyanan55@huawei.com>
+        <20210617105824.31752-2-wangyanan55@huawei.com>
+        <20210617123837.GA24457@willie-the-truck>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, wangyanan55@huawei.com, qperret@google.com, alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, gshan@redhat.com, wanghaibin.wang@huawei.com, zhukeqian1@huawei.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Claudio Fontana <cfontana@suse.de> writes:
+On Thu, 17 Jun 2021 13:38:37 +0100,
+Will Deacon <will@kernel.org> wrote:
+> 
+> On Thu, Jun 17, 2021 at 06:58:21PM +0800, Yanan Wang wrote:
+> > To prepare for performing CMOs for guest stage-2 in the fault handlers
+> > in pgtable.c, here introduce two cache maintenance callbacks in struct
+> > kvm_pgtable_mm_ops. We also adjust the comment alignment for the
+> > existing part but make no real content change at all.
+> > 
+> > Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_pgtable.h | 42 +++++++++++++++++-----------
+> >  1 file changed, 25 insertions(+), 17 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index c3674c47d48c..b6ce34aa44bb 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -27,23 +27,29 @@ typedef u64 kvm_pte_t;
+> >  
+> >  /**
+> >   * struct kvm_pgtable_mm_ops - Memory management callbacks.
+> > - * @zalloc_page:	Allocate a single zeroed memory page. The @arg parameter
+> > - *			can be used by the walker to pass a memcache. The
+> > - *			initial refcount of the page is 1.
+> > - * @zalloc_pages_exact:	Allocate an exact number of zeroed memory pages. The
+> > - *			@size parameter is in bytes, and is rounded-up to the
+> > - *			next page boundary. The resulting allocation is
+> > - *			physically contiguous.
+> > - * @free_pages_exact:	Free an exact number of memory pages previously
+> > - *			allocated by zalloc_pages_exact.
+> > - * @get_page:		Increment the refcount on a page.
+> > - * @put_page:		Decrement the refcount on a page. When the refcount
+> > - *			reaches 0 the page is automatically freed.
+> > - * @page_count:		Return the refcount of a page.
+> > - * @phys_to_virt:	Convert a physical address into a virtual address mapped
+> > - *			in the current context.
+> > - * @virt_to_phys:	Convert a virtual address mapped in the current context
+> > - *			into a physical address.
+> > + * @zalloc_page:		Allocate a single zeroed memory page.
+> > + *				The @arg parameter can be used by the walker
+> > + *				to pass a memcache. The initial refcount of
+> > + *				the page is 1.
+> > + * @zalloc_pages_exact:		Allocate an exact number of zeroed memory pages.
+> > + *				The @size parameter is in bytes, and is rounded
+> > + *				up to the next page boundary. The resulting
+> > + *				allocation is physically contiguous.
+> > + * @free_pages_exact:		Free an exact number of memory pages previously
+> > + *				allocated by zalloc_pages_exact.
+> > + * @get_page:			Increment the refcount on a page.
+> > + * @put_page:			Decrement the refcount on a page. When the
+> > + *				refcount reaches 0 the page is automatically
+> > + *				freed.
+> > + * @page_count:			Return the refcount of a page.
+> > + * @phys_to_virt:		Convert a physical address into a virtual address
+> > + *				mapped in the current context.
+> > + * @virt_to_phys:		Convert a virtual address mapped in the current
+> > + *				context into a physical address.
+> > + * @clean_invalidate_dcache:	Clean and invalidate the data cache for the
+> > + *				specified memory address range.
+> 
+> This should probably be explicit about whether this to the PoU/PoC/PoP.
 
-> On 6/17/21 1:09 PM, Markus Armbruster wrote:
->> Valeriy Vdovin <valeriy.vdovin@virtuozzo.com> writes:
->> 
->>> On Thu, Jun 17, 2021 at 07:22:36AM +0200, Markus Armbruster wrote:
->>>> Valeriy Vdovin <valeriy.vdovin@virtuozzo.com> writes:
->>>>
->>>>> Introducing new qapi method 'query-kvm-cpuid'. This method can be used to
->>>>
->>>> It's actually a QMP command.  There are no "qapi methods".
->>>>
->>>>> get virtualized cpu model info generated by QEMU during VM initialization in
->>>>> the form of cpuid representation.
->>>>>
->>>>> Diving into more details about virtual cpu generation: QEMU first parses '-cpu'
->>>>
->>>> virtual CPU
->>>>
->>>>> command line option. From there it takes the name of the model as the basis for
->>>>> feature set of the new virtual cpu. After that it uses trailing '-cpu' options,
->>>>> that state if additional cpu features should be present on the virtual cpu or
->>>>> excluded from it (tokens '+'/'-' or '=on'/'=off').
->>>>> After that QEMU checks if the host's cpu can actually support the derived
->>>>> feature set and applies host limitations to it.
->>>>> After this initialization procedure, virtual cpu has it's model and
->>>>> vendor names, and a working feature set and is ready for identification
->>>>> instructions such as CPUID.
->>>>>
->>>>> Currently full output for this method is only supported for x86 cpus.
->>>>
->>>> Not sure about "currently": the interface looks quite x86-specific to me.
->>>>
->>> Yes, at some point I was thinking this interface could become generic,
->>> but does not seem possible, so I'll remove this note.
->>>
->>>> The commit message doesn't mention KVM except in the command name.  The
->>>> schema provides the command only if defined(CONFIG_KVM).
->>>>
->>>> Can you explain why you need the restriction to CONFIG_KVM?
->>>>
->>> This CONFIG_KVM is used as a solution to a broken build if --disable-kvm
->>> flag is set. I was choosing between this and writing empty implementation into
->>> kvm-stub.c
->> 
->> If the command only makes sense for KVM, then it's named correctly, but
->> the commit message lacks a (brief!) explanation why it only makes for
->> KVM.
->
->
-> Is it meaningful for HVF?
+Indeed. I can fix that locally if there is nothing else that requires
+adjusting.
 
-I can't see why it couldn't be.
+	M.
 
-Different tack: if KVM is compiled out entirely, the command isn't
-there, and trying to use it fails like
-
-    {"error": {"class": "CommandNotFound", "desc": "The command query-kvm-cpuid has not been found"}}
-
-If KVM is compiled in, but disabled, e.g. with -machine accel=tcg, then
-the command fails like
-
-    {"error": {"class": "GenericError", "desc": "VCPU was not initialized yet"}}
-
-This is misleading.  The VCPU is actually running, it's just the wrong
-kind of VCPU.
-
->> If it just isn't implemented for anything but KVM, then putting "kvm"
->> into the command name is a bad idea.  Also, the commit message should
->> briefly note the restriction to KVM.
-
-Perhaps this one is closer to reality.
-
->> Pick one :)
->> 
->> [...]
-
+-- 
+Without deviation from the norm, progress is not possible.
