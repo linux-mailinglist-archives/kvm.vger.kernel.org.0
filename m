@@ -2,363 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A4013AB53F
-	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 15:55:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D2903AB59C
+	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 16:14:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232808AbhFQN5v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Jun 2021 09:57:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56676 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230411AbhFQN5u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Jun 2021 09:57:50 -0400
-Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 895F7C061574;
-        Thu, 17 Jun 2021 06:55:42 -0700 (PDT)
-Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 410AE387; Thu, 17 Jun 2021 15:55:40 +0200 (CEST)
-Date:   Thu, 17 Jun 2021 15:55:39 +0200
-From:   Joerg Roedel <joro@8bytes.org>
-To:     x86@kernel.org
-Cc:     Joerg Roedel <jroedel@suse.de>,
-        Peter Zijlstra <peterz@infradead.org>, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: [PATCH v6.1 2/2] x86/sev: Split up runtime #VC handler for correct
- state tracking
-Message-ID: <YMtUW2+kjQQG1Uy7@8bytes.org>
-References: <20210616184913.13064-1-joro@8bytes.org>
- <20210616184913.13064-3-joro@8bytes.org>
+        id S231678AbhFQOQa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Jun 2021 10:16:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35994 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230137AbhFQOQa (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 17 Jun 2021 10:16:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623939262;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3iDYzemEfvyBr5j053kFgUhvBAcaGUQWHEX3m7tez/E=;
+        b=hile8qPNcG7FLA6lxL6Jl9LaKiCU1Pjz1Yz+Usc650sm9IZgvFQw3IrDzs+N2fMyBWU5Yf
+        E/rQLaoW49sY3EDRY74hUdWUThuNcCVgQQiFEIRZ6AOyLj7AKphMVTGk5FJOTIAzvNYqQq
+        a5RfRPTt2R8j8gbLTK/tVYY6A7RNhFY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-15-bdVvo9HJMsm0JPyCCelcjw-1; Thu, 17 Jun 2021 10:14:20 -0400
+X-MC-Unique: bdVvo9HJMsm0JPyCCelcjw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A4088015DB;
+        Thu, 17 Jun 2021 14:14:19 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-104.ams2.redhat.com [10.36.112.104])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E9FAD100164C;
+        Thu, 17 Jun 2021 14:14:18 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+        id 81863113865F; Thu, 17 Jun 2021 16:14:17 +0200 (CEST)
+From:   Markus Armbruster <armbru@redhat.com>
+To:     Claudio Fontana <cfontana@suse.de>
+Cc:     Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Denis Lunev <den@openvz.org>, Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH v9] qapi: introduce 'query-kvm-cpuid' action
+References: <20210603090753.11688-1-valeriy.vdovin@virtuozzo.com>
+        <87im2d6p5v.fsf@dusky.pond.sub.org>
+        <20210617074919.GA998232@dhcp-172-16-24-191.sw.ru>
+        <87a6no3fzf.fsf@dusky.pond.sub.org>
+        <790d22e1-5de9-ba20-6c03-415b62223d7d@suse.de>
+Date:   Thu, 17 Jun 2021 16:14:17 +0200
+In-Reply-To: <790d22e1-5de9-ba20-6c03-415b62223d7d@suse.de> (Claudio Fontana's
+        message of "Thu, 17 Jun 2021 13:56:31 +0200")
+Message-ID: <877dis1sue.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210616184913.13064-3-joro@8bytes.org>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Joerg Roedel <jroedel@suse.de>
+Claudio Fontana <cfontana@suse.de> writes:
 
-Split up the #VC handler code into a from-user and a from-kernel part.
-This allows clean and correct state tracking, as the #VC handler needs
-to enter NMI-state when raised from kernel mode and plain IRQ state when
-raised from user-mode.
+> On 6/17/21 1:09 PM, Markus Armbruster wrote:
+>> Valeriy Vdovin <valeriy.vdovin@virtuozzo.com> writes:
+>> 
+>>> On Thu, Jun 17, 2021 at 07:22:36AM +0200, Markus Armbruster wrote:
+>>>> Valeriy Vdovin <valeriy.vdovin@virtuozzo.com> writes:
+>>>>
+>>>>> Introducing new qapi method 'query-kvm-cpuid'. This method can be used to
+>>>>
+>>>> It's actually a QMP command.  There are no "qapi methods".
+>>>>
+>>>>> get virtualized cpu model info generated by QEMU during VM initialization in
+>>>>> the form of cpuid representation.
+>>>>>
+>>>>> Diving into more details about virtual cpu generation: QEMU first parses '-cpu'
+>>>>
+>>>> virtual CPU
+>>>>
+>>>>> command line option. From there it takes the name of the model as the basis for
+>>>>> feature set of the new virtual cpu. After that it uses trailing '-cpu' options,
+>>>>> that state if additional cpu features should be present on the virtual cpu or
+>>>>> excluded from it (tokens '+'/'-' or '=on'/'=off').
+>>>>> After that QEMU checks if the host's cpu can actually support the derived
+>>>>> feature set and applies host limitations to it.
+>>>>> After this initialization procedure, virtual cpu has it's model and
+>>>>> vendor names, and a working feature set and is ready for identification
+>>>>> instructions such as CPUID.
+>>>>>
+>>>>> Currently full output for this method is only supported for x86 cpus.
+>>>>
+>>>> Not sure about "currently": the interface looks quite x86-specific to me.
+>>>>
+>>> Yes, at some point I was thinking this interface could become generic,
+>>> but does not seem possible, so I'll remove this note.
+>>>
+>>>> The commit message doesn't mention KVM except in the command name.  The
+>>>> schema provides the command only if defined(CONFIG_KVM).
+>>>>
+>>>> Can you explain why you need the restriction to CONFIG_KVM?
+>>>>
+>>> This CONFIG_KVM is used as a solution to a broken build if --disable-kvm
+>>> flag is set. I was choosing between this and writing empty implementation into
+>>> kvm-stub.c
+>> 
+>> If the command only makes sense for KVM, then it's named correctly, but
+>> the commit message lacks a (brief!) explanation why it only makes for
+>> KVM.
+>
+>
+> Is it meaningful for HVF?
 
-Fixes: 62441a1fb532 ("x86/sev-es: Correctly track IRQ states in runtime #VC handler")
-Suggested-by: Peter Zijlstra <peterz@infradead.org>
-Signed-off-by: Joerg Roedel <jroedel@suse.de>
----
- arch/x86/entry/entry_64.S       |   4 +-
- arch/x86/include/asm/idtentry.h |  29 +++----
- arch/x86/kernel/sev.c           | 148 +++++++++++++++++---------------
- 3 files changed, 91 insertions(+), 90 deletions(-)
+I can't see why it couldn't be.
 
-diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
-index a16a5294d55f..1886aaf19914 100644
---- a/arch/x86/entry/entry_64.S
-+++ b/arch/x86/entry/entry_64.S
-@@ -506,7 +506,7 @@ SYM_CODE_START(\asmsym)
- 
- 	movq	%rsp, %rdi		/* pt_regs pointer */
- 
--	call	\cfunc
-+	call	kernel_\cfunc
- 
- 	/*
- 	 * No need to switch back to the IST stack. The current stack is either
-@@ -517,7 +517,7 @@ SYM_CODE_START(\asmsym)
- 
- 	/* Switch to the regular task stack */
- .Lfrom_usermode_switch_stack_\@:
--	idtentry_body safe_stack_\cfunc, has_error_code=1
-+	idtentry_body user_\cfunc, has_error_code=1
- 
- _ASM_NOKPROBE(\asmsym)
- SYM_CODE_END(\asmsym)
-diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
-index 73d45b0dfff2..cd9f3e304944 100644
---- a/arch/x86/include/asm/idtentry.h
-+++ b/arch/x86/include/asm/idtentry.h
-@@ -312,8 +312,8 @@ static __always_inline void __##func(struct pt_regs *regs)
-  */
- #define DECLARE_IDTENTRY_VC(vector, func)				\
- 	DECLARE_IDTENTRY_RAW_ERRORCODE(vector, func);			\
--	__visible noinstr void ist_##func(struct pt_regs *regs, unsigned long error_code);	\
--	__visible noinstr void safe_stack_##func(struct pt_regs *regs, unsigned long error_code)
-+	__visible noinstr void kernel_##func(struct pt_regs *regs, unsigned long error_code);	\
-+	__visible noinstr void   user_##func(struct pt_regs *regs, unsigned long error_code)
- 
- /**
-  * DEFINE_IDTENTRY_IST - Emit code for IST entry points
-@@ -355,33 +355,24 @@ static __always_inline void __##func(struct pt_regs *regs)
- 	DEFINE_IDTENTRY_RAW_ERRORCODE(func)
- 
- /**
-- * DEFINE_IDTENTRY_VC_SAFE_STACK - Emit code for VMM communication handler
--				   which runs on a safe stack.
-+ * DEFINE_IDTENTRY_VC_KERNEL - Emit code for VMM communication handler
-+			       when raised from kernel mode
-  * @func:	Function name of the entry point
-  *
-  * Maps to DEFINE_IDTENTRY_RAW_ERRORCODE
-  */
--#define DEFINE_IDTENTRY_VC_SAFE_STACK(func)				\
--	DEFINE_IDTENTRY_RAW_ERRORCODE(safe_stack_##func)
-+#define DEFINE_IDTENTRY_VC_KERNEL(func)				\
-+	DEFINE_IDTENTRY_RAW_ERRORCODE(kernel_##func)
- 
- /**
-- * DEFINE_IDTENTRY_VC_IST - Emit code for VMM communication handler
--			    which runs on the VC fall-back stack
-+ * DEFINE_IDTENTRY_VC_USER - Emit code for VMM communication handler
-+			     when raised from user mode
-  * @func:	Function name of the entry point
-  *
-  * Maps to DEFINE_IDTENTRY_RAW_ERRORCODE
-  */
--#define DEFINE_IDTENTRY_VC_IST(func)				\
--	DEFINE_IDTENTRY_RAW_ERRORCODE(ist_##func)
--
--/**
-- * DEFINE_IDTENTRY_VC - Emit code for VMM communication handler
-- * @func:	Function name of the entry point
-- *
-- * Maps to DEFINE_IDTENTRY_RAW_ERRORCODE
-- */
--#define DEFINE_IDTENTRY_VC(func)					\
--	DEFINE_IDTENTRY_RAW_ERRORCODE(func)
-+#define DEFINE_IDTENTRY_VC_USER(func)				\
-+	DEFINE_IDTENTRY_RAW_ERRORCODE(user_##func)
- 
- #else	/* CONFIG_X86_64 */
- 
-diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-index e0d12728bcb7..fe98cec2973e 100644
---- a/arch/x86/kernel/sev.c
-+++ b/arch/x86/kernel/sev.c
-@@ -796,7 +796,7 @@ void __init sev_es_init_vc_handling(void)
- 	sev_es_setup_play_dead();
- 
- 	/* Secondary CPUs use the runtime #VC handler */
--	initial_vc_handler = (unsigned long)safe_stack_exc_vmm_communication;
-+	initial_vc_handler = (unsigned long)kernel_exc_vmm_communication;
- }
- 
- static void __init vc_early_forward_exception(struct es_em_ctxt *ctxt)
-@@ -1234,14 +1234,6 @@ static enum es_result vc_handle_trap_ac(struct ghcb *ghcb,
- 	return ES_EXCEPTION;
- }
- 
--static __always_inline void vc_handle_trap_db(struct pt_regs *regs)
--{
--	if (user_mode(regs))
--		noist_exc_debug(regs);
--	else
--		exc_debug(regs);
--}
--
- static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
- 					 struct ghcb *ghcb,
- 					 unsigned long exit_code)
-@@ -1337,41 +1329,13 @@ static __always_inline bool on_vc_fallback_stack(struct pt_regs *regs)
- 	return (sp >= __this_cpu_ist_bottom_va(VC2) && sp < __this_cpu_ist_top_va(VC2));
- }
- 
--/*
-- * Main #VC exception handler. It is called when the entry code was able to
-- * switch off the IST to a safe kernel stack.
-- *
-- * With the current implementation it is always possible to switch to a safe
-- * stack because #VC exceptions only happen at known places, like intercepted
-- * instructions or accesses to MMIO areas/IO ports. They can also happen with
-- * code instrumentation when the hypervisor intercepts #DB, but the critical
-- * paths are forbidden to be instrumented, so #DB exceptions currently also
-- * only happen in safe places.
-- */
--DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
-+static bool vc_raw_handle_exception(struct pt_regs *regs, unsigned long error_code)
- {
--	irqentry_state_t irq_state;
- 	struct ghcb_state state;
- 	struct es_em_ctxt ctxt;
- 	enum es_result result;
- 	struct ghcb *ghcb;
--
--	/*
--	 * Handle #DB before calling into !noinstr code to avoid recursive #DB.
--	 */
--	if (error_code == SVM_EXIT_EXCP_BASE + X86_TRAP_DB) {
--		vc_handle_trap_db(regs);
--		return;
--	}
--
--	irq_state = irqentry_nmi_enter(regs);
--	instrumentation_begin();
--
--	/*
--	 * This is invoked through an interrupt gate, so IRQs are disabled. The
--	 * code below might walk page-tables for user or kernel addresses, so
--	 * keep the IRQs disabled to protect us against concurrent TLB flushes.
--	 */
-+	bool ret = true;
- 
- 	ghcb = __sev_get_ghcb(&state);
- 
-@@ -1391,15 +1355,18 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
- 	case ES_UNSUPPORTED:
- 		pr_err_ratelimited("Unsupported exit-code 0x%02lx in #VC exception (IP: 0x%lx)\n",
- 				   error_code, regs->ip);
--		goto fail;
-+		ret = false;
-+		break;
- 	case ES_VMM_ERROR:
- 		pr_err_ratelimited("Failure in communication with VMM (exit-code 0x%02lx IP: 0x%lx)\n",
- 				   error_code, regs->ip);
--		goto fail;
-+		ret = false;
-+		break;
- 	case ES_DECODE_FAILED:
- 		pr_err_ratelimited("Failed to decode instruction (exit-code 0x%02lx IP: 0x%lx)\n",
- 				   error_code, regs->ip);
--		goto fail;
-+		ret = false;
-+		break;
- 	case ES_EXCEPTION:
- 		vc_forward_exception(&ctxt);
- 		break;
-@@ -1415,24 +1382,52 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
- 		BUG();
- 	}
- 
--out:
--	instrumentation_end();
--	irqentry_nmi_exit(regs, irq_state);
-+	return ret;
-+}
- 
--	return;
-+static __always_inline bool vc_is_db(unsigned long error_code)
-+{
-+	return error_code == SVM_EXIT_EXCP_BASE + X86_TRAP_DB;
-+}
- 
--fail:
--	if (user_mode(regs)) {
--		/*
--		 * Do not kill the machine if user-space triggered the
--		 * exception. Send SIGBUS instead and let user-space deal with
--		 * it.
--		 */
--		force_sig_fault(SIGBUS, BUS_OBJERR, (void __user *)0);
--	} else {
--		pr_emerg("PANIC: Unhandled #VC exception in kernel space (result=%d)\n",
--			 result);
-+/*
-+ * Runtime #VC exception handler when raised from kernel mode. Runs in NMI mode
-+ * and will panic when an error happens.
-+ */
-+DEFINE_IDTENTRY_VC_KERNEL(exc_vmm_communication)
-+{
-+	irqentry_state_t irq_state;
-+
-+	/*
-+	 * With the current implementation it is always possible to switch to a
-+	 * safe stack because #VC exceptions only happen at known places, like
-+	 * intercepted instructions or accesses to MMIO areas/IO ports. They can
-+	 * also happen with code instrumentation when the hypervisor intercepts
-+	 * #DB, but the critical paths are forbidden to be instrumented, so #DB
-+	 * exceptions currently also only happen in safe places.
-+	 *
-+	 * But keep this here in case the noinstr annotations are violated due
-+	 * to bug elsewhere.
-+	 */
-+	if (unlikely(on_vc_fallback_stack(regs))) {
-+		instrumentation_begin();
-+		panic("Can't handle #VC exception from unsupported context\n");
-+		instrumentation_end();
-+	}
-+
-+	/*
-+	 * Handle #DB before calling into !noinstr code to avoid recursive #DB.
-+	 */
-+	if (vc_is_db(error_code)) {
-+		exc_debug(regs);
-+		return;
-+	}
-+
-+	irq_state = irqentry_nmi_enter(regs);
- 
-+	instrumentation_begin();
-+
-+	if (!vc_raw_handle_exception(regs, error_code)) {
- 		/* Show some debug info */
- 		show_regs(regs);
- 
-@@ -1443,23 +1438,38 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
- 		panic("Returned from Terminate-Request to Hypervisor\n");
- 	}
- 
--	goto out;
-+	instrumentation_end();
-+	irqentry_nmi_exit(regs, irq_state);
- }
- 
--/* This handler runs on the #VC fall-back stack. It can cause further #VC exceptions */
--DEFINE_IDTENTRY_VC_IST(exc_vmm_communication)
-+/*
-+ * Runtime #VC exception handler when raised from user mode. Runs in IRQ mode
-+ * and will kill the current task with SIGBUS when an error happens.
-+ */
-+DEFINE_IDTENTRY_VC_USER(exc_vmm_communication)
- {
-+	/*
-+	 * Handle #DB before calling into !noinstr code to avoid recursive #DB.
-+	 */
-+	if (vc_is_db(error_code)) {
-+		noist_exc_debug(regs);
-+		return;
-+	}
-+
-+	irqentry_enter_from_user_mode(regs);
- 	instrumentation_begin();
--	panic("Can't handle #VC exception from unsupported context\n");
--	instrumentation_end();
--}
- 
--DEFINE_IDTENTRY_VC(exc_vmm_communication)
--{
--	if (likely(!on_vc_fallback_stack(regs)))
--		safe_stack_exc_vmm_communication(regs, error_code);
--	else
--		ist_exc_vmm_communication(regs, error_code);
-+	if (!vc_raw_handle_exception(regs, error_code)) {
-+		/*
-+		 * Do not kill the machine if user-space triggered the
-+		 * exception. Send SIGBUS instead and let user-space deal with
-+		 * it.
-+		 */
-+		force_sig_fault(SIGBUS, BUS_OBJERR, (void __user *)0);
-+	}
-+
-+	instrumentation_end();
-+	irqentry_exit_to_user_mode(regs);
- }
- 
- bool __init handle_vc_boot_ghcb(struct pt_regs *regs)
--- 
-2.31.1
+Different tack: if KVM is compiled out entirely, the command isn't
+there, and trying to use it fails like
+
+    {"error": {"class": "CommandNotFound", "desc": "The command query-kvm-cpuid has not been found"}}
+
+If KVM is compiled in, but disabled, e.g. with -machine accel=tcg, then
+the command fails like
+
+    {"error": {"class": "GenericError", "desc": "VCPU was not initialized yet"}}
+
+This is misleading.  The VCPU is actually running, it's just the wrong
+kind of VCPU.
+
+>> If it just isn't implemented for anything but KVM, then putting "kvm"
+>> into the command name is a bad idea.  Also, the commit message should
+>> briefly note the restriction to KVM.
+
+Perhaps this one is closer to reality.
+
+>> Pick one :)
+>> 
+>> [...]
 
