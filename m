@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F7913AB27A
-	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 13:24:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00AA93AB2D6
+	for <lists+kvm@lfdr.de>; Thu, 17 Jun 2021 13:41:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232586AbhFQL0I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Jun 2021 07:26:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33367 "EHLO
+        id S231276AbhFQLnn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Jun 2021 07:43:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52518 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232577AbhFQL0G (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Jun 2021 07:26:06 -0400
+        by vger.kernel.org with ESMTP id S231610AbhFQLnl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 17 Jun 2021 07:43:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623929038;
+        s=mimecast20190719; t=1623930093;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QeoOEjtdTbZHikE6qVHZkIHtsqJ8oL1MWdn59al3yJU=;
-        b=QPOshvNSHaHMRlCs/JLASRIRzg6IzS1axSTawZFHWQ7I3VLm1+WbR/58jk9N1C/WgYw62I
-        g3k775BjI9nF5FtOg00KGs0MexHgVchuTcdmCD8iJ3S+pyGHquveDk19Pu4q/vLJlU1NKZ
-        oPM/u9o9xGnNDfWS0ViWibD/iN39T3U=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283-R6I6JnwvNEKkTtg0MDXjIg-1; Thu, 17 Jun 2021 07:23:57 -0400
-X-MC-Unique: R6I6JnwvNEKkTtg0MDXjIg-1
-Received: by mail-ed1-f69.google.com with SMTP id g13-20020a056402090db02903935a4cb74fso1330717edz.1
-        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 04:23:56 -0700 (PDT)
+        bh=VmCLvCRTlrH58yubKa8HF1xENLoVvDewdsvG/LgtDCE=;
+        b=QKhcyJg4xZ3IsAapRO/6xV2CClxElDsDKwmJWrlpRagChY+8UZiEHBoeqjBjkmjoBiGkF4
+        D4e+HOcR+8Go+hGauXG1O5UDHwyyW2t3YPakgVk8C7nk5rCfffIcEZcK0mjCZaBsjLJIz/
+        C4UVs/eXJuP7LXVQKVQ6jinbWTN7A7I=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-337-UhfAOk4LNG--l8TUdSmIBw-1; Thu, 17 Jun 2021 07:41:32 -0400
+X-MC-Unique: UhfAOk4LNG--l8TUdSmIBw-1
+Received: by mail-lj1-f197.google.com with SMTP id o15-20020a2e9b4f0000b029015ae56d3aa0so2668705ljj.0
+        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 04:41:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=QeoOEjtdTbZHikE6qVHZkIHtsqJ8oL1MWdn59al3yJU=;
-        b=N5zONty299TO9Z5o3l7eVzetg8lHZR+U1gJgeW8Fph54Yb9mpdCpNbwzbYusULum0C
-         kzyBr9JcbnNQHKsApHV4eOmI/0+5ML9MZgVZEB8gDpTtpc9+ySd1i+y1rLn9LN+cAxmA
-         zcalXLscXO3zsJIbLxq/Wn0PknGsuQ7cs9hYzwVe8eRJwU4kaWA5b4gjb3+VmZpUDkYD
-         YU39IijNSy3T5fv0VVkpe4NpLEY8d10Uw9gHaa0wMK3pTDpwWdoiMYmmoQTYHzA6qn0O
-         GIJJa707QJEoxqm31w6hSXQ42ZW4+EVZyan8a5Jwy+MWBOvOtYaGHxUSwGuhTH0Gd4ro
-         7pwg==
-X-Gm-Message-State: AOAM532ycnr3r8eAj9j5MIVnHnjANA+aHWx347OH8hFryzZ0cjy76K+1
-        93pn0Cm/la26B/HoovAKMBsBaiSk1HO88w0yetqsyM/YO2C7MzitFh2gopdbybw+vhElAW3Vlle
-        r+M4ABypHdxAp
-X-Received: by 2002:a05:6402:268f:: with SMTP id w15mr5799067edd.228.1623928793194;
-        Thu, 17 Jun 2021 04:19:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzc8lc8kbfFsQbKsVnuEADgPqEmYVAvmC/1IvjtxjrXOO4gKYpFUgt0NPkDolV15GoZuo9rTg==
-X-Received: by 2002:a05:6402:268f:: with SMTP id w15mr5799027edd.228.1623928793011;
-        Thu, 17 Jun 2021 04:19:53 -0700 (PDT)
+        bh=VmCLvCRTlrH58yubKa8HF1xENLoVvDewdsvG/LgtDCE=;
+        b=foXr6CimQdheECGz5mEjZ4um000C/XmzCZfdab7XSHR/64srz27diDsIxpqaD8ei6U
+         eLC6jGIhWNDB1hsvVe+BtPgdPzhWAZG0ft3pYq/oWuQTXAn5nxinteVRPiKbzEkWfRde
+         +i9AONoAvQNb3bjyA5P/D9MYQClEGbjlD2H09i9gfvzU7cLVtQVSbPJnVSyBrkIgY51k
+         SExtMK0ttK3YGgaNq7RSSn/vaXGo/leu2d673FBwfyH4uPuO8yBNFSk8HChArddqBIbZ
+         tjKdEbl7OlsBRM+y2/DRSqnyu5ujMJzch3dDT0Vsf4yyB/bdBk1PezXuuUXJD+tsamwG
+         g38g==
+X-Gm-Message-State: AOAM533eO6WeVhf9lfxyFQpLgKCe26NHiStTuxvpioDBe5ztgGi7bSnC
+        6tDDaRDIYwCGi7NCk7IB6deKfLwOYiP3rFf6vHKD6t1Wid3ao2hJnPUhf3Ypk5igW3hAXElJAww
+        RpAjGsNBcLC4n
+X-Received: by 2002:a17:906:b317:: with SMTP id n23mr4753232ejz.324.1623929020526;
+        Thu, 17 Jun 2021 04:23:40 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzhbQ8ssqFmZsWb8sMpnt1Xu4dlg8VyEm5RPjNu6NQPEN0NLgvmdDkk7J48/7gKKGpvO8cI2w==
+X-Received: by 2002:a17:906:b317:: with SMTP id n23mr4753201ejz.324.1623929020383;
+        Thu, 17 Jun 2021 04:23:40 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id e18sm3537900ejh.64.2021.06.17.04.19.51
+        by smtp.gmail.com with ESMTPSA id by23sm3167995ejc.85.2021.06.17.04.23.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Jun 2021 04:19:52 -0700 (PDT)
-Subject: Re: [PATCH v10 3/5] KVM: stats: Add documentation for binary
- statistics interface
-To:     Greg KH <gregkh@linuxfoundation.org>,
-        Jing Zhang <jingzhangos@google.com>
+        Thu, 17 Jun 2021 04:23:39 -0700 (PDT)
+Subject: Re: [PATCH v10 2/5] KVM: stats: Add fd-based API to read binary stats
+ data
+To:     Greg KH <greg@kroah.com>, Jing Zhang <jingzhangos@google.com>
 Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
         LinuxMIPS <linux-mips@vger.kernel.org>,
         KVMPPC <kvm-ppc@vger.kernel.org>,
@@ -86,15 +85,15 @@ Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
         Krish Sadhukhan <krish.sadhukhan@oracle.com>,
         Fuad Tabba <tabba@google.com>
 References: <20210617044146.2667540-1-jingzhangos@google.com>
- <20210617044146.2667540-4-jingzhangos@google.com>
- <YMrmqOxDWJ2/8sfD@kroah.com>
+ <20210617044146.2667540-3-jingzhangos@google.com>
+ <YMrzzYEkDQNCpnP7@kroah.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <be506135-5bc3-31bd-1b20-063f01f41df1@redhat.com>
-Date:   Thu, 17 Jun 2021 13:19:50 +0200
+Message-ID: <d8ca6601-e3b7-e6b1-5992-12ae106de951@redhat.com>
+Date:   Thu, 17 Jun 2021 13:23:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <YMrmqOxDWJ2/8sfD@kroah.com>
+In-Reply-To: <YMrzzYEkDQNCpnP7@kroah.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -102,24 +101,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/06/21 08:07, Greg KH wrote:
->> The statistics data itself could be read out by userspace telemetry
->> periodically without any extra parsing or setup effort.
-> Do you have a pointer to userspace code that can do such a thing that
-> others can use?  We do not like adding apis to the kernel without at
-> least seeing the user of those apis, especially for complex things like
-> this.
+On 17/06/21 09:03, Greg KH wrote:
+>> 3. Fd-based solution provides the possibility that a telemetry can
+>>     read KVM stats in a less privileged situation.
+> "possiblity"?  Does this work or not?  Have you tested it?
 > 
-> Ideally you would include some library code in the kernel tree itself
-> that everyone can use for this for their own programs.  You have
-> provided a test which is great, but how do we know it works for "real"
-> usages?
 
-I am pretty sure that Google is using this internally, but we are also 
-going to work on QEMU and Libvirt support for this.
+I think this is essentially s/that/for/.  But more precisely:
 
-As for the rest, thanks for the review---I'll let Jing act on it and 
-only add my own remarks in a couple places.
+3. Compared for example to a ioctl, a separate file descriptor makes it 
+possible for an external program to read statistics, while maintaining 
+privilege separation between VMM and telemetry code.
+
+>>
+>> +	snprintf(&kvm_vm_stats_header.id[0], sizeof(kvm_vm_stats_header.id),
+>> +			"kvm-%d", task_pid_nr(current));
+> 
+> Why do you write to this static variable for EVERY read?  Shouldn't you
+> just do it once at open?  How can it change?
+> 
+> Wait, it's a single shared variable, what happens when multiple tasks
+> open this thing and read from it?  You race between writing to this
+> variable here and then:
+> 
+>> +	return kvm_stats_read(&kvm_vm_stats_header, &kvm_vm_stats_desc[0],
+>> +		&kvm->stat, sizeof(kvm->stat), user_buffer, size, offset);
+> 
+> Accessing it here.
+> 
+> So how is this really working?
+
+It's not - Jing, kvm_vm_stats_header is small enough that you can store 
+a copy in struct kvm.
 
 Paolo
 
