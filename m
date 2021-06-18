@@ -2,304 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 214453AC7CD
-	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 11:40:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AA273AC7F3
+	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 11:47:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231876AbhFRJmK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Jun 2021 05:42:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50841 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230512AbhFRJmJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 18 Jun 2021 05:42:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624009200;
+        id S232676AbhFRJtO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Jun 2021 05:49:14 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:34154 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230399AbhFRJtL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Jun 2021 05:49:11 -0400
+Received: from zn.tnic (p200300ec2f0dd8004fc95bebb5201001.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:d800:4fc9:5beb:b520:1001])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6F1EC1EC0559;
+        Fri, 18 Jun 2021 11:46:41 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1624009601;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9OTgWym34MWOytQh3dCOiJZNfcSTFJBcg5/VEusdTLU=;
-        b=iWza114pEBRlGpE4A7fHZ45dwJmZLAI8kEjs5JrEDvLIyPqcPYE/Q/dReu3WHoQYW2wn9x
-        hanSdWYY79vpsW7F/ddXO/O1JcKTXLjtx16evG88f3ezkFxsn2Qh16UEzlLFxBsob3DGWs
-        dwYI8ssrrmBPcztPcZMJGrt+kLV+ng0=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-139-ZKt9NYcIMQyRQs1ci5hOEg-1; Fri, 18 Jun 2021 05:39:58 -0400
-X-MC-Unique: ZKt9NYcIMQyRQs1ci5hOEg-1
-Received: by mail-ej1-f70.google.com with SMTP id l6-20020a1709062a86b029046ec0ceaf5cso1238278eje.8
-        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 02:39:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=9OTgWym34MWOytQh3dCOiJZNfcSTFJBcg5/VEusdTLU=;
-        b=Cou9BfL2z8/wt2zdATZdevQsaixIB+dfHlQCJyDzoy+n8MS4ywJTi13z9Bv1WdBIm/
-         sLc8GNg1YqQV6SIMMiY1l3pADg6PrxLaCZxdqVDDQhqdmomSjW9YcXLhWDdI1dYnUCY6
-         EJaHyIRM6JhxW32YinouExNmmMjHz+G3LsjduhTuL3HDdItjRVNHnfnBZC1vLNQDckNu
-         yHtLkeBlbGdUdK01gj3/wlaIuM/to57npflKWtemCvC9o4hGARq6KF0eFHqoHKrraZS3
-         FH7qWKgquTDB8hWZL2B9SfplxKXMvHQc0V49B906wPbj5Gvqlpmk6SNmQ9zSgbiyqfRq
-         1dFw==
-X-Gm-Message-State: AOAM530PDhq/BP+h7WUFZ2TYOUqlSDYMZrSurqQ1NEnzkM/hT0Z9eMmS
-        SBXfR942GzrpUFbziwHNNPajOmCKQOyH76mrtYAdlH/e0zPXe3RDwrUoPa/+FoA1qy0dJQ1qRS1
-        iMN1IW0BSnGvY
-X-Received: by 2002:a17:907:10d7:: with SMTP id rv23mr10004040ejb.163.1624009197508;
-        Fri, 18 Jun 2021 02:39:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzTSy+T330jfiNVwwXxtw5wBYMmXh7NS4dAyo6bHcMvj8+O+LrLu6QAkLP5Y7ZJJZ2IwLSP8w==
-X-Received: by 2002:a17:907:10d7:: with SMTP id rv23mr10004014ejb.163.1624009197332;
-        Fri, 18 Jun 2021 02:39:57 -0700 (PDT)
-Received: from steredhat.lan ([5.170.128.252])
-        by smtp.gmail.com with ESMTPSA id u12sm810511eje.40.2021.06.18.02.39.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Jun 2021 02:39:57 -0700 (PDT)
-Date:   Fri, 18 Jun 2021 11:39:51 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Jiang Wang <jiang.wang@bytedance.com>
-Cc:     virtualization@lists.linux-foundation.org, stefanha@redhat.com,
-        mst@redhat.com, arseny.krasnov@kaspersky.com,
-        jhansen@vmware.comments, cong.wang@bytedance.com,
-        duanxiongchun@bytedance.com, xieyongji@bytedance.com,
-        chaiwen.cc@bytedance.com, Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Colin Ian King <colin.king@canonical.com>,
-        Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC v1 1/6] virtio/vsock: add VIRTIO_VSOCK_F_DGRAM feature bit
-Message-ID: <20210618093951.g32htj3rsu2koqi5@steredhat.lan>
-References: <20210609232501.171257-1-jiang.wang@bytedance.com>
- <20210609232501.171257-2-jiang.wang@bytedance.com>
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=fhCS1VjB+E7C2WKgFiWhTOQPZHXnjbEcqr3FRlWi0xU=;
+        b=mVNHyRCG/AgGBIUULY2n0rYyqbBpwtuaHTqg5MgQ8DzjcE9TF4eqo9kb51Zi7yIPdYmL1j
+        UmVDFMG5XYUnevK4WKpCAJrbwegX9Q43eENYMOjzOw/qYPF1y04M24QPeRJ9ZYw+hFFVzJ
+        pl8wgyAk+mMAdq8y2SXzcZsoQS0G0Ek=
+Date:   Fri, 18 Jun 2021 11:46:31 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 21/22] x86/sev: Register SNP guest request
+ platform device
+Message-ID: <YMxrd5M1teku/hnA@zn.tnic>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-22-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210609232501.171257-2-jiang.wang@bytedance.com>
+In-Reply-To: <20210602140416.23573-22-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 09, 2021 at 11:24:53PM +0000, Jiang Wang wrote:
->When this feature is enabled, allocate 5 queues,
->otherwise, allocate 3 queues to be compatible with
->old QEMU versions.
->
->Signed-off-by: Jiang Wang <jiang.wang@bytedance.com>
->---
-> drivers/vhost/vsock.c             |  3 +-
-> include/linux/virtio_vsock.h      |  9 +++++
-> include/uapi/linux/virtio_vsock.h |  3 ++
-> net/vmw_vsock/virtio_transport.c  | 73 +++++++++++++++++++++++++++++++++++----
-> 4 files changed, 80 insertions(+), 8 deletions(-)
->
->diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->index 5e78fb719602..81d064601093 100644
->--- a/drivers/vhost/vsock.c
->+++ b/drivers/vhost/vsock.c
->@@ -31,7 +31,8 @@
->
-> enum {
-> 	VHOST_VSOCK_FEATURES = VHOST_FEATURES |
->-			       (1ULL << VIRTIO_F_ACCESS_PLATFORM)
->+			       (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
->+			       (1ULL << VIRTIO_VSOCK_F_DGRAM)
-> };
->
-> enum {
->diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
->index dc636b727179..ba3189ed9345 100644
->--- a/include/linux/virtio_vsock.h
->+++ b/include/linux/virtio_vsock.h
->@@ -18,6 +18,15 @@ enum {
-> 	VSOCK_VQ_MAX    = 3,
-> };
->
->+enum {
->+	VSOCK_VQ_STREAM_RX     = 0, /* for host to guest data */
->+	VSOCK_VQ_STREAM_TX     = 1, /* for guest to host data */
->+	VSOCK_VQ_DGRAM_RX       = 2,
->+	VSOCK_VQ_DGRAM_TX       = 3,
->+	VSOCK_VQ_EX_EVENT       = 4,
->+	VSOCK_VQ_EX_MAX         = 5,
->+};
->+
-> /* Per-socket state (accessed via vsk->trans) */
-> struct virtio_vsock_sock {
-> 	struct vsock_sock *vsk;
->diff --git a/include/uapi/linux/virtio_vsock.h b/include/uapi/linux/virtio_vsock.h
->index 1d57ed3d84d2..b56614dff1c9 100644
->--- a/include/uapi/linux/virtio_vsock.h
->+++ b/include/uapi/linux/virtio_vsock.h
->@@ -38,6 +38,9 @@
-> #include <linux/virtio_ids.h>
-> #include <linux/virtio_config.h>
->
->+/* The feature bitmap for virtio net */
->+#define VIRTIO_VSOCK_F_DGRAM	0	/* Host support dgram vsock */
->+
-> struct virtio_vsock_config {
-> 	__le64 guest_cid;
-> } __attribute__((packed));
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index 2700a63ab095..7dcb8db23305 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -27,7 +27,8 @@ static DEFINE_MUTEX(the_virtio_vsock_mutex); /* protects the_virtio_vsock */
->
-> struct virtio_vsock {
-> 	struct virtio_device *vdev;
->-	struct virtqueue *vqs[VSOCK_VQ_MAX];
->+	struct virtqueue **vqs;
->+	bool has_dgram;
->
-> 	/* Virtqueue processing is deferred to a workqueue */
-> 	struct work_struct tx_work;
->@@ -333,7 +334,10 @@ static int virtio_vsock_event_fill_one(struct virtio_vsock *vsock,
-> 	struct scatterlist sg;
-> 	struct virtqueue *vq;
->
->-	vq = vsock->vqs[VSOCK_VQ_EVENT];
->+	if (vsock->has_dgram)
->+		vq = vsock->vqs[VSOCK_VQ_EX_EVENT];
->+	else
->+		vq = vsock->vqs[VSOCK_VQ_EVENT];
->
-> 	sg_init_one(&sg, event, sizeof(*event));
->
->@@ -351,7 +355,10 @@ static void virtio_vsock_event_fill(struct virtio_vsock *vsock)
-> 		virtio_vsock_event_fill_one(vsock, event);
-> 	}
->
->-	virtqueue_kick(vsock->vqs[VSOCK_VQ_EVENT]);
->+	if (vsock->has_dgram)
->+		virtqueue_kick(vsock->vqs[VSOCK_VQ_EX_EVENT]);
->+	else
->+		virtqueue_kick(vsock->vqs[VSOCK_VQ_EVENT]);
-> }
->
-> static void virtio_vsock_reset_sock(struct sock *sk)
->@@ -391,7 +398,10 @@ static void virtio_transport_event_work(struct work_struct *work)
-> 		container_of(work, struct virtio_vsock, event_work);
-> 	struct virtqueue *vq;
->
->-	vq = vsock->vqs[VSOCK_VQ_EVENT];
->+	if (vsock->has_dgram)
->+		vq = vsock->vqs[VSOCK_VQ_EX_EVENT];
->+	else
->+		vq = vsock->vqs[VSOCK_VQ_EVENT];
->
-> 	mutex_lock(&vsock->event_lock);
->
->@@ -411,7 +421,10 @@ static void virtio_transport_event_work(struct work_struct *work)
-> 		}
-> 	} while (!virtqueue_enable_cb(vq));
->
->-	virtqueue_kick(vsock->vqs[VSOCK_VQ_EVENT]);
->+	if (vsock->has_dgram)
->+		virtqueue_kick(vsock->vqs[VSOCK_VQ_EX_EVENT]);
->+	else
->+		virtqueue_kick(vsock->vqs[VSOCK_VQ_EVENT]);
-> out:
-> 	mutex_unlock(&vsock->event_lock);
-> }
->@@ -434,6 +447,10 @@ static void virtio_vsock_tx_done(struct virtqueue *vq)
-> 	queue_work(virtio_vsock_workqueue, &vsock->tx_work);
-> }
->
->+static void virtio_vsock_dgram_tx_done(struct virtqueue *vq)
->+{
->+}
->+
-> static void virtio_vsock_rx_done(struct virtqueue *vq)
-> {
-> 	struct virtio_vsock *vsock = vq->vdev->priv;
->@@ -443,6 +460,10 @@ static void virtio_vsock_rx_done(struct virtqueue *vq)
-> 	queue_work(virtio_vsock_workqueue, &vsock->rx_work);
-> }
->
->+static void virtio_vsock_dgram_rx_done(struct virtqueue *vq)
->+{
->+}
->+
-> static struct virtio_transport virtio_transport = {
-> 	.transport = {
-> 		.module                   = THIS_MODULE,
->@@ -545,13 +566,29 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
-> 		virtio_vsock_tx_done,
-> 		virtio_vsock_event_done,
-> 	};
->+	vq_callback_t *ex_callbacks[] = {
+On Wed, Jun 02, 2021 at 09:04:15AM -0500, Brijesh Singh wrote:
+>  arch/x86/include/asm/sev.h      |  12 +++
+>  arch/x86/include/uapi/asm/svm.h |   2 +
+>  arch/x86/kernel/sev.c           | 176 ++++++++++++++++++++++++++++++++
+>  arch/x86/platform/efi/efi.c     |   2 +
+>  include/linux/efi.h             |   1 +
+>  include/linux/sev-guest.h       |  76 ++++++++++++++
+>  6 files changed, 269 insertions(+)
+>  create mode 100644 include/linux/sev-guest.h
 
-'ex' is not clear, maybe better 'dgram'?
+This patch is at least three patches in one:
 
-What happen if F_DGRAM is negotiated, but not F_STREAM?
+1. EFI changes
+2. SNP_GUEST_REQUEST struct etc definitions
+3. Add the functionality.
 
->+		virtio_vsock_rx_done,
->+		virtio_vsock_tx_done,
->+		virtio_vsock_dgram_rx_done,
->+		virtio_vsock_dgram_tx_done,
->+		virtio_vsock_event_done,
->+	};
->+
-> 	static const char * const names[] = {
-> 		"rx",
-> 		"tx",
-> 		"event",
-> 	};
->+	static const char * const ex_names[] = {
->+		"rx",
->+		"tx",
->+		"dgram_rx",
->+		"dgram_tx",
->+		"event",
->+	};
->+
-> 	struct virtio_vsock *vsock = NULL;
->-	int ret;
->+	int ret, max_vq;
->
-> 	ret = mutex_lock_interruptible(&the_virtio_vsock_mutex);
-> 	if (ret)
->@@ -572,9 +609,30 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
->
-> 	vsock->vdev = vdev;
->
->-	ret = virtio_find_vqs(vsock->vdev, VSOCK_VQ_MAX,
->+	if (virtio_has_feature(vdev, VIRTIO_VSOCK_F_DGRAM))
->+		vsock->has_dgram = true;
->+
->+	if (vsock->has_dgram)
->+		max_vq = VSOCK_VQ_EX_MAX;
->+	else
->+		max_vq = VSOCK_VQ_MAX;
->+
->+	vsock->vqs = kmalloc_array(max_vq, sizeof(struct virtqueue *), GFP_KERNEL);
->+	if (!vsock->vqs) {
->+		ret = -ENOMEM;
->+		goto out;
->+	}
->+
->+	if (vsock->has_dgram) {
->+		ret = virtio_find_vqs(vsock->vdev, max_vq,
->+			      vsock->vqs, ex_callbacks, ex_names,
->+			      NULL);
->+	} else {
->+		ret = virtio_find_vqs(vsock->vdev, max_vq,
-> 			      vsock->vqs, callbacks, names,
-> 			      NULL);
->+	}
->+
-> 	if (ret < 0)
-> 		goto out;
->
->@@ -695,6 +753,7 @@ static struct virtio_device_id id_table[] = {
-> };
->
-> static unsigned int features[] = {
->+	VIRTIO_VSOCK_F_DGRAM,
-> };
->
-> static struct virtio_driver virtio_vsock_driver = {
->-- 
->2.11.0
->
+Please split it this way before I take a look.
 
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
