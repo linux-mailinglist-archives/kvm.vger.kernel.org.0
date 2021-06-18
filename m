@@ -2,132 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BDBAF3AC0A2
-	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 03:52:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67B973AC155
+	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 05:30:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233593AbhFRByt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Jun 2021 21:54:49 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:5030 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230211AbhFRBys (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Jun 2021 21:54:48 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4G5hd256cNzXh6G;
-        Fri, 18 Jun 2021 09:47:34 +0800 (CST)
-Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Fri, 18 Jun 2021 09:52:38 +0800
-Received: from [10.174.187.128] (10.174.187.128) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Fri, 18 Jun 2021 09:52:37 +0800
-Subject: Re: [PATCH v7 1/4] KVM: arm64: Introduce two cache maintenance
- callbacks
-To:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
-CC:     Quentin Perret <qperret@google.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        <kvmarm@lists.cs.columbia.edu>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Gavin Shan <gshan@redhat.com>, <wanghaibin.wang@huawei.com>,
-        <zhukeqian1@huawei.com>, <yuzenghui@huawei.com>
-References: <20210617105824.31752-1-wangyanan55@huawei.com>
- <20210617105824.31752-2-wangyanan55@huawei.com>
- <20210617123837.GA24457@willie-the-truck> <87eed0d13p.wl-maz@kernel.org>
-From:   "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <2c1b9376-3997-aa7b-d5f3-b04da985c260@huawei.com>
-Date:   Fri, 18 Jun 2021 09:52:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S232090AbhFRDbm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Jun 2021 23:31:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38960 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232016AbhFRDbk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Jun 2021 23:31:40 -0400
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80ABBC061767
+        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 20:29:31 -0700 (PDT)
+Received: by mail-ed1-x536.google.com with SMTP id c7so5670723edn.6
+        for <kvm@vger.kernel.org>; Thu, 17 Jun 2021 20:29:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=RMJgBEdiibhwSUyvuLKFkBrL4/U8fE/jxx04irYLGbA=;
+        b=av/95B/MiI0xJSuNnIDSIou3GubtAy+v+Cj0IrEJ68VjpsLdRM7w3o1oORGPuxM9E9
+         WcXBTXk69tPR+JRT9pirwPl1i4rEmPN+ROSzO+PpYUb6DGevaUs4cQChuJ9gWp9jybLU
+         337xsWnlSDEFmVS8b9WCf45xojO+ucnKBtO3ThsQgErg6gNQGMsF1NJtWAQTA+IzuLEE
+         lYIbqpRQcPEBixvBPRcSDXBPAnVFOEE11AW5zQ6nXaMHXzougZshHL3HBZOa0i1hhh2b
+         I2Et2SNidVGS73kG8qlrW1IyTkcBNKTv++J6c5+xl/hwwNMONF8NwQMk+WXrJ33LwaNC
+         opBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=RMJgBEdiibhwSUyvuLKFkBrL4/U8fE/jxx04irYLGbA=;
+        b=Z0FSToHeTYlaw8GdJCnZs0oGjTxFYSp1JvU7erj7Y9wUInQrx3R+JpVs77VL5jZ2Tn
+         sROO+3fSarc7hurAoGtoalujIYVZwI9GOjNXS81SFYPmlhGTN908muPgC75zJIPtsC1w
+         FuI5mvjSrvvgHd/mdsBKnnVt148lCQ5lU5KJZJn+CrHfmkcwcl3Uspc8H3NTNyvavaDi
+         OPaAbo/DsJcdIF8IIWLO3dyZkThaAhyWT89hwQzmXK9deiNltTUKbwte+819tjmkFMq1
+         MiCVQ8YVRIZZZD9/A3rfIYVekTgb//wFB/uhir5Jq3/li9rmsq6u5OY8X5iO559EqwDK
+         pYig==
+X-Gm-Message-State: AOAM5305mUgqQOFIVlp5zZxjFVjOMK/ScflCLp2j7JLz+3V+DGzuamS0
+        JHUjCKSF1yyZAGDSgmH1CXZnZnG4SjD9388pvOPo
+X-Google-Smtp-Source: ABdhPJykGigJ4CmNJwWRgh5x2T6MNjBJPAc2OA16hTcBQrCjxSZwuj53EmfZdOWUW2UcDeCGl7ONh7uq9+Uou058YZU=
+X-Received: by 2002:aa7:d9d3:: with SMTP id v19mr2042806eds.145.1623986969936;
+ Thu, 17 Jun 2021 20:29:29 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87eed0d13p.wl-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggeme718-chm.china.huawei.com (10.1.199.114) To
- dggpemm500023.china.huawei.com (7.185.36.83)
-X-CFilter-Loop: Reflected
+References: <20210615141331.407-1-xieyongji@bytedance.com> <20210615141331.407-4-xieyongji@bytedance.com>
+ <8aeac914-7602-7323-31bd-71015a26f74c@windriver.com>
+In-Reply-To: <8aeac914-7602-7323-31bd-71015a26f74c@windriver.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Fri, 18 Jun 2021 11:29:19 +0800
+Message-ID: <CACycT3t1Dgrzsr7LbBrDhRLDa3qZ85ZOgj9H7r1fqPi-kf7r6Q@mail.gmail.com>
+Subject: Re: Re: [PATCH v8 03/10] eventfd: Increase the recursion depth of eventfd_signal()
+To:     He Zhe <zhe.he@windriver.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        qiang.zhang@windriver.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Jun 17, 2021 at 4:34 PM He Zhe <zhe.he@windriver.com> wrote:
+>
+>
+>
+> On 6/15/21 10:13 PM, Xie Yongji wrote:
+> > Increase the recursion depth of eventfd_signal() to 1. This
+> > is the maximum recursion depth we have found so far, which
+> > can be triggered with the following call chain:
+> >
+> >     kvm_io_bus_write                        [kvm]
+> >       --> ioeventfd_write                   [kvm]
+> >         --> eventfd_signal                  [eventfd]
+> >           --> vhost_poll_wakeup             [vhost]
+> >             --> vduse_vdpa_kick_vq          [vduse]
+> >               --> eventfd_signal            [eventfd]
+> >
+> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> > Acked-by: Jason Wang <jasowang@redhat.com>
+>
+> The fix had been posted one year ago.
+>
+> https://lore.kernel.org/lkml/20200410114720.24838-1-zhe.he@windriver.com/
+>
 
+OK, so it seems to be a fix for the RT system if my understanding is
+correct? Any reason why it's not merged? I'm happy to rebase my series
+on your patch if you'd like to repost it.
 
-On 2021/6/17 22:20, Marc Zyngier wrote:
-> On Thu, 17 Jun 2021 13:38:37 +0100,
-> Will Deacon <will@kernel.org> wrote:
->> On Thu, Jun 17, 2021 at 06:58:21PM +0800, Yanan Wang wrote:
->>> To prepare for performing CMOs for guest stage-2 in the fault handlers
->>> in pgtable.c, here introduce two cache maintenance callbacks in struct
->>> kvm_pgtable_mm_ops. We also adjust the comment alignment for the
->>> existing part but make no real content change at all.
->>>
->>> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
->>> ---
->>>   arch/arm64/include/asm/kvm_pgtable.h | 42 +++++++++++++++++-----------
->>>   1 file changed, 25 insertions(+), 17 deletions(-)
->>>
->>> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
->>> index c3674c47d48c..b6ce34aa44bb 100644
->>> --- a/arch/arm64/include/asm/kvm_pgtable.h
->>> +++ b/arch/arm64/include/asm/kvm_pgtable.h
->>> @@ -27,23 +27,29 @@ typedef u64 kvm_pte_t;
->>>   
->>>   /**
->>>    * struct kvm_pgtable_mm_ops - Memory management callbacks.
->>> - * @zalloc_page:	Allocate a single zeroed memory page. The @arg parameter
->>> - *			can be used by the walker to pass a memcache. The
->>> - *			initial refcount of the page is 1.
->>> - * @zalloc_pages_exact:	Allocate an exact number of zeroed memory pages. The
->>> - *			@size parameter is in bytes, and is rounded-up to the
->>> - *			next page boundary. The resulting allocation is
->>> - *			physically contiguous.
->>> - * @free_pages_exact:	Free an exact number of memory pages previously
->>> - *			allocated by zalloc_pages_exact.
->>> - * @get_page:		Increment the refcount on a page.
->>> - * @put_page:		Decrement the refcount on a page. When the refcount
->>> - *			reaches 0 the page is automatically freed.
->>> - * @page_count:		Return the refcount of a page.
->>> - * @phys_to_virt:	Convert a physical address into a virtual address mapped
->>> - *			in the current context.
->>> - * @virt_to_phys:	Convert a virtual address mapped in the current context
->>> - *			into a physical address.
->>> + * @zalloc_page:		Allocate a single zeroed memory page.
->>> + *				The @arg parameter can be used by the walker
->>> + *				to pass a memcache. The initial refcount of
->>> + *				the page is 1.
->>> + * @zalloc_pages_exact:		Allocate an exact number of zeroed memory pages.
->>> + *				The @size parameter is in bytes, and is rounded
->>> + *				up to the next page boundary. The resulting
->>> + *				allocation is physically contiguous.
->>> + * @free_pages_exact:		Free an exact number of memory pages previously
->>> + *				allocated by zalloc_pages_exact.
->>> + * @get_page:			Increment the refcount on a page.
->>> + * @put_page:			Decrement the refcount on a page. When the
->>> + *				refcount reaches 0 the page is automatically
->>> + *				freed.
->>> + * @page_count:			Return the refcount of a page.
->>> + * @phys_to_virt:		Convert a physical address into a virtual address
->>> + *				mapped in the current context.
->>> + * @virt_to_phys:		Convert a virtual address mapped in the current
->>> + *				context into a physical address.
->>> + * @clean_invalidate_dcache:	Clean and invalidate the data cache for the
->>> + *				specified memory address range.
->> This should probably be explicit about whether this to the PoU/PoC/PoP.
-> Indeed. I can fix that locally if there is nothing else that requires
-> adjusting.
-Will be grateful !
+BTW, I also notice another thread for this issue:
+
+https://lore.kernel.org/linux-fsdevel/DM6PR11MB420291B550A10853403C7592FF349@DM6PR11MB4202.namprd11.prod.outlook.com/T/
+
+>
+> > ---
+> >  fs/eventfd.c            | 2 +-
+> >  include/linux/eventfd.h | 5 ++++-
+> >  2 files changed, 5 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/fs/eventfd.c b/fs/eventfd.c
+> > index e265b6dd4f34..cc7cd1dbedd3 100644
+> > --- a/fs/eventfd.c
+> > +++ b/fs/eventfd.c
+> > @@ -71,7 +71,7 @@ __u64 eventfd_signal(struct eventfd_ctx *ctx, __u64 n)
+> >        * it returns true, the eventfd_signal() call should be deferred to a
+> >        * safe context.
+> >        */
+> > -     if (WARN_ON_ONCE(this_cpu_read(eventfd_wake_count)))
+> > +     if (WARN_ON_ONCE(this_cpu_read(eventfd_wake_count) > EFD_WAKE_DEPTH))
+> >               return 0;
+> >
+> >       spin_lock_irqsave(&ctx->wqh.lock, flags);
+> > diff --git a/include/linux/eventfd.h b/include/linux/eventfd.h
+> > index fa0a524baed0..886d99cd38ef 100644
+> > --- a/include/linux/eventfd.h
+> > +++ b/include/linux/eventfd.h
+> > @@ -29,6 +29,9 @@
+> >  #define EFD_SHARED_FCNTL_FLAGS (O_CLOEXEC | O_NONBLOCK)
+> >  #define EFD_FLAGS_SET (EFD_SHARED_FCNTL_FLAGS | EFD_SEMAPHORE)
+> >
+> > +/* Maximum recursion depth */
+> > +#define EFD_WAKE_DEPTH 1
+> > +
+> >  struct eventfd_ctx;
+> >  struct file;
+> >
+> > @@ -47,7 +50,7 @@ DECLARE_PER_CPU(int, eventfd_wake_count);
+> >
+> >  static inline bool eventfd_signal_count(void)
+> >  {
+> > -     return this_cpu_read(eventfd_wake_count);
+> > +     return this_cpu_read(eventfd_wake_count) > EFD_WAKE_DEPTH;
+>
+> count is just count. How deep is acceptable should be put
+> where eventfd_signal_count is called.
+>
+
+The return value of this function is boolean rather than integer.
+Please see the comments in eventfd_signal():
+
+"then it should check eventfd_signal_count() before calling this
+function. If it returns true, the eventfd_signal() call should be
+deferred to a safe context."
 
 Thanks,
-Yanan
-.
->
-> 	M.
->
-
+Yongji
