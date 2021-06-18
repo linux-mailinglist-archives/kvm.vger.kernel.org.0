@@ -2,143 +2,239 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 92C793ACF77
-	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 17:52:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB9553ACF8A
+	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 17:56:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235673AbhFRPyM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Jun 2021 11:54:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38947 "EHLO
+        id S235642AbhFRP6O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Jun 2021 11:58:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21803 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235659AbhFRPyL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 18 Jun 2021 11:54:11 -0400
+        by vger.kernel.org with ESMTP id S233886AbhFRP6M (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 18 Jun 2021 11:58:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624031521;
+        s=mimecast20190719; t=1624031763;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2JEl/D8fElGUs5qE1bIG8tGOHlH8JDuVtFpyPtPAcRM=;
-        b=JEFPYe7eYkoNs0u1MF2VlyQ3u0ZtH+8Qz6FK7E9IFj6Vf7dGULakGJI49asSHs8uJYouXW
-        fj/L9iteQXMWKHhQpcCPk598sJhvzbcCGhi1cXXZzt8CHX72ZI68u3vjlBC780B7frsuI1
-        /TiZlB75ke9C+cwaQnw2Iwq/FM/U0LQ=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-outw4BwBOa-7vsWXLAW-Cw-1; Fri, 18 Jun 2021 11:52:00 -0400
-X-MC-Unique: outw4BwBOa-7vsWXLAW-Cw-1
-Received: by mail-io1-f71.google.com with SMTP id e20-20020a6b50140000b02904b13c0d0212so4419391iob.19
-        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 08:52:00 -0700 (PDT)
+        bh=Awjn2v8qac0K7VClk6HbxoaGBdL5LeTfJlE9EQ+fOjk=;
+        b=OAACkEV23Oi9tlYJ9U6BKxTTlbDgCuADiI3NKHffgpkobmiW82yyTu/8q3N8yYbpn25lYO
+        nq0D3IsNHqkMs+XJxXZr4g3Hr23r4ngMGb8N0S0UYbqnXCQvomAYTXutfLQdbI6O+dhW4T
+        IAuC/ma+p4ISyUZCXqAIUlmO4Tssu70=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-439-QnSvl5FkM3O8eRUZtF24eQ-1; Fri, 18 Jun 2021 11:56:01 -0400
+X-MC-Unique: QnSvl5FkM3O8eRUZtF24eQ-1
+Received: by mail-wr1-f71.google.com with SMTP id h10-20020a5d688a0000b0290119c2ce2499so4515338wru.19
+        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 08:56:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=2JEl/D8fElGUs5qE1bIG8tGOHlH8JDuVtFpyPtPAcRM=;
-        b=m56ehyT/xLwxpwFp272UUPpGPIGXc6JVk7H8hRYbCPGfZSPYHtHX4+ICBqqosiGYGe
-         e85khEckECdjNICGxTpKrn5QcimWO86JRCSbucYoVBguGYrGFouE0tz8Obstp6T7QASr
-         0bsJc3det2dGgcUZnCYni6o8s1qN+JNpt59OmgAeHK5OnRqJ2RjNZDzD6/jRMY5e8LhT
-         H1qpVt8pYpACxCuhObuqjPxN/U4Yor0B2hz/zld7TkoKLiVffFXsEO6xyltmaiAOF9zX
-         oUpX40SYufXNBnl5ujwHKBBoAKL77l2v1inCjZUwOpWzog0oyiR4w2Ut3FxYkA0KHuG3
-         SncQ==
-X-Gm-Message-State: AOAM531lSzfbkAJ+3epFAgmHKCTCmxrzDsslCcDBFviRCPcHH52DmYpD
-        GiL0bHpqH8Ef3e6iNgMohpN/8GluhWm8s5AaQ5UjTR0wAYX6HtfZ2HD63SVsZlfu63+RFvGm6cu
-        ETbMBvuKQOFIT
-X-Received: by 2002:a05:6e02:1383:: with SMTP id d3mr6838000ilo.172.1624031519706;
-        Fri, 18 Jun 2021 08:51:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxyba3VKvMFyZqbrNjMBnKEoGABQfH7jzv5PsLUxAyjyr9uMPZs6fX5eNRt3vqIMNQW+GtEqg==
-X-Received: by 2002:a05:6e02:1383:: with SMTP id d3mr6837986ilo.172.1624031519497;
-        Fri, 18 Jun 2021 08:51:59 -0700 (PDT)
-Received: from redhat.com (c-73-14-100-188.hsd1.co.comcast.net. [73.14.100.188])
-        by smtp.gmail.com with ESMTPSA id y13sm4516131ioa.51.2021.06.18.08.51.58
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=Awjn2v8qac0K7VClk6HbxoaGBdL5LeTfJlE9EQ+fOjk=;
+        b=E6DuKEcPbzCt4ieM5w41OVbT+PESukPB5ygUY7fnmDN9cnjTP/Ft2HlAE0bAxim5Zp
+         4ocwYCMneXUrTPXbNqSwNxbE/iPWOpnJyMvCOeiAunS+WfzeBMW+CjkPIafhrEQin2I5
+         OudzvIi7XU7wxiaZFIP1DFmuEn5wIZKsY+8yL2+S8aVjlyihjQJw9NHzIT+8FES3m3D8
+         qggysNdJAdAxQMil1BMgeJdsry4dYaXRhorAYyT2vGZUCLmFwSxqK1sF9F0Z4/fj3KQT
+         Jqv1C9/J+OEFKFW9t4xpUFDYSCepGhzinLaZ42CEllN6oSXoTHH3wkCz7dkq1111SxUM
+         iEZA==
+X-Gm-Message-State: AOAM531+5sltUyZm6OMhgSlCUfHMHpIXlmtkm8iabvjUgR+KV/x2IFeL
+        ams4VTMkIwaPoTXPb/ebScwQxPJguphdbx3jXMptZH7381BSZ3hxf2rLY6a+wgcRiE8pz1nCicB
+        0AzfGA13h7zgB
+X-Received: by 2002:a5d:6d8a:: with SMTP id l10mr13665861wrs.63.1624031760678;
+        Fri, 18 Jun 2021 08:56:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyb8+5HIJLdutX7cENNNI1/ecBZD9YW9aCIcD5DoBeecwsxaAXgeOQAGd3lSOiR1Xdg+NTIjg==
+X-Received: by 2002:a5d:6d8a:: with SMTP id l10mr13665839wrs.63.1624031760459;
+        Fri, 18 Jun 2021 08:56:00 -0700 (PDT)
+Received: from steredhat.lan ([5.170.128.175])
+        by smtp.gmail.com with ESMTPSA id m18sm8968801wmq.45.2021.06.18.08.55.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Jun 2021 08:51:59 -0700 (PDT)
-Date:   Fri, 18 Jun 2021 09:51:57 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Raj, Ashok" <ashok.raj@intel.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, Joerg Roedel <joro@8bytes.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
+        Fri, 18 Jun 2021 08:56:00 -0700 (PDT)
+Date:   Fri, 18 Jun 2021 17:55:55 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shenming Lu <lushenming@huawei.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Colin Ian King <colin.king@canonical.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>
-Subject: Re: Plan for /dev/ioasid RFC v2
-Message-ID: <20210618095157.131eb309.alex.williamson@redhat.com>
-In-Reply-To: <20210618153735.GA37688@otc-nc-03>
-References: <20210612105711.7ac68c83.alex.williamson@redhat.com>
-        <20210614140711.GI1002214@nvidia.com>
-        <20210614102814.43ada8df.alex.williamson@redhat.com>
-        <MWHPR11MB1886239C82D6B66A732830B88C309@MWHPR11MB1886.namprd11.prod.outlook.com>
-        <20210615101215.4ba67c86.alex.williamson@redhat.com>
-        <MWHPR11MB188692A6182B1292FADB3BDB8C0F9@MWHPR11MB1886.namprd11.prod.outlook.com>
-        <20210616133937.59050e1a.alex.williamson@redhat.com>
-        <MWHPR11MB18865DF9C50F295820D038798C0E9@MWHPR11MB1886.namprd11.prod.outlook.com>
-        <YMykBzUHmATPbmdV@8bytes.org>
-        <20210618151506.GG1002214@nvidia.com>
-        <20210618153735.GA37688@otc-nc-03>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+Subject: Re: [PATCH v11 11/18] virtio/vsock: dequeue callback for
+ SOCK_SEQPACKET
+Message-ID: <20210618155555.j5p4v6j5gk2dboj3@steredhat.lan>
+References: <20210611110744.3650456-1-arseny.krasnov@kaspersky.com>
+ <20210611111241.3652274-1-arseny.krasnov@kaspersky.com>
+ <20210618134423.mksgnbmchmow4sgh@steredhat.lan>
+ <bb323125-f802-1d16-7530-6e4f4abb00a6@kaspersky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <bb323125-f802-1d16-7530-6e4f4abb00a6@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 18 Jun 2021 08:37:35 -0700
-"Raj, Ashok" <ashok.raj@intel.com> wrote:
+On Fri, Jun 18, 2021 at 06:04:37PM +0300, Arseny Krasnov wrote:
+>
+>On 18.06.2021 16:44, Stefano Garzarella wrote:
+>> Hi Arseny,
+>> the series looks great, I have just a question below about
+>> seqpacket_dequeue.
+>>
+>> I also sent a couple a simple fixes, it would be great if you can review
+>> them:
+>> https://lore.kernel.org/netdev/20210618133526.300347-1-sgarzare@redhat.com/
+>>
+>>
+>> On Fri, Jun 11, 2021 at 02:12:38PM +0300, Arseny Krasnov wrote:
+>>> Callback fetches RW packets from rx queue of socket until whole record
+>>> is copied(if user's buffer is full, user is not woken up). This is done
+>>> to not stall sender, because if we wake up user and it leaves syscall,
+>>> nobody will send credit update for rest of record, and sender will wait
+>>> for next enter of read syscall at receiver's side. So if user buffer is
+>>> full, we just send credit update and drop data.
+>>>
+>>> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>>> ---
+>>> v10 -> v11:
+>>> 1) 'msg_count' field added to count current number of EORs.
+>>> 2) 'msg_ready' argument removed from callback.
+>>> 3) If 'memcpy_to_msg()' failed during copy loop, there will be
+>>>    no next attempts to copy data, rest of record will be freed.
+>>>
+>>> include/linux/virtio_vsock.h            |  5 ++
+>>> net/vmw_vsock/virtio_transport_common.c | 84 +++++++++++++++++++++++++
+>>> 2 files changed, 89 insertions(+)
+>>>
+>>> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>>> index dc636b727179..1d9a302cb91d 100644
+>>> --- a/include/linux/virtio_vsock.h
+>>> +++ b/include/linux/virtio_vsock.h
+>>> @@ -36,6 +36,7 @@ struct virtio_vsock_sock {
+>>> 	u32 rx_bytes;
+>>> 	u32 buf_alloc;
+>>> 	struct list_head rx_queue;
+>>> +	u32 msg_count;
+>>> };
+>>>
+>>> struct virtio_vsock_pkt {
+>>> @@ -80,6 +81,10 @@ virtio_transport_dgram_dequeue(struct vsock_sock *vsk,
+>>> 			       struct msghdr *msg,
+>>> 			       size_t len, int flags);
+>>>
+>>> +ssize_t
+>>> +virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
+>>> +				   struct msghdr *msg,
+>>> +				   int flags);
+>>> s64 virtio_transport_stream_has_data(struct vsock_sock *vsk);
+>>> s64 virtio_transport_stream_has_space(struct vsock_sock *vsk);
+>>>
+>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>> index ad0d34d41444..1e1df19ec164 100644
+>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>> @@ -393,6 +393,78 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+>>> 	return err;
+>>> }
+>>>
+>>> +static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
+>>> +						 struct msghdr *msg,
+>>> +						 int flags)
+>>> +{
+>>> +	struct virtio_vsock_sock *vvs = vsk->trans;
+>>> +	struct virtio_vsock_pkt *pkt;
+>>> +	int dequeued_len = 0;
+>>> +	size_t user_buf_len = msg_data_left(msg);
+>>> +	bool copy_failed = false;
+>>> +	bool msg_ready = false;
+>>> +
+>>> +	spin_lock_bh(&vvs->rx_lock);
+>>> +
+>>> +	if (vvs->msg_count == 0) {
+>>> +		spin_unlock_bh(&vvs->rx_lock);
+>>> +		return 0;
+>>> +	}
+>>> +
+>>> +	while (!msg_ready) {
+>>> +		pkt = list_first_entry(&vvs->rx_queue, struct virtio_vsock_pkt, list);
+>>> +
+>>> +		if (!copy_failed) {
+>>> +			size_t pkt_len;
+>>> +			size_t bytes_to_copy;
+>>> +
+>>> +			pkt_len = (size_t)le32_to_cpu(pkt->hdr.len);
+>>> +			bytes_to_copy = min(user_buf_len, pkt_len);
+>>> +
+>>> +			if (bytes_to_copy) {
+>>> +				int err;
+>>> +
+>>> +				/* sk_lock is held by caller so no one else can dequeue.
+>>> +				 * Unlock rx_lock since memcpy_to_msg() may sleep.
+>>> +				 */
+>>> +				spin_unlock_bh(&vvs->rx_lock);
+>>> +
+>>> +				err = memcpy_to_msg(msg, pkt->buf, bytes_to_copy);
+>>> +				if (err) {
+>>> +					/* Copy of message failed, set flag to skip
+>>> +					 * copy path for rest of fragments. Rest of
+>>> +					 * fragments will be freed without copy.
+>>> +					 */
+>>> +					copy_failed = true;
+>>> +					dequeued_len = err;
+>> If we fail to copy the message we will discard the entire packet.
+>> Is it acceptable for the user point of view, or we should leave the
+>> packet in the queue and the user can retry, maybe with a different
+>> buffer?
+>>
+>> Then we can remove the packets only when we successfully copied all the
+>> fragments.
+>>
+>> I'm not sure make sense, maybe better to check also other
+>> implementations :-)
+>>
+>> Thanks,
+>> Stefano
+>
+>Understand, i'll check it on weekend, anyway I think it is
+>not critical for implementation.
 
-> On Fri, Jun 18, 2021 at 12:15:06PM -0300, Jason Gunthorpe wrote:
-> > On Fri, Jun 18, 2021 at 03:47:51PM +0200, Joerg Roedel wrote:  
-> > > Hi Kevin,
-> > > 
-> > > On Thu, Jun 17, 2021 at 07:31:03AM +0000, Tian, Kevin wrote:  
-> > > > Now let's talk about the new IOMMU behavior:
-> > > > 
-> > > > -   A device is blocked from doing DMA to any resource outside of
-> > > >     its group when it's probed by the IOMMU driver. This could be a
-> > > >     special state w/o attaching to any domain, or a new special domain
-> > > >     type which differentiates it from existing domain types (identity, 
-> > > >     dma, or unmanged). Actually existing code already includes a
-> > > >     IOMMU_DOMAIN_BLOCKED type but nobody uses it.  
-> > > 
-> > > There is a reason for the default domain to exist: Devices which require
-> > > RMRR mappings to be present. You can't just block all DMA from devices
-> > > until a driver takes over, we put much effort into making sure there is
-> > > not even a small window in time where RMRR regions (unity mapped regions
-> > > on AMD) are not mapped.  
-> > 
-> > Yes, I think the DMA blocking can only start around/after a VFIO type
-> > driver has probed() and bound to a device in the group, not much
-> > different from today.  
-> 
-> Does this mean when a device has a required "RMRR" that requires a unity
-> mapping we block assigning those devices to guests? I remember we had some
-> restriction but there was a need to go around it at some point in time.
-> 
-> - Either we disallow assigning devices with RMRR
-> - Break that unity map when the device is probed and after which any RMRR
->   access from device will fault.
+Yep, I agree.
 
-We currently disallow assignment of RMRR encumbered devices except for
-the known cases of USB and IGD.  In the general case, an RMRR imposes
-a requirement on the host system to maintain ranges of identity mapping
-that is incompatible with userspace ownership of the device and IOVA
-address space.  AFAICT, nothing changes in the /dev/iommu model that
-would make it safe to entrust userspace with RMRR encumbered devices.
+>
+>
+>I have another question: may be it is useful to research for
+>approach where packets are not queued until whole message
+>is received, but copied to user's buffer thus freeing memory.
+>(like previous implementation, of course with solution of problem
+>where part of message still in queue, while reader was woken
+>by timeout or signal).
+>
+>I think it is better, because  in current version, sender may set
+>'peer_alloc_buf' to  for example 1MB, so at receiver we get
+>1MB of 'kmalloc()' memory allocated, while having user's buffer
+>to copy data there or drop it(if user's buffer is full). This way
+>won't change spec(e.g. no message id or SEQ_BEGIN will be added).
+>
+>What do You think?
+
+Yep, I see your point and it would be great, but I think the main issues 
+to fix is how to handle a signal while we are waiting other fragments 
+since the other peer can take unspecified time to send them.
+
+Note that the 'peer_alloc_buf' in the sender, is the value get from the 
+receiver, so if the receiver doesn't want to allocate 1MB, can advertise 
+a small buffer size.
+
 Thanks,
-
-Alex
+Stefano
 
