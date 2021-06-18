@@ -2,157 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3F9F3AC512
-	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 09:36:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54D9A3AC5B6
+	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 10:03:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230461AbhFRHjF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Jun 2021 03:39:05 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52822 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S230413AbhFRHjC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 18 Jun 2021 03:39:02 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15I7WpRP046053;
-        Fri, 18 Jun 2021 03:36:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=DlYrtjWBHzw+KmSquw4v2hHh+QcBMyWfjJXzYe402nk=;
- b=JnzRdKpM2n8BH5HWIyZsAM03mhUNkNBkXNuVmR9jpJV3ywkAwKLRosJ6NdbxiUt9TkEw
- B2dSLObjAqFzVHF9VT4yMH5Lj6Hc8gwTy5SWyfED2VcQXNr3Fbt9aKoB8l861VCVgMRq
- Pi9qLQLHq1BklzSoiWOe1IHFVZGT9kvg8BmXRHoUUHiu370AL/9az3tWbC0PK0UpivvX
- Y2e3B5ARmCgTBRJHm9+XQ6m5dqjB2s4JU/vxRjjD12w9QJQXkKtcLvifONtpfjWjDx76
- 5f8328vbN4nsnQCg2k8tkxWuA7Ni1A7AicNzStHT2GrfSW94+JMrhrVJaiJe7dcBcSFO +A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 398nvatju4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Jun 2021 03:36:52 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15I7aQIw060893;
-        Fri, 18 Jun 2021 03:36:52 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 398nvatjte-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Jun 2021 03:36:52 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15I7Nfgn027110;
-        Fri, 18 Jun 2021 07:36:50 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma05fra.de.ibm.com with ESMTP id 394mj8hrbj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Jun 2021 07:36:50 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15I7ZbFf29360562
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 18 Jun 2021 07:35:37 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 292C542042;
-        Fri, 18 Jun 2021 07:36:48 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C9A7342049;
-        Fri, 18 Jun 2021 07:36:47 +0000 (GMT)
-Received: from linux.fritz.box (unknown [9.145.172.21])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 18 Jun 2021 07:36:47 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v5 0/7] s390: Add support for large pages
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com
-References: <20210611140705.553307-1-imbrenda@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <4adc92a9-d252-49e5-7877-079c9239a017@linux.ibm.com>
-Date:   Fri, 18 Jun 2021 09:36:47 +0200
+        id S232415AbhFRIGA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Jun 2021 04:06:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42794 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232724AbhFRIF3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Jun 2021 04:05:29 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92C72C06175F;
+        Fri, 18 Jun 2021 01:03:01 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id g8so14538797ejx.1;
+        Fri, 18 Jun 2021 01:03:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:to:cc:references:from:subject:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=3xbPqY0irxJhl12JwAlZ97VPkIKSYJSliaTHl1kU42s=;
+        b=X6Ghoa6vhet8MEaZEltddHovRPROJW0xifz5IyKxQPy9ewQVLhAot7OqQfkwAC0G6J
+         0ZqFW6LEPTg+F9ps12wbJJrHIBFV2uQHAhJTVID9EgmaG0Z0/XdPcnvw3//o4AYNnk+y
+         8rl39MwfIx/1WZGzS0j8F/68Y+nSBbJgAManVOMUWzv2+ODm2nh8KUxWAvw77rSOh+6I
+         3ZZzdX7f/ZCkiM4ar/16oLAN3sYAY8jOpZqqU9XtNhAuAsIt9L7OqYgwVfOnXg7DBr0r
+         tt/YK/AcxAj4stDfnsDqIVFL/W8uJ8FwYPxXkJOQ1QOdq9h/FnEmSkTqABoVw3LesFsk
+         7GWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:to:cc:references:from:subject:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=3xbPqY0irxJhl12JwAlZ97VPkIKSYJSliaTHl1kU42s=;
+        b=ODfOuZeaDuSUmr6I8K6WF8apd+ObP1iFYZ72/tG1aIlkvRfK5q4eAZTsv2DT8DFCMN
+         YnrOj2BwvnWjxHriNyYLgIVCa0EypxtB2gQnW6/BoFvdYm/iPtZw7iXOoTwT3JT32dlV
+         buNfTCLggXncdObW7Mix1zHbuuC3vtivAaPBvZn41r7KAZHLUrrBfCQils1CIyBenwUa
+         7zPTcXfHp62xCgKTNaplmI4efcbzEIkBTc3D52wOfsTjiO69PBk9lmwBxW7AcH6ufqqY
+         H3/JtwnbSGpXdIq99LabcBzhmxJYDYW6HVSPL0gijfLewtFVa27O/aD67DM1ukgAIyv0
+         PyWw==
+X-Gm-Message-State: AOAM531vQJyPlMWeUm1EoFI6qXRI9OrmsRxuRB9lEmnpt110LW/C0Esr
+        RjksBOLgBdFS7B48hU+Zwus=
+X-Google-Smtp-Source: ABdhPJxEFgsEbgHJkMRzhhTkPUPj8+EQf+r+/JMQ0JQA3N6KTgyL2iffbuEMHZFd87UEgYmHVCAo+Q==
+X-Received: by 2002:a17:906:3b99:: with SMTP id u25mr9792782ejf.539.1624003380108;
+        Fri, 18 Jun 2021 01:03:00 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id l22sm13925edr.15.2021.06.18.01.02.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Jun 2021 01:02:59 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+To:     Greg KH <gregkh@linuxfoundation.org>,
+        Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Fuad Tabba <tabba@google.com>
+References: <20210618044819.3690166-1-jingzhangos@google.com>
+ <20210618044819.3690166-3-jingzhangos@google.com>
+ <YMxEqvKyGnZinMOS@kroah.com>
+From:   Paolo Bonzini <bonzini@gnu.org>
+Subject: Re: [PATCH v11 2/7] KVM: stats: Add fd-based API to read binary stats
+ data
+Message-ID: <f2616b8e-0cf8-570f-4bd3-7ef5cbcb37b0@gnu.org>
+Date:   Fri, 18 Jun 2021 10:02:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20210611140705.553307-1-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <YMxEqvKyGnZinMOS@kroah.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Nevv5YPVRvEZtMbhE9QeXWLJXfpoiP1p
-X-Proofpoint-ORIG-GUID: hPTgHxbqyRKOFIb9ZQdImMddTsHY23Zc
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-06-17_17:2021-06-15,2021-06-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- bulkscore=0 impostorscore=0 priorityscore=1501 lowpriorityscore=0
- mlxlogscore=999 malwarescore=0 mlxscore=0 suspectscore=0 clxscore=1015
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106180042
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/11/21 4:06 PM, Claudio Imbrenda wrote:
-> Introduce support for large (1M) and huge (2G) pages.
+On 18/06/21 09:00, Greg KH wrote:
+>> +struct kvm_stats_header {
+>> +	__u32 name_size;
+>> +	__u32 count;
+>> +	__u32 desc_offset;
+>> +	__u32 data_offset;
+>> +	char id[];
+>> +};
 > 
-> Add a simple testcase for EDAT1 and EDAT2.
+> You mentioned before that the size of this really is the size of the
+> structure + KVM_STATS_ID_MAXLEN, right?  Or is it - KVM_STATS_ID_MAXLEN?
 > 
-> v4->v5
-> * fixed some typos and comment style issues
-> * introduced enum pgt_level, switched all functions to use it
+> If so, why not put that value explicitly in:
+> 	char id[THE_REST_OF_THE_HEADER_SPACE];
 > 
-> v3->v4
-> * replace macros in patch 5 with a union representing TEID fields
-> * clear the teid in expect_pgm_int and clear_pgm_int
-> * update testcase to use expect_pgm_int, remove expect_dat_fault
-> * update testcase to use teid union
-> 
-> v2->v3
-> * Add proper macros for control register bits
-> * Improved patch titles and descriptions
-> * Moved definition of TEID bits to library
-> * Rebased on the lastest upstream branch
-> 
-> v1->v2
-> 
-> * split patch 2 -> new patch 2 and new patch 3
-> * patch 2: fixes pgtable.h, also fixes wrong usage of REGION_TABLE_LENGTH
->   instead of SEGMENT_TABLE_LENGTH
-> * patch 3: introduces new macros and functions for large pages
-> * patch 4: remove erroneous double call to pte_alloc in get_pte
-> * patch 4: added comment in mmu.c to bridge the s390x architecural names
->   with the Linux ones used in the kvm-unit-tests
-> * patch 5: added and fixed lots of comments to explain what's going on
-> * patch 5: set FC for region 3 after writing the canary, like for segments
-> * patch 5: use uintptr_t instead of intptr_t for set_prefix
-> * patch 5: introduce new macro PGD_PAGE_SHIFT instead of using magic value 41
-> * patch 5: use VIRT(0) instead of mem to make it more clear what we are
->   doing, even though VIRT(0) expands to mem
+> As this is not a variable header size at all, and you can not change it
+> going forward, so the variable length array here feels disingenuous.
 
+It can change; the header goes up to desc_offset.  Let's rename 
+desc_offset to header_size.
 
-Thanks, picked
+>> +struct kvm_stats_desc {
+>> +	__u32 flags;
+>> +	__s16 exponent;
+>> +	__u16 size;
+>> +	__u32 offset;
+>> +	__u32 unused;
+>> +	char name[];
+>> +};
+> 
+> What is the max length of name?
 
-> 
-> 
-> Claudio Imbrenda (7):
->   s390x: lib: add and use macros for control register bits
->   libcflat: add SZ_1M and SZ_2G
->   s390x: lib: fix pgtable.h
->   s390x: lib: Add idte and other huge pages functions/macros
->   s390x: lib: add teid union and clear teid from lowcore
->   s390x: mmu: add support for large pages
->   s390x: edat test
-> 
->  s390x/Makefile            |   1 +
->  lib/s390x/asm/arch_def.h  |  12 ++
->  lib/s390x/asm/float.h     |   4 +-
->  lib/s390x/asm/interrupt.h |  28 +++-
->  lib/s390x/asm/pgtable.h   |  44 +++++-
->  lib/libcflat.h            |   2 +
->  lib/s390x/mmu.h           |  84 +++++++++++-
->  lib/s390x/interrupt.c     |   2 +
->  lib/s390x/mmu.c           | 262 ++++++++++++++++++++++++++++++++----
->  lib/s390x/sclp.c          |   4 +-
->  s390x/diag288.c           |   2 +-
->  s390x/edat.c              | 274 ++++++++++++++++++++++++++++++++++++++
->  s390x/gs.c                |   2 +-
->  s390x/iep.c               |   4 +-
->  s390x/skrf.c              |   2 +-
->  s390x/smp.c               |   8 +-
->  s390x/vector.c            |   2 +-
->  s390x/unittests.cfg       |   3 +
->  18 files changed, 691 insertions(+), 49 deletions(-)
->  create mode 100644 s390x/edat.c
-> 
+It's name_size in the header.
 
+> Why aren't these structures defined here in kerneldoc so that we can
+> understand them better?  Putting them in a .rst file guarantees they
+> will get out of sync, and you can always directly import the kerneldoc
+> into the .rst file.
+
+This is a problem in general with Documentation/virt/kvm/api.rst.  The 
+file is organized to match the kerneldoc structs to the ioctl that they 
+are used for, and sometimes a ioctl includes different structs for each 
+architecture.
+
+It is probably possible to do it using :identifiers: and/or :doc:, but 
+it would require running scripts/kernel-doc on the uAPI headers dozens 
+of times.  That is quite expensive at 0.3s each run, but that's what you 
+get with Perl (gcc -fsyntax-only is 20 times faster).
+
+Paolo
