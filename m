@@ -2,326 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 73E363ACDE6
-	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 16:50:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB37C3ACDEA
+	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 16:50:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234709AbhFROwj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Jun 2021 10:52:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30752 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234700AbhFROwh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 18 Jun 2021 10:52:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624027827;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fbPbuj0msVDGWFUsKqeCrFUb5LMoYgYB88VJeRxprBs=;
-        b=CCYulatqXIF7UN47eDnR6yJ8xEJ7DfrOvzoZuPsTwJrgIiq5ldhbQ3NzSiIkQjbyaHgwCj
-        6RQNfCqzZa12PyA6uxfFgzMeVWNn9W7WNYqW24JxY8cLx+T1//Av3L1CF6w4BcB0D+1EVS
-        b1mzU/U9aDI6nkZ7SuemWjw7BnudFcI=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-BZnSiGyhOb6Oc9dcLyPvcw-1; Fri, 18 Jun 2021 10:50:26 -0400
-X-MC-Unique: BZnSiGyhOb6Oc9dcLyPvcw-1
-Received: by mail-ed1-f72.google.com with SMTP id r15-20020aa7da0f0000b02903946a530334so3777598eds.22
-        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 07:50:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=fbPbuj0msVDGWFUsKqeCrFUb5LMoYgYB88VJeRxprBs=;
-        b=ZhrkaK7H+pmaWtp9Mbv1W32TSoLM3DjdEOFGVX6EwzGqsdFsjrVMQpQqb9Rr+hBmsw
-         o82Lb9dNsr5VjUKWuAPWSXMFoMaSYOIYjoy7bTEyd0s7UgsuN0y6E1nQzBcjAp6IV717
-         H1fXb27oH/lc2tNs5EAlkQM8Mghgd4irpM25Uw8Ab7AAEyAF3NxSlgzDICke65Bz+gVm
-         HYSrEhd1ahyyr5nZPBm+Xlr2kIaMa13GiClGEB0SfrRzhuPMAebsfmQY4+qSWM9ObrQa
-         x1peGgOh2ZXPcyqtf8IcTLv2wdwvnM9nQ26cMB3gsn5YS7rdnv/wWv3UtORXKbHegDWG
-         Srmw==
-X-Gm-Message-State: AOAM533CF6gAkMQAhpZQP79QTgr8mGYimkPtDjadh3TogzJ4MwccibQu
-        1zVsWabiNeKE0xmFb+983wR4N68fkthUfKNIzUWTGAsdux656KeOBVip2ls3N72UVWZRKOdXr+Q
-        /gtcC580i/aYz
-X-Received: by 2002:a17:906:6d59:: with SMTP id a25mr3271322ejt.83.1624027825311;
-        Fri, 18 Jun 2021 07:50:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxGMqnaIUeLgzXdL4MB+nq3qWIIQQpHpYHpBobQjDwJLtjovX4eLv3MrjB5uzX9trFvePwGEg==
-X-Received: by 2002:a17:906:6d59:: with SMTP id a25mr3271295ejt.83.1624027825049;
-        Fri, 18 Jun 2021 07:50:25 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id i10sm1112727eja.3.2021.06.18.07.50.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Jun 2021 07:50:24 -0700 (PDT)
-Subject: Re: [PATCH v1 1/1] tools: Rename bitmap_alloc() to bitmap_zalloc()
-To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Yury Norov <yury.norov@gmail.com>,
-        Ian Rogers <irogers@google.com>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Leo Yan <leo.yan@linaro.org>, Jiri Olsa <jolsa@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Yury Norov <ynorov@caviumnetworks.com>
-References: <20210618143854.62967-1-andriy.shevchenko@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f159d297-7eed-e054-ae70-e593a42685b5@redhat.com>
-Date:   Fri, 18 Jun 2021 16:50:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S234717AbhFROwo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Jun 2021 10:52:44 -0400
+Received: from mx12.kaspersky-labs.com ([91.103.66.155]:55083 "EHLO
+        mx12.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234710AbhFROwn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Jun 2021 10:52:43 -0400
+Received: from relay12.kaspersky-labs.com (unknown [127.0.0.10])
+        by relay12.kaspersky-labs.com (Postfix) with ESMTP id 0330F762AF;
+        Fri, 18 Jun 2021 17:50:31 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
+        s=mail202102; t=1624027831;
+        bh=mioIxcKn1dUte/rgRLgYR39/5M/DokLmC2JiaDqlwUM=;
+        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
+        b=rW1+7mq38xP+IdNDdBJgMHmo+K1nIdgK0vSkPb52gBLuBHd+m89rZrxtvN7K0iJY2
+         Vq6MIS1/9VpQ/EVwjm/GBjr1w2HjUkCZpYM1GDv11GdX5JUGkD64bjAqv2AQT5k1qJ
+         Yhg50PVZ9Tn0ca76vHPiiJ9+TH+f4VFBi7GM5o/25W2H7XwHDvi9PuJ4AaGGMaHw24
+         JAHf9X37yOohX7UMmk4MSfr45TAqHaqkr0I+5IMWaCkJEY1JbbiXBZXECGJmDrd5X2
+         cPlZjmBcS69o1dyHPAV+tO8+/SIUuML/TreUhfESF169wXoo+1Hn1nGRd0semLpRt5
+         qkid4ukbeUEMA==
+Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
+        by mailhub12.kaspersky-labs.com (Postfix) with ESMTPS id 6413B762A9;
+        Fri, 18 Jun 2021 17:50:30 +0300 (MSK)
+Received: from [10.16.171.77] (10.64.68.128) by hqmailmbx3.avp.ru
+ (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.14; Fri, 18
+ Jun 2021 17:50:29 +0300
+Subject: Re: [PATCH net-next 1/3] vsock: rename vsock_has_data()
+To:     Stefano Garzarella <sgarzare@redhat.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20210618133526.300347-1-sgarzare@redhat.com>
+ <20210618133526.300347-2-sgarzare@redhat.com>
+From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Message-ID: <74271c7b-fb61-2f54-0ca6-6ea315cb758f@kaspersky.com>
+Date:   Fri, 18 Jun 2021 17:50:29 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210618143854.62967-1-andriy.shevchenko@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <20210618133526.300347-2-sgarzare@redhat.com>
+Content-Type: text/plain; charset="koi8-r"
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.64.68.128]
+X-ClientProxiedBy: hqmailmbx3.avp.ru (10.64.67.243) To hqmailmbx3.avp.ru
+ (10.64.67.243)
+X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 06/18/2021 14:29:51
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 164482 [Jun 18 2021]
+X-KSE-AntiSpam-Info: Version: 5.9.20.0
+X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
+X-KSE-AntiSpam-Info: LuaCore: 448 448 71fb1b37213ce9a885768d4012c46ac449c77b17
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;kaspersky.com:7.1.1
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 06/18/2021 14:32:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 18.06.2021 12:17:00
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KLMS-Rule-ID: 52
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2021/06/18 13:10:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/06/18 12:17:00 #16756757
+X-KLMS-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/06/21 16:38, Andy Shevchenko wrote:
-> Rename bitmap_alloc() to bitmap_zalloc() in tools to follow new coming
-> bitmap API extension in kernel.
-> 
-> No functional changes intended.
-> 
-> Suggested-by: Yury Norov <ynorov@caviumnetworks.com>
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+
+On 18.06.2021 16:35, Stefano Garzarella wrote:
+> vsock_has_data() is used only by STREAM and SEQPACKET sockets,
+> so let's rename it to vsock_connectible_has_data(), using the same
+> nomenclature (connectible) used in other functions after the
+> introduction of SEQPACKET.
+>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 > ---
->   tools/include/linux/bitmap.h                            | 4 ++--
->   tools/perf/bench/find-bit-bench.c                       | 2 +-
->   tools/perf/builtin-c2c.c                                | 6 +++---
->   tools/perf/builtin-record.c                             | 2 +-
->   tools/perf/tests/bitmap.c                               | 2 +-
->   tools/perf/tests/mem2node.c                             | 2 +-
->   tools/perf/util/affinity.c                              | 4 ++--
->   tools/perf/util/header.c                                | 4 ++--
->   tools/perf/util/metricgroup.c                           | 2 +-
->   tools/perf/util/mmap.c                                  | 4 ++--
->   tools/testing/selftests/kvm/dirty_log_perf_test.c       | 2 +-
->   tools/testing/selftests/kvm/dirty_log_test.c            | 4 ++--
->   tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c | 2 +-
->   13 files changed, 20 insertions(+), 20 deletions(-)
-> 
-> diff --git a/tools/include/linux/bitmap.h b/tools/include/linux/bitmap.h
-> index 330dbf7509cc..7eae64eb5c80 100644
-> --- a/tools/include/linux/bitmap.h
-> +++ b/tools/include/linux/bitmap.h
-> @@ -109,10 +109,10 @@ static inline int test_and_clear_bit(int nr, unsigned long *addr)
->   }
->   
->   /**
-> - * bitmap_alloc - Allocate bitmap
-> + * bitmap_zalloc - Allocate bitmap
->    * @nbits: Number of bits
->    */
-> -static inline unsigned long *bitmap_alloc(int nbits)
-> +static inline unsigned long *bitmap_zalloc(int nbits)
->   {
->   	return calloc(1, BITS_TO_LONGS(nbits) * sizeof(unsigned long));
->   }
-> diff --git a/tools/perf/bench/find-bit-bench.c b/tools/perf/bench/find-bit-bench.c
-> index 73b5bcc5946a..22b5cfe97023 100644
-> --- a/tools/perf/bench/find-bit-bench.c
-> +++ b/tools/perf/bench/find-bit-bench.c
-> @@ -54,7 +54,7 @@ static bool asm_test_bit(long nr, const unsigned long *addr)
->   
->   static int do_for_each_set_bit(unsigned int num_bits)
->   {
-> -	unsigned long *to_test = bitmap_alloc(num_bits);
-> +	unsigned long *to_test = bitmap_zalloc(num_bits);
->   	struct timeval start, end, diff;
->   	u64 runtime_us;
->   	struct stats fb_time_stats, tb_time_stats;
-> diff --git a/tools/perf/builtin-c2c.c b/tools/perf/builtin-c2c.c
-> index e3b9d63077ef..a17726ff85a9 100644
-> --- a/tools/perf/builtin-c2c.c
-> +++ b/tools/perf/builtin-c2c.c
-> @@ -137,11 +137,11 @@ static void *c2c_he_zalloc(size_t size)
->   	if (!c2c_he)
->   		return NULL;
->   
-> -	c2c_he->cpuset = bitmap_alloc(c2c.cpus_cnt);
-> +	c2c_he->cpuset = bitmap_zalloc(c2c.cpus_cnt);
->   	if (!c2c_he->cpuset)
->   		return NULL;
->   
-> -	c2c_he->nodeset = bitmap_alloc(c2c.nodes_cnt);
-> +	c2c_he->nodeset = bitmap_zalloc(c2c.nodes_cnt);
->   	if (!c2c_he->nodeset)
->   		return NULL;
->   
-> @@ -2045,7 +2045,7 @@ static int setup_nodes(struct perf_session *session)
->   		struct perf_cpu_map *map = n[node].map;
->   		unsigned long *set;
->   
-> -		set = bitmap_alloc(c2c.cpus_cnt);
-> +		set = bitmap_zalloc(c2c.cpus_cnt);
->   		if (!set)
->   			return -ENOMEM;
->   
-> diff --git a/tools/perf/builtin-record.c b/tools/perf/builtin-record.c
-> index 84803abeb942..978b6bbd06e4 100644
-> --- a/tools/perf/builtin-record.c
-> +++ b/tools/perf/builtin-record.c
-> @@ -2766,7 +2766,7 @@ int cmd_record(int argc, const char **argv)
->   
->   	if (rec->opts.affinity != PERF_AFFINITY_SYS) {
->   		rec->affinity_mask.nbits = cpu__max_cpu();
-> -		rec->affinity_mask.bits = bitmap_alloc(rec->affinity_mask.nbits);
-> +		rec->affinity_mask.bits = bitmap_zalloc(rec->affinity_mask.nbits);
->   		if (!rec->affinity_mask.bits) {
->   			pr_err("Failed to allocate thread mask for %zd cpus\n", rec->affinity_mask.nbits);
->   			err = -ENOMEM;
-> diff --git a/tools/perf/tests/bitmap.c b/tools/perf/tests/bitmap.c
-> index 96c137360918..12b805efdca0 100644
-> --- a/tools/perf/tests/bitmap.c
-> +++ b/tools/perf/tests/bitmap.c
-> @@ -14,7 +14,7 @@ static unsigned long *get_bitmap(const char *str, int nbits)
->   	unsigned long *bm = NULL;
->   	int i;
->   
-> -	bm = bitmap_alloc(nbits);
-> +	bm = bitmap_zalloc(nbits);
->   
->   	if (map && bm) {
->   		for (i = 0; i < map->nr; i++)
-> diff --git a/tools/perf/tests/mem2node.c b/tools/perf/tests/mem2node.c
-> index a258bd51f1a4..e4d0d58b97f8 100644
-> --- a/tools/perf/tests/mem2node.c
-> +++ b/tools/perf/tests/mem2node.c
-> @@ -27,7 +27,7 @@ static unsigned long *get_bitmap(const char *str, int nbits)
->   	unsigned long *bm = NULL;
->   	int i;
->   
-> -	bm = bitmap_alloc(nbits);
-> +	bm = bitmap_zalloc(nbits);
->   
->   	if (map && bm) {
->   		for (i = 0; i < map->nr; i++) {
-> diff --git a/tools/perf/util/affinity.c b/tools/perf/util/affinity.c
-> index a5e31f826828..7b12bd7a3080 100644
-> --- a/tools/perf/util/affinity.c
-> +++ b/tools/perf/util/affinity.c
-> @@ -25,11 +25,11 @@ int affinity__setup(struct affinity *a)
->   {
->   	int cpu_set_size = get_cpu_set_size();
->   
-> -	a->orig_cpus = bitmap_alloc(cpu_set_size * 8);
-> +	a->orig_cpus = bitmap_zalloc(cpu_set_size * 8);
->   	if (!a->orig_cpus)
->   		return -1;
->   	sched_getaffinity(0, cpu_set_size, (cpu_set_t *)a->orig_cpus);
-> -	a->sched_cpus = bitmap_alloc(cpu_set_size * 8);
-> +	a->sched_cpus = bitmap_zalloc(cpu_set_size * 8);
->   	if (!a->sched_cpus) {
->   		zfree(&a->orig_cpus);
->   		return -1;
-> diff --git a/tools/perf/util/header.c b/tools/perf/util/header.c
-> index aa1e42518d37..c67c03dd3db2 100644
-> --- a/tools/perf/util/header.c
-> +++ b/tools/perf/util/header.c
-> @@ -277,7 +277,7 @@ static int do_read_bitmap(struct feat_fd *ff, unsigned long **pset, u64 *psize)
->   	if (ret)
->   		return ret;
->   
-> -	set = bitmap_alloc(size);
-> +	set = bitmap_zalloc(size);
->   	if (!set)
->   		return -ENOMEM;
->   
-> @@ -1259,7 +1259,7 @@ static int memory_node__read(struct memory_node *n, unsigned long idx)
->   
->   	size++;
->   
-> -	n->set = bitmap_alloc(size);
-> +	n->set = bitmap_zalloc(size);
->   	if (!n->set) {
->   		closedir(dir);
->   		return -ENOMEM;
-> diff --git a/tools/perf/util/metricgroup.c b/tools/perf/util/metricgroup.c
-> index 8336dd8e8098..f24c6998d26c 100644
-> --- a/tools/perf/util/metricgroup.c
-> +++ b/tools/perf/util/metricgroup.c
-> @@ -313,7 +313,7 @@ static int metricgroup__setup_events(struct list_head *groups,
->   	struct evsel *evsel, *tmp;
->   	unsigned long *evlist_used;
->   
-> -	evlist_used = bitmap_alloc(perf_evlist->core.nr_entries);
-> +	evlist_used = bitmap_zalloc(perf_evlist->core.nr_entries);
->   	if (!evlist_used)
->   		return -ENOMEM;
->   
-> diff --git a/tools/perf/util/mmap.c b/tools/perf/util/mmap.c
-> index ab7108d22428..512dc8b9c168 100644
-> --- a/tools/perf/util/mmap.c
-> +++ b/tools/perf/util/mmap.c
-> @@ -106,7 +106,7 @@ static int perf_mmap__aio_bind(struct mmap *map, int idx, int cpu, int affinity)
->   		data = map->aio.data[idx];
->   		mmap_len = mmap__mmap_len(map);
->   		node_index = cpu__get_node(cpu);
-> -		node_mask = bitmap_alloc(node_index + 1);
-> +		node_mask = bitmap_zalloc(node_index + 1);
->   		if (!node_mask) {
->   			pr_err("Failed to allocate node mask for mbind: error %m\n");
->   			return -1;
-> @@ -258,7 +258,7 @@ static void build_node_mask(int node, struct mmap_cpu_mask *mask)
->   static int perf_mmap__setup_affinity_mask(struct mmap *map, struct mmap_params *mp)
->   {
->   	map->affinity_mask.nbits = cpu__max_cpu();
-> -	map->affinity_mask.bits = bitmap_alloc(map->affinity_mask.nbits);
-> +	map->affinity_mask.bits = bitmap_zalloc(map->affinity_mask.nbits);
->   	if (!map->affinity_mask.bits)
->   		return -1;
->   
-> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> index 04a2641261be..fbf0c2c1fbc9 100644
-> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> @@ -121,7 +121,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->   	guest_num_pages = (nr_vcpus * guest_percpu_mem_size) >> vm_get_page_shift(vm);
->   	guest_num_pages = vm_adjust_num_guest_pages(mode, guest_num_pages);
->   	host_num_pages = vm_num_host_pages(mode, guest_num_pages);
-> -	bmap = bitmap_alloc(host_num_pages);
-> +	bmap = bitmap_zalloc(host_num_pages);
->   
->   	if (dirty_log_manual_caps) {
->   		cap.cap = KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2;
-> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-> index 81edbd23d371..ef641b0ff125 100644
-> --- a/tools/testing/selftests/kvm/dirty_log_test.c
-> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
-> @@ -750,8 +750,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->   
->   	pr_info("guest physical test memory offset: 0x%lx\n", guest_test_phys_mem);
->   
-> -	bmap = bitmap_alloc(host_num_pages);
-> -	host_bmap_track = bitmap_alloc(host_num_pages);
-> +	bmap = bitmap_zalloc(host_num_pages);
-> +	host_bmap_track = bitmap_zalloc(host_num_pages);
->   
->   	/* Add an extra memory slot for testing dirty logging */
->   	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-> diff --git a/tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c b/tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c
-> index 537de1068554..a2f1bab6c234 100644
-> --- a/tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c
-> @@ -111,7 +111,7 @@ int main(int argc, char *argv[])
->   	nested_map(vmx, vm, NESTED_TEST_MEM1, GUEST_TEST_MEM, 4096, 0);
->   	nested_map(vmx, vm, NESTED_TEST_MEM2, GUEST_TEST_MEM, 4096, 0);
->   
-> -	bmap = bitmap_alloc(TEST_MEM_PAGES);
-> +	bmap = bitmap_zalloc(TEST_MEM_PAGES);
->   	host_test_mem = addr_gpa2hva(vm, GUEST_TEST_MEM);
->   
->   	while (!done) {
-> 
-
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-
+>  net/vmw_vsock/af_vsock.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> index 67954afef4e1..de8249483081 100644
+> --- a/net/vmw_vsock/af_vsock.c
+> +++ b/net/vmw_vsock/af_vsock.c
+> @@ -860,7 +860,7 @@ s64 vsock_stream_has_data(struct vsock_sock *vsk)
+>  }
+>  EXPORT_SYMBOL_GPL(vsock_stream_has_data);
+>  
+> -static s64 vsock_has_data(struct vsock_sock *vsk)
+> +static s64 vsock_connectible_has_data(struct vsock_sock *vsk)
+>  {
+>  	struct sock *sk = sk_vsock(vsk);
+>  
+> @@ -1880,7 +1880,7 @@ static int vsock_wait_data(struct sock *sk, struct wait_queue_entry *wait,
+>  	err = 0;
+>  	transport = vsk->transport;
+>  
+> -	while ((data = vsock_has_data(vsk)) == 0) {
+> +	while ((data = vsock_connectible_has_data(vsk)) == 0) {
+>  		prepare_to_wait(sk_sleep(sk), wait, TASK_INTERRUPTIBLE);
+>  
+>  		if (sk->sk_err != 0 ||
+LGTM
