@@ -2,72 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 72B353AD396
-	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 22:26:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DAD103AD3BD
+	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 22:40:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233558AbhFRU2d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Jun 2021 16:28:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41522 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230430AbhFRU23 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Jun 2021 16:28:29 -0400
-Received: from mail-oo1-xc2c.google.com (mail-oo1-xc2c.google.com [IPv6:2607:f8b0:4864:20::c2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 831A9C061574
-        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 13:26:18 -0700 (PDT)
-Received: by mail-oo1-xc2c.google.com with SMTP id k21-20020a4a2a150000b029024955603642so2753820oof.8
-        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 13:26:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kWL2l33mYtauMaQE1s/trtXMtvBBw4+h9fOrmAMfFaY=;
-        b=JRWCA/g6sDKrl6Uk59y4B5PmnBBC8gtegunfjfVYoiLYc4jY/xuRPHSZ5E976sfdx5
-         dnaLSUUj/W01yikBxtzpPzCNI8LGgvIwJV/bCC2/oicor519Q/stCa6/tOp4IBEZTa2F
-         FITHIbJQPHwhjaQtYXtY3gSZDeQNS3tlCuAXkV4S8F6lre2gAVxNgy9M59Fcae2HIl1v
-         8WxYR2vyADkMT6PliHUv1pvMOOMwVk54feowKPyBhZjdqAOIlHWJONkjjiE8gVRtGOyb
-         BiIpjINgZVZvpXaCD8x2EIIp/btonYCNYdHzZsER68imlHYeZ/Wes1QeOSxsHr+qnSe5
-         uStA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kWL2l33mYtauMaQE1s/trtXMtvBBw4+h9fOrmAMfFaY=;
-        b=LVuJKjTQcdcg8KgE83TvwEC3Wab1Wf3Ec3EyXNw8thufy/sLOb969XM6W4bGl6Ys12
-         nSgzDrs0p3tg7ETE6k4goaDRZUBwU3H3kckt3cflI4D1xUihVXvku2VhNDnh0LS/iAbk
-         FgpHdIRNrKsga28H92kJp2EZ+HtcDDL9uV3l/0iSE55b0XdiKGbcEpOMitKSokezH4Wa
-         TT5sjVDxcSv3nXGqYyXvWb7nJaWIV5l3CwY91hHtJhWEGM+tjvkRjvJh/HV8MufRZCsr
-         UizAjP13ZI1w1sbegkCeryuNKuo7ThzDBjowg8NUdX0vLt/iOpdm13y7psxD+IXD4e4f
-         02BQ==
-X-Gm-Message-State: AOAM531ZB5AEwYRy13teUMR9coq9fWrg6CQxNF5LY3RMKW5TG0cD2oja
-        0H5v3X/r7GvL4X1JW+2gy1staw3b1xzQr//YljZ1OA==
-X-Google-Smtp-Source: ABdhPJxv/fld1v4qiAfK9zVyWx77HVWUazBt2xHLNoxo4Ax7bx1t+RHD+j9DBhPVRtZH+kaQSb6sFufgGldQLJRjLUA=
-X-Received: by 2002:a4a:4585:: with SMTP id y127mr10534873ooa.82.1624047977644;
- Fri, 18 Jun 2021 13:26:17 -0700 (PDT)
+        id S233859AbhFRUmV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Jun 2021 16:42:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53798 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232739AbhFRUmU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 18 Jun 2021 16:42:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624048810;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5qKEO77u/d1G0OLkye+TPueIkTEWwNLFmRctaFbVPAk=;
+        b=CzbJb/nBCvzFpIXbES/espgokbb3w9JbnoQGkJQWkrPHQpjP9ZjA7ipEWavaGvMrqMn6qh
+        jcHvm2H1hyEtJxytjEW5mNXS8NIeIcPim20xb15c7TKGM7p0mGkclTfbD8uhoTf3WSXXkB
+        5G0dVfmngGDKBS/7reMbR8/Njk+U18U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-525-D2oycs5KOGWAPiVVIq8RiA-1; Fri, 18 Jun 2021 16:40:09 -0400
+X-MC-Unique: D2oycs5KOGWAPiVVIq8RiA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1130D9F92B;
+        Fri, 18 Jun 2021 20:40:08 +0000 (UTC)
+Received: from localhost (unknown [10.22.9.9])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7895F175B5;
+        Fri, 18 Jun 2021 20:40:07 +0000 (UTC)
+Date:   Fri, 18 Jun 2021 16:40:06 -0400
+From:   Eduardo Habkost <ehabkost@redhat.com>
+To:     Markus Armbruster <armbru@redhat.com>
+Cc:     Claudio Fontana <cfontana@suse.de>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org,
+        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
+        Denis Lunev <den@openvz.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH v9] qapi: introduce 'query-kvm-cpuid' action
+Message-ID: <20210618204006.k6krwuz2lpxvb6uh@habkost.net>
+References: <20210603090753.11688-1-valeriy.vdovin@virtuozzo.com>
+ <87im2d6p5v.fsf@dusky.pond.sub.org>
+ <20210617074919.GA998232@dhcp-172-16-24-191.sw.ru>
+ <87a6no3fzf.fsf@dusky.pond.sub.org>
+ <790d22e1-5de9-ba20-6c03-415b62223d7d@suse.de>
+ <877dis1sue.fsf@dusky.pond.sub.org>
+ <20210617153949.GA357@dhcp-172-16-24-191.sw.ru>
+ <e69ea2b4-21cc-8203-ad2d-10a0f4ffe34a@suse.de>
+ <20210617165111.eu3x2pvinpoedsqj@habkost.net>
+ <87sg1fwwgg.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20210618113118.70621-1-laramglazier@gmail.com>
- <ca3ca9a0-f6be-be85-b2a1-5f80dd9dd693@oracle.com> <CANX1H+3LC1FrGaJ+eo-FQnjHr8-VYAQJVW0j5H33x-hBAemGDA@mail.gmail.com>
-In-Reply-To: <CANX1H+3LC1FrGaJ+eo-FQnjHr8-VYAQJVW0j5H33x-hBAemGDA@mail.gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 18 Jun 2021 13:26:03 -0700
-Message-ID: <CALMp9eT+2kCSGb5=N5cc=OeH1uPFuxDtpjLn=av5DA3oTxqm9g@mail.gmail.com>
-Subject: Re: [PATCH kvm-unit-tests] svm: Updated cr4 in test_efer to fix
- report msg
-To:     Lara Lazier <laramglazier@gmail.com>
-Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87sg1fwwgg.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 18, 2021 at 12:59 PM Lara Lazier <laramglazier@gmail.com> wrote:
+On Fri, Jun 18, 2021 at 07:52:47AM +0200, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+> 
+> > On Thu, Jun 17, 2021 at 05:53:11PM +0200, Claudio Fontana wrote:
+> >> On 6/17/21 5:39 PM, Valeriy Vdovin wrote:
+> >> > On Thu, Jun 17, 2021 at 04:14:17PM +0200, Markus Armbruster wrote:
+> >> >> Claudio Fontana <cfontana@suse.de> writes:
+> >> >>
+> >> >>> On 6/17/21 1:09 PM, Markus Armbruster wrote:
+> 
+> [...]
+> 
+> >> >>>> If it just isn't implemented for anything but KVM, then putting "kvm"
+> >> >>>> into the command name is a bad idea.  Also, the commit message should
+> >> >>>> briefly note the restriction to KVM.
+> >> >>
+> >> >> Perhaps this one is closer to reality.
+> >> >>
+> >> > I agree.
+> >> > What command name do you suggest?
+> >> 
+> >> query-exposed-cpuid?
+> >
+> > Pasting the reply I sent at [1]:
+> >
+> >   I don't really mind how the command is called, but I would prefer
+> >   to add a more complex abstraction only if maintainers of other
+> >   accelerators are interested and volunteer to provide similar
+> >   functionality.  I don't want to introduce complexity for use
+> >   cases that may not even exist.
+> >
+> > I'm expecting this to be just a debugging mechanism, not a stable
+> > API to be maintained and supported for decades.  (Maybe a "x-"
+> > prefix should be added to indicate that?)
+> >
+> > [1] https://lore.kernel.org/qemu-devel/20210602204604.crsxvqixkkll4ef4@habkost.net
+> 
+> x-query-x86_64-cpuid?
+> 
 
-> My understanding is as follows:
-> The "first" test should succeed with an SVM_EXIT_ERR when EFER.LME and
-> CR0.PG are both
-> non-zero and CR0.PE is zero (so I believe we do not really care
-> whether CR4.PAE is set or not though
-> I might be overlooking something here).
+Unless somebody wants to spend time designing a generic
+abstraction around this (and justify the extra complexity), this
+is a KVM-specific command.  Is there a reason to avoid "kvm" in
+the command name?
 
-You are overlooking the fact that the test will fail if CR4.PAE is
-clear. If CR4.PAE is 0 *and* CR0.PE is 0, then you can't be sure which
-one triggered the failure.
+-- 
+Eduardo
+
