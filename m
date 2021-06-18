@@ -2,173 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A13CB3AD48F
-	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 23:47:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 337AA3AD4A7
+	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 23:55:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234670AbhFRVtN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Jun 2021 17:49:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59778 "EHLO
+        id S234743AbhFRV5o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Jun 2021 17:57:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234660AbhFRVtM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Jun 2021 17:49:12 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4630EC061574
-        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 14:47:02 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id d194-20020a3768cb0000b02903ad9d001bb6so6833942qkc.7
-        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 14:47:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=229mnDm6P0b0PXS4C471S6HQyDxSv4bvPmDKNuB7k40=;
-        b=aKAShhDSlz34FFmsBMzsWaopNkOIayd5iqC4WyI4nw7EHmyz6gT3UNsYYkA71XKeGs
-         HYe325z0spWnArGr1ct0HlvaPXJayYmoz3xEBsLNR2pYu9W5ytLUi3GbsyqNYhhg8FCD
-         Kb0ZSi/hLFCt9lXQLZwNJrIiFthTWhjtN8xLE6U8McLD2HTX3ZnPVJOlc6yt4/ltMrLJ
-         pxCJi0HXJEepqSOcKixEIappwWajaMiojKxb6YUNU6JblgSinSZlx5p1CKyHSE+IrT0d
-         VmEnviQfI4knT2PFN30QysB8oRcrx//+0BzI2VxVhymP1HfHRYD6i2XTIeuYzik0eK+B
-         fpVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=229mnDm6P0b0PXS4C471S6HQyDxSv4bvPmDKNuB7k40=;
-        b=NpDNnX3Q5D7neA/A1Nswg4R5fE1hNvvM3acNk7wqB8PMlvFaQa0ZkOajPQ/AeJQphA
-         hL2omvVy2BaUrihEACiSdTBbnGvmlSdO8EsbU0GnWx7uI1/bQoF2jbAgitncWE5WA5/k
-         3MyGUEQEl16YBKlM8HVPafkIXbUaJece0YRBddDUa6MHRCqzcE46gHZJ+MHNLi74G1vn
-         bIecCPauoOQv8xGdMsklw7sdsEaH33P0FlLFTL8n31LR8EM2DsF1VEDkXZrGWNsxFnJZ
-         YZFMinP0IozBKs9Udhp8WIPw7djRVbUmGBk/fy3nfbvQqdUnujMDQJdl6HIZ8lZzw8po
-         jkyQ==
-X-Gm-Message-State: AOAM530DzNS6teDq5u/1BkjgKXOliExumPGbLwZW9XslHIdAF3LJP0XP
-        hz+uhBtGu6h3ovQp+QB1Ms5S7Z3XmOY=
-X-Google-Smtp-Source: ABdhPJxZL8lxhONicplEpmwS8lyjiTsFH0Vv+IEk6+sMdK7gQPIj8pWgQOmqhB6KusakfNutUaK0t9NtoaI=
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:d689:126c:66f2:8013])
- (user=seanjc job=sendgmr) by 2002:a25:4048:: with SMTP id n69mr15751195yba.91.1624052821314;
- Fri, 18 Jun 2021 14:47:01 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 18 Jun 2021 14:46:58 -0700
-Message-Id: <20210618214658.2700765-1-seanjc@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.32.0.288.g62a8d224e6-goog
-Subject: [PATCH] KVM: nVMX: Dynamically compute max VMCS index for vmcs12
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S234714AbhFRV5n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Jun 2021 17:57:43 -0400
+Received: from forward105o.mail.yandex.net (forward105o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::608])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18B4DC061760
+        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 14:55:33 -0700 (PDT)
+Received: from forward100q.mail.yandex.net (forward100q.mail.yandex.net [IPv6:2a02:6b8:c0e:4b:0:640:4012:bb97])
+        by forward105o.mail.yandex.net (Yandex) with ESMTP id F21844201896;
+        Sat, 19 Jun 2021 00:55:30 +0300 (MSK)
+Received: from vla1-faefe240866f.qloud-c.yandex.net (vla1-faefe240866f.qloud-c.yandex.net [IPv6:2a02:6b8:c0d:98f:0:640:faef:e240])
+        by forward100q.mail.yandex.net (Yandex) with ESMTP id EC8C97080002;
+        Sat, 19 Jun 2021 00:55:30 +0300 (MSK)
+Received: from vla5-3832771863b8.qloud-c.yandex.net (vla5-3832771863b8.qloud-c.yandex.net [2a02:6b8:c18:3417:0:640:3832:7718])
+        by vla1-faefe240866f.qloud-c.yandex.net (mxback/Yandex) with ESMTP id a9JpwdzLSo-tUHC5WxU;
+        Sat, 19 Jun 2021 00:55:30 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1624053330;
+        bh=97vijMOZ1VfUvPQYfr3RTIKvAyu4D0r6o/vMLP8vcOw=;
+        h=In-Reply-To:From:Date:References:To:Subject:Message-ID:Cc;
+        b=vqCRBcdxGNTr7QV9yWi3kjzZ3gTeZGyAPBjdFOxV9zYCAINNvnahY1i5g+YsAPKC4
+         7JxUzLhPrSRtit6CH9Y1crOcGvW7JRd5KoAVIBIb5l2JlYuP8H0Z5OQaenF6HOzleW
+         QpN8nPum87AxwaLi+RyszlSVTvotBtW2GG1CcPhU=
+Authentication-Results: vla1-faefe240866f.qloud-c.yandex.net; dkim=pass header.i=@yandex.ru
+Received: by vla5-3832771863b8.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id KBsLTu8ioB-tU30VpNI;
+        Sat, 19 Jun 2021 00:55:30 +0300
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (Client certificate not present)
+Subject: Re: guest/host mem out of sync on core2duo?
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
+References: <bd4a2d30-5fb4-3612-c855-946d97068b9a@yandex.ru>
+ <YMeMov42fihXptQm@google.com>
+ <73f1f90e-f952-45a4-184e-1aafb3e4a8fd@yandex.ru>
+ <YMtfQHGJL7XP/0Rq@google.com>
+ <23b00d8a-1732-0b0b-cd8d-e802f7aca87c@yandex.ru>
+ <CALMp9eSpJ8=O=6YExpOtdnA=gQkWfQJ+oz0bBcV4gOPFdnciVA@mail.gmail.com>
+From:   stsp <stsp2@yandex.ru>
+Message-ID: <ca311331-c862-eed6-22ff-a82f0806797f@yandex.ru>
+Date:   Sat, 19 Jun 2021 00:55:30 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <CALMp9eSpJ8=O=6YExpOtdnA=gQkWfQJ+oz0bBcV4gOPFdnciVA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Calculate the max VMCS index for vmcs12 by walking the array to find the
-actual max index.  Hardcoding the index is prone to bitrot, and the
-calculation is only done on KVM bringup (albeit on every CPU, but there
-aren't _that_ many null entries in the array).
+19.06.2021 00:07, Jim Mattson пишет:
+> On Fri, Jun 18, 2021 at 9:02 AM stsp <stsp2@yandex.ru> wrote:
+>
+>> Here it goes.
+>> But I studied it quite thoroughly
+>> and can't see anything obviously
+>> wrong.
+>>
+>>
+>> [7011807.029737] *** Guest State ***
+>> [7011807.029742] CR0: actual=0x0000000080000031,
+>> shadow=0x00000000e0000031, gh_mask=fffffffffffffff7
+>> [7011807.029743] CR4: actual=0x0000000000002041,
+>> shadow=0x0000000000000001, gh_mask=ffffffffffffe871
+>> [7011807.029744] CR3 = 0x000000000a709000
+>> [7011807.029745] RSP = 0x000000000000eff0  RIP = 0x000000000000017c
+>> [7011807.029746] RFLAGS=0x00080202         DR7 = 0x0000000000000400
+>> [7011807.029747] Sysenter RSP=0000000000000000 CS:RIP=0000:0000000000000000
+>> [7011807.029749] CS:   sel=0x0097, attr=0x040fb, limit=0x000001a0,
+>> base=0x0000000002110000
+>> [7011807.029751] DS:   sel=0x00f7, attr=0x0c0f2, limit=0xffffffff,
+>> base=0x0000000000000000
+> I believe DS is illegal. Per the SDM, Checks on Guest Segment Registers:
+>
+> * If the guest will not be virtual-8086, the different sub-fields are
+> considered separately:
+>    - Bits 3:0 (Type).
+>      * DS, ES, FS, GS. The following checks apply if the register is usable:
+>        - Bit 0 of the Type must be 1 (accessed).
 
-Fixes: 3c0f99366e34 ("KVM: nVMX: Add a TSC multiplier field in VMCS12")
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
+That seems to be it, thank you!
+At least for the minimal reproducer
+I've done.
 
-Note, the vmx test in kvm-unit-tests will still fail using stock QEMU,
-as QEMU also hardcodes and overwrites the MSR.  The test passes if I
-hack KVM to ignore userspace (it was easier than rebuilding QEMU).
+So only with unrestricted guest its
+possible to ignore that field?
 
- arch/x86/kvm/vmx/nested.c | 37 +++++++++++++++++++++++++++++++++++--
- arch/x86/kvm/vmx/vmcs.h   |  8 ++++++++
- arch/x86/kvm/vmx/vmcs12.h |  6 ------
- 3 files changed, 43 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index b531e08a095b..183fd9d62fc5 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -6374,6 +6374,40 @@ void nested_vmx_set_vmcs_shadowing_bitmap(void)
- 	}
- }
- 
-+/*
-+ * Indexing into the vmcs12 uses the VMCS encoding rotated left by 6.  Undo
-+ * that madness to get the encoding for comparison.
-+ */
-+#define VMCS12_IDX_TO_ENC(idx) ((u16)(((u16)(idx) >> 6) | ((u16)(idx) << 10)))
-+
-+static u64 nested_vmx_calc_vmcs_enum_msr(void)
-+{
-+	/*
-+	 * Note these are the so called "index" of the VMCS field encoding, not
-+	 * the index into vmcs12.
-+	 */
-+	unsigned int max_idx, idx;
-+	int i;
-+
-+	/*
-+	 * For better or worse, KVM allows VMREAD/VMWRITE to all fields in
-+	 * vmcs12, regardless of whether or not the associated feature is
-+	 * exposed to L1.  Simply find the field with the highest index.
-+	 */
-+	max_idx = 0;
-+	for (i = 0; i < nr_vmcs12_fields; i++) {
-+		/* The vmcs12 table is very, very sparsely populated. */
-+		if (!vmcs_field_to_offset_table[i])
-+			continue;
-+
-+		idx = vmcs_field_index(VMCS12_IDX_TO_ENC(i));
-+		if (idx > max_idx)
-+			max_idx = idx;
-+	}
-+
-+	return (u64)max_idx << VMCS_FIELD_INDEX_SHIFT;
-+}
-+
- /*
-  * nested_vmx_setup_ctls_msrs() sets up variables containing the values to be
-  * returned for the various VMX controls MSRs when nested VMX is enabled.
-@@ -6619,8 +6653,7 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
- 	rdmsrl(MSR_IA32_VMX_CR0_FIXED1, msrs->cr0_fixed1);
- 	rdmsrl(MSR_IA32_VMX_CR4_FIXED1, msrs->cr4_fixed1);
- 
--	/* highest index: VMX_PREEMPTION_TIMER_VALUE */
--	msrs->vmcs_enum = VMCS12_MAX_FIELD_INDEX << 1;
-+	msrs->vmcs_enum = nested_vmx_calc_vmcs_enum_msr();
- }
- 
- void nested_vmx_hardware_unsetup(void)
-diff --git a/arch/x86/kvm/vmx/vmcs.h b/arch/x86/kvm/vmx/vmcs.h
-index 1472c6c376f7..de3b04d4b587 100644
---- a/arch/x86/kvm/vmx/vmcs.h
-+++ b/arch/x86/kvm/vmx/vmcs.h
-@@ -164,4 +164,12 @@ static inline int vmcs_field_readonly(unsigned long field)
- 	return (((field >> 10) & 0x3) == 1);
- }
- 
-+#define VMCS_FIELD_INDEX_SHIFT		(1)
-+#define VMCS_FIELD_INDEX_MASK		GENMASK(9, 1)
-+
-+static inline unsigned int vmcs_field_index(unsigned long field)
-+{
-+	return (field & VMCS_FIELD_INDEX_MASK) >> VMCS_FIELD_INDEX_SHIFT;
-+}
-+
- #endif /* __KVM_X86_VMX_VMCS_H */
-diff --git a/arch/x86/kvm/vmx/vmcs12.h b/arch/x86/kvm/vmx/vmcs12.h
-index bb81a23afe89..5e0e1b39f495 100644
---- a/arch/x86/kvm/vmx/vmcs12.h
-+++ b/arch/x86/kvm/vmx/vmcs12.h
-@@ -205,12 +205,6 @@ struct __packed vmcs12 {
-  */
- #define VMCS12_SIZE		KVM_STATE_NESTED_VMX_VMCS_SIZE
- 
--/*
-- * VMCS12_MAX_FIELD_INDEX is the highest index value used in any
-- * supported VMCS12 field encoding.
-- */
--#define VMCS12_MAX_FIELD_INDEX 0x17
--
- /*
-  * For save/restore compatibility, the vmcs12 field offsets must not change.
-  */
--- 
-2.32.0.288.g62a8d224e6-goog
+> [7011807.029764] FS:   sel=0x0000, attr=0x10000, limit=0x00000000,
+> base=0x0000000000000000
+> [7011807.029765] GS:   sel=0x0000, attr=0x10000, limit=0x00000000,
+> base=0x0000000000000000
+> [7011807.029767] GDTR:                           limit=0x00000017,
+> base=0x000000000a708100
+> [7011807.029768] LDTR: sel=0x0010, attr=0x00082, limit=0x0000ffff,
+> base=0x000000000ab0a000
+> [7011807.029769] IDTR:                           limit=0x000007ff,
+> base=0x000000000a708200
+> [7011807.029770] TR:   sel=0x0010, attr=0x0008b, limit=0x00002088,
+> base=0x000000000a706000
+> It seems a bit odd that TR and LDTR are both 0x10,  but that's perfectly legal.
+
+This selector is fake.
+Our guest doesn't do LLDT or LTR,
+so we didn't care to even reserve
+the GDT entries for those.
 
