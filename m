@@ -2,87 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B41733AD45A
-	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 23:20:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1C5D3AD476
+	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 23:37:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232536AbhFRVWj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Jun 2021 17:22:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53890 "EHLO
+        id S234570AbhFRVjd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Jun 2021 17:39:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231631AbhFRVWd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Jun 2021 17:22:33 -0400
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98071C061574
-        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 14:20:22 -0700 (PDT)
-Received: by mail-ot1-x329.google.com with SMTP id 5-20020a9d01050000b02903c700c45721so11049992otu.6
-        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 14:20:22 -0700 (PDT)
+        with ESMTP id S233617AbhFRVjc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Jun 2021 17:39:32 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41F1EC061574;
+        Fri, 18 Jun 2021 14:37:22 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id h12so8754248pfe.2;
+        Fri, 18 Jun 2021 14:37:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=9lgU/PMWeQeUbCd3XE0jzHQ9dorLgAsc49ujOL35SEU=;
-        b=GzBgZ4E84z3ZOlgfz9osCY0uVbPfDfg91HIzGAbwashIBb2RG8gUXUHeYvzgvJu9VH
-         FaecV8qk+evG0P3FUGbn4tilFeHYzxj3MlzpAeRin4IzhJ/6L//Xc6T7uEERcN/hwd/Z
-         Nc6z+TBd6Yr6XuvAAZ1eGuoT0PDDnRQIw0kX7Klq/lx2pmafHvyoz8qJoUU3BJ002sTF
-         4d5clG5zABOfXhuLo4OVxNY3RQsA8zIFYkOQCBkgxh7bkVXDmbRd1KsTB9ZiGh1Yxdlc
-         mYeOvBFUh+/eijE7EL4ffif2pgqODA99ov5Q7lbAca5Zaudr/nREItCmna7MIHKETWFC
-         S9iw==
+        bh=5F0/o83rPn6kF1SWIHORQRDoAw20SA/iZS1LAUQxvto=;
+        b=e1TuHTIi91aVzlQxa54+NMMojBj3bHrti5EbzZ2htrtS2SdCleDjpi9LQ1qjPMURp1
+         trsZXQdDdJEsShqcokOI+7xzBJgmrEHEoIlBTyEPhm6i16Cg/WhNPstTBMIlMW6NC3rk
+         D3xEIUOe72C89Mlc2Z+Q461rQPLfrh2v0claYeiR1qaGQIaEgnRtlT3O6sgmkOZPBJFk
+         9l1UVEg+zlbTQWfLXUSLAsZo9sUP6Tup9TJW2MESA0ogsFiZ6nydsX4NTtSmTKazIj3r
+         0q7a1kY1UwizmVrlzoI5xo37fX5gMQZUfincvWoqf5YAeBpdJ6A6gBLmkGRgudNJVsYy
+         1z2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=9lgU/PMWeQeUbCd3XE0jzHQ9dorLgAsc49ujOL35SEU=;
-        b=Rb3JNCE2RA01AaE2meS20WeYJ6vie9du3eM81uy4a/ZaWoUc5e/a8tphOuSZOxWNhS
-         45fPtfw6WpPMA4LzqtJi8zIMh8iFyn1EXGT/npnjlDlbamMA8vlMcLZyJ9JVCrEdYwtL
-         +5rfj1Fb1h/8DP596K147luFifwP/VQMsH8vvsCtjRnPFI8zSKoPoZkooR6l8py38KUH
-         AuFzZrRG9G1aovyU0PGx5rNRmcYeEdRa6RyQXQo7h/GbW0Jpe48HPZHJoAd1vlR1LC0+
-         2teIvSGYPjI34Jw8biOrp5F1k1xtwOsT22oKhbqWAU0VvDet+huVZWodBsCLXZmNOSHl
-         aJIQ==
-X-Gm-Message-State: AOAM530pIF0tseVWRYlgOSTiw7aNGtUIhJno9Sx0HnoOKua5rSbRFhDK
-        trhUzk/94GNyscB3U76XW41WEVsl2pxsObNGZaU=
-X-Google-Smtp-Source: ABdhPJwyjgUUV11wJ0gms1NAz7TjBOaHPz5GI4ofwlF+2UnFBFvBeGxrrDaYWqIAcDV5YYTNjA09oc7TRvZSGUbbGRs=
-X-Received: by 2002:a05:6830:2241:: with SMTP id t1mr11535635otd.123.1624051222032;
- Fri, 18 Jun 2021 14:20:22 -0700 (PDT)
+        bh=5F0/o83rPn6kF1SWIHORQRDoAw20SA/iZS1LAUQxvto=;
+        b=I4lJMjq6h+nhvnUNv7rmA2zCj1a9MqiT6+e5MtJi4IqLh4jiUpThkCFRCPPdcy/yge
+         1Dmw0C/3GJ4HPGwaZcWdNYg4oyFHEdjTqbVcCdJNv4HbUBwG58rmE8IEWONQt4hG5+/D
+         lfj/6QL3anq0/cYiGQBSYw8i2/NvNbR/wuQ8qYuu0tfPxAoKgocSxytECCXMA88OErzA
+         HipPHR6yci8NHb9M4JVIWpHMb0ufU5ACQZYTbiFo4fHWJjdwZrvovzJRXyTIKsH/jEMz
+         2BCYXqGY5/AYbZSSWWCDVXFFXA1fS0hWEgChtMwfLiujFNNOQIw+gmr9KqrTRZQTXqq6
+         Q46g==
+X-Gm-Message-State: AOAM530FCa8UL+YfyYJlvt6YIsVBAQ6ylspZSkTTVSKMaxKHWadrCslu
+        kT/Oe6ER1PfsEbzb9eqFh/Hjk1mu7kbuAqAWnjk=
+X-Google-Smtp-Source: ABdhPJzgINR5Oh3qoN1vLBU6Th3toYjPFxtFBsXuIsw5EDHoYPGLW5qODh63bC9YBhL5jv8xT7nPgu6ZI8HoDswqovU=
+X-Received: by 2002:a63:b00d:: with SMTP id h13mr11949770pgf.74.1624052241679;
+ Fri, 18 Jun 2021 14:37:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210618113118.70621-1-laramglazier@gmail.com>
- <ca3ca9a0-f6be-be85-b2a1-5f80dd9dd693@oracle.com> <CANX1H+3LC1FrGaJ+eo-FQnjHr8-VYAQJVW0j5H33x-hBAemGDA@mail.gmail.com>
- <CALMp9eT+2kCSGb5=N5cc=OeH1uPFuxDtpjLn=av5DA3oTxqm9g@mail.gmail.com>
- <CANX1H+2YUt6wF7P=jNBpfzJEnjz7Yz=Y8K_hWTwvYYbNb-vV2A@mail.gmail.com> <CALMp9eRDkfHHmRuRuRabRLcNBhudJwb+mhE=WD2tVR016Yq58w@mail.gmail.com>
-In-Reply-To: <CALMp9eRDkfHHmRuRuRabRLcNBhudJwb+mhE=WD2tVR016Yq58w@mail.gmail.com>
-From:   Lara Lazier <laramglazier@gmail.com>
-Date:   Fri, 18 Jun 2021 23:20:10 +0200
-Message-ID: <CANX1H+0M5+TS8gaOoi7_dUii0m_2h6rqORer0h3FvErk0hRLxA@mail.gmail.com>
-Subject: Re: [PATCH kvm-unit-tests] svm: Updated cr4 in test_efer to fix
- report msg
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
+References: <20210618143854.62967-1-andriy.shevchenko@linux.intel.com> <YMz80O2mkEWyl2Xx@yury-ThinkPad>
+In-Reply-To: <YMz80O2mkEWyl2Xx@yury-ThinkPad>
+From:   Andy Shevchenko <andy.shevchenko@gmail.com>
+Date:   Sat, 19 Jun 2021 00:36:44 +0300
+Message-ID: <CAHp75Veti-7h=BoH9ZXXPMS1e8gq3rb19QS4TAB1J33GTdLKRg@mail.gmail.com>
+Subject: Re: [PATCH v1 1/1] tools: Rename bitmap_alloc() to bitmap_zalloc()
+To:     Yury Norov <yury.norov@gmail.com>
+Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Ian Rogers <irogers@google.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Leo Yan <leo.yan@linaro.org>, Jiri Olsa <jolsa@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Yury Norov <ynorov@caviumnetworks.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am Fr., 18. Juni 2021 um 23:10 Uhr schrieb Jim Mattson <jmattson@google.com>:
+On Fri, Jun 18, 2021 at 11:11 PM Yury Norov <yury.norov@gmail.com> wrote:
 >
-> On Fri, Jun 18, 2021 at 1:57 PM Lara Lazier <laramglazier@gmail.com> wrote:
-> >
-> > Am Fr., 18. Juni 2021 um 22:26 Uhr schrieb Jim Mattson <jmattson@google.com>:
-> > >
-> > > On Fri, Jun 18, 2021 at 12:59 PM Lara Lazier <laramglazier@gmail.com> wrote:
-> > >
-> > > > My understanding is as follows:
-> > > > The "first" test should succeed with an SVM_EXIT_ERR when EFER.LME and
-> > > > CR0.PG are both
-> > > > non-zero and CR0.PE is zero (so I believe we do not really care
-> > > > whether CR4.PAE is set or not though
-> > > > I might be overlooking something here).
-> > >
-> > > You are overlooking the fact that the test will fail if CR4.PAE is
-> > > clear. If CR4.PAE is 0 *and* CR0.PE is 0, then you can't be sure which
-> > > one triggered the failure.
-> > Oh, yes that makes sense! Thank you for the explanation.
-> > I will move it back up.
+> On Fri, Jun 18, 2021 at 05:38:54PM +0300, Andy Shevchenko wrote:
+> > Rename bitmap_alloc() to bitmap_zalloc() in tools to follow new coming
+> > bitmap API extension in kernel.
 >
-> I think this may be subtle enough to warrant a comment as well, if
-> you're so inclined.
+> Can you please tell more about the new coming extensions?
 
-Sure, I will add a corresponding comment.
+Ah, this is outdated text. It was about the time when bitmap_*alloc()
+was introduced in the kernel.
+
+> Anyways,
+> Acked-by: Yury Norov <ynorov@caviumnetworks.com>
+>
+> All bitmap patches together can be found here:
+> https://github.com/norov/linux/commits/bm-f1
+
+Should I resend with that fixed (I have also noticed that your address
+in Suggested-by is outdated)?
+
+-- 
+With Best Regards,
+Andy Shevchenko
