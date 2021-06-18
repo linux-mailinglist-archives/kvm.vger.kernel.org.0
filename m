@@ -2,119 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B14F03AD500
-	for <lists+kvm@lfdr.de>; Sat, 19 Jun 2021 00:26:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA11E3AD506
+	for <lists+kvm@lfdr.de>; Sat, 19 Jun 2021 00:27:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234949AbhFRW2U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Jun 2021 18:28:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40400 "EHLO
+        id S234956AbhFRW3Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Jun 2021 18:29:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234103AbhFRW2U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Jun 2021 18:28:20 -0400
-Received: from forward105o.mail.yandex.net (forward105o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::608])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D21C4C061574
-        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 15:26:09 -0700 (PDT)
-Received: from forward103q.mail.yandex.net (forward103q.mail.yandex.net [IPv6:2a02:6b8:c0e:50:0:640:b21c:d009])
-        by forward105o.mail.yandex.net (Yandex) with ESMTP id 01E204201711;
-        Sat, 19 Jun 2021 01:26:08 +0300 (MSK)
-Received: from vla1-9bfbcecd0651.qloud-c.yandex.net (vla1-9bfbcecd0651.qloud-c.yandex.net [IPv6:2a02:6b8:c0d:4591:0:640:9bfb:cecd])
-        by forward103q.mail.yandex.net (Yandex) with ESMTP id F0ADE61E0002;
-        Sat, 19 Jun 2021 01:26:07 +0300 (MSK)
-Received: from vla5-3832771863b8.qloud-c.yandex.net (vla5-3832771863b8.qloud-c.yandex.net [2a02:6b8:c18:3417:0:640:3832:7718])
-        by vla1-9bfbcecd0651.qloud-c.yandex.net (mxback/Yandex) with ESMTP id Vc0Sp8xEeQ-Q7HiOqpg;
-        Sat, 19 Jun 2021 01:26:07 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1624055167;
-        bh=NH3RyQeT5sw3yYqyLnAOqva3rhV6ae9khfvH9hoOyBM=;
-        h=In-Reply-To:From:Date:References:To:Subject:Message-ID:Cc;
-        b=BhEt4J59G0DK3nVfUMV9tEHFZUA3eTpwE7Waf9k/Vva4kHj+Ld4cMOkgVsctonUNE
-         dMogKV95a/qmfnJ+nOuVt+mLu73giIA0HVDypb05JGR8QS/Mtq0d6Jv/FjfkoaoT8K
-         nlRa9yUVs9TvncjF8I5ovRJYlrzRrmOjd2EP9k2s=
-Authentication-Results: vla1-9bfbcecd0651.qloud-c.yandex.net; dkim=pass header.i=@yandex.ru
-Received: by vla5-3832771863b8.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id S2QL6kS1QU-Q738r0md;
-        Sat, 19 Jun 2021 01:26:07 +0300
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (Client certificate not present)
-Subject: Re: guest/host mem out of sync on core2duo?
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        kvm list <kvm@vger.kernel.org>
-References: <bd4a2d30-5fb4-3612-c855-946d97068b9a@yandex.ru>
- <YMeMov42fihXptQm@google.com>
- <73f1f90e-f952-45a4-184e-1aafb3e4a8fd@yandex.ru>
- <YMtfQHGJL7XP/0Rq@google.com>
- <23b00d8a-1732-0b0b-cd8d-e802f7aca87c@yandex.ru>
- <CALMp9eSpJ8=O=6YExpOtdnA=gQkWfQJ+oz0bBcV4gOPFdnciVA@mail.gmail.com>
- <ca311331-c862-eed6-22ff-a82f0806797f@yandex.ru>
- <CALMp9eQxys64U-r5xdF_wdunqn8ynBoOBPRDSjTDMh-gF3EEpg@mail.gmail.com>
-From:   stsp <stsp2@yandex.ru>
-Message-ID: <e2efcbcb-a0cb-999b-b81e-4721f3b41775@yandex.ru>
-Date:   Sat, 19 Jun 2021 01:26:07 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <CALMp9eQxys64U-r5xdF_wdunqn8ynBoOBPRDSjTDMh-gF3EEpg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+        with ESMTP id S234955AbhFRW3Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Jun 2021 18:29:24 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B5B3C061768
+        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 15:27:13 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id o11-20020a62f90b0000b02902db3045f898so6494386pfh.23
+        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 15:27:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=Rfo1W3uIN+oXhpQ4fFbpzg3hhziXATDdq5mP9Sy8YmE=;
+        b=aIYN4+wVVAkm16BxMrsAIblZurqsWDq1k5rpZKYzrpPVtnjJooCxHt+wvHKu/vmUXT
+         tzRsVJb2kPXWI/iihrS2Q6RnhUZ6g4QZXgEEBLP556HTfjvzXKT9Jyf+uc/U1P0GzogT
+         VoRq4kVv9Tu4cSCrt47bOaSueq1yP0Cqh8UQHk+O9WqEHf5jZyK/xxfcfiG5eAGJS3Cu
+         MWl11xl4UjW3wELOFkYJwjjDSaAW5ZJLIR8tf+1hmcX8/36Z0/QvwJeS6CgkUbGo4nQE
+         mvz5bzypgVY1WSBO4fjKCbig37vmOW+gMDXLlrsLKtFD/NuEG0ImluxQrtNM5gp5SHa4
+         eRcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=Rfo1W3uIN+oXhpQ4fFbpzg3hhziXATDdq5mP9Sy8YmE=;
+        b=tYJGs4zybgG/wbwycs1o9wZ4OiR8zhX5oml9NEwkMqNUrvkUd47HK1F+sYmqyhkvnn
+         tFb3s1OxR0yr4IeBj5PtgPBoRI2sHW/k3o0xuBWHwxkBVyfZc8FRddqFwzXx+owzt0rL
+         V9ha2xrPAdUbUCGiiHtYVbGRBhI/Oja5PXryWEeYgp1Ev6Ideku8Ecwb3f61Es08ujN9
+         5oVlRUAg/kwSHNvqJU8qoDADK0YF5JmpOs8SN/UY0dZ/86TqR+4W3TWNRQtn77Uy6nMd
+         ztzzn+2Qy4NJuXW1HI0k3OViZYslfu2af7ZumOdBAB0/FFXAkPBOytz+3wQyysbc4wYZ
+         KvMw==
+X-Gm-Message-State: AOAM533TqIOh4DWEDRd9ZBlAbf8FbrukdZFUHgBzTmIdN0TGlKxBNSM3
+        TedITaQktYhiFAa2YwlbmMCncyiRiP1E8lEqN9KmjW9ofstKE3XaX3rULzqbdju74/o+mKBxynu
+        nDUGNtoDWeWLQ82gzNprWbsHLm5tZqkcbE2SJRb4L9b3ztIMS7aiH6CX5YUM5fa1F8B9ATnY=
+X-Google-Smtp-Source: ABdhPJxq7gZzEkJhd70zVlEMr7IlzZeL5JxVSf0DCO+Q9uRpodXSo9AqnAN/jRwaShxfxk4IPXPUTJbxDu62WSfIEw==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a17:902:e04f:b029:eb:66b0:6d08 with
+ SMTP id x15-20020a170902e04fb02900eb66b06d08mr6816032plx.50.1624055232365;
+ Fri, 18 Jun 2021 15:27:12 -0700 (PDT)
+Date:   Fri, 18 Jun 2021 22:27:02 +0000
+Message-Id: <20210618222709.1858088-1-jingzhangos@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.288.g62a8d224e6-goog
+Subject: [PATCH v12 0/7] KVM statistics data fd-based binary interface
+From:   Jing Zhang <jingzhangos@google.com>
+To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Fuad Tabba <tabba@google.com>,
+        Greg KH <gregkh@linuxfoundation.org>
+Cc:     Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-19.06.2021 01:06, Jim Mattson пишет:
-> On Fri, Jun 18, 2021 at 2:55 PM stsp <stsp2@yandex.ru> wrote:
->> 19.06.2021 00:07, Jim Mattson пишет:
->>> On Fri, Jun 18, 2021 at 9:02 AM stsp <stsp2@yandex.ru> wrote:
->>>
->>>> Here it goes.
->>>> But I studied it quite thoroughly
->>>> and can't see anything obviously
->>>> wrong.
->>>>
->>>>
->>>> [7011807.029737] *** Guest State ***
->>>> [7011807.029742] CR0: actual=0x0000000080000031,
->>>> shadow=0x00000000e0000031, gh_mask=fffffffffffffff7
->>>> [7011807.029743] CR4: actual=0x0000000000002041,
->>>> shadow=0x0000000000000001, gh_mask=ffffffffffffe871
->>>> [7011807.029744] CR3 = 0x000000000a709000
->>>> [7011807.029745] RSP = 0x000000000000eff0  RIP = 0x000000000000017c
->>>> [7011807.029746] RFLAGS=0x00080202         DR7 = 0x0000000000000400
->>>> [7011807.029747] Sysenter RSP=0000000000000000 CS:RIP=0000:0000000000000000
->>>> [7011807.029749] CS:   sel=0x0097, attr=0x040fb, limit=0x000001a0,
->>>> base=0x0000000002110000
->>>> [7011807.029751] DS:   sel=0x00f7, attr=0x0c0f2, limit=0xffffffff,
->>>> base=0x0000000000000000
->>> I believe DS is illegal. Per the SDM, Checks on Guest Segment Registers:
->>>
->>> * If the guest will not be virtual-8086, the different sub-fields are
->>> considered separately:
->>>     - Bits 3:0 (Type).
->>>       * DS, ES, FS, GS. The following checks apply if the register is usable:
->>>         - Bit 0 of the Type must be 1 (accessed).
->> That seems to be it, thank you!
->> At least for the minimal reproducer
->> I've done.
->>
->> So only with unrestricted guest its
->> possible to ignore that field?
-> The VM-entry constraints are the same with unrestricted guest.
->
-> Note that *without* unrestricted guest, kvm will generally have to
-> emulate the early guest protected mode code--until the last vestiges
-> of real-address mode are purged from the descriptor cache. Maybe it
-> fails to set the accessed bits in the LDT on emulated segment register
-> loads?
-I believe this is where the KVM_SET_SREGS
-difference kicks in. When the segregs are
-loaded in guest's ring0, there is no problem.
-Likely in this case the accessed bit is properly
-set.
-But if we bypass the ring0 trampoline, then
-the just created new LDT entry doesn't yet
-have the accessed bit, and that propagates
-to KVM_SET_SREGS. I believe I should just
-force the accessed bit for KVM_SET_SREGS?
+This patchset provides a file descriptor for every VM and VCPU to read
+KVM statistics data in binary format.
+It is meant to provide a lightweight, flexible, scalable and efficient
+lock-free solution for user space telemetry applications to pull the
+statistics data periodically for large scale systems. The pulling
+frequency could be as high as a few times per second.
+In this patchset, every statistics data are treated to have some
+attributes as below:
+  * architecture dependent or generic
+  * VM statistics data or VCPU statistics data
+  * type: cumulative, instantaneous, peak
+  * unit: none for simple counter, nanosecond, microsecond,
+    millisecond, second, Byte, KiByte, MiByte, GiByte, Clock Cycles
+Since no lock/synchronization is used, the consistency between all
+the statistics data is not guaranteed. That means not all statistics
+data are read out at the exact same time, since the statistics data
+are still being updated by KVM subsystems while they are read out.
 
-But there is no such problem if unrestricted
-guest is available, so not everything is yet
-clear.
+---
+
+* v11 -> v12
+  - Revised the structure kvm_stats_header and corresponding code by
+    Paolo's suggestion. Move the id string out of header.
+  - Define stats header and stats descriptors as const.
+  - Update some comments by Greg's review.
+
+* v10 -> v11
+  - Rebase to kvm/queue, commit f1b832550832
+    (KVM: x86/mmu: Fix TDP MMU page table level)
+  - Separate binary stats implementation commit
+  - Use flexible length array member field in API structure instead of
+    zero-length array member field
+  - Move major binary stats reading function in a separate source file
+  - Move stats id string into vm/vcpu structures
+  - Add some detailed comments and update commit messages
+  - Addressed some other review comments from Greg K.H. and Paolo.
+
+* v9 -> v10
+  - Relocate vcpu stat in vcpu's slab's usercopy region
+  - Fix test issue for capability checking
+  - Update commit message to explain why/how we need to add this new
+    API for KVM statistics
+
+* v8 -> v9
+  - Rebase to commit 8331a2bc0898
+    (KVM: X86: Introduce KVM_HC_MAP_GPA_RANGE hypercall)
+  - Reduce code duplication between binary and debugfs interface
+  - Add field "offset" in stats descriptor to let us define stats
+    descriptors in any order (not necessary in the order of stats
+    defined in vm/vcpu stats structures)
+  - Add static check to make sure the number of stats descriptors
+    is the same as the number of stats defined in vm/vcpu stats
+    structures
+  - Fix missing/mismatched stats descriptor definition caused by
+    rebase
+
+* v7 -> v8
+  - Rebase to kvm/queue, commit c1dc20e254b4 ("KVM: switch per-VM
+  stats to u64")
+  - Revise code to reflect the per-VM stats type from ulong to u64
+  - Addressed some other nits
+
+* v6 -> v7
+  - Improve file descriptor allocation function by Krish suggestion
+  - Use "generic stats" instead of "common stats" as Krish suggested
+  - Addressed some other nits from Krish and David Matlack
+
+* v5 -> v6
+  - Use designated initializers for STATS_DESC
+  - Change KVM_STATS_SCALE... to KVM_STATS_BASE...
+  - Use a common function for kvm_[vm|vcpu]_stats_read
+  - Fix some documentation errors/missings
+  - Use TEST_ASSERT in selftest
+  - Use a common function for [vm|vcpu]_stats_test in selftest
+
+* v4 -> v5
+  - Rebase to kvm/queue, commit a4345a7cecfb ("Merge tag
+    'kvmarm-fixes-5.13-1'")
+  - Change maximum stats name length to 48
+  - Replace VM_STATS_COMMON/VCPU_STATS_COMMON macros with stats
+    descriptor definition macros.
+  - Fixed some errors/warnings reported by checkpatch.pl
+
+* v3 -> v4
+  - Rebase to kvm/queue, commit 9f242010c3b4 ("KVM: avoid "deadlock"
+    between install_new_memslots and MMU notifier")
+  - Use C-stype comments in the whole patch
+  - Fix wrong count for x86 VCPU stats descriptors
+  - Fix KVM stats data size counting and validity check in selftest
+
+* v2 -> v3
+  - Rebase to kvm/queue, commit edf408f5257b ("KVM: avoid "deadlock"
+    between install_new_memslots and MMU notifier")
+  - Resolve some nitpicks about format
+
+* v1 -> v2
+  - Use ARRAY_SIZE to count the number of stats descriptors
+  - Fix missing `size` field initialization in macro STATS_DESC
+
+[1] https://lore.kernel.org/kvm/20210402224359.2297157-1-jingzhangos@google.com
+[2] https://lore.kernel.org/kvm/20210415151741.1607806-1-jingzhangos@google.com
+[3] https://lore.kernel.org/kvm/20210423181727.596466-1-jingzhangos@google.com
+[4] https://lore.kernel.org/kvm/20210429203740.1935629-1-jingzhangos@google.com
+[5] https://lore.kernel.org/kvm/20210517145314.157626-1-jingzhangos@google.com
+[6] https://lore.kernel.org/kvm/20210524151828.4113777-1-jingzhangos@google.com
+[7] https://lore.kernel.org/kvm/20210603211426.790093-1-jingzhangos@google.com
+[8] https://lore.kernel.org/kvm/20210611124624.1404010-1-jingzhangos@google.com
+[9] https://lore.kernel.org/kvm/20210614212155.1670777-1-jingzhangos@google.com
+[10] https://lore.kernel.org/kvm/20210617044146.2667540-1-jingzhangos@google.com
+[11] https://lore.kernel.org/kvm/20210618044819.3690166-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (7):
+  KVM: stats: Separate generic stats from architecture specific ones
+  KVM: stats: Add fd-based API to read binary stats data
+  KVM: stats: Support binary stats retrieval for a VM
+  KVM: stats: Support binary stats retrieval for a VCPU
+  KVM: stats: Add documentation for binary statistics interface
+  KVM: selftests: Add selftest for KVM statistics data binary interface
+  KVM: stats: Remove code duplication for binary and debugfs stats
+
+ Documentation/virt/kvm/api.rst                | 198 ++++++++++++++-
+ arch/arm64/include/asm/kvm_host.h             |   9 +-
+ arch/arm64/kvm/Makefile                       |   2 +-
+ arch/arm64/kvm/guest.c                        |  48 ++--
+ arch/mips/include/asm/kvm_host.h              |   9 +-
+ arch/mips/kvm/Makefile                        |   2 +-
+ arch/mips/kvm/mips.c                          |  90 ++++---
+ arch/powerpc/include/asm/kvm_host.h           |   9 +-
+ arch/powerpc/kvm/Makefile                     |   2 +-
+ arch/powerpc/kvm/book3s.c                     |  91 ++++---
+ arch/powerpc/kvm/book3s_hv.c                  |  12 +-
+ arch/powerpc/kvm/book3s_pr.c                  |   2 +-
+ arch/powerpc/kvm/book3s_pr_papr.c             |   2 +-
+ arch/powerpc/kvm/booke.c                      |  76 ++++--
+ arch/s390/include/asm/kvm_host.h              |   9 +-
+ arch/s390/kvm/Makefile                        |   3 +-
+ arch/s390/kvm/kvm-s390.c                      | 232 +++++++++--------
+ arch/x86/include/asm/kvm_host.h               |   9 +-
+ arch/x86/kvm/Makefile                         |   2 +-
+ arch/x86/kvm/x86.c                            | 109 ++++----
+ include/linux/kvm_host.h                      | 182 ++++++++++++--
+ include/linux/kvm_types.h                     |  14 ++
+ include/uapi/linux/kvm.h                      |  73 ++++++
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   3 +
+ .../selftests/kvm/kvm_binary_stats_test.c     | 234 ++++++++++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  12 +
+ virt/kvm/binary_stats.c                       | 144 +++++++++++
+ virt/kvm/kvm_main.c                           | 218 +++++++++++++---
+ 30 files changed, 1443 insertions(+), 357 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/kvm_binary_stats_test.c
+ create mode 100644 virt/kvm/binary_stats.c
+
+
+base-commit: f1b8325508327a302f1d5cd8a4bf51e2c9c72fa9
+-- 
+2.32.0.288.g62a8d224e6-goog
+
