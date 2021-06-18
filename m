@@ -2,116 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DAD103AD3BD
-	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 22:40:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8DD03AD3C9
+	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 22:42:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233859AbhFRUmV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Jun 2021 16:42:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53798 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232739AbhFRUmU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 18 Jun 2021 16:42:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624048810;
+        id S233999AbhFRUpB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Jun 2021 16:45:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45188 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233859AbhFRUov (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Jun 2021 16:44:51 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D2E0C061574;
+        Fri, 18 Jun 2021 13:42:41 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1624048959;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=5qKEO77u/d1G0OLkye+TPueIkTEWwNLFmRctaFbVPAk=;
-        b=CzbJb/nBCvzFpIXbES/espgokbb3w9JbnoQGkJQWkrPHQpjP9ZjA7ipEWavaGvMrqMn6qh
-        jcHvm2H1hyEtJxytjEW5mNXS8NIeIcPim20xb15c7TKGM7p0mGkclTfbD8uhoTf3WSXXkB
-        5G0dVfmngGDKBS/7reMbR8/Njk+U18U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-525-D2oycs5KOGWAPiVVIq8RiA-1; Fri, 18 Jun 2021 16:40:09 -0400
-X-MC-Unique: D2oycs5KOGWAPiVVIq8RiA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1130D9F92B;
-        Fri, 18 Jun 2021 20:40:08 +0000 (UTC)
-Received: from localhost (unknown [10.22.9.9])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7895F175B5;
-        Fri, 18 Jun 2021 20:40:07 +0000 (UTC)
-Date:   Fri, 18 Jun 2021 16:40:06 -0400
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     Markus Armbruster <armbru@redhat.com>
-Cc:     Claudio Fontana <cfontana@suse.de>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-        kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        qemu-devel@nongnu.org,
-        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
-        Denis Lunev <den@openvz.org>,
+        bh=viaF2+vzF8yGuceHiGdcXmR+KhaApSpPdBORO7fsb08=;
+        b=ezsxCMn96b+2rHdzRATVpDVBpAYMddpcAvBC98rFOdITrLchNFKuyjWGTqiD/peJdjfyZo
+        9uA2SACZ7MDy7RW/rBDSPjsl2GGYfeESMBAKGPmDMR4ZLxDMQmS9JRSgoiTdHgKzEYCA7D
+        0fAwkVCTrOBU59v1jzl5McNQQNJ3p/rhehvTGnWJEzlHBUzdoN7aS303gjP3spWP7G5SWh
+        ok/HPjFbxtVYnv1cMLG8UEqBdXEujEWCyqYYoB7pWpTPWqBlc8VdE/cR1EqGjaCBnteb3s
+        iVmZgxZGlmKicLxoqfVSOyzZNaJs/Rs1Ug91LJmtPT/PUyTsAQAPvUaoSq+7Vw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1624048959;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=viaF2+vzF8yGuceHiGdcXmR+KhaApSpPdBORO7fsb08=;
+        b=vMq4tRHu7ixDGl3mtG0JpRgtNMAsZHXhoKJUnNyvBYVWnj1SLFxNFsZoD5kQMCDWRCTerB
+        6JPjgWDDW4WzKbBQ==
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>
+Cc:     Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Jens Axboe <axboe@kernel.dk>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Felipe Balbi <balbi@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jason Wessel <jason.wessel@windriver.com>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, Will Deacon <will@kernel.org>,
+        Waiman Long <longman@redhat.com>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Oleg Nesterov <oleg@redhat.com>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v9] qapi: introduce 'query-kvm-cpuid' action
-Message-ID: <20210618204006.k6krwuz2lpxvb6uh@habkost.net>
-References: <20210603090753.11688-1-valeriy.vdovin@virtuozzo.com>
- <87im2d6p5v.fsf@dusky.pond.sub.org>
- <20210617074919.GA998232@dhcp-172-16-24-191.sw.ru>
- <87a6no3fzf.fsf@dusky.pond.sub.org>
- <790d22e1-5de9-ba20-6c03-415b62223d7d@suse.de>
- <877dis1sue.fsf@dusky.pond.sub.org>
- <20210617153949.GA357@dhcp-172-16-24-191.sw.ru>
- <e69ea2b4-21cc-8203-ad2d-10a0f4ffe34a@suse.de>
- <20210617165111.eu3x2pvinpoedsqj@habkost.net>
- <87sg1fwwgg.fsf@dusky.pond.sub.org>
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, cgroups@vger.kernel.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        linux-perf-users@vger.kernel.org, linux-pm@vger.kernel.org,
+        rcu@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 5/6] sched,timer: Use __set_current_state()
+In-Reply-To: <20210602133040.524487671@infradead.org>
+References: <20210602131225.336600299@infradead.org> <20210602133040.524487671@infradead.org>
+Date:   Fri, 18 Jun 2021 22:42:38 +0200
+Message-ID: <87sg1eewg1.ffs@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87sg1fwwgg.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 18, 2021 at 07:52:47AM +0200, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
-> 
-> > On Thu, Jun 17, 2021 at 05:53:11PM +0200, Claudio Fontana wrote:
-> >> On 6/17/21 5:39 PM, Valeriy Vdovin wrote:
-> >> > On Thu, Jun 17, 2021 at 04:14:17PM +0200, Markus Armbruster wrote:
-> >> >> Claudio Fontana <cfontana@suse.de> writes:
-> >> >>
-> >> >>> On 6/17/21 1:09 PM, Markus Armbruster wrote:
-> 
-> [...]
-> 
-> >> >>>> If it just isn't implemented for anything but KVM, then putting "kvm"
-> >> >>>> into the command name is a bad idea.  Also, the commit message should
-> >> >>>> briefly note the restriction to KVM.
-> >> >>
-> >> >> Perhaps this one is closer to reality.
-> >> >>
-> >> > I agree.
-> >> > What command name do you suggest?
-> >> 
-> >> query-exposed-cpuid?
-> >
-> > Pasting the reply I sent at [1]:
-> >
-> >   I don't really mind how the command is called, but I would prefer
-> >   to add a more complex abstraction only if maintainers of other
-> >   accelerators are interested and volunteer to provide similar
-> >   functionality.  I don't want to introduce complexity for use
-> >   cases that may not even exist.
-> >
-> > I'm expecting this to be just a debugging mechanism, not a stable
-> > API to be maintained and supported for decades.  (Maybe a "x-"
-> > prefix should be added to indicate that?)
-> >
-> > [1] https://lore.kernel.org/qemu-devel/20210602204604.crsxvqixkkll4ef4@habkost.net
-> 
-> x-query-x86_64-cpuid?
-> 
+On Wed, Jun 02 2021 at 15:12, Peter Zijlstra wrote:
+> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 
-Unless somebody wants to spend time designing a generic
-abstraction around this (and justify the extra complexity), this
-is a KVM-specific command.  Is there a reason to avoid "kvm" in
-the command name?
-
--- 
-Eduardo
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 
