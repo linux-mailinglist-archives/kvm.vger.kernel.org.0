@@ -2,74 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 595D13AC8DC
-	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 12:31:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81EA63AC8E0
+	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 12:32:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233664AbhFRKd4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Jun 2021 06:33:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53342 "EHLO
+        id S233700AbhFRKeZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Jun 2021 06:34:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29157 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232347AbhFRKdz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 18 Jun 2021 06:33:55 -0400
+        by vger.kernel.org with ESMTP id S233746AbhFRKeR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 18 Jun 2021 06:34:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624012305;
+        s=mimecast20190719; t=1624012328;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1kxjjVfDr06FdqvB+NtA55I89EuxwDAZ4o8llHKwLkQ=;
-        b=RpRwBMC1FYknOtlPAOxPj60N/9Q6qkwveksJU4sYZF/vw8uPsJJuwDxx6dGkr4HB1yERha
-        h13HW3sDdO0VcjIo3RQSpP4LsP1Ez/yUcFOVeX4fe1645QKqQsChySlvxptWEZEMuMHsLo
-        ou43c+p3oQVVS+xNdfXh9bs384yGYBk=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-546-PoaSETvkNNCXPctyvXdADA-1; Fri, 18 Jun 2021 06:31:44 -0400
-X-MC-Unique: PoaSETvkNNCXPctyvXdADA-1
-Received: by mail-ed1-f69.google.com with SMTP id v12-20020aa7dbcc0000b029038fc8e57037so3339765edt.0
-        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 03:31:44 -0700 (PDT)
+        bh=hfAvw0hgq0EhOtnnmtyXispMmzn0udfGL2kHrYegWv0=;
+        b=AaZ4T/gKtA9YLc3UFA2R7YuDmiuLM8KOOmYzo2ljdS8Z0dRJ3OevZCDA6IzWdlnxhmyLX1
+        +hgQZuKlzDhHqzfNmGXNj6XQDgjhSecmEPUTNT6451DBr/7ghH8I9n50tVL0klSXrtz6dq
+        ix/54dbkBLH7lMrJbfx53QAJCsfrJg0=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-296-j0Z2cwuSOKC3ACii8PFRRw-1; Fri, 18 Jun 2021 06:32:06 -0400
+X-MC-Unique: j0Z2cwuSOKC3ACii8PFRRw-1
+Received: by mail-ej1-f70.google.com with SMTP id w22-20020a17090652d6b029048a3391d9f6so248491ejn.12
+        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 03:32:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=1kxjjVfDr06FdqvB+NtA55I89EuxwDAZ4o8llHKwLkQ=;
-        b=CiF9+cEsF2DQtOm8eAU3Pg+WVYs1oZhhLu5AiDstlec2lB8jFxbm7cr4V3mN1TbI/H
-         1O61rFiLyfNz2SlDpet9CYM6umUUybqPNjpIiV21Ngz1eWj9IEfWwUDw82b831suKQkz
-         9g0c9+yaLAfjSDFFLod+HFEqUualcNH3h2IDD0lW1DC7SBDuiNZdMwKQTLNuNnXWR5ZX
-         t2Xyr3bsCogbNHaKfnc1itlq89Nk37hA0f3OVMTgvhl8KBqUDEzIwV3FoyNIF6tGFSop
-         xbCbCVlJiPoYTT+tjmfe+OAZVSZmCs1KLrhnBitapEyouEsNAXehJ2CMFICJzoOAGFEt
-         JQWA==
-X-Gm-Message-State: AOAM530k89XLdAZUuLsgyPdRNKpEUMbYzECR7nq6X+cWCttGj90HPxtD
-        yzTCUNGDYIlKgHqzi2qMzT4TXbuexhcWoYMdj6ZXKB4m+A2CPBQJTJRmEF48ty3MJpV00ipZelQ
-        X8xY4ArUKZFjq
-X-Received: by 2002:aa7:d14d:: with SMTP id r13mr4088069edo.212.1624012303404;
-        Fri, 18 Jun 2021 03:31:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzbt3wJrddbRFGnPR6wPSg0b+MAsEry4G6dxNcer2lCh+oPeXK8W3vzerWkcD5lf0rLxjOGjw==
-X-Received: by 2002:aa7:d14d:: with SMTP id r13mr4088049edo.212.1624012303218;
-        Fri, 18 Jun 2021 03:31:43 -0700 (PDT)
+        bh=hfAvw0hgq0EhOtnnmtyXispMmzn0udfGL2kHrYegWv0=;
+        b=KsH/uQuGHRUa+5DX9aHCOPHQsaFRMpwVp7eN2Qng9Hq9y1aDBMPc42K/grDvhNxd1b
+         dCvCOZVUQHJftGXugsylHSIBlMw/xl8CPE0zQim5ORscO7/aCMfWPL1x8JqDbVeC+7gV
+         Y65yLHktw40ilkvqJUWPJ8tFlB3zaJUrwhKKcuRPghEtB4vzcPlJo9ujm9orusCt7Kje
+         pL4BDoGc4MjVuUZl3a0bpoA+swDwbeCTw3b5qOsn0SxbELWatD0DXUYf3R0nvL+K9U6e
+         0KkvEmXcDpeT0f8a2EQ6I82Y3/pdjMfAAf9ioy+2bcffDsL8Xq7kfZOtXDA5WDe/ReHt
+         S83A==
+X-Gm-Message-State: AOAM532pZk/lqJzLSSIR34pQT2eetY3k+CxmcaB2jplh4pwq7f4t3bT8
+        C6tIT0G2hjgxqnOgVJL2cTishNxmK/p3kkxFIBuScrtQ1a8EH+jTm00qcHtF+FFa6ZaHzR6fBv+
+        wlJErgVvx31U+
+X-Received: by 2002:a17:906:6d59:: with SMTP id a25mr2090258ejt.83.1624012325552;
+        Fri, 18 Jun 2021 03:32:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzxSSyuG/lp7VKy9v50YMmn7y8mIz2ZyCGQj3rEnS1eNbeDJb9F7YHyHC8OBkKI0VatG7L01w==
+X-Received: by 2002:a17:906:6d59:: with SMTP id a25mr2090238ejt.83.1624012325419;
+        Fri, 18 Jun 2021 03:32:05 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id s2sm6176459edt.53.2021.06.18.03.31.42
+        by smtp.gmail.com with ESMTPSA id o5sm5925198edq.8.2021.06.18.03.32.04
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Jun 2021 03:31:42 -0700 (PDT)
-Subject: Re: [PATCH 4/4] KVM: x86: Simplify logic to handle lack of host NX
- support
-To:     Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>
+        Fri, 18 Jun 2021 03:32:04 -0700 (PDT)
+Subject: Re: [PATCH 0/4] KVM: x86: Require EFER.NX support unless EPT is on
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 References: <20210615164535.2146172-1-seanjc@google.com>
- <20210615164535.2146172-5-seanjc@google.com>
- <CALMp9eRGj_5+dZXQazVEkeKeDnc7GFm1Vnt2RS_V6akAR=rZsA@mail.gmail.com>
- <YMk40yLeyV1DHpYp@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <24c8db9d-cee3-7f43-08fc-287bca4d6f08@redhat.com>
-Date:   Fri, 18 Jun 2021 12:31:41 +0200
+Message-ID: <388739c8-6881-8fa7-2025-53b9a464c4cb@redhat.com>
+Date:   Fri, 18 Jun 2021 12:32:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <YMk40yLeyV1DHpYp@google.com>
+In-Reply-To: <20210615164535.2146172-1-seanjc@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,20 +73,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/06/21 01:33, Sean Christopherson wrote:
->> It would be nice if we chose one consistent approach to dealing with
->> invalid guest CPUID information and stuck with it. Silently modifying
->> the table provided by userspace seems wrong to me. I much prefer the
->> kvm_check_cpuid approach of telling userspace that the guest CPUID
->> information is invalid. (Of course, once we return -EINVAL for more
->> than one field, good luck figuring out which field is invalid!)
-> Yeah.  I suspect this one can be dropped if EFER.NX is required for everything
-> except EPT, but I didn't fully grok the problem that this was fixing, and it's
-> such an esoteric case that I both don't care and am terrified of breaking some
-> bizarre case.
+On 15/06/21 18:45, Sean Christopherson wrote:
+> KVM has silently required EFER.NX support for shadow paging for well over
+> a year, and for NPT for roughly the same amount of time.  Attempting to
+> run any VM with shadow paging on a system without NX support will fail due
+> to invalid state, while enabling nx_huge_pages with NPT and no NX will
+> explode due to setting a reserved bit in the page tables.
+> 
+> I really, really wanted to require NX across the board, because the lack
+> of bug reports for the shadow paging change strongly suggests no one is
+> running KVM on a CPU that truly doesn't have NX.  But, Intel CPUs let
+> firmware disable NX via MISC_ENABLES, so it's plausible that there are
+> users running KVM with EPT and no NX.
+> 
+> Sean Christopherson (4):
+>    KVM: VMX: Refuse to load kvm_intel if EPT and NX are disabled
+>    KVM: SVM: Refuse to load kvm_amd if NX support is not available
+>    KVM: x86: WARN and reject loading KVM if NX is supported but not
+>      enabled
+>    KVM: x86: Simplify logic to handle lack of host NX support
+> 
+>   arch/x86/kvm/cpuid.c   | 13 +++++--------
+>   arch/x86/kvm/svm/svm.c | 13 ++++++++++---
+>   arch/x86/kvm/vmx/vmx.c |  6 ++++++
+>   arch/x86/kvm/x86.c     |  3 +++
+>   4 files changed, 24 insertions(+), 11 deletions(-)
 > 
 
-It's dating back to 2007 when EPT didn't even exist, I would just drop it.
+Queued 1-3, thanks.
 
 Paolo
 
