@@ -2,56 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 33B1F3AC7BA
-	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 11:35:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 214453AC7CD
+	for <lists+kvm@lfdr.de>; Fri, 18 Jun 2021 11:40:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231896AbhFRJhs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Jun 2021 05:37:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43164 "EHLO
+        id S231876AbhFRJmK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Jun 2021 05:42:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50841 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232052AbhFRJhr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 18 Jun 2021 05:37:47 -0400
+        by vger.kernel.org with ESMTP id S230512AbhFRJmJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 18 Jun 2021 05:42:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624008937;
+        s=mimecast20190719; t=1624009200;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rLL8PB172SRL8lGgz205HV0dC/eqDJtIYHSvhcZcv70=;
-        b=GS8vU6C7vrY7gPoaPe/PGhAfPRT2cfSjD/JSlPOUUSKrGKn9BcGQ3A0vLD2xcgRNeBqw1d
-        LwrjrAkvsdE7hn5+SKeNnaIUAoFbJVGklOU4MHP6qpYEafQPRFyMxwKO1Oy1gS1SeDXJ50
-        FlJKmj3vypP+L4WhimuMz1QUARy9sZs=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-k6c0H4cBPfOKlumFFBTSPQ-1; Fri, 18 Jun 2021 05:35:36 -0400
-X-MC-Unique: k6c0H4cBPfOKlumFFBTSPQ-1
-Received: by mail-ed1-f70.google.com with SMTP id z5-20020a05640235c5b0290393974bcf7eso3243472edc.2
-        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 02:35:35 -0700 (PDT)
+        bh=9OTgWym34MWOytQh3dCOiJZNfcSTFJBcg5/VEusdTLU=;
+        b=iWza114pEBRlGpE4A7fHZ45dwJmZLAI8kEjs5JrEDvLIyPqcPYE/Q/dReu3WHoQYW2wn9x
+        hanSdWYY79vpsW7F/ddXO/O1JcKTXLjtx16evG88f3ezkFxsn2Qh16UEzlLFxBsob3DGWs
+        dwYI8ssrrmBPcztPcZMJGrt+kLV+ng0=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-139-ZKt9NYcIMQyRQs1ci5hOEg-1; Fri, 18 Jun 2021 05:39:58 -0400
+X-MC-Unique: ZKt9NYcIMQyRQs1ci5hOEg-1
+Received: by mail-ej1-f70.google.com with SMTP id l6-20020a1709062a86b029046ec0ceaf5cso1238278eje.8
+        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 02:39:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=rLL8PB172SRL8lGgz205HV0dC/eqDJtIYHSvhcZcv70=;
-        b=CtKVImWLC+5j9fCMRXzC0bvgNRGtYRX0es/fRUFRkyYkCoe8l0KwzaJYOTWVD2DC10
-         koDNnUiP/GvoDHTG5HHmxVgUkh3iwWg58PeTyOC63/tXdkY48usfbeB2o+fLPUTzmlFh
-         mvrrBVq8olw/3iRvpNYHAd04ZqPD5IEHsQ9zqazvYdbW2ncVog8Mv8dV3P3CkbXIuDl8
-         Q/Ki1NqZH1aoqEKWZJqzF5J149UQwz27N2nKPIRKrzNzjcxpfg2B+1FFgjxQOBzphUtR
-         x8C5aR/MksxUhebV4qCmnf3RSLQJ631K7WZ7PSIfRGprj+tAowYr5Koj7qFQkxZgnCEQ
-         0Meg==
-X-Gm-Message-State: AOAM531+TIW/XUd/wBn4xFrOnHHcI+oyZJNwLl6yq1SSWY6Av9kU/P9x
-        MhmfI5hhuHulAugJjV3YJRdeVN3FMm/o8QIYVtvA56V0wVKKPFEaJzGF1x7D6G5CPHWyeGUEYiS
-        tF6/aWbna2NSw
-X-Received: by 2002:a50:9d8d:: with SMTP id w13mr3745087ede.94.1624008934362;
-        Fri, 18 Jun 2021 02:35:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzrTXbUUFRfwaNYCZ2CYmaoH3ldgRuFW7Ykg1x5qXMOhN3Q/A6Vhme8lxLfTWTSAbzIR/PDfg==
-X-Received: by 2002:a50:9d8d:: with SMTP id w13mr3745054ede.94.1624008934194;
-        Fri, 18 Jun 2021 02:35:34 -0700 (PDT)
+         :mime-version:content-disposition:in-reply-to;
+        bh=9OTgWym34MWOytQh3dCOiJZNfcSTFJBcg5/VEusdTLU=;
+        b=Cou9BfL2z8/wt2zdATZdevQsaixIB+dfHlQCJyDzoy+n8MS4ywJTi13z9Bv1WdBIm/
+         sLc8GNg1YqQV6SIMMiY1l3pADg6PrxLaCZxdqVDDQhqdmomSjW9YcXLhWDdI1dYnUCY6
+         EJaHyIRM6JhxW32YinouExNmmMjHz+G3LsjduhTuL3HDdItjRVNHnfnBZC1vLNQDckNu
+         yHtLkeBlbGdUdK01gj3/wlaIuM/to57npflKWtemCvC9o4hGARq6KF0eFHqoHKrraZS3
+         FH7qWKgquTDB8hWZL2B9SfplxKXMvHQc0V49B906wPbj5Gvqlpmk6SNmQ9zSgbiyqfRq
+         1dFw==
+X-Gm-Message-State: AOAM530PDhq/BP+h7WUFZ2TYOUqlSDYMZrSurqQ1NEnzkM/hT0Z9eMmS
+        SBXfR942GzrpUFbziwHNNPajOmCKQOyH76mrtYAdlH/e0zPXe3RDwrUoPa/+FoA1qy0dJQ1qRS1
+        iMN1IW0BSnGvY
+X-Received: by 2002:a17:907:10d7:: with SMTP id rv23mr10004040ejb.163.1624009197508;
+        Fri, 18 Jun 2021 02:39:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzTSy+T330jfiNVwwXxtw5wBYMmXh7NS4dAyo6bHcMvj8+O+LrLu6QAkLP5Y7ZJJZ2IwLSP8w==
+X-Received: by 2002:a17:907:10d7:: with SMTP id rv23mr10004014ejb.163.1624009197332;
+        Fri, 18 Jun 2021 02:39:57 -0700 (PDT)
 Received: from steredhat.lan ([5.170.128.252])
-        by smtp.gmail.com with ESMTPSA id ch17sm5993778edb.42.2021.06.18.02.35.31
+        by smtp.gmail.com with ESMTPSA id u12sm810511eje.40.2021.06.18.02.39.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Jun 2021 02:35:33 -0700 (PDT)
-Date:   Fri, 18 Jun 2021 11:35:29 +0200
+        Fri, 18 Jun 2021 02:39:57 -0700 (PDT)
+Date:   Fri, 18 Jun 2021 11:39:51 +0200
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Jiang Wang <jiang.wang@bytedance.com>
 Cc:     virtualization@lists.linux-foundation.org, stefanha@redhat.com,
@@ -63,63 +61,245 @@ Cc:     virtualization@lists.linux-foundation.org, stefanha@redhat.com,
         Jakub Kicinski <kuba@kernel.org>,
         Steven Rostedt <rostedt@goodmis.org>,
         Ingo Molnar <mingo@redhat.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Jorgen Hansen <jhansen@vmware.com>,
         Andra Paraschiv <andraprs@amazon.com>,
         Norbert Slusarek <nslusarek@gmx.net>,
-        Lu Wei <luwei32@huawei.com>,
+        Colin Ian King <colin.king@canonical.com>,
         Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC v1 0/6] virtio/vsock: introduce SOCK_DGRAM support
-Message-ID: <20210618093529.bxsv4qnryccivdsd@steredhat.lan>
+Subject: Re: [RFC v1 1/6] virtio/vsock: add VIRTIO_VSOCK_F_DGRAM feature bit
+Message-ID: <20210618093951.g32htj3rsu2koqi5@steredhat.lan>
 References: <20210609232501.171257-1-jiang.wang@bytedance.com>
+ <20210609232501.171257-2-jiang.wang@bytedance.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210609232501.171257-1-jiang.wang@bytedance.com>
+In-Reply-To: <20210609232501.171257-2-jiang.wang@bytedance.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 09, 2021 at 11:24:52PM +0000, Jiang Wang wrote:
->This patchset implements support of SOCK_DGRAM for virtio
->transport.
+On Wed, Jun 09, 2021 at 11:24:53PM +0000, Jiang Wang wrote:
+>When this feature is enabled, allocate 5 queues,
+>otherwise, allocate 3 queues to be compatible with
+>old QEMU versions.
 >
->Datagram sockets are connectionless and unreliable. To avoid unfair contention
->with stream and other sockets, add two more virtqueues and
->a new feature bit to indicate if those two new queues exist or not.
+>Signed-off-by: Jiang Wang <jiang.wang@bytedance.com>
+>---
+> drivers/vhost/vsock.c             |  3 +-
+> include/linux/virtio_vsock.h      |  9 +++++
+> include/uapi/linux/virtio_vsock.h |  3 ++
+> net/vmw_vsock/virtio_transport.c  | 73 +++++++++++++++++++++++++++++++++++----
+> 4 files changed, 80 insertions(+), 8 deletions(-)
 >
->Dgram does not use the existing credit update mechanism for
->stream sockets. When sending from the guest/driver, sending packets
->synchronously, so the sender will get an error when the virtqueue is full.
->When sending from the host/device, send packets asynchronously
->because the descriptor memory belongs to the corresponding QEMU
->process.
+>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>index 5e78fb719602..81d064601093 100644
+>--- a/drivers/vhost/vsock.c
+>+++ b/drivers/vhost/vsock.c
+>@@ -31,7 +31,8 @@
 >
->The virtio spec patch is here:
->https://www.spinics.net/lists/linux-virtualization/msg50027.html
+> enum {
+> 	VHOST_VSOCK_FEATURES = VHOST_FEATURES |
+>-			       (1ULL << VIRTIO_F_ACCESS_PLATFORM)
+>+			       (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
+>+			       (1ULL << VIRTIO_VSOCK_F_DGRAM)
+> };
 >
->For those who prefer git repo, here is the link for the linux kernel：
->https://github.com/Jiang1155/linux/tree/vsock-dgram-v1
+> enum {
+>diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>index dc636b727179..ba3189ed9345 100644
+>--- a/include/linux/virtio_vsock.h
+>+++ b/include/linux/virtio_vsock.h
+>@@ -18,6 +18,15 @@ enum {
+> 	VSOCK_VQ_MAX    = 3,
+> };
 >
->qemu patch link:
->https://github.com/Jiang1155/qemu/tree/vsock-dgram-v1
+>+enum {
+>+	VSOCK_VQ_STREAM_RX     = 0, /* for host to guest data */
+>+	VSOCK_VQ_STREAM_TX     = 1, /* for guest to host data */
+>+	VSOCK_VQ_DGRAM_RX       = 2,
+>+	VSOCK_VQ_DGRAM_TX       = 3,
+>+	VSOCK_VQ_EX_EVENT       = 4,
+>+	VSOCK_VQ_EX_MAX         = 5,
+>+};
+>+
+> /* Per-socket state (accessed via vsk->trans) */
+> struct virtio_vsock_sock {
+> 	struct vsock_sock *vsk;
+>diff --git a/include/uapi/linux/virtio_vsock.h b/include/uapi/linux/virtio_vsock.h
+>index 1d57ed3d84d2..b56614dff1c9 100644
+>--- a/include/uapi/linux/virtio_vsock.h
+>+++ b/include/uapi/linux/virtio_vsock.h
+>@@ -38,6 +38,9 @@
+> #include <linux/virtio_ids.h>
+> #include <linux/virtio_config.h>
 >
+>+/* The feature bitmap for virtio net */
+>+#define VIRTIO_VSOCK_F_DGRAM	0	/* Host support dgram vsock */
+>+
+> struct virtio_vsock_config {
+> 	__le64 guest_cid;
+> } __attribute__((packed));
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index 2700a63ab095..7dcb8db23305 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -27,7 +27,8 @@ static DEFINE_MUTEX(the_virtio_vsock_mutex); /* protects the_virtio_vsock */
 >
->To do:
->1. use skb when receiving packets
->2. support multiple transport
->3. support mergeable rx buffer
+> struct virtio_vsock {
+> 	struct virtio_device *vdev;
+>-	struct virtqueue *vqs[VSOCK_VQ_MAX];
+>+	struct virtqueue **vqs;
+>+	bool has_dgram;
+>
+> 	/* Virtqueue processing is deferred to a workqueue */
+> 	struct work_struct tx_work;
+>@@ -333,7 +334,10 @@ static int virtio_vsock_event_fill_one(struct virtio_vsock *vsock,
+> 	struct scatterlist sg;
+> 	struct virtqueue *vq;
+>
+>-	vq = vsock->vqs[VSOCK_VQ_EVENT];
+>+	if (vsock->has_dgram)
+>+		vq = vsock->vqs[VSOCK_VQ_EX_EVENT];
+>+	else
+>+		vq = vsock->vqs[VSOCK_VQ_EVENT];
+>
+> 	sg_init_one(&sg, event, sizeof(*event));
+>
+>@@ -351,7 +355,10 @@ static void virtio_vsock_event_fill(struct virtio_vsock *vsock)
+> 		virtio_vsock_event_fill_one(vsock, event);
+> 	}
+>
+>-	virtqueue_kick(vsock->vqs[VSOCK_VQ_EVENT]);
+>+	if (vsock->has_dgram)
+>+		virtqueue_kick(vsock->vqs[VSOCK_VQ_EX_EVENT]);
+>+	else
+>+		virtqueue_kick(vsock->vqs[VSOCK_VQ_EVENT]);
+> }
+>
+> static void virtio_vsock_reset_sock(struct sock *sk)
+>@@ -391,7 +398,10 @@ static void virtio_transport_event_work(struct work_struct *work)
+> 		container_of(work, struct virtio_vsock, event_work);
+> 	struct virtqueue *vq;
+>
+>-	vq = vsock->vqs[VSOCK_VQ_EVENT];
+>+	if (vsock->has_dgram)
+>+		vq = vsock->vqs[VSOCK_VQ_EX_EVENT];
+>+	else
+>+		vq = vsock->vqs[VSOCK_VQ_EVENT];
+>
+> 	mutex_lock(&vsock->event_lock);
+>
+>@@ -411,7 +421,10 @@ static void virtio_transport_event_work(struct work_struct *work)
+> 		}
+> 	} while (!virtqueue_enable_cb(vq));
+>
+>-	virtqueue_kick(vsock->vqs[VSOCK_VQ_EVENT]);
+>+	if (vsock->has_dgram)
+>+		virtqueue_kick(vsock->vqs[VSOCK_VQ_EX_EVENT]);
+>+	else
+>+		virtqueue_kick(vsock->vqs[VSOCK_VQ_EVENT]);
+> out:
+> 	mutex_unlock(&vsock->event_lock);
+> }
+>@@ -434,6 +447,10 @@ static void virtio_vsock_tx_done(struct virtqueue *vq)
+> 	queue_work(virtio_vsock_workqueue, &vsock->tx_work);
+> }
+>
+>+static void virtio_vsock_dgram_tx_done(struct virtqueue *vq)
+>+{
+>+}
+>+
+> static void virtio_vsock_rx_done(struct virtqueue *vq)
+> {
+> 	struct virtio_vsock *vsock = vq->vdev->priv;
+>@@ -443,6 +460,10 @@ static void virtio_vsock_rx_done(struct virtqueue *vq)
+> 	queue_work(virtio_vsock_workqueue, &vsock->rx_work);
+> }
+>
+>+static void virtio_vsock_dgram_rx_done(struct virtqueue *vq)
+>+{
+>+}
+>+
+> static struct virtio_transport virtio_transport = {
+> 	.transport = {
+> 		.module                   = THIS_MODULE,
+>@@ -545,13 +566,29 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+> 		virtio_vsock_tx_done,
+> 		virtio_vsock_event_done,
+> 	};
+>+	vq_callback_t *ex_callbacks[] = {
 
-Jiang, I'll do a fast review, but I think is better to rebase on 
-net-next since SEQPACKET support is now merged.
+'ex' is not clear, maybe better 'dgram'?
 
-Please also run ./scripts/checkpatch.pl, there are a lot of issues.
+What happen if F_DGRAM is negotiated, but not F_STREAM?
 
-I'll leave some simple comments in the patches, but I prefer to do a 
-deep review after the rebase and the dynamic handling of DGRAM.
-
-Thanks,
-Stefano
+>+		virtio_vsock_rx_done,
+>+		virtio_vsock_tx_done,
+>+		virtio_vsock_dgram_rx_done,
+>+		virtio_vsock_dgram_tx_done,
+>+		virtio_vsock_event_done,
+>+	};
+>+
+> 	static const char * const names[] = {
+> 		"rx",
+> 		"tx",
+> 		"event",
+> 	};
+>+	static const char * const ex_names[] = {
+>+		"rx",
+>+		"tx",
+>+		"dgram_rx",
+>+		"dgram_tx",
+>+		"event",
+>+	};
+>+
+> 	struct virtio_vsock *vsock = NULL;
+>-	int ret;
+>+	int ret, max_vq;
+>
+> 	ret = mutex_lock_interruptible(&the_virtio_vsock_mutex);
+> 	if (ret)
+>@@ -572,9 +609,30 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+>
+> 	vsock->vdev = vdev;
+>
+>-	ret = virtio_find_vqs(vsock->vdev, VSOCK_VQ_MAX,
+>+	if (virtio_has_feature(vdev, VIRTIO_VSOCK_F_DGRAM))
+>+		vsock->has_dgram = true;
+>+
+>+	if (vsock->has_dgram)
+>+		max_vq = VSOCK_VQ_EX_MAX;
+>+	else
+>+		max_vq = VSOCK_VQ_MAX;
+>+
+>+	vsock->vqs = kmalloc_array(max_vq, sizeof(struct virtqueue *), GFP_KERNEL);
+>+	if (!vsock->vqs) {
+>+		ret = -ENOMEM;
+>+		goto out;
+>+	}
+>+
+>+	if (vsock->has_dgram) {
+>+		ret = virtio_find_vqs(vsock->vdev, max_vq,
+>+			      vsock->vqs, ex_callbacks, ex_names,
+>+			      NULL);
+>+	} else {
+>+		ret = virtio_find_vqs(vsock->vdev, max_vq,
+> 			      vsock->vqs, callbacks, names,
+> 			      NULL);
+>+	}
+>+
+> 	if (ret < 0)
+> 		goto out;
+>
+>@@ -695,6 +753,7 @@ static struct virtio_device_id id_table[] = {
+> };
+>
+> static unsigned int features[] = {
+>+	VIRTIO_VSOCK_F_DGRAM,
+> };
+>
+> static struct virtio_driver virtio_vsock_driver = {
+>-- 
+>2.11.0
+>
 
