@@ -2,108 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A92853AD632
-	for <lists+kvm@lfdr.de>; Sat, 19 Jun 2021 01:59:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 026163AD639
+	for <lists+kvm@lfdr.de>; Sat, 19 Jun 2021 02:11:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235287AbhFSACE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Jun 2021 20:02:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32950 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235285AbhFSACD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Jun 2021 20:02:03 -0400
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C087BC061574
-        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 16:59:52 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id d12-20020ac8668c0000b0290246e35b30f8so6126863qtp.21
-        for <kvm@vger.kernel.org>; Fri, 18 Jun 2021 16:59:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=QYeKq174KM5+fTY38SgJUZakLTmS4zF3GIxooJkhjrM=;
-        b=sYWcM1384CTKDdsj7+0weHRC5heoI/ZpPY1S58rxhfrQyOviJJCEa1UkJS8eTJqMgx
-         ARwpA6CLp07fvMT2ZU7oV+f3UKp5tyekWW+J0olaG8+9yYh6iO5PXRDkOIPqpbAkw3Rm
-         6wDCKdYvKByd2a6ZHfmUrCZ6TN+HyR5LnfPlEwW5lammRffgHHGhHvAgs8ErreUBYwhr
-         jGMEtguM/AlMfhw8AWQcNUlQlBS/o+1Tswcw85ceaIlqcthH/WH/WHKgDoeCequ2r/qN
-         DllYSHuNyv8C8M/pvfNeklosl5Kp9yLsSJbeNOO/bY+NkUiLEEBn9Tz9DEO4TmWHkETA
-         piTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=QYeKq174KM5+fTY38SgJUZakLTmS4zF3GIxooJkhjrM=;
-        b=bQChNv1YXDMYwfLOcfe4Eih4boEbQ8RWWjV93XwfFBz8b0a4disGTnLPDG2cOZke1x
-         uHrZ5ORWaQu9dWCJDOIzqAvStfg3PdELdXf0JoxcQCPaZ5id+8/jJZEnF84uwVf3RKIh
-         +LD5Zpf+gvbusQVwVAS8Gbx8PBWj4EmMzO5z2gE4f8z8raTUFfpr9hpc9SMEplSr3RdY
-         1+caIekrGYZaPImNPsis2V2AlEvsvmseP+FjLbBsXjDtqWemRKir0vhNE/Dm+oO5Eigc
-         FREKGSYGtNv0MZBWXBuLZT6PBtp18+rcgtxhpmUkXdy+0xABC30iofBvou1eQqpND5Iq
-         f5PA==
-X-Gm-Message-State: AOAM530BAPG4AFTL51tss6XRkpO4GtY79LZCm+EJa7vq748ZTIUfJ2+f
-        6bFc2+HO7Rw+5wKqSMFsrOE1DiGRRZrPbL2oXKJgI+ooe6G8mzX+fZYj8PqqODqJrcw22/jygWf
-        xm9erFgc244Fpa0J/SZuVQNqKT7hshNwVoXwWYLV2s8YwYLGdlsudWS7pn1Ss3Pg=
-X-Google-Smtp-Source: ABdhPJzqnpfLzORH2YEVr9iBZrmkCCHIopIRGVDvE3rvmytT93hLRSh2mF3VGZmLKziCCsGv4l5aci8uQkTscA==
-X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1a0d])
- (user=jmattson job=sendgmr) by 2002:a25:d0c3:: with SMTP id
- h186mr17222388ybg.150.1624060791835; Fri, 18 Jun 2021 16:59:51 -0700 (PDT)
-Date:   Fri, 18 Jun 2021 16:59:41 -0700
-Message-Id: <20210618235941.1041604-1-jmattson@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.32.0.288.g62a8d224e6-goog
-Subject: [PATCH] KVM: VMX: Skip #PF(RSVD) intercepts when emulating smaller maxphyaddr
-From:   Jim Mattson <jmattson@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com
-Cc:     Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S231723AbhFSAOA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Jun 2021 20:14:00 -0400
+Received: from forward103p.mail.yandex.net ([77.88.28.106]:34017 "EHLO
+        forward103p.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229730AbhFSAOA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 18 Jun 2021 20:14:00 -0400
+Received: from sas1-3b8498a5e64a.qloud-c.yandex.net (sas1-3b8498a5e64a.qloud-c.yandex.net [IPv6:2a02:6b8:c08:cb19:0:640:3b84:98a5])
+        by forward103p.mail.yandex.net (Yandex) with ESMTP id 0A76C18C0450;
+        Sat, 19 Jun 2021 03:11:43 +0300 (MSK)
+Received: from sas1-f4dc5f2fc86f.qloud-c.yandex.net (sas1-f4dc5f2fc86f.qloud-c.yandex.net [2a02:6b8:c08:cb28:0:640:f4dc:5f2f])
+        by sas1-3b8498a5e64a.qloud-c.yandex.net (mxback/Yandex) with ESMTP id 2IqZNf9eQb-BgHS6pYW;
+        Sat, 19 Jun 2021 03:11:42 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1624061502;
+        bh=AF8xJN5qwkBn7d33Vg0PTsfQKZpwqcC/BbGR9fN6wwU=;
+        h=In-Reply-To:From:Date:References:To:Subject:Message-ID:Cc;
+        b=ZFGTX4OKs2j2dE9UVTDKFSzvHwYibU1hHO2PJ4QYYz4h94uART3YSTzJ2ndpwac6V
+         D+PnzUEURMM8F52ml3Sg8OQW76p2teCbXGIS99LAx02Ua+8lnEtCIE1hetmZPvp0CI
+         nz6VQV9haqWvvdhvopTQglWa9rdubDjGguHkbPRY=
+Authentication-Results: sas1-3b8498a5e64a.qloud-c.yandex.net; dkim=pass header.i=@yandex.ru
+Received: by sas1-f4dc5f2fc86f.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id nmVJc733w4-Bg4CBbHw;
+        Sat, 19 Jun 2021 03:11:42 +0300
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (Client certificate not present)
+Subject: Re: guest/host mem out of sync on core2duo?
+To:     Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>
+References: <bd4a2d30-5fb4-3612-c855-946d97068b9a@yandex.ru>
+ <YMeMov42fihXptQm@google.com>
+ <73f1f90e-f952-45a4-184e-1aafb3e4a8fd@yandex.ru>
+ <YMtfQHGJL7XP/0Rq@google.com>
+ <23b00d8a-1732-0b0b-cd8d-e802f7aca87c@yandex.ru>
+ <CALMp9eSpJ8=O=6YExpOtdnA=gQkWfQJ+oz0bBcV4gOPFdnciVA@mail.gmail.com>
+ <ca311331-c862-eed6-22ff-a82f0806797f@yandex.ru>
+ <CALMp9eQxys64U-r5xdF_wdunqn8ynBoOBPRDSjTDMh-gF3EEpg@mail.gmail.com>
+ <YM0fBtqYe+VyPME7@google.com>
+From:   stsp <stsp2@yandex.ru>
+Message-ID: <4834cc76-72d5-4d23-7a56-63e455683db5@yandex.ru>
+Date:   Sat, 19 Jun 2021 03:11:42 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <YM0fBtqYe+VyPME7@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As part of smaller maxphyaddr emulation, kvm needs to intercept
-present page faults to see if it needs to add the RSVD flag (bit 3) to
-the error code. However, there is no need to intercept page faults
-that already have the RSVD flag set. When setting up the page fault
-intercept, add the RSVD flag into the #PF error code mask field (but
-not the #PF error code match field) to skip the intercept when the
-RSVD flag is already set.
+19.06.2021 01:32, Sean Christopherson пишет:
+> Argh!  Check out this gem:
+>
+> 	/*
+> 	 *   Fix the "Accessed" bit in AR field of segment registers for older
+> 	 * qemu binaries.
+> 	 *   IA32 arch specifies that at the time of processor reset the
+> 	 * "Accessed" bit in the AR field of segment registers is 1. And qemu
+> 	 * is setting it to 0 in the userland code. This causes invalid guest
+> 	 * state vmexit when "unrestricted guest" mode is turned on.
+> 	 *    Fix for this setup issue in cpu_reset is being pushed in the qemu
+> 	 * tree. Newer qemu binaries with that qemu fix would not need this
+> 	 * kvm hack.
+> 	 */
+> 	if (is_unrestricted_guest(vcpu) && (seg != VCPU_SREG_LDTR))
+> 		var->type |= 0x1; /* Accessed */
+>
+>
+> KVM fixes up segs when unrestricted guest is enabled, but otherwise leaves 'em
+> be, presumably because it has the emulator to fall back on for invalid state.
+> Guess what's missing in the invalid state check...
+>
+> I think this should do it:
+Until when will it run on an
+emulator in this case?
+Will it be too slow without a
+slightest hint to the user?
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- arch/x86/kvm/vmx/vmx.c | 23 ++++++++++++++---------
- 1 file changed, 14 insertions(+), 9 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 68a72c80bd3f..1fc28d8b72c7 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -747,16 +747,21 @@ void vmx_update_exception_bitmap(struct kvm_vcpu *vcpu)
- 	if (is_guest_mode(vcpu))
- 		eb |= get_vmcs12(vcpu)->exception_bitmap;
-         else {
--		/*
--		 * If EPT is enabled, #PF is only trapped if MAXPHYADDR is mismatched
--		 * between guest and host.  In that case we only care about present
--		 * faults.  For vmcs02, however, PFEC_MASK and PFEC_MATCH are set in
--		 * prepare_vmcs02_rare.
--		 */
--		bool selective_pf_trap = enable_ept && (eb & (1u << PF_VECTOR));
--		int mask = selective_pf_trap ? PFERR_PRESENT_MASK : 0;
-+		int mask = 0, match = 0;
-+
-+		if (enable_ept && (eb & (1u << PF_VECTOR))) {
-+			/*
-+			 * If EPT is enabled, #PF is currently only intercepted
-+			 * if MAXPHYADDR is smaller on the guest than on the
-+			 * host.  In that case we only care about present,
-+			 * non-reserved faults.  For vmcs02, however, PFEC_MASK
-+			 * and PFEC_MATCH are set in prepare_vmcs02_rare.
-+			 */
-+			mask = PFERR_PRESENT_MASK | PFERR_RSVD_MASK;
-+			match = PFERR_PRESENT_MASK;
-+		}
- 		vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, mask);
--		vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, mask);
-+		vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, match);
- 	}
- 
- 	vmcs_write32(EXCEPTION_BITMAP, eb);
--- 
-2.32.0.288.g62a8d224e6-goog
-
+If it is indeed the performance
+penalty for no good reason,
+then my preference would be
+to get an error right from
+KVM_SET_SREGS instead,
+or maybe from KVM_RUN,
+but not run everything on
+an emulator.
