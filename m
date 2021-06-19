@@ -2,99 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D8F673AD85B
-	for <lists+kvm@lfdr.de>; Sat, 19 Jun 2021 09:03:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84FFC3AD8DC
+	for <lists+kvm@lfdr.de>; Sat, 19 Jun 2021 11:18:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234242AbhFSHFm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 19 Jun 2021 03:05:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42156 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234150AbhFSHF1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 19 Jun 2021 03:05:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624086196;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8ML4REiy5OkcaqfJ6brk7+RfQQvQg3ZqoRzOqMYC4CQ=;
-        b=J0F5GsHhMdf4BjcqmRPbvxjekUgLvI8ieIlqkO+70qHtKV/eoSgGnb4CRKOZTdUAGtzPKe
-        Dt/NNKKWK5OPBPGQ9nNJ2RT0HATEAatgN9CHg5AFwI9RXhmIlqNCyz27mmtrcEyTCyKunB
-        YTAmIpKU/GxGZeXwEmh7hPdQAP+/QGI=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-7APu7AgjNbuNhsnJaRseYQ-1; Sat, 19 Jun 2021 03:03:15 -0400
-X-MC-Unique: 7APu7AgjNbuNhsnJaRseYQ-1
-Received: by mail-ed1-f72.google.com with SMTP id z5-20020a05640235c5b0290393974bcf7eso4540968edc.2
-        for <kvm@vger.kernel.org>; Sat, 19 Jun 2021 00:03:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8ML4REiy5OkcaqfJ6brk7+RfQQvQg3ZqoRzOqMYC4CQ=;
-        b=tRlJt4PZI5jRHZHec+GJ+2E5PkXz2bjHmg2HRWasxknHS3czOOiG7rvyEhIITwqiHz
-         GmjcJEnUoSn8qAfocBVR/N4YszJnRhoAzHog5dfW5tgdVsiHJ/XnoAhV7RdyMQfXWUiA
-         1vliqk0OpJEK8l+VXmBjz5QIGOsU9nV9/sDrTeplvY0SCc4FJLB6Xf4vpPE+SN5Im/75
-         f8p6yBjHuY6yzBvQDydKxE3SPLCfvmokojgIBCV8uo6LeEgeoCJp0e9qkXKlZlO990om
-         cp4/ZoQl3oAUhqdoEAKQ3oX2uMpM6MUYyL+9+/f7lIhOGKAr62K4efBsyKQGVtMQquYr
-         twRw==
-X-Gm-Message-State: AOAM530vZ9dwv7DjT8X6hZasjtYysUlNT4DXf3VRD9bZv+dfUYo9/CWe
-        tI5Dxq9priU/GJ21cml6Brncs59nfZlRML8UpqiiSwLBNF4eTN64MRT0Gl+hsEmDaSaVXV/5SGs
-        a9BLQsHWJRsG8
-X-Received: by 2002:a05:6402:2317:: with SMTP id l23mr9400533eda.265.1624086194034;
-        Sat, 19 Jun 2021 00:03:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwhkU4ORZu2NUVqekm38wER3uTsadAxLzHjeKIBOfzZkIl9xiP0Gksb8acUUBxOaPCJVpfJRA==
-X-Received: by 2002:a05:6402:2317:: with SMTP id l23mr9400523eda.265.1624086193880;
-        Sat, 19 Jun 2021 00:03:13 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id hx18sm448140ejc.82.2021.06.19.00.03.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 19 Jun 2021 00:03:13 -0700 (PDT)
-Subject: Re: [PATCH v3 8/8] KVM: x86: avoid loading PDPTRs after migration
- when possible
-To:     Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, open list <linux-kernel@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Jim Mattson <jmattson@google.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "H. Peter Anvin" <hpa@zytor.com>
-References: <20210607090203.133058-1-mlevitsk@redhat.com>
- <20210607090203.133058-9-mlevitsk@redhat.com> <YM0H3Hvs8/3+twnc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <289ac328-703f-6eb0-292e-99b1eda08784@redhat.com>
-Date:   Sat, 19 Jun 2021 09:03:11 +0200
+        id S232164AbhFSJUX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 19 Jun 2021 05:20:23 -0400
+Received: from forward103p.mail.yandex.net ([77.88.28.106]:36823 "EHLO
+        forward103p.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230318AbhFSJUW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 19 Jun 2021 05:20:22 -0400
+Received: from myt5-95f184467838.qloud-c.yandex.net (myt5-95f184467838.qloud-c.yandex.net [IPv6:2a02:6b8:c12:5981:0:640:95f1:8446])
+        by forward103p.mail.yandex.net (Yandex) with ESMTP id C439118C05A7;
+        Sat, 19 Jun 2021 12:18:10 +0300 (MSK)
+Received: from myt6-9bdf92ffd111.qloud-c.yandex.net (myt6-9bdf92ffd111.qloud-c.yandex.net [2a02:6b8:c12:468a:0:640:9bdf:92ff])
+        by myt5-95f184467838.qloud-c.yandex.net (mxback/Yandex) with ESMTP id 4OZBN6xDsw-IAHilqQF;
+        Sat, 19 Jun 2021 12:18:10 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1624094290;
+        bh=G8ihFkoPxaj4xqRTQyEdHkcn0usFLQ2PC4LP8q9g2QY=;
+        h=In-Reply-To:From:Date:References:To:Subject:Message-ID:Cc;
+        b=l7Cg9MX+JluGyoZxldlKcMhCavlipx4lH3rUFN59jKy9TnsnTMIpRypuRZmfVP2Y2
+         dhMALT/RHDvnmGlnq9zVyZ2S7ZS1LSazNLsLUxn4/jcnrb1tqJgGml0i29oZeoMaAX
+         aujVqB0LkEpwpd0d4WVTDw+S1mRFVFpbpnFOO5rQ=
+Authentication-Results: myt5-95f184467838.qloud-c.yandex.net; dkim=pass header.i=@yandex.ru
+Received: by myt6-9bdf92ffd111.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id Xb75OwHdKq-IA38bIdR;
+        Sat, 19 Jun 2021 12:18:10 +0300
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (Client certificate not present)
+Subject: Re: guest/host mem out of sync on core2duo?
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Jim Mattson <jmattson@google.com>, kvm list <kvm@vger.kernel.org>
+References: <bd4a2d30-5fb4-3612-c855-946d97068b9a@yandex.ru>
+ <YMeMov42fihXptQm@google.com>
+ <73f1f90e-f952-45a4-184e-1aafb3e4a8fd@yandex.ru>
+ <YMtfQHGJL7XP/0Rq@google.com>
+ <23b00d8a-1732-0b0b-cd8d-e802f7aca87c@yandex.ru>
+ <CALMp9eSpJ8=O=6YExpOtdnA=gQkWfQJ+oz0bBcV4gOPFdnciVA@mail.gmail.com>
+ <ca311331-c862-eed6-22ff-a82f0806797f@yandex.ru>
+ <CALMp9eQxys64U-r5xdF_wdunqn8ynBoOBPRDSjTDMh-gF3EEpg@mail.gmail.com>
+ <YM0fBtqYe+VyPME7@google.com>
+ <4834cc76-72d5-4d23-7a56-63e455683db5@yandex.ru>
+ <YM1AWuoRm6xh+OVr@google.com>
+From:   stsp <stsp2@yandex.ru>
+Message-ID: <bda4611d-3ac7-de7c-44f4-f6fc5ac309f9@yandex.ru>
+Date:   Sat, 19 Jun 2021 12:18:10 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <YM0H3Hvs8/3+twnc@google.com>
+In-Reply-To: <YM1AWuoRm6xh+OVr@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/06/21 22:53, Sean Christopherson wrote:
-> The bool is essentially an extension of
-> KVM_REQ_GET_NESTED_STATE_PAGES, I think it makes sense to clear the flag whenever
-> KVM_REQ_GET_NESTED_STATE_PAGES is cleared.
-
-So in vcpu_enter_guest?
-
-> Another thing that's not obvious is the required ordering between KVM_SET_SREGS2
-> and KVM_SET_NESTED_STATE.  AFAICT it's not documented, but that may be PEBKAC on
-> my end.  E.g. what happens if walk_mmu == &root_mmu (L1 active in targte KVM)
-> when SET_SREGS2 is called, and_then_  KVM_SET_NESTED_STATE is called?
-
-Either ordering should work.
-
-Paolo
-
+19.06.2021 03:54, Sean Christopherson пишет:
+> On Sat, Jun 19, 2021, stsp wrote:
+>> 19.06.2021 01:32, Sean Christopherson пишет:
+>>> Argh!  Check out this gem:
+>>>
+>>> 	/*
+>>> 	 *   Fix the "Accessed" bit in AR field of segment registers for older
+>>> 	 * qemu binaries.
+>>> 	 *   IA32 arch specifies that at the time of processor reset the
+>>> 	 * "Accessed" bit in the AR field of segment registers is 1. And qemu
+>>> 	 * is setting it to 0 in the userland code. This causes invalid guest
+>>> 	 * state vmexit when "unrestricted guest" mode is turned on.
+>>> 	 *    Fix for this setup issue in cpu_reset is being pushed in the qemu
+>>> 	 * tree. Newer qemu binaries with that qemu fix would not need this
+>>> 	 * kvm hack.
+>>> 	 */
+>>> 	if (is_unrestricted_guest(vcpu) && (seg != VCPU_SREG_LDTR))
+>>> 		var->type |= 0x1; /* Accessed */
+>>>
+>>>
+>>> KVM fixes up segs when unrestricted guest is enabled, but otherwise leaves 'em
+>>> be, presumably because it has the emulator to fall back on for invalid state.
+>>> Guess what's missing in the invalid state check...
+>>>
+>>> I think this should do it:
+>> Until when will it run on an emulator in this case?  Will it be too slow
+>> without a slightest hint to the user?
+> KVM would emulate until the invalid state went away, i.e. until the offending
+> register was loaded with a new segment that set the Accessed bit.
+Such condition will happen
+pretty quickly if the emulator
+sets the accessed bit also in LDT.
+Does it do that?
