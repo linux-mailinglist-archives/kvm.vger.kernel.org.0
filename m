@@ -2,166 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FF323ADC56
-	for <lists+kvm@lfdr.de>; Sun, 20 Jun 2021 04:28:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 895CB3ADECE
+	for <lists+kvm@lfdr.de>; Sun, 20 Jun 2021 15:36:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230286AbhFTCaJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 19 Jun 2021 22:30:09 -0400
-Received: from mga12.intel.com ([192.55.52.136]:39960 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230236AbhFTCaI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 19 Jun 2021 22:30:08 -0400
-IronPort-SDR: obwet/oHU5vEWcI22y/a7ykBUUnXJSF2wHFIASd6AgaSTUN1zDEXO4FZ0ArCdXuPTlnajga2ND
- pSnOW2YV6bSg==
-X-IronPort-AV: E=McAfee;i="6200,9189,10020"; a="186389886"
-X-IronPort-AV: E=Sophos;i="5.83,286,1616482800"; 
-   d="scan'208";a="186389886"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2021 19:27:56 -0700
-IronPort-SDR: oPHjK4C4bNdCQdHRjnZJQ0nysGJAxicuoflawwpi3X13whl1KILJYZ8YWWRlgp6rJG9UG+hqBp
- ihYG1q8rpwXw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.83,286,1616482800"; 
-   d="scan'208";a="486095355"
-Received: from michael-optiplex-9020.sh.intel.com ([10.239.159.182])
-  by orsmga001.jf.intel.com with ESMTP; 19 Jun 2021 19:27:55 -0700
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        richard.henderson@linaro.org, armbru@redhat.com,
-        wei.w.wang@intel.com
-Cc:     Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH v4 2/2] target/i386: Add lbr-fmt vPMU option to support guest LBR
-Date:   Sun, 20 Jun 2021 10:42:37 +0800
-Message-Id: <1624156957-7223-2-git-send-email-weijiang.yang@intel.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1624156957-7223-1-git-send-email-weijiang.yang@intel.com>
-References: <1624156957-7223-1-git-send-email-weijiang.yang@intel.com>
+        id S229887AbhFTNjA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 20 Jun 2021 09:39:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40568 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229621AbhFTNiu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 20 Jun 2021 09:38:50 -0400
+Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BA4BC0617AD
+        for <kvm@vger.kernel.org>; Sun, 20 Jun 2021 06:36:16 -0700 (PDT)
+Received: by mail-io1-xd44.google.com with SMTP id a6so4011658ioe.0
+        for <kvm@vger.kernel.org>; Sun, 20 Jun 2021 06:36:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=D7l/Y2nU4ivOXB3kYNarWKNDy1SUWuawPt7q4q/Bhv4=;
+        b=uDIEtWfgl91FDet7ZYX1u1ozW0abpKvg4acx3thqXBCDoYcWKg7eyNZSXNk+51VeuJ
+         sYbwx77CCJt/Xl1UBy7P++4/uHOQjQcptGzc4BiJd5A/7x+FLCtsFr6R08yAScCPxE/G
+         ycRitdP5UZQCPHBcljPWiYz9qooX9+o9VlIcE1iBIKjgWFsG58IfpnIZmKh5Mer/et0Q
+         Wvv2McVtUA6rn+iTugaAQulni5t+7gIBWkpgi42U+JEUmcEEUifIxcViVFyKhDEEgfNV
+         A33afccbptAYxVMQ3XRd6cg8QS8Vl2AEYQyihFbFLRpIaiCXlHMQE4BSfPfytvzUMqcd
+         FXMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=D7l/Y2nU4ivOXB3kYNarWKNDy1SUWuawPt7q4q/Bhv4=;
+        b=oaOfguZ2EG2YZmQjMwph0pPpxJ3I+BlSgqSgIEkEU20WuZMhGpbfKVMuVAiSHS5PuN
+         7DtfPpSVqULKffiaaKPHcUOfEmBZ1h99bk7skMD2r0vwnoYordlwChU/PSBRpXqfXGg6
+         h6cREaG70heZzJb1HXr3BqLqMCh2Cbfy/am0i9fhfTR/dJgegoIzzD9aspVvh+96VkkB
+         TriH+Bg2r3IiNae7oFPnyl7kM9wrnc9cDY/odk4VHd4CnCGdGBgUlKT+3R0Nt4Wz7gu8
+         WYt7VNqkggmOPAsDb3liaHUgdciXN8quJf2jNa5e2KiL96RyG2RusgKb/ggSkXNoSlCd
+         ohGw==
+X-Gm-Message-State: AOAM530i6gRqpm+hseZ9oOk8XFExGp5pywyqXwavt7ff8VnOs4u/Ylh8
+        J/qLOwWLnNlgzybzUuL/UKfoS5Y/F0VEYoX+5k4=
+X-Google-Smtp-Source: ABdhPJwOQ5lA8oaPxit1UXNypL8Kah2QWj0jtAWNuj5/Z8/Rl7T8YsfxHtOIriCZuXo1tXOWzxp5d5YlbnVjDFRsY5Q=
+X-Received: by 2002:a02:a810:: with SMTP id f16mr12630337jaj.64.1624196175568;
+ Sun, 20 Jun 2021 06:36:15 -0700 (PDT)
+MIME-Version: 1.0
+Received: by 2002:a05:6e02:1baf:0:0:0:0 with HTTP; Sun, 20 Jun 2021 06:36:14
+ -0700 (PDT)
+Reply-To: sarahkoffi389@yahoo.co.jp
+From:   Sarah Koffi <sarah.koffi101@gmail.com>
+Date:   Sun, 20 Jun 2021 15:36:14 +0200
+Message-ID: <CA+ifgLE1g7jgi567M2HhZfvRSUF63Hu6stsW+ysX=3U-=qnn6Q@mail.gmail.com>
+Subject: Greetings From Mrs. Sarah Koffi
+To:     sarahkoffi389@yahoo.co.jp
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The Last Branch Recording (LBR) is a performance monitor unit (PMU)
-feature on Intel processors which records a running trace of the most
-recent branches taken by the processor in the LBR stack. This option
-indicates the LBR format to enable for guest perf.
+Greetings From Mrs. Sarah Koffi
 
-The LBR feature is enabled if below conditions are met:
-1) KVM is enabled and the PMU is enabled.
-2) msr-based-feature IA32_PERF_CAPABILITIES is supporterd on KVM.
-3) Supported returned value for lbr_fmt from above msr is non-zero.
-4) Guest vcpu model does support FEAT_1_ECX.CPUID_EXT_PDCM.
-5) User-provided lbr-fmt value doesn't violate its bitmask (0x3f).
-6) Target guest LBR format matches that of host.
+I'm contacting you based on your good profiles I read and for a good
+reasons, I am in search of a property to buy in your country as I
+intended to come over to your
+country for investment, Though I have not meet with you before but I
+believe that one has to risk confiding in someone to succeed sometimes
+in life.
 
-Co-developed-by: Like Xu <like.xu@linux.intel.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
----
- target/i386/cpu.c | 41 +++++++++++++++++++++++++++++++++++++++++
- target/i386/cpu.h | 10 ++++++++++
- 2 files changed, 51 insertions(+)
+My name is Mrs. Sarah Koffi. My late husband deals on Crude Oil with
+Federal Government of Sudan and he has a personal Oil firm in Bentiu
+Oil zone town and Upper
+Nile city. What I have experience physically, I don't wish to
+experience it again in my life due to the recent civil Ethnic war
+cause by our President Mr. Salva Kiir
+and the rebel leader Mr Riek Machar, I have been Under United Nation
+refuge camp in chad to save my life and that of my little daughter.
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index ad99cad0e7..c80b8b7fe2 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -6701,6 +6701,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-     CPUX86State *env = &cpu->env;
-     Error *local_err = NULL;
-     static bool ht_warned;
-+    uint64_t requested_lbr_fmt;
- 
-     if (xcc->host_cpuid_required) {
-         if (!accel_uses_host_cpuid()) {
-@@ -6748,6 +6749,42 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-         goto out;
-     }
- 
-+    /*
-+     * Override env->features[FEAT_PERF_CAPABILITIES].LBR_FMT
-+     * with user-provided setting.
-+     */
-+    if (cpu->lbr_fmt != ~PERF_CAP_LBR_FMT) {
-+        if ((cpu->lbr_fmt & PERF_CAP_LBR_FMT) != cpu->lbr_fmt) {
-+            error_setg(errp, "invalid lbr-fmt");
-+            return;
-+        }
-+        env->features[FEAT_PERF_CAPABILITIES] &= ~PERF_CAP_LBR_FMT;
-+        env->features[FEAT_PERF_CAPABILITIES] |= cpu->lbr_fmt;
-+    }
-+
-+    /*
-+     * vPMU LBR is supported when 1) KVM is enabled 2) Option pmu=on and
-+     * 3)vPMU LBR format matches that of host setting.
-+     */
-+    requested_lbr_fmt =
-+        env->features[FEAT_PERF_CAPABILITIES] & PERF_CAP_LBR_FMT;
-+    if (requested_lbr_fmt && kvm_enabled()) {
-+        uint64_t host_perf_cap =
-+            x86_cpu_get_supported_feature_word(FEAT_PERF_CAPABILITIES, false);
-+        uint64_t host_lbr_fmt = host_perf_cap & PERF_CAP_LBR_FMT;
-+
-+        if (!cpu->enable_pmu) {
-+            error_setg(errp, "vPMU: LBR is unsupported without pmu=on");
-+            return;
-+        }
-+        if (requested_lbr_fmt != host_lbr_fmt) {
-+            error_setg(errp, "vPMU: the lbr-fmt value (0x%lx) mismatches "
-+                        "the host supported value (0x%lx).",
-+                        requested_lbr_fmt, host_lbr_fmt);
-+            return;
-+        }
-+    }
-+
-     x86_cpu_filter_features(cpu, cpu->check_cpuid || cpu->enforce_cpuid);
- 
-     if (cpu->enforce_cpuid && x86_cpu_have_filtered_features(cpu)) {
-@@ -7150,6 +7187,9 @@ static void x86_cpu_initfn(Object *obj)
-     object_property_add_alias(obj, "sse4_1", obj, "sse4.1");
-     object_property_add_alias(obj, "sse4_2", obj, "sse4.2");
- 
-+    cpu->lbr_fmt = ~PERF_CAP_LBR_FMT;
-+    object_property_add_alias(obj, "lbr_fmt", obj, "lbr-fmt");
-+
-     if (xcc->model) {
-         x86_cpu_load_model(cpu, xcc->model);
-     }
-@@ -7300,6 +7340,7 @@ static Property x86_cpu_properties[] = {
- #endif
-     DEFINE_PROP_INT32("node-id", X86CPU, node_id, CPU_UNSET_NUMA_NODE_ID),
-     DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
-+    DEFINE_PROP_UINT64_CHECKMASK("lbr-fmt", X86CPU, lbr_fmt, PERF_CAP_LBR_FMT),
- 
-     DEFINE_PROP_UINT32("hv-spinlocks", X86CPU, hyperv_spinlock_attempts,
-                        HYPERV_SPINLOCK_NEVER_NOTIFY),
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 1bc300ce85..50e6d66791 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -354,6 +354,7 @@ typedef enum X86Seg {
- #define ARCH_CAP_TSX_CTRL_MSR		(1<<7)
- 
- #define MSR_IA32_PERF_CAPABILITIES      0x345
-+#define PERF_CAP_LBR_FMT                0x3f
- 
- #define MSR_IA32_TSX_CTRL		0x122
- #define MSR_IA32_TSCDEADLINE            0x6e0
-@@ -1726,6 +1727,15 @@ struct X86CPU {
-      */
-     bool enable_pmu;
- 
-+    /*
-+     * Enable LBR_FMT bits of IA32_PERF_CAPABILITIES MSR.
-+     * This can't be initialized with a default because it doesn't have
-+     * stable ABI support yet. It is only allowed to pass all LBR_FMT bits
-+     * returned by kvm_arch_get_supported_msr_feature()(which depends on both
-+     * host CPU and kernel capabilities) to the guest.
-+     */
-+    uint64_t lbr_fmt;
-+
-     /* LMCE support can be enabled/disabled via cpu option 'lmce=on/off'. It is
-      * disabled by default to avoid breaking migration between QEMU with
-      * different LMCE configurations.
--- 
-2.21.1
+Though, I do not know how you will feel to my proposal, but the truth
+is that I sneaked into Chad our neighboring country where I am living
+now as a refugee.
+I escaped with my little daughter when the rebels bust into our house
+and killed my husband as one of the big oil dealers in the country,
+ever since then, I have being on the run.
 
+I left my country and move to Chad our neighboring country with the
+little ceasefire we had, due to the face to face peace meeting accord
+coordinated by the US Secretary of State, Mr John Kerry and United
+Nations in Ethiopia (Addis Ababa) between our President Mr Salva Kiir
+and the rebel leader Mr Riek Machar to stop this war.
+
+I want to solicit for your partnership with trust to invest the $8
+million dollars deposited by my late husband in Bank because my life
+is no longer safe in our country, since the rebels are looking for the
+families of all the oil business men in the country to kill, saying
+that they are they one that is milking the country dry.
+
+I will offer you 20% of the total fund for your help while I will
+partner with you for the investment in your country.
+If I get your reply.
+
+I will wait to hear from you so as to give you details.With love from
+
+ i need you to contact me here sarahkoffi389@yahoo.co.jp
+
+Mrs. Sarah Koffi
