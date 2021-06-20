@@ -2,392 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B8BCE3ADF13
-	for <lists+kvm@lfdr.de>; Sun, 20 Jun 2021 16:46:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EDFDA3AE0E9
+	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 00:25:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229897AbhFTOsg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 20 Jun 2021 10:48:36 -0400
-Received: from mail-dm6nam11on2086.outbound.protection.outlook.com ([40.107.223.86]:48897
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229650AbhFTOsc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 20 Jun 2021 10:48:32 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cTfhidZGPNg6uWtwRoK4fXLHD8dhc59yt9DCkzc9Ff5YmF/f+GQsDeNyDs37zhdo3O99WLd4+zw19lzwiAxT6NM+8a/zeWVJiZfAj+eU7kOAPPGv6lZcNaamaWzt5+JstPRAiCe227VYjUmyGz/GYYJ/PkxJsJ1S+uIev2GM0AvKgjJpoQO00zbDu9BTl6oHnvKOc4DzuEhqjJgElW4guT6UqH+2N97uUqAItYs6oNU9lV8QvbWau6zRbTmcqdmpVIF8e9WFgSuP7KnjIcnqr9MdMAr68DuigqPWYkZBi3PEKhpBnj2TY0Lu1vb1u4zuyur5j5nDlqQL1/xUPWrV0w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=K3qQIL/qMtn8miKKA3jOqRXIdF8etcCeDsjaAO6sMxs=;
- b=J/RiCwhk2qjVCn1fDTBUEPKguNb8aaoALFIktGOnyhCUTkyma9PvEqEdLWBJ7wAzavdxooNBnQuRNk7E84cNV/ApdaiDL6KkJakuexMjZEhmBCgBQSjEo/dswLeg8iXTo9Zyb0/tS8I6X9RZ8yHe3HB+2B0/dloeoT4bZmnT2V9/ao8jDFMK74S1eI6bUMdzjQBZZp3WIAVuvwFXOUKJP6y86NM6Ijf1ghgWLEMux9Ha/eYmRySoS9u3xDNg2D+dgxQFcuDBrciXwN/+gStv3BfUL0s28IoRWVgRBE8t8r8m1JxCwFx9y0jTerfrf/lkyhcBfZYzyOWZCx3XIc20WA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=K3qQIL/qMtn8miKKA3jOqRXIdF8etcCeDsjaAO6sMxs=;
- b=Q2clLJvzCS80v/Q3+rLHnpkMxv1WzNJNXYRJzQlR+Dqw01x6Fn+GDprJjRjOfBo5TkyJG9LbU6jqBPirGyf260vtoHB1ZRiEx4Trb/kQACymNOlt0/YNSf2xtCeRl1p3cUuZLeOCsfeMjIrDzRDWP9RXWo5GWIC/3AdHuHGZMwwPPUx1gVfL17lNesPX+euReGrCC56ACNqx47MiIygVqZRVZIe92yoNDwXCgzPXJojXSgEw1Qg1ZKS/EtyrwfBZ8VmoTgPdvXpHqTCdjozTN38nHe8u7ZrBIiXqgZC6I/1PCT2uoAA8GJRnR+E264+tXdWYGjT/OlLXn0it+IA/aw==
-Received: from BN8PR15CA0060.namprd15.prod.outlook.com (2603:10b6:408:80::37)
- by DM5PR12MB1516.namprd12.prod.outlook.com (2603:10b6:4:5::12) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4242.21; Sun, 20 Jun 2021 14:46:18 +0000
-Received: from BN8NAM11FT006.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:80:cafe::1d) by BN8PR15CA0060.outlook.office365.com
- (2603:10b6:408:80::37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4242.21 via Frontend
- Transport; Sun, 20 Jun 2021 14:46:18 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
- smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.34; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.34) by
- BN8NAM11FT006.mail.protection.outlook.com (10.13.177.21) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4242.16 via Frontend Transport; Sun, 20 Jun 2021 14:46:18 +0000
-Received: from [172.27.13.145] (172.20.187.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Sun, 20 Jun
- 2021 14:46:12 +0000
-Subject: Re: [PATCH 09/11] PCI: add matching checks for driver_override
- binding
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     Alex Williamson <alex.williamson@redhat.com>, <cohuck@redhat.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <aviadye@nvidia.com>, <oren@nvidia.com>, <shahafs@nvidia.com>,
-        <parav@nvidia.com>, <artemp@nvidia.com>, <kwankhede@nvidia.com>,
-        <ACurrid@nvidia.com>, <cjia@nvidia.com>, <yishaih@nvidia.com>,
-        <kevin.tian@intel.com>, <hch@infradead.org>, <targupta@nvidia.com>,
-        <shameerali.kolothum.thodi@huawei.com>, <liulongfang@huawei.com>,
-        <yan.y.zhao@intel.com>
-References: <20210615230017.GZ1002214@nvidia.com>
- <20210615172242.4b2be854.alex.williamson@redhat.com>
- <20210615233257.GB1002214@nvidia.com>
- <20210615182245.54944509.alex.williamson@redhat.com>
- <20210616003417.GH1002214@nvidia.com>
- <cd95b92c-a23b-03a7-1dd3-9554b9d22955@nvidia.com>
- <20210616233317.GR1002214@nvidia.com>
- <f6ef5c0c-0a85-30ca-5711-3b86d71c141a@nvidia.com>
- <20210616234437.GS1002214@nvidia.com>
- <6c97caa0-f6f6-11c8-9870-4f08f6f8d6a0@nvidia.com>
- <20210616235623.GT1002214@nvidia.com>
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-Message-ID: <a9b4ffbb-4bad-1dfe-d2ef-2446e2b73ca4@nvidia.com>
-Date:   Sun, 20 Jun 2021 17:46:09 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S230032AbhFTW1n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 20 Jun 2021 18:27:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40791 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229897AbhFTW1m (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 20 Jun 2021 18:27:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624227929;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=crwPYk9/LCjPOHjUmfS2MavxdcK4sFFcOYXWTbXDKlk=;
+        b=iAu5azhfdFP8nQAdWXMqWBdAFkV26dzyKQGgV6Ga+1THjppaYKr4nmKX8UNcdB5J+q2wc6
+        4yNTBd0rMuJBsie7pfmScvrYG9TviRywE1bMRZMv50cmMIyWZ8rQovblWHyUEFW3lhGZ51
+        PUmySUu8qixt/0KT2CTtPIzUB0+oCe0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-3-cldV6BLFPKSG5AdxXLOuTw-1; Sun, 20 Jun 2021 18:25:27 -0400
+X-MC-Unique: cldV6BLFPKSG5AdxXLOuTw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0541636268;
+        Sun, 20 Jun 2021 22:25:25 +0000 (UTC)
+Received: from starship (unknown [10.40.192.10])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 492C460C9D;
+        Sun, 20 Jun 2021 22:25:20 +0000 (UTC)
+Message-ID: <7df87b7f0b2e029b483d08611e70291aab4e4d0b.camel@redhat.com>
+Subject: Re: [PATCH v3 8/8] KVM: x86: avoid loading PDPTRs after migration
+ when possible
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Jim Mattson <jmattson@google.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Date:   Mon, 21 Jun 2021 01:25:18 +0300
+In-Reply-To: <YM0H3Hvs8/3+twnc@google.com>
+References: <20210607090203.133058-1-mlevitsk@redhat.com>
+         <20210607090203.133058-9-mlevitsk@redhat.com> <YM0H3Hvs8/3+twnc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <20210616235623.GT1002214@nvidia.com>
-Content-Type: multipart/mixed;
-        boundary="------------BF748129378E213267087AFE"
-Content-Language: en-US
-X-Originating-IP: [172.20.187.5]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2117fb36-4a6e-4f73-fbf3-08d933fa29c8
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1516:
-X-Microsoft-Antispam-PRVS: <DM5PR12MB15166E23D1A1863E61A9922DDE0B9@DM5PR12MB1516.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ns1czBF0ome3QonNpQLV4GZtvelhSynBIsU+6hF+4QP/mX45T2HgFmHpkZ4RPjVlmq45n/cM1f2hSDw9veO0hjlJ1qlX5PKRphEH9qhbxoxQPhvPP9AbTFMLeGPKpMwMndOxGYlqorQV/h6OOc5ZHHUHntr9GY4556UTE3TZQ1n5IJNVmGnevTI10pwSNXvr82o5ISaFpcy3uPl6tispM+8Afew2BeOeyRymdQ3UMM8M5kuYepMTrhl90GGReDsAFd9kMJY2Z57fns8RbVAtwIFvYdBOmPLoaZv6UoCZzvzjIiVbeSBdiNuL3Dw5Rsa9ciPU+jlRF+3hhvlcnzrNJLnpKd4DY+kC841SXJsCQgJYA+HprmxEGU05qivfo+jPyqD4BbF34V78RncYHgT8cTlp4AS2N4+QaQXmOqzDTkZ8mZf2aOnunrh0wJ8wC+yBXmNd9QcRvAfiQlebSyfW1PPJZMg2h1+vZiLeael28flgchhNuDKTBpv9hHLz2lGuF4NxAfPF42GVxV3eYcAOJR/bqQOzvQS283BY/4okj98eGTPIJR6XK7c67P9S0bSKq8YnhQ1ay5JrqrVXwBSRG+5zCsTqSe4mMVVeBKXgdd7XwLFOQkYwlNNzS1h35I1/c7ZFfwVn8X4CGzmsa9ByU8BeTFxy+c65POzwbTEbTfs0g2P5E8c4/mPlAjOY0J3o
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(346002)(396003)(376002)(39860400002)(136003)(46966006)(36840700001)(6666004)(36756003)(36906005)(16576012)(316002)(37006003)(5660300002)(36860700001)(54906003)(82740400003)(82310400003)(2906002)(66576008)(235185007)(70206006)(70586007)(2616005)(26005)(31686004)(31696002)(86362001)(16526019)(356005)(47076005)(33964004)(53546011)(7636003)(8936002)(6862004)(4326008)(8676002)(186003)(336012)(478600001)(426003)(6636002)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2021 14:46:18.3165
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2117fb36-4a6e-4f73-fbf3-08d933fa29c8
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT006.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1516
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---------------BF748129378E213267087AFE
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+On Fri, 2021-06-18 at 20:53 +0000, Sean Christopherson wrote:
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 11260e83518f..eadfc9caf500 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -815,6 +815,8 @@ int load_pdptrs(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu, unsigned long cr3)
+> >  
+> >  	memcpy(mmu->pdptrs, pdpte, sizeof(mmu->pdptrs));
+> >  	kvm_register_mark_dirty(vcpu, VCPU_EXREG_PDPTR);
+> > +	vcpu->arch.pdptrs_restored_oob = false;
+> > +
+> >  out:
+> >  
+> >  	return ret;
+> > @@ -10113,6 +10115,7 @@ static int __set_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2)
+> >  
+> >  		kvm_register_mark_dirty(vcpu, VCPU_EXREG_PDPTR);
+> >  		mmu_reset_needed = 1;
+> > +		vcpu->arch.pdptrs_restored_oob = true;
+> 
+> Setting pdptrs_restored_oob[*] here and _only_ clearing it on successful
+> load_pdptrs() is not robust.  Potential problems once the flag is set:
+
+Hi Sean Christopherson!
+Thanks for the review!
+
+I also thought about the exact same thing when I submitted the last version of
+this patches (prior version didn't clear the flag at all but I noticed that
+while doing self review of my patches).
 
 
-On 6/17/2021 2:56 AM, Jason Gunthorpe wrote:
-> On Thu, Jun 17, 2021 at 02:51:09AM +0300, Max Gurtovoy wrote:
->> On 6/17/2021 2:44 AM, Jason Gunthorpe wrote:
->>> On Thu, Jun 17, 2021 at 02:42:46AM +0300, Max Gurtovoy wrote:
->>>
->>>> Do you see a reason not adding this alias for stub drivers but
->>>> adding it to vfio_pci drivers ?
->>> It creates uABI without a userspace user and that is strongly
->>> discouraged. The 'stub_pci:' prefix becomes fixed ABI.
->> so is it better to have "pci:v*d*sv*sd*bc*sc*i*" for stub drivers ?
-> No, we don't want to convey any new information about stub drivers to
-> userspace.
->
->> or not adding alias at all if stub flag is set ?
-> Yes, just don't change it at all, IMHO.
+> 
+>   1.  Userspace calls KVM_SET_SREGS{,2} without valid PDPTRs.  Flag is now stale.
 
-Ok.
+True. It isn't that big issue though since the only way to this is to also disable PAE mode
+in CR4 during the call or before it, thus PDPTRs becomes irrelevant.
+Once PAE is enabled again, PDPTRs will be loaded again, resetting this flag.
 
-I've attached 2 patches that I would like to agree on before we'll send 
-the V5.
+Something to note is that we also don't clear available/dirty status of VCPU_EXREG_PDPTR
+in this case.
 
-They include the pci-pf-stub additions and keep searching for matching 
-static ids as we discussed.
 
-Max.
 
->
-> Jason
+>   2.  kvm_check_nested_events() VM-Exits to L1 before the flag is processed.
+>       Flag is now stale.
 
---------------BF748129378E213267087AFE
-Content-Type: text/plain; charset="UTF-8";
-	name="0001-PCI-add-flags-field-to-pci_device_id-structure.patch"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
-	filename="0001-PCI-add-flags-field-to-pci_device_id-structure.patch"
+Also true. However this means that we enter L1 now, and once we are ready to enter
+L2 again, we will load PDPTRS from guest memory as thankfully VM entries in PAE mode
+do load PDPTRS from guest memory (both on Intel and AMD).
 
-RnJvbSA2N2JlMWUzYTY1MjVjNzNmYTU4MmU4ZjVhYTcwM2I5ODJkNmQ4MTE0IE1vbiBTZXAg
-MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBNYXggR3VydG92b3kgPG1ndXJ0b3ZveUBudmlkaWEu
-Y29tPgpEYXRlOiBUaHUsIDEzIE1heSAyMDIxIDEzOjUzOjE5ICswMzAwClN1YmplY3Q6IFtQ
-QVRDSCAxLzJdIFBDSTogYWRkIGZsYWdzIGZpZWxkIHRvIHBjaV9kZXZpY2VfaWQgc3RydWN0
-dXJlCgpUaGlzIGZpZWxkIHdpbGwgYmUgdXNlZCB0byBhbGxvdyBwY2kgbW9kdWxlcyB0byBz
-ZXQgc29tZSBzcGVjaWZpYyBkYXRhCnRoYXQgY2FuIGJlIHVzZWQgZm9yIG1hdGNoaW5nLCBh
-bGlhc2VzIGFuZCBvdGhlciBoaW50cy4gQWRkIGV4YW1wbGUgZm9yCiJkcml2ZXJfb3ZlcnJp
-ZGUiIHBjaSBkcml2ZXJzIHRoYXQgbWF5IHdhbnQgdG8gc2V0IGEgc3BlY2lhbCBwcmVmaXgg
-aW4KdGhlIG1vZHVsZXMuYWxpYXMgdGFibGUuIEluIHRoZSBmdXR1cmUsIHRoaXMgZmxhZyB3
-aWxsIGVuZm9yY2UKImRyaXZlcl9vdmVycmlkZSIgdG8gd29yayBvbiBkcml2ZXJzIHRoYXQg
-c3BlY2lmaWNhbGx5IG9wdCBpbnRvIHRoaXMKZmVhdHVyZS4gSW4gdGhpcyBjYXNlLCB0aGUg
-dWRldiB1dGlsaXR5IHdpbGwgbm90IHRyeSB0byBsb2FkIHRoZXNlCmRyaXZlcnMgYXV0b21h
-dGljYWxseSBpbiBvcmRlciB0byBiaW5kIHRvIG5ldyBkaXNjb3ZlcmVkIGRldmljZXMuIFRo
-aXMKd2lsbCBiZSBiZWNhdXNlIHRoZSBtb2RhbGlhcyB0YWJsZXMgcG9wdWxhdGVkIGJ5IHRo
-b3NlIGRyaXZlcnMgd2lsbCBiZQpkaWZmZXJlbnQgZnJvbSAicmVndWxhciIgcGNpIG1vZGFs
-aWFzIHRhYmxlcy4gVXNlcnNwYWNlIHV0aWxpdGllcywgc3VjaAphcyBsaWJ2aXJ0IGZvciB2
-ZmlvIGRldmljZXMsIHdpbGwgbmVlZCB0byBhZGp1c3QgYW5kIGJpbmQgZGV2aWNlcwphY2Nv
-cmRpbmcgdG8gbmV3IG1hdGNoaW5nIG1lY2hhbmlzbSB3aXRoIHRha2luZyAiZHJpdmVyX292
-ZXJyaWRlIgplbmZvcmNlbWVudCBpbnRvIGNvbnNpZGVyYXRpb24uIEFkZCB2ZmlvIGFuZCBz
-dHViIHRvICJkcml2ZXJfb3ZlcnJpZGUiClBDSSBmYW1pbHkgYW5kIGNyZWF0ZSBuZXcgYWxp
-YXMgZm9yICJkcml2ZXJfb3ZlcnJpZGUiIHZmaW8gZGV2aWNlcy4KClNpZ25lZC1vZmYtYnk6
-IE1heCBHdXJ0b3ZveSA8bWd1cnRvdm95QG52aWRpYS5jb20+Ci0tLQogRG9jdW1lbnRhdGlv
-bi9QQ0kvcGNpLnJzdCAgICAgICAgIHwgIDEgKwogaW5jbHVkZS9saW51eC9tb2RfZGV2aWNl
-dGFibGUuaCAgIHwgMTEgKysrKysrKysrKysKIGluY2x1ZGUvbGludXgvcGNpLmggICAgICAg
-ICAgICAgICB8IDI3ICsrKysrKysrKysrKysrKysrKysrKysrKysrKwogc2NyaXB0cy9tb2Qv
-ZGV2aWNldGFibGUtb2Zmc2V0cy5jIHwgIDEgKwogc2NyaXB0cy9tb2QvZmlsZTJhbGlhcy5j
-ICAgICAgICAgIHwgMTAgKysrKysrKystLQogNSBmaWxlcyBjaGFuZ2VkLCA0OCBpbnNlcnRp
-b25zKCspLCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL0RvY3VtZW50YXRpb24vUENJ
-L3BjaS5yc3QgYi9Eb2N1bWVudGF0aW9uL1BDSS9wY2kucnN0CmluZGV4IDgxNGI0MGY4MzYw
-Yi4uMDg1NTY1N2RhZjkzIDEwMDY0NAotLS0gYS9Eb2N1bWVudGF0aW9uL1BDSS9wY2kucnN0
-CisrKyBiL0RvY3VtZW50YXRpb24vUENJL3BjaS5yc3QKQEAgLTEwMyw2ICsxMDMsNyBAQCBu
-ZWVkIHBhc3Mgb25seSBhcyBtYW55IG9wdGlvbmFsIGZpZWxkcyBhcyBuZWNlc3Nhcnk6CiAg
-IC0gc3VidmVuZG9yIGFuZCBzdWJkZXZpY2UgZmllbGRzIGRlZmF1bHQgdG8gUENJX0FOWV9J
-RCAoRkZGRkZGRkYpCiAgIC0gY2xhc3MgYW5kIGNsYXNzbWFzayBmaWVsZHMgZGVmYXVsdCB0
-byAwCiAgIC0gZHJpdmVyX2RhdGEgZGVmYXVsdHMgdG8gMFVMLgorICAtIGZsYWdzIGZpZWxk
-IGRlZmF1bHRzIHRvIDAuCiAKIE5vdGUgdGhhdCBkcml2ZXJfZGF0YSBtdXN0IG1hdGNoIHRo
-ZSB2YWx1ZSB1c2VkIGJ5IGFueSBvZiB0aGUgcGNpX2RldmljZV9pZAogZW50cmllcyBkZWZp
-bmVkIGluIHRoZSBkcml2ZXIuIFRoaXMgbWFrZXMgdGhlIGRyaXZlcl9kYXRhIGZpZWxkIG1h
-bmRhdG9yeQpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9tb2RfZGV2aWNldGFibGUuaCBi
-L2luY2x1ZGUvbGludXgvbW9kX2RldmljZXRhYmxlLmgKaW5kZXggN2Q0NWI1Zjk4OWIwLi41
-MWI4NTJhMmQzMmIgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbGludXgvbW9kX2RldmljZXRhYmxl
-LmgKKysrIGIvaW5jbHVkZS9saW51eC9tb2RfZGV2aWNldGFibGUuaApAQCAtMTYsNiArMTYs
-MTUgQEAgdHlwZWRlZiB1bnNpZ25lZCBsb25nIGtlcm5lbF91bG9uZ190OwogCiAjZGVmaW5l
-IFBDSV9BTllfSUQgKH4wKQogCisKK2VudW0gcGNpX2lkX2ZsYWdzIHsKKwlQQ0lfSURfRl9W
-RklPX0RSSVZFUl9PVkVSUklERQk9IDEgPDwgMCwKKwlQQ0lfSURfRl9TVFVCX0RSSVZFUl9P
-VkVSUklERQk9IDEgPDwgMSwKK307CisKKyNkZWZpbmUgUENJX0lEX0ZfRFJJVkVSX09WRVJS
-SURFIFwKKwkoUENJX0lEX0ZfVkZJT19EUklWRVJfT1ZFUlJJREUgfCBQQ0lfSURfRl9TVFVC
-X0RSSVZFUl9PVkVSUklERSkKKwogLyoqCiAgKiBzdHJ1Y3QgcGNpX2RldmljZV9pZCAtIFBD
-SSBkZXZpY2UgSUQgc3RydWN0dXJlCiAgKiBAdmVuZG9yOgkJVmVuZG9yIElEIHRvIG1hdGNo
-IChvciBQQ0lfQU5ZX0lEKQpAQCAtMzQsMTIgKzQzLDE0IEBAIHR5cGVkZWYgdW5zaWduZWQg
-bG9uZyBrZXJuZWxfdWxvbmdfdDsKICAqCQkJQmVzdCBwcmFjdGljZSBpcyB0byB1c2UgZHJp
-dmVyX2RhdGEgYXMgYW4gaW5kZXgKICAqCQkJaW50byBhIHN0YXRpYyBsaXN0IG9mIGVxdWl2
-YWxlbnQgZGV2aWNlIHR5cGVzLAogICoJCQlpbnN0ZWFkIG9mIHVzaW5nIGl0IGFzIGEgcG9p
-bnRlci4KKyAqIEBmbGFnczoJCVBDSSBmbGFncyBvZiB0aGUgZHJpdmVyLiBCaXRtYXAgb2Yg
-cGNpX2lkX2ZsYWdzIGVudW0uCiAgKi8KIHN0cnVjdCBwY2lfZGV2aWNlX2lkIHsKIAlfX3Uz
-MiB2ZW5kb3IsIGRldmljZTsJCS8qIFZlbmRvciBhbmQgZGV2aWNlIElEIG9yIFBDSV9BTllf
-SUQqLwogCV9fdTMyIHN1YnZlbmRvciwgc3ViZGV2aWNlOwkvKiBTdWJzeXN0ZW0gSUQncyBv
-ciBQQ0lfQU5ZX0lEICovCiAJX191MzIgY2xhc3MsIGNsYXNzX21hc2s7CS8qIChjbGFzcyxz
-dWJjbGFzcyxwcm9nLWlmKSB0cmlwbGV0ICovCiAJa2VybmVsX3Vsb25nX3QgZHJpdmVyX2Rh
-dGE7CS8qIERhdGEgcHJpdmF0ZSB0byB0aGUgZHJpdmVyICovCisJX191MzIgZmxhZ3M7CiB9
-OwogCiAKZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvcGNpLmggYi9pbmNsdWRlL2xpbnV4
-L3BjaS5oCmluZGV4IGMyMDIxMWU1OWE1Ny4uNGFmNzYxNTUyMDY4IDEwMDY0NAotLS0gYS9p
-bmNsdWRlL2xpbnV4L3BjaS5oCisrKyBiL2luY2x1ZGUvbGludXgvcGNpLmgKQEAgLTg5OCw2
-ICs4OTgsMzMgQEAgc3RydWN0IHBjaV9kcml2ZXIgewogCS52ZW5kb3IgPSAodmVuZCksIC5k
-ZXZpY2UgPSAoZGV2KSwgXAogCS5zdWJ2ZW5kb3IgPSBQQ0lfQU5ZX0lELCAuc3ViZGV2aWNl
-ID0gUENJX0FOWV9JRAogCisvKioKKyAqIFBDSV9ERVZJQ0VfRkxBR1MgLSBtYWNybyB1c2Vk
-IHRvIGRlc2NyaWJlIGEgUENJIGRldmljZSB3aXRoIHNwZWNpZmljIGZsYWdzLgorICogQHZl
-bmQ6IHRoZSAxNiBiaXQgUENJIFZlbmRvciBJRAorICogQGRldjogdGhlIDE2IGJpdCBQQ0kg
-RGV2aWNlIElECisgKiBAZmw6IFBDSSBEZXZpY2UgZmxhZ3MgYXMgYSBiaXRtYXAgb2YgcGNp
-X2lkX2ZsYWdzIGVudW0KKyAqCisgKiBUaGlzIG1hY3JvIGlzIHVzZWQgdG8gY3JlYXRlIGEg
-c3RydWN0IHBjaV9kZXZpY2VfaWQgdGhhdCBtYXRjaGVzIGEKKyAqIHNwZWNpZmljIGRldmlj
-ZS4gVGhlIHN1YnZlbmRvciBhbmQgc3ViZGV2aWNlIGZpZWxkcyB3aWxsIGJlIHNldCB0bwor
-ICogUENJX0FOWV9JRC4KKyAqLworI2RlZmluZSBQQ0lfREVWSUNFX0ZMQUdTKHZlbmQsIGRl
-diwgZmwpIFwKKwkudmVuZG9yID0gKHZlbmQpLCAuZGV2aWNlID0gKGRldiksIC5zdWJ2ZW5k
-b3IgPSBQQ0lfQU5ZX0lELCBcCisJLnN1YmRldmljZSA9IFBDSV9BTllfSUQsIC5mbGFncyA9
-IChmbCkKKworLyoqCisgKiBQQ0lfRFJJVkVSX09WRVJSSURFX0RFVklDRV9WRklPIC0gbWFj
-cm8gdXNlZCB0byBkZXNjcmliZSBhIFZGSU8KKyAqICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAiZHJpdmVyX292ZXJyaWRlIiBQQ0kgZGV2aWNlLgorICogQHZlbmQ6IHRo
-ZSAxNiBiaXQgUENJIFZlbmRvciBJRAorICogQGRldjogdGhlIDE2IGJpdCBQQ0kgRGV2aWNl
-IElECisgKgorICogVGhpcyBtYWNybyBpcyB1c2VkIHRvIGNyZWF0ZSBhIHN0cnVjdCBwY2lf
-ZGV2aWNlX2lkIHRoYXQgbWF0Y2hlcyBhCisgKiBzcGVjaWZpYyBkZXZpY2UuIFRoZSBzdWJ2
-ZW5kb3IgYW5kIHN1YmRldmljZSBmaWVsZHMgd2lsbCBiZSBzZXQgdG8KKyAqIFBDSV9BTllf
-SUQgYW5kIHRoZSBmbGFncyB3aWxsIGJlIHNldCB0byBQQ0lfSURfRl9WRklPX0RSSVZFUl9P
-VkVSUklERS4KKyAqLworI2RlZmluZSBQQ0lfRFJJVkVSX09WRVJSSURFX0RFVklDRV9WRklP
-KHZlbmQsIGRldikgXAorCVBDSV9ERVZJQ0VfRkxBR1ModmVuZCwgZGV2LCBQQ0lfSURfRl9W
-RklPX0RSSVZFUl9PVkVSUklERSkKKwogLyoqCiAgKiBQQ0lfREVWSUNFX1NVQiAtIG1hY3Jv
-IHVzZWQgdG8gZGVzY3JpYmUgYSBzcGVjaWZpYyBQQ0kgZGV2aWNlIHdpdGggc3Vic3lzdGVt
-CiAgKiBAdmVuZDogdGhlIDE2IGJpdCBQQ0kgVmVuZG9yIElECmRpZmYgLS1naXQgYS9zY3Jp
-cHRzL21vZC9kZXZpY2V0YWJsZS1vZmZzZXRzLmMgYi9zY3JpcHRzL21vZC9kZXZpY2V0YWJs
-ZS1vZmZzZXRzLmMKaW5kZXggOWJiNmM3ZWRjY2M0Li5iOTI3YzM2YjgzMzMgMTAwNjQ0Ci0t
-LSBhL3NjcmlwdHMvbW9kL2RldmljZXRhYmxlLW9mZnNldHMuYworKysgYi9zY3JpcHRzL21v
-ZC9kZXZpY2V0YWJsZS1vZmZzZXRzLmMKQEAgLTQyLDYgKzQyLDcgQEAgaW50IG1haW4odm9p
-ZCkKIAlERVZJRF9GSUVMRChwY2lfZGV2aWNlX2lkLCBzdWJkZXZpY2UpOwogCURFVklEX0ZJ
-RUxEKHBjaV9kZXZpY2VfaWQsIGNsYXNzKTsKIAlERVZJRF9GSUVMRChwY2lfZGV2aWNlX2lk
-LCBjbGFzc19tYXNrKTsKKwlERVZJRF9GSUVMRChwY2lfZGV2aWNlX2lkLCBmbGFncyk7CiAK
-IAlERVZJRChjY3dfZGV2aWNlX2lkKTsKIAlERVZJRF9GSUVMRChjY3dfZGV2aWNlX2lkLCBt
-YXRjaF9mbGFncyk7CmRpZmYgLS1naXQgYS9zY3JpcHRzL21vZC9maWxlMmFsaWFzLmMgYi9z
-Y3JpcHRzL21vZC9maWxlMmFsaWFzLmMKaW5kZXggN2M5N2ZhOGUzNmJjLi4yYjJiN2Q4NzU0
-MTYgMTAwNjQ0Ci0tLSBhL3NjcmlwdHMvbW9kL2ZpbGUyYWxpYXMuYworKysgYi9zY3JpcHRz
-L21vZC9maWxlMmFsaWFzLmMKQEAgLTQyNiw3ICs0MjYsNyBAQCBzdGF0aWMgaW50IGRvX2ll
-ZWUxMzk0X2VudHJ5KGNvbnN0IGNoYXIgKmZpbGVuYW1lLAogCXJldHVybiAxOwogfQogCi0v
-KiBMb29rcyBsaWtlOiBwY2k6dk5kTnN2TnNkTmJjTnNjTmlOLiAqLworLyogTG9va3MgbGlr
-ZTogcGNpOnZOZE5zdk5zZE5iY05zY05pTiBvciA8cHJlZml4Pl9wY2k6dk5kTnN2TnNkTmJj
-TnNjTmlOLiAqLwogc3RhdGljIGludCBkb19wY2lfZW50cnkoY29uc3QgY2hhciAqZmlsZW5h
-bWUsCiAJCQl2b2lkICpzeW12YWwsIGNoYXIgKmFsaWFzKQogewpAQCAtNDQwLDggKzQ0MCwx
-NCBAQCBzdGF0aWMgaW50IGRvX3BjaV9lbnRyeShjb25zdCBjaGFyICpmaWxlbmFtZSwKIAlE
-RUZfRklFTEQoc3ltdmFsLCBwY2lfZGV2aWNlX2lkLCBzdWJkZXZpY2UpOwogCURFRl9GSUVM
-RChzeW12YWwsIHBjaV9kZXZpY2VfaWQsIGNsYXNzKTsKIAlERUZfRklFTEQoc3ltdmFsLCBw
-Y2lfZGV2aWNlX2lkLCBjbGFzc19tYXNrKTsKKwlERUZfRklFTEQoc3ltdmFsLCBwY2lfZGV2
-aWNlX2lkLCBmbGFncyk7CiAKLQlzdHJjcHkoYWxpYXMsICJwY2k6Iik7CisJaWYgKCFmbGFn
-cykKKwkJc3RyY3B5KGFsaWFzLCAicGNpOiIpOworCWVsc2UgaWYgKGZsYWdzICYgUENJX0lE
-X0ZfVkZJT19EUklWRVJfT1ZFUlJJREUpCisJCXN0cmNweShhbGlhcywgInZmaW9fcGNpOiIp
-OworCWVsc2UKKwkJcmV0dXJuIDA7CiAJQUREKGFsaWFzLCAidiIsIHZlbmRvciAhPSBQQ0lf
-QU5ZX0lELCB2ZW5kb3IpOwogCUFERChhbGlhcywgImQiLCBkZXZpY2UgIT0gUENJX0FOWV9J
-RCwgZGV2aWNlKTsKIAlBREQoYWxpYXMsICJzdiIsIHN1YnZlbmRvciAhPSBQQ0lfQU5ZX0lE
-LCBzdWJ2ZW5kb3IpOwotLSAKMi4xOC4xCgo=
---------------BF748129378E213267087AFE
-Content-Type: text/plain; charset="UTF-8";
-	name="0002-PCI-add-matching-checks-for-driver_override-binding.patch"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
-	filename*0="0002-PCI-add-matching-checks-for-driver_override-binding.pat";
-	filename*1="ch"
 
-RnJvbSBkYmFkM2FiOTdhZjM5NDU1YzRlNGY2OTY3YmRkNDdlZjFlYTY3MTk4IE1vbiBTZXAg
-MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBNYXggR3VydG92b3kgPG1ndXJ0b3ZveUBudmlkaWEu
-Y29tPgpEYXRlOiBUaHUsIDEzIE1heSAyMDIxIDE1OjM4OjI3ICswMzAwClN1YmplY3Q6IFtQ
-QVRDSCAyLzJdIFBDSTogYWRkIG1hdGNoaW5nIGNoZWNrcyBmb3IgZHJpdmVyX292ZXJyaWRl
-IGJpbmRpbmcKCkFsbG93aW5nIGFueSBkcml2ZXIgaW4gdGhlIHN5c3RlbSB0byBiZSB1bmNv
-bmRpdGlvbmFsbHkgYm91bmQgdG8gYW55ClBDSSBIVyBpcyBkYW5nZXJvdXMuIENvbm5lY3Rp
-bmcgYSBkcml2ZXIgdG8gYSBwaHlzaWNhbCBIVyBkZXZpY2UgaXQgd2FzCm5ldmVyIGludGVu
-ZGVkIHRvIG9wZXJhdGUgbWF5IHRyaWdnZXIgZXhwbG9pdGFibGUga2VybmVsIGJ1Z3MsIG9y
-IHdvcnNlLgpJdCBhbHNvIGFsbG93cyB1c2Vyc3BhY2UgdG8gbG9hZCBhbmQgcnVuIGtlcm5l
-bCBjb2RlIHRoYXQgb3RoZXJ3aXNlCndvdWxkIG5ldmVyIGJlIHJ1bm5hYmxlIG9uIHRoZSBz
-eXN0ZW0uCgpFbmFibGUgdGhlIG9wdGlvbiBmb3IgZHJpdmVycyB0byBzcGVjaWZpY2FsbHkg
-b3B0IGludG8gZHJpdmVyX292ZXJyaWRlCmZlYXR1cmUuIFRoZXNlIGRyaXZlcnMgd2lsbCBl
-eHBvc2UgYSBwcm9wZXIgbWF0Y2hpbmcgdGFibGUgdGhhdCBpbmRpY2F0ZXMKd2hhdCBIVyBp
-dCBjYW4gcHJvcGVybHkgc3VwcG9ydC4gdmZpby1wY2kgYW5kIHBjaSBzdHViIGRyaXZlcnMg
-Y29udGludWVzCnRvIHN1cHBvcnQgZXZlcnl0aGluZy4KClRoZSBtb2RhbGlhcyB0YWJsZXMg
-dG8gYmUgcG9wdWxhdGVkIHdpdGggZGVkaWNhdGVkIG1hdGNoIHRhYmxlIGFuZAp1c2Vyc3Bh
-Y2Ugbm93IGJlY29tZXMgYXdhcmUgdGhhdCB2ZmlvLXBjaSBjYW4gYmUgbG9hZGVkIGFnYWlu
-c3QgYW55IFBDSQpkZXZpY2UgdXNpbmcgZHJpdmVyX292ZXJyaWRlIChtb2RhbGlhcyBmb3Ig
-cGNpIHN0dWIgZHJpdmVycyBjYW4gYmUgYWRkZWQKaW4gdGhlIGZ1dHVyZSwgaWYgbmVlZGVk
-KS4KClRoZSBkeW5hbWljIG5ld19pZCBvcHRpb24gaXMgc3RpbGwgbWlnaHQgYmUgaW4gdXNl
-IGZvciB0aGVzZSBkcml2ZXJzIHRvCnByZXNlcnZlIGJhY2t3YXJkIGNvbXBhdGliaWxpdHku
-IEZvciBub3csIGFsc28gcHJlc2VydmUgdGhlIG9sZApkcml2ZXJfb3ZlcnJpZGUgbWVjaGFu
-aXNtIGZvciBub24gImRyaXZlcl9vdmVycmlkZSIgbW9kdWxlcy4KClNpZ25lZC1vZmYtYnk6
-IE1heCBHdXJ0b3ZveSA8bWd1cnRvdm95QG52aWRpYS5jb20+Ci0tLQogRG9jdW1lbnRhdGlv
-bi9BQkkvdGVzdGluZy9zeXNmcy1idXMtcGNpIHwgIDUgKysrKy0KIGRyaXZlcnMvcGNpL3Bj
-aS1kcml2ZXIuYyAgICAgICAgICAgICAgICB8IDI2ICsrKysrKysrKysrKysrKysrKysrKy0t
-LS0KIGRyaXZlcnMvcGNpL3BjaS1wZi1zdHViLmMgICAgICAgICAgICAgICB8ICAxICsKIGRy
-aXZlcnMvcGNpL3BjaS1zdHViLmMgICAgICAgICAgICAgICAgICB8ICA5ICsrKysrKysrLQog
-ZHJpdmVycy92ZmlvL3BjaS92ZmlvX3BjaS5jICAgICAgICAgICAgIHwgIDkgKysrKysrKyst
-CiA1IGZpbGVzIGNoYW5nZWQsIDQzIGluc2VydGlvbnMoKyksIDcgZGVsZXRpb25zKC0pCgpk
-aWZmIC0tZ2l0IGEvRG9jdW1lbnRhdGlvbi9BQkkvdGVzdGluZy9zeXNmcy1idXMtcGNpIGIv
-RG9jdW1lbnRhdGlvbi9BQkkvdGVzdGluZy9zeXNmcy1idXMtcGNpCmluZGV4IGVmMDBmYWRh
-MmVmYi4uZmZiMzFmZGE1OTdkIDEwMDY0NAotLS0gYS9Eb2N1bWVudGF0aW9uL0FCSS90ZXN0
-aW5nL3N5c2ZzLWJ1cy1wY2kKKysrIGIvRG9jdW1lbnRhdGlvbi9BQkkvdGVzdGluZy9zeXNm
-cy1idXMtcGNpCkBAIC0yODksNyArMjg5LDEwIEBAIERlc2NyaXB0aW9uOgogCQl3aWxsIG5v
-dCBiaW5kIHRvIGFueSBkcml2ZXIuICBUaGlzIGFsc28gYWxsb3dzIGRldmljZXMgdG8KIAkJ
-b3B0LW91dCBvZiBkcml2ZXIgYmluZGluZyB1c2luZyBhIGRyaXZlcl9vdmVycmlkZSBuYW1l
-IHN1Y2ggYXMKIAkJIm5vbmUiLiAgT25seSBhIHNpbmdsZSBkcml2ZXIgbWF5IGJlIHNwZWNp
-ZmllZCBpbiB0aGUgb3ZlcnJpZGUsCi0JCXRoZXJlIGlzIG5vIHN1cHBvcnQgZm9yIHBhcnNp
-bmcgZGVsaW1pdGVycy4KKwkJdGhlcmUgaXMgbm8gc3VwcG9ydCBmb3IgcGFyc2luZyBkZWxp
-bWl0ZXJzLiAgRm9yIHN0YXRpYyBJRHMKKwkJbWF0Y2hpbmcsIHRoaXMgYmluZGluZyBtZWNo
-YW5pc20gaXMgYWxsb3dlZCBpZiB0aGUgbWF0Y2hpbmcKKwkJZHJpdmVyIGhhcyBzcGVjaWZp
-Y2FsbHkgb3B0IGludG8gdGhpcyBmZWF0dXJlIChieSBzZXR0aW5nIGEKKwkJc3VpdGFibGUg
-ZmxhZyBpbiB0aGUgImZsYWdzIiBmaWVsZCBvZiBwY2lfZGV2aWNlX2lkIHN0cnVjdHVyZSku
-CiAKIFdoYXQ6CQkvc3lzL2J1cy9wY2kvZGV2aWNlcy8uLi4vbnVtYV9ub2RlCiBEYXRlOgkJ
-T2N0IDIwMTQKZGlmZiAtLWdpdCBhL2RyaXZlcnMvcGNpL3BjaS1kcml2ZXIuYyBiL2RyaXZl
-cnMvcGNpL3BjaS1kcml2ZXIuYwppbmRleCBlYzQ0YTc5ZTk1MWEuLmJhNDQ5NDQ5OTkzMSAx
-MDA2NDQKLS0tIGEvZHJpdmVycy9wY2kvcGNpLWRyaXZlci5jCisrKyBiL2RyaXZlcnMvcGNp
-L3BjaS1kcml2ZXIuYwpAQCAtMTM2LDcgKzEzNiw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3Qg
-cGNpX2RldmljZV9pZCAqcGNpX21hdGNoX2RldmljZShzdHJ1Y3QgcGNpX2RyaXZlciAqZHJ2
-LAogCQkJCQkJICAgIHN0cnVjdCBwY2lfZGV2ICpkZXYpCiB7CiAJc3RydWN0IHBjaV9keW5p
-ZCAqZHluaWQ7Ci0JY29uc3Qgc3RydWN0IHBjaV9kZXZpY2VfaWQgKmZvdW5kX2lkID0gTlVM
-TDsKKwljb25zdCBzdHJ1Y3QgcGNpX2RldmljZV9pZCAqZm91bmRfaWQgPSBOVUxMLCAqaWRz
-OwogCiAJLyogV2hlbiBkcml2ZXJfb3ZlcnJpZGUgaXMgc2V0LCBvbmx5IGJpbmQgdG8gdGhl
-IG1hdGNoaW5nIGRyaXZlciAqLwogCWlmIChkZXYtPmRyaXZlcl9vdmVycmlkZSAmJiBzdHJj
-bXAoZGV2LT5kcml2ZXJfb3ZlcnJpZGUsIGRydi0+bmFtZSkpCkBAIC0xNTIsMTAgKzE1Miwy
-OCBAQCBzdGF0aWMgY29uc3Qgc3RydWN0IHBjaV9kZXZpY2VfaWQgKnBjaV9tYXRjaF9kZXZp
-Y2Uoc3RydWN0IHBjaV9kcml2ZXIgKmRydiwKIAl9CiAJc3Bpbl91bmxvY2soJmRydi0+ZHlu
-aWRzLmxvY2spOwogCi0JaWYgKCFmb3VuZF9pZCkKLQkJZm91bmRfaWQgPSBwY2lfbWF0Y2hf
-aWQoZHJ2LT5pZF90YWJsZSwgZGV2KTsKKwlpZiAoZm91bmRfaWQpCisJCXJldHVybiBmb3Vu
-ZF9pZDsKIAotCS8qIGRyaXZlcl9vdmVycmlkZSB3aWxsIGFsd2F5cyBtYXRjaCwgc2VuZCBh
-IGR1bW15IGlkICovCisJaWRzID0gZHJ2LT5pZF90YWJsZTsKKwl3aGlsZSAoKGZvdW5kX2lk
-ID0gcGNpX21hdGNoX2lkKGlkcywgZGV2KSkpIHsKKwkJLyoKKwkJICogaWYgd2UgZm91bmQg
-aWQgaW4gdGhlIHN0YXRpYyB0YWJsZSwgd2UgbXVzdCBmdWxmaWxsIHRoZQorCQkgKiBtYXRj
-aGluZyBmbGFncyAoaS5lLiBpZiBQQ0lfSURfRl9EUklWRVJfT1ZFUlJJREUgZmxhZyBpcwor
-CQkgKiBzZXQsIGRyaXZlcl9vdmVycmlkZSBzaG91bGQgYmUgcHJvdmlkZWQpLgorCQkgKi8K
-KwkJYm9vbCBpc19kcml2ZXJfb3ZlcnJpZGUgPQorCQkJKGZvdW5kX2lkLT5mbGFncyAmIFBD
-SV9JRF9GX0RSSVZFUl9PVkVSUklERSkgIT0gMDsKKwkJaWYgKGlzX2RyaXZlcl9vdmVycmlk
-ZSAmJiAhZGV2LT5kcml2ZXJfb3ZlcnJpZGUpCisJCQlpZHMgPSBmb3VuZF9pZCArIDE7IC8q
-IGNvbnRpbnVlIHNlYXJjaGluZyAqLworCQllbHNlCisJCQlicmVhazsgLyogZm91bmQgYSBt
-YXRjaCAhICovCisJfQorCisJLyoKKwkgKiBpZiBubyBzdGF0aWMgbWF0Y2gsIGRyaXZlcl9v
-dmVycmlkZSB3aWxsIGFsd2F5cyBtYXRjaCwgc2VuZCBhIGR1bW15CisJICogaWQuCisJICov
-CiAJaWYgKCFmb3VuZF9pZCAmJiBkZXYtPmRyaXZlcl9vdmVycmlkZSkKIAkJZm91bmRfaWQg
-PSAmcGNpX2RldmljZV9pZF9hbnk7CiAKZGlmZiAtLWdpdCBhL2RyaXZlcnMvcGNpL3BjaS1w
-Zi1zdHViLmMgYi9kcml2ZXJzL3BjaS9wY2ktcGYtc3R1Yi5jCmluZGV4IDQ1ODU1YTVlOWZj
-YS4uNDk1NDRiYTlhN2FmIDEwMDY0NAotLS0gYS9kcml2ZXJzL3BjaS9wY2ktcGYtc3R1Yi5j
-CisrKyBiL2RyaXZlcnMvcGNpL3BjaS1wZi1zdHViLmMKQEAgLTE5LDYgKzE5LDcgQEAKICAq
-Lwogc3RhdGljIGNvbnN0IHN0cnVjdCBwY2lfZGV2aWNlX2lkIHBjaV9wZl9zdHViX3doaXRl
-bGlzdFtdID0gewogCXsgUENJX1ZERVZJQ0UoQU1BWk9OLCAweDAwNTMpIH0sCisJeyBQQ0lf
-REVWSUNFX0ZMQUdTKFBDSV9BTllfSUQsIFBDSV9BTllfSUQsIFBDSV9JRF9GX1NUVUJfRFJJ
-VkVSX09WRVJSSURFKSB9LCAvKiBtYXRjaCBhbGwgYnkgZGVmYXVsdCAob3ZlcnJpZGUpICov
-CiAJLyogcmVxdWlyZWQgbGFzdCBlbnRyeSAqLwogCXsgMCB9CiB9OwpkaWZmIC0tZ2l0IGEv
-ZHJpdmVycy9wY2kvcGNpLXN0dWIuYyBiL2RyaXZlcnMvcGNpL3BjaS1zdHViLmMKaW5kZXgg
-ZTQwODA5OWZlYTUyLi5hNjdkMTM2YWQxZTIgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvcGNpL3Bj
-aS1zdHViLmMKKysrIGIvZHJpdmVycy9wY2kvcGNpLXN0dWIuYwpAQCAtMjYsNiArMjYsMTMg
-QEAgTU9EVUxFX1BBUk1fREVTQyhpZHMsICJJbml0aWFsIFBDSSBJRHMgdG8gYWRkIHRvIHRo
-ZSBzdHViIGRyaXZlciwgZm9ybWF0IGlzICIKIAkJICJcInZlbmRvcjpkZXZpY2VbOnN1YnZl
-bmRvcls6c3ViZGV2aWNlWzpjbGFzc1s6Y2xhc3NfbWFza11dXV1cIiIKIAkJICIgYW5kIG11
-bHRpcGxlIGNvbW1hIHNlcGFyYXRlZCBlbnRyaWVzIGNhbiBiZSBzcGVjaWZpZWQiKTsKIAor
-c3RhdGljIGNvbnN0IHN0cnVjdCBwY2lfZGV2aWNlX2lkIHN0dWJfcGNpX3RhYmxlW10gPSB7
-CisJeyBQQ0lfREVWSUNFX0ZMQUdTKFBDSV9BTllfSUQsIFBDSV9BTllfSUQsIFBDSV9JRF9G
-X1NUVUJfRFJJVkVSX09WRVJSSURFKSB9LCAvKiBtYXRjaCBhbGwgYnkgZGVmYXVsdCAqLwor
-CXsgMCwgfQorfTsKKworTU9EVUxFX0RFVklDRV9UQUJMRShwY2ksIHN0dWJfcGNpX3RhYmxl
-KTsKKwogc3RhdGljIGludCBwY2lfc3R1Yl9wcm9iZShzdHJ1Y3QgcGNpX2RldiAqZGV2LCBj
-b25zdCBzdHJ1Y3QgcGNpX2RldmljZV9pZCAqaWQpCiB7CiAJcGNpX2luZm8oZGV2LCAiY2xh
-aW1lZCBieSBzdHViXG4iKTsKQEAgLTM0LDcgKzQxLDcgQEAgc3RhdGljIGludCBwY2lfc3R1
-Yl9wcm9iZShzdHJ1Y3QgcGNpX2RldiAqZGV2LCBjb25zdCBzdHJ1Y3QgcGNpX2RldmljZV9p
-ZCAqaWQpCiAKIHN0YXRpYyBzdHJ1Y3QgcGNpX2RyaXZlciBzdHViX2RyaXZlciA9IHsKIAku
-bmFtZQkJPSAicGNpLXN0dWIiLAotCS5pZF90YWJsZQk9IE5VTEwsCS8qIG9ubHkgZHluYW1p
-YyBpZCdzICovCisJLmlkX3RhYmxlCT0gc3R1Yl9wY2lfdGFibGUsCiAJLnByb2JlCQk9IHBj
-aV9zdHViX3Byb2JlLAogfTsKIApkaWZmIC0tZ2l0IGEvZHJpdmVycy92ZmlvL3BjaS92Zmlv
-X3BjaS5jIGIvZHJpdmVycy92ZmlvL3BjaS92ZmlvX3BjaS5jCmluZGV4IDg1MGVhM2E5NGUy
-OC4uOWJlYjRiODQxOTQ1IDEwMDY0NAotLS0gYS9kcml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNp
-LmMKKysrIGIvZHJpdmVycy92ZmlvL3BjaS92ZmlvX3BjaS5jCkBAIC0xNjYsOSArMTY2LDE2
-IEBAIHN0YXRpYyBpbnQgdmZpb19wY2lfc3Jpb3ZfY29uZmlndXJlKHN0cnVjdCBwY2lfZGV2
-ICpwZGV2LCBpbnQgbnJfdmlydGZuKQogCXJldHVybiB2ZmlvX3BjaV9jb3JlX3NyaW92X2Nv
-bmZpZ3VyZShwZGV2LCBucl92aXJ0Zm4pOwogfQogCitzdGF0aWMgY29uc3Qgc3RydWN0IHBj
-aV9kZXZpY2VfaWQgdmZpb19wY2lfdGFibGVbXSA9IHsKKwl7IFBDSV9EUklWRVJfT1ZFUlJJ
-REVfREVWSUNFX1ZGSU8oUENJX0FOWV9JRCwgUENJX0FOWV9JRCkgfSwgLyogbWF0Y2ggYWxs
-IGJ5IGRlZmF1bHQgKi8KKwl7IDAsIH0KK307CisKK01PRFVMRV9ERVZJQ0VfVEFCTEUocGNp
-LCB2ZmlvX3BjaV90YWJsZSk7CisKIHN0YXRpYyBzdHJ1Y3QgcGNpX2RyaXZlciB2ZmlvX3Bj
-aV9kcml2ZXIgPSB7CiAJLm5hbWUJCQk9ICJ2ZmlvLXBjaSIsCi0JLmlkX3RhYmxlCQk9IE5V
-TEwsIC8qIG9ubHkgZHluYW1pYyBpZHMgKi8KKwkuaWRfdGFibGUJCT0gdmZpb19wY2lfdGFi
-bGUsCiAJLnByb2JlCQkJPSB2ZmlvX3BjaV9wcm9iZSwKIAkucmVtb3ZlCQkJPSB2ZmlvX3Bj
-aV9yZW1vdmUsCiAJLnNyaW92X2NvbmZpZ3VyZQk9IHZmaW9fcGNpX3NyaW92X2NvbmZpZ3Vy
-ZSwKLS0gCjIuMTguMQoK
---------------BF748129378E213267087AFE--
+
+> 
+> (2) might not be problematic in practice since the "normal" load_pdptrs()
+> should reset the flag on the next VM-Enter, but it's really, really hard to tell.
+> E.g. what if an SMI causes an exit and _that_ non-VM-Enter reload of L2 state
+> is the first to trip the flag?  The bool is essentially an extension of
+> KVM_REQ_GET_NESTED_STATE_PAGES, I think it makes sense to clear the flag whenever
+> KVM_REQ_GET_NESTED_STATE_PAGES is cleared.
+
+Could you expalain a bit better about SMM case? When SMM entry is done, at least Intel
+spec is silent on if PDPTRs are preserved in SMRAM (and it doesn't have any place allocated
+for them).
+
+We currently don't preserve PDTPRS on SMM entry and we reload them via CR3/CR0 write 
+when we exit SMM.
+
+Ah I see now, on VMX the non VM-Enter code path is also used for returns from SMM,
+and it sets the KVM_REQ_GET_NESTED_STATE_PAGES, so this is a real issue.
+If SMM code enabled PAE, and then KVM_SET_SREGS2 was used, and followed by
+RSM, we indeed have a risk of not loading the PDPTRs.
+
+I think that this is best fixed by resetting this flag in vmx_leave_smm,
+since RSM loads PDPTRS from memory always otherwise.
+
+I also note that we don't do KVM_REQ_GET_NESTED_STATE_PAGES on SVM,
+on return from SMM at all,
+thus on SVM I think I broke the resume from SMM to a guest if the guest is PAE.
+Oh well....
+
+I will now extend the testing I usually do to SMM and prepare a patch to fix this.
+
+> 
+> Another thing that's not obvious is the required ordering between KVM_SET_SREGS2
+> and KVM_SET_NESTED_STATE.  AFAICT it's not documented, but that may be PEBKAC on
+> my end.  E.g. what happens if walk_mmu == &root_mmu (L1 active in targte KVM)
+> when SET_SREGS2 is called, and _then_ KVM_SET_NESTED_STATE is called?
+
+Isn't that exactly the current ordering (and reason why I had to do this patch series)
+First the KVM_SET_SREGS is called indeed prior to KVM_SET_NESTED_STATE and it can
+potentially load wrong PDPTRS, and then KVM_SET_NESTED_STATE is called which used
+to 'fix' this by reloading them always.
+
+
+
+> 
+> [*] pdptrs_from_userspace in Paolo's tree.
+> 
+
+
+I think that strictly speaking this flag should be cleared when PAE mode is disabled,
+and together with clearing of availablity of VCPU_EXREG_PDPTR.
+
+I don't agree that this flag is an extension of the KVM_REQ_GET_NESTED_STATE_PAGES.
+I think this flag is more like an extra property of VCPU_EXREG_PDPTR.
+In addition to being dirty/available, this "register" can be loaded from memory
+or restored from migration stream.
+
+Thanks again for the review,
+Best regards,
+	Maxim Levitsky
+
