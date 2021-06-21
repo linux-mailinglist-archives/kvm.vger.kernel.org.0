@@ -2,155 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 77B353AE216
-	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 06:12:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 234513AE30E
+	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 08:19:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229727AbhFUEOz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Jun 2021 00:14:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60622 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229876AbhFUEOs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Jun 2021 00:14:48 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4EA1C061756;
-        Sun, 20 Jun 2021 21:03:46 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id w71so2594502pfd.4;
-        Sun, 20 Jun 2021 21:03:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=to:cc:references:from:subject:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=W9BcsAwtpmpC79LzU3QerIgLLyt1O/3DCtZegRGpFas=;
-        b=SH4QCyDkfJ/xzy+yLjO8n3rGGyUav2vEPfoUmuZCkUs4YlpcbDY7gouPGs4NwF0ATH
-         TGwBfic2WiDF+6GTq7NQ41nciMq05daYsqWKZ+NI2K0jJC17T6Fb5fbpwROUGzB87rsz
-         3JC1ksrj3++eIOmHGI7z6EdHydG4Ye8WXqIZSIffQ5hoyE7/cWE3Zo4XkdslQg7dBhCo
-         EZTIW/g4/PU5scTC+4yhbiQsNxt47H7eomhTu1MbDhwRdhz6LznjtwQqb72WCiSTRq7a
-         93p/UpUgeylY+E8oxdPRrFIJKvUvdNLUE0wOAh0qDHMfeLcLVplm7P+3f9SZDRBbTFDq
-         t+EQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=W9BcsAwtpmpC79LzU3QerIgLLyt1O/3DCtZegRGpFas=;
-        b=UbrMzZPPgpGokEkLFo7rNCKUuY28volcVUmP9rTKB2+ZxACAeppjZsvcjD1vIsUbf3
-         5RkJdoUKLqn/qm4VRoUjxSxCqc5313pQyasmBvu4z2w3nz7ECI5P/ViDKUgOh2WsCn0S
-         yB5C8BOiv3nLqyhZn4SZIFWTEtyoL5WQ6QuStxW/PrEVxBxL6oVrWr1ki4XFvz2uGYsE
-         oUOS9LAKbzHiqidhxWpzG7sdaNKTserBy1VNwJMhrMc1ZENn/ERi7+6AjaOPXPxvg7f5
-         XWngb5nfP/8WPKizrTYVZfrF12Y03/8lJwq66kFlCDJ3z1PB4R5JDlNuiYq6be+WY/ZP
-         IvfQ==
-X-Gm-Message-State: AOAM53297Ftrc7kBg/wkenkTLIGFBqlSonpNM3/dNH5N0FYcinSAqK7F
-        Ne+tIgapI9+foov8fx9CNiA=
-X-Google-Smtp-Source: ABdhPJzvBS8QJe1nvB8Sk6H6Bj0KzExcP2APyMgc+vVfBoYpHRNXKyG//xGyWtSoJZe4jM32xztACg==
-X-Received: by 2002:a62:9242:0:b029:300:6fb1:38b7 with SMTP id o63-20020a6292420000b02903006fb138b7mr14132504pfd.80.1624248226456;
-        Sun, 20 Jun 2021 21:03:46 -0700 (PDT)
-Received: from Likes-MacBook-Pro.local ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id q12sm15418855pgc.25.2021.06.20.21.03.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 20 Jun 2021 21:03:45 -0700 (PDT)
-To:     Sean Christopherson <seanjc@google.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Like Xu <like.xu@linux.intel.com>
-References: <20210514084436.848396-1-like.xu@linux.intel.com>
- <YK6HsR4QXbVuhZf8@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Subject: Re: [PATCH] KVM: x86/pt: Do not inject TraceToPAPMI when guest PT
- isn't supported
-Message-ID: <e82cd903-77ad-790e-22e4-dd8cdf1f4167@gmail.com>
-Date:   Mon, 21 Jun 2021 12:03:36 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        id S229487AbhFUGVc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Jun 2021 02:21:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26829 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229597AbhFUGVb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Jun 2021 02:21:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624256357;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dux2cUFImLRKn85ybuSPa/zW6LP/oKBWsPIgHV1K8bU=;
+        b=Rud4fGuSMPeJMtrjYdPIozec4noWwm5Asp6pDLLA3gtaMXZ88Musi9Z9ZwyXWUiXBFv1do
+        xe4sTP+HRYx6orHWIStC62LJtDFrSnTNPAB4I5QVY+/Z1gN3m/zxzdrP7iY/7JnFLzAwnc
+        ompO6p42Prk0Mz7J+weMeucOVDHR4M0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-561-sgUYmBzuPcKDNihrjFxmDQ-1; Mon, 21 Jun 2021 02:19:15 -0400
+X-MC-Unique: sgUYmBzuPcKDNihrjFxmDQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 877C2C740D;
+        Mon, 21 Jun 2021 06:19:13 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-99.ams2.redhat.com [10.36.112.99])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 10FCF60BD9;
+        Mon, 21 Jun 2021 06:19:13 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+        id 93888112D587; Mon, 21 Jun 2021 08:19:11 +0200 (CEST)
+From:   Markus Armbruster <armbru@redhat.com>
+To:     Eduardo Habkost <ehabkost@redhat.com>
+Cc:     Laurent Vivier <lvivier@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org, Claudio Fontana <cfontana@suse.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Denis Lunev <den@openvz.org>, Eric Blake <eblake@redhat.com>,
+        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+Subject: Re: [PATCH v9] qapi: introduce 'query-kvm-cpuid' action
+References: <20210603090753.11688-1-valeriy.vdovin@virtuozzo.com>
+        <87im2d6p5v.fsf@dusky.pond.sub.org>
+        <20210617074919.GA998232@dhcp-172-16-24-191.sw.ru>
+        <87a6no3fzf.fsf@dusky.pond.sub.org>
+        <790d22e1-5de9-ba20-6c03-415b62223d7d@suse.de>
+        <877dis1sue.fsf@dusky.pond.sub.org>
+        <20210617153949.GA357@dhcp-172-16-24-191.sw.ru>
+        <e69ea2b4-21cc-8203-ad2d-10a0f4ffe34a@suse.de>
+        <20210617165111.eu3x2pvinpoedsqj@habkost.net>
+        <87sg1fwwgg.fsf@dusky.pond.sub.org>
+        <20210618204006.k6krwuz2lpxvb6uh@habkost.net>
+Date:   Mon, 21 Jun 2021 08:19:11 +0200
+In-Reply-To: <20210618204006.k6krwuz2lpxvb6uh@habkost.net> (Eduardo Habkost's
+        message of "Fri, 18 Jun 2021 16:40:06 -0400")
+Message-ID: <8735tb68ps.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <YK6HsR4QXbVuhZf8@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/5/2021 1:38 am, Sean Christopherson wrote:
-> On Fri, May 14, 2021, Like Xu wrote:
->> When a PT perf user is running in system-wide mode on the host,
->> the guest (w/ pt_mode=0) will warn about anonymous NMIs from
->> kvm_handle_intel_pt_intr():
->>
->> [   18.126444] Uhhuh. NMI received for unknown reason 10 on CPU 0.
->> [   18.126447] Do you have a strange power saving mode enabled?
->> [   18.126448] Dazed and confused, but trying to continue
->>
->> In this case, these PMIs should be handled by the host PT handler().
->> When PT is used in guest-only mode, it's harmless to call host handler.
->>
->> Fix: 8479e04e7d("KVM: x86: Inject PMI for KVM guest")
-> 
-> s/Fix/Fixes
-> 
->> Signed-off-by: Like Xu <like.xu@linux.intel.com>
->> ---
->>   arch/x86/events/intel/core.c | 3 +--
->>   arch/x86/kvm/x86.c           | 3 +++
->>   2 files changed, 4 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
->> index 2521d03de5e0..2f09eb0853de 100644
->> --- a/arch/x86/events/intel/core.c
->> +++ b/arch/x86/events/intel/core.c
->> @@ -2853,8 +2853,7 @@ static int handle_pmi_common(struct pt_regs *regs, u64 status)
->>   		if (unlikely(perf_guest_cbs && perf_guest_cbs->is_in_guest() &&
->>   			perf_guest_cbs->handle_intel_pt_intr))
->>   			perf_guest_cbs->handle_intel_pt_intr();
->> -		else
->> -			intel_pt_interrupt();
->> +		intel_pt_interrupt();
-> 
-> Would it make sense to instead do something like:
-> 
-> 	bool host_pmi = true;
-> 
-> 	...
-> 
-> 		if (unlikely(perf_guest_cbs && perf_guest_cbs->is_in_guest() &&
-> 			     perf_guest_cbs->handle_intel_pt_intr)
-> 			host_pmi = !perf_guest_cbs->handle_intel_pt_intr();
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-struct perf_guest_info_callbacks {
-	...
-	void				(*handle_intel_pt_intr)(void);
-};
+> On Fri, Jun 18, 2021 at 07:52:47AM +0200, Markus Armbruster wrote:
+>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>> 
+>> > On Thu, Jun 17, 2021 at 05:53:11PM +0200, Claudio Fontana wrote:
+>> >> On 6/17/21 5:39 PM, Valeriy Vdovin wrote:
+>> >> > On Thu, Jun 17, 2021 at 04:14:17PM +0200, Markus Armbruster wrote:
+>> >> >> Claudio Fontana <cfontana@suse.de> writes:
+>> >> >>
+>> >> >>> On 6/17/21 1:09 PM, Markus Armbruster wrote:
+>> 
+>> [...]
+>> 
+>> >> >>>> If it just isn't implemented for anything but KVM, then putting "kvm"
+>> >> >>>> into the command name is a bad idea.  Also, the commit message should
+>> >> >>>> briefly note the restriction to KVM.
+>> >> >>
+>> >> >> Perhaps this one is closer to reality.
+>> >> >>
+>> >> > I agree.
+>> >> > What command name do you suggest?
+>> >> 
+>> >> query-exposed-cpuid?
+>> >
+>> > Pasting the reply I sent at [1]:
+>> >
+>> >   I don't really mind how the command is called, but I would prefer
+>> >   to add a more complex abstraction only if maintainers of other
+>> >   accelerators are interested and volunteer to provide similar
+>> >   functionality.  I don't want to introduce complexity for use
+>> >   cases that may not even exist.
+>> >
+>> > I'm expecting this to be just a debugging mechanism, not a stable
+>> > API to be maintained and supported for decades.  (Maybe a "x-"
+>> > prefix should be added to indicate that?)
+>> >
+>> > [1] https://lore.kernel.org/qemu-devel/20210602204604.crsxvqixkkll4ef4@habkost.net
+>> 
+>> x-query-x86_64-cpuid?
+>> 
+>
+> Unless somebody wants to spend time designing a generic
+> abstraction around this (and justify the extra complexity), this
+> is a KVM-specific command.  Is there a reason to avoid "kvm" in
+> the command name?
 
+I can't see what's specific to KVM in the interface (it's implemented
+only for KVM, but that's just a restriction).  The doc comment looks
+like the command returns whatever the guest's cpuid instruction will
+write to registers.  Can you help me understand the interface's KVM
+dependence?
 
-This fix is deferred until the following proposal is finalized.
-
-https://lore.kernel.org/lkml/YKImQ2%2FDilGIkrfe@hirez.programming.kicks-ass.net/
-
-> 
-> 		if (likely(host_pmi))
-> 			intel_pt_interrupt();
->>   	}
->>   
->>   	/*
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 6529e2023147..6660f3948cea 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -8087,6 +8087,9 @@ static void kvm_handle_intel_pt_intr(void)
->>   {
->>   	struct kvm_vcpu *vcpu = __this_cpu_read(current_vcpu);
->>   
->> +	if (!guest_cpuid_has(vcpu, X86_FEATURE_INTEL_PT))
->> +		return;
->> +
->>   	kvm_make_request(KVM_REQ_PMI, vcpu);
->>   	__set_bit(MSR_CORE_PERF_GLOBAL_OVF_CTRL_TRACE_TOPA_PMI_BIT,
->>   			(unsigned long *)&vcpu->arch.pmu.global_status);
->> -- 
->> 2.31.1
->>
-> 
