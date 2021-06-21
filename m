@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0247A3AF1E5
-	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 19:25:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 757753AF1F6
+	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 19:27:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231461AbhFUR16 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Jun 2021 13:27:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42492 "EHLO
+        id S231585AbhFURaH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Jun 2021 13:30:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231463AbhFUR1y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Jun 2021 13:27:54 -0400
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36CB2C06175F
-        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 10:25:38 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id m137so20710756oig.6
-        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 10:25:38 -0700 (PDT)
+        with ESMTP id S231407AbhFURaG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Jun 2021 13:30:06 -0400
+Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7544C061756
+        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 10:27:51 -0700 (PDT)
+Received: by mail-ot1-x330.google.com with SMTP id 102-20020a9d0eef0000b02903fccc5b733fso18478368otj.4
+        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 10:27:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=8Nl+UATUG/ekcwj7+lbeC3lq97VrKeBhXiFoqjO/PoM=;
-        b=ZtzZJVQIiktzwMhbckUEj/FSihpO/1RWyF2QAlXOSMKMLwYz2qMKBN98I5AgANFqVc
-         IQChA9yq5zSYbUEZVhDym/IGTUjOOFfdCcY8CsltdJLqcaDvjBZbmL1FSeBG/ceO4kD2
-         iThRqjQh4BBr2EJIQTTbgH+yjk/gP0KSFYyy/Rj8JAGUoVMUmJuJGbBG4QIWzerRMtuz
-         Wi8blOC/XZShQv0fW1DPtvTn6/SMk7szm4Rxzr7YqRhVen7Joc1TDeG2HuA/tcCsiyR/
-         w54Q9fwepWbIPmLIehU2/RpQo/1UIepba1ErkP5TY+UUUAwNnAqOcsKj4+oWEVQiJkKT
-         5OgA==
+        bh=WmGjGSnaoIjbfNbK6jg4Z58leTIpBSXXFk+GdaHK+O8=;
+        b=IkafJuMXU1dxFooFT/Z7CDiyPl66XkMYfmNHgkZ7Zr9ROZgxDLuuLCItaGKVG+g3ei
+         StPnLiq+x2oO47VLNdr3X8f2MNhdKMSBQivdUZebRFGoy+8PcRI5KnPzwKoGXDq0vAms
+         uOKTDF1aPZqzzgWio3fYUV04SFgYxLlLuiGV0yHop2Fdw9SW3u5n5BFTJBU3vnd9WFvD
+         Rimi7mod+IOXsJwod9l4B5e+z9QEueios+GMwLdNvEMPmTXIUsXGBP1I7DyrZPQQLIen
+         dV6MBOQTH1MFJyB6tKOmOFlqEnXysxtjprh6XkRv1/cGvUFGMFih52BaeUDAlxYnQOsP
+         I4yQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=8Nl+UATUG/ekcwj7+lbeC3lq97VrKeBhXiFoqjO/PoM=;
-        b=tMrQqkPuFE90DZEx7zzfRa4LuBIJVK3lKBfNFyzXSRrvy2EnsJ17nEHFo9tnpj9WTr
-         7dhTOnYZqtFD13kwUKf8XjRQzRwURQPPCJtZb1HLHyNKMMJfoimM5vzy4KWE5zDBEywz
-         HWFMi2AZM8hpeOv/bTncWImhKG6aPiv6HEtBnaniMsFC3Qe90ZQsXsC5xT+5rAMdXbf2
-         TIzSjWJOBr/jkbE/ZAjvR5F04jZ7X2tzhGTA5zd4KAGPZutCA2//aDZgktCOdrCMlbz2
-         Ninhn7Vdf+PXoFdH8T6WZbmkNvrmwcHhyTADvcFEFDHRXlsUW4QaNZrWbBkk7KrUo8mb
-         biBg==
-X-Gm-Message-State: AOAM531s/QAJU5gHQf4mQSZK3rWB5a/OHhDXRWSUwvryzazzmNAEh1sG
-        PpQ7RfHQkJN9AToD1IIIWXOGCJ2xyqapSuckhM+QGg==
-X-Google-Smtp-Source: ABdhPJyopzV7pDlrYVX5eV/Fi7NWMvWgN1AYozmtcDSU6CyqoDJ+CXMCQ3Dt6qAgUPNI5GU++0ExZe1a/ltfasDu9zw=
-X-Received: by 2002:aca:e0d6:: with SMTP id x205mr17927435oig.109.1624296337665;
- Mon, 21 Jun 2021 10:25:37 -0700 (PDT)
+        bh=WmGjGSnaoIjbfNbK6jg4Z58leTIpBSXXFk+GdaHK+O8=;
+        b=aXDEN3eXP0r9/cZk8UG0C6DZrZtZVnPHiXljISERJwsau/gQWqFUH1lt320AuuqLI7
+         KVSSxUZlr/6Ys8Bd/5O5qR35pPk5Z47rZg5UoIPwLNV8C5vxDhI9uflW5mEyoR2zwbMZ
+         8ARBLAKprEHKYtM3cNsQeW7eNRpHb9E8xxUoPL6Kud/ox5Ug/3BtVRkb8stYn/9rgsnY
+         jfVHgZVk4S7p6X6ViWJDv7NMQXaFUoTqQbqFExLtlLu9mJEA8QfgVEZaZhQ0Ex0eFtrx
+         hLMKKASEKXivQF19C+2TGBIxeNXcWphF68avWy/otgDj5A+WEpp9VX4chCHXMKSHeLzL
+         stkg==
+X-Gm-Message-State: AOAM530gKLNqseNxnnZCfFrM+WGSavAuISJwhZ/+Kb8gHNiRm9A33JpF
+        dol5472w/c3GgyPGIQC/itfmvsqdnrEdvdFg3aPm+A==
+X-Google-Smtp-Source: ABdhPJwi8uED1KtCHcgJosUou/U3YERsHdEZWa6Y4ITdxzqfoSrQyjLejdlRZ2O4PLdCBDaz+Bchb6q7YPN7hVIoEJI=
+X-Received: by 2002:a05:6830:1dd5:: with SMTP id a21mr21512580otj.180.1624296471321;
+ Mon, 21 Jun 2021 10:27:51 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210609232501.171257-1-jiang.wang@bytedance.com>
- <20210609232501.171257-6-jiang.wang@bytedance.com> <20210618095409.q6s3knm2m4u7lezd@steredhat.lan>
-In-Reply-To: <20210618095409.q6s3knm2m4u7lezd@steredhat.lan>
+ <20210609232501.171257-7-jiang.wang@bytedance.com> <20210618100424.wfljrnycxxguwt3d@steredhat.lan>
+In-Reply-To: <20210618100424.wfljrnycxxguwt3d@steredhat.lan>
 From:   "Jiang Wang ." <jiang.wang@bytedance.com>
-Date:   Mon, 21 Jun 2021 10:25:27 -0700
-Message-ID: <CAP_N_Z8+-ObttNsk7YZSdFcRpso5YHJTVqgerPpB0TvMMtj7WA@mail.gmail.com>
-Subject: Re: [External] Re: [RFC v1 5/6] vhost/vsock: add kconfig for vhost
- dgram support
+Date:   Mon, 21 Jun 2021 10:27:40 -0700
+Message-ID: <CAP_N_Z-U0_XP69iNLA1Ray9EEVWyXqb2f85bL-sG2oxjM5PaMA@mail.gmail.com>
+Subject: Re: [External] Re: [RFC v1 6/6] virtio/vsock: add sysfs for rx buf
+ len for dgram
 To:     Stefano Garzarella <sgarzare@redhat.com>
 Cc:     virtualization@lists.linux-foundation.org,
         Stefan Hajnoczi <stefanha@redhat.com>,
@@ -66,9 +66,9 @@ Cc:     virtualization@lists.linux-foundation.org,
         Jakub Kicinski <kuba@kernel.org>,
         Steven Rostedt <rostedt@goodmis.org>,
         Ingo Molnar <mingo@redhat.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
         Colin Ian King <colin.king@canonical.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Andra Paraschiv <andraprs@amazon.com>,
         Lu Wei <luwei32@huawei.com>,
         Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
         Networking <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
@@ -77,21 +77,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 18, 2021 at 2:54 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
+On Fri, Jun 18, 2021 at 3:04 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
 >
-> On Wed, Jun 09, 2021 at 11:24:57PM +0000, Jiang Wang wrote:
-> >Also change number of vqs according to the config
+> On Wed, Jun 09, 2021 at 11:24:58PM +0000, Jiang Wang wrote:
+> >Make rx buf len configurable via sysfs
 > >
 > >Signed-off-by: Jiang Wang <jiang.wang@bytedance.com>
 > >---
-> > drivers/vhost/Kconfig |  8 ++++++++
-> > drivers/vhost/vsock.c | 11 ++++++++---
-> > 2 files changed, 16 insertions(+), 3 deletions(-)
+> > net/vmw_vsock/virtio_transport.c | 37 +++++++++++++++++++++++++++++++++++--
+> > 1 file changed, 35 insertions(+), 2 deletions(-)
+> >
+> >diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> >index cf47aadb0c34..2e4dd9c48472 100644
+> >--- a/net/vmw_vsock/virtio_transport.c
+> >+++ b/net/vmw_vsock/virtio_transport.c
+> >@@ -29,6 +29,14 @@ static struct virtio_vsock __rcu *the_virtio_vsock;
+> > static struct virtio_vsock *the_virtio_vsock_dgram;
+> > static DEFINE_MUTEX(the_virtio_vsock_mutex); /* protects the_virtio_vsock */
+> >
+> >+static int rx_buf_len = VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE;
+> >+static struct kobject *kobj_ref;
+> >+static ssize_t  sysfs_show(struct kobject *kobj,
+> >+                      struct kobj_attribute *attr, char *buf);
+> >+static ssize_t  sysfs_store(struct kobject *kobj,
+> >+                      struct kobj_attribute *attr, const char *buf, size_t count);
+> >+static struct kobj_attribute rxbuf_attr = __ATTR(rx_buf_value, 0660, sysfs_show, sysfs_store);
 >
-> As we already discussed, I think we don't need this patch.
+> Maybe better to use a 'dgram' prefix.
 
-Sure. will do
+Sure.
+
+> >+
+> > struct virtio_vsock {
+> >       struct virtio_device *vdev;
+> >       struct virtqueue **vqs;
+> >@@ -360,7 +368,7 @@ virtio_transport_cancel_pkt(struct vsock_sock *vsk)
+> >
+> > static void virtio_vsock_rx_fill(struct virtio_vsock *vsock, bool is_dgram)
+> > {
+> >-      int buf_len = VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE;
+> >+      int buf_len = rx_buf_len;
+> >       struct virtio_vsock_pkt *pkt;
+> >       struct scatterlist hdr, buf, *sgs[2];
+> >       struct virtqueue *vq;
+> >@@ -1003,6 +1011,22 @@ static struct virtio_driver virtio_vsock_driver = {
+> >       .remove = virtio_vsock_remove,
+> > };
+> >
+> >+static ssize_t sysfs_show(struct kobject *kobj,
+> >+              struct kobj_attribute *attr, char *buf)
+> >+{
+> >+      return sprintf(buf, "%d", rx_buf_len);
+> >+}
+> >+
+> >+static ssize_t sysfs_store(struct kobject *kobj,
+> >+              struct kobj_attribute *attr, const char *buf, size_t count)
+> >+{
+> >+      if (kstrtou32(buf, 0, &rx_buf_len) < 0)
+> >+              return -EINVAL;
+> >+      if (rx_buf_len < 1024)
+> >+              rx_buf_len = 1024;
+> >+      return count;
+> >+}
+> >+
+> > static int __init virtio_vsock_init(void)
+> > {
+> >       int ret;
+> >@@ -1020,8 +1044,17 @@ static int __init virtio_vsock_init(void)
+> >       if (ret)
+> >               goto out_vci;
+> >
+> >-      return 0;
+> >+      kobj_ref = kobject_create_and_add("vsock", kernel_kobj);
+>
+> So, IIUC, the path will be /sys/vsock/rx_buf_value?
+>
+> I'm not sure if we need to add a `virtio` subdir (e.g.
+> /sys/vsock/virtio/dgram_rx_buf_size)
+
+I agree adding a virtio is better in case vmware or hyperv will
+also have some settings.
 
 > Thanks,
 > Stefano
+>
+> >
+> >+      /*Creating sysfs file for etx_value*/
+> >+      ret = sysfs_create_file(kobj_ref, &rxbuf_attr.attr);
+> >+      if (ret)
+> >+              goto out_sysfs;
+> >+
+> >+      return 0;
+> >+out_sysfs:
+> >+      kobject_put(kobj_ref);
+> >+      sysfs_remove_file(kernel_kobj, &rxbuf_attr.attr);
+> > out_vci:
+> >       vsock_core_unregister(&virtio_transport.transport);
+> > out_wq:
+> >--
+> >2.11.0
+> >
 >
