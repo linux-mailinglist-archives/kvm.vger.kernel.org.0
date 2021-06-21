@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 96B493AF126
-	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 18:59:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B60FE3AF128
+	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 18:59:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232854AbhFURBH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Jun 2021 13:01:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35838 "EHLO
+        id S233000AbhFURBP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Jun 2021 13:01:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232400AbhFURAz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Jun 2021 13:00:55 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CC68C0A3BDB
-        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 09:31:33 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id 124-20020a6217820000b02902feebfd791eso6816325pfx.19
-        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 09:31:33 -0700 (PDT)
+        with ESMTP id S232424AbhFURA4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Jun 2021 13:00:56 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89BCAC061145
+        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 09:31:35 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id a12-20020ac8108c0000b029023c90fba3dcso12321500qtj.7
+        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 09:31:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=bTUKqBPqapF288kZZi/PG/V7rZyTt+OxkKa+oulHbRk=;
-        b=N6SvcbUbTlGHC4fDyS3Y27KAdwUBrHccHb0ywPUY1xzkr7R4zKjiiKT7RA22AKwt8U
-         UZIKNCKeVCNGypfCE1wX6RtdvgQmvxipBORstRpTN1Xm/HbQmr/PuDo1ucGS5meXygL4
-         UQ47xrEknBtaHVW3NZqz92wMeKSlOjUZn0rJ0iVvEqCzm7qLzOZMLHf4ETcdrqQ3NqPc
-         aKRj2Vc7hYJAdVny7pvfzXaA/pg1cTzyzxeFqbyjfYXDaPdLEQH47ocUUr5Qn7p0QWBg
-         KyNrrfiJTZ++Xg1YvPecYsjdgaRl4IqsxxhEfrK1/twSwoG2LpepDSBGefH4+Q2lMG8I
-         yyRg==
+        bh=sTDc/9kKVWFZ6hO1Y/wCoh3Kz/EL9+Y6sOs1hNsKjRo=;
+        b=XC5Xo6xTMpDKeVOIL6dec5Gzfea5nQ0s3icAgn2IAVmt4Q4g4JmKxYdqFH/YqBmVUK
+         kg3tczoXIEviY5a0BhYdgUPqFgQWkXNRyp21sVKK3K8Yr9Q7FDKxOC9i3KtipT9pgRO9
+         8pYBULpRNiJezzFO+0L4dDexJ3U5nG756BnFhoBZe2lSzWkymIn5RXYqINw+anpIwBbb
+         VMOb0UWZ3xXbZoWBf3NA317vQbvSt6xBF7nqBVfY7+s3+OobwOQNWF2M+2YJ/AN02Juo
+         iiJwb2UDC0TacYoyIFY+1oBeN1pu8n1hYDVOiKMpR6rqThPIKwYrtfKzfSlqB2fVkIDm
+         BjFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=bTUKqBPqapF288kZZi/PG/V7rZyTt+OxkKa+oulHbRk=;
-        b=VK5jk/b5j9JsrDbTyy+uYjaF6/aoF0jB6foxz+nuIgw9M0LcyFbOOPE9h2MAiiHluW
-         QTKZ6MGEehq2gwGSJlVRrEwXK47r095ucLSedFFR3rMy3M8gzoWUNFqKer7QMRfnEVWa
-         O3sn/3Qqp+gp2TxsasMwhZTWZuZfodTfoa70ROujvqD8tDtVz6oRz09MQERAnsGxoRm/
-         UXvsK24CWxAj/S5hFI2ZfE/rEfJWjvGgKr59Fe2+XrTkAl9gU+8IJMglaXICqTeTgYIx
-         O65X3pEdlMidtCPVgRo6CFemjNHoAvbP+VpG4UC4BuyxLzciOLZpl/3Gx2Ec4AlY+Me4
-         eTxg==
-X-Gm-Message-State: AOAM531RYIwflrX6zRwmxlAVltqt1errYRFNMP5KPCEe9eh3hlVLCUqD
-        NanXC34mVpqdW6E4i89j68NkYOG8SO03dt4Mvka8vdiA6BlEQE8/buMMnUIbHr6tPkvXCU5+AEy
-        hfEJpG2TcklObwUZquzCYrbQuXP0Q4vZHAb0atGByA5XuEoA7q59NTfRVaw==
-X-Google-Smtp-Source: ABdhPJyeUJ48/anYVTyxeIzXXEjJkQLKxlKEo7hCXi78i1LHj83QtlKWNDNyNwU12joDcL00D/tVx5RaM/Y=
+        bh=sTDc/9kKVWFZ6hO1Y/wCoh3Kz/EL9+Y6sOs1hNsKjRo=;
+        b=C9LwEz8dcmeKeAhyL0bckCfnXzDiMa7lzyP2ZUp7hSB8Q2sLcOg/zHkAO21TPYtP7a
+         lmfHUkoqNUyg3bIGPkewO6ASeB2Z2bODadZ0Qb4BaAbENghFjV7Did0oDZfudIPP6pxq
+         1LyeVY2XgxsuAybfj2Ik0j9cfZ0sRUoCiBHSWYVLr+QTRi0W0alJmopF4aYKRhhWSOgh
+         x7eJalh3dCwN238H9GQkF6n9fRhqd6z9lnI1MGr2kqdKCXA52SIplCNAv0qsShXdjKCm
+         yvIVaDXLMDI47uIbto5RU6Fem/bDG3apgi+2anUL6aJIGtNCXS3wn+5sNqcFIX1zvv7d
+         JBtg==
+X-Gm-Message-State: AOAM533bUHiJhunJd5l9mhktgAo2+UMqkirf3wry5SVKg+P6ZrII83SJ
+        Aj31VReEHjD/o5e8gQdmRnob9owOepPCA1Mhrjcr8FpR/izrdaywqRlYOP+kjCHNEmHDVe0KFLh
+        9CJDvQhae5fiuULte4xaI8bTRzfABzlI87fJjsAtF/BLpF1i3Yt63RZ1geA==
+X-Google-Smtp-Source: ABdhPJwm3lwYL9m3LNZBnOOsE/MWmq1zF7GnEB8bo+g0PBvbGRxctdVhkOdgYzhRfiXTQ8KYdYOcL080KHY=
 X-Received: from pgonda1.kir.corp.google.com ([2620:0:1008:11:2742:338c:f077:6d85])
- (user=pgonda job=sendgmr) by 2002:a63:490a:: with SMTP id w10mr24676791pga.286.1624293092751;
- Mon, 21 Jun 2021 09:31:32 -0700 (PDT)
-Date:   Mon, 21 Jun 2021 09:31:17 -0700
+ (user=pgonda job=sendgmr) by 2002:a25:be89:: with SMTP id i9mr31617565ybk.300.1624293094559;
+ Mon, 21 Jun 2021 09:31:34 -0700 (PDT)
+Date:   Mon, 21 Jun 2021 09:31:18 -0700
 In-Reply-To: <20210621163118.1040170-1-pgonda@google.com>
-Message-Id: <20210621163118.1040170-3-pgonda@google.com>
+Message-Id: <20210621163118.1040170-4-pgonda@google.com>
 Mime-Version: 1.0
 References: <20210621163118.1040170-1-pgonda@google.com>
 X-Mailer: git-send-email 2.32.0.288.g62a8d224e6-goog
-Subject: [PATCH 2/3] KVM, SEV: Add support for SEV local migration
+Subject: [PATCH 3/3] KVM, SEV: Add support for SEV-ES local migration
 From:   Peter Gonda <pgonda@google.com>
 To:     kvm@vger.kernel.org
-Cc:     Peter Gonda <pgonda@google.com>, Lars Bull <larsbull@google.com>,
+Cc:     Peter Gonda <pgonda@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         David Rientjes <rientjes@google.com>,
@@ -77,31 +77,14 @@ It is an alternative to traditional (i.e., remote) live migration. Whereas
 remote migration handles move a guest to a new host, local migration only
 handles moving a guest to a new userspace VMM within a host.
 
-For SEV to work with local migration, contents of the SEV info struct
-such as the ASID (used to index the encryption key in the AMD SP) and
-the list
-of memory regions need to be transferred to the target VM. Adds
-commands for sending and receiving the sev info.
+For SEV-ES to work with local migration the VMSAs, GHCB metadata,
+and other SEV-ES info needs to be preserved along with the guest's
+memory. KVM maintains a pointer to each vCPUs GHCB and may additionally
+contain an copy of the GHCB's save area if the guest has been using it
+for NAE handling. The local send and receive ioctls have been updated to
+move this additional metadata required for each vCPU in SEV-ES into
+hashmap for SEV local migration data.
 
-To avoid exposing this internal state to userspace and prevent other
-processes from importing state they shouldn't have access to, the send
-returns a token to userspace that is handed off to the target VM. The
-target passes in this token to receive the sent state. The token is only
-valid for one-time use. Functionality on the source becomes limited
-after
-send has been performed. If the source is destroyed before the target
-has
-received, the token becomes invalid.
-
-The target is expected to be initialized (sev_guest_init), but not
-launched
-state (sev_launch_start) when performing receive. Once the target has
-received, it will be in a launched state and will not need to perform
-the
-typical SEV launch commands.
-
-Co-developed-by: Lars Bull <larsbull@google.com>
-Signed-off-by: Lars Bull <larsbull@google.com>
 Signed-off-by: Peter Gonda <pgonda@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Sean Christopherson <seanjc@google.com>
@@ -120,448 +103,250 @@ Cc: kvm@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 
 ---
- .../virt/kvm/amd-memory-encryption.rst        |  43 +++
- arch/x86/kvm/svm/sev.c                        | 270 +++++++++++++++++-
- arch/x86/kvm/svm/svm.h                        |   1 +
- include/uapi/linux/kvm.h                      |  12 +
- 4 files changed, 317 insertions(+), 9 deletions(-)
+ arch/x86/kvm/svm/sev.c | 164 +++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 150 insertions(+), 14 deletions(-)
 
-diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
-index 5ec8a1902e15..0f9030e3dcfe 100644
---- a/Documentation/virt/kvm/amd-memory-encryption.rst
-+++ b/Documentation/virt/kvm/amd-memory-encryption.rst
-@@ -427,6 +427,49 @@ issued by the hypervisor to make the guest ready for execution.
- 
- Returns: 0 on success, -negative on error
- 
-+10. KVM_SEV_LOCAL_SEND
-+----------------------------------
-+
-+The KVM_SEV_LOCAL_SEND command is used to stage the VM's SEV info
-+for the purposes of migrating memory to a new local VM while using the same SEV
-+key. If the source VM is destroyed before the staged info has been received by
-+the target, the info is lost. Once the info has been staged, only commands
-+KVM_SEV_DBG_DECRYPT, and KVM_SEV_DBG_ENCRYPT
-+can be used by the source.
-+
-+Parameters (out): struct kvm_sev_local_send
-+
-+Returns: 0 on success, -negative on error
-+
-+::
-+
-+    struct kvm_sev_local_send {
-+        __u64 info_token;    /* token referencing the staged info */
-+    };
-+
-+11. KVM_SEV_LOCAL_RECEIVE
-+-------------------------------------
-+
-+The KVM_SEV_LOCAL_RECEIVE command is used to transfer staged SEV
-+info to a target VM from some source VM. SEV on the target VM should be active
-+when receive is performed, but not yet launched and without any pinned memory.
-+The launch commands should be skipped after receive because they should have
-+already been performed on the source.
-+
-+Parameters (in/out): struct kvm_sev_local_receive
-+
-+Returns: 0 on success, -negative on error
-+
-+::
-+
-+    struct kvm_sev_local_receive {
-+        __u64 info_token;    /* token referencing the staged info */
-+        __u32 handle;        /* guest handle */
-+    };
-+
-+On success, the 'handle' field contains the handle for this SEV guest.
-+
-+
- References
- ==========
- 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 5af46ff6ec48..7c33ad2b910d 100644
+index 7c33ad2b910d..33df7ed08d21 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -14,6 +14,7 @@
- #include <linux/psp-sev.h>
- #include <linux/pagemap.h>
- #include <linux/swap.h>
-+#include <linux/random.h>
- #include <linux/misc_cgroup.h>
- #include <linux/processor.h>
- #include <linux/trace_events.h>
-@@ -57,6 +58,8 @@ module_param_named(sev_es, sev_es_enabled, bool, 0444);
- #define sev_es_enabled false
- #endif /* CONFIG_KVM_AMD_SEV */
- 
-+#define MAX_RAND_RETRY    3
-+
- static u8 sev_enc_bit;
- static DECLARE_RWSEM(sev_deactivate_lock);
- static DEFINE_MUTEX(sev_bitmap_lock);
-@@ -74,6 +77,22 @@ struct enc_region {
+@@ -77,6 +77,19 @@ struct enc_region {
  	unsigned long size;
  };
  
-+struct sev_info_migration_node {
-+	struct hlist_node hnode;
-+	u64 token;
-+	bool valid;
++struct vmsa_node {
++	struct list_head list;
++	int vcpu_id;
++	struct vmcb_save_area *vmsa;
++	struct ghcb *ghcb;
++	u64 ghcb_gpa;
 +
-+	unsigned int asid;
-+	unsigned int handle;
-+	unsigned long pages_locked;
-+	struct list_head regions_list;
-+	struct misc_cg *misc_cg;
++	void *ghcb_sa;
++	u64 ghcb_sa_len;
++	bool ghcb_sa_sync;
++	bool ghcb_sa_free;
 +};
 +
-+#define SEV_INFO_MIGRATION_HASH_BITS    7
-+static DEFINE_HASHTABLE(sev_info_migration_hash, SEV_INFO_MIGRATION_HASH_BITS);
-+static DEFINE_SPINLOCK(sev_info_migration_hash_lock);
+ struct sev_info_migration_node {
+ 	struct hlist_node hnode;
+ 	u64 token;
+@@ -87,6 +100,11 @@ struct sev_info_migration_node {
+ 	unsigned long pages_locked;
+ 	struct list_head regions_list;
+ 	struct misc_cg *misc_cg;
 +
- /* Called with the sev_bitmap_lock held, or on shutdown  */
- static int sev_flush_asids(int min_asid, int max_asid)
- {
-@@ -1094,6 +1113,185 @@ static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
++	/* The following fields are for SEV-ES guests */
++	bool es_enabled;
++	struct list_head vmsa_list;
++	u64 ap_jump_table;
+ };
+ 
+ #define SEV_INFO_MIGRATION_HASH_BITS    7
+@@ -1163,6 +1181,94 @@ static int place_migration_node(struct sev_info_migration_node *entry)
  	return ret;
  }
  
-+static struct sev_info_migration_node *find_migration_info(unsigned long token)
++static int process_vmsa_list(struct kvm *kvm, struct list_head *vmsa_list)
 +{
-+	struct sev_info_migration_node *entry;
++	struct vmsa_node *vmsa_node, *q;
++	struct kvm_vcpu *vcpu;
++	struct vcpu_svm *svm;
 +
-+	hash_for_each_possible(sev_info_migration_hash, entry, hnode, token) {
-+		if (entry->token == token)
-+			return entry;
++	lockdep_assert_held(&kvm->lock);
++
++	if (!vmsa_list)
++		return 0;
++
++	list_for_each_entry(vmsa_node, vmsa_list, list) {
++		if (!kvm_get_vcpu_by_id(kvm, vmsa_node->vcpu_id)) {
++			WARN(1,
++			     "Failed to find VCPU with ID %d despite presence in VMSA list.\n",
++			     vmsa_node->vcpu_id);
++			return -1;
++		}
 +	}
-+
-+	return NULL;
-+}
-+
-+/*
-+ * Places @entry into the |sev_info_migration_hash|. Returns 0 if successful
-+ * and ownership of @entry is transferred to the hashmap.
-+ */
-+static int place_migration_node(struct sev_info_migration_node *entry)
-+{
-+	u64 token = 0;
-+	unsigned int retries;
-+	int ret = -EFAULT;
 +
 +	/*
-+	 * Generate a token associated with this VM's SEV info that userspace
-+	 * can use to import on the other side. We use 0 to indicate a not-
-+	 * present token. The token cannot collide with other existing ones, so
-+	 * reroll a few times until we get a valid token. In the unlikely event
-+	 * we're having trouble generating a unique token, give up and let
-+	 * userspace retry if it needs to.
++	 * Move any stashed VMSAs back to their respective VMCBs and delete
++	 * those nodes.
 +	 */
-+	spin_lock(&sev_info_migration_hash_lock);
-+	for (retries = 0; retries < MAX_RAND_RETRY; retries++)  {
-+		get_random_bytes((void *)&token, sizeof(token));
++	list_for_each_entry_safe(vmsa_node, q, vmsa_list, list) {
++		vcpu = kvm_get_vcpu_by_id(kvm, vmsa_node->vcpu_id);
++		svm = to_svm(vcpu);
++		svm->vmsa = vmsa_node->vmsa;
++		svm->ghcb = vmsa_node->ghcb;
++		svm->vmcb->control.ghcb_gpa = vmsa_node->ghcb_gpa;
++		svm->vcpu.arch.guest_state_protected = true;
++		svm->vmcb->control.vmsa_pa = __pa(svm->vmsa);
++		svm->ghcb_sa = vmsa_node->ghcb_sa;
++		svm->ghcb_sa_len = vmsa_node->ghcb_sa_len;
++		svm->ghcb_sa_sync = vmsa_node->ghcb_sa_sync;
++		svm->ghcb_sa_free = vmsa_node->ghcb_sa_free;
 +
-+		if (find_migration_info(token))
-+			continue;
-+
-+		entry->token = token;
-+		entry->valid = true;
-+
-+		hash_add(sev_info_migration_hash, &entry->hnode, token);
-+		ret = 0;
-+		goto out;
++		list_del(&vmsa_node->list);
++		kfree(vmsa_node);
 +	}
 +
-+out:
-+	spin_unlock(&sev_info_migration_hash_lock);
-+	return ret;
++	return 0;
 +}
 +
-+static int sev_local_send(struct kvm *kvm, struct kvm_sev_cmd *argp)
++static int create_vmsa_list(struct kvm *kvm,
++			    struct sev_info_migration_node *entry)
 +{
-+	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-+	struct sev_info_migration_node *entry;
-+	struct kvm_sev_local_send params;
-+	u64 token;
-+	int ret = -EFAULT;
++	int i;
++	const int num_vcpus = atomic_read(&kvm->online_vcpus);
++	struct vmsa_node *node;
++	struct kvm_vcpu *vcpu;
++	struct vcpu_svm *svm;
 +
-+	if (!sev_guest(kvm))
-+		return -ENOTTY;
++	INIT_LIST_HEAD(&entry->vmsa_list);
++	for (i = 0; i < num_vcpus; ++i) {
++		node = kzalloc(sizeof(*node), GFP_KERNEL);
++		if (!node)
++			goto e_freelist;
 +
-+	if (sev->es_active)
-+		return -EPERM;
++		vcpu = kvm->vcpus[i];
++		node->vcpu_id = vcpu->vcpu_id;
 +
-+	if (sev->info_token != 0)
-+		return -EEXIST;
++		svm = to_svm(vcpu);
++		node->vmsa = svm->vmsa;
++		svm->vmsa = NULL;
++		node->ghcb = svm->ghcb;
++		svm->ghcb = NULL;
++		node->ghcb_gpa = svm->vmcb->control.ghcb_gpa;
++		node->ghcb_sa = svm->ghcb_sa;
++		svm->ghcb_sa = NULL;
++		node->ghcb_sa_len = svm->ghcb_sa_len;
++		svm->ghcb_sa_len = 0;
++		node->ghcb_sa_sync = svm->ghcb_sa_sync;
++		svm->ghcb_sa_sync = false;
++		node->ghcb_sa_free = svm->ghcb_sa_free;
++		svm->ghcb_sa_free = false;
 +
-+	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
-+			   sizeof(params)))
-+		return -EFAULT;
-+
-+	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
-+	if (!entry)
-+		return -ENOMEM;
-+
-+	entry->asid = sev->asid;
-+	entry->handle = sev->handle;
-+	entry->pages_locked = sev->pages_locked;
-+	entry->misc_cg = sev->misc_cg;
-+
-+	INIT_LIST_HEAD(&entry->regions_list);
-+	list_replace_init(&sev->regions_list, &entry->regions_list);
-+
-+	if (place_migration_node(entry))
-+		goto e_listdel;
-+
-+	token = entry->token;
-+
-+	params.info_token = token;
-+	if (copy_to_user((void __user *)(uintptr_t)argp->data, &params,
-+			 sizeof(params)))
-+		goto e_hashdel;
-+
-+	sev->info_token = token;
++		list_add_tail(&node->list, &entry->vmsa_list);
++	}
 +
 +	return 0;
 +
-+e_hashdel:
-+	spin_lock(&sev_info_migration_hash_lock);
-+	hash_del(&entry->hnode);
-+	spin_unlock(&sev_info_migration_hash_lock);
-+
-+e_listdel:
-+	list_replace_init(&entry->regions_list, &sev->regions_list);
-+
-+	kfree(entry);
-+
-+	return ret;
++e_freelist:
++	if (process_vmsa_list(kvm, &entry->vmsa_list))
++		WARN(1, "Unable to move VMSA list back to source VM. Guest is in a broken state now.");
++	return -1;
 +}
 +
-+static int sev_local_receive(struct kvm *kvm, struct kvm_sev_cmd *argp)
-+{
-+	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-+	struct sev_info_migration_node *entry;
-+	struct kvm_sev_local_receive params;
-+	struct kvm_sev_info old_info;
-+
-+	if (!sev_guest(kvm))
-+		return -ENOTTY;
-+
-+	if (sev->es_active)
-+		return -EPERM;
-+
-+	if (sev->handle != 0)
-+		return -EPERM;
-+
-+	if (!list_empty(&sev->regions_list))
-+		return -EPERM;
-+
-+	if (copy_from_user(&params,
-+			   (void __user *)(uintptr_t)argp->data,
-+			   sizeof(params)))
-+		return -EFAULT;
-+
-+	spin_lock(&sev_info_migration_hash_lock);
-+	entry = find_migration_info(params.info_token);
-+	if (!entry || !entry->valid)
-+		goto err_unlock;
-+
-+	memcpy(&old_info, sev, sizeof(old_info));
-+
-+	/*
-+	 * The source VM always frees @entry On the target we simply
-+	 * mark the token as invalid to notify the source the sev info
-+	 * has been moved successfully.
-+	 */
-+	entry->valid = false;
-+	sev->active = true;
-+	sev->asid = entry->asid;
-+	sev->handle = entry->handle;
-+	sev->pages_locked = entry->pages_locked;
-+	sev->misc_cg = entry->misc_cg;
-+
-+	INIT_LIST_HEAD(&sev->regions_list);
-+	list_replace_init(&entry->regions_list, &sev->regions_list);
-+
-+	spin_unlock(&sev_info_migration_hash_lock);
-+
-+	params.handle = sev->handle;
-+
-+	if (copy_to_user((void __user *)(uintptr_t)argp->data, &params,
-+			 sizeof(params)))
-+		goto err_unwind;
-+
-+	sev_asid_free(&old_info);
-+	return 0;
-+
-+err_unwind:
-+	spin_lock(&sev_info_migration_hash_lock);
-+	list_replace_init(&sev->regions_list, &entry->regions_list);
-+	entry->valid = true;
-+	memcpy(sev, &old_info, sizeof(*sev));
-+
-+err_unlock:
-+	spin_unlock(&sev_info_migration_hash_lock);
-+
-+	return -EFAULT;
-+}
-+
- /* Userspace wants to query session length. */
- static int
- __sev_send_start_query_session_length(struct kvm *kvm, struct kvm_sev_cmd *argp,
-@@ -1513,6 +1711,18 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
- 		goto out;
- 	}
- 
-+	/*
-+	 * If this VM has started exporting its SEV contents to another VM,
-+	 * it's not allowed to do any more SEV operations that may modify the
-+	 * SEV state.
-+	 */
-+	if (to_kvm_svm(kvm)->sev_info.info_token &&
-+	    sev_cmd.id != KVM_SEV_DBG_ENCRYPT &&
-+	    sev_cmd.id != KVM_SEV_DBG_DECRYPT) {
-+		r = -EPERM;
-+		goto out;
-+	}
-+
- 	switch (sev_cmd.id) {
- 	case KVM_SEV_ES_INIT:
- 		if (!sev_es_enabled) {
-@@ -1553,6 +1763,12 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
- 	case KVM_SEV_GET_ATTESTATION_REPORT:
- 		r = sev_get_attestation_report(kvm, &sev_cmd);
- 		break;
-+	case KVM_SEV_LOCAL_SEND:
-+		r = sev_local_send(kvm, &sev_cmd);
-+		break;
-+	case KVM_SEV_LOCAL_RECEIVE:
-+		r = sev_local_receive(kvm, &sev_cmd);
-+		break;
- 	case KVM_SEV_SEND_START:
- 		r = sev_send_start(kvm, &sev_cmd);
- 		break;
-@@ -1786,6 +2002,8 @@ static void __unregister_region_list_locked(struct kvm *kvm,
- void sev_vm_destroy(struct kvm *kvm)
+ static int sev_local_send(struct kvm *kvm, struct kvm_sev_cmd *argp)
  {
  	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-+	struct sev_info_migration_node *entry = NULL;
-+	bool info_migrated = false;
- 
+@@ -1174,9 +1280,6 @@ static int sev_local_send(struct kvm *kvm, struct kvm_sev_cmd *argp)
  	if (!sev_guest(kvm))
- 		return;
-@@ -1796,25 +2014,59 @@ void sev_vm_destroy(struct kvm *kvm)
- 		return;
- 	}
+ 		return -ENOTTY;
  
-+	/*
-+	 * If userspace has requested that we migrate the SEV info to a new VM,
-+	 * then we own and must remove an entry node in the tracking data
-+	 * structure. Whether we clean up the data in our SEV info struct and
-+	 * entry node depends on whether userspace has done the migration,
-+	 * which transfers ownership to a new VM. We can identify that
-+	 * migration has occurred by checking if the node is marked invalid.
-+	 */
-+	if (sev->info_token != 0) {
-+		spin_lock(&sev_info_migration_hash_lock);
-+		entry = find_migration_info(sev->info_token);
-+		if (entry) {
-+			info_migrated = !entry->valid;
-+			hash_del(&entry->hnode);
-+		} else
-+			WARN(1,
-+			     "SEV VM was marked for export, but does not have associated export node.\n");
-+		spin_unlock(&sev_info_migration_hash_lock);
+-	if (sev->es_active)
+-		return -EPERM;
+-
+ 	if (sev->info_token != 0)
+ 		return -EEXIST;
+ 
+@@ -1196,8 +1299,19 @@ static int sev_local_send(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	INIT_LIST_HEAD(&entry->regions_list);
+ 	list_replace_init(&sev->regions_list, &entry->regions_list);
+ 
++	if (sev_es_guest(kvm)) {
++		/*
++		 * If this is an ES guest, we need to move each VMCB's VMSA into a
++		 * list for migration.
++		 */
++		entry->es_enabled = true;
++		entry->ap_jump_table = sev->ap_jump_table;
++		if (create_vmsa_list(kvm, entry))
++			goto e_listdel;
 +	}
 +
- 	mutex_lock(&kvm->lock);
+ 	if (place_migration_node(entry))
+-		goto e_listdel;
++		goto e_vmsadel;
  
- 	/*
--	 * Ensure that all guest tagged cache entries are flushed before
--	 * releasing the pages back to the system for use. CLFLUSH will
--	 * not do this, so issue a WBINVD.
-+	 * Adding memory regions after a local send has started
-+	 * is dangerous.
- 	 */
--	wbinvd_on_all_cpus();
-+	if (sev->info_token != 0 && !list_empty(&sev->regions_list)) {
+ 	token = entry->token;
+ 
+@@ -1215,6 +1329,11 @@ static int sev_local_send(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	hash_del(&entry->hnode);
+ 	spin_unlock(&sev_info_migration_hash_lock);
+ 
++e_vmsadel:
++	if (sev_es_guest(kvm) && process_vmsa_list(kvm, &entry->vmsa_list))
 +		WARN(1,
-+		     "Source SEV regions list non-empty after export request. List is not expected to be modified after export request.\n");
-+		__unregister_region_list_locked(kvm, &sev->regions_list);
-+	}
++		     "Unable to move VMSA list back to source VM. Guest is in a broken state now.");
++
+ e_listdel:
+ 	list_replace_init(&entry->regions_list, &sev->regions_list);
  
+@@ -1233,9 +1352,6 @@ static int sev_local_receive(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	if (!sev_guest(kvm))
+ 		return -ENOTTY;
+ 
+-	if (sev->es_active)
+-		return -EPERM;
+-
+ 	if (sev->handle != 0)
+ 		return -EPERM;
+ 
+@@ -1254,6 +1370,14 @@ static int sev_local_receive(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 
+ 	memcpy(&old_info, sev, sizeof(old_info));
+ 
++	if (entry->es_enabled) {
++		if (process_vmsa_list(kvm, &entry->vmsa_list))
++			goto err_unlock;
++
++		sev->es_active = true;
++		sev->ap_jump_table = entry->ap_jump_table;
++	}
++
  	/*
--	 * if userspace was terminated before unregistering the memory regions
--	 * then lets unpin all the registered memory.
-+	 * If userspace was terminated before unregistering the memory
-+	 * regions then lets unpin all the registered memory.
- 	 */
--	__unregister_region_list_locked(kvm, &sev->regions_list);
-+	if (entry)
-+		__unregister_region_list_locked(kvm, &entry->regions_list);
+ 	 * The source VM always frees @entry On the target we simply
+ 	 * mark the token as invalid to notify the source the sev info
+@@ -2046,12 +2170,22 @@ void sev_vm_destroy(struct kvm *kvm)
+ 		__unregister_region_list_locked(kvm, &sev->regions_list);
+ 	}
+ 
+-	/*
+-	 * If userspace was terminated before unregistering the memory
+-	 * regions then lets unpin all the registered memory.
+-	 */
+-	if (entry)
++	if (entry) {
++		/*
++		 * If there are any saved VMSAs, restore them so they can be
++		 * destructed through the normal path.
++		 */
++		if (entry->es_enabled)
++			if (process_vmsa_list(kvm, &entry->vmsa_list))
++				WARN(1,
++				     "Unable to clean up vmsa_list");
++
++		/*
++		 * If userspace was terminated before unregistering the memory
++		 * regions then lets unpin all the registered memory.
++		 */
+ 		__unregister_region_list_locked(kvm, &entry->regions_list);
++	}
  
  	mutex_unlock(&kvm->lock);
  
--	sev_unbind_asid(kvm, sev->handle);
--	sev_asid_free(sev);
-+	/*
-+	 * Ensure that all guest tagged cache entries are flushed before
-+	 * releasing the pages back to the system for use. CLFLUSH will
-+	 * not do this, so issue a WBINVD.
-+	 */
-+	wbinvd_on_all_cpus();
-+	if (!info_migrated) {
-+		sev_unbind_asid(kvm, sev->handle);
-+		sev_asid_free(sev);
-+	}
+@@ -2243,9 +2377,11 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu)
+ 
+ 	svm = to_svm(vcpu);
+ 
+-	if (vcpu->arch.guest_state_protected)
++	if (svm->ghcb && vcpu->arch.guest_state_protected)
+ 		sev_flush_guest_memory(svm, svm->vmsa, PAGE_SIZE);
+-	__free_page(virt_to_page(svm->vmsa));
 +
-+	kfree(entry);
- }
++	if (svm->vmsa)
++		__free_page(virt_to_page(svm->vmsa));
  
- void __init sev_set_cpu_caps(void)
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 70419e417c0d..1ae8fe623c70 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -65,6 +65,7 @@ struct kvm_sev_info {
- 	u64 ap_jump_table;	/* SEV-ES AP Jump Table address */
- 	struct kvm *enc_context_owner; /* Owner of copied encryption context */
- 	struct misc_cg *misc_cg; /* For misc cgroup accounting */
-+	u64 info_token; /* Token for SEV info local migration */
- };
- 
- struct kvm_svm {
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 79d9c44d1ad7..b317d4b2507d 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1678,6 +1678,9 @@ enum sev_cmd_id {
- 	KVM_SEV_GET_ATTESTATION_REPORT,
- 	/* Guest Migration Extension */
- 	KVM_SEV_SEND_CANCEL,
-+	/* Local migration commands */
-+	KVM_SEV_LOCAL_SEND,
-+	KVM_SEV_LOCAL_RECEIVE,
- 
- 	KVM_SEV_NR_MAX,
- };
-@@ -1775,6 +1778,15 @@ struct kvm_sev_receive_update_data {
- 	__u32 trans_len;
- };
- 
-+struct kvm_sev_local_send {
-+	__u64 info_token;
-+};
-+
-+struct kvm_sev_local_receive {
-+	__u64 info_token;
-+	__u32 handle;
-+};
-+
- #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
- #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
- #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
+ 	if (svm->ghcb_sa_free)
+ 		kfree(svm->ghcb_sa);
 -- 
 2.32.0.288.g62a8d224e6-goog
 
