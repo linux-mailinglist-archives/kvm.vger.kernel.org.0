@@ -2,136 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F1353AE489
-	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 10:03:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32C073AE48D
+	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 10:07:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230056AbhFUIFX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Jun 2021 04:05:23 -0400
-Received: from mx21.baidu.com ([220.181.3.85]:55566 "EHLO baidu.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229905AbhFUIFW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Jun 2021 04:05:22 -0400
-Received: from BC-Mail-Ex21.internal.baidu.com (unknown [172.31.51.15])
-        by Forcepoint Email with ESMTPS id 7CE98EE3E5D820EB9D94;
-        Mon, 21 Jun 2021 16:03:03 +0800 (CST)
-Received: from BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42) by
- BC-Mail-Ex21.internal.baidu.com (172.31.51.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2242.4; Mon, 21 Jun 2021 16:03:03 +0800
-Received: from LAPTOP-UKSR4ENP.internal.baidu.com (172.31.63.8) by
- BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2242.4; Mon, 21 Jun 2021 16:03:02 +0800
-From:   Cai Huoqing <caihuoqing@baidu.com>
-To:     <kraxel@redhat.com>
-CC:     <kvm@vger.kernel.org>, Cai Huoqing <caihuoqing@baidu.com>
-Subject: [PATCH] remove "#include<linux/virtio.h>"
-Date:   Mon, 21 Jun 2021 16:02:55 +0800
-Message-ID: <20210621080255.238-1-caihuoqing@baidu.com>
-X-Mailer: git-send-email 2.17.1
+        id S230061AbhFUIKA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Jun 2021 04:10:00 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:46112 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229618AbhFUIKA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Jun 2021 04:10:00 -0400
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id B441E21966;
+        Mon, 21 Jun 2021 08:07:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1624262865; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=T6rFZ0lwQYZfsvuyDyVPU+tlvewx6b5mmFXLMKuhHrY=;
+        b=XnVKLDyxLrsrbooI0OIUtLfV4G+zcMJ8d41UUZLB453X7BlgpYbhepRVSz/bTz/nwFR8Al
+        lNfDx1vwlaZ88PdxWTcIcAM0G5uVJabzyuGrLrzEBWfP+dr4rPtgsCmws492NjxgkI0TJR
+        AqPFW+fcv7KSDws6Wd0DEopvH+G67qI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1624262865;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=T6rFZ0lwQYZfsvuyDyVPU+tlvewx6b5mmFXLMKuhHrY=;
+        b=a91c8/2+fMFLdP2/WzTkRbFgGy4Ve0mcWTDe+FSMqsuw59nhNOOuFapJRetDB1eJWNXteF
+        rIj4mJMrCrNglNCg==
+Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        by imap.suse.de (Postfix) with ESMTP id 3E66E118DD;
+        Mon, 21 Jun 2021 08:07:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1624262865; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=T6rFZ0lwQYZfsvuyDyVPU+tlvewx6b5mmFXLMKuhHrY=;
+        b=XnVKLDyxLrsrbooI0OIUtLfV4G+zcMJ8d41UUZLB453X7BlgpYbhepRVSz/bTz/nwFR8Al
+        lNfDx1vwlaZ88PdxWTcIcAM0G5uVJabzyuGrLrzEBWfP+dr4rPtgsCmws492NjxgkI0TJR
+        AqPFW+fcv7KSDws6Wd0DEopvH+G67qI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1624262865;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=T6rFZ0lwQYZfsvuyDyVPU+tlvewx6b5mmFXLMKuhHrY=;
+        b=a91c8/2+fMFLdP2/WzTkRbFgGy4Ve0mcWTDe+FSMqsuw59nhNOOuFapJRetDB1eJWNXteF
+        rIj4mJMrCrNglNCg==
+Received: from director2.suse.de ([192.168.254.72])
+        by imap3-int with ESMTPSA
+        id lVpNDdFI0GBmGwAALh3uQQ
+        (envelope-from <cfontana@suse.de>); Mon, 21 Jun 2021 08:07:45 +0000
+Subject: Re: [PATCH v9] qapi: introduce 'query-kvm-cpuid' action
+To:     Eduardo Habkost <ehabkost@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>
+Cc:     Laurent Vivier <lvivier@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Denis Lunev <den@openvz.org>, Eric Blake <eblake@redhat.com>,
+        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+References: <20210603090753.11688-1-valeriy.vdovin@virtuozzo.com>
+ <87im2d6p5v.fsf@dusky.pond.sub.org>
+ <20210617074919.GA998232@dhcp-172-16-24-191.sw.ru>
+ <87a6no3fzf.fsf@dusky.pond.sub.org>
+ <790d22e1-5de9-ba20-6c03-415b62223d7d@suse.de>
+ <877dis1sue.fsf@dusky.pond.sub.org>
+ <20210617153949.GA357@dhcp-172-16-24-191.sw.ru>
+ <e69ea2b4-21cc-8203-ad2d-10a0f4ffe34a@suse.de>
+ <20210617165111.eu3x2pvinpoedsqj@habkost.net>
+ <87sg1fwwgg.fsf@dusky.pond.sub.org>
+ <20210618204006.k6krwuz2lpxvb6uh@habkost.net>
+From:   Claudio Fontana <cfontana@suse.de>
+Message-ID: <6f644bbb-52ff-4d79-36bb-208c6b6c4eef@suse.de>
+Date:   Mon, 21 Jun 2021 10:07:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [172.31.63.8]
-X-ClientProxiedBy: BC-Mail-Ex03.internal.baidu.com (172.31.51.43) To
- BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42)
+In-Reply-To: <20210618204006.k6krwuz2lpxvb6uh@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-virtio_config.h already includes virtio.h. so remove it
+On 6/18/21 10:40 PM, Eduardo Habkost wrote:
+> On Fri, Jun 18, 2021 at 07:52:47AM +0200, Markus Armbruster wrote:
+>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>>
+>>> On Thu, Jun 17, 2021 at 05:53:11PM +0200, Claudio Fontana wrote:
+>>>> On 6/17/21 5:39 PM, Valeriy Vdovin wrote:
+>>>>> On Thu, Jun 17, 2021 at 04:14:17PM +0200, Markus Armbruster wrote:
+>>>>>> Claudio Fontana <cfontana@suse.de> writes:
+>>>>>>
+>>>>>>> On 6/17/21 1:09 PM, Markus Armbruster wrote:
+>>
+>> [...]
+>>
+>>>>>>>> If it just isn't implemented for anything but KVM, then putting "kvm"
+>>>>>>>> into the command name is a bad idea.  Also, the commit message should
+>>>>>>>> briefly note the restriction to KVM.
+>>>>>>
+>>>>>> Perhaps this one is closer to reality.
+>>>>>>
+>>>>> I agree.
+>>>>> What command name do you suggest?
+>>>>
+>>>> query-exposed-cpuid?
+>>>
+>>> Pasting the reply I sent at [1]:
+>>>
+>>>   I don't really mind how the command is called, but I would prefer
+>>>   to add a more complex abstraction only if maintainers of other
+>>>   accelerators are interested and volunteer to provide similar
+>>>   functionality.  I don't want to introduce complexity for use
+>>>   cases that may not even exist.
+>>>
+>>> I'm expecting this to be just a debugging mechanism, not a stable
+>>> API to be maintained and supported for decades.  (Maybe a "x-"
+>>> prefix should be added to indicate that?)
+>>>
+>>> [1] https://lore.kernel.org/qemu-devel/20210602204604.crsxvqixkkll4ef4@habkost.net
+>>
+>> x-query-x86_64-cpuid?
+>>
+> 
+> Unless somebody wants to spend time designing a generic
+> abstraction around this (and justify the extra complexity), this
+> is a KVM-specific command.  Is there a reason to avoid "kvm" in
+> the command name?
+> 
 
-Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
----
- drivers/vdpa/virtio_pci/vp_vdpa.c  | 1 -
- drivers/virtio/virtio.c            | 1 -
- drivers/virtio/virtio_input.c      | 1 -
- drivers/virtio/virtio_mmio.c       | 1 -
- drivers/virtio/virtio_pci_common.h | 1 -
- drivers/virtio/virtio_ring.c       | 1 -
- drivers/virtio/virtio_vdpa.c       | 1 -
- 7 files changed, 7 deletions(-)
+If the point of all of this is "please get me the cpuid, as seen by the guest", then I fail to see how this should be kvm-only.
+We can still return "not implemented" of some kind for HVF, TCG etc.
 
-diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
-index c76ebb531212..8cb6fa86f055 100644
---- a/drivers/vdpa/virtio_pci/vp_vdpa.c
-+++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
-@@ -12,7 +12,6 @@
- #include <linux/module.h>
- #include <linux/pci.h>
- #include <linux/vdpa.h>
--#include <linux/virtio.h>
- #include <linux/virtio_config.h>
- #include <linux/virtio_ring.h>
- #include <linux/virtio_pci.h>
-diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
-index 4b15c00c0a0a..06b6c8c86ae5 100644
---- a/drivers/virtio/virtio.c
-+++ b/drivers/virtio/virtio.c
-@@ -1,5 +1,4 @@
- // SPDX-License-Identifier: GPL-2.0-only
--#include <linux/virtio.h>
- #include <linux/spinlock.h>
- #include <linux/virtio_config.h>
- #include <linux/module.h>
-diff --git a/drivers/virtio/virtio_input.c b/drivers/virtio/virtio_input.c
-index ce51ae165943..ab8439a94f73 100644
---- a/drivers/virtio/virtio_input.c
-+++ b/drivers/virtio/virtio_input.c
-@@ -1,6 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0-only
- #include <linux/module.h>
--#include <linux/virtio.h>
- #include <linux/virtio_config.h>
- #include <linux/input.h>
- #include <linux/slab.h>
-diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
-index 56128b9c46eb..5061ff088dd1 100644
---- a/drivers/virtio/virtio_mmio.c
-+++ b/drivers/virtio/virtio_mmio.c
-@@ -64,7 +64,6 @@
- #include <linux/platform_device.h>
- #include <linux/slab.h>
- #include <linux/spinlock.h>
--#include <linux/virtio.h>
- #include <linux/virtio_config.h>
- #include <uapi/linux/virtio_mmio.h>
- #include <linux/virtio_ring.h>
-diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
-index beec047a8f8d..acae912fdb12 100644
---- a/drivers/virtio/virtio_pci_common.h
-+++ b/drivers/virtio/virtio_pci_common.h
-@@ -21,7 +21,6 @@
- #include <linux/pci.h>
- #include <linux/slab.h>
- #include <linux/interrupt.h>
--#include <linux/virtio.h>
- #include <linux/virtio_config.h>
- #include <linux/virtio_ring.h>
- #include <linux/virtio_pci.h>
-diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-index 88f0b16b11b8..0766bb227211 100644
---- a/drivers/virtio/virtio_ring.c
-+++ b/drivers/virtio/virtio_ring.c
-@@ -3,7 +3,6 @@
-  *
-  *  Copyright 2007 Rusty Russell IBM Corporation
-  */
--#include <linux/virtio.h>
- #include <linux/virtio_ring.h>
- #include <linux/virtio_config.h>
- #include <linux/device.h>
-diff --git a/drivers/virtio/virtio_vdpa.c b/drivers/virtio/virtio_vdpa.c
-index e28acf482e0c..80f75401296e 100644
---- a/drivers/virtio/virtio_vdpa.c
-+++ b/drivers/virtio/virtio_vdpa.c
-@@ -13,7 +13,6 @@
- #include <linux/kernel.h>
- #include <linux/slab.h>
- #include <linux/uuid.h>
--#include <linux/virtio.h>
- #include <linux/vdpa.h>
- #include <linux/virtio_config.h>
- #include <linux/virtio_ring.h>
--- 
-2.22.0
+But maybe I misread the use case?
 
+Thanks,
+
+C
