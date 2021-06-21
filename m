@@ -2,108 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C00063AF51D
-	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 20:31:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 684963AF64E
+	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 21:42:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231991AbhFUSdn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Jun 2021 14:33:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57446 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231741AbhFUSdn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Jun 2021 14:33:43 -0400
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE2B1C061574
-        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 11:31:27 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id h9so8413402oih.4
-        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 11:31:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=b0z3SnOjdByYCusiaWRhpgFnNMjGbloRor2UMReTdAU=;
-        b=ezyiwYDIXMixTaiQx7t705ryBmU7uwaEQzIsQNfCkLbZV6ik1qIZWt15dL1TQpxMvf
-         I4H6GCKhWKkEamKg6ndsSVwrHyWMpwZv/yw1luaOBTRdN8M3Mo18k+CCHEPLD3RgQKoH
-         SOrqouMW9fGsNHZwDNYUojMehuU6Gt6cBWaOQSqfybc7uCQp0O733s+z0wfrHSr1a4+6
-         Ow1NtF6aZFGLrxbt/1Uvm19K1degpP/qrPTZA7SZAehaUVjO1mgktgXUKVYwXD8jJgej
-         ph+OX5ELY6HphXYK0siyK+3NG/vXe/Cy7mDTmLRavF0dVrSJBsfUrK325RT+sXSm7078
-         JjtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=b0z3SnOjdByYCusiaWRhpgFnNMjGbloRor2UMReTdAU=;
-        b=UQKmg4Mhy/1GnQB4laAVkhBOrDWfQvCSjp/Ec6KdJElXVNc05zhV4yr+A6lP1cXe+F
-         daoh8F433Ob9ImOllph4vcnrGbNAwa12XGa9+49yZadvd9lTcSvXPyURTmMtpLpgtUO3
-         khT4GjJ6XZUBgzlD5cDEuhBXyhwzLWwNUbhY1wTsuUL+9H5SHQ6+RSc3BrzVTW1A4x2C
-         +DXb8J5P8F8mCJV0rc55tBgv9evVTBD3gk1EHhzHMoAq45O5QKclCtzoBAQHRAaj9ncf
-         gdK7ul+M8wvCay+SHNX2mBrPfkBIAlgv8jZc/ksFQgQd6JcrPwNAmkpMzjA+LSK2/et9
-         KsFw==
-X-Gm-Message-State: AOAM532c+bb2RyV77BEfdpFLxZwmkuXPuR/nWqvl0CkWhJQqDdgOWINP
-        i62QptyrWPS/fV9p7WCz0bs/1IDmSL4ulqVx0vkB+LeGFoTflw==
-X-Google-Smtp-Source: ABdhPJzGBk3QK4lBtkFUIMORjH1rTbcYNoX0RRkQY8p0IsllSOu2o5t/q5HUij6VJ3MmTtLq0x+8yo+3+yURiXAuu2Q=
-X-Received: by 2002:aca:a983:: with SMTP id s125mr26065600oie.13.1624300286696;
- Mon, 21 Jun 2021 11:31:26 -0700 (PDT)
+        id S230490AbhFUTob (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Jun 2021 15:44:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43790 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230222AbhFUTob (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Jun 2021 15:44:31 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15LJY43K140007;
+        Mon, 21 Jun 2021 15:42:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=tpTbAY+2SNGjxOxee8jh1frQ5eR6mnKDfmrbz8wFNlA=;
+ b=eIKO0dqY7kds6RPToVJ+mzJRstYxNBCXl8SFGwMys1hmq13DQ1Zt/nXFR7UBiCE74WiU
+ /8OkfOVJFyTj3Bvhz+MBqm3nzaGqUnNtpOzuhtPpPCd/4pC4t+ELnm5wQYFdRpapEnPL
+ tXHk0VwSSHR+DX+386aeMWkseldl77bTvKRN9G1xuM0zthGgHbyrQrHxpsysZ4EStRC+
+ f4K/kZvt7SmgGmI0QEZ/1lwZD3NMEwHVWi1ZosDDuzG6Sofc+2qS9LxwV7uFe6A8h+ft
+ AP3NWiXW3oP12jdaVgKjKzTlzb5+Ue06uusWdmlR1V/htPO8vbgjC/FYT+j5Ju2z8C5s JA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39ayjmtvby-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Jun 2021 15:42:16 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15LJZAbP145922;
+        Mon, 21 Jun 2021 15:42:15 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39ayjmtvay-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Jun 2021 15:42:15 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15LJXcJ2006046;
+        Mon, 21 Jun 2021 19:42:13 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma05fra.de.ibm.com with ESMTP id 3998788jxt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Jun 2021 19:42:13 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15LJgAdH25952556
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 21 Jun 2021 19:42:10 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5A4E2A4054;
+        Mon, 21 Jun 2021 19:42:10 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 11E26A405B;
+        Mon, 21 Jun 2021 19:42:10 +0000 (GMT)
+Received: from osiris (unknown [9.145.14.202])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 21 Jun 2021 19:42:09 +0000 (GMT)
+Date:   Mon, 21 Jun 2021 21:42:08 +0200
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] virtio/s390: get rid of open-coded kvm hypercall
+Message-ID: <YNDrkOhjRiaBv34p@osiris>
+References: <20210621144522.1304273-1-hca@linux.ibm.com>
+ <87lf73nsqj.fsf@redhat.com>
 MIME-Version: 1.0
-References: <20200710154811.418214-1-mgamal@redhat.com> <20200710154811.418214-8-mgamal@redhat.com>
- <CALMp9eSbY6FjZAXt7ojQrX_SC_Lyg24dTGFZdKZK7fARGA=3hg@mail.gmail.com>
- <CALMp9eTFzQMpsrGhN4uJxyUHMKd5=yFwxLoBy==2BTHwmv_UGQ@mail.gmail.com>
- <20201023031433.GF23681@linux.intel.com> <498cfe12-f3e4-c4a2-f36b-159ccc10cdc4@redhat.com>
- <CALMp9eQ8C0pp5yP4tLsckVWq=j3Xb=e4M7UVZz67+pngaXJJUw@mail.gmail.com>
- <f40e5d23-88b6-01c0-60f9-5419dac703a2@redhat.com> <CALMp9eRGBiQDPr1wpAY34V=T6Jjij_iuHOX+_-QQPP=5SEw3GQ@mail.gmail.com>
- <4463f391-0a25-017e-f913-69c297e13c5e@redhat.com> <CALMp9eRnjdJtmU9bBosGNAxa2pvMzB8mHjtbYa-yb2uNoAkgdA@mail.gmail.com>
- <CALMp9eR2ONSpz__H2+ZpM4qqT7FNowNwOfe4x9o-ocfhwRnEhw@mail.gmail.com> <CALMp9eTyoVwvkc6YH9oBPP74dABJmUsA0Gz98+O+5kANHobWbQ@mail.gmail.com>
-In-Reply-To: <CALMp9eTyoVwvkc6YH9oBPP74dABJmUsA0Gz98+O+5kANHobWbQ@mail.gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 21 Jun 2021 11:31:15 -0700
-Message-ID: <CALMp9eRWa+SryhQUzSzjiN=PPwtd8JWheYJU67JUQLMcBY9UMQ@mail.gmail.com>
-Subject: Re: [PATCH v3 7/9] KVM: VMX: Add guest physical address check in EPT
- violation and misconfig
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Mohammed Gamal <mgamal@redhat.com>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87lf73nsqj.fsf@redhat.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: IKAMp-76W4k5MjT0MgTo-NnoAPNCMtOh
+X-Proofpoint-GUID: miWDX3LO9_vFH9H89bde_3WaO8KLONef
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-06-21_11:2021-06-21,2021-06-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ lowpriorityscore=0 suspectscore=0 phishscore=0 spamscore=0 malwarescore=0
+ adultscore=0 clxscore=1015 impostorscore=0 priorityscore=1501 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
+ definitions=main-2106210114
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 27, 2021 at 12:57 PM Jim Mattson <jmattson@google.com> wrote:
->
-> On Wed, Jan 20, 2021 at 1:16 PM Jim Mattson <jmattson@google.com> wrote:
+On Mon, Jun 21, 2021 at 05:27:00PM +0200, Cornelia Huck wrote:
+> On Mon, Jun 21 2021, Heiko Carstens <hca@linux.ibm.com> wrote:
+> 
+> > do_kvm_notify() and __do_kvm_notify() are an (exact) open-coded variant
+> > of kvm_hypercall3(). Therefore simply make use of kvm_hypercall3(),
+> > and get rid of duplicated code.
 > >
-> > On Fri, Jan 15, 2021 at 11:35 AM Jim Mattson <jmattson@google.com> wrote:
-> > >
-> > > On Fri, Oct 23, 2020 at 10:43 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > > >
-> > > > On 23/10/20 19:23, Jim Mattson wrote:
-> > > > >> The information that we need is _not_ that provided by the advanced
-> > > > >> VM-exit information (or by a page walk).  If a page is neither writable
-> > > > >> nor executable, the advanced information doesn't say if the injected #PF
-> > > > >> should be a W=1 or a F=1 fault.  We need the information in bits 0..2 of
-> > > > >> the exit qualification for the final access, which however is not
-> > > > >> available for the paging-structure access.
-> > > > >>
-> > > > > Are you planning to extend the emulator, then, to support all
-> > > > > instructions? I'm not sure where you are going with this.
-> > > >
-> > > > I'm going to fix the bit 8=1 case, but for bit 8=0 there's not much that
-> > > > you can do.  In all likelihood the guest is buggy anyway.
-> > >
-> > > Did this drop off your radar? Are you still planning to fix the bit8=1
-> > > case to use advanced EPT exit qualification information? Or did I just
-> > > miss it?
+> > Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
+> > ---
+> >  drivers/s390/virtio/virtio_ccw.c | 30 ++++--------------------------
+> >  1 file changed, 4 insertions(+), 26 deletions(-)
 > >
-> > Paolo,
-> > If you're not working on this, do you mind if I ask Aaron to take a look at it?
->
-> Ugh. The advanced EPT exit qualification contains nothing useful here,
-> AFAICT. It only contains x86 page protection information--nothing
-> about the access itself.
+> 
+> Hm, I wonder why I didn't use kvm_hypercall3 in the first place. It's in
+> a header, and therefore should be independent of kvm being configured.
+> 
+> I don't think there's anything else virtio-ccw in flight at the moment,
+> so maybe you can apply this one directly?
 
-BTW, I don't think this patch is complete. In particular, L0 needs to
-take first crack at any L2 #PF intercepts for present, not-reserved
-faults, to see if it needs to set the RSVD flag in the error code.
+Yes, sure.
+
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+
+Thank you!
