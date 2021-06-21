@@ -2,172 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 234C13AEABB
-	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 16:05:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1AB83AEB22
+	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 16:23:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230121AbhFUOHG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Jun 2021 10:07:06 -0400
-Received: from foss.arm.com ([217.140.110.172]:35166 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229890AbhFUOHF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Jun 2021 10:07:05 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 18BABD6E;
-        Mon, 21 Jun 2021 07:04:51 -0700 (PDT)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C791A3F694;
-        Mon, 21 Jun 2021 07:04:49 -0700 (PDT)
-Date:   Mon, 21 Jun 2021 15:04:34 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
-        kvm@vger.kernel.org, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com, maz@kernel.org, pierre.gondois@arm.com
-Subject: Re: [PATCH v2 kvmtool 4/4] arm/arm64: vfio: Add PCI Express
- Capability Structure
-Message-ID: <20210621150434.715e4f1f@slackpad.fritz.box>
-In-Reply-To: <20210621092128.11313-5-alexandru.elisei@arm.com>
-References: <20210621092128.11313-1-alexandru.elisei@arm.com>
-        <20210621092128.11313-5-alexandru.elisei@arm.com>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+        id S230087AbhFUOZt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Jun 2021 10:25:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35992 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229876AbhFUOZt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Jun 2021 10:25:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624285414;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YNu5Bg5Blog31a4R2un4VWYXZOCNOgVuIDk7FGHXa5U=;
+        b=NR/FvaKa0bWpUiAPiGWSLc3AN1jQf6I5Wfsz4WAvfv1Zn52Csw5Cl+TfbJMp+iSGjejF6v
+        UcPU7GW0rP+FRiNcWPA+QisVt5JTZPq8FTWg4hDN5qeEsUsfUhebhzrfadpmF3x/kkO2vF
+        /tebJtY4aX8ZR2hzX7izTcmqM9lEXp0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-321-GkXdPMaXOt6XXh4wig7E0Q-1; Mon, 21 Jun 2021 10:23:32 -0400
+X-MC-Unique: GkXdPMaXOt6XXh4wig7E0Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 121A2A0CAC;
+        Mon, 21 Jun 2021 14:23:31 +0000 (UTC)
+Received: from localhost (unknown [10.22.8.47])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 98C2560938;
+        Mon, 21 Jun 2021 14:23:30 +0000 (UTC)
+Date:   Mon, 21 Jun 2021 10:23:29 -0400
+From:   Eduardo Habkost <ehabkost@redhat.com>
+To:     Claudio Fontana <cfontana@suse.de>
+Cc:     Markus Armbruster <armbru@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Denis Lunev <den@openvz.org>, Eric Blake <eblake@redhat.com>,
+        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+Subject: Re: [PATCH v9] qapi: introduce 'query-kvm-cpuid' action
+Message-ID: <20210621142329.atlhrovqkblbjwgh@habkost.net>
+References: <20210617074919.GA998232@dhcp-172-16-24-191.sw.ru>
+ <87a6no3fzf.fsf@dusky.pond.sub.org>
+ <790d22e1-5de9-ba20-6c03-415b62223d7d@suse.de>
+ <877dis1sue.fsf@dusky.pond.sub.org>
+ <20210617153949.GA357@dhcp-172-16-24-191.sw.ru>
+ <e69ea2b4-21cc-8203-ad2d-10a0f4ffe34a@suse.de>
+ <20210617165111.eu3x2pvinpoedsqj@habkost.net>
+ <87sg1fwwgg.fsf@dusky.pond.sub.org>
+ <20210618204006.k6krwuz2lpxvb6uh@habkost.net>
+ <6f644bbb-52ff-4d79-36bb-208c6b6c4eef@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6f644bbb-52ff-4d79-36bb-208c6b6c4eef@suse.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 21 Jun 2021 10:21:28 +0100
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-
-> It turns out that some Linux drivers (like Realtek R8169) fall back to a
-> device-specific configuration method if the device is not PCI Express
-> capable:
+On Mon, Jun 21, 2021 at 10:07:44AM +0200, Claudio Fontana wrote:
+> On 6/18/21 10:40 PM, Eduardo Habkost wrote:
+> > On Fri, Jun 18, 2021 at 07:52:47AM +0200, Markus Armbruster wrote:
+> >> Eduardo Habkost <ehabkost@redhat.com> writes:
+> >>
+> >>> On Thu, Jun 17, 2021 at 05:53:11PM +0200, Claudio Fontana wrote:
+> >>>> On 6/17/21 5:39 PM, Valeriy Vdovin wrote:
+> >>>>> On Thu, Jun 17, 2021 at 04:14:17PM +0200, Markus Armbruster wrote:
+> >>>>>> Claudio Fontana <cfontana@suse.de> writes:
+> >>>>>>
+> >>>>>>> On 6/17/21 1:09 PM, Markus Armbruster wrote:
+> >>
+> >> [...]
+> >>
+> >>>>>>>> If it just isn't implemented for anything but KVM, then putting "kvm"
+> >>>>>>>> into the command name is a bad idea.  Also, the commit message should
+> >>>>>>>> briefly note the restriction to KVM.
+> >>>>>>
+> >>>>>> Perhaps this one is closer to reality.
+> >>>>>>
+> >>>>> I agree.
+> >>>>> What command name do you suggest?
+> >>>>
+> >>>> query-exposed-cpuid?
+> >>>
+> >>> Pasting the reply I sent at [1]:
+> >>>
+> >>>   I don't really mind how the command is called, but I would prefer
+> >>>   to add a more complex abstraction only if maintainers of other
+> >>>   accelerators are interested and volunteer to provide similar
+> >>>   functionality.  I don't want to introduce complexity for use
+> >>>   cases that may not even exist.
+> >>>
+> >>> I'm expecting this to be just a debugging mechanism, not a stable
+> >>> API to be maintained and supported for decades.  (Maybe a "x-"
+> >>> prefix should be added to indicate that?)
+> >>>
+> >>> [1] https://lore.kernel.org/qemu-devel/20210602204604.crsxvqixkkll4ef4@habkost.net
+> >>
+> >> x-query-x86_64-cpuid?
+> >>
+> > 
+> > Unless somebody wants to spend time designing a generic
+> > abstraction around this (and justify the extra complexity), this
+> > is a KVM-specific command.  Is there a reason to avoid "kvm" in
+> > the command name?
+> > 
 > 
-> [    1.433825] r8169 0000:00:00.0 enp0s0: No native access to PCI extended config space, falling back to CSI
+> If the point of all of this is "please get me the cpuid, as seen by the guest", then I fail to see how this should be kvm-only.
+> We can still return "not implemented" of some kind for HVF, TCG etc.
 > 
-> Add the PCI Express Capability Structure and populate it for assigned
-> devices, as this is how the Linux PCI driver determines if a device is PCI
-> Express capable.
-> 
-> Because we don't emulate a PCI Express link, a root complex or any slot
-> related properties, the PCI Express capability is kept as small as possible
-> by ignoring those fields.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> But maybe I misread the use case?
 
-OK, took a while to wrap my head around how this capability limit works,
-but it seems correct.
-Thanks for fixing compilation on my system :-)
+A generic interface would require additional glue to connect the
+generic code to the accel-specific implementation.  I'm trying to
+avoid wasting everybody's time with the extra complexity unless
+necessary.
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+But if you all believe the extra complexity is worth it, I won't
+object.
 
-Thanks,
-Andre
-
-> ---
->  include/kvm/pci.h | 24 ++++++++++++++++++++++++
->  vfio/pci.c        | 18 ++++++++++++++++++
->  2 files changed, 42 insertions(+)
-> 
-> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
-> index 42d9e1c5645f..0f2d5bbabdc3 100644
-> --- a/include/kvm/pci.h
-> +++ b/include/kvm/pci.h
-> @@ -46,6 +46,8 @@ struct kvm;
->  #define PCI_DEV_CFG_SIZE_EXTENDED 	4096
->  
->  #ifdef ARCH_HAS_PCI_EXP
-> +#define arch_has_pci_exp()	(true)
-> +
->  #define PCI_CFG_SIZE		PCI_CFG_SIZE_EXTENDED
->  #define PCI_DEV_CFG_SIZE	PCI_DEV_CFG_SIZE_EXTENDED
->  
-> @@ -73,6 +75,8 @@ union pci_config_address {
->  };
->  
->  #else
-> +#define arch_has_pci_exp()	(false)
-> +
->  #define PCI_CFG_SIZE		PCI_CFG_SIZE_LEGACY
->  #define PCI_DEV_CFG_SIZE	PCI_DEV_CFG_SIZE_LEGACY
->  
-> @@ -143,6 +147,24 @@ struct pci_cap_hdr {
->  	u8	next;
->  };
->  
-> +struct pci_exp_cap {
-> +	u8 cap;
-> +	u8 next;
-> +	u16 cap_reg;
-> +	u32 dev_cap;
-> +	u16 dev_ctrl;
-> +	u16 dev_status;
-> +	u32 link_cap;
-> +	u16 link_ctrl;
-> +	u16 link_status;
-> +	u32 slot_cap;
-> +	u16 slot_ctrl;
-> +	u16 slot_status;
-> +	u16 root_ctrl;
-> +	u16 root_cap;
-> +	u32 root_status;
-> +};
-> +
->  struct pci_device_header;
->  
->  typedef int (*bar_activate_fn_t)(struct kvm *kvm,
-> @@ -188,6 +210,8 @@ struct pci_device_header {
->  			u8		min_gnt;
->  			u8		max_lat;
->  			struct msix_cap msix;
-> +			/* Used only by architectures which support PCIE */
-> +			struct pci_exp_cap pci_exp;
->  		} __attribute__((packed));
->  		/* Pad to PCI config space size */
->  		u8	__pad[PCI_DEV_CFG_SIZE];
-> diff --git a/vfio/pci.c b/vfio/pci.c
-> index 6a4204634e71..14d578a8f2eb 100644
-> --- a/vfio/pci.c
-> +++ b/vfio/pci.c
-> @@ -12,6 +12,11 @@
->  
->  #include <assert.h>
->  
-> +/* Some distros don't have the define. */
-> +#ifndef PCI_CAP_EXP_RC_ENDPOINT_SIZEOF_V1
-> +#define PCI_CAP_EXP_RC_ENDPOINT_SIZEOF_V1	12
-> +#endif
-> +
->  /* Wrapper around UAPI vfio_irq_set */
->  union vfio_irq_eventfd {
->  	struct vfio_irq_set	irq;
-> @@ -623,6 +628,12 @@ static ssize_t vfio_pci_cap_size(struct pci_cap_hdr *cap_hdr)
->  		return PCI_CAP_MSIX_SIZEOF;
->  	case PCI_CAP_ID_MSI:
->  		return vfio_pci_msi_cap_size((void *)cap_hdr);
-> +	case PCI_CAP_ID_EXP:
-> +		/*
-> +		 * We don't emulate any of the link, slot and root complex
-> +		 * properties, so ignore them.
-> +		 */
-> +		return PCI_CAP_EXP_RC_ENDPOINT_SIZEOF_V1;
->  	default:
->  		pr_err("unknown PCI capability 0x%x", cap_hdr->type);
->  		return 0;
-> @@ -696,6 +707,13 @@ static int vfio_pci_parse_caps(struct vfio_device *vdev)
->  			pdev->msi.pos = pos;
->  			pdev->irq_modes |= VFIO_PCI_IRQ_MODE_MSI;
->  			break;
-> +		case PCI_CAP_ID_EXP:
-> +			if (!arch_has_pci_exp())
-> +				continue;
-> +			ret = vfio_pci_add_cap(vdev, virt_hdr, cap, pos);
-> +			if (ret)
-> +				return ret;
-> +			break;
->  		}
->  	}
->  
+-- 
+Eduardo
 
