@@ -2,97 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1508A3AE42A
-	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 09:25:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F1353AE489
+	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 10:03:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230490AbhFUH1v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Jun 2021 03:27:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29732 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230393AbhFUH1s (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 21 Jun 2021 03:27:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624260334;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Y91dYcMgXLfHCLyVYB59BpoFbsjdnxGwPE3tJAk3G9E=;
-        b=ijREfezNfySFETQ6KGzBus6nYQ0OlXJ4zndQ3dXCj5LRfOzw/1eXoJ6B14I6aCcWWaUnBp
-        e6LOS4n3Hz/pcw3p4qQaa0Rl3aKvahv2HUNZgy8W5p5aTBec5KcCRRf745RLD7/J7ko0y6
-        tSzVPI/V0R2E206nYw+WqonlYHGHkLQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-353-RVWeyvspMIyjERPo9vRPhw-1; Mon, 21 Jun 2021 03:25:29 -0400
-X-MC-Unique: RVWeyvspMIyjERPo9vRPhw-1
-Received: by mail-wm1-f71.google.com with SMTP id v2-20020a7bcb420000b0290146b609814dso6666539wmj.0
-        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 00:25:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Y91dYcMgXLfHCLyVYB59BpoFbsjdnxGwPE3tJAk3G9E=;
-        b=XT+xpZEeRz9n5dhfTid3Qa8iA13RtQ3su1E9d/eRhFJRyTv/T0LK8qX4iBrNPRY2id
-         buGWvoBrJ1LHoQjXRVSGxuZ1KrhQ05ImKHAzxKZ509YmYPTQREgdR8Jkj3gLdsqB1uXl
-         DqZ4dj0anOqJVGZLZ0SK1ODd/ks3upUTaPx1wuESs7PZPDOFyItJdR+otyLeROrk2xqG
-         wXyAmqjL1mEARGLhS7MX7yxseydP1wa2jC3HQXTgwLUqQ+CGYc2+skEgjLJ9DH6x2sJR
-         NiTbsmsWINmp0B/6kRQfEqRtK9Fw2p1OYkWVRePJrw0hQAV506mwL8KfGQoX0TOX6s8D
-         AdEg==
-X-Gm-Message-State: AOAM530Yi2dOG+/j6oNLtHdWZamGSOthgkGdH/+OffCsCuyOxtYqoEte
-        qWsvbva5BCdmL0zH2TXq7YQcSFm/rSvMrD4W7OZwu/inKl+LT1NK26Pq1xkCNUgkCiLHXYwZKKt
-        3K2ZRgnaSE1wwEg+BtSiXxeUT5dCk8bOnVyo0XBd5ZGbHxaEAI6d+MuVVPoWP
-X-Received: by 2002:a5d:4b8d:: with SMTP id b13mr9209307wrt.147.1624260328477;
-        Mon, 21 Jun 2021 00:25:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzHVU6j+LzdrJcmaQeig17pW1uGhnpdStHIRjy++aHV83rTrNrXZmfslT877E/9tuHYIgTMtw==
-X-Received: by 2002:a5d:4b8d:: with SMTP id b13mr9209272wrt.147.1624260328101;
-        Mon, 21 Jun 2021 00:25:28 -0700 (PDT)
-Received: from thuth.remote.csb (pd9575fcd.dip0.t-ipconnect.de. [217.87.95.205])
-        by smtp.gmail.com with ESMTPSA id h15sm16494162wrq.88.2021.06.21.00.25.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Jun 2021 00:25:27 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH] README.md: remove duplicate "to adhere"
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org
-References: <20210614100151.123622-1-cohuck@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <a3184421-5548-a7d3-dca1-78c922015a6f@redhat.com>
-Date:   Mon, 21 Jun 2021 09:25:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S230056AbhFUIFX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Jun 2021 04:05:23 -0400
+Received: from mx21.baidu.com ([220.181.3.85]:55566 "EHLO baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229905AbhFUIFW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Jun 2021 04:05:22 -0400
+Received: from BC-Mail-Ex21.internal.baidu.com (unknown [172.31.51.15])
+        by Forcepoint Email with ESMTPS id 7CE98EE3E5D820EB9D94;
+        Mon, 21 Jun 2021 16:03:03 +0800 (CST)
+Received: from BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42) by
+ BC-Mail-Ex21.internal.baidu.com (172.31.51.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2242.4; Mon, 21 Jun 2021 16:03:03 +0800
+Received: from LAPTOP-UKSR4ENP.internal.baidu.com (172.31.63.8) by
+ BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2242.4; Mon, 21 Jun 2021 16:03:02 +0800
+From:   Cai Huoqing <caihuoqing@baidu.com>
+To:     <kraxel@redhat.com>
+CC:     <kvm@vger.kernel.org>, Cai Huoqing <caihuoqing@baidu.com>
+Subject: [PATCH] remove "#include<linux/virtio.h>"
+Date:   Mon, 21 Jun 2021 16:02:55 +0800
+Message-ID: <20210621080255.238-1-caihuoqing@baidu.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <20210614100151.123622-1-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [172.31.63.8]
+X-ClientProxiedBy: BC-Mail-Ex03.internal.baidu.com (172.31.51.43) To
+ BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/06/2021 12.01, Cornelia Huck wrote:
-> Fixes: 844669a9631d ("README.md: add guideline for header guards format")
-> Reported-by: Andrew Jones <drjones@redhat.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->   README.md | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/README.md b/README.md
-> index 687ff50d0af1..b498aafd1a77 100644
-> --- a/README.md
-> +++ b/README.md
-> @@ -158,7 +158,7 @@ Exceptions:
->   
->   Header guards:
->   
-> -Please try to adhere to adhere to the following patterns when adding
-> +Please try to adhere to the following patterns when adding
->   "#ifndef <...> #define <...>" header guards:
->       ./lib:             _HEADER_H_
->       ./lib/<ARCH>:      _ARCH_HEADER_H_
-> 
+virtio_config.h already includes virtio.h. so remove it
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
+---
+ drivers/vdpa/virtio_pci/vp_vdpa.c  | 1 -
+ drivers/virtio/virtio.c            | 1 -
+ drivers/virtio/virtio_input.c      | 1 -
+ drivers/virtio/virtio_mmio.c       | 1 -
+ drivers/virtio/virtio_pci_common.h | 1 -
+ drivers/virtio/virtio_ring.c       | 1 -
+ drivers/virtio/virtio_vdpa.c       | 1 -
+ 7 files changed, 7 deletions(-)
+
+diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
+index c76ebb531212..8cb6fa86f055 100644
+--- a/drivers/vdpa/virtio_pci/vp_vdpa.c
++++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
+@@ -12,7 +12,6 @@
+ #include <linux/module.h>
+ #include <linux/pci.h>
+ #include <linux/vdpa.h>
+-#include <linux/virtio.h>
+ #include <linux/virtio_config.h>
+ #include <linux/virtio_ring.h>
+ #include <linux/virtio_pci.h>
+diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+index 4b15c00c0a0a..06b6c8c86ae5 100644
+--- a/drivers/virtio/virtio.c
++++ b/drivers/virtio/virtio.c
+@@ -1,5 +1,4 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+-#include <linux/virtio.h>
+ #include <linux/spinlock.h>
+ #include <linux/virtio_config.h>
+ #include <linux/module.h>
+diff --git a/drivers/virtio/virtio_input.c b/drivers/virtio/virtio_input.c
+index ce51ae165943..ab8439a94f73 100644
+--- a/drivers/virtio/virtio_input.c
++++ b/drivers/virtio/virtio_input.c
+@@ -1,6 +1,5 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ #include <linux/module.h>
+-#include <linux/virtio.h>
+ #include <linux/virtio_config.h>
+ #include <linux/input.h>
+ #include <linux/slab.h>
+diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+index 56128b9c46eb..5061ff088dd1 100644
+--- a/drivers/virtio/virtio_mmio.c
++++ b/drivers/virtio/virtio_mmio.c
+@@ -64,7 +64,6 @@
+ #include <linux/platform_device.h>
+ #include <linux/slab.h>
+ #include <linux/spinlock.h>
+-#include <linux/virtio.h>
+ #include <linux/virtio_config.h>
+ #include <uapi/linux/virtio_mmio.h>
+ #include <linux/virtio_ring.h>
+diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
+index beec047a8f8d..acae912fdb12 100644
+--- a/drivers/virtio/virtio_pci_common.h
++++ b/drivers/virtio/virtio_pci_common.h
+@@ -21,7 +21,6 @@
+ #include <linux/pci.h>
+ #include <linux/slab.h>
+ #include <linux/interrupt.h>
+-#include <linux/virtio.h>
+ #include <linux/virtio_config.h>
+ #include <linux/virtio_ring.h>
+ #include <linux/virtio_pci.h>
+diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+index 88f0b16b11b8..0766bb227211 100644
+--- a/drivers/virtio/virtio_ring.c
++++ b/drivers/virtio/virtio_ring.c
+@@ -3,7 +3,6 @@
+  *
+  *  Copyright 2007 Rusty Russell IBM Corporation
+  */
+-#include <linux/virtio.h>
+ #include <linux/virtio_ring.h>
+ #include <linux/virtio_config.h>
+ #include <linux/device.h>
+diff --git a/drivers/virtio/virtio_vdpa.c b/drivers/virtio/virtio_vdpa.c
+index e28acf482e0c..80f75401296e 100644
+--- a/drivers/virtio/virtio_vdpa.c
++++ b/drivers/virtio/virtio_vdpa.c
+@@ -13,7 +13,6 @@
+ #include <linux/kernel.h>
+ #include <linux/slab.h>
+ #include <linux/uuid.h>
+-#include <linux/virtio.h>
+ #include <linux/vdpa.h>
+ #include <linux/virtio_config.h>
+ #include <linux/virtio_ring.h>
+-- 
+2.22.0
 
