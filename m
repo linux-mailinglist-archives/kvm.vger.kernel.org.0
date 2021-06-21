@@ -2,111 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05FD23AF898
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 00:34:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12E8B3AF8C4
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 00:45:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232040AbhFUWgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Jun 2021 18:36:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55732 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231669AbhFUWgW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Jun 2021 18:36:22 -0400
-Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34FC4C061756
-        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 15:34:07 -0700 (PDT)
-Received: by mail-ot1-x32b.google.com with SMTP id v11-20020a9d340b0000b0290455f7b8b1dcso6426716otb.7
-        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 15:34:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=DIEaAdhYLn2ObxgkdO43eKzaGE5c/AnFoDKU5gNxSU8=;
-        b=tL9OyUZ9F98klGMtms1GaSBPGfqvwqaDJQT8BeJI3mK1ic4rANTyISmdKuEqIxF0bj
-         bgL2x6hkRZOWvp1MjplApdvsvuckpFH/xaXSc2n7LZbb6iPfss0o30gr/GiyKnAwT+E4
-         rJANrMR9RzMxtGhLdUayiJ1B/fIezx7flO0RLD8kPAubOvk3nimS0CTd91DSuJjXTI5X
-         7PyRoswXkplF+NKT3FaZQ4SI8Mo3YhhCsE6zK4i0VsXMtKtIpyBlZcUfQ5Aaknv/HgF4
-         acN9lml0hyjcWQIHh2gK6HkAJbsw0EKCIUbdlAPs7zNGGWuFhxqRp4X8g9U06pjLmrOr
-         MJIw==
+        id S232256AbhFUWrY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Jun 2021 18:47:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43811 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232200AbhFUWrX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Jun 2021 18:47:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624315507;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9Ww1F8FpJZaZo8phfEn0boIIG2NuubuAivva/xm/sdo=;
+        b=ejp16SJbO1knmQ6xrUIXMQvRR184jd9PfqcVkB6L8oIHDeNZUKAlusfII1lxE7pMgbsJA8
+        0pl35Wpti7kSKfUqxBlPvjko6V1sXk8OOn0YrHr33oma8rAQJ3Jut7HGvR+JYIkBAJflDI
+        nsniSk3R0zLz6L0YLF/wf6/xhf0It5I=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-590-Y-p0Ux73Nb-fsY-hPs5z_w-1; Mon, 21 Jun 2021 18:45:06 -0400
+X-MC-Unique: Y-p0Ux73Nb-fsY-hPs5z_w-1
+Received: by mail-wr1-f71.google.com with SMTP id j2-20020a5d61820000b029011a6a8149b5so8498671wru.14
+        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 15:45:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=DIEaAdhYLn2ObxgkdO43eKzaGE5c/AnFoDKU5gNxSU8=;
-        b=TmCTwhOfYmxVO/y3HGKB2FpaVvq6jbr7pf4Rmi6S6Pt87CmtG0Ak5kM7FhtDa+BKNF
-         27ug2qdbiHMLtcoHrfWJZN5Ik3/UYkY558kAlA7EjUWVNsUDUFhZEJFMAUK4+QpP13aX
-         9VTQaVGKxp5eYM6l3OyczTp8JbWo1KyZc1hf1A3cSsYI/h7ECAzqqTJjoF6mQEWBppPt
-         xlVtLy2OUsFhBGuv3Wdwp4Ny20xHeAg6d/TJvOxhKNWn30kiUgQCd8x1OjoUcn3yN5Mn
-         CtAvmW5z4UYxcFdYevfyhZebpffHtiJHFvwQflXlHhh75M6QB4z2ICc9sR0tf8m7hH+c
-         Entg==
-X-Gm-Message-State: AOAM530qOKUuC9i7x+us3PV6MiisTsUnkw0c2Nqqe5UBsFfjqTxDmX7z
-        y0zGZVKiOolF0XQm/rn6qc9vf7C4gnMUkaPsTRg28g==
-X-Google-Smtp-Source: ABdhPJxjoZIxSj6dXU/MWzfmmZgYcojQZIOQp5ZQd8mEIzPGeRsOFiE8R9zlwAgGgxkZ/RFDMI36SwJCJzus62C7ppA=
-X-Received: by 2002:a05:6830:2011:: with SMTP id e17mr298279otp.295.1624314846280;
- Mon, 21 Jun 2021 15:34:06 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=9Ww1F8FpJZaZo8phfEn0boIIG2NuubuAivva/xm/sdo=;
+        b=iY34UA5tjGZPhKF2y2zakeVZSs+6oFdv2rZzzlQdZFJd3XQbG2HI4X6xfGF76Dptuo
+         2Ww9n3QcO9WSQiu0UfiYG9MVtjpUoG1aVNjkykaJAUGCWifr4n5NaufU1fM0gYKMe038
+         7t/U7GMWhETcQTIV+ODN+rDLHBTVh52YRGllhuDqG8De5qj1SbUfZaEFn5VoJXxHoURO
+         udohpd8jK9+ZexcPS4TadfX6ZTWSbceF7Ittnhug9ZEFqlRDAEnPwMMf53LGnj/gUgrD
+         zYd7CRY7mD3AJueO/RkF4Sspv3eXuoVs2++QXO6LdklDTjm2C+wPtM9Zcq60o8lc3sYh
+         5ohA==
+X-Gm-Message-State: AOAM531+ZjTNxsieZkypJbFXLqmg7I4mXb0T00aFrPP38zoxhipY9m4W
+        9ePkCcg4h8+N7KT13P4NeF4cUdwnnhlo+Bu97sK7fH+FGlzjzmtBhF8/iIv9n0ipuDNPQV0uVFZ
+        W7xsT1xPZPKmc
+X-Received: by 2002:a05:6000:2a3:: with SMTP id l3mr831636wry.395.1624315505343;
+        Mon, 21 Jun 2021 15:45:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwlFclcimGGjPltn0DAxtLrcGDZCJlLH0UWL7OyUr1L1pgHHRNr4wPtn6Uw/OIdBFiF9M4JrQ==
+X-Received: by 2002:a05:6000:2a3:: with SMTP id l3mr831601wry.395.1624315505122;
+        Mon, 21 Jun 2021 15:45:05 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id d15sm18577278wri.58.2021.06.21.15.45.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Jun 2021 15:45:04 -0700 (PDT)
+Subject: Re: [PATCH v12 2/7] KVM: stats: Add fd-based API to read binary stats
+ data
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Fuad Tabba <tabba@google.com>,
+        Greg KH <gregkh@linuxfoundation.org>
+References: <20210618222709.1858088-1-jingzhangos@google.com>
+ <20210618222709.1858088-3-jingzhangos@google.com>
+ <0cde024e-a234-9a10-5157-d17ba423939e@redhat.com>
+ <CAAdAUtiL6DwJDWLLmUqct6B6n7Zaa2DyPhpwKZKb=cpRH+8+vQ@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <aa1d0bd9-55cf-161a-5af9-f5abde807353@redhat.com>
+Date:   Tue, 22 Jun 2021 00:45:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-References: <bd4a2d30-5fb4-3612-c855-946d97068b9a@yandex.ru>
- <YMeMov42fihXptQm@google.com> <73f1f90e-f952-45a4-184e-1aafb3e4a8fd@yandex.ru>
- <YMtfQHGJL7XP/0Rq@google.com> <23b00d8a-1732-0b0b-cd8d-e802f7aca87c@yandex.ru>
- <CALMp9eSpJ8=O=6YExpOtdnA=gQkWfQJ+oz0bBcV4gOPFdnciVA@mail.gmail.com> <d5bf20f4-9aef-8e7e-8a8f-47d10510724e@yandex.ru>
-In-Reply-To: <d5bf20f4-9aef-8e7e-8a8f-47d10510724e@yandex.ru>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 21 Jun 2021 15:33:55 -0700
-Message-ID: <CALMp9eQANi7SPAvue5VQazG7A0=b_2vkUxYK+GMLbzNkxbXM5w@mail.gmail.com>
-Subject: Re: exception vs SIGALRM race (was: Re: guest/host mem out of sync on core2duo?)
-To:     stsp <stsp2@yandex.ru>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAAdAUtiL6DwJDWLLmUqct6B6n7Zaa2DyPhpwKZKb=cpRH+8+vQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jun 20, 2021 at 7:34 PM stsp <stsp2@yandex.ru> wrote:
->
-> 19.06.2021 00:07, Jim Mattson =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
-> > I believe DS is illegal. Per the SDM, Checks on Guest Segment Registers=
-:
-> OK, so this indeed have solved
-> the biggest part of the problem,
-> thanks again.
->
-> Now back to the original problem,
-> where I was getting a page fault
-> on some CPUs sometimes.
-> I digged a bit more.
-> It seems I am getting a race of
-> this kind: exception in guest happens
-> at the same time when the host's
-> SIGALRM arrives. KVM returns to
-> host with the exception somehow
-> "pending", but its still on ring3, not
-> switched to the ring0 handler.
->
-> Then from host I inject the interrupt
-> (which is what SIGALRM asks for),
-> and when I enter the guest, it throws
-> the pending exception instead of
-> executing the interrupt handler.
-> I suspect the bug is again on my side,
-> but I am not sure how to handle that
-> kind of race. I suppose I need to look
-> at some interruptibility state to find
-> out that the interrupt cannot be injected
-> at that time. But I can't find if KVM
-> exports the interruptibility state, other
-> than guest's IF/VIF flag, which is not
-> enough in this case.
+On 21/06/21 19:46, Jing Zhang wrote:
+>> const struct kvm_stats_header kvm_vm_stats_header = {
+>>          .name_size = KVM_STATS_NAME_SIZE,
+>>          .num_desc = num_desc,
+> The problem is how we calculate the number of descriptors, which needs the
+> size of the descriptor array for each architecture.
+> Define another global variable to export the size of descriptor array?
 
-Maybe what you want is run->ready_for_interrupt_injection? And, if
-that's not set, try KVM_RUN with run->request_interrupt_window set?
+Pass it as an argument?
 
-> Also I am a bit puzzled why I can't
-> see such race on an I7 CPU even
-> after disabling the unrestricted_guest.
->
-> Any ideas? :)
+Paolo
 
-I'm guessing that your core2duo doesn't have a VMX preemption timer,
-and this has some subtle effect on how the alarm interrupts VMX
-non-root operation. On the i7, try setting the module parameter
-preemption_timer to 0.
