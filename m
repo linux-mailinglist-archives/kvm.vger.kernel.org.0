@@ -2,1855 +2,404 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 26F0D3AE5BD
-	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 11:14:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 85CD53AE5E0
+	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 11:20:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230137AbhFUJQc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Jun 2021 05:16:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23432 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230272AbhFUJQ0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 21 Jun 2021 05:16:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624266852;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Tt7yo2RvlMhoUkpaMWxyjOZFsanqqyuVLb80GWGQKSo=;
-        b=ZevnA71Bogk9/eC+9j861nvczkJ0SNvxBpfE60Drh/ghZvubn959x1iKRs2/xxGBn+VPvb
-        Dcot+Ov5/9h71DSusGN7SPF0bMxJJthFIaxZ52/05j5CtNvRvJ1E9+SZkawRRWsLB5/EMV
-        /m+PBJDj4PBWdJTGE21Ay5N4exK5ZoA=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-PEOlpdGbP420sov-REPOeg-1; Mon, 21 Jun 2021 05:14:09 -0400
-X-MC-Unique: PEOlpdGbP420sov-REPOeg-1
-Received: by mail-pj1-f70.google.com with SMTP id p22-20020a17090a9316b029016a0aced749so9293207pjo.9
-        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 02:14:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=Tt7yo2RvlMhoUkpaMWxyjOZFsanqqyuVLb80GWGQKSo=;
-        b=Wdd/R8sL5da8Vjh4mLWHr62T7F3pCfeVuxQObWgQ6lVXsRbQK8JRHyx19XbAgnQR5w
-         6b3asBvwz8SytB7GycGS/qbONThvItEzykJ/k6hPBQG6KabLwQIABAqchuekEhFrm45n
-         d41jxsH2ARvM4ZPigH7mhfVl5KUiPrwxgcnz4EQAy3UFeGIEsMgc5cmeC/2GIxujZk2X
-         F3NgrcpdUcF2uybQrjws6vyqvB0YdcfbBzMBiVL5x4zTRanmD0tG4SerM7SBxLJ/AH/J
-         riO6PEwbjMw6qaA6zg6TPWnFgSQpq9YOunMs8qkRqlfITipNDV6lSWc14Tbqvvej1e6A
-         YdPg==
-X-Gm-Message-State: AOAM533B1F2yCLKF1hMmI0+pRjpV9a7G5nXUC9dp16goqqE1lGOhrpOZ
-        UIOSP5hI/ae69gvZW0/Gxqe+E2Fa7S2ghlrPfJ2vbWxRt3OyvGyf70aDZH0CPS4sdupQ+LfIF5V
-        LFFyOT4MBOeg6
-X-Received: by 2002:a17:90a:e606:: with SMTP id j6mr20491661pjy.230.1624266848392;
-        Mon, 21 Jun 2021 02:14:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx760A/hTM9EzlHk6g1tGJ/qdpSIJzoPD2qafIY56u0RfGUdMjcnsBf7nOS0VHd+bGYuxc98w==
-X-Received: by 2002:a17:90a:e606:: with SMTP id j6mr20491630pjy.230.1624266847951;
-        Mon, 21 Jun 2021 02:14:07 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id n12sm5354590pfu.5.2021.06.21.02.14.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Jun 2021 02:14:07 -0700 (PDT)
-Subject: Re: [PATCH v8 09/10] vduse: Introduce VDUSE - vDPA Device in
- Userspace
-To:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
-        stefanha@redhat.com, sgarzare@redhat.com, parav@nvidia.com,
-        hch@infradead.org, christian.brauner@canonical.com,
-        rdunlap@infradead.org, willy@infradead.org,
-        viro@zeniv.linux.org.uk, axboe@kernel.dk, bcrl@kvack.org,
-        corbet@lwn.net, mika.penttila@nextfour.com,
-        dan.carpenter@oracle.com, joro@8bytes.org,
-        gregkh@linuxfoundation.org
-Cc:     songmuchun@bytedance.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
-References: <20210615141331.407-1-xieyongji@bytedance.com>
- <20210615141331.407-10-xieyongji@bytedance.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <adfb2be9-9ed9-ca37-ac37-4cd00bdff349@redhat.com>
-Date:   Mon, 21 Jun 2021 17:13:55 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        id S230505AbhFUJXA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Jun 2021 05:23:00 -0400
+Received: from foss.arm.com ([217.140.110.172]:59574 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230436AbhFUJWz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Jun 2021 05:22:55 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0DD2F1FB;
+        Mon, 21 Jun 2021 02:20:41 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CEA3B3F718;
+        Mon, 21 Jun 2021 02:20:39 -0700 (PDT)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org
+Cc:     andre.przywara@arm.com, sami.mujawar@arm.com,
+        lorenzo.pieralisi@arm.com, maz@kernel.org, pierre.gondois@arm.com
+Subject: [PATCH v2 kvmtool 0/4] arm/arm64: PCI Express 1.1 support
+Date:   Mon, 21 Jun 2021 10:21:24 +0100
+Message-Id: <20210621092128.11313-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-In-Reply-To: <20210615141331.407-10-xieyongji@bytedance.com>
-Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Patches + EDK2 binary that I used for testing can be found at [5].
 
-ÔÚ 2021/6/15 ÏÂÎç10:13, Xie Yongji Ð´µÀ:
-> This VDUSE driver enables implementing vDPA devices in userspace.
-> The vDPA device's control path is handled in kernel and the data
-> path is handled in userspace.
->
-> A message mechnism is used by VDUSE driver to forward some control
-> messages such as starting/stopping datapath to userspace. Userspace
-> can use read()/write() to receive/reply those control messages.
->
-> And some ioctls are introduced to help userspace to implement the
-> data path. VDUSE_IOTLB_GET_FD ioctl can be used to get the file
-> descriptors referring to vDPA device's iova regions. Then userspace
-> can use mmap() to access those iova regions. VDUSE_DEV_GET_FEATURES
-> and VDUSE_VQ_GET_INFO ioctls are used to get the negotiated features
-> and metadata of virtqueues. VDUSE_INJECT_VQ_IRQ and VDUSE_VQ_SETUP_KICKFD
-> ioctls can be used to inject interrupt and setup the kickfd for
-> virtqueues. VDUSE_DEV_UPDATE_CONFIG ioctl is used to update the
-> configuration space and inject a config interrupt.
->
-> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-> ---
->   Documentation/userspace-api/ioctl/ioctl-number.rst |    1 +
->   drivers/vdpa/Kconfig                               |   10 +
->   drivers/vdpa/Makefile                              |    1 +
->   drivers/vdpa/vdpa_user/Makefile                    |    5 +
->   drivers/vdpa/vdpa_user/vduse_dev.c                 | 1453 ++++++++++++++++++++
->   include/uapi/linux/vduse.h                         |  143 ++
->   6 files changed, 1613 insertions(+)
->   create mode 100644 drivers/vdpa/vdpa_user/Makefile
->   create mode 100644 drivers/vdpa/vdpa_user/vduse_dev.c
->   create mode 100644 include/uapi/linux/vduse.h
->
-> diff --git a/Documentation/userspace-api/ioctl/ioctl-number.rst b/Documentation/userspace-api/ioctl/ioctl-number.rst
-> index 9bfc2b510c64..acd95e9dcfe7 100644
-> --- a/Documentation/userspace-api/ioctl/ioctl-number.rst
-> +++ b/Documentation/userspace-api/ioctl/ioctl-number.rst
-> @@ -300,6 +300,7 @@ Code  Seq#    Include File                                           Comments
->   'z'   10-4F  drivers/s390/crypto/zcrypt_api.h                        conflict!
->   '|'   00-7F  linux/media.h
->   0x80  00-1F  linux/fb.h
-> +0x81  00-1F  linux/vduse.h
->   0x89  00-06  arch/x86/include/asm/sockios.h
->   0x89  0B-DF  linux/sockios.h
->   0x89  E0-EF  linux/sockios.h                                         SIOCPROTOPRIVATE range
-> diff --git a/drivers/vdpa/Kconfig b/drivers/vdpa/Kconfig
-> index a503c1b2bfd9..6e23bce6433a 100644
-> --- a/drivers/vdpa/Kconfig
-> +++ b/drivers/vdpa/Kconfig
-> @@ -33,6 +33,16 @@ config VDPA_SIM_BLOCK
->   	  vDPA block device simulator which terminates IO request in a
->   	  memory buffer.
->   
-> +config VDPA_USER
-> +	tristate "VDUSE (vDPA Device in Userspace) support"
-> +	depends on EVENTFD && MMU && HAS_DMA
-> +	select DMA_OPS
-> +	select VHOST_IOTLB
-> +	select IOMMU_IOVA
-> +	help
-> +	  With VDUSE it is possible to emulate a vDPA Device
-> +	  in a userspace program.
-> +
->   config IFCVF
->   	tristate "Intel IFC VF vDPA driver"
->   	depends on PCI_MSI
-> diff --git a/drivers/vdpa/Makefile b/drivers/vdpa/Makefile
-> index 67fe7f3d6943..f02ebed33f19 100644
-> --- a/drivers/vdpa/Makefile
-> +++ b/drivers/vdpa/Makefile
-> @@ -1,6 +1,7 @@
->   # SPDX-License-Identifier: GPL-2.0
->   obj-$(CONFIG_VDPA) += vdpa.o
->   obj-$(CONFIG_VDPA_SIM) += vdpa_sim/
-> +obj-$(CONFIG_VDPA_USER) += vdpa_user/
->   obj-$(CONFIG_IFCVF)    += ifcvf/
->   obj-$(CONFIG_MLX5_VDPA) += mlx5/
->   obj-$(CONFIG_VP_VDPA)    += virtio_pci/
-> diff --git a/drivers/vdpa/vdpa_user/Makefile b/drivers/vdpa/vdpa_user/Makefile
-> new file mode 100644
-> index 000000000000..260e0b26af99
-> --- /dev/null
-> +++ b/drivers/vdpa/vdpa_user/Makefile
-> @@ -0,0 +1,5 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +vduse-y := vduse_dev.o iova_domain.o
-> +
-> +obj-$(CONFIG_VDPA_USER) += vduse.o
-> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/vduse_dev.c
-> new file mode 100644
-> index 000000000000..5271cbd15e28
-> --- /dev/null
-> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> @@ -0,0 +1,1453 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * VDUSE: vDPA Device in Userspace
-> + *
-> + * Copyright (C) 2020-2021 Bytedance Inc. and/or its affiliates. All rights reserved.
-> + *
-> + * Author: Xie Yongji <xieyongji@bytedance.com>
-> + *
-> + */
-> +
-> +#include <linux/init.h>
-> +#include <linux/module.h>
-> +#include <linux/cdev.h>
-> +#include <linux/device.h>
-> +#include <linux/eventfd.h>
-> +#include <linux/slab.h>
-> +#include <linux/wait.h>
-> +#include <linux/dma-map-ops.h>
-> +#include <linux/poll.h>
-> +#include <linux/file.h>
-> +#include <linux/uio.h>
-> +#include <linux/vdpa.h>
-> +#include <linux/nospec.h>
-> +#include <uapi/linux/vduse.h>
-> +#include <uapi/linux/vdpa.h>
-> +#include <uapi/linux/virtio_config.h>
-> +#include <uapi/linux/virtio_ids.h>
-> +#include <uapi/linux/virtio_blk.h>
-> +#include <linux/mod_devicetable.h>
-> +
-> +#include "iova_domain.h"
-> +
-> +#define DRV_AUTHOR   "Yongji Xie <xieyongji@bytedance.com>"
-> +#define DRV_DESC     "vDPA Device in Userspace"
-> +#define DRV_LICENSE  "GPL v2"
-> +
-> +#define VDUSE_DEV_MAX (1U << MINORBITS)
-> +#define VDUSE_MAX_BOUNCE_SIZE (64 * 1024 * 1024)
-> +#define VDUSE_IOVA_SIZE (128 * 1024 * 1024)
-> +#define VDUSE_REQUEST_TIMEOUT 30
-> +
-> +struct vduse_virtqueue {
-> +	u16 index;
-> +	u32 num;
-> +	u32 avail_idx;
-> +	u64 desc_addr;
-> +	u64 driver_addr;
-> +	u64 device_addr;
-> +	bool ready;
-> +	bool kicked;
-> +	spinlock_t kick_lock;
-> +	spinlock_t irq_lock;
-> +	struct eventfd_ctx *kickfd;
-> +	struct vdpa_callback cb;
-> +	struct work_struct inject;
-> +};
-> +
-> +struct vduse_dev;
-> +
-> +struct vduse_vdpa {
-> +	struct vdpa_device vdpa;
-> +	struct vduse_dev *dev;
-> +};
-> +
-> +struct vduse_dev {
-> +	struct vduse_vdpa *vdev;
-> +	struct device *dev;
-> +	struct vduse_virtqueue *vqs;
-> +	struct vduse_iova_domain *domain;
-> +	char *name;
-> +	struct mutex lock;
-> +	spinlock_t msg_lock;
-> +	u64 msg_unique;
-> +	wait_queue_head_t waitq;
-> +	struct list_head send_list;
-> +	struct list_head recv_list;
-> +	struct vdpa_callback config_cb;
-> +	struct work_struct inject;
-> +	spinlock_t irq_lock;
-> +	int minor;
-> +	bool connected;
-> +	bool started;
-> +	u64 api_version;
-> +	u64 user_features;
+This series aims to add support for PCI Express 1.1. It is based on the
+last patch [0] of the reassignable BAR series. The patch was discarded at
+the time because there was no easy solution to solve the overlap between
+the UART address and kvmtool's PCI I/O region, which made EDK2 and/or a
+guest compiled with 64k pages very unhappy [1]. This is not the case
+anymore, as the UART has been moved to address 0x1000000 in commit
+45b4968e0de1 ("hw/serial: ARM/arm64: Use MMIO at higher addresses").
+
+The series has also been tested with EDK2 built from the patches [6] that
+add PCI Express when running under kvmtool. This means that someone will be
+able to download an official iso from the debian website and install it in
+a kvmtool VM.
+
+The first two patches in the series are small and hopefully straightford
+cleanups for stuff that I discovered when playing with kvmtool.
+
+The third patch implements the PCI Express support only for the arm and
+arm64 architectures. The reason for that is that I don't know how to do it
+for x86, powerpc and mips (and for the last two I don't even have machines
+to test it).
+
+The last patch implements a fix for a Realtek RTL8168 NIC, where the Linux
+drivers falls back to a device specific method of initialization if the
+device is not PCI Express capable (doesn't have the PCI Express
+Capability) [2].
 
 
-Let's use device_features.
+Changes in v2
+=============
+
+* Gathered Reviewed-by tag, many thanks!
+
+* Renamed #2 "arm/fdt.c: Warn if MMIO device doesn't provide a node
+  generator" to "arm/fdt.c: Don't generate the node if generator function
+  is NULL" and replaced the warning with a debug message.
+
+* Added the PCI_CAP_EXP_RC_ENDPOINT_SIZEOF_V1 define when it's not present
+  on the system in patch #4.
 
 
-> +	u64 features;
+Testing for v2
+==============
+
+In this iteration, the only change that impacts PCI Express support is the
+addition of the PCI_CAP_EXP_RC_ENDPOINT_SIZEOF_V1 define when it's not
+present on the system. Because of this, I believe the testing I did for v1
+is still valid.
+
+However, for completeness, a did a sanity run on my x86 machine. Also, the
+EDK2 version that I used for testing on arm64 was built from a
+work-in-progress tree, and in the meantime the patches have landed on the
+mailing list [6]. I also ran some tests with EDK2 built from those patches.
+Details below.
+
+On a Ryzen 3900x:
+-----------------
+
+amd64 architecture and no PCIE support, making sure no regressions are
+introduced.
+
+1. Direct kernel boot + Debian 10 disk with SDL, to exercise the emulated
+VESA device.  Was able to login using the display manager and
+virtio-{net,blk} were working correctly.
+
+On odroid-c4:
+-------------
+
+1. Debian 10 disk + EDK2 + --force-pci. The kernel was booted via Debian
+grub, and I tried kernels compiled with 4k, 16k and 64k page sizes.
+
+On AMD Seattle:
+---------------
+
+1. Using the EDK2 image and the passthrough Realtek RTL8168 NIC as the
+network interface, and a vanilla netinstall iso from the debian website [3]
+I was able to install debian in a virtual machine. The installation hint
+from the testing for v1 still applies.
+
+2. Realtek RTL8168 + EDK2 boot + --force-pci, kernel compiled with 4k and
+64k pages (Seattle doesn't support 16k pages).
+
+3. Intel 82574L NIC + EDK2 boot + --force-pci, kernel compiled with 4k and
+64k pages.
+
+4. AMD FirePro W2100 VGA + HDMI audio (both assigned to the VM) + EDK2 boot
++ --force-pci, kernel compiled from v5.10 (see testing for v1) with 4k and
+64k pages.
+
+5. NVIDIA Quadro P400 VGA + HDMI audio (both assigned to the VM) + EDK2
+boot + --force-pci, kernel compiled with 4k and 64k pages (see testing for
+v1).
 
 
-And driver features.
+Testing for v1
+==============
 
+Warning, wall of text. Unless specified, the guest kernel was built from
+tag v5.12.
 
-> +	u32 device_id;
-> +	u32 vendor_id;
-> +	u32 generation;
-> +	u32 config_size;
-> +	void *config;
-> +	u8 status;
-> +	u16 vq_size_max;
-> +	u32 vq_num;
-> +	u32 vq_align;
-> +};
-> +
-> +struct vduse_dev_msg {
-> +	struct vduse_dev_request req;
-> +	struct vduse_dev_response resp;
-> +	struct list_head list;
-> +	wait_queue_head_t waitq;
-> +	bool completed;
-> +};
-> +
-> +struct vduse_control {
-> +	u64 api_version;
-> +};
-> +
-> +static DEFINE_MUTEX(vduse_lock);
-> +static DEFINE_IDR(vduse_idr);
-> +
-> +static dev_t vduse_major;
-> +static struct class *vduse_class;
-> +static struct cdev vduse_ctrl_cdev;
-> +static struct cdev vduse_cdev;
-> +static struct workqueue_struct *vduse_irq_wq;
-> +
-> +static u32 allowed_device_id[] = {
-> +	VIRTIO_ID_BLOCK,
-> +};
-> +
-> +static inline struct vduse_dev *vdpa_to_vduse(struct vdpa_device *vdpa)
-> +{
-> +	struct vduse_vdpa *vdev = container_of(vdpa, struct vduse_vdpa, vdpa);
-> +
-> +	return vdev->dev;
-> +}
-> +
-> +static inline struct vduse_dev *dev_to_vduse(struct device *dev)
-> +{
-> +	struct vdpa_device *vdpa = dev_to_vdpa(dev);
-> +
-> +	return vdpa_to_vduse(vdpa);
-> +}
-> +
-> +static struct vduse_dev_msg *vduse_find_msg(struct list_head *head,
-> +					    uint32_t request_id)
-> +{
-> +	struct vduse_dev_msg *msg;
-> +
-> +	list_for_each_entry(msg, head, list) {
-> +		if (msg->req.request_id == request_id) {
-> +			list_del(&msg->list);
-> +			return msg;
-> +		}
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
-> +static struct vduse_dev_msg *vduse_dequeue_msg(struct list_head *head)
-> +{
-> +	struct vduse_dev_msg *msg = NULL;
-> +
-> +	if (!list_empty(head)) {
-> +		msg = list_first_entry(head, struct vduse_dev_msg, list);
-> +		list_del(&msg->list);
-> +	}
-> +
-> +	return msg;
-> +}
-> +
-> +static void vduse_enqueue_msg(struct list_head *head,
-> +			      struct vduse_dev_msg *msg)
-> +{
-> +	list_add_tail(&msg->list, head);
-> +}
-> +
-> +static int vduse_dev_msg_send(struct vduse_dev *dev,
-> +			      struct vduse_dev_msg *msg, bool no_reply)
-> +{
+On a Ryzen 3900x:
+-----------------
 
+amd64 architecture and no PCIE support, making sure no regressions are
+introduced.
 
-It looks to me the only user for no_reply=true is the dataplane start. I 
-wonder no_reply is really needed consider we have switched to use 
-wait_event_killable_timeout().
+1. Direct kernel boot + Debian 10 disk with SDL, to exercise the emulated
+VESA device.  Was able to login using the display manager and
+virtio-{net,blk} were working correctly.
 
-In another way, no_reply is false for vq state synchronization and IOTLB 
-updating. I wonder if we can simply use no_reply = true for them.
+2. Direct kernel boot + Debian 10 disk with SDL + Realtek RTL8168 + Intel
+82574L PCIE NIC, both assigned to the VM. Assigning an ip address to the
+Realtek NIC fails with the message: "No native access to PCI extended
+config space, falling back to CSI", which makes sense since kvmtool is
+emulating legacy PCI 3.0 for the amd64 architecture. Other than that,
+everything works as expected.
 
+On odroid-c4:
+-------------
 
-> +	init_waitqueue_head(&msg->waitq);
-> +	spin_lock(&dev->msg_lock);
-> +	msg->req.request_id = dev->msg_unique++;
-> +	vduse_enqueue_msg(&dev->send_list, msg);
-> +	wake_up(&dev->waitq);
-> +	spin_unlock(&dev->msg_lock);
-> +	if (no_reply)
-> +		return 0;
-> +
-> +	wait_event_killable_timeout(msg->waitq, msg->completed,
-> +				    VDUSE_REQUEST_TIMEOUT * HZ);
-> +	spin_lock(&dev->msg_lock);
-> +	if (!msg->completed) {
-> +		list_del(&msg->list);
-> +		msg->resp.result = VDUSE_REQ_RESULT_FAILED;
-> +	}
-> +	spin_unlock(&dev->msg_lock);
-> +
-> +	return (msg->resp.result == VDUSE_REQ_RESULT_OK) ? 0 : -EIO;
+1. Debian 10 disk + upstream EDK2 built from commit 1f515342d8d8
+("DynamicTablesPkg: Use AML_NAME_SEG_SIZE define"), **without** --force-pci
+(so using virtio-mmio). Kernel compiled with 4k, 16k and 64k pages. This
+was done to make sure there are no regressions.
 
+2. Direct kernel boot + Debian 10 disk, with --force-pci. Tried 3 versions
+of the kernel, compiled with 4k, 16k and 64k pagesize. Got the warning:
+"TCP: enp0s0: Driver has suspect GRO implementation, TCP performance may be
+compromised." I suspect it is because of kvmtool legacy version of virtio.
+This was further confirmed by running the same kernel with kvmtool built
+from master, with and without --force-pci, the warning was still there.
 
-Do we need to serialize the check by protecting it with the spinlock above?
+3. Debian 10 disk + a work-in-progress version of EDK2 which enables PCIE
+support for kvmtool, with --force-pci. The kernel was booted via Debian
+grub, and same as above, I tried with kernels compiled with 4k, 16k and 64k
+page sizes.
 
+On AMD Seattle:
+---------------
 
-> +}
-> +
-> +static void vduse_dev_msg_cleanup(struct vduse_dev *dev)
-> +{
-> +	struct vduse_dev_msg *msg;
-> +
-> +	spin_lock(&dev->msg_lock);
-> +	while ((msg = vduse_dequeue_msg(&dev->send_list))) {
-> +		if (msg->req.flags & VDUSE_REQ_FLAGS_NO_REPLY)
-> +			kfree(msg);
-> +		else
-> +			vduse_enqueue_msg(&dev->recv_list, msg);
-> +	}
-> +	while ((msg = vduse_dequeue_msg(&dev->recv_list))) {
-> +		msg->resp.result = VDUSE_REQ_RESULT_FAILED;
-> +		msg->completed = 1;
-> +		wake_up(&msg->waitq);
-> +	}
-> +	spin_unlock(&dev->msg_lock);
-> +}
-> +
-> +static void vduse_dev_start_dataplane(struct vduse_dev *dev)
-> +{
-> +	struct vduse_dev_msg *msg = kzalloc(sizeof(*msg),
-> +					    GFP_KERNEL | __GFP_NOFAIL);
-> +
-> +	msg->req.type = VDUSE_START_DATAPLANE;
-> +	msg->req.flags |= VDUSE_REQ_FLAGS_NO_REPLY;
-> +	vduse_dev_msg_send(dev, msg, true);
-> +}
-> +
-> +static void vduse_dev_stop_dataplane(struct vduse_dev *dev)
-> +{
-> +	struct vduse_dev_msg *msg = kzalloc(sizeof(*msg),
-> +					    GFP_KERNEL | __GFP_NOFAIL);
-> +
-> +	msg->req.type = VDUSE_STOP_DATAPLANE;
-> +	msg->req.flags |= VDUSE_REQ_FLAGS_NO_REPLY;
+1. Using the EDK2 image and the passthrough Realtek RTL8168 NIC as the
+network interface, I was able to use a vanilla netinstall iso from the
+debian website [3] and install debian in a virtual machine. Woohoo!
 
+One gotcha during installation: because kvmtool doesn't emulate a SCSI
+CD-ROM, you need to manually specify the virtio disk for the installation
+iso. At the 'Detect and mount CD-ROM' prompt, choose No when asked to load
+CD-ROM drivers from removable media, Yes to manually select a CD-ROM module
+and device, none when choosing the CD-ROM module (it's a virtio disk), then
+the device file for accessing the CD-ROM is /dev/vda (only if the iso file
+is the first --disk kvmtool parameter, otherwise /dev/vdb if it's the
+second, and so on).
 
-Can we simply use this flag instead of introducing a new parameter 
-(no_reply) in vduse_dev_msg_send()?
+2. Realtek RTL8168, direct kernel boot and EDK2 boot with Debian 10 disk,
+--force-pci, kernel compiled with 4k and 64k pages (Seattle doesn't support
+16k pages) for both direct kernel boot and EDK2 boot.
 
+3. Intel 82574L NIC, direct kernel boot and EDK2 boot with Debian 10 disk,
+--force-pci, kernel compiled with 4k and 64k pages for both direct boot and
+EDK2 boot.
 
-> +	vduse_dev_msg_send(dev, msg, true);
-> +}
-> +
-> +static int vduse_dev_get_vq_state(struct vduse_dev *dev,
-> +				  struct vduse_virtqueue *vq,
-> +				  struct vdpa_vq_state *state)
-> +{
-> +	struct vduse_dev_msg msg = { 0 };
-> +	int ret;
+4. AMD FirePro W2100 VGA + HDMI audio, both assigned to a VM, direct kernel
+boot and EDK2 boot with Debian 10 disk, --force-pci, kernel compiled with
+4k and 64k pages for both direct boot and EDK2 boot.
 
+For this test, I switched the guest kernel to v5.10 because with v5.11 and
+v5.12 I was getting this kernel panic caused by a NULL pointer deference:
 
-Note that I post a series that implement the packed virtqueue support:
+[..]
+[    0.943927] [drm] radeon kernel modesetting enabled.
+[    0.945050] [drm] initializing kernel modesetting (OLAND 0x1002:0x6608 0x1002:0x2120 0x00).
+[    0.946313] radeon 0000:00:00.0: BAR 6: can't assign [??? 0x00000000 flags 0x20000000] (bogus alignment)
+[    0.947736] radeon 0000:00:00.0: BAR 6: can't assign [??? 0x00000000 flags 0x20000000] (bogus alignment)
+[    0.949193] [drm:radeon_get_bios] *ERROR* Unable to locate a BIOS ROM
+[    0.950151] radeon 0000:00:00.0: Fatal error during GPU init
+[    0.950990] [drm] radeon: finishing device.
+[    0.951633] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000020
+[    0.952936] Mem abort info:
+[    0.953369]   ESR = 0x96000004
+[    0.953838]   EC = 0x25: DABT (current EL), IL = 32 bits
+[    0.954635]   SET = 0, FnV = 0
+[    0.955100]   EA = 0, S1PTW = 0
+[    0.955590] Data abort info:
+[    0.956033]   ISV = 0, ISS = 0x00000004
+[    0.956608]   CM = 0, WnR = 0
+[    0.957099] [0000000000000020] user address but active_mm is swapper
+[    0.958051] Internal error: Oops: 96000004 [#1] PREEMPT SMP
+[    0.958881] Modules linked in:
+[    0.959356] CPU: 3 PID: 1 Comm: swapper/0 Not tainted 5.11.0 #13
+[    0.960268] Hardware name: linux,dummy-virt (DT)
+[    0.960970] pstate: 60000005 (nZCv daif -PAN -UAO -TCO BTYPE=--)
+[    0.962013] pc : ttm_resource_manager_evict_all+0x64/0x1f0
+[    0.962972] lr : ttm_resource_manager_evict_all+0x5c/0x1f0
+[    0.963931] sp : ffff80001212ba00
+[    0.964517] x29: ffff80001212ba00 x28: 0000000000000000 
+[    0.965448] x27: ffff8000118004e0 x26: ffff8000120cd000 
+[    0.966371] x25: 0000000000000000 x24: ffff000080c946e8 
+[    0.967296] x23: 0000000000000020 x22: 0000000000000000 
+[    0.968227] x21: 0000000000000000 x20: ffff8000120cdb90 
+[    0.969152] x19: ffff000080c94000 x18: ffffffffffffffff 
+[    0.970076] x17: 0000000000000000 x16: 0000000000000001 
+[    0.970999] x15: ffff80009212b787 x14: 0000000000000006 
+[    0.971928] x13: ffff800011de2368 x12: 0000000000000264 
+[    0.972852] x11: 00000000000000cc x10: ffff800011de2368 
+[    0.973780] x9 : ffff800011de2368 x8 : 00000000ffffefff 
+[    0.974701] x7 : ffff800011e3a368 x6 : ffff800011e3a368 
+[    0.975637] x5 : 0000000000000000 x4 : 0000000000000000 
+[    0.976559] x3 : ffff8000120cdb90 x2 : 0000000000000001 
+[    0.977483] x1 : 0000000000000000 x0 : 0000000000000000 
+[    0.978410] Call trace:
+[    0.978851]  ttm_resource_manager_evict_all+0x64/0x1f0
+[    0.979759]  radeon_bo_evict_vram+0x1c/0x30
+[    0.980494]  radeon_device_fini+0x34/0xe8
+[    0.981209]  radeon_driver_unload_kms+0x48/0x90
+[    0.982000]  radeon_driver_load_kms+0x124/0x174
+[    0.982792]  drm_dev_register+0xe0/0x210
+[    0.983486]  radeon_pci_probe+0x120/0x1bc
+[    0.984180]  local_pci_probe+0x40/0xac
+[    0.984843]  pci_device_probe+0x114/0x1b0
+[    0.985548]  really_probe+0xe4/0x4c0
+[    0.986181]  driver_probe_device+0x58/0xc0
+[    0.986902]  device_driver_attach+0xc0/0xcc
+[    0.987642]  __driver_attach+0x84/0x124
+[    0.988317]  bus_for_each_dev+0x70/0xd0
+[    0.988996]  driver_attach+0x24/0x30
+[    0.989627]  bus_add_driver+0x104/0x1ec
+[    0.990300]  driver_register+0x78/0x130
+[    0.990974]  __pci_register_driver+0x48/0x54
+[    0.991730]  radeon_module_init+0x54/0x64
+[    0.992438]  do_one_initcall+0x50/0x1b0
+[    0.993115]  kernel_init_freeable+0x1d4/0x23c
+[    0.993880]  kernel_init+0x14/0x118
+[    0.994496]  ret_from_fork+0x10/0x34
+[    0.995132] Code: f90033ff 9420650e d37c7f36 8b1602b6 (f94012c0) 
+[    0.996201] ---[ end trace 88eed6171e8cb9bc ]---
+[    0.997011] note: swapper/0[1] exited with preempt_count 1
+[    0.997840] Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
+[    0.998984] SMP: stopping secondary CPUs
+[    0.999605] Kernel Offset: disabled
+[    1.000137] CPU features: 0x00240022,61006082
+[    1.000793] Memory Limit: none
+[    1.001330] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b ]---
 
-https://lists.linuxfoundation.org/pipermail/virtualization/2021-June/054501.html
+This is how dmesg looks like with v5.10, v5.8 and v5.6:
 
-So this patch needs to be updated as well.
+[..]
+[    0.972061] [drm] radeon kernel modesetting enabled.
+[    0.973162] [drm] initializing kernel modesetting (OLAND 0x1002:0x6608 0x1002:0x2120 0x00).
+[    0.974426] radeon 0000:00:00.0: BAR 6: can't assign [??? 0x00000000 flags 0x20000000] (bogus alignment)
+[    0.976037] radeon 0000:00:00.0: BAR 6: can't assign [??? 0x00000000 flags 0x20000000] (bogus alignment)
+[    0.977435] [drm:radeon_get_bios] *ERROR* Unable to locate a BIOS ROM
+[    0.978381] radeon 0000:00:00.0: Fatal error during GPU init
+[    0.979341] [drm] radeon: finishing device.
+[    0.979963] [TTM] Memory type 2 has not been initialized
+[    0.988250] radeon: probe of 0000:00:00.0 failed with error -22
+[    0.989282] cacheinfo: Unable to detect cache hierarchy for CPU 0
+[    0.993326] loop: module loaded
+[..]
 
+In my opinion, this is an upstream bug caused by incorrect clean up when
+probing fails. I plan to see if I can reproduce it on my x86 machine (to
+make it easier to other people to reproduce it) and then report it
+upstream.
 
-> +
-> +	msg.req.type = VDUSE_GET_VQ_STATE;
-> +	msg.req.vq_state.index = vq->index;
-> +
-> +	ret = vduse_dev_msg_send(dev, &msg, false);
-> +	if (ret)
-> +		return ret;
-> +
-> +	state->avail_index = msg.resp.vq_state.avail_idx;
-> +	return 0;
-> +}
-> +
-> +static int vduse_dev_update_iotlb(struct vduse_dev *dev,
-> +				u64 start, u64 last)
-> +{
-> +	struct vduse_dev_msg msg = { 0 };
-> +
-> +	if (last < start)
-> +		return -EINVAL;
-> +
-> +	msg.req.type = VDUSE_UPDATE_IOTLB;
-> +	msg.req.iova.start = start;
-> +	msg.req.iova.last = last;
-> +
-> +	return vduse_dev_msg_send(dev, &msg, false);
-> +}
-> +
-> +static ssize_t vduse_dev_read_iter(struct kiocb *iocb, struct iov_iter *to)
-> +{
-> +	struct file *file = iocb->ki_filp;
-> +	struct vduse_dev *dev = file->private_data;
-> +	struct vduse_dev_msg *msg;
-> +	int size = sizeof(struct vduse_dev_request);
-> +	ssize_t ret;
-> +
-> +	if (iov_iter_count(to) < size)
-> +		return -EINVAL;
-> +
-> +	spin_lock(&dev->msg_lock);
-> +	while (1) {
-> +		msg = vduse_dequeue_msg(&dev->send_list);
-> +		if (msg)
-> +			break;
-> +
-> +		ret = -EAGAIN;
-> +		if (file->f_flags & O_NONBLOCK)
-> +			goto unlock;
-> +
-> +		spin_unlock(&dev->msg_lock);
-> +		ret = wait_event_interruptible_exclusive(dev->waitq,
-> +					!list_empty(&dev->send_list));
-> +		if (ret)
-> +			return ret;
-> +
-> +		spin_lock(&dev->msg_lock);
-> +	}
-> +	spin_unlock(&dev->msg_lock);
-> +	ret = copy_to_iter(&msg->req, size, to);
-> +	spin_lock(&dev->msg_lock);
-> +	if (ret != size) {
-> +		ret = -EFAULT;
-> +		vduse_enqueue_msg(&dev->send_list, msg);
-> +		goto unlock;
-> +	}
-> +	if (msg->req.flags & VDUSE_REQ_FLAGS_NO_REPLY)
-> +		kfree(msg);
-> +	else
-> +		vduse_enqueue_msg(&dev->recv_list, msg);
-> +unlock:
-> +	spin_unlock(&dev->msg_lock);
-> +
-> +	return ret;
-> +}
-> +
-> +static ssize_t vduse_dev_write_iter(struct kiocb *iocb, struct iov_iter *from)
-> +{
-> +	struct file *file = iocb->ki_filp;
-> +	struct vduse_dev *dev = file->private_data;
-> +	struct vduse_dev_response resp;
-> +	struct vduse_dev_msg *msg;
-> +	size_t ret;
-> +
-> +	ret = copy_from_iter(&resp, sizeof(resp), from);
-> +	if (ret != sizeof(resp))
-> +		return -EINVAL;
-> +
-> +	spin_lock(&dev->msg_lock);
-> +	msg = vduse_find_msg(&dev->recv_list, resp.request_id);
-> +	if (!msg) {
-> +		ret = -ENOENT;
-> +		goto unlock;
-> +	}
-> +
-> +	memcpy(&msg->resp, &resp, sizeof(resp));
-> +	msg->completed = 1;
-> +	wake_up(&msg->waitq);
-> +unlock:
-> +	spin_unlock(&dev->msg_lock);
-> +
-> +	return ret;
-> +}
-> +
-> +static __poll_t vduse_dev_poll(struct file *file, poll_table *wait)
-> +{
-> +	struct vduse_dev *dev = file->private_data;
-> +	__poll_t mask = 0;
-> +
-> +	poll_wait(file, &dev->waitq, wait);
-> +
-> +	if (!list_empty(&dev->send_list))
-> +		mask |= EPOLLIN | EPOLLRDNORM;
-> +	if (!list_empty(&dev->recv_list))
-> +		mask |= EPOLLOUT | EPOLLWRNORM;
-> +
-> +	return mask;
-> +}
-> +
-> +static void vduse_dev_reset(struct vduse_dev *dev)
-> +{
-> +	int i;
-> +	struct vduse_iova_domain *domain = dev->domain;
-> +
-> +	/* The coherent mappings are handled in vduse_dev_free_coherent() */
-> +	if (domain->bounce_map)
-> +		vduse_domain_reset_bounce_map(domain);
-> +
-> +	dev->features = 0;
-> +	dev->generation++;
-> +	spin_lock(&dev->irq_lock);
-> +	dev->config_cb.callback = NULL;
-> +	dev->config_cb.private = NULL;
-> +	spin_unlock(&dev->irq_lock);
-> +
-> +	for (i = 0; i < dev->vq_num; i++) {
-> +		struct vduse_virtqueue *vq = &dev->vqs[i];
-> +
-> +		vq->ready = false;
-> +		vq->desc_addr = 0;
-> +		vq->driver_addr = 0;
-> +		vq->device_addr = 0;
-> +		vq->avail_idx = 0;
-> +		vq->num = 0;
-> +
-> +		spin_lock(&vq->kick_lock);
-> +		vq->kicked = false;
-> +		if (vq->kickfd)
-> +			eventfd_ctx_put(vq->kickfd);
-> +		vq->kickfd = NULL;
-> +		spin_unlock(&vq->kick_lock);
-> +
-> +		spin_lock(&vq->irq_lock);
-> +		vq->cb.callback = NULL;
-> +		vq->cb.private = NULL;
-> +		spin_unlock(&vq->irq_lock);
-> +	}
-> +}
-> +
-> +static int vduse_vdpa_set_vq_address(struct vdpa_device *vdpa, u16 idx,
-> +				u64 desc_area, u64 driver_area,
-> +				u64 device_area)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +	struct vduse_virtqueue *vq = &dev->vqs[idx];
-> +
-> +	vq->desc_addr = desc_area;
-> +	vq->driver_addr = driver_area;
-> +	vq->device_addr = device_area;
-> +
-> +	return 0;
-> +}
-> +
-> +static void vduse_vdpa_kick_vq(struct vdpa_device *vdpa, u16 idx)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +	struct vduse_virtqueue *vq = &dev->vqs[idx];
-> +
-> +	spin_lock(&vq->kick_lock);
-> +	if (!vq->ready)
-> +		goto unlock;
-> +
-> +	if (vq->kickfd)
-> +		eventfd_signal(vq->kickfd, 1);
-> +	else
-> +		vq->kicked = true;
-> +unlock:
-> +	spin_unlock(&vq->kick_lock);
-> +}
-> +
-> +static void vduse_vdpa_set_vq_cb(struct vdpa_device *vdpa, u16 idx,
-> +			      struct vdpa_callback *cb)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +	struct vduse_virtqueue *vq = &dev->vqs[idx];
-> +
-> +	spin_lock(&vq->irq_lock);
-> +	vq->cb.callback = cb->callback;
-> +	vq->cb.private = cb->private;
-> +	spin_unlock(&vq->irq_lock);
-> +}
-> +
-> +static void vduse_vdpa_set_vq_num(struct vdpa_device *vdpa, u16 idx, u32 num)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +	struct vduse_virtqueue *vq = &dev->vqs[idx];
-> +
-> +	vq->num = num;
-> +}
-> +
-> +static void vduse_vdpa_set_vq_ready(struct vdpa_device *vdpa,
-> +					u16 idx, bool ready)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +	struct vduse_virtqueue *vq = &dev->vqs[idx];
-> +
-> +	vq->ready = ready;
-> +}
-> +
-> +static bool vduse_vdpa_get_vq_ready(struct vdpa_device *vdpa, u16 idx)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +	struct vduse_virtqueue *vq = &dev->vqs[idx];
-> +
-> +	return vq->ready;
-> +}
-> +
-> +static int vduse_vdpa_set_vq_state(struct vdpa_device *vdpa, u16 idx,
-> +				const struct vdpa_vq_state *state)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +	struct vduse_virtqueue *vq = &dev->vqs[idx];
-> +
-> +	vq->avail_idx = state->avail_index;
-> +	return 0;
-> +}
-> +
-> +static int vduse_vdpa_get_vq_state(struct vdpa_device *vdpa, u16 idx,
-> +				struct vdpa_vq_state *state)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +	struct vduse_virtqueue *vq = &dev->vqs[idx];
-> +
-> +	return vduse_dev_get_vq_state(dev, vq, state);
-> +}
-> +
-> +static u32 vduse_vdpa_get_vq_align(struct vdpa_device *vdpa)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +
-> +	return dev->vq_align;
-> +}
-> +
-> +static u64 vduse_vdpa_get_features(struct vdpa_device *vdpa)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +
-> +	return dev->user_features;
-> +}
-> +
-> +static int vduse_vdpa_set_features(struct vdpa_device *vdpa, u64 features)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +
-> +	dev->features = features;
-> +	return 0;
-> +}
-> +
-> +static void vduse_vdpa_set_config_cb(struct vdpa_device *vdpa,
-> +				  struct vdpa_callback *cb)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +
-> +	spin_lock(&dev->irq_lock);
-> +	dev->config_cb.callback = cb->callback;
-> +	dev->config_cb.private = cb->private;
-> +	spin_unlock(&dev->irq_lock);
-> +}
-> +
-> +static u16 vduse_vdpa_get_vq_num_max(struct vdpa_device *vdpa)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +
-> +	return dev->vq_size_max;
-> +}
-> +
-> +static u32 vduse_vdpa_get_device_id(struct vdpa_device *vdpa)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +
-> +	return dev->device_id;
-> +}
-> +
-> +static u32 vduse_vdpa_get_vendor_id(struct vdpa_device *vdpa)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +
-> +	return dev->vendor_id;
-> +}
-> +
-> +static u8 vduse_vdpa_get_status(struct vdpa_device *vdpa)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +
-> +	return dev->status;
-> +}
-> +
-> +static void vduse_vdpa_set_status(struct vdpa_device *vdpa, u8 status)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +	bool started = !!(status & VIRTIO_CONFIG_S_DRIVER_OK);
-> +
-> +	dev->status = status;
-> +
-> +	if (dev->started == started)
-> +		return;
+Note that I used the radeon driver instead of amdgpu because this is the
+recommended driver [4] for the GCN1 architecture.
 
+5. NVIDIA Quadro P400 VGA + HDMI audio, both assigned to a VM, direct kernel
+boot and EDK2 boot with Debian 10 disk, --force-pci, kernel compiled with
+4k and 64k pages for both direct boot and EDK2 boot.
 
-If we check dev->status == status, (or only check the DRIVER_OK bit) 
-then there's no need to introduce an extra dev->started.
+Nouveau seems to work as expected (it binds to the GPU). but during driver
+initialization it looks like the system hangs for 30s-1m. My guess is that
+something times out in the driver due to missing emulation in kvmtool:
 
+[..]
+[    0.335506] [drm] radeon kernel modesetting enabled.
+[    0.336369] nouveau 0000:00:00.0: enabling device (0000 -> 0003)
+[    0.359468] nouveau 0000:00:00.0: NVIDIA GP107 (137000a1)
+[    0.505066] nouveau 0000:00:00.0: bios: version 86.07.6b.00.01
+              <---- hangs here
+[  123.867379] nouveau 0000:00:00.0: acr: firmware unavailable
+[  123.868337] nouveau 0000:00:00.0: pmu: firmware unavailable
+[  123.869488] nouveau 0000:00:00.0: gr: firmware unavailable
+[  123.870506] nouveau 0000:00:00.0: sec2: firmware unavailable
+[  123.928149] nouveau 0000:00:00.0: fb: 2048 MiB GDDR5
+[  123.963159] [TTM] Zone  kernel: Available graphics memory: 8313888 KiB
+[  123.964823] [TTM] Zone   dma32: Available graphics memory: 2097152 KiB
+[  123.966172] nouveau 0000:00:00.0: DRM: VRAM: 2048 MiB
+[  123.967101] nouveau 0000:00:00.0: DRM: GART: 536870912 MiB
+[  123.968258] nouveau 0000:00:00.0: DRM: BIT table 'A' not found
+[  123.969403] nouveau 0000:00:00.0: DRM: BIT table 'L' not found
+[  123.970498] nouveau 0000:00:00.0: DRM: TMDS table version 2.0
+[  123.971688] nouveau 0000:00:00.0: DRM: DCB version 4.1
+[  123.972639] nouveau 0000:00:00.0: DRM: DCB outp 00: 01800f56 04600020
+[  123.973820] nouveau 0000:00:00.0: DRM: DCB outp 01: 01000f52 04620020
+[  123.975083] nouveau 0000:00:00.0: DRM: DCB outp 02: 01811f46 04600010
+[  123.976500] nouveau 0000:00:00.0: DRM: DCB outp 03: 01011f42 04620010
+[  123.977681] nouveau 0000:00:00.0: DRM: DCB outp 04: 02822f76 04600020
+[  123.978955] nouveau 0000:00:00.0: DRM: DCB outp 05: 02022f72 00020020
+[  123.980309] nouveau 0000:00:00.0: DRM: DCB conn 00: 00002046
+[  123.981352] nouveau 0000:00:00.0: DRM: DCB conn 01: 00001146
+[  123.982379] nouveau 0000:00:00.0: DRM: DCB conn 02: 00020246
+[  123.984507] nouveau 0000:00:00.0: DRM: failed to create kernel channel, -22
+[  123.986661] nouveau 0000:00:00.0: DRM: MM: using COPY for buffer copies
+[  124.291297] nouveau 0000:00:00.0: [drm] Cannot find any crtc or sizes
+[  124.292839] [drm] Initialized nouveau 1.3.1 20120801 for 0000:00:00.0 on minor 0
+[..]
 
-> +
-> +	dev->started = started;
-> +	if (dev->started) {
-> +		vduse_dev_start_dataplane(dev);
-> +	} else {
-> +		vduse_dev_reset(dev);
-> +		vduse_dev_stop_dataplane(dev);
+6. Crucial MX500 SSD connected to a generic PCIE to sata adapter assigned
+to the VM, direct kernel boot and EDK2 boot with Debian 10 disk,
+--force-pci, 4k and 64k pages kernel for both direct kernel and UEFI boot.
 
+This was weird. On the host, the PCIE adapter worked just fine with kernel
+v5.8, but on v5.12 the host was not able to initialize it:
 
-I wonder if no_reply work for the case of vhost-vdpa. For virtio-vDPA, 
-we have bouncing buffers so it's harmless if usersapce dataplane keeps 
-performing read/write. For vhost-vDPA we don't have such stuffs.
+[    2.891697] ata2: SATA link down (SStatus 0 SControl 300)
+[    3.211695] ata3: SATA link down (SStatus 0 SControl 300)
+[    3.531699] ata4: SATA link down (SStatus 0 SControl 300)
+[    3.851694] ata5: SATA link down (SStatus 0 SControl 300)
+[    4.141559] ata9: SATA link down (SStatus 0 SControl 0)
+[    4.171691] ata6: SATA link down (SStatus 0 SControl 300)
+[    4.491695] ata7: SATA link down (SStatus 0 SControl 300)
+[    4.811693] ata8: SATA link down (SStatus 0 SControl 300)
+[    6.973559] arm-smmu e0a00000.smmu: Unhandled context fault: fsr=0x2, iova=0x8002420000, fsynr=0x181, cbfrsynra=0x100, cb=0
+[    6.983615] ata10: softreset failed (SRST command error)
+[    6.989992] ata10: reset failed (errno=-5), retrying in 8 secs
+[   17.173560] arm-smmu e0a00000.smmu: Unhandled context fault: fsr=0x2, iova=0x8002420000, fsynr=0x181, cbfrsynra=0x100, cb=0
+[   17.183618] ata10: softreset failed (SRST command error)
+[   17.189990] ata10: reset failed (errno=-5), retrying in 8 secs
+[   27.413557] arm-smmu e0a00000.smmu: Unhandled context fault: fsr=0x2, iova=0x8002420000, fsynr=0x181, cbfrsynra=0x100, cb=0
+[   27.423615] ata10: softreset failed (SRST command error)
+[   27.429986] ata10: reset failed (errno=-5), retrying in 33 secs
+[   60.837548] ata10: limiting SATA link speed to 1.5 Gbps
+[   63.001557] arm-smmu e0a00000.smmu: Unhandled context fault: fsr=0x2, iova=0x8002420000, fsynr=0x181, cbfrsynra=0x100, cb=0
+[   63.011615] ata10: softreset failed (SRST command error)
+[   63.017988] ata10: reset failed, giving up
 
+Assigning it to a VM worked though after the host running Linux v5.8
+unitializes the adapter, so I'm going to consider this a pass. After a few
+more tests, I was able to trigger the same error on v5.8. On v5.12
+initialization has failed every time (so far, at least).
 
-> +	}
-> +}
-> +
-> +static size_t vduse_vdpa_get_config_size(struct vdpa_device *vdpa)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +
-> +	return dev->config_size;
-> +}
-> +
-> +static void vduse_vdpa_get_config(struct vdpa_device *vdpa, unsigned int offset,
-> +				  void *buf, unsigned int len)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +
-> +	memcpy(buf, dev->config + offset, len);
-> +}
-> +
-> +static void vduse_vdpa_set_config(struct vdpa_device *vdpa, unsigned int offset,
-> +			const void *buf, unsigned int len)
-> +{
-> +	/* Now we only support read-only configuration space */
-> +}
-> +
-> +static u32 vduse_vdpa_get_generation(struct vdpa_device *vdpa)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +
-> +	return dev->generation;
-> +}
-> +
-> +static int vduse_vdpa_set_map(struct vdpa_device *vdpa,
-> +				struct vhost_iotlb *iotlb)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +	int ret;
-> +
-> +	ret = vduse_domain_set_map(dev->domain, iotlb);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = vduse_dev_update_iotlb(dev, 0ULL, ULLONG_MAX);
-> +	if (ret) {
-> +		vduse_domain_clear_map(dev->domain, iotlb);
-> +		return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static void vduse_vdpa_free(struct vdpa_device *vdpa)
-> +{
-> +	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +
-> +	dev->vdev = NULL;
-> +}
-> +
-> +static const struct vdpa_config_ops vduse_vdpa_config_ops = {
-> +	.set_vq_address		= vduse_vdpa_set_vq_address,
-> +	.kick_vq		= vduse_vdpa_kick_vq,
-> +	.set_vq_cb		= vduse_vdpa_set_vq_cb,
-> +	.set_vq_num             = vduse_vdpa_set_vq_num,
-> +	.set_vq_ready		= vduse_vdpa_set_vq_ready,
-> +	.get_vq_ready		= vduse_vdpa_get_vq_ready,
-> +	.set_vq_state		= vduse_vdpa_set_vq_state,
-> +	.get_vq_state		= vduse_vdpa_get_vq_state,
-> +	.get_vq_align		= vduse_vdpa_get_vq_align,
-> +	.get_features		= vduse_vdpa_get_features,
-> +	.set_features		= vduse_vdpa_set_features,
-> +	.set_config_cb		= vduse_vdpa_set_config_cb,
-> +	.get_vq_num_max		= vduse_vdpa_get_vq_num_max,
-> +	.get_device_id		= vduse_vdpa_get_device_id,
-> +	.get_vendor_id		= vduse_vdpa_get_vendor_id,
-> +	.get_status		= vduse_vdpa_get_status,
-> +	.set_status		= vduse_vdpa_set_status,
-> +	.get_config_size	= vduse_vdpa_get_config_size,
-> +	.get_config		= vduse_vdpa_get_config,
-> +	.set_config		= vduse_vdpa_set_config,
-> +	.get_generation		= vduse_vdpa_get_generation,
-> +	.set_map		= vduse_vdpa_set_map,
-> +	.free			= vduse_vdpa_free,
-> +};
-> +
-> +static dma_addr_t vduse_dev_map_page(struct device *dev, struct page *page,
-> +				     unsigned long offset, size_t size,
-> +				     enum dma_data_direction dir,
-> +				     unsigned long attrs)
-> +{
-> +	struct vduse_dev *vdev = dev_to_vduse(dev);
-> +	struct vduse_iova_domain *domain = vdev->domain;
-> +
-> +	return vduse_domain_map_page(domain, page, offset, size, dir, attrs);
-> +}
-> +
-> +static void vduse_dev_unmap_page(struct device *dev, dma_addr_t dma_addr,
-> +				size_t size, enum dma_data_direction dir,
-> +				unsigned long attrs)
-> +{
-> +	struct vduse_dev *vdev = dev_to_vduse(dev);
-> +	struct vduse_iova_domain *domain = vdev->domain;
-> +
-> +	return vduse_domain_unmap_page(domain, dma_addr, size, dir, attrs);
-> +}
-> +
-> +static void *vduse_dev_alloc_coherent(struct device *dev, size_t size,
-> +					dma_addr_t *dma_addr, gfp_t flag,
-> +					unsigned long attrs)
-> +{
-> +	struct vduse_dev *vdev = dev_to_vduse(dev);
-> +	struct vduse_iova_domain *domain = vdev->domain;
-> +	unsigned long iova;
-> +	void *addr;
-> +
-> +	*dma_addr = DMA_MAPPING_ERROR;
-> +	addr = vduse_domain_alloc_coherent(domain, size,
-> +				(dma_addr_t *)&iova, flag, attrs);
-> +	if (!addr)
-> +		return NULL;
-> +
-> +	*dma_addr = (dma_addr_t)iova;
-> +
-> +	return addr;
-> +}
-> +
-> +static void vduse_dev_free_coherent(struct device *dev, size_t size,
-> +					void *vaddr, dma_addr_t dma_addr,
-> +					unsigned long attrs)
-> +{
-> +	struct vduse_dev *vdev = dev_to_vduse(dev);
-> +	struct vduse_iova_domain *domain = vdev->domain;
-> +
-> +	vduse_domain_free_coherent(domain, size, vaddr, dma_addr, attrs);
-> +}
-> +
-> +static size_t vduse_dev_max_mapping_size(struct device *dev)
-> +{
-> +	struct vduse_dev *vdev = dev_to_vduse(dev);
-> +	struct vduse_iova_domain *domain = vdev->domain;
-> +
-> +	return domain->bounce_size;
-> +}
-> +
-> +static const struct dma_map_ops vduse_dev_dma_ops = {
-> +	.map_page = vduse_dev_map_page,
-> +	.unmap_page = vduse_dev_unmap_page,
-> +	.alloc = vduse_dev_alloc_coherent,
-> +	.free = vduse_dev_free_coherent,
-> +	.max_mapping_size = vduse_dev_max_mapping_size,
-> +};
-> +
-> +static unsigned int perm_to_file_flags(u8 perm)
-> +{
-> +	unsigned int flags = 0;
-> +
-> +	switch (perm) {
-> +	case VDUSE_ACCESS_WO:
-> +		flags |= O_WRONLY;
-> +		break;
-> +	case VDUSE_ACCESS_RO:
-> +		flags |= O_RDONLY;
-> +		break;
-> +	case VDUSE_ACCESS_RW:
-> +		flags |= O_RDWR;
-> +		break;
-> +	default:
-> +		WARN(1, "invalidate vhost IOTLB permission\n");
-> +		break;
-> +	}
-> +
-> +	return flags;
-> +}
-> +
-> +static int vduse_kickfd_setup(struct vduse_dev *dev,
-> +			struct vduse_vq_eventfd *eventfd)
-> +{
-> +	struct eventfd_ctx *ctx = NULL;
-> +	struct vduse_virtqueue *vq;
-> +	u32 index;
-> +
-> +	if (eventfd->index >= dev->vq_num)
-> +		return -EINVAL;
-> +
-> +	index = array_index_nospec(eventfd->index, dev->vq_num);
-> +	vq = &dev->vqs[index];
-> +	if (eventfd->fd >= 0) {
-> +		ctx = eventfd_ctx_fdget(eventfd->fd);
-> +		if (IS_ERR(ctx))
-> +			return PTR_ERR(ctx);
-> +	} else if (eventfd->fd != VDUSE_EVENTFD_DEASSIGN)
-> +		return 0;
-> +
-> +	spin_lock(&vq->kick_lock);
-> +	if (vq->kickfd)
-> +		eventfd_ctx_put(vq->kickfd);
-> +	vq->kickfd = ctx;
-> +	if (vq->ready && vq->kicked && vq->kickfd) {
-> +		eventfd_signal(vq->kickfd, 1);
-> +		vq->kicked = false;
-> +	}
-> +	spin_unlock(&vq->kick_lock);
-> +
-> +	return 0;
-> +}
-> +
-> +static void vduse_dev_irq_inject(struct work_struct *work)
-> +{
-> +	struct vduse_dev *dev = container_of(work, struct vduse_dev, inject);
-> +
-> +	spin_lock_irq(&dev->irq_lock);
-> +	if (dev->config_cb.callback)
-> +		dev->config_cb.callback(dev->config_cb.private);
-> +	spin_unlock_irq(&dev->irq_lock);
-> +}
-> +
-> +static void vduse_vq_irq_inject(struct work_struct *work)
-> +{
-> +	struct vduse_virtqueue *vq = container_of(work,
-> +					struct vduse_virtqueue, inject);
-> +
-> +	spin_lock_irq(&vq->irq_lock);
-> +	if (vq->ready && vq->cb.callback)
-> +		vq->cb.callback(vq->cb.private);
-> +	spin_unlock_irq(&vq->irq_lock);
-> +}
-> +
-> +static long vduse_dev_ioctl(struct file *file, unsigned int cmd,
-> +			    unsigned long arg)
-> +{
-> +	struct vduse_dev *dev = file->private_data;
-> +	void __user *argp = (void __user *)arg;
-> +	int ret;
-> +
-> +	switch (cmd) {
-> +	case VDUSE_IOTLB_GET_FD: {
-> +		struct vduse_iotlb_entry entry;
-> +		struct vhost_iotlb_map *map;
-> +		struct vdpa_map_file *map_file;
-> +		struct vduse_iova_domain *domain = dev->domain;
-> +		struct file *f = NULL;
-> +
-> +		ret = -EFAULT;
-> +		if (copy_from_user(&entry, argp, sizeof(entry)))
-> +			break;
-> +
-> +		ret = -EINVAL;
-> +		if (entry.start > entry.last)
-> +			break;
-> +
-> +		spin_lock(&domain->iotlb_lock);
-> +		map = vhost_iotlb_itree_first(domain->iotlb,
-> +					      entry.start, entry.last);
-> +		if (map) {
-> +			map_file = (struct vdpa_map_file *)map->opaque;
-> +			f = get_file(map_file->file);
-> +			entry.offset = map_file->offset;
-> +			entry.start = map->start;
-> +			entry.last = map->last;
-> +			entry.perm = map->perm;
-> +		}
-> +		spin_unlock(&domain->iotlb_lock);
-> +		ret = -EINVAL;
-> +		if (!f)
-> +			break;
-> +
-> +		ret = -EFAULT;
-> +		if (copy_to_user(argp, &entry, sizeof(entry))) {
-> +			fput(f);
-> +			break;
-> +		}
-> +		ret = receive_fd(f, perm_to_file_flags(entry.perm));
-> +		fput(f);
-> +		break;
-> +	}
-> +	case VDUSE_DEV_GET_FEATURES:
-> +		ret = put_user(dev->features, (u64 __user *)argp);
-> +		break;
-> +	case VDUSE_DEV_UPDATE_CONFIG: {
-> +		struct vduse_config_update config;
-> +		unsigned long size = offsetof(struct vduse_config_update,
-> +					      buffer);
-> +
-> +		ret = -EFAULT;
-> +		if (copy_from_user(&config, argp, size))
-> +			break;
-> +
-> +		ret = -EINVAL;
-> +		if (config.length == 0 ||
-> +		    config.length > dev->config_size - config.offset)
-> +			break;
-> +
-> +		ret = -EFAULT;
-> +		if (copy_from_user(dev->config + config.offset, argp + size,
-> +				   config.length))
-> +			break;
-> +
-> +		ret = 0;
-> +		queue_work(vduse_irq_wq, &dev->inject);
+[0] https://lore.kernel.org/kvm/20200326152438.6218-1-alexandru.elisei@arm.com/T/#m835c93ef1dc7c539b4cdda85aee23210d494ea49
+[1] https://lore.kernel.org/kvm/20200326152438.6218-1-alexandru.elisei@arm.com/
+[2] https://www.spinics.net/lists/kvm/msg245607.html
+[3] https://cdimage.debian.org/debian-cd/current/arm64/iso-cd/debian-10.9.0-arm64-netinst.iso
+[4] https://wiki.archlinux.org/title/Xorg#AMD
+[5] https://gitlab.arm.com/linux-arm/kvmtool-ae/-/tree/pci-express-v2-edk2-binary
+[6] https://edk2.groups.io/g/devel/message/76522?p=,,,20,0,0,0::Created,,armvirtpkg,20,2,0,83558261
 
+Alexandru Elisei (4):
+  Move fdt_irq_fn typedef to fdt.h
+  arm/fdt.c: Don't generate the node if generator function is NULL
+  arm/arm64: Add PCI Express 1.1 support
+  arm/arm64: vfio: Add PCI Express Capability Structure
 
-I wonder if it's better to separate config interrupt out of config 
-update or we need document this.
+ arm/fdt.c                         |  7 ++-
+ arm/include/arm-common/kvm-arch.h |  4 +-
+ arm/pci.c                         |  2 +-
+ hw/rtc.c                          |  1 +
+ include/kvm/fdt.h                 |  2 +
+ include/kvm/kvm.h                 |  1 -
+ include/kvm/pci.h                 | 75 ++++++++++++++++++++++++++++---
+ pci.c                             |  5 ++-
+ vfio/pci.c                        | 44 ++++++++++++++----
+ 9 files changed, 121 insertions(+), 20 deletions(-)
 
-
-> +		break;
-> +	}
-> +	case VDUSE_VQ_GET_INFO: {
-
-
-Do we need to limit this only when DRIVER_OK is set?
-
-
-> +		struct vduse_vq_info vq_info;
-> +		u32 vq_index;
-> +
-> +		ret = -EFAULT;
-> +		if (copy_from_user(&vq_info, argp, sizeof(vq_info)))
-> +			break;
-> +
-> +		ret = -EINVAL;
-> +		if (vq_info.index >= dev->vq_num)
-> +			break;
-> +
-> +		vq_index = array_index_nospec(vq_info.index, dev->vq_num);
-> +		vq_info.desc_addr = dev->vqs[vq_index].desc_addr;
-> +		vq_info.driver_addr = dev->vqs[vq_index].driver_addr;
-> +		vq_info.device_addr = dev->vqs[vq_index].device_addr;
-> +		vq_info.num = dev->vqs[vq_index].num;
-> +		vq_info.avail_idx = dev->vqs[vq_index].avail_idx;
-> +		vq_info.ready = dev->vqs[vq_index].ready;
-> +
-> +		ret = -EFAULT;
-> +		if (copy_to_user(argp, &vq_info, sizeof(vq_info)))
-> +			break;
-> +
-> +		ret = 0;
-> +		break;
-> +	}
-> +	case VDUSE_VQ_SETUP_KICKFD: {
-> +		struct vduse_vq_eventfd eventfd;
-> +
-> +		ret = -EFAULT;
-> +		if (copy_from_user(&eventfd, argp, sizeof(eventfd)))
-> +			break;
-> +
-> +		ret = vduse_kickfd_setup(dev, &eventfd);
-> +		break;
-> +	}
-> +	case VDUSE_VQ_INJECT_IRQ: {
-> +		u32 vq_index;
-> +
-> +		ret = -EFAULT;
-> +		if (get_user(vq_index, (u32 __user *)argp))
-> +			break;
-> +
-> +		ret = -EINVAL;
-> +		if (vq_index >= dev->vq_num)
-> +			break;
-> +
-> +		ret = 0;
-> +		vq_index = array_index_nospec(vq_index, dev->vq_num);
-> +		queue_work(vduse_irq_wq, &dev->vqs[vq_index].inject);
-> +		break;
-> +	}
-> +	default:
-> +		ret = -ENOIOCTLCMD;
-> +		break;
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> +static int vduse_dev_release(struct inode *inode, struct file *file)
-> +{
-> +	struct vduse_dev *dev = file->private_data;
-> +
-> +	spin_lock(&dev->msg_lock);
-> +	/* Make sure the inflight messages can processed after reconncection */
-> +	list_splice_init(&dev->recv_list, &dev->send_list);
-> +	spin_unlock(&dev->msg_lock);
-> +	dev->connected = false;
-> +
-> +	return 0;
-> +}
-> +
-> +static struct vduse_dev *vduse_dev_get_from_minor(int minor)
-> +{
-> +	struct vduse_dev *dev;
-> +
-> +	mutex_lock(&vduse_lock);
-> +	dev = idr_find(&vduse_idr, minor);
-> +	mutex_unlock(&vduse_lock);
-> +
-> +	return dev;
-> +}
-> +
-> +static int vduse_dev_open(struct inode *inode, struct file *file)
-> +{
-> +	int ret;
-> +	struct vduse_dev *dev = vduse_dev_get_from_minor(iminor(inode));
-> +
-> +	if (!dev)
-> +		return -ENODEV;
-> +
-> +	ret = -EBUSY;
-> +	mutex_lock(&dev->lock);
-> +	if (dev->connected)
-> +		goto unlock;
-> +
-> +	ret = 0;
-> +	dev->connected = true;
-> +	file->private_data = dev;
-> +unlock:
-> +	mutex_unlock(&dev->lock);
-> +
-> +	return ret;
-> +}
-> +
-> +static const struct file_operations vduse_dev_fops = {
-> +	.owner		= THIS_MODULE,
-> +	.open		= vduse_dev_open,
-> +	.release	= vduse_dev_release,
-> +	.read_iter	= vduse_dev_read_iter,
-> +	.write_iter	= vduse_dev_write_iter,
-> +	.poll		= vduse_dev_poll,
-> +	.unlocked_ioctl	= vduse_dev_ioctl,
-> +	.compat_ioctl	= compat_ptr_ioctl,
-> +	.llseek		= noop_llseek,
-> +};
-> +
-> +static struct vduse_dev *vduse_dev_create(void)
-> +{
-> +	struct vduse_dev *dev = kzalloc(sizeof(*dev), GFP_KERNEL);
-> +
-> +	if (!dev)
-> +		return NULL;
-> +
-> +	mutex_init(&dev->lock);
-> +	spin_lock_init(&dev->msg_lock);
-> +	INIT_LIST_HEAD(&dev->send_list);
-> +	INIT_LIST_HEAD(&dev->recv_list);
-> +	spin_lock_init(&dev->irq_lock);
-> +
-> +	INIT_WORK(&dev->inject, vduse_dev_irq_inject);
-> +	init_waitqueue_head(&dev->waitq);
-> +
-> +	return dev;
-> +}
-> +
-> +static void vduse_dev_destroy(struct vduse_dev *dev)
-> +{
-> +	kfree(dev);
-> +}
-> +
-> +static struct vduse_dev *vduse_find_dev(const char *name)
-> +{
-> +	struct vduse_dev *dev;
-> +	int id;
-> +
-> +	idr_for_each_entry(&vduse_idr, dev, id)
-> +		if (!strcmp(dev->name, name))
-> +			return dev;
-> +
-> +	return NULL;
-> +}
-> +
-> +static int vduse_destroy_dev(char *name)
-> +{
-> +	struct vduse_dev *dev = vduse_find_dev(name);
-> +
-> +	if (!dev)
-> +		return -EINVAL;
-> +
-> +	mutex_lock(&dev->lock);
-> +	if (dev->vdev || dev->connected) {
-> +		mutex_unlock(&dev->lock);
-> +		return -EBUSY;
-> +	}
-> +	dev->connected = true;
-> +	mutex_unlock(&dev->lock);
-> +
-> +	vduse_dev_msg_cleanup(dev);
-> +	device_destroy(vduse_class, MKDEV(MAJOR(vduse_major), dev->minor));
-> +	idr_remove(&vduse_idr, dev->minor);
-> +	kvfree(dev->config);
-> +	kfree(dev->vqs);
-> +	vduse_domain_destroy(dev->domain);
-> +	kfree(dev->name);
-> +	vduse_dev_destroy(dev);
-> +	module_put(THIS_MODULE);
-> +
-> +	return 0;
-> +}
-> +
-> +static bool device_is_allowed(u32 device_id)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(allowed_device_id); i++)
-> +		if (allowed_device_id[i] == device_id)
-> +			return true;
-> +
-> +	return false;
-> +}
-> +
-> +static bool features_is_valid(u64 features)
-> +{
-> +	if (!(features & (1ULL << VIRTIO_F_ACCESS_PLATFORM)))
-> +		return false;
-> +
-> +	/* Now we only support read-only configuration space */
-> +	if (features & (1ULL << VIRTIO_BLK_F_CONFIG_WCE))
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
-> +static bool vduse_validate_config(struct vduse_dev_config *config)
-> +{
-> +	if (config->bounce_size > VDUSE_MAX_BOUNCE_SIZE)
-> +		return false;
-> +
-> +	if (config->vq_align > PAGE_SIZE)
-> +		return false;
-> +
-> +	if (config->config_size > PAGE_SIZE)
-> +		return false;
-> +
-> +	if (!device_is_allowed(config->device_id))
-> +		return false;
-> +
-> +	if (!features_is_valid(config->features))
-> +		return false;
-
-
-Do we need to validate whether or not config_size is too small otherwise 
-we may have OOB access in get_config()?
-
-
-> +
-> +	return true;
-> +}
-> +
-> +static int vduse_create_dev(struct vduse_dev_config *config,
-> +			    void *config_buf, u64 api_version)
-> +{
-> +	int i, ret;
-> +	struct vduse_dev *dev;
-> +
-> +	ret = -EEXIST;
-> +	if (vduse_find_dev(config->name))
-> +		goto err;
-> +
-> +	ret = -ENOMEM;
-> +	dev = vduse_dev_create();
-> +	if (!dev)
-> +		goto err;
-> +
-> +	dev->api_version = api_version;
-> +	dev->user_features = config->features;
-> +	dev->device_id = config->device_id;
-> +	dev->vendor_id = config->vendor_id;
-> +	dev->name = kstrdup(config->name, GFP_KERNEL);
-> +	if (!dev->name)
-> +		goto err_str;
-> +
-> +	dev->domain = vduse_domain_create(VDUSE_IOVA_SIZE - 1,
-> +					  config->bounce_size);
-> +	if (!dev->domain)
-> +		goto err_domain;
-> +
-> +	dev->config = config_buf;
-> +	dev->config_size = config->config_size;
-> +	dev->vq_align = config->vq_align;
-> +	dev->vq_size_max = config->vq_size_max;
-> +	dev->vq_num = config->vq_num;
-> +	dev->vqs = kcalloc(dev->vq_num, sizeof(*dev->vqs), GFP_KERNEL);
-> +	if (!dev->vqs)
-> +		goto err_vqs;
-> +
-> +	for (i = 0; i < dev->vq_num; i++) {
-> +		dev->vqs[i].index = i;
-> +		INIT_WORK(&dev->vqs[i].inject, vduse_vq_irq_inject);
-> +		spin_lock_init(&dev->vqs[i].kick_lock);
-> +		spin_lock_init(&dev->vqs[i].irq_lock);
-> +	}
-> +
-> +	ret = idr_alloc(&vduse_idr, dev, 1, VDUSE_DEV_MAX, GFP_KERNEL);
-> +	if (ret < 0)
-> +		goto err_idr;
-> +
-> +	dev->minor = ret;
-> +	dev->dev = device_create(vduse_class, NULL,
-> +				 MKDEV(MAJOR(vduse_major), dev->minor),
-> +				 NULL, "%s", config->name);
-> +	if (IS_ERR(dev->dev)) {
-> +		ret = PTR_ERR(dev->dev);
-> +		goto err_dev;
-> +	}
-> +	__module_get(THIS_MODULE);
-> +
-> +	return 0;
-> +err_dev:
-> +	idr_remove(&vduse_idr, dev->minor);
-> +err_idr:
-> +	kfree(dev->vqs);
-> +err_vqs:
-> +	vduse_domain_destroy(dev->domain);
-> +err_domain:
-> +	kfree(dev->name);
-> +err_str:
-> +	vduse_dev_destroy(dev);
-> +err:
-> +	kvfree(config_buf);
-> +	return ret;
-> +}
-> +
-> +static long vduse_ioctl(struct file *file, unsigned int cmd,
-> +			unsigned long arg)
-> +{
-> +	int ret;
-> +	void __user *argp = (void __user *)arg;
-> +	struct vduse_control *control = file->private_data;
-> +
-> +	mutex_lock(&vduse_lock);
-> +	switch (cmd) {
-> +	case VDUSE_GET_API_VERSION:
-> +		ret = put_user(control->api_version, (u64 __user *)argp);
-> +		break;
-> +	case VDUSE_SET_API_VERSION: {
-> +		u64 api_version;
-> +
-> +		ret = -EFAULT;
-> +		if (get_user(api_version, (u64 __user *)argp))
-> +			break;
-> +
-> +		ret = -EINVAL;
-> +		if (api_version > VDUSE_API_VERSION)
-> +			break;
-> +
-> +		ret = 0;
-> +		control->api_version = api_version;
-> +		break;
-> +	}
-> +	case VDUSE_CREATE_DEV: {
-> +		struct vduse_dev_config config;
-> +		unsigned long size = offsetof(struct vduse_dev_config, config);
-> +		void *buf;
-> +
-> +		ret = -EFAULT;
-> +		if (copy_from_user(&config, argp, size))
-> +			break;
-> +
-> +		ret = -EINVAL;
-> +		if (vduse_validate_config(&config) == false)
-> +			break;
-> +
-> +		buf = vmemdup_user(argp + size, config.config_size);
-> +		if (IS_ERR(buf)) {
-> +			ret = PTR_ERR(buf);
-> +			break;
-> +		}
-> +		ret = vduse_create_dev(&config, buf, control->api_version);
-> +		break;
-> +	}
-> +	case VDUSE_DESTROY_DEV: {
-> +		char name[VDUSE_NAME_MAX];
-> +
-> +		ret = -EFAULT;
-> +		if (copy_from_user(name, argp, VDUSE_NAME_MAX))
-> +			break;
-> +
-> +		ret = vduse_destroy_dev(name);
-> +		break;
-> +	}
-> +	default:
-> +		ret = -EINVAL;
-> +		break;
-> +	}
-> +	mutex_unlock(&vduse_lock);
-> +
-> +	return ret;
-> +}
-> +
-> +static int vduse_release(struct inode *inode, struct file *file)
-> +{
-> +	struct vduse_control *control = file->private_data;
-> +
-> +	kfree(control);
-> +	return 0;
-> +}
-> +
-> +static int vduse_open(struct inode *inode, struct file *file)
-> +{
-> +	struct vduse_control *control;
-> +
-> +	control = kmalloc(sizeof(struct vduse_control), GFP_KERNEL);
-> +	if (!control)
-> +		return -ENOMEM;
-> +
-> +	control->api_version = VDUSE_API_VERSION;
-> +	file->private_data = control;
-> +
-> +	return 0;
-> +}
-> +
-> +static const struct file_operations vduse_ctrl_fops = {
-> +	.owner		= THIS_MODULE,
-> +	.open		= vduse_open,
-> +	.release	= vduse_release,
-> +	.unlocked_ioctl	= vduse_ioctl,
-> +	.compat_ioctl	= compat_ptr_ioctl,
-> +	.llseek		= noop_llseek,
-> +};
-> +
-> +static char *vduse_devnode(struct device *dev, umode_t *mode)
-> +{
-> +	return kasprintf(GFP_KERNEL, "vduse/%s", dev_name(dev));
-> +}
-> +
-> +static void vduse_mgmtdev_release(struct device *dev)
-> +{
-> +}
-> +
-> +static struct device vduse_mgmtdev = {
-> +	.init_name = "vduse",
-> +	.release = vduse_mgmtdev_release,
-> +};
-> +
-> +static struct vdpa_mgmt_dev mgmt_dev;
-> +
-> +static int vduse_dev_init_vdpa(struct vduse_dev *dev, const char *name)
-> +{
-> +	struct vduse_vdpa *vdev;
-> +	int ret;
-> +
-> +	if (dev->vdev)
-> +		return -EEXIST;
-> +
-> +	vdev = vdpa_alloc_device(struct vduse_vdpa, vdpa, dev->dev,
-> +				 &vduse_vdpa_config_ops, name, true);
-> +	if (!vdev)
-> +		return -ENOMEM;
-> +
-> +	dev->vdev = vdev;
-> +	vdev->dev = dev;
-> +	vdev->vdpa.dev.dma_mask = &vdev->vdpa.dev.coherent_dma_mask;
-> +	ret = dma_set_mask_and_coherent(&vdev->vdpa.dev, DMA_BIT_MASK(64));
-> +	if (ret) {
-> +		put_device(&vdev->vdpa.dev);
-> +		return ret;
-> +	}
-> +	set_dma_ops(&vdev->vdpa.dev, &vduse_dev_dma_ops);
-> +	vdev->vdpa.dma_dev = &vdev->vdpa.dev;
-> +	vdev->vdpa.mdev = &mgmt_dev;
-> +
-> +	return 0;
-> +}
-> +
-> +static int vdpa_dev_add(struct vdpa_mgmt_dev *mdev, const char *name)
-> +{
-> +	struct vduse_dev *dev;
-> +	int ret;
-> +
-> +	mutex_lock(&vduse_lock);
-> +	dev = vduse_find_dev(name);
-> +	if (!dev) {
-> +		mutex_unlock(&vduse_lock);
-> +		return -EINVAL;
-> +	}
-> +	ret = vduse_dev_init_vdpa(dev, name);
-> +	mutex_unlock(&vduse_lock);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = _vdpa_register_device(&dev->vdev->vdpa, dev->vq_num);
-> +	if (ret) {
-> +		put_device(&dev->vdev->vdpa.dev);
-> +		return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static void vdpa_dev_del(struct vdpa_mgmt_dev *mdev, struct vdpa_device *dev)
-> +{
-> +	_vdpa_unregister_device(dev);
-> +}
-> +
-> +static const struct vdpa_mgmtdev_ops vdpa_dev_mgmtdev_ops = {
-> +	.dev_add = vdpa_dev_add,
-> +	.dev_del = vdpa_dev_del,
-> +};
-> +
-> +static struct virtio_device_id id_table[] = {
-> +	{ VIRTIO_ID_BLOCK, VIRTIO_DEV_ANY_ID },
-> +	{ 0 },
-> +};
-> +
-> +static struct vdpa_mgmt_dev mgmt_dev = {
-> +	.device = &vduse_mgmtdev,
-> +	.id_table = id_table,
-> +	.ops = &vdpa_dev_mgmtdev_ops,
-> +};
-> +
-> +static int vduse_mgmtdev_init(void)
-> +{
-> +	int ret;
-> +
-> +	ret = device_register(&vduse_mgmtdev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = vdpa_mgmtdev_register(&mgmt_dev);
-> +	if (ret)
-> +		goto err;
-> +
-> +	return 0;
-> +err:
-> +	device_unregister(&vduse_mgmtdev);
-> +	return ret;
-> +}
-> +
-> +static void vduse_mgmtdev_exit(void)
-> +{
-> +	vdpa_mgmtdev_unregister(&mgmt_dev);
-> +	device_unregister(&vduse_mgmtdev);
-> +}
-> +
-> +static int vduse_init(void)
-> +{
-> +	int ret;
-> +	struct device *dev;
-> +
-> +	vduse_class = class_create(THIS_MODULE, "vduse");
-> +	if (IS_ERR(vduse_class))
-> +		return PTR_ERR(vduse_class);
-> +
-> +	vduse_class->devnode = vduse_devnode;
-> +
-> +	ret = alloc_chrdev_region(&vduse_major, 0, VDUSE_DEV_MAX, "vduse");
-> +	if (ret)
-> +		goto err_chardev_region;
-> +
-> +	/* /dev/vduse/control */
-> +	cdev_init(&vduse_ctrl_cdev, &vduse_ctrl_fops);
-> +	vduse_ctrl_cdev.owner = THIS_MODULE;
-> +	ret = cdev_add(&vduse_ctrl_cdev, vduse_major, 1);
-> +	if (ret)
-> +		goto err_ctrl_cdev;
-> +
-> +	dev = device_create(vduse_class, NULL, vduse_major, NULL, "control");
-> +	if (IS_ERR(dev)) {
-> +		ret = PTR_ERR(dev);
-> +		goto err_device;
-> +	}
-> +
-> +	/* /dev/vduse/$DEVICE */
-> +	cdev_init(&vduse_cdev, &vduse_dev_fops);
-> +	vduse_cdev.owner = THIS_MODULE;
-> +	ret = cdev_add(&vduse_cdev, MKDEV(MAJOR(vduse_major), 1),
-> +		       VDUSE_DEV_MAX - 1);
-> +	if (ret)
-> +		goto err_cdev;
-> +
-> +	vduse_irq_wq = alloc_workqueue("vduse-irq",
-> +				WQ_HIGHPRI | WQ_SYSFS | WQ_UNBOUND, 0);
-> +	if (!vduse_irq_wq)
-> +		goto err_wq;
-> +
-> +	ret = vduse_domain_init();
-> +	if (ret)
-> +		goto err_domain;
-> +
-> +	ret = vduse_mgmtdev_init();
-> +	if (ret)
-> +		goto err_mgmtdev;
-> +
-> +	return 0;
-> +err_mgmtdev:
-> +	vduse_domain_exit();
-> +err_domain:
-> +	destroy_workqueue(vduse_irq_wq);
-> +err_wq:
-> +	cdev_del(&vduse_cdev);
-> +err_cdev:
-> +	device_destroy(vduse_class, vduse_major);
-> +err_device:
-> +	cdev_del(&vduse_ctrl_cdev);
-> +err_ctrl_cdev:
-> +	unregister_chrdev_region(vduse_major, VDUSE_DEV_MAX);
-> +err_chardev_region:
-> +	class_destroy(vduse_class);
-> +	return ret;
-> +}
-> +module_init(vduse_init);
-> +
-> +static void vduse_exit(void)
-> +{
-> +	vduse_mgmtdev_exit();
-> +	vduse_domain_exit();
-> +	destroy_workqueue(vduse_irq_wq);
-> +	cdev_del(&vduse_cdev);
-> +	device_destroy(vduse_class, vduse_major);
-> +	cdev_del(&vduse_ctrl_cdev);
-> +	unregister_chrdev_region(vduse_major, VDUSE_DEV_MAX);
-> +	class_destroy(vduse_class);
-> +}
-> +module_exit(vduse_exit);
-> +
-> +MODULE_LICENSE(DRV_LICENSE);
-> +MODULE_AUTHOR(DRV_AUTHOR);
-> +MODULE_DESCRIPTION(DRV_DESC);
-> diff --git a/include/uapi/linux/vduse.h b/include/uapi/linux/vduse.h
-> new file mode 100644
-> index 000000000000..f21b2e51b5c8
-> --- /dev/null
-> +++ b/include/uapi/linux/vduse.h
-> @@ -0,0 +1,143 @@
-> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> +#ifndef _UAPI_VDUSE_H_
-> +#define _UAPI_VDUSE_H_
-> +
-> +#include <linux/types.h>
-> +
-> +#define VDUSE_API_VERSION	0
-> +
-> +#define VDUSE_NAME_MAX	256
-> +
-> +/* the control messages definition for read/write */
-> +
-> +enum vduse_req_type {
-> +	/* Get the state for virtqueue from userspace */
-> +	VDUSE_GET_VQ_STATE,
-> +	/* Notify userspace to start the dataplane, no reply */
-> +	VDUSE_START_DATAPLANE,
-> +	/* Notify userspace to stop the dataplane, no reply */
-> +	VDUSE_STOP_DATAPLANE,
-> +	/* Notify userspace to update the memory mapping in device IOTLB */
-> +	VDUSE_UPDATE_IOTLB,
-> +};
-> +
-> +struct vduse_vq_state {
-> +	__u32 index; /* virtqueue index */
-> +	__u32 avail_idx; /* virtqueue state (last_avail_idx) */
-> +};
-
-
-This needs some tweaks to support packed virtqueue.
-
-
-> +
-> +struct vduse_iova_range {
-> +	__u64 start; /* start of the IOVA range */
-> +	__u64 last; /* end of the IOVA range */
-> +};
-> +
-> +struct vduse_dev_request {
-> +	__u32 type; /* request type */
-> +	__u32 request_id; /* request id */
-> +#define VDUSE_REQ_FLAGS_NO_REPLY	(1 << 0) /* No need to reply */
-> +	__u32 flags; /* request flags */
-> +	__u32 reserved; /* for future use */
-> +	union {
-> +		struct vduse_vq_state vq_state; /* virtqueue state */
-> +		struct vduse_iova_range iova; /* iova range for updating */
-> +		__u32 padding[16]; /* padding */
-> +	};
-> +};
-> +
-> +struct vduse_dev_response {
-> +	__u32 request_id; /* corresponding request id */
-> +#define VDUSE_REQ_RESULT_OK	0x00
-> +#define VDUSE_REQ_RESULT_FAILED	0x01
-> +	__u32 result; /* the result of request */
-> +	__u32 reserved[2]; /* for future use */
-> +	union {
-> +		struct vduse_vq_state vq_state; /* virtqueue state */
-> +		__u32 padding[16]; /* padding */
-> +	};
-> +};
-> +
-> +/* ioctls */
-> +
-> +struct vduse_dev_config {
-> +	char name[VDUSE_NAME_MAX]; /* vduse device name */
-> +	__u32 vendor_id; /* virtio vendor id */
-> +	__u32 device_id; /* virtio device id */
-> +	__u64 features; /* device features */
-> +	__u64 bounce_size; /* bounce buffer size for iommu */
-> +	__u16 vq_size_max; /* the max size of virtqueue */
-> +	__u16 padding; /* padding */
-> +	__u32 vq_num; /* the number of virtqueues */
-> +	__u32 vq_align; /* the allocation alignment of virtqueue's metadata */
-> +	__u32 config_size; /* the size of the configuration space */
-> +	__u32 reserved[15]; /* for future use */
-> +	__u8 config[0]; /* the buffer of the configuration space */
-> +};
-> +
-> +struct vduse_iotlb_entry {
-> +	__u64 offset; /* the mmap offset on fd */
-> +	__u64 start; /* start of the IOVA range */
-> +	__u64 last; /* last of the IOVA range */
-> +#define VDUSE_ACCESS_RO 0x1
-> +#define VDUSE_ACCESS_WO 0x2
-> +#define VDUSE_ACCESS_RW 0x3
-> +	__u8 perm; /* access permission of this range */
-> +};
-> +
-> +struct vduse_config_update {
-> +	__u32 offset; /* offset from the beginning of configuration space */
-> +	__u32 length; /* the length to write to configuration space */
-> +	__u8 buffer[0]; /* buffer used to write from */
-> +};
-> +
-> +struct vduse_vq_info {
-> +	__u32 index; /* virtqueue index */
-> +	__u32 avail_idx; /* virtqueue state (last_avail_idx) */
-> +	__u64 desc_addr; /* address of desc area */
-> +	__u64 driver_addr; /* address of driver area */
-> +	__u64 device_addr; /* address of device area */
-> +	__u32 num; /* the size of virtqueue */
-> +	__u8 ready; /* ready status of virtqueue */
-> +};
-> +
-> +struct vduse_vq_eventfd {
-> +	__u32 index; /* virtqueue index */
-> +#define VDUSE_EVENTFD_DEASSIGN -1
-> +	int fd; /* eventfd, -1 means de-assigning the eventfd */
-> +};
-> +
-> +#define VDUSE_BASE	0x81
-> +
-> +/* Get the version of VDUSE API. This is used for future extension */
-> +#define VDUSE_GET_API_VERSION	_IOR(VDUSE_BASE, 0x00, __u64)
-> +
-> +/* Set the version of VDUSE API. */
-> +#define VDUSE_SET_API_VERSION	_IOW(VDUSE_BASE, 0x01, __u64)
-> +
-> +/* Create a vduse device which is represented by a char device (/dev/vduse/<name>) */
-> +#define VDUSE_CREATE_DEV	_IOW(VDUSE_BASE, 0x02, struct vduse_dev_config)
-> +
-> +/* Destroy a vduse device. Make sure there are no references to the char device */
-> +#define VDUSE_DESTROY_DEV	_IOW(VDUSE_BASE, 0x03, char[VDUSE_NAME_MAX])
-> +
-> +/*
-> + * Get a file descriptor for the first overlapped iova region,
-> + * -EINVAL means the iova region doesn't exist.
-> + */
-> +#define VDUSE_IOTLB_GET_FD	_IOWR(VDUSE_BASE, 0x04, struct vduse_iotlb_entry)
-> +
-> +/* Get the negotiated features */
-> +#define VDUSE_DEV_GET_FEATURES	_IOR(VDUSE_BASE, 0x05, __u64)
-> +
-> +/* Update the configuration space */
-> +#define VDUSE_DEV_UPDATE_CONFIG	_IOW(VDUSE_BASE, 0x06, struct vduse_config_update)
-> +
-> +/* Get the specified virtqueue's information */
-> +#define VDUSE_VQ_GET_INFO	_IOWR(VDUSE_BASE, 0x07, struct vduse_vq_info)
-> +
-> +/* Setup an eventfd to receive kick for virtqueue */
-> +#define VDUSE_VQ_SETUP_KICKFD	_IOW(VDUSE_BASE, 0x08, struct vduse_vq_eventfd)
-> +
-> +/* Inject an interrupt for specific virtqueue */
-> +#define VDUSE_VQ_INJECT_IRQ	_IOW(VDUSE_BASE, 0x09, __u32)
-> +
-> +#endif /* _UAPI_VDUSE_H_ */
+-- 
+2.32.0
 
