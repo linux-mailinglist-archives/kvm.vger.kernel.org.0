@@ -2,147 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D0A2F3AF15B
-	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 19:06:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7897B3AF16F
+	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 19:08:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231349AbhFURIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Jun 2021 13:08:14 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42882 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230056AbhFURIJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 21 Jun 2021 13:08:09 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15LH4Wt9155774;
-        Mon, 21 Jun 2021 13:05:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=o8wMvApiow6Zn5Y2v41+NZF8QNWxGVvu1MeLNe4pPLE=;
- b=XxZHApvNlYxDYeg6b302oVDGy6AqPV9Z1StDDIB/kjdFaujjS9eu9EFd0hKxj5AYVgmA
- iAVuNvJ0sRS45N+YK1lVihToNnlNiFIe+WiOiVxkyZgkG4+MO91I8dDaOepoephIgeBm
- 0tf2em+Z3JSP91Y1wj4GhtwpPvrRzUF+xvsYHfN+eZjhRx6z+CgAIDHQ3keZ/Rh6ByqW
- zFTc9W1hFW9W0l3DWv0WldkugrkUbEbTdZ5dOnlg7S6tQbdvgsjgUbUyIer5N+jAWWYB
- 2rAJO7w01JQ2aZlaEL9q/m7sk/DDZzWFow+xlQthBJq4yWSV3vw6rS5unjQHRnHBG7L5 uw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39aup3q0am-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Jun 2021 13:05:54 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15LH4eRJ156570;
-        Mon, 21 Jun 2021 13:05:54 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39aup3q0a2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Jun 2021 13:05:53 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15LH4i2o021544;
-        Mon, 21 Jun 2021 17:05:52 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04ams.nl.ibm.com with ESMTP id 3998789101-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Jun 2021 17:05:52 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15LH5n3M21823890
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 21 Jun 2021 17:05:49 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 427ED52069;
-        Mon, 21 Jun 2021 17:05:49 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.171.79.141])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 36A7652078;
-        Mon, 21 Jun 2021 17:05:48 +0000 (GMT)
-Subject: Re: [PATCH] virtio/s390: get rid of open-coded kvm hypercall
-To:     Heiko Carstens <hca@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Cc:     Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20210621144522.1304273-1-hca@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <410630b4-589d-cc35-a31f-9af9de93ec01@de.ibm.com>
-Date:   Mon, 21 Jun 2021 19:05:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S231148AbhFURKe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Jun 2021 13:10:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38450 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230469AbhFURKd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Jun 2021 13:10:33 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B85DCC061756
+        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 10:08:18 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id m17so5747340plx.7
+        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 10:08:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=GoxSCKJLN3ao+jAyYEtlEkr/xldmKtHQCJtNY7NrOWY=;
+        b=FioMSdx5swYgNtCcKYBAv0NM37OT2BVbfDNQ5Qz2acE/Yei7Ish73AogIu2wEJcgA4
+         YW+60HAPnm0BLHa34ObbdTUm4ZTz7S/y/z+qANPLBJbReaxh8JaIGvv4hw88POfxKaot
+         FGI01/eiT3reQ4d6hPku7M1lMmp1WXilHk+Jtf/JY5Y72JKcbEEeaf9+5UpMnnwbnvN+
+         uORm0QWAzGlb3J0V+9otbtx3SKByrXIsm15VHBXuzFD9FfJoQ8nANXVBZUJmILkw+Xkc
+         ywZlmljDaC75R6jHo3QJA/N1ovSOxIqagyBfn40NKfNVuM+Ul5XkGyohPe+WJbSIHSsK
+         pEiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=GoxSCKJLN3ao+jAyYEtlEkr/xldmKtHQCJtNY7NrOWY=;
+        b=Ha1UOjd94z4YQKl5vnoL2JrwGYFQ099W8IVKEDXKq7IfZE4oplhjOrFF/BVyMAgoQd
+         Dh+8Zcmbr/sxOy+wYoLn4IohutG/Xdkk07MggSEguLGmC0mzALtKf3pyPSMMJaHe88hQ
+         pp8s+0Dgn2qzvsOVNwJjdotUtEmNM2rH8q1I4PUS4OXLntwGtCp0iVIwCkbK8Lhuy/zf
+         9e7N+Mw1eqZj7vh2qq4Hh9+/Ujo59L3mL3PfBW2F4u95X1Tgq89ekXL/kYn0zjZeOWzv
+         6o0vjrtDd865pX8/Ixgu0IB0NxDO4lgMdxoDbtSwx86iKb/yMsmOCFi3bmFgLfS/L2R7
+         jE7A==
+X-Gm-Message-State: AOAM532jkyZnGWLuEG6kqh83jkbq+JAfI9L052/+grhenkqXk0WoGLk8
+        ZGQFDS6+Y7z3zecM58dMfMA0FA==
+X-Google-Smtp-Source: ABdhPJzs1GMXbV/9bDzOq/0KurNzolqKa0kZjFW70lSkHjwYFdMFkeFqj7vl2N1jED50glItzmU5FQ==
+X-Received: by 2002:a17:90b:3e89:: with SMTP id rj9mr27646029pjb.114.1624295298050;
+        Mon, 21 Jun 2021 10:08:18 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id q24sm17709726pgk.32.2021.06.21.10.08.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Jun 2021 10:08:17 -0700 (PDT)
+Date:   Mon, 21 Jun 2021 17:08:13 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: nVMX: Dynamically compute max VMCS index for vmcs12
+Message-ID: <YNDHfX0cntj72sk6@google.com>
+References: <20210618214658.2700765-1-seanjc@google.com>
+ <c847e00a-e422-cdc9-3317-fbbd82b6e418@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210621144522.1304273-1-hca@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: S3IGO6cOwp8wKAPKlQDUu6vL0C3gJz1r
-X-Proofpoint-GUID: iuB3PKU47DaHWagxWNx8VS6OIZe02hM7
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-06-21_06:2021-06-21,2021-06-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- mlxlogscore=999 suspectscore=0 adultscore=0 phishscore=0 malwarescore=0
- bulkscore=0 clxscore=1015 spamscore=0 mlxscore=0 lowpriorityscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106210097
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c847e00a-e422-cdc9-3317-fbbd82b6e418@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21.06.21 16:45, Heiko Carstens wrote:
-> do_kvm_notify() and __do_kvm_notify() are an (exact) open-coded variant
-> of kvm_hypercall3(). Therefore simply make use of kvm_hypercall3(),
-> and get rid of duplicated code.
+On Mon, Jun 21, 2021, Paolo Bonzini wrote:
+> On 18/06/21 23:46, Sean Christopherson wrote:
+> > Calculate the max VMCS index for vmcs12 by walking the array to find the
+> > actual max index.  Hardcoding the index is prone to bitrot, and the
+> > calculation is only done on KVM bringup (albeit on every CPU, but there
+> > aren't _that_ many null entries in the array).
+> > 
+> > Fixes: 3c0f99366e34 ("KVM: nVMX: Add a TSC multiplier field in VMCS12")
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> > 
+> > Note, the vmx test in kvm-unit-tests will still fail using stock QEMU,
+> > as QEMU also hardcodes and overwrites the MSR.  The test passes if I
+> > hack KVM to ignore userspace (it was easier than rebuilding QEMU).
 > 
-> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
-> ---
->   drivers/s390/virtio/virtio_ccw.c | 30 ++++--------------------------
->   1 file changed, 4 insertions(+), 26 deletions(-)
+> Queued, thanks.  Without having checked the kvm-unit-tests sources very
+> thoroughly, this might be a configuration issue in kvm-unit-tests; in theory
+> "-cpu host" (unlike "-cpu host,migratable=no") should not enable TSC
+> scaling.
 
-Certainly a nice improvement in terms of LOCs.
+As noted in the code comments, KVM allows VMREAD/VMWRITE to all defined fields,
+whether or not the field should actually exist for the vCPU model doesn't enter
+into the equation.  That's technically wrong as there are a number of fields
+that the SDM explicitly states exist iff a certain feature is supported.  To fix
+that we'd need to add a "feature flag" to vmcs_field_to_offset_table that is
+checked against the vCPU model, though updating the MSR would probably fall onto
+userspace's shoulders?
 
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+And FWIW, this is the QEMU code:
 
-  
-> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-> index 54e686dca6de..d35e7a3f7067 100644
-> --- a/drivers/s390/virtio/virtio_ccw.c
-> +++ b/drivers/s390/virtio/virtio_ccw.c
-> @@ -388,31 +388,6 @@ static void virtio_ccw_drop_indicator(struct virtio_ccw_device *vcdev,
->   	ccw_device_dma_free(vcdev->cdev, thinint_area, sizeof(*thinint_area));
->   }
->   
-> -static inline long __do_kvm_notify(struct subchannel_id schid,
-> -				   unsigned long queue_index,
-> -				   long cookie)
-> -{
-> -	register unsigned long __nr asm("1") = KVM_S390_VIRTIO_CCW_NOTIFY;
-> -	register struct subchannel_id __schid asm("2") = schid;
-> -	register unsigned long __index asm("3") = queue_index;
-> -	register long __rc asm("2");
-> -	register long __cookie asm("4") = cookie;
-> -
-> -	asm volatile ("diag 2,4,0x500\n"
-> -		      : "=d" (__rc) : "d" (__nr), "d" (__schid), "d" (__index),
-> -		      "d"(__cookie)
-> -		      : "memory", "cc");
-> -	return __rc;
-> -}
-> -
-> -static inline long do_kvm_notify(struct subchannel_id schid,
-> -				 unsigned long queue_index,
-> -				 long cookie)
-> -{
-> -	diag_stat_inc(DIAG_STAT_X500);
-> -	return __do_kvm_notify(schid, queue_index, cookie);
-> -}
-> -
->   static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
->   {
->   	struct virtio_ccw_vq_info *info = vq->priv;
-> @@ -421,7 +396,10 @@ static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
->   
->   	vcdev = to_vc_device(info->vq->vdev);
->   	ccw_device_get_schid(vcdev->cdev, &schid);
-> -	info->cookie = do_kvm_notify(schid, vq->index, info->cookie);
-> +	BUILD_BUG_ON(sizeof(struct subchannel_id) != sizeof(unsigned int));
-> +	info->cookie = kvm_hypercall3(KVM_S390_VIRTIO_CCW_NOTIFY,
-> +				      *((unsigned int *)&schid),
-> +				      vq->index, info->cookie);
-   	if (info->cookie < 0)
->   		return false;
->   	return true;
-> 
+  #define VMCS12_MAX_FIELD_INDEX (0x17)
+
+  static void kvm_msr_entry_add_vmx(X86CPU *cpu, FeatureWordArray f)
+  {
+      ...
+
+      /*
+       * Just to be safe, write these with constant values.  The CRn_FIXED1
+       * MSRs are generated by KVM based on the vCPU's CPUID.
+       */
+      kvm_msr_entry_add(cpu, MSR_IA32_VMX_CR0_FIXED0,
+                        CR0_PE_MASK | CR0_PG_MASK | CR0_NE_MASK);
+      kvm_msr_entry_add(cpu, MSR_IA32_VMX_CR4_FIXED0,
+                        CR4_VMXE_MASK);
+      kvm_msr_entry_add(cpu, MSR_IA32_VMX_VMCS_ENUM,
+                        VMCS12_MAX_FIELD_INDEX << 1);
+  }
+
