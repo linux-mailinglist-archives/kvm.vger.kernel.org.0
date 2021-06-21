@@ -2,93 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 78DFE3AECA0
-	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 17:39:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4FF23AECC8
+	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 17:51:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230161AbhFUPmL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Jun 2021 11:42:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46760 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229837AbhFUPmL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Jun 2021 11:42:11 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA63AC061574
-        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 08:39:56 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id m14so2881589edp.9
-        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 08:39:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=oLRhhhShTuwh+hyxDOfuOUG3kN6JTKhoqPpqYogQPwc=;
-        b=Q0nO6k1nqvxTXXYqFjyrZMjCxcOTkq2hY+D96d9Evk/BHV2KzfUDFBJQWgPWQMxaOA
-         OixSvjbz8yO8NPoCeLcyXpp/r7noFci5FeFmxegSV6TB9x6l7yzHYtI9u4bcwVnys0fs
-         hJIgvAzw0Or9gKDFEGhTVIPhF396aLB+fl3F1PVdQWPnUMytb4JtoQNASvuLU3FBv80K
-         8EL7lf3FoikRIUTEmpXdPCqro08nhQCmjFClLmQ+Yr8kUSvPtTnAmCVHDgLAscrTfctn
-         bJyo9uatFPn7WPW24Xn8dJCJlSmC3kHvW5xuQ8NDq4biVibTjv8RKHi1oleT8RTIMxyg
-         Y3Gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=oLRhhhShTuwh+hyxDOfuOUG3kN6JTKhoqPpqYogQPwc=;
-        b=cCwvcHShV2/07Epj0GROMvqPvsNioSZMpSYnhSfLDx3S1A66mnxYtgb/rESxz8i1/h
-         MeTQy5v1NAkh9BgehHxSBZ017Xf8kEMvN9ZXttwVEX9Tx5k4flrrE2l8BmffFAgxXFo5
-         oVz+SQusjcTZjZ7nUgXRTw7pzmm1QdJ3oob0NHU4GUCw3v3KEM0yjIAy688Lz/n2sC3K
-         8+PUsZii8nye/rsk1pmf9YbneGkxDLPJIBnNxj4XVcLWuTMtTMe4awDmRTv3fV7GsMzF
-         Gn/LdueKgPMQ7EcnOv3i8Gz8FcA8w15Q8i+jw3JX1rgrmVMC4yDDiXFk+lOHyXdfQXA7
-         +fzQ==
-X-Gm-Message-State: AOAM530hyqW52Le5jN2PnWtiF5Q0X3cY3AERD3xwnbk/0AKu3hwCsz4p
-        KiVYqywyS+RMbreKz+aB85PdjqLSLJ/vVP+UXm4=
-X-Google-Smtp-Source: ABdhPJwbYDj9OYrRY4jVDAYn99csNJPNfUMRVDbBVYzKK8yL/OI9XHywbZNgde7I+tY6Ag7gPpzZ5g==
-X-Received: by 2002:a50:9b06:: with SMTP id o6mr22686198edi.284.1624289995515;
-        Mon, 21 Jun 2021 08:39:55 -0700 (PDT)
-Received: from laral.fritz.box (200116b82b183200057523d5827ff379.dip.versatel-1u1.de. [2001:16b8:2b18:3200:575:23d5:827f:f379])
-        by smtp.gmail.com with ESMTPSA id f5sm4912177ejj.45.2021.06.21.08.39.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Jun 2021 08:39:55 -0700 (PDT)
-From:   Lara Lazier <laramglazier@gmail.com>
-To:     kvm@vger.kernel.org
-Cc:     Lara Lazier <laramglazier@gmail.com>
-Subject: [PATCH v2 kvm-unit-tests] svm: Updated cr4 in test_efer to fix report msg
-Date:   Mon, 21 Jun 2021 17:39:25 +0200
-Message-Id: <20210621153925.31375-1-laramglazier@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        id S230205AbhFUPxP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Jun 2021 11:53:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31665 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230028AbhFUPxP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Jun 2021 11:53:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624290660;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+3fpGGBW89ECTriAWpeGj89OnKVQUE/HNB3VmaOd6TQ=;
+        b=R1PBhrAr7WdAeO2h+T1SMLNCXJKgMrXwo24vLbpGMzLf7s9CS8b6+UB+UwAeLnsz1C2jsV
+        zqYK/AlCwjsxCRoN/eTEJYZuVKYY6yodzvBKxnzraSFSgLB3vrKmKKyJBygYw8F5js4Tvd
+        ieVuL/KKMWe4dgIv9vSd05mCRmbX0po=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-71-4yYly-hLMBmxrw0iNxqHcw-1; Mon, 21 Jun 2021 11:50:59 -0400
+X-MC-Unique: 4yYly-hLMBmxrw0iNxqHcw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96865653;
+        Mon, 21 Jun 2021 15:50:57 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-99.ams2.redhat.com [10.36.112.99])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E85DB60C9D;
+        Mon, 21 Jun 2021 15:50:56 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+        id 7EEDB112D587; Mon, 21 Jun 2021 17:50:55 +0200 (CEST)
+From:   Markus Armbruster <armbru@redhat.com>
+To:     Eduardo Habkost <ehabkost@redhat.com>
+Cc:     Claudio Fontana <cfontana@suse.de>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org,
+        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
+        Denis Lunev <den@openvz.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH v9] qapi: introduce 'query-kvm-cpuid' action
+References: <20210617074919.GA998232@dhcp-172-16-24-191.sw.ru>
+        <87a6no3fzf.fsf@dusky.pond.sub.org>
+        <790d22e1-5de9-ba20-6c03-415b62223d7d@suse.de>
+        <877dis1sue.fsf@dusky.pond.sub.org>
+        <20210617153949.GA357@dhcp-172-16-24-191.sw.ru>
+        <e69ea2b4-21cc-8203-ad2d-10a0f4ffe34a@suse.de>
+        <20210617165111.eu3x2pvinpoedsqj@habkost.net>
+        <87sg1fwwgg.fsf@dusky.pond.sub.org>
+        <20210618204006.k6krwuz2lpxvb6uh@habkost.net>
+        <6f644bbb-52ff-4d79-36bb-208c6b6c4eef@suse.de>
+        <20210621142329.atlhrovqkblbjwgh@habkost.net>
+Date:   Mon, 21 Jun 2021 17:50:55 +0200
+In-Reply-To: <20210621142329.atlhrovqkblbjwgh@habkost.net> (Eduardo Habkost's
+        message of "Mon, 21 Jun 2021 10:23:29 -0400")
+Message-ID: <874kdrkyhs.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Updated cr4 so that cr4 and vmcb->save.cr4 are the same
-and the report statement prints out the correct cr4.
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-v1->v2: moved the assignment to vmcb->save.cr4 back to the previous test
-as described in the comment.
+> On Mon, Jun 21, 2021 at 10:07:44AM +0200, Claudio Fontana wrote:
+>> On 6/18/21 10:40 PM, Eduardo Habkost wrote:
+>> > On Fri, Jun 18, 2021 at 07:52:47AM +0200, Markus Armbruster wrote:
+>> >> Eduardo Habkost <ehabkost@redhat.com> writes:
+>> >>
+>> >>> On Thu, Jun 17, 2021 at 05:53:11PM +0200, Claudio Fontana wrote:
+>> >>>> On 6/17/21 5:39 PM, Valeriy Vdovin wrote:
+>> >>>>> On Thu, Jun 17, 2021 at 04:14:17PM +0200, Markus Armbruster wrote:
+>> >>>>>> Claudio Fontana <cfontana@suse.de> writes:
+>> >>>>>>
+>> >>>>>>> On 6/17/21 1:09 PM, Markus Armbruster wrote:
+>> >>
+>> >> [...]
+>> >>
+>> >>>>>>>> If it just isn't implemented for anything but KVM, then putting "kvm"
+>> >>>>>>>> into the command name is a bad idea.  Also, the commit message should
+>> >>>>>>>> briefly note the restriction to KVM.
+>> >>>>>>
+>> >>>>>> Perhaps this one is closer to reality.
+>> >>>>>>
+>> >>>>> I agree.
+>> >>>>> What command name do you suggest?
+>> >>>>
+>> >>>> query-exposed-cpuid?
+>> >>>
+>> >>> Pasting the reply I sent at [1]:
+>> >>>
+>> >>>   I don't really mind how the command is called, but I would prefer
+>> >>>   to add a more complex abstraction only if maintainers of other
+>> >>>   accelerators are interested and volunteer to provide similar
+>> >>>   functionality.  I don't want to introduce complexity for use
+>> >>>   cases that may not even exist.
+>> >>>
+>> >>> I'm expecting this to be just a debugging mechanism, not a stable
+>> >>> API to be maintained and supported for decades.  (Maybe a "x-"
+>> >>> prefix should be added to indicate that?)
+>> >>>
+>> >>> [1] https://lore.kernel.org/qemu-devel/20210602204604.crsxvqixkkll4ef4@habkost.net
+>> >>
+>> >> x-query-x86_64-cpuid?
+>> >>
+>> > 
+>> > Unless somebody wants to spend time designing a generic
+>> > abstraction around this (and justify the extra complexity), this
+>> > is a KVM-specific command.  Is there a reason to avoid "kvm" in
+>> > the command name?
+>> > 
+>> 
+>> If the point of all of this is "please get me the cpuid, as seen by the guest", then I fail to see how this should be kvm-only.
+>> We can still return "not implemented" of some kind for HVF, TCG etc.
+>> 
+>> But maybe I misread the use case?
+>
+> A generic interface would require additional glue to connect the
+> generic code to the accel-specific implementation.  I'm trying to
+> avoid wasting everybody's time with the extra complexity unless
+> necessary.
 
-Signed-off-by: Lara Lazier <laramglazier@gmail.com>
----
- x86/svm_tests.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+If I read the patch correctly, the *interface* is specific to x86_64,
+but not to any accelerator.  It's *implemented* only for KVM, though.
+Is that correct?
 
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index 8387bea..824c856 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -2251,8 +2251,12 @@ static void test_efer(void)
- 
- 	/*
- 	 * EFER.LME and CR0.PG are both set and CR0.PE is zero.
-+	 * CR4.PAE needs to be set as we otherwise cannot
-+	 * determine if CR4.PAE=0 or CR0.PE=0 triggered the
-+	 * SVM_EXIT_ERR.
- 	 */
--	vmcb->save.cr4 = cr4_saved | X86_CR4_PAE;
-+	cr4 = cr4_saved | X86_CR4_PAE;
-+	vmcb->save.cr4 = cr4;
- 	cr0 &= ~X86_CR0_PE;
- 	vmcb->save.cr0 = cr0;
- 	report(svm_vmrun() == SVM_EXIT_ERR, "EFER.LME=1 (%lx), "
--- 
-2.25.1
+> But if you all believe the extra complexity is worth it, I won't
+> object.
+
+I'm not arguing for a complete implementation now.
+
+I think the command name is a matter of taste.
+
+The command exists only if defined(TARGET_I386).  Putting -x86_64- or
+similar in the name isn't strictly required, but why not.  Maybe just
+-x86-.
+
+Putting -kvm- in the name signals (1) the command works only with KVM,
+and (2) we don't intend to make it work with other accelerators.  If we
+later decide to make it work with other accelerators, we get to rename
+the command.
+
+Not putting -kvm- in the name doesn't commit us to anything.
+
+Either way, the command exists and fails when defined(CONFIG_KVM) and
+accel!=kvm.
+
+Aside: I think having the command depend on defined(CONFIG_KVM)
+accomplishes nothing but enlarging the test matrix:
+
+    defined(CONFIG_KVM) and accel=kvm   command exists and works
+    defined(CONFIG_KVM) and accel!=kvm  command exists and fails
+    !defined(CONFIG_KVM)                command does not exist
+
+Simpler:
+
+    accel=kvm                           command exists and works
+    accel!=kvm                          command exists and fails
 
