@@ -2,264 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 61AF73AF113
-	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 18:55:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0A2F3AF15B
+	for <lists+kvm@lfdr.de>; Mon, 21 Jun 2021 19:06:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232354AbhFUQ5g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Jun 2021 12:57:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26973 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233252AbhFUQ40 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 21 Jun 2021 12:56:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624294451;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=V6zZE8akrhvGvHpQPlV5MKIUMKjEzy8+Ripv6n6JNYY=;
-        b=fW7Mo9ND6ub6LGGRCgjSbkynPZkdJMzMIn8TAqO1PQkzFlHKocC5Nn5Mu7g3++x3uH9z+D
-        3Rl3MX97V9+VxByKgss24c+vinxjtj9qVuF5UHCAHINlf9t/yJvIxqUmjrBZyIeuFKQ5ce
-        gKqdxupMIZbmYIrXBJQyqhTKwDEI2VY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-556--PBKW3zgMK2tGXD0DN9N9w-1; Mon, 21 Jun 2021 12:54:09 -0400
-X-MC-Unique: -PBKW3zgMK2tGXD0DN9N9w-1
-Received: by mail-wm1-f69.google.com with SMTP id j2-20020a05600c1c02b02901cecbe55d49so1841061wms.3
-        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 09:54:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=V6zZE8akrhvGvHpQPlV5MKIUMKjEzy8+Ripv6n6JNYY=;
-        b=Id4iK+rV/rKd6BQVWBYcGOqNnwp0tfh/RpG7RkhwfdVZd334q79+h8V/z1fkz0WgTv
-         YywS05qQST0tpwpZ20hti2z7m7HpZWy5ZOn7IBfCtUYFnDAjVRJMqpn674L3pCTCVSmX
-         KwYmCF5S3ytjh/atgk2cVdEYu4FwPHS+/76IZy7JkQ+FBII3TPedp0vth3JjKGEGT9My
-         zyc4T1vXfqRfE2mYJjEVNw/ylFzKQboM1igPkhTt6/SZN/9m68niPwAFF9AXbiM2C2Ey
-         aq+/04oxBC8RX9Ik7fCIZ1EiD5U5vr4jbY0sqZJxQekG793UExdUMMnJQWU68d8oNH0a
-         ooDg==
-X-Gm-Message-State: AOAM530b6r6kq+a1dG+DqQMdaDXMMQUlIffC+bT2u/AkgzLOLUelhdr9
-        ydBXMMcMsMIsnY9sKd8/UI23jbIKi8YywkeLz/b90nTvmlmFTdFWxGziOotaLODtK9QNEYMrOnk
-        F3FQ2rwg3akJh
-X-Received: by 2002:adf:c790:: with SMTP id l16mr30126542wrg.121.1624294448700;
-        Mon, 21 Jun 2021 09:54:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyFGKeK1C9aLsbZ5fRG1HBzWUJ6GrPEryjqbjN7Js4Yi7goQyQWGV98j24oQrMV7cmBtu0WdQ==
-X-Received: by 2002:adf:c790:: with SMTP id l16mr30126528wrg.121.1624294448496;
-        Mon, 21 Jun 2021 09:54:08 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id p11sm8468508wre.57.2021.06.21.09.54.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Jun 2021 09:54:07 -0700 (PDT)
-To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        LinuxS390 <linux-s390@vger.kernel.org>,
-        Linuxkselftest <linux-kselftest@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
+        id S231349AbhFURIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Jun 2021 13:08:14 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42882 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230056AbhFURIJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Jun 2021 13:08:09 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15LH4Wt9155774;
+        Mon, 21 Jun 2021 13:05:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=o8wMvApiow6Zn5Y2v41+NZF8QNWxGVvu1MeLNe4pPLE=;
+ b=XxZHApvNlYxDYeg6b302oVDGy6AqPV9Z1StDDIB/kjdFaujjS9eu9EFd0hKxj5AYVgmA
+ iAVuNvJ0sRS45N+YK1lVihToNnlNiFIe+WiOiVxkyZgkG4+MO91I8dDaOepoephIgeBm
+ 0tf2em+Z3JSP91Y1wj4GhtwpPvrRzUF+xvsYHfN+eZjhRx6z+CgAIDHQ3keZ/Rh6ByqW
+ zFTc9W1hFW9W0l3DWv0WldkugrkUbEbTdZ5dOnlg7S6tQbdvgsjgUbUyIer5N+jAWWYB
+ 2rAJO7w01JQ2aZlaEL9q/m7sk/DDZzWFow+xlQthBJq4yWSV3vw6rS5unjQHRnHBG7L5 uw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39aup3q0am-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Jun 2021 13:05:54 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15LH4eRJ156570;
+        Mon, 21 Jun 2021 13:05:54 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39aup3q0a2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Jun 2021 13:05:53 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15LH4i2o021544;
+        Mon, 21 Jun 2021 17:05:52 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04ams.nl.ibm.com with ESMTP id 3998789101-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Jun 2021 17:05:52 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15LH5n3M21823890
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 21 Jun 2021 17:05:49 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 427ED52069;
+        Mon, 21 Jun 2021 17:05:49 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.79.141])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 36A7652078;
+        Mon, 21 Jun 2021 17:05:48 +0000 (GMT)
+Subject: Re: [PATCH] virtio/s390: get rid of open-coded kvm hypercall
+To:     Heiko Carstens <hca@linux.ibm.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Fuad Tabba <tabba@google.com>,
-        Greg KH <gregkh@linuxfoundation.org>
-References: <20210618222709.1858088-1-jingzhangos@google.com>
- <20210618222709.1858088-3-jingzhangos@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v12 2/7] KVM: stats: Add fd-based API to read binary stats
- data
-Message-ID: <0cde024e-a234-9a10-5157-d17ba423939e@redhat.com>
-Date:   Mon, 21 Jun 2021 18:54:06 +0200
+        Halil Pasic <pasic@linux.ibm.com>
+Cc:     Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20210621144522.1304273-1-hca@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <410630b4-589d-cc35-a31f-9af9de93ec01@de.ibm.com>
+Date:   Mon, 21 Jun 2021 19:05:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210618222709.1858088-3-jingzhangos@google.com>
+In-Reply-To: <20210621144522.1304273-1-hca@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: S3IGO6cOwp8wKAPKlQDUu6vL0C3gJz1r
+X-Proofpoint-GUID: iuB3PKU47DaHWagxWNx8VS6OIZe02hM7
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-06-21_06:2021-06-21,2021-06-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ mlxlogscore=999 suspectscore=0 adultscore=0 phishscore=0 malwarescore=0
+ bulkscore=0 clxscore=1015 spamscore=0 mlxscore=0 lowpriorityscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106210097
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/06/21 00:27, Jing Zhang wrote:
-> +/**
-> + * kvm_stats_read() - Common vm/vcpu stats read function to userspace.
+On 21.06.21 16:45, Heiko Carstens wrote:
+> do_kvm_notify() and __do_kvm_notify() are an (exact) open-coded variant
+> of kvm_hypercall3(). Therefore simply make use of kvm_hypercall3(),
+> and get rid of duplicated code.
+> 
+> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
+> ---
+>   drivers/s390/virtio/virtio_ccw.c | 30 ++++--------------------------
+>   1 file changed, 4 insertions(+), 26 deletions(-)
 
-Common function to read from the binary statistics file descriptor.
+Certainly a nice improvement in terms of LOCs.
 
-> + * @id: identification string of the stats
-> + * @header: stats header for a vm or a vcpu
-> + * @desc: start address of an array of stats descriptors for a vm or a vcpu
-> + * @stats: start address of stats data block for a vm or a vcpu
-> + * @size_stats: the size of stats data block pointed by @stats
-> + * @user_buffer: start address of userspace buffer
-> + * @size: requested read size from userspace
-> + * @offset: the start position from which the content will be read for the
-> + *          corresponding vm or vcp file descriptor
-> + *
-> + * The file content of a vm/vcpu file descriptor is now defined as below:
-> + * +-------------+
-> + * |   Header    |
-> + * +-------------+
-> + * |  id string  |
-> + * +-------------+
-> + * | Descriptors |
-> + * +-------------+
-> + * | Stats Data  |
-> + * +-------------+
-> + * Although this function allows userspace to read any amount of data (as long
-> + * as in the limit) from any position, the typical usage would follow below
-> + * steps:
-> + * 1. Read header from offset 0. Get the offset of descriptors and stats data
-> + *    and some other necessary information. This is a one-time work for the
-> + *    lifecycle of the corresponding vm/vcpu stats fd.
-> + * 2. Read id string from its offset. This is a one-time work for the lifecycle
-> + *    of the corresponding vm/vcpu stats fd.
-> + * 3. Read descriptors from its offset and discover all the stats by parsing
-> + *    descriptors. This is a one-time work for the lifecycle of the
-> + *    corresponding vm/vcpu stats fd.
-> + * 4. Periodically read stats data from its offset using pread.
-> + *
-> + * Return: the number of bytes that has been successfully read
-> + */
-> +ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
-> +		       const struct _kvm_stats_desc *desc,
-> +		       void *stats, size_t size_stats,
-> +		       char __user *user_buffer, size_t size, loff_t *offset)
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
-
-You can replace the header argument with just the number of descriptors, 
-and then construct the header in the "if" statement below that copies it 
-to userspace:
-
-const struct kvm_stats_header kvm_vm_stats_header = {
-	.name_size = KVM_STATS_NAME_SIZE,
-	.num_desc = num_desc,
-	.id_offset = size_header,
-	.desc_offset = size_header + KVM_STATS_NAME_SIZE,
-	.data_offset = size_header + KVM_STATS_NAME_SIZE +
-		       size_desc,
-};
-
-Of course size_header can be assigned with sizeof (struct kvm_stats_header).
-
-This removes the definition of the header in each architecture.
-
-Paolo
-
-> +{
-> +	ssize_t len;
-> +	ssize_t copylen;
-> +	ssize_t remain = size;
-> +	size_t size_desc;
-> +	size_t size_header;
-> +	void *src;
-> +	loff_t pos = *offset;
-> +	char __user *dest = user_buffer;
-> +
-> +	size_header = sizeof(*header);
-> +	size_desc = header->num_desc * sizeof(*desc);
-> +
-> +	len = KVM_STATS_NAME_SIZE + size_header + size_desc + size_stats - pos;
-> +	len = min(len, remain);
-> +	if (len <= 0)
-> +		return 0;
-> +	remain = len;
-> +
-> +	/*
-> +	 * Copy kvm stats header.
-> +	 * The header is the first block of content userspace usually read out.
-> +	 * The pos is 0 and the copylen and remain would be the size of header.
-> +	 * The copy of the header would be skipped if offset is larger than the
-> +	 * size of header. That usually happens when userspace reads stats
-> +	 * descriptors and stats data.
-> +	 */
-> +	copylen = size_header - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = (void *)header + pos;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-> +
-> +	/*
-> +	 * Copy kvm stats header id string.
-> +	 * The id string is unique for every vm/vcpu, which is stored in kvm
-> +	 * and kvm_vcpu structure.
-> +	 * The id string is part of the stat header from the perspective of
-> +	 * userspace, it is usually read out together with previous constant
-> +	 * header part and could be skipped for later descriptors and stats
-> +	 * data readings.
-> +	 */
-> +	copylen = size_header + KVM_STATS_NAME_SIZE - pos;
-
-Should use header->id_offset instead of size_header here and in the 
-computation of src.
-
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = id + pos - size_header;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-> +
-> +	/*
-> +	 * Copy kvm stats descriptors.
-> +	 * The descriptors copy would be skipped in the typical case that
-> +	 * userspace periodically read stats data, since the pos would be
-> +	 * greater than the end address of descriptors
-> +	 * (header->header.desc_offset + size_desc) causing copylen <= 0.
-> +	 */
-> +	copylen = header->desc_offset + size_desc - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = (void *)desc + pos - header->desc_offset;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-> +
-> +	/* Copy kvm stats values */
-> +	copylen = header->data_offset + size_stats - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = stats + pos - header->data_offset;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-> +
-> +	*offset = pos;
-> +	return len;
-> +}
-
+  
+> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> index 54e686dca6de..d35e7a3f7067 100644
+> --- a/drivers/s390/virtio/virtio_ccw.c
+> +++ b/drivers/s390/virtio/virtio_ccw.c
+> @@ -388,31 +388,6 @@ static void virtio_ccw_drop_indicator(struct virtio_ccw_device *vcdev,
+>   	ccw_device_dma_free(vcdev->cdev, thinint_area, sizeof(*thinint_area));
+>   }
+>   
+> -static inline long __do_kvm_notify(struct subchannel_id schid,
+> -				   unsigned long queue_index,
+> -				   long cookie)
+> -{
+> -	register unsigned long __nr asm("1") = KVM_S390_VIRTIO_CCW_NOTIFY;
+> -	register struct subchannel_id __schid asm("2") = schid;
+> -	register unsigned long __index asm("3") = queue_index;
+> -	register long __rc asm("2");
+> -	register long __cookie asm("4") = cookie;
+> -
+> -	asm volatile ("diag 2,4,0x500\n"
+> -		      : "=d" (__rc) : "d" (__nr), "d" (__schid), "d" (__index),
+> -		      "d"(__cookie)
+> -		      : "memory", "cc");
+> -	return __rc;
+> -}
+> -
+> -static inline long do_kvm_notify(struct subchannel_id schid,
+> -				 unsigned long queue_index,
+> -				 long cookie)
+> -{
+> -	diag_stat_inc(DIAG_STAT_X500);
+> -	return __do_kvm_notify(schid, queue_index, cookie);
+> -}
+> -
+>   static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
+>   {
+>   	struct virtio_ccw_vq_info *info = vq->priv;
+> @@ -421,7 +396,10 @@ static bool virtio_ccw_kvm_notify(struct virtqueue *vq)
+>   
+>   	vcdev = to_vc_device(info->vq->vdev);
+>   	ccw_device_get_schid(vcdev->cdev, &schid);
+> -	info->cookie = do_kvm_notify(schid, vq->index, info->cookie);
+> +	BUILD_BUG_ON(sizeof(struct subchannel_id) != sizeof(unsigned int));
+> +	info->cookie = kvm_hypercall3(KVM_S390_VIRTIO_CCW_NOTIFY,
+> +				      *((unsigned int *)&schid),
+> +				      vq->index, info->cookie);
+   	if (info->cookie < 0)
+>   		return false;
+>   	return true;
+> 
