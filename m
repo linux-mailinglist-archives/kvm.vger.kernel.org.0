@@ -2,445 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8ECF83AFE5A
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 09:50:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12C493AFE61
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 09:50:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230268AbhFVHw1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 03:52:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32206 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230326AbhFVHwX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 03:52:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624348207;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=B9jxicCY/A2tBCMMCVXdYtwBAnUmmmvP+ho9k5jFvbQ=;
-        b=I0BP+qlbBbBZmc/T0L3Y/gyQWtcTrvK/tPuXmy7eydfDmO0VTseZ2wENLrOZpAP3tE6b1l
-        Ei4Qf9w8tFYirt8sJL/ljHJIXg2AT2YOIaAaRzkPjjghvKHyNhOKCPZcQFTdQwsG40m41U
-        f6osBUuqsexk+Gn2giADzMkHjBB4I54=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-551-lpq-40DfOZybQcAyekmNdQ-1; Tue, 22 Jun 2021 03:50:06 -0400
-X-MC-Unique: lpq-40DfOZybQcAyekmNdQ-1
-Received: by mail-pf1-f199.google.com with SMTP id o11-20020a62f90b0000b02902db3045f898so10779217pfh.23
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 00:50:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=B9jxicCY/A2tBCMMCVXdYtwBAnUmmmvP+ho9k5jFvbQ=;
-        b=NGAaRNGvBubxWinC1B0aT1RM7xYO4H6vLLZLOO4+fLFUf/cYVARRZNEmzEc35pRJEj
-         P/c8dv3L2MpjYcRO8lnuLd+y9MsHRbWhjyCWCg8mCogyBxOBzD+5Bvi20A+fnnUrsNVo
-         vO/i8IoDvSIfRTobfHsLmTT6k/67jcbHyc+skdrD1vlGhxSaQRqF/wcDzY6mcyseEiYA
-         HnIP0MjphWb0J0xm31GKo6OQIr2kJ9DrOnu94r/Ib5Qhzd28yZwiM0om3qEPFaz5hjBC
-         gOkdSTc4ckl6QauCisFTE4sIkStpmQSlCpl+ReAsmlyhbWwy+yvRiplxMkT+2Bc8tWYz
-         1YEg==
-X-Gm-Message-State: AOAM532legZ653qknz2ZpVHj1RT7I17+f/OHVd2cqqdvZB7TQNFsPboT
-        06dkFiH8WAgz2UPbhv8hMsZOgMPnUhLn5Lhu8fDaEa9vz3ULp/wAXGAz41fENjC7zueL/0sf20f
-        Yh5aDupL7/Mdo
-X-Received: by 2002:a17:902:c641:b029:122:6927:6e50 with SMTP id s1-20020a170902c641b029012269276e50mr9862238pls.6.1624348205577;
-        Tue, 22 Jun 2021 00:50:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxekq+kgOUVrlD5LnpXeHpq0h9w1ALVma6btHHZ2quAdETHnuyEnF0QoKaSap2eytMg2NykVQ==
-X-Received: by 2002:a17:902:c641:b029:122:6927:6e50 with SMTP id s1-20020a170902c641b029012269276e50mr9862215pls.6.1624348205162;
-        Tue, 22 Jun 2021 00:50:05 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id f18sm1474016pjq.48.2021.06.22.00.49.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Jun 2021 00:50:04 -0700 (PDT)
-Subject: Re: [PATCH v8 09/10] vduse: Introduce VDUSE - vDPA Device in
- Userspace
-To:     Yongji Xie <xieyongji@bytedance.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=c3=a4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-References: <20210615141331.407-1-xieyongji@bytedance.com>
- <20210615141331.407-10-xieyongji@bytedance.com>
- <adfb2be9-9ed9-ca37-ac37-4cd00bdff349@redhat.com>
- <CACycT3tAON+-qZev+9EqyL2XbgH5HDspOqNt3ohQLQ8GqVK=EA@mail.gmail.com>
- <1bba439f-ffc8-c20e-e8a4-ac73e890c592@redhat.com>
- <CACycT3uzMJS7vw6MVMOgY4rb=SPfT2srV+8DPdwUVeELEiJgbA@mail.gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <0aeb7cb7-58e5-1a95-d830-68edd7e8ec2e@redhat.com>
-Date:   Tue, 22 Jun 2021 15:49:52 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        id S230343AbhFVHwo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 03:52:44 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:2042 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S230377AbhFVHwd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 03:52:33 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15M7Xfo9149727;
+        Tue, 22 Jun 2021 03:50:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=oZ2YFKZYILhRlNIk06dtI70vqN13MOl0zKdph1KWA8w=;
+ b=KrGWEm26iFSM4QDpGm5RCkJdx1fwjFSA7qveBxXrb1UMSZ8cFu7gguUKIltTOHg/p/hr
+ C6If2hDi9TO2WXxNybR24GRYyFvN+m1zQ7ST0O81v9OT4B/nTYm/Ph/iGB5ggdkWs/rC
+ dCNNZig37cyrP8H6h76REt9/zYnBm1nFTAKD+Bfpm+yJDGEEQcYWCwbTLd5p/XKp3p8U
+ 6fz+URYKG7YYEs5DmPaVVhw1TkHgESBwFjTp0tY02VZaKstDfeOz9QqnQt+ad1oBzxum
+ zV/pbV1M9JiHTFQ/pvyK/+C664XHyemjDJnC6wgVPU5wwohZgOYXqA6aEg/b8YRuL9Cf bA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39b94q3vn4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Jun 2021 03:50:17 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15M7Xi3f149970;
+        Tue, 22 Jun 2021 03:50:17 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39b94q3vmj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Jun 2021 03:50:17 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15M7mZrV012367;
+        Tue, 22 Jun 2021 07:50:15 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03fra.de.ibm.com with ESMTP id 3998788psb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Jun 2021 07:50:15 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15M7oC3132309630
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 22 Jun 2021 07:50:12 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 79BA8A405F;
+        Tue, 22 Jun 2021 07:50:12 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1B365A4054;
+        Tue, 22 Jun 2021 07:50:12 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.47.225])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 22 Jun 2021 07:50:12 +0000 (GMT)
+Subject: Re: [PATCH] KVM: s390: get rid of register asm usage
+To:     Thomas Huth <thuth@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20210621140356.1210771-1-hca@linux.ibm.com>
+ <7edaf85c-810b-e0f9-5977-6e89270f0709@redhat.com>
+ <ef34e1df-b56d-8123-60c7-e56d00cd01ca@de.ibm.com>
+ <67653df1-1a9e-c406-c45c-f30b69a2ee8a@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <b537af91-87a5-a1f7-343b-5b36b72d57a0@de.ibm.com>
+Date:   Tue, 22 Jun 2021 09:50:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <CACycT3uzMJS7vw6MVMOgY4rb=SPfT2srV+8DPdwUVeELEiJgbA@mail.gmail.com>
+In-Reply-To: <67653df1-1a9e-c406-c45c-f30b69a2ee8a@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: r_A5dU9jWwMhS5O7eFZWJLmky3o7fhVn
+X-Proofpoint-ORIG-GUID: 5nVZu8AiYo2pLIC3bBM0U60ha16eUNXR
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-06-22_04:2021-06-21,2021-06-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ mlxscore=0 suspectscore=0 phishscore=0 adultscore=0 clxscore=1015
+ mlxlogscore=999 spamscore=0 priorityscore=1501 lowpriorityscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106220046
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-在 2021/6/22 下午3:22, Yongji Xie 写道:
->> We need fix a way to propagate the error to the userspace.
+
+On 22.06.21 09:46, Thomas Huth wrote:
+> On 22/06/2021 09.43, Christian Borntraeger wrote:
 >>
->> E.g if we want to stop the deivce, we will delay the status reset until
->> we get respose from the userspace?
 >>
-> I didn't get how to delay the status reset. And should it be a DoS
-> that we want to fix if the userspace doesn't give a response forever?
-
-
-You're right. So let's make set_status() can fail first, then propagate 
-its failure via VHOST_VDPA_SET_STATUS.
-
-
->
->>>>> +     }
->>>>> +}
->>>>> +
->>>>> +static size_t vduse_vdpa_get_config_size(struct vdpa_device *vdpa)
->>>>> +{
->>>>> +     struct vduse_dev *dev = vdpa_to_vduse(vdpa);
->>>>> +
->>>>> +     return dev->config_size;
->>>>> +}
->>>>> +
->>>>> +static void vduse_vdpa_get_config(struct vdpa_device *vdpa, unsigned int offset,
->>>>> +                               void *buf, unsigned int len)
->>>>> +{
->>>>> +     struct vduse_dev *dev = vdpa_to_vduse(vdpa);
->>>>> +
->>>>> +     memcpy(buf, dev->config + offset, len);
->>>>> +}
->>>>> +
->>>>> +static void vduse_vdpa_set_config(struct vdpa_device *vdpa, unsigned int offset,
->>>>> +                     const void *buf, unsigned int len)
->>>>> +{
->>>>> +     /* Now we only support read-only configuration space */
->>>>> +}
->>>>> +
->>>>> +static u32 vduse_vdpa_get_generation(struct vdpa_device *vdpa)
->>>>> +{
->>>>> +     struct vduse_dev *dev = vdpa_to_vduse(vdpa);
->>>>> +
->>>>> +     return dev->generation;
->>>>> +}
->>>>> +
->>>>> +static int vduse_vdpa_set_map(struct vdpa_device *vdpa,
->>>>> +                             struct vhost_iotlb *iotlb)
->>>>> +{
->>>>> +     struct vduse_dev *dev = vdpa_to_vduse(vdpa);
->>>>> +     int ret;
->>>>> +
->>>>> +     ret = vduse_domain_set_map(dev->domain, iotlb);
->>>>> +     if (ret)
->>>>> +             return ret;
->>>>> +
->>>>> +     ret = vduse_dev_update_iotlb(dev, 0ULL, ULLONG_MAX);
->>>>> +     if (ret) {
->>>>> +             vduse_domain_clear_map(dev->domain, iotlb);
->>>>> +             return ret;
->>>>> +     }
->>>>> +
->>>>> +     return 0;
->>>>> +}
->>>>> +
->>>>> +static void vduse_vdpa_free(struct vdpa_device *vdpa)
->>>>> +{
->>>>> +     struct vduse_dev *dev = vdpa_to_vduse(vdpa);
->>>>> +
->>>>> +     dev->vdev = NULL;
->>>>> +}
->>>>> +
->>>>> +static const struct vdpa_config_ops vduse_vdpa_config_ops = {
->>>>> +     .set_vq_address         = vduse_vdpa_set_vq_address,
->>>>> +     .kick_vq                = vduse_vdpa_kick_vq,
->>>>> +     .set_vq_cb              = vduse_vdpa_set_vq_cb,
->>>>> +     .set_vq_num             = vduse_vdpa_set_vq_num,
->>>>> +     .set_vq_ready           = vduse_vdpa_set_vq_ready,
->>>>> +     .get_vq_ready           = vduse_vdpa_get_vq_ready,
->>>>> +     .set_vq_state           = vduse_vdpa_set_vq_state,
->>>>> +     .get_vq_state           = vduse_vdpa_get_vq_state,
->>>>> +     .get_vq_align           = vduse_vdpa_get_vq_align,
->>>>> +     .get_features           = vduse_vdpa_get_features,
->>>>> +     .set_features           = vduse_vdpa_set_features,
->>>>> +     .set_config_cb          = vduse_vdpa_set_config_cb,
->>>>> +     .get_vq_num_max         = vduse_vdpa_get_vq_num_max,
->>>>> +     .get_device_id          = vduse_vdpa_get_device_id,
->>>>> +     .get_vendor_id          = vduse_vdpa_get_vendor_id,
->>>>> +     .get_status             = vduse_vdpa_get_status,
->>>>> +     .set_status             = vduse_vdpa_set_status,
->>>>> +     .get_config_size        = vduse_vdpa_get_config_size,
->>>>> +     .get_config             = vduse_vdpa_get_config,
->>>>> +     .set_config             = vduse_vdpa_set_config,
->>>>> +     .get_generation         = vduse_vdpa_get_generation,
->>>>> +     .set_map                = vduse_vdpa_set_map,
->>>>> +     .free                   = vduse_vdpa_free,
->>>>> +};
->>>>> +
->>>>> +static dma_addr_t vduse_dev_map_page(struct device *dev, struct page *page,
->>>>> +                                  unsigned long offset, size_t size,
->>>>> +                                  enum dma_data_direction dir,
->>>>> +                                  unsigned long attrs)
->>>>> +{
->>>>> +     struct vduse_dev *vdev = dev_to_vduse(dev);
->>>>> +     struct vduse_iova_domain *domain = vdev->domain;
->>>>> +
->>>>> +     return vduse_domain_map_page(domain, page, offset, size, dir, attrs);
->>>>> +}
->>>>> +
->>>>> +static void vduse_dev_unmap_page(struct device *dev, dma_addr_t dma_addr,
->>>>> +                             size_t size, enum dma_data_direction dir,
->>>>> +                             unsigned long attrs)
->>>>> +{
->>>>> +     struct vduse_dev *vdev = dev_to_vduse(dev);
->>>>> +     struct vduse_iova_domain *domain = vdev->domain;
->>>>> +
->>>>> +     return vduse_domain_unmap_page(domain, dma_addr, size, dir, attrs);
->>>>> +}
->>>>> +
->>>>> +static void *vduse_dev_alloc_coherent(struct device *dev, size_t size,
->>>>> +                                     dma_addr_t *dma_addr, gfp_t flag,
->>>>> +                                     unsigned long attrs)
->>>>> +{
->>>>> +     struct vduse_dev *vdev = dev_to_vduse(dev);
->>>>> +     struct vduse_iova_domain *domain = vdev->domain;
->>>>> +     unsigned long iova;
->>>>> +     void *addr;
->>>>> +
->>>>> +     *dma_addr = DMA_MAPPING_ERROR;
->>>>> +     addr = vduse_domain_alloc_coherent(domain, size,
->>>>> +                             (dma_addr_t *)&iova, flag, attrs);
->>>>> +     if (!addr)
->>>>> +             return NULL;
->>>>> +
->>>>> +     *dma_addr = (dma_addr_t)iova;
->>>>> +
->>>>> +     return addr;
->>>>> +}
->>>>> +
->>>>> +static void vduse_dev_free_coherent(struct device *dev, size_t size,
->>>>> +                                     void *vaddr, dma_addr_t dma_addr,
->>>>> +                                     unsigned long attrs)
->>>>> +{
->>>>> +     struct vduse_dev *vdev = dev_to_vduse(dev);
->>>>> +     struct vduse_iova_domain *domain = vdev->domain;
->>>>> +
->>>>> +     vduse_domain_free_coherent(domain, size, vaddr, dma_addr, attrs);
->>>>> +}
->>>>> +
->>>>> +static size_t vduse_dev_max_mapping_size(struct device *dev)
->>>>> +{
->>>>> +     struct vduse_dev *vdev = dev_to_vduse(dev);
->>>>> +     struct vduse_iova_domain *domain = vdev->domain;
->>>>> +
->>>>> +     return domain->bounce_size;
->>>>> +}
->>>>> +
->>>>> +static const struct dma_map_ops vduse_dev_dma_ops = {
->>>>> +     .map_page = vduse_dev_map_page,
->>>>> +     .unmap_page = vduse_dev_unmap_page,
->>>>> +     .alloc = vduse_dev_alloc_coherent,
->>>>> +     .free = vduse_dev_free_coherent,
->>>>> +     .max_mapping_size = vduse_dev_max_mapping_size,
->>>>> +};
->>>>> +
->>>>> +static unsigned int perm_to_file_flags(u8 perm)
->>>>> +{
->>>>> +     unsigned int flags = 0;
->>>>> +
->>>>> +     switch (perm) {
->>>>> +     case VDUSE_ACCESS_WO:
->>>>> +             flags |= O_WRONLY;
->>>>> +             break;
->>>>> +     case VDUSE_ACCESS_RO:
->>>>> +             flags |= O_RDONLY;
->>>>> +             break;
->>>>> +     case VDUSE_ACCESS_RW:
->>>>> +             flags |= O_RDWR;
->>>>> +             break;
->>>>> +     default:
->>>>> +             WARN(1, "invalidate vhost IOTLB permission\n");
->>>>> +             break;
->>>>> +     }
->>>>> +
->>>>> +     return flags;
->>>>> +}
->>>>> +
->>>>> +static int vduse_kickfd_setup(struct vduse_dev *dev,
->>>>> +                     struct vduse_vq_eventfd *eventfd)
->>>>> +{
->>>>> +     struct eventfd_ctx *ctx = NULL;
->>>>> +     struct vduse_virtqueue *vq;
->>>>> +     u32 index;
->>>>> +
->>>>> +     if (eventfd->index >= dev->vq_num)
->>>>> +             return -EINVAL;
->>>>> +
->>>>> +     index = array_index_nospec(eventfd->index, dev->vq_num);
->>>>> +     vq = &dev->vqs[index];
->>>>> +     if (eventfd->fd >= 0) {
->>>>> +             ctx = eventfd_ctx_fdget(eventfd->fd);
->>>>> +             if (IS_ERR(ctx))
->>>>> +                     return PTR_ERR(ctx);
->>>>> +     } else if (eventfd->fd != VDUSE_EVENTFD_DEASSIGN)
->>>>> +             return 0;
->>>>> +
->>>>> +     spin_lock(&vq->kick_lock);
->>>>> +     if (vq->kickfd)
->>>>> +             eventfd_ctx_put(vq->kickfd);
->>>>> +     vq->kickfd = ctx;
->>>>> +     if (vq->ready && vq->kicked && vq->kickfd) {
->>>>> +             eventfd_signal(vq->kickfd, 1);
->>>>> +             vq->kicked = false;
->>>>> +     }
->>>>> +     spin_unlock(&vq->kick_lock);
->>>>> +
->>>>> +     return 0;
->>>>> +}
->>>>> +
->>>>> +static void vduse_dev_irq_inject(struct work_struct *work)
->>>>> +{
->>>>> +     struct vduse_dev *dev = container_of(work, struct vduse_dev, inject);
->>>>> +
->>>>> +     spin_lock_irq(&dev->irq_lock);
->>>>> +     if (dev->config_cb.callback)
->>>>> +             dev->config_cb.callback(dev->config_cb.private);
->>>>> +     spin_unlock_irq(&dev->irq_lock);
->>>>> +}
->>>>> +
->>>>> +static void vduse_vq_irq_inject(struct work_struct *work)
->>>>> +{
->>>>> +     struct vduse_virtqueue *vq = container_of(work,
->>>>> +                                     struct vduse_virtqueue, inject);
->>>>> +
->>>>> +     spin_lock_irq(&vq->irq_lock);
->>>>> +     if (vq->ready && vq->cb.callback)
->>>>> +             vq->cb.callback(vq->cb.private);
->>>>> +     spin_unlock_irq(&vq->irq_lock);
->>>>> +}
->>>>> +
->>>>> +static long vduse_dev_ioctl(struct file *file, unsigned int cmd,
->>>>> +                         unsigned long arg)
->>>>> +{
->>>>> +     struct vduse_dev *dev = file->private_data;
->>>>> +     void __user *argp = (void __user *)arg;
->>>>> +     int ret;
->>>>> +
->>>>> +     switch (cmd) {
->>>>> +     case VDUSE_IOTLB_GET_FD: {
->>>>> +             struct vduse_iotlb_entry entry;
->>>>> +             struct vhost_iotlb_map *map;
->>>>> +             struct vdpa_map_file *map_file;
->>>>> +             struct vduse_iova_domain *domain = dev->domain;
->>>>> +             struct file *f = NULL;
->>>>> +
->>>>> +             ret = -EFAULT;
->>>>> +             if (copy_from_user(&entry, argp, sizeof(entry)))
->>>>> +                     break;
->>>>> +
->>>>> +             ret = -EINVAL;
->>>>> +             if (entry.start > entry.last)
->>>>> +                     break;
->>>>> +
->>>>> +             spin_lock(&domain->iotlb_lock);
->>>>> +             map = vhost_iotlb_itree_first(domain->iotlb,
->>>>> +                                           entry.start, entry.last);
->>>>> +             if (map) {
->>>>> +                     map_file = (struct vdpa_map_file *)map->opaque;
->>>>> +                     f = get_file(map_file->file);
->>>>> +                     entry.offset = map_file->offset;
->>>>> +                     entry.start = map->start;
->>>>> +                     entry.last = map->last;
->>>>> +                     entry.perm = map->perm;
->>>>> +             }
->>>>> +             spin_unlock(&domain->iotlb_lock);
->>>>> +             ret = -EINVAL;
->>>>> +             if (!f)
->>>>> +                     break;
->>>>> +
->>>>> +             ret = -EFAULT;
->>>>> +             if (copy_to_user(argp, &entry, sizeof(entry))) {
->>>>> +                     fput(f);
->>>>> +                     break;
->>>>> +             }
->>>>> +             ret = receive_fd(f, perm_to_file_flags(entry.perm));
->>>>> +             fput(f);
->>>>> +             break;
->>>>> +     }
->>>>> +     case VDUSE_DEV_GET_FEATURES:
->>>>> +             ret = put_user(dev->features, (u64 __user *)argp);
->>>>> +             break;
->>>>> +     case VDUSE_DEV_UPDATE_CONFIG: {
->>>>> +             struct vduse_config_update config;
->>>>> +             unsigned long size = offsetof(struct vduse_config_update,
->>>>> +                                           buffer);
->>>>> +
->>>>> +             ret = -EFAULT;
->>>>> +             if (copy_from_user(&config, argp, size))
->>>>> +                     break;
->>>>> +
->>>>> +             ret = -EINVAL;
->>>>> +             if (config.length == 0 ||
->>>>> +                 config.length > dev->config_size - config.offset)
->>>>> +                     break;
->>>>> +
->>>>> +             ret = -EFAULT;
->>>>> +             if (copy_from_user(dev->config + config.offset, argp + size,
->>>>> +                                config.length))
->>>>> +                     break;
->>>>> +
->>>>> +             ret = 0;
->>>>> +             queue_work(vduse_irq_wq, &dev->inject);
->>>> I wonder if it's better to separate config interrupt out of config
->>>> update or we need document this.
+>> On 22.06.21 09:36, Thomas Huth wrote:
+>>> On 21/06/2021 16.03, Heiko Carstens wrote:
+>>>> Using register asm statements has been proven to be very error prone,
+>>>> especially when using code instrumentation where gcc may add function
+>>>> calls, which clobbers register contents in an unexpected way.
 >>>>
->>> I have documented it in the docs. Looks like a config update should be
->>> always followed by a config interrupt. I didn't find a case that uses
->>> them separately.
->> The uAPI doesn't prevent us from the following scenario:
->>
->> update_config(mac[0], ..);
->> update_config(max[1], ..);
->>
->> So it looks to me it's better to separate the config interrupt from the
->> config updating.
->>
-> Fine.
->
->>>>> +             break;
->>>>> +     }
->>>>> +     case VDUSE_VQ_GET_INFO: {
->>>> Do we need to limit this only when DRIVER_OK is set?
+>>>> Therefore get rid of register asm statements in kvm code, even though
+>>>> there is currently nothing wrong with them. This way we know for sure
+>>>> that this bug class won't be introduced here.
 >>>>
->>> Any reason to add this limitation?
->> Otherwise the vq is not fully initialized, e.g the desc_addr might not
->> be correct.
+>>>> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>>>> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
+>>>> ---
+>>>>   arch/s390/kvm/kvm-s390.c | 18 +++++++++---------
+>>>>   1 file changed, 9 insertions(+), 9 deletions(-)
+>>>>
+>>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>>>> index 1296fc10f80c..4b7b24f07790 100644
+>>>> --- a/arch/s390/kvm/kvm-s390.c
+>>>> +++ b/arch/s390/kvm/kvm-s390.c
+>>>> @@ -329,31 +329,31 @@ static void allow_cpu_feat(unsigned long nr)
+>>>>   static inline int plo_test_bit(unsigned char nr)
+>>>>   {
+>>>> -    register unsigned long r0 asm("0") = (unsigned long) nr | 0x100;
+>>>> +    unsigned long function = (unsigned long) nr | 0x100;
+>>>>       int cc;
+>>>>       asm volatile(
+>>>> +        "    lgr    0,%[function]\n"
+>>>>           /* Parameter registers are ignored for "test bit" */
+>>>>           "    plo    0,0,0,0(0)\n"
+>>>>           "    ipm    %0\n"
+>>>>           "    srl    %0,28\n"
+>>>>           : "=d" (cc)
+>>>> -        : "d" (r0)
+>>>> -        : "cc");
+>>>> +        : [function] "d" (function)
+>>>> +        : "cc", "0");
+>>>>       return cc == 0;
+>>>>   }
+>>>>   static __always_inline void __insn32_query(unsigned int opcode, u8 *query)
+>>>>   {
+>>>> -    register unsigned long r0 asm("0") = 0;    /* query function */
+>>>> -    register unsigned long r1 asm("1") = (unsigned long) query;
+>>>> -
+>>>>       asm volatile(
+>>>> -        /* Parameter regs are ignored */
+>>>> +        "    lghi    0,0\n"
+>>>> +        "    lgr    1,%[query]\n"
+>>>> +        /* Parameter registers are ignored */
+>>>>           "    .insn    rrf,%[opc] << 16,2,4,6,0\n"
+>>>>           :
+>>>> -        : "d" (r0), "a" (r1), [opc] "i" (opcode)
+>>>> -        : "cc", "memory");
+>>>> +        : [query] "d" ((unsigned long)query), [opc] "i" (opcode)
+>>>
+>>> Wouldn't it be better to keep the "a" constraint instead of "d" to avoid that the compiler ever passes the "query" value in r0 ?
+>>> Otherwise the query value might get trashed if it is passed in r0...
 >>
-> The vq_info->ready can be used to tell userspace whether the vq is
-> initialized or not.
+>> I first thought the same, but if you look closely the value is only used by the lgr, to load
+>> the value finally into r1. So d is correct as lgr can take all registers.
+> 
+> But what about the "lghi    0,0" right in front of it? ... I've got the feeling that I'm missing something here...
 
+It does load an immediate value of 0 into register 0. Are you afraid of an early clobber if
+gcc decides to use r0 for query?
 
-Yes, this will work as well.
-
-Thanks
-
-
->
-> Thanks,
-> Yongji
->
-
+> Heiko, maybe you could at least swap the initialization of r0 and r1, then I'd feel a little bit better...
+> 
+>   Thomas
+> 
