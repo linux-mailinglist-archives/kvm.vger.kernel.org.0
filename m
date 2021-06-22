@@ -2,144 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A92513AFF34
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 10:24:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F3E13AFF91
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 10:47:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229628AbhFVI1O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 04:27:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56143 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229620AbhFVI1M (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 04:27:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624350296;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zVozGF4hJZA941GLqgUVkQE/BXYFfLZ21xsbsn2roDY=;
-        b=AUk2LLGukNgxPjuCSxtm6QKoHL5arsUyqWqXIF2wxrN5LqIiEgjbT/yaJyhecSKta/bBq2
-        VOevP1t1EdUA8f0yiNYp4KsvzCw2FK6OTnVhYMWX5cWBMnH7JSFczfSsRp9HRaGcllQxMO
-        NDk4DN3b2lrjrg7McOz1poWtoVPZeIQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-s8Rx6Q7vOlq4puinaAqgSQ-1; Tue, 22 Jun 2021 04:24:55 -0400
-X-MC-Unique: s8Rx6Q7vOlq4puinaAqgSQ-1
-Received: by mail-wm1-f70.google.com with SMTP id j38-20020a05600c1c26b02901dbf7d18ff8so439976wms.8
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 01:24:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=zVozGF4hJZA941GLqgUVkQE/BXYFfLZ21xsbsn2roDY=;
-        b=gyuSVwQDY63epZvzEP2MXjULDuYR5XGJZI90NUVdE6+mNsuACGkukeRuuVU8PAHRvs
-         2kTq6o1QNbjR/eW0YXL2AZOyrZ1hWZUQMq+KhbjDlzvDk+zu43pbtV72GgxnPcmAjd2A
-         sOEodXP0kh3UqV6isqhlZuGhWWq0FcVZRzwwr0FSYPTTHY2u4uU8QBRx/0AMtW85qJyA
-         vs2kvJ8obV74JTYKp5mKuaMl7Y9QGVwMlhLD7C1d4233t8hzGJ5gkiN4+6vS+1NY16to
-         yUO41xc0S2kDYmrq882S0jQ3KWG9r35AcF3Y/M5da6/ZsGoAZLqU4ZEN1PqmEH7MVx3P
-         Vt0A==
-X-Gm-Message-State: AOAM533z1kMijTaxjdGLcwmafc7xnNz4xYeU6eIj/CxDmUeaoP4CQPGT
-        VLIXvADS/gHQ8r2LMw+UtA2DHEk6muaGbgSD52UUpZxHAX0eUpE47ghiAuNyZrxMM/JgHFRLVP9
-        gaz0q99ctxqbx
-X-Received: by 2002:a5d:4486:: with SMTP id j6mr3269211wrq.174.1624350294078;
-        Tue, 22 Jun 2021 01:24:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwe6MmlnOxEV9WkVefBAAZcEhrmxm2rNI0OwW6f1BQv4LaVIdSahf2XG3G3DbyVJoPpIseEUQ==
-X-Received: by 2002:a5d:4486:: with SMTP id j6mr3269193wrq.174.1624350293921;
-        Tue, 22 Jun 2021 01:24:53 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id i6sm14791559wro.12.2021.06.22.01.24.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Jun 2021 01:24:53 -0700 (PDT)
-Subject: Re: [kvm-unit-tests GIT PULL 00/12] s390x update 2021-22-06
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, david@redhat.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, linux-s390@vger.kernel.org,
-        imbrenda@linux.ibm.com, thuth@redhat.com
-References: <20210622082042.13831-1-frankja@linux.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a134a99f-fd80-4ed5-4122-a052ffcc5e34@redhat.com>
-Date:   Tue, 22 Jun 2021 10:24:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S229702AbhFVItf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 04:49:35 -0400
+Received: from mga17.intel.com ([192.55.52.151]:36958 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229490AbhFVItf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Jun 2021 04:49:35 -0400
+IronPort-SDR: icvnJynfx3cRjCCMThGggg5xTGuVe2f+Obakbd8+bvzh7FzdP4gfUyeEdDL5jbJoX7kOk8Cl4s
+ FZ4FkSn/6fXA==
+X-IronPort-AV: E=McAfee;i="6200,9189,10022"; a="187394152"
+X-IronPort-AV: E=Sophos;i="5.83,291,1616482800"; 
+   d="scan'208";a="187394152"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2021 01:47:15 -0700
+IronPort-SDR: ukPvfoQOa44oqWOVGcyyHYwYOtkxKNyKOuVVvXOs9sLN5Iv3/3rhYIL8pjFx3zTSDDT6zPtHbY
+ JD+12BxKULpQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.83,291,1616482800"; 
+   d="scan'208";a="486827427"
+Received: from michael-optiplex-9020.sh.intel.com (HELO localhost) ([10.239.159.182])
+  by orsmga001.jf.intel.com with ESMTP; 22 Jun 2021 01:47:11 -0700
+Date:   Tue, 22 Jun 2021 17:01:52 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     pbonzini@redhat.com
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, weijiang.yang@intel.com,
+        wei.w.wang@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RESEND PATCH v4 00/10] KVM: x86/pmu: Guest Architectural LBR
+ Enabling
+Message-ID: <20210622090152.GA13141@intel.com>
+References: <20210510081535.94184-1-like.xu@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20210622082042.13831-1-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210510081535.94184-1-like.xu@linux.intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/06/21 10:20, Janosch Frank wrote:
-> Dear Paolo,
-> 
-> please merge or pull the following changes:
-> 
-> Merge:
-> https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/merge_requests/11
-> 
-> Pipeline:
-> https://gitlab.com/frankja/kvm-unit-tests/-/pipelines/324608397
-> 
-> Pull:
-> The following changes since commit f09465ac9044145f20435344d41566aede62fc08:
-> 
->    x86: Flush the TLB after setting user-bit (2021-06-17 14:36:25 -0400)
-> 
-> are available in the Git repository at:
-> 
->    https://gitlab.com/frankja/kvm-unit-tests.git s390x-pull-2021-22-06
-> 
-> for you to fetch changes up to d58ec2ec341cbea746944a8ae92c737041c35172:
-> 
->    s390x: edat test (2021-06-21 14:55:12 +0000)
-> 
-> 
-> Claudio Imbrenda (7):
->    s390x: lib: add and use macros for control register bits
->    libcflat: add SZ_1M and SZ_2G
->    s390x: lib: fix pgtable.h
->    s390x: lib: Add idte and other huge pages functions/macros
->    s390x: lib: add teid union and clear teid from lowcore
->    s390x: mmu: add support for large pages
->    s390x: edat test
-> 
-> Janosch Frank (5):
->    s390x: sie: Only overwrite r3 if it isn't needed anymore
->    s390x: selftest: Add prefixes to fix report output
->    s390x: Don't run PV testcases under tcg
->    configure: s390x: Check if the host key document exists
->    s390x: run: Skip PV tests when tcg is the accelerator
-> 
->   configure                 |   5 +
->   lib/libcflat.h            |   2 +
->   lib/s390x/asm/arch_def.h  |  12 ++
->   lib/s390x/asm/float.h     |   4 +-
->   lib/s390x/asm/interrupt.h |  28 +++-
->   lib/s390x/asm/pgtable.h   |  44 +++++-
->   lib/s390x/interrupt.c     |   2 +
->   lib/s390x/mmu.c           | 264 ++++++++++++++++++++++++++++++++----
->   lib/s390x/mmu.h           |  84 +++++++++++-
->   lib/s390x/sclp.c          |   4 +-
->   s390x/Makefile            |   1 +
->   s390x/cpu.S               |   2 +-
->   s390x/diag288.c           |   2 +-
->   s390x/edat.c              | 274 ++++++++++++++++++++++++++++++++++++++
->   s390x/gs.c                |   2 +-
->   s390x/iep.c               |   4 +-
->   s390x/run                 |   5 +
->   s390x/selftest.c          |  26 ++--
->   s390x/skrf.c              |   2 +-
->   s390x/smp.c               |   8 +-
->   s390x/unittests.cfg       |   3 +
->   s390x/vector.c            |   2 +-
->   scripts/s390x/func.bash   |   3 +
->   23 files changed, 724 insertions(+), 59 deletions(-)
->   create mode 100644 s390x/edat.c
-> 
 
-Merged, thanks!
+Hello, maintainers,
 
-Paolo
+I took over the work from Like and will carry it forward. Here I'd like to
+get your valuable comments on this patch series before I post next version.
 
+Thanks a lot!
+
+> Hi geniuses,
+> 
+> A new kernel cycle has begun, and this version looks promising. 
+> 
+> >From the end user's point of view, the usage of Arch LBR is the same as
+> the legacy LBR we have merged in the mainline, but it is much faster.
+> 
+> The Architectural Last Branch Records (LBRs) is published 
+> in the 319433-040 release of Intel Architecture Instruction
+> Set Extensions and Future Features Programming Reference[0].
+> 
+> The main advantages for the Arch LBR users are [1]:
+> - Faster context switching due to XSAVES support and faster reset of
+>   LBR MSRs via the new DEPTH MSR
+> - Faster LBR read for a non-PEBS event due to XSAVES support, which
+>   lowers the overhead of the NMI handler.
+> - Linux kernel can support the LBR features without knowing the model
+>   number of the current CPU.
+> 
+> Please check more details in each commit and feel free to comment.
+> 
+> [0] https://software.intel.com/content/www/us/en/develop/download/
+> intel-architecture-instruction-set-extensions-and-future-features-programming-reference.html
+> [1] https://lore.kernel.org/lkml/1593780569-62993-1-git-send-email-kan.liang@linux.intel.com/
+> 
+> ---
+> v13->v13 RESEND Changelog:
+> - Rebase to kvm/queue tree tag: kvm-5.13-2;
+> - Includes two XSS dependency patches from kvm/intel tree;
+> 
+> v3->v4 Changelog:
+> - Add one more host patch to reuse ARCH_LBR_CTL_MASK;
+> - Add reserve_lbr_buffers() instead of using GFP_ATOMIC;
+> - Fia a bug in the arch_lbr_depth_is_valid();
+> - Add LBR_CTL_EN to unify DEBUGCTLMSR_LBR and ARCH_LBR_CTL_LBREN;
+> - Add vmx->host_lbrctlmsr to save/restore host values;
+> - Add KVM_SUPPORTED_XSS to refactoring supported_xss;
+> - Clear Arch_LBR ans its XSS bit if it's not supported;
+> - Add negative testing to the related kvm-unit-tests;
+> - Refine code and commit messages;
+> 
+> Previous:
+> v4: https://lore.kernel.org/kvm/20210314155225.206661-1-like.xu@linux.intel.com/
+> v3: https://lore.kernel.org/kvm/20210303135756.1546253-1-like.xu@linux.intel.com/
+> 
+> Like Xu (8):
+>   perf/x86/intel: Fix the comment about guest LBR support on KVM
+>   perf/x86/lbr: Simplify the exposure check for the LBR_INFO registers
+>   KVM: vmx/pmu: Add MSR_ARCH_LBR_DEPTH emulation for Arch LBR
+>   KVM: vmx/pmu: Add MSR_ARCH_LBR_CTL emulation for Arch LBR
+>   KVM: vmx/pmu: Add Arch LBR emulation and its VMCS field
+>   KVM: x86: Expose Architectural LBR CPUID leaf
+>   KVM: x86: Refine the matching and clearing logic for supported_xss
+>   KVM: x86: Add XSAVE Support for Architectural LBRs
+> 
+> Sean Christopherson (1):
+>   KVM: x86: Report XSS as an MSR to be saved if there are supported
+>     features
+> 
+> Yang Weijiang (1):
+>   KVM: x86: Refresh CPUID on writes to MSR_IA32_XSS
+> 
+>  arch/x86/events/intel/core.c     |   3 +-
+>  arch/x86/events/intel/lbr.c      |   6 +-
+>  arch/x86/include/asm/kvm_host.h  |   1 +
+>  arch/x86/include/asm/msr-index.h |   1 +
+>  arch/x86/include/asm/vmx.h       |   4 ++
+>  arch/x86/kvm/cpuid.c             |  46 ++++++++++++--
+>  arch/x86/kvm/vmx/capabilities.h  |  25 +++++---
+>  arch/x86/kvm/vmx/pmu_intel.c     | 103 ++++++++++++++++++++++++++++---
+>  arch/x86/kvm/vmx/vmx.c           |  50 +++++++++++++--
+>  arch/x86/kvm/vmx/vmx.h           |   4 ++
+>  arch/x86/kvm/x86.c               |  19 +++++-
+>  11 files changed, 226 insertions(+), 36 deletions(-)
+> 
+> -- 
+> 2.31.1
