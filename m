@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C71AA3B0C33
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 20:01:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8EC43B0C35
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 20:01:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232989AbhFVSDt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 14:03:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37720 "EHLO
+        id S232498AbhFVSDz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 14:03:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232723AbhFVSDL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Jun 2021 14:03:11 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16900C061A31
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:59:08 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id d12-20020ac8668c0000b0290246e35b30f8so35081qtp.21
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:59:08 -0700 (PDT)
+        with ESMTP id S232766AbhFVSDO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Jun 2021 14:03:14 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66E9BC0610CC
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:59:10 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id 14-20020a37060e0000b02903aad32851d2so19101588qkg.1
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:59:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=H8ArnWlUNfoAxDJNt3hI336FC1ZAyBAzOuUBrFRlP+c=;
-        b=Bnv/Cqw3SGOaMwXrlE5IAjRdvibUZQO8cQGd0wND0ys5E1f5JsNoZWowJ9r18xA0Xv
-         RWvITiqcwT9afAr4UHD9PKLMYehdKpU8F1eKy0vqvShSL0NiJtDNI5QM6GgSrypwHKA2
-         MMT7ERrOit0WNsvi2nBgoOskdg8K5emIPBSWJFy1ZJJkJZrlvwi2jmNn/n7l7HJRZtp9
-         Qvt9doF6vHYsAZhQaXPk/N8zFt0BwOtUGHrHVcLEBOpXriOsL+2lxxOU+epq0nrP2aCZ
-         KoDMFj8HyCW/KBWUS9/iMqdzhsc2h1HqwLTw0iD4l2w37GD7vyeM3uM/8jEWFdakn/Nr
-         vSBA==
+        bh=AxsRK2ImS4sX2YhbK1ZoKxLuOaRGjI3JwD6rPRybQYU=;
+        b=pDmKsy23UTC+dTo/4uIFj4a+wCnm5aPUtxKO+DelRIoI1MICP/8r9THgzjEDmqtbdn
+         gS6hr3PX15L4UCXbFsvW17Ycf1fAiM1vEzvXBSo1ysYAfgiYpaTfIdQhz0ugb/qDynCv
+         KPA8ACRvRpcmkUAJ0yMc09I27wa2jIkFvxT0NyyjieAvWOmc6szi/Tkuf3j2bOuPasfv
+         /tf+DNr4FGFLd2Z0xwn8a3KMdVmxDeOlU6GbyC8fwuderczhYAk2PuF6/BQzbRkrey0Z
+         hFpN+Eqgfxgo97SwH2ZyESvSKZnThkuMrsZbr8cmi2PPrEbtuSTtahf6otB4ibA1FG0e
+         orBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=H8ArnWlUNfoAxDJNt3hI336FC1ZAyBAzOuUBrFRlP+c=;
-        b=fhWL79YF6oKQu0oBO5U39AIwhIYbkyKV+JVvfv5B2HeaJ2YP3fnZvqk1ER5DL9JUHW
-         TegBE25Hz9P99HU2ZYChgTAKxLqBlta38w1MycBtKRQ0tHDCZQIy+jPI9Ye6d13M1XM0
-         PApX1Zel6yLh0H/sE4qj5GOBvDtGfo/2PF/brd3DYOrPf4YFjj5XHJxt23iy+dFSqO9Z
-         Bx5h4xnf1IdZ5lWwNN4vfx59r5Fvyn/Hw38w4f6sKvOGtZYl6hphfcHBfO8vVazP2scg
-         +tu1H7iKXBETNYJtgviGLweBU9F+D/vCJhLkZcgu6FGXvbJrHSmLrEXU7eZjr0LIUva0
-         n76g==
-X-Gm-Message-State: AOAM531BCxjswAYqYbaC/Arfw8Aux05sjz4tyxPPSXcuiZDHfTfZKCFC
-        PEeFDNu9IzqQyjRNwhffTYbBgI/y33o=
-X-Google-Smtp-Source: ABdhPJy7prasZnVsVu93Mki513dM4gcsPMBYy1gDNHzMWo2A+0gIm7DNpjphZgOl8rawhlsX+kVCfpmA4GA=
+        bh=AxsRK2ImS4sX2YhbK1ZoKxLuOaRGjI3JwD6rPRybQYU=;
+        b=o76IWo/ls5dkex+MWODyNwB2sy6bR/udNKC60pEMvbE7+UoW/CSSJDB9+uNw9q+MNK
+         EKl3C3LloV3EWEDKdFf9qDPnxu33ShzcaOk4jGRONBl8JE7oPuN5/P0TsF4aANXMmzmW
+         jX1SyYIXTW4mGcjFdLkrcTTH816+YUMkAkhNvJ2Y1TJsxwa5xvfJiGewvEfqsrs4H2PU
+         rKJzskshDDlqPejQb9QRveIYdSSgvEOYp5S60Qahg+OqHqZC7/FqzbUOBvwSnNn/41YO
+         mWddz/pCXfAKzjj4s799ILbV8fbp7RFKZBfMcjFJXBYrN7FNmMgkDuIfiJwL8335kzzC
+         DXFQ==
+X-Gm-Message-State: AOAM533NmJgefHZVZwblFU3y+cLr1EURyfpZ9h8YEKHhTTv3buLykog4
+        kyUSzfZDDVVR08zj5owvgFoh3wEtLH4=
+X-Google-Smtp-Source: ABdhPJyX0zZB8kxLADbwUwXSQoMZ1QccAerKbpDfYMqg0PqZYli2jyMSrWHkHaTQ/5gbICTOwwbaLuXbL8o=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:5722:92ce:361f:3832])
- (user=seanjc job=sendgmr) by 2002:a25:8607:: with SMTP id y7mr6676021ybk.17.1624384747179;
- Tue, 22 Jun 2021 10:59:07 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6214:311:: with SMTP id
+ i17mr7885985qvu.57.1624384749550; Tue, 22 Jun 2021 10:59:09 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 22 Jun 2021 10:57:16 -0700
+Date:   Tue, 22 Jun 2021 10:57:17 -0700
 In-Reply-To: <20210622175739.3610207-1-seanjc@google.com>
-Message-Id: <20210622175739.3610207-32-seanjc@google.com>
+Message-Id: <20210622175739.3610207-33-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210622175739.3610207-1-seanjc@google.com>
 X-Mailer: git-send-email 2.32.0.288.g62a8d224e6-goog
-Subject: [PATCH 31/54] KVM: x86/mmu: Drop vCPU param from reserved bits calculator
+Subject: [PATCH 32/54] KVM: x86/mmu: Use MMU's role to compute permission bitmask
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -67,60 +67,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop the vCPU param from __reset_rsvds_bits_mask() as it's now unused,
-and ideally will remain unused in the future.  Any information that's
-needed by the low level helper should be explicitly provided as it's used
-for both shadow/host MMUs and guest MMUs, i.e. vCPU state may be
-meaningless or simply wrong.
+Use the MMU's role to generate the permission bitmasks for the MMU.
+For some flows, the vCPU state may not be correct (or relevant), e.g.
+the nested NPT MMU can be initialized with incoherent vCPU state.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index e912d9a83e22..c3bf5d4186e9 100644
+index c3bf5d4186e9..bd412e082356 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4119,8 +4119,7 @@ static inline bool is_last_gpte(struct kvm_mmu *mmu,
- #undef PTTYPE
+@@ -4365,8 +4365,7 @@ reset_ept_shadow_zero_bits_mask(struct kvm_vcpu *vcpu,
+ 	 (7 & (access) ? 128 : 0))
  
- static void
--__reset_rsvds_bits_mask(struct kvm_vcpu *vcpu,
--			struct rsvd_bits_validate *rsvd_check,
-+__reset_rsvds_bits_mask(struct rsvd_bits_validate *rsvd_check,
- 			u64 pa_bits_rsvd, int level, bool nx, bool gbpages,
- 			bool pse, bool amd)
+ 
+-static void update_permission_bitmask(struct kvm_vcpu *vcpu,
+-				      struct kvm_mmu *mmu, bool ept)
++static void update_permission_bitmask(struct kvm_mmu *mmu, bool ept)
  {
-@@ -4212,7 +4211,7 @@ __reset_rsvds_bits_mask(struct kvm_vcpu *vcpu,
- static void reset_rsvds_bits_mask(struct kvm_vcpu *vcpu,
- 				  struct kvm_mmu *context)
- {
--	__reset_rsvds_bits_mask(vcpu, &context->guest_rsvd_check,
-+	__reset_rsvds_bits_mask(&context->guest_rsvd_check,
- 				vcpu->arch.reserved_gpa_bits,
- 				context->root_level, context->nx,
- 				guest_cpuid_has(vcpu, X86_FEATURE_GBPAGES),
-@@ -4292,8 +4291,7 @@ static void reset_shadow_zero_bits_mask(struct kvm_vcpu *vcpu,
- 	WARN_ON_ONCE(context->shadow_root_level < PT32E_ROOT_LEVEL);
+ 	unsigned byte;
  
- 	shadow_zero_check = &context->shadow_zero_check;
--	__reset_rsvds_bits_mask(vcpu, shadow_zero_check,
--				reserved_hpa_bits(),
-+	__reset_rsvds_bits_mask(shadow_zero_check, reserved_hpa_bits(),
- 				context->shadow_root_level, uses_nx,
- 				guest_cpuid_has(vcpu, X86_FEATURE_GBPAGES),
- 				is_pse, is_amd);
-@@ -4328,8 +4326,7 @@ reset_tdp_shadow_zero_bits_mask(struct kvm_vcpu *vcpu,
- 	shadow_zero_check = &context->shadow_zero_check;
+@@ -4374,9 +4373,9 @@ static void update_permission_bitmask(struct kvm_vcpu *vcpu,
+ 	const u8 w = BYTE_MASK(ACC_WRITE_MASK);
+ 	const u8 u = BYTE_MASK(ACC_USER_MASK);
  
- 	if (boot_cpu_is_amd())
--		__reset_rsvds_bits_mask(vcpu, shadow_zero_check,
--					reserved_hpa_bits(),
-+		__reset_rsvds_bits_mask(shadow_zero_check, reserved_hpa_bits(),
- 					context->shadow_root_level, false,
- 					boot_cpu_has(X86_FEATURE_GBPAGES),
- 					false, true);
+-	bool cr4_smep = kvm_read_cr4_bits(vcpu, X86_CR4_SMEP) != 0;
+-	bool cr4_smap = kvm_read_cr4_bits(vcpu, X86_CR4_SMAP) != 0;
+-	bool cr0_wp = is_write_protection(vcpu);
++	bool cr4_smep = is_cr4_smep(mmu);
++	bool cr4_smap = is_cr4_smap(mmu);
++	bool cr0_wp = is_cr0_wp(mmu);
+ 
+ 	for (byte = 0; byte < ARRAY_SIZE(mmu->permissions); ++byte) {
+ 		unsigned pfec = byte << 1;
+@@ -4672,7 +4671,7 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu)
+ 		context->gva_to_gpa = paging32_gva_to_gpa;
+ 	}
+ 
+-	update_permission_bitmask(vcpu, context, false);
++	update_permission_bitmask(context, false);
+ 	update_pkru_bitmask(vcpu, context, false);
+ 	update_last_nonleaf_level(vcpu, context);
+ 	reset_tdp_shadow_zero_bits_mask(vcpu, context);
+@@ -4730,7 +4729,7 @@ static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *conte
+ 
+ 	if (____is_cr0_pg(regs)) {
+ 		reset_rsvds_bits_mask(vcpu, context);
+-		update_permission_bitmask(vcpu, context, false);
++		update_permission_bitmask(context, false);
+ 		update_pkru_bitmask(vcpu, context, false);
+ 		update_last_nonleaf_level(vcpu, context);
+ 	}
+@@ -4838,7 +4837,7 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
+ 	context->root_level = level;
+ 	context->direct_map = false;
+ 
+-	update_permission_bitmask(vcpu, context, true);
++	update_permission_bitmask(context, true);
+ 	update_pkru_bitmask(vcpu, context, true);
+ 	update_last_nonleaf_level(vcpu, context);
+ 	reset_rsvds_bits_mask_ept(vcpu, context, execonly);
+@@ -4935,7 +4934,7 @@ static void init_kvm_nested_mmu(struct kvm_vcpu *vcpu)
+ 		g_context->gva_to_gpa = paging32_gva_to_gpa_nested;
+ 	}
+ 
+-	update_permission_bitmask(vcpu, g_context, false);
++	update_permission_bitmask(g_context, false);
+ 	update_pkru_bitmask(vcpu, g_context, false);
+ 	update_last_nonleaf_level(vcpu, g_context);
+ }
 -- 
 2.32.0.288.g62a8d224e6-goog
 
