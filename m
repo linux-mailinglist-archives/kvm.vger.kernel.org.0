@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 250313B0BF7
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 19:58:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22FF73B0BF4
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 19:58:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232559AbhFVSAZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 14:00:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37602 "EHLO
+        id S232548AbhFVSAY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 14:00:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232505AbhFVSAV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Jun 2021 14:00:21 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9964EC061767
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:03 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id a12-20020ac8108c0000b029023c90fba3dcso91114qtj.7
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:03 -0700 (PDT)
+        with ESMTP id S232476AbhFVSAW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Jun 2021 14:00:22 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9C46C0617AD
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:05 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id s9-20020ad452490000b02902786b63dbfeso3018819qvq.5
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=w16oYt0iKSKWOMspUVtVlE9oFeOTkC9A/TBUaesRgr0=;
-        b=wCOY/2V6r5LJo6VUNy2t44U0CjXGUf3gp6SBDvliT/3aYksK7+5EpnjfV9JSvomODP
-         PWWEKUodU01x8l/Vvcph3qX209E0sO2Er0XB2uhDIJamudunocqSTJLI6Xpjl4bsWwDs
-         MyIDrG0HlvNBZmPuqCT+D8pGut1jyt33Pltp2xkYpwAWfxnNyFbX5Xd8Ake35zHAFuri
-         KeGgu+iC6tX8yKIKY9uUPKrTSDAa0B8HTEtI7dAIkvW1NNBikB5TecyW9aChHYvWollr
-         5MWTYG6E5bRRagwBcZueQPspSBil5B/Rlgs9CA22GODgovTWQA+WrDkZl6G2DK/8jsoH
-         970Q==
+        bh=CIzHUFEr3GeKAMXjnbC+xjP+Eg1EK4JnSnmAhJQMsJE=;
+        b=WCs4PSsVQ6zrFs+0qZ1BRM00puOifY/e7Ztf88WvlGbmeunkDfepfkdfmUClSsXwDb
+         yYQg4I6Ik2sHs8so3Ax10vc+kOszdU+ckAiqLmdc6AqRNtoGS0PA0hsbE33mF3XNmeIC
+         DLFtsBHvpG6t4RG683rfJ+4GRl7aauHp8lTQHu/+Z1vaLDoz0djw/NYlwnQky6HhvXs3
+         gyK1NQmyQOUA6NeoyS/OSIk4z46/FrlaxOI92qekb+EpFVkBKqLKS+3Mq9ykzdNUXF/0
+         GVSB7DSwc8Zo3tTakIaMC3ZLzQj+3pMBzUYnKhq8lwn8LFsM56oHTbZdP8Db3xJVWjnZ
+         yegg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=w16oYt0iKSKWOMspUVtVlE9oFeOTkC9A/TBUaesRgr0=;
-        b=VAxWj5mLtDGuZjVGpe6k9fAqkPAo7+jA3v0ObVQBfXWuO5fFhtrLWuyABjubu8ieFb
-         6tGjk1smMvlPlm64GIAuYboU3Vje0/+qZcdm7MTbYuqoFJeqXdeNGpdvYWKtPJ6sT6Ds
-         OEpMj7p8JpKhIunOyQLobRLcHrPKj9jefalK6ZB2DYLKhZ85PJKOyFhBMYoQP2sfyFtg
-         ZeTzOkHdr+Xj2rVGSKUsc/NR67op976K2yT8p3vSv1pn4t2jBNEmoVvIl1sy8I4Ed5EM
-         2Oz5H9Xxz9FCRxxVVa9oNicMMFw/HN+0wEnVTiodU2M3ORoWGmp3c7DfWj+umVHDCSAw
-         mxLw==
-X-Gm-Message-State: AOAM533UEknacXhnKvUXeVIttEUNDYCZuxF976/UJLtvioTrlNuaMklQ
-        hX/lt6J90cUtdbVyCEFjTksyPFM0PQc=
-X-Google-Smtp-Source: ABdhPJzhjd9weDitq99P+aWf5UUwgjWeiPEDbkdiLCgMwTr/Xsn4umcE0nX1tvL+mom4QsYOUvRMv1sS6PY=
+        bh=CIzHUFEr3GeKAMXjnbC+xjP+Eg1EK4JnSnmAhJQMsJE=;
+        b=f9XOBDHwDbTSS3Mtc6Nbzb7QXboOghjotMQQjOOMWwtiORRlA4q7l0RQq3SCEII1o5
+         rSiN7KpjlMzehyfogGOSXfpot8I3vM6wf4UmcT9nZAp77m7GiWrd0uepGgxd8AhQrINj
+         pUeAnRpcT1rLUn4GGuTj4EtxpOG0kJ6DOlSRk0lIzP+vFMToX4jQjPJrEDMc9MvLW8pO
+         RTekIDl8n1PIAgs0gacxvguML5O+RPFZxLPDnC+toubYGS9Ex+vKBki1Oou6saEYBGl8
+         y+ZnPEuTIv1YIq6oe0vxOvGI2YYto4EQKee7IMxfv6v4dKSuouWTrluzldVoJ/z0I5yF
+         UQkw==
+X-Gm-Message-State: AOAM531OGXyadoIKGqb83SVqwh4rpYGPN2sst/VCBtpfq6UkVRXWC6TN
+        T93niImHYexYUo1fELKBhAr/4XFtUKg=
+X-Google-Smtp-Source: ABdhPJzmgHHM+NNllA3I3T3c3z6tsMtbpsbsqUrpXg0+3SYN522sb9bhMpGy7zTaTjtwVkUL+G7w7vnCA84=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:5722:92ce:361f:3832])
- (user=seanjc job=sendgmr) by 2002:a25:ab6b:: with SMTP id u98mr6473219ybi.98.1624384682743;
- Tue, 22 Jun 2021 10:58:02 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a5b:4c6:: with SMTP id u6mr6647323ybp.31.1624384684905;
+ Tue, 22 Jun 2021 10:58:04 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 22 Jun 2021 10:56:48 -0700
+Date:   Tue, 22 Jun 2021 10:56:49 -0700
 In-Reply-To: <20210622175739.3610207-1-seanjc@google.com>
-Message-Id: <20210622175739.3610207-4-seanjc@google.com>
+Message-Id: <20210622175739.3610207-5-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210622175739.3610207-1-seanjc@google.com>
 X-Mailer: git-send-email 2.32.0.288.g62a8d224e6-goog
-Subject: [PATCH 03/54] KVM: x86: Properly reset MMU context at vCPU RESET/INIT
+Subject: [PATCH 04/54] KVM: x86/mmu: Use MMU's role to detect CR4.SMEP value
+ in nested NPT walk
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -67,77 +68,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Reset the MMU context at vCPU INIT (and RESET for good measure) if CR0.PG
-was set prior to INIT.  Simply re-initializing the current MMU is not
-sufficient as the current root HPA may not be usable in the new context.
-E.g. if TDP is disabled and INIT arrives while the vCPU is in long mode,
-KVM will fail to switch to the 32-bit pae_root and bomb on the next
-VM-Enter due to running with a 64-bit CR3 in 32-bit mode.
+Use the MMU's role to get its effective SMEP value when injecting a fault
+into the guest.  When walking L1's (nested) NPT while L2 is active, vCPU
+state will reflect L2, whereas NPT uses the host's (L1 in this case) CR0,
+CR4, EFER, etc...  If L1 and L2 have different settings for SMEP and
+L1 does not have EFER.NX=1, this can result in an incorrect PFEC.FETCH
+when injecting #NPF.
 
-This bug was papered over in both VMX and SVM, but still managed to rear
-its head in the MMU role on VMX.  Because EFER.LMA=1 requires CR0.PG=1,
-kvm_calc_shadow_mmu_root_page_role() checks for EFER.LMA without first
-checking CR0.PG.  VMX's RESET/INIT flow writes CR0 before EFER, and so
-an INIT with the vCPU in 64-bit mode will cause the hack-a-fix to
-generate the wrong MMU role.
-
-In VMX, the INIT issue is specific to running without unrestricted guest
-since unrestricted guest is available if and only if EPT is enabled.
-Commit 8668a3c468ed ("KVM: VMX: Reset mmu context when entering real
-mode") resolved the issue by forcing a reset when entering emulated real
-mode.
-
-In SVM, commit ebae871a509d ("kvm: svm: reset mmu on VCPU reset") forced
-a MMU reset on every INIT to workaround the flaw in common x86.  Note, at
-the time the bug was fixed, the SVM problem was exacerbated by a complete
-lack of a CR4 update.
-
-The vendor resets will be reverted in future patches, primarily to aid
-bisection in case there are non-INIT flows that rely on the existing VMX
-logic.
-
-Because CR0.PG is unconditionally cleared on INIT, and because CR0.WP and
-all CR4/EFER paging bits are ignored if CR0.PG=0, simply checking that
-CR0.PG was '1' prior to INIT/RESET is sufficient to detect a required MMU
-context reset.
-
+Fixes: e57d4a356ad3 ("KVM: Add instruction fetch checking when walking guest page table")
 Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ arch/x86/kvm/mmu/paging_tmpl.h | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 76dae88cf524..42608b515ce4 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10735,6 +10735,8 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 823a5919f9fa..52fffd68b522 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -471,8 +471,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
  
- void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- {
-+	unsigned long old_cr0 = kvm_read_cr0(vcpu);
-+
- 	kvm_lapic_reset(vcpu, init_event);
+ error:
+ 	errcode |= write_fault | user_fault;
+-	if (fetch_fault && (mmu->nx ||
+-			    kvm_read_cr4_bits(vcpu, X86_CR4_SMEP)))
++	if (fetch_fault && (mmu->nx || mmu->mmu_role.ext.cr4_smep))
+ 		errcode |= PFERR_FETCH_MASK;
  
- 	vcpu->arch.hflags = 0;
-@@ -10803,6 +10805,17 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	vcpu->arch.ia32_xss = 0;
- 
- 	static_call(kvm_x86_vcpu_reset)(vcpu, init_event);
-+
-+	/*
-+	 * Reset the MMU context if paging was enabled prior to INIT (which is
-+	 * implied if CR0.PG=1 as CR0 will be '0' prior to RESET).  Unlike the
-+	 * standard CR0/CR4/EFER modification paths, only CR0.PG needs to be
-+	 * checked because it is unconditionally cleared on INIT and all other
-+	 * paging related bits are ignored if paging is disabled, i.e. CR0.WP,
-+	 * CR4, and EFER changes are all irrelevant if CR0.PG was '0'.
-+	 */
-+	if (old_cr0 & X86_CR0_PG)
-+		kvm_mmu_reset_context(vcpu);
- }
- 
- void kvm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+ 	walker->fault.vector = PF_VECTOR;
 -- 
 2.32.0.288.g62a8d224e6-goog
 
