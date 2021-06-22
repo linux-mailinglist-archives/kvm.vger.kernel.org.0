@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1ED203B0C04
+	by mail.lfdr.de (Postfix) with ESMTP id E271D3B0C06
 	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 19:59:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232677AbhFVSBJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 14:01:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37646 "EHLO
+        id S232738AbhFVSBR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 14:01:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232671AbhFVSAn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Jun 2021 14:00:43 -0400
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2885DC061787
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:22 -0700 (PDT)
-Received: by mail-qv1-xf4a.google.com with SMTP id y17-20020ad445b10000b029027389e9530fso7397931qvu.4
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:22 -0700 (PDT)
+        with ESMTP id S232576AbhFVSAx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Jun 2021 14:00:53 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A717BC0617AD
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:24 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id e13-20020a37e50d0000b02903ad5730c883so1723796qkg.22
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=w2Kt+/2qENUIrhf0LV790hqbhtHihwRSzE//krnionw=;
-        b=WOP77fC3Ucs4V8/L6vxTB/JiH0DwuxnXT6BnGHWWO+6w3nDkR4dayPBlG3Kz4N3loF
-         6nzwP4ABmUvOQGpc/ZfhyXvTlYr1PA0Rawxk9ENqAY1+PPF8ykvgWEShpq8lDijd/xYM
-         O8InonsZbIK7zabxNSsdWGRH7t1GWgq2l95mMPwCDZF2HWTd2/XpVKflZTh2MyAbgTPK
-         ytoKjzM1evJ4/sTgqtYZLGY8vuqRId3e7lLzVw/XWA1Bl74jWZ9DNBu7qtNyXEQ7vXwP
-         vqo+f7q8R0IOtGVqimnpjc8SUNp3ILAzsUA2hr6NSWv+3cm+wWrD7D5Pd0VATPRSzsce
-         dONA==
+        bh=SXPUg9mNmqVN5rRtGZsktXnV3IRtDTAZpIQMiVU+baY=;
+        b=m1bpxHKWRMXd6AP9P/rxCP1SVrJwcVZ+LBLaU6bVsOae/XAOt9w7AyOgX1LluKqP+C
+         cdGh27lYDruC6CulMsAYjvLoAGMAy3JFOJqNWfgtWYlbpZRyWuZcTD5xtbrFO9e3+SxE
+         Xnt/QfpgKtpG4UrtYtVNI1pjErGJFV6+5IaNjq1+zpzgGtBeGqW5Uq1dut0AuKfmiuOA
+         XtJPkxtmycqkDXwohCE8n7xPT1SdrluCrjzn2XrvOLEp7UD/LJJHYjmPoXkkrMtwFzzq
+         yGWFOEmvgcPYVBs8VxHhHH9Rid40Fz95cHSd9TgVh+JUiWqd/P3p0dooVe9z7dEm5KWl
+         BuCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=w2Kt+/2qENUIrhf0LV790hqbhtHihwRSzE//krnionw=;
-        b=lzruU7mwoNaw9eQusmnf1A84f044ilj5+9ThelfkLHRwHpU5V9JbrMHt8UDVvno0z6
-         TFgsRaVmd3P/kV2q0ago6kBx5RNB82h/3jTZp0xGgyEJwzFYBh+LeftrRbeyfnkCfofl
-         73EvWiSZ0JGTslRouL732e7w0P/AwrZrFlG6g2GC8DcJEw6Ln2jC7snBotcWCRNbhZLf
-         bsxpZ0aKkpgqXpDhEY574nvZXwTGR+jr4EhV+o3q8zr235QCEpiLjAXXz+x8/Ip0QpNb
-         T+U3SBgrQlsd148zg3czJARPHW499U/hdMuchD3oMPd/aVnB3Slc5Rj/lyOx2S3UDdaR
-         qm3w==
-X-Gm-Message-State: AOAM53173RTN1Juhfh1VzePcMFvFdkrsysf/37mVQ5BlNZ0eHVNswiXL
-        1FK3nfmm8AZQQv0hbosXY0uSiOWRaa0=
-X-Google-Smtp-Source: ABdhPJyYEvOaW0sEkmBKcm9Z+YODGpl5E/7J7NUNoQhsTWSaxBw75d9oUqOvwvow9P+dR7Wygfia25GCgF4=
+        bh=SXPUg9mNmqVN5rRtGZsktXnV3IRtDTAZpIQMiVU+baY=;
+        b=Q28S7csThfbkSXvADkiMTruvWDs0kgd1KyQbXgDnFekZcELaaMvTo1B4fX0mZs7qb3
+         4Wlsgzh4aeCFWb+dvPOj74SKD7vmb2rQm/jmpDZEYn1qXZVhu4HrPQUcYYy1XHmvonMV
+         6lpBxb6G3VpTEx0jKa9CYH7HPZh06EW+UTTgX2RrjdwM8BShVSYTZ1iudt81tMCFbmms
+         7OjF3V7oURh2tddTRGp0ByA+VNuPXUIauXnIly3cVQFfsbqylJFVfG9UnBdEqo59gpEy
+         RXSlTfjHFNGS1pOKLeJjZxiQkmHhRYkiVW/ehJ8xlsS2MWJHyFV0NIVQpHuBGpO659JH
+         Elpg==
+X-Gm-Message-State: AOAM533c2waYBeq9qPNepy0eix8/9IOUCGjKeGJ0zgILrjW6uAKbXNhj
+        RXPe9sC9j2qYLo7mSG5nYfqK8Xm4Pe8=
+X-Google-Smtp-Source: ABdhPJxbENL+2wIAUfosytd1ZbrgFCTF9+OpHIVawKBqVJIDy4pnomFUqtWns578BZpguezHdmPPkQtpHXM=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:5722:92ce:361f:3832])
- (user=seanjc job=sendgmr) by 2002:a25:ada5:: with SMTP id z37mr6434317ybi.415.1624384701324;
- Tue, 22 Jun 2021 10:58:21 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:d44f:: with SMTP id m76mr6300374ybf.198.1624384703815;
+ Tue, 22 Jun 2021 10:58:23 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 22 Jun 2021 10:56:56 -0700
+Date:   Tue, 22 Jun 2021 10:56:57 -0700
 In-Reply-To: <20210622175739.3610207-1-seanjc@google.com>
-Message-Id: <20210622175739.3610207-12-seanjc@google.com>
+Message-Id: <20210622175739.3610207-13-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210622175739.3610207-1-seanjc@google.com>
 X-Mailer: git-send-email 2.32.0.288.g62a8d224e6-goog
-Subject: [PATCH 11/54] KVM: x86/mmu: WARN and zap SP when sync'ing if MMU role mismatches
+Subject: [PATCH 12/54] KVM: x86/mmu: Drop the intermediate "transient" __kvm_sync_page()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -67,83 +67,95 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When synchronizing a shadow page, WARN and zap the page if its mmu role
-isn't compatible with the current MMU context, where "compatible" is an
-exact match sans the bits that have no meaning in the overall MMU context
-or will be explicitly overwritten during the sync.  Many of the helpers
-used by sync_page() are specific to the current context, updating a SMM
-vs. non-SMM shadow page would use the wrong memslots, updating L1 vs. L2
-PTEs might work but would be extremely bizaree, and so on and so forth.
+Nove the kvm_unlink_unsync_page() call out of kvm_sync_page() and into
+it's sole caller, and fold __kvm_sync_page() into kvm_sync_page() since
+the latter becomes a pure pass-through.  There really should be no reason
+for code to do a complete sync of a shadow page outside of the full
+kvm_mmu_sync_roots(), e.g. the one use case that creeped in turned out to
+be flawed and counter-productive.
 
-Drop the guard with respect to 8-byte vs. 4-byte PTEs in
-__kvm_sync_page(), it was made useless when kvm_mmu_get_page() stopped
-trying to sync shadow pages irrespective of the current MMU context.
+Update the comment in kvm_mmu_get_page() regarding its sync_page() usage,
+which is anything but obvious.
+
+Drop the stale comment about @sp->gfn needing to be write-protected, as
+it directly contradicts the kvm_mmu_get_page() usage.
+
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c         |  5 +----
- arch/x86/kvm/mmu/paging_tmpl.h | 27 +++++++++++++++++++++++++--
- 2 files changed, 26 insertions(+), 6 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 36 +++++++++++++++++++-----------------
+ 1 file changed, 19 insertions(+), 17 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 9f277c5bab76..2e2d66319325 100644
+index 2e2d66319325..77296ce6215f 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1784,10 +1784,7 @@ static void kvm_mmu_commit_zap_page(struct kvm *kvm,
- static bool __kvm_sync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 			    struct list_head *invalid_list)
- {
--	union kvm_mmu_page_role mmu_role = vcpu->arch.mmu->mmu_role.base;
+@@ -1780,18 +1780,6 @@ static void kvm_mmu_commit_zap_page(struct kvm *kvm,
+ 	  &(_kvm)->arch.mmu_page_hash[kvm_page_table_hashfn(_gfn)])	\
+ 		if ((_sp)->gfn != (_gfn) || (_sp)->role.direct) {} else
+ 
+-/* @sp->gfn should be write-protected at the call site */
+-static bool __kvm_sync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+-			    struct list_head *invalid_list)
+-{
+-	if (vcpu->arch.mmu->sync_page(vcpu, sp) == 0) {
+-		kvm_mmu_prepare_zap_page(vcpu->kvm, sp, invalid_list);
+-		return false;
+-	}
 -
--	if (sp->role.gpte_is_8_bytes != mmu_role.gpte_is_8_bytes ||
--	    vcpu->arch.mmu->sync_page(vcpu, sp) == 0) {
-+	if (vcpu->arch.mmu->sync_page(vcpu, sp) == 0) {
- 		kvm_mmu_prepare_zap_page(vcpu->kvm, sp, invalid_list);
- 		return false;
- 	}
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 52fffd68b522..b632606a87d6 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -1030,13 +1030,36 @@ static gpa_t FNAME(gva_to_gpa_nested)(struct kvm_vcpu *vcpu, gpa_t vaddr,
-  */
- static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+-	return true;
+-}
+-
+ static bool kvm_mmu_remote_flush_or_zap(struct kvm *kvm,
+ 					struct list_head *invalid_list,
+ 					bool remote_flush)
+@@ -1833,8 +1821,12 @@ static bool is_obsolete_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+ static bool kvm_sync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 			 struct list_head *invalid_list)
  {
-+	union kvm_mmu_page_role mmu_role = vcpu->arch.mmu->mmu_role.base;
- 	int i, nr_present = 0;
- 	bool host_writable;
- 	gpa_t first_pte_gpa;
- 	int set_spte_ret = 0;
- 
--	/* direct kvm_mmu_page can not be unsync. */
--	BUG_ON(sp->role.direct);
-+	/*
-+	 * Ignore various flags when verifying that it's safe to sync a shadow
-+	 * page using the current MMU context.
-+	 *
-+	 *  - level: not part of the overall MMU role and will never match as the MMU's
-+	 *           level tracks the root level
-+	 *  - access: updated based on the new guest PTE
-+	 *  - quadrant: not part of the overall MMU role (similar to level)
-+	 */
-+	const union kvm_mmu_page_role sync_role_ign = {
-+		.level = 0xf,
-+		.access = 0x7,
-+		.quadrant = 0x3,
-+	};
+-	kvm_unlink_unsync_page(vcpu->kvm, sp);
+-	return __kvm_sync_page(vcpu, sp, invalid_list);
++	if (vcpu->arch.mmu->sync_page(vcpu, sp) == 0) {
++		kvm_mmu_prepare_zap_page(vcpu->kvm, sp, invalid_list);
++		return false;
++	}
 +
-+	/*
-+	 * Direct pages can never be unsync, and KVM should never attempt to
-+	 * sync a shadow page for a different MMU context, e.g. if the role
-+	 * differs then the memslot lookup (SMM vs. non-SMM) will be bogus, the
-+	 * reserved bits checks will be wrong, etc...
-+	 */
-+	if (WARN_ON_ONCE(sp->role.direct ||
-+			 (sp->role.word ^ mmu_role.word) & ~sync_role_ign.word))
-+		return 0;
++	return true;
+ }
  
- 	first_pte_gpa = FNAME(get_level1_sp_gpa)(sp);
+ struct mmu_page_path {
+@@ -1931,6 +1923,7 @@ static void mmu_sync_children(struct kvm_vcpu *vcpu,
+ 		}
  
+ 		for_each_sp(pages, sp, parents, i) {
++			kvm_unlink_unsync_page(vcpu->kvm, sp);
+ 			flush |= kvm_sync_page(vcpu, sp, &invalid_list);
+ 			mmu_pages_clear_parents(&parents);
+ 		}
+@@ -2008,10 +2001,19 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 			goto trace_get_page;
+ 
+ 		if (sp->unsync) {
+-			/* The page is good, but __kvm_sync_page might still end
+-			 * up zapping it.  If so, break in order to rebuild it.
++			/*
++			 * The page is good, but is stale.  "Sync" the page to
++			 * get the latest guest state, but don't write-protect
++			 * the page and don't mark it synchronized!  KVM needs
++			 * to ensure the mapping is valid, but doesn't need to
++			 * fully sync (write-protect) the page until the guest
++			 * invalidates the TLB mapping.  This allows multiple
++			 * SPs for a single gfn to be unsync.
++			 *
++			 * If the sync fails, the page is zapped.  If so, break
++			 * If so, break in order to rebuild it.
+ 			 */
+-			if (!__kvm_sync_page(vcpu, sp, &invalid_list))
++			if (!kvm_sync_page(vcpu, sp, &invalid_list))
+ 				break;
+ 
+ 			WARN_ON(!list_empty(&invalid_list));
 -- 
 2.32.0.288.g62a8d224e6-goog
 
