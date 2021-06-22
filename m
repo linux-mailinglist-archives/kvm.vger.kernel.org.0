@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 779E83B0C14
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 19:59:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3CF983B0C16
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 19:59:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232288AbhFVSBy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 14:01:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37720 "EHLO
+        id S232710AbhFVSCG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 14:02:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232697AbhFVSBT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Jun 2021 14:01:19 -0400
+        with ESMTP id S232797AbhFVSB1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Jun 2021 14:01:27 -0400
 Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31E75C06124A
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:38 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id b6-20020a05620a1266b02903b10c5cfa93so841383qkl.13
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:38 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CE53C061226
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:40 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id n195-20020a3740cc0000b02903b2ccb7bbe6so2526820qka.20
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=HZb8OLBJZDPapTr8/JRwbfQg/ysQN+FOOKZXN2ZmDnI=;
-        b=c7dMyoiY/YzDEAKBg8tlk7JQ02rmJ1AdEoobUEXudHruDHKI/JkxZ9CR8dfiJc8Rhi
-         NXSnzi6uOe1DgGKrWhdalFNfWnVpZzsrLSCKsuS/98veGOHM+XAIP4/84MkyewEBCKCO
-         2SDdrwYfZHSCjnkHyTRrKHVD8PWZBYxbu/0V7dvsp98iUFy2N4isELd0FrREpRkEJomA
-         eiPjwTryx8lkmRcQaBcc3HAcyFfGq8Ncn3Sb83lkHKPRSTUdHXPkiw/9hKrZyNY66MFm
-         f3GneBwdKCJdi5m763xtRYqXeJKQDTWVTVqsW5BmwEdXRaGs6rGUOnPZaCIlHG82esui
-         mhKg==
+        bh=3dZybjy6vwU9WfW0H4YoDO4hpVV/AUIoIg4sHYrpcm8=;
+        b=D80TzGeFtbzp+OgIhK2zHERLxniKlpWd//90G4A5NN9szTRrAuf1HHhd10pjxv8HUM
+         sXISFGUYrWRuAKT6TsZ8bWq958xK7V05X21BEb0fp8t8sKDxQ1Zo8Lg6aaxPkoiB4GNY
+         0lzhlee5RKkrjurvphE/x9YYJLLCsQ9drbsYo+c32wPY+/YzhjM43gDEiD9I0zL/KTYA
+         Hc3xFbwjsHuvNtRIYPL0AZD952qUVDpbI2sUxBKT2lu3raV5DDy8EQ34v5+3ctnA+wAj
+         dHZ/jftE61JWUrRvYp3bdT7LkuhS1BQLMvb2gxpV38LmVRoFKb+TJ1+5zSEJ+jjRr63g
+         az8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=HZb8OLBJZDPapTr8/JRwbfQg/ysQN+FOOKZXN2ZmDnI=;
-        b=Ys9R4jq7FI0tSxcqiC5L3bDVQOG6F84bydoIuac0Rqi8rfoWQTcNN7tXs5a42ASH3P
-         WUQMta2inYUopE6gK+KdYANWK5h64xWEPiKTh8mIGyQPm6jVONFre8kErq5oBE2HgPI8
-         zmO+bwxfPw3sto8ivNtwxh2TVgR0RpKRwCEAupNgEpVLfNjBKq5v7Y+Ag3Kz+0E01Vpk
-         UdbuI/laWNao/fDnBC6s3zPSGMpTYXPAEGH7p/jdFJvWEsxzRbQeo9QrhRvlMweJW6Qq
-         RJoL1+p1O6t7OqGXvz31mc+HZLzZaXwuPN3wpLMmh3X565bPOzMoxu2PxMUCT8+OxQy0
-         OHcg==
-X-Gm-Message-State: AOAM5317nPdhjOtodFt/qtzO2+bG9gjrK895XoT7vLG8ybB5e8DoBJt4
-        JEXgsgkVLzNXaPGfLA4D3Fpy8/1nQBA=
-X-Google-Smtp-Source: ABdhPJyjOS840Dh66sh9kYKMVYAWYWMwlpDlLvqiyp18elHTQEQDjLfdQVgO9tcRkn3CX4oLl9ZARYaeIsQ=
+        bh=3dZybjy6vwU9WfW0H4YoDO4hpVV/AUIoIg4sHYrpcm8=;
+        b=MsBGy4M04IxDF3R3Rd0rWs4UmHJs7gYpoAZ2XbZShIvY1GTEQbJUXIaMIbwXWohBVx
+         XphpOTH9LXjwTdgCb7Vv88n0kZ9qf8lVzhceKhfTKvQ4ZmtxLwyPwJ+ZKYbGM6EyvkzL
+         FTonASV2KYd68gMGJt+LOGC93gMeSfCh/CwiW9ruS3nQoxBcvSdomV0o1KtX4Qfbp1t0
+         xrqpkR5IWXLad/RteZn8xurlVzV0gqTwokp3WXRM2SuyTonRhNy5ySR3XQ6fIzXW7Rox
+         zWdGQ+mjnouUtNkTfO5Bkf860a3Wl2Hgzqy1RprpelLchCpfN6GVlzOmF0JPUaz5w+67
+         ZJVQ==
+X-Gm-Message-State: AOAM531TRx5pJ6gVtnwuDu9SOjyk2R7ozwZRAsIZSu5ShA1JxPnWB3Vq
+        aOVToPy3shA1ADPUF07H47SqpVA0HFg=
+X-Google-Smtp-Source: ABdhPJyf7SXRR+kMnblZcElhy/0cxr30tGVPxHF1h18GpS9LWm9iYp5muMU6PIgPPN0gJqMgm/qgnOdS7p0=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:5722:92ce:361f:3832])
- (user=seanjc job=sendgmr) by 2002:a25:df82:: with SMTP id w124mr6162687ybg.425.1624384717363;
- Tue, 22 Jun 2021 10:58:37 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:7109:: with SMTP id m9mr6679225ybc.274.1624384719700;
+ Tue, 22 Jun 2021 10:58:39 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 22 Jun 2021 10:57:03 -0700
+Date:   Tue, 22 Jun 2021 10:57:04 -0700
 In-Reply-To: <20210622175739.3610207-1-seanjc@google.com>
-Message-Id: <20210622175739.3610207-19-seanjc@google.com>
+Message-Id: <20210622175739.3610207-20-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210622175739.3610207-1-seanjc@google.com>
 X-Mailer: git-send-email 2.32.0.288.g62a8d224e6-goog
-Subject: [PATCH 18/54] KVM: x86/mmu: Move nested NPT reserved bit calculation
- into MMU proper
+Subject: [PATCH 19/54] KVM: x86/mmu: Grab shadow root level from mmu_role for
+ shadow MMUs
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -68,82 +68,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move nested NPT's invocation of reset_shadow_zero_bits_mask() into the
-MMU proper and unexport said function.  Aside from dropping an export,
-this is a baby step toward eliminating the call entirely by fixing the
-shadow_root_level confusion.
-
-No functional change intended.
+Use the mmu_role to initialize shadow root level instead of assuming the
+level of KVM's shadow root (host) is the same as that of the guest root,
+or in the case of 32-bit non-PAE paging where KVM forces PAE paging.
+For nested NPT, the shadow root level cannot be adapted to L1's NPT root
+level and is instead always the TDP root level because NPT uses the
+current host CR0/CR4/EFER, e.g. 64-bit KVM can't drop into 32-bit PAE to
+shadow L1's NPT.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu.h        |  3 ---
- arch/x86/kvm/mmu/mmu.c    | 11 ++++++++---
- arch/x86/kvm/svm/nested.c |  1 -
- 3 files changed, 8 insertions(+), 7 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 18 +++++-------------
+ 1 file changed, 5 insertions(+), 13 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 4e926f4935b0..62844bacd13f 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -68,9 +68,6 @@ static __always_inline u64 rsvd_bits(int s, int e)
- void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask);
- void kvm_mmu_set_ept_masks(bool has_ad_bits, bool has_exec_only);
- 
--void
--reset_shadow_zero_bits_mask(struct kvm_vcpu *vcpu, struct kvm_mmu *context);
--
- void kvm_init_mmu(struct kvm_vcpu *vcpu);
- void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, unsigned long cr0,
- 			     unsigned long cr4, u64 efer, gpa_t nested_cr3);
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 02c54426e7a2..5a46a87b23b0 100644
+index 5a46a87b23b0..5e3ee4aba2ff 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4212,8 +4212,8 @@ static inline u64 reserved_hpa_bits(void)
-  * table in guest or amd nested guest, its mmu features completely
-  * follow the features in guest.
-  */
--void
--reset_shadow_zero_bits_mask(struct kvm_vcpu *vcpu, struct kvm_mmu *context)
-+static void reset_shadow_zero_bits_mask(struct kvm_vcpu *vcpu,
-+					struct kvm_mmu *context)
- {
- 	/*
- 	 * KVM uses NX when TDP is disabled to handle a variety of scenarios,
-@@ -4247,7 +4247,6 @@ reset_shadow_zero_bits_mask(struct kvm_vcpu *vcpu, struct kvm_mmu *context)
- 	}
- 
+@@ -3898,7 +3898,6 @@ static void nonpaging_init_context(struct kvm_vcpu *vcpu,
+ 	context->sync_page = nonpaging_sync_page;
+ 	context->invlpg = NULL;
+ 	context->root_level = 0;
+-	context->shadow_root_level = PT32E_ROOT_LEVEL;
+ 	context->direct_map = true;
+ 	context->nx = false;
  }
--EXPORT_SYMBOL_GPL(reset_shadow_zero_bits_mask);
+@@ -4466,10 +4465,10 @@ static void update_last_nonleaf_level(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu
  
- static inline bool boot_cpu_is_amd(void)
+ static void paging64_init_context_common(struct kvm_vcpu *vcpu,
+ 					 struct kvm_mmu *context,
+-					 int level)
++					 int root_level)
  {
-@@ -4714,6 +4713,12 @@ void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, unsigned long cr0,
- 		 */
- 		context->shadow_root_level = new_role.base.level;
- 	}
+ 	context->nx = is_nx(vcpu);
+-	context->root_level = level;
++	context->root_level = root_level;
+ 
+ 	reset_rsvds_bits_mask(vcpu, context);
+ 	update_permission_bitmask(vcpu, context, false);
+@@ -4481,7 +4480,6 @@ static void paging64_init_context_common(struct kvm_vcpu *vcpu,
+ 	context->gva_to_gpa = paging64_gva_to_gpa;
+ 	context->sync_page = paging64_sync_page;
+ 	context->invlpg = paging64_invlpg;
+-	context->shadow_root_level = level;
+ 	context->direct_map = false;
+ }
+ 
+@@ -4509,7 +4507,6 @@ static void paging32_init_context(struct kvm_vcpu *vcpu,
+ 	context->gva_to_gpa = paging32_gva_to_gpa;
+ 	context->sync_page = paging32_sync_page;
+ 	context->invlpg = paging32_invlpg;
+-	context->shadow_root_level = PT32E_ROOT_LEVEL;
+ 	context->direct_map = false;
+ }
+ 
+@@ -4669,6 +4666,8 @@ static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *conte
+ 	else
+ 		paging32_init_context(vcpu, context);
+ 
++	context->shadow_root_level = new_role.base.level;
 +
-+	/*
-+	 * Redo the shadow bits, the reset done by shadow_mmu_init_context()
-+	 * (above) may use the wrong shadow_root_level.
-+	 */
-+	reset_shadow_zero_bits_mask(vcpu, context);
+ 	context->mmu_role.as_u64 = new_role.as_u64;
+ 	reset_shadow_zero_bits_mask(vcpu, context);
  }
- EXPORT_SYMBOL_GPL(kvm_init_shadow_npt_mmu);
+@@ -4704,16 +4703,9 @@ void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, unsigned long cr0,
  
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 33b2f9337e26..927e545591c3 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -110,7 +110,6 @@ static void nested_svm_init_mmu_context(struct kvm_vcpu *vcpu)
- 	vcpu->arch.mmu->get_guest_pgd     = nested_svm_get_tdp_cr3;
- 	vcpu->arch.mmu->get_pdptr         = nested_svm_get_tdp_pdptr;
- 	vcpu->arch.mmu->inject_page_fault = nested_svm_inject_npf_exit;
--	reset_shadow_zero_bits_mask(vcpu, vcpu->arch.mmu);
- 	vcpu->arch.walk_mmu              = &vcpu->arch.nested_mmu;
- }
+ 	__kvm_mmu_new_pgd(vcpu, nested_cr3, new_role.base);
  
+-	if (new_role.as_u64 != context->mmu_role.as_u64) {
++	if (new_role.as_u64 != context->mmu_role.as_u64)
+ 		shadow_mmu_init_context(vcpu, context, cr0, cr4, efer, new_role);
+ 
+-		/*
+-		 * Override the level set by the common init helper, nested TDP
+-		 * always uses the host's TDP configuration.
+-		 */
+-		context->shadow_root_level = new_role.base.level;
+-	}
+-
+ 	/*
+ 	 * Redo the shadow bits, the reset done by shadow_mmu_init_context()
+ 	 * (above) may use the wrong shadow_root_level.
 -- 
 2.32.0.288.g62a8d224e6-goog
 
