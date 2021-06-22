@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6513D3B0BFE
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 19:58:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C704B3B0C00
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 19:58:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232655AbhFVSAl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 14:00:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37640 "EHLO
+        id S232628AbhFVSAy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 14:00:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232598AbhFVSAc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Jun 2021 14:00:32 -0400
+        with ESMTP id S232627AbhFVSAh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Jun 2021 14:00:37 -0400
 Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A753FC0617AF
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:14 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id ez18-20020ad459120000b029020e62abfcbdso10062060qvb.16
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02427C0611C0
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:17 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id r15-20020a0562140c4fb0290262f40bf4bcso18347504qvj.11
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=1cuJlej5QtQVUgXaKXLCLupE2h8bZDvIvc+XU0Qy11c=;
-        b=FO/N2ZK8XxpG8TPbM5BAoGiA8fcp0UzdbCojc3o0jFF0opgx7osqSDUuL8TqSRyToR
-         8Ii6cA+AWkjOR2SaGHv6qtWsiMp+4ypf0+uLoCdajMO7S+hnWs73H9+Kq7VLUOLue2OW
-         cfDYenHu2qGY/Y5HsqFET/TTfrZHvTdsdBR5+ImhvxxEbzPEuXfeVY+agKdsxXyhrjCz
-         1Rb8dfXUM6auBfI/s/0BDyVaxlcgZr2AurtTVN3YehlxkF4rKBp5GjIhRseu9PMQf5DS
-         0NSVDRYKCYYwXqhh6DiA4kwHhxa13AvIp3xd/atAfqBRNMcWUhwuoVnLFEfoygkhJ3p5
-         FZ0g==
+        bh=WVFaMcj6eBUNfXCYM+guxa1ToSj4nAzpGmcEUcXwoLU=;
+        b=fR9azdqHDrrsRqLrk1mw1/khPxXD8zS5fO6Mc48QzCE1Wxj+ICx1DYJZGkJr6oKfw7
+         O9boiQL7kNK/4+RNr9j9x4FnX8eeMyW+wgzHNPJ8GEbrnH1RBX4gLr5CvbnCTCZH1vNk
+         0EvirxEWYIN7Xa0f4s7LGTMRkoORtdmDHpTKAUct7/4B6R9yYtkONcCmt6NsXrIa+s1b
+         2Vi87sN2bWmFzdCHch4QdVnFPUsv0TX1BvhprsWhtzEZ1TP9h6H67zajN5fwTcpgVzq7
+         128W4sMulSt06iM0BdbYOFyHnExtZ3d7GctYJD34w6WykmpMVmaatBZ0fqMzolxdNBwQ
+         UIrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=1cuJlej5QtQVUgXaKXLCLupE2h8bZDvIvc+XU0Qy11c=;
-        b=t0X/Xu/NOBoIVmIrnQLVVokyd3DKiikPj4nnyI3shU/LAiKaCkxtlW/7qDiGaJ4S+f
-         FHeuG/tjDsGzvUZIA74fx6sNkqgbNNPLSCvJa1MVfEsrhtEvp3WXWw4RvKA+ERcS4QU4
-         y9+Yh3CT0wgmLV1ta8+7qdOqvkIPCbi4XuCDvSVePAmzPSxkB+XM+I8lloJ1YFz4La9y
-         gwzd491THJ68gS6mNVNSZoI/11sAxEjhF+lNgcagUaBXk9IZYg6v4mD93I6ilhESnECd
-         BPnyVptcju2XOFfCbtoX7JiZV1Yw0jrnnzdvYUQwejXSmbiRTh1sVzjCS8N8NzR/ST1w
-         w9eA==
-X-Gm-Message-State: AOAM530RjN5d7tnIooBulp0bt1uK+VxgWw0KYXkWq8lerS/MjRkVMSdj
-        byjI4nP6lphwgvZVE2R2afphOtWf0MA=
-X-Google-Smtp-Source: ABdhPJyRTYcjOOe7Hpuegj9TYeKT7xA8Phn/GsRgC9q+yKHQzi56T+2XNNurVkrdjS8MimO54PakvpGyePc=
+        bh=WVFaMcj6eBUNfXCYM+guxa1ToSj4nAzpGmcEUcXwoLU=;
+        b=EP904doX0GRYz5Lre23EGacK3z3bZbP6eE9G+iVsyxDf6/4gJvJBcS7NkS/+JsGZRE
+         /yCN0AMJ2C9fvNBwrgPUwHifS4BKYR4e5npQr7dJSbgch5CFCR2UvnMmZQok2+DUb4vl
+         r0bmgRUB5DpwSgBPSMGk7li5OzP2ErzdRLgpTTVRzhE193n4cIQHa9yH3AoRgP5okqeK
+         NTzfnKJi5WtDJFLhR768VhLvE5ZKjmY07SvpXV1Ep7XD2BuR3QqjLnEE9Ub8LkE7PUPv
+         aZWL1RCahr1oBgDMN7iMbRqoeZ88vBB+R2L04xUXY8w208UQIznX8y1ccMrfSCiBWcOt
+         35Aw==
+X-Gm-Message-State: AOAM531UvcLMGjhM7tXQrpkV3n4mF9wH1t0AjrLmREEkGHwg7GD724Vo
+        AYHzcRDUZF8wrhIzRk5JfIWnBu9LBF0=
+X-Google-Smtp-Source: ABdhPJxGL/L9iCuRcW+ybcf0LTSFzUQPLd8NEZi0xJP9P+67r+oO6cLmNTEqbsWhsecmFCudS5bpOsjLyGw=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:5722:92ce:361f:3832])
- (user=seanjc job=sendgmr) by 2002:a05:6214:10e9:: with SMTP id
- q9mr27020191qvt.45.1624384693773; Tue, 22 Jun 2021 10:58:13 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:d694:: with SMTP id n142mr6295564ybg.349.1624384696152;
+ Tue, 22 Jun 2021 10:58:16 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 22 Jun 2021 10:56:53 -0700
+Date:   Tue, 22 Jun 2021 10:56:54 -0700
 In-Reply-To: <20210622175739.3610207-1-seanjc@google.com>
-Message-Id: <20210622175739.3610207-9-seanjc@google.com>
+Message-Id: <20210622175739.3610207-10-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210622175739.3610207-1-seanjc@google.com>
 X-Mailer: git-send-email 2.32.0.288.g62a8d224e6-goog
-Subject: [PATCH 08/54] Revert "KVM: MMU: record maximum physical address width
- in kvm_mmu_extended_role"
+Subject: [PATCH 09/54] KVM: x86/mmu: Unconditionally zap unsync SPs when
+ creating >4k SP at GFN
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -68,44 +68,121 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop MAXPHYADDR from mmu_role now that all MMUs have their role
-invalidated after a CPUID update.  Invalidating the role forces all MMUs
-to re-evaluate the guest's MAXPHYADDR, and the guest's MAXPHYADDR can
-only be changed only through a CPUID update.
+When creating a new upper-level shadow page, zap unsync shadow pages at
+the same target gfn instead of attempting to sync the pages.  This fixes
+a bug where an unsync shadow page could be sync'd with an incompatible
+context, e.g. wrong smm, is_guest, etc... flags.  In practice, the bug is
+relatively benign as sync_page() is all but guaranteed to fail its check
+that the guest's desired gfn (for the to-be-sync'd page) matches the
+current gfn associated with the shadow page.  I.e. kvm_sync_page() would
+end up zapping the page anyways.
 
-This reverts commit de3ccd26fafc707b09792d9b633c8b5b48865315.
+Alternatively, __kvm_sync_page() could be modified to explicitly verify
+the mmu_role of the unsync shadow page is compatible with the current MMU
+context.  But, except for this specific case, __kvm_sync_page() is called
+iff the page is compatible, e.g. the transient sync in kvm_mmu_get_page()
+requires an exact role match, and the call from kvm_sync_mmu_roots() is
+only synchronizing shadow pages from the current MMU (which better be
+compatible or KVM has problems).  And as described above, attempting to
+sync shadow pages when creating an upper-level shadow page is unlikely
+to succeed, e.g. zero successful syncs were observed when running Linux
+guests despite over a million attempts.
 
-Cc: Yu Zhang <yu.c.zhang@linux.intel.com>
+Fixes: 9f1a122f970d ("KVM: MMU: allow more page become unsync at getting sp time")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm_host.h | 1 -
- arch/x86/kvm/mmu/mmu.c          | 1 -
- 2 files changed, 2 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 50 ++++++++++++++----------------------------
+ 1 file changed, 16 insertions(+), 34 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 19c88b445ee0..cdaff399ed94 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -321,7 +321,6 @@ union kvm_mmu_extended_role {
- 		unsigned int cr4_smap:1;
- 		unsigned int cr4_smep:1;
- 		unsigned int cr4_la57:1;
--		unsigned int maxphyaddr:6;
- 	};
- };
- 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 8d97d21d5241..04cab330c445 100644
+index 04cab330c445..99d26859021d 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4538,7 +4538,6 @@ static union kvm_mmu_extended_role kvm_calc_mmu_role_ext(struct kvm_vcpu *vcpu)
- 	ext.cr4_pse = !!is_pse(vcpu);
- 	ext.cr4_pke = !!kvm_read_cr4_bits(vcpu, X86_CR4_PKE);
- 	ext.cr4_la57 = !!kvm_read_cr4_bits(vcpu, X86_CR4_LA57);
--	ext.maxphyaddr = cpuid_maxphyaddr(vcpu);
+@@ -1843,24 +1843,6 @@ static bool kvm_sync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	return __kvm_sync_page(vcpu, sp, invalid_list);
+ }
  
- 	ext.valid = 1;
+-/* @gfn should be write-protected at the call site */
+-static bool kvm_sync_pages(struct kvm_vcpu *vcpu, gfn_t gfn,
+-			   struct list_head *invalid_list)
+-{
+-	struct kvm_mmu_page *s;
+-	bool ret = false;
+-
+-	for_each_gfn_indirect_valid_sp(vcpu->kvm, s, gfn) {
+-		if (!s->unsync)
+-			continue;
+-
+-		WARN_ON(s->role.level != PG_LEVEL_4K);
+-		ret |= kvm_sync_page(vcpu, s, invalid_list);
+-	}
+-
+-	return ret;
+-}
+-
+ struct mmu_page_path {
+ 	struct kvm_mmu_page *parent[PT64_ROOT_MAX_LEVEL];
+ 	unsigned int idx[PT64_ROOT_MAX_LEVEL];
+@@ -1990,8 +1972,6 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 	struct hlist_head *sp_list;
+ 	unsigned quadrant;
+ 	struct kvm_mmu_page *sp;
+-	bool need_sync = false;
+-	bool flush = false;
+ 	int collisions = 0;
+ 	LIST_HEAD(invalid_list);
  
+@@ -2014,11 +1994,21 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 			continue;
+ 		}
+ 
+-		if (!need_sync && sp->unsync)
+-			need_sync = true;
+-
+-		if (sp->role.word != role.word)
++		if (sp->role.word != role.word) {
++			/*
++			 * If the guest is creating an upper-level page, zap
++			 * unsync pages for the same gfn.  While it's possible
++			 * the guest is using recursive page tables, in all
++			 * likelihood the guest has stopped using the unsync
++			 * page and is installing a completely unrelated page.
++			 * Unsync pages must not be left as is, because the new
++			 * upper-level page will be write-protected.
++			 */
++			if (level > PG_LEVEL_4K && sp->unsync)
++				kvm_mmu_prepare_zap_page(vcpu->kvm, sp,
++							 &invalid_list);
+ 			continue;
++		}
+ 
+ 		if (direct_mmu)
+ 			goto trace_get_page;
+@@ -2052,22 +2042,14 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 	sp->role = role;
+ 	hlist_add_head(&sp->hash_link, sp_list);
+ 	if (!direct) {
+-		/*
+-		 * we should do write protection before syncing pages
+-		 * otherwise the content of the synced shadow page may
+-		 * be inconsistent with guest page table.
+-		 */
+ 		account_shadowed(vcpu->kvm, sp);
+ 		if (level == PG_LEVEL_4K && rmap_write_protect(vcpu, gfn))
+ 			kvm_flush_remote_tlbs_with_address(vcpu->kvm, gfn, 1);
+-
+-		if (level > PG_LEVEL_4K && need_sync)
+-			flush |= kvm_sync_pages(vcpu, gfn, &invalid_list);
+ 	}
+ 	trace_kvm_mmu_get_page(sp, true);
+-
+-	kvm_mmu_flush_or_zap(vcpu, &invalid_list, false, flush);
+ out:
++	kvm_mmu_commit_zap_page(vcpu->kvm, &invalid_list);
++
+ 	if (collisions > vcpu->kvm->stat.max_mmu_page_hash_collisions)
+ 		vcpu->kvm->stat.max_mmu_page_hash_collisions = collisions;
+ 	return sp;
 -- 
 2.32.0.288.g62a8d224e6-goog
 
