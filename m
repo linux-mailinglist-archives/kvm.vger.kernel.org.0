@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1AC33B0E4F
+	by mail.lfdr.de (Postfix) with ESMTP id 752EA3B0E4E
 	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 22:07:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233249AbhFVUJY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 16:09:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38346 "EHLO
+        id S232802AbhFVUJW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 16:09:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233019AbhFVUJC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233163AbhFVUJC (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 22 Jun 2021 16:09:02 -0400
-Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9143FC06114C
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 13:06:20 -0700 (PDT)
-Received: by mail-qk1-x749.google.com with SMTP id 81-20020a370e540000b02903aacdbd70b7so19382177qko.23
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 13:06:20 -0700 (PDT)
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B56CC061151
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 13:06:22 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id o14-20020a05620a0d4eb02903a5eee61155so1230099qkl.9
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 13:06:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=GrfMAola6gddFitesBXZsmG+RUWwJ0hTCm8HOWv8lMA=;
-        b=OtkPNGkUfKyTykV6MIPXwPtACqNYdKiMVrmVZgithFtkKevkpXs9aBjAUMaj3tIhJq
-         pFx9DJiiGTTKeztlqq9gtwc72OCyOJsAY72U9PWdzfCRNsTtTBSKIX20sjVRK5VeJbqz
-         Tk1UFanmaE/aAdZp0xE8Sheq0KZgQVFRllx6IqCmT/Eeg3KsmMs2WK5GhY2vqdZxvpBG
-         6HYhVR/qGt09Jtpj9a4gP/eyUYTkHc7TCGdelRlUOkc9mABzjWcjg7qaPzqj7NzZo7AU
-         8F/JhgSKWmmfaF24+8n+Ittxy+TEL2rwKtyjXlnZgUF+Vh8DDUe0iezRoLOpmBRovhFi
-         qIiQ==
+        bh=QyEwXRXT2urLsHLGo2cN5dFnw8/WVT3cYfJ0isgbfF0=;
+        b=PlFbL8vxU+sOB44yCowC4K/Jlcj32kbZEcyIo5LSpS0eA7SJi70wwN67NJZLWUQXHM
+         72g9+CpyRo2anQtOUVWt2SaCNkeFNWvRmXvj8TIJT/3kIFA17SU6Zb0zAlH6BwT3V43J
+         CeiLEJ3MDnIszFIHc1GHRLUult8sRn1Bcu9va7WCzqF7YzLNcrp+oV2DeFbGIG3Qn6ul
+         Moi2oOQwg377orU2tCt0yUcXeASn6QBziXwibuj+J/hTBn5q5iE9k46oDAiV/r/5f13S
+         GqBV5yQ3ADD4nwMj99MNu2L9wbtjorkvbcYT9jmy5RScQnPbthJb+CWL/iz7i+RSgko3
+         6i5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=GrfMAola6gddFitesBXZsmG+RUWwJ0hTCm8HOWv8lMA=;
-        b=kKZWah0lMpwvy0RxQFUErm4hNy2CQsxBSWIvFDte2tkx6Ba9ne/YN7pC3w0T+BmdZK
-         M6DkYvyEPLPD9Up7RyoDeChiZ9tiKVYl+WmmRz0P19A7UZPSrDE+uBIpV0w5kbIeali5
-         qCjaaO+KJrGYVXEUS6BA59SxpUCkEe6SbbAjVKv7BliaSpCFyCXANcDAgs9tvFrCf3XM
-         lRjzlJhAmLH2+bpi1uD8NhIjXVknZo6hOA31O8v+xC8DROVPW7VvWWkMc6iA8QTEDMnr
-         dIg8CYqH/Ju2TTutgeAAuaN5vWnVqnDbOw8KEN4q0l6EPAEbnHKBRZFyfKDiGvGc4S+G
-         wYmg==
-X-Gm-Message-State: AOAM531yait8A5r8xrVh9bKw6/3ucYoCT27PTVof+tCyRAwVTO9PS6TW
-        FohVlr4zQmA6V/FFaocW3fag/4e7v+E=
-X-Google-Smtp-Source: ABdhPJzPB0EjUbRyo0XA+/E6+jq74qa1wKsj3CmG5GTC/Kc56BVqTOBldRjYoUlQ9D3D8LxUFi/LNf/19go=
+        bh=QyEwXRXT2urLsHLGo2cN5dFnw8/WVT3cYfJ0isgbfF0=;
+        b=hedP7ubaDDJEv3ThHgpC/K/bLFZ1GS0hk/mw/68rd1kRqgRN/sjD0amNwvRJG0BJNY
+         BNvydlPiLndHhMtWHyFeMvIj+uMfg5URM0/x7gK6QlWSY3epOYMfYoSE39kio0GEx9sa
+         FahrVUnEpXeg/nBy+3GcodfZmw1GjsJaCLPcx7iXKHo8kytDSgYPpuAuo8zHZXg+Nvr4
+         WZf5Mj4Qo2oJSSoO9HCz3HVNMZWS/UTeTRT9GQn7aZOAwZR9FuG4jndfKikW4swsoDIh
+         Cog/2QoRtLsCORwexTV/xw3B0ACYZ9kGfLiZ+E+iNDRV061ueeZP1ecnbHc8w9Xm1KJx
+         /VHw==
+X-Gm-Message-State: AOAM531a59hDyQLzQg81lO30PSIiMe/r0gbqbdUjbS+jhhQ12cSfWvDO
+        3GO5SCBfq+qXxdNAgcwYBv5wNISDreE=
+X-Google-Smtp-Source: ABdhPJyCCOJQejZcAY35znCE45kL8yJlqS1sf7Sh9SYUamUWLhhxukO5zKwzXvgEhYuuz49tt2Dlm6PDEHM=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:7d90:4528:3c45:18fb])
- (user=seanjc job=sendgmr) by 2002:a25:208b:: with SMTP id g133mr6491488ybg.211.1624392379721;
- Tue, 22 Jun 2021 13:06:19 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a0c:f704:: with SMTP id w4mr558674qvn.50.1624392381729;
+ Tue, 22 Jun 2021 13:06:21 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 22 Jun 2021 13:05:28 -0700
+Date:   Tue, 22 Jun 2021 13:05:29 -0700
 In-Reply-To: <20210622200529.3650424-1-seanjc@google.com>
-Message-Id: <20210622200529.3650424-19-seanjc@google.com>
+Message-Id: <20210622200529.3650424-20-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210622200529.3650424-1-seanjc@google.com>
 X-Mailer: git-send-email 2.32.0.288.g62a8d224e6-goog
-Subject: [PATCH 18/19] KVM: selftests: Add hugepage support for x86-64
+Subject: [PATCH 19/19] KVM: sefltests: Add x86-64 test to verify MMU reacts to
+ CPUID updates
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
@@ -67,157 +68,220 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add x86-64 hugepage support in the form of a x86-only variant of
-virt_pg_map() that takes an explicit page size.  To keep things simple,
-follow the existing logic for 4k pages and disallow creating a hugepage
-if the upper-level entry is present, even if the desired pfn matches.
+Add an x86-only test to verify that x86's MMU reacts to CPUID updates
+that impact the MMU.  KVM has had multiple bugs where it fails to
+reconfigure the MMU after the guest's vCPU model changes.
 
-Opportunistically fix a double "beyond beyond" reported by checkpatch.
+Sadly, this test is effectively limited to shadow paging because the
+hardware page walk handler doesn't support software disabling of GBPAGES
+support, and KVM doesn't manually walk the GVA->GPA on faults for
+performance reasons (doing so would large defeat the benefits of TDP).
+
+Don't require !TDP for the tests as there is still value in running the
+tests with TDP, even though the tests will fail (barring KVM hacks).
+E.g. KVM should not completely explode if MAXPHYADDR results in KVM using
+4-level vs. 5-level paging for the guest.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/include/x86_64/processor.h  |  8 ++
- .../selftests/kvm/lib/x86_64/processor.c      | 83 +++++++++++++------
- 2 files changed, 67 insertions(+), 24 deletions(-)
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/x86_64/processor.h  |   3 +
+ .../selftests/kvm/x86_64/mmu_role_test.c      | 147 ++++++++++++++++++
+ 4 files changed, 152 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/mmu_role_test.c
 
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index e0e14150744e..6ead3403eca6 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -15,6 +15,7 @@
+ /x86_64/hyperv_cpuid
+ /x86_64/hyperv_features
+ /x86_64/mmio_warning_test
++/x86_64/mmu_role_test
+ /x86_64/platform_info_test
+ /x86_64/set_boot_cpu_id
+ /x86_64/set_sregs_test
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 61e2accd080d..8dc007bac0fe 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -47,6 +47,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_features
+ TEST_GEN_PROGS_x86_64 += x86_64/kvm_pv_test
+ TEST_GEN_PROGS_x86_64 += x86_64/mmio_warning_test
++TEST_GEN_PROGS_x86_64 += x86_64/mmu_role_test
+ TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
+ TEST_GEN_PROGS_x86_64 += x86_64/set_boot_cpu_id
+ TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
 diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 9a5b47d2d5d6..f21126941f19 100644
+index f21126941f19..914b0d16929c 100644
 --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
 +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -412,6 +412,14 @@ struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(void);
- void vcpu_set_hv_cpuid(struct kvm_vm *vm, uint32_t vcpuid);
- struct kvm_cpuid2 *vcpu_get_supported_hv_cpuid(struct kvm_vm *vm, uint32_t vcpuid);
+@@ -55,6 +55,9 @@
+ #define CPUID_PKU		(1ul << 3)
+ #define CPUID_LA57		(1ul << 16)
  
-+enum x86_page_size {
-+	X86_PAGE_SIZE_4K = 0,
-+	X86_PAGE_SIZE_2M,
-+	X86_PAGE_SIZE_1G,
-+};
-+void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
-+		   enum x86_page_size page_size);
++/* CPUID.0x8000_0001.EDX */
++#define CPUID_GBPAGES		(1ul << 26)
 +
- /*
-  * Basic CPU control in CR0
-  */
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index cc2483db47a9..a770a5fc852c 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -198,55 +198,90 @@ static void *virt_get_pte(struct kvm_vm *vm, uint64_t pt_pfn, uint64_t vaddr,
- static struct pageUpperEntry *virt_create_upper_pte(struct kvm_vm *vm,
- 						    uint64_t pt_pfn,
- 						    uint64_t vaddr,
--						    int level)
-+						    uint64_t paddr,
-+						    int level,
-+						    enum x86_page_size page_size)
- {
- 	struct pageUpperEntry *pte = virt_get_pte(vm, pt_pfn, vaddr, level);
+ #define UNEXPECTED_VECTOR_PORT 0xfff0u
  
- 	if (!pte->present) {
--		pte->pfn = vm_alloc_page_table(vm) >> vm->page_shift;
- 		pte->writable = true;
- 		pte->present = true;
-+		pte->page_size = (level == page_size);
-+		if (pte->page_size)
-+			pte->pfn = paddr >> vm->page_shift;
-+		else
-+			pte->pfn = vm_alloc_page_table(vm) >> vm->page_shift;
-+	} else {
-+		/*
-+		 * Entry already present.  Assert that the caller doesn't want
-+		 * a hugepage at this level, and that there isn't a hugepage at
-+		 * this level.
-+		 */
-+		TEST_ASSERT(level != page_size,
-+			    "Cannot create hugepage at level: %u, vaddr: 0x%lx\n",
-+			    page_size, vaddr);
-+		TEST_ASSERT(!pte->page_size,
-+			    "Cannot create page table at level: %u, vaddr: 0x%lx\n",
-+			    level, vaddr);
- 	}
- 	return pte;
- }
- 
--void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
-+void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
-+		   enum x86_page_size page_size)
- {
-+	const uint64_t pg_size = 1ull << ((page_size * 9) + 12);
- 	struct pageUpperEntry *pml4e, *pdpe, *pde;
- 	struct pageTableEntry *pte;
- 
--	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K, "Attempt to use "
--		"unknown or unsupported guest mode, mode: 0x%x", vm->mode);
-+	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K,
-+		    "Unknown or unsupported guest mode, mode: 0x%x", vm->mode);
- 
--	TEST_ASSERT((vaddr % vm->page_size) == 0,
--		"Virtual address not on page boundary,\n"
--		"  vaddr: 0x%lx vm->page_size: 0x%x",
--		vaddr, vm->page_size);
--	TEST_ASSERT(sparsebit_is_set(vm->vpages_valid,
--		(vaddr >> vm->page_shift)),
--		"Invalid virtual address, vaddr: 0x%lx",
--		vaddr);
--	TEST_ASSERT((paddr % vm->page_size) == 0,
--		"Physical address not on page boundary,\n"
--		"  paddr: 0x%lx vm->page_size: 0x%x",
--		paddr, vm->page_size);
-+	TEST_ASSERT((vaddr % pg_size) == 0,
-+		    "Virtual address not aligned,\n"
-+		    "vaddr: 0x%lx page size: 0x%lx", vaddr, pg_size);
-+	TEST_ASSERT(sparsebit_is_set(vm->vpages_valid, (vaddr >> vm->page_shift)),
-+		    "Invalid virtual address, vaddr: 0x%lx", vaddr);
-+	TEST_ASSERT((paddr % pg_size) == 0,
-+		    "Physical address not aligned,\n"
-+		    "  paddr: 0x%lx page size: 0x%lx", paddr, pg_size);
- 	TEST_ASSERT((paddr >> vm->page_shift) <= vm->max_gfn,
--		"Physical address beyond beyond maximum supported,\n"
--		"  paddr: 0x%lx vm->max_gfn: 0x%lx vm->page_size: 0x%x",
--		paddr, vm->max_gfn, vm->page_size);
-+		    "Physical address beyond maximum supported,\n"
-+		    "  paddr: 0x%lx vm->max_gfn: 0x%lx vm->page_size: 0x%x",
-+		    paddr, vm->max_gfn, vm->page_size);
- 
--	/* Allocate upper level page tables, if not already present. */
--	pml4e = virt_create_upper_pte(vm, vm->pgd >> vm->page_shift, vaddr, 3);
--	pdpe = virt_create_upper_pte(vm, pml4e->pfn, vaddr, 2);
--	pde = virt_create_upper_pte(vm, pdpe->pfn, vaddr, 1);
-+	/*
-+	 * Allocate upper level page tables, if not already present.  Return
-+	 * early if a hugepage was created.
-+	 */
-+	pml4e = virt_create_upper_pte(vm, vm->pgd >> vm->page_shift,
-+				      vaddr, paddr, 3, page_size);
-+	if (pml4e->page_size)
-+		return;
+ /* General Registers in 64-Bit Mode */
+diff --git a/tools/testing/selftests/kvm/x86_64/mmu_role_test.c b/tools/testing/selftests/kvm/x86_64/mmu_role_test.c
+new file mode 100644
+index 000000000000..523371cf8e8f
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/mmu_role_test.c
+@@ -0,0 +1,147 @@
++// SPDX-License-Identifier: GPL-2.0
 +
-+	pdpe = virt_create_upper_pte(vm, pml4e->pfn, vaddr, paddr, 2, page_size);
-+	if (pdpe->page_size)
-+		return;
++#include "kvm_util.h"
++#include "processor.h"
 +
-+	pde = virt_create_upper_pte(vm, pdpe->pfn, vaddr, paddr, 1, page_size);
-+	if (pde->page_size)
-+		return;
- 
- 	/* Fill in page table entry. */
- 	pte = virt_get_pte(vm, pde->pfn, vaddr, 0);
-+	TEST_ASSERT(!pte->present,
-+		    "PTE already present for 4k page at vaddr: 0x%lx\n", vaddr);
- 	pte->pfn = paddr >> vm->page_shift;
- 	pte->writable = true;
- 	pte->present = 1;
- }
- 
-+void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
++#define VCPU_ID			1
++
++#define MMIO_GPA	0x100000000ull
++
++static void guest_code(void)
 +{
-+	__virt_pg_map(vm, vaddr, paddr, X86_PAGE_SIZE_4K);
++	(void)READ_ONCE(*((uint64_t *)MMIO_GPA));
++	(void)READ_ONCE(*((uint64_t *)MMIO_GPA));
++
++	GUEST_ASSERT(0);
 +}
 +
- void virt_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
- {
- 	struct pageUpperEntry *pml4e, *pml4e_start;
++static void guest_pf_handler(struct ex_regs *regs)
++{
++	/* PFEC == RSVD | PRESENT (read, kernel). */
++	GUEST_ASSERT(regs->error_code == 0x9);
++	GUEST_DONE();
++}
++
++static void mmu_role_test(u32 *cpuid_reg, u32 evil_cpuid_val)
++{
++	u32 good_cpuid_val = *cpuid_reg;
++	struct kvm_run *run;
++	struct kvm_vm *vm;
++	uint64_t cmd;
++	int r;
++
++	/* Create VM */
++	vm = vm_create_default(VCPU_ID, 0, guest_code);
++	run = vcpu_state(vm, VCPU_ID);
++
++	/* Map 1gb page without a backing memlot. */
++	__virt_pg_map(vm, MMIO_GPA, MMIO_GPA, X86_PAGE_SIZE_1G);
++
++	r = _vcpu_run(vm, VCPU_ID);
++
++	/* Guest access to the 1gb page should trigger MMIO. */
++	TEST_ASSERT(r == 0, "vcpu_run failed: %d\n", r);
++	TEST_ASSERT(run->exit_reason == KVM_EXIT_MMIO,
++		    "Unexpected exit reason: %u (%s), expected MMIO exit (1gb page w/o memslot)\n",
++		    run->exit_reason, exit_reason_str(run->exit_reason));
++
++	TEST_ASSERT(run->mmio.len == 8, "Unexpected exit mmio size = %u", run->mmio.len);
++
++	TEST_ASSERT(run->mmio.phys_addr == MMIO_GPA,
++		    "Unexpected exit mmio address = 0x%llx", run->mmio.phys_addr);
++
++	/*
++	 * Effect the CPUID change for the guest and re-enter the guest.  Its
++	 * access should now #PF due to the PAGE_SIZE bit being reserved or
++	 * the resulting GPA being invalid.  Note, kvm_get_supported_cpuid()
++	 * returns the struct that contains the entry being modified.  Eww.
++	 */
++	*cpuid_reg = evil_cpuid_val;
++	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
++
++	/*
++	 * Add a dummy memslot to coerce KVM into bumping the MMIO generation.
++	 * KVM does not "officially" support mucking with CPUID after KVM_RUN,
++	 * and will incorrectly reuse MMIO SPTEs.  Don't delete the memslot!
++	 * KVM x86 zaps all shadow pages on memslot deletion.
++	 */
++	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
++				    MMIO_GPA << 1, 10, 1, 0);
++
++	/* Set up a #PF handler to eat the RSVD #PF and signal all done! */
++	vm_init_descriptor_tables(vm);
++	vcpu_init_descriptor_tables(vm, VCPU_ID);
++	vm_handle_exception(vm, PF_VECTOR, guest_pf_handler);
++
++	r = _vcpu_run(vm, VCPU_ID);
++	TEST_ASSERT(r == 0, "vcpu_run failed: %d\n", r);
++
++	cmd = get_ucall(vm, VCPU_ID, NULL);
++	TEST_ASSERT(cmd == UCALL_DONE,
++		    "Unexpected guest exit, exit_reason=%s, ucall.cmd = %lu\n",
++		    exit_reason_str(run->exit_reason), cmd);
++
++	/*
++	 * Restore the happy CPUID value for the next test.  Yes, changes are
++	 * indeed persistent across VM destruction.
++	 */
++	*cpuid_reg = good_cpuid_val;
++
++	kvm_vm_free(vm);
++}
++
++int main(int argc, char *argv[])
++{
++	struct kvm_cpuid_entry2 *entry;
++	int opt;
++
++	/*
++	 * All tests are opt-in because TDP doesn't play nice with reserved #PF
++	 * in the GVA->GPA translation.  The hardware page walker doesn't let
++	 * software change GBPAGES or MAXPHYADDR, and KVM doesn't manually walk
++	 * the GVA on fault for performance reasons.
++	 */
++	bool do_gbpages = false;
++	bool do_maxphyaddr = false;
++
++	setbuf(stdout, NULL);
++
++	while ((opt = getopt(argc, argv, "gm")) != -1) {
++		switch (opt) {
++		case 'g':
++			do_gbpages = true;
++			break;
++		case 'm':
++			do_maxphyaddr = true;
++			break;
++		case 'h':
++		default:
++			printf("usage: %s [-g (GBPAGES)] [-m (MAXPHYADDR)]\n", argv[0]);
++			break;
++		}
++	}
++
++	if (!do_gbpages && !do_maxphyaddr) {
++		print_skip("No sub-tests selected");
++		return 0;
++	}
++
++	entry = kvm_get_supported_cpuid_entry(0x80000001);
++	if (!(entry->edx & CPUID_GBPAGES)) {
++		print_skip("1gb hugepages not supported");
++		return 0;
++	}
++
++	if (do_gbpages) {
++		pr_info("Test MMIO after toggling CPUID.GBPAGES\n\n");
++		mmu_role_test(&entry->edx, entry->edx & ~CPUID_GBPAGES);
++	}
++
++	if (do_maxphyaddr) {
++		pr_info("Test MMIO after changing CPUID.MAXPHYADDR\n\n");
++		entry = kvm_get_supported_cpuid_entry(0x80000008);
++		mmu_role_test(&entry->eax, (entry->eax & ~0xff) | 0x20);
++	}
++
++	return 0;
++}
 -- 
 2.32.0.288.g62a8d224e6-goog
 
