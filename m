@@ -2,108 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5881E3B0AA2
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 18:49:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF2073B0AAF
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 18:52:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230343AbhFVQwN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 12:52:13 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36364 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229751AbhFVQwM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 12:52:12 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15MGXH3U092752;
-        Tue, 22 Jun 2021 12:49:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=N+nCIBChoZxZTXIaXdw5uH30INWPR73VPJaaXcXTE90=;
- b=R2kZ2zaDpAGWqukvqHrQPCQMSDUgGh5g+Z9vTu6nNn+y0nprrWwTOnkt0EKI/L+TEci8
- 2zucgQb133/euyKJcbK6vckd/pjYAlnbnJRw5XzTOJU790htOqC0xsUlbePncr9WdxdJ
- ZQ6A9Wa7QVI90LlyLb5fYiJKuNXCuAAAVRP5idcJwMfFklaWez3+R7rcPUyLboJ8u0+E
- FiSh/XzSmMsSV4Wu6hGpz3FzVzn5nuQxhLqmOtlJHdH1FVVHPRF/Up/B9Sr0B8QQlQMN
- ELoWf/aYHm4ZhZu+z5s+dzDgThjE6msKIp/bvB8gETVgTtRte+J5/MK9TO0G0ajiq6z0 9w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 39bjas3dd9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Jun 2021 12:49:56 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15MGYHon095228;
-        Tue, 22 Jun 2021 12:49:55 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 39bjas3dcf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Jun 2021 12:49:55 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15MGmMZc024724;
-        Tue, 22 Jun 2021 16:49:53 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06fra.de.ibm.com with ESMTP id 3997uhgvcf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Jun 2021 16:49:53 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15MGnp5d31982042
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Jun 2021 16:49:51 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 51DD64C044;
-        Tue, 22 Jun 2021 16:49:51 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 076284C04E;
-        Tue, 22 Jun 2021 16:49:51 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.171.32.128])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 22 Jun 2021 16:49:50 +0000 (GMT)
-Subject: Re: [PATCH 0/2] KVM: s390: Enable some more facilities
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-References: <20210622143412.143369-1-borntraeger@de.ibm.com>
- <871r8tontj.fsf@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <f9a467ba-2730-7a41-6cc5-dc0a5c9e34fc@de.ibm.com>
-Date:   Tue, 22 Jun 2021 18:49:50 +0200
+        id S231320AbhFVQyc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 12:54:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51601 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230076AbhFVQya (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 12:54:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624380733;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4P1PfITd6m9CRCYryDXbjzGuOd03lvZO6GwMrQOOd8k=;
+        b=RZ3jyMWVgsKGixQcFMbjo5Z+S7U83pEDWFWf4lMkpCbG+R4YDQBDAC5FrithoqJn9oKb5w
+        owPvco3JHsZmGLFD/ksbfduX6SzRnW6BXkf2cx05CfN0v+/LEhp35l61OwdVxMJcoGyMv0
+        EFS0LpgcXZEie1J8glLLUVa4TiCdlso=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-64-KNVKk5mPNO2oHlx1x0qg_w-1; Tue, 22 Jun 2021 12:52:12 -0400
+X-MC-Unique: KNVKk5mPNO2oHlx1x0qg_w-1
+Received: by mail-wm1-f69.google.com with SMTP id w186-20020a1cdfc30000b02901ced88b501dso937374wmg.2
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 09:52:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=4P1PfITd6m9CRCYryDXbjzGuOd03lvZO6GwMrQOOd8k=;
+        b=a8PfVQ6CeuvEtO6sRUZREslbaTaE6WmvZpmHeS4M+rWtUjQrYgFWnXoQAHgePEhG3F
+         ggyyg31E2gbvGCSrX015w1R7v3N7LdppLfZn3RKQLbe6cB8C9vUGLTJ841tyQpLKN+Km
+         6Aol/TN1pkkcR4Olgl2+VCPqKo6FL0nIT7eMIcJXNooQezztLijLS5NHU8/YUQU9cAeG
+         B4LtyJP9XQBh0RDgII7otWE+bOxFIVH3HMYUmZb5pgn52Ea+lwcTHy+00jDBZtvMt46D
+         NxIOQzMviYXiHuQTgvW4UNLqx2eI4SMmM2HAm4smUYZWxObjVUM1qtT9czjAsoWArxD0
+         Y/gA==
+X-Gm-Message-State: AOAM531g2oVOiOS3IF7CQe8KFiLXYpzTKatf1Q6eopfjY2Ox4o2JAwUg
+        plAbPlbxZ5Oh7XVTOJ4wumo7pvgIch+bprSGu3+/WrVOoVWS0kWIDiCEMdK3WB9CiewO+iROYos
+        Kxf0uS6UhKzrw
+X-Received: by 2002:a5d:4904:: with SMTP id x4mr5938991wrq.202.1624380731194;
+        Tue, 22 Jun 2021 09:52:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzHwvAETSGbesb6gzKh+dnovh/8/FzEzs9O+mu8f0VjdUXRziEiWzP7ITmfJWkfwxeiQrPAIQ==
+X-Received: by 2002:a5d:4904:: with SMTP id x4mr5938982wrq.202.1624380731048;
+        Tue, 22 Jun 2021 09:52:11 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id n18sm3132025wmq.41.2021.06.22.09.52.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Jun 2021 09:52:10 -0700 (PDT)
+Subject: Re: linux-next: manual merge of the kvm tree with the powerpc tree
+To:     Michael Ellerman <mpe@ellerman.id.au>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        KVM <kvm@vger.kernel.org>,
+        PowerPC <linuxppc-dev@lists.ozlabs.org>
+Cc:     Ashish Kalra <ashish.kalra@amd.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20210622152544.74e01567@canb.auug.org.au>
+ <9c2dbe56-4c64-0032-0acb-2e2925c7a2ab@redhat.com>
+ <871r8u2bqp.fsf@mpe.ellerman.id.au>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <479d2898-07d6-9a40-70e5-f33c91943d52@redhat.com>
+Date:   Tue, 22 Jun 2021 18:52:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <871r8tontj.fsf@redhat.com>
+In-Reply-To: <871r8u2bqp.fsf@mpe.ellerman.id.au>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: FLIG4R_DpXREgzPqvQqI1HE3v5SvsL_q
-X-Proofpoint-GUID: XhbERjjXmvlxqjAdMfZG1UPB6ZFTidmF
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-06-22_08:2021-06-22,2021-06-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 malwarescore=0 mlxlogscore=999 spamscore=0 adultscore=0
- mlxscore=0 priorityscore=1501 phishscore=0 bulkscore=0 lowpriorityscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106220102
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 22/06/21 16:51, Michael Ellerman wrote:
+>> Please drop the patches at
+>> https://www.spinics.net/lists/kvm-ppc/msg18666.html  from the powerpc
+>> tree, and merge them through either the kvm-powerpc or kvm trees.
+> The kvm-ppc tree is not taking patches at the moment.
 
+If so, let's remove the "T" entry from MAINTAINERS and add an entry for 
+the kvm@vger.kernel.org mailing list.
 
-On 22.06.21 18:40, Cornelia Huck wrote:
-> On Tue, Jun 22 2021, Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>   https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git/log/?h=topic/ppc-kvm
 > 
->> Some more facilities that can be enabled in the future.
->>
->> Christian Borntraeger (2):
->>    KVM: s390: gen_facilities: allow facilities 165, 193, 194 and 196
->>    KVM: s390: allow facility 192 (vector-packed-decimal-enhancement
->>      facility 2)
->>
->>   arch/s390/kvm/kvm-s390.c         | 4 ++++
->>   arch/s390/tools/gen_facilities.c | 4 ++++
->>   2 files changed, 8 insertions(+)
-> 
-> I assume we can also expect some QEMU patches sometime in the future
-> that add some new features?
+> The commit Stephen mentioned has been rebased since to squash in a fix.
+> But what is in the topic branch is now final, I won't rebase what's
+> there.
 
-yes. Either today or tomorrow.
+Thanks, I pulled it.  Anyway, if the workflow is not the one indicated 
+by MAINTAINERS it's never a bad idea to Cc more people when applying 
+patches.
+
+Paolo
+
