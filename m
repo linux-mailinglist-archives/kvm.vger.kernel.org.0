@@ -2,175 +2,445 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2542B3AFE51
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 09:48:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8ECF83AFE5A
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 09:50:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230031AbhFVHvD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 03:51:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51376 "EHLO
+        id S230268AbhFVHw1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 03:52:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32206 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230174AbhFVHvC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 03:51:02 -0400
+        by vger.kernel.org with ESMTP id S230326AbhFVHwX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 03:52:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624348126;
+        s=mimecast20190719; t=1624348207;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=w3/ExjzsF+2HstscGugNhVD5aJGwY7/sJV7g6WW6sRQ=;
-        b=TTFBkyYIcFWz8OCJC5MWf1WZNEfZoMU58HfLaphIMFXnu8o0AL9dQBnr25NhOhsdNxxV/4
-        vjEbk073JOrU/SguETfdtEiffPYd4ufQbDttUaSrryAvIlIyxIlH6RMWgfx3kmV8aHi3Aj
-        RtKq9M6Bh2dyJ6c3hNQEJwOP4AlaKg4=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357-UV1kOFZZN-CRXX00w7YajQ-1; Tue, 22 Jun 2021 03:48:44 -0400
-X-MC-Unique: UV1kOFZZN-CRXX00w7YajQ-1
-Received: by mail-ed1-f70.google.com with SMTP id cb4-20020a0564020b64b02903947455afa5so7218289edb.9
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 00:48:44 -0700 (PDT)
+        bh=B9jxicCY/A2tBCMMCVXdYtwBAnUmmmvP+ho9k5jFvbQ=;
+        b=I0BP+qlbBbBZmc/T0L3Y/gyQWtcTrvK/tPuXmy7eydfDmO0VTseZ2wENLrOZpAP3tE6b1l
+        Ei4Qf9w8tFYirt8sJL/ljHJIXg2AT2YOIaAaRzkPjjghvKHyNhOKCPZcQFTdQwsG40m41U
+        f6osBUuqsexk+Gn2giADzMkHjBB4I54=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-551-lpq-40DfOZybQcAyekmNdQ-1; Tue, 22 Jun 2021 03:50:06 -0400
+X-MC-Unique: lpq-40DfOZybQcAyekmNdQ-1
+Received: by mail-pf1-f199.google.com with SMTP id o11-20020a62f90b0000b02902db3045f898so10779217pfh.23
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 00:50:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=w3/ExjzsF+2HstscGugNhVD5aJGwY7/sJV7g6WW6sRQ=;
-        b=pyVcmbn/ZumLQWiEIlE4zs2h+k/tUgS/MOBkhrXVMvceBOWzDqcYIW/3QlYnBHaIBX
-         evmyx7N1go5lVQr9Mnz0lS6ejCmjK3oR5SJ51hGFQNq+bSPKotRk08t0gO4gjVMfq3e9
-         n6cj/4PKFcGfqE953aOI+YdwCjFmK7VLPdw99FRmlPrhLnKIrD/DxveVAJqGaI+QiZFx
-         e+QqYhndX06jxoEI8Rt7bgyVbrpcIjKK+IbENBCGdKffjEOQzjFgExZdx9FgeutoiIJy
-         tHd6apERSZ9XB8dghIxHFAmjwNZ3GSTGMcfhzY3+0DkAV+jHwOXYolr+YketvLvkRKz/
-         Riiw==
-X-Gm-Message-State: AOAM533qYSXTS0k7Q1jMZita1xldpifymLXkvYLFKaLbyyGm05ipgxBZ
-        n3V9nmKu6C3R5zdrtxeBSRAluVhCXIIYeFTxH1T4sP7xomqcsE/2/kJZIcFChsslUOrwR6oJHX2
-        Iu8wv19novKxw
-X-Received: by 2002:a17:907:2651:: with SMTP id ar17mr2588837ejc.135.1624348123786;
-        Tue, 22 Jun 2021 00:48:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyQPANaf1gnr3VrtMggQ7XkKBkZxYQrVYm1TCYwqOu7GPYzFbd0SPFej6fHnHmwig2VtLVGZg==
-X-Received: by 2002:a17:907:2651:: with SMTP id ar17mr2588817ejc.135.1624348123579;
-        Tue, 22 Jun 2021 00:48:43 -0700 (PDT)
-Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id g8sm11771648edw.89.2021.06.22.00.48.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Jun 2021 00:48:43 -0700 (PDT)
-Date:   Tue, 22 Jun 2021 09:48:41 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        ricarkol@google.com, eric.auger@redhat.com,
-        alexandru.elisei@arm.com, pbonzini@redhat.com
-Subject: Re: [PATCH v3 0/5] KVM: arm64: selftests: Fix get-reg-list
-Message-ID: <20210622074841.in2halgoakruglzs@gator>
-References: <20210531103344.29325-1-drjones@redhat.com>
- <20210622070732.zod7gaqhqo344vg6@gator>
- <878s32cq1o.wl-maz@kernel.org>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=B9jxicCY/A2tBCMMCVXdYtwBAnUmmmvP+ho9k5jFvbQ=;
+        b=NGAaRNGvBubxWinC1B0aT1RM7xYO4H6vLLZLOO4+fLFUf/cYVARRZNEmzEc35pRJEj
+         P/c8dv3L2MpjYcRO8lnuLd+y9MsHRbWhjyCWCg8mCogyBxOBzD+5Bvi20A+fnnUrsNVo
+         vO/i8IoDvSIfRTobfHsLmTT6k/67jcbHyc+skdrD1vlGhxSaQRqF/wcDzY6mcyseEiYA
+         HnIP0MjphWb0J0xm31GKo6OQIr2kJ9DrOnu94r/Ib5Qhzd28yZwiM0om3qEPFaz5hjBC
+         gOkdSTc4ckl6QauCisFTE4sIkStpmQSlCpl+ReAsmlyhbWwy+yvRiplxMkT+2Bc8tWYz
+         1YEg==
+X-Gm-Message-State: AOAM532legZ653qknz2ZpVHj1RT7I17+f/OHVd2cqqdvZB7TQNFsPboT
+        06dkFiH8WAgz2UPbhv8hMsZOgMPnUhLn5Lhu8fDaEa9vz3ULp/wAXGAz41fENjC7zueL/0sf20f
+        Yh5aDupL7/Mdo
+X-Received: by 2002:a17:902:c641:b029:122:6927:6e50 with SMTP id s1-20020a170902c641b029012269276e50mr9862238pls.6.1624348205577;
+        Tue, 22 Jun 2021 00:50:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxekq+kgOUVrlD5LnpXeHpq0h9w1ALVma6btHHZ2quAdETHnuyEnF0QoKaSap2eytMg2NykVQ==
+X-Received: by 2002:a17:902:c641:b029:122:6927:6e50 with SMTP id s1-20020a170902c641b029012269276e50mr9862215pls.6.1624348205162;
+        Tue, 22 Jun 2021 00:50:05 -0700 (PDT)
+Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id f18sm1474016pjq.48.2021.06.22.00.49.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Jun 2021 00:50:04 -0700 (PDT)
+Subject: Re: [PATCH v8 09/10] vduse: Introduce VDUSE - vDPA Device in
+ Userspace
+To:     Yongji Xie <xieyongji@bytedance.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=c3=a4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+References: <20210615141331.407-1-xieyongji@bytedance.com>
+ <20210615141331.407-10-xieyongji@bytedance.com>
+ <adfb2be9-9ed9-ca37-ac37-4cd00bdff349@redhat.com>
+ <CACycT3tAON+-qZev+9EqyL2XbgH5HDspOqNt3ohQLQ8GqVK=EA@mail.gmail.com>
+ <1bba439f-ffc8-c20e-e8a4-ac73e890c592@redhat.com>
+ <CACycT3uzMJS7vw6MVMOgY4rb=SPfT2srV+8DPdwUVeELEiJgbA@mail.gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <0aeb7cb7-58e5-1a95-d830-68edd7e8ec2e@redhat.com>
+Date:   Tue, 22 Jun 2021 15:49:52 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <878s32cq1o.wl-maz@kernel.org>
+In-Reply-To: <CACycT3uzMJS7vw6MVMOgY4rb=SPfT2srV+8DPdwUVeELEiJgbA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 22, 2021 at 08:32:51AM +0100, Marc Zyngier wrote:
-> Hi Andrew,
-> 
-> On Tue, 22 Jun 2021 08:07:32 +0100,
-> Andrew Jones <drjones@redhat.com> wrote:
-> > 
-> > On Mon, May 31, 2021 at 12:33:39PM +0200, Andrew Jones wrote:
-> > > v3:
-> > >  - Took Ricardo's suggestions in order to avoid needing to update
-> > >    prepare_vcpu_init, finalize_vcpu, and check_supported when adding
-> > >    new register sublists by better associating the sublists with their
-> > >    vcpu feature bits and caps [Ricardo]
-> > >  - We now dynamically generate the vcpu config name by creating them
-> > >    from its sublist names [drew]
-> > > 
-> > > v2:
-> > >  - Removed some cruft left over from a previous more complex design of the
-> > >    config command line parser
-> > >  - Dropped the list printing factor out patch as it's not necessary
-> > >  - Added a 'PASS' output for passing tests to allow testers to feel good
-> > >  - Changed the "up to date with kernel" comment to reference 5.13.0-rc2
-> > > 
-> > > 
-> > > Since KVM commit 11663111cd49 ("KVM: arm64: Hide PMU registers from
-> > > userspace when not available") the get-reg-list* tests have been
-> > > failing with
-> > > 
-> > >   ...
-> > >   ... There are 74 missing registers.
-> > >   The following lines are missing registers:
-> > >   ...
-> > > 
-> > > where the 74 missing registers are all PMU registers. This isn't a
-> > > bug in KVM that the selftest found, even though it's true that a
-> > > KVM userspace that wasn't setting the KVM_ARM_VCPU_PMU_V3 VCPU
-> > > flag, but still expecting the PMU registers to be in the reg-list,
-> > > would suddenly no longer have their expectations met. In that case,
-> > > the expectations were wrong, though, so that KVM userspace needs to
-> > > be fixed, and so does this selftest.
-> > > 
-> > > We could fix the test with a one-liner since we just need a
-> > > 
-> > >   init->features[0] |= 1 << KVM_ARM_VCPU_PMU_V3;
-> > > 
-> > > in prepare_vcpu_init(), but that's too easy, so here's a 5 patch patch
-> > > series instead :-)  The reason for all the patches and the heavy diffstat
-> > > is to prepare for other vcpu configuration testing, e.g. ptrauth and mte.
-> > > With the refactoring done in this series, we should now be able to easily
-> > > add register sublists and vcpu configs to the get-reg-list test, as the
-> > > last patch demonstrates with the pmu fix.
-> > > 
-> > > Thanks,
-> > > drew
-> > > 
-> > > 
-> > > Andrew Jones (5):
-> > >   KVM: arm64: selftests: get-reg-list: Introduce vcpu configs
-> > >   KVM: arm64: selftests: get-reg-list: Prepare to run multiple configs
-> > >     at once
-> > >   KVM: arm64: selftests: get-reg-list: Provide config selection option
-> > >   KVM: arm64: selftests: get-reg-list: Remove get-reg-list-sve
-> > >   KVM: arm64: selftests: get-reg-list: Split base and pmu registers
-> > > 
-> > >  tools/testing/selftests/kvm/.gitignore        |   1 -
-> > >  tools/testing/selftests/kvm/Makefile          |   1 -
-> > >  .../selftests/kvm/aarch64/get-reg-list-sve.c  |   3 -
-> > >  .../selftests/kvm/aarch64/get-reg-list.c      | 439 +++++++++++++-----
-> > >  4 files changed, 321 insertions(+), 123 deletions(-)
-> > >  delete mode 100644 tools/testing/selftests/kvm/aarch64/get-reg-list-sve.c
-> > > 
-> > > -- 
-> > > 2.31.1
-> > >
-> > 
-> > Gentle ping.
-> > 
-> > I'm not sure if I'm pinging Marc or Paolo though. MAINTAINERS shows Paolo
-> > as all kvm selftests, but I think Marc has started picking up the AArch64
-> > specific kvm selftests.
-> 
-> I'm happy to queue this series.
-> 
-> > Marc, if you've decided to maintain AArch64 kvm selftests, would you be
-> > opposed to adding
-> > 
-> >   F: tools/testing/selftests/kvm/*/aarch64/
-> >   F: tools/testing/selftests/kvm/aarch64/
-> > 
-> > to "KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)"?
-> 
-> No problem to add this, but I *will* rely on you (and whoever wants to
-> part-take) to do the bulk of the reviewing. Do we have a deal?
 
-It's a deal. Thanks!
+在 2021/6/22 下午3:22, Yongji Xie 写道:
+>> We need fix a way to propagate the error to the userspace.
+>>
+>> E.g if we want to stop the deivce, we will delay the status reset until
+>> we get respose from the userspace?
+>>
+> I didn't get how to delay the status reset. And should it be a DoS
+> that we want to fix if the userspace doesn't give a response forever?
 
-drew
 
-> 
+You're right. So let's make set_status() can fail first, then propagate 
+its failure via VHOST_VDPA_SET_STATUS.
+
+
+>
+>>>>> +     }
+>>>>> +}
+>>>>> +
+>>>>> +static size_t vduse_vdpa_get_config_size(struct vdpa_device *vdpa)
+>>>>> +{
+>>>>> +     struct vduse_dev *dev = vdpa_to_vduse(vdpa);
+>>>>> +
+>>>>> +     return dev->config_size;
+>>>>> +}
+>>>>> +
+>>>>> +static void vduse_vdpa_get_config(struct vdpa_device *vdpa, unsigned int offset,
+>>>>> +                               void *buf, unsigned int len)
+>>>>> +{
+>>>>> +     struct vduse_dev *dev = vdpa_to_vduse(vdpa);
+>>>>> +
+>>>>> +     memcpy(buf, dev->config + offset, len);
+>>>>> +}
+>>>>> +
+>>>>> +static void vduse_vdpa_set_config(struct vdpa_device *vdpa, unsigned int offset,
+>>>>> +                     const void *buf, unsigned int len)
+>>>>> +{
+>>>>> +     /* Now we only support read-only configuration space */
+>>>>> +}
+>>>>> +
+>>>>> +static u32 vduse_vdpa_get_generation(struct vdpa_device *vdpa)
+>>>>> +{
+>>>>> +     struct vduse_dev *dev = vdpa_to_vduse(vdpa);
+>>>>> +
+>>>>> +     return dev->generation;
+>>>>> +}
+>>>>> +
+>>>>> +static int vduse_vdpa_set_map(struct vdpa_device *vdpa,
+>>>>> +                             struct vhost_iotlb *iotlb)
+>>>>> +{
+>>>>> +     struct vduse_dev *dev = vdpa_to_vduse(vdpa);
+>>>>> +     int ret;
+>>>>> +
+>>>>> +     ret = vduse_domain_set_map(dev->domain, iotlb);
+>>>>> +     if (ret)
+>>>>> +             return ret;
+>>>>> +
+>>>>> +     ret = vduse_dev_update_iotlb(dev, 0ULL, ULLONG_MAX);
+>>>>> +     if (ret) {
+>>>>> +             vduse_domain_clear_map(dev->domain, iotlb);
+>>>>> +             return ret;
+>>>>> +     }
+>>>>> +
+>>>>> +     return 0;
+>>>>> +}
+>>>>> +
+>>>>> +static void vduse_vdpa_free(struct vdpa_device *vdpa)
+>>>>> +{
+>>>>> +     struct vduse_dev *dev = vdpa_to_vduse(vdpa);
+>>>>> +
+>>>>> +     dev->vdev = NULL;
+>>>>> +}
+>>>>> +
+>>>>> +static const struct vdpa_config_ops vduse_vdpa_config_ops = {
+>>>>> +     .set_vq_address         = vduse_vdpa_set_vq_address,
+>>>>> +     .kick_vq                = vduse_vdpa_kick_vq,
+>>>>> +     .set_vq_cb              = vduse_vdpa_set_vq_cb,
+>>>>> +     .set_vq_num             = vduse_vdpa_set_vq_num,
+>>>>> +     .set_vq_ready           = vduse_vdpa_set_vq_ready,
+>>>>> +     .get_vq_ready           = vduse_vdpa_get_vq_ready,
+>>>>> +     .set_vq_state           = vduse_vdpa_set_vq_state,
+>>>>> +     .get_vq_state           = vduse_vdpa_get_vq_state,
+>>>>> +     .get_vq_align           = vduse_vdpa_get_vq_align,
+>>>>> +     .get_features           = vduse_vdpa_get_features,
+>>>>> +     .set_features           = vduse_vdpa_set_features,
+>>>>> +     .set_config_cb          = vduse_vdpa_set_config_cb,
+>>>>> +     .get_vq_num_max         = vduse_vdpa_get_vq_num_max,
+>>>>> +     .get_device_id          = vduse_vdpa_get_device_id,
+>>>>> +     .get_vendor_id          = vduse_vdpa_get_vendor_id,
+>>>>> +     .get_status             = vduse_vdpa_get_status,
+>>>>> +     .set_status             = vduse_vdpa_set_status,
+>>>>> +     .get_config_size        = vduse_vdpa_get_config_size,
+>>>>> +     .get_config             = vduse_vdpa_get_config,
+>>>>> +     .set_config             = vduse_vdpa_set_config,
+>>>>> +     .get_generation         = vduse_vdpa_get_generation,
+>>>>> +     .set_map                = vduse_vdpa_set_map,
+>>>>> +     .free                   = vduse_vdpa_free,
+>>>>> +};
+>>>>> +
+>>>>> +static dma_addr_t vduse_dev_map_page(struct device *dev, struct page *page,
+>>>>> +                                  unsigned long offset, size_t size,
+>>>>> +                                  enum dma_data_direction dir,
+>>>>> +                                  unsigned long attrs)
+>>>>> +{
+>>>>> +     struct vduse_dev *vdev = dev_to_vduse(dev);
+>>>>> +     struct vduse_iova_domain *domain = vdev->domain;
+>>>>> +
+>>>>> +     return vduse_domain_map_page(domain, page, offset, size, dir, attrs);
+>>>>> +}
+>>>>> +
+>>>>> +static void vduse_dev_unmap_page(struct device *dev, dma_addr_t dma_addr,
+>>>>> +                             size_t size, enum dma_data_direction dir,
+>>>>> +                             unsigned long attrs)
+>>>>> +{
+>>>>> +     struct vduse_dev *vdev = dev_to_vduse(dev);
+>>>>> +     struct vduse_iova_domain *domain = vdev->domain;
+>>>>> +
+>>>>> +     return vduse_domain_unmap_page(domain, dma_addr, size, dir, attrs);
+>>>>> +}
+>>>>> +
+>>>>> +static void *vduse_dev_alloc_coherent(struct device *dev, size_t size,
+>>>>> +                                     dma_addr_t *dma_addr, gfp_t flag,
+>>>>> +                                     unsigned long attrs)
+>>>>> +{
+>>>>> +     struct vduse_dev *vdev = dev_to_vduse(dev);
+>>>>> +     struct vduse_iova_domain *domain = vdev->domain;
+>>>>> +     unsigned long iova;
+>>>>> +     void *addr;
+>>>>> +
+>>>>> +     *dma_addr = DMA_MAPPING_ERROR;
+>>>>> +     addr = vduse_domain_alloc_coherent(domain, size,
+>>>>> +                             (dma_addr_t *)&iova, flag, attrs);
+>>>>> +     if (!addr)
+>>>>> +             return NULL;
+>>>>> +
+>>>>> +     *dma_addr = (dma_addr_t)iova;
+>>>>> +
+>>>>> +     return addr;
+>>>>> +}
+>>>>> +
+>>>>> +static void vduse_dev_free_coherent(struct device *dev, size_t size,
+>>>>> +                                     void *vaddr, dma_addr_t dma_addr,
+>>>>> +                                     unsigned long attrs)
+>>>>> +{
+>>>>> +     struct vduse_dev *vdev = dev_to_vduse(dev);
+>>>>> +     struct vduse_iova_domain *domain = vdev->domain;
+>>>>> +
+>>>>> +     vduse_domain_free_coherent(domain, size, vaddr, dma_addr, attrs);
+>>>>> +}
+>>>>> +
+>>>>> +static size_t vduse_dev_max_mapping_size(struct device *dev)
+>>>>> +{
+>>>>> +     struct vduse_dev *vdev = dev_to_vduse(dev);
+>>>>> +     struct vduse_iova_domain *domain = vdev->domain;
+>>>>> +
+>>>>> +     return domain->bounce_size;
+>>>>> +}
+>>>>> +
+>>>>> +static const struct dma_map_ops vduse_dev_dma_ops = {
+>>>>> +     .map_page = vduse_dev_map_page,
+>>>>> +     .unmap_page = vduse_dev_unmap_page,
+>>>>> +     .alloc = vduse_dev_alloc_coherent,
+>>>>> +     .free = vduse_dev_free_coherent,
+>>>>> +     .max_mapping_size = vduse_dev_max_mapping_size,
+>>>>> +};
+>>>>> +
+>>>>> +static unsigned int perm_to_file_flags(u8 perm)
+>>>>> +{
+>>>>> +     unsigned int flags = 0;
+>>>>> +
+>>>>> +     switch (perm) {
+>>>>> +     case VDUSE_ACCESS_WO:
+>>>>> +             flags |= O_WRONLY;
+>>>>> +             break;
+>>>>> +     case VDUSE_ACCESS_RO:
+>>>>> +             flags |= O_RDONLY;
+>>>>> +             break;
+>>>>> +     case VDUSE_ACCESS_RW:
+>>>>> +             flags |= O_RDWR;
+>>>>> +             break;
+>>>>> +     default:
+>>>>> +             WARN(1, "invalidate vhost IOTLB permission\n");
+>>>>> +             break;
+>>>>> +     }
+>>>>> +
+>>>>> +     return flags;
+>>>>> +}
+>>>>> +
+>>>>> +static int vduse_kickfd_setup(struct vduse_dev *dev,
+>>>>> +                     struct vduse_vq_eventfd *eventfd)
+>>>>> +{
+>>>>> +     struct eventfd_ctx *ctx = NULL;
+>>>>> +     struct vduse_virtqueue *vq;
+>>>>> +     u32 index;
+>>>>> +
+>>>>> +     if (eventfd->index >= dev->vq_num)
+>>>>> +             return -EINVAL;
+>>>>> +
+>>>>> +     index = array_index_nospec(eventfd->index, dev->vq_num);
+>>>>> +     vq = &dev->vqs[index];
+>>>>> +     if (eventfd->fd >= 0) {
+>>>>> +             ctx = eventfd_ctx_fdget(eventfd->fd);
+>>>>> +             if (IS_ERR(ctx))
+>>>>> +                     return PTR_ERR(ctx);
+>>>>> +     } else if (eventfd->fd != VDUSE_EVENTFD_DEASSIGN)
+>>>>> +             return 0;
+>>>>> +
+>>>>> +     spin_lock(&vq->kick_lock);
+>>>>> +     if (vq->kickfd)
+>>>>> +             eventfd_ctx_put(vq->kickfd);
+>>>>> +     vq->kickfd = ctx;
+>>>>> +     if (vq->ready && vq->kicked && vq->kickfd) {
+>>>>> +             eventfd_signal(vq->kickfd, 1);
+>>>>> +             vq->kicked = false;
+>>>>> +     }
+>>>>> +     spin_unlock(&vq->kick_lock);
+>>>>> +
+>>>>> +     return 0;
+>>>>> +}
+>>>>> +
+>>>>> +static void vduse_dev_irq_inject(struct work_struct *work)
+>>>>> +{
+>>>>> +     struct vduse_dev *dev = container_of(work, struct vduse_dev, inject);
+>>>>> +
+>>>>> +     spin_lock_irq(&dev->irq_lock);
+>>>>> +     if (dev->config_cb.callback)
+>>>>> +             dev->config_cb.callback(dev->config_cb.private);
+>>>>> +     spin_unlock_irq(&dev->irq_lock);
+>>>>> +}
+>>>>> +
+>>>>> +static void vduse_vq_irq_inject(struct work_struct *work)
+>>>>> +{
+>>>>> +     struct vduse_virtqueue *vq = container_of(work,
+>>>>> +                                     struct vduse_virtqueue, inject);
+>>>>> +
+>>>>> +     spin_lock_irq(&vq->irq_lock);
+>>>>> +     if (vq->ready && vq->cb.callback)
+>>>>> +             vq->cb.callback(vq->cb.private);
+>>>>> +     spin_unlock_irq(&vq->irq_lock);
+>>>>> +}
+>>>>> +
+>>>>> +static long vduse_dev_ioctl(struct file *file, unsigned int cmd,
+>>>>> +                         unsigned long arg)
+>>>>> +{
+>>>>> +     struct vduse_dev *dev = file->private_data;
+>>>>> +     void __user *argp = (void __user *)arg;
+>>>>> +     int ret;
+>>>>> +
+>>>>> +     switch (cmd) {
+>>>>> +     case VDUSE_IOTLB_GET_FD: {
+>>>>> +             struct vduse_iotlb_entry entry;
+>>>>> +             struct vhost_iotlb_map *map;
+>>>>> +             struct vdpa_map_file *map_file;
+>>>>> +             struct vduse_iova_domain *domain = dev->domain;
+>>>>> +             struct file *f = NULL;
+>>>>> +
+>>>>> +             ret = -EFAULT;
+>>>>> +             if (copy_from_user(&entry, argp, sizeof(entry)))
+>>>>> +                     break;
+>>>>> +
+>>>>> +             ret = -EINVAL;
+>>>>> +             if (entry.start > entry.last)
+>>>>> +                     break;
+>>>>> +
+>>>>> +             spin_lock(&domain->iotlb_lock);
+>>>>> +             map = vhost_iotlb_itree_first(domain->iotlb,
+>>>>> +                                           entry.start, entry.last);
+>>>>> +             if (map) {
+>>>>> +                     map_file = (struct vdpa_map_file *)map->opaque;
+>>>>> +                     f = get_file(map_file->file);
+>>>>> +                     entry.offset = map_file->offset;
+>>>>> +                     entry.start = map->start;
+>>>>> +                     entry.last = map->last;
+>>>>> +                     entry.perm = map->perm;
+>>>>> +             }
+>>>>> +             spin_unlock(&domain->iotlb_lock);
+>>>>> +             ret = -EINVAL;
+>>>>> +             if (!f)
+>>>>> +                     break;
+>>>>> +
+>>>>> +             ret = -EFAULT;
+>>>>> +             if (copy_to_user(argp, &entry, sizeof(entry))) {
+>>>>> +                     fput(f);
+>>>>> +                     break;
+>>>>> +             }
+>>>>> +             ret = receive_fd(f, perm_to_file_flags(entry.perm));
+>>>>> +             fput(f);
+>>>>> +             break;
+>>>>> +     }
+>>>>> +     case VDUSE_DEV_GET_FEATURES:
+>>>>> +             ret = put_user(dev->features, (u64 __user *)argp);
+>>>>> +             break;
+>>>>> +     case VDUSE_DEV_UPDATE_CONFIG: {
+>>>>> +             struct vduse_config_update config;
+>>>>> +             unsigned long size = offsetof(struct vduse_config_update,
+>>>>> +                                           buffer);
+>>>>> +
+>>>>> +             ret = -EFAULT;
+>>>>> +             if (copy_from_user(&config, argp, size))
+>>>>> +                     break;
+>>>>> +
+>>>>> +             ret = -EINVAL;
+>>>>> +             if (config.length == 0 ||
+>>>>> +                 config.length > dev->config_size - config.offset)
+>>>>> +                     break;
+>>>>> +
+>>>>> +             ret = -EFAULT;
+>>>>> +             if (copy_from_user(dev->config + config.offset, argp + size,
+>>>>> +                                config.length))
+>>>>> +                     break;
+>>>>> +
+>>>>> +             ret = 0;
+>>>>> +             queue_work(vduse_irq_wq, &dev->inject);
+>>>> I wonder if it's better to separate config interrupt out of config
+>>>> update or we need document this.
+>>>>
+>>> I have documented it in the docs. Looks like a config update should be
+>>> always followed by a config interrupt. I didn't find a case that uses
+>>> them separately.
+>> The uAPI doesn't prevent us from the following scenario:
+>>
+>> update_config(mac[0], ..);
+>> update_config(max[1], ..);
+>>
+>> So it looks to me it's better to separate the config interrupt from the
+>> config updating.
+>>
+> Fine.
+>
+>>>>> +             break;
+>>>>> +     }
+>>>>> +     case VDUSE_VQ_GET_INFO: {
+>>>> Do we need to limit this only when DRIVER_OK is set?
+>>>>
+>>> Any reason to add this limitation?
+>> Otherwise the vq is not fully initialized, e.g the desc_addr might not
+>> be correct.
+>>
+> The vq_info->ready can be used to tell userspace whether the vq is
+> initialized or not.
+
+
+Yes, this will work as well.
+
+Thanks
+
+
+>
 > Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
-> 
+> Yongji
+>
 
