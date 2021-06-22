@@ -2,119 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B5E233B07F0
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 16:52:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C3733B0801
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 16:58:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231933AbhFVOyX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 10:54:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50880 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231857AbhFVOyW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Jun 2021 10:54:22 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F39E9C061574;
-        Tue, 22 Jun 2021 07:52:05 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4G8TrK4rByz9sRf;
-        Wed, 23 Jun 2021 00:52:01 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
-        s=201909; t=1624373522;
-        bh=SVtmLGZR9lhjmGlAVYs+m0Yd4tc3JZtrT8YuTPZ2oug=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=ic+xiL7PNffQ36MhT6Lr8b/XgkLIRK9sXhatVB2LOw6PL7QxwFiVCXXRDLsbtQWdj
-         q7iu0HUGdMtXDmTHCRgtPC5kv357aqsqhsKmgYXk9u7JGci4w8hX1x0Bef6GB67R2p
-         fwkeUi8TMPN0+nj+vbsaQetK7FnaV7oADCrES01nowucP9yMgHjazZw5O4x52doq+m
-         bsgMRSYkyuTWpAJPDnGZFAgECe2K+aILH4UW+rwKOIqLLBS/TQxxRXDqwXbf8Y97MG
-         OqxvPil8LEWM6m+FguQdNnsQIO041ZfkHDPbZUXcT5PSgPVl9/Dhyifwno5nyLzq3e
-         IMVhPgGBU/nHQ==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        KVM <kvm@vger.kernel.org>,
-        PowerPC <linuxppc-dev@lists.ozlabs.org>
-Cc:     Ashish Kalra <ashish.kalra@amd.com>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: linux-next: manual merge of the kvm tree with the powerpc tree
-In-Reply-To: <9c2dbe56-4c64-0032-0acb-2e2925c7a2ab@redhat.com>
-References: <20210622152544.74e01567@canb.auug.org.au>
- <9c2dbe56-4c64-0032-0acb-2e2925c7a2ab@redhat.com>
-Date:   Wed, 23 Jun 2021 00:51:58 +1000
-Message-ID: <871r8u2bqp.fsf@mpe.ellerman.id.au>
+        id S231941AbhFVPAT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 11:00:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36662 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231656AbhFVPAQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 11:00:16 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15MEhULj187659;
+        Tue, 22 Jun 2021 10:58:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=n9xGlmupv4opIn3YqzjMStUK+s9mChU/0uMEJHKrDfI=;
+ b=dBNycG3UQriX0js/RWNZ/94BC9V6spoIummgWW5mBSHs/DIFFc9HVX87a4bksvL8dlqX
+ TRuQo4iRpUZoJFuSDeAFKHLtCPIUIhzQ0jwJyKwpsL/QQ0cHCA3sKFzUOoMmBY9FA0v4
+ FhWqg0ILQ+5q6J4nK9c7OTY0v+zTOwdGH57ffQ+tVs+1ru5rhw0qTh7Eu3OtKgl0pG6c
+ s57Q4nX8m4zSI1o5WNhUB6wT6g6/DE/CIz/qn2tQFlTp3N+hHH0BNJbpUwa3a6vvtX7l
+ ON09li4TnmQ9xnNXHCSaH5or/r+7wtxtqoDPjVBTxGru+83vlIu/YGnxZBRhmZuvzTlc 2w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39bgswb2ct-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Jun 2021 10:58:00 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15MEifjA193811;
+        Tue, 22 Jun 2021 10:57:59 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39bgswb2bx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Jun 2021 10:57:59 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15MEs1VA024048;
+        Tue, 22 Jun 2021 14:56:58 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 3998789hgy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Jun 2021 14:56:57 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15MEutPJ20971866
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 22 Jun 2021 14:56:55 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F2F004C04A;
+        Tue, 22 Jun 2021 14:56:54 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 912884C044;
+        Tue, 22 Jun 2021 14:56:54 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.32.128])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 22 Jun 2021 14:56:54 +0000 (GMT)
+Subject: Re: [PATCH] KVM: s390: get rid of register asm usage
+To:     Heiko Carstens <hca@linux.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20210621140356.1210771-1-hca@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <4f5e36d2-1f1f-c6cf-5066-a81e3b5caa91@de.ibm.com>
+Date:   Tue, 22 Jun 2021 16:56:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20210621140356.1210771-1-hca@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ZZhBNOlCrXSIFeCiqNIe1mp4V-x1BZ6p
+X-Proofpoint-ORIG-GUID: LI7qAlLbX_gVT5LRx3JP_pJkZpVGReBb
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-06-22_08:2021-06-21,2021-06-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ mlxscore=0 malwarescore=0 priorityscore=1501 suspectscore=0 clxscore=1015
+ spamscore=0 bulkscore=0 phishscore=0 impostorscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
+ definitions=main-2106220090
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
-> On 22/06/21 07:25, Stephen Rothwell wrote:
->> Hi all,
->> 
->> Today's linux-next merge of the kvm tree got a conflict in:
->> 
->>    include/uapi/linux/kvm.h
->> 
->> between commit:
->> 
->>    9bb4a6f38fd4 ("KVM: PPC: Book3S HV: Add KVM_CAP_PPC_RPT_INVALIDATE capability")
->> 
->> from the powerpc tree and commits:
->> 
->>    644f706719f0 ("KVM: x86: hyper-v: Introduce KVM_CAP_HYPERV_ENFORCE_CPUID")
->>    6dba94035203 ("KVM: x86: Introduce KVM_GET_SREGS2 / KVM_SET_SREGS2")
->>    0dbb11230437 ("KVM: X86: Introduce KVM_HC_MAP_GPA_RANGE hypercall")
->> 
->> from the kvm tree.
->> 
->> I fixed it up (see below) and can carry the fix as necessary. This
->> is now fixed as far as linux-next is concerned, but any non trivial
->> conflicts should be mentioned to your upstream maintainer when your tree
->> is submitted for merging.  You may also want to consider cooperating
->> with the maintainer of the conflicting tree to minimise any particularly
->> complex conflicts.
->> 
->
-> What are the dependencies of these KVM patches on patches from the bare 
-> metal trees,
-
-I don't think there's actually a semantic dependency on my tree, but
-there's multiple textual conflicts with my tree. That series has to go
-via both trees, or there will be conflicts.
-
-> ... and can you guys *please* start using topic branches?
->
-> I've been asking you for literally years, but this is the first time I 
-> remember that Linus will have to resolve conflicts in uAPI changes and 
-> it is *not* acceptable.
-
-The patches are in a topic branch, which I will ask you to pull before
-the merge window, in order to resolve any conflicts.
-
-> Please drop the patches at 
-> https://www.spinics.net/lists/kvm-ppc/msg18666.html from the powerpc 
-> tree, and merge them through either the kvm-powerpc or kvm trees.
-
-The kvm-ppc tree is not taking patches at the moment.
-
-But it doesn't matter anyway, this series needs to be merged into my
-tree and the KVM tree regardless.
-
-The topic branch is here:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git/log/?h=topic/ppc-kvm
 
 
-The commit Stephen mentioned has been rebased since to squash in a fix.
-But what is in the topic branch is now final, I won't rebase what's
-there.
+On 21.06.21 16:03, Heiko Carstens wrote:
+> Using register asm statements has been proven to be very error prone,
+> especially when using code instrumentation where gcc may add function
+> calls, which clobbers register contents in an unexpected way.
+> 
+> Therefore get rid of register asm statements in kvm code, even though
+> there is currently nothing wrong with them. This way we know for sure
+> that this bug class won't be introduced here.
+> 
+> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
 
-cheers
+thanks applied.
+
+> ---
+>   arch/s390/kvm/kvm-s390.c | 18 +++++++++---------
+>   1 file changed, 9 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 1296fc10f80c..4b7b24f07790 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -329,31 +329,31 @@ static void allow_cpu_feat(unsigned long nr)
+>   
+>   static inline int plo_test_bit(unsigned char nr)
+>   {
+> -	register unsigned long r0 asm("0") = (unsigned long) nr | 0x100;
+> +	unsigned long function = (unsigned long) nr | 0x100;
+>   	int cc;
+>   
+>   	asm volatile(
+> +		"	lgr	0,%[function]\n"
+>   		/* Parameter registers are ignored for "test bit" */
+>   		"	plo	0,0,0,0(0)\n"
+>   		"	ipm	%0\n"
+>   		"	srl	%0,28\n"
+>   		: "=d" (cc)
+> -		: "d" (r0)
+> -		: "cc");
+> +		: [function] "d" (function)
+> +		: "cc", "0");
+>   	return cc == 0;
+>   }
+>   
+>   static __always_inline void __insn32_query(unsigned int opcode, u8 *query)
+>   {
+> -	register unsigned long r0 asm("0") = 0;	/* query function */
+> -	register unsigned long r1 asm("1") = (unsigned long) query;
+> -
+>   	asm volatile(
+> -		/* Parameter regs are ignored */
+> +		"	lghi	0,0\n"
+> +		"	lgr	1,%[query]\n"
+> +		/* Parameter registers are ignored */
+>   		"	.insn	rrf,%[opc] << 16,2,4,6,0\n"
+>   		:
+> -		: "d" (r0), "a" (r1), [opc] "i" (opcode)
+> -		: "cc", "memory");
+> +		: [query] "d" ((unsigned long)query), [opc] "i" (opcode)
+> +		: "cc", "memory", "0", "1");
+>   }
+>   
+>   #define INSN_SORTL 0xb938
+> 
