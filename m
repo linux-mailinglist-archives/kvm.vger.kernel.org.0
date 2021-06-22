@@ -2,104 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 833EE3B0E60
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 22:10:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A68843B0EEC
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 22:39:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231860AbhFVUNE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 16:13:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39428 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229786AbhFVUNE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Jun 2021 16:13:04 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7301FC061574
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 13:10:47 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id c15so10936193pls.13
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 13:10:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=21xgjufa4gzmA5sbAsLTU+XApnrHffYBBU5/YlGT9j0=;
-        b=Mu3afzjT7AjWy9DHCVVeSuPZpVVtPczT/SlM/TKhkGJ5yPCGdZMGzGrCcm94DX51vF
-         uSd0J+yRUkulaiWRVvVWOnw+aFO3HmOQtCRaS4Pzd7jj1Myo3YSkIB/LFh9wX4YeWhAt
-         P//uzUy+lt00HwTZ5H1USQGq0lCAzWuDZ9R8c9FyIz5X8QT8nNbwhLfWslgDzdkvAEWF
-         N1lc71dmPNfVHjf0zjtUAfGNFhKHrkZSdGeFPoL6On9CUgw7JNgpcUmM/jtlnWBCn5Rc
-         TuYDhnqLXA98SDcMVO1sT0jXf+Np1AS40pvs8KQ8Q4aInjxaginIyAJIGHqrtcpGkpmk
-         e4Gw==
+        id S229831AbhFVUlr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 16:41:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32131 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229629AbhFVUlq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 16:41:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624394370;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=g0MrG4+ll2NdZhlnJFDRRtUXoxi3BC214us5+iugMf4=;
+        b=dMMgFNCcdG2ph1OghqEpEDx2g4DW/xiZPpbvDZ2ZJMUsLG5pmtBQegvNFHPD2+V695v8+8
+        xROkFRFViQdmJBagF+n2iOj4SiA3Odb6cy81gLdqmB4ZOzxg/yqDiY7qE0qBGxhCnLQ1Te
+        JSkfj/rShXk38366OunRmFPhuztO4mA=
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
+ [209.85.167.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-435-PtRI2fJRNY6Txnatx4CzcQ-1; Tue, 22 Jun 2021 16:39:28 -0400
+X-MC-Unique: PtRI2fJRNY6Txnatx4CzcQ-1
+Received: by mail-oi1-f200.google.com with SMTP id r3-20020aca44030000b02902241b7398a8so368624oia.19
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 13:39:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=21xgjufa4gzmA5sbAsLTU+XApnrHffYBBU5/YlGT9j0=;
-        b=YLkS/Dod+EAyG7dLNp1zebICUthwro4mU6KhB6DB+vt2YIGwsqJJ0ejaQ4Y/7y0nC9
-         8h+pnxR5jNXQsouVGeTcKeroq0VeUUp+bJXdrOHZl6bXgLsxZoo2luKKNEhJPfwQdROO
-         dM/+DZbKqjzRfLXkU49h/lshbcgoeUT46HBWIogMYCzhMRodSA19g6u+lEhOH7OgE8Jv
-         GvzhLPCyq6A2CrTup6bpTN4g4Kfrtg0Jol5uR/1Q5iYQco0MqCxF+RVL9MhIf1BEjgc6
-         OVEc+K1BF830ZJFkh+NJO3wwS6AqQiBYayF7ewvwV8ZAon093BXtcxvE+6dt62BGK3ki
-         6ClQ==
-X-Gm-Message-State: AOAM530ezI+7IfzacCYcq194D72AgmSt09271ro+TsLxPZJu6a4J/N9V
-        m8lSWdHxozFzBBODegMFIVJFjA==
-X-Google-Smtp-Source: ABdhPJxF79gefY2EG4keXirmC5v0DgovMexsMCqE+oiHoIDnceAda0/BVvB9iKbm51yWO16Wutm4wA==
-X-Received: by 2002:a17:90a:1382:: with SMTP id i2mr5670751pja.221.1624392646714;
-        Tue, 22 Jun 2021 13:10:46 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h8sm173171pfn.0.2021.06.22.13.10.45
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=g0MrG4+ll2NdZhlnJFDRRtUXoxi3BC214us5+iugMf4=;
+        b=Qs7zsLCKafxXHGIJIuRdDSTNliOIgDbfdGzvotV2O8S3D3Q0eismrt7JmAS/SsB392
+         Sh62s77hSKbDqjUMMXwWkqm4QgkHUS77HNxEnNhjlevzQXrH03+wqGeHVS2rT0eXPQPf
+         4JdNtN1mjkfaeH6+FRgvfpopPaWg2zqj6sfhvV8kRsX60uzWXUS16m5BoQTdAwnoxZjv
+         eWWz/zWpbf1cpiq/WHpg+lIW/h18ydPvw25yD8lYMq4pv9TftZejFft5Xet706cUCSDW
+         ZiDEIntSB4DxcY5reJM8FUsL/K5mqY2Nr+MossboprDq4H9ZO8AOPsWtkk0SqxLHsDY4
+         S/vw==
+X-Gm-Message-State: AOAM531K4CLIWQ7w+WcJDxFsnZMwS2vjrPQHBl7vpjeGHc0+sxX1dJ2a
+        B2NbytA5qTN+ORR5H2Boc6QIzdqRSAIC3y37zdSmdVTvkvR2cY5pPpfG+hQSlQPwnSnApxZvQkC
+        FCl76yaE+nNwI
+X-Received: by 2002:a05:6808:2012:: with SMTP id q18mr505145oiw.1.1624394368055;
+        Tue, 22 Jun 2021 13:39:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyEtvh0TeVS8XIjLHgIJPcpwXe8Uxkzd568eyguTJwkGZ5onD2K6d+EchimlC6NR2wEOkVRIg==
+X-Received: by 2002:a05:6808:2012:: with SMTP id q18mr505135oiw.1.1624394367873;
+        Tue, 22 Jun 2021 13:39:27 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id f63sm115130otb.36.2021.06.22.13.39.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Jun 2021 13:10:46 -0700 (PDT)
-Date:   Tue, 22 Jun 2021 20:10:42 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH] x86: svm: Skip NPT-only part of guest CR3
- tests when NPT is disabled
-Message-ID: <YNJDwlw8xltbfOPT@google.com>
-References: <20210422025448.3475200-1-seanjc@google.com>
+        Tue, 22 Jun 2021 13:39:27 -0700 (PDT)
+Date:   Tue, 22 Jun 2021 14:39:26 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Colin King <colin.king@canonical.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        kvm@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH][next] vfio/mdpy: Fix memory leak of object
+ mdev_state->vconfig
+Message-ID: <20210622143926.7880e698.alex.williamson@redhat.com>
+In-Reply-To: <20210622185824.GU1096940@ziepe.ca>
+References: <20210622183710.28954-1-colin.king@canonical.com>
+        <20210622185824.GU1096940@ziepe.ca>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210422025448.3475200-1-seanjc@google.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 21, 2021, Sean Christopherson wrote:
-> Skip the sub-tests for guest CR3 that rely on NPT, unsurprisingly they
-> fail when running with NPT disabled.  Alternatively, the test could be
-> modified to poke into the legacy page tables, but obviously no one
-> actually cares that much about shadow paging.
-> 
-> Fixes: 6d0ecbf ("nSVM: Test non-MBZ reserved bits in CR3 in long mode and legacy PAE mode")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Tue, 22 Jun 2021 15:58:24 -0300
+Jason Gunthorpe <jgg@ziepe.ca> wrote:
 
-Ping!  Doesn't look like this ever got merged.
-
-> ---
->  x86/svm_tests.c | 5 +++++
->  1 file changed, 5 insertions(+)
+> On Tue, Jun 22, 2021 at 07:37:10PM +0100, Colin King wrote:
+> > From: Colin Ian King <colin.king@canonical.com>
+> > 
+> > In the case where the call to vfio_register_group_dev fails the error
+> > return path kfree's mdev_state but not mdev_state->vconfig. Fix this
+> > by kfree'ing mdev_state->vconfig before returning.
+> > 
+> > Addresses-Coverity: ("Resource leak")
+> > Fixes: 437e41368c01 ("vfio/mdpy: Convert to use vfio_register_group_dev()")
+> > Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> >  samples/vfio-mdev/mdpy.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
+> > index 7e9c9df0f05b..393c9df6f6a0 100644
+> > +++ b/samples/vfio-mdev/mdpy.c
+> > @@ -261,6 +261,7 @@ static int mdpy_probe(struct mdev_device *mdev)
+> >  
+> >  	ret = vfio_register_group_dev(&mdev_state->vdev);
+> >  	if (ret) {
+> > +		kfree(mdev_state->vconfig);
+> >  		kfree(mdev_state);
+> >  		return ret;
+> >  	}  
 > 
-> diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-> index 29a0b59..353ab6b 100644
-> --- a/x86/svm_tests.c
-> +++ b/x86/svm_tests.c
-> @@ -2237,6 +2237,9 @@ static void test_cr3(void)
+> Thanks Colin, looks right
+> 
+> Alex, this is in your hch-mdev-direct-v4 branch can you squash or
+> whatever?
+> 
+> Though if we are touching this I prefer the below:
+
+Discrete fix above as a follow-up patch and later add the below as an
+exit path cleanup, if you'd like to post it separately, seems like the
+way to go to me.  Thanks,
+
+Alex
+
+> diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
+> index 7e9c9df0f05bac..868a0e7fa90e98 100644
+> --- a/samples/vfio-mdev/mdpy.c
+> +++ b/samples/vfio-mdev/mdpy.c
+> @@ -235,17 +235,16 @@ static int mdpy_probe(struct mdev_device *mdev)
 >  
->  	vmcb->save.cr4 = cr4_saved & ~X86_CR4_PCIDE;
+>  	mdev_state->vconfig = kzalloc(MDPY_CONFIG_SPACE_SIZE, GFP_KERNEL);
+>  	if (mdev_state->vconfig == NULL) {
+> -		kfree(mdev_state);
+> -		return -ENOMEM;
+> +		ret = -ENOMEM;
+> +		goto err_state;
+>  	}
 >  
-> +	if (!npt_supported())
-> +		goto skip_npt_only;
+>  	fbsize = roundup_pow_of_two(type->width * type->height * type->bytepp);
+>  
+>  	mdev_state->memblk = vmalloc_user(fbsize);
+>  	if (!mdev_state->memblk) {
+> -		kfree(mdev_state->vconfig);
+> -		kfree(mdev_state);
+> -		return -ENOMEM;
+> +		ret = -ENOMEM;
+> +		goto err_vconfig;
+>  	}
+>  	dev_info(dev, "%s: %s (%dx%d)\n", __func__, type->name, type->width,
+>  		 type->height);
+> @@ -260,12 +259,17 @@ static int mdpy_probe(struct mdev_device *mdev)
+>  	mdpy_count++;
+>  
+>  	ret = vfio_register_group_dev(&mdev_state->vdev);
+> -	if (ret) {
+> -		kfree(mdev_state);
+> -		return ret;
+> -	}
+> +	if (ret)
+> +		goto err_vconfig;
 > +
->  	/* Clear P (Present) bit in NPT in order to trigger #NPF */
->  	pdpe[0] &= ~1ULL;
->  
-> @@ -2255,6 +2258,8 @@ static void test_cr3(void)
->  	    SVM_CR3_PAE_LEGACY_RESERVED_MASK, SVM_EXIT_NPF, "(PAE) ");
->  
->  	pdpe[0] |= 1ULL;
+>  	dev_set_drvdata(&mdev->dev, mdev_state);
+>  	return 0;
 > +
-> +skip_npt_only:
->  	vmcb->save.cr3 = cr3_saved;
->  	vmcb->save.cr4 = cr4_saved;
+> +err_vconfig:
+> +	kfree(mdev_state->vconfig);
+> +err_state:
+> +	kfree(mdev_state);
+> +	return ret;
 >  }
-> -- 
-> 2.31.1.498.g6c1eba8ee3d-goog
+>  
+>  static void mdpy_remove(struct mdev_device *mdev)
 > 
+
