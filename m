@@ -2,106 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 308213B0002
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 11:12:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 581233B0009
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 11:16:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229820AbhFVJO7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 05:14:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57785 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229486AbhFVJO7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 05:14:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624353163;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=1Igklq7VSMhkhXc/lnWk7BeO8P0U0v7mvbLRIWocBkU=;
-        b=f9co3dHGbRFyjW5UEcYu48BPKfMVJzRsAYe5JeN18m0+XAcXyIkfbv7YKJFTimd23beqhs
-        6wsyw5+CjqvFJjEnc94dTOXZD5eZC3z8lxtAOJdCa33iSV0lqKm6MTTyZeSnAKdldw92wS
-        ktcDgu0/A4C9DYIFw2ppE9/G52f1kMY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-555-bPVNJgvxM-uBFwGRbNYhEg-1; Tue, 22 Jun 2021 05:12:41 -0400
-X-MC-Unique: bPVNJgvxM-uBFwGRbNYhEg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9C008042FE
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 09:12:40 +0000 (UTC)
-Received: from thuth.com (ovpn-112-107.ams2.redhat.com [10.36.112.107])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4BC4669CB6
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 09:12:40 +0000 (UTC)
-From:   Thomas Huth <thuth@redhat.com>
-To:     kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH] Avoid backticks, use $() instead
-Date:   Tue, 22 Jun 2021 11:12:37 +0200
-Message-Id: <20210622091237.194410-1-thuth@redhat.com>
+        id S229794AbhFVJS5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 05:18:57 -0400
+Received: from mx20.baidu.com ([111.202.115.85]:60692 "EHLO baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229486AbhFVJS5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Jun 2021 05:18:57 -0400
+Received: from BC-Mail-EX02.internal.baidu.com (unknown [172.31.51.42])
+        by Forcepoint Email with ESMTPS id 2747E39B733B00C13CF6;
+        Tue, 22 Jun 2021 17:16:36 +0800 (CST)
+Received: from BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42) by
+ BC-Mail-EX02.internal.baidu.com (172.31.51.42) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2242.10; Tue, 22 Jun 2021 17:16:35 +0800
+Received: from LAPTOP-UKSR4ENP.internal.baidu.com (172.31.63.8) by
+ BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2242.4; Tue, 22 Jun 2021 17:16:35 +0800
+From:   Cai Huoqing <caihuoqing@baidu.com>
+To:     <kraxel@redhat.com>
+CC:     <kbuild-all@lists.01.org>, <kvm@vger.kernel.org>,
+        Cai Huoqing <caihuoqing@baidu.com>
+Subject: [PATCH v2] remove "#include<linux/virtio.h>"
+Date:   Tue, 22 Jun 2021 17:16:28 +0800
+Message-ID: <20210622091628.523-1-caihuoqing@baidu.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain
+X-Originating-IP: [172.31.63.8]
+X-ClientProxiedBy: BC-Mail-Ex11.internal.baidu.com (172.31.51.51) To
+ BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The backticks are considered as bad style these days, e.g. when checking
-scripts with https://www.shellcheck.net/ ... let's use the modern $()
-syntax instead.
+virtio_config.h already includes virtio.h. so remove it
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
 ---
- configure             |  2 +-
- run_tests.sh          |  2 +-
- scripts/arch-run.bash | 10 +++++-----
- 3 files changed, 7 insertions(+), 7 deletions(-)
+ drivers/vdpa/virtio_pci/vp_vdpa.c  | 1 -
+ drivers/virtio/virtio.c            | 1 -
+ drivers/virtio/virtio_input.c      | 1 -
+ drivers/virtio/virtio_mmio.c       | 1 -
+ drivers/virtio/virtio_pci_common.h | 1 -
+ drivers/virtio/virtio_ring.c       | 3 +--
+ drivers/virtio/virtio_vdpa.c       | 1 -
+ 7 files changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/configure b/configure
-index 71aaad4..d21601f 100755
---- a/configure
-+++ b/configure
-@@ -13,7 +13,7 @@ objcopy=objcopy
- objdump=objdump
- ar=ar
- addr2line=addr2line
--arch=`uname -m | sed -e 's/i.86/i386/;s/arm.*/arm/;s/ppc64.*/ppc64/'`
-+arch=$(uname -m | sed -e 's/i.86/i386/;s/arm.*/arm/;s/ppc64.*/ppc64/')
- host=$arch
- cross_prefix=
- endian=""
-diff --git a/run_tests.sh b/run_tests.sh
-index 65108e7..9f233c5 100755
---- a/run_tests.sh
-+++ b/run_tests.sh
-@@ -42,7 +42,7 @@ if [ $? -ne 4 ]; then
- fi
- 
- only_tests=""
--args=`getopt -u -o ag:htj:v -l all,group:,help,tap13,parallel:,verbose -- $*`
-+args=$(getopt -u -o ag:htj:v -l all,group:,help,tap13,parallel:,verbose -- $*)
- [ $? -ne 0 ] && exit 2;
- set -- $args;
- while [ $# -gt 0 ]; do
-diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-index 5997e38..9dd963b 100644
---- a/scripts/arch-run.bash
-+++ b/scripts/arch-run.bash
-@@ -111,11 +111,11 @@ run_migration ()
- 		return 2
- 	fi
- 
--	migsock=`mktemp -u -t mig-helper-socket.XXXXXXXXXX`
--	migout1=`mktemp -t mig-helper-stdout1.XXXXXXXXXX`
--	qmp1=`mktemp -u -t mig-helper-qmp1.XXXXXXXXXX`
--	qmp2=`mktemp -u -t mig-helper-qmp2.XXXXXXXXXX`
--	fifo=`mktemp -u -t mig-helper-fifo.XXXXXXXXXX`
-+	migsock=$(mktemp -u -t mig-helper-socket.XXXXXXXXXX)
-+	migout1=$(mktemp -t mig-helper-stdout1.XXXXXXXXXX)
-+	qmp1=$(mktemp -u -t mig-helper-qmp1.XXXXXXXXXX)
-+	qmp2=$(mktemp -u -t mig-helper-qmp2.XXXXXXXXXX)
-+	fifo=$(mktemp -u -t mig-helper-fifo.XXXXXXXXXX)
- 	qmpout1=/dev/null
- 	qmpout2=/dev/null
- 
+diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
+index c76ebb531212..8cb6fa86f055 100644
+--- a/drivers/vdpa/virtio_pci/vp_vdpa.c
++++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
+@@ -12,7 +12,6 @@
+ #include <linux/module.h>
+ #include <linux/pci.h>
+ #include <linux/vdpa.h>
+-#include <linux/virtio.h>
+ #include <linux/virtio_config.h>
+ #include <linux/virtio_ring.h>
+ #include <linux/virtio_pci.h>
+diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+index 4b15c00c0a0a..06b6c8c86ae5 100644
+--- a/drivers/virtio/virtio.c
++++ b/drivers/virtio/virtio.c
+@@ -1,5 +1,4 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+-#include <linux/virtio.h>
+ #include <linux/spinlock.h>
+ #include <linux/virtio_config.h>
+ #include <linux/module.h>
+diff --git a/drivers/virtio/virtio_input.c b/drivers/virtio/virtio_input.c
+index ce51ae165943..ab8439a94f73 100644
+--- a/drivers/virtio/virtio_input.c
++++ b/drivers/virtio/virtio_input.c
+@@ -1,6 +1,5 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ #include <linux/module.h>
+-#include <linux/virtio.h>
+ #include <linux/virtio_config.h>
+ #include <linux/input.h>
+ #include <linux/slab.h>
+diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+index 56128b9c46eb..5061ff088dd1 100644
+--- a/drivers/virtio/virtio_mmio.c
++++ b/drivers/virtio/virtio_mmio.c
+@@ -64,7 +64,6 @@
+ #include <linux/platform_device.h>
+ #include <linux/slab.h>
+ #include <linux/spinlock.h>
+-#include <linux/virtio.h>
+ #include <linux/virtio_config.h>
+ #include <uapi/linux/virtio_mmio.h>
+ #include <linux/virtio_ring.h>
+diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
+index beec047a8f8d..acae912fdb12 100644
+--- a/drivers/virtio/virtio_pci_common.h
++++ b/drivers/virtio/virtio_pci_common.h
+@@ -21,7 +21,6 @@
+ #include <linux/pci.h>
+ #include <linux/slab.h>
+ #include <linux/interrupt.h>
+-#include <linux/virtio.h>
+ #include <linux/virtio_config.h>
+ #include <linux/virtio_ring.h>
+ #include <linux/virtio_pci.h>
+diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+index 71e16b53e9c1..0dfe9aa0dad9 100644
+--- a/drivers/virtio/virtio_ring.c
++++ b/drivers/virtio/virtio_ring.c
+@@ -3,9 +3,8 @@
+  *
+  *  Copyright 2007 Rusty Russell IBM Corporation
+  */
+-#include <linux/virtio.h>
+-#include <linux/virtio_ring.h>
+ #include <linux/virtio_config.h>
++#include <linux/virtio_ring.h>
+ #include <linux/device.h>
+ #include <linux/slab.h>
+ #include <linux/module.h>
+diff --git a/drivers/virtio/virtio_vdpa.c b/drivers/virtio/virtio_vdpa.c
+index e28acf482e0c..80f75401296e 100644
+--- a/drivers/virtio/virtio_vdpa.c
++++ b/drivers/virtio/virtio_vdpa.c
+@@ -13,7 +13,6 @@
+ #include <linux/kernel.h>
+ #include <linux/slab.h>
+ #include <linux/uuid.h>
+-#include <linux/virtio.h>
+ #include <linux/vdpa.h>
+ #include <linux/virtio_config.h>
+ #include <linux/virtio_ring.h>
 -- 
-2.27.0
+2.22.0
 
