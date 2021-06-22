@@ -2,153 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C3733B0801
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 16:58:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EBFB03B07FE
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 16:58:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231941AbhFVPAT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 11:00:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36662 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231656AbhFVPAQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 11:00:16 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15MEhULj187659;
-        Tue, 22 Jun 2021 10:58:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=n9xGlmupv4opIn3YqzjMStUK+s9mChU/0uMEJHKrDfI=;
- b=dBNycG3UQriX0js/RWNZ/94BC9V6spoIummgWW5mBSHs/DIFFc9HVX87a4bksvL8dlqX
- TRuQo4iRpUZoJFuSDeAFKHLtCPIUIhzQ0jwJyKwpsL/QQ0cHCA3sKFzUOoMmBY9FA0v4
- FhWqg0ILQ+5q6J4nK9c7OTY0v+zTOwdGH57ffQ+tVs+1ru5rhw0qTh7Eu3OtKgl0pG6c
- s57Q4nX8m4zSI1o5WNhUB6wT6g6/DE/CIz/qn2tQFlTp3N+hHH0BNJbpUwa3a6vvtX7l
- ON09li4TnmQ9xnNXHCSaH5or/r+7wtxtqoDPjVBTxGru+83vlIu/YGnxZBRhmZuvzTlc 2w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 39bgswb2ct-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Jun 2021 10:58:00 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15MEifjA193811;
-        Tue, 22 Jun 2021 10:57:59 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 39bgswb2bx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Jun 2021 10:57:59 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15MEs1VA024048;
-        Tue, 22 Jun 2021 14:56:58 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 3998789hgy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Jun 2021 14:56:57 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15MEutPJ20971866
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Jun 2021 14:56:55 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F2F004C04A;
-        Tue, 22 Jun 2021 14:56:54 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 912884C044;
-        Tue, 22 Jun 2021 14:56:54 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.171.32.128])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 22 Jun 2021 14:56:54 +0000 (GMT)
-Subject: Re: [PATCH] KVM: s390: get rid of register asm usage
-To:     Heiko Carstens <hca@linux.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20210621140356.1210771-1-hca@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <4f5e36d2-1f1f-c6cf-5066-a81e3b5caa91@de.ibm.com>
-Date:   Tue, 22 Jun 2021 16:56:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S231489AbhFVPAQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 11:00:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33872 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230185AbhFVPAP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Jun 2021 11:00:15 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 71BE760FEA;
+        Tue, 22 Jun 2021 14:57:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1624373879;
+        bh=VwMIe4cYe/W3nLlDB3Fbw/+ECa70qefUiyNfPw6sEP4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=JmOlbsDiK3T2O385xlYkCENWOmuHB7ZpPYZhlhAmDXqQ+o0HANIXCII8YnvhMerWS
+         saTgOUOP1tFtfjUl6uRuQHQ6gqzOLM8TyEWZv0RWXAXeMzpIbgUY2p7k6AM3n0NNll
+         SU58NY8wjl1MJfkkspKDe9r0eC7ZZ/lDLIVeJS+eqSrj9bEJ2qLP/lX3UrA2SQ3PfT
+         bi03/lXYjDDjERiTtwz3uitGUIELqRQAshhbaoz+p6VYXWg+l5JqP/hRAd8N1MDhSx
+         PJdWX3svLEawxIdaJx8mROYD6JKSpedlem4hehcAx2+rLTAs1F7rqOlmBJA2dtNA2r
+         aSdSyJQv6nIcQ==
+Date:   Tue, 22 Jun 2021 09:57:58 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     bhelgaas@google.com, alex.williamson@redhat.com, cohuck@redhat.com,
+        jgg@ziepe.ca, kevin.tian@intel.com, eric.auger@redhat.com,
+        giovanni.cabiddu@intel.com, mjrosato@linux.ibm.com,
+        jannh@google.com, kvm@vger.kernel.org, linux-pci@vger.kernel.org,
+        minchan@kernel.org, gregkh@linuxfoundation.org, jeyu@kernel.org,
+        ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
+        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
+        tglx@linutronix.de, keescook@chromium.org, jikos@kernel.org,
+        rostedt@goodmis.org, peterz@infradead.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] pci: export pci_dev_unlock() and the respective
+ unlock
+Message-ID: <20210622145758.GA3336253@bjorn-Precision-5520>
 MIME-Version: 1.0
-In-Reply-To: <20210621140356.1210771-1-hca@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ZZhBNOlCrXSIFeCiqNIe1mp4V-x1BZ6p
-X-Proofpoint-ORIG-GUID: LI7qAlLbX_gVT5LRx3JP_pJkZpVGReBb
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-06-22_08:2021-06-21,2021-06-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
- mlxscore=0 malwarescore=0 priorityscore=1501 suspectscore=0 clxscore=1015
- spamscore=0 bulkscore=0 phishscore=0 impostorscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2106220090
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210622000310.728294-1-mcgrof@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Please update the subject line to match the convention:
 
+  PCI: Export pci_dev_trylock() and pci_dev_unlock()
 
-On 21.06.21 16:03, Heiko Carstens wrote:
-> Using register asm statements has been proven to be very error prone,
-> especially when using code instrumentation where gcc may add function
-> calls, which clobbers register contents in an unexpected way.
+On Mon, Jun 21, 2021 at 05:03:09PM -0700, Luis Chamberlain wrote:
+> Other places in the kernel use this form, and so just
+> provide a common path for it.
 > 
-> Therefore get rid of register asm statements in kvm code, even though
-> there is currently nothing wrong with them. This way we know for sure
-> that this bug class won't be introduced here.
-> 
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 
-thanks applied.
+With tweaks mentioned here:
+
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
 
 > ---
->   arch/s390/kvm/kvm-s390.c | 18 +++++++++---------
->   1 file changed, 9 insertions(+), 9 deletions(-)
+>  drivers/pci/pci.c   | 6 ++++--
+>  include/linux/pci.h | 3 +++
+>  2 files changed, 7 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 1296fc10f80c..4b7b24f07790 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -329,31 +329,31 @@ static void allow_cpu_feat(unsigned long nr)
->   
->   static inline int plo_test_bit(unsigned char nr)
->   {
-> -	register unsigned long r0 asm("0") = (unsigned long) nr | 0x100;
-> +	unsigned long function = (unsigned long) nr | 0x100;
->   	int cc;
->   
->   	asm volatile(
-> +		"	lgr	0,%[function]\n"
->   		/* Parameter registers are ignored for "test bit" */
->   		"	plo	0,0,0,0(0)\n"
->   		"	ipm	%0\n"
->   		"	srl	%0,28\n"
->   		: "=d" (cc)
-> -		: "d" (r0)
-> -		: "cc");
-> +		: [function] "d" (function)
-> +		: "cc", "0");
->   	return cc == 0;
->   }
->   
->   static __always_inline void __insn32_query(unsigned int opcode, u8 *query)
->   {
-> -	register unsigned long r0 asm("0") = 0;	/* query function */
-> -	register unsigned long r1 asm("1") = (unsigned long) query;
-> -
->   	asm volatile(
-> -		/* Parameter regs are ignored */
-> +		"	lghi	0,0\n"
-> +		"	lgr	1,%[query]\n"
-> +		/* Parameter registers are ignored */
->   		"	.insn	rrf,%[opc] << 16,2,4,6,0\n"
->   		:
-> -		: "d" (r0), "a" (r1), [opc] "i" (opcode)
-> -		: "cc", "memory");
-> +		: [query] "d" ((unsigned long)query), [opc] "i" (opcode)
-> +		: "cc", "memory", "0", "1");
->   }
->   
->   #define INSN_SORTL 0xb938
+> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+> index f09821af1d2e..b1d9bb3f5ae2 100644
+> --- a/drivers/pci/pci.c
+> +++ b/drivers/pci/pci.c
+> @@ -5027,7 +5027,7 @@ static void pci_dev_lock(struct pci_dev *dev)
+>  }
+>  
+>  /* Return 1 on successful lock, 0 on contention */
+> -static int pci_dev_trylock(struct pci_dev *dev)
+> +int pci_dev_trylock(struct pci_dev *dev)
+>  {
+>  	if (pci_cfg_access_trylock(dev)) {
+>  		if (device_trylock(&dev->dev))
+> @@ -5037,12 +5037,14 @@ static int pci_dev_trylock(struct pci_dev *dev)
+>  
+>  	return 0;
+>  }
+> +EXPORT_SYMBOL_GPL(pci_dev_trylock);
+>  
+> -static void pci_dev_unlock(struct pci_dev *dev)
+> +void pci_dev_unlock(struct pci_dev *dev)
+>  {
+>  	device_unlock(&dev->dev);
+>  	pci_cfg_access_unlock(dev);
+>  }
+> +EXPORT_SYMBOL_GPL(pci_dev_unlock);
+>  
+>  static void pci_dev_save_and_disable(struct pci_dev *dev)
+>  {
+> diff --git a/include/linux/pci.h b/include/linux/pci.h
+> index 6248e044dd29..c55368f58965 100644
+> --- a/include/linux/pci.h
+> +++ b/include/linux/pci.h
+> @@ -1353,6 +1353,9 @@ int devm_request_pci_bus_resources(struct device *dev,
+>  /* Temporary until new and working PCI SBR API in place */
+>  int pci_bridge_secondary_bus_reset(struct pci_dev *dev);
+>  
+> +int pci_dev_trylock(struct pci_dev *dev);
+> +void pci_dev_unlock(struct pci_dev *dev);
+
+Move next to pci_cfg_access_lock(), which seems a little more related.
+
+>  #define pci_bus_for_each_resource(bus, res, i)				\
+>  	for (i = 0;							\
+>  	    (res = pci_bus_resource_n(bus, i)) || i < PCI_BRIDGE_RESOURCE_NUM; \
+> -- 
+> 2.30.2
 > 
