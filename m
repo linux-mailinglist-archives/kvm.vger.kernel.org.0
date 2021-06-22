@@ -2,118 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1887A3B0A58
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 18:29:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B89B3B0A47
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 18:25:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229853AbhFVQbk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 12:31:40 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57270 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229501AbhFVQbk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 12:31:40 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15MG3INZ027345;
-        Tue, 22 Jun 2021 12:29:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=AlSvS6/j8WtIKfsoCPqprGMMO5RF5YeWz5gVfhr6J74=;
- b=fhC5HUso6+W1Y3oD7OdAMqmnpUxcL2QZQA8ncKCrCtxWsN+nhqYS4qYXOhUKdY0tW+HS
- YYXXeUJ+qMHUhB1E7IqyI29vXatTO9VGXwS7mBWBLRlEKuiRldf64YDrkPARN5KdbGxf
- 1/g9O/nAxp9kwuD2Vmwucmb6frJB1XqUWsmmBEjJ51VpGGylqPP7s8uMRrQ/LjGfDyQc
- ZaUkCYz31nTU8LUA6hNnTuZkwacFhyylrSNKmUQh1ez6fMAEe5TVOp7S07ey0I/Rehtf
- VEYhU850wkuO+j2vTMTW+DFm3lZ2Ac08X6LvdC1FRwZj79DWrCluLUBsIMV91WAnGQxM Ew== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39bj1gudah-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Jun 2021 12:29:24 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15MG3Niv027747;
-        Tue, 22 Jun 2021 12:29:24 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39bj1gud9h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Jun 2021 12:29:23 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15MGScWT021551;
-        Tue, 22 Jun 2021 16:29:21 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma05fra.de.ibm.com with ESMTP id 3998788uxv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Jun 2021 16:29:21 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15MGRwPB35914036
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Jun 2021 16:27:58 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E288411C04C;
-        Tue, 22 Jun 2021 16:29:18 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8EED911C04A;
-        Tue, 22 Jun 2021 16:29:18 +0000 (GMT)
-Received: from ibm-vm (unknown [9.145.9.205])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 22 Jun 2021 16:29:18 +0000 (GMT)
-Date:   Tue, 22 Jun 2021 18:24:11 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: s390: gen_facilities: allow facilities 165,
- 193, 194 and 196
-Message-ID: <20210622182411.7ce350ad@ibm-vm>
-In-Reply-To: <20210622143412.143369-2-borntraeger@de.ibm.com>
-References: <20210622143412.143369-1-borntraeger@de.ibm.com>
-        <20210622143412.143369-2-borntraeger@de.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S229769AbhFVQ17 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 12:27:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49427 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229501AbhFVQ17 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 12:27:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624379142;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vjqaP9Z8UpgwrTU8DHBWtrD6r/Zid6ORfkGZGN1NUwQ=;
+        b=BpO/YQyiYsU0oqgJmIErZOLPlWELI8JgQEK7XTChoRyPT7+lmj9U+9ipFhJFp31/6P48fQ
+        DKCO6bGh1wDDmUPrgsuqzeKlcbI2SpWZtUvJzuz9HZMB+YgUvDR6Km2aNiIEhuKvnEf6Md
+        RTairNprCRXRmjbzazvORc1tUtXNtz8=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-34-Oagpnj8DPRWEJy9gRbv2MQ-1; Tue, 22 Jun 2021 12:25:41 -0400
+X-MC-Unique: Oagpnj8DPRWEJy9gRbv2MQ-1
+Received: by mail-wm1-f69.google.com with SMTP id g14-20020a05600c4eceb02901b609849650so902073wmq.6
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 09:25:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=vjqaP9Z8UpgwrTU8DHBWtrD6r/Zid6ORfkGZGN1NUwQ=;
+        b=GFX6eBY7TLBTNrjhv9UASLMHUmBPJtfIEubdUOVZJ4cI9DK+sd5KIRwdo8PuuOI6Mp
+         7u1t4gswH621Tf+96C7FF4QrDTmaNDpoFje3ycsc0j+AeT6vXFMt3/aNtjs/l6oo1NlY
+         v5jZV0tVVJrGrm1wgPc9ZFzaCiFZa93/nK7z+wgkd7c/sOgbN3dKrMuBdXg0zx1WT1EE
+         mIe9uaJmAPKKbB6geT0UYV22oOpWRZieFaG6LUxrkonZQ1Ku1T7FywVgwHT0aEEAJMVH
+         RMzwaXFGGktAwmaMtFQNl7i5f8RyfMnlB9mIMRZBLobsWwn0Zz71hHPDi71aeN9+DOBM
+         jioQ==
+X-Gm-Message-State: AOAM533/z+mSf8SPHkE+7SCVhcAbJa8MAYA/QMmDxeTEkp6dmdTq+Kah
+        68LsQeBViLCqPhMmajQ9GAPJ/zyFL//+mMXTdB6d7XsXKkkzOu1ZKRvfyxf/sLlS9hvVZZVoHFS
+        Qs2zFwkB31KzM
+X-Received: by 2002:a5d:6b82:: with SMTP id n2mr4151602wrx.206.1624379139784;
+        Tue, 22 Jun 2021 09:25:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzuuYvVtHoTe9VGU82USBbvdDmOc1QFRrl8B1NHWep4YfgrR6ZFUxpJLAwMcq3Z3RkUw6ELIA==
+X-Received: by 2002:a5d:6b82:: with SMTP id n2mr4151586wrx.206.1624379139642;
+        Tue, 22 Jun 2021 09:25:39 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id n18sm3059855wmq.41.2021.06.22.09.25.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Jun 2021 09:25:39 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 0/4] Test compiling with Clang in the
+ Travis-CI
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     Laurent Vivier <lvivier@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+References: <20210622135517.234801-1-thuth@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4130711c-2c22-c417-5e88-a68e610ae891@redhat.com>
+Date:   Tue, 22 Jun 2021 18:25:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20210622135517.234801-1-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Z8MHEhrYG0yszFdyoWEcCq09BUYyMevR
-X-Proofpoint-ORIG-GUID: As9AIMADLIwkPDaxP_Ih8xNTWDxt4fkJ
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-06-22_08:2021-06-22,2021-06-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- mlxscore=0 mlxlogscore=999 bulkscore=0 suspectscore=0 priorityscore=1501
- lowpriorityscore=0 malwarescore=0 phishscore=0 clxscore=1015
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106220100
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 22 Jun 2021 16:34:11 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On 22/06/21 15:55, Thomas Huth wrote:
+> Travis-CI recently changed their policy so that builds on the non-x86
+> build machines are possible without consuming any credits again.
+> While we're already testing the non-x86 builds in the gitlab-CI with
+> the GCC cross-compilers, we could still benefit from the non-x86
+> builders in the Travis-CI by compiling the code with Clang there, too
+> (since there are AFAIK no Clang cross-compilers available in the usual
+> distros on x86).
 
-> This enables the neural NNPA, BEAR enhancement,reset DAT protection
-> and processor activity counter facilities via the cpu model.
-> 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Looks good apart from Claudio's remark.  Thanks very much!
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
-> ---
->  arch/s390/tools/gen_facilities.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/arch/s390/tools/gen_facilities.c
-> b/arch/s390/tools/gen_facilities.c index 61ce5b59b828..606324e56e4e
-> 100644 --- a/arch/s390/tools/gen_facilities.c
-> +++ b/arch/s390/tools/gen_facilities.c
-> @@ -115,6 +115,10 @@ static struct facility_def facility_defs[] = {
->  			12, /* AP Query Configuration Information */
->  			15, /* AP Facilities Test */
->  			156, /* etoken facility */
-> +			165, /* nnpa facility */
-> +			193, /* bear enhancement facility */
-> +			194, /* rdp enhancement facility */
-> +			196, /* processor activity instrumentation
-> facility */ -1  /* END */
->  		}
->  	},
+Paolo
 
