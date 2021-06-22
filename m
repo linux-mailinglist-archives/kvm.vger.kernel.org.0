@@ -2,117 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 11F133AFCB2
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 07:31:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81D063AFD06
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 08:23:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229999AbhFVFd0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 01:33:26 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:43751 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229853AbhFVFd0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Jun 2021 01:33:26 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4G8FP92yLZz9sjB;
-        Tue, 22 Jun 2021 15:31:08 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1624339870;
-        bh=+iTBWQ1I2dZ1rputthWeJ/k2YsXV48BguOCFkccfVsM=;
-        h=Date:From:To:Cc:Subject:From;
-        b=j7lrNnbCjMXFeINRUnZ0RewL4ixFZ75s05+TtrJU1Xt0At9CumtyqSGbtVzoDcK7c
-         wvlZ4FPDEoHX798NGL0jS+CWBKoZX611iwZqLvwhj8jttj58mqBr7tHDpMElbqGBTX
-         ptPOh6DNtbVZm14YKEBktMT+6/2suKyV7b1UBUAAW67j/znjEkLoEGDRfn9kekUuCg
-         aXEK15o9pQFU9qPBbH4w5ESebDzGNzejLxrycB14mctRA3b7o2jYsJ81tTePqH56r0
-         KKKl2FmcIvtLd9ApU6m7R0NX134Ka5Jwm+1SDUlQzD8UMFPuPZ2n/7eTEcl/LW0E0q
-         SV/QWWTNrTNyQ==
-Date:   Tue, 22 Jun 2021 15:31:07 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Christoffer Dall <cdall@cs.columbia.edu>,
-        Marc Zyngier <maz@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Jim Mattson <jmattson@google.com>,
+        id S229853AbhFVGZq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 02:25:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21310 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229628AbhFVGZp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 02:25:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624343009;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aQqfkvCtBb6g17+HqN0uwZioUK6+vGsvOXTdTvz9LIc=;
+        b=fZbAp+kY9Oq/YcndHYZ02y2K9/mDYZvIsJ1pA++0V7SNbrwRzWWf3De51W4uTxu7IbGfQn
+        awtaSu6T8DEMJs6H8CYaJP4jjIm6p0iRe8FYbVtjEDNiy55g/qPya7r6sbQGQXl7FfRiLD
+        kQmN9PanN+ampm7TuUyBSOrm6XiVArA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-327-9lEXvDGPO96ZsVOU8x86rw-1; Tue, 22 Jun 2021 02:23:28 -0400
+X-MC-Unique: 9lEXvDGPO96ZsVOU8x86rw-1
+Received: by mail-wm1-f69.google.com with SMTP id l9-20020a05600c1d09b02901dc060832e2so910689wms.1
+        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 23:23:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=aQqfkvCtBb6g17+HqN0uwZioUK6+vGsvOXTdTvz9LIc=;
+        b=WfuVLr5lxF4uoxhsfkZu2EvHpiExWJX/rLdJK6MqhlICBY9TpJA6YAOU3C5X3CslS+
+         7VeyFvqIgUWE84QIaqhWivDhXbPGGpr8S4nOpnP7E1n2Qz6zxQ59TL6NxfLz18dXiwDi
+         E1foYVt8RcDZghwQvUu13Sr5Rv3Z52Jc/KPAioRydXI5no1IY3FphO1b4LgEr4J1PFSs
+         gzGnWKj42z2SL0LEhhMbiaD4TLGm8sZNWbJeaxggPFXR3nSNeIpcL0f8sMQ6cP3+V5qK
+         GY9C9mQCWPOX4CHP+BguaxcYbYt3Ck1EM3RFbitHLEteHA4U1u0rEC5rWo6m195zGkse
+         k8PQ==
+X-Gm-Message-State: AOAM533Dv1U8KY1Fe5kV8lefcIry6nk4hP1mvQ+PRTbROEdmaIWFrzs0
+        Ipq1LO7rLkleXIdIG4HB8uJF6TAckTOOzgslBnMFRfACYNsYgfeitcKIelbSasmuGf9FCTkEdRj
+        9R8FW6YnP+jBv
+X-Received: by 2002:a5d:44d2:: with SMTP id z18mr2678886wrr.358.1624343006203;
+        Mon, 21 Jun 2021 23:23:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyH/4w8wmlBb+QUv5p9+m3hdd4Lh4ZTIRS504JjrKAX2ybZM9tGHk+qPRypejrUSPVJj6nMOg==
+X-Received: by 2002:a5d:44d2:: with SMTP id z18mr2678861wrr.358.1624343006005;
+        Mon, 21 Jun 2021 23:23:26 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id a1sm26072095wra.63.2021.06.21.23.23.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Jun 2021 23:23:25 -0700 (PDT)
+Subject: Re: linux-next: manual merge of the kvm tree with the powerpc tree
+To:     Stephen Rothwell <sfr@canb.auug.org.au>, KVM <kvm@vger.kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        PowerPC <linuxppc-dev@lists.ozlabs.org>
+Cc:     Ashish Kalra <ashish.kalra@amd.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Ricardo Koller <ricarkol@google.com>
-Subject: linux-next: manual merge of the kvm-arm tree with the kvm tree
-Message-ID: <20210622153107.1db31b13@canb.auug.org.au>
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20210622152544.74e01567@canb.auug.org.au>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9c2dbe56-4c64-0032-0acb-2e2925c7a2ab@redhat.com>
+Date:   Tue, 22 Jun 2021 08:23:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/t1p/v3sR99B7_wU_ust+T8f";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+In-Reply-To: <20210622152544.74e01567@canb.auug.org.au>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/t1p/v3sR99B7_wU_ust+T8f
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 22/06/21 07:25, Stephen Rothwell wrote:
+> Hi all,
+> 
+> Today's linux-next merge of the kvm tree got a conflict in:
+> 
+>    include/uapi/linux/kvm.h
+> 
+> between commit:
+> 
+>    9bb4a6f38fd4 ("KVM: PPC: Book3S HV: Add KVM_CAP_PPC_RPT_INVALIDATE capability")
+> 
+> from the powerpc tree and commits:
+> 
+>    644f706719f0 ("KVM: x86: hyper-v: Introduce KVM_CAP_HYPERV_ENFORCE_CPUID")
+>    6dba94035203 ("KVM: x86: Introduce KVM_GET_SREGS2 / KVM_SET_SREGS2")
+>    0dbb11230437 ("KVM: X86: Introduce KVM_HC_MAP_GPA_RANGE hypercall")
+> 
+> from the kvm tree.
+> 
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+> 
 
-Hi all,
+What are the dependencies of these KVM patches on patches from the bare 
+metal trees, and can you guys *please* start using topic branches?
 
-Today's linux-next merge of the kvm-arm tree got a conflict in:
+I've been asking you for literally years, but this is the first time I 
+remember that Linus will have to resolve conflicts in uAPI changes and 
+it is *not* acceptable.
 
-  tools/testing/selftests/kvm/Makefile
+Please drop the patches at 
+https://www.spinics.net/lists/kvm-ppc/msg18666.html from the powerpc 
+tree, and merge them through either the kvm-powerpc or kvm trees.
 
-between commit:
+Paolo
 
-  4c63c9234085 ("KVM: selftests: Hoist APIC functions out of individual tes=
-ts")
-
-from the kvm tree and commit:
-
-  e3db7579ef35 ("KVM: selftests: Add exception handling support for aarch64=
-")
-
-from the kvm-arm tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc tools/testing/selftests/kvm/Makefile
-index 61e2accd080d,36e4ebcc82f0..000000000000
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@@ -34,8 -34,8 +34,8 @@@ ifeq ($(ARCH),s390
-  endif
- =20
-  LIBKVM =3D lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/rbtree.c li=
-b/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
- -LIBKVM_x86_64 =3D lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.=
-c lib/x86_64/ucall.c lib/x86_64/handlers.S
- +LIBKVM_x86_64 =3D lib/x86_64/apic.c lib/x86_64/processor.c lib/x86_64/vmx=
-.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
-- LIBKVM_aarch64 =3D lib/aarch64/processor.c lib/aarch64/ucall.c
-+ LIBKVM_aarch64 =3D lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch6=
-4/handlers.S
-  LIBKVM_s390x =3D lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag31=
-8_test_handler.c
- =20
-  TEST_GEN_PROGS_x86_64 =3D x86_64/cr4_cpuid_sync_test
-
---Sig_/t1p/v3sR99B7_wU_ust+T8f
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmDRdZsACgkQAVBC80lX
-0GyiiQf/b4t2JydoHxXvWZMGRgMDwCw0u1z/7CwfdoShDBUMhuweR5Cfr8q+I9dx
-u3SmYsXibM/zZJm+YhetjHPad3lKRu5qb5CtIkid6m4o3Ed5Fen69eTfbib97mxg
-nU0f3Mp6Oz5u+kwj34Q0AzlJZPjXo5mRukzSnCa48an23GiklDxRl3wDMELZHn4d
-cA+Eh2Xlu5VqKdmo3p9SWSyuA86D8jviOCXnvr7tCIxN35rticAYEkY+K2fVvnEp
-dB1yI8oILMFP+QKKT3LYTzcP7GmmzL6xlRAmpaBzZ6piz1up1cREozqrLpFyXunw
-agdPwyTohTDJvymxs5Ohc9k29keBxQ==
-=lraZ
------END PGP SIGNATURE-----
-
---Sig_/t1p/v3sR99B7_wU_ust+T8f--
