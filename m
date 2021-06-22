@@ -2,22 +2,19 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0487B3B07DC
+	by mail.lfdr.de (Postfix) with ESMTP id 699BE3B07DD
 	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 16:48:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231944AbhFVOvA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S231980AbhFVOvB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 10:51:01 -0400
+Received: from 8bytes.org ([81.169.241.247]:49960 "EHLO theia.8bytes.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230185AbhFVOvA (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 22 Jun 2021 10:51:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50058 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230433AbhFVOvA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Jun 2021 10:51:00 -0400
-Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72C62C061574;
-        Tue, 22 Jun 2021 07:48:44 -0700 (PDT)
 Received: from cap.home.8bytes.org (p4ff2ba7c.dip0.t-ipconnect.de [79.242.186.124])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 0A56D133;
+        by theia.8bytes.org (Postfix) with ESMTPSA id 9AE0F260;
         Tue, 22 Jun 2021 16:48:41 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
@@ -40,10 +37,12 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Arvind Sankar <nivedita@alum.mit.edu>,
         linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: [PATCH 0/3] x86/sev: Minor updates for SEV guest support
-Date:   Tue, 22 Jun 2021 16:48:22 +0200
-Message-Id: <20210622144825.27588-1-joro@8bytes.org>
+Subject: [PATCH 1/3] x86/sev: Add Comments to existing GHCB MSR protocol defines
+Date:   Tue, 22 Jun 2021 16:48:23 +0200
+Message-Id: <20210622144825.27588-2-joro@8bytes.org>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20210622144825.27588-1-joro@8bytes.org>
+References: <20210622144825.27588-1-joro@8bytes.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -52,30 +51,34 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Hi,
+Add comments to the defines for SEV Info and CPUID MSR protocol defines
+to document to which protocol part they belong.
 
-here are three small patches to update SEV-ES guest support in Linux.
-It would be great to have at least patch 3 merged for v5.14 to avoid
-future merge conflicts. It contains defines needed by KVM and X86
-patches under development.
+Signed-off-by: Joerg Roedel <jroedel@suse.de>
+---
+ arch/x86/include/asm/sev-common.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Thanks,
-
-	Joerg
-
-Brijesh Singh (1):
-  x86/sev: Add defines for GHCB version 2 MSR protocol requests
-
-Joerg Roedel (2):
-  x86/sev: Add Comments to existing GHCB MSR protocol defines
-  x86/sev: Use "SEV: " prefix for messages from sev.c
-
- arch/x86/include/asm/sev-common.h | 17 +++++++++++++++++
- arch/x86/kernel/sev.c             |  2 +-
- 2 files changed, 18 insertions(+), 1 deletion(-)
-
-
-base-commit: be1a5408868af341f61f93c191b5e346ee88c82a
+diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+index 629c3df243f0..1cc9e7dd8107 100644
+--- a/arch/x86/include/asm/sev-common.h
++++ b/arch/x86/include/asm/sev-common.h
+@@ -11,6 +11,7 @@
+ #define GHCB_MSR_INFO_POS		0
+ #define GHCB_MSR_INFO_MASK		(BIT_ULL(12) - 1)
+ 
++/* SEV Information Request/Response */
+ #define GHCB_MSR_SEV_INFO_RESP		0x001
+ #define GHCB_MSR_SEV_INFO_REQ		0x002
+ #define GHCB_MSR_VER_MAX_POS		48
+@@ -28,6 +29,7 @@
+ #define GHCB_MSR_PROTO_MAX(v)		(((v) >> GHCB_MSR_VER_MAX_POS) & GHCB_MSR_VER_MAX_MASK)
+ #define GHCB_MSR_PROTO_MIN(v)		(((v) >> GHCB_MSR_VER_MIN_POS) & GHCB_MSR_VER_MIN_MASK)
+ 
++/* CPUID Request/Response */
+ #define GHCB_MSR_CPUID_REQ		0x004
+ #define GHCB_MSR_CPUID_RESP		0x005
+ #define GHCB_MSR_CPUID_FUNC_POS		32
 -- 
 2.31.1
 
