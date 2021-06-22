@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 281D93B0A0A
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 18:12:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71C383B0A28
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 18:19:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230072AbhFVQO1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 12:14:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51792 "EHLO mail.kernel.org"
+        id S229818AbhFVQVe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 12:21:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52652 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229786AbhFVQO0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Jun 2021 12:14:26 -0400
+        id S229704AbhFVQVe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Jun 2021 12:21:34 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4F6D561075;
-        Tue, 22 Jun 2021 16:12:10 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6EC7E60FEE;
+        Tue, 22 Jun 2021 16:19:18 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1lvj0S-009DCo-Bg; Tue, 22 Jun 2021 17:12:08 +0100
-Date:   Tue, 22 Jun 2021 17:12:07 +0100
-Message-ID: <87y2b1c208.wl-maz@kernel.org>
+        id 1lvj7M-009DG1-BW; Tue, 22 Jun 2021 17:19:16 +0100
+Date:   Tue, 22 Jun 2021 17:19:15 +0100
+Message-ID: <87wnqlc1oc.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Alexandru Elisei <alexandru.elisei@arm.com>
 Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
@@ -32,11 +32,11 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
         Hector Martin <marcan@marcan.st>,
         Mark Rutland <mark.rutland@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>, kernel-team@android.com
-Subject: Re: [PATCH v4 6/9] KVM: arm64: vgic: Implement SW-driven deactivation
-In-Reply-To: <b87fb2e9-a3f9-accc-86d9-64dc2ee90dea@arm.com>
+Subject: Re: [PATCH v4 4/9] KVM: arm64: vgic: Let an interrupt controller advertise lack of HW deactivation
+In-Reply-To: <fa1fee85-04c6-d0a8-bd93-64d2ebc32e4a@arm.com>
 References: <20210601104005.81332-1-maz@kernel.org>
-        <20210601104005.81332-7-maz@kernel.org>
-        <b87fb2e9-a3f9-accc-86d9-64dc2ee90dea@arm.com>
+        <20210601104005.81332-5-maz@kernel.org>
+        <fa1fee85-04c6-d0a8-bd93-64d2ebc32e4a@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -50,112 +50,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 17 Jun 2021 15:58:31 +0100,
+On Tue, 15 Jun 2021 15:26:02 +0100,
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
 > Hi Marc,
 > 
 > On 6/1/21 11:40 AM, Marc Zyngier wrote:
-> > In order to deal with these systems that do not offer HW-based
-> > deactivation of interrupts, let implement a SW-based approach:
-> 
-> Nitpick, but shouldn't that be "let's"?
-
-"Let it be...". ;-) Yup.
-
-> 
+> > The vGIC, as architected by ARM, allows a virtual interrupt to
+> > trigger the deactivation of a physical interrupt. This allows
+> > the following interrupt to be delivered without requiring an exit.
 > >
-> > - When the irq is queued into a LR, treat it as a pure virtual
-> >   interrupt and set the EOI flag in the LR.
+> > However, some implementations have choosen not to implement this,
+> > meaning that we will need some unsavoury workarounds to deal with this.
 > >
-> > - When the interrupt state is read back from the LR, force a
-> >   deactivation when the state is invalid (neither active nor
-> >   pending)
-> >
-> > Interrupts requiring such treatment get the VGIC_SW_RESAMPLE flag.
+> > On detecting such a case, taint the kernel and spit a nastygram.
+> > We'll deal with this in later patches.
 > >
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> >  arch/arm64/kvm/vgic/vgic-v2.c | 19 +++++++++++++++----
-> >  arch/arm64/kvm/vgic/vgic-v3.c | 19 +++++++++++++++----
-> >  include/kvm/arm_vgic.h        | 10 ++++++++++
-> >  3 files changed, 40 insertions(+), 8 deletions(-)
+> >  arch/arm64/kvm/vgic/vgic-init.c       | 10 ++++++++++
+> >  include/kvm/arm_vgic.h                |  3 +++
+> >  include/linux/irqchip/arm-vgic-info.h |  2 ++
+> >  3 files changed, 15 insertions(+)
 > >
-> > diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-> > index 11934c2af2f4..2c580204f1dc 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-v2.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-v2.c
-> > @@ -108,11 +108,22 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
-> >  		 * If this causes us to lower the level, we have to also clear
-> >  		 * the physical active state, since we will otherwise never be
-> >  		 * told when the interrupt becomes asserted again.
-> > +		 *
-> > +		 * Another case is when the interrupt requires a helping hand
-> > +		 * on deactivation (no HW deactivation, for example).
-> >  		 */
-> > -		if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT)) {
-> > -			irq->line_level = vgic_get_phys_line_level(irq);
-> > +		if (vgic_irq_is_mapped_level(irq)) {
-> > +			bool resample = false;
-> > +
-> > +			if (val & GICH_LR_PENDING_BIT) {
-> > +				irq->line_level = vgic_get_phys_line_level(irq);
-> > +				resample = !irq->line_level;
-> > +			} else if (vgic_irq_needs_resampling(irq) &&
-> > +				   !(irq->active || irq->pending_latch)) {
+> > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> > index 6752d084934d..340c51d87677 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-init.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> > @@ -532,6 +532,16 @@ int kvm_vgic_hyp_init(void)
+> >  		return -ENXIO;
+> >  	}
+> >  
+> > +	/*
+> > +	 * If we get one of these oddball non-GICs, taint the kernel,
+> > +	 * as we have no idea of how they *really* behave.
+> > +	 */
+> > +	if (gic_kvm_info->no_hw_deactivation) {
+> > +		kvm_info("Non-architectural vgic, tainting kernel\n");
+> > +		add_taint(TAINT_CPU_OUT_OF_SPEC, LOCKDEP_STILL_OK);
 > 
-> I'm having a hard time figuring out when and why a level sensitive
-> can have pending_latch = true.
+> I'm trying to figure out what are the effects of tainting the
+> kernel, besides those nasty messages. In
+> Documentation/admin-guide/tainted-kernels.rst, I found this bit:
 > 
-> I looked kvm_vgic_inject_irq(), and that function sets pending_latch
-> only for edge triggered interrupts (it sets line_level for level
-> sensitive ones). But irq_is_pending() looks at **both**
-> pending_latch and line_level for level sensitive interrupts.
-
-Yes, and that's what an implementation requires.
-
-> The only place that I've found that sets pending_latch regardless of
-> the  interrupt type  is in  vgic_mmio_write_spending() (called  on a
-> trapped  write  to   GICD_ISENABLER).
-
-Are you sure? It really should be GICD_ISPENDR. I'll assume that this
-is what you mean below.
-
-> vgic_v2_populate_lr()  clears
-> pending_latch  only for  edge triggered  interrupts, so  that leaves
-> vgic_v2_fold_lr_state()  as  the   only  function  pending_latch  is
-> cleared for level sensitive interrupts,  when the interrupt has been
-> handled by the guest.  Are we doing all of this  to emulate the fact
-> that level sensitive interrupts (either purely virtual or hw mapped)
-> made pending by a write  to GICD_ISENABLER remain pending until they
-> are handled by the guest?
-
-Yes, or cleared by a write to GICD_ICPENDR. You really need to think
-of the input into the GIC as some sort of OR gate combining both the
-line level and the PEND register. With a latch for edge interrupts.
-
-Have a look at Figure 4-10 ("Logic of the pending status of a
-level-sensitive interrupt") in the GICv2 arch spec (ARM IHI 0048B.b)
-to see what I actually mean.
-
-> If that is the case, then I think this is what the code is doing:
+> [..] the information is mainly of interest once someone wants to
+> investigate some problem, as its real cause might be the event that
+> got the kernel tainted. That's why bug reports from tainted kernels
+> will often be ignored by developers, hence try to reproduce problems
+> with an untainted kernel.
 > 
-> - There's no functional change when the irqchip has HW deactivation
-> 
-> - For level sensitive, hw mapped interrupts made pending by a write
-> to GICD_ISENABLER and not yet handled by the guest (pending_latch ==
-> true) we don't clear the pending state of the interrupt.
-> 
-> - For level sensitive, hw mapped interrupts we clear the pending
-> state in the GIC and the device will assert the interrupt again if
-> it's still pending at the device 1level. I have a question about
-> this. Why don't we sample the interrupt state by calling
-> vgic_get_phys_line_level()? Because that would be slower than the
-> alternative that you are proposing here?
+> The lack of HW deactivation affects only KVM, I was wondering if we
+> could taint the kernel the first time a VM created. If the above doc
+> is to go by, someone who is running Linux on an M1, but not using
+> KVM, might stand a better chance to get support when something goes
+> wrong in that case.
 
-Yes. It is *much* faster to read the timer status register (for
-example) than going via an MMIO access to read the (re)distributor
-that will return the same value.
+Unfortunately, by the time we're here, we have already committed to
+using stuff that isn't architectural.
+
+For example, this CPU doesn't advertise a virtual GICv3 CPU interface
+(because it isn't possible to do so independently of the full-fat
+one). And right from the beginning, before any VM is present, we are
+going to access ICH_VTR_EL2, because we really need it as part of
+initialising KVM.
+
+> What do you think?
+
+I think that if people are bothered by this tainting, they can disable
+KVM altogether. And to be fair, we should taint the kernel right when
+the first CPU boots, because it isn't implementing the ARM
+architecture as defined by the spec.
 
 Thanks,
 
