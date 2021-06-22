@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 762ED3B0BF8
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 19:58:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 184433B0BFA
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 19:58:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232454AbhFVSAb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 14:00:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37624 "EHLO
+        id S232636AbhFVSAh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 14:00:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232539AbhFVSAY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Jun 2021 14:00:24 -0400
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DEC8C06175F
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:08 -0700 (PDT)
-Received: by mail-qv1-xf4a.google.com with SMTP id f11-20020a056214164bb029026bc7adaae8so12449007qvw.2
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:08 -0700 (PDT)
+        with ESMTP id S232506AbhFVSA1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Jun 2021 14:00:27 -0400
+Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77059C061760
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:10 -0700 (PDT)
+Received: by mail-qt1-x849.google.com with SMTP id 44-20020aed30af0000b029024e8ccfcd07so69915qtf.11
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 10:58:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=aT64cUHXT6dp41D10XTHz8018dt0NmEcWWEMJr3d1uw=;
-        b=v51wOygFZrNku7rVxKLTi0sdbT8P6eE9TRRoSpgd9idvUUeZzScIheIG3y9gBe97Em
-         rb+mUSN0c1WFJyrdnjV+RIZYptSeavZ/B3zZ0H3e7vqroQ1owEp0wlMwGcunpDW8zKpP
-         qKlPqDIODviw+R4hiV2F5HvqsNDcDDoiarAtZzDYCgW8Z+iNu1K+U/VXNDWvlm6/r2Rr
-         aFFxrGOld5R/e6JH8Jk1OSWj9m1vQ5bvzdSd8x5yQZmMUa2o81+0Qq5z614QOty+TlGk
-         0Dkz9cNdrj5djFlcP4M39aO9X3YCCFkjxgYA6bwAg7h3WIeHfvhQ029xhgc03g4LPRkO
-         PkHA==
+        bh=UvWOiZNIX7hCeQXFYIlCFQ6LdPOFZrfts8z5QCqyL0U=;
+        b=oDnh2Quk2OxkzewIMcVO6Z65slyLPg2A6HSZBCtvjs6itrPS8R/0+q358KpJ/Gju2y
+         Qhe2B+5GN6BiHsUCbnClOjG9o4dL4/cYuh2Ss5GUIBeAt2TKlgyk8XWt+dKXqj4flReS
+         UPhedyp09aR9TcHcqg659LjqfcGDaeCWSqngScokdH8X1jxsv6Eev3dAaeapESy6R9qr
+         Fz7Xr3CE/syMaVS9OcpEFhqDvhGjmpru9FFQmnbCzUN7iCHRq41LqZcoUEtJiKTB+eCI
+         l+Jlcfnz8J8gjHdUOwIsVU9qn2pNQdS4rZSY8/ItdMdYYdsADxPB104GPblkPDsyUZM/
+         Vq6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=aT64cUHXT6dp41D10XTHz8018dt0NmEcWWEMJr3d1uw=;
-        b=GLIr6/cDFw6N0n87RCVOAo1KMq+//m7IkA+8kBgXtLD7qUw8OT/25xC88oU02PRgG5
-         uSDDAOEHFXCRdkA3K8r3jCSifxFSZmTK8HOU81hhFlsozF6s/LWnpVNZj8uqceQTe6G4
-         0yDt/bb7NI4ktfyMCGPCGVXpExY4HNtAPCEGiDYGbts8J5HOlVZarz0u1e0fT/D8nrl3
-         gO0Ptkogk5kQrClTQV6RjCt2+SvOLBB/Y6mVXpiYSaGihERTt0yB/HyrcZSAfncWf8jC
-         ZsObtDqiIyoVefHILI6cjzbJAZXzGmYsFxMCXLry1l+UiyU2u2fDktTHw24vNVTGgibt
-         Mjiw==
-X-Gm-Message-State: AOAM530IDRm/i2l51+5kToUnQLdilyIjDcpxvIRfOE7lp7ayteMuoYhG
-        NV30CTIgo2OHkWTmux375gpaXe2dHog=
-X-Google-Smtp-Source: ABdhPJwwAwFbfISpq/EYG7173lVaWK9r9UnVQlH1SZxJ8QnY5vnyH2+2J1GpKrB3vtZjR4v64KEISAlRCsg=
+        bh=UvWOiZNIX7hCeQXFYIlCFQ6LdPOFZrfts8z5QCqyL0U=;
+        b=p+i+rliN/dfNFSypGLIb5lRY7PQ64grjYrRTCDb25fKn1RLIqF0OU2Btwt8ZwE9sc7
+         vlz9XWlKiEkfpPf+HpTqSPnbgJPXoWrIbqhlJkHlPUouw7OyqVGrsdfAPCEECw6h9B25
+         xbxfczE3+8egkLCducKNNNVXSKLOPAdx88YTGmMAl42CImE/OFZ2t6uoSIimszmutQCD
+         xs90qDBN8bQ1t0Nh3LFCBclkcXZaU8ge0tG9hs5bwAtXjZEDUswC5Lg39CL3tdrKzpRH
+         olwiJMN1UQxhCqAp8lf3nvieu7CkZhheYQCBf7TPTe2KJ0AO1LYh1GAIWb6OI/L2r03k
+         t1yQ==
+X-Gm-Message-State: AOAM532VpGh4PinWRjUWqf8yCo+vXrR8stKmk8CCkENvO/PQJKMaRc8L
+        6TZlUyMjHGDzFr3ASEb4RF6YhjjGD0I=
+X-Google-Smtp-Source: ABdhPJwYEA+Qrti8CZz/HffI7CWhUsl0klOtkUVNZq4ZYdO06MlUHWYqBSR7V5t5Hn0+u0gmATJF+ioOp34=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:5722:92ce:361f:3832])
- (user=seanjc job=sendgmr) by 2002:a25:c6cb:: with SMTP id k194mr6257503ybf.286.1624384687156;
- Tue, 22 Jun 2021 10:58:07 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:be8a:: with SMTP id i10mr6596444ybk.176.1624384689502;
+ Tue, 22 Jun 2021 10:58:09 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 22 Jun 2021 10:56:50 -0700
+Date:   Tue, 22 Jun 2021 10:56:51 -0700
 In-Reply-To: <20210622175739.3610207-1-seanjc@google.com>
-Message-Id: <20210622175739.3610207-6-seanjc@google.com>
+Message-Id: <20210622175739.3610207-7-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210622175739.3610207-1-seanjc@google.com>
 X-Mailer: git-send-email 2.32.0.288.g62a8d224e6-goog
-Subject: [PATCH 05/54] Revert "KVM: x86/mmu: Drop kvm_mmu_extended_role.cr4_la57
- hack"
+Subject: [PATCH 06/54] KVM: x86: Force all MMUs to reinitialize if guest CPUID
+ is modified
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -68,59 +68,105 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Restore CR4.LA57 to the mmu_role to fix an amusing edge case with nested
-virtualization.  When KVM (L0) is using TDP, CR4.LA57 is not reflected in
-mmu_role.base.level because that tracks the shadow root level, i.e. TDP
-level.  Normally, this is not an issue because LA57 can't be toggled
-while long mode is active, i.e. the guest has to first disable paging,
-then toggle LA57, then re-enable paging, thus ensuring an MMU
-reinitialization.
+Invalidate all MMUs' roles after a CPUID update to force reinitizliation
+of the MMU context/helpers.  Despite the efforts of commit de3ccd26fafc
+("KVM: MMU: record maximum physical address width in kvm_mmu_extended_role"),
+there are still a handful of CPUID-based properties that affect MMU
+behavior but are not incorporated into mmu_role.  E.g. 1gb hugepage
+support, AMD vs. Intel handling of bit 8, and SEV's C-Bit location all
+factor into the guest's reserved PTE bits.
 
-But if L1 is crafty, it can load a new CR4 on VM-Exit and toggle LA57
-without having to bounce through an unpaged section.  L1 can also load a
-new CR3 on exit, i.e. it doesn't even need to play crazy paging games, a
-single entry PML5 is sufficient.  Such shenanigans are only problematic
-if L0 and L1 use TDP, otherwise L1 and L2 share an MMU that gets
-reinitialized on nested VM-Enter/VM-Exit due to mmu_role.base.guest_mode.
+The obvious alternative would be to add all such properties to mmu_role,
+but doing so provides no benefit over simply forcing a reinitialization
+on every CPUID update, as setting guest CPUID is a rare operation.
 
-Note, in the L2 case with nested TDP, even though L1 can switch between
-L2s with different LA57 settings, thus bypassing the paging requirement,
-in that case KVM's nested_mmu will track LA57 in base.level.
+Note, reinitializing all MMUs after a CPUID update does not fix all of
+KVM's woes.  Specifically, kvm_mmu_page_role doesn't track the CPUID
+properties, which means that a vCPU can reuse shadow pages that should
+not exist for the new vCPU model, e.g. that map GPAs that are now illegal
+(due to MAXPHYADDR changes) or that set bits that are now reserved
+(PAGE_SIZE for 1gb pages), etc...
 
-This reverts commit 8053f924cad30bf9f9a24e02b6c8ddfabf5202ea.
+Tracking the relevant CPUID properties in kvm_mmu_page_role would address
+the majority of problems, but fully tracking that much state in the
+shadow page role comes with an unpalatable cost as it would require a
+non-trivial increase in KVM's memory footprint.  The GBPAGES case is even
+worse, as neither Intel nor AMD provides a way to disable 1gb hugepage
+support in the hardware page walker, i.e. it's a virtualization hole that
+can't be closed when using TDP.
 
-Fixes: 8053f924cad3 ("KVM: x86/mmu: Drop kvm_mmu_extended_role.cr4_la57 hack")
+In other words, resetting the MMU after a CPUID update is largely a
+superficial fix.  But, it will allow reverting the tracking of MAXPHYADDR
+in the mmu_role, and that case in particular needs to mostly work because
+KVM's shadow_root_level depends on guest MAXPHYADDR when 5-level paging
+is supported.  For cases where KVM botches guest behavior, the damage is
+limited to that guest.  But for the shadow_root_level, a misconfigured
+MMU can cause KVM to incorrectly access memory, e.g. due to walking off
+the end of its shadow page tables.
+
+Fixes: 7dcd57552008 ("x86/kvm/mmu: check if tdp/shadow MMU reconfiguration is needed")
+Cc: Yu Zhang <yu.c.zhang@linux.intel.com>
 Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm_host.h | 1 +
- arch/x86/kvm/mmu/mmu.c          | 1 +
- 2 files changed, 2 insertions(+)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/cpuid.c            |  6 +++---
+ arch/x86/kvm/mmu/mmu.c          | 12 ++++++++++++
+ 3 files changed, 16 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e11d64aa0bcd..916e0f89fdfc 100644
+index 916e0f89fdfc..4ac534766eff 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -320,6 +320,7 @@ union kvm_mmu_extended_role {
- 		unsigned int cr4_pke:1;
- 		unsigned int cr4_smap:1;
- 		unsigned int cr4_smep:1;
-+		unsigned int cr4_la57:1;
- 		unsigned int maxphyaddr:6;
- 	};
- };
+@@ -1501,6 +1501,7 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu);
+ void kvm_mmu_init_vm(struct kvm *kvm);
+ void kvm_mmu_uninit_vm(struct kvm *kvm);
+ 
++void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu);
+ void kvm_mmu_reset_context(struct kvm_vcpu *vcpu);
+ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+ 				      struct kvm_memory_slot *memslot,
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index b4da665bb892..c42613cfb5ba 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -202,10 +202,10 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 	static_call(kvm_x86_vcpu_after_set_cpuid)(vcpu);
+ 
+ 	/*
+-	 * Except for the MMU, which needs to be reset after any vendor
+-	 * specific adjustments to the reserved GPA bits.
++	 * Except for the MMU, which needs to do its thing any vendor specific
++	 * adjustments to the reserved GPA bits.
+ 	 */
+-	kvm_mmu_reset_context(vcpu);
++	kvm_mmu_after_set_cpuid(vcpu);
+ }
+ 
+ static int is_efer_nx(void)
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 0db12f461c9d..5024318dec45 100644
+index 5024318dec45..e2668a9b5936 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4537,6 +4537,7 @@ static union kvm_mmu_extended_role kvm_calc_mmu_role_ext(struct kvm_vcpu *vcpu)
- 	ext.cr4_smap = !!kvm_read_cr4_bits(vcpu, X86_CR4_SMAP);
- 	ext.cr4_pse = !!is_pse(vcpu);
- 	ext.cr4_pke = !!kvm_read_cr4_bits(vcpu, X86_CR4_PKE);
-+	ext.cr4_la57 = !!kvm_read_cr4_bits(vcpu, X86_CR4_LA57);
- 	ext.maxphyaddr = cpuid_maxphyaddr(vcpu);
+@@ -4903,6 +4903,18 @@ kvm_mmu_calc_root_page_role(struct kvm_vcpu *vcpu)
+ 	return role.base;
+ }
  
- 	ext.valid = 1;
++void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu)
++{
++	/*
++	 * Invalidate all MMU roles to force them to reinitialize as CPUID
++	 * information is factored into reserved bit calculations.
++	 */
++	vcpu->arch.root_mmu.mmu_role.ext.valid = 0;
++	vcpu->arch.guest_mmu.mmu_role.ext.valid = 0;
++	vcpu->arch.nested_mmu.mmu_role.ext.valid = 0;
++	kvm_mmu_reset_context(vcpu);
++}
++
+ void kvm_mmu_reset_context(struct kvm_vcpu *vcpu)
+ {
+ 	kvm_mmu_unload(vcpu);
 -- 
 2.32.0.288.g62a8d224e6-goog
 
