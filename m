@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E0F263B0E32
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 22:06:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 420F23B0E36
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 22:06:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233111AbhFVUI0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 16:08:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38246 "EHLO
+        id S233010AbhFVUI2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 16:08:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232992AbhFVUIO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Jun 2021 16:08:14 -0400
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53421C061756
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 13:05:58 -0700 (PDT)
-Received: by mail-qv1-xf4a.google.com with SMTP id ez18-20020ad459120000b029020e62abfcbdso290127qvb.16
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 13:05:58 -0700 (PDT)
+        with ESMTP id S233028AbhFVUIR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Jun 2021 16:08:17 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67A5AC0617A6
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 13:06:00 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id jm5-20020ad45ec50000b0290219dc9a1ab8so271285qvb.21
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 13:06:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=g+L06HpH5qB/hdPw6Qw10O0ltqfkEfqbD0xNTcKTGXs=;
-        b=sgSTa0wqdAVJ7yyWVZx4egcKlcIz7e4wDm2G2W7yXfcy9//Whu1kCZVgZvuatE6hxx
-         WbOzXEwVmdsnUeENd3eob8mb0xRbaAxSLIFt7M17oY99ZjuXc88oDxMfr+q5GnDuwgMM
-         GvzsV1PIG7mn4azu/2y17rnEXcdlPuZzLp3R0DIREDxbP3QGOuTXoZQGTKCoMnIm1CXF
-         OinEjsa/mRwk1+Zf6ZkeJ8Q+C818AWXOyg3nu4Poh3IvJJi1MTia/zss0eulbSvvyu5h
-         ZH3cpUVrRoajD90suM86OGrUPwilOiWqL78ilzCL9ZFYXIMEbI60VMFp71hz0pKJQytg
-         Dk8w==
+        bh=l/JRo2YX24UnuecMDab+COARG9prpR51zi0SeGy+27g=;
+        b=uFZQ1pZU0jM+GfAZ1WNnhwK06kyfcMFKTheDt+RKPq3wb9aLAfCGX9SCZl8oZg95HI
+         /ZoI/qnQex6nCMnmNBzx0FmbFjWPvR8k8gsPvdNaFkqqnFfUHkxrI9w7ozCeKPYEONGk
+         ZWPeVX3e3R1YcOH0s83VLSEFq9qk7stH2pxPc7OdFPflxTnZiVJ5waPuH2rUK/kBFkeJ
+         AMIOTbhhPJcOJWtjR7+/+D3TsvTLW7Kfhjks6JnXofFCwsFxQsERh+jxjgmIB5kG/n5h
+         9oJg62NjUttyvr1cNNRUV8Tlg2+UPHmS67XrQQVjk+BTbEv7wZ9lu2iBPpQL4tjk4t39
+         MuRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=g+L06HpH5qB/hdPw6Qw10O0ltqfkEfqbD0xNTcKTGXs=;
-        b=Gtj6GjDZvISrKprQ9tFoSDlK54ZO9JQQv4sN/JBLpi8XykT0CFEeeeaSavgDtVUiC/
-         8T80tLfz7O5FoGHlJ/n+26gkxoB5ZJmnh3tcAWQi0TLaYEZe8ocPQ9CDk/C+lAEZa6Hq
-         2GX8ENFKh5DHN02bXfBuOFE/my6Unn5L8tUMH1MTLX1IwqwsNpYXWkKYgRGsi4huqsXp
-         ByqAVTYuPEQs4Lr9Z7qV7tKlzaXZ4V/3srw+nFdxQ/8rUcftt9V9OE5TXHiuNbMa3aB2
-         rPHx84n6flZJQxxCJQNrahCWid6SNTHUjdrUKb18uGK4eLCcDKMTnjHfQAPlG5MJRT+A
-         Dw4Q==
-X-Gm-Message-State: AOAM533/z96/8Lwiws4VcpsPB+dSDYNRO3Flh0QWoI/SUX0JUiVAfJ7+
-        UNtFU/TXs+cdb1deTyLl/aNSwozXiAw=
-X-Google-Smtp-Source: ABdhPJwZG6rPwBU1XuAHdFRt0GoGXoH1n5oGeVto4RXr1qkIZktgq0K2WnxgvQrwI8jkGwr16QdHCxvbJ9Y=
+        bh=l/JRo2YX24UnuecMDab+COARG9prpR51zi0SeGy+27g=;
+        b=GrskvctwTZkGdfXHY1n4GcJILb5RvwMFK+w5DcI/MVGeq8nQ+K1NAZpsv0i2fjBhx5
+         kkj7rSQ/kFIbARpG/soFbO5GRIBKO1Fh30TdL5Ex14MUVqdev+FFVNh/1JAiRhnpN3NM
+         L5Y5R8Zea7Vf6no+gZb+8r5+iU/WXdHny4uBeOBhcfqXspszf8vHrCvdoSTxJaHSrhIT
+         wLkUUvSY1cZfB5/AGz89tVXnjt65mGbwRtJ1G3/eiKd0QCBs0YMJAZHOgPHe9zO4wSIB
+         bUf6ERlu01nbc6osVkW+qvyNRq+wZjronDm1nmCGmoYLuBivj/oZoC+mBq+O604qU0Fm
+         k91w==
+X-Gm-Message-State: AOAM53364Kzt+tic2vAdzKxOOtQZNEKPcsrxVCV3mnMrjmkXZQS2He9w
+        l3WRsxrzKavtLnbYlSRh2hket0Ns0Ck=
+X-Google-Smtp-Source: ABdhPJx5ixIQh4nUYSOEJyh9rcUVCRZR/7CJ5Ngnxn4UBt9/hGVCPxU0KBjbqL/cQOYwzJBK/z6T6aDjMTU=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:7d90:4528:3c45:18fb])
- (user=seanjc job=sendgmr) by 2002:a25:cf92:: with SMTP id f140mr6593986ybg.38.1624392357413;
- Tue, 22 Jun 2021 13:05:57 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a0c:c507:: with SMTP id x7mr589963qvi.10.1624392359533;
+ Tue, 22 Jun 2021 13:05:59 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 22 Jun 2021 13:05:18 -0700
+Date:   Tue, 22 Jun 2021 13:05:19 -0700
 In-Reply-To: <20210622200529.3650424-1-seanjc@google.com>
-Message-Id: <20210622200529.3650424-9-seanjc@google.com>
+Message-Id: <20210622200529.3650424-10-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210622200529.3650424-1-seanjc@google.com>
 X-Mailer: git-send-email 2.32.0.288.g62a8d224e6-goog
-Subject: [PATCH 08/19] KVM: selftests: Use alloc_page helper for x86-64's
- GDT/ITD/TSS allocations
+Subject: [PATCH 09/19] KVM: selftests: Use alloc page helper for xAPIC IPI test
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
@@ -68,52 +67,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Switch to the vm_vaddr_alloc_page() helper for x86-64's "kernel"
-allocations now that the helper uses the same min virtual address as the
-open coded versions.
+Use the common page allocation helper for the xAPIC IPI test, effectively
+raising the minimum virtual address from 0x1000 to 0x2000.  Presumably
+the test won't explode if it can't get a page at address 0x1000...
 
-No functional change intended.
-
+Cc: Peter Shier <pshier@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/lib/x86_64/processor.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index b1fb4c60dd73..afe15a238a81 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -521,8 +521,7 @@ vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
- static void kvm_setup_gdt(struct kvm_vm *vm, struct kvm_dtable *dt)
- {
- 	if (!vm->gdt)
--		vm->gdt = vm_vaddr_alloc(vm, getpagesize(),
--			KVM_UTIL_MIN_VADDR, 0, 0);
-+		vm->gdt = vm_vaddr_alloc_page(vm);
+diff --git a/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c b/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
+index 21b22718a9db..5a79c8ed4611 100644
+--- a/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
++++ b/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
+@@ -427,7 +427,7 @@ int main(int argc, char *argv[])
  
- 	dt->base = vm->gdt;
- 	dt->limit = getpagesize();
-@@ -532,8 +531,7 @@ static void kvm_setup_tss_64bit(struct kvm_vm *vm, struct kvm_segment *segp,
- 				int selector)
- {
- 	if (!vm->tss)
--		vm->tss = vm_vaddr_alloc(vm, getpagesize(),
--			KVM_UTIL_MIN_VADDR, 0, 0);
-+		vm->tss = vm_vaddr_alloc_page(vm);
+ 	vm_vcpu_add_default(vm, SENDER_VCPU_ID, sender_guest_code);
  
- 	memset(segp, 0, sizeof(*segp));
- 	segp->base = vm->tss;
-@@ -1220,8 +1218,8 @@ void vm_init_descriptor_tables(struct kvm_vm *vm)
- 	extern void *idt_handlers;
- 	int i;
- 
--	vm->idt = vm_vaddr_alloc(vm, getpagesize(), 0x2000, 0, 0);
--	vm->handlers = vm_vaddr_alloc(vm, 256 * sizeof(void *), 0x2000, 0, 0);
-+	vm->idt = vm_vaddr_alloc_page(vm);
-+	vm->handlers = vm_vaddr_alloc_page(vm);
- 	/* Handlers have the same address in both address spaces.*/
- 	for (i = 0; i < NUM_INTERRUPTS; i++)
- 		set_idt_entry(vm, i, (unsigned long)(&idt_handlers)[i], 0,
+-	test_data_page_vaddr = vm_vaddr_alloc(vm, 0x1000, 0x1000, 0, 0);
++	test_data_page_vaddr = vm_vaddr_alloc_page(vm);
+ 	data =
+ 	   (struct test_data_page *)addr_gva2hva(vm, test_data_page_vaddr);
+ 	memset(data, 0, sizeof(*data));
 -- 
 2.32.0.288.g62a8d224e6-goog
 
