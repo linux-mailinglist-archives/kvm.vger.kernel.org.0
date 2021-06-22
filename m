@@ -2,146 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 65D363B0560
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 14:59:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0018E3B0648
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 15:55:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231756AbhFVNBt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 09:01:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36772 "EHLO
+        id S231452AbhFVN5q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 09:57:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33611 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231531AbhFVNBs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 09:01:48 -0400
+        by vger.kernel.org with ESMTP id S229907AbhFVN5p (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 09:57:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624366772;
+        s=mimecast20190719; t=1624370128;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=11IbQ6LtwZCZCGfVWaU4+0InIg5X713BIpB4uME6Q/U=;
-        b=M5xY8Q5aIkEm0fN0mo+CNTXMnVTi595f8i7vhHUhd52nfk9HgjuovSuLXi591HRu9BJc78
-        DGsoE/Q9oaygWW3ZVG9UPYVQR5PWT0bE728VwMS6CrAD7vAfyGgH5QZ4hpOwdPEdFLCypL
-        INk1tU1kxHdKp2WB2M+3CQDTwe16vy4=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=I4vXGfb12olPaNZAsZiiv1VuvejH/tkrBwhicf+ya/w=;
+        b=ER5Rtx/PRdAdom/yUF6xM+ZqOoQuJ+Bht1/FBVZlt+8kxoDUPc8DIcmzNvm7SLm2zg0AIA
+        z5bCIILIBg6IUd2zdlE/ivWJXyjisU3tDkV9g2sqxZTpkhWqWtVIahvhWFW4BnuXwypPlY
+        QE/EYd2XVcYPNbBjb6Ns0ABV5q7TFB0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-576-Dmf2g3JhNSWLu0hkcTYwYw-1; Tue, 22 Jun 2021 08:59:31 -0400
-X-MC-Unique: Dmf2g3JhNSWLu0hkcTYwYw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-553-8BXrqVyROi6P6O7aJKkCZQ-1; Tue, 22 Jun 2021 09:55:25 -0400
+X-MC-Unique: 8BXrqVyROi6P6O7aJKkCZQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 522D5100CEC2;
-        Tue, 22 Jun 2021 12:59:30 +0000 (UTC)
-Received: from [10.36.112.216] (ovpn-112-216.ams2.redhat.com [10.36.112.216])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0266460C13;
-        Tue, 22 Jun 2021 12:59:26 +0000 (UTC)
-Message-ID: <01f3b0a48ac46d148f0cb489cb58f4b551832815.camel@redhat.com>
-Subject: Re: [PATCH] KVM: x86: VMX: Make smaller physical guest address
- space support user-configurable
-From:   Mohammed Gamal <mgamal@redhat.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Date:   Tue, 22 Jun 2021 14:59:23 +0200
-In-Reply-To: <CALMp9eTU8C4gXWfsLF-_=ymRC7Vqb0St=0BKvuvcNjBkqQBayA@mail.gmail.com>
-References: <20200903141122.72908-1-mgamal@redhat.com>
-         <CALMp9eT7yDGncP-G9v3fC=9PP3FD=uE1SBy1EPBbqkbrWSAXSg@mail.gmail.com>
-         <11bb013a6beb7ccb3a5f5d5112fbccbf3eb64705.camel@redhat.com>
-         <CALMp9eTU8C4gXWfsLF-_=ymRC7Vqb0St=0BKvuvcNjBkqQBayA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.38.4 (3.38.4-1.fc33) 
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2981101C8AA;
+        Tue, 22 Jun 2021 13:55:23 +0000 (UTC)
+Received: from thuth.com (ovpn-112-107.ams2.redhat.com [10.36.112.107])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 871791899A;
+        Tue, 22 Jun 2021 13:55:19 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Laurent Vivier <lvivier@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Subject: [kvm-unit-tests PATCH 0/4] Test compiling with Clang in the Travis-CI
+Date:   Tue, 22 Jun 2021 15:55:13 +0200
+Message-Id: <20210622135517.234801-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2021-06-21 at 11:01 -0700, Jim Mattson wrote:
-> On Mon, Jan 18, 2021 at 2:22 AM Mohammed Gamal <mgamal@redhat.com>
-> wrote:
-> > 
-> > On Fri, 2021-01-15 at 16:08 -0800, Jim Mattson wrote:
-> > > On Thu, Sep 3, 2020 at 7:12 AM Mohammed Gamal <mgamal@redhat.com>
-> > > wrote:
-> > > > 
-> > > > This patch exposes allow_smaller_maxphyaddr to the user as a
-> > > > module
-> > > > parameter.
-> > > > 
-> > > > Since smaller physical address spaces are only supported on
-> > > > VMX,
-> > > > the parameter
-> > > > is only exposed in the kvm_intel module.
-> > > > Modifications to VMX page fault and EPT violation handling will
-> > > > depend on whether
-> > > > that parameter is enabled.
-> > > > 
-> > > > Also disable support by default, and let the user decide if
-> > > > they
-> > > > want to enable
-> > > > it.
-> > > > 
-> > > > Signed-off-by: Mohammed Gamal <mgamal@redhat.com>
-> > > > ---
-> > > >  arch/x86/kvm/vmx/vmx.c | 15 ++++++---------
-> > > >  arch/x86/kvm/vmx/vmx.h |  3 +++
-> > > >  arch/x86/kvm/x86.c     |  2 +-
-> > > >  3 files changed, 10 insertions(+), 10 deletions(-)
-> > > > 
-> > > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > > > index 819c185adf09..dc778c7b5a06 100644
-> > > > --- a/arch/x86/kvm/vmx/vmx.c
-> > > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > > > @@ -129,6 +129,9 @@ static bool __read_mostly
-> > > > enable_preemption_timer = 1;
-> > > >  module_param_named(preemption_timer, enable_preemption_timer,
-> > > > bool, S_IRUGO);
-> > > >  #endif
-> > > > 
-> > > > +extern bool __read_mostly allow_smaller_maxphyaddr;
-> > > 
-> > > Since this variable is in the kvm module rather than the
-> > > kvm_intel
-> > > module, its current setting is preserved across "rmmod kvm_intel;
-> > > modprobe kvm_intel." That is, if set to true, it doesn't revert
-> > > to
-> > > false after "rmmod kvm_intel." Is that the intended behavior?
-> > > 
-> > 
-> > IIRC, this is because this setting was indeed not intended to be
-> > just
-> > VMX-specific, but since AMD has an issue with PTE accessed-bits
-> > being
-> > set by hardware and thus we can't yet enable this feature on it, it
-> > might make sense to move the variable to the kvm_intel module for
-> > now.
-> 
-> Um...
-> 
-> We do allow it for SVM, if NPT is not enabled. In fact, we set it
-> unconditionally in that case. See commit 3edd68399dc15 ("KVM: x86:
-> Add
-> a capability for GUEST_MAXPHYADDR < HOST_MAXPHYADDR support").
-> 
-> Perhaps it should be a module parameter for SVM as well?
+Travis-CI recently changed their policy so that builds on the non-x86
+build machines are possible without consuming any credits again.
+While we're already testing the non-x86 builds in the gitlab-CI with
+the GCC cross-compilers, we could still benefit from the non-x86
+builders in the Travis-CI by compiling the code with Clang there, too
+(since there are AFAIK no Clang cross-compilers available in the usual
+distros on x86).
 
-Hmmm, I think given how AMD CPUs' behavior with NPT enabled, maybe it'd
-actually be a better idea to move this entirely to VMX for the time
-being. And then maybe make it available again on AMD only if the
-behavior with NPT is changed.
+Thomas Huth (4):
+  configure: Add the possibility to specify additional cflags
+  powerpc: Probe whether the compiler understands -mabi=no-altivec
+  lib/s390x: Fix the epsw inline assembly
+  Test compilation with Clang on aarch64, ppc64le and s390x in Travis-CI
 
-> 
-> And, in any case, it would be nice if the parameter reverted to false
-> when the kvm_intel module is unloaded.
-> 
-> > Paolo, what do you think?
-> > 
-> > 
-> 
+ .travis.yml              | 44 ++++++++++++++++++++++++++++++++++++++++
+ Makefile                 |  3 ---
+ configure                | 10 +++++++--
+ lib/s390x/asm/arch_def.h |  2 +-
+ powerpc/Makefile.common  |  4 +++-
+ 5 files changed, 56 insertions(+), 7 deletions(-)
+ create mode 100644 .travis.yml
 
+-- 
+2.27.0
 
