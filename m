@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 373FC3AFA02
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 02:03:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 507213AFA05
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 02:03:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230031AbhFVAFc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Jun 2021 20:05:32 -0400
-Received: from mail-pg1-f171.google.com ([209.85.215.171]:43541 "EHLO
-        mail-pg1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229747AbhFVAFb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Jun 2021 20:05:31 -0400
-Received: by mail-pg1-f171.google.com with SMTP id e22so9303353pgv.10;
-        Mon, 21 Jun 2021 17:03:16 -0700 (PDT)
+        id S230304AbhFVAFf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Jun 2021 20:05:35 -0400
+Received: from mail-pj1-f43.google.com ([209.85.216.43]:44756 "EHLO
+        mail-pj1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229747AbhFVAFf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Jun 2021 20:05:35 -0400
+Received: by mail-pj1-f43.google.com with SMTP id p4-20020a17090a9304b029016f3020d867so1057889pjo.3;
+        Mon, 21 Jun 2021 17:03:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=kPvPHHqOJHdMhmGWwfRJSkp/uTYoev95TYDhk0HG6a0=;
-        b=li1I2GIFBGvIGusaobRdLCufUidsUbgk18cOhYdZnqJZfFI7K+z/xMjG9vQgFCOaYM
-         SR2pobabJzfgZ1nlua5pZLlTZRbbxGBL/CGR7qM6pdKN53wG8rv4nsNCb2jLEWwbgyNL
-         Fx6Nd9030m0XZWauSVYQOAqxxfW+gU3N97GscVrcuXwuUjhF+hFlZZ9Hqq3bXeM60IZB
-         p0sOAqCXdViYIdai2RxLZW88tBY7YI+gLCI3xK5/03moEy/U9mjpzTGkS9yMDiwlDZk1
-         6asfhjs0FqiOHEd6I7JU/ktIDHbQoij5d1/d5CydGXY9IUjHbhlhOuRi5tlcYg2HSob5
-         SflQ==
-X-Gm-Message-State: AOAM531BRN194KjyG4xmLc0cl81VP/MNt5q1qjMkfvnopk5+vH1AqdQU
-        zgxos5gbg4yYvFsrcrmxIQE=
-X-Google-Smtp-Source: ABdhPJwusuabXNp23P3HhIZ6jO2wGUGtkgCZmg9BDd7MMDOt4n5381fC3wDFdYCo4j8yj8E5n2+1wQ==
-X-Received: by 2002:a05:6a00:a1e:b029:303:56b5:414b with SMTP id p30-20020a056a000a1eb029030356b5414bmr759601pfh.48.1624320195786;
-        Mon, 21 Jun 2021 17:03:15 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=gwx1ZCzIHLcluKpzR6wn6tTFWmEGPnbN9lvDpuT4Ci8=;
+        b=K5wn6QmBf0KaTQxNHoHvvpbi+MeBjgTHoJFqxw7tNmJepkHfOTaEOkZh8g5Y0eE9mh
+         AwrcIEpVXllNYn7qitn8/ED00sNpjxKEGsx0PtlEnKiAFmYpgbCsM7LxSOFbwvDlEpuf
+         PqSlwz7o04VTYu72UXnFm3UKhxIlidqJYtnRSzn5r5G1lelHI4akkI+EgCbRJjxm57cY
+         fCT3VlNJpxU7CJTLYe3RJN+FGFXjlRUUMOXyqpZPW1E58IptvgpSNFUzbfFWjWcZwxJp
+         P9ZC1Ew9XoS9nn6T2XR2UdBaV0Q+EHQgW67LifieNuIUmbvcYlYVDlxFC5rve9vfVANv
+         PaQw==
+X-Gm-Message-State: AOAM531IdsHVxRHszwe8AomaRUi8bbWYzpPT62aCCNYj4miVEh7xITT/
+        MskPWUG4ajbUxrQKjE32szY=
+X-Google-Smtp-Source: ABdhPJwJXA/z/L/6sTK1XoGq6CelorG3QsRkOMPQt2w54jrHngmv2vQzfn+HgNf2ECThlwWPiBTTHA==
+X-Received: by 2002:a17:90a:7f8c:: with SMTP id m12mr815076pjl.109.1624320199153;
+        Mon, 21 Jun 2021 17:03:19 -0700 (PDT)
 Received: from localhost ([173.239.198.97])
-        by smtp.gmail.com with ESMTPSA id m4sm292044pjv.41.2021.06.21.17.03.13
+        by smtp.gmail.com with ESMTPSA id z6sm13498332pfj.117.2021.06.21.17.03.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Jun 2021 17:03:14 -0700 (PDT)
+        Mon, 21 Jun 2021 17:03:18 -0700 (PDT)
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     bhelgaas@google.com, alex.williamson@redhat.com, cohuck@redhat.com,
         jgg@ziepe.ca, kevin.tian@intel.com, eric.auger@redhat.com,
@@ -44,68 +44,47 @@ Cc:     minchan@kernel.org, gregkh@linuxfoundation.org, jeyu@kernel.org,
         jpoimboe@redhat.com, tglx@linutronix.de, keescook@chromium.org,
         jikos@kernel.org, rostedt@goodmis.org, peterz@infradead.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] pci: export pci_dev_unlock() and the respective unlock
-Date:   Mon, 21 Jun 2021 17:03:09 -0700
-Message-Id: <20210622000310.728294-1-mcgrof@kernel.org>
+Subject: [PATCH 2/2] vfio: use the new pci_dev_trylock() helper to simplify try lock
+Date:   Mon, 21 Jun 2021 17:03:10 -0700
+Message-Id: <20210622000310.728294-2-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210622000310.728294-1-mcgrof@kernel.org>
+References: <20210622000310.728294-1-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Other places in the kernel use this form, and so just
-provide a common path for it.
+Use the new pci_dev_trylock() helper to simplify our locking.
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/pci/pci.c   | 6 ++++--
- include/linux/pci.h | 3 +++
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ drivers/vfio/pci/vfio_pci.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-index f09821af1d2e..b1d9bb3f5ae2 100644
---- a/drivers/pci/pci.c
-+++ b/drivers/pci/pci.c
-@@ -5027,7 +5027,7 @@ static void pci_dev_lock(struct pci_dev *dev)
- }
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index bd7c482c948a..02b05f7b9a91 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -477,13 +477,10 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
+ 	 * We can not use the "try" reset interface here, which will
+ 	 * overwrite the previously restored configuration information.
+ 	 */
+-	if (vdev->reset_works && pci_cfg_access_trylock(pdev)) {
+-		if (device_trylock(&pdev->dev)) {
+-			if (!__pci_reset_function_locked(pdev))
+-				vdev->needs_reset = false;
+-			device_unlock(&pdev->dev);
+-		}
+-		pci_cfg_access_unlock(pdev);
++	if (vdev->reset_works && pci_dev_trylock(pdev)) {
++		if (!__pci_reset_function_locked(pdev))
++			vdev->needs_reset = false;
++		pci_dev_unlock(pdev);
+ 	}
  
- /* Return 1 on successful lock, 0 on contention */
--static int pci_dev_trylock(struct pci_dev *dev)
-+int pci_dev_trylock(struct pci_dev *dev)
- {
- 	if (pci_cfg_access_trylock(dev)) {
- 		if (device_trylock(&dev->dev))
-@@ -5037,12 +5037,14 @@ static int pci_dev_trylock(struct pci_dev *dev)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(pci_dev_trylock);
- 
--static void pci_dev_unlock(struct pci_dev *dev)
-+void pci_dev_unlock(struct pci_dev *dev)
- {
- 	device_unlock(&dev->dev);
- 	pci_cfg_access_unlock(dev);
- }
-+EXPORT_SYMBOL_GPL(pci_dev_unlock);
- 
- static void pci_dev_save_and_disable(struct pci_dev *dev)
- {
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 6248e044dd29..c55368f58965 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -1353,6 +1353,9 @@ int devm_request_pci_bus_resources(struct device *dev,
- /* Temporary until new and working PCI SBR API in place */
- int pci_bridge_secondary_bus_reset(struct pci_dev *dev);
- 
-+int pci_dev_trylock(struct pci_dev *dev);
-+void pci_dev_unlock(struct pci_dev *dev);
-+
- #define pci_bus_for_each_resource(bus, res, i)				\
- 	for (i = 0;							\
- 	    (res = pci_bus_resource_n(bus, i)) || i < PCI_BRIDGE_RESOURCE_NUM; \
+ 	pci_restore_state(pdev);
 -- 
 2.30.2
 
