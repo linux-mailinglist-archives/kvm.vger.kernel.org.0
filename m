@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 919B33B00AE
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 11:46:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52F913B00B0
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 11:46:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230411AbhFVJrx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 05:47:53 -0400
-Received: from mga11.intel.com ([192.55.52.93]:45209 "EHLO mga11.intel.com"
+        id S230174AbhFVJr4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 05:47:56 -0400
+Received: from mga11.intel.com ([192.55.52.93]:45213 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231138AbhFVJre (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Jun 2021 05:47:34 -0400
-IronPort-SDR: P/nzGc+6Imn5jfROm/7tzS7lq0KzPlIVaUQYv2euA1tbiyyCibj57pXtsCFR2b6JE/Mz8XRLz2
- +aybCbohFJwg==
-X-IronPort-AV: E=McAfee;i="6200,9189,10022"; a="204013209"
+        id S230161AbhFVJrh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Jun 2021 05:47:37 -0400
+IronPort-SDR: iKzp/IOd5jfEAOYiYhVFNSpEzf44p/Np+JrM2QUJyxnJSrUlG5U+TZORsljABLdyvgnYugk6BH
+ hnukfusSUkUQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,10022"; a="204013217"
 X-IronPort-AV: E=Sophos;i="5.83,291,1616482800"; 
-   d="scan'208";a="204013209"
+   d="scan'208";a="204013217"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2021 02:44:33 -0700
-IronPort-SDR: rJiO5ayWzI49CsQgZZNJywFqAcyi5aA4KAUZ7m0LCqvHzJJhKhDcu8/KiJj8rojXvVsS7K8owa
- uqQ/kkSbLFSQ==
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2021 02:44:37 -0700
+IronPort-SDR: 7MFMKrbVC1suIh0pHWVxqDq05HGB6FNn3qi9vLteA74+8oLgEFQBX0XKZJ4vBsV/AA/YvjOxNw
+ kp+PgN24Vo+g==
 X-IronPort-AV: E=Sophos;i="5.83,291,1616482800"; 
-   d="scan'208";a="641600354"
+   d="scan'208";a="641600366"
 Received: from vmm_a4_icx.sh.intel.com (HELO localhost.localdomain) ([10.239.53.245])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2021 02:44:29 -0700
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2021 02:44:33 -0700
 From:   Zhu Lingshan <lingshan.zhu@intel.com>
 To:     peterz@infradead.org, pbonzini@redhat.com
 Cc:     bp@alien8.de, seanjc@google.com, vkuznets@redhat.com,
@@ -33,10 +33,11 @@ Cc:     bp@alien8.de, seanjc@google.com, vkuznets@redhat.com,
         liuxiangdong5@huawei.com, linux-kernel@vger.kernel.org,
         x86@kernel.org, kvm@vger.kernel.org, like.xu.linux@gmail.com,
         Like Xu <like.xu@linux.intel.com>,
+        Luwei Kang <luwei.kang@intel.com>,
         Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH V7 17/18] KVM: x86/cpuid: Refactor host/guest CPU model consistency check
-Date:   Tue, 22 Jun 2021 17:43:05 +0800
-Message-Id: <20210622094306.8336-18-lingshan.zhu@intel.com>
+Subject: [PATCH V7 18/18] KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64
+Date:   Tue, 22 Jun 2021 17:43:06 +0800
+Message-Id: <20210622094306.8336-19-lingshan.zhu@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20210622094306.8336-1-lingshan.zhu@intel.com>
 References: <20210622094306.8336-1-lingshan.zhu@intel.com>
@@ -48,90 +49,105 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <like.xu@linux.intel.com>
 
-For the same purpose, the leagcy intel_pmu_lbr_is_compatible() can be
-renamed for reuse by more callers, and remove the comment about LBR
-use case can be deleted by the way.
+The CPUID features PDCM, DS and DTES64 are required for PEBS feature.
+KVM would expose CPUID feature PDCM, DS and DTES64 to guest when PEBS
+is supported in the KVM on the Ice Lake server platforms.
 
+Originally-by: Andi Kleen <ak@linux.intel.com>
+Co-developed-by: Kan Liang <kan.liang@linux.intel.com>
+Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+Co-developed-by: Luwei Kang <luwei.kang@intel.com>
+Signed-off-by: Luwei Kang <luwei.kang@intel.com>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
 ---
- arch/x86/kvm/cpuid.h         |  5 +++++
- arch/x86/kvm/vmx/pmu_intel.c | 12 +-----------
- arch/x86/kvm/vmx/vmx.c       |  2 +-
- arch/x86/kvm/vmx/vmx.h       |  1 -
- 4 files changed, 7 insertions(+), 13 deletions(-)
+ arch/x86/kvm/vmx/capabilities.h | 26 ++++++++++++++++++--------
+ arch/x86/kvm/vmx/vmx.c          | 15 +++++++++++++++
+ 2 files changed, 33 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index c99edfff7f82..439ce776b9a0 100644
---- a/arch/x86/kvm/cpuid.h
-+++ b/arch/x86/kvm/cpuid.h
-@@ -143,6 +143,11 @@ static inline int guest_cpuid_model(struct kvm_vcpu *vcpu)
- 	return x86_model(best->eax);
+diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+index aa0e7872fcc9..921be9c2bad4 100644
+--- a/arch/x86/kvm/vmx/capabilities.h
++++ b/arch/x86/kvm/vmx/capabilities.h
+@@ -5,6 +5,7 @@
+ #include <asm/vmx.h>
+ 
+ #include "lapic.h"
++#include "pmu.h"
+ 
+ extern bool __read_mostly enable_vpid;
+ extern bool __read_mostly flexpriority_enabled;
+@@ -377,20 +378,29 @@ static inline bool vmx_pt_mode_is_host_guest(void)
+ 	return pt_mode == PT_MODE_HOST_GUEST;
  }
  
-+static inline bool cpuid_model_is_consistent(struct kvm_vcpu *vcpu)
-+{
-+	return boot_cpu_data.x86_model == guest_cpuid_model(vcpu);
-+}
-+
- static inline int guest_cpuid_stepping(struct kvm_vcpu *vcpu)
+-static inline u64 vmx_get_perf_capabilities(void)
++static inline bool vmx_pebs_supported(void)
  {
- 	struct kvm_cpuid_entry2 *best;
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index d0610716675b..a706d3597720 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -173,16 +173,6 @@ static inline struct kvm_pmc *get_fw_gp_pmc(struct kvm_pmu *pmu, u32 msr)
- 	return get_gp_pmc(pmu, msr, MSR_IA32_PMC0);
- }
- 
--bool intel_pmu_lbr_is_compatible(struct kvm_vcpu *vcpu)
--{
--	/*
--	 * As a first step, a guest could only enable LBR feature if its
--	 * cpu model is the same as the host because the LBR registers
--	 * would be pass-through to the guest and they're model specific.
--	 */
--	return boot_cpu_data.x86_model == guest_cpuid_model(vcpu);
--}
+-	u64 perf_cap = 0;
 -
- bool intel_pmu_lbr_is_enabled(struct kvm_vcpu *vcpu)
- {
- 	struct x86_pmu_lbr *lbr = vcpu_to_lbr_records(vcpu);
-@@ -578,7 +568,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+-	if (boot_cpu_has(X86_FEATURE_PDCM))
+-		rdmsrl(MSR_IA32_PERF_CAPABILITIES, perf_cap);
+-
+-	perf_cap &= PMU_CAP_LBR_FMT;
++	return boot_cpu_has(X86_FEATURE_PEBS) && kvm_pmu_cap.pebs_vmx;
++}
  
- 	nested_vmx_pmu_entry_exit_ctls_update(vcpu);
++static inline u64 vmx_get_perf_capabilities(void)
++{
+ 	/*
+ 	 * Since counters are virtualized, KVM would support full
+ 	 * width counting unconditionally, even if the host lacks it.
+ 	 */
+-	return PMU_CAP_FW_WRITES | perf_cap;
++	u64 perf_cap = PMU_CAP_FW_WRITES;
++	u64 host_perf_cap = 0;
++
++	if (boot_cpu_has(X86_FEATURE_PDCM))
++		rdmsrl(MSR_IA32_PERF_CAPABILITIES, host_perf_cap);
++
++	perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
++
++	if (vmx_pebs_supported())
++		perf_cap |= host_perf_cap & PERF_CAP_PEBS_MASK;
++
++	return perf_cap;
+ }
  
--	if (intel_pmu_lbr_is_compatible(vcpu))
-+	if (cpuid_model_is_consistent(vcpu))
- 		x86_perf_get_lbr(&lbr_desc->records);
- 	else
- 		lbr_desc->records.nr = 0;
+ static inline u64 vmx_supported_debugctl(void)
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 299f75747936..bfc004482b34 100644
+index bfc004482b34..19e1cb5296bd 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2307,7 +2307,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			if ((data & PMU_CAP_LBR_FMT) !=
- 			    (vmx_get_perf_capabilities() & PMU_CAP_LBR_FMT))
- 				return 1;
--			if (!intel_pmu_lbr_is_compatible(vcpu))
-+			if (!cpuid_model_is_consistent(vcpu))
+@@ -2310,6 +2310,17 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			if (!cpuid_model_is_consistent(vcpu))
  				return 1;
  		}
++		if (data & PERF_CAP_PEBS_FORMAT) {
++			if ((data & PERF_CAP_PEBS_MASK) !=
++			    (vmx_get_perf_capabilities() & PERF_CAP_PEBS_MASK))
++				return 1;
++			if (!guest_cpuid_has(vcpu, X86_FEATURE_DS))
++				return 1;
++			if (!guest_cpuid_has(vcpu, X86_FEATURE_DTES64))
++				return 1;
++			if (!cpuid_model_is_consistent(vcpu))
++				return 1;
++		}
  		ret = kvm_set_msr_common(vcpu, msr_info);
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 72f1175e474b..3afdcebb0a11 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -97,7 +97,6 @@ union vmx_exit_reason {
- #define vcpu_to_lbr_records(vcpu) (&to_vmx(vcpu)->lbr_desc.records)
+ 		break;
  
- void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu);
--bool intel_pmu_lbr_is_compatible(struct kvm_vcpu *vcpu);
- bool intel_pmu_lbr_is_enabled(struct kvm_vcpu *vcpu);
+@@ -7304,6 +7315,10 @@ static __init void vmx_set_cpu_caps(void)
+ 		kvm_cpu_cap_clear(X86_FEATURE_INVPCID);
+ 	if (vmx_pt_mode_is_host_guest())
+ 		kvm_cpu_cap_check_and_set(X86_FEATURE_INTEL_PT);
++	if (vmx_pebs_supported()) {
++		kvm_cpu_cap_check_and_set(X86_FEATURE_DS);
++		kvm_cpu_cap_check_and_set(X86_FEATURE_DTES64);
++	}
  
- int intel_pmu_create_guest_lbr_event(struct kvm_vcpu *vcpu);
+ 	if (!enable_sgx) {
+ 		kvm_cpu_cap_clear(X86_FEATURE_SGX);
 -- 
 2.27.0
 
