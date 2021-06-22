@@ -2,276 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E48A53B0D81
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 21:12:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6598A3B0E18
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 22:05:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232614AbhFVTOj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 15:14:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45810 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230146AbhFVTOi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 15:14:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624389141;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=w/kiGqfvKmHlvvODf12+NKLRbxkAQ5ugskJmY6siGHk=;
-        b=hjNWB7h5kEhDK4bQok6Rdc1TJbL1Y1eyygoRbWy6m+oi7UoQ93SflaAtJkASh0LmNUFh58
-        pM3wIWEsQTAZug7rkyqstxh1S/R8Rs5oJkqm0x+vPdR5Tv+9ECN+eOFwsxMM0QjHafZADb
-        os45mbiPfBM/0dikyiW+zqcrWykshMY=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-QGb_j9CePIKGtZ7YZMA6Gg-1; Tue, 22 Jun 2021 15:12:20 -0400
-X-MC-Unique: QGb_j9CePIKGtZ7YZMA6Gg-1
-Received: by mail-ot1-f69.google.com with SMTP id z60-20020a9d24c20000b029045ef35e4636so595805ota.2
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 12:12:20 -0700 (PDT)
+        id S232858AbhFVUH7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 16:07:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38214 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232818AbhFVUH5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Jun 2021 16:07:57 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73B3CC061756
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 13:05:40 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id es19-20020a0562141933b029023930e98a57so281230qvb.18
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 13:05:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=4xDEyrn3HHz6L+fu48+GfShlH/vZQ/A+7NZnpXhmIWM=;
+        b=m1f5GmwfDb5ryD/M4M2TiJRLL83bnKsKSkt9wkSMqMvTygR8MIWg9fS26MWtuQd8/d
+         mmpOZLroAA2jPbnWL/yt+I7UEMfDDu9fpTS/CpRBuqq8Dp1dFgrRkZxsiD/FfPVR/nEN
+         Cy8feg76ML7ECaqpMBmqygFu6NPfl4SM6R35zGJyjEKqRMkRTJWmRAZMBomeUd6QgeXb
+         LizCXATz6zSJKAIEDwNRYGqiejqh+rw0akVXqyOFIuHMx9u5Saiw0Ditw+97+Sb2ggYo
+         fWsO3n2CLr41MeSXTFiWHvyIp+IJ15WYY2dOz8UrlwimWW8N1N/CpcnbEQS00N3r2Ed2
+         0Nlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=w/kiGqfvKmHlvvODf12+NKLRbxkAQ5ugskJmY6siGHk=;
-        b=t2dcon4oagp5lrZrulxaasyE5C7H7vY+YSKESXUkE58jDAcnV1QbXXZy54n8CpRZV+
-         Etv+zXVTUEwhol+T8ak5eJhPof3EffatLDKZ1pkgLcTp1RcAicCx6eTOJMJ2CyNo97VZ
-         Hz6KLiVsxEVaDf5TiytYkg5Drvut/63KKv7W943/5oFXOO18EHZdcP7bYSSYIq6cmNIt
-         TLUobpE5z5yCBVuxNLwy52WO8u0Fmn/N5lgCxE76QAOK8e1AgaXFkVb8B/iU9zNqUaAk
-         OktpCKehkINZ6/aGpXBai5WFjVMvEWFD+480pPU8hPiLqUxr9t3eBDOCBCwTj4/VYear
-         Rwrw==
-X-Gm-Message-State: AOAM530YGf0Ir7lk09A/fRy8aR64u5PsDm8hv9uv2jfN+0FwpAfxFtAA
-        0oMapp4PN7MOQsjLYsQyzR3OSwIy1v/QRGNXDWt69i+Ey1MRQoChLiupjKGI1alI+7xKeyK77Xi
-        befhB7gXPJDMx
-X-Received: by 2002:a05:6808:60e:: with SMTP id y14mr215422oih.105.1624389139941;
-        Tue, 22 Jun 2021 12:12:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzTbIHJ0ujoAPprlki2Iz6RXGVi3W9WlzesdoICOvQDuvhj4xQg7LDpOgVZu3i41y2ImTenAA==
-X-Received: by 2002:a05:6808:60e:: with SMTP id y14mr215402oih.105.1624389139699;
-        Tue, 22 Jun 2021 12:12:19 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id y16sm50876oto.60.2021.06.22.12.12.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Jun 2021 12:12:19 -0700 (PDT)
-Date:   Tue, 22 Jun 2021 13:12:17 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        "Dey, Megha" <megha.dey@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: Virtualizing MSI-X on IMS via VFIO
-Message-ID: <20210622131217.76b28f6f.alex.williamson@redhat.com>
-In-Reply-To: <MWHPR11MB188603D0D809C1079F5817DC8C099@MWHPR11MB1886.namprd11.prod.outlook.com>
-References: <MWHPR11MB188603D0D809C1079F5817DC8C099@MWHPR11MB1886.namprd11.prod.outlook.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=4xDEyrn3HHz6L+fu48+GfShlH/vZQ/A+7NZnpXhmIWM=;
+        b=byi9LHRUR9YkY64ng27RGz4kh3KQwCQgkgTDMz25eBpk4ftiDD4W+L5iRDLaaN++VQ
+         AVOMb+pAAYHp2iI5gV6X9OWM2VvR6IDAj+vcYmVIn0qFO9rl7JJvIaHzLLqxI7jlnIC+
+         SQ70aeAtHVAV1bCT4b1PzcZv9Y3HDROOSfQaFMOSx9CWv/pEksxEFvkzQz8VxnWff3jE
+         baNSH1cKbhZ6eOw3knkFJLhkfvjc2fe1UrKUnsSHyls3Q3YSy+dwQUlLKghoQnSDleVR
+         Uj75CyB9/t72AjFxubG4LX8rwTop9VWWgkDm5sHPjWIZFQIJUZiYz/sDzPSn5ulThCf1
+         o46Q==
+X-Gm-Message-State: AOAM530vGfAaaFUkjoL8XT6Txwo4RQj/WXQm/1YQtZyFoHSDJZijeTCw
+        aE1BNJbUwlbS+XjIWksC4WHdThaPWEQ=
+X-Google-Smtp-Source: ABdhPJyTRuHyH5vGbURHHXwScZzWSDK/hcRzUE+vE7jAVENjHb7S2mNzag8RNVFo45F7PU7LLaYgHHSilTI=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:7d90:4528:3c45:18fb])
+ (user=seanjc job=sendgmr) by 2002:a25:33d7:: with SMTP id z206mr6983498ybz.33.1624392339468;
+ Tue, 22 Jun 2021 13:05:39 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue, 22 Jun 2021 13:05:10 -0700
+Message-Id: <20210622200529.3650424-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.288.g62a8d224e6-goog
+Subject: [PATCH 00/19] KVM: selftests: Add x86 mmu_role test and cleanups
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 22 Jun 2021 10:16:15 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+The primary intent of this series is to allow x86-64 tests to create
+arbitrary hugepages and use the new functionality to abuse x86's CPUID
+APIs to test KVM MMU behavior.
 
-> Hi, Alex,
-> 
-> Need your help to understand the current MSI-X virtualization flow in 
-> VFIO. Some background info first.
-> 
-> Recently we are discussing how to virtualize MSI-X with Interrupt 
-> Message Storage (IMS) on mdev:
-> 	https://lore.kernel.org/kvm/87im2lyiv6.ffs@nanos.tec.linutronix.de/ 
-> 
-> IMS is a device specific interrupt storage, allowing an optimized and 
-> scalable manner for generating interrupts. idxd mdev exposes virtual 
-> MSI-X capability to guest but uses IMS entries physically for generating 
-> interrupts. 
-> 
-> Thomas has helped implement a generic ims irqchip driver:
-> 	https://lore.kernel.org/linux-hyperv/20200826112335.202234502@linutronix.de/
-> 
-> idxd device allows software to specify an IMS entry (for triggering 
-> completion interrupt) when submitting a descriptor. To prevent one 
-> mdev triggering malicious interrupt into another mdev (by specifying 
-> an arbitrary entry), idxd ims entry includes a PASID field for validation - 
-> only a matching PASID in the executed descriptor can trigger interrupt 
-> via this entry. idxd driver is expected to program ims entries with 
-> PASIDs that are allocated to the mdev which owns those entries.
-> 
-> Other devices may have different ID and format to isolate ims entries. 
-> But we need abstract a generic means for programming vendor-specific 
-> ID into vendor-specific ims entry, without violating the layering model. 
-> 
-> Thomas suggested vendor driver to first register ID information (possibly 
-> plus the location where to write ID to) in msi_desc when allocating irqs 
-> (extend existing alloc function or via new helper function) and then have 
-> the generic ims irqchip driver to update ID to the ims entry when it's 
-> started up by request_irq().
-> 
-> Then there are two questions to be answered:
-> 
->     1) How does vendor driver decide the ID to be registered to msi_desc?
->     2) How is Thomas's model mapped to the MSI-X virtualization flow in VFIO?
-> 
-> For the 1st open, there are two types of PASIDs on idxd mdev:
-> 
->     1) default PASID: one per mdev and allocated when mdev is created;
->     2) sva PASIDs: multiple per mdev and allocated on-demand (via vIOMMU);
-> 
-> If vIOMMU is not exposed, all ims entries of this mdev should be 
-> programmed with default PASID which is always available in mdev's 
-> lifespan.
-> 
-> If vIOMMU is exposed and guest sva is enabled, entries used for sva 
-> should be tagged with sva PASIDs, leaving others tagged with default 
-> PASID. To help achieve intra-guest interrupt isolation, guest idxd driver 
-> needs program guest sva PASIDs into virtual MSIX_PERM register (one 
-> per MSI-X entry) for validation. Access to MSIX_PERM is trap-and-emulated 
-> by host idxd driver which then figure out which PASID to register to 
-> msi_desc (require PASID translation info via new /dev/iommu proposal).
-> 
-> The guest driver is expected to update MSIX_PERM before request_irq().
-> 
-> Now the 2nd open requires your help. Below is what I learned from 
-> current vfio/qemu code (for vfio-pci device):
-> 
->     0) Qemu doesn't attempt to allocate all irqs as reported by msix->
->         table_size. It is done in an dynamic and incremental way.
+The majority of the prep work refactors the selftests APIs related to
+memory allocation.  The core memory allocation APIs within the selftests
+don't provide defaults for memslot or min virtual address, which has led
+to a ridiculous amount of magic and duplicate code.  Literally zero tests
+use non-standard values in a meaningful way, and if a test comes along
+that has a legitimate use case, it should use lower-level helpers.
 
-Not by table_size, our expectation is that the device interrupt
-behavior can be implicitly affected by the enabled vectors and the
-table size may support far more vectors than the driver might actually
-use.  It's also easier if we never need to get into the scenario of
-pci_alloc_irq_vectors() returning a smaller than requested number of
-vectors and needing to fallback to a vector negotiation that doesn't
-exist via MSI-X.
+Patches 01 and 02 are fixes for bugs found during the refactoring.
 
-FWIW, more recent QEMU will scan the vector table for the highest
-non-masked vector to initially enable that number of vectors in the
-host, both to improve restore behavior after migration and avoid
-overhead for guests that write the vector table before setting the
-MSI-X capability enable bit (Windows?).
+As for the mmu_role test itself, the idea is to change the vCPU model
+while the guest is running (via KVM_SET_CPUID2) to verify that KVM
+reconfigures its MMUs when the vCPU model is changed.  E.g. toggling
+guest support for 1gb hugepages and changing guest MAXPHYADDR.
 
->     1) VFIO provides just one command (VFIO_DEVICE_SET_IRQS) for 
->          allocating/enabling irqs given a set of vMSIX vectors [start, count]:
-> 
->         a) if irqs not allocated, allocate irqs [start+count]. Enable irqs for 
->             specified vectors [start, count] via request_irq();
->         b) if irqs already allocated, enable irqs for specified vectors;
->         c) if irq already enabled, disable and re-enable irqs for specified
->              vectors because user may specify a different eventfd;
-> 
->     2) When guest enables virtual MSI-X capability, Qemu calls VFIO_
->         DEVICE_SET_IRQS to enable vector#0, even though it's currently 
->         masked by the guest. Interrupts are received by Qemu but blocked
->         from guest via mask/pending bit emulation. The main intention is 
->         to enable physical MSI-X;
+Sadly, the test doesn't pass when KVM is using TDP paging (even with all
+my mmu_role fixes) because KVM doesn't fully support manipulating GBPAGES
+and MAXPHYADDR (and other CPUID-based properties that affect the MMU)
+while the guest is running.  And practically speaking, KVM will never
+fully support such behavior becuase (a) there is likely no sane use case,
+(b) fixing the issues is very costly (memory consumption), (c) GBPAGES
+and potentially other features _can't_ be handled correctly due to lack
+of hardware support, and (d) userspace can workaround all issues simply
+by deleting a memslot.
 
-Yes, this is a bit awkward since the interrupt API is via SET_IRQS and
-we don't allow writes to the MSI-X enable bit via config space.
- 
->     3) When guest unmasks vector#0 via request_irq(), Qemu calls VFIO_
->         DEVICE_SET_IRQS to enable vector#0 again, with a eventfd different
->         from the one provided in 2);
-> 
->     4) When guest unmasks vector#1, Qemu finds it's outside of allocated
->         vectors (only vector#0 now):
-> 
->         a) Qemu first calls VFIO_DEVICE_SET_IRQS to disable and free 
->             irq for vector#0;
-> 
->         b) Qemu then calls VFIO_DEVICE_SET_IRQS to allocate and enable
->             irqs for both vector#0 and vector#1;
-> 
->      5) When guest unmasks vector#2, same flow in 4) continues.
-> 
->      ....
-> 
-> If above understanding is correct, how is lost interrupt avoided between 
-> 4.a) and 4.b) given that irq has been torn down for vector#0 in the middle
-> while from guest p.o.v this vector is actually unmasked? There must be
-> a mechanism in place, but I just didn't figure it out...
+All that said, I purposely made the test off-by-default instead of
+requiring TDP.  Partly because detecting whether TDP is enabled is a pain
+becuase it's per-vendor, but also because running the test with TDP
+enabled is still interesting to some extent, e.g. the test will fail, but
+it shouldn't crash KVM, trigger WARNs, etc...
 
-In practice unmasking new vectors is rare and done only at
-initialization.  Risk from lost interrupts at this time is low.  When
-masking and unmasking vectors that are already in use, we're only
-changing the signaling eventfd between KVM and QEMU such that QEMU can
-set emulated pending bits in response to interrupts (and our lack of
-interfaces to handle the mask/unmask at the host).  I believe that
-locking in the vfio-pci driver prevents an interrupt from being lost
-during the eventfd switch.
+Sean Christopherson (19):
+  KVM: selftests: Remove errant asm/barrier.h include to fix arm64 build
+  KVM: selftests: Zero out the correct page in the Hyper-V features test
+  KVM: selftests: Unconditionally use memslot 0 when loading elf binary
+  KVM: selftests: Unconditionally use memslot 0 for x86's GDT/TSS setup
+  KVM: selftests: Use "standard" min virtual address for Hyper-V pages
+  KVM: selftests: Add helpers to allocate N pages of virtual memory
+  KVM: selftests: Lower the min virtual address for misc page
+    allocations
+  KVM: selftests: Use alloc_page helper for x86-64's GDT/ITD/TSS
+    allocations
+  KVM: selftests: Use alloc page helper for xAPIC IPI test
+  KVM: selftests: Use "standard" min virtual address for CPUID test
+    alloc
+  KVM: selftest: Unconditionally use memslot 0 for vaddr allocations
+  KVM: selftests: Unconditionally use memslot '0' for page table
+    allocations
+  KVM: selftests: Unconditionally allocate EPT tables in memslot 0
+  KVM: selftests: Add wrapper to allocate page table page
+  KVM: selftests: Rename x86's page table "address" to "pfn"
+  KVM: selfests: Add PTE helper for x86-64 in preparation for hugepages
+  KVM: selftests: Genericize upper level page table entry struct
+  KVM: selftests: Add hugepage support for x86-64
+  KVM: sefltests: Add x86-64 test to verify MMU reacts to CPUID updates
 
-> Given above flow is robust, mapping Thomas's model to this flow is
-> straightforward. Assume idxd mdev has two vectors: vector#0 for
-> misc/error interrupt and vector#1 as completion interrupt for guest
-> sva. VFIO_DEVICE_SET_IRQS is handled by idxd mdev driver:
-> 
->     2) When guest enables virtual MSI-X capability, Qemu calls VFIO_
->         DEVICE_SET_IRQS to enable vector#0. Because vector#0 is not
->         used for sva, MSIX_PERM#0 has PASID disabled. Host idxd driver 
->         knows to register default PASID to msi_desc#0 when allocating irqs. 
->         Then .startup() callback of ims irqchip is called to program default 
->         PASID saved in msi_desc#0 to the target ims entry when request_irq().
-> 
->     3) When guest unmasks vector#0 via request_irq(), Qemu calls VFIO_
->         DEVICE_SET_IRQS to enable vector#0 again. Following same logic
->         as vfio-pci, idxd driver first disable irq#0 via free_irq() and then
->         re-enable irq#0 via request_irq(). It's still default PASID being used
->         according to msi_desc#0.
-> 
->     4) When guest unmasks vector#1, Qemu finds it's outside of allocated
->         vectors (only vector#0 now):
-> 
->         a) Qemu first calls VFIO_DEVICE_SET_IRQS to disable and free 
->             irq for vector#0. msi_desc#0 is also freed.
-> 
->         b) Qemu then calls VFIO_DEVICE_SET_IRQS to allocate and enable
->             irqs for both vector#0 and vector#1. At this point, MSIX_PERM#0
->            has PASID disabled while MSIX_PERM#1 has a valid guest PASID1
->            for sva. idxd driver registers default PASID to msix_desc#0 and 
->            host PASID2 (translated from guest PASID1) to msix_desc#1 when
->            allocating irqs. Later when both irqs are enabled via request_irq(),
->            ims irqchip driver updates the target ims entries according to 
->            msix_desc#0 and misx_desc#1 respectively.
-> 
-> But this is specific to how Qemu virtualizes MSI-X today. What about it
-> may change (or another device model) to allocate all table_size irqs 
-> when guest enables MSI-X capability? At that point we don't have valid
-> MSIX_PERM content to register PASID info to msix_desc. Possibly what 
-> we really require is a separate helper function allowing driver to update 
-> msix_desc after irq allocation, e.g. when guest unmasks a vector...
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ tools/testing/selftests/kvm/dirty_log_test.c  |   5 +-
+ .../selftests/kvm/hardware_disable_test.c     |   2 +-
+ .../testing/selftests/kvm/include/kvm_util.h  |  18 +-
+ .../selftests/kvm/include/x86_64/processor.h  |  11 +
+ .../selftests/kvm/include/x86_64/vmx.h        |  10 +-
+ .../selftests/kvm/kvm_page_table_test.c       |   2 +-
+ .../selftests/kvm/lib/aarch64/processor.c     |  34 +--
+ .../testing/selftests/kvm/lib/aarch64/ucall.c |   2 +-
+ tools/testing/selftests/kvm/lib/elf.c         |   6 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  62 ++++-
+ .../selftests/kvm/lib/perf_test_util.c        |   2 +-
+ .../selftests/kvm/lib/s390x/processor.c       |  17 +-
+ .../selftests/kvm/lib/x86_64/processor.c      | 254 ++++++++----------
+ tools/testing/selftests/kvm/lib/x86_64/svm.c  |   9 +-
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c  |  52 ++--
+ .../testing/selftests/kvm/memslot_perf_test.c |   2 +-
+ .../selftests/kvm/set_memory_region_test.c    |   2 +-
+ tools/testing/selftests/kvm/steal_time.c      |   2 +-
+ .../selftests/kvm/x86_64/get_cpuid_test.c     |   3 +-
+ .../selftests/kvm/x86_64/hyperv_clock.c       |   2 +-
+ .../selftests/kvm/x86_64/hyperv_features.c    |   8 +-
+ .../selftests/kvm/x86_64/mmu_role_test.c      | 147 ++++++++++
+ .../selftests/kvm/x86_64/set_boot_cpu_id.c    |   2 +-
+ .../kvm/x86_64/vmx_apic_access_test.c         |   2 +-
+ .../selftests/kvm/x86_64/vmx_dirty_log_test.c |   8 +-
+ .../selftests/kvm/x86_64/xapic_ipi_test.c     |   4 +-
+ .../selftests/kvm/x86_64/xen_shinfo_test.c    |   2 +-
+ .../selftests/kvm/x86_64/xen_vmcall_test.c    |   2 +-
+ 30 files changed, 414 insertions(+), 260 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/mmu_role_test.c
 
-I think you're basically asking how you can guarantee that you always
-have a mechanism to update your device specific MSIX_PERM table before
-or after the vector tables.  You're trapping and emulating the
-MSIX_PERM table, so every write traps to your driver.  Therefore
-shouldn't the driver be able to setup any vector using the default PASID
-if MSIX_PERM is not configured and update it with the correct PASID
-translation based on the trapped write to the register?  Logically I
-think you'd want your guest driver to mask and unmask the affected
-vector around modifying the MSIX_PERM entry as well, so it would be
-another option to reevaluate MSI_PERM on unmask, which triggers a
-SET_IRQS ioctl into the idxd host driver.  Either entry point could
-trigger a descriptor update to the host irqchip driver.
- 
-> and do you see any other facets which are overlooked here?
-
-AIUI, the default with no sva PASID should always work, the host driver
-initializes the device with a virtual MSIX_PERM table with all the
-entries disabled, no special guest/host driver coordination is
-required.  In the case of setting a PASID for a vector, you have entry
-points into the driver either by the virtualization of the MSIX_PERM
-table or likely also at the unmasking of the vector, so it seems fully
-contained.  Thanks,
-
-Alex
+-- 
+2.32.0.288.g62a8d224e6-goog
 
