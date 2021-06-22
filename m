@@ -2,119 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 81D063AFD06
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 08:23:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 624573AFD92
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 09:07:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229853AbhFVGZq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 02:25:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21310 "EHLO
+        id S229950AbhFVHJy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 03:09:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26359 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229628AbhFVGZp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 02:25:45 -0400
+        by vger.kernel.org with ESMTP id S229890AbhFVHJy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 03:09:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624343009;
+        s=mimecast20190719; t=1624345658;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aQqfkvCtBb6g17+HqN0uwZioUK6+vGsvOXTdTvz9LIc=;
-        b=fZbAp+kY9Oq/YcndHYZ02y2K9/mDYZvIsJ1pA++0V7SNbrwRzWWf3De51W4uTxu7IbGfQn
-        awtaSu6T8DEMJs6H8CYaJP4jjIm6p0iRe8FYbVtjEDNiy55g/qPya7r6sbQGQXl7FfRiLD
-        kQmN9PanN+ampm7TuUyBSOrm6XiVArA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-327-9lEXvDGPO96ZsVOU8x86rw-1; Tue, 22 Jun 2021 02:23:28 -0400
-X-MC-Unique: 9lEXvDGPO96ZsVOU8x86rw-1
-Received: by mail-wm1-f69.google.com with SMTP id l9-20020a05600c1d09b02901dc060832e2so910689wms.1
-        for <kvm@vger.kernel.org>; Mon, 21 Jun 2021 23:23:28 -0700 (PDT)
+        bh=BpxLvUdEN4UOwGk1JTOpTM4c5SQrD6XCtpiY9c/D+sc=;
+        b=Bh/0elMG5ApqAHS87Fgqow3DOrM/sCSoIC5mn7FQZXit90KVw/0kGJZkWnUDLEq0KHyLtQ
+        Fri7+0VaUePT5LoYD7VWIg3YwZ2wQNM++qJQrV/IbrbzIhNycovAKCOwY4Lk4YLke8tvSs
+        APFufwWVMwzxCYi3VhFQOTRSd1GQmes=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-341-azcIy1qoOOuzmQZCidK_uw-1; Tue, 22 Jun 2021 03:07:36 -0400
+X-MC-Unique: azcIy1qoOOuzmQZCidK_uw-1
+Received: by mail-ej1-f71.google.com with SMTP id g6-20020a1709064e46b02903f57f85ac45so2858142ejw.15
+        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 00:07:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=aQqfkvCtBb6g17+HqN0uwZioUK6+vGsvOXTdTvz9LIc=;
-        b=WfuVLr5lxF4uoxhsfkZu2EvHpiExWJX/rLdJK6MqhlICBY9TpJA6YAOU3C5X3CslS+
-         7VeyFvqIgUWE84QIaqhWivDhXbPGGpr8S4nOpnP7E1n2Qz6zxQ59TL6NxfLz18dXiwDi
-         E1foYVt8RcDZghwQvUu13Sr5Rv3Z52Jc/KPAioRydXI5no1IY3FphO1b4LgEr4J1PFSs
-         gzGnWKj42z2SL0LEhhMbiaD4TLGm8sZNWbJeaxggPFXR3nSNeIpcL0f8sMQ6cP3+V5qK
-         GY9C9mQCWPOX4CHP+BguaxcYbYt3Ck1EM3RFbitHLEteHA4U1u0rEC5rWo6m195zGkse
-         k8PQ==
-X-Gm-Message-State: AOAM533Dv1U8KY1Fe5kV8lefcIry6nk4hP1mvQ+PRTbROEdmaIWFrzs0
-        Ipq1LO7rLkleXIdIG4HB8uJF6TAckTOOzgslBnMFRfACYNsYgfeitcKIelbSasmuGf9FCTkEdRj
-        9R8FW6YnP+jBv
-X-Received: by 2002:a5d:44d2:: with SMTP id z18mr2678886wrr.358.1624343006203;
-        Mon, 21 Jun 2021 23:23:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyH/4w8wmlBb+QUv5p9+m3hdd4Lh4ZTIRS504JjrKAX2ybZM9tGHk+qPRypejrUSPVJj6nMOg==
-X-Received: by 2002:a5d:44d2:: with SMTP id z18mr2678861wrr.358.1624343006005;
-        Mon, 21 Jun 2021 23:23:26 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id a1sm26072095wra.63.2021.06.21.23.23.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Jun 2021 23:23:25 -0700 (PDT)
-Subject: Re: linux-next: manual merge of the kvm tree with the powerpc tree
-To:     Stephen Rothwell <sfr@canb.auug.org.au>, KVM <kvm@vger.kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        PowerPC <linuxppc-dev@lists.ozlabs.org>
-Cc:     Ashish Kalra <ashish.kalra@amd.com>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20210622152544.74e01567@canb.auug.org.au>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9c2dbe56-4c64-0032-0acb-2e2925c7a2ab@redhat.com>
-Date:   Tue, 22 Jun 2021 08:23:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=BpxLvUdEN4UOwGk1JTOpTM4c5SQrD6XCtpiY9c/D+sc=;
+        b=MnlCrbp70SMiilMr8bA/k9uouIjkP6wBWFtU7DTVLQ6zzwog3KQmzz2duo5bFlBF4E
+         aUN7eQbl2ADN6t9adlL2S64czaayhMqmRIjWvesTb7ku8bQ5GpXkyQ7aRO9e9WgVlhJB
+         wODc9eqoRF136V+ujYoFKBvOeGbPDRaoH9NOk1WyP7YO9GfQiZuvwmqO2rEUPWVkelcf
+         27Rf4+I9gO6Wzvczxsd3MqUmDnmEeU7oamjMqTfg9NSJ13eCWnScMHBGYyrCk/CvEF0/
+         cEITq6dCpvf+Ant8ht+LLIv7RNxI1Rqe453rCBs4W7TwhuWF0s6CkWII/OGXQeGDzX88
+         QtdQ==
+X-Gm-Message-State: AOAM533/B1+BkxXJggObq5euf20reVrInB2lRC5GJCdCIdC4Vs8PNvja
+        qSQwp+tc/80RtaEPz4YB/RghR4MkQ6c9EnvhatabnYx9T1zjFzSezTcDstVZyrf0Xd7E1noDADv
+        6+aMoNYaiS5k6+kuLkNMbETlEQbT7k2gskSV/HW2YeZUmnlMzdqJNJHrXlgNAST8=
+X-Received: by 2002:a17:906:670c:: with SMTP id a12mr2323240ejp.249.1624345655056;
+        Tue, 22 Jun 2021 00:07:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyIRL7kFdSnYi6ayAi9cWByQS1oJPIkRm7y2jVnBDl937Rh9GVFkpzhNuSsQPogXJRPDSPj+A==
+X-Received: by 2002:a17:906:670c:: with SMTP id a12mr2323214ejp.249.1624345654861;
+        Tue, 22 Jun 2021 00:07:34 -0700 (PDT)
+Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+        by smtp.gmail.com with ESMTPSA id h20sm5416875ejl.7.2021.06.22.00.07.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Jun 2021 00:07:34 -0700 (PDT)
+Date:   Tue, 22 Jun 2021 09:07:32 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     maz@kernel.org, ricarkol@google.com, eric.auger@redhat.com,
+        alexandru.elisei@arm.com, pbonzini@redhat.com
+Subject: Re: [PATCH v3 0/5] KVM: arm64: selftests: Fix get-reg-list
+Message-ID: <20210622070732.zod7gaqhqo344vg6@gator>
+References: <20210531103344.29325-1-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210622152544.74e01567@canb.auug.org.au>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210531103344.29325-1-drjones@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/06/21 07:25, Stephen Rothwell wrote:
-> Hi all,
+On Mon, May 31, 2021 at 12:33:39PM +0200, Andrew Jones wrote:
+> v3:
+>  - Took Ricardo's suggestions in order to avoid needing to update
+>    prepare_vcpu_init, finalize_vcpu, and check_supported when adding
+>    new register sublists by better associating the sublists with their
+>    vcpu feature bits and caps [Ricardo]
+>  - We now dynamically generate the vcpu config name by creating them
+>    from its sublist names [drew]
 > 
-> Today's linux-next merge of the kvm tree got a conflict in:
+> v2:
+>  - Removed some cruft left over from a previous more complex design of the
+>    config command line parser
+>  - Dropped the list printing factor out patch as it's not necessary
+>  - Added a 'PASS' output for passing tests to allow testers to feel good
+>  - Changed the "up to date with kernel" comment to reference 5.13.0-rc2
 > 
->    include/uapi/linux/kvm.h
 > 
-> between commit:
+> Since KVM commit 11663111cd49 ("KVM: arm64: Hide PMU registers from
+> userspace when not available") the get-reg-list* tests have been
+> failing with
 > 
->    9bb4a6f38fd4 ("KVM: PPC: Book3S HV: Add KVM_CAP_PPC_RPT_INVALIDATE capability")
+>   ...
+>   ... There are 74 missing registers.
+>   The following lines are missing registers:
+>   ...
 > 
-> from the powerpc tree and commits:
+> where the 74 missing registers are all PMU registers. This isn't a
+> bug in KVM that the selftest found, even though it's true that a
+> KVM userspace that wasn't setting the KVM_ARM_VCPU_PMU_V3 VCPU
+> flag, but still expecting the PMU registers to be in the reg-list,
+> would suddenly no longer have their expectations met. In that case,
+> the expectations were wrong, though, so that KVM userspace needs to
+> be fixed, and so does this selftest.
 > 
->    644f706719f0 ("KVM: x86: hyper-v: Introduce KVM_CAP_HYPERV_ENFORCE_CPUID")
->    6dba94035203 ("KVM: x86: Introduce KVM_GET_SREGS2 / KVM_SET_SREGS2")
->    0dbb11230437 ("KVM: X86: Introduce KVM_HC_MAP_GPA_RANGE hypercall")
+> We could fix the test with a one-liner since we just need a
 > 
-> from the kvm tree.
+>   init->features[0] |= 1 << KVM_ARM_VCPU_PMU_V3;
 > 
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
+> in prepare_vcpu_init(), but that's too easy, so here's a 5 patch patch
+> series instead :-)  The reason for all the patches and the heavy diffstat
+> is to prepare for other vcpu configuration testing, e.g. ptrauth and mte.
+> With the refactoring done in this series, we should now be able to easily
+> add register sublists and vcpu configs to the get-reg-list test, as the
+> last patch demonstrates with the pmu fix.
 > 
+> Thanks,
+> drew
+> 
+> 
+> Andrew Jones (5):
+>   KVM: arm64: selftests: get-reg-list: Introduce vcpu configs
+>   KVM: arm64: selftests: get-reg-list: Prepare to run multiple configs
+>     at once
+>   KVM: arm64: selftests: get-reg-list: Provide config selection option
+>   KVM: arm64: selftests: get-reg-list: Remove get-reg-list-sve
+>   KVM: arm64: selftests: get-reg-list: Split base and pmu registers
+> 
+>  tools/testing/selftests/kvm/.gitignore        |   1 -
+>  tools/testing/selftests/kvm/Makefile          |   1 -
+>  .../selftests/kvm/aarch64/get-reg-list-sve.c  |   3 -
+>  .../selftests/kvm/aarch64/get-reg-list.c      | 439 +++++++++++++-----
+>  4 files changed, 321 insertions(+), 123 deletions(-)
+>  delete mode 100644 tools/testing/selftests/kvm/aarch64/get-reg-list-sve.c
+> 
+> -- 
+> 2.31.1
+>
 
-What are the dependencies of these KVM patches on patches from the bare 
-metal trees, and can you guys *please* start using topic branches?
+Gentle ping.
 
-I've been asking you for literally years, but this is the first time I 
-remember that Linus will have to resolve conflicts in uAPI changes and 
-it is *not* acceptable.
+I'm not sure if I'm pinging Marc or Paolo though. MAINTAINERS shows Paolo
+as all kvm selftests, but I think Marc has started picking up the AArch64
+specific kvm selftests.
 
-Please drop the patches at 
-https://www.spinics.net/lists/kvm-ppc/msg18666.html from the powerpc 
-tree, and merge them through either the kvm-powerpc or kvm trees.
+Marc, if you've decided to maintain AArch64 kvm selftests, would you be
+opposed to adding
 
-Paolo
+  F: tools/testing/selftests/kvm/*/aarch64/
+  F: tools/testing/selftests/kvm/aarch64/
+
+to "KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)"?
+
+Thanks,
+drew
 
