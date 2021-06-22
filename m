@@ -2,101 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B219B3AFDCA
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 09:25:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E9603AFDEF
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 09:32:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230046AbhFVH1P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 03:27:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60296 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229677AbhFVH1N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Jun 2021 03:27:13 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42228C061574
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 00:24:58 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id v134-20020a37618c0000b02902fa5329f2b4so2519383qkb.18
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 00:24:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=BD4lpbPgIYJoxQKzEzU6bqCGaw9muIxLDsW7Q3v9h6k=;
-        b=esL8Wgp1T4BxTy0TqGV+jDA5F57PodHBxA6bFbaWmKGQPwRDwaBqhB0QD8a+AEzzIc
-         CbAPXjSfXR7KaKvl4yJNzj6r4ti/Z4dwYWc/Ji66CpEuJpXhag2VJwV5oeLdRR1fsBM9
-         H9ojzo6rqek2pOe21/j8o60sgq6oMGy9N4KU11E7YOJxWGpGOefyDp7vyuxE2Pn3WSn3
-         iSspCTit8s7i4G5DSB0YEtcofXbLo5DVz2XzRWcFAAIts9nwy9Gw/tsZ0YVe4WftZ/pc
-         Cs+9wXAg9Xf1n9ODTt4b4BhJGBqeyyFtgXhv1yZNSElx8fX+dozETAipwHmbjTOkF5HY
-         KU8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=BD4lpbPgIYJoxQKzEzU6bqCGaw9muIxLDsW7Q3v9h6k=;
-        b=SPpnkWnLk9EO3Eq8s1e8CUgjSPqBi1pXb8n6ZXkeOKp1Ia6M2ivacZOvy+WzK3whCG
-         muylVCSUICKQwfC88YEoEofj6yq1v9dyiwuP4uKQh3T3IfDPsu9tA6OcYkTJ7KWPftls
-         StdOPMdKXezwR+rIUEqyCcIYw23qbTAhUyouC/Goxar41TcDcnA9WmVduVNaOXN7zviE
-         qH6LAG5kJNTucNKi+tQsdyA6Z20TxEYPEU03+9r/Bv7Au6fXUwPgiCUMfdzFaKhYVKxj
-         UAms9md4+3uUSRWRbq1HuhIWc7/tM2y4NyogdJj9qVUJgN1MaN/S9ITEB5CDqwMdGIIk
-         jiCw==
-X-Gm-Message-State: AOAM532Z82+GzJV7UxxFMUUDcIElgrGKIlMY+eC5YKp3j/Uw0+LHCyXI
-        eJGlnBUl1eWVvUuJSAt00LpdhB+d4LI=
-X-Google-Smtp-Source: ABdhPJyJj8tlqT95Jr5UGXnlzkZJA+EWDiIPs1qaYV1oUrDbRZ4ZtoVYOfZpGDiXR7pjcX8YU+BBsU153rs=
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:5722:92ce:361f:3832])
- (user=seanjc job=sendgmr) by 2002:a25:aba7:: with SMTP id v36mr2898354ybi.124.1624346697403;
- Tue, 22 Jun 2021 00:24:57 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 22 Jun 2021 00:24:54 -0700
-Message-Id: <20210622072454.3449146-1-seanjc@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.32.0.288.g62a8d224e6-goog
-Subject: [PATCH] KVM: x86/mmu: Don't WARN on a NULL shadow page in TDP MMU check
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S229702AbhFVHfK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 03:35:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59432 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229628AbhFVHfJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Jun 2021 03:35:09 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4DB146128C;
+        Tue, 22 Jun 2021 07:32:54 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1lvatw-0092VW-AY; Tue, 22 Jun 2021 08:32:52 +0100
+Date:   Tue, 22 Jun 2021 08:32:51 +0100
+Message-ID: <878s32cq1o.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        ricarkol@google.com, eric.auger@redhat.com,
+        alexandru.elisei@arm.com, pbonzini@redhat.com
+Subject: Re: [PATCH v3 0/5] KVM: arm64: selftests: Fix get-reg-list
+In-Reply-To: <20210622070732.zod7gaqhqo344vg6@gator>
+References: <20210531103344.29325-1-drjones@redhat.com>
+        <20210622070732.zod7gaqhqo344vg6@gator>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: drjones@redhat.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, ricarkol@google.com, eric.auger@redhat.com, alexandru.elisei@arm.com, pbonzini@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Treat a NULL shadow page in the "is a TDP MMU" check as valid, non-TDP
-root.  KVM uses a "direct" PAE paging MMU when TDP is disabled and the
-guest is running with paging disabled.  In that case, root_hpa points at
-the pae_root page (of which only 32 bytes are used), not a standard
-shadow page, and the WARN fires (a lot).
+Hi Andrew,
 
-Fixes: 0b873fd7fb53 ("KVM: x86/mmu: Remove redundant is_tdp_mmu_enabled check")
-Cc: David Matlack <dmatlack@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/tdp_mmu.h | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+On Tue, 22 Jun 2021 08:07:32 +0100,
+Andrew Jones <drjones@redhat.com> wrote:
+> 
+> On Mon, May 31, 2021 at 12:33:39PM +0200, Andrew Jones wrote:
+> > v3:
+> >  - Took Ricardo's suggestions in order to avoid needing to update
+> >    prepare_vcpu_init, finalize_vcpu, and check_supported when adding
+> >    new register sublists by better associating the sublists with their
+> >    vcpu feature bits and caps [Ricardo]
+> >  - We now dynamically generate the vcpu config name by creating them
+> >    from its sublist names [drew]
+> > 
+> > v2:
+> >  - Removed some cruft left over from a previous more complex design of the
+> >    config command line parser
+> >  - Dropped the list printing factor out patch as it's not necessary
+> >  - Added a 'PASS' output for passing tests to allow testers to feel good
+> >  - Changed the "up to date with kernel" comment to reference 5.13.0-rc2
+> > 
+> > 
+> > Since KVM commit 11663111cd49 ("KVM: arm64: Hide PMU registers from
+> > userspace when not available") the get-reg-list* tests have been
+> > failing with
+> > 
+> >   ...
+> >   ... There are 74 missing registers.
+> >   The following lines are missing registers:
+> >   ...
+> > 
+> > where the 74 missing registers are all PMU registers. This isn't a
+> > bug in KVM that the selftest found, even though it's true that a
+> > KVM userspace that wasn't setting the KVM_ARM_VCPU_PMU_V3 VCPU
+> > flag, but still expecting the PMU registers to be in the reg-list,
+> > would suddenly no longer have their expectations met. In that case,
+> > the expectations were wrong, though, so that KVM userspace needs to
+> > be fixed, and so does this selftest.
+> > 
+> > We could fix the test with a one-liner since we just need a
+> > 
+> >   init->features[0] |= 1 << KVM_ARM_VCPU_PMU_V3;
+> > 
+> > in prepare_vcpu_init(), but that's too easy, so here's a 5 patch patch
+> > series instead :-)  The reason for all the patches and the heavy diffstat
+> > is to prepare for other vcpu configuration testing, e.g. ptrauth and mte.
+> > With the refactoring done in this series, we should now be able to easily
+> > add register sublists and vcpu configs to the get-reg-list test, as the
+> > last patch demonstrates with the pmu fix.
+> > 
+> > Thanks,
+> > drew
+> > 
+> > 
+> > Andrew Jones (5):
+> >   KVM: arm64: selftests: get-reg-list: Introduce vcpu configs
+> >   KVM: arm64: selftests: get-reg-list: Prepare to run multiple configs
+> >     at once
+> >   KVM: arm64: selftests: get-reg-list: Provide config selection option
+> >   KVM: arm64: selftests: get-reg-list: Remove get-reg-list-sve
+> >   KVM: arm64: selftests: get-reg-list: Split base and pmu registers
+> > 
+> >  tools/testing/selftests/kvm/.gitignore        |   1 -
+> >  tools/testing/selftests/kvm/Makefile          |   1 -
+> >  .../selftests/kvm/aarch64/get-reg-list-sve.c  |   3 -
+> >  .../selftests/kvm/aarch64/get-reg-list.c      | 439 +++++++++++++-----
+> >  4 files changed, 321 insertions(+), 123 deletions(-)
+> >  delete mode 100644 tools/testing/selftests/kvm/aarch64/get-reg-list-sve.c
+> > 
+> > -- 
+> > 2.31.1
+> >
+> 
+> Gentle ping.
+> 
+> I'm not sure if I'm pinging Marc or Paolo though. MAINTAINERS shows Paolo
+> as all kvm selftests, but I think Marc has started picking up the AArch64
+> specific kvm selftests.
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index b981a044ab55..1cae4485b3bc 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -94,11 +94,13 @@ static inline bool is_tdp_mmu(struct kvm_mmu *mmu)
- 	if (WARN_ON(!VALID_PAGE(hpa)))
- 		return false;
- 
-+	/*
-+	 * A NULL shadow page is legal when shadowing a non-paging guest with
-+	 * PAE paging, as the MMU will be direct with root_hpa pointing at the
-+	 * pae_root page, not a shadow page.
-+	 */
- 	sp = to_shadow_page(hpa);
--	if (WARN_ON(!sp))
--		return false;
--
--	return is_tdp_mmu_page(sp) && sp->root_count;
-+	return sp && is_tdp_mmu_page(sp) && sp->root_count;
- }
- #else
- static inline bool kvm_mmu_init_tdp_mmu(struct kvm *kvm) { return false; }
+I'm happy to queue this series.
+
+> Marc, if you've decided to maintain AArch64 kvm selftests, would you be
+> opposed to adding
+> 
+>   F: tools/testing/selftests/kvm/*/aarch64/
+>   F: tools/testing/selftests/kvm/aarch64/
+> 
+> to "KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)"?
+
+No problem to add this, but I *will* rely on you (and whoever wants to
+part-take) to do the bulk of the reviewing. Do we have a deal?
+
+Thanks,
+
+	M.
+
 -- 
-2.32.0.288.g62a8d224e6-goog
-
+Without deviation from the norm, progress is not possible.
