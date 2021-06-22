@@ -2,102 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 68B933AFEE4
-	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 10:15:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 312B43AFF12
+	for <lists+kvm@lfdr.de>; Tue, 22 Jun 2021 10:21:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230377AbhFVIRY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 04:17:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43844 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230062AbhFVIRX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Jun 2021 04:17:23 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81CB0C06175F
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 01:15:06 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id hz1so10569817ejc.1
-        for <kvm@vger.kernel.org>; Tue, 22 Jun 2021 01:15:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=YVCp8xiBvtUwUFNttbUN5nSyQGNG3BOtMHGI4CyjTHQ=;
-        b=o28htubtbLEiarTQcM4helMW63ggtrRYD6odB80RYrMKlzXBuBNkg6jqk7xSk51aaf
-         O28DIRNwUv88sKL7YBwXuvCLNoIBLB+qyueDzvX1XAPAF+lP7b6r00JG0ydO3mbfBvjj
-         MITBvN5IFEf9VgWqwbQ5cTBOQbN005m0gdSrZ4UFZ5PhJfMcLeyIImvlDYQppBZOLOIs
-         wivfY/Yy9LtygR+8wILj+pUcRikwSCVZB5LjievWPsu4MJMdYRsp3p46J9zcNoF3btSf
-         hqfnJys8BLX9k98ZfHt7+Ao5s4RN54hEJpzwW0KS+1cLQ67k5xAElsfeANuN+ySwxymS
-         gCeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=YVCp8xiBvtUwUFNttbUN5nSyQGNG3BOtMHGI4CyjTHQ=;
-        b=WgKR8kcPZk/gbgZrNROg2MuaBoJG/Z0TYLH+D9Vg1func0T74QFazEPDHzJcdbStzq
-         6+XAx7D+SS4wLHU/wUOulfJEscHe8BuE3kmEw3m4ob2MX0qGQnVBDtdTwJFLxCIpyfkr
-         L92LMDXxY/NtYSHxgGsbw1bjhcEaQNlMZiMa+42D35AtSrBaFfBR0xpNMeLM2P6bKmNn
-         Bqp9geJE4D9qmhrwvbX7STEPViJ0F7GLNsM8wwQTSdAZn79JWdpfS3UcmBH0Moy9ibXX
-         WaBlT8566Li2p75xAHTaAn/9o9/oSYBd8mddEm9IZ5rJS9PkUY62mj+EGb9zeF+icJWN
-         40bw==
-X-Gm-Message-State: AOAM533dG9HTSRWJAlMwG98Qnv+RhlqnEUswNgOh71PVNBlZQSewJEf+
-        m5gbWn7SuyrnSWicugj6TOmeMEs5DSCNe3u/Jh+Y
-X-Google-Smtp-Source: ABdhPJypM7pjKQ3KkOxcIFLDNBXVrECsVU1ZZT8FKvu2e7Av799B1KikoicL0OhYmYSH0T8F/YyLCEgy2EG+tm9UOts=
-X-Received: by 2002:a17:907:1b11:: with SMTP id mp17mr2736493ejc.1.1624349704564;
- Tue, 22 Jun 2021 01:15:04 -0700 (PDT)
+        id S230308AbhFVIXx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 04:23:53 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6152 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229628AbhFVIXu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Jun 2021 04:23:50 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15M8I9Dh153731;
+        Tue, 22 Jun 2021 04:21:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=guOHEWAUJmaU4W/263HDVfe89kN/IbabEf98436S2Yw=;
+ b=Yo4PA4zdZoiPo7Ax3nkRfsAXd+j+eKgU+7YVIGJuqzJjYeEYfAI+AyGMHuSSMjdxnIOS
+ zhw0/3HlPQSY/rB42xSO75mmpL52MmJVDoNe1dvjwlqdcSUrTyh6vPi75UfqmHp33d2d
+ sEM5zZ5VP9IZUwiS14Xl6GJvQGG4m3viiMUFps/Jbk+q18udsg3ZP3VeMSlMZUPZAs5A
+ 97kbW+Y1Q/krrwqXTv1KBsh1JVMwRvgraCzsE7JD7cayqlIifNriDTiS/uJmyPkwdrGC
+ oaCIWkHSgFh96n83Z1HDfgadvAQcZ6GAZQ5F6Qr3h/in7zJhP+UQxfLg6L2l4M5glxZx ug== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39bc7yr1ja-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Jun 2021 04:21:35 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15M8Ilpe154249;
+        Tue, 22 Jun 2021 04:21:34 -0400
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39bc7yr1hw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Jun 2021 04:21:34 -0400
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15M8DQcc007660;
+        Tue, 22 Jun 2021 08:21:32 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma01fra.de.ibm.com with ESMTP id 3998788q5n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Jun 2021 08:21:32 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15M8KCOE25821640
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 22 Jun 2021 08:20:12 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5147EAE051;
+        Tue, 22 Jun 2021 08:21:29 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C55DCAE04D;
+        Tue, 22 Jun 2021 08:21:28 +0000 (GMT)
+Received: from localhost.localdomain.com (unknown [9.145.182.30])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 22 Jun 2021 08:21:28 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        thuth@redhat.com
+Subject: [kvm-unit-tests GIT PULL 00/12] s390x update 2021-22-06
+Date:   Tue, 22 Jun 2021 10:20:30 +0200
+Message-Id: <20210622082042.13831-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ODtYAHCpvJ5BEwSK2Ik-QMMpmxT2_Y3a
+X-Proofpoint-ORIG-GUID: qkGw2IGNcoHwmaqxCETnxtYfZr8f-cl6
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-References: <20210615141331.407-1-xieyongji@bytedance.com> <20210615141331.407-10-xieyongji@bytedance.com>
- <adfb2be9-9ed9-ca37-ac37-4cd00bdff349@redhat.com> <CACycT3tAON+-qZev+9EqyL2XbgH5HDspOqNt3ohQLQ8GqVK=EA@mail.gmail.com>
- <1bba439f-ffc8-c20e-e8a4-ac73e890c592@redhat.com> <CACycT3uzMJS7vw6MVMOgY4rb=SPfT2srV+8DPdwUVeELEiJgbA@mail.gmail.com>
- <0aeb7cb7-58e5-1a95-d830-68edd7e8ec2e@redhat.com>
-In-Reply-To: <0aeb7cb7-58e5-1a95-d830-68edd7e8ec2e@redhat.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Tue, 22 Jun 2021 16:14:53 +0800
-Message-ID: <CACycT3uuooKLNnpPHewGZ=q46Fap2P4XCFirdxxn=FxK+X1ECg@mail.gmail.com>
-Subject: Re: Re: [PATCH v8 09/10] vduse: Introduce VDUSE - vDPA Device in Userspace
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-06-22_04:2021-06-21,2021-06-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
+ spamscore=0 mlxlogscore=999 malwarescore=0 clxscore=1015 phishscore=0
+ mlxscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106220050
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 22, 2021 at 3:50 PM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> =E5=9C=A8 2021/6/22 =E4=B8=8B=E5=8D=883:22, Yongji Xie =E5=86=99=E9=81=93=
-:
-> >> We need fix a way to propagate the error to the userspace.
-> >>
-> >> E.g if we want to stop the deivce, we will delay the status reset unti=
-l
-> >> we get respose from the userspace?
-> >>
-> > I didn't get how to delay the status reset. And should it be a DoS
-> > that we want to fix if the userspace doesn't give a response forever?
->
->
-> You're right. So let's make set_status() can fail first, then propagate
-> its failure via VHOST_VDPA_SET_STATUS.
->
+Dear Paolo,
 
-OK. So we only need to propagate the failure in the vhost-vdpa case, right?
+please merge or pull the following changes:
 
-Thanks,
-Yongji
+Merge:
+https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/merge_requests/11
+
+Pipeline:
+https://gitlab.com/frankja/kvm-unit-tests/-/pipelines/324608397
+
+Pull:
+The following changes since commit f09465ac9044145f20435344d41566aede62fc08:
+
+  x86: Flush the TLB after setting user-bit (2021-06-17 14:36:25 -0400)
+
+are available in the Git repository at:
+
+  https://gitlab.com/frankja/kvm-unit-tests.git s390x-pull-2021-22-06
+
+for you to fetch changes up to d58ec2ec341cbea746944a8ae92c737041c35172:
+
+  s390x: edat test (2021-06-21 14:55:12 +0000)
+
+
+Claudio Imbrenda (7):
+  s390x: lib: add and use macros for control register bits
+  libcflat: add SZ_1M and SZ_2G
+  s390x: lib: fix pgtable.h
+  s390x: lib: Add idte and other huge pages functions/macros
+  s390x: lib: add teid union and clear teid from lowcore
+  s390x: mmu: add support for large pages
+  s390x: edat test
+
+Janosch Frank (5):
+  s390x: sie: Only overwrite r3 if it isn't needed anymore
+  s390x: selftest: Add prefixes to fix report output
+  s390x: Don't run PV testcases under tcg
+  configure: s390x: Check if the host key document exists
+  s390x: run: Skip PV tests when tcg is the accelerator
+
+ configure                 |   5 +
+ lib/libcflat.h            |   2 +
+ lib/s390x/asm/arch_def.h  |  12 ++
+ lib/s390x/asm/float.h     |   4 +-
+ lib/s390x/asm/interrupt.h |  28 +++-
+ lib/s390x/asm/pgtable.h   |  44 +++++-
+ lib/s390x/interrupt.c     |   2 +
+ lib/s390x/mmu.c           | 264 ++++++++++++++++++++++++++++++++----
+ lib/s390x/mmu.h           |  84 +++++++++++-
+ lib/s390x/sclp.c          |   4 +-
+ s390x/Makefile            |   1 +
+ s390x/cpu.S               |   2 +-
+ s390x/diag288.c           |   2 +-
+ s390x/edat.c              | 274 ++++++++++++++++++++++++++++++++++++++
+ s390x/gs.c                |   2 +-
+ s390x/iep.c               |   4 +-
+ s390x/run                 |   5 +
+ s390x/selftest.c          |  26 ++--
+ s390x/skrf.c              |   2 +-
+ s390x/smp.c               |   8 +-
+ s390x/unittests.cfg       |   3 +
+ s390x/vector.c            |   2 +-
+ scripts/s390x/func.bash   |   3 +
+ 23 files changed, 724 insertions(+), 59 deletions(-)
+ create mode 100644 s390x/edat.c
+
+-- 
+2.31.1
+
