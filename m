@@ -2,114 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD5503B1983
-	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 14:00:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC1883B1A31
+	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 14:31:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230450AbhFWMCu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 08:02:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54085 "EHLO
+        id S230212AbhFWMdA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 08:33:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50281 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230019AbhFWMCu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 08:02:50 -0400
+        by vger.kernel.org with ESMTP id S230163AbhFWMc7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 08:32:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624449632;
+        s=mimecast20190719; t=1624451441;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=40lufiefSAXJYxyzql25e+wiCU9kJZcVj8CF016XD70=;
-        b=CEstZ7cIdGOqDR+jnolP/XRG/JXhBLjDflf7lCofp0kpQHaMDnWWthH34tcmchbvdBV0ct
-        GJl0+gObI3CuwmCiDP0LxOQZ8lsmAOI+mWDkiJj3CBZWA3Zdc6hRvOOm/ZGUvW7Rt6GMvx
-        f+zXS2rNdBJfAth/dDRE3/o+8wCG0zQ=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-591-txznQztfP_KLp_njZYFmnQ-1; Wed, 23 Jun 2021 08:00:30 -0400
-X-MC-Unique: txznQztfP_KLp_njZYFmnQ-1
-Received: by mail-wr1-f71.google.com with SMTP id x5-20020adff0c50000b029011a7be832b7so973620wro.18
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 05:00:30 -0700 (PDT)
+        bh=CNpTMCJ8h80BO/+0pCndBRwHmkrNlQnKpFd4gripH9E=;
+        b=OfyCtexLB+xuQwWMrWH2TEsAElfGBALjH62CBwUb3bHS6REPLwiO+9uxf9Hk4jdjt+XRKV
+        Azdlgxxb27L9s50WWnoKkzZ18ZsislWgcJGyEXBD6T/ZIvnx5zNgJboKiMU0vArz7ZH01L
+        ggbcIgfEIJDCNVIMxxRRjbfsOFstCsE=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-137--N94VIjwOTGxGXgqHz-slg-1; Wed, 23 Jun 2021 08:30:40 -0400
+X-MC-Unique: -N94VIjwOTGxGXgqHz-slg-1
+Received: by mail-ed1-f71.google.com with SMTP id p19-20020aa7c4d30000b0290394bdda6d9cso1190688edr.21
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 05:30:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=40lufiefSAXJYxyzql25e+wiCU9kJZcVj8CF016XD70=;
-        b=cO2tgsR0K7Tl/qQ/UAoqY4ckep1HEyl1A2P2ajEncD9cAQI2OYGfk63X4hSMXd7TTr
-         2H6j/tS+KAoqJCATvbyUYbz8+m0VKxds7ItC8GG/2w376pRBayudkHamX/b/s5NxjL8b
-         n8tzSt44P9VOmrHUCesRu6MrCiGcRx5oXPG88zF80ZT7OwRhG326uRVLMR7iSaNZydj+
-         bHZo0mD+R6dEHtYs1pmjuh3IWjsIHxBmGiP4zC66LDZvj9gSlN0Qoo/6Ah35S/bi5XSU
-         UWlBCEwNsguPIpearl12yrDGss0TDgxhxmxKEk1U96njztsCN2He+EUVBVNYPxQ6F4fG
-         wHDg==
-X-Gm-Message-State: AOAM532BtBB+x94zfjaWOkytRFQsawUBNOkf2B8DHGQCOTICjQ7vVwlA
-        TMgaUSpwukq5NyJ/Sp8YXhnxA0jLMeqACCJp8z5jcddnnlyNfshcfuDnDDt2JjHZDSkCmvsQmzg
-        BcKE3SHNvCJk5
-X-Received: by 2002:a05:600c:b57:: with SMTP id k23mr10532630wmr.133.1624449629597;
-        Wed, 23 Jun 2021 05:00:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxNmyUviHSGAy39wspBqD/44uhbsty4Dt6H2q9/tUgrngrqOMapjcP5jZzJYKbXJOEg9kj0+A==
-X-Received: by 2002:a05:600c:b57:: with SMTP id k23mr10532600wmr.133.1624449629425;
-        Wed, 23 Jun 2021 05:00:29 -0700 (PDT)
+        bh=CNpTMCJ8h80BO/+0pCndBRwHmkrNlQnKpFd4gripH9E=;
+        b=UevOqQAX2Zd0JhQNBtepDQ+inxvGgOABgc1AavYml7Fl1YzdBOw08+M+72J7pk/+7w
+         5owlJjoj5SjA+brT88jy5qvQgqTiHdCnb0d2gdUrR0Ho0qGQ9PcR7GcqdE1BYV/B6nnH
+         LQuY9tdC5Fu70dmHUhL9v3rXv2yGz5XGAsIV1RlZB/qEQddSfmPX+LTs06YdFN/ldI6b
+         dwBukxTaJzo4EwUEKk3obLaWtbtdEQRZs3ndXADww/Y67okLO+K1aDY+DsdMcgR1tVdp
+         BJ1MXq2wOgemmLevFg14B7d2YmilyLOSKXXq0+hi6xXf12aE0mkuRymZAnZk8yJXKJdp
+         /vGg==
+X-Gm-Message-State: AOAM5315um3eQKtVOlIGGPabZmEA1qs9TwnpB2OsAvWjJ00eIoES4Giv
+        PXkOiFUI56bES26zkG2c5jZYriawoayx2Hymw09rcy0/JQ7OYGhvqpSmUPzXqo6bfgSBvAVqwPy
+        /InFBsRUX4bqz
+X-Received: by 2002:a50:8dc6:: with SMTP id s6mr12033902edh.50.1624451438886;
+        Wed, 23 Jun 2021 05:30:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxmm7zTFDcKfnLZRxH+XZo5x35PRmTvnIDFPY8FLZghKb25e1jWxAFk5KRn57K4/Snxjtkn+Q==
+X-Received: by 2002:a50:8dc6:: with SMTP id s6mr12033887edh.50.1624451438767;
+        Wed, 23 Jun 2021 05:30:38 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id o203sm5900649wmo.36.2021.06.23.05.00.28
+        by smtp.gmail.com with ESMTPSA id o14sm8403568edw.36.2021.06.23.05.30.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Jun 2021 05:00:28 -0700 (PDT)
-Subject: Re: [PATCH RFC] KVM: nSVM: Fix L1 state corruption upon return from
- SMM
-To:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
+        Wed, 23 Jun 2021 05:30:38 -0700 (PDT)
+Subject: Re: [PATCH] KVM: nVMX: Handle split-lock #AC exceptions that happen
+ in L2
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Cathy Avery <cavery@redhat.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-References: <20210623074427.152266-1-vkuznets@redhat.com>
- <a3918bfa-7b4f-c31a-448a-aa22a44d4dfd@redhat.com>
- <2eaa94bcc697fec92d994146f7c69625b6a84cd0.camel@redhat.com>
+References: <20210622172244.3561540-1-seanjc@google.com>
+ <5196d26a-abb5-7ec9-70b1-69912a45ecd7@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e4ba5286-f683-5876-1cd7-7fc83bc1638e@redhat.com>
-Date:   Wed, 23 Jun 2021 14:00:28 +0200
+Message-ID: <e0acbfa6-0f46-1c75-7453-fa604548b3c5@redhat.com>
+Date:   Wed, 23 Jun 2021 14:30:37 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <2eaa94bcc697fec92d994146f7c69625b6a84cd0.camel@redhat.com>
+In-Reply-To: <5196d26a-abb5-7ec9-70b1-69912a45ecd7@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/06/21 13:39, Maxim Levitsky wrote:
-> On Wed, 2021-06-23 at 11:39 +0200, Paolo Bonzini wrote:
->> On 23/06/21 09:44, Vitaly Kuznetsov wrote:
->>> - RFC: I'm not 100% sure my 'smart' idea to use currently-unused HSAVE area
->>> is that smart. Also, we don't even seem to check that L1 set it up upon
->>> nested VMRUN so hypervisors which don't do that may remain broken. A very
->>> much needed selftest is also missing.
+On 23/06/21 04:43, Xiaoyao Li wrote:
 >>
->> It's certainly a bit weird, but I guess it counts as smart too.  It
->> needs a few more comments, but I think it's a good solution.
->>
->> One could delay the backwards memcpy until vmexit time, but that would
->> require a new flag so it's not worth it for what is a pretty rare and
->> already expensive case.
+>> +        else if (is_alignment_check(intr_info) &&
+>> +             !vmx_guest_inject_ac(vcpu))
+>> +            return true;
 > 
-> I wonder what would happen if SMM entry is triggered by L1 (say with ICR),
-> on a VCPU which is in L2. Such exit should go straight to L1 SMM mode.
+> Why choose to check in nested_vmx_l0_wants_exit, not in 
+> nested_vmx_l1_wants_exit()?
 
-Yes, it does, but it still records the L2 state in the guest's SMM state 
-save area.  Everything works right as long as the guest stays in L2 (the 
-vmcb12 control save area is still there in svm->nested and is 
-saved/restored by KVM_GET/SET_NESTED_STATE), the problem that Vitaly 
-found is the destruction of the saved L1 host state.
+nested_vmx_l0_wants_exit() == true means "this is a vmexit that needs 
+some transformation before being injected into L1".  Instead, 
+nested_vmx_l1_wants_exit() == true means "this is an event that should 
+either be processed directly by L0, or cause a vmexit in L1"
+
+Typically, nested_vmx_l1_wants_exit() checks the controls in vmcs12, 
+while nested_vmx_l0_wants_exit() returns true unconditionally for most 
+vmexits; for others it checks processor state, or other state set up by 
+userspace with ioctls such as vcpu->guest_debug.
+
+In this case it's *L0* that wants that vmexit, in order to either 
+disable split-lock detection or inject a SIGBUS, so 
+nested_vmx_l0_wants_exit() is the right one to test.
 
 Paolo
-
-> I will very very soon, maybe even today start testing SMM with my migration
-> tests and such. I hope I will find more bugs in this area.
-> 
-> Thanks for fixing this issue!
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
 
