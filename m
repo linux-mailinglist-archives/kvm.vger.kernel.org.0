@@ -2,184 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C71D23B1C01
-	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 16:06:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCC643B1C2C
+	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 16:14:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230304AbhFWOIp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 10:08:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40448 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230182AbhFWOIo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 10:08:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624457186;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8Y+gMnSaFBvm6Fhb4k8PQvOFFp5EQ+FUuVvzgThZ0xI=;
-        b=JzkoHSyLMLgMTHk271uQRuY5lElIS0/hUsNr8GYB95kV6J+8pUfiVDE7rRjn7t/gD0rh7k
-        zIxReAjhRfT15sUGpkDfQa3BDHv/ItyQuycioikD4Pbd/Wja14/soBeLA1MmLvKFdpd7w9
-        Cq9JIoyPPfoEMMFvFYEM11njAZ+COOw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-220-8xyP_-oVPh6-YaznndGvsw-1; Wed, 23 Jun 2021 10:06:25 -0400
-X-MC-Unique: 8xyP_-oVPh6-YaznndGvsw-1
-Received: by mail-wr1-f72.google.com with SMTP id d9-20020adffbc90000b029011a3b249b10so1117253wrs.3
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 07:06:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=8Y+gMnSaFBvm6Fhb4k8PQvOFFp5EQ+FUuVvzgThZ0xI=;
-        b=X8sUDv3CV6K8RAmnoFPMcHgfmsasq7/Leb5YD1R3FLp4Y2fBJSqNvNEJ4vJDwUQ/YN
-         h4aTNaj601m7HMapFH1HonUcs2+GFuL6BgDCJeh9+hgMocA82UTFhpmHdmr0mNcDM3ZH
-         d+X/250wyB7jG4dk28/xw+7uMmBX2cnCnqYP849ToQOe6YDMB+iHgIlo+HqJdoRyW+Bo
-         6UOh8jBEUC4+QOZ209ftsorU8pZ9PkSHCcFSxglCICh8fQXbsHDQA1BrdyWVP9DlJEIT
-         j7PcYLcdvfAvmM4yK437wov/wPVAs6kV9uHBRSsH2KXX7LcePRYEq8tU3rEitnQLrweR
-         qmMg==
-X-Gm-Message-State: AOAM530b2cO7Lg/ukxUQIcOcvFkG9oasUiZ6zHsPlTEwwCu5m6IZAu4b
-        S4ncO41x7gxRPKArGGsSG4ivLkkcNjfUpih7kkt6PeGgtrQIkOsoHurhE6cyQeZBNRYLbuPzeVu
-        Q/Hb31d8SaSaL
-X-Received: by 2002:adf:fd12:: with SMTP id e18mr227816wrr.242.1624457184223;
-        Wed, 23 Jun 2021 07:06:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyGCGaIAZPfxN798nYa7lRaSSqWRq/lB0TlzsgG6OLvp8zvqc7LtxIYRstMKwbKvWHvxupn9A==
-X-Received: by 2002:adf:fd12:: with SMTP id e18mr227791wrr.242.1624457184068;
-        Wed, 23 Jun 2021 07:06:24 -0700 (PDT)
-Received: from [172.16.0.103] ([5.28.162.59])
-        by smtp.gmail.com with ESMTPSA id f19sm67972wmc.16.2021.06.23.07.06.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Jun 2021 07:06:23 -0700 (PDT)
-Message-ID: <568fceb7f01d328f880af656bc79ead3eebdfc26.camel@redhat.com>
-Subject: Re: [PATCH RFC] KVM: nSVM: Fix L1 state corruption upon return from
- SMM
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Cathy Avery <cavery@redhat.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 23 Jun 2021 17:06:21 +0300
-In-Reply-To: <01564b34-2476-2098-7ec8-47336922afda@redhat.com>
-References: <20210623074427.152266-1-vkuznets@redhat.com>
-         <a3918bfa-7b4f-c31a-448a-aa22a44d4dfd@redhat.com>
-         <53a9f893cb895f4b52e16c374cbe988607925cdf.camel@redhat.com>
-         <01564b34-2476-2098-7ec8-47336922afda@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.1 (3.40.1-1.fc34) 
+        id S230286AbhFWOQc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 10:16:32 -0400
+Received: from foss.arm.com ([217.140.110.172]:36192 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230182AbhFWOQb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Jun 2021 10:16:31 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3AB99ED1;
+        Wed, 23 Jun 2021 07:14:14 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B21C73F718;
+        Wed, 23 Jun 2021 07:14:12 -0700 (PDT)
+Subject: Re: [PATCH v4 6/9] KVM: arm64: vgic: Implement SW-driven deactivation
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Hector Martin <marcan@marcan.st>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, kernel-team@android.com
+References: <20210601104005.81332-1-maz@kernel.org>
+ <20210601104005.81332-7-maz@kernel.org>
+ <b87fb2e9-a3f9-accc-86d9-64dc2ee90dea@arm.com> <87y2b1c208.wl-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <0e490a98-dca3-cbf9-204b-da77688057d0@arm.com>
+Date:   Wed, 23 Jun 2021 15:15:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <87y2b1c208.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2021-06-23 at 15:21 +0200, Paolo Bonzini wrote:
-> On 23/06/21 15:01, Maxim Levitsky wrote:
-> > I did some homework on this now and I would like to share few my
-> > thoughts on this:
-> > 
-> > First of all my attention caught the way we intercept the #SMI
-> > (this isn't 100% related to the bug but still worth talking about
-> > IMHO)
-> > 
-> > A. Bare metal: Looks like SVM allows to intercept SMI, with
-> > SVM_EXIT_SMI,
-> >   with an intention of then entering the BIOS SMM handler manually
-> > using the SMM_CTL msr.
-> 
-> ... or just using STGI, which is what happens for KVM.  This is in
-> the 
-> manual: "The hypervisor may respond to the #VMEXIT(SMI) by executing
-> the 
-> STGI instruction, which causes the pending SMI to be taken
-> immediately".
+Hi Marc,
 
-Right, I didn't notice that, that makes sense.
-Thanks for the explanation!
+On 6/22/21 5:12 PM, Marc Zyngier wrote:
+> On Thu, 17 Jun 2021 15:58:31 +0100,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>> Hi Marc,
+>>
+>> On 6/1/21 11:40 AM, Marc Zyngier wrote:
+>>> In order to deal with these systems that do not offer HW-based
+>>> deactivation of interrupts, let implement a SW-based approach:
+>> Nitpick, but shouldn't that be "let's"?
+> "Let it be...". ;-) Yup.
+>
+>>> - When the irq is queued into a LR, treat it as a pure virtual
+>>>   interrupt and set the EOI flag in the LR.
+>>>
+>>> - When the interrupt state is read back from the LR, force a
+>>>   deactivation when the state is invalid (neither active nor
+>>>   pending)
+>>>
+>>> Interrupts requiring such treatment get the VGIC_SW_RESAMPLE flag.
+>>>
+>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>> ---
+>>>  arch/arm64/kvm/vgic/vgic-v2.c | 19 +++++++++++++++----
+>>>  arch/arm64/kvm/vgic/vgic-v3.c | 19 +++++++++++++++----
+>>>  include/kvm/arm_vgic.h        | 10 ++++++++++
+>>>  3 files changed, 40 insertions(+), 8 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
+>>> index 11934c2af2f4..2c580204f1dc 100644
+>>> --- a/arch/arm64/kvm/vgic/vgic-v2.c
+>>> +++ b/arch/arm64/kvm/vgic/vgic-v2.c
+>>> @@ -108,11 +108,22 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+>>>  		 * If this causes us to lower the level, we have to also clear
+>>>  		 * the physical active state, since we will otherwise never be
+>>>  		 * told when the interrupt becomes asserted again.
+>>> +		 *
+>>> +		 * Another case is when the interrupt requires a helping hand
+>>> +		 * on deactivation (no HW deactivation, for example).
+>>>  		 */
+>>> -		if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT)) {
+>>> -			irq->line_level = vgic_get_phys_line_level(irq);
+>>> +		if (vgic_irq_is_mapped_level(irq)) {
+>>> +			bool resample = false;
+>>> +
+>>> +			if (val & GICH_LR_PENDING_BIT) {
+>>> +				irq->line_level = vgic_get_phys_line_level(irq);
+>>> +				resample = !irq->line_level;
+>>> +			} else if (vgic_irq_needs_resampling(irq) &&
+>>> +				   !(irq->active || irq->pending_latch)) {
+>> I'm having a hard time figuring out when and why a level sensitive
+>> can have pending_latch = true.
+>>
+>> I looked kvm_vgic_inject_irq(), and that function sets pending_latch
+>> only for edge triggered interrupts (it sets line_level for level
+>> sensitive ones). But irq_is_pending() looks at **both**
+>> pending_latch and line_level for level sensitive interrupts.
+> Yes, and that's what an implementation requires.
+>
+>> The only place that I've found that sets pending_latch regardless of
+>> the  interrupt type  is in  vgic_mmio_write_spending() (called  on a
+>> trapped  write  to   GICD_ISENABLER).
+> Are you sure? It really should be GICD_ISPENDR. I'll assume that this
+> is what you mean below.
 
-> 
-> It *should* work for KVM to just not intercept SMI, but it adds more 
-> complexity for no particular gain.
+Yes, that's what I meant, sorry for the confusion.
 
-It would be nice to do so to increase testing coverage of running
-a nested KVM. I'll add a hack for that in my nested kernel.
+>
+>> vgic_v2_populate_lr()  clears
+>> pending_latch  only for  edge triggered  interrupts, so  that leaves
+>> vgic_v2_fold_lr_state()  as  the   only  function  pending_latch  is
+>> cleared for level sensitive interrupts,  when the interrupt has been
+>> handled by the guest.  Are we doing all of this  to emulate the fact
+>> that level sensitive interrupts (either purely virtual or hw mapped)
+>> made pending by a write  to GICD_ISENABLER remain pending until they
+>> are handled by the guest?
+> Yes, or cleared by a write to GICD_ICPENDR. You really need to think
+> of the input into the GIC as some sort of OR gate combining both the
+> line level and the PEND register. With a latch for edge interrupts.
+>
+> Have a look at Figure 4-10 ("Logic of the pending status of a
+> level-sensitive interrupt") in the GICv2 arch spec (ARM IHI 0048B.b)
+> to see what I actually mean.
+>
+>> If that is the case, then I think this is what the code is doing:
+>>
+>> - There's no functional change when the irqchip has HW deactivation
+>>
+>> - For level sensitive, hw mapped interrupts made pending by a write
+>> to GICD_ISENABLER and not yet handled by the guest (pending_latch ==
+>> true) we don't clear the pending state of the interrupt.
+>>
+>> - For level sensitive, hw mapped interrupts we clear the pending
+>> state in the GIC and the device will assert the interrupt again if
+>> it's still pending at the device 1level. I have a question about
+>> this. Why don't we sample the interrupt state by calling
+>> vgic_get_phys_line_level()? Because that would be slower than the
+>> alternative that you are proposing here?
+> Yes. It is *much* faster to read the timer status register (for
+> example) than going via an MMIO access to read the (re)distributor
+> that will return the same value.
 
-> 
-> >   On bare metal we do set the INTERCEPT_SMI but we emulate the exit
-> > as a nop.
-> >   I guess on bare metal there are some undocumented bits that BIOS
-> > set which
-> >   make the CPU to ignore that SMI intercept and still take the #SMI
-> > handler,
-> >   normally but I wonder if we could still break some motherboard
-> >   code due to that.
-> > 
-> > B. Nested: If #SMI is intercepted, then it causes nested VMEXIT.
-> >   Since KVM does enable SMI intercept, when it runs nested it means
-> > that all SMIs
-> >   that nested KVM gets are emulated as NOP, and L1's SMI handler is
-> > not run.
-> 
-> No, this is incorrect.  Note that svm_check_nested_events does not
-> clear 
-> smi_pending the way vmx_check_nested_events does it for nmi_pending. 
-> So 
-> the interrupt is still there and will be injected on the next STGI.
-I din't check the code, but just assumed that same issue should be
-present. Now it makes sense. I totally forgot about STGI.
-
+Thank you for the explanation, much appreciated. The patch looks to me like it's
+doing the right thing.
 
 Thanks,
-	Best regards,
-		Maxim Levitsky
 
-> 
-> Paolo
-> 
-> > 
-> > About the issue that was fixed in this patch. Let me try to
-> > understand how
-> > it would work on bare metal:
-> > 
-> > 1. A guest is entered. Host state is saved to VM_HSAVE_PA area (or
-> > stashed somewhere
-> >    in the CPU)
-> > 
-> > 2. #SMI (without intercept) happens
-> > 
-> > 3. CPU has to exit SVM, and start running the host SMI handler, it
-> > loads the SMM
-> >      state without touching the VM_HSAVE_PA runs the SMI handler,
-> > then once it RSMs,
-> >      it restores the guest state from SMM area and continues the
-> > guest
-> > 
-> > 4. Once a normal VMexit happens, the host state is restored from
-> > VM_HSAVE_PA
-> > 
-> > So host state indeed can't be saved to VMC01.
-> > 
-> > I to be honest think would prefer not to use the L1's hsave area
-> > but rather add back our
-> > 'hsave' in KVM and store there the L1 host state on the nested
-> > entry always.
-> > 
-> > This way we will avoid touching the vmcb01 at all and both solve
-> > the issue and
-> > reduce code complexity.
-> > (copying of L1 host state to what basically is L1 guest state area
-> > and back
-> > even has a comment to explain why it (was) possible to do so.
-> > (before you discovered that this doesn't work with SMM).
-> > 
-> > Thanks again for fixing this bug!
-> > 
-> > Best regards,
-> >         Maxim Levitsky
-> > 
-> 
-
+Alex
 
