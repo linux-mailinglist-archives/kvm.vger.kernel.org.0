@@ -2,119 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 18F363B14B0
-	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 09:34:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 438D63B150A
+	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 09:44:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230073AbhFWHg0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 03:36:26 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40616 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229999AbhFWHg0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 03:36:26 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15N7Y4wQ119687
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 03:34:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=CzV1JrA3FQBzrMNhrDLFkViOFhPBSEtJ7E91RAS/TPU=;
- b=GNR5U26VFS6rG1dAggExiZT1WKgksdbVfCiaQPmcvPpeAHJvAlPL1WLgxuxO5jz4cbqq
- TPOdefzSA+EXJE8ZukMf5Z/g8yTXVielN/6qFLAHQZI6+Qb4Jn6CB35KD5d8NVtmP8/B
- bKhKPaOamdG+cjbGPh3JzB41E3Dcz3v61U1t+HM6kkvEx3JjpGgyHzpbIhgIVAwLYufJ
- NBSKEsvl7eqIwFql3IfD080Ityshm/uvSS5EHttkKrFsEvrI0GuTPeyfoz1h04KNetRA
- Y5k+HjWLvAiPELr5KulGz7fd4gXPcj9iDu9+apBHreP/uGbfoJWcmE28YnR83BnOWDtN GA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39c0kqr36m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 03:34:08 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15N7Y8kf120147
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 03:34:08 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39c0kqr32s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Jun 2021 03:34:08 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15N7RKaP012679;
-        Wed, 23 Jun 2021 07:34:01 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03ams.nl.ibm.com with ESMTP id 3998789u0t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Jun 2021 07:34:01 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15N7XxFN28574106
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Jun 2021 07:33:59 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E5938A4053;
-        Wed, 23 Jun 2021 07:33:58 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8329FA4051;
-        Wed, 23 Jun 2021 07:33:58 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.77.251])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 23 Jun 2021 07:33:58 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH 3/4] lib/s390x: Fix the epsw inline
- assembly
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Laurent Vivier <lvivier@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-References: <20210622135517.234801-1-thuth@redhat.com>
- <20210622135517.234801-4-thuth@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <559e9999-3f52-5843-de28-481d90b41da5@linux.ibm.com>
-Date:   Wed, 23 Jun 2021 09:33:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S230039AbhFWHqw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 03:46:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32236 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229896AbhFWHqv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 03:46:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624434274;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=GoKBmPGWEhsMFpDL3RjinlhlKAMDjGAWJsst2nKIbvI=;
+        b=QgdDNytTAmr4SxandKajcexXNy9M2gvfhCJioJKnmSBukskny8Fq811CNfgit8DRkiraNp
+        Z8wLv5MfhCNAYKazzIA28q9ErDS6ROHDoOonnS1gss43S8m2jhJVfk0Gq12EUQusjbVGIY
+        JS6pxT10HNGGZrI/CR9uQDotz2DuuAs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-363-vUaJGREzP5G47qs9skj7rA-1; Wed, 23 Jun 2021 03:44:32 -0400
+X-MC-Unique: vUaJGREzP5G47qs9skj7rA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71F8E100C663;
+        Wed, 23 Jun 2021 07:44:31 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.193.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0221C10013D6;
+        Wed, 23 Jun 2021 07:44:28 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Cathy Avery <cavery@redhat.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH RFC] KVM: nSVM: Fix L1 state corruption upon return from SMM
+Date:   Wed, 23 Jun 2021 09:44:27 +0200
+Message-Id: <20210623074427.152266-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210622135517.234801-4-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 7jRKcPTzv5zOSV6iGJOBD9gUpl3bFP3Y
-X-Proofpoint-GUID: gOwXjG09pc1kGjQrRRUfNWiiMOCleJ_X
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-06-23_02:2021-06-22,2021-06-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
- suspectscore=0 adultscore=0 spamscore=0 phishscore=0 lowpriorityscore=0
- priorityscore=1501 malwarescore=0 impostorscore=0 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106230044
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/22/21 3:55 PM, Thomas Huth wrote:
-> According to the Principles of Operation, the epsw instruction
-> does not touch the second register if it is r0. With GCC we were
-> lucky so far that it never tried to use r0 here, but when compiling
-> the kvm-unit-tests with Clang, this indeed happens and leads to
-> very weird crashes. Thus let's make sure to never use r0 for the
-> second operand of the epsw instruction.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  lib/s390x/asm/arch_def.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index 3aa5da9..15cf7d4 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -265,7 +265,7 @@ static inline uint64_t extract_psw_mask(void)
->  
->  	asm volatile(
->  		"	epsw	%0,%1\n"
-> -		: "+r" (mask_upper), "+r" (mask_lower) : : );
-> +		: "=r" (mask_upper), "=a" (mask_lower));
->  
->  	return (uint64_t) mask_upper << 32 | mask_lower;
->  }
-> 
+VMCB split commit 4995a3685f1b ("KVM: SVM: Use a separate vmcb for the
+nested L2 guest") broke return from SMM when we entered there from guest
+(L2) mode. Gen2 WS2016/Hyper-V is known to do this on boot. The problem
+manifests itself like this:
 
-With Claudio's nits fixed:
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
+  kvm_exit:             reason EXIT_RSM rip 0x7ffbb280 info 0 0
+  kvm_emulate_insn:     0:7ffbb280: 0f aa
+  kvm_smm_transition:   vcpu 0: leaving SMM, smbase 0x7ffb3000
+  kvm_nested_vmrun:     rip: 0x000000007ffbb280 vmcb: 0x0000000008224000
+    nrip: 0xffffffffffbbe119 int_ctl: 0x01020000 event_inj: 0x00000000
+    npt: on
+  kvm_nested_intercepts: cr_read: 0000 cr_write: 0010 excp: 40060002
+    intercepts: fd44bfeb 0000217f 00000000
+  kvm_entry:            vcpu 0, rip 0xffffffffffbbe119
+  kvm_exit:             reason EXIT_NPF rip 0xffffffffffbbe119 info
+    200000006 1ab000
+  kvm_nested_vmexit:    vcpu 0 reason npf rip 0xffffffffffbbe119 info1
+    0x0000000200000006 info2 0x00000000001ab000 intr_info 0x00000000
+    error_code 0x00000000
+  kvm_page_fault:       address 1ab000 error_code 6
+  kvm_nested_vmexit_inject: reason EXIT_NPF info1 200000006 info2 1ab000
+    int_info 0 int_info_err 0
+  kvm_entry:            vcpu 0, rip 0x7ffbb280
+  kvm_exit:             reason EXIT_EXCP_GP rip 0x7ffbb280 info 0 0
+  kvm_emulate_insn:     0:7ffbb280: 0f aa
+  kvm_inj_exception:    #GP (0x0)
+
+Note: return to L2 succeeded but upon first exit to L1 its RIP points to
+'RSM' instruction but we're not in SMM.
+
+The problem appears to be that VMCB01 gets irreversibly destroyed during
+SMM execution. Previously, we used to have 'hsave' VMCB where regular
+(pre-SMM) L1's state was saved upon nested_svm_vmexit() but now we just
+switch to VMCB01 from VMCB02.
+
+Pre-split (working) flow looked like:
+- SMM is triggered during L2's execution
+- L2's state is pushed to SMRAM
+- nested_svm_vmexit() restores L1's state from 'hsave'
+- SMM -> RSM
+- enter_svm_guest_mode() switches to L2 but keeps 'hsave' intact so we have
+  pre-SMM (and pre L2 VMRUN) L1's state there
+- L2's state is restored from SMRAM
+- upon first exit L1's state is restored from L1.
+
+This was always broken with regards to svm_get_nested_state()/
+svm_set_nested_state(): 'hsave' was never a part of what's being
+save and restored so migration happening during SMM triggered from L2 would
+never restore L1's state correctly.
+
+Post-split flow (broken) looks like:
+- SMM is triggered during L2's execution
+- L2's state is pushed to SMRAM
+- nested_svm_vmexit() switches to VMCB01 from VMCB02
+- SMM -> RSM
+- enter_svm_guest_mode() switches from VMCB01 to VMCB02 but pre-SMM VMCB01
+  is already lost.
+- L2's state is restored from SMRAM
+- upon first exit L1's state is restored from VMCB01 but it is corrupted
+ (reflects the state during 'RSM' execution).
+
+VMX doesn't have this problem because unlike VMCB, VMCS keeps both guest
+and host state so when we switch back to VMCS02 L1's state is intact there.
+
+To resolve the issue we need to save L1's state somewhere. We could've
+created a third VMCB for SMM but that would require us to modify saved
+state format. L1's architectural HSAVE area (pointed by MSR_VM_HSAVE_PA)
+seems appropriate: L0 is free to save any (or none) of L1's state there.
+Currently, KVM does 'none'.
+
+Note, for nested state migration to succeed, both source and destination
+hypervisors must have the fix. We, however, don't need to create a new
+flag indicating the fact that HSAVE area is now populated as migration
+during SMM triggered from L2 was always broken.
+
+Fixes: 4995a3685f1b ("KVM: SVM: Use a separate vmcb for the nested L2 guest")
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+- RFC: I'm not 100% sure my 'smart' idea to use currently-unused HSAVE area
+is that smart. Also, we don't even seem to check that L1 set it up upon
+nested VMRUN so hypervisors which don't do that may remain broken. A very
+much needed selftest is also missing.
+---
+ arch/x86/kvm/svm/svm.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 12c06ea28f5c..d110bfe0e208 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4286,6 +4286,7 @@ static int svm_smi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+ static int svm_enter_smm(struct kvm_vcpu *vcpu, char *smstate)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
++	struct kvm_host_map map_save;
+ 	int ret;
+ 
+ 	if (is_guest_mode(vcpu)) {
+@@ -4301,6 +4302,13 @@ static int svm_enter_smm(struct kvm_vcpu *vcpu, char *smstate)
+ 		ret = nested_svm_vmexit(svm);
+ 		if (ret)
+ 			return ret;
++
++		/* Save L1 state to L1 HSAVE area as vmcb01 will be used in SMM */
++		if (kvm_vcpu_map(vcpu, gpa_to_gfn(svm->nested.hsave_msr),
++				 &map_save) == -EINVAL)
++			return 1;
++		memcpy(map_save.hva, &svm->vmcb01.ptr->save, sizeof(svm->vmcb01.ptr->save));
++		kvm_vcpu_unmap(vcpu, &map_save, true);
+ 	}
+ 	return 0;
+ }
+@@ -4308,7 +4316,7 @@ static int svm_enter_smm(struct kvm_vcpu *vcpu, char *smstate)
+ static int svm_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+-	struct kvm_host_map map;
++	struct kvm_host_map map, map_save;
+ 	int ret = 0;
+ 
+ 	if (guest_cpuid_has(vcpu, X86_FEATURE_LM)) {
+@@ -4332,6 +4340,13 @@ static int svm_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+ 
+ 			ret = enter_svm_guest_mode(vcpu, vmcb12_gpa, map.hva);
+ 			kvm_vcpu_unmap(vcpu, &map, true);
++
++			/* Restore L1 state from L1 HSAVE area as vmcb01 was used in SMM */
++			if (kvm_vcpu_map(vcpu, gpa_to_gfn(svm->nested.hsave_msr),
++					 &map_save) == -EINVAL)
++				return 1;
++			memcpy(&svm->vmcb01.ptr->save, map_save.hva, sizeof(svm->vmcb01.ptr->save));
++			kvm_vcpu_unmap(vcpu, &map_save, true);
+ 		}
+ 	}
+ 
+-- 
+2.31.1
+
