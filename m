@@ -2,94 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C4D43B1F4B
-	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 19:18:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54B113B1FD1
+	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 19:44:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229849AbhFWRU6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 13:20:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49631 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229831AbhFWRU5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 13:20:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624468719;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6avEDBgEg/m6epnbR31G0pmFV1cXbC29MU0UeyyuH4I=;
-        b=RgXTjOGxB6OPhCZsXN1OApL/GYftXYA+0vkUneX2TaDNL90accdND8LQ7bBhohAmKEmd5s
-        DI8Xabj6LBlgI812ypuUHSqCEWPb/vBtt9R8E6jgHbKO4atnYQVzmgAzIHCYFtEip8bAp9
-        QouK37B41Zbblu45BJz1Ga0L70KQbpc=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-XBGOHbNZPVuQx_Ac3fDwRQ-1; Wed, 23 Jun 2021 13:18:36 -0400
-X-MC-Unique: XBGOHbNZPVuQx_Ac3fDwRQ-1
-Received: by mail-ed1-f71.google.com with SMTP id v8-20020a0564023488b0290393873961f6so1693666edc.17
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 10:18:36 -0700 (PDT)
+        id S229831AbhFWRrP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 13:47:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47490 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229660AbhFWRrO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Jun 2021 13:47:14 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E005DC061574
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 10:44:56 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id hc16so5196377ejc.12
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 10:44:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=f9/U/jLXud2GQd2KmYWMdYMdKs/YOulP7g1Ex/feogc=;
+        b=XJae6CI6DxRHPvJ/Z/1pUqc8nOpWrPds3nttmgbGJ1zMQPTnBszxKhOqV2vbJQ2DRz
+         2gY6cYzTtNaMXcXgqBw3W5wzOmzq2G+f0pqFwhjpkG6yt5jsfFoaJi7JJ2lhE/HzDhTc
+         G4SsLgySUi+X0lkmnzCHg+Q/sNfJ3j9EgxEWma8kjfmd5z+Bo3dzwJRrIq8LIIAsRHmx
+         o1wDjdrWtz9W4KPL7EEHDd14VPmpFBB0nMtvntnIMktCXYHUnj4mMHoTNTBpzIT5q8gx
+         lEghXhsGnc45zZs/mB54ycPs7zfhGKWlzg1TpDy15kViITPvIra5ZM3sz5mt2wRaqzBR
+         00Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=6avEDBgEg/m6epnbR31G0pmFV1cXbC29MU0UeyyuH4I=;
-        b=AYvwQk8rvxQh7c211lAEWktgeKYBphhJ9KIRNjmzL2P5LRNaZ72UJd/f5Sb1KV+1f3
-         B56H4sNuJNO6ro1y0Om9lslL6brs4lj+CCbYM442e6sjZFc0XkF1PsYGR8q6abgEGwUD
-         Rym8oH4q4TnQ7MeuWv0Qk+uQWUoBa4GoFgT5uC0qhum9ODZ7hFKAvQ0l5qMVnPS0abIJ
-         RAy64lfcD9AaWhY/mRtL/Not6v42oPCryeSwgXiawet95QgW5cFpaJmGu3541zvzfzkx
-         iQj6alh83ryb9fyJxOvQTF1mInzIDbtreppXWSDLTjafQWaJjww6l32kAlktmI15ZouU
-         VXcw==
-X-Gm-Message-State: AOAM531llTYOIrk3LESs+EEa35z31UoQqaABSfxXZJC6VnqpO5RFju9Z
-        7zGNdPrNfQlYKlo06JdsnWlZssNDF5NphQwSDfqLrrN1iOTgjHfoUmf9BnpJu0O4X7GWHej6+nU
-        NOG54YM9QSkKh
-X-Received: by 2002:a17:907:6fd:: with SMTP id yh29mr1168042ejb.432.1624468715232;
-        Wed, 23 Jun 2021 10:18:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyzz2Z2ugg1KGq4OmFuDAXL2mGlkfLATWN6gvMvTiBP+rn9k965qo/kW3qBks/ZBZ+QfZ8PyQ==
-X-Received: by 2002:a17:907:6fd:: with SMTP id yh29mr1168025ejb.432.1624468715091;
-        Wed, 23 Jun 2021 10:18:35 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id n13sm380399edx.30.2021.06.23.10.18.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Jun 2021 10:18:34 -0700 (PDT)
-Subject: Re: [PATCH 20/54] KVM: x86/mmu: Add struct and helpers to retrieve
- MMU role bits from regs
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-References: <20210622175739.3610207-1-seanjc@google.com>
- <20210622175739.3610207-21-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7e1a0bb6-cd73-70c7-0b94-4a52f5b04577@redhat.com>
-Date:   Wed, 23 Jun 2021 19:18:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=f9/U/jLXud2GQd2KmYWMdYMdKs/YOulP7g1Ex/feogc=;
+        b=gBS+GqKnL7qbNsSxCe/P3cMcfPv3DHQQY2GXWL0Nc1EuhIAqYWyad8MF5GlKo6do+t
+         iYke1Wka3i6vpzX3EYFIEKSGyecU3OzS1lAFHrxyufWe5T7uCwze2T3gRrYkNPYHjy00
+         2O7p0aR/kYWzu2zOSPBAzaLs7nLtKeFftcson7IgLVUjH0CfqzPqS6oB1N1T5scztRJI
+         lmqPZK3Svbtuxi4Q7uyTij0rD6sj3IXQ+4KwciZ2iY0+daE/z9JB7Dc+a9fA3RRcix8I
+         3EM8jr/aVMk301ZLldoDkOfOt6ApWCXGpK4aM9qzch3sTtBxdKfkmuPml6aTyZViJeMZ
+         DCaA==
+X-Gm-Message-State: AOAM5335gMo6Mi/21jGfxYBXXZBI2Ncu90eKLfYE/FXN5KjPxjMGaZVE
+        HTsA1dO3vmMyPHFnWTYTq+SQhoFt43gQJCNaLeAlrw==
+X-Google-Smtp-Source: ABdhPJwhqoBgy2ZgFMmq67Pkgw9SZlPIpvoIsrlwm38yEl8+dz+nfbcgo5l9RSFaJ8G2LoL5ToOHQEkdJumCOIvmWVk=
+X-Received: by 2002:a17:906:1c84:: with SMTP id g4mr1188496ejh.99.1624470295247;
+ Wed, 23 Jun 2021 10:44:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210622175739.3610207-21-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20210510144834.658457-1-aaronlewis@google.com>
+ <20210510144834.658457-2-aaronlewis@google.com> <CALMp9eQ_42r-S-JPD-n7oXEaeMRVZdUG1UQkYJkhmHCSUkjvrw@mail.gmail.com>
+In-Reply-To: <CALMp9eQ_42r-S-JPD-n7oXEaeMRVZdUG1UQkYJkhmHCSUkjvrw@mail.gmail.com>
+From:   Aaron Lewis <aaronlewis@google.com>
+Date:   Wed, 23 Jun 2021 10:44:44 -0700
+Message-ID: <CAAAPnDEQUG0_0+UuJoybdbQOv_p+267n_3it9m64wR1Nar7cOw@mail.gmail.com>
+Subject: Re: [PATCH v6 1/2] kvm: x86: Allow userspace to handle emulation errors
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Edmondson <david.edmondson@oracle.com>,
+        Sean Christopherson <seanjc@google.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/06/21 19:57, Sean Christopherson wrote:
-> +/*
-> + * Yes, lot's of underscores.  They're a hint that you probably shouldn't be
-> + * reading from the role_regs.  Once the mmu_role is constructed, it becomes
-> + * the single source of truth for the MMU's state.
-> + */
-> +#define BUILD_MMU_ROLE_REGS_ACCESSOR(reg, name, flag)			\
-> +static inline bool ____is_##reg##_##name(struct kvm_mmu_role_regs *regs)\
-> +{									\
-> +	return !!(regs->reg & flag);					\
-> +}
+On Thu, Jun 3, 2021 at 1:35 PM Jim Mattson <jmattson@google.com> wrote:
+>
+> On Mon, May 10, 2021 at 7:48 AM Aaron Lewis <aaronlewis@google.com> wrote:
+> >
+> > Add a fallback mechanism to the in-kernel instruction emulator that
+> > allows userspace the opportunity to process an instruction the emulator
+> > was unable to.  When the in-kernel instruction emulator fails to process
+> > an instruction it will either inject a #UD into the guest or exit to
+> > userspace with exit reason KVM_INTERNAL_ERROR.  This is because it does
+> > not know how to proceed in an appropriate manner.  This feature lets
+> > userspace get involved to see if it can figure out a better path
+> > forward.
+> >
+> > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> > Reviewed-by: David Edmondson <david.edmondson@oracle.com>
+> Reviewed-by: Jim Mattson <jmattson@google.com>
 
-Ok, that's a decent reason to have these accessors in the first place. :)
+Hi Paolo,
 
-Paolo
+Does this change look okay to you?  Can I get it queued?
 
+Thanks,
+Aaron
