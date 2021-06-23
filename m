@@ -2,113 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2EDCD3B200F
-	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 20:12:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB51E3B201F
+	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 20:17:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229822AbhFWSON (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 14:14:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53480 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbhFWSOM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Jun 2021 14:14:12 -0400
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26C27C061574
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 11:11:55 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id 14so4267520oir.11
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 11:11:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=k7O/1D2MABRKTWEnJ4gsRDyfVcuNtzDzmQ12E1aStS8=;
-        b=O2lFQDP85iiyxpQsmL3RsHJsuO2o54nS0Y+LaeWF/gpizYfeoWcc7tmzg7oR9yqb2s
-         SVqEf6eJqLmPHl9bLJRA3Qzl1gC6p776tGoPb1kz+pYOtpnSTIzEaorVf+t41j3tsxi2
-         dDu4WXRGgc3Vw+hkAR2DaJUvuB5kbGLP1VDpsynVMvwr/2jignw81smHX9qCBHrI+Pjw
-         C38w/CwaYOGs1RBDjQ0PaqsH9Q4UocEBh4cscpNPXNM58p+1ttQ5g6Vn6VPuPUi7UJ+s
-         O2g/sA1An/sWmWHcQilH4YRrqfwoSOPuNRYekg1JQMNDrdb7Oza3mVuoYOG82ZvLxE2G
-         4NuQ==
+        id S229759AbhFWSTY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 14:19:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21263 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229774AbhFWSTX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 14:19:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624472224;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zsnnWPBw158ioKHOEvs2KKkgeu539ulBwP58qKPdjxw=;
+        b=ZXLaZ5Fsmga8OximBd+2rCCTqY/6vcsJ4hqegM4Fna1X3tYB1goe+zrA4OP9xhlLqahvZC
+        +x/VGFlId7tBr8dSLmlJHBZb1J3nZvRiylBh+k7bomidXRSmUzqHrZwMlGd9nalz1aKopv
+        DrG+qXJFiT3legUgmzfczbmyF8QML/0=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-59-ASxg5Cw2MX2Je7u10X8GvA-1; Wed, 23 Jun 2021 14:17:03 -0400
+X-MC-Unique: ASxg5Cw2MX2Je7u10X8GvA-1
+Received: by mail-ot1-f72.google.com with SMTP id l18-20020a9d70920000b029044977534021so1794282otj.12
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 11:17:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=k7O/1D2MABRKTWEnJ4gsRDyfVcuNtzDzmQ12E1aStS8=;
-        b=dyiKaCdmU7uXKuXoITOF6ZeAGOznrUV4WQCB8YMOiYdpvToIGmzb3BOkESHLUAviM5
-         FEk4YZ3TNqRY+2x0VOf3zvSTw7kt/P8ONOWnNpNwZ+6FRQAjbUp+wZe7aS0l/BzCtL/S
-         0MQGipH3xms4VEr9BblF8P6SSlj3y6qHEkSXzJ0O9yE8ktZ8k4aZYQ57cKrEVjUGAxFk
-         2q4BiAjpHPb7omV8eWdnjjm+U7x2IonAhylmeaQFi88wG4VPf6mjjp5tFDEXmUHryznX
-         YkRFXfQYk6N37QPplBtqmHVB8XyaCidwxs1y5jrPPGNaXmTV5S/QofZk5/ATLaNhc6d6
-         xilQ==
-X-Gm-Message-State: AOAM53003wLq0cFCiOHxX/nVRJ0UKXLAVOMJDLgz4qEXAZWISa89aDGi
-        Uk8MvSJbsifDpkycDqWVW7d1Zs+fo+u6Qsphh1xZhg==
-X-Google-Smtp-Source: ABdhPJxJCcpmCbfs9B6a7LnsucauuSHO0LXTdfFLhRhcJMlFStXC3aLC9TE5ynTw5kMX8wUvBz41Eqq5xHS39sXfi6U=
-X-Received: by 2002:a54:4586:: with SMTP id z6mr4217883oib.6.1624471914212;
- Wed, 23 Jun 2021 11:11:54 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=zsnnWPBw158ioKHOEvs2KKkgeu539ulBwP58qKPdjxw=;
+        b=uRYscjdJ5Wrzn7S9RefyJ0Z1OcPZXqhUeSwoZcD+X2hQNK+HCKng/TtzVNk8Twd/OT
+         dz5our5WeStrf396CGqiSBMPlDwflwsKMHWm0KdjZH0S4+gCphwGI2O/Rh+Mh1z9yLEU
+         ZMQzthol6mowA1BnV19j5JsA5Y7zBD2zwiEjbZo1QkAJtDUbWRCzEM+2WRg8bKugpnve
+         xOKaBOVM2uRq+Y6AqeiE1hXB2C5idRC3ROG0qIQybYCszwNfJVa19WetIXAgjdAtUDzO
+         DccJe341mQmBOrRx8+O6y7kkkEG49NgtseZ1zh8c/1HfbNV6/vRDeThv2Sj7XzzReifB
+         7MsQ==
+X-Gm-Message-State: AOAM5338biAaTS6M+0+i+2nu0cNzjQRKB7LhPk72sFWPqEiMzlWxxPQu
+        5J3W7hecWibFB++wuH+w8DYfCjU3kJ9UoSaRJlnKxG5SQ9esfG7LyDQgrggoAiAiAhwcsij4eV/
+        RlQrYW1GFN62p
+X-Received: by 2002:a54:4706:: with SMTP id k6mr888676oik.61.1624472222519;
+        Wed, 23 Jun 2021 11:17:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyL0YKbaTtBpyfI6uxPnb987mGgVkN6qd0BiEd/xyLXC74Z3rr1q+2jYxVhnQLadq7/gCiFPw==
+X-Received: by 2002:a54:4706:: with SMTP id k6mr888659oik.61.1624472222401;
+        Wed, 23 Jun 2021 11:17:02 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id e5sm102607oou.27.2021.06.23.11.17.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Jun 2021 11:17:02 -0700 (PDT)
+Date:   Wed, 23 Jun 2021 12:17:00 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Luis Chamberlain <mcgrof@kernel.org>, bhelgaas@google.com
+Cc:     cohuck@redhat.com, jgg@ziepe.ca, kevin.tian@intel.com,
+        eric.auger@redhat.com, giovanni.cabiddu@intel.com,
+        mjrosato@linux.ibm.com, jannh@google.com, kvm@vger.kernel.org,
+        linux-pci@vger.kernel.org, schnelle@linux.ibm.com,
+        minchan@kernel.org, gregkh@linuxfoundation.org, rafael@kernel.org,
+        jeyu@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, axboe@kernel.dk,
+        mbenes@suse.com, jpoimboe@redhat.com, tglx@linutronix.de,
+        keescook@chromium.org, jikos@kernel.org, rostedt@goodmis.org,
+        peterz@infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/2] vfio: export and make use of pci_dev_trylock()
+Message-ID: <20210623121700.4725e22f.alex.williamson@redhat.com>
+In-Reply-To: <20210623022824.308041-1-mcgrof@kernel.org>
+References: <20210623022824.308041-1-mcgrof@kernel.org>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20210622175739.3610207-1-seanjc@google.com> <20210622175739.3610207-8-seanjc@google.com>
- <f031b6bc-c98d-8e46-34ac-79e540674a55@redhat.com> <CALMp9eSpEJrr6mNoLcGgV8Pa2abQUkPA1uwNBMJZWexBArB3gg@mail.gmail.com>
- <6f25273e-ad80-4d99-91df-1dd0c847af39@redhat.com>
-In-Reply-To: <6f25273e-ad80-4d99-91df-1dd0c847af39@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 23 Jun 2021 11:11:43 -0700
-Message-ID: <CALMp9eTzJb0gnRzK_2MQyeO2kmrKJwyYYHE5eYEai+_LPg8HrQ@mail.gmail.com>
-Subject: Re: [PATCH 07/54] KVM: x86: Alert userspace that KVM_SET_CPUID{,2}
- after KVM_RUN is broken
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 23, 2021 at 10:11 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 23/06/21 19:00, Jim Mattson wrote:
-> > On Wed, Jun 23, 2021 at 7:16 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >>
-> >> On 22/06/21 19:56, Sean Christopherson wrote:
-> >>> +     /*
-> >>> +      * KVM does not correctly handle changing guest CPUID after KVM_RUN, as
-> >>> +      * MAXPHYADDR, GBPAGES support, AMD reserved bit behavior, etc.. aren't
-> >>> +      * tracked in kvm_mmu_page_role.  As a result, KVM may miss guest page
-> >>> +      * faults due to reusing SPs/SPTEs.  Alert userspace, but otherwise
-> >>> +      * sweep the problem under the rug.
-> >>> +      *
-> >>> +      * KVM's horrific CPUID ABI makes the problem all but impossible to
-> >>> +      * solve, as correctly handling multiple vCPU models (with respect to
-> >>> +      * paging and physical address properties) in a single VM would require
-> >>> +      * tracking all relevant CPUID information in kvm_mmu_page_role.  That
-> >>> +      * is very undesirable as it would double the memory requirements for
-> >>> +      * gfn_track (see struct kvm_mmu_page_role comments), and in practice
-> >>> +      * no sane VMM mucks with the core vCPU model on the fly.
-> >>> +      */
-> >>> +     if (vcpu->arch.last_vmentry_cpu != -1)
-> >>> +             pr_warn_ratelimited("KVM: KVM_SET_CPUID{,2} after KVM_RUN may cause guest instability\n");
-> >>
-> >> Let's make this even stronger and promise to break it in 5.16.
-> >>
-> >> Paolo
-> >
-> > Doesn't this fall squarely into kvm's philosophy of "we should let
-> > userspace shoot itself in the foot wherever possible"? I thought we
-> > only stepped in when host stability was an issue.
-> >
-> > I'm actually delighted if this is a sign that we're rethinking that
-> > philosophy. I'd just like to hear someone say it.
->
-> Nah, that's not the philosophy.  The philosophy is that covering all
-> possible ways for userspace to shoot itself in the foot is impossible.
->
-> However, here we're talking about 2 lines of code (thanks also to your
-> patches that add last_vmentry_cpu for completely unrelated reasons) to
-> remove a whole set of bullet/foot encounters.
+On Tue, 22 Jun 2021 19:28:22 -0700
+Luis Chamberlain <mcgrof@kernel.org> wrote:
 
-What about the problems that arise when we have different CPUID tables
-for different vCPUs in the same VM? Can we just replace this
-hole-in-foot inducing ioctl with a KVM_VM_SET_CPUID ioctl on the VM
-level that has to be called before any vCPUs are created?
+> This v2 series addreses the changes requested by Bjorn, namely:
+> 
+>   - moved the new forward declarations next to pci_cfg_access_lock()
+>     as requested
+>   - modify the subject patch for the first PCI patch
+
+Looks ok to me and I assume by Bjorn's Ack that he's expecting it to go
+through my tree.  I'll give a bit of time to note otherwise if that's
+not the case.  Thanks,
+
+Alex
+
+> Luis Chamberlain (2):
+>   PCI: Export pci_dev_trylock() and pci_dev_unlock()
+>   vfio: use the new pci_dev_trylock() helper to simplify try lock
+> 
+>  drivers/pci/pci.c           |  6 ++++--
+>  drivers/vfio/pci/vfio_pci.c | 11 ++++-------
+>  include/linux/pci.h         |  3 +++
+>  3 files changed, 11 insertions(+), 9 deletions(-)
+> 
+
