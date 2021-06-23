@@ -2,171 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B2E323B1B33
-	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 15:33:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E9F6B3B1B2D
+	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 15:32:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231289AbhFWNeo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 09:34:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46592 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231196AbhFWNeh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Jun 2021 09:34:37 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B28C8C06175F;
-        Wed, 23 Jun 2021 06:32:15 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id t9so1798117pgn.4;
-        Wed, 23 Jun 2021 06:32:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=to:cc:references:from:subject:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=mJH7rACNlel6eUyneHxIwMW/GXu36vjTuPNE7PBMzIg=;
-        b=l8RoFeCH7xmCkTqznyBujWUHSA5ikw7BcIAtLyePN9+xI5lFB1kAUW6FlzcSiPP2M2
-         adW06ZNYgsZKjD8oqvtcF5PTvDEykL+KG5ai6+OZroTbxOWzXYIVOO00gwCZKVIc3IhG
-         yaATYsj0Yb6n9LzS6TrH2wQeS9DnQUJFWtHLJS8PeiC1O4lQ6qAnIY8Ejo5cTrHU59Pg
-         uIkvjlWA9+IA8eMezXZ6QoWqJ56efdJ/mD3oZa2z0Dm3oucn2baKQntZdRKwXIb64F+W
-         C0sih7wy6NACN0Ic++csKFOohz7qbEqy4OmyV28WH6kNgTDGgoHI66q5pFXwQa6jCUUL
-         0WpQ==
+        id S231202AbhFWNeg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 09:34:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49569 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230449AbhFWNea (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 09:34:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624455131;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NauHAI0CHbhsa2fGusxRfVa5/FAzeCMJVSm7zm9WPEI=;
+        b=PJtkOEjmSFK/nbHjZE+SaVqIUPR0KnMjkd8idKMf7l4lKLO4xH33U606E9T1uvCpAdPNe0
+        Kt7mhFtvR83eBMqkf2xyxnexqOTd7tnw3ZRtK9cjKa4wa0OHAbTV1A5eA7DWVdIFj8zRUo
+        a5m7azRfSzxznl0R6yOcyBrXa+SQQHU=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-574-wEY7kf5mP4CC0K2oxeTRdw-1; Wed, 23 Jun 2021 09:32:10 -0400
+X-MC-Unique: wEY7kf5mP4CC0K2oxeTRdw-1
+Received: by mail-ej1-f71.google.com with SMTP id ho42-20020a1709070eaab02904a77ea3380eso992727ejc.4
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 06:32:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=mJH7rACNlel6eUyneHxIwMW/GXu36vjTuPNE7PBMzIg=;
-        b=M9SigwEC07LUu6s5BwMGUsfhxHMiWzZsFOhb/LKsAZzbGv0f9LZelgCxy1/qHCHnJA
-         pbK8JRwBLSzKeecsMFO8n0e1q4Ik5gSYn6xNBe5/QB41OfKt0YM3D45WMF6baM9UVKkG
-         GRU1oHGlBTBt3QQ6IODKbSeQalni1DA/zGQ3evHlOJOduCb/SQqbvI9k2CjLlAJLI6qv
-         HPM+VMwuI5zN0P2c1tMcKqziyMrcMfI1fVsRUQD1wouvzuCelfpXLMMYhhqNMUlXd1Rk
-         VO0bTzZnBFIpkQIP5cVH++deXMAGtlzQjM74IClXHUTaPakJJ+b0/2JaGV8O9Zn5ttrJ
-         +bmw==
-X-Gm-Message-State: AOAM532AnYDyErMTK7wyPnzKlT3BaF/Ne6ZL/yEXCqLd07BowEA0Dzgv
-        ChHi8YBcx9c9XJH+GPq+TTM=
-X-Google-Smtp-Source: ABdhPJyjGwKnGi4vn/R3jRF2XDTo7onVA3+42SoHnaXGbqyfpDV7J/q7rcYSq75qfn7tHyJcb/4eIA==
-X-Received: by 2002:a63:5d19:: with SMTP id r25mr3859541pgb.317.1624455135179;
-        Wed, 23 Jun 2021 06:32:15 -0700 (PDT)
-Received: from Likes-MacBook-Pro.local ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id y2sm24414pfa.195.2021.06.23.06.32.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Jun 2021 06:32:14 -0700 (PDT)
-To:     pbonzini@redhat.com, Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=NauHAI0CHbhsa2fGusxRfVa5/FAzeCMJVSm7zm9WPEI=;
+        b=oGwM6FcUByJwT19vL52rnLFBqIuFOw2QbfbkX6ynmvSmbLh2wE+yOle2+gVGwdQ1lu
+         JfmNVSQLx7ZBl4esk5dKO2ybKmOpLVMFBEVbmNZLPuDXfADEa92mq7sETWKsGOc78YBZ
+         JcoGWDfTRucNI6C4yrzdX9m6TRAQ26yXEyvivblu0oJpuAwQtQtsJi68f0P5HGpDpdIn
+         SkvzXBQxLKpoa9AFuCl669l6+cQiPqOixJ1POHcdCq3s30McuaPX38tbTSZaOW5EE6sD
+         KaA55Hob3+NNz2qUqb7iqLGiYb04xPV4IDToWxqc/u10w8IeGfy/EJUU0Yler71zp1jh
+         4f7A==
+X-Gm-Message-State: AOAM531QEm+ZLQA9YqINeTIPY0kqr/cZ7V4hQuYujlmA8PEbYHoXm4GS
+        +9u5n0JuFBajaxqM5EsueW/soTkH5FDcsNBrqKkr7QQICKtUeIb+x4bc/cxCEwU0KvlTnQjwrsK
+        ogRiXG4mYJXuGmq+toeSnvVujEF55KjJKcvwo6aQhBBzpOwB60sxKsPqY+304I6qO
+X-Received: by 2002:a05:6402:354d:: with SMTP id f13mr12403190edd.71.1624455129162;
+        Wed, 23 Jun 2021 06:32:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxCxfF2up/YZIVS08yHiIq6GoxMXVkJxXwH+FOJDnRGGAPn2YQd1WvYES2tGXE+a/KsBItaoQ==
+X-Received: by 2002:a05:6402:354d:: with SMTP id f13mr12403149edd.71.1624455128934;
+        Wed, 23 Jun 2021 06:32:08 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id o20sm34087eds.20.2021.06.23.06.32.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Jun 2021 06:32:08 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, wei.w.wang@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yang Weijiang <weijiang.yang@intel.com>
-References: <20210510081535.94184-1-like.xu@linux.intel.com>
- <20210622090152.GA13141@intel.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Subject: Re: [RESEND PATCH v4 00/10] KVM: x86/pmu: Guest Architectural LBR
- Enabling
-Message-ID: <1183cac7-eab9-d3ab-99bc-5f1fa0a552a8@gmail.com>
-Date:   Wed, 23 Jun 2021 21:32:06 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        Cathy Avery <cavery@redhat.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH RFC] KVM: nSVM: Fix L1 state corruption upon return from
+ SMM
+In-Reply-To: <ac98150acd77f4c09167bc1bb1c552db68925cf2.camel@redhat.com>
+References: <20210623074427.152266-1-vkuznets@redhat.com>
+ <a3918bfa-7b4f-c31a-448a-aa22a44d4dfd@redhat.com>
+ <53a9f893cb895f4b52e16c374cbe988607925cdf.camel@redhat.com>
+ <ac98150acd77f4c09167bc1bb1c552db68925cf2.camel@redhat.com>
+Date:   Wed, 23 Jun 2021 15:32:07 +0200
+Message-ID: <87pmwc4sh4.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210622090152.GA13141@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+Maxim Levitsky <mlevitsk@redhat.com> writes:
 
-It looks that we don't have perf subsystem dependency
-to enable guest Arch LBR here and it also has tests to cover it.
+> On Wed, 2021-06-23 at 16:01 +0300, Maxim Levitsky wrote:
+>> On Wed, 2021-06-23 at 11:39 +0200, Paolo Bonzini wrote:
+>> > On 23/06/21 09:44, Vitaly Kuznetsov wrote:
+>> > > - RFC: I'm not 100% sure my 'smart' idea to use currently-unused HSAVE area
+>> > > is that smart. Also, we don't even seem to check that L1 set it up upon
+>> > > nested VMRUN so hypervisors which don't do that may remain broken. A very
+>> > > much needed selftest is also missing.
+>> > 
+>> > It's certainly a bit weird, but I guess it counts as smart too.  It 
+>> > needs a few more comments, but I think it's a good solution.
+>> > 
+>> > One could delay the backwards memcpy until vmexit time, but that would 
+>> > require a new flag so it's not worth it for what is a pretty rare and 
+>> > already expensive case.
+>> > 
+>> > Paolo
+>> > 
+>> 
+>> Hi!
+>> 
+>> I did some homework on this now and I would like to share few my thoughts on this:
+>> 
+>> First of all my attention caught the way we intercept the #SMI
+>> (this isn't 100% related to the bug but still worth talking about IMHO)
+>> 
+>> A. Bare metal: Looks like SVM allows to intercept SMI, with SVM_EXIT_SMI, 
+>>  with an intention of then entering the BIOS SMM handler manually using the SMM_CTL msr.
+>>  On bare metal we do set the INTERCEPT_SMI but we emulate the exit as a nop.
+>>  I guess on bare metal there are some undocumented bits that BIOS set which
+>>  make the CPU to ignore that SMI intercept and still take the #SMI handler,
+>>  normally but I wonder if we could still break some motherboard
+>>  code due to that.
+>> 
+>> 
+>> B. Nested: If #SMI is intercepted, then it causes nested VMEXIT.
+>>  Since KVM does enable SMI intercept, when it runs nested it means that all SMIs 
+>>  that nested KVM gets are emulated as NOP, and L1's SMI handler is not run.
+>> 
+>> 
+>> About the issue that was fixed in this patch. Let me try to understand how
+>> it would work on bare metal:
+>> 
+>> 1. A guest is entered. Host state is saved to VM_HSAVE_PA area (or stashed somewhere
+>>   in the CPU)
+>> 
+>> 2. #SMI (without intercept) happens
+>> 
+>> 3. CPU has to exit SVM, and start running the host SMI handler, it loads the SMM
+>>     state without touching the VM_HSAVE_PA runs the SMI handler, then once it RSMs,
+>>     it restores the guest state from SMM area and continues the guest
+>> 
+>> 4. Once a normal VMexit happens, the host state is restored from VM_HSAVE_PA
+>> 
+>> So host state indeed can't be saved to VMC01.
+>> 
+>> I to be honest think would prefer not to use the L1's hsave area but rather add back our
+>> 'hsave' in KVM and store there the L1 host state on the nested entry always.
+>> 
+>> This way we will avoid touching the vmcb01 at all and both solve the issue and 
+>> reduce code complexity.
+>> (copying of L1 host state to what basically is L1 guest state area and back
+>> even has a comment to explain why it (was) possible to do so.
+>> (before you discovered that this doesn't work with SMM).
+>
+> I need more coffee today. The comment is somwhat wrong actually.
+> When L1 switches to L2, then its HSAVE area is L1 guest state, but
+> but L1 is a "host" vs L2, so it is host state.
+> The copying is more between kvm's register cache and the vmcb.
+>
+> So maybe backing it up as this patch does is the best solution yet.
+> I will take more in depth look at this soon.
 
-Do you have any concerns about not accepting them ?
+We can resurrect 'hsave' and keep it internally indeed but to make this
+migratable, we'd have to add it to the nested state acquired through
+svm_get_nested_state(). Using L1's HSAVE area (ponted to by
+MSR_VM_HSAVE_PA) avoids that as we have everything in L1's memory. And,
+as far as I understand, we comply with the spec as 1) L1 has to set it
+up and 2) L1 is not supposed to expect any particular format there, it's
+completely volatile.
 
-Thanks,
-Like Xu
+-- 
+Vitaly
 
-On 22/6/2021 5:01 pm, Yang Weijiang wrote:
-> 
-> Hello, maintainers,
-> 
-> I took over the work from Like and will carry it forward. Here I'd like to
-> get your valuable comments on this patch series before I post next version.
-> 
-> Thanks a lot!
-> 
->> Hi geniuses,
->>
->> A new kernel cycle has begun, and this version looks promising.
->>
->> >From the end user's point of view, the usage of Arch LBR is the same as
->> the legacy LBR we have merged in the mainline, but it is much faster.
->>
->> The Architectural Last Branch Records (LBRs) is published
->> in the 319433-040 release of Intel Architecture Instruction
->> Set Extensions and Future Features Programming Reference[0].
->>
->> The main advantages for the Arch LBR users are [1]:
->> - Faster context switching due to XSAVES support and faster reset of
->>    LBR MSRs via the new DEPTH MSR
->> - Faster LBR read for a non-PEBS event due to XSAVES support, which
->>    lowers the overhead of the NMI handler.
->> - Linux kernel can support the LBR features without knowing the model
->>    number of the current CPU.
->>
->> Please check more details in each commit and feel free to comment.
->>
->> [0] https://software.intel.com/content/www/us/en/develop/download/
->> intel-architecture-instruction-set-extensions-and-future-features-programming-reference.html
->> [1] https://lore.kernel.org/lkml/1593780569-62993-1-git-send-email-kan.liang@linux.intel.com/
->>
->> ---
->> v13->v13 RESEND Changelog:
->> - Rebase to kvm/queue tree tag: kvm-5.13-2;
->> - Includes two XSS dependency patches from kvm/intel tree;
->>
->> v3->v4 Changelog:
->> - Add one more host patch to reuse ARCH_LBR_CTL_MASK;
->> - Add reserve_lbr_buffers() instead of using GFP_ATOMIC;
->> - Fia a bug in the arch_lbr_depth_is_valid();
->> - Add LBR_CTL_EN to unify DEBUGCTLMSR_LBR and ARCH_LBR_CTL_LBREN;
->> - Add vmx->host_lbrctlmsr to save/restore host values;
->> - Add KVM_SUPPORTED_XSS to refactoring supported_xss;
->> - Clear Arch_LBR ans its XSS bit if it's not supported;
->> - Add negative testing to the related kvm-unit-tests;
->> - Refine code and commit messages;
->>
->> Previous:
->> v4: https://lore.kernel.org/kvm/20210314155225.206661-1-like.xu@linux.intel.com/
->> v3: https://lore.kernel.org/kvm/20210303135756.1546253-1-like.xu@linux.intel.com/
->>
->> Like Xu (8):
->>    perf/x86/intel: Fix the comment about guest LBR support on KVM
->>    perf/x86/lbr: Simplify the exposure check for the LBR_INFO registers
->>    KVM: vmx/pmu: Add MSR_ARCH_LBR_DEPTH emulation for Arch LBR
->>    KVM: vmx/pmu: Add MSR_ARCH_LBR_CTL emulation for Arch LBR
->>    KVM: vmx/pmu: Add Arch LBR emulation and its VMCS field
->>    KVM: x86: Expose Architectural LBR CPUID leaf
->>    KVM: x86: Refine the matching and clearing logic for supported_xss
->>    KVM: x86: Add XSAVE Support for Architectural LBRs
->>
->> Sean Christopherson (1):
->>    KVM: x86: Report XSS as an MSR to be saved if there are supported
->>      features
->>
->> Yang Weijiang (1):
->>    KVM: x86: Refresh CPUID on writes to MSR_IA32_XSS
->>
->>   arch/x86/events/intel/core.c     |   3 +-
->>   arch/x86/events/intel/lbr.c      |   6 +-
->>   arch/x86/include/asm/kvm_host.h  |   1 +
->>   arch/x86/include/asm/msr-index.h |   1 +
->>   arch/x86/include/asm/vmx.h       |   4 ++
->>   arch/x86/kvm/cpuid.c             |  46 ++++++++++++--
->>   arch/x86/kvm/vmx/capabilities.h  |  25 +++++---
->>   arch/x86/kvm/vmx/pmu_intel.c     | 103 ++++++++++++++++++++++++++++---
->>   arch/x86/kvm/vmx/vmx.c           |  50 +++++++++++++--
->>   arch/x86/kvm/vmx/vmx.h           |   4 ++
->>   arch/x86/kvm/x86.c               |  19 +++++-
->>   11 files changed, 226 insertions(+), 36 deletions(-)
->>
->> -- 
->> 2.31.1
-> 
