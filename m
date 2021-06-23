@@ -2,66 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 263DD3B195A
-	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 13:53:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD5503B1983
+	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 14:00:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230291AbhFWLzP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 07:55:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34623 "EHLO
+        id S230450AbhFWMCu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 08:02:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54085 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230239AbhFWLzO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 07:55:14 -0400
+        by vger.kernel.org with ESMTP id S230019AbhFWMCu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 08:02:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624449176;
+        s=mimecast20190719; t=1624449632;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Ti/ZapEQofSOgyCY32URs7OAEbZg1MUEdI99dbt0WZY=;
-        b=bIRsoE3XGEGrCsdKkDVkReaBcv3sLlBLdURVjPsobjeevBx7yCEl6jAZdPQG2kyFQlgRdx
-        D/3fWYJNqau2vCqPNuDAu1gl1kWCkuoh7Sbakl/ouVsqZGC6B6zLmB9MI+UNwad3HhAqkV
-        w8LzonjURA+L5qQNLu2ubTTcn1K+VAY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-284-7HWchB6-NQKCD5XlbB8cmg-1; Wed, 23 Jun 2021 07:52:55 -0400
-X-MC-Unique: 7HWchB6-NQKCD5XlbB8cmg-1
-Received: by mail-wm1-f70.google.com with SMTP id s80-20020a1ca9530000b02901cff732fde5so510045wme.6
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 04:52:55 -0700 (PDT)
+        bh=40lufiefSAXJYxyzql25e+wiCU9kJZcVj8CF016XD70=;
+        b=CEstZ7cIdGOqDR+jnolP/XRG/JXhBLjDflf7lCofp0kpQHaMDnWWthH34tcmchbvdBV0ct
+        GJl0+gObI3CuwmCiDP0LxOQZ8lsmAOI+mWDkiJj3CBZWA3Zdc6hRvOOm/ZGUvW7Rt6GMvx
+        f+zXS2rNdBJfAth/dDRE3/o+8wCG0zQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-591-txznQztfP_KLp_njZYFmnQ-1; Wed, 23 Jun 2021 08:00:30 -0400
+X-MC-Unique: txznQztfP_KLp_njZYFmnQ-1
+Received: by mail-wr1-f71.google.com with SMTP id x5-20020adff0c50000b029011a7be832b7so973620wro.18
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 05:00:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Ti/ZapEQofSOgyCY32URs7OAEbZg1MUEdI99dbt0WZY=;
-        b=tORmmuBc668rWK2H1Y/IpsSXpAZ06t0VeKJp5Dajz71QdYIa49wwvJaGOCGRghO0He
-         Co5SqCVPIkJnJOwCDXuRTf3TF3l3P3fOeoyiqQhJx0WhMvEbjIjUThXa7ApHmiICAEvc
-         RxbWj35bwjhhUp6GVPI3oiOOq5I1E3hw/tJO70faWd+viQujG6iypzz4A5Dgtg/vq1el
-         b+GrQqIm+Q8toYlgWwzdZsbs+q9KCnF+apxMgYN/8B5EuUaoghDJFUlXdnSZ4NZ9uqD4
-         MIk+i03twQCd5kCE8nD9visGyi7zMXAEfFLwlJ1mwp/StQnsc1QwZN65YzDhbvbwW9lQ
-         RqwQ==
-X-Gm-Message-State: AOAM5312463asP0wAhNasTmdDcz2umpFutc74aguEG6c0N96ESpqtHHq
-        rNc0B4L9NwpXcGMxK2k+urDGU9BYwmtMd2oHmbBQ3MJhExtCMcTiIhMyegPvdcY5dKsleuqLaNf
-        xVQ57jdQKmLW0bXgt6shOzwct9B3Rf8TrSuly7WOLQO9PJBrWuTeBs/kKHrbB8SZs
-X-Received: by 2002:a7b:c346:: with SMTP id l6mr10054526wmj.109.1624449174150;
-        Wed, 23 Jun 2021 04:52:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw4BtzXNtSWx26WDklJOd7CY3SC2PGptCaT7HfuwW2GeWN9FB5Z3V5p7d4WO2rpm1ywpGuyRg==
-X-Received: by 2002:a7b:c346:: with SMTP id l6mr10054502wmj.109.1624449173852;
-        Wed, 23 Jun 2021 04:52:53 -0700 (PDT)
+        bh=40lufiefSAXJYxyzql25e+wiCU9kJZcVj8CF016XD70=;
+        b=cO2tgsR0K7Tl/qQ/UAoqY4ckep1HEyl1A2P2ajEncD9cAQI2OYGfk63X4hSMXd7TTr
+         2H6j/tS+KAoqJCATvbyUYbz8+m0VKxds7ItC8GG/2w376pRBayudkHamX/b/s5NxjL8b
+         n8tzSt44P9VOmrHUCesRu6MrCiGcRx5oXPG88zF80ZT7OwRhG326uRVLMR7iSaNZydj+
+         bHZo0mD+R6dEHtYs1pmjuh3IWjsIHxBmGiP4zC66LDZvj9gSlN0Qoo/6Ah35S/bi5XSU
+         UWlBCEwNsguPIpearl12yrDGss0TDgxhxmxKEk1U96njztsCN2He+EUVBVNYPxQ6F4fG
+         wHDg==
+X-Gm-Message-State: AOAM532BtBB+x94zfjaWOkytRFQsawUBNOkf2B8DHGQCOTICjQ7vVwlA
+        TMgaUSpwukq5NyJ/Sp8YXhnxA0jLMeqACCJp8z5jcddnnlyNfshcfuDnDDt2JjHZDSkCmvsQmzg
+        BcKE3SHNvCJk5
+X-Received: by 2002:a05:600c:b57:: with SMTP id k23mr10532630wmr.133.1624449629597;
+        Wed, 23 Jun 2021 05:00:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxNmyUviHSGAy39wspBqD/44uhbsty4Dt6H2q9/tUgrngrqOMapjcP5jZzJYKbXJOEg9kj0+A==
+X-Received: by 2002:a05:600c:b57:: with SMTP id k23mr10532600wmr.133.1624449629425;
+        Wed, 23 Jun 2021 05:00:29 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id m8sm2729175wrz.97.2021.06.23.04.52.53
+        by smtp.gmail.com with ESMTPSA id o203sm5900649wmo.36.2021.06.23.05.00.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Jun 2021 04:52:53 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH 00/12] nSVM: NPT improvements and cleanups
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org
-References: <20210622210047.3691840-1-seanjc@google.com>
+        Wed, 23 Jun 2021 05:00:28 -0700 (PDT)
+Subject: Re: [PATCH RFC] KVM: nSVM: Fix L1 state corruption upon return from
+ SMM
+To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Cathy Avery <cavery@redhat.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        linux-kernel@vger.kernel.org
+References: <20210623074427.152266-1-vkuznets@redhat.com>
+ <a3918bfa-7b4f-c31a-448a-aa22a44d4dfd@redhat.com>
+ <2eaa94bcc697fec92d994146f7c69625b6a84cd0.camel@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1b1dc5cf-f602-1ec9-2440-229c599dd7da@redhat.com>
-Date:   Wed, 23 Jun 2021 13:52:52 +0200
+Message-ID: <e4ba5286-f683-5876-1cd7-7fc83bc1638e@redhat.com>
+Date:   Wed, 23 Jun 2021 14:00:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20210622210047.3691840-1-seanjc@google.com>
+In-Reply-To: <2eaa94bcc697fec92d994146f7c69625b6a84cd0.camel@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -69,50 +78,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/06/21 23:00, Sean Christopherson wrote:
-> The first chunk of this series (everything up to the lib/vmalloc patch)
-> are cleanups and bug fixes for existing nSVM tests that I collected on
-> my first attempt at the new NPT test.  I originally wanted to piggyback
-> the existing "v1" nSVM tests and implemented the fixes/cleanups, but that
-> approach didn't go so well because of the v1 infrastructure limitations.
+On 23/06/21 13:39, Maxim Levitsky wrote:
+> On Wed, 2021-06-23 at 11:39 +0200, Paolo Bonzini wrote:
+>> On 23/06/21 09:44, Vitaly Kuznetsov wrote:
+>>> - RFC: I'm not 100% sure my 'smart' idea to use currently-unused HSAVE area
+>>> is that smart. Also, we don't even seem to check that L1 set it up upon
+>>> nested VMRUN so hypervisors which don't do that may remain broken. A very
+>>> much needed selftest is also missing.
+>>
+>> It's certainly a bit weird, but I guess it counts as smart too.  It
+>> needs a few more comments, but I think it's a good solution.
+>>
+>> One could delay the backwards memcpy until vmexit time, but that would
+>> require a new flag so it's not worth it for what is a pretty rare and
+>> already expensive case.
 > 
-> The common lib/vmalloc changes are to allow arch code to pass arbitrary
-> data to its setup_mmu() function.  x86-64 uses the param to avoid marking
-> PTEs a USER so that tests can enable SMEP (#PF if supervisor mode fetches
-> from a USER PTE) without exploding or having to duplicate all page tables.
-> 
-> The "new" test targets nested NPT by running L1 and L2 with different
-> EFER.NX and CR4.SMEP settings to verify that KVM uses the correct MMU
-> settings when injecting page faults.
-> 
-> Sean Christopherson (12):
->    nSVM: Provide expected and actual exit codes on VMRUN test failure
->    nSVM: Replace open coded NX manipulation with appropriate macros
->    nSVM: Reset the VMCB before every v1 test
->    nSVM: Explicitly save/update/restore EFER.NX for NPT NX test
->    nSVM: Remove NPT reserved bits tests (new one on the way)
->    nSVM: Stop forcing EFER.NX=1 for all tests
->    nSVM: Remove a superfluous modification of guest EFER.NX in NPT NX
->      test
->    nSVM: Clear guest's EFER.NX in NPT NX test
->    lib/vmalloc: Let arch code pass a value to its setup_mmu() helper
->    x86: Let tests omit PT_USER_MASK when configuring virtual memory
->    x86: Add GBPAGES CPUID macro, clean up CPUID comments
->    nSVM: Add test for NPT reserved bit and #NPF error code behavior
-> 
->   lib/arm/mmu.c       |   2 +-
->   lib/s390x/mmu.c     |   3 +-
->   lib/vmalloc.c       |   9 +-
->   lib/vmalloc.h       |   4 +-
->   lib/x86/processor.h |  15 +--
->   lib/x86/vm.c        |  15 ++-
->   s390x/uv-host.c     |   2 +-
->   x86/svm.c           |  10 +-
->   x86/svm_tests.c     | 220 +++++++++++++++++++++++++++++++-------------
->   9 files changed, 196 insertions(+), 84 deletions(-)
-> 
+> I wonder what would happen if SMM entry is triggered by L1 (say with ICR),
+> on a VCPU which is in L2. Such exit should go straight to L1 SMM mode.
 
-Queued, thanks.
+Yes, it does, but it still records the L2 state in the guest's SMM state 
+save area.  Everything works right as long as the guest stays in L2 (the 
+vmcb12 control save area is still there in svm->nested and is 
+saved/restored by KVM_GET/SET_NESTED_STATE), the problem that Vitaly 
+found is the destruction of the saved L1 host state.
 
 Paolo
+
+> I will very very soon, maybe even today start testing SMM with my migration
+> tests and such. I hope I will find more bugs in this area.
+> 
+> Thanks for fixing this issue!
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
 
