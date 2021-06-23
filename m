@@ -2,87 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E0493B1673
-	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 11:06:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E6AE3B16E3
+	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 11:30:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230053AbhFWJJA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 05:09:00 -0400
-Received: from mga05.intel.com ([192.55.52.43]:29249 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229833AbhFWJJA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Jun 2021 05:09:00 -0400
-IronPort-SDR: S+IM988uVSEKBokjjz1Lqb22C910DNJNNhjRPvfat9BR5y9z1NoRzLvQHcArePcrYN/0oCazXM
- KCJ92sLiW6LQ==
-X-IronPort-AV: E=McAfee;i="6200,9189,10023"; a="292852416"
-X-IronPort-AV: E=Sophos;i="5.83,293,1616482800"; 
-   d="scan'208";a="292852416"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2021 02:06:43 -0700
-IronPort-SDR: g2eO6eKo7NA4GY19a7CouO+5j1o7GAnTSLroawrK3+rYpOJrEVfMjr60J7q5kjcIpvJfXcjBDr
- 3E4HH0+4OM1A==
-X-IronPort-AV: E=Sophos;i="5.83,293,1616482800"; 
-   d="scan'208";a="487232734"
-Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.255.30.127]) ([10.255.30.127])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2021 02:06:38 -0700
-Subject: Re: [PATCH V7 01/18] perf/core: Use static_call to optimize
- perf_guest_info_callbacks
-To:     Boris Ostrovsky <boris.ostrovsky@oracle.com>, pbonzini@redhat.com
-Cc:     Like Xu <like.xu@linux.intel.com>, Will Deacon <will@kernel.org>,
-        Marc Zyngier <maz@kernel.org>, Guo Ren <guoren@kernel.org>,
-        Nick Hu <nickhu@andestech.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-csky@vger.kernel.org, linux-riscv@lists.infradead.org,
-        xen-devel@lists.xenproject.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>, bp@alien8.de,
-        kan.liang@linux.intel.com
-References: <20210622093823.8215-1-lingshan.zhu@intel.com>
- <20210622093823.8215-2-lingshan.zhu@intel.com>
- <92fdf981-68ef-92a2-b1ae-0c5f347ae460@oracle.com>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-Message-ID: <43f6bb94-616c-f0c9-edc6-a72ea1244f59@intel.com>
-Date:   Wed, 23 Jun 2021 17:06:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        id S230175AbhFWJdB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 05:33:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39672 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230138AbhFWJc7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 05:32:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624440642;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kAxjtAMgAgnQc3g+VJW6cHqmyhoDwUFxxzEOFIhyLsg=;
+        b=eA+x8zHSbuASvyEngVxHmODSmEwpHzNsJmobHcN9H7EXyKUi/nqiFDwTH9EFRHLEt7DTP4
+        0sDrQu6soQgD6Lnt73cGBjLX+FGJCPOXMOyEtNGkF6ZHbywD50Jrd7SFDETczwGCBNhQEC
+        Wf3DyfUaj9u2dhT6YRo/o3eS/oiyics=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-219-pOP5RYI6NWGGf7tuvIJtUQ-1; Wed, 23 Jun 2021 05:30:38 -0400
+X-MC-Unique: pOP5RYI6NWGGf7tuvIJtUQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58985100CF6E;
+        Wed, 23 Jun 2021 09:30:35 +0000 (UTC)
+Received: from localhost (ovpn-113-66.ams2.redhat.com [10.36.113.66])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 884CF5D6D7;
+        Wed, 23 Jun 2021 09:30:27 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Luis Chamberlain <mcgrof@kernel.org>, bhelgaas@google.com,
+        alex.williamson@redhat.com, jgg@ziepe.ca, kevin.tian@intel.com,
+        eric.auger@redhat.com, giovanni.cabiddu@intel.com,
+        mjrosato@linux.ibm.com, jannh@google.com, kvm@vger.kernel.org,
+        linux-pci@vger.kernel.org, schnelle@linux.ibm.com
+Cc:     minchan@kernel.org, gregkh@linuxfoundation.org, rafael@kernel.org,
+        jeyu@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, mcgrof@kernel.org,
+        axboe@kernel.dk, mbenes@suse.com, jpoimboe@redhat.com,
+        tglx@linutronix.de, keescook@chromium.org, jikos@kernel.org,
+        rostedt@goodmis.org, peterz@infradead.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] PCI: Export pci_dev_trylock() and pci_dev_unlock()
+In-Reply-To: <20210623022824.308041-2-mcgrof@kernel.org>
+Organization: Red Hat GmbH
+References: <20210623022824.308041-1-mcgrof@kernel.org>
+ <20210623022824.308041-2-mcgrof@kernel.org>
+User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
+Date:   Wed, 23 Jun 2021 11:30:25 +0200
+Message-ID: <87sg19lyha.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <92fdf981-68ef-92a2-b1ae-0c5f347ae460@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thanks Boris, I will fix this in V8
+On Tue, Jun 22 2021, Luis Chamberlain <mcgrof@kernel.org> wrote:
 
-On 6/23/2021 1:31 AM, Boris Ostrovsky wrote:
+> Other places in the kernel use this form, and so just
+> provide a common path for it.
 >
-> On 6/22/21 5:38 AM, Zhu Lingshan wrote:
->
->> -static int xen_is_user_mode(void)
->> -{
->> -	const struct xen_pmu_data *xenpmu_data = get_xenpmu_data();
->> +	state |= PERF_GUEST_ACTIVE;
->>   
->> -	if (!xenpmu_data) {
->> -		pr_warn_once("%s: pmudata not initialized\n", __func__);
->> -		return 0;
->> +	if (xenpmu_data->pmu.pmu_flags & PMU_SAMPLE_PV) {
->> +		if (xenpmu_data->pmu.pmu_flags & PMU_SAMPLE_USER)
->> +			state |= PERF_GUEST_USER;
->> +	} else {
->> +		if (!!(xenpmu_data->pmu.r.regs.cpl & 3))
->> +			state |= PERF_GUEST_USER;
->
->
-> Please drop "!!", it's not needed here. And use "else if".
->
->
-> With that, for Xen bits:
->
-> Reviewed-by: Boris Ostrovsky <boris.ostrvsky@oracle.com>
->
-> -boris
->
+> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> ---
+>  drivers/pci/pci.c   | 6 ++++--
+>  include/linux/pci.h | 3 +++
+>  2 files changed, 7 insertions(+), 2 deletions(-)
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
