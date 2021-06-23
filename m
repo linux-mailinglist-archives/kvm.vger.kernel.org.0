@@ -2,142 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 24F3C3B1EB7
-	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 18:31:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BCB573B1ECB
+	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 18:38:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229882AbhFWQdy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 12:33:54 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:38514 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229660AbhFWQdx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Jun 2021 12:33:53 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1624465895;
+        id S230041AbhFWQk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 12:40:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58482 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229818AbhFWQk6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 12:40:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624466320;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vum7XhG4Y/D6N0CnClS6m9YiPMuQUmjUuLSjPUe4UiU=;
-        b=18q/s0XeWySvRpSD4BYDKY2u8rjH27TrHKNHyCwaERbA2eDl9yPULzJTIeXzLbaQmRLGZk
-        A1UqKD9EFVmq/Rx4yrsFNWA9lQRff0+LFrI4+CckZPhxIhXM+Wb2Nd2qunWK85gdr2Y3Gm
-        Ri8qKu2H2ghtfoKx2sNlarTy8J1QWVJZfOmEK2u36npqCbC+7UWmWPzqW3rPE8gtW3Tx9x
-        WbBmLcZsOR/onwmu77lsVzZgSueBq922cO3XZUJqPoEBvm/v8ZsUa5+QAL4e1R8IzZpkSG
-        4EAprE5Fuj7Z/Z8D2qrnNrM3kWbsxQyhiKQlPVk6Y3RHF4LJnHS3K6CfR5d/Uw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1624465895;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vum7XhG4Y/D6N0CnClS6m9YiPMuQUmjUuLSjPUe4UiU=;
-        b=cCSiRfYI4Pn9pQ/AytopE5opHmoRRL5BB7oRhn6jszRJQsvy4Y1D155HtVPYk9E/leEBw4
-        0p9D1eDFTEb0iRAw==
-To:     "Tian\, Kevin" <kevin.tian@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        "Dey\, Megha" <megha.dey@intel.com>,
-        "Raj\, Ashok" <ashok.raj@intel.com>,
-        "Pan\, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Jiang\, Dave" <dave.jiang@intel.com>,
-        "Liu\, Yi L" <yi.l.liu@intel.com>,
-        "Lu\, Baolu" <baolu.lu@intel.com>,
-        "Williams\, Dan J" <dan.j.williams@intel.com>,
-        "Luck\, Tony" <tony.luck@intel.com>,
-        "Kumar\, Sanjay K" <sanjay.k.kumar@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>, KVM <kvm@vger.kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Bjorn Helgaas <helgaas@kernel.org>
-Subject: RE: Virtualizing MSI-X on IMS via VFIO
-In-Reply-To: <MWHPR11MB1886811339F7873A8E34549A8C089@MWHPR11MB1886.namprd11.prod.outlook.com>
-References: <20210622131217.76b28f6f.alex.williamson@redhat.com> <87o8bxcuxv.ffs@nanos.tec.linutronix.de> <MWHPR11MB1886811339F7873A8E34549A8C089@MWHPR11MB1886.namprd11.prod.outlook.com>
-Date:   Wed, 23 Jun 2021 18:31:34 +0200
-Message-ID: <87bl7wczkp.ffs@nanos.tec.linutronix.de>
+        bh=ZzECnKDBmIvo/ujBqWPH8Hf50HLw/m8oX6rv0gXcfxQ=;
+        b=IL7I/xWhBYvZ8K4YZm4ZEgdW3jkTQCwDUNK7tqhsEhdaDxsD2uF14su78M9ucH6Ar8eISu
+        DdbJHVfwm+5sl/pt3eWOqljtlgTl2DNfAakNEO9WbbFMH7Rs8WXY0Uj/gCh462bsmjOjrx
+        xSr05b/NQQYPmPXr5u7YquWKr6uhjBE=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-590-iiB-UikPOoe9ZBa5xVDDFA-1; Wed, 23 Jun 2021 12:38:36 -0400
+X-MC-Unique: iiB-UikPOoe9ZBa5xVDDFA-1
+Received: by mail-ej1-f72.google.com with SMTP id lu1-20020a170906fac1b02904aa7372ec41so1053705ejb.23
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 09:38:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ZzECnKDBmIvo/ujBqWPH8Hf50HLw/m8oX6rv0gXcfxQ=;
+        b=oQvsGTlHAr/IByPtdlLt5eTfI+M2oC39d/CDXiLnPFE4et/RcH9UlpeSMGoh5qXp3k
+         HjcwZ64J72DQA7za5YOtQRRauuOtXl5gakoJcs8krckUFOkrUojdYluJtZIRwMyYdJuH
+         naPx5eWUn8Imb7FreMdf36PQxpgDXrhpJ468V4ukXmasdH8VYV35JeRiSCh17uz1sUep
+         qV2OYqzwUg1zG3h6Zdtn9XuC/3NrkAzS8FrOSowg+GX4nCjKMK40pMJPChTZmutiY+q6
+         C63kna1nyKVuIHBwLNF8aeoeQxlsLRGncppc+2f4NZ7aI8GzahpN0plo1ROqoGSPQyIz
+         Q04Q==
+X-Gm-Message-State: AOAM532JaZut2O6gKpBr89CUfFgMe7fOBwQzzbfOxcUvj0OcaKYkycV5
+        4BW3khJSpq2fwIFSv1Stzxh+oD4JLqY21eEkgmjV1Ma67gpgPCygc7MEAgcqxgr54KMtjRV2huB
+        JHZo1f5ORh7Fo
+X-Received: by 2002:a17:907:98c4:: with SMTP id kd4mr943066ejc.119.1624466315855;
+        Wed, 23 Jun 2021 09:38:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzdyc0GxzXAVwYD9leeHbZf3Ojn8RjxXdUDPOsa5C3q1WvM24iq/adb2MXELwzuVvE/n2m6Zw==
+X-Received: by 2002:a17:907:98c4:: with SMTP id kd4mr943052ejc.119.1624466315643;
+        Wed, 23 Jun 2021 09:38:35 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id d6sm318843edq.37.2021.06.23.09.38.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Jun 2021 09:38:34 -0700 (PDT)
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+References: <20210622175739.3610207-1-seanjc@google.com>
+ <20210622175739.3610207-10-seanjc@google.com>
+ <f2dcfe12-e562-754e-2756-1414e8e2775f@redhat.com>
+ <YNNOeIWqNoZ3j8o+@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 09/54] KVM: x86/mmu: Unconditionally zap unsync SPs when
+ creating >4k SP at GFN
+Message-ID: <f13fcf5b-f6bc-fb95-6f69-ea524ae446f5@redhat.com>
+Date:   Wed, 23 Jun 2021 18:38:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <YNNOeIWqNoZ3j8o+@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 23 2021 at 06:12, Kevin Tian wrote:
->> From: Thomas Gleixner <tglx@linutronix.de>
->> So the only downside today of allocating more MSI-X vectors than
->> necessary is memory consumption for the irq descriptors.
->
-> Curious about irte entry when IRQ remapping is enabled. Is it also
-> allocated at request_irq()?
+On 23/06/21 17:08, Sean Christopherson wrote:
+> Because the shadow page's level is incorporated into its role, if the level of
+> the new page is >4k, the branch at (1) will be taken for all 4k shadow pages.
+> 
+> Maybe something like this for a comment?
 
-Good question. No, it has to be allocated right away. We stick the
-shutdown vector into the IRTE and then request_irq() will update it with
-the real one.
+Good, integrated.
 
-> So the correct flow is like below:
->
->     guest::enable_msix()
->       trapped_by_host()
->         pci_alloc_irq_vectors(); // for all possible vMSI-X entries
->           pci_enable_msix();      
->
->     guest::unmask()
->       trapped_by_host()
->         request_irqs();
->
-> the first trap calls a new VFIO ioctl e.g. VFIO_DEVICE_ALLOC_IRQS.
->
-> the 2nd trap can reuse existing VFIO_DEVICE_SET_IRQS which just
-> does request_irq() if specified irqs have been allocated.
->
-> Then map ims to this flow:
->
->     guest::enable_msix()
->       trapped_by_host()
->         msi_domain_alloc_irqs(); // for all possible vMSI-X entries
->         for_all_allocated_irqs(i)
->           pci_update_msi_desc_id(i, default_pasid); // a new helper func
->
->     guest::unmask(entry#0) 
->       trapped_by_host()
->         request_irqs();
->           ims_array_irq_startup(); // write msi_desc.id (default_pasid) to ims entry
->
->     guest::set_msix_perm(entry#1, guest_sva_pasid)
->       trapped_by_host()
->         pci_update_msi_desc_id(1, host_sva_pasid);
->
->     guest::unmask(entry#1)
->       trapped_by_host()
->         request_irqs();
->           ims_array_irq_startup(); // write msi_desc.id (host_sva_pasid) to ims entry
+Though I also wonder why breaking out of the loop early is okay.  Initially I thought
+that zapping only matters if there's no existing page with the desired role,
+because otherwise the unsync page would have been zapped already by an earlier
+kvm_get_mmu_page, but what if the page was synced at the time of kvm_get_mmu_page
+and then both were unsynced?
 
-That's one way to do that, but that still has the same problem that the
-request_irq() in the guest succeeds even if the host side fails.
+It may be easier to just split the loop to avoid that additional confusion,
+something like:
 
-As this is really new stuff there is no real good reason to force that
-into the existing VFIO/MSIX stuff with all it's known downsides and
-limitations.
+         /*
+          * If the guest is creating an upper-level page, zap unsync pages
+          * for the same gfn, because the gfn will be write protected and
+          * future syncs of those unsync pages could happen with an incompatible
+          * context.  While it's possible the guest is using recursive page
+          * tables, in all likelihood the guest has stopped using the unsync
+          * page and is installing a completely unrelated page.
+          */
+         if (level > PG_LEVEL_4K) {
+                 for_each_valid_sp(vcpu->kvm, sp, sp_list)
+                         if (sp->gfn == gfn && sp->role.word != role.word && sp->unsync)
+                                 kvm_mmu_prepare_zap_page(vcpu->kvm, sp,
+                                                          &invalid_list);
+         }
 
-The point is, that IMS can just add another interrupt to a device on the
-fly without doing any of the PCI/MSIX nasties. So why not take advantage
-of that?
-
-I can see the point of using PCI to expose the device to the guest
-because it's trivial to enumerate, but contrary to VF devices there is
-no legacy and the mechanism how to setup the device interrupts can be
-completely different from PCI/MSIX.
-
-Exposing some trappable "IMS" storage in a separate PCI bar won't cut it
-because this still has the same problem that the allocation or
-request_irq() on the host can fail w/o feedback.
-
-So IMO creating a proper paravirt interface is the right approach.  It
-avoids _all_ of the trouble and will be necessary anyway once you want
-to support devices which store the message/pasid in system memory and
-not in on-device memory.
-
-Thanks,
-
-        tglx
-
-
-
+Paolo
 
