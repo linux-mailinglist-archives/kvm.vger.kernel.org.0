@@ -2,159 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E9F6B3B1B2D
-	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 15:32:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB0573B1BD3
+	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 15:59:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231202AbhFWNeg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 09:34:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49569 "EHLO
+        id S230520AbhFWOCN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 10:02:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24745 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230449AbhFWNea (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 09:34:30 -0400
+        by vger.kernel.org with ESMTP id S230263AbhFWOCN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 10:02:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624455131;
+        s=mimecast20190719; t=1624456795;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NauHAI0CHbhsa2fGusxRfVa5/FAzeCMJVSm7zm9WPEI=;
-        b=PJtkOEjmSFK/nbHjZE+SaVqIUPR0KnMjkd8idKMf7l4lKLO4xH33U606E9T1uvCpAdPNe0
-        Kt7mhFtvR83eBMqkf2xyxnexqOTd7tnw3ZRtK9cjKa4wa0OHAbTV1A5eA7DWVdIFj8zRUo
-        a5m7azRfSzxznl0R6yOcyBrXa+SQQHU=
+        bh=W+F5l5QW3STX3y3/WEJ/bMw23bThzj09neVyyElnu8M=;
+        b=DHUxPvCpa9YfjRomBooI3V6j2ZvBJM2vVRtBh35oHsEHsPCeAkGVlFthSxrXSZbQsGnS43
+        tw942VMVIWC1WBfDkTvhRejIM1nlLdRIcBKmYQ8ljCLWjdUSBEadYwnPkPjTanAYC6plqi
+        ZltZpPA/vw7WjX9/z+NDtG69F1SuBK4=
 Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
  [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-574-wEY7kf5mP4CC0K2oxeTRdw-1; Wed, 23 Jun 2021 09:32:10 -0400
-X-MC-Unique: wEY7kf5mP4CC0K2oxeTRdw-1
-Received: by mail-ej1-f71.google.com with SMTP id ho42-20020a1709070eaab02904a77ea3380eso992727ejc.4
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 06:32:10 -0700 (PDT)
+ us-mta-84-wcwPQeaZM267_LxB_zdZJw-1; Wed, 23 Jun 2021 09:59:53 -0400
+X-MC-Unique: wcwPQeaZM267_LxB_zdZJw-1
+Received: by mail-ej1-f71.google.com with SMTP id ho42-20020a1709070eaab02904a77ea3380eso1023993ejc.4
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 06:59:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=NauHAI0CHbhsa2fGusxRfVa5/FAzeCMJVSm7zm9WPEI=;
-        b=oGwM6FcUByJwT19vL52rnLFBqIuFOw2QbfbkX6ynmvSmbLh2wE+yOle2+gVGwdQ1lu
-         JfmNVSQLx7ZBl4esk5dKO2ybKmOpLVMFBEVbmNZLPuDXfADEa92mq7sETWKsGOc78YBZ
-         JcoGWDfTRucNI6C4yrzdX9m6TRAQ26yXEyvivblu0oJpuAwQtQtsJi68f0P5HGpDpdIn
-         SkvzXBQxLKpoa9AFuCl669l6+cQiPqOixJ1POHcdCq3s30McuaPX38tbTSZaOW5EE6sD
-         KaA55Hob3+NNz2qUqb7iqLGiYb04xPV4IDToWxqc/u10w8IeGfy/EJUU0Yler71zp1jh
-         4f7A==
-X-Gm-Message-State: AOAM531QEm+ZLQA9YqINeTIPY0kqr/cZ7V4hQuYujlmA8PEbYHoXm4GS
-        +9u5n0JuFBajaxqM5EsueW/soTkH5FDcsNBrqKkr7QQICKtUeIb+x4bc/cxCEwU0KvlTnQjwrsK
-        ogRiXG4mYJXuGmq+toeSnvVujEF55KjJKcvwo6aQhBBzpOwB60sxKsPqY+304I6qO
-X-Received: by 2002:a05:6402:354d:: with SMTP id f13mr12403190edd.71.1624455129162;
-        Wed, 23 Jun 2021 06:32:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxCxfF2up/YZIVS08yHiIq6GoxMXVkJxXwH+FOJDnRGGAPn2YQd1WvYES2tGXE+a/KsBItaoQ==
-X-Received: by 2002:a05:6402:354d:: with SMTP id f13mr12403149edd.71.1624455128934;
-        Wed, 23 Jun 2021 06:32:08 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id o20sm34087eds.20.2021.06.23.06.32.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Jun 2021 06:32:08 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=W+F5l5QW3STX3y3/WEJ/bMw23bThzj09neVyyElnu8M=;
+        b=T2PMmwSmXJ3TWAEaXM19sbmW+gSj+QlRYXeJE6lzS5B2qToizH763L1pCa7vnjSzIL
+         ezSFAXpRjBBDP6TjfnlMguZ5kvG8w4ruP+JTn/fn3d4lbG2EtoOtrxzrw4HBO9UbKqnx
+         WJhn0k17fEC1OC0+qs4aJ+8mAnp+bXRBXVOuucwtit+7qIhksZcc+JXp5wE+nQY98vL1
+         9wki8vOfo9SCt1kig7wecdHjrV87BzeFASdd5u0FGUJLPtQ6KhdG1UMKXHcFZWNZPGUe
+         CzXSZdlHXe1XYWv1CNThbD+JrSbLI3wCh45UdP43QaJQuMN99nNF+fpZE/ozgrV70pK/
+         /TFw==
+X-Gm-Message-State: AOAM532I532ascniNzHjkVy1piHTYAACTsBI6XPIIt9h7KhEytuNGp0S
+        F83fFUkfHalcLp508CLpnVzi+bXsbzKh55vud5YQ33xpiUKH0AwFNkoz1qkZR0U9YLGcqfVimSB
+        LTqaujVt4T0K2
+X-Received: by 2002:aa7:dcd9:: with SMTP id w25mr9584655edu.372.1624456792872;
+        Wed, 23 Jun 2021 06:59:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwLHabZmyqKCiK4K8pfsG0grstezdILx8RDtMnSnWBdAxMkonqBuG3peMm/7+YrUFSAudLzSw==
+X-Received: by 2002:aa7:dcd9:: with SMTP id w25mr9584628edu.372.1624456792651;
+        Wed, 23 Jun 2021 06:59:52 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id qq26sm7351945ejb.6.2021.06.23.06.59.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Jun 2021 06:59:52 -0700 (PDT)
+Subject: Re: [PATCH 03/54] KVM: x86: Properly reset MMU context at vCPU
+ RESET/INIT
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Cathy Avery <cavery@redhat.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH RFC] KVM: nSVM: Fix L1 state corruption upon return from
- SMM
-In-Reply-To: <ac98150acd77f4c09167bc1bb1c552db68925cf2.camel@redhat.com>
-References: <20210623074427.152266-1-vkuznets@redhat.com>
- <a3918bfa-7b4f-c31a-448a-aa22a44d4dfd@redhat.com>
- <53a9f893cb895f4b52e16c374cbe988607925cdf.camel@redhat.com>
- <ac98150acd77f4c09167bc1bb1c552db68925cf2.camel@redhat.com>
-Date:   Wed, 23 Jun 2021 15:32:07 +0200
-Message-ID: <87pmwc4sh4.fsf@vitty.brq.redhat.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+References: <20210622175739.3610207-1-seanjc@google.com>
+ <20210622175739.3610207-4-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2460a222-947a-6913-117c-f222f1dd0579@redhat.com>
+Date:   Wed, 23 Jun 2021 15:59:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20210622175739.3610207-4-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Maxim Levitsky <mlevitsk@redhat.com> writes:
+On 22/06/21 19:56, Sean Christopherson wrote:
+> +	/*
+> +	 * Reset the MMU context if paging was enabled prior to INIT (which is
+> +	 * implied if CR0.PG=1 as CR0 will be '0' prior to RESET).  Unlike the
+> +	 * standard CR0/CR4/EFER modification paths, only CR0.PG needs to be
+> +	 * checked because it is unconditionally cleared on INIT and all other
+> +	 * paging related bits are ignored if paging is disabled, i.e. CR0.WP,
+> +	 * CR4, and EFER changes are all irrelevant if CR0.PG was '0'.
+> +	 */
+> +	if (old_cr0 & X86_CR0_PG)
+> +		kvm_mmu_reset_context(vcpu);
 
-> On Wed, 2021-06-23 at 16:01 +0300, Maxim Levitsky wrote:
->> On Wed, 2021-06-23 at 11:39 +0200, Paolo Bonzini wrote:
->> > On 23/06/21 09:44, Vitaly Kuznetsov wrote:
->> > > - RFC: I'm not 100% sure my 'smart' idea to use currently-unused HSAVE area
->> > > is that smart. Also, we don't even seem to check that L1 set it up upon
->> > > nested VMRUN so hypervisors which don't do that may remain broken. A very
->> > > much needed selftest is also missing.
->> > 
->> > It's certainly a bit weird, but I guess it counts as smart too.  It 
->> > needs a few more comments, but I think it's a good solution.
->> > 
->> > One could delay the backwards memcpy until vmexit time, but that would 
->> > require a new flag so it's not worth it for what is a pretty rare and 
->> > already expensive case.
->> > 
->> > Paolo
->> > 
->> 
->> Hi!
->> 
->> I did some homework on this now and I would like to share few my thoughts on this:
->> 
->> First of all my attention caught the way we intercept the #SMI
->> (this isn't 100% related to the bug but still worth talking about IMHO)
->> 
->> A. Bare metal: Looks like SVM allows to intercept SMI, with SVM_EXIT_SMI, 
->>  with an intention of then entering the BIOS SMM handler manually using the SMM_CTL msr.
->>  On bare metal we do set the INTERCEPT_SMI but we emulate the exit as a nop.
->>  I guess on bare metal there are some undocumented bits that BIOS set which
->>  make the CPU to ignore that SMI intercept and still take the #SMI handler,
->>  normally but I wonder if we could still break some motherboard
->>  code due to that.
->> 
->> 
->> B. Nested: If #SMI is intercepted, then it causes nested VMEXIT.
->>  Since KVM does enable SMI intercept, when it runs nested it means that all SMIs 
->>  that nested KVM gets are emulated as NOP, and L1's SMI handler is not run.
->> 
->> 
->> About the issue that was fixed in this patch. Let me try to understand how
->> it would work on bare metal:
->> 
->> 1. A guest is entered. Host state is saved to VM_HSAVE_PA area (or stashed somewhere
->>   in the CPU)
->> 
->> 2. #SMI (without intercept) happens
->> 
->> 3. CPU has to exit SVM, and start running the host SMI handler, it loads the SMM
->>     state without touching the VM_HSAVE_PA runs the SMI handler, then once it RSMs,
->>     it restores the guest state from SMM area and continues the guest
->> 
->> 4. Once a normal VMexit happens, the host state is restored from VM_HSAVE_PA
->> 
->> So host state indeed can't be saved to VMC01.
->> 
->> I to be honest think would prefer not to use the L1's hsave area but rather add back our
->> 'hsave' in KVM and store there the L1 host state on the nested entry always.
->> 
->> This way we will avoid touching the vmcb01 at all and both solve the issue and 
->> reduce code complexity.
->> (copying of L1 host state to what basically is L1 guest state area and back
->> even has a comment to explain why it (was) possible to do so.
->> (before you discovered that this doesn't work with SMM).
->
-> I need more coffee today. The comment is somwhat wrong actually.
-> When L1 switches to L2, then its HSAVE area is L1 guest state, but
-> but L1 is a "host" vs L2, so it is host state.
-> The copying is more between kvm's register cache and the vmcb.
->
-> So maybe backing it up as this patch does is the best solution yet.
-> I will take more in depth look at this soon.
+Why not just check "if (init_event)", with a simple comment like
 
-We can resurrect 'hsave' and keep it internally indeed but to make this
-migratable, we'd have to add it to the nested state acquired through
-svm_get_nested_state(). Using L1's HSAVE area (ponted to by
-MSR_VM_HSAVE_PA) avoids that as we have everything in L1's memory. And,
-as far as I understand, we comply with the spec as 1) L1 has to set it
-up and 2) L1 is not supposed to expect any particular format there, it's
-completely volatile.
+	/*
+	 * Reset the MMU context in case paging was enabled prior to INIT (CR0
+	 * will be '0' prior to RESET).
+	 */
 
--- 
-Vitaly
+?
+
+Paolo
 
