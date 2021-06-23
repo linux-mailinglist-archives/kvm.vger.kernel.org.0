@@ -2,54 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B51033B2238
-	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 23:07:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0A9F3B2281
+	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 23:33:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229881AbhFWVJS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 17:09:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36440 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229844AbhFWVJO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Jun 2021 17:09:14 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DAE8C061756
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 14:06:55 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id s17-20020a17090a8811b029016e89654f93so4584635pjn.1
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 14:06:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=NGOtnJRM413AW/4WzGgBLLTqbXHQ1TD22dgtA07InvY=;
-        b=d+7AgKkBClG4Pi7p+1wrEXh5Vw7Ffgd5qmz+Ifmsk9unDXMJwnMadmgiOclHpqjXfQ
-         kUBsjWgXXWjEa/W2Fxm6rj+GEzi1gXYks4nUyZiLqRqd5ga3B+Ee5Xq0aR7BtQIo27jm
-         9BbQRI49JsfoAPU/5thquB7J164rNuol74IIAN5OWgvmS3U2tQdnkRC+R+3MZx9mNmVR
-         LLI/O/1MYjYQ2gsbbT7X3MJOShiAQs3OcE8/9gzwELLe8sbbTu5/vXeoOUCncYxn5Kzj
-         /Mbjkb1+zQ+iiZmr2QFRE3HciQHLuOvr7BOf/ntZp8dg83rgxas+khDXe5ereDFht2sw
-         gcCA==
+        id S229873AbhFWVfc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 17:35:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56689 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229688AbhFWVfc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 17:35:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624483994;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PFYcdOACUL59Qvc4FRYngRxPwSqQBpDBN6EEDPGjjUk=;
+        b=CYju/gXKj/EfVHb5hklqFEi4d9A0sVMTpptFzz255eUKwJMdK8HdvTaxnsFN8iACC2P7Cw
+        mDMk0+pcAM4a0L8FOn8hMybdnQ9FLcnKtO+OGkOUjN+131QJr7m7b26wvyc/WrlNnnVfF6
+        lLXnUoYe/A9FlblOQNQ9hDyWkbNGPPo=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-141-QuzoSIEsPEOaPFJ0oXR03w-1; Wed, 23 Jun 2021 17:33:12 -0400
+X-MC-Unique: QuzoSIEsPEOaPFJ0oXR03w-1
+Received: by mail-ed1-f72.google.com with SMTP id x10-20020aa7cd8a0000b0290394bdda92a8so2073185edv.8
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 14:33:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=NGOtnJRM413AW/4WzGgBLLTqbXHQ1TD22dgtA07InvY=;
-        b=H0FayexSoBldFEjKM2OFECuEQcyoaMdoJBnrzESBQ794O5vsGwdaUBA92+EBU70XJK
-         MfPExhF95qxzTcuMwV7fWUn9JQpPMT9gKJ6mDpy4HSFtSKY1wecqqXn/pxGbNJTxLk6g
-         BeDPbvhES70MwB2JN7s4CsjAQC05kfjHVxJcbkGn5GhnR/r4tIQTOH/KBpS8HAmN9c7F
-         Nu8/Sxy6zOHfrPnEkm8VtH4fJyodTGEf3m21VrlPJ9pi3lFHuSXCYrIhXgoyKuR0b39z
-         ETyWaX4pLV4+NDHvmDr2Q2IojrK+H3xxzBYFYbfXAnzaPw/dy63sDSHaFoVQdAtIumeH
-         c0uA==
-X-Gm-Message-State: AOAM532uq8LbAcficp5hEKeS04I9bqoKg56+QYT2RsujiegPwQK34Nta
-        KHCSF/F7m19GYSA84PEZFX5tCA==
-X-Google-Smtp-Source: ABdhPJxmcGvI6WF/6wJ4phX5MiTOXtD1weAlXETOb2PhcyTtcuAy620UrfS6qWp1nh89/XX4bqdPlQ==
-X-Received: by 2002:a17:902:9a01:b029:11a:d4e:8f4 with SMTP id v1-20020a1709029a01b029011a0d4e08f4mr1271615plp.52.1624482414587;
-        Wed, 23 Jun 2021 14:06:54 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id 190sm46371pgd.1.2021.06.23.14.06.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Jun 2021 14:06:54 -0700 (PDT)
-Date:   Wed, 23 Jun 2021 21:06:50 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PFYcdOACUL59Qvc4FRYngRxPwSqQBpDBN6EEDPGjjUk=;
+        b=icBVuNl6FBiI6c5TYxmfE38UWheSX3yLR2ERIkxwJMI6Um5AC31P/Yhzxfh67GIcBC
+         QWdZQwQnLJ8QHaHLCadSAo1tPeD/DZkJIyABQTCkcfKZAgLgfRdLJDwJuOtXZy9HZ10j
+         s4XMcaU0ShYhWYlxPdQk2P90h6f2FSWWTooyp7IbrD7ZO2XbjdPmDWIQH1Y4H0+NzqUM
+         WkOfIVMmaUPHwLAJtBHksPLmkoPWqRJHFvaaYWYlfpnq8nZrY5xxA+5sSeoxQkC5vs5s
+         d1N1FkH/6HffSfPaK4IbhimqWEighxV5C6OD9q9UHxteNwjfzkNnPhzt5l3k0AgP4/hP
+         rKyQ==
+X-Gm-Message-State: AOAM530WOmiIAzkozeS46UEP2fwtIkfI0vYzGAzFUOhmkuNndbiMaP7n
+        07qNLU2vpn2hF0S/kBezV9+q4HlRnapAfHWuCEjkNlMYWTrRIuNXtj3Zd2MEVv2LJu0E0vxsp0y
+        8MatXAfbX/mpC
+X-Received: by 2002:a05:6402:31a9:: with SMTP id dj9mr2459678edb.164.1624483991666;
+        Wed, 23 Jun 2021 14:33:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy7loBBFqTPbXnGVrSMX7KEDA1IKgrhU2wGwS08VkIiayRVDOaVyT3cWE10La9bhIXhoN+FnQ==
+X-Received: by 2002:a05:6402:31a9:: with SMTP id dj9mr2459667edb.164.1624483991509;
+        Wed, 23 Jun 2021 14:33:11 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id p13sm662608edh.79.2021.06.23.14.33.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Jun 2021 14:33:10 -0700 (PDT)
+Subject: Re: [PATCH 00/54] KVM: x86/mmu: Bug fixes and summer cleaning
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -57,66 +60,49 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         linux-kernel@vger.kernel.org,
         Yu Zhang <yu.c.zhang@linux.intel.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH 00/54] KVM: x86/mmu: Bug fixes and summer cleaning
-Message-ID: <YNOiar3ySxs0Z3N3@google.com>
 References: <20210622175739.3610207-1-seanjc@google.com>
  <b4efb3fd-9591-3153-5a64-19afb12edb2b@redhat.com>
+ <YNOiar3ySxs0Z3N3@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d9004cf0-d7ac-dc7d-06ad-6669fe11a21b@redhat.com>
+Date:   Wed, 23 Jun 2021 23:33:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b4efb3fd-9591-3153-5a64-19afb12edb2b@redhat.com>
+In-Reply-To: <YNOiar3ySxs0Z3N3@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 23, 2021, Paolo Bonzini wrote:
-> On 22/06/21 19:56, Sean Christopherson wrote:
-> > Patch 01 is the only patch that is remotely 5.13 worthy, and even then
-> > only because it's about as safe as a patch can be.  Everything else is far
-> > from urgent as these bugs have existed for quite some time.
-> 
-> Maybe patch 54 (not sarcastic), but I agree it's not at all necessary.
-> 
-> This is good stuff, I made a few comments but almost all of them (all except
-> the last comment on patch 9, "Unconditionally zap unsync SPs") are cosmetic
-> and I can resolve them myself.
+On 23/06/21 23:06, Sean Christopherson wrote:
+>>
+>> This is good stuff, I made a few comments but almost all of them (all except
+>> the last comment on patch 9, "Unconditionally zap unsync SPs") are cosmetic
+>> and I can resolve them myself.
+> The 0-day bot also reported some warnings.  vcpu_to_role_regs() needs to be
+> static, the helpers are added without a user.  I liked the idea of adding the
+> helpers in one patch, but I can't really defend adding them without a user. :-/
 
-The 0-day bot also reported some warnings.  vcpu_to_role_regs() needs to be
-static, the helpers are added without a user.  I liked the idea of adding the
-helpers in one patch, but I can't really defend adding them without a user. :-/
+Yep, I noticed them too.
 
-   arch/x86/kvm/mmu/mmu.c:209:26: warning: no previous prototype for function 'vcpu_to_role_regs' [-Wmissing-prototypes]
-   struct kvm_mmu_role_regs vcpu_to_role_regs(struct kvm_vcpu *vcpu)
-                            ^
-   arch/x86/kvm/mmu/mmu.c:209:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-   struct kvm_mmu_role_regs vcpu_to_role_regs(struct kvm_vcpu *vcpu)
-   ^
-   static
-   arch/x86/kvm/mmu/mmu.c:199:1: warning: unused function '____is_cr0_wp' [-Wunused-function]
-   BUILD_MMU_ROLE_REGS_ACCESSOR(cr0, wp, X86_CR0_WP);
+We can just mark them static inline, which is a good idea anyway and 
+enough to shut up the compiler (clang might behave different in this 
+respect for .h and .c files, but again it's just a warning and not a 
+bisection breakage).
 
-> 
-> I'd like your input on renaming is_{cr0,cr4,efer}_* to is_mmu_* (and
-> possibly reduce the four underscores to two...).
-> 
-> If I get remarks by tomorrow, I'll get this into 5.14, otherwise consider
-> everything but the first eight patches queued only for 5.15.
-> 
-> > I labeled the "sections" of this mess in the shortlog below.
-> > 
-> > P.S. Does anyone know how PKRU interacts with NPT?  I assume/hope NPT
-> >       accesses, which are always "user", ignore PKRU, but the APM doesn't
-> >       say a thing.  If PKRU is ignored, KVM has some fixing to do.  If PKRU
-> >       isn't ignored, AMD has some fixing to do:-)
-> > 
-> > P.S.S. This series pulled in one patch from my vCPU RESET/INIT series,
-> >         "Properly reset MMU context at vCPU RESET/INIT", as that was needed
-> >         to fix a root_level bug on VMX.  My goal is to get the RESET/INIT
-> >         series refreshed later this week and thoroughly bombard everyone.
-> 
-> Note that it won't get into 5.14 anyway, since I plan to send my first pull
-> request to Linus as soon as Friday.
+Paolo
 
-Good to know.  I'll still try to get it out tomorrow as I'll be on vacation
-for a few weeks starting Friday, and I'm afraid I'll completely forget what's in
-the series :-)
+>     arch/x86/kvm/mmu/mmu.c:209:26: warning: no previous prototype for function 'vcpu_to_role_regs' [-Wmissing-prototypes]
+>     struct kvm_mmu_role_regs vcpu_to_role_regs(struct kvm_vcpu *vcpu)
+>                              ^
+>     arch/x86/kvm/mmu/mmu.c:209:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+>     struct kvm_mmu_role_regs vcpu_to_role_regs(struct kvm_vcpu *vcpu)
+>     ^
+>     static
+>     arch/x86/kvm/mmu/mmu.c:199:1: warning: unused function '____is_cr0_wp' [-Wunused-function]
+>     BUILD_MMU_ROLE_REGS_ACCESSOR(cr0, wp, X86_CR0_WP);
+> 
+
