@@ -2,120 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A76803B1FDD
-	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 19:51:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D3A13B1FFA
+	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 20:03:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229826AbhFWRxT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 13:53:19 -0400
-Received: from mga03.intel.com ([134.134.136.65]:4750 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229660AbhFWRxT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Jun 2021 13:53:19 -0400
-IronPort-SDR: 64YC395H+5wg85FOBN0TnevsXlk9+a2FiXIfogaTTuvu8REwhR+TaFcfK721JywNxdt7VvV34R
- 2qJcVZuxqPxA==
-X-IronPort-AV: E=McAfee;i="6200,9189,10024"; a="207357772"
-X-IronPort-AV: E=Sophos;i="5.83,294,1616482800"; 
-   d="scan'208";a="207357772"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2021 10:51:00 -0700
-IronPort-SDR: 34pEdGAnHf/ASv1bGqQhp0YqQXE+yVL2/C0acUcuiCniCTsBsk+KU4s4yqHh7h2qHmwkNVU47L
- /4Q50Un6DXYg==
-X-IronPort-AV: E=Sophos;i="5.83,294,1616482800"; 
-   d="scan'208";a="487410616"
-Received: from eagelaga-mobl.amr.corp.intel.com (HELO [10.209.43.81]) ([10.209.43.81])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2021 10:50:58 -0700
-Subject: Re: [PATCH RFC 2/7] kvm: x86: Introduce XFD MSRs as passthrough to
- guest
-To:     Sean Christopherson <seanjc@google.com>,
-        Jing Liu <jing2.liu@linux.intel.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jing2.liu@intel.com
-References: <20210207154256.52850-1-jing2.liu@linux.intel.com>
- <20210207154256.52850-3-jing2.liu@linux.intel.com>
- <YKwd5OTXr97Fxfok@google.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
- oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
- 2UnKuZuSBu7lgOE193+7Uks3416N2hTkyKUSNkduyoZ9F5twiBhxPJwPtn/wnch6n5RsoXsb
- ygOEDxLEsSk/7eyFycjE+btUtAWZtx+HseyaGfqkZK0Z9bT1lsaHecmB203xShwCPT49Blxz
- VOab8668QpaEOdLGhtvrVYVK7x4skyT3nGWcgDCl5/Vp3TWA4K+IofwvXzX2ON/Mj7aQwf5W
- iC+3nWC7q0uxKwwsddJ0Nu+dpA/UORQWa1NiAftEoSpk5+nUUi0WE+5DRm0H+TXKBWMGNCFn
- c6+EKg5zQaa8KqymHcOrSXNPmzJuXvDQ8uj2J8XuzCZfK4uy1+YdIr0yyEMI7mdh4KX50LO1
- pmowEqDh7dLShTOif/7UtQYrzYq9cPnjU2ZW4qd5Qz2joSGTG9eCXLz5PRe5SqHxv6ljk8mb
- ApNuY7bOXO/A7T2j5RwXIlcmssqIjBcxsRRoIbpCwWWGjkYjzYCjgsNFL6rt4OL11OUF37wL
- QcTl7fbCGv53KfKPdYD5hcbguLKi/aCccJK18ZwNjFhqr4MliQARAQABzShEYXZpZCBDaHJp
- c3RvcGhlciBIYW5zZW4gPGRhdmVAc3I3MS5uZXQ+wsF7BBMBAgAlAhsDBgsJCAcDAgYVCAIJ
- CgsEFgIDAQIeAQIXgAUCTo3k0QIZAQAKCRBoNZUwcMmSsMO2D/421Xg8pimb9mPzM5N7khT0
- 2MCnaGssU1T59YPE25kYdx2HntwdO0JA27Wn9xx5zYijOe6B21ufrvsyv42auCO85+oFJWfE
- K2R/IpLle09GDx5tcEmMAHX6KSxpHmGuJmUPibHVbfep2aCh9lKaDqQR07gXXWK5/yU1Dx0r
- VVFRaHTasp9fZ9AmY4K9/BSA3VkQ8v3OrxNty3OdsrmTTzO91YszpdbjjEFZK53zXy6tUD2d
- e1i0kBBS6NLAAsqEtneplz88T/v7MpLmpY30N9gQU3QyRC50jJ7LU9RazMjUQY1WohVsR56d
- ORqFxS8ChhyJs7BI34vQusYHDTp6PnZHUppb9WIzjeWlC7Jc8lSBDlEWodmqQQgp5+6AfhTD
- kDv1a+W5+ncq+Uo63WHRiCPuyt4di4/0zo28RVcjtzlGBZtmz2EIC3vUfmoZbO/Gn6EKbYAn
- rzz3iU/JWV8DwQ+sZSGu0HmvYMt6t5SmqWQo/hyHtA7uF5Wxtu1lCgolSQw4t49ZuOyOnQi5
- f8R3nE7lpVCSF1TT+h8kMvFPv3VG7KunyjHr3sEptYxQs4VRxqeirSuyBv1TyxT+LdTm6j4a
- mulOWf+YtFRAgIYyyN5YOepDEBv4LUM8Tz98lZiNMlFyRMNrsLV6Pv6SxhrMxbT6TNVS5D+6
- UorTLotDZKp5+M7BTQRUY85qARAAsgMW71BIXRgxjYNCYQ3Xs8k3TfAvQRbHccky50h99TUY
- sqdULbsb3KhmY29raw1bgmyM0a4DGS1YKN7qazCDsdQlxIJp9t2YYdBKXVRzPCCsfWe1dK/q
- 66UVhRPP8EGZ4CmFYuPTxqGY+dGRInxCeap/xzbKdvmPm01Iw3YFjAE4PQ4hTMr/H76KoDbD
- cq62U50oKC83ca/PRRh2QqEqACvIH4BR7jueAZSPEDnzwxvVgzyeuhwqHY05QRK/wsKuhq7s
- UuYtmN92Fasbxbw2tbVLZfoidklikvZAmotg0dwcFTjSRGEg0Gr3p/xBzJWNavFZZ95Rj7Et
- db0lCt0HDSY5q4GMR+SrFbH+jzUY/ZqfGdZCBqo0cdPPp58krVgtIGR+ja2Mkva6ah94/oQN
- lnCOw3udS+Eb/aRcM6detZr7XOngvxsWolBrhwTQFT9D2NH6ryAuvKd6yyAFt3/e7r+HHtkU
- kOy27D7IpjngqP+b4EumELI/NxPgIqT69PQmo9IZaI/oRaKorYnDaZrMXViqDrFdD37XELwQ
- gmLoSm2VfbOYY7fap/AhPOgOYOSqg3/Nxcapv71yoBzRRxOc4FxmZ65mn+q3rEM27yRztBW9
- AnCKIc66T2i92HqXCw6AgoBJRjBkI3QnEkPgohQkZdAb8o9WGVKpfmZKbYBo4pEAEQEAAcLB
- XwQYAQIACQUCVGPOagIbDAAKCRBoNZUwcMmSsJeCEACCh7P/aaOLKWQxcnw47p4phIVR6pVL
- e4IEdR7Jf7ZL00s3vKSNT+nRqdl1ugJx9Ymsp8kXKMk9GSfmZpuMQB9c6io1qZc6nW/3TtvK
- pNGz7KPPtaDzvKA4S5tfrWPnDr7n15AU5vsIZvgMjU42gkbemkjJwP0B1RkifIK60yQqAAlT
- YZ14P0dIPdIPIlfEPiAWcg5BtLQU4Wg3cNQdpWrCJ1E3m/RIlXy/2Y3YOVVohfSy+4kvvYU3
- lXUdPb04UPw4VWwjcVZPg7cgR7Izion61bGHqVqURgSALt2yvHl7cr68NYoFkzbNsGsye9ft
- M9ozM23JSgMkRylPSXTeh5JIK9pz2+etco3AfLCKtaRVysjvpysukmWMTrx8QnI5Nn5MOlJj
- 1Ov4/50JY9pXzgIDVSrgy6LYSMc4vKZ3QfCY7ipLRORyalFDF3j5AGCMRENJjHPD6O7bl3Xo
- 4DzMID+8eucbXxKiNEbs21IqBZbbKdY1GkcEGTE7AnkA3Y6YB7I/j9mQ3hCgm5muJuhM/2Fr
- OPsw5tV/LmQ5GXH0JQ/TZXWygyRFyyI2FqNTx4WHqUn3yFj8rwTAU1tluRUYyeLy0ayUlKBH
- ybj0N71vWO936MqP6haFERzuPAIpxj2ezwu0xb1GjTk4ynna6h5GjnKgdfOWoRtoWndMZxbA
- z5cecg==
-Message-ID: <d6e7328d-335f-b244-48d7-4ffe8b04fb05@intel.com>
-Date:   Wed, 23 Jun 2021 10:50:56 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S229726AbhFWSGJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 14:06:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51706 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229523AbhFWSGJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Jun 2021 14:06:09 -0400
+Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 840F3C061574
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 11:03:51 -0700 (PDT)
+Received: by mail-ot1-x32b.google.com with SMTP id w23-20020a9d5a970000b02903d0ef989477so2808444oth.9
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 11:03:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ID4YxNs3xN3x+8LywFzdmj0UktQ90FUDosmq+5vRnZg=;
+        b=Z4I7dR3Epkl8D+3m2daYH8xBRXBye6C2eiqERp3ozT2NT66IB6OEYAiiBox9SPtdGX
+         WW6euVurh5nUW0esCn4eTZjwLwbUFEmKx2xmIQQs/OtVvL5SzAYYk/e5wc9E28PE89ZS
+         DIR8lNXYE5rXpddmiCqCLFJeAqhSj2J+rkRH86oeKYXGk0j9chtqURs7154BAbYDVub4
+         5CF025BNnCNUqtY3haDTE0EDAFYrIWe2RQIx0/waA6u0BXTe23bed27rTtNOTIwxJmIX
+         bl57el2tfLa1o3njokVh+wx5L4HSLjPhzPpdnJY1qpGL6GTTJc0s6S0BmE8q0V6nvq2w
+         fFZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ID4YxNs3xN3x+8LywFzdmj0UktQ90FUDosmq+5vRnZg=;
+        b=sBqFUA/AHe+h2dgUQ1Ds2Z5Ud/1N0EMP1ED9H8hyxOA3bQH9aG/a+CJDXzleOBEa6S
+         eOv7whU+RzXbct1OCdspDcNvi5LrdaV+P0NHzX+i4+G1MlY9sQON1XTp9A1QwCrqePXn
+         Js/aLZU3qNacshjK462ABLB/Cj9VGLJdBL3zOfVFWnKKviio4U+Yeg5B/vx1lkq0Wuuh
+         l4kdIBr0KSduUPBPIDqbKICmGlQi/oqQ4rmM3RtorJ+QGKg/+RGHu77Sg9MILh1BQdFq
+         /0wBrfn3ngiJHQ0Ioqi1Z1dL8mvYfIyAtdZaWxpOX2yYQ1d+cTJBvJ/x8THB6kELGiGw
+         Ro5g==
+X-Gm-Message-State: AOAM532m4T/RIEd0Mk4dJnI02WaKEMJ2onBBzrw1qgDITKlrA4i4ofLY
+        bGC2SVfS5ub1clgZjxjEcu3E3c+4BqvDMPaMPG60WA==
+X-Google-Smtp-Source: ABdhPJxQLLEgrnmknnF8EVFw8E0MWMzyT9d728esAcvYEZ3n7jXuR/S5XRUckZHuCzZvrYIgn3W0/Pygl0fwwwENudA=
+X-Received: by 2002:a9d:550e:: with SMTP id l14mr1037619oth.241.1624471430417;
+ Wed, 23 Jun 2021 11:03:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <YKwd5OTXr97Fxfok@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20210510081535.94184-1-like.xu@linux.intel.com> <20210510081535.94184-4-like.xu@linux.intel.com>
+In-Reply-To: <20210510081535.94184-4-like.xu@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 23 Jun 2021 11:03:39 -0700
+Message-ID: <CALMp9eT-KL-xDgV9p31NgnbW2tnwPes7r6GhJbMedim5e9Ab4g@mail.gmail.com>
+Subject: Re: [RESEND PATCH v4 03/10] KVM: vmx/pmu: Add MSR_ARCH_LBR_DEPTH
+ emulation for Arch LBR
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        Wei Wang <wei.w.wang@intel.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/24/21 2:43 PM, Sean Christopherson wrote:
-> On Sun, Feb 07, 2021, Jing Liu wrote:
->> Passthrough both MSRs to let guest access and write without vmexit.
-> Why?  Except for read-only MSRs, e.g. MSR_CORE_C1_RES, passthrough MSRs are
-> costly to support because KVM must context switch the MSR (which, by the by, is
-> completely missing from the patch).
-> 
-> In other words, if these MSRs are full RW passthrough, guests with XFD enabled
-> will need to load the guest value on entry, save the guest value on exit, and
-> load the host value on exit.  That's in the neighborhood of a 40% increase in
-> latency for a single VM-Enter/VM-Exit roundtrip (~1500 cycles => >2000 cycles).
+On Mon, May 10, 2021 at 1:16 AM Like Xu <like.xu@linux.intel.com> wrote:
+>
+> The number of Arch LBR entries available for recording operations
+> is dictated by the value in MSR_ARCH_LBR_DEPTH.DEPTH. The supported
+> LBR depth values can be found in CPUID.(EAX=01CH, ECX=0):EAX[7:0]
+> and for each bit "n" set in this field, the MSR_ARCH_LBR_DEPTH.DEPTH
+> value of "8*(n+1)" is supported.
+>
+> On a guest write to MSR_ARCH_LBR_DEPTH, all LBR entries are reset to 0.
+> KVM emulates the reset behavior by introducing lbr_desc->arch_lbr_reset.
+> KVM writes the guest requested value to the native ARCH_LBR_DEPTH MSR
+> (this is safe because the two values will be the same) when the Arch LBR
+> records MSRs are pass-through to the guest.
+>
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> ---
+>  arch/x86/kvm/vmx/pmu_intel.c | 43 ++++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/vmx/vmx.h       |  3 +++
+>  2 files changed, 46 insertions(+)
+>
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index 9efc1a6b8693..d9c9cb6c9a4b 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -220,6 +220,9 @@ static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+>         case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
+>                 ret = pmu->version > 1;
+>                 break;
+> +       case MSR_ARCH_LBR_DEPTH:
+> +               ret = guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR);
+> +               break;
 
-I'm not taking a position as to whether these _should_ be passthrough or
-not.  But, if they are, I don't think you strictly need to do the
-RDMSR/WRMSR at VM-Exit time.
+This doesn't seem like a very safe test, since userspace can provide
+whatever CPUID tables it likes. You should definitely think about
+hardening this code against a malicious userspace.
 
-Just like the "FPU", XFD isn't be used in normal kernel code.  This is
-why we can be lazy about FPU state with TIF_NEED_FPU_LOAD.  I _suspect_
-that some XFD manipulation can be at least deferred to the same place
-where the FPU state is manipulated: places like switch_fpu_return() or
-kernel_fpu_begin().
-
-Doing that would at least help the fast VM-Exit/VM-Enter paths that
-really like TIF_NEED_FPU_LOAD today.
-
-I guess the nasty part is that you actually need to stash the old XFD
-MSR value in the vcpu structure and that's not available at
-context-switch time.  So, maybe this would only allow deferring the
-WRMSR.  That's better than nothing I guess.
+When you add a new guest MSR, it should be enumerated by
+KVM_GET_MSR_INDEX_LIST. Otherwise, userspace will not save/restore the
+MSR value on suspend/resume.
