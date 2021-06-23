@@ -2,522 +2,268 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 40EA53B23CB
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 01:06:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02C403B23F6
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 01:37:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229864AbhFWXIl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 19:08:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34754 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230064AbhFWXIe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Jun 2021 19:08:34 -0400
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 662EFC061574
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 16:06:15 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id z5-20020ac86c450000b029024e9a87714dso4321850qtu.2
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 16:06:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=l9aUZrrzGLgepJinEz3O0tk6pl4pmaaVEKJ+sq+iUN0=;
-        b=pmsPDc5hXdnA6yKgqqTSnoOMXjRgXzeAos39T6ctNGKcHpWPf7Alees6O7nfCeQsNW
-         /dHyXaMxgREaFX2ycxlV8Dq3JyBW3bmjee6bjX1aMtJ+FN13ou5ju56cx7xOQXbl8Aj4
-         +/qWvBC3UdJe8AgSqH5Ag9gYkiWxiVL5sSO++/YTtv7duDUwn7tnV3H62jZc3v1bH/Md
-         UNuIPU876HO90Bt9c9vBJdtAk439UEgm1cwx5ma6J+NL60QVfdc4k6R4BG5QpPCQRtVs
-         A464WPCkdNCCL4IuDZDpXO0H1TXIyUffBWgH0YJT6yM10Ywyl4fxXEcUv+C/O/68OwqI
-         OA0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=l9aUZrrzGLgepJinEz3O0tk6pl4pmaaVEKJ+sq+iUN0=;
-        b=HJufIOgnu4zZvxg+TWpZ5Saw1HzxVXYO4ibr2K8c/KjnMx5nFhY4JJs2hJoqMZeau7
-         9irOfhAuhRoGIV4XCboxmI/GAH7oQFGM7abQwIgjCUgzbDvITHqRm4MeUNWI1/xIr31T
-         fcD12cECRUphYCys6R2uhl6SLyUUesf3qEuYyPzySIqR390WxsugOE+Tttr7XwUzbpXQ
-         ODky1TBPZ9CLCr0xh3mmaCMoOh5B2TXO6gQeQcLGn60JfpLf8Lz39bvRnjZJ4QywxCe4
-         nVvqge07CMrub0sstUkjFv9bonoyLgi22GFf3sCbhF8V886K7NllkoJGs6n0/7RSj1bT
-         NqkQ==
-X-Gm-Message-State: AOAM530DjFtl3r/9ExDxaKsqodhH1y0HI9i6jIjBBSP4T2UX9NKZK0JJ
-        RMo1f9BFFIZJG2YCLB6Y8UD3+tG90kg=
-X-Google-Smtp-Source: ABdhPJxpoyVkWTGtRZmaBZHSEw7M2IBz0+/aAH7SHg6Z4kChqFyLVaKo9txpCm+74+Sb/tCcuYn9/qpiyAs=
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:e9e:5b86:b4f2:e3c9])
- (user=seanjc job=sendgmr) by 2002:a25:bd84:: with SMTP id f4mr741765ybh.143.1624489574547;
- Wed, 23 Jun 2021 16:06:14 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 23 Jun 2021 16:05:52 -0700
-In-Reply-To: <20210623230552.4027702-1-seanjc@google.com>
-Message-Id: <20210623230552.4027702-8-seanjc@google.com>
-Mime-Version: 1.0
-References: <20210623230552.4027702-1-seanjc@google.com>
-X-Mailer: git-send-email 2.32.0.288.g62a8d224e6-goog
-Subject: [PATCH 7/7] KVM: x86/mmu: Use separate namespaces for guest PTEs and
- shadow PTEs
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Peter Gonda <pgonda@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S229796AbhFWXj1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 19:39:27 -0400
+Received: from mga03.intel.com ([134.134.136.65]:30535 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229726AbhFWXj0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Jun 2021 19:39:26 -0400
+IronPort-SDR: V0mOCDFtLxEs38O64qwjZVbekz35tKTlXyKUS3HsgG4jMdQ3Ke735epucuITED1+9y++R5FnYK
+ POSLdFwRKy6w==
+X-IronPort-AV: E=McAfee;i="6200,9189,10024"; a="207404008"
+X-IronPort-AV: E=Sophos;i="5.83,295,1616482800"; 
+   d="scan'208";a="207404008"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2021 16:37:08 -0700
+IronPort-SDR: 4OebLzyy/qxQiFP8wFKUkTFgyV4VvPfjEXeQ+r3Ik6LDBDELkPvNFoNaJN6UIgpIVgHz8adgCC
+ KlNpIntx9GTA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.83,295,1616482800"; 
+   d="scan'208";a="406466179"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga006.jf.intel.com with ESMTP; 23 Jun 2021 16:37:07 -0700
+Received: from orsmsx606.amr.corp.intel.com (10.22.229.19) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.4; Wed, 23 Jun 2021 16:37:07 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4
+ via Frontend Transport; Wed, 23 Jun 2021 16:37:07 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.176)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2242.4; Wed, 23 Jun 2021 16:37:07 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XOGEnPa1kSuu2U9Z2wSW+cJJmOm8fWKENJ1BgTYMFj9+UhhDfIw7a6FCEUliGVJHycWXb+edALGp2uIzpwma7Sy6joHJCETxJbqctckOSo3ASkhJjLU2xbDzawsR78W8a9Vyb/UjDps0kruqya815TONvMsS0sQbvuDALYt3isS/h9GPf7NTZZjbX00VWm8YHwvhFiPxazuVicLFIO0T5vJlABV7WGk6p863V1O9LxgGQzxp5XZ159WAarwiHVUuJmMnm81gCpUwg76GD84bO0NOccOMBnnorKy1d+uUWbQQPhwFoimhyVW08ei2hTplLkcpgGN1XJvLEICbqZvbJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ikzHZEuhTlqOWebinQqP/K7ohbbQ1CORBGdCy5esD5Y=;
+ b=ADJcoBKcFCYcOvdu3Q4dHLeupAgvY9O9/jQ2WEK5sXM6lNbUVWc63XBx1b0a3pq2o12SGqtIALyBGnkkq/8xJcEoYO5ckAWifmgcTkWoTRZPyyHFX8tCRkqHNrpqL6dloLv6H/2t4suSdBq1bk728KqcgRu0oWjjzA79NxVanCanPvdbWsrx+yhI1A3r0hRP66oY6IyOqiaaDT5nb5R6hHuxjyPeNr4MA4tE/MaPaQfkyMTEH8uEStSWz595vtWkQjfE8bbqpprUN3l1diMu44+3C39MdUg33Y8e4vAeAVYpVgDc3VLt5bw8Ch6birxiB29HYIrEUr4qD3KAF5YLDg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ikzHZEuhTlqOWebinQqP/K7ohbbQ1CORBGdCy5esD5Y=;
+ b=v5GoGmaBEa6qwVSAUmlxqe5YJPyMPieMykaYQugenGyKzuF2Xv96pKWuhh+5iPqXLEvqd9Gl31ylaX1//KbBv+evlz+Gllh7etcuiNpwnaJbwa68awarPbjoyWpHnUI0HOF8VPWhIwYqdhLitLg3eg7S+WN8LqJzBUawq7kxbUU=
+Received: from MWHPR11MB1886.namprd11.prod.outlook.com (2603:10b6:300:110::9)
+ by MW3PR11MB4715.namprd11.prod.outlook.com (2603:10b6:303:57::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.18; Wed, 23 Jun
+ 2021 23:37:03 +0000
+Received: from MWHPR11MB1886.namprd11.prod.outlook.com
+ ([fe80::6597:eb05:c507:c6c1]) by MWHPR11MB1886.namprd11.prod.outlook.com
+ ([fe80::6597:eb05:c507:c6c1%12]) with mapi id 15.20.4242.024; Wed, 23 Jun
+ 2021 23:37:03 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Alex Williamson <alex.williamson@redhat.com>
+CC:     Jason Gunthorpe <jgg@nvidia.com>,
+        "Dey, Megha" <megha.dey@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>, KVM <kvm@vger.kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "Peter Zijlstra" <peterz@infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        "Bjorn Helgaas" <helgaas@kernel.org>
+Subject: RE: Virtualizing MSI-X on IMS via VFIO
+Thread-Topic: Virtualizing MSI-X on IMS via VFIO
+Thread-Index: AddnMs7+4GfLhTceT8q8tdV8716lmQAZ7UiAAAoHBgAACsXtAAAX4LwAAA2wIPA=
+Date:   Wed, 23 Jun 2021 23:37:03 +0000
+Message-ID: <MWHPR11MB1886BB017C6C53A8061DDEE28C089@MWHPR11MB1886.namprd11.prod.outlook.com>
+References: <20210622131217.76b28f6f.alex.williamson@redhat.com>
+ <87o8bxcuxv.ffs@nanos.tec.linutronix.de>
+ <MWHPR11MB1886811339F7873A8E34549A8C089@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <87bl7wczkp.ffs@nanos.tec.linutronix.de>
+In-Reply-To: <87bl7wczkp.ffs@nanos.tec.linutronix.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: linutronix.de; dkim=none (message not signed)
+ header.d=none;linutronix.de; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [192.198.142.21]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 77b388e5-8dbe-4f89-3935-08d9369fce52
+x-ms-traffictypediagnostic: MW3PR11MB4715:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr,ExtFwd
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MW3PR11MB47158D7C243CB311A2D13AA78C089@MW3PR11MB4715.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: /+/DR/Y+xChXnXu+NirIlKDywIS+/Y7I2M7bJpdLPG9HuSyoxyheNQHHXjsTTjRQ9aiwCK5j7kMc7Y9DEmPM4Ghvo67oeeNOpMvtyDgGO5ZSs3RRX0kmPDQ/chBfgFcIc/77OYeCfMWZjLOKczweeOy28aq6CzvSrb87PciC/o/QK2+U4NgoyeBqD7FVUbqp8FpYYHA6MSHhL83ZSetsDa3dkaFLNwA9SBODQm/DBNHT2kLJuRH65T7uCux/7cHibDeMJl61WTgDapiqsAIzvFV9dz9s4OuVKwztGONTkxbA7FNw5DR0Gc2Vx+neyqL3o17aTnzjl17SAW6PPVkgFVLUYTkbLz0se31bggv8y/O9Jy7V6ntwezSmJNcLjEN3oyTHDgSwJDxdcMLIzrx8UJjouc3ux2nNiaI9xXVlYtSL/2jOzvTw4pNgd1vv392Fhgpb7kKcO2Y3ip9FrywjjVAI33UU/CDFESIc1D4jwb48V9y9taxtzVRUyVzBg94Tw2QBZQ4RTv8gpdruI3PrDLkSuPEe/5rsdvNrKEUNZ8SmDLVljwReJdYxZPGzg/ABDYIWZVqgucTdk894pmIgs5B/Lo+dX+EwAe134TV5zJU=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1886.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(136003)(396003)(376002)(39860400002)(366004)(6506007)(83380400001)(26005)(7696005)(7416002)(55016002)(33656002)(478600001)(122000001)(4326008)(38100700002)(9686003)(186003)(8676002)(2906002)(76116006)(71200400001)(5660300002)(66556008)(64756008)(66946007)(66446008)(66476007)(52536014)(8936002)(110136005)(54906003)(316002)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?74Vlam4pPM4wyo9ldcH40+KhQX9z9KZ/W0hgslW7w2UBwMgIcYi91jlYuxr1?=
+ =?us-ascii?Q?7PDptfwztg89CJFYMKZCP4/oQoSf2XBaMieR7O/oyv7jI6GpQ3d0ZYF1ZvGi?=
+ =?us-ascii?Q?JrwqGLQ2V8QcSbwLg0Rbxs95Tj7lVX0v0gnxUCWrP2MBD89FpAeM/2fCV5Oh?=
+ =?us-ascii?Q?BpdosmqwJUYwvuT3dHu5/algc8TwFaO3a3m8z+sC1GI0o0GU2vb/cVWm3y74?=
+ =?us-ascii?Q?QOp6jtOl230ZoY5SM+0X7Z1q14Yjt7DH+gIOsIFqXs6dBNBGDddql2Z4hWa+?=
+ =?us-ascii?Q?U0FCNii8H32hjAZVzvtDG4/gp0+HliK5PrY3hXdLQgkOLUl8qCEx60fdUyCT?=
+ =?us-ascii?Q?o8c5sD8p8J+IQvEh3qiPV8CvIv2GCv0dcga/ce1FKc6akSIXEq9KTKphGxIe?=
+ =?us-ascii?Q?g6AeCI7bSc23GARBuvm2zCOg0MmenjIc8HN8GBwudTfaKf/KXbOJZ+btzEJS?=
+ =?us-ascii?Q?YWSOcKDNZ3YSKcoA2ugpC0IVipjjlCiLRGYxrV/7lBsMDLBdcJG0WdUYtcK5?=
+ =?us-ascii?Q?/N6Anp/mztP9SqrhXOPhiZAaH8T4IE8aNgpYnTAiNDjwGScvS87/Fo7CYmZ2?=
+ =?us-ascii?Q?dQkVBaXKY3zUE0hdaqSRSfzFoLgvxlJJYm54qD2sTIM5ir+2x/5Nwiw3PUUA?=
+ =?us-ascii?Q?enHMErxT16XASoviJPoogH14fdYgBcgiNRAJ0mvbNu7lg0GYluhAZ+zOTDTp?=
+ =?us-ascii?Q?+MGq1hXXrjvpFqe29EsEi8tA4z8fW7gd9NmMRjZCHGq7CASg9kkk6ZRVZO8u?=
+ =?us-ascii?Q?FP4pVjI9TsUip8E9UIoB1B5O/vZXQnsNHkTzdXaKkDNQ/yCBGpjROYTywCFF?=
+ =?us-ascii?Q?5R2JRPCRq/nYP4n7U3j7d1ALxPamtzef0vJvA3c6h4pdFcie9me+1Db8gwz3?=
+ =?us-ascii?Q?YNyc5UTBnKoLkjKgS9fUNRNBZUosQGZ2du/HaVVNTp+Ab4Pwkw0KH9j4Vchd?=
+ =?us-ascii?Q?xBKHmWdysvU+PwavCUN/Tn0Duu4rO6IxPyX+Y4Em3Za7La5r/cEEEmlBwlfq?=
+ =?us-ascii?Q?m60Bn27wjrd1WPLjNxvObDIjOQh4Z9adf8hkhWKMPDJi77FG3A90nX7NwUIh?=
+ =?us-ascii?Q?yNVqb6wAtMP01V+74d5+Ie+fmFo7CXlvUvDeEFi26v4/eDiY3XbbkYXeT1Y8?=
+ =?us-ascii?Q?XV4MEWyes/85ItwVjUWh6XJCuHZutl+8Kv3tgBxgZilSX3DwWJGRk0JaNab5?=
+ =?us-ascii?Q?8knoL2P5z8RRUI3lylJATKiE+LFhXf4BQBvTnFN40hJY3+pUSFQvGUud1Hmw?=
+ =?us-ascii?Q?MS01TmBTb387YXNO3RImOP9qoY4kpNDnNJ2jJUTuh9twDA8Mce7exTAaW1Kp?=
+ =?us-ascii?Q?jxtBkNNrLqecmDf7QRZJ5KfZ?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1886.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 77b388e5-8dbe-4f89-3935-08d9369fce52
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jun 2021 23:37:03.6881
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zm8VN3MjhxZDfX+VsZqLSByqaQ8akmmtv1XEUsuSGHLyvKbhnwBKXQGDVG/lp0f3Z4r/YXZgAqp8TFYBWfvdFw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4715
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Separate the macros for KVM's shadow PTEs (SPTE) from guest 64-bit PTEs
-(PT64).  SPTE and PT64 are _mostly_ the same, but the few differences are
-quite critical, e.g. *_BASE_ADDR_MASK must differentiate between host and
-guest physical address spaces, and SPTE_PERM_MASK (was PT64_PERM_MASK) is
-very much specific to SPTEs.
+> From: Thomas Gleixner <tglx@linutronix.de>
+> Sent: Thursday, June 24, 2021 12:32 AM
+>=20
+> On Wed, Jun 23 2021 at 06:12, Kevin Tian wrote:
+> >> From: Thomas Gleixner <tglx@linutronix.de>
+> >> So the only downside today of allocating more MSI-X vectors than
+> >> necessary is memory consumption for the irq descriptors.
+> >
+> > Curious about irte entry when IRQ remapping is enabled. Is it also
+> > allocated at request_irq()?
+>=20
+> Good question. No, it has to be allocated right away. We stick the
+> shutdown vector into the IRTE and then request_irq() will update it with
+> the real one.
 
-Add helper macros to deduplicate the 32-bit vs. 64-bit code, and to avoid
-additional duplication for SPTEs.
+There are max 64K irte entries per Intel VT-d. Do we consider it as
+a limited resource in this new model, though it's much more than
+CPU vectors?
 
-Opportunistically move most guest macros into paging_tmpl.h to clearly
-associate them with shadow paging, and to make it more difficult to
-unintentionally use a guest macro in the MMU.  Sadly, PT32_LEVEL_BITS is
-left behind in mmu.h because it's need for the quadrant calculation in
-kvm_mmu_get_page(), which is hot enough that adding a per-context helper
-is undesirable, and burying the computation in paging_tmpl.h with a
-forward declaration isn't exactly an improvement.
+>=20
+> > So the correct flow is like below:
+> >
+> >     guest::enable_msix()
+> >       trapped_by_host()
+> >         pci_alloc_irq_vectors(); // for all possible vMSI-X entries
+> >           pci_enable_msix();
+> >
+> >     guest::unmask()
+> >       trapped_by_host()
+> >         request_irqs();
+> >
+> > the first trap calls a new VFIO ioctl e.g. VFIO_DEVICE_ALLOC_IRQS.
+> >
+> > the 2nd trap can reuse existing VFIO_DEVICE_SET_IRQS which just
+> > does request_irq() if specified irqs have been allocated.
+> >
+> > Then map ims to this flow:
+> >
+> >     guest::enable_msix()
+> >       trapped_by_host()
+> >         msi_domain_alloc_irqs(); // for all possible vMSI-X entries
+> >         for_all_allocated_irqs(i)
+> >           pci_update_msi_desc_id(i, default_pasid); // a new helper fun=
+c
+> >
+> >     guest::unmask(entry#0)
+> >       trapped_by_host()
+> >         request_irqs();
+> >           ims_array_irq_startup(); // write msi_desc.id (default_pasid)=
+ to ims
+> entry
+> >
+> >     guest::set_msix_perm(entry#1, guest_sva_pasid)
+> >       trapped_by_host()
+> >         pci_update_msi_desc_id(1, host_sva_pasid);
+> >
+> >     guest::unmask(entry#1)
+> >       trapped_by_host()
+> >         request_irqs();
+> >           ims_array_irq_startup(); // write msi_desc.id (host_sva_pasid=
+) to ims
+> entry
+>=20
+> That's one way to do that, but that still has the same problem that the
+> request_irq() in the guest succeeds even if the host side fails.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu.h              |  8 ++----
- arch/x86/kvm/mmu/mmu.c          | 50 ++++++++++-----------------------
- arch/x86/kvm/mmu/mmu_audit.c    |  6 ++--
- arch/x86/kvm/mmu/mmu_internal.h | 14 +++++++++
- arch/x86/kvm/mmu/paging_tmpl.h  | 35 +++++++++++++++++------
- arch/x86/kvm/mmu/spte.c         |  2 +-
- arch/x86/kvm/mmu/spte.h         | 28 ++++++++----------
- arch/x86/kvm/mmu/tdp_iter.c     |  6 ++--
- arch/x86/kvm/mmu/tdp_mmu.c      |  2 +-
- 9 files changed, 79 insertions(+), 72 deletions(-)
+yes
 
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 2b9d08b080cc..0199c8c2222d 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -6,11 +6,6 @@
- #include "kvm_cache_regs.h"
- #include "cpuid.h"
- 
--#define PT64_PT_BITS 9
--#define PT64_ENT_PER_PAGE (1 << PT64_PT_BITS)
--#define PT32_PT_BITS 10
--#define PT32_ENT_PER_PAGE (1 << PT32_PT_BITS)
--
- #define PT_WRITABLE_SHIFT 1
- #define PT_USER_SHIFT 2
- 
-@@ -34,6 +29,9 @@
- #define PT_DIR_PAT_SHIFT 12
- #define PT_DIR_PAT_MASK (1ULL << PT_DIR_PAT_SHIFT)
- 
-+/* The number of bits for 32-bit PTEs is to compute the quandrant. :-( */
-+#define PT32_LEVEL_BITS 10
-+
- #define PT64_ROOT_5LEVEL 5
- #define PT64_ROOT_4LEVEL 4
- #define PT32_ROOT_LEVEL 2
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index ef92717bff86..cc93649f41cb 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -113,26 +113,6 @@ module_param(dbg, bool, 0644);
- 
- #define PTE_PREFETCH_NUM		8
- 
--#define PT32_LEVEL_BITS 10
--
--#define PT32_LEVEL_SHIFT(level) \
--		(PAGE_SHIFT + (level - 1) * PT32_LEVEL_BITS)
--
--#define PT32_LVL_OFFSET_MASK(level) \
--	(PT32_BASE_ADDR_MASK & ((1ULL << (PAGE_SHIFT + (((level) - 1) \
--						* PT32_LEVEL_BITS))) - 1))
--
--#define PT32_INDEX(address, level)\
--	(((address) >> PT32_LEVEL_SHIFT(level)) & ((1 << PT32_LEVEL_BITS) - 1))
--
--
--#define PT32_BASE_ADDR_MASK PAGE_MASK
--#define PT32_DIR_BASE_ADDR_MASK \
--	(PAGE_MASK & ~((1ULL << (PAGE_SHIFT + PT32_LEVEL_BITS)) - 1))
--#define PT32_LVL_ADDR_MASK(level) \
--	(PAGE_MASK & ~((1ULL << (PAGE_SHIFT + (((level) - 1) \
--					    * PT32_LEVEL_BITS))) - 1))
--
- #include <trace/events/kvm.h>
- 
- /* make pte_list_desc fit well in cache line */
-@@ -675,7 +655,7 @@ static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
- 	if (!sp->role.direct)
- 		return sp->gfns[index];
- 
--	return sp->gfn + (index << ((sp->role.level - 1) * PT64_LEVEL_BITS));
-+	return sp->gfn + (index << ((sp->role.level - 1) * SPTE_LEVEL_BITS));
- }
- 
- static void kvm_mmu_page_set_gfn(struct kvm_mmu_page *sp, int index, gfn_t gfn)
-@@ -1706,7 +1686,7 @@ static int __mmu_unsync_walk(struct kvm_mmu_page *sp,
- 			continue;
- 		}
- 
--		child = to_shadow_page(ent & PT64_BASE_ADDR_MASK);
-+		child = to_shadow_page(ent & SPTE_BASE_ADDR_MASK);
- 
- 		if (child->unsync_children) {
- 			if (mmu_pages_add(pvec, child, i))
-@@ -1989,8 +1969,8 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
- 		role.gpte_is_8_bytes = true;
- 	role.access = access;
- 	if (!direct_mmu && vcpu->arch.mmu->root_level <= PT32_ROOT_LEVEL) {
--		quadrant = gaddr >> (PAGE_SHIFT + (PT64_PT_BITS * level));
--		quadrant &= (1 << ((PT32_PT_BITS - PT64_PT_BITS) * level)) - 1;
-+		quadrant = gaddr >> (PAGE_SHIFT + (SPTE_LEVEL_BITS * level));
-+		quadrant &= (1 << ((PT32_LEVEL_BITS - SPTE_LEVEL_BITS) * level)) - 1;
- 		role.quadrant = quadrant;
- 	}
- 
-@@ -2082,7 +2062,7 @@ static void shadow_walk_init_using_root(struct kvm_shadow_walk_iterator *iterato
- 
- 		iterator->shadow_addr
- 			= vcpu->arch.mmu->pae_root[(addr >> 30) & 3];
--		iterator->shadow_addr &= PT64_BASE_ADDR_MASK;
-+		iterator->shadow_addr &= SPTE_BASE_ADDR_MASK;
- 		--iterator->level;
- 		if (!iterator->shadow_addr)
- 			iterator->level = 0;
-@@ -2101,7 +2081,7 @@ static bool shadow_walk_okay(struct kvm_shadow_walk_iterator *iterator)
- 	if (iterator->level < PG_LEVEL_4K)
- 		return false;
- 
--	iterator->index = SHADOW_PT_INDEX(iterator->addr, iterator->level);
-+	iterator->index = SPTE_INDEX(iterator->addr, iterator->level);
- 	iterator->sptep	= ((u64 *)__va(iterator->shadow_addr)) + iterator->index;
- 	return true;
- }
-@@ -2114,7 +2094,7 @@ static void __shadow_walk_next(struct kvm_shadow_walk_iterator *iterator,
- 		return;
- 	}
- 
--	iterator->shadow_addr = spte & PT64_BASE_ADDR_MASK;
-+	iterator->shadow_addr = spte & SPTE_BASE_ADDR_MASK;
- 	--iterator->level;
- }
- 
-@@ -2153,7 +2133,7 @@ static void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
- 		 * so we should update the spte at this point to get
- 		 * a new sp with the correct access.
- 		 */
--		child = to_shadow_page(*sptep & PT64_BASE_ADDR_MASK);
-+		child = to_shadow_page(*sptep & SPTE_BASE_ADDR_MASK);
- 		if (child->role.access == direct_access)
- 			return;
- 
-@@ -2176,7 +2156,7 @@ static int mmu_page_zap_pte(struct kvm *kvm, struct kvm_mmu_page *sp,
- 			if (is_large_pte(pte))
- 				--kvm->stat.lpages;
- 		} else {
--			child = to_shadow_page(pte & PT64_BASE_ADDR_MASK);
-+			child = to_shadow_page(pte & SPTE_BASE_ADDR_MASK);
- 			drop_parent_pte(child, spte);
- 
- 			/*
-@@ -2202,7 +2182,7 @@ static int kvm_mmu_page_unlink_children(struct kvm *kvm,
- 	int zapped = 0;
- 	unsigned i;
- 
--	for (i = 0; i < PT64_ENT_PER_PAGE; ++i)
-+	for (i = 0; i < SPTE_ENT_PER_PAGE; ++i)
- 		zapped += mmu_page_zap_pte(kvm, sp, sp->spt + i, invalid_list);
- 
- 	return zapped;
-@@ -2580,7 +2560,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
- 			struct kvm_mmu_page *child;
- 			u64 pte = *sptep;
- 
--			child = to_shadow_page(pte & PT64_BASE_ADDR_MASK);
-+			child = to_shadow_page(pte & SPTE_BASE_ADDR_MASK);
- 			drop_parent_pte(child, sptep);
- 			flush = true;
- 		} else if (pfn != spte_to_pfn(*sptep)) {
-@@ -3134,7 +3114,7 @@ static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
- 	if (!VALID_PAGE(*root_hpa))
- 		return;
- 
--	sp = to_shadow_page(*root_hpa & PT64_BASE_ADDR_MASK);
-+	sp = to_shadow_page(*root_hpa & SPTE_BASE_ADDR_MASK);
- 
- 	if (is_tdp_mmu_page(sp))
- 		kvm_tdp_mmu_put_root(kvm, sp, false);
-@@ -3494,7 +3474,7 @@ void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu)
- 		hpa_t root = vcpu->arch.mmu->pae_root[i];
- 
- 		if (IS_VALID_PAE_ROOT(root)) {
--			root &= PT64_BASE_ADDR_MASK;
-+			root &= SPTE_BASE_ADDR_MASK;
- 			sp = to_shadow_page(root);
- 			mmu_sync_children(vcpu, sp);
- 		}
-@@ -4927,11 +4907,11 @@ static bool need_remote_flush(u64 old, u64 new)
- 		return false;
- 	if (!is_shadow_present_pte(new))
- 		return true;
--	if ((old ^ new) & PT64_BASE_ADDR_MASK)
-+	if ((old ^ new) & SPTE_BASE_ADDR_MASK)
- 		return true;
- 	old ^= shadow_nx_mask;
- 	new ^= shadow_nx_mask;
--	return (old & ~new & PT64_PERM_MASK) != 0;
-+	return (old & ~new & SPTE_PERM_MASK) != 0;
- }
- 
- static u64 mmu_pte_write_fetch_gpte(struct kvm_vcpu *vcpu, gpa_t *gpa,
-diff --git a/arch/x86/kvm/mmu/mmu_audit.c b/arch/x86/kvm/mmu/mmu_audit.c
-index cedc17b2f60e..4b5335188d01 100644
---- a/arch/x86/kvm/mmu/mmu_audit.c
-+++ b/arch/x86/kvm/mmu/mmu_audit.c
-@@ -45,7 +45,7 @@ static void __mmu_spte_walk(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 		      !is_last_spte(ent[i], level)) {
- 			struct kvm_mmu_page *child;
- 
--			child = to_shadow_page(ent[i] & PT64_BASE_ADDR_MASK);
-+			child = to_shadow_page(ent[i] & SPTE_BASE_ADDR_MASK);
- 			__mmu_spte_walk(vcpu, child, fn, level - 1);
- 		}
- 	}
-@@ -71,7 +71,7 @@ static void mmu_spte_walk(struct kvm_vcpu *vcpu, inspect_spte_fn fn)
- 		hpa_t root = vcpu->arch.mmu->pae_root[i];
- 
- 		if (IS_VALID_PAE_ROOT(root)) {
--			root &= PT64_BASE_ADDR_MASK;
-+			root &= SPTE_BASE_ADDR_MASK;
- 			sp = to_shadow_page(root);
- 			__mmu_spte_walk(vcpu, sp, fn, 2);
- 		}
-@@ -117,7 +117,7 @@ static void audit_mappings(struct kvm_vcpu *vcpu, u64 *sptep, int level)
- 		return;
- 
- 	hpa =  pfn << PAGE_SHIFT;
--	if ((*sptep & PT64_BASE_ADDR_MASK) != hpa)
-+	if ((*sptep & SPTE_BASE_ADDR_MASK) != hpa)
- 		audit_printk(vcpu->kvm, "levels %d pfn %llx hpa %llx "
- 			     "ent %llxn", vcpu->arch.mmu->root_level, pfn,
- 			     hpa, *sptep);
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 18be103df9d5..b9ef013a2202 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -20,6 +20,20 @@ extern bool dbg;
- #define MMU_WARN_ON(x) do { } while (0)
- #endif
- 
-+/* Page table builder macros common to shadow (host) PTEs and guest PTEs. */
-+#define __PT_LEVEL_SHIFT(level, bits_per_level)	\
-+	(PAGE_SHIFT + ((level) - 1) * (bits_per_level))
-+#define __PT_INDEX(address, level, bits_per_level) \
-+	(((address) >> __PT_LEVEL_SHIFT(level, bits_per_level)) & ((1 << (bits_per_level)) - 1))
-+
-+#define __PT_LVL_ADDR_MASK(base_addr_mask, level, bits_per_level) \
-+	((base_addr_mask) & ~((1ULL << (PAGE_SHIFT + (((level) - 1) * (bits_per_level)))) - 1))
-+
-+#define __PT_LVL_OFFSET_MASK(base_addr_mask, level, bits_per_level) \
-+	((base_addr_mask) & ((1ULL << (PAGE_SHIFT + (((level) - 1) * (bits_per_level)))) - 1))
-+
-+#define __PT_ENT_PER_PAGE(bits_per_level)  (1 << (bits_per_level))
-+
- /*
-  * Unlike regular MMU roots, PAE "roots", a.k.a. PDPTEs/PDPTRs, have a PRESENT
-  * bit, and thus are guaranteed to be non-zero when valid.  And, when a guest
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index a2dbea70ffda..caaeec848b12 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -24,13 +24,32 @@
- #ifndef __KVM_X86_PAGING_TMPL_COMMON_H
- #define __KVM_X86_PAGING_TMPL_COMMON_H
- 
--#define GUEST_PT64_BASE_ADDR_MASK (((1ULL << 52) - 1) & ~(u64)(PAGE_SIZE-1))
-+/* 64-bit guest PTEs, i.e. PAE paging and EPT. */
-+#define PT64_LEVEL_BITS 9
-+#define PT64_LEVEL_SHIFT		__PT_LEVEL_SHIFT(level, PT64_LEVEL_BITS)
-+#define PT64_INDEX(address, level)	__PT_INDEX(address, level, PT64_LEVEL_BITS)
-+#define PT64_ENT_PER_PAGE		__PT_ENT_PER_PAGE(PT64_LEVEL_BITS)
-+
-+#define PT64_BASE_ADDR_MASK (((1ULL << 52) - 1) & ~(u64)(PAGE_SIZE-1))
- #define PT64_LVL_ADDR_MASK(level) \
--	(GUEST_PT64_BASE_ADDR_MASK & ~((1ULL << (PAGE_SHIFT + (((level) - 1) \
--						* PT64_LEVEL_BITS))) - 1))
-+	__PT_LVL_ADDR_MASK(PT64_BASE_ADDR_MASK, level, PT64_LEVEL_BITS)
-+
- #define PT64_LVL_OFFSET_MASK(level) \
--	(GUEST_PT64_BASE_ADDR_MASK & ((1ULL << (PAGE_SHIFT + (((level) - 1) \
--						* PT64_LEVEL_BITS))) - 1))
-+	__PT_LVL_OFFSET_MASK(PT64_BASE_ADDR_MASK, level, PT64_LEVEL_BITS)
-+
-+/* 32-bit guest PTEs, i.e. non-PAE IA32 paging. */
-+#define PT32_LEVEL_SHIFT(level)		__PT_LEVEL_SHIFT(level, PT32_LEVEL_BITS)
-+#define PT32_INDEX(address, level)	__PT_INDEX(address, level, PT32_LEVEL_BITS)
-+#define PT32_ENT_PER_PAGE		__PT_ENT_PER_PAGE(PT32_LEVEL_BITS)
-+
-+#define PT32_BASE_ADDR_MASK PAGE_MASK
-+#define PT32_DIR_BASE_ADDR_MASK \
-+	(PAGE_MASK & ~((1ULL << (PAGE_SHIFT + PT32_LEVEL_BITS)) - 1))
-+#define PT32_LVL_ADDR_MASK(level) \
-+	__PT_LVL_ADDR_MASK(PT32_BASE_ADDR_MASK, level, PT32_LEVEL_BITS)
-+
-+#define PT32_LVL_OFFSET_MASK(level) \
-+	__PT_LVL_OFFSET_MASK(PT32_BASE_ADDR_MASK, level, PT32_LEVEL_BITS)
- 
- #define PT32_DIR_PSE36_SIZE 4
- #define PT32_DIR_PSE36_SHIFT 13
-@@ -55,7 +74,7 @@ static inline gfn_t pse36_gfn_delta(u32 gpte)
- 	#define pt_element_t u64
- 	#define guest_walker guest_walker64
- 	#define FNAME(name) paging##64_##name
--	#define PT_BASE_ADDR_MASK GUEST_PT64_BASE_ADDR_MASK
-+	#define PT_BASE_ADDR_MASK PT64_BASE_ADDR_MASK
- 	#define PT_LVL_ADDR_MASK(lvl) PT64_LVL_ADDR_MASK(lvl)
- 	#define PT_LVL_OFFSET_MASK(lvl) PT64_LVL_OFFSET_MASK(lvl)
- 	#define PT_INDEX(addr, level) PT64_INDEX(addr, level)
-@@ -88,7 +107,7 @@ static inline gfn_t pse36_gfn_delta(u32 gpte)
- 	#define pt_element_t u64
- 	#define guest_walker guest_walkerEPT
- 	#define FNAME(name) ept_##name
--	#define PT_BASE_ADDR_MASK GUEST_PT64_BASE_ADDR_MASK
-+	#define PT_BASE_ADDR_MASK PT64_BASE_ADDR_MASK
- 	#define PT_LVL_ADDR_MASK(lvl) PT64_LVL_ADDR_MASK(lvl)
- 	#define PT_LVL_OFFSET_MASK(lvl) PT64_LVL_OFFSET_MASK(lvl)
- 	#define PT_INDEX(addr, level) PT64_INDEX(addr, level)
-@@ -1072,7 +1091,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
- 
- 	first_pte_gpa = FNAME(get_level1_sp_gpa)(sp);
- 
--	for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
-+	for (i = 0; i < SPTE_ENT_PER_PAGE; i++) {
- 		unsigned pte_access;
- 		pt_element_t gpte;
- 		gpa_t pte_gpa;
-diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index 66d43cec0c31..cc7feac12e26 100644
---- a/arch/x86/kvm/mmu/spte.c
-+++ b/arch/x86/kvm/mmu/spte.c
-@@ -200,7 +200,7 @@ u64 kvm_mmu_changed_pte_notifier_make_spte(u64 old_spte, kvm_pfn_t new_pfn)
- {
- 	u64 new_spte;
- 
--	new_spte = old_spte & ~PT64_BASE_ADDR_MASK;
-+	new_spte = old_spte & ~SPTE_BASE_ADDR_MASK;
- 	new_spte |= (u64)new_pfn << PAGE_SHIFT;
- 
- 	new_spte &= ~PT_WRITABLE_MASK;
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index 6925dfc38981..719785eea2fe 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -34,12 +34,12 @@
- static_assert(SPTE_TDP_AD_ENABLED_MASK == 0);
- 
- #ifdef CONFIG_DYNAMIC_PHYSICAL_MASK
--#define PT64_BASE_ADDR_MASK (physical_mask & ~(u64)(PAGE_SIZE-1))
-+#define SPTE_BASE_ADDR_MASK (physical_mask & ~(u64)(PAGE_SIZE-1))
- #else
--#define PT64_BASE_ADDR_MASK (((1ULL << 52) - 1) & ~(u64)(PAGE_SIZE-1))
-+#define SPTE_BASE_ADDR_MASK (((1ULL << 52) - 1) & ~(u64)(PAGE_SIZE-1))
- #endif
- 
--#define PT64_PERM_MASK (PT_PRESENT_MASK | PT_WRITABLE_MASK | shadow_user_mask \
-+#define SPTE_PERM_MASK (PT_PRESENT_MASK | PT_WRITABLE_MASK | shadow_user_mask \
- 			| shadow_x_mask | shadow_nx_mask | shadow_me_mask)
- 
- #define ACC_EXEC_MASK    1
-@@ -48,17 +48,13 @@ static_assert(SPTE_TDP_AD_ENABLED_MASK == 0);
- #define ACC_ALL          (ACC_EXEC_MASK | ACC_WRITE_MASK | ACC_USER_MASK)
- 
- /* The mask for the R/X bits in EPT PTEs */
--#define PT64_EPT_READABLE_MASK			0x1ull
--#define PT64_EPT_EXECUTABLE_MASK		0x4ull
-+#define SPTE_EPT_READABLE_MASK			0x1ull
-+#define SPTE_EPT_EXECUTABLE_MASK		0x4ull
- 
--#define PT64_LEVEL_BITS 9
--
--#define PT64_LEVEL_SHIFT(level) \
--		(PAGE_SHIFT + (level - 1) * PT64_LEVEL_BITS)
--
--#define PT64_INDEX(address, level)\
--	(((address) >> PT64_LEVEL_SHIFT(level)) & ((1 << PT64_LEVEL_BITS) - 1))
--#define SHADOW_PT_INDEX(addr, level) PT64_INDEX(addr, level)
-+#define SPTE_LEVEL_BITS			9
-+#define SPTE_LEVEL_SHIFT(level)		__PT_LEVEL_SHIFT(level, SPTE_LEVEL_BITS)
-+#define SPTE_INDEX(address, level)	__PT_INDEX(address, level, SPTE_LEVEL_BITS)
-+#define SPTE_ENT_PER_PAGE		__PT_ENT_PER_PAGE(SPTE_LEVEL_BITS)
- 
- /* Bits 9 and 10 are ignored by all non-EPT PTEs. */
- #define DEFAULT_SPTE_HOST_WRITEABLE	BIT_ULL(9)
-@@ -71,8 +67,8 @@ static_assert(SPTE_TDP_AD_ENABLED_MASK == 0);
-  * restored only when a write is attempted to the page.  This mask obviously
-  * must not overlap the A/D type mask.
-  */
--#define SHADOW_ACC_TRACK_SAVED_BITS_MASK (PT64_EPT_READABLE_MASK | \
--					  PT64_EPT_EXECUTABLE_MASK)
-+#define SHADOW_ACC_TRACK_SAVED_BITS_MASK (SPTE_EPT_READABLE_MASK | \
-+					  SPTE_EPT_EXECUTABLE_MASK)
- #define SHADOW_ACC_TRACK_SAVED_BITS_SHIFT 54
- #define SHADOW_ACC_TRACK_SAVED_MASK	(SHADOW_ACC_TRACK_SAVED_BITS_MASK << \
- 					 SHADOW_ACC_TRACK_SAVED_BITS_SHIFT)
-@@ -269,7 +265,7 @@ static inline bool is_executable_pte(u64 spte)
- 
- static inline kvm_pfn_t spte_to_pfn(u64 pte)
- {
--	return (pte & PT64_BASE_ADDR_MASK) >> PAGE_SHIFT;
-+	return (pte & SPTE_BASE_ADDR_MASK) >> PAGE_SHIFT;
- }
- 
- static inline bool is_accessed_spte(u64 spte)
-diff --git a/arch/x86/kvm/mmu/tdp_iter.c b/arch/x86/kvm/mmu/tdp_iter.c
-index b3ed302c1a35..5c002c43cb3c 100644
---- a/arch/x86/kvm/mmu/tdp_iter.c
-+++ b/arch/x86/kvm/mmu/tdp_iter.c
-@@ -11,7 +11,7 @@
- static void tdp_iter_refresh_sptep(struct tdp_iter *iter)
- {
- 	iter->sptep = iter->pt_path[iter->level - 1] +
--		SHADOW_PT_INDEX(iter->gfn << PAGE_SHIFT, iter->level);
-+		SPTE_INDEX(iter->gfn << PAGE_SHIFT, iter->level);
- 	iter->old_spte = READ_ONCE(*rcu_dereference(iter->sptep));
- }
- 
-@@ -113,8 +113,8 @@ static bool try_step_side(struct tdp_iter *iter)
- 	 * Check if the iterator is already at the end of the current page
- 	 * table.
- 	 */
--	if (SHADOW_PT_INDEX(iter->gfn << PAGE_SHIFT, iter->level) ==
--            (PT64_ENT_PER_PAGE - 1))
-+	if (SPTE_INDEX(iter->gfn << PAGE_SHIFT, iter->level) ==
-+	    (SPTE_ENT_PER_PAGE - 1))
- 		return false;
- 
- 	iter->gfn += KVM_PAGES_PER_HPAGE(iter->level);
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index caac4ddb46df..3720d244e5a2 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -335,7 +335,7 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
- 
- 	tdp_mmu_unlink_page(kvm, sp, shared);
- 
--	for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
-+	for (i = 0; i < SPTE_ENT_PER_PAGE; i++) {
- 		sptep = rcu_dereference(pt) + i;
- 		gfn = base_gfn + i * KVM_PAGES_PER_HPAGE(level);
- 
--- 
-2.32.0.288.g62a8d224e6-goog
+>=20
+> As this is really new stuff there is no real good reason to force that
+> into the existing VFIO/MSIX stuff with all it's known downsides and
+> limitations.
+>=20
+> The point is, that IMS can just add another interrupt to a device on the
+> fly without doing any of the PCI/MSIX nasties. So why not take advantage
+> of that?
+>=20
+> I can see the point of using PCI to expose the device to the guest
+> because it's trivial to enumerate, but contrary to VF devices there is
 
+also about compatibility since PCI is supported by almost all OSes.
+
+> no legacy and the mechanism how to setup the device interrupts can be
+> completely different from PCI/MSIX.
+>=20
+> Exposing some trappable "IMS" storage in a separate PCI bar won't cut it
+> because this still has the same problem that the allocation or
+> request_irq() on the host can fail w/o feedback.
+
+yes to fully fix the said nasty some feedback mechanism is required.
+
+>=20
+> So IMO creating a proper paravirt interface is the right approach.  It
+> avoids _all_ of the trouble and will be necessary anyway once you want
+> to support devices which store the message/pasid in system memory and
+> not in on-device memory.
+>=20
+
+While I agree a paravirt interface is definitely cleaner, I wonder whether
+this should be done in orthogonal or tied to all new ims-capable devices.
+Back to earlier discussion about guest ims support, you explained a layered
+model where the paravirt interface sits between msi domain and vector
+domain to get addr/data pair from the host. In this way it could provide
+a feedback mechanism for both msi and ims devices, thus not specific
+to ims only. Then considering the transition window where not all guest
+OSes may support paravirt interface at the same time (or there are
+multiple paravirt interfaces which takes time for host to support all),=20
+would below staging approach still makes sense?
+
+1)  Fix the lost interrupt issue in existing MSI virtualization flow;
+2)  Virtualize MSI-X on IMS, bearing the same request_irq() problem;
+3)  Develop a paravirt interface to solve request_irq() problem for
+      both msi and ims devices;
+
+Thanks
+Kevin
