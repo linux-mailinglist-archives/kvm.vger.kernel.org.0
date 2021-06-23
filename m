@@ -2,154 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCC643B1C2C
-	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 16:14:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 94E273B1C38
+	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 16:16:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230286AbhFWOQc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 10:16:32 -0400
-Received: from foss.arm.com ([217.140.110.172]:36192 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230182AbhFWOQb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Jun 2021 10:16:31 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3AB99ED1;
-        Wed, 23 Jun 2021 07:14:14 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B21C73F718;
-        Wed, 23 Jun 2021 07:14:12 -0700 (PDT)
-Subject: Re: [PATCH v4 6/9] KVM: arm64: vgic: Implement SW-driven deactivation
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Hector Martin <marcan@marcan.st>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>, kernel-team@android.com
-References: <20210601104005.81332-1-maz@kernel.org>
- <20210601104005.81332-7-maz@kernel.org>
- <b87fb2e9-a3f9-accc-86d9-64dc2ee90dea@arm.com> <87y2b1c208.wl-maz@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <0e490a98-dca3-cbf9-204b-da77688057d0@arm.com>
-Date:   Wed, 23 Jun 2021 15:15:08 +0100
+        id S231174AbhFWOTL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 10:19:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20049 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230286AbhFWOTJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 10:19:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624457811;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MdpZu0o7ZaWAk08H/jPUVPtESBvGLrn2fcmv09RwUVI=;
+        b=e6VhomLs+0xQ69YqXKbsJPpEHJUuSbb0fSP8Psqq0zvhvyq4ev11pxW/Xt/ZW9vuBMOu4g
+        IJBHgZ4mZi+Xo+6TUDuJlP7Q+HEqhOEwe+8sdku98F1jbDrXYcSj+3Sem5PDG9L4KP+QqQ
+        /1Xehrvko/w3L3OXpdcz0Iyi0VHBFks=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-510-ZTsHwLb5OEiojBjSsqQzPA-1; Wed, 23 Jun 2021 10:16:50 -0400
+X-MC-Unique: ZTsHwLb5OEiojBjSsqQzPA-1
+Received: by mail-ed1-f70.google.com with SMTP id x10-20020aa7cd8a0000b0290394bdda92a8so1405544edv.8
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 07:16:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MdpZu0o7ZaWAk08H/jPUVPtESBvGLrn2fcmv09RwUVI=;
+        b=H6wdjliUCuu7FoQXzaGuniHiVRMiKD7fkbidTShEJNcI2OrtKllYcvKuNQkVFfenff
+         skP+Y9iua7QFW5XzY5K1+grMd964KYDRJbfkdLbUr3iQk94irZwgii3GxHisKgcwKaBq
+         qQgZGlzffBiKwG0x6jE+seyPdmk8X1IOdJYp7JV/TMTeYE7G4pWnS2G0eC5SPTcBK9z2
+         LRsOttMLH2xjLMPmC7FNjN6oIGOCWWgoM1FyLHKkfVYYF1HnU/f5NMxJvp+j5cfC7zqK
+         7c0uxtJBmg80fqdwjjwyjcemVJqVyZXr4WAJP5zV2KcsEB9UIq9kOEqAkpxpZQVn8haA
+         AUrg==
+X-Gm-Message-State: AOAM531aP0unSm8+sDR/aVOqD2DfafsLEzrxLcbnWIaZBRkD1+lQQH4V
+        UbWNaovPTpG/ucB4r+50atj36G9JmsdGXWhJoqnQUbv5laKHLA3V17qmPmYzD0SkOTVvhvfOP3g
+        3OizkP62tOlRE
+X-Received: by 2002:a17:906:4a55:: with SMTP id a21mr231149ejv.209.1624457808979;
+        Wed, 23 Jun 2021 07:16:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx9lAMl15cgRez4LOG9KWkUydqqrLbogVo4u/Vl+8budcXaL0bATX7IXkG/cdBkxqpO4ruWKw==
+X-Received: by 2002:a17:906:4a55:: with SMTP id a21mr231127ejv.209.1624457808793;
+        Wed, 23 Jun 2021 07:16:48 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id d6sm100976edq.37.2021.06.23.07.16.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Jun 2021 07:16:48 -0700 (PDT)
+Subject: Re: [PATCH 07/54] KVM: x86: Alert userspace that KVM_SET_CPUID{,2}
+ after KVM_RUN is broken
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+References: <20210622175739.3610207-1-seanjc@google.com>
+ <20210622175739.3610207-8-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f031b6bc-c98d-8e46-34ac-79e540674a55@redhat.com>
+Date:   Wed, 23 Jun 2021 16:16:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <87y2b1c208.wl-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20210622175739.3610207-8-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On 22/06/21 19:56, Sean Christopherson wrote:
+> +	/*
+> +	 * KVM does not correctly handle changing guest CPUID after KVM_RUN, as
+> +	 * MAXPHYADDR, GBPAGES support, AMD reserved bit behavior, etc.. aren't
+> +	 * tracked in kvm_mmu_page_role.  As a result, KVM may miss guest page
+> +	 * faults due to reusing SPs/SPTEs.  Alert userspace, but otherwise
+> +	 * sweep the problem under the rug.
+> +	 *
+> +	 * KVM's horrific CPUID ABI makes the problem all but impossible to
+> +	 * solve, as correctly handling multiple vCPU models (with respect to
+> +	 * paging and physical address properties) in a single VM would require
+> +	 * tracking all relevant CPUID information in kvm_mmu_page_role.  That
+> +	 * is very undesirable as it would double the memory requirements for
+> +	 * gfn_track (see struct kvm_mmu_page_role comments), and in practice
+> +	 * no sane VMM mucks with the core vCPU model on the fly.
+> +	 */
+> +	if (vcpu->arch.last_vmentry_cpu != -1)
+> +		pr_warn_ratelimited("KVM: KVM_SET_CPUID{,2} after KVM_RUN may cause guest instability\n");
 
-On 6/22/21 5:12 PM, Marc Zyngier wrote:
-> On Thu, 17 Jun 2021 15:58:31 +0100,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->> Hi Marc,
->>
->> On 6/1/21 11:40 AM, Marc Zyngier wrote:
->>> In order to deal with these systems that do not offer HW-based
->>> deactivation of interrupts, let implement a SW-based approach:
->> Nitpick, but shouldn't that be "let's"?
-> "Let it be...". ;-) Yup.
->
->>> - When the irq is queued into a LR, treat it as a pure virtual
->>>   interrupt and set the EOI flag in the LR.
->>>
->>> - When the interrupt state is read back from the LR, force a
->>>   deactivation when the state is invalid (neither active nor
->>>   pending)
->>>
->>> Interrupts requiring such treatment get the VGIC_SW_RESAMPLE flag.
->>>
->>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>> ---
->>>  arch/arm64/kvm/vgic/vgic-v2.c | 19 +++++++++++++++----
->>>  arch/arm64/kvm/vgic/vgic-v3.c | 19 +++++++++++++++----
->>>  include/kvm/arm_vgic.h        | 10 ++++++++++
->>>  3 files changed, 40 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
->>> index 11934c2af2f4..2c580204f1dc 100644
->>> --- a/arch/arm64/kvm/vgic/vgic-v2.c
->>> +++ b/arch/arm64/kvm/vgic/vgic-v2.c
->>> @@ -108,11 +108,22 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
->>>  		 * If this causes us to lower the level, we have to also clear
->>>  		 * the physical active state, since we will otherwise never be
->>>  		 * told when the interrupt becomes asserted again.
->>> +		 *
->>> +		 * Another case is when the interrupt requires a helping hand
->>> +		 * on deactivation (no HW deactivation, for example).
->>>  		 */
->>> -		if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT)) {
->>> -			irq->line_level = vgic_get_phys_line_level(irq);
->>> +		if (vgic_irq_is_mapped_level(irq)) {
->>> +			bool resample = false;
->>> +
->>> +			if (val & GICH_LR_PENDING_BIT) {
->>> +				irq->line_level = vgic_get_phys_line_level(irq);
->>> +				resample = !irq->line_level;
->>> +			} else if (vgic_irq_needs_resampling(irq) &&
->>> +				   !(irq->active || irq->pending_latch)) {
->> I'm having a hard time figuring out when and why a level sensitive
->> can have pending_latch = true.
->>
->> I looked kvm_vgic_inject_irq(), and that function sets pending_latch
->> only for edge triggered interrupts (it sets line_level for level
->> sensitive ones). But irq_is_pending() looks at **both**
->> pending_latch and line_level for level sensitive interrupts.
-> Yes, and that's what an implementation requires.
->
->> The only place that I've found that sets pending_latch regardless of
->> the  interrupt type  is in  vgic_mmio_write_spending() (called  on a
->> trapped  write  to   GICD_ISENABLER).
-> Are you sure? It really should be GICD_ISPENDR. I'll assume that this
-> is what you mean below.
+Let's make this even stronger and promise to break it in 5.16.
 
-Yes, that's what I meant, sorry for the confusion.
-
->
->> vgic_v2_populate_lr()  clears
->> pending_latch  only for  edge triggered  interrupts, so  that leaves
->> vgic_v2_fold_lr_state()  as  the   only  function  pending_latch  is
->> cleared for level sensitive interrupts,  when the interrupt has been
->> handled by the guest.  Are we doing all of this  to emulate the fact
->> that level sensitive interrupts (either purely virtual or hw mapped)
->> made pending by a write  to GICD_ISENABLER remain pending until they
->> are handled by the guest?
-> Yes, or cleared by a write to GICD_ICPENDR. You really need to think
-> of the input into the GIC as some sort of OR gate combining both the
-> line level and the PEND register. With a latch for edge interrupts.
->
-> Have a look at Figure 4-10 ("Logic of the pending status of a
-> level-sensitive interrupt") in the GICv2 arch spec (ARM IHI 0048B.b)
-> to see what I actually mean.
->
->> If that is the case, then I think this is what the code is doing:
->>
->> - There's no functional change when the irqchip has HW deactivation
->>
->> - For level sensitive, hw mapped interrupts made pending by a write
->> to GICD_ISENABLER and not yet handled by the guest (pending_latch ==
->> true) we don't clear the pending state of the interrupt.
->>
->> - For level sensitive, hw mapped interrupts we clear the pending
->> state in the GIC and the device will assert the interrupt again if
->> it's still pending at the device 1level. I have a question about
->> this. Why don't we sample the interrupt state by calling
->> vgic_get_phys_line_level()? Because that would be slower than the
->> alternative that you are proposing here?
-> Yes. It is *much* faster to read the timer status register (for
-> example) than going via an MMIO access to read the (re)distributor
-> that will return the same value.
-
-Thank you for the explanation, much appreciated. The patch looks to me like it's
-doing the right thing.
-
-Thanks,
-
-Alex
+Paolo
 
