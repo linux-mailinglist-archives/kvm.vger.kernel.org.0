@@ -2,288 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E07E83B10E0
-	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 01:59:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF0DA3B10E9
+	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 02:05:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230101AbhFWABm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Jun 2021 20:01:42 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:32958 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230002AbhFWABm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Jun 2021 20:01:42 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1624406365;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to; bh=RzYa72mioInPwQvI3NEpRj5PoaDVGEY7YubgtuSnqRw=;
-        b=S/e/szlvUv0xGBmwhxTzk8Notvpd5128Z2lJK76DZiGW3UVNLX6hWh/8aPQ3tdEGOKB6uj
-        Fb9zYvwQSerZuL140DAHp5D58CWOj6jm/P7K8RPraBUyTHGQ6nOpeixr7drLcFFNR8fvyP
-        pxhg3gbvyJJVXrLRYJZZ5R+9W/jrdTCF7cZ0PQuT2FS4nb7Oh7+yqOSjUv3Ufh7auO0A4r
-        sndd1Vd9t7VpYqIlKAIR5scmD89+ngBvrCmWfaIgrNea9AgJfI0HhYoLc/EOUnOskLYc6+
-        OkjtfOR5dzxVx1GoLPzhi1O5Jx1BidRU0hvkq+HbjBvEPxSqTQrljnh+DFCGcg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1624406365;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to; bh=RzYa72mioInPwQvI3NEpRj5PoaDVGEY7YubgtuSnqRw=;
-        b=XqfxyzhPwSRUbUgsSq+pfRJ2e6N4Bi5Qnd8OxT5OeiqHiYA1N5B/QCvnby4RVWidFZVnGJ
-        /rvtiiltecdX1oBw==
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, Megha Dey <megha.dey@intel.com>,
-        Ashok Rai <ashok.raj@intel.com>,
-        Jacob Pan <jacob.jun.pan@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>, Yi Liu <yi.l.liu@intel.com>,
-        Baolu Lu <baolu.lu@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Sanjay Kumar <sanjay.k.kumar@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>, KVM <kvm@vger.kernel.org>,
+        id S230001AbhFWAIK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Jun 2021 20:08:10 -0400
+Received: from mail-dm6nam10on2072.outbound.protection.outlook.com ([40.107.93.72]:52896
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229718AbhFWAIJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Jun 2021 20:08:09 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=B3/KBdJDauQ7dVt5+j3SNsPYpt1TvZFwcKBAe/soen3qdXoWy/gKEc+plQ7pohVAa5gCm47wBBjYygAqdsZfnxN2AOj1etAaTLVtNs6NMm8ZMrkuTf/7Y6H7aDU0yjuUTf8M/c9RcloWuzKJ+Tw5b+wBaemP9QOzXAWV+NwCzIG70rqsy+5zPBQfj/qLJajjjCEw71/XKNdH45M9k/yx1mXdRgNyEuacgwT04rbD3BTtAMiLG0Gr81Uw5TLVXjIwdmUtWh/sNgIb/qZu6SlbNTy9HU4DhTouIRxs4RRB/OkfJCDcpWf+u6OrLGEPUZ7mJFFYa40nOHtCeyVTX8xTPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=00vjd5eelAB3Z7Vn7EjsipaY4AuovUAUgikKTrMKhzM=;
+ b=lXEulpoItrKWYdS/wGXx7cnk4ZQRk7/IPZa/5nSNzSn7NE8130514GFVTO5+8VxU5/GmbWltpSaZabrvjNI9GLr9T9PLkuy/VQ2qUS/sTVCv1qraFglMNj+g99jf2mOsMpjMVAT8tTv5BIt631uU2pRFwVsPgXaEBKrwZak4D7TesDuA2kykh0l5XERVXV7gGIMMGgfFCfcBdze20bxlO40gRZQaeRIZPgHppQo6l/gVzcEuhEFq+npBNw7F6nVUtbZ0UhoDnWOqO9KtyH5wU0tqaP9jYdEegO4Jy7c+6DPcuDIlg5rpQCTdcfxyOcrkKLyzOCctZYbrl+k4mndrfg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=00vjd5eelAB3Z7Vn7EjsipaY4AuovUAUgikKTrMKhzM=;
+ b=jsNY7CzXfOG07PJuCaZasImaDQMH7rmjvakSFgWf74FikzwL0O4Z/4kTOl51yVpToh2ovtBVBKEhP76CCLM2PPQOgY9/REnC1keEUJRr9isqXr0oxuhwmV2GKH+W3y2gPwL+5hLm2zzBY8c/iMU404D8HvPi2IGrd+uW9f15iWcgAVDWB6KbFBlfXwj7XsIoDRolCbZIG3Sg9UQEGL1S86ofAGbKvvLH9tH5qDqSbaaYMk7SxUEprv20648i1rzZHv7Fafs5tWIcFqiRcr8olmMV8YxTDyzYw+N6iWCwjMY3uOy1Tlm5YfOhEavViog33blxHaIwweMoknNHZI0g0A==
+Authentication-Results: lst.de; dkim=none (message not signed)
+ header.d=none;lst.de; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5206.namprd12.prod.outlook.com (2603:10b6:208:31c::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.18; Wed, 23 Jun
+ 2021 00:05:51 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e%8]) with mapi id 15.20.4264.018; Wed, 23 Jun 2021
+ 00:05:51 +0000
+Date:   Tue, 22 Jun 2021 21:05:50 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
         Kirti Wankhede <kwankhede@nvidia.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Bjorn Helgaas <helgaas@kernel.org>
-Subject: Re: Virtualizing MSI-X on IMS via VFIO
-In-Reply-To: <20210622131217.76b28f6f.alex.williamson@redhat.com>
-Date:   Wed, 23 Jun 2021 01:59:24 +0200
-Message-ID: <87o8bxcuxv.ffs@nanos.tec.linutronix.de>
+        David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org, Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>
+Subject: Re: Allow mdev drivers to directly create the vfio_device (v4)
+Message-ID: <20210623000550.GI2371267@nvidia.com>
+References: <20210617142218.1877096-1-hch@lst.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210617142218.1877096-1-hch@lst.de>
+X-Originating-IP: [47.55.113.94]
+X-ClientProxiedBy: BL0PR02CA0048.namprd02.prod.outlook.com
+ (2603:10b6:207:3d::25) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (47.55.113.94) by BL0PR02CA0048.namprd02.prod.outlook.com (2603:10b6:207:3d::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4242.21 via Frontend Transport; Wed, 23 Jun 2021 00:05:51 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lvqOs-00BGsO-Ht; Tue, 22 Jun 2021 21:05:50 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: db3435c1-3125-49fe-86d3-08d935daa988
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5206:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5206A1FB5B9C0F2BD51DB5EBC2089@BL1PR12MB5206.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: FMI2kWyz/BN5MjZjGURmfvJglsflb5Bhsj7jW8FZNjXnC0fY8oppCwp3C3+R2Wxn5v1CFgn/9au0Pp2vb+mvhDpkG1FM0rIXZRn9XE5+3XYJqdY52a7/UGR5vOMIcGc+SrbraqxX7Zmzbp48AyIJs8oB2G3rprXVBylUUYOuO8MysGSmoslMEmOOFjSoGvgeczOusPcXzEq1IVOEtnCVfDDkz7dmvMul5Q8BQrVGvC1zV1h+PQK9uGMOWvjNM0YGQZY9G6n6egEfLgGnEaox8FERjKnP21YOc/q/St73VJ74nJgE5pQc2GaeokHLKZMMx+TRN0ycsgtwgLOzNQULXhY1xFktQ2BL626JmtrEc/3t+2t/WOgDwyD/nD2004rGZMKaP++tswPMBVMAfGGjlON+CYwX6A75DN72MM3CtiIMDVWXJiiOkz8LRfCajitpp3Of8aal40iCCBxEanHVf63bbHyQmMHsKtKYsora+c4n800HNvuM8iiv8stYDEv82I2riHnCw+vJn7W6CyW1mlNrwhpTGxGsLnLAk/NAT7GOKiIiQT7sT1mS7dO+ZpeUz3xLrZxYSYKTOESYP1MfZKaeevhdMWoQKHHDS9z6/ey1V3wkuEkg8gb/YJbflbqtR5200d7hhzoGKAd/YZMCEqj009Wq/57dnAF1RmX8drftCak4uhhsQMpn47AbTd2pcbizzWesIFKIkzkd52LP9a53Q5x1Gt3BSKa65FfoWRjn3KaX1sVOFe4gxezeOakmblH7giunK4rmCVfthp6S9Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(136003)(366004)(396003)(346002)(376002)(6916009)(8676002)(36756003)(8936002)(86362001)(9786002)(9746002)(478600001)(316002)(38100700002)(2616005)(426003)(966005)(2906002)(4744005)(66946007)(1076003)(66556008)(66476007)(54906003)(5660300002)(26005)(33656002)(7416002)(186003)(4326008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?p8OXyhdzcu+DPmcstmmHumq6IL7nNzruzvpzeWheHwnLpZ7hRqia9G41pO3K?=
+ =?us-ascii?Q?4Oe16pCitCvVYdXU40sCtnXAXmM36UX+vrhKNEnOqnqkRyLPeHkw9+KtxuLC?=
+ =?us-ascii?Q?nlDDs1br4BNAx/w1vF4GwAiQQQ0KEMFCpYjjo+Q1I8BPWw6PMYKLOYipoAxt?=
+ =?us-ascii?Q?RDYpT33/IZghZUz+OoR/ljnHXc3mOJruyzn/VI1BNi/FGeoQEaLxlRT7xDCz?=
+ =?us-ascii?Q?2jLUWYZIsYYIsZZCUAyxwQm23jLykuE+jGmePPBFNDEle4XEG/D8lJvz7E53?=
+ =?us-ascii?Q?cZUGFmfzPMGc82aqo1PcuSQ5bGqp0J5hwww9w2HYb+GWitoJWPyOhMGAl9DI?=
+ =?us-ascii?Q?Pjv21fQ+vl5wKfJKveUeeSSfxZui3lYAEHLUURLOazFLjpCtCLug2PYgt5x4?=
+ =?us-ascii?Q?XXtUHDN/azMk38Sx+EPi9RRzInnyfW5cFXb5bLm6e+t7u+RPCca3wvayF24b?=
+ =?us-ascii?Q?mFxUDxK2i8edZXDMXvZRl7VKEBG8saFUQP+LB9T82GqiFqvehf/fh/cRZU4A?=
+ =?us-ascii?Q?QZx0Gj5Fdvap7yakWprOFT/418Xo3su4IGo1Z0ey8JPvYG9w97bg34VUQJTk?=
+ =?us-ascii?Q?nzsJbAvi/1+qyiViwS5oXdQe1h409bzRmL8oEJCd2h/uTS+4jAR9MwuWUZG8?=
+ =?us-ascii?Q?HZsM/m5GSUrJnsVnbgGhl4xXpdXaBvZLRUVeBfP6/RR0hMSnWYEPHROqrGKg?=
+ =?us-ascii?Q?PMpopIlqJbYiLlD8nBVbo5+pviYwMja4uD5eTWKKldUUoYbiY2wtgN0JwRPH?=
+ =?us-ascii?Q?e+Vkmmr/r+CpZ2yUBJoYfeksoiU3s/nnaN7Ul7bWTOcoN4fwxxBysJGvP/7h?=
+ =?us-ascii?Q?qXzG3oD14Ep7BylXWwXPI9tcfPltFKi/awdm4GaKq5U+zyCkmAtT1NOlligE?=
+ =?us-ascii?Q?qJ5SeiJKHK+P5d5YToFZ/GBnQy8uR1YrDUZogwJPjjH+etrXm/g6/NNhkw/3?=
+ =?us-ascii?Q?+ulD5IoYyzted5o8HGKXeHI5XnDj6LaB8unF8hbQ3oAqb/TaM4H1XKTGZM0b?=
+ =?us-ascii?Q?i5WhusVsf9qMLN3IZV2b7ZZlgOz/brC9wk8ZK7NeLdKagSxQSFGufJC21et1?=
+ =?us-ascii?Q?yvukRezvP5xvSQJaF7zVrv0LhiIXehVKiIkv/2eTVaLVLR4doaF0JQH8UQMM?=
+ =?us-ascii?Q?u/rNinWe0wcbq+zo/I3DeBsDpo2GEsmjowQQRatPrpWwtWYkaMHXPp7eUFZL?=
+ =?us-ascii?Q?4RdsyyPQZU+XAvnYctYnZgwxI3ZbmM8OTWJnINTCXz16YgkSwIxEFeMC6psn?=
+ =?us-ascii?Q?Zvj6uxdU3xoZu+ttiCbXhVWl8iz6TXgYYIEvpDHp6JjwFPRQ4jr1814enl1X?=
+ =?us-ascii?Q?DykCWpNBC1R39XWHV7Iwg0Jm?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: db3435c1-3125-49fe-86d3-08d935daa988
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2021 00:05:51.5245
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UjBGZjHrBZ+ImINUr7RJ9ye3BtoW5h/xfhAjdOoZ5oMF6HbtDLAt602iD5iIx6JL
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5206
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Alex,
+On Thu, Jun 17, 2021 at 04:22:08PM +0200, Christoph Hellwig wrote:
+> This is my alternative take on this series from Jason:
+> 
+> https://lore.kernel.org/dri-devel/87czsszi9i.fsf@redhat.com/T/
+> 
+> The mdev/vfio parts are exactly the same, but this solves the driver core
+> changes for the direct probing without the in/out flag that Greg hated,
+> which cause a little more work, but probably make the result better.
 
-[ Resend due to a delivery issue here. Sorry if you got this twice. ]
+I did some testing and it looks good, thanks
 
-On Tue, Jun 22 2021 at 13:12, Alex Williamson wrote:
-> On Tue, 22 Jun 2021 10:16:15 +0000 "Tian, Kevin" <kevin.tian@intel.com> wrote:
->
-> Now the 2nd open requires your help. Below is what I learned from 
->> current vfio/qemu code (for vfio-pci device):
->> 
->>     0) Qemu doesn't attempt to allocate all irqs as reported by msix->
->>         table_size. It is done in an dynamic and incremental way.
->
-> Not by table_size, our expectation is that the device interrupt
-> behavior can be implicitly affected by the enabled vectors and the
-> table size may support far more vectors than the driver might actually
-> use.  It's also easier if we never need to get into the scenario of
-> pci_alloc_irq_vectors() returning a smaller than requested number of
-> vectors and needing to fallback to a vector negotiation that doesn't
-> exist via MSI-X.
->
-> FWIW, more recent QEMU will scan the vector table for the highest
-> non-masked vector to initially enable that number of vectors in the
-> host, both to improve restore behavior after migration and avoid
-> overhead for guests that write the vector table before setting the
-> MSI-X capability enable bit (Windows?).
->
->>     1) VFIO provides just one command (VFIO_DEVICE_SET_IRQS) for 
->>          allocating/enabling irqs given a set of vMSIX vectors [start, count]:
->>         a) if irqs not allocated, allocate irqs [start+count]. Enable irqs for 
->>             specified vectors [start, count] via request_irq();
->>         b) if irqs already allocated, enable irqs for specified vectors;
->>         c) if irq already enabled, disable and re-enable irqs for specified
->>              vectors because user may specify a different eventfd;
->> 
->>     2) When guest enables virtual MSI-X capability, Qemu calls VFIO_
->>         DEVICE_SET_IRQS to enable vector#0, even though it's currently 
->>         masked by the guest. Interrupts are received by Qemu but blocked
->>         from guest via mask/pending bit emulation. The main intention is 
->>         to enable physical MSI-X;
->
-> Yes, this is a bit awkward since the interrupt API is via SET_IRQS and
-> we don't allow writes to the MSI-X enable bit via config space.
->  
->>     3) When guest unmasks vector#0 via request_irq(), Qemu calls VFIO_
->>         DEVICE_SET_IRQS to enable vector#0 again, with a eventfd different
->>         from the one provided in 2);
->> 
->>     4) When guest unmasks vector#1, Qemu finds it's outside of allocated
->>         vectors (only vector#0 now):
->> 
->>         a) Qemu first calls VFIO_DEVICE_SET_IRQS to disable and free 
->>             irq for vector#0;
->> 
->>         b) Qemu then calls VFIO_DEVICE_SET_IRQS to allocate and enable
->>             irqs for both vector#0 and vector#1;
->> 
->>      5) When guest unmasks vector#2, same flow in 4) continues.
+I see Alex has this in hch-mdev-direct-v4 in linux-next now, so
+expecting this to be in the next merge window?
 
-That's dangerous and makes weird assumptions about interrupts being
-requested early in the driver init() function. But that's wishful
-thinking, really. There are enough drivers, especially networking which
-request interrupts on device open() and not on device init(). Some
-special functions only request the irq way later, i.e. only when someone
-uses that special function and at this point the other irqs of that very
-same device are already in use.
+The AP prep patches seemed sorted so I'll resend the AP patch in three
+weeks
 
->> If above understanding is correct, how is lost interrupt avoided between 
->> 4.a) and 4.b) given that irq has been torn down for vector#0 in the middle
->> while from guest p.o.v this vector is actually unmasked? There must be
->> a mechanism in place, but I just didn't figure it out...
->
-> In practice unmasking new vectors is rare and done only at
-> initialization.  Risk from lost interrupts at this time is low.
-
-See above. Wishful thinking.
-
-OMG, I really don't want to be the one to debug _WHY_ a device lost
-interrupts just because it did a late request_irq() when the device is
-operational already and has other interrupts active.
-
-> When masking and unmasking vectors that are already in use, we're only
-> changing the signaling eventfd between KVM and QEMU such that QEMU can
-> set emulated pending bits in response to interrupts (and our lack of
-> interfaces to handle the mask/unmask at the host).  I believe that
-> locking in the vfio-pci driver prevents an interrupt from being lost
-> during the eventfd switch.
-
-Let's look at this from a driver perspective:
-
-  1) Driver checks how many entries are possible in the MSI-X table
-
-  2) Driver invokes pci_msix_enable[_range]() which returns the number
-     of vectors the system is willing to hand out to the driver.
-
-  3) Driver assigns the vectors to the different resources in the
-     hardware
-
-  4) Later on these interrupts are requested, but not necessarily during
-     device init.
-
-     Yes, request_irq() can fail and today it can fail also due to CPU
-     vector exhaustion. That's perfectly fine as the driver can handle
-     the fail and act accordingly.
-
-All of this is consistent and well defined.
-
-Now lets look at the guest. This VFIO mechanism introduces two brand new
-failure modes because of this:
-
-    guest::unmask()
-      trapped_by_host()
-        free_irqs();
-        pci_free_irq_vectors();
-          pci_disable_msix();
-        pci_alloc_irq_vectors();
-          pci_enable_msix();
-        request_irqs();
-        
-   #1 What happens if the host side allocation or the host side request_irq()
-      fails?
-
-        a) Guest is killed?
-        b) Failure is silently ignored and guest just does not receive
-           interrupts?
-        c) Any other mechanism?
-
-       Whatever it is, it simply _cannot_ make request_irq() in the
-       guest fail because the guest has already passed all failure
-       points and is in the low level function of unmasking the
-       interrupt for the first time after which is will return 0, aka
-       success.
-
-       So if you answer #a, fine with me. It's well defined.
-
-   #2 What happens to already active interrupts on that device which might
-      fire during that time?
-
-       They get lost or are redirected to the legacy PCI interrupt and
-       there is absolutely nothing you can do about that.
-
-       Simply because to prevent that the host side would have to
-       disable the interrupt source at the device level, i.e. fiddle
-       with actual device registers to shut up interrupt delivery and
-       reenable it afterwards again and thereby racing against some
-       other VCPU of the same guest which fiddles with that very same
-       registers.
-
-       IOW, undefined behaviour, which the "VFIO design" shrugged off on
-       completely unjustified assumptions.
-
-No matter how much you argue about this being unlikely, this is just
-broken. Unlikely simply does not exist at cloud scale.
-
-Aside of that. How did you come to the conclusion that #2 does not
-matter? By analyzing _every_ open and closed source driver for their
-usage patterns and documenting that all drivers which want to work in
-VFIO-PCI space have to follow specific rules vs. interrupt setup and
-usage? I'm pretty sure that you have a mechanism in place which
-monitors closely whether a driver violates those well documented rules.
-
-Yes, I know that I'm dreaming and the reality is that this is based on
-interesting assumptions and just works by chance.
-
-I have no idea _why_ this has been done that way. The changelogs of the
-relevant commits are void of useful content and lack links to the
-possibly existing discussions about this.
-
-I only can assume that back then the main problem was vector exhaustion
-on the host and to avoid allocating memory for interrupt descriptors
-etc, right?
-
-The host vector exhaustion problem was that each MSIX vector consumed a
-real CPU vector which is a limited resource on X86. This is not longer
-the case today:
-
-    1) pci_msix_enable[range]() consumes exactly zero CPU vectors from
-       the allocatable range independent of the number of MSIX vectors
-       it allocates, unless it is in multi-queue managed mode where it
-       will actually reserve a vector (maybe two) per CPU.
-
-       But for devices which are not using that mode, they just
-       opportunistically "reserve" vectors.
-
-       All entries are initialized with a special system vector which
-       when raised will emit a nastigram in dmesg.
-
-    2) request_irq() actually allocates a CPU vector from the
-       allocatable vector space which can obviously still fail, which is
-       perfectly fine.
-
-So the only downside today of allocating more MSI-X vectors than
-necessary is memory consumption for the irq descriptors.
-
-Though for virtualization there is still another problem:
-
-  Even if all possible MSI-X vectors for a passthrough PCI device would
-  be allocated upfront independent of the actual usage in the guest,
-  then there is still the issue of request_irq() failing on the host
-  once the guest decides to use any of those interrupts.
-
-It's a halfways reasonable argumentation by some definition of
-reasonable, that this case would be a host system configuration problem
-and the admin who overcommitted is responsible for the consequence.
-
-Where the only reasonable consequence is to kill the guest right there
-because there is no mechanism to actually tell it that the host ran out
-of resources.
-
-Not at all a pretty solution, but it is contrary to the status quo well
-defined. The most important aspect is that it is well defined for the
-case of success:
-
-  If it succeeds then there is no way that already requested interrupts
-  can be lost or end up being redirected to the legacy PCI irq due to
-  clearing the MSIX enable bit, which is a gazillion times better than
-  the "let's hope it works" based tinkerware we have now.
-
-So, aside of the existing VFIO/PCI/MSIX thing being just half thought
-out, even thinking about proliferating this with IMS is bonkers.
-
-IMS is meant to avoid the problem of MSI-X which needs to disable MSI-X
-in order to expand the number of vectors. The use cases are going to be
-even more dynamic than the usual device drivers, so the lost interrupt
-issue will be much more likely to trigger.
-
-So no, we are not going to proliferate this complete ignorance of how
-MSI-X actually works and just cram another "feature" into code which is
-known to be incorrect.
-
-Thanks,
-
-        tglx
+Jason
